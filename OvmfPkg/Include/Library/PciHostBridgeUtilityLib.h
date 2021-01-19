@@ -102,23 +102,27 @@ PciHostBridgeUtilityUninitRootBridge (
 /**
   Utility function to return all the root bridge instances in an array.
 
-  @param[out] Count            The number of root bridge instances.
+  @param[out] Count                  The number of root bridge instances.
 
-  @param[in]  Attributes       Initial attributes.
+  @param[in]  Attributes             Initial attributes.
 
-  @param[in]  AllocAttributes  Allocation attributes.
+  @param[in]  AllocAttributes        Allocation attributes.
 
-  @param[in]  Io               IO aperture.
+  @param[in]  DmaAbove4G             DMA above 4GB memory.
 
-  @param[in]  Mem              MMIO aperture.
+  @param[in]  NoExtendedConfigSpace  No Extended Config Space.
 
-  @param[in]  MemAbove4G       MMIO aperture above 4G.
+  @param[in]  Io                     IO aperture.
 
-  @param[in]  PMem             Prefetchable MMIO aperture.
+  @param[in]  Mem                    MMIO aperture.
 
-  @param[in]  PMemAbove4G      Prefetchable MMIO aperture above 4G.
+  @param[in]  MemAbove4G             MMIO aperture above 4G.
 
-  @return                      All the root bridge instances in an array.
+  @param[in]  PMem                   Prefetchable MMIO aperture.
+
+  @param[in]  PMemAbove4G            Prefetchable MMIO aperture above 4G.
+
+  @return                            All the root bridge instances in an array.
 **/
 PCI_ROOT_BRIDGE *
 EFIAPI
@@ -126,6 +130,8 @@ PciHostBridgeUtilityGetRootBridges (
   OUT UINTN                    *Count,
   IN  UINT64                   Attributes,
   IN  UINT64                   AllocationAttributes,
+  IN  BOOLEAN                  DmaAbove4G,
+  IN  BOOLEAN                  NoExtendedConfigSpace,
   IN  PCI_ROOT_BRIDGE_APERTURE *Io,
   IN  PCI_ROOT_BRIDGE_APERTURE *Mem,
   IN  PCI_ROOT_BRIDGE_APERTURE *MemAbove4G,
