@@ -49,6 +49,10 @@
   #                  access.
   PciCapPciSegmentLib|Include/Library/PciCapPciSegmentLib.h
 
+  ##  @libraryclass  Provide common utility functions to PciHostBridgeLib
+  #                  instances in ArmVirtPkg and OvmfPkg.
+  PciHostBridgeUtilityLib|Include/Library/PciHostBridgeUtilityLib.h
+
   ##  @libraryclass  Register a status code handler for printing the Boot
   #                  Manager's LoadImage() and StartImage() preparations, and
   #                  return codes, to the UEFI console.
