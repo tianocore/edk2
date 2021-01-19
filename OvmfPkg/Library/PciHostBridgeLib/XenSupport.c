@@ -456,6 +456,7 @@ ScanForRootBridges (
       ASSERT (RootBridges != NULL);
       PciHostBridgeUtilityInitRootBridge (
         Attributes, Attributes, 0,
+        FALSE, PcdGet16 (PcdOvmfHostBridgePciDevId) != INTEL_Q35_MCH_DEVICE_ID,
         (UINT8) PrimaryBus, (UINT8) SubBus,
         &Io, &Mem, &MemAbove4G, &mNonExistAperture, &mNonExistAperture,
         &RootBridges[*NumberOfRootBridges]

@@ -39,7 +39,3 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
-  PcdLib
-
-[Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
