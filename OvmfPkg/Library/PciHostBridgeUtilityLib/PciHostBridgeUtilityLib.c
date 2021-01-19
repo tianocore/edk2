@@ -200,6 +200,10 @@ PciHostBridgeUtilityUninitRootBridge (
 
   @param[in]  NoExtendedConfigSpace  No Extended Config Space.
 
+  @param[in]  BusMin                 Minimum Bus number, inclusive.
+
+  @param[in]  BusMax                 Maximum Bus number, inclusive.
+
   @param[in]  Io                     IO aperture.
 
   @param[in]  Mem                    MMIO aperture.
@@ -220,6 +224,8 @@ PciHostBridgeUtilityGetRootBridges (
   IN  UINT64                   AllocationAttributes,
   IN  BOOLEAN                  DmaAbove4G,
   IN  BOOLEAN                  NoExtendedConfigSpace,
+  IN  UINTN                    BusMin,
+  IN  UINTN                    BusMax,
   IN  PCI_ROOT_BRIDGE_APERTURE *Io,
   IN  PCI_ROOT_BRIDGE_APERTURE *Mem,
   IN  PCI_ROOT_BRIDGE_APERTURE *MemAbove4G,
@@ -238,6 +244,12 @@ PciHostBridgeUtilityGetRootBridges (
 
   *Count = 0;
 
+  if (BusMin > BusMax || BusMax > PCI_MAX_BUS) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid bus range with BusMin %Lu and BusMax "
+      "%Lu\n", __FUNCTION__, (UINT64)BusMin, (UINT64)BusMax));
+    return NULL;
+  }
+
   //
   // QEMU provides the number of extra root buses, shortening the exhaustive
   // search below. If there is no hint, the feature is missing.
@@ -249,7 +261,14 @@ PciHostBridgeUtilityGetRootBridges (
     QemuFwCfgSelectItem (FwCfgItem);
     QemuFwCfgReadBytes (FwCfgSize, &ExtraRootBridges);
 
-    if (ExtraRootBridges > PCI_MAX_BUS) {
+    //
+    // Validate the number of extra root bridges. As BusMax is inclusive, the
+    // max bus count is (BusMax - BusMin + 1). From that, the "main" root bus
+    // is always a given, so the max count for the "extra" root bridges is one
+    // less, i.e. (BusMax - BusMin). If the QEMU hint exceeds that, we have
+    // invalid behavior.
+    //
+    if (ExtraRootBridges > BusMax - BusMin) {
       DEBUG ((DEBUG_ERROR, "%a: invalid count of extra root buses (%Lu) "
         "reported by QEMU\n", __FUNCTION__, ExtraRootBridges));
       return NULL;
@@ -271,15 +290,15 @@ PciHostBridgeUtilityGetRootBridges (
   //
   // The "main" root bus is always there.
   //
-  LastRootBridgeNumber = 0;
+  LastRootBridgeNumber = BusMin;
 
   //
   // Scan all other root buses. If function 0 of any device on a bus returns a
   // VendorId register value different from all-bits-one, then that bus is
   // alive.
   //
-  for (RootBridgeNumber = 1;
-       RootBridgeNumber <= PCI_MAX_BUS && Initialized < ExtraRootBridges;
+  for (RootBridgeNumber = BusMin + 1;
+       RootBridgeNumber <= BusMax && Initialized < ExtraRootBridges;
        ++RootBridgeNumber) {
     UINTN Device;
 
@@ -329,7 +348,7 @@ PciHostBridgeUtilityGetRootBridges (
     DmaAbove4G,
     NoExtendedConfigSpace,
     (UINT8) LastRootBridgeNumber,
-    PCI_MAX_BUS,
+    (UINT8) BusMax,
     Io,
     Mem,
     MemAbove4G,

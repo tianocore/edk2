@@ -112,6 +112,10 @@ PciHostBridgeUtilityUninitRootBridge (
 
   @param[in]  NoExtendedConfigSpace  No Extended Config Space.
 
+  @param[in]  BusMin                 Minimum Bus number, inclusive.
+
+  @param[in]  BusMax                 Maximum Bus number, inclusive.
+
   @param[in]  Io                     IO aperture.
 
   @param[in]  Mem                    MMIO aperture.
@@ -132,6 +136,8 @@ PciHostBridgeUtilityGetRootBridges (
   IN  UINT64                   AllocationAttributes,
   IN  BOOLEAN                  DmaAbove4G,
   IN  BOOLEAN                  NoExtendedConfigSpace,
+  IN  UINTN                    BusMin,
+  IN  UINTN                    BusMax,
   IN  PCI_ROOT_BRIDGE_APERTURE *Io,
   IN  PCI_ROOT_BRIDGE_APERTURE *Mem,
   IN  PCI_ROOT_BRIDGE_APERTURE *MemAbove4G,
