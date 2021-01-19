@@ -42,7 +42,6 @@
   BaseLib
   BaseMemoryLib
   DebugLib
-  IoLib
   MemoryAllocationLib
   MtrrLib
   UefiBootServicesTableLib
