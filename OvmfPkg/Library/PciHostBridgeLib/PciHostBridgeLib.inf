@@ -39,6 +39,7 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
+  PciHostBridgeUtilityLib
   PciLib
   QemuFwCfgLib
 
