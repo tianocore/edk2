@@ -9,9 +9,6 @@
 **/
 #include <PiDxe.h>
 
-#include <IndustryStandard/Pci.h>
-#include <IndustryStandard/Q35MchIch9.h>
-
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciRootBridgeIo.h>
 
@@ -21,8 +18,6 @@
 #include <Library/PcdLib.h>
 #include <Library/PciHostBridgeLib.h>
 #include <Library/PciHostBridgeUtilityLib.h>
-#include <Library/PciLib.h>
-#include <Library/QemuFwCfgLib.h>
 #include "PciHostBridge.h"
 
 
@@ -44,14 +39,6 @@ PciHostBridgeGetRootBridges (
   UINTN *Count
   )
 {
-  EFI_STATUS           Status;
-  FIRMWARE_CONFIG_ITEM FwCfgItem;
-  UINTN                FwCfgSize;
-  UINT64               ExtraRootBridges;
-  PCI_ROOT_BRIDGE      *Bridges;
-  UINTN                Initialized;
-  UINTN                LastRootBridgeNumber;
-  UINTN                RootBridgeNumber;
   UINT64               Attributes;
   UINT64               AllocationAttributes;
   PCI_ROOT_BRIDGE_APERTURE Io;
@@ -89,123 +76,16 @@ PciHostBridgeGetRootBridges (
   Mem.Base = PcdGet64 (PcdPciMmio32Base);
   Mem.Limit = PcdGet64 (PcdPciMmio32Base) + (PcdGet64 (PcdPciMmio32Size) - 1);
 
-  *Count = 0;
-
-  //
-  // QEMU provides the number of extra root buses, shortening the exhaustive
-  // search below. If there is no hint, the feature is missing.
-  //
-  Status = QemuFwCfgFindFile ("etc/extra-pci-roots", &FwCfgItem, &FwCfgSize);
-  if (EFI_ERROR (Status) || FwCfgSize != sizeof ExtraRootBridges) {
-    ExtraRootBridges = 0;
-  } else {
-    QemuFwCfgSelectItem (FwCfgItem);
-    QemuFwCfgReadBytes (FwCfgSize, &ExtraRootBridges);
-
-    if (ExtraRootBridges > PCI_MAX_BUS) {
-      DEBUG ((DEBUG_ERROR, "%a: invalid count of extra root buses (%Lu) "
-        "reported by QEMU\n", __FUNCTION__, ExtraRootBridges));
-      return NULL;
-    }
-    DEBUG ((DEBUG_INFO, "%a: %Lu extra root buses reported by QEMU\n",
-      __FUNCTION__, ExtraRootBridges));
-  }
-
-  //
-  // Allocate the "main" root bridge, and any extra root bridges.
-  //
-  Bridges = AllocatePool ((1 + (UINTN)ExtraRootBridges) * sizeof *Bridges);
-  if (Bridges == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
-    return NULL;
-  }
-  Initialized = 0;
-
-  //
-  // The "main" root bus is always there.
-  //
-  LastRootBridgeNumber = 0;
-
-  //
-  // Scan all other root buses. If function 0 of any device on a bus returns a
-  // VendorId register value different from all-bits-one, then that bus is
-  // alive.
-  //
-  for (RootBridgeNumber = 1;
-       RootBridgeNumber <= PCI_MAX_BUS && Initialized < ExtraRootBridges;
-       ++RootBridgeNumber) {
-    UINTN Device;
-
-    for (Device = 0; Device <= PCI_MAX_DEVICE; ++Device) {
-      if (PciRead16 (PCI_LIB_ADDRESS (RootBridgeNumber, Device, 0,
-                       PCI_VENDOR_ID_OFFSET)) != MAX_UINT16) {
-        break;
-      }
-    }
-    if (Device <= PCI_MAX_DEVICE) {
-      //
-      // Found the next root bus. We can now install the *previous* one,
-      // because now we know how big a bus number range *that* one has, for any
-      // subordinate buses that might exist behind PCI bridges hanging off it.
-      //
-      Status = PciHostBridgeUtilityInitRootBridge (
-        Attributes,
-        Attributes,
-        AllocationAttributes,
-        FALSE,
-        PcdGet16 (PcdOvmfHostBridgePciDevId) != INTEL_Q35_MCH_DEVICE_ID,
-        (UINT8) LastRootBridgeNumber,
-        (UINT8) (RootBridgeNumber - 1),
-        &Io,
-        &Mem,
-        &MemAbove4G,
-        &mNonExistAperture,
-        &mNonExistAperture,
-        &Bridges[Initialized]
-        );
-      if (EFI_ERROR (Status)) {
-        goto FreeBridges;
-      }
-      ++Initialized;
-      LastRootBridgeNumber = RootBridgeNumber;
-    }
-  }
-
-  //
-  // Install the last root bus (which might be the only, ie. main, root bus, if
-  // we've found no extra root buses).
-  //
-  Status = PciHostBridgeUtilityInitRootBridge (
-    Attributes,
+  return PciHostBridgeUtilityGetRootBridges (
+    Count,
     Attributes,
     AllocationAttributes,
-    FALSE,
-    PcdGet16 (PcdOvmfHostBridgePciDevId) != INTEL_Q35_MCH_DEVICE_ID,
-    (UINT8) LastRootBridgeNumber,
-    PCI_MAX_BUS,
     &Io,
     &Mem,
     &MemAbove4G,
     &mNonExistAperture,
-    &mNonExistAperture,
-    &Bridges[Initialized]
+    &mNonExistAperture
     );
-  if (EFI_ERROR (Status)) {
-    goto FreeBridges;
-  }
-  ++Initialized;
-
-  *Count = Initialized;
-  return Bridges;
-
-FreeBridges:
-  while (Initialized > 0) {
-    --Initialized;
-    PciHostBridgeUtilityUninitRootBridge (&Bridges[Initialized]);
-  }
-
-  FreePool (Bridges);
-  return NULL;
 }
 
 
@@ -223,17 +103,7 @@ PciHostBridgeFreeRootBridges (
   UINTN           Count
   )
 {
-  if (Bridges == NULL && Count == 0) {
-    return;
-  }
-  ASSERT (Bridges != NULL && Count > 0);
-
-  do {
-    --Count;
-    PciHostBridgeUtilityUninitRootBridge (&Bridges[Count]);
-  } while (Count > 0);
-
-  FreePool (Bridges);
+  PciHostBridgeUtilityFreeRootBridges (Bridges, Count);
 }
 
 
