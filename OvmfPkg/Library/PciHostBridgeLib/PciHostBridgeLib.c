@@ -9,6 +9,9 @@
 **/
 #include <PiDxe.h>
 
+#include <IndustryStandard/Pci.h>
+#include <IndustryStandard/Q35MchIch9.h>
+
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciRootBridgeIo.h>
 
@@ -80,6 +83,8 @@ PciHostBridgeGetRootBridges (
     Count,
     Attributes,
     AllocationAttributes,
+    FALSE,
+    PcdGet16 (PcdOvmfHostBridgePciDevId) != INTEL_Q35_MCH_DEVICE_ID,
     &Io,
     &Mem,
     &MemAbove4G,
