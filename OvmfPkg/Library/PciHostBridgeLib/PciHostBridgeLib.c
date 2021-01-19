@@ -10,6 +10,7 @@
 #include <PiDxe.h>
 
 #include <IndustryStandard/Pci.h>
+#include <IndustryStandard/Q35MchIch9.h>
 
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciRootBridgeIo.h>
@@ -151,6 +152,8 @@ PciHostBridgeGetRootBridges (
         Attributes,
         Attributes,
         AllocationAttributes,
+        FALSE,
+        PcdGet16 (PcdOvmfHostBridgePciDevId) != INTEL_Q35_MCH_DEVICE_ID,
         (UINT8) LastRootBridgeNumber,
         (UINT8) (RootBridgeNumber - 1),
         &Io,
@@ -176,6 +179,8 @@ PciHostBridgeGetRootBridges (
     Attributes,
     Attributes,
     AllocationAttributes,
+    FALSE,
+    PcdGet16 (PcdOvmfHostBridgePciDevId) != INTEL_Q35_MCH_DEVICE_ID,
     (UINT8) LastRootBridgeNumber,
     PCI_MAX_BUS,
     &Io,
