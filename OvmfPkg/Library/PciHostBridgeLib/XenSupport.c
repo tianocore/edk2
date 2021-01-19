@@ -19,6 +19,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PciHostBridgeLib.h>
+#include <Library/PciHostBridgeUtilityLib.h>
 #include <Library/PciLib.h>
 #include "PciHostBridge.h"
 
@@ -453,7 +454,7 @@ ScanForRootBridges (
         RootBridges
       );
       ASSERT (RootBridges != NULL);
-      InitRootBridge (
+      PciHostBridgeUtilityInitRootBridge (
         Attributes, Attributes, 0,
         (UINT8) PrimaryBus, (UINT8) SubBus,
         &Io, &Mem, &MemAbove4G, &mNonExistAperture, &mNonExistAperture,
