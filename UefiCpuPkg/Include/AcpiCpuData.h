@@ -178,6 +178,8 @@ typedef struct {
   // If TableLength is > 0, then elements of RegisterTableEntry are used to
   // initialize the CPU that matches InitialApicId, during an ACPI S3 resume,
   // before SMBASE relocation is performed.
+  // If a register table is not required for any one of the CPUs, then
+  // PreSmmInitRegisterTable may be set to 0.
   //
   EFI_PHYSICAL_ADDRESS  PreSmmInitRegisterTable;
   //
@@ -187,6 +189,8 @@ typedef struct {
   // If TableLength is > 0, then elements of RegisterTableEntry are used to
   // initialize the CPU that matches InitialApicId, during an ACPI S3 resume,
   // after SMBASE relocation is performed.
+  // If a register table is not required for any one of the CPUs, then
+  // RegisterTable may be set to 0.
   //
   EFI_PHYSICAL_ADDRESS  RegisterTable;
   //
