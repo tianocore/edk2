@@ -6,6 +6,16 @@
 **/
 
 #include "UefiPayloadEntry.h"
+#include <Guid/MemoryTypeInformation.h>
+
+EFI_MEMORY_TYPE_INFORMATION mDefaultMemoryTypeInformation[] = {
+  { EfiACPIReclaimMemory,   FixedPcdGet32 (PcdMemoryTypeEfiACPIReclaimMemory) },
+  { EfiACPIMemoryNVS,       FixedPcdGet32 (PcdMemoryTypeEfiACPIMemoryNVS) },
+  { EfiReservedMemoryType,  FixedPcdGet32 (PcdMemoryTypeEfiReservedMemoryType) },
+  { EfiRuntimeServicesData, FixedPcdGet32 (PcdMemoryTypeEfiRuntimeServicesData) },
+  { EfiRuntimeServicesCode, FixedPcdGet32 (PcdMemoryTypeEfiRuntimeServicesCode) },
+  { EfiMaxMemoryType,       0     }
+};
 
 /**
    Callback function to build resource descriptor HOB
@@ -42,6 +52,9 @@ MemInfoCallback (
 
   if (Base >= BASE_4GB ) {
     // Remove tested attribute to avoid DXE core to dispatch driver to memory above 4GB
+    Attribue &= ~EFI_RESOURCE_ATTRIBUTE_TESTED;
+  }
+  if (Base == 0x00) {
     Attribue &= ~EFI_RESOURCE_ATTRIBUTE_TESTED;
   }
 
@@ -314,6 +327,13 @@ BuildGenericHob (
   UINT32                           RegEax;
   UINT8                            PhysicalAddressBits;
   EFI_RESOURCE_ATTRIBUTE_TYPE      ResourceAttribute;
+
+  //
+  // Create Memory Type Information HOB
+  //
+  BuildGuidDataHob (&gEfiMemoryTypeInformationGuid,
+                    mDefaultMemoryTypeInformation,
+                    sizeof (mDefaultMemoryTypeInformation));
 
   // The UEFI payload FV
   BuildMemoryAllocationHob (PcdGet32 (PcdPayloadFdMemBase), PcdGet32 (PcdPayloadFdMemSize), EfiBootServicesData);
