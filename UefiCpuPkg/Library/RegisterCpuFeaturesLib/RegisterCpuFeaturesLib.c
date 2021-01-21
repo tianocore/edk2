@@ -957,6 +957,7 @@ GetAcpiCpuData (
     //
     // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
     //
+    NumberOfCpus = AcpiCpuData->NumberOfCpus;
     TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
     RegisterTable  = AllocatePages (EFI_SIZE_TO_PAGES (TableSize));
     ASSERT (RegisterTable != NULL);
