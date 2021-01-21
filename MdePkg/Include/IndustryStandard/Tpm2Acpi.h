@@ -2,6 +2,7 @@
   TPM2 ACPI table definition.
 
 Copyright (c) 2013 - 2019, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2021, Ampere Computing LLC. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -47,6 +48,18 @@ typedef struct {
   UINT32   ResponseSize;
   UINT64   Response;
 } EFI_TPM2_ACPI_CONTROL_AREA;
+
+//
+// Start Method Specific Parameters for ARM SMC Start Method (11)
+// Refer to Table 9: Start Method Specific Parameters for ARM SMC
+//
+typedef struct {
+  UINT32   Interrupt;
+  UINT8    Flags;
+  UINT8    OperationFlags;
+  UINT8    Reserved[2];
+  UINT32   SmcFunctionId;
+} EFI_TPM2_ACPI_START_METHOD_SPECIFIC_PARAMETERS_ARM_SMC;
 
 #pragma pack ()
 
