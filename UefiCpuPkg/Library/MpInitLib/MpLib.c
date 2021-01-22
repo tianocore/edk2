@@ -769,15 +769,6 @@ ApWakeupFunction (
       RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
-
-      //
-      // Delay decrementing the APs executing count when SEV-ES is enabled
-      // to allow the APs to issue an AP_RESET_HOLD before the BSP possibly
-      // performs another INIT-SIPI-SIPI sequence.
-      //
-      if (!CpuMpData->SevEsIsEnabled) {
-        InterlockedDecrement ((UINT32 *) &CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
-      }
     } else {
       //
       // Execute AP function if AP is ready
@@ -866,19 +857,33 @@ ApWakeupFunction (
       }
     }
 
-    //
-    // AP finished executing C code
-    //
-    InterlockedIncrement ((UINT32 *) &CpuMpData->FinishedCount);
-
-    //
-    // Place AP is specified loop mode
-    //
     if (CpuMpData->ApLoopMode == ApInHltLoop) {
       //
       // Save AP volatile registers
       //
       SaveVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
+    }
+
+    //
+    // AP finished executing C code
+    //
+    InterlockedIncrement ((UINT32 *) &CpuMpData->FinishedCount);
+
+    if (CpuMpData->InitFlag == ApInitConfig) {
+      //
+      // Delay decrementing the APs executing count when SEV-ES is enabled
+      // to allow the APs to issue an AP_RESET_HOLD before the BSP possibly
+      // performs another INIT-SIPI-SIPI sequence.
+      //
+      if (!CpuMpData->SevEsIsEnabled) {
+        InterlockedDecrement ((UINT32 *) &CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
+      }
+    }
+
+    //
+    // Place AP is specified loop mode
+    //
+    if (CpuMpData->ApLoopMode == ApInHltLoop) {
       //
       // Place AP in HLT-loop
       //
