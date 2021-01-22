@@ -1,7 +1,7 @@
 /** @file
   CPU PEI Module installs CPU Multiple Processor PPI.
 
-  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -532,13 +532,9 @@ InitializeMpExceptionStackSwitchHandlers (
   ExceptionNumber = FixedPcdGetSize (PcdCpuStackSwitchExceptionList);
   NewStackSize = FixedPcdGet32 (PcdCpuKnownGoodStackSize) * ExceptionNumber;
 
-  Status = PeiServicesAllocatePool (
-             NewStackSize * NumberOfProcessors,
-             (VOID **)&StackTop
-             );
+  StackTop = AllocatePages (EFI_SIZE_TO_PAGES (NewStackSize * NumberOfProcessors));
   ASSERT(StackTop != NULL);
-  if (EFI_ERROR (Status)) {
-    ASSERT_EFI_ERROR (Status);
+  if (StackTop == NULL) {
     return;
   }
   StackTop += NewStackSize  * NumberOfProcessors;
