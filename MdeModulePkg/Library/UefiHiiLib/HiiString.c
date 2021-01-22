@@ -1,7 +1,8 @@
 /** @file
   HII Library implementation that uses DXE protocols and services.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+ (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -190,16 +191,8 @@ HiiGetPackageString (
 }
 
 /**
-  Retrieves a string from a string package in a specific language.  If the language
-  is not specified, then a string from a string package in the current platform
-  language is retrieved.  If the string can not be retrieved using the specified
-  language or the current platform language, then the string is retrieved from
-  the string package in the first language the string package supports.  The
-  returned string is allocated using AllocatePool().  The caller is responsible
-  for freeing the allocated buffer using FreePool().
-
-  If HiiHandle is NULL, then ASSERT().
-  If StringId is 0, then ASSET.
+  Retrieves a string from a string package in a specific language specified in Language
+  or in the best lanaguage. See HiiGetStringEx () for the details.
 
   @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
   @param[in]  StringId   The identifier of the string to retrieved from the string
@@ -221,6 +214,51 @@ HiiGetString (
   IN CONST CHAR8     *Language  OPTIONAL
   )
 {
+  return HiiGetStringEx (HiiHandle, StringId, Language, TRUE);
+}
+
+/**
+  Retrieves a string from a string package in a specific language or in the best
+  language at discretion of this function according to the priority of languages.
+  TryBestLanguage is used to get the string in the best language or in the language
+  specified in Language parameter. The behavior is,
+  If TryBestLanguage is TRUE, this function looks for the best language for the string.
+   - If the string can not be retrieved using the specified language or the current
+     platform language, then the string is retrieved from the string package in the
+     first language the string package supports.
+  If TryBestLanguage is FALSE, Language must be specified for retrieving the string.
+
+  The returned string is allocated using AllocatePool().  The caller is responsible
+  for freeing the allocated buffer using FreePool().
+
+  If HiiHandle is NULL, then ASSERT().
+  If StringId is 0, then ASSET.
+  If TryBestLanguage is FALE and Language is NULL, then ASSERT().
+
+  @param[in]  HiiHandle         A handle that was previously registered in the HII Database.
+  @param[in]  StringId          The identifier of the string to retrieved from the string
+                                package associated with HiiHandle.
+  @param[in]  Language          The language of the string to retrieve.  If this parameter
+                                is NULL, then the current platform language is used.  The
+                                format of Language must follow the language format assumed
+                                the HII Database.
+  @param[in]  TryBestLanguage   If TRUE, try to get the best matching language from all
+                                supported languages.If FALSE, the Language must be assigned
+                                for the StringID.
+
+  @retval NULL   The string specified by StringId is not present in the string package.
+  @retval Other  The string was returned.
+
+**/
+EFI_STRING
+EFIAPI
+HiiGetStringEx (
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN EFI_STRING_ID   StringId,
+  IN CONST CHAR8     *Language  OPTIONAL,
+  IN BOOLEAN         TryBestLanguage
+  )
+{
   EFI_STATUS  Status;
   UINTN       StringSize;
   CHAR16      TempString;
@@ -231,7 +269,10 @@ HiiGetString (
 
   ASSERT (HiiHandle != NULL);
   ASSERT (StringId != 0);
-
+  //
+  // Language must be specified if TryBestLanguage = FALSE.
+  //
+  ASSERT (!(!TryBestLanguage && Language == NULL));
   //
   // Initialize all allocated buffers to NULL
   //
@@ -261,20 +302,25 @@ HiiGetString (
     Language = "";
   }
 
-  //
-  // Get the best matching language from SupportedLanguages
-  //
-  BestLanguage = GetBestLanguage (
-                   SupportedLanguages,
-                   FALSE,                                             // RFC 4646 mode
-                   Language,                                          // Highest priority
-                   PlatformLanguage != NULL ? PlatformLanguage : "",  // Next highest priority
-                   SupportedLanguages,                                // Lowest priority
-                   NULL
-                   );
-  if (BestLanguage == NULL) {
-    goto Error;
+  if (TryBestLanguage) {
+    //
+    // Get the best matching language from SupportedLanguages
+    //
+    BestLanguage = GetBestLanguage (
+                     SupportedLanguages,
+                     FALSE,                                             // RFC 4646 mode
+                     Language,                                          // Highest priority
+                     PlatformLanguage != NULL ? PlatformLanguage : "",  // Next highest priority
+                     SupportedLanguages,                                // Lowest priority
+                     NULL
+                     );
+    if (BestLanguage == NULL) {
+      goto Error;
+    }
+  } else {
+    BestLanguage = (CHAR8 *) Language;
   }
+
 
   //
   // Retrieve the size of the string in the string package for the BestLanguage
@@ -337,7 +383,7 @@ Error:
   if (PlatformLanguage != NULL) {
     FreePool (PlatformLanguage);
   }
-  if (BestLanguage != NULL) {
+  if (TryBestLanguage && BestLanguage != NULL) {
     FreePool (BestLanguage);
   }
 
