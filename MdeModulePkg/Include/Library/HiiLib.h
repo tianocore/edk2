@@ -1,7 +1,8 @@
 /** @file
   Public include file for the HII Library
 
-Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -123,16 +124,8 @@ HiiSetString (
 ;
 
 /**
-  Retrieves a string from a string package in a specific language.  If the language
-  is not specified, then a string from a string package in the current platform
-  language is retrieved.  If the string cannot be retrieved using the specified
-  language or the current platform language, then the string is retrieved from
-  the string package in the first language the string package supports.  The
-  returned string is allocated using AllocatePool().  The caller is responsible
-  for freeing the allocated buffer using FreePool().
-
-  If HiiHandle is NULL, then ASSERT().
-  If StringId is 0, then ASSERT().
+  Retrieves a string from a string package in a specific language specified in Language
+  or in the best lanaguage. See HiiGetStringEx () for the details.
 
   @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
   @param[in]  StringId   The identifier of the string to retrieved from the string
@@ -152,8 +145,49 @@ HiiGetString (
   IN EFI_HII_HANDLE  HiiHandle,
   IN EFI_STRING_ID   StringId,
   IN CONST CHAR8     *Language  OPTIONAL
-  )
-;
+  );
+
+/**
+  Retrieves a string from a string package in a specific language or in the best
+  language at discretion of this function according to the priority of languages.
+  TryBestLanguage is used to get the string in the best language or in the language
+  specified in Language parameter. The behavior is,
+  If TryBestLanguage is TRUE, this function looks for the best language for the string.
+   - If the string can not be retrieved using the specified language or the current
+     platform language, then the string is retrieved from the string package in the
+     first language the string package supports.
+  If TryBestLanguage is FALSE, Language must be specified for retrieving the string.
+
+  The returned string is allocated using AllocatePool().  The caller is responsible
+  for freeing the allocated buffer using FreePool().
+
+  If HiiHandle is NULL, then ASSERT().
+  If StringId is 0, then ASSET.
+  If TryBestLanguage is FALE and Language is NULL, then ASSERT().
+
+  @param[in]  HiiHandle         A handle that was previously registered in the HII Database.
+  @param[in]  StringId          The identifier of the string to retrieved from the string
+                                package associated with HiiHandle.
+  @param[in]  Language          The language of the string to retrieve.  If this parameter
+                                is NULL, then the current platform language is used.  The
+                                format of Language must follow the language format assumed
+                                the HII Database.
+  @param[in]  TryBestLanguage   If TRUE, try to get the best matching language from all
+                                supported languages.If FALSE, the Language must be assigned
+                                for the StringID.
+
+  @retval NULL   The string specified by StringId is not present in the string package.
+  @retval Other  The string was returned.
+
+**/
+EFI_STRING
+EFIAPI
+HiiGetStringEx (
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN EFI_STRING_ID   StringId,
+  IN CONST CHAR8     *Language  OPTIONAL,
+  IN BOOLEAN         TryBestLanguage
+  );
 
 /**
   Retrieves a string from a string package named by GUID, in the specified language.
