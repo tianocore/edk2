@@ -16,11 +16,17 @@
 
 #include "QemuFlash.h"
 
+STATIC EFI_PHYSICAL_ADDRESS mSevEsFlashPhysBase;
+
 VOID
 QemuFlashConvertPointers (
   VOID
   )
 {
+  if (MemEncryptSevEsIsEnabled ()) {
+    mSevEsFlashPhysBase = (UINTN) mFlashBase;
+  }
+
   EfiConvertPointer (0x0, (VOID **) &mFlashBase);
 }
 
@@ -52,10 +58,22 @@ QemuFlashPtrWrite (
   if (MemEncryptSevEsIsEnabled ()) {
     MSR_SEV_ES_GHCB_REGISTER  Msr;
     GHCB                      *Ghcb;
+    EFI_PHYSICAL_ADDRESS      PhysAddr;
     BOOLEAN                   InterruptState;
 
     Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
     Ghcb = Msr.Ghcb;
+
+    //
+    // The MMIO write needs to be to the physical address of the flash pointer.
+    // Since this service is available as part of the EFI runtime services,
+    // account for a non-identity mapped VA after SetVirtualAddressMap().
+    //
+    if (mSevEsFlashPhysBase == 0) {
+      PhysAddr = (UINTN) Ptr;
+    } else {
+      PhysAddr = mSevEsFlashPhysBase + (Ptr - mFlashBase);
+    }
 
     //
     // Writing to flash is emulated by the hypervisor through the use of write
@@ -68,7 +86,7 @@ QemuFlashPtrWrite (
     Ghcb->SharedBuffer[0] = Value;
     Ghcb->SaveArea.SwScratch = (UINT64) (UINTN) Ghcb->SharedBuffer;
     VmgSetOffsetValid (Ghcb, GhcbSwScratch);
-    VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, (UINT64) (UINTN) Ptr, 1);
+    VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, PhysAddr, 1);
     VmgDone (Ghcb, InterruptState);
   } else {
     *Ptr = Value;
