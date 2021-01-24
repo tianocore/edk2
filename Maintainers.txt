@@ -576,10 +576,12 @@ R: Catharine West <catharine.west@intel.com>
 UefiPayloadPkg
 F: UefiPayloadPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
-M: Maurice Ma <maurice.ma@intel.com>
 M: Guo Dong <guo.dong@intel.com>
-M: Benjamin You <benjamin.you@intel.com>
+M: Philipp Deppenwiese <philipp.deppenwiese@9elements.com>
+R: Benjamin You <benjamin.you@intel.com>
+R: Maurice Ma <maurice.ma@intel.com>
 S: Maintained
+
 
 UnitTestFrameworkPkg
 F: UnitTestFrameworkPkg/
