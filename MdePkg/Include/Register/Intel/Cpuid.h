@@ -3601,7 +3601,7 @@ typedef union {
   CPUID Hybrid Information Enumeration Leaf
 
   @param   EAX  CPUID_HYBRID_INFORMATION (0x1A)
-  @param   ECX  CPUID_HYBRID_INFORMATION_SUB_LEAF (0x00).
+  @param   ECX  CPUID_HYBRID_INFORMATION_MAIN_LEAF (0x00).
 
   @retval  EAX  Enumerates the native model ID and core type described
                 by the type CPUID_NATIVE_MODEL_ID_AND_CORE_TYPE_EAX
@@ -3615,7 +3615,7 @@ typedef union {
 
   AsmCpuidEx (
     CPUID_HYBRID_INFORMATION,
-    CPUID_HYBRID_INFORMATION_SUB_LEAF,
+    CPUID_HYBRID_INFORMATION_MAIN_LEAF,
     &Eax, NULL, NULL, NULL
     );
   @endcode
@@ -3624,13 +3624,13 @@ typedef union {
 #define CPUID_HYBRID_INFORMATION                                       0x1A
 
 ///
-/// CPUID Hybrid Information Enumeration sub-leaf
+/// CPUID Hybrid Information Enumeration main leaf
 ///
-#define CPUID_HYBRID_INFORMATION_SUB_LEAF                               0x00
+#define CPUID_HYBRID_INFORMATION_MAIN_LEAF                              0x00
 
 /**
   CPUID Hybrid Information EAX for CPUID leaf #CPUID_HYBRID_INFORMATION,
-  sub-leaf #CPUID_HYBRID_INFORMATION_SUB_LEAF.
+  main leaf #CPUID_HYBRID_INFORMATION_MAIN_LEAF.
 **/
 typedef union {
   ///
@@ -3656,6 +3656,15 @@ typedef union {
   ///
   UINT32  Uint32;
 } CPUID_NATIVE_MODEL_ID_AND_CORE_TYPE_EAX;
+
+///
+/// @{ Define value for CPUID_NATIVE_MODEL_ID_AND_CORE_TYPE_EAX.CoreType
+///
+#define   CPUID_CORE_TYPE_INTEL_ATOM                                    0x20
+#define   CPUID_CORE_TYPE_INTEL_CORE                                    0x40
+///
+/// @}
+///
 
 
 /**
