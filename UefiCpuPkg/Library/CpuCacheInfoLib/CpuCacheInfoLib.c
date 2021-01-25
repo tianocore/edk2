@@ -175,7 +175,7 @@ CpuCacheInfoCollectCoreAndCacheData (
   //
   Context->ProcessorInfo[ProcessorIndex].CoreType = 0;
   if (CpuidMaxInput >= CPUID_HYBRID_INFORMATION) {
-    AsmCpuidEx (CPUID_HYBRID_INFORMATION, CPUID_HYBRID_INFORMATION_SUB_LEAF, &NativeModelIdAndCoreTypeEax.Uint32, NULL, NULL, NULL);
+    AsmCpuidEx (CPUID_HYBRID_INFORMATION, CPUID_HYBRID_INFORMATION_MAIN_LEAF, &NativeModelIdAndCoreTypeEax.Uint32, NULL, NULL, NULL);
     Context->ProcessorInfo[ProcessorIndex].CoreType = (UINT8) NativeModelIdAndCoreTypeEax.Bits.CoreType;
   }
 
