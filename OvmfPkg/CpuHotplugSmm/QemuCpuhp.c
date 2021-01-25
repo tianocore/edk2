@@ -67,7 +67,17 @@ QemuCpuhpReadCpuStatus (
   return CpuStatus;
 }
 
-UINT8
+/**
+  Collect the APIC IDs of
+  - the CPUs that have been hot-plugged,
+  - the CPUs that are about to be hot-unplugged.
+
+  @param[in] MmCpuIo      The EFI_MM_CPU_IO_PROTOCOL instance for
+                          accessing IO Ports.
+
+  @param[in] CpuStatus    CPU status value to write
+**/
+VOID
 QemuCpuhpWriteCpuStatus (
   IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
   IN UINT8                        CpuStatus
@@ -87,7 +97,6 @@ QemuCpuhpWriteCpuStatus (
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
-  return Status;
 }
 
 UINT32

@@ -67,7 +67,7 @@ STATIC EFI_HANDLE mDispatchHandle;
 /**
   CPU Hotplug handler function.
 
-  @param[in] mPluggedApicIds     List of APIC IDs to be plugged.
+  @param[in] PluggedApicIds      List of APIC IDs to be plugged.
 
   @param[in] PluggedCount        Count of APIC IDs to be plugged.
 
@@ -80,7 +80,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 PlugCpus(
-  IN APIC_ID                      *mPluggedApicIds,
+  IN APIC_ID                      *PluggedApicIds,
   IN UINT32                       PluggedCount
   )
 {
@@ -105,7 +105,7 @@ PlugCpus(
     UINT32  CheckSlot;
     UINTN   NewProcessorNumberByProtocol;
 
-    NewApicId = mPluggedApicIds[PluggedIdx];
+    NewApicId = PluggedApicIds[PluggedIdx];
 
     //
     // Check if the supposedly hot-added CPU is already known to us.
@@ -183,6 +183,19 @@ Fatal:
   return EFI_INTERRUPT_PENDING;
 }
 
+/**
+  CPU Hot-eject handler function.
+
+  If the executing CPU is neither worker nor to be ejected: NOP
+
+  If the executing CPU is to be ejected: wait in a CpuDeadLoop()
+  until ejected.
+
+  If the executing CPU is a worker CPU: tell QEMU to eject the
+  CPUs to be ejected.
+
+  @param[in] ProcessorNum      Index of executing CPU.
+**/
 VOID
 EFIAPI
 CpuEject(
@@ -204,7 +217,9 @@ CpuEject(
     UINT32 CpuIndex;
 
     for (CpuIndex = 0; CpuIndex < mCpuHotEjectData->ArrayLength; CpuIndex++) {
-      UINT64 RemoveApicId = mCpuHotEjectData->ApicIdMap[CpuIndex];
+      UINT64 RemoveApicId;
+
+      RemoveApicId = mCpuHotEjectData->ApicIdMap[CpuIndex];
 
       if ((RemoveApicId != CPU_EJECT_INVALID &&
            RemoveApicId != CPU_EJECT_WORKER)) {
@@ -216,7 +231,7 @@ CpuEject(
         //
         // Tell QEMU to context-switch it out.
         //
-        QemuCpuhpWriteCpuSelector (mMmCpuIo, RemoveApicId);
+        QemuCpuhpWriteCpuSelector (mMmCpuIo, (APIC_ID) RemoveApicId);
         QemuCpuhpWriteCpuStatus (mMmCpuIo, QEMU_CPUHP_STAT_EJECTED);
 
         //
@@ -262,7 +277,7 @@ CpuEject(
 /**
   CPU Hot-unplug MMI handler function.
 
-  @param[in] mUnplugApicIds      List of APIC IDs to be unplugged.
+  @param[in] UnplugApicIds       List of APIC IDs to be unplugged.
 
   @param[in] ToUnplugCount       Count of APIC IDs to be unplugged.
 
@@ -275,20 +290,21 @@ STATIC
 EFI_STATUS
 EFIAPI
 UnplugCpus(
-  IN APIC_ID                      *mUnplugApicIds,
+  IN APIC_ID                      *UnplugApicIds,
   IN UINT32                       ToUnplugCount
   )
 {
-  EFI_STATUS Status = EFI_SUCCESS;
+  EFI_STATUS Status;
   UINT32     ToUnplugIdx;
-  UINT32     EjectCount = 0;
+  UINT32     EjectCount;
   UINTN      ProcessorNum;
 
   ToUnplugIdx = 0;
+  EjectCount = 0;
   while (ToUnplugIdx < ToUnplugCount) {
     APIC_ID    RemoveApicId;
 
-    RemoveApicId = mUnplugApicIds[ToUnplugIdx];
+    RemoveApicId = UnplugApicIds[ToUnplugIdx];
 
     //
     // mCpuHotPlugData->ApicId maps ProcessorNum -> ApicId. Use it to find
@@ -343,7 +359,7 @@ UnplugCpus(
     ToUnplugIdx++;
   }
 
-  if (EjectCount) {
+  if (EjectCount != 0) {
     UINTN  Worker;
 
     Status = mMmCpuService->WhoAmI(mMmCpuService, &Worker);
