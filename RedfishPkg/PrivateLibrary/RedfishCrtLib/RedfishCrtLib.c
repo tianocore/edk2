@@ -15,6 +15,10 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 int  errno = 0;
+char errnum_message [] = "We don't support to map errnum to the error message on edk2 Redfish\n";
+
+// This is required to keep VC++ happy if you use floating-point
+int _fltused  = 1;
 
 /**
   Determine if a particular character is an alphanumeric character
@@ -465,6 +469,77 @@ strtod (const char * __restrict nptr, char ** __restrict endptr) {
     return (double)0;
 }
 
+static UINT8  BitMask[] = {
+  0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
+  };
+
+#define WHICH8(c)     ((unsigned char)(c) >> 3)
+#define WHICH_BIT(c)  (BitMask[((c) & 0x7)])
+#define BITMAP64      ((UINT64 *)bitmap)
+
+static
+void
+BuildBitmap(unsigned char * bitmap, const char *s2, int n)
+{
+  unsigned char bit;
+  int           index;
+
+  // Initialize bitmap.  Bit 0 is always 1 which corresponds to '\0'
+  for (BITMAP64[0] = index = 1; index < n; index++) {
+    BITMAP64[index] = 0;
+  }
+
+  // Set bits in bitmap corresponding to the characters in s2
+  for (; *s2 != '\0'; s2++) {
+    index = WHICH8(*s2);
+    bit = WHICH_BIT(*s2);
+    bitmap[index] = bitmap[index] | bit;
+  }
+}
+
+/** The strpbrk function locates the first occurrence in the string pointed to
+    by s1 of any character from the string pointed to by s2.
+
+    @return   The strpbrk function returns a pointer to the character, or a
+              null pointer if no character from s2 occurs in s1.
+**/
+char *
+strpbrk(const char *s1, const char *s2)
+{
+  UINT8 bitmap[ (((UCHAR_MAX + 1) / CHAR_BIT) + (CHAR_BIT - 1)) & ~7U];
+  UINT8 bit;
+  int index;
+
+  BuildBitmap( bitmap, s2, sizeof(bitmap) / sizeof(UINT64));
+
+  for( ; *s1 != '\0'; ++s1) {
+    index = WHICH8(*s1);
+    bit = WHICH_BIT(*s1);
+    if( (bitmap[index] & bit) != 0) {
+      return (char *)s1;
+    }
+  }
+  return NULL;
+}
+
+/** The strerror function maps the number in errnum to a message string.
+    Typically, the values for errnum come from errno, but strerror shall map
+    any value of type int to a message.
+
+    The implementation shall behave as if no library function calls the
+    strerror function.
+
+    @return   The strerror function returns a pointer to the string, the
+              contents of which are locale specific.  The array pointed to
+              shall not be modified by the program, but may be overwritten by
+              a subsequent call to the strerror function.
+**/
+char *
+strerror(int errnum)
+{
+  return errnum_message;
+}
+
 /**
   Allocate and zero-initialize array.
 **/
@@ -592,7 +667,52 @@ void qsort (void *base, size_t num, size_t width, int (*compare)(const void *, c
 
 **/
 int fgetc(FILE * _File){
-   return 0;
+   return EOF;
+}
+/**
+  Open stream file, we don't support file operastion on edk2 JSON library.
+
+  @return 0 Unsupported
+
+**/
+FILE *fopen (const char *filename, const char *mode) {
+  return NULL;
+}
+/**
+  Read stream from file, we don't support file operastion on edk2 JSON library.
+
+  @return 0 Unsupported
+
+**/
+size_t fread (void * ptr, size_t size, size_t count, FILE * stream) {
+  return 0;
+}
+/**
+  Write stream from file, we don't support file operastion on edk2 JSON library.
+
+  @return 0 Unsupported
+
+**/
+size_t fwrite (const void * ptr, size_t size, size_t count, FILE * stream) {
+  return 0;
+}
+/**
+  Close file, we don't support file operastion on edk2 JSON library.
+
+  @return 0 Unsupported
+
+**/
+int fclose (FILE * stream) {
+  return EOF;
+}
+/**
+  Write the formatted string to file, we don't support file operastion on edk2 JSON library.
+
+  @return 0 Unsupported
+
+**/
+int fprintf (FILE * stream, const char * format, ...) {
+  return -1;
 }
 /**
   This function check if this is the formating string specifier.
