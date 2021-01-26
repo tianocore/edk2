@@ -13,6 +13,7 @@
 ; Notes:
 ;
 ;------------------------------------------------------------------------------
+%include "Nasm.inc"
 
 ;
 ; CommonExceptionHandler()
@@ -23,6 +24,7 @@
 extern ASM_PFX(mErrorCodeFlag)    ; Error code flags for exceptions
 extern ASM_PFX(mDoFarReturnFlag)  ; Do far return flag
 extern ASM_PFX(CommonExceptionHandler)
+extern ASM_PFX(FeaturePcdGet (PcdCpuSmmStackGuard))
 
 SECTION .data
 
@@ -371,8 +373,48 @@ DoReturn:
     push    qword [rax + 0x18]       ; save EFLAGS in new location
     mov     rax, [rax]        ; restore rax
     popfq                     ; restore EFLAGS
-    DB      0x48               ; prefix to composite "retq" with next "retf"
-    retf                      ; far return
+
+    ; The follow algorithm is used for clear shadow stack token busy bit.
+    ; The comment is based on the sample shadow stack.
+    ; The sample shadow stack layout :
+    ; Address | Context
+    ;         +-------------------------+
+    ;  0xFD0  |   FREE                  | it is 0xFD8|0x02|(LMA & CS.L), after SAVEPREVSSP.
+    ;         +-------------------------+
+    ;  0xFD8  |  Prev SSP               |
+    ;         +-------------------------+
+    ;  0xFE0  |   RIP                   |
+    ;         +-------------------------+
+    ;  0xFE8  |   CS                    |
+    ;         +-------------------------+
+    ;  0xFF0  |  0xFF0 | BUSY           | BUSY flag cleared after CLRSSBSY
+    ;         +-------------------------+
+    ;  0xFF8  | 0xFD8|0x02|(LMA & CS.L) |
+    ;         +-------------------------+
+    ; Instructions for Intel Control Flow Enforcement Technology (CET) are supported since NASM version 2.15.01.
+    push     rax                ; SSP should be 0xFD8 at this point
+    cmp      byte [dword ASM_PFX(FeaturePcdGet (PcdCpuSmmStackGuard))], 0
+    jz       CetDone
+    mov      rax, cr4
+    and      rax, 0x800000      ; check if CET is enabled
+    jz       CetDone
+    mov      rax, 0x04          ; advance past cs:lip:prevssp;supervisor shadow stack token
+    INCSSP_RAX                  ; After this SSP should be 0xFF8
+    SAVEPREVSSP                 ; now the shadow stack restore token will be created at 0xFD0
+    READSSP_RAX                 ; Read new SSP, SSP should be 0x1000
+    push     rax
+    sub      rax, 0x10
+    CLRSSBSY_RAX                ; Clear token at 0xFF0, SSP should be 0 after this
+    sub      rax, 0x20
+    RSTORSSP_RAX                ; Restore to token at 0xFD0, new SSP will be 0xFD0
+    pop      rax
+    mov      rax, 0x01          ; Pop off the new save token created
+    INCSSP_RAX                  ; SSP should be 0xFD8 now
+CetDone:
+    pop      rax                ; restore rax
+
+    DB       0x48               ; prefix to composite "retq" with next "retf"
+    retf                        ; far return
 DoIret:
     iretq
 
