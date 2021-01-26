@@ -9,6 +9,18 @@
 ;
 ;------------------------------------------------------------------------------
 
+%macro SAVEPREVSSP     0
+    DB 0xF3, 0x0F, 0x01, 0xEA
+%endmacro
+
+%macro CLRSSBSY_EAX    0
+    DB 0x67, 0xF3, 0x0F, 0xAE, 0x30
+%endmacro
+
+%macro RSTORSSP_EAX    0
+    DB 0x67, 0xF3, 0x0F, 0x01, 0x28
+%endmacro
+
 %macro SETSSBSY        0
     DB 0xF3, 0x0F, 0x01, 0xE8
 %endmacro
