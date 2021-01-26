@@ -25,6 +25,8 @@ typedef struct {
   UINT64             ResetRegAddress;
   UINT64             PcieBaseAddress;
   UINT64             PcieBaseSize;
+  UINT8              TPM20Present;
+  UINT8              TPM12Present;
 } ACPI_BOARD_INFO;
 
 #endif
