@@ -7,6 +7,7 @@
 
 **/
 #include "BlSupportDxe.h"
+#include <Guid/TpmInstance.h>
 
 /**
   Reserve MMIO/IO resource in GCD
@@ -102,6 +103,7 @@ BlDxeEntryPoint (
   SYSTEM_TABLE_INFO          *SystemTableInfo;
   EFI_PEI_GRAPHICS_INFO_HOB  *GfxInfo;
   ACPI_BOARD_INFO            *AcpiBoardInfo;
+  UINTN                      Size;
 
   Status = EFI_SUCCESS;
   //
@@ -155,6 +157,27 @@ BlDxeEntryPoint (
     ASSERT_EFI_ERROR (Status);
     Status = PcdSet64S (PcdPciExpressBaseSize, AcpiBoardInfo->PcieBaseSize);
     ASSERT_EFI_ERROR (Status);
+
+    if (AcpiBoardInfo->TPM12Present)
+    {
+      Size = sizeof (gEfiTpmDeviceInstanceTpm12Guid);
+      Status = PcdSetPtrS (
+               PcdTpmInstanceGuid,
+               &Size,
+               &gEfiTpmDeviceInstanceTpm12Guid
+               );
+      ASSERT_EFI_ERROR (Status);
+    }
+    else if (AcpiBoardInfo->TPM20Present)
+    {
+      Size = sizeof (gEfiTpmDeviceInstanceTpm20DtpmGuid);
+      Status = PcdSetPtrS (
+                 PcdTpmInstanceGuid,
+                 &Size,
+                 &gEfiTpmDeviceInstanceTpm20DtpmGuid
+                 );
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 
   return EFI_SUCCESS;
