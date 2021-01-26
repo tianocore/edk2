@@ -1,5 +1,5 @@
 /** @file
-  SMM driver instance of SmiHandlerProfile Library.
+  Standalone MM driver instance of SmiHandlerProfile Library.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.
@@ -12,7 +12,7 @@
 #include "MmSmiHandlerProfileLib.h"
 
 /**
-  The constructor function for traditional MM SMI handler profile.
+  The constructor function for standalone MM SMI handler profile.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
@@ -21,10 +21,11 @@
 **/
 EFI_STATUS
 EFIAPI
-SmmSmiHandlerProfileLibConstructor (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+StandaloneMmSmiHandlerProfileLibConstructor (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *SystemTable
   )
 {
   return MmSmiHandlerProfileLibInitialization ();
 }
+
