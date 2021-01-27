@@ -1,7 +1,7 @@
 /** @file
 SMM MP service implementation
 
-Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -22,6 +22,7 @@ UINTN                                       mSemaphoreSize;
 SPIN_LOCK                                   *mPFLock = NULL;
 SMM_CPU_SYNC_MODE                           mCpuSmmSyncMode;
 BOOLEAN                                     mMachineCheckSupported = FALSE;
+MM_COMPLETION                               mSmmStartupThisApToken;
 
 extern UINTN mSmmShadowStackSize;
 
@@ -1240,9 +1241,26 @@ InternalSmmStartupThisAp (
   mSmmMpSyncData->CpuData[CpuIndex].Procedure = Procedure;
   mSmmMpSyncData->CpuData[CpuIndex].Parameter = ProcArguments;
   if (Token != NULL) {
-    ProcToken= GetFreeToken (1);
-    mSmmMpSyncData->CpuData[CpuIndex].Token = ProcToken;
-    *Token = (MM_COMPLETION)ProcToken->SpinLock;
+    if (Token != &mSmmStartupThisApToken) {
+      //
+      // When Token points to mSmmStartupThisApToken, this routine is called
+      // from SmmStartupThisAp() in non-blocking mode (PcdCpuSmmBlockStartupThisAp == FALSE).
+      //
+      // In this case, caller wants to startup AP procedure in non-blocking
+      // mode and cannot get the completion status from the Token because there
+      // is no way to return the Token to caller from SmmStartupThisAp().
+      // Caller needs to use its implementation specific way to query the completion status.
+      //
+      // There is no need to allocate a token for such case so the 3 overheads
+      // can be avoided:
+      // 1. Call AllocateTokenBuffer() when there is no free token.
+      // 2. Get a free token from the token buffer.
+      // 3. Call ReleaseToken() in APHandler().
+      //
+      ProcToken = GetFreeToken (1);
+      mSmmMpSyncData->CpuData[CpuIndex].Token = ProcToken;
+      *Token = (MM_COMPLETION)ProcToken->SpinLock;
+    }
   }
   mSmmMpSyncData->CpuData[CpuIndex].Status    = CpuStatus;
   if (mSmmMpSyncData->CpuData[CpuIndex].Status != NULL) {
@@ -1474,8 +1492,6 @@ SmmStartupThisAp (
   IN OUT  VOID                      *ProcArguments OPTIONAL
   )
 {
-  MM_COMPLETION               Token;
-
   gSmmCpuPrivate->ApWrapperFunc[CpuIndex].Procedure = Procedure;
   gSmmCpuPrivate->ApWrapperFunc[CpuIndex].ProcedureArgument = ProcArguments;
 
@@ -1486,7 +1502,7 @@ SmmStartupThisAp (
     ProcedureWrapper,
     CpuIndex,
     &gSmmCpuPrivate->ApWrapperFunc[CpuIndex],
-    FeaturePcdGet (PcdCpuSmmBlockStartupThisAp) ? NULL : &Token,
+    FeaturePcdGet (PcdCpuSmmBlockStartupThisAp) ? NULL : &mSmmStartupThisApToken,
     0,
     NULL
     );
