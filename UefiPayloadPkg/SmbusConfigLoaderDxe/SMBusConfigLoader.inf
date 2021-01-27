@@ -46,7 +46,8 @@
 
 [Depex]
   gEfiSmbusHcProtocolGuid AND
-  gEfiVariableArchProtocolGuid
+  gEfiVariableArchProtocolGuid AND
+  gEfiProdriveHermesBoardNullGuid
 
 [Protocols]
   gEfiSmbusHcProtocolGuid                       ## CONSUMES

@@ -45,6 +45,7 @@
 
 [Protocols]
   gEfiSmbiosProtocolGuid
+  gEfiProdriveHermesBoardNullGuid   ## SOMETIMES_PRODUCES
 
 [Depex]
   gEfiSmbiosProtocolGuid
