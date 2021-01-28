@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -161,18 +161,12 @@ LongModeStart:
     add        edi, LockLocation
     mov        rax, NotVacantFlag
 
-TestLock:
-    xchg       qword [edi], rax
-    cmp        rax, NotVacantFlag
-    jz         TestLock
+    mov        edi, esi
+    add        edi, ApIndexLocation
+    mov        ebx, 1
+    lock xadd  dword [edi], ebx                 ; EBX = ApIndex++
+    inc        ebx                              ; EBX is CpuNumber
 
-    lea        ecx, [esi + ApIndexLocation]
-    inc        dword [ecx]
-    mov        ebx, [ecx]
-
-Releaselock:
-    mov        rax, VacantFlag
-    xchg       qword [edi], rax
     ; program stack
     mov        edi, esi
     add        edi, StackSizeLocation

@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -125,19 +125,11 @@ SkipEnableExecuteDisable:
     add        edi, LockLocation
     mov        eax, NotVacantFlag
 
-TestLock:
-    xchg       [edi], eax
-    cmp        eax, NotVacantFlag
-    jz         TestLock
-
-    mov        ecx, esi
-    add        ecx, ApIndexLocation
-    inc        dword [ecx]
-    mov        ebx, [ecx]
-
-Releaselock:
-    mov        eax, VacantFlag
-    xchg       [edi], eax
+    mov        edi, esi
+    add        edi, ApIndexLocation
+    mov        ebx, 1
+    lock xadd  dword [edi], ebx                 ; EBX = ApIndex++
+    inc        ebx                              ; EBX is CpuNumber
 
     mov        edi, esi
     add        edi, StackSizeLocation
