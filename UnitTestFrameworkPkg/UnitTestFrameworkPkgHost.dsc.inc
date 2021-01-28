@@ -6,7 +6,7 @@
 #
 ##
 
-!include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
+!include UnitTestFrameworkPkg/UnitTestFrameworkPkgCommon.dsc.inc
 
 [LibraryClasses.common.HOST_APPLICATION]
   BaseLib|MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
