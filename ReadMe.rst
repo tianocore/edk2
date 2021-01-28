@@ -1,6 +1,23 @@
 ==============
-EDK II Project
+EDK II Project - 9elements enhanced
 ==============
+
+The EDK2 repository contains custom patches not upstreamed yet.
+The following features have been added to be used with coreboot:
+
+-  Variable support using SMMSTOREv2
+-  Workaround for coreboot's PCIHostBridge allocator
+-  Disabled EDK2 MTRR programming sometimes crashing the system
+-  Rng support
+-  Filesystem drivers for EXT2,EXT3,EXT4,NTFS
+-  Run EFI Option ROMs
+-  Firmware menu shows information about the platform
+-  Runtime platform detection and custom EEPROM config loader over SMBUS
+-  Fix for Aspeed BMC keyboards
+-  TPM support, enable with ``build -DTPM_ENABLE=TRUE``
+-  Secureboot support, enable with ``build -DSECURE_BOOT_ENABLE=TRUE``
+-  IPXE support, enable with ``build -DNETWORK_IPXE=TRUE``
+-  Network support, enable with ``build -DNETWORK_ENABLE=TRUE``
 
 A modern, feature-rich, cross-platform firmware development
 environment for the UEFI and PI specifications from www.uefi.org.
