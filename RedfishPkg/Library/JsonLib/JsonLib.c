@@ -430,10 +430,10 @@ JsonValueGetAsciiString (
   IN    EDKII_JSON_VALUE    Json
   )
 {
-  CHAR8          *AsciiStr;
+  CONST CHAR8    *AsciiStr;
   UINTN          Index;
 
-  AsciiStr = (CHAR8 *)  ((json_t *) Json);
+  AsciiStr = json_string_value ((json_t *) Json);
   if (AsciiStr == NULL) {
     return NULL;
   }
