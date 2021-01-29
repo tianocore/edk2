@@ -75,12 +75,13 @@
   #   C4244: conversion from type1 to type2, possible loss of data
   #   C4334: 32-bit shift implicitly converted to 64-bit
   #   C4204: nonstandard extension used: non-constant aggregate initializer
+  #   C4706: assignment within conditional expression
   #
   # Define macro HAVE_CONFIG_H to include jansson_private_config.h to build.
   # Undefined _WIN32, WIN64, _MSC_VER macros
   # On GCC, no error on the unused-function and unused-but-set-variable.
   #
-  MSFT:*_*_X64_CC_FLAGS = /wd4204 /wd4244 /wd4090 /wd4334 /DHAVE_CONFIG_H=1 /U_WIN32 /UWIN64 /U_MSC_VER
-  MSFT:*_*_IA32_CC_FLAGS = /wd4204 /wd4244 /wd4090 /DHAVE_CONFIG_H=1 /U_WIN32 /UWIN64 /U_MSC_VER
+  MSFT:*_*_X64_CC_FLAGS = /wd4204 /wd4244 /wd4090 /wd4334 /wd4706 /DHAVE_CONFIG_H=1 /U_WIN32 /UWIN64 /U_MSC_VER
+  MSFT:*_*_IA32_CC_FLAGS = /wd4204 /wd4244 /wd4090 /wd4706 /DHAVE_CONFIG_H=1 /U_WIN32 /UWIN64 /U_MSC_VER
   GCC:*_*_*_CC_FLAGS = -Wno-unused-function -Wno-unused-but-set-variable
 
