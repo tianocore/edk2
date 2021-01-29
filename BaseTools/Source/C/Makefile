@@ -19,6 +19,7 @@ APPLICATIONS = \
   GenFw \
   GenSec \
   LzmaCompress \
+  Split \
   TianoCompress \
   VolInfo \
   DevicePath \
