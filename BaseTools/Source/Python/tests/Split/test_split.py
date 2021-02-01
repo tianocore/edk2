@@ -18,26 +18,27 @@ import struct as st
 
 class TestSplit(unittest.TestCase):
     def setUp(self):
-        self.WORKSPACE = tempfile.mkdtemp()
-        self.binary_file = os.path.join(self.WORKSPACE, "Binary.bin")
+        self.tmpdir = tempfile.mkdtemp()
+        self.binary_file = os.path.join(self.tmpdir, "Binary.bin")
         self.create_inputfile()
 
     def tearDown(self):
-        if os.path.exists(self.WORKSPACE):
-            shutil.rmtree(self.WORKSPACE)
+        if os.path.exists(self.tmpdir):
+            shutil.rmtree(self.tmpdir)
 
     def test_splitFile_position(self):
         position = [-1, 0, 256, 512, 700, 1024, 2048]
         result = [(0, 1024), (0, 1024), (256, 768),
                   (512, 512), (700, 324), (1024, 0), (1024, 0)]
+        outputfolder = self.tmpdir
         for index, po in enumerate(position):
             try:
                 sp.splitFile(self.binary_file, po)
             except Exception as e:
                 self.assertTrue(False, msg="splitFile function error")
 
-            output1 = os.path.join(self.WORKSPACE, "Binary.bin1")
-            output2 = os.path.join(self.WORKSPACE, "Binary.bin2")
+            output1 = os.path.join(outputfolder, "Binary.bin1")
+            output2 = os.path.join(outputfolder, "Binary.bin2")
             with open(output1, "rb") as f1:
                 size1 = len(f1.read())
             with open(output2, "rb") as f2:
@@ -53,58 +54,61 @@ class TestSplit(unittest.TestCase):
                 fout.write(st.pack("<H", i))
 
     def test_splitFile_outputfile(self):
-        output = [None, "Binary.bin", "Binary1.bin", r"output/Binary1.bin",
-                  os.path.join(self.WORKSPACE, r"output/Binary1.bin")]
-        for o in output:
+        output = [
+            None,
+            "Binary.bin",
+            "Binary1.bin",
+            r"output/Binary1.bin",
+            os.path.abspath( r"output/Binary1.bin")
+            ]
+        expected_output = [
+            os.path.join(os.path.dirname(self.binary_file),"Binary.bin1" ),
+            os.path.join(os.getcwd(),"Binary.bin"),
+            os.path.join(os.getcwd(),"Binary1.bin"),
+            os.path.join(os.getcwd(),r"output/Binary1.bin"),
+            os.path.join(os.path.abspath( r"output/Binary1.bin"))
+            ]
+        for index, o in enumerate(output):
             try:
                 sp.splitFile(self.binary_file, 123, outputfile1=o)
             except Exception as e:
                 self.assertTrue(False, msg="splitFile function error")
-            if o is None:
-                self.assertTrue(os.path.exists(
-                    os.path.join(self.WORKSPACE, "Binary.bin1")))
-            else:
-                if os.path.isabs(o):
-                    self.assertTrue(os.path.exists(o))
-                else:
-                    self.assertTrue(os.path.exists(
-                        os.path.join(self.WORKSPACE, o)))
-            self.create_inputfile()
 
-            try:
-                sp.splitFile(self.binary_file, 123, outputfile2=o)
-            except Exception as e:
-                self.assertTrue(False, msg="splitFile function error")
-            if o is None:
-                self.assertTrue(os.path.exists(
-                    os.path.join(self.WORKSPACE, "Binary.bin2")))
-            else:
-                if os.path.isabs(o):
-                    self.assertTrue(os.path.exists(o))
-                else:
-                    self.assertTrue(os.path.exists(
-                        os.path.join(self.WORKSPACE, o)))
+            self.assertTrue(os.path.exists(expected_output[index]))
             self.create_inputfile()
 
     def test_splitFile_outputfolder(self):
-        outputfolder = [None, "output", r"output1/output2",
-                        os.path.join(self.WORKSPACE, "output")]
-        for o in outputfolder:
+        outputfolder = [
+            None,
+            "output",
+            r"output1/output2",
+            os.path.abspath("output"),
+            "output"
+            ]
+        output = [
+            None,
+            None,
+            "Binary1.bin",
+            r"output/Binary1.bin",
+            os.path.abspath( r"output_1/Binary1.bin")
+            ]
+
+        expected_output = [
+            os.path.join(os.path.dirname(self.binary_file),"Binary.bin1" ),
+            os.path.join(os.getcwd(),"output", "Binary.bin1"),
+            os.path.join(os.getcwd(), r"output1/output2" , "Binary1.bin"),
+            os.path.join(os.getcwd(),r"output", "output/Binary1.bin"),
+            os.path.join(os.path.abspath( r"output/Binary1.bin"))
+            ]
+
+        for index, o in enumerate(outputfolder):
             try:
-                sp.splitFile(self.binary_file, 123, outputdir=o)
+                sp.splitFile(self.binary_file, 123, outputdir=o,outputfile1=output[index])
             except Exception as e:
                 self.assertTrue(False, msg="splitFile function error")
 
-            if o is None:
-                self.assertTrue(os.path.exists(
-                    os.path.join(self.WORKSPACE, "Binary.bin1")))
-            else:
-                if os.path.isabs(o):
-                    self.assertTrue(os.path.exists(
-                        os.path.join(o, "Binary.bin1")))
-                else:
-                    self.assertTrue(os.path.exists(
-                        os.path.join(self.WORKSPACE, o, "Binary.bin1")))
+            self.assertTrue(os.path.exists(expected_output[index]))
+            self.create_inputfile()
 
 
 if __name__ == '__main__':
