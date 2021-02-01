@@ -51,6 +51,13 @@ CpuCacheInfoStartupAllCPUs (
   EFI_STATUS                Status;
 
   Status = MpServices.Protocol->StartupAllAPs (MpServices.Protocol, Procedure, FALSE, NULL, 0, ProcedureArgument, NULL);
+  if (Status == EFI_NOT_STARTED) {
+    //
+    // EFI_NOT_STARTED is returned when there is no enabled AP.
+    // Treat this case as EFI_SUCCESS.
+    //
+    Status = EFI_SUCCESS;
+  }
   ASSERT_EFI_ERROR (Status);
 
   Procedure (ProcedureArgument);
