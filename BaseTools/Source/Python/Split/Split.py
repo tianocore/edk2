@@ -92,6 +92,27 @@ def getFileSize(filename):
 
     return length
 
+def getoutputfileabs(inputfile, prefix, outputfile,index):
+    inputfile = os.path.abspath(inputfile)
+    if outputfile is None:
+        if prefix is None:
+            outputfileabs = os.path.join(os.path.dirname(inputfile), "{}{}".format(os.path.basename(inputfile),index))
+        else:
+            if os.path.isabs(prefix):
+                outputfileabs = os.path.join(prefix, "{}{}".format(os.path.basename(inputfile),index))
+            else:
+                outputfileabs = os.path.join(os.getcwd(), prefix, "{}{}".format(os.path.basename(inputfile),index))
+    elif not os.path.isabs(outputfile):
+        if prefix is None:
+            outputfileabs = os.path.join(os.getcwd(), outputfile)
+        else:
+            if os.path.isabs(prefix):
+                outputfileabs = os.path.join(prefix, outputfile)
+            else:
+                outputfileabs = os.path.join(os.getcwd(), prefix, outputfile)
+    else:
+        outputfileabs = outputfile
+    return outputfileabs
 
 def splitFile(inputfile, position, outputdir=None, outputfile1=None, outputfile2=None):
     '''
@@ -99,8 +120,6 @@ def splitFile(inputfile, position, outputdir=None, outputfile1=None, outputfile2
     '''
     logger = logging.getLogger('Split')
 
-    inputfile = os.path.abspath(inputfile)
-    workspace = os.path.dirname(inputfile)
     if not os.path.exists(inputfile):
         logger.error("File Not Found: %s" % inputfile)
         raise(Exception)
@@ -110,44 +129,33 @@ def splitFile(inputfile, position, outputdir=None, outputfile1=None, outputfile2
             "The firstfile and the secondfile can't be the same: %s" % outputfile1)
         raise(Exception)
 
-    if not outputdir:
-        outputdir = workspace
-    elif not os.path.isabs(outputdir):
-        outputdir = os.path.join(workspace, outputdir)
-
     # Create dir for the output files
     try:
-        if not outputfile1:
-            outputfile1 = os.path.abspath(os.path.join(
-                outputdir, "{}1".format(os.path.basename(inputfile))))
-        else:
-            outputfile1 = os.path.abspath(os.path.join(outputdir, outputfile1))
-        outputdir = os.path.dirname(outputfile1)
-        if not os.path.exists(outputdir):
-            os.makedirs(outputdir)
 
-        if not outputfile2:
-            outputfile2 = os.path.abspath(os.path.join(
-                outputdir, "{}2".format(os.path.basename(inputfile))))
-        else:
-            outputfile2 = os.path.abspath(os.path.join(outputdir, outputfile2))
-        outputdir = os.path.dirname(outputfile2)
-        if not os.path.exists(outputdir):
-            os.makedirs(outputdir)
+        outputfile1 = getoutputfileabs(inputfile, outputdir, outputfile1,1)
+        outputfolder = os.path.dirname(outputfile1)
+        if not os.path.exists(outputfolder):
+            os.makedirs(outputfolder)
+
+        outputfile2 = getoutputfileabs(inputfile, outputdir, outputfile2,2)
+        outputfolder = os.path.dirname(outputfile2)
+        if not os.path.exists(outputfolder):
+            os.makedirs(outputfolder)
+
     except Exception as e:
-        logger.error("Can't make dir: %s" % outputdir)
+        logger.error("Can't make dir: %s" % outputfolder)
         raise(e)
 
     if position <= 0:
-        if outputfile2 != inputfile:
-            shutil.copy2(inputfile, outputfile2)
+        if outputfile2 != os.path.abspath(inputfile):
+            shutil.copy2(os.path.abspath(inputfile), outputfile2)
         with open(outputfile1, "wb") as fout:
             fout.write(b'')
     else:
         inputfilesize = getFileSize(inputfile)
         if position >= inputfilesize:
-            if outputfile1 != inputfile:
-                shutil.copy2(inputfile, outputfile1)
+            if outputfile1 != os.path.abspath(inputfile):
+                shutil.copy2(os.path.abspath(inputfile), outputfile1)
             with open(outputfile2, "wb") as fout:
                 fout.write(b'')
         else:
