@@ -2,7 +2,7 @@
   This Protocol provides Crypto services to DXE modules
 
   Copyright (C) Microsoft Corporation. All rights reserved.
-  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1104,32 +1104,6 @@ BOOLEAN
   IN  UINTN                         HashSize,
   IN  CONST UINT8                  *Signature,
   IN  UINTN                         SigSize
-  );
-
-/**
-  Retrieve the RSA Public Key from one DER-encoded X509 certificate.
-
-  If Cert is NULL, then return FALSE.
-  If RsaContext is NULL, then return FALSE.
-  If this interface is not supported, then return FALSE.
-
-  @param[in]  Cert         Pointer to the DER-encoded X509 certificate.
-  @param[in]  CertSize     Size of the X509 certificate in bytes.
-  @param[out] RsaContext   Pointer to new-generated RSA context which contain the retrieved
-                           RSA public key component. Use RsaFree() function to free the
-                           resource.
-
-  @retval  TRUE   RSA Public Key was retrieved successfully.
-  @retval  FALSE  Fail to retrieve RSA public key from X509 certificate.
-  @retval  FALSE  This interface is not supported.
-
-**/
-typedef
-BOOLEAN
-(EFIAPI *EDKII_CRYPTO_RSA_GET_PUBLIC_KEY_FROM_X509) (
-  IN   CONST UINT8  *Cert,
-  IN   UINTN        CertSize,
-  OUT  VOID         **RsaContext
   );
 
 /**
