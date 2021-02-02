@@ -2,7 +2,7 @@
   This protocol provides services to display a popup window.
   The protocol is typically produced by the forms browser and consumed by a driver callback handler.
 
-  Copyright (c) 2017-2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017-2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
@@ -67,10 +67,10 @@ EFI_STATUS
   OUT EFI_HII_POPUP_SELECTION *UserSelection OPTIONAL
 );
 
-typedef struct _EFI_HII_POPUP_PROTOCOL {
+struct _EFI_HII_POPUP_PROTOCOL {
   UINT64                Revision;
   EFI_HII_CREATE_POPUP  CreatePopup;
-} EFI_HII_POPUP_PROTOCOL;
+};
 
 extern EFI_GUID gEfiHiiPopupProtocolGuid;
 
