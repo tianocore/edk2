@@ -44,6 +44,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define CONFIG_HEADER_BN_H
 
+#if !defined(SIXTY_FOUR_BIT) && !defined (THIRTY_TWO_BIT)
 #if defined(MDE_CPU_X64) || defined(MDE_CPU_AARCH64) || defined(MDE_CPU_IA64) || defined(MDE_CPU_RISCV64)
 //
 // With GCC we would normally use SIXTY_FOUR_BIT_LONG, but MSVC needs
@@ -55,6 +56,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define THIRTY_TWO_BIT
 #else
 #error Unknown target architecture
+#endif
 #endif
 
 //
