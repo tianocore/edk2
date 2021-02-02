@@ -59,8 +59,6 @@ typedef struct {
   @retval         EFI_INVALID_PARAMETER   CpuCacheInfo is NULL while CpuCacheInfoCount contains the value
                                           greater than zero.
   @retval         EFI_UNSUPPORTED         Processor does not support CPUID_CACHE_PARAMS Leaf.
-  @retval         EFI_NOT_FOUND           EDKII_PEI_MP_SERVICES2_PPI or EFI_MP_SERVICES_PROTOCOL interface
-                                          is not found.
   @retval         EFI_OUT_OF_RESOURCES    Required resources could not be allocated.
   @retval         EFI_BUFFER_TOO_SMALL    CpuCacheInfoCount is too small to hold the response CpuCacheInfo
                                           array. CpuCacheInfoCount has been updated with the length needed
