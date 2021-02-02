@@ -257,6 +257,11 @@
   #
   UnitTestHostBaseLib|Test/UnitTest/Include/Library/UnitTestHostBaseLib.h
 
+  ##  @libraryclass  This library provides an interface for DXE drivers to request MM environment
+  #   to map/unblock a memory region for accessibility inside MM.
+  #
+  MmUnblockMemoryLib|Include/Library/MmUnblockMemoryLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Abstracts both S/W SMI generation and detection.
   ##
