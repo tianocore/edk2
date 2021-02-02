@@ -97,18 +97,28 @@ jobs:
           ./Testing/test_UefiPayloadPkgQemu.sh Build/UefiPayloadPkgX64/DEBUG_GCC5/FV/UEFIPAYLOAD.fd
 
   UefiPayloadPkgX64CbTPM:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Install dependencies
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
           DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install \
-          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev qemu-system-x86 xz-utils
+          git python3 python3-distutils-extra build-essential nasm iasl uuid-dev qemu-system-x86 xz-utils \
+          gpg software-properties-common trousers python3-cryptography libgnutls30 gnutls-bin
           DEBIAN_FRONTEND=noninteractive sudo apt-get clean
           sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1337
+          sudo add-apt-repository ppa:stefanberger/swtpm-focal -y
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qq update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -qqy install swtpm
 
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Hack swtpm-tools into this debian
+        run: |
+          sudo dpkg -i ./Testing/swtpm-tools_0.4.0-2.20200828_amd64.deb
+          sudo mv /usr/lib/python3.9/site-packages/py_swtpm_setup /usr/lib/python3.8/
+          sudo mv /usr/lib/python3.9/site-packages/swtpm_setup-0.4.0-py3.9.egg-info /usr/lib/python3.8/
 
       - name: Update submodules
         run: |
