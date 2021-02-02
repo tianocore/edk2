@@ -154,6 +154,11 @@
   #
   VariablePolicyHelperLib|Include/Library/VariablePolicyHelperLib.h
 
+  ##  @libraryclass  This library provides an interface for DXE drivers to request MM environment
+  #   to map/unblock a memory region for accessibility inside MM.
+  #
+  DxeMmUnblockMemoryLib|Include/Library/DxeMmUnblockMemoryLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
