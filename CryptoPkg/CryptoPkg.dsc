@@ -45,6 +45,8 @@
   !error CRYPTO_SERVICES must be set to one of PACKAGE ALL NONE MIN_PEI MIN_DXE_MIN_SMM.
 !endif
 
+!include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
+
 ################################################################################
 #
 # Library Class section - list of all Library Classes needed by this Platform.
@@ -229,26 +231,7 @@
 ###################################################################################################
 [Components]
   CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibShell.inf {
-    <LibraryClasses>
-      PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
-      UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
-      UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
-
-      BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
-      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
-      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-      MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
-      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-      PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
-      PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
-      PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
-      UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-
-      UnitTestLib|UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLib.inf
-      UnitTestPersistenceLib|UnitTestFrameworkPkg/Library/UnitTestPersistenceLibNull/UnitTestPersistenceLibNull.inf
-      UnitTestResultReportLib|UnitTestFrameworkPkg/Library/UnitTestResultReportLib/UnitTestResultReportLibDebugLib.inf
-  }
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibShell.inf
 
 !if $(CRYPTO_SERVICES) == PACKAGE
 [Components]
