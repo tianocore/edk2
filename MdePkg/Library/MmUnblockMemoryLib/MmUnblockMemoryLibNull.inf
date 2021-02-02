@@ -1,0 +1,29 @@
+## @file
+#  Null instance of MM Unblock Page Library.
+#
+#  This library provides an abstraction layer of requesting certain page access to be unblocked
+#  by MM environment if applicable.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = MmUnblockMemoryLibNull
+  FILE_GUID                      = 9E890F68-5C95-4C31-95DD-59E6286F85EA
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MmUnblockMemoryLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MmUnblockMemoryLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
