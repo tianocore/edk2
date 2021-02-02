@@ -40,4 +40,4 @@
 [Pcd]
 
 [Depex]
-  TRUE
+  gEfiMpServiceProtocolGuid
