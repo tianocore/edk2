@@ -37,10 +37,10 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
-  DevicePathLib
   MemoryAllocationLib
+  PcdLib
+  PciHostBridgeUtilityLib
   PciLib
-  QemuFwCfgLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase

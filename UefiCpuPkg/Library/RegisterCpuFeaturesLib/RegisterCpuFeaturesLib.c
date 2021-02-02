@@ -1,7 +1,7 @@
 /** @file
   CPU Register Table Library functions.
 
-  Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -937,45 +937,52 @@ GetAcpiCpuData (
   EFI_PROCESSOR_INFORMATION            ProcessorInfoBuffer;
 
   AcpiCpuData = (ACPI_CPU_DATA *) (UINTN) PcdGet64 (PcdCpuS3DataAddress);
-  if (AcpiCpuData != NULL) {
-    return AcpiCpuData;
-  }
+  if (AcpiCpuData == NULL) {
+    AcpiCpuData  = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (ACPI_CPU_DATA)));
+    ASSERT (AcpiCpuData != NULL);
+    ZeroMem (AcpiCpuData, sizeof (ACPI_CPU_DATA));
 
-  AcpiCpuData  = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (ACPI_CPU_DATA)));
-  ASSERT (AcpiCpuData != NULL);
-
-  //
-  // Set PcdCpuS3DataAddress to the base address of the ACPI_CPU_DATA structure
-  //
-  Status = PcdSet64S (PcdCpuS3DataAddress, (UINT64)(UINTN)AcpiCpuData);
-  ASSERT_EFI_ERROR (Status);
-
-  GetNumberOfProcessor (&NumberOfCpus, &NumberOfEnabledProcessors);
-  AcpiCpuData->NumberOfCpus = (UINT32)NumberOfCpus;
-
-  //
-  // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
-  //
-  TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
-  RegisterTable  = AllocatePages (EFI_SIZE_TO_PAGES (TableSize));
-  ASSERT (RegisterTable != NULL);
-
-  for (Index = 0; Index < NumberOfCpus; Index++) {
-    Status = GetProcessorInformation (Index, &ProcessorInfoBuffer);
+    //
+    // Set PcdCpuS3DataAddress to the base address of the ACPI_CPU_DATA structure
+    //
+    Status = PcdSet64S (PcdCpuS3DataAddress, (UINT64)(UINTN)AcpiCpuData);
     ASSERT_EFI_ERROR (Status);
 
-    RegisterTable[Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
-    RegisterTable[Index].TableLength        = 0;
-    RegisterTable[Index].AllocatedSize      = 0;
-    RegisterTable[Index].RegisterTableEntry = 0;
-
-    RegisterTable[NumberOfCpus + Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
-    RegisterTable[NumberOfCpus + Index].TableLength        = 0;
-    RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
-    RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
+    GetNumberOfProcessor (&NumberOfCpus, &NumberOfEnabledProcessors);
+    AcpiCpuData->NumberOfCpus = (UINT32)NumberOfCpus;
   }
-  AcpiCpuData->RegisterTable           = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
-  AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
+
+  if (AcpiCpuData->RegisterTable == 0 ||
+      AcpiCpuData->PreSmmInitRegisterTable == 0) {
+    //
+    // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
+    //
+    NumberOfCpus = AcpiCpuData->NumberOfCpus;
+    TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
+    RegisterTable  = AllocatePages (EFI_SIZE_TO_PAGES (TableSize));
+    ASSERT (RegisterTable != NULL);
+
+    for (Index = 0; Index < NumberOfCpus; Index++) {
+      Status = GetProcessorInformation (Index, &ProcessorInfoBuffer);
+      ASSERT_EFI_ERROR (Status);
+
+      RegisterTable[Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
+      RegisterTable[Index].TableLength        = 0;
+      RegisterTable[Index].AllocatedSize      = 0;
+      RegisterTable[Index].RegisterTableEntry = 0;
+
+      RegisterTable[NumberOfCpus + Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
+      RegisterTable[NumberOfCpus + Index].TableLength        = 0;
+      RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
+      RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
+    }
+    if (AcpiCpuData->RegisterTable == 0) {
+      AcpiCpuData->RegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
+    }
+    if (AcpiCpuData->PreSmmInitRegisterTable == 0) {
+      AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
+    }
+  }
 
   return AcpiCpuData;
 }

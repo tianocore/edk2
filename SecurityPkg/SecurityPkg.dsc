@@ -150,6 +150,7 @@
 [LibraryClasses.common.DXE_SMM_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
+  MmServicesTableLib|MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/SmmReportStatusCodeLib/SmmReportStatusCodeLib.inf
   SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
@@ -210,6 +211,7 @@
   SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
   SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
   SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
+  SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpmStandaloneMm.inf
   SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.inf
   SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterPei.inf
 
@@ -316,6 +318,7 @@
   SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
   SecurityPkg/Tcg/Tcg2Smm/Tcg2Smm.inf
   SecurityPkg/Library/SmmTcg2PhysicalPresenceLib/SmmTcg2PhysicalPresenceLib.inf
+  SecurityPkg/Library/SmmTcg2PhysicalPresenceLib/StandaloneMmTcg2PhysicalPresenceLib.inf
 
   #
   # Random Number Generator

@@ -1,0 +1,54 @@
+## @file
+#  Provides TPM 2.0 TIS/PTP functions for DTPM
+#
+#  Spec Compliance Info:
+#    "TCG PC Client Platform TPM Profile(PTP) Specification Family 2.0 Level 00 Revision 00.43"
+#    "TCG PC Client Specific TPM Interface Specification(TIS) Version 1.3"
+#
+#  This library implements TIS (TPM Interface Specification) and
+#  PTP (Platform TPM Profile) functions which is
+#  used for every TPM 2.0 command. Choosing this library means platform uses and
+#  only uses TPM 2.0 DTPM device.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm2DeviceLibDTpmStandaloneMm
+  FILE_GUID                      = 9A5DB21A-FF0B-46D0-8672-B4F83FEF1F0E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm2DeviceLib|MM_STANDALONE
+  CONSTRUCTOR                    = Tpm2DeviceLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  Tpm2Tis.c
+  Tpm2Ptp.c
+  Tpm2DeviceLibDTpm.c
+  Tpm2DeviceLibDTpmStandaloneMm.c
+  Tpm2DeviceLibDTpm.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  IoLib
+  TimerLib
+  DebugLib
+  PcdLib
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress            ## CONSUMES

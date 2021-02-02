@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
-#include <Library/SmmServicesTableLib.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 
 #define MAX_IO_PORT_ADDRESS   0xFFFF
@@ -151,6 +151,18 @@ CpuIoServiceWrite (
   IN UINT64                          Address,
   IN UINTN                           Count,
   IN VOID                            *Buffer
+  );
+
+/**
+  The module Entry Point SmmCpuIoProtocol driver
+
+  @retval EFI_SUCCESS  The entry point is executed successfully.
+  @retval Other        Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+CommonCpuIo2Initialize (
+  VOID
   );
 
 #endif

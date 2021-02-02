@@ -1,0 +1,43 @@
+## @file
+#  Provide common utility functions to PciHostBridgeLib instances in
+#  ArmVirtPkg and OvmfPkg.
+#
+#  Copyright (C) 2016, Red Hat, Inc.
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2020, Huawei Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = PciHostBridgeUtilityLib
+  FILE_GUID                      = e3aa5932-527a-42e7-86f5-81b144c7e5f1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciHostBridgeUtilityLib
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 ARM
+#
+
+[Sources]
+  PciHostBridgeUtilityLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PciLib
+  QemuFwCfgLib

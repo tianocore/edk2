@@ -31,12 +31,15 @@
   ArmVirtPkg/ArmVirtPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseMemoryLib
   DebugLib
   DevicePathLib
   DxeServicesTableLib
   MemoryAllocationLib
+  PciHostBridgeUtilityLib
   PciPcdProducerLib
 
 [FixedPcd]

@@ -482,6 +482,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
 !endif
   gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler|0x10
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength|0
 !if ($(FD_SIZE_IN_KB) == 1024) || ($(FD_SIZE_IN_KB) == 2048)
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
@@ -567,6 +568,8 @@
   # Network Pcds
   #
 !include NetworkPkg/NetworkPcds.dsc.inc
+
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
 !if $(SMM_REQUIRE) == TRUE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x4000
@@ -761,6 +764,7 @@
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
     <LibraryClasses>
       PciHostBridgeLib|OvmfPkg/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+      PciHostBridgeUtilityLib|OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
       NULL|OvmfPkg/Library/PlatformHasIoMmuLib/PlatformHasIoMmuLib.inf
   }
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {

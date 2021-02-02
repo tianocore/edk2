@@ -1,7 +1,7 @@
 /** @file
   CPU MP Initialize Library common functions.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -485,14 +485,12 @@ CollectProcessorCount (
   CpuMpData->InitFlag = ApInitConfig;
   WakeUpAP (CpuMpData, TRUE, 0, NULL, NULL, TRUE);
   CpuMpData->InitFlag = ApInitDone;
+  //
+  // When InitFlag == ApInitConfig, WakeUpAP () guarantees all APs are checked in.
+  // FinishedCount is the number of check-in APs.
+  //
+  CpuMpData->CpuCount = CpuMpData->FinishedCount + 1;
   ASSERT (CpuMpData->CpuCount <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
-  //
-  // Wait for all APs finished the initialization
-  //
-  while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
-    CpuPause ();
-  }
-
 
   //
   // Enable x2APIC mode if
@@ -751,10 +749,6 @@ ApWakeupFunction (
   CurrentApicMode = GetApicMode ();
   while (TRUE) {
     if (CpuMpData->InitFlag == ApInitConfig) {
-      //
-      // Add CPU number
-      //
-      InterlockedIncrement ((UINT32 *) &CpuMpData->CpuCount);
       ProcessorNumber = ApIndex;
       //
       // This is first time AP wakeup, get BIST information from AP stack
@@ -769,15 +763,6 @@ ApWakeupFunction (
       RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
-
-      //
-      // Delay decrementing the APs executing count when SEV-ES is enabled
-      // to allow the APs to issue an AP_RESET_HOLD before the BSP possibly
-      // performs another INIT-SIPI-SIPI sequence.
-      //
-      if (!CpuMpData->SevEsIsEnabled) {
-        InterlockedDecrement ((UINT32 *) &CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
-      }
     } else {
       //
       // Execute AP function if AP is ready
@@ -866,19 +851,33 @@ ApWakeupFunction (
       }
     }
 
-    //
-    // AP finished executing C code
-    //
-    InterlockedIncrement ((UINT32 *) &CpuMpData->FinishedCount);
-
-    //
-    // Place AP is specified loop mode
-    //
     if (CpuMpData->ApLoopMode == ApInHltLoop) {
       //
       // Save AP volatile registers
       //
       SaveVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
+    }
+
+    //
+    // AP finished executing C code
+    //
+    InterlockedIncrement ((UINT32 *) &CpuMpData->FinishedCount);
+
+    if (CpuMpData->InitFlag == ApInitConfig) {
+      //
+      // Delay decrementing the APs executing count when SEV-ES is enabled
+      // to allow the APs to issue an AP_RESET_HOLD before the BSP possibly
+      // performs another INIT-SIPI-SIPI sequence.
+      //
+      if (!CpuMpData->SevEsIsEnabled) {
+        InterlockedDecrement ((UINT32 *) &CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
+      }
+    }
+
+    //
+    // Place AP is specified loop mode
+    //
+    if (CpuMpData->ApLoopMode == ApInHltLoop) {
       //
       // Place AP in HLT-loop
       //

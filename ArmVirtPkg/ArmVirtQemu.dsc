@@ -78,6 +78,7 @@
   PciPcdProducerLib|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|ArmVirtPkg/Library/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
+  PciHostBridgeUtilityLib|OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
@@ -204,6 +205,7 @@
 !endif
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|3
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
 [PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
@@ -487,6 +489,7 @@
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
+  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   OvmfPkg/Virtio10Dxe/Virtio10.inf
 

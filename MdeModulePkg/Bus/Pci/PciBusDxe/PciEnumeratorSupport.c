@@ -1681,6 +1681,7 @@ PciIovParseVfBar (
                 );
 
       if (EFI_ERROR (Status)) {
+        PciIoDevice->VfPciBar[BarIndex].BarType = PciBarTypeUnknown;
         return Offset + 4;
       }
 

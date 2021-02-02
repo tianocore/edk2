@@ -23,16 +23,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <Library/IoLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Protocol/MpService.h>
 #include <Guid/EventGroup.h>
-
-#include <IndustryStandard/Q35MchIch9.h>
-#include <IndustryStandard/QemuCpuHotplug.h>
 
 //
 // Data structure used to allocate ACPI_CPU_DATA and its supporting structures
@@ -168,17 +164,12 @@ CpuS3DataInitialize (
   EFI_MP_SERVICES_PROTOCOL   *MpServices;
   UINTN                      NumberOfCpus;
   VOID                       *Stack;
-  UINTN                      TableSize;
-  CPU_REGISTER_TABLE         *RegisterTable;
-  UINTN                      Index;
-  EFI_PROCESSOR_INFORMATION  ProcessorInfoBuffer;
   UINTN                      GdtSize;
   UINTN                      IdtSize;
   VOID                       *Gdt;
   VOID                       *Idt;
   EFI_EVENT                  Event;
   ACPI_CPU_DATA              *OldAcpiCpuData;
-  BOOLEAN                    FetchPossibleApicIds;
 
   if (!PcdGetBool (PcdAcpiS3Enable)) {
     return EFI_UNSUPPORTED;
@@ -193,13 +184,7 @@ CpuS3DataInitialize (
   ASSERT (AcpiCpuDataEx != NULL);
   AcpiCpuData = &AcpiCpuDataEx->AcpiCpuData;
 
-  //
-  // The "SMRAM at default SMBASE" feature guarantees that
-  // QEMU_CPUHP_CMD_GET_ARCH_ID too is available.
-  //
-  FetchPossibleApicIds = PcdGetBool (PcdQ35SmramAtDefaultSmbase);
-
-  if (FetchPossibleApicIds) {
+  if (PcdGetBool (PcdQ35SmramAtDefaultSmbase)) {
     NumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
   } else {
     UINTN NumberOfEnabledProcessors;
@@ -271,59 +256,6 @@ CpuS3DataInitialize (
     AcpiCpuData->PreSmmInitRegisterTable = OldAcpiCpuData->PreSmmInitRegisterTable;
     AcpiCpuData->ApLocation              = OldAcpiCpuData->ApLocation;
     CopyMem (&AcpiCpuData->CpuStatus, &OldAcpiCpuData->CpuStatus, sizeof (CPU_STATUS_INFORMATION));
-  } else {
-    //
-    // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
-    //
-    TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
-    RegisterTable = (CPU_REGISTER_TABLE *)AllocateZeroPages (TableSize);
-    ASSERT (RegisterTable != NULL);
-
-    if (FetchPossibleApicIds) {
-      //
-      // Write a valid selector so that other hotplug registers can be
-      // accessed.
-      //
-      IoWrite32 (ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_W_CPU_SEL, 0);
-      //
-      // We'll be fetching the APIC IDs.
-      //
-      IoWrite8 (ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_W_CMD,
-        QEMU_CPUHP_CMD_GET_ARCH_ID);
-    }
-    for (Index = 0; Index < NumberOfCpus; Index++) {
-      UINT32 InitialApicId;
-
-      if (FetchPossibleApicIds) {
-        IoWrite32 (ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_W_CPU_SEL,
-          (UINT32)Index);
-        InitialApicId = IoRead32 (
-                          ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_RW_CMD_DATA);
-      } else {
-        Status = MpServices->GetProcessorInfo (
-                             MpServices,
-                             Index,
-                             &ProcessorInfoBuffer
-                             );
-        ASSERT_EFI_ERROR (Status);
-        InitialApicId = (UINT32)ProcessorInfoBuffer.ProcessorId;
-      }
-
-      DEBUG ((DEBUG_VERBOSE, "%a: Index=%05Lu ApicId=0x%08x\n", __FUNCTION__,
-        (UINT64)Index, InitialApicId));
-
-      RegisterTable[Index].InitialApicId      = InitialApicId;
-      RegisterTable[Index].TableLength        = 0;
-      RegisterTable[Index].AllocatedSize      = 0;
-      RegisterTable[Index].RegisterTableEntry = 0;
-
-      RegisterTable[NumberOfCpus + Index].InitialApicId      = InitialApicId;
-      RegisterTable[NumberOfCpus + Index].TableLength        = 0;
-      RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
-      RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
-    }
-    AcpiCpuData->RegisterTable           = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
-    AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
   }
 
   //

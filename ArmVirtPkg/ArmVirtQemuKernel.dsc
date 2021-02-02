@@ -76,6 +76,7 @@
   PciPcdProducerLib|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|ArmVirtPkg/Library/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
+  PciHostBridgeUtilityLib|OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
 
 [LibraryClasses.common.DXE_DRIVER]
@@ -174,6 +175,7 @@
 !endif
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|3
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
 [PcdsPatchableInModule.common]
   # we need to provide a resolution for this PCD that supports PcdSet64()
@@ -423,6 +425,7 @@
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
+  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   OvmfPkg/Virtio10Dxe/Virtio10.inf
 

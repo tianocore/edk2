@@ -17,7 +17,9 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PciHostBridgeLib.h>
+#include <Library/PciHostBridgeUtilityLib.h>
 #include <Library/PciLib.h>
 #include "PciHostBridge.h"
 
@@ -452,8 +454,9 @@ ScanForRootBridges (
         RootBridges
       );
       ASSERT (RootBridges != NULL);
-      InitRootBridge (
+      PciHostBridgeUtilityInitRootBridge (
         Attributes, Attributes, 0,
+        FALSE, PcdGet16 (PcdOvmfHostBridgePciDevId) != INTEL_Q35_MCH_DEVICE_ID,
         (UINT8) PrimaryBus, (UINT8) SubBus,
         &Io, &Mem, &MemAbove4G, &mNonExistAperture, &mNonExistAperture,
         &RootBridges[*NumberOfRootBridges]

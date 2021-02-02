@@ -20,7 +20,7 @@
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = Tcg2PhysicalPresenceLib|DXE_SMM_DRIVER
-  CONSTRUCTOR                    = Tcg2PhysicalPresenceLibConstructor
+  CONSTRUCTOR                    = Tcg2PhysicalPresenceLibTraditionalConstructor
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -30,6 +30,8 @@
 
 [Sources]
   SmmTcg2PhysicalPresenceLib.c
+  MmTcg2PhysicalPresenceLibCommon.c
+  MmTcg2PhysicalPresenceLibCommon.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -39,7 +41,7 @@
 [LibraryClasses]
   DebugLib
   Tcg2PpVendorLib
-  SmmServicesTableLib
+  MmServicesTableLib
   BaseMemoryLib
 
 [Guids]

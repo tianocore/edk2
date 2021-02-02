@@ -1278,7 +1278,7 @@ typedef union {
   @retval  EAX  The maximum input value for ECX to retrieve sub-leaf information.
   @retval  EBX  Structured Extended Feature Flags described by the type
                 CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_EBX.
-  @retval  EBX  Structured Extended Feature Flags described by the type
+  @retval  ECX  Structured Extended Feature Flags described by the type
                 CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX.
   @retval  EDX  Reserved.
 
@@ -3592,6 +3592,76 @@ typedef union {
 #define   CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS_TRANSLATION_CACHE_TYPE_DATA_TLB         0x01
 #define   CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS_TRANSLATION_CACHE_TYPE_INSTRUCTION_TLB  0x02
 #define   CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS_TRANSLATION_CACHE_TYPE_UNIFIED_TLB      0x03
+///
+/// @}
+///
+
+
+/**
+  CPUID Hybrid Information Enumeration Leaf
+
+  @param   EAX  CPUID_HYBRID_INFORMATION (0x1A)
+  @param   ECX  CPUID_HYBRID_INFORMATION_MAIN_LEAF (0x00).
+
+  @retval  EAX  Enumerates the native model ID and core type described
+                by the type CPUID_NATIVE_MODEL_ID_AND_CORE_TYPE_EAX
+  @retval  EBX  Reserved.
+  @retval  ECX  Reserved.
+  @retval  EDX  Reserved.
+
+  <b>Example usage</b>
+  @code
+  CPUID_NATIVE_MODEL_ID_AND_CORE_TYPE_EAX          Eax;
+
+  AsmCpuidEx (
+    CPUID_HYBRID_INFORMATION,
+    CPUID_HYBRID_INFORMATION_MAIN_LEAF,
+    &Eax, NULL, NULL, NULL
+    );
+  @endcode
+
+**/
+#define CPUID_HYBRID_INFORMATION                                       0x1A
+
+///
+/// CPUID Hybrid Information Enumeration main leaf
+///
+#define CPUID_HYBRID_INFORMATION_MAIN_LEAF                              0x00
+
+/**
+  CPUID Hybrid Information EAX for CPUID leaf #CPUID_HYBRID_INFORMATION,
+  main leaf #CPUID_HYBRID_INFORMATION_MAIN_LEAF.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 23:0] Native model ID of the core.
+    ///
+    /// The core-type and native mode ID can be used to uniquely identify
+    /// the microarchitecture of the core.This native model ID is not unique
+    /// across core types, and not related to the model ID reported in CPUID
+    /// leaf 01H, and does not identify the SOC.
+    ///
+    UINT32  NativeModelId:24;
+    ///
+    /// [Bit 31:24] Core type
+    ///
+    UINT32  CoreType:8;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+} CPUID_NATIVE_MODEL_ID_AND_CORE_TYPE_EAX;
+
+///
+/// @{ Define value for CPUID_NATIVE_MODEL_ID_AND_CORE_TYPE_EAX.CoreType
+///
+#define   CPUID_CORE_TYPE_INTEL_ATOM                                    0x20
+#define   CPUID_CORE_TYPE_INTEL_CORE                                    0x40
 ///
 /// @}
 ///
