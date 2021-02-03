@@ -103,7 +103,11 @@ InitializeFvAndVariableStoreHeaders (
   // VARIABLE_STORE_HEADER
   //
   VariableStoreHeader = (VARIABLE_STORE_HEADER*)((UINTN)Headers + FirmwareVolumeHeader->HeaderLength);
-  CopyGuid (&VariableStoreHeader->Signature, &gEfiVariableGuid);
+  //
+  // Should be gEfiVariableGuid as SMM doesn't authenticate, but userspace does 
+  // Must be gEfiAuthenticatedVariableGuid for SecureBoot
+  //
+  CopyGuid (&VariableStoreHeader->Signature, &gEfiAuthenticatedVariableGuid);
   VariableStoreHeader->Size = PcdGet32(PcdFlashNvStorageVariableSize) - FirmwareVolumeHeader->HeaderLength;
   VariableStoreHeader->Format            = VARIABLE_STORE_FORMATTED;
   VariableStoreHeader->State             = VARIABLE_STORE_HEALTHY;
