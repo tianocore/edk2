@@ -84,6 +84,18 @@ APRIORI DXE {
   INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF  UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
+  INF  UefiPayloadPkg/SmbusDxe/SMBusi801Dxe.inf # After BlSupportDxe
+  INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  INF  UefiPayloadPkg/BlSupportDxe/BlSupportDxeSmbios.inf # After SmbiosDxe
+  INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+  INF  UefiPayloadPkg/BlSMMStoreDxe/BlSMMStoreDxe.inf # After DevicePathDxe
+  INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf # After BlSMMStoreDxe, RuntimeDxe
+  INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf # After FaultTolerantWriteDxe
+  INF  UefiPayloadPkg/SmbusConfigLoaderDxe/SMBusConfigLoader.inf
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+  INF  UefiPayloadPkg/SecureBootEnrollDefaultKeys/SecureBootSetup.inf # After SMBusConfigLoader and PcatRealTimeClockRuntimeDxe, before Tcg2Dxe
+!endif
 }
 
 #

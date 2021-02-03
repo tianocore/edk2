@@ -48,7 +48,7 @@
 
 [Protocols]
   gEfiTcgProtocolGuid                                ## CONSUMES
-  gEfiVariableWriteArchProtocolGuid                  ## NOTIFY
+  gEfiVariableWriteArchProtocolGuid                  ## CONSUMES
 
 [Depex]
-  AFTER gEfiVariableWriteArchProtocolGuid
+  TRUE
