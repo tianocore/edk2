@@ -1,7 +1,7 @@
 /** @file
   Defines data types and constants introduced in UEFI.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011 - 2016, ARM Ltd. All rights reserved.<BR>
 Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
@@ -248,6 +248,8 @@ typedef union {
 #define EFI_IMAGE_MACHINE_RISCV64   0x5064
 #define EFI_IMAGE_MACHINE_RISCV128  0x5128
 
+#ifdef EFI_IMAGE_MACHINE_TYPE_SUPPORTED
+#else
 #if   defined (MDE_CPU_IA32)
 
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
@@ -293,6 +295,7 @@ typedef union {
 
 #else
 #error Unknown Processor Type
+#endif
 #endif
 
 #endif
