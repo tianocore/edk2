@@ -423,9 +423,9 @@ R: Siyuan Fu <siyuan.fu@intel.com>
 OvmfPkg
 F: OvmfPkg/
 W: http://www.tianocore.org/ovmf/
-M: Jordan Justen <jordan.l.justen@intel.com>
 M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ardb+tianocore@kernel.org>
+R: Jordan Justen <jordan.l.justen@intel.com>
 S: Maintained
 
 OvmfPkg: bhyve-related modules
