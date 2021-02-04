@@ -197,7 +197,6 @@ M: Ard Biesheuvel <ardb+tianocore@kernel.org>
 EmulatorPkg
 F: EmulatorPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
-M: Jordan Justen <jordan.l.justen@intel.com>
 M: Andrew Fish <afish@apple.com>
 M: Ray Ni <ray.ni@intel.com>
 S: Maintained
