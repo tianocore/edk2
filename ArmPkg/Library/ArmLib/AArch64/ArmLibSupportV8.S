@@ -84,7 +84,7 @@ ASM_FUNC(ArmDisableAllExceptions)
   ret
 
 
-// UINT32
+// UINTN
 // ReadCCSIDR (
 //   IN UINT32 CSSELR
 //   )

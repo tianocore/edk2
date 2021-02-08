@@ -68,7 +68,7 @@
   mrc    p15,0,r0,c0,c2,6     ; Read ID_MMFR4 Register
   bx     LR
 
-// UINT32
+// UINTN
 // ReadCCSIDR (
 //   IN UINT32 CSSELR
 //   )
