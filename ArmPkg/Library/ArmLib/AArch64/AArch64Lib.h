@@ -41,5 +41,16 @@ EFIAPI
 ArmReadIdAA64Pfr0 (
   VOID
   );
+
+/** Reads the ID_AA64MMFR2_EL1 register.
+
+   @return The contents of the ID_AA64MMFR2_EL1 register.
+**/
+UINTN
+EFIAPI
+ArmReadIdAA64Mmfr2 (
+  VOID
+  );
+
 #endif // __AARCH64_LIB_H__
 
