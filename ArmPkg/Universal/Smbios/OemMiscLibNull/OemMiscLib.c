@@ -11,6 +11,7 @@
 
 #include <Uefi.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
 #include <Library/HiiLib.h>
 
 #include <Library/OemMiscLib.h>
