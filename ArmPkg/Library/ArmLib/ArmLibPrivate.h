@@ -170,6 +170,17 @@ ReadCCSIDR (
   IN UINT32 CSSELR
   );
 
+/** Reads the CCSIDR2 for the specified cache.
+
+  @param CSSELR The CSSELR cache selection register value
+
+  @return The contents of the CCSIDR2 register for the specified cache.
+**/
+UINT32
+ReadCCSIDR2 (
+  IN UINT32 CSSELR
+  );
+
 UINT32
 ReadCLIDR (
   VOID
