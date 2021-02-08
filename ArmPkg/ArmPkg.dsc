@@ -148,6 +148,8 @@
   ArmPkg/Drivers/ArmCrashDumpDxe/ArmCrashDumpDxe.inf
   ArmPkg/Drivers/ArmScmiDxe/ArmScmiDxe.inf
 
+  ArmPkg/Universal/Smbios/ProcessorSubClassDxe/ProcessorSubClassDxe.inf
+
 [Components.AARCH64]
   ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf
   ArmPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf

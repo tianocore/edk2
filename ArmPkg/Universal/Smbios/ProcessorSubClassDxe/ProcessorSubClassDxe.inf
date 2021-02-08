@@ -1,0 +1,66 @@
+#/** @file
+#    ProcessorSubClassDxe.inf
+#
+#    Copyright (c) 2021, NUVIA Inc. All rights reserved.
+#    Copyright (c) 2015, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2015, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = ProcessorSubClass
+  FILE_GUID                      = f3fe0e33-ea38-4069-9fb5-be23407207c7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ProcessorSubClassEntryPoint
+
+[Sources]
+  SmbiosProcessorArmCommon.c
+  ProcessorSubClass.c
+  ProcessorSubClassStrings.uni
+  SmbiosProcessor.h
+
+[Sources.AARCH64]
+  SmbiosProcessorAArch64.c
+
+[Sources.ARM]
+  SmbiosProcessorArm.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmSmcLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+  IoLib
+  MemoryAllocationLib
+  OemMiscLib
+  PcdLib
+  PrintLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdProcessorManufacturer
+  gArmTokenSpaceGuid.PcdProcessorVersion
+  gArmTokenSpaceGuid.PcdProcessorSerialNumber
+  gArmTokenSpaceGuid.PcdProcessorAssetTag
+  gArmTokenSpaceGuid.PcdProcessorPartNumber
+
+[Guids]
+
+
+[Depex]
+  gEfiSmbiosProtocolGuid
