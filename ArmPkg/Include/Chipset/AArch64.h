@@ -112,6 +112,10 @@
 #define ARM_VECTOR_LOW_A32_FIQ  0x700
 #define ARM_VECTOR_LOW_A32_SERR 0x780
 
+// The ID_AA64MMFR2_EL1 register was added in ARMv8.2. Since we
+// build for ARMv8.0, we need to define the register here.
+#define ID_AA64MMFR2_EL1 S3_0_C0_C7_2
+
 #define VECTOR_BASE(tbl)          \
   .section .text.##tbl##,"ax";    \
   .align 11;                      \
