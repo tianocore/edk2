@@ -1,0 +1,22 @@
+/** @file
+ *  Based on files under Nt32Pkg/MiscSubClassPlatformDxe/
+ *
+ *  Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
+ *  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+ *  Copyright (c) 2015, Hisilicon Limited. All rights reserved.<BR>
+ *  Copyright (c) 2015, Linaro Limited. All rights reserved.<BR>
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ *
+**/
+
+
+/=#
+
+#langdef en-US "English"
+
+#include "Type00/MiscBiosVendor.uni"
+#include "Type01/MiscSystemManufacturer.uni"
+#include "Type02/MiscBaseBoardManufacturer.uni"
+#include "Type03/MiscChassisManufacturer.uni"
+#include "Type13/MiscNumberOfInstallableLanguages.uni"
