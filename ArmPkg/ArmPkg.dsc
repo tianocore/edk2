@@ -84,6 +84,8 @@
 
   ArmMtlLib|ArmPkg/Library/ArmMtlNullLib/ArmMtlNullLib.inf
 
+  OemMiscLib|ArmPkg/Universal/Smbios/OemMiscLibNull/OemMiscLibNull.inf
+
 [LibraryClasses.common.PEIM]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
