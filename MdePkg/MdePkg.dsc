@@ -1,7 +1,7 @@
 ## @file
 # EFI/PI MdePkg Package
 #
-# Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 #
@@ -126,6 +126,8 @@
 
   MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
+
+  MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
