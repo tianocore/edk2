@@ -1,0 +1,88 @@
+GlobalDataDef
+    SKUID = 0, "DEFAULT"
+EndGlobalData
+
+
+StructDef
+
+    Find "QEMUPD_T"
+        $gQemuFspPkgTokenSpaceGuid_Revision                            1 bytes    $_DEFAULT_ = 0x01
+        Skip 87 bytes
+        $gQemuFspPkgTokenSpaceGuid_ChickenBytes                        4 bytes    $_DEFAULT_ = 0x00000000
+
+    Find "QEMUPD_M"
+        $gQemuFspPkgTokenSpaceGuid_Revision                            1 bytes    $_DEFAULT_ = 0x01
+        Skip 35 bytes
+        $gQemuFspPkgTokenSpaceGuid_StackBase                           4 bytes    $_DEFAULT_ = 0x00070000
+        $gQemuFspPkgTokenSpaceGuid_StackSize                           4 bytes    $_DEFAULT_ = 0x00010000
+        $gQemuFspPkgTokenSpaceGuid_BootLoaderTolumSize                 4 bytes    $_DEFAULT_ = 0x00000000
+        $gPlatformFspPkgTokenSpaceGuid_Bootmode                        4 bytes    $_DEFAULT_ = 0x00000000
+        Skip 8 bytes
+        $gQemuFspPkgTokenSpaceGuid_SerialDebugPortAddress              4 bytes    $_DEFAULT_ = 0x00000000
+        $gQemuFspPkgTokenSpaceGuid_SerialDebugPortType                 1 bytes    $_DEFAULT_ = 0x02
+        $gQemuFspPkgTokenSpaceGuid_SerialDebugPortDevice               1 bytes    $_DEFAULT_ = 0x02
+        $gQemuFspPkgTokenSpaceGuid_SerialDebugPortStrideSize           1 bytes    $_DEFAULT_ = 0x02
+
+    Find "QEMUPD_S"
+        $gQemuFspPkgTokenSpaceGuid_Revision                            1 bytes    $_DEFAULT_ = 0x01
+        Skip 55 bytes
+        $gQemuFspPkgTokenSpaceGuid_LogoSize                            4 bytes    $_DEFAULT_ = 0x00000000
+        $gQemuFspPkgTokenSpaceGuid_LogoPtr                             4 bytes    $_DEFAULT_ = 0x00000000
+        $gQemuFspPkgTokenSpaceGuid_GraphicsConfigPtr                   4 bytes    $_DEFAULT_ = 0x00000000
+        $gQemuFspPkgTokenSpaceGuid_PciTempResourceBase                 4 bytes    $_DEFAULT_ = 0x80000000
+
+EndStruct
+
+
+List &EN_DIS
+    Selection 0x1 , "Enabled"
+    Selection 0x0 , "Disabled"
+EndList
+
+List &gQemuFspPkgTokenSpaceGuid_SerialDebugPortType
+    Selection 0 , "NONE"
+    Selection 1 , "I/O"
+    Selection 2 , "MMIO"
+EndList
+
+List &gQemuFspPkgTokenSpaceGuid_SerialDebugPortDevice
+    Selection 0 , "SOC UART0"
+    Selection 1 , "SOC UART1"
+    Selection 2 , "SOC UART2"
+    Selection 3 , "External Device"
+EndList
+
+List &gQemuFspPkgTokenSpaceGuid_SerialDebugPortStrideSize
+    Selection 0 , "1"
+    Selection 2 , "4"
+EndList
+
+BeginInfoBlock
+    PPVer       "0.1"
+    Description "QEMU Platform"
+EndInfoBlock
+
+Page "FSP T"
+    EditNum $gQemuFspPkgTokenSpaceGuid_ChickenBytes, "Chicken bytes to test Hex config", HEX,
+        Help "This option shows how to present option for 4 bytes data"
+             "Valid range: 0x00000000 ~ 0xFFFFFFFF"
+EndPage
+
+Page "FSP MemoryInit Settings"
+    EditNum $gQemuFspPkgTokenSpaceGuid_SerialDebugPortAddress, "Debug Serial Port Base address", HEX,
+        Help "Debug serial port base address. This option will be used only when the 'Serial Port Debug Device' option is set to 'External Device'. 0x00000000(Default)."
+             "Valid range: 0x00000000 ~ 0xFFFFFFFF"
+    Combo $gQemuFspPkgTokenSpaceGuid_SerialDebugPortType, "Debug Serial Port Type", &gQemuFspPkgTokenSpaceGuid_SerialDebugPortType,
+        Help "16550 compatible debug serial port resource type. NONE means no serial port support. 0x02:MMIO(Default)."
+    Combo $gQemuFspPkgTokenSpaceGuid_SerialDebugPortDevice, "Serial Port Debug Device", &gQemuFspPkgTokenSpaceGuid_SerialDebugPortDevice,
+        Help "Select active serial port device for debug.For SOC UART devices,'Debug Serial Port Base' options will be ignored. 0x02:SOC UART2(Default)."
+    Combo $gQemuFspPkgTokenSpaceGuid_SerialDebugPortStrideSize, "Debug Serial Port Stride Size", &gQemuFspPkgTokenSpaceGuid_SerialDebugPortStrideSize,
+        Help "Debug serial port register map stride size in bytes. 0x00:1, 0x02:4(Default)."
+EndPage
+
+Page "FSP SiliconInit Settings"
+    EditNum $gQemuFspPkgTokenSpaceGuid_PciTempResourceBase, "PCI GFX Temporary MMIO Base", HEX,
+        Help "PCI Temporary PCI GFX Base used before full PCI enumeration. 0x80000000(Default)."
+             "Valid range: 0x80000000 ~ 0xDFFFFFFF"
+EndPage
+
