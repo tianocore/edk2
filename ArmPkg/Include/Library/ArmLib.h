@@ -109,6 +109,10 @@ typedef enum {
 #define GET_MPID(ClusterId, CoreId)   (((ClusterId) << 8) | (CoreId))
 #define PRIMARY_CORE_ID       (PcdGet32(PcdArmPrimaryCore) & ARM_CORE_MASK)
 
+// The ARM Architecture Reference Manual for ARMv8-A defines up
+// to 7 levels of cache, L1 through L7.
+#define MAX_ARM_CACHE_LEVEL   7
+
 UINTN
 EFIAPI
 ArmDataCacheLineLength (
