@@ -13,8 +13,8 @@
 #     "Errata for PC Client Specific Platform Firmware Profile Specification Version 1.0 Revision 1.03"
 #
 #  This driver implements TPM 2.0 definition block in ACPI table and
-#  registers SMI callback functions for Tcg2 physical presence and
-#  MemoryClear to handle the requests from ACPI method.
+#  populates registered SMI callback functions for Tcg2 physical presence
+#  and MemoryClear to handle the requests for ACPI method.
 #
 #  Caution: This module requires additional review when modified.
 #  This driver will have external input - variable and ACPINvs data in SMM mode.
@@ -28,18 +28,16 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = Tcg2Smm
-  MODULE_UNI_FILE                = Tcg2Smm.uni
-  FILE_GUID                      = 44A20657-10B8-4049-A148-ACD8812AF257
-  MODULE_TYPE                    = DXE_SMM_DRIVER
+  BASE_NAME                      = Tcg2Acpi
+  FILE_GUID                      = 0D4BBF18-C2CC-4C23-BD63-BFDAD4C710D0
+  MODULE_TYPE                    = DXE_DRIVER
   PI_SPECIFICATION_VERSION       = 0x0001000A
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = InitializeTcgSmm
+  ENTRY_POINT                    = InitializeTcgAcpi
 
 [Sources]
-  Tcg2Smm.h
-  Tcg2Smm.c
-  Tcg2TraditionalMm.c
+  Tcg2Acpi.c
+  Tpm.asl
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -50,7 +48,6 @@
   BaseLib
   BaseMemoryLib
   UefiDriverEntryPoint
-  MmServicesTableLib
   UefiBootServicesTableLib
   DebugLib
   DxeServicesLib
@@ -58,29 +55,37 @@
   Tpm2CommandLib
   Tcg2PhysicalPresenceLib
   PcdLib
-  SmmMemLib
 
 [Guids]
-  ## SOMETIMES_PRODUCES ## Variable:L"MemoryOverwriteRequestControl"
-  ## SOMETIMES_CONSUMES ## Variable:L"MemoryOverwriteRequestControl"
-  gEfiMemoryOverwriteControlDataGuid
-
   gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## PRODUCES           ## GUID       # TPM device identifier
-  gTcg2MmSwSmiRegisteredGuid                                    ## PRODUCES
   gTpmNvsMmGuid                                                 ## CONSUMES
+  gEdkiiPiSmmCommunicationRegionTableGuid                       ## CONSUMES
 
 [Protocols]
-  gEfiSmmSwDispatch2ProtocolGuid                                ## CONSUMES
-  gEfiSmmVariableProtocolGuid                                   ## CONSUMES
-  gEfiMmReadyToLockProtocolGuid                                 ## CONSUMES
+  gEfiAcpiTableProtocolGuid                                     ## CONSUMES
+  gEfiMmCommunicationProtocolGuid                               ## CONSUMES
+
+[FixedPcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdSmiCommandIoPort             ## CONSUMES
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid              ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress               ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer  ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev                 ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass                 ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2CurrentIrqNum            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2PossibleIrqNumBuf        ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType       ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLaml            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa            ## CONSUMES
 
 [Depex]
-  gEfiSmmSwDispatch2ProtocolGuid AND
-  gEfiSmmVariableProtocolGuid AND
+  gEfiAcpiTableProtocolGuid AND
+  gTcg2MmSwSmiRegisteredGuid AND
   gEfiTcg2ProtocolGuid
-
-[UserExtensions.TianoCore."ExtraFiles"]
-  Tcg2SmmExtra.uni
