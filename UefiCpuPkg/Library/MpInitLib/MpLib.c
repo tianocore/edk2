@@ -1006,7 +1006,6 @@ FillExchangeInfoData (
   IA32_CR4                         Cr4;
 
   ExchangeInfo                  = CpuMpData->MpCpuExchangeInfo;
-  ExchangeInfo->Lock            = 0;
   ExchangeInfo->StackStart      = CpuMpData->Buffer;
   ExchangeInfo->StackSize       = CpuMpData->CpuApStackSize;
   ExchangeInfo->BufferStart     = CpuMpData->WakeupBuffer;
