@@ -31,6 +31,7 @@
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "SecurityPkg/SecurityPkg.dec",
+            "StandaloneMmPkg/StandaloneMmPkg.dec",
             "CryptoPkg/CryptoPkg.dec"
         ],
         # For host based unit tests
