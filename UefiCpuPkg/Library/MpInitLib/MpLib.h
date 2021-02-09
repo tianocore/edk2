@@ -1,7 +1,7 @@
 /** @file
   Common header file for MP Initialize Library.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -190,7 +190,6 @@ typedef struct _CPU_MP_DATA  CPU_MP_DATA;
 // into this structure are used in assembly code in this module
 //
 typedef struct {
-  UINTN                 Lock;
   UINTN                 StackStart;
   UINTN                 StackSize;
   UINTN                 CFunction;
