@@ -122,10 +122,6 @@ SkipEnableExecuteDisable:
 
     ; AP init
     mov        edi, esi
-    add        edi, MP_CPU_EXCHANGE_INFO_FIELD (Lock)
-    mov        eax, NotVacantFlag
-
-    mov        edi, esi
     add        edi, MP_CPU_EXCHANGE_INFO_FIELD (ApIndex)
     mov        ebx, 1
     lock xadd  dword [edi], ebx                 ; EBX = ApIndex++

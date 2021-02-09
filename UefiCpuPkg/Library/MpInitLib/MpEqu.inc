@@ -13,9 +13,6 @@
 ;-------------------------------------------------------------------------------
 %include "Nasm.inc"
 
-VacantFlag                    equ        00h
-NotVacantFlag                 equ        0ffh
-
 CPU_SWITCH_STATE_IDLE         equ        0
 CPU_SWITCH_STATE_STORED       equ        1
 CPU_SWITCH_STATE_LOADED       equ        2
@@ -72,7 +69,6 @@ endstruc
 ; Equivalent NASM structure of MP_CPU_EXCHANGE_INFO
 ;
 struc MP_CPU_EXCHANGE_INFO
-  .Lock:                         CTYPE_UINTN 1
   .StackStart:                   CTYPE_UINTN 1
   .StackSize:                    CTYPE_UINTN 1
   .CFunction:                    CTYPE_UINTN 1
