@@ -55,6 +55,7 @@
   Tpm2CommandLib
   Tcg2PhysicalPresenceLib
   PcdLib
+  DxeMmUnblockMemoryLib
 
 [Guids]
   gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## PRODUCES           ## GUID       # TPM device identifier

@@ -67,6 +67,7 @@
   VariableKeyLib|SecurityPkg/Library/VariableKeyLibNull/VariableKeyLibNull.inf
   RpmcLib|SecurityPkg/Library/RpmcLibNull/RpmcLibNull.inf
   TcgEventLogRecordLib|SecurityPkg/Library/TcgEventLogRecordLib/TcgEventLogRecordLib.inf
+  DxeMmUnblockMemoryLib|MdeModulePkg/Library/DxeMmUnblockMemoryLib/DxeMmUnblockMemoryLibNull.inf
 
 [LibraryClasses.ARM]
   #
