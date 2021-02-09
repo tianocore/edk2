@@ -1,10 +1,27 @@
 ## @file
 # CI configuration for DynamicTablesPkg
 #
-# Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+# Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    ## options defined .pytool/Plugin/LicenseCheck
+    "LicenseCheck": {
+        "IgnoreFiles": []
+    },
+
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+        ]
+    },
+
     ## options defined .pytool/Plugin/CompilerPlugin
     "CompilerPlugin": {
         "DscPath": "DynamicTablesPkg.dsc"
