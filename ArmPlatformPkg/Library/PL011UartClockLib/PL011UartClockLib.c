@@ -1,9 +1,10 @@
 /** @file
-*
-*  Copyright 2018 NXP
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
+
+  Copyright 2018 NXP
+  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #include <Base.h>

@@ -1,9 +1,9 @@
 /** @file
-*
-*  Copyright (c) 2011, ARM Limited. All rights reserved.
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
+
+  Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #include <Library/ArmPlatformLib.h>

@@ -1,9 +1,9 @@
 /** @file
-*
-*  Copyright (c) 2011-2016, ARM Limited. All rights reserved.
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
+
+ Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #ifndef __PL011_UART_LIB_H__
