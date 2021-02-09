@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
-  "id": "binwrappers",
-  "scope": "global-win",
+  "scope": "pipbuild-win",
+  "override_id": "binwrappers",
   "flags": ["set_path"]
 }

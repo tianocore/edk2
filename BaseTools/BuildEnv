@@ -46,7 +46,7 @@ RestorePreviousConfiguration() {
       done
     fi
   fi
-  
+
   PREVIOUS_CONF_FILE=$CONF_PATH/BuildEnv.sh
   if [ -e $PREVIOUS_CONF_FILE ]
   then
@@ -198,7 +198,17 @@ AddEdkToolsToPath() {
 
   EDK_TOOLS_PATH_BIN=`GetEdkToolsPathBinDirectory`
 
-  AddDirToStartOfPath $EDK_TOOLS_PATH/BinWrappers/PosixLike
+  # check if the edk2basetools pip package is available
+  if $PYTHON_COMMAND -c "import edk2basetools" &> /dev/null; then
+    # if it is, use the pip version of the wrappers
+    echo "Using Pip Basetools"
+    AddDirToStartOfPath $EDK_TOOLS_PATH/BinPipWrappers/PosixLike
+  else
+    echo "Using EDK2 in-source Basetools"
+    AddDirToStartOfPath $EDK_TOOLS_PATH/BinWrappers/PosixLike
+  fi
+
+
   AddDirToStartOfPath $EDK_TOOLS_PATH_BIN
 
 }
