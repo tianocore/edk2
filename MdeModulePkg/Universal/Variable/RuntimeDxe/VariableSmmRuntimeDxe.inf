@@ -60,6 +60,7 @@
   TpmMeasurementLib
   SafeIntLib
   PcdLib
+  DxeMmUnblockMemoryLib
 
 [Protocols]
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
