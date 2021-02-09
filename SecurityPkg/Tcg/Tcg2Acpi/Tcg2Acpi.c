@@ -38,6 +38,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/Tpm2CommandLib.h>
 #include <Library/UefiLib.h>
+#include <Library/MmUnblockMemoryLib.h>
 
 //
 // Physical Presence Interface Version supported by Platform
@@ -147,6 +148,11 @@ AssignOpRegion (
       ZeroMem ((VOID *)(UINTN)MemoryAddress, Size);
       OpRegion->RegionOffset = (UINT32) (UINTN) MemoryAddress;
       OpRegion->RegionLen    = (UINT8) Size;
+      // Request to unblock this region from MM core
+      Status = MmUnblockMemoryRequest (MemoryAddress, EFI_SIZE_TO_PAGES (Size));
+      if (Status != EFI_UNSUPPORTED && EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+      }
       break;
     }
   }
