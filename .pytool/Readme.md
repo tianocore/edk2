@@ -254,6 +254,16 @@ Install
 
   More cspell info: https://github.com/streetsidesoftware/cspell
 
+### License Checking - LicenseCheck
+
+Scans all new added files in a package to make sure code is contributed under
+BSD-2-Clause-Patent.
+
+### Ecc tool - EccCheck
+
+Run the Ecc tool on the package. The Ecc tool is available in the BaseTools
+package. It checks that the code complies to the EDKII coding standard.
+
 ## PyTool Scopes
 
 Scopes are how the PyTool ext_dep, path_env, and plugins are activated.  Meaning
