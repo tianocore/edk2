@@ -1,7 +1,7 @@
 /** @file
   MADT Table Generator
 
-  Copyright (c) 2017 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2021, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -122,17 +122,17 @@ AddGICC (
   // UINT64 PhysicalBaseAddress
   Gicc->PhysicalBaseAddress = GicCInfo->PhysicalBaseAddress;
   // UINT64 GICV
-  Gicc->GICV = GicCInfo->GICV;
+  Gicc->GICV = GicCInfo->GicV;
   // UINT64 GICH
-  Gicc->GICH = GicCInfo->GICH;
+  Gicc->GICH = GicCInfo->GicH;
 
   // UINT32 VGICMaintenanceInterrupt
-  Gicc->VGICMaintenanceInterrupt = GicCInfo->VGICMaintenanceInterrupt;
+  Gicc->VGICMaintenanceInterrupt = GicCInfo->VGicMaintenanceInterrupt;
   // UINT64 GICRBaseAddress
-  Gicc->GICRBaseAddress = GicCInfo->GICRBaseAddress;
+  Gicc->GICRBaseAddress = GicCInfo->GicRBaseAddress;
 
   // UINT64 MPIDR
-  Gicc->MPIDR = GicCInfo->MPIDR;
+  Gicc->MPIDR = GicCInfo->Mpidr;
   // UINT8 ProcessorPowerEfficiencyClass
   Gicc->ProcessorPowerEfficiencyClass =
     GicCInfo->ProcessorPowerEfficiencyClass;

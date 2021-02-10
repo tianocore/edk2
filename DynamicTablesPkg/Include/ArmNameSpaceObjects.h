@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -130,31 +130,31 @@ typedef struct CmArmGicCInfo {
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64  GICV;
+  UINT64  GicV;
 
   /** The base address for GICH interface
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64  GICH;
+  UINT64  GicH;
 
   /** The GICV maintenance interrupt
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT32  VGICMaintenanceInterrupt;
+  UINT32  VGicMaintenanceInterrupt;
 
   /** The base address for GICR interface
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64  GICRBaseAddress;
+  UINT64  GicRBaseAddress;
 
   /** The MPIDR for the CPU
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64  MPIDR;
+  UINT64  Mpidr;
 
   /** The Processor Power Efficiency class
       as described by the GICC structure in the
