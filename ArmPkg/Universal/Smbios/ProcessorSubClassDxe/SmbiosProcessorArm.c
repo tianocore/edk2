@@ -22,7 +22,7 @@
     @return The cache size.
 **/
 UINT64
-ArmGetCacheSize (
+SmbiosProcessorGetCacheSize (
   IN UINT8   CacheLevel,
   IN BOOLEAN DataCache,
   IN BOOLEAN UnifiedCache
@@ -66,14 +66,13 @@ ArmGetCacheSize (
     @return The cache associativity.
 **/
 UINT32
-ArmGetCacheAssociativity (
+SmbiosProcessorGetCacheAssociativity (
   IN UINT8   CacheLevel,
   IN BOOLEAN DataCache,
   IN BOOLEAN UnifiedCache
   )
 {
   CCSIDR_DATA  Ccsidr;
-  CCSIDR2_DATA Ccsidr2;
   CSSELR_DATA  Csselr;
   BOOLEAN      CcidxSupported;
   UINT32       Associativity;
@@ -88,7 +87,6 @@ ArmGetCacheAssociativity (
   CcidxSupported = ArmHasCcidx ();
 
   if (CcidxSupported) {
-    Ccsidr2.Data = ReadCCSIDR2 (Csselr.Data);
     Associativity = Ccsidr.BitsCcidxAA32.Associativity + 1;
   } else {
     Associativity = Ccsidr.BitsNonCcidx.Associativity + 1;
