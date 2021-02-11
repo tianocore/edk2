@@ -511,7 +511,7 @@ StandaloneMmMain (
   EFI_HOB_GUID_TYPE               *MmramRangesHob;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
   EFI_MMRAM_DESCRIPTOR            *MmramRanges;
-  UINT32                          MmramRangeCount;
+  UINTN                           MmramRangeCount;
   EFI_HOB_FIRMWARE_VOLUME         *BfvHob;
 
   ProcessLibraryConstructorList (HobStart, &gMmCoreMmst);
@@ -546,7 +546,7 @@ StandaloneMmMain (
     MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
     ASSERT (MmramRangesHobData != NULL);
     MmramRanges = MmramRangesHobData->Descriptor;
-    MmramRangeCount = MmramRangesHobData->NumberOfMmReservedRegions;
+    MmramRangeCount = (UINTN)MmramRangesHobData->NumberOfMmReservedRegions;
     ASSERT (MmramRanges);
     ASSERT (MmramRangeCount);
 
@@ -554,7 +554,7 @@ StandaloneMmMain (
     // Copy the MMRAM ranges into MM_CORE_PRIVATE_DATA table just in case any
     // code relies on them being present there
     //
-    gMmCorePrivate->MmramRangeCount = MmramRangeCount;
+    gMmCorePrivate->MmramRangeCount = (UINT64)MmramRangeCount;
     gMmCorePrivate->MmramRanges =
       (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (MmramRangeCount * sizeof (EFI_MMRAM_DESCRIPTOR));
     ASSERT (gMmCorePrivate->MmramRanges != 0);
@@ -567,7 +567,7 @@ StandaloneMmMain (
     DataInHob       = GET_GUID_HOB_DATA (GuidHob);
     gMmCorePrivate = (MM_CORE_PRIVATE_DATA *)(UINTN)DataInHob->Address;
     MmramRanges     = (EFI_MMRAM_DESCRIPTOR *)(UINTN)gMmCorePrivate->MmramRanges;
-    MmramRangeCount = gMmCorePrivate->MmramRangeCount;
+    MmramRangeCount = (UINTN)gMmCorePrivate->MmramRangeCount;
   }
 
   //
