@@ -157,8 +157,6 @@ PlatformBootManagerBeforeConsole (
   EFI_INPUT_KEY                Down;
   EFI_BOOT_MANAGER_LOAD_OPTION BootOption;
 
-  PlatformConsoleInit ();
-
   //
   // Register ENTER as CONTINUE key
   //
@@ -192,6 +190,8 @@ PlatformBootManagerBeforeConsole (
   // Dispatch deferred images after EndOfDxe event and ReadyToLock installation.
   //
   EfiBootManagerDispatchDeferredImages ();
+
+  PlatformConsoleInit ();
 }
 
 /**
