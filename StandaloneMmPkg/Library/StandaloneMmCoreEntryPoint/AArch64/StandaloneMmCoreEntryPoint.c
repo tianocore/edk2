@@ -32,8 +32,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPM_MINOR_VER_MASK        0x0000FFFF
 #define SPM_MAJOR_VER_SHIFT       16
 
-#define SPM_MAJOR_VER             0
-#define SPM_MINOR_VER             1
+STATIC CONST UINT32 mSpmMajorVer = SPM_MAJOR_VERSION;
+STATIC CONST UINT32 mSpmMinorVer = SPM_MINOR_VERSION;
 
 #define BOOT_PAYLOAD_VERSION      1
 
@@ -196,8 +196,8 @@ GetSpmVersion (VOID)
   // revision A must work in a compatible way with revision B.
   // However, it is possible for revision B to have a higher
   // function count than revision A.
-  if ((SpmMajorVersion == SPM_MAJOR_VER) &&
-      (SpmMinorVersion >= SPM_MINOR_VER))
+  if ((SpmMajorVersion == mSpmMajorVer) &&
+      (SpmMinorVersion >= mSpmMinorVer))
   {
     DEBUG ((DEBUG_INFO, "SPM Version: Major=0x%x, Minor=0x%x\n",
            SpmMajorVersion, SpmMinorVersion));
@@ -206,7 +206,7 @@ GetSpmVersion (VOID)
   else
   {
     DEBUG ((DEBUG_INFO, "Incompatible SPM Versions.\n Current Version: Major=0x%x, Minor=0x%x.\n Expected: Major=0x%x, Minor>=0x%x.\n",
-            SpmMajorVersion, SpmMinorVersion, SPM_MAJOR_VER, SPM_MINOR_VER));
+            SpmMajorVersion, SpmMinorVersion, mSpmMajorVer, mSpmMinorVer));
     Status = EFI_UNSUPPORTED;
   }
 
