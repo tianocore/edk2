@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <PiSmm.h>
+#include <PiMm.h>
 #include "CpuFeaturesLib.h"
 
 /**
