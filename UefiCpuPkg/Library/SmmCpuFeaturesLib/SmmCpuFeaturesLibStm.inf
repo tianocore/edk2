@@ -19,7 +19,7 @@
 
 [Sources]
   CpuFeaturesLib.h
-  SmmCpuFeaturesLib.c
+  SmmCpuFeaturesLibCommon.c
   SmmStm.c
   SmmStm.h
 
