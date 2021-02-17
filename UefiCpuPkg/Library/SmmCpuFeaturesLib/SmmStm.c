@@ -21,6 +21,7 @@
 
 #include <Protocol/MpService.h>
 
+#include "CpuFeaturesLib.h"
 #include "SmmStm.h"
 
 #define TXT_EVTYPE_BASE                  0x400

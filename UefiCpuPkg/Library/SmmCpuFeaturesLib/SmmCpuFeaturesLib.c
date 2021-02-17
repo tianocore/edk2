@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Register/Intel/Cpuid.h>
 #include <Register/Intel/SmramSaveStateMap.h>
+#include "CpuFeaturesLib.h"
 
 //
 // Machine Specific Registers (MSRs)
@@ -34,16 +35,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define SMM_FEATURES_LIB_IA32_MCA_CAP              0x17D
 #define   SMM_CODE_ACCESS_CHK_BIT                  BIT58
-
-/**
-  Internal worker function that is called to complete CPU initialization at the
-  end of SmmCpuFeaturesInitializeProcessor().
-
-**/
-VOID
-FinishSmmCpuFeaturesInitializeProcessor (
-  VOID
-  );
 
 //
 // Set default value to assume SMRR is not supported

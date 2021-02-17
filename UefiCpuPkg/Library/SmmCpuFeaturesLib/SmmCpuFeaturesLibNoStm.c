@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <PiSmm.h>
 #include <Library/SmmCpuFeaturesLib.h>
+#include "CpuFeaturesLib.h"
 
 /**
   Internal worker function that is called to complete CPU initialization at the
