@@ -10,6 +10,18 @@
 #define CPU_FEATURES_LIB_H_
 
 /**
+  Performs library initialization.
+
+  This initialization function contains common functionality shared betwen all
+  library instance constructors.
+
+**/
+VOID
+CpuFeaturesLibInitialization (
+  VOID
+  );
+
+/**
   Internal worker function that is called to complete CPU initialization at the
   end of SmmCpuFeaturesInitializeProcessor().
 
