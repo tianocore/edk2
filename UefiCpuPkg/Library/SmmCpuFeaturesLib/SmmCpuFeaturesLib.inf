@@ -17,6 +17,7 @@
   CONSTRUCTOR                    = SmmCpuFeaturesLibConstructor
 
 [Sources]
+  CpuFeaturesLib.h
   SmmCpuFeaturesLib.c
   SmmCpuFeaturesLibNoStm.c
 
