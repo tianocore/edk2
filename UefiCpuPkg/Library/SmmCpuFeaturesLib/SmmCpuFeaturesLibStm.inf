@@ -22,6 +22,7 @@
   SmmCpuFeaturesLibCommon.c
   SmmStm.c
   SmmStm.h
+  TraditionalMmCpuFeaturesLib.c
 
 [Sources.Ia32]
   Ia32/SmmStmSupport.c
