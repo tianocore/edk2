@@ -31,4 +31,18 @@ FinishSmmCpuFeaturesInitializeProcessor (
   VOID
   );
 
+/**
+  Gets the maximum number of logical processors from the PCD PcdCpuMaxLogicalProcessorNumber.
+
+  This access is abstracted from the PCD services to enforce that the PCD be
+  FixedAtBuild in the Standalone MM build of this driver.
+
+  @return  The value of PcdCpuMaxLogicalProcessorNumber.
+
+**/
+UINT32
+GetCpuMaxLogicalProcessorNumber (
+  VOID
+  );
+
 #endif

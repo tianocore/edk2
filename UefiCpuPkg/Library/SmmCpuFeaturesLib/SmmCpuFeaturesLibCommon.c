@@ -157,7 +157,7 @@ CpuFeaturesLibInitialization (
   //
   // Allocate array for state of SMRR enable on all CPUs
   //
-  mSmrrEnabled = (BOOLEAN *)AllocatePool (sizeof (BOOLEAN) * PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+  mSmrrEnabled = (BOOLEAN *)AllocatePool (sizeof (BOOLEAN) * GetCpuMaxLogicalProcessorNumber ());
   ASSERT (mSmrrEnabled != NULL);
 }
 

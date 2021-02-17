@@ -21,6 +21,7 @@
   SmmCpuFeaturesLib.c
   SmmCpuFeaturesLibCommon.c
   SmmCpuFeaturesLibNoStm.c
+  TraditionalMmCpuFeaturesLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
