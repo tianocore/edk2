@@ -2,6 +2,7 @@
 Implementation shared across all library instances.
 
 Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -63,19 +64,15 @@ BOOLEAN  mNeedConfigureMtrrs = TRUE;
 BOOLEAN  *mSmrrEnabled;
 
 /**
-  The constructor function
+  Performs library initialization.
 
-  @param[in]  ImageHandle  The firmware allocated handle for the EFI image.
-  @param[in]  SystemTable  A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS      The constructor always returns EFI_SUCCESS.
+  This initialization function contains common functionality shared betwen all
+  library instance constructors.
 
 **/
-EFI_STATUS
-EFIAPI
-SmmCpuFeaturesLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+VOID
+CpuFeaturesLibInitialization (
+  VOID
   )
 {
   UINT32  RegEax;
@@ -162,8 +159,6 @@ SmmCpuFeaturesLibConstructor (
   //
   mSmrrEnabled = (BOOLEAN *)AllocatePool (sizeof (BOOLEAN) * PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
   ASSERT (mSmrrEnabled != NULL);
-
-  return EFI_SUCCESS;
 }
 
 /**
