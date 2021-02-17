@@ -6,7 +6,7 @@
 
 **/
 
-#include <PiSmm.h>
+#include <PiMm.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>

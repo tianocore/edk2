@@ -6,7 +6,7 @@
 
 **/
 
-#include <PiSmm.h>
+#include <PiMm.h>
 #include <Library/DebugLib.h>
 
 #include "SmmStm.h"
