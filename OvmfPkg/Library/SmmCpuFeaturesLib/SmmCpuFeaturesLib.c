@@ -467,6 +467,21 @@ SmmCpuFeaturesRendezvousExit (
   IN UINTN  CpuIndex
   )
 {
+  //
+  // We only call the Handler if CPU hot-eject is enabled
+  // (PcdCpuMaxLogicalProcessorNumber > 1), and hot-eject is needed
+  // in this SMI exit (otherwise mCpuHotEjectData->Handler is not armed.)
+  //
+
+  if (mCpuHotEjectData != NULL) {
+    CPU_HOT_EJECT_HANDLER Handler;
+
+    Handler = mCpuHotEjectData->Handler;
+
+    if (Handler != NULL) {
+      Handler (CpuIndex);
+    }
+  }
 }
 
 /**
