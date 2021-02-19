@@ -20,4 +20,7 @@
 #define ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ_AARCH64      0xC400006F
 #define ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP_AARCH64     0xC4000070
 
+#define SPM_MAJOR_VERSION_FFA                           1
+#define SPM_MINOR_VERSION_FFA                           0
+
 #endif // ARM_FFA_SVC_H_
