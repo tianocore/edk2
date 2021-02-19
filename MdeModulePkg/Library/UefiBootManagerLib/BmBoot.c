@@ -3,7 +3,7 @@
 
 Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
 Copyright (c) 2011 - 2020, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2015-2021 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2505,7 +2505,7 @@ BmRegisterBootManagerMenu (
     EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
     );
 
-  return EfiBootManagerAddLoadOptionVariable (BootOption, 0);
+  return EfiBootManagerAddLoadOptionVariable (BootOption, (UINTN) -1);
 }
 
 /**
