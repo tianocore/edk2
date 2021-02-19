@@ -41,4 +41,7 @@
 #define ARM_SVC_SPM_RET_DENIED               -3
 #define ARM_SVC_SPM_RET_NO_MEMORY            -5
 
+#define SPM_MAJOR_VERSION                     0
+#define SPM_MINOR_VERSION                     1
+
 #endif
