@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/PcdLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/ArmMmSvc.h>
@@ -31,9 +32,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SPM_MAJOR_VER_MASK        0xFFFF0000
 #define SPM_MINOR_VER_MASK        0x0000FFFF
 #define SPM_MAJOR_VER_SHIFT       16
+#define FFA_NOT_SUPPORTED         -1
 
 STATIC CONST UINT32 mSpmMajorVer = SPM_MAJOR_VERSION;
 STATIC CONST UINT32 mSpmMinorVer = SPM_MINOR_VERSION;
+
+STATIC CONST UINT32 mSpmMajorVerFfa = SPM_MAJOR_VERSION_FFA;
+STATIC CONST UINT32 mSpmMinorVerFfa = SPM_MINOR_VERSION_FFA;
 
 #define BOOT_PAYLOAD_VERSION      1
 
@@ -175,19 +180,34 @@ EFI_STATUS
 GetSpmVersion (VOID)
 {
   EFI_STATUS   Status;
-  UINT16       SpmMajorVersion;
-  UINT16       SpmMinorVersion;
+  UINT16       CalleeSpmMajorVer;
+  UINT16       CallerSpmMajorVer;
+  UINT16       CalleeSpmMinorVer;
+  UINT16       CallerSpmMinorVer;
   UINT32       SpmVersion;
   ARM_SVC_ARGS SpmVersionArgs;
 
-  SpmVersionArgs.Arg0 = ARM_SVC_ID_SPM_VERSION_AARCH32;
+  if (FeaturePcdGet (PcdFfaEnable)) {
+    SpmVersionArgs.Arg0 = ARM_SVC_ID_FFA_VERSION_AARCH32;
+    SpmVersionArgs.Arg1 = mSpmMajorVerFfa << SPM_MAJOR_VER_SHIFT;
+    SpmVersionArgs.Arg1 |= mSpmMinorVerFfa;
+    CallerSpmMajorVer = mSpmMajorVerFfa;
+    CallerSpmMinorVer = mSpmMinorVerFfa;
+  } else {
+    SpmVersionArgs.Arg0 = ARM_SVC_ID_SPM_VERSION_AARCH32;
+    CallerSpmMajorVer = mSpmMajorVer;
+    CallerSpmMinorVer = mSpmMinorVer;
+  }
 
   ArmCallSvc (&SpmVersionArgs);
 
   SpmVersion = SpmVersionArgs.Arg0;
+  if (SpmVersion == FFA_NOT_SUPPORTED) {
+    return EFI_UNSUPPORTED;
+  }
 
-  SpmMajorVersion = ((SpmVersion & SPM_MAJOR_VER_MASK) >> SPM_MAJOR_VER_SHIFT);
-  SpmMinorVersion = ((SpmVersion & SPM_MINOR_VER_MASK) >> 0);
+  CalleeSpmMajorVer = ((SpmVersion & SPM_MAJOR_VER_MASK) >> SPM_MAJOR_VER_SHIFT);
+  CalleeSpmMinorVer = ((SpmVersion & SPM_MINOR_VER_MASK) >> 0);
 
   // Different major revision values indicate possibly incompatible functions.
   // For two revisions, A and B, for which the major revision values are
@@ -196,17 +216,17 @@ GetSpmVersion (VOID)
   // revision A must work in a compatible way with revision B.
   // However, it is possible for revision B to have a higher
   // function count than revision A.
-  if ((SpmMajorVersion == mSpmMajorVer) &&
-      (SpmMinorVersion >= mSpmMinorVer))
+  if ((CalleeSpmMajorVer == CallerSpmMajorVer) &&
+      (CalleeSpmMinorVer >= CallerSpmMinorVer))
   {
     DEBUG ((DEBUG_INFO, "SPM Version: Major=0x%x, Minor=0x%x\n",
-           SpmMajorVersion, SpmMinorVersion));
+           CalleeSpmMajorVer, CalleeSpmMinorVer));
     Status = EFI_SUCCESS;
   }
   else
   {
-    DEBUG ((DEBUG_INFO, "Incompatible SPM Versions.\n Current Version: Major=0x%x, Minor=0x%x.\n Expected: Major=0x%x, Minor>=0x%x.\n",
-            SpmMajorVersion, SpmMinorVersion, mSpmMajorVer, mSpmMinorVer));
+    DEBUG ((DEBUG_INFO, "Incompatible SPM Versions.\n Callee Version: Major=0x%x, Minor=0x%x.\n Caller: Major=0x%x, Minor>=0x%x.\n",
+            CalleeSpmMajorVer, CalleeSpmMinorVer, CallerSpmMajorVer, CallerSpmMinorVer));
     Status = EFI_UNSUPPORTED;
   }
 
