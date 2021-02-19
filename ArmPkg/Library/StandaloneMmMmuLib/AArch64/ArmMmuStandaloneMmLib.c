@@ -116,47 +116,89 @@ RequestMemoryPermissionChange (
   IN  UINTN                     Permissions
   )
 {
-  EFI_STATUS    Status;
+  INT32         Ret;
+  BOOLEAN       FfaEnabled;
   ARM_SVC_ARGS  ChangeMemoryPermissionsSvcArgs;
 
   ZeroMem (&ChangeMemoryPermissionsSvcArgs, sizeof (ARM_SVC_ARGS));
 
-  ChangeMemoryPermissionsSvcArgs.Arg0 = ARM_SVC_ID_SP_SET_MEM_ATTRIBUTES_AARCH64;
-  ChangeMemoryPermissionsSvcArgs.Arg1 = BaseAddress;
-  ChangeMemoryPermissionsSvcArgs.Arg2 = EFI_SIZE_TO_PAGES(Length);
-  ChangeMemoryPermissionsSvcArgs.Arg3 = Permissions;
+  FfaEnabled = FeaturePcdGet (PcdFfaEnable);
+
+  if (FfaEnabled) {
+    ChangeMemoryPermissionsSvcArgs.Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ_AARCH64;
+    ChangeMemoryPermissionsSvcArgs.Arg1 = ARM_FFA_DESTINATION_ENDPOINT_ID;
+    ChangeMemoryPermissionsSvcArgs.Arg2 = 0;
+    ChangeMemoryPermissionsSvcArgs.Arg3 = ARM_SVC_ID_SP_SET_MEM_ATTRIBUTES_AARCH64;
+    ChangeMemoryPermissionsSvcArgs.Arg4 = BaseAddress;
+    ChangeMemoryPermissionsSvcArgs.Arg5 = EFI_SIZE_TO_PAGES (Length);
+    ChangeMemoryPermissionsSvcArgs.Arg6 = Permissions;
+  } else {
+    ChangeMemoryPermissionsSvcArgs.Arg0 = ARM_SVC_ID_SP_SET_MEM_ATTRIBUTES_AARCH64;
+    ChangeMemoryPermissionsSvcArgs.Arg1 = BaseAddress;
+    ChangeMemoryPermissionsSvcArgs.Arg2 = EFI_SIZE_TO_PAGES (Length);
+    ChangeMemoryPermissionsSvcArgs.Arg3 = Permissions;
+  }
 
   ArmCallSvc (&ChangeMemoryPermissionsSvcArgs);
 
-  Status = ChangeMemoryPermissionsSvcArgs.Arg0;
+  if (FfaEnabled) {
+    // Setting memory attributes is an atomic call, with
+    // StandaloneMm at S-EL0 being the caller and the SPM
+    // core being the callee. Thus there won't be a
+    // FFA_INTERRUPT or FFA_SUCCESS response to the Direct
+    // Request sent above. This will have to be considered
+    // for other Direct Request calls which are not atomic
+    // We therefore check only for Direct Response by the
+    // callee.
+    if (ChangeMemoryPermissionsSvcArgs.Arg0 !=
+        ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP_AARCH64) {
+      // If Arg0 is not a Direct Response, that means we
+      // have an FF-A error. We need to check Arg2 for the
+      // FF-A error code.
+      Ret = ChangeMemoryPermissionsSvcArgs.Arg2;
+      switch (Ret) {
+      case ARM_FFA_SPM_RET_INVALID_PARAMETERS:
+        return EFI_INVALID_PARAMETER;
 
-  switch (Status) {
-  case ARM_SVC_SPM_RET_SUCCESS:
-    Status = EFI_SUCCESS;
-    break;
+      case ARM_FFA_SPM_RET_DENIED:
+        return EFI_NOT_READY;
 
-  case ARM_SVC_SPM_RET_NOT_SUPPORTED:
-    Status = EFI_UNSUPPORTED;
-    break;
+      case ARM_FFA_SPM_RET_NOT_SUPPORTED:
+        return EFI_UNSUPPORTED;
 
-  case ARM_SVC_SPM_RET_INVALID_PARAMS:
-    Status = EFI_INVALID_PARAMETER;
-    break;
+      case ARM_FFA_SPM_RET_BUSY:
+        return EFI_NOT_READY;
 
-  case ARM_SVC_SPM_RET_DENIED:
-    Status = EFI_ACCESS_DENIED;
-    break;
-
-  case ARM_SVC_SPM_RET_NO_MEMORY:
-    Status = EFI_BAD_BUFFER_SIZE;
-    break;
-
-  default:
-    Status = EFI_ACCESS_DENIED;
-    ASSERT (0);
+      case ARM_FFA_SPM_RET_ABORTED:
+        return EFI_ABORTED;
+      }
+    } else if (ChangeMemoryPermissionsSvcArgs.Arg0 ==
+               ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP_AARCH64) {
+      // A Direct Response means FF-A success
+      // Now check the payload for errors
+      // The callee sends back the return value
+      // in Arg3
+      Ret = ChangeMemoryPermissionsSvcArgs.Arg3;
+    }
+  } else {
+    Ret = ChangeMemoryPermissionsSvcArgs.Arg0;
   }
 
-  return Status;
+  switch (Ret) {
+  case ARM_SVC_SPM_RET_NOT_SUPPORTED:
+    return EFI_UNSUPPORTED;
+
+  case ARM_SVC_SPM_RET_INVALID_PARAMS:
+    return EFI_INVALID_PARAMETER;
+
+  case ARM_SVC_SPM_RET_DENIED:
+    return EFI_ACCESS_DENIED;
+
+  case ARM_SVC_SPM_RET_NO_MEMORY:
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS
