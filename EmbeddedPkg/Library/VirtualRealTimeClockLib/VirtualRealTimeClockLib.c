@@ -88,7 +88,7 @@ LibGetTime (
     //
     EpochSeconds = BUILD_EPOCH;
     DEBUG ((
-      DEBUG_INFO,
+      DEBUG_VERBOSE,
       "LibGetTime: %s non volatile variable was not found - Using compilation time epoch.\n",
       mEpochVariableName
       ));
