@@ -71,8 +71,8 @@ typedef enum
 
   @return               CPU frequency in Hz
 **/
-EFIAPI
 UINTN
+EFIAPI
 OemGetCpuFreq (
   IN UINT8 ProcessorIndex
   );
@@ -87,8 +87,8 @@ OemGetCpuFreq (
 
   @return  TRUE on success, FALSE on failure.
 **/
-EFIAPI
 BOOLEAN
+EFIAPI
 OemGetProcessorInformation (
   IN UINTN ProcessorIndex,
   IN OUT PROCESSOR_STATUS_DATA *ProcessorStatus,
@@ -106,8 +106,8 @@ OemGetProcessorInformation (
 
   @return TRUE on success, FALSE on failure.
 **/
-EFIAPI
 BOOLEAN
+EFIAPI
 OemGetCacheInformation (
   IN UINT8   ProcessorIndex,
   IN UINT8   CacheLevel,
@@ -120,8 +120,8 @@ OemGetCacheInformation (
 
   @return The maximum number of sockets.
 **/
-EFIAPI
 UINT8
+EFIAPI
 OemGetProcessorMaxSockets (
   VOID
   );
@@ -132,8 +132,8 @@ OemGetProcessorMaxSockets (
 
   @retval EFI_SUCCESS The chassis type was fetched successfully.
 **/
-EFIAPI
 EFI_STATUS
+EFIAPI
 OemGetChassisType (
   OUT UINT8 *ChassisType
   );
@@ -144,8 +144,8 @@ OemGetChassisType (
 
   @return TRUE is the processor is present, FALSE otherwise.
 **/
-EFIAPI
 BOOLEAN
+EFIAPI
 OemIsSocketPresent (
   IN UINTN ProcessorIndex
   );
@@ -156,8 +156,8 @@ OemIsSocketPresent (
   @param TokenToUpdate The string to update.
   @param Offset        The field to get information about.
 **/
-EFIAPI
 VOID
+EFIAPI
 OemUpdateSmbiosInfo (
   IN EFI_HII_HANDLE    HiiHandle,
   IN EFI_STRING_ID     TokenToUpdate,
