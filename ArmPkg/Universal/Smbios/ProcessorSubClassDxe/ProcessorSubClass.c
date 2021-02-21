@@ -439,8 +439,8 @@ AddSmbiosCacheTypeTable (
     strings following the data fields.
 
   @param[out] Type4Record    The Type 4 structure to allocate and initialize
-  @param[in]  ProcessorIndex The index of the processor socket
-  @param[in]  Populated      Whether the specified processor socket is
+  @param[in]  ProcessorIndex The index of the processor
+  @param[in]  Populated      Whether the specified processor is
                              populated.
 
   @retval EFI_SUCCESS          The Type 4 structure was successfully
@@ -460,7 +460,7 @@ AllocateType4AndSetProcessorInformationStrings (
   EFI_STRING_ID   SerialNumber;
   EFI_STRING_ID   AssetTag;
   EFI_STRING_ID   PartNumber;
-  EFI_STRING      ProcessorSocketStr;
+  EFI_STRING      ProcessorStr;
   EFI_STRING      ProcessorManuStr;
   EFI_STRING      ProcessorVersionStr;
   EFI_STRING      SerialNumberStr;
@@ -468,7 +468,7 @@ AllocateType4AndSetProcessorInformationStrings (
   EFI_STRING      PartNumberStr;
   CHAR8           *OptionalStrStart;
   CHAR8           *StrStart;
-  UINTN           ProcessorSocketStrLen;
+  UINTN           ProcessorStrLen;
   UINTN           ProcessorManuStrLen;
   UINTN           ProcessorVersionStrLen;
   UINTN           SerialNumberStrLen;
@@ -497,14 +497,14 @@ AllocateType4AndSetProcessorInformationStrings (
   SET_HII_STRING_IF_PCD_NOT_EMPTY (PcdProcessorAssetTag, AssetTag);
   SET_HII_STRING_IF_PCD_NOT_EMPTY (PcdProcessorPartNumber, PartNumber);
 
-  // Processor Socket Designation
+  // Processor Designation
   StringBufferSize = sizeof (CHAR16) * SMBIOS_STRING_MAX_LENGTH;
-  ProcessorSocketStr = AllocateZeroPool (StringBufferSize);
-  if (ProcessorSocketStr == NULL) {
+  ProcessorStr = AllocateZeroPool (StringBufferSize);
+  if (ProcessorStr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ProcessorSocketStrLen = UnicodeSPrint (ProcessorSocketStr, StringBufferSize,
+  ProcessorStrLen = UnicodeSPrint (ProcessorStr, StringBufferSize,
                                          L"CPU%02d", ProcessorIndex + 1);
 
   // Processor Manufacture
@@ -528,7 +528,7 @@ AllocateType4AndSetProcessorInformationStrings (
   PartNumberStrLen = StrLen (PartNumberStr);
 
   TotalSize = sizeof (SMBIOS_TABLE_TYPE4) +
-              ProcessorSocketStrLen  + 1 +
+              ProcessorStrLen        + 1 +
               ProcessorManuStrLen    + 1 +
               ProcessorVersionStrLen + 1 +
               SerialNumberStrLen     + 1 +
@@ -545,12 +545,12 @@ AllocateType4AndSetProcessorInformationStrings (
 
   OptionalStrStart = (CHAR8 *)(*Type4Record + 1);
   UnicodeStrToAsciiStrS (
-    ProcessorSocketStr,
+    ProcessorStr,
     OptionalStrStart,
-    ProcessorSocketStrLen + 1
+    ProcessorStrLen + 1
     );
 
-  StrStart = OptionalStrStart + ProcessorSocketStrLen + 1;
+  StrStart = OptionalStrStart + ProcessorStrLen + 1;
   UnicodeStrToAsciiStrS (
     ProcessorManuStr,
     StrStart,
@@ -586,7 +586,7 @@ AllocateType4AndSetProcessorInformationStrings (
     );
 
 Exit:
-  FreePool (ProcessorSocketStr);
+  FreePool (ProcessorStr);
   FreePool (ProcessorManuStr);
   FreePool (ProcessorVersionStr);
   FreePool (SerialNumberStr);
@@ -618,7 +618,7 @@ AddSmbiosProcessorTypeTable (
   UINT64                      *ProcessorId;
   PROCESSOR_CHARACTERISTIC_FLAGS ProcessorCharacteristics;
   OEM_MISC_PROCESSOR_DATA     MiscProcessorData;
-  BOOLEAN                     SocketPopulated;
+  BOOLEAN                     ProcessorPopulated;
 
   Type4Record         = NULL;
 
@@ -632,12 +632,12 @@ AddSmbiosProcessorTypeTable (
   L2CacheHandle       = 0xFFFF;
   L3CacheHandle       = 0xFFFF;
 
-  SocketPopulated = OemIsSocketPresent(ProcessorIndex);
+  ProcessorPopulated = OemIsProcessorPresent (ProcessorIndex);
 
   Status = AllocateType4AndSetProcessorInformationStrings (
              &Type4Record,
              ProcessorIndex,
-             SocketPopulated
+             ProcessorPopulated
              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -649,7 +649,7 @@ AddSmbiosProcessorTypeTable (
                                 &Type4Record->ProcessorCharacteristics,
                               &MiscProcessorData);
 
-  if (SocketPopulated) {
+  if (ProcessorPopulated) {
     AddSmbiosCacheTypeTable (ProcessorIndex, &L1CacheHandle,
                              &L2CacheHandle, &L3CacheHandle);
   }
@@ -713,7 +713,7 @@ ProcessorSubClassEntryPoint(
   )
 {
   EFI_STATUS    Status;
-  UINT32        SocketIndex;
+  UINT32        ProcessorIndex;
 
   //
   // Locate dependent protocols
@@ -740,8 +740,8 @@ ProcessorSubClassEntryPoint(
   //
   // Add SMBIOS tables for populated sockets.
   //
-  for (SocketIndex = 0; SocketIndex < OemGetProcessorMaxSockets(); SocketIndex++) {
-    Status = AddSmbiosProcessorTypeTable (SocketIndex);
+  for (ProcessorIndex = 0; ProcessorIndex < OemGetMaxProcessors (); ProcessorIndex++) {
+    Status = AddSmbiosProcessorTypeTable (ProcessorIndex);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Add Processor Type Table Failed!  %r.\n", Status));
       return Status;
