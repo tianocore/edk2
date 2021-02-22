@@ -113,6 +113,13 @@ QemuCpuhpWriteCpuSelector (
   }
 }
 
+/**
+ QemuCpuhpWriteCpuStatus: comment to make ECC happy.
+
+ @param[in] MmCpuIo          Denotes the MM_CPU_IO_PROTOCOL owner
+
+ @param[in] CpuStatus        Write to QEMU's Status register
+**/
 VOID
 QemuCpuhpWriteCpuStatus (
   IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
