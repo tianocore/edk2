@@ -95,19 +95,16 @@ OemGetMaxProcessors (
 
 /** Gets the type of chassis for the system.
 
-  @param ChassisType The type of the chassis.
-
-  @retval EFI_SUCCESS The chassis type was fetched successfully.
+  @retval The type of the chassis.
 **/
-EFI_STATUS
+MISC_CHASSIS_TYPE
 EFIAPI
 OemGetChassisType (
-  UINT8 *ChassisType
+  VOID
   )
 {
   ASSERT (FALSE);
-  *ChassisType = MiscChassisTypeUnknown;
-  return EFI_SUCCESS;
+  return MiscChassisTypeUnknown;
 }
 
 /** Returns whether the specified processor is present or not.
