@@ -116,13 +116,13 @@ OemGetCacheInformation (
   IN OUT SMBIOS_TABLE_TYPE7 *SmbiosCacheTable
   );
 
-/** Gets the maximum number of sockets supported by the platform.
+/** Gets the maximum number of processors supported by the platform.
 
-  @return The maximum number of sockets.
+  @return The maximum number of processors.
 **/
 UINT8
 EFIAPI
-OemGetProcessorMaxSockets (
+OemGetMaxProcessors (
   VOID
   );
 
@@ -146,22 +146,22 @@ OemGetChassisType (
 **/
 BOOLEAN
 EFIAPI
-OemIsSocketPresent (
+OemIsProcessorPresent (
   IN UINTN ProcessorIndex
   );
 
 /** Updates the HII string for the specified field.
 
-  @param mHiiHandle    The HII handle.
+  @param HiiHandle     The HII handle.
   @param TokenToUpdate The string to update.
-  @param Offset        The field to get information about.
+  @param Field         The field to get information about.
 **/
 VOID
 EFIAPI
 OemUpdateSmbiosInfo (
   IN EFI_HII_HANDLE    HiiHandle,
   IN EFI_STRING_ID     TokenToUpdate,
-  IN OEM_MISC_SMBIOS_HII_STRING_FIELD Offset
+  IN OEM_MISC_SMBIOS_HII_STRING_FIELD Field
   );
 
 #endif // OEM_MISC_LIB_H_
