@@ -126,14 +126,23 @@ InitGlobalDescriptorTable (
 {
   GDT_ENTRIES *gdt;
   IA32_DESCRIPTOR gdtPtr;
+  EFI_PHYSICAL_ADDRESS page;
 
+  page = 0xFFFFFFFF;
+  gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiRuntimeServicesData,
+                  EFI_SIZE_TO_PAGES (sizeof (GdtTemplate) + 8),
+                  &page 
+                  );
+  gdt = (VOID *)page;
+  
   //
   // Allocate Runtime Data for the GDT
   //
-  gdt = AllocateRuntimePool (sizeof (GdtTemplate) + 8);
   ASSERT (gdt != NULL);
   gdt = ALIGN_POINTER (gdt, 8);
-
+  DEBUG((EFI_D_ERROR, "InitGlobalDescriptorTable %p\n", gdt));
   //
   // Initialize all GDT entries
   //
@@ -142,7 +151,7 @@ InitGlobalDescriptorTable (
   //
   // Write GDT register
   //
-  gdtPtr.Base = (UINT32)(UINTN)(VOID*) gdt;
+  gdtPtr.Base = (UINTN)(VOID*) gdt;
   gdtPtr.Limit = (UINT16) (sizeof (GdtTemplate) - 1);
   AsmWriteGdtr (&gdtPtr);
 

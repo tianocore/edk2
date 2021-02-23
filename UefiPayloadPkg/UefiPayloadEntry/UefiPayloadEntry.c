@@ -40,11 +40,6 @@ MemInfoCallback (
              EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
              EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
 
-  if (Base >= BASE_4GB ) {
-    // Remove tested attribute to avoid DXE core to dispatch driver to memory above 4GB
-    Attribue &= ~EFI_RESOURCE_ATTRIBUTE_TESTED;
-  }
-
   BuildResourceDescriptorHob (Type, Attribue, (EFI_PHYSICAL_ADDRESS)Base, Size);
   DEBUG ((DEBUG_INFO , "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x\n", Base, Size, Type));
 
