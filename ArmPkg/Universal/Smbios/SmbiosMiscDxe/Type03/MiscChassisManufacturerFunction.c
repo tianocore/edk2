@@ -24,27 +24,6 @@
 #include "SmbiosMisc.h"
 
 /**
- * Returns the chassis type in SMBIOS format.
- *
- * @return Chassis type
-**/
-UINT8
-GetChassisType (
-  VOID
-  )
-{
-  EFI_STATUS                      Status;
-  UINT8                           ChassisType;
-
-  Status = OemGetChassisType (&ChassisType);
-  if (EFI_ERROR (Status)) {
-    return 0;
-  }
-
-  return ChassisType;
-}
-
-/**
   This function makes boot time changes to the contents of the
   MiscChassisManufacturer (Type 3) record.
 
@@ -79,8 +58,6 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscChassisManufacturer)
   UINT8                           ContainedElementCount;
   CONTAINED_ELEMENT               ContainedElements;
   UINT8                           ExtendLength;
-
-  UINT8                           ChassisType;
 
   ExtendLength = 0;
 
@@ -165,10 +142,7 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscChassisManufacturer)
 
   SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE3) + ExtendLength + 1;
 
-  ChassisType = GetChassisType ();
-  if (ChassisType != 0) {
-    SmbiosRecord->Type  = ChassisType;
-  }
+  SmbiosRecord->Type = OemGetChassisType ();
 
   //ContainedElements
   ASSERT (ContainedElementCount < 2);
