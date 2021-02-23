@@ -13,7 +13,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HiiLib.h>
-
 #include <Library/OemMiscLib.h>
 
 
@@ -80,13 +79,13 @@ OemGetCacheInformation (
   return TRUE;
 }
 
-/** Gets the maximum number of sockets supported by the platform.
+/** Gets the maximum number of processors supported by the platform.
 
-  @return The maximum number of sockets.
+  @return The maximum number of processors.
 **/
 UINT8
 EFIAPI
-OemGetProcessorMaxSockets (
+OemGetMaxProcessors (
   VOID
   )
 {
@@ -119,7 +118,7 @@ OemGetChassisType (
 **/
 BOOLEAN
 EFIAPI
-OemIsSocketPresent (
+OemIsProcessorPresent (
   IN UINTN ProcessorIndex
   )
 {
@@ -129,16 +128,16 @@ OemIsSocketPresent (
 
 /** Updates the HII string for the specified field.
 
-  @param mHiiHandle    The HII handle.
+  @param HiiHandle     The HII handle.
   @param TokenToUpdate The string to update.
-  @param Offset        The field to get information about.
+  @param Field         The field to get information about.
 **/
 VOID
 EFIAPI
 OemUpdateSmbiosInfo (
-  IN EFI_HII_HANDLE mHiiHandle,
+  IN EFI_HII_HANDLE HiiHandle,
   IN EFI_STRING_ID TokenToUpdate,
-  IN OEM_MISC_SMBIOS_HII_STRING_FIELD Offset
+  IN OEM_MISC_SMBIOS_HII_STRING_FIELD Field
   )
 {
   ASSERT (FALSE);
