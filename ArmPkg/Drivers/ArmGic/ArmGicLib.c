@@ -25,10 +25,10 @@
                                            + ARM_GICR_SGI_RESERVED_FRAME_SIZE)
 
 #define ISENABLER_ADDRESS(base,offset) ((base) + \
-          ARM_GICR_CTLR_FRAME_SIZE +  ARM_GICR_ISENABLER + (4 * offset))
+          ARM_GICR_CTLR_FRAME_SIZE + ARM_GICR_ISENABLER + 4 * (offset))
 
 #define ICENABLER_ADDRESS(base,offset) ((base) + \
-          ARM_GICR_CTLR_FRAME_SIZE +  ARM_GICR_ICENABLER + (4 * offset))
+          ARM_GICR_CTLR_FRAME_SIZE + ARM_GICR_ICENABLER + 4 * (offset))
 
 /**
  *
