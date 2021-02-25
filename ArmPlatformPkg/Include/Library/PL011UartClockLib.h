@@ -1,9 +1,9 @@
 /** @file
-*
-*  Copyright 2018 NXP
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
+
+  Copyright 2018 NXP
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #ifndef __PL011UARTCLOCKLIB_H__

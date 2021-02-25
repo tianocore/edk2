@@ -1,9 +1,9 @@
 /** @file
-*
-*  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
+
+  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #ifndef _PREPI_H_
