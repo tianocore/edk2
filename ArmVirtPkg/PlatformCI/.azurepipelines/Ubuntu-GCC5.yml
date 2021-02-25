@@ -72,42 +72,42 @@ jobs:
           KVMTOOL_AARCH64_DEBUG:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "AARCH64"
-            Build.Flags: "--VT kvm"
+            Build.Flags: "--VT kvmtool"
             Build.Target: "DEBUG"
             Run.Flags: ""
             Run: false
           KVMTOOL_AARCH64_RELEASE:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "AARCH64"
-            Build.Flags: "--VT kvm"
+            Build.Flags: "--VT kvmtool"
             Build.Target: "RELEASE"
             Run.Flags: ""
             Run: false
           KVMTOOL_AARCH64_NOOPT:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "AARCH64"
-            Build.Flags: "--VT kvm"
+            Build.Flags: "--VT kvmtool"
             Build.Target: "NOOPT"
             Run.Flags: ""
             Run: false
           KVMTOOL_ARM_DEBUG:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "ARM"
-            Build.Flags: "--VT kvm"
+            Build.Flags: "--VT kvmtool"
             Build.Target: "DEBUG"
             Run.Flags: ""
             Run: false
           KVMTOOL_ARM_RELEASE:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "ARM"
-            Build.Flags: "--VT kvm"
+            Build.Flags: "--VT kvmtool"
             Build.Target: "RELEASE"
             Run.Flags: ""
             Run: false
           KVMTOOL_ARM_NOOPT:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "ARM"
-            Build.Flags: "--VT kvm"
+            Build.Flags: "--VT kvmtool"
             Build.Target: "NOOPT"
             Run.Flags: ""
             Run: false

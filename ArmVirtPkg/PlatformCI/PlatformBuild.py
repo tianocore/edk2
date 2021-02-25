@@ -36,7 +36,7 @@ class CommonPlatform():
 
     VirtualizationTypes = {
         "qemu": "ArmVirtPkg/ArmVirtQemu.dsc",
-        "kvm": "ArmVirtPkg/ArmVirtKvmTool.dsc"}
+        "kvmtool": "ArmVirtPkg/ArmVirtKvmTool.dsc"}
 
     # ####################################################################################### #
     #                         Configuration for Update & Setup                                #
