@@ -23,7 +23,7 @@
   OUTPUT_DIRECTORY               = Build/ArmVirtKvmTool-$(ARCH)
 !endif
   SUPPORTED_ARCHITECTURES        = AARCH64|ARM
-  BUILD_TARGETS                  = DEBUG|RELEASE
+  BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtKvmTool.fdf
 
