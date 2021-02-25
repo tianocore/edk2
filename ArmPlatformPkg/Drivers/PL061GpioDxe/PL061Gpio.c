@@ -1,10 +1,10 @@
 /** @file
-*
-*  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
-*  Copyright (c) 2016, Linaro Limited. All rights reserved.
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
+
+  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2016, Linaro Limited. All rights reserved.
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 

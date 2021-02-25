@@ -1,9 +1,9 @@
 /** @file
-*
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
+
+  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #include "PrePi.h"
