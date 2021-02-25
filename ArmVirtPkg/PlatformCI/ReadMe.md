@@ -12,8 +12,8 @@ This solution for building and running ArmVirtPkg has only been validated with U
 | :----------             | :-----             | :-----              | :----           |
 | AARCH64                 | AARCH64            | ArmVirtQemu.dsc     | None            |
 | ARM                     | ARM                | ArmVirtQemu.dsc     | None            |
-| AARCH64                 | AARCH64            | ArmVirtKvmTool.dsc  | None            |
-| ARM                     | ARM                | ArmVirtKvmTool.dsc  | None            |
+| AARCH64                 | AARCH64            | ArmVirtKvmTool.dsc  | --VT kvm        |
+| ARM                     | ARM                | ArmVirtKvmTool.dsc  | --VT kvm        |
 
 ## EDK2 Developer environment
 
@@ -58,13 +58,13 @@ Pytools build system.
 4. Initialize & Update Submodules - only when submodules updated
 
     ``` bash
-    stuart_setup -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+    stuart_setup -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH> --VT <qemu or kvm>
     ```
 
 5. Initialize & Update Dependencies - only as needed when ext_deps change
 
     ``` bash
-    stuart_update -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+    stuart_update -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH> --VT <qemu or kvm>
     ```
 
 6. Compile the basetools if necessary - only when basetools C source files change
@@ -76,16 +76,16 @@ Pytools build system.
 7. Compile Firmware
 
     ``` bash
-    stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+    stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH> --VT <qemu or kvm>
     ```
 
     - use `stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py -h` option to see additional
     options like `--clean`, `--dsc`, etc.
 
-    Example: The `--dsc` option can be used to specify the platform to build.
+    Example: The `--VT` option can be used to specify the Virtualization platform to build.
 
       ``` bash
-      stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH> --dsc ArmVirtPkg/ArmVirtKvmTool.dsc
+      stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH> --VT kvm
       ```
 
 8. Running Emulator
@@ -104,7 +104,8 @@ Pytools build system.
    need to match your build step.
 2. Configuring *ACTIVE_PLATFORM* and *TARGET_ARCH* in Conf/target.txt is **not** required. This
    environment is set by PlatformBuild.py based upon the `[-a <TARGET_ARCH>]` parameter.
-3. QEMU must be on your path.  On Windows this is a manual process and not part of the QEMU installer.
+3. If building for QEMU, then QEMU must be on your path.  On Windows this is a manual process and not part of the QEMU installer.
+4. Support for targeting a different virtualization type is done using the `--VT` option
 
 **NOTE:** Logging the execution output will be in the normal stuart log as well as to your console.
 
