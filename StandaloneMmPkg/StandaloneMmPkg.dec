@@ -25,9 +25,6 @@
   ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint.
   StandaloneMmCoreEntryPoint|Include/Library/StandaloneMmCoreEntryPoint.h
 
-  ##  @libraryclass  Defines a set of interfaces for the MM driver entrypoint.
-  StandaloneMmDriverEntryPoint|Include/Library/StandaloneMmDriverEntryPoint.h
-
   ##  @libraryclass  Defines a set of interfaces that provides services for
   ##                 MM Memory Operation.
   MemLib|Include/Library/StandaloneMmMemLib.h
