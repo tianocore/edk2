@@ -30,6 +30,9 @@
 #define ICENABLER_ADDRESS(base,offset) ((base) + \
           ARM_GICR_CTLR_FRAME_SIZE + ARM_GICR_ICENABLER + 4 * (offset))
 
+#define IPRIORITY_ADDRESS(base,offset) ((base) + \
+          ARM_GICR_CTLR_FRAME_SIZE + ARM_GIC_ICDIPR + 4 * (offset))
+
 /**
  *
  * Return whether the Source interrupt index refers to a shared interrupt (SPI)
@@ -236,7 +239,7 @@ ArmGicSetInterruptPriority (
     }
 
     MmioAndThenOr32 (
-      GicCpuRedistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset),
+      IPRIORITY_ADDRESS (GicCpuRedistributorBase, RegOffset),
       ~(0xff << RegShift),
       Priority << RegShift
       );
