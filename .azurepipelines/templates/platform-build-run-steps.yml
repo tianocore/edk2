@@ -65,7 +65,7 @@ steps:
   displayName: Check if ${{ parameters.build_pkg }} need testing
   inputs:
     filename: stuart_pr_eval
-    arguments: -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} --pr-target origin/$(System.PullRequest.targetBranch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
+    arguments: -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}} --pr-target origin/$(System.PullRequest.targetBranch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
   condition: eq(variables['Build.Reason'], 'PullRequest')
 
  # Setup repo
