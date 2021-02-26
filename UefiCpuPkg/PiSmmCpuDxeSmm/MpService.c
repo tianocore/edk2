@@ -23,6 +23,8 @@ SPIN_LOCK                                   *mPFLock = NULL;
 SMM_CPU_SYNC_MODE                           mCpuSmmSyncMode;
 BOOLEAN                                     mMachineCheckSupported = FALSE;
 
+extern UINTN mSmmShadowStackSize;
+
 /**
   Performs an atomic compare exchange operation to get semaphore.
   The compare exchange operation must be performed using
@@ -920,7 +922,7 @@ Gen4GPageTable (
     // Add two more pages for known good stack and stack guard page,
     // then find the lower 2MB aligned address.
     //
-    High2MBoundary = (mSmmStackArrayEnd - mSmmStackSize + EFI_PAGE_SIZE * 2) & ~(SIZE_2MB-1);
+    High2MBoundary = (mSmmStackArrayEnd - mSmmStackSize - mSmmShadowStackSize + EFI_PAGE_SIZE * 2) & ~(SIZE_2MB-1);
     PagesNeeded = ((High2MBoundary - Low2MBoundary) / SIZE_2MB) + 1;
   }
   //
@@ -971,7 +973,7 @@ Gen4GPageTable (
           // Mark the guard page as non-present
           //
           Pte[Index] = PageAddress | mAddressEncMask;
-          GuardPage += mSmmStackSize;
+          GuardPage += (mSmmStackSize + mSmmShadowStackSize);
           if (GuardPage > mSmmStackArrayEnd) {
             GuardPage = 0;
           }

@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define PAGE_TABLE_PAGES            8
 #define ACC_MAX_BIT                 BIT3
 
+extern UINTN mSmmShadowStackSize;
+
 LIST_ENTRY                          mPagePool = INITIALIZE_LIST_HEAD_VARIABLE (mPagePool);
 BOOLEAN                             m1GPageTableSupport = FALSE;
 BOOLEAN                             mCpuSmmRestrictedMemoryAccess;
@@ -1037,7 +1039,7 @@ SmiPFHandler (
       (PFAddress < (mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize))) {
     DumpCpuContext (InterruptType, SystemContext);
     CpuIndex = GetCpuIndex ();
-    GuardPageAddress = (mSmmStackArrayBase + EFI_PAGE_SIZE + CpuIndex * mSmmStackSize);
+    GuardPageAddress = (mSmmStackArrayBase + EFI_PAGE_SIZE + CpuIndex * (mSmmStackSize + mSmmShadowStackSize));
     if ((FeaturePcdGet (PcdCpuSmmStackGuard)) &&
         (PFAddress >= GuardPageAddress) &&
         (PFAddress < (GuardPageAddress + EFI_PAGE_SIZE))) {
