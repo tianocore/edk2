@@ -216,19 +216,18 @@ InstallSMBusConfigLoader (
   if (EFI_ERROR(Status)) {
     DEBUG ((DEBUG_ERROR, "SMBusConfigLoader: Failed to set SecureBoot: %x\n", Status));
   }
-  
-  if (BoardSettings.SecureBoot == 0) {
-    UINT8 SetupMode;
-    // Hide the UI if secureboot is disabled
-    SetupMode = 1;
-    Status = gRT->SetVariable (EFI_SETUP_MODE_NAME, 
+
+  UINT8 SetupMode;
+  // EFI_SETUP_MODE_NAME must be valid if EFI_SECURE_BOOT_MODE_NAME exists
+  // Force setup mode to enroll default keys
+  SetupMode = 1;
+  Status = gRT->SetVariable (EFI_SETUP_MODE_NAME, 
            &gEfiGlobalVariableGuid,
            EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
            sizeof SetupMode, &SetupMode);
 
-   if (EFI_ERROR(Status)) {
-     DEBUG ((DEBUG_ERROR, "SMBusConfigLoader: Failed to set SetupMode: %x\n", Status));
-    }
+  if (EFI_ERROR(Status)) {
+    DEBUG ((DEBUG_ERROR, "SMBusConfigLoader: Failed to set SetupMode: %x\n", Status));
   }
 
   // Restore I2C_EN Bit
