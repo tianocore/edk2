@@ -26,7 +26,7 @@ EFI_HII_HANDLE            mHiiHandle;
 LOGO_ENTRY                mLogos[] = {
   {
     IMAGE_TOKEN (IMG_LOGO),
-    EdkiiPlatformLogoDisplayAttributeMicrosoftRecommended,
+    EdkiiPlatformLogoDisplayAttributeCenter,
     0,
     0
   }
