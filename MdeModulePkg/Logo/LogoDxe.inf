@@ -47,6 +47,7 @@
   gEfiHiiImageExProtocolGuid         ## CONSUMES
   gEfiHiiPackageListProtocolGuid     ## PRODUCES CONSUMES
   gEdkiiPlatformLogoProtocolGuid     ## PRODUCES
+  gEfiGraphicsOutputProtocolGuid     ## CONSUMES
 
 [Depex]
   gEfiHiiDatabaseProtocolGuid AND

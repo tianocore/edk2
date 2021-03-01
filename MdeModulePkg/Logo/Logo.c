@@ -56,7 +56,10 @@ GetImage (
      OUT INTN                                  *OffsetY
   )
 {
-  UINT32 Current;
+  UINT32                        Current;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
+  EFI_STATUS                    Status;
+
   if (Instance == NULL || Image == NULL ||
       Attribute == NULL || OffsetX == NULL || OffsetY == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -67,10 +70,31 @@ GetImage (
     return EFI_NOT_FOUND;
   }
 
+  //
+  // Get current video resolution and text mode
+  //
+  Status = gBS->HandleProtocol (
+                  gST->ConsoleOutHandle,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  (VOID**)&GraphicsOutput
+                  );
+  if (EFI_ERROR (Status)) {
+    GraphicsOutput = NULL;
+  }
+
   (*Instance)++;
   *Attribute = mLogos[Current].Attribute;
-  *OffsetX   = mLogos[Current].OffsetX;
-  *OffsetY   = mLogos[Current].OffsetY;
+
+  //
+  // Place at 38.2% from top of screen
+  //
+  if (GraphicsOutput != NULL && GraphicsOutput->Mode != NULL && GraphicsOutput->Mode->Info != NULL) {
+    *OffsetX   = 0;
+    *OffsetY   = -118 * (INTN) GraphicsOutput->Mode->Info->VerticalResolution / 1000;
+  } else {
+    *OffsetX   = mLogos[Current].OffsetX;
+    *OffsetY   = mLogos[Current].OffsetY;
+  }
   return mHiiImageEx->GetImageEx (mHiiImageEx, mHiiHandle, mLogos[Current].ImageId, Image);
 }
 
