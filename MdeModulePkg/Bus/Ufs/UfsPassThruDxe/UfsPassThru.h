@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -40,6 +40,7 @@
 //
 #define UFS_MAX_LUNS                12
 #define UFS_WLUN_PREFIX             0xC1
+#define UFS_INIT_COMPLETION_TIMEOUT 600000
 
 typedef struct {
   UINT8    Lun[UFS_MAX_LUNS];
