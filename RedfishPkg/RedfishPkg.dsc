@@ -55,5 +55,6 @@
   RedfishPkg/Library/BaseUcs2Utf8Lib/BaseUcs2Utf8Lib.inf
   RedfishPkg/PrivateLibrary/RedfishCrtLib/RedfishCrtLib.inf
   RedfishPkg/Library/JsonLib/JsonLib.inf
+  RedfishPkg/PrivateLibrary/RedfishLib/RedfishLib.inf
 
   !include RedfishPkg/Redfish.dsc.inc
