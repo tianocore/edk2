@@ -1,7 +1,7 @@
 ## @file
 # CI configuration for NetworkPkg
 #
-# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -41,7 +41,18 @@
             ## load.c is overrided from open source.
             "Library/JsonLib/load.c",
             "Library/JsonLib/jansson_config.h",
-            "Library/JsonLib/jansson_private_config.h"
+            "Library/JsonLib/jansson_private_config.h",
+            ##
+            ## For libredfish open source
+            ## The files under edk2libredfish are cloned
+            ## from DMTF open source
+            "PrivateLibrary/RedfishLib/edk2libredfish/include/redfish.h",
+            "PrivateLibrary/RedfishLib/edk2libredfish/include/redfishPayload.h",
+            "PrivateLibrary/RedfishLib/edk2libredfish/include/redfishService.h",
+            "PrivateLibrary/RedfishLib/edk2libredfish/include/redpath.h",
+            "PrivateLibrary/RedfishLib/edk2libredfish/src/payload.c",
+            "PrivateLibrary/RedfishLib/edk2libredfish/src/redpath.c",
+            "PrivateLibrary/RedfishLib/edk2libredfish/src/service.c"
         ]
     },
     "CompilerPlugin": {
