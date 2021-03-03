@@ -197,6 +197,8 @@ class parser_lst(object):
     efitxt = efivarstore_format.findall(self.text)
     for i in efitxt:
       struct = struct_re.findall(i.replace(' ',''))
+      if struct[0] in self._ignore:
+          continue
       name = name_re.findall(i.replace(' ',''))
       if struct and name:
         efivarstore_dict[name[0]]=struct[0]
