@@ -93,6 +93,7 @@
 #string STR_SMBIOSVIEW_PRINTINFO_POWER_SUPPLY_STATE             #language en-US "Power Supply State "
 #string STR_SMBIOSVIEW_PRINTINFO_THERMAL_STATE                  #language en-US "Thermal state "
 #string STR_SMBIOSVIEW_PRINTINFO_SECURITY_STATUS                #language en-US "Security Status "
+#string STR_SMBIOSVIEW_PRINTINFO_CONTAINED_ELEMENT              #language en-US "Contained Element %d: "
 #string STR_SMBIOSVIEW_PRINTINFO_SUPOPRT                        #language en-US "Support "
 #string STR_SMBIOSVIEW_PRINTINFO_CURRENT                        #language en-US "Current "
 #string STR_SMBIOSVIEW_PRINTINFO_INSTALLED                      #language en-US "Installed "
