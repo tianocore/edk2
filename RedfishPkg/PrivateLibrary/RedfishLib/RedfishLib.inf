@@ -1,0 +1,60 @@
+## @file
+#  RedfishLib Library implementation.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = DxeRedfishLib
+  FILE_GUID                      = 9C2CA9CF-4F79-11E8-A7D1-8CDCD426C973
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RedfishLib| DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
+#
+
+[Sources]
+  edk2libredfish/src/redpath.c
+  edk2libredfish/src/service.c
+  edk2libredfish/src/payload.c
+  edk2libredfish/include/redfish.h
+  edk2libredfish/include/redfishPayload.h
+  edk2libredfish/include/redfishService.h
+  edk2libredfish/include/redpath.h
+  RedfishLib.c
+  RedfishMisc.h
+  RedfishMisc.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HttpLib
+  MemoryAllocationLib
+  NetLib
+  RedfishContentCodingLib
+  RedfishCrtLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Protocols]
+  gEfiRestExServiceBindingProtocolGuid  ## Consumed
+  gEfiRestExProtocolGuid                ## Consumed
+  gEdkIIRedfishCredentialProtocolGuid   ## Consumed
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /U_WIN32 /UWIN64 /U_MSC_VER
+  GCC:*_*_*_CC_FLAGS = -Wno-unused-function -Wno-unused-but-set-variable

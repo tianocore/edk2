@@ -5,7 +5,7 @@
 # by using "!include RedfishPkg/RedfisLibs.dsc.inc" to specify the library instances
 # of EDKII network library classes.
 #
-# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -16,5 +16,6 @@
   BaseSortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
   RedfishCrtLib|RedfishPkg/PrivateLibrary/RedfishCrtLib/RedfishCrtLib.inf
   JsonLib|RedfishPkg/Library/JsonLib/JsonLib.inf
+  RedfishLib|RedfishPkg/PrivateLibrary/RedfishLib/RedfishLib.inf
 !endif
 

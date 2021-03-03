@@ -62,6 +62,10 @@
   #   project).
   RedfishCrtLib|PrivateInclude/Library/RedfishCrtLib.h
 
+  ##  @libraryclass Redfish Helper Library
+  #   Library provides Redfish helper functions.
+  RedfishLib|PrivateInclude/Library/RedfishLib.h
+
 [Protocols]
   ## Include/Protocol/RedfishDiscover.h
   gEfiRedfishDiscoverProtocolGuid      = { 0x5db12509, 0x4550, 0x4347, { 0x96, 0xb3, 0x73, 0xc0, 0xff, 0x6e, 0x86, 0x9f }}
