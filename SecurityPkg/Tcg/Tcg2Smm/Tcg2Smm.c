@@ -870,7 +870,7 @@ InitializeTcgSmm (
   //
   // Get the Sw dispatch protocol and register SMI callback functions.
   //
-  Status = gSmst->SmmLocateProtocol (&gEfiSmmSwDispatch2ProtocolGuid, NULL, (VOID**)&SwDispatch);
+  Status = gMmst->MmLocateProtocol (&gEfiSmmSwDispatch2ProtocolGuid, NULL, (VOID**)&SwDispatch);
   ASSERT_EFI_ERROR (Status);
   SwContext.SwSmiInputValue = (UINTN) -1;
   Status = SwDispatch->Register (SwDispatch, PhysicalPresenceCallback, &SwContext, &SwHandle);
@@ -891,7 +891,7 @@ InitializeTcgSmm (
   //
   // Locate SmmVariableProtocol.
   //
-  Status = gSmst->SmmLocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID**)&mSmmVariable);
+  Status = gMmst->MmLocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID**)&mSmmVariable);
   ASSERT_EFI_ERROR (Status);
 
   //

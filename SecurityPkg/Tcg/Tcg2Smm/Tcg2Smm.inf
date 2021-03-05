@@ -50,7 +50,7 @@
   BaseLib
   BaseMemoryLib
   UefiDriverEntryPoint
-  SmmServicesTableLib
+  MmServicesTableLib
   UefiBootServicesTableLib
   DebugLib
   DxeServicesLib
