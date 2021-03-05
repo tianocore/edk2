@@ -383,6 +383,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy|1|UINT8|0x0001000E
 
   ## Guid name to identify TPM instance.<BR><BR>
+  #  NOTE: This Pcd must be FixedAtBuild if Standalone MM is used
   #  TPM_DEVICE_INTERFACE_NONE means disable.<BR>
   #  TPM_DEVICE_INTERFACE_TPM12 means TPM 1.2 DTPM.<BR>
   #  TPM_DEVICE_INTERFACE_DTPM2 means TPM 2.0 DTPM.<BR>
