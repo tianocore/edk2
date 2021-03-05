@@ -257,6 +257,11 @@
   #
   UnitTestHostBaseLib|Test/UnitTest/Include/Library/UnitTestHostBaseLib.h
 
+  ##  @libraryclass  This library provides an interface to request non-MMRAM pages to be mapped
+  #                  or unblocked from inside MM environment.
+  #
+  MmUnblockMemoryLib|Include/Library/MmUnblockMemoryLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Abstracts both S/W SMI generation and detection.
   ##
