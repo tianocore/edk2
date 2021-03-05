@@ -88,10 +88,18 @@ LibGetTime (
     //
     EpochSeconds = BUILD_EPOCH;
     DEBUG ((
-      DEBUG_VERBOSE,
+      DEBUG_INFO,
       "LibGetTime: %s non volatile variable was not found - Using compilation time epoch.\n",
       mEpochVariableName
       ));
+
+    EfiSetVariable (
+      (CHAR16 *)mEpochVariableName,
+      &gEfiCallerIdGuid,
+      EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+      sizeof (EpochSeconds),
+      &EpochSeconds
+      );
   }
   Counter = GetPerformanceCounter ();
   EpochSeconds += DivU64x64Remainder (Counter, Freq, &Remainder);
