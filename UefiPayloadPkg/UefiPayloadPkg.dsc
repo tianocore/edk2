@@ -33,6 +33,7 @@
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
   DEFINE SECURITY_STUB_ENABLE         = TRUE
   DEFINE SMM_SUPPORT                  = FALSE
+  DEFINE USE_CBMEM_FOR_CONSOLE        = FALSE
   #
   # SBL:      UEFI payload for Slim Bootloader
   # COREBOOT: UEFI payload for coreboot
@@ -223,7 +224,11 @@
   TimerLib|UefiPayloadPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
 !endif
   ResetSystemLib|UefiPayloadPkg/Library/ResetSystemLib/ResetSystemLib.inf
+!if $(USE_CBMEM_FOR_CONSOLE) == TRUE
+  SerialPortLib|UefiPayloadPkg/Library/CbSerialPortLib/CbSerialPortLib.inf
+!else
   SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
+!endif
   PlatformHookLib|UefiPayloadPkg/Library/PlatformHookLib/PlatformHookLib.inf
   PlatformBootManagerLib|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf

@@ -1,0 +1,27 @@
+## @file
+#  Component description file for CbSerialPortLib module.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CbSerialPortLib
+  FILE_GUID                      = 0DB3EF12-1426-4086-B012-113184C4CE11
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 0.5
+  LIBRARY_CLASS                  = SerialPortLib
+  CONSTRUCTOR                    = SerialPortInitialize
+
+[Sources]
+  CbSerialPortLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BlParseLib
