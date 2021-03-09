@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2018, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2021, Arm Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -120,7 +120,14 @@ ArmGicGetMaxNumInterrupts (
   IN  INTN          GicDistributorBase
   )
 {
-  return 32 * ((MmioRead32 (GicDistributorBase + ARM_GIC_ICDICTR) & 0x1F) + 1);
+  UINTN ItLines;
+
+  ItLines = MmioRead32 (GicDistributorBase + ARM_GIC_ICDICTR) & 0x1F;
+
+  //
+  // Interrupt ID 1020-1023 are reserved.
+  //
+  return (ItLines == 0x1f) ? 1020 : 32 * (ItLines + 1);
 }
 
 VOID
