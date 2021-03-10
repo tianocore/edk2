@@ -445,17 +445,7 @@ OvmfPkg: CSM modules
 F: OvmfPkg/Csm/
 R: David Woodhouse <dwmw2@infradead.org>
 
-OvmfPkg: LsiScsi driver
-F: OvmfPkg/LsiScsiDxe/
-R: Gary Lin <glin@suse.com>
-
-OvmfPkg: MptScsi and PVSCSI driver
-F: OvmfPkg/MptScsiDxe/
-F: OvmfPkg/PvScsiDxe/
-R: Liran Alon <liran.alon@oracle.com>
-R: Nikita Leshenko <nikita.leshchenko@oracle.com>
-
-OvmfPkg: SEV-related modules
+OvmfPkg: Confidential Computing
 F: OvmfPkg/AmdSev/
 F: OvmfPkg/AmdSevDxe/
 F: OvmfPkg/Include/Guid/ConfidentialComputingSecret.h
@@ -467,9 +457,21 @@ F: OvmfPkg/Library/VmgExitLib/
 F: OvmfPkg/PlatformPei/AmdSev.c
 F: OvmfPkg/ResetVector/
 F: OvmfPkg/Sec/
-R: Tom Lendacky <thomas.lendacky@amd.com>
 R: Brijesh Singh <brijesh.singh@amd.com>
 R: James Bottomley <jejb@linux.ibm.com>
+R: Jiewen Yao <jiewen.yao@intel.com>
+R: Min Xu <min.m.xu@intel.com>
+R: Tom Lendacky <thomas.lendacky@amd.com>
+
+OvmfPkg: LsiScsi driver
+F: OvmfPkg/LsiScsiDxe/
+R: Gary Lin <glin@suse.com>
+
+OvmfPkg: MptScsi and PVSCSI driver
+F: OvmfPkg/MptScsiDxe/
+F: OvmfPkg/PvScsiDxe/
+R: Liran Alon <liran.alon@oracle.com>
+R: Nikita Leshenko <nikita.leshchenko@oracle.com>
 
 OvmfPkg: TCG- and TPM2-related modules
 F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
