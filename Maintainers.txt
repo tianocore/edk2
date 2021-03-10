@@ -456,14 +456,20 @@ R: Liran Alon <liran.alon@oracle.com>
 R: Nikita Leshenko <nikita.leshchenko@oracle.com>
 
 OvmfPkg: SEV-related modules
+F: OvmfPkg/AmdSev/
 F: OvmfPkg/AmdSevDxe/
+F: OvmfPkg/Include/Guid/ConfidentialComputingSecret.h
 F: OvmfPkg/Include/Library/MemEncryptSevLib.h
 F: OvmfPkg/IoMmuDxe/AmdSevIoMmu.*
 F: OvmfPkg/Library/BaseMemEncryptSevLib/
+F: OvmfPkg/Library/PlatformBootManagerLibGrub/
 F: OvmfPkg/Library/VmgExitLib/
 F: OvmfPkg/PlatformPei/AmdSev.c
+F: OvmfPkg/ResetVector/
+F: OvmfPkg/Sec/
 R: Tom Lendacky <thomas.lendacky@amd.com>
 R: Brijesh Singh <brijesh.singh@amd.com>
+R: James Bottomley <jejb@linux.ibm.com>
 
 OvmfPkg: TCG- and TPM2-related modules
 F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
