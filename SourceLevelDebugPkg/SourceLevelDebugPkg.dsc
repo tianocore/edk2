@@ -1,7 +1,7 @@
 ## @file
 # Source Level Debug Package.
 #
-# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2020, AMD Incorporated. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -42,6 +42,7 @@
   PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
   PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
   PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
+  RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
 
 !ifdef $(SOURCE_DEBUG_USE_USB)
   DebugCommunicationLib|SourceLevelDebugPkg/Library/DebugCommunicationLibUsb/DebugCommunicationLibUsb.inf
