@@ -1,7 +1,7 @@
 ## @file
 # Source Level Debug Package.
 #
-# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2020, AMD Incorporated. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -24,6 +24,8 @@
   SKUID_IDENTIFIER               = DEFAULT
 
 [LibraryClasses.common]
+  !include MdePkg/MdeLibs.dsc.inc
+
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
