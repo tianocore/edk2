@@ -1,7 +1,7 @@
 ## @file
 # Redfish Package
 #
-# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2021 Hewlett-Packard Enterprise Development LP.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -38,6 +38,7 @@
   DpcLib|NetworkPkg/Library/DxeDpcLib/DxeDpcLib.inf
   RedfishPlatformCredentialLib|RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
   RedfishContentCodingLib|RedfishPkg/Library/RedfishContentCodingLibNull/RedfishContentCodingLibNull.inf
+  RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
