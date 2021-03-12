@@ -1,7 +1,7 @@
 ## @file
 # UnitTestFrameworkPkg DSC include file for target based test DSC
 #
-# Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -25,6 +25,7 @@
   PerformanceLib|MdePkg/Library/BasePerformanceLibNull/BasePerformanceLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
 
   UnitTestLib|UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLib.inf
   UnitTestPersistenceLib|UnitTestFrameworkPkg/Library/UnitTestPersistenceLibNull/UnitTestPersistenceLibNull.inf
