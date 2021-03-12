@@ -3,7 +3,7 @@
 #
 # Provides drivers and definitions to create uefi payload for bootloaders.
 #
-# Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -114,6 +114,8 @@
 #
 ################################################################################
 [LibraryClasses]
+  !include MdePkg/MdeLibs.dsc.inc
+
   #
   # Entry point
   #
