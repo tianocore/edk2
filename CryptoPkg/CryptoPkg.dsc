@@ -2,7 +2,7 @@
 #  Cryptographic Library Package for UEFI Security Implementation.
 #  PEIM, DXE Driver, and SMM Driver with all crypto services enabled.
 #
-#  Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -61,6 +61,7 @@
   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
   HashApiLib|CryptoPkg/Library/BaseHashApiLib/BaseHashApiLib.inf
   RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
+  RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
