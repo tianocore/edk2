@@ -413,6 +413,9 @@
   DebugLib
   BaseMemoryLib
 
+[LibraryClasses.X64, LibraryClasses.IA32]
+  RegisterFilterLib
+
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength      ## SOMETIMES_CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength     ## SOMETIMES_CONSUMES
