@@ -7,7 +7,7 @@
 # customized using libraries and PCDs.
 #
 # Copyright (c) Microsoft Corporation.<BR>
-# Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -39,6 +39,8 @@
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
 
 [LibraryClasses]
+  !include MdePkg/MdeLibs.dsc.inc
+
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
