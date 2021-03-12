@@ -452,6 +452,40 @@ SmmCpuFeaturesRendezvousExit (
   IN UINTN  CpuIndex
   )
 {
+  //
+  // We only call the Handler if CPU hot-eject is enabled
+  // (PcdCpuMaxLogicalProcessorNumber > 1), and hot-eject is needed
+  // in this SMI exit (otherwise mCpuHotEjectData->Handler is not armed.)
+  //
+
+  if (mCpuHotEjectData != NULL) {
+    CPU_HOT_EJECT_HANDLER Handler;
+
+    //
+    // As the comment above mentions, mCpuHotEjectData->Handler might be
+    // written to on the BSP as part of handling of the CPU-ejection.
+    //
+    // We know that any initial assignment to mCpuHotEjectData->Handler
+    // (on the BSP, in the CpuHotplugMmi() context) is ordered-before the
+    // load below, since it is guaranteed to happen before the
+    // control-dependency of the BSP's SMI exit signal -- by way of a store
+    // to AllCpusInSync (on the BSP, in BspHandler()) and the corresponding
+    // AllCpusInSync loop (on the APs, in SmiRendezvous()) which depends on
+    // that store.
+    //
+    // This guarantees that these pieces of code can never execute
+    // simultaneously. In addition, we ensure that the following load is
+    // ordered-after the AllCpusInSync loop by using a MemoryFence() with
+    // acquire semantics.
+    //
+    MemoryFence();
+
+    Handler = mCpuHotEjectData->Handler;
+
+    if (Handler != NULL) {
+      Handler (CpuIndex);
+    }
+  }
 }
 
 /**
