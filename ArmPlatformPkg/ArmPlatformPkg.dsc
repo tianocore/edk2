@@ -34,6 +34,8 @@
   gArmTokenSpaceGuid.PcdFdSize|0x1000
 
 [LibraryClasses.common]
+  !include MdePkg/MdeLibs.dsc.inc
+
   ArmGicArchLib|ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
   ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
