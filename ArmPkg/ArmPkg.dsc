@@ -32,6 +32,8 @@
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
 
+!include MdePkg/MdeLibs.dsc.inc
+
 [LibraryClasses.common]
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
