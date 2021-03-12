@@ -10,10 +10,12 @@
 #include <IndustryStandard/Q35MchIch9.h>     // ICH9_APM_CNT
 #include <IndustryStandard/QemuCpuHotplug.h> // QEMU_CPUHP_CMD_GET_PENDING
 #include <Library/BaseLib.h>                 // CpuDeadLoop()
+#include <Library/CpuLib.h>                  // CpuSleep()
 #include <Library/DebugLib.h>                // ASSERT()
 #include <Library/MmServicesTableLib.h>      // gMmst
 #include <Library/PcdLib.h>                  // PcdGetBool()
 #include <Library/SafeIntLib.h>              // SafeUintnSub()
+#include <Pcd/CpuHotEjectData.h>             // CPU_HOT_EJECT_DATA
 #include <Protocol/MmCpuIo.h>                // EFI_MM_CPU_IO_PROTOCOL
 #include <Protocol/SmmCpuService.h>          // EFI_SMM_CPU_SERVICE_PROTOCOL
 #include <Uefi/UefiBaseType.h>               // EFI_STATUS
@@ -32,11 +34,12 @@ STATIC EFI_MM_CPU_IO_PROTOCOL *mMmCpuIo;
 //
 STATIC EFI_SMM_CPU_SERVICE_PROTOCOL *mMmCpuService;
 //
-// This structure is a communication side-channel between the
+// These structures serve as communication side-channels between the
 // EFI_SMM_CPU_SERVICE_PROTOCOL consumer (i.e., this driver) and provider
 // (i.e., PiSmmCpuDxeSmm).
 //
 STATIC CPU_HOT_PLUG_DATA *mCpuHotPlugData;
+STATIC CPU_HOT_EJECT_DATA *mCpuHotEjectData;
 //
 // SMRAM arrays for fetching the APIC IDs of processors with pending events (of
 // known event types), for the time of just one MMI.
@@ -190,17 +193,70 @@ RevokeNewSlot:
 }
 
 /**
+  CPU Hot-eject handler, called from SmmCpuFeaturesRendezvousExit()
+  on each CPU at exit from SMM.
+
+  If, the executing CPU is not being ejected, nothing to be done.
+  If, the executing CPU is being ejected, wait in a halted loop
+  until ejected.
+
+  @param[in] ProcessorNum      ProcessorNum denotes the CPU exiting SMM,
+                               and will be used as an index into
+                               CPU_HOT_EJECT_DATA->QemuSelectorMap. It is
+                               identical to the processor handle number in
+                               EFI_SMM_CPU_SERVICE_PROTOCOL.
+**/
+VOID
+EFIAPI
+EjectCpu (
+  IN UINTN ProcessorNum
+  )
+{
+  UINT64 QemuSelector;
+
+  QemuSelector = mCpuHotEjectData->QemuSelectorMap[ProcessorNum];
+  if (QemuSelector == CPU_EJECT_QEMU_SELECTOR_INVALID) {
+    return;
+  }
+
+  //
+  // APs being unplugged get here from SmmCpuFeaturesRendezvousExit()
+  // after having been cleared to exit the SMI and so have no SMM
+  // processing remaining.
+  //
+  // Keep them penned here until the BSP tells QEMU to eject them.
+  //
+  for (;;) {
+    DisableInterrupts ();
+    CpuSleep ();
+  }
+}
+
+/**
   Process to be hot-unplugged CPUs, per QemuCpuhpCollectApicIds().
 
   For each such CPU, report the CPU to PiSmmCpuDxeSmm via
-  EFI_SMM_CPU_SERVICE_PROTOCOL. If the to be hot-unplugged CPU is
-  unknown, skip it silently.
+  EFI_SMM_CPU_SERVICE_PROTOCOL and stash the QEMU Cpu Selectors for later
+  ejection. If the to be hot-unplugged CPU is unknown, skip it silently.
+
+  Additonally, if we do stash any Cpu Selectors, also install a CPU eject
+  handler which would handle the ejection.
 
   @param[in] ToUnplugApicIds    The APIC IDs of the CPUs that are about to be
                                 hot-unplugged.
 
+  @param[in] ToUnplugSelectors  The QEMU Selectors of the CPUs that are about to
+                                be hot-unplugged.
+
   @param[in] ToUnplugCount      The number of filled-in APIC IDs in
                                 ToUnplugApicIds.
+
+  @retval EFI_ALREADY_STARTED   For the ProcessorNum that
+                                EFI_SMM_CPU_SERVICE_PROTOCOL had assigned to
+                                one of the APIC IDs in ToUnplugApicIds,
+                                mCpuHotEjectData->QemuSelectorMap already has
+                                the QemuSelector value stashed. (This should
+                                never happen.)
 
   @retval EFI_SUCCESS           Known APIC IDs have been removed from SMM data
                                 structures.
@@ -212,23 +268,36 @@ STATIC
 EFI_STATUS
 UnplugCpus (
   IN APIC_ID                      *ToUnplugApicIds,
+  IN UINT32                       *ToUnplugSelectors,
   IN UINT32                       ToUnplugCount
   )
 {
   EFI_STATUS Status;
   UINT32     ToUnplugIdx;
+  UINT32     EjectCount;
   UINTN      ProcessorNum;
 
   ToUnplugIdx = 0;
+  EjectCount = 0;
   while (ToUnplugIdx < ToUnplugCount) {
     APIC_ID    RemoveApicId;
+    UINT32     QemuSelector;
 
     RemoveApicId = ToUnplugApicIds[ToUnplugIdx];
+    QemuSelector = ToUnplugSelectors[ToUnplugIdx];
 
     //
-    // mCpuHotPlugData->ApicId maps ProcessorNum -> ApicId. Use it to find
-    // the ProcessorNum for the APIC ID to be removed.
+    // mCpuHotPlugData->ApicId maps ProcessorNum -> ApicId. Use RemoveApicId
+    // to find the corresponding ProcessorNum for the CPU to be removed.
     //
+    // With this we can establish a 3 way mapping:
+    //    APIC_ID -- ProcessorNum -- QemuSelector
+    //
+    // We stash the ProcessorNum -> QemuSelector mapping so it can later be
+    // used for CPU hot-eject in SmmCpuFeaturesRendezvousExit() context (where
+    // we only have ProcessorNum available.)
+    //
+
     for (ProcessorNum = 0;
          ProcessorNum < mCpuHotPlugData->ArrayLength;
          ProcessorNum++) {
@@ -257,11 +326,62 @@ UnplugCpus (
       return Status;
     }
 
+    if (mCpuHotEjectData->QemuSelectorMap[ProcessorNum] !=
+        CPU_EJECT_QEMU_SELECTOR_INVALID) {
+      //
+      // mCpuHotEjectData->QemuSelectorMap[ProcessorNum] is set to
+      // CPU_EJECT_QEMU_SELECTOR_INVALID when mCpuHotEjectData->QemuSelectorMap
+      // is allocated, and once the subject processsor is ejected.
+      //
+      // Additionally, mMmCpuService->RemoveProcessor(ProcessorNum) invalidates
+      // mCpuHotPlugData->ApicId[ProcessorNum], so a given ProcessorNum can
+      // never match more than one APIC ID -- nor, by transitivity, designate
+      // more than one QemuSelector -- in a single invocation of UnplugCpus().
+      //
+      DEBUG ((DEBUG_ERROR, "%a: ProcessorNum %Lu maps to QemuSelector %Lu, "
+        "cannot also map to %u\n", __FUNCTION__, (UINT64)ProcessorNum,
+        mCpuHotEjectData->QemuSelectorMap[ProcessorNum], QemuSelector));
+
+      return EFI_ALREADY_STARTED;
+    }
+
+    //
+    // Stash the QemuSelector so we can do the actual ejection later.
+    //
+    mCpuHotEjectData->QemuSelectorMap[ProcessorNum] = (UINT64)QemuSelector;
+
+    DEBUG ((DEBUG_INFO, "%a: Started hot-unplug on ProcessorNum %Lu, APIC ID "
+      FMT_APIC_ID ", QemuSelector %u\n", __FUNCTION__, (UINT64)ProcessorNum,
+      RemoveApicId, QemuSelector));
+
+    EjectCount++;
     ToUnplugIdx++;
   }
 
+  if (EjectCount != 0) {
+    //
+    // We have processors to be ejected; install the handler.
+    //
+    mCpuHotEjectData->Handler = EjectCpu;
+
+    //
+    // The BSP and APs load mCpuHotEjectData->Handler, and
+    // mCpuHotEjectData->QemuSelectorMap[] in SmmCpuFeaturesRendezvousExit()
+    // and EjectCpu().
+    //
+    // The comment in SmmCpuFeaturesRendezvousExit() details how we use
+    // the AllCpusInSync control-dependency to ensure that any loads are
+    // ordered-after the stores above.
+    //
+    // Ensure that the stores above are ordered-before the AllCpusInSync store
+    // by using a MemoryFence() with release semantics.
+    //
+    MemoryFence ();
+  }
+
   //
-  // We've removed this set of APIC IDs from SMM data structures.
+  // We've removed this set of APIC IDs from SMM data structures and
+  // have installed an ejection handler if needed.
   //
   return EFI_SUCCESS;
 }
@@ -389,7 +509,7 @@ CpuHotplugMmi (
   }
 
   if (ToUnplugCount > 0) {
-    Status = UnplugCpus (mToUnplugApicIds, ToUnplugCount);
+    Status = UnplugCpus (mToUnplugApicIds, mToUnplugSelectors, ToUnplugCount);
     if (EFI_ERROR (Status)) {
       goto Fatal;
     }
@@ -460,9 +580,14 @@ CpuHotplugEntry (
 
   //
   // Our DEPEX on EFI_SMM_CPU_SERVICE_PROTOCOL guarantees that PiSmmCpuDxeSmm
-  // has pointed PcdCpuHotPlugDataAddress to CPU_HOT_PLUG_DATA in SMRAM.
+  // has pointed:
+  // - PcdCpuHotPlugDataAddress to CPU_HOT_PLUG_DATA in SMRAM,
+  // - PcdCpuHotEjectDataAddress to CPU_HOT_EJECT_DATA in SMRAM, if the
+  //   possible CPU count is greater than 1.
   //
   mCpuHotPlugData = (VOID *)(UINTN)PcdGet64 (PcdCpuHotPlugDataAddress);
+  mCpuHotEjectData = (VOID *)(UINTN)PcdGet64 (PcdCpuHotEjectDataAddress);
+
   if (mCpuHotPlugData == NULL) {
     Status = EFI_NOT_FOUND;
     DEBUG ((DEBUG_ERROR, "%a: CPU_HOT_PLUG_DATA: %r\n", __FUNCTION__, Status));
@@ -474,6 +599,19 @@ CpuHotplugEntry (
   if (mCpuHotPlugData->ArrayLength == 1) {
     return EFI_UNSUPPORTED;
   }
+
+  if (mCpuHotEjectData == NULL) {
+    Status = EFI_NOT_FOUND;
+  } else if (mCpuHotPlugData->ArrayLength != mCpuHotEjectData->ArrayLength) {
+    Status = EFI_INVALID_PARAMETER;
+  } else {
+    Status = EFI_SUCCESS;
+  }
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: CPU_HOT_EJECT_DATA: %r\n", __FUNCTION__, Status));
+    goto Fatal;
+  }
+
   //
   // Allocate the data structures that depend on the possible CPU count.
   //
