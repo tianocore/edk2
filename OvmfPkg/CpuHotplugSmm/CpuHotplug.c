@@ -62,6 +62,129 @@ STATIC UINT32 mPostSmmPenAddress;
 //
 STATIC EFI_HANDLE mDispatchHandle;
 
+/**
+  Process CPUs that have been hot-added, per QemuCpuhpCollectApicIds().
+
+  For each such CPU, relocate the SMBASE, and report the CPU to PiSmmCpuDxeSmm
+  via EFI_SMM_CPU_SERVICE_PROTOCOL. If the supposedly hot-added CPU is already
+  known, skip it silently.
+
+  @param[in] PluggedApicIds    The APIC IDs of the CPUs that have been
+                               hot-plugged.
+
+  @param[in] PluggedCount      The number of filled-in APIC IDs in
+                               PluggedApicIds.
+
+  @retval EFI_SUCCESS          CPUs corresponding to all the APIC IDs are
+                               populated.
+
+  @retval EFI_OUT_OF_RESOURCES Out of APIC ID space in "mCpuHotPlugData".
+
+  @return                      Error codes propagated from SmbaseRelocate()
+                               and mMmCpuService->AddProcessor().
+**/
+STATIC
+EFI_STATUS
+ProcessHotAddedCpus (
+  IN APIC_ID                      *PluggedApicIds,
+  IN UINT32                       PluggedCount
+  )
+{
+  EFI_STATUS Status;
+  UINT32     PluggedIdx;
+  UINT32     NewSlot;
+
+  //
+  // The Post-SMM Pen need not be reinstalled multiple times within a single
+  // root MMI handling. Even reinstalling once per root MMI is only prudence;
+  // in theory installing the pen in the driver's entry point function should
+  // suffice.
+  //
+  SmbaseReinstallPostSmmPen (mPostSmmPenAddress);
+
+  PluggedIdx = 0;
+  NewSlot = 0;
+  while (PluggedIdx < PluggedCount) {
+    APIC_ID NewApicId;
+    UINT32  CheckSlot;
+    UINTN   NewProcessorNumberByProtocol;
+
+    NewApicId = PluggedApicIds[PluggedIdx];
+
+    //
+    // Check if the supposedly hot-added CPU is already known to us.
+    //
+    for (CheckSlot = 0;
+         CheckSlot < mCpuHotPlugData->ArrayLength;
+         CheckSlot++) {
+      if (mCpuHotPlugData->ApicId[CheckSlot] == NewApicId) {
+        break;
+      }
+    }
+    if (CheckSlot < mCpuHotPlugData->ArrayLength) {
+      DEBUG ((DEBUG_VERBOSE, "%a: APIC ID " FMT_APIC_ID " was hot-plugged "
+        "before; ignoring it\n", __FUNCTION__, NewApicId));
+      PluggedIdx++;
+      continue;
+    }
+
+    //
+    // Find the first empty slot in CPU_HOT_PLUG_DATA.
+    //
+    while (NewSlot < mCpuHotPlugData->ArrayLength &&
+           mCpuHotPlugData->ApicId[NewSlot] != MAX_UINT64) {
+      NewSlot++;
+    }
+    if (NewSlot == mCpuHotPlugData->ArrayLength) {
+      DEBUG ((DEBUG_ERROR, "%a: no room for APIC ID " FMT_APIC_ID "\n",
+        __FUNCTION__, NewApicId));
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    //
+    // Store the APIC ID of the new processor to the slot.
+    //
+    mCpuHotPlugData->ApicId[NewSlot] = NewApicId;
+
+    //
+    // Relocate the SMBASE of the new CPU.
+    //
+    Status = SmbaseRelocate (NewApicId, mCpuHotPlugData->SmBase[NewSlot],
+               mPostSmmPenAddress);
+    if (EFI_ERROR (Status)) {
+      goto RevokeNewSlot;
+    }
+
+    //
+    // Add the new CPU with EFI_SMM_CPU_SERVICE_PROTOCOL.
+    //
+    Status = mMmCpuService->AddProcessor (mMmCpuService, NewApicId,
+                              &NewProcessorNumberByProtocol);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: AddProcessor(" FMT_APIC_ID "): %r\n",
+        __FUNCTION__, NewApicId, Status));
+      goto RevokeNewSlot;
+    }
+
+    DEBUG ((DEBUG_INFO, "%a: hot-added APIC ID " FMT_APIC_ID ", SMBASE 0x%Lx, "
+      "EFI_SMM_CPU_SERVICE_PROTOCOL assigned number %Lu\n", __FUNCTION__,
+      NewApicId, (UINT64)mCpuHotPlugData->SmBase[NewSlot],
+      (UINT64)NewProcessorNumberByProtocol));
+
+    NewSlot++;
+    PluggedIdx++;
+  }
+
+  //
+  // We've processed this batch of hot-added CPUs.
+  //
+  return EFI_SUCCESS;
+
+RevokeNewSlot:
+  mCpuHotPlugData->ApicId[NewSlot] = MAX_UINT64;
+
+  return Status;
+}
 
 /**
   CPU Hotplug MMI handler function.
@@ -122,8 +245,6 @@ CpuHotplugMmi (
   UINT8      ApmControl;
   UINT32     PluggedCount;
   UINT32     ToUnplugCount;
-  UINT32     PluggedIdx;
-  UINT32     NewSlot;
 
   //
   // Assert that we are entering this function due to our root MMI handler
@@ -179,96 +300,17 @@ CpuHotplugMmi (
     goto Fatal;
   }
 
-  //
-  // Process hot-added CPUs.
-  //
-  // The Post-SMM Pen need not be reinstalled multiple times within a single
-  // root MMI handling. Even reinstalling once per root MMI is only prudence;
-  // in theory installing the pen in the driver's entry point function should
-  // suffice.
-  //
-  SmbaseReinstallPostSmmPen (mPostSmmPenAddress);
-
-  PluggedIdx = 0;
-  NewSlot = 0;
-  while (PluggedIdx < PluggedCount) {
-    APIC_ID NewApicId;
-    UINT32  CheckSlot;
-    UINTN   NewProcessorNumberByProtocol;
-
-    NewApicId = mPluggedApicIds[PluggedIdx];
-
-    //
-    // Check if the supposedly hot-added CPU is already known to us.
-    //
-    for (CheckSlot = 0;
-         CheckSlot < mCpuHotPlugData->ArrayLength;
-         CheckSlot++) {
-      if (mCpuHotPlugData->ApicId[CheckSlot] == NewApicId) {
-        break;
-      }
-    }
-    if (CheckSlot < mCpuHotPlugData->ArrayLength) {
-      DEBUG ((DEBUG_VERBOSE, "%a: APIC ID " FMT_APIC_ID " was hot-plugged "
-        "before; ignoring it\n", __FUNCTION__, NewApicId));
-      PluggedIdx++;
-      continue;
-    }
-
-    //
-    // Find the first empty slot in CPU_HOT_PLUG_DATA.
-    //
-    while (NewSlot < mCpuHotPlugData->ArrayLength &&
-           mCpuHotPlugData->ApicId[NewSlot] != MAX_UINT64) {
-      NewSlot++;
-    }
-    if (NewSlot == mCpuHotPlugData->ArrayLength) {
-      DEBUG ((DEBUG_ERROR, "%a: no room for APIC ID " FMT_APIC_ID "\n",
-        __FUNCTION__, NewApicId));
+  if (PluggedCount > 0) {
+    Status = ProcessHotAddedCpus (mPluggedApicIds, PluggedCount);
+    if (EFI_ERROR (Status)) {
       goto Fatal;
     }
-
-    //
-    // Store the APIC ID of the new processor to the slot.
-    //
-    mCpuHotPlugData->ApicId[NewSlot] = NewApicId;
-
-    //
-    // Relocate the SMBASE of the new CPU.
-    //
-    Status = SmbaseRelocate (NewApicId, mCpuHotPlugData->SmBase[NewSlot],
-               mPostSmmPenAddress);
-    if (EFI_ERROR (Status)) {
-      goto RevokeNewSlot;
-    }
-
-    //
-    // Add the new CPU with EFI_SMM_CPU_SERVICE_PROTOCOL.
-    //
-    Status = mMmCpuService->AddProcessor (mMmCpuService, NewApicId,
-                              &NewProcessorNumberByProtocol);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: AddProcessor(" FMT_APIC_ID "): %r\n",
-        __FUNCTION__, NewApicId, Status));
-      goto RevokeNewSlot;
-    }
-
-    DEBUG ((DEBUG_INFO, "%a: hot-added APIC ID " FMT_APIC_ID ", SMBASE 0x%Lx, "
-      "EFI_SMM_CPU_SERVICE_PROTOCOL assigned number %Lu\n", __FUNCTION__,
-      NewApicId, (UINT64)mCpuHotPlugData->SmBase[NewSlot],
-      (UINT64)NewProcessorNumberByProtocol));
-
-    NewSlot++;
-    PluggedIdx++;
   }
 
   //
   // We've handled this MMI.
   //
   return EFI_SUCCESS;
-
-RevokeNewSlot:
-  mCpuHotPlugData->ApicId[NewSlot] = MAX_UINT64;
 
 Fatal:
   ASSERT (FALSE);
