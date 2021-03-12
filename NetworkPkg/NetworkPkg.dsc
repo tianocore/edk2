@@ -2,7 +2,7 @@
 # UEFI 2.4 Network Module Package for All Architectures
 #
 # (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-# Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -19,6 +19,8 @@
   SKUID_IDENTIFIER               = DEFAULT
 
   DEFINE NETWORK_ISCSI_ENABLE    = TRUE
+
+!include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
