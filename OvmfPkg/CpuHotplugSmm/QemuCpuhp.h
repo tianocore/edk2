@@ -42,6 +42,12 @@ QemuCpuhpWriteCpuSelector (
   );
 
 VOID
+QemuCpuhpWriteCpuStatus (
+  IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
+  IN UINT8                        CpuStatus
+  );
+
+VOID
 QemuCpuhpWriteCommand (
   IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
   IN UINT8                        Command
