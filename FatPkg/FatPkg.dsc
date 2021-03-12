@@ -3,7 +3,7 @@
 #
 #  This Platform file is used to generate the Binary Fat Drivers
 #  for EDK II Prime release.
-#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -28,6 +28,8 @@
   *_*_*_CC_FLAGS                       = -D DISABLE_NEW_DEPRECATED_INTERFACES
 
 [LibraryClasses]
+  !include MdePkg/MdeLibs.dsc.inc
+
   #
   # Entry Point Libraries
   #
