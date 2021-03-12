@@ -10,7 +10,7 @@
   We don't advocate putting compiler specifics in libraries or drivers but there
   is no other way to make this work.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -39,8 +39,14 @@ IoRead8 (
   )
 {
   UINT8   Data;
+  BOOLEAN Flag;
 
-  __asm__ __volatile__ ("inb %w1,%b0" : "=a" (Data) : "d" ((UINT16)Port));
+  Flag = FilterBeforeIoRead (FilterWidth8, Port, &Data);
+  if (Flag) {
+    __asm__ __volatile__ ("inb %w1,%b0" : "=a" (Data) : "d" ((UINT16)Port));
+  }
+  FilterAfterIoRead (FilterWidth8, Port, &Data);
+
   return Data;
 }
 
@@ -66,7 +72,14 @@ IoWrite8 (
   IN      UINT8                     Value
   )
 {
-  __asm__ __volatile__ ("outb %b0,%w1" : : "a" (Value), "d" ((UINT16)Port));
+  BOOLEAN Flag;
+
+  Flag = FilterBeforeIoWrite (FilterWidth8, Port, &Value);
+  if (Flag) {
+    __asm__ __volatile__ ("outb %b0,%w1" : : "a" (Value), "d" ((UINT16)Port));
+  }
+  FilterAfterIoWrite (FilterWidth8, Port, &Value);
+
   return Value;;
 }
 
@@ -92,9 +105,16 @@ IoRead16 (
   )
 {
   UINT16   Data;
+  BOOLEAN  Flag;
 
   ASSERT ((Port & 1) == 0);
-  __asm__ __volatile__ ("inw %w1,%w0" : "=a" (Data) : "d" ((UINT16)Port));
+
+  Flag = FilterBeforeIoRead (FilterWidth16, Port, &Data);
+  if (Flag) {
+     __asm__ __volatile__ ("inw %w1,%w0" : "=a" (Data) : "d" ((UINT16)Port));
+  }
+  FilterAfterIoRead (FilterWidth16, Port, &Data);
+
   return Data;
 }
 
@@ -121,8 +141,17 @@ IoWrite16 (
   IN      UINT16                    Value
   )
 {
+
+  BOOLEAN Flag;
+
   ASSERT ((Port & 1) == 0);
-  __asm__ __volatile__ ("outw %w0,%w1" : : "a" (Value), "d" ((UINT16)Port));
+
+  Flag = FilterBeforeIoWrite (FilterWidth16, Port, &Value);
+  if (Flag) {
+    __asm__ __volatile__ ("outw %w0,%w1" : : "a" (Value), "d" ((UINT16)Port));
+  }
+  FilterAfterIoWrite (FilterWidth16, Port, &Value);
+
   return Value;;
 }
 
@@ -148,9 +177,16 @@ IoRead32 (
   )
 {
   UINT32   Data;
+  BOOLEAN  Flag;
 
   ASSERT ((Port & 3) == 0);
-  __asm__ __volatile__ ("inl %w1,%0" : "=a" (Data) : "d" ((UINT16)Port));
+
+  Flag = FilterBeforeIoRead (FilterWidth32, Port, &Data);
+  if (Flag) {
+    __asm__ __volatile__ ("inl %w1,%0" : "=a" (Data) : "d" ((UINT16)Port));
+  }
+  FilterAfterIoRead (FilterWidth32, Port, &Data);
+
   return Data;
 }
 
@@ -177,8 +213,16 @@ IoWrite32 (
   IN      UINT32                    Value
   )
 {
+  BOOLEAN  Flag;
+
   ASSERT ((Port & 3) == 0);
-  __asm__ __volatile__ ("outl %0,%w1" : : "a" (Value), "d" ((UINT16)Port));
+
+  Flag = FilterBeforeIoWrite (FilterWidth32, Port, &Value);
+  if (Flag) {
+    __asm__ __volatile__ ("outl %0,%w1" : : "a" (Value), "d" ((UINT16)Port));
+  }
+  FilterAfterIoWrite (FilterWidth32, Port, &Value);
+
   return Value;
 }
 
