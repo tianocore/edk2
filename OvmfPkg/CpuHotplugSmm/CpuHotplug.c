@@ -190,6 +190,83 @@ RevokeNewSlot:
 }
 
 /**
+  Process to be hot-unplugged CPUs, per QemuCpuhpCollectApicIds().
+
+  For each such CPU, report the CPU to PiSmmCpuDxeSmm via
+  EFI_SMM_CPU_SERVICE_PROTOCOL. If the to be hot-unplugged CPU is
+  unknown, skip it silently.
+
+  @param[in] ToUnplugApicIds    The APIC IDs of the CPUs that are about to be
+                                hot-unplugged.
+
+  @param[in] ToUnplugCount      The number of filled-in APIC IDs in
+                                ToUnplugApicIds.
+
+  @retval EFI_SUCCESS           Known APIC IDs have been removed from SMM data
+                                structures.
+
+  @return                       Error codes propagated from
+                                mMmCpuService->RemoveProcessor().
+**/
+STATIC
+EFI_STATUS
+UnplugCpus (
+  IN APIC_ID                      *ToUnplugApicIds,
+  IN UINT32                       ToUnplugCount
+  )
+{
+  EFI_STATUS Status;
+  UINT32     ToUnplugIdx;
+  UINTN      ProcessorNum;
+
+  ToUnplugIdx = 0;
+  while (ToUnplugIdx < ToUnplugCount) {
+    APIC_ID    RemoveApicId;
+
+    RemoveApicId = ToUnplugApicIds[ToUnplugIdx];
+
+    //
+    // mCpuHotPlugData->ApicId maps ProcessorNum -> ApicId. Use it to find
+    // the ProcessorNum for the APIC ID to be removed.
+    //
+    for (ProcessorNum = 0;
+         ProcessorNum < mCpuHotPlugData->ArrayLength;
+         ProcessorNum++) {
+      if (mCpuHotPlugData->ApicId[ProcessorNum] == RemoveApicId) {
+        break;
+      }
+    }
+
+    //
+    // Ignore the unplug if APIC ID not found
+    //
+    if (ProcessorNum == mCpuHotPlugData->ArrayLength) {
+      DEBUG ((DEBUG_VERBOSE, "%a: did not find APIC ID " FMT_APIC_ID
+        " to unplug\n", __FUNCTION__, RemoveApicId));
+      ToUnplugIdx++;
+      continue;
+    }
+
+    //
+    // Mark ProcessorNum for removal from SMM data structures
+    //
+    Status = mMmCpuService->RemoveProcessor (mMmCpuService, ProcessorNum);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: RemoveProcessor(" FMT_APIC_ID "): %r\n",
+        __FUNCTION__, RemoveApicId, Status));
+      return Status;
+    }
+
+    ToUnplugIdx++;
+  }
+
+  //
+  // We've removed this set of APIC IDs from SMM data structures.
+  //
+  return EFI_SUCCESS;
+}
+
+/**
   CPU Hotplug MMI handler function.
 
   This is a root MMI handler.
@@ -306,6 +383,13 @@ CpuHotplugMmi (
 
   if (PluggedCount > 0) {
     Status = ProcessHotAddedCpus (mPluggedApicIds, PluggedCount);
+    if (EFI_ERROR (Status)) {
+      goto Fatal;
+    }
+  }
+
+  if (ToUnplugCount > 0) {
+    Status = UnplugCpus (mToUnplugApicIds, ToUnplugCount);
     if (EFI_ERROR (Status)) {
       goto Fatal;
     }
