@@ -30,6 +30,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000
 
 [LibraryClasses]
+  !include MdePkg/MdeLibs.dsc.inc
+
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
 [Components]
