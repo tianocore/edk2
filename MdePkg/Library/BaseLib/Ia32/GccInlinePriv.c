@@ -10,6 +10,7 @@
 
 
 #include "BaseLibInternals.h"
+#include <Library/RegisterFilterLib.h>
 
 /**
   Enables CPU interrupts.
@@ -63,12 +64,17 @@ AsmReadMsr64 (
   )
 {
   UINT64 Data;
+  BOOLEAN Flag;
 
-  __asm__ __volatile__ (
-    "rdmsr"
-    : "=A" (Data)   // %0
-    : "c"  (Index)  // %1
-    );
+  Flag = FilterBeforeMsrRead (Index, &Data);
+  if (Flag) {
+    __asm__ __volatile__ (
+      "rdmsr"
+      : "=A" (Data)   // %0
+      : "c"  (Index)  // %1
+      );
+  }
+  FilterAfterMsrRead (Index, &Data);
 
   return Data;
 }
@@ -97,12 +103,18 @@ AsmWriteMsr64 (
   IN      UINT64                    Value
   )
 {
-  __asm__ __volatile__ (
-    "wrmsr"
-    :
-    : "c" (Index),
-      "A" (Value)
-    );
+  BOOLEAN  Flag;
+
+  Flag = FilterBeforeMsrWrite (Index, &Value);
+  if (Flag) {
+    __asm__ __volatile__ (
+      "wrmsr"
+      :
+      : "c" (Index),
+        "A" (Value)
+      );
+  }
+  FilterAfterMsrWrite (Index, &Value);
 
   return Value;
 }
