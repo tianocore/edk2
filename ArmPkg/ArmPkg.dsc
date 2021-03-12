@@ -33,6 +33,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
 
 [LibraryClasses.common]
+  !include MdePkg/MdeLibs.dsc.inc
+
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
