@@ -1,7 +1,7 @@
 ## @file
 # Standalone MM Platform.
 #
-# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 # Copyright (C) Microsoft Corporation<BR>
 #
@@ -33,6 +33,8 @@
 #
 ################################################################################
 [LibraryClasses]
+  !include MdePkg/MdeLibs.dsc.inc
+
   #
   # Basic
   #
