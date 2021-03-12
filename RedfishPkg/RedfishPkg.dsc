@@ -38,6 +38,7 @@
   DpcLib|NetworkPkg/Library/DxeDpcLib/DxeDpcLib.inf
   RedfishPlatformCredentialLib|RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
   RedfishContentCodingLib|RedfishPkg/Library/RedfishContentCodingLibNull/RedfishContentCodingLibNull.inf
+  RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
