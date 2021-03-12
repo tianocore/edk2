@@ -28,6 +28,12 @@
 // "etc/smi/supported-features" and "etc/smi/requested-features" fw_cfg files.
 //
 #define ICH9_LPC_SMI_F_CPU_HOTPLUG BIT1
+//
+// The following bit value stands for "enable CPU hot-unplug, and inject an SMI
+// with control value ICH9_APM_CNT_CPU_HOTPLUG upon hot-unplug", in the
+// "etc/smi/supported-features" and "etc/smi/requested-features" fw_cfg files.
+//
+#define ICH9_LPC_SMI_F_CPU_HOT_UNPLUG BIT2
 
 //
 // Provides a scratch buffer (allocated in EfiReservedMemoryType type memory)
@@ -112,7 +118,8 @@ NegotiateSmiFeatures (
   QemuFwCfgReadBytes (sizeof mSmiFeatures, &mSmiFeatures);
 
   //
-  // We want broadcast SMI, SMI on CPU hotplug, and nothing else.
+  // We want broadcast SMI, SMI on CPU hotplug, SMI on CPU hot-unplug
+  // and nothing else.
   //
   RequestedFeaturesMask = ICH9_LPC_SMI_F_BROADCAST;
   if (!MemEncryptSevIsEnabled ()) {
@@ -120,6 +127,7 @@ NegotiateSmiFeatures (
     // For now, we only support hotplug with SEV disabled.
     //
     RequestedFeaturesMask |= ICH9_LPC_SMI_F_CPU_HOTPLUG;
+    RequestedFeaturesMask |= ICH9_LPC_SMI_F_CPU_HOT_UNPLUG;
   }
   mSmiFeatures &= RequestedFeaturesMask;
   QemuFwCfgSelectItem (mRequestedFeaturesItem);
@@ -163,6 +171,13 @@ NegotiateSmiFeatures (
     DEBUG ((DEBUG_INFO, "%a: CPU hotplug not negotiated\n", __FUNCTION__));
   } else {
     DEBUG ((DEBUG_INFO, "%a: CPU hotplug with SMI negotiated\n",
+      __FUNCTION__));
+  }
+
+  if ((mSmiFeatures & ICH9_LPC_SMI_F_CPU_HOT_UNPLUG) == 0) {
+    DEBUG ((DEBUG_INFO, "%a: CPU hot-unplug not negotiated\n", __FUNCTION__));
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: CPU hot-unplug with SMI negotiated\n",
       __FUNCTION__));
   }
 
