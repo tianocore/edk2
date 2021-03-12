@@ -144,6 +144,7 @@ typedef struct {
   UINT32                         ProcessorSignature;
   UINT8                          PlatformId;
   UINT64                         MicrocodeEntryAddr;
+  UINT32                         MicrocodeRevision;
 } CPU_AP_DATA;
 
 //

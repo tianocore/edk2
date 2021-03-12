@@ -315,17 +315,8 @@ Done:
         MSR_IA32_BIOS_UPDT_TRIG,
         (UINT64) (UINTN) MicrocodeData
         );
-    //
-    // Get and check new microcode signature
-    //
-    CurrentRevision = GetCurrentMicrocodeSignature ();
-    if (CurrentRevision != LatestRevision) {
-      AcquireSpinLock(&CpuMpData->MpLock);
-      DEBUG ((EFI_D_ERROR, "Updated microcode signature [0x%08x] does not match \
-                loaded microcode signature [0x%08x]\n", CurrentRevision, LatestRevision));
-      ReleaseSpinLock(&CpuMpData->MpLock);
-    }
   }
+  CpuMpData->CpuData[ProcessorNumber].MicrocodeRevision = GetCurrentMicrocodeSignature ();
 }
 
 /**
