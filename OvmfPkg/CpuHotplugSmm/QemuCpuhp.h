@@ -55,6 +55,7 @@ QemuCpuhpCollectApicIds (
   OUT APIC_ID                      *PluggedApicIds,
   OUT UINT32                       *PluggedCount,
   OUT APIC_ID                      *ToUnplugApicIds,
+  OUT UINT32                       *ToUnplugSelectors,
   OUT UINT32                       *ToUnplugCount
   );
 
