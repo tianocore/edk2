@@ -8,7 +8,7 @@
   We don't advocate putting compiler specifics in libraries or drivers but there
   is no other way to make this work.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -66,10 +66,16 @@ IoRead8 (
   )
 {
   UINT8                             Value;
+  BOOLEAN                           Flag;
 
-  _ReadWriteBarrier ();
-  Value = (UINT8)_inp ((UINT16)Port);
-  _ReadWriteBarrier ();
+  Flag = FilterBeforeIoRead (FilterWidth8, Port, &Value);
+  if (Flag) {
+    _ReadWriteBarrier ();
+    Value = (UINT8)_inp ((UINT16)Port);
+    _ReadWriteBarrier ();
+  }
+  FilterAfterIoRead (FilterWidth8, Port, &Value);
+
   return Value;
 }
 
@@ -95,9 +101,16 @@ IoWrite8 (
   IN      UINT8                     Value
   )
 {
-  _ReadWriteBarrier ();
-  (UINT8)_outp ((UINT16)Port, Value);
-  _ReadWriteBarrier ();
+  BOOLEAN                           Flag;
+
+  Flag = FilterBeforeIoWrite(FilterWidth8, Port, &Value);
+  if (Flag) {
+    _ReadWriteBarrier ();
+    (UINT8)_outp ((UINT16)Port, Value);
+    _ReadWriteBarrier ();
+  }
+  FilterAfterIoWrite (FilterWidth8, Port, &Value);
+
   return Value;
 }
 
@@ -123,11 +136,18 @@ IoRead16 (
   )
 {
   UINT16                            Value;
+  BOOLEAN                           Flag;
 
   ASSERT ((Port & 1) == 0);
-  _ReadWriteBarrier ();
-  Value = _inpw ((UINT16)Port);
-  _ReadWriteBarrier ();
+
+  Flag = FilterBeforeIoRead (FilterWidth16, Port, &Value);
+  if (Flag) {
+    _ReadWriteBarrier ();
+    Value = _inpw ((UINT16)Port);
+    _ReadWriteBarrier ();
+  }
+  FilterBeforeIoRead (FilterWidth16, Port, &Value);
+
   return Value;
 }
 
@@ -154,10 +174,18 @@ IoWrite16 (
   IN      UINT16                    Value
   )
 {
+  BOOLEAN                           Flag;
+
   ASSERT ((Port & 1) == 0);
-  _ReadWriteBarrier ();
-  _outpw ((UINT16)Port, Value);
-  _ReadWriteBarrier ();
+
+  Flag = FilterBeforeIoWrite(FilterWidth16, Port, &Value);
+  if (Flag) {
+    _ReadWriteBarrier ();
+    _outpw ((UINT16)Port, Value);
+    _ReadWriteBarrier ();
+  }
+  FilterAfterIoWrite (FilterWidth16, Port, &Value);
+
   return Value;
 }
 
@@ -183,11 +211,18 @@ IoRead32 (
   )
 {
   UINT32                            Value;
+  BOOLEAN                           Flag;
 
   ASSERT ((Port & 3) == 0);
-  _ReadWriteBarrier ();
-  Value = _inpd ((UINT16)Port);
-  _ReadWriteBarrier ();
+
+  Flag = FilterBeforeIoRead(FilterWidth32, Port, &Value);
+  if (Flag) {
+    _ReadWriteBarrier ();
+    Value = _inpd ((UINT16)Port);
+    _ReadWriteBarrier ();
+  }
+  FilterAfterIoRead (FilterWidth32, Port, &Value);
+
   return Value;
 }
 
@@ -214,9 +249,17 @@ IoWrite32 (
   IN      UINT32                    Value
   )
 {
+  BOOLEAN                           Flag;
+
   ASSERT ((Port & 3) == 0);
-  _ReadWriteBarrier ();
-  _outpd ((UINT16)Port, Value);
-  _ReadWriteBarrier ();
+
+  Flag = FilterBeforeIoWrite(FilterWidth32, Port, &Value);
+  if (Flag) {
+    _ReadWriteBarrier ();
+    _outpd ((UINT16)Port, Value);
+    _ReadWriteBarrier ();
+  }
+  FilterAfterIoWrite (FilterWidth32, Port, &Value);
+
   return Value;
 }
