@@ -1,7 +1,7 @@
 ## @file
 # This package provides EDKII capsule related support.
 #
-# Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -18,6 +18,8 @@
   SKUID_IDENTIFIER               = DEFAULT
 
 [LibraryClasses]
+  !include MdePkg/MdeLibs.dsc.inc
+
   #
   # Entry point
   #
