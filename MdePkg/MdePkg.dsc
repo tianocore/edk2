@@ -21,6 +21,8 @@
 
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
 
+!include MdePkg/MdeLibs.dsc.inc
+
 [PcdsFeatureFlag]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE
 
