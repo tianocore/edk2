@@ -30,9 +30,13 @@
   BaseMemoryLib
   DebugLib
   MemEncryptSevLib
+  MemoryAllocationLib
   PcdLib
+  SafeIntLib
   SmmServicesTableLib
   UefiBootServicesTableLib
 
 [Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
+  gUefiOvmfPkgTokenSpaceGuid.PcdCpuHotEjectDataAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase

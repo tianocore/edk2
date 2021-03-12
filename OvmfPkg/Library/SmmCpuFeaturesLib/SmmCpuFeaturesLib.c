@@ -11,10 +11,13 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SafeIntLib.h>
 #include <Library/SmmCpuFeaturesLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Pcd/CpuHotEjectData.h>
 #include <PiSmm.h>
 #include <Register/Intel/SmramSaveStateMap.h>
 #include <Register/QemuSmramSaveStateMap.h>
@@ -171,6 +174,77 @@ SmmCpuFeaturesHookReturnFromSmm (
   return OriginalInstructionPointer;
 }
 
+STATIC CPU_HOT_EJECT_DATA *mCpuHotEjectData = NULL;
+
+/**
+  Initialize mCpuHotEjectData if PcdCpuMaxLogicalProcessorNumber > 1.
+
+  Also setup the corresponding PcdCpuHotEjectDataAddress.
+**/
+STATIC
+VOID
+InitCpuHotEjectData (
+  VOID
+  )
+{
+  UINTN          Size;
+  UINT32         Idx;
+  UINT32         MaxNumberOfCpus;
+  RETURN_STATUS  PcdStatus;
+
+  MaxNumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  if (MaxNumberOfCpus == 1) {
+    return;
+  }
+
+  //
+  // We allocate CPU_HOT_EJECT_DATA and CPU_HOT_EJECT_DATA->QemuSelectorMap[]
+  // in a single allocation, and explicitly align the QemuSelectorMap[] (which
+  // is a UINT64 array) at its natural boundary.
+  // Accordingly, allocate:
+  //   sizeof(*mCpuHotEjectData) + (MaxNumberOfCpus * sizeof(UINT64))
+  // and, add sizeof(UINT64) - 1 to use as padding if needed.
+  //
+
+  if (RETURN_ERROR (SafeUintnMult (MaxNumberOfCpus, sizeof (UINT64), &Size)) ||
+      RETURN_ERROR (SafeUintnAdd (Size, sizeof (*mCpuHotEjectData), &Size)) ||
+      RETURN_ERROR (SafeUintnAdd (Size, sizeof (UINT64) - 1, &Size))) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid CPU_HOT_EJECT_DATA\n", __FUNCTION__));
+    goto Fatal;
+  }
+
+  mCpuHotEjectData = AllocatePool (Size);
+  if (mCpuHotEjectData == NULL) {
+    ASSERT (mCpuHotEjectData != NULL);
+    goto Fatal;
+  }
+
+  mCpuHotEjectData->Handler = NULL;
+  mCpuHotEjectData->ArrayLength = MaxNumberOfCpus;
+
+  mCpuHotEjectData->QemuSelectorMap = ALIGN_POINTER (mCpuHotEjectData + 1,
+                                        sizeof (UINT64));
+  //
+  // We use mCpuHotEjectData->QemuSelectorMap to map
+  // ProcessorNum -> QemuSelector. Initialize to invalid values.
+  //
+  for (Idx = 0; Idx < mCpuHotEjectData->ArrayLength; Idx++) {
+    mCpuHotEjectData->QemuSelectorMap[Idx] = CPU_EJECT_QEMU_SELECTOR_INVALID;
+  }
+
+  //
+  // Expose address of CPU Hot eject Data structure
+  //
+  PcdStatus = PcdSet64S (PcdCpuHotEjectDataAddress,
+                (UINTN)(VOID *)mCpuHotEjectData);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
+  return;
+
+Fatal:
+  CpuDeadLoop ();
+}
+
 /**
   Hook point in normal execution mode that allows the one CPU that was elected
   as monarch during System Management Mode initialization to perform additional
@@ -187,6 +261,9 @@ SmmCpuFeaturesSmmRelocationComplete (
   EFI_STATUS Status;
   UINTN      MapPagesBase;
   UINTN      MapPagesCount;
+
+
+  InitCpuHotEjectData ();
 
   if (!MemEncryptSevIsEnabled ()) {
     return;
