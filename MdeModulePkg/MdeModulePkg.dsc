@@ -2,7 +2,7 @@
 # EFI/PI Reference Module Package for All Architectures
 #
 # (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -20,6 +20,8 @@
   SKUID_IDENTIFIER               = DEFAULT
 
 [LibraryClasses]
+  !include MdePkg/MdeLibs.dsc.inc
+
   #
   # Entry point
   #
