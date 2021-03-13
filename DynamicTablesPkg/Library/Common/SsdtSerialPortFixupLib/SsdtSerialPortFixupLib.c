@@ -27,6 +27,8 @@
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
+int a = 1;
+
 /** C array containing the compiled AML template.
     This symbol is defined in the auto generated C file
     containing the AML bytecode array.
