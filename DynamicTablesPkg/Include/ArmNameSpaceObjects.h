@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -466,16 +466,6 @@ typedef struct CmArmItsGroupNode {
 } CM_ARM_ITS_GROUP_NODE;
 
 /** A structure that describes the
-    GIC ITS Identifiers for an ITS Group node.
-
-    ID: EArmObjGicItsIdentifierArray
-*/
-typedef struct CmArmGicItsIdentifier {
-  /// The ITS Identifier
-  UINT32  ItsId;
-} CM_ARM_ITS_IDENTIFIER;
-
-/** A structure that describes the
     Named component node for the Platform.
 
     ID: EArmObjNamedComponent
@@ -635,6 +625,16 @@ typedef struct CmArmPmcgNode {
   /// Reference token for the IORT node associated with this node
   CM_OBJECT_TOKEN   ReferenceToken;
 } CM_ARM_PMCG_NODE;
+
+/** A structure that describes the
+    GIC ITS Identifiers for an ITS Group node.
+
+    ID: EArmObjGicItsIdentifierArray
+*/
+typedef struct CmArmGicItsIdentifier {
+  /// The ITS Identifier
+  UINT32  ItsId;
+} CM_ARM_ITS_IDENTIFIER;
 
 /** A structure that describes the
     ID Mappings for the Platform.
