@@ -64,4 +64,6 @@
    MSFT:RELEASE_*_IA32_CC_FLAGS           == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /FIAutoGen.h /EHs-c- /GR- /GF
    MSFT:DEBUG_*_X64_CC_FLAGS              == /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1b2s /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
    MSFT:RELEASE_*_X64_CC_FLAGS            == /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1b2s /Gy /FIAutoGen.h /EHs-c- /GR- /GF
+   MSFT:DEBUG_*_AARCH64_CC_FLAGS          == /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1b2s /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
+   MSFT:RELEASE_*_AARCH64_CC_FLAGS        == /nologo /c /WX /GS- /X /W4 /Gs32768 /D UNICODE /O1b2s /Gy /FIAutoGen.h /EHs-c- /GR- /GF
   INTEL:*_*_*_CC_FLAGS                    =  /Oi-
