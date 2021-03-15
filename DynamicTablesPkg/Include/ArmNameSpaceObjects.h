@@ -681,8 +681,6 @@ typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
                 Vector Flags (Byte 3) of the Extended Interrupt
                 resource descriptor.
                 See EFI_ACPI_EXTENDED_INTERRUPT_FLAG_xxx in Acpi10.h
-
-    ID: EArmObjExtendedInterruptInfo
 */
 typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
 
