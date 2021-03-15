@@ -1128,6 +1128,11 @@ AhciDmaTransfer (
   }
 
   //
+  // Set Status to suppress incorrect compiler/analyzer warnings
+  //
+  Status = EFI_SUCCESS;
+
+  //
   // DMA buffer allocation. Needs to be done only once for both sync and async
   // DMA transfers irrespective of number of retries.
   //

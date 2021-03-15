@@ -115,6 +115,11 @@ CreateBasicVariablePolicy (
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // Set NameSize to suppress incorrect compiler/analyzer warnings
+  //
+  NameSize  = 0;
+
   // Now we've gotta determine the total size of the buffer required for
   // the VariablePolicy structure.
   TotalSize = sizeof( VARIABLE_POLICY_ENTRY );
