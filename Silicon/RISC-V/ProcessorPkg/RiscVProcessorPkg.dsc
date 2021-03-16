@@ -36,6 +36,8 @@
 [SkuIds]
   0|DEFAULT
 
+!include MdePkg/MdeLibs.dsc.inc
+
 [LibraryClasses.common]
   CpuExceptionHandlerLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVExceptionLib/CpuExceptionHandlerDxeLib.inf
   RiscVCpuLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVCpuLib/RiscVCpuLib.inf
