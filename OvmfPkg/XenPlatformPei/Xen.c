@@ -17,6 +17,8 @@
 //
 // The Library classes this module consumes
 //
+#include <Library/BaseMemoryLib.h>
+#include <Library/CpuLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -25,6 +27,7 @@
 #include <IndustryStandard/E820.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Library/MtrrLib.h>
+#include <IndustryStandard/PageTable.h>
 #include <IndustryStandard/Xen/arch-x86/hvm/start_info.h>
 #include <Library/XenHypercallLib.h>
 #include <IndustryStandard/Xen/memory.h>
@@ -383,6 +386,74 @@ InitializeXen (
 
   PcdStatus = PcdSetBoolS (PcdPciDisableBusEnumeration, TRUE);
   ASSERT_RETURN_ERROR (PcdStatus);
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+PhysicalAddressIdentityMapping (
+  IN EFI_PHYSICAL_ADDRESS   AddressToMap
+  )
+{
+  INTN                            Index;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *L4, *L3;
+  PAGE_TABLE_ENTRY                *PageTable;
+
+  DEBUG ((DEBUG_INFO, "Mapping 1:1 of address 0x%lx\n", (UINT64)AddressToMap));
+
+  // L4 / Top level Page Directory Pointers
+
+  L4 = (VOID*)(UINTN)PcdGet32 (PcdOvmfSecPageTablesBase);
+  Index = PML4_OFFSET (AddressToMap);
+
+  if (!L4[Index].Bits.Present) {
+    L3 = AllocatePages (1);
+    if (L3 == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    ZeroMem (L3, EFI_PAGE_SIZE);
+
+    L4[Index].Bits.ReadWrite = 1;
+    L4[Index].Bits.Accessed = 1;
+    L4[Index].Bits.PageTableBaseAddress = (EFI_PHYSICAL_ADDRESS)L3 >> 12;
+    L4[Index].Bits.Present = 1;
+  }
+
+  // L3 / Next level Page Directory Pointers
+
+  L3 = (VOID*)(EFI_PHYSICAL_ADDRESS)(L4[Index].Bits.PageTableBaseAddress << 12);
+  Index = PDP_OFFSET (AddressToMap);
+
+  if (!L3[Index].Bits.Present) {
+    PageTable = AllocatePages (1);
+    if (PageTable == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    ZeroMem (PageTable, EFI_PAGE_SIZE);
+
+    L3[Index].Bits.ReadWrite = 1;
+    L3[Index].Bits.Accessed = 1;
+    L3[Index].Bits.PageTableBaseAddress = (EFI_PHYSICAL_ADDRESS)PageTable >> 12;
+    L3[Index].Bits.Present = 1;
+  }
+
+  // L2 / Page Table Entries
+
+  PageTable = (VOID*)(EFI_PHYSICAL_ADDRESS)(L3[Index].Bits.PageTableBaseAddress << 12);
+  Index = PDE_OFFSET (AddressToMap);
+
+  if (!PageTable[Index].Bits.Present) {
+    PageTable[Index].Bits.ReadWrite = 1;
+    PageTable[Index].Bits.Accessed = 1;
+    PageTable[Index].Bits.Dirty = 1;
+    PageTable[Index].Bits.MustBe1 = 1;
+    PageTable[Index].Bits.PageTableBaseAddress = AddressToMap >> 21;
+    PageTable[Index].Bits.Present = 1;
+  }
+
+  CpuFlushTlb ();
 
   return EFI_SUCCESS;
 }
