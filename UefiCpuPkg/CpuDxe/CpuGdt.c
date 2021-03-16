@@ -124,15 +124,26 @@ InitGlobalDescriptorTable (
   VOID
   )
 {
+  EFI_STATUS            Status;
   GDT_ENTRIES           *Gdt;
   IA32_DESCRIPTOR       Gdtr;
+  EFI_PHYSICAL_ADDRESS  Memory;
 
   //
-  // Allocate Runtime Data for the GDT
+  // Allocate Runtime Data below 4GB for the GDT
+  // AP uses the same GDT when it's waken up from real mode so
+  // the GDT needs to be below 4GB.
   //
-  Gdt = AllocateRuntimePool (sizeof (mGdtTemplate) + 8);
-  ASSERT (Gdt != NULL);
-  Gdt = ALIGN_POINTER (Gdt, 8);
+  Memory = SIZE_4GB - 1;
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiRuntimeServicesData,
+                  EFI_SIZE_TO_PAGES (sizeof (mGdtTemplate)),
+                  &Memory
+                  );
+  ASSERT_EFI_ERROR (Status);
+  ASSERT ((Memory != 0) && (Memory < SIZE_4GB));
+  Gdt = (GDT_ENTRIES *) (UINTN) Memory;
 
   //
   // Initialize all GDT entries
