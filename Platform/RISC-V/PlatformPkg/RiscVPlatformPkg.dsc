@@ -36,6 +36,8 @@
 [SkuIds]
   0|DEFAULT
 
+!include MdePkg/MdeLibs.dsc.inc
+
 [LibraryClasses.common]
   RiscVOpensbiPlatformLib|Platform/RISC-V/PlatformPkg/Library/OpensbiPlatformLibNull/OpensbiPlatformLibNull.inf
   RiscVCpuLib|Silicon/RISC-V/ProcessorPkg/Library/RiscVCpuLib/RiscVCpuLib.inf
