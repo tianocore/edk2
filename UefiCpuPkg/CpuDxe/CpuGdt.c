@@ -2,7 +2,7 @@
   C based implementation of IA32 interrupt handling only
   requiring a minimal assembly interrupt entry point.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -13,7 +13,7 @@
 //
 // Global descriptor table (GDT) Template
 //
-STATIC GDT_ENTRIES GdtTemplate = {
+STATIC GDT_ENTRIES mGdtTemplate = {
   //
   // NULL_SEL
   //
@@ -124,27 +124,27 @@ InitGlobalDescriptorTable (
   VOID
   )
 {
-  GDT_ENTRIES *gdt;
-  IA32_DESCRIPTOR gdtPtr;
+  GDT_ENTRIES           *Gdt;
+  IA32_DESCRIPTOR       Gdtr;
 
   //
   // Allocate Runtime Data for the GDT
   //
-  gdt = AllocateRuntimePool (sizeof (GdtTemplate) + 8);
-  ASSERT (gdt != NULL);
-  gdt = ALIGN_POINTER (gdt, 8);
+  Gdt = AllocateRuntimePool (sizeof (mGdtTemplate) + 8);
+  ASSERT (Gdt != NULL);
+  Gdt = ALIGN_POINTER (Gdt, 8);
 
   //
   // Initialize all GDT entries
   //
-  CopyMem (gdt, &GdtTemplate, sizeof (GdtTemplate));
+  CopyMem (Gdt, &mGdtTemplate, sizeof (mGdtTemplate));
 
   //
   // Write GDT register
   //
-  gdtPtr.Base = (UINT32)(UINTN)(VOID*) gdt;
-  gdtPtr.Limit = (UINT16) (sizeof (GdtTemplate) - 1);
-  AsmWriteGdtr (&gdtPtr);
+  Gdtr.Base  = (UINT32) (UINTN) Gdt;
+  Gdtr.Limit = (UINT16) (sizeof (mGdtTemplate) - 1);
+  AsmWriteGdtr (&Gdtr);
 
   //
   // Update selector (segment) registers base on new GDT
@@ -152,4 +152,3 @@ InitGlobalDescriptorTable (
   SetCodeSelector ((UINT16)CPU_CODE_SEL);
   SetDataSelectors ((UINT16)CPU_DATA_SEL);
 }
-
