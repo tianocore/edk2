@@ -12,7 +12,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = PrePiHobLib
-  FILE_GUID                      = 1F3A3278-82EB-4C0D-86F1-5BCDA5846CB2
+  FILE_GUID                      = AEF7D85A-6A91-4ACD-9A28-193DEFB325FB
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = HobLib
