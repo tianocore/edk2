@@ -161,6 +161,11 @@ QemuLoadLegacyImage (
     LoadedImage->CommandLine = LoadLinuxAllocateCommandLinePages (
                                  EFI_SIZE_TO_PAGES (
                                    LoadedImage->CommandLineSize));
+    if (LoadedImage->CommandLine == NULL) {
+      DEBUG ((DEBUG_ERROR, "Unable to allocate memory for kernel command line!\n"));
+      Status = EFI_OUT_OF_RESOURCES;
+      goto FreeImage;
+    }
     QemuFwCfgSelectItem (QemuFwCfgItemCommandLineData);
     QemuFwCfgReadBytes (LoadedImage->CommandLineSize, LoadedImage->CommandLine);
   }
@@ -178,6 +183,11 @@ QemuLoadLegacyImage (
     LoadedImage->InitrdData = LoadLinuxAllocateInitrdPages (
                                 LoadedImage->SetupBuf,
                                 EFI_SIZE_TO_PAGES (LoadedImage->InitrdSize));
+    if (LoadedImage->InitrdData == NULL) {
+      DEBUG ((DEBUG_ERROR, "Unable to allocate memory for initrd!\n"));
+      Status = EFI_OUT_OF_RESOURCES;
+      goto FreeImage;
+    }
     DEBUG ((DEBUG_INFO, "Initrd size: 0x%x\n",
       (UINT32)LoadedImage->InitrdSize));
     DEBUG ((DEBUG_INFO, "Reading initrd image ..."));
