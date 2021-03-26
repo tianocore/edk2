@@ -1016,6 +1016,7 @@ SmiPFHandler (
 {
   UINTN             PFAddress;
   UINTN             GuardPageAddress;
+  UINTN             ShadowStackGuardPageAddress;
   UINTN             CpuIndex;
 
   ASSERT (InterruptType == EXCEPT_IA32_PAGE_FAULT);
@@ -1032,7 +1033,7 @@ SmiPFHandler (
   }
 
   //
-  // If a page fault occurs in SMRAM range, it might be in a SMM stack guard page,
+  // If a page fault occurs in SMRAM range, it might be in a SMM stack/shadow stack guard page,
   // or SMM page protection violation.
   //
   if ((PFAddress >= mCpuHotPlugData.SmrrBase) &&
@@ -1040,10 +1041,16 @@ SmiPFHandler (
     DumpCpuContext (InterruptType, SystemContext);
     CpuIndex = GetCpuIndex ();
     GuardPageAddress = (mSmmStackArrayBase + EFI_PAGE_SIZE + CpuIndex * (mSmmStackSize + mSmmShadowStackSize));
+    ShadowStackGuardPageAddress = (mSmmStackArrayBase + mSmmStackSize + EFI_PAGE_SIZE + CpuIndex * (mSmmStackSize + mSmmShadowStackSize));
     if ((FeaturePcdGet (PcdCpuSmmStackGuard)) &&
         (PFAddress >= GuardPageAddress) &&
         (PFAddress < (GuardPageAddress + EFI_PAGE_SIZE))) {
       DEBUG ((DEBUG_ERROR, "SMM stack overflow!\n"));
+    } else if ((FeaturePcdGet (PcdCpuSmmStackGuard)) &&
+        (mSmmShadowStackSize > 0) &&
+        (PFAddress >= ShadowStackGuardPageAddress) &&
+        (PFAddress < (ShadowStackGuardPageAddress + EFI_PAGE_SIZE))) {
+      DEBUG ((DEBUG_ERROR, "SMM shadow stack overflow!\n"));
     } else {
       if ((SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_ID) != 0) {
         DEBUG ((DEBUG_ERROR, "SMM exception at execution (0x%lx)\n", PFAddress));
