@@ -419,6 +419,13 @@ ReadSaveStateRegister (
     }
 
     //
+    // Make sure the incoming buffer is large enough to hold IoInfo before accessing
+    //
+    if (Width < sizeof (EFI_SMM_SAVE_STATE_IO_INFO)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
     // Zero the IoInfo structure that will be returned in Buffer
     //
     IoInfo = (EFI_SMM_SAVE_STATE_IO_INFO *)Buffer;
