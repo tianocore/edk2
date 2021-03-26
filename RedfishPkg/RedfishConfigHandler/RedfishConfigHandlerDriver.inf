@@ -1,0 +1,60 @@
+## @file
+#  INF file for the UEFI driver model Redfish Configuration Handler
+#  Driver.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x0001000b
+  BASE_NAME                 = RedfishConfigHandlerDriver
+  FILE_GUID                 = 6e881000-5749-11e8-9bf0-8cdcd426c973
+  MODULE_TYPE               = UEFI_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = RedfishConfigHandlerDriverEntryPoint
+  UNLOAD_IMAGE              = RedfishConfigHandlerDriverUnload
+
+#
+#  VALID_ARCHITECTURES      = IA32 X64 ARM AARCH64 RISCV64
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[Sources]
+  RedfishConfigHandlerDriver.h
+  RedfishConfigHandlerDriver.c
+  RedfishConfigHandlerCommon.h
+  RedfishConfigHandlerCommon.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiLib
+  MemoryAllocationLib
+  NetLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiRedfishDiscoverProtocolGuid         ## CONSUMES
+  gEfiRestExServiceBindingProtocolGuid
+  gEfiRestExProtocolGuid                  ## CONSUMES
+  gEdkIIRedfishCredentialProtocolGuid     ## CONSUMES
+  gEdkIIRedfishConfigHandlerProtocolGuid  ## CONSUMES
+
+[Guids]
+  gEfiEventExitBootServicesGuid           ## CONSUMES ## Event
+  gEfiEndOfDxeEventGroupGuid              ## CONSUMES ## Event
+
+[Depex]
+  TRUE
+
