@@ -125,6 +125,7 @@
   #
   # SMBIOS PCDs
   #
+  gArmTokenSpaceGuid.PcdPlatformSupportsPCI|TRUE|BOOLEAN|0x30000052
   gArmTokenSpaceGuid.PcdSystemProductName|L""|VOID*|0x30000053
   gArmTokenSpaceGuid.PcdSystemVersion|L""|VOID*|0x30000054
   gArmTokenSpaceGuid.PcdBaseBoardManufacturer|L""|VOID*|0x30000055

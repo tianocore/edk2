@@ -13,6 +13,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HiiLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -264,6 +265,9 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscBiosVendor)
   UnicodeStrToAsciiStrS (Version, StrStart, VerStrLen + 1);
   StrStart += VerStrLen + 1;
   UnicodeStrToAsciiStrS (ReleaseDate, StrStart, DateStrLen + 1);
+
+  SmbiosRecord->BiosCharacteristics.PciIsSupported = FixedPcdGetBool (PcdPlatformSupportsPCI);
+
   //
   // Now we have got the full smbios record, call smbios protocol to add this record.
   //

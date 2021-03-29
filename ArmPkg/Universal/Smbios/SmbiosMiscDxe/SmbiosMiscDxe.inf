@@ -71,6 +71,7 @@
   gArmTokenSpaceGuid.PcdFdSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+  gArmTokenSpaceGuid.PcdPlatformSupportsPCI
   gArmTokenSpaceGuid.PcdSystemBiosRelease
   gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease
   gArmTokenSpaceGuid.PcdSystemProductName
