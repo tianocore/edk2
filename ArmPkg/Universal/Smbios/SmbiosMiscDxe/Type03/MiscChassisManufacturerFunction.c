@@ -162,6 +162,14 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscChassisManufacturer)
   UnicodeStrToAsciiStrS (AssertTag, StrStart, AssertTagStrLen + 1);
   StrStart += AssertTagStrLen + 1;
   UnicodeStrToAsciiStrS (ChassisSkuNumber, StrStart, ChaNumStrLen + 1);
+
+  SmbiosRecord->BootupState = OemGetChassisBootUpState ();
+  SmbiosRecord->PowerSupplyState = OemGetChassisPowerSupplyState ();
+  SmbiosRecord->ThermalState = OemGetChassisThermalState ();
+  SmbiosRecord->SecurityStatus = OemGetChassisSecurityStatus ();
+  SmbiosRecord->Height = OemGetChassisHeight ();
+  SmbiosRecord->NumberofPowerCords = OemGetChassisNumPowerCords ();
+
   //
   // Now we have got the full smbios record, call smbios protocol to add this record.
   //

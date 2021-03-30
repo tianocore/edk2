@@ -139,3 +139,88 @@ OemUpdateSmbiosInfo (
 {
   ASSERT (FALSE);
 }
+
+/** Fetches the chassis status when it was last booted.
+
+ @return Chassis status.
+**/
+MISC_CHASSIS_STATE
+EFIAPI
+OemGetChassisBootUpState (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+  return ChassisStateSafe;
+}
+
+/** Fetches the chassis power supply/supplies status when last booted.
+
+ @return Chassis power supply/supplies status.
+**/
+MISC_CHASSIS_STATE
+EFIAPI
+OemGetChassisPowerSupplyState (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+  return ChassisStateSafe;
+}
+
+/** Fetches the chassis thermal status when last booted.
+
+ @return Chassis thermal status.
+**/
+MISC_CHASSIS_STATE
+EFIAPI
+OemGetChassisThermalState (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+  return ChassisStateSafe;
+}
+
+/** Fetches the chassis security status when last booted.
+
+ @return Chassis security status.
+**/
+MISC_CHASSIS_SECURITY_STATE
+EFIAPI
+OemGetChassisSecurityStatus (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+  return ChassisSecurityStatusNone;
+}
+
+/** Fetches the chassis height in RMUs (Rack Mount Units).
+
+  @return The height of the chassis.
+**/
+UINT8
+EFIAPI
+OemGetChassisHeight (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+  return 1U;
+}
+
+/** Fetches the number of power cords.
+
+  @return The number of power cords.
+**/
+UINT8
+EFIAPI
+OemGetChassisNumPowerCords (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+  return 1;
+}
+
