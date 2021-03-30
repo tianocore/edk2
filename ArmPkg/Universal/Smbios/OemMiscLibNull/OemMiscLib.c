@@ -140,6 +140,20 @@ OemUpdateSmbiosInfo (
   ASSERT (FALSE);
 }
 
+/** Fetches the Type 32 boot information status.
+
+  @return Boot status.
+**/
+MISC_BOOT_INFORMATION_STATUS_DATA_TYPE
+EFIAPI
+OemGetBootStatus (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+  return BootInformationStatusNoError;
+}
+
 /** Fetches the chassis status when it was last booted.
 
  @return Chassis status.
