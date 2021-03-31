@@ -188,19 +188,19 @@ TABLE_ITEM  SystemEnclosureTypeTable[] = {
   },
   {
     0x10,
-    L"  Main Server Chassis"
+    L"  Lunch Box"
   },
   {
     0x11,
-    L"  Expansion Chassis"
+    L"  Main Server Chassis"
   },
   {
     0x12,
-    L"  SubChassis"
+    L"  Expansion Chassis"
   },
   {
     0x13,
-    L"  Sub Notebook"
+    L"  SubChassis"
   },
   {
     0x14,
