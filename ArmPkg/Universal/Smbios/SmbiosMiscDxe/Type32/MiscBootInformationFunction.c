@@ -16,6 +16,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/OemMiscLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include "SmbiosMisc.h"
@@ -58,6 +59,8 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscBootInformation)
   (VOID)CopyMem (SmbiosRecord, InputData, sizeof (SMBIOS_TABLE_TYPE32));
 
   SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE32);
+
+  SmbiosRecord->BootStatus = OemGetBootStatus ();
 
   //
   // Now we have got the full smbios record, call smbios protocol to add this record.
