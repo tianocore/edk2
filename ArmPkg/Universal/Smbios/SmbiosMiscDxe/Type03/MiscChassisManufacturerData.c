@@ -23,7 +23,7 @@ SMBIOS_MISC_TABLE_DATA(SMBIOS_TABLE_TYPE3, MiscChassisManufacturer) = {
     0,                                                    // Length,
     0                                                     // Handle
   },
-  1,                                                      // Manufactrurer
+  1,                                                      // Manufacturer
   MiscChassisTypeMainServerChassis,                       // Type
   2,                                                      // Version
   3,                                                      // SerialNumber
