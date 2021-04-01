@@ -1,6 +1,6 @@
 /** @file
 *
-* Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+* Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -31,6 +31,7 @@
 #include <Guid/MemoryMapInfoGuid.h>
 #include <Guid/AcpiBoardInfoGuid.h>
 #include <Guid/GraphicsInfoHob.h>
+#include <UniversalPayload/SmbiosTable.h>
 
 
 #define LEGACY_8259_MASK_REGISTER_MASTER  0x21
