@@ -42,7 +42,6 @@
   HobLib
 
 [Guids]
-  gEfiAcpiTableGuid
   gUefiSystemTableInfoGuid
   gUefiAcpiBoardInfoGuid
   gEfiGraphicsInfoHobGuid
