@@ -235,6 +235,7 @@ BuildHobFromBl (
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB GfxDeviceInfo;
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB *NewGfxDeviceInfo;
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE   *SmBiosTableHob;
+  UNIVERSAL_PAYLOAD_ACPI_TABLE     *AcpiTableHob;
 
   //
   // Parse memory info and build memory HOBs
@@ -286,6 +287,16 @@ BuildHobFromBl (
   SmBiosTableHob->Header.Length = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
   SmBiosTableHob->SmBiosEntryPoint = SysTableInfo.SmbiosTableBase;
   DEBUG ((DEBUG_INFO, "Create smbios table gUniversalPayloadSmbiosTableGuid guid hob\n"));
+
+  //
+  // Creat ACPI table Hob
+  //
+  AcpiTableHob = BuildGuidHob (&gUniversalPayloadAcpiTableGuid, sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE));
+  ASSERT (AcpiTableHob != NULL);
+  AcpiTableHob->Header.Revision = UNIVERSAL_PAYLOAD_ACPI_TABLE_REVISION;
+  AcpiTableHob->Header.Length = sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE);
+  AcpiTableHob->Rsdp = SysTableInfo.AcpiTableBase;
+  DEBUG ((DEBUG_INFO, "Create smbios table gUniversalPayloadAcpiTableGuid guid hob\n"));
 
   //
   // Create guid hob for acpi board information
