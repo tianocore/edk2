@@ -2,7 +2,7 @@
   This driver will report some MMIO/IO resources to dxe core, extract smbios and acpi
   tables from bootloader.
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -126,15 +126,6 @@ BlDxeEntryPoint (
   if (SystemTableInfo->AcpiTableBase != 0 && SystemTableInfo->AcpiTableSize != 0) {
     DEBUG ((DEBUG_ERROR, "Install Acpi Table at 0x%lx, length 0x%x\n", SystemTableInfo->AcpiTableBase, SystemTableInfo->AcpiTableSize));
     Status = gBS->InstallConfigurationTable (&gEfiAcpiTableGuid, (VOID *)(UINTN)SystemTableInfo->AcpiTableBase);
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  //
-  // Install Smbios Table
-  //
-  if (SystemTableInfo->SmbiosTableBase != 0 && SystemTableInfo->SmbiosTableSize != 0) {
-    DEBUG ((DEBUG_ERROR, "Install Smbios Table at 0x%lx, length 0x%x\n", SystemTableInfo->SmbiosTableBase, SystemTableInfo->SmbiosTableSize));
-    Status = gBS->InstallConfigurationTable (&gEfiSmbiosTableGuid, (VOID *)(UINTN)SystemTableInfo->SmbiosTableBase);
     ASSERT_EFI_ERROR (Status);
   }
 
