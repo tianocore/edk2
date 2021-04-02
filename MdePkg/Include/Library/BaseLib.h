@@ -2,7 +2,7 @@
   Provides string functions, linked list functions, math functions, synchronization
   functions, file path functions, and CPU architecture-specific functions.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
@@ -7438,6 +7438,29 @@ AsmXGetBv (
   IN UINT32  Index
   );
 
+/**
+  Executes a XSETBV instruction to write a 64-bit value to a Extended Control
+  Register(XCR), and returns the value.
+
+  Writes the 64-bit value specified by Value to the XCR specified by Index. The
+  64-bit value written to the XCR is returned. No parameter checking is
+  performed on Index or Value, and some of these may cause CPU exceptions. The
+  caller must either guarantee that Index and Value are valid, or the caller
+  must establish proper exception handlers. This function is only available on
+  IA-32 and x64.
+
+  @param  Index The 32-bit XCR index to write.
+  @param  Value The 64-bit value to write to the XCR.
+
+  @return Value
+
+**/
+UINT64
+EFIAPI
+AsmXSetBv (
+  IN UINT32  Index,
+  IN UINT64  Value
+  );
 
 /**
   Executes a VMGEXIT instruction (VMMCALL with a REP prefix)
