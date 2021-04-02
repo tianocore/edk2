@@ -120,7 +120,10 @@ ArmGicGetMaxNumInterrupts (
   IN  INTN          GicDistributorBase
   )
 {
-  return 32 * ((MmioRead32 (GicDistributorBase + ARM_GIC_ICDICTR) & 0x1F) + 1);
+  UINT32 ITLinesNumber;
+
+  ITLinesNumber = MmioRead32 (GicDistributorBase + ARM_GIC_ICDICTR) & 0x1F;
+  return MIN (32 * (ITLinesNumber+ 1), 1020);
 }
 
 VOID
