@@ -1,7 +1,7 @@
 /** @file
   Save the S3 data to S3 boot script.
 
-  Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -124,7 +124,7 @@ VOID                             *mRegistrationSmmReadyToLock = NULL;
 BOOLEAN                          mS3BootScriptTableAllocated = FALSE;
 BOOLEAN                          mS3BootScriptTableSmmAllocated = FALSE;
 EFI_SMM_SYSTEM_TABLE2            *mBootScriptSmst = NULL;
-BOOLEAN                          mAcpiS3Enable = TRUE;
+BOOLEAN                          mS3BootScriptAcpiS3Enable = TRUE;
 
 /**
   This is an internal function to add a terminate node the entry, recalculate the table
@@ -438,7 +438,7 @@ S3BootScriptLibInitialize (
   EFI_PHYSICAL_ADDRESS           Buffer;
 
   if (!PcdGetBool (PcdAcpiS3Enable)) {
-    mAcpiS3Enable = FALSE;
+    mS3BootScriptAcpiS3Enable = FALSE;
     DEBUG ((DEBUG_INFO, "%a: Skip S3BootScript because ACPI S3 disabled.\n", gEfiCallerBaseName));
     return RETURN_SUCCESS;
   }
@@ -569,7 +569,7 @@ S3BootScriptLibDeinitialize (
 {
   EFI_STATUS                Status;
 
-  if (!mAcpiS3Enable) {
+  if (!mS3BootScriptAcpiS3Enable) {
     return RETURN_SUCCESS;
   }
 
@@ -821,7 +821,7 @@ S3BootScriptGetEntryAddAddress (
 {
   UINT8*                         NewEntryPtr;
 
-  if (!mAcpiS3Enable) {
+  if (!mS3BootScriptAcpiS3Enable) {
     return NULL;
   }
 
@@ -2410,4 +2410,3 @@ S3BootScriptCompare (
 
   return EFI_SUCCESS;
 }
-
