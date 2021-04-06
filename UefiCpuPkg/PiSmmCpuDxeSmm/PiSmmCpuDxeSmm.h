@@ -337,7 +337,7 @@ This function supports reading a CPU Save State register in SMBase relocation ha
 
 @retval EFI_SUCCESS           The register was read from Save State.
 @retval EFI_NOT_FOUND         The register is not defined for the Save State of Processor.
-@retval EFI_INVALID_PARAMETER  This or Buffer is NULL.
+@retval EFI_INVALID_PARAMETER Buffer is NULL, or Width does not meet requirement per Register type.
 
 **/
 EFI_STATUS
