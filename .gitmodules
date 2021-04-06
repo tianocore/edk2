@@ -6,7 +6,7 @@
 	url = https://github.com/ucb-bar/berkeley-softfloat-3.git
 [submodule "UnitTestFrameworkPkg/Library/CmockaLib/cmocka"]
 	path = UnitTestFrameworkPkg/Library/CmockaLib/cmocka
-	url = https://git.cryptomilk.org/projects/cmocka.git
+	url = https://github.com/tianocore/edk2-cmocka.git
 [submodule "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma"]
 	path = MdeModulePkg/Universal/RegularExpressionDxe/oniguruma
 	url = https://github.com/kkos/oniguruma
