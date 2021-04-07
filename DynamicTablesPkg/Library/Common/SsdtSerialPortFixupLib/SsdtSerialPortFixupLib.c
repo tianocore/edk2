@@ -8,6 +8,7 @@
   @par Reference(s):
   - Arm Server Base Boot Requirements (SBBR), s4.2.1.8 "SPCR".
   - Microsoft Debug Port Table 2 (DBG2) Specification - December 10, 2015.
+  - ACPI for Arm Components 1.0 - 2020
 **/
 
 #include <IndustryStandard/DebugPort2Table.h>
@@ -176,7 +177,7 @@ FixupIds (
     case EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART:
     case EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART_2X:
     {
-      HidString = "ARMH0011";
+      HidString = "ARMHB000";
       CidString = "";
       break;
     }
