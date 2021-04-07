@@ -116,8 +116,6 @@
   UefiCpuPkg/Library/SecPeiDxeTimerLibUefiCpu/SecPeiDxeTimerLibUefiCpu.inf
   UefiCpuPkg/Application/Cpuid/Cpuid.inf
   UefiCpuPkg/Library/CpuTimerLib/BaseCpuTimerLib.inf
-  UefiCpuPkg/Library/CpuTimerLib/DxeCpuTimerLib.inf
-  UefiCpuPkg/Library/CpuTimerLib/PeiCpuTimerLib.inf
   UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
   UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
 
