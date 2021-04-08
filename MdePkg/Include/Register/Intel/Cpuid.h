@@ -6,7 +6,7 @@
   If a register returned is a single 32-bit value, then a data structure is
   not provided for that register.
 
-  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -1550,9 +1550,17 @@ typedef union {
     ///
     UINT32  AVX512_4FMAPS:1;
     ///
-    /// [Bit 25:4] Reserved.
+    /// [Bit 14:4] Reserved.
     ///
-    UINT32  Reserved2:22;
+    UINT32  Reserved4:11;
+    ///
+    /// [Bit 15] Hybrid. If 1, the processor is identified as a hybrid part.
+    ///
+    UINT32  Hybrid:1;
+    ///
+    /// [Bit 25:16] Reserved.
+    ///
+    UINT32  Reserved5:10;
     ///
     /// [Bit 26] Enumerates support for indirect branch restricted speculation
     /// (IBRS) and the indirect branch pre-dictor barrier (IBPB). Processors
