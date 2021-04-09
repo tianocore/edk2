@@ -148,6 +148,10 @@ FixupIds (
       // If there is a non-BSA compliant HID, use that.
       NonBsaHid = (CONST CHAR8*)PcdGetPtr (PcdNonBsaCompliant16550SerialHid);
       if ((NonBsaHid != NULL) && (AsciiStrLen (NonBsaHid) != 0)) {
+        if (!(IsValidPnpId (NonBsaHid) || IsValidAcpiId (NonBsaHid))) {
+          return EFI_INVALID_PARAMETER;
+        }
+
         HidString = NonBsaHid;
         CidString = "";
       } else {
