@@ -226,6 +226,7 @@ SetStaticPageTable (
   UINTN                                         IndexOfPml4Entries;
   UINTN                                         IndexOfPdpEntries;
   UINTN                                         IndexOfPageDirectoryEntries;
+  UINT64                                        PhysicalAddressBits;
   UINT64                                        *PageMapLevel5Entry;
   UINT64                                        *PageMapLevel4Entry;
   UINT64                                        *PageMap;
@@ -237,26 +238,28 @@ SetStaticPageTable (
   // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses
   //  when 5-Level Paging is disabled.
   //
-  ASSERT (mPhysicalAddressBits <= 52);
-  if (!m5LevelPagingNeeded && mPhysicalAddressBits > 48) {
-    mPhysicalAddressBits = 48;
+  PhysicalAddressBits = mPhysicalAddressBits;
+
+  ASSERT (PhysicalAddressBits <= 52);
+  if (!m5LevelPagingNeeded && PhysicalAddressBits > 48) {
+    PhysicalAddressBits = 48;
   }
 
   NumberOfPml5EntriesNeeded = 1;
-  if (mPhysicalAddressBits > 48) {
-    NumberOfPml5EntriesNeeded = (UINTN) LShiftU64 (1, mPhysicalAddressBits - 48);
-    mPhysicalAddressBits = 48;
+  if (PhysicalAddressBits > 48) {
+    NumberOfPml5EntriesNeeded = (UINTN) LShiftU64 (1, PhysicalAddressBits - 48);
+    PhysicalAddressBits = 48;
   }
 
   NumberOfPml4EntriesNeeded = 1;
-  if (mPhysicalAddressBits > 39) {
-    NumberOfPml4EntriesNeeded = (UINTN) LShiftU64 (1, mPhysicalAddressBits - 39);
-    mPhysicalAddressBits = 39;
+  if (PhysicalAddressBits > 39) {
+    NumberOfPml4EntriesNeeded = (UINTN) LShiftU64 (1, PhysicalAddressBits - 39);
+    PhysicalAddressBits = 39;
   }
 
   NumberOfPdpEntriesNeeded = 1;
-  ASSERT (mPhysicalAddressBits > 30);
-  NumberOfPdpEntriesNeeded = (UINTN) LShiftU64 (1, mPhysicalAddressBits - 30);
+  ASSERT (PhysicalAddressBits > 30);
+  NumberOfPdpEntriesNeeded = (UINTN) LShiftU64 (1, PhysicalAddressBits - 30);
 
   //
   // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
