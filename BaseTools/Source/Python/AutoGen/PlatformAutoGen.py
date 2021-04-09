@@ -1,7 +1,7 @@
 ## @file
 # Create makefile for MS nmake and GNU make
 #
-# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -805,20 +805,26 @@ class PlatformAutoGen(AutoGen):
     #
     @cached_property
     def BuildCommand(self):
-        RetVal = []
-        if "MAKE" in self.ToolDefinition and "PATH" in self.ToolDefinition["MAKE"]:
-            RetVal += _SplitOption(self.ToolDefinition["MAKE"]["PATH"])
-            if "FLAGS" in self.ToolDefinition["MAKE"]:
-                NewOption = self.ToolDefinition["MAKE"]["FLAGS"].strip()
-                if NewOption != '':
-                    RetVal += _SplitOption(NewOption)
-            if "MAKE" in self.EdkIIBuildOption:
-                if "FLAGS" in self.EdkIIBuildOption["MAKE"]:
-                    Flags = self.EdkIIBuildOption["MAKE"]["FLAGS"]
-                    if Flags.startswith('='):
-                        RetVal = [RetVal[0]] + [Flags[1:]]
-                    else:
-                        RetVal.append(Flags)
+        if "MAKE" in self.EdkIIBuildOption and "PATH" in self.EdkIIBuildOption["MAKE"]:
+            # MAKE_PATH in DSC [BuildOptions] section is higher priority
+            Path = self.EdkIIBuildOption["MAKE"]["PATH"]
+            if Path.startswith('='):
+                Path = Path[1:].strip()
+            RetVal = _SplitOption(Path)
+        elif "MAKE" in self.ToolDefinition and "PATH" in self.ToolDefinition["MAKE"]:
+            RetVal = _SplitOption(self.ToolDefinition["MAKE"]["PATH"])
+        else:
+            return []
+        if "MAKE" in self.ToolDefinition and "FLAGS" in self.ToolDefinition["MAKE"]:
+            NewOption = self.ToolDefinition["MAKE"]["FLAGS"].strip()
+            if NewOption != '':
+                RetVal += _SplitOption(NewOption)
+        if "MAKE" in self.EdkIIBuildOption and "FLAGS" in self.EdkIIBuildOption["MAKE"]:
+            Flags = self.EdkIIBuildOption["MAKE"]["FLAGS"]
+            if Flags.startswith('='):
+                RetVal = [RetVal[0]] + _SplitOption(Flags[1:].strip())
+            else:
+                RetVal = RetVal + _SplitOption(Flags.strip())
         return RetVal
 
     ## Get tool chain definition
