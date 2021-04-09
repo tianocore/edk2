@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #  Portions copyright (c) 2011 - 2019, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett-Packard Development Company, L.P.<BR>
@@ -531,7 +531,7 @@ NOOPT_VS2008_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 *_VS2008x86_*_*_FAMILY        = MSFT
 
 *_VS2008x86_*_MAKE_PATH       = DEF(VS2008x86_BIN)\nmake.exe
-*_VS2008x86_*_MAKE_FLAG       = /nologo
+*_VS2008x86_*_MAKE_FLAGS      = /nologo
 *_VS2008x86_*_RC_PATH         = DEF(WINSDK_BIN)\rc.exe
 
 *_VS2008x86_*_MAKE_FLAGS      = /nologo
@@ -765,7 +765,7 @@ NOOPT_VS2010_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 *_VS2010x86_*_*_FAMILY        = MSFT
 
 *_VS2010x86_*_MAKE_PATH       = DEF(VS2010x86_BIN)\nmake.exe
-*_VS2010x86_*_MAKE_FLAG       = /nologo
+*_VS2010x86_*_MAKE_FLAGS      = /nologo
 *_VS2010x86_*_RC_PATH         = DEF(WINSDK7x86_BIN)\rc.exe
 
 *_VS2010x86_*_MAKE_FLAGS      = /nologo
@@ -999,7 +999,7 @@ NOOPT_VS2012_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 *_VS2012x86_*_*_FAMILY        = MSFT
 
 *_VS2012x86_*_MAKE_PATH       = DEF(VS2012x86_BIN)\nmake.exe
-*_VS2012x86_*_MAKE_FLAG       = /nologo
+*_VS2012x86_*_MAKE_FLAGS      = /nologo
 *_VS2012x86_*_RC_PATH         = DEF(WINSDK71x86_BIN)\rc.exe
 
 *_VS2012x86_*_MAKE_FLAGS      = /nologo
@@ -1233,7 +1233,7 @@ NOOPT_VS2013_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 *_VS2013x86_*_*_FAMILY        = MSFT
 
 *_VS2013x86_*_MAKE_PATH       = DEF(VS2013x86_BIN)\nmake.exe
-*_VS2013x86_*_MAKE_FLAG       = /nologo
+*_VS2013x86_*_MAKE_FLAGS      = /nologo
 *_VS2013x86_*_RC_PATH         = DEF(WINSDK8x86_BIN)\rc.exe
 
 *_VS2013x86_*_MAKE_FLAGS      = /nologo
@@ -1468,7 +1468,7 @@ NOOPT_VS2015_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 *_VS2015x86_*_*_FAMILY        = MSFT
 
 *_VS2015x86_*_MAKE_PATH       = DEF(VS2015x86_BIN)\nmake.exe
-*_VS2015x86_*_MAKE_FLAG       = /nologo
+*_VS2015x86_*_MAKE_FLAGS      = /nologo
 *_VS2015x86_*_RC_PATH         = DEF(WINSDK81x86_BIN)\rc.exe
 
 *_VS2015x86_*_MAKE_FLAGS      = /nologo
@@ -1586,7 +1586,7 @@ NOOPT_VS2015x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2017_*_*_DLL           = DEF(VS2017_BIN_HOST)
 
 *_VS2017_*_MAKE_PATH       = DEF(VS2017_BIN_HOST)\nmake.exe
-*_VS2017_*_MAKE_FLAG       = /nologo
+*_VS2017_*_MAKE_FLAGS      = /nologo
 *_VS2017_*_RC_PATH         = DEF(RC_PATH)
 
 *_VS2017_*_MAKE_FLAGS      = /nologo
@@ -1749,7 +1749,7 @@ NOOPT_VS2017_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2019_*_*_DLL           = DEF(VS2019_BIN_HOST)
 
 *_VS2019_*_MAKE_PATH       = DEF(VS2019_BIN_HOST)\nmake.exe
-*_VS2019_*_MAKE_FLAG       = /nologo
+*_VS2019_*_MAKE_FLAGS      = /nologo
 *_VS2019_*_RC_PATH         = DEF(RC_PATH)
 
 *_VS2019_*_MAKE_FLAGS      = /nologo
