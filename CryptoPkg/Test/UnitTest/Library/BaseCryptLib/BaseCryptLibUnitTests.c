@@ -16,6 +16,7 @@ SUITE_DESC  mSuiteDesc[] = {
     {"HMAC verify tests",           "CryptoPkg.BaseCryptLib", NULL, NULL, &mHmacTestNum,           mHmacTest},
     {"BlockCipher verify tests",    "CryptoPkg.BaseCryptLib", NULL, NULL, &mBlockCipherTestNum,    mBlockCipherTest},
     {"RSA verify tests",            "CryptoPkg.BaseCryptLib", NULL, NULL, &mRsaTestNum,            mRsaTest},
+    {"RSA PSS verify tests",        "CryptoPkg.BaseCryptLib", NULL, NULL, &mRsaPssTestNum,         mRsaPssTest},
     {"RSACert verify tests",        "CryptoPkg.BaseCryptLib", NULL, NULL, &mRsaCertTestNum,        mRsaCertTest},
     {"PKCS7 verify tests",          "CryptoPkg.BaseCryptLib", NULL, NULL, &mPkcs7TestNum,          mPkcs7Test},
     {"PKCS5 verify tests",          "CryptoPkg.BaseCryptLib", NULL, NULL, &mPkcs5TestNum,          mPkcs5Test},

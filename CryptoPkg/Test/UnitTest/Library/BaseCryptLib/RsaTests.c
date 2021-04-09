@@ -295,6 +295,8 @@ TestVerifyRsaPkcs1SignVerify (
   Status = RsaPkcs1Verify (mRsa, HashValue, HashSize, Signature, SigSize);
   UT_ASSERT_TRUE (Status);
 
+  FreePool(Signature);
+
   return UNIT_TEST_PASSED;
 }
 
