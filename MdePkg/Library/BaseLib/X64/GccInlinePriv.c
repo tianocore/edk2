@@ -80,7 +80,7 @@ AsmReadMsr64 (
   }
   FilterAfterMsrRead (Index, &Value);
 
-  return (((UINT64)HighData) << 32) | LowData;
+  return Value;
 }
 
 /**
@@ -111,11 +111,10 @@ AsmWriteMsr64 (
   UINT32 HighData;
   BOOLEAN Flag;
 
-  LowData  = (UINT32)(Value);
-  HighData = (UINT32)(Value >> 32);
-
   Flag = FilterBeforeMsrWrite (Index, &Value);
   if (Flag) {
+    LowData  = (UINT32)(Value);
+    HighData = (UINT32)(Value >> 32);
     __asm__ __volatile__ (
       "wrmsr"
       :
