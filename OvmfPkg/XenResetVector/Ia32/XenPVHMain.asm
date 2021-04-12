@@ -73,7 +73,7 @@ xenPVHMain:
     ;
     ; parameter for Flat32SearchForBfvBase
     ;
-    mov     eax, ADDR_OF(fourGigabytes)
+    mov     eax, 0   ; ADDR_OF(fourGigabytes)
     add     eax, edx ; add delta
 
     ;
