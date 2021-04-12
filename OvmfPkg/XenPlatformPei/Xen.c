@@ -21,8 +21,10 @@
 #include <Library/CpuLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
+#include <Library/LocalApicLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SafeIntLib.h>
 #include <Guid/XenInfo.h>
 #include <IndustryStandard/E820.h>
 #include <Library/ResourcePublicationLib.h>
@@ -456,4 +458,179 @@ PhysicalAddressIdentityMapping (
   CpuFlushTlb ();
 
   return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+MapSharedInfoPage (
+  IN VOID *PagePtr
+  )
+{
+  xen_add_to_physmap_t  Parameters;
+  INTN                  ReturnCode;
+
+  Parameters.domid = DOMID_SELF;
+  Parameters.space = XENMAPSPACE_shared_info;
+  Parameters.idx = 0;
+  Parameters.gpfn = (UINTN)PagePtr >> EFI_PAGE_SHIFT;
+  ReturnCode = XenHypercallMemoryOp (XENMEM_add_to_physmap, &Parameters);
+  if (ReturnCode != 0) {
+    return EFI_NO_MAPPING;
+  }
+  return EFI_SUCCESS;
+}
+
+STATIC
+VOID
+UnmapXenPage (
+  IN VOID *PagePtr
+  )
+{
+  xen_remove_from_physmap_t Parameters;
+  INTN                      ReturnCode;
+
+  Parameters.domid = DOMID_SELF;
+  Parameters.gpfn = (UINTN)PagePtr >> EFI_PAGE_SHIFT;
+  ReturnCode = XenHypercallMemoryOp (XENMEM_remove_from_physmap, &Parameters);
+  ASSERT (ReturnCode == 0);
+}
+
+
+STATIC
+UINT64
+GetCpuFreq (
+  IN XEN_VCPU_TIME_INFO *VcpuTime
+  )
+{
+  UINT32 Version;
+  UINT32 TscToSystemMultiplier;
+  INT8   TscShift;
+  UINT64 CpuFreq;
+
+  do {
+    Version = VcpuTime->Version;
+    MemoryFence ();
+    TscToSystemMultiplier = VcpuTime->TscToSystemMultiplier;
+    TscShift = VcpuTime->TscShift;
+    MemoryFence ();
+  } while (((Version & 1) != 0) && (Version != VcpuTime->Version));
+
+  CpuFreq = DivU64x32 (LShiftU64 (1000000000ULL, 32), TscToSystemMultiplier);
+  if (TscShift >= 0) {
+      CpuFreq = RShiftU64 (CpuFreq, TscShift);
+  } else {
+      CpuFreq = LShiftU64 (CpuFreq, -TscShift);
+  }
+  return CpuFreq;
+}
+
+STATIC
+VOID
+XenDelay (
+  IN XEN_VCPU_TIME_INFO *VcpuTimeInfo,
+  IN UINT64             DelayNs
+  )
+{
+  UINT64        Tick;
+  UINT64        CpuFreq;
+  UINT64        Delay;
+  UINT64        DelayTick;
+  UINT64        NewTick;
+  RETURN_STATUS Status;
+
+  Tick = AsmReadTsc ();
+
+  CpuFreq = GetCpuFreq (VcpuTimeInfo);
+  Status = SafeUint64Mult (DelayNs, CpuFreq, &Delay);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+      "XenDelay (%lu ns): delay too big in relation to CPU freq %lu Hz\n",
+      DelayNs, CpuFreq));
+    ASSERT_EFI_ERROR (Status);
+    CpuDeadLoop ();
+  }
+
+  DelayTick = DivU64x32 (Delay, 1000000000);
+
+  NewTick = Tick + DelayTick;
+
+  //
+  // Check for overflow
+  //
+  if (NewTick < Tick) {
+    //
+    // Overflow, wait for TSC to also overflow
+    //
+    while (AsmReadTsc () >= Tick) {
+      CpuPause ();
+    }
+  }
+
+  while (AsmReadTsc () <= NewTick) {
+    CpuPause ();
+  }
+}
+
+
+/**
+  Calculate the frequency of the Local Apic Timer
+**/
+VOID
+CalibrateLapicTimer (
+  VOID
+  )
+{
+  XEN_SHARED_INFO       *SharedInfo;
+  XEN_VCPU_TIME_INFO    *VcpuTimeInfo;
+  UINT32                TimerTick, TimerTick2, DiffTimer;
+  UINT64                TscTick, TscTick2;
+  UINT64                Freq;
+  UINT64                Dividend;
+  EFI_STATUS            Status;
+
+
+  SharedInfo = (VOID*)((1ULL << mPhysMemAddressWidth) - EFI_PAGE_SIZE);
+  Status = PhysicalAddressIdentityMapping ((EFI_PHYSICAL_ADDRESS)SharedInfo);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+      "Failed to add page table entry for Xen shared info page: %r\n",
+      Status));
+    ASSERT_EFI_ERROR (Status);
+    return;
+  }
+
+  Status = MapSharedInfoPage (SharedInfo);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to map Xen's shared info page: %r\n",
+      Status));
+    ASSERT_EFI_ERROR (Status);
+    return;
+  }
+
+  VcpuTimeInfo = &SharedInfo->VcpuInfo[0].Time;
+
+  InitializeApicTimer (1, MAX_UINT32, TRUE, 0);
+  DisableApicTimerInterrupt ();
+
+  TimerTick = GetApicTimerCurrentCount ();
+  TscTick = AsmReadTsc ();
+  XenDelay (VcpuTimeInfo, 1000000ULL);
+  TimerTick2 = GetApicTimerCurrentCount ();
+  TscTick2 = AsmReadTsc ();
+
+
+  DiffTimer = TimerTick - TimerTick2;
+  Status = SafeUint64Mult (GetCpuFreq (VcpuTimeInfo), DiffTimer, &Dividend);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "overflow while calculating APIC frequency\n"));
+    DEBUG ((DEBUG_ERROR, "CPU freq: %lu Hz; APIC timer tick count for 1 ms: %u\n",
+      GetCpuFreq (VcpuTimeInfo), DiffTimer));
+    ASSERT_EFI_ERROR (Status);
+    CpuDeadLoop ();
+  }
+
+  Freq = DivU64x64Remainder (Dividend, TscTick2 - TscTick, NULL);
+  DEBUG ((DEBUG_INFO, "APIC Freq % 8lu Hz\n", Freq));
+
+  UnmapXenPage (SharedInfo);
 }
