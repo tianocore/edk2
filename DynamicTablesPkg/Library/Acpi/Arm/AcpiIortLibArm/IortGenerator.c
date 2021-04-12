@@ -766,7 +766,7 @@ AddItsGroupNodes (
     ItsGroupNode->Node.Type          = EFI_ACPI_IORT_TYPE_ITS_GROUP;
     ItsGroupNode->Node.Length        = (UINT16)NodeLength;
     ItsGroupNode->Node.Revision      = 0;
-    ItsGroupNode->Node.Reserved      = EFI_ACPI_RESERVED_DWORD;
+    ItsGroupNode->Node.Identifier    = EFI_ACPI_RESERVED_DWORD;
     ItsGroupNode->Node.NumIdMappings = 0;
     ItsGroupNode->Node.IdReference   = 0;
 
@@ -872,7 +872,7 @@ AddNamedComponentNodes (
     NcNode->Node.Type          = EFI_ACPI_IORT_TYPE_NAMED_COMP;
     NcNode->Node.Length        = (UINT16)NodeLength;
     NcNode->Node.Revision      = 2;
-    NcNode->Node.Reserved      = EFI_ACPI_RESERVED_DWORD;
+    NcNode->Node.Identifier    = EFI_ACPI_RESERVED_DWORD;
     NcNode->Node.NumIdMappings = NodeList->IdMappingCount;
 
     ObjectNameLength         = AsciiStrLen (NodeList->ObjectName) + 1;
@@ -1005,7 +1005,7 @@ AddRootComplexNodes (
     RcNode->Node.Type          = EFI_ACPI_IORT_TYPE_ROOT_COMPLEX;
     RcNode->Node.Length        = (UINT16)NodeLength;
     RcNode->Node.Revision      = 1;
-    RcNode->Node.Reserved      = EFI_ACPI_RESERVED_DWORD;
+    RcNode->Node.Identifier    = EFI_ACPI_RESERVED_DWORD;
     RcNode->Node.NumIdMappings = NodeList->IdMappingCount;
     RcNode->Node.IdReference   = (NodeList->IdMappingCount == 0) ?
                                  0 : sizeof (EFI_ACPI_6_0_IO_REMAPPING_RC_NODE);
@@ -1018,9 +1018,8 @@ AddRootComplexNodes (
     RcNode->AtsAttribute      = NodeList->AtsAttribute;
     RcNode->PciSegmentNumber  = NodeList->PciSegmentNumber;
     RcNode->MemoryAddressSize = NodeList->MemoryAddressSize;
+    RcNode->PasidCapabilities = EFI_ACPI_RESERVED_WORD;
     RcNode->Reserved1[0]      = EFI_ACPI_RESERVED_BYTE;
-    RcNode->Reserved1[1]      = EFI_ACPI_RESERVED_BYTE;
-    RcNode->Reserved1[2]      = EFI_ACPI_RESERVED_BYTE;
 
     if (NodeList->IdMappingCount > 0) {
       if (NodeList->IdMappingToken == CM_NULL_TOKEN) {
@@ -1188,7 +1187,7 @@ AddSmmuV1V2Nodes (
     SmmuNode->Node.Type          = EFI_ACPI_IORT_TYPE_SMMUv1v2;
     SmmuNode->Node.Length        = (UINT16)NodeLength;
     SmmuNode->Node.Revision      = 0;
-    SmmuNode->Node.Reserved      = EFI_ACPI_RESERVED_DWORD;
+    SmmuNode->Node.Identifier    = EFI_ACPI_RESERVED_DWORD;
     SmmuNode->Node.NumIdMappings = NodeList->IdMappingCount;
     SmmuNode->Node.IdReference   = (NodeList->IdMappingCount == 0) ?
                                    0 : (sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE) +
@@ -1387,7 +1386,7 @@ AddSmmuV3Nodes (
     SmmuV3Node->Node.Type          = EFI_ACPI_IORT_TYPE_SMMUv3;
     SmmuV3Node->Node.Length        = (UINT16)NodeLength;
     SmmuV3Node->Node.Revision      = 2;
-    SmmuV3Node->Node.Reserved      = EFI_ACPI_RESERVED_DWORD;
+    SmmuV3Node->Node.Identifier    = EFI_ACPI_RESERVED_DWORD;
     SmmuV3Node->Node.NumIdMappings = NodeList->IdMappingCount;
     SmmuV3Node->Node.IdReference   = (NodeList->IdMappingCount == 0) ?
                                      0 : sizeof (EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE);
@@ -1518,7 +1517,7 @@ AddPmcgNodes (
     PmcgNode->Node.Type          = EFI_ACPI_IORT_TYPE_PMCG;
     PmcgNode->Node.Length        = (UINT16)NodeLength;
     PmcgNode->Node.Revision      = 1;
-    PmcgNode->Node.Reserved      = EFI_ACPI_RESERVED_DWORD;
+    PmcgNode->Node.Identifier    = EFI_ACPI_RESERVED_DWORD;
     PmcgNode->Node.NumIdMappings = NodeList->IdMappingCount;
     PmcgNode->Node.IdReference   = (NodeList->IdMappingCount == 0) ?
                                    0 : sizeof (EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE);
@@ -2258,9 +2257,9 @@ ACPI_IORT_GENERATOR  IortGenerator = {
     // ACPI Table Signature
     EFI_ACPI_6_2_IO_REMAPPING_TABLE_SIGNATURE,
     // ACPI Table Revision supported by this Generator
-    EFI_ACPI_IO_REMAPPING_TABLE_REVISION,
+    EFI_ACPI_IO_REMAPPING_TABLE_REVISION_00,
     // Minimum supported ACPI Table Revision
-    EFI_ACPI_IO_REMAPPING_TABLE_REVISION,
+    EFI_ACPI_IO_REMAPPING_TABLE_REVISION_00,
     // Creator ID
     TABLE_GENERATOR_CREATOR_ID_ARM,
     // Creator Revision
