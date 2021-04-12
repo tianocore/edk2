@@ -183,10 +183,10 @@ struct vcpu_time_info {
      * The correct way to interact with the version number is similar to
      * Linux's seqlock: see the implementations of read_seqbegin/read_seqretry.
      */
-    UINT32 version;
+    UINT32 Version;
     UINT32 pad0;
-    UINT64 tsc_timestamp;   /* TSC at last update of time vals.  */
-    UINT64 system_time;     /* Time, in nanosecs, since boot.    */
+    UINT64 TscTimestamp;   /* TSC at last update of time vals.  */
+    UINT64 SystemTime;     /* Time, in nanosecs, since boot.    */
     /*
      * Current system time:
      *   system_time +
@@ -194,11 +194,11 @@ struct vcpu_time_info {
      * CPU frequency (Hz):
      *   ((10^9 << 32) / tsc_to_system_mul) >> tsc_shift
      */
-    UINT32 tsc_to_system_mul;
-    INT8   tsc_shift;
+    UINT32 TscToSystemMultiplier;
+    INT8   TscShift;
     INT8   pad1[3];
 }; /* 32 bytes */
-typedef struct vcpu_time_info vcpu_time_info_t;
+typedef struct vcpu_time_info XEN_VCPU_TIME_INFO;
 
 struct vcpu_info {
     /*
@@ -234,7 +234,7 @@ struct vcpu_info {
 #endif /* XEN_HAVE_PV_UPCALL_MASK */
     xen_ulong_t evtchn_pending_sel;
     struct arch_vcpu_info arch;
-    struct vcpu_time_info time;
+    struct vcpu_time_info Time;
 }; /* 64 bytes (x86) */
 #ifndef __XEN__
 typedef struct vcpu_info vcpu_info_t;
@@ -250,7 +250,7 @@ typedef struct vcpu_info vcpu_info_t;
  * of this structure remaining constant.
  */
 struct shared_info {
-    struct vcpu_info vcpu_info[XEN_LEGACY_MAX_VCPUS];
+    struct vcpu_info VcpuInfo[XEN_LEGACY_MAX_VCPUS];
 
     /*
      * A domain can create "event channels" on which it can send and receive
@@ -299,6 +299,7 @@ struct shared_info {
 };
 #ifndef __XEN__
 typedef struct shared_info shared_info_t;
+typedef struct shared_info XEN_SHARED_INFO;
 #endif
 
 /* Turn a plain number into a C UINTN constant. */
