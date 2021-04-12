@@ -1,12 +1,19 @@
 /** @file
-  ACPI IO Remapping Table (IORT) as specified in ARM spec DEN0049D
-
-  http://infocenter.arm.com/help/topic/com.arm.doc.den0049d/DEN0049D_IO_Remapping_Table.pdf
+  ACPI IO Remapping Table (IORT) definitions.
 
   Copyright (c) 2017, Linaro Limited. All rights reserved.<BR>
-  Copyright (c) 2018, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2018 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
+
+  @par Reference(s):
+  - IO Remapping Table, Platform Design Document, Revision E.b, Feb 2021
+    (https://developer.arm.com/documentation/den0049/)
+
+  @par Glossary:
+  - Ref  : Reference
+  - Mem  : Memory
+  - Desc : Descriptor
 **/
 
 #ifndef __IO_REMAPPING_TABLE_H__
@@ -14,7 +21,8 @@
 
 #include <IndustryStandard/Acpi.h>
 
-#define EFI_ACPI_IO_REMAPPING_TABLE_REVISION        0x0
+#define EFI_ACPI_IO_REMAPPING_TABLE_REV0      0x0
+#define EFI_ACPI_IO_REMAPPING_TABLE_REV3      0x3
 
 #define EFI_ACPI_IORT_TYPE_ITS_GROUP                0x0
 #define EFI_ACPI_IORT_TYPE_NAMED_COMP               0x1
@@ -22,6 +30,7 @@
 #define EFI_ACPI_IORT_TYPE_SMMUv1v2                 0x3
 #define EFI_ACPI_IORT_TYPE_SMMUv3                   0x4
 #define EFI_ACPI_IORT_TYPE_PMCG                     0x5
+#define EFI_ACPI_IORT_TYPE_RMR                      0x6
 
 #define EFI_ACPI_IORT_MEM_ACCESS_PROP_CCA           BIT0
 
@@ -55,7 +64,16 @@
 #define EFI_ACPI_IORT_SMMUv3_MODEL_CAVIUM_CN99XX    0x2
 
 #define EFI_ACPI_IORT_ROOT_COMPLEX_ATS_UNSUPPORTED  0x0
-#define EFI_ACPI_IORT_ROOT_COMPLEX_ATS_SUPPORTED    0x1
+#define EFI_ACPI_IORT_ROOT_COMPLEX_ATS_SUPPORTED    BIT0
+
+#define EFI_ACPI_IORT_ROOT_COMPLEX_PRI_UNSUPPORTED  0x0
+#define EFI_ACPI_IORT_ROOT_COMPLEX_PRI_SUPPORTED    BIT1
+
+#define EFI_ACPI_IORT_ROOT_COMPLEX_PASID_FWD_UNSUPPORTED  0x0
+#define EFI_ACPI_IORT_ROOT_COMPLEX_PASID_FWD_SUPPORTED    BIT2
+
+#define EFI_ACPI_IORT_RMR_REMAP_NOT_PERMITTED       0x0
+#define EFI_ACPI_IORT_RMR_REMAP_PERMITTED           BIT0
 
 #define EFI_ACPI_IORT_ID_MAPPING_FLAGS_SINGLE       BIT0
 
@@ -89,7 +107,7 @@ typedef struct {
   UINT8                                   Type;
   UINT16                                  Length;
   UINT8                                   Revision;
-  UINT32                                  Reserved;
+  UINT32                                  Identifier;
   UINT32                                  NumIdMappings;
   UINT32                                  IdReference;
 } EFI_ACPI_6_0_IO_REMAPPING_NODE;
@@ -197,6 +215,40 @@ typedef struct {
   UINT64                                  Page1Base;
 //EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE      OverflowInterruptMsiMapping[1];
 } EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE;
+
+///
+/// Memory Range Descriptor.
+///
+typedef struct {
+  /// Base address of Reserved Memory Range,
+  /// aligned to a page size of 64K.
+  UINT64                                  Base;
+
+  /// Length of the Reserved Memory range.
+  /// Must be a multiple of the page size of 64K.
+  UINT64                                  Length;
+
+  /// Reserved, must be zero.
+  UINT32                                  Reserved;
+} EFI_ACPI_6_0_IO_REMAPPING_MEM_RANGE_DESC;
+
+///
+/// Node type 6: Reserved Memory Range (RMR) node
+///
+typedef struct {
+  EFI_ACPI_6_0_IO_REMAPPING_NODE              Node;
+
+  /// RMR flags
+  UINT32                                      Flags;
+
+  /// Memory range descriptor count.
+  UINT32                                      NumMemRangeDesc;
+
+  /// Offset of the memory range descriptor array.
+  UINT32                                      MemRangeDescRef;
+// EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE         IdMapping[1];
+// EFI_ACPI_6_0_IO_REMAPPING_MEM_RANGE_DESC   MemRangeDesc[1];
+} EFI_ACPI_6_0_IO_REMAPPING_RMR_NODE;
 
 #pragma pack()
 
