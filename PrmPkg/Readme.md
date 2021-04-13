@@ -5,6 +5,8 @@ code module that executes within the OS context. Moving this firmware to the OS 
 and mitigates the negative system impact currently accompanied with SMM solutions. Futhermore, the PRM code is
 packaged into modules with well-defined entry points, each representing a specific PRM functionality.
 
+For more details on PRM, refer to the [Platform Runtime Mechanism Specification on uefi.org](https://uefi.org/sites/default/files/resources/Platform%20Runtime%20Mechanism%20-%20with%20legal%20notice.pdf).
+
 The `PrmPkg` maintained in this branch provides a single cohesive set of generic PRM functionality that is intended
 to be leveraged by platform firmware with minimal overhead to integrate PRM functionality in the firmware.
 
