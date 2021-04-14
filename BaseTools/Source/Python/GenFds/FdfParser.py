@@ -1,7 +1,7 @@
 ## @file
 # parse FDF file
 #
-#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2015, Hewlett Packard Enterprise Development, L.P.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -3504,8 +3504,6 @@ class FdfParser:
             raise Warning.Expected("'.'", self.FileName, self.CurrentLineNumber)
 
         Arch = self._SkippedChars.rstrip(TAB_SPLIT)
-        if Arch.upper() not in ARCH_SET_FULL:
-            raise Warning("Unknown Arch '%s'" % Arch, self.FileName, self.CurrentLineNumber)
 
         ModuleType = self._GetModuleType()
 
