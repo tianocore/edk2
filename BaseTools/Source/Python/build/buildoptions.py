@@ -2,7 +2,7 @@
 # build a platform or a module
 #
 #  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2018 - 2020, Hewlett Packard Enterprise Development, L.P.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -40,7 +40,7 @@ class MyOptionParser():
 
     def GetOption(self):
         Parser = OptionParser(description=__copyright__, version=__version__, prog="build.exe", usage="%prog [options] [all|fds|genc|genmake|clean|cleanall|cleanlib|modules|libraries|run]")
-        Parser.add_option("-a", "--arch", action="append", type="choice", choices=['IA32', 'X64', 'EBC', 'ARM', 'AARCH64', 'RISCV64'], dest="TargetArch",
+        Parser.add_option("-a", "--arch", action="append", dest="TargetArch",
             help="ARCHS is one of list: IA32, X64, ARM, AARCH64, RISCV64 or EBC, which overrides target.txt's TARGET_ARCH definition. To specify more archs, please repeat this option.")
         Parser.add_option("-p", "--platform", action="callback", type="string", dest="PlatformFile", callback=SingleCheckCallback,
             help="Build the platform specified by the DSC file name argument, overriding target.txt's ACTIVE_PLATFORM definition.")
