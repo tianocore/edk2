@@ -67,7 +67,7 @@ InstallPreHashFvPpi (
   HASH_INFO                                         *HashInfo;
 
   PpiSize = sizeof (EDKII_PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_PPI)
-            + sizeof (sizeof (HASH_INFO))
+            + sizeof (HASH_INFO)
             + HashSize;
 
   PreHashedFvPpi = AllocatePool (PpiSize);
