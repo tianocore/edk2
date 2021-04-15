@@ -293,6 +293,9 @@ typedef struct CmArmSerialPortInfo {
 
   /// The Base address length
   UINT64  BaseAddressLength;
+
+  /// The access size
+  UINT8   AccessSize;
 } CM_ARM_SERIAL_PORT_INFO;
 
 /** A structure that describes the
