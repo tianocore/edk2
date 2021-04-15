@@ -1,7 +1,7 @@
 /** @file
   SPCR Table Generator
 
-  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -312,6 +312,26 @@ BuildSpcrTableEx (
 
   // Update the base address
   AcpiSpcr.BaseAddress.Address = SerialPortInfo->BaseAddress;
+
+  // Set the access size
+  if (SerialPortInfo->AccessSize >= EFI_ACPI_6_3_QWORD) {
+    Status = EFI_INVALID_PARAMETER;
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: SPCR: Access size must be <= 3 (DWORD). Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  } else if (SerialPortInfo->AccessSize == EFI_ACPI_6_3_UNDEFINED) {
+    // 0 Undefined (legacy reasons)
+    // Default to DWORD access size as the access
+    // size field was introduced at a later date
+    // and some ConfigurationManager implementations
+    // may not be providing this field data
+    AcpiSpcr.BaseAddress.AccessSize = EFI_ACPI_6_3_DWORD;
+  } else {
+    AcpiSpcr.BaseAddress.AccessSize = SerialPortInfo->AccessSize;
+  }
 
   // Update the UART interrupt
   AcpiSpcr.GlobalSystemInterrupt = SerialPortInfo->Interrupt;
