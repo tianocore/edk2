@@ -1,7 +1,7 @@
 /** @file
   Sample to provide TempRamInitParams data.
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -52,8 +52,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST FSPT_UPD_CORE_DATA FsptUpdDataPtr = {
     }
   },
   {
-    ((UINT32)FixedPcdGet64 (PcdCpuMicrocodePatchAddress) + FixedPcdGet32 (PcdFlashMicrocodeOffset)),
-    ((UINT32)FixedPcdGet64 (PcdCpuMicrocodePatchRegionSize) - FixedPcdGet32 (PcdFlashMicrocodeOffset)),
+    FixedPcdGet32 (PcdCpuMicrocodePatchAddress),
+    FixedPcdGet32 (PcdCpuMicrocodePatchRegionSize),
     FixedPcdGet32 (PcdFlashCodeCacheAddress),
     FixedPcdGet32 (PcdFlashCodeCacheSize),
   }
