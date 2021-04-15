@@ -1,7 +1,7 @@
 ## @file
 # Provides drivers and definitions to support fsp in EDKII bios.
 #
-# Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -55,12 +55,6 @@
   gIntelFsp2WrapperTokenSpaceGuid.PcdFlashCodeCacheAddress|0xFFE00000|UINT32|0x10000001
   ## Provides the size of the BIOS Flash Device.
   gIntelFsp2WrapperTokenSpaceGuid.PcdFlashCodeCacheSize|0x00200000|UINT32|0x10000002
-
-  ## Indicates the base address of the first Microcode Patch in the Microcode Region
-  gIntelFsp2WrapperTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0|UINT64|0x10000005
-  gIntelFsp2WrapperTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0|UINT64|0x10000006
-  ## Indicates the offset of the Cpu Microcode.
-  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashMicrocodeOffset|0x90|UINT32|0x10000007
 
   ## Indicate the PEI memory size platform want to report
   gIntelFsp2WrapperTokenSpaceGuid.PcdPeiMinMemSize|0x1800000|UINT32|0x40000004
