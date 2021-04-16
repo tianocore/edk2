@@ -141,6 +141,7 @@ AmdSevInitialize (
   )
 {
   UINT64                            EncryptionMask;
+  UINT64                            TpmBaseAddress;
   RETURN_STATUS                     PcdStatus;
 
   //
@@ -204,6 +205,24 @@ AmdSevInitialize (
         EfiBootServicesData                // MemoryType
         );
     }
+  }
+
+  //
+  // PEI TPM support will perform MMIO accesses, be sure this range is not
+  // marked encrypted.
+  //
+  TpmBaseAddress = PcdGet64 (PcdTpmBaseAddress);
+  if (TpmBaseAddress != 0) {
+    RETURN_STATUS  DecryptStatus;
+
+    DecryptStatus = MemEncryptSevClearPageEncMask (
+                      0,
+                      TpmBaseAddress,
+                      EFI_SIZE_TO_PAGES (0x5000),
+                      FALSE
+                      );
+
+    ASSERT_RETURN_ERROR (DecryptStatus);
   }
 
   //
