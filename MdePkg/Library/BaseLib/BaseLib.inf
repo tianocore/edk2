@@ -321,6 +321,7 @@
   X64/XGetBv.nasm
   X64/XSetBv.nasm
   X64/VmgExit.nasm
+  X64/Pvalidate.nasm
   ChkStkGcc.c  | GCC
 
 [Sources.EBC]
