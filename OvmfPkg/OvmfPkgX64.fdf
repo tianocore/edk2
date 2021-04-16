@@ -88,6 +88,9 @@ gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase|gUefiCpuPkgTokenSpaceGuid.PcdSevE
 0x00C000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
 
+0x00D000|0x001000
+gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase|gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretSize
+
 0x010000|0x010000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
@@ -178,6 +181,7 @@ INF  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
 INF  SecurityPkg/Tcg/TcgPei/TcgPei.inf
 INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
 !endif
+INF  OvmfPkg/AmdSev/SecretPei/SecretPei.inf
 
 ################################################################################
 
@@ -313,6 +317,7 @@ INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
 
 INF MdeModulePkg/Logo/LogoDxe.inf
+INF OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
 
 #
 # Network modules

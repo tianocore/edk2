@@ -716,6 +716,7 @@
   OvmfPkg/SmmAccess/SmmAccessPei.inf
 !endif
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
+  OvmfPkg/AmdSev/SecretPei/SecretPei.inf
 
 !if $(TPM_ENABLE) == TRUE
   OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
@@ -965,6 +966,7 @@
   OvmfPkg/PlatformDxe/Platform.inf
   OvmfPkg/AmdSevDxe/AmdSevDxe.inf
   OvmfPkg/IoMmuDxe/IoMmuDxe.inf
+  OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
 
 !if $(SMM_REQUIRE) == TRUE
   OvmfPkg/SmmAccess/SmmAccess2Dxe.inf
