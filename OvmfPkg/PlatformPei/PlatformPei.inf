@@ -52,6 +52,7 @@
   BaseLib
   CacheMaintenanceLib
   DebugLib
+  GhcbRegisterLib
   HobLib
   IoLib
   PciLib
