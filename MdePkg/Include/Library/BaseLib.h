@@ -7518,5 +7518,42 @@ PatchInstructionX86 (
   IN  UINTN                    ValueSize
   );
 
+/**
+ Execute a PVALIDATE instruction to validate or rescnids validation of a guest
+ page's RMP entry.
+
+ Upon completion, in addition to the return value the instruction also updates
+ the eFlags. A caller must check both the return code as well as eFlags to
+ determine if the RMP entry has been updated.
+
+ The function is available on x64.
+
+ @param[in]    Address        The guest virtual address to validate.
+ @param[in]    PageSize       The page size to use.
+ @param[i]     Validate       Validate or rescinds.
+ @param[out]   Eflags         The value of Eflags after PVALIDATE completion.
+
+ @retval       PvalidateRetValue  The return value from the PVALIDATE instruction.
+**/
+typedef enum {
+  PVALIDATE_PAGE_SIZE_4K = 0,
+  PVALIDATE_PAGE_SIZE_2M,
+} PvalidatePageSize;
+
+typedef enum {
+  PVALIDATE_RET_SUCCESS = 0,
+  PVALIDATE_RET_FAIL_INPUT = 1,
+  PVALIDATE_RET_FAIL_SIZEMISMATCH = 6,
+} PvalidateRetValue;
+
+PvalidateRetValue
+EFIAPI
+AsmPvalidate (
+  IN   PvalidatePageSize       PageSize,
+  IN   BOOLEAN                 Validate,
+  IN   UINTN                   Address,
+  OUT  IA32_EFLAGS32           *Eflags
+  );
+
 #endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 #endif // !defined (__BASE_LIB__)
