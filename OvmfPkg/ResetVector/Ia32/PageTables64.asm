@@ -70,8 +70,77 @@ BITS    32
 %define GHCB_HYPERVISOR_FEATURES_REQUEST    128
 %define GHCB_HYPERVISOR_FEATURES_RESPONSE   129
 
+; GHCB Page Invalidate request and response protocol values
+;
+%define GHCB_PAGE_STATE_CHANGE_REQUEST    20
+%define GHCB_PAGE_STATE_CHANGE_RESPONSE   21
+%define GHCB_PAGE_STATE_SHARED            2
+
 ; GHCB request to terminate protocol values
 %define GHCB_GENERAL_TERMINATE_REQUEST    255
+
+; If its an SEV-SNP guest then use the page state change VMGEXIT to invalidate
+; the GHCB page.
+;
+; Modified:  EAX, EBX, ECX, EDX
+;
+InvalidateGHCBPage:
+    ; Check if it is SEV-SNP guest.
+    cmp     byte[SEV_ES_WORK_AREA_SNP], 1
+    jne     InvalidateGHCBPageDone
+
+    ; Check whether hypervisor features has SEV-SNP (BIT0) set to indicate that
+    ; hypervisor supports the page state change.
+    mov     eax, dword[SEV_ES_WORK_AREA_HYPERVISOR_FEATURES]
+    bt      eax, 0
+    jnc     TerminateSevGuestLaunch
+
+    ; Use PVALIDATE instruction to invalidate the page
+    mov     eax, GHCB_BASE
+    mov     ecx, 0
+    mov     edx, 0
+    DB      0xF2, 0x0F, 0x01, 0xFF
+    cmp     eax, 0
+    jnz     TerminateSevGuestLaunch
+
+    ; Ask hypervisor to change the page state to shared using the
+    ; Page State Change VMGEXIT.
+    ;
+    ; Setup GHCB MSR
+    ;   GHCB_MSR[55:52] = Page Operation
+    ;   GHCB_MSR[51:12] = Guest Physical Frame Number
+    ;   GHCB_MSR[11:0]  = Page State Change Request
+    ;
+    mov     eax, (GHCB_BASE >> 12)
+    shl     eax, 12
+    or      eax, GHCB_PAGE_STATE_CHANGE_REQUEST
+    mov     edx, (GHCB_PAGE_STATE_SHARED << 20)
+    mov     ecx, 0xc0010130
+    wrmsr
+
+    ;
+    ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
+    ; mode, so work around this by temporarily switching to 64-bit mode.
+    ;
+BITS    64
+    rep     vmmcall
+BITS    32
+
+    ;
+    ; Response GHCB MSR
+    ;   GHCB_MSR[51:12] = Guest Physical Frame Number
+    ;   GHCB_MSR[11:0]  = Page State Change Response
+    ;
+    mov     ecx, 0xc0010130
+    rdmsr
+    and     eax, 0xfff
+    cmp     eax, GHCB_PAGE_STATE_CHANGE_RESPONSE
+    jnz     TerminateSevGuestLaunch
+    cmp     edx, 0
+    jnz     TerminateSevGuestLaunch
+
+InvalidateGHCBPageDone:
+    OneTimeCallRet InvalidateGHCBPage
 
 ; Check if Secure Encrypted Virtualization (SEV) features are enabled.
 ;
@@ -449,6 +518,19 @@ clearGhcbMemoryLoop:
     ; It is SEV-ES guest, query the Hypervisor features
     ;
     OneTimeCall   CheckHypervisorFeatures
+
+    ;
+    ; The page table built above cleared the memory encryption mask from the
+    ; GHCB_BASE (aka made it shared). When SEV-SNP is enabled, to maintain
+    ; the security guarantees, the page state transition from private to
+    ; shared must go through the page invalidation steps. Invalidate the
+    ; memory range before loading the page table below.
+    ;
+    ; NOTE: the invalidation must happen after zeroing the GHCB memory. This
+    ;       is because, in the 32-bit mode all the access are considered private.
+    ;       The invalidation before the zero'ing will cause a #VC.
+    ;
+    OneTimeCall  InvalidateGHCBPage
 
 SetCr3:
     ;
