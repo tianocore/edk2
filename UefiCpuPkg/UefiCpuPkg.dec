@@ -396,5 +396,16 @@
   # @Prompt SEV-ES Status
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|FALSE|BOOLEAN|0x60000016
 
+  ## This dynamic PCD indicates whether SEV-SNP is enabled
+  #   TRUE  - SEV-SNP is enabled
+  #   FALSE - SEV-SNP is not enabled
+  # @Prompt SEV-SNP Status
+  gUefiCpuPkgTokenSpaceGuid.PcdSevSnpIsEnabled|FALSE|BOOLEAN|0x60000017
+
+  ## This dynamic PCD contains the hypervisor features value obtained through the GHCB HYPERVISOR
+  #  features VMGEXIT defined in the GHCB section 2.2.
+  # @Prompt GHCB Hypervisor Features
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures|0x0|UINT64|0x60000018
+
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni
