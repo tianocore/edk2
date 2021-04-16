@@ -48,6 +48,11 @@ typedef union {
     UINT32  Reserved2:32;
   } GhcbTerminate;
 
+  struct {
+    UINT64  Function:12;
+    UINT64  Features:52;
+  } GhcbHypervisorFeatures;
+
   VOID    *Ghcb;
 
   UINT64  GhcbPhysicalAddress;
@@ -57,6 +62,8 @@ typedef union {
 #define GHCB_INFO_SEV_INFO_GET             2
 #define GHCB_INFO_CPUID_REQUEST            4
 #define GHCB_INFO_CPUID_RESPONSE           5
+#define GHCB_HYPERVISOR_FEATURES_REQUEST   128
+#define GHCB_HYPERVISOR_FEATURES_RESPONSE  129
 #define GHCB_INFO_TERMINATE_REQUEST        256
 
 #define GHCB_TERMINATE_GHCB                0
