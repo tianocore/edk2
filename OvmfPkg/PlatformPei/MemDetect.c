@@ -894,6 +894,19 @@ InitializeRamRegions (
         EfiACPIMemoryNVS
         );
     }
+
+    if (MemEncryptSevSnpIsEnabled ()) {
+      //
+      // If SEV-SNP is enabled, reserve the CPUID page. The memory range will
+      // be used by the Reset Vector on S3 resume, it must be reserved as
+      // ACPI NVS.
+      //
+      BuildMemoryAllocationHob (
+        (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfSnpCpuidBase),
+        (UINT64)(UINTN) PcdGet32 (PcdOvmfSnpCpuidSize),
+        EfiACPIMemoryNVS
+      );
+    }
 #endif
   }
 

@@ -118,6 +118,8 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
