@@ -17,6 +17,8 @@
 #include <Register/Cpuid.h>
 #include <Uefi/UefiBaseType.h>
 
+#include "SnpPageStateChange.h"
+
 /**
   Reads and sets the status of SEV features.
 
