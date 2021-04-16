@@ -62,6 +62,16 @@ BITS    32
 %define GHCB_CPUID_REGISTER_SHIFT  30
 %define CPUID_INSN_LEN              2
 
+; GHCB SEV Information MSR protocol
+%define GHCB_SEV_INFORMATION_REQUEST    2
+%define GHCB_SEV_INFORMATION_RESPONSE   1
+
+; GHCB Hypervisor features MSR protocol
+%define GHCB_HYPERVISOR_FEATURES_REQUEST    128
+%define GHCB_HYPERVISOR_FEATURES_RESPONSE   129
+
+; GHCB request to terminate protocol values
+%define GHCB_GENERAL_TERMINATE_REQUEST    255
 
 ; Check if Secure Encrypted Virtualization (SEV) features are enabled.
 ;
@@ -85,6 +95,13 @@ CheckSevFeatures:
     ; phase that SEV-SNP is not enabled. If SEV-SNP is enabled, this function
     ; will set it to 1.
     mov       byte[SEV_ES_WORK_AREA_SNP], 0
+
+    ; Set the Hypervisor features field in the workarea to zero to communicate
+    ; to the hypervisor features to the SEC phase. The hypervisor feature is
+    ; filled during the call to CheckHypervisorFeatures.
+    mov     eax, 0
+    mov     dword[SEV_ES_WORK_AREA_HYPERVISOR_FEATURES], eax
+    mov     dword[SEV_ES_WORK_AREA_HYPERVISOR_FEATURES + 4], eax
 
     ;
     ; Set up exception handlers to check for SEV-ES
@@ -225,6 +242,106 @@ IsSevEsEnabled:
 SevEsDisabled:
     OneTimeCallRet IsSevEsEnabled
 
+; The version 2 of GHCB specification added the support to query the hypervisor features.
+; If the GHCB version is greather than 2 then read the hypervisor features.
+;
+; Modified:  EAX, EBX, ECX, EDX
+;
+CheckHypervisorFeatures:
+    ; Get the SEV Information
+    ; Setup GHCB MSR
+    ;   GHCB_MSR[11:0]  = SEV information request
+    ;
+    mov     edx, 0
+    mov     eax, GHCB_SEV_INFORMATION_REQUEST
+    mov     ecx, 0xc0010130
+    wrmsr
+
+    ;
+    ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
+    ; mode, so work around this by temporarily switching to 64-bit mode.
+    ;
+BITS    64
+    rep     vmmcall
+BITS    32
+
+    ;
+    ; SEV Information Response GHCB MSR
+    ;   GHCB_MSR[63:48] = Maximum protocol version
+    ;   GHCB_MSR[47:32] = Minimum protocol version
+    ;   GHCB_MSR[11:0]  = SEV information response
+    ;
+    mov     ecx, 0xc0010130
+    rdmsr
+    and     eax, 0xfff
+    cmp     eax, GHCB_SEV_INFORMATION_RESPONSE
+    jnz     TerminateSevGuestLaunch
+    shr     edx, 16
+    cmp     edx, 2
+    jl      CheckHypervisorFeaturesDone
+
+    ; Get the hypervisor features
+    ; Setup GHCB MSR
+    ;   GHCB_MSR[11:0]  = Hypervisor features request
+    ;
+    mov     edx, 0
+    mov     eax, GHCB_HYPERVISOR_FEATURES_REQUEST
+    mov     ecx, 0xc0010130
+    wrmsr
+
+    ;
+    ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
+    ; mode, so work around this by temporarily switching to 64-bit mode.
+    ;
+BITS    64
+    rep     vmmcall
+BITS    32
+
+    ;
+    ; Hypervisor features reponse
+    ;   GHCB_MSR[63:12] = Features bitmap
+    ;   GHCB_MSR[11:0]  = Hypervisor features response
+    ;
+    mov     ecx, 0xc0010130
+    rdmsr
+    mov     ebx, eax
+    and     eax, 0xfff
+    cmp     eax, GHCB_HYPERVISOR_FEATURES_RESPONSE
+    jnz     TerminateSevGuestLaunch
+
+    shr     ebx, 12
+    mov     dword[SEV_ES_WORK_AREA_HYPERVISOR_FEATURES], ebx
+    mov     dword[SEV_ES_WORK_AREA_HYPERVISOR_FEATURES + 4], edx
+
+    jmp     CheckHypervisorFeaturesDone
+TerminateSevGuestLaunch:
+    ;
+    ; Setup GHCB MSR
+    ;   GHCB_MSR[23:16] = 0
+    ;   GHCB_MSR[15:12] = 0
+    ;   GHCB_MSR[11:0]  = Terminate Request
+    ;
+    mov     edx, 0
+    mov     eax, GHCB_GENERAL_TERMINATE_REQUEST
+    mov     ecx, 0xc0010130
+    wrmsr
+
+    ;
+    ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
+    ; mode, so work around this by temporarily switching to 64-bit mode.
+    ;
+BITS    64
+    rep     vmmcall
+BITS    32
+
+TerminateSevGuestLaunchHlt:
+    cli
+    hlt
+    jmp     TerminateSevGuestLaunchHlt
+
+CheckHypervisorFeaturesDone:
+    OneTimeCallRet CheckHypervisorFeatures
+
 ;
 ; Modified:  EAX, EBX, ECX, EDX
 ;
@@ -327,6 +444,11 @@ pageTableEntries4kLoop:
 clearGhcbMemoryLoop:
     mov     dword[ecx * 4 + GHCB_BASE - 4], eax
     loop    clearGhcbMemoryLoop
+
+    ;
+    ; It is SEV-ES guest, query the Hypervisor features
+    ;
+    OneTimeCall   CheckHypervisorFeatures
 
 SetCr3:
     ;
