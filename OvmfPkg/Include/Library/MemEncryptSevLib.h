@@ -49,7 +49,8 @@ typedef struct {
 //
 typedef struct _SEC_SEV_ES_WORK_AREA {
   UINT8    SevEsEnabled;
-  UINT8    Reserved1[7];
+  UINT8    SevSnpEnabled;
+  UINT8    Reserved1[6];
 
   UINT64   RandomData;
 
