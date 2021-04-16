@@ -751,6 +751,76 @@ SevEsProtocolFailure (
 }
 
 /**
+  Determine if SEV-SNP is active. There is a MemEncryptIsSnpEnabled() in MemEncryptSevLib
+  but we can not use it because the SEV-SNP check need to be done before the
+  ProcessLibraryConstructorList() is called.
+
+  @retval TRUE   SEV-SNP is enabled
+  @retval FALSE  SEV-SNP is not enabled
+
+**/
+STATIC
+BOOLEAN
+SevSnpIsEnabled (
+  VOID
+  )
+{
+  SEC_SEV_ES_WORK_AREA  *SevEsWorkArea;
+
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
+
+  return ((SevEsWorkArea != NULL) && (SevEsWorkArea->SevSnpEnabled != 0));
+}
+
+/**
+ The GHCB GPA registeration need to be done before the ProcessLibraryConstructorList()
+ is called. So use a local implementation instead of including the GhcbRegisterLib.
+
+ */
+STATIC
+VOID
+SevSnpGhcbRegister (
+  UINTN   Address
+  )
+{
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+  MSR_SEV_ES_GHCB_REGISTER  CurrentMsr;
+  EFI_PHYSICAL_ADDRESS      GuestFrameNumber;
+
+  GuestFrameNumber = Address >> EFI_PAGE_SHIFT;
+
+  //
+  // Save the current MSR Value
+  //
+  CurrentMsr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+
+  //
+  // Use the GHCB MSR Protocol to request to register the GPA.
+  //
+  Msr.GhcbPhysicalAddress = 0;
+  Msr.GhcbGpaRegister.Function = GHCB_INFO_GHCB_GPA_REGISTER_REQUEST;
+  Msr.GhcbGpaRegister.GuestFrameNumber = GuestFrameNumber;
+  AsmWriteMsr64 (MSR_SEV_ES_GHCB, Msr.GhcbPhysicalAddress);
+
+  AsmVmgExit ();
+
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+
+  //
+  // If hypervisor responded with a different GPA than requested then fail.
+  //
+  if ((Msr.GhcbGpaRegister.Function != GHCB_INFO_GHCB_GPA_REGISTER_RESPONSE) ||
+      (Msr.GhcbGpaRegister.GuestFrameNumber != GuestFrameNumber)) {
+    SevEsProtocolFailure (GHCB_TERMINATE_GHCB_GENERAL);
+  }
+
+  //
+  // Restore the MSR
+  //
+  AsmWriteMsr64 (MSR_SEV_ES_GHCB, CurrentMsr.GhcbPhysicalAddress);
+}
+
+/**
   Validate the SEV-ES/GHCB protocol level.
 
   Verify that the level of SEV-ES/GHCB protocol supported by the hypervisor
@@ -791,6 +861,12 @@ SevEsProtocolCheck (
     SevEsProtocolFailure (GHCB_TERMINATE_GHCB_PROTOCOL);
   }
 
+  if (SevSnpIsEnabled ()) {
+    //
+    // SEV-SNP guest requires that GHCB GPA must be registered before using it.
+    //
+    SevSnpGhcbRegister (FixedPcdGet32 (PcdOvmfSecGhcbBase));
+  }
   //
   // SEV-ES protocol checking succeeded, set the initial GHCB address
   //
