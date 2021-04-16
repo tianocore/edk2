@@ -45,6 +45,27 @@ AmdSevSnpInitialize (
 
 /**
 
+  Function to set the PcdHypervisorFeatures.
+**/
+STATIC
+VOID
+AmdSevHypervisorFeatures (
+  VOID
+  )
+{
+  SEC_SEV_ES_WORK_AREA  *SevEsWorkArea;
+  RETURN_STATUS         PcdStatus;
+
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
+
+  PcdStatus = PcdSet64S (PcdGhcbHypervisorFeatures, SevEsWorkArea->HypervisorFeatures);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
+  DEBUG ((DEBUG_INFO, "GHCB Hypervisor Features=0x%Lx\n", SevEsWorkArea->HypervisorFeatures));
+}
+
+/**
+
   Initialize SEV-ES support if running as an SEV-ES guest.
 
   **/
@@ -72,6 +93,11 @@ AmdSevEsInitialize (
 
   PcdStatus = PcdSetBoolS (PcdSevEsIsEnabled, TRUE);
   ASSERT_RETURN_ERROR (PcdStatus);
+
+  //
+  // Set the hypervisor features PCD.
+  //
+  AmdSevHypervisorFeatures ();
 
   //
   // Allocate GHCB and per-CPU variable pages.
