@@ -81,6 +81,11 @@ CheckSevFeatures:
     ; the MSR check below will set the first byte of the workarea to one.
     mov     byte[SEV_ES_WORK_AREA], 0
 
+    ; Set the SevSnpEnabled field in workarea to zero to communicate to the SEC
+    ; phase that SEV-SNP is not enabled. If SEV-SNP is enabled, this function
+    ; will set it to 1.
+    mov       byte[SEV_ES_WORK_AREA_SNP], 0
+
     ;
     ; Set up exception handlers to check for SEV-ES
     ;   Load temporary RAM stack based on PCDs (see SevEsIdtVmmComm for
@@ -135,6 +140,13 @@ CheckSevFeatures:
     ; Set the first byte of the workarea to one to communicate to the SEC
     ; phase that SEV-ES is enabled.
     mov       byte[SEV_ES_WORK_AREA], 1
+
+    bt        eax, 2
+    jnc       GetSevEncBit
+
+    ; Set the second byte of the workarea to one to communicate to the SEC
+    ; phase that the SEV-SNP is enabled
+    mov       byte[SEV_ES_WORK_AREA_SNP], 1
 
 GetSevEncBit:
     ; Get pte bit position to enable memory encryption
