@@ -24,6 +24,27 @@
 
 /**
 
+  Initialize SEV-SNP support if running as an SEV-SNP guest.
+
+  **/
+STATIC
+VOID
+AmdSevSnpInitialize (
+  VOID
+  )
+{
+  RETURN_STATUS        PcdStatus;
+
+  if (!MemEncryptSevSnpIsEnabled ()) {
+    return;
+  }
+
+  PcdStatus = PcdSetBoolS (PcdSevSnpIsEnabled, TRUE);
+  ASSERT_RETURN_ERROR (PcdStatus);
+}
+
+/**
+
   Initialize SEV-ES support if running as an SEV-ES guest.
 
   **/
@@ -209,4 +230,9 @@ AmdSevInitialize (
   // Check and perform SEV-ES initialization if required.
   //
   AmdSevEsInitialize ();
+
+  //
+  // Check and perform SEV-SNP initialization if required.
+  //
+  AmdSevSnpInitialize ();
 }
