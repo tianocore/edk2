@@ -50,6 +50,7 @@
   PeCoffExtraActionLib
   ExtractGuidedSectionLib
   LocalApicLib
+  MemEncryptSevLib
   CpuExceptionHandlerLib
 
 [Ppis]
@@ -70,6 +71,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDecompressionScratchEnd
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecPreValidatedStart
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecPreValidatedEnd
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
