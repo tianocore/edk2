@@ -120,7 +120,7 @@ if not defined CLANG_BIN (
     @echo.
     @echo !!! WARNING !!! CLANG_BIN environment variable is not set
     @if exist "C:\Program Files\LLVM\bin\clang.exe" (
-        @set CLANG_BIN=C:\Program Files\LLVM\bin\
+        @set "CLANG_BIN=C:\Program Files\LLVM\bin\"
         @echo   Found LLVM, setting CLANG_BIN environment variable to C:\Program Files\LLVM\bin\
     )
 )
