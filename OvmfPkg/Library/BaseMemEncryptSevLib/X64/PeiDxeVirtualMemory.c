@@ -557,6 +557,7 @@ EnableReadOnlyPageWriteProtect (
   @param[in]  Mode                    Set or Clear mode
   @param[in]  CacheFlush              Flush the caches before applying the
                                       encryption mask
+  @param[in]  IsMmio                  The address is Mmio address.
 
   @retval RETURN_SUCCESS              The attributes were cleared for the
                                       memory region.
@@ -572,7 +573,8 @@ SetMemoryEncDec (
   IN    PHYSICAL_ADDRESS         PhysicalAddress,
   IN    UINTN                    Length,
   IN    MAP_RANGE_MODE           Mode,
-  IN    BOOLEAN                  CacheFlush
+  IN    BOOLEAN                  CacheFlush,
+  IN    BOOLEAN                  Mmio
   )
 {
   PAGE_MAP_AND_DIRECTORY_POINTER *PageMapLevel4Entry;
@@ -852,7 +854,8 @@ InternalMemEncryptSevSetMemoryDecrypted (
            PhysicalAddress,
            Length,
            ClearCBit,
-           Flush
+           Flush,
+           FALSE
            );
 }
 
@@ -888,6 +891,41 @@ InternalMemEncryptSevSetMemoryEncrypted (
            PhysicalAddress,
            Length,
            SetCBit,
-           Flush
+           Flush,
+           FALSE
+           );
+}
+
+/**
+  This function clears memory encryption bit for the Mmio region specified by
+  PhysicalAddress and Length from the current page table context.
+
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
+  @param[in]  PhysicalAddress         The physical address that is the start
+                                      address of a mmio region.
+  @param[in]  Length                  The length of memory region
+
+  @retval RETURN_SUCCESS              The attributes were cleared for the
+                                      memory region.
+  @retval RETURN_INVALID_PARAMETER    Number of pages is zero.
+  @retval RETURN_UNSUPPORTED          Clearing the memory encyrption attribute
+                                      is not supported
+**/
+RETURN_STATUS
+EFIAPI
+InternalMemEncryptSevClearMmioPageEncMask (
+  IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS        PhysicalAddress,
+  IN  UINTN                   Length
+  )
+{
+  return SetMemoryEncDec (
+           Cr3BaseAddress,
+           PhysicalAddress,
+           Length,
+           ClearCBit,
+           FALSE,
+           TRUE
            );
 }
