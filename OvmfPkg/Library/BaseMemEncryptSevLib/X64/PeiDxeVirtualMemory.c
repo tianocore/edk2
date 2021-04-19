@@ -536,6 +536,121 @@ EnableReadOnlyPageWriteProtect (
   AsmWriteCr0 (AsmReadCr0() | BIT16);
 }
 
+RETURN_STATUS
+EFIAPI
+InternalMemEncryptSevCreateIdentityMap1G (
+  IN    PHYSICAL_ADDRESS      Cr3BaseAddress,
+  IN    PHYSICAL_ADDRESS      PhysicalAddress,
+  IN    UINTN                 Length
+  )
+{
+  PAGE_MAP_AND_DIRECTORY_POINTER *PageMapLevel4Entry;
+  PAGE_TABLE_1G_ENTRY            *PageDirectory1GEntry;
+  UINT64                         PgTableMask;
+  UINT64                         AddressEncMask;
+  BOOLEAN                        IsWpEnabled;
+  RETURN_STATUS                  Status;
+
+  //
+  // Set PageMapLevel4Entry to suppress incorrect compiler/analyzer warnings.
+  //
+  PageMapLevel4Entry = NULL;
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx\n",
+    gEfiCallerBaseName,
+    __FUNCTION__,
+    Cr3BaseAddress,
+    PhysicalAddress,
+    (UINT64)Length
+    ));
+
+  if (Length == 0) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  //
+  // Check if we have a valid memory encryption mask
+  //
+  AddressEncMask = InternalGetMemEncryptionAddressMask ();
+  if (!AddressEncMask) {
+    return RETURN_ACCESS_DENIED;
+  }
+
+  PgTableMask = AddressEncMask | EFI_PAGE_MASK;
+
+
+  //
+  // Make sure that the page table is changeable.
+  //
+  IsWpEnabled = IsReadOnlyPageWriteProtected ();
+  if (IsWpEnabled) {
+    DisableReadOnlyPageWriteProtect ();
+  }
+
+  Status = EFI_SUCCESS;
+
+  while (Length)
+  {
+    //
+    // If Cr3BaseAddress is not specified then read the current CR3
+    //
+    if (Cr3BaseAddress == 0) {
+      Cr3BaseAddress = AsmReadCr3();
+    }
+
+    PageMapLevel4Entry = (VOID*) (Cr3BaseAddress & ~PgTableMask);
+    PageMapLevel4Entry += PML4_OFFSET(PhysicalAddress);
+    if (!PageMapLevel4Entry->Bits.Present) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a:%a: bad PML4 for Physical=0x%Lx\n",
+        gEfiCallerBaseName,
+        __FUNCTION__,
+        PhysicalAddress
+        ));
+      Status = RETURN_NO_MAPPING;
+      goto Done;
+    }
+
+    PageDirectory1GEntry = (VOID *)(
+                             (PageMapLevel4Entry->Bits.PageTableBaseAddress <<
+                              12) & ~PgTableMask
+                             );
+    PageDirectory1GEntry += PDP_OFFSET(PhysicalAddress);
+    if (!PageDirectory1GEntry->Bits.Present) {
+      PageDirectory1GEntry->Bits.Present = 1;
+      PageDirectory1GEntry->Bits.MustBe1 = 1;
+      PageDirectory1GEntry->Bits.MustBeZero = 0;
+      PageDirectory1GEntry->Bits.ReadWrite = 1;
+      PageDirectory1GEntry->Uint64 |= (UINT64)PhysicalAddress | AddressEncMask;
+    }
+
+    if (Length <= BIT30) {
+      Length = 0;
+    } else {
+      Length -= BIT30;
+    }
+
+    PhysicalAddress += BIT30;
+  }
+
+  //
+  // Flush TLB
+  //
+  CpuFlushTlb();
+
+Done:
+  //
+  // Restore page table write protection, if any.
+  //
+  if (IsWpEnabled) {
+    EnableReadOnlyPageWriteProtect ();
+  }
+
+  return Status;
+}
 
 /**
   This function either sets or clears memory encryption bit for the memory
