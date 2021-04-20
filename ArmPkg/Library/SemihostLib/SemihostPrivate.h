@@ -7,8 +7,8 @@
 
 **/
 
-#ifndef __SEMIHOST_PRIVATE_H__
-#define __SEMIHOST_PRIVATE_H__
+#ifndef SEMIHOST_PRIVATE_H_
+#define SEMIHOST_PRIVATE_H_
 
 typedef struct {
   CHAR8   *FileName;
@@ -209,4 +209,4 @@ GccSemihostCall (
 
 #endif // __CC_ARM
 
-#endif //__SEMIHOST_PRIVATE_H__
+#endif // SEMIHOST_PRIVATE_H_

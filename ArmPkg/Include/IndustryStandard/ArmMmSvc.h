@@ -6,8 +6,8 @@
 *
 **/
 
-#ifndef __ARM_MM_SVC_H__
-#define __ARM_MM_SVC_H__
+#ifndef ARM_MM_SVC_H_
+#define ARM_MM_SVC_H_
 
 /*
  * SVC IDs to allow the MM secure partition to initialise itself, handle
@@ -44,4 +44,4 @@
 #define SPM_MAJOR_VERSION                     0
 #define SPM_MINOR_VERSION                     1
 
-#endif
+#endif // ARM_MM_SVC_H_
