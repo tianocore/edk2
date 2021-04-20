@@ -51,7 +51,7 @@ EFI_FILE gSemihostFsFile = {
 };
 
 //
-// Device path for semi-hosting. It contains our autogened Caller ID GUID.
+// Device path for semi-hosting. It contains our auto-generated Caller ID GUID.
 //
 typedef struct {
   VENDOR_DEVICE_PATH        Guid;
