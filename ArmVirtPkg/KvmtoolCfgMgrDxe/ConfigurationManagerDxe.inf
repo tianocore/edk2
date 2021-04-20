@@ -1,0 +1,54 @@
+## @file
+#  Configuration Manager Dxe
+#
+#  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ConfigurationManagerDxe
+  FILE_GUID                      = 3C80D366-510C-4154-BB3A-E12439AD337C
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ConfigurationManagerDxeInitialize
+  UNLOAD_IMAGE                   = ConfigurationManagerDxeUnloadImage
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  AslTables/Dsdt.asl
+  ConfigurationManager.c
+  ConfigurationManager.h
+  ConfigurationManagerDxe.inf
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DynamicPlatRepoLib
+  HobLib
+  HwInfoParserLib
+  PrintLib
+  TableHelperLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid
+
+[Guids]
+  gFdtHobGuid
+
+[Depex]
+  gEdkiiPlatformHasAcpiGuid
