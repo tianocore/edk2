@@ -7,8 +7,8 @@
 
 **/
 
-#ifndef _OPTEE_SMC_H_
-#define _OPTEE_SMC_H_
+#ifndef OPTEE_SMC_H_
+#define OPTEE_SMC_H_
 
 /* Returned in Arg0 only from Trusted OS functions */
 #define OPTEE_SMC_RETURN_OK                     0x0
@@ -47,4 +47,4 @@ typedef struct {
   UINT8   Data4[8];
 } RFC4122_UUID;
 
-#endif
+#endif // OPTEE_SMC_H_

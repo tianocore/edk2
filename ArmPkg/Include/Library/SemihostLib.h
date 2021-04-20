@@ -7,8 +7,8 @@
 
 **/
 
-#ifndef __SEMIHOSTING_H__
-#define __SEMIHOSTING_H__
+#ifndef SEMIHOSTING_LIB_H_
+#define SEMIHOSTING_LIB_H_
 
 /*
  *
@@ -129,4 +129,4 @@ SemihostSystem (
   IN CHAR8 *CommandLine
   );
 
-#endif // __SEMIHOSTING_H__
+#endif // SEMIHOSTING_LIB_H_
