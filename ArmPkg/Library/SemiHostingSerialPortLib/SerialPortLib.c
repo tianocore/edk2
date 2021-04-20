@@ -37,11 +37,11 @@ SerialPortInitialize (
 /**
   Write data to serial device.
 
-  @param  Buffer           Point of data buffer which need to be writed.
+  @param  Buffer           Point of data buffer which need to be written.
   @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
 
   @retval 0                Write data failed.
-  @retval !0               Actual number of bytes writed to serial device.
+  @retval !0               Actual number of bytes written to serial device.
 
 **/
 
@@ -103,7 +103,7 @@ SerialPortWrite (
 /**
   Read data from serial device and save the datas in buffer.
 
-  @param  Buffer           Point of data buffer which need to be writed.
+  @param  Buffer           Point of data buffer which need to be written.
   @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
 
   @retval 0                Read data failed.
