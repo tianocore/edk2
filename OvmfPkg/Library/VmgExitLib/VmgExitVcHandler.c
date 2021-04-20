@@ -14,7 +14,10 @@
 #include <Library/VmgExitLib.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/Cpuid.h>
+#include <IndustryStandard/Q35MchIch9.h>
+#include <IndustryStandard/I440FxPiix4.h>
 #include <IndustryStandard/InstructionParsing.h>
+#include <Library/PcdLib.h>
 
 #include "VmgExitVcHandler.h"
 
@@ -596,6 +599,40 @@ UnsupportedExit (
   return Status;
 }
 
+STATIC
+BOOLEAN
+IsPmbaBaseAddress (
+  IN  UINTN     Address
+  )
+{
+  UINT16 HostBridgeDevId;
+  UINTN Pmba;
+
+  //
+  // Query Host Bridge DID to determine platform type
+  //
+  HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
+  switch (HostBridgeDevId) {
+    case INTEL_82441_DEVICE_ID:
+      Pmba = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
+      break;
+    case INTEL_Q35_MCH_DEVICE_ID:
+      Pmba = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
+      //
+      // Add the MMCONFIG base address to get the Pmba base access address
+      //
+      Pmba += FixedPcdGet64 (PcdPciExpressBaseAddress);
+      break;
+    default:
+      return FALSE;
+  }
+
+  // Round up the offset to page size
+  Pmba = Pmba & ~(SIZE_4KB - 1);
+
+  return (Address == Pmba);
+}
+
 /**
   Validate that the MMIO memory access is not to encrypted memory.
 
@@ -637,6 +674,14 @@ ValidateMmioMemory (
             MemoryLength
             );
   if (State == MemEncryptSevAddressRangeUnencrypted) {
+    return 0;
+  }
+
+  //
+  // Allow PMBASE accesses (which will have the encryption bit set before
+  // AmdSevDxe runs in the DXE phase)
+  //
+  if (IsPmbaBaseAddress (Address)) {
     return 0;
   }
 
