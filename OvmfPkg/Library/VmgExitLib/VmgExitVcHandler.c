@@ -678,6 +678,7 @@ MmioExit (
   UINTN   Bytes;
   UINT64  *Register;
   UINT8   OpCode, SignByte;
+  UINTN   Address;
 
   Bytes = 0;
 
@@ -726,6 +727,52 @@ MmioExit (
       return Status;
     }
     break;
+
+  //
+  // MMIO write (MOV moffsetX, aX)
+  //
+  case 0xA2:
+    Bytes = 1;
+    //
+    // fall through
+    //
+  case 0xA3:
+    Bytes = ((Bytes != 0) ? Bytes :
+             (InstructionData->DataSize == Size16Bits) ? 2 :
+             (InstructionData->DataSize == Size32Bits) ? 4 :
+             (InstructionData->DataSize == Size64Bits) ? 8 :
+             0);
+
+    InstructionData->ImmediateSize = (UINTN) (1 << InstructionData->AddrSize);
+    InstructionData->End += (UINTN) (1 << InstructionData->AddrSize);
+
+    if (InstructionData->AddrSize == Size8Bits) {
+      Address = *(UINT8 *) InstructionData->Immediate;
+    } else if (InstructionData->AddrSize == Size16Bits) {
+      Address = *(UINT16 *) InstructionData->Immediate;
+    } else if (InstructionData->AddrSize == Size32Bits) {
+      Address = *(UINT32 *) InstructionData->Immediate;
+    } else {
+      Address = *(UINTN *) InstructionData->Immediate;
+    }
+
+    Status = ValidateMmioMemory (Ghcb, Address, Bytes);
+    if (Status != 0) {
+      return Status;
+    }
+
+    ExitInfo1 = *((UINTN *) InstructionData->Immediate);
+    ExitInfo2 = Bytes;
+    CopyMem (Ghcb->SharedBuffer, &Regs->Rax, Bytes);
+
+    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
+    if (Status != 0) {
+      return Status;
+    }
+    break;
+
 
   //
   // MMIO write (MOV reg/memX, immX)
@@ -810,6 +857,58 @@ MmioExit (
     break;
 
   //
+  // MMIO read (MOV aX, moffsetX)
+  //
+  case 0xA0:
+    Bytes = 1;
+    //
+    // fall through
+    //
+  case 0xA1:
+    Bytes = ((Bytes != 0) ? Bytes :
+             (InstructionData->DataSize == Size16Bits) ? 2 :
+             (InstructionData->DataSize == Size32Bits) ? 4 :
+             (InstructionData->DataSize == Size64Bits) ? 8 :
+             0);
+
+    InstructionData->ImmediateSize = (UINTN) (1 << InstructionData->AddrSize);
+    InstructionData->End += (UINTN) (1 << InstructionData->AddrSize);
+
+    if (InstructionData->AddrSize == Size8Bits) {
+      Address = *(UINT8 *) InstructionData->Immediate;
+    } else if (InstructionData->AddrSize == Size16Bits) {
+      Address = *(UINT16 *) InstructionData->Immediate;
+    } else if (InstructionData->AddrSize == Size32Bits) {
+      Address = *(UINT32 *) InstructionData->Immediate;
+    } else {
+      Address = *(UINTN *) InstructionData->Immediate;
+    }
+
+    Status = ValidateMmioMemory (Ghcb, Address, Bytes);
+    if (Status != 0) {
+      return Status;
+    }
+
+    ExitInfo1 = *((UINTN *) InstructionData->Immediate);
+    ExitInfo2 = Bytes;
+
+    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
+    if (Status != 0) {
+      return Status;
+    }
+
+    if (Bytes == 4) {
+      //
+      // Zero-extend for 32-bit operation
+      //
+      Regs->Rax = 0;
+    }
+    CopyMem (&Regs->Rax, Ghcb->SharedBuffer, Bytes);
+    break;
+
+  //
   // MMIO read w/ zero-extension ((MOVZX regX, reg/memX)
   //
   case 0xB6:
@@ -886,6 +985,7 @@ MmioExit (
     break;
 
   default:
+    DEBUG ((DEBUG_INFO, "Invalid MMIO opcode (%x)\n", OpCode));
     Status = GP_EXCEPTION;
     ASSERT (FALSE);
   }
