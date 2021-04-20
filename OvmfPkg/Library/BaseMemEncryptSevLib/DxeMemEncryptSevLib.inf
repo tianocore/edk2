@@ -51,6 +51,7 @@
   DebugLib
   MemoryAllocationLib
   PcdLib
+  VmgExitLib
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
