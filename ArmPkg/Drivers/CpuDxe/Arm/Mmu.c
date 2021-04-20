@@ -345,7 +345,7 @@ EfiAttributeToArmAttribute (
       break;
 
     case EFI_MEMORY_WC:
-      // Map to normal non-cachable
+      // Map to normal non-cacheable
       ArmAttributes = TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
       break;
 

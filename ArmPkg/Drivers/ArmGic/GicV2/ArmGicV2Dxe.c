@@ -121,7 +121,7 @@ GicV2GetInterruptSourceState (
   @param This     Instance pointer for this protocol
   @param Source   Hardware source of the interrupt
 
-  @retval EFI_SUCCESS       Source interrupt EOI'ed.
+  @retval EFI_SUCCESS       Source interrupt ended successfully.
   @retval EFI_UNSUPPORTED   Source interrupt is not supported
 
 **/

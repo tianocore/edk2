@@ -23,9 +23,9 @@
 /**
   Get next language from language code list (with separator ';').
 
-  @param  LangCode       Input: point to first language in the list. On
-                         Otput: point to next language in the list, or
-                                NULL if no more language in the list.
+  @param  LangCode       Input:  point to first language in the list. On
+                         Output: point to next language in the list, or
+                                 NULL if no more language in the list.
   @param  Lang           The first language in the list.
 
 **/
