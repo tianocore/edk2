@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
 
-#ifndef __ARM_GIC_DXE_H__
-#define __ARM_GIC_DXE_H__
+#ifndef ARM_GIC_DXE_H_
+#define ARM_GIC_DXE_H_
 
 #include <Library/ArmGicLib.h>
 #include <Library/ArmLib.h>
@@ -76,4 +76,4 @@ GicGetDistributorIcfgBaseAndBit (
   OUT UINTN                               *Config1Bit
   );
 
-#endif
+#endif // ARM_GIC_DXE_H_

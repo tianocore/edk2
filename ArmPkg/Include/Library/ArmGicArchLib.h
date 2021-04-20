@@ -6,8 +6,8 @@
 *
 **/
 
-#ifndef __ARM_GIC_ARCH_LIB_H__
-#define __ARM_GIC_ARCH_LIB_H__
+#ifndef ARM_GIC_ARCH_LIB_H_
+#define ARM_GIC_ARCH_LIB_H_
 
 //
 // GIC definitions
@@ -24,4 +24,4 @@ ArmGicGetSupportedArchRevision (
   VOID
   );
 
-#endif
+#endif // ARM_GIC_ARCH_LIB_H_

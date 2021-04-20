@@ -10,8 +10,8 @@
 **/
 
 
-#ifndef __MACRO_IO_LIB_H__
-#define __MACRO_IO_LIB_H__
+#ifndef ASM_MACRO_IO_LIB_H_
+#define ASM_MACRO_IO_LIB_H_
 
 #define _ASM_FUNC(Name, Section)    \
   .global   Name                  ; \
@@ -36,4 +36,4 @@
   movt      Reg, #:upper16:(Sym) - (. + 12) ; \
   ldr       Reg, [pc, Reg]
 
-#endif
+#endif // ASM_MACRO_IO_LIB_H_

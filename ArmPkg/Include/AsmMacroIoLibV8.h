@@ -10,8 +10,8 @@
 **/
 
 
-#ifndef __MACRO_IO_LIBV8_H__
-#define __MACRO_IO_LIBV8_H__
+#ifndef ASM_MACRO_IO_LIBV8_H_
+#define ASM_MACRO_IO_LIBV8_H_
 
 // CurrentEL : 0xC = EL3; 8 = EL2; 4 = EL1
 // This only selects between EL1 and EL2, else we die.
@@ -54,4 +54,4 @@
   movk      Reg, ((Val) >> 16) & 0xffff, lsl #16  ; \
   movk      Reg, (Val) & 0xffff
 
-#endif // __MACRO_IO_LIBV8_H__
+#endif // ASM_MACRO_IO_LIBV8_H_

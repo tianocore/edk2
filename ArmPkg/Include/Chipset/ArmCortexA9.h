@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __ARM_CORTEX_A9_H__
-#define __ARM_CORTEX_A9_H__
+#ifndef ARM_CORTEX_A9_H_
+#define ARM_CORTEX_A9_H_
 
 #include <Chipset/ArmV7.h>
 
@@ -55,5 +55,5 @@ ArmGetScuBaseAddress (
   VOID
   );
 
-#endif
+#endif // ARM_CORTEX_A9_H_
 

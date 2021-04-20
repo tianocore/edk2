@@ -8,8 +8,8 @@
 
 **/
 
-#ifndef __AARCH64_LIB_H__
-#define __AARCH64_LIB_H__
+#ifndef AARCH64_LIB_H_
+#define AARCH64_LIB_H_
 
 typedef VOID (*AARCH64_CACHE_OPERATION)(UINTN);
 
@@ -52,5 +52,5 @@ ArmReadIdAA64Mmfr2 (
   VOID
   );
 
-#endif // __AARCH64_LIB_H__
+#endif // AARCH64_LIB_H_
 

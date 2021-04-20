@@ -10,8 +10,8 @@
 *    (https://developer.arm.com/documentation/den0028/c/?lang=en)
 **/
 
-#ifndef __ARM_STD_SMC_H__
-#define __ARM_STD_SMC_H__
+#ifndef ARM_STD_SMC_H_
+#define ARM_STD_SMC_H_
 
 /*
  * SMC function IDs for Standard Service queries
@@ -129,4 +129,4 @@
 /*                                    0xbf00ff02 is reserved */
 #define ARM_SMC_ID_TOS_REVISION       0xbf00ff03
 
-#endif
+#endif // ARM_STD_SMC_H_
