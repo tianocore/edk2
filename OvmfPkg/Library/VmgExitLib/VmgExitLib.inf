@@ -27,6 +27,7 @@
   PeiDxeVmgExitVcHandler.c
 
 [Packages]
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
@@ -37,4 +38,10 @@
   DebugLib
   LocalApicLib
   MemEncryptSevLib
+  PcdLib
 
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
