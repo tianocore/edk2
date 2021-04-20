@@ -716,6 +716,77 @@ AmlCreateLpiNode (
   OUT       AML_OBJECT_NODE_HANDLE  * NewLpiNode   OPTIONAL
   );
 
+/** Add an _LPI state to a LPI node created using AmlCreateLpiNode ().
+
+  AmlAddLpiState () increments the Count of LPI states in the LPI node by one,
+  and adds the following package:
+    Package() {
+      MinResidency,
+      WorstCaseWakeLatency,
+      Flags,
+      ArchFlags,
+      ResCntFreq,
+      EnableParentState,
+      (GenericRegisterDescriptor != NULL) ?           // Entry method. If a
+        ResourceTemplate(GenericRegisterDescriptor) : // Register is given,
+        Integer,                                      // use it. Use the
+                                                      // Integer otherwise.
+      ResourceTemplate() {                            // NULL Residency Counter
+        Register (SystemMemory, 0, 0, 0, 0)
+      },
+      ResourceTemplate() {                            // NULL Usage Counter
+        Register (SystemMemory, 0, 0, 0, 0)
+      },
+      ""                                              // NULL State Name
+    },
+
+  Cf ACPI 6.3 specification, s8.4.4 "Lower Power Idle States".
+
+  @ingroup CodeGenApis
+
+  @param [in]  MinResidency               Minimum Residency.
+  @param [in]  WorstCaseWakeLatency       Worst case wake-up latency.
+  @param [in]  Flags                      Flags.
+  @param [in]  ArchFlags                  Architectural flags.
+  @param [in]  ResCntFreq                 Residency Counter Frequency.
+  @param [in]  EnableParentState          Enabled Parent State.
+  @param [in]  GenericRegisterDescriptor  Entry Method.
+                                          If not NULL, use this Register to
+                                          describe the entry method address.
+  @param [in]  Integer                    Entry Method.
+                                          If GenericRegisterDescriptor is NULL,
+                                          take this value.
+  @param [in]  ResidencyCounterRegister   If not NULL, use it to populate the
+                                          residency counter register.
+  @param [in]  UsageCounterRegister       If not NULL, use it to populate the
+                                          usage counter register.
+  @param [in]  StateName                  If not NULL, use it to populate the
+                                          state name.
+  @param [in]  LpiNode                    Lpi node created with the function
+                                          AmlCreateLpiNode to which the new LPI
+                                          state is appended.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddLpiState (
+  IN  UINT32                                    MinResidency,
+  IN  UINT32                                    WorstCaseWakeLatency,
+  IN  UINT32                                    Flags,
+  IN  UINT32                                    ArchFlags,
+  IN  UINT32                                    ResCntFreq,
+  IN  UINT32                                    EnableParentState,
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * GenericRegisterDescriptor,  OPTIONAL
+  IN  UINT64                                    Integer,                    OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * ResidencyCounterRegister,   OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * UsageCounterRegister,       OPTIONAL
+  IN  CHAR8                                   * StateName,                  OPTIONAL
+  IN  AML_OBJECT_NODE_HANDLE                    LpiNode
+  );
+
 // DEPRECATED APIS
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
