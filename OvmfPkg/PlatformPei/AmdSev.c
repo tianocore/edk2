@@ -34,7 +34,9 @@ AmdSevSnpInitialize (
   VOID
   )
 {
-  RETURN_STATUS        PcdStatus;
+  RETURN_STATUS                 PcdStatus;
+  EFI_PEI_HOB_POINTERS          Hob;
+  EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceHob;
 
   if (!MemEncryptSevSnpIsEnabled ()) {
     return;
@@ -42,6 +44,22 @@ AmdSevSnpInitialize (
 
   PcdStatus = PcdSetBoolS (PcdSevSnpIsEnabled, TRUE);
   ASSERT_RETURN_ERROR (PcdStatus);
+
+  //
+  // Iterate through the system RAM and validate it.
+  //
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (Hob.Raw != NULL && GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      ResourceHob = Hob.ResourceDescriptor;
+
+      if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
+        MemEncryptSevSnpPreValidateSystemRam (
+          ResourceHob->PhysicalStart,
+          EFI_SIZE_TO_PAGES (ResourceHob->ResourceLength)
+          );
+      }
+    }
+  }
 }
 
 /**
@@ -205,6 +223,14 @@ AmdSevInitialize (
   }
 
   //
+  // Check and perform SEV-SNP initialization if required. This need to be
+  // done before the GHCB page is made shared in the current page table. This
+  // is because the system RAM must be validated before it is made shared.
+  // The AmdSevSnpInitialize() validates the system RAM.
+  //
+  AmdSevSnpInitialize ();
+
+  //
   // Set Memory Encryption Mask PCD
   //
   EncryptionMask = MemEncryptSevGetEncryptionMask ();
@@ -264,9 +290,4 @@ AmdSevInitialize (
   // Check and perform SEV-ES initialization if required.
   //
   AmdSevEsInitialize ();
-
-  //
-  // Check and perform SEV-SNP initialization if required.
-  //
-  AmdSevSnpInitialize ();
 }
