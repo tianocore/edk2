@@ -1474,8 +1474,11 @@ class PlatformAutoGen(AutoGen):
                 if ToolDef[Tool].get(TAB_TOD_DEFINES_BUILDRULEFAMILY, "") != "":
                     if Family != ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
                         continue
-                elif Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
-                    continue
+                else:
+                    if ToolDef[Tool].get(TAB_TOD_DEFINES_FAMILY, "") == "":
+                        continue
+                    if Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+                        continue
                 FamilyMatch = True
             # expand any wildcard
             if Target == TAB_STAR or Target == self.BuildTarget:
@@ -1509,6 +1512,8 @@ class PlatformAutoGen(AutoGen):
             if Tool not in ToolDef or Family == "":
                 continue
             # option has been added before
+            if TAB_TOD_DEFINES_FAMILY not in ToolDef[Tool]:
+                continue
             if Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
                 continue
 
