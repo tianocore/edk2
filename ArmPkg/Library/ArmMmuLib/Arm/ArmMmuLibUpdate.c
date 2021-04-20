@@ -124,7 +124,7 @@ UpdatePageEntries (
   } else if ((Attributes & EFI_MEMORY_WC) != 0) {
     // modify cacheability attributes
     EntryMask |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK;
-    // map to normal non-cachable
+    // map to normal non-cacheable
     EntryValue |= TT_DESCRIPTOR_PAGE_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
   } else if ((Attributes & EFI_MEMORY_WT) != 0) {
     // modify cacheability attributes
@@ -254,7 +254,7 @@ UpdateSectionEntries (
   } else if ((Attributes & EFI_MEMORY_WC) != 0) {
     // modify cacheability attributes
     EntryMask |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK;
-    // map to normal non-cachable
+    // map to normal non-cacheable
     EntryValue |= TT_DESCRIPTOR_SECTION_CACHE_POLICY_NON_CACHEABLE; // TEX [2:0]= 001 = 0x2, B=0, C=0
   } else if ((Attributes & EFI_MEMORY_WT) != 0) {
     // modify cacheability attributes
