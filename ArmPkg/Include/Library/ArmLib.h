@@ -8,8 +8,8 @@
 
 **/
 
-#ifndef __ARM_LIB__
-#define __ARM_LIB__
+#ifndef ARM_LIB_H_
+#define ARM_LIB_H_
 
 #include <Uefi/UefiBaseType.h>
 
@@ -753,4 +753,4 @@ ArmHasSecurityExtensions (
   );
 #endif // MDE_CPU_ARM
 
-#endif // __ARM_LIB__
+#endif // ARM_LIB_H_
