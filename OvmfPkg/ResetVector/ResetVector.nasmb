@@ -90,5 +90,7 @@
   %define SEV_LAUNCH_SECRET_SIZE  FixedPcdGet32 (PcdSevLaunchSecretSize)
   %define SNP_CPUID_BASE  FixedPcdGet32 (PcdOvmfSnpCpuidBase)
   %define SNP_CPUID_SIZE  FixedPcdGet32 (PcdOvmfSnpCpuidSize)
+  %define SNP_HV_VALIDATED_START FixedPcdGet32 (PcdOvmfSnpHypervisorPreValidatedStart)
+  %define SNP_HV_VALIDATED_END FixedPcdGet32 (PcdOvmfSnpHypervisorPreValidatedEnd)
 %include "Ia16/ResetVectorVtf0.asm"
 
