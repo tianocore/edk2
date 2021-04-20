@@ -855,8 +855,8 @@ SmbiosPrintStructure (
     PRINT_STRUCT_VALUE_H (Struct, Type20, InterleavePosition);
     PRINT_STRUCT_VALUE_H (Struct, Type20, InterleavedDataDepth);
     if (AE_SMBIOS_VERSION (0x2, 0x7) && (Struct->Hdr->Length > 0x13)) {
-      PRINT_STRUCT_VALUE_LH (Struct, Type19, ExtendedStartingAddress);
-      PRINT_STRUCT_VALUE_LH (Struct, Type19, ExtendedEndingAddress);
+      PRINT_STRUCT_VALUE_LH (Struct, Type20, ExtendedStartingAddress);
+      PRINT_STRUCT_VALUE_LH (Struct, Type20, ExtendedEndingAddress);
     }
     break;
 
