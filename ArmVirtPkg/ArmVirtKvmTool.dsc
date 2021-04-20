@@ -28,6 +28,7 @@
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtKvmTool.fdf
 
 !include ArmVirtPkg/ArmVirt.dsc.inc
+!include DynamicTablesPkg/DynamicTables.dsc.inc
 
 !include MdePkg/MdeLibs.dsc.inc
 
@@ -144,6 +145,11 @@
   #
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
 
+  #
+  # ACPI Table Version
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x20
+
 [PcdsPatchableInModule.common]
   #
   # This will be overridden in the code
@@ -198,8 +204,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
 
-  ## Force DTB
-  gArmVirtTokenSpaceGuid.PcdForceNoAcpi|TRUE
+  ## Set default option to ACPI
+  gArmVirtTokenSpaceGuid.PcdForceNoAcpi|FALSE
 
   # Setup Flash storage variables
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
@@ -356,3 +362,8 @@
   }
   OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
   OvmfPkg/Virtio10Dxe/Virtio10.inf
+  #
+  # ACPI Support
+  #
+  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  ArmVirtPkg/KvmtoolCfgMgrDxe/ConfigurationManagerDxe.inf
