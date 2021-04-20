@@ -105,7 +105,14 @@ FV = PEIFV
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
 FV = DXEFV
 
-################################################################################
+##########################################################################################
+#
+# The range of the pages pre-validated through the SEV-SNP firmware while creating SEV-SNP guest
+#
+SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpHypervisorPreValidatedStart = $(MEMFD_BASE_ADDRESS) + gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
+
+SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpHypervisorPreValidatedEnd = $(MEMFD_BASE_ADDRESS) + gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
+##########################################################################################
 
 [FV.SECFV]
 FvNameGuid         = 763BED0D-DE9F-48F5-81F1-3E90E1B1A015
