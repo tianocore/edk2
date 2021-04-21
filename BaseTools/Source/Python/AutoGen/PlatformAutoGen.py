@@ -841,6 +841,12 @@ class PlatformAutoGen(AutoGen):
         DllPathList = set()
         for Def in ToolDefinition:
             Target, Tag, Arch, Tool, Attr = Def.split("_")
+            if Target == TAB_STAR:
+                Target = self.BuildTarget
+            if Tag == TAB_STAR:
+                Tag = self.ToolChain
+            if Arch == TAB_STAR:
+                Arch = self.Arch
             if Target != self.BuildTarget or Tag != self.ToolChain or Arch != self.Arch:
                 continue
 
@@ -850,9 +856,14 @@ class PlatformAutoGen(AutoGen):
                 DllPathList.add(Value)
                 continue
 
+            #
+            # ToolDefintion is sorted from highest priority to lowest priority.
+            # Only add the first(highest priority) match to RetVal
+            #
             if Tool not in RetVal:
                 RetVal[Tool] = OrderedDict()
-            RetVal[Tool][Attr] = Value
+            if Attr not in RetVal[Tool]:
+                RetVal[Tool][Attr] = Value
 
         ToolsDef = ''
         if GlobalData.gOptions.SilentMode and "MAKE" in RetVal:
@@ -860,9 +871,21 @@ class PlatformAutoGen(AutoGen):
                 RetVal["MAKE"]["FLAGS"] = ""
             RetVal["MAKE"]["FLAGS"] += " -s"
         MakeFlags = ''
-        for Tool in RetVal:
-            for Attr in RetVal[Tool]:
-                Value = RetVal[Tool][Attr]
+
+        ToolList = list(RetVal.keys())
+        ToolList.sort()
+        for Tool in ToolList:
+            if Tool == TAB_STAR:
+                continue
+            AttrList = list(RetVal[Tool].keys())
+            if TAB_STAR in ToolList:
+                AttrList += list(RetVal[TAB_STAR])
+            AttrList.sort()
+            for Attr in AttrList:
+                if Attr in RetVal[Tool]:
+                    Value = RetVal[Tool][Attr]
+                else:
+                    Value = RetVal[TAB_STAR][Attr]
                 if Tool in self._BuildOptionWithToolDef(RetVal) and Attr in self._BuildOptionWithToolDef(RetVal)[Tool]:
                     # check if override is indicated
                     if self._BuildOptionWithToolDef(RetVal)[Tool][Attr].startswith('='):
@@ -877,7 +900,7 @@ class PlatformAutoGen(AutoGen):
                 if Attr == "PATH":
                     # Don't put MAKE definition in the file
                     if Tool != "MAKE":
-                        ToolsDef += "%s = %s\n" % (Tool, Value)
+                        ToolsDef += "%s_%s = %s\n" % (Tool, Attr, Value)
                 elif Attr != "DLL":
                     # Don't put MAKE definition in the file
                     if Tool == "MAKE":
@@ -1469,17 +1492,31 @@ class PlatformAutoGen(AutoGen):
             Family = Key[0]
             Target, Tag, Arch, Tool, Attr = Key[1].split("_")
             # if tool chain family doesn't match, skip it
-            if Tool in ToolDef and Family != "":
-                FamilyIsNull = False
-                if ToolDef[Tool].get(TAB_TOD_DEFINES_BUILDRULEFAMILY, "") != "":
-                    if Family != ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
-                        continue
-                else:
-                    if ToolDef[Tool].get(TAB_TOD_DEFINES_FAMILY, "") == "":
-                        continue
-                    if Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
-                        continue
-                FamilyMatch = True
+            if Family != "":
+                Found = False
+                if Tool in ToolDef:
+                    FamilyIsNull = False
+                    if TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDef[Tool]:
+                        if Family == ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                    if TAB_TOD_DEFINES_FAMILY in ToolDef[Tool]:
+                        if Family == ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                if TAB_STAR in ToolDef:
+                    FamilyIsNull = False
+                    if TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDef[TAB_STAR]:
+                        if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                    if TAB_TOD_DEFINES_FAMILY in ToolDef[TAB_STAR]:
+                        if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_FAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                if not Found:
+                    continue
+
             # expand any wildcard
             if Target == TAB_STAR or Target == self.BuildTarget:
                 if Tag == TAB_STAR or Tag == self.ToolChain:
@@ -1509,12 +1546,19 @@ class PlatformAutoGen(AutoGen):
             Family = Key[0]
             Target, Tag, Arch, Tool, Attr = Key[1].split("_")
             # if tool chain family doesn't match, skip it
-            if Tool not in ToolDef or Family == "":
+            if Family == "":
                 continue
             # option has been added before
-            if TAB_TOD_DEFINES_FAMILY not in ToolDef[Tool]:
-                continue
-            if Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+            Found = False
+            if Tool in ToolDef:
+                if TAB_TOD_DEFINES_FAMILY in ToolDef[Tool]:
+                    if Family == ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+                        Found = True
+            if TAB_STAR in ToolDef:
+                if TAB_TOD_DEFINES_FAMILY in ToolDef[TAB_STAR]:
+                    if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_FAMILY]:
+                        Found = True
+            if not Found:
                 continue
 
             # expand any wildcard
