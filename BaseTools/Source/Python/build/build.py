@@ -2,7 +2,7 @@
 # build a platform or a module
 #
 #  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-#  Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
 #  Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
 #
@@ -62,6 +62,8 @@ from AutoGen.ModuleAutoGenHelper import WorkSpaceInfo, PlatformInfo
 from GenFds.FdfParser import FdfParser
 from AutoGen.IncludesAutoGen import IncludesAutoGen
 from GenFds.GenFds import resetFdsGlobalVariable
+
+import configparser
 
 ## standard targets of build command
 gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'clean', 'cleanall', 'cleanlib', 'run']
@@ -889,11 +891,69 @@ class Build():
         except:
             return False, UNKNOWN_ERROR
 
+    def ReadDscFile (self, File):
+        try:
+            Lines = [Line.strip() for Line in open(File.OriginalPath.Path).readlines()]
+        except:
+            return []
+        Result = []
+        for Line in Lines:
+            if Line.startswith ('!include '):
+                IncludeFile = Line.split('!include')[1].strip()
+                IncludeFile = PathClass(NormFile(IncludeFile, self.WorkspaceDir), self.WorkspaceDir)
+                Result += self.ReadDscFile (IncludeFile)
+            else:
+                Result.append(Line)
+        return Result
+
+    def GetToolChainAndFamilyFromDsc (self, File):
+        config = configparser.ConfigParser(strict=False,delimiters=('=','|'),allow_no_value=True)
+        config.optionxform = lambda option: option
+        config.read_string('\n'.join(self.ReadDscFile(File)))
+        for section in config.sections():
+            if section.startswith ('BuildOptions'):
+                for item in config[section].items():
+                    if item[0].strip().endswith ('_FAMILY'):
+                        ToolChain = item[0].split('_')[1]
+                        Family =item[1].strip().lstrip('=').strip()
+                        if TAB_TOD_DEFINES_FAMILY not in self.ToolDef.ToolsDefTxtDatabase:
+                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY] = {}
+                        if ToolChain not in self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY]:
+                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_FAMILY][ToolChain] = Family
+                        if TAB_TOD_DEFINES_BUILDRULEFAMILY not in self.ToolDef.ToolsDefTxtDatabase:
+                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY] = {}
+                        if ToolChain not in self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_BUILDRULEFAMILY][ToolChain] = Family
+                        if TAB_TOD_DEFINES_TOOL_CHAIN_TAG not in self.ToolDef.ToolsDefTxtDatabase:
+                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG] = []
+                        if ToolChain not in self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG]:
+                            self.ToolDef.ToolsDefTxtDatabase[TAB_TOD_DEFINES_TOOL_CHAIN_TAG].append(ToolChain)
+
     ## Load configuration
     #
     #   This method will parse target.txt and get the build configurations.
     #
     def LoadConfiguration(self):
+
+        if not self.PlatformFile:
+            PlatformFile = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_ACTIVE_PLATFORM]
+            if not PlatformFile:
+                # Try to find one in current directory
+                WorkingDirectory = os.getcwd()
+                FileList = glob.glob(os.path.normpath(os.path.join(WorkingDirectory, '*.dsc')))
+                FileNum = len(FileList)
+                if FileNum >= 2:
+                    EdkLogger.error("build", OPTION_MISSING,
+                                    ExtraData="There are %d DSC files in %s. Use '-p' to specify one.\n" % (FileNum, WorkingDirectory))
+                elif FileNum == 1:
+                    PlatformFile = FileList[0]
+                else:
+                    EdkLogger.error("build", RESOURCE_NOT_AVAILABLE,
+                                    ExtraData="No active platform specified in target.txt or command line! Nothing can be built.\n")
+
+            self.PlatformFile = PathClass(NormFile(PlatformFile, self.WorkspaceDir), self.WorkspaceDir)
+
+        self.GetToolChainAndFamilyFromDsc (self.PlatformFile)
 
         # if no ARCH given in command line, get it from target.txt
         if not self.ArchList:
@@ -935,23 +995,6 @@ class Build():
                 ToolChainFamily.append(ToolDefinition[TAB_TOD_DEFINES_FAMILY][Tool])
         self.ToolChainFamily = ToolChainFamily
 
-        if not self.PlatformFile:
-            PlatformFile = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_ACTIVE_PLATFORM]
-            if not PlatformFile:
-                # Try to find one in current directory
-                WorkingDirectory = os.getcwd()
-                FileList = glob.glob(os.path.normpath(os.path.join(WorkingDirectory, '*.dsc')))
-                FileNum = len(FileList)
-                if FileNum >= 2:
-                    EdkLogger.error("build", OPTION_MISSING,
-                                    ExtraData="There are %d DSC files in %s. Use '-p' to specify one.\n" % (FileNum, WorkingDirectory))
-                elif FileNum == 1:
-                    PlatformFile = FileList[0]
-                else:
-                    EdkLogger.error("build", RESOURCE_NOT_AVAILABLE,
-                                    ExtraData="No active platform specified in target.txt or command line! Nothing can be built.\n")
-
-            self.PlatformFile = PathClass(NormFile(PlatformFile, self.WorkspaceDir), self.WorkspaceDir)
         self.ThreadNumber   = ThreadNum()
     ## Initialize build configuration
     #
@@ -2381,24 +2424,25 @@ class Build():
                     continue
 
                 for Arch in self.ArchList:
-                    # Build up the list of supported architectures for this build
-                    prefix = '%s_%s_%s_' % (BuildTarget, ToolChain, Arch)
-
                     # Look through the tool definitions for GUIDed tools
                     guidAttribs = []
                     for (attrib, value) in self.ToolDef.ToolsDefTxtDictionary.items():
-                        if attrib.upper().endswith('_GUID'):
-                            split = attrib.split('_')
-                            thisPrefix = '_'.join(split[0:3]) + '_'
-                            if thisPrefix == prefix:
-                                guid = self.ToolDef.ToolsDefTxtDictionary[attrib]
-                                guid = guid.lower()
-                                toolName = split[3]
-                                path = '_'.join(split[0:4]) + '_PATH'
-                                path = self.ToolDef.ToolsDefTxtDictionary[path]
-                                path = self.GetRealPathOfTool(path)
-                                guidAttribs.append((guid, toolName, path))
-
+                        GuidBuildTarget, GuidToolChain, GuidArch, GuidTool, GuidAttr = attrib.split('_')
+                        if GuidAttr.upper() == 'GUID':
+                            if GuidBuildTarget == TAB_STAR:
+                                GuidBuildTarget = BuildTarget
+                            if GuidToolChain == TAB_STAR:
+                                GuidToolChain = ToolChain
+                            if GuidArch == TAB_STAR:
+                                GuidArch = Arch
+                            if GuidBuildTarget == BuildTarget and GuidToolChain == ToolChain and GuidArch == Arch:
+                                path = '_'.join(attrib.split('_')[:-1]) + '_PATH'
+                                if path in self.ToolDef.ToolsDefTxtDictionary:
+                                    path = self.ToolDef.ToolsDefTxtDictionary[path]
+                                    path = self.GetRealPathOfTool(path)
+                                    guidAttribs.append((value.lower(), GuidTool, path))
+                    # Sort by GuidTool name
+                    sorted (guidAttribs, key=lambda x: x[1])
                     # Write out GuidedSecTools.txt
                     toolsFile = os.path.join(FvDir, 'GuidedSectionTools.txt')
                     toolsFile = open(toolsFile, 'wt')
