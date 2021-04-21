@@ -1,7 +1,7 @@
 ## @file
 # Global variables for GenFds
 #
-#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -875,14 +875,27 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
     ToolOptionKey = None
     KeyList = None
     for tool_def in ToolDefinition.items():
-        if NameGuid.lower() == tool_def[1].lower():
-            KeyList = tool_def[0].split('_')
-            Key = KeyList[0] + \
-                  '_' + \
-                  KeyList[1] + \
-                  '_' + \
-                  KeyList[2]
-            if Key in KeyStringList and KeyList[4] == DataType.TAB_GUID:
+        KeyList = tool_def[0].split('_')
+        if len(KeyList) < 5:
+            continue
+        if KeyList[4] != DataType.TAB_GUID:
+            continue
+        if NameGuid.lower() != tool_def[1].lower():
+            continue
+        Key = KeyList[0] + \
+                '_' + \
+                KeyList[1] + \
+                '_' + \
+                KeyList[2]
+        for KeyString in KeyStringList:
+            KeyStringBuildTarget, KeyStringToolChain, KeyStringArch = KeyString.split('_')
+            if KeyList[0] == DataType.TAB_STAR:
+                KeyList[0] = KeyStringBuildTarget
+            if KeyList[1] == DataType.TAB_STAR:
+                KeyList[1] = KeyStringToolChain
+            if KeyList[2] == DataType.TAB_STAR:
+                KeyList[2] = KeyStringArch
+            if KeyList[0] == KeyStringBuildTarget and KeyList[1] == KeyStringToolChain and KeyList[2] == KeyStringArch:
                 ToolPathKey   = Key + '_' + KeyList[3] + '_PATH'
                 ToolOptionKey = Key + '_' + KeyList[3] + '_FLAGS'
                 ToolPath = ToolDefinition.get(ToolPathKey)
