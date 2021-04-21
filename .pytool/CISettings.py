@@ -49,7 +49,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
         ''' return iterable of edk2 packages supported by this build.
         These should be edk2 workspace relative paths '''
 
-        return ("ArmVirtPkg",
+        return ("ArmPkg",
+                "ArmVirtPkg",
                 "DynamicTablesPkg",
                 "EmulatorPkg",
                 "MdePkg",
