@@ -22,7 +22,7 @@ jobs:
   strategy:
     matrix:
       TARGET_ARM:
-        Build.Pkgs: 'ArmPkg'
+        Build.Pkgs: 'ArmPkg,ArmPlatformPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_MDE_CPU:
         Build.Pkgs: 'MdePkg,UefiCpuPkg'
