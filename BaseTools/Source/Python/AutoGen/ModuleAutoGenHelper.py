@@ -173,17 +173,30 @@ class AutoGenInfo(object):
             Family = Key[0]
             Target, Tag, Arch, Tool, Attr = Key[1].split("_")
             # if tool chain family doesn't match, skip it
-            if Tool in ToolDef and Family != "":
-                FamilyIsNull = False
-                if ToolDef[Tool].get(TAB_TOD_DEFINES_BUILDRULEFAMILY, "") != "":
-                    if Family != ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
-                        continue
-                else:
-                    if ToolDef[Tool].get(TAB_TOD_DEFINES_FAMILY, "") == "":
-                        continue
-                    if Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
-                        continue
-                FamilyMatch = True
+            if Family != "":
+                Found = False
+                if Tool in ToolDef:
+                    FamilyIsNull = False
+                    if TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDef[Tool]:
+                        if Family == ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                    if TAB_TOD_DEFINES_FAMILY in ToolDef[Tool]:
+                        if Family == ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                if TAB_STAR in ToolDef:
+                    FamilyIsNull = False
+                    if TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDef[TAB_STAR]:
+                        if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                    if TAB_TOD_DEFINES_FAMILY in ToolDef[TAB_STAR]:
+                        if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_FAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                if not Found:
+                    continue
             # expand any wildcard
             if Target == TAB_STAR or Target == self.BuildTarget:
                 if Tag == TAB_STAR or Tag == self.ToolChain:
@@ -213,12 +226,19 @@ class AutoGenInfo(object):
             Family = Key[0]
             Target, Tag, Arch, Tool, Attr = Key[1].split("_")
             # if tool chain family doesn't match, skip it
-            if Tool not in ToolDef or Family == "":
+            if Family == "":
                 continue
             # option has been added before
-            if TAB_TOD_DEFINES_FAMILY not in ToolDef[Tool]:
-                continue
-            if Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+            Found = False
+            if Tool in ToolDef:
+                if TAB_TOD_DEFINES_FAMILY in ToolDef[Tool]:
+                    if Family == ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+                        Found = True
+            if TAB_STAR in ToolDef:
+                if TAB_TOD_DEFINES_FAMILY in ToolDef[TAB_STAR]:
+                    if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_FAMILY]:
+                        Found = True
+            if not Found:
                 continue
 
             # expand any wildcard
