@@ -5,7 +5,7 @@
 | Package              | Windows VS2019 (IA32/X64)| Ubuntu GCC (IA32/X64/ARM/AARCH64) | Known Issues |
 | :----                | :-----                   | :----                             | :---         |
 | ArmPkg               |                    | :heavy_check_mark: |
-| ArmPlatformPkg       |
+| ArmPlatformPkg       |                    | :heavy_check_mark: |
 | ArmVirtPkg           | SEE PACKAGE README | SEE PACKAGE README |
 | CryptoPkg            | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
 | DynamicTablesPkg     |                    | :heavy_check_mark: |
