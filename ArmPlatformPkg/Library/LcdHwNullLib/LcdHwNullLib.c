@@ -23,7 +23,7 @@ LcdIdentify (
   VOID
   )
 {
-  return EFI_SUCCESS;
+  return EFI_NOT_FOUND;
 }
 
 /**
