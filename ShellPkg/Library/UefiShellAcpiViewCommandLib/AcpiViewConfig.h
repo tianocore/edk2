@@ -1,7 +1,7 @@
 /** @file
   Header file for 'acpiview' configuration.
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -106,6 +106,7 @@ typedef enum {
   ReportSelected,     ///< Report Selected table.
   ReportTableList,    ///< Report List of tables.
   ReportDumpBinFile,  ///< Dump selected table to a file.
+  ReportDotGraph,     ///< Create Dot Graph for selected compatible table.
   ReportMax,
 } EREPORT_OPTION;
 

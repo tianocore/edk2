@@ -20,11 +20,13 @@
   Flags for the parser.
 */
 #define PARSE_FLAGS_TRACE               BIT0
+#define PARSE_FLAGS_GRAPH               BIT1
 
 /**
   Helper macros to test parser flags.
 */
 #define IS_TRACE_FLAG_SET(Flags) (((Flags) & PARSE_FLAGS_TRACE) != 0)
+#define IS_GRAPH_FLAG_SET(Flags) (((Flags) & PARSE_FLAGS_GRAPH) != 0)
 
 /**
   This function increments the ACPI table error counter.
