@@ -1,7 +1,7 @@
 /** @file
   FADT table parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -198,7 +198,7 @@ STATIC CONST ACPI_PARSER FadtParser[] = {
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -206,7 +206,7 @@ STATIC CONST ACPI_PARSER FadtParser[] = {
 VOID
 EFIAPI
 ParseAcpiFadt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -219,6 +219,9 @@ ParseAcpiFadt (
   UINT32                  FacsLength;
   UINT8                   FacsRevision;
   PARSE_ACPI_TABLE_PROC   FacsParserProc;
+  BOOLEAN                 Trace;
+
+  Trace = IS_TRACE_FLAG_SET (ParseFlags);
 
   ParseAcpi (
     Trace,
@@ -253,7 +256,7 @@ ParseAcpiFadt (
     // if HW_REDUCED_ACPI flag is not set, both FIRMWARE_CTRL and
     // X_FIRMWARE_CTRL cannot be zero, and the FACS Table must be
     // present.
-    if ((Trace) &&
+    if (Trace &&
         (Flags != NULL) &&
         ((*Flags & EFI_ACPI_6_3_HW_REDUCED_ACPI) != EFI_ACPI_6_3_HW_REDUCED_ACPI)) {
       IncrementErrorCount ();
@@ -274,11 +277,15 @@ ParseAcpiFadt (
     // The FACS version is 1 byte starting at offset 32.
     FacsRevision = *(UINT8*)(FirmwareCtrlPtr + FACS_VERSION_OFFSET);
 
-    Trace = ProcessTableReportOptions (
-              FacsSignature,
-              FirmwareCtrlPtr,
-              FacsLength
-              );
+    if (ProcessTableReportOptions (
+          FacsSignature,
+          FirmwareCtrlPtr,
+          FacsLength
+          )) {
+      ParseFlags |= PARSE_FLAGS_TRACE;
+    } else {
+      ParseFlags &= ~PARSE_FLAGS_TRACE;
+    }
 
     Status = GetParser (FacsSignature, &FacsParserProc);
     if (EFI_ERROR (Status)) {
@@ -289,7 +296,7 @@ ParseAcpiFadt (
     }
 
     FacsParserProc (
-      Trace,
+      ParseFlags,
       FirmwareCtrlPtr,
       FacsLength,
       FacsRevision
