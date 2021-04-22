@@ -458,6 +458,7 @@ F: OvmfPkg/PlatformPei/AmdSev.c
 F: OvmfPkg/ResetVector/
 F: OvmfPkg/Sec/
 R: Brijesh Singh <brijesh.singh@amd.com>
+R: Erdem Aktas <erdemaktas@google.com>
 R: James Bottomley <jejb@linux.ibm.com>
 R: Jiewen Yao <jiewen.yao@intel.com>
 R: Min Xu <min.m.xu@intel.com>
