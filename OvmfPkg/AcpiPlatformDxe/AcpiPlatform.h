@@ -67,6 +67,12 @@ InstallQemuFwCfgTables (
 
 EFI_STATUS
 EFIAPI
+InstallClhAcpiTable (
+  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
+  );
+
+EFI_STATUS
+EFIAPI
 InstallAcpiTables (
   IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiTable
   );

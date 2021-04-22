@@ -374,3 +374,10 @@
   #  firmware contains a CSM (Compatibility Support Module).
   #
   gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable|FALSE|BOOLEAN|0x35
+
+  ##
+  # This is the physical address of rsdp which is the core struct of Acpi.
+  # Some hypervisor may has no way to pass rsdp address to the guest, so a PCD
+  # is worth for those.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdRsdpBaseAddress|0x0|UINT64|0x000000047

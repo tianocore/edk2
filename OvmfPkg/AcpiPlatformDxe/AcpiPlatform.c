@@ -249,8 +249,10 @@ InstallAcpiTables (
 
   if (XenDetected ()) {
     Status = InstallXenTables (AcpiTable);
-  } else {
+  } else if (QemuDetected ()) {
     Status = InstallQemuFwCfgTables (AcpiTable);
+  } else {
+    Status = InstallClhTables (AcpiTable);
   }
 
   if (EFI_ERROR (Status)) {

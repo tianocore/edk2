@@ -1,0 +1,56 @@
+## @file
+#  OVMF ACPI Platform Driver for Cloud Hypervisor
+#
+#  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ClhFwCfgAcpiPlatform
+  FILE_GUID                      = 17985e6f-e778-4d94-aefa-c5dd2b77e186
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AcpiPlatformEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  AcpiPlatform.h
+  BootScript.c
+  EntryPoint.c
+  PciDecoding.c
+  ClhAcpiPlatform.c
+  ClhAcpi.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  OrderedCollectionLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiPciIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMED
+
+[Guids]
+  gRootBridgesConnectedEventGroupGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
+  gUefiOvmfPkgTokenSpaceGuid.PcdRsdpBaseAddress
+
+[Depex]
+  gEfiAcpiTableProtocolGuid
