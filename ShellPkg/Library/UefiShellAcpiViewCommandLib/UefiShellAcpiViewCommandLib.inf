@@ -1,7 +1,7 @@
 ##  @file
 # Provides Shell 'acpiview' command functions
 #
-# Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.<BR>
+# Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -27,6 +27,8 @@
   AcpiView.h
   AcpiViewConfig.c
   AcpiViewConfig.h
+  DotGenerator.c
+  DotGenerator.h
   Parsers/Aest/AestParser.c
   Parsers/Bgrt/BgrtParser.c
   Parsers/Dbg2/Dbg2Parser.c
