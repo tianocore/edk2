@@ -1,7 +1,7 @@
 /** @file
   ACPI table parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Glossary:
@@ -183,7 +183,7 @@ ProcessAcpiTable (
   )
 {
   EFI_STATUS    Status;
-  BOOLEAN       Trace;
+  UINT8         ParseFlags;
   CONST UINT32* AcpiTableSignature;
   CONST UINT32* AcpiTableLength;
   CONST UINT8*  AcpiTableRevision;
@@ -197,13 +197,13 @@ ProcessAcpiTable (
     &AcpiTableRevision
     );
 
-  Trace = ProcessTableReportOptions (
-            *AcpiTableSignature,
-            Ptr,
-            *AcpiTableLength
-            );
+  ParseFlags = ProcessTableReportOptions (
+                 *AcpiTableSignature,
+                 Ptr,
+                 *AcpiTableLength
+                 );
 
-  if (Trace) {
+  if (IS_TRACE_FLAG_SET (ParseFlags)) {
     DumpRaw (Ptr, *AcpiTableLength);
 
     // Do not process the ACPI table any further if the table length read
@@ -236,14 +236,14 @@ ProcessAcpiTable (
   Status = GetParser (*AcpiTableSignature, &ParserProc);
   if (EFI_ERROR (Status)) {
     // No registered parser found, do default handling.
-    if (Trace) {
+    if (IS_TRACE_FLAG_SET (ParseFlags)) {
       DumpAcpiHeader (Ptr);
     }
     return;
   }
 
   ParserProc (
-    Trace,
+    ParseFlags,
     Ptr,
     *AcpiTableLength,
     *AcpiTableRevision

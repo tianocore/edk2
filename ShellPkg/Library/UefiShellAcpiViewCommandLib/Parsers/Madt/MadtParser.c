@@ -1,7 +1,7 @@
 /** @file
   MADT table parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -216,7 +216,7 @@ STATIC CONST ACPI_PARSER MadtInterruptControllerHeaderParser[] = {
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -224,7 +224,7 @@ STATIC CONST ACPI_PARSER MadtInterruptControllerHeaderParser[] = {
 VOID
 EFIAPI
 ParseAcpiMadt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -236,7 +236,7 @@ ParseAcpiMadt (
 
   GICDCount = 0;
 
-  if (!Trace) {
+  if (!IS_TRACE_FLAG_SET (ParseFlags)) {
     return;
   }
 

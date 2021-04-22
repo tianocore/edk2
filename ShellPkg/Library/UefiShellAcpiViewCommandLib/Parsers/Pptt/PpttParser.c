@@ -1,7 +1,7 @@
 /** @file
   PPTT table parser
 
-  Copyright (c) 2019 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -241,13 +241,15 @@ STATIC CONST ACPI_PARSER IdStructureParser[] = {
 /**
   This function parses the Processor Hierarchy Node Structure (Type 0).
 
-  @param [in] Ptr     Pointer to the start of the Processor Hierarchy Node
-                      Structure data.
-  @param [in] Length  Length of the Processor Hierarchy Node Structure.
+  @param [in] ParseFlags   Flags describing what the parser needs to do.
+  @param [in] Ptr          Pointer to the start of the Processor Hierarchy Node
+                           Structure data.
+  @param [in] Length       Length of the Processor Hierarchy Node Structure.
 **/
 STATIC
 VOID
 DumpProcessorHierarchyNodeStructure (
+  IN UINT8  ParseFlags,
   IN UINT8* Ptr,
   IN UINT8  Length
   )
@@ -257,7 +259,7 @@ DumpProcessorHierarchyNodeStructure (
   CHAR16 Buffer[OUTPUT_FIELD_COLUMN_WIDTH];
 
   Offset = ParseAcpi (
-             TRUE,
+             IS_TRACE_FLAG_SET (ParseFlags),
              2,
              "Processor Hierarchy Node Structure",
              Ptr,
@@ -315,18 +317,20 @@ DumpProcessorHierarchyNodeStructure (
 /**
   This function parses the Cache Type Structure (Type 1).
 
-  @param [in] Ptr     Pointer to the start of the Cache Type Structure data.
-  @param [in] Length  Length of the Cache Type Structure.
+  @param [in] ParseFlags  Flags describing what the parser needs to do.
+  @param [in] Ptr         Pointer to the start of the Cache Type Structure data.
+  @param [in] Length      Length of the Cache Type Structure.
 **/
 STATIC
 VOID
 DumpCacheTypeStructure (
+  IN UINT8  ParseFlags,
   IN UINT8* Ptr,
   IN UINT8  Length
   )
 {
   ParseAcpi (
-    TRUE,
+    IS_TRACE_FLAG_SET (ParseFlags),
     2,
     "Cache Type Structure",
     Ptr,
@@ -338,18 +342,20 @@ DumpCacheTypeStructure (
 /**
   This function parses the ID Structure (Type 2).
 
-  @param [in] Ptr     Pointer to the start of the ID Structure data.
-  @param [in] Length  Length of the ID Structure.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
+  @param [in] Ptr                Pointer to the start of the ID Structure data.
+  @param [in] Length             Length of the ID Structure.
 **/
 STATIC
 VOID
 DumpIDStructure (
+  IN UINT8  ParseFlags,
   IN UINT8* Ptr,
-  IN UINT8 Length
+  IN UINT8  Length
   )
 {
   ParseAcpi (
-    TRUE,
+    IS_TRACE_FLAG_SET (ParseFlags),
     2,
     "ID Structure",
     Ptr,
@@ -370,7 +376,7 @@ DumpIDStructure (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -378,7 +384,7 @@ DumpIDStructure (
 VOID
 EFIAPI
 ParseAcpiPptt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -387,12 +393,12 @@ ParseAcpiPptt (
   UINT32 Offset;
   UINT8* ProcessorTopologyStructurePtr;
 
-  if (!Trace) {
+  if (!IS_TRACE_FLAG_SET (ParseFlags)) {
     return;
   }
 
   Offset = ParseAcpi (
-             TRUE,
+             IS_TRACE_FLAG_SET (ParseFlags),
              0,
              "PPTT",
              Ptr,
@@ -440,24 +446,29 @@ ParseAcpiPptt (
       return;
     }
 
-    PrintFieldName (2, L"* Structure Offset *");
-    Print (L"0x%x\n", Offset);
+    if (IS_TRACE_FLAG_SET (ParseFlags)) {
+      PrintFieldName (2, L"* Structure Offset *");
+      Print (L"0x%x\n", Offset);
+    }
 
     switch (*ProcessorTopologyStructureType) {
       case EFI_ACPI_6_2_PPTT_TYPE_PROCESSOR:
         DumpProcessorHierarchyNodeStructure (
+          ParseFlags,
           ProcessorTopologyStructurePtr,
           *ProcessorTopologyStructureLength
           );
         break;
       case EFI_ACPI_6_2_PPTT_TYPE_CACHE:
         DumpCacheTypeStructure (
+          ParseFlags,
           ProcessorTopologyStructurePtr,
           *ProcessorTopologyStructureLength
           );
         break;
       case EFI_ACPI_6_2_PPTT_TYPE_ID:
         DumpIDStructure (
+          ParseFlags,
           ProcessorTopologyStructurePtr,
           *ProcessorTopologyStructureLength
           );
