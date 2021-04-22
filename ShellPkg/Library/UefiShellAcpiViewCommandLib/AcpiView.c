@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Glossary:
@@ -73,9 +73,9 @@ DumpAcpiTableToFile (
   @param [in] TablePtr  Pointer to the ACPI table data.
   @param [in] Length    The length fo the ACPI table.
 
-  @retval Returns TRUE if the ACPI table should be traced.
+  @retval Returns the ParseFlags for the ACPI table.
 **/
-BOOLEAN
+UINT8
 ProcessTableReportOptions (
   IN CONST UINT32  Signature,
   IN CONST UINT8*  TablePtr,
@@ -84,7 +84,7 @@ ProcessTableReportOptions (
 {
   UINTN                OriginalAttribute;
   UINT8                *SignaturePtr;
-  BOOLEAN              Log;
+  UINT8                ParseFlags;
   BOOLEAN              HighLight;
   SELECTED_ACPI_TABLE  *SelectedTable;
 
@@ -93,17 +93,17 @@ ProcessTableReportOptions (
   //
   OriginalAttribute = 0;
   SignaturePtr = (UINT8*)(UINTN)&Signature;
-  Log = FALSE;
+  ParseFlags = 0;
   HighLight = GetColourHighlighting ();
   GetSelectedAcpiTable (&SelectedTable);
 
   switch (GetReportOption ()) {
     case ReportAll:
-      Log = TRUE;
+      ParseFlags |= PARSE_FLAGS_TRACE;
       break;
     case ReportSelected:
       if (Signature == SelectedTable->Type) {
-        Log = TRUE;
+        ParseFlags |= PARSE_FLAGS_TRACE;
         SelectedTable->Found = TRUE;
       }
       break;
@@ -143,7 +143,7 @@ ProcessTableReportOptions (
       break;
   } // switch
 
-  if (Log) {
+  if (IS_TRACE_FLAG_SET (ParseFlags)) {
     if (HighLight) {
       OriginalAttribute = gST->ConOut->Mode->Attribute;
       gST->ConOut->SetAttribute (
@@ -164,7 +164,7 @@ ProcessTableReportOptions (
     }
   }
 
-  return Log;
+  return ParseFlags;
 }
 
 
@@ -196,7 +196,7 @@ AcpiView (
   UINT32                   RsdpLength;
   UINT8                    RsdpRevision;
   PARSE_ACPI_TABLE_PROC    RsdpParserProc;
-  BOOLEAN                  Trace;
+  UINT8                    ParseFlags;
   SELECTED_ACPI_TABLE      *SelectedTable;
 
   //
@@ -249,7 +249,11 @@ AcpiView (
     // The RSDP length is 4 bytes starting at offset 20
     RsdpLength = *(UINT32*)(RsdpPtr + RSDP_LENGTH_OFFSET);
 
-    Trace = ProcessTableReportOptions (RSDP_TABLE_INFO, RsdpPtr, RsdpLength);
+    ParseFlags = ProcessTableReportOptions (
+                   RSDP_TABLE_INFO,
+                   RsdpPtr,
+                   RsdpLength
+                   );
 
     Status = GetParser (RSDP_TABLE_INFO, &RsdpParserProc);
     if (EFI_ERROR (Status)) {
@@ -260,7 +264,7 @@ AcpiView (
     }
 
     RsdpParserProc (
-      Trace,
+      ParseFlags,
       RsdpPtr,
       RsdpLength,
       RsdpRevision

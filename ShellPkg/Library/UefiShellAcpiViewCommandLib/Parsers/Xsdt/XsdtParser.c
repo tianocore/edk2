@@ -1,7 +1,7 @@
 /** @file
   XSDT table parser
 
-  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -40,7 +40,7 @@ GetAcpiXsdtHeaderInfo (
 
   This function also performs validation of the XSDT table.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -48,7 +48,7 @@ GetAcpiXsdtHeaderInfo (
 VOID
 EFIAPI
 ParseAcpiXsdt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -61,7 +61,7 @@ ParseAcpiXsdt (
   CHAR16        Buffer[32];
 
   Offset = ParseAcpi (
-             Trace,
+             IS_TRACE_FLAG_SET (ParseFlags),
              0,
              "XSDT",
              Ptr,
@@ -71,7 +71,7 @@ ParseAcpiXsdt (
 
   TableOffset = Offset;
 
-  if (Trace) {
+  if (IS_TRACE_FLAG_SET (ParseFlags)) {
     EntryIndex = 0;
     TablePointer = (UINT64*)(Ptr + TableOffset);
     while (Offset < AcpiTableLength) {

@@ -1,7 +1,7 @@
 /** @file
   Header file for ACPI parser
 
-  Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -15,6 +15,16 @@
 /// To work around this oddity define a signature type
 /// that allows us to process the log options.
 #define RSDP_TABLE_INFO  SIGNATURE_32('R', 'S', 'D', 'P')
+
+/**
+  Flags for the parser.
+*/
+#define PARSE_FLAGS_TRACE               BIT0
+
+/**
+  Helper macros to test parser flags.
+*/
+#define IS_TRACE_FLAG_SET(Flags) (((Flags) & PARSE_FLAGS_TRACE) != 0)
 
 /**
   This function increments the ACPI table error counter.
@@ -489,7 +499,7 @@ ParseAcpiAest (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -497,7 +507,7 @@ ParseAcpiAest (
 VOID
 EFIAPI
 ParseAcpiBgrt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -510,7 +520,7 @@ ParseAcpiBgrt (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -518,7 +528,7 @@ ParseAcpiBgrt (
 VOID
 EFIAPI
 ParseAcpiDbg2 (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -531,7 +541,7 @@ ParseAcpiDbg2 (
   For the DSDT table only the ACPI header fields are parsed and
   traced.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -539,7 +549,7 @@ ParseAcpiDbg2 (
 VOID
 EFIAPI
 ParseAcpiDsdt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -552,7 +562,7 @@ ParseAcpiDsdt (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -560,7 +570,7 @@ ParseAcpiDsdt (
 VOID
 EFIAPI
 ParseAcpiFacs (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -573,7 +583,7 @@ ParseAcpiFacs (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -581,7 +591,7 @@ ParseAcpiFacs (
 VOID
 EFIAPI
 ParseAcpiFadt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -598,7 +608,7 @@ ParseAcpiFadt (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -606,7 +616,7 @@ ParseAcpiFadt (
 VOID
 EFIAPI
 ParseAcpiGtdt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -653,7 +663,7 @@ ParseAcpiHmat (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -661,7 +671,7 @@ ParseAcpiHmat (
 VOID
 EFIAPI
 ParseAcpiIort (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -682,7 +692,7 @@ ParseAcpiIort (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -690,7 +700,7 @@ ParseAcpiIort (
 VOID
 EFIAPI
 ParseAcpiMadt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -703,7 +713,7 @@ ParseAcpiMadt (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -711,7 +721,7 @@ ParseAcpiMadt (
 VOID
 EFIAPI
 ParseAcpiMcfg (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -746,7 +756,7 @@ ParseAcpiPcct (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -754,7 +764,7 @@ ParseAcpiPcct (
 VOID
 EFIAPI
 ParseAcpiPptt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -769,7 +779,7 @@ ParseAcpiPptt (
   This function also performs a RAW dump of the ACPI table and
   validates the checksum.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -777,7 +787,7 @@ ParseAcpiPptt (
 VOID
 EFIAPI
 ParseAcpiRsdp (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -793,7 +803,8 @@ ParseAcpiRsdp (
     - Relative distance from System Locality at i*N+j is same as
       j*N+i
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+      @param [in] ParseFlags         Flags describing what the parser needs to
+      do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -801,7 +812,7 @@ ParseAcpiRsdp (
 VOID
 EFIAPI
 ParseAcpiSlit (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -814,7 +825,7 @@ ParseAcpiSlit (
 
   This function also performs validations of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -822,7 +833,7 @@ ParseAcpiSlit (
 VOID
 EFIAPI
 ParseAcpiSpcr (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -841,7 +852,7 @@ ParseAcpiSpcr (
 
   This function also performs validation of the ACPI table fields.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -849,7 +860,7 @@ ParseAcpiSpcr (
 VOID
 EFIAPI
 ParseAcpiSrat (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -862,7 +873,7 @@ ParseAcpiSrat (
   For the SSDT table only the ACPI header fields are
   parsed and traced.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -870,7 +881,7 @@ ParseAcpiSrat (
 VOID
 EFIAPI
 ParseAcpiSsdt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -882,7 +893,7 @@ ParseAcpiSsdt (
 
   This function also performs validation of the XSDT table.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -890,7 +901,7 @@ ParseAcpiSsdt (
 VOID
 EFIAPI
 ParseAcpiXsdt (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision

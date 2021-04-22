@@ -1,7 +1,7 @@
 /** @file
   Header file for ACPI table parser
 
-  Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -20,7 +20,7 @@
 /**
   A function that parses the ACPI table.
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -28,7 +28,7 @@
 typedef
 VOID
 (EFIAPI * PARSE_ACPI_TABLE_PROC) (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision

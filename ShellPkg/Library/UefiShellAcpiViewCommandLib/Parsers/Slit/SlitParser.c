@@ -1,7 +1,7 @@
 /** @file
   SLIT table parser
 
-  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -42,7 +42,7 @@ STATIC CONST ACPI_PARSER SlitParser[] = {
     - Relative distance from System Locality at i*N+j is same as
       j*N+i
 
-  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] ParseFlags         Flags describing what the parser needs to do.
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
@@ -50,7 +50,7 @@ STATIC CONST ACPI_PARSER SlitParser[] = {
 VOID
 EFIAPI
 ParseAcpiSlit (
-  IN BOOLEAN Trace,
+  IN UINT8   ParseFlags,
   IN UINT8*  Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
@@ -63,7 +63,7 @@ ParseAcpiSlit (
   UINT8* LocalityPtr;
   CHAR16 Buffer[80];  // Used for AsciiName param of ParseAcpi
 
-  if (!Trace) {
+  if (!IS_TRACE_FLAG_SET (ParseFlags)) {
     return;
   }
 
