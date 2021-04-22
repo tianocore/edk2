@@ -192,6 +192,12 @@ ProcessTableReportOptions (
         DumpAcpiTableToFile (TablePtr, Length);
       }
       break;
+    case ReportDotGraph:
+      if (Signature == SelectedTable->Type) {
+        SelectedTable->Found = TRUE;
+        ParseFlags |= PARSE_FLAGS_GRAPH;
+      }
+      break;
     case ReportMax:
       // We should never be here.
       // This case is only present to prevent compiler warning.
@@ -340,7 +346,8 @@ AcpiView (
 
   ReportOption = GetReportOption ();
   if (ReportTableList != ReportOption) {
-    if (((ReportSelected == ReportOption)  ||
+    if (((ReportSelected == ReportOption) ||
+         (ReportDotGraph == ReportOption) ||
          (ReportDumpBinFile == ReportOption)) &&
         (!SelectedTable->Found)) {
       Print (L"\nRequested ACPI Table not found.\n");

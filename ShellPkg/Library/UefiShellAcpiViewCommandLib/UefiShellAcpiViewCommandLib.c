@@ -1,7 +1,7 @@
 /** @file
   Main file for 'acpiview' Shell command function.
 
-  Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -34,6 +34,7 @@ EFI_HII_HANDLE gShellAcpiViewHiiHandle = NULL;
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-q", TypeFlag},
   {L"-d", TypeFlag},
+  {L"-g", TypeFlag},
   {L"-h", TypeFlag},
   {L"-l", TypeFlag},
   {L"-s", TypeValue},
@@ -293,6 +294,18 @@ ShellCommandRunAcpiView (
           L"-d"
           );
         ShellStatus = SHELL_INVALID_PARAMETER;
+    } else if (ShellCommandLineGetFlag (Package, L"-g") &&
+               !ShellCommandLineGetFlag (Package, L"-s")) {
+        ShellPrintHiiEx (
+          -1,
+          -1,
+          NULL,
+          STRING_TOKEN (STR_GEN_MISSING_OPTION),
+          gShellAcpiViewHiiHandle,
+          L"acpiview",
+          L"-s",
+          L"-g"
+          );
     } else {
       // Turn on colour highlighting if requested
       SetColourHighlighting (ShellCommandLineGetFlag (Package, L"-h"));
@@ -316,10 +329,15 @@ ShellCommandRunAcpiView (
           SelectAcpiTable (SelectedTableName);
           SetReportOption (ReportSelected);
 
-          if (ShellCommandLineGetFlag (Package, L"-d"))  {
+          if (ShellCommandLineGetFlag (Package, L"-d") ||
+              ShellCommandLineGetFlag (Package, L"-g"))  {
             // Create a temporary file to check if the media is writable.
             CHAR16 FileNameBuffer[MAX_FILE_NAME_LEN];
-            SetReportOption (ReportDumpBinFile);
+            if (ShellCommandLineGetFlag (Package, L"-d")) {
+              SetReportOption (ReportDumpBinFile);
+            } else {
+              SetReportOption (ReportDotGraph);
+            }
 
             UnicodeSPrint (
               FileNameBuffer,
