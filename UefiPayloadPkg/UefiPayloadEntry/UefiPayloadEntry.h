@@ -83,14 +83,14 @@ UpdateStackHob (
 /**
   Build a Handoff Information Table HOB
 
-  This function initialize a HOB region from EfiMemoryBegin with length
-  EfiMemoryLength. And EfiFreeMemoryBottom and EfiFreeMemoryTop should
+  This function initialize a HOB region from EfiMemoryBegin to
+  EfiMemoryTop. And EfiFreeMemoryBottom and EfiFreeMemoryTop should
   be inside the HOB region.
 
-  @param[in] EfiMemoryBegin       Total memory start address
-  @param[in] EfiMemoryLength      Total memory length reported in handoff HOB.
-  @param[in] EfiFreeMemoryBottom  Free memory start address
-  @param[in] EfiFreeMemoryTop     Free memory end address.
+  @param[in] EfiMemoryBottom       Total memory start address
+  @param[in] EfiMemoryTop          Total memory end address.
+  @param[in] EfiFreeMemoryBottom   Free memory start address
+  @param[in] EfiFreeMemoryTop      Free memory end address.
 
   @return   The pointer to the handoff HOB table.
 
@@ -98,8 +98,8 @@ UpdateStackHob (
 EFI_HOB_HANDOFF_INFO_TABLE*
 EFIAPI
 HobConstructor (
-  IN VOID   *EfiMemoryBegin,
-  IN UINTN  EfiMemoryLength,
+  IN VOID   *EfiMemoryBottom,
+  IN VOID   *EfiMemoryTop,
   IN VOID   *EfiFreeMemoryBottom,
   IN VOID   *EfiFreeMemoryTop
   );

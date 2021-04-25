@@ -382,7 +382,6 @@ PayloadEntry (
   PHYSICAL_ADDRESS              DxeCoreEntryPoint;
   EFI_HOB_HANDOFF_INFO_TABLE    *HandoffHobTable;
   UINTN                         MemBase;
-  UINTN                         MemSize;
   UINTN                         HobMemBase;
   UINTN                         HobMemTop;
   EFI_PEI_HOB_POINTERS          Hob;
@@ -401,9 +400,7 @@ PayloadEntry (
   HobMemBase = ALIGN_VALUE (MemBase + PcdGet32 (PcdPayloadFdMemSize), SIZE_1MB);
   HobMemTop  = HobMemBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
 
-  // DXE core assumes the memory below HOB region could be used, so include the FV region memory into HOB range.
-  MemSize    = HobMemTop - MemBase;
-  HandoffHobTable = HobConstructor ((VOID *)MemBase, MemSize, (VOID *)HobMemBase, (VOID *)HobMemTop);
+  HobConstructor ((VOID *)MemBase, (VOID *)HobMemTop, (VOID *)HobMemBase, (VOID *)HobMemTop);
 
   // Build HOB based on information from Bootloader
   Status = BuildHobFromBl ();
