@@ -93,6 +93,27 @@ extern  EFI_IFR_GUID_LABEL         *mEndLabel;
 #define HASHALG_RAW                            0x00000004
 #define HASHALG_MAX                            0x00000004
 
+//
+// Certificate public key minimum size (bytes)
+//
+#define CER_PUBKEY_MIN_SIZE     256
+
+//
+// Types of errors may occur during certificate enrollment.
+//
+typedef enum {
+  None_Error = 0,
+  //
+  // Unsupported_type indicates the certificate type is not supported.
+  //
+  Unsupported_Type,
+  //
+  // Unqualified_key indicates the key strength of certificate is not
+  // strong enough.
+  //
+  Unqualified_Key,
+  Enroll_Error_Max
+}ENROLL_KEY_ERROR;
 
 typedef struct {
   UINTN             Signature;
