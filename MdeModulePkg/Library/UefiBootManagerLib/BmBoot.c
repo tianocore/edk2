@@ -2,7 +2,7 @@
   Library functions which relates with booting.
 
 Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
-Copyright (c) 2011 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2021 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -2385,7 +2385,8 @@ EfiBootManagerRefreshAllBootOption (
   This function is called to get or create the boot option for the Boot Manager Menu.
 
   The Boot Manager Menu is shown after successfully booting a boot option.
-  Assume the BootManagerMenuFile is in the same FV as the module links to this library.
+  This function will first try to search the BootManagerMenuFile is in the same FV as
+  the module links to this library. If fails, it will search in all FVs.
 
   @param  BootOption    Return the boot option of the Boot Manager Menu
 
@@ -2437,7 +2438,7 @@ BmRegisterBootManagerMenu (
 
   if (DevicePath == NULL) {
     Data = NULL;
-    Status = GetSectionFromFv (
+    Status = GetSectionFromAnyFv (
                PcdGetPtr (PcdBootManagerMenuFile),
                EFI_SECTION_PE32,
                0,
@@ -2455,7 +2456,7 @@ BmRegisterBootManagerMenu (
     //
     // Get BootManagerMenu application's description from EFI User Interface Section.
     //
-    Status = GetSectionFromFv (
+    Status = GetSectionFromAnyFv (
                PcdGetPtr (PcdBootManagerMenuFile),
                EFI_SECTION_USER_INTERFACE,
                0,
