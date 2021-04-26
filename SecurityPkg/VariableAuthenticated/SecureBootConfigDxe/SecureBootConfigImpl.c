@@ -90,6 +90,22 @@ CHAR16* mDerEncodedSuffix[] = {
 };
 CHAR16* mSupportX509Suffix = L"*.cer/der/crt";
 
+//
+// Prompt strings during certificate enrollment.
+//
+CHAR16* mX509EnrollPromptTitle[] = {
+  L"",
+  L"ERROR: Unsupported file type!",
+  L"ERROR: Unsupported certificate!",
+  NULL
+};
+CHAR16* mX509EnrollPromptString[] = {
+  L"",
+  L"Only DER encoded certificate file (*.cer/der/crt) is supported.",
+  L"Public key length should be equal to or greater than 2048 bits.",
+  NULL
+};
+
 SECUREBOOT_CONFIG_PRIVATE_DATA  *gSecureBootPrivateData = NULL;
 
 /**
@@ -384,6 +400,102 @@ SetSecureBootMode (
 }
 
 /**
+  This code checks if the encode type and key strength of X.509
+  certificate is qualified.
+
+  @param[in]  X509FileContext     FileContext of X.509 certificate storing
+                                  file.
+  @param[out] Error               Error type checked in the certificate.
+
+  @return EFI_SUCCESS             The certificate checked successfully.
+  @return EFI_INVALID_PARAMETER   The parameter is invalid.
+  @return EFI_OUT_OF_RESOURCES    Memory allocation failed.
+
+**/
+EFI_STATUS
+CheckX509Certificate (
+  IN    SECUREBOOT_FILE_CONTEXT*    X509FileContext,
+  OUT   ENROLL_KEY_ERROR*           Error
+)
+{
+  EFI_STATUS     Status;
+  UINT16*        FilePostFix;
+  UINTN          NameLength;
+  UINT8*         X509Data;
+  UINTN          X509DataSize;
+  void*          X509PubKey;
+  UINTN          PubKeyModSize;
+
+  if (X509FileContext->FileName == NULL) {
+    *Error = Unsupported_Type;
+    return EFI_INVALID_PARAMETER;
+  }
+
+  X509Data       = NULL;
+  X509DataSize   = 0;
+  X509PubKey     = NULL;
+  PubKeyModSize  = 0;
+
+  //
+  // Parse the file's postfix. Only support DER encoded X.509 certificate files.
+  //
+  NameLength = StrLen (X509FileContext->FileName);
+  if (NameLength <= 4) {
+    DEBUG ((DEBUG_ERROR, "Wrong X509 NameLength\n"));
+    *Error = Unsupported_Type;
+    return EFI_INVALID_PARAMETER;
+  }
+  FilePostFix = X509FileContext->FileName + NameLength - 4;
+  if (!IsDerEncodeCertificate (FilePostFix)) {
+    DEBUG ((DEBUG_ERROR, "Unsupported file type, only DER encoded certificate (%s) is supported.\n", mSupportX509Suffix));
+    *Error = Unsupported_Type;
+    return EFI_INVALID_PARAMETER;
+  }
+  DEBUG ((DEBUG_INFO, "FileName= %s\n", X509FileContext->FileName));
+  DEBUG ((DEBUG_INFO, "FilePostFix = %s\n", FilePostFix));
+
+  //
+  // Read the certificate file content
+  //
+  Status = ReadFileContent (X509FileContext->FHandle, (VOID**) &X509Data, &X509DataSize, 0);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error occured while reading the file.\n"));
+    goto ON_EXIT;
+  }
+
+  //
+  // Parse the public key context.
+  //
+  if (RsaGetPublicKeyFromX509 (X509Data, X509DataSize, &X509PubKey) == FALSE) {
+    DEBUG ((DEBUG_ERROR, "Error occured while parsing the pubkey from certificate.\n"));
+    Status = EFI_INVALID_PARAMETER;
+    *Error = Unsupported_Type;
+    goto ON_EXIT;
+  }
+
+  //
+  // Parse Module size of public key using interface provided by CryptoPkg, which is
+  // actually the size of public key.
+  //
+  if (X509PubKey != NULL) {
+    RsaGetKey (X509PubKey, RsaKeyN, NULL, &PubKeyModSize);
+    if (PubKeyModSize < CER_PUBKEY_MIN_SIZE) {
+      DEBUG ((DEBUG_ERROR, "Unqualified PK size, key size should be equal to or greater than 2048 bits.\n"));
+      Status = EFI_INVALID_PARAMETER;
+      *Error = Unqualified_Key;
+    }
+    RsaFree (X509PubKey);
+  }
+
+ ON_EXIT:
+  if (X509Data != NULL) {
+    FreePool (X509Data);
+  }
+
+  return Status;
+}
+
+/**
   Generate the PK signature list from the X509 Certificate storing file (.cer)
 
   @param[in]   X509File              FileHandle of X509 Certificate storing file.
@@ -477,12 +589,6 @@ EnrollPlatformKey (
   UINT32                          Attr;
   UINTN                           DataSize;
   EFI_SIGNATURE_LIST              *PkCert;
-  UINT16*                         FilePostFix;
-  UINTN                           NameLength;
-
-  if (Private->FileContext->FileName == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   PkCert = NULL;
 
@@ -490,21 +596,6 @@ EnrollPlatformKey (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  //
-  // Parse the file's postfix. Only support DER encoded X.509 certificate files.
-  //
-  NameLength = StrLen (Private->FileContext->FileName);
-  if (NameLength <= 4) {
-    return EFI_INVALID_PARAMETER;
-  }
-  FilePostFix = Private->FileContext->FileName + NameLength - 4;
-  if (!IsDerEncodeCertificate(FilePostFix)) {
-    DEBUG ((EFI_D_ERROR, "Unsupported file type, only DER encoded certificate (%s) is supported.", mSupportX509Suffix));
-    return EFI_INVALID_PARAMETER;
-  }
-  DEBUG ((EFI_D_INFO, "FileName= %s\n", Private->FileContext->FileName));
-  DEBUG ((EFI_D_INFO, "FilePostFix = %s\n", FilePostFix));
 
   //
   // Prase the selected PK file and generate PK certificate list.
@@ -4300,12 +4391,14 @@ SecureBootCallback (
   UINT16                          *FilePostFix;
   SECUREBOOT_CONFIG_PRIVATE_DATA  *PrivateData;
   BOOLEAN                         GetBrowserDataResult;
+  ENROLL_KEY_ERROR                EnrollKeyErrorCode;
 
-  Status           = EFI_SUCCESS;
-  SecureBootEnable = NULL;
-  SecureBootMode   = NULL;
-  SetupMode        = NULL;
-  File             = NULL;
+  Status             = EFI_SUCCESS;
+  SecureBootEnable   = NULL;
+  SecureBootMode     = NULL;
+  SetupMode          = NULL;
+  File               = NULL;
+  EnrollKeyErrorCode = None_Error;
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -4718,18 +4811,35 @@ SecureBootCallback (
       }
       break;
     case KEY_VALUE_SAVE_AND_EXIT_PK:
-      Status = EnrollPlatformKey (Private);
+      //
+      // Check the suffix, encode type and the key strength of PK certificate.
+      //
+      Status = CheckX509Certificate (Private->FileContext, &EnrollKeyErrorCode);
+      if (EFI_ERROR (Status)) {
+        if (EnrollKeyErrorCode != None_Error && EnrollKeyErrorCode < Enroll_Error_Max) {
+          CreatePopUp (
+            EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+            &Key,
+            mX509EnrollPromptTitle[EnrollKeyErrorCode],
+            mX509EnrollPromptString[EnrollKeyErrorCode],
+            NULL
+            );
+          break;
+        }
+      } else {
+        Status = EnrollPlatformKey (Private);
+      }
       if (EFI_ERROR (Status)) {
         UnicodeSPrint (
           PromptString,
           sizeof (PromptString),
-          L"Only DER encoded certificate file (%s) is supported.",
-          mSupportX509Suffix
+          L"Error status: %x.",
+          Status
           );
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
-          L"ERROR: Unsupported file type!",
+          L"ERROR: Enrollment failed!",
           PromptString,
           NULL
           );
