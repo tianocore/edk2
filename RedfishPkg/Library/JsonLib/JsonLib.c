@@ -5,7 +5,7 @@
   https://jansson.readthedocs.io/en/2.13/apiref.html
 
   Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
- (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+ (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 
     SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -154,12 +154,12 @@ JsonValueInitUnicodeString (
 
   @param[in]   Value       The integer to initialize to JSON value
 
-  @retval      The created JSON value which contains a JSON number or NULL.
+  @retval      The created JSON value which contains a JSON integer or NULL.
 
 **/
 EDKII_JSON_VALUE
 EFIAPI
-JsonValueInitNumber (
+JsonValueInitInteger (
   IN    INT64    Value
   )
 {
@@ -184,6 +184,42 @@ JsonValueInitBoolean (
   )
 {
   return (EDKII_JSON_VALUE)json_boolean (Value);
+}
+
+/**
+  The function is used to initialize a JSON value which contains a TRUE JSON value,
+  or NULL on error.
+
+  NULL JSON value is kept as static value, and no need to do any cleanup work.
+
+  @retval      The created JSON TRUE value.
+
+**/
+EDKII_JSON_VALUE
+EFIAPI
+JsonValueInitTrue (
+  VOID
+  )
+{
+  return (EDKII_JSON_VALUE)json_true();
+}
+
+/**
+  The function is used to initialize a JSON value which contains a FALSE JSON value,
+  or NULL on error.
+
+  NULL JSON value is kept as static value, and no need to do any cleanup work.
+
+  @retval      The created JSON FALSE value.
+
+**/
+EDKII_JSON_VALUE
+EFIAPI
+JsonValueInitFalse (
+  VOID
+  )
+{
+  return (EDKII_JSON_VALUE)json_false();
 }
 
 /**
@@ -315,6 +351,24 @@ JsonValueIsString (
 }
 
 /**
+  The function is used to return if the provided JSON value contains a JSON integer.
+
+  @param[in]   Json             The provided JSON value.
+
+  @retval      TRUE             The JSON value is contains JSON integer.
+  @retval      FALSE            The JSON value doesn't contain a JSON integer.
+
+**/
+BOOLEAN
+EFIAPI
+JsonValueIsInteger (
+  IN    EDKII_JSON_VALUE    Json
+  )
+{
+  return json_is_integer ((json_t *) Json);
+}
+
+/**
   The function is used to return if the provided JSON value contains a JSON number.
 
   @param[in]   Json             The provided JSON value.
@@ -329,7 +383,7 @@ JsonValueIsNumber (
   IN    EDKII_JSON_VALUE    Json
   )
 {
-  return json_is_integer ((json_t *) Json);
+  return json_is_number ((json_t *) Json);
 }
 
 /**
@@ -350,6 +404,47 @@ JsonValueIsBoolean (
   return json_is_boolean ((json_t *) Json);
 }
 
+/**
+  The function is used to return if the provided JSON value contains a TRUE value.
+
+  @param[in]   Json             The provided JSON value.
+
+  @retval      TRUE             The JSON value contains a TRUE value.
+  @retval      FALSE            The JSON value doesn't contain a TRUE value.
+
+**/
+BOOLEAN
+EFIAPI
+JsonValueIsTrue (
+  IN    EDKII_JSON_VALUE    Json
+  )
+{
+  if (json_is_true ((json_t *)Json)) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+  The function is used to return if the provided JSON value contains a FALSE value.
+
+  @param[in]   Json             The provided JSON value.
+
+  @retval      TRUE             The JSON value contains a FALSE value.
+  @retval      FALSE            The JSON value doesn't contain a FALSE value.
+
+**/
+BOOLEAN
+EFIAPI
+JsonValueIsFalse (
+  IN    EDKII_JSON_VALUE    Json
+  )
+{
+  if (json_is_false ((json_t *)Json)) {
+    return TRUE;
+  }
+  return FALSE;
+}
 /**
   The function is used to return if the provided JSON value contains a JSON NULL.
 
@@ -485,24 +580,24 @@ JsonValueGetUnicodeString (
 }
 
 /**
-  The function is used to retrieve the associated integer in a number type JSON value.
+  The function is used to retrieve the associated integer in a integer type JSON value.
 
-  The input JSON value should not be NULL or contain no JSON number, otherwise it will
+  The input JSON value should not be NULL or contain no JSON integer, otherwise it will
   ASSERT() and return 0.
 
   @param[in]   Json             The provided JSON value.
 
-  @retval      Return the associated number in JSON value.
+  @retval      Return the associated integer in JSON value.
 
 **/
 INT64
 EFIAPI
-JsonValueGetNumber (
+JsonValueGetInteger (
   IN    EDKII_JSON_VALUE    Json
   )
 {
-  ASSERT (Json != NULL && JsonValueIsNumber (Json));
-  if (Json == NULL || !JsonValueIsNumber (Json)) {
+  ASSERT (Json != NULL && JsonValueIsInteger (Json));
+  if (Json == NULL || !JsonValueIsInteger (Json)) {
     return 0;
   }
 
@@ -830,6 +925,8 @@ JsonDumpString (
   Caller needs to cleanup the root value by calling JsonValueFree().
 
   @param[in]   String        The NULL terminated CHAR8 string to convert.
+  @param[in]   Flags         Flags for loading JSON string.
+  @param[in]   Error         Returned error status.
 
   @retval      Array JSON value or object JSON value, or NULL when any error occurs.
 
@@ -837,12 +934,12 @@ JsonDumpString (
 EDKII_JSON_VALUE
 EFIAPI
 JsonLoadString (
-  IN    CONST CHAR8*    String
+  IN    CONST CHAR8*     String,
+  IN    UINT64           Flags,
+  IN    EDKII_JSON_ERROR *Error
   )
 {
-  json_error_t    JsonError;
-
-  return (EDKII_JSON_VALUE) json_loads ((const char *)String, 0, &JsonError);
+  return (EDKII_JSON_VALUE) json_loads ((const char *)String, Flags, (json_error_t *)Error);
 }
 
 /**
@@ -959,12 +1056,43 @@ JsonObjectIteratorValue (
   @retval      Iterator pointer
 **/
 VOID *
+EFIAPI
 JsonObjectIteratorNext (
   IN EDKII_JSON_VALUE JsonValue,
   IN VOID             *Iterator
   )
 {
   return json_object_iter_next(JsonValue, Iterator);
+}
+
+/**
+  Returns the key of iterator pointing.
+
+  @param[in]   Iterator   Iterator pointer
+  @retval      Key
+**/
+CHAR8 *
+EFIAPI
+JsonObjectIteratorKey (
+  IN VOID *Iterator
+)
+{
+  return (CHAR8 *)json_object_iter_key(Iterator);
+}
+
+/**
+  Returns the pointer of iterator by key.
+
+  @param[in]   Key   The key of interator pointer.
+  @retval      Pointer to interator
+**/
+VOID *
+EFIAPI
+JsonObjectKeyToIterator (
+  IN CHAR8 *Key
+)
+{
+  return json_object_key_to_iter(Key);
 }
 
 /**
