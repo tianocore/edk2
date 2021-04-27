@@ -22,12 +22,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // https://www.iana.org/assignments/ppp-numbers/ppp-numbers.xhtml#ppp-numbers-9
 //
 #define ISCSI_CHAP_ALGORITHM_MD5                  5
+#define ISCSI_CHAP_ALGORITHM_SHA256               7
 
 //
 // Byte count of the largest digest over the above-listed
 // ISCSI_CHAP_ALGORITHM_* hash algorithms.
 //
-#define ISCSI_CHAP_MAX_DIGEST_SIZE                MD5_DIGEST_SIZE
+#define ISCSI_CHAP_MAX_DIGEST_SIZE                SHA256_DIGEST_SIZE
 
 #define ISCSI_CHAP_STEP_ONE                       1
 #define ISCSI_CHAP_STEP_TWO                       2
