@@ -27,20 +27,70 @@
   Include                        # Root include for the package
 
 [LibraryClasses.common]
+  ##  @libraryclass  Provides an interface to Arm registers.
+  #
   ArmLib|Include/Library/ArmLib.h
+
+  ##  @libraryclass  Provides a Mmu interface.
+  #
   ArmMmuLib|Include/Library/ArmMmuLib.h
+
+  ##  @libraryclass  Provides an interface to initialize a
+  #   Generic Interrupt Controller (GIC).
+  #
   SemihostLib|Include/Library/SemihostLib.h
+
+  ##  @libraryclass  Provides a Generic Interrupt Controller (GIC)
+  #   configuration interface.
+  #
   DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
+
+  ##  @libraryclass  Convert Arm instructions to a human readable format.
+  #
   ArmDisassemblerLib|Include/Library/ArmDisassemblerLib.h
+
+  ##  @libraryclass  Provides an interface to initialize a
+  #   Generic Interrupt Controller (GIC).
+  #
   ArmGicArchLib|Include/Library/ArmGicArchLib.h
+
+  ##  @libraryclass  Provides a Mailbox Transport Layer (MTL) interface
+  #   for the System Control and Management Interface (SCMI).
+  #
   ArmMtlLib|Include/Library/ArmMtlLib.h
+
+  ##  @libraryclass  Provides a SuperVisor Call (SVC) interface.
+  #
   ArmSvcLib|Include/Library/ArmSvcLib.h
+
+  ##  @libraryclass  Provides an OpTee interface.
+  #
   OpteeLib|Include/Library/OpteeLib.h
+
+  ##  @libraryclass  Provides an interface to a StandaloneMm Mmu.
+  #
   StandaloneMmMmuLib|Include/Library/StandaloneMmMmuLib.h
+
+  ##  @libraryclass  Provides an interface to query miscellaneous OEM
+  #   information.
+  #
   ArmGenericTimerCounterLib|Include/Library/ArmGenericTimerCounterLib.h
+
+  ##  @libraryclass  Provides a Generic Interrupt Controller (GIC)
+  #   configuration interface.
   ArmGicLib|Include/Library/ArmGicLib.h
+
+  ##  @libraryclass  Provides a HyperVisor Call (HVC) interface.
+  #
   ArmHvcLib|Include/Library/ArmHvcLib.h
+
+  ##  @libraryclass  Provides an interface to query miscellaneous OEM
+  #   information.
+  #
   OemMiscLib|Include/Library/OemMiscLib.h
+
+  ##  @libraryclass  Provides a System Monitor Call (SMC) interface.
+  #
   ArmSmcLib|Include/Library/ArmSmcLib.h
 
 
