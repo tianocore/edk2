@@ -1,0 +1,40 @@
+## @file
+# Map TPM MMIO range unencrypted when SEV is active
+#
+# Copyright (C) 2021, Advanced Micro Devices, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TpmMmioSevDecryptPei
+  FILE_GUID                      = F12F698A-E506-4A1B-B32E-6920E55DA1C4
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TpmMmioSevDecryptPeimEntryPoint
+
+[Sources]
+  TpmMmioSevDecryptPeim.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemEncryptSevLib
+  PeimEntryPoint
+  PeiServicesLib
+
+[Ppis]
+  gOvmfTpmMmioAccessiblePpiGuid                      ## PRODUCES
+
+[FixedPcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress    ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid
