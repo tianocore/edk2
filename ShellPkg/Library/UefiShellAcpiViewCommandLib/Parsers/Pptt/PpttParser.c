@@ -15,11 +15,23 @@
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
 #include "PpttParser.h"
+#include "DotGenerator.h"
 
 // Local variables
 STATIC CONST UINT8*  ProcessorTopologyStructureType;
 STATIC CONST UINT8*  ProcessorTopologyStructureLength;
+
 STATIC CONST UINT32* NumberOfPrivateResources;
+STATIC CONST UINT32* ProcessorHierarchyParent;
+STATIC CONST EFI_ACPI_6_3_PPTT_STRUCTURE_PROCESSOR_FLAGS* ProcStructFlags;
+STATIC CONST UINT32* NextLevelOfCache;
+STATIC CONST EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE_ATTRIBUTES* CacheAttributes;
+STATIC CONST UINT32* CacheSize;
+
+STATIC CONST UINT8*  PpttStartPointer;
+
+STATIC SHELL_FILE_HANDLE mDotFileHandle;
+
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
 /**
@@ -198,8 +210,9 @@ STATIC CONST ACPI_PARSER ProcessorHierarchyNodeStructureParser[] = {
   {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
   {L"Reserved", 2, 2, L"0x%x", NULL, NULL, NULL, NULL},
 
-  {L"Flags", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Parent", 4, 8, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Flags", 4, 4, L"0x%x", NULL, (VOID**)&ProcStructFlags, NULL, NULL},
+  {L"Parent", 4, 8, L"0x%x", NULL,
+    (VOID**)&ProcessorHierarchyParent, NULL, NULL},
   {L"ACPI Processor ID", 4, 12, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Number of private resources", 4, 16, L"%d", NULL,
    (VOID**)&NumberOfPrivateResources, NULL, NULL}
@@ -214,11 +227,13 @@ STATIC CONST ACPI_PARSER CacheTypeStructureParser[] = {
   {L"Reserved", 2, 2, L"0x%x", NULL, NULL, NULL, NULL},
 
   {L"Flags", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Next Level of Cache", 4, 8, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Size", 4, 12, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Next Level of Cache", 4, 8, L"0x%x", NULL,
+    (VOID**)&NextLevelOfCache, NULL, NULL},
+  {L"Size", 4, 12, L"0x%x", NULL, (VOID**)&CacheSize, NULL, NULL},
   {L"Number of sets", 4, 16, L"%d", NULL, NULL, ValidateCacheNumberOfSets, NULL},
   {L"Associativity", 1, 20, L"%d", NULL, NULL, ValidateCacheAssociativity, NULL},
-  {L"Attributes", 1, 21, L"0x%x", NULL, NULL, ValidateCacheAttributes, NULL},
+  {L"Attributes", 1, 21, L"0x%x", NULL, (VOID**)&CacheAttributes,
+    ValidateCacheAttributes, NULL},
   {L"Line size", 2, 22, L"%d", NULL, NULL, ValidateCacheLineSize, NULL}
 };
 
@@ -257,6 +272,7 @@ DumpProcessorHierarchyNodeStructure (
   UINT32 Offset;
   UINT32 Index;
   CHAR16 Buffer[OUTPUT_FIELD_COLUMN_WIDTH];
+  CONST UINT8* TypePtr;
 
   Offset = ParseAcpi (
              IS_TRACE_FLAG_SET (ParseFlags),
@@ -291,26 +307,67 @@ DumpProcessorHierarchyNodeStructure (
     return;
   }
 
-  Index = 0;
+  if (IS_GRAPH_FLAG_SET (ParseFlags)) {
+    if (ProcStructFlags->ProcessorIsAThread) {
+      UnicodeSPrint(Buffer, sizeof (Buffer), L"Thread");
+    } else if (ProcStructFlags->NodeIsALeaf) {
+      UnicodeSPrint(Buffer, sizeof (Buffer), L"Core");
+    } else if (ProcStructFlags->PhysicalPackage) {
+      UnicodeSPrint(Buffer, sizeof (Buffer), L"Physical\\nPackage");
+    } else {
+      UnicodeSPrint(Buffer, sizeof (Buffer), L"Cluster");
+    }
+
+    DotAddNode (
+      mDotFileHandle,
+      (UINT32)(Ptr - PpttStartPointer),
+      DOT_BOX_SQUARE | DOT_COLOR_BLUE | DOT_BOX_ADD_ID_TO_LABEL,
+      Buffer
+      );
+
+    // Add link to parent node.
+    if (*ProcessorHierarchyParent != 0) {
+      DotAddLink (
+        mDotFileHandle,
+        (UINT32)(Ptr - PpttStartPointer),
+        *ProcessorHierarchyParent,
+        0x0
+        );
+    }
+  }
 
   // Parse the specified number of private resource references or the Processor
   // Hierarchy Node length. Whichever is minimum.
-  while (Index < *NumberOfPrivateResources) {
-    UnicodeSPrint (
-      Buffer,
-      sizeof (Buffer),
-      L"Private resources [%d]",
-      Index
-      );
+  for (Index = 0; Index < *NumberOfPrivateResources; Index++) {
+    if (IS_TRACE_FLAG_SET (ParseFlags)) {
+      UnicodeSPrint (
+        Buffer,
+        sizeof (Buffer),
+        L"Private resources [%d]",
+        Index
+        );
 
-    PrintFieldName (4, Buffer);
-    Print (
-      L"0x%x\n",
-      *((UINT32*)(Ptr + Offset))
-      );
+      PrintFieldName (4, Buffer);
+      Print (
+        L"0x%x\n",
+        *((UINT32*)(Ptr + Offset))
+        );
+    }
+
+    if (IS_GRAPH_FLAG_SET (ParseFlags)) {
+      TypePtr = PpttStartPointer + *((UINT32*)(Ptr + Offset));
+      if (*TypePtr == EFI_ACPI_6_2_PPTT_TYPE_ID) {
+        continue;
+      }
+      DotAddLink (
+        mDotFileHandle,
+        *((UINT32*)(Ptr + Offset)),
+        (UINT32)(Ptr - PpttStartPointer),
+        DOT_ARROW_RANK_REVERSE
+        );
+    }
 
     Offset += sizeof (UINT32);
-    Index++;
   }
 }
 
@@ -329,6 +386,8 @@ DumpCacheTypeStructure (
   IN UINT8  Length
   )
 {
+  CHAR16 LabelBuffer[64];
+
   ParseAcpi (
     IS_TRACE_FLAG_SET (ParseFlags),
     2,
@@ -337,6 +396,88 @@ DumpCacheTypeStructure (
     Length,
     PARSER_PARAMS (CacheTypeStructureParser)
     );
+
+  if (IS_GRAPH_FLAG_SET (ParseFlags)) {
+    // Create cache node
+
+    // Start node label with type of cache
+    switch (CacheAttributes->CacheType) {
+      case EFI_ACPI_6_3_CACHE_ATTRIBUTES_CACHE_TYPE_DATA:
+        UnicodeSPrint (
+          LabelBuffer,
+          sizeof (LabelBuffer),
+          L"D-Cache\\n"
+          );
+        break;
+      case EFI_ACPI_6_3_CACHE_ATTRIBUTES_CACHE_TYPE_INSTRUCTION:
+        UnicodeSPrint (
+          LabelBuffer,
+          sizeof (LabelBuffer),
+          L"I-Cache\\n"
+          );
+        break;
+      default:
+        UnicodeSPrint (
+          LabelBuffer,
+          sizeof (LabelBuffer),
+          L"Unified Cache\\n"
+          );
+    }
+
+    // Add size of cache to node label
+    if (((*CacheSize) & 0xfff00000) != 0) {
+      UnicodeSPrint (
+        LabelBuffer,
+        sizeof (LabelBuffer),
+        L"%s%dMiB",
+        LabelBuffer,
+        *CacheSize >> 20
+        );
+    }
+    if ((*CacheSize & 0xffc00) != 0) {
+      UnicodeSPrint (
+        LabelBuffer,
+        sizeof (LabelBuffer),
+        L"%s%dkiB",
+        LabelBuffer,
+        (*CacheSize >> 10) & 0x3ff
+        );
+    }
+    if ((*CacheSize & 0x3ff) != 0) {
+      UnicodeSPrint (
+        LabelBuffer,
+        sizeof (LabelBuffer),
+        L"%s%dB",
+        LabelBuffer,
+        *CacheSize & 0x3ff
+        );
+    }
+    if (*CacheSize == 0) {
+      UnicodeSPrint (
+        LabelBuffer,
+        sizeof (LabelBuffer),
+        L"%s0B",
+        LabelBuffer
+        );
+    }
+
+    //Add node to dot file
+    DotAddNode (
+      mDotFileHandle,
+      (UINT32)(Ptr - PpttStartPointer),
+      DOT_BOX_SQUARE | DOT_COLOR_YELLOW | DOT_BOX_ADD_ID_TO_LABEL,
+      LabelBuffer
+      );
+
+    if (*NextLevelOfCache != 0) {
+      DotAddLink (
+        mDotFileHandle,
+        *NextLevelOfCache,
+        (UINT32)(Ptr - PpttStartPointer),
+        DOT_ARROW_RANK_REVERSE | DOT_COLOR_GRAY
+        );
+    }
+  }
 }
 
 /**
@@ -390,12 +531,45 @@ ParseAcpiPptt (
   IN UINT8   AcpiTableRevision
   )
 {
-  UINT32 Offset;
-  UINT8* ProcessorTopologyStructurePtr;
+  EFI_STATUS  Status;
+  UINT32      Offset;
+  UINT8*      ProcessorTopologyStructurePtr;
+  CHAR16      Buffer[128];
+  CHAR16      FileNameBuffer[MAX_FILE_NAME_LEN];
 
-  if (!IS_TRACE_FLAG_SET (ParseFlags)) {
+  if (!IS_TRACE_FLAG_SET (ParseFlags) &&
+      !IS_GRAPH_FLAG_SET (ParseFlags)) {
     return;
   }
+
+  if (IS_GRAPH_FLAG_SET (ParseFlags)) {
+    Status = GetNewFileName (
+               L"PPTT",
+               L"dot",
+               FileNameBuffer,
+               sizeof (FileNameBuffer)
+               );
+
+    if (EFI_ERROR (Status)) {
+      Print (
+        L"Error: Could not open dot file for PPTT table:\n"
+        L"Could not get a file name."
+        );
+      // Abandonning creation of dot graph by unsetting the flag.
+      // We continue parsing in case trace is set.
+      ParseFlags &= ~PARSE_FLAGS_GRAPH;
+    } else {
+      mDotFileHandle = DotOpenNewFile (FileNameBuffer);
+      if (mDotFileHandle == NULL) {
+        Print (L"ERROR: Could not open dot file for PPTT table.\n");
+        // Abandonning creation of dot graph by unsetting the flag.
+        // We continue parsing in case trace is set.
+        ParseFlags &= ~PARSE_FLAGS_GRAPH;
+      }
+    }
+  }
+
+  PpttStartPointer = Ptr;
 
   Offset = ParseAcpi (
              IS_TRACE_FLAG_SET (ParseFlags),
@@ -405,6 +579,24 @@ ParseAcpiPptt (
              AcpiTableLength,
              PARSER_PARAMS (PpttParser)
              );
+
+  if (*(AcpiHdrInfo.Revision) < 2 &&
+       IS_GRAPH_FLAG_SET (ParseFlags)) {
+    Print (L"\nWARNING: Dot output may not be consistent for PPTT revisions < 2\n");
+    UnicodeSPrint (
+      Buffer,
+      sizeof (Buffer),
+      L"WARNING: PPTT table revision is %u.\\n" \
+      L"Revisions lower than 2 might lead to incorrect labelling",
+      *(AcpiHdrInfo.Revision)
+      );
+    DotAddNode (
+      mDotFileHandle,
+      0,
+      DOT_COLOR_RED | DOT_BOX_SQUARE,
+      Buffer
+      );
+  }
 
   ProcessorTopologyStructurePtr = Ptr + Offset;
 
@@ -486,4 +678,8 @@ ParseAcpiPptt (
     ProcessorTopologyStructurePtr += *ProcessorTopologyStructureLength;
     Offset += *ProcessorTopologyStructureLength;
   } // while
+
+  if (IS_GRAPH_FLAG_SET (ParseFlags)) {
+    DotCloseFile (mDotFileHandle);
+  }
 }
