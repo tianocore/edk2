@@ -19,7 +19,7 @@ jobs:
   - job: Platform_CI
     variables:
       package: 'EmulatorPkg'
-      vm_image: 'ubuntu-18.04'
+      vm_image: 'ubuntu-16.04'
       should_run: false
       run_flags: "MAKE_STARTUP_NSH=TRUE"
 
