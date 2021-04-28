@@ -49,5 +49,7 @@ InterruptDxeInitialize (
     Status = EFI_UNSUPPORTED;
   }
 
+  Status = 0;
+
   return Status;
 }
