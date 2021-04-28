@@ -135,6 +135,6 @@ jobs:
         - bash: sudo apt-get update
           displayName: do apt-get update
           condition: and(gt(variables.pkg_count, 0), eq(variables['Build.Arch'], 'IA32'), succeeded())
-        - bash: sudo apt-get install libc6-dev:i386 libx11-dev:i386 libxext-dev:i386 lib32gcc-7-dev
+        - bash: sudo apt-get install libc6-dev-i386 libx11-dev libxext-dev lib32gcc-7-dev
           displayName: Add additional i386 packages
           condition: and(gt(variables.pkg_count, 0), eq(variables['Build.Arch'], 'IA32'), succeeded())
