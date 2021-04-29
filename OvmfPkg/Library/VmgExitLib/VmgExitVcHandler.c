@@ -643,6 +643,9 @@ ValidateMmioMemory (
   //
   // Any state other than unencrypted is an error, issue a #GP.
   //
+  DEBUG ((DEBUG_ERROR,
+    "MMIO using encrypted memory: %lx\n",
+    (UINT64) MemoryAddress));
   GpEvent.Uint64 = 0;
   GpEvent.Elements.Vector = GP_EXCEPTION;
   GpEvent.Elements.Type   = GHCB_EVENT_INJECTION_TYPE_EXCEPTION;
@@ -817,6 +820,7 @@ MmioExit (
     // fall through
     //
   case 0xB7:
+    DecodeModRm (Regs, InstructionData);
     Bytes = (Bytes != 0) ? Bytes : 2;
 
     Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
@@ -835,7 +839,7 @@ MmioExit (
     }
 
     Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
-    SetMem (Register, InstructionData->DataSize, 0);
+    SetMem (Register, (UINTN) (1 << InstructionData->DataSize), 0);
     CopyMem (Register, Ghcb->SharedBuffer, Bytes);
     break;
 
@@ -848,6 +852,7 @@ MmioExit (
     // fall through
     //
   case 0xBF:
+    DecodeModRm (Regs, InstructionData);
     Bytes = (Bytes != 0) ? Bytes : 2;
 
     Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
@@ -878,7 +883,7 @@ MmioExit (
     }
 
     Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
-    SetMem (Register, InstructionData->DataSize, SignByte);
+    SetMem (Register, (UINTN) (1 << InstructionData->DataSize), SignByte);
     CopyMem (Register, Ghcb->SharedBuffer, Bytes);
     break;
 
