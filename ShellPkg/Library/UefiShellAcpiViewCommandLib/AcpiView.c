@@ -27,8 +27,55 @@
 #include "Arm/SbbrValidator.h"
 #endif
 
-STATIC UINT32             mTableCount;
-STATIC UINT32             mBinTableCount;
+STATIC UINT32  mTableCount;
+
+/**
+  This function finds a filename not already used by adding a number in between
+  The BaseFileName and the extension.
+
+  Make sure the buffer FileName is big enough before calling the function. A
+  size of MAX_FILE_NAME_LEN is recommended.
+
+  @param [in]      BaseFileName      Start of the desired file name.
+  @param [in]      Extension         Extension of the desired file name
+                                     (without '.').
+  @param [in, out] FileName          Preallocated buffer for the returned file
+                                     name.
+  @param [in]      FileNameBufferLen Size of FileName buffer..
+**/
+EFI_STATUS
+GetNewFileName (
+  IN     CONST CHAR16* BaseFileName,
+  IN     CONST CHAR16* Extension,
+  IN OUT       CHAR16* FileName,
+  IN           UINT32  FileNameBufferLen
+  )
+{
+  UINT16            Index;
+  EFI_STATUS        Status;
+  SHELL_FILE_HANDLE tmpFileHandle;
+  for (Index = 0; Index <= 99; Index++) {
+    UnicodeSPrint(
+      FileName,
+      FileNameBufferLen,
+      L"%s%02d.%s",
+      BaseFileName,
+      Index,
+      Extension
+      );
+    Status = ShellOpenFileByName (
+               FileName,
+               &tmpFileHandle,
+               EFI_FILE_MODE_READ,
+               0
+               );
+    if (Status == EFI_NOT_FOUND) {
+      return EFI_SUCCESS;
+    }
+    ShellCloseFile (&tmpFileHandle);
+  }
+  return EFI_OUT_OF_RESOURCES;
+}
 
 /**
   This function dumps the ACPI table to a file.
@@ -46,19 +93,27 @@ DumpAcpiTableToFile (
   IN CONST UINTN   Length
   )
 {
-  CHAR16              FileNameBuffer[MAX_FILE_NAME_LEN];
-  UINTN               TransferBytes;
-  SELECTED_ACPI_TABLE *SelectedTable;
+  CHAR16               FileNameBuffer[MAX_FILE_NAME_LEN];
+  UINTN                TransferBytes;
+  EFI_STATUS           Status;
+  SELECTED_ACPI_TABLE* SelectedTable;
 
   GetSelectedAcpiTable (&SelectedTable);
 
-  UnicodeSPrint (
-    FileNameBuffer,
-    sizeof (FileNameBuffer),
-    L".\\%s%04d.bin",
-    SelectedTable->Name,
-    mBinTableCount++
-    );
+  Status = GetNewFileName (
+             SelectedTable->Name,
+             L"bin",
+             FileNameBuffer,
+             sizeof (FileNameBuffer)
+             );
+  if (EFI_ERROR (Status)) {
+    Print (
+      L"Error: Could not open bin file for %s table:\n"
+      L"Could not get a file name.",
+      SelectedTable->Name
+      );
+    return FALSE;
+  }
 
   Print (L"Dumping ACPI table to : %s ... ", FileNameBuffer);
 
@@ -207,7 +262,6 @@ AcpiView (
 
   // Reset Table counts
   mTableCount = 0;
-  mBinTableCount = 0;
 
   // Reset The error/warning counters
   ResetErrorCount ();
