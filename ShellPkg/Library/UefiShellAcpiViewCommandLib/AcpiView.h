@@ -1,12 +1,13 @@
 /** @file
   Header file for AcpiView
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #ifndef ACPIVIEW_H_
 #define ACPIVIEW_H_
+#include <Library/ShellLib.h>
 
 /**
   A macro to define the max file name length
@@ -22,6 +23,28 @@
   Offset to the RSDP length from the start of the RSDP
 **/
 #define RSDP_LENGTH_OFFSET   20
+
+/**
+  This function finds a filename not already used by adding a number in between
+  the BaseFileName and the extension.
+
+  Make sure the buffer FileName is big enough before calling the function. A
+  size of MAX_FILE_NAME_LEN is recommended.
+
+  @param [in]      BaseFileName      Start of the desired file name.
+  @param [in]      Extension         Extension of the desired file name
+                                     (without '.').
+  @param [in, out] FileName          Preallocated buffer for the returned file
+                                     name.
+  @param [in]      FileNameBufferLen Size of FileName buffer..
+**/
+EFI_STATUS
+GetNewFileName (
+  IN     CONST CHAR16* BaseFileName,
+  IN     CONST CHAR16* Extension,
+  IN OUT       CHAR16* FileName,
+  IN           UINT32  FileNameBufferLen
+  );
 
 /**
   This function resets the ACPI table error counter to Zero.
