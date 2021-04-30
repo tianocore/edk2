@@ -2,7 +2,7 @@
   Library instance of PciHostBridgeLib library class for coreboot.
 
   Copyright (C) 2016, Red Hat, Inc.
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -19,6 +19,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PciHostBridgeLib.h>
 #include <Library/PciLib.h>
+#include <Library/HobLib.h>
 
 #include "PciHostBridge.h"
 
@@ -47,7 +48,6 @@ CB_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
     }
   }
 };
-
 
 /**
   Initialize a PCI_ROOT_BRIDGE structure.
@@ -145,6 +145,27 @@ InitRootBridge (
   return EFI_SUCCESS;
 }
 
+/**
+  Initialize DevicePath for a PCI_ROOT_BRIDGE.
+  @param[in] HID               HID for device path
+  @param[in] UID               UID for device path
+
+  @retval A pointer to the new created device patch.
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+CreateRootBridgeDevicePath (
+  IN     UINT32                   HID,
+  IN     UINT32                   UID
+)
+{
+  CB_PCI_ROOT_BRIDGE_DEVICE_PATH *DevicePath;
+  DevicePath = AllocateCopyPool (sizeof (mRootBridgeDevicePathTemplate),
+                                 &mRootBridgeDevicePathTemplate);
+  ASSERT (DevicePath != NULL);
+  DevicePath->AcpiDevicePath.HID = HID;
+  DevicePath->AcpiDevicePath.UID = UID;
+  return (EFI_DEVICE_PATH_PROTOCOL *)DevicePath;
+}
 
 /**
   Return all the root bridge instances in an array.
@@ -161,9 +182,29 @@ PciHostBridgeGetRootBridges (
   UINTN *Count
 )
 {
+  UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *PciRootBridgeInfo;
+  EFI_HOB_GUID_TYPE                   *GuidHob;
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER    *GenericHeader;
+  //
+  // Find Universal Payload PCI Root Bridge Info hob
+  //
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadPciRootBridgeInfoGuid);
+  if (GuidHob != NULL) {
+    GenericHeader = (UNIVERSAL_PAYLOAD_GENERIC_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+    if ((sizeof(UNIVERSAL_PAYLOAD_GENERIC_HEADER) <= GET_GUID_HOB_DATA_SIZE (GuidHob)) && (GenericHeader->Length <= GET_GUID_HOB_DATA_SIZE (GuidHob))) {
+      if ((GenericHeader->Revision == UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES_REVISION) && (GenericHeader->Length >= sizeof (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES))) {
+        //
+        // UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES structure is used when Revision equals to UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES_REVISION
+        //
+        PciRootBridgeInfo = (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES *) GET_GUID_HOB_DATA (GuidHob);
+        if (PciRootBridgeInfo->Count <= (GET_GUID_HOB_DATA_SIZE (GuidHob) - sizeof(UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES)) / sizeof(UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE)) {
+          return RetrieveRootBridgeInfoFromHob (PciRootBridgeInfo, Count);
+        }
+      }
+    }
+  }
   return ScanForRootBridges (Count);
 }
-
 
 /**
   Free the root bridge instances array returned from
