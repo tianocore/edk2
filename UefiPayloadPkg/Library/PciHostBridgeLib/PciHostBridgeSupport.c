@@ -1,7 +1,7 @@
 /** @file
   Scan the entire PCI bus for root bridges to support coreboot UEFI payload.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -581,4 +581,75 @@ ScanForRootBridges (
   }
 
   return RootBridges;
+}
+
+/**
+  Scan for all root bridges from Universal Payload PciRootBridgeInfoHob
+
+  @param[in]  PciRootBridgeInfo    Pointer of Universal Payload PCI Root Bridge Info Hob
+  @param[out] NumberOfRootBridges  Number of root bridges detected
+
+  @retval     Pointer to the allocated PCI_ROOT_BRIDGE structure array.
+
+**/
+PCI_ROOT_BRIDGE *
+RetrieveRootBridgeInfoFromHob (
+  IN  UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *PciRootBridgeInfo,
+  OUT UINTN                               *NumberOfRootBridges
+)
+{
+  PCI_ROOT_BRIDGE                *PciRootBridges;
+  UINTN                          Size;
+  UINT8                          Index;
+
+  ASSERT (PciRootBridgeInfo != NULL);
+  ASSERT (NumberOfRootBridges != NULL);
+  if (PciRootBridgeInfo == NULL) {
+    return NULL;
+  }
+  if (PciRootBridgeInfo->Count == 0) {
+    return NULL;
+  }
+  Size = PciRootBridgeInfo->Count * sizeof (PCI_ROOT_BRIDGE);
+  PciRootBridges = (PCI_ROOT_BRIDGE *) AllocatePool (Size);
+  ASSERT (PciRootBridges != NULL);
+  if (PciRootBridges == NULL) {
+    return NULL;
+  }
+  ZeroMem (PciRootBridges, PciRootBridgeInfo->Count * sizeof (PCI_ROOT_BRIDGE));
+
+  //
+  // Create all root bridges with PciRootBridgeInfoHob
+  //
+  for (Index = 0; Index < PciRootBridgeInfo->Count; Index++) {
+    PciRootBridges[Index].Segment               = PciRootBridgeInfo->RootBridge[Index].Segment;
+    PciRootBridges[Index].Supports              = PciRootBridgeInfo->RootBridge[Index].Supports;
+    PciRootBridges[Index].Attributes            = PciRootBridgeInfo->RootBridge[Index].Attributes;
+    PciRootBridges[Index].DmaAbove4G            = PciRootBridgeInfo->RootBridge[Index].DmaAbove4G;
+    PciRootBridges[Index].NoExtendedConfigSpace = PciRootBridgeInfo->RootBridge[Index].NoExtendedConfigSpace;
+    PciRootBridges[Index].ResourceAssigned      = PciRootBridgeInfo->ResourceAssigned;
+    PciRootBridges[Index].AllocationAttributes  = PciRootBridgeInfo->RootBridge[Index].AllocationAttributes;
+    PciRootBridges[Index].DevicePath            = CreateRootBridgeDevicePath(PciRootBridgeInfo->RootBridge[Index].HID, PciRootBridgeInfo->RootBridge[Index].UID);
+    CopyMem(&PciRootBridges[Index].Bus,         &PciRootBridgeInfo->RootBridge[Index].Bus,         sizeof(UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE_APERTURE));
+    CopyMem(&PciRootBridges[Index].Io,          &PciRootBridgeInfo->RootBridge[Index].Io,          sizeof(UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE_APERTURE));
+    CopyMem(&PciRootBridges[Index].Mem,         &PciRootBridgeInfo->RootBridge[Index].Mem,         sizeof(UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE_APERTURE));
+    CopyMem(&PciRootBridges[Index].MemAbove4G,  &PciRootBridgeInfo->RootBridge[Index].MemAbove4G,  sizeof(UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE_APERTURE));
+    CopyMem(&PciRootBridges[Index].PMem,        &PciRootBridgeInfo->RootBridge[Index].PMem,        sizeof(UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE_APERTURE));
+    CopyMem(&PciRootBridges[Index].PMemAbove4G, &PciRootBridgeInfo->RootBridge[Index].PMemAbove4G, sizeof(UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE_APERTURE));
+  }
+
+  *NumberOfRootBridges = PciRootBridgeInfo->Count;
+
+  //
+  // Now, this library only supports RootBridge that ResourceAssigned is True
+  //
+  if (PciRootBridgeInfo->ResourceAssigned) {
+    PcdSetBoolS (PcdPciDisableBusEnumeration, TRUE);
+  } else {
+    DEBUG ((DEBUG_ERROR, "There is root bridge whose ResourceAssigned is FALSE\n"));
+    PcdSetBoolS (PcdPciDisableBusEnumeration, FALSE);
+    return NULL;
+  }
+
+  return PciRootBridges;
 }
