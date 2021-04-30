@@ -16,6 +16,8 @@
         ##     "<ErrorID>", "<KeyWord>"
         ## ]
         "ExceptionList": [
+            "8005", "UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE.UID",
+            "8005", "UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE.HID",
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
