@@ -2,7 +2,7 @@
   This code produces the Smbios protocol. It also responsible for constructing
   SMBIOS table into system table.
 
-Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -148,6 +148,12 @@ SMBIOS_TABLE_3_0_ENTRY_POINT Smbios30EntryPointStructureData = {
   //
   0
 };
+
+IS_SMBIOS_TABLE_VALID_ENTRY mIsSmbiosTableValid[] = {
+  {&gUniversalPayloadSmbios3TableGuid, IsValidSmbios30Table },
+  {&gUniversalPayloadSmbiosTableGuid,  IsValidSmbios20Table }
+};
+
 /**
 
   Get the full size of SMBIOS structure including optional strings that follow the formatted structure.
@@ -1409,6 +1415,290 @@ SmbiosTableConstruction (
 }
 
 /**
+  Validates a SMBIOS 2.0 table entry point.
+
+  @param  TableEntry       The SmBios table entry to validate.
+  @param  TableAddress     On exit, point to the smbios table addres.
+  @param  TableMaximumSize On exit, point to the maximum size of the table.
+
+  @retval TRUE           SMBIOS table entry point is valid.
+  @retval FALSE          SMBIOS table entry point is malformed.
+
+**/
+STATIC
+BOOLEAN
+IsValidSmbios20Table (
+  IN  VOID               *TableEntry,
+  OUT VOID               **TableAddress,
+  OUT UINTN              *TableMaximumSize
+  )
+{
+  UINT8                                      Checksum;
+  SMBIOS_TABLE_ENTRY_POINT                   *SmbiosTable;
+  SmbiosTable = (SMBIOS_TABLE_ENTRY_POINT *) TableEntry;
+
+  if (CompareMem (SmbiosTable->AnchorString, "_SM_", 4) != 0) {
+    return FALSE;
+  }
+
+  if (CompareMem (SmbiosTable->IntermediateAnchorString, "_DMI_", 5) != 0) {
+    return FALSE;
+  }
+
+  //
+  // The actual value of the EntryPointLength should be 1Fh.
+  // However, it was incorrectly stated in version 2.1 of smbios specification.
+  // Therefore, 0x1F and 0x1E are both accepted.
+  //
+  if (SmbiosTable->EntryPointLength != 0x1E && SmbiosTable->EntryPointLength != sizeof (SMBIOS_TABLE_ENTRY_POINT)) {
+    return FALSE;
+  }
+
+  //
+  // MajorVersion should not be less than 2.
+  //
+  if (SmbiosTable->MajorVersion < 2) {
+    return FALSE;
+  }
+
+  //
+  // The whole struct check sum should be zero
+  //
+  Checksum = CalculateSum8 (
+               (UINT8 *) SmbiosTable,
+               SmbiosTable->EntryPointLength
+               );
+  if (Checksum != 0) {
+    return FALSE;
+  }
+
+  //
+  // The Intermediate Entry Point Structure check sum should be zero.
+  //
+  Checksum = CalculateSum8 (
+               (UINT8 *) SmbiosTable + OFFSET_OF (SMBIOS_TABLE_ENTRY_POINT, IntermediateAnchorString),
+               SmbiosTable->EntryPointLength - OFFSET_OF (SMBIOS_TABLE_ENTRY_POINT, IntermediateAnchorString)
+               );
+  if (Checksum != 0) {
+    return FALSE;
+  }
+
+  *TableAddress     = (VOID *) (UINTN) SmbiosTable->TableAddress;
+  *TableMaximumSize = SmbiosTable->TableLength;
+  return TRUE;
+}
+
+/**
+  Validates a SMBIOS 3.0 table entry point.
+
+  @param  TableEntry       The SmBios table entry to validate.
+  @param  TableAddress     On exit, point to the smbios table addres.
+  @param  TableMaximumSize On exit, point to the maximum size of the table.
+
+  @retval TRUE           SMBIOS table entry point is valid.
+  @retval FALSE          SMBIOS table entry point is malformed.
+
+**/
+STATIC
+BOOLEAN
+IsValidSmbios30Table (
+  IN  VOID               *TableEntry,
+  OUT VOID               **TableAddress,
+  OUT UINTN              *TableMaximumSize
+  )
+{
+  UINT8                          Checksum;
+  SMBIOS_TABLE_3_0_ENTRY_POINT   *SmbiosTable;
+  SmbiosTable = (SMBIOS_TABLE_3_0_ENTRY_POINT *) TableEntry;
+
+  if (CompareMem (SmbiosTable->AnchorString, "_SM3_", 5) != 0) {
+    return FALSE;
+  }
+  if (SmbiosTable->EntryPointLength < sizeof (SMBIOS_TABLE_3_0_ENTRY_POINT)) {
+    return FALSE;
+  }
+  if (SmbiosTable->MajorVersion < 3) {
+    return FALSE;
+  }
+
+  //
+  // The whole struct check sum should be zero
+  //
+  Checksum = CalculateSum8 (
+               (UINT8 *) SmbiosTable,
+               SmbiosTable->EntryPointLength
+               );
+  if (Checksum != 0) {
+    return FALSE;
+  }
+
+  *TableAddress     = (VOID *) (UINTN) SmbiosTable->TableAddress;
+  *TableMaximumSize = SmbiosTable->TableMaximumSize;
+  return TRUE;
+}
+
+/**
+  Parse an existing SMBIOS table and insert it using SmbiosAdd.
+
+  @param  ImageHandle           The EFI_HANDLE to this driver.
+  @param  Smbios                The SMBIOS table to parse.
+  @param  Length                The length of the SMBIOS table.
+
+  @retval EFI_SUCCESS           SMBIOS table was parsed and installed.
+  @retval EFI_OUT_OF_RESOURCES  Record was not added due to lack of system resources.
+  @retval EFI_INVALID_PARAMETER Smbios is not a correct smbios table
+
+**/
+STATIC
+EFI_STATUS
+ParseAndAddExistingSmbiosTable (
+  IN EFI_HANDLE                    ImageHandle,
+  IN SMBIOS_STRUCTURE_POINTER      Smbios,
+  IN UINTN                         Length
+  )
+{
+  EFI_STATUS                    Status;
+  CHAR8                         *String;
+  EFI_SMBIOS_HANDLE             SmbiosHandle;
+  SMBIOS_STRUCTURE_POINTER      SmbiosEnd;
+
+  SmbiosEnd.Raw = Smbios.Raw + Length;
+
+  if (Smbios.Raw >= SmbiosEnd.Raw || Smbios.Raw == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  do {
+    //
+    // Make sure not to access memory beyond SmbiosEnd
+    //
+    if (Smbios.Raw + sizeof (SMBIOS_STRUCTURE) > SmbiosEnd.Raw ||
+      Smbios.Raw + sizeof (SMBIOS_STRUCTURE) < Smbios.Raw) {
+      return EFI_INVALID_PARAMETER;
+    }
+    //
+    // Check for end marker
+    //
+    if (Smbios.Hdr->Type == SMBIOS_TYPE_END_OF_TABLE) {
+      break;
+    }
+    //
+    // Make sure not to access memory beyond SmbiosEnd
+    // Each structure shall be terminated by a double-null (0000h).
+    //
+    if (Smbios.Raw + Smbios.Hdr->Length + 2 * sizeof (UINT8) > SmbiosEnd.Raw ||
+      Smbios.Raw + Smbios.Hdr->Length + 2 * sizeof (UINT8) < Smbios.Raw) {
+      return EFI_INVALID_PARAMETER;
+    }
+    //
+    // Install the table
+    //
+    SmbiosHandle = Smbios.Hdr->Handle;
+    Status = SmbiosAdd (
+               &mPrivateData.Smbios,
+               ImageHandle,
+               &SmbiosHandle,
+               Smbios.Hdr
+               );
+
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+    //
+    // Go to the next SMBIOS structure. Each SMBIOS structure may include 2 parts:
+    // 1. Formatted section; 2. Unformatted string section. So, 2 steps are needed
+    // to skip one SMBIOS structure.
+    //
+
+    //
+    // Step 1: Skip over formatted section.
+    //
+    String = (CHAR8 *) (Smbios.Raw + Smbios.Hdr->Length);
+
+    //
+    // Step 2: Skip over unformatted string section.
+    //
+    do {
+      //
+      // Each string is terminated with a NULL(00h) BYTE and the sets of strings
+      // is terminated with an additional NULL(00h) BYTE.
+      //
+      for ( ; *String != 0; String++) {
+        if ((UINTN) String >= (UINTN) SmbiosEnd.Raw - sizeof (UINT8)) {
+          return EFI_INVALID_PARAMETER;
+        }
+      }
+
+      if (*(UINT8 *) ++String == 0) {
+        //
+        // Pointer to the next SMBIOS structure.
+        //
+        Smbios.Raw = (UINT8 *) ++String;
+        break;
+      }
+    } while (TRUE);
+  } while (Smbios.Raw < SmbiosEnd.Raw);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Retrieve SMBIOS from Hob.
+  @param ImageHandle     Module's image handle
+
+  @retval EFI_SUCCESS    Smbios from Hob is installed.
+  @return EFI_NOT_FOUND  Not found Smbios from Hob.
+  @retval Other          No Smbios from Hob is installed.
+
+**/
+EFI_STATUS
+RetrieveSmbiosFromHob (
+  IN EFI_HANDLE           ImageHandle
+  )
+{
+  EFI_STATUS                         Status;
+  UINTN                              Index;
+  SMBIOS_STRUCTURE_POINTER           Smbios;
+  EFI_HOB_GUID_TYPE                  *GuidHob;
+  UNIVERSAL_PAYLOAD_SMBIOS_TABLE     *SmBiosTableAdress;
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER   *GenericHeader;
+  VOID                               *TableAddress;
+  UINTN                              TableMaximumSize;
+
+  Status = EFI_NOT_FOUND;
+
+  for (Index = 0; Index < ARRAY_SIZE (mIsSmbiosTableValid); Index++) {
+    GuidHob = GetFirstGuidHob (mIsSmbiosTableValid[Index].Guid);
+    if (GuidHob == NULL) {
+      continue;
+    }
+    GenericHeader = (UNIVERSAL_PAYLOAD_GENERIC_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+    if ((sizeof (UNIVERSAL_PAYLOAD_GENERIC_HEADER) <= GET_GUID_HOB_DATA_SIZE (GuidHob)) && (GenericHeader->Length <= GET_GUID_HOB_DATA_SIZE (GuidHob))) {
+      if (GenericHeader->Revision == UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION) {
+        //
+        // UNIVERSAL_PAYLOAD_SMBIOS_TABLE structure is used when Revision equals to UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION
+        //
+        SmBiosTableAdress = (UNIVERSAL_PAYLOAD_SMBIOS_TABLE *) GET_GUID_HOB_DATA (GuidHob);
+        if (GenericHeader->Length >= UNIVERSAL_PAYLOAD_SIZEOF_THROUGH_FIELD (UNIVERSAL_PAYLOAD_SMBIOS_TABLE, SmBiosEntryPoint)) {
+          if (mIsSmbiosTableValid[Index].IsValid ((VOID *) (UINTN )SmBiosTableAdress->SmBiosEntryPoint, &TableAddress, &TableMaximumSize)) {
+            Smbios.Raw = TableAddress;
+            Status = ParseAndAddExistingSmbiosTable (ImageHandle, Smbios, TableMaximumSize);
+            if (EFI_ERROR (Status)) {
+              DEBUG ((DEBUG_ERROR, "RetrieveSmbiosFromHob: Failed to parse preinstalled tables from Guid Hob\n"));
+              Status = EFI_UNSUPPORTED;
+            } else {
+              return EFI_SUCCESS;
+            }
+          }
+        }
+      }
+    }
+  }
+  return Status;
+}
+
+/**
 
   Driver to produce Smbios protocol and pre-allocate 1 page for the final SMBIOS table.
 
@@ -1451,5 +1741,6 @@ SmbiosDriverEntryPoint (
                   &mPrivateData.Smbios
                   );
 
+  RetrieveSmbiosFromHob (ImageHandle);
   return Status;
 }
