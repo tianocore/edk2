@@ -181,18 +181,10 @@ class AutoGenInfo(object):
                         if Family == ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
                             FamilyMatch = True
                             Found = True
-                    if TAB_TOD_DEFINES_FAMILY in ToolDef[Tool]:
-                        if Family == ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
-                            FamilyMatch = True
-                            Found = True
                 if TAB_STAR in ToolDef:
                     FamilyIsNull = False
                     if TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDef[TAB_STAR]:
                         if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
-                            FamilyMatch = True
-                            Found = True
-                    if TAB_TOD_DEFINES_FAMILY in ToolDef[TAB_STAR]:
-                        if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_FAMILY]:
                             FamilyMatch = True
                             Found = True
                 if not Found:
@@ -640,14 +632,19 @@ class PlatformInfo(AutoGenInfo):
                     if Attr == TAB_TOD_DEFINES_BUILDRULEORDER:
                         continue
                     Value = Options[Tool][Attr]
-                    # check if override is indicated
-                    if Value.startswith('='):
-                        BuildOptions[Tool][Attr] = mws.handleWsMacro(Value[1:])
-                    else:
-                        if Attr != 'PATH':
-                            BuildOptions[Tool][Attr] += " " + mws.handleWsMacro(Value)
+                    ToolList = [Tool]
+                    if Tool == TAB_STAR:
+                        ToolList = list(AllTools)
+                        ToolList.remove(TAB_STAR)
+                    for ExpandedTool in ToolList:
+                        # check if override is indicated
+                        if Value.startswith('='):
+                            BuildOptions[ExpandedTool][Attr] = mws.handleWsMacro(Value[1:])
                         else:
-                            BuildOptions[Tool][Attr] = mws.handleWsMacro(Value)
+                            if Attr != 'PATH':
+                                BuildOptions[ExpandedTool][Attr] += " " + mws.handleWsMacro(Value)
+                            else:
+                                BuildOptions[ExpandedTool][Attr] = mws.handleWsMacro(Value)
 
         return BuildOptions, BuildRuleOrder
 
