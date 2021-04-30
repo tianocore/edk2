@@ -1,7 +1,7 @@
 ## @file
 # This driver initializes and installs the SMBIOS protocol, constructs SMBIOS table into system configuration table.
 #
-# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -41,6 +41,7 @@
   UefiDriverEntryPoint
   DebugLib
   PcdLib
+  HobLib
 
 [Protocols]
   gEfiSmbiosProtocolGuid                            ## PRODUCES
@@ -48,6 +49,8 @@
 [Guids]
   gEfiSmbiosTableGuid                               ## SOMETIMES_PRODUCES ## SystemTable
   gEfiSmbios3TableGuid                              ## SOMETIMES_PRODUCES ## SystemTable
+  gUniversalPayloadSmbios3TableGuid                 ## CONSUMES           ## HOB
+  gUniversalPayloadSmbiosTableGuid                  ## SOMETIMES_CONSUMES ## HOB
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion   ## CONSUMES
