@@ -11,7 +11,31 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef UNIVERSAL_PAYLOAD_H_
 #define UNIVERSAL_PAYLOAD_H_
 
+/**
+  Main entry point to Universal Payload.
+
+  @param HobList  Pointer to the beginning of the HOB List from boot loader.
+**/
+typedef  VOID   (EFIAPI *UNIVERSAL_PAYLOAD_ENTRY) (VOID *HobList);
+
+#define UNIVERSAL_PAYLOAD_IDENTIFIER                   SIGNATURE_32('U', 'P', 'L', 'D')
+#define UNIVERSAL_PAYLOAD_INFO_SEC_NAME                ".upld_info"
+#define UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX        ".upld."
+#define UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX_LENGTH (sizeof (UNIVERSAL_PAYLOAD_EXTRA_SEC_NAME_PREFIX) - 1)
+
 #pragma pack(1)
+
+typedef struct {
+  UINT32                          Identifier;
+  UINT32                          HeaderLength;
+  UINT16                          SpecRevision;
+  UINT8                           Reserved[2];
+  UINT32                          Revision;
+  UINT32                          Attribute;
+  UINT32                          Capability;
+  CHAR8                           ProducerId[16];
+  CHAR8                           ImageId[16];
+} UNIVERSAL_PAYLOAD_INFO_HEADER;
 
 typedef struct {
   UINT8                Revision;
