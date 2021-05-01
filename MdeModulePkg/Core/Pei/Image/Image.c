@@ -1,7 +1,7 @@
 /** @file
   Pei Core Load Image Support
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -660,9 +660,6 @@ PeiLoadImageLoadImage (
     &ImageSize,
     &ImageEntryPoint
   );
-
-  ASSERT_EFI_ERROR (Status);
-
 
   if (EFI_ERROR (Status)) {
     return Status;
