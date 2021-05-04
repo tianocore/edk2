@@ -111,6 +111,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled
   gUefiCpuPkgTokenSpaceGuid.PcdSevSnpIsEnabled
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
