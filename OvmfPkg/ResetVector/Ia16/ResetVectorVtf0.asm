@@ -55,11 +55,16 @@ guidedStructureStart:
 ;   the BIOS at a RAM area defined by SEV_SNP_CPUID_BASE. A hypervisor will
 ;   locate this information using the SEV-SNP boot block GUID.
 ;
+;   In order to boot the SEV-SNP guest the hypervisor must pre-validated the
+;   memory range from SNP_HV_VALIDATED_START to SNP_HV_VALIDATED_END.
+;
 ; GUID (SEV-SNP boot block): bd39c0c2-2f8e-4243-83e8-1b74cebcb7d9
 ;
 sevSnpBootBlockStart:
     DD      SNP_CPUID_BASE
     DD      SNP_CPUID_SIZE
+    DD      SNP_HV_VALIDATED_START
+    DD      SNP_HV_VALIDATED_END
     DW      sevSnpBootBlockEnd - sevSnpBootBlockStart
     DB      0xC2, 0xC0, 0x39, 0xBD, 0x8e, 0x2F, 0x43, 0x42
     DB      0x83, 0xE8, 0x1B, 0x74, 0xCE, 0xBC, 0xB7, 0xD9
