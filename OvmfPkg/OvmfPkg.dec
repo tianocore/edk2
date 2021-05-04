@@ -336,6 +336,11 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpHypervisorPreValidatedStart|0x0|UINT32|0x49
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpHypervisorPreValidatedEnd|0x0|UINT32|0x50
 
+  ## The range of memory that need to be pre-validated in the SEC phase
+  #  when SEV-SNP is active in the guest VM.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecPreValidatedStart|0|UINT32|0x51
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecPreValidatedEnd|0|UINT32|0x52
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
