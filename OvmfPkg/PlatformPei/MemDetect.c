@@ -894,6 +894,18 @@ InitializeRamRegions (
         EfiACPIMemoryNVS
         );
     }
+
+    if (MemEncryptSevSnpIsEnabled ()) {
+      //
+      // If SEV-SNP is enabled, reserve the CPUID page. The memory range should
+      // not be treated as a RAM by the guest OS, so, mark it as reserved.
+      //
+      BuildMemoryAllocationHob (
+        (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfSnpCpuidBase),
+        (UINT64)(UINTN) PcdGet32 (PcdOvmfSnpCpuidSize),
+        EfiReservedMemoryType
+      );
+    }
 #endif
   }
 
