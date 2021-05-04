@@ -727,7 +727,10 @@
   }
 
   OvmfPkg/PlatformDxe/Platform.inf
-  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
+  OvmfPkg/AmdSevDxe/AmdSevDxe.inf {
+    <LibraryClasses>
+    PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  }
   OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 
   #
