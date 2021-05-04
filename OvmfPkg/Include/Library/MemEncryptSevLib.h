@@ -67,6 +67,18 @@ typedef enum {
 } MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE;
 
 /**
+  Returns a boolean to indicate whether SEV-SNP is enabled
+
+  @retval TRUE           SEV-SNP is enabled
+  @retval FALSE          SEV-SNP is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpIsEnabled (
+  VOID
+  );
+
+/**
   Returns a boolean to indicate whether SEV-ES is enabled.
 
   @retval TRUE           SEV-ES is enabled

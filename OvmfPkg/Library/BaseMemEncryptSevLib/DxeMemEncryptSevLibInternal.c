@@ -19,6 +19,7 @@
 
 STATIC BOOLEAN mSevStatus = FALSE;
 STATIC BOOLEAN mSevEsStatus = FALSE;
+STATIC BOOLEAN mSevSnpStatus = FALSE;
 STATIC BOOLEAN mSevStatusChecked = FALSE;
 
 STATIC UINT64  mSevEncryptionMask = 0;
@@ -82,9 +83,35 @@ InternalMemEncryptSevStatus (
     if (Msr.Bits.SevEsBit) {
       mSevEsStatus = TRUE;
     }
+
+    //
+    // Check MSR_0xC0010131 Bit 2 (Sev-Snp Enabled)
+    //
+    if (Msr.Bits.SevSnpBit) {
+      mSevSnpStatus = TRUE;
+    }
   }
 
   mSevStatusChecked = TRUE;
+}
+
+/**
+  Returns a boolean to indicate whether SEV-SNP is enabled.
+
+  @retval TRUE           SEV-SNP is enabled
+  @retval FALSE          SEV-SNP is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpIsEnabled (
+  VOID
+  )
+{
+  if (!mSevStatusChecked) {
+    InternalMemEncryptSevStatus ();
+  }
+
+  return mSevSnpStatus;
 }
 
 /**
