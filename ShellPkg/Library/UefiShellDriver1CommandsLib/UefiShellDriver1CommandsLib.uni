@@ -324,7 +324,7 @@
 "     disconnect all child handles of the 'DeviceHandle'.\r\n"
 "  3. If the '-r' option is specified, all consoles and drivers will be\r\n"
 "     disconnected from all devices in the system, then consoles are\r\n"
-"     reconnected. If the '-nc' option is also spcified, then console devices\r\n"
+"     reconnected. If the '-nc' option is also specified, then console devices\r\n"
 "     are not reconnected.\r\n"
 "  4. This command does not support output redirection.\r\n"
 ".SH EXAMPLES\r\n"
