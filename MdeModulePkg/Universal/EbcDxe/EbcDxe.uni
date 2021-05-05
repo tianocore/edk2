@@ -1,5 +1,5 @@
 // /** @file
-// Module that produces EBC Interprete and EBC Debug Support protocols.
+// Module that produces EBC Interpreter and EBC Debug Support protocols.
 //
 // This module implements EFI Byte Code (EBC) Virtual Machine that can provide
 // platform and processor-independent mechanisms for loading and executing EFI
