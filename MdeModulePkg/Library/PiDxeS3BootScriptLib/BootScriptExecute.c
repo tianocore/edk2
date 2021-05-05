@@ -369,7 +369,7 @@ ScriptIoWrite (
   return EFI_SUCCESS;
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_IO_WRITE OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_IO_WRITE OP code.
 
   @param Script       Pointer to the node which is to be interpreted.
 
@@ -598,7 +598,7 @@ ScriptMemoryWrite (
   return EFI_SUCCESS;
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_MEM_WRITE OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_MEM_WRITE OP code.
 
   @param[in]  Script Pointer to the node which is to be interpreted.
 
@@ -859,7 +859,7 @@ ScriptPciCfgWrite (
   return ScriptPciCfg2Write (Width, 0, Address, Count, Buffer);
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE OP code.
 
   @param  Script        The pointer of typed node in boot script table
 
@@ -887,7 +887,7 @@ BootScriptExecutePciCfgWrite (
   return ScriptPciCfgWrite (Width, Address, Count, Buffer);
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_IO_READ_WRITE OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_IO_READ_WRITE OP code.
 
   @param Script   The pointer of typed node in boot script table
   @param AndMask  Mask value for 'and' operation
@@ -931,7 +931,7 @@ BootScriptExecuteIoReadWrite (
   return Status;
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_MEM_READ_WRITE OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_MEM_READ_WRITE OP code.
 
   @param Script    The pointer of typed node in boot script table
   @param AndMask   Mask value for 'and' operation
@@ -975,7 +975,7 @@ BootScriptExecuteMemoryReadWrite (
   return Status;
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_PCI_CFG_READ_WRITE OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_PCI_CFG_READ_WRITE OP code.
 
   @param Script   The pointer of typed node in boot script table
   @param AndMask  Mask value for 'and' operation
@@ -1023,7 +1023,7 @@ BootScriptExecutePciCfgReadWrite (
   return Status;
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_SMBUS_EXECUTE OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_SMBUS_EXECUTE OP code.
 
   @param Script  The pointer of typed node in boot script table
 
@@ -1054,7 +1054,7 @@ BootScriptExecuteSmbusExecute (
            );
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_STALL OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_STALL OP code.
 
   @param Script      The pointer of typed node in boot script table
 
@@ -1075,7 +1075,7 @@ BootScriptExecuteStall (
   return EFI_SUCCESS;
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_DISPATCH OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_DISPATCH OP code.
 
   @param Script  The pointer of typed node in boot script table
   @retval EFI_SUCCESS  The operation was executed successfully
@@ -1099,7 +1099,7 @@ BootScriptExecuteDispatch (
   return Status;
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_DISPATCH_2 OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_DISPATCH_2 OP code.
 
   @param  Script       The pointer of typed node in boot script table
   @retval EFI_SUCCESS  The operation was executed successfully
@@ -1124,7 +1124,7 @@ BootScriptExecuteDispatch2 (
   return Status;
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_MEM_POLL OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_MEM_POLL OP code.
 
   @param  Script  The pointer of typed node in boot script table
   @param  AndMask  Mask value for 'and' operation
@@ -1325,7 +1325,7 @@ CheckAndOrMask (
   return;
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_IO_POLL OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_IO_POLL OP code.
 
   @param  Script  The pointer of typed node in boot script table
   @param  AndMask  Mask value for 'and' operation
@@ -1382,7 +1382,7 @@ BootScriptExecuteIoPoll (
   }
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE OP code.
 
   @param    Script              The pointer of S3 boot script
 
@@ -1415,7 +1415,7 @@ BootScriptExecutePciCfg2Write (
 
 
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE OP code.
 
   @param     Script                     The pointer of S3 boot script
   @param     AndMask                    Mask value for 'and' operation
@@ -1463,7 +1463,7 @@ BootScriptExecutePciCfg2ReadWrite (
   return Status;
 }
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_PCI_CONFIG_POLL OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_PCI_CONFIG_POLL OP code.
 
   @param     Script                     The pointer of S3 boot script
   @param     AndMask                    Mask value for 'and' operation
@@ -1522,7 +1522,7 @@ BootScriptPciCfgPoll (
 }
 
 /**
-  Interprete the boot script node with EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL OP code.
+  Interpret the boot script node with EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL OP code.
 
   @param     Script                     The pointer of S3 Boot Script
   @param     AndMask                    Mask value for 'and' operation

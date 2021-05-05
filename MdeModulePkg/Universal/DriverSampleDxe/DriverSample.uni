@@ -2,7 +2,7 @@
 // This is a sample HII driver.
 //
 // This driver shows how HII protocol, VFR and UNI files are used to create a HII
-// driver which can be dipslayed and configured by a UEFI HII Form Browser.
+// driver which can be displayed and configured by a UEFI HII Form Browser.
 //
 // Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 //

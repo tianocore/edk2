@@ -313,7 +313,7 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSerialPciDeviceInfo_PROMPT  #language en-US "PCI Serial Device Info"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSerialPciDeviceInfo_HELP  #language en-US "PCI Serial Device Info. It is an array of Device, Function, and Power Management\n"
-                                                                                        "information that describes the path that contains zero or more PCI to PCI briges\n"
+                                                                                        "information that describes the path that contains zero or more PCI to PCI bridges\n"
                                                                                         "followed by a PCI serial device.  Each array entry is 4-bytes in length.  The\n"
                                                                                         "first byte is the PCI Device Number, then second byte is the PCI Function Number,\n"
                                                                                         "and the last two bytes are the offset to the PCI power management capabilities\n"
@@ -880,7 +880,7 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdDriverHealthConfigureForm_PROMPT  #language en-US "Driver Health Management Form"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdDriverHealthConfigureForm_HELP  #language en-US "This PCD points to the formset GUID of the driver health management form\n"
-                                                                                              "The form will be popped up by BDS core when there are Configuration Required driver health intances.\n"
+                                                                                              "The form will be popped up by BDS core when there are Configuration Required driver health instances.\n"
                                                                                               "Platform can customize the PCD to point to different formset."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSetupVideoHorizontalResolution_PROMPT  #language en-US "Video Horizontal Resolution of Text Setup"
@@ -1173,9 +1173,9 @@
                                                                                           " TRUE  - Capsule In Ram is supported.<BR>"
                                                                                           " FALSE - Capsule In Ram is not supported."
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCodRelocationDevPath_PROMPT  #language en-US "Capsule On Disk relacation device path."
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCodRelocationDevPath_PROMPT  #language en-US "Capsule On Disk relocation device path."
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCodRelocationDevPath_HELP  #language en-US   "Full device path of plaform specific device to store Capsule On Disk temp relocation file.<BR>"
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCodRelocationDevPath_HELP  #language en-US   "Full device path of platform specific device to store Capsule On Disk temp relocation file.<BR>"
                                                                                            "If this PCD is set, Capsule On Disk temp relocation file will be stored in the device specified by this PCD, instead of the EFI System Partition that stores capsule image file."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNullPointerDetectionPropertyMask_PROMPT  #language en-US "Enable NULL pointer detection"

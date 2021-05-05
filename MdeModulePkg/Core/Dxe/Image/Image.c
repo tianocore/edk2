@@ -470,7 +470,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
        if (ValueInSectionHeader != 0) {
          //
          // When the feature is configured as load module at fixed absolute address, the ImageAddress field of ImageContext
-         // hold the spcified address. If the feature is configured as load module at fixed offset, ImageAddress hold an offset
+         // hold the specified address. If the feature is configured as load module at fixed offset, ImageAddress hold an offset
          // relative to top address
          //
          if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) < 0) {

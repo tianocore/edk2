@@ -1,7 +1,7 @@
 ## @file
 #  PCI Incompatible device support module template.
 #
-#  Installs EFI PCI Incompatible Device Support protocol and includes one incompatile
+#  Installs EFI PCI Incompatible Device Support protocol and includes one incompatible
 #  pci devices list template.
 #
 #  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
