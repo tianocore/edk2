@@ -53,11 +53,11 @@ typedef union {
   UINT64  GhcbPhysicalAddress;
 } MSR_SEV_ES_GHCB_REGISTER;
 
-#define GHCB_INFO_SEV_INFO                 1
-#define GHCB_INFO_SEV_INFO_GET             2
-#define GHCB_INFO_CPUID_REQUEST            4
-#define GHCB_INFO_CPUID_RESPONSE           5
-#define GHCB_INFO_TERMINATE_REQUEST        256
+#define GHCB_INFO_SEV_INFO                          1
+#define GHCB_INFO_SEV_INFO_GET                      2
+#define GHCB_INFO_CPUID_REQUEST                     4
+#define GHCB_INFO_CPUID_RESPONSE                    5
+#define GHCB_INFO_TERMINATE_REQUEST                 256
 
 #define GHCB_TERMINATE_GHCB                0
 #define GHCB_TERMINATE_GHCB_GENERAL        0

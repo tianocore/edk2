@@ -49,12 +49,12 @@
 //
 // VMG Special Exit Codes
 //
-#define SVM_EXIT_MMIO_READ      0x80000001ULL
-#define SVM_EXIT_MMIO_WRITE     0x80000002ULL
-#define SVM_EXIT_NMI_COMPLETE   0x80000003ULL
-#define SVM_EXIT_AP_RESET_HOLD  0x80000004ULL
-#define SVM_EXIT_AP_JUMP_TABLE  0x80000005ULL
-#define SVM_EXIT_UNSUPPORTED    0x8000FFFFULL
+#define SVM_EXIT_MMIO_READ                      0x80000001ULL
+#define SVM_EXIT_MMIO_WRITE                     0x80000002ULL
+#define SVM_EXIT_NMI_COMPLETE                   0x80000003ULL
+#define SVM_EXIT_AP_RESET_HOLD                  0x80000004ULL
+#define SVM_EXIT_AP_JUMP_TABLE                  0x80000005ULL
+#define SVM_EXIT_UNSUPPORTED                    0x8000FFFFULL
 
 //
 // IOIO Exit Information
