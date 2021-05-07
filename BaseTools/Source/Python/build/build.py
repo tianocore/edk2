@@ -62,6 +62,7 @@ from AutoGen.ModuleAutoGenHelper import WorkSpaceInfo, PlatformInfo
 from GenFds.FdfParser import FdfParser
 from AutoGen.IncludesAutoGen import IncludesAutoGen
 from GenFds.GenFds import resetFdsGlobalVariable
+from AutoGen.AutoGen import CalculatePriorityValue
 
 ## standard targets of build command
 gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'clean', 'cleanall', 'cleanlib', 'run']
@@ -2425,27 +2426,41 @@ class Build():
                 FvDir = Wa.FvDir
                 if not os.path.exists(FvDir):
                     continue
-
                 for Arch in self.ArchList:
-                    # Look through the tool definitions for GUIDed tools
+                    guidList = []
+                    tooldefguidList = []
                     guidAttribs = []
-                    for (attrib, value) in self.ToolDef.ToolsDefTxtDictionary.items():
-                        GuidBuildTarget, GuidToolChain, GuidArch, GuidTool, GuidAttr = attrib.split('_')
-                        if GuidAttr.upper() == 'GUID':
-                            if GuidBuildTarget == TAB_STAR:
-                                GuidBuildTarget = BuildTarget
-                            if GuidToolChain == TAB_STAR:
-                                GuidToolChain = ToolChain
-                            if GuidArch == TAB_STAR:
-                                GuidArch = Arch
-                            if GuidBuildTarget == BuildTarget and GuidToolChain == ToolChain and GuidArch == Arch:
-                                path = '_'.join(attrib.split('_')[:-1]) + '_PATH'
-                                if path in self.ToolDef.ToolsDefTxtDictionary:
-                                    path = self.ToolDef.ToolsDefTxtDictionary[path]
-                                    path = self.GetRealPathOfTool(path)
-                                    guidAttribs.append((value.lower(), GuidTool, path))
+                    for Platform in Wa.AutoGenObjectList:
+                        if Platform.BuildTarget != BuildTarget:
+                            continue
+                        if Platform.ToolChain != ToolChain:
+                            continue
+                        if Platform.Arch != Arch:
+                            continue
+                        for Tool in Platform.BuildOption:
+                            if 'GUID' in Platform.BuildOption[Tool]:
+                                if 'PATH' in Platform.BuildOption[Tool]:
+                                    value = Platform.BuildOption[Tool]['GUID']
+                                    if value in guidList:
+                                        EdkLogger.error("build", FORMAT_INVALID, "Duplicate GUID value %s used with Tool %s in DSC [BuildOptions]." % (value, Tool))
+                                    path = Platform.BuildOption[Tool]['PATH']
+                                    guidList.append(value)
+                                    guidAttribs.append((value, Tool, path))
+                        for Tool in Platform.ToolDefinition:
+                            if 'GUID' in Platform.ToolDefinition[Tool]:
+                                if 'PATH' in Platform.ToolDefinition[Tool]:
+                                    value = Platform.ToolDefinition[Tool]['GUID']
+                                    if value in tooldefguidList:
+                                        EdkLogger.error("build", FORMAT_INVALID, "Duplicate GUID value %s used with Tool %s in tools_def.txt." % (value, Tool))
+                                    tooldefguidList.append(value)
+                                    if value in guidList:
+                                        # Already added by platform
+                                        continue
+                                    path = Platform.ToolDefinition[Tool]['PATH']
+                                    guidList.append(value)
+                                    guidAttribs.append((value, Tool, path))
                     # Sort by GuidTool name
-                    sorted (guidAttribs, key=lambda x: x[1])
+                    guidAttribs = sorted (guidAttribs, key=lambda x: x[1])
                     # Write out GuidedSecTools.txt
                     toolsFile = os.path.join(FvDir, 'GuidedSectionTools.txt')
                     toolsFile = open(toolsFile, 'wt')
