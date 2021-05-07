@@ -55,6 +55,7 @@
 #define SVM_EXIT_AP_RESET_HOLD                  0x80000004ULL
 #define SVM_EXIT_AP_JUMP_TABLE                  0x80000005ULL
 #define SVM_EXIT_SNP_PAGE_STATE_CHANGE          0x80000010ULL
+#define SVM_EXIT_SNP_AP_CREATION                0x80000013ULL
 #define SVM_EXIT_HYPERVISOR_FEATURES            0x8000FFFDULL
 #define SVM_EXIT_UNSUPPORTED                    0x8000FFFFULL
 
@@ -83,6 +84,12 @@
 #define IOIO_SEG_ES         0
 #define IOIO_SEG_DS         (BIT11 | BIT10)
 
+//
+// AP Creation Information
+//
+#define SVM_VMGEXIT_SNP_AP_CREATE_ON_INIT  0
+#define SVM_VMGEXIT_SNP_AP_CREATE          1
+#define SVM_VMGEXIT_SNP_AP_DESTROY         2
 
 typedef PACKED struct {
   UINT8                  Reserved1[203];
@@ -194,5 +201,68 @@ typedef struct {
   SNP_PAGE_STATE_HEADER  Header;
   SNP_PAGE_STATE_ENTRY   Entry[SNP_PAGE_STATE_MAX_ENTRY];
 } SNP_PAGE_STATE_CHANGE_INFO;
+
+//
+// SEV-ES save area mapping structures used for SEV-SNP AP Creation.
+// Only the fields required to be set to a non-zero value are defined.
+//
+#pragma pack(1)
+typedef struct {
+  UINT16  Selector;
+  UINT16  Attributes;
+  UINT32  Limit;
+  UINT64  Base;
+} SEV_ES_SEGMENT_REGISTER;
+#pragma pack()
+
+#define SEV_ES_RESET_CS_ATTRIBUTES    (BIT7 | BIT4 | BIT3 | BIT1)
+#define SEV_ES_RESET_DS_ATTRIBUTES    (BIT7 | BIT4 | BIT1)
+#define SEV_ES_RESET_ES_ATTRIBUTES    SEV_ES_RESET_DS_ATTRIBUTES
+#define SEV_ES_RESET_FS_ATTRIBUTES    SEV_ES_RESET_DS_ATTRIBUTES
+#define SEV_ES_RESET_GS_ATTRIBUTES    SEV_ES_RESET_DS_ATTRIBUTES
+#define SEV_ES_RESET_SS_ATTRIBUTES    SEV_ES_RESET_DS_ATTRIBUTES
+
+#define SEV_ES_RESET_GDTR_ATTRIBUTES  0
+#define SEV_ES_RESET_LDTR_ATTRIBUTES  (BIT7 | 2)
+#define SEV_ES_RESET_IDTR_ATTRIBUTES  0
+#define SEV_ES_RESET_TR_ATTRIBUTES    (BIT7 | 3)
+
+#pragma pack(1)
+typedef struct {
+  SEV_ES_SEGMENT_REGISTER  Es;
+  SEV_ES_SEGMENT_REGISTER  Cs;
+  SEV_ES_SEGMENT_REGISTER  Ss;
+  SEV_ES_SEGMENT_REGISTER  Ds;
+  SEV_ES_SEGMENT_REGISTER  Fs;
+  SEV_ES_SEGMENT_REGISTER  Gs;
+  SEV_ES_SEGMENT_REGISTER  Gdtr;
+  SEV_ES_SEGMENT_REGISTER  Ldtr;
+  SEV_ES_SEGMENT_REGISTER  Idtr;
+  SEV_ES_SEGMENT_REGISTER  Tr;
+  UINT8                    Reserved1[42];
+  UINT8                    Vmpl;
+  UINT8                    Reserved2[5];
+  UINT64                   Efer;
+  UINT8                    Reserved3[112];
+  UINT64                   Cr4;
+  UINT8                    Reserved4[8];
+  UINT64                   Cr0;
+  UINT64                   Dr7;
+  UINT64                   Dr6;
+  UINT64                   Rflags;
+  UINT64                   Rip;
+  UINT8                    Reserved5[232];
+  UINT64                   GPat;
+  UINT8                    Reserved6[320];
+  UINT64                   SevFeatures;
+  UINT8                    Reserved7[48];
+  UINT64                   XCr0;
+  UINT8                    Reserved8[24];
+  UINT32                   Mxcsr;
+  UINT64                   X87Ftw;
+  UINT64                   Reserved9[8];
+  UINT64                   X87Fcw;
+} SEV_ES_SAVE_AREA;
+#pragma pack()
 
 #endif
