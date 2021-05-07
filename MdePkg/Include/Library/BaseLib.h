@@ -4857,8 +4857,42 @@ AsmPvalidate (
   IN   BOOLEAN                 Validate,
   IN   PHYSICAL_ADDRESS        Address
   );
-#endif
 
+//
+// RDX settings for RMPADJUST
+//
+#define RMPADJUST_VMPL_MAX               3
+#define RMPADJUST_VMPL_MASK              0xFF
+#define RMPADJUST_VMPL_SHIFT             0
+#define RMPADJUST_PERMISSION_MASK_MASK   0xFF
+#define RMPADJUST_PERMISSION_MASK_SHIFT  8
+#define RMPADJUST_VMSA_PAGE_BIT          BIT16
+
+/**
+  Adjusts the permissions of an SEV-SNP guest page.
+
+  Executes a RMPADJUST instruction with the register state specified by Rax,
+  Rcx and Rdx. Returns Eax. This function is only available x64.
+
+  The instruction is available only when CPUID Fn8000_001F_EAX[SNP]=1.
+
+  @param[in]  Rax   The value to load into RAX before executing the RMPADJUST
+                    instruction.
+  @param[in]  Rcx   The value to load into RCX before executing the RMPADJUST
+                    instruction.
+  @param[in]  Rdx   The value to load into RDX before executing the RMPADJUST
+                    instruction.
+
+  @return     Eax
+**/
+UINTN
+EFIAPI
+AsmRmpAdjust (
+  IN      UINTN                     Rax,
+  IN      UINTN                     Rcx,
+  IN      UINTN                     Rdx
+  );
+#endif
 
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 ///
