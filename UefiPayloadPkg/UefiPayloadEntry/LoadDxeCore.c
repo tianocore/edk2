@@ -305,3 +305,50 @@ LoadDxeCore (
 
   return EFI_SUCCESS;
 }
+
+/**
+  Find DXE core from FV and build DXE core HOBs.
+
+  @param[in]   DxeFv                 The FV where to find the DXE core.
+  @param[out]  DxeCoreEntryPoint     DXE core entry point
+
+  @retval EFI_SUCCESS        If it completed successfully.
+  @retval EFI_NOT_FOUND      If it failed to load DXE FV.
+**/
+EFI_STATUS
+UniversalLoadDxeCore (
+  IN  EFI_FIRMWARE_VOLUME_HEADER *DxeFv,
+  OUT PHYSICAL_ADDRESS           *DxeCoreEntryPoint
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_FFS_FILE_HEADER         *FileHeader;
+  VOID                        *PeCoffImage;
+  EFI_PHYSICAL_ADDRESS        ImageAddress;
+  UINT64                      ImageSize;
+
+  //
+  // Find DXE core file from DXE FV
+  //
+  Status = FvFindFile (DxeFv, EFI_FV_FILETYPE_DXE_CORE, &FileHeader);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = FileFindSection (FileHeader, EFI_SECTION_PE32, (VOID **)&PeCoffImage);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Get DXE core info
+  //
+  Status = LoadPeCoffImage (PeCoffImage, &ImageAddress, &ImageSize, DxeCoreEntryPoint);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  BuildModuleHob (&FileHeader->Name, ImageAddress, EFI_SIZE_TO_PAGES ((UINT32) ImageSize) * EFI_PAGE_SIZE, *DxeCoreEntryPoint);
+
+  return EFI_SUCCESS;
+}
