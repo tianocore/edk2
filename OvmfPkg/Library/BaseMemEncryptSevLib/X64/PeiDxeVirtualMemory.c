@@ -891,3 +891,36 @@ InternalMemEncryptSevSetMemoryEncrypted (
            Flush
            );
 }
+
+/**
+  This function clears memory encryption bit for the Mmio region specified by
+  PhysicalAddress and Length.
+
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
+  @param[in]  PhysicalAddress         The physical address that is the start
+                                      address of a mmio region.
+  @param[in]  Length                  The length of memory region
+
+  @retval RETURN_SUCCESS              The attributes were cleared for the
+                                      memory region.
+  @retval RETURN_INVALID_PARAMETER    Length is zero.
+  @retval RETURN_UNSUPPORTED          Clearing the memory encyrption attribute
+                                      is not supported
+**/
+RETURN_STATUS
+EFIAPI
+InternalMemEncryptSevClearMmioPageEncMask (
+  IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS        PhysicalAddress,
+  IN  UINTN                   Length
+  )
+{
+  return SetMemoryEncDec (
+           Cr3BaseAddress,
+           PhysicalAddress,
+           Length,
+           ClearCBit,
+           FALSE
+           );
+}
