@@ -66,8 +66,8 @@ HandOffToDxeCore (
   //
   // Get the address and size of the GHCB pages
   //
-  GhcbBase = (VOID *) PcdGet64 (PcdGhcbBase);
-  GhcbSize = PcdGet64 (PcdGhcbSize);
+  GhcbBase = 0;
+  GhcbSize = 0;
 
   PageTables = 0;
   if (FeaturePcdGet (PcdDxeIplBuildPageTables)) {

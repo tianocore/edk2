@@ -179,7 +179,8 @@ FindAnotherHighestBelow4GResourceDescriptor (
 **/
 EFI_STATUS
 BuildHobs (
-  IN UINTN                     BootloaderParameter
+  IN  UINTN                       BootloaderParameter,
+  OUT EFI_FIRMWARE_VOLUME_HEADER  **DxeFv
   )
 {
   EFI_PEI_HOB_POINTERS             Hob;
@@ -190,6 +191,9 @@ BuildHobs (
   EFI_PHYSICAL_ADDRESS             MemoryTop;
   EFI_HOB_RESOURCE_DESCRIPTOR      *PhitResourceHob;
   EFI_HOB_RESOURCE_DESCRIPTOR      *ResourceHob;
+  UNIVERSAL_PAYLOAD_EXTRA_DATA     *ExtraData;
+  UINT8                            *GuidHob;
+  EFI_HOB_FIRMWARE_VOLUME          *FvHob;
 
   Hob.Raw = (UINT8 *) BootloaderParameter;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
@@ -255,6 +259,10 @@ BuildHobs (
   //
 
   //
+  // Create an empty FvHob for the DXE FV that contains DXE core.
+  //
+  BuildFvHob ((EFI_PHYSICAL_ADDRESS) 0, 0);
+  //
   // Since payload created new Hob, move all hobs except PHIT from boot loader hob list.
   //
   while (!END_OF_HOB_LIST (Hob)) {
@@ -265,6 +273,25 @@ BuildHobs (
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 
+  //
+  // Get DXE FV location
+  //
+  GuidHob = GetFirstGuidHob(&gUniversalPayloadExtraDataGuid);
+  ASSERT (GuidHob != NULL);
+  ExtraData = (UNIVERSAL_PAYLOAD_EXTRA_DATA *) GET_GUID_HOB_DATA (GuidHob);
+  ASSERT (ExtraData->Count == 1);
+  ASSERT (AsciiStrCmp (ExtraData->Entry[0].Identifier, "uefi_fv") == 0);
+
+  *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) ExtraData->Entry[0].Base;
+  ASSERT ((*DxeFv)->FvLength == ExtraData->Entry[0].Size);
+
+  //
+  // Update DXE FV information to first fv hob in the hob list, which
+  // is the empty FvHob created before.
+  //
+  FvHob = GetFirstHob (EFI_HOB_TYPE_FV);
+  FvHob->BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) *DxeFv;
+  FvHob->Length = (*DxeFv)->FvLength;
   return EFI_SUCCESS;
 }
 
@@ -280,10 +307,13 @@ _ModuleEntryPoint (
   )
 {
   EFI_STATUS                    Status;
+  PHYSICAL_ADDRESS              DxeCoreEntryPoint;
   EFI_HOB_HANDOFF_INFO_TABLE    *HandoffHobTable;
   EFI_PEI_HOB_POINTERS          Hob;
+  EFI_FIRMWARE_VOLUME_HEADER    *DxeFv;
 
   mHobList = (VOID *) BootloaderParameter;
+  DxeFv    = NULL;
   // Call constructor for all libraries
   ProcessLibraryConstructorList ();
 
@@ -294,7 +324,11 @@ _ModuleEntryPoint (
   InitializeFloatingPointUnits ();
 
   // Build HOB based on information from Bootloader
-  Status = BuildHobs (BootloaderParameter);
+  Status = BuildHobs (BootloaderParameter, &DxeFv);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = UniversalLoadDxeCore (DxeFv, &DxeCoreEntryPoint);
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Mask off all legacy 8259 interrupt sources
@@ -304,6 +338,7 @@ _ModuleEntryPoint (
 
   HandoffHobTable = (EFI_HOB_HANDOFF_INFO_TABLE *) GetFirstHob(EFI_HOB_TYPE_HANDOFF);
   Hob.HandoffInformationTable = HandoffHobTable;
+  HandOffToDxeCore (DxeCoreEntryPoint, Hob);
 
   // Should not get here
   CpuDeadLoop ();
