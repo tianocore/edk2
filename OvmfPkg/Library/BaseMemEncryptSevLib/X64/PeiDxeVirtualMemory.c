@@ -555,8 +555,7 @@ EnableReadOnlyPageWriteProtect (
                                       address of a memory region.
   @param[in]  Length                  The length of memory region
   @param[in]  Mode                    Set or Clear mode
-  @param[in]  CacheFlush              Flush the caches before applying the
-                                      encryption mask
+  @param[in]  Mmio                    The physical address range is Mmio.
 
   @retval RETURN_SUCCESS              The attributes were cleared for the
                                       memory region.
@@ -572,7 +571,7 @@ SetMemoryEncDec (
   IN    PHYSICAL_ADDRESS         PhysicalAddress,
   IN    UINTN                    Length,
   IN    MAP_RANGE_MODE           Mode,
-  IN    BOOLEAN                  CacheFlush
+  IN    BOOLEAN                  Mmio
   )
 {
   PAGE_MAP_AND_DIRECTORY_POINTER *PageMapLevel4Entry;
@@ -585,12 +584,23 @@ SetMemoryEncDec (
   UINT64                         AddressEncMask;
   BOOLEAN                        IsWpEnabled;
   RETURN_STATUS                  Status;
+  BOOLEAN                        CacheFlush;
 
   //
   // Set PageMapLevel4Entry to suppress incorrect compiler/analyzer warnings.
   //
   PageMapLevel4Entry = NULL;
 
+  //
+  // The cache need to flushed for the non-Mmio address range.
+  //
+  if (Mmio == TRUE) {
+    CacheFlush = FALSE;
+  } else {
+    CacheFlush = TRUE;
+  }
+
+  //
   DEBUG ((
     DEBUG_VERBOSE,
     "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u\n",
@@ -600,7 +610,7 @@ SetMemoryEncDec (
     PhysicalAddress,
     (UINT64)Length,
     (Mode == SetCBit) ? "Encrypt" : "Decrypt",
-    (UINT32)CacheFlush
+    (UINT32)Mmio
     ));
 
   //
@@ -828,8 +838,6 @@ Done:
   @param[in]  PhysicalAddress         The physical address that is the start
                                       address of a memory region.
   @param[in]  Length                  The length of memory region
-  @param[in]  Flush                   Flush the caches before applying the
-                                      encryption mask
 
   @retval RETURN_SUCCESS              The attributes were cleared for the
                                       memory region.
@@ -842,8 +850,7 @@ EFIAPI
 InternalMemEncryptSevSetMemoryDecrypted (
   IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
   IN  PHYSICAL_ADDRESS        PhysicalAddress,
-  IN  UINTN                   Length,
-  IN  BOOLEAN                 Flush
+  IN  UINTN                   Length
   )
 {
 
@@ -852,7 +859,7 @@ InternalMemEncryptSevSetMemoryDecrypted (
            PhysicalAddress,
            Length,
            ClearCBit,
-           Flush
+           FALSE
            );
 }
 
@@ -865,8 +872,6 @@ InternalMemEncryptSevSetMemoryDecrypted (
   @param[in]  PhysicalAddress         The physical address that is the start
                                       address of a memory region.
   @param[in]  Length                  The length of memory region
-  @param[in]  Flush                   Flush the caches before applying the
-                                      encryption mask
 
   @retval RETURN_SUCCESS              The attributes were set for the memory
                                       region.
@@ -879,8 +884,7 @@ EFIAPI
 InternalMemEncryptSevSetMemoryEncrypted (
   IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
   IN  PHYSICAL_ADDRESS        PhysicalAddress,
-  IN  UINTN                   Length,
-  IN  BOOLEAN                 Flush
+  IN  UINTN                   Length
   )
 {
   return SetMemoryEncDec (
@@ -888,7 +892,7 @@ InternalMemEncryptSevSetMemoryEncrypted (
            PhysicalAddress,
            Length,
            SetCBit,
-           Flush
+           FALSE
            );
 }
 
@@ -921,6 +925,6 @@ InternalMemEncryptSevClearMmioPageEncMask (
            PhysicalAddress,
            Length,
            ClearCBit,
-           FALSE
+           TRUE
            );
 }

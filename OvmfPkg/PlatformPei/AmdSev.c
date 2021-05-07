@@ -72,8 +72,7 @@ AmdSevEsInitialize (
     DecryptStatus = MemEncryptSevClearPageEncMask (
       0,
       GhcbBasePa + EFI_PAGES_TO_SIZE (PageCount),
-      1,
-      TRUE
+      1
       );
     ASSERT_RETURN_ERROR (DecryptStatus);
   }
