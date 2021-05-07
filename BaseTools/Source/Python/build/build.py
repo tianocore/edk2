@@ -62,6 +62,7 @@ from AutoGen.ModuleAutoGenHelper import WorkSpaceInfo, PlatformInfo
 from GenFds.FdfParser import FdfParser
 from AutoGen.IncludesAutoGen import IncludesAutoGen
 from GenFds.GenFds import resetFdsGlobalVariable
+from AutoGen.AutoGen import CalculatePriorityValue
 
 ## standard targets of build command
 gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'clean', 'cleanall', 'cleanlib', 'run']
@@ -2428,8 +2429,9 @@ class Build():
 
                 for Arch in self.ArchList:
                     # Look through the tool definitions for GUIDed tools
-                    guidAttribs = []
+                    guidDict = {}
                     for (attrib, value) in self.ToolDef.ToolsDefTxtDictionary.items():
+                        value = value.lower()
                         GuidBuildTarget, GuidToolChain, GuidArch, GuidTool, GuidAttr = attrib.split('_')
                         if GuidAttr.upper() == 'GUID':
                             if GuidBuildTarget == TAB_STAR:
@@ -2443,7 +2445,16 @@ class Build():
                                 if path in self.ToolDef.ToolsDefTxtDictionary:
                                     path = self.ToolDef.ToolsDefTxtDictionary[path]
                                     path = self.GetRealPathOfTool(path)
-                                    guidAttribs.append((value.lower(), GuidTool, path))
+                                    # Keep the highest priority attrib
+                                    if value in guidDict:
+                                        if CalculatePriorityValue(attrib) < CalculatePriorityValue(guidDict[value][0]):
+                                            continue
+                                    guidDict[value] = (attrib, GuidTool, path)
+                    # Convert dictionary to list
+                    guidAttribs = []
+                    for value in guidDict:
+                        (attrib, GuidTool, path) = guidDict[value]
+                        guidAttribs.append((value, GuidTool, path))
                     # Sort by GuidTool name
                     sorted (guidAttribs, key=lambda x: x[1])
                     # Write out GuidedSecTools.txt
