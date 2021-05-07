@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2021, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
