@@ -10,7 +10,6 @@ import lldb
 import os
 import uuid
 import string
-import commands
 import optparse
 import shlex
 
@@ -389,7 +388,7 @@ def LoadEmulatorEfiSymbols(frame, bp_loc , internal_dict):
 
     FileName = frame.thread.process.ReadCStringFromMemory (FileNamePtr, FileNameLen, Error)
     if not Error.Success():
-        print "!ReadCStringFromMemory() did not find a %d byte C string at %x" % (FileNameLen, FileNamePtr)
+        print("!ReadCStringFromMemory() did not find a %d byte C string at %x" % (FileNameLen, FileNamePtr))
         # make breakpoint command continue
         return False
 
@@ -398,7 +397,7 @@ def LoadEmulatorEfiSymbols(frame, bp_loc , internal_dict):
         LoadAddress = frame.FindVariable ("LoadAddress").GetValueAsUnsigned() - 0x240
 
         debugger.HandleCommand ("target modules add  %s" % FileName)
-        print "target modules load --slid 0x%x %s" % (LoadAddress, FileName)
+        print("target modules load --slid 0x%x %s" % (LoadAddress, FileName))
         debugger.HandleCommand ("target modules load --slide 0x%x --file %s" % (LoadAddress, FileName))
     else:
         target = debugger.GetSelectedTarget()
@@ -408,7 +407,7 @@ def LoadEmulatorEfiSymbols(frame, bp_loc , internal_dict):
             if FileName == ModuleName or FileName == SBModule.GetFileSpec().GetFilename():
                 target.ClearModuleLoadAddress (SBModule)
                 if not target.RemoveModule (SBModule):
-                    print "!lldb.target.RemoveModule (%s) FAILED" % SBModule
+                    print("!lldb.target.RemoveModule (%s) FAILED" % SBModule)
 
     # make breakpoint command continue
     return False
@@ -490,15 +489,15 @@ def efi_guid_command(debugger, command, result, dict):
 
     if len(args) >= 1:
         if GuidStr in guid_dict:
-            print "%s = %s" % (guid_dict[GuidStr], GuidStr)
-            print "%s = %s" % (guid_dict[GuidStr], GuidToCStructStr (GuidStr))
+            print("%s = %s" % (guid_dict[GuidStr], GuidStr))
+            print("%s = %s" % (guid_dict[GuidStr], GuidToCStructStr (GuidStr)))
         else:
-            print GuidStr
+            print(GuidStr)
     else:
         # dump entire dictionary
         width = max(len(v) for k,v in guid_dict.iteritems())
         for value in sorted(guid_dict, key=guid_dict.get):
-            print '%-*s %s %s' % (width, guid_dict[value], value, GuidToCStructStr(value))
+            print('%-*s %s %s' % (width, guid_dict[value], value, GuidToCStructStr(value)))
 
     return
 
@@ -538,4 +537,4 @@ def __lldb_init_module (debugger, internal_dict):
         if Breakpoint.GetNumLocations() == 1:
             # Set the emulator breakpoints, if we are in the emulator
             debugger.HandleCommand("breakpoint command add -s python -F lldbefi.LoadEmulatorEfiSymbols {id}".format(id=Breakpoint.GetID()))
-            print 'Type r to run emulator. SecLldbScriptBreak armed. EFI modules should now get source level debugging in the emulator.'
+            print('Type r to run emulator. SecLldbScriptBreak armed. EFI modules should now get source level debugging in the emulator.')
