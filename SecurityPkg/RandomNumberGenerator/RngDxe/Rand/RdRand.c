@@ -8,48 +8,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 #include <Library/RngLib.h>
 
-#include "RdRand.h"
 #include "AesCore.h"
-
-/**
-  Calls RDRAND to fill a buffer of arbitrary size with random bytes.
-
-  @param[in]   Length        Size of the buffer, in bytes,  to fill with.
-  @param[out]  RandBuffer    Pointer to the buffer to store the random result.
-
-  @retval EFI_SUCCESS        Random bytes generation succeeded.
-  @retval EFI_NOT_READY      Failed to request random bytes.
-
-**/
-EFI_STATUS
-EFIAPI
-RdRandGetBytes (
-  IN UINTN         Length,
-  OUT UINT8        *RandBuffer
-  )
-{
-  BOOLEAN     IsRandom;
-  UINT64      TempRand[2];
-
-  while (Length > 0) {
-    IsRandom = GetRandomNumber128 (TempRand);
-    if (!IsRandom) {
-      return EFI_NOT_READY;
-    }
-    if (Length >= sizeof (TempRand)) {
-      WriteUnaligned64 ((UINT64*)RandBuffer, TempRand[0]);
-      RandBuffer += sizeof (UINT64);
-      WriteUnaligned64 ((UINT64*)RandBuffer, TempRand[1]);
-      RandBuffer += sizeof (UINT64);
-      Length -= sizeof (TempRand);
-    } else {
-      CopyMem (RandBuffer, TempRand, Length);
-      Length = 0;
-    }
-  }
-
-  return EFI_SUCCESS;
-}
+#include "RdRand.h"
+#include "RngDxeInternals.h"
 
 /**
   Creates a 128bit random value that is fully forward and backward prediction resistant,
@@ -92,7 +53,7 @@ RdRandGetSeed128 (
   //
   for (Index = 0; Index < 32; Index++) {
     MicroSecondDelay (10);
-    Status = RdRandGetBytes (16, RandByte);
+    Status = RngGetBytes (16, RandByte);
     if (EFI_ERROR (Status)) {
       return Status;
     }
