@@ -1265,7 +1265,7 @@ SetSevEsJumpTable (
   UINT32            Offset, InsnByte;
   UINT8             LoNib, HiNib;
 
-  JmpFar = (SEV_ES_AP_JMP_FAR *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  JmpFar = (SEV_ES_AP_JMP_FAR *) (UINTN) FixedPcdGet32 (PcdSevEsWorkAreaBase);
   ASSERT (JmpFar != NULL);
 
   //
