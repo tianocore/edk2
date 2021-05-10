@@ -267,6 +267,11 @@
   #
   RegisterFilterLib|Include/Library/RegisterFilterLib.h
 
+[LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
+  ##  @libraryclass  Provides services to generate random number.
+  #
+  RngLib|Include/Library/RngLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Abstracts both S/W SMI generation and detection.
   ##
@@ -287,10 +292,6 @@
   ##  @libraryclass  Provides services to enable/disable periodic SMI handlers.
   #
   SmmPeriodicSmiLib|Include/Library/SmmPeriodicSmiLib.h
-
-  ##  @libraryclass  Provides services to generate random number.
-  #
-  RngLib|Include/Library/RngLib.h
 
   ##  @libraryclass  Provides services to log the SMI handler registration.
   SmiHandlerProfileLib|Include/Library/SmiHandlerProfileLib.h
