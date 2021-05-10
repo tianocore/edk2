@@ -4,9 +4,9 @@
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
-  System Control and Management Interface V1.0
-    http://infocenter.arm.com/help/topic/com.arm.doc.den0056a/
-    DEN0056A_System_Control_and_Management_Interface.pdf
+  @par Specification Reference:
+  - Arm System Control and Management Interface - Platform Design Document
+    (https://developer.arm.com/documentation/den0056/)
 **/
 
 #ifndef ARM_SCMI_BASE_PROTOCOL_H_
@@ -14,7 +14,8 @@
 
 #include <Protocol/ArmScmi.h>
 
-#define BASE_PROTOCOL_VERSION  0x10000
+#define BASE_PROTOCOL_VERSION_V1  0x10000
+#define BASE_PROTOCOL_VERSION_V2  0x20000
 
 #define NUM_PROTOCOL_MASK      0xFFU
 #define NUM_AGENT_MASK         0xFFU
@@ -165,4 +166,3 @@ typedef enum {
 } SCMI_MESSAGE_ID_BASE;
 
 #endif /* ARM_SCMI_BASE_PROTOCOL_H_ */
-
