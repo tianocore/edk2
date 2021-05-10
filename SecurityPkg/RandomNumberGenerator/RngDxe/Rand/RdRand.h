@@ -24,23 +24,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Rng.h>
 
 /**
-  Calls RDRAND to fill a buffer of arbitrary size with random bytes.
-
-  @param[in]   Length        Size of the buffer, in bytes,  to fill with.
-  @param[out]  RandBuffer    Pointer to the buffer to store the random result.
-
-  @retval EFI_SUCCESS        Random bytes generation succeeded.
-  @retval EFI_NOT_READY      Failed to request random bytes.
-
-**/
-EFI_STATUS
-EFIAPI
-RdRandGetBytes (
-  IN UINTN         Length,
-  OUT UINT8        *RandBuffer
-  );
-
-/**
   Generate high-quality entropy source through RDRAND.
 
   @param[in]   Length        Size of the buffer, in bytes, to fill with.

@@ -26,15 +26,22 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources.common]
   RngDxe.c
-  RdRand.c
-  RdRand.h
-  AesCore.c
-  AesCore.h
+  RngDxeInternals.h
+
+[Sources.IA32, Sources.X64]
+  Rand/RngDxe.c
+  Rand/RdRand.c
+  Rand/RdRand.h
+  Rand/AesCore.c
+  Rand/AesCore.h
+
+[Sources.AARCH64]
+  AArch64/RngDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -50,11 +57,18 @@
   RngLib
 
 [Guids]
+  gEfiRngAlgorithmSp80090Hash256Guid  ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
+  gEfiRngAlgorithmSp80090Hmac256Guid  ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
   gEfiRngAlgorithmSp80090Ctr256Guid   ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
+  gEfiRngAlgorithmX9313DesGuid        ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
+  gEfiRngAlgorithmX931AesGuid         ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
   gEfiRngAlgorithmRaw                 ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
 
 [Protocols]
   gEfiRngProtocolGuid                ## PRODUCES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm      ## CONSUMES
 
 [Depex]
   TRUE
