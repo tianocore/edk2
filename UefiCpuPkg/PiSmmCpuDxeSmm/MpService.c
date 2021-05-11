@@ -1887,11 +1887,13 @@ InitializeMpServiceData (
   IN UINTN       ShadowStackSize
   )
 {
-  UINT32                    Cr3;
-  UINTN                     Index;
-  UINT8                     *GdtTssTables;
-  UINTN                     GdtTableStepSize;
-  CPUID_VERSION_INFO_EDX    RegEdx;
+  UINT32                          Cr3;
+  UINTN                           Index;
+  UINT8                           *GdtTssTables;
+  UINTN                           GdtTableStepSize;
+  CPUID_VERSION_INFO_EDX          RegEdx;
+  UINT32                          MaxExtendedFunction;
+  CPUID_VIR_PHY_ADDRESS_SIZE_EAX  VirPhyAddressSize;
 
   //
   // Determine if this CPU supports machine check
@@ -1918,9 +1920,17 @@ InitializeMpServiceData (
   // Initialize physical address mask
   // NOTE: Physical memory above virtual address limit is not supported !!!
   //
-  AsmCpuid (0x80000008, (UINT32*)&Index, NULL, NULL, NULL);
-  gPhyMask = LShiftU64 (1, (UINT8)Index) - 1;
-  gPhyMask &= (1ull << 48) - EFI_PAGE_SIZE;
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunction, NULL, NULL, NULL);
+  if (MaxExtendedFunction >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
+  } else {
+    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
+  }
+  gPhyMask  = LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits) - 1;
+  //
+  // Clear the low 12 bits
+  //
+  gPhyMask &= 0xfffffffffffff000ULL;
 
   //
   // Create page tables
