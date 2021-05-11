@@ -11,6 +11,8 @@
 #include <Guid/S3SmmInitDone.h>
 #include <Ppi/ShadowMicrocode.h>
 
+STATIC UINT64 mWakeupBuffer = BASE_1MB;
+
 /**
   S3 SMM Init Done notification function.
 
@@ -220,11 +222,11 @@ GetWakeupBuffer (
         // Need memory under 1MB to be collected here
         //
         WakeupBufferEnd = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
-        if (WakeupBufferEnd > BASE_1MB) {
+        if (WakeupBufferEnd > mWakeupBuffer) {
           //
-          // Wakeup buffer should be under 1MB
+          // Wakeup buffer should be under 1MB and under the previous one
           //
-          WakeupBufferEnd = BASE_1MB;
+          WakeupBufferEnd = mWakeupBuffer;
         }
         while (WakeupBufferEnd > WakeupBufferSize) {
           //
@@ -244,6 +246,12 @@ GetWakeupBuffer (
           }
           DEBUG ((DEBUG_INFO, "WakeupBufferStart = %x, WakeupBufferSize = %x\n",
                                WakeupBufferStart, WakeupBufferSize));
+
+          //
+          // Next wakeup buffer allocation must be below this allocation
+          //
+          mWakeupBuffer = WakeupBufferStart;
+
           return (UINTN)WakeupBufferStart;
         }
       }
