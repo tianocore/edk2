@@ -44,7 +44,7 @@ CONST CHAR8 *mExceptionNameStr[] = {
   "#MC - Machine-Check",
   "#XM - SIMD floating-point",
   "#VE - Virtualization",
-  "#CP - Control Protection"
+  "#CP - Control Protection",
   "Reserved",
   "Reserved",
   "Reserved",
