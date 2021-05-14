@@ -1164,20 +1164,6 @@ GetApResetVectorSize (
            AddressMap->SwitchToRealSize +
            sizeof (MP_CPU_EXCHANGE_INFO);
 
-  //
-  // The AP reset stack is only used by SEV-ES guests. Do not add to the
-  // allocation if SEV-ES is not enabled.
-  //
-  if (PcdGetBool (PcdSevEsIsEnabled)) {
-    //
-    // Stack location is based on APIC ID, so use the total number of
-    // processors for calculating the total stack area.
-    //
-    Size += AP_RESET_STACK_SIZE * PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
-
-    Size = ALIGN_VALUE (Size, CPU_STACK_ALIGNMENT);
-  }
-
   return Size;
 }
 
@@ -1192,6 +1178,7 @@ AllocateResetVector (
   )
 {
   UINTN           ApResetVectorSize;
+  UINTN           ApResetStackSize;
 
   if (CpuMpData->WakeupBuffer == (UINTN) -1) {
     ApResetVectorSize = GetApResetVectorSize (&CpuMpData->AddressMap);
@@ -1207,9 +1194,39 @@ AllocateResetVector (
                                     CpuMpData->AddressMap.ModeTransitionOffset
                                     );
     //
-    // The reset stack starts at the end of the buffer.
+    // The AP reset stack is only used by SEV-ES guests. Do not allocate it
+    // if SEV-ES is not enabled.
     //
-    CpuMpData->SevEsAPResetStackStart = CpuMpData->WakeupBuffer + ApResetVectorSize;
+    if (PcdGetBool (PcdSevEsIsEnabled)) {
+      //
+      // Stack location is based on ProcessorNumber, so use the total number
+      // of processors for calculating the total stack area.
+      //
+      ApResetStackSize = (AP_RESET_STACK_SIZE *
+                          PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+
+      //
+      // Invoke GetWakeupBuffer a second time to allocate the stack area
+      // below 1MB. The returned buffer will be page aligned and sized and
+      // below the previously allocated buffer.
+      //
+      CpuMpData->SevEsAPResetStackStart = GetWakeupBuffer (ApResetStackSize);
+
+      //
+      // Check to be sure that the "allocate below" behavior hasn't changed.
+      // This will also catch a failed allocation, as "-1" is returned on
+      // failure.
+      //
+      if (CpuMpData->SevEsAPResetStackStart >= CpuMpData->WakeupBuffer) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "SEV-ES AP reset stack is not below wakeup buffer\n"
+          ));
+
+        ASSERT (FALSE);
+        CpuDeadLoop ();
+      }
+    }
   }
   BackupAndPrepareWakeupBuffer (CpuMpData);
 }
