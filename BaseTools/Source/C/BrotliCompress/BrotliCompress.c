@@ -156,6 +156,7 @@ int CompressFile(char *InputFile, uint8_t *InputBuffer, char *OutputFile, uint8_
   uint8_t *NextOut;
   uint8_t *Input;
   uint8_t *Output;
+  size_t TotalOut;
   size_t OutSize;
   uint32_t SizeHint;
   BROTLI_BOOL IsOk;
@@ -214,39 +215,53 @@ int CompressFile(char *InputFile, uint8_t *InputBuffer, char *OutputFile, uint8_
       IsEof = !HasMoreInput(InputFileHandle);
     }
 
-    if (!BrotliEncoderCompressStream(EncodeState,
-      IsEof ? BROTLI_OPERATION_FINISH : BROTLI_OPERATION_PROCESS,
-      &AvailableIn, &NextIn, &AvailableOut, &NextOut, NULL)) {
-        printf("Failed to compress data [%s]\n", InputFile);
-        IsOk = BROTLI_FALSE;
-        goto Finish;
-    }
-    if (AvailableOut == 0) {
-      OutSize = (size_t)(NextOut - Output);
-      if (OutSize > 0) {
-        fwrite(Output, 1, OutSize, OutputFileHandle);
-        if (ferror(OutputFileHandle)) {
-          printf("Failed to write output [%s]\n", OutputFile);
+    if (!IsEof){
+      do{
+        if (!BrotliEncoderCompressStream(EncodeState,
+        BROTLI_OPERATION_FLUSH,
+        &AvailableIn, &NextIn, &AvailableOut, &NextOut, &TotalOut)) {
+          printf("Failed to compress data [%s]\n", InputFile);
           IsOk = BROTLI_FALSE;
           goto Finish;
         }
+        OutSize = (size_t)(NextOut - Output);
+        if (OutSize > 0) {
+          fwrite(Output, 1, OutSize, OutputFileHandle);
+          if (ferror(OutputFileHandle)) {
+            printf("Failed to write output [%s]\n", OutputFile);
+            IsOk = BROTLI_FALSE;
+            goto Finish;
+          }
+        }
+        NextOut = Output;
+        AvailableOut = kFileBufferSize;
       }
-      AvailableOut = kFileBufferSize;
-      NextOut = Output;
+      while (AvailableIn > 0 || BrotliEncoderHasMoreOutput(EncodeState));
     }
-    if (BrotliEncoderIsFinished(EncodeState)) {
-      OutSize = (size_t)(NextOut - Output);
-      if (OutSize > 0) {
-        fwrite(Output, 1, OutSize, OutputFileHandle);
-        if (ferror(OutputFileHandle)) {
-          printf("Failed to write output [%s]\n", OutputFile);
+    else{
+      do{
+        if (!BrotliEncoderCompressStream(EncodeState,
+        BROTLI_OPERATION_FINISH,
+        &AvailableIn, &NextIn, &AvailableOut, &NextOut, &TotalOut)) {
+          printf("Failed to compress data [%s]\n", InputFile);
           IsOk = BROTLI_FALSE;
           goto Finish;
         }
-        AvailableOut = 0;
+        OutSize = (size_t)(NextOut - Output);
+        if (OutSize > 0) {
+          fwrite(Output, 1, OutSize, OutputFileHandle);
+          if (ferror(OutputFileHandle)) {
+            printf("Failed to write output [%s]\n", OutputFile);
+            IsOk = BROTLI_FALSE;
+            goto Finish;
+          }
+        }
+        NextOut = Output;
+        AvailableOut = kFileBufferSize;
       }
+      while (AvailableIn > 0 || BrotliEncoderHasMoreOutput(EncodeState));
     }
-    if (IsEof) {
+    if (BrotliEncoderIsFinished(EncodeState)){
       break;
     }
   }
