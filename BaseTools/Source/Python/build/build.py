@@ -2757,6 +2757,7 @@ def Main():
             Conclusion = "Done"
         except:
             Conclusion = "Failed"
+            ReturnCode = POSTBUILD_ERROR
     elif ReturnCode == ABORT_ERROR:
         Conclusion = "Aborted"
     else:
