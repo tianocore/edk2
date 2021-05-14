@@ -19,8 +19,9 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <Library/AcpiHelperLib.h>
+#include <Library/AmlLib/AmlLib.h>
 #include <Library/SsdtSerialPortFixupLib.h>
-#include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 /** ARM standard SSDT Serial Port Table Generator
