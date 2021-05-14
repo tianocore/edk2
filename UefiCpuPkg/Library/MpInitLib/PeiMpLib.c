@@ -11,6 +11,8 @@
 #include <Guid/S3SmmInitDone.h>
 #include <Ppi/ShadowMicrocode.h>
 
+STATIC UINT64 mSevEsPeiWakeupBuffer = BASE_1MB;
+
 /**
   S3 SMM Init Done notification function.
 
@@ -220,7 +222,13 @@ GetWakeupBuffer (
         // Need memory under 1MB to be collected here
         //
         WakeupBufferEnd = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
-        if (WakeupBufferEnd > BASE_1MB) {
+        if (PcdGetBool (PcdSevEsIsEnabled) &&
+            WakeupBufferEnd > mSevEsPeiWakeupBuffer) {
+          //
+          // SEV-ES Wakeup buffer should be under 1MB and under any previous one
+          //
+          WakeupBufferEnd = mSevEsPeiWakeupBuffer;
+        } else if (WakeupBufferEnd > BASE_1MB) {
           //
           // Wakeup buffer should be under 1MB
           //
@@ -244,6 +252,15 @@ GetWakeupBuffer (
           }
           DEBUG ((DEBUG_INFO, "WakeupBufferStart = %x, WakeupBufferSize = %x\n",
                                WakeupBufferStart, WakeupBufferSize));
+
+          if (PcdGetBool (PcdSevEsIsEnabled)) {
+            //
+            // Next SEV-ES wakeup buffer allocation must be below this
+            // allocation
+            //
+            mSevEsPeiWakeupBuffer = WakeupBufferStart;
+          }
+
           return (UINTN)WakeupBufferStart;
         }
       }
