@@ -1,7 +1,7 @@
 ## @file
 #  Dsc include file for Dynamic Tables Framework.
 #
-#  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -13,6 +13,7 @@
   RELEASE_*_*_CC_FLAGS     = -DMDEPKG_NDEBUG
 
 [LibraryClasses.common]
+  AcpiHelperLib|DynamicTablesPkg/Library/Common/AcpiHelperLib/AcpiHelperLib.inf
   AmlLib|DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
   SsdtSerialPortFixupLib|DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
