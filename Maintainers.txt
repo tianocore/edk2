@@ -146,6 +146,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ardb+tianocore@kernel.org>
 R: Leif Lindholm <leif@nuviainc.com>
+R: Sami Mujawar <sami.mujawar@arm.com>
 
 ArmVirtPkg: modules used on Xen
 F: ArmVirtPkg/ArmVirtXen.*
@@ -156,16 +157,6 @@ F: ArmVirtPkg/XenAcpiPlatformDxe/
 F: ArmVirtPkg/XenPlatformHasAcpiDtDxe/
 F: ArmVirtPkg/XenioFdtDxe/
 R: Julien Grall <julien@xen.org>
-
-ArmVirtPkg: Kvmtool emulated platform support
-F: ArmVirtPkg/ArmVirtKvmTool.*
-F: ArmVirtPkg/KvmtoolPlatformDxe/
-F: ArmVirtPkg/Library/Fdt16550SerialPortHookLib/
-F: ArmVirtPkg/Library/KvmtoolPlatformPeiLib/
-F: ArmVirtPkg/Library/KvmtoolRtcFdtClientLib/
-F: ArmVirtPkg/Library/KvmtoolVirtMemInfoLib/
-F: ArmVirtPkg/Library/NorFlashKvmtoolLib/
-R: Sami Mujawar <sami.mujawar@arm.com>
 
 BaseTools
 F: BaseTools/
