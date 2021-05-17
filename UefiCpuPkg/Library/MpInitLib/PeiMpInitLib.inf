@@ -23,9 +23,11 @@
 
 [Sources.IA32]
   Ia32/MpFuncs.nasm
+  Ia32/SevSnpRmpAdjustInternal.c
 
 [Sources.X64]
   X64/MpFuncs.nasm
+  X64/SevSnpRmpAdjustInternal.c
 
 [Sources.common]
   MpEqu.inc
@@ -62,10 +64,11 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                       ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate                   ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures              ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled                      ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                   ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                       ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevSnpIsEnabled                     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                       ## CONSUMES
 
 [Ppis]
   gEdkiiPeiShadowMicrocodePpiGuid        ## SOMETIMES_CONSUMES
