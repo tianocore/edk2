@@ -15,6 +15,7 @@
 
 #include <Register/Intel/Cpuid.h>
 #include <Register/Amd/Cpuid.h>
+#include <Register/Amd/Ghcb.h>
 #include <Register/Intel/Msr.h>
 #include <Register/Intel/LocalApic.h>
 #include <Register/Intel/Microcode.h>
@@ -146,6 +147,7 @@ typedef struct {
   UINT8                          PlatformId;
   UINT64                         MicrocodeEntryAddr;
   UINT32                         MicrocodeRevision;
+  SEV_ES_SAVE_AREA               *SevEsSaveArea;
 } CPU_AP_DATA;
 
 //
@@ -289,6 +291,7 @@ struct _CPU_MP_DATA {
 
   BOOLEAN                        SevEsIsEnabled;
   BOOLEAN                        SevSnpIsEnabled;
+  BOOLEAN                        UseSevEsAPMethod;
   UINTN                          SevEsAPBuffer;
   UINTN                          SevEsAPResetStackStart;
   CPU_MP_DATA                    *NewCpuMpData;
@@ -741,6 +744,20 @@ GetProcessorNumber (
 EFI_STATUS
 PlatformShadowMicrocode (
   IN OUT CPU_MP_DATA             *CpuMpData
+  );
+
+/**
+  Issue RMPADJUST to adjust the attributes of an SEV-SNP page.
+
+  @param[in]  PageAddress
+  @param[in]  VmsaPage
+
+  @return  RMPADJUST return value
+**/
+UINT32
+SevSnpRmpAdjust (
+  IN  EFI_PHYSICAL_ADDRESS  PageAddress,
+  IN  BOOLEAN               VmsaPage
   );
 
 #endif
