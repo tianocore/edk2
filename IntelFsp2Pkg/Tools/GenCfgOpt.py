@@ -708,7 +708,8 @@ EndList
                             for Page in PageList:
                                 Page  = Page.strip()
                                 Match = re.match("(\w+):\"(.+)\"", Page)
-                                self._CfgPageDict[Match.group(1)] = Match.group(2)
+                                if Match != None:
+                                    self._CfgPageDict[Match.group(1)] = Match.group(2)
 
                         Match = re.match("(?:^|.+\s+)BLOCK:{NAME:\"(.+)\"\s*,\s*VER:\"(.+)\"\s*}", Remaining)
                         if Match:
