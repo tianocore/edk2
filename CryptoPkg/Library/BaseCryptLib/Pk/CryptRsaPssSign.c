@@ -97,6 +97,7 @@ RsaPssSign (
   EVP_PKEY_CTX          *KeyCtx;
   CONST EVP_MD          *HashAlg;
 
+  Result = FALSE;
   EvpRsaKey = NULL;
   EvpVerifyCtx = NULL;
   KeyCtx = NULL;
