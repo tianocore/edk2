@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MmramMemoryReserve.h>
 #include <Guid/MpInformation.h>
 
-#include <Library/AArch64/StandaloneMmCoreEntryPoint.h>
+#include <Library/Arm/StandaloneMmCoreEntryPoint.h>
 #include <Library/ArmMmuLib.h>
 #include <Library/ArmSvcLib.h>
 #include <Library/DebugLib.h>
