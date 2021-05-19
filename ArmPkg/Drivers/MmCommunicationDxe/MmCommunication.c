@@ -125,7 +125,7 @@ MmCommunication2Communicate (
   }
 
   // SMC Function ID
-  CommunicateSmcArgs.Arg0 = ARM_SMC_ID_MM_COMMUNICATE_AARCH64;
+  CommunicateSmcArgs.Arg0 = ARM_SMC_ID_MM_COMMUNICATE;
 
   // Cookie
   CommunicateSmcArgs.Arg1 = 0;
