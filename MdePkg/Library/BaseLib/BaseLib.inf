@@ -319,6 +319,7 @@
   X64/DisablePaging64.nasm
   X64/Pvalidate.nasm
   X64/RdRand.nasm
+  X64/RmpAdjust.nasm
   X64/XGetBv.nasm
   X64/XSetBv.nasm
   X64/VmgExit.nasm
