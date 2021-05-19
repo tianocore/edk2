@@ -54,6 +54,7 @@
 #define SVM_EXIT_NMI_COMPLETE                   0x80000003ULL
 #define SVM_EXIT_AP_RESET_HOLD                  0x80000004ULL
 #define SVM_EXIT_AP_JUMP_TABLE                  0x80000005ULL
+#define SVM_EXIT_SNP_PAGE_STATE_CHANGE          0x80000010ULL
 #define SVM_EXIT_HYPERVISOR_FEATURES            0x8000FFFDULL
 #define SVM_EXIT_UNSUPPORTED                    0x8000FFFFULL
 
@@ -162,4 +163,36 @@ typedef union {
 #define GHCB_HV_FEATURES_SNP_AP_CREATE                    (GHCB_HV_FEATURES_SNP | BIT1)
 #define GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION         (GHCB_HV_FEATURES_SNP_AP_CREATE | BIT2)
 #define GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION_TIMER   (GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION | BIT3)
+
+//
+// SNP Page State Change.
+//
+// Note that the PSMASH and UNSMASH operations are not supported when using the MSR protocol.
+//
+#define SNP_PAGE_STATE_PRIVATE              1
+#define SNP_PAGE_STATE_SHARED               2
+#define SNP_PAGE_STATE_PSMASH               3
+#define SNP_PAGE_STATE_UNSMASH              4
+
+typedef struct {
+  UINT64  CurrentPage:12;
+  UINT64  GuestFrameNumber:40;
+  UINT64  Operation:4;
+  UINT64  PageSize:1;
+  UINT64  Reserved:7;
+} SNP_PAGE_STATE_ENTRY;
+
+typedef struct {
+  UINT16 CurrentEntry;
+  UINT16 EndEntry;
+  UINT32 Reserved;
+} SNP_PAGE_STATE_HEADER;
+
+#define SNP_PAGE_STATE_MAX_ENTRY            253
+
+typedef struct {
+  SNP_PAGE_STATE_HEADER  Header;
+  SNP_PAGE_STATE_ENTRY   Entry[SNP_PAGE_STATE_MAX_ENTRY];
+} SNP_PAGE_STATE_CHANGE_INFO;
+
 #endif
