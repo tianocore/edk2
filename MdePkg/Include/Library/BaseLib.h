@@ -4813,6 +4813,56 @@ SpeculationBarrier (
   VOID
   );
 
+#if defined (MDE_CPU_X64)
+//
+// The page size for the PVALIDATE instruction
+//
+typedef enum {
+  PvalidatePageSize4K = 0,
+  PvalidatePageSize2MB,
+} PVALIDATE_PAGE_SIZE;
+
+//
+// PVALIDATE Return Code.
+//
+#define PVALIDATE_RET_SUCCESS         0
+#define PVALIDATE_RET_FAIL_INPUT      1
+#define PVALIDATE_RET_SIZE_MISMATCH   6
+
+//
+// The PVALIDATE instruction did not make any changes to the RMP entry.
+//
+#define PVALIDATE_RET_NO_RMPUPDATE    255
+
+/**
+ Execute a PVALIDATE instruction to validate or to rescinds validation of a guest
+ page's RMP entry.
+
+ The instruction is available only when CPUID Fn8000_001F_EAX[SNP]=1.
+
+ The function is available on X64.
+
+ @param[in]    PageSize         The page size to use.
+ @param[in]    Validate         If TRUE, validate the guest virtual address
+                                otherwise invalidate the guest virtual address.
+ @param[in]    Address          The guest virtual address.
+
+ @retval PVALIDATE_RET_SUCCESS        The PVALIDATE instruction succeeded, and
+                                      updated the RMP entry.
+ @retval PVALIDATE_RET_NO_RMPUPDATE   The PVALIDATE instruction succeeded, but
+                                      did not update the RMP entry.
+ @return                              Failure code from the PVALIDATE
+                                      instruction.
+**/
+UINT32
+EFIAPI
+AsmPvalidate (
+  IN   PVALIDATE_PAGE_SIZE     PageSize,
+  IN   BOOLEAN                 Validate,
+  IN   PHYSICAL_ADDRESS        Address
+  );
+#endif
+
 
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 ///
