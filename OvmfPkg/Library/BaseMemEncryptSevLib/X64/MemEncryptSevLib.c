@@ -118,3 +118,36 @@ MemEncryptSevGetAddressRangeState (
            Length
            );
 }
+
+/**
+  This function clears memory encryption bit for the mmio region specified by
+  BaseAddress and NumPages.
+
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
+  @param[in]  BaseAddress             The physical address that is the start
+                                      address of a mmio region.
+  @param[in]  NumPages                The number of pages from start memory
+                                      region.
+
+  @retval RETURN_SUCCESS              The attributes were cleared for the
+                                      memory region.
+  @retval RETURN_INVALID_PARAMETER    Number of pages is zero.
+  @retval RETURN_UNSUPPORTED          Clearing the memory encryption attribute
+                                      is not supported
+**/
+RETURN_STATUS
+EFIAPI
+MemEncryptSevClearMmioPageEncMask (
+  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS         BaseAddress,
+  IN UINTN                    NumPages
+  )
+{
+  return InternalMemEncryptSevClearMmioPageEncMask (
+           Cr3BaseAddress,
+           BaseAddress,
+           EFI_PAGES_TO_SIZE (NumPages)
+           );
+
+}
