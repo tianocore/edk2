@@ -283,8 +283,7 @@ SmmCpuFeaturesSmmRelocationComplete (
   Status = MemEncryptSevSetPageEncMask (
              0,             // Cr3BaseAddress -- use current CR3
              MapPagesBase,  // BaseAddress
-             MapPagesCount, // NumPages
-             TRUE           // Flush
+             MapPagesCount  // NumPages
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: MemEncryptSevSetPageEncMask(): %r\n",
