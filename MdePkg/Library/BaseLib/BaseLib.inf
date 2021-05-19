@@ -317,6 +317,7 @@
   X64/GccInlinePriv.c | GCC
   X64/EnableDisableInterrupts.nasm
   X64/DisablePaging64.nasm
+  X64/Pvalidate.nasm
   X64/RdRand.nasm
   X64/XGetBv.nasm
   X64/XSetBv.nasm
