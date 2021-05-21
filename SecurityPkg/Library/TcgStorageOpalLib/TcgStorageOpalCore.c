@@ -1,7 +1,7 @@
 /** @file
   Public API for Opal Core library.
 
-Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1647,6 +1647,7 @@ OpalGetSupportedAttributesInfo(
   NULL_CHECK(OpalBaseComId);
 
   ZeroMem(Buffer, BUFFER_SIZE);
+  ZeroMem(SupportedAttributes, sizeof(OPAL_DISK_SUPPORT_ATTRIBUTE));
   ASSERT(sizeof(Buffer) >= sizeof(TCG_SUPPORTED_SECURITY_PROTOCOLS));
 
   //
