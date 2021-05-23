@@ -47,6 +47,7 @@ typedef struct {
 #define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART                      0x000e
 #define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_DCC                                        0x000f
 #define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_BCM2835_UART                               0x0010
+#define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_WITH_GAS                             0x0012
 #define EFI_ACPI_DBG2_PORT_TYPE_1394                                                   0x8001
 #define   EFI_ACPI_DBG2_PORT_SUBTYPE_1394_STANDARD                                     0x0000
 #define EFI_ACPI_DBG2_PORT_TYPE_USB                                                    0x8002
