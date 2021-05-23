@@ -100,6 +100,11 @@ typedef struct {
 ///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_BCM2835_UART              0x10
 
+///
+/// 16550-compatible with parameters defined in Generic Address Structure
+///
+#define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16550_WITH_GAS            0x12
+
 //
 // Interrupt Type
 //
