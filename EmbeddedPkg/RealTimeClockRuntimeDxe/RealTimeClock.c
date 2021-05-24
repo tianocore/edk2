@@ -143,6 +143,17 @@ GetWakeupTime (
   OUT EFI_TIME    *Time
   )
 {
+  if (Time == NULL || Enabled == NULL || Pending == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Set these first so the RealTimeClockLib implementation
+  // can override them based on its own settings.
+  //
+  Time->TimeZone = mTimeSettings.TimeZone;
+  Time->Daylight = mTimeSettings.Daylight;
+
   return LibGetWakeupTime (Enabled, Pending, Time);
 }
 
