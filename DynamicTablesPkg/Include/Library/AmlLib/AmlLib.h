@@ -418,6 +418,278 @@ AmlUpdateRdQWord (
   IN  UINT64                BaseAddressLength
   );
 
+/** Code generation for the "DWordIO ()" ASL function.
+
+  The Resource Data effectively created is a DWord Address Space Resource
+  Data. Cf ACPI 6.4:
+   - s6.4.3.5.2 "DWord Address Space Descriptor".
+   - s19.6.34 "DWordIO".
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  See ACPI 6.4 spec, s19.6.34 for more.
+
+  @param [in]  IsResourceConsumer   ResourceUsage parameter.
+  @param [in]  IsMinFixed           Minimum address is fixed.
+  @param [in]  IsMaxFixed           Maximum address is fixed.
+  @param [in]  IsPosDecode          Decode parameter
+  @param [in]  IsaRanges            Possible values are:
+                                     0-Reserved
+                                     1-NonISAOnly
+                                     2-ISAOnly
+                                     3-EntireRange
+  @param [in]  AddressGranularity   Address granularity.
+  @param [in]  AddressMinimum       Minimum address.
+  @param [in]  AddressMaximum       Maximum address.
+  @param [in]  AddressTranslation   Address translation.
+  @param [in]  RangeLength          Range length.
+  @param [in]  ResourceSourceIndex  Resource Source index.
+                                    Not supported. Must be 0.
+  @param [in]  ResourceSource       Resource Source.
+                                    Not supported. Must be NULL.
+  @param [in]  IsDenseTranslation   TranslationDensity parameter.
+  @param [in]  IsTypeStatic         TranslationType parameter.
+  @param [in]  NameOpNode           NameOp object node defining a named object.
+                                    If provided, append the new resource data
+                                    node to the list of resource data elements
+                                    of this node.
+  @param [out] NewRdNode            If provided and success,
+                                    contain the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdDWordIo (
+  IN        BOOLEAN                 IsResourceConsumer,
+  IN        BOOLEAN                 IsMinFixed,
+  IN        BOOLEAN                 IsMaxFixed,
+  IN        BOOLEAN                 IsPosDecode,
+  IN        UINT8                   IsaRanges,
+  IN        UINT32                  AddressGranularity,
+  IN        UINT32                  AddressMinimum,
+  IN        UINT32                  AddressMaximum,
+  IN        UINT32                  AddressTranslation,
+  IN        UINT32                  RangeLength,
+  IN        UINT8                   ResourceSourceIndex,
+  IN  CONST CHAR8                   *ResourceSource,
+  IN        BOOLEAN                 IsDenseTranslation,
+  IN        BOOLEAN                 IsTypeStatic,
+  IN        AML_OBJECT_NODE_HANDLE  NameOpNode, OPTIONAL
+  OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
+  );
+
+/** Code generation for the "DWordMemory ()" ASL function.
+
+  The Resource Data effectively created is a DWord Address Space Resource
+  Data. Cf ACPI 6.4:
+   - s6.4.3.5.2 "DWord Address Space Descriptor".
+   - s19.6.35 "DWordMemory".
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  See ACPI 6.4 spec, s19.6.35 for more.
+
+  @param [in]  IsResourceConsumer   ResourceUsage parameter.
+  @param [in]  IsPosDecode          Decode parameter
+  @param [in]  IsMinFixed           Minimum address is fixed.
+  @param [in]  IsMaxFixed           Maximum address is fixed.
+  @param [in]  Cacheable            Possible values are:
+                                    0-The memory is non-cacheable
+                                    1-The memory is cacheable
+                                    2-The memory is cacheable and supports
+                                      write combining
+                                    3-The memory is cacheable and prefetchable
+  @param [in]  IsReadWrite          ReadAndWrite parameter.
+  @param [in]  AddressGranularity   Address granularity.
+  @param [in]  AddressMinimum       Minimum address.
+  @param [in]  AddressMaximum       Maximum address.
+  @param [in]  AddressTranslation   Address translation.
+  @param [in]  RangeLength          Range length.
+  @param [in]  ResourceSourceIndex  Resource Source index.
+                                    Not supported. Must be 0.
+  @param [in]  ResourceSource       Resource Source.
+                                    Not supported. Must be NULL.
+  @param [in]  MemoryRangeType      Possible values are:
+                                      0-AddressRangeMemory
+                                      1-AddressRangeReserved
+                                      2-AddressRangeACPI
+                                      3-AddressRangeNVS
+  @param [in]  IsTypeStatic         TranslationType parameter.
+  @param [in]  NameOpNode           NameOp object node defining a named object.
+                                    If provided, append the new resource data
+                                    node to the list of resource data elements
+                                    of this node.
+  @param [out] NewRdNode            If provided and success,
+                                    contain the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdDWordMemory (
+  IN        BOOLEAN                 IsResourceConsumer,
+  IN        BOOLEAN                 IsPosDecode,
+  IN        BOOLEAN                 IsMinFixed,
+  IN        BOOLEAN                 IsMaxFixed,
+  IN        UINT8                   Cacheable,
+  IN        BOOLEAN                 IsReadWrite,
+  IN        UINT32                  AddressGranularity,
+  IN        UINT32                  AddressMinimum,
+  IN        UINT32                  AddressMaximum,
+  IN        UINT32                  AddressTranslation,
+  IN        UINT32                  RangeLength,
+  IN        UINT8                   ResourceSourceIndex,
+  IN  CONST CHAR8                   *ResourceSource,
+  IN        UINT8                   MemoryRangeType,
+  IN        BOOLEAN                 IsTypeStatic,
+  IN        AML_OBJECT_NODE_HANDLE  NameOpNode, OPTIONAL
+  OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
+  );
+
+/** Code generation for the "WordBusNumber ()" ASL function.
+
+  The Resource Data effectively created is a Word Address Space Resource
+  Data. Cf ACPI 6.4:
+   - s6.4.3.5.3 "Word Address Space Descriptor".
+   - s19.6.149 "WordBusNumber".
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  See ACPI 6.4 spec, s19.6.149 for more.
+
+  @param [in]  IsResourceConsumer   ResourceUsage parameter.
+  @param [in]  IsMinFixed           Minimum address is fixed.
+  @param [in]  IsMaxFixed           Maximum address is fixed.
+  @param [in]  IsPosDecode          Decode parameter
+  @param [in]  AddressGranularity   Address granularity.
+  @param [in]  AddressMinimum       Minimum address.
+  @param [in]  AddressMaximum       Maximum address.
+  @param [in]  AddressTranslation   Address translation.
+  @param [in]  RangeLength          Range length.
+  @param [in]  ResourceSourceIndex  Resource Source index.
+                                    Not supported. Must be 0.
+  @param [in]  ResourceSource       Resource Source.
+                                    Not supported. Must be NULL.
+  @param [in]  NameOpNode           NameOp object node defining a named object.
+                                    If provided, append the new resource data
+                                    node to the list of resource data elements
+                                    of this node.
+  @param [out] NewRdNode            If provided and success,
+                                    contain the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdWordBusNumber (
+  IN        BOOLEAN                 IsResourceConsumer,
+  IN        BOOLEAN                 IsMinFixed,
+  IN        BOOLEAN                 IsMaxFixed,
+  IN        BOOLEAN                 IsPosDecode,
+  IN        UINT32                  AddressGranularity,
+  IN        UINT32                  AddressMinimum,
+  IN        UINT32                  AddressMaximum,
+  IN        UINT32                  AddressTranslation,
+  IN        UINT32                  RangeLength,
+  IN        UINT8                   ResourceSourceIndex,
+  IN  CONST CHAR8                   *ResourceSource,
+  IN        AML_OBJECT_NODE_HANDLE  NameOpNode, OPTIONAL
+  OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
+  );
+
+/** Code generation for the "QWordMemory ()" ASL function.
+
+  The Resource Data effectively created is a QWord Address Space Resource
+  Data. Cf ACPI 6.4:
+   - s6.4.3.5.1 "QWord Address Space Descriptor".
+   - s19.6.110 "QWordMemory".
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  See ACPI 6.4 spec, s19.6.110 for more.
+
+  @param [in]  IsResourceConsumer   ResourceUsage parameter.
+  @param [in]  IsPosDecode          Decode parameter.
+  @param [in]  IsMinFixed           Minimum address is fixed.
+  @param [in]  IsMaxFixed           Maximum address is fixed.
+  @param [in]  Cacheable            Possible values are:
+                                    0-The memory is non-cacheable
+                                    1-The memory is cacheable
+                                    2-The memory is cacheable and supports
+                                      write combining
+                                    3-The memory is cacheable and prefetchable
+  @param [in]  IsReadWrite          ReadAndWrite parameter.
+  @param [in]  AddressGranularity   Address granularity.
+  @param [in]  AddressMinimum       Minimum address.
+  @param [in]  AddressMaximum       Maximum address.
+  @param [in]  AddressTranslation   Address translation.
+  @param [in]  RangeLength          Range length.
+  @param [in]  ResourceSourceIndex  Resource Source index.
+                                    Not supported. Must be 0.
+  @param [in]  ResourceSource       Resource Source.
+                                    Not supported. Must be NULL.
+  @param [in]  MemoryRangeType      Possible values are:
+                                      0-AddressRangeMemory
+                                      1-AddressRangeReserved
+                                      2-AddressRangeACPI
+                                      3-AddressRangeNVS
+  @param [in]  IsTypeStatic         TranslationType parameter.
+  @param [in]  NameOpNode           NameOp object node defining a named object.
+                                    If provided, append the new resource data
+                                    node to the list of resource data elements
+                                    of this node.
+  @param [out] NewRdNode            If provided and success,
+                                    contain the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdQWordMemory (
+  IN        BOOLEAN                 IsResourceConsumer,
+  IN        BOOLEAN                 IsPosDecode,
+  IN        BOOLEAN                 IsMinFixed,
+  IN        BOOLEAN                 IsMaxFixed,
+  IN        UINT8                   Cacheable,
+  IN        BOOLEAN                 IsReadWrite,
+  IN        UINT64                  AddressGranularity,
+  IN        UINT64                  AddressMinimum,
+  IN        UINT64                  AddressMaximum,
+  IN        UINT64                  AddressTranslation,
+  IN        UINT64                  RangeLength,
+  IN        UINT8                   ResourceSourceIndex,
+  IN  CONST CHAR8                   *ResourceSource,
+  IN        UINT8                   MemoryRangeType,
+  IN        BOOLEAN                 IsTypeStatic,
+  IN        AML_OBJECT_NODE_HANDLE  NameOpNode, OPTIONAL
+  OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
+  );
+
 /** Code generation for the "Interrupt ()" ASL function.
 
   The Resource Data effectively created is an Extended Interrupt Resource
