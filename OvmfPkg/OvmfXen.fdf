@@ -348,7 +348,7 @@ INF  MdeModulePkg/Bus/Pci/PciSioSerialDxe/PciSioSerialDxe.inf
 INF  MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
 
 INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
-INF  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+INF  OvmfPkg/SmbiosPlatformDxe/XenSmbiosPlatformDxe.inf
 
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 INF  OvmfPkg/XenAcpiPlatformDxe/XenAcpiPlatformDxe.inf

@@ -645,7 +645,7 @@
     <LibraryClasses>
       NULL|OvmfPkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
   }
-  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+  OvmfPkg/SmbiosPlatformDxe/XenSmbiosPlatformDxe.inf
 
   #
   # ACPI Support
