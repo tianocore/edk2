@@ -400,7 +400,7 @@ GicV2DxeInitialize (
   // the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  mGicInterruptInterfaceBase = PcdGet64 (PcdGicInterruptInterfaceBase);
+  mGicInterruptInterfaceBase = (UINTN)PcdGet64 (PcdGicInterruptInterfaceBase);
   mGicDistributorBase        = (UINTN)PcdGet64 (PcdGicDistributorBase);
   mGicNumInterrupts          = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 

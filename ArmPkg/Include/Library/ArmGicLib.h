@@ -113,7 +113,7 @@
 UINTN
 EFIAPI
 ArmGicGetInterfaceIdentification (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 // GIC Secure interfaces
@@ -122,7 +122,7 @@ EFIAPI
 ArmGicSetupNonSecure (
   IN  UINTN  MpId,
   IN  UINTN  GicDistributorBase,
-  IN  INTN   GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
@@ -136,13 +136,13 @@ ArmGicSetSecureInterrupts (
 VOID
 EFIAPI
 ArmGicEnableInterruptInterface (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicDisableInterruptInterface (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
@@ -203,8 +203,8 @@ ArmGicEndOfInterrupt (
 UINTN
 EFIAPI
 ArmGicSetPriorityMask (
-  IN  INTN  GicInterruptInterfaceBase,
-  IN  INTN  PriorityMask
+  IN  UINTN  GicInterruptInterfaceBase,
+  IN  INTN   PriorityMask
   );
 
 VOID
@@ -252,19 +252,19 @@ EFIAPI
 ArmGicV2SetupNonSecure (
   IN  UINTN  MpId,
   IN  UINTN  GicDistributorBase,
-  IN  INTN   GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicV2EnableInterruptInterface (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicV2DisableInterruptInterface (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 UINTN
