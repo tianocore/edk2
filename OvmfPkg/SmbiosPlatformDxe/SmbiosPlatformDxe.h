@@ -22,15 +22,4 @@ InstallAllStructures (
   IN UINT8                     *TableAddress
   );
 
-/**
-  Locates and extracts the QEMU SMBIOS table data if present in fw_cfg
-
-  @return             Address of extracted QEMU SMBIOS data
-
-**/
-UINT8 *
-GetQemuSmbiosTables (
-  VOID
-  );
-
 #endif
