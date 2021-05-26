@@ -1,5 +1,5 @@
 /** @file
-  OVMF's instance of the PCI Host Bridge Library.
+  OVMF's instance of the PCI Host Bridge Library, for Bhyve and Xen guests.
 
   Copyright (C) 2016-2021, Red Hat, Inc.
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
