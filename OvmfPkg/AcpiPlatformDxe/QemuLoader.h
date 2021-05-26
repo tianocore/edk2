@@ -11,7 +11,7 @@
 #define QEMU_LOADER_H_
 
 #include <Base.h>
-#include <Library/QemuFwCfgLib.h>
+#include <IndustryStandard/QemuFwCfg.h>
 
 //
 // The types and the documentation reflects the SeaBIOS interface.
