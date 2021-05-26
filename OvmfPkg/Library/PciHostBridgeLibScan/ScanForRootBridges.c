@@ -1,5 +1,5 @@
 /** @file
-  Scan the entire PCI bus for root bridges to support OVMF above Xen.
+  Scan the entire PCI bus for root bridges to support OVMF on Bhyve and Xen.
 
   Copyright (C) 2021, Red Hat, Inc.
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
