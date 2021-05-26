@@ -484,7 +484,6 @@ F: OvmfPkg/Include/Library/XenIoMmioLib.h
 F: OvmfPkg/Include/Library/XenPlatformLib.h
 F: OvmfPkg/Include/Protocol/XenBus.h
 F: OvmfPkg/Include/Protocol/XenIo.h
-F: OvmfPkg/Library/PciHostBridgeLib/XenSupport.c
 F: OvmfPkg/Library/PciHostBridgeLibScan/
 F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
 F: OvmfPkg/Library/XenConsoleSerialPortLib/
