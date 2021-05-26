@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2018, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2023, Arm Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -381,7 +381,7 @@ GicV3DxeInitialize (
   // the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  mGicDistributorBase    = PcdGet64 (PcdGicDistributorBase);
+  mGicDistributorBase    = (UINTN)PcdGet64 (PcdGicDistributorBase);
   mGicRedistributorsBase = PcdGet64 (PcdGicRedistributorsBase);
   mGicNumInterrupts      = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
