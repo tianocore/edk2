@@ -10,12 +10,10 @@
 
 #include <IndustryStandard/SmBios.h>          // SMBIOS_TABLE_TYPE0
 #include <Library/DebugLib.h>                 // ASSERT_EFI_ERROR()
-#include <Library/MemoryAllocationLib.h>      // FreePool()
 #include <Library/UefiBootServicesTableLib.h> // gBS
 #include <Protocol/Smbios.h>                  // EFI_SMBIOS_PROTOCOL
 
 #include "SmbiosPlatformDxe.h"
-#include "XenSmbiosPlatformDxe.h"
 
 #define TYPE0_STRINGS \
   "EFI Development Kit II / OVMF\0"     /* Vendor */ \
@@ -167,51 +165,4 @@ InstallAllStructures (
   }
 
   return EFI_SUCCESS;
-}
-
-
-/**
-  Installs SMBIOS information for OVMF
-
-  @param ImageHandle     Module's image handle
-  @param SystemTable     Pointer of EFI_SYSTEM_TABLE
-
-  @retval EFI_SUCCESS    Smbios data successfully installed
-  @retval Other          Smbios data was not installed
-
-**/
-EFI_STATUS
-EFIAPI
-SmbiosTablePublishEntry (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
-  )
-{
-  EFI_STATUS                Status;
-  SMBIOS_TABLE_ENTRY_POINT  *EntryPointStructure;
-  UINT8                     *SmbiosTables;
-
-  Status = EFI_NOT_FOUND;
-  //
-  // Add Xen or QEMU SMBIOS data if found
-  //
-  EntryPointStructure = GetXenSmbiosTables ();
-  if (EntryPointStructure != NULL) {
-    SmbiosTables = (UINT8*)(UINTN)EntryPointStructure->TableAddress;
-  } else {
-    SmbiosTables = GetQemuSmbiosTables ();
-  }
-
-  if (SmbiosTables != NULL) {
-    Status = InstallAllStructures (SmbiosTables);
-
-    //
-    // Free SmbiosTables if allocated by Qemu (i.e., NOT by Xen):
-    //
-    if (EntryPointStructure == NULL) {
-      FreePool (SmbiosTables);
-    }
-  }
-
-  return Status;
 }
