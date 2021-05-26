@@ -6,10 +6,12 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/DebugLib.h>            // ASSERT_EFI_ERROR()
+#include <Library/MemoryAllocationLib.h> // AllocatePool()
+#include <Library/PcdLib.h>              // PcdGetBool()
+#include <Library/QemuFwCfgLib.h>        // QemuFwCfgFindFile()
+
 #include "SmbiosPlatformDxe.h"
-#include <Library/QemuFwCfgLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/PcdLib.h>
 
 /**
   Locates and extracts the QEMU SMBIOS data if present in fw_cfg
