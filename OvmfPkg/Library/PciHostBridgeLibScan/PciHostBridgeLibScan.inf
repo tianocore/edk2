@@ -44,11 +44,4 @@
   PciLib
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciIoSize
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size
