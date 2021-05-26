@@ -30,8 +30,8 @@
   QemuLoader.h
 
 [Packages]
-  MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
