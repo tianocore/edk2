@@ -25,23 +25,17 @@
   AcpiPlatform.c
   AcpiPlatform.h
   EntryPoint.c
-  Qemu.c
   Xen.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
-  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
-  BaseMemoryLib
   DebugLib
-  DxeServicesTableLib
-  MemoryAllocationLib
   PcdLib
-  QemuFwCfgLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   XenPlatformLib
@@ -56,9 +50,6 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
-  gUefiOvmfPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
 
 [Depex]
   gEfiAcpiTableProtocolGuid
