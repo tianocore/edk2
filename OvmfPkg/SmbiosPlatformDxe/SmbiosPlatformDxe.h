@@ -11,20 +11,6 @@
 #ifndef SMBIOS_PLATFORM_DXE_H_
 #define SMBIOS_PLATFORM_DXE_H_
 
-#include <IndustryStandard/SmBios.h> // SMBIOS_TABLE_ENTRY_POINT
-
-/**
-  Locates the Xen SMBIOS data if it exists
-
-  @return SMBIOS_TABLE_ENTRY_POINT   Address of Xen SMBIOS data
-
-**/
-SMBIOS_TABLE_ENTRY_POINT *
-GetXenSmbiosTables (
-  VOID
-  );
-
-
 /**
   Locates and extracts the QEMU SMBIOS table data if present in fw_cfg
 
