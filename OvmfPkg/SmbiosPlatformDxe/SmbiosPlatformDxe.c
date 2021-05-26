@@ -95,20 +95,31 @@ SmbiosTableLength (
 /**
   Install all structures from the given SMBIOS structures block
 
-  @param  Smbios               SMBIOS protocol
   @param  TableAddress         SMBIOS tables starting address
 
 **/
 EFI_STATUS
 InstallAllStructures (
-  IN EFI_SMBIOS_PROTOCOL       *Smbios,
   IN UINT8                     *TableAddress
   )
 {
+  EFI_SMBIOS_PROTOCOL       *Smbios;
   EFI_STATUS                Status;
   SMBIOS_STRUCTURE_POINTER  SmbiosTable;
   EFI_SMBIOS_HANDLE         SmbiosHandle;
   BOOLEAN                   NeedSmbiosType0;
+
+  //
+  // Find the SMBIOS protocol
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiSmbiosProtocolGuid,
+                  NULL,
+                  (VOID**)&Smbios
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   SmbiosTable.Raw = TableAddress;
   if (SmbiosTable.Raw == NULL) {
@@ -176,21 +187,8 @@ SmbiosTablePublishEntry (
   )
 {
   EFI_STATUS                Status;
-  EFI_SMBIOS_PROTOCOL       *Smbios;
   SMBIOS_TABLE_ENTRY_POINT  *EntryPointStructure;
   UINT8                     *SmbiosTables;
-
-  //
-  // Find the SMBIOS protocol
-  //
-  Status = gBS->LocateProtocol (
-                  &gEfiSmbiosProtocolGuid,
-                  NULL,
-                  (VOID**)&Smbios
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
 
   Status = EFI_NOT_FOUND;
   //
@@ -204,7 +202,7 @@ SmbiosTablePublishEntry (
   }
 
   if (SmbiosTables != NULL) {
-    Status = InstallAllStructures (Smbios, SmbiosTables);
+    Status = InstallAllStructures (SmbiosTables);
 
     //
     // Free SmbiosTables if allocated by Qemu (i.e., NOT by Xen):
