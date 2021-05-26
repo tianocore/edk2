@@ -372,26 +372,6 @@ XenPublishRamRegions (
 }
 
 
-/**
-  Perform Xen PEI initialization.
-
-  @return EFI_SUCCESS     Xen initialized successfully
-  @return EFI_NOT_FOUND   Not running under Xen
-
-**/
-EFI_STATUS
-InitializeXen (
-  VOID
-  )
-{
-  RETURN_STATUS PcdStatus;
-
-  PcdStatus = PcdSetBoolS (PcdPciDisableBusEnumeration, TRUE);
-  ASSERT_RETURN_ERROR (PcdStatus);
-
-  return EFI_SUCCESS;
-}
-
 EFI_STATUS
 PhysicalAddressIdentityMapping (
   IN EFI_PHYSICAL_ADDRESS   AddressToMap
