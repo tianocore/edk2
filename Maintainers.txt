@@ -492,9 +492,6 @@ F: OvmfPkg/Library/XenPlatformLib/
 F: OvmfPkg/Library/XenRealTimeClockLib/
 F: OvmfPkg/OvmfXen.*
 F: OvmfPkg/OvmfXenElfHeaderGenerator.c
-F: OvmfPkg/PlatformPei/MemDetect.c
-F: OvmfPkg/PlatformPei/Platform.*
-F: OvmfPkg/PlatformPei/Xen.*
 F: OvmfPkg/SmbiosPlatformDxe/*Xen.c
 F: OvmfPkg/XenAcpiPlatformDxe/
 F: OvmfPkg/XenBusDxe/
