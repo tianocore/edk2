@@ -9,12 +9,10 @@
 **/
 
 #include <IndustryStandard/Pci.h>            // EFI_PCI_COMMAND_IO_SPACE
-#include <IndustryStandard/Q35MchIch9.h>     // INTEL_Q35_MCH_DEVICE_ID
 #include <Library/BaseLib.h>                 // DisableInterrupts()
 #include <Library/BaseMemoryLib.h>           // ZeroMem()
 #include <Library/DebugLib.h>                // ASSERT()
 #include <Library/MemoryAllocationLib.h>     // ReallocatePool()
-#include <Library/PcdLib.h>                  // PcdGet16()
 #include <Library/PciHostBridgeLib.h>        // PCI_ROOT_BRIDGE_APERTURE
 #include <Library/PciHostBridgeUtilityLib.h> // PciHostBridgeUtilityInitRoot...
 #include <Library/PciLib.h>                  // PciRead32()
@@ -455,7 +453,7 @@ ScanForRootBridges (
       ASSERT (RootBridges != NULL);
       PciHostBridgeUtilityInitRootBridge (
         Attributes, Attributes, 0,
-        FALSE, PcdGet16 (PcdOvmfHostBridgePciDevId) != INTEL_Q35_MCH_DEVICE_ID,
+        FALSE, TRUE /* NoExtendedConfigSpace */,
         (UINT8) PrimaryBus, (UINT8) SubBus,
         &Io, &Mem, &MemAbove4G, &mNonExistAperture, &mNonExistAperture,
         &RootBridges[*NumberOfRootBridges]
