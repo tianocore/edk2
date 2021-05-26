@@ -41,7 +41,7 @@
   #
   # CPU options
   #
-  DEFINE MAX_LOGICAL_PROCESSORS       = 64
+  DEFINE MAX_LOGICAL_PROCESSORS       = 256
 
   #
   # PCI options
