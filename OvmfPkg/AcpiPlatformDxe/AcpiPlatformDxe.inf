@@ -28,7 +28,6 @@
   PciDecoding.c
   Qemu.c
   QemuFwCfgAcpi.c
-  QemuLoader.h
   Xen.c
 
 [Packages]
