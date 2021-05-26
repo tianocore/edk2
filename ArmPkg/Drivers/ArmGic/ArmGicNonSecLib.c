@@ -17,6 +17,7 @@ ArmGicEnableDistributor (
   )
 {
   ARM_GIC_ARCH_REVISION  Revision;
+  UINT32                 GicDistributorCtl;
 
   /*
    * Enable GIC distributor in Non-Secure world.
@@ -26,7 +27,8 @@ ArmGicEnableDistributor (
   if (Revision == ARM_GIC_ARCH_REVISION_2) {
     MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
   } else {
-    if (MmioRead32 (GicDistributorBase + ARM_GIC_ICDDCR) & ARM_GIC_ICDDCR_ARE) {
+    GicDistributorCtl = MmioRead32 (GicDistributorBase + ARM_GIC_ICDDCR);
+    if ((GicDistributorCtl & ARM_GIC_ICDDCR_ARE) != 0) {
       MmioOr32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x2);
     } else {
       MmioOr32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
