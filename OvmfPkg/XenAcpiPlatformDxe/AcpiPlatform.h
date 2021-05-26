@@ -14,15 +14,6 @@
 
 EFI_STATUS
 EFIAPI
-InstallAcpiTable (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
-  IN   VOID                          *AcpiTableBuffer,
-  IN   UINTN                         AcpiTableBufferSize,
-  OUT  UINTN                         *TableKey
-  );
-
-EFI_STATUS
-EFIAPI
 InstallXenTables (
   IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
   );
