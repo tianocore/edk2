@@ -6,21 +6,19 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-#include <PiDxe.h>
 
-#include <IndustryStandard/Pci.h>
-#include <IndustryStandard/Q35MchIch9.h>
+#include <IndustryStandard/Pci.h>            // EFI_PCI_COMMAND_IO_SPACE
+#include <IndustryStandard/Q35MchIch9.h>     // INTEL_Q35_MCH_DEVICE_ID
+#include <Library/BaseLib.h>                 // DisableInterrupts()
+#include <Library/BaseMemoryLib.h>           // ZeroMem()
+#include <Library/DebugLib.h>                // ASSERT()
+#include <Library/MemoryAllocationLib.h>     // ReallocatePool()
+#include <Library/PcdLib.h>                  // PcdGet16()
+#include <Library/PciHostBridgeLib.h>        // PCI_ROOT_BRIDGE_APERTURE
+#include <Library/PciHostBridgeUtilityLib.h> // PciHostBridgeUtilityInitRoot...
+#include <Library/PciLib.h>                  // PciRead32()
+#include <Protocol/PciRootBridgeIo.h>        // EFI_PCI_ATTRIBUTE_ISA_IO
 
-#include <Protocol/PciHostBridgeResourceAllocation.h>
-#include <Protocol/PciRootBridgeIo.h>
-
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/PcdLib.h>
-#include <Library/PciHostBridgeLib.h>
-#include <Library/PciHostBridgeUtilityLib.h>
-#include <Library/PciLib.h>
 #include "PciHostBridge.h"
 
 STATIC
