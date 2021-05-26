@@ -110,7 +110,7 @@
 // Bit Mask for
 #define ARM_GIC_ICCIAR_ACKINTID  0x3FF
 
-UINTN
+UINT32
 EFIAPI
 ArmGicGetInterfaceIdentification (
   IN  UINTN  GicInterruptInterfaceBase

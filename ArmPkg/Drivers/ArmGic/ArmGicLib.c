@@ -111,7 +111,7 @@ GicGetCpuRedistributorBase (
 
   @retval CPU Interface Identification information.
 **/
-UINTN
+UINT32
 EFIAPI
 ArmGicGetInterfaceIdentification (
   IN  UINTN  GicInterruptInterfaceBase
