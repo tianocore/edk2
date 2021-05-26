@@ -15,6 +15,7 @@
 #include <Protocol/Smbios.h>                  // EFI_SMBIOS_PROTOCOL
 
 #include "SmbiosPlatformDxe.h"
+#include "XenSmbiosPlatformDxe.h"
 
 #define TYPE0_STRINGS \
   "EFI Development Kit II / OVMF\0"     /* Vendor */ \
