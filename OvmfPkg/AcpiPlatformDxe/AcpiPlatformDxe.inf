@@ -32,24 +32,24 @@
   Xen.c
 
 [Packages]
-  MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
-  UefiLib
-  PcdLib
+  BaseLib
   BaseMemoryLib
   DebugLib
-  UefiBootServicesTableLib
-  UefiDriverEntryPoint
+  DxeServicesTableLib
+  MemoryAllocationLib
+  OrderedCollectionLib
+  PcdLib
   QemuFwCfgLib
   QemuFwCfgS3Lib
-  MemoryAllocationLib
-  BaseLib
-  DxeServicesTableLib
-  OrderedCollectionLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
   XenPlatformLib
 
 [Protocols]

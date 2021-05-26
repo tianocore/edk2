@@ -8,6 +8,7 @@
 **/
 
 #include <Guid/RootBridgesConnectedEventGroup.h>
+
 #include "AcpiPlatform.h"
 
 STATIC
