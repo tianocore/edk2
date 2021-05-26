@@ -21,35 +21,6 @@ typedef struct S3_CONTEXT S3_CONTEXT;
 
 EFI_STATUS
 EFIAPI
-InstallAcpiTable (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
-  IN   VOID                          *AcpiTableBuffer,
-  IN   UINTN                         AcpiTableBufferSize,
-  OUT  UINTN                         *TableKey
-  );
-
-BOOLEAN
-QemuDetected (
-  VOID
-  );
-
-EFI_STATUS
-EFIAPI
-QemuInstallAcpiTable (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
-  IN   VOID                          *AcpiTableBuffer,
-  IN   UINTN                         AcpiTableBufferSize,
-  OUT  UINTN                         *TableKey
-  );
-
-EFI_STATUS
-EFIAPI
-InstallXenTables (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
-  );
-
-EFI_STATUS
-EFIAPI
 InstallQemuFwCfgTables (
   IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
   );

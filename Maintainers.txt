@@ -475,7 +475,6 @@ R: Marc-André Lureau <marcandre.lureau@redhat.com>
 R: Stefan Berger <stefanb@linux.ibm.com>
 
 OvmfPkg: Xen-related modules
-F: OvmfPkg/AcpiPlatformDxe/Xen.c
 F: OvmfPkg/Include/Guid/XenBusRootDevice.h
 F: OvmfPkg/Include/Guid/XenInfo.h
 F: OvmfPkg/Include/IndustryStandard/Xen/
