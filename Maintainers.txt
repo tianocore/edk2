@@ -426,6 +426,7 @@ F: OvmfPkg/Include/Library/BhyveFwCtlLib.h
 F: OvmfPkg/Library/AcpiTimerLib/BaseAcpiTimerLibBhyve.c
 F: OvmfPkg/Library/AcpiTimerLib/BaseAcpiTimerLibBhyve.inf
 F: OvmfPkg/Library/BhyveFwCtlLib/
+F: OvmfPkg/Library/PciHostBridgeLibScan/
 F: OvmfPkg/Library/PlatformBootManagerLibBhyve/
 F: OvmfPkg/Library/ResetSystemLib/BaseResetShutdownBhyve.c
 F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
@@ -484,6 +485,7 @@ F: OvmfPkg/Include/Library/XenPlatformLib.h
 F: OvmfPkg/Include/Protocol/XenBus.h
 F: OvmfPkg/Include/Protocol/XenIo.h
 F: OvmfPkg/Library/PciHostBridgeLib/XenSupport.c
+F: OvmfPkg/Library/PciHostBridgeLibScan/
 F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
 F: OvmfPkg/Library/XenConsoleSerialPortLib/
 F: OvmfPkg/Library/XenHypercallLib/
