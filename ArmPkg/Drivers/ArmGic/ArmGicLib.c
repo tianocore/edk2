@@ -141,9 +141,9 @@ VOID
 EFIAPI
 ArmGicSendSgiTo (
   IN  UINTN  GicDistributorBase,
-  IN  INTN   TargetListFilter,
-  IN  INTN   CPUTargetList,
-  IN  INTN   SgiId
+  IN  UINT8  TargetListFilter,
+  IN  UINT8  CPUTargetList,
+  IN  UINT8  SgiId
   )
 {
   MmioWrite32 (
