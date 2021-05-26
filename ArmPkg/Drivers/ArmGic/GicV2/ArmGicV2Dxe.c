@@ -2,7 +2,7 @@
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2017, ARM Ltd. All rights reserved.<BR>
+Portions copyright (c) 2011-2023, Arm Ltd. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -400,8 +400,10 @@ GicV2DxeInitialize (
   // the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
+  ASSERT (PcdGet64 (PcdGicDistributorBase) <= MAX_UINTN);
+
   mGicInterruptInterfaceBase = PcdGet64 (PcdGicInterruptInterfaceBase);
-  mGicDistributorBase        = PcdGet64 (PcdGicDistributorBase);
+  mGicDistributorBase        = (UINTN)PcdGet64 (PcdGicDistributorBase);
   mGicNumInterrupts          = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
