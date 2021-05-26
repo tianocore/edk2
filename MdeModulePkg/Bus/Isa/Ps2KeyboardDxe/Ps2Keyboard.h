@@ -157,7 +157,7 @@ InstallPs2KeyboardDriver (
 #define KEYBOARD_MAX_TRY                 256     // 256
 #define KEYBOARD_TIMEOUT                 65536   // 0.07s
 #define KEYBOARD_WAITFORVALUE_TIMEOUT    1000000 // 1s
-#define KEYBOARD_BAT_TIMEOUT             4000000 // 4s
+#define KEYBOARD_BAT_TIMEOUT             1000000 // 1s
 #define KEYBOARD_TIMER_INTERVAL          200000  // 0.02s
 #define SCANCODE_EXTENDED0               0xE0
 #define SCANCODE_EXTENDED1               0xE1
