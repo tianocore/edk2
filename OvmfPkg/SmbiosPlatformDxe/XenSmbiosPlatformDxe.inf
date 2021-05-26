@@ -16,7 +16,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
-  ENTRY_POINT                    = SmbiosTablePublishEntry
+  ENTRY_POINT                    = XenSmbiosTablePublishEntry
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -25,9 +25,9 @@
 #
 
 [Sources]
-  Qemu.c
   SmbiosPlatformDxe.c
   SmbiosPlatformDxe.h
+  Xen.c
   XenSmbiosPlatformDxe.h
 
 [Sources.IA32, Sources.X64]
@@ -38,22 +38,18 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+
+[Packages.IA32, Packages.X64]
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   DebugLib
-  MemoryAllocationLib
-  PcdLib
-  QemuFwCfgLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
 [LibraryClasses.IA32, LibraryClasses.X64]
   BaseLib
   HobLib
-
-[Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated
 
 [Protocols]
   gEfiSmbiosProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED

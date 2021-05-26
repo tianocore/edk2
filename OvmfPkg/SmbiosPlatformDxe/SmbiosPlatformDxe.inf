@@ -27,13 +27,6 @@
   Qemu.c
   SmbiosPlatformDxe.c
   SmbiosPlatformDxe.h
-  XenSmbiosPlatformDxe.h
-
-[Sources.IA32, Sources.X64]
-  X86Xen.c
-
-[Sources.ARM, Sources.AARCH64]
-  ArmXen.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -47,18 +40,11 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
-[LibraryClasses.IA32, LibraryClasses.X64]
-  BaseLib
-  HobLib
-
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated
 
 [Protocols]
   gEfiSmbiosProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
-
-[Guids.IA32, Guids.X64]
-  gEfiXenInfoGuid
 
 [Depex]
   gEfiSmbiosProtocolGuid
