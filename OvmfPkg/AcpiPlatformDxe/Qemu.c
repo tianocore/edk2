@@ -9,13 +9,13 @@
 
 **/
 
-#include <IndustryStandard/Acpi.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DxeServicesTableLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/OrderedCollectionLib.h>
-#include <Library/PcdLib.h>
-#include <Library/QemuFwCfgLib.h>
+#include <IndustryStandard/Acpi.h>        // EFI_ACPI_1_0_IO_APIC_STRUCTURE
+#include <Library/BaseMemoryLib.h>        // CopyMem()
+#include <Library/DebugLib.h>             // DEBUG()
+#include <Library/DxeServicesTableLib.h>  // gDS
+#include <Library/MemoryAllocationLib.h>  // AllocatePool()
+#include <Library/PcdLib.h>               // PcdGet16()
+#include <Library/QemuFwCfgLib.h>         // QemuFwCfgIsAvailable()
 
 #include "AcpiPlatform.h"
 

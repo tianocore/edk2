@@ -6,6 +6,11 @@
 
 **/
 
+#include <Library/DebugLib.h>                 // ASSERT_EFI_ERROR()
+#include <Library/UefiBootServicesTableLib.h> // gBS
+#include <Library/XenPlatformLib.h>           // XenDetected()
+#include <Protocol/FirmwareVolume2.h>         // gEfiFirmwareVolume2Protocol...
+
 #include "AcpiPlatform.h"
 
 EFI_STATUS
