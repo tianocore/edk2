@@ -104,10 +104,17 @@ GicGetCpuRedistributorBase (
   return 0;
 }
 
+/**
+  Return the GIC CPU Interrupt Interface ID.
+
+  @param GicInterruptInterfaceBase  Base address of the GIC Interrupt Interface.
+
+  @retval CPU Interface Identification information.
+**/
 UINTN
 EFIAPI
 ArmGicGetInterfaceIdentification (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   )
 {
   // Read the GIC Identification Register
@@ -400,7 +407,7 @@ ArmGicDisableDistributor (
 VOID
 EFIAPI
 ArmGicEnableInterruptInterface (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   )
 {
   ARM_GIC_ARCH_REVISION  Revision;
@@ -418,7 +425,7 @@ ArmGicEnableInterruptInterface (
 VOID
 EFIAPI
 ArmGicDisableInterruptInterface (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   )
 {
   ARM_GIC_ARCH_REVISION  Revision;
