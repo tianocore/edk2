@@ -226,7 +226,6 @@
   S3BootScriptLib|MdeModulePkg/Library/PiDxeS3BootScriptLib/DxeS3BootScriptLib.inf
   SmbusLib|MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
-  XenPlatformLib|OvmfPkg/Library/XenPlatformLib/XenPlatformLib.inf
 
 !if $(TPM_ENABLE) == TRUE
   Tpm12CommandLib|SecurityPkg/Library/Tpm12CommandLib/Tpm12CommandLib.inf
@@ -770,6 +769,7 @@
   MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
+      XenPlatformLib|OvmfPkg/Library/XenPlatformLib/XenPlatformLib.inf
 !ifdef $(CSM_ENABLE)
       NULL|OvmfPkg/Csm/CsmSupportLib/CsmSupportLib.inf
       NULL|OvmfPkg/Csm/LegacyBootManagerLib/LegacyBootManagerLib.inf
