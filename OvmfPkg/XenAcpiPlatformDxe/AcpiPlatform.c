@@ -155,17 +155,10 @@ InstallOvmfFvTables (
   UINT32                               FvStatus;
   UINTN                                TableSize;
   UINTN                                Size;
-  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE    TableInstallFunction;
 
   Instance     = 0;
   CurrentTable = NULL;
   TableHandle  = 0;
-
-  if (QemuDetected ()) {
-    TableInstallFunction = QemuInstallAcpiTable;
-  } else {
-    TableInstallFunction = InstallAcpiTable;
-  }
 
   //
   // set FwVol (and use an ASSERT() below) to suppress incorrect
@@ -207,7 +200,7 @@ InstallOvmfFvTables (
       //
       // Install ACPI table
       //
-      Status = TableInstallFunction (
+      Status = InstallAcpiTable (
                  AcpiTable,
                  CurrentTable,
                  TableSize,
