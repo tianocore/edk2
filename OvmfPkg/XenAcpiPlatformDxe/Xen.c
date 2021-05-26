@@ -185,12 +185,12 @@ InstallXenTables (
       //
       // Install the XSDT tables
       //
-      Status = InstallAcpiTable (
-                 AcpiProtocol,
-                 CurrentTable,
-                 CurrentTable->Length,
-                 &TableHandle
-                 );
+      Status = AcpiProtocol->InstallAcpiTable (
+                               AcpiProtocol,
+                               CurrentTable,
+                               CurrentTable->Length,
+                               &TableHandle
+                               );
 
       if (EFI_ERROR (Status)) {
         return Status;
@@ -235,12 +235,12 @@ InstallXenTables (
       //
       // Install the RSDT tables
       //
-      Status = InstallAcpiTable (
-                 AcpiProtocol,
-                 CurrentTable,
-                 CurrentTable->Length,
-                 &TableHandle
-                 );
+      Status = AcpiProtocol->InstallAcpiTable (
+                               AcpiProtocol,
+                               CurrentTable,
+                               CurrentTable->Length,
+                               &TableHandle
+                               );
 
       if (EFI_ERROR (Status)) {
         return Status;
@@ -266,12 +266,12 @@ InstallXenTables (
     //
     // FACS 2.0
     //
-    Status = InstallAcpiTable (
-               AcpiProtocol,
-               Facs2Table,
-               Facs2Table->Length,
-               &TableHandle
-               );
+    Status = AcpiProtocol->InstallAcpiTable (
+                             AcpiProtocol,
+                             Facs2Table,
+                             Facs2Table->Length,
+                             &TableHandle
+                             );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -280,12 +280,12 @@ InstallXenTables (
     //
     // FACS 1.0
     //
-    Status = InstallAcpiTable (
-               AcpiProtocol,
-               Facs1Table,
-               Facs1Table->Length,
-               &TableHandle
-               );
+    Status = AcpiProtocol->InstallAcpiTable (
+                             AcpiProtocol,
+                             Facs1Table,
+                             Facs1Table->Length,
+                             &TableHandle
+                             );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -301,12 +301,12 @@ InstallXenTables (
     CpuDeadLoop ();
   }
 
-  Status = InstallAcpiTable (
-             AcpiProtocol,
-             DsdtTable,
-             DsdtTable->Length,
-             &TableHandle
-             );
+  Status = AcpiProtocol->InstallAcpiTable (
+                           AcpiProtocol,
+                           DsdtTable,
+                           DsdtTable->Length,
+                           &TableHandle
+                           );
   if (EFI_ERROR (Status)) {
     return Status;
   }
