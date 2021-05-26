@@ -2,7 +2,7 @@
   This file contains AML code definition in the latest ACPI spec.
 
   Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2019, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -175,5 +175,10 @@
 #define AML_FIELD_ACCESS_OP          0x01
 #define AML_FIELD_CONNECTION_OP      0x02
 #define AML_FIELD_EXT_ACCESS_OP      0x03
+
+//
+// AML Name segment definitions
+//
+#define AML_NAME_SEG_SIZE            4
 
 #endif
