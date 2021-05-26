@@ -9,14 +9,15 @@
 
 **/
 
-#include "AcpiPlatform.h"
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/QemuFwCfgLib.h>
-#include <Library/DxeServicesTableLib.h>
-#include <Library/PcdLib.h>
-#include <Library/OrderedCollectionLib.h>
 #include <IndustryStandard/Acpi.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DxeServicesTableLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/OrderedCollectionLib.h>
+#include <Library/PcdLib.h>
+#include <Library/QemuFwCfgLib.h>
+
+#include "AcpiPlatform.h"
 
 BOOLEAN
 QemuDetected (

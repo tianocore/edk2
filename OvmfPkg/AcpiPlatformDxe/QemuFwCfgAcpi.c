@@ -8,17 +8,17 @@
 
 **/
 
-#include "AcpiPlatform.h"
-#include "QemuLoader.h"
+#include <IndustryStandard/Acpi.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/OrderedCollectionLib.h>
+#include <Library/PcdLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgS3Lib.h>
-#include <Library/DxeServicesTableLib.h>
-#include <Library/PcdLib.h>
-#include <Library/OrderedCollectionLib.h>
-#include <IndustryStandard/Acpi.h>
 
+#include "AcpiPlatform.h"
+#include "QemuLoader.h"
 
 //
 // The user structure for the ordered collection that will track the fw_cfg

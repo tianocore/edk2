@@ -9,19 +9,16 @@
 #ifndef ACPI_PLATFORM_H_
 #define ACPI_PLATFORM_H_
 
+#include <IndustryStandard/Acpi.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/XenPlatformLib.h>
 #include <PiDxe.h>
-
 #include <Protocol/AcpiTable.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Protocol/PciIo.h>
-
-#include <Library/BaseLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
-#include <Library/XenPlatformLib.h>
-
-#include <IndustryStandard/Acpi.h>
 
 typedef struct {
   EFI_PCI_IO_PROTOCOL *PciIo;
