@@ -12,6 +12,17 @@
 #define SMBIOS_PLATFORM_DXE_H_
 
 /**
+  Install all structures from the given SMBIOS structures block
+
+  @param  TableAddress         SMBIOS tables starting address
+
+**/
+EFI_STATUS
+InstallAllStructures (
+  IN UINT8                     *TableAddress
+  );
+
+/**
   Locates and extracts the QEMU SMBIOS table data if present in fw_cfg
 
   @return             Address of extracted QEMU SMBIOS data
