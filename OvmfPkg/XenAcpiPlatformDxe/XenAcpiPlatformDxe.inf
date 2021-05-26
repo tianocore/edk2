@@ -42,13 +42,11 @@
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
-  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL SOMETIMES_CONSUMED
 
 [Guids]
   gRootBridgesConnectedEventGroupGuid
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
 
 [Depex]
