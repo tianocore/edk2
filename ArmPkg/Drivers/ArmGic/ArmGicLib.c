@@ -117,7 +117,7 @@ ArmGicGetInterfaceIdentification (
 UINTN
 EFIAPI
 ArmGicGetMaxNumInterrupts (
-  IN  INTN  GicDistributorBase
+  IN  UINTN  GicDistributorBase
   )
 {
   UINTN  ItLines;
@@ -133,10 +133,10 @@ ArmGicGetMaxNumInterrupts (
 VOID
 EFIAPI
 ArmGicSendSgiTo (
-  IN  INTN  GicDistributorBase,
-  IN  INTN  TargetListFilter,
-  IN  INTN  CPUTargetList,
-  IN  INTN  SgiId
+  IN  UINTN  GicDistributorBase,
+  IN  INTN   TargetListFilter,
+  IN  INTN   CPUTargetList,
+  IN  INTN   SgiId
   )
 {
   MmioWrite32 (
@@ -390,7 +390,7 @@ ArmGicIsInterruptEnabled (
 VOID
 EFIAPI
 ArmGicDisableDistributor (
-  IN  INTN  GicDistributorBase
+  IN  UINTN  GicDistributorBase
   )
 {
   // Disable Gic Distributor

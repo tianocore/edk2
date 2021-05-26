@@ -121,7 +121,7 @@ VOID
 EFIAPI
 ArmGicSetupNonSecure (
   IN  UINTN  MpId,
-  IN  INTN   GicDistributorBase,
+  IN  UINTN  GicDistributorBase,
   IN  INTN   GicInterruptInterfaceBase
   );
 
@@ -148,28 +148,28 @@ ArmGicDisableInterruptInterface (
 VOID
 EFIAPI
 ArmGicEnableDistributor (
-  IN  INTN  GicDistributorBase
+  IN  UINTN  GicDistributorBase
   );
 
 VOID
 EFIAPI
 ArmGicDisableDistributor (
-  IN  INTN  GicDistributorBase
+  IN  UINTN  GicDistributorBase
   );
 
 UINTN
 EFIAPI
 ArmGicGetMaxNumInterrupts (
-  IN  INTN  GicDistributorBase
+  IN  UINTN  GicDistributorBase
   );
 
 VOID
 EFIAPI
 ArmGicSendSgiTo (
-  IN  INTN  GicDistributorBase,
-  IN  INTN  TargetListFilter,
-  IN  INTN  CPUTargetList,
-  IN  INTN  SgiId
+  IN  UINTN  GicDistributorBase,
+  IN  INTN   TargetListFilter,
+  IN  INTN   CPUTargetList,
+  IN  INTN   SgiId
   );
 
 /*
@@ -251,7 +251,7 @@ VOID
 EFIAPI
 ArmGicV2SetupNonSecure (
   IN  UINTN  MpId,
-  IN  INTN   GicDistributorBase,
+  IN  UINTN  GicDistributorBase,
   IN  INTN   GicInterruptInterfaceBase
   );
 
