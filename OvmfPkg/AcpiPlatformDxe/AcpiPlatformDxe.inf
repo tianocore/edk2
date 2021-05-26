@@ -48,7 +48,6 @@
   QemuFwCfgS3Lib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  UefiLib
   XenPlatformLib
 
 [Protocols]
