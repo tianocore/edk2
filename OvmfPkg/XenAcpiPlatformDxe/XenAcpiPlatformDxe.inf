@@ -28,26 +28,18 @@
   Xen.c
 
 [Packages]
-  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseLib
   DebugLib
-  PcdLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   XenPlatformLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
-
-[Guids]
-  gRootBridgesConnectedEventGroupGuid
-
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
 
 [Depex]
   gEfiAcpiTableProtocolGuid
