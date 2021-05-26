@@ -14,24 +14,6 @@
 
 #include "AcpiPlatform.h"
 
-EFI_STATUS
-EFIAPI
-InstallAcpiTable (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
-  IN   VOID                          *AcpiTableBuffer,
-  IN   UINTN                         AcpiTableBufferSize,
-  OUT  UINTN                         *TableKey
-  )
-{
-  return AcpiProtocol->InstallAcpiTable (
-                         AcpiProtocol,
-                         AcpiTableBuffer,
-                         AcpiTableBufferSize,
-                         TableKey
-                         );
-}
-
-
 /**
   Locate the first instance of a protocol.  If the protocol requested is an
   FV protocol, then it will return the first FV that contains the ACPI table
@@ -200,12 +182,12 @@ InstallOvmfFvTables (
       //
       // Install ACPI table
       //
-      Status = InstallAcpiTable (
-                 AcpiTable,
-                 CurrentTable,
-                 TableSize,
-                 &TableHandle
-                 );
+      Status = AcpiTable->InstallAcpiTable (
+                            AcpiTable,
+                            CurrentTable,
+                            TableSize,
+                            &TableHandle
+                            );
 
       //
       // Free memory allocated by ReadSection
