@@ -132,7 +132,7 @@ LocateFvInstanceWithTables (
   by the VMM first.
 
   If that fails, we use this function to load the ACPI tables from an FV. The
-  sources for the FV based tables is located under OvmfPkg/AcpiTables.
+  sources for the FV based tables is located under OvmfPkg/Bhyve/AcpiTables.
 
   @param  AcpiTable     Protocol instance pointer
 
