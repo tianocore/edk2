@@ -256,7 +256,7 @@ InstallAcpiTables (
   if (XenDetected ()) {
     Status = InstallXenTables (AcpiTable);
   } else {
-    Status = InstallQemuFwCfgTables (AcpiTable);
+    Status = EFI_UNSUPPORTED;
   }
 
   if (EFI_ERROR (Status)) {
