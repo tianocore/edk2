@@ -8,19 +8,10 @@
 
 **/
 
-#ifndef _SMBIOS_PLATFORM_DXE_H_
-#define _SMBIOS_PLATFORM_DXE_H_
+#ifndef SMBIOS_PLATFORM_DXE_H_
+#define SMBIOS_PLATFORM_DXE_H_
 
-#include <PiDxe.h>
-
-#include <Protocol/Smbios.h>
-#include <IndustryStandard/SmBios.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/MemoryAllocationLib.h>
-
+#include <IndustryStandard/SmBios.h> // SMBIOS_TABLE_ENTRY_POINT
 
 /**
   Locates the Xen SMBIOS data if it exists

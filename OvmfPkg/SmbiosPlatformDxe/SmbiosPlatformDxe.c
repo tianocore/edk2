@@ -8,6 +8,12 @@
 
 **/
 
+#include <IndustryStandard/SmBios.h>          // SMBIOS_TABLE_TYPE0
+#include <Library/DebugLib.h>                 // ASSERT_EFI_ERROR()
+#include <Library/MemoryAllocationLib.h>      // FreePool()
+#include <Library/UefiBootServicesTableLib.h> // gBS
+#include <Protocol/Smbios.h>                  // EFI_SMBIOS_PROTOCOL
+
 #include "SmbiosPlatformDxe.h"
 
 #define TYPE0_STRINGS \
