@@ -497,6 +497,7 @@ F: OvmfPkg/PlatformPei/MemDetect.c
 F: OvmfPkg/PlatformPei/Platform.*
 F: OvmfPkg/PlatformPei/Xen.*
 F: OvmfPkg/SmbiosPlatformDxe/*Xen.c
+F: OvmfPkg/XenAcpiPlatformDxe/
 F: OvmfPkg/XenBusDxe/
 F: OvmfPkg/XenIoPciDxe/
 F: OvmfPkg/XenIoPvhDxe/
