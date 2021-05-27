@@ -322,6 +322,45 @@ PciExBarInitialization (
 }
 
 VOID
+MicrovmInitialization (
+  VOID
+  )
+{
+    FIRMWARE_CONFIG_ITEM FdtItem;
+    UINTN FdtSize;
+    UINTN FdtPages;
+    EFI_STATUS Status;
+    UINT64 *FdtHobData;
+    VOID *NewBase;
+
+    Status = QemuFwCfgFindFile ("etc/fdt", &FdtItem, &FdtSize);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "%a: no etc/fdt found in fw_cfg\n", __FUNCTION__));
+      return;
+    }
+
+    FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
+    NewBase = AllocatePages (FdtPages);
+    if (NewBase == NULL) {
+      DEBUG ((DEBUG_INFO, "%a: AllocatePages failed\n", __FUNCTION__));
+      return;
+    }
+
+    QemuFwCfgSelectItem (FdtItem);
+    QemuFwCfgReadBytes (FdtSize, NewBase);
+
+    FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof (*FdtHobData));
+    if (FdtHobData == NULL) {
+      DEBUG ((DEBUG_INFO, "%a: BuildGuidHob failed\n", __FUNCTION__));
+      return;
+    }
+
+    DEBUG ((DEBUG_INFO, "%a: fdt at 0x%x (size %d)\n", __FUNCTION__,
+            NewBase, FdtSize));
+    *FdtHobData = (UINTN)NewBase;
+}
+
+VOID
 MiscInitialization (
   VOID
   )
@@ -368,6 +407,7 @@ MiscInitialization (
       break;
     case 0xffff: /* microvm */
       DEBUG ((DEBUG_INFO, "%a: microvm\n", __FUNCTION__));
+      MicrovmInitialization();
       PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId,
                              MICROVM_PSEUDO_DEVICE_ID);
       ASSERT_RETURN_ERROR (PcdStatus);
