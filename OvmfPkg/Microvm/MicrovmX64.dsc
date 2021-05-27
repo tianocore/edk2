@@ -233,6 +233,8 @@
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   VmgExitLib|OvmfPkg/Library/VmgExitLib/VmgExitLib.inf
+  SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
+  PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
 
 [LibraryClasses.common.SEC]
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
@@ -537,6 +539,11 @@
   # Point to the MdeModulePkg/Application/UiApp/UiApp.inf
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
 
+  # microvm serial port^M
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialPciDeviceInfo|{0xFF}
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x3f8
+
 ################################################################################
 #
 # Pcd Dynamic Section - list of all EDK II PCD Entries defined by this Platform
@@ -732,9 +739,7 @@
   #
   # ISA Support
   #
-  OvmfPkg/SioBusDxe/SioBusDxe.inf
-  MdeModulePkg/Bus/Pci/PciSioSerialDxe/PciSioSerialDxe.inf
-  MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
+  MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
   #
   # SMBIOS Support

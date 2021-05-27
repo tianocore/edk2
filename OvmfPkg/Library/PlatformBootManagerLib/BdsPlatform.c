@@ -8,6 +8,7 @@
 
 #include "BdsPlatform.h"
 #include <Guid/RootBridgesConnectedEventGroup.h>
+#include <Guid/SerialPortLibVendor.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Library/PlatformBmPrintScLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
@@ -661,6 +662,43 @@ PrepareLpcBridgeDevicePath (
   return EFI_SUCCESS;
 }
 
+typedef struct {
+  VENDOR_DEVICE_PATH        Guid;
+  EFI_DEVICE_PATH_PROTOCOL  End;
+} SERIAL_DEVICE_PATH;
+
+SERIAL_DEVICE_PATH serialDevicePath = {
+  {
+    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, { sizeof (VENDOR_DEVICE_PATH), 0} },
+    EDKII_SERIAL_PORT_LIB_VENDOR_GUID
+  },
+  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0 } }
+};
+
+VOID
+PrepareMicrovmDevicePath (
+  VOID
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  UINT16                    HostBridgeDevId;
+
+  HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
+  if (HostBridgeDevId != MICROVM_PSEUDO_DEVICE_ID) {
+    return;
+  }
+
+  DevicePath = (EFI_DEVICE_PATH_PROTOCOL*)&serialDevicePath;
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
+
+  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
+}
+
 EFI_STATUS
 GetGopDevicePath (
    IN  EFI_DEVICE_PATH_PROTOCOL *PciDevicePath,
@@ -1020,6 +1058,8 @@ PlatformInitializeConsole (
   // ErrOut
   //
   VisitAllPciInstances (DetectAndPreparePlatformPciDevicePath);
+
+  PrepareMicrovmDevicePath ();
 
   //
   // Have chance to connect the platform default console,
