@@ -69,7 +69,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PEI_MM_DEACTIVATE) (
+(EFIAPI *EFI_PEI_MM_DEACTIVATE) (
   IN EFI_PEI_SERVICES                      **PeiServices,
   IN EFI_PEI_MM_CONTROL_PPI                * This,
   IN BOOLEAN                               Periodic OPTIONAL
@@ -80,9 +80,9 @@ EFI_STATUS
 ///  platform hardware that generates an MMI. There are often I/O ports that, when accessed, will
 ///  generate the MMI. Also, the hardware optionally supports the periodic generation of these signals.
 ///
-struct _PEI_MM_CONTROL_PPI {
-  PEI_MM_ACTIVATE    Trigger;
-  PEI_MM_DEACTIVATE  Clear;
+struct _EFI_PEI_MM_CONTROL_PPI {
+  EFI_PEI_MM_ACTIVATE    Trigger;
+  EFI_PEI_MM_DEACTIVATE  Clear;
 };
 
 extern EFI_GUID gEfiPeiMmControlPpiGuid;
