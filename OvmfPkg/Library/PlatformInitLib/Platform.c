@@ -154,7 +154,7 @@ PlatformMemMapInitialization (
     // The MMCONFIG area is expected to fall between the top of low RAM and
     // the base of the 32-bit PCI host aperture.
     //
-    PciExBarBase = FixedPcdGet64 (PcdPciExpressBaseAddress);
+    PciExBarBase = PcdGet64 (PcdPciExpressBaseAddress);
     ASSERT (TopOfLowRam <= PciExBarBase);
     ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
     PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
@@ -278,7 +278,7 @@ PciExBarInitialization (
   // determined in AddressWidthInitialization(), i.e., 36 bits, will suffice
   // for DXE's page tables to cover the MMCONFIG area.
   //
-  PciExBarBase.Uint64 = FixedPcdGet64 (PcdPciExpressBaseAddress);
+  PciExBarBase.Uint64 = PcdGet64 (PcdPciExpressBaseAddress);
   ASSERT ((PciExBarBase.Uint32[1] & MCH_PCIEXBAR_HIGHMASK) == 0);
   ASSERT ((PciExBarBase.Uint32[0] & MCH_PCIEXBAR_LOWMASK) == 0);
 
