@@ -1,7 +1,7 @@
 ## @file
 #  GNU/Linux makefile for C tools build.
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -59,7 +59,10 @@ APPLICATIONS = \
   LzmaCompress \
   TianoCompress \
   VolInfo \
-  DevicePath
+  DevicePath \
+  BfmLib \
+  FCE \
+  FMMT
 
 SUBDIRS := $(LIBRARIES) $(APPLICATIONS)
 
