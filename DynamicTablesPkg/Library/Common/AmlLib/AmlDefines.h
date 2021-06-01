@@ -1,7 +1,7 @@
 /** @file
   AML Defines.
 
-  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -137,13 +137,6 @@ typedef enum EAmlParseIndex {
   @ingroup TreeStructures
 */
 #define AML_FIELD_NAMED_OP            0x04
-
-/** Size of a NameSeg.
-    Cf. ACPI 6.3 specification, s20.2.
-
-  @ingroup TreeStructures
-*/
- #define AML_NAME_SEG_SIZE            4U
 
 /** AML object types.
 

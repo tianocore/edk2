@@ -1,7 +1,7 @@
 /** @file
   SSDT Serial Port Table Generator.
 
-  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -171,7 +171,7 @@ BuildSsdtSerialPortTableEx (
   CM_ARM_SERIAL_PORT_INFO       * SerialPortInfo;
   UINT32                          SerialPortCount;
   UINTN                           Index;
-  CHAR8                           NewName[5];
+  CHAR8                           NewName[AML_NAME_SEG_SIZE + 1];
   UINT64                          Uid;
   EFI_ACPI_DESCRIPTION_HEADER  ** TableList;
 
