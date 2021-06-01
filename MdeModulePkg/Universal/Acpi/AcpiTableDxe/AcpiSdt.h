@@ -56,7 +56,6 @@ typedef struct _EFI_AML_NODE_LIST EFI_AML_NODE_LIST;
 //  Size is the total size of this ACPI node buffer.
 //  Children is the children linked list of this node.
 //
-#define AML_NAME_SEG_SIZE  4
 
 struct _EFI_AML_NODE_LIST {
   UINT32                  Signature;
