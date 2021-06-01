@@ -31,6 +31,7 @@
 #include <Library/ResourcePublicationLib.h>
 #include <Ppi/MasterBootMode.h>
 #include <IndustryStandard/I440FxPiix4.h>
+#include <IndustryStandard/Microvm.h>
 #include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
@@ -714,7 +715,11 @@ InitializePlatform (
   //
   // Query Host Bridge DID
   //
+#ifdef PLATFORM_IS_MICROVM
+  mHostBridgeDevId = MICROVM_PSEUDO_DEVICE_ID;
+#else
   mHostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
+#endif
 
   MaxCpuCountInitialization ();
 

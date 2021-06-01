@@ -15,6 +15,7 @@ Module Name:
 //
 #include <IndustryStandard/E820.h>
 #include <IndustryStandard/I440FxPiix4.h>
+#include <IndustryStandard/Microvm.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <PiPei.h>
 #include <Register/Intel/SmramSaveStateMap.h>
@@ -134,6 +135,10 @@ QemuUc32BaseInitialization (
 {
   UINT32 LowerMemorySize;
   UINT32 Uc32Size;
+
+  if (mHostBridgeDevId == MICROVM_PSEUDO_DEVICE_ID) {
+    return;
+  }
 
   if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     //

@@ -73,6 +73,9 @@
 !endif
 
 [BuildOptions]
+  GCC:*_*_*_CC_FLAGS                   = -DPLATFORM_IS_MICROVM
+  INTEL:*_*_*_CC_FLAGS                 = /D PLATFORM_IS_MICROVM
+  MSFT:*_*_*_CC_FLAGS                  = /D PLATFORM_IS_MICROVM
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS            = /D MDEPKG_NDEBUG
