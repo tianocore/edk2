@@ -365,6 +365,12 @@ MiscInitialization (
       AcpiCtlReg = POWER_MGMT_REGISTER_Q35 (ICH9_ACPI_CNTL);
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
+    case MICROVM_PSEUDO_DEVICE_ID:
+      DEBUG ((DEBUG_INFO, "%a: microvm\n", __FUNCTION__));
+      PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId,
+                             MICROVM_PSEUDO_DEVICE_ID);
+      ASSERT_RETURN_ERROR (PcdStatus);
+      return;
     default:
       DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__, mHostBridgeDevId));
