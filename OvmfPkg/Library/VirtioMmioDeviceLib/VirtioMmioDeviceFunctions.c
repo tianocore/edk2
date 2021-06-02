@@ -173,6 +173,7 @@ VirtioMmioSetQueueSel (
 }
 
 EFI_STATUS
+EFIAPI
 VirtioMmioSetQueueAddress (
   IN VIRTIO_DEVICE_PROTOCOL  *This,
   IN VRING                   *Ring,
