@@ -859,7 +859,6 @@
   }
 
   OvmfPkg/PlatformDxe/Platform.inf
-  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
   OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 
   #
