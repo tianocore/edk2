@@ -26,7 +26,8 @@ typedef struct {
   ///
   /// Describes the size of Data (in bytes) and does not include the size of the header.
   ///
-  UINTN     MessageLength;
+  /// BZ3398: Make MessageLength the same size in EFI_MM_COMMUNICATE_HEADER for both IA32 and X64.
+  UINT64    MessageLength;
   ///
   /// Designates an array of bytes that is MessageLength in size.
   ///
