@@ -26,7 +26,7 @@ typedef struct {
   ///
   /// Describes the size of Data (in bytes) and does not include the size of the header.
   ///
-  UINTN     MessageLength;
+  UINT64    MessageLength;
   ///
   /// Designates an array of bytes that is MessageLength in size.
   ///
