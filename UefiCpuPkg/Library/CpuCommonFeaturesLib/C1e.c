@@ -63,9 +63,9 @@ C1eInitialize (
 {
   //
   // The scope of C1EEnable bit in the MSR_NEHALEM_POWER_CTL is Package, only program
-  // MSR_FEATURE_CONFIG for thread 0 core 0 in each package.
+  // MSR_NEHALEM_POWER_CTL once for each package.
   //
-  if ((CpuInfo->ProcessorInfo.Location.Thread != 0) || (CpuInfo->ProcessorInfo.Location.Core != 0)) {
+  if ((CpuInfo->First.Thread == 0) || (CpuInfo->First.Core == 0)) {
   return RETURN_SUCCESS;
   }
 
