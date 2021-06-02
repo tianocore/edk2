@@ -1,8 +1,8 @@
 /** @file
 
-  Unified linker script for GCC based builds
+  Unified linker script for CLANG based builds
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
@@ -71,7 +71,6 @@ SECTIONS {
     *(.interp)
     *(.dynsym)
     *(.dynstr)
-    *(.dynamic)
     *(.hash .gnu.hash)
     *(.comment)
     *(COMMON)
