@@ -29,7 +29,7 @@ features
  [working] serial console
  [working] direct kernel boot
  [working] virtio-mmio support
- [in progress] pcie support
+ [working] pcie support
 
 known limitations
 -----------------
