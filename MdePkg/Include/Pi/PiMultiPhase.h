@@ -149,6 +149,44 @@ typedef struct _EFI_MM_RESERVED_MMRAM_REGION {
   UINT64                  MmramReservedSize;
 } EFI_MM_RESERVED_MMRAM_REGION;
 
+#pragma pack(1)
+
+///
+/// To avoid confusion in interpreting frames, the buffer communicating to MM core through
+/// EFI_MM_COMMUNICATE3 or later should always start with EFI_MM_COMMUNICATE_HEADER_V3.
+///
+typedef struct {
+  ///
+  /// Signature to indicate data is compliant with new MM communicate header structure.
+  ///
+  UINT32    Signature;
+  ///
+  /// MM communicate data format version, MM foundation entry point should check if incoming
+  /// data is a supported format before proceeding.
+  ///
+  UINT32    Version;
+  ///
+  /// Allows for disambiguation of the message format.
+  ///
+  EFI_GUID  MessageGuid;
+  ///
+  /// Describes the size of MessageData (in bytes) and does not include the size of the header.
+  ///
+  UINT64    MessageSize;
+  ///
+  /// Designates an array of bytes that is MessageSize in size.
+  ///
+  UINT8     MessageData[];
+} EFI_MM_COMMUNICATE_HEADER_V3;
+
+#pragma pack()
+
+STATIC_ASSERT ((sizeof (EFI_MM_COMMUNICATE_HEADER_V3) == OFFSET_OF (EFI_MM_COMMUNICATE_HEADER_V3, MessageData)), \
+  "sizeof (EFI_MM_COMMUNICATE_HEADER_V3) does not align with the beginning of flexible array MessageData");
+
+#define EFI_MM_COMMUNICATE_HEADER_V3_SIGNATURE  0x4D434833 // "MCH3"
+#define EFI_MM_COMMUNICATE_HEADER_V3_VERSION    3
+
 typedef enum {
   EFI_PCD_TYPE_8,
   EFI_PCD_TYPE_16,
