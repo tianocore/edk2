@@ -246,7 +246,7 @@ IsTextShdr (
   Elf_Shdr *Shdr
   )
 {
-  return (BOOLEAN) ((Shdr->sh_flags & (SHF_WRITE | SHF_ALLOC)) == SHF_ALLOC);
+  return (BOOLEAN) ((Shdr->sh_flags & (SHF_EXECINSTR | SHF_ALLOC)) == (SHF_EXECINSTR | SHF_ALLOC));
 }
 
 STATIC
@@ -269,7 +269,7 @@ IsDataShdr (
   if (IsHiiRsrcShdr(Shdr)) {
     return FALSE;
   }
-  return (BOOLEAN) (Shdr->sh_flags & (SHF_WRITE | SHF_ALLOC)) == (SHF_ALLOC | SHF_WRITE);
+  return (BOOLEAN) (Shdr->sh_flags & (SHF_EXECINSTR | SHF_WRITE | SHF_ALLOC)) == (SHF_ALLOC | SHF_WRITE);
 }
 
 STATIC
@@ -1060,6 +1060,7 @@ WriteSections64 (
 
             exit(EXIT_FAILURE);
           }
+          continue;
         }
         SymShdr = GetShdrByIndex(Sym->st_shndx);
 
