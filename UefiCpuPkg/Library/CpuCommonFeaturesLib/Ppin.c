@@ -130,10 +130,10 @@ PpinInitialize (
   // Support function already check the processor which support PPIN feature, so this function not need
   // to check the processor again.
   //
-  // The scope of the MSR_IVY_BRIDGE_PPIN_CTL is package level, only program MSR_IVY_BRIDGE_PPIN_CTL for
-  // thread 0 core 0 in each package.
+  // The scope of the MSR_IVY_BRIDGE_PPIN_CTL is package level, only program MSR_IVY_BRIDGE_PPIN_CTL
+  // once for each package.
   //
-  if ((CpuInfo->ProcessorInfo.Location.Thread != 0) || (CpuInfo->ProcessorInfo.Location.Core != 0)) {
+  if ((CpuInfo->First.Thread == 0) || (CpuInfo->First.Core == 0)) {
     return RETURN_SUCCESS;
   }
 
