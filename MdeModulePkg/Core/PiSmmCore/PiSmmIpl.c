@@ -34,6 +34,7 @@
 #include <Library/UefiRuntimeLib.h>
 #include <Library/PcdLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/SafeIntLib.h>
 
 #include "PiSmmCorePrivateData.h"
 
@@ -515,6 +516,7 @@ SmmCommunicationCommunicate (
   EFI_STATUS                  Status;
   EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
   BOOLEAN                     OldInSmm;
+  UINT64                      BZ3398_LongCommSize;
   UINTN                       TempCommSize;
 
   //
@@ -527,7 +529,16 @@ SmmCommunicationCommunicate (
   CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *) CommBuffer;
 
   if (CommSize == NULL) {
-    TempCommSize = OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
+    // BZ3398 Starts: Make MessageLength the same size in EFI_MM_COMMUNICATE_HEADER for both IA32 and X64.
+    Status = SafeUint64Add (OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data), CommunicateHeader->MessageLength, &BZ3398_LongCommSize);
+    if (EFI_ERROR (Status)) {
+      return EFI_INVALID_PARAMETER;
+    }
+    Status = SafeUint64ToUintn (BZ3398_LongCommSize, &TempCommSize);
+    if (EFI_ERROR (Status)) {
+      return EFI_INVALID_PARAMETER;
+    }
+    // BZ3398 Ends
   } else {
     TempCommSize = *CommSize;
     //
