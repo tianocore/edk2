@@ -46,11 +46,13 @@
   DxeServicesLib
   PcdLib
   ReportStatusCodeLib
+  SafeIntLib
 
 [Protocols]
   gEfiSmmBase2ProtocolGuid                      ## PRODUCES
   gEfiSmmCommunicationProtocolGuid              ## PRODUCES
   gEfiMmCommunication2ProtocolGuid              ## PRODUCES
+  gEfiMmCommunication3ProtocolGuid              ## PRODUCES
   gEfiSmmAccess2ProtocolGuid                    ## CONSUMES
   ## NOTIFY
   ## CONSUMES
