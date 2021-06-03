@@ -1190,7 +1190,9 @@ GetSmramProfileData (
   CommRecordingState->Header.ReturnStatus = (UINT64)-1;
   CommRecordingState->RecordingState      = MEMORY_PROFILE_RECORDING_DISABLE;
 
-  CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + CommHeader->MessageLength;
+  // BZ3398: Make MessageLength the same size in EFI_MM_COMMUNICATE_HEADER for both IA32 and X64.
+  // The CommHeader->MessageLength contains a definitive value, thus UINTN cast is safe here.
+  CommSize = OFFSET_OF(EFI_SMM_COMMUNICATE_HEADER, Data) + (UINTN)CommHeader->MessageLength;
   Status = SmmCommunication->Communicate (SmmCommunication, CommBuffer, &CommSize);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "SmramProfile: SmmCommunication - %r\n", Status));
@@ -1213,7 +1215,9 @@ GetSmramProfileData (
     CommRecordingState->Header.ReturnStatus = (UINT64)-1;
     CommRecordingState->RecordingState      = MEMORY_PROFILE_RECORDING_DISABLE;
 
-    CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + CommHeader->MessageLength;
+    // BZ3398: Make MessageLength the same size in EFI_MM_COMMUNICATE_HEADER for both IA32 and X64.
+    // The CommHeader->MessageLength contains a definitive value, thus UINTN cast is safe here.
+    CommSize = OFFSET_OF(EFI_SMM_COMMUNICATE_HEADER, Data) + (UINTN)CommHeader->MessageLength;
     SmmCommunication->Communicate (SmmCommunication, CommBuffer, &CommSize);
   }
 
@@ -1230,7 +1234,9 @@ GetSmramProfileData (
   CommGetProfileInfo->Header.ReturnStatus = (UINT64)-1;
   CommGetProfileInfo->ProfileSize         = 0;
 
-  CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + CommHeader->MessageLength;
+  // BZ3398: Make MessageLength the same size in EFI_MM_COMMUNICATE_HEADER for both IA32 and X64.
+  // The CommHeader->MessageLength contains a definitive value, thus UINTN cast is safe here.
+  CommSize = OFFSET_OF(EFI_SMM_COMMUNICATE_HEADER, Data) + (UINTN)CommHeader->MessageLength;
   Status = SmmCommunication->Communicate (SmmCommunication, CommBuffer, &CommSize);
   ASSERT_EFI_ERROR (Status);
 
@@ -1261,7 +1267,9 @@ GetSmramProfileData (
   CommGetProfileData->Header.DataLength   = sizeof (*CommGetProfileData);
   CommGetProfileData->Header.ReturnStatus = (UINT64)-1;
 
-  CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + CommHeader->MessageLength;
+  // BZ3398: Make MessageLength the same size in EFI_MM_COMMUNICATE_HEADER for both IA32 and X64.
+  // The CommHeader->MessageLength contains a definitive value, thus UINTN cast is safe here.
+  CommSize = OFFSET_OF(EFI_SMM_COMMUNICATE_HEADER, Data) + (UINTN)CommHeader->MessageLength;
   Buffer = (UINT8 *) CommHeader + CommSize;
   Size -= CommSize;
 
@@ -1320,7 +1328,9 @@ Done:
     CommRecordingState->Header.ReturnStatus = (UINT64)-1;
     CommRecordingState->RecordingState      = MEMORY_PROFILE_RECORDING_ENABLE;
 
-    CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + CommHeader->MessageLength;
+    // BZ3398: Make MessageLength the same size in EFI_MM_COMMUNICATE_HEADER for both IA32 and X64.
+    // The CommHeader->MessageLength contains a definitive value, thus UINTN cast is safe here.
+    CommSize = OFFSET_OF(EFI_SMM_COMMUNICATE_HEADER, Data) + (UINTN)CommHeader->MessageLength;
     SmmCommunication->Communicate (SmmCommunication, CommBuffer, &CommSize);
   }
 
