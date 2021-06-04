@@ -268,7 +268,7 @@ PiMmCpuTpFwRootMmiHandler (
                     &PerCpuGuidedEventContext[CpuNumber]->HeaderGuid,
                     NULL,
                     PerCpuGuidedEventContext[CpuNumber]->Data,
-                    &PerCpuGuidedEventContext[CpuNumber]->MessageLength
+                    (UINTN)&PerCpuGuidedEventContext[CpuNumber]->MessageLength
                     );
 
   if (Status != EFI_SUCCESS) {

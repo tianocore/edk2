@@ -514,6 +514,7 @@ SmmCommunicationCommunicate (
   EFI_STATUS                  Status;
   EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
   BOOLEAN                     OldInSmm;
+  UINT64                      LongCommSize;
   UINTN                       TempCommSize;
 
   //
@@ -526,7 +527,15 @@ SmmCommunicationCommunicate (
   CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommBuffer;
 
   if (CommSize == NULL) {
-    TempCommSize = OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
+    Status = SafeUint64Add (OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data), CommunicateHeader->MessageLength, &LongCommSize);
+    if (EFI_ERROR (Status)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Status = SafeUint64ToUintn (LongCommSize, &TempCommSize);
+    if (EFI_ERROR (Status)) {
+      return EFI_INVALID_PARAMETER;
+    }
   } else {
     TempCommSize = *CommSize;
     //
