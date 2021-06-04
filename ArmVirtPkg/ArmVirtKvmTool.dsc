@@ -1,7 +1,7 @@
 #  @file
 #  Workspace file for KVMTool virtual platform.
 #
-#  Copyright (c) 2018 - 2021, ARM Limited. All rights reserved.
+#  Copyright (c) 2018 - 2022, ARM Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -26,6 +26,9 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtKvmTool.fdf
+
+[Defines.AARCH64]
+  DEFINE ACPIVIEW_ENABLE         = TRUE
 
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
