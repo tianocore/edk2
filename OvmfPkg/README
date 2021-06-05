@@ -59,7 +59,7 @@ https://github.com/tianocore/tianocore.github.io/wiki/How%20to%20build%20OVMF
 
 === RUNNING OVMF on QEMU ===
 
-* Be sure to use qemu-system-x86_64, if you are using and X64 firmware.
+* Be sure to use qemu-system-x86_64, if you are using an X64 firmware.
   (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
 * Use OVMF for QEMU firmware (3 options available)
   - Option 1: Use QEMU -pflash parameter
