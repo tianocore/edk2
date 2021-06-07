@@ -7,6 +7,7 @@
 **/
 
 #include <Library/ArmGicLib.h>
+#include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 
 UINTN
@@ -26,5 +27,6 @@ ArmGicV2EndOfInterrupt (
   IN UINTN   Source
   )
 {
-  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, Source);
+  ASSERT (Source < MAX_UINT32);
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, (UINT32)Source);
 }
