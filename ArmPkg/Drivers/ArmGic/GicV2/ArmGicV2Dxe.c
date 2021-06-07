@@ -162,7 +162,7 @@ GicV2IrqInterruptHandler (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  UINT32                      GicInterrupt;
+  UINTN                       GicInterrupt;
   HARDWARE_INTERRUPT_HANDLER  InterruptHandler;
 
   GicInterrupt = ArmGicV2AcknowledgeInterrupt (mGicInterruptInterfaceBase);
@@ -179,7 +179,7 @@ GicV2IrqInterruptHandler (
     // Call the registered interrupt handler.
     InterruptHandler (GicInterrupt, SystemContext);
   } else {
-    DEBUG ((DEBUG_ERROR, "Spurious GIC interrupt: 0x%x\n", GicInterrupt));
+    DEBUG ((DEBUG_ERROR, "Spurious GIC interrupt: 0x%x\n", (UINT32)GicInterrupt));
     GicV2EndOfInterrupt (&gHardwareInterruptV2Protocol, GicInterrupt);
   }
 }
@@ -349,8 +349,8 @@ GicV2ExitBootServicesEvent (
   IN VOID       *Context
   )
 {
-  UINTN   Index;
-  UINT32  GicInterrupt;
+  UINTN  Index;
+  UINTN  GicInterrupt;
 
   // Disable all the interrupts
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
