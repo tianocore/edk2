@@ -16,7 +16,7 @@ ArmGicV2AcknowledgeInterrupt (
   )
 {
   // Read the Interrupt Acknowledge Register
-  return MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
+  return (UINTN)MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
 }
 
 VOID
