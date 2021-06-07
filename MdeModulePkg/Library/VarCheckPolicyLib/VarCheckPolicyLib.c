@@ -216,6 +216,7 @@ VarCheckPolicyLibMmiHandler (
         DumpParamsOut->TotalSize = 0;
         DumpParamsOut->PageSize = 0;
         DumpParamsOut->HasMore = FALSE;
+        TempSize = 0;
         SubCommandStatus = DumpVariablePolicy (NULL, &TempSize);
         if (SubCommandStatus == EFI_BUFFER_TOO_SMALL && TempSize > 0) {
           mCurrentPaginationCommand = VAR_CHECK_POLICY_COMMAND_DUMP;

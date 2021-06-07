@@ -21,6 +21,9 @@ jobs:
   #Use matrix to speed up the build process
   strategy:
     matrix:
+      TARGET_ARM_ARMPLATFORM:
+        Build.Pkgs: 'ArmPkg,ArmPlatformPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
       TARGET_MDE_CPU:
         Build.Pkgs: 'MdePkg,UefiCpuPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'

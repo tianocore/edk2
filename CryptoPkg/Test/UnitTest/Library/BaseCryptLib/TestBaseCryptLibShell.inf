@@ -35,6 +35,7 @@
   RandTests.c
   Pkcs7EkuTests.c
   OaepEncryptTests.c
+  RsaPssTests.c
 
 [Packages]
   MdePkg/MdePkg.dec

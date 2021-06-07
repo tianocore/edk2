@@ -128,6 +128,10 @@
   # has been discovered and recorded
   gOvmfTpmDiscoveredPpiGuid             = {0xb9a61ad0, 0x2802, 0x41f3, {0xb5, 0x13, 0x96, 0x51, 0xce, 0x6b, 0xd5, 0x75}}
 
+  # This PPI signals that accessing the MMIO range of the TPM is possible in
+  # the PEI phase, regardless of memory encryption
+  gOvmfTpmMmioAccessiblePpiGuid         = {0x35c84ff2, 0x7bfe, 0x453d, {0x84, 0x5f, 0x68, 0x3a, 0x49, 0x2c, 0xf7, 0xb7}}
+
 [Protocols]
   gVirtioDeviceProtocolGuid             = {0xfa920010, 0x6785, 0x4941, {0xb6, 0xec, 0x49, 0x8c, 0x57, 0x9f, 0x16, 0x0a}}
   gXenBusProtocolGuid                   = {0x3d3ca290, 0xb9a5, 0x11e3, {0xb7, 0x5d, 0xb8, 0xac, 0x6f, 0x7d, 0x65, 0xe6}}
@@ -351,6 +355,10 @@
   #
   #  This PCD is only accessed if PcdSmmSmramRequire is TRUE (see below).
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE|BOOLEAN|0x34
+
+  ## This PCD adds a communication channel between OVMF's SmmCpuFeaturesLib
+  #  instance in PiSmmCpuDxeSmm, and CpuHotplugSmm.
+  gUefiOvmfPkgTokenSpaceGuid.PcdCpuHotEjectDataAddress|0|UINT64|0x46
 
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c

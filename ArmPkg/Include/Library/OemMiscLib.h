@@ -162,4 +162,74 @@ OemUpdateSmbiosInfo (
   IN OEM_MISC_SMBIOS_HII_STRING_FIELD Field
   );
 
+/** Fetches the Type 32 boot information status.
+
+  @return Boot status.
+**/
+MISC_BOOT_INFORMATION_STATUS_DATA_TYPE
+EFIAPI
+OemGetBootStatus (
+  VOID
+  );
+
+/** Fetches the chassis status when it was last booted.
+
+ @return Chassis status.
+**/
+MISC_CHASSIS_STATE
+EFIAPI
+OemGetChassisBootupState (
+  VOID
+  );
+
+/** Fetches the chassis power supply/supplies status when last booted.
+
+ @return Chassis power supply/supplies status.
+**/
+MISC_CHASSIS_STATE
+EFIAPI
+OemGetChassisPowerSupplyState (
+  VOID
+  );
+
+/** Fetches the chassis thermal status when last booted.
+
+ @return Chassis thermal status.
+**/
+MISC_CHASSIS_STATE
+EFIAPI
+OemGetChassisThermalState (
+  VOID
+  );
+
+/** Fetches the chassis security status when last booted.
+
+ @return Chassis security status.
+**/
+MISC_CHASSIS_SECURITY_STATE
+EFIAPI
+OemGetChassisSecurityStatus (
+  VOID
+  );
+
+/** Fetches the chassis height in RMUs (Rack Mount Units).
+
+  @return The height of the chassis.
+**/
+UINT8
+EFIAPI
+OemGetChassisHeight (
+  VOID
+  );
+
+/** Fetches the number of power cords.
+
+  @return The number of power cords.
+**/
+UINT8
+EFIAPI
+OemGetChassisNumPowerCords (
+  VOID
+  );
+
 #endif // OEM_MISC_LIB_H_

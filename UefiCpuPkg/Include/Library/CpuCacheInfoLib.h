@@ -1,7 +1,7 @@
 /** @file
   Header file for CPU Cache info Library.
 
-  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -33,7 +33,18 @@ typedef struct {
   // Ways of associativity.
   // Value = CPUID.04h:EBX[31:22]
   //
-  UINT16        CacheWays;
+  UINT16        CacheWays : 10;
+  //
+  // Fully associative cache.
+  // Value = CPUID.04h:EAX[09]
+  //
+  UINT16        FullyAssociativeCache : 1;
+  //
+  // Direct mapped cache.
+  // Value = CPUID.04h:EDX[02]
+  //
+  UINT16        DirectMappedCache : 1;
+  UINT16        Reserved : 4;
   //
   // Size of single cache that this package's this type of logical processor corresponds to.
   // Value = (CPUID.04h:EBX[31:22] + 1) * (CPUID.04h:EBX[21:12] + 1) *

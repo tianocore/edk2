@@ -43,21 +43,21 @@ BITS 16
     mov        fs, ax
     mov        gs, ax
 
-    mov        si,  BufferStartLocation
+    mov        si,  MP_CPU_EXCHANGE_INFO_FIELD (BufferStart)
     mov        ebx, [si]
 
-    mov        si,  DataSegmentLocation
+    mov        si,  MP_CPU_EXCHANGE_INFO_FIELD (DataSegment)
     mov        edx, [si]
 
     ;
     ; Get start address of 32-bit code in low memory (<1MB)
     ;
-    mov        edi, ModeTransitionMemoryLocation
+    mov        edi, MP_CPU_EXCHANGE_INFO_FIELD (ModeTransitionMemory)
 
-    mov        si, GdtrLocation
+    mov        si, MP_CPU_EXCHANGE_INFO_FIELD (GdtrProfile)
 o32 lgdt       [cs:si]
 
-    mov        si, IdtrLocation
+    mov        si, MP_CPU_EXCHANGE_INFO_FIELD (IdtrProfile)
 o32 lidt       [cs:si]
 
     ;
@@ -85,7 +85,7 @@ Flat32Start:                                   ; protected mode entry point
     ;
     ; Enable execute disable bit
     ;
-    mov        esi, EnableExecuteDisableLocation
+    mov        esi, MP_CPU_EXCHANGE_INFO_FIELD (EnableExecuteDisable)
     cmp        byte [ebx + esi], 0
     jz         SkipEnableExecuteDisableBit
 
@@ -101,7 +101,7 @@ SkipEnableExecuteDisableBit:
     mov        eax, cr4
     bts        eax, 5
 
-    mov        esi, Enable5LevelPagingLocation
+    mov        esi, MP_CPU_EXCHANGE_INFO_FIELD (Enable5LevelPaging)
     cmp        byte [ebx + esi], 0
     jz         SkipEnable5LevelPaging
 
@@ -117,7 +117,7 @@ SkipEnable5LevelPaging:
     ;
     ; Load page table
     ;
-    mov        esi, Cr3Location             ; Save CR3 in ecx
+    mov        esi, MP_CPU_EXCHANGE_INFO_FIELD (Cr3)             ; Save CR3 in ecx
     mov        ecx, [ebx + esi]
     mov        cr3, ecx                    ; Load CR3
 
@@ -139,47 +139,43 @@ SkipEnable5LevelPaging:
     ;
     ; Far jump to 64-bit code
     ;
-    mov        edi, ModeHighMemoryLocation
+    mov        edi, MP_CPU_EXCHANGE_INFO_FIELD (ModeHighMemory)
     add        edi, ebx
     jmp far    [edi]
 
 BITS 64
 LongModeStart:
     mov        esi, ebx
-    lea        edi, [esi + InitFlagLocation]
+    lea        edi, [esi + MP_CPU_EXCHANGE_INFO_FIELD (InitFlag)]
     cmp        qword [edi], 1       ; ApInitConfig
     jnz        GetApicId
 
     ; Increment the number of APs executing here as early as possible
     ; This is decremented in C code when AP is finished executing
     mov        edi, esi
-    add        edi, NumApsExecutingLocation
+    add        edi, MP_CPU_EXCHANGE_INFO_FIELD (NumApsExecuting)
     lock inc   dword [edi]
 
     ; AP init
     mov        edi, esi
-    add        edi, LockLocation
-    mov        rax, NotVacantFlag
-
-    mov        edi, esi
-    add        edi, ApIndexLocation
+    add        edi, MP_CPU_EXCHANGE_INFO_FIELD (ApIndex)
     mov        ebx, 1
     lock xadd  dword [edi], ebx                 ; EBX = ApIndex++
     inc        ebx                              ; EBX is CpuNumber
 
     ; program stack
     mov        edi, esi
-    add        edi, StackSizeLocation
+    add        edi, MP_CPU_EXCHANGE_INFO_FIELD (StackSize)
     mov        eax, dword [edi]
     mov        ecx, ebx
     inc        ecx
     mul        ecx                               ; EAX = StackSize * (CpuNumber + 1)
     mov        edi, esi
-    add        edi, StackStartAddressLocation
+    add        edi, MP_CPU_EXCHANGE_INFO_FIELD (StackStart)
     add        rax, qword [edi]
     mov        rsp, rax
 
-    lea        edi, [esi + SevEsIsEnabledLocation]
+    lea        edi, [esi + MP_CPU_EXCHANGE_INFO_FIELD (SevEsIsEnabled)]
     cmp        byte [edi], 1        ; SevEsIsEnabled
     jne        CProcedureInvoke
 
@@ -193,7 +189,7 @@ LongModeStart:
     mov        ecx, ebx
     mul        ecx                               ; EAX = SIZE_4K * 2 * CpuNumber
     mov        edi, esi
-    add        edi, GhcbBaseLocation
+    add        edi, MP_CPU_EXCHANGE_INFO_FIELD (GhcbBase)
     add        rax, qword [edi]
     mov        rdx, rax
     shr        rdx, 32
@@ -202,7 +198,7 @@ LongModeStart:
     jmp        CProcedureInvoke
 
 GetApicId:
-    lea        edi, [esi + SevEsIsEnabledLocation]
+    lea        edi, [esi + MP_CPU_EXCHANGE_INFO_FIELD (SevEsIsEnabled)]
     cmp        byte [edi], 1        ; SevEsIsEnabled
     jne        DoCpuid
 
@@ -296,18 +292,18 @@ GetProcessorNumber:
     ; Note that BSP may become an AP due to SwitchBsp()
     ;
     xor         ebx, ebx
-    lea         eax, [esi + CpuInfoLocation]
+    lea         eax, [esi + MP_CPU_EXCHANGE_INFO_FIELD (CpuInfo)]
     mov         rdi, [eax]
 
 GetNextProcNumber:
-    cmp         dword [rdi], edx                      ; APIC ID match?
+    cmp         dword [rdi + CPU_INFO_IN_HOB.InitialApicId], edx                      ; APIC ID match?
     jz          ProgramStack
-    add         rdi, 20
+    add         rdi, CPU_INFO_IN_HOB_size
     inc         ebx
     jmp         GetNextProcNumber
 
 ProgramStack:
-    mov         rsp, qword [rdi + 12]
+    mov         rsp, qword [rdi + CPU_INFO_IN_HOB.ApTopOfStack]
 
 CProcedureInvoke:
     push       rbp               ; Push BIST data at top of AP stack
@@ -315,17 +311,17 @@ CProcedureInvoke:
     push       rbp
     mov        rbp, rsp
 
-    mov        rax, qword [esi + InitializeFloatingPointUnitsAddress]
+    mov        rax, qword [esi + MP_CPU_EXCHANGE_INFO_FIELD (InitializeFloatingPointUnits)]
     sub        rsp, 20h
     call       rax               ; Call assembly function to initialize FPU per UEFI spec
     add        rsp, 20h
 
     mov        edx, ebx          ; edx is ApIndex
     mov        ecx, esi
-    add        ecx, LockLocation ; rcx is address of exchange info data buffer
+    add        ecx, MP_CPU_EXCHANGE_INFO_OFFSET ; rcx is address of exchange info data buffer
 
     mov        edi, esi
-    add        edi, ApProcedureLocation
+    add        edi, MP_CPU_EXCHANGE_INFO_FIELD (CFunction)
     mov        rax, qword [edi]
 
     sub        rsp, 20h
@@ -661,18 +657,18 @@ AsmRelocateApLoopEnd:
 global ASM_PFX(AsmGetAddressMap)
 ASM_PFX(AsmGetAddressMap):
     lea        rax, [ASM_PFX(RendezvousFunnelProc)]
-    mov        qword [rcx], rax
-    mov        qword [rcx +  8h], LongModeStart - RendezvousFunnelProcStart
-    mov        qword [rcx + 10h], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RendezvousFunnelAddress], rax
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.ModeEntryOffset], LongModeStart - RendezvousFunnelProcStart
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RendezvousFunnelSize], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
     lea        rax, [ASM_PFX(AsmRelocateApLoop)]
-    mov        qword [rcx + 18h], rax
-    mov        qword [rcx + 20h], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
-    mov        qword [rcx + 28h], Flat32Start - RendezvousFunnelProcStart
-    mov        qword [rcx + 30h], SwitchToRealProcEnd - SwitchToRealProcStart          ; SwitchToRealSize
-    mov        qword [rcx + 38h], SwitchToRealProcStart - RendezvousFunnelProcStart    ; SwitchToRealOffset
-    mov        qword [rcx + 40h], SwitchToRealProcStart - Flat32Start                  ; SwitchToRealNoNxOffset
-    mov        qword [rcx + 48h], PM16Mode - RendezvousFunnelProcStart                 ; SwitchToRealPM16ModeOffset
-    mov        qword [rcx + 50h], SwitchToRealProcEnd - PM16Mode                       ; SwitchToRealPM16ModeSize
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddress], rax
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSize], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.ModeTransitionOffset], Flat32Start - RendezvousFunnelProcStart
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealSize], SwitchToRealProcEnd - SwitchToRealProcStart
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealOffset], SwitchToRealProcStart - RendezvousFunnelProcStart
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealNoNxOffset], SwitchToRealProcStart - Flat32Start
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealPM16ModeOffset], PM16Mode - RendezvousFunnelProcStart
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealPM16ModeSize], SwitchToRealProcEnd - PM16Mode
     ret
 
 ;-------------------------------------------------------------------------------------
@@ -715,18 +711,18 @@ ASM_PFX(AsmExchangeRole):
 
     ;Store EFLAGS, GDTR and IDTR regiter to stack
     pushfq
-    sgdt       [rsi + 16]
-    sidt       [rsi + 26]
+    sgdt       [rsi + CPU_EXCHANGE_ROLE_INFO.Gdtr]
+    sidt       [rsi + CPU_EXCHANGE_ROLE_INFO.Idtr]
 
     ; Store the its StackPointer
-    mov        [rsi + 8], rsp
+    mov        [rsi + CPU_EXCHANGE_ROLE_INFO.StackPointer], rsp
 
     ; update its switch state to STORED
-    mov        byte [rsi], CPU_SWITCH_STATE_STORED
+    mov        byte [rsi + CPU_EXCHANGE_ROLE_INFO.State], CPU_SWITCH_STATE_STORED
 
 WaitForOtherStored:
     ; wait until the other CPU finish storing its state
-    cmp        byte [rdi], CPU_SWITCH_STATE_STORED
+    cmp        byte [rdi + CPU_EXCHANGE_ROLE_INFO.State], CPU_SWITCH_STATE_STORED
     jz         OtherStored
     pause
     jmp        WaitForOtherStored
@@ -734,21 +730,21 @@ WaitForOtherStored:
 OtherStored:
     ; Since another CPU already stored its state, load them
     ; load GDTR value
-    lgdt       [rdi + 16]
+    lgdt       [rdi + CPU_EXCHANGE_ROLE_INFO.Gdtr]
 
     ; load IDTR value
-    lidt       [rdi + 26]
+    lidt       [rdi + CPU_EXCHANGE_ROLE_INFO.Idtr]
 
     ; load its future StackPointer
-    mov        rsp, [rdi + 8]
+    mov        rsp, [rdi + CPU_EXCHANGE_ROLE_INFO.StackPointer]
 
     ; update the other CPU's switch state to LOADED
-    mov        byte [rdi], CPU_SWITCH_STATE_LOADED
+    mov        byte [rdi + CPU_EXCHANGE_ROLE_INFO.State], CPU_SWITCH_STATE_LOADED
 
 WaitForOtherLoaded:
     ; wait until the other CPU finish loading new state,
     ; otherwise the data in stack may corrupt
-    cmp        byte [rsi], CPU_SWITCH_STATE_LOADED
+    cmp        byte [rsi + CPU_EXCHANGE_ROLE_INFO.State], CPU_SWITCH_STATE_LOADED
     jz         OtherLoaded
     pause
     jmp        WaitForOtherLoaded

@@ -135,10 +135,6 @@ QemuUc32BaseInitialization (
   UINT32 LowerMemorySize;
   UINT32 Uc32Size;
 
-  if (mXen) {
-    return;
-  }
-
   if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     //
     // On q35, the 32-bit area that we'll mark as UC, through variable MTRRs,
@@ -819,11 +815,7 @@ InitializeRamRegions (
   VOID
   )
 {
-  if (!mXen) {
-    QemuInitializeRam ();
-  } else {
-    XenPublishRamRegions ();
-  }
+  QemuInitializeRam ();
 
   if (mS3Supported && mBootMode != BOOT_ON_S3_RESUME) {
     //

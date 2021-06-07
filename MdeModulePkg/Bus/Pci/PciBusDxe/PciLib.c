@@ -1778,10 +1778,9 @@ PciProgramResizableBar (
 
     if (ResizableBarOp == PciResizableBarMax) {
       Bit = HighBitSet64(Capabilities);
-    } else if (ResizableBarOp == PciResizableBarMin) {
-      Bit = LowBitSet64(Capabilities);
     } else {
-      ASSERT ((ResizableBarOp == PciResizableBarMax) || (ResizableBarOp == PciResizableBarMin));
+      ASSERT (ResizableBarOp == PciResizableBarMin);
+      Bit = LowBitSet64(Capabilities);
     }
 
     ASSERT (Bit >= 0);

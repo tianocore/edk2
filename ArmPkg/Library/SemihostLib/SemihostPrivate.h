@@ -1,14 +1,14 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2013 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SEMIHOST_PRIVATE_H__
-#define __SEMIHOST_PRIVATE_H__
+#ifndef SEMIHOST_PRIVATE_H_
+#define SEMIHOST_PRIVATE_H_
 
 typedef struct {
   CHAR8   *FileName;
@@ -151,19 +151,19 @@ _Semihost_SYS_SYSTEM(
   IN SEMIHOST_SYSTEM_BLOCK *SystemBlock
   );
 
-#define Semihost_SYS_OPEN(OpenBlock)        _Semihost_SYS_OPEN(0x01, OpenBlock)
-#define Semihost_SYS_CLOSE(Handle)          _Semihost_SYS_CLOSE(0x02, Handle)
-#define Semihost_SYS_WRITE0(String)         _Semihost_SYS_WRITE0(0x04, String)
-#define Semihost_SYS_WRITEC(Character)      _Semihost_SYS_WRITEC(0x03, Character)
-#define Semihost_SYS_WRITE(WriteBlock)      _Semihost_SYS_WRITE(0x05, WriteBlock)
-#define Semihost_SYS_READ(ReadBlock)        _Semihost_SYS_READ(0x06, ReadBlock)
-#define Semihost_SYS_READC()                _Semihost_SYS_READC(0x07, 0)
-#define Semihost_SYS_SEEK(SeekBlock)        _Semihost_SYS_SEEK(0x0A, SeekBlock)
-#define Semihost_SYS_FLEN(Handle)           _Semihost_SYS_FLEN(0x0C, Handle)
-#define Semihost_SYS_TMPNAME(TmpNameBlock)  _Semihost_SYS_TMPNAME(0x0D, TmpNameBlock)
-#define Semihost_SYS_REMOVE(RemoveBlock)    _Semihost_SYS_REMOVE(0x0E, RemoveBlock)
-#define Semihost_SYS_RENAME(RenameBlock)    _Semihost_SYS_RENAME(0x0F, RenameBlock)
-#define Semihost_SYS_SYSTEM(SystemBlock)    _Semihost_SYS_SYSTEM(0x12, SystemBlock)
+#define SEMIHOST_SYS_OPEN(OpenBlock)        _Semihost_SYS_OPEN(0x01, OpenBlock)
+#define SEMIHOST_SYS_CLOSE(Handle)          _Semihost_SYS_CLOSE(0x02, Handle)
+#define SEMIHOST_SYS_WRITE0(String)         _Semihost_SYS_WRITE0(0x04, String)
+#define SEMIHOST_SYS_WRITEC(Character)      _Semihost_SYS_WRITEC(0x03, Character)
+#define SEMIHOST_SYS_WRITE(WriteBlock)      _Semihost_SYS_WRITE(0x05, WriteBlock)
+#define SEMIHOST_SYS_READ(ReadBlock)        _Semihost_SYS_READ(0x06, ReadBlock)
+#define SEMIHOST_SYS_READC()                _Semihost_SYS_READC(0x07, 0)
+#define SEMIHOST_SYS_SEEK(SeekBlock)        _Semihost_SYS_SEEK(0x0A, SeekBlock)
+#define SEMIHOST_SYS_FLEN(Handle)           _Semihost_SYS_FLEN(0x0C, Handle)
+#define SEMIHOST_SYS_TMPNAME(TmpNameBlock)  _Semihost_SYS_TMPNAME(0x0D, TmpNameBlock)
+#define SEMIHOST_SYS_REMOVE(RemoveBlock)    _Semihost_SYS_REMOVE(0x0E, RemoveBlock)
+#define SEMIHOST_SYS_RENAME(RenameBlock)    _Semihost_SYS_RENAME(0x0F, RenameBlock)
+#define SEMIHOST_SYS_SYSTEM(SystemBlock)    _Semihost_SYS_SYSTEM(0x12, SystemBlock)
 
 #elif defined(__GNUC__) // __CC_ARM
 
@@ -175,38 +175,38 @@ GccSemihostCall (
   IN UINTN    SystemBlockAddress
   ); // __attribute__ ((interrupt ("SVC")));
 
-#define Semihost_SYS_OPEN(OpenBlock)        GccSemihostCall(0x01, (UINTN)(OpenBlock))
-#define Semihost_SYS_CLOSE(Handle)          GccSemihostCall(0x02, (UINTN)(Handle))
-#define Semihost_SYS_WRITE0(String)         GccSemihostCall(0x04, (UINTN)(String))
-#define Semihost_SYS_WRITEC(Character)      GccSemihostCall(0x03, (UINTN)(Character))
-#define Semihost_SYS_WRITE(WriteBlock)      GccSemihostCall(0x05, (UINTN)(WriteBlock))
-#define Semihost_SYS_READ(ReadBlock)        GccSemihostCall(0x06, (UINTN)(ReadBlock))
-#define Semihost_SYS_READC()                GccSemihostCall(0x07, (UINTN)(0))
-#define Semihost_SYS_SEEK(SeekBlock)        GccSemihostCall(0x0A, (UINTN)(SeekBlock))
-#define Semihost_SYS_FLEN(Handle)           GccSemihostCall(0x0C, (UINTN)(Handle))
-#define Semihost_SYS_TMPNAME(TmpNameBlock)  GccSemihostCall(0x0D, (UINTN)(TmpNameBlock))
-#define Semihost_SYS_REMOVE(RemoveBlock)    GccSemihostCall(0x0E, (UINTN)(RemoveBlock))
-#define Semihost_SYS_RENAME(RenameBlock)    GccSemihostCall(0x0F, (UINTN)(RenameBlock))
-#define Semihost_SYS_SYSTEM(SystemBlock)    GccSemihostCall(0x12, (UINTN)(SystemBlock))
+#define SEMIHOST_SYS_OPEN(OpenBlock)        GccSemihostCall(0x01, (UINTN)(OpenBlock))
+#define SEMIHOST_SYS_CLOSE(Handle)          GccSemihostCall(0x02, (UINTN)(Handle))
+#define SEMIHOST_SYS_WRITE0(String)         GccSemihostCall(0x04, (UINTN)(String))
+#define SEMIHOST_SYS_WRITEC(Character)      GccSemihostCall(0x03, (UINTN)(Character))
+#define SEMIHOST_SYS_WRITE(WriteBlock)      GccSemihostCall(0x05, (UINTN)(WriteBlock))
+#define SEMIHOST_SYS_READ(ReadBlock)        GccSemihostCall(0x06, (UINTN)(ReadBlock))
+#define SEMIHOST_SYS_READC()                GccSemihostCall(0x07, (UINTN)(0))
+#define SEMIHOST_SYS_SEEK(SeekBlock)        GccSemihostCall(0x0A, (UINTN)(SeekBlock))
+#define SEMIHOST_SYS_FLEN(Handle)           GccSemihostCall(0x0C, (UINTN)(Handle))
+#define SEMIHOST_SYS_TMPNAME(TmpNameBlock)  GccSemihostCall(0x0D, (UINTN)(TmpNameBlock))
+#define SEMIHOST_SYS_REMOVE(RemoveBlock)    GccSemihostCall(0x0E, (UINTN)(RemoveBlock))
+#define SEMIHOST_SYS_RENAME(RenameBlock)    GccSemihostCall(0x0F, (UINTN)(RenameBlock))
+#define SEMIHOST_SYS_SYSTEM(SystemBlock)    GccSemihostCall(0x12, (UINTN)(SystemBlock))
 
 #else // __CC_ARM
 
 #define SEMIHOST_SUPPORTED  FALSE
 
-#define Semihost_SYS_OPEN(OpenBlock)        (-1)
-#define Semihost_SYS_CLOSE(Handle)          (-1)
-#define Semihost_SYS_WRITE0(String)
-#define Semihost_SYS_WRITEC(Character)
-#define Semihost_SYS_WRITE(WriteBlock)      (0)
-#define Semihost_SYS_READ(ReadBlock)        ((ReadBlock)->Length)
-#define Semihost_SYS_READC()                ('x')
-#define Semihost_SYS_SEEK(SeekBlock)        (-1)
-#define Semihost_SYS_FLEN(Handle)           (-1)
-#define Semihost_SYS_TMPNAME(TmpNameBlock)  (-1)
-#define Semihost_SYS_REMOVE(RemoveBlock)    (-1)
-#define Semihost_SYS_RENAME(RenameBlock)    (-1)
-#define Semihost_SYS_SYSTEM(SystemBlock)    (-1)
+#define SEMIHOST_SYS_OPEN(OpenBlock)        (-1)
+#define SEMIHOST_SYS_CLOSE(Handle)          (-1)
+#define SEMIHOST_SYS_WRITE0(String)
+#define SEMIHOST_SYS_WRITEC(Character)
+#define SEMIHOST_SYS_WRITE(WriteBlock)      (0)
+#define SEMIHOST_SYS_READ(ReadBlock)        ((ReadBlock)->Length)
+#define SEMIHOST_SYS_READC()                ('x')
+#define SEMIHOST_SYS_SEEK(SeekBlock)        (-1)
+#define SEMIHOST_SYS_FLEN(Handle)           (-1)
+#define SEMIHOST_SYS_TMPNAME(TmpNameBlock)  (-1)
+#define SEMIHOST_SYS_REMOVE(RemoveBlock)    (-1)
+#define SEMIHOST_SYS_RENAME(RenameBlock)    (-1)
+#define SEMIHOST_SYS_SYSTEM(SystemBlock)    (-1)
 
 #endif // __CC_ARM
 
-#endif //__SEMIHOST_PRIVATE_H__
+#endif // SEMIHOST_PRIVATE_H_

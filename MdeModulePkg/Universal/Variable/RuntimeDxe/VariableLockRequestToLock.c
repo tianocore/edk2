@@ -48,9 +48,9 @@ VariableLockRequestToLock (
   EFI_STATUS             Status;
   VARIABLE_POLICY_ENTRY  *NewPolicy;
 
-  DEBUG ((DEBUG_ERROR, "!!! DEPRECATED INTERFACE !!! %a() will go away soon!\n", __FUNCTION__));
-  DEBUG ((DEBUG_ERROR, "!!! DEPRECATED INTERFACE !!! Please move to use Variable Policy!\n"));
-  DEBUG ((DEBUG_ERROR, "!!! DEPRECATED INTERFACE !!! Variable: %g %s\n", VendorGuid, VariableName));
+  DEBUG ((DEBUG_WARN, "!!! DEPRECATED INTERFACE !!! %a() will go away soon!\n", __FUNCTION__));
+  DEBUG ((DEBUG_WARN, "!!! DEPRECATED INTERFACE !!! Please move to use Variable Policy!\n"));
+  DEBUG ((DEBUG_WARN, "!!! DEPRECATED INTERFACE !!! Variable: %g %s\n", VendorGuid, VariableName));
 
   NewPolicy = NULL;
   Status = CreateBasicVariablePolicy(
@@ -69,13 +69,13 @@ VariableLockRequestToLock (
     //
     // If the error returned is EFI_ALREADY_STARTED, we need to check the
     // current database for the variable and see whether it's locked. If it's
-    // locked, we're still fine, but also generate a DEBUG_ERROR message so the
+    // locked, we're still fine, but also generate a DEBUG_WARN message so the
     // duplicate lock can be removed.
     //
     if (Status == EFI_ALREADY_STARTED) {
       Status = ValidateSetVariable (VariableName, VendorGuid, 0, 0, NULL);
       if (Status == EFI_WRITE_PROTECTED) {
-        DEBUG ((DEBUG_ERROR, "  Variable: %g %s is already locked!\n", VendorGuid, VariableName));
+        DEBUG ((DEBUG_WARN, "  Variable: %g %s is already locked!\n", VendorGuid, VariableName));
         Status = EFI_SUCCESS;
       } else {
         DEBUG ((DEBUG_ERROR, "  Variable: %g %s can not be locked!\n", VendorGuid, VariableName));

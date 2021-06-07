@@ -146,6 +146,10 @@ MemMapInitialization (
   UINT64        PciIoBase;
   UINT64        PciIoSize;
   RETURN_STATUS PcdStatus;
+  UINT32        TopOfLowRam;
+  UINT64        PciExBarBase;
+  UINT32        PciBase;
+  UINT32        PciSize;
 
   PciIoBase = 0xC000;
   PciIoSize = 0x4000;
@@ -155,88 +159,81 @@ MemMapInitialization (
   //
   AddIoMemoryRangeHob (0x0A0000, BASE_1MB);
 
-  if (!mXen) {
-    UINT32  TopOfLowRam;
-    UINT64  PciExBarBase;
-    UINT32  PciBase;
-    UINT32  PciSize;
-
-    TopOfLowRam = GetSystemMemorySizeBelow4gb ();
-    PciExBarBase = 0;
-    if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
-      //
-      // The MMCONFIG area is expected to fall between the top of low RAM and
-      // the base of the 32-bit PCI host aperture.
-      //
-      PciExBarBase = FixedPcdGet64 (PcdPciExpressBaseAddress);
-      ASSERT (TopOfLowRam <= PciExBarBase);
-      ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
-      PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
-    } else {
-      ASSERT (TopOfLowRam <= mQemuUc32Base);
-      PciBase = mQemuUc32Base;
-    }
-
+  TopOfLowRam = GetSystemMemorySizeBelow4gb ();
+  PciExBarBase = 0;
+  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     //
-    // address       purpose   size
-    // ------------  --------  -------------------------
-    // max(top, 2g)  PCI MMIO  0xFC000000 - max(top, 2g)
-    // 0xFC000000    gap                           44 MB
-    // 0xFEC00000    IO-APIC                        4 KB
-    // 0xFEC01000    gap                         1020 KB
-    // 0xFED00000    HPET                           1 KB
-    // 0xFED00400    gap                          111 KB
-    // 0xFED1C000    gap (PIIX4) / RCRB (ICH9)     16 KB
-    // 0xFED20000    gap                          896 KB
-    // 0xFEE00000    LAPIC                          1 MB
+    // The MMCONFIG area is expected to fall between the top of low RAM and
+    // the base of the 32-bit PCI host aperture.
     //
-    PciSize = 0xFC000000 - PciBase;
-    AddIoMemoryBaseSizeHob (PciBase, PciSize);
-    PcdStatus = PcdSet64S (PcdPciMmio32Base, PciBase);
-    ASSERT_RETURN_ERROR (PcdStatus);
-    PcdStatus = PcdSet64S (PcdPciMmio32Size, PciSize);
-    ASSERT_RETURN_ERROR (PcdStatus);
+    PciExBarBase = FixedPcdGet64 (PcdPciExpressBaseAddress);
+    ASSERT (TopOfLowRam <= PciExBarBase);
+    ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
+    PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
+  } else {
+    ASSERT (TopOfLowRam <= mQemuUc32Base);
+    PciBase = mQemuUc32Base;
+  }
 
-    AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
-    AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
-    if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
-      AddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
-      //
-      // Note: there should be an
-      //
-      //   AddIoMemoryBaseSizeHob (PciExBarBase, SIZE_256MB);
-      //
-      // call below, just like the one above for RCBA. However, Linux insists
-      // that the MMCONFIG area be marked in the E820 or UEFI memory map as
-      // "reserved memory" -- Linux does not content itself with a simple gap
-      // in the memory map wherever the MCFG ACPI table points to.
-      //
-      // This appears to be a safety measure. The PCI Firmware Specification
-      // (rev 3.1) says in 4.1.2. "MCFG Table Description": "The resources can
-      // *optionally* be returned in [...] EFIGetMemoryMap as reserved memory
-      // [...]". (Emphasis added here.)
-      //
-      // Normally we add memory resource descriptor HOBs in
-      // QemuInitializeRam(), and pre-allocate from those with memory
-      // allocation HOBs in InitializeRamRegions(). However, the MMCONFIG area
-      // is most definitely not RAM; so, as an exception, cover it with
-      // uncacheable reserved memory right here.
-      //
-      AddReservedMemoryBaseSizeHob (PciExBarBase, SIZE_256MB, FALSE);
-      BuildMemoryAllocationHob (PciExBarBase, SIZE_256MB,
-        EfiReservedMemoryType);
-    }
-    AddIoMemoryBaseSizeHob (PcdGet32(PcdCpuLocalApicBaseAddress), SIZE_1MB);
+  //
+  // address       purpose   size
+  // ------------  --------  -------------------------
+  // max(top, 2g)  PCI MMIO  0xFC000000 - max(top, 2g)
+  // 0xFC000000    gap                           44 MB
+  // 0xFEC00000    IO-APIC                        4 KB
+  // 0xFEC01000    gap                         1020 KB
+  // 0xFED00000    HPET                           1 KB
+  // 0xFED00400    gap                          111 KB
+  // 0xFED1C000    gap (PIIX4) / RCRB (ICH9)     16 KB
+  // 0xFED20000    gap                          896 KB
+  // 0xFEE00000    LAPIC                          1 MB
+  //
+  PciSize = 0xFC000000 - PciBase;
+  AddIoMemoryBaseSizeHob (PciBase, PciSize);
+  PcdStatus = PcdSet64S (PcdPciMmio32Base, PciBase);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet64S (PcdPciMmio32Size, PciSize);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
+  AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB);
+  AddIoMemoryBaseSizeHob (0xFED00000, SIZE_1KB);
+  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+    AddIoMemoryBaseSizeHob (ICH9_ROOT_COMPLEX_BASE, SIZE_16KB);
     //
-    // On Q35, the IO Port space is available for PCI resource allocations from
-    // 0x6000 up.
+    // Note: there should be an
     //
-    if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
-      PciIoBase = 0x6000;
-      PciIoSize = 0xA000;
-      ASSERT ((ICH9_PMBASE_VALUE & 0xF000) < PciIoBase);
-    }
+    //   AddIoMemoryBaseSizeHob (PciExBarBase, SIZE_256MB);
+    //
+    // call below, just like the one above for RCBA. However, Linux insists
+    // that the MMCONFIG area be marked in the E820 or UEFI memory map as
+    // "reserved memory" -- Linux does not content itself with a simple gap
+    // in the memory map wherever the MCFG ACPI table points to.
+    //
+    // This appears to be a safety measure. The PCI Firmware Specification
+    // (rev 3.1) says in 4.1.2. "MCFG Table Description": "The resources can
+    // *optionally* be returned in [...] EFIGetMemoryMap as reserved memory
+    // [...]". (Emphasis added here.)
+    //
+    // Normally we add memory resource descriptor HOBs in
+    // QemuInitializeRam(), and pre-allocate from those with memory
+    // allocation HOBs in InitializeRamRegions(). However, the MMCONFIG area
+    // is most definitely not RAM; so, as an exception, cover it with
+    // uncacheable reserved memory right here.
+    //
+    AddReservedMemoryBaseSizeHob (PciExBarBase, SIZE_256MB, FALSE);
+    BuildMemoryAllocationHob (PciExBarBase, SIZE_256MB,
+      EfiReservedMemoryType);
+  }
+  AddIoMemoryBaseSizeHob (PcdGet32(PcdCpuLocalApicBaseAddress), SIZE_1MB);
+
+  //
+  // On Q35, the IO Port space is available for PCI resource allocations from
+  // 0x6000 up.
+  //
+  if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+    PciIoBase = 0x6000;
+    PciIoSize = 0xA000;
+    ASSERT ((ICH9_PMBASE_VALUE & 0xF000) < PciIoBase);
   }
 
   //
@@ -371,9 +368,9 @@ MiscInitialization (
   ASSERT_RETURN_ERROR (PcdStatus);
 
   //
-  // If the appropriate IOspace enable bit is set, assume the ACPI PMBA
-  // has been configured (e.g., by Xen) and skip the setup here.
-  // This matches the logic in AcpiTimerLibConstructor ().
+  // If the appropriate IOspace enable bit is set, assume the ACPI PMBA has
+  // been configured and skip the setup here. This matches the logic in
+  // AcpiTimerLibConstructor ().
   //
   if ((PciRead8 (AcpiCtlReg) & AcpiEnBit) == 0) {
     //
@@ -703,8 +700,6 @@ InitializePlatform (
 
   DebugDumpCmos ();
 
-  XenDetect ();
-
   if (QemuFwCfgS3Enabled ()) {
     DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
     mS3Supported = TRUE;
@@ -734,11 +729,6 @@ InitializePlatform (
   QemuUc32BaseInitialization ();
 
   InitializeRamRegions ();
-
-  if (mXen) {
-    DEBUG ((DEBUG_INFO, "Xen was detected\n"));
-    InitializeXen ();
-  }
 
   if (mBootMode != BOOT_ON_S3_RESUME) {
     if (!FeaturePcdGet (PcdSmmSmramRequire)) {

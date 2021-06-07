@@ -643,6 +643,9 @@ ValidateMmioMemory (
   //
   // Any state other than unencrypted is an error, issue a #GP.
   //
+  DEBUG ((DEBUG_ERROR,
+    "MMIO using encrypted memory: %lx\n",
+    (UINT64) MemoryAddress));
   GpEvent.Uint64 = 0;
   GpEvent.Elements.Vector = GP_EXCEPTION;
   GpEvent.Elements.Type   = GHCB_EVENT_INJECTION_TYPE_EXCEPTION;
@@ -677,6 +680,7 @@ MmioExit (
   UINTN   Bytes;
   UINT64  *Register;
   UINT8   OpCode, SignByte;
+  UINTN   Address;
 
   Bytes = 0;
 
@@ -717,6 +721,57 @@ MmioExit (
     ExitInfo1 = InstructionData->Ext.RmData;
     ExitInfo2 = Bytes;
     CopyMem (Ghcb->SharedBuffer, &InstructionData->Ext.RegData, Bytes);
+
+    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, ExitInfo1, ExitInfo2);
+    if (Status != 0) {
+      return Status;
+    }
+    break;
+
+  //
+  // MMIO write (MOV moffsetX, aX)
+  //
+  case 0xA2:
+    Bytes = 1;
+    //
+    // fall through
+    //
+  case 0xA3:
+    Bytes = ((Bytes != 0) ? Bytes :
+             (InstructionData->DataSize == Size16Bits) ? 2 :
+             (InstructionData->DataSize == Size32Bits) ? 4 :
+             (InstructionData->DataSize == Size64Bits) ? 8 :
+             0);
+
+    InstructionData->ImmediateSize = (UINTN) (1 << InstructionData->AddrSize);
+    InstructionData->End += InstructionData->ImmediateSize;
+
+    //
+    // This code is X64 only, so a possible 8-byte copy to a UINTN is ok.
+    // Use a STATIC_ASSERT to be certain the code is being built as X64.
+    //
+    STATIC_ASSERT (
+      sizeof (UINTN) == sizeof (UINT64),
+      "sizeof (UINTN) != sizeof (UINT64), this file must be built as X64"
+      );
+
+    Address = 0;
+    CopyMem (
+      &Address,
+      InstructionData->Immediate,
+      InstructionData->ImmediateSize
+      );
+
+    Status = ValidateMmioMemory (Ghcb, Address, Bytes);
+    if (Status != 0) {
+      return Status;
+    }
+
+    ExitInfo1 = Address;
+    ExitInfo2 = Bytes;
+    CopyMem (Ghcb->SharedBuffer, &Regs->Rax, Bytes);
 
     Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
     VmgSetOffsetValid (Ghcb, GhcbSwScratch);
@@ -809,6 +864,64 @@ MmioExit (
     break;
 
   //
+  // MMIO read (MOV aX, moffsetX)
+  //
+  case 0xA0:
+    Bytes = 1;
+    //
+    // fall through
+    //
+  case 0xA1:
+    Bytes = ((Bytes != 0) ? Bytes :
+             (InstructionData->DataSize == Size16Bits) ? 2 :
+             (InstructionData->DataSize == Size32Bits) ? 4 :
+             (InstructionData->DataSize == Size64Bits) ? 8 :
+             0);
+
+    InstructionData->ImmediateSize = (UINTN) (1 << InstructionData->AddrSize);
+    InstructionData->End += InstructionData->ImmediateSize;
+
+    //
+    // This code is X64 only, so a possible 8-byte copy to a UINTN is ok.
+    // Use a STATIC_ASSERT to be certain the code is being built as X64.
+    //
+    STATIC_ASSERT (
+      sizeof (UINTN) == sizeof (UINT64),
+      "sizeof (UINTN) != sizeof (UINT64), this file must be built as X64"
+      );
+
+    Address = 0;
+    CopyMem (
+      &Address,
+      InstructionData->Immediate,
+      InstructionData->ImmediateSize
+      );
+
+    Status = ValidateMmioMemory (Ghcb, Address, Bytes);
+    if (Status != 0) {
+      return Status;
+    }
+
+    ExitInfo1 = Address;
+    ExitInfo2 = Bytes;
+
+    Ghcb->SaveArea.SwScratch = (UINT64) Ghcb->SharedBuffer;
+    VmgSetOffsetValid (Ghcb, GhcbSwScratch);
+    Status = VmgExit (Ghcb, SVM_EXIT_MMIO_READ, ExitInfo1, ExitInfo2);
+    if (Status != 0) {
+      return Status;
+    }
+
+    if (Bytes == 4) {
+      //
+      // Zero-extend for 32-bit operation
+      //
+      Regs->Rax = 0;
+    }
+    CopyMem (&Regs->Rax, Ghcb->SharedBuffer, Bytes);
+    break;
+
+  //
   // MMIO read w/ zero-extension ((MOVZX regX, reg/memX)
   //
   case 0xB6:
@@ -817,6 +930,7 @@ MmioExit (
     // fall through
     //
   case 0xB7:
+    DecodeModRm (Regs, InstructionData);
     Bytes = (Bytes != 0) ? Bytes : 2;
 
     Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
@@ -835,7 +949,7 @@ MmioExit (
     }
 
     Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
-    SetMem (Register, InstructionData->DataSize, 0);
+    SetMem (Register, (UINTN) (1 << InstructionData->DataSize), 0);
     CopyMem (Register, Ghcb->SharedBuffer, Bytes);
     break;
 
@@ -848,6 +962,7 @@ MmioExit (
     // fall through
     //
   case 0xBF:
+    DecodeModRm (Regs, InstructionData);
     Bytes = (Bytes != 0) ? Bytes : 2;
 
     Status = ValidateMmioMemory (Ghcb, InstructionData->Ext.RmData, Bytes);
@@ -878,11 +993,12 @@ MmioExit (
     }
 
     Register = GetRegisterPointer (Regs, InstructionData->Ext.ModRm.Reg);
-    SetMem (Register, InstructionData->DataSize, SignByte);
+    SetMem (Register, (UINTN) (1 << InstructionData->DataSize), SignByte);
     CopyMem (Register, Ghcb->SharedBuffer, Bytes);
     break;
 
   default:
+    DEBUG ((DEBUG_ERROR, "Invalid MMIO opcode (%x)\n", OpCode));
     Status = GP_EXCEPTION;
     ASSERT (FALSE);
   }

@@ -183,6 +183,13 @@
   ## Include/OpalPasswordExtraInfoVariable.h
   gOpalExtraInfoVariableGuid =  {0x44a2ad5d, 0x612c, 0x47b3, {0xb0, 0x6e, 0xc8, 0xf5, 0x0b, 0xfb, 0xf0, 0x7d}}
 
+  ## GUID used to exchange registered SWI value and NVS region between Tcg2Acpi and Tcg2Smm.
+  ## Include/Guid/TpmNvsMm.h
+  gTpmNvsMmGuid                      = { 0xc96c76eb, 0xbc78, 0x429c, { 0x9f, 0x4b, 0xda, 0x51, 0x78, 0xc2, 0x84, 0x57 }}
+
+  ## GUID used to enforce loading order between Tcg2Acpi and Tcg2Smm
+  gTcg2MmSwSmiRegisteredGuid         = { 0x9d4548b9, 0xa48d, 0x4db4, { 0x9a, 0x68, 0x32, 0xc5, 0x13, 0x9e, 0x20, 0x18 } }
+
 
 [Ppis]
   ## The PPI GUID for that TPM physical presence should be locked.
@@ -290,6 +297,8 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationPass|0x0303100A|UINT32|0x00010030
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationFail|0x0303100B|UINT32|0x00010031
 
+  gEfiSecurityPkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00010032
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Image verification policy for OptionRom. Only following values are valid:<BR><BR>
   #  NOTE: Do NOT use 0x5 and 0x2 since it violates the UEFI specification and has been removed.<BR>
@@ -376,6 +385,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy|1|UINT8|0x0001000E
 
   ## Guid name to identify TPM instance.<BR><BR>
+  #  NOTE: This Pcd must be FixedAtBuild if Standalone MM is used
   #  TPM_DEVICE_INTERFACE_NONE means disable.<BR>
   #  TPM_DEVICE_INTERFACE_TPM12 means TPM 1.2 DTPM.<BR>
   #  TPM_DEVICE_INTERFACE_DTPM2 means TPM 2.0 DTPM.<BR>

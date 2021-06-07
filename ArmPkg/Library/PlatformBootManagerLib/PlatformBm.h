@@ -9,8 +9,8 @@
 
 **/
 
-#ifndef _PLATFORM_BM_H_
-#define _PLATFORM_BM_H_
+#ifndef PLATFORM_BM_H_
+#define PLATFORM_BM_H_
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -50,4 +50,4 @@ DisableQuietBoot (
   VOID
   );
 
-#endif // _PLATFORM_BM_H_
+#endif // PLATFORM_BM_H_

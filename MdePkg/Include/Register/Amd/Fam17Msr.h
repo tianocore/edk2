@@ -48,16 +48,45 @@ typedef union {
     UINT32  Reserved2:32;
   } GhcbTerminate;
 
+  struct {
+    UINT64  Function:12;
+    UINT64  Features:52;
+  } GhcbHypervisorFeatures;
+
+  struct {
+    UINT64  Function:12;
+    UINT64  GuestFrameNumber:52;
+  } GhcbGpaRegister;
+
+  struct {
+    UINT64 Function:12;
+    UINT64 GuestFrameNumber:40;
+    UINT64 Operation:4;
+    UINT64 Reserved:8;
+  } SnpPageStateChangeRequest;
+
+  struct {
+    UINT32 Function:12;
+    UINT32 Reserved:20;
+    UINT32 ErrorCode;
+  } SnpPageStateChangeResponse;
+
   VOID    *Ghcb;
 
   UINT64  GhcbPhysicalAddress;
 } MSR_SEV_ES_GHCB_REGISTER;
 
-#define GHCB_INFO_SEV_INFO                 1
-#define GHCB_INFO_SEV_INFO_GET             2
-#define GHCB_INFO_CPUID_REQUEST            4
-#define GHCB_INFO_CPUID_RESPONSE           5
-#define GHCB_INFO_TERMINATE_REQUEST        256
+#define GHCB_INFO_SEV_INFO                          1
+#define GHCB_INFO_SEV_INFO_GET                      2
+#define GHCB_INFO_CPUID_REQUEST                     4
+#define GHCB_INFO_CPUID_RESPONSE                    5
+#define GHCB_INFO_GHCB_GPA_REGISTER_REQUEST         18
+#define GHCB_INFO_GHCB_GPA_REGISTER_RESPONSE        19
+#define GHCB_INFO_SNP_PAGE_STATE_CHANGE_REQUEST     20
+#define GHCB_INFO_SNP_PAGE_STATE_CHANGE_RESPONSE    21
+#define GHCB_HYPERVISOR_FEATURES_REQUEST            128
+#define GHCB_HYPERVISOR_FEATURES_RESPONSE           129
+#define GHCB_INFO_TERMINATE_REQUEST                 256
 
 #define GHCB_TERMINATE_GHCB                0
 #define GHCB_TERMINATE_GHCB_GENERAL        0
@@ -87,7 +116,12 @@ typedef union {
     ///
     UINT32  SevEsBit:1;
 
-    UINT32  Reserved:30;
+    ///
+    /// [Bit 2] Secure Nested Paging (SevSnp) is enabled
+    ///
+    UINT32  SevSnpBit:1;
+
+    UINT32  Reserved2:29;
   } Bits;
   ///
   /// All bit fields as a 32-bit value

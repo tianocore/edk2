@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2018, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2021, ARM Limited. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -27,15 +27,68 @@
   Include                        # Root include for the package
 
 [LibraryClasses.common]
-  ArmLib|Include/Library/ArmLib.h
-  ArmMmuLib|Include/Library/ArmMmuLib.h
-  SemihostLib|Include/Library/Semihosting.h
-  DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
+  ##  @libraryclass  Convert Arm instructions to a human readable format.
+  #
   ArmDisassemblerLib|Include/Library/ArmDisassemblerLib.h
+
+  ##  @libraryclass  Provides an interface to Arm generic counters.
+  #
+  ArmGenericTimerCounterLib|Include/Library/ArmGenericTimerCounterLib.h
+
+  ##  @libraryclass  Provides an interface to initialize a
+  #   Generic Interrupt Controller (GIC).
+  #
   ArmGicArchLib|Include/Library/ArmGicArchLib.h
-  ArmMtlLib|ArmPlatformPkg/Include/Library/ArmMtlLib.h
+
+  ##  @libraryclass  Provides a Generic Interrupt Controller (GIC)
+  #   configuration interface.
+  #
+  ArmGicLib|Include/Library/ArmGicLib.h
+
+  ##  @libraryclass  Provides a HyperVisor Call (HVC) interface.
+  #
+  ArmHvcLib|Include/Library/ArmHvcLib.h
+
+  ##  @libraryclass  Provides an interface to Arm registers.
+  #
+  ArmLib|Include/Library/ArmLib.h
+
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
+
+  ##  @libraryclass  Provides a Mailbox Transport Layer (MTL) interface
+  #   for the System Control and Management Interface (SCMI).
+  #
+  ArmMtlLib|Include/Library/ArmMtlLib.h
+
+  ##  @libraryclass  Provides a System Monitor Call (SMC) interface.
+  #
+  ArmSmcLib|Include/Library/ArmSmcLib.h
+
+  ##  @libraryclass  Provides a SuperVisor Call (SVC) interface.
+  #
   ArmSvcLib|Include/Library/ArmSvcLib.h
+
+  ##  @libraryclass  Provides a default exception handler.
+  #
+  DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
+
+  ##  @libraryclass  Provides an interface to query miscellaneous OEM
+  #   information.
+  #
+  OemMiscLib|Include/Library/OemMiscLib.h
+
+  ##  @libraryclass  Provides an OpTee interface.
+  #
   OpteeLib|Include/Library/OpteeLib.h
+
+  ##  @libraryclass  Provides a semihosting interface.
+  #
+  SemihostLib|Include/Library/SemihostLib.h
+
+  ##  @libraryclass  Provides an interface for a StandaloneMm Mmu.
+  #
   StandaloneMmMmuLib|Include/Library/StandaloneMmMmuLib.h
 
 [Guids.common]

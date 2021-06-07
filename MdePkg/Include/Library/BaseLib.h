@@ -2,7 +2,7 @@
   Provides string functions, linked list functions, math functions, synchronization
   functions, file path functions, and CPU architecture-specific functions.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
@@ -4813,6 +4813,91 @@ SpeculationBarrier (
   VOID
   );
 
+#if defined (MDE_CPU_X64)
+//
+// The page size for the PVALIDATE instruction
+//
+typedef enum {
+  PvalidatePageSize4K = 0,
+  PvalidatePageSize2MB,
+} PVALIDATE_PAGE_SIZE;
+
+//
+// PVALIDATE Return Code.
+//
+#define PVALIDATE_RET_SUCCESS         0
+#define PVALIDATE_RET_FAIL_INPUT      1
+#define PVALIDATE_RET_SIZE_MISMATCH   6
+
+//
+// The PVALIDATE instruction did not make any changes to the RMP entry.
+//
+#define PVALIDATE_RET_NO_RMPUPDATE    255
+
+/**
+ Execute a PVALIDATE instruction to validate or to rescinds validation of a guest
+ page's RMP entry.
+
+ The instruction is available only when CPUID Fn8000_001F_EAX[SNP]=1.
+
+ The function is available on X64.
+
+ @param[in]    PageSize         The page size to use.
+ @param[in]    Validate         If TRUE, validate the guest virtual address
+                                otherwise invalidate the guest virtual address.
+ @param[in]    Address          The guest virtual address.
+
+ @retval PVALIDATE_RET_SUCCESS        The PVALIDATE instruction succeeded, and
+                                      updated the RMP entry.
+ @retval PVALIDATE_RET_NO_RMPUPDATE   The PVALIDATE instruction succeeded, but
+                                      did not update the RMP entry.
+ @return                              Failure code from the PVALIDATE
+                                      instruction.
+**/
+UINT32
+EFIAPI
+AsmPvalidate (
+  IN   PVALIDATE_PAGE_SIZE     PageSize,
+  IN   BOOLEAN                 Validate,
+  IN   PHYSICAL_ADDRESS        Address
+  );
+
+//
+// RDX settings for RMPADJUST
+//
+#define RMPADJUST_VMPL_MAX               3
+#define RMPADJUST_VMPL_MASK              0xFF
+#define RMPADJUST_VMPL_SHIFT             0
+#define RMPADJUST_PERMISSION_MASK_MASK   0xFF
+#define RMPADJUST_PERMISSION_MASK_SHIFT  8
+#define RMPADJUST_VMSA_PAGE_BIT          BIT16
+
+/**
+  Adjusts the permissions of an SEV-SNP guest page.
+
+  Executes a RMPADJUST instruction with the register state specified by Rax,
+  Rcx, and Rdx. Returns Eax. This function is only available on X64.
+
+  The instruction is available only when CPUID Fn8000_001F_EAX[SNP]=1.
+
+  @param[in]  Rax   The value to load into RAX before executing the RMPADJUST
+                    instruction.
+  @param[in]  Rcx   The value to load into RCX before executing the RMPADJUST
+                    instruction.
+  @param[in]  Rdx   The value to load into RDX before executing the RMPADJUST
+                    instruction.
+
+  @return     Eax
+**/
+UINT32
+EFIAPI
+AsmRmpAdjust (
+  IN      UINT64                     Rax,
+  IN      UINT64                     Rcx,
+  IN      UINT64                     Rdx
+  );
+#endif
+
 
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 ///
@@ -7438,6 +7523,29 @@ AsmXGetBv (
   IN UINT32  Index
   );
 
+/**
+  Executes a XSETBV instruction to write a 64-bit value to a Extended Control
+  Register(XCR), and returns the value.
+
+  Writes the 64-bit value specified by Value to the XCR specified by Index. The
+  64-bit value written to the XCR is returned. No parameter checking is
+  performed on Index or Value, and some of these may cause CPU exceptions. The
+  caller must either guarantee that Index and Value are valid, or the caller
+  must establish proper exception handlers. This function is only available on
+  IA-32 and x64.
+
+  @param  Index The 32-bit XCR index to write.
+  @param  Value The 64-bit value to write to the XCR.
+
+  @return Value
+
+**/
+UINT64
+EFIAPI
+AsmXSetBv (
+  IN UINT32  Index,
+  IN UINT64  Value
+  );
 
 /**
   Executes a VMGEXIT instruction (VMMCALL with a REP prefix)

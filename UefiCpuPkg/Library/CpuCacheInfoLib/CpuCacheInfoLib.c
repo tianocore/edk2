@@ -1,7 +1,7 @@
 /** @file
   Provides cache info for each package, core type, cache level and cache type.
 
-  Copyright (c) 2020 Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -23,18 +23,18 @@ CpuCacheInfoPrintCpuCacheInfoTable (
 {
   UINTN                     Index;
 
-  DEBUG ((DEBUG_INFO, "+-------+-------------------------------------------------------------------------------+\n"));
-  DEBUG ((DEBUG_INFO, "| Index | Packge  CoreType  CacheLevel  CacheType  CacheWays  CacheSizeinKB  CacheCount |\n"));
-  DEBUG ((DEBUG_INFO, "+-------+-------------------------------------------------------------------------------+\n"));
+  DEBUG ((DEBUG_INFO, "+-------+--------------------------------------------------------------------------------------+\n"));
+  DEBUG ((DEBUG_INFO, "| Index | Packge  CoreType  CacheLevel  CacheType  CacheWays (FA|DM) CacheSizeinKB  CacheCount |\n"));
+  DEBUG ((DEBUG_INFO, "+-------+--------------------------------------------------------------------------------------+\n"));
 
   for (Index = 0; Index < CpuCacheInfoCount; Index++) {
-    DEBUG ((DEBUG_INFO, "| %4x  | %4x       %2x        %2x          %2x       %4x      %8x         %4x     |\n", Index,
-        CpuCacheInfo[Index].Package, CpuCacheInfo[Index].CoreType, CpuCacheInfo[Index].CacheLevel,
-        CpuCacheInfo[Index].CacheType, CpuCacheInfo[Index].CacheWays, CpuCacheInfo[Index].CacheSizeinKB,
-        CpuCacheInfo[Index].CacheCount));
+    DEBUG ((DEBUG_INFO, "| %4x  | %4x       %2x        %2x          %2x       %4x     ( %x| %x) %8x         %4x     |\n",
+        Index, CpuCacheInfo[Index].Package, CpuCacheInfo[Index].CoreType, CpuCacheInfo[Index].CacheLevel,
+        CpuCacheInfo[Index].CacheType, CpuCacheInfo[Index].CacheWays, CpuCacheInfo[Index].FullyAssociativeCache,
+        CpuCacheInfo[Index].DirectMappedCache, CpuCacheInfo[Index].CacheSizeinKB, CpuCacheInfo[Index].CacheCount));
   }
 
-  DEBUG ((DEBUG_INFO, "+-------+-------------------------------------------------------------------------------+\n"));
+  DEBUG ((DEBUG_INFO, "+-------+--------------------------------------------------------------------------------------+\n"));
 }
 
 /**
@@ -160,6 +160,7 @@ CpuCacheInfoCollectCoreAndCacheData (
   CPUID_CACHE_PARAMS_EAX    CacheParamEax;
   CPUID_CACHE_PARAMS_EBX    CacheParamEbx;
   UINT32                    CacheParamEcx;
+  CPUID_CACHE_PARAMS_EDX    CacheParamEdx;
   CPUID_NATIVE_MODEL_ID_AND_CORE_TYPE_EAX   NativeModelIdAndCoreTypeEax;
   COLLECT_CPUID_CACHE_DATA_CONTEXT  *Context;
   CPUID_CACHE_DATA          *CacheData;
@@ -185,17 +186,19 @@ CpuCacheInfoCollectCoreAndCacheData (
   CacheParamLeafIndex = 0;
 
   while (CacheParamLeafIndex < MAX_NUM_OF_CACHE_PARAMS_LEAF) {
-    AsmCpuidEx (CPUID_CACHE_PARAMS, CacheParamLeafIndex, &CacheParamEax.Uint32, &CacheParamEbx.Uint32, &CacheParamEcx, NULL);
+    AsmCpuidEx (CPUID_CACHE_PARAMS, CacheParamLeafIndex, &CacheParamEax.Uint32, &CacheParamEbx.Uint32, &CacheParamEcx, &CacheParamEdx.Uint32);
 
     if (CacheParamEax.Bits.CacheType == 0) {
       break;
     }
 
-    CacheData[CacheParamLeafIndex].CacheLevel     = (UINT8)CacheParamEax.Bits.CacheLevel;
-    CacheData[CacheParamLeafIndex].CacheType      = (UINT8)CacheParamEax.Bits.CacheType;
-    CacheData[CacheParamLeafIndex].CacheWays      = (UINT16)CacheParamEbx.Bits.Ways;
-    CacheData[CacheParamLeafIndex].CacheShareBits = (UINT16)CacheParamEax.Bits.MaximumAddressableIdsForLogicalProcessors;
-    CacheData[CacheParamLeafIndex].CacheSizeinKB  = (CacheParamEbx.Bits.Ways + 1) *
+    CacheData[CacheParamLeafIndex].CacheLevel            = (UINT8)CacheParamEax.Bits.CacheLevel;
+    CacheData[CacheParamLeafIndex].CacheType             = (UINT8)CacheParamEax.Bits.CacheType;
+    CacheData[CacheParamLeafIndex].CacheWays             = (UINT16)CacheParamEbx.Bits.Ways;
+    CacheData[CacheParamLeafIndex].FullyAssociativeCache = (UINT8)CacheParamEax.Bits.FullyAssociativeCache;
+    CacheData[CacheParamLeafIndex].DirectMappedCache     = (UINT8)CacheParamEdx.Bits.ComplexCacheIndexing;
+    CacheData[CacheParamLeafIndex].CacheShareBits        = (UINT16)CacheParamEax.Bits.MaximumAddressableIdsForLogicalProcessors;
+    CacheData[CacheParamLeafIndex].CacheSizeinKB         = (CacheParamEbx.Bits.Ways + 1) *
         (CacheParamEbx.Bits.LinePartitions + 1) * (CacheParamEbx.Bits.LineSize + 1) * (CacheParamEcx + 1) / SIZE_1KB;
 
     CacheParamLeafIndex++;
@@ -305,13 +308,15 @@ CpuCacheInfoCollectCpuCacheInfoData (
     if (CacheInfoIndex == LocalCacheInfoCount) {
       ASSERT (LocalCacheInfoCount < MaxCacheInfoCount);
 
-      LocalCacheInfo[LocalCacheInfoCount].Package       = ProcessorInfo[Index / MAX_NUM_OF_CACHE_PARAMS_LEAF].Package;
-      LocalCacheInfo[LocalCacheInfoCount].CoreType      = ProcessorInfo[Index / MAX_NUM_OF_CACHE_PARAMS_LEAF].CoreType;
-      LocalCacheInfo[LocalCacheInfoCount].CacheLevel    = CacheData[Index].CacheLevel;
-      LocalCacheInfo[LocalCacheInfoCount].CacheType     = CacheData[Index].CacheType;
-      LocalCacheInfo[LocalCacheInfoCount].CacheWays     = CacheData[Index].CacheWays;
-      LocalCacheInfo[LocalCacheInfoCount].CacheSizeinKB = CacheData[Index].CacheSizeinKB;
-      LocalCacheInfo[LocalCacheInfoCount].CacheCount    = 1;
+      LocalCacheInfo[LocalCacheInfoCount].Package               = ProcessorInfo[Index / MAX_NUM_OF_CACHE_PARAMS_LEAF].Package;
+      LocalCacheInfo[LocalCacheInfoCount].CoreType              = ProcessorInfo[Index / MAX_NUM_OF_CACHE_PARAMS_LEAF].CoreType;
+      LocalCacheInfo[LocalCacheInfoCount].CacheLevel            = CacheData[Index].CacheLevel;
+      LocalCacheInfo[LocalCacheInfoCount].CacheType             = CacheData[Index].CacheType;
+      LocalCacheInfo[LocalCacheInfoCount].CacheWays             = CacheData[Index].CacheWays;
+      LocalCacheInfo[LocalCacheInfoCount].FullyAssociativeCache = CacheData[Index].FullyAssociativeCache;
+      LocalCacheInfo[LocalCacheInfoCount].DirectMappedCache     = CacheData[Index].DirectMappedCache;
+      LocalCacheInfo[LocalCacheInfoCount].CacheSizeinKB         = CacheData[Index].CacheSizeinKB;
+      LocalCacheInfo[LocalCacheInfoCount].CacheCount            = 1;
 
       LocalCacheInfoCount++;
     }

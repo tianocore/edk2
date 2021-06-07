@@ -6,10 +6,12 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/DebugLib.h>            // ASSERT_EFI_ERROR()
+#include <Library/MemoryAllocationLib.h> // AllocatePool()
+#include <Library/PcdLib.h>              // PcdGetBool()
+#include <Library/QemuFwCfgLib.h>        // QemuFwCfgFindFile()
+
 #include "SmbiosPlatformDxe.h"
-#include <Library/QemuFwCfgLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/PcdLib.h>
 
 /**
   Locates and extracts the QEMU SMBIOS data if present in fw_cfg
@@ -45,4 +47,37 @@ GetQemuSmbiosTables (
   QemuFwCfgReadBytes (TablesSize, QemuTables);
 
   return QemuTables;
+}
+
+/**
+  Installs SMBIOS information for OVMF
+
+  @param ImageHandle     Module's image handle
+  @param SystemTable     Pointer of EFI_SYSTEM_TABLE
+
+  @retval EFI_SUCCESS    Smbios data successfully installed
+  @retval Other          Smbios data was not installed
+
+**/
+EFI_STATUS
+EFIAPI
+SmbiosTablePublishEntry (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_SYSTEM_TABLE     *SystemTable
+  )
+{
+  EFI_STATUS                Status;
+  UINT8                     *SmbiosTables;
+
+  Status = EFI_NOT_FOUND;
+  //
+  // Add QEMU SMBIOS data if found
+  //
+  SmbiosTables = GetQemuSmbiosTables ();
+  if (SmbiosTables != NULL) {
+    Status = InstallAllStructures (SmbiosTables);
+    FreePool (SmbiosTables);
+  }
+
+  return Status;
 }

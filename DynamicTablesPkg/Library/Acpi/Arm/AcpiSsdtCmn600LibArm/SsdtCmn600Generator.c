@@ -1,7 +1,7 @@
 /** @file
   SSDT CMN-600 AML Table Generator.
 
-  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -511,7 +511,7 @@ BuildSsdtCmn600TableEx (
   UINT64                            Index;
   CM_ARM_CMN_600_INFO             * Cmn600Info;
   UINT32                            Cmn600Count;
-  CHAR8                             NewName[5];
+  CHAR8                             NewName[AML_NAME_SEG_SIZE + 1];
   EFI_ACPI_DESCRIPTION_HEADER    ** TableList;
 
   ASSERT (This != NULL);

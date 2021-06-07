@@ -26,8 +26,6 @@
 
 [Sources]
   PciHostBridgeLib.c
-  XenSupport.c
-  PciHostBridge.h
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
@@ -36,18 +34,14 @@
 
 [LibraryClasses]
   BaseMemoryLib
-  DebugLib
-  MemoryAllocationLib
   PcdLib
   PciHostBridgeUtilityLib
-  PciLib
 
 [Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoSize
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration

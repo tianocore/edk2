@@ -1,13 +1,13 @@
 /** @file
 *
-*  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
 
-#ifndef __AARCH64_MMU_H_
-#define __AARCH64_MMU_H_
+#ifndef AARCH64_MMU_H_
+#define AARCH64_MMU_H_
 
 //
 // Memory Attribute Indirection register Definitions
@@ -190,9 +190,9 @@
 
 // The value written to the T*SZ fields are defined as 2^(64-T*SZ). So a 39Bit
 // Virtual address range for 512GB of virtual space sets T*SZ to 25
-#define INPUT_ADDRESS_SIZE_TO_TxSZ(a)        (64 - a)
+#define INPUT_ADDRESS_SIZE_TO_TXSZ(a)        (64 - a)
 
 // Uses LPAE Page Table format
 
-#endif // __AARCH64_MMU_H_
+#endif // AARCH64_MMU_H_
 

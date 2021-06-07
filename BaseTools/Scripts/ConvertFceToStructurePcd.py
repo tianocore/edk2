@@ -197,6 +197,8 @@ class parser_lst(object):
     efitxt = efivarstore_format.findall(self.text)
     for i in efitxt:
       struct = struct_re.findall(i.replace(' ',''))
+      if struct[0] in self._ignore:
+          continue
       name = name_re.findall(i.replace(' ',''))
       if struct and name:
         efivarstore_dict[name[0]]=struct[0]
@@ -277,6 +279,7 @@ class Config(object):
     attribute_re=re.compile(r'attribute=(\w+)')
     value_re = re.compile(r'(//.*)')
     part = []
+    part_without_comment = []
     for x in section[1:]:
         line=x.split('\n')[0]
         comment_list = value_re.findall(line) # the string \\... in "Q...." line
@@ -293,8 +296,18 @@ class Config(object):
           if attribute[0] in ['0x3','0x7']:
             offset = int(offset[0], 16)
             #help = help_re.findall(x)
-            text = offset, name[0], guid[0], value, attribute[0], comment
-            part.append(text)
+            text_without_comment = offset, name[0], guid[0], value, attribute[0]
+            if text_without_comment in part_without_comment:
+                # check if exists same Pcd with different comments, add different comments in one line with "|".
+                dupl_index = part_without_comment.index(text_without_comment)
+                part[dupl_index] = list(part[dupl_index])
+                if comment not in part[dupl_index][-1]:
+                    part[dupl_index][-1] += " | " + comment
+                part[dupl_index] = tuple(part[dupl_index])
+            else:
+                text = offset, name[0], guid[0], value, attribute[0], comment
+                part_without_comment.append(text_without_comment)
+                part.append(text)
     return(part)
 
   def value_parser(self, list1):
@@ -532,6 +545,18 @@ class mainprocess(object):
       i.sort()
     return keys,title_all,info_list,header_list,inf_list
 
+  def correct_sort(self, PcdString):
+    # sort the Pcd list with two rules:
+    # First sort through Pcd name;
+    # Second if the Pcd exists several elements, sort them through index value.
+    if ("]|") in PcdString:
+        Pcdname = PcdString.split("[")[0]
+        Pcdindex = int(PcdString.split("[")[1].split("]")[0])
+    else:
+        Pcdname = PcdString.split("|")[0]
+        Pcdindex = 0
+    return Pcdname, Pcdindex
+
   def remove_bracket(self,List):
     for i in List:
       for j in i:
@@ -543,7 +568,7 @@ class mainprocess(object):
           List[List.index(i)][i.index(j)] = j
     for i in List:
       if type(i) == type([0,0]):
-        i.sort()
+        i.sort(key = lambda x:(self.correct_sort(x)[0], self.correct_sort(x)[1]))
     return List
 
   def write_all(self):

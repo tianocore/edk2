@@ -7,22 +7,14 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-#include <PiDxe.h>
-
-#include <IndustryStandard/Pci.h>
-#include <IndustryStandard/Q35MchIch9.h>
-
-#include <Protocol/PciHostBridgeResourceAllocation.h>
-#include <Protocol/PciRootBridgeIo.h>
-
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/PcdLib.h>
-#include <Library/PciHostBridgeLib.h>
-#include <Library/PciHostBridgeUtilityLib.h>
-#include "PciHostBridge.h"
-
+#include <IndustryStandard/Pci.h>                     // PCI_MAX_BUS
+#include <IndustryStandard/Q35MchIch9.h>              // INTEL_Q35_MCH_DEVIC...
+#include <Library/BaseMemoryLib.h>                    // ZeroMem()
+#include <Library/PcdLib.h>                           // PcdGet64()
+#include <Library/PciHostBridgeLib.h>                 // PCI_ROOT_BRIDGE_APE...
+#include <Library/PciHostBridgeUtilityLib.h>          // PciHostBridgeUtilit...
+#include <Protocol/PciHostBridgeResourceAllocation.h> // EFI_PCI_HOST_BRIDGE...
+#include <Protocol/PciRootBridgeIo.h>                 // EFI_PCI_ATTRIBUTE_I...
 
 STATIC PCI_ROOT_BRIDGE_APERTURE mNonExistAperture = { MAX_UINT64, 0 };
 
@@ -47,10 +39,6 @@ PciHostBridgeGetRootBridges (
   PCI_ROOT_BRIDGE_APERTURE Io;
   PCI_ROOT_BRIDGE_APERTURE Mem;
   PCI_ROOT_BRIDGE_APERTURE MemAbove4G;
-
-  if (PcdGetBool (PcdPciDisableBusEnumeration)) {
-    return ScanForRootBridges (Count);
-  }
 
   ZeroMem (&Io, sizeof (Io));
   ZeroMem (&Mem, sizeof (Mem));

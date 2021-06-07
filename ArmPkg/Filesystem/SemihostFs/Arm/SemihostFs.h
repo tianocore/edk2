@@ -7,8 +7,8 @@
 
 **/
 
-#ifndef __SEMIHOST_FS_H__
-#define __SEMIHOST_FS_H__
+#ifndef SEMIHOST_FS_H_
+#define SEMIHOST_FS_H_
 
 EFI_STATUS
 VolumeOpen (
@@ -242,5 +242,5 @@ FileFlush (
   IN EFI_FILE *File
   );
 
-#endif // __SEMIHOST_FS_H__
+#endif // SEMIHOST_FS_H_
 

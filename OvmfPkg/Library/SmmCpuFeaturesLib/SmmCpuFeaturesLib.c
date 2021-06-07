@@ -11,10 +11,13 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SafeIntLib.h>
 #include <Library/SmmCpuFeaturesLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Pcd/CpuHotEjectData.h>
 #include <PiSmm.h>
 #include <Register/Intel/SmramSaveStateMap.h>
 #include <Register/QemuSmramSaveStateMap.h>
@@ -171,6 +174,77 @@ SmmCpuFeaturesHookReturnFromSmm (
   return OriginalInstructionPointer;
 }
 
+STATIC CPU_HOT_EJECT_DATA *mCpuHotEjectData = NULL;
+
+/**
+  Initialize mCpuHotEjectData if PcdCpuMaxLogicalProcessorNumber > 1.
+
+  Also setup the corresponding PcdCpuHotEjectDataAddress.
+**/
+STATIC
+VOID
+InitCpuHotEjectData (
+  VOID
+  )
+{
+  UINTN          Size;
+  UINT32         Idx;
+  UINT32         MaxNumberOfCpus;
+  RETURN_STATUS  PcdStatus;
+
+  MaxNumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  if (MaxNumberOfCpus == 1) {
+    return;
+  }
+
+  //
+  // We allocate CPU_HOT_EJECT_DATA and CPU_HOT_EJECT_DATA->QemuSelectorMap[]
+  // in a single allocation, and explicitly align the QemuSelectorMap[] (which
+  // is a UINT64 array) at its natural boundary.
+  // Accordingly, allocate:
+  //   sizeof(*mCpuHotEjectData) + (MaxNumberOfCpus * sizeof(UINT64))
+  // and, add sizeof(UINT64) - 1 to use as padding if needed.
+  //
+
+  if (RETURN_ERROR (SafeUintnMult (MaxNumberOfCpus, sizeof (UINT64), &Size)) ||
+      RETURN_ERROR (SafeUintnAdd (Size, sizeof (*mCpuHotEjectData), &Size)) ||
+      RETURN_ERROR (SafeUintnAdd (Size, sizeof (UINT64) - 1, &Size))) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid CPU_HOT_EJECT_DATA\n", __FUNCTION__));
+    goto Fatal;
+  }
+
+  mCpuHotEjectData = AllocatePool (Size);
+  if (mCpuHotEjectData == NULL) {
+    ASSERT (mCpuHotEjectData != NULL);
+    goto Fatal;
+  }
+
+  mCpuHotEjectData->Handler = NULL;
+  mCpuHotEjectData->ArrayLength = MaxNumberOfCpus;
+
+  mCpuHotEjectData->QemuSelectorMap = ALIGN_POINTER (mCpuHotEjectData + 1,
+                                        sizeof (UINT64));
+  //
+  // We use mCpuHotEjectData->QemuSelectorMap to map
+  // ProcessorNum -> QemuSelector. Initialize to invalid values.
+  //
+  for (Idx = 0; Idx < mCpuHotEjectData->ArrayLength; Idx++) {
+    mCpuHotEjectData->QemuSelectorMap[Idx] = CPU_EJECT_QEMU_SELECTOR_INVALID;
+  }
+
+  //
+  // Expose address of CPU Hot eject Data structure
+  //
+  PcdStatus = PcdSet64S (PcdCpuHotEjectDataAddress,
+                (UINTN)(VOID *)mCpuHotEjectData);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
+  return;
+
+Fatal:
+  CpuDeadLoop ();
+}
+
 /**
   Hook point in normal execution mode that allows the one CPU that was elected
   as monarch during System Management Mode initialization to perform additional
@@ -187,6 +261,9 @@ SmmCpuFeaturesSmmRelocationComplete (
   EFI_STATUS Status;
   UINTN      MapPagesBase;
   UINTN      MapPagesCount;
+
+
+  InitCpuHotEjectData ();
 
   if (!MemEncryptSevIsEnabled ()) {
     return;
@@ -206,8 +283,7 @@ SmmCpuFeaturesSmmRelocationComplete (
   Status = MemEncryptSevSetPageEncMask (
              0,             // Cr3BaseAddress -- use current CR3
              MapPagesBase,  // BaseAddress
-             MapPagesCount, // NumPages
-             TRUE           // Flush
+             MapPagesCount  // NumPages
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: MemEncryptSevSetPageEncMask(): %r\n",
@@ -375,6 +451,40 @@ SmmCpuFeaturesRendezvousExit (
   IN UINTN  CpuIndex
   )
 {
+  //
+  // We only call the Handler if CPU hot-eject is enabled
+  // (PcdCpuMaxLogicalProcessorNumber > 1), and hot-eject is needed
+  // in this SMI exit (otherwise mCpuHotEjectData->Handler is not armed.)
+  //
+
+  if (mCpuHotEjectData != NULL) {
+    CPU_HOT_EJECT_HANDLER Handler;
+
+    //
+    // As the comment above mentions, mCpuHotEjectData->Handler might be
+    // written to on the BSP as part of handling of the CPU-ejection.
+    //
+    // We know that any initial assignment to mCpuHotEjectData->Handler
+    // (on the BSP, in the CpuHotplugMmi() context) is ordered-before the
+    // load below, since it is guaranteed to happen before the
+    // control-dependency of the BSP's SMI exit signal -- by way of a store
+    // to AllCpusInSync (on the BSP, in BspHandler()) and the corresponding
+    // AllCpusInSync loop (on the APs, in SmiRendezvous()) which depends on
+    // that store.
+    //
+    // This guarantees that these pieces of code can never execute
+    // simultaneously. In addition, we ensure that the following load is
+    // ordered-after the AllCpusInSync loop by using a MemoryFence() with
+    // acquire semantics.
+    //
+    MemoryFence();
+
+    Handler = mCpuHotEjectData->Handler;
+
+    if (Handler != NULL) {
+      Handler (CpuIndex);
+    }
+  }
 }
 
 /**

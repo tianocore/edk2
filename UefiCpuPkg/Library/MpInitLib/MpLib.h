@@ -1,7 +1,7 @@
 /** @file
   Common header file for MP Initialize Library.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -32,6 +32,7 @@
 #include <Library/MtrrLib.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
+#include <Library/MicrocodeLib.h>
 
 #include <Guid/MicrocodePatchHob.h>
 
@@ -144,6 +145,7 @@ typedef struct {
   UINT32                         ProcessorSignature;
   UINT8                          PlatformId;
   UINT64                         MicrocodeEntryAddr;
+  UINT32                         MicrocodeRevision;
 } CPU_AP_DATA;
 
 //
@@ -190,7 +192,6 @@ typedef struct _CPU_MP_DATA  CPU_MP_DATA;
 // into this structure are used in assembly code in this module
 //
 typedef struct {
-  UINTN                 Lock;
   UINTN                 StackStart;
   UINTN                 StackSize;
   UINTN                 CFunction;

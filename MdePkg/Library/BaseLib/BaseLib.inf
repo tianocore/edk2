@@ -1,7 +1,7 @@
 ## @file
 #  Base Library implementation.
 #
-#  Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #  Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
@@ -184,6 +184,7 @@
   Ia32/DisableCache.nasm| GCC
   Ia32/RdRand.nasm
   Ia32/XGetBv.nasm
+  Ia32/XSetBv.nasm
   Ia32/VmgExit.nasm
 
   Ia32/DivS64x64Remainder.c
@@ -316,8 +317,11 @@
   X64/GccInlinePriv.c | GCC
   X64/EnableDisableInterrupts.nasm
   X64/DisablePaging64.nasm
+  X64/Pvalidate.nasm
   X64/RdRand.nasm
+  X64/RmpAdjust.nasm
   X64/XGetBv.nasm
+  X64/XSetBv.nasm
   X64/VmgExit.nasm
   ChkStkGcc.c  | GCC
 
@@ -410,6 +414,9 @@
   PcdLib
   DebugLib
   BaseMemoryLib
+
+[LibraryClasses.X64, LibraryClasses.IA32]
+  RegisterFilterLib
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength      ## SOMETIMES_CONSUMES

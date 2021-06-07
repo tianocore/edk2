@@ -81,6 +81,11 @@ typedef struct {
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_ARM_PL011_UART            0x03
 
 ///
+/// NVIDIA 16550 UART
+///
+#define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_NVIDIA_16550_UART         0x05
+
+///
 /// ARM SBSA Generic UART (2.x) supporting 32-bit only accesses [deprecated]
 ///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_ARM_SBSA_GENERIC_UART_2X  0x0d
@@ -99,6 +104,11 @@ typedef struct {
 /// BCM2835 UART
 ///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_BCM2835_UART              0x10
+
+///
+/// 16550-compatible with parameters defined in Generic Address Structure
+///
+#define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16550_WITH_GAS            0x12
 
 //
 // Interrupt Type

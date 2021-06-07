@@ -44,7 +44,7 @@ SemihostFileOpen (
   OpenBlock.Mode        = Mode;
   OpenBlock.NameLength  = AsciiStrLen(FileName);
 
-  Result = Semihost_SYS_OPEN(&OpenBlock);
+  Result = SEMIHOST_SYS_OPEN (&OpenBlock);
 
   if (Result == -1) {
     return RETURN_NOT_FOUND;
@@ -66,7 +66,7 @@ SemihostFileSeek (
   SeekBlock.Handle   = FileHandle;
   SeekBlock.Location = Offset;
 
-  Result = Semihost_SYS_SEEK(&SeekBlock);
+  Result = SEMIHOST_SYS_SEEK (&SeekBlock);
 
   // Semihosting does not behave as documented. It returns the offset on
   // success.
@@ -95,7 +95,7 @@ SemihostFileRead (
   ReadBlock.Buffer = Buffer;
   ReadBlock.Length = *Length;
 
-  Result = Semihost_SYS_READ(&ReadBlock);
+  Result = SEMIHOST_SYS_READ (&ReadBlock);
 
   if ((*Length != 0) && (Result == *Length)) {
     return RETURN_ABORTED;
@@ -122,7 +122,7 @@ SemihostFileWrite (
   WriteBlock.Buffer = Buffer;
   WriteBlock.Length = *Length;
 
-  *Length = Semihost_SYS_WRITE(&WriteBlock);
+  *Length = SEMIHOST_SYS_WRITE (&WriteBlock);
 
   if (*Length != 0)
     return RETURN_ABORTED;
@@ -135,7 +135,7 @@ SemihostFileClose (
   IN UINTN  FileHandle
   )
 {
-  if (Semihost_SYS_CLOSE (&FileHandle) == -1) {
+  if (SEMIHOST_SYS_CLOSE (&FileHandle) == -1) {
     return RETURN_INVALID_PARAMETER;
   } else {
     return RETURN_SUCCESS;
@@ -154,7 +154,7 @@ SemihostFileLength (
     return RETURN_INVALID_PARAMETER;
   }
 
-  Result = Semihost_SYS_FLEN(&FileHandle);
+  Result = SEMIHOST_SYS_FLEN (&FileHandle);
 
   if (Result == -1) {
     return RETURN_ABORTED;
@@ -195,7 +195,7 @@ SemihostFileTmpName(
   TmpNameBlock.Identifier = Identifier;
   TmpNameBlock.Length     = Length;
 
-  Result = Semihost_SYS_TMPNAME (&TmpNameBlock);
+  Result = SEMIHOST_SYS_TMPNAME (&TmpNameBlock);
 
   if (Result != 0) {
     return  RETURN_ABORTED;
@@ -220,7 +220,7 @@ SemihostFileRemove (
   RemoveBlock.FileName    = FileName;
   RemoveBlock.NameLength  = AsciiStrLen(FileName);
 
-  Result = Semihost_SYS_REMOVE(&RemoveBlock);
+  Result = SEMIHOST_SYS_REMOVE (&RemoveBlock);
 
   if (Result == 0) {
     return RETURN_SUCCESS;
@@ -258,7 +258,7 @@ SemihostFileRename(
   RenameBlock.NewFileName       = NewFileName;
   RenameBlock.NewFileNameLength = AsciiStrLen (NewFileName);
 
-  Result = Semihost_SYS_RENAME (&RenameBlock);
+  Result = SEMIHOST_SYS_RENAME (&RenameBlock);
 
   if (Result != 0) {
     return  RETURN_ABORTED;
@@ -272,7 +272,7 @@ SemihostReadCharacter (
   VOID
   )
 {
-  return Semihost_SYS_READC();
+  return SEMIHOST_SYS_READC ();
 }
 
 VOID
@@ -280,7 +280,7 @@ SemihostWriteCharacter (
   IN CHAR8 Character
   )
 {
-  Semihost_SYS_WRITEC(&Character);
+  SEMIHOST_SYS_WRITEC (&Character);
 }
 
 VOID
@@ -288,7 +288,7 @@ SemihostWriteString (
   IN CHAR8 *String
   )
 {
-  Semihost_SYS_WRITE0(String);
+  SEMIHOST_SYS_WRITE0 (String);
 }
 
 UINT32
@@ -301,5 +301,5 @@ SemihostSystem (
   SystemBlock.CommandLine   = CommandLine;
   SystemBlock.CommandLength = AsciiStrLen(CommandLine);
 
-  return Semihost_SYS_SYSTEM(&SystemBlock);
+  return SEMIHOST_SYS_SYSTEM (&SystemBlock);
 }

@@ -101,8 +101,8 @@ SendMemoryPermissionRequest (
   }
 
   // Check error response from Callee.
-  if (*RetVal & BIT31) {
-    // Bit 31 set means there is an error retured
+  if ((*RetVal & BIT31) != 0) {
+    // Bit 31 set means there is an error returned
     // See [1], Section 13.5.5.1 MM_SP_MEMORY_ATTRIBUTES_GET_AARCH64 and
     // Section 13.5.5.2 MM_SP_MEMORY_ATTRIBUTES_SET_AARCH64.
     switch (*RetVal) {

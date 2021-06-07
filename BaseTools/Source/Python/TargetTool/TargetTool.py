@@ -1,7 +1,7 @@
 ## @file
 # Target Tool Parser
 #
-#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -197,7 +197,7 @@ def RangeCheckCallback(option, opt_str, value, parser):
 
 def MyOptionParser():
     parser = OptionParser(version=__version__, prog="TargetTool.exe", usage=__usage__, description=__copyright__)
-    parser.add_option("-a", "--arch", action="append", type="choice", choices=['IA32', 'X64', 'EBC', 'ARM', 'AARCH64', '0'], dest="TARGET_ARCH",
+    parser.add_option("-a", "--arch", action="append", dest="TARGET_ARCH",
         help="ARCHS is one of list: IA32, X64, ARM, AARCH64 or EBC, which replaces target.txt's TARGET_ARCH definition. To specify more archs, please repeat this option. 0 will clear this setting in target.txt and can't combine with other value.")
     parser.add_option("-p", "--platform", action="callback", type="string", dest="DSCFILE", callback=SingleCheckCallback,
         help="Specify a DSC file, which replace target.txt's ACTIVE_PLATFORM definition. 0 will clear this setting in target.txt and can't combine with other value.")

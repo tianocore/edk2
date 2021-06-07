@@ -1,7 +1,7 @@
 ## @file
 # Create makefile for MS nmake and GNU make
 #
-# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -805,21 +805,54 @@ class PlatformAutoGen(AutoGen):
     #
     @cached_property
     def BuildCommand(self):
-        RetVal = []
-        if "MAKE" in self.ToolDefinition and "PATH" in self.ToolDefinition["MAKE"]:
-            RetVal += _SplitOption(self.ToolDefinition["MAKE"]["PATH"])
-            if "FLAGS" in self.ToolDefinition["MAKE"]:
-                NewOption = self.ToolDefinition["MAKE"]["FLAGS"].strip()
-                if NewOption != '':
-                    RetVal += _SplitOption(NewOption)
-            if "MAKE" in self.EdkIIBuildOption:
-                if "FLAGS" in self.EdkIIBuildOption["MAKE"]:
-                    Flags = self.EdkIIBuildOption["MAKE"]["FLAGS"]
-                    if Flags.startswith('='):
-                        RetVal = [RetVal[0]] + [Flags[1:]]
-                    else:
-                        RetVal.append(Flags)
+        if "MAKE" in self.EdkIIBuildOption and "PATH" in self.EdkIIBuildOption["MAKE"]:
+            # MAKE_PATH in DSC [BuildOptions] section is higher priority
+            Path = self.EdkIIBuildOption["MAKE"]["PATH"]
+            if Path.startswith('='):
+                Path = Path[1:].strip()
+            RetVal = _SplitOption(Path)
+        elif "MAKE" in self.ToolDefinition and "PATH" in self.ToolDefinition["MAKE"]:
+            RetVal = _SplitOption(self.ToolDefinition["MAKE"]["PATH"])
+        else:
+            return []
+        if "MAKE" in self.ToolDefinition and "FLAGS" in self.ToolDefinition["MAKE"]:
+            NewOption = self.ToolDefinition["MAKE"]["FLAGS"].strip()
+            if NewOption != '':
+                RetVal += _SplitOption(NewOption)
+        if "MAKE" in self.EdkIIBuildOption and "FLAGS" in self.EdkIIBuildOption["MAKE"]:
+            Flags = self.EdkIIBuildOption["MAKE"]["FLAGS"]
+            if Flags.startswith('='):
+                RetVal = [RetVal[0]] + _SplitOption(Flags[1:].strip())
+            else:
+                RetVal = RetVal + _SplitOption(Flags.strip())
         return RetVal
+
+    ## Compute a tool defintion key priority value in range 0..15
+    #
+    #  TARGET_TOOLCHAIN_ARCH_COMMANDTYPE_ATTRIBUTE  15
+    #  ******_TOOLCHAIN_ARCH_COMMANDTYPE_ATTRIBUTE  14
+    #  TARGET_*********_ARCH_COMMANDTYPE_ATTRIBUTE  13
+    #  ******_*********_ARCH_COMMANDTYPE_ATTRIBUTE  12
+    #  TARGET_TOOLCHAIN_****_COMMANDTYPE_ATTRIBUTE  11
+    #  ******_TOOLCHAIN_****_COMMANDTYPE_ATTRIBUTE  10
+    #  TARGET_*********_****_COMMANDTYPE_ATTRIBUTE   9
+    #  ******_*********_****_COMMANDTYPE_ATTRIBUTE   8
+    #  TARGET_TOOLCHAIN_ARCH_***********_ATTRIBUTE   7
+    #  ******_TOOLCHAIN_ARCH_***********_ATTRIBUTE   6
+    #  TARGET_*********_ARCH_***********_ATTRIBUTE   5
+    #  ******_*********_ARCH_***********_ATTRIBUTE   4
+    #  TARGET_TOOLCHAIN_****_***********_ATTRIBUTE   3
+    #  ******_TOOLCHAIN_****_***********_ATTRIBUTE   2
+    #  TARGET_*********_****_***********_ATTRIBUTE   1
+    #  ******_*********_****_***********_ATTRIBUTE   0
+    #
+    def ToolDefinitionPriority (self,Key):
+        KeyList = Key.split('_')
+        Priority = 0
+        for Index in range (0, min(4, len(KeyList))):
+            if KeyList[Index] != '*':
+                Priority += (1 << Index)
+        return Priority
 
     ## Get tool chain definition
     #
@@ -833,8 +866,16 @@ class PlatformAutoGen(AutoGen):
                             ExtraData="[%s]" % self.MetaFile)
         RetVal = OrderedDict()
         DllPathList = set()
-        for Def in ToolDefinition:
+
+        PrioritizedDefList = sorted(ToolDefinition.keys(), key=self.ToolDefinitionPriority, reverse=True)
+        for Def in PrioritizedDefList:
             Target, Tag, Arch, Tool, Attr = Def.split("_")
+            if Target == TAB_STAR:
+                Target = self.BuildTarget
+            if Tag == TAB_STAR:
+                Tag = self.ToolChain
+            if Arch == TAB_STAR:
+                Arch = self.Arch
             if Target != self.BuildTarget or Tag != self.ToolChain or Arch != self.Arch:
                 continue
 
@@ -844,9 +885,14 @@ class PlatformAutoGen(AutoGen):
                 DllPathList.add(Value)
                 continue
 
+            #
+            # ToolDefinition is sorted from highest priority to lowest priority.
+            # Only add the first(highest priority) match to RetVal
+            #
             if Tool not in RetVal:
                 RetVal[Tool] = OrderedDict()
-            RetVal[Tool][Attr] = Value
+            if Attr not in RetVal[Tool]:
+                RetVal[Tool][Attr] = Value
 
         ToolsDef = ''
         if GlobalData.gOptions.SilentMode and "MAKE" in RetVal:
@@ -854,24 +900,35 @@ class PlatformAutoGen(AutoGen):
                 RetVal["MAKE"]["FLAGS"] = ""
             RetVal["MAKE"]["FLAGS"] += " -s"
         MakeFlags = ''
-        for Tool in RetVal:
-            for Attr in RetVal[Tool]:
-                Value = RetVal[Tool][Attr]
+
+        ToolList = list(RetVal.keys())
+        ToolList.sort()
+        for Tool in ToolList:
+            if Tool == TAB_STAR:
+                continue
+            AttrList = list(RetVal[Tool].keys())
+            if TAB_STAR in ToolList:
+                AttrList += list(RetVal[TAB_STAR])
+            AttrList.sort()
+            for Attr in AttrList:
+                if Attr in RetVal[Tool]:
+                    Value = RetVal[Tool][Attr]
+                else:
+                    Value = RetVal[TAB_STAR][Attr]
                 if Tool in self._BuildOptionWithToolDef(RetVal) and Attr in self._BuildOptionWithToolDef(RetVal)[Tool]:
                     # check if override is indicated
                     if self._BuildOptionWithToolDef(RetVal)[Tool][Attr].startswith('='):
-                        Value = self._BuildOptionWithToolDef(RetVal)[Tool][Attr][1:]
+                        Value = self._BuildOptionWithToolDef(RetVal)[Tool][Attr][1:].strip()
                     else:
-                        if Attr != 'PATH':
+                        # Do not append PATH or GUID
+                        if Attr != 'PATH' and Attr != 'GUID':
                             Value += " " + self._BuildOptionWithToolDef(RetVal)[Tool][Attr]
                         else:
                             Value = self._BuildOptionWithToolDef(RetVal)[Tool][Attr]
-                            Def = '_'.join([self.BuildTarget, self.ToolChain, self.Arch, Tool, Attr])
-                            self.Workspace.ToolDef.ToolsDefTxtDictionary[Def] = Value
                 if Attr == "PATH":
                     # Don't put MAKE definition in the file
                     if Tool != "MAKE":
-                        ToolsDef += "%s = %s\n" % (Tool, Value)
+                        ToolsDef += "%s_%s = %s\n" % (Tool, Attr, Value)
                 elif Attr != "DLL":
                     # Don't put MAKE definition in the file
                     if Tool == "MAKE":
@@ -1333,14 +1390,19 @@ class PlatformAutoGen(AutoGen):
                     if Attr == TAB_TOD_DEFINES_BUILDRULEORDER:
                         continue
                     Value = Options[Tool][Attr]
-                    # check if override is indicated
-                    if Value.startswith('='):
-                        BuildOptions[Tool][Attr] = mws.handleWsMacro(Value[1:])
-                    else:
-                        if Attr != 'PATH':
-                            BuildOptions[Tool][Attr] += " " + mws.handleWsMacro(Value)
+                    ToolList = [Tool]
+                    if Tool == TAB_STAR:
+                        ToolList = list(AllTools)
+                        ToolList.remove(TAB_STAR)
+                    for ExpandedTool in ToolList:
+                        # check if override is indicated
+                        if Value.startswith('='):
+                            BuildOptions[ExpandedTool][Attr] = mws.handleWsMacro(Value[1:])
                         else:
-                            BuildOptions[Tool][Attr] = mws.handleWsMacro(Value)
+                            if Attr != 'PATH':
+                                BuildOptions[ExpandedTool][Attr] += " " + mws.handleWsMacro(Value)
+                            else:
+                                BuildOptions[ExpandedTool][Attr] = mws.handleWsMacro(Value)
 
         return BuildOptions, BuildRuleOrder
 
@@ -1463,14 +1525,23 @@ class PlatformAutoGen(AutoGen):
             Family = Key[0]
             Target, Tag, Arch, Tool, Attr = Key[1].split("_")
             # if tool chain family doesn't match, skip it
-            if Tool in ToolDef and Family != "":
-                FamilyIsNull = False
-                if ToolDef[Tool].get(TAB_TOD_DEFINES_BUILDRULEFAMILY, "") != "":
-                    if Family != ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
-                        continue
-                elif Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+            if Family != "":
+                Found = False
+                if Tool in ToolDef:
+                    FamilyIsNull = False
+                    if TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDef[Tool]:
+                        if Family == ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                if TAB_STAR in ToolDef:
+                    FamilyIsNull = False
+                    if TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDef[TAB_STAR]:
+                        if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                if not Found:
                     continue
-                FamilyMatch = True
+
             # expand any wildcard
             if Target == TAB_STAR or Target == self.BuildTarget:
                 if Tag == TAB_STAR or Tag == self.ToolChain:
@@ -1500,10 +1571,19 @@ class PlatformAutoGen(AutoGen):
             Family = Key[0]
             Target, Tag, Arch, Tool, Attr = Key[1].split("_")
             # if tool chain family doesn't match, skip it
-            if Tool not in ToolDef or Family == "":
+            if Family == "":
                 continue
             # option has been added before
-            if Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+            Found = False
+            if Tool in ToolDef:
+                if TAB_TOD_DEFINES_FAMILY in ToolDef[Tool]:
+                    if Family == ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+                        Found = True
+            if TAB_STAR in ToolDef:
+                if TAB_TOD_DEFINES_FAMILY in ToolDef[TAB_STAR]:
+                    if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_FAMILY]:
+                        Found = True
+            if not Found:
                 continue
 
             # expand any wildcard

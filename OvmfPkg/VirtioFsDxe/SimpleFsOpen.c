@@ -333,6 +333,12 @@ VirtioFsSimpleFileOpen (
   }
 
   //
+  // Set CreateDirectoryIfCreating to suppress incorrect compiler/analyzer
+  // warnings.
+  //
+  CreateDirectoryIfCreating = FALSE;
+
+  //
   // Validate the Attributes requested for the case when the file ends up being
   // created, provided creation is permitted.
   //
@@ -425,6 +431,11 @@ VirtioFsSimpleFileOpen (
   if (EFI_ERROR (Status)) {
     goto FreeNewCanonicalPath;
   }
+
+  //
+  // Set NewNodeIsDirectory to suppress incorrect compiler/analyzer warnings.
+  //
+  NewNodeIsDirectory = FALSE;
 
   //
   // Try to open LastComponent directly under DirNodeId, as an existent regular

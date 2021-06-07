@@ -1,7 +1,7 @@
 /** @file
 Elf64 convert solution
 
-Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
 Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
@@ -162,8 +162,7 @@ InitializeElf64 (
     return FALSE;
   }
   if (!((mEhdr->e_machine == EM_X86_64) || (mEhdr->e_machine == EM_AARCH64) || (mEhdr->e_machine == EM_RISCV64))) {
-    Error (NULL, 0, 3000, "Unsupported", "ELF e_machine is not Elf64 machine.");
-    return FALSE;
+    Warning (NULL, 0, 3000, "Unsupported", "ELF e_machine is not Elf64 machine.");
   }
   if (mEhdr->e_version != EV_CURRENT) {
     Error (NULL, 0, 3000, "Unsupported", "ELF e_version (%u) not EV_CURRENT (%d)", (unsigned) mEhdr->e_version, EV_CURRENT);
@@ -247,7 +246,7 @@ IsTextShdr (
   Elf_Shdr *Shdr
   )
 {
-  return (BOOLEAN) ((Shdr->sh_flags & (SHF_WRITE | SHF_ALLOC)) == SHF_ALLOC);
+  return (BOOLEAN) ((Shdr->sh_flags & (SHF_EXECINSTR | SHF_ALLOC)) == (SHF_EXECINSTR | SHF_ALLOC));
 }
 
 STATIC
@@ -270,7 +269,7 @@ IsDataShdr (
   if (IsHiiRsrcShdr(Shdr)) {
     return FALSE;
   }
-  return (BOOLEAN) (Shdr->sh_flags & (SHF_WRITE | SHF_ALLOC)) == (SHF_ALLOC | SHF_WRITE);
+  return (BOOLEAN) (Shdr->sh_flags & (SHF_EXECINSTR | SHF_WRITE | SHF_ALLOC)) == (SHF_ALLOC | SHF_WRITE);
 }
 
 STATIC
@@ -715,7 +714,7 @@ ScanSections64 (
     }
   }
 
-  if (!FoundSection) {
+  if (!FoundSection && mOutImageType != FW_ACPI_IMAGE) {
     Error (NULL, 0, 3000, "Invalid", "Did not find any '.text' section.");
     assert (FALSE);
   }
@@ -1061,6 +1060,7 @@ WriteSections64 (
 
             exit(EXIT_FAILURE);
           }
+          continue;
         }
         SymShdr = GetShdrByIndex(Sym->st_shndx);
 

@@ -8,17 +8,18 @@
 
 **/
 
-#include "AcpiPlatform.h"
-#include "QemuLoader.h"
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/QemuFwCfgLib.h>
-#include <Library/QemuFwCfgS3Lib.h>
-#include <Library/DxeServicesTableLib.h>
-#include <Library/PcdLib.h>
-#include <Library/OrderedCollectionLib.h>
-#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/Acpi.h>            // EFI_ACPI_DESCRIPTION_HEADER
+#include <IndustryStandard/QemuLoader.h>      // QEMU_LOADER_FNAME_SIZE
+#include <Library/BaseLib.h>                  // AsciiStrCmp()
+#include <Library/BaseMemoryLib.h>            // CopyMem()
+#include <Library/DebugLib.h>                 // DEBUG()
+#include <Library/MemoryAllocationLib.h>      // AllocatePool()
+#include <Library/OrderedCollectionLib.h>     // OrderedCollectionMin()
+#include <Library/QemuFwCfgLib.h>             // QemuFwCfgFindFile()
+#include <Library/QemuFwCfgS3Lib.h>           // QemuFwCfgS3Enabled()
+#include <Library/UefiBootServicesTableLib.h> // gBS
 
+#include "AcpiPlatform.h"
 
 //
 // The user structure for the ordered collection that will track the fw_cfg

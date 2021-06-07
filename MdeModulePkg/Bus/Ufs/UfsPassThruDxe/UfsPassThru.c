@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -749,7 +749,7 @@ UfsFinishDeviceInitialization (
 {
   EFI_STATUS  Status;
   UINT8  DeviceInitStatus;
-  UINT8  Timeout;
+  UINT32 Timeout;
 
   DeviceInitStatus = 0xFF;
 
@@ -761,7 +761,10 @@ UfsFinishDeviceInitialization (
     return Status;
   }
 
-  Timeout = 5;
+  //
+  // There are cards that can take upto 600ms to clear fDeviceInit flag.
+  //
+  Timeout = UFS_INIT_COMPLETION_TIMEOUT;
   do {
     Status = UfsReadFlag (Private, UfsFlagDevInit, &DeviceInitStatus);
     if (EFI_ERROR (Status)) {
@@ -771,7 +774,13 @@ UfsFinishDeviceInitialization (
     Timeout--;
   } while (DeviceInitStatus != 0 && Timeout != 0);
 
-  return EFI_SUCCESS;
+  if (Timeout == 0) {
+    DEBUG ((DEBUG_ERROR, "UfsFinishDeviceInitialization DeviceInitStatus=%x EFI_TIMEOUT \n", DeviceInitStatus));
+    return EFI_TIMEOUT;
+  } else {
+    DEBUG ((DEBUG_INFO, "UfsFinishDeviceInitialization Timeout left=%x EFI_SUCCESS \n", Timeout));
+    return EFI_SUCCESS;
+  }
 }
 
 /**

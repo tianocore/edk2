@@ -1,7 +1,7 @@
 ## @file
 # Global variables for GenFds
 #
-#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -32,6 +32,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 import Common.GlobalData as GlobalData
 from Common.BuildToolError import *
+from AutoGen.AutoGen import CalculatePriorityValue
 
 ## Global variables
 #
@@ -850,6 +851,10 @@ class GenFdsGlobalVariable:
 #  @param  NameGuid         The Guid name
 #
 def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
+    if GenFdsGlobalVariable.GuidToolDefinition:
+        if NameGuid in GenFdsGlobalVariable.GuidToolDefinition:
+            return GenFdsGlobalVariable.GuidToolDefinition[NameGuid]
+
     ToolDefObj = ToolDefDict((os.path.join(os.getenv("WORKSPACE"), "Conf")))
     ToolDef = ToolDefObj.ToolDef
     ToolDb = ToolDef.ToolsDefTxtDatabase
@@ -864,73 +869,159 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
             if Target + '_' + ToolChain + '_' + Arch not in KeyStringList:
                 KeyStringList.append(Target + '_' + ToolChain + '_' + Arch)
 
-    if GenFdsGlobalVariable.GuidToolDefinition:
-        if NameGuid in GenFdsGlobalVariable.GuidToolDefinition:
-            return GenFdsGlobalVariable.GuidToolDefinition[NameGuid]
-
-    ToolDefinition = ToolDef.ToolsDefTxtDictionary
     ToolPathTmp = None
     ToolOption = None
-    ToolPathKey = None
-    ToolOptionKey = None
-    KeyList = None
-    for tool_def in ToolDefinition.items():
-        if NameGuid.lower() == tool_def[1].lower():
-            KeyList = tool_def[0].split('_')
-            Key = KeyList[0] + \
-                  '_' + \
-                  KeyList[1] + \
-                  '_' + \
-                  KeyList[2]
-            if Key in KeyStringList and KeyList[4] == DataType.TAB_GUID:
-                ToolPathKey   = Key + '_' + KeyList[3] + '_PATH'
-                ToolOptionKey = Key + '_' + KeyList[3] + '_FLAGS'
-                ToolPath = ToolDefinition.get(ToolPathKey)
-                ToolOption = ToolDefinition.get(ToolOptionKey)
-                if ToolPathTmp is None:
-                    ToolPathTmp = ToolPath
-                else:
-                    if ToolPathTmp != ToolPath:
-                        EdkLogger.error("GenFds", GENFDS_ERROR, "Don't know which tool to use, %s or %s ?" % (ToolPathTmp, ToolPath))
-
-    BuildOption = {}
     for Arch in CurrentArchList:
-        Platform = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
-        # key is (ToolChainFamily, ToolChain, CodeBase)
-        for item in Platform.BuildOptions:
-            if '_PATH' in item[1] or '_FLAGS' in item[1] or '_GUID' in item[1]:
-                if not item[0] or (item[0] and GenFdsGlobalVariable.ToolChainFamily== item[0]):
-                    if item[1] not in BuildOption:
-                        BuildOption[item[1]] = Platform.BuildOptions[item]
-        if BuildOption:
-            ToolList = [DataType.TAB_TOD_DEFINES_TARGET, DataType.TAB_TOD_DEFINES_TOOL_CHAIN_TAG, DataType.TAB_TOD_DEFINES_TARGET_ARCH]
-            for Index in range(2, -1, -1):
-                for Key in list(BuildOption.keys()):
-                    List = Key.split('_')
-                    if List[Index] == DataType.TAB_STAR:
-                        for String in ToolDb[ToolList[Index]]:
-                            if String in [Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]:
-                                List[Index] = String
-                                NewKey = '%s_%s_%s_%s_%s' % tuple(List)
-                                if NewKey not in BuildOption:
-                                    BuildOption[NewKey] = BuildOption[Key]
-                                    continue
-                                del BuildOption[Key]
-                    elif List[Index] not in ToolDb[ToolList[Index]]:
-                        del BuildOption[Key]
-    if BuildOption:
-        if not KeyList:
-            for Op in BuildOption:
-                if NameGuid == BuildOption[Op]:
-                    KeyList = Op.split('_')
-                    Key = KeyList[0] + '_' + KeyList[1] +'_' + KeyList[2]
-                    if Key in KeyStringList and KeyList[4] == DataType.TAB_GUID:
-                        ToolPathKey   = Key + '_' + KeyList[3] + '_PATH'
-                        ToolOptionKey = Key + '_' + KeyList[3] + '_FLAGS'
-        if ToolPathKey in BuildOption:
-            ToolPathTmp = BuildOption[ToolPathKey]
-        if ToolOptionKey in BuildOption:
-            ToolOption = BuildOption[ToolOptionKey]
+        MatchItem = None
+        MatchPathItem = None
+        MatchOptionsItem = None
+        for KeyString in KeyStringList:
+            KeyStringBuildTarget, KeyStringToolChain, KeyStringArch = KeyString.split('_')
+            if KeyStringArch != Arch:
+                continue
+            for Item in ToolDef.ToolsDefTxtDictionary:
+                if len(Item.split('_')) < 5:
+                    continue
+                ItemTarget, ItemToolChain, ItemArch, ItemTool, ItemAttr = Item.split('_')
+                if ItemTarget == DataType.TAB_STAR:
+                    ItemTarget = KeyStringBuildTarget
+                if ItemToolChain == DataType.TAB_STAR:
+                    ItemToolChain = KeyStringToolChain
+                if ItemArch == DataType.TAB_STAR:
+                    ItemArch = KeyStringArch
+                if ItemTarget != KeyStringBuildTarget:
+                    continue
+                if ItemToolChain != KeyStringToolChain:
+                    continue
+                if ItemArch != KeyStringArch:
+                    continue
+                if ItemAttr != DataType.TAB_GUID:
+                    # Not GUID attribute
+                    continue
+                if ToolDef.ToolsDefTxtDictionary[Item].lower() != NameGuid.lower():
+                    # No GUID value match
+                    continue
+                if MatchItem:
+                    if MatchItem.split('_')[3] == ItemTool:
+                        # Tool name is the same
+                        continue
+                    if CalculatePriorityValue(MatchItem) > CalculatePriorityValue(Item):
+                        # Current MatchItem is higher priority than new match item
+                        continue
+                MatchItem = Item
+            if not MatchItem:
+                continue
+            ToolName = MatchItem.split('_')[3]
+            for Item in ToolDef.ToolsDefTxtDictionary:
+                if len(Item.split('_')) < 5:
+                    continue
+                ItemTarget, ItemToolChain, ItemArch, ItemTool, ItemAttr = Item.split('_')
+                if ItemTarget == DataType.TAB_STAR:
+                    ItemTarget = KeyStringBuildTarget
+                if ItemToolChain == DataType.TAB_STAR:
+                    ItemToolChain = KeyStringToolChain
+                if ItemArch == DataType.TAB_STAR:
+                    ItemArch = KeyStringArch
+                if ItemTarget != KeyStringBuildTarget:
+                    continue
+                if ItemToolChain != KeyStringToolChain:
+                    continue
+                if ItemArch != KeyStringArch:
+                    continue
+                if ItemTool != ToolName:
+                    continue
+                if ItemAttr == 'PATH':
+                    if MatchPathItem:
+                        if CalculatePriorityValue(MatchPathItem) <= CalculatePriorityValue(Item):
+                            MatchPathItem = Item
+                    else:
+                        MatchPathItem = Item
+                if ItemAttr == 'FLAGS':
+                    if MatchOptionsItem:
+                        if CalculatePriorityValue(MatchOptionsItem) <= CalculatePriorityValue(Item):
+                            MatchOptionsItem = Item
+                    else:
+                        MatchOptionsItem = Item
+        if MatchPathItem:
+            ToolPathTmp = ToolDef.ToolsDefTxtDictionary[MatchPathItem]
+        if MatchOptionsItem:
+            ToolOption = ToolDef.ToolsDefTxtDictionary[MatchOptionsItem]
 
+    for Arch in CurrentArchList:
+        MatchItem = None
+        MatchPathItem = None
+        MatchOptionsItem = None
+        for KeyString in KeyStringList:
+            KeyStringBuildTarget, KeyStringToolChain, KeyStringArch = KeyString.split('_')
+            if KeyStringArch != Arch:
+                continue
+            Platform = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, KeyStringBuildTarget, KeyStringToolChain]
+            for Item in Platform.BuildOptions:
+                if len(Item[1].split('_')) < 5:
+                    continue
+                ItemTarget, ItemToolChain, ItemArch, ItemTool, ItemAttr = Item[1].split('_')
+                if ItemTarget == DataType.TAB_STAR:
+                    ItemTarget = KeyStringBuildTarget
+                if ItemToolChain == DataType.TAB_STAR:
+                    ItemToolChain = KeyStringToolChain
+                if ItemArch == DataType.TAB_STAR:
+                    ItemArch = KeyStringArch
+                if ItemTarget != KeyStringBuildTarget:
+                    continue
+                if ItemToolChain != KeyStringToolChain:
+                    continue
+                if ItemArch != KeyStringArch:
+                    continue
+                if ItemAttr != DataType.TAB_GUID:
+                    # Not GUID attribute match
+                    continue
+                if Platform.BuildOptions[Item].lower() != NameGuid.lower():
+                    # No GUID value match
+                    continue
+                if MatchItem:
+                    if MatchItem[1].split('_')[3] == ItemTool:
+                        # Tool name is the same
+                        continue
+                    if CalculatePriorityValue(MatchItem[1]) > CalculatePriorityValue(Item[1]):
+                        # Current MatchItem is higher priority than new match item
+                        continue
+                MatchItem = Item
+            if not MatchItem:
+                continue
+            ToolName = MatchItem[1].split('_')[3]
+            for Item in Platform.BuildOptions:
+                if len(Item[1].split('_')) < 5:
+                    continue
+                ItemTarget, ItemToolChain, ItemArch, ItemTool, ItemAttr = Item[1].split('_')
+                if ItemTarget == DataType.TAB_STAR:
+                    ItemTarget = KeyStringBuildTarget
+                if ItemToolChain == DataType.TAB_STAR:
+                    ItemToolChain = KeyStringToolChain
+                if ItemArch == DataType.TAB_STAR:
+                    ItemArch = KeyStringArch
+                if ItemTarget != KeyStringBuildTarget:
+                    continue
+                if ItemToolChain != KeyStringToolChain:
+                    continue
+                if ItemArch != KeyStringArch:
+                    continue
+                if ItemTool != ToolName:
+                    continue
+                if ItemAttr == 'PATH':
+                    if MatchPathItem:
+                        if CalculatePriorityValue(MatchPathItem[1]) <= CalculatePriorityValue(Item[1]):
+                            MatchPathItem = Item
+                    else:
+                        MatchPathItem = Item
+                if ItemAttr == 'FLAGS':
+                    if MatchOptionsItem:
+                        if CalculatePriorityValue(MatchOptionsItem[1]) <= CalculatePriorityValue(Item[1]):
+                            MatchOptionsItem = Item
+                    else:
+                        MatchOptionsItem = Item
+    if MatchPathItem:
+        ToolPathTmp = Platform.BuildOptions[MatchPathItem]
+    if MatchOptionsItem:
+        ToolOption = Platform.BuildOptions[MatchOptionsItem]
     GenFdsGlobalVariable.GuidToolDefinition[NameGuid] = (ToolPathTmp, ToolOption)
     return ToolPathTmp, ToolOption

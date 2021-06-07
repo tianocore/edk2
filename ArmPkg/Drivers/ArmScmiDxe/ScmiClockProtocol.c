@@ -52,7 +52,7 @@ ClockGetVersion (
   OUT UINT32               *Version
   )
 {
-  return ScmiGetProtocolVersion (SCMI_PROTOCOL_ID_CLOCK, Version);
+  return ScmiGetProtocolVersion (ScmiProtocolIdClock, Version);
 }
 
 /** Return total number of clock devices supported by the clock management
@@ -76,7 +76,7 @@ ClockGetTotalClocks (
   EFI_STATUS  Status;
   UINT32     *ReturnValues;
 
-  Status = ScmiGetProtocolAttributes (SCMI_PROTOCOL_ID_CLOCK, &ReturnValues);
+  Status = ScmiGetProtocolAttributes (ScmiProtocolIdClock, &ReturnValues);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -122,8 +122,8 @@ ClockGetClockAttributes (
 
   *MessageParams = ClockId;
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_CLOCK;
-  Cmd.MessageId  = SCMI_MESSAGE_ID_CLOCK_ATTRIBUTES;
+  Cmd.ProtocolId = ScmiProtocolIdClock;
+  Cmd.MessageId  = ScmiMessageIdClockAttributes;
 
   PayloadLength = sizeof (ClockId);
 
@@ -152,10 +152,10 @@ ClockGetClockAttributes (
   @param[in] This        A pointer to SCMI_CLOCK_PROTOCOL Instance.
   @param[in] ClockId     Identifier for the clock device.
 
-  @param[out] Format      SCMI_CLOCK_RATE_FORMAT_DISCRETE: Clock device
+  @param[out] Format      ScmiClockRateFormatDiscrete: Clock device
                           supports range of clock rates which are non-linear.
 
-                          SCMI_CLOCK_RATE_FORMAT_LINEAR: Clock device supports
+                          ScmiClockRateFormatLinear: Clock device supports
                           range of linear clock rates from Min to Max in steps.
 
   @param[out] TotalRates  Total number of rates.
@@ -203,8 +203,8 @@ ClockDescribeRates (
     return Status;
   }
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_CLOCK;
-  Cmd.MessageId  = SCMI_MESSAGE_ID_CLOCK_DESCRIBE_RATES;
+  Cmd.ProtocolId = ScmiProtocolIdClock;
+  Cmd.MessageId  = ScmiMessageIdClockDescribeRates;
 
   *MessageParams++  = ClockId;
 
@@ -236,7 +236,7 @@ ClockDescribeRates (
       *TotalRates = NUM_RATES (DescribeRates->NumRatesFlags)
                     + NUM_REMAIN_RATES (DescribeRates->NumRatesFlags);
 
-      if (*Format == SCMI_CLOCK_RATE_FORMAT_DISCRETE) {
+      if (*Format == ScmiClockRateFormatDiscrete) {
          RequiredArraySize = (*TotalRates) * sizeof (UINT64);
       } else {
          // We need to return triplet of 64 bit value for each rate
@@ -251,26 +251,30 @@ ClockDescribeRates (
 
     RateOffset = 0;
 
-    if (*Format == SCMI_CLOCK_RATE_FORMAT_DISCRETE) {
+    if (*Format == ScmiClockRateFormatDiscrete) {
       for (RateNo = 0; RateNo < NUM_RATES (DescribeRates->NumRatesFlags); RateNo++) {
         Rate = &DescribeRates->Rates[RateOffset++];
         // Non-linear discrete rates.
-        RateArray[RateIndex++].Rate = ConvertTo64Bit (Rate->Low, Rate->High);
+        RateArray[RateIndex++].DiscreteRate.Rate =
+          ConvertTo64Bit (Rate->Low, Rate->High);
       }
     } else {
       for (RateNo = 0; RateNo < NUM_RATES (DescribeRates->NumRatesFlags); RateNo++) {
         // Linear clock rates from minimum to maximum in steps
         // Minimum clock rate.
         Rate = &DescribeRates->Rates[RateOffset++];
-        RateArray[RateIndex].Min = ConvertTo64Bit (Rate->Low, Rate->High);
+        RateArray[RateIndex].ContinuousRate.Min =
+          ConvertTo64Bit (Rate->Low, Rate->High);
 
         Rate = &DescribeRates->Rates[RateOffset++];
         // Maximum clock rate.
-        RateArray[RateIndex].Max = ConvertTo64Bit (Rate->Low, Rate->High);
+        RateArray[RateIndex].ContinuousRate.Max =
+          ConvertTo64Bit (Rate->Low, Rate->High);
 
         Rate = &DescribeRates->Rates[RateOffset++];
         // Step.
-        RateArray[RateIndex++].Step = ConvertTo64Bit (Rate->Low, Rate->High);
+        RateArray[RateIndex++].ContinuousRate.Step =
+          ConvertTo64Bit (Rate->Low, Rate->High);
       }
     }
   } while (NUM_REMAIN_RATES (DescribeRates->NumRatesFlags) != 0);
@@ -316,8 +320,8 @@ ClockRateGet (
   // Fill arguments for clock protocol command.
   *MessageParams  = ClockId;
 
-  Cmd.ProtocolId  = SCMI_PROTOCOL_ID_CLOCK;
-  Cmd.MessageId   = SCMI_MESSAGE_ID_CLOCK_RATE_GET;
+  Cmd.ProtocolId  = ScmiProtocolIdClock;
+  Cmd.MessageId   = ScmiMessageIdClockRateGet;
 
   PayloadLength = sizeof (ClockId);
 
@@ -370,8 +374,8 @@ ClockRateSet (
   ClockRateSetAttributes->Rate.Low   = (UINT32)Rate;
   ClockRateSetAttributes->Rate.High  = (UINT32)(Rate >> 32);
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_CLOCK;
-  Cmd.MessageId  = SCMI_MESSAGE_ID_CLOCK_RATE_SET;
+  Cmd.ProtocolId = ScmiProtocolIdClock;
+  Cmd.MessageId  = ScmiMessageIdClockRateSet;
 
   PayloadLength = sizeof (CLOCK_RATE_SET_ATTRIBUTES);
 
@@ -417,8 +421,8 @@ ClockEnable (
   ClockConfigSetAttributes->ClockId    = ClockId;
   ClockConfigSetAttributes->Attributes = Enable ? BIT0 : 0;
 
-  Cmd.ProtocolId = SCMI_PROTOCOL_ID_CLOCK;
-  Cmd.MessageId  = SCMI_MESSAGE_ID_CLOCK_CONFIG_SET;
+  Cmd.ProtocolId = ScmiProtocolIdClock;
+  Cmd.MessageId  = ScmiMessageIdClockConfigSet;
 
   PayloadLength = sizeof (CLOCK_CONFIG_SET_ATTRIBUTES);
 

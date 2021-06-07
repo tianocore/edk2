@@ -2129,6 +2129,11 @@ ShellSortFileList (
   }
 
   //
+  // Set Dupes to suppress incorrect compiler/analyzer warnings.
+  //
+  Dupes = NULL;
+
+  //
   // If separation of duplicates has been requested, allocate the list for
   // them.
   //

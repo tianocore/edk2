@@ -1,14 +1,14 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2017, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __AARCH64_H__
-#define __AARCH64_H__
+#ifndef AARCH64_H_
+#define AARCH64_H_
 
 #include <Chipset/AArch64Mmu.h>
 
@@ -39,7 +39,7 @@
 // MIDR - Main ID Register definitions
 #define ARM_CPU_TYPE_SHIFT      4
 #define ARM_CPU_TYPE_MASK       0xFFF
-#define ARM_CPU_TYPE_AEMv8      0xD0F
+#define ARM_CPU_TYPE_AEMV8      0xD0F
 #define ARM_CPU_TYPE_A53        0xD03
 #define ARM_CPU_TYPE_A57        0xD07
 #define ARM_CPU_TYPE_A72        0xD08
@@ -97,10 +97,10 @@
 #define ARM_VECTOR_CUR_SP0_FIQ  0x100
 #define ARM_VECTOR_CUR_SP0_SERR 0x180
 
-#define ARM_VECTOR_CUR_SPx_SYNC 0x200
-#define ARM_VECTOR_CUR_SPx_IRQ  0x280
-#define ARM_VECTOR_CUR_SPx_FIQ  0x300
-#define ARM_VECTOR_CUR_SPx_SERR 0x380
+#define ARM_VECTOR_CUR_SPX_SYNC 0x200
+#define ARM_VECTOR_CUR_SPX_IRQ  0x280
+#define ARM_VECTOR_CUR_SPX_FIQ  0x300
+#define ARM_VECTOR_CUR_SPX_SERR 0x380
 
 #define ARM_VECTOR_LOW_A64_SYNC 0x400
 #define ARM_VECTOR_LOW_A64_IRQ  0x480
@@ -238,4 +238,4 @@ ArmWriteCntHctl (
   IN UINT32 CntHctl
   );
 
-#endif // __AARCH64_H__
+#endif // AARCH64_H_
