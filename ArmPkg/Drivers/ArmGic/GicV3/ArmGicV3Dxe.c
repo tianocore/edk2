@@ -156,7 +156,7 @@ GicV3IrqInterruptHandler (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  UINT32                      GicInterrupt;
+  UINTN                       GicInterrupt;
   HARDWARE_INTERRUPT_HANDLER  InterruptHandler;
 
   GicInterrupt = ArmGicV3AcknowledgeInterrupt ();
@@ -173,7 +173,7 @@ GicV3IrqInterruptHandler (
     // Call the registered interrupt handler.
     InterruptHandler (GicInterrupt, SystemContext);
   } else {
-    DEBUG ((DEBUG_ERROR, "Spurious GIC interrupt: 0x%x\n", GicInterrupt));
+    DEBUG ((DEBUG_ERROR, "Spurious GIC interrupt: 0x%x\n", (UINT32)GicInterrupt));
     GicV3EndOfInterrupt (&gHardwareInterruptV3Protocol, GicInterrupt);
   }
 }
