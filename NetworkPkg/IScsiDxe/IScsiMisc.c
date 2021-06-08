@@ -376,6 +376,7 @@ IScsiBinToHex (
 
   @retval EFI_SUCCESS           The hexadecimal string is converted into a
                                 binary encoded buffer.
+  @retval EFI_INVALID_PARAMETER Invalid hex encoding found in HexStr.
   @retval EFI_BUFFER_TOO_SMALL  The binary buffer is too small to hold the
                                 converted data.
 **/
@@ -402,14 +403,21 @@ IScsiHexToBin (
 
   Length = AsciiStrLen (HexStr);
 
+  //
+  // Reject an empty hex string; reject a stray nibble.
+  //
+  if (Length == 0 || Length % 2 != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   for (Index = 0; Index < Length; Index ++) {
     TemStr[0] = HexStr[Index];
     Digit = (UINT8) AsciiStrHexToUint64 (TemStr);
     if (Digit == 0 && TemStr[0] != '0') {
       //
-      // Invalid Lun Char.
+      // Invalid Hex Char.
       //
-      break;
+      return EFI_INVALID_PARAMETER;
     }
     if ((Index & 1) == 0) {
       BinBuffer [Index/2] = Digit;
