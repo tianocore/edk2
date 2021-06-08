@@ -49,7 +49,7 @@ typedef struct _ISCSI_CHAP_AUTH_CONFIG_NVDATA {
 typedef struct _ISCSI_CHAP_AUTH_DATA {
   ISCSI_CHAP_AUTH_CONFIG_NVDATA *AuthConfig;
   UINT32                        InIdentifier;
-  UINT8                         InChallenge[ISCSI_CHAP_AUTH_MAX_LEN];
+  UINT8                         InChallenge[1024];
   UINT32                        InChallengeLength;
   //
   // Calculated CHAP Response (CHAP_R) value.
