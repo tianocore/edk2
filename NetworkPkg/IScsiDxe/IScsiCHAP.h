@@ -19,7 +19,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define ISCSI_CHAP_ALGORITHM_MD5  5
 
-#define ISCSI_CHAP_AUTH_MAX_LEN   1024
 ///
 /// MD5_HASHSIZE
 ///
@@ -59,9 +58,13 @@ typedef struct _ISCSI_CHAP_AUTH_DATA {
   //
   // Auth-data to be sent out for mutual authentication.
   //
+  // While the challenge size is technically independent of the hashing
+  // algorithm, it is good practice to avoid hashing *fewer bytes* than the
+  // digest size. In other words, it's good practice to feed *at least as many
+  // bytes* to the hashing algorithm as the hashing algorithm will output.
+  //
   UINT32                        OutIdentifier;
-  UINT8                         OutChallenge[ISCSI_CHAP_AUTH_MAX_LEN];
-  UINT32                        OutChallengeLength;
+  UINT8                         OutChallenge[ISCSI_CHAP_RSP_LEN];
 } ISCSI_CHAP_AUTH_DATA;
 
 /**
