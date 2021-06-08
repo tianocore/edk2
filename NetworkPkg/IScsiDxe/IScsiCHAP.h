@@ -88,7 +88,8 @@ IScsiCHAPOnRspReceived (
   @param[in, out]  Pdu         The PDU to send out.
 
   @retval EFI_SUCCESS           All check passed and the phase-related CHAP
-                                authentication info is filled into the iSCSI PDU.
+                                authentication info is filled into the iSCSI
+                                PDU.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
   @retval EFI_PROTOCOL_ERROR    Some kind of protocol error occurred.
 
