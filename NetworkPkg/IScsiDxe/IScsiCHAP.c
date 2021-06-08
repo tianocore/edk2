@@ -122,7 +122,7 @@ IScsiCHAPAuthTarget (
              AuthData->AuthConfig->ReverseCHAPSecret,
              SecretSize,
              AuthData->OutChallenge,
-             AuthData->OutChallengeLength,
+             ISCSI_CHAP_RSP_LEN,                      // ChallengeLength
              VerifyRsp
              );
 
@@ -490,7 +490,6 @@ IScsiCHAPToSendReq (
       // CHAP_C=<C>
       //
       IScsiGenRandom ((UINT8 *) AuthData->OutChallenge, ISCSI_CHAP_RSP_LEN);
-      AuthData->OutChallengeLength = ISCSI_CHAP_RSP_LEN;
       IScsiBinToHex (
         (UINT8 *) AuthData->OutChallenge,
         ISCSI_CHAP_RSP_LEN,
