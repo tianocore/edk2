@@ -370,14 +370,14 @@ IScsiBinToHex (
 /**
   Convert the hexadecimal string into a binary encoded buffer.
 
-  @param[in, out]  BinBuffer   The binary buffer.
-  @param[in, out]  BinLength   Length of the binary buffer.
-  @param[in]       HexStr      The hexadecimal string.
+  @param[in, out]  BinBuffer    The binary buffer.
+  @param[in, out]  BinLength    Length of the binary buffer.
+  @param[in]       HexStr       The hexadecimal string.
 
-  @retval EFI_SUCCESS          The hexadecimal string is converted into a binary
-                               encoded buffer.
-  @retval EFI_BUFFER_TOO_SMALL The binary buffer is too small to hold the converted data.
-
+  @retval EFI_SUCCESS           The hexadecimal string is converted into a
+                                binary encoded buffer.
+  @retval EFI_BUFFER_TOO_SMALL  The binary buffer is too small to hold the
+                                converted data.
 **/
 EFI_STATUS
 IScsiHexToBin (
