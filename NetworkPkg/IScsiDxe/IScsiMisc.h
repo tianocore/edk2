@@ -172,6 +172,9 @@ IScsiBinToHex (
   @retval EFI_SUCCESS           The hexadecimal string is converted into a
                                 binary encoded buffer.
   @retval EFI_INVALID_PARAMETER Invalid hex encoding found in HexStr.
+  @retval EFI_BAD_BUFFER_SIZE   The length of HexStr is too large for decoding:
+                                the decoded size cannot be expressed in
+                                BinLength on output.
   @retval EFI_BUFFER_TOO_SMALL  The binary buffer is too small to hold the
                                 converted data.
 **/
