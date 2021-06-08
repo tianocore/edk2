@@ -59,20 +59,6 @@ def _PpiValue(CName, PackageList, Inffile = None):
 # into ModuleBuildClassObject form for easier use for AutoGen.
 #
 class InfBuildData(ModuleBuildClassObject):
-    # dict used to convert PCD type in database to string used by build tool
-    _PCD_TYPE_STRING_ = {
-        MODEL_PCD_FIXED_AT_BUILD        :   TAB_PCDS_FIXED_AT_BUILD,
-        MODEL_PCD_PATCHABLE_IN_MODULE   :   TAB_PCDS_PATCHABLE_IN_MODULE,
-        MODEL_PCD_FEATURE_FLAG          :   TAB_PCDS_FEATURE_FLAG,
-        MODEL_PCD_DYNAMIC               :   TAB_PCDS_DYNAMIC,
-        MODEL_PCD_DYNAMIC_DEFAULT       :   TAB_PCDS_DYNAMIC,
-        MODEL_PCD_DYNAMIC_HII           :   TAB_PCDS_DYNAMIC_HII,
-        MODEL_PCD_DYNAMIC_VPD           :   TAB_PCDS_DYNAMIC_VPD,
-        MODEL_PCD_DYNAMIC_EX            :   TAB_PCDS_DYNAMIC_EX,
-        MODEL_PCD_DYNAMIC_EX_DEFAULT    :   TAB_PCDS_DYNAMIC_EX,
-        MODEL_PCD_DYNAMIC_EX_HII        :   TAB_PCDS_DYNAMIC_EX_HII,
-        MODEL_PCD_DYNAMIC_EX_VPD        :   TAB_PCDS_DYNAMIC_EX_VPD,
-    }
 
     # dict used to convert part of [Defines] to members of InfBuildData directly
     _PROPERTY_ = {
@@ -154,6 +140,7 @@ class InfBuildData(ModuleBuildClassObject):
         self._PcdComments = None
         self._BuildOptions = None
         self._DependencyFileList = None
+        self.UpdatePcdTypeDict()
         self.LibInstances = []
         self.ReferenceModules = set()
 
