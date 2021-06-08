@@ -316,6 +316,7 @@ IScsiMacAddrToStr (
   @retval EFI_SUCCESS          The binary data is converted to the hexadecimal string
                                and the length of the string is updated.
   @retval EFI_BUFFER_TOO_SMALL The string is too small.
+  @retval EFI_BAD_BUFFER_SIZE  BinLength is too large for hex encoding.
   @retval EFI_INVALID_PARAMETER The IP string is malformatted.
 
 **/
@@ -327,18 +328,28 @@ IScsiBinToHex (
   IN OUT UINT32 *HexLength
   )
 {
-  UINTN Index;
+  UINT32 HexLengthMin;
+  UINT32 HexLengthProvided;
+  UINT32 Index;
 
   if ((HexStr == NULL) || (BinBuffer == NULL) || (BinLength == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((*HexLength) - 3) < BinLength * 2) {
-    *HexLength = BinLength * 2 + 3;
+  //
+  // Safely calculate: HexLengthMin := BinLength * 2 + 3.
+  //
+  if (RETURN_ERROR (SafeUint32Mult (BinLength, 2, &HexLengthMin)) ||
+      RETURN_ERROR (SafeUint32Add (HexLengthMin, 3, &HexLengthMin))) {
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  HexLengthProvided = *HexLength;
+  *HexLength = HexLengthMin;
+  if (HexLengthProvided < HexLengthMin) {
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  *HexLength = BinLength * 2 + 3;
   //
   // Prefix for Hex String.
   //
