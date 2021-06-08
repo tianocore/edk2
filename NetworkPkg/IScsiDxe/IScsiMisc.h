@@ -150,6 +150,7 @@ IScsiAsciiStrToIp (
   @retval EFI_SUCCESS          The binary data is converted to the hexadecimal string
                                and the length of the string is updated.
   @retval EFI_BUFFER_TOO_SMALL The string is too small.
+  @retval EFI_BAD_BUFFER_SIZE  BinLength is too large for hex encoding.
   @retval EFI_INVALID_PARAMETER The IP string is malformatted.
 
 **/
