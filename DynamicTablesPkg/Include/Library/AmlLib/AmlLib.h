@@ -418,31 +418,21 @@ AmlUpdateRdQWord (
   IN  UINT64                BaseAddressLength
   );
 
-/** Add an Interrupt Resource Data node.
-
-  This function creates a Resource Data element corresponding to the
-  "Interrupt ()" ASL function, stores it in an AML Data Node.
-
-  It then adds it after the input NameOpNode in the list of resource data
-  element.
+/** Code generation for the "Interrupt ()" ASL function.
 
   The Resource Data effectively created is an Extended Interrupt Resource
-  Data. See ACPI 6.3 specification, s6.4.3.6 "Extended Interrupt Descriptor"
-  for more information about Extended Interrupt Resource Data.
+  Data. Cf ACPI 6.4:
+   - s6.4.3.6 "Extended Interrupt Descriptor"
+   - s19.6.64 "Interrupt (Interrupt Resource Descriptor Macro)"
 
-  The Extended Interrupt contains one single interrupt.
-
-  This function allocates memory to create a data node. It is the caller's
-  responsibility to either:
-   - attach this node to an AML tree;
-   - delete this node.
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
 
   @ingroup CodeGenApis
 
-  @param  [in]  NameOpNode       NameOp object node defining a named object.
-                                 Must have an OpCode=AML_NAME_OP, SubOpCode=0.
-                                 NameOp object nodes are defined in ASL
-                                 using the "Name ()" function.
   @param  [in]  ResourceConsumer The device consumes the specified interrupt
                                  or produces it for use by a child device.
   @param  [in]  EdgeTriggered    The interrupt is edge triggered or
@@ -452,7 +442,12 @@ AmlUpdateRdQWord (
                                  devices or not (Exclusive).
   @param  [in]  IrqList          Interrupt list. Must be non-NULL.
   @param  [in]  IrqCount         Interrupt count. Must be non-zero.
-
+  @param  [in]  NameOpNode       NameOp object node defining a named object.
+                                 If provided, append the new resource data node
+                                 to the list of resource data elements of this
+                                 node.
+  @param  [out] NewRdNode        If provided and success,
+                                 contain the created node.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -460,14 +455,15 @@ AmlUpdateRdQWord (
 **/
 EFI_STATUS
 EFIAPI
-AmlCodeGenAddRdInterrupt (
-  IN  AML_OBJECT_NODE_HANDLE  NameOpNode,
+AmlCodeGenRdInterrupt (
   IN  BOOLEAN                 ResourceConsumer,
   IN  BOOLEAN                 EdgeTriggered,
   IN  BOOLEAN                 ActiveLow,
   IN  BOOLEAN                 Shared,
-  IN  UINT32                * IrqList,
-  IN  UINT8                   IrqCount
+  IN  UINT32                  *IrqList,
+  IN  UINT8                   IrqCount,
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode, OPTIONAL
+  OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
   );
 
 /** AML code generation for DefinitionBlock.
