@@ -9,8 +9,8 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __IO_REMAPPING_TABLE_H__
-#define __IO_REMAPPING_TABLE_H__
+#ifndef IO_REMAPPING_TABLE_H_
+#define IO_REMAPPING_TABLE_H_
 
 #include <IndustryStandard/Acpi.h>
 
