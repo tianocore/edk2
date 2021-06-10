@@ -856,6 +856,216 @@ AmlCodeGenNameResourceTemplate (
   return Status;
 }
 
+/** Add a _PRT entry.
+
+  AmlCodeGenPrtEntry (0x0FFFF, 0, "LNKA", 0, PrtNameNode) is
+  equivalent of the following ASL code:
+    Package (4) {
+      0x0FFFF, // Address: Device address (([Device Id] << 16) | 0xFFFF).
+      0,       // Pin: PCI pin number of the device (0-INTA, ...).
+      LNKA     // Source: Name of the device that allocates the interrupt
+               // to which the above pin is connected.
+      0        // Source Index: Source is assumed to only describe one
+               // interrupt, so let it to index 0.
+    }
+
+  The package is added at the tail of the list of the input _PRT node
+  name:
+    Name (_PRT, Package () {
+      [Pre-existing _PRT entries],
+      [Newly created _PRT entry]
+    })
+
+  Cf. ACPI 6.4 specification:
+   - s6.2.13 "_PRT (PCI Routing Table)"
+   - s6.1.1 "_ADR (Address)"
+
+  @param [in]  Address        Address. Cf ACPI 6.4 specification, Table 6.2:
+                              "ADR Object Address Encodings":
+                              High word-Device #, Low word-Function #. (for
+                              example, device 3, function 2 is 0x00030002).
+                              To refer to all the functions on a device #,
+                              use a function number of FFFF).
+  @param [in]  Pin            PCI pin number of the device (0-INTA ... 3-INTD).
+                              Must be between 0-3.
+  @param [in]  LinkName       Link Name, i.e. device in the AML NameSpace
+                              describing the interrupt used.
+                              The input string is copied.
+  @param [in]  SourceIndex    Source index or GSIV.
+  @param [in]  PrtNameNode    Prt Named node to add the object to ....
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddPrtEntry (
+  IN        UINT32                    Address,
+  IN        UINT8                     Pin,
+  IN  CONST CHAR8                   * LinkName,
+  IN        UINT32                    SourceIndex,
+  IN        AML_OBJECT_NODE_HANDLE    PrtNameNode
+  )
+{
+  EFI_STATUS          Status;
+  AML_OBJECT_NODE   * PrtEntryList;
+  AML_OBJECT_NODE   * PackageNode;
+  AML_OBJECT_NODE   * NewElementNode;
+
+  CHAR8             * AmlNameString;
+  UINT32              AmlNameStringSize;
+  AML_DATA_NODE     * DataNode;
+
+  if ((Pin > 3)                 ||
+      (LinkName == NULL)        ||
+      (PrtNameNode == NULL)     ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PrtNameNode) != EAmlNodeObject) ||
+      (!AmlNodeHasOpCode (PrtNameNode, AML_NAME_OP, 0))                 ||
+      !AmlNameOpCompareName (PrtNameNode, "_PRT")) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  NewElementNode = NULL;
+  AmlNameString = NULL;
+  DataNode = NULL;
+
+  // Get the Package object node of the _PRT node,
+  // which is the 2nd fixed argument (i.e. index 1).
+  PrtEntryList = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                           PrtNameNode,
+                                           EAmlParseIndexTerm1
+                                           );
+  if ((PrtEntryList == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PrtEntryList) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (PrtEntryList, AML_PACKAGE_OP, 0))) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // The new _PRT entry.
+  Status = AmlCodeGenPackage (&PackageNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlCodeGenInteger (Address, &NewElementNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PackageNode,
+             (AML_NODE_HANDLE)NewElementNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  NewElementNode = NULL;
+
+  Status = AmlCodeGenInteger (Pin, &NewElementNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PackageNode,
+             (AML_NODE_HANDLE)NewElementNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  NewElementNode = NULL;
+
+  Status = ConvertAslNameToAmlName (LinkName, &AmlNameString);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  Status = AmlGetNameStringSize (AmlNameString, &AmlNameStringSize);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8*)AmlNameString,
+             AmlNameStringSize,
+             &DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  // AmlNameString will be freed before returning.
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PackageNode,
+             (AML_NODE_HANDLE)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  DataNode = NULL;
+
+  Status = AmlCodeGenInteger (SourceIndex, &NewElementNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PackageNode,
+             (AML_NODE_HANDLE)NewElementNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  // Append to the the list of _PRT entries.
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PrtEntryList,
+             (AML_NODE_HANDLE)PackageNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  // Free AmlNameString before returning as it is copied
+  // in the call to AmlCreateDataNode().
+  goto exit_handler;
+
+error_handler:
+  AmlDeleteTree ((AML_NODE_HANDLE)PackageNode);
+  if (NewElementNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)NewElementNode);
+  }
+  if (DataNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)DataNode);
+  }
+
+exit_handler:
+  if (AmlNameString != NULL) {
+    FreePool (AmlNameString);
+  }
+  return Status;
+}
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is

@@ -891,6 +891,58 @@ AmlCodeGenNameResourceTemplate (
   OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
   );
 
+/** Add a _PRT entry.
+
+  AmlCodeGenPrtEntry (0x0FFFF, 0, "LNKA", 0, PrtNameNode) is
+  equivalent of the following ASL code:
+    Package (4) {
+      0x0FFFF, // Address: Device address (([Device Id] << 16) | 0xFFFF).
+      0,       // Pin: PCI pin number of the device (0-INTA, ...).
+      LNKA     // Source: Name of the device that allocates the interrupt
+               // to which the above pin is connected.
+      0        // Source Index: Source is assumed to only describe one
+               // interrupt, so let it to index 0.
+    }
+
+  The package is added at the tail of the list of the input _PRT node
+  name:
+    Name (_PRT, Package () {
+      [Pre-existing _PRT entries],
+      [Newly created _PRT entry]
+    })
+
+  Cf. ACPI 6.4, s6.2.13 "_PRT (PCI Routing Table)"
+
+  @ingroup CodeGenApis
+
+  @param [in]  Address        Address. Cf ACPI 6.4 specification, Table 6.2:
+                              "ADR Object Address Encodings":
+                              High word-Device #, Low word-Function #. (for
+                              example, device 3, function 2 is 0x00030002).
+                              To refer to all the functions on a device #,
+                              use a function number of FFFF).
+  @param [in]  Pin            PCI pin number of the device (0-INTA ... 3-INTD).
+                              Must be between 0-3.
+  @param [in]  LinkName       Link Name, i.e. device in the AML NameSpace
+                              describing the interrupt used.
+                              The input string is copied.
+  @param [in]  SourceIndex    Source index or GSIV.
+  @param [in]  PrtNameNode    Prt Named node to add the object to ....
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddPrtEntry (
+  IN        UINT32                    Address,
+  IN        UINT8                     Pin,
+  IN  CONST CHAR8                   * LinkName,
+  IN        UINT32                    SourceIndex,
+  IN        AML_OBJECT_NODE_HANDLE    PrtNameNode
+  );
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is
