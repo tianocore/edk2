@@ -2,7 +2,7 @@
 
   Module to rewrite stdlib references within Oniguruma
 
-  (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2014-2021 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -96,3 +96,20 @@ void* memset (void *dest, char ch, unsigned int count)
   return SetMem (dest, count, ch);
 }
 
+void free(void *ptr)
+{
+  VOID         *EvalOnce;
+  ONIGMEM_HEAD *PoolHdr;
+
+  EvalOnce = ptr;
+  if (EvalOnce == NULL) {
+    return;
+  }
+
+  PoolHdr = (ONIGMEM_HEAD *)EvalOnce - 1;
+  if (PoolHdr->Signature == ONIGMEM_HEAD_SIGNATURE) {
+    FreePool (PoolHdr);
+  } else {
+    FreePool (EvalOnce);
+  }
+}
