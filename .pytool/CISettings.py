@@ -219,6 +219,12 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 build_these_packages = possible_packages
                 break
 
+            # any python environment dependency change should trigger
+            # a build for all core ci
+            if f.endswith("pip-requirements.txt"):
+                build_these_packages = possible_packages
+                break
+
             # BaseTools files that might change the build
             if "BaseTools" in nodes:
                 if os.path.splitext(f) not in [".txt", ".md"]:
