@@ -35,6 +35,7 @@
 #include <UniversalPayload/AcpiTable.h>
 #include <UniversalPayload/UniversalPayload.h>
 #include <UniversalPayload/ExtraData.h>
+#include <Guid/PcdDataBaseSignatureGuid.h>
 
 #define LEGACY_8259_MASK_REGISTER_MASTER  0x21
 #define LEGACY_8259_MASK_REGISTER_SLAVE   0xA1
@@ -159,4 +160,48 @@ HandOffToDxeCore (
   IN EFI_PEI_HOB_POINTERS   HobList
   );
 
+EFI_STATUS
+FixUpPcdDatabase (
+  IN  EFI_FIRMWARE_VOLUME_HEADER *DxeFv
+  );
+
+/**
+  This function searchs a given section type within a valid FFS file.
+
+  @param  FileHeader            A pointer to the file header that contains the set of sections to
+                                be searched.
+  @param  SearchType            The value of the section type to search.
+  @param  SectionData           A pointer to the discovered section, if successful.
+
+  @retval EFI_SUCCESS           The section was found.
+  @retval EFI_NOT_FOUND         The section was not found.
+
+**/
+EFI_STATUS
+FileFindSection (
+  IN EFI_FFS_FILE_HEADER        *FileHeader,
+  IN EFI_SECTION_TYPE           SectionType,
+  OUT VOID                      **SectionData
+  );
+
+/**
+  This function searchs a given file type with a given Guid within a valid FV.
+  If input Guid is NULL, will locate the first section having the given file type
+
+  @param FvHeader        A pointer to firmware volume header that contains the set of files
+                         to be searched.
+  @param FileType        File type to be searched.
+  @param Guid            Will ignore if it is NULL.
+  @param FileHeader      A pointer to the discovered file, if successful.
+
+  @retval EFI_SUCCESS    Successfully found FileType
+  @retval EFI_NOT_FOUND  File type can't be found.
+**/
+EFI_STATUS
+FvFindFileByTypeGuid (
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *FvHeader,
+  IN  EFI_FV_FILETYPE             FileType,
+  IN  EFI_GUID                    *Guid           OPTIONAL,
+  OUT EFI_FFS_FILE_HEADER         **FileHeader
+  );
 #endif
