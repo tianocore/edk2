@@ -59,6 +59,8 @@ typedef enum ArmObjectID {
   EArmObjSerialPortInfo,               ///< 35 - Generic Serial Port Info
   EArmObjCmn600Info,                   ///< 36 - CMN-600 Info
   EArmObjLpiInfo,                      ///< 37 - Lpi Info
+  EArmObjPciAddressMapInfo,            ///< 38 - Pci Address Map Info
+  EArmObjPciInterruptMapInfo,          ///< 39 - Pci Interrupt Map Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -433,6 +435,14 @@ typedef struct CmArmPciConfigSpaceInfo {
 
   /// The end bus number
   UINT8   EndBusNumber;
+
+  /// Optional field: Reference Token for address mapping.
+  /// Token identifying a CM_ARM_OBJ_REF structure.
+  CM_OBJECT_TOKEN   AddressMapToken;
+
+  /// Optional field: Reference Token for interrupt mapping.
+  /// Token identifying a CM_ARM_OBJ_REF structure.
+  CM_OBJECT_TOKEN   InterruptMapToken;
 } CM_ARM_PCI_CONFIG_SPACE_INFO;
 
 /** A structure that describes the
@@ -666,6 +676,10 @@ typedef struct CmArmGenericInterrupt {
   UINT32    Interrupt;
 
   /// Flags
+  /// BIT0: 0: Interrupt is Level triggered
+  ///       1: Interrupt is Edge triggered
+  /// BIT1: 0: Interrupt is Active high
+  ///       1: Interrupt is Active low
   UINT32    Flags;
 } CM_ARM_GENERIC_INTERRUPT;
 
@@ -945,6 +959,70 @@ typedef struct CmArmLpiInfo {
   */
   CHAR8                                   StateName[16];
 } CM_ARM_LPI_INFO;
+
+/** A structure that describes a PCI Address Map.
+
+  The memory-ranges used by the PCI bus are described by this object.
+
+  ID: EArmObjPciAddressMapInfo
+*/
+typedef struct CmArmPciAddressMapInfo {
+  /** Pci address space code
+
+  Available values are:
+   - 0: Configuration Space
+   - 1: I/O Space
+   - 2: 32-bit-address Memory Space
+   - 3: 64-bit-address Memory Space
+  */
+  UINT8                     SpaceCode;
+
+  /// PCI address
+  UINT64                    PciAddress;
+
+  /// Cpu address
+  UINT64                    CpuAddress;
+
+  /// Address size
+  UINT64                    AddressSize;
+} CM_ARM_PCI_ADDRESS_MAP_INFO;
+
+/** A structure that describes a PCI Interrupt Map.
+
+  The legacy PCI interrupts used by PCI devices are described by this object.
+
+  Cf Devicetree Specification - Release v0.3
+  s2.4.3 "Interrupt Nexus Properties"
+
+  ID: EArmObjPciInterruptMapInfo
+*/
+typedef struct CmArmPciInterruptMapInfo {
+  /// Pci Bus.
+  /// Value on 8 bits (max 255).
+  UINT8                       PciBus;
+
+  /// Pci Bus.
+  /// Value on 5 bits (max 31).
+  UINT8                       PciDevice;
+
+  /** PCI interrupt
+
+  ACPI bindings are used:
+  Cf. ACPI 6.4, s6.2.13 _PRT (PCI Routing Table):
+      "0-INTA, 1-INTB, 2-INTC, 3-INTD"
+
+  Device-tree bindings are shifted by 1:
+      "INTA=1, INTB=2, INTC=3, INTD=4"
+  */
+  UINT8                       PciInterrupt;
+
+  /** Interrupt controller interrupt.
+
+  Cf Devicetree Specification - Release v0.3
+  s2.4.3 "Interrupt Nexus Properties": "parent interrupt specifier"
+  */
+  CM_ARM_GENERIC_INTERRUPT    IntcInterrupt;
+} CM_ARM_PCI_INTERRUPT_MAP_INFO;
 
 #pragma pack()
 
