@@ -125,6 +125,12 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
                     build_these_packages = possible_packages
                     break
 
+            # any python environment dependency change should trigger
+            # platform ci
+            if f.endswith("pip-requirements.txt"):
+                build_these_packages = possible_packages
+                break
+
             # if the azure pipeline platform template file changed
             if "platform-build-run-steps.yml" in f:
                 build_these_packages = possible_packages
