@@ -26,6 +26,60 @@
 extern VOID  *mHobList;
 
 /**
+  Find DXE core from FV and build DXE core HOBs.
+
+  @param[in]   FvBase                FV base to load DXE core from
+  @param[out]  DxeCoreEntryPoint     DXE core entry point
+
+  @retval EFI_SUCCESS        If it completed successfully.
+  @retval EFI_NOT_FOUND      If it failed to load DXE FV.
+**/
+EFI_STATUS
+FixUpPcdDatabase (
+  IN  EFI_FIRMWARE_VOLUME_HEADER *DxeFv
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_FFS_FILE_HEADER         *FileHeader;
+  VOID                        *PcdRawData;
+  PEI_PCD_DATABASE            *PeiDatabase;
+  PEI_PCD_DATABASE            *UplDatabase;
+  EFI_HOB_GUID_TYPE           *GuidHob;
+  DYNAMICEX_MAPPING           *ExMapTable;
+  UINTN                       Index;
+
+  GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
+  if (GuidHob == NULL) {
+    //
+    // No fix-up is needed.
+    //
+    return EFI_SUCCESS;
+  }
+  PeiDatabase = (PEI_PCD_DATABASE *) GET_GUID_HOB_DATA (GuidHob);
+  DEBUG ((DEBUG_INFO, "Find the Pei PCD data base, the total local token number is %d\n", PeiDatabase->LocalTokenCount));
+
+  Status = FvFindFileByTypeGuid (DxeFv, EFI_FV_FILETYPE_DRIVER, PcdGetPtr (PcdPcdDriverFile), &FileHeader);
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = FileFindSection (FileHeader, EFI_SECTION_RAW, &PcdRawData);
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  UplDatabase = (PEI_PCD_DATABASE *) PcdRawData;
+  ExMapTable  = (DYNAMICEX_MAPPING *) (UINTN) ((UINTN) PcdRawData + UplDatabase->ExMapTableOffset);
+
+  for (Index = 0; Index < UplDatabase->ExTokenCount; Index++) {
+    ExMapTable[Index].TokenNumber += PeiDatabase->LocalTokenCount;
+  }
+  DEBUG ((DEBUG_INFO, "Fix up UPL PCD database successfully\n"));
+  return EFI_SUCCESS;
+}
+
+/**
   Add HOB into HOB list
 
   @param[in]  Hob    The HOB to be added into the HOB list.
@@ -327,6 +381,7 @@ _ModuleEntryPoint (
   Status = BuildHobs (BootloaderParameter, &DxeFv);
   ASSERT_EFI_ERROR (Status);
 
+  FixUpPcdDatabase (DxeFv);
   Status = UniversalLoadDxeCore (DxeFv, &DxeCoreEntryPoint);
   ASSERT_EFI_ERROR (Status);
 

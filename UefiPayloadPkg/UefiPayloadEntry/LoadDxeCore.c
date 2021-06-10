@@ -114,20 +114,23 @@ LoadPeCoffImage (
 }
 
 /**
-  This function searchs a given file type within a valid FV.
+  This function searchs a given file type with a given Guid within a valid FV.
+  If input Guid is NULL, will locate the first section having the given file type
 
   @param FvHeader        A pointer to firmware volume header that contains the set of files
                          to be searched.
   @param FileType        File type to be searched.
+  @param Guid            Will ignore if it is NULL.
   @param FileHeader      A pointer to the discovered file, if successful.
 
   @retval EFI_SUCCESS    Successfully found FileType
   @retval EFI_NOT_FOUND  File type can't be found.
 **/
 EFI_STATUS
-FvFindFile (
+FvFindFileByTypeGuid (
   IN  EFI_FIRMWARE_VOLUME_HEADER  *FvHeader,
   IN  EFI_FV_FILETYPE             FileType,
+  IN  EFI_GUID                    *Guid           OPTIONAL,
   OUT EFI_FFS_FILE_HEADER         **FileHeader
   )
 {
@@ -172,7 +175,11 @@ FvFindFile (
     //
     if (File->Type == FileType) {
       *FileHeader = File;
-      return EFI_SUCCESS;
+      DEBUG ((DEBUG_ERROR, "FileHeader->Name = %g\n", File->Name));
+      if (Guid == NULL || CompareGuid(&File->Name, Guid)) {
+        *FileHeader = File;
+        return EFI_SUCCESS;
+      }
     }
   }
 
@@ -266,7 +273,7 @@ LoadDxeCore (
   //
   // DXE FV is inside Payload FV. Here find DXE FV from Payload FV
   //
-  Status = FvFindFile (PayloadFv, EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE, &FileHeader);
+  Status = FvFindFileByTypeGuid (PayloadFv, EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE, NULL, &FileHeader);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -279,11 +286,10 @@ LoadDxeCore (
   // Report DXE FV to DXE core
   //
   BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) DxeCoreFv, DxeCoreFv->FvLength);
-
   //
   // Find DXE core file from DXE FV
   //
-  Status = FvFindFile (DxeCoreFv, EFI_FV_FILETYPE_DXE_CORE, &FileHeader);
+  Status = FvFindFileByTypeGuid (DxeCoreFv, EFI_FV_FILETYPE_DXE_CORE, NULL, &FileHeader);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -330,7 +336,7 @@ UniversalLoadDxeCore (
   //
   // Find DXE core file from DXE FV
   //
-  Status = FvFindFile (DxeFv, EFI_FV_FILETYPE_DXE_CORE, &FileHeader);
+  Status = FvFindFileByTypeGuid (DxeFv, EFI_FV_FILETYPE_DXE_CORE, NULL, &FileHeader);
   if (EFI_ERROR (Status)) {
     return Status;
   }
