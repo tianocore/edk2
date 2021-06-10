@@ -801,6 +801,61 @@ AmlCodeGenNamePackage (
   return Status;
 }
 
+/** AML code generation for a Name object node, containing a ResourceTemplate.
+
+  AmlCodeGenNameResourceTemplate ("PRS0", ParentNode, NewObjectNode) is
+  equivalent of the following ASL code:
+    Name(PRS0, ResourceTemplate () {})
+
+  @param [in]  NameString     The new variable name.
+                              Must be a NULL-terminated ASL NameString
+                              e.g.: "DEV0", "DV15.DEV0", etc.
+                              The input string is copied.
+  @param [in]  ParentNode     If provided, set ParentNode as the parent
+                              of the node created.
+  @param [out] NewObjectNode  If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenNameResourceTemplate (
+  IN  CONST CHAR8              * NameString,
+  IN        AML_NODE_HEADER    * ParentNode,     OPTIONAL
+  OUT       AML_OBJECT_NODE   ** NewObjectNode   OPTIONAL
+  )
+{
+  EFI_STATUS          Status;
+  AML_OBJECT_NODE   * ResourceTemplateNode;
+
+  if ((NameString == NULL)  ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL))) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlCodeGenResourceTemplate (&ResourceTemplateNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlCodeGenName (
+             NameString,
+             ResourceTemplateNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    AmlDeleteTree ((AML_NODE_HEADER*)ResourceTemplateNode);
+  }
+
+  return Status;
+}
+
 /** AML code generation for a Device object node.
 
   AmlCodeGenDevice ("COM0", ParentNode, NewObjectNode) is
