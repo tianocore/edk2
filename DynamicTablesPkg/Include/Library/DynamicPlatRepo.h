@@ -13,6 +13,8 @@
 #ifndef DYNAMIC_PLAT_REPO_H_
 #define DYNAMIC_PLAT_REPO_H_
 
+#include <Protocol/ConfigurationManagerProtocol.h>
+
 /** A structure describing the platform configuration
     manager repository information
 */
@@ -109,4 +111,4 @@ DynamicPlatRepoShutdown (
   IN  DYNAMIC_PLATFORM_REPOSITORY_INFO * DynPlatRepo
   );
 
-#endif DYNAMIC_PLAT_REPO_H_
+#endif // DYNAMIC_PLAT_REPO_H_

@@ -43,6 +43,7 @@
   DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
   DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
+  DynamicTablesPkg/Library/Common/DynamicPlatRepo/DynamicPlatRepo.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
