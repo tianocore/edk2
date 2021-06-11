@@ -133,7 +133,8 @@ class SpellCheck(ICiBuildPlugin):
         #
         relpath = os.path.relpath(abs_pkg_path)
         cpsell_paths = " ".join(
-            [f"{relpath}/**/{x}" for x in package_relative_paths_to_spell_check])
+            # Double quote each path to defer expansion to cspell parameters
+            [f'"{relpath}/**/{x}"' for x in package_relative_paths_to_spell_check])
 
         # Make the config file
         config_file_path = os.path.join(
