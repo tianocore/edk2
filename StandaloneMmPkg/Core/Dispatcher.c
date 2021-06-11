@@ -4,7 +4,7 @@
   Step #1 - When a FV protocol is added to the system every driver in the FV
             is added to the mDiscoveredList. The Before, and After Depex are
             pre-processed as drivers are added to the mDiscoveredList. If an Apriori
-            file exists in the FV those drivers are addeded to the
+            file exists in the FV those drivers are added to the
             mScheduledQueue. The mFwVolList is used to make sure a
             FV is only processed once.
 
