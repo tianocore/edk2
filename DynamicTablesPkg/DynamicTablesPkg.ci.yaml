@@ -5,6 +5,22 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        "9005", "@defgroup",      # Use extra Doxygen commands
+        "9005", "@ingroup",       # Use extra Doxygen commands
+        "9005", "@mainpage",      # Use extra Doxygen commands
+        "9005", "@ref",           # Use extra Doxygen commands
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+        ]
+    },
+
     ## options defined .pytool/Plugin/CompilerPlugin
     "CompilerPlugin": {
         "DscPath": "DynamicTablesPkg.dsc"

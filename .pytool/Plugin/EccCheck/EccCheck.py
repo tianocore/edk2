@@ -272,6 +272,7 @@ class EccCheck(ICiBuildPlugin):
             keyword_node.appendChild(keyword_node_text_value)
             customer_node.appendChild(keyword_node)
             error_code_node = dom_tree.createElement("ErrorID")
+            print(f"Pierre: {error_code}")
             error_code_text_value = dom_tree.createTextNode(error_code)
             error_code_node.appendChild(error_code_text_value)
             customer_node.appendChild(error_code_node)

@@ -68,7 +68,9 @@ class ExceptionCheck(object):
             self.ExceptionList = self.ExceptionListXml.ToList()
 
     def IsException(self, ErrorID, KeyWord, FileID=-1):
+        print(f"+++++ {ErrorID}   {KeyWord}")
         if (str(ErrorID), KeyWord.replace('\r\n', '\n')) in self.ExceptionList:
+            print(f"********* {ErrorID}   {KeyWord}")
             return True
         else:
             return False

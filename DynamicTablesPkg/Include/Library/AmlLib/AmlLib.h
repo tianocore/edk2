@@ -82,6 +82,31 @@ AmlParseDefinitionBlock (
   OUT       AML_ROOT_NODE_HANDLE          * RootPtr
   );
 
+/** Parse the definition block.
+
+  The function parses the whole AML blob. It starts with the ACPI DSDT/SSDT
+  header and then parses the AML bytestream.
+  A tree structure is returned via the RootPtr.
+  The tree must be deleted with the AmlDeleteTree function.
+
+  @ingroup UserApis
+
+  @param  [in]  DefinitionBlock   Pointer to the definition block.
+  @param  [out] RootPtr           Pointer to the root node of the AML tree.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_BUFFER_TOO_SMALL    No space left in the buffer.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlParseDefinitionBlock (
+  IN  CONST EFI_ACPI_DESCRIPTION_HEADER   * DefinitionBlock,
+  OUT       AML_ROOT_NODE_HANDLE          * RootPtr
+  );
+
+
 /** Serialize an AML definition block.
 
   This functions allocates memory with the "AllocateZeroPool ()"
