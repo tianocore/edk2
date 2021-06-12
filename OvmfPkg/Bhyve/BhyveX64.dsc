@@ -31,8 +31,6 @@
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE SMM_REQUIRE             = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
-  DEFINE TPM_ENABLE              = FALSE
-  DEFINE TPM_CONFIG_ENABLE       = FALSE
 
   #
   # Network definition
@@ -221,16 +219,8 @@
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
   XenPlatformLib|OvmfPkg/Library/XenPlatformLib/XenPlatformLib.inf
 
-
-!if $(TPM_ENABLE) == TRUE
-  Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
-  Tcg2PhysicalPresenceLib|OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.inf
-  Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
-  TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
-!else
   Tcg2PhysicalPresenceLib|OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
-!endif
 
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
@@ -291,11 +281,6 @@
 !endif
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiCpuExceptionHandlerLib.inf
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-
-!if $(TPM_ENABLE) == TRUE
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
-  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
-!endif
 
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
 
@@ -366,9 +351,6 @@
 !endif
   PciLib|OvmfPkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLibUp/MpInitLibUp.inf
-!if $(TPM_ENABLE) == TRUE
-  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
-!endif
 
 [LibraryClasses.common.UEFI_APPLICATION]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -563,21 +545,11 @@
 
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
 
-!if $(TPM_ENABLE) == TRUE
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-!endif
-
   # MdeModulePkg resolution sets up the system display resolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
-
-[PcdsDynamicHii]
-!if $(TPM_ENABLE) == TRUE && $(TPM_CONFIG_ENABLE) == TRUE
-  gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x8|3|NV,BS
-!endif
 
 ################################################################################
 #
@@ -618,19 +590,6 @@
     <LibraryClasses>
   }
 
-!if $(TPM_ENABLE) == TRUE
-  OvmfPkg/Bhyve/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
-    <LibraryClasses>
-      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
-  }
-!endif
-
   #
   # DXE Phase modules
   #
@@ -653,9 +612,6 @@
     <LibraryClasses>
 !if $(SECURE_BOOT_ENABLE) == TRUE
       NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
-!endif
-!if $(TPM_ENABLE) == TRUE
-      NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
 !endif
   }
 
@@ -841,23 +797,3 @@
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
   }
 
-
-  #
-  # TPM support
-  #
-!if $(TPM_ENABLE) == TRUE
-  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
-    <LibraryClasses>
-      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.inf
-      NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
-      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterDxe.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
-  }
-!if $(TPM_CONFIG_ENABLE) == TRUE
-  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
-!endif
-!endif
