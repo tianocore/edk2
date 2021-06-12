@@ -18,7 +18,6 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/XenPlatformLib.h>
 #include <IndustryStandard/Acpi.h>
 
 typedef struct {
@@ -44,12 +43,6 @@ BhyveInstallAcpiTable(
   IN   VOID                          *AcpiTableBuffer,
   IN   UINTN                         AcpiTableBufferSize,
   OUT  UINTN                         *TableKey
-  );
-
-EFI_STATUS
-EFIAPI
-InstallXenTables (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
   );
 
 EFI_STATUS
