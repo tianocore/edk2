@@ -158,11 +158,6 @@ INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 INF  OvmfPkg/Bhyve/SmmAccess/SmmAccessPei.inf
 !endif
 
-!if $(TPM_ENABLE) == TRUE
-INF  OvmfPkg/Bhyve/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-INF  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
-!endif
-
 ################################################################################
 
 [FV.DXEFV]
@@ -331,16 +326,6 @@ INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-!endif
-
-#
-# TPM support
-#
-!if $(TPM_ENABLE) == TRUE
-INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
-!if $(TPM_CONFIG_ENABLE) == TRUE
-INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
-!endif
 !endif
 
 ################################################################################
