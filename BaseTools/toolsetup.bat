@@ -299,7 +299,6 @@ IF NOT EXIST "%EDK_TOOLS_BIN%\GenFfs.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\GenFv.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\GenFw.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\GenSec.exe" goto check_c_tools
-IF NOT EXIST "%EDK_TOOLS_BIN%\Split.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\TianoCompress.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\VfrCompile.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\VolInfo.exe" goto check_c_tools
