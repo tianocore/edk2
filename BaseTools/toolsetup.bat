@@ -401,6 +401,8 @@ goto end
   if %ERRORLEVEL% EQU 0 (
     goto use_pip_basetools
   ) else (
+    REM reset ERRORLEVEL
+    type nul>nul
     goto use_builtin_basetools
   )
 
