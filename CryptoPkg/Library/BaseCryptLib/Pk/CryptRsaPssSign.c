@@ -59,7 +59,7 @@ GetEvpMD (
   If Message is NULL, then return FALSE.
   If MsgSize is zero or > INT_MAX, then return FALSE.
   If DigestLen is NOT 32, 48 or 64, return FALSE.
-  If SaltLen is < DigestLen, then return FALSE.
+  If SaltLen is not equal to DigestLen, then return FALSE.
   If SigSize is large enough but Signature is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
@@ -120,7 +120,7 @@ RsaPssSign (
     return FALSE;
   }
 
-  if (SaltLen < DigestLen) {
+  if (SaltLen != DigestLen) {
     return FALSE;
   }
 
