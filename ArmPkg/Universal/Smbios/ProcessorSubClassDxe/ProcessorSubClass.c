@@ -10,11 +10,11 @@
 
 #include <Uefi.h>
 #include <Protocol/Smbios.h>
+#include <IndustryStandard/ArmCache.h>
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/SmBios.h>
 #include <Library/ArmLib.h>
 #include <Library/ArmSmcLib.h>
-#include <Library/ArmLib/ArmLibPrivate.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
