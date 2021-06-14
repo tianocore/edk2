@@ -1474,6 +1474,9 @@ class ModuleAutoGen(AutoGen):
             for File in Files:
                 if File.lower().endswith('.pdb'):
                     AsBuiltInfDict['binary_item'].append('DISPOSABLE|' + File)
+
+        AsBuiltInfDict['binary_item'] = sorted(AsBuiltInfDict['binary_item'])
+
         HeaderComments = self.Module.HeaderComments
         StartPos = 0
         for Index in range(len(HeaderComments)):
@@ -1749,7 +1752,7 @@ class ModuleAutoGen(AutoGen):
             if os.path.exists (self.TimeStampPath):
                 os.remove (self.TimeStampPath)
 
-            SaveFileOnChange(self.TimeStampPath, "\n".join(FileSet), False)
+            SaveFileOnChange(self.TimeStampPath, "\n".join(sorted(FileSet)), False)
 
         # Ignore generating makefile when it is a binary module
         if self.IsBinaryModule:

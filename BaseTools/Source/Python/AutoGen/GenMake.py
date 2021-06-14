@@ -575,7 +575,7 @@ cleanlib:
                 os.remove(RespFileList)
 
         # convert source files and binary files to build targets
-        self.ResultFileList = [str(T.Target) for T in MyAgo.CodaTargetList]
+        self.ResultFileList = sorted([str(T.Target) for T in MyAgo.CodaTargetList])
         if len(self.ResultFileList) == 0 and len(MyAgo.SourceFileList) != 0:
             EdkLogger.error("build", AUTOGEN_ERROR, "Nothing to build",
                             ExtraData="[%s]" % str(MyAgo))
@@ -726,7 +726,7 @@ cleanlib:
         OutputFile = ''
         DepsFileList = []
 
-        for Cmd in self.GenFfsList:
+        for Cmd in sorted(self.GenFfsList):
             if Cmd[2]:
                 for CopyCmd in Cmd[2]:
                     Src, Dst = CopyCmd
@@ -759,7 +759,7 @@ cleanlib:
             self.BuildTargetList.append('\t%s' % CmdString)
 
             self.ParseSecCmd(DepsFileList, Cmd[1])
-            for SecOutputFile, SecDepsFile, SecCmd in self.FfsOutputFileList :
+            for SecOutputFile, SecDepsFile, SecCmd in sorted(self.FfsOutputFileList):
                 self.BuildTargetList.append('%s : %s' % (self.ReplaceMacro(SecOutputFile), self.ReplaceMacro(SecDepsFile)))
                 self.BuildTargetList.append('\t%s' % self.ReplaceMacro(SecCmd))
             self.FfsOutputFileList = []
@@ -798,13 +798,13 @@ cleanlib:
 
     def CommandExceedLimit(self):
         FlagDict = {
-                    'CC'    :  { 'Macro' : '$(CC_FLAGS)',    'Value' : False},
-                    'PP'    :  { 'Macro' : '$(PP_FLAGS)',    'Value' : False},
-                    'APP'   :  { 'Macro' : '$(APP_FLAGS)',   'Value' : False},
-                    'ASLPP' :  { 'Macro' : '$(ASLPP_FLAGS)', 'Value' : False},
-                    'VFRPP' :  { 'Macro' : '$(VFRPP_FLAGS)', 'Value' : False},
-                    'ASM'   :  { 'Macro' : '$(ASM_FLAGS)',   'Value' : False},
-                    'ASLCC' :  { 'Macro' : '$(ASLCC_FLAGS)', 'Value' : False},
+                    'CC'    :  { 'Macro' : '$(CC_FLAGS)',    'Value' : True},
+                    'PP'    :  { 'Macro' : '$(PP_FLAGS)',    'Value' : True},
+                    'APP'   :  { 'Macro' : '$(APP_FLAGS)',   'Value' : True},
+                    'ASLPP' :  { 'Macro' : '$(ASLPP_FLAGS)', 'Value' : True},
+                    'VFRPP' :  { 'Macro' : '$(VFRPP_FLAGS)', 'Value' : True},
+                    'ASM'   :  { 'Macro' : '$(ASM_FLAGS)',   'Value' : True},
+                    'ASLCC' :  { 'Macro' : '$(ASLCC_FLAGS)', 'Value' : True},
                    }
 
         RespDict = {}
@@ -1007,9 +1007,9 @@ cleanlib:
                 if not self.ObjTargetDict.get(T.Target.SubDir):
                     self.ObjTargetDict[T.Target.SubDir] = set()
                 self.ObjTargetDict[T.Target.SubDir].add(NewFile)
-        for Type in self._AutoGenObject.Targets:
+        for Type in sorted(self._AutoGenObject.Targets):
             resp_file_number = 0
-            for T in self._AutoGenObject.Targets[Type]:
+            for T in sorted(self._AutoGenObject.Targets[Type]):
                 # Generate related macros if needed
                 if T.GenFileListMacro and T.FileListMacro not in self.FileListMacros:
                     self.FileListMacros[T.FileListMacro] = []
