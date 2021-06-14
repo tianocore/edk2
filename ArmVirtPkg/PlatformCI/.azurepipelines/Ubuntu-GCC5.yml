@@ -86,6 +86,6 @@ jobs:
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
         extra_install_step:
-        - bash: sudo apt-get install qemu
-          displayName: Install qemu
+        - bash: sudo apt-get install qemu-system
+          displayName: Install qemu-system
           condition: and(gt(variables.pkg_count, 0), succeeded())
