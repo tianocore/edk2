@@ -1376,7 +1376,7 @@ RsaPkcs1Verify (
   If Message is NULL, then return FALSE.
   If MsgSize is zero or > INT_MAX, then return FALSE.
   If DigestLen is NOT 32, 48 or 64, return FALSE.
-  If SaltLen is < DigestLen, then return FALSE.
+  If SaltLen is not equal to DigestLen, then return FALSE.
   If SigSize is large enough but Signature is NULL, then return FALSE.
   If this interface is not supported, then return FALSE.
 
@@ -1411,7 +1411,7 @@ RsaPssSign (
   Verifies the RSA signature with RSASSA-PSS signature scheme defined in RFC 8017.
   Implementation determines salt length automatically from the signature encoding.
   Mask generation function is the same as the message digest algorithm.
-  Salt length should atleast be equal to digest length.
+  Salt length should be equal to digest length.
 
   @param[in]  RsaContext      Pointer to RSA context for signature verification.
   @param[in]  Message         Pointer to octet message to be verified.

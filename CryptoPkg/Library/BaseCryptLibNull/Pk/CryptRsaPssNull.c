@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   Verifies the RSA signature with RSASSA-PSS signature scheme defined in RFC 8017.
   Implementation determines salt length automatically from the signature encoding.
   Mask generation function is the same as the message digest algorithm.
-  Salt length should atleast be equal to digest length.
+  Salt length should be equal to digest length.
 
   @param[in]  RsaContext      Pointer to RSA context for signature verification.
   @param[in]  Message         Pointer to octet message to be verified.
