@@ -47,6 +47,7 @@
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "ArmVirtPkg/ArmVirtPkg.dec",
+            "DynamicTablesPkg/DynamicTablesPkg.dec",
             "NetworkPkg/NetworkPkg.dec",
             "ArmPkg/ArmPkg.dec",
             "OvmfPkg/OvmfPkg.dec",
@@ -97,6 +98,8 @@
         "AuditOnly": False,           # Fails right now with over 270 errors
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [
+            "armltd",
+            "ssdts",
             "setjump",
             "plong",
             "lparam",
