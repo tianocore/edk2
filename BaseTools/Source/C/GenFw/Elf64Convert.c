@@ -14,6 +14,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __GNUC__
 #include <windows.h>
 #include <io.h>
+#else
+#define _GNU_SOURCE
 #endif
 #include <assert.h>
 #include <stdio.h>
@@ -869,7 +871,7 @@ ScanSections64 (
   }
   mCoffOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
                 sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
-                strlen(mInImageName) + 1;
+                strlen(basename(mInImageName)) + 1;
 
   mCoffOffset = CoffAlign(mCoffOffset);
   if (SectionCount == 0) {
@@ -1712,7 +1714,7 @@ WriteDebug64 (
   EFI_IMAGE_DEBUG_DIRECTORY_ENTRY     *Dir;
   EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY *Nb10;
 
-  Len = strlen(mInImageName) + 1;
+  Len = strlen(basename(mInImageName)) + 1;
 
   Dir = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY*)(mCoffFile + mDebugOffset);
   Dir->Type = EFI_IMAGE_DEBUG_TYPE_CODEVIEW;
@@ -1722,7 +1724,7 @@ WriteDebug64 (
 
   Nb10 = (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY*)(Dir + 1);
   Nb10->Signature = CODEVIEW_SIGNATURE_NB10;
-  strcpy ((char *)(Nb10 + 1), mInImageName);
+  strcpy ((char *)(Nb10 + 1), basename(mInImageName));
 
 
   NtHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)(mCoffFile + mNtHdrOffset);

@@ -70,6 +70,9 @@ class TargetDescBlock(object):
         else:
             return str(Other) == self.Target.Path
 
+    def __lt__(self, other):
+        return str(self) < str(other)
+
     def AddInput(self, Input):
         if Input not in self.Inputs:
             self.Inputs.append(Input)
