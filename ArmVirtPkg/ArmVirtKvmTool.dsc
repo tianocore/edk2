@@ -1,7 +1,7 @@
 #  @file
 #  Workspace file for KVMTool virtual platform.
 #
-#  Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.
+#  Copyright (c) 2018 - 2021, ARM Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -60,7 +60,7 @@
   PciPcdProducerLib|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|ArmVirtPkg/Library/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
-  PciHostBridgeUtilityLib|OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
+  PciHostBridgeUtilityLib|ArmVirtPkg/Library/ArmVirtPciHostBridgeUtilityLib/ArmVirtPciHostBridgeUtilityLib.inf
 
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
@@ -174,6 +174,17 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase|0x0
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
+
+  #
+  # PCI settings
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
+
+  # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
+  # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
+
+  gArmTokenSpaceGuid.PcdPciIoTranslation|0x0
 
   #
   # Set video resolution for boot options and for text setup.
@@ -322,3 +333,23 @@
   #
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+  #
+  # PCI support
+  #
+  ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf {
+    <LibraryClasses>
+      NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+      NULL|ArmVirtPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
+  }
+  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
+    <LibraryClasses>
+      NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+      NULL|ArmVirtPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
+  }
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
+    <LibraryClasses>
+      NULL|ArmVirtPkg/Library/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+      NULL|ArmVirtPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
+  }
+  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  OvmfPkg/Virtio10Dxe/Virtio10.inf
