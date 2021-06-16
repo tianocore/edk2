@@ -230,6 +230,7 @@ M: Hao A Wu <hao.a.wu@intel.com>
 MdeModulePkg: ACPI modules
 F: MdeModulePkg/Include/*Acpi*.h
 F: MdeModulePkg/Universal/Acpi/
+R: Zhiguang Liu <zhiguang.liu@intel.com>
 R: Dandan Bi <dandan.bi@intel.com>
 R: Liming Gao <gaoliming@byosoft.com.cn>
 
@@ -383,6 +384,7 @@ R: Zhichao Gao <zhichao.gao@intel.com>
 
 MdeModulePkg: SMBIOS modules
 F: MdeModulePkg/Universal/Smbios*/
+R: Zhiguang Liu <zhiguang.liu@intel.com>
 R: Dandan Bi <dandan.bi@intel.com>
 R: Star Zeng <star.zeng@intel.com>
 R: Zhichao Gao <zhichao.gao@intel.com>
