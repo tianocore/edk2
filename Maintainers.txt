@@ -397,6 +397,11 @@ F: MdeModulePkg/Universal/FaultTolerantWrite*/
 R: Hao A Wu <hao.a.wu@intel.com>
 R: Liming Gao <gaoliming@byosoft.com.cn>
 
+MdeModulePkg: Universal Payload definitions
+F: MdeModulePkg/Include/UniversalPayload/
+R: Zhiguang Liu <zhiguang.liu@intel.com>
+R: Ray Ni <ray.ni@intel.com>
+
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
