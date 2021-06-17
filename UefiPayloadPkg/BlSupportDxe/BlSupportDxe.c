@@ -41,13 +41,12 @@ ReserveResourceInGcd (
                     );
     if (EFI_ERROR (Status)) {
       DEBUG ((
-        DEBUG_ERROR,
+        DEBUG_WARN,
         "Failed to add memory space :0x%lx 0x%lx\n",
         BaseAddress,
         Length
         ));
     }
-    ASSERT_EFI_ERROR (Status);
     Status = gDS->AllocateMemorySpace (
                     EfiGcdAllocateAddress,
                     GcdType,
@@ -57,14 +56,20 @@ ReserveResourceInGcd (
                     ImageHandle,
                     NULL
                     );
-    ASSERT_EFI_ERROR (Status);
   } else {
     Status = gDS->AddIoSpace (
                     GcdType,
                     BaseAddress,
                     Length
                     );
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_WARN,
+        "Failed to add IO space :0x%lx 0x%lx\n",
+        BaseAddress,
+        Length
+        ));
+    }
     Status = gDS->AllocateIoSpace (
                     EfiGcdAllocateAddress,
                     GcdType,
@@ -74,7 +79,6 @@ ReserveResourceInGcd (
                     ImageHandle,
                     NULL
                     );
-    ASSERT_EFI_ERROR (Status);
   }
   return Status;
 }
@@ -106,11 +110,9 @@ BlDxeEntryPoint (
   //
   // Report MMIO/IO Resources
   //
-  Status = ReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFEC00000, SIZE_4KB, 0, ImageHandle); // IOAPIC
-  ASSERT_EFI_ERROR (Status);
+  ReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFEC00000, SIZE_4KB, 0, ImageHandle); // IOAPIC
 
-  Status = ReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFED00000, SIZE_1KB, 0, ImageHandle); // HPET
-  ASSERT_EFI_ERROR (Status);
+  ReserveResourceInGcd (TRUE, EfiGcdMemoryTypeMemoryMappedIo, 0xFED00000, SIZE_1KB, 0, ImageHandle); // HPET
 
   //
   // Find the frame buffer information and update PCDs
