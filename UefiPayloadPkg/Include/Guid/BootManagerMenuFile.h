@@ -15,8 +15,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack (1)
 
 typedef struct {
-  PLD_GENERIC_HEADER   Header;
-  GUID                 PassedGUID;
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER   Header;
+  GUID                               PassedGUID;
 } BOOT_MANAGER_MENU_FILE;
 
 #pragma pack()

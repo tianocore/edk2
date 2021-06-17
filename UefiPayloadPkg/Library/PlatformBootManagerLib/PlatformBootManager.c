@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PlatformBootManager.h"
 #include "PlatformConsole.h"
 #include <Protocol/PlatformBootManagerOverride.h>
+#include <Guid/BootManagerMenuFile.h>
+#include <Library/HobLib.h>
 
 UNIVERSAL_PAYLOAD_PLATFORM_BOOT_MANAGER_OVERRIDE_PROTOCOL  *mUniversalPayloadPlatformBootManagerOverrideInstance = NULL;
 
@@ -286,3 +288,39 @@ PlatformBootManagerUnableToBoot (
   return;
 }
 
+
+
+/**
+  Get/update PcdBootManagerMenuFile from GUID HOB which will be assigned in bootloader.
+
+  @retval EFI_SUCCESS       The entry point is executed successfully.
+  @retval other             Some error occurs.
+  
+**/
+EFI_STATUS
+EFIAPI
+PlatformBootManagerLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  ) 
+{
+  EFI_STATUS                         Status;
+  UINTN                              size;
+  VOID                               *GuidHob;
+  BOOT_MANAGER_MENU_FILE             *BootManagerMenuFile;
+  Status = EFI_SUCCESS;
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadBootManagerMenuFileGuid);
+  DEBUG((DEBUG_ERROR,"gUniversalPayloadBootManagerMenuFileGuid\n"));
+  //
+  // Find the buffer information and update PCDs
+  //
+  if (GuidHob != NULL) {
+    DEBUG((DEBUG_ERROR,"gUniversalPayloadBootManagerMenuFileGuid2\n"));
+    BootManagerMenuFile = (BOOT_MANAGER_MENU_FILE *)GET_GUID_HOB_DATA (GuidHob);
+    size = sizeof(BootManagerMenuFile->PassedGUID);
+    Status = PcdSetPtrS (PcdBootManagerMenuFile, &size, &BootManagerMenuFile->PassedGUID);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return EFI_SUCCESS;
+}
