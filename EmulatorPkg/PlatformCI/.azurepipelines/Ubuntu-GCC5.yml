@@ -47,27 +47,6 @@ jobs:
             Build.Target: "NOOPT"
             Run.Flags: $(run_flags)
             Run: $(should_run)
-          EmulatorPkg_IA32_DEBUG:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: ""
-            Build.Target: "DEBUG"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          EmulatorPkg_IA32_RELEASE:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: ""
-            Build.Target: "RELEASE"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          EmulatorPkg_IA32_NOOPT:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: ""
-            Build.Target: "NOOPT"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
           EmulatorPkg_X64_FULL_DEBUG:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "X64"
@@ -89,27 +68,6 @@ jobs:
             Build.Target: "NOOPT"
             Run.Flags: $(run_flags)
             Run: $(should_run)
-          EmulatorPkg_IA32_FULL_DEBUG:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE"
-            Build.Target: "DEBUG"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          EmulatorPkg_IA32_FULL_RELEASE:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE"
-            Build.Target: "RELEASE"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          EmulatorPkg_IA32_FULL_NOOPT:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE"
-            Build.Target: "NOOPT"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
 
     workspace:
       clean: all
@@ -127,14 +85,3 @@ jobs:
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
-        # Add steps to install some IA32 only dependencies
-        extra_install_step:
-        - bash: sudo dpkg --add-architecture i386
-          displayName: Add i386 to dpkg
-          condition: and(gt(variables.pkg_count, 0), eq(variables['Build.Arch'], 'IA32'), succeeded())
-        - bash: sudo apt-get update
-          displayName: do apt-get update
-          condition: and(gt(variables.pkg_count, 0), eq(variables['Build.Arch'], 'IA32'), succeeded())
-        - bash: sudo apt-get install libc6-dev:i386 libx11-dev:i386 libxext-dev:i386 lib32gcc-7-dev
-          displayName: Add additional i386 packages
-          condition: and(gt(variables.pkg_count, 0), eq(variables['Build.Arch'], 'IA32'), succeeded())

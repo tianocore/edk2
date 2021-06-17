@@ -33,6 +33,8 @@
   gArmTokenSpaceGuid.PcdFdBaseAddress|0x0
   gArmTokenSpaceGuid.PcdFdSize|0x1000
 
+!include MdePkg/MdeLibs.dsc.inc
+
 [LibraryClasses.common]
   ArmGicArchLib|ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
   ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf

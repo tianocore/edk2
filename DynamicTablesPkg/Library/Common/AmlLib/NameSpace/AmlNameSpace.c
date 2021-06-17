@@ -1,7 +1,7 @@
 /** @file
   AML NameSpace.
 
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -1075,10 +1075,8 @@ AmlEnumeratePathCallback (
   AML_PATH_SEARCH_CONTEXT   * PathSearchContext;
 
   AML_STREAM                * SearchPathBStream;
-  CHAR8                     * SearchedPath;
 
   AML_STREAM                * CurrNodePathBStream;
-  CHAR8                     * CurrNodePath;
   UINT32                      CurrNodePathSize;
 
   ContinueEnum = TRUE;
@@ -1122,9 +1120,6 @@ AmlEnumeratePathCallback (
     ContinueEnum = FALSE;
     goto exit_handler;
   }
-
-  SearchedPath = (CHAR8*)AmlStreamGetCurrPos (SearchPathBStream);
-  CurrNodePath = (CHAR8*)AmlStreamGetCurrPos (CurrNodePathBStream);
 
   // Get the raw AML absolute pathname of the current node.
   Status1 = AmlGetRawNameSpacePath (Node, 0, CurrNodePathBStream);

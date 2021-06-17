@@ -1,10 +1,10 @@
 /** @file
-*  Main file supporting the transition to PEI Core in Normal World for Versatile Express
-*
-*  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
+  Main file supporting the transition to PEI Core in Normal World for Versatile Express
+
+  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #include <Library/BaseLib.h>

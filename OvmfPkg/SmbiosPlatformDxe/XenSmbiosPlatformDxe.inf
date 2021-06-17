@@ -1,0 +1,62 @@
+## @file
+#  This driver installs SMBIOS information for OVMF on Xen
+#
+#  Copyright (C) 2021, Red Hat, Inc.
+#  Copyright (c) 2011, Bei Guan <gbtju85@gmail.com>
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenSmbiosPlatformDxe
+  FILE_GUID                      = c41f0579-5598-40f1-95db-3983c8ebbe2a
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = XenSmbiosTablePublishEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
+#
+
+[Sources]
+  SmbiosPlatformDxe.c
+  SmbiosPlatformDxe.h
+  Xen.c
+  XenSmbiosPlatformDxe.h
+
+[Sources.IA32, Sources.X64]
+  X86Xen.c
+
+[Sources.ARM, Sources.AARCH64]
+  ArmXen.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[Packages.IA32, Packages.X64]
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  BaseLib
+  HobLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+
+[Guids.IA32, Guids.X64]
+  gEfiXenInfoGuid
+
+[Depex]
+  gEfiSmbiosProtocolGuid
+

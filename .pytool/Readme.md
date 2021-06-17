@@ -4,8 +4,8 @@
 
 | Package              | Windows VS2019 (IA32/X64)| Ubuntu GCC (IA32/X64/ARM/AARCH64) | Known Issues |
 | :----                | :-----                   | :----                             | :---         |
-| ArmPkg               |
-| ArmPlatformPkg       |
+| ArmPkg               |                    | :heavy_check_mark: |
+| ArmPlatformPkg       |                    | :heavy_check_mark: |
 | ArmVirtPkg           | SEE PACKAGE README | SEE PACKAGE README |
 | CryptoPkg            | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
 | DynamicTablesPkg     |                    | :heavy_check_mark: |
@@ -253,6 +253,16 @@ Install
   2. Run `npm install -g cspell`
 
   More cspell info: https://github.com/streetsidesoftware/cspell
+
+### License Checking - LicenseCheck
+
+Scans all new added files in a package to make sure code is contributed under
+BSD-2-Clause-Patent.
+
+### Ecc tool - EccCheck
+
+Run the Ecc tool on the package. The Ecc tool is available in the BaseTools
+package. It checks that the code complies to the EDKII coding standard.
 
 ## PyTool Scopes
 

@@ -1,6 +1,7 @@
 ## @file
 # This file is used to define checkpoints used by ECC tool
 #
+# Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 # Copyright (c) 2008 - 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -1436,11 +1437,13 @@ class Check(object):
 
             SqlCommand = """select ID, Value from %s where Model = %s""" % (FileTable, MODEL_IDENTIFIER_MACRO_IFNDEF)
             RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
-            for Record in RecordSet:
-                Name = Record[1].replace('#ifndef', '').strip()
-                if Name[-1] != '_':
+            if RecordSet:
+                # Only check the first ifndef statement of the file
+                FirstDefine = sorted(RecordSet, key=lambda Record: Record[0])[0]
+                Name = FirstDefine[1].replace('#ifndef', '').strip()
+                if Name[0] == '_' or Name[-1] != '_' or Name[-2] == '_':
                     if not EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_IFNDEF_STATEMENT, Name):
-                        EccGlobalData.gDb.TblReport.Insert(ERROR_NAMING_CONVENTION_CHECK_IFNDEF_STATEMENT, OtherMsg="The #ifndef name [%s] does not follow the rules" % (Name), BelongsToTable=FileTable, BelongsToItem=Record[0])
+                        EccGlobalData.gDb.TblReport.Insert(ERROR_NAMING_CONVENTION_CHECK_IFNDEF_STATEMENT, OtherMsg="The #ifndef name [%s] does not follow the rules" % (Name), BelongsToTable=FileTable, BelongsToItem=FirstDefine[0])
 
     # Rule for path name, variable name and function name
     # 1. First character should be upper case

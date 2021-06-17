@@ -1,7 +1,7 @@
 ## @file
 #  SSDT Serial Port fixup Library
 #
-#  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -28,3 +28,5 @@
   AmlLib
   BaseLib
 
+[Pcd]
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdNonBsaCompliant16550SerialHid

@@ -1,0 +1,240 @@
+## @file
+# CI configuration for ArmPkg
+#
+# Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    ## options defined .pytool/Plugin/LicenseCheck
+    "LicenseCheck": {
+        "IgnoreFiles": []
+    },
+
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+            "Library/ArmSoftFloatLib/berkeley-softfloat-3"
+        ]
+    },
+
+    ## options defined .pytool/Plugin/CompilerPlugin
+    "CompilerPlugin": {
+        "DscPath": "ArmPkg.dsc"
+    },
+
+    ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "" # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/CharEncodingCheck
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+
+    ## options defined .pytool/Plugin/DependencyCheck
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "ArmPlatformPkg/ArmPlatformPkg.dec",
+            "ArmPkg/ArmPkg.dec",
+            "EmbeddedPkg/EmbeddedPkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "MdePkg/MdePkg.dec",
+            "ShellPkg/ShellPkg.dec"
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "IgnoreInf": []
+    },
+
+    ## options defined .pytool/Plugin/DscCompleteCheck
+    "DscCompleteCheck": {
+        "IgnoreInf": [],
+        "DscPath": "ArmPkg.dsc"
+    },
+
+    ## options defined .pytool/Plugin/HostUnitTestDscCompleteCheck
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": "" # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/GuidCheck
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": [],
+        "IgnoreDuplicates": [],
+    },
+
+    ## options defined .pytool/Plugin/LibraryClassCheck
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined .pytool/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": False,
+        "IgnoreFiles": [
+            "Library/ArmSoftFloatLib/berkeley-softfloat-3/**"
+        ],                           # use gitignore syntax to ignore errors
+                                     # in matching files
+        "ExtendWords": [
+          "api's",
+          "ackintid",
+          "actlr",
+          "aeabi",
+          "asedis",
+          "ashldi",
+          "ashrdi",
+          "baddr",
+          "ccidx",
+          "ccsidr",
+          "clidr",
+          "clrex",
+          "clzsi",
+          "cnthctl",
+          "cortexa",
+          "cpacr",
+          "cpuactlr",
+          "csselr",
+          "ctzsi",
+          "cygdrive",
+          "cygpaths",
+          "datas",
+          "dcmpeq",
+          "dcmpge",
+          "dcmpgt",
+          "dcmple",
+          "dcmplt",
+          "ddisable",
+          "divdi",
+          "divsi",
+          "dmdepkg",
+          "dpref",
+          "drsub",
+          "fcmpeq",
+          "fcmpge",
+          "fcmpgt",
+          "fcmple",
+          "fcmplt",
+          "ffreestanding",
+          "frsub",
+          "hisilicon",
+          "iccabpr",
+          "iccbpr",
+          "icciar",
+          "iccicr",
+          "icciidr",
+          "iccpir",
+          "iccpmr",
+          "iccrpr",
+          "icdabr",
+          "icdicer",
+          "icdicfr",
+          "icdicpr",
+          "icdictr",
+          "icdiidr",
+          "icdiser",
+          "icdisr",
+          "icdppisr",
+          "icdsgir",
+          "icdspr",
+          "icenabler",
+          "intid",
+          "ipriority",
+          "irouter",
+          "isenabler",
+          "istatus",
+          "itargets",
+          "lable",
+          "ldivmod",
+          "ldmdb",
+          "ldmia",
+          "ldrbt",
+          "ldrex",
+          "ldrexb",
+          "ldrexd",
+          "ldrexh",
+          "ldrhbt",
+          "ldrht",
+          "ldrsb",
+          "ldrsbt",
+          "ldrsh",
+          "lshrdi",
+          "moddi",
+          "modsi",
+          "mpcore",
+          "mpidr",
+          "muldi",
+          "mullu",
+          "nonshareable",
+          "nsacr",
+          "nsasedis",
+          "nuvia",
+          "oldit",
+          "pcten",
+          "plpis",
+          "procno",
+          "readc",
+          "revsh",
+          "rfedb",
+          "sctlr",
+          "smccc",
+          "smlabb",
+          "smlabt",
+          "smlad",
+          "smladx",
+          "smlatb",
+          "smlatt",
+          "smlawb",
+          "smlawt",
+          "smlsd",
+          "smlsdx",
+          "smmla",
+          "smmlar",
+          "smmls",
+          "smmlsr",
+          "sourcery",
+          "srsdb",
+          "ssacr",
+          "stmdb",
+          "stmia",
+          "strbt",
+          "strexb",
+          "strexd",
+          "strexh",
+          "strht",
+          "switchu",
+          "tpidrurw",
+          "ttbcr",
+          "typer",
+          "ucmpdi",
+          "udivdi",
+          "udivmoddi",
+          "udivsi",
+          "uefi's",
+          "uldiv",
+          "umoddi",
+          "umodsi",
+          "usada",
+          "vlpis",
+          "writec"
+        ],                          # words to extend to the dictionary for this package
+        "IgnoreStandardPaths": [    # Standard Plugin defined paths that
+            "*.asm", "*.s"          # should be ignore
+        ],
+        "AdditionalIncludePaths": [] # Additional paths to spell check
+                                     # (wildcards supported)
+    }
+}

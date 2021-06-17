@@ -53,11 +53,10 @@ AmdSevDxeEntryPoint (
       Desc = &AllDescMap[Index];
       if (Desc->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo ||
           Desc->GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
-        Status = MemEncryptSevClearPageEncMask (
+        Status = MemEncryptSevClearMmioPageEncMask (
                    0,
                    Desc->BaseAddress,
-                   EFI_SIZE_TO_PAGES (Desc->Length),
-                   FALSE
+                   EFI_SIZE_TO_PAGES (Desc->Length)
                    );
         ASSERT_EFI_ERROR (Status);
       }
@@ -73,11 +72,10 @@ AmdSevDxeEntryPoint (
   // the range.
   //
   if (PcdGet16 (PcdOvmfHostBridgePciDevId) == INTEL_Q35_MCH_DEVICE_ID) {
-    Status = MemEncryptSevClearPageEncMask (
+    Status = MemEncryptSevClearMmioPageEncMask (
                0,
                FixedPcdGet64 (PcdPciExpressBaseAddress),
-               EFI_SIZE_TO_PAGES (SIZE_256MB),
-               FALSE
+               EFI_SIZE_TO_PAGES (SIZE_256MB)
                );
 
     ASSERT_EFI_ERROR (Status);
@@ -122,8 +120,7 @@ AmdSevDxeEntryPoint (
     Status = MemEncryptSevClearPageEncMask (
                0,             // Cr3BaseAddress -- use current CR3
                MapPagesBase,  // BaseAddress
-               MapPagesCount, // NumPages
-               TRUE           // Flush
+               MapPagesCount  // NumPages
                );
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: MemEncryptSevClearPageEncMask(): %r\n",

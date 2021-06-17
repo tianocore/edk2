@@ -1,7 +1,7 @@
 /** @file
   CPU MP Initialize Library common functions.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -485,14 +485,12 @@ CollectProcessorCount (
   CpuMpData->InitFlag = ApInitConfig;
   WakeUpAP (CpuMpData, TRUE, 0, NULL, NULL, TRUE);
   CpuMpData->InitFlag = ApInitDone;
+  //
+  // When InitFlag == ApInitConfig, WakeUpAP () guarantees all APs are checked in.
+  // FinishedCount is the number of check-in APs.
+  //
+  CpuMpData->CpuCount = CpuMpData->FinishedCount + 1;
   ASSERT (CpuMpData->CpuCount <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
-  //
-  // Wait for all APs finished the initialization
-  //
-  while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
-    CpuPause ();
-  }
-
 
   //
   // Enable x2APIC mode if
@@ -751,10 +749,6 @@ ApWakeupFunction (
   CurrentApicMode = GetApicMode ();
   while (TRUE) {
     if (CpuMpData->InitFlag == ApInitConfig) {
-      //
-      // Add CPU number
-      //
-      InterlockedIncrement ((UINT32 *) &CpuMpData->CpuCount);
       ProcessorNumber = ApIndex;
       //
       // This is first time AP wakeup, get BIST information from AP stack
@@ -769,15 +763,6 @@ ApWakeupFunction (
       RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
-
-      //
-      // Delay decrementing the APs executing count when SEV-ES is enabled
-      // to allow the APs to issue an AP_RESET_HOLD before the BSP possibly
-      // performs another INIT-SIPI-SIPI sequence.
-      //
-      if (!CpuMpData->SevEsIsEnabled) {
-        InterlockedDecrement ((UINT32 *) &CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
-      }
     } else {
       //
       // Execute AP function if AP is ready
@@ -866,19 +851,33 @@ ApWakeupFunction (
       }
     }
 
-    //
-    // AP finished executing C code
-    //
-    InterlockedIncrement ((UINT32 *) &CpuMpData->FinishedCount);
-
-    //
-    // Place AP is specified loop mode
-    //
     if (CpuMpData->ApLoopMode == ApInHltLoop) {
       //
       // Save AP volatile registers
       //
       SaveVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
+    }
+
+    //
+    // AP finished executing C code
+    //
+    InterlockedIncrement ((UINT32 *) &CpuMpData->FinishedCount);
+
+    if (CpuMpData->InitFlag == ApInitConfig) {
+      //
+      // Delay decrementing the APs executing count when SEV-ES is enabled
+      // to allow the APs to issue an AP_RESET_HOLD before the BSP possibly
+      // performs another INIT-SIPI-SIPI sequence.
+      //
+      if (!CpuMpData->SevEsIsEnabled) {
+        InterlockedDecrement ((UINT32 *) &CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
+      }
+    }
+
+    //
+    // Place AP is specified loop mode
+    //
+    if (CpuMpData->ApLoopMode == ApInHltLoop) {
       //
       // Place AP in HLT-loop
       //
@@ -1007,7 +1006,6 @@ FillExchangeInfoData (
   IA32_CR4                         Cr4;
 
   ExchangeInfo                  = CpuMpData->MpCpuExchangeInfo;
-  ExchangeInfo->Lock            = 0;
   ExchangeInfo->StackStart      = CpuMpData->Buffer;
   ExchangeInfo->StackSize       = CpuMpData->CpuApStackSize;
   ExchangeInfo->BufferStart     = CpuMpData->WakeupBuffer;
@@ -1166,20 +1164,6 @@ GetApResetVectorSize (
            AddressMap->SwitchToRealSize +
            sizeof (MP_CPU_EXCHANGE_INFO);
 
-  //
-  // The AP reset stack is only used by SEV-ES guests. Do not add to the
-  // allocation if SEV-ES is not enabled.
-  //
-  if (PcdGetBool (PcdSevEsIsEnabled)) {
-    //
-    // Stack location is based on APIC ID, so use the total number of
-    // processors for calculating the total stack area.
-    //
-    Size += AP_RESET_STACK_SIZE * PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
-
-    Size = ALIGN_VALUE (Size, CPU_STACK_ALIGNMENT);
-  }
-
   return Size;
 }
 
@@ -1194,6 +1178,7 @@ AllocateResetVector (
   )
 {
   UINTN           ApResetVectorSize;
+  UINTN           ApResetStackSize;
 
   if (CpuMpData->WakeupBuffer == (UINTN) -1) {
     ApResetVectorSize = GetApResetVectorSize (&CpuMpData->AddressMap);
@@ -1209,9 +1194,39 @@ AllocateResetVector (
                                     CpuMpData->AddressMap.ModeTransitionOffset
                                     );
     //
-    // The reset stack starts at the end of the buffer.
+    // The AP reset stack is only used by SEV-ES guests. Do not allocate it
+    // if SEV-ES is not enabled.
     //
-    CpuMpData->SevEsAPResetStackStart = CpuMpData->WakeupBuffer + ApResetVectorSize;
+    if (PcdGetBool (PcdSevEsIsEnabled)) {
+      //
+      // Stack location is based on ProcessorNumber, so use the total number
+      // of processors for calculating the total stack area.
+      //
+      ApResetStackSize = (AP_RESET_STACK_SIZE *
+                          PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+
+      //
+      // Invoke GetWakeupBuffer a second time to allocate the stack area
+      // below 1MB. The returned buffer will be page aligned and sized and
+      // below the previously allocated buffer.
+      //
+      CpuMpData->SevEsAPResetStackStart = GetWakeupBuffer (ApResetStackSize);
+
+      //
+      // Check to be sure that the "allocate below" behavior hasn't changed.
+      // This will also catch a failed allocation, as "-1" is returned on
+      // failure.
+      //
+      if (CpuMpData->SevEsAPResetStackStart >= CpuMpData->WakeupBuffer) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "SEV-ES AP reset stack is not below wakeup buffer\n"
+          ));
+
+        ASSERT (FALSE);
+        CpuDeadLoop ();
+      }
+    }
   }
   BackupAndPrepareWakeupBuffer (CpuMpData);
 }
@@ -1267,7 +1282,7 @@ SetSevEsJumpTable (
   UINT32            Offset, InsnByte;
   UINT8             LoNib, HiNib;
 
-  JmpFar = (SEV_ES_AP_JMP_FAR *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  JmpFar = (SEV_ES_AP_JMP_FAR *) (UINTN) FixedPcdGet32 (PcdSevEsWorkAreaBase);
   ASSERT (JmpFar != NULL);
 
   //
@@ -2137,6 +2152,31 @@ MpInitLibInitialize (
     }
   }
 
+  //
+  // Dump the microcode revision for each core.
+  //
+  DEBUG_CODE (
+    UINT32 ThreadId;
+    UINT32 ExpectedMicrocodeRevision;
+    CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
+    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+      GetProcessorLocationByApicId (CpuInfoInHob[Index].InitialApicId, NULL, NULL, &ThreadId);
+      if (ThreadId == 0) {
+        //
+        // MicrocodeDetect() loads microcode in first thread of each core, so,
+        // CpuMpData->CpuData[Index].MicrocodeEntryAddr is initialized only for first thread of each core.
+        //
+        ExpectedMicrocodeRevision = 0;
+        if (CpuMpData->CpuData[Index].MicrocodeEntryAddr != 0) {
+          ExpectedMicrocodeRevision = ((CPU_MICROCODE_HEADER *)(UINTN)CpuMpData->CpuData[Index].MicrocodeEntryAddr)->UpdateRevision;
+        }
+        DEBUG ((
+          DEBUG_INFO, "CPU[%04d]: Microcode revision = %08x, expected = %08x\n",
+          Index, CpuMpData->CpuData[Index].MicrocodeRevision, ExpectedMicrocodeRevision
+          ));
+      }
+    }
+  );
   //
   // Initialize global data for MP support
   //

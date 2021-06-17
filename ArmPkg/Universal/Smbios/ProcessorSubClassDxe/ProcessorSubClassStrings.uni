@@ -1,0 +1,24 @@
+/** @file
+  SMBIOS Type 4 strings
+
+  Copyright (c) 2021, NUVIA Inc. All rights reserved.
+  Copyright (c) 2015, Hisilicon Limited. All rights reserved.
+  Copyright (c) 2015, Linaro Limited. All rights reserved.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+/=#
+
+#langdef en-US "English"
+
+//
+// Processor Information
+//
+#string STR_PROCESSOR_SOCKET_DESIGNATION    #language en-US  "Not Specified"
+#string STR_PROCESSOR_MANUFACTURE           #language en-US  "Not Specified"
+#string STR_PROCESSOR_VERSION               #language en-US  "Not Specified"
+#string STR_PROCESSOR_SERIAL_NUMBER         #language en-US  "Not Specified"
+#string STR_PROCESSOR_ASSET_TAG             #language en-US  "Not Specified"
+#string STR_PROCESSOR_PART_NUMBER           #language en-US  "Not Specified"
+#string STR_PROCESSOR_UNKNOWN               #language en-US  "Unknown"

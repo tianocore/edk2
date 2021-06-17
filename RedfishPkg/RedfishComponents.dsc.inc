@@ -6,7 +6,7 @@
 # of EDKII Redfish drivers according to the value of flags described in
 # "RedfishDefines.dsc.inc".
 #
-# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2020-2021 Hewlett Packard Enterprise Development LP<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -17,4 +17,6 @@
   RedfishPkg/RedfishHostInterfaceDxe/RedfishHostInterfaceDxe.inf
   RedfishPkg/RedfishRestExDxe/RedfishRestExDxe.inf
   RedfishPkg/RedfishCredentialDxe/RedfishCredentialDxe.inf
+  RedfishPkg/RedfishDiscoverDxe/RedfishDiscoverDxe.inf
+  RedfishPkg/RedfishConfigHandler/RedfishConfigHandlerDriver.inf
 !endif

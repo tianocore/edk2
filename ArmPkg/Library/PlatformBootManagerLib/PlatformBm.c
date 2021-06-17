@@ -848,11 +848,15 @@ PlatformBootManagerUnableToBoot (
   // If the number of configured boot options has changed, reboot
   // the system so the new boot options will be taken into account
   // while executing the ordinary BDS bootflow sequence.
+  // *Unless* persistent varstore is being emulated, since we would
+  // then end up in an endless reboot loop.
   //
-  if (NewBootOptionCount != OldBootOptionCount) {
-    DEBUG ((DEBUG_WARN, "%a: rebooting after refreshing all boot options\n",
-      __FUNCTION__));
-    gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+  if (!PcdGetBool (PcdEmuVariableNvModeEnable)) {
+    if (NewBootOptionCount != OldBootOptionCount) {
+      DEBUG ((DEBUG_WARN, "%a: rebooting after refreshing all boot options\n",
+        __FUNCTION__));
+      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+    }
   }
 
   Status = EfiBootManagerGetBootManagerMenu (&BootManagerMenu);

@@ -165,10 +165,6 @@ CpuS3DataInitialize (
   UINTN                      NumberOfCpus;
   UINTN                      NumberOfEnabledProcessors;
   VOID                       *Stack;
-  UINTN                      TableSize;
-  CPU_REGISTER_TABLE         *RegisterTable;
-  UINTN                      Index;
-  EFI_PROCESSOR_INFORMATION  ProcessorInfoBuffer;
   UINTN                      GdtSize;
   UINTN                      IdtSize;
   VOID                       *Gdt;
@@ -255,34 +251,6 @@ CpuS3DataInitialize (
     AcpiCpuData->PreSmmInitRegisterTable = OldAcpiCpuData->PreSmmInitRegisterTable;
     AcpiCpuData->ApLocation              = OldAcpiCpuData->ApLocation;
     CopyMem (&AcpiCpuData->CpuStatus, &OldAcpiCpuData->CpuStatus, sizeof (CPU_STATUS_INFORMATION));
-  } else {
-    //
-    // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
-    //
-    TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
-    RegisterTable = (CPU_REGISTER_TABLE *)AllocateZeroPages (TableSize);
-    ASSERT (RegisterTable != NULL);
-
-    for (Index = 0; Index < NumberOfCpus; Index++) {
-      Status = MpServices->GetProcessorInfo (
-                           MpServices,
-                           Index,
-                           &ProcessorInfoBuffer
-                           );
-      ASSERT_EFI_ERROR (Status);
-
-      RegisterTable[Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
-      RegisterTable[Index].TableLength        = 0;
-      RegisterTable[Index].AllocatedSize      = 0;
-      RegisterTable[Index].RegisterTableEntry = 0;
-
-      RegisterTable[NumberOfCpus + Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
-      RegisterTable[NumberOfCpus + Index].TableLength        = 0;
-      RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
-      RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
-    }
-    AcpiCpuData->RegisterTable           = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
-    AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
   }
 
   //

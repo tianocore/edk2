@@ -1,7 +1,7 @@
 /** @file
   This code supports the implementation of the Smbios protocol
 
-Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -24,6 +24,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/PcdLib.h>
+#include <Library/HobLib.h>
+#include <UniversalPayload/SmbiosTable.h>
 
 #define SMBIOS_INSTANCE_SIGNATURE SIGNATURE_32 ('S', 'B', 'i', 's')
 typedef struct {
@@ -120,5 +122,66 @@ SmbiosTableConstruction (
   BOOLEAN     Smbios32BitTable,
   BOOLEAN     Smbios64BitTable
   );
+
+/**
+  Validates a SMBIOS 3.0 table entry point.
+
+  @param  TableEntry       The SmBios table entry to validate.
+  @param  TableAddress     On exit, point to the smbios table addres.
+  @param  TableMaximumSize On exit, point to the maximum size of the table.
+
+  @retval TRUE           SMBIOS table entry point is valid.
+  @retval FALSE          SMBIOS table entry point is malformed.
+
+**/
+STATIC
+BOOLEAN
+IsValidSmbios30Table (
+  IN  VOID               *TableEntry,
+  OUT VOID               **TableAddress,
+  OUT UINTN              *TableMaximumSize
+  );
+
+/**
+  Validates a SMBIOS 2.0 table entry point.
+
+  @param  TableEntry       The SmBios table entry to validate.
+  @param  TableAddress     On exit, point to the smbios table addres.
+  @param  TableMaximumSize On exit, point to the maximum size of the table.
+
+  @retval TRUE           SMBIOS table entry point is valid.
+  @retval FALSE          SMBIOS table entry point is malformed.
+
+**/
+STATIC
+BOOLEAN
+IsValidSmbios20Table (
+  IN  VOID               *TableEntry,
+  OUT VOID               **TableAddress,
+  OUT UINTN              *TableMaximumSize
+  );
+
+/**
+  Validates a SMBIOS table entry point.
+
+  @param  TableEntry       The SmBios table entry to validate.
+  @param  TableAddress     On exit, point to the smbios table addres.
+  @param  TableMaximumSize On exit, point to the maximum size of the table.
+
+  @retval TRUE           SMBIOS table entry point is valid.
+  @retval FALSE          SMBIOS table entry point is malformed.
+
+**/
+typedef
+BOOLEAN
+(* IS_SMBIOS_TABLE_VALID) (
+  IN  VOID               *TableEntry,
+  OUT VOID               **TableAddress,
+  OUT UINTN              *TableMaximumSize
+  );
+typedef struct {
+  EFI_GUID               *Guid;
+  IS_SMBIOS_TABLE_VALID  IsValid;
+} IS_SMBIOS_TABLE_VALID_ENTRY;
 
 #endif

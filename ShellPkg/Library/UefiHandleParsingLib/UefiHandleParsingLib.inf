@@ -2,7 +2,7 @@
 #  Provides interface to advanced shell functionality for parsing both handle and protocol database.
 #  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
 #  (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-#  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+#  (C) Copyright 2015-2021 Hewlett Packard Enterprise Development LP<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -269,6 +269,8 @@
   gEfiHttpProtocolGuid                                    ## UNDEFINED
   gEfiHttpUtilitiesProtocolGuid                           ## UNDEFINED
   gEfiRestProtocolGuid                                    ## UNDEFINED
+  gEfiRestExProtocolGuid                                  ## UNDEFINED
+  gEfiRedfishDiscoverProtocolGuid                         ## UNDEFINED
   gEfiMmEndOfDxeProtocolGuid                              ## UNDEFINED
   gEfiMmIoTrapDispatchProtocolGuid                        ## UNDEFINED
   gEfiMmPowerButtonDispatchProtocolGuid                   ## UNDEFINED

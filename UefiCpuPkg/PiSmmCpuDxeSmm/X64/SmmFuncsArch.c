@@ -93,7 +93,7 @@ InitGdt (
       //
       // Setup top of known good stack as IST1 for each processor.
       //
-      *(UINTN *)(TssBase + TSS_X64_IST1_OFFSET) = (mSmmStackArrayBase + EFI_PAGE_SIZE + Index * mSmmStackSize);
+      *(UINTN *)(TssBase + TSS_X64_IST1_OFFSET) = (mSmmStackArrayBase + EFI_PAGE_SIZE + Index * (mSmmStackSize + mSmmShadowStackSize));
     }
   }
 
@@ -173,6 +173,7 @@ InitShadowStack (
 {
   UINTN       SmmShadowStackSize;
   UINT64      *InterruptSspTable;
+  UINT32      InterruptSsp;
 
   if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
     SmmShadowStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmShadowStackSize)));
@@ -191,7 +192,19 @@ InitShadowStack (
         ASSERT (mSmmInterruptSspTables != 0);
         DEBUG ((DEBUG_INFO, "mSmmInterruptSspTables - 0x%x\n", mSmmInterruptSspTables));
       }
-      mCetInterruptSsp = (UINT32)((UINTN)ShadowStack + EFI_PAGES_TO_SIZE(1) - sizeof(UINT64));
+
+      //
+      // The highest address on the stack (0xFF8) is a save-previous-ssp token pointing to a location that is 40 bytes away - 0xFD0.
+      // The supervisor shadow stack token is just above it at address 0xFF0. This is where the interrupt SSP table points.
+      // So when an interrupt of exception occurs, we can use SAVESSP/RESTORESSP/CLEARSSBUSY for the supervisor shadow stack,
+      // due to the reason the RETF in SMM exception handler cannot clear the BUSY flag with same CPL.
+      // (only IRET or RETF with different CPL can clear BUSY flag)
+      // Please refer to UefiCpuPkg/Library/CpuExceptionHandlerLib/X64 for the full stack frame at runtime.
+      //
+      InterruptSsp = (UINT32)((UINTN)ShadowStack + EFI_PAGES_TO_SIZE(1) - sizeof(UINT64));
+      *(UINT32 *)(UINTN)InterruptSsp = (InterruptSsp - sizeof(UINT64) * 4) | 0x2;
+      mCetInterruptSsp = InterruptSsp - sizeof(UINT64);
+
       mCetInterruptSspTable = (UINT32)(UINTN)(mSmmInterruptSspTables + sizeof(UINT64) * 8 * CpuIndex);
       InterruptSspTable = (UINT64 *)(UINTN)mCetInterruptSspTable;
       InterruptSspTable[1] = mCetInterruptSsp;

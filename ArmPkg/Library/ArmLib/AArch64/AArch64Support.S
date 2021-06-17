@@ -425,6 +425,9 @@ ASM_FUNC(ArmCallWFI)
   wfi
   ret
 
+ASM_FUNC(ArmReadIdAA64Mmfr2)
+  mrs   x0, ID_AA64MMFR2_EL1           // read EL1 MMFR2
+  ret
 
 ASM_FUNC(ArmReadMpidr)
   mrs   x0, mpidr_el1           // read EL1 MPIDR

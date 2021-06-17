@@ -23,16 +23,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/PcdLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/ArmMmSvc.h>
+#include <IndustryStandard/ArmFfaSvc.h>
 
 #define SPM_MAJOR_VER_MASK        0xFFFF0000
 #define SPM_MINOR_VER_MASK        0x0000FFFF
 #define SPM_MAJOR_VER_SHIFT       16
+#define FFA_NOT_SUPPORTED         -1
 
-#define SPM_MAJOR_VER             0
-#define SPM_MINOR_VER             1
+STATIC CONST UINT32 mSpmMajorVer = SPM_MAJOR_VERSION;
+STATIC CONST UINT32 mSpmMinorVer = SPM_MINOR_VERSION;
+
+STATIC CONST UINT32 mSpmMajorVerFfa = SPM_MAJOR_VERSION_FFA;
+STATIC CONST UINT32 mSpmMinorVerFfa = SPM_MINOR_VERSION_FFA;
 
 #define BOOT_PAYLOAD_VERSION      1
 
@@ -114,6 +120,7 @@ DelegatedEventLoop (
   IN ARM_SVC_ARGS *EventCompleteSvcArgs
   )
 {
+  BOOLEAN FfaEnabled;
   EFI_STATUS Status;
   UINTN SvcStatus;
 
@@ -125,16 +132,32 @@ DelegatedEventLoop (
     DEBUG ((DEBUG_INFO, "X1 :  0x%x\n", (UINT32) EventCompleteSvcArgs->Arg1));
     DEBUG ((DEBUG_INFO, "X2 :  0x%x\n", (UINT32) EventCompleteSvcArgs->Arg2));
     DEBUG ((DEBUG_INFO, "X3 :  0x%x\n", (UINT32) EventCompleteSvcArgs->Arg3));
+    DEBUG ((DEBUG_INFO, "X4 :  0x%x\n", (UINT32) EventCompleteSvcArgs->Arg4));
+    DEBUG ((DEBUG_INFO, "X5 :  0x%x\n", (UINT32) EventCompleteSvcArgs->Arg5));
+    DEBUG ((DEBUG_INFO, "X6 :  0x%x\n", (UINT32) EventCompleteSvcArgs->Arg6));
+    DEBUG ((DEBUG_INFO, "X7 :  0x%x\n", (UINT32) EventCompleteSvcArgs->Arg7));
 
-    Status = CpuDriverEntryPoint (
-               EventCompleteSvcArgs->Arg0,
-               EventCompleteSvcArgs->Arg3,
-               EventCompleteSvcArgs->Arg1
-               );
-
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "Failed delegated event 0x%x, Status 0x%x\n",
-              EventCompleteSvcArgs->Arg0, Status));
+    FfaEnabled = FeaturePcdGet (PcdFfaEnable);
+    if (FfaEnabled) {
+      Status = CpuDriverEntryPoint (
+                 EventCompleteSvcArgs->Arg0,
+                 EventCompleteSvcArgs->Arg6,
+                 EventCompleteSvcArgs->Arg3
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "Failed delegated event 0x%x, Status 0x%x\n",
+          EventCompleteSvcArgs->Arg3, Status));
+      }
+    } else {
+      Status = CpuDriverEntryPoint (
+                 EventCompleteSvcArgs->Arg0,
+                 EventCompleteSvcArgs->Arg3,
+                 EventCompleteSvcArgs->Arg1
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "Failed delegated event 0x%x, Status 0x%x\n",
+          EventCompleteSvcArgs->Arg0, Status));
+      }
     }
 
     switch (Status) {
@@ -158,8 +181,16 @@ DelegatedEventLoop (
       break;
     }
 
-    EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_SP_EVENT_COMPLETE_AARCH64;
-    EventCompleteSvcArgs->Arg1 = SvcStatus;
+    if (FfaEnabled) {
+      EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP_AARCH64;
+      EventCompleteSvcArgs->Arg1 = 0;
+      EventCompleteSvcArgs->Arg2 = 0;
+      EventCompleteSvcArgs->Arg3 = ARM_SVC_ID_SP_EVENT_COMPLETE_AARCH64;
+      EventCompleteSvcArgs->Arg4 = SvcStatus;
+    } else {
+      EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_SP_EVENT_COMPLETE_AARCH64;
+      EventCompleteSvcArgs->Arg1 = SvcStatus;
+    }
   }
 }
 
@@ -174,19 +205,34 @@ EFI_STATUS
 GetSpmVersion (VOID)
 {
   EFI_STATUS   Status;
-  UINT16       SpmMajorVersion;
-  UINT16       SpmMinorVersion;
+  UINT16       CalleeSpmMajorVer;
+  UINT16       CallerSpmMajorVer;
+  UINT16       CalleeSpmMinorVer;
+  UINT16       CallerSpmMinorVer;
   UINT32       SpmVersion;
   ARM_SVC_ARGS SpmVersionArgs;
 
-  SpmVersionArgs.Arg0 = ARM_SVC_ID_SPM_VERSION_AARCH32;
+  if (FeaturePcdGet (PcdFfaEnable)) {
+    SpmVersionArgs.Arg0 = ARM_SVC_ID_FFA_VERSION_AARCH32;
+    SpmVersionArgs.Arg1 = mSpmMajorVerFfa << SPM_MAJOR_VER_SHIFT;
+    SpmVersionArgs.Arg1 |= mSpmMinorVerFfa;
+    CallerSpmMajorVer = mSpmMajorVerFfa;
+    CallerSpmMinorVer = mSpmMinorVerFfa;
+  } else {
+    SpmVersionArgs.Arg0 = ARM_SVC_ID_SPM_VERSION_AARCH32;
+    CallerSpmMajorVer = mSpmMajorVer;
+    CallerSpmMinorVer = mSpmMinorVer;
+  }
 
   ArmCallSvc (&SpmVersionArgs);
 
   SpmVersion = SpmVersionArgs.Arg0;
+  if (SpmVersion == FFA_NOT_SUPPORTED) {
+    return EFI_UNSUPPORTED;
+  }
 
-  SpmMajorVersion = ((SpmVersion & SPM_MAJOR_VER_MASK) >> SPM_MAJOR_VER_SHIFT);
-  SpmMinorVersion = ((SpmVersion & SPM_MINOR_VER_MASK) >> 0);
+  CalleeSpmMajorVer = ((SpmVersion & SPM_MAJOR_VER_MASK) >> SPM_MAJOR_VER_SHIFT);
+  CalleeSpmMinorVer = ((SpmVersion & SPM_MINOR_VER_MASK) >> 0);
 
   // Different major revision values indicate possibly incompatible functions.
   // For two revisions, A and B, for which the major revision values are
@@ -195,21 +241,47 @@ GetSpmVersion (VOID)
   // revision A must work in a compatible way with revision B.
   // However, it is possible for revision B to have a higher
   // function count than revision A.
-  if ((SpmMajorVersion == SPM_MAJOR_VER) &&
-      (SpmMinorVersion >= SPM_MINOR_VER))
+  if ((CalleeSpmMajorVer == CallerSpmMajorVer) &&
+      (CalleeSpmMinorVer >= CallerSpmMinorVer))
   {
     DEBUG ((DEBUG_INFO, "SPM Version: Major=0x%x, Minor=0x%x\n",
-           SpmMajorVersion, SpmMinorVersion));
+           CalleeSpmMajorVer, CalleeSpmMinorVer));
     Status = EFI_SUCCESS;
   }
   else
   {
-    DEBUG ((DEBUG_INFO, "Incompatible SPM Versions.\n Current Version: Major=0x%x, Minor=0x%x.\n Expected: Major=0x%x, Minor>=0x%x.\n",
-            SpmMajorVersion, SpmMinorVersion, SPM_MAJOR_VER, SPM_MINOR_VER));
+    DEBUG ((DEBUG_INFO, "Incompatible SPM Versions.\n Callee Version: Major=0x%x, Minor=0x%x.\n Caller: Major=0x%x, Minor>=0x%x.\n",
+            CalleeSpmMajorVer, CalleeSpmMinorVer, CallerSpmMajorVer, CallerSpmMinorVer));
     Status = EFI_UNSUPPORTED;
   }
 
   return Status;
+}
+
+/**
+  Initialize parameters to be sent via SVC call.
+
+  @param[out]     InitMmFoundationSvcArgs  Args structure
+  @param[out]     Ret                      Return Code
+
+**/
+STATIC
+VOID
+InitArmSvcArgs (
+  OUT ARM_SVC_ARGS *InitMmFoundationSvcArgs,
+  OUT INT32 *Ret
+  )
+{
+  if (FeaturePcdGet (PcdFfaEnable)) {
+    InitMmFoundationSvcArgs->Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP_AARCH64;
+    InitMmFoundationSvcArgs->Arg1 = 0;
+    InitMmFoundationSvcArgs->Arg2 = 0;
+    InitMmFoundationSvcArgs->Arg3 = ARM_SVC_ID_SP_EVENT_COMPLETE_AARCH64;
+    InitMmFoundationSvcArgs->Arg4 = *Ret;
+  } else {
+    InitMmFoundationSvcArgs->Arg0 = ARM_SVC_ID_SP_EVENT_COMPLETE_AARCH64;
+    InitMmFoundationSvcArgs->Arg1 = *Ret;
+  }
 }
 
 /**
@@ -234,6 +306,7 @@ _ModuleEntryPoint (
   EFI_SECURE_PARTITION_BOOT_INFO          *PayloadBootInfo;
   ARM_SVC_ARGS                            InitMmFoundationSvcArgs;
   EFI_STATUS                              Status;
+  INT32                                   Ret;
   UINT32                                  SectionHeaderOffset;
   UINT16                                  NumberOfSections;
   VOID                                    *HobStart;
@@ -325,8 +398,16 @@ _ModuleEntryPoint (
   DEBUG ((DEBUG_INFO, "Shared Cpu Driver EP 0x%lx\n", (UINT64) CpuDriverEntryPoint));
 
 finish:
+  if (Status == RETURN_UNSUPPORTED) {
+    Ret = -1;
+  } else if (Status == RETURN_INVALID_PARAMETER) {
+    Ret = -2;
+  } else if (Status == EFI_NOT_FOUND) {
+    Ret = -7;
+  } else {
+    Ret = 0;
+  }
   ZeroMem (&InitMmFoundationSvcArgs, sizeof(InitMmFoundationSvcArgs));
-  InitMmFoundationSvcArgs.Arg0 = ARM_SVC_ID_SP_EVENT_COMPLETE_AARCH64;
-  InitMmFoundationSvcArgs.Arg1 = Status;
+  InitArmSvcArgs (&InitMmFoundationSvcArgs, &Ret);
   DelegatedEventLoop (&InitMmFoundationSvcArgs);
 }

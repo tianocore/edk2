@@ -91,11 +91,6 @@ XenConnect (
   VOID
   );
 
-EFI_STATUS
-InitializeXen (
-  VOID
-  );
-
 BOOLEAN
 XenDetect (
   VOID
@@ -125,6 +120,16 @@ EFI_STATUS
 XenGetE820Map (
   EFI_E820_ENTRY64 **Entries,
   UINT32 *Count
+  );
+
+EFI_STATUS
+PhysicalAddressIdentityMapping (
+  IN EFI_PHYSICAL_ADDRESS AddressToMap
+  );
+
+VOID
+CalibrateLapicTimer (
+  VOID
   );
 
 extern EFI_BOOT_MODE mBootMode;

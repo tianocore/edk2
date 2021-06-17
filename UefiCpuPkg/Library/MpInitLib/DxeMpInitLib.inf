@@ -1,7 +1,7 @@
 ## @file
 #  MP Initialize Library instance for DXE driver.
 #
-#  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -22,14 +22,13 @@
 #
 
 [Sources.IA32]
-  Ia32/MpEqu.inc
   Ia32/MpFuncs.nasm
 
 [Sources.X64]
-  X64/MpEqu.inc
   X64/MpFuncs.nasm
 
 [Sources.common]
+  MpEqu.inc
   DxeMpLib.c
   MpLib.c
   MpLib.h
@@ -53,6 +52,7 @@
   SynchronizationLib
   PcdLib
   VmgExitLib
+  MicrocodeLib
 
 [Protocols]
   gEfiTimerArchProtocolGuid                     ## SOMETIMES_CONSUMES

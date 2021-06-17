@@ -2,13 +2,14 @@
   OP-TEE specific header file.
 
   Copyright (c) 2018, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _OPTEE_H_
-#define _OPTEE_H_
+#ifndef OPTEE_LIB_H_
+#define OPTEE_LIB_H_
 
 /*
  * The 'Trusted OS Call UID' is supposed to return the following UUID for
@@ -45,12 +46,14 @@ typedef struct {
   UINT64    C;
 } OPTEE_MESSAGE_PARAM_VALUE;
 
+typedef union {
+  OPTEE_MESSAGE_PARAM_MEMORY   Memory;
+  OPTEE_MESSAGE_PARAM_VALUE    Value;
+} OPTEE_MESSAGE_PARAM_UNION;
+
 typedef struct {
   UINT64 Attribute;
-  union {
-    OPTEE_MESSAGE_PARAM_MEMORY   Memory;
-    OPTEE_MESSAGE_PARAM_VALUE    Value;
-  } Union;
+  OPTEE_MESSAGE_PARAM_UNION Union;
 } OPTEE_MESSAGE_PARAM;
 
 #define OPTEE_MAX_CALL_PARAMS       4
@@ -114,4 +117,4 @@ OpteeInvokeFunction (
   IN OUT OPTEE_INVOKE_FUNCTION_ARG       *InvokeFunctionArg
   );
 
-#endif
+#endif // OPTEE_LIB_H_

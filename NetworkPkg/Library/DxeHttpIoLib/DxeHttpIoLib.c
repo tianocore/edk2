@@ -189,6 +189,7 @@ HttpIoCreateIo (
   HttpIo->Http        = Http;
   HttpIo->Callback    = Callback;
   HttpIo->Context     = Context;
+  HttpIo->Timeout     = PcdGet32 (PcdHttpIoTimeout);
 
   if (ConfigData != NULL) {
     if (HttpIo->IpVersion == IP_VERSION_4) {

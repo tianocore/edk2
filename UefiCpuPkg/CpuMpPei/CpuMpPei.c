@@ -1,7 +1,7 @@
 /** @file
   CPU PEI Module installs CPU Multiple Processor PPI.
 
-  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -430,43 +430,6 @@ GetGdtr (
 }
 
 /**
-  Migrates the Global Descriptor Table (GDT) to permanent memory.
-
-  @retval   EFI_SUCCESS           The GDT was migrated successfully.
-  @retval   EFI_OUT_OF_RESOURCES  The GDT could not be migrated due to lack of available memory.
-
-**/
-EFI_STATUS
-MigrateGdt (
-  VOID
-  )
-{
-  EFI_STATUS          Status;
-  UINTN               GdtBufferSize;
-  IA32_DESCRIPTOR     Gdtr;
-  VOID                *GdtBuffer;
-
-  AsmReadGdtr ((IA32_DESCRIPTOR *) &Gdtr);
-  GdtBufferSize = sizeof (IA32_SEGMENT_DESCRIPTOR) -1 + Gdtr.Limit + 1;
-
-  Status =  PeiServicesAllocatePool (
-              GdtBufferSize,
-              &GdtBuffer
-              );
-  ASSERT (GdtBuffer != NULL);
-  if (EFI_ERROR (Status)) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  GdtBuffer = ALIGN_POINTER (GdtBuffer, sizeof (IA32_SEGMENT_DESCRIPTOR));
-  CopyMem (GdtBuffer, (VOID *) Gdtr.Base, Gdtr.Limit + 1);
-  Gdtr.Base = (UINTN) GdtBuffer;
-  AsmWriteGdtr (&Gdtr);
-
-  return EFI_SUCCESS;
-}
-
-/**
   Initializes CPU exceptions handlers for the sake of stack switch requirement.
 
   This function is a wrapper of InitializeCpuExceptionHandlersEx. It's mainly
@@ -532,13 +495,9 @@ InitializeMpExceptionStackSwitchHandlers (
   ExceptionNumber = FixedPcdGetSize (PcdCpuStackSwitchExceptionList);
   NewStackSize = FixedPcdGet32 (PcdCpuKnownGoodStackSize) * ExceptionNumber;
 
-  Status = PeiServicesAllocatePool (
-             NewStackSize * NumberOfProcessors,
-             (VOID **)&StackTop
-             );
+  StackTop = AllocatePages (EFI_SIZE_TO_PAGES (NewStackSize * NumberOfProcessors));
   ASSERT(StackTop != NULL);
-  if (EFI_ERROR (Status)) {
-    ASSERT_EFI_ERROR (Status);
+  if (StackTop == NULL) {
     return;
   }
   StackTop += NewStackSize  * NumberOfProcessors;

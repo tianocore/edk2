@@ -27,6 +27,8 @@
 #
 
 [Sources]
+  MmSmiHandlerProfileLib.c
+  MmSmiHandlerProfileLib.h
   SmmSmiHandlerProfileLib.c
 
 [Packages]
@@ -34,7 +36,7 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  SmmServicesTableLib
+  MmServicesTableLib
 
 [Guids]
   gSmiHandlerProfileGuid  ## CONSUMES   ## GUID # Locate protocol

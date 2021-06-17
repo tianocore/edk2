@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2021, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -22,16 +22,16 @@ extern EFI_GUID gArmScmiClockProtocolGuid;
 
 // Message Type for clock management protocol.
 typedef enum {
-  SCMI_MESSAGE_ID_CLOCK_ATTRIBUTES     = 0x3,
-  SCMI_MESSAGE_ID_CLOCK_DESCRIBE_RATES = 0x4,
-  SCMI_MESSAGE_ID_CLOCK_RATE_SET       = 0x5,
-  SCMI_MESSAGE_ID_CLOCK_RATE_GET       = 0x6,
-  SCMI_MESSAGE_ID_CLOCK_CONFIG_SET     = 0x7
+  ScmiMessageIdClockAttributes    = 0x3,
+  ScmiMessageIdClockDescribeRates = 0x4,
+  ScmiMessageIdClockRateSet       = 0x5,
+  ScmiMessageIdClockRateGet       = 0x6,
+  ScmiMessageIdClockConfigSet     = 0x7
 } SCMI_MESSAGE_ID_CLOCK;
 
 typedef enum {
-  SCMI_CLOCK_RATE_FORMAT_DISCRETE, // Non-linear range.
-  SCMI_CLOCK_RATE_FORMAT_LINEAR    // Linear range.
+  ScmiClockRateFormatDiscrete, // Non-linear range.
+  ScmiClockRateFormatLinear    // Linear range.
 } SCMI_CLOCK_RATE_FORMAT;
 
 // Clock management protocol version.
@@ -57,12 +57,18 @@ typedef enum {
    either Rate or Min/Max/Step triplet is valid.
 */
 typedef struct {
-  union {
   UINT64 Min;
-  UINT64 Rate;
-  };
   UINT64 Max;
   UINT64 Step;
+} SCMI_CLOCK_RATE_CONTINUOUS;
+
+typedef struct {
+  UINT64 Rate;
+} SCMI_CLOCK_RATE_DISCRETE;
+
+typedef union {
+  SCMI_CLOCK_RATE_CONTINUOUS ContinuousRate;
+  SCMI_CLOCK_RATE_DISCRETE DiscreteRate;
 } SCMI_CLOCK_RATE;
 
 #pragma pack()
@@ -133,10 +139,10 @@ EFI_STATUS
   @param[in] This        A pointer to SCMI_CLOCK_PROTOCOL Instance.
   @param[in] ClockId     Identifier for the clock device.
 
-  @param[out] Format      SCMI_CLOCK_RATE_FORMAT_DISCRETE: Clock device
+  @param[out] Format      ScmiClockRateFormatDiscrete: Clock device
                           supports range of clock rates which are non-linear.
 
-                          SCMI_CLOCK_RATE_FORMAT_LINEAR: Clock device supports
+                          ScmiClockRateFormatLinear: Clock device supports
                           range of linear clock rates from Min to Max in steps.
 
   @param[out] TotalRates  Total number of rates.

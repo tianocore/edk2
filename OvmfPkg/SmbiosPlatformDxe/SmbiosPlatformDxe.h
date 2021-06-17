@@ -8,41 +8,18 @@
 
 **/
 
-#ifndef _SMBIOS_PLATFORM_DXE_H_
-#define _SMBIOS_PLATFORM_DXE_H_
-
-#include <PiDxe.h>
-
-#include <Protocol/Smbios.h>
-#include <IndustryStandard/SmBios.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/MemoryAllocationLib.h>
-
+#ifndef SMBIOS_PLATFORM_DXE_H_
+#define SMBIOS_PLATFORM_DXE_H_
 
 /**
-  Locates the Xen SMBIOS data if it exists
+  Install all structures from the given SMBIOS structures block
 
-  @return SMBIOS_TABLE_ENTRY_POINT   Address of Xen SMBIOS data
-
-**/
-SMBIOS_TABLE_ENTRY_POINT *
-GetXenSmbiosTables (
-  VOID
-  );
-
-
-/**
-  Locates and extracts the QEMU SMBIOS table data if present in fw_cfg
-
-  @return             Address of extracted QEMU SMBIOS data
+  @param  TableAddress         SMBIOS tables starting address
 
 **/
-UINT8 *
-GetQemuSmbiosTables (
-  VOID
+EFI_STATUS
+InstallAllStructures (
+  IN UINT8                     *TableAddress
   );
 
 #endif

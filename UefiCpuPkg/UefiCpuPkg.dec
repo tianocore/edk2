@@ -1,7 +1,7 @@
 ## @file  UefiCpuPkg.dec
 # This Package provides UEFI compatible CPU modules and libraries.
 #
-# Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -58,6 +58,9 @@
 
   ##  @libraryclass  Provides function to get CPU cache information.
   CpuCacheInfoLib|Include/Library/CpuCacheInfoLib.h
+
+  ##  @libraryclass  Provides function for loading microcode.
+  MicrocodeLib|Include/Library/MicrocodeLib.h
 
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}

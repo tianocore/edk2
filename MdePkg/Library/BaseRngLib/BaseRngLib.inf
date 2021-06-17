@@ -1,9 +1,10 @@
 ## @file
 #  Instance of RNG (Random Number Generator) Library.
 #
-#  BaseRng Library that uses CPU RdRand instruction access to provide
-#  high-quality random numbers.
+#  BaseRng Library that uses CPU RNG instructions (e.g. RdRand) to
+#  provide random numbers.
 #
+#  Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
 #  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -22,11 +23,25 @@
   CONSTRUCTOR                    = BaseRngLibConstructor
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
-[Sources.Ia32, Sources.X64]
+[Sources]
   BaseRng.c
+  BaseRngLibInternals.h
+
+[Sources.Ia32, Sources.X64]
+  Rand/RdRand.c
+
+[Sources.AARCH64]
+  AArch64/Rndr.c
+  AArch64/ArmRng.h
+
+  AArch64/ArmReadIdIsar0.S   | GCC
+  AArch64/ArmRng.S           | GCC
+
+  AArch64/ArmReadIdIsar0.asm | MSFT
+  AArch64/ArmRng.asm         | MSFT
 
 [Packages]
   MdePkg/MdePkg.dec

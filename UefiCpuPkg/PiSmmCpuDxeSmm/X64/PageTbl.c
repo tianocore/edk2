@@ -13,6 +13,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define PAGE_TABLE_PAGES            8
 #define ACC_MAX_BIT                 BIT3
 
+extern UINTN mSmmShadowStackSize;
+
 LIST_ENTRY                          mPagePool = INITIALIZE_LIST_HEAD_VARIABLE (mPagePool);
 BOOLEAN                             m1GPageTableSupport = FALSE;
 BOOLEAN                             mCpuSmmRestrictedMemoryAccess;
@@ -209,11 +211,13 @@ CalculateMaximumSupportAddress (
 /**
   Set static page table.
 
-  @param[in] PageTable     Address of page table.
+  @param[in] PageTable              Address of page table.
+  @param[in] PhysicalAddressBits    The maximum physical address bits supported.
 **/
 VOID
 SetStaticPageTable (
-  IN UINTN               PageTable
+  IN UINTN               PageTable,
+  IN UINT8               PhysicalAddressBits
   )
 {
   UINT64                                        PageAddress;
@@ -235,26 +239,26 @@ SetStaticPageTable (
   // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses
   //  when 5-Level Paging is disabled.
   //
-  ASSERT (mPhysicalAddressBits <= 52);
-  if (!m5LevelPagingNeeded && mPhysicalAddressBits > 48) {
-    mPhysicalAddressBits = 48;
+  ASSERT (PhysicalAddressBits <= 52);
+  if (!m5LevelPagingNeeded && PhysicalAddressBits > 48) {
+    PhysicalAddressBits = 48;
   }
 
   NumberOfPml5EntriesNeeded = 1;
-  if (mPhysicalAddressBits > 48) {
-    NumberOfPml5EntriesNeeded = (UINTN) LShiftU64 (1, mPhysicalAddressBits - 48);
-    mPhysicalAddressBits = 48;
+  if (PhysicalAddressBits > 48) {
+    NumberOfPml5EntriesNeeded = (UINTN) LShiftU64 (1, PhysicalAddressBits - 48);
+    PhysicalAddressBits = 48;
   }
 
   NumberOfPml4EntriesNeeded = 1;
-  if (mPhysicalAddressBits > 39) {
-    NumberOfPml4EntriesNeeded = (UINTN) LShiftU64 (1, mPhysicalAddressBits - 39);
-    mPhysicalAddressBits = 39;
+  if (PhysicalAddressBits > 39) {
+    NumberOfPml4EntriesNeeded = (UINTN) LShiftU64 (1, PhysicalAddressBits - 39);
+    PhysicalAddressBits = 39;
   }
 
   NumberOfPdpEntriesNeeded = 1;
-  ASSERT (mPhysicalAddressBits > 30);
-  NumberOfPdpEntriesNeeded = (UINTN) LShiftU64 (1, mPhysicalAddressBits - 30);
+  ASSERT (PhysicalAddressBits > 30);
+  NumberOfPdpEntriesNeeded = (UINTN) LShiftU64 (1, PhysicalAddressBits - 30);
 
   //
   // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
@@ -436,7 +440,7 @@ SmmInitPageTable (
     // When access to non-SMRAM memory is restricted, create page table
     // that covers all memory space.
     //
-    SetStaticPageTable ((UINTN)PTEntry);
+    SetStaticPageTable ((UINTN)PTEntry, mPhysicalAddressBits);
   } else {
     //
     // Add pages to page pool
@@ -1014,6 +1018,7 @@ SmiPFHandler (
 {
   UINTN             PFAddress;
   UINTN             GuardPageAddress;
+  UINTN             ShadowStackGuardPageAddress;
   UINTN             CpuIndex;
 
   ASSERT (InterruptType == EXCEPT_IA32_PAGE_FAULT);
@@ -1030,18 +1035,24 @@ SmiPFHandler (
   }
 
   //
-  // If a page fault occurs in SMRAM range, it might be in a SMM stack guard page,
+  // If a page fault occurs in SMRAM range, it might be in a SMM stack/shadow stack guard page,
   // or SMM page protection violation.
   //
   if ((PFAddress >= mCpuHotPlugData.SmrrBase) &&
       (PFAddress < (mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize))) {
     DumpCpuContext (InterruptType, SystemContext);
     CpuIndex = GetCpuIndex ();
-    GuardPageAddress = (mSmmStackArrayBase + EFI_PAGE_SIZE + CpuIndex * mSmmStackSize);
+    GuardPageAddress = (mSmmStackArrayBase + EFI_PAGE_SIZE + CpuIndex * (mSmmStackSize + mSmmShadowStackSize));
+    ShadowStackGuardPageAddress = (mSmmStackArrayBase + mSmmStackSize + EFI_PAGE_SIZE + CpuIndex * (mSmmStackSize + mSmmShadowStackSize));
     if ((FeaturePcdGet (PcdCpuSmmStackGuard)) &&
         (PFAddress >= GuardPageAddress) &&
         (PFAddress < (GuardPageAddress + EFI_PAGE_SIZE))) {
       DEBUG ((DEBUG_ERROR, "SMM stack overflow!\n"));
+    } else if ((FeaturePcdGet (PcdCpuSmmStackGuard)) &&
+        (mSmmShadowStackSize > 0) &&
+        (PFAddress >= ShadowStackGuardPageAddress) &&
+        (PFAddress < (ShadowStackGuardPageAddress + EFI_PAGE_SIZE))) {
+      DEBUG ((DEBUG_ERROR, "SMM shadow stack overflow!\n"));
     } else {
       if ((SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_ID) != 0) {
         DEBUG ((DEBUG_ERROR, "SMM exception at execution (0x%lx)\n", PFAddress));

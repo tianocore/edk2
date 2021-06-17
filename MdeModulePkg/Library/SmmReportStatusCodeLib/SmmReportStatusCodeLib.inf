@@ -28,6 +28,8 @@
 
 [Sources]
   ReportStatusCodeLib.c
+  ReportStatusCodeLib.h
+  ReportStatusCodeLibTraditional.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -45,7 +47,7 @@
   gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES   ## UNDEFINED
 
 [Protocols]
-  gEfiSmmStatusCodeProtocolGuid                 ## CONSUMES
+  gEfiMmStatusCodeProtocolGuid                  ## CONSUMES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask  ## CONSUMES

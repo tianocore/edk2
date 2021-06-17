@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+  "id": "binwrappers",
   "scope": "global-nix",
   "flags": ["set_path"]
 }

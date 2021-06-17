@@ -8,8 +8,8 @@
 
 **/
 
-#ifndef __ARM_LIB__
-#define __ARM_LIB__
+#ifndef ARM_LIB_H_
+#define ARM_LIB_H_
 
 #include <Uefi/UefiBaseType.h>
 
@@ -108,6 +108,10 @@ typedef enum {
 #define GET_CLUSTER_ID(MpId)  (((MpId) & ARM_CLUSTER_MASK) >> 8)
 #define GET_MPID(ClusterId, CoreId)   (((ClusterId) << 8) | (CoreId))
 #define PRIMARY_CORE_ID       (PcdGet32(PcdArmPrimaryCore) & ARM_CORE_MASK)
+
+// The ARM Architecture Reference Manual for ARMv8-A defines up
+// to 7 levels of cache, L1 through L7.
+#define MAX_ARM_CACHE_LEVEL   7
 
 UINTN
 EFIAPI
@@ -721,6 +725,17 @@ ArmHasGicSystemRegisters (
   VOID
   );
 
+/** Checks if CCIDX is implemented.
+
+   @retval TRUE  CCIDX is implemented.
+   @retval FALSE CCIDX is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasCcidx (
+  VOID
+  );
+
 #ifdef MDE_CPU_ARM
 ///
 /// AArch32-only ID Register Helper functions
@@ -738,4 +753,4 @@ ArmHasSecurityExtensions (
   );
 #endif // MDE_CPU_ARM
 
-#endif // __ARM_LIB__
+#endif // ARM_LIB_H_

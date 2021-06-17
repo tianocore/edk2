@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -293,6 +293,9 @@ typedef struct CmArmSerialPortInfo {
 
   /// The Base address length
   UINT64  BaseAddressLength;
+
+  /// The access size
+  UINT8   AccessSize;
 } CM_ARM_SERIAL_PORT_INFO;
 
 /** A structure that describes the
@@ -466,16 +469,6 @@ typedef struct CmArmItsGroupNode {
 } CM_ARM_ITS_GROUP_NODE;
 
 /** A structure that describes the
-    GIC ITS Identifiers for an ITS Group node.
-
-    ID: EArmObjGicItsIdentifierArray
-*/
-typedef struct CmArmGicItsIdentifier {
-  /// The ITS Identifier
-  UINT32  ItsId;
-} CM_ARM_ITS_IDENTIFIER;
-
-/** A structure that describes the
     Named component node for the Platform.
 
     ID: EArmObjNamedComponent
@@ -637,6 +630,16 @@ typedef struct CmArmPmcgNode {
 } CM_ARM_PMCG_NODE;
 
 /** A structure that describes the
+    GIC ITS Identifiers for an ITS Group node.
+
+    ID: EArmObjGicItsIdentifierArray
+*/
+typedef struct CmArmGicItsIdentifier {
+  /// The ITS Identifier
+  UINT32  ItsId;
+} CM_ARM_ITS_IDENTIFIER;
+
+/** A structure that describes the
     ID Mappings for the Platform.
 
     ID: EArmObjIdMappingArray
@@ -681,8 +684,6 @@ typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
                 Vector Flags (Byte 3) of the Extended Interrupt
                 resource descriptor.
                 See EFI_ACPI_EXTENDED_INTERRUPT_FLAG_xxx in Acpi10.h
-
-    ID: EArmObjExtendedInterruptInfo
 */
 typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
 

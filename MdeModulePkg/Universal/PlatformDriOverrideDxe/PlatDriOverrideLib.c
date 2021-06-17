@@ -776,7 +776,7 @@ InitOverridesMapping (
         // Check buffer overflow
         //
         if ((DriverImageInfo->DriverImagePath == NULL) || (VariableIndex < (UINT8 *) DriverDevicePath) ||
-            (VariableIndex < (UINT8 *) VariableBuffer + BufferSize)) {
+            (VariableIndex > (UINT8 *) VariableBuffer + BufferSize)) {
           Corrupted = TRUE;
           break;
         }

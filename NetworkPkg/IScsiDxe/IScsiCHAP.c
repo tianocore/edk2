@@ -1,5 +1,6 @@
 /** @file
-  This file is for Challenge-Handshake Authentication Protocol (CHAP) Configuration.
+  This file is for Challenge-Handshake Authentication Protocol (CHAP)
+  Configuration.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -18,9 +19,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param[in]   ChallengeLength    The length of iSCSI CHAP challenge message.
   @param[out]  ChapResponse       The calculation of the expected hash value.
 
-  @retval EFI_SUCCESS             The expected hash value was calculatedly successfully.
-  @retval EFI_PROTOCOL_ERROR      The length of the secret should be at least the
-                                  length of the hash value for the hashing algorithm chosen.
+  @retval EFI_SUCCESS             The expected hash value was calculatedly
+                                  successfully.
+  @retval EFI_PROTOCOL_ERROR      The length of the secret should be at least
+                                  the length of the hash value for the hashing
+                                  algorithm chosen.
   @retval EFI_PROTOCOL_ERROR      MD5 hash operation fail.
   @retval EFI_OUT_OF_RESOURCES    Fail to allocate resource to complete MD5.
 
@@ -94,8 +97,10 @@ Exit:
   @param[in]   AuthData             iSCSI CHAP authentication data.
   @param[in]   TargetResponse       The response from target.
 
-  @retval EFI_SUCCESS               The response from target passed authentication.
-  @retval EFI_SECURITY_VIOLATION    The response from target was not expected value.
+  @retval EFI_SUCCESS               The response from target passed
+                                    authentication.
+  @retval EFI_SECURITY_VIOLATION    The response from target was not expected
+                                    value.
   @retval Others                    Other errors as indicated.
 
 **/
@@ -117,7 +122,7 @@ IScsiCHAPAuthTarget (
              AuthData->AuthConfig->ReverseCHAPSecret,
              SecretSize,
              AuthData->OutChallenge,
-             AuthData->OutChallengeLength,
+             ISCSI_CHAP_RSP_LEN,                      // ChallengeLength
              VerifyRsp
              );
 
@@ -193,7 +198,10 @@ IScsiCHAPOnRspReceived (
     //
     // The first Login Response.
     //
-    Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_TARGET_PORTAL_GROUP_TAG);
+    Value = IScsiGetValueByKeyFromList (
+              KeyValueList,
+              ISCSI_KEY_TARGET_PORTAL_GROUP_TAG
+              );
     if (Value == NULL) {
       goto ON_EXIT;
     }
@@ -205,13 +213,17 @@ IScsiCHAPOnRspReceived (
 
     Session->TargetPortalGroupTag = (UINT16) Result;
 
-    Value                         = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_AUTH_METHOD);
+    Value                         = IScsiGetValueByKeyFromList (
+                                      KeyValueList,
+                                      ISCSI_KEY_AUTH_METHOD
+                                      );
     if (Value == NULL) {
       goto ON_EXIT;
     }
     //
-    // Initiator mandates CHAP authentication but target replies without "CHAP", or
-    // initiator suggets "None" but target replies with some kind of auth method.
+    // Initiator mandates CHAP authentication but target replies without
+    // "CHAP", or initiator suggets "None" but target replies with some kind of
+    // auth method.
     //
     if (Session->AuthType == ISCSI_AUTH_TYPE_NONE) {
       if (AsciiStrCmp (Value, ISCSI_KEY_VALUE_NONE) != 0) {
@@ -236,7 +248,10 @@ IScsiCHAPOnRspReceived (
     //
     // The Target replies with CHAP_A=<A> CHAP_I=<I> CHAP_C=<C>
     //
-    Value = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_CHAP_ALGORITHM);
+    Value = IScsiGetValueByKeyFromList (
+              KeyValueList,
+              ISCSI_KEY_CHAP_ALGORITHM
+              );
     if (Value == NULL) {
       goto ON_EXIT;
     }
@@ -249,12 +264,18 @@ IScsiCHAPOnRspReceived (
       goto ON_EXIT;
     }
 
-    Identifier = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_CHAP_IDENTIFIER);
+    Identifier = IScsiGetValueByKeyFromList (
+                   KeyValueList,
+                   ISCSI_KEY_CHAP_IDENTIFIER
+                   );
     if (Identifier == NULL) {
       goto ON_EXIT;
     }
 
-    Challenge = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_CHAP_CHALLENGE);
+    Challenge = IScsiGetValueByKeyFromList (
+                  KeyValueList,
+                  ISCSI_KEY_CHAP_CHALLENGE
+                  );
     if (Challenge == NULL) {
       goto ON_EXIT;
     }
@@ -268,8 +289,16 @@ IScsiCHAPOnRspReceived (
     }
 
     AuthData->InIdentifier      = (UINT32) Result;
-    AuthData->InChallengeLength = ISCSI_CHAP_AUTH_MAX_LEN;
-    IScsiHexToBin ((UINT8 *) AuthData->InChallenge, &AuthData->InChallengeLength, Challenge);
+    AuthData->InChallengeLength = (UINT32) sizeof (AuthData->InChallenge);
+    Status = IScsiHexToBin (
+               (UINT8 *) AuthData->InChallenge,
+               &AuthData->InChallengeLength,
+               Challenge
+               );
+    if (EFI_ERROR (Status)) {
+      Status = EFI_PROTOCOL_ERROR;
+      goto ON_EXIT;
+    }
     Status = IScsiCHAPCalculateResponse (
                AuthData->InIdentifier,
                AuthData->AuthConfig->CHAPSecret,
@@ -303,13 +332,20 @@ IScsiCHAPOnRspReceived (
       goto ON_EXIT;
     }
 
-    Response = IScsiGetValueByKeyFromList (KeyValueList, ISCSI_KEY_CHAP_RESPONSE);
+    Response = IScsiGetValueByKeyFromList (
+                 KeyValueList,
+                 ISCSI_KEY_CHAP_RESPONSE
+                 );
     if (Response == NULL) {
       goto ON_EXIT;
     }
 
     RspLen = ISCSI_CHAP_RSP_LEN;
-    IScsiHexToBin (TargetRsp, &RspLen, Response);
+    Status = IScsiHexToBin (TargetRsp, &RspLen, Response);
+    if (EFI_ERROR (Status) || RspLen != ISCSI_CHAP_RSP_LEN) {
+      Status = EFI_PROTOCOL_ERROR;
+      goto ON_EXIT;
+    }
 
     //
     // Check the CHAP Name and Response replied by Target.
@@ -341,7 +377,8 @@ ON_EXIT:
   @param[in, out]  Pdu         The PDU to send out.
 
   @retval EFI_SUCCESS           All check passed and the phase-related CHAP
-                                authentication info is filled into the iSCSI PDU.
+                                authentication info is filled into the iSCSI
+                                PDU.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
   @retval EFI_PROTOCOL_ERROR    Some kind of protocol error occurred.
 
@@ -362,6 +399,7 @@ IScsiCHAPToSendReq (
   UINT32                      RspLen;
   CHAR8                       *Challenge;
   UINT32                      ChallengeLen;
+  EFI_STATUS                  BinToHexStatus;
 
   ASSERT (Conn->CurrentStage == ISCSI_SECURITY_NEGOTIATION);
 
@@ -392,7 +430,11 @@ IScsiCHAPToSendReq (
     // It's the initial Login Request. Fill in the key=value pairs mandatory
     // for the initial Login Request.
     //
-    IScsiAddKeyValuePair (Pdu, ISCSI_KEY_INITIATOR_NAME, mPrivate->InitiatorName);
+    IScsiAddKeyValuePair (
+      Pdu,
+      ISCSI_KEY_INITIATOR_NAME,
+      mPrivate->InitiatorName
+      );
     IScsiAddKeyValuePair (Pdu, ISCSI_KEY_SESSION_TYPE, "Normal");
     IScsiAddKeyValuePair (
       Pdu,
@@ -413,7 +455,8 @@ IScsiCHAPToSendReq (
 
   case ISCSI_CHAP_STEP_ONE:
     //
-    // First step, send the Login Request with CHAP_A=<A1,A2...> key-value pair.
+    // First step, send the Login Request with CHAP_A=<A1,A2...> key-value
+    // pair.
     //
     AsciiSPrint (ValueStr, sizeof (ValueStr), "%d", ISCSI_CHAP_ALGORITHM_MD5);
     IScsiAddKeyValuePair (Pdu, ISCSI_KEY_CHAP_ALGORITHM, ValueStr);
@@ -429,11 +472,21 @@ IScsiCHAPToSendReq (
     //
     // CHAP_N=<N>
     //
-    IScsiAddKeyValuePair (Pdu, ISCSI_KEY_CHAP_NAME, (CHAR8 *) &AuthData->AuthConfig->CHAPName);
+    IScsiAddKeyValuePair (
+      Pdu,
+      ISCSI_KEY_CHAP_NAME,
+      (CHAR8 *) &AuthData->AuthConfig->CHAPName
+      );
     //
     // CHAP_R=<R>
     //
-    IScsiBinToHex ((UINT8 *) AuthData->CHAPResponse, ISCSI_CHAP_RSP_LEN, Response, &RspLen);
+    BinToHexStatus = IScsiBinToHex (
+                       (UINT8 *) AuthData->CHAPResponse,
+                       ISCSI_CHAP_RSP_LEN,
+                       Response,
+                       &RspLen
+                       );
+    ASSERT_EFI_ERROR (BinToHexStatus);
     IScsiAddKeyValuePair (Pdu, ISCSI_KEY_CHAP_RESPONSE, Response);
 
     if (AuthData->AuthConfig->CHAPType == ISCSI_CHAP_MUTUAL) {
@@ -447,8 +500,13 @@ IScsiCHAPToSendReq (
       // CHAP_C=<C>
       //
       IScsiGenRandom ((UINT8 *) AuthData->OutChallenge, ISCSI_CHAP_RSP_LEN);
-      AuthData->OutChallengeLength = ISCSI_CHAP_RSP_LEN;
-      IScsiBinToHex ((UINT8 *) AuthData->OutChallenge, ISCSI_CHAP_RSP_LEN, Challenge, &ChallengeLen);
+      BinToHexStatus = IScsiBinToHex (
+                         (UINT8 *) AuthData->OutChallenge,
+                         ISCSI_CHAP_RSP_LEN,
+                         Challenge,
+                         &ChallengeLen
+                         );
+      ASSERT_EFI_ERROR (BinToHexStatus);
       IScsiAddKeyValuePair (Pdu, ISCSI_KEY_CHAP_CHALLENGE, Challenge);
 
       Conn->AuthStep = ISCSI_CHAP_STEP_FOUR;

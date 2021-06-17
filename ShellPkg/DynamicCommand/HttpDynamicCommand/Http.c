@@ -1524,6 +1524,7 @@ GetResponse (
   Context->ResponseToken.Message = &ResponseMessage;
   Context->ContentLength = 0;
   Context->Status = REQ_OK;
+  Status = EFI_SUCCESS;
   MsgParser = NULL;
   ResponseData.StatusCode = HTTP_STATUS_UNSUPPORTED_STATUS;
   ResponseMessage.Data.Response = &ResponseData;

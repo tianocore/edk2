@@ -280,6 +280,7 @@ SmbiosPrintStructure (
   )
 {
   UINT8 Index;
+  UINT8 Index2;
   UINT8 *Buffer;
 
   if (Struct == NULL) {
@@ -403,6 +404,21 @@ SmbiosPrintStructure (
       }
       if (Struct->Hdr->Length > 0x12) {
         PRINT_STRUCT_VALUE (Struct, Type3, NumberofPowerCords);
+      }
+      if (Struct->Hdr->Length > 0x13) {
+        PRINT_STRUCT_VALUE (Struct, Type3, ContainedElementCount);
+      }
+      if (Struct->Hdr->Length > 0x14) {
+        PRINT_STRUCT_VALUE (Struct, Type3, ContainedElementRecordLength);
+      }
+      if (Struct->Hdr->Length > 0x15) {
+        for (Index = 0; Index < Struct->Type3->ContainedElementCount; Index++) {
+          ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_CONTAINED_ELEMENT), gShellDebug1HiiHandle, Index+1);
+          for (Index2 = 0; Index2< Struct->Type3->ContainedElementRecordLength; Index2++) {
+            Print (L"%02X ", Buffer[0x15 + (Index * Struct->Type3->ContainedElementRecordLength) + Index2]);
+          }
+          Print (L"\n");
+        }
       }
     }
     if (AE_SMBIOS_VERSION (0x2, 0x7) && (Struct->Hdr->Length > 0x13)) {

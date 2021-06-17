@@ -1,6 +1,6 @@
 ## @ GenCfgOpt.py
 #
-# Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -283,10 +283,10 @@ class CLogicalExpression:
         return Result
 
 class CGenCfgOpt:
-    def __init__(self):
+    def __init__(self, Mode = ''):
         self.Debug          = False
         self.Error          = ''
-
+        self.Mode           = Mode
         self._GlobalDataDef = """
 GlobalDataDef
     SKUID = 0, "DEFAULT"
@@ -300,18 +300,20 @@ List &EN_DIS
 EndList
 
 """
-
-        self._BsfKeyList    = ['FIND','NAME','HELP','TYPE','PAGE','OPTION','ORDER']
+        self._BsfKeyList    = ['FIND','NAME','HELP','TYPE','PAGE', 'PAGES', 'BLOCK', 'OPTION','CONDITION','ORDER', 'MARKER', 'SUBT']
         self._HdrKeyList    = ['HEADER','STRUCT', 'EMBED', 'COMMENT']
         self._BuidinOption  = {'$EN_DIS' : 'EN_DIS'}
 
         self._MacroDict   = {}
+        self._VarDict     = {}
         self._PcdsDict    = {}
         self._CfgBlkDict  = {}
         self._CfgPageDict = {}
+        self._BsfTempDict = {}
         self._CfgItemList = []
+        self._DscLines    = []
         self._DscFile     = ''
-        self._FvDir       = ''
+
         self._MapVer      = 0
         self._DscTime     = 0
 
@@ -351,7 +353,7 @@ EndList
             print ("INFO : Eval Ifdef [%s] : %s" % (Macro, Result))
         return  Result
 
-    def ExpandMacros (self, Input):
+    def ExpandMacros (self, Input, Preserve = False):
         Line = Input
         Match = re.findall("\$\(\w+\)", Input)
         if Match:
@@ -362,7 +364,8 @@ EndList
               else:
                   if self.Debug:
                       print ("WARN : %s is not defined" % Each)
-                  Line = Line.replace(Each, Each[2:-1])
+                  if not Preserve:
+                      Line = Line.replace(Each, Each[2:-1])
         return Line
 
     def ExpandPcds (self, Input):
@@ -384,6 +387,70 @@ EndList
         Result  = LogExpr.evaluateExpress (ExpExpr)
         if self.Debug:
             print ("INFO : Eval Express [%s] : %s" % (Expr, Result))
+        return Result
+
+    def ValueToByteArray (self, ValueStr, Length):
+        Match = re.match("\{\s*FILE:(.+)\}", ValueStr)
+        if Match:
+          FileList = Match.group(1).split(',')
+          Result  = bytearray()
+          for File in FileList:
+            File = File.strip()
+            BinPath = os.path.join(os.path.dirname(self._DscFile), File)
+            Result.extend(bytearray(open(BinPath, 'rb').read()))
+        else:
+            try:
+                Result  = bytearray(self.ValueToList(ValueStr, Length))
+            except ValueError as e:
+                raise Exception ("Bytes in '%s' must be in range 0~255 !" % ValueStr)
+        if len(Result) < Length:
+            Result.extend(b'\x00' * (Length - len(Result)))
+        elif len(Result) > Length:
+            raise Exception ("Value '%s' is too big to fit into %d bytes !" % (ValueStr, Length))
+
+        return Result[:Length]
+
+    def ValueToList (self, ValueStr, Length):
+        if ValueStr[0] == '{':
+            Result = []
+            BinList = ValueStr[1:-1].split(',')
+            InBitField     = False
+            LastInBitField = False
+            Value          = 0
+            BitLen         = 0
+            for Element in BinList:
+                InBitField = False
+                Each = Element.strip()
+                if len(Each) == 0:
+                    pass
+                else:
+                    if Each[0] in ['"', "'"]:
+                        Result.extend(list(bytearray(Each[1:-1], 'utf-8')))
+                    elif ':' in Each:
+                        Match    = re.match("(.+):(\d+)b", Each)
+                        if Match is None:
+                            raise Exception("Invald value list format '%s' !" % Each)
+                        InBitField = True
+                        CurrentBitLen = int(Match.group(2))
+                        CurrentValue  = ((self.EvaluateExpress(Match.group(1)) & (1<<CurrentBitLen) - 1)) << BitLen
+                    else:
+                        Result.append(self.EvaluateExpress(Each.strip()))
+                if InBitField:
+                    Value  += CurrentValue
+                    BitLen += CurrentBitLen
+                if LastInBitField and ((not InBitField) or (Element == BinList[-1])):
+                    if BitLen % 8 != 0:
+                        raise Exception("Invald bit field length!")
+                    Result.extend(Val2Bytes(Value, BitLen // 8))
+                    Value  = 0
+                    BitLen = 0
+                LastInBitField = InBitField
+        elif ValueStr.startswith("'") and ValueStr.endswith("'"):
+            Result = Str2Bytes (ValueStr, Length)
+        elif ValueStr.startswith('"') and ValueStr.endswith('"'):
+            Result = Str2Bytes (ValueStr, Length)
+        else:
+            Result = Val2Bytes (self.EvaluateExpress(ValueStr), Length)
         return Result
 
     def FormatListValue(self, ConfigDict):
@@ -424,28 +491,53 @@ EndList
         self._DscFile     = DscFile
         self._FvDir       = FvDir
 
+        self._DscLines    = []
+        self._BsfTempDict = {}
+
         # Initial DSC time is parent DSC time.
         self._DscTime     = os.path.getmtime(DscFile)
+
+        CfgDict = {}
 
         IsDefSect       = False
         IsPcdSect       = False
         IsUpdSect       = False
         IsVpdSect       = False
+        IsTmpSect       = False
+
+        TemplateName    = ''
 
         IfStack         = []
         ElifStack       = []
         Error           = 0
         ConfigDict      = {}
 
-        DscFd        = open(DscFile, "r")
-        DscLines     = DscFd.readlines()
-        DscFd.close()
+
+        if type(DscFile) is list:
+            # it is DSC lines already
+            DscLines       = DscFile
+            self._DscFile  = '.'
+        else:
+            DscFd        = open(DscFile, "r")
+            DscLines     = DscFd.readlines()
+            DscFd.close()
+            self._DscFile = DscFile
+
+        SkipLines = 0
 
         MaxAlign = 32   #Default align to 32, but if there are 64 bit unit, align to 64
         SizeAlign = 0   #record the struct max align
         Base = 0        #Starting offset of sub-structure.
+
         while len(DscLines):
             DscLine  = DscLines.pop(0).strip()
+            if SkipLines == 0:
+              self._DscLines.append (DscLine)
+            else:
+              SkipLines = SkipLines - 1
+            if len(DscLine) == 0:
+              continue
+
             Handle   = False
             Match    = re.match("^\[(.+)\]", DscLine)
             if Match is not None:
@@ -453,11 +545,15 @@ EndList
                 IsPcdSect = False
                 IsVpdSect = False
                 IsUpdSect = False
-                if  Match.group(1).lower() == "Defines".lower():
+                IsTmpSect = False
+                SectionName = Match.group(1).lower()
+                if  SectionName == "Defines".lower():
                     IsDefSect = True
-                if  (Match.group(1).lower() == "PcdsFeatureFlag".lower() or Match.group(1).lower() == "PcdsFixedAtBuild".lower()):
+                if  (SectionName == "PcdsFeatureFlag".lower() or SectionName == "PcdsFixedAtBuild".lower()):
                     IsPcdSect = True
-                elif Match.group(1).lower() == "PcdsDynamicVpd.Upd".lower():
+                elif SectionName == "PcdsDynamicVpd.Tmp".lower():
+                    IsTmpSect = True
+                elif SectionName == "PcdsDynamicVpd.Upd".lower():
                     ConfigDict = {}
                     ConfigDict['header']  = 'ON'
                     ConfigDict['region']  = 'UPD'
@@ -465,90 +561,98 @@ EndList
                     ConfigDict['page']    = ''
                     ConfigDict['name']    = ''
                     ConfigDict['find']    = ''
+                    ConfigDict['marker']  = ''
                     ConfigDict['struct']  = ''
                     ConfigDict['embed']   = ''
                     ConfigDict['comment'] = ''
                     ConfigDict['subreg']  = []
+                    ConfigDict['condition']  = ''
+                    ConfigDict['option']  = ''
                     IsUpdSect = True
                     Offset    = 0
             else:
-                if IsDefSect or IsPcdSect or IsUpdSect or IsVpdSect:
-                    if re.match("^!else($|\s+#.+)", DscLine):
+                if IsDefSect or IsPcdSect or IsUpdSect or IsVpdSect or IsTmpSect:
+
+                    Match = False if DscLine[0] != '!' else True
+                    if Match:
+                        Match = re.match("^!(else|endif|ifdef|ifndef|if|elseif|include)\s*(.+)?$", DscLine.split("#")[0])
+                    Keyword   = Match.group(1) if Match else ''
+                    Remaining = Match.group(2) if Match else ''
+                    Remaining = '' if Remaining is None else Remaining.strip()
+
+                    if Keyword in ['if', 'elseif', 'ifdef', 'ifndef', 'include'] and not Remaining:
+                        raise Exception ("ERROR: Expression is expected after '!if' or !elseif' for line '%s'" % DscLine)
+
+                    if Keyword == 'else':
                         if IfStack:
                             IfStack[-1] = not IfStack[-1]
                         else:
-                            print("ERROR: No paired '!if' found for '!else' for line '%s'" % DscLine)
-                            raise SystemExit
-                    elif re.match("^!endif($|\s+#.+)", DscLine):
+                            raise Exception ("ERROR: No paired '!if' found for '!else' for line '%s'" % DscLine)
+                    elif Keyword == 'endif':
                         if IfStack:
                             IfStack.pop()
                             Level = ElifStack.pop()
                             if Level > 0:
                                 del IfStack[-Level:]
                         else:
-                            print("ERROR: No paired '!if' found for '!endif' for line '%s'" % DscLine)
-                            raise SystemExit
-                    else:
-                        Result = False
-                        Match = re.match("!(ifdef|ifndef)\s+(.+)", DscLine)
-                        if Match:
-                            Result = self.EvaulateIfdef (Match.group(2))
-                            if Match.group(1) == 'ifndef':
-                                Result = not Result
-                            IfStack.append(Result)
+                            raise Exception ("ERROR: No paired '!if' found for '!endif' for line '%s'" % DscLine)
+                    elif Keyword == 'ifdef' or Keyword == 'ifndef':
+                        Result = self.EvaulateIfdef (Remaining)
+                        if Keyword == 'ifndef':
+                            Result = not Result
+                        IfStack.append(Result)
+                        ElifStack.append(0)
+                    elif Keyword == 'if' or Keyword == 'elseif':
+                        Result = self.EvaluateExpress(Remaining)
+                        if Keyword == "if":
                             ElifStack.append(0)
-                        else:
-                            Match  = re.match("!(if|elseif)\s+(.+)", DscLine.split("#")[0])
-                            if Match:
-                                Result = self.EvaluateExpress(Match.group(2))
-                                if Match.group(1) == "if":
-                                    ElifStack.append(0)
-                                    IfStack.append(Result)
-                                else:   #elseif
-                                    if IfStack:
-                                        IfStack[-1] = not IfStack[-1]
-                                        IfStack.append(Result)
-                                        ElifStack[-1] = ElifStack[-1] + 1
-                                    else:
-                                        print("ERROR: No paired '!if' found for '!elif' for line '%s'" % DscLine)
-                                        raise SystemExit
+                            IfStack.append(Result)
+                        else:   #elseif
+                            if IfStack:
+                                IfStack[-1] = not IfStack[-1]
+                                IfStack.append(Result)
+                                ElifStack[-1] = ElifStack[-1] + 1
                             else:
-                                if IfStack:
-                                    Handle = reduce(lambda x,y: x and y, IfStack)
+                                raise Exception ("ERROR: No paired '!if' found for '!elif' for line '%s'" % DscLine)
+                    else:
+                        if IfStack:
+                            Handle = reduce(lambda x,y: x and y, IfStack)
+                        else:
+                            Handle = True
+                        if Handle:
+                            Match = re.match("!include\s+(.+)", DscLine)
+                            if Match:
+                                IncludeFilePath = Match.group(1)
+                                IncludeFilePath = self.ExpandMacros(IncludeFilePath)
+                                PackagesPath = os.getenv("PACKAGES_PATH")
+                                if PackagesPath:
+                                  for PackagePath in PackagesPath.split(os.pathsep):
+                                      IncludeFilePathAbs = os.path.join(os.path.normpath(PackagePath), os.path.normpath(IncludeFilePath))
+                                      if os.path.exists(IncludeFilePathAbs):
+                                          IncludeDsc  = open(IncludeFilePathAbs, "r")
+                                          break
                                 else:
-                                    Handle = True
-                                if Handle:
-                                    Match = re.match("!include\s+(.+)", DscLine)
-                                    if Match:
-                                        IncludeFilePath = Match.group(1)
-                                        IncludeFilePath = self.ExpandMacros(IncludeFilePath)
-                                        PackagesPath = os.getenv("PACKAGES_PATH")
-                                        if PackagesPath:
-                                          for PackagePath in PackagesPath.split(os.pathsep):
-                                              IncludeFilePathAbs = os.path.join(os.path.normpath(PackagePath), os.path.normpath(IncludeFilePath))
-                                              if os.path.exists(IncludeFilePathAbs):
-                                                  IncludeDsc  = open(IncludeFilePathAbs, "r")
-                                                  break
-                                        else:
-                                          IncludeDsc  = open(IncludeFilePath, "r")
-                                        if IncludeDsc == None:
-                                            print("ERROR: Cannot open file '%s'" % IncludeFilePath)
-                                            raise SystemExit
+                                  IncludeDsc  = open(IncludeFilePath, "r")
+                                if IncludeDsc == None:
+                                    print("ERROR: Cannot open file '%s'" % IncludeFilePath)
+                                    raise SystemExit
 
-                                        # Update DscTime when newer DSC time found.
-                                        CurrentDscTime = os.path.getmtime(os.path.realpath(IncludeDsc.name))
-                                        if CurrentDscTime > self._DscTime:
-                                            self._DscTime = CurrentDscTime
+                                # Update DscTime when newer DSC time found.
+                                CurrentDscTime = os.path.getmtime(os.path.realpath(IncludeDsc.name))
+                                if CurrentDscTime > self._DscTime:
+                                    self._DscTime = CurrentDscTime
 
-                                        NewDscLines = IncludeDsc.readlines()
-                                        IncludeDsc.close()
-                                        DscLines = NewDscLines + DscLines
-                                        Offset = 0
-                                    else:
-                                        if DscLine.startswith('!'):
-                                            print("ERROR: Unrecognized directive for line '%s'" % DscLine)
-                                            raise SystemExit
+                                NewDscLines = IncludeDsc.readlines()
+                                IncludeDsc.close()
+                                DscLines = NewDscLines + DscLines
+                                del self._DscLines[-1]
+                                Offset = 0
+                            else:
+                                if DscLine.startswith('!'):
+                                    print("ERROR: Unrecognized directive for line '%s'" % DscLine)
+                                    raise SystemExit
             if not Handle:
+                del self._DscLines[-1]
                 continue
 
             if IsDefSect:
@@ -556,7 +660,7 @@ EndList
                 #DEFINE FSP_T_UPD_TOOL_GUID = 34686CA3-34F9-4901-B82A-BA630F0714C6
                 #DEFINE FSP_M_UPD_TOOL_GUID = 39A250DB-E465-4DD1-A2AC-E2BD3C0E2385
                 #DEFINE FSP_S_UPD_TOOL_GUID = CAE3605B-5B34-4C85-B3D7-27D54273C40F
-                Match = re.match("^\s*(?:DEFINE\s+)*(\w+)\s*=\s*([/$()-.\w]+)", DscLine)
+                Match = re.match("^\s*(?:DEFINE\s+)*(\w+)\s*=\s*(.+)", DscLine)
                 if Match:
                     self._MacroDict[Match.group(1)] = self.ExpandMacros(Match.group(2))
                     if self.Debug:
@@ -575,6 +679,23 @@ EndList
                         if Match:
                             self._PcdsDict[Match.group(1)] = Match.group(2)
                         i += 1
+
+            elif IsTmpSect:
+                # !BSF DEFT:{GPIO_TMPL:START}
+                Match = re.match("^\s*#\s+(!BSF)\s+DEFT:{(.+?):(START|END)}", DscLine)
+                if Match:
+                    if Match.group(3) == 'START' and not TemplateName:
+                        TemplateName = Match.group(2).strip()
+                        self._BsfTempDict[TemplateName] = []
+                    if Match.group(3) == 'END' and (TemplateName == Match.group(2).strip()) and TemplateName:
+                        TemplateName = ''
+                else:
+                    if TemplateName:
+                        Match = re.match("^!include\s*(.+)?$", DscLine)
+                        if Match:
+                            continue
+                        self._BsfTempDict[TemplateName].append(DscLine)
+
             else:
                 Match = re.match("^\s*#\s+(!BSF|@Bsf|!HDR)\s+(.+)", DscLine)
                 if Match:
@@ -587,7 +708,8 @@ EndList
                             for Page in PageList:
                                 Page  = Page.strip()
                                 Match = re.match("(\w+):\"(.+)\"", Page)
-                                self._CfgPageDict[Match.group(1)] = Match.group(2)
+                                if Match != None:
+                                    self._CfgPageDict[Match.group(1)] = Match.group(2)
 
                         Match = re.match("(?:^|.+\s+)BLOCK:{NAME:\"(.+)\"\s*,\s*VER:\"(.+)\"\s*}", Remaining)
                         if Match:
@@ -630,9 +752,9 @@ EndList
                 Match = re.match("^\s*#\s*@ValidRange\s*(.+)\s*\|\s*(.+)\s*-\s*(.+)\s*", DscLine)
                 if Match:
                     if "0x" in Match.group(2) or "0x" in Match.group(3):
-                       ConfigDict['type'] = "EditNum, HEX, (%s,%s)" % (Match.group(2), Match.group(3))
+                        ConfigDict['type'] = "EditNum, HEX, (%s,%s)" % (Match.group(2), Match.group(3))
                     else:
-                       ConfigDict['type'] = "EditNum, DEC, (%s,%s)" % (Match.group(2), Match.group(3))
+                        ConfigDict['type'] = "EditNum, DEC, (%s,%s)" % (Match.group(2), Match.group(3))
 
                 Match = re.match("^\s*##\s+(.+)", DscLine)
                 if Match:
@@ -748,6 +870,7 @@ EndList
                     ConfigDict['struct'] = ''
                     ConfigDict['embed']  = ''
                     ConfigDict['comment'] = ''
+                    ConfigDict['marker'] = ''
                     ConfigDict['order']  = -1
                     ConfigDict['subreg'] = []
                     ConfigDict['option'] = ''
@@ -786,9 +909,8 @@ EndList
         bitsvalue = bitsvalue[::-1]
         bitslen   = len(bitsvalue)
         if start > bitslen or end > bitslen:
-            print ("Invalid bits offset [%d,%d] for %s" % (start, end, subitem['name']))
-            raise SystemExit
-        return hex(int(bitsvalue[start:end][::-1], 2))
+            raise Exception ("Invalid bits offset [%d,%d] %d for %s" % (start, end, bitslen, subitem['name']))
+        return '0x%X' % (int(bitsvalue[start:end][::-1], 2))
 
     def UpdateSubRegionDefaultValue (self):
         Error = 0
@@ -888,62 +1010,141 @@ EndList
             TxtFd.close()
         return 0
 
-    def ProcessMultilines (self, String, MaxCharLength):
-            Multilines = ''
-            StringLength = len(String)
-            CurrentStringStart = 0
-            StringOffset = 0
-            BreakLineDict = []
-            if len(String) <= MaxCharLength:
-                while (StringOffset < StringLength):
-                    if StringOffset >= 1:
-                        if String[StringOffset - 1] == '\\' and String[StringOffset] == 'n':
-                            BreakLineDict.append (StringOffset + 1)
-                    StringOffset += 1
-                if BreakLineDict != []:
-                    for Each in BreakLineDict:
-                        Multilines += "  %s\n" % String[CurrentStringStart:Each].lstrip()
-                        CurrentStringStart = Each
-                    if StringLength - CurrentStringStart > 0:
-                        Multilines += "  %s\n" % String[CurrentStringStart:].lstrip()
+    def CreateVarDict (self):
+        Error = 0
+        self._VarDict = {}
+        if len(self._CfgItemList) > 0:
+            Item = self._CfgItemList[-1]
+            self._VarDict['_LENGTH_'] = '%d' % (Item['offset'] + Item['length'])
+        for Item in self._CfgItemList:
+            Embed = Item['embed']
+            Match = re.match("^(\w+):(\w+):(START|END)", Embed)
+            if Match:
+                StructName = Match.group(1)
+                VarName = '_%s_%s_' % (Match.group(3), StructName)
+                if Match.group(3) == 'END':
+                    self._VarDict[VarName] = Item['offset'] + Item['length']
+                    self._VarDict['_LENGTH_%s_' % StructName] = \
+                        self._VarDict['_END_%s_' % StructName] - self._VarDict['_START_%s_' % StructName]
+                    if Match.group(2).startswith('TAG_'):
+                        if (self.Mode != 'FSP') and (self._VarDict['_LENGTH_%s_' % StructName] % 4):
+                            raise Exception("Size of structure '%s' is %d, not DWORD aligned !" % (StructName, self._VarDict['_LENGTH_%s_' % StructName]))
+                        self._VarDict['_TAG_%s_' % StructName] = int (Match.group(2)[4:], 16) & 0xFFF
                 else:
-                    Multilines = "  %s\n" % String
-            else:
-                NewLineStart = 0
-                NewLineCount = 0
-                FoundSpaceChar = False
-                while (StringOffset < StringLength):
-                    if StringOffset >= 1:
-                        if NewLineCount >= MaxCharLength - 1:
-                            if String[StringOffset] == ' ' and StringLength - StringOffset > 10:
-                                BreakLineDict.append (NewLineStart + NewLineCount)
-                                NewLineStart = NewLineStart + NewLineCount
-                                NewLineCount = 0
-                                FoundSpaceChar = True
-                            elif StringOffset == StringLength - 1 and FoundSpaceChar == False:
-                                BreakLineDict.append (0)
-                        if String[StringOffset - 1] == '\\' and String[StringOffset] == 'n':
-                            BreakLineDict.append (StringOffset + 1)
-                            NewLineStart = StringOffset + 1
-                            NewLineCount = 0
-                    StringOffset += 1
-                    NewLineCount += 1
-                if BreakLineDict != []:
-                    BreakLineDict.sort ()
-                    for Each in BreakLineDict:
-                        if Each > 0:
-                            Multilines += "  %s\n" % String[CurrentStringStart:Each].lstrip()
-                        CurrentStringStart = Each
-                    if StringLength - CurrentStringStart > 0:
-                        Multilines += "  %s\n" % String[CurrentStringStart:].lstrip()
-            return Multilines
+                    self._VarDict[VarName] = Item['offset']
+            if Item['marker']:
+                self._VarDict['_OFFSET_%s_' % Item['marker'].strip()] = Item['offset']
+        return Error
 
-    def CreateField (self, Item, Name, Length, Offset, Struct, BsfName, Help, Option):
+    def UpdateBsfBitUnit (self, Item):
+        BitTotal  = 0
+        BitOffset = 0
+        StartIdx  = 0
+        Unit      = None
+        UnitDec   = {1:'BYTE', 2:'WORD', 4:'DWORD', 8:'QWORD'}
+        for Idx, SubItem in enumerate(Item['subreg']):
+            if Unit is None:
+                Unit  = SubItem['bitunit']
+            BitLength = SubItem['bitlength']
+            BitTotal  += BitLength
+            BitOffset += BitLength
+
+            if BitOffset > 64 or BitOffset > Unit * 8:
+                break
+
+            if BitOffset == Unit * 8:
+                for SubIdx in range (StartIdx, Idx + 1):
+                    Item['subreg'][SubIdx]['bitunit'] = Unit
+                BitOffset = 0
+                StartIdx  = Idx + 1
+                Unit      = None
+
+        if BitOffset > 0:
+            raise Exception ("Bit fields cannot fit into %s for '%s.%s' !" % (UnitDec[Unit], Item['cname'], SubItem['cname']))
+
+        ExpectedTotal = Item['length'] * 8
+        if Item['length'] * 8 != BitTotal:
+            raise Exception ("Bit fields total length (%d) does not match length (%d) of '%s' !" % (BitTotal, ExpectedTotal, Item['cname']))
+
+    def UpdateDefaultValue (self):
+        Error = 0
+        for Idx, Item in enumerate(self._CfgItemList):
+            if len(Item['subreg']) == 0:
+                Value = Item['value']
+                if (len(Value) > 0) and (Value[0] == '{' or Value[0] == "'" or Value[0] == '"'):
+                    # {XXX} or 'XXX' strings
+                    self.FormatListValue(self._CfgItemList[Idx])
+                else:
+                  Match = re.match("(0x[0-9a-fA-F]+|[0-9]+)", Value)
+                  if not Match:
+                    NumValue = self.EvaluateExpress (Value)
+                    Item['value'] = '0x%X' % NumValue
+            else:
+                ValArray = self.ValueToByteArray (Item['value'], Item['length'])
+                for SubItem in Item['subreg']:
+                    SubItem['value']   = self.GetBsfBitFields(SubItem, ValArray)
+                self.UpdateBsfBitUnit (Item)
+        return Error
+
+    def ProcessMultilines (self, String, MaxCharLength):
+        Multilines = ''
+        StringLength = len(String)
+        CurrentStringStart = 0
+        StringOffset = 0
+        BreakLineDict = []
+        if len(String) <= MaxCharLength:
+            while (StringOffset < StringLength):
+                if StringOffset >= 1:
+                    if String[StringOffset - 1] == '\\' and String[StringOffset] == 'n':
+                        BreakLineDict.append (StringOffset + 1)
+                StringOffset += 1
+            if BreakLineDict != []:
+                for Each in BreakLineDict:
+                    Multilines += "  %s\n" % String[CurrentStringStart:Each].lstrip()
+                    CurrentStringStart = Each
+                if StringLength - CurrentStringStart > 0:
+                    Multilines += "  %s\n" % String[CurrentStringStart:].lstrip()
+            else:
+                Multilines = "  %s\n" % String
+        else:
+            NewLineStart = 0
+            NewLineCount = 0
+            FoundSpaceChar = False
+            while (StringOffset < StringLength):
+                if StringOffset >= 1:
+                    if NewLineCount >= MaxCharLength - 1:
+                        if String[StringOffset] == ' ' and StringLength - StringOffset > 10:
+                            BreakLineDict.append (NewLineStart + NewLineCount)
+                            NewLineStart = NewLineStart + NewLineCount
+                            NewLineCount = 0
+                            FoundSpaceChar = True
+                        elif StringOffset == StringLength - 1 and FoundSpaceChar == False:
+                            BreakLineDict.append (0)
+                    if String[StringOffset - 1] == '\\' and String[StringOffset] == 'n':
+                        BreakLineDict.append (StringOffset + 1)
+                        NewLineStart = StringOffset + 1
+                        NewLineCount = 0
+                StringOffset += 1
+                NewLineCount += 1
+            if BreakLineDict != []:
+                BreakLineDict.sort ()
+                for Each in BreakLineDict:
+                    if Each > 0:
+                        Multilines += "  %s\n" % String[CurrentStringStart:Each].lstrip()
+                    CurrentStringStart = Each
+                if StringLength - CurrentStringStart > 0:
+                    Multilines += "  %s\n" % String[CurrentStringStart:].lstrip()
+        return Multilines
+
+    def CreateField (self, Item, Name, Length, Offset, Struct, BsfName, Help, Option, BitsLength = None):
         PosName    = 28
         PosComment = 30
         NameLine=''
         HelpLine=''
         OptionLine=''
+
+        if Length == 0 and Name == 'Dummy':
+            return '\n'
 
         IsArray = False
         if Length in [1,2,4,8]:
@@ -992,7 +1193,12 @@ EndList
         else:
             OffsetStr = '0x%04X' % Offset
 
-        return "\n/** Offset %s%s%s%s**/\n  %s%s%s;\n" % (OffsetStr, NameLine, HelpLine, OptionLine, Type, ' ' * Space1, Name,)
+        if BitsLength is None:
+            BitsLength = ''
+        else:
+            BitsLength = ' : %d' % BitsLength
+
+        return "\n/** Offset %s%s%s%s**/\n  %s%s%s%s;\n" % (OffsetStr, NameLine, HelpLine, OptionLine, Type, ' ' * Space1, Name, BitsLength)
 
     def PostProcessBody (self, TextBody):
         NewTextBody = []
@@ -1097,6 +1303,7 @@ EndList
             UpdStructure = ['FSPT_UPD', 'FSPM_UPD', 'FSPS_UPD']
             for Item in self._CfgItemList:
                 if Item["cname"] == 'Signature' and Item["value"][0:6] in UpdSignature:
+                    Item["offset"] = 0 # re-initialize offset to 0 when new UPD structure starting
                     UpdOffsetTable.append (Item["offset"])
 
             for UpdIdx in range(len(UpdOffsetTable)):

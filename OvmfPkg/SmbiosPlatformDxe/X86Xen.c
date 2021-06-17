@@ -8,9 +8,11 @@
 
 **/
 
-#include "SmbiosPlatformDxe.h"
-#include <Library/HobLib.h>
-#include <Guid/XenInfo.h>
+#include <Library/BaseLib.h> // AsciiStrnCmp()
+#include <Library/HobLib.h>  // GetFirstGuidHob()
+#include <Pi/PiHob.h>        // EFI_HOB_GUID_TYPE
+
+#include "XenSmbiosPlatformDxe.h"
 
 #define XEN_SMBIOS_PHYSICAL_ADDRESS       0x000EB000
 #define XEN_SMBIOS_PHYSICAL_END           0x000F0000

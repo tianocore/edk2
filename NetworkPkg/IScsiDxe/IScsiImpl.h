@@ -35,21 +35,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/AdapterInformation.h>
 #include <Protocol/NetworkInterfaceIdentifier.h>
 
-#include <Library/HiiLib.h>
-#include <Library/UefiHiiServicesLib.h>
-#include <Library/DevicePathLib.h>
-#include <Library/DebugLib.h>
+#include <Library/BaseCryptLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/HiiLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PrintLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/UefiLib.h>
-#include <Library/DpcLib.h>
 #include <Library/NetLib.h>
+#include <Library/PrintLib.h>
+#include <Library/SafeIntLib.h>
 #include <Library/TcpIoLib.h>
-#include <Library/BaseCryptLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiHiiServicesLib.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Guid/MdeModuleHii.h>
 #include <Guid/EventGroup.h>

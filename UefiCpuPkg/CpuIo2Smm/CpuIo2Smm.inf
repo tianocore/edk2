@@ -24,7 +24,8 @@
 
 [Sources]
   CpuIo2Smm.c
-  CpuIo2Smm.h
+  CpuIo2Mm.c
+  CpuIo2Mm.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -34,7 +35,7 @@
   BaseLib
   DebugLib
   IoLib
-  SmmServicesTableLib
+  MmServicesTableLib
   BaseMemoryLib
 
 [Protocols]

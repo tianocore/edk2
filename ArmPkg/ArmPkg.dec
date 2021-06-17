@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2018, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2021, ARM Limited. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -27,15 +27,68 @@
   Include                        # Root include for the package
 
 [LibraryClasses.common]
-  ArmLib|Include/Library/ArmLib.h
-  ArmMmuLib|Include/Library/ArmMmuLib.h
-  SemihostLib|Include/Library/Semihosting.h
-  DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
+  ##  @libraryclass  Convert Arm instructions to a human readable format.
+  #
   ArmDisassemblerLib|Include/Library/ArmDisassemblerLib.h
+
+  ##  @libraryclass  Provides an interface to Arm generic counters.
+  #
+  ArmGenericTimerCounterLib|Include/Library/ArmGenericTimerCounterLib.h
+
+  ##  @libraryclass  Provides an interface to initialize a
+  #   Generic Interrupt Controller (GIC).
+  #
   ArmGicArchLib|Include/Library/ArmGicArchLib.h
-  ArmMtlLib|ArmPlatformPkg/Include/Library/ArmMtlLib.h
+
+  ##  @libraryclass  Provides a Generic Interrupt Controller (GIC)
+  #   configuration interface.
+  #
+  ArmGicLib|Include/Library/ArmGicLib.h
+
+  ##  @libraryclass  Provides a HyperVisor Call (HVC) interface.
+  #
+  ArmHvcLib|Include/Library/ArmHvcLib.h
+
+  ##  @libraryclass  Provides an interface to Arm registers.
+  #
+  ArmLib|Include/Library/ArmLib.h
+
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
+
+  ##  @libraryclass  Provides a Mailbox Transport Layer (MTL) interface
+  #   for the System Control and Management Interface (SCMI).
+  #
+  ArmMtlLib|Include/Library/ArmMtlLib.h
+
+  ##  @libraryclass  Provides a System Monitor Call (SMC) interface.
+  #
+  ArmSmcLib|Include/Library/ArmSmcLib.h
+
+  ##  @libraryclass  Provides a SuperVisor Call (SVC) interface.
+  #
   ArmSvcLib|Include/Library/ArmSvcLib.h
+
+  ##  @libraryclass  Provides a default exception handler.
+  #
+  DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
+
+  ##  @libraryclass  Provides an interface to query miscellaneous OEM
+  #   information.
+  #
+  OemMiscLib|Include/Library/OemMiscLib.h
+
+  ##  @libraryclass  Provides an OpTee interface.
+  #
   OpteeLib|Include/Library/OpteeLib.h
+
+  ##  @libraryclass  Provides a semihosting interface.
+  #
+  SemihostLib|Include/Library/SemihostLib.h
+
+  ##  @libraryclass  Provides an interface for a StandaloneMm Mmu.
+  #
   StandaloneMmMmuLib|Include/Library/StandaloneMmMmuLib.h
 
 [Guids.common]
@@ -84,6 +137,13 @@
   # hardware coherency (i.e., no virtualization or cache coherent DMA)
   gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000043
 
+[PcdsFeatureFlag.AARCH64]
+  ## Used to select method for requesting services from S-EL1.<BR><BR>
+  #   TRUE  - Selects FF-A calls for communication between S-EL0 and SPMC.<BR>
+  #   FALSE - Selects SVC calls for communication between S-EL0 and SPMC.<BR>
+  # @Prompt Enable FF-A support.
+  gArmTokenSpaceGuid.PcdFfaEnable|FALSE|BOOLEAN|0x0000005B
+
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
 
@@ -114,6 +174,20 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
   # The Primary Core is ClusterId[0] & CoreId[0]
   gArmTokenSpaceGuid.PcdArmPrimaryCore|0|UINT32|0x00000037
+
+  #
+  # SMBIOS PCDs
+  #
+  gArmTokenSpaceGuid.PcdSystemProductName|L""|VOID*|0x30000053
+  gArmTokenSpaceGuid.PcdSystemVersion|L""|VOID*|0x30000054
+  gArmTokenSpaceGuid.PcdBaseBoardManufacturer|L""|VOID*|0x30000055
+  gArmTokenSpaceGuid.PcdBaseBoardProductName|L""|VOID*|0x30000056
+  gArmTokenSpaceGuid.PcdBaseBoardVersion|L""|VOID*|0x30000057
+  gArmTokenSpaceGuid.PcdProcessorManufacturer|L""|VOID*|0x30000071
+  gArmTokenSpaceGuid.PcdProcessorVersion|L""|VOID*|0x30000072
+  gArmTokenSpaceGuid.PcdProcessorSerialNumber|L""|VOID*|0x30000073
+  gArmTokenSpaceGuid.PcdProcessorAssetTag|L""|VOID*|0x30000074
+  gArmTokenSpaceGuid.PcdProcessorPartNumber|L""|VOID*|0x30000075
 
   #
   # ARM L2x0 PCDs
@@ -214,6 +288,9 @@
 
   gArmTokenSpaceGuid.PcdMmBufferBase|0|UINT64|0x00000045
   gArmTokenSpaceGuid.PcdMmBufferSize|0|UINT64|0x00000046
+
+  gArmTokenSpaceGuid.PcdSystemBiosRelease|0xFFFF|UINT16|0x30000058
+  gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease|0xFFFF|UINT16|0x30000059
 
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
   #

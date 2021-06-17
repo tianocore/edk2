@@ -1,7 +1,7 @@
 /** @file
   SSDT Serial Port Fixup Library.
 
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -139,13 +139,25 @@ FixupIds (
   AML_OBJECT_NODE_HANDLE    NameOpIdNode;
   CONST CHAR8             * HidString;
   CONST CHAR8             * CidString;
+  CONST CHAR8             * NonBsaHid;
 
   // Get the _CID and _HID value to write.
   switch (SerialPortInfo->PortSubtype) {
     case EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550:
     {
-      HidString = "PNP0501";
-      CidString = "PNP0500";
+      // If there is a non-BSA compliant HID, use that.
+      NonBsaHid = (CONST CHAR8*)PcdGetPtr (PcdNonBsaCompliant16550SerialHid);
+      if ((NonBsaHid != NULL) && (AsciiStrLen (NonBsaHid) != 0)) {
+        if (!(IsValidPnpId (NonBsaHid) || IsValidAcpiId (NonBsaHid))) {
+          return EFI_INVALID_PARAMETER;
+        }
+
+        HidString = NonBsaHid;
+        CidString = "";
+      } else {
+        HidString = "PNP0501";
+        CidString = "PNP0500";
+      }
       break;
     }
     case EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_PL011_UART:

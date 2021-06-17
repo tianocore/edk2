@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __ARM_MMU_LIB__
-#define __ARM_MMU_LIB__
+#ifndef ARM_MMU_LIB_H_
+#define ARM_MMU_LIB_H_
 
 #include <Uefi/UefiBaseType.h>
 
@@ -64,4 +64,4 @@ ArmSetMemoryAttributes (
   IN UINT64                    Attributes
   );
 
-#endif
+#endif // ARM_MMU_LIB_H_

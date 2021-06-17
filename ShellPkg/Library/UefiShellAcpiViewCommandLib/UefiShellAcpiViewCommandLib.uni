@@ -85,6 +85,7 @@
 "       DSDT  - Differentiated System Description Table\r\n"
 "       FACP  - Fixed ACPI Description Table (FADT)\r\n"
 "       GTDT  - Generic Timer Description Table\r\n"
+"       HMAT  - Heterogeneous Memory Attributes Table\r\n"
 "       IORT  - IO Remapping Table\r\n"
 "       MCFG  - Memory Mapped Config Space Base Address Description Table\r\n"
 "       PPTT  - Processor Properties Topology Table\r\n"

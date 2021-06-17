@@ -1,7 +1,7 @@
 ## @file
 # Create makefile for MS nmake and GNU make
 #
-# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 from __future__ import absolute_import
@@ -173,14 +173,22 @@ class AutoGenInfo(object):
             Family = Key[0]
             Target, Tag, Arch, Tool, Attr = Key[1].split("_")
             # if tool chain family doesn't match, skip it
-            if Tool in ToolDef and Family != "":
-                FamilyIsNull = False
-                if ToolDef[Tool].get(TAB_TOD_DEFINES_BUILDRULEFAMILY, "") != "":
-                    if Family != ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
-                        continue
-                elif Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+            if Family != "":
+                Found = False
+                if Tool in ToolDef:
+                    FamilyIsNull = False
+                    if TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDef[Tool]:
+                        if Family == ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                if TAB_STAR in ToolDef:
+                    FamilyIsNull = False
+                    if TAB_TOD_DEFINES_BUILDRULEFAMILY in ToolDef[TAB_STAR]:
+                        if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                            FamilyMatch = True
+                            Found = True
+                if not Found:
                     continue
-                FamilyMatch = True
             # expand any wildcard
             if Target == TAB_STAR or Target == self.BuildTarget:
                 if Tag == TAB_STAR or Tag == self.ToolChain:
@@ -210,10 +218,19 @@ class AutoGenInfo(object):
             Family = Key[0]
             Target, Tag, Arch, Tool, Attr = Key[1].split("_")
             # if tool chain family doesn't match, skip it
-            if Tool not in ToolDef or Family == "":
+            if Family == "":
                 continue
             # option has been added before
-            if Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+            Found = False
+            if Tool in ToolDef:
+                if TAB_TOD_DEFINES_FAMILY in ToolDef[Tool]:
+                    if Family == ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
+                        Found = True
+            if TAB_STAR in ToolDef:
+                if TAB_TOD_DEFINES_FAMILY in ToolDef[TAB_STAR]:
+                    if Family == ToolDef[TAB_STAR][TAB_TOD_DEFINES_FAMILY]:
+                        Found = True
+            if not Found:
                 continue
 
             # expand any wildcard
@@ -615,14 +632,19 @@ class PlatformInfo(AutoGenInfo):
                     if Attr == TAB_TOD_DEFINES_BUILDRULEORDER:
                         continue
                     Value = Options[Tool][Attr]
-                    # check if override is indicated
-                    if Value.startswith('='):
-                        BuildOptions[Tool][Attr] = mws.handleWsMacro(Value[1:])
-                    else:
-                        if Attr != 'PATH':
-                            BuildOptions[Tool][Attr] += " " + mws.handleWsMacro(Value)
+                    ToolList = [Tool]
+                    if Tool == TAB_STAR:
+                        ToolList = list(AllTools)
+                        ToolList.remove(TAB_STAR)
+                    for ExpandedTool in ToolList:
+                        # check if override is indicated
+                        if Value.startswith('='):
+                            BuildOptions[ExpandedTool][Attr] = mws.handleWsMacro(Value[1:])
                         else:
-                            BuildOptions[Tool][Attr] = mws.handleWsMacro(Value)
+                            if Attr != 'PATH':
+                                BuildOptions[ExpandedTool][Attr] += " " + mws.handleWsMacro(Value)
+                            else:
+                                BuildOptions[ExpandedTool][Attr] = mws.handleWsMacro(Value)
 
         return BuildOptions, BuildRuleOrder
 

@@ -42,6 +42,12 @@ QemuCpuhpWriteCpuSelector (
   );
 
 VOID
+QemuCpuhpWriteCpuStatus (
+  IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
+  IN UINT8                        CpuStatus
+  );
+
+VOID
 QemuCpuhpWriteCommand (
   IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
   IN UINT8                        Command
@@ -55,6 +61,7 @@ QemuCpuhpCollectApicIds (
   OUT APIC_ID                      *PluggedApicIds,
   OUT UINT32                       *PluggedCount,
   OUT APIC_ID                      *ToUnplugApicIds,
+  OUT UINT32                       *ToUnplugSelectors,
   OUT UINT32                       *ToUnplugCount
   );
 

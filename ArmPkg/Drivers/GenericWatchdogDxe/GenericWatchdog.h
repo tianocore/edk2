@@ -5,8 +5,8 @@
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
-#ifndef __GENERIC_WATCHDOG_H__
-#define __GENERIC_WATCHDOG_H__
+#ifndef GENERIC_WATCHDOG_H_
+#define GENERIC_WATCHDOG_H_
 
 // Refresh Frame:
 #define GENERIC_WDOG_REFRESH_REG              ((UINTN)FixedPcdGet64 (PcdGenericWatchdogRefreshBase) + 0x000)
@@ -21,4 +21,4 @@
 #define GENERIC_WDOG_ENABLED          1
 #define GENERIC_WDOG_DISABLED         0
 
-#endif  // __GENERIC_WATCHDOG_H__
+#endif  // GENERIC_WATCHDOG_H_

@@ -1,7 +1,7 @@
 ## @file
 #  Module to manage the list of available table factories.
 #
-#  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+#  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -41,9 +41,9 @@
   UefiDriverEntryPoint
 
 [FixedPcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomACPIGenerators
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomSMBIOSGenerators
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomDTGenerators
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomACPIGenerators
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomSMBIOSGenerators
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomDTGenerators
 
 [Protocols]
   gEdkiiDynamicTableFactoryProtocolGuid         # PRODUCES

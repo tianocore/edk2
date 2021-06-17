@@ -1,7 +1,7 @@
 /** @file
   Definitions to install Multiple Processor PPI.
 
-  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -27,6 +27,7 @@
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/MpInitLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 extern EFI_PEI_PPI_DESCRIPTOR   mPeiCpuMpPpiDesc;
 

@@ -6,8 +6,8 @@
 *
 **/
 
-#ifndef __ARM_SVC_LIB__
-#define __ARM_SVC_LIB__
+#ifndef ARM_SVC_LIB_H_
+#define ARM_SVC_LIB_H_
 
 /**
  * The size of the SVC arguments are different between AArch64 and AArch32.
@@ -27,9 +27,15 @@ typedef struct {
 /**
   Trigger an SVC call
 
-  SVC calls can take up to 7 arguments and return up to 4 return values.
-  Therefore, the 4 first fields in the ARM_SVC_ARGS structure are used
+  SVC calls can take up to 8 arguments and return up to 8 return values.
+  Therefore, the 8 first fields in the ARM_SVC_ARGS structure are used
   for both input and output values.
+
+  @param[in, out]    Args Arguments to be passed as part of the SVC call
+                     The return values of the SVC call are also placed
+                     in the same structure
+
+  @retval None
 
 **/
 VOID
@@ -37,4 +43,4 @@ ArmCallSvc (
   IN OUT ARM_SVC_ARGS *Args
   );
 
-#endif
+#endif // ARM_SVC_LIB_H_

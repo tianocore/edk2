@@ -132,7 +132,7 @@ EFI_STATUS
                                          supports.
   @param[in]    ToStructure              The function to convert REST JSON resource to structure.
   @param[in]    ToJson                   The function to convert REST JSON structure to JSON in text format.
-  @param[out]    DestroyStructure         Destroy REST JSON structure returned in ToStructure() function.
+  @param[in]    DestroyStructure         Destroy REST JSON structure returned in ToStructure() function.
 
   @retval EFI_SUCCESS             Register successfully.
   @retval Others                  Fail to register.

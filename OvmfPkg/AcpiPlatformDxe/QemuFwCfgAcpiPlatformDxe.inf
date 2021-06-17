@@ -27,18 +27,19 @@
   PciDecoding.c
   QemuFwCfgAcpi.c
   QemuFwCfgAcpiPlatform.c
-  QemuLoader.h
 
 [Packages]
-  MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
   DebugLib
   MemoryAllocationLib
   OrderedCollectionLib
+  PcdLib
   QemuFwCfgLib
   QemuFwCfgS3Lib
   UefiBootServicesTableLib

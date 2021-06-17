@@ -49,12 +49,15 @@
 //
 // VMG Special Exit Codes
 //
-#define SVM_EXIT_MMIO_READ      0x80000001ULL
-#define SVM_EXIT_MMIO_WRITE     0x80000002ULL
-#define SVM_EXIT_NMI_COMPLETE   0x80000003ULL
-#define SVM_EXIT_AP_RESET_HOLD  0x80000004ULL
-#define SVM_EXIT_AP_JUMP_TABLE  0x80000005ULL
-#define SVM_EXIT_UNSUPPORTED    0x8000FFFFULL
+#define SVM_EXIT_MMIO_READ                      0x80000001ULL
+#define SVM_EXIT_MMIO_WRITE                     0x80000002ULL
+#define SVM_EXIT_NMI_COMPLETE                   0x80000003ULL
+#define SVM_EXIT_AP_RESET_HOLD                  0x80000004ULL
+#define SVM_EXIT_AP_JUMP_TABLE                  0x80000005ULL
+#define SVM_EXIT_SNP_PAGE_STATE_CHANGE          0x80000010ULL
+#define SVM_EXIT_SNP_AP_CREATION                0x80000013ULL
+#define SVM_EXIT_HYPERVISOR_FEATURES            0x8000FFFDULL
+#define SVM_EXIT_UNSUPPORTED                    0x8000FFFFULL
 
 //
 // IOIO Exit Information
@@ -81,6 +84,12 @@
 #define IOIO_SEG_ES         0
 #define IOIO_SEG_DS         (BIT11 | BIT10)
 
+//
+// AP Creation Information
+//
+#define SVM_VMGEXIT_SNP_AP_CREATE_ON_INIT  0
+#define SVM_VMGEXIT_SNP_AP_CREATE          1
+#define SVM_VMGEXIT_SNP_AP_DESTROY         2
 
 typedef PACKED struct {
   UINT8                  Reserved1[203];
@@ -153,5 +162,121 @@ typedef union {
 #define GHCB_EVENT_INJECTION_TYPE_NMI        2
 #define GHCB_EVENT_INJECTION_TYPE_EXCEPTION  3
 #define GHCB_EVENT_INJECTION_TYPE_SOFT_INT   4
+
+//
+// Hypervisor features
+//
+#define GHCB_HV_FEATURES_SNP                              BIT0
+#define GHCB_HV_FEATURES_SNP_AP_CREATE                    (GHCB_HV_FEATURES_SNP | BIT1)
+#define GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION         (GHCB_HV_FEATURES_SNP_AP_CREATE | BIT2)
+#define GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION_TIMER   (GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION | BIT3)
+
+//
+// SNP Page State Change.
+//
+// Note that the PSMASH and UNSMASH operations are not supported when using the MSR protocol.
+//
+#define SNP_PAGE_STATE_PRIVATE              1
+#define SNP_PAGE_STATE_SHARED               2
+#define SNP_PAGE_STATE_PSMASH               3
+#define SNP_PAGE_STATE_UNSMASH              4
+
+typedef struct {
+  UINT64  CurrentPage:12;
+  UINT64  GuestFrameNumber:40;
+  UINT64  Operation:4;
+  UINT64  PageSize:1;
+  UINT64  Reserved:7;
+} SNP_PAGE_STATE_ENTRY;
+
+typedef struct {
+  UINT16 CurrentEntry;
+  UINT16 EndEntry;
+  UINT32 Reserved;
+} SNP_PAGE_STATE_HEADER;
+
+#define SNP_PAGE_STATE_MAX_ENTRY            253
+
+typedef struct {
+  SNP_PAGE_STATE_HEADER  Header;
+  SNP_PAGE_STATE_ENTRY   Entry[SNP_PAGE_STATE_MAX_ENTRY];
+} SNP_PAGE_STATE_CHANGE_INFO;
+
+//
+// SEV-ES save area mapping structures used for SEV-SNP AP Creation.
+// Only the fields required to be set to a non-zero value are defined.
+//
+// The segment register definition is defined for processor reset/real mode
+// (as when an INIT of the vCPU is requested). Should other modes (long mode,
+// etc.) be required, then the definitions can be enhanced.
+//
+
+//
+// Segment types at processor reset, See AMD APM Volume 2, Table 14-2.
+//
+#define SEV_ES_RESET_CODE_SEGMENT_TYPE  0xA
+#define SEV_ES_RESET_DATA_SEGMENT_TYPE  0x2
+
+#define SEV_ES_RESET_LDT_TYPE           0x2
+#define SEV_ES_RESET_TSS_TYPE           0x3
+
+#pragma pack (1)
+typedef union {
+    struct {
+      UINT16  Type:4;
+      UINT16  Sbit:1;
+      UINT16  Dpl:2;
+      UINT16  Present:1;
+      UINT16  Avl:1;
+      UINT16  Reserved1:1;
+      UINT16  Db:1;
+      UINT16  Granularity:1;
+    } Bits;
+    UINT16  Uint16;
+} SEV_ES_SEGMENT_REGISTER_ATTRIBUTES;
+
+typedef struct {
+  UINT16                                Selector;
+  SEV_ES_SEGMENT_REGISTER_ATTRIBUTES    Attributes;
+  UINT32                                Limit;
+  UINT64                                Base;
+} SEV_ES_SEGMENT_REGISTER;
+
+typedef struct {
+  SEV_ES_SEGMENT_REGISTER  Es;
+  SEV_ES_SEGMENT_REGISTER  Cs;
+  SEV_ES_SEGMENT_REGISTER  Ss;
+  SEV_ES_SEGMENT_REGISTER  Ds;
+  SEV_ES_SEGMENT_REGISTER  Fs;
+  SEV_ES_SEGMENT_REGISTER  Gs;
+  SEV_ES_SEGMENT_REGISTER  Gdtr;
+  SEV_ES_SEGMENT_REGISTER  Ldtr;
+  SEV_ES_SEGMENT_REGISTER  Idtr;
+  SEV_ES_SEGMENT_REGISTER  Tr;
+  UINT8                    Reserved1[42];
+  UINT8                    Vmpl;
+  UINT8                    Reserved2[5];
+  UINT64                   Efer;
+  UINT8                    Reserved3[112];
+  UINT64                   Cr4;
+  UINT8                    Reserved4[8];
+  UINT64                   Cr0;
+  UINT64                   Dr7;
+  UINT64                   Dr6;
+  UINT64                   Rflags;
+  UINT64                   Rip;
+  UINT8                    Reserved5[232];
+  UINT64                   GPat;
+  UINT8                    Reserved6[320];
+  UINT64                   SevFeatures;
+  UINT8                    Reserved7[48];
+  UINT64                   XCr0;
+  UINT8                    Reserved8[24];
+  UINT32                   Mxcsr;
+  UINT16                   X87Ftw;
+  UINT8                    Reserved9[2];
+  UINT16                   X87Fcw;
+} SEV_ES_SAVE_AREA;
+#pragma pack ()
 
 #endif

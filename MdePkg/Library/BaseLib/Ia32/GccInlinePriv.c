@@ -2,7 +2,7 @@
   GCC inline implementation of BaseLib processor specific functions that use
   privlidged instructions.
 
-  Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,6 +10,7 @@
 
 
 #include "BaseLibInternals.h"
+#include <Library/RegisterFilterLib.h>
 
 /**
   Enables CPU interrupts.
@@ -63,12 +64,17 @@ AsmReadMsr64 (
   )
 {
   UINT64 Data;
+  BOOLEAN Flag;
 
-  __asm__ __volatile__ (
-    "rdmsr"
-    : "=A" (Data)   // %0
-    : "c"  (Index)  // %1
-    );
+  Flag = FilterBeforeMsrRead (Index, &Data);
+  if (Flag) {
+    __asm__ __volatile__ (
+      "rdmsr"
+      : "=A" (Data)   // %0
+      : "c"  (Index)  // %1
+      );
+  }
+  FilterAfterMsrRead (Index, &Data);
 
   return Data;
 }
@@ -97,12 +103,18 @@ AsmWriteMsr64 (
   IN      UINT64                    Value
   )
 {
-  __asm__ __volatile__ (
-    "wrmsr"
-    :
-    : "c" (Index),
-      "A" (Value)
-    );
+  BOOLEAN  Flag;
+
+  Flag = FilterBeforeMsrWrite (Index, &Value);
+  if (Flag) {
+    __asm__ __volatile__ (
+      "wrmsr"
+      :
+      : "c" (Index),
+        "A" (Value)
+      );
+  }
+  FilterAfterMsrWrite (Index, &Value);
 
   return Value;
 }
@@ -890,7 +902,7 @@ AsmReadSs (
   UINT16  Data;
 
   __asm__ __volatile__ (
-    "mov  %%ds, %0"
+    "mov  %%ss, %0"
     :"=a" (Data)
     );
 

@@ -2,6 +2,7 @@
 *  Exception Handling support specific for AArch64
 *
 *  Copyright (c) 2016 HP Development Company, L.P.
+*  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -27,7 +28,8 @@ RegisterEl0Stack (
   IN  VOID    *Stack
   );
 
-RETURN_STATUS ArchVectorConfig(
+RETURN_STATUS
+ArchVectorConfig (
   IN  UINTN       VectorBaseAddress
   )
 {

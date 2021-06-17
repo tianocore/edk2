@@ -43,3 +43,4 @@
 
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpChunkTransfer  ## SOMETIMES_CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout         ## SOMETIMES_CONSUMES

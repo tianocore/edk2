@@ -430,10 +430,10 @@ JsonValueGetAsciiString (
   IN    EDKII_JSON_VALUE    Json
   )
 {
-  CHAR8          *AsciiStr;
+  CONST CHAR8    *AsciiStr;
   UINTN          Index;
 
-  AsciiStr = (CHAR8 *)  ((json_t *) Json);
+  AsciiStr = json_string_value ((json_t *) Json);
   if (AsciiStr == NULL) {
     return NULL;
   }
@@ -817,6 +817,32 @@ JsonDumpString (
       return NULL;
     }
     return json_dumps((json_t *)JsonValue, Flags);
+}
+
+/**
+  Convert a string to JSON object.
+  The function is used to convert a NULL terminated CHAR8 string to a JSON
+  value. Only object and array represented strings can be converted successfully,
+  since they are the only valid root values of a JSON text for UEFI usage.
+
+  Real number and number with exponent part are not supportted by UEFI.
+
+  Caller needs to cleanup the root value by calling JsonValueFree().
+
+  @param[in]   String        The NULL terminated CHAR8 string to convert.
+
+  @retval      Array JSON value or object JSON value, or NULL when any error occurs.
+
+**/
+EDKII_JSON_VALUE
+EFIAPI
+JsonLoadString (
+  IN    CONST CHAR8*    String
+  )
+{
+  json_error_t    JsonError;
+
+  return (EDKII_JSON_VALUE) json_loads ((const char *)String, 0, &JsonError);
 }
 
 /**

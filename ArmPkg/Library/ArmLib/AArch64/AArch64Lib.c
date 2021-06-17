@@ -2,7 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Portions copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
-  Copyright (c) 2020, NUVIA Inc. All rights reserved.<BR>
+  Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -86,4 +86,21 @@ ArmHasGicSystemRegisters (
   )
 {
   return ((ArmReadIdAA64Pfr0 () & AARCH64_PFR0_GIC) != 0);
+}
+
+/** Checks if CCIDX is implemented.
+
+   @retval TRUE  CCIDX is implemented.
+   @retval FALSE CCIDX is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasCcidx (
+  VOID
+  )
+{
+  UINTN Mmfr2;
+
+  Mmfr2 = ArmReadIdAA64Mmfr2 ();
+  return (((Mmfr2 >> 20) & 0xF) == 1) ? TRUE : FALSE;
 }
