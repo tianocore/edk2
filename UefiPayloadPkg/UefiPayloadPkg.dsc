@@ -87,6 +87,12 @@
   #
   DEFINE SHELL_TYPE                   = BUILD_SHELL
 
+  #
+  # Disable features
+  #
+  DEFINE DISABLE_VARIABLE      = FALSE
+  DEFINE DISABLE_RESET_SYSTEM  = FALSE
+
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
   GCC:*_UNIXGCC_*_CC_FLAGS       = -DMDEPKG_NDEBUG
@@ -432,10 +438,13 @@
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+!if $(DISABLE_RESET_SYSTEM) == FALSE
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+!endif
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+!if $(DISABLE_VARIABLE) == FALSE
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-
+!endif
   #
   # Following are the DXE drivers
   #
