@@ -1,7 +1,7 @@
 /** @file
   PEI Services Table Pointer Library.
 
-  Copyright (c) 2019 - 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -9,7 +9,7 @@
 #include <PiPei.h>
 #include <Library/DebugLib.h>
 #include <Library/RiscVCpuLib.h>
-#include <Library/RiscVEdk2SbiLib.h>
+#include <Library/RiscVFirmwareContextLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <sbi/sbi_scratch.h>
 #include <sbi/sbi_platform.h>
@@ -32,8 +32,8 @@ SetPeiServicesTablePointer (
   )
 {
   EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContext;
-  SbiGetFirmwareContext (&FirmwareContext);
 
+  GetFirmwareContextPointer (&FirmwareContext);
   FirmwareContext->PeiServiceTable = (VOID *)(UINTN)PeiServicesTablePointer;
 
   DEBUG ((DEBUG_INFO, "Set PEI Service 0x%x at OpenSBI Firmware Context at 0x%x\n",
@@ -61,8 +61,8 @@ GetPeiServicesTablePointer (
   )
 {
   EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContext;
-  SbiGetFirmwareContext (&FirmwareContext);
 
+  GetFirmwareContextPointer (&FirmwareContext);
   return (CONST EFI_PEI_SERVICES **)FirmwareContext->PeiServiceTable;
 }
 

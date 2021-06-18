@@ -4,7 +4,7 @@
 #  PEI Services Table Pointer Library implementation that retrieves a pointer to the
 #  PEI Services Table from a RISC-V OpenSBI sbi_platform firmware context structure.
 #
-#  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -35,5 +35,5 @@
 [LibraryClasses]
   DebugLib
   RiscVCpuLib
-  RiscVEdk2SbiLib
+  RiscVFirmwareContextLib
 
