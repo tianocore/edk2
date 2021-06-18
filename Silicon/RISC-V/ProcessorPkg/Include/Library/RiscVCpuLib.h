@@ -1,7 +1,7 @@
 /** @file
   RISC-V CPU library definitions.
 
-  Copyright (c) 2016 - 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -67,5 +67,17 @@ RiscVReadMachineImplementId (VOID);
 
 VOID
 RiscVSetSupervisorAddressTranslationRegister(UINT64);
+
+VOID
+RiscVSetSupervisorScratch (UINT64);
+
+UINT64
+RiscVGetSupervisorScratch (VOID);
+
+VOID
+RiscVSetSupervisorStvec (UINT64);
+
+UINT64
+RiscVGetSupervisorStvec (VOID);
 
 #endif
