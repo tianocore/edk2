@@ -243,6 +243,22 @@ VOID
   );
 
 ///
+/// Structure describing a MMRAM region which cannot be used for the MMRAM heap.
+///
+typedef struct _EFI_MM_RESERVED_MMRAM_REGION {
+  ///
+  /// Starting address of the reserved MMRAM area, as it appears while MMRAM is open.
+  /// Ignored if MmramReservedSize is 0.
+  ///
+  EFI_PHYSICAL_ADDRESS    MmramReservedStart;
+  ///
+  /// Number of bytes occupied by the reserved MMRAM area. A size of zero indicates the
+  /// last MMRAM area.
+  ///
+  UINT64                  MmramReservedSize;
+} EFI_MM_RESERVED_MMRAM_REGION;
+
+///
 /// Management Mode System Table (MMST)
 ///
 /// The Management Mode System Table (MMST) is a table that contains a collection of common
