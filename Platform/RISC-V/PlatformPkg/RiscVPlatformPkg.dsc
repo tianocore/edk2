@@ -71,6 +71,7 @@
 
 [LibraryClasses.common.SEC]
   ExtractGuidedSectionLib|MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
+  RiscVSpecialPlatformLib|Platform/RISC-V/PlatformPkg/Library/RiscVSpecialPlatformLib/RiscVSpecialPlatformLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   PlatformBootManagerLib|Platform/RISC-V/PlatformPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
@@ -84,6 +85,7 @@
   Platform/RISC-V/PlatformPkg/Library/RiscVPlatformTempMemoryInitLibNull/RiscVPlatformTempMemoryInitLibNull.inf
   Platform/RISC-V/PlatformPkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   Platform/RISC-V/PlatformPkg/Library/PlatformSecPpiLibNull/PlatformSecPpiLibNull.inf
+  Platform/RISC-V/PlatformPkg/Library/RiscVSpecialPlatformLib/RiscVSpecialPlatformLib.inf
 
 [Components.common.SEC]
   Platform/RISC-V/PlatformPkg/Universal/Sec/SecMain.inf

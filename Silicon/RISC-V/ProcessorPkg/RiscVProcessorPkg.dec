@@ -19,6 +19,7 @@
   Include/Library
   Library/RiscVOpensbiLib/opensbi         # OpenSBI header file reference ("include/sbi/...")
   Library/RiscVOpensbiLib/opensbi/include # Header file reference from opensbi files, ("sbi/...")
+  Library/RiscVOpensbiLib/opensbi/platform/generic/include # Header file reference from opensbi files, ("sbi/...")
 
 [LibraryClasses]
   RiscVPlatformDxeIplLib|Include/Library/RiscVPlatformDxeIpl.h
