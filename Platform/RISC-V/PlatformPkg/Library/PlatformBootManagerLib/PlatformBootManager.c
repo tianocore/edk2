@@ -1,7 +1,7 @@
 /** @file
   This file include all platform actions
 
-Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -154,6 +154,11 @@ PlatformBootManagerBeforeConsole (
   EFI_INPUT_KEY                Enter;
   EFI_INPUT_KEY                F2;
   EFI_BOOT_MANAGER_LOAD_OPTION BootOption;
+
+  //
+  // Signal EndOfDxe PI Event
+  //
+  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
 
   //
   // Update the console variables.
