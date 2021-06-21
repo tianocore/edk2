@@ -202,7 +202,7 @@ InitShadowStack (
       // Please refer to UefiCpuPkg/Library/CpuExceptionHandlerLib/X64 for the full stack frame at runtime.
       //
       InterruptSsp = (UINT32)((UINTN)ShadowStack + EFI_PAGES_TO_SIZE(1) - sizeof(UINT64));
-      *(UINT32 *)(UINTN)InterruptSsp = (InterruptSsp - sizeof(UINT64) * 4) | 0x2;
+      *(UINT64 *)(UINTN)InterruptSsp = (InterruptSsp - sizeof(UINT64) * 4) | 0x2;
       mCetInterruptSsp = InterruptSsp - sizeof(UINT64);
 
       mCetInterruptSspTable = (UINT32)(UINTN)(mSmmInterruptSspTables + sizeof(UINT64) * 8 * CpuIndex);
