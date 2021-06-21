@@ -50,6 +50,7 @@
   BaseMemoryLib
   DebugLib
   UefiBootManagerLib
+  VariablePolicyHelperLib
   PlatformBootManagerLib
   PcdLib
   PrintLib
@@ -77,7 +78,7 @@
 [Protocols]
   gEfiBdsArchProtocolGuid                       ## PRODUCES
   gEfiSimpleTextInputExProtocolGuid             ## CONSUMES
-  gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
+  gEdkiiVariablePolicyProtocolGuid              ## SOMETIMES_CONSUMES
   gEfiDeferredImageLoadProtocolGuid             ## CONSUMES
 
 [FeaturePcd]
