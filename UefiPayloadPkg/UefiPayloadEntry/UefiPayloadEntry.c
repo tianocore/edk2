@@ -517,6 +517,8 @@ BuildGenericHob (
 
   // The UEFI payload FV
   BuildMemoryAllocationHob (PcdGet32 (PcdPayloadFdMemBase), PcdGet32 (PcdPayloadFdMemSize), EfiBootServicesData);
+  // The UEFI payload config FV
+  BuildMemoryAllocationHob (PcdGet32 (PcdPayloadFdMemBase) - SIZE_64KB, SIZE_64KB, EfiRuntimeServicesData);
 
   //
   // Build CPU memory space and IO space hob
