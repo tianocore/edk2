@@ -517,6 +517,10 @@ BuildGenericHob (
 
   // The UEFI payload FV
   BuildMemoryAllocationHob (PcdGet32 (PcdPayloadFdMemBase), PcdGet32 (PcdPayloadFdMemSize), EfiBootServicesData);
+  #ifdef LINUXBOOT_PAYLOAD
+  // The UEFI payload config FV
+  BuildMemoryAllocationHob (PcdGet32 (PcdPayloadFdMemBase) - SIZE_64KB, SIZE_64KB, EfiRuntimeServicesData);
+  #endif
 
   //
   // Build CPU memory space and IO space hob
