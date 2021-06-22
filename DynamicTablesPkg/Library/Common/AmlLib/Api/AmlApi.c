@@ -379,6 +379,42 @@ AmlNameOpGetNextRdNode (
   return EFI_SUCCESS;
 }
 
+/** Attach a node in an AML tree.
+
+  The node will be added as the last statement of the ParentNode.
+  E.g.:
+  ASL code corresponding to NewNode:
+  Name (_UID, 0)
+
+  ASL code corresponding to ParentNode:
+  Device (PCI0) {
+    Name(_HID, EISAID("PNP0A08"))
+  }
+
+  "AmlAttachNode (ParentNode, NewNode)" will result in:
+  ASL code:
+  Device (PCI0) {
+    Name(_HID, EISAID("PNP0A08"))
+    Name (_UID, 0)
+  }
+
+  @param  [in]  ParentNode  Pointer to the parent node.
+                            Must be a root or an object node.
+  @param  [in]  NewNode     Pointer to the node to add.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlAttachNode (
+  IN  AML_NODE_HANDLE   ParentNode,
+  IN  AML_NODE_HANDLE   NewNode
+  )
+{
+  return AmlVarListAddTail (ParentNode, NewNode);
+}
+
 // DEPRECATED APIS
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
