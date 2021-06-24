@@ -751,6 +751,79 @@ SevEsProtocolFailure (
 }
 
 /**
+  Determine if SEV-SNP is active.
+
+  @retval TRUE   SEV-SNP is enabled
+  @retval FALSE  SEV-SNP is not enabled
+
+**/
+STATIC
+BOOLEAN
+SevSnpIsEnabled (
+  VOID
+  )
+{
+  MSR_SEV_STATUS_REGISTER           Msr;
+
+  //
+  // Read the SEV_STATUS MSR to determine whether SEV-SNP is active.
+  //
+  Msr.Uint32 = AsmReadMsr32 (MSR_SEV_STATUS);
+
+  //
+  // Check MSR_0xC0010131 Bit 2 (Sev-Snp Enabled)
+  //
+  if (Msr.Bits.SevSnpBit) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+STATIC
+VOID
+SevSnpGhcbRegister (
+  UINTN   Address
+  )
+{
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+  MSR_SEV_ES_GHCB_REGISTER  CurrentMsr;
+  EFI_PHYSICAL_ADDRESS      GuestFrameNumber;
+
+  GuestFrameNumber = Address >> EFI_PAGE_SHIFT;
+
+  //
+  // Save the current MSR Value
+  //
+  CurrentMsr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+
+  //
+  // Use the GHCB MSR Protocol to request to register the GPA.
+  //
+  Msr.GhcbPhysicalAddress = 0;
+  Msr.GhcbGpaRegister.Function = GHCB_INFO_GHCB_GPA_REGISTER_REQUEST;
+  Msr.GhcbGpaRegister.GuestFrameNumber = GuestFrameNumber;
+  AsmWriteMsr64 (MSR_SEV_ES_GHCB, Msr.GhcbPhysicalAddress);
+
+  AsmVmgExit ();
+
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+
+  //
+  // If hypervisor responded with a different GPA than requested then fail.
+  //
+  if ((Msr.GhcbGpaRegister.Function != GHCB_INFO_GHCB_GPA_REGISTER_RESPONSE) ||
+      (Msr.GhcbGpaRegister.GuestFrameNumber != GuestFrameNumber)) {
+    SevEsProtocolFailure (GHCB_TERMINATE_GHCB_GENERAL);
+  }
+
+  //
+  // Restore the MSR
+  //
+  AsmWriteMsr64 (MSR_SEV_ES_GHCB, CurrentMsr.GhcbPhysicalAddress);
+}
+
+/**
   Validate the SEV-ES/GHCB protocol level.
 
   Verify that the level of SEV-ES/GHCB protocol supported by the hypervisor
@@ -789,6 +862,17 @@ SevEsProtocolCheck (
   if ((Msr.GhcbProtocol.SevEsProtocolMin > GHCB_VERSION_MAX) ||
       (Msr.GhcbProtocol.SevEsProtocolMax < GHCB_VERSION_MIN)) {
     SevEsProtocolFailure (GHCB_TERMINATE_GHCB_PROTOCOL);
+  }
+
+  //
+  // We cannot use the MemEncryptSevSnpIsEnabled () because the
+  // ProcessLibraryConstructorList () is not called yet.
+  //
+  if (SevSnpIsEnabled ()) {
+    //
+    // SEV-SNP guest requires that GHCB GPA must be registered before using it.
+    //
+    SevSnpGhcbRegister (FixedPcdGet32 (PcdOvmfSecGhcbBase));
   }
 
   //
