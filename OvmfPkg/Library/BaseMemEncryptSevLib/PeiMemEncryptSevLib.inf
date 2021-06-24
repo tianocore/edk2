@@ -58,3 +58,5 @@
 
 [FixedPcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpHypervisorPreValidatedEnd
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpHypervisorPreValidatedStart
