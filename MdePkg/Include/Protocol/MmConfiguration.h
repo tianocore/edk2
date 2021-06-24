@@ -21,22 +21,6 @@
     0x26eeb3de, 0xb689, 0x492e, {0x80, 0xf0, 0xbe, 0x8b, 0xd7, 0xda, 0x4b, 0xa7 }  \
   }
 
-///
-/// Structure describing a MMRAM region which cannot be used for the MMRAM heap.
-///
-typedef struct _EFI_MM_RESERVED_MMRAM_REGION {
-  ///
-  /// Starting address of the reserved MMRAM area, as it appears while MMRAM is open.
-  /// Ignored if MmramReservedSize is 0.
-  ///
-  EFI_PHYSICAL_ADDRESS    MmramReservedStart;
-  ///
-  /// Number of bytes occupied by the reserved MMRAM area. A size of zero indicates the
-  /// last MMRAM area.
-  ///
-  UINT64                  MmramReservedSize;
-} EFI_MM_RESERVED_MMRAM_REGION;
-
 typedef struct _EFI_MM_CONFIGURATION_PROTOCOL  EFI_MM_CONFIGURATION_PROTOCOL;
 
 /**
