@@ -334,6 +334,11 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidBase|0|UINT32|0x49
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidSize|0|UINT32|0x50
 
+  ## The start and end of pre-validated memory region by the hypervisor
+  #  through the SEV-SNP firmware.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpHypervisorPreValidatedStart|0x0|UINT32|0x51
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpHypervisorPreValidatedEnd|0x0|UINT32|0x52
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10

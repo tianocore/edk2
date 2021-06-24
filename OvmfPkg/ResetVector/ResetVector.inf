@@ -51,3 +51,5 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpHypervisorPreValidatedStart
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpHypervisorPreValidatedEnd
