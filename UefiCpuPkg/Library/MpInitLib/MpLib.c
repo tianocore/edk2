@@ -15,7 +15,6 @@
 
 EFI_GUID mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
 
-
 /**
   The function will check if BSP Execute Disable is enabled.
 
@@ -297,8 +296,8 @@ GetApLoopMode (
 
     if (PcdGetBool (PcdSevEsIsEnabled)) {
       //
-      // For SEV-ES, force AP in Hlt-loop mode in order to use the GHCB
-      // protocol for starting APs
+      // For SEV-ES (SEV-SNP is also considered SEV-ES), force AP in Hlt-loop
+      // mode in order to use the GHCB protocol for starting APs
       //
       ApLoopMode = ApInHltLoop;
     }
@@ -869,7 +868,7 @@ ApWakeupFunction (
       // to allow the APs to issue an AP_RESET_HOLD before the BSP possibly
       // performs another INIT-SIPI-SIPI sequence.
       //
-      if (!CpuMpData->SevEsIsEnabled) {
+      if (!CpuMpData->UseSevEsAPMethod) {
         InterlockedDecrement ((UINT32 *) &CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
       }
     }
@@ -883,7 +882,7 @@ ApWakeupFunction (
       //
       while (TRUE) {
         DisableInterrupts ();
-        if (CpuMpData->SevEsIsEnabled) {
+        if (CpuMpData->UseSevEsAPMethod) {
           MSR_SEV_ES_GHCB_REGISTER  Msr;
           GHCB                      *Ghcb;
           UINT64                    Status;
@@ -1196,9 +1195,11 @@ AllocateResetVector (
                                     );
     //
     // The AP reset stack is only used by SEV-ES guests. Do not allocate it
-    // if SEV-ES is not enabled.
+    // if SEV-ES is not enabled. An SEV-SNP guest is also considered
+    // an SEV-ES guest, but uses a different method of AP startup, eliminating
+    // the need for the allocation.
     //
-    if (PcdGetBool (PcdSevEsIsEnabled)) {
+    if (PcdGetBool (PcdSevEsIsEnabled) && !PcdGetBool (PcdSevSnpIsEnabled)) {
       //
       // Stack location is based on ProcessorNumber, so use the total number
       // of processors for calculating the total stack area.
@@ -1248,7 +1249,7 @@ FreeResetVector (
   // perform the restore as this will overwrite memory which has data
   // needed by SEV-ES.
   //
-  if (!CpuMpData->SevEsIsEnabled) {
+  if (!CpuMpData->UseSevEsAPMethod) {
     RestoreWakeupBuffer (CpuMpData);
   }
 }
@@ -1265,7 +1266,7 @@ AllocateSevEsAPMemory (
 {
   if (CpuMpData->SevEsAPBuffer == (UINTN) -1) {
     CpuMpData->SevEsAPBuffer =
-      CpuMpData->SevEsIsEnabled ? GetSevEsAPMemory () : 0;
+      CpuMpData->UseSevEsAPMethod ? GetSevEsAPMemory () : 0;
   }
 }
 
@@ -1319,6 +1320,222 @@ SetSevEsJumpTable (
 }
 
 /**
+  Create an SEV-SNP AP save area (VMSA) for use in running the vCPU.
+
+  @param[in]  CpuMpData        Pointer to CPU MP Data
+  @param[in]  CpuData          Pointer to CPU AP Data
+  @param[in]  ApicId           APIC ID of the vCPU
+**/
+STATIC
+VOID
+SevSnpCreateSaveArea (
+  IN CPU_MP_DATA               *CpuMpData,
+  IN CPU_AP_DATA               *CpuData,
+  UINT32                       ApicId
+  )
+{
+  SEV_ES_SAVE_AREA          *SaveArea;
+  IA32_CR0                  ApCr0;
+  IA32_CR0                  ResetCr0;
+  IA32_CR4                  ApCr4;
+  IA32_CR4                  ResetCr4;
+  UINTN                     StartIp;
+  UINT8                     SipiVector;
+  UINT32                    RmpAdjustStatus;
+  UINT64                    VmgExitStatus;
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+  GHCB                      *Ghcb;
+  BOOLEAN                   InterruptState;
+  UINT64                    ExitInfo1;
+  UINT64                    ExitInfo2;
+
+  //
+  // Allocate a single page for the SEV-ES Save Area and initialize it.
+  //
+  SaveArea = AllocateReservedPages (1);
+  if (!SaveArea) {
+    return;
+  }
+  ZeroMem (SaveArea, EFI_PAGE_SIZE);
+
+  //
+  // Propogate the CR0.NW and CR0.CD setting to the AP
+  //
+  ResetCr0.UintN = 0x00000010;
+  ApCr0.UintN = CpuData->VolatileRegisters.Cr0;
+  if (ApCr0.Bits.NW) {
+    ResetCr0.Bits.NW = 1;
+  }
+  if (ApCr0.Bits.CD) {
+    ResetCr0.Bits.CD = 1;
+  }
+
+  //
+  // Propagate the CR4.MCE setting to the AP
+  //
+  ResetCr4.UintN = 0;
+  ApCr4.UintN = CpuData->VolatileRegisters.Cr4;
+  if (ApCr4.Bits.MCE) {
+    ResetCr4.Bits.MCE = 1;
+  }
+
+  //
+  // Convert the start IP into a SIPI Vector
+  //
+  StartIp = CpuMpData->MpCpuExchangeInfo->BufferStart;
+  SipiVector = (UINT8) (StartIp >> 12);
+
+  //
+  // Set the CS:RIP value based on the start IP
+  //
+  SaveArea->Cs.Base = SipiVector << 12;
+  SaveArea->Cs.Selector = SipiVector << 8;
+  SaveArea->Cs.Limit = 0xFFFF;
+  SaveArea->Cs.Attributes.Bits.Present = 1;
+  SaveArea->Cs.Attributes.Bits.Sbit = 1;
+  SaveArea->Cs.Attributes.Bits.Type = SEV_ES_RESET_CODE_SEGMENT_TYPE;
+  SaveArea->Rip = StartIp & 0xFFF;
+
+  //
+  // Set the remaining values as defined in APM for INIT
+  //
+  SaveArea->Ds.Limit = 0xFFFF;
+  SaveArea->Ds.Attributes.Bits.Present = 1;
+  SaveArea->Ds.Attributes.Bits.Sbit = 1;
+  SaveArea->Ds.Attributes.Bits.Type = SEV_ES_RESET_DATA_SEGMENT_TYPE;
+  SaveArea->Es = SaveArea->Ds;
+  SaveArea->Fs = SaveArea->Ds;
+  SaveArea->Gs = SaveArea->Ds;
+  SaveArea->Ss = SaveArea->Ds;
+
+  SaveArea->Gdtr.Limit = 0xFFFF;
+  SaveArea->Ldtr.Limit = 0xFFFF;
+  SaveArea->Ldtr.Attributes.Bits.Present = 1;
+  SaveArea->Ldtr.Attributes.Bits.Type = SEV_ES_RESET_LDT_TYPE;
+  SaveArea->Idtr.Limit = 0xFFFF;
+  SaveArea->Tr.Limit = 0xFFFF;
+  SaveArea->Ldtr.Attributes.Bits.Present = 1;
+  SaveArea->Ldtr.Attributes.Bits.Type = SEV_ES_RESET_TSS_TYPE;
+
+  SaveArea->Efer   = 0x1000;
+  SaveArea->Cr4    = ResetCr4.UintN;
+  SaveArea->Cr0    = ResetCr0.UintN;
+  SaveArea->Dr7    = 0x0400;
+  SaveArea->Dr6    = 0xFFFF0FF0;
+  SaveArea->Rflags = 0x0002;
+  SaveArea->GPat   = 0x0007040600070406ULL;
+  SaveArea->XCr0   = 0x0001;
+  SaveArea->Mxcsr  = 0x1F80;
+  SaveArea->X87Ftw = 0x5555;
+  SaveArea->X87Fcw = 0x0040;
+
+  //
+  // Set the SEV-SNP specific fields for the save area:
+  //   VMPL - always VMPL0
+  //   SEV_FEATURES - equivalent to the SEV_STATUS MSR right shifted 2 bits
+  //
+  SaveArea->Vmpl        = 0;
+  SaveArea->SevFeatures = AsmReadMsr64 (MSR_SEV_STATUS) >> 2;
+
+  //
+  // To turn the page into a recognized VMSA page, issue RMPADJUST:
+  //   Target VMPL but numerically higher than current VMPL
+  //   Target PermissionMask is not used
+  //
+  RmpAdjustStatus = SevSnpRmpAdjust (
+                      (EFI_PHYSICAL_ADDRESS) (UINTN) SaveArea,
+                      TRUE
+                      );
+  ASSERT (RmpAdjustStatus == 0);
+
+  ExitInfo1 = (UINT64) ApicId << 32;
+  ExitInfo1 |= SVM_VMGEXIT_SNP_AP_CREATE;
+  ExitInfo2 = (UINT64) (UINTN) SaveArea;
+
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+  Ghcb = Msr.Ghcb;
+
+  VmgInit (Ghcb, &InterruptState);
+  Ghcb->SaveArea.Rax = SaveArea->SevFeatures;
+  VmgSetOffsetValid (Ghcb, GhcbRax);
+  VmgExitStatus = VmgExit (
+                    Ghcb,
+                    SVM_EXIT_SNP_AP_CREATION,
+                    ExitInfo1,
+                    ExitInfo2
+                    );
+  VmgDone (Ghcb, InterruptState);
+
+  ASSERT (VmgExitStatus == 0);
+  if (VmgExitStatus != 0) {
+    RmpAdjustStatus = SevSnpRmpAdjust (
+                        (EFI_PHYSICAL_ADDRESS) (UINTN) SaveArea,
+                        FALSE
+                        );
+    if (RmpAdjustStatus == 0) {
+      FreePages (SaveArea, 1);
+    } else {
+      DEBUG ((DEBUG_INFO, "SEV-SNP: RMPADJUST failed, leaking VMSA page\n"));
+    }
+
+    SaveArea = NULL;
+  }
+
+  if (CpuData->SevEsSaveArea) {
+    RmpAdjustStatus = SevSnpRmpAdjust (
+                        (EFI_PHYSICAL_ADDRESS) (UINTN) CpuData->SevEsSaveArea,
+                        FALSE
+                        );
+    if (RmpAdjustStatus == 0) {
+      FreePages (CpuData->SevEsSaveArea, 1);
+    } else {
+      DEBUG ((DEBUG_INFO, "SEV-SNP: RMPADJUST failed, leaking VMSA page\n"));
+    }
+  }
+
+  CpuData->SevEsSaveArea = SaveArea;
+}
+
+/**
+  Create SEV-SNP APs.
+
+  @param[in]  CpuMpData        Pointer to CPU MP Data
+  @param[in]  ProcessorNumber  The handle number of specified processor
+                               (-1 for all APs)
+**/
+STATIC
+VOID
+SevSnpCreateAP (
+  IN CPU_MP_DATA               *CpuMpData,
+  IN INTN                      ProcessorNumber
+  )
+{
+  CPU_INFO_IN_HOB  *CpuInfoInHob;
+  CPU_AP_DATA      *CpuData;
+  UINTN            Index;
+  UINT32           ApicId;
+
+  ASSERT (CpuMpData->MpCpuExchangeInfo->BufferStart < 0x100000);
+
+  CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
+
+  if (ProcessorNumber < 0) {
+    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+      if (Index != CpuMpData->BspNumber) {
+        CpuData = &CpuMpData->CpuData[Index];
+        ApicId = CpuInfoInHob[Index].ApicId,
+        SevSnpCreateSaveArea (CpuMpData, CpuData, ApicId);
+      }
+    }
+  } else {
+    Index = (UINTN) ProcessorNumber;
+    CpuData = &CpuMpData->CpuData[Index];
+    ApicId = CpuInfoInHob[ProcessorNumber].ApicId,
+    SevSnpCreateSaveArea (CpuMpData, CpuData, ApicId);
+  }
+}
+
+/**
   This function will be called by BSP to wakeup AP.
 
   @param[in] CpuMpData          Pointer to CPU MP Data
@@ -1349,7 +1566,7 @@ WakeUpAP (
   ResetVectorRequired = FALSE;
 
   if (CpuMpData->WakeUpByInitSipiSipi ||
-      CpuMpData->InitFlag   != ApInitDone) {
+      CpuMpData->InitFlag != ApInitDone) {
     ResetVectorRequired = TRUE;
     AllocateResetVector (CpuMpData);
     AllocateSevEsAPMemory (CpuMpData);
@@ -1390,7 +1607,7 @@ WakeUpAP (
     }
     if (ResetVectorRequired) {
       //
-      // For SEV-ES, the initial AP boot address will be defined by
+      // For SEV-ES and SEV-SNP, the initial AP boot address will be defined by
       // PcdSevEsWorkAreaBase. The Segment/Rip must be the jump address
       // from the original INIT-SIPI-SIPI.
       //
@@ -1400,8 +1617,14 @@ WakeUpAP (
 
       //
       // Wakeup all APs
+      //   Must use the INIT-SIPI-SIPI method for initial configuration in
+      //   order to obtain the APIC ID.
       //
-      SendInitSipiSipiAllExcludingSelf ((UINT32) ExchangeInfo->BufferStart);
+      if (CpuMpData->SevSnpIsEnabled && CpuMpData->InitFlag != ApInitConfig) {
+        SevSnpCreateAP (CpuMpData, -1);
+      } else {
+        SendInitSipiSipiAllExcludingSelf ((UINT32) ExchangeInfo->BufferStart);
+      }
     }
     if (CpuMpData->InitFlag == ApInitConfig) {
       if (PcdGet32 (PcdCpuBootLogicalProcessorNumber) > 0) {
@@ -1491,7 +1714,7 @@ WakeUpAP (
       CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
 
       //
-      // For SEV-ES, the initial AP boot address will be defined by
+      // For SEV-ES and SEV-SNP, the initial AP boot address will be defined by
       // PcdSevEsWorkAreaBase. The Segment/Rip must be the jump address
       // from the original INIT-SIPI-SIPI.
       //
@@ -1499,10 +1722,14 @@ WakeUpAP (
         SetSevEsJumpTable (ExchangeInfo->BufferStart);
       }
 
-      SendInitSipiSipi (
-        CpuInfoInHob[ProcessorNumber].ApicId,
-        (UINT32) ExchangeInfo->BufferStart
-        );
+      if (CpuMpData->SevSnpIsEnabled && CpuMpData->InitFlag != ApInitConfig) {
+        SevSnpCreateAP (CpuMpData, (INTN) ProcessorNumber);
+      } else {
+        SendInitSipiSipi (
+          CpuInfoInHob[ProcessorNumber].ApicId,
+          (UINT32) ExchangeInfo->BufferStart
+          );
+      }
     }
     //
     // Wait specified AP waken up
@@ -2033,10 +2260,15 @@ MpInitLibInitialize (
   CpuMpData->CpuData          = (CPU_AP_DATA *) (CpuMpData + 1);
   CpuMpData->CpuInfoInHob     = (UINT64) (UINTN) (CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock(&CpuMpData->MpLock);
-  CpuMpData->SevEsIsEnabled = PcdGetBool (PcdSevEsIsEnabled);
-  CpuMpData->SevSnpIsEnabled = PcdGetBool (PcdSevSnpIsEnabled);
-  CpuMpData->SevEsAPBuffer  = (UINTN) -1;
-  CpuMpData->GhcbBase       = PcdGet64 (PcdGhcbBase);
+  CpuMpData->SevEsIsEnabled   = PcdGetBool (PcdSevEsIsEnabled);
+  CpuMpData->SevSnpIsEnabled  = PcdGetBool (PcdSevSnpIsEnabled);
+  CpuMpData->SevEsAPBuffer    = (UINTN) -1;
+  CpuMpData->GhcbBase         = PcdGet64 (PcdGhcbBase);
+  CpuMpData->UseSevEsAPMethod = CpuMpData->SevEsIsEnabled && !CpuMpData->SevSnpIsEnabled;
+
+  if (CpuMpData->SevSnpIsEnabled) {
+    ASSERT ((PcdGet64 (PcdGhcbHypervisorFeatures) & GHCB_HV_FEATURES_SNP_AP_CREATE) == GHCB_HV_FEATURES_SNP_AP_CREATE);
+  }
 
   //
   // Make sure no memory usage outside of the allocated buffer.
