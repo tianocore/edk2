@@ -915,6 +915,26 @@ SevEsIsEnabled (
   return ((SevEsWorkArea != NULL) && (SevEsWorkArea->SevEsEnabled != 0));
 }
 
+/**
+ Pre-validate System RAM used for decompressing the PEI and DXE firmware volumes
+ when SEV-SNP is active. The PCDs SecPreValidatedStart and SecPreValidatedEnd are
+ set in OvmfPkg/FvmainCompactScratchEnd.fdf.inc.
+
+**/
+STATIC
+VOID
+SevSnpSecPreValidateSystemRam (
+  VOID
+  )
+{
+  PHYSICAL_ADDRESS        Start, End;
+
+  Start = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdOvmfSnpSecPreValidatedStart);
+  End = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdOvmfSnpSecPreValidatedEnd);
+
+  MemEncryptSevSnpPreValidateSystemRam (Start, EFI_SIZE_TO_PAGES (End - Start));
+}
+
 VOID
 EFIAPI
 SecCoreStartupWithStack (
@@ -1045,6 +1065,13 @@ SecCoreStartupWithStack (
 
   SecCoreData.BootFirmwareVolumeBase = BootFv;
   SecCoreData.BootFirmwareVolumeSize = (UINTN) BootFv->FvLength;
+
+  if (SevSnpIsEnabled ()) {
+    //
+    // Pre-validate the System RAM used in the SEC Phase
+    //
+    SevSnpSecPreValidateSystemRam ();
+  }
 
   //
   // Make sure the 8259 is masked before initializing the Debug Agent and the debug timer is enabled
