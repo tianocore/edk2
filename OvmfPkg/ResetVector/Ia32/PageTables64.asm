@@ -140,6 +140,19 @@ clearGhcbMemoryLoop:
     mov     dword[ecx * 4 + GHCB_BASE - 4], eax
     loop    clearGhcbMemoryLoop
 
+    ;
+    ; The page table built above cleared the memory encryption mask from the
+    ; GHCB_BASE (aka made it shared). When SEV-SNP is enabled, to maintain
+    ; the security guarantees, the page state transition from private to
+    ; shared must go through the page invalidation steps. Invalidate the
+    ; memory range before loading the page table below.
+    ;
+    ; NOTE: the invalidation must happen after zeroing the GHCB memory. This
+    ;       is because, in the 32-bit mode all the access are considered private.
+    ;       The invalidation before the zero'ing will cause a #VC.
+    ;
+    OneTimeCall  InvalidateGHCBPage
+
 SetCr3:
     ;
     ; Set CR3 now that the paging structures are available
