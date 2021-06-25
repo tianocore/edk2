@@ -89,5 +89,9 @@
   %define SEV_ES_AP_RESET_IP  FixedPcdGet32 (PcdSevEsWorkAreaBase)
   %define SEV_LAUNCH_SECRET_BASE  FixedPcdGet32 (PcdSevLaunchSecretBase)
   %define SEV_LAUNCH_SECRET_SIZE  FixedPcdGet32 (PcdSevLaunchSecretSize)
+  %define SNP_CPUID_BASE  FixedPcdGet32 (PcdOvmfSnpCpuidBase)
+  %define SNP_CPUID_SIZE  FixedPcdGet32 (PcdOvmfSnpCpuidSize)
+  %define SNP_SECRETS_BASE  FixedPcdGet32 (PcdOvmfSnpSecretsBase)
+  %define SNP_SECRETS_SIZE  FixedPcdGet32 (PcdOvmfSnpSecretsSize)
 %include "Ia16/ResetVectorVtf0.asm"
 
