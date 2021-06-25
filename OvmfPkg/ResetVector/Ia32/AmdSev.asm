@@ -36,6 +36,44 @@ BITS    32
 %define CPUID_INSN_LEN              2
 
 
+%define SEV_GHCB_MSR                0xc0010130
+%define SEV_STATUS_MSR              0xc0010131
+
+; Macro is used to issue the MSR protocol based VMGEXIT. The caller is
+; responsible to populate values in the EDX:EAX registers. After the vmmcall
+; returns, it verifies that the response code matches with the expected
+; code. If it does not match then terminate the guest. The result of request
+; is returned in the EDX:EAX.
+;
+; args 1:Request code, 2: Response code
+%macro VmgExit 2
+    ;
+    ; Add request code:
+    ;   GHCB_MSR[11:0]  = Request code
+    or      eax, %1
+
+    mov     ecx, SEV_GHCB_MSR
+    wrmsr
+
+    ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
+    ; mode, so work around this by temporarily switching to 64-bit mode.
+    ;
+BITS    64
+    rep     vmmcall
+BITS    32
+
+    mov     ecx, SEV_GHCB_MSR
+    rdmsr
+
+    ;
+    ; Verify the reponse code, if it does not match then request to terminate
+    ;   GHCB_MSR[11:0]  = Response code
+    mov     ecx, eax
+    and     ecx, 0xfff
+    cmp     ecx, %2
+    jne     SevEsUnexpectedRespTerminate
+%endmacro
+
 ; Check if Secure Encrypted Virtualization (SEV) features are enabled.
 ;
 ; Register usage is tight in this routine, so multiple calls for the
@@ -85,7 +123,7 @@ CheckSevFeatures:
 
     ; Check if SEV memory encryption is enabled
     ;  MSR_0xC0010131 - Bit 0 (SEV enabled)
-    mov       ecx, 0xc0010131
+    mov       ecx, SEV_STATUS_MSR
     rdmsr
     bt        eax, 0
     jnc       NoSev
@@ -100,7 +138,7 @@ CheckSevFeatures:
 
     ; Check if SEV-ES is enabled
     ;  MSR_0xC0010131 - Bit 1 (SEV-ES enabled)
-    mov       ecx, 0xc0010131
+    mov       ecx, SEV_STATUS_MSR
     rdmsr
     bt        eax, 1
     jnc       GetSevEncBit
@@ -197,10 +235,10 @@ SevEsIdtNotCpuid:
     mov     eax, 1
     jmp     SevEsIdtTerminate
 
-SevEsIdtNoCpuidResponse:
+SevEsUnexpectedRespTerminate:
     ;
     ; Use VMGEXIT to request termination.
-    ;   2 - GHCB_CPUID_RESPONSE not received
+    ;   2 - Unexpected Response is received
     ;
     mov     eax, 2
 
@@ -216,7 +254,7 @@ SevEsIdtTerminate:
     shl     eax, 16
     or      eax, 0x1100
     xor     edx, edx
-    mov     ecx, 0xc0010130
+    mov     ecx, SEV_GHCB_MSR
     wrmsr
     ;
     ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
@@ -276,7 +314,7 @@ SevEsIdtVmmComm:
     mov     [esp + VC_CPUID_REQUEST_REGISTER], eax
 
     ; Save current GHCB MSR value
-    mov     ecx, 0xc0010130
+    mov     ecx, SEV_GHCB_MSR
     rdmsr
     mov     [esp + VC_GHCB_MSR_EAX], eax
     mov     [esp + VC_GHCB_MSR_EDX], edx
@@ -293,31 +331,16 @@ NextReg:
     jge     VmmDone
 
     shl     eax, GHCB_CPUID_REGISTER_SHIFT
-    or      eax, GHCB_CPUID_REQUEST
     mov     edx, [esp + VC_CPUID_FUNCTION]
-    mov     ecx, 0xc0010130
-    wrmsr
+
+    VmgExit GHCB_CPUID_REQUEST, GHCB_CPUID_RESPONSE
 
     ;
-    ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
-    ; mode, so work around this by temporarily switching to 64-bit mode.
-    ;
-BITS    64
-    rep     vmmcall
-BITS    32
-
-    ;
-    ; Read GHCB MSR
+    ; Response GHCB MSR
     ;   GHCB_MSR[63:32] = CPUID register value
     ;   GHCB_MSR[31:30] = CPUID register
     ;   GHCB_MSR[11:0]  = CPUID response protocol
     ;
-    mov     ecx, 0xc0010130
-    rdmsr
-    mov     ecx, eax
-    and     ecx, 0xfff
-    cmp     ecx, GHCB_CPUID_RESPONSE
-    jne     SevEsIdtNoCpuidResponse
 
     ; Save returned value
     shr     eax, GHCB_CPUID_REGISTER_SHIFT
@@ -335,7 +358,7 @@ VmmDone:
     ;
     mov     eax, [esp + VC_GHCB_MSR_EAX]
     mov     edx, [esp + VC_GHCB_MSR_EDX]
-    mov     ecx, 0xc0010130
+    mov     ecx, SEV_GHCB_MSR
     wrmsr
 
     mov     eax, [esp + VC_CPUID_RESULT_EAX]
