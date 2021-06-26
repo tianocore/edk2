@@ -39,6 +39,13 @@ BITS    32
 %define SEV_GHCB_MSR                0xc0010130
 %define SEV_STATUS_MSR              0xc0010131
 
+; The #VC was not for CPUID
+%define TERM_VC_NOT_CPUID           1
+
+; The unexpected response code
+%define TERM_UNEXPECTED_RESP_CODE   2
+
+
 ; Macro is used to issue the MSR protocol based VMGEXIT. The caller is
 ; responsible to populate values in the EDX:EAX registers. After the vmmcall
 ; returns, it verifies that the response code matches with the expected
@@ -73,6 +80,43 @@ BITS    32
     cmp     ecx, %2
     jne     SevEsUnexpectedRespTerminate
 %endmacro
+
+; Macro to terminate the guest using the VMGEXIT.
+; arg 1: reason code
+%macro TerminateVmgExit 1
+    mov     eax, %1
+    ;
+    ; Use VMGEXIT to request termination. At this point the reason code is
+    ; located in EAX, so shift it left 16 bits to the proper location.
+    ;
+    ; EAX[11:0]  => 0x100 - request termination
+    ; EAX[15:12] => 0x1   - OVMF
+    ; EAX[23:16] => 0xXX  - REASON CODE
+    ;
+    shl     eax, 16
+    or      eax, 0x1100
+    xor     edx, edx
+    mov     ecx, SEV_GHCB_MSR
+    wrmsr
+    ;
+    ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
+    ; mode, so work around this by temporarily switching to 64-bit mode.
+    ;
+BITS    64
+    rep     vmmcall
+BITS    32
+
+    ;
+    ; We shouldn't come back from the VMGEXIT, but if we do, just loop.
+    ;
+%%TerminateHlt:
+    hlt
+    jmp     %%TerminateHlt
+%endmacro
+
+; Terminate the guest due to unexpected response code.
+SevEsUnexpectedRespTerminate:
+    TerminateVmgExit    TERM_UNEXPECTED_RESP_CODE
 
 ; Check if Secure Encrypted Virtualization (SEV) features are enabled.
 ;
@@ -228,48 +272,7 @@ SevEsDisabled:
 ;
 
 SevEsIdtNotCpuid:
-    ;
-    ; Use VMGEXIT to request termination.
-    ;   1 - #VC was not for CPUID
-    ;
-    mov     eax, 1
-    jmp     SevEsIdtTerminate
-
-SevEsUnexpectedRespTerminate:
-    ;
-    ; Use VMGEXIT to request termination.
-    ;   2 - Unexpected Response is received
-    ;
-    mov     eax, 2
-
-SevEsIdtTerminate:
-    ;
-    ; Use VMGEXIT to request termination. At this point the reason code is
-    ; located in EAX, so shift it left 16 bits to the proper location.
-    ;
-    ; EAX[11:0]  => 0x100 - request termination
-    ; EAX[15:12] => 0x1   - OVMF
-    ; EAX[23:16] => 0xXX  - REASON CODE
-    ;
-    shl     eax, 16
-    or      eax, 0x1100
-    xor     edx, edx
-    mov     ecx, SEV_GHCB_MSR
-    wrmsr
-    ;
-    ; Issue VMGEXIT - NASM doesn't support the vmmcall instruction in 32-bit
-    ; mode, so work around this by temporarily switching to 64-bit mode.
-    ;
-BITS    64
-    rep     vmmcall
-BITS    32
-
-    ;
-    ; We shouldn't come back from the VMGEXIT, but if we do, just loop.
-    ;
-SevEsIdtHlt:
-    hlt
-    jmp     SevEsIdtHlt
+    TerminateVmgExit TERM_VC_NOT_CPUID
     iret
 
     ;
