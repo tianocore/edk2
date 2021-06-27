@@ -270,24 +270,13 @@ const struct sbi_platform_operations platform_ops = {
   .timer_exit            = fdt_timer_exit,
 };
 
-#if FixedPcdGet32(PcdBootableHartNumber) == 4
-#define U540_BOOTABLE_HART_COUNT FixedPcdGet32(PcdBootableHartNumber)
-static u32 U540_hart_index2id[U540_BOOTABLE_HART_COUNT] = {1, 2, 3, 4};
-#endif
-
 struct sbi_platform platform = {
-  .opensbi_version  = OPENSBI_VERSION,
-  .platform_version = SBI_PLATFORM_VERSION(0x0, 0x01),
-  .name             = "Generic",
-  .features    = SBI_PLATFORM_DEFAULT_FEATURES,
-  .hart_count    = SBI_HARTMASK_MAX_BITS,
-// TODO: Workaround for U540. Not sure why we need this. OpenSBI doesn't need it.
-#if FixedPcdGet32(PcdBootableHartNumber) == 4
-  .hart_index2id    = U540_hart_index2id,
-#else
-  .hart_index2id    = generic_hart_index2id,
-#endif
-  // TODO: Any reason why it shouldn't just be SBI_PLATFORM_DEFAULT_HART_STACK_SIZE?
-  .hart_stack_size  = FixedPcdGet32(PcdOpenSbiStackSize),
+  .opensbi_version    = OPENSBI_VERSION,
+  .platform_version   = SBI_PLATFORM_VERSION(0x0, 0x01),
+  .name               = "Generic",
+  .features           = SBI_PLATFORM_DEFAULT_FEATURES,
+  .hart_count         = SBI_HARTMASK_MAX_BITS,
+  .hart_index2id      = generic_hart_index2id,
+  .hart_stack_size    = FixedPcdGet32(PcdOpenSbiStackSize), // The stack given by SEC for each hart
   .platform_ops_addr  = (unsigned long)&platform_ops
 };
