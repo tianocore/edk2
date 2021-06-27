@@ -817,6 +817,27 @@ InitializeRamRegions (
 {
   QemuInitializeRam ();
 
+  if (MemEncryptSevSnpIsEnabled ()) {
+    //
+    // If SEV-SNP is enabled, reserve the Secrets and CPUID memory area.
+    //
+    // This memory range is given to the PSP by the hypervisor to populate
+    // the information used during the SNP VM boots, and it need to persist
+    // across the kexec boots. Mark it as EfiReservedMemoryType so that
+    // the guest firmware and OS does not use it as a system memory.
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfSnpSecretsBase),
+      (UINT64)(UINTN) PcdGet32 (PcdOvmfSnpSecretsSize),
+      EfiReservedMemoryType
+      );
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN) PcdGet32 (PcdOvmfSnpCpuidBase),
+      (UINT64)(UINTN) PcdGet32 (PcdOvmfSnpCpuidSize),
+      EfiReservedMemoryType
+      );
+  }
+
   if (mS3Supported && mBootMode != BOOT_ON_S3_RESUME) {
     //
     // This is the memory range that will be used for PEI on S3 resume

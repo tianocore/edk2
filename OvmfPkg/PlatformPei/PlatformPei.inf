@@ -122,6 +122,10 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidSize
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable
