@@ -5,7 +5,7 @@
 #  for Firmware Basic Boot Performance Record and other boot performance records,
 #  and install FPDT to ACPI table.
 #
-#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -46,12 +46,14 @@
   HobLib
   LockBoxLib
   UefiLib
+  VariablePolicyHelperLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     ## CONSUMES
   gEfiRscHandlerProtocolGuid                    ## CONSUMES
   gEfiVariableArchProtocolGuid                  ## CONSUMES
   gEfiLockBoxProtocolGuid                       ## CONSUMES
+  gEdkiiVariablePolicyProtocolGuid              ## CONSUMES
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## CONSUMES             ## Event
@@ -63,6 +65,7 @@
   gEfiFirmwarePerformanceGuid
   gEdkiiFpdtExtendedFirmwarePerformanceGuid     ## SOMETIMES_CONSUMES ## UNDEFINED # StatusCode Data
   gFirmwarePerformanceS3PointerGuid             ## PRODUCES ## UNDEFINED # SaveLockBox
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES ## Event
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad    ## CONSUMES
@@ -72,6 +75,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask    ## CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support   ## CONSUMES
