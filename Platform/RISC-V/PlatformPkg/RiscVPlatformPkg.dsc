@@ -61,6 +61,7 @@
 [LibraryClasses.common.PEI_CORE]
   # RISC-V platform PEI core entry point.
   PeiCoreEntryPoint|Platform/RISC-V/PlatformPkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
+  PlatformSecPpiLib|Platform/RISC-V/PlatformPkg/Library/PlatformSecPpiLibNull/PlatformSecPpiLibNull.inf
 
 [LibraryClasses.common.PEIM]
   FirmwareContextProcessorSpecificLib|Platform/RISC-V/PlatformPkg/Library/FirmwareContextProcessorSpecificLib/FirmwareContextProcessorSpecificLib.inf
@@ -82,6 +83,7 @@
   Platform/RISC-V/PlatformPkg/Library/FirmwareContextProcessorSpecificLib/FirmwareContextProcessorSpecificLib.inf
   Platform/RISC-V/PlatformPkg/Library/RiscVPlatformTempMemoryInitLibNull/RiscVPlatformTempMemoryInitLibNull.inf
   Platform/RISC-V/PlatformPkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
+  Platform/RISC-V/PlatformPkg/Library/PlatformSecPpiLibNull/PlatformSecPpiLibNull.inf
 
 [Components.common.SEC]
   Platform/RISC-V/PlatformPkg/Universal/Sec/SecMain.inf
