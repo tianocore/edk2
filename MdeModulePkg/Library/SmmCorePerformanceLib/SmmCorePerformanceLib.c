@@ -16,7 +16,7 @@
 
  SmmPerformanceHandlerEx(), SmmPerformanceHandler() will receive untrusted input and do basic validation.
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -48,6 +48,7 @@ CHAR8                *mPlatformLanguage    = NULL;
 SPIN_LOCK            mSmmFpdtLock;
 PERFORMANCE_PROPERTY  mPerformanceProperty;
 UINT32               mCachedLength         = 0;
+UINT32               mBootRecordSize       = 0;
 
 //
 // Interfaces for SMM PerformanceMeasurement Protocol.
@@ -776,41 +777,116 @@ InsertFpdtRecord (
 }
 
 /**
-  SmmReadyToBoot protocol notification event handler.
+  Communication service SMI Handler entry.
 
-  @param  Protocol   Points to the protocol's unique identifier
-  @param  Interface  Points to the interface instance
-  @param  Handle     The handle on which the interface was installed
+  This SMI handler provides services for report MM boot records.
 
-  @retval EFI_SUCCESS   SmmReadyToBootCallback runs successfully
+  Caution: This function may receive untrusted input.
+  Communicate buffer and buffer size are external input, so this function will do basic validation.
+
+  @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
+  @param[in]     RegisterContext Points to an optional handler context which was specified when the
+                                 handler was registered.
+  @param[in, out] CommBuffer     A pointer to a collection of data in memory that will
+                                 be conveyed from a non-MM environment into an MM environment.
+  @param[in, out] CommBufferSize The size of the CommBuffer.
+
+  @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers
+                                              should still be called.
+  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The interrupt has been quiesced but other handlers should
+                                              still be called.
+  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The interrupt is still pending and other handlers should still
+                                              be called.
+  @retval EFI_INTERRUPT_PENDING               The interrupt could not be quiesced.
 
 **/
 EFI_STATUS
 EFIAPI
-SmmReportFpdtRecordData (
-  IN CONST EFI_GUID                       *Protocol,
-  IN VOID                                 *Interface,
-  IN EFI_HANDLE                           Handle
+FpdtSmiHandler (
+  IN     EFI_HANDLE                   DispatchHandle,
+  IN     CONST VOID                   *RegisterContext,
+  IN OUT VOID                         *CommBuffer,
+  IN OUT UINTN                        *CommBufferSize
   )
 {
-  UINT64          SmmBPDTddr;
+  EFI_STATUS                   Status;
+  SMM_BOOT_RECORD_COMMUNICATE  *SmmCommData;
+  UINTN                        BootRecordOffset;
+  UINTN                        BootRecordSize;
+  VOID                         *BootRecordData;
+  UINTN                        TempCommBufferSize;
+  UINT8                        *BootRecordBuffer;
 
-  if (!mFpdtDataIsReported && mSmmBootPerformanceTable != NULL) {
-    SmmBPDTddr = (UINT64)(UINTN)mSmmBootPerformanceTable;
-    REPORT_STATUS_CODE_EX (
-        EFI_PROGRESS_CODE,
-        EFI_SOFTWARE_SMM_DRIVER,
-        0,
-        NULL,
-        &gEdkiiFpdtExtendedFirmwarePerformanceGuid,
-        &SmmBPDTddr,
-        sizeof (UINT64)
-        );
-    //
-    // Set FPDT report state to TRUE.
-    //
-    mFpdtDataIsReported = TRUE;
+  //
+  // If input is invalid, stop processing this SMI
+  //
+  if (CommBuffer == NULL || CommBufferSize == NULL) {
+    return EFI_SUCCESS;
   }
+
+  TempCommBufferSize = *CommBufferSize;
+
+  if(TempCommBufferSize < sizeof (SMM_BOOT_RECORD_COMMUNICATE)) {
+    return EFI_SUCCESS;
+  }
+
+  if (!SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
+    DEBUG ((DEBUG_ERROR, "FpdtSmiHandler: MM communication data buffer in MMRAM or overflow!\n"));
+    return EFI_SUCCESS;
+  }
+
+  SmmCommData = (SMM_BOOT_RECORD_COMMUNICATE*)CommBuffer;
+
+  Status = EFI_SUCCESS;
+
+  switch (SmmCommData->Function) {
+    case SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE :
+      if (mSmmBootPerformanceTable != NULL) {
+        mBootRecordSize = mSmmBootPerformanceTable->Header.Length - sizeof (SMM_BOOT_PERFORMANCE_TABLE);
+      }
+      SmmCommData->BootRecordSize = mBootRecordSize;
+      break;
+
+    case SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA :
+      Status = EFI_UNSUPPORTED;
+      break;
+
+    case SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA_BY_OFFSET :
+      BootRecordOffset = SmmCommData->BootRecordOffset;
+      BootRecordData   = SmmCommData->BootRecordData;
+      BootRecordSize   = SmmCommData->BootRecordSize;
+      if (BootRecordData == NULL || BootRecordOffset >= mBootRecordSize) {
+        Status = EFI_INVALID_PARAMETER;
+        break;
+      }
+
+      //
+      // Sanity check
+      //
+      if (BootRecordSize > mBootRecordSize - BootRecordOffset) {
+        BootRecordSize = mBootRecordSize - BootRecordOffset;
+      }
+      SmmCommData->BootRecordSize = BootRecordSize;
+      if (!SmmIsBufferOutsideSmmValid ((UINTN)BootRecordData, BootRecordSize)) {
+        DEBUG ((DEBUG_ERROR, "FpdtSmiHandler: MM Data buffer in MMRAM or overflow!\n"));
+        Status = EFI_ACCESS_DENIED;
+        break;
+      }
+      BootRecordBuffer = ((UINT8 *) (mSmmBootPerformanceTable)) + sizeof (SMM_BOOT_PERFORMANCE_TABLE);
+      CopyMem (
+        (UINT8*)BootRecordData,
+        BootRecordBuffer + BootRecordOffset,
+        BootRecordSize
+        );
+      mFpdtDataIsReported = TRUE;
+      break;
+
+    default:
+      Status = EFI_UNSUPPORTED;
+  }
+
+  SmmCommData->ReturnStatus = Status;
+
   return EFI_SUCCESS;
 }
 
@@ -830,8 +906,8 @@ InitializeSmmCorePerformanceLib (
   )
 {
   EFI_HANDLE                Handle;
+  EFI_HANDLE                SmiHandle;
   EFI_STATUS                Status;
-  VOID                      *SmmReadyToBootRegistration;
   PERFORMANCE_PROPERTY      *PerformanceProperty;
 
   //
@@ -851,11 +927,13 @@ InitializeSmmCorePerformanceLib (
                     );
   ASSERT_EFI_ERROR (Status);
 
-  Status = gSmst->SmmRegisterProtocolNotify (
-                    &gEdkiiSmmReadyToBootProtocolGuid,
-                    SmmReportFpdtRecordData,
-                    &SmmReadyToBootRegistration
-                    );
+  //
+  // Register SMI handler.
+  //
+  SmiHandle = NULL;
+  Status = gSmst->SmiHandlerRegister (FpdtSmiHandler, &gEfiFirmwarePerformanceGuid, &SmiHandle);
+  ASSERT_EFI_ERROR (Status);
+
   Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, (VOID **) &PerformanceProperty);
   if (EFI_ERROR (Status)) {
     //

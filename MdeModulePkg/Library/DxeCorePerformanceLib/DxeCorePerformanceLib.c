@@ -10,7 +10,7 @@
   This library is mainly used by DxeCore to start performance logging to ensure that
   Performance Protocol is installed at the very beginning of DXE phase.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -64,7 +64,7 @@ UINT32  mLoadImageCount       = 0;
 UINT32  mPerformanceLength    = 0;
 UINT32  mMaxPerformanceLength = 0;
 UINT32  mBootRecordSize       = 0;
-UINT32  mBootRecordMaxSize    = 0;
+UINTN   mBootRecordMaxSize    = 0;
 UINT32  mCachedLength         = 0;
 
 BOOLEAN mFpdtBufferIsReported = FALSE;
@@ -205,25 +205,26 @@ IsKnownID (
 }
 
 /**
-  Allocate buffer for Boot Performance table.
+  This internal function dumps all the SMM performance data and size.
 
-  @return Status code.
+  @param    SmmPerfData        Smm Performance data. The buffer contain the SMM perf data is allocated by this function and caller needs to free it.
+  @param    SmmPerfDataSize    Smm Performance data size.
+  @param    SkipGetPerfData    Skip to get performance data, just get the size.
 
 **/
-EFI_STATUS
-AllocateBootPerformanceTable (
+VOID
+InternalGetSmmPerfData (
+  OUT VOID      **SmmPerfData,
+  OUT UINTN     *SmmPerfDataSize,
+  IN  BOOLEAN   SkipGetPerfData
   )
 {
   EFI_STATUS                              Status;
-  UINTN                                   Size;
   UINT8                                   *SmmBootRecordCommBuffer;
   EFI_SMM_COMMUNICATE_HEADER              *SmmCommBufferHeader;
   SMM_BOOT_RECORD_COMMUNICATE             *SmmCommData;
   UINTN                                   CommSize;
-  UINTN                                   BootPerformanceDataSize;
-  UINT8                                   *BootPerformanceData;
   EFI_SMM_COMMUNICATION_PROTOCOL          *Communication;
-  FIRMWARE_PERFORMANCE_VARIABLE           PerformanceVariable;
   EDKII_PI_SMM_COMMUNICATION_REGION_TABLE *SmmCommRegionTable;
   EFI_MEMORY_DESCRIPTOR                   *SmmCommMemRegion;
   UINTN                                   Index;
@@ -237,7 +238,6 @@ AllocateBootPerformanceTable (
   SmmBootRecordCommBuffer = NULL;
   SmmCommData             = NULL;
   SmmBootRecordData       = NULL;
-  SmmBootRecordDataSize   = 0;
   ReservedMemSize         = 0;
   Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &Communication);
   if (!EFI_ERROR (Status)) {
@@ -284,6 +284,10 @@ AllocateBootPerformanceTable (
         Status = Communication->Communicate (Communication, SmmBootRecordCommBuffer, &CommSize);
 
         if (!EFI_ERROR (Status) && !EFI_ERROR (SmmCommData->ReturnStatus) && SmmCommData->BootRecordSize != 0) {
+          if (SkipGetPerfData) {
+            *SmmPerfDataSize = SmmCommData->BootRecordSize;
+            return;
+          }
           //
           // Get all boot records
           //
@@ -305,19 +309,45 @@ AllocateBootPerformanceTable (
             }
             SmmCommData->BootRecordOffset = SmmCommData->BootRecordOffset + SmmCommData->BootRecordSize;
           }
+          *SmmPerfData     = SmmBootRecordData;
+          *SmmPerfDataSize = SmmBootRecordDataSize;
         }
       }
     }
   }
+}
+
+/**
+  Allocate buffer for Boot Performance table.
+
+  @return Status code.
+
+**/
+EFI_STATUS
+AllocateBootPerformanceTable (
+  VOID
+  )
+{
+  EFI_STATUS                              Status;
+  UINTN                                   Size;
+  UINTN                                   BootPerformanceDataSize;
+  UINT8                                   *BootPerformanceData;
+  FIRMWARE_PERFORMANCE_VARIABLE           PerformanceVariable;
+  UINTN                                   SmmBootRecordDataSize;
+
+  SmmBootRecordDataSize = 0;
+
+  //
+  // Get SMM performance data size at the point of EndOfDxe in order to allocate the boot performance table.
+  // Will Get all the data at ReadyToBoot.
+  //
+  InternalGetSmmPerfData (NULL, &SmmBootRecordDataSize, TRUE);
 
   //
   // Prepare memory for Boot Performance table.
   // Boot Performance table includes BasicBoot record, and one or more appended Boot Records.
   //
-  BootPerformanceDataSize = sizeof (BOOT_PERFORMANCE_TABLE) + mPerformanceLength + PcdGet32 (PcdExtFpdtBootRecordPadSize);
-  if (SmmCommData != NULL && SmmBootRecordData != NULL) {
-    BootPerformanceDataSize += SmmBootRecordDataSize;
-  }
+  BootPerformanceDataSize = sizeof (BOOT_PERFORMANCE_TABLE) + mPerformanceLength + SmmBootRecordDataSize + PcdGet32 (PcdExtFpdtBootRecordPadSize);
 
   //
   // Try to allocate the same runtime buffer as last time boot.
@@ -358,9 +388,6 @@ AllocateBootPerformanceTable (
   DEBUG ((DEBUG_INFO, "DxeCorePerformanceLib: ACPI Boot Performance Table address = 0x%x\n", mAcpiBootPerformanceTable));
 
   if (mAcpiBootPerformanceTable == NULL) {
-    if (SmmCommData != NULL && SmmBootRecordData != NULL) {
-      FreePool (SmmBootRecordData);
-    }
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -385,19 +412,10 @@ AllocateBootPerformanceTable (
     mPerformanceLength    = 0;
     mMaxPerformanceLength = 0;
   }
-  if (SmmCommData != NULL && SmmBootRecordData != NULL) {
-    //
-    // Fill Boot records from SMM drivers.
-    //
-    CopyMem (BootPerformanceData, SmmBootRecordData, SmmBootRecordDataSize);
-    FreePool (SmmBootRecordData);
-    mAcpiBootPerformanceTable->Header.Length = (UINT32) (mAcpiBootPerformanceTable->Header.Length + SmmBootRecordDataSize);
-    BootPerformanceData = BootPerformanceData + SmmBootRecordDataSize;
-  }
 
   mBootRecordBuffer  = (UINT8 *) mAcpiBootPerformanceTable;
   mBootRecordSize    = mAcpiBootPerformanceTable->Header.Length;
-  mBootRecordMaxSize = mBootRecordSize + PcdGet32 (PcdExtFpdtBootRecordPadSize);
+  mBootRecordMaxSize = BootPerformanceDataSize;
 
   return EFI_SUCCESS;
 }
@@ -1337,6 +1355,47 @@ ReportFpdtRecordBuffer (
 }
 
 /**
+  Update Boot Performance table.
+
+  @param  Event    The event of notify protocol.
+  @param  Context  Notify event context.
+
+**/
+VOID
+EFIAPI
+UpdateBootPerformanceTable (
+  IN EFI_EVENT     Event,
+  IN VOID          *Context
+  )
+{
+  VOID                             *SmmBootRecordData;
+  UINTN                            SmmBootRecordDataSize;
+  UINTN                            AppendSize;
+  UINT8                            *FirmwarePerformanceTablePtr;
+
+  //
+  // Get SMM performance data.
+  //
+  SmmBootRecordData = NULL;
+  InternalGetSmmPerfData (&SmmBootRecordData, &SmmBootRecordDataSize, FALSE);
+
+  FirmwarePerformanceTablePtr = (UINT8 *) mAcpiBootPerformanceTable + mAcpiBootPerformanceTable->Header.Length;
+
+  if (mAcpiBootPerformanceTable->Header.Length + SmmBootRecordDataSize > mBootRecordMaxSize) {
+    DEBUG ((DEBUG_INFO, "DxeCorePerformanceLib: No enough space to save all SMM boot performance data\n"));
+    AppendSize = mBootRecordMaxSize - mAcpiBootPerformanceTable->Header.Length;
+  } else {
+    AppendSize = SmmBootRecordDataSize;
+  }
+  if (SmmBootRecordData != NULL) {
+    CopyMem (FirmwarePerformanceTablePtr, SmmBootRecordData, AppendSize);
+    mAcpiBootPerformanceTable->Header.Length += (UINT32) AppendSize;
+    mBootRecordSize +=  (UINT32) AppendSize;
+    FreePool (SmmBootRecordData);
+  }
+}
+
+/**
   The constructor function initializes Performance infrastructure for DXE phase.
 
   The constructor function publishes Performance and PerformanceEx protocol, allocates memory to log DXE performance
@@ -1358,6 +1417,7 @@ DxeCorePerformanceLibConstructor (
 {
   EFI_STATUS                Status;
   EFI_HANDLE                Handle;
+  EFI_EVENT                 EndOfDxeEvent;
   EFI_EVENT                 ReadyToBootEvent;
   PERFORMANCE_PROPERTY      *PerformanceProperty;
 
@@ -1386,12 +1446,24 @@ DxeCorePerformanceLibConstructor (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Register ReadyToBoot event to report StatusCode data
+  // Register EndOfDxe event to allocate the boot performance table and report the table address through status code.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  ReportFpdtRecordBuffer,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &EndOfDxeEvent
+                  );
+
+  //
+  // Register ReadyToBoot event to update the boot performance table for SMM performance data.
   //
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
-                  ReportFpdtRecordBuffer,
+                  UpdateBootPerformanceTable,
                   NULL,
                   &gEfiEventReadyToBootGuid,
                   &ReadyToBootEvent
