@@ -44,6 +44,11 @@ PlatformConfigLoad (
   OUT UINT64          *OptionalElements
   );
 
+VOID
+AmdSevSetRuntimeConfig(
+  VOID
+  );
+
 //
 // Feature flags for OptionalElements.
 //
