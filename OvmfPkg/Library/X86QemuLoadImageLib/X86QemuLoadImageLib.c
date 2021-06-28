@@ -446,14 +446,16 @@ QemuLoadKernelImage (
   }
 
   *ImageHandle = KernelImageHandle;
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
 
 FreeCommandLine:
   if (CommandLineSize > 0) {
     FreePool (CommandLine);
   }
 UnloadImage:
-  gBS->UnloadImage (KernelImageHandle);
+  if (EFI_ERROR (Status)) {
+    gBS->UnloadImage (KernelImageHandle);
+  }
 
   return Status;
 }
