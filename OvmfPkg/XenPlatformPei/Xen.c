@@ -569,7 +569,7 @@ CalibrateLapicTimer (
   EFI_STATUS            Status;
 
 
-  SharedInfo = (VOID*)((1ULL << mPhysMemAddressWidth) - EFI_PAGE_SIZE);
+  SharedInfo = (VOID*)((UINTN)PcdGet32 (PcdCpuLocalApicBaseAddress) + SIZE_1MB);
   Status = PhysicalAddressIdentityMapping ((EFI_PHYSICAL_ADDRESS)SharedInfo);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR,
