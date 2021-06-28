@@ -25,14 +25,15 @@
 
 [LibraryClasses]
   DebugLib
+  FileHandleLib
   MemoryAllocationLib
   PrintLib
-  QemuFwCfgLib
   UefiBootServicesTableLib
 
 [Protocols]
   gEfiDevicePathProtocolGuid
   gEfiLoadedImageProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
 
 [Guids]
   gQemuKernelLoaderFsMediaGuid
