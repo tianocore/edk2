@@ -25,8 +25,6 @@
 #include <Library/PeCoffLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/RiscVCpuLib.h>
-#include <Ppi/TemporaryRamDone.h>
-#include <Ppi/TemporaryRamSupport.h>
 
 int
 SecPostOpenSbiPlatformEarlylInit(
@@ -47,21 +45,6 @@ VOID
 EFIAPI
 SecStartupPhase2 (
   IN VOID                     *Context
-  );
-
-EFI_STATUS
-EFIAPI
-TemporaryRamMigration (
-  IN CONST EFI_PEI_SERVICES   **PeiServices,
-  IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
-  IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
-  IN UINTN                    CopySize
-  );
-
-EFI_STATUS
-EFIAPI
-TemporaryRamDone (
-  VOID
   );
 
 #endif // _SECMAIN_H_

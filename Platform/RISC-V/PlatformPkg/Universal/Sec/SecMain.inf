@@ -52,10 +52,6 @@
   RiscVOpensbiPlatformLib
   RiscVEdk2SbiLib
 
-[Ppis]
-  gEfiTemporaryRamSupportPpiGuid # PPI ALWAYS_PRODUCED
-  gEfiTemporaryRamDonePpiGuid    # PPI ALWAYS_PRODUCED
-
 [FixedPcd]
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVPeiFvBase
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVPeiFvSize

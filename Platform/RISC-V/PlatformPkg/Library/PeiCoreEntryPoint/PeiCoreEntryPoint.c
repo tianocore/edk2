@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiCoreEntryPoint.h>
+#include <Library/PlatformSecPpiLib.h>
 #include <Library/RiscVFirmwareContextLib.h>
 
 /**
@@ -49,15 +50,25 @@ _ModuleEntryPoint(
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
 )
 {
+  EFI_STATUS Status;
   EFI_SEC_PEI_HAND_OFF    *ThisSecCoreData;
   EFI_PEI_PPI_DESCRIPTOR  *ThisPpiList;
   EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContext;
 
   FirmwareContext = (EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *)PpiList;
   SetFirmwareContextPointer (FirmwareContext);
+  FirmwareContext->BootHartId = (UINT64)SecCoreData;
+
   ThisSecCoreData = (EFI_SEC_PEI_HAND_OFF *)FirmwareContext->SecPeiHandOffData;
-  ThisPpiList = (EFI_PEI_PPI_DESCRIPTOR *)FirmwareContext->SecPeiHandoffPpi;
-  ProcessModuleEntryPointList (ThisSecCoreData, ThisPpiList, NULL);
+  Status = GetPlatformPrePeiCorePpiDescriptor (&ThisPpiList);
+  if (EFI_ERROR (Status)) {
+    ThisPpiList = NULL;
+  }
+
+  //
+  // Invoke PEI Core entry point.
+  //
+  ProcessModuleEntryPointList(ThisSecCoreData, ThisPpiList, NULL);
 
   //
   // Should never return

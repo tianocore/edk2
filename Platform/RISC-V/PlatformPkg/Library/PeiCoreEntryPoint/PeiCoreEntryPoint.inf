@@ -32,5 +32,6 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+  PlatformSecPpiLib
   RiscVFirmwareContextLib
 
