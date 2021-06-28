@@ -2,6 +2,9 @@
   X86 specific implementation of QemuLoadImageLib library class interface
   with support for loading mixed mode images and non-EFI stub images
 
+  Note that this implementation reads the cmdline (and possibly kernel, setup
+  data, and initrd in the legacy boot mode) from fw_cfg directly.
+
   Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
 
