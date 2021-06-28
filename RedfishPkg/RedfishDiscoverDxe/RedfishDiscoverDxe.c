@@ -87,6 +87,7 @@ CreateRestExInstance (
   EFI_STATUS  Status;
 
   Status = RestExLibCreateChild (
+             Instance->NetworkInterface->OpenDriverControllerHandle,
              Instance->Owner,
              FixedPcdGetBool (PcdRedfishDiscoverAccessModeInBand) ? EfiRestExServiceInBandAccess : EfiRestExServiceOutOfBandAccess,
              EfiRestExConfigHttp,
