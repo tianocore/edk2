@@ -2,6 +2,7 @@
   This library provides help functions for REST EX Protocol.
 
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -20,6 +21,7 @@
   This function allows the caller to create child handle for specific
   REST server.
 
+  @param[in]  Controller           The controller handle used of selected interface.
   @param[in]  Image                The image handle used to open service.
   @param[in]  AccessMode           Access mode of REST server.
   @param[in]  ConfigType           Underlying configuration to communicate with REST server.
@@ -32,6 +34,7 @@
 **/
 EFI_STATUS
 RestExLibCreateChild (
+  IN EFI_HANDLE                       Controller,
   IN EFI_HANDLE                       Image,
   IN EFI_REST_EX_SERVICE_ACCESS_MODE  AccessMode,
   IN EFI_REST_EX_CONFIG_TYPE          ConfigType,
