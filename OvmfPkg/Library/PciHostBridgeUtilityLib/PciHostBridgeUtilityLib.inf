@@ -38,6 +38,7 @@
   BaseMemoryLib
   DebugLib
   DevicePathLib
+  DxeHardwareInfoLib
   MemoryAllocationLib
   PciLib
   QemuFwCfgLib
