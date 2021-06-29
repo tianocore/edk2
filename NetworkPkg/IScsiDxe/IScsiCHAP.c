@@ -16,6 +16,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 STATIC CONST CHAP_HASH mChapHash[] = {
   {
+    ISCSI_CHAP_ALGORITHM_SHA256,
+    SHA256_DIGEST_SIZE,
+    Sha256GetContextSize,
+    Sha256Init,
+    Sha256Update,
+    Sha256Final
+  },
+  //
+  // Keep the deprecated MD5 entry at the end of the array (making MD5 the
+  // least preferred choice of the initiator).
+  //
+  {
     ISCSI_CHAP_ALGORITHM_MD5,
     MD5_DIGEST_SIZE,
     Md5GetContextSize,
