@@ -173,7 +173,6 @@ ProcessRelocation64 (
           // Calculation: B + A
           //
           if (RelaType == SHT_RELA) {
-            ASSERT (*Ptr == 0);
             *Ptr = Delta + Rela->r_addend;
           } else {
             //
