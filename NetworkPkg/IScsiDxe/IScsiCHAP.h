@@ -17,12 +17,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ISCSI_KEY_CHAP_NAME                       "CHAP_N"
 #define ISCSI_KEY_CHAP_RESPONSE                   "CHAP_R"
 
+//
+// Identifiers of supported CHAP hash algorithms:
+// https://www.iana.org/assignments/ppp-numbers/ppp-numbers.xhtml#ppp-numbers-9
+//
 #define ISCSI_CHAP_ALGORITHM_MD5                  5
 
-///
-/// MD5_HASHSIZE
-///
-#define ISCSI_CHAP_RSP_LEN                        16
+//
+// Byte count of the largest digest over the above-listed
+// ISCSI_CHAP_ALGORITHM_* hash algorithms.
+//
+#define ISCSI_CHAP_MAX_DIGEST_SIZE                MD5_DIGEST_SIZE
 
 #define ISCSI_CHAP_STEP_ONE                       1
 #define ISCSI_CHAP_STEP_TWO                       2
@@ -53,7 +58,7 @@ typedef struct _ISCSI_CHAP_AUTH_DATA {
   //
   // Calculated CHAP Response (CHAP_R) value.
   //
-  UINT8                         CHAPResponse[ISCSI_CHAP_RSP_LEN];
+  UINT8                         CHAPResponse[ISCSI_CHAP_MAX_DIGEST_SIZE];
 
   //
   // Auth-data to be sent out for mutual authentication.
@@ -64,7 +69,7 @@ typedef struct _ISCSI_CHAP_AUTH_DATA {
   // bytes* to the hashing algorithm as the hashing algorithm will output.
   //
   UINT32                        OutIdentifier;
-  UINT8                         OutChallenge[ISCSI_CHAP_RSP_LEN];
+  UINT8                         OutChallenge[ISCSI_CHAP_MAX_DIGEST_SIZE];
 } ISCSI_CHAP_AUTH_DATA;
 
 /**
