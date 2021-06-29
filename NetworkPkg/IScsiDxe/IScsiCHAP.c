@@ -112,7 +112,7 @@ IScsiCHAPAuthTarget (
 {
   EFI_STATUS  Status;
   UINT32      SecretSize;
-  UINT8       VerifyRsp[ISCSI_CHAP_RSP_LEN];
+  UINT8       VerifyRsp[ISCSI_CHAP_MAX_DIGEST_SIZE];
 
   Status      = EFI_SUCCESS;
 
@@ -122,11 +122,11 @@ IScsiCHAPAuthTarget (
              AuthData->AuthConfig->ReverseCHAPSecret,
              SecretSize,
              AuthData->OutChallenge,
-             ISCSI_CHAP_RSP_LEN,                      // ChallengeLength
+             MD5_DIGEST_SIZE,                         // ChallengeLength
              VerifyRsp
              );
 
-  if (CompareMem (VerifyRsp, TargetResponse, ISCSI_CHAP_RSP_LEN) != 0) {
+  if (CompareMem (VerifyRsp, TargetResponse, MD5_DIGEST_SIZE) != 0) {
     Status = EFI_SECURITY_VIOLATION;
   }
 
@@ -163,7 +163,7 @@ IScsiCHAPOnRspReceived (
   CHAR8                       *Challenge;
   CHAR8                       *Name;
   CHAR8                       *Response;
-  UINT8                       TargetRsp[ISCSI_CHAP_RSP_LEN];
+  UINT8                       TargetRsp[ISCSI_CHAP_MAX_DIGEST_SIZE];
   UINT32                      RspLen;
   UINTN                       Result;
 
@@ -340,9 +340,9 @@ IScsiCHAPOnRspReceived (
       goto ON_EXIT;
     }
 
-    RspLen = ISCSI_CHAP_RSP_LEN;
+    RspLen = MD5_DIGEST_SIZE;
     Status = IScsiHexToBin (TargetRsp, &RspLen, Response);
-    if (EFI_ERROR (Status) || RspLen != ISCSI_CHAP_RSP_LEN) {
+    if (EFI_ERROR (Status) || RspLen != MD5_DIGEST_SIZE) {
       Status = EFI_PROTOCOL_ERROR;
       goto ON_EXIT;
     }
@@ -411,13 +411,13 @@ IScsiCHAPToSendReq (
   }
   Status      = EFI_SUCCESS;
 
-  RspLen      = 2 * ISCSI_CHAP_RSP_LEN + 3;
+  RspLen      = 2 * ISCSI_CHAP_MAX_DIGEST_SIZE + 3;
   Response    = AllocateZeroPool (RspLen);
   if (Response == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ChallengeLen  = 2 * ISCSI_CHAP_RSP_LEN + 3;
+  ChallengeLen  = 2 * ISCSI_CHAP_MAX_DIGEST_SIZE + 3;
   Challenge     = AllocateZeroPool (ChallengeLen);
   if (Challenge == NULL) {
     FreePool (Response);
@@ -482,7 +482,7 @@ IScsiCHAPToSendReq (
     //
     BinToHexStatus = IScsiBinToHex (
                        (UINT8 *) AuthData->CHAPResponse,
-                       ISCSI_CHAP_RSP_LEN,
+                       MD5_DIGEST_SIZE,
                        Response,
                        &RspLen
                        );
@@ -499,10 +499,10 @@ IScsiCHAPToSendReq (
       //
       // CHAP_C=<C>
       //
-      IScsiGenRandom ((UINT8 *) AuthData->OutChallenge, ISCSI_CHAP_RSP_LEN);
+      IScsiGenRandom ((UINT8 *) AuthData->OutChallenge, MD5_DIGEST_SIZE);
       BinToHexStatus = IScsiBinToHex (
                          (UINT8 *) AuthData->OutChallenge,
-                         ISCSI_CHAP_RSP_LEN,
+                         MD5_DIGEST_SIZE,
                          Challenge,
                          &ChallengeLen
                          );
