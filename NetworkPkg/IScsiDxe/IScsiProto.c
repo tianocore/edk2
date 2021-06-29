@@ -432,6 +432,9 @@ IScsiSessionResetAuthData (
   IN OUT ISCSI_SESSION *Session
   )
 {
+  if (Session->AuthType == ISCSI_AUTH_TYPE_CHAP) {
+    Session->AuthData.CHAP.Hash = NULL;
+  }
 }
 
 /**
