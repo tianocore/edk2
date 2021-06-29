@@ -215,7 +215,7 @@ RelocateElf64Dynamic (
   Elf64_Shdr                   *DynShdr;
   Elf64_Shdr                   *RelShdr;
   Elf64_Dyn                    *Dyn;
-  UINT64                       RelaOffset;
+  UINT64                       RelaAddress;
   UINT64                       RelaCount;
   UINT64                       RelaSize;
   UINT64                       RelaEntrySize;
@@ -255,7 +255,7 @@ RelocateElf64Dynamic (
   //
   // 2. Locate the relocation section from the dynamic section.
   //
-  RelaOffset    = MAX_UINT64;
+  RelaAddress    = MAX_UINT64;
   RelaSize      = 0;
   RelaCount     = 0;
   RelaEntrySize = 0;
@@ -274,8 +274,8 @@ RelocateElf64Dynamic (
         // based on the original file value and the memory base address.
         // For consistency, files do not contain relocation entries to ``correct'' addresses in the dynamic structure.
         //
-        RelaOffset = Dyn->d_un.d_ptr - (UINTN) ElfCt->PreferredImageAddress;
-        RelaType   = (Dyn->d_tag == DT_RELA) ? SHT_RELA: SHT_REL;
+        RelaAddress = Dyn->d_un.d_ptr;
+        RelaType    = (Dyn->d_tag == DT_RELA) ? SHT_RELA: SHT_REL;
         break;
       case DT_RELACOUNT:
       case DT_RELCOUNT:
@@ -294,7 +294,7 @@ RelocateElf64Dynamic (
     }
   }
 
-  if (RelaOffset == MAX_UINT64) {
+  if (RelaAddress == MAX_UINT64) {
     ASSERT (RelaCount     == 0);
     ASSERT (RelaEntrySize == 0);
     ASSERT (RelaSize      == 0);
@@ -307,8 +307,16 @@ RelocateElf64Dynamic (
   //
   // Verify the existence of the relocation section.
   //
-  RelShdr = GetElf64SectionByRange (ElfCt->FileBase, RelaOffset, RelaSize);
-  ASSERT (RelShdr != NULL);
+  RelShdr = NULL;
+  for (Index = 0; Index < ElfCt->ShNum; Index++) {
+    RelShdr = GetElf64SectionByIndex (ElfCt->FileBase, Index);
+    ASSERT (RelShdr != NULL);
+    if ((RelShdr->sh_addr == RelaAddress) && (RelShdr->sh_size == RelaSize)) {
+      break;
+    }
+    RelShdr = NULL;
+  }
+
   if (RelShdr == NULL) {
     return EFI_UNSUPPORTED;
   }
