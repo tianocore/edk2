@@ -19,6 +19,7 @@
 #   DEFINE NETWORK_HTTP_BOOT_ENABLE       = TRUE
 #   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = FALSE
 #   DEFINE NETWORK_ISCSI_ENABLE           = FALSE
+#   DEFINE NETWORK_ISCSI_MD5_ENABLE       = TRUE
 #   DEFINE NETWORK_VLAN_ENABLE            = TRUE
 #
 # Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
@@ -115,6 +116,25 @@
   #       since libssl is not required for iSCSI.
   #
   DEFINE NETWORK_ISCSI_ENABLE = FALSE
+!endif
+
+!ifndef NETWORK_ISCSI_MD5_ENABLE
+  #
+  # This flag enables the deprecated MD5 hash algorithm in iSCSI CHAP
+  # authentication.
+  #
+  # Note: The NETWORK_ISCSI_MD5_ENABLE flag only makes a difference if
+  #       NETWORK_ISCSI_ENABLE is TRUE; otherwise, NETWORK_ISCSI_MD5_ENABLE is
+  #       ignored.
+  #
+  #       With NETWORK_ISCSI_MD5_ENABLE set to TRUE, MD5 is enabled as the
+  #       least preferred CHAP hash algorithm. With NETWORK_ISCSI_MD5_ENABLE
+  #       set to FALSE, MD5 is disabled statically, at build time.
+  #
+  #       The default value is TRUE, because RFC 7143 mandates MD5, and because
+  #       several vendors' iSCSI targets only support MD5, for CHAP.
+  #
+  DEFINE NETWORK_ISCSI_MD5_ENABLE = TRUE
 !endif
 
 !if $(NETWORK_ENABLE) == TRUE

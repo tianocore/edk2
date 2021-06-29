@@ -23,6 +23,7 @@ STATIC CONST CHAP_HASH mChapHash[] = {
     Sha256Update,
     Sha256Final
   },
+#ifdef ENABLE_MD5_DEPRECATED_INTERFACES
   //
   // Keep the deprecated MD5 entry at the end of the array (making MD5 the
   // least preferred choice of the initiator).
@@ -35,6 +36,7 @@ STATIC CONST CHAP_HASH mChapHash[] = {
     Md5Update,
     Md5Final
   },
+#endif // ENABLE_MD5_DEPRECATED_INTERFACES
 };
 
 //
