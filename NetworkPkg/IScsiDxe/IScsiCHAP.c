@@ -30,12 +30,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 IScsiCHAPCalculateResponse (
-  IN  UINT32  ChapIdentifier,
-  IN  CHAR8   *ChapSecret,
-  IN  UINT32  SecretLength,
-  IN  UINT8   *ChapChallenge,
-  IN  UINT32  ChallengeLength,
-  OUT UINT8   *ChapResponse
+  IN  UINT32          ChapIdentifier,
+  IN  CHAR8           *ChapSecret,
+  IN  UINT32          SecretLength,
+  IN  UINT8           *ChapChallenge,
+  IN  UINT32          ChallengeLength,
+  OUT UINT8           *ChapResponse
   )
 {
   UINTN       Md5ContextSize;
