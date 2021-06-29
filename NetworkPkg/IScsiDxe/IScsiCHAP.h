@@ -47,6 +47,45 @@ typedef struct _ISCSI_CHAP_AUTH_CONFIG_NVDATA {
 
 #pragma pack()
 
+//
+// Typedefs for collecting sets of hash APIs from BaseCryptLib.
+//
+typedef
+UINTN
+(EFIAPI *CHAP_HASH_GET_CONTEXT_SIZE) (
+  VOID
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *CHAP_HASH_INIT) (
+  OUT VOID *Context
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *CHAP_HASH_UPDATE) (
+  IN OUT VOID       *Context,
+  IN     CONST VOID *Data,
+  IN     UINTN      DataSize
+  );
+
+typedef
+BOOLEAN
+(EFIAPI *CHAP_HASH_FINAL) (
+  IN OUT VOID  *Context,
+  OUT    UINT8 *HashValue
+  );
+
+typedef struct {
+  UINT8                      Algorithm;      // ISCSI_CHAP_ALGORITHM_*, CHAP_A
+  UINT32                     DigestSize;
+  CHAP_HASH_GET_CONTEXT_SIZE GetContextSize;
+  CHAP_HASH_INIT             Init;
+  CHAP_HASH_UPDATE           Update;
+  CHAP_HASH_FINAL            Final;
+} CHAP_HASH;
+
 ///
 /// ISCSI CHAP Authentication Data
 ///
@@ -55,6 +94,11 @@ typedef struct _ISCSI_CHAP_AUTH_DATA {
   UINT32                        InIdentifier;
   UINT8                         InChallenge[1024];
   UINT32                        InChallengeLength;
+  //
+  // The hash algorithm (CHAP_A) that the target selects in
+  // ISCSI_CHAP_STEP_TWO.
+  //
+  CONST CHAP_HASH               *Hash;
   //
   // Calculated CHAP Response (CHAP_R) value.
   //
@@ -108,4 +152,15 @@ IScsiCHAPToSendReq (
   IN OUT  NET_BUF           *Pdu
   );
 
+/**
+  Initialize the CHAP_A=<A1,A2...> *value* string for the entire driver, to be
+  sent by the initiator in ISCSI_CHAP_STEP_ONE.
+
+  This function sanity-checks the internal table of supported CHAP hashing
+  algorithms, as well.
+**/
+VOID
+IScsiCHAPInitHashList (
+  VOID
+  );
 #endif

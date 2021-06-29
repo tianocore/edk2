@@ -1779,6 +1779,8 @@ IScsiDriverEntryPoint (
   //
   // Create the private data structures.
   //
+  IScsiCHAPInitHashList ();
+
   mPrivate = AllocateZeroPool (sizeof (ISCSI_PRIVATE_DATA));
   if (mPrivate == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
