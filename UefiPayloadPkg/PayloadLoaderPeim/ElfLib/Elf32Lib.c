@@ -206,7 +206,7 @@ RelocateElf32Dynamic (
   Elf32_Shdr                   *DynShdr;
   Elf32_Shdr                   *RelShdr;
   Elf32_Dyn                    *Dyn;
-  UINT32                       RelaOffset;
+  UINT32                       RelaAddress;
   UINT32                       RelaCount;
   UINT32                       RelaSize;
   UINT32                       RelaEntrySize;
@@ -246,7 +246,7 @@ RelocateElf32Dynamic (
   //
   // 2. Locate the relocation section from the dynamic section.
   //
-  RelaOffset    = MAX_UINT32;
+  RelaAddress   = MAX_UINT32;
   RelaSize      = 0;
   RelaCount     = 0;
   RelaEntrySize = 0;
@@ -265,8 +265,8 @@ RelocateElf32Dynamic (
         // based on the original file value and the memory base address.
         // For consistency, files do not contain relocation entries to ``correct'' addresses in the dynamic structure.
         //
-        RelaOffset = Dyn->d_un.d_ptr - (UINT32) (UINTN) ElfCt->PreferredImageAddress;
-        RelaType   = (Dyn->d_tag == DT_RELA) ? SHT_RELA: SHT_REL;
+        RelaAddress = Dyn->d_un.d_ptr;
+        RelaType    = (Dyn->d_tag == DT_RELA) ? SHT_RELA: SHT_REL;
         break;
       case DT_RELACOUNT:
       case DT_RELCOUNT:
@@ -285,7 +285,7 @@ RelocateElf32Dynamic (
     }
   }
 
-  if (RelaOffset == MAX_UINT64) {
+  if (RelaAddress == MAX_UINT64) {
     ASSERT (RelaCount     == 0);
     ASSERT (RelaEntrySize == 0);
     ASSERT (RelaSize      == 0);
@@ -298,8 +298,16 @@ RelocateElf32Dynamic (
   //
   // Verify the existence of the relocation section.
   //
-  RelShdr = GetElf32SectionByRange (ElfCt->FileBase, RelaOffset, RelaSize);
-  ASSERT (RelShdr != NULL);
+  RelShdr = NULL;
+  for (Index = 0; Index < ElfCt->ShNum; Index++) {
+    RelShdr = GetElf32SectionByIndex (ElfCt->FileBase, Index);
+    ASSERT (RelShdr != NULL);
+    if ((RelShdr->sh_addr == RelaAddress) && (RelShdr->sh_size == RelaSize)) {
+      break;
+    }
+    RelShdr = NULL;
+  }
+
   if (RelShdr == NULL) {
     return EFI_UNSUPPORTED;
   }
