@@ -9,25 +9,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _ISCSI_CHAP_H_
 #define _ISCSI_CHAP_H_
 
-#define ISCSI_AUTH_METHOD_CHAP    "CHAP"
+#define ISCSI_AUTH_METHOD_CHAP                    "CHAP"
 
-#define ISCSI_KEY_CHAP_ALGORITHM  "CHAP_A"
-#define ISCSI_KEY_CHAP_IDENTIFIER "CHAP_I"
-#define ISCSI_KEY_CHAP_CHALLENGE  "CHAP_C"
-#define ISCSI_KEY_CHAP_NAME       "CHAP_N"
-#define ISCSI_KEY_CHAP_RESPONSE   "CHAP_R"
+#define ISCSI_KEY_CHAP_ALGORITHM                  "CHAP_A"
+#define ISCSI_KEY_CHAP_IDENTIFIER                 "CHAP_I"
+#define ISCSI_KEY_CHAP_CHALLENGE                  "CHAP_C"
+#define ISCSI_KEY_CHAP_NAME                       "CHAP_N"
+#define ISCSI_KEY_CHAP_RESPONSE                   "CHAP_R"
 
-#define ISCSI_CHAP_ALGORITHM_MD5  5
+#define ISCSI_CHAP_ALGORITHM_MD5                  5
 
 ///
 /// MD5_HASHSIZE
 ///
-#define ISCSI_CHAP_RSP_LEN        16
+#define ISCSI_CHAP_RSP_LEN                        16
 
-#define ISCSI_CHAP_STEP_ONE       1
-#define ISCSI_CHAP_STEP_TWO       2
-#define ISCSI_CHAP_STEP_THREE     3
-#define ISCSI_CHAP_STEP_FOUR      4
+#define ISCSI_CHAP_STEP_ONE                       1
+#define ISCSI_CHAP_STEP_TWO                       2
+#define ISCSI_CHAP_STEP_THREE                     3
+#define ISCSI_CHAP_STEP_FOUR                      4
 
 
 #pragma pack(1)
