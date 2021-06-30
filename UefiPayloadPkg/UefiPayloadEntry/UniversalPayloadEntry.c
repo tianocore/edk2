@@ -364,7 +364,6 @@ _ModuleEntryPoint (
 {
   EFI_STATUS                    Status;
   PHYSICAL_ADDRESS              DxeCoreEntryPoint;
-  EFI_HOB_HANDOFF_INFO_TABLE    *HandoffHobTable;
   EFI_PEI_HOB_POINTERS          Hob;
   EFI_FIRMWARE_VOLUME_HEADER    *DxeFv;
 
@@ -393,8 +392,7 @@ _ModuleEntryPoint (
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
   IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE,  0xFF);
 
-  HandoffHobTable = (EFI_HOB_HANDOFF_INFO_TABLE *) GetFirstHob(EFI_HOB_TYPE_HANDOFF);
-  Hob.HandoffInformationTable = HandoffHobTable;
+  Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *) GetFirstHob(EFI_HOB_TYPE_HANDOFF);
   HandOffToDxeCore (DxeCoreEntryPoint, Hob);
 
   // Should not get here

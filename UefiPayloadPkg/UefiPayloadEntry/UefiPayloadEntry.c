@@ -559,7 +559,6 @@ PayloadEntry (
 {
   EFI_STATUS                    Status;
   PHYSICAL_ADDRESS              DxeCoreEntryPoint;
-  EFI_HOB_HANDOFF_INFO_TABLE    *HandoffHobTable;
   UINTN                         MemBase;
   UINTN                         HobMemBase;
   UINTN                         HobMemTop;
@@ -603,7 +602,7 @@ PayloadEntry (
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
   IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE,  0xFF);
 
-  Hob.HandoffInformationTable = HandoffHobTable;
+  Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *) GetFirstHob(EFI_HOB_TYPE_HANDOFF);
   HandOffToDxeCore (DxeCoreEntryPoint, Hob);
 
   // Should not get here
