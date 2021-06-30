@@ -53,6 +53,12 @@ BITS    32
 ; Hypervisor does not support SEV-SNP feature
 %define TERM_HV_UNSUPPORTED_FEATURE 4
 
+; SEV-SNP guest is not launched at VMPL-0
+%define TERM_SNP_NOT_VMPL0          5
+
+; The #VC is not for PVALIDATE
+%define TERM_VC_NOT_PVALIDATE       6
+
 ; GHCB SEV Information MSR protocol
 %define GHCB_SEV_INFORMATION_REQUEST        2
 %define GHCB_SEV_INFORMATION_RESPONSE       1
@@ -139,6 +145,25 @@ BITS    32
 SevEsUnexpectedRespTerminate:
     TerminateVmgExit    TERM_UNEXPECTED_RESP_CODE
 
+; Check whether we're booted under the VMPL-0.
+;
+; There is no straightforward way to query the current VMPL level. The simplest
+; method is to use the PVALIDATE instruction to change the page state. If its
+; not a VMPL-0 guest then PVALIDATE will cause #GP.
+;
+CheckSnpVmpl0:
+    ; This routine is part of the ROM, and should have been validated by the SNP
+    ; guest launch sequence. So its safe to re-validate the page containing
+    ; this routine.
+    mov     eax, ADDR_OF(CheckSnpVmpl0)
+    mov     ecx, 0
+    mov     edx, 1
+    PVALIDATE
+
+    ; We will reach here only if we are running at VMPL-0.
+
+    OneTimeCallRet    CheckSnpVmpl0
+
 ; Check if Secure Encrypted Virtualization (SEV) features are enabled.
 ;
 ; Register usage is tight in this routine, so multiple calls for the
@@ -193,6 +218,17 @@ CheckSevFeatures:
     bt        eax, 0
     jnc       NoSev
 
+    ; Check if we're SEV-SNP guest and booted under VMPL-0.
+    ;
+    ; This check should happen here because the PVALIDATE instruction
+    ; used in the check will cause an exception. The IDT is active
+    ; during the CheckSevFeatures only.
+    ;
+    bt        eax, 2
+    jnc       SkipCheckSnpVmpl0
+    OneTimeCall     CheckSnpVmpl0
+
+SkipCheckSnpVmpl0:
     ; Check for SEV-ES memory encryption feature:
     ; CPUID  Fn8000_001F[EAX] - Bit 3
     ;   CPUID raises a #VC exception if running as an SEV-ES guest
@@ -393,6 +429,36 @@ IsSevEsEnabled:
 SevEsDisabled:
     OneTimeCallRet IsSevEsEnabled
 
+; Start handling of #GP exception handling routines
+;
+SevEsIdtNotPvalidate:
+    TerminateVmgExit TERM_VC_NOT_PVALIDATE
+    iret
+
+SevSnpGpException:
+    ;
+    ; If we're here, then we are an SEV-SNP guest and this
+    ; was triggered by a PVALIDATE instruction.
+    ;
+    ; Verify that its an PVALIDATE instruction
+    ; The exception stack looks like this:
+    ;     +---------+
+    ;     | ....    |
+    ;     | eip     |
+    ;     | err code|
+    ;     +---------+
+    pop     ebx
+    pop     ebx
+    mov     ecx, [ebx]
+    cmp     ecx, 0xff010ff2       ; Compare EIP with PVALIDATE menomics
+    jne     SevEsIdtNotPvalidate
+
+    ; The #GP was triggered by the PVALIDATE instruction, this will happen
+    ; only when we're not running at VMPL-0
+    ;
+    TerminateVmgExit TERM_SNP_NOT_VMPL0
+    iret
+
 ; Start of #VC exception handling routines
 ;
 
@@ -522,15 +588,34 @@ ALIGN   16
 ;
 IDT_BASE:
 ;
-; Vectors 0 - 28 (No handlers)
+; Vectors 0 - 12 (No handlers)
 ;
-%rep 29
+%rep 13
     dw      0                                    ; Offset low bits 15..0
     dw      0x10                                 ; Selector
     db      0                                    ; Reserved
     db      0x8E                                 ; Gate Type (IA32_IDT_GATE_TYPE_INTERRUPT_32)
     dw      0                                    ; Offset high bits 31..16
 %endrep
+;
+; Vector 13 (GP Exception)
+;
+    dw      (ADDR_OF(SevSnpGpException) & 0xffff)  ; Offset low bits 15..0
+    dw      0x10                                 ; Selector
+    db      0                                    ; Reserved
+    db      0x8E                                 ; Gate Type (IA32_IDT_GATE_TYPE_INTERRUPT_32)
+    dw      (ADDR_OF(SevSnpGpException) >> 16)   ; Offset high bits 31..16
+;
+; Vectors 14 - 28 (No handlers)
+;
+%rep 15
+    dw      0                                    ; Offset low bits 15..0
+    dw      0x10                                 ; Selector
+    db      0                                    ; Reserved
+    db      0x8E                                 ; Gate Type (IA32_IDT_GATE_TYPE_INTERRUPT_32)
+    dw      0                                    ; Offset high bits 31..16
+%endrep
+
 ;
 ; Vector 29 (VMM Communication Exception)
 ;
