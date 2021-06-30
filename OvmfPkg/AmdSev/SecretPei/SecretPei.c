@@ -4,6 +4,7 @@
   Copyright (C) 2020 James Bottomley, IBM Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
+#include <Base.h>
 #include <PiPei.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
@@ -17,7 +18,7 @@ InitializeSecretPei (
 {
   BuildMemoryAllocationHob (
     PcdGet32 (PcdSevLaunchSecretBase),
-    PcdGet32 (PcdSevLaunchSecretSize),
+    ALIGN_VALUE (PcdGet32 (PcdSevLaunchSecretSize), EFI_PAGE_SIZE),
     EfiBootServicesData
     );
 
