@@ -8,10 +8,10 @@
 **/
 
 #include <Uefi.h>
+#include <IndustryStandard/ArmCache.h>
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/SmBios.h>
 #include <Library/ArmLib.h>
-#include <Library/ArmLib/ArmLibPrivate.h>
 #include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
 

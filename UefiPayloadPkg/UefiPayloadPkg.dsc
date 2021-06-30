@@ -27,6 +27,7 @@
 
   DEFINE SOURCE_DEBUG_ENABLE          = FALSE
   DEFINE PS2_KEYBOARD_ENABLE          = FALSE
+  DEFINE UNIVERSAL_PAYLOAD            = FALSE
 
   #
   # SBL:      UEFI payload for Slim Bootloader
@@ -85,6 +86,9 @@
   # Shell options: [BUILD_SHELL, MIN_BIN, NONE, UEFI_BIN]
   #
   DEFINE SHELL_TYPE                   = BUILD_SHELL
+
+  DEFINE EMU_VARIABLE_ENABLE   = TRUE
+  DEFINE DISABLE_RESET_SYSTEM  = FALSE
 
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
@@ -146,6 +150,13 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  DxeHobListLib|UefiPayloadPkg/Library/DxeHobListLib/DxeHobListLib.inf
+
+!if $(UNIVERSAL_PAYLOAD) == TRUE
+  HobLib|UefiPayloadPkg/Library/DxeHobLib/DxeHobLib.inf
+!else
+  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+!endif
 
   #
   # UEFI & PI
@@ -188,7 +199,11 @@
   TimerLib|UefiPayloadPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   ResetSystemLib|UefiPayloadPkg/Library/ResetSystemLib/ResetSystemLib.inf
   SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
+!if $(UNIVERSAL_PAYLOAD) == TRUE
+  PlatformHookLib|UefiPayloadPkg/Library/UniversalPayloadPlatformHookLib/PlatformHookLib.inf
+!else
   PlatformHookLib|UefiPayloadPkg/Library/PlatformHookLib/PlatformHookLib.inf
+!endif
   PlatformBootManagerLib|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
 
@@ -205,10 +220,12 @@
   DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
 !endif
   PlatformSupportLib|UefiPayloadPkg/Library/PlatformSupportLibNull/PlatformSupportLibNull.inf
-!if $(BOOTLOADER) == "COREBOOT"
-  BlParseLib|UefiPayloadPkg/Library/CbParseLib/CbParseLib.inf
-!else
-  BlParseLib|UefiPayloadPkg/Library/SblParseLib/SblParseLib.inf
+!if $(UNIVERSAL_PAYLOAD) == FALSE
+  !if $(BOOTLOADER) == "COREBOOT"
+    BlParseLib|UefiPayloadPkg/Library/CbParseLib/CbParseLib.inf
+  !else
+    BlParseLib|UefiPayloadPkg/Library/SblParseLib/SblParseLib.inf
+  !endif
 !endif
 
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
@@ -221,10 +238,12 @@
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
 
 [LibraryClasses.common.SEC]
-  HobLib|UefiPayloadPkg/Library/HobLib/HobLib.inf
+  HobLib|UefiPayloadPkg/Library/PayloadEntryHobLib/HobLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  DxeHobListLib|UefiPayloadPkg/Library/DxeHobListLibNull/DxeHobListLibNull.inf
 
 [LibraryClasses.common.DXE_CORE]
+  DxeHobListLib|UefiPayloadPkg/Library/DxeHobListLibNull/DxeHobListLibNull.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   MemoryAllocationLib|MdeModulePkg/Library/DxeCoreMemoryAllocationLib/DxeCoreMemoryAllocationLib.inf
@@ -238,7 +257,6 @@
 
 [LibraryClasses.common.DXE_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
@@ -251,7 +269,6 @@
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
@@ -260,7 +277,6 @@
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
 
 ################################################################################
 #
@@ -271,6 +287,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
+  ## This PCD specified whether ACPI SDT protocol is installed.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x10000
@@ -289,14 +307,15 @@
 !endif
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
 
+  gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile|{ 0x57, 0x72, 0xcf, 0x80, 0xab, 0x87, 0xf9, 0x47, 0xa3, 0xfe, 0xD5, 0x0B, 0x76, 0xd8, 0x95, 0x41 }
 
 !if $(SOURCE_DEBUG_ENABLE)
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 !endif
 
 [PcdsPatchableInModule.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x7
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
 !if $(SOURCE_DEBUG_ENABLE)
@@ -340,6 +359,7 @@
 ################################################################################
 
 [PcdsDynamicExDefault]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
@@ -375,10 +395,18 @@
 
 !if "IA32" in $(ARCH)
   [Components.IA32]
+  !if $(UNIVERSAL_PAYLOAD) == TRUE
+    UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
+  !else
     UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
+  !endif
 !else
   [Components.X64]
+  !if $(UNIVERSAL_PAYLOAD) == TRUE
+    UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
+  !else
     UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
+  !endif
 !endif
 
 [Components.X64]
@@ -409,10 +437,13 @@
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+!if $(DISABLE_RESET_SYSTEM) == FALSE
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+!endif
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+!if $(EMU_VARIABLE_ENABLE) == TRUE
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-
+!endif
   #
   # Following are the DXE drivers
   #

@@ -152,10 +152,10 @@ McaInitialize (
 
   //
   // The scope of MSR_IA32_MC*_CTL/MSR_IA32_MC*_STATUS is package for below processor type, only program
-  // MSR_IA32_MC*_CTL/MSR_IA32_MC*_STATUS for thread 0 core 0 in each package.
+  // MSR_IA32_MC*_CTL/MSR_IA32_MC*_STATUS once for each package.
   //
   if (IS_NEHALEM_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
-    if ((CpuInfo->ProcessorInfo.Location.Thread != 0) || (CpuInfo->ProcessorInfo.Location.Core != 0)) {
+    if ((CpuInfo->First.Thread == 0) || (CpuInfo->First.Core == 0)) {
       return RETURN_SUCCESS;
     }
   }
