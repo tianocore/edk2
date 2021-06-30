@@ -5,6 +5,7 @@
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -926,7 +927,7 @@ AddAndSignalNewRedfishService (
     }
 
     Status = gBS->SignalEvent (Instance->DiscoverToken->Event);
-    if (!EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a:No event to signal!\n", __func__));
     }
   }
