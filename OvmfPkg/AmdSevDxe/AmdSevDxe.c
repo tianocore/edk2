@@ -15,9 +15,47 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Guid/MemEncryptLib.h>
 #include <Library/PcdLib.h>
+
+STATIC
+VOID
+EFIAPI
+AmdSevDxeExitBoot (
+  IN EFI_EVENT Event,
+  IN VOID      *EventToSignal
+  )
+{
+  EFI_STATUS Status;
+  BOOLEAN SevLiveMigrationEnabled;
+
+  SevLiveMigrationEnabled = MemEncryptSevLiveMigrationIsEnabled();
+
+  if (SevLiveMigrationEnabled) {
+    Status = gRT->SetVariable (
+               L"SevLiveMigrationEnabled",
+               &gMemEncryptGuid,
+               EFI_VARIABLE_NON_VOLATILE |
+               EFI_VARIABLE_BOOTSERVICE_ACCESS |
+               EFI_VARIABLE_RUNTIME_ACCESS,
+               sizeof (BOOLEAN),
+               &SevLiveMigrationEnabled
+               );
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Setting SevLiveMigrationEnabled variable, status = %lx\n",
+      __FUNCTION__,
+      Status
+      ));
+  }
+
+  DEBUG ((DEBUG_VERBOSE, "%a\n", __FUNCTION__));
+}
 
 EFI_STATUS
 EFIAPI
@@ -28,6 +66,7 @@ AmdSevDxeEntryPoint (
 {
   EFI_STATUS                       Status;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *AllDescMap;
+  EFI_EVENT                        ExitBootEvent;
   UINTN                            NumEntries;
   UINTN                            Index;
 
@@ -128,6 +167,21 @@ AmdSevDxeEntryPoint (
       ASSERT (FALSE);
       CpuDeadLoop ();
     }
+  }
+
+  // Create the event whose notification function will be queued by
+  // gBS->ExitBootServices() and will signal the event created above.
+  //
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES, // Type
+                  TPL_CALLBACK,                  // NotifyTpl
+                  AmdSevDxeExitBoot,             // NotifyFunction
+                  NULL,                          // NotifyContext
+                  &ExitBootEvent                 // Event
+                  );
+  if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "%a: CreateEvent(): %r\n",
+        __FUNCTION__, Status));
   }
 
   return EFI_SUCCESS;
