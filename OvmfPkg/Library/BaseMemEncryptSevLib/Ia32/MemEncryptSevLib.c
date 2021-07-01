@@ -136,3 +136,30 @@ MemEncryptSevClearMmioPageEncMask (
   //
   return RETURN_UNSUPPORTED;
 }
+
+/**
+ This hyercall is used to notify hypervisor when a page is marked as
+ 'decrypted' (i.e C-bit removed).
+
+ @param[in]   PhysicalAddress       The physical address that is the start address
+                                    of a memory region. The physical address is
+                                    expected to be PAGE_SIZE aligned.
+ @param[in]   Pages                 Number of Pages in the memory region.
+ @param[in]   Mode                  SetCBit or ClearCBit
+
+@retval RETURN_SUCCESS              Hypercall returned success.
+**/
+RETURN_STATUS
+EFIAPI
+SetMemoryEncDecHypercall3 (
+  IN  UINTN     PhysicalAddress,
+  IN  UINTN     Pages,
+  IN  UINTN     Mode
+  )
+{
+  //
+  // Memory encryption bit is not accessible in 32-bit mode
+  //
+  return RETURN_UNSUPPORTED;
+}
+
