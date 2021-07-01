@@ -17,6 +17,7 @@
 #include <Guid/QemuKernelLoaderFsMedia.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/BlobVerifierLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -1036,6 +1037,14 @@ QemuKernelLoaderFsDxeEntrypoint (
   for (BlobType = 0; BlobType < KernelBlobTypeMax; ++BlobType) {
     CurrentBlob = &mKernelBlob[BlobType];
     Status = FetchBlob (CurrentBlob);
+    if (EFI_ERROR (Status)) {
+      goto FreeBlobs;
+    }
+    Status = VerifyBlob (
+               CurrentBlob->Name,
+               CurrentBlob->Data,
+               CurrentBlob->Size
+               );
     if (EFI_ERROR (Status)) {
       goto FreeBlobs;
     }
