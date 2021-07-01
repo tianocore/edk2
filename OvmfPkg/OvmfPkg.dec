@@ -23,6 +23,9 @@
   ##  @libraryclass  Access bhyve's firmware control interface.
   BhyveFwCtlLib|Include/Library/BhyveFwCtlLib.h
 
+  ##  @libraryclass  Verify blobs read from the VMM
+  BlobVerifierLib|Include/Library/BlobVerifierLib.h
+
   ##  @libraryclass  Loads and boots a Linux kernel image
   #
   LoadLinuxLib|Include/Library/LoadLinuxLib.h
