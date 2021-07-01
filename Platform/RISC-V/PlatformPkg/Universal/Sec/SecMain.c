@@ -398,6 +398,13 @@ SecPostOpenSbiPlatformEarlylInit(
   IN BOOLEAN ColdBoot
   )
 {
+  UINT32 HartId;
+
+  if (!ColdBoot) {
+    HartId = current_hartid();
+    DEBUG ((DEBUG_INFO, "%a: Non boot hart %d.\n", __FUNCTION__, HartId));
+    return 0;
+  }
   //
   // Boot HART is already in the process of OpenSBI initialization.
   // We can let other HART to keep booting.
@@ -422,6 +429,12 @@ SecPostOpenSbiPlatformFinalInit (
   struct sbi_scratch *ScratchSpace;
   struct sbi_platform *SbiPlatform;
   EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT *FirmwareContext;
+
+  if (!ColdBoot) {
+    HartId = current_hartid();
+    DEBUG ((DEBUG_INFO, "%a: Non boot hart %d.\n", __FUNCTION__, HartId));
+    return 0;
+  }
 
   DEBUG((DEBUG_INFO, "%a: Entry, preparing to jump to PEI Core\n\n", __FUNCTION__));
 
@@ -777,7 +790,7 @@ VOID EFIAPI SecCoreStartUpWithStack(
   sbi_init(Scratch);
 }
 
-void xxxx (char *debugstr, ...)
+void OpensbiDebugPrint (char *debugstr, ...)
 {
   VA_LIST  Marker;
 
