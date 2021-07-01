@@ -100,6 +100,39 @@ MemEncryptSevIsEnabled (
   return Msr.Bits.SevBit ? TRUE : FALSE;
 }
 
+INTN
+EFIAPI
+SetMemoryEncDecHypercall3AsmStub (
+  IN  UINTN  HypercallNum,
+  IN  UINTN  PhysicalAddress,
+  IN  UINTN  Pages,
+  IN  UINTN  Attributes
+  )
+{
+  //
+  // Not used in SEC phase.
+  //
+  return RETURN_UNSUPPORTED;
+}
+
+/**
+  Returns a boolean to indicate whether SEV live migration is enabled.
+
+  @retval TRUE           SEV live migration is enabled
+  @retval FALSE          SEV live migration is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevLiveMigrationIsEnabled (
+  VOID
+  )
+{
+  //
+  // Not used in SEC phase.
+  //
+  return FALSE;
+}
+
 /**
   Returns the SEV encryption mask.
 
