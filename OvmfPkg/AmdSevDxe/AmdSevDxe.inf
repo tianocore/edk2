@@ -45,3 +45,6 @@
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+
+[Guids]
+  gMemEncryptGuid
