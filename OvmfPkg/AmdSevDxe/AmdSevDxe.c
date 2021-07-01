@@ -14,10 +14,48 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/UefiLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Guid/MemEncryptLib.h>
 #include <Library/PcdLib.h>
+
+STATIC
+VOID
+EFIAPI
+AmdSevDxeOnReadyToBoot (
+  IN EFI_EVENT Event,
+  IN VOID      *EventToSignal
+  )
+{
+  EFI_STATUS Status;
+  BOOLEAN SevLiveMigrationEnabled;
+
+  SevLiveMigrationEnabled = MemEncryptSevLiveMigrationIsEnabled();
+
+  if (SevLiveMigrationEnabled) {
+    Status = gRT->SetVariable (
+               L"SevLiveMigrationEnabled",
+               &gMemEncryptGuid,
+               EFI_VARIABLE_NON_VOLATILE |
+               EFI_VARIABLE_BOOTSERVICE_ACCESS |
+               EFI_VARIABLE_RUNTIME_ACCESS,
+               sizeof (BOOLEAN),
+               &SevLiveMigrationEnabled
+               );
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Setting SevLiveMigrationEnabled variable, status = %lx\n",
+      __FUNCTION__,
+      Status
+      ));
+  }
+
+  DEBUG ((DEBUG_VERBOSE, "%a\n", __FUNCTION__));
+}
 
 EFI_STATUS
 EFIAPI
@@ -30,6 +68,7 @@ AmdSevDxeEntryPoint (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *AllDescMap;
   UINTN                            NumEntries;
   UINTN                            Index;
+  EFI_EVENT                        Event;
 
   //
   // Do nothing when SEV is not enabled
@@ -128,6 +167,18 @@ AmdSevDxeEntryPoint (
       ASSERT (FALSE);
       CpuDeadLoop ();
     }
+  }
+
+  Status = EfiCreateEventReadyToBootEx (
+             TPL_CALLBACK,
+             AmdSevDxeOnReadyToBoot,
+             NULL,
+             &Event
+             );
+
+  if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "%a: CreateEventReadyToBootEx(): %r\n",
+        __FUNCTION__, Status));
   }
 
   return EFI_SUCCESS;
