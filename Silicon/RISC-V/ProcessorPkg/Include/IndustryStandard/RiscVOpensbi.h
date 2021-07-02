@@ -47,6 +47,7 @@ typedef struct {
 
 typedef struct {
   VOID            *PeiServiceTable;       // PEI Service table
+  UINT64           FlattenedDeviceTree;   // Pointer to Flattened Device tree
   EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC  *HartSpecific[RISC_V_MAX_HART_SUPPORTED];
 } EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT;
 

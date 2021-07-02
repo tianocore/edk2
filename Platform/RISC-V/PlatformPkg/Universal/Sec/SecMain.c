@@ -557,6 +557,12 @@ VOID EFIAPI PeiCore (
              &FirmwareContext
              ));
   ThisSbiPlatform->firmware_context = (unsigned long)&FirmwareContext;
+
+  //
+  // Save Flattened Device tree in firmware context
+  //
+  FirmwareContext.FlattenedDeviceTree = FuncArg1;
+
   //
   // Set firmware context Hart-specific pointer
   //
@@ -648,6 +654,42 @@ RiscVOpenSbiHartSwitchMode (
 }
 
 /**
+  Get device tree address
+
+  @retval The address of Device Tree binary.
+**/
+VOID *
+EFIAPI
+GetDeviceTreeAddress (
+  VOID
+  )
+{
+  EFI_STATUS Status;
+  EFI_COMMON_SECTION_HEADER *FoundSection;
+
+  if (FixedPcdGet32 (PcdDeviceTreeAddress)) {
+      return (VOID *)*((unsigned long *)FixedPcdGet32 (PcdDeviceTreeAddress));
+  } else if (FixedPcdGet32 (PcdRiscVDtbFvBase)) {
+      Status = FindFfsFileAndSection (
+                 (EFI_FIRMWARE_VOLUME_HEADER *)FixedPcdGet32 (PcdRiscVDtbFvBase),
+                 EFI_FV_FILETYPE_FREEFORM,
+                 EFI_SECTION_RAW,
+                 &FoundSection
+               );
+      if (EFI_ERROR(Status)) {
+        DEBUG ((DEBUG_ERROR, "Platform Device Tree is not found from FV.\n"));
+        return NULL;
+      }
+      FoundSection ++;
+      return (VOID *)FoundSection;
+  } else {
+      DEBUG ((DEBUG_ERROR, "Must use DTB either from memory or compiled in FW. PCDs configured incorrectly.\n"));
+      ASSERT (FALSE);
+  }
+  return NULL;
+}
+
+/**
   This function initilizes hart specific information and SBI.
   For the boot hart, it boots system through PEI core and initial SBI in the DXE IPL.
   For others, it goes to initial SBI and halt.
@@ -685,6 +727,13 @@ VOID EFIAPI SecCoreStartUpWithStack(
   UINT64 BootHartDoneSbiInit;
   UINT64 NonBootHartMessageLockValue;
   EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC *HartFirmwareContext;
+
+  Scratch->next_arg1 = (unsigned long)GetDeviceTreeAddress ();
+  if (Scratch->next_arg1 == (unsigned long)NULL) {
+    DEBUG ((DEBUG_ERROR, "Platform Device Tree is not found\n"));
+    ASSERT (FALSE);
+  }
+  DEBUG ((DEBUG_INFO, "DTB address: 0x%08x\n", Scratch->next_arg1));
 
   //
   // Setup EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC for each hart.

@@ -57,6 +57,8 @@
 [FixedPcd]
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVPeiFvBase
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVPeiFvSize
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDtbFvBase
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdDeviceTreeAddress
 
 [Pcd]
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId

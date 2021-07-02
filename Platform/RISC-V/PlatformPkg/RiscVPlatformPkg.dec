@@ -31,6 +31,8 @@
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVPeiFvSize|0x0|UINT32|0x00001003
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvBase|0x0|UINT32|0x00001004
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDxeFvSize|0x0|UINT32|0x00001005
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDtbFvBase|0x0|UINT32|0x00001016
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRiscVDtbFvSize|0x0|UINT32|0x00001017
 
 #
 # Definition of EFI Variable region
@@ -65,6 +67,8 @@
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamBase|0|UINT32|0x00001103
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdTemporaryRamSize|0|UINT32|0x00001104
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdPeiCorePrivilegeMode|0|UINT32|0x00001105
+
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdDeviceTreeAddress|0|UINT32|0x00001106
 
 [PcdsPatchableInModule]
 
