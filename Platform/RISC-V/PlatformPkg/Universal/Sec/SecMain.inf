@@ -41,6 +41,7 @@
   DebugAgentLib
   DebugLib
   ExtractGuidedSectionLib
+  FdtLib
   IoLib
   PcdLib
   PeCoffLib
@@ -62,6 +63,7 @@
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdHartCount
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartIndexToId
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRootFirmwareDomainBaseAddress
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdRootFirmwareDomainSize
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdOpenSbiStackSize

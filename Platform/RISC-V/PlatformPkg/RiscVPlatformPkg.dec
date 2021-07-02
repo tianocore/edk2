@@ -55,9 +55,20 @@
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdHartCount|0|UINT32|0x00001083
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootHartId|0|UINT32|0x00001084
 #
-# The bootable hart core number, which is incorporate with OpenSBI platform hart_index2id value.
+# The bootable hart core number, which incorporates with OpenSBI platform hart_index2id value.
+# PcdBootableHartNumber = 0 means the number of bootable hart comes from Device Tree.
+# Otherwise the number assigned in PcdBootableHartNumber overwrite it.
 #
   gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartNumber|0|UINT32|0x00001085
+#
+# PcdBootableHartIndexToId is valid if PcdBootableHartNumber != 0.
+# If PcdBootableHartNumber != 0, then PcdBootableHartIndexToId is an array of
+# bootable hart ID.
+# For example,
+# if PcdBootableHartNumber == 3 then PcdBootableHartIndexToId could be defined
+# as {0x1, 0x2, 0x3}.
+#
+  gUefiRiscVPlatformPkgTokenSpaceGuid.PcdBootableHartIndexToId|NULL|VOID*|0x00001086
 #
 # Definitions for OpenSbi
 #

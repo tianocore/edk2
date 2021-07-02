@@ -615,16 +615,17 @@ GetDeviceTreeAddress (
   EFI_COMMON_SECTION_HEADER *FoundSection;
 
   if (FixedPcdGet32 (PcdDeviceTreeAddress)) {
+      DEBUG ((DEBUG_INFO, "Use fixed address of DBT from PcdDeviceTreeAddress.\n"));
       return (VOID *)*((unsigned long *)FixedPcdGet32 (PcdDeviceTreeAddress));
   } else if (FixedPcdGet32 (PcdRiscVDtbFvBase)) {
+      DEBUG ((DEBUG_INFO, "Use DBT FV\n"));
       Status = FindFfsFileAndSection (
                  (EFI_FIRMWARE_VOLUME_HEADER *)FixedPcdGet32 (PcdRiscVDtbFvBase),
                  EFI_FV_FILETYPE_FREEFORM,
                  EFI_SECTION_RAW,
                  &FoundSection
-               );
+                 );
       if (EFI_ERROR(Status)) {
-        DEBUG ((DEBUG_ERROR, "Platform Device Tree is not found from FV.\n"));
         return NULL;
       }
       FoundSection ++;
@@ -634,6 +635,35 @@ GetDeviceTreeAddress (
       ASSERT (FALSE);
   }
   return NULL;
+}
+/**
+  Overwrite hart_index2id array if platform would like to use the
+  bootable harts other than those declared in Device Tree
+
+  @param[in]  SbiPlatform   Pointer to SBI platform
+  @retval  hart_index2id Index to ID value may be overwrote.
+  @retval  hart_count Index to ID value may be overwrote.
+
+**/
+VOID
+Edk2PlatformHartIndex2Id (
+  IN struct sbi_platform *SbiPlatform
+  )
+{
+  UINT32 Index;
+  UINT32 *HartIndexToId;
+  UINT32 BootableHartCount;
+  UINT8 *PlatformHartIndex2IdArray;
+
+  BootableHartCount = FixedPcdGet32(PcdBootableHartNumber);
+  if (BootableHartCount != 0) {
+    HartIndexToId = (UINT32 *)SbiPlatform->hart_index2id;
+    PlatformHartIndex2IdArray = (UINT8 *)FixedPcdGetPtr (PcdBootableHartIndexToId);
+    for (Index = 0; Index < BootableHartCount; Index++) {
+      *(HartIndexToId + Index) = (UINT32)(*(PlatformHartIndex2IdArray + Index));
+    }
+    SbiPlatform->hart_count = BootableHartCount;
+  }
 }
 
 /**
@@ -671,17 +701,13 @@ VOID EFIAPI SecCoreStartUpWithStack(
   IN  struct sbi_scratch *Scratch
   )
 {
+  UINT32 HardIndex;
   UINT64 BootHartDoneSbiInit;
   UINT64 NonBootHartMessageLockValue;
   struct sbi_platform *ThisSbiPlatform;
   EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC *HartFirmwareContext;
 
-  Scratch->next_arg1 = (unsigned long)GetDeviceTreeAddress ();
-  if (Scratch->next_arg1 == (unsigned long)NULL) {
-    DEBUG ((DEBUG_ERROR, "Platform Device Tree is not found\n"));
-    ASSERT (FALSE);
-  }
-  DEBUG ((DEBUG_INFO, "DTB address: 0x%08x\n", Scratch->next_arg1));
+  DEBUG ((DEBUG_INFO, "HART ID: 0x%x enter SecCoreStartUpWithStack\n", HartId));
 
   //
   // Setup EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC for each hart.
@@ -705,6 +731,18 @@ VOID EFIAPI SecCoreStartUpWithStack(
   ThisSbiPlatform->platform_ops_addr = (unsigned long)&Edk2OpensbiPlatformOps;
 
   if (HartId == FixedPcdGet32(PcdBootHartId)) {
+
+    Scratch->next_arg1 = (unsigned long)GetDeviceTreeAddress ();
+    if (Scratch->next_arg1 == (unsigned long)NULL) {
+      DEBUG ((DEBUG_ERROR, "Platform Device Tree is not found\n"));
+      ASSERT (FALSE);
+    }
+
+    DEBUG ((DEBUG_INFO, "HART number: 0x%x\n", ThisSbiPlatform->hart_count));
+    DEBUG ((DEBUG_INFO, "HART index to HART ID:\n"));
+    for (HardIndex = 0; HardIndex < ThisSbiPlatform->hart_count; HardIndex ++) {
+      DEBUG ((DEBUG_INFO, "  Index: %d -> Hard ID: %x\n", HardIndex, ThisSbiPlatform->hart_index2id [HardIndex]));
+    }
     LaunchPeiCore (HartId, Scratch);
   }
 
@@ -739,3 +777,11 @@ VOID EFIAPI SecCoreStartUpWithStack(
   sbi_init(Scratch);
 }
 
+void xxxx (char *debugstr, ...)
+{
+  VA_LIST  Marker;
+
+  VA_START (Marker, debugstr);
+  DebugVPrint (DEBUG_INFO, debugstr, Marker);
+  VA_END (Marker);
+}

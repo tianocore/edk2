@@ -101,15 +101,34 @@ _scratch_init:
   /* Loop to next hart */
   blt   t1, s7, _scratch_init
 
-  /* Fill-out temporary memory with 55aa*/
+  li    a4, FixedPcdGet32 (PcdTemporaryRamBase)
+  li    a5, FixedPcdGet32 (PcdTemporaryRamSize)
+
+  /* Use Temp memory as the stack for calling to C code */
+  add   sp, a4, a5
+  /* Get the address of device tree and call generic fw_platform_init */
+  call  GetDeviceTreeAddress /* a0 return the device tree address */
+  beqz  a0, skip_fw_init
+  add   a1, a0, 0            /* a1 is device tree */
+  csrr  a0, CSR_MHARTID      /* a0 is hart ID */
+  call  fw_platform_init
+skip_fw_init:
+
+  /* Zero out temporary memory */
   li    a4, FixedPcdGet32 (PcdTemporaryRamBase)
   li    a5, FixedPcdGet32 (PcdTemporaryRamSize)
   add   a5, a4, a5
 1:
-  li    a3, 0x5AA55AA55AA55AA5
+  li    a3, 0x0
   sd    a3, (a4)
   add   a4, a4, __SIZEOF_POINTER__
   blt   a4, a5, 1b
+
+  /* Overwrite hart_index2id array of
+     platform would like to use the bootable hart
+     other than it defined in Device Tree */
+  la    a0, platform
+  call  Edk2PlatformHartIndex2Id
 
   /* Update boot hart flag */
   la    a4, _boot_hart_done
@@ -136,6 +155,10 @@ _start_warm:
   csrw  CSR_MIP, zero
 
   li    s7, FixedPcdGet32 (PcdBootableHartNumber)
+  bnez  s7, 1f
+  la    a4, platform
+  REG_L s7, SBI_PLATFORM_HART_COUNT_OFFSET(a4)
+1:
   li    s8, FixedPcdGet32 (PcdOpenSbiStackSize)
   la    a4, platform
 
@@ -205,7 +228,7 @@ _start_warm:
   /* Setup stack */
   add   sp, tp, zero
 
-  /* Setup stack for the Hart executing EFI to top of temporary ram*/
+  /* Setup stack for the boot hart executing EFI to top of temporary ram*/
   csrr  a6, CSR_MHARTID
   li    a5, FixedPcdGet32 (PcdBootHartId)
   bne   a6, a5, 1f
