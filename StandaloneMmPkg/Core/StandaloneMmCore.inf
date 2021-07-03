@@ -75,6 +75,7 @@
   gEfiEventLegacyBootGuid
   gEfiEventExitBootServicesGuid
   gEfiEventReadyToBootGuid
+  gCommunicateHeaderV3Guid    ## CONSUMES   ## GUID # Communicate header
 
 [BuildOptions]
   GCC:*_*_*_CC_FLAGS = -fpie

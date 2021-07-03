@@ -340,8 +340,12 @@ MmEntryPoint (
   IN CONST EFI_MM_ENTRY_CONTEXT  *MmEntryContext
 )
 {
-  EFI_STATUS                  Status;
-  EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
+  EFI_STATUS                    Status;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER     *LegacyCommunicateHeader;
+  EFI_GUID                      *CommGuid;
+  VOID                          *CommData;
+  UINTN                         CommHeaderSize;
 
   DEBUG ((DEBUG_INFO, "MmEntryPoint ...\n"));
 
@@ -379,19 +383,35 @@ MmEntryPoint (
       gMmCorePrivate->CommunicationBuffer = 0;
       gMmCorePrivate->ReturnStatus = EFI_INVALID_PARAMETER;
     } else {
-      CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)gMmCorePrivate->CommunicationBuffer;
-      gMmCorePrivate->BufferSize -= OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+      CommGuid = &((EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)gMmCorePrivate->CommunicationBuffer)->HeaderGuid;
+      //
+      // Check if the signature matches EFI_MM_COMMUNICATE_HEADER_V3 definition
+      //
+      if (CompareGuid (CommGuid, &gCommunicateHeaderV3Guid)) {
+        CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)gMmCorePrivate->CommunicationBuffer;
+        ASSERT (CommunicateHeader->Signature == EFI_MM_COMMUNICATE_HEADER_V3_SIGNATURE);
+        ASSERT (CommunicateHeader->Version <= EFI_MM_COMMUNICATE_HEADER_V3_VERSION);
+        CommGuid = &CommunicateHeader->MessageGuid;
+        CommData = CommunicateHeader->MessageData;
+        CommHeaderSize = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+      } else {
+        LegacyCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)gMmCorePrivate->CommunicationBuffer;
+        CommGuid = &LegacyCommunicateHeader->HeaderGuid;
+        CommData = LegacyCommunicateHeader->Data;
+        CommHeaderSize = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+      }
+      gMmCorePrivate->BufferSize -= CommHeaderSize;
       Status = MmiManage (
-                 &CommunicateHeader->HeaderGuid,
+                 CommGuid,
                  NULL,
-                 CommunicateHeader->Data,
+                 CommData,
                  (UINTN *)&gMmCorePrivate->BufferSize
                  );
       //
       // Update CommunicationBuffer, BufferSize and ReturnStatus
       // Communicate service finished, reset the pointer to CommBuffer to NULL
       //
-      gMmCorePrivate->BufferSize += OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+      gMmCorePrivate->BufferSize += CommHeaderSize;
       gMmCorePrivate->CommunicationBuffer = 0;
       gMmCorePrivate->ReturnStatus = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
     }
