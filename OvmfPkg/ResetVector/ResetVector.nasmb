@@ -4,6 +4,7 @@
 ;
 ; Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
 ; Copyright (c) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+; Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;------------------------------------------------------------------------------
@@ -67,6 +68,44 @@
     %error "This implementation inherently depends on PcdOvmfSecGhcbBase not straddling a 2MB boundary"
   %endif
 
+  ;
+  ; TDX meta data
+  ;
+  %define TDX_METADATA_SECTION_TYPE_BFV       0
+  %define TDX_METADATA_SECTION_TYPE_CFV       1
+  %define TDX_METADATA_SECTION_TYPE_TD_HOB    2
+  %define TDX_METADATA_SECTION_TYPE_TEMP_MEM  3
+  %define TDX_METADATA_VERSION                1
+  %define TDX_METADATA_ATTRIBUTES_EXTENDMR    0x00000001
+
+  %define TDX_BFV_RAW_DATA_OFFSET   FixedPcdGet32 (PcdBfvRawDataOffset)
+  %define TDX_BFV_RAW_DATA_SIZE     FixedPcdGet32 (PcdBfvRawDataSize)
+  %define TDX_BFV_MEMORY_BASE       FixedPcdGet32 (PcdBfvBase)
+  %define TDX_BFV_MEMORY_SIZE       FixedPcdGet32 (PcdBfvRawDataSize)
+
+  %define TDX_CFV_RAW_DATA_OFFSET   FixedPcdGet32 (PcdCfvRawDataOffset)
+  %define TDX_CFV_RAW_DATA_SIZE     FixedPcdGet32 (PcdCfvRawDataSize)
+  %define TDX_CFV_MEMORY_BASE       FixedPcdGet32 (PcdCfvBase),
+  %define TDX_CFV_MEMORY_SIZE       FixedPcdGet32 (PcdCfvRawDataSize),
+
+  %define TDX_HEAP_MEMORY_BASE      FixedPcdGet32 (PcdOvmfSecPeiTempRamBase)
+  %define TDX_HEAP_MEMORY_SIZE      FixedPcdGet32 (PcdOvmfSecPeiTempRamSize) / 2
+
+  %define TDX_STACK_MEMORY_BASE     (TDX_HEAP_MEMORY_BASE + TDX_HEAP_MEMORY_SIZE)
+  %define TDX_STACK_MEMORY_SIZE     FixedPcdGet32 (PcdOvmfSecPeiTempRamSize) / 2
+
+  %define TDX_HOB_MEMORY_BASE       FixedPcdGet32 (PcdOvmfSecGhcbBase)
+  %define TDX_HOB_MEMORY_SIZE       FixedPcdGet32 (PcdOvmfSecGhcbSize)
+
+  %define TDX_MAILBOX_MEMORY_BASE   FixedPcdGet32 (PcdOvmfSecGhcbBackupBase)
+  %define TDX_MAILBOX_MEMORY_SIZE   FixedPcdGet32 (PcdOvmfSecGhcbBackupSize)
+
+  %define OVMF_PAGE_TABLE_BASE      FixedPcdGet32 (PcdOvmfSecPageTablesBase)
+  %define OVMF_PAGE_TABLE_SIZE      FixedPcdGet32 (PcdOvmfSecPageTablesSize)
+
+  %define TDX_EXTRA_PAGE_TABLE_BASE FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase)
+  %define TDX_EXTRA_PAGE_TABLE_SIZE FixedPcdGet32 (PcdOvmfSecGhcbPageTableSize)
+
   %define PT_ADDR(Offset) (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
 
   %define GHCB_PT_ADDR (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
@@ -76,8 +115,11 @@
   %define SEV_ES_WORK_AREA_RDRAND (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
   %define SEV_ES_WORK_AREA_ENC_MASK (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
   %define SEV_ES_VC_TOP_OF_STACK (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
-%include "Ia32/Flat32ToFlat64.asm"
-%include "Ia32/PageTables64.asm"
+
+  %include "X64/TdxMetadata.asm"
+
+  %include "Ia32/Flat32ToFlat64.asm"
+  %include "Ia32/PageTables64.asm"
 %endif
 
 %include "Ia16/Real16ToFlat32.asm"
@@ -88,5 +130,6 @@
   %define SEV_ES_AP_RESET_IP  FixedPcdGet32 (PcdSevEsWorkAreaBase)
   %define SEV_LAUNCH_SECRET_BASE  FixedPcdGet32 (PcdSevLaunchSecretBase)
   %define SEV_LAUNCH_SECRET_SIZE  FixedPcdGet32 (PcdSevLaunchSecretSize)
+  %define OVMF_IMAGE_SIZE_IN_KB   FixedPcdGet32 (PcdOvmfImageSizeInKb)
 %include "Ia16/ResetVectorVtf0.asm"
 
