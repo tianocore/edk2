@@ -3,6 +3,7 @@
 #
 # Copyright (c) Microsoft Corporation
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -24,7 +25,9 @@
             "Library/BrotliCustomDecompressLib/brotli",
             "Universal/RegularExpressionDxe/oniguruma",
             "Library/LzmaCustomDecompressLib/Sdk/DOC",
-            "Library/LzmaCustomDecompressLib/Sdk/C"
+            "Library/LzmaCustomDecompressLib/Sdk/C",
+            "Universal/RegularExpressionDxe/OnigurumaUefiPort.h",
+            "Universal/RegularExpressionDxe/OnigurumaUefiPort.c"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
