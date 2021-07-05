@@ -2,7 +2,7 @@
 
   Module to rewrite stdlib references within Oniguruma
 
-  (C) Copyright 2014-2015 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2014-2021 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -46,17 +46,6 @@ typedef INTN        intptr_t;
 #endif
 
 #define calloc(n,s) AllocateZeroPool((n)*(s))
-
-#define free(p)             \
-  do {                      \
-    VOID *EvalOnce;         \
-                            \
-    EvalOnce = (p);         \
-    if (EvalOnce != NULL) { \
-      FreePool (EvalOnce);  \
-    }                       \
-  } while (FALSE)
-
 #define xmemmove(Dest,Src,Length) CopyMem(Dest,Src,Length)
 #define xmemcpy(Dest,Src,Length) CopyMem(Dest,Src,Length)
 #define xmemset(Buffer,Value,Length) SetMem(Buffer,Length,Value)
@@ -98,6 +87,7 @@ void* malloc(size_t size);
 void* realloc(void *ptr, size_t size);
 void* memcpy (void *dest, const void *src, unsigned int count);
 void* memset (void *dest, char ch, unsigned int count);
+void free(void *ptr);
 
 #define exit(n) ASSERT(FALSE);
 
