@@ -191,7 +191,9 @@ MemMapInitialization (
       ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
       PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
     } else {
-      PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
+      PciBase = PcdGet64 (PcdPciMmio32Base);
+      if (PciBase == 0)
+        PciBase = (TopOfLowRam < BASE_2GB) ? BASE_2GB : TopOfLowRam;
     }
 
     //

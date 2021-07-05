@@ -519,8 +519,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoSize|0x0
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base|0x0
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size|0x0
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base|0xC0000000
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size|0x20000000
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
 
