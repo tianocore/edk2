@@ -67,6 +67,7 @@ class EccCheck(ICiBuildPlugin):
         env = shell_environment.GetEnvironment()
         env.set_shell_var('PYTHONPATH', python_path)
         env.set_shell_var('WORKSPACE', workspace_path)
+        env.set_shell_var('PACKAGES_PATH', os.pathsep.join(Edk2pathObj.PackagePathList))
         self.ECC_PASS = True
         self.ApplyConfig(pkgconfig, workspace_path, basetools_path, packagename)
         modify_dir_list = self.GetModifyDir(packagename)
