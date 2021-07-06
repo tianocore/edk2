@@ -1,6 +1,6 @@
 ## @ PatchFv.py
 #
-# Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -304,10 +304,11 @@ class Symbols:
             match = re.match("^EFI_BASE_ADDRESS\s*=\s*(0x[a-fA-F0-9]+)", rptLine)
             if match is not None:
                 self.fdBase = int(match.group(1), 16) - fvOffset
+                break
             rptLine  = fdIn.readline()
         fdIn.close()
         if self.fdBase == 0xFFFFFFFF:
-            raise Exception("Could not find EFI_BASE_ADDRESS in INF file!" % fvFile)
+            raise Exception("Could not find EFI_BASE_ADDRESS in INF file!" % infFile)
         return 0
 
     #
@@ -402,6 +403,7 @@ class Symbols:
     #
     #  retval      0           Parsed MOD MAP file successfully
     #  retval      1           There is no moduleEntryPoint in modSymbols
+    #  retval      2           There is no offset for moduleEntryPoint in modSymbols
     #
     def parseModMapFile(self, moduleName, mapFile):
         #
@@ -426,7 +428,7 @@ class Symbols:
         else:
             #MSFT
             #0003:00000190       _gComBase                  00007a50     SerialPo
-            patchMapFileMatchString =  "^\s[0-9a-fA-F]{4}:[0-9a-fA-F]{8}\s+(\w+)\s+([0-9a-fA-F]{8}\s+)"
+            patchMapFileMatchString =  "^\s[0-9a-fA-F]{4}:[0-9a-fA-F]{8}\s+(\w+)\s+([0-9a-fA-F]{8,16}\s+)"
             matchKeyGroupIndex = 1
             matchSymbolGroupIndex  = 2
             prefix = ''
@@ -455,7 +457,13 @@ class Symbols:
                         continue
 
         if not moduleEntryPoint in modSymbols:
-            return 1
+            if matchSymbolGroupIndex == 2:
+                if not '_ModuleEntryPoint' in modSymbols:
+                    return 1
+                else:
+                    moduleEntryPoint = "_ModuleEntryPoint"
+            else:
+                return 1
 
         modEntry = '%s:%s' % (moduleName,moduleEntryPoint)
         if not modEntry in self.dictSymbolAddress:
@@ -498,7 +506,7 @@ class Symbols:
     #
     #  Get current character
     #
-    #  retval      elf.string[self.index]
+    #  retval      self.string[self.index]
     #  retval      ''                       Exception
     #
     def getCurr(self):
