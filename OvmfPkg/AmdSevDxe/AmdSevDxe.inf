@@ -45,3 +45,7 @@
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+
+[Guids]
+  gMemEncryptGuid
+  gEfiEndOfDxeEventGroupGuid         ## CONSUMES   ## Event
