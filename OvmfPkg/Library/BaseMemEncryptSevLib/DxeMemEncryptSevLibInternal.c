@@ -20,9 +20,13 @@
 STATIC BOOLEAN mSevStatus = FALSE;
 STATIC BOOLEAN mSevEsStatus = FALSE;
 STATIC BOOLEAN mSevStatusChecked = FALSE;
+STATIC BOOLEAN mSevLiveMigrationStatus = FALSE;
+STATIC BOOLEAN mSevLiveMigrationStatusChecked = FALSE;
 
 STATIC UINT64  mSevEncryptionMask = 0;
 STATIC BOOLEAN mSevEncryptionMaskSaved = FALSE;
+
+#define KVM_FEATURE_MIGRATION_CONTROL   BIT17
 
 /**
   Reads and sets the status of SEV features.
@@ -88,6 +92,54 @@ InternalMemEncryptSevStatus (
 }
 
 /**
+  Figures out if we are running inside KVM HVM and
+  KVM HVM supports SEV Live Migration feature.
+**/
+STATIC
+VOID
+EFIAPI
+KvmDetectSevLiveMigrationFeature(
+  VOID
+  )
+{
+  UINT8 Signature[13];
+  UINT32 mKvmLeaf = 0;
+  UINT32 RegEax, RegEbx, RegEcx, RegEdx;
+
+  Signature[12] = '\0';
+  for (mKvmLeaf = 0x40000000; mKvmLeaf < 0x40010000; mKvmLeaf += 0x100) {
+    AsmCpuid (mKvmLeaf,
+              NULL,
+              (UINT32 *) &Signature[0],
+              (UINT32 *) &Signature[4],
+              (UINT32 *) &Signature[8]);
+
+    if (!AsciiStrCmp ((CHAR8 *) Signature, "KVMKVMKVM\0\0\0")) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: KVM Detected, signature = %s\n",
+        __FUNCTION__,
+        Signature
+        ));
+
+      RegEax = mKvmLeaf + 1;
+      RegEcx = 0;
+      AsmCpuid (mKvmLeaf + 1, &RegEax, &RegEbx, &RegEcx, &RegEdx);
+      if ((RegEax & KVM_FEATURE_MIGRATION_CONTROL) != 0) {
+        DEBUG ((
+          DEBUG_INFO,
+          "%a: Live Migration feature supported\n",
+          __FUNCTION__
+          ));
+        mSevLiveMigrationStatus = TRUE;
+      }
+    }
+  }
+
+  mSevLiveMigrationStatusChecked = TRUE;
+}
+
+/**
   Returns a boolean to indicate whether SEV-ES is enabled.
 
   @retval TRUE           SEV-ES is enabled
@@ -123,6 +175,25 @@ MemEncryptSevIsEnabled (
   }
 
   return mSevStatus;
+}
+
+/**
+  Returns a boolean to indicate whether SEV live migration is enabled.
+
+  @retval TRUE           SEV live migration is enabled
+  @retval FALSE          SEV live migration is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevLiveMigrationIsEnabled (
+  VOID
+  )
+{
+  if (!mSevLiveMigrationStatusChecked) {
+    KvmDetectSevLiveMigrationFeature ();
+  }
+
+  return mSevLiveMigrationStatus;
 }
 
 /**
