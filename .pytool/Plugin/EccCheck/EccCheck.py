@@ -206,11 +206,10 @@ class EccCheck(ICiBuildPlugin):
 
     def ParseEccReport(self, ecc_diff_range: Dict[str, List[Tuple[int, int]]], workspace_path: str) -> None:
         ecc_log = os.path.join(workspace_path, "Ecc.log")
-        ecc_csv = "Ecc.csv"
-        file = os.listdir(workspace_path)
+        ecc_csv = os.path.join(workspace_path, "Ecc.csv")
         row_lines = []
         ignore_error_code = self.GetIgnoreErrorCode()
-        if ecc_csv in file:
+        if os.path.exists(ecc_csv):
             with open(ecc_csv) as csv_file:
                 reader = csv.reader(csv_file)
                 for row in reader:
