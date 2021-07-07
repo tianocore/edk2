@@ -15,9 +15,48 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Guid/MemEncryptLib.h>
+#include <Guid/EventGroup.h>
 #include <Library/PcdLib.h>
+
+STATIC
+VOID
+EFIAPI
+AmdSevDxeOnEndOfDxe (
+  IN EFI_EVENT Event,
+  IN VOID      *EventToSignal
+  )
+{
+  EFI_STATUS Status;
+  BOOLEAN SevLiveMigrationEnabled;
+
+  SevLiveMigrationEnabled = MemEncryptSevLiveMigrationIsEnabled();
+
+  if (SevLiveMigrationEnabled) {
+    Status = gRT->SetVariable (
+               L"SevLiveMigrationEnabled",
+               &gMemEncryptGuid,
+               EFI_VARIABLE_NON_VOLATILE |
+               EFI_VARIABLE_BOOTSERVICE_ACCESS |
+               EFI_VARIABLE_RUNTIME_ACCESS,
+               sizeof (BOOLEAN),
+               &SevLiveMigrationEnabled
+               );
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Setting SevLiveMigrationEnabled variable, status = %lx\n",
+      __FUNCTION__,
+      Status
+      ));
+  }
+
+  DEBUG ((DEBUG_VERBOSE, "%a\n", __FUNCTION__));
+}
 
 EFI_STATUS
 EFIAPI
@@ -30,6 +69,7 @@ AmdSevDxeEntryPoint (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *AllDescMap;
   UINTN                            NumEntries;
   UINTN                            Index;
+  EFI_EVENT                        Event;
 
   //
   // Do nothing when SEV is not enabled
@@ -128,6 +168,25 @@ AmdSevDxeEntryPoint (
       ASSERT (FALSE);
       CpuDeadLoop ();
     }
+  }
+
+  //
+  // Register EFI_END_OF_DXE_EVENT_GROUP_GUID event.
+  // The notification function sets the runtime variable indicating OVMF
+  // support for SEV live migration.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  AmdSevDxeOnEndOfDxe,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &Event
+                  );
+
+  if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "%a: CreateEventEx(): %r\n",
+        __FUNCTION__, Status));
   }
 
   return EFI_SUCCESS;
