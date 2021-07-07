@@ -67,23 +67,3 @@ jobs:
       build_pkgs: $(Build.Pkgs)
       build_targets: $(Build.Targets)
       build_archs: ${{ parameters.arch_list }}
-
-- job: FINISHED
-  dependsOn: Build_${{ parameters.tool_chain_tag }}
-  condition: succeeded()
-  steps:
-  - checkout: none
-  - script: |
-      echo FINISHED
-      sleep 10
-    displayName: FINISHED
-
-- job: FAILED
-  dependsOn: Build_${{ parameters.tool_chain_tag }}
-  condition: failed()
-  steps:
-  - checkout: none
-  - script: |
-      echo FAILED
-      sleep 10
-    displayName: FAILED
