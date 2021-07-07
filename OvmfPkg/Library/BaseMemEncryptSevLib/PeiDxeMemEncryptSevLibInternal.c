@@ -61,3 +61,54 @@ MemEncryptSevLocateInitialSmramSaveStateMapPages (
 
   return RETURN_SUCCESS;
 }
+
+/**
+  Figures out if we are running inside KVM HVM and
+  KVM HVM supports SEV Live Migration feature.
+
+  @retval TRUE           SEV live migration is supported.
+  @retval FALSE          SEV live migration is not supported.
+**/
+BOOLEAN
+EFIAPI
+KvmDetectSevLiveMigrationFeature(
+  VOID
+  )
+{
+  CHAR8 Signature[13];
+  UINT32 mKvmLeaf;
+  UINT32 RegEax, RegEbx, RegEcx, RegEdx;
+
+  Signature[12] = '\0';
+  for (mKvmLeaf = 0x40000000; mKvmLeaf < 0x40010000; mKvmLeaf += 0x100) {
+    AsmCpuid (mKvmLeaf,
+      NULL,
+      (UINT32 *) &Signature[0],
+      (UINT32 *) &Signature[4],
+      (UINT32 *) &Signature[8]);
+
+    if (AsciiStrCmp ((CHAR8 *) Signature, "KVMKVMKVM\0\0\0") == 0) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: KVM Detected, signature = %s\n",
+        __FUNCTION__,
+        Signature
+        ));
+
+      RegEax = mKvmLeaf + 1;
+      RegEcx = 0;
+      AsmCpuid (mKvmLeaf + 1, &RegEax, &RegEbx, &RegEcx, &RegEdx);
+      if ((RegEax & KVM_FEATURE_MIGRATION_CONTROL) != 0) {
+        DEBUG ((
+          DEBUG_INFO,
+          "%a: Live Migration feature supported\n",
+          __FUNCTION__
+          ));
+
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
