@@ -53,6 +53,15 @@ AmdSevEsInitialize (
   ASSERT_RETURN_ERROR (PcdStatus);
 
   //
+  // GHCB_BASE setup during reset-vector needs to be marked as
+  // decrypted in the hypervisor page encryption bitmap.
+  //
+  SetMemoryEncDecHypercall3 (FixedPcdGet32 (PcdOvmfSecGhcbBase),
+    EFI_SIZE_TO_PAGES(FixedPcdGet32 (PcdOvmfSecGhcbSize)),
+    KVM_MAP_GPA_RANGE_DECRYPTED
+    );
+
+  //
   // Allocate GHCB and per-CPU variable pages.
   //   Since the pages must survive across the UEFI to OS transition
   //   make them reserved.
