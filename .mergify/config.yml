@@ -16,7 +16,7 @@
 # * This file must be checked into the 'default' branch of a repo.  Copies
 #   of this file on other branches of a repo are ignored by Mergify.
 #
-# Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 # https://github.com/apps/mergify
@@ -24,74 +24,27 @@
 #
 ##
 
-pull_request_rules:
+queue_rules:
+  - name: default
+    conditions:
+      - base~=(^main|^master|^stable/)
+      - label=push
 
+pull_request_rules:
   - name: Automatically merge a PR when all required checks pass and 'push' label is present
     conditions:
-      - base~=(^master|^stable/)
+      - base~=(^main|^master|^stable/)
       - label=push
-      - author=@tianocore/edk-ii-maintainers
-      - status-success=tianocore.PatchCheck
-      - status-success=Ubuntu GCC5 PR
-      - status-success=Windows VS2019 PR
     actions:
-      merge:
-        strict: true
+      queue:
         method: rebase
-
-  - name: Automatically close a PR when all required checks pass and 'push' label is not present
-    conditions:
-      - base~=(^master|^stable/)
-      - -label=push
-      - -closed
-      - status-success=tianocore.PatchCheck
-      - status-success=Ubuntu GCC5 PR
-      - status-success=Windows VS2019 PR
-      - status-success=Ubuntu GCC5 PR (FINISHED)
-      - status-success=Windows VS2019 PR (FINISHED)
-    actions:
-      close:
-        message: All checks passed. Auto close personal build.
+        rebase_fallback: none
+        name: default
 
   - name: Post a comment on a PR that can not be merged due to a merge conflict
     conditions:
-      - base~=(^master|^stable/)
+      - base~=(^main|^master|^stable/)
       - conflict
     actions:
       comment:
         message: PR can not be merged due to conflict.  Please rebase and resubmit
-
-  - name: Automatically close a PR that fails the EDK II Maintainers membership check and 'push' label is present
-    conditions:
-      - base~=(^master|^stable/)
-      - label=push
-      - -author=@tianocore/edk-ii-maintainers
-    actions:
-      close:
-        message: PR submitter is not a member of the Tianocore EDK II Maintainers team
-
-  - name: Post a comment on a PR if PatchCheck fails
-    conditions:
-      - base~=(^master|^stable/)
-      - status-failure=tianocore.PatchCheck
-    actions:
-      comment:
-        message: PR can not be merged due to a PatchCheck failure.  Please resolve and resubmit
-
-  - name: Post a comment on a PR if Ubuntu GCC5 fails
-    conditions:
-      - base~=(^master|^stable/)
-      - status-failure=Ubuntu GCC5 PR
-      - status-success=Ubuntu GCC5 PR (FAILED)
-    actions:
-      comment:
-        message: PR can not be merged due to an Ubuntu GCC5 failure.  Please resolve and resubmit
-
-  - name: Post a comment on a PR if Windows VS2019 fails
-    conditions:
-      - base~=(^master|^stable/)
-      - status-failure=Windows VS2019 PR
-      - status-success=Windows VS2019 PR (FAILED)
-    actions:
-      comment:
-        message: PR can not be merged due to a Windows VS2019 failure.  Please resolve and resubmit
