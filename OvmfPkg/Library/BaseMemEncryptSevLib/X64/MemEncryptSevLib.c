@@ -143,3 +143,57 @@ MemEncryptSevClearMmioPageEncMask (
            );
 
 }
+
+/**
+ This hyercall is used to notify hypervisor when the page's encryption
+ state changes.
+
+ @param[in]   PhysicalAddress       The physical address that is the start address
+                                    of a memory region. The physical address is
+                                    expected to be PAGE_SIZE aligned.
+ @param[in]   Pages                 Number of Pages in the memory region.
+ @param[in]   Status                Encrypted(1) or Decrypted(0).
+
+@retval RETURN_SUCCESS              Hypercall returned success.
+**/
+RETURN_STATUS
+EFIAPI
+SetMemoryEncDecHypercall3 (
+  IN  UINTN     PhysicalAddress,
+  IN  UINTN     Pages,
+  IN  UINTN     Status
+  )
+{
+  RETURN_STATUS Ret;
+  INTN Error;
+
+  Ret = RETURN_UNSUPPORTED;
+
+  if (MemEncryptSevLiveMigrationIsEnabled ()) {
+    Ret = EFI_SUCCESS;
+    //
+    // The encryption bit is set/clear on the smallest page size, hence
+    // use the 4k page size in MAP_GPA_RANGE hypercall below.
+    // Also, the hypercall expects the guest physical address to be
+    // page-aligned.
+    //
+    Error = SetMemoryEncDecHypercall3AsmStub (
+              KVM_HC_MAP_GPA_RANGE,
+              (PhysicalAddress & (~(EFI_PAGE_SIZE-1))),
+              Pages,
+              KVM_MAP_GPA_RANGE_PAGE_SZ_4K | KVM_MAP_GPA_RANGE_ENC_STAT(Status)
+              );
+
+    if (Error != 0) {
+      DEBUG ((DEBUG_ERROR,
+              "SetMemoryEncDecHypercall3 failed, Phys = %Lx, Pages = %Ld, Err = %Ld\n",
+              PhysicalAddress,
+              Pages,
+              (INT64)Error));
+
+      Ret = RETURN_NO_MAPPING;
+    }
+  }
+
+  return Ret;
+}

@@ -91,6 +91,18 @@ MemEncryptSevIsEnabled (
   );
 
 /**
+  Returns a boolean to indicate whether SEV live migration is enabled.
+
+  @retval TRUE           SEV live migration is enabled
+  @retval FALSE          SEV live migration is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevLiveMigrationIsEnabled (
+  VOID
+  );
+
+/**
   This function clears memory encryption bit for the memory region specified by
   BaseAddress and NumPages from the current page table context.
 
@@ -220,6 +232,58 @@ MemEncryptSevClearMmioPageEncMask (
   IN PHYSICAL_ADDRESS         Cr3BaseAddress,
   IN PHYSICAL_ADDRESS         BaseAddress,
   IN UINTN                    NumPages
+  );
+
+/**
+ This hyercall is used to notify hypervisor when the page's encryption
+ state changes.
+
+ @param[in]   PhysicalAddress       The physical address that is the start address
+                                    of a memory region. The PhysicalAddress is
+                                    expected to be PAGE_SIZE aligned.
+ @param[in]   Pages                 Number of pages in memory region.
+ @param[in]   Status                Encrypted(1) or Decrypted(0).
+
+@retval RETURN_SUCCESS              Hypercall returned success.
+**/
+RETURN_STATUS
+EFIAPI
+SetMemoryEncDecHypercall3 (
+  IN  UINTN     PhysicalAddress,
+  IN  UINTN     Pages,
+  IN  UINTN     Status
+  );
+
+#define KVM_HC_MAP_GPA_RANGE   12
+#define KVM_MAP_GPA_RANGE_PAGE_SZ_4K    0
+#define KVM_MAP_GPA_RANGE_PAGE_SZ_2M    BIT0
+#define KVM_MAP_GPA_RANGE_PAGE_SZ_1G    BIT1
+#define KVM_MAP_GPA_RANGE_ENC_STAT(n)   ((n) << 4)
+#define KVM_MAP_GPA_RANGE_ENCRYPTED     KVM_MAP_GPA_RANGE_ENC_STAT(1)
+#define KVM_MAP_GPA_RANGE_DECRYPTED     KVM_MAP_GPA_RANGE_ENC_STAT(0)
+
+#define KVM_FEATURE_MIGRATION_CONTROL   BIT17
+
+/**
+  Figures out if we are running inside KVM HVM and
+  KVM HVM supports SEV Live Migration feature.
+**/
+BOOLEAN
+EFIAPI
+KvmDetectSevLiveMigrationFeature(
+  VOID
+  );
+
+/**
+  Interface exposed by the ASM implementation of the core hypercall
+**/
+UINTN
+EFIAPI
+SetMemoryEncDecHypercall3AsmStub (
+  IN  UINTN  HypercallNum,
+  IN  UINTN  PhysicalAddress,
+  IN  UINTN  Pages,
+  IN  UINTN  Attributes
   );
 
 #endif // _MEM_ENCRYPT_SEV_LIB_H_
