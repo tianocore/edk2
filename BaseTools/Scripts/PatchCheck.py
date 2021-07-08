@@ -1,7 +1,7 @@
 ## @file
 #  Check a patch for various format issues
 #
-#  Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (C) 2020, Red Hat, Inc.<BR>
 #  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
 #
@@ -89,12 +89,17 @@ class EmailAddressCheck:
 class CommitMessageCheck:
     """Checks the contents of a git commit message."""
 
-    def __init__(self, subject, message):
+    def __init__(self, subject, message, author_email):
         self.ok = True
 
         if subject is None and  message is None:
             self.error('Commit message is missing!')
             return
+
+        MergifyMerge = False
+        if "mergify[bot]@users.noreply.github.com" in author_email:
+            if "Merge branch" in subject:
+                MergifyMerge = True
 
         self.subject = subject
         self.msg = message
@@ -102,9 +107,10 @@ class CommitMessageCheck:
         print (subject)
 
         self.check_contributed_under()
-        self.check_signed_off_by()
-        self.check_misc_signatures()
-        self.check_overall_format()
+        if not MergifyMerge:
+            self.check_signed_off_by()
+            self.check_misc_signatures()
+            self.check_overall_format()
         self.report_message_result()
 
     url = 'https://github.com/tianocore/tianocore.github.io/wiki/Commit-Message-Format'
@@ -522,7 +528,7 @@ class CheckOnePatch:
         email_check = EmailAddressCheck(self.author_email, 'Author')
         email_ok = email_check.ok
 
-        msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg)
+        msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg, self.author_email)
         msg_ok = msg_check.ok
 
         diff_ok = True
