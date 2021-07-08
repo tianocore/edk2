@@ -223,7 +223,7 @@ CpuGetTimerValue (
     return EFI_INVALID_PARAMETER;
   }
 
-  *TimerValue = (UINT64)RiscVReadMachineTimer ();
+  *TimerValue = (UINT64)RiscVReadMachineTimerInterface ();
   if (TimerPeriod != NULL) {
     *TimerPeriod  = DivU64x32 (
                       1000000000000000u,

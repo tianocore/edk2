@@ -26,6 +26,7 @@
   CpuLib
   CpuExceptionHandlerLib
   DebugLib
+  MachineModeTimerLib
   RiscVCpuLib
   TimerLib
   UefiBootServicesTableLib

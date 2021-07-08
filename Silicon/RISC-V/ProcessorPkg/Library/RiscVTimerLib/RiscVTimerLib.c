@@ -36,9 +36,9 @@ InternalRiscVTimerDelay (
     //
     // The target timer count is calculated here
     //
-    Ticks = RiscVReadMachineTimer () + Delay;
+    Ticks = RiscVReadMachineTimerInterface () + Delay;
     Delay = 1 << (RISCV_TIMER_COMPARE_BITS - 2);
-    while (((Ticks - RiscVReadMachineTimer ()) & ( 1 << (RISCV_TIMER_COMPARE_BITS - 1))) == 0) {
+    while (((Ticks - RiscVReadMachineTimerInterface ()) & ( 1 << (RISCV_TIMER_COMPARE_BITS - 1))) == 0) {
       CpuPause ();
     }
   } while (Times-- > 0);
@@ -118,7 +118,7 @@ GetPerformanceCounter (
   VOID
   )
 {
-  return (UINT64)RiscVReadMachineTimer ();
+  return (UINT64)RiscVReadMachineTimerInterface ();
 }
 
 /**return

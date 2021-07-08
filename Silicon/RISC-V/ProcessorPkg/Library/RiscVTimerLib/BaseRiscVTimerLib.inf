@@ -30,5 +30,6 @@
   BaseLib
   PcdLib
   RiscVCpuLib
-  RiscVPlatformTimerLib
+  MachineModeTimerLib
+
 
