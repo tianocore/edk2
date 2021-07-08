@@ -18,7 +18,7 @@ EXPRESSIONS = {
     'exclude':    re.compile(r'^X:\s*(?P<exclude>.*?)\r*$'),
     'file':       re.compile(r'^F:\s*(?P<file>.*?)\r*$'),
     'list':       re.compile(r'^L:\s*(?P<list>.*?)\r*$'),
-    'maintainer': re.compile(r'^M:\s*(?P<maintainer>.*<.*?>)\r*$'),
+    'maintainer': re.compile(r'^M:\s*(?P<maintainer>.*?)\r*$'),
     'reviewer':   re.compile(r'^R:\s*(?P<reviewer>.*?)\r*$'),
     'status':     re.compile(r'^S:\s*(?P<status>.*?)\r*$'),
     'tree':       re.compile(r'^T:\s*(?P<tree>.*?)\r*$'),
@@ -178,7 +178,7 @@ if __name__ == '__main__':
     SECTIONS = parse_maintainers_file(CONFIG_FILE)
 
     if ARGS.lookup:
-        FILES = [ARGS.lookup]
+        FILES = [ARGS.lookup.replace('\\','/')]
     else:
         FILES = get_modified_files(REPO, ARGS)
 
@@ -191,4 +191,6 @@ if __name__ == '__main__':
             ADDRESSES += addresslist
 
     for address in list(OrderedDict.fromkeys(ADDRESSES)):
+        if '<' in address and '>' in address:
+            address = address.split('>', 1)[0] + '>'
         print('  %s' % address)
