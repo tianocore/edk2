@@ -18,7 +18,7 @@ EXPRESSIONS = {
     'exclude':    re.compile(r'^X:\s*(?P<exclude>.*?)\r*$'),
     'file':       re.compile(r'^F:\s*(?P<file>.*?)\r*$'),
     'list':       re.compile(r'^L:\s*(?P<list>.*?)\r*$'),
-    'maintainer': re.compile(r'^M:\s*(?P<maintainer>.*<.*?>)\r*$'),
+    'maintainer': re.compile(r'^M:\s*(?P<maintainer>.*?)\r*$'),
     'reviewer':   re.compile(r'^R:\s*(?P<reviewer>.*?)\r*$'),
     'status':     re.compile(r'^S:\s*(?P<status>.*?)\r*$'),
     'tree':       re.compile(r'^T:\s*(?P<tree>.*?)\r*$'),
