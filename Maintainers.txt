@@ -69,7 +69,6 @@ Tianocore Stewards
 ------------------
 F: *
 M: Andrew Fish <afish@apple.com>
-M: Laszlo Ersek <lersek@redhat.com>
 M: Leif Lindholm <leif@nuviainc.com>
 M: Michael D Kinney <michael.d.kinney@intel.com>
 
@@ -143,7 +142,6 @@ M: Ard Biesheuvel <ardb+tianocore@kernel.org>
 ArmVirtPkg
 F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
-M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ardb+tianocore@kernel.org>
 R: Leif Lindholm <leif@nuviainc.com>
 R: Sami Mujawar <sami.mujawar@arm.com>
@@ -421,7 +419,6 @@ R: Siyuan Fu <siyuan.fu@intel.com>
 OvmfPkg
 F: OvmfPkg/
 W: http://www.tianocore.org/ovmf/
-M: Laszlo Ersek <lersek@redhat.com>
 M: Ard Biesheuvel <ardb+tianocore@kernel.org>
 R: Jordan Justen <jordan.l.justen@intel.com>
 S: Maintained
@@ -567,7 +564,6 @@ F: UefiCpuPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Eric Dong <eric.dong@intel.com>
 M: Ray Ni <ray.ni@intel.com>
-R: Laszlo Ersek <lersek@redhat.com>
 R: Rahul Kumar <rahul1.kumar@intel.com>
 
 UefiCpuPkg: Sec related modules
