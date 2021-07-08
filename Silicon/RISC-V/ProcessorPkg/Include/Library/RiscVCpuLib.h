@@ -32,6 +32,9 @@ RiscVGetMachineTrapCause (VOID);
 UINT64
 RiscVReadMachineTimer (VOID);
 
+UINT64
+RiscVReadMachineTimerInterface (VOID);
+
 VOID
 RiscVSetMachineTimerCmp (UINT64);
 

@@ -1,0 +1,34 @@
+## @file
+# Library to read Machine Mode Timer.
+#
+# Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = EmulatedMachineModeTimerLib
+  FILE_GUID                      = 81B82615-D85C-4377-8BFF-7442322E2835
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MachineModeTimerLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+
+[Sources.RISCV64]
+  EmulatedMachineModeTimerLib.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+
+
+

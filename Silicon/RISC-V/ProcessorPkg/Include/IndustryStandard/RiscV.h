@@ -154,4 +154,9 @@
 #define RISCV_CSR_MTOHOST               0x780
 #define RISCV_CSR_MFROMHOST             0x781
 
+//
+// User mode CSR
+//
+#define RISCV_CSR_CYCLE                 0xc00
+#define RISCV_CSR_TIME                  0xc01
 #endif
