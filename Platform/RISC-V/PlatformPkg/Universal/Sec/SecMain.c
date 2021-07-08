@@ -15,10 +15,12 @@
 #include <sbi/riscv_asm.h>
 #include <sbi/riscv_atomic.h>
 #include <sbi/sbi_console.h>  // Reference to header file in opensbi
+#include <sbi/sbi_domain.h>
 #include <sbi/sbi_hart.h>     // Reference to header file in opensbi
-#include <sbi/sbi_hartmask.h>    // Reference to header file in opensbi
+#include <sbi/sbi_hartmask.h> // Reference to header file in opensbi
 #include <sbi/sbi_scratch.h>  // Reference to header file in opensbi
 #include <sbi/sbi_platform.h> // Reference to header file in opensbi
+#include <sbi/sbi_math.h>     // Reference to header file in opensbi
 #include <sbi/sbi_init.h>     // Reference to header file in opensbi
 #include <sbi/sbi_ecall.h>    // Reference to header file in opensbi
 #include <sbi/sbi_trap.h>     // Reference to header file in opensbi
@@ -31,7 +33,40 @@ extern struct sbi_platform_operations Edk2OpensbiPlatformOps;
 atomic_t BootHartDone = ATOMIC_INITIALIZER(0);
 atomic_t NonBootHartMessageLock = ATOMIC_INITIALIZER(0);
 
+int sbi_domain_root_add_memregion(const struct sbi_domain_memregion *reg);
+
 typedef struct sbi_scratch *(*hartid2scratch)(ulong hartid, ulong hartindex);
+
+struct sbi_domain_memregion fw_memregs;
+
+int SecSetEdk2FwMemoryRegions (VOID) {
+  int Ret;
+
+  Ret = 0;
+
+  //
+  // EDK2 PEI domain memory region
+  //
+  fw_memregs.order = log2roundup(FixedPcdGet32(PcdFirmwareDomainSize));
+  fw_memregs.base = FixedPcdGet32(PcdFirmwareDomainBaseAddress);
+  fw_memregs.flags = SBI_DOMAIN_MEMREGION_EXECUTABLE | SBI_DOMAIN_MEMREGION_READABLE;
+  Ret = sbi_domain_root_add_memregion ((const struct sbi_domain_memregion *)&fw_memregs);
+  if (Ret != 0) {
+    DEBUG ((DEBUG_ERROR, "%a: Add firmware regiosn of FW Domain fail\n", __FUNCTION__));
+  }
+
+  //
+  // EDK2 EFI Variable domain memory region
+  //
+  fw_memregs.order = log2roundup(FixedPcdGet32(PcdVariableFirmwareRegionSize));
+  fw_memregs.base = FixedPcdGet32(PcdVariableFirmwareRegionBaseAddress);
+  fw_memregs.flags = SBI_DOMAIN_MEMREGION_READABLE | SBI_DOMAIN_MEMREGION_WRITEABLE;
+  Ret = sbi_domain_root_add_memregion ((const struct sbi_domain_memregion *)&fw_memregs);
+  if (Ret != 0) {
+    DEBUG ((DEBUG_ERROR, "%a: Add firmware regiosn of variable FW Domain fail\n", __FUNCTION__));
+  }
+  return Ret;
+}
 
 /**
   Locates a section within a series of sections
@@ -406,6 +441,13 @@ SecPostOpenSbiPlatformEarlylInit(
     return 0;
   }
   //
+  // Setup firmware memory region.
+  //
+  if (SecSetEdk2FwMemoryRegions () != 0) {
+    ASSERT (FALSE);
+  }
+
+  //
   // Boot HART is already in the process of OpenSBI initialization.
   // We can let other HART to keep booting.
   //
@@ -477,7 +519,7 @@ SecPostOpenSbiPlatformFinalInit (
     }
   }
 
-  DEBUG((DEBUG_INFO, "%a: Jump to PEI Core with \n", __FUNCTION__));
+  DEBUG((DEBUG_INFO, "%a: Will jump to PEI Core in OpenSBI with \n", __FUNCTION__));
   DEBUG((DEBUG_INFO, "  sbi_scratch = %x\n", SbiScratch));
   DEBUG((DEBUG_INFO, "  sbi_platform = %x\n", SbiPlatform));
   DEBUG((DEBUG_INFO, "  FirmwareContext = %x\n", FirmwareContext));
@@ -793,7 +835,7 @@ VOID EFIAPI SecCoreStartUpWithStack(
   sbi_init(Scratch);
 }
 
-void OpensbiDebugPrint (char *debugstr, ...)
+VOID OpensbiDebugPrint (CHAR8 *debugstr, ...)
 {
   VA_LIST  Marker;
 
