@@ -36,6 +36,51 @@ Main16:
 
 BITS    32
 
+%ifdef ARCH_X64
+
+    jmp SearchBfv
+
+;
+; Modified:  EBX, ECX, EDX, EBP, EDI, ESP
+;
+; @param[in,out]  RAX/EAX  0
+; @param[in]      RFLAGS   2
+; @param[in]      RCX      [31:0] TDINITVP - Untrusted Configuration
+;                          [63:32] 0
+; @param[in]      RDX      [31:0] VCPUID
+;                          [63:32] 0
+; @param[in]      RBX      [6:0] CPU supported GPA width
+;                          [7:7] 5 level page table support
+;                          [63:8] 0
+; @param[in]      RSI      [31:0] VCPU_Index
+;                          [63:32] 0
+; @param[in]      RDI/EDI  0
+; @param[in]      RBP/EBP  0
+; @param[in]      R8       Same as RCX
+; @param[out]     RBP/EBP  Address of Boot Firmware Volume (BFV)
+; @param[out]     DS       Selector allowing flat access to all addresses
+; @param[out]     ES       Selector allowing flat access to all addresses
+; @param[out]     FS       Selector allowing flat access to all addresses
+; @param[out]     GS       Selector allowing flat access to all addresses
+; @param[out]     SS       Selector allowing flat access to all addresses
+;
+; @return         None  This routine jumps to SEC and does not return
+Main32:
+    ;
+    ; Save EBX in EBP because EBX will be changed in ReloadFlat32
+    ;
+    mov     ebp, ebx
+
+    OneTimeCall ReloadFlat32
+
+    ;
+    ; Init Tdx
+    ;
+    OneTimeCall  InitTdx
+
+%endif
+
+SearchBfv:
     ;
     ; Search for the Boot Firmware Volume (BFV)
     ;
