@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -164,7 +164,7 @@ EfiRecoverCacheMtrr (
 **/
 VOID
 EfiProgramMtrr (
-  IN  UINTN                     MtrrNumber,
+  IN  UINT32                    MtrrNumber,
   IN  EFI_PHYSICAL_ADDRESS      MemoryAddress,
   IN  UINT64                    MemoryLength,
   IN  EFI_MEMORY_CACHE_TYPE     MemoryCacheType,
