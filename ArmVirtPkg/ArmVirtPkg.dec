@@ -66,6 +66,12 @@
   #
   gArmVirtTokenSpaceGuid.PcdTerminalTypeGuidBuffer|{0x65, 0x60, 0xA6, 0xDF, 0x19, 0xB4, 0xD3, 0x11, 0x9A, 0x2D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D}|VOID*|0x00000007
 
+  ##
+  # This is the physical address of Rsdp which is the core struct of Acpi.
+  # Cloud Hypervisor has no other way to pass Rsdp address to the guest except use a PCD.
+  #
+  gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x0|UINT64|0x00000005
+
 [PcdsDynamic]
   #
   # Whether to force disable ACPI, regardless of the fw_cfg settings

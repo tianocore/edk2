@@ -418,6 +418,26 @@ ON_EXIT:
 }
 
 /**
+  Re-set any stateful session-level authentication information that is used by
+  the leading login / leading connection.
+
+  (Note that this driver only supports a single connection per session -- see
+  ISCSI_MAX_CONNS_PER_SESSION.)
+
+  @param[in,out] Session  The iSCSI session.
+**/
+STATIC
+VOID
+IScsiSessionResetAuthData (
+  IN OUT ISCSI_SESSION *Session
+  )
+{
+  if (Session->AuthType == ISCSI_AUTH_TYPE_CHAP) {
+    Session->AuthData.CHAP.Hash = NULL;
+  }
+}
+
+/**
   Login the iSCSI session.
 
   @param[in]  Session           The iSCSI session.
@@ -470,6 +490,7 @@ IScsiSessionLogin (
     //
     // Login through the newly created connection.
     //
+    IScsiSessionResetAuthData (Session);
     Status = IScsiConnLogin (Conn, Session->ConfigData->SessionConfigData.ConnectTimeout);
     if (EFI_ERROR (Status)) {
       IScsiConnReset (Conn);
