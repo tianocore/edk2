@@ -557,6 +557,60 @@ WriteSectionRiscV64 (
     Value = (UINT32)(RV_X(*(UINT32 *)mRiscVPass1Targ, 12, 20));
     break;
 
+  case R_RISCV_PCREL_LO12_S:
+    if (mRiscVPass1Targ != NULL && mRiscVPass1Sym != NULL && mRiscVPass1SymSecIndex != 0) {
+      int i;
+      Value2 = (UINT32)(RV_X(*(UINT32 *)mRiscVPass1Targ, 12, 20));
+
+      Value = ((UINT32)(RV_X(*(UINT32 *)Targ, 25, 7)) << 5);
+      Value = (Value | (UINT32)(RV_X(*(UINT32 *)Targ, 7, 5)));
+
+      if(Value & (RISCV_IMM_REACH/2)) {
+        Value |= ~(RISCV_IMM_REACH-1);
+      }
+      Value = Value - (UINT32)mRiscVPass1Sym->sh_addr + mCoffSectionsOffset[mRiscVPass1SymSecIndex];
+
+      if(-2048 > (INT32)Value) {
+        i = (((INT32)Value * -1) / 4096);
+        Value2 -= i;
+        Value += 4096 * i;
+        if(-2048 > (INT32)Value) {
+          Value2 -= 1;
+          Value += 4096;
+        }
+      }
+      else if( 2047 < (INT32)Value) {
+        i = (Value / 4096);
+        Value2 += i;
+        Value -= 4096 * i;
+        if(2047 < (INT32)Value) {
+          Value2 += 1;
+          Value -= 4096;
+        }
+      }
+
+      // Update the IMM of SD instruction
+      //
+      // |31      25|24  20|19  15|14   12 |11      7|6     0|
+      // |-------------------------------------------|-------|
+      // |imm[11:5] | rs2  | rs1  | funct3 |imm[4:0] | opcode|
+      //  ---------------------------------------------------
+
+      // First Zero out current IMM
+      *(UINT32 *)Targ &= ~0xfe000f80;
+
+      // Update with new IMM
+      *(UINT32 *)Targ |= (RV_X(Value, 5, 7) << 25);
+      *(UINT32 *)Targ |= (RV_X(Value, 0, 5) << 7);
+
+      // Update previous instruction
+      *(UINT32 *)mRiscVPass1Targ = (RV_X(Value2, 0, 20)<<12) | (RV_X(*(UINT32 *)mRiscVPass1Targ, 0, 12));
+    }
+    mRiscVPass1Sym = NULL;
+    mRiscVPass1Targ = NULL;
+    mRiscVPass1SymSecIndex = 0;
+    break;
+
   case R_RISCV_PCREL_LO12_I:
     if (mRiscVPass1Targ != NULL && mRiscVPass1Sym != NULL && mRiscVPass1SymSecIndex != 0) {
       int i;
@@ -1587,6 +1641,7 @@ WriteRelocations64 (
             case R_RISCV_PCREL_HI20:
             case R_RISCV_GOT_HI20:
             case R_RISCV_PCREL_LO12_I:
+            case R_RISCV_PCREL_LO12_S:
               break;
 
             default:
