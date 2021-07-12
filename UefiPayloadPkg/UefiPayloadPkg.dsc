@@ -24,6 +24,7 @@
   SKUID_IDENTIFIER                    = DEFAULT
   OUTPUT_DIRECTORY                    = Build/UefiPayloadPkgX64
   FLASH_DEFINITION                    = UefiPayloadPkg/UefiPayloadPkg.fdf
+  PCD_DYNAMIC_AS_DYNAMICEX            = TRUE
 
   DEFINE SOURCE_DEBUG_ENABLE          = FALSE
   DEFINE PS2_KEYBOARD_ENABLE          = FALSE
