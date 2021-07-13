@@ -18,11 +18,13 @@ typedef struct {
 } UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY;
 
 typedef struct {
-  UNIVERSAL_PAYLOAD_GENERIC_HEADER   PldHeader;
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER   Header;
   UINT32                             Count;
   UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY Entry[0];
 } UNIVERSAL_PAYLOAD_EXTRA_DATA;
 
 #pragma pack()
+
+#define UNIVERSAL_PAYLOAD_EXTRA_DATA_REVISION 1
 
 #endif
