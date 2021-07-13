@@ -811,6 +811,8 @@ class application(tkinter.Frame):
         self.org_cfg_data_bin = None
         self.in_left = state()
         self.in_right = state()
+        self.search_text = ''
+        self.binseg_dict = {}
 
         # Check if current directory contains a file with a .yaml extension
         # if not default self.last_dir to a Platform directory where it is
@@ -834,6 +836,23 @@ class application(tkinter.Frame):
         ]
 
         root.geometry("1200x800")
+
+        # Search string
+        fram = tkinter.Frame(root)
+        # adding label to search box
+        tkinter.Label(fram, text='Text to find:').pack(side=tkinter.LEFT)
+        # adding of single line text box
+        self.edit = tkinter.Entry(fram, width=30)
+        # positioning of text box
+        self.edit.pack(
+            side=tkinter.LEFT, fill=tkinter.BOTH, expand=1, padx=(4, 4))
+        # setting focus
+        self.edit.focus_set()
+        # adding of search button
+        butt = tkinter.Button(fram, text='Search', relief=tkinter.GROOVE,
+                              command=self.search_bar)
+        butt.pack(side=tkinter.RIGHT, padx=(4, 4))
+        fram.pack(side=tkinter.TOP, anchor=tkinter.SE)
 
         paned = ttk.Panedwindow(root, orient=tkinter.HORIZONTAL)
         paned.pack(fill=tkinter.BOTH, expand=True, padx=(4, 4))
@@ -943,6 +962,12 @@ class application(tkinter.Frame):
                                      "Unsupported file '%s' !" % path)
                 return
 
+    def search_bar(self):
+        # get data from text box
+        self.search_text = self.edit.get()
+        # Clear the page and update it according to search value
+        self.refresh_config_data_page()
+
     def set_object_name(self, widget, name):
         self.conf_list[id(widget)] = name
 
@@ -976,14 +1001,18 @@ class application(tkinter.Frame):
                                               'units')
 
     def update_visibility_for_widget(self, widget, args):
-
         visible = True
         item = self.get_config_data_item_from_widget(widget, True)
         if item is None:
             return visible
         elif not item:
             return visible
-
+        if self.cfg_data_obj.binseg_dict:
+            str_split = item['path'].split('.')
+            if self.cfg_data_obj.binseg_dict[str_split[-2]] == -1:
+                visible = False
+                widget.grid_remove()
+                return visible
         result = 1
         if item['condition']:
             result = self.evaluate_condition(item)
@@ -998,6 +1027,12 @@ class application(tkinter.Frame):
                 # Show
                 widget.grid()
                 widget.configure(state='normal')
+
+        if visible and self.search_text != '':
+            name = item['name']
+            if name.lower().find(self.search_text.lower()) == -1:
+                visible = False
+                widget.grid_remove()
 
         return visible
 
@@ -1134,6 +1169,7 @@ class application(tkinter.Frame):
             self.fsp_version = '2.X'
         else:
             self.fsp_version = '1.X'
+
         return gen_cfg_data
 
     def about(self):
@@ -1377,6 +1413,7 @@ class application(tkinter.Frame):
                 return None
         else:
             path = name
+
         item = self.cfg_data_obj.get_item_by_path(path)
         return item
 
