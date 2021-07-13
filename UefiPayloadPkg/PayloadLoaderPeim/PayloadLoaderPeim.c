@@ -56,6 +56,7 @@ PeiLoadFileLoadPayload (
   UINTN                         Size;
   UINT32                        ExtraDataCount;
   UINTN                         Instance;
+  UINTN                         Length;
 
   //
   // ELF is added to file as RAW section for EDKII bootloader.
@@ -105,11 +106,14 @@ PeiLoadFileLoadPayload (
   //
   // Report the additional PLD sections through HOB.
   //
+  Length = sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA) + ExtraDataCount * sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY);
   ExtraData = BuildGuidHob (
                &gUniversalPayloadExtraDataGuid,
-               sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA) + ExtraDataCount * sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY)
+               Length
                );
   ExtraData->Count = ExtraDataCount;
+  ExtraData->Header.Revision = UNIVERSAL_PAYLOAD_EXTRA_DATA_REVISION;
+  ExtraData->Header.Length = (UINT16) Length;
   if (ExtraDataCount != 0) {
     for (ExtraDataIndex = 0, Index = 0; Index < Context.ShNum; Index++) {
       Status = GetElfSectionName (&Context, Index, &SectionName);
