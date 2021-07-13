@@ -26,6 +26,16 @@
 extern VOID  *mHobList;
 
 /**
+  Print all HOBs info from the HOB list.
+
+  @return The pointer to the HOB list.
+**/
+VOID
+PrintHob (
+  IN CONST VOID             *HobStart
+  );
+
+/**
   Some bootloader may pass a pcd database, and UPL also contain a PCD database.
   Dxe PCD driver has the assumption that the two PCD database can be catenated and
   the local token number should be successive。
@@ -374,6 +384,13 @@ _ModuleEntryPoint (
 
   DEBUG ((DEBUG_INFO, "Entering Universal Payload...\n"));
   DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof(UINTN)));
+
+  DEBUG_CODE (
+    //
+    // Dump the Hobs from boot loader
+    //
+    PrintHob (mHobList);
+  );
 
   // Initialize floating point operating environment to be compliant with UEFI spec.
   InitializeFloatingPointUnits ();
