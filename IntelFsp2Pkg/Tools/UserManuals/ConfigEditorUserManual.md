@@ -40,6 +40,10 @@ This option generates a new configuration delta file for the newly changed value
 ## 8. Save Full Config Data to Delta File
 This option saves all the changed configuration values into a Delta file.
 
+## 9. Search feature
+This feature helps the user to easily find any configuration item they are looking for in ConfigEditor.
+A text search box is available on the Top Right Corner of ConfigEditor. To use this feature the user should type the name or a key word of the item they want to search in the text box and then click on the "Search" button. This will display all the items which contains that particular word searched by the user.
+
 ## Running Configuration Editor:
 
    **python ConfigEditor.py**
