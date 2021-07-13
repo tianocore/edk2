@@ -583,6 +583,8 @@ class CGenYamlCfg:
         self._mode = ''
         self._debug = False
         self._macro_dict = {}
+        self.bin_offset = []
+        self.binseg_dict = {}
         self.initialize()
 
     def initialize(self):
@@ -1301,10 +1303,15 @@ option format '%s' !" % option)
             if 'indx' not in cfgs:
                 return
             act_cfg = self.get_item_by_index(cfgs['indx'])
-            if force or act_cfg['value'] == '':
+            actual_offset = act_cfg['offset'] - struct_info['offset']
+            set_value = True
+            for each in self.bin_offset:
+                if actual_offset in range(each[0], (each[0] + each[2]) * 8):
+                    if each[1] < 0:
+                        set_value = False
+            if set_value and force or act_cfg['value'] == '':
                 value = get_bits_from_bytes(full_bytes,
-                                            act_cfg['offset'] -
-                                            struct_info['offset'],
+                                            actual_offset,
                                             act_cfg['length'])
                 act_val = act_cfg['value']
                 if act_val == '':
@@ -1423,9 +1430,11 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
                               "in binary, the 1st instance will be used !"
                               % seg[0])
                 bin_segs.append([seg[0], pos, seg[2]])
+                self.binseg_dict[seg[0]] = pos
             else:
-                raise Exception("Could not find '%s' in binary !"
-                                % seg[0])
+                bin_segs.append([seg[0], -1, seg[2]])
+                self.binseg_dict[seg[0]] = -1
+                continue
 
         return bin_segs
 
@@ -1433,8 +1442,17 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
         # get cfg bin length
         cfg_bins = bytearray()
         bin_segs = self.get_bin_segment(bin_data)
+        Dummy_offset = 0
         for each in bin_segs:
-            cfg_bins.extend(bin_data[each[1]:each[1] + each[2]])
+            if each[1] != -1:
+                self.bin_offset.append([Dummy_offset, each[1], each[2]])
+                cfg_bins.extend(bin_data[each[1]:each[1] + each[2]])
+            else:
+                string = each[0] + ' is not availabe.'
+                messagebox.showinfo('', string)
+                self.bin_offset.append([Dummy_offset, each[1], each[2]])
+                cfg_bins.extend(bytearray(each[2]))
+            Dummy_offset += each[2]
         return cfg_bins
 
     def save_current_to_bin(self):
@@ -1447,12 +1465,15 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
         cfg_off = 0
         for each in bin_segs:
             length = each[2]
-            bin_data[each[1]:each[1] + length] = cfg_bins[cfg_off:
-                                                          cfg_off
-                                                          + length]
-            cfg_off += length
-        print('Patched the loaded binary successfully !')
+            if each[1] != -1:
+                bin_data[each[1]:each[1] + length] = cfg_bins[cfg_off:
+                                                              cfg_off
+                                                              + length]
+                cfg_off += length
+            else:
+                cfg_off += length
 
+        print('Patched the loaded binary successfully !')
         return bin_data
 
     def load_default_from_bin(self, bin_data):
@@ -1469,6 +1490,7 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
             if not top:
                 raise Exception("Invalid configuration path '%s' !"
                                 % path)
+
         return self.get_field_value(top)
 
     def generate_binary(self, bin_file_name, path=''):
