@@ -24,6 +24,7 @@
   UniversalPayloadEntry.c
   LoadDxeCore.c
   MemoryAllocation.c
+  PrintHob.c
 
 [Sources.Ia32]
   X64/VirtualMemory.h
@@ -64,6 +65,11 @@
   gUefiSerialPortInfoGuid
   gUniversalPayloadExtraDataGuid
   gPcdDataBaseHobGuid
+  gUniversalPayloadSmbiosTableGuid
+  gEfiHobMemoryAllocBspStoreGuid
+  gUniversalPayloadAcpiTableGuid
+  gUniversalPayloadPciRootBridgeInfoGuid
+  gUniversalPayloadSmbios3TableGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
