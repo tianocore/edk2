@@ -34,6 +34,7 @@ FV = PLDFV
 
 ################################################################################
 [FV.PLDFV]
+FvNameGuid         = 96E75986-6FDD-491E-9FD5-35E21AC45B45
 BlockSize          = $(FD_BLOCK_SIZE)
 FvAlignment        = 16
 ERASE_POLARITY     = 1
@@ -62,6 +63,7 @@ FILE FV_IMAGE = 4E35FD93-9C72-4c15-8C4B-E77F1DB2D793 {
 ################################################################################
 
 [FV.DXEFV]
+FvNameGuid         = 8063C21A-8E58-4576-95CE-089E87975D23
 BlockSize          = $(FD_BLOCK_SIZE)
 FvForceRebase      = FALSE
 FvAlignment        = 16
