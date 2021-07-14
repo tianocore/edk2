@@ -260,6 +260,9 @@
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
+  SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
+  SecurityPkg/EnrollFromDefaultKeys/EnrollFromDefaultKeys.inf
+  SecurityPkg/VariableAuthenticated/SecureBootDefaultKeys/SecureBootDefaultKeys.inf
 
 [Components.IA32, Components.X64, Components.AARCH64]
   #
