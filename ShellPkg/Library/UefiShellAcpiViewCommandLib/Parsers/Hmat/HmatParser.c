@@ -30,7 +30,7 @@ STATIC CONST UINT32*  HmatStructureLength;
 STATIC CONST UINT32*  NumberInitiatorProximityDomain;
 STATIC CONST UINT32*  NumberTargetProximityDomain;
 STATIC CONST
-EFI_ACPI_6_3_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO_FLAGS*
+EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO_FLAGS*
 SllbiFlags;
 
 STATIC CONST UINT8*   SllbiDataType;
@@ -65,11 +65,11 @@ ValidateCacheAttributes (
   IN VOID*  Context
   )
 {
-  EFI_ACPI_6_3_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES*
+  EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES*
   Attributes;
 
   Attributes =
-    (EFI_ACPI_6_3_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES*)Ptr;
+    (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES*)Ptr;
 
   if (Attributes->TotalCacheLevels > 0x3) {
     IncrementErrorCount ();
@@ -115,11 +115,11 @@ DumpCacheAttributes (
   IN UINT8*        Ptr
   )
 {
-  EFI_ACPI_6_3_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES*
+  EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES*
   Attributes;
 
   Attributes =
-    (EFI_ACPI_6_3_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES*)Ptr;
+    (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES*)Ptr;
 
   Print (L"\n");
   PrintFieldName (4, L"Total Cache Levels");
@@ -178,7 +178,8 @@ STATIC CONST ACPI_PARSER SllbiParser[] = {
   {L"Length", 4, 4, L"%d", NULL, NULL, NULL, NULL},
   {L"Flags", 1, 8, L"0x%x", NULL, (VOID**)&SllbiFlags, NULL, NULL},
   {L"Data type", 1, 9, L"0x%x", NULL, (VOID**)&SllbiDataType, NULL, NULL},
-  {L"Reserved", 2, 10, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Min Transfer Size", 1, 10, L"%d", NULL, NULL, NULL, NULL},
+  {L"Reserved", 1, 11, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Initiator Proximity Dom Count", 4, 12, L"%d", NULL,
     (VOID**)&NumberInitiatorProximityDomain, NULL, NULL},
   {L"Target Proximity Dom Count", 4, 16, L"%d", NULL,
@@ -615,19 +616,19 @@ ParseAcpiHmat (
     }
 
     switch (*HmatStructureType) {
-      case EFI_ACPI_6_3_HMAT_TYPE_MEMORY_PROXIMITY_DOMAIN_ATTRIBUTES:
+      case EFI_ACPI_6_4_HMAT_TYPE_MEMORY_PROXIMITY_DOMAIN_ATTRIBUTES:
         DumpMpda (
           HmatStructurePtr,
           *HmatStructureLength
           );
         break;
-      case EFI_ACPI_6_3_HMAT_TYPE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO:
+      case EFI_ACPI_6_4_HMAT_TYPE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO:
         DumpSllbi (
           HmatStructurePtr,
           *HmatStructureLength
           );
         break;
-      case EFI_ACPI_6_3_HMAT_TYPE_MEMORY_SIDE_CACHE_INFO:
+      case EFI_ACPI_6_4_HMAT_TYPE_MEMORY_SIDE_CACHE_INFO:
          DumpMsci (
           HmatStructurePtr,
           *HmatStructureLength
