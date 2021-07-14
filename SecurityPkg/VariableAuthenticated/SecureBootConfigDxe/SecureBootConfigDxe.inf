@@ -110,6 +110,7 @@
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiDevicePathProtocolGuid                    ## PRODUCES
+  gEfiHiiPopupProtocolGuid
 
 [Depex]
   gEfiHiiConfigRoutingProtocolGuid  AND
