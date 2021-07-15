@@ -8,20 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "ArmGicDxe.h"
 
-VOID
-EFIAPI
-IrqInterruptHandler (
-  IN EFI_EXCEPTION_TYPE  InterruptType,
-  IN EFI_SYSTEM_CONTEXT  SystemContext
-  );
-
-VOID
-EFIAPI
-ExitBootServicesEvent (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  );
-
 // Making this global saves a few bytes in image size
 EFI_HANDLE  gHardwareInterruptHandle = NULL;
 
