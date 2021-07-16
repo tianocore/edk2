@@ -130,6 +130,7 @@
   MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
 
   MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
+  MdePkg/Library/TdxProbeLib/TdxProbeLib.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
