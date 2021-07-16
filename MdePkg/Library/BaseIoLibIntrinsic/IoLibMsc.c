@@ -16,6 +16,7 @@
 
 
 #include "BaseIoLibIntrinsicInternal.h"
+#include "IoLibTdx.h"
 
 //
 // Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics.
@@ -54,6 +55,8 @@ void          _ReadWriteBarrier (void);
 
   If 8-bit I/O port operations are not supported, then ASSERT().
 
+  For Td guest TDVMCALL_IO is invoked to read I/O port.
+
   @param  Port  The I/O port to read.
 
   @return The value read.
@@ -70,9 +73,13 @@ IoRead8 (
 
   Flag = FilterBeforeIoRead (FilterWidth8, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    Value = (UINT8)_inp ((UINT16)Port);
-    _ReadWriteBarrier ();
+    if (TdxIsEnabled ()) {
+      Value = TdIoRead8 (Port);
+    } else {
+      _ReadWriteBarrier ();
+      Value = (UINT8)_inp ((UINT16)Port);
+      _ReadWriteBarrier ();
+    }
   }
   FilterAfterIoRead (FilterWidth8, Port, &Value);
 
@@ -87,6 +94,8 @@ IoRead8 (
   operations are serialized.
 
   If 8-bit I/O port operations are not supported, then ASSERT().
+
+  For Td guest TDVMCALL_IO is invoked to write I/O port.
 
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
@@ -105,9 +114,13 @@ IoWrite8 (
 
   Flag = FilterBeforeIoWrite(FilterWidth8, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    (UINT8)_outp ((UINT16)Port, Value);
-    _ReadWriteBarrier ();
+    if (TdxIsEnabled ()) {
+      TdIoWrite8 (Port, Value);
+    } else {
+      _ReadWriteBarrier ();
+      (UINT8)_outp ((UINT16)Port, Value);
+      _ReadWriteBarrier ();
+    }
   }
   FilterAfterIoWrite (FilterWidth8, Port, &Value);
 
@@ -123,6 +136,8 @@ IoWrite8 (
 
   If 16-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 16-bit boundary, then ASSERT().
+
+  For Td guest TDVMCALL_IO is invoked to read I/O port.
 
   @param  Port  The I/O port to read.
 
@@ -142,9 +157,13 @@ IoRead16 (
 
   Flag = FilterBeforeIoRead (FilterWidth16, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    Value = _inpw ((UINT16)Port);
-    _ReadWriteBarrier ();
+    if (TdxIsEnabled ()) {
+      Value = TdIoRead16 (Port);
+    } else {
+      _ReadWriteBarrier ();
+      Value = _inpw ((UINT16)Port);
+      _ReadWriteBarrier ();
+    }
   }
   FilterBeforeIoRead (FilterWidth16, Port, &Value);
 
@@ -160,6 +179,8 @@ IoRead16 (
 
   If 16-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 16-bit boundary, then ASSERT().
+
+  For Td guest TDVMCALL_IO is invoked to write I/O port.
 
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
@@ -180,9 +201,13 @@ IoWrite16 (
 
   Flag = FilterBeforeIoWrite(FilterWidth16, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    _outpw ((UINT16)Port, Value);
-    _ReadWriteBarrier ();
+    if (TdxIsEnabled ()) {
+      TdIoWrite16 (Port, Value);
+    } else {
+      _ReadWriteBarrier ();
+      _outpw ((UINT16)Port, Value);
+      _ReadWriteBarrier ();
+    }
   }
   FilterAfterIoWrite (FilterWidth16, Port, &Value);
 
@@ -198,6 +223,8 @@ IoWrite16 (
 
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
+
+  For Td guest TDVMCALL_IO is invoked to read I/O port.
 
   @param  Port  The I/O port to read.
 
@@ -217,9 +244,13 @@ IoRead32 (
 
   Flag = FilterBeforeIoRead(FilterWidth32, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    Value = _inpd ((UINT16)Port);
-    _ReadWriteBarrier ();
+    if (TdxIsEnabled ()) {
+      Value = TdIoRead32 (Port);
+    } else {
+      _ReadWriteBarrier ();
+      Value = _inpd ((UINT16)Port);
+      _ReadWriteBarrier ();
+    }
   }
   FilterAfterIoRead (FilterWidth32, Port, &Value);
 
@@ -235,6 +266,8 @@ IoRead32 (
 
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
+
+  For Td guest TDVMCALL_IO is invoked to write I/O port.
 
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
@@ -255,9 +288,13 @@ IoWrite32 (
 
   Flag = FilterBeforeIoWrite(FilterWidth32, Port, &Value);
   if (Flag) {
-    _ReadWriteBarrier ();
-    _outpd ((UINT16)Port, Value);
-    _ReadWriteBarrier ();
+    if (TdxIsEnabled ()) {
+      TdIoWrite32 (Port, Value);
+    } else {
+      _ReadWriteBarrier ();
+      _outpd ((UINT16)Port, Value);
+      _ReadWriteBarrier ();
+    }
   }
   FilterAfterIoWrite (FilterWidth32, Port, &Value);
 
