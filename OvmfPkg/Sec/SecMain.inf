@@ -70,6 +70,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDecompressionScratchEnd
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
