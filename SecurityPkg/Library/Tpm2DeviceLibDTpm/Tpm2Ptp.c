@@ -310,7 +310,7 @@ PtpCrbTpmCommand (
     // Command completed, but buffer is not enough
     //
     Status = EFI_BUFFER_TOO_SMALL;
-    goto GoReady_Exit;
+    goto GoIdle_Exit;
   }
   *SizeOut = TpmOutSize;
   //
@@ -327,16 +327,6 @@ PtpCrbTpmCommand (
     }
     DEBUG ((EFI_D_VERBOSE, "\n"));
   );
-
-GoReady_Exit:
-  //
-  // Goto Ready State if command is completed successfully and TPM support IdleBypass
-  // If not supported. flow down to GoIdle
-  //
-  if (GetCachedIdleByPass () == 1) {
-    MmioWrite32((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_COMMAND_READY);
-    return Status;
-  }
 
   //
   // Do not wait for state transition for TIMEOUT_C
