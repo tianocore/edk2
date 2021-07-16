@@ -30,6 +30,7 @@
   Ia32/SecEntry.nasm
 
 [Sources.X64]
+  IntelTdx.c
   X64/SecEntry.nasm
 
 [Packages]
@@ -55,6 +56,9 @@
   MemEncryptSevLib
   CpuExceptionHandlerLib
 
+[LibraryClasses.X64]
+  TdxLib
+
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
 
@@ -77,6 +81,9 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
