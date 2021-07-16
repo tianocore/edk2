@@ -7,6 +7,7 @@
 **/
 
 #include "BaseIoLibIntrinsicInternal.h"
+#include "IoLibTdx.h"
 
 /**
   Reads a 64-bit I/O port.
@@ -70,6 +71,8 @@ IoWrite64 (
 
   If 8-bit MMIO register operations are not supported, then ASSERT().
 
+  For Td guest TDVMCALL_MMIO is invoked to read MMIO registers.
+
   @param  Address The MMIO register to read.
 
   @return The value read.
@@ -86,9 +89,13 @@ MmioRead8 (
 
   Flag = FilterBeforeMmIoRead (FilterWidth8, Address, &Value);
   if (Flag) {
-    MemoryFence ();
-    Value = *(volatile UINT8*)Address;
-    MemoryFence ();
+    if (TdxIsEnabled ()) {
+      Value = TdMmioRead8 (Address);
+    } else {
+      MemoryFence ();
+      Value = *(volatile UINT8*)Address;
+      MemoryFence ();
+    }
   }
   FilterAfterMmIoRead (FilterWidth8, Address, &Value);
 
@@ -103,6 +110,8 @@ MmioRead8 (
   and write operations are serialized.
 
   If 8-bit MMIO register operations are not supported, then ASSERT().
+
+  For Td guest TDVMCALL_MMIO is invoked to write MMIO registers.
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
@@ -121,9 +130,13 @@ MmioWrite8 (
 
   Flag = FilterBeforeMmIoWrite (FilterWidth8, Address, &Value);
   if (Flag) {
-    MemoryFence ();
-    *(volatile UINT8*)Address = Value;
-    MemoryFence ();
+    if (TdxIsEnabled ()) {
+      TdMmioWrite8 (Address, Value);
+    } else {
+      MemoryFence ();
+      *(volatile UINT8*)Address = Value;
+      MemoryFence ();
+    }
   }
   FilterAfterMmIoWrite (FilterWidth8, Address, &Value);
 
@@ -139,6 +152,8 @@ MmioWrite8 (
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
+
+  For Td guest TDVMCALL_MMIO is invoked to read MMIO registers.
 
   @param  Address The MMIO register to read.
 
@@ -157,9 +172,13 @@ MmioRead16 (
   ASSERT ((Address & 1) == 0);
   Flag = FilterBeforeMmIoRead (FilterWidth16, Address, &Value);
   if (Flag) {
-    MemoryFence ();
-    Value = *(volatile UINT16*)Address;
-    MemoryFence ();
+    if (TdxIsEnabled ()) {
+      Value = TdMmioRead16 (Address);
+    } else {
+      MemoryFence ();
+      Value = *(volatile UINT16*)Address;
+      MemoryFence ();
+    }
   }
   FilterAfterMmIoRead (FilterWidth16, Address, &Value);
 
@@ -175,6 +194,8 @@ MmioRead16 (
 
   If 16-bit MMIO register operations are not supported, then ASSERT().
   If Address is not aligned on a 16-bit boundary, then ASSERT().
+
+  For Td guest TDVMCALL_MMIO is invoked to write MMIO registers.
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
@@ -195,9 +216,13 @@ MmioWrite16 (
 
   Flag = FilterBeforeMmIoWrite (FilterWidth16, Address, &Value);
   if (Flag) {
-    MemoryFence ();
-    *(volatile UINT16*)Address = Value;
-    MemoryFence ();
+    if (TdxIsEnabled ()) {
+      TdMmioWrite16 (Address, Value);
+    } else {
+      MemoryFence ();
+      *(volatile UINT16*)Address = Value;
+      MemoryFence ();
+    }
   }
   FilterAfterMmIoWrite (FilterWidth16, Address, &Value);
 
@@ -213,6 +238,8 @@ MmioWrite16 (
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
+
+  For Td guest TDVMCALL_MMIO is invoked to read MMIO registers.
 
   @param  Address The MMIO register to read.
 
@@ -232,9 +259,13 @@ MmioRead32 (
 
   Flag = FilterBeforeMmIoRead (FilterWidth32, Address, &Value);
   if (Flag) {
-    MemoryFence ();
-    Value = *(volatile UINT32*)Address;
-    MemoryFence ();
+    if (TdxIsEnabled ()) {
+      Value = TdMmioRead32 (Address);
+    } else {
+      MemoryFence ();
+      Value = *(volatile UINT32*)Address;
+      MemoryFence ();
+    }
   }
   FilterAfterMmIoRead (FilterWidth32, Address, &Value);
 
@@ -250,6 +281,8 @@ MmioRead32 (
 
   If 32-bit MMIO register operations are not supported, then ASSERT().
   If Address is not aligned on a 32-bit boundary, then ASSERT().
+
+  For Td guest TDVMCALL_MMIO is invoked to write MMIO registers.
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
@@ -270,9 +303,13 @@ MmioWrite32 (
 
   Flag = FilterBeforeMmIoWrite (FilterWidth32, Address, &Value);
   if (Flag) {
-    MemoryFence ();
-    *(volatile UINT32*)Address = Value;
-    MemoryFence ();
+    if (TdxIsEnabled ()) {
+      TdMmioWrite32 (Address, Value);
+    } else {
+      MemoryFence ();
+      *(volatile UINT32*)Address = Value;
+      MemoryFence ();
+    }
   }
   FilterAfterMmIoWrite (FilterWidth32, Address, &Value);
 
@@ -288,6 +325,8 @@ MmioWrite32 (
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
   If Address is not aligned on a 64-bit boundary, then ASSERT().
+
+  For Td guest TDVMCALL_MMIO is invoked to read MMIO registers.
 
   @param  Address The MMIO register to read.
 
@@ -307,9 +346,13 @@ MmioRead64 (
 
   Flag = FilterBeforeMmIoRead (FilterWidth64, Address, &Value);
   if (Flag) {
-    MemoryFence ();
-    Value = *(volatile UINT64*)Address;
-    MemoryFence ();
+    if (TdxIsEnabled ()) {
+      Value = TdMmioRead64 (Address);
+    } else {
+      MemoryFence ();
+      Value = *(volatile UINT64*)Address;
+      MemoryFence ();
+    }
   }
   FilterAfterMmIoRead (FilterWidth64, Address, &Value);
 
@@ -325,6 +368,8 @@ MmioRead64 (
 
   If 64-bit MMIO register operations are not supported, then ASSERT().
   If Address is not aligned on a 64-bit boundary, then ASSERT().
+
+  For Td guest TDVMCALL_MMIO is invoked to write MMIO registers.
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
@@ -343,9 +388,13 @@ MmioWrite64 (
 
   Flag = FilterBeforeMmIoWrite (FilterWidth64, Address, &Value);
   if (Flag) {
-    MemoryFence ();
-    *(volatile UINT64*)Address = Value;
-    MemoryFence ();
+    if (TdxIsEnabled ()) {
+      TdMmioWrite64 (Address, Value);
+    } else {
+      MemoryFence ();
+      *(volatile UINT64*)Address = Value;
+      MemoryFence ();
+    }
   }
   FilterAfterMmIoWrite (FilterWidth64, Address, &Value);
 

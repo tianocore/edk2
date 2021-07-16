@@ -34,6 +34,7 @@
   IoLibMmioBuffer.c
   BaseIoLibIntrinsicInternal.h
   IoHighLevel.c
+  IoLibInternalTdxNull.c
 
 [Sources.IA32]
   IoLibGcc.c    | GCC
@@ -67,4 +68,6 @@
   DebugLib
   BaseLib
   RegisterFilterLib
+  TdxLib
+  TdxProbeLib
 
