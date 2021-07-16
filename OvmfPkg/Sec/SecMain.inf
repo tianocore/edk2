@@ -55,6 +55,9 @@
   MemEncryptSevLib
   CpuExceptionHandlerLib
 
+[LibraryClasses.X64]
+  PlatformInitLib
+
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
 
@@ -77,6 +80,9 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire

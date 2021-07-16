@@ -26,9 +26,8 @@
 #include <Library/ExtractGuidedSectionLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
-
 #include <Ppi/TemporaryRamSupport.h>
-
+#include <Library/PlatformInitLib.h>
 #include "AmdSev.h"
 
 #define SEC_IDT_ENTRY_COUNT  34
@@ -738,6 +737,20 @@ SecCoreStartupWithStack (
   UINT32                Index;
   volatile UINT8        *Table;
 
+ #if defined (MDE_CPU_X64)
+  if (TdIsEnabled ()) {
+    //
+    // For Td guests, the memory map info is in TdHobLib. It should be processed
+    // first so that the memory is accepted. Otherwise access to the unaccepted
+    // memory will trigger tripple fault.
+    //
+    if (ProcessTdxHobList () != EFI_SUCCESS) {
+      CpuDeadLoop ();
+    }
+  }
+
+ #endif
+
   //
   // To ensure SMM can't be compromised on S3 resume, we must force re-init of
   // the BaseExtractGuidedSectionLib. Since this is before library contructors
@@ -756,6 +769,7 @@ SecCoreStartupWithStack (
   // we use a loop rather than CopyMem.
   //
   IdtTableInStack.PeiService = NULL;
+
   for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index++) {
     //
     // Declare the local variables that actually move the data elements as
@@ -812,6 +826,17 @@ SecCoreStartupWithStack (
     //
     AsmEnableCache ();
   }
+
+ #if defined (MDE_CPU_X64)
+  if (TdIsEnabled ()) {
+    //
+    // InitializeCpuExceptionHandlers () should be called in Td guests so that
+    // #VE exceptions can be handled correctly.
+    //
+    InitializeCpuExceptionHandlers (NULL);
+  }
+
+ #endif
 
   DEBUG ((
     DEBUG_INFO,

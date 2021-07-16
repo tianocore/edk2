@@ -237,6 +237,7 @@
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   VmgExitLib|OvmfPkg/Library/VmgExitLib/VmgExitLib.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
 
 [LibraryClasses.common.SEC]
   TimerLib|OvmfPkg/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf
@@ -261,6 +262,7 @@
 !endif
   VmgExitLib|OvmfPkg/Library/VmgExitLib/SecVmgExitLib.inf
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/SecMemEncryptSevLib.inf
+  PlatformInitLib|OvmfPkg/Library/PlatformInitLib/PlatformInitLibNull.inf
 
 [LibraryClasses.common.PEI_CORE]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf

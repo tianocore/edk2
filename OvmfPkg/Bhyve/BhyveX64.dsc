@@ -228,6 +228,7 @@
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
 
 [LibraryClasses.common.SEC]
 !ifdef $(DEBUG_ON_SERIAL_PORT)
@@ -246,6 +247,7 @@
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/SecMemEncryptSevLib.inf
+  PlatformInitLib|OvmfPkg/Library/PlatformInitLib/PlatformInitLibNull.inf
 
 [LibraryClasses.common.PEI_CORE]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf

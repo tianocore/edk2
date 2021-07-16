@@ -232,6 +232,7 @@
   PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
 
 [LibraryClasses.common.SEC]
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
@@ -256,6 +257,7 @@
 !endif
   VmgExitLib|OvmfPkg/Library/VmgExitLib/SecVmgExitLib.inf
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/SecMemEncryptSevLib.inf
+  PlatformInitLib|OvmfPkg/Library/PlatformInitLib/PlatformInitLibNull.inf
 
 [LibraryClasses.common.PEI_CORE]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
