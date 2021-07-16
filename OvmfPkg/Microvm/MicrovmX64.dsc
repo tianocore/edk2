@@ -232,6 +232,7 @@
   PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
 
 [LibraryClasses.common.SEC]
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf

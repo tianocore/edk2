@@ -93,6 +93,13 @@
   INTEL:*_*_*_CC_FLAGS = /D DISABLE_NEW_DEPRECATED_INTERFACES
   GCC:*_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
 
+  #
+  # Add TDX_GUEST_SUPPORTED
+  #
+  MSFT:*_*_*_CC_FLAGS = /D TDX_GUEST_SUPPORTED
+  INTEL:*_*_*_CC_FLAGS = /D TDX_GUEST_SUPPORTED
+  GCC:*_*_*_CC_FLAGS = -D TDX_GUEST_SUPPORTED
+
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
@@ -238,6 +245,8 @@
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   VmgExitLib|OvmfPkg/Library/VmgExitLib/VmgExitLib.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
+  TdxMailboxLib|OvmfPkg/Library/TdxMailboxLib/TdxMailboxLib.inf
 
 [LibraryClasses.common.SEC]
   TimerLib|OvmfPkg/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf
@@ -559,6 +568,10 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x100
 
   #
+  # TDX need 1G PageTable support
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
+
+  #
   # Network Pcds
   #
 !include NetworkPkg/NetworkPcds.dsc.inc
@@ -669,6 +682,7 @@
   OvmfPkg/Sec/SecMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+      NULL|OvmfPkg/Library/PlatformInitLib/PlatformInitLib.inf
   }
 
   #
