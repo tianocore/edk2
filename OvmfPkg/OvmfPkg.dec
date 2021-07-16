@@ -373,6 +373,9 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart|0|UINT32|0x62
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd|0|UINT32|0x63
 
+  ## The Tdx accept page size. 0x1000(4k),0x200000(2M)
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize|0x1000|UINT32|0x64
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
