@@ -62,6 +62,9 @@
   ##  @libraryclass  Provides function for loading microcode.
   MicrocodeLib|Include/Library/MicrocodeLib.h
 
+  ##  @libraryclass  Provides function to support VMTDEXIT processing.
+  VmgExitLib|Include/Library/VmTdExitLib.h
+
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
   gMsegSmramGuid                 = { 0x5802bce4, 0xeeee, 0x4e33, { 0xa1, 0x30, 0xeb, 0xad, 0x27, 0xf0, 0xe4, 0x39 }}
@@ -395,6 +398,13 @@
   #   FALSE - SEV-ES is not enabled
   # @Prompt SEV-ES Status
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|FALSE|BOOLEAN|0x60000016
+
+  ## This dynamic PCD indicates the Confidential Computing Category
+  #  [7:0]   Confidential Computing Category  (0 - Non-Cc, 1 - AmdSev, 2 - IntelTdx)
+  #  [15:8]  Sub-Category (defined by each vendor, SEV-ES, SEV-SNP, or TDX-1.0, TDX-2.0, etc)
+  #  [31:16] Reserved
+  # @Prompt Confidential Computing Category
+  gUefiCpuPkgTokenSpaceGuid.PcdConfidentialComputingCategory|0|UINT32|0x60000017
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni
