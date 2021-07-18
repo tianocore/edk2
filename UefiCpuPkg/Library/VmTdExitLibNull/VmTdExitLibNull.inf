@@ -1,0 +1,34 @@
+## @file
+#  VMTDEXIT Support Library.
+#
+#  Copyright (c) 2020, Intel Inc. All rights reserved.<BR>
+#  Copyright (C) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VmTdExitLibNull
+  FILE_GUID                      = 79BD5323-6CF4-4ECF-A132-F7D31EEADC1E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = VmTdExitLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64 IA32
+#
+
+[Sources.common]
+  VmTdExitLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
