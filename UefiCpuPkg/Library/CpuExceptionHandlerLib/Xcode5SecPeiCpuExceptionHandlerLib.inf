@@ -54,6 +54,7 @@
   LocalApicLib
   PeCoffGetEntryPointLib
   VmgExitLib
+  VmTdExitLib
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
