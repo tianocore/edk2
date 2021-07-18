@@ -1,0 +1,52 @@
+#/** @file
+#
+#  TBD
+#
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TdxMailboxLib
+  FILE_GUID                      = 2F81A9BA-748E-4519-BB11-A63A039D561E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TdxMailboxLib
+
+#
+#  VALID_ARCHITECTURES           = X64 IA32
+#
+
+[Sources.IA32]
+  TdxMailboxNull.c
+
+[Sources.X64]
+  TdxMailbox.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  PcdLib
+  UefiCpuLib
+  DebugAgentLib
+  IoLib
+  SynchronizationLib
+  MemoryAllocationLib
+
+[Guids]
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
