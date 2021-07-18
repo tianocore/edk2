@@ -298,6 +298,14 @@ typedef UINT32 EFI_RESOURCE_ATTRIBUTE_TYPE;
 //
 #define EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE            0x02000000
 
+//
+// Physical memory encrypted attribute. This
+// memory uses platform encrpytion capabilities for
+// protection. If this bit is clear, the memory does
+// not use platform encryption protection
+//
+#define EFI_RESOURCE_ATTRIBUTE_ENCRYPTED                0x04000000
+
 ///
 /// Describes the resource properties of all fixed,
 /// nonrelocatable resource ranges found on the processor
