@@ -43,6 +43,24 @@ CommonExceptionHandler (
     }
   }
 
+  if (ExceptionType == VE_EXCEPTION) {
+    EFI_STATUS  Status;
+    //
+    // #VE needs to be handled immediately upon enabling exception handling
+    // and therefore can't use the RegisterCpuInterruptHandler() interface
+    // (which isn't supported under Sec and Pei anyway).
+    //
+    // Handle the #VE:
+    //   On EFI_SUCCESS - Exception has been handled, return
+    //   On other       - ExceptionType contains (possibly new) exception
+    //                    value
+    //
+    Status = VmTdExitHandleVe (&ExceptionType, SystemContext);
+    if (!EFI_ERROR (Status)) {
+      return;
+    }
+  }
+
   //
   // Initialize the serial port before dumping.
   //
