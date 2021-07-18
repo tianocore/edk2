@@ -25,22 +25,47 @@ CommonExceptionHandler (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  if (ExceptionType == VC_EXCEPTION) {
-    EFI_STATUS  Status;
-    //
-    // #VC needs to be handled immediately upon enabling exception handling
-    // and therefore can't use the RegisterCpuInterruptHandler() interface
-    // (which isn't supported under Sec and Pei anyway).
-    //
-    // Handle the #VC:
-    //   On EFI_SUCCESS - Exception has been handled, return
-    //   On other       - ExceptionType contains (possibly new) exception
-    //                    value
-    //
-    Status = VmgExitHandleVc (&ExceptionType, SystemContext);
-    if (!EFI_ERROR (Status)) {
-      return;
-    }
+  EFI_STATUS  Status;
+
+  switch (ExceptionType) {
+    case VC_EXCEPTION:
+      //
+      // #VC needs to be handled immediately upon enabling exception handling
+      // and therefore can't use the RegisterCpuInterruptHandler() interface
+      // (which isn't supported under Sec and Pei anyway).
+      //
+      // Handle the #VC:
+      //   On EFI_SUCCESS - Exception has been handled, return
+      //   On other       - ExceptionType contains (possibly new) exception
+      //                    value
+      //
+      Status = VmgExitHandleVc (&ExceptionType, SystemContext);
+      if (!EFI_ERROR (Status)) {
+        return;
+      }
+
+      break;
+
+    case VE_EXCEPTION:
+      //
+      // #VE needs to be handled immediately upon enabling exception handling
+      // and therefore can't use the RegisterCpuInterruptHandler() interface
+      // (which isn't supported under Sec and Pei anyway).
+      //
+      // Handle the #VE:
+      //   On EFI_SUCCESS - Exception has been handled, return
+      //   On other       - ExceptionType contains (possibly new) exception
+      //                    value
+      //
+      Status = VmTdExitHandleVe (&ExceptionType, SystemContext);
+      if (!EFI_ERROR (Status)) {
+        return;
+      }
+
+      break;
+
+    default:
+      break;
   }
 
   //
