@@ -53,6 +53,7 @@
   MemoryAllocationLib
   SynchronizationLib
   VmgExitLib
+  VmTdExitLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard    # CONSUMES
