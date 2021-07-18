@@ -45,6 +45,23 @@ CommonExceptionHandlerWorker (
     }
   }
 
+  if (ExceptionType == VE_EXCEPTION) {
+    EFI_STATUS  Status;
+    //
+    // #VE needs to be handled immediately upon enabling exception handling
+    // and therefore can't use the RegisterCpuInterruptHandler() interface.
+    //
+    // Handle the #VE:
+    //   On EFI_SUCCESS - Exception has been handled, return
+    //   On other       - ExceptionType contains (possibly new) exception
+    //                    value
+    //
+    Status = VmTdExitHandleVe (&ExceptionType, SystemContext);
+    if (!EFI_ERROR (Status)) {
+      return;
+    }
+  }
+
   ExceptionHandlerContext  = (EXCEPTION_HANDLER_CONTEXT *) (UINTN) (SystemContext.SystemContextIa32);
   ReservedVectors          = ExceptionHandlerData->ReservedVectors;
   ExternalInterruptHandler = ExceptionHandlerData->ExternalInterruptHandler;
