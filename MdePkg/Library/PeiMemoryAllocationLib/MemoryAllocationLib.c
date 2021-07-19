@@ -839,4 +839,31 @@ FreePool (
   //
 }
 
+/**
+  Allocates one or more 4KB pages of given type MemoryType.
 
+  Allocates the number of 4KB pages of MemoryType and returns a pointer to the
+  allocated buffer. The buffer returned is aligned on a 4KB boundary. If Pages
+  is 0, then NULL is returned. If there is not enough memory remaining to satisfy
+  the request, then NULL is returned.
+
+  @param  MemoryType            Type of memory to use for this allocation.
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+EFIAPI
+AllocatePagesWithMemoryType (
+  IN UINTN            MemoryType,
+  IN UINTN            Pages
+  )
+{
+  if (MemoryType >= EfiMaxMemoryType) {
+    ASSERT (FALSE);
+    return NULL;
+  }
+
+  return InternalAllocatePages (MemoryType, Pages);
+}
