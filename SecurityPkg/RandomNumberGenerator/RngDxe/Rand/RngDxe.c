@@ -20,7 +20,9 @@
 
 **/
 
-#include "RdRand.h"
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+
 #include "RngDxeInternals.h"
 
 /**
@@ -88,7 +90,7 @@ RngGetRNG (
       return EFI_INVALID_PARAMETER;
     }
 
-    Status = RdRandGenerateEntropy (RNGValueLength, RNGValue);
+    Status = GenerateEntropy (RNGValueLength, RNGValue);
     return Status;
   }
 
