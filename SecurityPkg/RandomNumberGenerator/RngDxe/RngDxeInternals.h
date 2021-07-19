@@ -10,6 +10,8 @@
 #ifndef RNGDXE_INTERNALS_H_
 #define RNGDXE_INTERNALS_H_
 
+#include <Protocol/Rng.h>
+
 /**
   Returns information about the random number generation implementation.
 
@@ -112,6 +114,23 @@ EFIAPI
 RngGetBytes (
   IN UINTN   Length,
   OUT UINT8  *RandBuffer
+  );
+
+/**
+  Generate high-quality entropy source using a TRNG or through RDRAND.
+
+  @param[in]   Length        Size of the buffer, in bytes, to fill with.
+  @param[out]  Entropy       Pointer to the buffer to store the entropy data.
+
+  @retval EFI_SUCCESS        Entropy generation succeeded.
+  @retval EFI_NOT_READY      Failed to request random data.
+
+**/
+EFI_STATUS
+EFIAPI
+GenerateEntropy (
+  IN UINTN   Length,
+  OUT UINT8  *Entropy
   );
 
 #endif // RNGDXE_INTERNALS_H_
