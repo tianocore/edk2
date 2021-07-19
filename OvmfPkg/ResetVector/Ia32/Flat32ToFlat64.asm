@@ -17,6 +17,9 @@ Transition32FlatTo64Flat:
 
     OneTimeCall SetCr3ForPageTables64
 
+    cmp     dword[TDX_WORK_AREA], 0x47584454 ; 'TDXG'
+    jz      TdxTransition32FlatTo64Flat
+
     mov     eax, cr4
     bts     eax, 5                      ; enable PAE
     mov     cr4, eax
@@ -65,9 +68,53 @@ EnablePaging:
     bts     eax, 31                     ; set PG
     mov     cr0, eax                    ; enable paging
 
+    jmp     _jumpTo64Bit
+
+;
+; Tdx Transition from 32Flat to 64Flat
+;
+TdxTransition32FlatTo64Flat:
+
+    mov     eax, cr4
+    bts     eax, 5                      ; enable PAE
+
+    ;
+    ; byte[TDX_WORK_AREA_PAGELEVEL5] holds the indicator whether 52bit is supported.
+    ; if it is the case, need to set LA57 and use 5-level paging
+    ;
+    cmp     byte[TDX_WORK_AREA_PAGELEVEL5], 0
+    jz      .set_cr4
+    bts     eax, 12
+.set_cr4:
+    mov     cr4, eax
+    mov     ebx, cr3
+
+    ;
+    ; if la57 is not set, we are ok
+    ; if using 5-level paging, adjust top-level page directory
+    ;
+    bt      eax, 12
+    jnc     .set_cr3
+    mov     ebx, TDX_PT_ADDR (0)
+.set_cr3:
+    mov     cr3, ebx
+
+    mov     eax, cr0
+    bts     eax, 31                     ; set PG
+    mov     cr0, eax                    ; enable paging
+
+_jumpTo64Bit:
     jmp     LINEAR_CODE64_SEL:ADDR_OF(jumpTo64BitAndLandHere)
+
 BITS    64
 jumpTo64BitAndLandHere:
+
+    ;
+    ; For Td guest we are done and jump to the end
+    ;
+    mov     eax, TDX_WORK_AREA
+    cmp     dword [eax], 0x47584454 ; 'TDXG'
+    jz      GoodCompare
 
     ;
     ; Check if the second step of the SEV-ES mitigation is to be performed.

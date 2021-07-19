@@ -1,7 +1,7 @@
 ## @file
 #  Reset Vector
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -43,6 +43,15 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfImageSizeInKb
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataOffset
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase

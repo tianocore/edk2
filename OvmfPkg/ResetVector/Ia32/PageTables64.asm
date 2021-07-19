@@ -218,6 +218,24 @@ SevEsDisabled:
 ;
 SetCr3ForPageTables64:
 
+    ;
+    ; Check Td guest
+    ;
+    cmp     dword[TDX_WORK_AREA], 0x47584454 ; 'TDXG'
+    jnz     CheckSev
+
+    xor     edx, edx
+
+    ;
+    ; In Td guest, BSP builds the page table and set the flag of
+    ; TDX_WORK_AREA_PGTBL_READY. APs check this flag and then set
+    ; cr3 directly.
+    ;
+    cmp     byte[TDX_WORK_AREA_PGTBL_READY], 1
+    jz      SetCr3
+    jmp     SevNotActive
+
+CheckSev:
     OneTimeCall   CheckSevFeatures
     xor     edx, edx
     test    eax, eax
@@ -277,6 +295,29 @@ pageTableEntriesLoop:
     mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
     loop    pageTableEntriesLoop
 
+    ;
+    ; If it is Td guest, TdxExtraPageTable should be initialized as well
+    ;
+    cmp     dword[TDX_WORK_AREA], 0x47584454 ; 'TDXG'
+    jnz     IsSevEs
+
+    xor     eax, eax
+    mov     ecx, 0x400
+tdClearTdxPageTablesMemoryLoop:
+    mov     dword [ecx * 4 + TDX_PT_ADDR (0) - 4], eax
+    loop    tdClearTdxPageTablesMemoryLoop
+
+    xor     edx, edx
+    ;
+    ; Top level Page Directory Pointers (1 * 256TB entry)
+    ;
+    mov     dword[TDX_PT_ADDR (0)], PT_ADDR (0) + PAGE_PDP_ATTR
+    mov     dword[TDX_PT_ADDR (4)], edx
+
+    mov     byte[TDX_WORK_AREA_PGTBL_READY], 1
+    jmp     SetCr3
+
+IsSevEs:
     OneTimeCall   IsSevEsEnabled
     test    eax, eax
     jz      SetCr3

@@ -51,6 +51,8 @@
 %include "Ia32/SearchForSecEntry.asm"
 
 %ifdef ARCH_X64
+%include "Ia32/InitTdx.asm"
+%include "Ia32/ReloadFlat32.asm"
 %include "Ia32/Flat32ToFlat64.asm"
 %include "Ia32/PageTables64.asm"
 %endif
