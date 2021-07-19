@@ -24,6 +24,7 @@
   PlatformConfig.c
   PlatformConfig.h
   PlatformForms.vfr
+  AmdSev.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -43,6 +44,7 @@
   UefiLib
   UefiRuntimeServicesTableLib
   UefiDriverEntryPoint
+  MemEncryptSevLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
@@ -56,6 +58,7 @@
 [Guids]
   gEfiIfrTianoGuid
   gOvmfPlatformConfigGuid
+  gMemEncryptGuid
 
 [Depex]
   gEfiHiiConfigRoutingProtocolGuid  AND

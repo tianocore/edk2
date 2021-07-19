@@ -763,6 +763,11 @@ PlatformInit (
 {
   EFI_STATUS Status;
 
+  //
+  // Detect and set Amd Sev runtime configuation
+  //
+  AmdSevSetRuntimeConfig();
+
   ExecutePlatformConfig ();
 
   mConfigAccess.ExtractConfig = &ExtractConfig;
