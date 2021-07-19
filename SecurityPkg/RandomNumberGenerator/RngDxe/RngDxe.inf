@@ -36,7 +36,6 @@
 [Sources.IA32, Sources.X64]
   Rand/RngDxe.c
   Rand/RdRand.c
-  Rand/RdRand.h
   Rand/AesCore.c
   Rand/AesCore.h
 
