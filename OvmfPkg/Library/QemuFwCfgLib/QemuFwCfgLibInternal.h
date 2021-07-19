@@ -59,4 +59,15 @@ InternalQemuFwCfgDmaBytes (
   IN     UINT32  Control
   );
 
+/**
+  Check if it is Tdx guest
+
+  @retval    TRUE   It is Tdx guest
+  @retval    FALSE  It is not Tdx guest
+**/
+BOOLEAN
+QemuFwCfgIsTdxGuest (
+  VOID
+  );
+
 #endif
