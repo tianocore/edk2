@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2021, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2022, ARM Limited. All rights reserved.
 # Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -131,6 +131,11 @@
 
   # Define if the GICv3 controller should use the GICv2 legacy
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE|BOOLEAN|0x00000042
+
+  ## Define the conduit to use for monitor calls.
+  # Default PcdMonitorConduitHvc = FALSE, conduit = SMC
+  # If PcdMonitorConduitHvc = TRUE, conduit = HVC
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc|FALSE|BOOLEAN|0x00000047
 
 [PcdsFeatureFlag.ARM]
   # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
