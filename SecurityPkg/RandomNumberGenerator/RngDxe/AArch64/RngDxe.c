@@ -1,11 +1,12 @@
 /** @file
   RNG Driver to produce the UEFI Random Number Generator protocol.
 
-  The driver will use the RNDR instruction to produce random numbers.
+  The driver will use the RNDR instruction to produce random numbers. It also
+  uses the Arm FW-TRNG interface to implement EFI_RNG_ALGORITHM_RAW.
 
   RNG Algorithms defined in UEFI 2.4:
    - EFI_RNG_ALGORITHM_SP800_90_CTR_256_GUID
-   - EFI_RNG_ALGORITHM_RAW                    - Unsupported
+   - EFI_RNG_ALGORITHM_RAW
    - EFI_RNG_ALGORITHM_SP800_90_HMAC_256_GUID
    - EFI_RNG_ALGORITHM_SP800_90_HASH_256_GUID
    - EFI_RNG_ALGORITHM_X9_31_3DES_GUID        - Unsupported
@@ -14,15 +15,17 @@
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
   Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#include <Guid/ZeroGuid.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/TimerLib.h>
+#include <Library/DebugLib.h>
+#include <Library/TrngLib.h>
 #include <Protocol/Rng.h>
 
 #include "RngDxeInternals.h"
@@ -58,7 +61,9 @@ RngGetRNG (
   OUT UINT8                      *RNGValue
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
+  UINT16      MajorRevision;
+  UINT16      MinorRevision;
 
   if ((RNGValueLength == 0) || (RNGValue == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -74,6 +79,17 @@ RngGetRNG (
   if (CompareGuid (RNGAlgorithm, PcdGetPtr (PcdCpuRngSupportedAlgorithm))) {
     Status = RngGetBytes (RNGValueLength, RNGValue);
     return Status;
+  }
+
+  //
+  // The "raw" algorithm is intended to provide entropy directly
+  //
+  if (CompareGuid (RNGAlgorithm, &gEfiRngAlgorithmRaw)) {
+    Status = GetTrngVersion (&MajorRevision, &MinorRevision);
+    if (EFI_ERROR (Status)) {
+      return EFI_UNSUPPORTED;
+    }
+    return GenerateEntropy (RNGValueLength, RNGValue);
   }
 
   //
@@ -97,8 +113,9 @@ RngGetRNG (
                                       is the default algorithm for the driver.
 
   @retval EFI_SUCCESS                 The RNG algorithm list was returned successfully.
+  @retval EFI_UNSUPPORTED             No supported algorithms found.
   @retval EFI_BUFFER_TOO_SMALL        The buffer RNGAlgorithmList is too small to hold the result.
-
+  @retval EFI_INVALID_PARAMETER       The pointer to the buffer RNGAlgorithmList is invalid.
 **/
 UINTN
 EFIAPI
@@ -107,19 +124,61 @@ ArchGetSupportedRngAlgorithms (
   OUT    EFI_RNG_ALGORITHM         *RNGAlgorithmList
   )
 {
-  UINTN RequiredSize;
+  EFI_STATUS  Status;
+  UINT16      MajorRevision;
+  UINT16      MinorRevision;
+  UINTN       RequiredSize;
+  BOOLEAN     CpuRngAlgorithmSupported;
+  BOOLEAN     RawAlgorithmSupported;
+  UINTN       Index;
   EFI_RNG_ALGORITHM *CpuRngSupportedAlgorithm;
 
-  RequiredSize = sizeof (EFI_RNG_ALGORITHM);
+  RequiredSize = 0;
+  CpuRngAlgorithmSupported = FALSE;
+  RawAlgorithmSupported = FALSE;
+
+  CpuRngSupportedAlgorithm = PcdGetPtr (PcdCpuRngSupportedAlgorithm);
+  if (!CompareGuid (CpuRngSupportedAlgorithm, &gZeroGuid)) {
+    CpuRngAlgorithmSupported = TRUE;
+    RequiredSize += sizeof (EFI_RNG_ALGORITHM);
+  }
+
+  Status = GetTrngVersion (&MajorRevision, &MinorRevision);
+  if (!EFI_ERROR (Status)) {
+    RawAlgorithmSupported = TRUE;
+    RequiredSize += sizeof (EFI_RNG_ALGORITHM);
+  }
 
   if (*RNGAlgorithmListSize < RequiredSize) {
     *RNGAlgorithmListSize = RequiredSize;
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  CpuRngSupportedAlgorithm = PcdGetPtr (PcdCpuRngSupportedAlgorithm);
+  if (RequiredSize == 0) {
+    // No supported algorithms found.
+    return EFI_UNSUPPORTED;
+  }
 
-  CopyMem(&RNGAlgorithmList[0], CpuRngSupportedAlgorithm, sizeof (EFI_RNG_ALGORITHM));
+  if (RNGAlgorithmList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Index = 0;
+  if (CpuRngAlgorithmSupported) {
+    CopyMem (
+      &RNGAlgorithmList[Index++],
+      CpuRngSupportedAlgorithm,
+      sizeof (EFI_RNG_ALGORITHM)
+      );
+  }
+
+  if (RawAlgorithmSupported) {
+    CopyMem (
+      &RNGAlgorithmList[Index++],
+      &gEfiRngAlgorithmRaw,
+      sizeof (EFI_RNG_ALGORITHM)
+      );
+  }
 
   *RNGAlgorithmListSize = RequiredSize;
   return EFI_SUCCESS;

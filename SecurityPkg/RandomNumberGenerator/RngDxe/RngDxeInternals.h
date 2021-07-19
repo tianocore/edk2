@@ -89,6 +89,7 @@ RngGetRNG (
                                       is the default algorithm for the driver.
 
   @retval EFI_SUCCESS                 The RNG algorithm list was returned successfully.
+  @retval EFI_UNSUPPORTED             No supported algorithms found.
   @retval EFI_BUFFER_TOO_SMALL        The buffer RNGAlgorithmList is too small to hold the result.
   @retval EFI_INVALID_PARAMETER       The pointer to the buffer RNGAlgorithmList is invalid.
 **/

@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015-2020 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -85,6 +86,11 @@
   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
+
+  # Arm FW-TRNG interface library.
+  TrngLib|ArmPkg/Library/ArmFwTrngLib/ArmFwTrngLib.inf
+  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
+  ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
 
 [LibraryClasses.ARM]
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
@@ -277,7 +283,7 @@
   SecurityPkg/EnrollFromDefaultKeysApp/EnrollFromDefaultKeysApp.inf
   SecurityPkg/VariableAuthenticated/SecureBootDefaultKeysDxe/SecureBootDefaultKeysDxe.inf
 
-[Components.IA32, Components.X64, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64, Components.ARM]
   #
   # Random Number Generator
   #

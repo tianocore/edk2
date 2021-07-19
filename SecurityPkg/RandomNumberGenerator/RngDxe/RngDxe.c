@@ -45,7 +45,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                                       is the default algorithm for the driver.
 
   @retval EFI_SUCCESS                 The RNG algorithm list was returned successfully.
-  @retval EFI_UNSUPPORTED             The services is not supported by this driver.
+  @retval EFI_UNSUPPORTED             No supported algorithms found.
   @retval EFI_DEVICE_ERROR            The list of algorithms could not be retrieved due to a
                                       hardware or firmware error.
   @retval EFI_INVALID_PARAMETER       One or more of the parameters are incorrect.
