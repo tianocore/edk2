@@ -9,9 +9,11 @@
 **/
 
 #include "MpLib.h"
+#include "MpIntelTdx.h"
 #include <Library/VmgExitLib.h>
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
+#include <ConfidentialComputingGuestAttr.h>
 
 EFI_GUID  mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
 
@@ -1803,6 +1805,10 @@ MpInitLibInitialize (
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
 
+  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    return EFI_SUCCESS;
+  }
+
   OldCpuMpData = GetCpuMpDataFromGuidedHob ();
   if (OldCpuMpData == NULL) {
     MaxLogicalProcessorNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
@@ -2073,6 +2079,10 @@ MpInitLibGetProcessorInfo (
   CPU_INFO_IN_HOB  *CpuInfoInHob;
   UINTN            OriginalProcessorNumber;
 
+  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    return TdxMpInitLibGetProcessorInfo (ProcessorNumber, ProcessorInfoBuffer, HealthData);
+  }
+
   CpuMpData    = GetCpuMpData ();
   CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
 
@@ -2307,6 +2317,10 @@ EnableDisableApWorker (
   CPU_MP_DATA  *CpuMpData;
   UINTN        CallerNumber;
 
+  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    return EFI_UNSUPPORTED;
+  }
+
   CpuMpData = GetCpuMpData ();
 
   //
@@ -2367,6 +2381,11 @@ MpInitLibWhoAmI (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    *ProcessorNumber = 0;
+    return EFI_SUCCESS;
+  }
+
   CpuMpData = GetCpuMpData ();
 
   return GetProcessorNumber (CpuMpData, ProcessorNumber);
@@ -2404,6 +2423,10 @@ MpInitLibGetNumberOfProcessors (
   UINTN        ProcessorNumber;
   UINTN        EnabledProcessorNumber;
   UINTN        Index;
+
+  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    return TdxMpInitLibGetNumberOfProcessors (NumberOfProcessors, NumberOfEnabledProcessors);
+  }
 
   CpuMpData = GetCpuMpData ();
 
@@ -2489,6 +2512,10 @@ StartupAllCPUsWorker (
   CPU_AP_DATA  *CpuData;
   BOOLEAN      HasEnabledAp;
   CPU_STATE    ApState;
+
+  if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    return EFI_SUCCESS;
+  }
 
   CpuMpData = GetCpuMpData ();
 
