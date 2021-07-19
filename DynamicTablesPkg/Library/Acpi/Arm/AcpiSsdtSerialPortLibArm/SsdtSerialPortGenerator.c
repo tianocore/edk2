@@ -184,6 +184,7 @@ BuildSsdtSerialPortTableEx (
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
 
   *Table = NULL;
+  SerialPortInfo = NULL;
 
   Status = GetEArmObjSerialPortInfo (
              CfgMgrProtocol,

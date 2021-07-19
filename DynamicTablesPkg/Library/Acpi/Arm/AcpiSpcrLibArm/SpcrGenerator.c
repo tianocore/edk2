@@ -225,6 +225,7 @@ BuildSpcrTableEx (
   }
 
   *Table = NULL;
+  SerialPortInfo = NULL;
 
   Status = GetEArmObjSerialConsolePortInfo (
              CfgMgrProtocol,
