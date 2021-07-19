@@ -30,16 +30,19 @@
   DEFINE PS2_KEYBOARD_ENABLE          = FALSE
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
 
+  DEFINE DISABLE_MMX_SSE              = FALSE
+
   #
   # SBL:      UEFI payload for Slim Bootloader
   # COREBOOT: UEFI payload for coreboot
+  # LINUXBOOT: UEFI payload for linuxboot
   #
   DEFINE   BOOTLOADER = SBL
 
   #
   # CPU options
   #
-  DEFINE MAX_LOGICAL_PROCESSORS       = 64
+  DEFINE MAX_LOGICAL_PROCESSORS       = 256
 
   #
   # PCI options
@@ -93,6 +96,12 @@
 
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
+!if $(BOOTLOADER) == "LINUXBOOT"
+  *_*_*_CC_FLAGS                 = -D LINUXBOOT_PAYLOAD
+!endif
+!if $(DISABLE_MMX_SSE)
+  *_*_*_CC_FLAGS                 = -mno-mmx -mno-sse
+!endif
   GCC:*_UNIXGCC_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS     = /D MDEPKG_NDEBUG
@@ -222,11 +231,13 @@
 !endif
   PlatformSupportLib|UefiPayloadPkg/Library/PlatformSupportLibNull/PlatformSupportLibNull.inf
 !if $(UNIVERSAL_PAYLOAD) == FALSE
-  !if $(BOOTLOADER) == "COREBOOT"
-    BlParseLib|UefiPayloadPkg/Library/CbParseLib/CbParseLib.inf
-  !else
-    BlParseLib|UefiPayloadPkg/Library/SblParseLib/SblParseLib.inf
-  !endif
+ !if $(BOOTLOADER) == "COREBOOT"
+   BlParseLib|UefiPayloadPkg/Library/CbParseLib/CbParseLib.inf
+ !elseif $(BOOTLOADER) == "LINUXBOOT"
+   BlParseLib|UefiPayloadPkg/Library/LbParseLib/LbParseLib.inf
+ !else
+   BlParseLib|UefiPayloadPkg/Library/SblParseLib/SblParseLib.inf
+ !endif
 !endif
 
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
@@ -432,7 +443,13 @@
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   }
 
+!if $(BOOTLOADER) == "LINUXBOOT"
+  OvmfPkg/8254TimerDxe/8254Timer.inf
+  OvmfPkg/8259InterruptControllerDxe/8259.inf
+!else
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+!endif
+
   MdeModulePkg/Universal/Metronome/Metronome.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
