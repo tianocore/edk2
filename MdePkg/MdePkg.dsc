@@ -67,6 +67,7 @@
   MdePkg/Library/DxeRngLib/DxeRngLib.inf
   MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
   MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+  MdePkg/Library/BaseTrngLibNull/BaseTrngLibNull.inf
 
   MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
   MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
