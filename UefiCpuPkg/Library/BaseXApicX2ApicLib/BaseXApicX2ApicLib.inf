@@ -39,6 +39,7 @@
   IoLib
   PcdLib
   UefiCpuLib
+  TdxLib
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds  ## SOMETIMES_CONSUMES
