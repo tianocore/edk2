@@ -42,4 +42,5 @@
   IoLib
   MemoryAllocationLib
   MemEncryptSevLib
+  TdxProbeLib
 
