@@ -43,3 +43,5 @@
   MemoryAllocationLib
   MemEncryptSevLib
 
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
