@@ -138,6 +138,7 @@
   ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
   ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
+  ArmPkg/Library/ArmFwTrngLib/ArmFwTrngLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
