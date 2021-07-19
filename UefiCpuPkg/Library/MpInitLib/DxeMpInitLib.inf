@@ -22,9 +22,11 @@
 #
 
 [Sources.IA32]
+  MpLibTdxNull.c
   Ia32/MpFuncs.nasm
 
 [Sources.X64]
+  MpLibTdx.c
   X64/MpFuncs.nasm
 
 [Sources.common]
@@ -33,6 +35,7 @@
   MpLib.c
   MpLib.h
   Microcode.c
+  MpIntelTdx.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -76,3 +79,4 @@
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                       ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr           ## CONSUMES
