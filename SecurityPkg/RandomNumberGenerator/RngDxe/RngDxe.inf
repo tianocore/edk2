@@ -10,6 +10,7 @@
 #
 #  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+#  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -26,7 +27,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 ARM
 #
 
 [Sources.common]
@@ -41,6 +42,11 @@
 
 [Sources.AARCH64]
   AArch64/RngDxe.c
+  ArmTrng.c
+
+[Sources.ARM]
+  Arm/RngDxe.c
+  ArmTrng.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -55,6 +61,9 @@
   TimerLib
   RngLib
 
+[LibraryClasses.AARCH64, LibraryClasses.ARM]
+  TrngLib
+
 [Guids]
   gEfiRngAlgorithmSp80090Hash256Guid  ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
   gEfiRngAlgorithmSp80090Hmac256Guid  ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
@@ -62,6 +71,7 @@
   gEfiRngAlgorithmX9313DesGuid        ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
   gEfiRngAlgorithmX931AesGuid         ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
   gEfiRngAlgorithmRaw                 ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
+  gNullGuid                           ## CONSUMES
 
 [Protocols]
   gEfiRngProtocolGuid                ## PRODUCES
