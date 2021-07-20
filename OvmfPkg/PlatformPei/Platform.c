@@ -35,6 +35,7 @@
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
 #include <OvmfPlatforms.h>
+#include <Library/TdxProbeLib.h>
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -742,6 +743,7 @@ InitializePlatform (
 
   InstallClearCacheCallback ();
   AmdSevInitialize ();
+  IntelTdxInitialize ();
   MiscInitialization ();
   InstallFeatureControlCallback ();
 
