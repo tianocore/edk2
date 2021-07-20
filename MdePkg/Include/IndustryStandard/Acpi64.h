@@ -174,7 +174,7 @@ typedef struct {
 /// FADT Version (as defined in ACPI 6.4 spec.)
 ///
 #define EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_REVISION  0x06
-#define EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION  0x03
+#define EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION  0x04
 
 //
 // Fixed ACPI Description Table Preferred Power Management Profile
