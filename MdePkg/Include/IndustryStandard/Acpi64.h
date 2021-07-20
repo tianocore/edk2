@@ -1014,73 +1014,78 @@ typedef struct {
 } EFI_ACPI_6_4_MPST_MEMORY_POWER_STATE_CHARACTERISTICS_TABLE;
 
 ///
-/// Memory Topology Table definition.
+/// Platform Memory Topology Table definition.
 ///
 typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER Header;
-  UINT32                      Reserved;
-} EFI_ACPI_6_4_MEMORY_TOPOLOGY_TABLE;
+  EFI_ACPI_DESCRIPTION_HEADER             Header;
+  UINT32                                  NumberOfMemoryDevices;
+//EFI_ACPI_6_4_PMTT_COMMON_MEMORY_DEVICE  MemoryDeviceStructure[NumberOfMemoryDevices];
+} EFI_ACPI_6_4_PLATFORM_MEMORY_TOPOLOGY_TABLE;
 
 ///
 /// PMTT Version (as defined in ACPI 6.4 spec.)
 ///
-#define EFI_ACPI_6_4_MEMORY_TOPOLOGY_TABLE_REVISION 0x01
+#define EFI_ACPI_6_4_MEMORY_TOPOLOGY_TABLE_REVISION 0x02
 
 ///
-/// Common Memory Aggregator Device Structure.
+/// Common Memory Device.
 ///
 typedef struct {
-  UINT8                       Type;
-  UINT8                       Reserved;
-  UINT16                      Length;
-  UINT16                      Flags;
-  UINT16                      Reserved1;
-} EFI_ACPI_6_4_PMTT_COMMON_MEMORY_AGGREGATOR_DEVICE_STRUCTURE;
+  UINT8                                   Type;
+  UINT8                                   Reserved;
+  UINT16                                  Length;
+  UINT16                                  Flags;
+  UINT16                                  Reserved1;
+  UINT32                                  NumberOfMemoryDevices;
+//UINT8                                   TypeSpecificData[];
+//EFI_ACPI_6_4_PMTT_COMMON_MEMORY_DEVICE  MemoryDeviceStructure[NumberOfMemoryDevices];
+} EFI_ACPI_6_4_PMTT_COMMON_MEMORY_DEVICE;
 
 ///
-/// Memory Aggregator Device Type
+/// Memory Device Type.
 ///
-#define EFI_ACPI_6_4_PMTT_MEMORY_AGGREGATOR_DEVICE_TYPE_SOCKET            0x1
-#define EFI_ACPI_6_4_PMTT_MEMORY_AGGREGATOR_DEVICE_TYPE_MEMORY_CONTROLLER 0x2
-#define EFI_ACPI_6_4_PMTT_MEMORY_AGGREGATOR_DEVICE_TYPE_DIMM              0x3
+#define EFI_ACPI_6_4_PMTT_MEMORY_DEVICE_TYPE_SOCKET               0x1
+#define EFI_ACPI_6_4_PMTT_MEMORY_DEVICE_TYPE_MEMORY_CONTROLLER    0x2
+#define EFI_ACPI_6_4_PMTT_MEMORY_DEVICE_TYPE_DIMM                 0x3
+#define EFI_ACPI_6_4_PMTT_MEMORY_DEVICE_TYPE_VENDOR_SPECIFIC_TYPE 0xFF
 
 ///
-/// Socket Memory Aggregator Device Structure.
+/// Socket Type Data.
 ///
 typedef struct {
-  EFI_ACPI_6_4_PMTT_COMMON_MEMORY_AGGREGATOR_DEVICE_STRUCTURE  Header;
-  UINT16                                                       SocketIdentifier;
-  UINT16                                                       Reserved;
-//EFI_ACPI_6_4_PMTT_MEMORY_CONTROLLER_MEMORY_AGGREGATOR_DEVICE_STRUCTURE  MemoryController[];
-} EFI_ACPI_6_4_PMTT_SOCKET_MEMORY_AGGREGATOR_DEVICE_STRUCTURE;
+  EFI_ACPI_6_4_PMTT_COMMON_MEMORY_DEVICE  CommonMemoryDeviceHeader;
+  UINT16                                  SocketIdentifier;
+  UINT16                                  Reserved;
+//EFI_ACPI_6_4_PMTT_COMMON_MEMORY_DEVICE  MemoryDeviceStructure[];
+} EFI_ACPI_6_4_PMTT_SOCKET_TYPE_DATA;
 
 ///
-/// MemoryController Memory Aggregator Device Structure.
+/// Memory Controller Type Data.
 ///
 typedef struct {
-  EFI_ACPI_6_4_PMTT_COMMON_MEMORY_AGGREGATOR_DEVICE_STRUCTURE  Header;
-  UINT32                                                       ReadLatency;
-  UINT32                                                       WriteLatency;
-  UINT32                                                       ReadBandwidth;
-  UINT32                                                       WriteBandwidth;
-  UINT16                                                       OptimalAccessUnit;
-  UINT16                                                       OptimalAccessAlignment;
-  UINT16                                                       Reserved;
-  UINT16                                                       NumberOfProximityDomains;
-//UINT32                                                       ProximityDomain[NumberOfProximityDomains];
-//EFI_ACPI_6_4_PMTT_DIMM_MEMORY_AGGREGATOR_DEVICE_STRUCTURE    PhysicalComponent[];
-} EFI_ACPI_6_4_PMTT_MEMORY_CONTROLLER_MEMORY_AGGREGATOR_DEVICE_STRUCTURE;
+  EFI_ACPI_6_4_PMTT_COMMON_MEMORY_DEVICE  CommonMemoryDeviceHeader;
+  UINT16                                  MemoryControllerIdentifier;
+  UINT16                                  Reserved;
+//EFI_ACPI_6_4_PMTT_COMMON_MEMORY_DEVICE  MemoryDeviceStructure[];
+} EFI_ACPI_6_4_PMTT_MEMORY_CONTROLLER_TYPE_DATA;
 
 ///
-/// DIMM Memory Aggregator Device Structure.
+/// DIMM Type Specific Data.
 ///
 typedef struct {
-  EFI_ACPI_6_4_PMTT_COMMON_MEMORY_AGGREGATOR_DEVICE_STRUCTURE  Header;
-  UINT16                                                       PhysicalComponentIdentifier;
-  UINT16                                                       Reserved;
-  UINT32                                                       SizeOfDimm;
-  UINT32                                                       SmbiosHandle;
-} EFI_ACPI_6_4_PMTT_DIMM_MEMORY_AGGREGATOR_DEVICE_STRUCTURE;
+  EFI_ACPI_6_4_PMTT_COMMON_MEMORY_DEVICE  CommonMemoryDeviceHeader;
+  UINT32                                  SmbiosHandle;
+} EFI_ACPI_6_4_PMTT_DIMM_TYPE_SPECIFIC_DATA;
+
+///
+/// Vendor Specific Type Data.
+///
+typedef struct {
+  EFI_ACPI_6_4_PMTT_COMMON_MEMORY_DEVICE        CommonMemoryDeviceHeader;
+  UINT8                                         TypeUuid[16];
+//EFI_ACPI_6_4_PMTT_VENDOR_SPECIFIC_TYPE_DATA   VendorSpecificData[];
+//EFI_ACPI_6_4_PMTT_COMMON_MEMORY_DEVICE        MemoryDeviceStructure[];
+} EFI_ACPI_6_4_PMTT_VENDOR_SPECIFIC_TYPE_DATA;
 
 ///
 /// Boot Graphics Resource Table definition.
