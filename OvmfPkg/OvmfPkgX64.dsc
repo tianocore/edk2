@@ -542,7 +542,15 @@
   # DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
   #                             // significantly impact boot performance
   # DEBUG_ERROR     0x80000000  // Error
+
+#
+# This is for debug purpose.
+!ifdef $(DEBUG_ON_SERIAL_PORT)
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0xff1fff4f
+!else
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
+!endif
+
 
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
@@ -573,6 +581,10 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x80
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x100
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x100
+
+  #
+  # TDX need 1G PageTable support
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
 
   #
   # Network Pcds
