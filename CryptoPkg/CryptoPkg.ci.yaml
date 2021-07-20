@@ -7,7 +7,11 @@
 ##
 {
     "LicenseCheck": {
-        "IgnoreFiles": []
+        "IgnoreFiles": [
+            # These directories contain auto-generated OpenSSL content
+            "Library/OpensslLib/X64",
+            "Library/OpensslLib/X64Gcc"
+        ]
     },
     "EccCheck": {
         ## Exception sample looks like below:
@@ -23,8 +27,13 @@
             "Test/UnitTest",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
             "Library/BaseCryptLib/SysCall/UnitTestHostCrtWrapper.c",
-            # this has OpenSSL interfaces that aren't UEFI spec compliant
-            "Library/OpensslLib/rand_pool.c"
+            # This has OpenSSL interfaces that aren't UEFI spec compliant
+            "Library/OpensslLib/rand_pool.c",
+            # This has OpenSSL interfaces that aren't UEFI spec compliant
+            "Library/Include/CrtLibSupport.h",
+            # These directories contain auto-generated OpenSSL content
+            "Library/OpensslLib/X64",
+            "Library/OpensslLib/X64Gcc"
         ]
     },
     "CompilerPlugin": {
@@ -51,7 +60,11 @@
     },
     "DscCompleteCheck": {
         "DscPath": "CryptoPkg.dsc",
-        "IgnoreInf": []
+        "IgnoreInf": [
+            # These are alternatives to OpensslLib.inf
+            "CryptoPkg/Library/OpensslLib/OpensslLibX64.inf",
+            "CryptoPkg/Library/OpensslLib/OpensslLibX64Gcc.inf"
+        ]
     },
     "GuidCheck": {
         "IgnoreGuidName": [],

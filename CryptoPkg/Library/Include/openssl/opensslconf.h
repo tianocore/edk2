@@ -112,9 +112,6 @@ extern "C" {
 #ifndef OPENSSL_NO_ASAN
 # define OPENSSL_NO_ASAN
 #endif
-#ifndef OPENSSL_NO_ASM
-# define OPENSSL_NO_ASM
-#endif
 #ifndef OPENSSL_NO_ASYNC
 # define OPENSSL_NO_ASYNC
 #endif
