@@ -1,0 +1,49 @@
+/** @file
+  Main SEC phase code. Handles initial TDX Hob List Processing
+
+  Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <PiPei.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <IndustryStandard/IntelTdx.h>
+
+/**
+  Check if it is Tdx guest
+
+  @retval    TRUE   It is Tdx guest
+  @retval    FALSE  It is not Tdx guest
+**/
+BOOLEAN
+PlatformPeiIsTdxGuest (
+  VOID
+  )
+{
+  return FALSE;
+}
+
+VOID
+TdxPublishRamRegions (
+  VOID
+  )
+{
+}
+
+VOID
+IntelTdxInitialize (
+  VOID
+  )
+{
+}
+
+VOID
+AsmGetRelocationMap (
+  OUT MP_RELOCATION_MAP    *AddressMap
+  )
+{
+}

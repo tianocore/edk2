@@ -35,6 +35,7 @@ Module Name:
 #include <Library/MtrrLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
+#include <Library/TdxLib.h>
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -488,6 +489,7 @@ AddressWidthInitialization (
   )
 {
   UINT64 FirstNonAddress;
+  UINT64 TdxSharedPageMask;
 
   //
   // As guest-physical memory size grows, the permanent PEI RAM requirements
@@ -515,7 +517,17 @@ AddressWidthInitialization (
   if (mPhysMemAddressWidth <= 36) {
     mPhysMemAddressWidth = 36;
   }
-  ASSERT (mPhysMemAddressWidth <= 48);
+
+  if (PlatformPeiIsTdxGuest ()) {
+    TdxSharedPageMask = TdSharedPageMask ();
+    if (TdxSharedPageMask == (1ULL << 47)) {
+      mPhysMemAddressWidth = 48;
+    } else {
+      mPhysMemAddressWidth = 52;
+    }
+  }
+
+  ASSERT (mPhysMemAddressWidth <= 52);
 }
 
 
@@ -532,8 +544,10 @@ GetPeiMemoryCap (
   UINT32  RegEax;
   UINT32  RegEdx;
   UINT32  Pml4Entries;
+  UINT32  Pml5Entries;
   UINT32  PdpEntries;
   UINTN   TotalPages;
+  UINT8   PhysicalAddressBits;
 
   //
   // If DXE is 32-bit, then just return the traditional 64 MB cap.
@@ -561,19 +575,32 @@ GetPeiMemoryCap (
     }
   }
 
-  if (mPhysMemAddressWidth <= 39) {
-    Pml4Entries = 1;
-    PdpEntries = 1 << (mPhysMemAddressWidth - 30);
-    ASSERT (PdpEntries <= 0x200);
-  } else {
-    Pml4Entries = 1 << (mPhysMemAddressWidth - 39);
-    ASSERT (Pml4Entries <= 0x200);
-    PdpEntries = 512;
+  PhysicalAddressBits = mPhysMemAddressWidth;
+  Pml5Entries = 1;
+
+  if (PhysicalAddressBits > 48) {
+    Pml5Entries = (UINT32) LShiftU64 (1, PhysicalAddressBits - 48);
+    PhysicalAddressBits = 48;
   }
 
-  TotalPages = Page1GSupport ? Pml4Entries + 1 :
-                               (PdpEntries + 1) * Pml4Entries + 1;
-  ASSERT (TotalPages <= 0x40201);
+  Pml4Entries = 1;
+  if (PhysicalAddressBits > 39) {
+    Pml4Entries = (UINT32) LShiftU64 (1, PhysicalAddressBits - 39);
+    PhysicalAddressBits = 39;
+  }
+
+  PdpEntries = 1;
+  ASSERT (PhysicalAddressBits > 30);
+  PdpEntries = (UINT32) LShiftU64 (1, PhysicalAddressBits - 30);
+
+  //
+  // Pre-allocate big pages to avoid later allocations.
+  //
+  if (!Page1GSupport) {
+    TotalPages = ((PdpEntries + 1) * Pml4Entries + 1) * Pml5Entries + 1;
+  } else {
+    TotalPages = (Pml4Entries + 1) * Pml5Entries + 1;
+  }
 
   //
   // Add 64 MB for miscellaneous allocations. Note that for
@@ -819,7 +846,11 @@ InitializeRamRegions (
   VOID
   )
 {
-  QemuInitializeRam ();
+  if (PlatformPeiIsTdxGuest ()) {
+    TdxPublishRamRegions ();
+  } else {
+    QemuInitializeRam ();
+  }
 
   if (mS3Supported && mBootMode != BOOT_ON_S3_RESUME) {
     //

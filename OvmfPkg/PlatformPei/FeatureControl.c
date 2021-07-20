@@ -12,6 +12,8 @@
 #include <Library/QemuFwCfgLib.h>
 #include <Ppi/MpServices.h>
 #include <Register/ArchitecturalMsr.h>
+#include <Library/TdxLib.h>
+#include <IndustryStandard/Tdx.h>
 
 #include "Platform.h"
 
@@ -37,7 +39,11 @@ WriteFeatureControl (
   IN OUT VOID *WorkSpace
   )
 {
-  AsmWriteMsr64 (MSR_IA32_FEATURE_CONTROL, mFeatureControlValue);
+  if (PlatformPeiIsTdxGuest ()) {
+    TdVmCall (TDVMCALL_WRMSR, (UINT64) MSR_IA32_FEATURE_CONTROL, mFeatureControlValue, 0, 0, 0);
+  } else {
+    AsmWriteMsr64 (MSR_IA32_FEATURE_CONTROL, mFeatureControlValue);
+  }
 }
 
 /**
