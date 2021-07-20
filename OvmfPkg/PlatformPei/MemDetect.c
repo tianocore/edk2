@@ -35,6 +35,8 @@ Module Name:
 #include <Library/MtrrLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
+#include <Library/TdxLib.h>
+#include <Library/TdxProbeLib.h>
 
 #include "Platform.h"
 #include "Cmos.h"
@@ -484,6 +486,7 @@ AddressWidthInitialization (
   )
 {
   UINT64 FirstNonAddress;
+  UINT64 TdxSharedPageMask;
 
   //
   // As guest-physical memory size grows, the permanent PEI RAM requirements
@@ -511,6 +514,17 @@ AddressWidthInitialization (
   if (mPhysMemAddressWidth <= 36) {
     mPhysMemAddressWidth = 36;
   }
+
+  if (TdxIsEnabled ()) {
+    TdxSharedPageMask = TdSharedPageMask ();
+    if (TdxSharedPageMask == (1ULL << 47)) {
+      mPhysMemAddressWidth = 48;
+    } else {
+      DEBUG ((DEBUG_ERROR, "Currently only PhysMemAddressWidth = 48 is supported in TDX.\n"));
+      ASSERT (FALSE);
+    }
+  }
+
   ASSERT (mPhysMemAddressWidth <= 48);
 }
 
@@ -815,7 +829,11 @@ InitializeRamRegions (
   VOID
   )
 {
-  QemuInitializeRam ();
+  if (TdxIsEnabled ()) {
+    TdxPublishRamRegions ();
+  } else {
+    QemuInitializeRam ();
+  }
 
   if (mS3Supported && mBootMode != BOOT_ON_S3_RESUME) {
     //
