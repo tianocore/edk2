@@ -10,6 +10,7 @@
 #define _PLATFORM_PEI_H_INCLUDED_
 
 #include <IndustryStandard/E820.h>
+#include <IndustryStandard/IntelTdx.h>
 
 VOID
 AddIoMemoryBaseSizeHob (
@@ -99,6 +100,33 @@ InstallClearCacheCallback (
 
 VOID
 AmdSevInitialize (
+  VOID
+  );
+
+VOID
+TdxPublishRamRegions (
+  VOID
+  );
+
+VOID
+AsmGetRelocationMap (
+  OUT MP_RELOCATION_MAP    *AddressMap
+  );
+
+
+VOID
+IntelTdxInitialize (
+  VOID
+  );
+
+/**
+  Check if it is Tdx guest
+
+  @retval    TRUE   It is Tdx guest
+  @retval    FALSE  It is not Tdx guest
+**/
+BOOLEAN
+PlatformPeiIsTdxGuest (
   VOID
   );
 
