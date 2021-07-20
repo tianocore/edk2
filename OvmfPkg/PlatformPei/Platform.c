@@ -792,6 +792,7 @@ InitializePlatform (
 
   InstallClearCacheCallback ();
   AmdSevInitialize ();
+  IntelTdxInitialize ();
   MiscInitialization ();
   InstallFeatureControlCallback ();
 
