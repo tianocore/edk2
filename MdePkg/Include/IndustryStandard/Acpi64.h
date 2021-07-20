@@ -1373,7 +1373,7 @@ typedef struct {
 /// Platform Timer Type
 ///
 #define EFI_ACPI_6_4_GTDT_GT_BLOCK                       0
-#define EFI_ACPI_6_4_GTDT_SBSA_GENERIC_WATCHDOG          1
+#define EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG           1
 
 ///
 /// GT Block Structure
@@ -1415,7 +1415,7 @@ typedef struct {
 #define EFI_ACPI_6_4_GTDT_GT_BLOCK_COMMON_FLAG_ALWAYS_ON_CAPABILITY      BIT1
 
 ///
-/// SBSA Generic Watchdog Structure
+/// Arm Generic Watchdog Structure
 ///
 typedef struct {
   UINT8   Type;
@@ -1425,14 +1425,14 @@ typedef struct {
   UINT64  WatchdogControlFramePhysicalAddress;
   UINT32  WatchdogTimerGSIV;
   UINT32  WatchdogTimerFlags;
-} EFI_ACPI_6_4_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE;
+} EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG_STRUCTURE;
 
 ///
-/// SBSA Generic Watchdog Timer Flags.  All other bits are reserved and must be 0.
+/// Arm Generic Watchdog Timer Flags.  All other bits are reserved and must be 0.
 ///
-#define EFI_ACPI_6_4_GTDT_SBSA_GENERIC_WATCHDOG_FLAG_TIMER_INTERRUPT_MODE          BIT0
-#define EFI_ACPI_6_4_GTDT_SBSA_GENERIC_WATCHDOG_FLAG_TIMER_INTERRUPT_POLARITY      BIT1
-#define EFI_ACPI_6_4_GTDT_SBSA_GENERIC_WATCHDOG_FLAG_SECURE_TIMER                  BIT2
+#define EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG_FLAG_TIMER_INTERRUPT_MODE          BIT0
+#define EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG_FLAG_TIMER_INTERRUPT_POLARITY      BIT1
+#define EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG_FLAG_SECURE_TIMER                  BIT2
 
 //
 // NVDIMM Firmware Interface Table definition.
