@@ -34,6 +34,13 @@
   Platform.c
   Platform.h
 
+[Sources.IA32, Sources.EBC]
+  IntelTdxNull.c
+
+[Sources.X64]
+  IntelTdx.c
+  X64/ApRunLoop.nasm
+
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
@@ -44,6 +51,7 @@
 
 [Guids]
   gEfiMemoryTypeInformationGuid
+  gUefiOvmfPkgTdxPlatformGuid
 
 [LibraryClasses]
   BaseLib
@@ -62,6 +70,10 @@
   MtrrLib
   MemEncryptSevLib
   PcdLib
+  TdxProbeLib
+  TdxMailboxLib
+  TdxLib
+  MemoryAllocationLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
@@ -106,6 +118,8 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled
+  gUefiCpuPkgTokenSpaceGuid.PcdTdxIsEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress

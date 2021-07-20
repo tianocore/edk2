@@ -10,6 +10,7 @@
 #define _PLATFORM_PEI_H_INCLUDED_
 
 #include <IndustryStandard/E820.h>
+#include <IndustryStandard/IntelTdx.h>
 
 VOID
 AddIoMemoryBaseSizeHob (
@@ -99,6 +100,22 @@ InstallClearCacheCallback (
 
 VOID
 AmdSevInitialize (
+  VOID
+  );
+
+VOID
+TdxPublishRamRegions (
+  VOID
+  );
+
+VOID
+AsmGetRelocationMap (
+  OUT MP_RELOCATION_MAP    *AddressMap
+  );
+
+
+VOID
+IntelTdxInitialize (
   VOID
   );
 
