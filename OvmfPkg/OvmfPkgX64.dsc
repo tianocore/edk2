@@ -577,6 +577,10 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x100
 
   #
+  # TDX need 1G PageTable support
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
+
+  #
   # Network Pcds
   #
 !include NetworkPkg/NetworkPcds.dsc.inc
