@@ -75,6 +75,7 @@
   DebugAgentLib
   PeiServicesTablePointerLib
   PerformanceLib
+  TdxProbeLib
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ArmMmuLib
