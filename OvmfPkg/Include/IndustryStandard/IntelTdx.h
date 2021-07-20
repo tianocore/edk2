@@ -62,6 +62,16 @@ typedef struct {
   UINT8             *RelocateApLoopFuncAddress;
   UINTN             RelocateApLoopFuncSize;
 } MP_RELOCATION_MAP;
+
+typedef struct {
+  ///
+  EFI_HOB_GUID_TYPE       GuidHeader;
+  UINT64                  RelocatedMailBox;
+  UINT16                  HostBridgePciDevId;
+  BOOLEAN                 SetNxForStack;
+  UINT8                   SystemStates[6];
+} EFI_HOB_PLATFORM_INFO;
+
 #pragma pack()
 
 #endif
