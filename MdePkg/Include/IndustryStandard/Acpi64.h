@@ -2329,6 +2329,7 @@ typedef struct {
 #define EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_2_HW_REDUCED_COMMUNICATIONS     0x02
 #define EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_3_EXTENDED_PCC                  0x03
 #define EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC                  0x04
+#define EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_5_HW_REGISTERS_COMMUNICATIONS   0x05
 
 ///
 /// PCC Subspace Structure Header
@@ -2467,6 +2468,34 @@ typedef struct {
   UINT32                                    Length;
   UINT32                                    Command;
 } EFI_ACPI_6_4_PCCT_EXTENDED_PCC_SHARED_MEMORY_REGION_HEADER;
+
+///
+/// Type 5 HW Registers based Communications Subspace Structure
+///
+typedef struct {
+  UINT8                                   Type;
+  UINT8                                   Length;
+  UINT16                                  Version;
+  UINT64                                  BaseAddress;
+  UINT64                                  SharedMemoryRangeLength;
+  EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  DoorbellRegister;
+  UINT64                                  DoorbellPreserve;
+  UINT64                                  DoorbellWrite;
+  EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  CommandCompleteCheckRegister;
+  UINT64                                  CommandCompleteCheckMask;
+  EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  ErrorStatusRegister;
+  UINT64                                  ErrorStatusMask;
+  UINT32                                  NominalLatency;
+  UINT32                                  MinimumRequestTurnaroundTime;
+} EFI_ACPI_6_4_PCCT_SUBSPACE_5_HW_REGISTERS_COMMUNICATIONS;
+
+///
+/// Reduced PCC Subspace Shared Memory Region
+///
+typedef struct {
+  UINT32      Signature;
+//UINT8       CommunicationSubspace[];
+} EFI_6_4_PCCT_REDUCED_PCC_SUBSPACE_SHARED_MEMORY_REGION;
 
 ///
 /// Platform Debug Trigger Table (PDTT)
