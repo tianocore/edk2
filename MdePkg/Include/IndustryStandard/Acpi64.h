@@ -1476,6 +1476,8 @@ typedef struct {
 //
 #define EFI_ACPI_6_4_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_FLAGS_CONTROL_REGION_FOR_MANAGEMENT      BIT0
 #define EFI_ACPI_6_4_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_FLAGS_PROXIMITY_DOMAIN_VALID             BIT1
+#define EFI_ACPI_6_4_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_FLAGS_SPA_LOCATION_COOKIE_VALID          BIT2
+
 #define EFI_ACPI_6_4_NFIT_GUID_VOLATILE_MEMORY_REGION                             { 0x7305944F, 0xFDDA, 0x44E3, { 0xB1, 0x6C, 0x3F, 0x22, 0xD2, 0x52, 0xE5, 0xD0 }}
 #define EFI_ACPI_6_4_NFIT_GUID_BYTE_ADDRESSABLE_PERSISTENT_MEMORY_REGION          { 0x66F0D379, 0xB4F3, 0x4074, { 0xAC, 0x43, 0x0D, 0x33, 0x18, 0xB7, 0x8C, 0xDB }}
 #define EFI_ACPI_6_4_NFIT_GUID_NVDIMM_CONTROL_REGION                              { 0x92F701F6, 0x13B4, 0x405D, { 0x91, 0x0B, 0x29, 0x93, 0x67, 0xE8, 0x23, 0x4C }}
@@ -1484,6 +1486,7 @@ typedef struct {
 #define EFI_ACPI_6_4_NFIT_GUID_RAM_DISK_SUPPORTING_VIRTUAL_CD_REGION_VOLATILE     { 0x3D5ABD30, 0x4175, 0x87CE, { 0x6D, 0x64, 0xD2, 0xAD, 0xE5, 0x23, 0xC4, 0xBB }}
 #define EFI_ACPI_6_4_NFIT_GUID_RAM_DISK_SUPPORTING_VIRTUAL_DISK_REGION_PERSISTENT { 0x5CEA02C9, 0x4D07, 0x69D3, { 0x26, 0x9F ,0x44, 0x96, 0xFB, 0xE0, 0x96, 0xF9 }}
 #define EFI_ACPI_6_4_NFIT_GUID_RAM_DISK_SUPPORTING_VIRTUAL_CD_REGION_PERSISTENT   { 0x08018188, 0x42CD, 0xBB48, { 0x10, 0x0F, 0x53, 0x87, 0xD5, 0x3D, 0xED, 0x3D }}
+
 typedef struct {
   UINT16                                      Type;
   UINT16                                      Length;
@@ -1495,6 +1498,7 @@ typedef struct {
   UINT64                                      SystemPhysicalAddressRangeBase;
   UINT64                                      SystemPhysicalAddressRangeLength;
   UINT64                                      AddressRangeMemoryMappingAttribute;
+  UINT64                                      SPALocationCookie;
 } EFI_ACPI_6_4_NFIT_SYSTEM_PHYSICAL_ADDRESS_RANGE_STRUCTURE;
 
 //
@@ -1516,6 +1520,7 @@ typedef struct {
 #define EFI_ACPI_6_4_NFIT_MEMORY_DEVICE_STATE_FLAGS_SMART_HEALTH_EVENTS_PRIOR_OSPM_HAND_OFF                 BIT4
 #define EFI_ACPI_6_4_NFIT_MEMORY_DEVICE_STATE_FLAGS_FIRMWARE_ENABLED_TO_NOTIFY_OSPM_ON_SMART_HEALTH_EVENTS  BIT5
 #define EFI_ACPI_6_4_NFIT_MEMORY_DEVICE_STATE_FLAGS_FIRMWARE_NOT_MAP_NVDIMM_TO_SPA                          BIT6
+
 typedef struct {
   UINT16                                      Type;
   UINT16                                      Length;
@@ -1562,6 +1567,7 @@ typedef struct {
 #define EFI_ACPI_6_4_NFIT_NVDIMM_CONTROL_REGION_VALID_FIELDS_MANUFACTURING           BIT0
 
 #define EFI_ACPI_6_4_NFIT_NVDIMM_CONTROL_REGION_FLAGS_BLOCK_DATA_WINDOWS_BUFFERED    BIT0
+
 typedef struct {
   UINT16                                      Type;
   UINT16                                      Length;
