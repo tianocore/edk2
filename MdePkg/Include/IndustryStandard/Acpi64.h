@@ -1661,15 +1661,16 @@ typedef struct {
 #define EFI_ACPI_6_4_SECURE_DEVICES_TABLE_REVISION      0x01
 
 ///
-/// Secure Devcice types
+/// Secure Device types
 ///
-#define EFI_ACPI_6_4_SDEV_TYPE_PCIE_ENDPOINT_DEVICE     0x01
 #define EFI_ACPI_6_4_SDEV_TYPE_ACPI_NAMESPACE_DEVICE    0x00
+#define EFI_ACPI_6_4_SDEV_TYPE_PCIE_ENDPOINT_DEVICE     0x01
 
 ///
-/// Secure Devcice flags
+/// Secure Device flags
 ///
-#define EFI_ACPI_6_4_SDEV_FLAG_ALLOW_HANDOFF            BIT0
+#define EFI_ACPI_6_4_SDEV_FLAG_ALLOW_HANDOFF                      BIT0
+#define EFI_ACPI_6_4_SDEV_FLAG_SECURE_ACCESS_COMPONENTS_PRESENT   BIT1
 
 ///
 /// SDEV Structure Header
@@ -1681,32 +1682,63 @@ typedef struct {
 } EFI_ACPI_6_4_SDEV_STRUCTURE_HEADER;
 
 ///
-/// PCIe Endpoint Device based Secure Device Structure
-///
-typedef struct {
-  UINT8                         Type;
-  UINT8                         Flags;
-  UINT16                        Length;
-  UINT16                        PciSegmentNumber;
-  UINT16                        StartBusNumber;
-  UINT16                        PciPathOffset;
-  UINT16                        PciPathLength;
-  UINT16                        VendorSpecificDataOffset;
-  UINT16                        VendorSpecificDataLength;
-} EFI_ACPI_6_4_SDEV_STRUCTURE_PCIE_ENDPOINT_DEVICE;
-
-///
 /// ACPI_NAMESPACE_DEVICE based Secure Device Structure
 ///
 typedef struct {
-  UINT8                         Type;
-  UINT8                         Flags;
-  UINT16                        Length;
-  UINT16                        DeviceIdentifierOffset;
-  UINT16                        DeviceIdentifierLength;
-  UINT16                        VendorSpecificDataOffset;
-  UINT16                        VendorSpecificDataLength;
+  EFI_ACPI_6_4_SDEV_STRUCTURE_HEADER  Header;
+  UINT16                              DeviceIdentifierOffset;
+  UINT16                              DeviceIdentifierLength;
+  UINT16                              VendorSpecificDataOffset;
+  UINT16                              VendorSpecificDataLength;
+  UINT16                              SecureAccessComponentsOffset;
+  UINT16                              SecureAccessComponentsLength;
 } EFI_ACPI_6_4_SDEV_STRUCTURE_ACPI_NAMESPACE_DEVICE;
+
+///
+/// Secure Access Component Types
+///
+#define EFI_ACPI_6_4_SDEV_SECURE_ACCESS_COMPONENT_TYPE_IDENTIFICATION   0x00
+#define EFI_ACPI_6_4_SDEV_SECURE_ACCESS_COMPONENT_TYPE_MEMORY           0x01
+
+///
+/// Identification Based Secure Access Component
+///
+typedef struct {
+  EFI_ACPI_6_4_SDEV_STRUCTURE_HEADER  Header;
+  UINT16                              HardwareIdentifierOffset;
+  UINT16                              HardwareIdentifierLength;
+  UINT16                              SubsystemIdentifierOffset;
+  UINT16                              SubsystemIdentifierLength;
+  UINT16                              HardwareRevision;
+  UINT8                               HardwareRevisionPresent;
+  UINT8                               ClassCodePresent;
+  UINT8                               PciCompatibleBaseClass;
+  UINT8                               PciCompatibleSubClass;
+  UINT8                               PciCompatibleProgrammingInterface;
+} EFI_ACPI_6_4_SDEV_SECURE_ACCESS_COMPONENT_IDENTIFICATION_STRUCTURE;
+
+///
+/// Memory-based Secure Access Component
+///
+typedef struct {
+  EFI_ACPI_6_4_SDEV_STRUCTURE_HEADER  Header;
+  UINT32                              Reserved;
+  UINT64                              MemoryAddressBase;
+  UINT64                              MemoryLength;
+} EFI_ACPI_6_4_SDEV_SECURE_ACCESS_COMPONENT_MEMORY_STRUCTURE;
+
+///
+/// PCIe Endpoint Device based Secure Device Structure
+///
+typedef struct {
+  EFI_ACPI_6_4_SDEV_STRUCTURE_HEADER  Header;
+  UINT16                              PciSegmentNumber;
+  UINT16                              StartBusNumber;
+  UINT16                              PciPathOffset;
+  UINT16                              PciPathLength;
+  UINT16                              VendorSpecificDataOffset;
+  UINT16                              VendorSpecificDataLength;
+} EFI_ACPI_6_4_SDEV_STRUCTURE_PCIE_ENDPOINT_DEVICE;
 
 ///
 /// Boot Error Record Table (BERT)
