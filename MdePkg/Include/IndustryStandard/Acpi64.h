@@ -2844,11 +2844,6 @@ typedef struct {
 #define EFI_ACPI_6_4_DMA_REMAPPING_TABLE_SIGNATURE  SIGNATURE_32('D', 'M', 'A', 'R')
 
 ///
-/// "DPPT" DMA Protection Policy Table
-///
-#define EFI_ACPI_6_4_DMA_PROTECTION_POLICY_TABLE_SIGNATURE  SIGNATURE_32('D', 'P', 'P', 'T')
-
-///
 /// "DRTM" Dynamic Root of Trust for Measurement Table
 ///
 #define EFI_ACPI_6_4_DYNAMIC_ROOT_OF_TRUST_FOR_MEASUREMENT_TABLE_SIGNATURE  SIGNATURE_32('D', 'R', 'T', 'M')
