@@ -2603,7 +2603,7 @@ typedef struct {
 ///
 /// PPTT Revision (as defined in ACPI 6.4 spec.)
 ///
-#define EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_REVISION 0x02
+#define EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_REVISION 0x03
 
 ///
 /// PPTT types
@@ -2689,7 +2689,8 @@ typedef struct {
   UINT32                        CacheTypeValid:1;
   UINT32                        WritePolicyValid:1;
   UINT32                        LineSizeValid:1;
-  UINT32                        Reserved:25;
+  UINT32                        CacheIdValid:1;
+  UINT32                        Reserved:24;
 } EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE_FLAGS;
 
 ///
@@ -2728,6 +2729,7 @@ typedef struct {
   UINT8                                         Associativity;
   EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE_ATTRIBUTES  Attributes;
   UINT16                                        LineSize;
+  UINT32                                        CacheId;
 } EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE;
 
 ///
