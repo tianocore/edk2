@@ -302,7 +302,7 @@ typedef struct {
 
 //
 // Multiple APIC Description Table APIC structure types
-// All other values between 0x0D and 0x7F are reserved and
+// All other values between 0x10 and 0x7F are reserved and
 // will be ignored by OSPM. 0x80 ~ 0xFF are reserved for OEM.
 //
 #define EFI_ACPI_6_4_PROCESSOR_LOCAL_APIC           0x00
@@ -321,6 +321,7 @@ typedef struct {
 #define EFI_ACPI_6_4_GIC_MSI_FRAME                  0x0D
 #define EFI_ACPI_6_4_GICR                           0x0E
 #define EFI_ACPI_6_4_GIC_ITS                        0x0F
+#define EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP          0x10
 
 //
 // APIC Structure Definitions
@@ -588,6 +589,32 @@ typedef struct {
   UINT64  PhysicalBaseAddress;
   UINT32  Reserved2;
 } EFI_ACPI_6_4_GIC_ITS_STRUCTURE;
+
+///
+/// Multiprocessor Wakeup Structure
+///
+typedef struct {
+  UINT8   Type;
+  UINT8   Length;
+  UINT16  MailBoxVersion;
+  UINT32  Reserved;
+  UINT64  MailBoxAddress;
+} EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_STRUCTURE;
+
+///
+/// Multiprocessor Wakeup Mailbox Structure
+///
+typedef struct {
+  UINT16  Command;
+  UINT16  Reserved;
+  UINT32  AcpiId;
+  UINT64  WakeupVector;
+  UINT8   ReservedForOs[2032];
+  UINT8   ReservedForFirmware[2048];
+} EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_MAILBOX_STRUCTURE;
+
+#define EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_MAILBOX_COMMAND_NOOP     0x0000
+#define EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_MAILBOX_COMMAND_WAKEUP   0x0001
 
 ///
 /// Smart Battery Description Table (SBST)
