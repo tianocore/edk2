@@ -783,7 +783,8 @@ typedef struct {
 /// Generic Initiator Affinity Structure Flags. All other bits are reserved
 /// and must be 0.
 ///
-#define EFI_ACPI_6_4_GENERIC_INITIATOR_AFFINITY_STRUCTURE_ENABLED (1 << 0)
+#define EFI_ACPI_6_4_GENERIC_INITIATOR_AFFINITY_STRUCTURE_ENABLED                     BIT0
+#define EFI_ACPI_6_4_GENERIC_INITIATOR_AFFINITY_STRUCTURE_ARCHITECTURAL_TRANSACTIONS  BIT1
 
 ///
 /// System Locality Distance Information Table (SLIT).
@@ -2079,7 +2080,8 @@ typedef struct {
 ///
 typedef struct {
   UINT8                         MemoryHierarchy:4;
-  UINT8                         Reserved:4;
+  UINT8                         AccessAttributes:2;
+  UINT8                         Reserved:2;
 } EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO_FLAGS;
 
 ///
@@ -2091,7 +2093,8 @@ typedef struct {
   UINT32                                                                        Length;
   EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO_FLAGS  Flags;
   UINT8                                                                         DataType;
-  UINT8                                                                         Reserved1[2];
+  UINT8                                                                         MinTransferSize;
+  UINT8                                                                         Reserved1;
   UINT32                                                                        NumberOfInitiatorProximityDomains;
   UINT32                                                                        NumberOfTargetProximityDomains;
   UINT8                                                                         Reserved2[4];
