@@ -2713,6 +2713,80 @@ typedef struct {
   UINT16                        SpinRev;
 } EFI_ACPI_6_4_PPTT_STRUCTURE_ID;
 
+///
+/// Platform Health Assessment Table (PHAT) Format
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER   Header;
+//UINT8                         PlatformTelemetryRecords[];
+} EFI_ACPI_6_4_PLATFORM_HEALTH_ASSESSMENT_TABLE;
+
+#define EFI_ACPI_6_4_PLATFORM_HEALTH_ASSESSMENT_TABLE_REVISION 0x01
+
+///
+/// PHAT Record Format
+///
+typedef struct {
+  UINT16  PlatformHealthAssessmentRecordType;
+  UINT16  RecordLength;
+  UINT8   Revision;
+//UINT8   Data[];
+} EFI_ACPI_6_4_PHAT_RECORD;
+
+///
+/// PHAT Record Type Format
+///
+#define EFI_ACPI_6_4_PHAT_RECORD_TYPE_FIRMWARE_VERSION_DATA_RECORD  0x0000
+#define EFI_ACPI_6_4_PHAT_RECORD_TYPE_FIRMWARE_HEALTH_DATA_RECORD   0x0001
+
+///
+/// PHAT Version Element
+///
+typedef struct {
+  GUID    ComponentId;
+  UINT64  VersionValue;
+  UINT32  ProducerId;
+} EFI_ACPI_6_4_PHAT_VERSION_ELEMENT;
+
+///
+/// PHAT Firmware Version Data Record
+///
+typedef struct {
+  UINT16  PlatformRecordType;
+  UINT16  RecordLength;
+  UINT8   Revision;
+  UINT8   Reserved[3];
+  UINT32  RecordCount;
+//UINT8   PhatVersionElement[];
+} EFI_ACPI_6_4_PHAT_FIRMWARE_VERISON_DATA_RECORD;
+
+#define EFI_ACPI_6_4_PHAT_FIRMWARE_VERSION_DATA_RECORD_REVISION   0x01
+
+///
+/// Firmware Health Data Record Structure
+///
+typedef struct {
+  UINT16  PlatformRecordType;
+  UINT16  RecordLength;
+  UINT8   Revision;
+  UINT16  Reserved;
+  UINT8   AmHealthy;
+  GUID    DeviceSignature;
+  UINT32  DeviceSpecificDataOffset;
+//UINT8   DevicePath[];
+//UINT8   DeviceSpecificData[];
+} EFI_ACPI_6_4_PHAT_FIRMWARE_HEALTH_DATA_RECORD_STRUCTURE;
+
+#define EFI_ACPI_6_4_PHAT_FIRMWARE_HEALTH_DATA_RECORD_REVISION  0x01
+
+///
+/// Firmware Health Data Record device health state
+///
+#define EFI_ACPI_6_4_PHAT_FIRMWARE_HEALTH_DATA_RECORD_ERRORS_FOUND      0x00
+#define EFI_ACPI_6_4_PHAT_FIRMWARE_HEALTH_DATA_RECORD_NO_ERRORS_FOUND   0x01
+#define EFI_ACPI_6_4_PHAT_FIRMWARE_HEALTH_DATA_RECORD_UNKNOWN           0x02
+#define EFI_ACPI_6_4_PHAT_FIRMWARE_HEALTH_DATA_RECORD_ADVISORY          0x03
+
 //
 // Known table signatures
 //
@@ -2956,6 +3030,11 @@ typedef struct {
 /// "PCCT" Platform Communications Channel Table
 ///
 #define EFI_ACPI_6_4_PLATFORM_COMMUNICATIONS_CHANNEL_TABLE_SIGNATURE  SIGNATURE_32('P', 'C', 'C', 'T')
+
+///
+/// "PHAT" Platform Health Assessment Table
+///
+#define EFI_ACPI_6_4_PLATFORM_HEALTH_ASSESSMENT_TABLE_SIGNATURE SIGNATURE_32('P', 'H', 'A', 'T')
 
 ///
 /// "SDEI" Software Delegated Exceptions Interface Table
