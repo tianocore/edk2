@@ -59,7 +59,8 @@
             "Lfnbuffer",
             "FFFFFFFFL",
             "CDVOL",
-            "DMDEPKG"
+            "DMDEPKG",
+            "lba's"
         ]
     }
 }
