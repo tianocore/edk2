@@ -420,6 +420,7 @@ OvmfPkg
 F: OvmfPkg/
 W: http://www.tianocore.org/ovmf/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
+M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Jordan Justen <jordan.l.justen@intel.com> [jljusten]
 S: Maintained
 
