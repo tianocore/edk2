@@ -1,0 +1,29 @@
+// *++
+//
+//  Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
+//  Copyright (c) 2021, Semihalf All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//  Module Name:
+//
+//   BootDiscoveryPolicyUiLibStrings.uni
+//
+//  Abstract:
+//
+//    String definitions for Boot Discovery Policy UI.
+//
+// --*/
+
+/=#
+
+
+#langdef en-US "English"
+
+#string STR_FORM_BDP_MAIN_TITLE        #language en-US  "Boot Discovery Policy"
+
+#string STR_FORM_BDP_CONN_MIN          #language en-US  "Minimal"
+
+#string STR_FORM_BDP_CONN_NET          #language en-US  "Connect Network Devices"
+
+#string STR_FORM_BDP_CONN_ALL          #language en-US  "Connect All Devices"
+
