@@ -16,6 +16,7 @@
 
   Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -116,6 +117,7 @@ RngGetRNG (
 
   @retval EFI_SUCCESS                 The RNG algorithm list was returned successfully.
   @retval EFI_BUFFER_TOO_SMALL        The buffer RNGAlgorithmList is too small to hold the result.
+  @retval EFI_INVALID_PARAMETER       The pointer to the buffer RNGAlgorithmList is invalid.
 
 **/
 UINTN
@@ -133,6 +135,10 @@ ArchGetSupportedRngAlgorithms (
   if (*RNGAlgorithmListSize < RequiredSize) {
     *RNGAlgorithmListSize = RequiredSize;
     return EFI_BUFFER_TOO_SMALL;
+  }
+
+  if (RNGAlgorithmList == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
   CpuRngSupportedAlgorithm = PcdGetPtr (PcdCpuRngSupportedAlgorithm);

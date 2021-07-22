@@ -14,6 +14,7 @@
 
 Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -59,8 +60,6 @@ RngGetInfo (
   OUT EFI_RNG_ALGORITHM           *RNGAlgorithmList
   )
 {
-  EFI_STATUS    Status;
-
   if ((This == NULL) || (RNGAlgorithmListSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -68,13 +67,7 @@ RngGetInfo (
   //
   // Return algorithm list supported by driver.
   //
-  if (RNGAlgorithmList != NULL) {
-    Status = ArchGetSupportedRngAlgorithms (RNGAlgorithmListSize, RNGAlgorithmList);
-  } else {
-    Status = EFI_INVALID_PARAMETER;
-  }
-
-  return Status;
+  return ArchGetSupportedRngAlgorithms (RNGAlgorithmListSize, RNGAlgorithmList);
 }
 
 //
