@@ -1,7 +1,7 @@
 ## @file
 #  Automate the process of building the various reset vector types
 #
-#  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -33,7 +33,7 @@ for arch in ('ia32', 'x64'):
             'Vtf0.nasmb',
             )
         ret = RunCommand(commandLine)
-        print '\tASM\t' + output
+        print('\tASM\t' + output)
         if ret != 0: sys.exit(ret)
 
         commandLine = (
@@ -41,7 +41,7 @@ for arch in ('ia32', 'x64'):
             'Tools/FixupForRawSection.py',
             output,
             )
-        print '\tFIXUP\t' + output
+        print('\tFIXUP\t' + output)
         ret = RunCommand(commandLine)
         if ret != 0: sys.exit(ret)
 
