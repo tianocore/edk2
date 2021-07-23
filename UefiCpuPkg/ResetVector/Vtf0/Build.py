@@ -32,9 +32,12 @@ for arch in ('ia32', 'x64'):
             '-o', output,
             'Vtf0.nasmb',
             )
+        print(f"Command : {' '.join(commandLine)}")
         ret = RunCommand(commandLine)
+        if ret != 0:
+            print(f"something went wrong while executing {commandLine[-1]}")
+            sys.exit()
         print('\tASM\t' + output)
-        if ret != 0: sys.exit(ret)
 
         commandLine = (
             'python',
