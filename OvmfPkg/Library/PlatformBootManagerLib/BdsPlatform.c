@@ -1517,14 +1517,14 @@ PlatformBootManagerAfterConsole (
   Tcg2PhysicalPresenceLibProcessRequest (NULL);
 
   //
-  // Process QEMU's -kernel command line option
-  //
-  TryRunningQemuKernel ();
-
-  //
   // Perform some platform specific connect sequence
   //
   PlatformBdsConnectSequence ();
+
+  //
+  // Process QEMU's -kernel command line option
+  //
+  TryRunningQemuKernel ();
 
   EfiBootManagerRefreshAllBootOption ();
 
