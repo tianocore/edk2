@@ -118,6 +118,9 @@
   %define TDX_WORK_AREA_PGTBL_READY     (TDX_WORK_AREA + 5)
   %define TDX_WORK_AREA_INITVP          (TDX_WORK_AREA + 8)
   %define TDX_WORK_AREA_INFO            (TDX_WORK_AREA + 8 + 4)
+
+  %define TDX_PT_ADDR(Offset)  (TDX_EXTRA_PAGE_TABLE_BASE + (Offset))
+
   %define PT_ADDR(Offset) (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
 
   %define GHCB_PT_ADDR (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
