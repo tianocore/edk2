@@ -106,6 +106,18 @@
   %define TDX_EXTRA_PAGE_TABLE_BASE FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase)
   %define TDX_EXTRA_PAGE_TABLE_SIZE FixedPcdGet32 (PcdOvmfSecGhcbPageTableSize)
 
+  ;
+  ; TdMailboxBase [0x10, 0x800] is reserved for OS.
+  ; Td guest initialize piece of this area (TdMailboxBase [0x10,0x20]) to
+  ; record the Td guest info so that this information can be used in the
+  ; following ResetVector flow.
+  ;
+  %define TD_MAILBOX_WORKAREA_OFFSET    0x10
+  %define TDX_WORK_AREA                 (TDX_MAILBOX_MEMORY_BASE + TD_MAILBOX_WORKAREA_OFFSET)
+  %define TDX_WORK_AREA_PAGELEVEL5      (TDX_WORK_AREA + 4)
+  %define TDX_WORK_AREA_PGTBL_READY     (TDX_WORK_AREA + 5)
+  %define TDX_WORK_AREA_INITVP          (TDX_WORK_AREA + 8)
+  %define TDX_WORK_AREA_INFO            (TDX_WORK_AREA + 8 + 4)
   %define PT_ADDR(Offset) (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
 
   %define GHCB_PT_ADDR (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
