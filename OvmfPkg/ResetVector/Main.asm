@@ -36,6 +36,20 @@ Main16:
 
 BITS    32
 
+%ifdef ARCH_X64
+
+    jmp SearchBfv
+
+;
+; Entry point of Main32
+;
+Main32:
+
+    OneTimeCall Init32
+
+%endif
+
+SearchBfv:
     ;
     ; Search for the Boot Firmware Volume (BFV)
     ;
