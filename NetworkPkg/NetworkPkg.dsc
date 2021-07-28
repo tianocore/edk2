@@ -87,6 +87,9 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2f
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
 
+[PcdsDynamicDefault]
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout|5000
+
 ###################################################################################################
 #
 # Components Section - list of the modules and components that will be processed by compilation
