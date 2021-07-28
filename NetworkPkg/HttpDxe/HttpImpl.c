@@ -527,6 +527,7 @@ EfiHttpRequest (
       } else {
         Status = HttpDns6 (HttpInstance, HostNameStr, &HttpInstance->RemoteIpv6Addr);
       }
+      HttpNotify (HttpEventDns, Status);
 
       FreePool (HostNameStr);
       if (EFI_ERROR (Status)) {
@@ -588,6 +589,7 @@ EfiHttpRequest (
              Configure || ReConfigure,
              TlsConfigure
              );
+  HttpNotify (HttpEventInitSession, Status);
   if (EFI_ERROR (Status)) {
     goto Error2;
   }

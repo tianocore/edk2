@@ -1,7 +1,7 @@
 /** @file
   The header files of the driver binding and service binding protocol for HttpDxe driver.
 
-  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -47,6 +47,7 @@
 #include <Protocol/Ip6Config.h>
 #include <Protocol/Tls.h>
 #include <Protocol/TlsConfig.h>
+#include <Protocol/HttpCallback.h>
 
 #include <Guid/ImageAuthentication.h>
 //

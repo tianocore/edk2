@@ -65,6 +65,7 @@
   gEfiTlsServiceBindingProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiTlsProtocolGuid                              ## SOMETIMES_CONSUMES
   gEfiTlsConfigurationProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEdkiiHttpCallbackProtocolGuid                   ## SOMETIMES_CONSUMES
 
 [Guids]
   gEfiTlsCaCertificateGuid                         ## SOMETIMES_CONSUMES  ## Variable:L"TlsCaCertificate"
