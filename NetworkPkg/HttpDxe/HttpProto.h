@@ -1,7 +1,7 @@
 /** @file
   The header files of miscellaneous routines for HttpDxe driver.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -41,7 +41,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define HTTP_BUFFER_SIZE_DEAULT      65535
 #define HTTP_MAX_SYN_BACK_LOG        5
 #define HTTP_CONNECTION_TIMEOUT      60
-#define HTTP_RESPONSE_TIMEOUT        5
 #define HTTP_DATA_RETRIES            12
 #define HTTP_FIN_TIMEOUT             2
 #define HTTP_KEEP_ALIVE_PROBES       6
