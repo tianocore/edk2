@@ -148,14 +148,14 @@ def splitFile(inputfile, position, outputdir=None, outputfile1=None, outputfile2
 
     if position <= 0:
         if outputfile2 != os.path.abspath(inputfile):
-            shutil.copy2(os.path.abspath(inputfile), outputfile2)
+            shutil.copyfile(os.path.abspath(inputfile), outputfile2)
         with open(outputfile1, "wb") as fout:
             fout.write(b'')
     else:
         inputfilesize = getFileSize(inputfile)
         if position >= inputfilesize:
             if outputfile1 != os.path.abspath(inputfile):
-                shutil.copy2(os.path.abspath(inputfile), outputfile1)
+                shutil.copyfile(os.path.abspath(inputfile), outputfile1)
             with open(outputfile2, "wb") as fout:
                 fout.write(b'')
         else:
@@ -171,8 +171,8 @@ def splitFile(inputfile, position, outputdir=None, outputfile1=None, outputfile2
                     content2 = fin.read(inputfilesize - position)
                     with open(tempfile2, "wb") as fout2:
                         fout2.write(content2)
-                shutil.copy2(tempfile1, outputfile1)
-                shutil.copy2(tempfile2, outputfile2)
+                shutil.copyfile(tempfile1, outputfile1)
+                shutil.copyfile(tempfile2, outputfile2)
             except Exception as e:
                 logger.error("Split file failed")
                 raise(e)
