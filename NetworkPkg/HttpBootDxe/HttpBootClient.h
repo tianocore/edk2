@@ -1,7 +1,7 @@
 /** @file
   Declaration of the boot file download function.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,12 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __EFI_HTTP_BOOT_HTTP_H__
 #define __EFI_HTTP_BOOT_HTTP_H__
 
-#define HTTP_BOOT_REQUEST_TIMEOUT            5000      // 5 seconds in uints of millisecond.
-#define HTTP_BOOT_RESPONSE_TIMEOUT           5000      // 5 seconds in uints of millisecond.
 #define HTTP_BOOT_BLOCK_SIZE                 1500
-
-
-
 #define HTTP_USER_AGENT_EFI_HTTP_BOOT        "UefiHttpBoot/1.0"
 
 //
