@@ -97,10 +97,6 @@
   # @Prompt Max size of total HTTP chunk transfer. the default value is 12MB.
   gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpChunkTransfer|0x0C00000|UINT32|0x0000000E
 
-  ## The Timeout value of HTTP IO.
-  # @Prompt The Timeout value of HTTP Io. Default value is 5000.
-  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout|5000|UINT32|0x0000000F
-
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Indicates whether HTTP connections (i.e., unsecured) are permitted or not.
   # TRUE  - HTTP connections are allowed. Both the "https://" and "http://" URI schemes are permitted.
@@ -159,6 +155,10 @@
   # 0x01 = PXE Enabled
   # 0x00 = PXE Disabled
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01|UINT8|0x1000000a
+
+  ## The Timeout value of HTTP IO.
+  # @Prompt The Timeout value of HTTP Io. Default value is 5000.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout|5000|UINT32|0x0000000F
 
 [UserExtensions.TianoCore."ExtraFiles"]
   NetworkPkgExtra.uni

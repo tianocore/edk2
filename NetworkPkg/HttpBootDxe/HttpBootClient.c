@@ -1,7 +1,7 @@
 /** @file
   Implementation of the boot file download function.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -596,19 +596,25 @@ HttpBootCreateHttpIo (
   HTTP_IO_CONFIG_DATA          ConfigData;
   EFI_STATUS                   Status;
   EFI_HANDLE                   ImageHandle;
+  UINT32                       TimeoutValue;
 
   ASSERT (Private != NULL);
+
+  //
+  // Get HTTP timeout value
+  //
+  TimeoutValue = PcdGet32 (PcdHttpIoTimeout);
 
   ZeroMem (&ConfigData, sizeof (HTTP_IO_CONFIG_DATA));
   if (!Private->UsingIpv6) {
     ConfigData.Config4.HttpVersion    = HttpVersion11;
-    ConfigData.Config4.RequestTimeOut = HTTP_BOOT_REQUEST_TIMEOUT;
+    ConfigData.Config4.RequestTimeOut = TimeoutValue;
     IP4_COPY_ADDRESS (&ConfigData.Config4.LocalIp, &Private->StationIp.v4);
     IP4_COPY_ADDRESS (&ConfigData.Config4.SubnetMask, &Private->SubnetMask.v4);
     ImageHandle = Private->Ip4Nic->ImageHandle;
   } else {
     ConfigData.Config6.HttpVersion    = HttpVersion11;
-    ConfigData.Config6.RequestTimeOut = HTTP_BOOT_REQUEST_TIMEOUT;
+    ConfigData.Config6.RequestTimeOut = TimeoutValue;
     IP6_COPY_ADDRESS (&ConfigData.Config6.LocalIp, &Private->StationIp.v6);
     ImageHandle = Private->Ip6Nic->ImageHandle;
   }
