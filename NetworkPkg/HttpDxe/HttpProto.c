@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines for HttpDxe driver.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -966,6 +966,7 @@ HttpCreateConnection (
     HttpInstance->IsTcp4ConnDone = FALSE;
     HttpInstance->Tcp4ConnToken.CompletionToken.Status = EFI_NOT_READY;
     Status = HttpInstance->Tcp4->Connect (HttpInstance->Tcp4, &HttpInstance->Tcp4ConnToken);
+    HttpNotify (HttpEventConnectTcp, Status);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "HttpCreateConnection: Tcp4->Connect() = %r\n", Status));
       return Status;
@@ -981,6 +982,7 @@ HttpCreateConnection (
     HttpInstance->IsTcp6ConnDone = FALSE;
     HttpInstance->Tcp6ConnToken.CompletionToken.Status = EFI_NOT_READY;
     Status = HttpInstance->Tcp6->Connect (HttpInstance->Tcp6, &HttpInstance->Tcp6ConnToken);
+    HttpNotify (HttpEventConnectTcp, Status);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "HttpCreateConnection: Tcp6->Connect() = %r\n", Status));
       return Status;
@@ -1277,6 +1279,7 @@ HttpConnectTcp4 (
     }
 
     Status = TlsConnectSession (HttpInstance, HttpInstance->TimeoutEvent);
+    HttpNotify (HttpEventTlsConnectSession, Status);
 
     gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
 
@@ -1369,6 +1372,7 @@ HttpConnectTcp6 (
     }
 
     Status = TlsConnectSession (HttpInstance, HttpInstance->TimeoutEvent);
+    HttpNotify (HttpEventTlsConnectSession, Status);
 
     gBS->SetTimer (HttpInstance->TimeoutEvent, TimerCancel, 0);
 
@@ -2194,4 +2198,56 @@ HttpTcpTokenCleanup (
     }
   }
 
+}
+
+/**
+  Send Events via EDKII_HTTP_CALLBACK_PROTOCOL.
+
+  @param[in]  Event               The event that occurs in the current state.
+  @param[in]  EventStatus         The Status of Event, EFI_SUCCESS or other errors.
+
+**/
+VOID
+HttpNotify (
+  IN  EDKII_HTTP_CALLBACK_EVENT         Event,
+  IN  EFI_STATUS                        EventStatus
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_HANDLE                      *Handles;
+  UINTN                           Index;
+  UINTN                           HandleCount;
+  EFI_HANDLE                      Handle;
+  EDKII_HTTP_CALLBACK_PROTOCOL    *HttpCallback;
+
+  DEBUG ((DEBUG_INFO, "HttpNotify: Event - %d, EventStatus - %r\n", Event, EventStatus));
+
+  Handles = NULL;
+  HandleCount = 0;
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEdkiiHttpCallbackProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &Handles
+                  );
+  if (Status == EFI_SUCCESS) {
+    for (Index = 0; Index < HandleCount; Index++) {
+      Handle = Handles[Index];
+      Status = gBS->HandleProtocol (
+                      Handle,
+                      &gEdkiiHttpCallbackProtocolGuid,
+                      (VOID **) &HttpCallback
+                      );
+      if (Status == EFI_SUCCESS) {
+        DEBUG ((DEBUG_INFO, "HttpNotify: Notifying %p\n", HttpCallback));
+        HttpCallback->Callback (
+                HttpCallback,
+                Event,
+                EventStatus
+                );
+      }
+    }
+    FreePool (Handles);
+  }
 }
