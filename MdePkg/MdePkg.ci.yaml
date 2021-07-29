@@ -3,6 +3,7 @@
 #
 # Copyright (c) Microsoft Corporation
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -19,6 +20,7 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            "Include/IndustryStandard/Acpi64.h"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
