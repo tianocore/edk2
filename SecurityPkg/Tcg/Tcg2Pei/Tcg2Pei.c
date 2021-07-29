@@ -262,6 +262,7 @@ SyncPcrAllocationsAndPcrMask (
 {
   EFI_STATUS                        Status;
   EFI_TCG2_EVENT_ALGORITHM_BITMAP   TpmHashAlgorithmBitmap;
+  EFI_TCG2_EVENT_ALGORITHM_BITMAP   BiosHashAlgorithmBitmap;
   UINT32                            TpmActivePcrBanks;
   UINT32                            NewTpmActivePcrBanks;
   UINT32                            Tpm2PcrMask;
@@ -273,16 +274,27 @@ SyncPcrAllocationsAndPcrMask (
   // Determine the current TPM support and the Platform PCR mask.
   //
   Status = Tpm2GetCapabilitySupportedAndActivePcrs (&TpmHashAlgorithmBitmap, &TpmActivePcrBanks);
+
   ASSERT_EFI_ERROR (Status);
+  
+  DEBUG ((EFI_D_INFO, "Tpm2GetCapabilitySupportedAndActivePcrs - TpmHashAlgorithmBitmap: 0x%08x\n", TpmHashAlgorithmBitmap));
+  DEBUG ((EFI_D_INFO, "Tpm2GetCapabilitySupportedAndActivePcrs - TpmActivePcrBanks 0x%08x\n", TpmActivePcrBanks));
 
   Tpm2PcrMask = PcdGet32 (PcdTpm2HashMask);
   if (Tpm2PcrMask == 0) {
     //
     // if PcdTPm2HashMask is zero, use ActivePcr setting
     //
+    DEBUG ((EFI_D_VERBOSE, "Initializing PcdTpm2HashMask to TpmActivePcrBanks 0x%08x\n", TpmActivePcrBanks));
     PcdSet32S (PcdTpm2HashMask, TpmActivePcrBanks);
+    DEBUG ((EFI_D_VERBOSE, "Initializing Tpm2PcrMask to TpmActivePcrBanks 0x%08x\n", Tpm2PcrMask));
     Tpm2PcrMask = TpmActivePcrBanks;
   }
+  
+  BiosHashAlgorithmBitmap = PcdGet32 (PcdTcg2HashAlgorithmBitmap);
+  DEBUG ((EFI_D_INFO, "PcdTcg2HashAlgorithmBitmap 0x%08x\n", BiosHashAlgorithmBitmap));
+  DEBUG ((EFI_D_INFO, "Tpm2PcrMask 0x%08x\n", Tpm2PcrMask)); // Active PCR banks from TPM input
+  DEBUG ((EFI_D_INFO, "TpmActivePcrBanks & BiosHashAlgorithmBitmap = 0x%08x\n", NewTpmActivePcrBanks));
 
   //
   // Find the intersection of Pcd support and TPM support.
@@ -294,9 +306,12 @@ SyncPcrAllocationsAndPcrMask (
   // If there are active PCR banks that are not supported by the Platform mask,
   // update the TPM allocations and reboot the machine.
   //
-  if ((TpmActivePcrBanks & Tpm2PcrMask) != TpmActivePcrBanks) {
+  if (((TpmActivePcrBanks & Tpm2PcrMask) != TpmActivePcrBanks) ||
+      ((TpmActivePcrBanks & BiosHashAlgorithmBitmap) != TpmActivePcrBanks)) {
     NewTpmActivePcrBanks = TpmActivePcrBanks & Tpm2PcrMask;
+    NewTpmActivePcrBanks &= BiosHashAlgorithmBitmap;
 
+    DEBUG ((EFI_D_INFO, "NewTpmActivePcrBanks 0x%08x\n", NewTpmActivePcrBanks));
     DEBUG ((EFI_D_INFO, "%a - Reallocating PCR banks from 0x%X to 0x%X.\n", __FUNCTION__, TpmActivePcrBanks, NewTpmActivePcrBanks));
     if (NewTpmActivePcrBanks == 0) {
       DEBUG ((EFI_D_ERROR, "%a - No viable PCRs active! Please set a less restrictive value for PcdTpm2HashMask!\n", __FUNCTION__));
@@ -331,6 +346,7 @@ SyncPcrAllocationsAndPcrMask (
     }
 
     Status = PcdSet32S (PcdTpm2HashMask, NewTpm2PcrMask);
+    DEBUG ((EFI_D_INFO, "Setting PcdTpm2Hash Mask to 0x%08x\n", NewTpm2PcrMask));
     ASSERT_EFI_ERROR (Status);
   }
 }
