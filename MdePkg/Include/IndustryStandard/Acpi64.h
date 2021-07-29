@@ -788,22 +788,25 @@ typedef struct {
 } EFI_ACPI_6_4_DEVICE_HANDLE_PCI;
 
 ///
+/// Device Handle
+///
+typedef union {
+    EFI_ACPI_6_4_DEVICE_HANDLE_ACPI   Acpi;
+    EFI_ACPI_6_4_DEVICE_HANDLE_PCI    Pci;
+} EFI_ACPI_6_4_DEVICE_HANDLE;
+
+///
 /// Generic Initiator Affinity Structure
 ///
 typedef struct {
-  UINT8   Type;
-  UINT8   Length;
-  UINT8   Reserved1;
-  UINT8   DeviceHandleType;
-  UINT32  ProximityDomain;
-
-  union {
-    EFI_ACPI_6_4_DEVICE_HANDLE_ACPI   Acpi;
-    EFI_ACPI_6_4_DEVICE_HANDLE_PCI    Pci;
-  } DeviceHandle;
-
-  UINT32  Flags;
-  UINT8   Reserved2[4];
+  UINT8                       Type;
+  UINT8                       Length;
+  UINT8                       Reserved1;
+  UINT8                       DeviceHandleType;
+  UINT32                      ProximityDomain;
+  EFI_ACPI_6_4_DEVICE_HANDLE  DeviceHandle;
+  UINT32                      Flags;
+  UINT8                       Reserved2[4];
 } EFI_ACPI_6_4_GENERIC_INITIATOR_AFFINITY_STRUCTURE;
 
 ///
