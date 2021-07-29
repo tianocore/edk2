@@ -509,7 +509,7 @@ GetUpdateFileSystem (
     DevicePath = DuplicateDevicePath (MappedDevicePath);
     Status = GetEfiSysPartitionFromDevPath (DevicePath, &FullPath, Fs);
     if (EFI_ERROR (Status)) {
-      Print (L"Error: Cannot get EFI system partiion from '%s' - %r\n", Map, Status);
+      Print (L"Error: Cannot get EFI system partition from '%s' - %r\n", Map, Status);
       return EFI_NOT_FOUND;
     }
     Print (L"Warning: Cannot find Boot Option on '%s'!\n", Map);
