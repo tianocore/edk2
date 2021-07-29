@@ -502,18 +502,18 @@ typedef struct {
   UINT8   Type;
   UINT8   Length;
   UINT16  Reserved;
-  UINT32  CPUInterfaceNumber;
+  UINT32  CpuInterfaceNumber;
   UINT32  AcpiProcessorUid;
   UINT32  Flags;
   UINT32  ParkingProtocolVersion;
   UINT32  PerformanceInterruptGsiv;
   UINT64  ParkedAddress;
   UINT64  PhysicalBaseAddress;
-  UINT64  GICV;
-  UINT64  GICH;
-  UINT32  VGICMaintenanceInterrupt;
-  UINT64  GICRBaseAddress;
-  UINT64  MPIDR;
+  UINT64  GicV;
+  UINT64  GicH;
+  UINT32  VGicMaintenanceInterrupt;
+  UINT64  GicRBaseAddress;
+  UINT64  MpIdr;
   UINT8   ProcessorPowerEfficiencyClass;
   UINT8   Reserved2;
   UINT16  SpeOverflowInterrupt;
@@ -788,22 +788,25 @@ typedef struct {
 } EFI_ACPI_6_4_DEVICE_HANDLE_PCI;
 
 ///
+/// Device Handle
+///
+typedef union {
+    EFI_ACPI_6_4_DEVICE_HANDLE_ACPI   Acpi;
+    EFI_ACPI_6_4_DEVICE_HANDLE_PCI    Pci;
+} EFI_ACPI_6_4_DEVICE_HANDLE;
+
+///
 /// Generic Initiator Affinity Structure
 ///
 typedef struct {
-  UINT8   Type;
-  UINT8   Length;
-  UINT8   Reserved1;
-  UINT8   DeviceHandleType;
-  UINT32  ProximityDomain;
-
-  union {
-    EFI_ACPI_6_4_DEVICE_HANDLE_ACPI   Acpi;
-    EFI_ACPI_6_4_DEVICE_HANDLE_PCI    Pci;
-  } DeviceHandle;
-
-  UINT32  Flags;
-  UINT8   Reserved2[4];
+  UINT8                       Type;
+  UINT8                       Length;
+  UINT8                       Reserved1;
+  UINT8                       DeviceHandleType;
+  UINT32                      ProximityDomain;
+  EFI_ACPI_6_4_DEVICE_HANDLE  DeviceHandle;
+  UINT32                      Flags;
+  UINT8                       Reserved2[4];
 } EFI_ACPI_6_4_GENERIC_INITIATOR_AFFINITY_STRUCTURE;
 
 ///
