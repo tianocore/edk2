@@ -330,6 +330,19 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase|0x0|UINT32|0x47
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize|0x0|UINT32|0x48
 
+  ## The base address and size of the TDX Cfv base and size.
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase|0|UINT32|0x49
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataOffset|0|UINT32|0x4a
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize|0|UINT32|0x4b
+
+  ## The base address and size of the TDX Bfv base and size.
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase|0|UINT32|0x4c
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset|0|UINT32|0x4d
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize|0|UINT32|0x4e
+
+  ## Size of the Ovmf image in KB
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfImageSizeInKb|0|UINT32|0x4f
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
