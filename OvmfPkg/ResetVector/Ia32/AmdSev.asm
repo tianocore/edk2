@@ -128,13 +128,6 @@ SevEsUnexpectedRespTerminate:
 ; If SEV is disabled then EAX will be zero.
 ;
 CheckSevFeatures:
-    ; Set the first byte of the workarea to zero to communicate to the SEC
-    ; phase that SEV-ES is not enabled. If SEV-ES is enabled, the CPUID
-    ; instruction will trigger a #VC exception where the first byte of the
-    ; workarea will be set to one or, if CPUID is not being intercepted,
-    ; the MSR check below will set the first byte of the workarea to one.
-    mov     byte[SEV_ES_WORK_AREA], 0
-
     ;
     ; Set up exception handlers to check for SEV-ES
     ;   Load temporary RAM stack based on PCDs (see SevEsIdtVmmComm for
