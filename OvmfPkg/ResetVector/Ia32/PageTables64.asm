@@ -37,11 +37,81 @@ BITS    32
                        PAGE_READ_WRITE + \
                        PAGE_PRESENT)
 
+TdxBuildExtraPageTables:
+    ;
+    ; Extra page tables built by Tdx guests
+    ;
+    xor     eax, eax
+    mov     ecx, 0x400
+tdClearTdxPageTablesMemoryLoop:
+    mov     dword [ecx * 4 + TDX_PT_ADDR(0) - 4], eax
+    loop    tdClearTdxPageTablesMemoryLoop
+
+    ;
+    ; Top level Page Directory Pointers (1 * 256TB entry)
+    ;
+    mov     dword[TDX_PT_ADDR (0)], PT_ADDR(0) + PAGE_PDP_ATTR
+
+    ;
+    ; Set TDX_WORK_AREA_PGTBL_READY to notify APs to go
+    ;
+    mov     byte[TDX_WORK_AREA_PGTBL_READY], 1
+
+    OneTimeCallRet TdxBuildExtraPageTables
+
+SevBuildGhcbPageTables:
+    ;
+    ; The initial GHCB will live at GHCB_BASE and needs to be un-encrypted.
+    ; This requires the 2MB page for this range be broken down into 512 4KB
+    ; pages.  All will be marked encrypted, except for the GHCB.
+    ;
+    mov     ecx, (GHCB_BASE >> 21)
+    mov     eax, GHCB_PT_ADDR + PAGE_PDP_ATTR
+    mov     [ecx * 8 + PT_ADDR (0x2000)], eax
+
+    ;
+    ; Page Table Entries (512 * 4KB entries => 2MB)
+    ;
+    mov     ecx, 512
+pageTableEntries4kLoop:
+    mov     eax, ecx
+    dec     eax
+    shl     eax, 12
+    add     eax, GHCB_BASE & 0xFFE0_0000
+    add     eax, PAGE_4K_PDE_ATTR
+    mov     [ecx * 8 + GHCB_PT_ADDR - 8], eax
+    mov     [(ecx * 8 + GHCB_PT_ADDR - 8) + 4], edx
+    loop    pageTableEntries4kLoop
+
+    ;
+    ; Clear the encryption bit from the GHCB entry
+    ;
+    mov     ecx, (GHCB_BASE & 0x1F_FFFF) >> 12
+    mov     [ecx * 8 + GHCB_PT_ADDR + 4], strict dword 0
+
+    mov     ecx, GHCB_SIZE / 4
+    xor     eax, eax
+clearGhcbMemoryLoop:
+    mov     dword[ecx * 4 + GHCB_BASE - 4], eax
+    loop    clearGhcbMemoryLoop
+
+    OneTimeCallRet  SevBuildGhcbPageTables
+
 ;
 ; Modified:  EAX, EBX, ECX, EDX
 ;
 SetCr3ForPageTables64:
 
+    cmp     byte[CC_WORK_AREA], VM_GUEST_TDX
+    jne     CheckSev
+
+    cmp     byte[TDX_WORK_AREA_PGTBL_READY], 1
+    je      SetCr3
+
+    xor     edx, edx
+    jmp     SevNotActive
+
+CheckSev:
     OneTimeCall   CheckSevFeatures
     xor     edx, edx
     test    eax, eax
@@ -101,44 +171,19 @@ pageTableEntriesLoop:
     mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
     loop    pageTableEntriesLoop
 
+    OneTimeCall IsTdxEnabled
+    test    eax, eax
+    jz      IsSevEs
+
+    OneTimeCall TdxBuildExtraPageTables
+    jmp     SetCr3
+
+IsSevEs:
     OneTimeCall   IsSevEsEnabled
     test    eax, eax
     jz      SetCr3
 
-    ;
-    ; The initial GHCB will live at GHCB_BASE and needs to be un-encrypted.
-    ; This requires the 2MB page for this range be broken down into 512 4KB
-    ; pages.  All will be marked encrypted, except for the GHCB.
-    ;
-    mov     ecx, (GHCB_BASE >> 21)
-    mov     eax, GHCB_PT_ADDR + PAGE_PDP_ATTR
-    mov     [ecx * 8 + PT_ADDR (0x2000)], eax
-
-    ;
-    ; Page Table Entries (512 * 4KB entries => 2MB)
-    ;
-    mov     ecx, 512
-pageTableEntries4kLoop:
-    mov     eax, ecx
-    dec     eax
-    shl     eax, 12
-    add     eax, GHCB_BASE & 0xFFE0_0000
-    add     eax, PAGE_4K_PDE_ATTR
-    mov     [ecx * 8 + GHCB_PT_ADDR - 8], eax
-    mov     [(ecx * 8 + GHCB_PT_ADDR - 8) + 4], edx
-    loop    pageTableEntries4kLoop
-
-    ;
-    ; Clear the encryption bit from the GHCB entry
-    ;
-    mov     ecx, (GHCB_BASE & 0x1F_FFFF) >> 12
-    mov     [ecx * 8 + GHCB_PT_ADDR + 4], strict dword 0
-
-    mov     ecx, GHCB_SIZE / 4
-    xor     eax, eax
-clearGhcbMemoryLoop:
-    mov     dword[ecx * 4 + GHCB_BASE - 4], eax
-    loop    clearGhcbMemoryLoop
+    OneTimeCall   SevBuildGhcbPageTables
 
 SetCr3:
     ;

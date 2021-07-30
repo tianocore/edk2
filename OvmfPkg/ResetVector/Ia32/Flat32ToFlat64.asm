@@ -17,6 +17,14 @@ Transition32FlatTo64Flat:
 
     OneTimeCall SetCr3ForPageTables64
 
+    OneTimeCall PostSetCr3PageTables64Tdx
+
+    ;
+    ; If it is TDX, we're done and jump to enable paging
+    ;
+    cmp     byte[CC_WORK_AREA], VM_GUEST_TDX
+    je      EnablePaging
+
     mov     eax, cr4
     bts     eax, 5                      ; enable PAE
     mov     cr4, eax
@@ -71,6 +79,7 @@ jumpTo64BitAndLandHere:
 
     ;
     ; Check if the second step of the SEV-ES mitigation is to be performed.
+    ; If it is Tdx, ebx is cleared in PostSetCr3PageTables64Tdx.
     ;
     test    ebx, ebx
     jz      InsnCompare
