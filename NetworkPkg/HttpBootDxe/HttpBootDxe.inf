@@ -90,13 +90,13 @@
   ## SOMETIMES_PRODUCES ## GUID # HiiGetBrowserData     mHttpBootConfigStorageName
   ## SOMETIMES_CONSUMES ## HII
   gHttpBootConfigGuid
-  gEfiVirtualCdGuid            ## SOMETIMES_CONSUMES ## GUID
-  gEfiVirtualDiskGuid          ## SOMETIMES_CONSUMES ## GUID
+  gEfiVirtualCdGuid                              ## SOMETIMES_CONSUMES ## GUID
+  gEfiVirtualDiskGuid                            ## SOMETIMES_CONSUMES ## GUID
   gEfiAdapterInfoUndiIpv6SupportGuid             ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd]
-  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES
-  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout              ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections    ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout           ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpBootDxeExtra.uni
