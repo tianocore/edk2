@@ -828,7 +828,7 @@ SevEsIsEnabled (
 
   SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
 
-  return ((SevEsWorkArea != NULL) && (SevEsWorkArea->SevEsEnabled != 0));
+  return ((SevEsWorkArea != NULL) && (SevEsWorkArea->SevEsEnabled == 1));
 }
 
 VOID
