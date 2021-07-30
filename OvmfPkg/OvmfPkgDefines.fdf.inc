@@ -9,6 +9,7 @@
 ##
 
 DEFINE BLOCK_SIZE        = 0x1000
+DEFINE VARS_OFFSET       = 0
 
 #
 # A firmware binary built with FD_SIZE_IN_KB=1024, and a firmware binary built
@@ -66,6 +67,7 @@ DEFINE SECFV_OFFSET      = 0x003CC000
 DEFINE SECFV_SIZE        = 0x34000
 !endif
 
+SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfImageSizeInKb     = $(FD_SIZE_IN_KB)
 SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress     = $(FW_BASE_ADDRESS)
 SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize    = $(FW_SIZE)
 SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize = $(BLOCK_SIZE)
@@ -81,6 +83,14 @@ SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize = $(BLOCK_SIZ
 
 SET gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwSpareBase = gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwWorkingBase + gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize = $(VARS_SPARE_SIZE)
+
+SET gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase           = $(FW_BASE_ADDRESS)
+SET gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataOffset  = $(VARS_OFFSET)
+SET gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize    = $(VARS_LIVE_SIZE)
+
+SET gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase           = $(CODE_BASE_ADDRESS)
+SET gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset  = $(VARS_SIZE)
+SET gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize    = $(CODE_SIZE)
 
 !if $(SMM_REQUIRE) == TRUE
 SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64 = gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
