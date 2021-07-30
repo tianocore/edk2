@@ -24,6 +24,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define RC_NV_UndefineSpace_authHandle      (TPM_RC_H + TPM_RC_1)
 #define RC_NV_UndefineSpace_nvIndex         (TPM_RC_H + TPM_RC_2)
 
+#define RC_NV_UndefineSpaceSpecial_nvIndex  (TPM_RC_H + TPM_RC_1)
+
 #define RC_NV_Read_authHandle               (TPM_RC_H + TPM_RC_1)
 #define RC_NV_Read_nvIndex                  (TPM_RC_H + TPM_RC_2)
 #define RC_NV_Read_size                     (TPM_RC_P + TPM_RC_1)
@@ -73,6 +75,20 @@ typedef struct {
   UINT32                     AuthSessionSize;
   TPMS_AUTH_RESPONSE         AuthSession;
 } TPM2_NV_UNDEFINESPACE_RESPONSE;
+
+typedef struct {
+  TPM2_COMMAND_HEADER       Header;
+  TPMI_RH_NV_INDEX          NvIndex;
+  TPMI_RH_PLATFORM          Platform;
+  UINT32                    AuthSessionSize;
+  TPMS_AUTH_COMMAND         AuthSession;
+} TPM2_NV_UNDEFINESPACESPECIAL_COMMAND;
+
+typedef struct {
+  TPM2_RESPONSE_HEADER       Header;
+  UINT32                     AuthSessionSize;
+  TPMS_AUTH_RESPONSE         AuthSession;
+} TPM2_NV_UNDEFINESPACESPECIAL_RESPONSE;
 
 typedef struct {
   TPM2_COMMAND_HEADER       Header;
@@ -505,6 +521,112 @@ Done:
   ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
   return Status;
 }
+
+/**
+  This command removes an index from the TPM.
+
+  @param[in]  NvIndex             The NV Index.
+  @param[in]  IndexAuthSession    Auth session context for the Index auth/policy
+  @param[in]  PlatAuthSession     Auth session context for the Platform auth/policy
+
+  @retval EFI_SUCCESS             Operation completed successfully.
+  @retval EFI_NOT_FOUND           The command was returned successfully, but NvIndex is not found.
+  @retval EFI_UNSUPPORTED         Selected NvIndex does not support deletion through this call.
+  @retval EFI_SECURITY_VIOLATION  Deletion is not authorized by current policy session.
+  @retval EFI_INVALID_PARAMETER   The command was unsuccessful.
+  @retval EFI_DEVICE_ERROR        The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2NvUndefineSpaceSpecial (
+  IN      TPMI_RH_NV_INDEX          NvIndex,
+  IN      TPMS_AUTH_COMMAND         *IndexAuthSession OPTIONAL,
+  IN      TPMS_AUTH_COMMAND         *PlatAuthSession OPTIONAL
+  )
+{
+  EFI_STATUS                              Status;
+  TPM2_NV_UNDEFINESPACESPECIAL_COMMAND    SendBuffer;
+  TPM2_NV_UNDEFINESPACESPECIAL_RESPONSE   RecvBuffer;
+  UINT32                                  SendBufferSize;
+  UINT32                                  RecvBufferSize;
+  UINT8                                   *Buffer;
+  UINT32                                  IndexAuthSize, PlatAuthSize;
+  TPM_RC                                  ResponseCode;
+
+  //
+  // Construct command
+  //
+  SendBuffer.Header.tag = SwapBytes16(TPM_ST_SESSIONS);
+  SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_NV_UndefineSpaceSpecial);
+
+  SendBuffer.NvIndex = SwapBytes32 (NvIndex);
+  SendBuffer.Platform = SwapBytes32 (TPM_RH_PLATFORM);
+
+  //
+  // Marshall the Auth Sessions for the two handles.
+  Buffer = (UINT8 *)&SendBuffer.AuthSession;
+  // IndexAuthSession
+  IndexAuthSize = CopyAuthSessionCommand (IndexAuthSession, Buffer);
+  Buffer += IndexAuthSize;
+  // PlatAuthSession
+  PlatAuthSize = CopyAuthSessionCommand (PlatAuthSession, Buffer);
+  Buffer += PlatAuthSize;
+  // AuthSessionSize
+  SendBuffer.AuthSessionSize = SwapBytes32(IndexAuthSize + PlatAuthSize);
+
+  // Update total command size.
+  SendBufferSize = (UINT32)(Buffer - (UINT8 *)&SendBuffer);
+  SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
+
+  //
+  // send Tpm command
+  //
+  RecvBufferSize = sizeof (RecvBuffer);
+  Status = Tpm2SubmitCommand (SendBufferSize, (UINT8 *)&SendBuffer, &RecvBufferSize, (UINT8 *)&RecvBuffer);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
+    DEBUG ((EFI_D_ERROR, "Tpm2NvUndefineSpaceSpecial - RecvBufferSize Error - %x\n", RecvBufferSize));
+    Status = EFI_DEVICE_ERROR;
+    goto Done;
+  }
+
+  ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
+  if (ResponseCode != TPM_RC_SUCCESS) {
+    DEBUG ((EFI_D_ERROR, "Tpm2NvUndefineSpaceSpecial - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+  }
+  switch (ResponseCode) {
+  case TPM_RC_SUCCESS:
+    // return data
+    break;
+  case TPM_RC_ATTRIBUTES:
+  case TPM_RC_ATTRIBUTES + RC_NV_UndefineSpaceSpecial_nvIndex:
+    Status = EFI_UNSUPPORTED;
+    break;
+  case TPM_RC_NV_AUTHORIZATION:
+    Status = EFI_SECURITY_VIOLATION;
+    break;
+  case TPM_RC_HANDLE + RC_NV_UndefineSpaceSpecial_nvIndex: // TPM_RC_NV_DEFINED:
+    Status = EFI_NOT_FOUND;
+    break;
+  case TPM_RC_VALUE + RC_NV_UndefineSpace_nvIndex:
+    Status = EFI_INVALID_PARAMETER;
+    break;
+  default:
+    Status = EFI_DEVICE_ERROR;
+    break;
+  }
+
+Done:
+  //
+  // Clear AuthSession Content
+  //
+  ZeroMem (&SendBuffer, sizeof(SendBuffer));
+  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  return Status;
+} // Tpm2NvUndefineSpaceSpecial()
 
 /**
   This command reads a value from an area in NV memory previously defined by TPM2_NV_DefineSpace().
