@@ -96,7 +96,7 @@
 
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES
-  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout             ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout              ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpBootDxeExtra.uni

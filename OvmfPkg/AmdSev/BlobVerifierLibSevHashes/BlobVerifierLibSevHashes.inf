@@ -1,0 +1,37 @@
+## @file
+#
+#  Blob verifier library that uses SEV hashes table.  The hashes table holds the
+#  allowed hashes of the kernel, initrd, and cmdline blobs.
+#
+#  Copyright (C) 2021, IBM Corp
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = BlobVerifierLibSevHashes
+  FILE_GUID                      = 59e713b5-eff3-46a7-8d8b-46f4c004ad7b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BlobVerifierLib
+  CONSTRUCTOR                    = BlobVerifierLibSevHashesConstructor
+
+[Sources]
+  BlobVerifierSevHashes.c
+
+[Packages]
+  CryptoPkg/CryptoPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseCryptLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize

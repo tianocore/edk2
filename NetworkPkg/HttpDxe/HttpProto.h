@@ -608,4 +608,17 @@ HttpResponseWorker (
   IN  HTTP_TOKEN_WRAP           *Wrap
   );
 
+/**
+  Send Events via EDKII_HTTP_CALLBACK_PROTOCOL.
+
+  @param[in]  Event               The event that occurs in the current state.
+  @param[in]  EventStatus         The Status of Event, EFI_SUCCESS or other errors.
+
+**/
+VOID
+HttpNotify (
+  IN  EDKII_HTTP_CALLBACK_EVENT         Event,
+  IN  EFI_STATUS                        EventStatus
+  );
+
 #endif

@@ -87,8 +87,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x2f
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
 
-[PcdsDynamic]
-  gEfiNetworkPkgTokenSpaceGuid.PcdHttpTimeout|5000
+[PcdsDynamicDefault]
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout|5000
 
 ###################################################################################################
 #
