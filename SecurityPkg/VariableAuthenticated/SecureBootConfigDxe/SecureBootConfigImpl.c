@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SecureBootConfigImpl.h"
 #include <Library/BaseCryptLib.h>
+#include <Library/SecureBootVariableLib.h>
+#include <Library/SecureBootVariableProvisionLib.h>
 
 CHAR16              mSecureBootStorageName[] = L"SECUREBOOT_CONFIGURATION";
 
@@ -235,168 +237,6 @@ SaveSecureBootVariable (
              &VarValue
              );
   return Status;
-}
-
-/**
-  Create a time based data payload by concatenating the EFI_VARIABLE_AUTHENTICATION_2
-  descriptor with the input data. NO authentication is required in this function.
-
-  @param[in, out]   DataSize       On input, the size of Data buffer in bytes.
-                                   On output, the size of data returned in Data
-                                   buffer in bytes.
-  @param[in, out]   Data           On input, Pointer to data buffer to be wrapped or
-                                   pointer to NULL to wrap an empty payload.
-                                   On output, Pointer to the new payload date buffer allocated from pool,
-                                   it's caller's responsibility to free the memory when finish using it.
-
-  @retval EFI_SUCCESS              Create time based payload successfully.
-  @retval EFI_OUT_OF_RESOURCES     There are not enough memory resources to create time based payload.
-  @retval EFI_INVALID_PARAMETER    The parameter is invalid.
-  @retval Others                   Unexpected error happens.
-
-**/
-EFI_STATUS
-CreateTimeBasedPayload (
-  IN OUT UINTN            *DataSize,
-  IN OUT UINT8            **Data
-  )
-{
-  EFI_STATUS                       Status;
-  UINT8                            *NewData;
-  UINT8                            *Payload;
-  UINTN                            PayloadSize;
-  EFI_VARIABLE_AUTHENTICATION_2    *DescriptorData;
-  UINTN                            DescriptorSize;
-  EFI_TIME                         Time;
-
-  if (Data == NULL || DataSize == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // In Setup mode or Custom mode, the variable does not need to be signed but the
-  // parameters to the SetVariable() call still need to be prepared as authenticated
-  // variable. So we create EFI_VARIABLE_AUTHENTICATED_2 descriptor without certificate
-  // data in it.
-  //
-  Payload     = *Data;
-  PayloadSize = *DataSize;
-
-  DescriptorSize    = OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo) + OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
-  NewData = (UINT8*) AllocateZeroPool (DescriptorSize + PayloadSize);
-  if (NewData == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  if ((Payload != NULL) && (PayloadSize != 0)) {
-    CopyMem (NewData + DescriptorSize, Payload, PayloadSize);
-  }
-
-  DescriptorData = (EFI_VARIABLE_AUTHENTICATION_2 *) (NewData);
-
-  ZeroMem (&Time, sizeof (EFI_TIME));
-  Status = gRT->GetTime (&Time, NULL);
-  if (EFI_ERROR (Status)) {
-    FreePool(NewData);
-    return Status;
-  }
-  Time.Pad1       = 0;
-  Time.Nanosecond = 0;
-  Time.TimeZone   = 0;
-  Time.Daylight   = 0;
-  Time.Pad2       = 0;
-  CopyMem (&DescriptorData->TimeStamp, &Time, sizeof (EFI_TIME));
-
-  DescriptorData->AuthInfo.Hdr.dwLength         = OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
-  DescriptorData->AuthInfo.Hdr.wRevision        = 0x0200;
-  DescriptorData->AuthInfo.Hdr.wCertificateType = WIN_CERT_TYPE_EFI_GUID;
-  CopyGuid (&DescriptorData->AuthInfo.CertType, &gEfiCertPkcs7Guid);
-
-  if (Payload != NULL) {
-    FreePool(Payload);
-  }
-
-  *DataSize = DescriptorSize + PayloadSize;
-  *Data     = NewData;
-  return EFI_SUCCESS;
-}
-
-/**
-  Internal helper function to delete a Variable given its name and GUID, NO authentication
-  required.
-
-  @param[in]      VariableName            Name of the Variable.
-  @param[in]      VendorGuid              GUID of the Variable.
-
-  @retval EFI_SUCCESS              Variable deleted successfully.
-  @retval Others                   The driver failed to start the device.
-
-**/
-EFI_STATUS
-DeleteVariable (
-  IN  CHAR16                    *VariableName,
-  IN  EFI_GUID                  *VendorGuid
-  )
-{
-  EFI_STATUS              Status;
-  VOID*                   Variable;
-  UINT8                   *Data;
-  UINTN                   DataSize;
-  UINT32                  Attr;
-
-  GetVariable2 (VariableName, VendorGuid, &Variable, NULL);
-  if (Variable == NULL) {
-    return EFI_SUCCESS;
-  }
-  FreePool (Variable);
-
-  Data     = NULL;
-  DataSize = 0;
-  Attr     = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS
-             | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
-
-  Status = CreateTimeBasedPayload (&DataSize, &Data);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
-    return Status;
-  }
-
-  Status = gRT->SetVariable (
-                  VariableName,
-                  VendorGuid,
-                  Attr,
-                  DataSize,
-                  Data
-                  );
-  if (Data != NULL) {
-    FreePool (Data);
-  }
-  return Status;
-}
-
-/**
-
-  Set the platform secure boot mode into "Custom" or "Standard" mode.
-
-  @param[in]   SecureBootMode        New secure boot mode: STANDARD_SECURE_BOOT_MODE or
-                                     CUSTOM_SECURE_BOOT_MODE.
-
-  @return EFI_SUCCESS                The platform has switched to the special mode successfully.
-  @return other                      Fail to operate the secure boot mode.
-
-**/
-EFI_STATUS
-SetSecureBootMode (
-  IN     UINT8         SecureBootMode
-  )
-{
-  return gRT->SetVariable (
-                EFI_CUSTOM_MODE_NAME,
-                &gEfiCustomModeEnableGuid,
-                EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                sizeof (UINT8),
-                &SecureBootMode
-                );
 }
 
 /**
@@ -643,32 +483,6 @@ ON_EXIT:
 
   CloseEnrolledFile(Private->FileContext);
 
-  return Status;
-}
-
-/**
-  Remove the PK variable.
-
-  @retval EFI_SUCCESS    Delete PK successfully.
-  @retval Others         Could not allow to delete PK.
-
-**/
-EFI_STATUS
-DeletePlatformKey (
-  VOID
-)
-{
-  EFI_STATUS Status;
-
-  Status = SetSecureBootMode(CUSTOM_SECURE_BOOT_MODE);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = DeleteVariable (
-             EFI_PLATFORM_KEY_NAME,
-             &gEfiGlobalVariableGuid
-             );
   return Status;
 }
 
