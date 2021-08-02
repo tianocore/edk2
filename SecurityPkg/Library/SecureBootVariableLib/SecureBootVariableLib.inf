@@ -1,0 +1,79 @@
+## @file
+#  Provides helper function for initialization of Secure Boot
+#  keys and databases.
+#
+#  Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2021, Semihalf All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecureBootVariableLib
+  MODULE_UNI_FILE                = SecureBootVariableLib.uni
+  FILE_GUID                      = D4FFF5CA-6D8E-4DBD-8A4B-7C7CEBD97F6F
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SecureBootVariableLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  SecureBootVariableLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  BaseCryptLib
+  DxeServicesLib
+
+[Guids]
+  ## CONSUMES            ## Variable:L"SetupMode"
+  ## PRODUCES            ## Variable:L"SetupMode"
+  ## CONSUMES            ## Variable:L"SecureBoot"
+  ## PRODUCES            ## Variable:L"SecureBoot"
+  ## PRODUCES            ## Variable:L"PK"
+  ## PRODUCES            ## Variable:L"KEK"
+  ## CONSUMES            ## Variable:L"PKDefault"
+  ## CONSUMES            ## Variable:L"KEKDefault"
+  ## CONSUMES            ## Variable:L"dbDefault"
+  ## CONSUMES            ## Variable:L"dbxDefault"
+  ## CONSUMES            ## Variable:L"dbtDefault"
+  gEfiGlobalVariableGuid
+
+  ## SOMETIMES_CONSUMES  ## Variable:L"DB"
+  ## SOMETIMES_CONSUMES  ## Variable:L"DBX"
+  ## SOMETIMES_CONSUMES  ## Variable:L"DBT"
+  gEfiImageSecurityDatabaseGuid
+
+  ## CONSUMES            ## Variable:L"SecureBootEnable"
+  ## PRODUCES            ## Variable:L"SecureBootEnable"
+  gEfiSecureBootEnableDisableGuid
+
+  ## CONSUMES            ## Variable:L"CustomMode"
+  ## PRODUCES            ## Variable:L"CustomMode"
+  gEfiCustomModeEnableGuid
+
+  gEfiCertTypeRsa2048Sha256Guid  ## CONSUMES
+  gEfiCertX509Guid               ## CONSUMES
+  gEfiCertPkcs7Guid              ## CONSUMES
+
+  gDefaultPKFileGuid
+  gDefaultKEKFileGuid
+  gDefaultdbFileGuid
+  gDefaultdbxFileGuid
+  gDefaultdbtFileGuid
