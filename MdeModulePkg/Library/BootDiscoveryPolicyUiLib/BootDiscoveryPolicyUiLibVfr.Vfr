@@ -1,0 +1,44 @@
+///** @file
+//
+//  Formset for Boot Discovery Policy UI
+//
+//  Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
+//  Copyright (c) 2021, Semihalf All rights reserved.<BR>
+//
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+#include <Uefi/UefiMultiPhase.h>
+#include "Guid/BootDiscoveryPolicy.h"
+#include <Guid/HiiBootMaintenanceFormset.h>
+
+typedef struct {
+  UINT32 BootDiscoveryPolicy;
+} BOOT_DISCOVERY_POLICY_VARSTORE_DATA;
+
+formset
+  guid      = BOOT_DISCOVERY_POLICY_MGR_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_BDP_MAIN_TITLE),
+  help      = STRING_TOKEN(STR_FORM_BDP_MAIN_TITLE),
+  classguid = EFI_IFR_BOOT_MAINTENANCE_GUID,
+
+  efivarstore BOOT_DISCOVERY_POLICY_VARSTORE_DATA,
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+    name  = BootDiscoveryPolicy,
+    guid  = BOOT_DISCOVERY_POLICY_MGR_FORMSET_GUID;
+
+  form formid = 0x0001,
+    title  = STRING_TOKEN(STR_FORM_BDP_MAIN_TITLE);
+
+  oneof varid = BootDiscoveryPolicy.BootDiscoveryPolicy,
+    prompt      = STRING_TOKEN(STR_FORM_BDP_MAIN_TITLE),
+    help        = STRING_TOKEN(STR_FORM_BDP_MAIN_TITLE),
+    flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+    option text = STRING_TOKEN(STR_FORM_BDP_CONN_MIN), value = BDP_CONNECT_MINIMAL, flags = DEFAULT;
+    option text = STRING_TOKEN(STR_FORM_BDP_CONN_NET), value = BDP_CONNECT_NET, flags = 0;
+    option text = STRING_TOKEN(STR_FORM_BDP_CONN_ALL), value = BDP_CONNECT_ALL, flags = 0;
+  endoneof;
+
+  endform;
+endformset;
