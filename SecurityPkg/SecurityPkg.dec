@@ -91,6 +91,10 @@
   ## @libraryclass  Provides helper functions related to creation/removal Secure Boot variables.
   #
   SecureBootVariableLib|Include/Library/SecureBootVariableLib.h
+
+  ## @libraryclass  Provides support to enroll Secure Boot keys.
+  #
+  SecureBootVariableProvisionLib|Include/Library/SecureBootVariableProvisionLib.h
 [Guids]
   ## Security package token space guid.
   # Include/Guid/SecurityPkgTokenSpace.h
