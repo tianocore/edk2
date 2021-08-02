@@ -1,0 +1,16 @@
+// /** @file
+//
+// Provides helper function for initialization of Secure Boot
+// keys and databases.
+//
+// Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
+// Copyright (c) 2021, Semihalf All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides helper functions to initialize PK, KEK and databases based on default variables."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Provides helper functions to initialize PK, KEK and databases based on default variables."
