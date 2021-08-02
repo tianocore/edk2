@@ -91,6 +91,18 @@ MemEncryptSevIsEnabled (
   );
 
 /**
+  Returns a boolean to indicate whether SEV live migration is enabled.
+
+  @retval TRUE           SEV live migration is enabled
+  @retval FALSE          SEV live migration is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevLiveMigrationIsEnabled (
+  VOID
+  );
+
+/**
   This function clears memory encryption bit for the memory region specified by
   BaseAddress and NumPages from the current page table context.
 
@@ -220,6 +232,21 @@ MemEncryptSevClearMmioPageEncMask (
   IN PHYSICAL_ADDRESS         Cr3BaseAddress,
   IN PHYSICAL_ADDRESS         BaseAddress,
   IN UINTN                    NumPages
+  );
+
+#define KVM_FEATURE_MIGRATION_CONTROL   BIT17
+
+/**
+  Figures out if we are running inside KVM HVM and
+  KVM HVM supports SEV Live Migration feature.
+
+  @retval TRUE           SEV live migration is supported.
+  @retval FALSE          SEV live migration is not supported.
+**/
+BOOLEAN
+EFIAPI
+KvmDetectSevLiveMigrationFeature(
+  VOID
   );
 
 #endif // _MEM_ENCRYPT_SEV_LIB_H_
