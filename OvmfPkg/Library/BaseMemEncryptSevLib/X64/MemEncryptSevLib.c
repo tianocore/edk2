@@ -143,3 +143,67 @@ MemEncryptSevClearMmioPageEncMask (
            );
 
 }
+
+/**
+ This hyercall is used to notify hypervisor when the page's encryption
+ state changes.
+
+ @param[in]   PhysicalAddress       The physical address that is the start address
+                                    of a memory region.
+ @param[in]   Pages                 Number of Pages in the memory region.
+ @param[in]   IsEncrypted           Encrypted or Decrypted.
+
+ @retval RETURN_SUCCESS             Hypercall returned success.
+ @retval RETURN_UNSUPPORTED         Hypercall not supported.
+ @retval RETURN_NO_MAPPING          Hypercall returned error.
+**/
+RETURN_STATUS
+EFIAPI
+SetMemoryEncDecHypercall3 (
+  IN  UINTN     PhysicalAddress,
+  IN  UINTN     Pages,
+  IN  BOOLEAN   IsEncrypted
+  )
+{
+  RETURN_STATUS Ret;
+  UINTN Error;
+  UINTN EncryptMask;
+
+  Ret = RETURN_UNSUPPORTED;
+
+  if (MemEncryptSevLiveMigrationIsEnabled ()) {
+    Ret = RETURN_SUCCESS;
+    //
+    // The encryption bit is set/clear on the smallest page size, hence
+    // use the 4k page size in MAP_GPA_RANGE hypercall below.
+    //
+    // Also, when the GCD map is being walked and the c-bit being cleared
+    // from MMIO and NonExistent memory spaces, the physical address
+    // range being passed may not be page-aligned and adding an assert
+    // here prevents booting. Hence, rounding it down when calling
+    // SetMemoryEncDecHypercall3AsmStub below.
+    //
+
+    EncryptMask = IsEncrypted ? KVM_MAP_GPA_RANGE_ENCRYPTED :
+        KVM_MAP_GPA_RANGE_DECRYPTED;
+
+    Error = SetMemoryEncDecHypercall3AsmStub (
+              KVM_HC_MAP_GPA_RANGE,
+              PhysicalAddress & ~EFI_PAGE_MASK,
+              Pages,
+              KVM_MAP_GPA_RANGE_PAGE_SZ_4K | EncryptMask
+              );
+
+    if (Error != 0) {
+      DEBUG ((DEBUG_ERROR,
+              "SetMemoryEncDecHypercall3 failed, Phys = %Lx, Pages = %Ld, Err = %Ld\n",
+              PhysicalAddress,
+              Pages,
+              (INT64)Error));
+
+      Ret = RETURN_NO_MAPPING;
+    }
+  }
+
+  return Ret;
+}
