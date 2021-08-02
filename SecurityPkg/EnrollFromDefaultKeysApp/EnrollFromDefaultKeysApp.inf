@@ -1,0 +1,48 @@
+## @file
+#  Enroll PK, KEK, db, dbx from Default variables
+#
+#  Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2021, Semihalf All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.28
+  BASE_NAME                      = EnrollFromDefaultKeysApp
+  FILE_GUID                      = 6F18CB2F-1293-4BC1-ABB8-35F84C71812E
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = UefiMain
+
+[Sources]
+  EnrollFromDefaultKeysApp.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[Guids]
+  gEfiCertPkcs7Guid
+  gEfiCertSha256Guid
+  gEfiCertX509Guid
+  gEfiCustomModeEnableGuid
+  gEfiGlobalVariableGuid
+  gEfiImageSecurityDatabaseGuid
+  gEfiSecureBootEnableDisableGuid
+
+[Protocols]
+  gEfiSmbiosProtocolGuid ## CONSUMES
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  SecureBootVariableLib
+  SecureBootVariableProvisionLib
