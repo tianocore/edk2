@@ -69,6 +69,12 @@ formset
     endif;
     endif;
 
+    text
+      help   = STRING_TOKEN(STR_SECURE_RESET_TO_DEFAULTS_HELP),
+      text   = STRING_TOKEN(STR_SECURE_RESET_TO_DEFAULTS),
+      flags  = INTERACTIVE,
+      key    = KEY_SECURE_BOOT_RESET_TO_DEFAULT;
+
   endform;
 
   //
