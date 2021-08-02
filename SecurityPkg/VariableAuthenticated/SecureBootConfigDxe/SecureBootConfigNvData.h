@@ -54,6 +54,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define KEY_VALUE_FROM_DBX_TO_LIST_FORM       0x100f
 
+#define KEY_SECURE_BOOT_RESET_TO_DEFAULT      0x1010
+
 #define KEY_SECURE_BOOT_OPTION                0x1100
 #define KEY_SECURE_BOOT_PK_OPTION             0x1101
 #define KEY_SECURE_BOOT_KEK_OPTION            0x1102
