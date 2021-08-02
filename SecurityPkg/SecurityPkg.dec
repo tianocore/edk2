@@ -87,6 +87,10 @@
   ## @libraryclass  Provides interfaces about firmware TPM measurement.
   #
   TcgEventLogRecordLib|Include/Library/TcgEventLogRecordLib.h
+
+  ## @libraryclass  Provides helper functions related to creation/removal Secure Boot variables.
+  #
+  SecureBootVariableLib|Include/Library/SecureBootVariableLib.h
 [Guids]
   ## Security package token space guid.
   # Include/Guid/SecurityPkgTokenSpace.h
