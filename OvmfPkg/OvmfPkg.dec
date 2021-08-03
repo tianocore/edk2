@@ -330,6 +330,18 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase|0x0|UINT32|0x47
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize|0x0|UINT32|0x48
 
+  ## The base address and size of the work area used during the SEC
+  # phase by the SEV and TDX supports.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase|0|UINT32|0x49
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize|0|UINT32|0x50
+
+  ## The work area contains a fixed size header in the Include/WorkArea.h.
+  # The size of this header is used early boot, and is provided through
+  # a fixed PCD. It need to be kept in sync with any changes to the
+  # header definition.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader|0|UINT32|0x51
+
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
