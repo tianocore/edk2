@@ -182,6 +182,8 @@ F: EmbeddedPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
 M: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
+M: Abner Chang <abner.chang@hpe.com> [changab]
+R: Daniel Schaefer <daniel.schaefer@hpe.com> [JohnAZoidberg]
 
 EmulatorPkg
 F: EmulatorPkg/
