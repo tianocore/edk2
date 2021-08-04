@@ -46,16 +46,13 @@ SetCr3ForPageTables64:
     ; work area when detected.
     mov     byte[WORK_AREA_GUEST_TYPE], 0
 
+    ; Check whether the SEV is active and populate the SevEsWorkArea
     OneTimeCall   CheckSevFeatures
-    xor     edx, edx
-    test    eax, eax
-    jz      SevNotActive
 
-    ; If SEV is enabled, C-bit is always above 31
-    sub     eax, 32
-    bts     edx, eax
-
-SevNotActive:
+    ; If SEV is enabled, the C-bit position is always above 31.
+    ; The mask will be saved in the EDX and applied during the
+    ; the page table build below.
+    OneTimeCall   GetSevCBitMaskAbove31
 
     ;
     ; For OVMF, build some initial page tables at
@@ -105,44 +102,8 @@ pageTableEntriesLoop:
     mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
     loop    pageTableEntriesLoop
 
-    OneTimeCall   IsSevEsEnabled
-    test    eax, eax
-    jz      SetCr3
-
-    ;
-    ; The initial GHCB will live at GHCB_BASE and needs to be un-encrypted.
-    ; This requires the 2MB page for this range be broken down into 512 4KB
-    ; pages.  All will be marked encrypted, except for the GHCB.
-    ;
-    mov     ecx, (GHCB_BASE >> 21)
-    mov     eax, GHCB_PT_ADDR + PAGE_PDP_ATTR
-    mov     [ecx * 8 + PT_ADDR (0x2000)], eax
-
-    ;
-    ; Page Table Entries (512 * 4KB entries => 2MB)
-    ;
-    mov     ecx, 512
-pageTableEntries4kLoop:
-    mov     eax, ecx
-    dec     eax
-    shl     eax, 12
-    add     eax, GHCB_BASE & 0xFFE0_0000
-    add     eax, PAGE_4K_PDE_ATTR
-    mov     [ecx * 8 + GHCB_PT_ADDR - 8], eax
-    mov     [(ecx * 8 + GHCB_PT_ADDR - 8) + 4], edx
-    loop    pageTableEntries4kLoop
-
-    ;
-    ; Clear the encryption bit from the GHCB entry
-    ;
-    mov     ecx, (GHCB_BASE & 0x1F_FFFF) >> 12
-    mov     [ecx * 8 + GHCB_PT_ADDR + 4], strict dword 0
-
-    mov     ecx, GHCB_SIZE / 4
-    xor     eax, eax
-clearGhcbMemoryLoop:
-    mov     dword[ecx * 4 + GHCB_BASE - 4], eax
-    loop    clearGhcbMemoryLoop
+    ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
+    OneTimeCall   SevClearPageEncMaskFromGHCBPage
 
 SetCr3:
     ;
