@@ -63,6 +63,25 @@ InternalMemEncryptSevStatus (
 }
 
 /**
+  Returns a boolean to indicate whether SEV-SNP is enabled.
+
+  @retval TRUE           SEV-SNP is enabled
+  @retval FALSE          SEV-SNP is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpIsEnabled (
+  VOID
+  )
+{
+  MSR_SEV_STATUS_REGISTER           Msr;
+
+  Msr.Uint32 = InternalMemEncryptSevStatus ();
+
+  return Msr.Bits.SevSnpBit ? TRUE : FALSE;
+}
+
+/**
   Returns a boolean to indicate whether SEV-ES is enabled.
 
   @retval TRUE           SEV-ES is enabled
