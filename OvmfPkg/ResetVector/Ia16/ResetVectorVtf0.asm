@@ -47,6 +47,29 @@ TIMES (15 - ((guidedStructureEnd - guidedStructureStart + 15) % 16)) DB 0
 ;
 guidedStructureStart:
 
+%ifdef ARCH_X64
+; SEV-SNP boot support
+;
+; sevSnpBlock:
+;   For the initial boot of SEV-SNP guest, a CPUID and Secrets page must
+;   be reserved by the BIOS at a RAM area defined by SNP_CPUID_BASE and
+;   SNP_SECRETS_BASE. A hypervisor will locate this information using the
+;   SEV-SNP boot block GUID and provide the GPA to the PSP to populate
+;   the memory area with the required information..
+;
+; GUID (SEV-SNP boot block): bd39c0c2-2f8e-4243-83e8-1b74cebcb7d9
+;
+sevSnpBootBlockStart:
+    DD      SNP_SECRETS_BASE
+    DD      SNP_SECRETS_SIZE
+    DD      SNP_CPUID_BASE
+    DD      SNP_CPUID_SIZE
+    DW      sevSnpBootBlockEnd - sevSnpBootBlockStart
+    DB      0xC2, 0xC0, 0x39, 0xBD, 0x8e, 0x2F, 0x43, 0x42
+    DB      0x83, 0xE8, 0x1B, 0x74, 0xCE, 0xBC, 0xB7, 0xD9
+sevSnpBootBlockEnd:
+%endif
+
 ; SEV Hash Table Block
 ;
 ; This describes the guest ram area where the hypervisor should
