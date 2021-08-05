@@ -33,12 +33,16 @@ AmdSevSnpInitialize (
   VOID
   )
 {
+  RETURN_STATUS                 PcdStatus;
   EFI_PEI_HOB_POINTERS          Hob;
   EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceHob;
 
   if (!MemEncryptSevSnpIsEnabled ()) {
     return;
   }
+
+  PcdStatus = PcdSetBoolS (PcdSevSnpIsEnabled, TRUE);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   //
   // Iterate through the system RAM and validate it.
