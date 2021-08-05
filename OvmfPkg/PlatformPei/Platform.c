@@ -16,6 +16,7 @@
 //
 // The Library classes this module consumes
 //
+#include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
@@ -321,6 +322,18 @@ PciExBarInitialization (
     );
 }
 
+static const UINT8 EmptyFdt[] = {
+  0xd0, 0x0d, 0xfe, 0xed, 0x00, 0x00, 0x00, 0x48,
+  0x00, 0x00, 0x00, 0x38, 0x00, 0x00, 0x00, 0x48,
+  0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x11,
+  0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x09,
+};
+
 VOID
 MicrovmInitialization (
   VOID
@@ -335,8 +348,9 @@ MicrovmInitialization (
 
     Status = QemuFwCfgFindFile ("etc/fdt", &FdtItem, &FdtSize);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "%a: no etc/fdt found in fw_cfg\n", __FUNCTION__));
-      return;
+      DEBUG ((DEBUG_INFO, "%a: no etc/fdt found in fw_cfg, using dummy\n", __FUNCTION__));
+      FdtItem = 0;
+      FdtSize = sizeof(EmptyFdt);
     }
 
     FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
@@ -346,8 +360,12 @@ MicrovmInitialization (
       return;
     }
 
-    QemuFwCfgSelectItem (FdtItem);
-    QemuFwCfgReadBytes (FdtSize, NewBase);
+    if (FdtItem) {
+      QemuFwCfgSelectItem (FdtItem);
+      QemuFwCfgReadBytes (FdtSize, NewBase);
+    } else {
+      CopyMem(NewBase, EmptyFdt, FdtSize);
+    }
 
     FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof (*FdtHobData));
     if (FdtHobData == NULL) {
