@@ -347,6 +347,12 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase|0|UINT32|0x52
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize|0|UINT32|0x53
 
+  ## The base address and size of the SEV-SNP CPUID Area that contains
+  #  the PSP filtered CPUID results. If this is set in the .fdf, the
+  #  platform is responsible to reserve this area from DXE phase overwrites.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidBase|0|UINT32|0x54
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidSize|0|UINT32|0x55
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
