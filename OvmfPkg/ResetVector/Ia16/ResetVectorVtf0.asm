@@ -57,9 +57,14 @@ guidedStructureStart:
 ;   SEV-SNP boot block GUID and provide the GPA to the PSP to populate
 ;   the memory area with the required information..
 ;
+;   In order to boot the SEV-SNP guest the hypervisor must pre-validated the
+;   memory range from SNP_HV_VALIDATED_START to SNP_HV_VALIDATED_END.
+;
 ; GUID (SEV-SNP boot block): bd39c0c2-2f8e-4243-83e8-1b74cebcb7d9
 ;
 sevSnpBootBlockStart:
+    DD      SNP_HV_VALIDATED_START
+    DD      SNP_HV_VALIDATED_END
     DD      SNP_SECRETS_BASE
     DD      SNP_SECRETS_SIZE
     DD      SNP_CPUID_BASE

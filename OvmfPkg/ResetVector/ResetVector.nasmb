@@ -81,6 +81,8 @@
   %define SNP_CPUID_SIZE  FixedPcdGet32 (PcdOvmfSnpCpuidSize)
   %define SNP_SECRETS_BASE  FixedPcdGet32 (PcdOvmfSnpSecretsBase)
   %define SNP_SECRETS_SIZE  FixedPcdGet32 (PcdOvmfSnpSecretsSize)
+  %define SNP_HV_VALIDATED_START FixedPcdGet32 (PcdOvmfSnpHypervisorPreValidatedStart)
+  %define SNP_HV_VALIDATED_END FixedPcdGet32 (PcdOvmfSnpHypervisorPreValidatedEnd)
 %include "Ia32/Flat32ToFlat64.asm"
 %include "Ia32/AmdSev.asm"
 %include "Ia32/PageTables64.asm"
