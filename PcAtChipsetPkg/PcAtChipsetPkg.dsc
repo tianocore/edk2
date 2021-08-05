@@ -45,6 +45,8 @@
   UefiCpuLib|UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
+  TdxProbeLib|MdePkg/Library/TdxProbeLib/TdxProbeLib.inf
 
 [Components]
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
