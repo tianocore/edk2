@@ -76,8 +76,16 @@ static inline size_t strnlen (const char* str, size_t strsz ) {
   return AsciiStrnLenS (str, strsz);
 }
 
+static inline size_t strcmp (const char* str1, const char* str2) {
+  return AsciiStrCmp (str1, str2);
+}
+
 static inline size_t strncmp (const char* str1, const char* str2, size_t strsz ) {
   return AsciiStrnCmp (str1, str2, strsz);
+}
+
+static inline size_t strncpy (char* dest, const char* source, size_t dest_max) {
+  return AsciiStrCpyS (dest, dest_max, source);
 }
 
 #endif /* _LIBFDT_ENV_H */
