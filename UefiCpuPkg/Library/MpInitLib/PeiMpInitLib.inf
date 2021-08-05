@@ -65,6 +65,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled                      ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                   ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSevSnpIsEnabled                     ## CONSUMES
 
 [Ppis]
   gEdkiiPeiShadowMicrocodePpiGuid        ## SOMETIMES_CONSUMES
