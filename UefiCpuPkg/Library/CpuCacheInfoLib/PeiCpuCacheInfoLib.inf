@@ -3,7 +3,7 @@
 #
 #  Provides cache info for each package, core type, cache level and cache type.
 #
-#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -25,6 +25,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
@@ -33,6 +34,7 @@
   BaseMemoryLib
   MemoryAllocationLib
   PeiServicesTablePointerLib
+  SortLib
 
 [Ppis]
   gEdkiiPeiMpServices2PpiGuid

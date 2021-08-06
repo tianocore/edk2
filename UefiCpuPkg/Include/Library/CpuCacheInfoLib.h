@@ -59,7 +59,7 @@ typedef struct {
 } CPU_CACHE_INFO;
 
 /**
-  Get CpuCacheInfo data array.
+  Get CpuCacheInfo data array. The array is sorted by CPU package ID, core type, cache level and cache type.
 
   @param[in, out] CpuCacheInfo        Pointer to the CpuCacheInfo array.
   @param[in, out] CpuCacheInfoCount   As input, point to the length of response CpuCacheInfo array.
