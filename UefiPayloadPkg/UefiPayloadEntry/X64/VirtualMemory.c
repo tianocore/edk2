@@ -15,7 +15,7 @@
     2) IA-32 Intel(R) Architecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
 
-Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -685,31 +685,30 @@ CreateIdentityMappingPageTables (
   IN UINTN                 GhcbSize
   )
 {
-  UINT32                                       RegEax;
-  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  EcxFlags;
-  UINT32                                       RegEdx;
-  UINT8                                        PhysicalAddressBits;
-  EFI_PHYSICAL_ADDRESS                         PageAddress;
-  UINTN                                        IndexOfPml5Entries;
-  UINTN                                        IndexOfPml4Entries;
-  UINTN                                        IndexOfPdpEntries;
-  UINTN                                        IndexOfPageDirectoryEntries;
-  UINT32                                       NumberOfPml5EntriesNeeded;
-  UINT32                                       NumberOfPml4EntriesNeeded;
-  UINT32                                       NumberOfPdpEntriesNeeded;
-  PAGE_MAP_AND_DIRECTORY_POINTER               *PageMapLevel5Entry;
-  PAGE_MAP_AND_DIRECTORY_POINTER               *PageMapLevel4Entry;
-  PAGE_MAP_AND_DIRECTORY_POINTER               *PageMap;
-  PAGE_MAP_AND_DIRECTORY_POINTER               *PageDirectoryPointerEntry;
-  PAGE_TABLE_ENTRY                             *PageDirectoryEntry;
-  UINTN                                        TotalPagesNum;
-  UINTN                                        BigPageAddress;
-  VOID                                         *Hob;
-  BOOLEAN                                      Page5LevelSupport;
-  BOOLEAN                                      Page1GSupport;
-  PAGE_TABLE_1G_ENTRY                          *PageDirectory1GEntry;
-  UINT64                                       AddressEncMask;
-  IA32_CR4                                     Cr4;
+  UINT32                          RegEax;
+  UINT32                          RegEdx;
+  UINT8                           PhysicalAddressBits;
+  EFI_PHYSICAL_ADDRESS            PageAddress;
+  UINTN                           IndexOfPml5Entries;
+  UINTN                           IndexOfPml4Entries;
+  UINTN                           IndexOfPdpEntries;
+  UINTN                           IndexOfPageDirectoryEntries;
+  UINT32                          NumberOfPml5EntriesNeeded;
+  UINT32                          NumberOfPml4EntriesNeeded;
+  UINT32                          NumberOfPdpEntriesNeeded;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel5Entry;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel4Entry;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMap;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *PageDirectoryPointerEntry;
+  PAGE_TABLE_ENTRY                *PageDirectoryEntry;
+  UINTN                           TotalPagesNum;
+  UINTN                           BigPageAddress;
+  VOID                            *Hob;
+  BOOLEAN                         Enable5LevelPaging;
+  BOOLEAN                         Page1GSupport;
+  PAGE_TABLE_1G_ENTRY             *PageDirectory1GEntry;
+  UINT64                          AddressEncMask;
+  IA32_CR4                        Cr4;
 
   //
   // Set PageMapLevel5Entry to suppress incorrect compiler/analyzer warnings
@@ -748,22 +747,16 @@ CreateIdentityMappingPageTables (
     }
   }
 
-  Page5LevelSupport = FALSE;
-  if (PcdGetBool (PcdUse5LevelPageTable)) {
-    AsmCpuidEx (
-      CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
-      CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
-      NULL,
-      &EcxFlags.Uint32,
-      NULL,
-      NULL
-      );
-    if (EcxFlags.Bits.FiveLevelPage != 0) {
-      Page5LevelSupport = TRUE;
-    }
-  }
+  //
+  // Check CR4.LA57[bit12] to determin whether 5-Level Paging is enabled.
+  // Because this code runs at both IA-32e (64bit) mode and legacy protected (32bit) mode,
+  // below logic inherits the 5-level paging setting from bootloader in IA-32e mode
+  // and uses 4-level paging in legacy protected mode.
+  //
+  Cr4.UintN          = AsmReadCr4 ();
+  Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
 
-  DEBUG ((DEBUG_INFO, "AddressBits=%u 5LevelPaging=%u 1GPage=%u\n", PhysicalAddressBits, Page5LevelSupport, Page1GSupport));
+  DEBUG ((DEBUG_INFO, "PayloadEntry: AddressBits=%u 5LevelPaging=%u 1GPage=%u\n", PhysicalAddressBits, Enable5LevelPaging, Page1GSupport));
 
   //
   // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses
@@ -771,7 +764,7 @@ CreateIdentityMappingPageTables (
   //  due to either unsupported by HW, or disabled by PCD.
   //
   ASSERT (PhysicalAddressBits <= 52);
-  if (!Page5LevelSupport && (PhysicalAddressBits > 48)) {
+  if (!Enable5LevelPaging && (PhysicalAddressBits > 48)) {
     PhysicalAddressBits = 48;
   }
 
@@ -806,7 +799,7 @@ CreateIdentityMappingPageTables (
   //
   // Substract the one page occupied by PML5 entries if 5-Level Paging is disabled.
   //
-  if (!Page5LevelSupport) {
+  if (!Enable5LevelPaging) {
     TotalPagesNum--;
   }
 
@@ -826,7 +819,7 @@ CreateIdentityMappingPageTables (
   // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
   //
   PageMap = (VOID *)BigPageAddress;
-  if (Page5LevelSupport) {
+  if (Enable5LevelPaging) {
     //
     // By architecture only one PageMapLevel5 exists - so lets allocate storage for it.
     //
@@ -848,7 +841,7 @@ CreateIdentityMappingPageTables (
     PageMapLevel4Entry = (VOID *)BigPageAddress;
     BigPageAddress    += SIZE_4KB;
 
-    if (Page5LevelSupport) {
+    if (Enable5LevelPaging) {
       //
       // Make a PML5 Entry
       //
@@ -942,10 +935,7 @@ CreateIdentityMappingPageTables (
     ZeroMem (PageMapLevel4Entry, (512 - IndexOfPml4Entries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
   }
 
-  if (Page5LevelSupport) {
-    Cr4.UintN     = AsmReadCr4 ();
-    Cr4.Bits.LA57 = 1;
-    AsmWriteCr4 (Cr4.UintN);
+  if (Enable5LevelPaging) {
     //
     // For the PML5 entries we are not using fill in a null entry.
     //
