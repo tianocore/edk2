@@ -38,4 +38,3 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase    ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate        ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride  ## PRODUCES
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate         ## PRODUCES
