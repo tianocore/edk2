@@ -38,6 +38,47 @@ CpuCacheInfoPrintCpuCacheInfoTable (
 }
 
 /**
+  Function to compare CPU package ID, core type, cache level and cache type for use in QuickSort.
+
+  @param[in]  Buffer1             pointer to CPU_CACHE_INFO poiner to compare
+  @param[in]  Buffer2             pointer to second CPU_CACHE_INFO pointer to compare
+
+  @retval  0                      Buffer1 equal to Buffer2
+  @retval  1                      Buffer1 is greater than Buffer2
+  @retval  -1                     Buffer1 is less than Buffer2
+**/
+INTN
+EFIAPI
+CpuCacheInfoCompare (
+  IN CONST VOID             *Buffer1,
+  IN CONST VOID             *Buffer2
+  )
+{
+  CPU_CACHE_INFO_COMPARATOR Comparator1, Comparator2;
+
+  ZeroMem (&Comparator1, sizeof (Comparator1));
+  ZeroMem (&Comparator2, sizeof (Comparator2));
+
+  Comparator1.Bits.Package    = ((CPU_CACHE_INFO*)Buffer1)->Package;
+  Comparator1.Bits.CoreType   = ((CPU_CACHE_INFO*)Buffer1)->CoreType;
+  Comparator1.Bits.CacheLevel = ((CPU_CACHE_INFO*)Buffer1)->CacheLevel;
+  Comparator1.Bits.CacheType  = ((CPU_CACHE_INFO*)Buffer1)->CacheType;
+
+  Comparator2.Bits.Package    = ((CPU_CACHE_INFO*)Buffer2)->Package;
+  Comparator2.Bits.CoreType   = ((CPU_CACHE_INFO*)Buffer2)->CoreType;
+  Comparator2.Bits.CacheLevel = ((CPU_CACHE_INFO*)Buffer2)->CacheLevel;
+  Comparator2.Bits.CacheType  = ((CPU_CACHE_INFO*)Buffer2)->CacheType;
+
+  if (Comparator1.Uint64 == Comparator2.Uint64) {
+    return 0;
+  } else if (Comparator1.Uint64 > Comparator2.Uint64) {
+    return 1;
+  } else {
+    return -1;
+  }
+}
+
+/**
   Get the total number of package and package ID in the platform.
 
   @param[in]      ProcessorInfo       Pointer to the ProcessorInfo array.
@@ -325,6 +366,10 @@ CpuCacheInfoCollectCpuCacheInfoData (
   if (*CacheInfoCount < LocalCacheInfoCount) {
     Status = EFI_BUFFER_TOO_SMALL;
   } else {
+    //
+    // Sort LocalCacheInfo array by CPU package ID, core type, cache level and cache type.
+    //
+    PerformQuickSort (LocalCacheInfo, LocalCacheInfoCount, sizeof (*LocalCacheInfo), (SORT_COMPARE) CpuCacheInfoCompare);
     CopyMem (CacheInfo, LocalCacheInfo, sizeof (*CacheInfo) * LocalCacheInfoCount);
     DEBUG_CODE (
       CpuCacheInfoPrintCpuCacheInfoTable (CacheInfo, LocalCacheInfoCount);
@@ -340,7 +385,7 @@ CpuCacheInfoCollectCpuCacheInfoData (
 }
 
 /**
-  Get CpuCacheInfo data array.
+  Get CpuCacheInfo data array. The array is sorted by CPU package ID, core type, cache level and cache type.
 
   @param[in, out] CpuCacheInfo        Pointer to the CpuCacheInfo array.
   @param[in, out] CpuCacheInfoCount   As input, point to the length of response CpuCacheInfo array.
