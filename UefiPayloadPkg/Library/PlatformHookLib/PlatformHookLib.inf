@@ -35,5 +35,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate        ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride  ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate       ## PRODUCES
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate         ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters   ## PRODUCES
