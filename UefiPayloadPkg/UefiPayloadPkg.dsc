@@ -98,6 +98,8 @@
   DEFINE RTC_INDEX_REGISTER = 0x70
   DEFINE RTC_TARGET_REGISTER = 0x71
 
+  DEFINE SERIAL_DRIVER_ENABLE = TRUE
+
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
   GCC:*_UNIXGCC_*_CC_FLAGS       = -DMDEPKG_NDEBUG
@@ -536,7 +538,9 @@
   #
   # ISA Support
   #
+!if $(SERIAL_DRIVER_ENABLE) == TRUE
   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
+!endif
 !if $(PS2_KEYBOARD_ENABLE) == TRUE
   OvmfPkg/SioBusDxe/SioBusDxe.inf
   MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
