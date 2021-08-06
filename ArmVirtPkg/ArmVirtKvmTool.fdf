@@ -224,6 +224,11 @@ READ_LOCK_STATUS   = TRUE
   #
   INF MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 
+  #
+  # Rng Support
+  #
+  INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 16
 ERASE_POLARITY     = 1
