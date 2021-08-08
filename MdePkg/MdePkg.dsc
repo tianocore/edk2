@@ -130,6 +130,7 @@
   MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
 
   MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
+  MdePkg/Library/TdxProbeLib/TdxProbeLib.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
@@ -175,6 +176,7 @@
   MdePkg/Library/SmiHandlerProfileLibNull/SmiHandlerProfileLibNull.inf
   MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
+  MdePkg/Library/TdxLib/TdxLib.inf
 
 [Components.EBC]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf

@@ -296,6 +296,12 @@
   ##  @libraryclass  Provides services to log the SMI handler registration.
   SmiHandlerProfileLib|Include/Library/SmiHandlerProfileLib.h
 
+  ##  @libraryclass  Provides function to support TDX probe processing.
+  TdxProbeLib|Include/Library/TdxProbeLib.h
+
+  ##  @libraryclass  Provides function to support TDX processing.
+  TdxLib|Include/Library/TdxLib.h
+
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1

@@ -109,6 +109,10 @@
   #
   XenPlatformLib|Include/Library/XenPlatformLib.h
 
+  ##  @libraryclass  TdxMailboxLib
+  #
+  TdxMailboxLib|Include/Library/TdxMailboxLib.h
+
 [Guids]
   gUefiOvmfPkgTokenSpaceGuid            = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
   gEfiXenInfoGuid                       = {0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d}}
@@ -124,6 +128,7 @@
   gQemuKernelLoaderFsMediaGuid          = {0x1428f772, 0xb64a, 0x441e, {0xb8, 0xc3, 0x9e, 0xbd, 0xd7, 0xf8, 0x93, 0xc7}}
   gGrubFileGuid                         = {0xb5ae312c, 0xbc8a, 0x43b1, {0x9c, 0x62, 0xeb, 0xb8, 0x26, 0xdd, 0x5d, 0x07}}
   gConfidentialComputingSecretGuid      = {0xadf956ad, 0xe98c, 0x484c, {0xae, 0x11, 0xb5, 0x1c, 0x7d, 0x33, 0x64, 0x47}}
+  gUefiOvmfPkgTdxPlatformGuid           = {0xdec9b486, 0x1f16, 0x47c7, {0x8f, 0x68, 0xdf, 0x1a, 0x41, 0x88, 0x8b, 0xa5}}
 
 [Ppis]
   # PPI whose presence in the PPI database signals that the TPM base address
@@ -328,6 +333,28 @@
   #  device
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase|0x0|UINT32|0x47
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize|0x0|UINT32|0x48
+
+  ## The base address and size of the TDX Cfv base and size.
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase|0|UINT32|0x49
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataOffset|0|UINT32|0x4a
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize|0|UINT32|0x4b
+
+  ## The base address and size of the TDX Bfv base and size.
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase|0|UINT32|0x4c
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset|0|UINT32|0x4d
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize|0|UINT32|0x4e
+
+  ## Size of the Ovmf image in KB
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfImageSizeInKb|0|UINT32|0x4f
+
+  ## Ignore the VE halt in Tdx
+  gUefiOvmfPkgTokenSpaceGuid.PcdIgnoreVeHalt|FALSE|BOOLEAN|0x50
+
+  ## The chunk size of Tdx accept page
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptChunkSize|0x2000000|UINT64|0x51
+
+  ## The Tdx accept page size. 0x1000(4k),0x200000(2M)
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize|0x1000|UINT64|0x52
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2

@@ -90,6 +90,9 @@
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
 !endif
 
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
+  TdxProbeLib|MdePkg/Library/TdxProbeLib/TdxProbeLib.inf
+
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
 

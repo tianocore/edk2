@@ -29,8 +29,11 @@
 #include <Library/MemEncryptSevLib.h>
 #include <Register/Amd/Ghcb.h>
 #include <Register/Amd/Msr.h>
-
+#include <IndustryStandard/Tdx.h>
+#include <Library/TdxLib.h>
+#include <Library/TdxProbeLib.h>
 #include <Ppi/TemporaryRamSupport.h>
+#include "IntelTdx.h"
 
 #define SEC_IDT_ENTRY_COUNT  34
 
@@ -828,7 +831,7 @@ SevEsIsEnabled (
 
   SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
 
-  return ((SevEsWorkArea != NULL) && (SevEsWorkArea->SevEsEnabled != 0));
+  return ((SevEsWorkArea != NULL) && (SevEsWorkArea->SevEsEnabled == 1));
 }
 
 VOID
@@ -843,6 +846,19 @@ SecCoreStartupWithStack (
   IA32_DESCRIPTOR             IdtDescriptor;
   UINT32                      Index;
   volatile UINT8              *Table;
+
+#if defined (MDE_CPU_X64)
+  if (TdxIsEnabled ()) {
+    //
+    // For Td guests, the memory map info is in TdHobLib. It should be processed
+    // first so that the memory is accepted. Otherwise access to the unaccepted
+    // memory will trigger tripple fault.
+    //
+    if (ProcessTdxHobList () != EFI_SUCCESS) {
+      CpuDeadLoop ();
+    }
+  }
+#endif
 
   //
   // To ensure SMM can't be compromised on S3 resume, we must force re-init of
@@ -861,13 +877,20 @@ SecCoreStartupWithStack (
   // we use a loop rather than CopyMem.
   //
   IdtTableInStack.PeiService = NULL;
-  for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index ++) {
-    UINT8  *Src;
-    UINT8  *Dst;
-    UINTN  Byte;
 
-    Src = (UINT8 *) &mIdtEntryTemplate;
-    Dst = (UINT8 *) &IdtTableInStack.IdtTable[Index];
+  for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index ++) {
+    //
+    // Declare the local variables that actually move the data elements as
+    // volatile to prevent the optimizer from replacing this function with
+    // the intrinsic memcpy()
+    //
+    CONST UINT8     *Src;
+    volatile UINT8  *Dst;
+    UINTN           Byte;
+
+    Src = (CONST UINT8 *) &mIdtEntryTemplate;
+    Dst = (volatile UINT8 *) &IdtTableInStack.IdtTable[Index];
+
     for (Byte = 0; Byte < sizeof (mIdtEntryTemplate); Byte++) {
       Dst[Byte] = Src[Byte];
     }
@@ -911,6 +934,14 @@ SecCoreStartupWithStack (
     // an SEV-ES guest.
     //
     AsmEnableCache ();
+  }
+
+  if (TdxIsEnabled ()) {
+    //
+    // InitializeCpuExceptionHandlers () should be called in Td guests so that
+    // #VE exceptions can be handled correctly.
+    //
+    InitializeCpuExceptionHandlers (NULL);
   }
 
   DEBUG ((DEBUG_INFO,

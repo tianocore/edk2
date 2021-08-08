@@ -52,6 +52,7 @@
   PeCoffGetEntryPointLib
   DebugLib
   VmgExitLib
+  VmTdExitLib
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
