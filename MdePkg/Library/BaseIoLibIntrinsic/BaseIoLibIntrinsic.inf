@@ -35,6 +35,7 @@
   BaseIoLibIntrinsicInternal.h
   IoHighLevel.c
   IoLibInternalTdxNull.c
+  IoLibTdx.h
 
 [Sources.IA32]
   IoLibGcc.c    | GCC

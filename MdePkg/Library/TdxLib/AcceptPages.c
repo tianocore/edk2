@@ -24,6 +24,13 @@ UINT64  mTdxAcceptPageLevelMap[2] = {
   SIZE_2MB
 };
 
+/**
+  This function gets the PageLevel according to the input page size.
+
+  @param[in]  PageSize    Page size
+
+  @return UINTN           The mapped page level
+**/
 UINTN
 GetGpaPageLevel (
   UINT64 PageSize

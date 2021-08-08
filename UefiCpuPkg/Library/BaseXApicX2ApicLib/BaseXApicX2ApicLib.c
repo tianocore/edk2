@@ -81,7 +81,7 @@ AccessMsrNative (
 }
 
 /**
-  Read MSR value
+  Read MSR value.
 
   @param  MsrIndex  Index of the MSR to read
   @retval 64-bit    Value of MSR.
@@ -107,7 +107,7 @@ ReadMsrReg64 (
 }
 
 /**
-  Write to MSR
+  Write to MSR.
 
   @param  MsrIndex  Index of the MSR to write to
   @param  Val       Value to be written to the MSR
@@ -132,7 +132,7 @@ WriteMsrReg64 (
 }
 
 /**
-  Read MSR value
+  Read MSR value.
 
   @param  MsrIndex  Index of the MSR to read
   @retval 32-bit    Value of MSR.
@@ -158,7 +158,7 @@ ReadMsrReg32 (
 }
 
 /**
-  Write to MSR
+  Write to MSR.
 
   @param  MsrIndex  Index of the MSR to write to
   @param  Val       Value to be written to the MSR

@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef _MDE_PKG_TDX_H_
-#define _MDE_PKG_TDX_H_
+#ifndef __MDE_PKG_TDX_H_
+#define __MDE_PKG_TDX_H_
 
 #define EXIT_REASON_EXTERNAL_INTERRUPT  1
 #define EXIT_REASON_TRIPLE_FAULT        2

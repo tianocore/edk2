@@ -4,8 +4,8 @@
 
 **/
 
-#ifndef __INTERNAL_TDX_PROBE_H__
-#define __INTERNAL_TDX_PROBE_H__
+#ifndef __INTERNAL_TDX_PROBE_H_
+#define __INTERNAL_TDX_PROBE_H_
 
 #define PROBE_IS_TD_GUEST     0
 #define PROBE_NOT_TD_GUEST    1

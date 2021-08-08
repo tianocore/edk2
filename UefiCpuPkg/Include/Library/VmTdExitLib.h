@@ -4,14 +4,13 @@
   This library class defines some routines used when invoking the VMEXIT
   instruction in support of VMX and TDX to handle #VE exceptions.
 
-  Copyright (c) 2020, Intel Inc. All rights reserved.<BR>
-  Copyright (C) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) 2020 - 2021, Intel Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __VM_TD_EXIT_LIB_H__
-#define __VM_TD_EXIT_LIB_H__
+#ifndef __VMTD_EXIT_LIB_H_
+#define __VMTD_EXIT_LIB_H_
 
 #include <Library/BaseLib.h>
 #include <Uefi/UefiBaseType.h>

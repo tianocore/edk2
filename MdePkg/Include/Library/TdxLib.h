@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef _TDX_LIB_H_
-#define _TDX_LIB_H_
+#ifndef __TDX_LIB_H_
+#define __TDX_LIB_H_
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -84,7 +84,7 @@ TdMaxVCpuNum (
   );
 
 /**
-  This function gets the number of Virtual CPUs that are usable for Td 
+  This function gets the number of Virtual CPUs that are usable for Td
   Guest.
 
   @return Virtual CPUs number
