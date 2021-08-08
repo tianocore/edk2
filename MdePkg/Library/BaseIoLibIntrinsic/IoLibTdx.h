@@ -5,8 +5,8 @@
    SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __IOLIB_TDX_H__
-#define __IOLIB_TDX_H__
+#ifndef IOLIB_TDX_H_
+#define IOLIB_TDX_H_
 
 #include <Library/TdxProbeLib.h>
 

@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef _TDX_PROBE_LIB_H_
-#define _TDX_PROBE_LIB_H_
+#ifndef TDX_PROBE_LIB_H_
+#define TDX_PROBE_LIB_H_
 
 #include <Library/BaseLib.h>
 

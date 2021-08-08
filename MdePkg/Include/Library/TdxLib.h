@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef _TDX_LIB_H_
-#define _TDX_LIB_H_
+#ifndef TDX_LIB_H_
+#define TDX_LIB_H_
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
