@@ -163,7 +163,7 @@ AllocatePool (
     return NULL;
   }
 
-  Hob = (EFI_HOB_MEMORY_POOL *)CreateHob (EFI_HOB_TYPE_MEMORY_POOL, (UINT16)(sizeof (EFI_HOB_TYPE_MEMORY_POOL) + AllocationSize));
+  Hob = (EFI_HOB_MEMORY_POOL *)CreateHob (EFI_HOB_TYPE_MEMORY_POOL, (UINT16)(sizeof (EFI_HOB_MEMORY_POOL) + AllocationSize));
   return (VOID *)(Hob + 1);
 }
 
