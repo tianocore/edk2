@@ -20,6 +20,13 @@
 //
 extern EFI_PHYSICAL_ADDRESS  mMmMemLibInternalMaximumSupportAddress;
 
+#ifdef MDE_CPU_AARCH64
+#define ARM_PHYSICAL_ADDRESS_BITS 36
+#endif
+#ifdef MDE_CPU_ARM
+#define ARM_PHYSICAL_ADDRESS_BITS 32
+#endif
+
 /**
   Calculate and save the maximum support address.
 
@@ -31,7 +38,7 @@ MmMemLibInternalCalculateMaximumSupportAddress (
 {
   UINT8        PhysicalAddressBits;
 
-  PhysicalAddressBits = 36;
+  PhysicalAddressBits = ARM_PHYSICAL_ADDRESS_BITS;
 
   //
   // Save the maximum support address in one global variable

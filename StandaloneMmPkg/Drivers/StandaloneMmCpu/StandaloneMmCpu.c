@@ -10,7 +10,7 @@
 
 #include <Base.h>
 #include <Pi/PiMmCis.h>
-#include <Library/AArch64/StandaloneMmCoreEntryPoint.h>
+#include <Library/Arm/StandaloneMmCoreEntryPoint.h>
 #include <Library/DebugLib.h>
 #include <Library/ArmSvcLib.h>
 #include <Library/ArmLib.h>

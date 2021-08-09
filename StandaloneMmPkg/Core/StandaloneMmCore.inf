@@ -17,7 +17,7 @@
   PI_SPECIFICATION_VERSION       = 0x00010032
   ENTRY_POINT                    = StandaloneMmMain
 
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 ARM
 
 [Sources]
   StandaloneMmCore.c
