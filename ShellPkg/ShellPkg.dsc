@@ -63,6 +63,9 @@
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
 
+  TdxProbeLib|MdePkg/Library/TdxProbeLib/TdxProbeLib.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
+
 [LibraryClasses.ARM,LibraryClasses.AARCH64]
   #
   # It is not possible to prevent the ARM compiler for generic intrinsic functions.
