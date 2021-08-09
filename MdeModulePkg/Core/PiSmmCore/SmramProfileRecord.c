@@ -2233,64 +2233,6 @@ Done:
 }
 
 /**
-  SMRAM profile handler to register SMM image.
-
-  @param SmramProfileParameterRegisterImage The parameter of SMM profile register image.
-
-**/
-VOID
-SmramProfileHandlerRegisterImage (
-  IN SMRAM_PROFILE_PARAMETER_REGISTER_IMAGE *SmramProfileParameterRegisterImage
-  )
-{
-  EFI_STATUS                        Status;
-  EFI_SMM_DRIVER_ENTRY              DriverEntry;
-  VOID                              *EntryPointInImage;
-
-  ZeroMem (&DriverEntry, sizeof (DriverEntry));
-  CopyMem (&DriverEntry.FileName, &SmramProfileParameterRegisterImage->FileName, sizeof(EFI_GUID));
-  DriverEntry.ImageBuffer = SmramProfileParameterRegisterImage->ImageBuffer;
-  DriverEntry.NumberOfPage = (UINTN) SmramProfileParameterRegisterImage->NumberOfPage;
-  Status = InternalPeCoffGetEntryPoint ((VOID *) (UINTN) DriverEntry.ImageBuffer, &EntryPointInImage);
-  ASSERT_EFI_ERROR (Status);
-  DriverEntry.ImageEntryPoint = (PHYSICAL_ADDRESS) (UINTN) EntryPointInImage;
-
-  Status = RegisterSmramProfileImage (&DriverEntry, FALSE);
-  if (!EFI_ERROR (Status)) {
-    SmramProfileParameterRegisterImage->Header.ReturnStatus = 0;
-  }
-}
-
-/**
-  SMRAM profile handler to unregister SMM image.
-
-  @param SmramProfileParameterUnregisterImage The parameter of SMM profile unregister image.
-
-**/
-VOID
-SmramProfileHandlerUnregisterImage (
-  IN SMRAM_PROFILE_PARAMETER_UNREGISTER_IMAGE *SmramProfileParameterUnregisterImage
-  )
-{
-  EFI_STATUS                        Status;
-  EFI_SMM_DRIVER_ENTRY              DriverEntry;
-  VOID                              *EntryPointInImage;
-
-  ZeroMem (&DriverEntry, sizeof (DriverEntry));
-  CopyMem (&DriverEntry.FileName, &SmramProfileParameterUnregisterImage->FileName, sizeof (EFI_GUID));
-  DriverEntry.ImageBuffer = SmramProfileParameterUnregisterImage->ImageBuffer;
-  DriverEntry.NumberOfPage = (UINTN) SmramProfileParameterUnregisterImage->NumberOfPage;
-  Status = InternalPeCoffGetEntryPoint ((VOID *) (UINTN) DriverEntry.ImageBuffer, &EntryPointInImage);
-  ASSERT_EFI_ERROR (Status);
-  DriverEntry.ImageEntryPoint = (PHYSICAL_ADDRESS) (UINTN) EntryPointInImage;
-
-  Status = UnregisterSmramProfileImage (&DriverEntry, FALSE);
-  if (!EFI_ERROR (Status)) {
-    SmramProfileParameterUnregisterImage->Header.ReturnStatus = 0;
-  }
-}
-
-/**
   Dispatch function for a Software SMI handler.
 
   Caution: This function may receive untrusted input.
@@ -2374,28 +2316,6 @@ SmramProfileHandler (
     }
     SmramProfileHandlerGetDataByOffset ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET *) (UINTN) CommBuffer);
     break;
-  case SMRAM_PROFILE_COMMAND_REGISTER_IMAGE:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerRegisterImage\n"));
-    if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_REGISTER_IMAGE)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
-      return EFI_SUCCESS;
-    }
-    if (mSmramReadyToLock) {
-      return EFI_SUCCESS;
-    }
-    SmramProfileHandlerRegisterImage ((SMRAM_PROFILE_PARAMETER_REGISTER_IMAGE *) (UINTN) CommBuffer);
-    break;
-  case SMRAM_PROFILE_COMMAND_UNREGISTER_IMAGE:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerUnregisterImage\n"));
-    if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_UNREGISTER_IMAGE)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
-      return EFI_SUCCESS;
-    }
-    if (mSmramReadyToLock) {
-      return EFI_SUCCESS;
-    }
-    SmramProfileHandlerUnregisterImage ((SMRAM_PROFILE_PARAMETER_UNREGISTER_IMAGE *) (UINTN) CommBuffer);
-    break;
   case SMRAM_PROFILE_COMMAND_GET_RECORDING_STATE:
     DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetRecordingState\n"));
     if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_RECORDING_STATE)) {
@@ -2417,6 +2337,15 @@ SmramProfileHandler (
     ParameterRecordingState->Header.ReturnStatus = 0;
     break;
 
+  //
+  // Below 2 commands have been deprecated. They may not be (re-)used.
+  //
+  case SMRAM_PROFILE_COMMAND_DEPRECATED1:
+  case SMRAM_PROFILE_COMMAND_DEPRECATED2:
+    ASSERT (FALSE);
+    //
+    // Fall-through to the default (unrecognized command) case.
+    //
   default:
     break;
   }

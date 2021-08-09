@@ -389,10 +389,10 @@ struct _EDKII_MEMORY_PROFILE_PROTOCOL {
 #define SMRAM_PROFILE_COMMAND_GET_PROFILE_INFO           0x1
 #define SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA           0x2
 //
-// Below 2 commands are now used by ECP only and only valid before SmmReadyToLock
+// Below 2 commands have been deprecated. They may not be re-used.
 //
-#define SMRAM_PROFILE_COMMAND_REGISTER_IMAGE             0x3
-#define SMRAM_PROFILE_COMMAND_UNREGISTER_IMAGE           0x4
+#define SMRAM_PROFILE_COMMAND_DEPRECATED1                0x3
+#define SMRAM_PROFILE_COMMAND_DEPRECATED2                0x4
 
 #define SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA_BY_OFFSET 0x5
 #define SMRAM_PROFILE_COMMAND_GET_RECORDING_STATE        0x6
