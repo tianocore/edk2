@@ -137,7 +137,7 @@
   # hardware coherency (i.e., no virtualization or cache coherent DMA)
   gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000043
 
-[PcdsFeatureFlag.AARCH64]
+[PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.ARM]
   ## Used to select method for requesting services from S-EL1.<BR><BR>
   #   TRUE  - Selects FF-A calls for communication between S-EL0 and SPMC.<BR>
   #   FALSE - Selects SVC calls for communication between S-EL0 and SPMC.<BR>
