@@ -328,7 +328,7 @@ _ModuleEntryPoint (
 
   // Locate PE/COFF File information for the Standalone MM core module
   Status = LocateStandaloneMmCorePeCoffData (
-             (EFI_FIRMWARE_VOLUME_HEADER *) PayloadBootInfo->SpImageBase,
+             (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PayloadBootInfo->SpImageBase,
              &TeData,
              &TeDataSize
              );

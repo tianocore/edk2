@@ -164,8 +164,8 @@ StandaloneMmCpuInitialize (
 
   // Share the entry point of the CPU driver
   DEBUG ((DEBUG_INFO, "Sharing Cpu Driver EP *0x%lx = 0x%lx\n",
-          (UINT64) CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr,
-          (UINT64) PiMmStandaloneArmTfCpuDriverEntry));
+          (UINTN) CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr,
+          (UINTN) PiMmStandaloneArmTfCpuDriverEntry));
   *(CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr) = PiMmStandaloneArmTfCpuDriverEntry;
 
   // Find the descriptor that contains the whereabouts of the buffer for
@@ -180,8 +180,8 @@ StandaloneMmCpuInitialize (
     return Status;
   }
 
-  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalStart - 0x%lx\n", (UINT64) NsCommBufMmramRange->PhysicalStart));
-  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalSize - 0x%lx\n", (UINT64) NsCommBufMmramRange->PhysicalSize));
+  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalStart - 0x%lx\n", (UINTN) NsCommBufMmramRange->PhysicalStart));
+  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalSize - 0x%lx\n", (UINTN) NsCommBufMmramRange->PhysicalSize));
 
   CopyMem (&mNsCommBuffer, NsCommBufMmramRange, sizeof(EFI_MMRAM_DESCRIPTOR));
   DEBUG ((DEBUG_INFO, "mNsCommBuffer: 0x%016lx - 0x%lx\n", mNsCommBuffer.CpuStart, mNsCommBuffer.PhysicalSize));
