@@ -38,7 +38,7 @@ PrintHob (
 /**
   Some bootloader may pass a pcd database, and UPL also contain a PCD database.
   Dxe PCD driver has the assumption that the two PCD database can be catenated and
-  the local token number should be successive。
+  the local token number should be successive.
   This function will fix up the UPL PCD database to meet that assumption.
 
   @param[in]   DxeFv         The FV where to find the Universal PCD database.
