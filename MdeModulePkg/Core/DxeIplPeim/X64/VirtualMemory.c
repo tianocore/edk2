@@ -25,7 +25,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Register/Intel/Cpuid.h>
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
-#include <Library/TdxProbeLib.h>
 
 //
 // Global variable to keep track current available memory used as page table.
@@ -930,9 +929,8 @@ CreateIdentityMappingPageTables (
 
   //
   // Set IA32_EFER.NXE if necessary.
-  // TDX doesn't allow us to change EFER
   //
-  if (!TdxIsEnabled () && IsEnableNonExecNeeded ()) {
+  if (IsEnableNonExecNeeded ()) {
     EnableExecuteDisableBit ();
   }
 
