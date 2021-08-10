@@ -17,7 +17,7 @@
 #ifndef LIBREDFISH_REDPATH_H_
 #define LIBREDFISH_REDPATH_H_
 
-#include <PrivateInclude/Library/RedfishCrtLib.h>
+#include <Include/Library/RedfishCrtLib.h>
 
 #include <jansson.h>
 

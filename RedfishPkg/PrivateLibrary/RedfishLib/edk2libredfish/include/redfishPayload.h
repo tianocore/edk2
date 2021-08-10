@@ -17,7 +17,7 @@
 #ifndef LIBREDFISH_REDFISH_PAYLOAD_H_
 #define LIBREDFISH_REDFISH_PAYLOAD_H_
 
-#include <PrivateInclude/Library/RedfishCrtLib.h>
+#include <Include/Library/RedfishCrtLib.h>
 
 #include <jansson.h>
 #include <redfishService.h>
