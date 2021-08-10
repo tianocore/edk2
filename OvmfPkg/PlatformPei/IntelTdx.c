@@ -217,10 +217,14 @@ IntelTdxInitialize (
   )
 {
   EFI_HOB_PLATFORM_INFO       PlatformInfoHob;
+  RETURN_STATUS               PcdStatus;
 
   if (!TdxIsEnabled ()) {
     return;
   }
+
+  PcdStatus = PcdSetBoolS (PcdTdxIsEnabled, TRUE);
+  ASSERT_RETURN_ERROR (PcdStatus);
 
   BuildTdxFvHobs();
   // PlatformInfoHob
