@@ -89,7 +89,7 @@ MmioRead8 (
 
   Flag = FilterBeforeMmIoRead (FilterWidth8, Address, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       Value = TdMmioRead8 (Address);
     } else {
       MemoryFence ();
@@ -130,7 +130,7 @@ MmioWrite8 (
 
   Flag = FilterBeforeMmIoWrite (FilterWidth8, Address, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       TdMmioWrite8 (Address, Value);
     } else {
       MemoryFence ();
@@ -172,7 +172,7 @@ MmioRead16 (
   ASSERT ((Address & 1) == 0);
   Flag = FilterBeforeMmIoRead (FilterWidth16, Address, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       Value = TdMmioRead16 (Address);
     } else {
       MemoryFence ();
@@ -216,7 +216,7 @@ MmioWrite16 (
 
   Flag = FilterBeforeMmIoWrite (FilterWidth16, Address, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       TdMmioWrite16 (Address, Value);
     } else {
       MemoryFence ();
@@ -259,7 +259,7 @@ MmioRead32 (
 
   Flag = FilterBeforeMmIoRead (FilterWidth32, Address, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       Value = TdMmioRead32 (Address);
     } else {
       MemoryFence ();
@@ -303,7 +303,7 @@ MmioWrite32 (
 
   Flag = FilterBeforeMmIoWrite (FilterWidth32, Address, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       TdMmioWrite32 (Address, Value);
     } else {
       MemoryFence ();
@@ -346,7 +346,7 @@ MmioRead64 (
 
   Flag = FilterBeforeMmIoRead (FilterWidth64, Address, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       Value = TdMmioRead64 (Address);
     } else {
       MemoryFence ();
@@ -388,7 +388,7 @@ MmioWrite64 (
 
   Flag = FilterBeforeMmIoWrite (FilterWidth64, Address, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       TdMmioWrite64 (Address, Value);
     } else {
       MemoryFence ();

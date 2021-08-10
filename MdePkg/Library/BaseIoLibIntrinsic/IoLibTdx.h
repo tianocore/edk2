@@ -8,7 +8,19 @@
 #ifndef IOLIB_TDX_H_
 #define IOLIB_TDX_H_
 
-#include <Library/TdxProbeLib.h>
+/**
+  Check if it is Tdx guest.
+
+  @return TRUE    It is Tdx guest
+  @return FALSE   It is not Tdx guest
+
+**/
+BOOLEAN
+EFIAPI
+IsTdxGuest (
+  VOID
+  );
+
 
 /**
   Reads an 8-bit I/O port.

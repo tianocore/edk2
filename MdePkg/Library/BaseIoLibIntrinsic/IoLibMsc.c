@@ -73,7 +73,7 @@ IoRead8 (
 
   Flag = FilterBeforeIoRead (FilterWidth8, Port, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       Value = TdIoRead8 (Port);
     } else {
       _ReadWriteBarrier ();
@@ -114,7 +114,7 @@ IoWrite8 (
 
   Flag = FilterBeforeIoWrite(FilterWidth8, Port, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       TdIoWrite8 (Port, Value);
     } else {
       _ReadWriteBarrier ();
@@ -157,7 +157,7 @@ IoRead16 (
 
   Flag = FilterBeforeIoRead (FilterWidth16, Port, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       Value = TdIoRead16 (Port);
     } else {
       _ReadWriteBarrier ();
@@ -201,7 +201,7 @@ IoWrite16 (
 
   Flag = FilterBeforeIoWrite(FilterWidth16, Port, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       TdIoWrite16 (Port, Value);
     } else {
       _ReadWriteBarrier ();
@@ -244,7 +244,7 @@ IoRead32 (
 
   Flag = FilterBeforeIoRead(FilterWidth32, Port, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       Value = TdIoRead32 (Port);
     } else {
       _ReadWriteBarrier ();
@@ -288,7 +288,7 @@ IoWrite32 (
 
   Flag = FilterBeforeIoWrite(FilterWidth32, Port, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       TdIoWrite32 (Port, Value);
     } else {
       _ReadWriteBarrier ();

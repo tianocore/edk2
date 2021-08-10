@@ -46,7 +46,7 @@ IoRead8 (
 
   Flag = FilterBeforeIoRead (FilterWidth8, Port, &Data);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       Data = TdIoRead8 (Port);
     } else {
       __asm__ __volatile__ ("inb %w1,%b0" : "=a" (Data) : "d" ((UINT16)Port));
@@ -85,7 +85,7 @@ IoWrite8 (
 
   Flag = FilterBeforeIoWrite (FilterWidth8, Port, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       TdIoWrite8 (Port, Value);
     } else {
       __asm__ __volatile__ ("outb %b0,%w1" : : "a" (Value), "d" ((UINT16)Port));
@@ -126,7 +126,7 @@ IoRead16 (
 
   Flag = FilterBeforeIoRead (FilterWidth16, Port, &Data);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       Data = TdIoRead16 (Port);
     } else {
      __asm__ __volatile__ ("inw %w1,%w0" : "=a" (Data) : "d" ((UINT16)Port));
@@ -169,7 +169,7 @@ IoWrite16 (
 
   Flag = FilterBeforeIoWrite (FilterWidth16, Port, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       TdIoWrite16 (Port, Value);
     } else {
       __asm__ __volatile__ ("outw %w0,%w1" : : "a" (Value), "d" ((UINT16)Port));
@@ -210,7 +210,7 @@ IoRead32 (
 
   Flag = FilterBeforeIoRead (FilterWidth32, Port, &Data);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       Data = TdIoRead32 (Port);
     } else {
       __asm__ __volatile__ ("inl %w1,%0" : "=a" (Data) : "d" ((UINT16)Port));
@@ -252,7 +252,7 @@ IoWrite32 (
 
   Flag = FilterBeforeIoWrite (FilterWidth32, Port, &Value);
   if (Flag) {
-    if (TdxIsEnabled ()) {
+    if (IsTdxGuest ()) {
       TdIoWrite32 (Port, Value);
     } else {
       __asm__ __volatile__ ("outl %0,%w1" : : "a" (Value), "d" ((UINT16)Port));

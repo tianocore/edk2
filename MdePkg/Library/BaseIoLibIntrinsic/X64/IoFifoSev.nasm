@@ -18,12 +18,12 @@ extern ASM_PFX(TdIoWriteFifo16)
 extern ASM_PFX(TdIoWriteFifo32)
 
 ;------------------------------------------------------------------------------
-; Check whether we are in Tdx guest
+; Check whether we need to unroll the String I/O in Tdx guest
 ;
-; Return // eax   (1 - tdx guest, 0 - not tdx guest)
+; Return // eax   (1 - unroll, 0 - no unroll)
 ;------------------------------------------------------------------------------
-global ASM_PFX(IsTdxGuest)
-ASM_PFX(IsTdxGuest):
+global ASM_PFX(TdxNoRepIo)
+ASM_PFX(TdxNoRepIo):
   ; CPUID clobbers ebx, ecx and edx
   push      rbx
   push      rcx
@@ -35,11 +35,11 @@ ASM_PFX(IsTdxGuest):
   mov     eax, 0
   cpuid
   cmp     ebx, 0x756e6547  ; "Genu"
-  jne     .not_td
+  jne     @NoTdx
   cmp     edx, 0x49656e69  ; "ineI"
-  jne     .not_td
+  jne     @NoTdx
   cmp     ecx, 0x6c65746e  ; "ntel"
-  jne     .not_td
+  jne     @NoTdx
 
   ;
   ; CPUID (1)
@@ -47,7 +47,7 @@ ASM_PFX(IsTdxGuest):
   mov     eax, 1
   cpuid
   test    ecx, 0x80000000
-  jz      .not_td
+  jz      @NoTdx
 
   ;
   ; CPUID[0].EAX >= 0x21?
@@ -55,7 +55,7 @@ ASM_PFX(IsTdxGuest):
   mov     eax, 0
   cpuid
   cmp     eax, 0x21
-  jl      .not_td
+  jl      @NoTdx
 
   ;
   ; CPUID (0x21,0)
@@ -65,22 +65,22 @@ ASM_PFX(IsTdxGuest):
   cpuid
 
   cmp     ebx, 0x65746E49   ; "Inte"
-  jne     .not_td
+  jne     @NoTdx
   cmp     edx, 0x5844546C   ; "lTDX"
-  jne     .not_td
+  jne     @NoTdx
   cmp     ecx, 0x20202020   ; "    "
-  jne     .not_td
+  jne     @NoTdx
 
   mov     rax, 1
-  jmp     .exit
+  jmp     @ExitTdxNoRepIo
 
-.not_td:
+@NoTdx:
   mov     rax, 0
 
-.exit:
-  pop       rdx
-  pop       rcx
-  pop       rbx
+@ExitTdxNoRepIo:
+  pop     rdx
+  pop     rcx
+  pop     rbx
   ret
 
 ;------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ ASM_PFX(SevNoRepIo):
 ;------------------------------------------------------------------------------
 global ASM_PFX(IoReadFifo8)
 ASM_PFX(IoReadFifo8):
-    call    ASM_PFX(IsTdxGuest)
+    call    ASM_PFX(TdxNoRepIo)
     test    rax, rax
     jz      @NonTd_IoReadFifo8
 
@@ -194,7 +194,7 @@ ASM_PFX(IoReadFifo8):
 ;------------------------------------------------------------------------------
 global ASM_PFX(IoReadFifo16)
 ASM_PFX(IoReadFifo16):
-    call    ASM_PFX(IsTdxGuest)
+    call    ASM_PFX(TdxNoRepIo)
     test    rax, rax
     jz      @NonTd_IoReadFifo16
 
@@ -240,7 +240,7 @@ ASM_PFX(IoReadFifo16):
 ;------------------------------------------------------------------------------
 global ASM_PFX(IoReadFifo32)
 ASM_PFX(IoReadFifo32):
-    call    ASM_PFX(IsTdxGuest)
+    call    ASM_PFX(TdxNoRepIo)
     test    rax, rax
     jz      @NonTd_IoReadFifo32
 
@@ -286,7 +286,7 @@ ASM_PFX(IoReadFifo32):
 ;------------------------------------------------------------------------------
 global ASM_PFX(IoWriteFifo8)
 ASM_PFX(IoWriteFifo8):
-    call    ASM_PFX(IsTdxGuest)
+    call    ASM_PFX(TdxNoRepIo)
     test    rax, rax
     jz      @NonTd_IoWriteFifo8
 
@@ -332,7 +332,7 @@ ASM_PFX(IoWriteFifo8):
 ;------------------------------------------------------------------------------
 global ASM_PFX(IoWriteFifo16)
 ASM_PFX(IoWriteFifo16):
-    call    ASM_PFX(IsTdxGuest)
+    call    ASM_PFX(TdxNoRepIo)
     test    rax, rax
     jz      @NonTd_IoWriteFifo16
 
@@ -378,7 +378,7 @@ ASM_PFX(IoWriteFifo16):
 ;------------------------------------------------------------------------------
 global ASM_PFX(IoWriteFifo32)
 ASM_PFX(IoWriteFifo32):
-    call    ASM_PFX(IsTdxGuest)
+    call    ASM_PFX(TdxNoRepIo)
     test    rax, rax
     jz      @NonTd_IoWriteFifo32
 
