@@ -16,6 +16,7 @@
 #include <Library/PcdLib.h>
 #include <Library/PlatformBmPrintScLib.h>
 #include <Library/QemuBootOrderLib.h>
+#include <Library/TpmPlatformHierarchyLib.h>
 #include <Library/UefiBootManagerLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/FirmwareVolume2.h>
@@ -695,6 +696,11 @@ PlatformBootManagerBeforeConsole (
   // Signal EndOfDxe PI Event
   //
   EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
+
+  //
+  // Disable the TPM 2 platform hierarchy
+  //
+  ConfigureTpmPlatformHierarchy ();
 
   //
   // Dispatch deferred images after EndOfDxe event.
