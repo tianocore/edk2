@@ -8,6 +8,7 @@
 #include "BaseIoLibIntrinsicInternal.h"
 #include <Include/IndustryStandard/Tdx.h>
 #include <Library/TdxLib.h>
+#include <Library/TdxProbeLib.h>
 #include "IoLibTdx.h"
 
 // Size of TDVMCALL Access, including IO and MMIO
@@ -19,6 +20,23 @@
 // Direction of TDVMCALL Access, including IO and MMIO
 #define TDVMCALL_ACCESS_READ        0
 #define TDVMCALL_ACCESS_WRITE       1
+
+/**
+  Check if it is Tdx guest.
+
+  @return TRUE    It is Tdx guest
+  @return FALSE   It is not Tdx guest
+
+**/
+BOOLEAN
+EFIAPI
+IsTdxGuest (
+  VOID
+  )
+{
+  return TdxIsEnabled ();
+}
+
 
 /**
   Reads an 8-bit I/O port.

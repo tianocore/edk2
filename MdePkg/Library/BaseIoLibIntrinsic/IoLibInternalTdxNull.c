@@ -10,6 +10,23 @@
 #include "IoLibTdx.h"
 
 /**
+  Check if it is Tdx guest.
+
+  @return TRUE    It is Tdx guest
+  @return FALSE   It is not Tdx guest
+
+**/
+BOOLEAN
+EFIAPI
+IsTdxGuest (
+  VOID
+  )
+{
+  return FALSE;
+}
+
+
+/**
   Reads an 8-bit I/O port.
 
   TDVMCALL_IO is invoked to read I/O port.
