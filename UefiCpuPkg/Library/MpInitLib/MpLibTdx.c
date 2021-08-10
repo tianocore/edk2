@@ -9,10 +9,11 @@
 **/
 
 #include "MpLib.h"
+#include "MpIntelTdx.h"
 
+#include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 #include <IndustryStandard/Tdx.h>
-#include <Library/TdxLib.h>
 
 
 /**
@@ -47,7 +48,7 @@ TdxMpInitLibGetProcessorInfo (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = TdCall(TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
+  Status = MyTdCall(TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
   ASSERT(Status == EFI_SUCCESS);
 
   if (ProcessorNumber >= TdReturnData.TdInfo.NumVcpus) {
@@ -112,7 +113,7 @@ TdxMpInitLibGetNumberOfProcessors (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = TdCall(TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
+  Status = MyTdCall(TDCALL_TDINFO, 0, 0, 0, &TdReturnData);
   ASSERT(Status == EFI_SUCCESS);
 
   if (NumberOfProcessors != NULL) {
@@ -123,4 +124,19 @@ TdxMpInitLibGetNumberOfProcessors (
   }
 
   return Status;
+}
+
+/**
+  Whether Intel TDX is enabled.
+
+  @return TRUE    TDX enabled
+  @return FALSE   TDX not enabled
+**/
+BOOLEAN
+EFIAPI
+MpTdxIsEnabled (
+  VOID
+  )
+{
+  return PcdGetBool (PcdTdxIsEnabled);
 }

@@ -9,10 +9,10 @@
 **/
 
 #include "MpLib.h"
+#include "MpIntelTdx.h"
 #include <Library/VmgExitLib.h>
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
-#include <Library/TdxProbeLib.h>
 
 EFI_GUID mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
 
@@ -1966,7 +1966,7 @@ MpInitLibInitialize (
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
 
-  if (TdxIsEnabled ()) {
+  if (MpTdxIsEnabled ()) {
     return EFI_SUCCESS;
   }
 
@@ -2220,7 +2220,7 @@ MpInitLibGetProcessorInfo (
   CPU_INFO_IN_HOB        *CpuInfoInHob;
   UINTN                  OriginalProcessorNumber;
 
-  if (TdxIsEnabled ()) {
+  if (MpTdxIsEnabled ()) {
     return TdxMpInitLibGetProcessorInfo (ProcessorNumber, ProcessorInfoBuffer, HealthData);
   }
 
@@ -2455,7 +2455,7 @@ EnableDisableApWorker (
   CPU_MP_DATA               *CpuMpData;
   UINTN                     CallerNumber;
 
-  if (TdxIsEnabled ()) {
+  if (MpTdxIsEnabled ()) {
     return EFI_UNSUPPORTED;
   }
 
@@ -2519,7 +2519,7 @@ MpInitLibWhoAmI (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (TdxIsEnabled ()) {
+  if (MpTdxIsEnabled ()) {
     *ProcessorNumber = 0;
     return EFI_SUCCESS;
   }
@@ -2562,7 +2562,7 @@ MpInitLibGetNumberOfProcessors (
   UINTN                   EnabledProcessorNumber;
   UINTN                   Index;
 
-  if (TdxIsEnabled ()) {
+  if (MpTdxIsEnabled ()) {
     return TdxMpInitLibGetNumberOfProcessors(NumberOfProcessors, NumberOfEnabledProcessors);
   }
 
@@ -2651,7 +2651,7 @@ StartupAllCPUsWorker (
   BOOLEAN                 HasEnabledAp;
   CPU_STATE               ApState;
 
-  if (TdxIsEnabled ()) {
+  if (MpTdxIsEnabled ()) {
     return EFI_SUCCESS;
   }
 

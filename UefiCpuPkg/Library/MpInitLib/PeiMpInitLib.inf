@@ -22,10 +22,13 @@
 #
 
 [Sources.IA32]
+  MpLibTdxNull.c
   Ia32/MpFuncs.nasm
 
 [Sources.X64]
+  MpLibTdx.c
   X64/MpFuncs.nasm
+  X64/IntelTdcall.nasm
 
 [Sources.common]
   MpEqu.inc
@@ -33,7 +36,6 @@
   MpLib.c
   MpLib.h
   Microcode.c
-  MpLibTdx.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -53,8 +55,6 @@
   PcdLib
   VmgExitLib
   MicrocodeLib
-  TdxLib
-  TdxProbeLib
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## CONSUMES
@@ -68,6 +68,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled                      ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                   ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdTdxIsEnabled                        ## CONSUMES
 
 [Ppis]
   gEdkiiPeiShadowMicrocodePpiGuid        ## SOMETIMES_CONSUMES
