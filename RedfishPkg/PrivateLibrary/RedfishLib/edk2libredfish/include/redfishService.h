@@ -30,7 +30,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#include <PrivateInclude/Library/RedfishCrtLib.h>
+#include <Include/Library/RedfishCrtLib.h>
 
 #include <Protocol/EdkIIRedfishConfigHandler.h>
 #include <Protocol/RestEx.h>
