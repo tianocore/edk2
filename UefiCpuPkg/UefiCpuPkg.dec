@@ -399,5 +399,11 @@
   # @Prompt SEV-ES Status
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|FALSE|BOOLEAN|0x60000016
 
+  ## This dynamic PCD indicates whether Intel TDX is enabled
+  #   TRUE  - Intel TDX is enabled
+  #   FALSE - Intel TDX is not enabled
+  # @Prompt Intel TDX Status
+  gUefiCpuPkgTokenSpaceGuid.PcdTdxIsEnabled|FALSE|BOOLEAN|0x60000017
+
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni
