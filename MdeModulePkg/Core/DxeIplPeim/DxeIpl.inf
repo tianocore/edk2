@@ -57,9 +57,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-[Packages.IA32, Packages.X64]
-  UefiCpuPkg/UefiCpuPkg.dec
-
 [Packages.ARM, Packages.AARCH64]
   ArmPkg/ArmPkg.dec
 
@@ -120,7 +117,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable                  ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize                            ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdTdxIsEnabled                             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed               ## CONSUMES
 
 [Pcd.IA32,Pcd.X64,Pcd.ARM,Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES

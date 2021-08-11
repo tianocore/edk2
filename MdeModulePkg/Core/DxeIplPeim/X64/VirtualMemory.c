@@ -149,9 +149,9 @@ IsEnableNonExecNeeded (
   }
 
   //
-  // Intel TDX does not allow EFER to be changed
+  // Intel TDX sets this flag to FALSE.
   //
-  if (PcdGetBool (PcdTdxIsEnabled)) {
+  if (!PcdGetBool (PcdIa32EferChangeAllowed)) {
     return FALSE;
   }
   //
