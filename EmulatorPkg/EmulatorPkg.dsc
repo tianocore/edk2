@@ -66,8 +66,6 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
-  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
-  TdxProbeLib|MdePkg/Library/TdxProbeLib/TdxProbeLib.inf
 
   #
   # UEFI & PI
