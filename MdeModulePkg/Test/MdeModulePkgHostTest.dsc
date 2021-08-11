@@ -41,3 +41,9 @@
     <PcdsFixedAtBuild>
       gEfiMdeModulePkgTokenSpaceGuid.PcdAllowVariablePolicyEnforcementDisable|TRUE
   }
+
+  MdeModulePkg/Library/UefiSortLib/UnitTest/UefiSortLibUnitTest.inf {
+    <LibraryClasses>
+      UefiSortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+  }
