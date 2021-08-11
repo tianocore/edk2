@@ -92,9 +92,6 @@
 
   OemMiscLib|ArmPkg/Universal/Smbios/OemMiscLibNull/OemMiscLibNull.inf
 
-  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
-  TdxProbeLib|MdePkg/Library/TdxProbeLib/TdxProbeLib.inf
-
 [LibraryClasses.common.PEIM]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
