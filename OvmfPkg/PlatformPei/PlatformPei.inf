@@ -119,6 +119,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled
   gUefiCpuPkgTokenSpaceGuid.PcdTdxIsEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress

@@ -226,6 +226,9 @@ IntelTdxInitialize (
   PcdStatus = PcdSetBoolS (PcdTdxIsEnabled, TRUE);
   ASSERT_RETURN_ERROR (PcdStatus);
 
+  PcdStatus = PcdSetBoolS (PcdIa32EferChangeAllowed, FALSE);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
   BuildTdxFvHobs();
   // PlatformInfoHob
   ZeroMem (&PlatformInfoHob, sizeof (PlatformInfoHob));
