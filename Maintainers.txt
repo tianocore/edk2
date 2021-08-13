@@ -488,7 +488,7 @@ R: Abner Chang <abner.chang@amd.com> [changab]
 
 OvmfPkg: LsiScsi driver
 F: OvmfPkg/LsiScsiDxe/
-R: Gary Lin <glin@suse.com>
+R: Gary Lin <gary.lin@hpe.com>
 
 OvmfPkg: MptScsi and PVSCSI driver
 F: OvmfPkg/MptScsiDxe/
