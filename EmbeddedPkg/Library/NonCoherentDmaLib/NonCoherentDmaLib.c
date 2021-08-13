@@ -224,7 +224,7 @@ DmaMap (
       goto FreeMapInfo;
     }
 
-    if (Map->Operation == MapOperationBusMasterRead) {
+    if (Operation == MapOperationBusMasterRead) {
       CopyMem (Map->BufferAddress, (VOID *)(UINTN)HostAddress, *NumberOfBytes);
     }
     mCpu->FlushDataCache (mCpu, (UINTN)Map->BufferAddress, AllocSize,
