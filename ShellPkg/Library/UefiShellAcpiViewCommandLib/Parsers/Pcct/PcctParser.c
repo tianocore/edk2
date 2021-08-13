@@ -1,11 +1,11 @@
 /** @file
   PCCT table parser
 
-  Copyright (c) 2020, Arm Limited.
+  Copyright (c) 2021, Arm Limited.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-    - ACPI 6.3 Specification - January 2019
+    - ACPI 6.4 Specification - January 2021
 **/
 
 #include <Library/BaseMemoryLib.h>
@@ -93,9 +93,9 @@ ValidatePccType0Gas (
 {
   switch (*(UINT8*)Ptr) {
 #if !(defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
-    case EFI_ACPI_6_3_SYSTEM_IO:
+    case EFI_ACPI_6_4_SYSTEM_IO:
 #endif //if not (defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
-    case EFI_ACPI_6_3_SYSTEM_MEMORY:
+    case EFI_ACPI_6_4_SYSTEM_MEMORY:
       return;
     default:
       IncrementErrorCount ();
@@ -120,10 +120,10 @@ ValidatePccGas (
 {
   switch (*(UINT8*)Ptr) {
 #if !(defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
-    case EFI_ACPI_6_3_SYSTEM_IO:
+    case EFI_ACPI_6_4_SYSTEM_IO:
 #endif //if not (defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
-    case EFI_ACPI_6_3_FUNCTIONAL_FIXED_HARDWARE:
-    case EFI_ACPI_6_3_SYSTEM_MEMORY:
+    case EFI_ACPI_6_4_FUNCTIONAL_FIXED_HARDWARE:
+    case EFI_ACPI_6_4_SYSTEM_MEMORY:
       return;
     default:
       IncrementErrorCount ();
@@ -148,10 +148,10 @@ ValidatePccDoorbellGas (
 {
   // For slave subspaces this field is optional, if not present the field
   // should just contain zeros.
-  if (*PccSubspaceType == EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) {
+  if (*PccSubspaceType == EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) {
     if (IsZeroBuffer (
           Ptr,
-          sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE)
+          sizeof (EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE)
           )) {
       return;
     }
@@ -180,14 +180,14 @@ ValidatePccIntAckGas (
   // edge driven the register may be omitted. A value of 0x0 on all
   // 12 bytes of the GAS structure indicates the register is not
   // present.
-  if (((*PccGlobalFlags & EFI_ACPI_6_3_PCCT_FLAGS_PLATFORM_INTERRUPT) !=
-       EFI_ACPI_6_3_PCCT_FLAGS_PLATFORM_INTERRUPT) ||
+  if (((*PccGlobalFlags & EFI_ACPI_6_4_PCCT_FLAGS_PLATFORM_INTERRUPT) !=
+       EFI_ACPI_6_4_PCCT_FLAGS_PLATFORM_INTERRUPT) ||
       ((*ExtendedPccSubspaceInterruptFlags &
-       EFI_ACPI_6_3_PCCT_SUBSPACE_PLATFORM_INTERRUPT_FLAGS_MODE) ==
-       EFI_ACPI_6_3_PCCT_SUBSPACE_PLATFORM_INTERRUPT_FLAGS_MODE)) {
+       EFI_ACPI_6_4_PCCT_SUBSPACE_PLATFORM_INTERRUPT_FLAGS_MODE) ==
+       EFI_ACPI_6_4_PCCT_SUBSPACE_PLATFORM_INTERRUPT_FLAGS_MODE)) {
     if (IsZeroBuffer (
           Ptr,
-          sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE)
+          sizeof (EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE)
           )) {
       return;
     }
@@ -212,7 +212,7 @@ ValidatePccErrStatusGas (
   )
 {
   // This field is ignored by the OSPM on slave channels.
-  if (*PccSubspaceType == EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) {
+  if (*PccSubspaceType == EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) {
     return;
   }
 
@@ -236,9 +236,9 @@ ValidatePlatInterrupt (
 {
   // If a slave subspace is present in the PCCT, then the global Platform
   // Interrupt flag must be set to 1.
-  if ((*PccSubspaceType == EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) &&
-      ((*PccGlobalFlags & EFI_ACPI_6_3_PCCT_FLAGS_PLATFORM_INTERRUPT) !=
-        EFI_ACPI_6_3_PCCT_FLAGS_PLATFORM_INTERRUPT)) {
+  if ((*PccSubspaceType == EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) &&
+      ((*PccGlobalFlags & EFI_ACPI_6_4_PCCT_FLAGS_PLATFORM_INTERRUPT) !=
+        EFI_ACPI_6_4_PCCT_FLAGS_PLATFORM_INTERRUPT)) {
     IncrementErrorCount ();
     Print (
       L"\nError: Global Platform interrupt flag must be set to 1" \
@@ -563,31 +563,31 @@ ParseAcpiPcct (
     }
 
     switch (*PccSubspaceType) {
-      case EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_GENERIC:
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_GENERIC:
         DumpPccSubspaceType0 (
           PccSubspacePtr,
           *PccSubspaceLength
           );
         break;
-      case EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_1_HW_REDUCED_COMMUNICATIONS:
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_1_HW_REDUCED_COMMUNICATIONS:
         DumpPccSubspaceType1 (
           PccSubspacePtr,
           *PccSubspaceLength
           );
         break;
-      case EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_2_HW_REDUCED_COMMUNICATIONS:
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_2_HW_REDUCED_COMMUNICATIONS:
         DumpPccSubspaceType2 (
           PccSubspacePtr,
           *PccSubspaceLength
           );
         break;
-      case EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_3_EXTENDED_PCC:
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_3_EXTENDED_PCC:
         DumpPccSubspaceType3 (
           PccSubspacePtr,
           *PccSubspaceLength
           );
         break;
-      case EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC:
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC:
         DumpPccSubspaceType4 (
           PccSubspacePtr,
           *PccSubspaceLength
