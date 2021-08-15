@@ -158,7 +158,11 @@ DebuggerBreakpointDel (
   // Delete this breakpoint
   //
   for (BpIndex = Index; BpIndex < DebuggerPrivate->DebuggerBreakpointCount - 1; BpIndex++) {
-    DebuggerPrivate->DebuggerBreakpointContext[BpIndex] = DebuggerPrivate->DebuggerBreakpointContext[BpIndex + 1];
+    CopyMem (
+      &DebuggerPrivate->DebuggerBreakpointContext[BpIndex],
+      &DebuggerPrivate->DebuggerBreakpointContext[BpIndex + 1],
+      sizeof (DebuggerPrivate->DebuggerBreakpointContext[BpIndex])
+      );
   }
   ZeroMem (
     &DebuggerPrivate->DebuggerBreakpointContext[BpIndex],
