@@ -219,7 +219,11 @@ EdbCheckBreakpoint (
       //
       // If hit, record current breakpoint
       //
-      DebuggerPrivate->DebuggerBreakpointContext[EFI_DEBUGGER_BREAKPOINT_MAX] = DebuggerPrivate->DebuggerBreakpointContext[Index];
+      CopyMem (
+        &DebuggerPrivate->DebuggerBreakpointContext[EFI_DEBUGGER_BREAKPOINT_MAX],
+        &DebuggerPrivate->DebuggerBreakpointContext[Index],
+        sizeof (DebuggerPrivate->DebuggerBreakpointContext[EFI_DEBUGGER_BREAKPOINT_MAX])
+        );
       DebuggerPrivate->DebuggerBreakpointContext[EFI_DEBUGGER_BREAKPOINT_MAX].State = TRUE;
       //
       // Do not set Breakpoint flag. We record the address here just let it not patch breakpoint address when de-init.
