@@ -230,7 +230,11 @@ EbcDebuggerPushTraceDestEntry (
     //
     ASSERT (mDebuggerPrivate.TraceEntry[EFI_DEBUGGER_TRACE_MAX].Type == Type);
     for (Index = 0; Index < EFI_DEBUGGER_TRACE_MAX; Index++) {
-      mDebuggerPrivate.TraceEntry[Index] = mDebuggerPrivate.TraceEntry[Index + 1];
+      CopyMem (
+        &mDebuggerPrivate.TraceEntry[Index],
+        &mDebuggerPrivate.TraceEntry[Index + 1],
+        sizeof (mDebuggerPrivate.TraceEntry[Index])
+        );
     }
     mDebuggerPrivate.TraceEntry[EFI_DEBUGGER_CALLSTACK_MAX - 1].DestAddress = DestEntry;
     mDebuggerPrivate.TraceEntryCount = EFI_DEBUGGER_TRACE_MAX;
