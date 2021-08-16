@@ -1433,7 +1433,8 @@ PlatformBdsConnectSequence (
   VOID
   )
 {
-  UINTN  Index;
+  UINTN          Index;
+  RETURN_STATUS  Status;
 
   DEBUG ((DEBUG_INFO, "PlatformBdsConnectSequence\n"));
 
@@ -1452,11 +1453,14 @@ PlatformBdsConnectSequence (
     Index++;
   }
 
-  //
-  // Just use the simple policy to connect all devices
-  //
-  DEBUG ((DEBUG_INFO, "EfiBootManagerConnectAll\n"));
-  EfiBootManagerConnectAll ();
+  Status = ConnectDevicesFromQemu ();
+  if (RETURN_ERROR (Status)) {
+    //
+    // Just use the simple policy to connect all devices
+    //
+    DEBUG ((DEBUG_INFO, "EfiBootManagerConnectAll\n"));
+    EfiBootManagerConnectAll ();
+  }
 }
 
 /**
@@ -1581,6 +1585,7 @@ PlatformBootManagerAfterConsole (
     );
 
   RemoveStaleFvFileOptions ();
+  SetBootOrderFromQemu ();
 
   PlatformBmPrintScRegisterHandler ();
 }

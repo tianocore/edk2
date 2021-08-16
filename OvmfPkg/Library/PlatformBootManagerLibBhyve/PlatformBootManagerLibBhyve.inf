@@ -46,6 +46,7 @@
   BootLogoLib
   DevicePathLib
   PciLib
+  QemuBootOrderLib
   NvVarsFileLib
   ReportStatusCodeLib
   UefiLib

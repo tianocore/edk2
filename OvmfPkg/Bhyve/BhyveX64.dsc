@@ -358,6 +358,7 @@
 !endif
   PlatformBootManagerLib|OvmfPkg/Library/PlatformBootManagerLibBhyve/PlatformBootManagerLibBhyve.inf
   PlatformBmPrintScLib|OvmfPkg/Library/PlatformBmPrintScLib/PlatformBmPrintScLib.inf
+  QemuBootOrderLib|OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxDxeLib.inf
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
