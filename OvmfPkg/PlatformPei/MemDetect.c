@@ -313,8 +313,15 @@ GetSystemMemorySizeBelow4gb (
   VOID
   )
 {
-  UINT8  Cmos0x34;
-  UINT8  Cmos0x35;
+  EFI_STATUS  Status;
+  UINT64      LowerMemorySize = 0;
+  UINT8       Cmos0x34;
+  UINT8       Cmos0x35;
+
+  Status = ScanOrAdd64BitE820Ram (FALSE, &LowerMemorySize, NULL);
+  if ((Status == EFI_SUCCESS) && (LowerMemorySize > 0)) {
+    return (UINT32)LowerMemorySize;
+  }
 
   //
   // CMOS 0x34/0x35 specifies the system memory above 16 MB.
@@ -769,7 +776,6 @@ QemuInitializeRam (
   // Determine total memory size available
   //
   LowerMemorySize = GetSystemMemorySizeBelow4gb ();
-  UpperMemorySize = GetSystemMemorySizeAbove4gb ();
 
   if (mBootMode == BOOT_ON_S3_RESUME) {
     //
@@ -819,8 +825,11 @@ QemuInitializeRam (
     // memory size read from the CMOS.
     //
     Status = ScanOrAdd64BitE820Ram (TRUE, NULL, NULL);
-    if (EFI_ERROR (Status) && (UpperMemorySize != 0)) {
-      AddMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
+    if (EFI_ERROR (Status)) {
+      UpperMemorySize = GetSystemMemorySizeAbove4gb ();
+      if (UpperMemorySize != 0) {
+        AddMemoryBaseSizeHob (BASE_4GB, UpperMemorySize);
+      }
     }
   }
 
