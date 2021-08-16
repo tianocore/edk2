@@ -395,21 +395,21 @@ typedef struct CmArmGTBlockInfo {
 } CM_ARM_GTBLOCK_INFO;
 
 /** A structure that describes the
-    SBSA Generic Watchdog information for the Platform.
+    Arm Generic Watchdog information for the Platform.
 
     ID: EArmObjPlatformGenericWatchdogInfo
 */
 typedef struct CmArmGenericWatchdogInfo {
-  /// The physical base address of the SBSA Watchdog control frame
+  /// The physical base address of the Arm Watchdog control frame
   UINT64  ControlFrameAddress;
 
-  /// The physical base address of the SBSA Watchdog refresh frame
+  /// The physical base address of the Arm Watchdog refresh frame
   UINT64  RefreshFrameAddress;
 
   /// The watchdog interrupt
   UINT32  TimerGSIV;
 
-  /** The flags for the watchdog as described by the SBSA watchdog
+  /** The flags for the watchdog as described by the Arm watchdog
       structure in the ACPI specification.
   */
   UINT32  Flags;
