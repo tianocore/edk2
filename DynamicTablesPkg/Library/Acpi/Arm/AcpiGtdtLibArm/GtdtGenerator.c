@@ -1,11 +1,11 @@
 /** @file
   GTDT Table Generator
 
-  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2021, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-  - ACPI 6.3 Specification - January 2019
+  - ACPI 6.4 Specification - January 2021
 
 **/
 
@@ -41,7 +41,7 @@ GET_OBJECT_LIST (
   CM_ARM_GENERIC_TIMER_INFO
   );
 
-/** This macro expands to a function that retrieves the SBSA Generic
+/** This macro expands to a function that retrieves the Arm Generic
     Watchdog Timer Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
@@ -91,7 +91,7 @@ EFI_STATUS
 EFIAPI
 AddGenericTimerInfo (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         * CONST CfgMgrProtocol,
-  IN        EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE * CONST Gtdt,
+  IN        EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE * CONST Gtdt,
   IN  CONST UINT32                                               PlatformTimerCount,
   IN  CONST UINT32                                               AcpiTableRevision
 )
@@ -133,7 +133,7 @@ AddGenericTimerInfo (
     GenericTimerInfo->CounterReadBaseAddress;
   Gtdt->PlatformTimerCount = PlatformTimerCount;
   Gtdt->PlatformTimerOffset = (PlatformTimerCount == 0) ? 0 :
-    sizeof (EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE);
+    sizeof (EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE);
 
   if (AcpiTableRevision > EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION) {
     Gtdt->VirtualPL2TimerGSIV = GenericTimerInfo->VirtualPL2TimerGSIV;
@@ -143,7 +143,7 @@ AddGenericTimerInfo (
   return Status;
 }
 
-/** Add the SBSA Generic Watchdog Timers to the GTDT table.
+/** Add the Arm Generic Watchdog Timers to the GTDT table.
 
   @param [in]  Gtdt             Pointer to the GTDT Table.
   @param [in]  WatchdogOffset   Offset to the watchdog information in the
@@ -154,26 +154,26 @@ AddGenericTimerInfo (
 STATIC
 VOID
 AddGenericWatchdogList (
-  IN EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE  * CONST Gtdt,
+  IN EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE  * CONST Gtdt,
   IN CONST UINT32                                          WatchdogOffset,
   IN CONST CM_ARM_GENERIC_WATCHDOG_INFO            *       WatchdogInfoList,
   IN       UINT32                                          WatchdogCount
   )
 {
-  EFI_ACPI_6_3_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE  * Watchdog;
+  EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG_STRUCTURE  * Watchdog;
 
   ASSERT (Gtdt != NULL);
   ASSERT (WatchdogInfoList != NULL);
 
-  Watchdog = (EFI_ACPI_6_3_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE *)
+  Watchdog = (EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG_STRUCTURE *)
              ((UINT8*)Gtdt + WatchdogOffset);
 
   while (WatchdogCount-- != 0) {
     // Add watchdog entry
     DEBUG ((DEBUG_INFO, "GTDT: Watchdog = 0x%p\n", Watchdog));
-    Watchdog->Type = EFI_ACPI_6_3_GTDT_SBSA_GENERIC_WATCHDOG;
+    Watchdog->Type = EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG;
     Watchdog->Length =
-      sizeof (EFI_ACPI_6_3_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE);
+      sizeof (EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG_STRUCTURE);
     Watchdog->Reserved = EFI_ACPI_RESERVED_BYTE;
     Watchdog->RefreshFramePhysicalAddress =
       WatchdogInfoList->RefreshFrameAddress;
@@ -249,7 +249,7 @@ IsGtFrameNumberEqual (
 STATIC
 EFI_STATUS
 AddGTBlockTimerFrames (
-  IN       EFI_ACPI_6_3_GTDT_GT_BLOCK_TIMER_STRUCTURE *       GtBlockFrame,
+  IN       EFI_ACPI_6_4_GTDT_GT_BLOCK_TIMER_STRUCTURE *       GtBlockFrame,
   IN CONST CM_ARM_GTBLOCK_TIMER_FRAME_INFO            *       GTBlockTimerFrameList,
   IN       UINT32                                             GTBlockFrameCount
 )
@@ -329,15 +329,15 @@ STATIC
 EFI_STATUS
 AddGTBlockList (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL     * CONST CfgMgrProtocol,
-  IN EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE    * CONST Gtdt,
+  IN EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE    * CONST Gtdt,
   IN CONST UINT32                                            GTBlockOffset,
   IN CONST CM_ARM_GTBLOCK_INFO                       *       GTBlockInfo,
   IN       UINT32                                            BlockTimerCount
 )
 {
   EFI_STATUS                                    Status;
-  EFI_ACPI_6_3_GTDT_GT_BLOCK_STRUCTURE        * GTBlock;
-  EFI_ACPI_6_3_GTDT_GT_BLOCK_TIMER_STRUCTURE  * GtBlockFrame;
+  EFI_ACPI_6_4_GTDT_GT_BLOCK_STRUCTURE        * GTBlock;
+  EFI_ACPI_6_4_GTDT_GT_BLOCK_TIMER_STRUCTURE  * GtBlockFrame;
   CM_ARM_GTBLOCK_TIMER_FRAME_INFO             * GTBlockTimerFrameList;
   UINT32                                        GTBlockTimerFrameCount;
   UINTN                                         Length;
@@ -345,7 +345,7 @@ AddGTBlockList (
   ASSERT (Gtdt != NULL);
   ASSERT (GTBlockInfo != NULL);
 
-  GTBlock = (EFI_ACPI_6_3_GTDT_GT_BLOCK_STRUCTURE *)((UINT8*)Gtdt +
+  GTBlock = (EFI_ACPI_6_4_GTDT_GT_BLOCK_STRUCTURE *)((UINT8*)Gtdt +
               GTBlockOffset);
 
   while (BlockTimerCount-- != 0) {
@@ -367,8 +367,8 @@ AddGTBlockList (
       return Status;
     }
 
-    Length = sizeof (EFI_ACPI_6_3_GTDT_GT_BLOCK_STRUCTURE) +
-               (sizeof (EFI_ACPI_6_3_GTDT_GT_BLOCK_TIMER_STRUCTURE) *
+    Length = sizeof (EFI_ACPI_6_4_GTDT_GT_BLOCK_STRUCTURE) +
+               (sizeof (EFI_ACPI_6_4_GTDT_GT_BLOCK_TIMER_STRUCTURE) *
                 GTBlockInfo->GTBlockTimerFrameCount);
 
     // Check that the length of the GT block does not
@@ -386,15 +386,15 @@ AddGTBlockList (
       return Status;
     }
 
-    GTBlock->Type = EFI_ACPI_6_3_GTDT_GT_BLOCK;
+    GTBlock->Type = EFI_ACPI_6_4_GTDT_GT_BLOCK;
     GTBlock->Length = (UINT16)Length;
     GTBlock->Reserved = EFI_ACPI_RESERVED_BYTE;
     GTBlock->CntCtlBase = GTBlockInfo->GTBlockPhysicalAddress;
     GTBlock->GTBlockTimerCount = GTBlockInfo->GTBlockTimerFrameCount;
     GTBlock->GTBlockTimerOffset =
-      sizeof (EFI_ACPI_6_3_GTDT_GT_BLOCK_STRUCTURE);
+      sizeof (EFI_ACPI_6_4_GTDT_GT_BLOCK_STRUCTURE);
 
-    GtBlockFrame = (EFI_ACPI_6_3_GTDT_GT_BLOCK_TIMER_STRUCTURE*)
+    GtBlockFrame = (EFI_ACPI_6_4_GTDT_GT_BLOCK_TIMER_STRUCTURE*)
       ((UINT8*)GTBlock + GTBlock->GTBlockTimerOffset);
 
     // Add GT Block Timer frames
@@ -413,7 +413,7 @@ AddGTBlockList (
     }
 
     // Next GTBlock
-    GTBlock = (EFI_ACPI_6_3_GTDT_GT_BLOCK_STRUCTURE *)((UINT8*)GTBlock +
+    GTBlock = (EFI_ACPI_6_4_GTDT_GT_BLOCK_STRUCTURE *)((UINT8*)GTBlock +
                GTBlock->Length);
     GTBlockInfo++;
   }// for
@@ -460,7 +460,7 @@ BuildGtdtTable (
   UINT32                                          BlockTimerCount;
   CM_ARM_GENERIC_WATCHDOG_INFO                  * WatchdogInfoList;
   CM_ARM_GTBLOCK_INFO                           * GTBlockInfo;
-  EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE  * Gtdt;
+  EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE  * Gtdt;
   UINT32                                          Idx;
   UINT32                                          GTBlockOffset;
   UINT32                                          WatchdogOffset;
@@ -527,11 +527,11 @@ BuildGtdtTable (
 
   // Calculate the GTDT Table Size
   PlatformTimerCount = 0;
-  TableSize = sizeof (EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE);
+  TableSize = sizeof (EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE);
   if (BlockTimerCount != 0) {
     GTBlockOffset = TableSize;
     PlatformTimerCount += BlockTimerCount;
-    TableSize += (sizeof (EFI_ACPI_6_3_GTDT_GT_BLOCK_STRUCTURE) *
+    TableSize += (sizeof (EFI_ACPI_6_4_GTDT_GT_BLOCK_STRUCTURE) *
                   BlockTimerCount);
 
     for (Idx = 0; Idx < BlockTimerCount; Idx++) {
@@ -546,7 +546,7 @@ BuildGtdtTable (
           ));
         goto error_handler;
       }
-      TableSize += (sizeof (EFI_ACPI_6_3_GTDT_GT_BLOCK_TIMER_STRUCTURE) *
+      TableSize += (sizeof (EFI_ACPI_6_4_GTDT_GT_BLOCK_TIMER_STRUCTURE) *
         GTBlockInfo[Idx].GTBlockTimerFrameCount);
     }
 
@@ -562,7 +562,7 @@ BuildGtdtTable (
   if (WatchdogCount != 0) {
     WatchdogOffset = TableSize;
     PlatformTimerCount += WatchdogCount;
-    TableSize += (sizeof (EFI_ACPI_6_3_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE) *
+    TableSize += (sizeof (EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG_STRUCTURE) *
                   WatchdogCount);
     DEBUG ((
       DEBUG_INFO,
@@ -585,7 +585,7 @@ BuildGtdtTable (
     goto error_handler;
   }
 
-  Gtdt = (EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE*)*Table;
+  Gtdt = (EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE*)*Table;
   DEBUG ((
     DEBUG_INFO,
     "GTDT: Gtdt = 0x%p TableSize = 0x%x\n",
@@ -712,9 +712,9 @@ ACPI_TABLE_GENERATOR GtdtGenerator = {
   // Generator Description
   L"ACPI.STD.GTDT.GENERATOR",
   // ACPI Table Signature
-  EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,
+  EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,
   // ACPI Table Revision supported by this Generator
-  EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION,
+  EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION,
   // Minimum ACPI Table Revision supported by this Generator
   EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION,
   // Creator ID
