@@ -145,6 +145,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 R: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
 R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
 ArmVirtPkg: modules used on Xen
 F: ArmVirtPkg/ArmVirtXen.*
@@ -424,6 +425,7 @@ W: http://www.tianocore.org/ovmf/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Jordan Justen <jordan.l.justen@intel.com> [jljusten]
+R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 S: Maintained
 
 OvmfPkg: bhyve-related modules
