@@ -1,11 +1,11 @@
 /** @file
   GTDT table parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2021, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-    - ACPI 6.3 Specification - January 2019
+    - ACPI 6.4 Specification - January 2021
   **/
 
 #include <IndustryStandard/Acpi.h>
@@ -155,7 +155,7 @@ STATIC CONST ACPI_PARSER GtBlockTimerParser[] = {
 /**
   An ACPI_PARSER array describing the Platform Watchdog.
 **/
-STATIC CONST ACPI_PARSER SBSAGenericWatchdogParser[] = {
+STATIC CONST ACPI_PARSER ArmGenericWatchdogParser[] = {
   {L"Type", 1, 0, L"%d", NULL, NULL, NULL, NULL},
   {L"Length", 2, 1, L"%d", NULL, NULL, NULL, NULL},
   {L"Reserved", 1, 3, L"%x", NULL, NULL, NULL, NULL},
@@ -236,10 +236,10 @@ DumpWatchdogTimer (
   ParseAcpi (
     TRUE,
     2,
-    "SBSA Generic Watchdog",
+    "Arm Generic Watchdog",
     Ptr,
     Length,
-    PARSER_PARAMS (SBSAGenericWatchdogParser)
+    PARSER_PARAMS (ArmGenericWatchdogParser)
     );
 }
 
@@ -343,10 +343,10 @@ ParseAcpiGtdt (
     }
 
     switch (*PlatformTimerType) {
-      case EFI_ACPI_6_3_GTDT_GT_BLOCK:
+      case EFI_ACPI_6_4_GTDT_GT_BLOCK:
         DumpGTBlock (TimerPtr, *PlatformTimerLength);
         break;
-      case EFI_ACPI_6_3_GTDT_SBSA_GENERIC_WATCHDOG:
+      case EFI_ACPI_6_4_GTDT_ARM_GENERIC_WATCHDOG:
         DumpWatchdogTimer (TimerPtr, *PlatformTimerLength);
         break;
       default:
