@@ -807,12 +807,12 @@ class application(tkinter.Frame):
         self.page_id = ''
         self.page_list = {}
         self.conf_list = {}
+        self.cfg_page_dict = {}
         self.cfg_data_obj = None
         self.org_cfg_data_bin = None
         self.in_left = state()
         self.in_right = state()
         self.search_text = ''
-        self.binseg_dict = {}
 
         # Check if current directory contains a file with a .yaml extension
         # if not default self.last_dir to a Platform directory where it is
@@ -1009,10 +1009,17 @@ class application(tkinter.Frame):
             return visible
         if self.cfg_data_obj.binseg_dict:
             str_split = item['path'].split('.')
-            if self.cfg_data_obj.binseg_dict[str_split[-2]] == -1:
-                visible = False
-                widget.grid_remove()
-                return visible
+            if str_split[-2] not in CGenYamlCfg.available_fv and \
+                    str_split[-2] not in CGenYamlCfg.missing_fv:
+                if self.cfg_data_obj.binseg_dict[str_split[-3]] == -1:
+                    visible = False
+                    widget.grid_remove()
+                    return visible
+            else:
+                if self.cfg_data_obj.binseg_dict[str_split[-2]] == -1:
+                    visible = False
+                    widget.grid_remove()
+                    return visible
         result = 1
         if item['condition']:
             result = self.evaluate_condition(item)
@@ -1371,8 +1378,34 @@ class application(tkinter.Frame):
         self.clear_widgets_inLayout()
         self.on_config_page_select_change(None)
 
+    def set_config_data_page(self):
+        page_id_list = []
+        for idx, page in enumerate(
+                self.cfg_data_obj._cfg_page['root']['child']):
+            page_id_list.append(list(page.keys())[0])
+            page_list = self.cfg_data_obj.get_cfg_list(page_id_list[idx])
+            self.cfg_page_dict[page_id_list[idx]] = 0
+            for item in page_list:
+                str_split = item['path'].split('.')
+                if str_split[-2] not in CGenYamlCfg.available_fv and \
+                        str_split[-2] not in CGenYamlCfg.missing_fv:
+                    if self.cfg_data_obj.binseg_dict[str_split[-3]] != -1:
+                        self.cfg_page_dict[page_id_list[idx]] += 1
+                else:
+                    if self.cfg_data_obj.binseg_dict[str_split[-2]] != -1:
+                        self.cfg_page_dict[page_id_list[idx]] += 1
+        removed_page = 0
+        for idx, id in enumerate(page_id_list):
+            if self.cfg_page_dict[id] == 0:
+                del self.cfg_data_obj._cfg_page['root']['child'][idx-removed_page]  # noqa: E501
+                removed_page += 1
+
     def reload_config_data_from_bin(self, bin_dat):
         self.cfg_data_obj.load_default_from_bin(bin_dat)
+        self.set_config_data_page()
+        self.left.delete(*self.left.get_children())
+        self.build_config_page_tree(self.cfg_data_obj.get_cfg_page()['root'],
+                                    '')
         self.refresh_config_data_page()
 
     def set_config_item_value(self, item, value_str):

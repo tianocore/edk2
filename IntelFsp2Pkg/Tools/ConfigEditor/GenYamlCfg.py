@@ -13,6 +13,7 @@ import string
 import operator as op
 import ast
 import tkinter.messagebox as messagebox
+import tkinter
 
 from datetime import date
 from collections import OrderedDict
@@ -583,7 +584,6 @@ class CGenYamlCfg:
         self._mode = ''
         self._debug = False
         self._macro_dict = {}
-        self.bin_offset = []
         self.binseg_dict = {}
         self.initialize()
 
@@ -1046,6 +1046,7 @@ option format '%s' !" % option)
                 try:
                     value = self.reformat_value_str(act_cfg['value'],
                                                     act_cfg['length'])
+
                 except Exception:
                     value = act_cfg['value']
             length = bit_len // 8
@@ -1298,18 +1299,85 @@ option format '%s' !" % option)
         self.traverse_cfg_tree(_get_field_value, top)
         return result
 
+    data_diff = ''
+
+    def find_data_difference(self, act_val, act_cfg):
+        # checks for any difference between BSF and Binary file
+        config_val = ''
+        if act_val != act_cfg['value']:
+
+            if 'DEC' in act_cfg['type']:
+                bsf_val = '0x%x' % int(act_val)
+                if bsf_val != act_cfg['value']:
+                    config_val = bsf_val
+                else:
+                    config_val = ''
+            else:
+                config_val = act_val
+
+            available_fv1 = 'none'
+            available_fv2 = 'none'
+
+            if self.detect_fsp():
+                if len(self.available_fv) >= 1:
+                    if len(self.available_fv) > 1:
+                        available_fv1 = self.available_fv[1]
+                        if self.available_fv[2]:
+                            available_fv2 = self.available_fv[2]
+            else:
+                available_fv1 = self.available_fv[1]
+                if act_cfg['length'] == 16:
+                    config_val = int(config_val, 16)
+                    config_val = '0x%x' % config_val
+                    act_cfg['value'] = int(
+                        act_cfg['value'], 16)
+                    act_cfg['value'] = '0x%x' %  \
+                        act_cfg['value']
+
+            if config_val:
+                string = ('.' + act_cfg['cname'])
+                if (act_cfg['path'].endswith(self.available_fv[0] + string)
+                    or act_cfg['path'].endswith(available_fv1 + string)
+                    or act_cfg['path'].endswith(available_fv2 + string)) \
+                    and 'BsfSkip' not in act_cfg['cname'] \
+                        and 'Reserved' not in act_cfg['name']:
+                    if act_cfg['option'] != '':
+                        if act_cfg['length'] == 8:
+                            config_val = int(config_val, 16)
+                            config_val = '0x%x' % config_val
+                            act_cfg['value'] = int(
+                                act_cfg['value'], 16)
+                            act_cfg['value'] = '0x%x' %  \
+                                act_cfg['value']
+                        option = act_cfg['option']
+
+                        cfg_val = ''
+                        bin_val = ''
+                        for i in option.split(','):
+                            if act_cfg['value'] in i:
+                                bin_val = i
+                            elif config_val in i:
+                                cfg_val = i
+                        if cfg_val != '' and bin_val != '':
+                            self.data_diff += '\n\nBinary:        ' \
+                                + act_cfg['name'] \
+                                + ': ' + bin_val.replace(' ', '') \
+                                + '\nConfig file:   ' \
+                                + act_cfg['name'] + ': ' \
+                                + cfg_val.replace(' ', '') + '\n'
+                    else:
+                        self.data_diff += '\n\nBinary:        ' \
+                            + act_cfg['name'] + ': ' + act_cfg['value'] \
+                            + '\nConfig file:   ' + act_cfg['name'] \
+                            + ': ' + config_val + '\n'
+
     def set_field_value(self, top, value_bytes, force=False):
         def _set_field_value(name, cfgs, level):
             if 'indx' not in cfgs:
                 return
             act_cfg = self.get_item_by_index(cfgs['indx'])
             actual_offset = act_cfg['offset'] - struct_info['offset']
-            set_value = True
-            for each in self.bin_offset:
-                if actual_offset in range(each[0], (each[0] + each[2]) * 8):
-                    if each[1] < 0:
-                        set_value = False
-            if set_value and force or act_cfg['value'] == '':
+            if force or act_cfg['value'] == '':
                 value = get_bits_from_bytes(full_bytes,
                                             actual_offset,
                                             act_cfg['length'])
@@ -1321,6 +1389,7 @@ option format '%s' !" % option)
                                                         act_val)
                 act_cfg['value'] = self.format_value_to_str(
                     value, act_cfg['length'], act_val)
+                self.find_data_difference(act_val, act_cfg)
 
         if 'indx' in top:
             # it is config option
@@ -1438,6 +1507,9 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
 
         return bin_segs
 
+    available_fv = []
+    missing_fv = []
+
     def extract_cfg_from_bin(self, bin_data):
         # get cfg bin length
         cfg_bins = bytearray()
@@ -1445,12 +1517,12 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
         Dummy_offset = 0
         for each in bin_segs:
             if each[1] != -1:
-                self.bin_offset.append([Dummy_offset, each[1], each[2]])
                 cfg_bins.extend(bin_data[each[1]:each[1] + each[2]])
+                self.available_fv.append(each[0])
             else:
+                self.missing_fv.append(each[0])
                 string = each[0] + ' is not availabe.'
                 messagebox.showinfo('', string)
-                self.bin_offset.append([Dummy_offset, each[1], each[2]])
                 cfg_bins.extend(bytearray(each[2]))
             Dummy_offset += each[2]
         return cfg_bins
@@ -1476,10 +1548,41 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
         print('Patched the loaded binary successfully !')
         return bin_data
 
+    def show_data_difference(self, data_diff):
+        # Displays if any data difference detected in BSF and Binary file
+        pop_up_text = 'There are differences in Config file and binary '\
+            'data detected!\n'
+        pop_up_text += data_diff
+
+        window = tkinter.Tk()
+        window.title("Data Difference")
+        window.resizable(1, 1)
+        # Window Size
+        window.geometry("800x400")
+        frame = tkinter.Frame(window, height=800, width=700)
+        frame.pack(side=tkinter.BOTTOM)
+        # Vertical (y) Scroll Bar
+        scroll = tkinter.Scrollbar(window)
+        scroll.pack(side=tkinter.RIGHT, fill=tkinter.Y)
+
+        text = tkinter.Text(window, wrap=tkinter.NONE,
+                            yscrollcommand=scroll.set,
+                            width=700, height=400)
+        text.insert(tkinter.INSERT, pop_up_text)
+        text.pack()
+        # Configure the scrollbars
+        scroll.config(command=text.yview)
+        exit_button = tkinter.Button(
+            window, text="Close", command=window.destroy)
+        exit_button.pack(in_=frame, side=tkinter.RIGHT, padx=20, pady=10)
+
     def load_default_from_bin(self, bin_data):
         self._old_bin = bin_data
         cfg_bins = self.extract_cfg_from_bin(bin_data)
         self.set_field_value(self._cfg_tree, cfg_bins, True)
+
+        if self.data_diff:
+            self.show_data_difference(self.data_diff)
         return cfg_bins
 
     def generate_binary_array(self, path=''):
