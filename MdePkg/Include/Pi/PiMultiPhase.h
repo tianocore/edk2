@@ -104,6 +104,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_SMRAM_LOCKED                EFI_MMRAM_LOCKED
 
 ///
+/// MM Communicate header constants
+///
+#define COMMUNICATE_HEADER_V3_GUID \
+  { \
+    0x68e8c853, 0x2ba9, 0x4dd7, { 0x9a, 0xc0, 0x91, 0xe1, 0x61, 0x55, 0xc9, 0x35 } \
+  }
+
+#define EFI_MM_COMMUNICATE_HEADER_V3_SIGNATURE  0x4D434833 // "MCH3"
+#define EFI_MM_COMMUNICATE_HEADER_V3_VERSION    3
+
+///
 /// Structure describing a MMRAM region and its accessibility attributes.
 ///
 typedef struct {
@@ -148,6 +159,48 @@ typedef struct _EFI_MM_RESERVED_MMRAM_REGION {
   ///
   UINT64                  MmramReservedSize;
 } EFI_MM_RESERVED_MMRAM_REGION;
+
+#pragma pack(1)
+
+///
+/// To avoid confusion in interpreting frames, the buffer communicating to MM core through
+/// EFI_MM_COMMUNICATE3 or later should always start with EFI_MM_COMMUNICATE_HEADER_V3.
+///
+typedef struct {
+  ///
+  /// Indicator GUID for MM core that the communication buffer is compliant with this v3 header.
+  /// Must be gCommunicateHeaderV3Guid.
+  ///
+  EFI_GUID  HeaderGuid;
+  ///
+  /// Signature to indicate data is compliant with new MM communicate header structure.
+  /// Must be "MCH3".
+  ///
+  UINT32    Signature;
+  ///
+  /// MM communicate data format version, MM foundation entry point should check if incoming
+  /// data is a supported format before proceeding.
+  /// Must be 3.
+  ///
+  UINT32    Version;
+  ///
+  /// Allows for disambiguation of the message format.
+  ///
+  EFI_GUID  MessageGuid;
+  ///
+  /// Describes the size of MessageData (in bytes) and does not include the size of the header.
+  ///
+  UINT64    MessageSize;
+  ///
+  /// Designates an array of bytes that is MessageSize in size.
+  ///
+  UINT8     MessageData[];
+} EFI_MM_COMMUNICATE_HEADER_V3;
+
+#pragma pack()
+
+STATIC_ASSERT ((sizeof (EFI_MM_COMMUNICATE_HEADER_V3) == OFFSET_OF (EFI_MM_COMMUNICATE_HEADER_V3, MessageData)), \
+  "sizeof (EFI_MM_COMMUNICATE_HEADER_V3) does not align with the beginning of flexible array MessageData");
 
 typedef enum {
   EFI_PCD_TYPE_8,
@@ -207,5 +260,7 @@ EFI_STATUS
 (EFIAPI *EFI_AP_PROCEDURE2)(
   IN VOID  *ProcedureArgument
 );
+
+extern EFI_GUID   gCommunicateHeaderV3Guid;
 
 #endif
