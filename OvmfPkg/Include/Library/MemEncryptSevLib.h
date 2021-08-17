@@ -12,6 +12,7 @@
 #define _MEM_ENCRYPT_SEV_LIB_H_
 
 #include <Base.h>
+#include <WorkArea.h>
 
 //
 // Define the maximum number of #VCs allowed (e.g. the level of nesting
@@ -35,26 +36,6 @@ typedef struct {
   UINTN   VcCount;
   VOID    *GhcbBackupPages;
 } SEV_ES_PER_CPU_DATA;
-
-//
-// Internal structure for holding SEV-ES information needed during SEC phase
-// and valid only during SEC phase and early PEI during platform
-// initialization.
-//
-// This structure is also used by assembler files:
-//   OvmfPkg/ResetVector/ResetVector.nasmb
-//   OvmfPkg/ResetVector/Ia32/PageTables64.asm
-//   OvmfPkg/ResetVector/Ia32/Flat32ToFlat64.asm
-// any changes must stay in sync with its usage.
-//
-typedef struct _SEC_SEV_ES_WORK_AREA {
-  UINT8    SevEsEnabled;
-  UINT8    Reserved1[7];
-
-  UINT64   RandomData;
-
-  UINT64   EncryptionMask;
-} SEC_SEV_ES_WORK_AREA;
 
 //
 // Memory encryption address range states.

@@ -939,9 +939,9 @@ InitializeRamRegions (
     }
 
 #ifdef MDE_CPU_X64
-    if (MemEncryptSevEsIsEnabled ()) {
+    if (FixedPcdGet32 (PcdOvmfWorkAreaSize) != 0) {
       //
-      // If SEV-ES is enabled, reserve the SEV-ES work area.
+      // Reserve the work area.
       //
       // Since this memory range will be used by the Reset Vector on S3
       // resume, it must be reserved as ACPI NVS.
@@ -951,8 +951,8 @@ InitializeRamRegions (
       // such that they would overlap the work area.
       //
       BuildMemoryAllocationHob (
-        (EFI_PHYSICAL_ADDRESS)(UINTN) FixedPcdGet32 (PcdSevEsWorkAreaBase),
-        (UINT64)(UINTN) FixedPcdGet32 (PcdSevEsWorkAreaSize),
+        (EFI_PHYSICAL_ADDRESS)(UINTN) FixedPcdGet32 (PcdOvmfWorkAreaBase),
+        (UINT64)(UINTN) FixedPcdGet32 (PcdOvmfWorkAreaSize),
         mS3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
         );
     }

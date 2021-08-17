@@ -116,8 +116,8 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
-  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
-  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable
