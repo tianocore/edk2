@@ -72,6 +72,7 @@
   %define GHCB_PT_ADDR (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
   %define GHCB_BASE (FixedPcdGet32 (PcdOvmfSecGhcbBase))
   %define GHCB_SIZE (FixedPcdGet32 (PcdOvmfSecGhcbSize))
+  %define WORK_AREA_GUEST_TYPE (FixedPcdGet32 (PcdOvmfWorkAreaBase))
   %define SEV_ES_WORK_AREA (FixedPcdGet32 (PcdSevEsWorkAreaBase))
   %define SEV_ES_WORK_AREA_RDRAND (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
   %define SEV_ES_WORK_AREA_ENC_MASK (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)

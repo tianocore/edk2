@@ -171,6 +171,9 @@ CheckSevFeatures:
     bt        eax, 0
     jnc       NoSev
 
+    ; Set the work area header to indicate that the SEV is enabled
+    mov     byte[WORK_AREA_GUEST_TYPE], 1
+
     ; Check for SEV-ES memory encryption feature:
     ; CPUID  Fn8000_001F[EAX] - Bit 3
     ;   CPUID raises a #VC exception if running as an SEV-ES guest
@@ -256,6 +259,11 @@ SevExit:
 ;
 IsSevEsEnabled:
     xor       eax, eax
+
+    ; During CheckSevFeatures, the WORK_AREA_GUEST_TYPE is set
+    ; to 1 if SEV is enabled.
+    cmp       byte[WORK_AREA_GUEST_TYPE], 1
+    jne       SevEsDisabled
 
     ; During CheckSevFeatures, the SEV_ES_WORK_AREA was set to 1 if
     ; SEV-ES is enabled.
