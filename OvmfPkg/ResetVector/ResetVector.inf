@@ -43,6 +43,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase
