@@ -42,6 +42,10 @@ BITS    32
 ;
 SetCr3ForPageTables64:
 
+    ; Clear the WorkArea header. The SEV probe routines will populate the
+    ; work area when detected.
+    mov     byte[WORK_AREA_GUEST_TYPE], 0
+
     OneTimeCall   CheckSevFeatures
     xor     edx, edx
     test    eax, eax
