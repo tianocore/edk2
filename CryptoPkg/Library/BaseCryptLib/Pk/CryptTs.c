@@ -155,7 +155,7 @@ ConvertAsn1TimeToEfiTime (
   }
 
   Str = (CONST CHAR8*)Asn1Time->data;
-  SetMem (EfiTime, 0, sizeof (EFI_TIME));
+  SetMem (EfiTime, sizeof (EFI_TIME), 0);
 
   Index = 0;
   if (Asn1Time->type == V_ASN1_UTCTIME) {               /* two digit year */
