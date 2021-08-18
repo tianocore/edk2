@@ -18,5 +18,6 @@
 #define BOOT_DISCOVERY_POLICY_MGR_FORMSET_GUID  { 0x5b6f7107, 0xbb3c, 0x4660, { 0x92, 0xcd, 0x54, 0x26, 0x90, 0x28, 0x0b, 0xbd } }
 
 #define BOOT_DISCOVERY_POLICY_VAR L"BootDiscoveryPolicy"
+#define BOOT_DISCOVERY_POLICY_OLD_VAR L"BootDiscoveryPolicyOld"
 
 #endif
