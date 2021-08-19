@@ -353,7 +353,16 @@ typedef struct {
   UINT8  Npss;                /* Number of Power States Support */
   UINT8  Avscc;               /* Admin Vendor Specific Command Configuration */
   UINT8  Apsta;               /* Autonomous Power State Transition Attributes */
-  UINT8  Rsvd2[246];          /* Reserved as of Nvm Express 1.1 Spec */
+  //
+  // Below fields before Rsvd2 are defined in NVM Express 1.3 Spec
+  //
+  UINT16 Wctemp;              /* Warning Composite Temperature Threshold */
+  UINT16 Cctemp;              /* Critical Composite Temperature Threshold */
+  UINT16 Mtfa;                /* Maximum Time for Firmware Activation */
+  UINT32 Hmpre;               /* Host Memory Buffer Preferred Size */
+  UINT32 Hmmin;               /* Host Memory Buffer Minimum Size */
+  UINT8  Tnvmcap[16];         /* Total NVM Capacity */
+  UINT8  Rsvd2[216];          /* Reserved as of NVM Express */
   //
   // NVM Command Set Attributes
   //
