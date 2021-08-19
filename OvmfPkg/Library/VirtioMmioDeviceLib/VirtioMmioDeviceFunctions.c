@@ -183,13 +183,36 @@ VirtioMmioSetQueueAddress (
   )
 {
   VIRTIO_MMIO_DEVICE *Device;
+  UINT64 Address;
 
   ASSERT (RingBaseShift == 0);
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
-  VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_PFN,
-    (UINT32)((UINTN)Ring->Base >> EFI_PAGE_SHIFT));
+  if (Device->Version == VIRTIO_MMIO_DEVICE_VERSION_0_95) {
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_PFN,
+      (UINT32)((UINTN)Ring->Base >> EFI_PAGE_SHIFT));
+  } else {
+    Address = (UINT64)Ring->Base;
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_DESC_LO,
+                      (UINT32)Address);
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_DESC_HI,
+                      (UINT32)RShiftU64(Address, 32));
+
+    Address = (UINT64)Ring->Avail.Flags;
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_AVAIL_LO,
+                      (UINT32)Address);
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_AVAIL_HI,
+                      (UINT32)RShiftU64(Address, 32));
+
+    Address = (UINT64)Ring->Used.Flags;
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_USED_LO,
+                      (UINT32)Address);
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_USED_HI,
+                      (UINT32)RShiftU64(Address, 32));
+
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_READY, 1);
+  }
 
   return EFI_SUCCESS;
 }
