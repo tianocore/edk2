@@ -83,7 +83,11 @@ VirtioMmioSetQueueSize (
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
-  VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_NUM, QueueSize);
+  if (Device->Version == VIRTIO_MMIO_DEVICE_VERSION_0_95) {
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_NUM, QueueSize);
+  } else {
+    Device->QueueNum = QueueSize;
+  }
 
   return EFI_SUCCESS;
 }
@@ -171,6 +175,10 @@ VirtioMmioSetQueueSel (
 
   VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_SEL, Sel);
 
+  if (Device->Version == VIRTIO_MMIO_DEVICE_VERSION_0_95) {
+    Device->QueueNum = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_QUEUE_NUM_MAX) & 0xFFFF;
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -193,6 +201,8 @@ VirtioMmioSetQueueAddress (
     VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_PFN,
       (UINT32)((UINTN)Ring->Base >> EFI_PAGE_SHIFT));
   } else {
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_NUM, Device->QueueNum);
+
     Address = (UINT64)Ring->Base;
     VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_DESC_LO,
                       (UINT32)Address);
