@@ -15,9 +15,46 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Guid/AmdSevMemEncryptLib.h>
+#include <Guid/EventGroup.h>
 #include <Library/PcdLib.h>
+
+STATIC
+VOID
+EFIAPI
+AmdSevDxeOnEndOfDxe (
+  IN EFI_EVENT Event,
+  IN VOID      *EventToSignal
+  )
+{
+  EFI_STATUS Status;
+  BOOLEAN SevLiveMigrationEnabled;
+
+  SevLiveMigrationEnabled = MemEncryptSevLiveMigrationIsEnabled();
+
+  if (SevLiveMigrationEnabled) {
+    Status = gRT->SetVariable (
+               L"SevLiveMigrationEnabled",
+               &gAmdSevMemEncryptGuid,
+               EFI_VARIABLE_NON_VOLATILE |
+               EFI_VARIABLE_BOOTSERVICE_ACCESS |
+               EFI_VARIABLE_RUNTIME_ACCESS,
+               sizeof SevLiveMigrationEnabled,
+               &SevLiveMigrationEnabled
+               );
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Setting SevLiveMigrationEnabled variable, status = %lx\n",
+      __FUNCTION__,
+      Status
+      ));
+  }
+}
 
 EFI_STATUS
 EFIAPI
@@ -30,6 +67,7 @@ AmdSevDxeEntryPoint (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *AllDescMap;
   UINTN                            NumEntries;
   UINTN                            Index;
+  EFI_EVENT                        Event;
 
   //
   // Do nothing when SEV is not enabled
@@ -128,6 +166,32 @@ AmdSevDxeEntryPoint (
       ASSERT (FALSE);
       CpuDeadLoop ();
     }
+  }
+
+  //
+  // AmdSevDxe module is an apriori driver so it gets loaded between PEI
+  // and DXE phases and the SetVariable call will fail at the driver's
+  // entry point as the Variable DXE module is still not loaded yet.
+  // So we need to wait for an event notification which is signaled
+  // after the Variable DXE module is loaded, hence, using the
+  // EndOfDxe event notification to make this call.
+  //
+  // Register EFI_END_OF_DXE_EVENT_GROUP_GUID event.
+  // The notification function sets the runtime variable indicating OVMF
+  // support for SEV live migration.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  AmdSevDxeOnEndOfDxe,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &Event
+                  );
+
+  if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: CreateEventEx(): %r\n",
+        __FUNCTION__, Status));
   }
 
   return EFI_SUCCESS;
