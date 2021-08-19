@@ -167,6 +167,7 @@ Tpm2ReadPublic (
     default:
       return EFI_UNSUPPORTED;
     }
+    break;
   case TPM_ALG_SYMCIPHER:
     OutPublic->publicArea.parameters.symDetail.algorithm = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
     Buffer += sizeof(UINT16);
