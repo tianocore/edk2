@@ -253,8 +253,9 @@ Tpm2NvReadPublic (
   NvPublic->nvPublic.nameAlg = SwapBytes16 (NvPublic->nvPublic.nameAlg);
   WriteUnaligned32 ((UINT32 *)&NvPublic->nvPublic.attributes, SwapBytes32 (ReadUnaligned32 ((UINT32 *)&NvPublic->nvPublic.attributes)));
   NvPublic->nvPublic.authPolicy.size = SwapBytes16 (NvPublic->nvPublic.authPolicy.size);
-  Buffer = (UINT8 *)&RecvBuffer.NvPublic.nvPublic.authPolicy;
-  Buffer += sizeof(UINT16) + NvPublic->nvPublic.authPolicy.size;
+  Buffer = RecvBuffer.NvPublic.nvPublic.authPolicy.buffer;
+  CopyMem (NvPublic->nvPublic.authPolicy.buffer, Buffer, NvPublic->nvPublic.authPolicy.size);
+  Buffer += NvPublic->nvPublic.authPolicy.size;
   NvPublic->nvPublic.dataSize = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
 
   CopyMem (NvName->name, (UINT8 *)&RecvBuffer + sizeof(TPM2_RESPONSE_HEADER) + sizeof(UINT16) + NvPublicSize + sizeof(UINT16), NvNameSize);
