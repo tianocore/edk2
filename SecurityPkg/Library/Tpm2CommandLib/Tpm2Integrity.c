@@ -326,6 +326,7 @@ Tpm2PcrRead (
   UINTN                             Index;
   TPML_DIGEST                       *PcrValuesOut;
   TPM2B_DIGEST                      *Digests;
+  UINT8                             *Buffer;
 
   //
   // Construct command
@@ -334,13 +335,17 @@ Tpm2PcrRead (
   SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_PCR_Read);
 
   SendBuffer.PcrSelectionIn.count = SwapBytes32(PcrSelectionIn->count);
+  Buffer = (UINT8 *)&SendBuffer.PcrSelectionIn.pcrSelections;
   for (Index = 0; Index < PcrSelectionIn->count; Index++) {
-    SendBuffer.PcrSelectionIn.pcrSelections[Index].hash = SwapBytes16(PcrSelectionIn->pcrSelections[Index].hash);
-    SendBuffer.PcrSelectionIn.pcrSelections[Index].sizeofSelect = PcrSelectionIn->pcrSelections[Index].sizeofSelect;
-    CopyMem (&SendBuffer.PcrSelectionIn.pcrSelections[Index].pcrSelect, &PcrSelectionIn->pcrSelections[Index].pcrSelect, SendBuffer.PcrSelectionIn.pcrSelections[Index].sizeofSelect);
+    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(PcrSelectionIn->pcrSelections[Index].hash));
+    Buffer += sizeof(UINT16);
+    *(UINT8 *)Buffer = PcrSelectionIn->pcrSelections[Index].sizeofSelect;
+    Buffer++;
+    CopyMem (Buffer, PcrSelectionIn->pcrSelections[Index].pcrSelect, PcrSelectionIn->pcrSelections[Index].sizeofSelect);
+    Buffer += PcrSelectionIn->pcrSelections[Index].sizeofSelect;
   }
 
-  SendBufferSize = sizeof(SendBuffer.Header) + sizeof(SendBuffer.PcrSelectionIn.count) + sizeof(SendBuffer.PcrSelectionIn.pcrSelections[0]) * PcrSelectionIn->count;
+  SendBufferSize = (UINT32)(Buffer - (UINT8 *)&SendBuffer);
   SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
 
   //
