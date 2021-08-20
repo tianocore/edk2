@@ -239,7 +239,7 @@ Tpm2ReadPublic (
     }
     OutPublic->publicArea.parameters.rsaDetail.keyBits = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
     Buffer += sizeof(UINT16);
-    OutPublic->publicArea.parameters.rsaDetail.exponent = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+    OutPublic->publicArea.parameters.rsaDetail.exponent = SwapBytes32 (ReadUnaligned32 ((UINT32 *)Buffer));
     Buffer += sizeof(UINT32);
     break;
   case TPM_ALG_ECC:
