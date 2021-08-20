@@ -324,8 +324,6 @@ Tpm2PcrRead (
   UINT32                            SendBufferSize;
   UINT32                            RecvBufferSize;
   UINTN                             Index;
-  TPML_DIGEST                       *PcrValuesOut;
-  TPM2B_DIGEST                      *Digests;
   UINT8                             *Buffer;
 
   //
@@ -392,24 +390,37 @@ Tpm2PcrRead (
     return EFI_DEVICE_ERROR;
   }
 
-  if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER) + sizeof(RecvBuffer.PcrUpdateCounter) + sizeof(RecvBuffer.PcrSelectionOut.count) + sizeof(RecvBuffer.PcrSelectionOut.pcrSelections[0]) * PcrSelectionOut->count) {
-    DEBUG ((EFI_D_ERROR, "Tpm2PcrRead - RecvBufferSize Error - %x\n", RecvBufferSize));
-    return EFI_DEVICE_ERROR;
-  }
+  Buffer = (UINT8 *)RecvBuffer.PcrSelectionOut.pcrSelections;
   for (Index = 0; Index < PcrSelectionOut->count; Index++) {
-    PcrSelectionOut->pcrSelections[Index].hash = SwapBytes16(RecvBuffer.PcrSelectionOut.pcrSelections[Index].hash);
-    PcrSelectionOut->pcrSelections[Index].sizeofSelect = RecvBuffer.PcrSelectionOut.pcrSelections[Index].sizeofSelect;
+    if (RecvBufferSize < Buffer - (UINT8 *)&RecvBuffer + sizeof(UINT16) + sizeof(UINT8)) {
+        DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - RecvBufferSize Error - %x\n", RecvBufferSize));
+        return EFI_DEVICE_ERROR;
+    }
+    PcrSelectionOut->pcrSelections[Index].hash = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
+    Buffer += sizeof(UINT16);
+    PcrSelectionOut->pcrSelections[Index].sizeofSelect = *(UINT8 *)Buffer;
+    Buffer++;
+
     if (PcrSelectionOut->pcrSelections[Index].sizeofSelect > PCR_SELECT_MAX) {
       return EFI_DEVICE_ERROR;
     }
-    CopyMem (&PcrSelectionOut->pcrSelections[Index].pcrSelect, &RecvBuffer.PcrSelectionOut.pcrSelections[Index].pcrSelect, PcrSelectionOut->pcrSelections[Index].sizeofSelect);
+    if (RecvBufferSize < (UINT32)(Buffer - (UINT8 *)&RecvBuffer + PcrSelectionOut->pcrSelections[Index].sizeofSelect)) {
+        DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - RecvBufferSize Error - %x\n", RecvBufferSize));
+        return EFI_DEVICE_ERROR;
+    }
+    CopyMem (PcrSelectionOut->pcrSelections[Index].pcrSelect, Buffer, PcrSelectionOut->pcrSelections[Index].sizeofSelect);
+    Buffer += PcrSelectionOut->pcrSelections[Index].sizeofSelect;
   }
 
   //
   // PcrValues
   //
-  PcrValuesOut = (TPML_DIGEST *)((UINT8 *)&RecvBuffer + sizeof (TPM2_RESPONSE_HEADER) + sizeof(RecvBuffer.PcrUpdateCounter) + sizeof(RecvBuffer.PcrSelectionOut.count) + sizeof(RecvBuffer.PcrSelectionOut.pcrSelections[0]) * PcrSelectionOut->count);
-  PcrValues->count = SwapBytes32(PcrValuesOut->count);
+  if (RecvBufferSize < Buffer - (UINT8 *)&RecvBuffer + sizeof(UINT32)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - RecvBufferSize Error - %x\n", RecvBufferSize));
+    return EFI_DEVICE_ERROR;
+  }
+  PcrValues->count = SwapBytes32(ReadUnaligned32 ((UINT32 *)Buffer));
+  Buffer += sizeof(UINT32);
   //
   // The number of digests in list is not greater than 8 per TPML_DIGEST definition
   //
@@ -417,15 +428,24 @@ Tpm2PcrRead (
     DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - PcrValues->count error %x\n", PcrValues->count));
     return EFI_DEVICE_ERROR;
   }
-  Digests = PcrValuesOut->digests;
   for (Index = 0; Index < PcrValues->count; Index++) {
-    PcrValues->digests[Index].size = SwapBytes16(Digests->size);
+    if (RecvBufferSize < Buffer - (UINT8 *)&RecvBuffer + sizeof(UINT16)) {
+      DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - RecvBufferSize Error - %x\n", RecvBufferSize));
+      return EFI_DEVICE_ERROR;
+    }
+    PcrValues->digests[Index].size = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
+    Buffer += sizeof(UINT16);
+
     if (PcrValues->digests[Index].size > sizeof(TPMU_HA)) {
       DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - Digest.size error %x\n", PcrValues->digests[Index].size));
       return EFI_DEVICE_ERROR;
     }
-    CopyMem (&PcrValues->digests[Index].buffer, &Digests->buffer, PcrValues->digests[Index].size);
-    Digests = (TPM2B_DIGEST *)((UINT8 *)Digests + sizeof(Digests->size) + PcrValues->digests[Index].size);
+    if (RecvBufferSize < (UINT32)(Buffer - (UINT8 *)&RecvBuffer + PcrValues->digests[Index].size)) {
+      DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - RecvBufferSize Error - %x\n", RecvBufferSize));
+      return EFI_DEVICE_ERROR;
+    }
+    CopyMem (&PcrValues->digests[Index].buffer, Buffer, PcrValues->digests[Index].size);
+    Buffer += PcrValues->digests[Index].size;
   }
 
   return EFI_SUCCESS;
