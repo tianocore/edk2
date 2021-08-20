@@ -47,7 +47,27 @@ TIMES (15 - ((guidedStructureEnd - guidedStructureStart + 15) % 16)) DB 0
 ;
 guidedStructureStart:
 
+; SEV Hash Table Block
 ;
+; This describes the guest ram area where the hypervisor should
+; install a table describing the hashes of certain firmware configuration
+; device files that would otherwise be passed in unchecked.  The current
+; use is for the kernel, initrd and command line values, but others may be
+; added.  The data format is:
+;
+; base physical address (32 bit word)
+; table length (32 bit word)
+;
+; GUID (SEV FW config hash block): 7255371f-3a3b-4b04-927b-1da6efa8d454
+;
+sevFwHashBlockStart:
+    DD      SEV_FW_HASH_BLOCK_BASE
+    DD      SEV_FW_HASH_BLOCK_SIZE
+    DW      sevFwHashBlockEnd - sevFwHashBlockStart
+    DB      0x1f, 0x37, 0x55, 0x72, 0x3b, 0x3a, 0x04, 0x4b
+    DB      0x92, 0x7b, 0x1d, 0xa6, 0xef, 0xa8, 0xd4, 0x54
+sevFwHashBlockEnd:
+
 ; SEV Secret block
 ;
 ; This describes the guest ram area where the hypervisor should

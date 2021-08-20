@@ -1,0 +1,100 @@
+## @file
+#  This is the first module for UEFI payload.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UniversalPayloadEntry
+  FILE_GUID                      = D4F0F269-1209-4A66-8039-C4D5A700EA4E
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  UniversalPayloadEntry.c
+  LoadDxeCore.c
+  MemoryAllocation.c
+  PrintHob.c
+
+[Sources.Ia32]
+  X64/VirtualMemory.h
+  X64/VirtualMemory.c
+  Ia32/DxeLoadFunc.c
+  Ia32/IdtVectorAsm.nasm
+
+[Sources.X64]
+  X64/VirtualMemory.h
+  X64/VirtualMemory.c
+  X64/DxeLoadFunc.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  SerialPortLib
+  IoLib
+  HobLib
+  PeCoffLib
+  UefiCpuLib
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+  gEfiFirmwareFileSystem2Guid
+  gUefiSystemTableInfoGuid
+  gEfiGraphicsInfoHobGuid
+  gEfiGraphicsDeviceInfoHobGuid
+  gUefiAcpiBoardInfoGuid
+  gEfiSmbiosTableGuid
+  gEfiAcpiTableGuid
+  gUefiSerialPortInfoGuid
+  gUniversalPayloadExtraDataGuid
+  gPcdDataBaseHobGuid
+  gUniversalPayloadSmbiosTableGuid
+  gEfiHobMemoryAllocBspStoreGuid
+  gUniversalPayloadAcpiTableGuid
+  gUniversalPayloadPciRootBridgeInfoGuid
+  gUniversalPayloadSmbios3TableGuid
+
+[FeaturePcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
+
+[FeaturePcd.X64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
+
+
+[Pcd.IA32,Pcd.X64]
+  gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable                  ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize                            ## CONSUMES
+
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemBase
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadStackTop
+  gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
+

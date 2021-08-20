@@ -88,6 +88,9 @@
   ## Include/Protocol/Dpc.h
   gEfiDpcProtocolGuid           = {0x480f8ae9, 0xc46, 0x4aa9,  { 0xbc, 0x89, 0xdb, 0x9f, 0xba, 0x61, 0x98, 0x6 }}
 
+  ## Include/Protocol/HttpCallback.h
+  gEdkiiHttpCallbackProtocolGuid  = {0x611114f1, 0xa37b, 0x4468, {0xa4, 0x36, 0x5b, 0xdd, 0xa1, 0x6a, 0xa2, 0x40}}
+
 [PcdsFixedAtBuild]
   ## The max attempt number will be created by iSCSI driver.
   # @Prompt Max attempt number.
@@ -96,10 +99,6 @@
   ## The maximum size of total HTTP chunk transfer.
   # @Prompt Max size of total HTTP chunk transfer. the default value is 12MB.
   gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpChunkTransfer|0x0C00000|UINT32|0x0000000E
-
-  ## The Timeout value of HTTP IO.
-  # @Prompt The Timeout value of HTTP Io. Default value is 5000.
-  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout|5000|UINT32|0x0000000F
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Indicates whether HTTP connections (i.e., unsecured) are permitted or not.
@@ -159,6 +158,10 @@
   # 0x01 = PXE Enabled
   # 0x00 = PXE Disabled
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01|UINT8|0x1000000a
+
+  ## The Timeout value of HTTP IO.
+  # @Prompt The Timeout value of HTTP Io. Default value is 5000.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout|5000|UINT32|0x0000000F
 
 [UserExtensions.TianoCore."ExtraFiles"]
   NetworkPkgExtra.uni

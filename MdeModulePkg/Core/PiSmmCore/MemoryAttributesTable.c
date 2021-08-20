@@ -1208,10 +1208,10 @@ PublishMemoryAttributesTable (
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
 
   do {
-    DEBUG ((DEBUG_INFO, "MemoryMapSize - 0x%x\n", MemoryMapSize));
+    DEBUG ((DEBUG_VERBOSE, "MemoryMapSize - 0x%x\n", MemoryMapSize));
     MemoryMap = AllocatePool (MemoryMapSize);
     ASSERT (MemoryMap != NULL);
-    DEBUG ((DEBUG_INFO, "MemoryMap - 0x%x\n", MemoryMap));
+    DEBUG ((DEBUG_VERBOSE, "MemoryMap - 0x%x\n", MemoryMap));
 
     Status = SmmCoreGetMemoryMapMemoryAttributesTable (
                &MemoryMapSize,
@@ -1236,19 +1236,19 @@ PublishMemoryAttributesTable (
   MemoryAttributesTable->NumberOfEntries = (UINT32)RuntimeEntryCount;
   MemoryAttributesTable->DescriptorSize  = (UINT32)DescriptorSize;
   MemoryAttributesTable->Reserved        = 0;
-  DEBUG ((DEBUG_INFO, "MemoryAttributesTable:\n"));
-  DEBUG ((DEBUG_INFO, "  Version              - 0x%08x\n", MemoryAttributesTable->Version));
-  DEBUG ((DEBUG_INFO, "  NumberOfEntries      - 0x%08x\n", MemoryAttributesTable->NumberOfEntries));
-  DEBUG ((DEBUG_INFO, "  DescriptorSize       - 0x%08x\n", MemoryAttributesTable->DescriptorSize));
+  DEBUG ((DEBUG_VERBOSE, "MemoryAttributesTable:\n"));
+  DEBUG ((DEBUG_VERBOSE, "  Version              - 0x%08x\n", MemoryAttributesTable->Version));
+  DEBUG ((DEBUG_VERBOSE, "  NumberOfEntries      - 0x%08x\n", MemoryAttributesTable->NumberOfEntries));
+  DEBUG ((DEBUG_VERBOSE, "  DescriptorSize       - 0x%08x\n", MemoryAttributesTable->DescriptorSize));
   MemoryAttributesEntry = (EFI_MEMORY_DESCRIPTOR *)(MemoryAttributesTable + 1);
   for (Index = 0; Index < MemoryMapSize/DescriptorSize; Index++) {
     CopyMem (MemoryAttributesEntry, MemoryMap, DescriptorSize);
-    DEBUG ((DEBUG_INFO, "Entry (0x%x)\n", MemoryAttributesEntry));
-    DEBUG ((DEBUG_INFO, "  Type              - 0x%x\n", MemoryAttributesEntry->Type));
-    DEBUG ((DEBUG_INFO, "  PhysicalStart     - 0x%016lx\n", MemoryAttributesEntry->PhysicalStart));
-    DEBUG ((DEBUG_INFO, "  VirtualStart      - 0x%016lx\n", MemoryAttributesEntry->VirtualStart));
-    DEBUG ((DEBUG_INFO, "  NumberOfPages     - 0x%016lx\n", MemoryAttributesEntry->NumberOfPages));
-    DEBUG ((DEBUG_INFO, "  Attribute         - 0x%016lx\n", MemoryAttributesEntry->Attribute));
+    DEBUG ((DEBUG_VERBOSE, "Entry (0x%x)\n", MemoryAttributesEntry));
+    DEBUG ((DEBUG_VERBOSE, "  Type              - 0x%x\n", MemoryAttributesEntry->Type));
+    DEBUG ((DEBUG_VERBOSE, "  PhysicalStart     - 0x%016lx\n", MemoryAttributesEntry->PhysicalStart));
+    DEBUG ((DEBUG_VERBOSE, "  VirtualStart      - 0x%016lx\n", MemoryAttributesEntry->VirtualStart));
+    DEBUG ((DEBUG_VERBOSE, "  NumberOfPages     - 0x%016lx\n", MemoryAttributesEntry->NumberOfPages));
+    DEBUG ((DEBUG_VERBOSE, "  Attribute         - 0x%016lx\n", MemoryAttributesEntry->Attribute));
     MemoryAttributesEntry = NEXT_MEMORY_DESCRIPTOR(MemoryAttributesEntry, DescriptorSize);
 
     MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, DescriptorSize);
@@ -1331,7 +1331,7 @@ SmmInstallMemoryAttributesTable (
 {
   SmmInstallImageRecord ();
 
-  DEBUG ((DEBUG_INFO, "SMM MemoryProtectionAttribute - 0x%016lx\n", mMemoryProtectionAttribute));
+  DEBUG ((DEBUG_VERBOSE, "SMM MemoryProtectionAttribute - 0x%016lx\n", mMemoryProtectionAttribute));
   if ((mMemoryProtectionAttribute & EFI_MEMORY_ATTRIBUTES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) == 0) {
     return EFI_SUCCESS;
   }

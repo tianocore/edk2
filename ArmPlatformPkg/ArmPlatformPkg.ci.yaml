@@ -83,7 +83,7 @@
 
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": False,
+        "AuditOnly": True,
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors
                                      # in matching files
         "ExtendWords": [

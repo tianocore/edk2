@@ -23,6 +23,9 @@
   ##  @libraryclass  Access bhyve's firmware control interface.
   BhyveFwCtlLib|Include/Library/BhyveFwCtlLib.h
 
+  ##  @libraryclass  Verify blobs read from the VMM
+  BlobVerifierLib|Include/Library/BlobVerifierLib.h
+
   ##  @libraryclass  Loads and boots a Linux kernel image
   #
   LoadLinuxLib|Include/Library/LoadLinuxLib.h
@@ -118,7 +121,6 @@
   gMicrosoftVendorGuid                  = {0x77fa9abd, 0x0359, 0x4d32, {0xbd, 0x60, 0x28, 0xf4, 0xe7, 0x8f, 0x78, 0x4b}}
   gEfiLegacyBiosGuid                    = {0x2E3044AC, 0x879F, 0x490F, {0x97, 0x60, 0xBB, 0xDF, 0xAF, 0x69, 0x5F, 0x50}}
   gEfiLegacyDevOrderVariableGuid        = {0xa56074db, 0x65fe, 0x45f7, {0xbd, 0x21, 0x2d, 0x2b, 0xdd, 0x8e, 0x96, 0x52}}
-  gLinuxEfiInitrdMediaGuid              = {0x5568e427, 0x68fc, 0x4f3d, {0xac, 0x74, 0xca, 0x55, 0x52, 0x31, 0xcc, 0x68}}
   gQemuKernelLoaderFsMediaGuid          = {0x1428f772, 0xb64a, 0x441e, {0xb8, 0xc3, 0x9e, 0xbd, 0xd7, 0xf8, 0x93, 0xc7}}
   gGrubFileGuid                         = {0xb5ae312c, 0xbc8a, 0x43b1, {0x9c, 0x62, 0xeb, 0xb8, 0x26, 0xdd, 0x5d, 0x07}}
   gConfidentialComputingSecretGuid      = {0xadf956ad, 0xe98c, 0x484c, {0xae, 0x11, 0xb5, 0x1c, 0x7d, 0x33, 0x64, 0x47}}
@@ -320,6 +322,12 @@
   #  is responsible for protecting the area from DXE phase overwrites.
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase|0x0|UINT32|0x42
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretSize|0x0|UINT32|0x43
+
+  ## The base address and size of a hash table confirming allowed
+  #  parameters to be passed in via the Qemu firmware configuration
+  #  device
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase|0x0|UINT32|0x47
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize|0x0|UINT32|0x48
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2

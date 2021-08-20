@@ -11,13 +11,14 @@
 #include <Base.h>
 #include <Guid/QemuKernelLoaderFsMedia.h>
 #include <Library/DebugLib.h>
+#include <Library/FileHandleLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
-#include <Library/QemuFwCfgLib.h>
 #include <Library/QemuLoadImageLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/SimpleFileSystem.h>
 
 #pragma pack (1)
 typedef struct {
@@ -30,6 +31,11 @@ typedef struct {
   KERNEL_FILE_DEVPATH       FileNode;
   EFI_DEVICE_PATH_PROTOCOL  EndNode;
 } KERNEL_VENMEDIA_FILE_DEVPATH;
+
+typedef struct {
+  VENDOR_DEVICE_PATH       VenMediaNode;
+  EFI_DEVICE_PATH_PROTOCOL EndNode;
+} SINGLE_VENMEDIA_NODE_DEVPATH;
 #pragma pack ()
 
 STATIC CONST KERNEL_VENMEDIA_FILE_DEVPATH mKernelDevicePath = {
@@ -50,6 +56,82 @@ STATIC CONST KERNEL_VENMEDIA_FILE_DEVPATH mKernelDevicePath = {
     { sizeof (EFI_DEVICE_PATH_PROTOCOL) }
   }
 };
+
+STATIC CONST SINGLE_VENMEDIA_NODE_DEVPATH mQemuKernelLoaderFsDevicePath = {
+  {
+    {
+      MEDIA_DEVICE_PATH, MEDIA_VENDOR_DP,
+      { sizeof (VENDOR_DEVICE_PATH) }
+    },
+    QEMU_KERNEL_LOADER_FS_MEDIA_GUID
+  }, {
+    END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { sizeof (EFI_DEVICE_PATH_PROTOCOL) }
+  }
+};
+
+STATIC
+EFI_STATUS
+GetQemuKernelLoaderBlobSize (
+  IN  EFI_FILE_HANDLE     Root,
+  IN  CHAR16              *FileName,
+  OUT UINTN               *Size
+  )
+{
+  EFI_STATUS      Status;
+  EFI_FILE_HANDLE FileHandle;
+  UINT64          FileSize;
+
+  Status = Root->Open (Root, &FileHandle, FileName, EFI_FILE_MODE_READ, 0);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = FileHandleGetSize (FileHandle, &FileSize);
+  if (EFI_ERROR (Status)) {
+    goto CloseFile;
+  }
+  if (FileSize > MAX_UINTN) {
+    Status = EFI_UNSUPPORTED;
+    goto CloseFile;
+  }
+  *Size = (UINTN)FileSize;
+  Status = EFI_SUCCESS;
+CloseFile:
+  FileHandle->Close (FileHandle);
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+ReadWholeQemuKernelLoaderBlob (
+  IN  EFI_FILE_HANDLE     Root,
+  IN  CHAR16              *FileName,
+  IN  UINTN               Size,
+  OUT VOID                *Buffer
+  )
+{
+  EFI_STATUS      Status;
+  EFI_FILE_HANDLE FileHandle;
+  UINTN           ReadSize;
+
+  Status = Root->Open (Root, &FileHandle, FileName, EFI_FILE_MODE_READ, 0);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  ReadSize = Size;
+  Status = FileHandle->Read (FileHandle, &ReadSize, Buffer);
+  if (EFI_ERROR (Status)) {
+    goto CloseFile;
+  }
+  if (ReadSize != Size) {
+    Status = EFI_PROTOCOL_ERROR;
+    goto CloseFile;
+  }
+  Status = EFI_SUCCESS;
+CloseFile:
+  FileHandle->Close (FileHandle);
+  return Status;
+}
 
 /**
   Download the kernel, the initial ramdisk, and the kernel command line from
@@ -76,12 +158,16 @@ QemuLoadKernelImage (
   OUT EFI_HANDLE                  *ImageHandle
   )
 {
-  EFI_STATUS                Status;
-  EFI_HANDLE                KernelImageHandle;
-  EFI_LOADED_IMAGE_PROTOCOL *KernelLoadedImage;
-  UINTN                     CommandLineSize;
-  CHAR8                     *CommandLine;
-  UINTN                     InitrdSize;
+  EFI_STATUS                      Status;
+  EFI_HANDLE                      KernelImageHandle;
+  EFI_LOADED_IMAGE_PROTOCOL       *KernelLoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL        *DevicePathNode;
+  EFI_HANDLE                      FsVolumeHandle;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FsProtocol;
+  EFI_FILE_HANDLE                 Root;
+  UINTN                           CommandLineSize;
+  CHAR8                           *CommandLine;
+  UINTN                           InitrdSize;
 
   //
   // Load the image. This should call back into the QEMU EFI loader file system.
@@ -124,8 +210,38 @@ QemuLoadKernelImage (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  QemuFwCfgSelectItem (QemuFwCfgItemCommandLineSize);
-  CommandLineSize = (UINTN)QemuFwCfgRead32 ();
+  //
+  // Open the Qemu Kernel Loader abstract filesystem (volume) which will be
+  // used to query the "initrd" and to read the "cmdline" synthetic files.
+  //
+  DevicePathNode = (EFI_DEVICE_PATH_PROTOCOL *)&mQemuKernelLoaderFsDevicePath;
+  Status = gBS->LocateDevicePath (
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  &DevicePathNode,
+                  &FsVolumeHandle
+                  );
+  if (EFI_ERROR (Status)) {
+    goto UnloadImage;
+  }
+
+  Status = gBS->HandleProtocol (
+                  FsVolumeHandle,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  (VOID **)&FsProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    goto UnloadImage;
+  }
+
+  Status = FsProtocol->OpenVolume (FsVolumeHandle, &Root);
+  if (EFI_ERROR (Status)) {
+    goto UnloadImage;
+  }
+
+  Status = GetQemuKernelLoaderBlobSize (Root, L"cmdline", &CommandLineSize);
+  if (EFI_ERROR (Status)) {
+    goto CloseRoot;
+  }
 
   if (CommandLineSize == 0) {
     KernelLoadedImage->LoadOptionsSize = 0;
@@ -133,11 +249,14 @@ QemuLoadKernelImage (
     CommandLine = AllocatePool (CommandLineSize);
     if (CommandLine == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
-      goto UnloadImage;
+      goto CloseRoot;
     }
 
-    QemuFwCfgSelectItem (QemuFwCfgItemCommandLineData);
-    QemuFwCfgReadBytes (CommandLineSize, CommandLine);
+    Status = ReadWholeQemuKernelLoaderBlob (Root, L"cmdline", CommandLineSize,
+               CommandLine);
+    if (EFI_ERROR (Status)) {
+      goto FreeCommandLine;
+    }
 
     //
     // Verify NUL-termination of the command line.
@@ -155,8 +274,10 @@ QemuLoadKernelImage (
     KernelLoadedImage->LoadOptionsSize = (UINT32)((CommandLineSize - 1) * 2);
   }
 
-  QemuFwCfgSelectItem (QemuFwCfgItemInitrdSize);
-  InitrdSize = (UINTN)QemuFwCfgRead32 ();
+  Status = GetQemuKernelLoaderBlobSize (Root, L"initrd", &InitrdSize);
+  if (EFI_ERROR (Status)) {
+    goto FreeCommandLine;
+  }
 
   if (InitrdSize > 0) {
     //
@@ -193,14 +314,18 @@ QemuLoadKernelImage (
   }
 
   *ImageHandle = KernelImageHandle;
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
 
 FreeCommandLine:
   if (CommandLineSize > 0) {
     FreePool (CommandLine);
   }
+CloseRoot:
+  Root->Close (Root);
 UnloadImage:
-  gBS->UnloadImage (KernelImageHandle);
+  if (EFI_ERROR (Status)) {
+    gBS->UnloadImage (KernelImageHandle);
+  }
 
   return Status;
 }

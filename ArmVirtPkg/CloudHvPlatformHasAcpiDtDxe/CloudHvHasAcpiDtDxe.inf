@@ -1,0 +1,42 @@
+## @file
+# Decide whether the firmware should expose an ACPI- and/or a Device Tree-based
+# hardware description to the operating system.
+#
+# Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = CloudHvPlatformHasAcpiDtDxe
+  FILE_GUID                      = 71fe72f9-6dc1-199d-5054-13b4200ee88d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PlatformHasAcpiDt
+
+[Sources]
+  CloudHvHasAcpiDtDxe.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gEdkiiPlatformHasAcpiGuid       ## SOMETIMES_PRODUCES ## PROTOCOL
+  gEdkiiPlatformHasDeviceTreeGuid ## SOMETIMES_PRODUCES ## PROTOCOL
+
+[Pcd]
+  gArmVirtTokenSpaceGuid.PcdForceNoAcpi
+
+[Depex]
+  gEfiVariableArchProtocolGuid

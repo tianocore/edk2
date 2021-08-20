@@ -1,5 +1,5 @@
 /** @file
-  SEV Secret configuration table constructor
+  Confidential Computing Secret configuration table constructor
 
   Copyright (C) 2020 James Bottomley, IBM Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent

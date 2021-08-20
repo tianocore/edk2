@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.
+#  Copyright (c) 2018 - 2021, ARM Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -173,9 +173,6 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
-  #
-  # UEFI application (Shell Embedded Boot Loader)
-  #
   INF ShellPkg/Application/Shell/Shell.inf
   INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 
@@ -194,6 +191,15 @@ READ_LOCK_STATUS   = TRUE
   #
   INF MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
   INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+
+  #
+  # PCI support
+  #
+  INF ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
+  INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  INF OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  INF OvmfPkg/Virtio10Dxe/Virtio10.inf
 
   #
   # TianoCore logo (splash screen)

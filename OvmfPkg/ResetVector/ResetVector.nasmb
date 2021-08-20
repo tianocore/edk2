@@ -77,6 +77,7 @@
   %define SEV_ES_WORK_AREA_ENC_MASK (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
   %define SEV_ES_VC_TOP_OF_STACK (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
 %include "Ia32/Flat32ToFlat64.asm"
+%include "Ia32/AmdSev.asm"
 %include "Ia32/PageTables64.asm"
 %endif
 
@@ -88,5 +89,7 @@
   %define SEV_ES_AP_RESET_IP  FixedPcdGet32 (PcdSevEsWorkAreaBase)
   %define SEV_LAUNCH_SECRET_BASE  FixedPcdGet32 (PcdSevLaunchSecretBase)
   %define SEV_LAUNCH_SECRET_SIZE  FixedPcdGet32 (PcdSevLaunchSecretSize)
+  %define SEV_FW_HASH_BLOCK_BASE  FixedPcdGet32 (PcdQemuHashTableBase)
+  %define SEV_FW_HASH_BLOCK_SIZE  FixedPcdGet32 (PcdQemuHashTableSize)
 %include "Ia16/ResetVectorVtf0.asm"
 

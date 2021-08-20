@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI_HTTP_PROTOCOL protocol interfaces.
 
-  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -527,6 +527,7 @@ EfiHttpRequest (
       } else {
         Status = HttpDns6 (HttpInstance, HostNameStr, &HttpInstance->RemoteIpv6Addr);
       }
+      HttpNotify (HttpEventDns, Status);
 
       FreePool (HostNameStr);
       if (EFI_ERROR (Status)) {
@@ -588,6 +589,7 @@ EfiHttpRequest (
              Configure || ReConfigure,
              TlsConfigure
              );
+  HttpNotify (HttpEventInitSession, Status);
   if (EFI_ERROR (Status)) {
     goto Error2;
   }
@@ -983,6 +985,7 @@ HttpResponseWorker (
   HTTP_TOKEN_WRAP               *ValueInItem;
   UINTN                         HdrLen;
   NET_FRAGMENT                  Fragment;
+  UINT32                        TimeoutValue;
 
   if (Wrap == NULL || Wrap->HttpInstance == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1053,9 +1056,14 @@ HttpResponseWorker (
     }
 
     //
+    // Get HTTP timeout value
+    //
+    TimeoutValue = PcdGet32 (PcdHttpIoTimeout);
+
+    //
     // Start the timer, and wait Timeout seconds to receive the header packet.
     //
-    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, HTTP_RESPONSE_TIMEOUT * TICKS_PER_SECOND);
+    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, TimeoutValue * TICKS_PER_MS);
     if (EFI_ERROR (Status)) {
       goto Error;
     }
@@ -1330,9 +1338,14 @@ HttpResponseWorker (
     }
 
     //
+    // Get HTTP timeout value
+    //
+    TimeoutValue = PcdGet32 (PcdHttpIoTimeout);
+
+    //
     // Start the timer, and wait Timeout seconds to receive the body packet.
     //
-    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, HTTP_RESPONSE_TIMEOUT * TICKS_PER_SECOND);
+    Status = gBS->SetTimer (HttpInstance->TimeoutEvent, TimerRelative, TimeoutValue * TICKS_PER_MS);
     if (EFI_ERROR (Status)) {
       goto Error2;
     }

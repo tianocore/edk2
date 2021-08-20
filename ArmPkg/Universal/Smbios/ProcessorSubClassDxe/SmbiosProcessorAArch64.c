@@ -8,8 +8,8 @@
 **/
 
 #include <Uefi.h>
+#include <IndustryStandard/ArmCache.h>
 #include <Library/ArmLib.h>
-#include <Library/ArmLib/ArmLibPrivate.h>
 
 #include "SmbiosProcessor.h"
 

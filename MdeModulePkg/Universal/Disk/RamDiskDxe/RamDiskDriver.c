@@ -155,6 +155,12 @@ RamDiskDxeEntryPoint (
   }
 
   //
+  // Initialize the list of registered RAM disks maintained by the driver
+  // before installing the protocol
+  //
+  InitializeListHead (&RegisteredRamDisks);
+
+  //
   // Install the EFI_RAM_DISK_PROTOCOL and RAM disk private data onto a
   // new handle
   //
@@ -169,11 +175,6 @@ RamDiskDxeEntryPoint (
   if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
-
-  //
-  // Initialize the list of registered RAM disks maintained by the driver
-  //
-  InitializeListHead (&RegisteredRamDisks);
 
   Status = EfiCreateEventReadyToBootEx (
              TPL_CALLBACK,

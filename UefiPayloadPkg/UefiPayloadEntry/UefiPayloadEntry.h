@@ -1,6 +1,6 @@
 /** @file
 *
-* Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+* Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -31,12 +31,26 @@
 #include <Guid/MemoryMapInfoGuid.h>
 #include <Guid/AcpiBoardInfoGuid.h>
 #include <Guid/GraphicsInfoHob.h>
-
+#include <UniversalPayload/SmbiosTable.h>
+#include <UniversalPayload/AcpiTable.h>
+#include <UniversalPayload/UniversalPayload.h>
+#include <UniversalPayload/ExtraData.h>
+#include <Guid/PcdDataBaseSignatureGuid.h>
 
 #define LEGACY_8259_MASK_REGISTER_MASTER  0x21
 #define LEGACY_8259_MASK_REGISTER_SLAVE   0xA1
 #define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
   ((ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1)))
+
+
+#define E820_RAM       1
+#define E820_RESERVED  2
+#define E820_ACPI      3
+#define E820_NVS       4
+#define E820_UNUSABLE  5
+#define E820_DISABLED  6
+#define E820_PMEM      7
+#define E820_UNDEFINED 8
 
 /**
   Auto-generated function that calls the library constructors for all of the module's
@@ -82,14 +96,14 @@ UpdateStackHob (
 /**
   Build a Handoff Information Table HOB
 
-  This function initialize a HOB region from EfiMemoryBegin with length
-  EfiMemoryLength. And EfiFreeMemoryBottom and EfiFreeMemoryTop should
+  This function initialize a HOB region from EfiMemoryBegin to
+  EfiMemoryTop. And EfiFreeMemoryBottom and EfiFreeMemoryTop should
   be inside the HOB region.
 
-  @param[in] EfiMemoryBegin       Total memory start address
-  @param[in] EfiMemoryLength      Total memory length reported in handoff HOB.
-  @param[in] EfiFreeMemoryBottom  Free memory start address
-  @param[in] EfiFreeMemoryTop     Free memory end address.
+  @param[in] EfiMemoryBottom       Total memory start address
+  @param[in] EfiMemoryTop          Total memory end address.
+  @param[in] EfiFreeMemoryBottom   Free memory start address
+  @param[in] EfiFreeMemoryTop      Free memory end address.
 
   @return   The pointer to the handoff HOB table.
 
@@ -97,8 +111,8 @@ UpdateStackHob (
 EFI_HOB_HANDOFF_INFO_TABLE*
 EFIAPI
 HobConstructor (
-  IN VOID   *EfiMemoryBegin,
-  IN UINTN  EfiMemoryLength,
+  IN VOID   *EfiMemoryBottom,
+  IN VOID   *EfiMemoryTop,
   IN VOID   *EfiFreeMemoryBottom,
   IN VOID   *EfiFreeMemoryTop
   );
@@ -117,6 +131,21 @@ LoadDxeCore (
   );
 
 /**
+  Find DXE core from FV and build DXE core HOBs.
+
+  @param[in]   DxeFv                 The FV where to find the DXE core.
+  @param[out]  DxeCoreEntryPoint     DXE core entry point
+
+  @retval EFI_SUCCESS        If it completed successfully.
+  @retval EFI_NOT_FOUND      If it failed to load DXE FV.
+**/
+EFI_STATUS
+UniversalLoadDxeCore (
+  IN  EFI_FIRMWARE_VOLUME_HEADER *DxeFv,
+  OUT PHYSICAL_ADDRESS           *DxeCoreEntryPoint
+  );
+
+/**
    Transfers control to DxeCore.
 
    This function performs a CPU architecture specific operations to execute
@@ -131,4 +160,48 @@ HandOffToDxeCore (
   IN EFI_PEI_HOB_POINTERS   HobList
   );
 
+EFI_STATUS
+FixUpPcdDatabase (
+  IN  EFI_FIRMWARE_VOLUME_HEADER *DxeFv
+  );
+
+/**
+  This function searchs a given section type within a valid FFS file.
+
+  @param  FileHeader            A pointer to the file header that contains the set of sections to
+                                be searched.
+  @param  SearchType            The value of the section type to search.
+  @param  SectionData           A pointer to the discovered section, if successful.
+
+  @retval EFI_SUCCESS           The section was found.
+  @retval EFI_NOT_FOUND         The section was not found.
+
+**/
+EFI_STATUS
+FileFindSection (
+  IN EFI_FFS_FILE_HEADER        *FileHeader,
+  IN EFI_SECTION_TYPE           SectionType,
+  OUT VOID                      **SectionData
+  );
+
+/**
+  This function searchs a given file type with a given Guid within a valid FV.
+  If input Guid is NULL, will locate the first section having the given file type
+
+  @param FvHeader        A pointer to firmware volume header that contains the set of files
+                         to be searched.
+  @param FileType        File type to be searched.
+  @param Guid            Will ignore if it is NULL.
+  @param FileHeader      A pointer to the discovered file, if successful.
+
+  @retval EFI_SUCCESS    Successfully found FileType
+  @retval EFI_NOT_FOUND  File type can't be found.
+**/
+EFI_STATUS
+FvFindFileByTypeGuid (
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *FvHeader,
+  IN  EFI_FV_FILETYPE             FileType,
+  IN  EFI_GUID                    *Guid           OPTIONAL,
+  OUT EFI_FFS_FILE_HEADER         **FileHeader
+  );
 #endif

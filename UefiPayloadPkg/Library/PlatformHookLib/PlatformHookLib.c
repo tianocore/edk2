@@ -75,11 +75,6 @@ PlatformHookSerialPortInitialize (
     return Status;
   }
 
-  Status = PcdSet64S (PcdUartDefaultBaudRate, SerialPortInfo.Baud);
-  if (RETURN_ERROR (Status)) {
-    return Status;
-  }
-
   Status = PcdSet32S (PcdSerialClockRate, SerialPortInfo.InputHertz);
   if (RETURN_ERROR (Status)) {
     return Status;

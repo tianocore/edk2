@@ -177,9 +177,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   INF MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
-  #
-  # UEFI application (Shell Embedded Boot Loader)
-  #
   INF ShellPkg/Application/Shell/Shell.inf
   INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
   INF ShellPkg/DynamicCommand/HttpDynamicCommand/HttpDynamicCommand.inf

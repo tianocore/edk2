@@ -186,6 +186,10 @@ typedef struct {
   UINT8                                  ParameterData[0];
 } IPMI_SET_BOOT_OPTIONS_REQUEST;
 
+typedef struct {
+  UINT8   CompletionCode:8;
+} IPMI_SET_BOOT_OPTIONS_RESPONSE;
+
 //
 //  Definitions for Get System Boot options command
 //

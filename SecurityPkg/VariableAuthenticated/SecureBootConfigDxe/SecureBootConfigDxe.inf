@@ -54,6 +54,8 @@
   DevicePathLib
   FileExplorerLib
   PeCoffLib
+  SecureBootVariableLib
+  SecureBootVariableProvisionLib
 
 [Guids]
   ## SOMETIMES_CONSUMES      ## Variable:L"CustomMode"
@@ -108,6 +110,7 @@
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiDevicePathProtocolGuid                    ## PRODUCES
+  gEfiHiiPopupProtocolGuid
 
 [Depex]
   gEfiHiiConfigRoutingProtocolGuid  AND

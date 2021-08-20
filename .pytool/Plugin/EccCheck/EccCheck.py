@@ -1,5 +1,6 @@
 # @file EccCheck.py
 #
+# Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 # Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -60,18 +61,20 @@ class EccCheck(ICiBuildPlugin):
     #   - Junit Logger
     #   - output_stream the StringIO output stream from this plugin via logging
     def RunBuildPlugin(self, packagename, Edk2pathObj, pkgconfig, environment, PLM, PLMHelper, tc, output_stream=None):
-        edk2_path = Edk2pathObj.WorkspacePath
-        python_path = os.path.join(edk2_path, "BaseTools", "Source", "Python")
+        workspace_path = Edk2pathObj.WorkspacePath
+        basetools_path = environment.GetValue("EDK_TOOLS_PATH")
+        python_path = os.path.join(basetools_path, "Source", "Python")
         env = shell_environment.GetEnvironment()
         env.set_shell_var('PYTHONPATH', python_path)
-        env.set_shell_var('WORKSPACE', edk2_path)
+        env.set_shell_var('WORKSPACE', workspace_path)
+        env.set_shell_var('PACKAGES_PATH', os.pathsep.join(Edk2pathObj.PackagePathList))
         self.ECC_PASS = True
-        self.ApplyConfig(pkgconfig, edk2_path, packagename)
+        self.ApplyConfig(pkgconfig, workspace_path, basetools_path, packagename)
         modify_dir_list = self.GetModifyDir(packagename)
         patch = self.GetDiff(packagename)
-        ecc_diff_range = self.GetDiffRange(patch, packagename, edk2_path)
-        self.GenerateEccReport(modify_dir_list, ecc_diff_range, edk2_path)
-        ecc_log = os.path.join(edk2_path, "Ecc.log")
+        ecc_diff_range = self.GetDiffRange(patch, packagename, workspace_path)
+        self.GenerateEccReport(modify_dir_list, ecc_diff_range, workspace_path, basetools_path)
+        ecc_log = os.path.join(workspace_path, "Ecc.log")
         self.RevertCode()
         if self.ECC_PASS:
             tc.SetSuccess()
@@ -176,24 +179,24 @@ class EccCheck(ICiBuildPlugin):
         return comment_range
 
     def GenerateEccReport(self, modify_dir_list: List[str], ecc_diff_range: Dict[str, List[Tuple[int, int]]],
-                          edk2_path: str) -> None:
+                           workspace_path: str, basetools_path: str) -> None:
         ecc_need = False
         ecc_run = True
-        config = os.path.join(edk2_path, "BaseTools", "Source", "Python", "Ecc", "config.ini")
-        exception = os.path.join(edk2_path, "BaseTools", "Source", "Python", "Ecc", "exception.xml")
-        report = os.path.join(edk2_path, "Ecc.csv")
+        config = os.path.join(basetools_path, "Source", "Python", "Ecc", "config.ini")
+        exception = os.path.join(basetools_path, "Source", "Python", "Ecc", "exception.xml")
+        report = os.path.join(workspace_path, "Ecc.csv")
         for modify_dir in modify_dir_list:
-            target = os.path.join(edk2_path, modify_dir)
+            target = os.path.join(workspace_path, modify_dir)
             logging.info('Run ECC tool for the commit in %s' % modify_dir)
             ecc_need = True
             ecc_params = "-c {0} -e {1} -t {2} -r {3}".format(config, exception, target, report)
-            return_code = RunCmd("Ecc", ecc_params, workingdir=edk2_path)
+            return_code = RunCmd("Ecc", ecc_params, workingdir=workspace_path)
             if return_code != 0:
                 ecc_run = False
                 break
             if not ecc_run:
                 logging.error('Fail to run ECC tool')
-            self.ParseEccReport(ecc_diff_range, edk2_path)
+            self.ParseEccReport(ecc_diff_range, workspace_path)
 
         if not ecc_need:
             logging.info("Doesn't need run ECC check")
@@ -202,13 +205,12 @@ class EccCheck(ICiBuildPlugin):
         RunCmd("git", revert_params)
         return
 
-    def ParseEccReport(self, ecc_diff_range: Dict[str, List[Tuple[int, int]]], edk2_path: str) -> None:
-        ecc_log = os.path.join(edk2_path, "Ecc.log")
-        ecc_csv = "Ecc.csv"
-        file = os.listdir(edk2_path)
+    def ParseEccReport(self, ecc_diff_range: Dict[str, List[Tuple[int, int]]], workspace_path: str) -> None:
+        ecc_log = os.path.join(workspace_path, "Ecc.log")
+        ecc_csv = os.path.join(workspace_path, "Ecc.csv")
         row_lines = []
         ignore_error_code = self.GetIgnoreErrorCode()
-        if ecc_csv in file:
+        if os.path.exists(ecc_csv):
             with open(ecc_csv) as csv_file:
                 reader = csv.reader(csv_file)
                 for row in reader:
@@ -234,10 +236,10 @@ class EccCheck(ICiBuildPlugin):
             log.writelines(all_line)
         return
 
-    def ApplyConfig(self, pkgconfig: Dict[str, List[str]], edk2_path: str, pkg: str) -> None:
+    def ApplyConfig(self, pkgconfig: Dict[str, List[str]], workspace_path: str, basetools_path: str, pkg: str) -> None:
         if "IgnoreFiles" in pkgconfig:
             for a in pkgconfig["IgnoreFiles"]:
-                a = os.path.join(edk2_path, pkg, a)
+                a = os.path.join(workspace_path, pkg, a)
                 a = a.replace(os.sep, "/")
 
                 logging.info("Ignoring Files {0}".format(a))
@@ -251,7 +253,7 @@ class EccCheck(ICiBuildPlugin):
 
         if "ExceptionList" in pkgconfig:
             exception_list = pkgconfig["ExceptionList"]
-            exception_xml = os.path.join(edk2_path, "BaseTools", "Source", "Python", "Ecc", "exception.xml")
+            exception_xml = os.path.join(basetools_path, "Source", "Python", "Ecc", "exception.xml")
             try:
                 logging.info("Appending exceptions")
                 self.AppendException(exception_list, exception_xml)

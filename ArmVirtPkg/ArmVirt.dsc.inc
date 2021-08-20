@@ -168,6 +168,8 @@
   #
 !if $(SECURE_BOOT_ENABLE) == TRUE
   AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
+  SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
+  SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
 
   # re-use the UserPhysicalPresent() dummy implementation from the ovmf tree
   PlatformSecureLib|OvmfPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
@@ -375,9 +377,6 @@
   #
   MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 
-  #
-  # UEFI application (Shell Embedded Boot Loader)
-  #
   ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
     <PcdsFixedAtBuild>
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE

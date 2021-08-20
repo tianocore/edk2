@@ -3,7 +3,7 @@
 
 Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2016-2021 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1610,6 +1610,7 @@ GetExPcdTokenNumber (
     }
   }
 
+  DEBUG ((DEBUG_ERROR, "%a: Failed to find PCD with GUID: %g and token number: %d\n", __FUNCTION__, Guid, ExTokenNumber));
   ASSERT (FALSE);
 
   return 0;

@@ -284,7 +284,15 @@ class Config(object):
         line=x.split('\n')[0]
         comment_list = value_re.findall(line) # the string \\... in "Q...." line
         comment_list[0] = comment_list[0].replace('//', '')
-        comment = comment_list[0].strip()
+        comment_ori = comment_list[0].strip()
+        comment = ""
+        for each in comment_ori:
+            if each != " " and "\x21" > each or each > "\x7E":
+                if bytes(each, 'utf-16') == b'\xff\xfe\xae\x00':
+                    each = '(R)'
+                else:
+                    each = ""
+            comment += each
         line=value_re.sub('',line) #delete \\... in "Q...." line
         list1=line.split(' ')
         value=self.value_parser(list1)

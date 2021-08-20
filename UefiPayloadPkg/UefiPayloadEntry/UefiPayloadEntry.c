@@ -1,16 +1,165 @@
 /** @file
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "UefiPayloadEntry.h"
 
+STATIC UINT32 mTopOfLowerUsableDram = 0;
+
 /**
    Callback function to build resource descriptor HOB
 
    This function build a HOB based on the memory map entry info.
+   It creates only EFI_RESOURCE_MEMORY_MAPPED_IO and EFI_RESOURCE_MEMORY_RESERVED
+   resources.
+
+   @param MemoryMapEntry         Memory map entry info got from bootloader.
+   @param Params                 A pointer to ACPI_BOARD_INFO.
+
+  @retval EFI_SUCCESS            Successfully build a HOB.
+  @retval EFI_INVALID_PARAMETER  Invalid parameter provided.
+**/
+EFI_STATUS
+MemInfoCallbackMmio (
+  IN MEMROY_MAP_ENTRY          *MemoryMapEntry,
+  IN VOID                      *Params
+  )
+{
+  EFI_PHYSICAL_ADDRESS         Base;
+  EFI_RESOURCE_TYPE            Type;
+  UINT64                       Size;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  Attribue;
+  ACPI_BOARD_INFO              *AcpiBoardInfo;
+
+  AcpiBoardInfo = (ACPI_BOARD_INFO *)Params;
+  if (AcpiBoardInfo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Skip types already handled in MemInfoCallback
+  //
+  if (MemoryMapEntry->Type == E820_RAM || MemoryMapEntry->Type == E820_ACPI) {
+    return EFI_SUCCESS;
+  }
+
+  if (MemoryMapEntry->Base == AcpiBoardInfo->PcieBaseAddress) {
+    //
+    // MMCONF is always MMIO
+    //
+    Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
+  } else if (MemoryMapEntry->Base < mTopOfLowerUsableDram) {
+    //
+    // It's in DRAM and thus must be reserved
+    //
+    Type = EFI_RESOURCE_MEMORY_RESERVED;
+  } else if ((MemoryMapEntry->Base < 0x100000000ULL) && (MemoryMapEntry->Base >= mTopOfLowerUsableDram)) {
+    //
+    // It's not in DRAM, must be MMIO
+    //
+    Type = EFI_RESOURCE_MEMORY_MAPPED_IO;
+  } else {
+    Type = EFI_RESOURCE_MEMORY_RESERVED;
+  }
+
+  Base    = MemoryMapEntry->Base;
+  Size    = MemoryMapEntry->Size;
+
+  Attribue = EFI_RESOURCE_ATTRIBUTE_PRESENT |
+             EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+             EFI_RESOURCE_ATTRIBUTE_TESTED |
+             EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+             EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+             EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+             EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
+
+  BuildResourceDescriptorHob (Type, Attribue, (EFI_PHYSICAL_ADDRESS)Base, Size);
+  DEBUG ((DEBUG_INFO , "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x\n", Base, Size, Type));
+
+  if (MemoryMapEntry->Type == E820_UNUSABLE ||
+    MemoryMapEntry->Type == E820_DISABLED) {
+    BuildMemoryAllocationHob (Base, Size, EfiUnusableMemory);
+  } else if (MemoryMapEntry->Type == E820_PMEM) {
+    BuildMemoryAllocationHob (Base, Size, EfiPersistentMemory);
+  }
+
+  return EFI_SUCCESS;
+}
+
+
+/**
+   Callback function to find TOLUD (Top of Lower Usable DRAM)
+
+   Estimate where TOLUD (Top of Lower Usable DRAM) resides. The exact position
+   would require platform specific code.
+
+   @param MemoryMapEntry         Memory map entry info got from bootloader.
+   @param Params                 Not used for now.
+
+  @retval EFI_SUCCESS            Successfully updated mTopOfLowerUsableDram.
+**/
+EFI_STATUS
+FindToludCallback (
+  IN MEMROY_MAP_ENTRY          *MemoryMapEntry,
+  IN VOID                      *Params
+  )
+{
+  //
+  // This code assumes that the memory map on this x86 machine below 4GiB is continous
+  // until TOLUD. In addition it assumes that the bootloader provided memory tables have
+  // no "holes" and thus the first memory range not covered by e820 marks the end of
+  // usable DRAM. In addition it's assumed that every reserved memory region touching
+  // usable RAM is also covering DRAM, everything else that is marked reserved thus must be
+  // MMIO not detectable by bootloader/OS
+  //
+
+  //
+  // Skip memory types not RAM or reserved
+  //
+  if ((MemoryMapEntry->Type == E820_UNUSABLE) || (MemoryMapEntry->Type == E820_DISABLED) ||
+    (MemoryMapEntry->Type == E820_PMEM)) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Skip resources above 4GiB
+  //
+  if ((MemoryMapEntry->Base + MemoryMapEntry->Size) > 0x100000000ULL) {
+    return EFI_SUCCESS;
+  }
+
+  if ((MemoryMapEntry->Type == E820_RAM) || (MemoryMapEntry->Type == E820_ACPI) ||
+    (MemoryMapEntry->Type == E820_NVS)) {
+    //
+    // It's usable DRAM. Update TOLUD.
+    //
+    if (mTopOfLowerUsableDram < (MemoryMapEntry->Base + MemoryMapEntry->Size)) {
+      mTopOfLowerUsableDram = (UINT32)(MemoryMapEntry->Base + MemoryMapEntry->Size);
+    }
+  } else {
+    //
+    // It might be 'reserved DRAM' or 'MMIO'.
+    //
+    // If it touches usable DRAM at Base assume it's DRAM as well,
+    // as it could be bootloader installed tables, TSEG, GTT, ...
+    //
+    if (mTopOfLowerUsableDram == MemoryMapEntry->Base) {
+      mTopOfLowerUsableDram = (UINT32)(MemoryMapEntry->Base + MemoryMapEntry->Size);
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+
+/**
+   Callback function to build resource descriptor HOB
+
+   This function build a HOB based on the memory map entry info.
+   Only add EFI_RESOURCE_SYSTEM_MEMORY.
 
    @param MemoryMapEntry         Memory map entry info got from bootloader.
    @param Params                 Not used for now.
@@ -28,7 +177,16 @@ MemInfoCallback (
   UINT64                       Size;
   EFI_RESOURCE_ATTRIBUTE_TYPE  Attribue;
 
-  Type    = (MemoryMapEntry->Type == 1) ? EFI_RESOURCE_SYSTEM_MEMORY : EFI_RESOURCE_MEMORY_RESERVED;
+  //
+  // Skip everything not known to be usable DRAM.
+  // It will be added later.
+  //
+  if ((MemoryMapEntry->Type != E820_RAM) && (MemoryMapEntry->Type != E820_ACPI) &&
+    (MemoryMapEntry->Type != E820_NVS)) {
+    return RETURN_SUCCESS;
+  }
+
+  Type    = EFI_RESOURCE_SYSTEM_MEMORY;
   Base    = MemoryMapEntry->Base;
   Size    = MemoryMapEntry->Size;
 
@@ -40,13 +198,14 @@ MemInfoCallback (
              EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
              EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
 
-  if (Base >= BASE_4GB ) {
-    // Remove tested attribute to avoid DXE core to dispatch driver to memory above 4GB
-    Attribue &= ~EFI_RESOURCE_ATTRIBUTE_TESTED;
-  }
-
   BuildResourceDescriptorHob (Type, Attribue, (EFI_PHYSICAL_ADDRESS)Base, Size);
   DEBUG ((DEBUG_INFO , "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x\n", Base, Size, Type));
+
+  if (MemoryMapEntry->Type == E820_ACPI) {
+    BuildMemoryAllocationHob (Base, Size, EfiACPIReclaimMemory);
+  } else if (MemoryMapEntry->Type == E820_NVS) {
+    BuildMemoryAllocationHob (Base, Size, EfiACPIMemoryNVS);
+  }
 
   return RETURN_SUCCESS;
 }
@@ -234,10 +393,23 @@ BuildHobFromBl (
   EFI_PEI_GRAPHICS_INFO_HOB        *NewGfxInfo;
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB GfxDeviceInfo;
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB *NewGfxDeviceInfo;
+  UNIVERSAL_PAYLOAD_SMBIOS_TABLE   *SmBiosTableHob;
+  UNIVERSAL_PAYLOAD_ACPI_TABLE     *AcpiTableHob;
 
   //
-  // Parse memory info and build memory HOBs
+  // First find TOLUD
   //
+  DEBUG ((DEBUG_INFO , "Guessing Top of Lower Usable DRAM:\n"));
+  Status = ParseMemoryInfo (FindToludCallback, NULL);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+  DEBUG ((DEBUG_INFO , "Assuming TOLUD = 0x%x\n", mTopOfLowerUsableDram));
+
+  //
+  // Parse memory info and build memory HOBs for Usable RAM
+  //
+  DEBUG ((DEBUG_INFO , "Building ResourceDescriptorHobs for usable memory:\n"));
   Status = ParseMemoryInfo (MemInfoCallback, NULL);
   if (EFI_ERROR(Status)) {
     return Status;
@@ -276,6 +448,25 @@ BuildHobFromBl (
     DEBUG ((DEBUG_INFO, "Detected Acpi Table at 0x%lx, length 0x%x\n", SysTableInfo.AcpiTableBase, SysTableInfo.AcpiTableSize));
     DEBUG ((DEBUG_INFO, "Detected Smbios Table at 0x%lx, length 0x%x\n", SysTableInfo.SmbiosTableBase, SysTableInfo.SmbiosTableSize));
   }
+  //
+  // Creat SmBios table Hob
+  //
+  SmBiosTableHob = BuildGuidHob (&gUniversalPayloadSmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
+  ASSERT (SmBiosTableHob != NULL);
+  SmBiosTableHob->Header.Revision = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
+  SmBiosTableHob->Header.Length = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
+  SmBiosTableHob->SmBiosEntryPoint = SysTableInfo.SmbiosTableBase;
+  DEBUG ((DEBUG_INFO, "Create smbios table gUniversalPayloadSmbiosTableGuid guid hob\n"));
+
+  //
+  // Creat ACPI table Hob
+  //
+  AcpiTableHob = BuildGuidHob (&gUniversalPayloadAcpiTableGuid, sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE));
+  ASSERT (AcpiTableHob != NULL);
+  AcpiTableHob->Header.Revision = UNIVERSAL_PAYLOAD_ACPI_TABLE_REVISION;
+  AcpiTableHob->Header.Length = sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE);
+  AcpiTableHob->Rsdp = SysTableInfo.AcpiTableBase;
+  DEBUG ((DEBUG_INFO, "Create smbios table gUniversalPayloadAcpiTableGuid guid hob\n"));
 
   //
   // Create guid hob for acpi board information
@@ -287,6 +478,15 @@ BuildHobFromBl (
     ASSERT (NewAcpiBoardInfo != NULL);
     CopyMem (NewAcpiBoardInfo, &AcpiBoardInfo, sizeof (ACPI_BOARD_INFO));
     DEBUG ((DEBUG_INFO, "Create acpi board info guid hob\n"));
+  }
+
+  //
+  // Parse memory info and build memory HOBs for reserved DRAM and MMIO
+  //
+  DEBUG ((DEBUG_INFO , "Building ResourceDescriptorHobs for reserved memory:\n"));
+  Status = ParseMemoryInfo (MemInfoCallbackMmio, &AcpiBoardInfo);
+  if (EFI_ERROR(Status)) {
+    return Status;
   }
 
   //
@@ -359,9 +559,7 @@ PayloadEntry (
 {
   EFI_STATUS                    Status;
   PHYSICAL_ADDRESS              DxeCoreEntryPoint;
-  EFI_HOB_HANDOFF_INFO_TABLE    *HandoffHobTable;
   UINTN                         MemBase;
-  UINTN                         MemSize;
   UINTN                         HobMemBase;
   UINTN                         HobMemTop;
   EFI_PEI_HOB_POINTERS          Hob;
@@ -380,9 +578,7 @@ PayloadEntry (
   HobMemBase = ALIGN_VALUE (MemBase + PcdGet32 (PcdPayloadFdMemSize), SIZE_1MB);
   HobMemTop  = HobMemBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
 
-  // DXE core assumes the memory below HOB region could be used, so include the FV region memory into HOB range.
-  MemSize    = HobMemTop - MemBase;
-  HandoffHobTable = HobConstructor ((VOID *)MemBase, MemSize, (VOID *)HobMemBase, (VOID *)HobMemTop);
+  HobConstructor ((VOID *)MemBase, (VOID *)HobMemTop, (VOID *)HobMemBase, (VOID *)HobMemTop);
 
   // Build HOB based on information from Bootloader
   Status = BuildHobFromBl ();
@@ -406,7 +602,7 @@ PayloadEntry (
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
   IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE,  0xFF);
 
-  Hob.HandoffInformationTable = HandoffHobTable;
+  Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *) GetFirstHob(EFI_HOB_TYPE_HANDOFF);
   HandOffToDxeCore (DxeCoreEntryPoint, Hob);
 
   // Should not get here
