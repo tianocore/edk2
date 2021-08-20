@@ -77,9 +77,9 @@ HobConstructor (
   Hob->Version             = EFI_HOB_HANDOFF_TABLE_VERSION;
   Hob->BootMode            = BOOT_WITH_FULL_CONFIGURATION;
 
-  Hob->EfiMemoryTop        = (EFI_PHYSICAL_ADDRESS) EfiMemoryTop;
-  Hob->EfiMemoryBottom     = (EFI_PHYSICAL_ADDRESS) EfiMemoryBottom;
-  Hob->EfiFreeMemoryTop    = (EFI_PHYSICAL_ADDRESS) EfiFreeMemoryTop;
+  Hob->EfiMemoryTop        = (EFI_PHYSICAL_ADDRESS) (UINTN) EfiMemoryTop;
+  Hob->EfiMemoryBottom     = (EFI_PHYSICAL_ADDRESS) (UINTN) EfiMemoryBottom;
+  Hob->EfiFreeMemoryTop    = (EFI_PHYSICAL_ADDRESS) (UINTN) EfiFreeMemoryTop;
   Hob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS) (UINTN) (HobEnd+1);
   Hob->EfiEndOfHobList     = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
 

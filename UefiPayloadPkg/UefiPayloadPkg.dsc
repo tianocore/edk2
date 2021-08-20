@@ -415,7 +415,7 @@
 #
 ################################################################################
 
-!if "IA32" in $(ARCH)
+!if "IA32" in "$(ARCH)"
   [Components.IA32]
   !if $(UNIVERSAL_PAYLOAD) == TRUE
     UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
