@@ -67,7 +67,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "CryptoPkg",
                 "UnitTestFrameworkPkg",
                 "OvmfPkg",
-                "RedfishPkg"
+                "RedfishPkg",
+                "UefiPayloadPkg"
                 )
 
     def GetArchitecturesSupported(self):

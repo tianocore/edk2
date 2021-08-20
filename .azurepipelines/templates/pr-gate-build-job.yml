@@ -48,6 +48,9 @@ jobs:
       TARGET_SECURITY:
         Build.Pkgs: 'SecurityPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
+      TARGET_UEFIPAYLOAD:
+        Build.Pkgs: 'UefiPayloadPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
       TARGET_PLATFORMS:
         # For Platforms only check code. Leave it to Platform CI
         # to build them.
