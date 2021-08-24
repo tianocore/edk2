@@ -877,6 +877,7 @@ SecCoreStartupWithStack (
   IA32_DESCRIPTOR             IdtDescriptor;
   UINT32                      Index;
   volatile UINT8              *Table;
+  IA32_CR4                    Cr4;
 
   //
   // To ensure SMM can't be compromised on S3 resume, we must force re-init of
@@ -963,8 +964,15 @@ SecCoreStartupWithStack (
   //
   // ASSERT that the Page Tables were set by the reset vector code to
   // the address we expect.
+  // There are 7 Pages reserved for the PageTables. The base address
+  // of 4-level paging is 0x1000 larger than 5-level paging.
   //
-  ASSERT (AsmReadCr3 () == (UINTN) PcdGet32 (PcdOvmfSecPageTablesBase));
+  Cr4.UintN = AsmReadCr4 ();
+  if (Cr4.Bits.LA57 == 1) {
+    ASSERT (AsmReadCr3 () == (UINTN) PcdGet32 (PcdOvmfSecPageTablesBase));
+  } else {
+    ASSERT (AsmReadCr3 () == ((UINTN) PcdGet32 (PcdOvmfSecPageTablesBase) + 0x1000));
+  }
 #endif
 
   //

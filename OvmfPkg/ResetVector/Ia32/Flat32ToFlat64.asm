@@ -11,15 +11,65 @@
 BITS    32
 
 ;
+; Check if 5-level paging is supported.
+; CPUID.(EAX=07H, ECX=0):ECX[bit 16] is a new feature flag
+; that will enumerate basic support for 5-level paging
+;
+; Modified: EAX, ECX
+;
+; If 5-level paging is supported, EAX is 1
+; If 5-level paging is *NOT* supported, EAX is 0
+;
+CheckLevel5PagingSupported:
+    mov     eax, 07h
+    xor     ecx, ecx
+    cpuid
+    xor     eax, eax
+    test    ecx, 10000h
+    jz      ExitCheckLevel5PagingSupported
+    mov     eax, 1
+
+ExitCheckLevel5PagingSupported:
+    OneTimeCallRet  CheckLevel5PagingSupported
+
+;
 ; Modified:  EAX, ECX, EDX
 ;
 Transition32FlatTo64Flat:
 
     OneTimeCall SetCr3ForPageTables64
 
-    mov     eax, cr4
-    bts     eax, 5                      ; enable PAE
-    mov     cr4, eax
+    ;
+    ; Set Cr4
+    ; But first should check if 5-level paging supported
+    ;
+    OneTimeCall CheckLevel5PagingSupported
+    test    eax, eax
+    jz      Level4Paging
+
+    mov     ebx, cr4
+    bts     ebx, 5                      ; enable PAE
+    bts     ebx, 12                     ; enable LA57
+    jmp     SetCr4
+
+Level4Paging:
+    mov     ebx, cr4
+    bts     ebx, 5                      ; enable PAE
+
+
+SetCr4:
+    mov     cr4, ebx
+
+    ;
+    ; In TDX LME has already been set. So we're done and jump to enable
+    ; paging directly if Tdx is enabled.
+    ; EBX is cleared because in the later it will be used to check if
+    ; the second step of the SEV-ES mitigation is to be performed.
+    ;
+    xor     ebx, ebx
+    OneTimeCall IsTdxEnabled
+    test    eax, eax
+    jnz     EnablePaging
 
     mov     ecx, 0xc0000080
     rdmsr

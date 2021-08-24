@@ -50,7 +50,7 @@
 %ifdef ARCH_X64
   #include <AutoGen.h>
 
-  %if (FixedPcdGet32 (PcdOvmfSecPageTablesSize) != 0x6000)
+  %if (FixedPcdGet32 (PcdOvmfSecPageTablesSize) != 0x7000)
     %error "This implementation inherently depends on PcdOvmfSecPageTablesSize"
   %endif
 
@@ -67,19 +67,54 @@
     %error "This implementation inherently depends on PcdOvmfSecGhcbBase not straddling a 2MB boundary"
   %endif
 
+  %define TDX_BFV_RAW_DATA_OFFSET   FixedPcdGet32 (PcdBfvRawDataOffset)
+  %define TDX_BFV_RAW_DATA_SIZE     FixedPcdGet32 (PcdBfvRawDataSize)
+  %define TDX_BFV_MEMORY_BASE       FixedPcdGet32 (PcdBfvBase)
+  %define TDX_BFV_MEMORY_SIZE       FixedPcdGet32 (PcdBfvRawDataSize)
+
+  %define TDX_CFV_RAW_DATA_OFFSET   FixedPcdGet32 (PcdCfvRawDataOffset)
+  %define TDX_CFV_RAW_DATA_SIZE     FixedPcdGet32 (PcdCfvRawDataSize)
+  %define TDX_CFV_MEMORY_BASE       FixedPcdGet32 (PcdCfvBase),
+  %define TDX_CFV_MEMORY_SIZE       FixedPcdGet32 (PcdCfvRawDataSize),
+
+  %define TDX_HEAP_MEMORY_BASE      FixedPcdGet32 (PcdOvmfSecPeiTempRamBase)
+  %define TDX_HEAP_MEMORY_SIZE      FixedPcdGet32 (PcdOvmfSecPeiTempRamSize) / 2
+
+  %define TDX_STACK_MEMORY_BASE     (TDX_HEAP_MEMORY_BASE + TDX_HEAP_MEMORY_SIZE)
+  %define TDX_STACK_MEMORY_SIZE     FixedPcdGet32 (PcdOvmfSecPeiTempRamSize) / 2
+
+  %define TDX_HOB_MEMORY_BASE       FixedPcdGet32 (PcdOvmfSecGhcbBase)
+  %define TDX_HOB_MEMORY_SIZE       FixedPcdGet32 (PcdOvmfSecGhcbSize)
+
+  %define TDX_MAILBOX_MEMORY_BASE   FixedPcdGet32 (PcdOvmfSecGhcbBackupBase)
+  %define TDX_MAILBOX_MEMORY_SIZE   FixedPcdGet32 (PcdOvmfSecGhcbBackupSize)
+
+  %define OVMF_PAGE_TABLE_BASE      FixedPcdGet32 (PcdOvmfSecPageTablesBase)
+  %define OVMF_PAGE_TABLE_SIZE      FixedPcdGet32 (PcdOvmfSecPageTablesSize)
+
+  %define TDX_WORK_AREA_PGTBL_READY (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 4)
+  %define TDX_WORK_AREA_GPAW        (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 8)
+
   %define PT_ADDR(Offset) (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
+
+  %define OVMF_WORK_AREA_BASE (FixedPcdGet32 (PcdOvmfWorkAreaBase))
+  %define OVMF_WORK_AREA_SIZE (FixedPcdGet32 (PcdOvmfWorkAreaSize))
 
   %define GHCB_PT_ADDR (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
   %define GHCB_BASE (FixedPcdGet32 (PcdOvmfSecGhcbBase))
   %define GHCB_SIZE (FixedPcdGet32 (PcdOvmfSecGhcbSize))
   %define WORK_AREA_GUEST_TYPE (FixedPcdGet32 (PcdOvmfWorkAreaBase))
+  %define WORK_AREA_GUEST_SUBTYPE (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 1)
   %define SEV_ES_WORK_AREA (FixedPcdGet32 (PcdSevEsWorkAreaBase))
   %define SEV_ES_WORK_AREA_RDRAND (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
   %define SEV_ES_WORK_AREA_ENC_MASK (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
   %define SEV_ES_VC_TOP_OF_STACK (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
-%include "Ia32/Flat32ToFlat64.asm"
-%include "Ia32/AmdSev.asm"
-%include "Ia32/PageTables64.asm"
+
+  %include "X64/IntelTdxMetadata.asm"
+  %include "Ia32/Flat32ToFlat64.asm"
+  %include "Ia32/AmdSev.asm"
+  %include "Ia32/PageTables64.asm"
+  %include "Ia32/IntelTdx.asm"
 %endif
 
 %include "Ia16/Real16ToFlat32.asm"
@@ -92,5 +127,6 @@
   %define SEV_LAUNCH_SECRET_SIZE  FixedPcdGet32 (PcdSevLaunchSecretSize)
   %define SEV_FW_HASH_BLOCK_BASE  FixedPcdGet32 (PcdQemuHashTableBase)
   %define SEV_FW_HASH_BLOCK_SIZE  FixedPcdGet32 (PcdQemuHashTableSize)
+  %define OVMF_IMAGE_SIZE_IN_KB   FixedPcdGet32 (PcdOvmfImageSizeInKb)
 %include "Ia16/ResetVectorVtf0.asm"
 
