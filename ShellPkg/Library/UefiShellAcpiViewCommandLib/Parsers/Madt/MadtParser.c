@@ -182,6 +182,57 @@ STATIC CONST ACPI_PARSER GicITSParser[] = {
 };
 
 /**
+  An ACPI_PARSER array describing the IO APIC Structure.
+**/
+STATIC CONST ACPI_PARSER IoApic[] = {
+  {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
+  {L"I/O APIC ID", 1, 2, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Reserved", 1, 3, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"I/O APIC Address", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Global System Interrupt Base", 4, 8, L"0x%x", NULL, NULL, NULL, NULL}
+};
+
+/**
+  An ACPI_PARSER array describing the Interrupt Source Override Structure.
+**/
+STATIC CONST ACPI_PARSER InterruptSourceOverride[] = {
+  {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
+  {L"Bus", 1, 2, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Source", 1, 3, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Global System Interrupt", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Flags", 2, 8, L"0x%x", NULL, NULL, NULL, NULL}
+};
+
+
+/**
+  An ACPI_PARSER array describing the Processor Local x2APIC Structure.
+**/
+STATIC CONST ACPI_PARSER ProcessorLocalX2Apic[] = {
+  {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
+  {L"Reserved", 2, 2, L"0x%x", NULL, NULL, NULL, NULL},
+
+  {L"X2APIC ID", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Flags", 4, 8, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"ACPI Processor UID", 4, 12, L"0x%x", NULL, NULL, NULL, NULL}
+};
+
+/**
+  An ACPI_PARSER array describing the Local x2APIC NMI Structure.
+**/
+STATIC CONST ACPI_PARSER LocalX2ApicNmi[] = {
+  {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
+  {L"Flags", 2, 2, L"0x%x", NULL, NULL, NULL, NULL},
+
+  {L"ACPI Processor UID", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Local x2APIC LINT#", 1, 8, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Reserved", 3, 9, L"0x%x%x%x", Dump3Chars, NULL, NULL, NULL}
+};
+
+/**
   An ACPI_PARSER array describing the ACPI MADT Table.
 **/
 STATIC CONST ACPI_PARSER MadtParser[] = {
@@ -353,6 +404,54 @@ ParseAcpiMadt (
           InterruptContollerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (GicITSParser)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_3_IO_APIC: {
+        ParseAcpi (
+          TRUE,
+          2,
+          "IO APIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (IoApic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_3_INTERRUPT_SOURCE_OVERRIDE: {
+        ParseAcpi (
+          TRUE,
+          2,
+          "INTERRUPT SOURCE OVERRIDE",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (InterruptSourceOverride)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_3_PROCESSOR_LOCAL_X2APIC: {
+        ParseAcpi (
+          TRUE,
+          2,
+          "PROCESSOR LOCAL X2APIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (ProcessorLocalX2Apic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_3_LOCAL_X2APIC_NMI: {
+        ParseAcpi (
+          TRUE,
+          2,
+          "LOCAL x2APIC NMI",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (LocalX2ApicNmi)
           );
         break;
       }
