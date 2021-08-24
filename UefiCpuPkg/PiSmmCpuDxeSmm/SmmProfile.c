@@ -985,13 +985,14 @@ CheckFeatureSupported (
   MSR_IA32_MISC_ENABLE_REGISTER  MiscEnableMsr;
 
   if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
-    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
-    if (RegEax <= CPUID_EXTENDED_FUNCTION) {
-      mCetSupported = FALSE;
-      PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
-    }
-    AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO, NULL, NULL, &RegEcx, NULL);
-    if ((RegEcx & CPUID_CET_SS) == 0) {
+    AsmCpuid (CPUID_SIGNATURE, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS) {
+      AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO, NULL, NULL, &RegEcx, NULL);
+      if ((RegEcx & CPUID_CET_SS) == 0) {
+        mCetSupported = FALSE;
+        PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
+      }
+    } else {
       mCetSupported = FALSE;
       PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
     }
