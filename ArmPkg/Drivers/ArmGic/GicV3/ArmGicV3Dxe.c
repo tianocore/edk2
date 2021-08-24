@@ -344,10 +344,6 @@ GicV3ExitBootServicesEvent (
     GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
   }
 
-  for (Index = 0; Index < mGicNumInterrupts; Index++) {
-    GicV3EndOfInterrupt (&gHardwareInterruptV3Protocol, Index);
-  }
-
   // Disable Gic Interface
   ArmGicV3DisableInterruptInterface ();
 
