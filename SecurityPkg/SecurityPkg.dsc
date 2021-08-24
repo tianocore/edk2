@@ -338,7 +338,6 @@
 
 [Components.IA32, Components.X64]
 
-  SecurityPkg/Tcg/MemoryOverwriteRequestControlLock/TcgMorLockSmm.inf
   SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
   SecurityPkg/Tcg/Tcg2Smm/Tcg2Smm.inf
   SecurityPkg/Tcg/Tcg2Smm/Tcg2StandaloneMm.inf
