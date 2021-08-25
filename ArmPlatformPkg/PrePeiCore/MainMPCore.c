@@ -68,7 +68,9 @@ SecondaryMain (
 
   // Find the core in the ArmCoreTable
   for (Index = 0; Index < ArmCoreCount; Index++) {
-    if ((ArmCoreInfoTable[Index].ClusterId == ClusterId) && (ArmCoreInfoTable[Index].CoreId == CoreId)) {
+    if ((GET_MPIDR_AFF1 (ArmCoreInfoTable[Index].Mpidr) == ClusterId) &&
+        (GET_MPIDR_AFF0 (ArmCoreInfoTable[Index].Mpidr) == CoreId))
+    {
       break;
     }
   }
