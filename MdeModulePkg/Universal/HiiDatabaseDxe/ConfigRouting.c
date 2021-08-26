@@ -2871,9 +2871,6 @@ ParseIfrData (
         //
         if ((BlockData->Name == NULL) && ((BlockData->Offset + BlockData->Width) > VarStorageData->Size)) {
           Status = EFI_INVALID_PARAMETER;
-          if (BlockData->Name != NULL) {
-            FreePool (BlockData->Name);
-          }
           FreePool (BlockData);
           goto Done;
         }
