@@ -81,4 +81,16 @@ typedef struct {
 #define VIRTIO_F_VERSION_1      BIT32
 #define VIRTIO_F_IOMMU_PLATFORM BIT33
 
+//
+// MMIO VirtIo Header Offsets
+//
+#define VIRTIO_MMIO_OFFSET_QUEUE_READY                0x44
+#define VIRTIO_MMIO_OFFSET_QUEUE_DESC_LO              0x80
+#define VIRTIO_MMIO_OFFSET_QUEUE_DESC_HI              0x84
+#define VIRTIO_MMIO_OFFSET_QUEUE_AVAIL_LO             0x90
+#define VIRTIO_MMIO_OFFSET_QUEUE_AVAIL_HI             0x94
+#define VIRTIO_MMIO_OFFSET_QUEUE_USED_LO              0xa0
+#define VIRTIO_MMIO_OFFSET_QUEUE_USED_HI              0xa4
+#define VIRTIO_MMIO_OFFSET_CONFIG_GENERATION          0xfc
+
 #endif // _VIRTIO_1_0_H_
