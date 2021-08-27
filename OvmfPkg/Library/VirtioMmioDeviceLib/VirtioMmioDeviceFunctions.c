@@ -151,7 +151,9 @@ VirtioMmioSetPageSize (
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
-  VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_PAGE_SIZE, PageSize);
+  if (Device->Version == VIRTIO_MMIO_DEVICE_VERSION_0_95) {
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_PAGE_SIZE, PageSize);
+  }
 
   return EFI_SUCCESS;
 }
