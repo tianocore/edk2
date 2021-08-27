@@ -20,6 +20,7 @@ VirtioMmioGetDeviceFeatures (
   )
 {
   VIRTIO_MMIO_DEVICE *Device;
+  UINT32  LowBits, HighBits;
 
   if (DeviceFeatures == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -27,7 +28,15 @@ VirtioMmioGetDeviceFeatures (
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
-  *DeviceFeatures = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES);
+  if (Device->Version == VIRTIO_MMIO_DEVICE_VERSION_0_95) {
+    *DeviceFeatures = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES);
+  } else {
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES_SEL, 0);
+    LowBits = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES);
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES_SEL, 1);
+    HighBits = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES);
+    *DeviceFeatures = LShiftU64(HighBits, 32) | LowBits;
+  }
 
   return EFI_SUCCESS;
 }
@@ -238,11 +247,20 @@ VirtioMmioSetGuestFeatures (
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
-  if (Features > MAX_UINT32) {
-    return EFI_UNSUPPORTED;
+  if (Device->Version == VIRTIO_MMIO_DEVICE_VERSION_0_95) {
+    if (Features > MAX_UINT32) {
+      return EFI_UNSUPPORTED;
+    }
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
+                      (UINT32)Features);
+  } else {
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES_SEL, 0);
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
+                      (UINT32)Features);
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES_SEL, 1);
+    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
+                      (UINT32)RShiftU64(Features, 32));
   }
-  VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
-    (UINT32)Features);
 
   return EFI_SUCCESS;
 }
