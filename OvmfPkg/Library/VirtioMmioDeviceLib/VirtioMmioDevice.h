@@ -30,6 +30,7 @@
 typedef struct {
   UINT32                 Signature;
   UINT32                 Version;
+  UINT16                 QueueNum;
   VIRTIO_DEVICE_PROTOCOL VirtioDevice;
   PHYSICAL_ADDRESS       BaseAddress;
 } VIRTIO_MMIO_DEVICE;
