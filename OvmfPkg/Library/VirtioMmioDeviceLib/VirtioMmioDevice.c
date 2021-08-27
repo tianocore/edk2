@@ -87,7 +87,7 @@ VirtioMmioInit (
     DEBUG ((DEBUG_INFO, "%a virtio 1.0, id %d\n", __FUNCTION__,
             Device->VirtioDevice.SubSystemDeviceId));
     Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (1, 0, 0);
-    return EFI_UNSUPPORTED;
+    break;
   default:
     return EFI_UNSUPPORTED;
   }
