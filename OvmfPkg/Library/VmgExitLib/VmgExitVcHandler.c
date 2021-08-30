@@ -17,6 +17,7 @@
 #include <IndustryStandard/InstructionParsing.h>
 
 #include "VmgExitVcHandler.h"
+//#include <Library/MemEncryptSevLib.h>
 
 //
 // Instruction execution mode definition
@@ -129,6 +130,32 @@ UINT64
   EFI_SYSTEM_CONTEXT_X64   *Regs,
   SEV_ES_INSTRUCTION_DATA  *InstructionData
   );
+
+//
+// SEV-SNP Cpuid table entry/function
+//
+typedef PACKED struct {
+  UINT32   EaxIn;
+  UINT32   EcxIn;
+  UINT64   Unused;
+  UINT64   Unused2;
+  UINT32   Eax;
+  UINT32   Ebx;
+  UINT32   Ecx;
+  UINT32   Edx;
+  UINT64   Reserved;
+} SEV_SNP_CPUID_FUNCTION;
+
+//
+// SEV-SNP Cpuid page format
+//
+typedef PACKED struct {
+  UINT32   Count;
+  UINT32   Reserved1;
+  UINT64   Reserved2;
+  SEV_SNP_CPUID_FUNCTION function[0];
+} SEV_SNP_CPUID_INFO;
+
 
 /**
   Return a pointer to the contents of the specified register.
@@ -1496,9 +1523,352 @@ InvdExit (
 }
 
 /**
+  Fetch CPUID leaf/function via hypervisor/VMGEXIT.
+
+  @param[in, out] Ghcb         Pointer to the Guest-Hypervisor Communication
+                               Block
+  @param[in]      EaxIn        EAX input for cpuid instruction
+  @param[in]      EcxIn        ECX input for cpuid instruction
+  @param[in]      Xcr0In       XCR0 at time of cpuid instruction
+  @param[in, out] Eax          Pointer to store leaf's EAX value
+  @param[in, out] Ebx          Pointer to store leaf's EBX value
+  @param[in, out] Ecx          Pointer to store leaf's ECX value
+  @param[in, out] Edx          Pointer to store leaf's EDX value
+  @param[in, out] Status       Pointer to store status from VMGEXIT (always 0
+                               unless return value indicates failure)
+  @param[in, out] Unsupported  Pointer to store indication of unsupported
+                               VMGEXIT (always false unless return value
+                               indicates failure)
+
+  @retval TRUE                 CPUID leaf fetch successfully.
+  @retval FALSE                Error occurred while fetching CPUID leaf. Callers
+                               should Status and Unsupported and handle
+                               accordingly if they indicate a more precise
+                               error condition.
+
+**/
+STATIC
+BOOLEAN
+GetCpuidHyp (
+  IN OUT GHCB                     *Ghcb,
+  IN     UINT32                   EaxIn,
+  IN     UINT32                   EcxIn,
+  IN     UINT64                   XCr0,
+  IN OUT UINT32                   *Eax,
+  IN OUT UINT32                   *Ebx,
+  IN OUT UINT32                   *Ecx,
+  IN OUT UINT32                   *Edx,
+  IN OUT UINT64                   *Status,
+  IN OUT BOOLEAN                  *UnsupportedExit
+  )
+{
+  *UnsupportedExit = FALSE;
+  Ghcb->SaveArea.Rax = EaxIn;
+  VmgSetOffsetValid (Ghcb, GhcbRax);
+  Ghcb->SaveArea.Rcx = EcxIn;
+  VmgSetOffsetValid (Ghcb, GhcbRcx);
+  if (EaxIn == CPUID_EXTENDED_STATE) {
+    Ghcb->SaveArea.XCr0 = XCr0;
+    VmgSetOffsetValid (Ghcb, GhcbXCr0);
+  }
+
+  *Status = VmgExit (Ghcb, SVM_EXIT_CPUID, 0, 0);
+  if (*Status != 0) {
+    return FALSE;
+  }
+
+  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRbx) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRcx) ||
+      !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
+    *UnsupportedExit = TRUE;
+    return FALSE;
+  }
+
+  if (Eax) {
+    *Eax = Ghcb->SaveArea.Rax;
+  }
+  if (Ebx) {
+    *Ebx = Ghcb->SaveArea.Rbx;
+  }
+  if (Ecx) {
+    *Ecx = Ghcb->SaveArea.Rcx;
+  }
+  if (Edx) {
+    *Edx = Ghcb->SaveArea.Rdx;
+  }
+
+  return TRUE;
+}
+
+/**
+  Check if SEV-SNP enabled.
+
+  @retval TRUE      SEV-SNP is enabled.
+  @retval FALSE     SEV-SNP is disabled.
+
+**/
+STATIC
+BOOLEAN
+SnpEnabled (VOID)
+{
+  MSR_SEV_STATUS_REGISTER  Msr;
+
+  Msr.Uint32 = AsmReadMsr32(MSR_SEV_STATUS);
+
+  return !!Msr.Bits.SevSnpBit;
+}
+
+/**
+  Calculate the total XSAVE area size for enabled XSAVE areas
+
+  @param[in]      XFeaturesEnabled  Bit-mask of enabled XSAVE features/areas as
+                                    indicated by XCR0/MSR_IA32_XSS bits
+  @param[in]      XSaveBaseSize     Base/legacy XSAVE area size (e.g. when
+                                    XCR0 is 1)
+  @param[in, out] XSaveSize         Pointer to storage for calculated XSAVE area
+                                    size
+  @param[in]      Compacted         Whether or not the calculation is for the
+                                    normal XSAVE area size (leaf 0xD,0x0,EBX) or
+                                    compacted XSAVE area size (leaf 0xD,0x1,EBX)
+
+
+  @retval TRUE                      XSAVE size calculation was successful.
+  @retval FALSE                     XSAVE size calculation was unsuccessful.
+**/
+STATIC
+BOOLEAN
+GetCpuidXSaveSize (
+  IN     UINT64   XFeaturesEnabled,
+  IN     UINT32   XSaveBaseSize,
+  IN OUT UINT32   *XSaveSize,
+  IN     BOOLEAN  Compacted
+  )
+{
+  SEV_SNP_CPUID_INFO  *CpuidInfo;
+  UINT64              XFeaturesFound = 0;
+  UINT32              Idx;
+
+  *XSaveSize = XSaveBaseSize;
+  CpuidInfo = (SEV_SNP_CPUID_INFO *)(UINT64)PcdGet32(PcdOvmfSnpCpuidBase);
+
+  for (Idx = 0; Idx < CpuidInfo->Count; Idx++) {
+    SEV_SNP_CPUID_FUNCTION *CpuidFn = &CpuidInfo->function[Idx];
+
+    if (!(CpuidFn->EaxIn == 0xD &&
+          (CpuidFn->EcxIn == 0 || CpuidFn->EcxIn == 1))) {
+      continue;
+    }
+
+    if (XFeaturesFound & (1UL << CpuidFn->EcxIn) ||
+        !(XFeaturesEnabled & (1UL << CpuidFn->EcxIn))) {
+        continue;
+    }
+
+    XFeaturesFound |= (1UL << CpuidFn->EcxIn);
+    if (Compacted) {
+        *XSaveSize += CpuidFn->Eax;
+    } else {
+        *XSaveSize = MAX(*XSaveSize, CpuidFn->Eax + CpuidFn->Ebx);
+    }
+  }
+
+  /*
+   * Either the guest set unsupported XCR0/XSS bits, or the corresponding
+   * entries in the CPUID table were not present. This is an invalid state.
+   */
+  if (XFeaturesFound != (XFeaturesEnabled & ~3UL)) {
+      return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Check if a CPUID leaf/function is indexed via ECX sub-leaf/sub-function
+
+  @param[in]      EaxIn        EAX input for cpuid instruction
+
+  @retval FALSE                cpuid leaf/function is not indexed by ECX input
+  @retval TRUE                 cpuid leaf/function is indexed by ECX input
+
+**/
+STATIC
+BOOLEAN
+IsFunctionIndexed (
+  IN     UINT32  EaxIn
+  )
+{
+    switch (EaxIn) {
+    case CPUID_CACHE_PARAMS:
+    case CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS:
+    case CPUID_EXTENDED_TOPOLOGY:
+    case CPUID_EXTENDED_STATE:
+    case CPUID_INTEL_RDT_MONITORING:
+    case CPUID_INTEL_RDT_ALLOCATION:
+    case CPUID_INTEL_SGX:
+    case CPUID_INTEL_PROCESSOR_TRACE:
+    case CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS:
+    case CPUID_V2_EXTENDED_TOPOLOGY:
+    case 0x8000001D: /* Cache Topology Information */
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/**
+  Fetch CPUID leaf/function via SEV-SNP CPUID table.
+
+  @param[in, out] Ghcb         Pointer to the Guest-Hypervisor Communication
+                               Block
+  @param[in]      EaxIn        EAX input for cpuid instruction
+  @param[in]      EcxIn        ECX input for cpuid instruction
+  @param[in]      Xcr0In       XCR0 at time of cpuid instruction
+  @param[in, out] Eax          Pointer to store leaf's EAX value
+  @param[in, out] Ebx          Pointer to store leaf's EBX value
+  @param[in, out] Ecx          Pointer to store leaf's ECX value
+  @param[in, out] Edx          Pointer to store leaf's EDX value
+  @param[in, out] Status       Pointer to store status from VMGEXIT (always 0
+                               unless return value indicates failure)
+  @param[in, out] Unsupported  Pointer to store indication of unsupported
+                               VMGEXIT (always false unless return value
+                               indicates failure)
+
+  @retval TRUE                 CPUID leaf fetch successfully.
+  @retval FALSE                Error occurred while fetching CPUID leaf. Callers
+                               should Status and Unsupported and handle
+                               accordingly if they indicate a more precise
+                               error condition.
+
+**/
+STATIC
+BOOLEAN
+GetCpuidFw (
+  IN OUT GHCB     *Ghcb,
+  IN     UINT32   EaxIn,
+  IN     UINT32   EcxIn,
+  IN     UINT64   XCr0,
+  IN OUT UINT32   *Eax,
+  IN OUT UINT32   *Ebx,
+  IN OUT UINT32   *Ecx,
+  IN OUT UINT32   *Edx,
+  IN OUT UINT64   *Status,
+  IN OUT BOOLEAN  *Unsupported
+  )
+{
+  SEV_SNP_CPUID_INFO  *CpuidInfo;
+  BOOLEAN             Found;
+  UINT32              Idx;
+
+  CpuidInfo = (SEV_SNP_CPUID_INFO *)(UINT64)PcdGet32(PcdOvmfSnpCpuidBase);
+  Found = FALSE;
+
+  for (Idx = 0; Idx < CpuidInfo->Count; Idx++) {
+    SEV_SNP_CPUID_FUNCTION *CpuidFn = &CpuidInfo->function[Idx];
+
+    if (CpuidFn->EaxIn != EaxIn) {
+      continue;
+    }
+
+    if (IsFunctionIndexed(CpuidFn->EaxIn) && CpuidFn->EcxIn != EcxIn) {
+      continue;
+    }
+
+    *Eax = CpuidFn->Eax;
+    *Ebx = CpuidFn->Ebx;
+    *Ecx = CpuidFn->Ecx;
+    *Edx = CpuidFn->Edx;
+
+    Found = TRUE;
+    break;
+  }
+
+  if (!Found) {
+    *Eax = *Ebx = *Ecx = *Edx = 0;
+    goto Out;
+  }
+
+  if (EaxIn == CPUID_VERSION_INFO) {
+    IA32_CR4  Cr4;
+    UINT32    Ebx2;
+    UINT32    Edx2;
+
+    if (!GetCpuidHyp (Ghcb, EaxIn, EcxIn, XCr0, NULL, &Ebx2, NULL, &Edx2,
+                      Status, Unsupported)) {
+      return FALSE;
+    }
+
+    /* initial APIC ID */
+    *Ebx = (*Ebx & 0x00FFFFFF) | (Ebx2 & 0xFF000000);
+    /* APIC enabled bit */
+    *Edx = (*Edx & ~BIT9) | (Edx2 & BIT9);
+    /* OSXSAVE enabled bit */
+    Cr4.UintN = AsmReadCr4 ();
+    *Ecx = (Cr4.Bits.OSXSAVE) ? (*Ecx & ~BIT27) | (*Ecx & BIT27)
+                              : (*Ecx & ~BIT27);
+  } else if (EaxIn == CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS) {
+    IA32_CR4  Cr4;
+
+    Cr4.UintN = AsmReadCr4 ();
+    /* OSPKE enabled bit */
+    *Ecx = (Cr4.Bits.PKE) ? (*Ecx | BIT4) : (*Ecx & ~BIT4);
+  } else if (EaxIn == CPUID_EXTENDED_TOPOLOGY) {
+    if (!GetCpuidHyp (Ghcb, EaxIn, EcxIn, XCr0, NULL, NULL, NULL, Edx,
+                      Status, Unsupported)) {
+      return FALSE;
+    }
+  } else if (EaxIn == CPUID_EXTENDED_STATE && (EcxIn == 0 || EcxIn == 1)) {
+    MSR_IA32_XSS_REGISTER  XssMsr;
+    BOOLEAN                Compacted;
+    UINT32                 XSaveSize;
+
+    XssMsr.Uint64 = 0;
+    if (EcxIn == 1) {
+        /*
+         * The PPR and APM aren't clear on what size should be encoded in
+         * 0xD:0x1:EBX when compaction is not enabled by either XSAVEC or
+         * XSAVES, as these are generally fixed to 1 on real CPUs. Report
+         * this undefined case as an error.
+         */
+        if (!(*Eax & (BIT3 | BIT1))) { /* (XSAVES | XSAVEC) */
+            return FALSE;
+        }
+
+        Compacted = TRUE;
+        XssMsr.Uint64 = AsmReadMsr64 (MSR_IA32_XSS);
+    }
+
+    if (!GetCpuidXSaveSize (XCr0 | XssMsr.Uint64, *Ebx, &XSaveSize,
+                            Compacted)) {
+        return FALSE;
+    }
+
+    *Ebx = XSaveSize;
+  } else if (EaxIn == 0x8000001E) {
+    UINT32  Ebx2;
+    UINT32  Ecx2;
+
+    /* extended APIC ID */
+    if (!GetCpuidHyp (Ghcb, EaxIn, EcxIn, XCr0, Eax, &Ebx2, &Ecx2, NULL,
+                      Status, Unsupported)) {
+      return FALSE;
+    }
+    /* compute ID */
+    *Ebx = (*Ebx & 0xFFFFFF00) | (Ebx2 & 0x000000FF);
+    /* node ID */
+    *Ecx = (*Ecx & 0xFFFFFF00) | (Ecx2 & 0x000000FF);
+  }
+
+Out:
+  *Status = 0;
+  *Unsupported = FALSE;
+  return TRUE;
+}
+
+/**
   Handle a CPUID event.
 
-  Use the VMGEXIT instruction to handle a CPUID event.
+  Use VMGEXIT instruction or CPUID table to handle a CPUID event.
 
   @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
                                    Block
@@ -1517,37 +1887,51 @@ CpuidExit (
   IN     SEV_ES_INSTRUCTION_DATA  *InstructionData
   )
 {
-  UINT64  Status;
+  BOOLEAN             Unsupported;
+  UINT64              Status;
+  UINT32              EaxIn;
+  UINT32              EcxIn;
+  UINT64              XCr0;
+  UINT32              Eax;
+  UINT32              Ebx;
+  UINT32              Ecx;
+  UINT32              Edx;
 
-  Ghcb->SaveArea.Rax = Regs->Rax;
-  VmgSetOffsetValid (Ghcb, GhcbRax);
-  Ghcb->SaveArea.Rcx = Regs->Rcx;
-  VmgSetOffsetValid (Ghcb, GhcbRcx);
-  if (Regs->Rax == CPUID_EXTENDED_STATE) {
+  EaxIn = Regs->Rax;
+  EcxIn = Regs->Rcx;
+
+  if (EaxIn == CPUID_EXTENDED_STATE) {
     IA32_CR4  Cr4;
 
     Cr4.UintN = AsmReadCr4 ();
-    Ghcb->SaveArea.XCr0 = (Cr4.Bits.OSXSAVE == 1) ? AsmXGetBv (0) : 1;
-    VmgSetOffsetValid (Ghcb, GhcbXCr0);
+    XCr0 = (Cr4.Bits.OSXSAVE == 1) ? AsmXGetBv (0) : 1;
   }
 
-  Status = VmgExit (Ghcb, SVM_EXIT_CPUID, 0, 0);
-  if (Status != 0) {
-    return Status;
+  if (SnpEnabled ()) {
+      if (!GetCpuidFw (Ghcb, EaxIn, EcxIn, XCr0, &Eax, &Ebx, &Ecx, &Edx,
+                       &Status, &Unsupported)) {
+        goto CpuidFail;
+      }
+  } else {
+      if (!GetCpuidHyp (Ghcb, EaxIn, EcxIn, XCr0, &Eax, &Ebx, &Ecx, &Edx,
+                        &Status, &Unsupported)) {
+        goto CpuidFail;
+      }
   }
 
-  if (!VmgIsOffsetValid (Ghcb, GhcbRax) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRbx) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRcx) ||
-      !VmgIsOffsetValid (Ghcb, GhcbRdx)) {
-    return UnsupportedExit (Ghcb, Regs, InstructionData);
-  }
-  Regs->Rax = Ghcb->SaveArea.Rax;
-  Regs->Rbx = Ghcb->SaveArea.Rbx;
-  Regs->Rcx = Ghcb->SaveArea.Rcx;
-  Regs->Rdx = Ghcb->SaveArea.Rdx;
+  Regs->Rax = Eax;
+  Regs->Rbx = Ebx;
+  Regs->Rcx = Ecx;
+  Regs->Rdx = Edx;
 
   return 0;
+
+CpuidFail:
+  if (Unsupported) {
+    return UnsupportedExit (Ghcb, Regs, InstructionData);
+  }
+
+  return Status;
 }
 
 /**

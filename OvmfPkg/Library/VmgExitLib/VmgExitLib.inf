@@ -38,3 +38,6 @@
   LocalApicLib
   MemEncryptSevLib
 
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpCpuidSize
