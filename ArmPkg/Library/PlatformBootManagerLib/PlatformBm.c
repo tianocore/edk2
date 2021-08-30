@@ -2,9 +2,10 @@
   Implementation for PlatformBootManagerLib library class interfaces.
 
   Copyright (C) 2015-2016, Red Hat, Inc.
-  Copyright (c) 2014 - 2019, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2021, Semihalf All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -19,6 +20,7 @@
 #include <Library/UefiBootManagerLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include <Protocol/BootManagerPolicy.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/EsrtManagement.h>
 #include <Protocol/GraphicsOutput.h>
@@ -27,6 +29,7 @@
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/PlatformBootManager.h>
+#include <Guid/BootDiscoveryPolicy.h>
 #include <Guid/EventGroup.h>
 #include <Guid/NonDiscoverableDevice.h>
 #include <Guid/TtyTerm.h>
@@ -704,6 +707,113 @@ HandleCapsules (
 #define VERSION_STRING_PREFIX    L"Tianocore/EDK2 firmware version "
 
 /**
+  This functions checks the value of BootDiscoverPolicy variable and
+  connect devices of class specified by that variable. Then it refreshes
+  Boot order for newly discovered boot device.
+
+  @retval  EFI_SUCCESS  Devices connected successfully or connection
+                        not required.
+  @retval  others       Return values from GetVariable(), LocateProtocol()
+                        and ConnectDeviceClass().
+**/
+STATIC
+EFI_STATUS
+BootDiscoveryPolicyHandler (
+  VOID
+  )
+{
+  EFI_STATUS                       Status;
+  UINT32                           DiscoveryPolicy;
+  UINT32                           DiscoveryPolicyOld;
+  UINTN                            Size;
+  EFI_BOOT_MANAGER_POLICY_PROTOCOL *BMPolicy;
+  EFI_GUID                         *Class;
+
+  Size = sizeof (DiscoveryPolicy);
+  Status = gRT->GetVariable (
+                  BOOT_DISCOVERY_POLICY_VAR,
+                  &gBootDiscoveryPolicyMgrFormsetGuid,
+                  NULL,
+                  &Size,
+                  &DiscoveryPolicy
+                  );
+  if (Status == EFI_NOT_FOUND) {
+    DiscoveryPolicy = PcdGet32 (PcdBootDiscoveryPolicy);
+    Status = PcdSet32S (PcdBootDiscoveryPolicy, DiscoveryPolicy);
+    if (Status == EFI_NOT_FOUND) {
+      return EFI_SUCCESS;
+    } else if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  } else if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (DiscoveryPolicy == BDP_CONNECT_MINIMAL) {
+    return EFI_SUCCESS;
+  }
+
+  switch (DiscoveryPolicy) {
+    case BDP_CONNECT_NET:
+      Class = &gEfiBootManagerPolicyNetworkGuid;
+      break;
+    case BDP_CONNECT_ALL:
+      Class = &gEfiBootManagerPolicyConnectAllGuid;
+      break;
+    default:
+      DEBUG ((
+        DEBUG_INFO,
+        "%a - Unexpected DiscoveryPolicy (0x%x). Run Minimal Discovery Policy\n",
+        __FUNCTION__,
+        DiscoveryPolicy
+        ));
+      return EFI_SUCCESS;
+  }
+
+  Status = gBS->LocateProtocol (
+                  &gEfiBootManagerPolicyProtocolGuid,
+                  NULL,
+                  (VOID **)&BMPolicy
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "%a - Failed to locate gEfiBootManagerPolicyProtocolGuid."
+      "Driver connect will be skipped.\n", __FUNCTION__));
+    return Status;
+  }
+
+  Status = BMPolicy->ConnectDeviceClass (BMPolicy, Class);
+  if (EFI_ERROR (Status)){
+    DEBUG ((DEBUG_ERROR, "%a - ConnectDeviceClass returns - %r\n", __FUNCTION__, Status));
+    return Status;
+  }
+
+  //
+  // Refresh Boot Options if Boot Discovery Policy has been changed
+  //
+  Size = sizeof (DiscoveryPolicyOld);
+  Status = gRT->GetVariable (
+                  BOOT_DISCOVERY_POLICY_OLD_VAR,
+                  &gBootDiscoveryPolicyMgrFormsetGuid,
+                  NULL,
+                  &Size,
+                  &DiscoveryPolicyOld
+                  );
+  if ((Status == EFI_NOT_FOUND) || (DiscoveryPolicyOld != DiscoveryPolicy)) {
+    EfiBootManagerRefreshAllBootOption ();
+
+    Status = gRT->SetVariable (
+                    BOOT_DISCOVERY_POLICY_OLD_VAR,
+                    &gBootDiscoveryPolicyMgrFormsetGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof (DiscoveryPolicyOld),
+                    &DiscoveryPolicy
+                    );
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Do the platform specific action after the console is ready
   Possible things that can be done in PlatformBootManagerAfterConsole:
   > Console post action:
@@ -752,6 +862,12 @@ PlatformBootManagerAfterConsole (
         PcdGetPtr (PcdFirmwareVersionString));
     }
   }
+
+  //
+  // Connect device specified by BootDiscoverPolicy variable and
+  // refresh Boot order for newly discovered boot devices
+  //
+  BootDiscoveryPolicyHandler ();
 
   //
   // On ARM, there is currently no reason to use the phased capsule
