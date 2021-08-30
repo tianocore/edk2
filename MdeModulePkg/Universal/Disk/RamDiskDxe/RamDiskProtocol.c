@@ -195,7 +195,7 @@ RamDiskPublishNfit (
       MemoryFound = TRUE;
       DEBUG ((
         EFI_D_INFO,
-        "RamDiskPublishNfit: RAM disk with reserved meomry type, will publish to NFIT.\n"
+        "RamDiskPublishNfit: RAM disk with reserved memory type, will publish to NFIT.\n"
         ));
       break;
     }
