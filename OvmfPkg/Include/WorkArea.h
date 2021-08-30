@@ -59,9 +59,39 @@ typedef struct _SEV_WORK_AREA {
   SEC_SEV_ES_WORK_AREA                      SevEsWorkArea;
 } SEV_WORK_AREA;
 
+//
+// Internal structure for holding Intel TDX information needed during SEC phase
+// and valid only during SEC phase and early PEI during platform
+// initialization.
+//
+// This structure is also used by assembler files:
+//   OvmfPkg/ResetVector/ResetVector.nasmb
+//   OvmfPkg/ResetVector/Ia32/PageTables64.asm
+//   OvmfPkg/ResetVector/Ia32/Flat32ToFlat64.asm
+//   OvmfPkg/ResetVector/Ia32/IntelTdx.asm
+//   OvmfPkg/ResetVector/Main.asm
+// any changes must stay in sync with its usage.
+//
+typedef struct _SEC_TDX_WORK_AREA {
+  UINT8    IsPageLevel5;
+  UINT8    IsPageTableReady;
+  UINT8    Rsvd[2];
+  UINT32   Gpaw;
+} SEC_TDX_WORK_AREA;
+
+//
+// The Intel TDX work area definition.
+//
+typedef struct _TDX_WORK_AREA {
+  CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER   Header;
+
+  SEC_TDX_WORK_AREA                         SecTdxWorkArea;
+} TDX_WORK_AREA;
+
 typedef union {
   CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER   Header;
   SEV_WORK_AREA                             SevWorkArea;
+  TDX_WORK_AREA                             TdxWorkArea;
 } OVMF_WORK_AREA;
 
 #endif
