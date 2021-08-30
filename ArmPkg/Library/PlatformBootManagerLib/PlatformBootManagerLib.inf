@@ -65,11 +65,15 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootDiscoveryPolicy
 
 [Guids]
+  gBootDiscoveryPolicyMgrFormsetGuid
   gEdkiiNonDiscoverableEhciDeviceGuid
   gEdkiiNonDiscoverableUhciDeviceGuid
   gEdkiiNonDiscoverableXhciDeviceGuid
+  gEfiBootManagerPolicyNetworkGuid
+  gEfiBootManagerPolicyConnectAllGuid
   gEfiFileInfoGuid
   gEfiFileSystemInfoGuid
   gEfiFileSystemVolumeLabelInfoIdGuid
@@ -79,6 +83,7 @@
 
 [Protocols]
   gEdkiiNonDiscoverableDeviceProtocolGuid
+  gEfiBootManagerPolicyProtocolGuid
   gEfiDevicePathProtocolGuid
   gEfiGraphicsOutputProtocolGuid
   gEfiLoadedImageProtocolGuid
