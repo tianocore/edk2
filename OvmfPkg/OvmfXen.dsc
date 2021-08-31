@@ -587,6 +587,7 @@
       NULL|OvmfPkg/Csm/LegacyBootMaintUiLib/LegacyBootMaintUiLib.inf
 !endif
   }
+  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
   OvmfPkg/XenIoPvhDxe/XenIoPvhDxe.inf
   OvmfPkg/XenIoPciDxe/XenIoPciDxe.inf
   OvmfPkg/XenBusDxe/XenBusDxe.inf
