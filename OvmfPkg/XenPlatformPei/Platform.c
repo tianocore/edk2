@@ -26,6 +26,7 @@
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/QemuFwCfgS3Lib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
@@ -423,6 +424,8 @@ InitializeXenPlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  EFI_STATUS    Status;
+
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
 
   DebugDumpCmos ();
@@ -431,6 +434,16 @@ InitializeXenPlatform (
     DEBUG ((DEBUG_ERROR, "ERROR: Xen isn't detected\n"));
     ASSERT (FALSE);
     CpuDeadLoop ();
+  }
+
+  //
+  // This S3 conditional test is mainly for HVM Direct Kernel Boot since
+  // QEMU fwcfg isn't really supported other than that.
+  //
+  if (QemuFwCfgS3Enabled ()) {
+    DEBUG ((DEBUG_INFO, "S3 support was detected on QEMU\n"));
+    Status = PcdSetBoolS (PcdAcpiS3Enable, TRUE);
+    ASSERT_EFI_ERROR (Status);
   }
 
   XenConnect ();
