@@ -317,9 +317,11 @@ PrintPciRootBridgeInfoGuidHob (
 {
   UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES *PciRootBridges;
   UINTN                              Index;
+  UINTN                              Length;
   Index = 0;
   PciRootBridges = (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES *) GET_GUID_HOB_DATA (HobRaw);
-  ASSERT (HobLength >= sizeof (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES));
+  Length = sizeof (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES) + PciRootBridges->Count * sizeof (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE);
+  ASSERT (HobLength >= Length);
   DEBUG ((DEBUG_INFO, "   Revision         = 0x%x\n", PciRootBridges->Header.Revision));
   DEBUG ((DEBUG_INFO, "   Length           = 0x%x\n", PciRootBridges->Header.Length));
   DEBUG ((DEBUG_INFO, "   Count            = 0x%x\n", PciRootBridges->Count));
@@ -369,10 +371,12 @@ PrintExtraDataGuidHob (
 {
   UNIVERSAL_PAYLOAD_EXTRA_DATA *ExtraData;
   UINTN                        Index;
+  UINTN                        Length;
 
   Index     = 0;
   ExtraData = (UNIVERSAL_PAYLOAD_EXTRA_DATA *) GET_GUID_HOB_DATA (HobRaw);
-  ASSERT (HobLength >= ExtraData->Header.Length);
+  Length = sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA) + ExtraData->Count * sizeof (UNIVERSAL_PAYLOAD_EXTRA_DATA_ENTRY);
+  ASSERT (HobLength >= Length);
   DEBUG ((DEBUG_INFO, "   Revision  = 0x%x\n", ExtraData->Header.Revision));
   DEBUG ((DEBUG_INFO, "   Length    = 0x%x\n", ExtraData->Header.Length));
   DEBUG ((DEBUG_INFO, "   Count     = 0x%x\n", ExtraData->Count));
@@ -443,7 +447,7 @@ PrintGuidHob (
   for (Index = 0; Index < ARRAY_SIZE (GuidHobPrintHandleTable); Index++) {
     if (CompareGuid (&Hob.Guid->Name, GuidHobPrintHandleTable[Index].Guid)) {
       DEBUG ((DEBUG_INFO, "   Guid   = %a\n", GuidHobPrintHandleTable[Index].GuidName));
-      Status = GuidHobPrintHandleTable[Index].PrintHandler (Hob.Raw, Hob.Header->HobLength);
+      Status = GuidHobPrintHandleTable[Index].PrintHandler (Hob.Raw, GET_GUID_HOB_DATA_SIZE (Hob.Raw));
       return Status;
     }
   }
