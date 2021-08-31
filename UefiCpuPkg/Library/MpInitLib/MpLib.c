@@ -1043,6 +1043,18 @@ FillExchangeInfoData (
   ExchangeInfo->SevSnpIsEnabled = CpuMpData->SevSnpIsEnabled;
   ExchangeInfo->GhcbBase        = (UINTN) CpuMpData->GhcbBase;
 
+  if (ExchangeInfo->SevSnpIsEnabled) {
+    UINT32 StdRangeMax = 0;
+
+    AsmCpuid (CPUID_SIGNATURE, &StdRangeMax, NULL, NULL, NULL);
+    if (StdRangeMax >= CPUID_EXTENDED_TOPOLOGY) {
+      CPUID_EXTENDED_TOPOLOGY_EBX ExtTopoEbx;
+
+      AsmCpuid (CPUID_EXTENDED_TOPOLOGY, NULL, &ExtTopoEbx.Uint32, NULL, NULL);
+      ExchangeInfo->ExtTopoAvail = !!ExtTopoEbx.Bits.LogicalProcessors;
+    }
+  }
+
   //
   // Get the BSP's data of GDT and IDT
   //

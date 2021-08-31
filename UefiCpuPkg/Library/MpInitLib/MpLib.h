@@ -220,6 +220,7 @@ typedef struct {
   BOOLEAN               SevEsIsEnabled;
   BOOLEAN               SevSnpIsEnabled;
   UINTN                 GhcbBase;
+  BOOLEAN               ExtTopoAvail;
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
