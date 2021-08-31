@@ -25,8 +25,6 @@
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
-#include <Library/QemuFwCfgLib.h>
-#include <Library/QemuFwCfgS3Lib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/S3SaveState.h>
 #include <Protocol/SmmControl2.h>
@@ -238,7 +236,7 @@ SmmControl2DxeEntryPoint (
   //
   mSmiFeatureNegotiation = NegotiateSmiFeatures ();
 
-  if (QemuFwCfgS3Enabled ()) {
+  if (PcdGetBool (PcdAcpiS3Enable)) {
     VOID *Registration;
 
     //
