@@ -33,8 +33,6 @@
   BaseMemoryLib
   DebugLib
   UefiBootServicesTableLib
-  QemuFwCfgLib
-  QemuFwCfgS3Lib
 
 [Protocols]
   gEfiLockBoxProtocolGuid    ## SOMETIMES_PRODUCES
@@ -42,6 +40,7 @@
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
