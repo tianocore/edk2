@@ -257,6 +257,8 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
             GlobalData.gGlobalDefines["TOOLCHAIN"] = GenFdsGlobalVariable.ToolChainTag
         if "TOOL_CHAIN_TAG" not in GlobalData.gGlobalDefines:
             GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = GenFdsGlobalVariable.ToolChainTag
+        if "WORKSPACE" not in GlobalData.gGlobalDefines:
+            GlobalData.gGlobalDefines['WORKSPACE'] = Workspace
 
         """call Workspace build create database"""
         GlobalData.gDatabasePath = os.path.normpath(os.path.join(ConfDirectoryPath, GlobalData.gDatabasePath))
