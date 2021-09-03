@@ -1,0 +1,32 @@
+## @file
+# Module entry point library for DXE core.
+#
+# Copyright (c) 2017 - 2021, Arm Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = StandaloneMmCoreEntryPointNull
+  FILE_GUID                      = 5E28E9FA-67DC-4408-A177-05F72CD7E248
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = StandaloneMmCoreEntryPoint|MM_CORE_STANDALONE
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
+#
+
+[Sources]
+  StandaloneMmCoreEntryPointNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib

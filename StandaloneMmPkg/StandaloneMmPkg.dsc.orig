@@ -56,7 +56,10 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+<<<<<<< HEAD
   StandaloneMmCoreEntryPoint|StandaloneMmPkg/Library/StandaloneMmCoreEntryPointNull/StandaloneMmCoreEntryPointNull.inf
+=======
+>>>>>>> f71ccd340de8 (ArmPkg: Create an Arm-specific version of StandaloneMmCoreEntryPoint)
   StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   VariableMmDependency|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
   MmuLib|MdePkg/Library/BaseMmuLibNull/BaseMmuLibNull.inf
@@ -121,6 +124,9 @@
   StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
   StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
   StandaloneMmPkg/Library/StandaloneMmCoreEntryPointNull/StandaloneMmCoreEntryPointNull.inf
+
+[Components.X64]
+  StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
 
 [Components.X64]
   StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
