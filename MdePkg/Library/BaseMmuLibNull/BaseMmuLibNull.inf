@@ -1,0 +1,28 @@
+## @file
+# This lib abstracts some of the MMU accesses currently hardcoded against
+# an Arm lib. It's likely that this will need to be refactored at some point.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = BaseMmuLibNull
+  FILE_GUID           = 97196A48-00C0-4487-802A-CC5540583EEB
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = BASE
+  LIBRARY_CLASS       = MmuLib
+
+
+[Sources]
+  BaseMmuLibNull.c
+
+
+[LibraryClasses]
+  DebugLib
+
+
+[Packages]
+  MdePkg/MdePkg.dec

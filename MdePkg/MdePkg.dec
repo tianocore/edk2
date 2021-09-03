@@ -267,6 +267,11 @@
   #
   RegisterFilterLib|Include/Library/RegisterFilterLib.h
 
+  ##  @libraryclass This lib abstracts some of the MMU accesses currently hardcoded against
+  #                 an Arm lib. It's likely that this will need to be refactored at some point.
+  #
+  MmuLib|Include/Library/MmuLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
