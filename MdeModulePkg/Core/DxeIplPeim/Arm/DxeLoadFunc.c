@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "DxeIpl.h"
 
-#include <Library/ArmMmuLib.h>
+#include <Library/MmuLib.h>
 
 /**
    Transfers control to DxeCore.
@@ -40,7 +40,7 @@ HandOffToDxeCore (
   ASSERT (BaseOfStack != NULL);
 
   if (PcdGetBool (PcdSetNxForStack)) {
-    Status = ArmSetMemoryRegionNoExec ((UINTN)BaseOfStack, STACK_SIZE);
+    Status = MmuSetAttributes ((UINTN)BaseOfStack, STACK_SIZE, EFI_MEMORY_XP);
     ASSERT_EFI_ERROR (Status);
   }
 

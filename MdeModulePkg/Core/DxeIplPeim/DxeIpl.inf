@@ -57,8 +57,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-[Packages.ARM, Packages.AARCH64]
-  ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
   PcdLib
@@ -77,7 +75,7 @@
   PerformanceLib
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
-  ArmMmuLib
+  MmuLib
 
 [Ppis]
   gEfiDxeIplPpiGuid                      ## PRODUCES
