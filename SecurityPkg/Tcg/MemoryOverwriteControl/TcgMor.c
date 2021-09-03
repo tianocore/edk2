@@ -52,7 +52,7 @@ OnReadyToBoot (
                &mMorControl
                );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TcgMor: Clear MOR_CLEAR_MEMORY_BIT failure, Status = %r\n"));
+    DEBUG ((DEBUG_ERROR, "TcgMor: Clear MOR_CLEAR_MEMORY_BIT failure, Status = %r\n", Status));
   }
 }
 
