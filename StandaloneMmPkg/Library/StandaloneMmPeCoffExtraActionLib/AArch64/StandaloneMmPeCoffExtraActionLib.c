@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <PiDxe.h>
 
-#include <Library/ArmMmuLib.h>
+#include <Library/MmuLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -164,6 +164,78 @@ UpdatePeCoffPermissions (
 }
 
 /**
+  Internal function to parameterize the call int MmuSetAttributes.
+
+  @param [in] BaseAddress
+  @param [in] Length
+
+  @retval   EFI_STATUS    Returned by MmuSetAttributes
+**/
+STATIC
+EFI_STATUS
+ArmPeSetMemoryRegionNoExec (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return MmuSetAttributes (BaseAddress, Length, EFI_MEMORY_XP);
+}
+
+/**
+  Internal function to parameterize the call int MmuSetAttributes.
+
+  @param [in] BaseAddress
+  @param [in] Length
+
+  @retval   EFI_STATUS    Returned by MmuSetAttributes
+**/
+STATIC
+EFI_STATUS
+ArmPeClearMemoryRegionNoExec (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return MmuClearAttributes (BaseAddress, Length, EFI_MEMORY_XP);
+}
+
+/**
+  Internal function to parameterize the call int MmuSetAttributes.
+
+  @param [in] BaseAddress
+  @param [in] Length
+
+  @retval   EFI_STATUS    Returned by MmuSetAttributes
+**/
+STATIC
+EFI_STATUS
+ArmPeSetMemoryRegionReadOnly (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return MmuSetAttributes (BaseAddress, Length, EFI_MEMORY_RO);
+}
+
+/**
+  Internal function to parameterize the call int MmuSetAttributes.
+
+  @param [in] BaseAddress
+  @param [in] Length
+
+  @retval   EFI_STATUS    Returned by MmuSetAttributes
+**/
+STATIC
+EFI_STATUS
+ArmPeClearMemoryRegionReadOnly (
+  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN  UINT64                    Length
+  )
+{
+  return MmuClearAttributes (BaseAddress, Length, EFI_MEMORY_RO);
+}
+
+/**
   Performs additional actions after a PE/COFF image has been loaded and relocated.
 
   If ImageContext is NULL, then ASSERT().
@@ -180,8 +252,8 @@ PeCoffLoaderRelocateImageExtraAction (
 {
   UpdatePeCoffPermissions (
     ImageContext,
-    ArmClearMemoryRegionNoExec,
-    ArmSetMemoryRegionReadOnly
+    ArmPeClearMemoryRegionNoExec,
+    ArmPeSetMemoryRegionReadOnly
     );
 }
 
@@ -205,7 +277,7 @@ PeCoffLoaderUnloadImageExtraAction (
 {
   UpdatePeCoffPermissions (
     ImageContext,
-    ArmSetMemoryRegionNoExec,
-    ArmClearMemoryRegionReadOnly
+    ArmPeSetMemoryRegionNoExec,
+    ArmPeClearMemoryRegionReadOnly
     );
 }
