@@ -25,14 +25,14 @@ class CommonPlatform():
         for the different parts of stuart
     '''
     PackagesSupported = ("OvmfPkg",)
-    ArchSupported = ("IA32", "X64", "XEN")
+    ArchSupported = ("IA32", "X64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('ovmf', 'edk2-build')
     WorkspaceRoot = os.path.realpath(os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
     @classmethod
-    def GetDscName(cls, ArchCsv: str) -> str:
+    def GetDscName(cls, ArchCsv: str, PlatformFile: str) -> str:
         ''' return the DSC given the architectures requested.
 
         ArchCsv: csv string containing all architectures to build
@@ -42,8 +42,8 @@ class CommonPlatform():
             dsc += "Ia32"
         if "X64" in ArchCsv.upper().split(","):
             dsc += "X64"
-        if "XEN" == ArchCsv:
-            dsc = "OvmfXen"
+        if PlatformFile:
+            dsc = PlatformFile
         dsc += ".dsc"
         return dsc
 
@@ -157,12 +157,14 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             help="Optional - CSV of architecture to build.  IA32 will use IA32 for Pei & Dxe. "
             "X64 will use X64 for both PEI and DXE.  IA32,X64 will use IA32 for PEI and "
             "X64 for DXE. default is IA32,X64")
+        parserObj.add_argument('-p', "--platform", dest="build_platform", type=str,
+            help="Optional - select a different dsc")
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''
 
         shell_environment.GetBuildVars().SetValue("TARGET_ARCH"," ".join(args.build_arch.upper().split(",")), "From CmdLine")
-        dsc = CommonPlatform.GetDscName(args.build_arch)
+        dsc = CommonPlatform.GetDscName(args.build_arch, args.build_platform)
         shell_environment.GetBuildVars().SetValue("ACTIVE_PLATFORM", f"OvmfPkg/{dsc}", "From CmdLine")
 
     def GetWorkspaceRoot(self):
