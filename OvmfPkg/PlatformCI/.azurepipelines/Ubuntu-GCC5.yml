@@ -113,6 +113,19 @@ jobs:
             Build.Target: "NOOPT"
             Run.Flags: $(run_flags)
             Run: $(should_run)
+
+          OVMF_XEN_DEBUG:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "XEN"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run: false
+          OVMF_XEN_RELEASE:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "XEN"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run: false
     workspace:
       clean: all
 
