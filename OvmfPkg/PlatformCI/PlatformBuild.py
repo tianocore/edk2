@@ -157,7 +157,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             help="Optional - CSV of architecture to build.  IA32 will use IA32 for Pei & Dxe. "
             "X64 will use X64 for both PEI and DXE.  IA32,X64 will use IA32 for PEI and "
             "X64 for DXE. default is IA32,X64")
-        parserObj.add_argument('-p', "--platform", dest="build_platform", type=str,
+        parserObj.add_argument('-p', "--platformfile", dest="build_platform", type=str,
             help="Optional - select a different dsc")
 
     def RetrieveCommandLineOptions(self, args):

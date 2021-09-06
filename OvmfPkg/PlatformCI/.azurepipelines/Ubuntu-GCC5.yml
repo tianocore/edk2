@@ -117,13 +117,13 @@ jobs:
           OVMF_XEN_DEBUG:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "X64"
-            Build.Flags: "--platform OvmfXen"
+            Build.Flags: "--platformfile OvmfXen"
             Build.Target: "DEBUG"
             Run: false
           OVMF_XEN_RELEASE:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "X64"
-            Build.Flags: "--platform OvmfXen"
+            Build.Flags: "--platformfile OvmfXen"
             Build.Target: "RELEASE"
             Run: false
     workspace:
