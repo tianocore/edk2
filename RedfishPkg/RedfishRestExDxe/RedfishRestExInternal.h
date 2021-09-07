@@ -41,7 +41,7 @@
                                 REST service.
   @param[in]  HttpReceiveEfiStatus  This is the status return from HttpIoRecvResponse
 
-  @retval EFI_SUCCESS           The payload receive from Redfish service in sucessfully.
+  @retval EFI_SUCCESS           The payload receive from Redfish service in successfully.
   @retval EFI_NOT_READY         May need to resend the HTTP request.
   @retval EFI_DEVICE_ERROR      Something wrong and can't be resolved.
   @retval Others                Other errors as indicated.

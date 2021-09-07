@@ -40,7 +40,7 @@ RedfishPlatformHostInterfaceDeviceDescriptor (
                                   this function using FreePool().
   param[in] IndexOfProtocolData   The index of protocol data.
 
-  @retval EFI_SUCESS      Protocol records are all returned.
+  @retval EFI_SUCCESS     Protocol records are all returned.
   @retval EFI_NOT_FOUND   No more protocol records.
   @retval Others          Fail to get protocol records.
 **/
