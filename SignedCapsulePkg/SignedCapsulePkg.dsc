@@ -104,7 +104,7 @@
   # This library provides the instrinsic functions generate by a given compiler.
   # And NULL mean link this library into all ARM images.
   #
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+  NULL|MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
   # Add support for GCC stack protector
   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
