@@ -44,6 +44,27 @@ BITS    32
 ; The unexpected response code
 %define TERM_UNEXPECTED_RESP_CODE   2
 
+%define PAGE_PRESENT            0x01
+%define PAGE_READ_WRITE         0x02
+%define PAGE_USER_SUPERVISOR    0x04
+%define PAGE_WRITE_THROUGH      0x08
+%define PAGE_CACHE_DISABLE     0x010
+%define PAGE_ACCESSED          0x020
+%define PAGE_DIRTY             0x040
+%define PAGE_PAT               0x080
+%define PAGE_GLOBAL           0x0100
+%define PAGE_2M_MBO            0x080
+%define PAGE_2M_PAT          0x01000
+
+%define PAGE_4K_PDE_ATTR (PAGE_ACCESSED + \
+                          PAGE_DIRTY + \
+                          PAGE_READ_WRITE + \
+                          PAGE_PRESENT)
+
+%define PAGE_PDP_ATTR (PAGE_ACCESSED + \
+                       PAGE_READ_WRITE + \
+                       PAGE_PRESENT)
+
 
 ; Macro is used to issue the MSR protocol based VMGEXIT. The caller is
 ; responsible to populate values in the EDX:EAX registers. After the vmmcall
@@ -117,6 +138,70 @@ BITS    32
 SevEsUnexpectedRespTerminate:
     TerminateVmgExit    TERM_UNEXPECTED_RESP_CODE
 
+; If SEV-ES is enabled then initialize and make the GHCB page shared
+SevClearPageEncMaskForGhcbPage:
+    ; Check if SEV is enabled
+    cmp       byte[WORK_AREA_GUEST_TYPE], 1
+    jnz       SevClearPageEncMaskForGhcbPageExit
+
+    ; Check if SEV-ES is enabled
+    cmp       byte[SEV_ES_WORK_AREA], 1
+    jnz       SevClearPageEncMaskForGhcbPageExit
+
+    ;
+    ; The initial GHCB will live at GHCB_BASE and needs to be un-encrypted.
+    ; This requires the 2MB page for this range be broken down into 512 4KB
+    ; pages.  All will be marked encrypted, except for the GHCB.
+    ;
+    mov     ecx, (GHCB_BASE >> 21)
+    mov     eax, GHCB_PT_ADDR + PAGE_PDP_ATTR
+    mov     [ecx * 8 + PT_ADDR (0x2000)], eax
+
+    ;
+    ; Page Table Entries (512 * 4KB entries => 2MB)
+    ;
+    mov     ecx, 512
+pageTableEntries4kLoop:
+    mov     eax, ecx
+    dec     eax
+    shl     eax, 12
+    add     eax, GHCB_BASE & 0xFFE0_0000
+    add     eax, PAGE_4K_PDE_ATTR
+    mov     [ecx * 8 + GHCB_PT_ADDR - 8], eax
+    mov     [(ecx * 8 + GHCB_PT_ADDR - 8) + 4], edx
+    loop    pageTableEntries4kLoop
+
+    ;
+    ; Clear the encryption bit from the GHCB entry
+    ;
+    mov     ecx, (GHCB_BASE & 0x1F_FFFF) >> 12
+    mov     [ecx * 8 + GHCB_PT_ADDR + 4], strict dword 0
+
+    mov     ecx, GHCB_SIZE / 4
+    xor     eax, eax
+clearGhcbMemoryLoop:
+    mov     dword[ecx * 4 + GHCB_BASE - 4], eax
+    loop    clearGhcbMemoryLoop
+
+SevClearPageEncMaskForGhcbPageExit:
+    OneTimeCallRet SevClearPageEncMaskForGhcbPage
+
+; Check if SEV is enabled, and get the C-bit mask above 31.
+; Modified: EDX
+;
+; The value is returned in the EDX
+GetSevCBitMaskAbove31:
+    xor       edx, edx
+
+    ; Check if SEV is enabled
+    cmp       byte[WORK_AREA_GUEST_TYPE], 1
+    jnz       GetSevCBitMaskAbove31Exit
+
+    mov       edx, dword[SEV_ES_WORK_AREA_ENC_MASK + 4]
+
+GetSevCBitMaskAbove31Exit:
+    OneTimeCallRet GetSevCBitMaskAbove31
+
 ; Check if Secure Encrypted Virtualization (SEV) features are enabled.
 ;
 ; Register usage is tight in this routine, so multiple calls for the
@@ -170,6 +255,9 @@ CheckSevFeatures:
     rdmsr
     bt        eax, 0
     jnc       NoSev
+
+    ; Set the work area header to indicate that the SEV is enabled
+    mov     byte[WORK_AREA_GUEST_TYPE], 1
 
     ; Check for SEV-ES memory encryption feature:
     ; CPUID  Fn8000_001F[EAX] - Bit 3
@@ -245,27 +333,6 @@ SevExit:
     mov       esp, 0
 
     OneTimeCallRet CheckSevFeatures
-
-; Check if Secure Encrypted Virtualization - Encrypted State (SEV-ES) feature
-; is enabled.
-;
-; Modified:  EAX
-;
-; If SEV-ES is enabled then EAX will be non-zero.
-; If SEV-ES is disabled then EAX will be zero.
-;
-IsSevEsEnabled:
-    xor       eax, eax
-
-    ; During CheckSevFeatures, the SEV_ES_WORK_AREA was set to 1 if
-    ; SEV-ES is enabled.
-    cmp       byte[SEV_ES_WORK_AREA], 1
-    jne       SevEsDisabled
-
-    mov       eax, 1
-
-SevEsDisabled:
-    OneTimeCallRet IsSevEsEnabled
 
 ; Start of #VC exception handling routines
 ;

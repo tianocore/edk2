@@ -931,6 +931,8 @@ NvmeControllerInit (
   DEBUG ((EFI_D_INFO, "    SN        : %a\n",   Sn));
   DEBUG ((EFI_D_INFO, "    MN        : %a\n",   Mn));
   DEBUG ((EFI_D_INFO, "    FR        : 0x%x\n", *((UINT64*)Private->ControllerData->Fr)));
+  DEBUG ((DEBUG_INFO, "    TNVMCAP (high 8-byte) : 0x%lx\n", *((UINT64*)(Private->ControllerData->Tnvmcap + 8))));
+  DEBUG ((DEBUG_INFO, "    TNVMCAP (low 8-byte)  : 0x%lx\n", *((UINT64*)Private->ControllerData->Tnvmcap)));
   DEBUG ((EFI_D_INFO, "    RAB       : 0x%x\n", Private->ControllerData->Rab));
   DEBUG ((EFI_D_INFO, "    IEEE      : 0x%x\n", *(UINT32*)Private->ControllerData->Ieee_oui));
   DEBUG ((EFI_D_INFO, "    AERL      : 0x%x\n", Private->ControllerData->Aerl));

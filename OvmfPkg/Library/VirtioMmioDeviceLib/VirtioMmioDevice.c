@@ -58,7 +58,6 @@ VirtioMmioInit (
   )
 {
   UINT32     MagicValue;
-  UINT32     Version;
 
   //
   // Initialize VirtIo Mmio Device
@@ -66,7 +65,6 @@ VirtioMmioInit (
   CopyMem (&Device->VirtioDevice, &mMmioDeviceProtocolTemplate,
         sizeof (VIRTIO_DEVICE_PROTOCOL));
   Device->BaseAddress = BaseAddress;
-  Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (0, 9, 5);
   Device->VirtioDevice.SubSystemDeviceId =
           MmioRead32 (BaseAddress + VIRTIO_MMIO_OFFSET_DEVICE_ID);
 
@@ -78,8 +76,19 @@ VirtioMmioInit (
     return EFI_UNSUPPORTED;
   }
 
-  Version = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_VERSION);
-  if (Version != 1) {
+  Device->Version = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_VERSION);
+  switch (Device->Version) {
+  case VIRTIO_MMIO_DEVICE_VERSION_0_95:
+    DEBUG ((DEBUG_INFO, "%a virtio 0.9.5, id %d\n", __FUNCTION__,
+            Device->VirtioDevice.SubSystemDeviceId));
+    Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (0, 9, 5);
+    break;
+  case VIRTIO_MMIO_DEVICE_VERSION_1_00:
+    DEBUG ((DEBUG_INFO, "%a virtio 1.0, id %d\n", __FUNCTION__,
+            Device->VirtioDevice.SubSystemDeviceId));
+    Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (1, 0, 0);
+    break;
+  default:
     return EFI_UNSUPPORTED;
   }
 

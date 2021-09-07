@@ -145,6 +145,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 R: Leif Lindholm <leif@nuviainc.com> [leiflindholm]
 R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
 ArmVirtPkg: modules used on Xen
 F: ArmVirtPkg/ArmVirtXen.*
@@ -225,7 +226,7 @@ MdeModulePkg
 F: MdeModulePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
 M: Jian J Wang <jian.j.wang@intel.com> [jwang36]
-M: Hao A Wu <hao.a.wu@intel.com> [hwu25]
+M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 MdeModulePkg: ACPI modules
 F: MdeModulePkg/Include/*Acpi*.h
@@ -332,7 +333,6 @@ F: MdeModulePkg/Include/Protocol/FirmwareManagementProgress.h
 F: MdeModulePkg/Library/DisplayUpdateProgressLib*/
 F: MdeModulePkg/Library/FmpAuthenticationLibNull/
 F: MdeModulePkg/Universal/Esrt*/
-R: Hao A Wu <hao.a.wu@intel.com> [hwu25]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Guomin Jiang <guomin.jiang@intel.com> [guominjia]
 
@@ -378,7 +378,6 @@ R: Ray Ni <ray.ni@intel.com> [niruiyu]
 MdeModulePkg: Serial modules
 F: MdeModulePkg/*Serial*/
 F: MdeModulePkg/Include/*SerialPort*.h
-R: Hao A Wu <hao.a.wu@intel.com> [hwu25]
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 
@@ -424,6 +423,7 @@ W: http://www.tianocore.org/ovmf/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Jordan Justen <jordan.l.justen@intel.com> [jljusten]
+R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 S: Maintained
 
 OvmfPkg: bhyve-related modules

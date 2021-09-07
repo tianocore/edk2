@@ -379,7 +379,7 @@ PlatformBootManagerBeforeConsole (
   //
   EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
 
-  if (QemuFwCfgS3Enabled ()) {
+  if (PcdGetBool (PcdAcpiS3Enable)) {
     //
     // Save the boot script too. Note that this will require us to emit the
     // DxeSmmReadyToLock event just below, which in turn locks down SMM.
