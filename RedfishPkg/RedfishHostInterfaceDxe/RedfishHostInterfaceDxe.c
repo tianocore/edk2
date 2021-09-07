@@ -24,7 +24,7 @@
 /**
   Create SMBIOS type 42 record for Redfish host interface.
 
-  @retval EFI_SUCESS     SMBIOS type 42 record is created.
+  @retval EFI_SUCCESS    SMBIOS type 42 record is created.
   @retval Others         Fail to create SMBIOS 42 record.
 
 **/
@@ -226,7 +226,7 @@ ON_EXIT:
   @param ImageHandle     Image handle this driver.
   @param SystemTable     Pointer to SystemTable.
 
-  @retval EFI_SUCESS     This function always complete successfully.
+  @retval EFI_SUCCESS    This function always complete successfully.
 
 **/
 EFI_STATUS
