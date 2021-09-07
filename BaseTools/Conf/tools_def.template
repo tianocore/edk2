@@ -15,7 +15,8 @@
 # 2.00 - Initial version with changes for CI
 #      - Change RC path to use plugin
 #
-#!VERSION=2.00
+# 2.10 - Move GccLto files to a tools path to be more repository layout agnostic
+#!VERSION=2.10
 
 IDENTIFIER = Default TOOL_CHAIN_CONF
 
@@ -2386,10 +2387,10 @@ RELEASE_GCC5_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
 *_GCC5_ARM_CC_XIPFLAGS           = DEF(GCC5_ARM_CC_XIPFLAGS)
 
   DEBUG_GCC5_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-  DEBUG_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
+  DEBUG_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
 
 RELEASE_GCC5_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-RELEASE_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
+RELEASE_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
 
   NOOPT_GCC5_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -O0
   NOOPT_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -O0
@@ -2420,11 +2421,11 @@ RELEASE_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKS
 *_GCC5_AARCH64_CC_XIPFLAGS       = DEF(GCC5_AARCH64_CC_XIPFLAGS)
 
   DEBUG_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-  DEBUG_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
+  DEBUG_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
   DEBUG_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 
 RELEASE_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-RELEASE_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
+RELEASE_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
 RELEASE_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 
   NOOPT_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -O0
@@ -2681,11 +2682,11 @@ DEFINE CLANG38_ARM_DLINK_FLAGS   = DEF(CLANG38_ARM_TARGET) DEF(GCC_ARM_DLINK_FLA
 *_CLANG38_ARM_CC_XIPFLAGS        = DEF(GCC_ARM_CC_XIPFLAGS)
 
   DEBUG_CLANG38_ARM_CC_FLAGS     = DEF(CLANG38_ARM_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -flto -O1
-  DEBUG_CLANG38_ARM_DLINK_FLAGS  = DEF(CLANG38_ARM_DLINK_FLAGS) -flto -Wl,-O1 -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
+  DEBUG_CLANG38_ARM_DLINK_FLAGS  = DEF(CLANG38_ARM_DLINK_FLAGS) -flto -Wl,-O1 -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
   NOOPT_CLANG38_ARM_CC_FLAGS     = DEF(CLANG38_ARM_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -O0
   NOOPT_CLANG38_ARM_DLINK_FLAGS  = DEF(CLANG38_ARM_DLINK_FLAGS)
 RELEASE_CLANG38_ARM_CC_FLAGS     = DEF(CLANG38_ARM_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -flto -O3
-RELEASE_CLANG38_ARM_DLINK_FLAGS  = DEF(CLANG38_ARM_DLINK_FLAGS) -flto -Wl,-O3 -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
+RELEASE_CLANG38_ARM_DLINK_FLAGS  = DEF(CLANG38_ARM_DLINK_FLAGS) -flto -Wl,-O3 -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
 
 ##################
 # CLANG38 AARCH64 definitions
@@ -2727,11 +2728,11 @@ DEFINE CLANG38_AARCH64_DLINK_FLAGS  = DEF(CLANG38_AARCH64_TARGET) DEF(GCC_AARCH6
 *_CLANG38_AARCH64_CC_XIPFLAGS    = DEF(GCC_AARCH64_CC_XIPFLAGS)
 
   DEBUG_CLANG38_AARCH64_CC_FLAGS    = DEF(CLANG38_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -flto -O1
-  DEBUG_CLANG38_AARCH64_DLINK_FLAGS = DEF(CLANG38_AARCH64_DLINK_FLAGS) -flto -Wl,-O1 -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64
+  DEBUG_CLANG38_AARCH64_DLINK_FLAGS = DEF(CLANG38_AARCH64_DLINK_FLAGS) -flto -Wl,-O1 -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64
   NOOPT_CLANG38_AARCH64_CC_FLAGS    = DEF(CLANG38_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -O0
   NOOPT_CLANG38_AARCH64_DLINK_FLAGS = DEF(CLANG38_AARCH64_DLINK_FLAGS)
 RELEASE_CLANG38_AARCH64_CC_FLAGS    = DEF(CLANG38_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -flto -O3
-RELEASE_CLANG38_AARCH64_DLINK_FLAGS = DEF(CLANG38_AARCH64_DLINK_FLAGS) -flto -Wl,-O3 -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64
+RELEASE_CLANG38_AARCH64_DLINK_FLAGS = DEF(CLANG38_AARCH64_DLINK_FLAGS) -flto -Wl,-O3 -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64
 
 ####################################################################################
 #
