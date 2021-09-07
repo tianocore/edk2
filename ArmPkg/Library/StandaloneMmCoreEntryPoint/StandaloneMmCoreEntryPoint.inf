@@ -10,8 +10,8 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001A
-  BASE_NAME                      = StandaloneMmCoreEntryPoint
-  FILE_GUID                      = C97AC593-109A-4C63-905C-675FDE2689E8
+  BASE_NAME                      = ArmStandaloneMmCoreEntryPoint
+  FILE_GUID                      = 0D7C6883-E1A8-4A7A-A35C-E0C200775B43
   MODULE_TYPE                    = MM_CORE_STANDALONE
   VERSION_STRING                 = 1.0
   PI_SPECIFICATION_VERSION       = 0x00010032
@@ -21,20 +21,43 @@
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
 #
 
-[Sources.X64]
-  X64/StandaloneMmCoreEntryPoint.c
+[Sources.AARCH64, Sources.ARM]
+  Arm/StandaloneMmCoreEntryPoint.c
+  Arm/SetPermissions.c
+  Arm/CreateHobList.c
+
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
 
+[Packages.ARM, Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
+
 [LibraryClasses]
   BaseLib
   DebugLib
+
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
+  ArmMmuLib
+  ArmSvcLib
 
 [Guids]
   gMpInformationHobGuid
   gEfiMmPeiMmramMemoryReserveGuid
   gEfiStandaloneMmNonSecureBufferGuid
   gEfiArmTfCpuDriverEpDescriptorGuid
+
+[FeaturePcd.ARM, FeaturePcd.AARCH64]
+  gArmTokenSpaceGuid.PcdFfaEnable
+
+#
+# This configuration fails for CLANGPDB, which does not support PIE in the GCC
+# sense. Such however is required for ARM family StandaloneMmCore
+# self-relocation, and thus the CLANGPDB toolchain is unsupported for ARM and
+# AARCH64 for this module.
+#
+[BuildOptions]
+  GCC:*_*_ARM_CC_FLAGS = -fpie
+  GCC:*_*_AARCH64_CC_FLAGS = -fpie
