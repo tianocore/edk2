@@ -159,6 +159,12 @@ MemMapInitialization (
   //
   AddIoMemoryRangeHob (0x0A0000, BASE_1MB);
 
+  if (mHostBridgeDevId == 0xffff /* microvm */) {
+    AddIoMemoryBaseSizeHob (0xFEC00000, SIZE_4KB); /* ioapic #1 */
+    AddIoMemoryBaseSizeHob (0xFEC10000, SIZE_4KB); /* ioapic #2 */
+    return;
+  }
+
   TopOfLowRam = GetSystemMemorySizeBelow4gb ();
   PciExBarBase = 0;
   if (mHostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
