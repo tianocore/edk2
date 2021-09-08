@@ -31,6 +31,7 @@
 #include <Library/ResourcePublicationLib.h>
 #include <Ppi/MasterBootMode.h>
 #include <IndustryStandard/I440FxPiix4.h>
+#include <IndustryStandard/Microvm.h>
 #include <IndustryStandard/Pci22.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuCpuHotplug.h>
@@ -364,6 +365,12 @@ MiscInitialization (
       AcpiCtlReg = POWER_MGMT_REGISTER_Q35 (ICH9_ACPI_CNTL);
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
+    case 0xffff: /* microvm */
+      DEBUG ((DEBUG_INFO, "%a: microvm\n", __FUNCTION__));
+      PcdStatus = PcdSet16S (PcdOvmfHostBridgePciDevId,
+                             MICROVM_PSEUDO_DEVICE_ID);
+      ASSERT_RETURN_ERROR (PcdStatus);
+      return;
     default:
       DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
         __FUNCTION__, mHostBridgeDevId));
