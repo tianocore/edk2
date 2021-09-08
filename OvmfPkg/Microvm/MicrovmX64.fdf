@@ -232,15 +232,6 @@ INF  OvmfPkg/Virtio10Dxe/Virtio10.inf
 INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
 INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
-!if $(PVSCSI_ENABLE) == TRUE
-INF  OvmfPkg/PvScsiDxe/PvScsiDxe.inf
-!endif
-!if $(MPT_SCSI_ENABLE) == TRUE
-INF  OvmfPkg/MptScsiDxe/MptScsiDxe.inf
-!endif
-!if $(LSI_SCSI_ENABLE) == TRUE
-INF  OvmfPkg/LsiScsiDxe/LsiScsiDxe.inf
-!endif
 
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
