@@ -440,6 +440,12 @@ F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
 R: Rebecca Cran <rebecca@bsdio.com> [bcran]
 R: Peter Grehan <grehan@freebsd.org> [grehan-freebsd]
 
+OvmfPkg: microvm-related modules
+F: OvmfPkg/Microvm/
+F: OvmfPkg/Include/IndustryStandard/Microvm.h
+F: OvmfPkg/Library/ResetSystemLib/*Microvm.*
+R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
+
 OvmfPkg: CSM modules
 F: OvmfPkg/Csm/
 R: David Woodhouse <dwmw2@infradead.org> [dwmw2]
