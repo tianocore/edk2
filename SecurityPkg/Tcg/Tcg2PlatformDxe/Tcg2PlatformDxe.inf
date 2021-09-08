@@ -1,4 +1,4 @@
-### @file
+## @file
 # Platform specific TPM2 component.
 #
 # Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
@@ -31,7 +31,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  MinPlatformPkg/MinPlatformPkg.dec
   SecurityPkg/SecurityPkg.dec
 
 [Sources]
