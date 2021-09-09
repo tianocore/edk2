@@ -36,10 +36,9 @@
   MdeModulePkg/MdeModulePkg.dec
   SecurityPkg/SecurityPkg.dec
   CryptoPkg/CryptoPkg.dec
-  MinPlatformPkg/MinPlatformPkg.dec
 
 [Sources]
   PeiDxeTpmPlatformHierarchyLib.c
 
 [Pcd]
-  gMinPlatformPkgTokenSpaceGuid.PcdRandomizePlatformHierarchy
+  gEfiSecurityPkgTokenSpaceGuid.PcdRandomizePlatformHierarchy
