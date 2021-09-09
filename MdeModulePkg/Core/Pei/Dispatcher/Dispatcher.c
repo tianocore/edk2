@@ -958,7 +958,7 @@ PeiCheckAndSwitchStack (
   @param PeimFileHandle       Pointer to the FFS file header of the image.
   @param MigratedFileHandle   Pointer to the FFS file header of the migrated image.
 
-  @retval EFI_SUCCESS         Sucessfully migrated the PEIM to permanent memory.
+  @retval EFI_SUCCESS         Successfully migrated the PEIM to permanent memory.
 
 **/
 EFI_STATUS
@@ -1120,7 +1120,7 @@ MigratePeimsInFv (
                          environment, such as the size and location of temporary RAM, the stack location and
                          the BFV location.
 
-  @retval EFI_SUCCESS           Succesfully migrated installed FVs from temporary RAM to permanent memory.
+  @retval EFI_SUCCESS           Successfully migrated installed FVs from temporary RAM to permanent memory.
   @retval EFI_OUT_OF_RESOURCES  Insufficient memory exists to allocate needed pages.
 
 **/
