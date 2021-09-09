@@ -1,6 +1,7 @@
 #/** @file
 #
 #  Copyright (c) 2014, ARM Ltd. All rights reserved.
+#  Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -23,6 +24,8 @@
   EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
+  BaseLib
+  BaseMemoryLib
   DebugLib
   UefiBootServicesTableLib
 
