@@ -1135,6 +1135,7 @@ EvacuateTempRam (
   volatile UINTN                FvIndex;
   volatile UINTN                FvChildIndex;
   UINTN                         ChildFvOffset;
+  EFI_PHYSICAL_ADDRESS          FvHeaderAddress;
   EFI_FIRMWARE_VOLUME_HEADER    *FvHeader;
   EFI_FIRMWARE_VOLUME_HEADER    *ChildFvHeader;
   EFI_FIRMWARE_VOLUME_HEADER    *MigratedFvHeader;
@@ -1186,9 +1187,10 @@ EvacuateTempRam (
       Status =  PeiServicesAllocatePages (
                   EfiBootServicesCode,
                   EFI_SIZE_TO_PAGES ((UINTN) FvHeader->FvLength),
-                  (EFI_PHYSICAL_ADDRESS *) &MigratedFvHeader
+                  &FvHeaderAddress
                   );
       ASSERT_EFI_ERROR (Status);
+      MigratedFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvHeaderAddress;
 
       //
       // Allocate pool to save the raw PEIMs, which is used to keep consistent context across
@@ -1197,9 +1199,10 @@ EvacuateTempRam (
       Status =  PeiServicesAllocatePages (
                   EfiBootServicesCode,
                   EFI_SIZE_TO_PAGES ((UINTN) FvHeader->FvLength),
-                  (EFI_PHYSICAL_ADDRESS *) &RawDataFvHeader
+                  &FvHeaderAddress
                   );
       ASSERT_EFI_ERROR (Status);
+      RawDataFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvHeaderAddress;
 
       DEBUG ((
         DEBUG_VERBOSE,
