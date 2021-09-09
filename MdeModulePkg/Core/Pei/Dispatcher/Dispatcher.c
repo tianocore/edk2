@@ -993,7 +993,7 @@ MigratePeim (
         AsciiString[Index] = 0;
       }
     }
-    DEBUG ((DEBUG_INFO, "%a", AsciiString));
+    DEBUG ((DEBUG_VERBOSE, "%a", AsciiString));
     DEBUG_CODE_END ();
 
     Pe32Data = (VOID *) ((UINTN) ImageAddress - (UINTN) MigratedFileHandle + (UINTN) FileHandle);
