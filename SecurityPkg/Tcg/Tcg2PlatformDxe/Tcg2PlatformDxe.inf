@@ -31,7 +31,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  MinPlatformPkg/MinPlatformPkg.dec
   SecurityPkg/SecurityPkg.dec
 
 [Sources]
