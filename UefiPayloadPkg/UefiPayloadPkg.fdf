@@ -101,6 +101,7 @@ INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF UefiCpuPkg/CpuDxe/CpuDxe.inf
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF MdeModulePkg/Application/UiApp/UiApp.inf
+INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
 INF MdeModulePkg/Universal/Metronome/Metronome.inf
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
@@ -124,6 +125,8 @@ INF MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+INF MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
+INF MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
 
 INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
@@ -143,6 +146,7 @@ INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 INF OvmfPkg/SioBusDxe/SioBusDxe.inf
 INF MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
 !endif
+INF MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
 
 #
 # Console Support
@@ -167,6 +171,7 @@ INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
 INF MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
 INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 INF MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+INF MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 
 INF FatPkg/EnhancedFatDxe/Fat.inf
 
@@ -186,6 +191,7 @@ INF MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
 INF MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
 INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+INF MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
 
 #
 # ACPI Support
