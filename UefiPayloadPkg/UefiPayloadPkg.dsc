@@ -90,6 +90,7 @@
 
   DEFINE EMU_VARIABLE_ENABLE   = TRUE
   DEFINE DISABLE_RESET_SYSTEM  = FALSE
+  DEFINE NETWORK_DRIVER_ENABLE = FALSE
 
   # Dfine the maximum size of the capsule image without a reset flag that the platform can support.
   DEFINE MAX_SIZE_NON_POPULATE_CAPSULE = 0xa00000
@@ -161,6 +162,11 @@
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   DxeHobListLib|UefiPayloadPkg/Library/DxeHobListLib/DxeHobListLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
+  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
 !if $(UNIVERSAL_PAYLOAD) == TRUE
   HobLib|UefiPayloadPkg/Library/DxeHobLib/DxeHobLib.inf
@@ -355,6 +361,7 @@
 
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|$(MAX_LOGICAL_PROCESSORS)
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs|0
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
 
 ################################################################################
 #
@@ -429,6 +436,13 @@
   !else
     UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
   !endif
+!endif
+
+#
+# UEFI network modules
+#
+!if $(NETWORK_DRIVER_ENABLE) == TRUE
+  !include NetworkPkg/Network.dsc.inc
 !endif
 
 [Components.X64]
