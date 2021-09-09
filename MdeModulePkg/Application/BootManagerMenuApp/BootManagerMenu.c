@@ -1,7 +1,7 @@
 /** @file
   The application to show the Boot Manager Menu.
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -45,9 +45,56 @@ PrintStringAt (
   IN CHAR16    *String
   )
 {
+  UINTN         ScreenWidth;
+  UINTN         ScreenRows;
+  CHAR16        *TurncateString;
+  EFI_STATUS    Status;
+  UINTN         ShowingLength;
 
   gST->ConOut->SetCursorPosition (gST->ConOut, Column, Row);
-  return Print (L"%s", String);
+
+  gST->ConOut->QueryMode (
+                 gST->ConOut,
+                 gST->ConOut->Mode->Mode,
+                 &ScreenWidth,
+                 &ScreenRows
+                 );
+
+  if (Column > (ScreenWidth - 1) || Row > (ScreenRows - 1)) {
+    return 0;
+  }
+
+  if ((StrLen (String) + Column) > (ScreenWidth - 1)) {
+    //
+    // |      - ScreenWidth -       |
+    // ...Column.....................
+    // TurncateString length should leave one character for draw box and
+    // require one character for string end.
+    //
+    ShowingLength = ScreenWidth - Column - 1;
+    TurncateString = AllocatePool ((ShowingLength + 1) * sizeof (CHAR16));
+
+    if (TurncateString == NULL) {
+      return 0;
+    }
+
+    Status = StrnCpyS (TurncateString, ShowingLength + 1, String, ShowingLength - 3);
+
+    if (EFI_ERROR (Status)) {
+      FreePool (TurncateString);
+      return 0;
+    }
+
+    *(TurncateString + ShowingLength - 3) = L'.';
+    *(TurncateString + ShowingLength - 2) = L'.';
+    *(TurncateString + ShowingLength - 1) = L'.';
+    *(TurncateString + ShowingLength)     = L'\0';
+    ShowingLength = Print (L"%s", TurncateString);
+    FreePool (TurncateString);
+    return ShowingLength;
+  } else {
+    return Print (L"%s", String);
+  }
 }
 
 /**
@@ -68,7 +115,22 @@ PrintCharAt (
   CHAR16       Character
   )
 {
+  UINTN         ScreenWidth;
+  UINTN         ScreenRows;
+
   gST->ConOut->SetCursorPosition (gST->ConOut, Column, Row);
+
+  gST->ConOut->QueryMode (
+                 gST->ConOut,
+                 gST->ConOut->Mode->Mode,
+                 &ScreenWidth,
+                 &ScreenRows
+                 );
+
+  if (Column > (ScreenWidth - 1) || Row > (ScreenRows - 1)) {
+    return 0;
+  }
+
   return Print (L"%c", Character);
 }
 
@@ -193,7 +255,11 @@ InitializeBootMenuScreen (
 
   MaxPrintRows = Row - 6;
   UnSelectableItmes = TITLE_TOKEN_COUNT + 2 + HELP_TOKEN_COUNT + 2;
-  BootMenuData->MenuScreen.Width = MaxStrWidth + 8;
+  if (MaxStrWidth + 8 > Column) {
+    BootMenuData->MenuScreen.Width = Column;
+  } else {
+    BootMenuData->MenuScreen.Width = MaxStrWidth + 8;
+  }
   if (BootMenuData->ItemCount + UnSelectableItmes > MaxPrintRows) {
     BootMenuData->MenuScreen.Height = MaxPrintRows;
     BootMenuData->ScrollBarControl.HasScrollBar = TRUE;
