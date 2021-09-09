@@ -17,8 +17,8 @@ DEFINE FD_SIZE     = 0x00850000
 DEFINE NUM_BLOCKS  = 0x850
 !else
 
-DEFINE FD_SIZE     = 0x00410000
-DEFINE NUM_BLOCKS  = 0x410
+DEFINE FD_SIZE     = 0x00590000
+DEFINE NUM_BLOCKS  = 0x590
 !endif
 
 ################################################################################
@@ -197,6 +197,13 @@ INF MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
 # ACPI Support
 #
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+
+#
+# UEFI network modules
+#
+!if $(NETWORK_DRIVER_ENABLE) == TRUE
+  !include NetworkPkg/Network.fdf.inc
+!endif
 
 #
 # Shell
