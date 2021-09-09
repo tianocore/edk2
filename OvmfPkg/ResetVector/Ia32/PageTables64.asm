@@ -37,14 +37,23 @@ BITS    32
                        PAGE_READ_WRITE + \
                        PAGE_PRESENT)
 
+%define TDX_BSP         1
+%define TDX_AP          2
+
 ;
 ; Modified:  EAX, EBX, ECX, EDX
 ;
 SetCr3ForPageTables64:
-
-    ; Clear the WorkArea header. The SEV probe routines will populate the
-    ; work area when detected.
-    mov     byte[WORK_AREA_GUEST_TYPE], 0
+    ; Check the TDX features.
+    ; If it is TDX APs, then jump to SetCr3 directly.
+    ; In TD guest the initialization is done by BSP, including building
+    ; the page tables. APs will spin on until byte[TDX_WORK_AREA_PGTBL_READY]
+    ; is set.
+    OneTimeCall   CheckTdxFeaturesBeforeBuildPagetables
+    cmp       eax, TDX_BSP
+    je        ClearOvmfPageTables
+    cmp       eax, TDX_AP
+    je        SetCr3
 
     ; Check whether the SEV is active and populate the SevEsWorkArea
     OneTimeCall   CheckSevFeatures
@@ -54,6 +63,7 @@ SetCr3ForPageTables64:
     ; the page table build below.
     OneTimeCall   GetSevCBitMaskAbove31
 
+ClearOvmfPageTables:
     ;
     ; For OVMF, build some initial page tables at
     ; PcdOvmfSecPageTablesBase - (PcdOvmfSecPageTablesBase + 0x6000).
@@ -104,6 +114,9 @@ pageTableEntriesLoop:
 
     ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
     OneTimeCall   SevClearPageEncMaskForGhcbPage
+
+    ; Set byte[TDX_WORK_AREA_PGTBL_READY] if TDX is enabled.
+    OneTimeCall   TdxPostBuildPageTables
 
 SetCr3:
     ;

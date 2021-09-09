@@ -27,7 +27,8 @@ typedef enum {
 //
 typedef struct _CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER {
   UINT8                   GuestType;
-  UINT8                   Reserved1[3];
+  UINT8                   SubType;
+  UINT8                   Reserved1[2];
 } CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER;
 
 //
