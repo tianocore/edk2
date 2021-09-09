@@ -35,7 +35,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   SecurityPkg/SecurityPkg.dec
-  MinPlatformPkg/MinPlatformPkg.dec
 
 [Sources]
   Tcg2PlatformPei.c
