@@ -419,7 +419,7 @@ MigratePeim (
                          environment, such as the size and location of temporary RAM, the stack location and
                          the BFV location.
 
-  @retval EFI_SUCCESS           Succesfully migrated installed FVs from temporary RAM to permanent memory.
+  @retval EFI_SUCCESS           Successfully migrated installed FVs from temporary RAM to permanent memory.
   @retval EFI_OUT_OF_RESOURCES  Insufficient memory exists to allocate needed pages.
 
 **/
