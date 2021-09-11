@@ -1,7 +1,7 @@
 ## @file
 #  Reset Vector binary
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -25,7 +25,7 @@
   RAW|IA32/ResetVector.ia32.raw|*
 
 [Binaries.X64]
-  RAW|X64/PageTable2M/ResetVector.x64.raw|*
+  RAW|X64/PageTable1G/ResetVector.x64.raw|*
 
 [UserExtensions.TianoCore."ExtraFiles"]
   ResetVectorExtra.uni

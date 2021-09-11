@@ -11,19 +11,7 @@ BITS    64
 
 %define ALIGN_TOP_TO_4K_FOR_PAGING
 
-%define PAGE_PRESENT            0x01
-%define PAGE_READ_WRITE         0x02
-%define PAGE_USER_SUPERVISOR    0x04
-%define PAGE_WRITE_THROUGH      0x08
-%define PAGE_CACHE_DISABLE     0x010
-%define PAGE_ACCESSED          0x020
-%define PAGE_DIRTY             0x040
-%define PAGE_PAT               0x080
-%define PAGE_GLOBAL           0x0100
-%define PAGE_2M_MBO            0x080
-%define PAGE_2M_PAT          0x01000
-
-%define PAGE_2M_PDE_ATTR (PAGE_2M_MBO + \
+%define PAGE_2M_PDE_ATTR (PAGE_SIZE + \
                           PAGE_ACCESSED + \
                           PAGE_DIRTY + \
                           PAGE_READ_WRITE + \
