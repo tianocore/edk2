@@ -20,6 +20,7 @@
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/SmramSaveStateMap.h>
 #include <Library/VmgExitLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 
 #include "Platform.h"
 
@@ -342,4 +343,18 @@ AmdSevInitialize (
   // Check and perform SEV-ES initialization if required.
   //
   AmdSevEsInitialize ();
+
+  //
+  // Set the Confidential computing attr PCD to communicate which SEV
+  // technology is active.
+  //
+  if (MemEncryptSevSnpIsEnabled ()) {
+    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CC_ATTR_AMD_SEV_SNP);
+  } else if (MemEncryptSevEsIsEnabled ()) {
+    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CC_ATTR_AMD_SEV_ES);
+  } else {
+    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CC_ATTR_AMD_SEV);
+  }
+  ASSERT_RETURN_ERROR (PcdStatus);
+
 }
