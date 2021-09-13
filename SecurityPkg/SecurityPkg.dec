@@ -342,6 +342,12 @@
   # @Prompt Physical presence of the platform operator.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPhysicalPresence|TRUE|BOOLEAN|0x00010001
 
+  ## Indicates whether the TPM2 platform hierarchy will be disabled by using
+  #  a random password or by disabling the hierarchy
+  #   TRUE  - A random password will be used
+  #   FALSE - The hierarchy will be disabled
+  gEfiSecurityPkgTokenSpaceGuid.PcdRandomizePlatformHierarchy|TRUE|BOOLEAN|0x00010024
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Indicates whether TPM physical presence is locked during platform initialization.
   #  Once it is locked, it can not be unlocked for TPM life time.<BR><BR>
