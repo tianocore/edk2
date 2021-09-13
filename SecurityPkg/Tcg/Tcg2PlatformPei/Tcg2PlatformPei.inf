@@ -1,0 +1,52 @@
+### @file
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = Tcg2PlatformPei
+  FILE_GUID                      = 47727552-A54B-4A84-8CC1-BFF23E239636
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = PEIM
+  ENTRY_POINT                    = Tcg2PlatformPeiEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 IPF EBC
+#
+
+[LibraryClasses]
+  PcdLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  Tpm2DeviceLib
+  Tpm2CommandLib
+  TpmPlatformHierarchyLib
+  RngLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[Sources]
+  Tcg2PlatformPei.c
+
+[Guids]
+  gTcgEventEntryHobGuid
+  gTcgEvent2EntryHobGuid
+
+[Ppis]
+  gEfiEndOfPeiSignalPpiGuid
+
+[Depex]
+  gEfiTpmDeviceSelectedGuid
+
