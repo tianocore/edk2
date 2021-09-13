@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPM_PLATFORM_HIERARCHY_LIB_H_
-#define _TPM_PLATFORM_HIERARCHY_LIB_H_
+#ifndef TPM_PLATFORM_HIERARCHY_LIB_H_
+#define TPM_PLATFORM_HIERARCHY_LIB_H_
 
 /**
    This service will perform the TPM Platform Hierarchy configuration at the SmmReadyToLock event.

@@ -233,7 +233,7 @@ DisableTpmPlatformHierarchy (
 
 /**
    This service defines the configuration of the Platform Hierarchy Authorization Value (platformAuth)
-   and Platform Hierarchy Authorization Policy (platformPolicy)
+   and Platform Hierarchy Authorization Policy (platformPolicy).
 
 **/
 VOID
