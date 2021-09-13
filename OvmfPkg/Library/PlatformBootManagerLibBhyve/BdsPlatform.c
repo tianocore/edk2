@@ -375,6 +375,15 @@ PlatformBootManagerBeforeConsole (
   //
   EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
 
+  // We need to connect all trusted consoles for TCG PP. Here we treat all
+  // consoles in OVMF to be trusted consoles.
+  PlatformInitializeConsole (gPlatformConsole);
+
+  //
+  // Process TPM PPI request
+  //
+  Tcg2PhysicalPresenceLibProcessRequest (NULL);
+
   //
   // Prevent further changes to LockBoxes or SMRAM.
   //
@@ -389,8 +398,6 @@ PlatformBootManagerBeforeConsole (
   // installation.
   //
   EfiBootManagerDispatchDeferredImages ();
-
-  PlatformInitializeConsole (gPlatformConsole);
 
   PlatformRegisterOptionsAndKeys ();
 
@@ -1444,11 +1451,6 @@ PlatformBootManagerAfterConsole (
   // Set PCI Interrupt Line registers and ACPI SCI_EN
   //
   PciAcpiInitialization ();
-
-  //
-  // Process TPM PPI request
-  //
-  Tcg2PhysicalPresenceLibProcessRequest (NULL);
 
   //
   // Perform some platform specific connect sequence
