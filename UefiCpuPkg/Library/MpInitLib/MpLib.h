@@ -219,6 +219,7 @@ typedef struct {
   //
   BOOLEAN               Enable5LevelPaging;
   BOOLEAN               SevEsIsEnabled;
+  BOOLEAN               SevSnpIsEnabled;
   UINTN                 GhcbBase;
 } MP_CPU_EXCHANGE_INFO;
 
@@ -288,6 +289,7 @@ struct _CPU_MP_DATA {
   BOOLEAN                        WakeUpByInitSipiSipi;
 
   BOOLEAN                        SevEsIsEnabled;
+  BOOLEAN                        SevSnpIsEnabled;
   UINTN                          SevEsAPBuffer;
   UINTN                          SevEsAPResetStackStart;
   CPU_MP_DATA                    *NewCpuMpData;
