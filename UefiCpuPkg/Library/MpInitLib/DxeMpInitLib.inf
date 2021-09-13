@@ -22,9 +22,11 @@
 #
 
 [Sources.IA32]
+  Ia32/AmdSev.c
   Ia32/MpFuncs.nasm
 
 [Sources.X64]
+  X64/AmdSev.c
   X64/MpFuncs.nasm
 
 [Sources.common]
@@ -72,6 +74,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                           ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate                       ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStatusCheckIntervalInMicroSeconds  ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures                  ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                       ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES
