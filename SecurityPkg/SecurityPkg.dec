@@ -68,6 +68,10 @@
   #
   Tcg2PhysicalPresenceLib|Include/Library/Tcg2PhysicalPresenceLib.h
 
+  ##  @libraryclass  Handle TPM 2.0 platform hierarchy configuration
+  #
+  TpmPlatformHierarchyLib|Include/Library/TpmPlatformHierarchyLib.h
+
   ## @libraryclass  Provides interfaces about TCG storage generic command.
   #
   TcgStorageCoreLib|Include/Library/TcgStorageCoreLib.h
