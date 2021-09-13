@@ -28,4 +28,9 @@ InternalSetPageState (
   IN BOOLEAN                          UseLargeEntry
   );
 
+VOID
+SnpPageStateFailureTerminate (
+  VOID
+  );
+
 #endif
