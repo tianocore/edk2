@@ -400,5 +400,10 @@
   # @Prompt Memory encryption attribute
   gUefiCpuPkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0|UINT64|0x60000017
 
+  ## This dynamic PCD contains the hypervisor features value obtained through the GHCB HYPERVISOR
+  #  features VMGEXIT defined in the version 2 of GHCB spec.
+  # @Prompt GHCB Hypervisor Features
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures|0x0|UINT64|0x60000018
+
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni
