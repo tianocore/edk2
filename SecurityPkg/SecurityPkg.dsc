@@ -231,6 +231,8 @@
 
   SecurityPkg/Library/HashLibTpm2/HashLibTpm2.inf
 
+  SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
+
   #
   # TCG Storage.
   #
@@ -310,6 +312,11 @@
       NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
   }
 
+  SecurityPkg/Tcg/Tcg2PlatformPei/Tcg2PlatformPei.inf {
+    <LibraryClasses>
+      TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
+  }
+
   SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
     <LibraryClasses>
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterDxe.inf
@@ -324,6 +331,11 @@
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf {
     <LibraryClasses>
       Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
+  }
+
+  SecurityPkg/Tcg/Tcg2PlatformDxe/Tcg2PlatformDxe.inf {
+    <LibraryClasses>
+      TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
   }
 
   #
