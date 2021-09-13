@@ -70,6 +70,7 @@
   %define PT_ADDR(Offset) (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
 
   %define GHCB_PT_ADDR (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
+  %define GHCB_PT_SIZE (FixedPcdGet32 (PcdOvmfSecGhcbPageTableSize))
   %define GHCB_BASE (FixedPcdGet32 (PcdOvmfSecGhcbBase))
   %define GHCB_SIZE (FixedPcdGet32 (PcdOvmfSecGhcbSize))
   %define WORK_AREA_GUEST_TYPE (FixedPcdGet32 (PcdOvmfWorkAreaBase))
@@ -81,6 +82,34 @@
   %define SEV_SNP_SECRETS_SIZE  (FixedPcdGet32 (PcdOvmfSnpSecretsSize))
   %define CPUID_BASE  (FixedPcdGet32 (PcdOvmfCpuidBase))
   %define CPUID_SIZE  (FixedPcdGet32 (PcdOvmfCpuidSize))
+  %define SEC_PAGE_TABLE_BASE   (FixedPcdGet32 (PcdOvmfSecPageTablesBase))
+  %define SEC_PAGE_TABLE_SIZE   (FixedPcdGet32 (PcdOvmfSecPageTablesSize))
+  %define LOCK_BOX_STORAGE_BASE (FixedPcdGet32 (PcdOvmfLockBoxStorageBase))
+  %define LOCK_BOX_STORAGE_SIZE (FixedPcdGet32 (PcdOvmfLockBoxStorageSize))
+  ;
+  ; The PcdGuidedExtractHandlerTableAddress is a 64-bit PCD. The FixedPcdGet64() returns
+  ; a number suffix with 'ULL' (e.g 0x1111ULL). NASM does not like the constant ending
+  ; with anything other than 'h'. So, instead of using the FixedPcdGet64(), calculate
+  ; the base address of GuidedExtractHandlerTableBase
+  ;
+  %define GUID_EXTRACT_HANDLER_TABLE_BASE (LOCK_BOX_STORAGE_BASE + LOCK_BOX_STORAGE_SIZE)
+  %define GUID_EXTRACT_HANDLER_TABLE_SIZE (FixedPcdGet32 (PcdGuidedExtractHandlerTableSize))
+  %define WORK_AREA_BASE (FixedPcdGet32 (PcdOvmfWorkAreaBase))
+  %define WORK_AREA_SIZE (FixedPcdGet32 (PcdOvmfWorkAreaSize))
+  %define SEC_PEI_TEMP_RAM_BASE (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase))
+  %define SEC_PEI_TEMP_RAM_SIZE (FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
+
+  ;
+  ; The PcdOvmfSecGhcbBase reserves two GHCB pages. The first page is used
+  ; as GHCB shared page and second is used for booking to support the
+  ; nested GHCB in SEC phase. The booking page is mapped private. The VMM
+  ; does not need to validate the shared page but it need to validate the
+  ; booking page
+  ;
+  %define GHCB_SEC_BACKUP_BASE (FixedPcdGet32 (PcdOvmfSecGhcbBackupBase))
+  %define GHCB_SEC_BACKUP_SIZE (FixedPcdGet32 (PcdOvmfSecGhcbBackupSize))
+  %define GHCB_BOOKKEEPING_BASE (GHCB_BASE + 0x1000)
+  %define GHCB_BOOKKEEPING_SIZE (GHCB_SIZE - 0x1000)
 
 %include "Ia32/Flat32ToFlat64.asm"
 %include "Ia32/AmdSev.asm"
