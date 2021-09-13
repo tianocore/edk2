@@ -39,6 +39,11 @@
 [Protocols]
   gAndroidBootImgProtocolGuid
   gEfiLoadedImageProtocolGuid
+  gEfiLoadFile2ProtocolGuid
 
 [Guids]
+  gEfiAcpiTableGuid
   gFdtTableGuid
+
+[FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdAndroidBootLoadFile2
