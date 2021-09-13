@@ -847,6 +847,13 @@ SecCoreStartupWithStack (
   SecCoreData.BootFirmwareVolumeBase = BootFv;
   SecCoreData.BootFirmwareVolumeSize = (UINTN) BootFv->FvLength;
 
+  if (SevSnpIsEnabled ()) {
+    //
+    // Pre-validate the System RAM used in the SEC Phase
+    //
+    SevSnpSecPreValidateSystemRam ();
+  }
+
   //
   // Make sure the 8259 is masked before initializing the Debug Agent and the debug timer is enabled
   //

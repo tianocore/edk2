@@ -55,7 +55,6 @@ SevEsProtocolFailure (
   @retval FALSE  SEV-SNP is not enabled
 
 **/
-STATIC
 BOOLEAN
 SevSnpIsEnabled (
   VOID
@@ -295,4 +294,23 @@ SevEsIsEnabled (
   SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
 
   return (SevEsWorkArea->SevEsEnabled != 0);
+}
+
+/**
+ Pre-validate System RAM used for decompressing the PEI and DXE firmware volumes
+ when SEV-SNP is active. The PCDs SecPreValidatedStart and SecPreValidatedEnd are
+ set in OvmfPkg/FvmainCompactScratchEnd.fdf.inc.
+
+**/
+VOID
+SevSnpSecPreValidateSystemRam (
+  VOID
+  )
+{
+  PHYSICAL_ADDRESS        Start, End;
+
+  Start = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdOvmfSnpSecPreValidatedStart);
+  End = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdOvmfSnpSecPreValidatedEnd);
+
+  MemEncryptSevSnpPreValidateSystemRam (Start, EFI_SIZE_TO_PAGES (End - Start));
 }

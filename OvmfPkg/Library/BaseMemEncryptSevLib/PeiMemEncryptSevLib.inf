@@ -78,3 +78,5 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecPreValidatedEnd
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecPreValidatedStart

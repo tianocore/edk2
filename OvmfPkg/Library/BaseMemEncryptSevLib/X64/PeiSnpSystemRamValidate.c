@@ -65,6 +65,11 @@ STATIC SNP_PRE_VALIDATED_RANGE mPreValidatedRange[] = {
     FixedPcdGet32 (PcdOvmfSecPeiTempRamBase),
     FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize),
   },
+  // The below range is pre-validated by the Sec/SecMain.c
+  {
+    FixedPcdGet32 (PcdOvmfSnpSecPreValidatedStart),
+    FixedPcdGet32 (PcdOvmfSnpSecPreValidatedEnd)
+  },
 };
 
 STATIC
