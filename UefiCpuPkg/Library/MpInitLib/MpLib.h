@@ -33,6 +33,7 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/MicrocodeLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 
 #include <Guid/MicrocodePatchHob.h>
 
@@ -739,6 +740,18 @@ GetProcessorNumber (
 EFI_STATUS
 PlatformShadowMicrocode (
   IN OUT CPU_MP_DATA             *CpuMpData
+  );
+
+/**
+ Check if the specified confidential computing attribute is active.
+
+ @retval TRUE   The specified Attr is active.
+ @retval FALSE  The specified Attr is not active.
+**/
+BOOLEAN
+EFIAPI
+ConfidentialComputingGuestHas (
+  CONFIDENTIAL_COMPUTING_GUEST_ATTR     Attr
   );
 
 #endif

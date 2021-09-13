@@ -93,7 +93,7 @@ GetWakeupBuffer (
   EFI_PHYSICAL_ADDRESS    StartAddress;
   EFI_MEMORY_TYPE         MemoryType;
 
-  if (PcdGetBool (PcdSevEsIsEnabled)) {
+  if (ConfidentialComputingGuestHas (CC_ATTR_AMD_SEV_ES)) {
     MemoryType = EfiReservedMemoryType;
   } else {
     MemoryType = EfiBootServicesData;
@@ -107,7 +107,7 @@ GetWakeupBuffer (
   // LagacyBios driver depends on CPU Arch protocol which guarantees below
   // allocation runs earlier than LegacyBios driver.
   //
-  if (PcdGetBool (PcdSevEsIsEnabled)) {
+  if (ConfidentialComputingGuestHas (CC_ATTR_AMD_SEV_ES)) {
     //
     // SEV-ES Wakeup buffer should be under 0x88000 and under any previous one
     //
@@ -124,7 +124,7 @@ GetWakeupBuffer (
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     StartAddress = (EFI_PHYSICAL_ADDRESS) -1;
-  } else if (PcdGetBool (PcdSevEsIsEnabled)) {
+  } else if (ConfidentialComputingGuestHas (CC_ATTR_AMD_SEV_ES)) {
     //
     // Next SEV-ES wakeup buffer allocation must be below this allocation
     //

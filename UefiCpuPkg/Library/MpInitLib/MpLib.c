@@ -295,7 +295,7 @@ GetApLoopMode (
       ApLoopMode = ApInHltLoop;
     }
 
-    if (PcdGetBool (PcdSevEsIsEnabled)) {
+    if (ConfidentialComputingGuestHas (CC_ATTR_AMD_SEV_ES)) {
       //
       // For SEV-ES, force AP in Hlt-loop mode in order to use the GHCB
       // protocol for starting APs
@@ -1197,7 +1197,7 @@ AllocateResetVector (
     // The AP reset stack is only used by SEV-ES guests. Do not allocate it
     // if SEV-ES is not enabled.
     //
-    if (PcdGetBool (PcdSevEsIsEnabled)) {
+    if (ConfidentialComputingGuestHas (CC_ATTR_AMD_SEV_ES)) {
       //
       // Stack location is based on ProcessorNumber, so use the total number
       // of processors for calculating the total stack area.
@@ -2032,7 +2032,7 @@ MpInitLibInitialize (
   CpuMpData->CpuData          = (CPU_AP_DATA *) (CpuMpData + 1);
   CpuMpData->CpuInfoInHob     = (UINT64) (UINTN) (CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock(&CpuMpData->MpLock);
-  CpuMpData->SevEsIsEnabled = PcdGetBool (PcdSevEsIsEnabled);
+  CpuMpData->SevEsIsEnabled = ConfidentialComputingGuestHas (CC_ATTR_AMD_SEV_ES);
   CpuMpData->SevEsAPBuffer  = (UINTN) -1;
   CpuMpData->GhcbBase       = PcdGet64 (PcdGhcbBase);
 
@@ -2921,4 +2921,49 @@ MpInitLibStartupAllCPUs (
            ProcedureArgument,
            NULL
            );
+}
+
+STATIC
+BOOLEAN
+AmdMemEncryptionAttrCheck (
+  UINT64                                CurrentAttr,
+  CONFIDENTIAL_COMPUTING_GUEST_ATTR     Attr
+  )
+{
+  switch (Attr) {
+    case CC_ATTR_AMD_SEV:
+      return CurrentAttr >= CC_ATTR_AMD_SEV;
+    case CC_ATTR_AMD_SEV_ES:
+      return CurrentAttr >= CC_ATTR_AMD_SEV_ES;
+    case CC_ATTR_AMD_SEV_SNP:
+      return CurrentAttr == CC_ATTR_AMD_SEV_SNP;
+    default:
+      return FALSE;
+  }
+}
+
+/**
+ Check if the specified confidential computing attribute is active.
+
+ @retval TRUE   The specified Attr is active.
+ @retval FALSE  The specified Attr is not active.
+**/
+BOOLEAN
+EFIAPI
+ConfidentialComputingGuestHas (
+  CONFIDENTIAL_COMPUTING_GUEST_ATTR     Attr
+  )
+{
+  UINT64    CurrentAttr;
+
+  CurrentAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
+
+  //
+  // If attr is for the AMD group then call AMD specific checks.
+  //
+  if (((CurrentAttr >> 8) & 0xff) == 1) {
+    return AmdMemEncryptionAttrCheck (CurrentAttr, Attr);
+  }
+
+  return (CurrentAttr == Attr);
 }
