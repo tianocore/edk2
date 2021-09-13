@@ -62,6 +62,7 @@
   MtrrLib
   MemEncryptSevLib
   PcdLib
+  VmgExitLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
@@ -107,6 +108,8 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled
   gUefiCpuPkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures
+
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
