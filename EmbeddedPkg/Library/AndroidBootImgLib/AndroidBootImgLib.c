@@ -382,10 +382,13 @@ AndroidBootImgBoot (
   UINTN                               RamdiskSize;
   IN  VOID                           *FdtBase;
 
+  NewKernelArg = NULL;
+  ImageHandle = NULL;
+
   Status = gBS->LocateProtocol (&gAndroidBootImgProtocolGuid, NULL,
                                 (VOID **) &mAndroidBootImg);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
 
   Status = AndroidBootImgGetKernelInfo (
@@ -394,19 +397,19 @@ AndroidBootImgBoot (
             &KernelSize
             );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
 
   NewKernelArg = AllocateZeroPool (ANDROID_BOOTIMG_KERNEL_ARGS_SIZE);
   if (NewKernelArg == NULL) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate memory\n"));
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
   }
 
   Status = AndroidBootImgUpdateArgs (Buffer, NewKernelArg);
   if (EFI_ERROR (Status)) {
-    FreePool (NewKernelArg);
-    return Status;
+    goto Exit;
   }
 
   Status = AndroidBootImgGetRamdiskInfo (
@@ -415,19 +418,17 @@ AndroidBootImgBoot (
             &RamdiskSize
             );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
 
   Status = AndroidBootImgLocateFdt (Buffer, &FdtBase);
   if (EFI_ERROR (Status)) {
-    FreePool (NewKernelArg);
-    return Status;
+    goto Exit;
   }
 
   Status = AndroidBootImgUpdateFdt (Buffer, FdtBase, RamdiskData, RamdiskSize);
   if (EFI_ERROR (Status)) {
-    FreePool (NewKernelArg);
-    return Status;
+    goto Exit;
   }
 
   KernelDevicePath = mMemoryDevicePathTemplate;
@@ -440,21 +441,15 @@ AndroidBootImgBoot (
                            (EFI_DEVICE_PATH *)&KernelDevicePath,
                            (VOID*)(UINTN)Kernel, KernelSize, &ImageHandle);
   if (EFI_ERROR (Status)) {
-    //
-    // With EFI_SECURITY_VIOLATION retval, the Image was loaded and an ImageHandle was created
-    // with a valid EFI_LOADED_IMAGE_PROTOCOL, but the image can not be started right now.
-    // If the caller doesn't have the option to defer the execution of an image, we should
-    // unload image for the EFI_SECURITY_VIOLATION to avoid resource leak.
-    //
-    if (Status == EFI_SECURITY_VIOLATION) {
-      gBS->UnloadImage (ImageHandle);
-    }
-    return Status;
+    goto Exit;
   }
 
   // Set kernel arguments
   Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid,
                                 (VOID **) &ImageInfo);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
   ImageInfo->LoadOptions = NewKernelArg;
   ImageInfo->LoadOptionsSize = StrLen (NewKernelArg) * sizeof (CHAR16);
 
@@ -464,5 +459,18 @@ AndroidBootImgBoot (
   Status = gBS->StartImage (ImageHandle, NULL, NULL);
   // Clear the Watchdog Timer if the image returns
   gBS->SetWatchdogTimer (0, 0x10000, 0, NULL);
-  return EFI_SUCCESS;
+
+Exit:
+  //Unload image as it will not be used anymore
+  if (ImageHandle != NULL) {
+    gBS->UnloadImage (ImageHandle);
+    ImageHandle = NULL;
+  }
+  if (EFI_ERROR (Status)) {
+    if (NewKernelArg != NULL) {
+      FreePool (NewKernelArg);
+      NewKernelArg = NULL;
+    }
+  }
+  return Status;
 }
