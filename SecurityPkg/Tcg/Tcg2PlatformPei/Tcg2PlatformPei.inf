@@ -1,4 +1,5 @@
-### @file
+## @file
+# Configure TPM 2 platform hierarchy on TPM state resume failure on S3 resume
 #
 # Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 #
@@ -35,7 +36,6 @@
 [Packages]
   MdePkg/MdePkg.dec
   SecurityPkg/SecurityPkg.dec
-  MinPlatformPkg/MinPlatformPkg.dec
 
 [Sources]
   Tcg2PlatformPei.c
