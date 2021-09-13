@@ -1,4 +1,5 @@
 /** @file
+  Configure TPM 2 platform hierarchy on TPM state resume failure on S3 resume
 
 Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
@@ -24,12 +25,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /**
   This function handles PlatformInit task at the end of PEI
 
-  @param[in]  PeiServices  Pointer to PEI Services Table.
-  @param[in]  NotifyDesc   Pointer to the descriptor for the Notification event that
-                           caused this function to execute.
-  @param[in]  Ppi          Pointer to the PPI data associated with this function.
+  @param[in]  PeiServices        Pointer to PEI Services Table.
+  @param[in]  NotifyDescriptor   Pointer to the descriptor for the Notification event that
+                                 caused this function to execute.
+  @param[in]  Ppi                Pointer to the PPI data associated with this function.
 
-  @retval     EFI_SUCCESS  The function completes successfully
+  @retval     EFI_SUCCESS        The function completes successfully
   @retval     others
 **/
 EFI_STATUS
