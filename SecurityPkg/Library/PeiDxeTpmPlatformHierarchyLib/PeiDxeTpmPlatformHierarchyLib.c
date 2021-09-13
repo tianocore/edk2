@@ -18,7 +18,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PcdLib.h>
 #include <Library/RngLib.h>
 #include <Library/Tpm2CommandLib.h>
 #include <Library/Tpm2DeviceLib.h>
@@ -27,7 +26,6 @@
 // The authorization value may be no larger than the digest produced by the hash
 //   algorithm used for context integrity.
 //
-#define      MAX_NEW_AUTHORIZATION_SIZE SHA512_DIGEST_SIZE
 
 UINT16       mAuthSize;
 
@@ -54,7 +52,7 @@ RdRandGenerateEntropy (
   UINT8       *Ptr;
 
   Status = EFI_NOT_READY;
-  BlockCount = Length / 64;
+  BlockCount = Length / sizeof(Seed);
   Ptr = (UINT8 *)Entropy;
 
   //
@@ -65,10 +63,10 @@ RdRandGenerateEntropy (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    CopyMem (Ptr, Seed, 64);
+    CopyMem (Ptr, Seed, sizeof(Seed));
 
     BlockCount--;
-    Ptr = Ptr + 64;
+    Ptr = Ptr + sizeof(Seed);
   }
 
   //
@@ -78,7 +76,7 @@ RdRandGenerateEntropy (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  CopyMem (Ptr, Seed, (Length % 64));
+  CopyMem (Ptr, Seed, (Length % sizeof(Seed)));
 
   return Status;
 }
@@ -164,8 +162,6 @@ RandomizePlatformAuth (
 {
   EFI_STATUS                        Status;
   UINT16                            AuthSize;
-  UINT8                             *Rand;
-  UINTN                             RandSize;
   TPM2B_AUTH                        NewPlatformAuth;
 
   //
@@ -174,19 +170,13 @@ RandomizePlatformAuth (
 
   GetAuthSize (&AuthSize);
 
-  ZeroMem (NewPlatformAuth.buffer, AuthSize);
   NewPlatformAuth.size = AuthSize;
 
   //
-  // Allocate one buffer to store random data.
+  // Create the random bytes in the destination buffer
   //
-  RandSize = MAX_NEW_AUTHORIZATION_SIZE;
-  Rand = AllocatePool (RandSize);
 
-  RdRandGenerateEntropy (RandSize, Rand);
-  CopyMem (NewPlatformAuth.buffer, Rand, AuthSize);
-
-  FreePool (Rand);
+  RdRandGenerateEntropy (NewPlatformAuth.size, NewPlatformAuth.buffer);
 
   //
   // Send Tpm2HierarchyChangeAuth command with the new Auth value
@@ -194,7 +184,6 @@ RandomizePlatformAuth (
   Status = Tpm2HierarchyChangeAuth (TPM_RH_PLATFORM, NULL, &NewPlatformAuth);
   DEBUG ((DEBUG_INFO, "Tpm2HierarchyChangeAuth Result: - %r\n", Status));
   ZeroMem (NewPlatformAuth.buffer, AuthSize);
-  ZeroMem (Rand, RandSize);
 }
 
 /**
