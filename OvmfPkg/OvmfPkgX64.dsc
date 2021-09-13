@@ -34,6 +34,7 @@
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
   DEFINE TPM_ENABLE              = FALSE
   DEFINE TPM_CONFIG_ENABLE       = FALSE
+  DEFINE TDX_ENABLE              = TRUE
 
   #
   # Network definition
@@ -757,6 +758,9 @@
 !if $(TPM_ENABLE) == TRUE
       NULL|SecurityPkg/Library/DxeTpmMeasureBootLib/DxeTpmMeasureBootLib.inf
       NULL|SecurityPkg/Library/DxeTpm2MeasureBootLib/DxeTpm2MeasureBootLib.inf
+!endif
+!if $(TDX_ENABLE) == TRUE
+      NULL|SecurityPkg/Library/DxeTdMeasureBootLib/DxeTdMeasureBootLib.inf
 !endif
   }
 
