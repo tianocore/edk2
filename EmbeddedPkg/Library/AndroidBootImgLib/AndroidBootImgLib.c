@@ -349,12 +349,13 @@ AndroidBootImgUpdateFdt (
     if (EFI_ERROR (Status)) {
       goto Fdt_Exit;
     }
-
-    Status = gBS->InstallConfigurationTable (
-                    &gFdtTableGuid,
-                    (VOID *)(UINTN)NewFdtBase
-                    );
+  } else {
+    NewFdtBase = UpdatedFdtBase;
   }
+  Status = gBS->InstallConfigurationTable (
+                  &gFdtTableGuid,
+                  (VOID *)(UINTN)NewFdtBase
+                  );
 
   if (!EFI_ERROR (Status)) {
     return EFI_SUCCESS;
