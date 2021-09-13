@@ -16,8 +16,6 @@
 #include <Protocol/AndroidBootImg.h>
 #include <Protocol/LoadedImage.h>
 
-#include <libfdt.h>
-
 #define FDT_ADDITIONAL_ENTRIES_SIZE 0x400
 
 typedef struct {
