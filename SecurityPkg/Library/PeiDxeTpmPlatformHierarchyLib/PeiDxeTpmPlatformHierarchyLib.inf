@@ -1,6 +1,5 @@
-### @file
-#
-#   TPM Platform Hierarchy configuration library.
+## @file
+# TPM Platform Hierarchy configuration library.
 #
 #   This library provides functions for customizing the TPM's Platform Hierarchy
 #   Authorization Value (platformAuth) and Platform Hierarchy Authorization
