@@ -1,0 +1,30 @@
+## @file
+# This library instance implements a very limited MMU Lib instance
+# for the ARM/AARCH64 architectures.  This library shims a common library
+# interface to the ArmPkg defined ArmMmuLib.
+#
+# Copyright (c) Microsoft Corporation.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MmuLib
+  FILE_GUID                      = 6f2ee9a4-79b3-4b77-9a47-e2bd4b917b75
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MmuLib
+
+[Sources]
+  MmuLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  ArmMmuLib
