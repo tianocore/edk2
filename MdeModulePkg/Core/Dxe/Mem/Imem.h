@@ -48,6 +48,22 @@ typedef struct {
 //
 
 /**
+  Internal function.  Used by the pool and page functions to accept memory
+  when OOM occurs.
+
+  @param  Type                   The type of allocation to perform.
+  @param  AcceptSize             Size of memory to be accepted.
+  @param  Memory                 Accept memory address
+
+**/
+EFI_STATUS
+AcceptMemoryResource (
+  IN EFI_ALLOCATE_TYPE         Type,
+  IN UINTN                     AcceptSize,
+  IN OUT EFI_PHYSICAL_ADDRESS  *Memory
+  );
+
+/**
   Internal function.  Used by the pool functions to allocate pages
   to back pool allocation requests.
 

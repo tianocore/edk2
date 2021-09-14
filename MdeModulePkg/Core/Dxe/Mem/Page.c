@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeMain.h"
 #include "Imem.h"
 #include "HeapGuard.h"
+#include <Protocol/MemoryAccept.h>
 
 //
 // Entry for tracking the memory regions for each memory type to coalesce similar memory types
@@ -376,6 +377,176 @@ CoreFreeMemoryMapStack (
   }
 
   mFreeMapStack -= 1;
+}
+
+/**
+  Used to accept memory when OOM occurs.
+
+  @param  Type                   The type of allocation to perform.
+  @param  AcceptSize             Size of memory to be accepted.
+  @param  Memory                 Accept memory address
+
+**/
+EFI_STATUS
+AcceptMemoryResource (
+  IN EFI_ALLOCATE_TYPE         Type,
+  IN UINTN                     AcceptSize,
+  IN OUT EFI_PHYSICAL_ADDRESS  *Memory
+  )
+{
+ #ifdef MDE_CPU_X64
+
+  LIST_ENTRY                  *Link;
+  EFI_GCD_MAP_ENTRY           *GcdEntry;
+  EFI_GCD_MAP_ENTRY           UnacceptedEntry;
+  EFI_MEMORY_ACCEPT_PROTOCOL  *MemoryAcceptProtocol;
+  UINTN                       Start;
+  UINTN                       End;
+  EFI_STATUS                  Status;
+
+  //
+  // We accept n*32MB at one time to improve the efficiency.
+  //
+  AcceptSize = (AcceptSize + SIZE_32MB - 1) & ~(SIZE_32MB - 1);
+
+  if (AcceptSize == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = gBS->LocateProtocol (&gEfiMemoryAcceptProtocolGuid, NULL, (VOID **)&MemoryAcceptProtocol);
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (Type == AllocateAddress) {
+    Start = *Memory;
+    End   = *Memory + AcceptSize;
+  }
+
+  if (Type == AllocateMaxAddress) {
+    if (*Memory < EFI_PAGE_MASK) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if ((*Memory & EFI_PAGE_MASK) != EFI_PAGE_MASK) {
+      //
+      // Change MaxAddress to be 1 page lower
+      //
+      *Memory -= EFI_PAGE_SIZE;
+
+      //
+      // Set MaxAddress to a page boundary
+      //
+      *Memory &= ~(UINT64)EFI_PAGE_MASK;
+
+      //
+      // Set MaxAddress to end of the page
+      //
+      *Memory |= EFI_PAGE_MASK;
+    }
+  }
+
+  //
+  // Traverse the mGcdMemorySpaceMap to find out the unaccepted
+  // memory entry with big enough size.
+  //
+  Link = mGcdMemorySpaceMap.ForwardLink;
+  while (Link != &mGcdMemorySpaceMap) {
+    GcdEntry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
+    if (GcdEntry->GcdMemoryType == EfiGcdMemoryTypeUnaccepted) {
+      if (Type == AllocateMaxAddress) {
+        if (GcdEntry->BaseAddress + AcceptSize - 1 > *Memory) {
+          Link = Link->ForwardLink;
+          continue;
+        }
+      } else if (Type == AllocateAddress) {
+        if ((GcdEntry->BaseAddress > *Memory) || (GcdEntry->EndAddress < *Memory + AcceptSize - 1)) {
+          Link = Link->ForwardLink;
+          continue;
+        }
+      }
+
+      //
+      // Is the entry big enough?
+      //
+      if (AcceptSize <= GcdEntry->EndAddress - GcdEntry->BaseAddress + 1) {
+        UnacceptedEntry = *GcdEntry;
+        if (Type != AllocateAddress) {
+          Start = UnacceptedEntry.BaseAddress;
+          End   = UnacceptedEntry.BaseAddress + AcceptSize - 1;
+        }
+
+        break;
+      }
+    }
+
+    Link = Link->ForwardLink;
+  }
+
+  if (Link == &mGcdMemorySpaceMap) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Accept memory using the interface provide by the protocol.
+  //
+  Status = MemoryAcceptProtocol->AcceptMemory (MemoryAcceptProtocol, Start, AcceptSize);
+  if (EFI_ERROR (Status)) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // If memory is accepted successfully, remove the target memory space from GCD.
+  //
+  CoreRemoveMemorySpace (UnacceptedEntry.BaseAddress, UnacceptedEntry.EndAddress - UnacceptedEntry.BaseAddress + 1);
+
+  //
+  // Add the remain lower part of unaccepted memory to the
+  // Gcd memory space and memory map.
+  //
+  if (Start > UnacceptedEntry.BaseAddress) {
+    CoreAddMemorySpace (
+      EfiGcdMemoryTypeUnaccepted,
+      UnacceptedEntry.BaseAddress,
+      Start - UnacceptedEntry.BaseAddress,
+      UnacceptedEntry.Capabilities
+      );
+  }
+
+  //
+  // Update accepted part of the memory entry to type of EfiGcdMemoryTypeSystemMemory
+  // and add the range to the memory map.
+  //
+  CoreAddMemorySpace (
+    EfiGcdMemoryTypeSystemMemory,
+    Start,
+    AcceptSize,
+    //
+    // Hardcode memory space attributes.
+    //
+    EFI_MEMORY_CPU_CRYPTO | EFI_MEMORY_XP | EFI_MEMORY_RO | EFI_MEMORY_RP
+    );
+
+  //
+  // Add the remain higher part of unaccepted memory to the
+  // Gcd memory space and memory map.
+  //
+  if (UnacceptedEntry.EndAddress > End) {
+    CoreAddMemorySpace (
+      EfiGcdMemoryTypeUnaccepted,
+      End + 1,
+      UnacceptedEntry.EndAddress - End,
+      UnacceptedEntry.Capabilities
+      );
+  }
+
+  return EFI_SUCCESS;
+
+ #else
+
+  return EFI_UNSUPPORTED;
+
+ #endif
 }
 
 /**
@@ -1471,6 +1642,25 @@ CoreAllocatePages (
                 Memory,
                 NeedGuard
                 );
+ #ifdef MDE_CPU_X64
+
+  if (Status == EFI_OUT_OF_RESOURCES) {
+    Status = AcceptMemoryResource (Type, NumberOfPages << EFI_PAGE_SHIFT, Memory);
+    if (!EFI_ERROR (Status)) {
+      Status = CoreInternalAllocatePages (
+                 Type,
+                 MemoryType,
+                 NumberOfPages,
+                 Memory,
+                 NeedGuard
+                 );
+    } else {
+      Status = EFI_OUT_OF_RESOURCES;
+    }
+  }
+
+ #endif
+
   if (!EFI_ERROR (Status)) {
     CoreUpdateProfile (
       (EFI_PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
