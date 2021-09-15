@@ -1047,4 +1047,8 @@
     <LibraryClasses>
       Tpm12DeviceLib|SecurityPkg/Library/Tpm12DeviceLibDTpm/Tpm12DeviceLibDTpm.inf
   }
+  SecurityPkg/Tcg/Tcg2PlatformDxe/Tcg2PlatformDxe.inf {
+    <LibraryClasses>
+      TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
+  }
 !endif
