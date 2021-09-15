@@ -32,6 +32,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/UefiBootManagerLib.h>
 
 #include <Library/Tcg2PhysicalPresenceLib.h>
 
@@ -590,6 +591,10 @@ Tcg2UserConfirm (
     FreePool (ConfirmText);
     return FALSE;
   }
+
+  // Console for user interaction
+  // We need to connect all trusted consoles for TCG PP. Here we treat all consoles in OVMF to be trusted consoles.
+  EfiBootManagerConnectAllDefaultConsoles ();
 
   if (TpmPpCommand < TCG2_PHYSICAL_PRESENCE_STORAGE_MANAGEMENT_BEGIN) {
     if (CautionKey) {

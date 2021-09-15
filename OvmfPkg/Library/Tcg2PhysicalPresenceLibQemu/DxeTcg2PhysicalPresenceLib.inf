@@ -59,6 +59,7 @@
   PrintLib
   QemuFwCfgLib
   Tpm2CommandLib
+  UefiBootManagerLib
   UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
