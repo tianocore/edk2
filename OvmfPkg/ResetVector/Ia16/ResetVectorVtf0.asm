@@ -47,6 +47,23 @@ TIMES (15 - ((guidedStructureEnd - guidedStructureStart + 15) % 16)) DB 0
 ;
 guidedStructureStart:
 
+%ifdef ARCH_X64
+;
+; OVMF metadata descriptor for the TDX and SEV-SNP
+;
+; Provide the start offset of the metadata blob within the OVMF binary.
+
+; GUID : e47a6535-984a-4798-865e-4685a7bf8ec2
+;
+OvmfMetadataOffsetStart:
+  DD      (fourGigabytes - OvmfMetadataGuid - 16)
+  DW      OvmfMetadataOffsetEnd - OvmfMetadataOffsetStart
+  DB      0x35, 0x65, 0x7a, 0xe4, 0x4a, 0x98, 0x98, 0x47
+  DB      0x86, 0x5e, 0x46, 0x85, 0xa7, 0xbf, 0x8e, 0xc2
+OvmfMetadataOffsetEnd:
+
+%endif
+
 ; SEV Hash Table Block
 ;
 ; This describes the guest ram area where the hypervisor should
