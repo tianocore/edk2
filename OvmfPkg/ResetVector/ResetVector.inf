@@ -37,6 +37,8 @@
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
@@ -44,6 +46,11 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+  gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
