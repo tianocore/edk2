@@ -2,6 +2,7 @@
   Functions for processor information common to ARM and AARCH64.
 
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
+  Copyright (c) 2021, Ampere Computing LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -171,7 +172,7 @@ SmbiosGetProcessorId (
 
   if (HasSmcArm64SocId ()) {
     SmbiosGetSmcArm64SocId (&Jep106Code, &SocRevision);
-    ProcessorId = ((UINT64)Jep106Code << 32) | SocRevision;
+    ProcessorId = ((UINT64)SocRevision << 32) | Jep106Code;
   } else {
     ProcessorId = ArmReadMidr ();
   }
