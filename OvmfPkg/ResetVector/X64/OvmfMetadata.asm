@@ -23,6 +23,9 @@ BITS  64
 ; The section must be accepted or validated by the VMM before the boot
 %define OVMF_SECTION_TYPE_SEC_MEM     0x102
 
+; AMD SEV-SNP specific sections
+%define OVMF_SECTION_TYPE_SNP_SECRETS 0x200
+
 ALIGN 16
 
 TIMES (15 - ((OvmfGuidedStructureEnd - OvmfGuidedStructureStart + 15) % 16)) DB 0
@@ -40,6 +43,12 @@ _Descriptor:
   DD OvmfGuidedStructureEnd - _Descriptor             ; Length
   DD OVMF_METADATA_VERSION                            ; Version
   DD (OvmfGuidedStructureEnd - _Descriptor - 16) / 12 ; Number of sections
+
+; SEV-SNP Secrets page
+SevSnpSecrets:
+  DD  SEV_SNP_SECRETS_BASE
+  DD  SEV_SNP_SECRETS_SIZE
+  DD  OVMF_SECTION_TYPE_SNP_SECRETS
 
 OvmfGuidedStructureEnd:
   ALIGN   16
