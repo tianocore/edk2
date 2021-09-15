@@ -354,6 +354,10 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase|0|UINT32|0x54
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize|0|UINT32|0x55
 
+  ## The range of memory that is validated by the SEC phase.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart|0|UINT32|0x56
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd|0|UINT32|0x57
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
