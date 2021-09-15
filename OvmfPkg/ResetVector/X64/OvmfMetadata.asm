@@ -23,6 +23,15 @@ BITS  64
 ; The section must be accepted or validated by the VMM before the boot
 %define OVMF_SECTION_TYPE_SEC_MEM     0x102
 
+;
+; The section contains the hypervisor pre-populated CPUID values.
+; In the case of SEV-SNP, the CPUID values are filtered and measured by
+; the SEV-SNP firmware.
+; The CPUID format is documented in SEV-SNP firmware spec 0.9 section 7.1
+; (CPUID function structure).
+;
+%define OVMF_SECTION_TYPE_CPUID       0x103
+
 ; AMD SEV-SNP specific sections
 %define OVMF_SECTION_TYPE_SNP_SECRETS 0x200
 
@@ -49,6 +58,12 @@ SevSnpSecrets:
   DD  SEV_SNP_SECRETS_BASE
   DD  SEV_SNP_SECRETS_SIZE
   DD  OVMF_SECTION_TYPE_SNP_SECRETS
+
+; CPUID values
+CpuidSec:
+  DD  CPUID_BASE
+  DD  CPUID_SIZE
+  DD  OVMF_SECTION_TYPE_CPUID
 
 OvmfGuidedStructureEnd:
   ALIGN   16
