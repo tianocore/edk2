@@ -100,7 +100,8 @@
             "gEfiProcessorSpecificErrorSectionGuid=gEfiIa32X64ProcessorErrorSectionGuid",  ## is this a bug
             "gEfiSmmPeriodicTimerDispatch2ProtocolGuid=gEfiMmPeriodicTimerDispatchProtocolGuid",
             "gEfiPeiMmAccessPpiGuid=gPeiSmmAccessPpiGuid",
-            "gPeiSmmControlPpiGuid=gEfiPeiMmControlPpiGuid"
+            "gPeiSmmControlPpiGuid=gEfiPeiMmControlPpiGuid",
+            "gEfiPeiMmCommunicationPpiGuid=gEfiPeiSmmCommunicationPpiGuid",
             ]
     },
 
