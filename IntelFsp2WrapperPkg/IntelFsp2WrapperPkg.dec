@@ -82,12 +82,6 @@
   # @Prompt Skip FSP API from FSP wrapper.
   gIntelFsp2WrapperTokenSpaceGuid.PcdSkipFspApi|0x00000000|UINT32|0x40000009
 
-  ## This PCD decides how Wrapper code utilizes FSP
-  # 0: DISPATCH mode (FSP Wrapper will load PeiCore from FSP without calling FSP API)
-  # 1: API mode (FSP Wrapper will call FSP API)
-  #
-  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection|0x00000001|UINT8|0x4000000A
-
   ## This PCD decides how FSP is measured
   # 1) The BootGuard ACM may already measured the FSP component, such as FSPT/FSPM.
   # We need a flag (PCD) to indicate if there is need to do such FSP measurement or NOT.
@@ -106,6 +100,12 @@
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspMeasurementConfig|0x00000000|UINT32|0x4000000B
 
 [PcdsFixedAtBuild, PcdsPatchableInModule,PcdsDynamic,PcdsDynamicEx]
+  ## This PCD decides how Wrapper code utilizes FSP
+  # 0: DISPATCH mode (FSP Wrapper will load PeiCore from FSP without calling FSP API)
+  # 1: API mode (FSP Wrapper will call FSP API)
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection|0x00000001|UINT8|0x4000000A
+
   #
   ## These are the base address of FSP-M/S
   #
