@@ -952,8 +952,8 @@ GetAcpiCpuData (
     AcpiCpuData->NumberOfCpus = (UINT32)NumberOfCpus;
   }
 
-  if (AcpiCpuData->RegisterTable == 0 ||
-      AcpiCpuData->PreSmmInitRegisterTable == 0) {
+  if (AcpiCpuData->CpuFeatureInitData.RegisterTable == 0 ||
+      AcpiCpuData->CpuFeatureInitData.PreSmmInitRegisterTable == 0) {
     //
     // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
     //
@@ -976,11 +976,11 @@ GetAcpiCpuData (
       RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
       RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
     }
-    if (AcpiCpuData->RegisterTable == 0) {
-      AcpiCpuData->RegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
+    if (AcpiCpuData->CpuFeatureInitData.RegisterTable == 0) {
+      AcpiCpuData->CpuFeatureInitData.RegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
     }
-    if (AcpiCpuData->PreSmmInitRegisterTable == 0) {
-      AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
+    if (AcpiCpuData->CpuFeatureInitData.PreSmmInitRegisterTable == 0) {
+      AcpiCpuData->CpuFeatureInitData.PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
     }
   }
 
@@ -1063,9 +1063,9 @@ CpuRegisterTableWriteWorker (
   CpuFeaturesData = GetCpuFeaturesData ();
   if (CpuFeaturesData->RegisterTable == NULL) {
     AcpiCpuData = GetAcpiCpuData ();
-    ASSERT ((AcpiCpuData != NULL) && (AcpiCpuData->RegisterTable != 0));
-    CpuFeaturesData->RegisterTable = (CPU_REGISTER_TABLE *) (UINTN) AcpiCpuData->RegisterTable;
-    CpuFeaturesData->PreSmmRegisterTable = (CPU_REGISTER_TABLE *) (UINTN) AcpiCpuData->PreSmmInitRegisterTable;
+    ASSERT ((AcpiCpuData != NULL) && (AcpiCpuData->CpuFeatureInitData.RegisterTable != 0));
+    CpuFeaturesData->RegisterTable = (CPU_REGISTER_TABLE *) (UINTN) AcpiCpuData->CpuFeatureInitData.RegisterTable;
+    CpuFeaturesData->PreSmmRegisterTable = (CPU_REGISTER_TABLE *) (UINTN) AcpiCpuData->CpuFeatureInitData.PreSmmInitRegisterTable;
   }
 
   if (PreSmmFlag) {

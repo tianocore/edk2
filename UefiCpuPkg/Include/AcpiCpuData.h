@@ -1,13 +1,20 @@
 /** @file
 Definitions for CPU S3 data.
 
-Copyright (c) 2013 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #ifndef _ACPI_CPU_DATA_H_
 #define _ACPI_CPU_DATA_H_
+
+//
+// This macro definition is used to fix incompatibility issue caused by
+// ACPI_CPU_DATA structure update. It will be removed after all the platform
+// code uses new ACPI_CPU_DATA structure.
+//
+#define ACPI_CPU_DATA_STRUCTURE_UPDATE
 
 //
 // Register types in register table
@@ -119,6 +126,49 @@ typedef struct {
 } CPU_REGISTER_TABLE;
 
 //
+// Data structure that is used for CPU feature initialization during ACPI S3
+// resume.
+//
+typedef struct {
+  //
+  // Physical address of an array of CPU_REGISTER_TABLE structures, with
+  // NumberOfCpus entries.  If a register table is not required, then the
+  // TableLength and AllocatedSize fields of CPU_REGISTER_TABLE are set to 0.
+  // If TableLength is > 0, then elements of RegisterTableEntry are used to
+  // initialize the CPU that matches InitialApicId, during an ACPI S3 resume,
+  // before SMBASE relocation is performed.
+  // If a register table is not required for any one of the CPUs, then
+  // PreSmmInitRegisterTable may be set to 0.
+  //
+  EFI_PHYSICAL_ADDRESS    PreSmmInitRegisterTable;
+  //
+  // Physical address of an array of CPU_REGISTER_TABLE structures, with
+  // NumberOfCpus entries.  If a register table is not required, then the
+  // TableLength and AllocatedSize fields of CPU_REGISTER_TABLE are set to 0.
+  // If TableLength is > 0, then elements of RegisterTableEntry are used to
+  // initialize the CPU that matches InitialApicId, during an ACPI S3 resume,
+  // after SMBASE relocation is performed.
+  // If a register table is not required for any one of the CPUs, then
+  // RegisterTable may be set to 0.
+  //
+  EFI_PHYSICAL_ADDRESS    RegisterTable;
+  //
+  // CPU information which is required when set the register table.
+  //
+  CPU_STATUS_INFORMATION  CpuStatus;
+  //
+  // Location info for each AP.
+  // It points to an array which saves all APs location info.
+  // The array count is the AP count in this CPU.
+  //
+  // If the platform does not support MSR setting at S3 resume, and
+  // therefore it doesn't need the dependency semaphores, it should set
+  // this field to 0.
+  //
+  EFI_PHYSICAL_ADDRESS    ApLocation;
+} CPU_FEATURE_INIT_DATA;
+
+//
 // Data structure that is required for ACPI S3 resume. The PCD
 // PcdCpuS3DataAddress must be set to the physical address where this structure
 // is allocated
@@ -172,28 +222,6 @@ typedef struct {
   //
   EFI_PHYSICAL_ADDRESS  MtrrTable;
   //
-  // Physical address of an array of CPU_REGISTER_TABLE structures, with
-  // NumberOfCpus entries.  If a register table is not required, then the
-  // TableLength and AllocatedSize fields of CPU_REGISTER_TABLE are set to 0.
-  // If TableLength is > 0, then elements of RegisterTableEntry are used to
-  // initialize the CPU that matches InitialApicId, during an ACPI S3 resume,
-  // before SMBASE relocation is performed.
-  // If a register table is not required for any one of the CPUs, then
-  // PreSmmInitRegisterTable may be set to 0.
-  //
-  EFI_PHYSICAL_ADDRESS  PreSmmInitRegisterTable;
-  //
-  // Physical address of an array of CPU_REGISTER_TABLE structures, with
-  // NumberOfCpus entries.  If a register table is not required, then the
-  // TableLength and AllocatedSize fields of CPU_REGISTER_TABLE are set to 0.
-  // If TableLength is > 0, then elements of RegisterTableEntry are used to
-  // initialize the CPU that matches InitialApicId, during an ACPI S3 resume,
-  // after SMBASE relocation is performed.
-  // If a register table is not required for any one of the CPUs, then
-  // RegisterTable may be set to 0.
-  //
-  EFI_PHYSICAL_ADDRESS  RegisterTable;
-  //
   // Physical address of a buffer that contains the machine check handler that
   // is used during an ACPI S3 Resume.  In order for this machine check
   // handler to be active on an AP during an ACPI S3 resume, the machine check
@@ -208,19 +236,10 @@ typedef struct {
   //
   UINT32                ApMachineCheckHandlerSize;
   //
-  // CPU information which is required when set the register table.
+  // Data structure that is used for CPU feature initialization during ACPI S3
+  // resume.
   //
-  CPU_STATUS_INFORMATION     CpuStatus;
-  //
-  // Location info for each AP.
-  // It points to an array which saves all APs location info.
-  // The array count is the AP count in this CPU.
-  //
-  // If the platform does not support MSR setting at S3 resume, and
-  // therefore it doesn't need the dependency semaphores, it should set
-  // this field to 0.
-  //
-  EFI_PHYSICAL_ADDRESS  ApLocation;
+  CPU_FEATURE_INIT_DATA CpuFeatureInitData;
 } ACPI_CPU_DATA;
 
 #endif

@@ -9,7 +9,7 @@ number of CPUs reported by the MP Services Protocol, so this module does not
 support hot plug CPUs.  This module can be copied into a CPU specific package
 and customized if these additional features are required.
 
-Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2021, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2015, Red Hat, Inc.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -247,10 +247,7 @@ CpuS3DataInitialize (
   AcpiCpuDataEx->IdtrProfile.Base = (UINTN)Idt;
 
   if (OldAcpiCpuData != NULL) {
-    AcpiCpuData->RegisterTable           = OldAcpiCpuData->RegisterTable;
-    AcpiCpuData->PreSmmInitRegisterTable = OldAcpiCpuData->PreSmmInitRegisterTable;
-    AcpiCpuData->ApLocation              = OldAcpiCpuData->ApLocation;
-    CopyMem (&AcpiCpuData->CpuStatus, &OldAcpiCpuData->CpuStatus, sizeof (CPU_STATUS_INFORMATION));
+    CopyMem (&AcpiCpuData->CpuFeatureInitData, &OldAcpiCpuData->CpuFeatureInitData, sizeof (CPU_FEATURE_INIT_DATA));
   }
 
   //
