@@ -1,7 +1,7 @@
 /** @file
   CPU Features Initialize functions.
 
-  Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -152,10 +152,10 @@ CpuInitDataInitialize (
   ASSERT (AcpiCpuData != NULL);
   CpuFeaturesData->AcpiCpuData= AcpiCpuData;
 
-  CpuStatus = &AcpiCpuData->CpuStatus;
+  CpuStatus = &AcpiCpuData->CpuFeatureInitData.CpuStatus;
   Location = AllocateZeroPool (sizeof (EFI_CPU_PHYSICAL_LOCATION) * NumberOfCpus);
   ASSERT (Location != NULL);
-  AcpiCpuData->ApLocation = (EFI_PHYSICAL_ADDRESS)(UINTN)Location;
+  AcpiCpuData->CpuFeatureInitData.ApLocation = (EFI_PHYSICAL_ADDRESS)(UINTN)Location;
 
   for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
     InitOrder = &CpuFeaturesData->InitOrder[ProcessorNumber];
@@ -1131,7 +1131,7 @@ SetProcessorRegister (
   CpuFeaturesData = (CPU_FEATURES_DATA *) Buffer;
   AcpiCpuData = CpuFeaturesData->AcpiCpuData;
 
-  RegisterTables = (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->RegisterTable;
+  RegisterTables = (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->CpuFeatureInitData.RegisterTable;
 
   InitApicId = GetInitialApicId ();
   RegisterTable = NULL;
@@ -1147,8 +1147,8 @@ SetProcessorRegister (
 
   ProgramProcessorRegister (
     RegisterTable,
-    (EFI_CPU_PHYSICAL_LOCATION *)(UINTN)AcpiCpuData->ApLocation + ProcIndex,
-    &AcpiCpuData->CpuStatus,
+    (EFI_CPU_PHYSICAL_LOCATION *)(UINTN)AcpiCpuData->CpuFeatureInitData.ApLocation + ProcIndex,
+    &AcpiCpuData->CpuFeatureInitData.CpuStatus,
     &CpuFeaturesData->CpuFlags
     );
 }
