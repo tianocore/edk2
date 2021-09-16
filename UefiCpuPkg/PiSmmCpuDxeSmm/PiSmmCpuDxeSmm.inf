@@ -4,7 +4,7 @@
 # This SMM driver performs SMM initialization, deploy SMM Entry Vector,
 # provides CPU specific services in SMM.
 #
-# Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -134,6 +134,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmShadowStackSize               ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES

@@ -1152,23 +1152,31 @@ GetAcpiCpuData (
   mAcpiCpuData.ApMachineCheckHandlerBase = (EFI_PHYSICAL_ADDRESS)(UINTN)MachineCheckHandlerForAp;
 
   ZeroMem (&mAcpiCpuData.CpuFeatureInitData, sizeof (CPU_FEATURE_INIT_DATA));
-  CopyCpuFeatureInitDatatoSmram (&mAcpiCpuData.CpuFeatureInitData, &AcpiCpuData->CpuFeatureInitData);
 
-  CpuStatus = &mAcpiCpuData.CpuFeatureInitData.CpuStatus;
+  if (!PcdGetBool (PcdCpuFeaturesInitOnS3Resume)) {
+    //
+    // If the CPU features will not be initialized by CpuFeaturesPei module during
+    // next ACPI S3 resume, copy the CPU features initialization data into SMRAM,
+    // which will be consumed in SmmRestoreCpu during next S3 resume.
+    //
+    CopyCpuFeatureInitDatatoSmram (&mAcpiCpuData.CpuFeatureInitData, &AcpiCpuData->CpuFeatureInitData);
 
-  mCpuFlags.CoreSemaphoreCount = AllocateZeroPool (
-                                   sizeof (UINT32) * CpuStatus->PackageCount *
-                                   CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount
-                                   );
-  ASSERT (mCpuFlags.CoreSemaphoreCount != NULL);
+    CpuStatus = &mAcpiCpuData.CpuFeatureInitData.CpuStatus;
 
-  mCpuFlags.PackageSemaphoreCount = AllocateZeroPool (
-                                      sizeof (UINT32) * CpuStatus->PackageCount *
-                                      CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount
-                                      );
-  ASSERT (mCpuFlags.PackageSemaphoreCount != NULL);
+    mCpuFlags.CoreSemaphoreCount = AllocateZeroPool (
+                                     sizeof (UINT32) * CpuStatus->PackageCount *
+                                     CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount
+                                     );
+    ASSERT (mCpuFlags.CoreSemaphoreCount != NULL);
 
-  InitializeSpinLock((SPIN_LOCK*) &mCpuFlags.MemoryMappedLock);
+    mCpuFlags.PackageSemaphoreCount = AllocateZeroPool (
+                                        sizeof (UINT32) * CpuStatus->PackageCount *
+                                        CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount
+                                        );
+    ASSERT (mCpuFlags.PackageSemaphoreCount != NULL);
+
+    InitializeSpinLock((SPIN_LOCK*) &mCpuFlags.MemoryMappedLock);
+  }
 }
 
 /**
