@@ -476,16 +476,19 @@ SetRegister (
   IN BOOLEAN                 PreSmmRegisterTable
   )
 {
+  CPU_FEATURE_INIT_DATA     *FeatureInitData;
   CPU_REGISTER_TABLE        *RegisterTable;
   CPU_REGISTER_TABLE        *RegisterTables;
   UINT32                    InitApicId;
   UINTN                     ProcIndex;
   UINTN                     Index;
 
+  FeatureInitData = &mAcpiCpuData.CpuFeatureInitData;
+
   if (PreSmmRegisterTable) {
-    RegisterTables = (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.PreSmmInitRegisterTable;
+    RegisterTables = (CPU_REGISTER_TABLE *)(UINTN)FeatureInitData->PreSmmInitRegisterTable;
   } else {
-    RegisterTables = (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.RegisterTable;
+    RegisterTables = (CPU_REGISTER_TABLE *)(UINTN)FeatureInitData->RegisterTable;
   }
   if (RegisterTables == NULL) {
     return;
@@ -503,18 +506,18 @@ SetRegister (
   }
   ASSERT (RegisterTable != NULL);
 
-  if (mAcpiCpuData.ApLocation != 0) {
+  if (FeatureInitData->ApLocation != 0) {
     ProgramProcessorRegister (
       RegisterTable,
-      (EFI_CPU_PHYSICAL_LOCATION *)(UINTN)mAcpiCpuData.ApLocation + ProcIndex,
-      &mAcpiCpuData.CpuStatus,
+      (EFI_CPU_PHYSICAL_LOCATION *)(UINTN)FeatureInitData->ApLocation + ProcIndex,
+      &FeatureInitData->CpuStatus,
       &mCpuFlags
       );
   } else {
     ProgramProcessorRegister (
       RegisterTable,
       NULL,
-      &mAcpiCpuData.CpuStatus,
+      &FeatureInitData->CpuStatus,
       &mCpuFlags
       );
   }
@@ -1011,6 +1014,71 @@ IsRegisterTableEmpty (
 }
 
 /**
+  Copy the data used to initialize processor register into SMRAM.
+
+  @param[in,out]  CpuFeatureInitDataDst   Pointer to the destination CPU_FEATURE_INIT_DATA structure.
+  @param[in]      CpuFeatureInitDataSrc   Pointer to the source CPU_FEATURE_INIT_DATA structure.
+
+**/
+VOID
+CopyCpuFeatureInitDatatoSmram (
+  IN OUT CPU_FEATURE_INIT_DATA    *CpuFeatureInitDataDst,
+  IN     CPU_FEATURE_INIT_DATA    *CpuFeatureInitDataSrc
+  )
+{
+  CPU_STATUS_INFORMATION    *CpuStatus;
+
+  if (!IsRegisterTableEmpty ((CPU_REGISTER_TABLE *)(UINTN)CpuFeatureInitDataSrc->PreSmmInitRegisterTable, mAcpiCpuData.NumberOfCpus)) {
+    CpuFeatureInitDataDst->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (mAcpiCpuData.NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
+    ASSERT (CpuFeatureInitDataDst->PreSmmInitRegisterTable != 0);
+
+    CopyRegisterTable (
+      (CPU_REGISTER_TABLE *)(UINTN)CpuFeatureInitDataDst->PreSmmInitRegisterTable,
+      (CPU_REGISTER_TABLE *)(UINTN)CpuFeatureInitDataSrc->PreSmmInitRegisterTable,
+      mAcpiCpuData.NumberOfCpus
+      );
+  }
+
+  if (!IsRegisterTableEmpty ((CPU_REGISTER_TABLE *)(UINTN)CpuFeatureInitDataSrc->RegisterTable, mAcpiCpuData.NumberOfCpus)) {
+    CpuFeatureInitDataDst->RegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (mAcpiCpuData.NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
+    ASSERT (CpuFeatureInitDataDst->RegisterTable != 0);
+
+    CopyRegisterTable (
+      (CPU_REGISTER_TABLE *)(UINTN)CpuFeatureInitDataDst->RegisterTable,
+      (CPU_REGISTER_TABLE *)(UINTN)CpuFeatureInitDataSrc->RegisterTable,
+      mAcpiCpuData.NumberOfCpus
+      );
+  }
+
+  CpuStatus = &CpuFeatureInitDataDst->CpuStatus;
+  CopyMem (CpuStatus, &CpuFeatureInitDataSrc->CpuStatus, sizeof (CPU_STATUS_INFORMATION));
+
+  if (CpuFeatureInitDataSrc->CpuStatus.ThreadCountPerPackage != 0) {
+    CpuStatus->ThreadCountPerPackage = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
+                                            sizeof (UINT32) * CpuStatus->PackageCount,
+                                            (UINT32 *)(UINTN)CpuFeatureInitDataSrc->CpuStatus.ThreadCountPerPackage
+                                            );
+    ASSERT (CpuStatus->ThreadCountPerPackage != 0);
+  }
+
+  if (CpuFeatureInitDataSrc->CpuStatus.ThreadCountPerCore != 0) {
+    CpuStatus->ThreadCountPerCore = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
+                                            sizeof (UINT8) * (CpuStatus->PackageCount * CpuStatus->MaxCoreCount),
+                                            (UINT32 *)(UINTN)CpuFeatureInitDataSrc->CpuStatus.ThreadCountPerCore
+                                            );
+    ASSERT (CpuStatus->ThreadCountPerCore != 0);
+  }
+
+  if (CpuFeatureInitDataSrc->ApLocation != 0) {
+    CpuFeatureInitDataDst->ApLocation = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
+                                mAcpiCpuData.NumberOfCpus * sizeof (EFI_CPU_PHYSICAL_LOCATION),
+                                (EFI_CPU_PHYSICAL_LOCATION *)(UINTN)CpuFeatureInitDataSrc->ApLocation
+                                );
+    ASSERT (CpuFeatureInitDataDst->ApLocation != 0);
+  }
+}
+
+/**
   Get ACPI CPU data.
 
 **/
@@ -1064,39 +1132,13 @@ GetAcpiCpuData (
 
   CopyMem ((VOID *)(UINTN)mAcpiCpuData.IdtrProfile, (VOID *)(UINTN)AcpiCpuData->IdtrProfile, sizeof (IA32_DESCRIPTOR));
 
-  if (!IsRegisterTableEmpty ((CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->PreSmmInitRegisterTable, mAcpiCpuData.NumberOfCpus)) {
-    mAcpiCpuData.PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (mAcpiCpuData.NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
-    ASSERT (mAcpiCpuData.PreSmmInitRegisterTable != 0);
-
-    CopyRegisterTable (
-      (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.PreSmmInitRegisterTable,
-      (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->PreSmmInitRegisterTable,
-      mAcpiCpuData.NumberOfCpus
-      );
-  } else {
-    mAcpiCpuData.PreSmmInitRegisterTable = 0;
-  }
-
-  if (!IsRegisterTableEmpty ((CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->RegisterTable, mAcpiCpuData.NumberOfCpus)) {
-    mAcpiCpuData.RegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (mAcpiCpuData.NumberOfCpus * sizeof (CPU_REGISTER_TABLE));
-    ASSERT (mAcpiCpuData.RegisterTable != 0);
-
-    CopyRegisterTable (
-      (CPU_REGISTER_TABLE *)(UINTN)mAcpiCpuData.RegisterTable,
-      (CPU_REGISTER_TABLE *)(UINTN)AcpiCpuData->RegisterTable,
-      mAcpiCpuData.NumberOfCpus
-      );
-  } else {
-    mAcpiCpuData.RegisterTable = 0;
-  }
-
   //
   // Copy AP's GDT, IDT and Machine Check handler into SMRAM.
   //
   Gdtr = (IA32_DESCRIPTOR *)(UINTN)mAcpiCpuData.GdtrProfile;
   Idtr = (IA32_DESCRIPTOR *)(UINTN)mAcpiCpuData.IdtrProfile;
 
-  GdtForAp = AllocatePool ((Gdtr->Limit + 1) + (Idtr->Limit + 1) +  mAcpiCpuData.ApMachineCheckHandlerSize);
+  GdtForAp = AllocatePool ((Gdtr->Limit + 1) + (Idtr->Limit + 1) + mAcpiCpuData.ApMachineCheckHandlerSize);
   ASSERT (GdtForAp != NULL);
   IdtForAp = (VOID *) ((UINTN)GdtForAp + (Gdtr->Limit + 1));
   MachineCheckHandlerForAp = (VOID *) ((UINTN)IdtForAp + (Idtr->Limit + 1));
@@ -1109,42 +1151,32 @@ GetAcpiCpuData (
   Idtr->Base = (UINTN)IdtForAp;
   mAcpiCpuData.ApMachineCheckHandlerBase = (EFI_PHYSICAL_ADDRESS)(UINTN)MachineCheckHandlerForAp;
 
-  CpuStatus = &mAcpiCpuData.CpuStatus;
-  CopyMem (CpuStatus, &AcpiCpuData->CpuStatus, sizeof (CPU_STATUS_INFORMATION));
-  if (AcpiCpuData->CpuStatus.ThreadCountPerPackage != 0) {
-    CpuStatus->ThreadCountPerPackage = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
-                                            sizeof (UINT32) * CpuStatus->PackageCount,
-                                            (UINT32 *)(UINTN)AcpiCpuData->CpuStatus.ThreadCountPerPackage
-                                            );
-    ASSERT (CpuStatus->ThreadCountPerPackage != 0);
-  }
-  if (AcpiCpuData->CpuStatus.ThreadCountPerCore != 0) {
-    CpuStatus->ThreadCountPerCore = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
-                                            sizeof (UINT8) * (CpuStatus->PackageCount * CpuStatus->MaxCoreCount),
-                                            (UINT32 *)(UINTN)AcpiCpuData->CpuStatus.ThreadCountPerCore
-                                            );
-    ASSERT (CpuStatus->ThreadCountPerCore != 0);
-  }
-  if (AcpiCpuData->ApLocation != 0) {
-    mAcpiCpuData.ApLocation = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateCopyPool (
-                                mAcpiCpuData.NumberOfCpus * sizeof (EFI_CPU_PHYSICAL_LOCATION),
-                                (EFI_CPU_PHYSICAL_LOCATION *)(UINTN)AcpiCpuData->ApLocation
-                                );
-    ASSERT (mAcpiCpuData.ApLocation != 0);
-  }
-  if (CpuStatus->PackageCount != 0) {
+  ZeroMem (&mAcpiCpuData.CpuFeatureInitData, sizeof (CPU_FEATURE_INIT_DATA));
+
+  if (!PcdGetBool (PcdCpuFeaturesInitOnS3Resume)) {
+    //
+    // If the CPU features will not be initialized by CpuFeaturesPei module during
+    // next ACPI S3 resume, copy the CPU features initialization data into SMRAM,
+    // which will be consumed in SmmRestoreCpu during next S3 resume.
+    //
+    CopyCpuFeatureInitDatatoSmram (&mAcpiCpuData.CpuFeatureInitData, &AcpiCpuData->CpuFeatureInitData);
+
+    CpuStatus = &mAcpiCpuData.CpuFeatureInitData.CpuStatus;
+
     mCpuFlags.CoreSemaphoreCount = AllocateZeroPool (
                                      sizeof (UINT32) * CpuStatus->PackageCount *
                                      CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount
                                      );
     ASSERT (mCpuFlags.CoreSemaphoreCount != NULL);
+
     mCpuFlags.PackageSemaphoreCount = AllocateZeroPool (
                                         sizeof (UINT32) * CpuStatus->PackageCount *
                                         CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount
                                         );
     ASSERT (mCpuFlags.PackageSemaphoreCount != NULL);
+
+    InitializeSpinLock((SPIN_LOCK*) &mCpuFlags.MemoryMappedLock);
   }
-  InitializeSpinLock((SPIN_LOCK*) &mCpuFlags.MemoryMappedLock);
 }
 
 /**
