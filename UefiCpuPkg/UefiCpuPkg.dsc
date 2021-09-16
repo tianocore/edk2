@@ -161,6 +161,7 @@
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
   UefiCpuPkg/SecCore/SecCore.inf
+  UefiCpuPkg/SecCore/SecCoreNative.inf
   UefiCpuPkg/SecMigrationPei/SecMigrationPei.inf
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf {
