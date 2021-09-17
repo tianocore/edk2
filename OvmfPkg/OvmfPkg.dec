@@ -338,7 +338,12 @@
   # The size of this header is used early boot, and is provided through
   # a fixed PCD. It need to be kept in sync with any changes to the
   # header definition.
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader|0|UINT32|0x51
+  #
+  # PcdOvmfConfidentialComputingWorkAreaHeader ==
+  #   sizeof (CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER)
+  #
+  # CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER defined in OvmfPkg/Include/WorkArea.h
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader|4|UINT32|0x51
 
 
 [PcdsDynamic, PcdsDynamicEx]
