@@ -25,6 +25,11 @@ typedef enum {
 // to the structure need to be kept in sync with the
 // PcdOvmfConfidentialComputingWorkAreaHeader.
 //
+// PcdOvmfConfidentialComputingWorkAreaHeader ==
+//   sizeof (CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER)
+// PcdOvmfConfidentialComputingWorkAreaHeader defined in:
+//   OvmfPkg/OvmfPkg.dec
+//   OvmfPkg/OvmfPkgDefines.fdf.inc
 typedef struct _CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER {
   UINT8                   GuestType;
   UINT8                   Reserved1[3];
