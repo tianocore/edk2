@@ -2,6 +2,7 @@
 #  Xen ARM ACPI Platform Driver using Xen ARM multiboot protocol
 #
 #  Copyright (C) 2016, Linaro Ltd. All rights reserved.
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -26,6 +27,7 @@
 
 [Packages]
   ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 

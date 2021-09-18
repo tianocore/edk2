@@ -3,6 +3,7 @@
 #  Component description file for ArmVirtGicArchLib module
 #
 #  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -30,6 +31,7 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
 
 [Protocols]

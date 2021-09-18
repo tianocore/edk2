@@ -2,6 +2,7 @@
 #  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
 #  Copyright (c) 2014-2016, Linaro Limited. All rights reserved.
 #  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.
+#  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -41,7 +42,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Core/Dxe/DxeMain.inf
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
   INF ArmVirtPkg/VirtioFdtDxe/VirtioFdtDxe.inf
-  INF ArmVirtPkg/FdtClientDxe/FdtClientDxe.inf
+  INF EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
   INF ArmVirtPkg/HighMemDxe/HighMemDxe.inf
 
   #
