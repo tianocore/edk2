@@ -1,0 +1,43 @@
+
+parameters:
+- name: board_name
+  type: string
+  default: ''
+- name: pool_name
+  type: string
+  default: ''
+
+steps:
+- checkout: self
+  submodules: true
+- checkout: edk2-non-osi
+- checkout: FSP
+- checkout: edk2-platforms
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: "3.8.x"
+    architecture: "x64"
+
+- ${{ if contains(parameters.pool_name, 'ubuntu') }}:
+  - bash: |
+      sudo apt-get update
+      sudo apt-get install gcc g++ make uuid-dev nasm iasl
+    displayName: Update apt and Install required tools
+  - script: |
+      source edksetup.sh
+      echo "##vso[task.setvariable variable=PATH;]$PATH"
+    displayName: Set env Path
+    workingDirectory: edk2/
+
+- ${{ if contains(parameters.pool_name, 'windows') }}:
+  - powershell: |
+      choco install iasl -y --version=2017.11.10
+      echo "##vso[task.setvariable variable=IASL_PREFIX;]C:\tools\ASL\"
+      choco install nasm -y
+      echo "##vso[task.setvariable variable=NASM_PREFIX;]C:\Program Files\NASM\"
+    displayName: Windows EDK II Prerequisites
+
+- script: python build_bios.py --platform ${{ parameters.board_name}}
+  displayName: Build platform ${{ parameters.board_name}}
+  workingDirectory: edk2-platforms/Platform/Intel

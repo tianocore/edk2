@@ -13,15 +13,15 @@ resources:
   repositories:
   - repository: edk2-platforms
     type: github
-    endpoint: tianocore
+    endpoint: td36
     name: td36/edk2-platforms
   - repository: edk2-non-osi
     type: github
-    endpoint: tianocore
+    endpoint: td36
     name: tianocore/edk2-non-osi
   - repository: FSP
     type: github
-    endpoint: tianocore
+    endpoint: td36
     name: intel/FSP
  
 jobs:

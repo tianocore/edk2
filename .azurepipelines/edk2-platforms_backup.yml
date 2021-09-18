@@ -1,0 +1,221 @@
+## @file
+# Core CI configuration for UefiPayloadPkg
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+trigger:
+- master
+pr:
+- master
+
+resources:
+  repositories:
+  - repository: coreboot
+    type: github
+    endpoint: https://github.com/td36/coreboot
+    name: coreboot
+  - repository: edk2-platforms
+    type: github
+    endpoint: https://github.com/tianocore/edk2-platforms.git
+    name: edk2-platforms
+  - repository: edk2-non-osi
+    type: github
+    endpoint: https://github.com/tianocore/edk2-non-osi.git
+    name: edk2-non-osi
+  - repository: FSP
+    type: github
+    endpoint: https://github.com/IntelFsp/FSP.git
+    name: FSP
+
+jobs:
+  - job: Edk2Platform_CI
+    parameters:
+    - name: extra_repo_clone_step
+      type: stepList
+      default:
+      - script: git clone https://github.com/tianocore/edk2-non-osi.git
+        displayName: Download edk2-non-osi repo
+      - script: git clone https://github.com/IntelFsp/FSP.git
+        displayName: Download FSP repo
+      - script: git clone https://github.com/tianocore/edk2-platforms.git
+        displayName: Download edk2-platforms repo
+
+    pool:
+      vmImage: 'windows-latest'
+
+    steps:
+    - checkout: self
+    - checkout: https://github.com/tianocore/edk2-non-osi.git
+    - checkout: https://github.com/IntelFsp/FSP.git
+    - checkout: https://github.com/tianocore/edk2-platforms.git
+
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: "3.8.x"
+        architecture: "x64"
+        choco install iasl -y --version=2017.11.10
+        echo "##vso[task.setvariable variable=IASL_PREFIX;]C:\tools\ASL\"
+
+    - ${{ parameters.extra_repo_clone_step }}
+
+    steps:
+    - script: python build_bios.py --platform WhiskeylakeURvp
+      displayName: Build platform WhiskeylakeURvp
+      workingDirectory: edk2-platforms\Platform\Intel
+
+resources:
+  repositories:
+  - repository: edk2-platforms
+    type: github
+    endpoint: td36
+    name: tianocore/edk2-platforms
+  - repository: edk2-non-osi
+    type: github
+    endpoint: td36
+    name: tianocore/edk2-non-osi
+  - repository: FSP
+    type: github
+    endpoint: td36
+    name: intel/FSP
+
+jobs:
+  - job: Edk2Platform_CI
+    pool:
+      vmImage: 'windows-latest'
+
+    steps:
+    - checkout: self
+      submodules: true
+    - checkout: edk2-non-osi
+    - checkout: FSP
+    - checkout: edk2-platforms
+
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: "3.8.x"
+        architecture: "x64"
+    
+    - powershell: |
+        choco install iasl -y --version=2017.11.10
+        echo "##vso[task.setvariable variable=IASL_PREFIX;]C:\tools\ASL\"
+        choco install nasm -y
+        echo "##vso[task.setvariable variable=NASM_PREFIX;]C:\Program Files\NASM\"
+      displayName: Windows EDK II Prerequisites
+
+    - script: python build_bios.py --platform WhiskeylakeURvp
+      displayName: Build platform WhiskeylakeURvp
+      workingDirectory: edk2-platforms\Platform\Intel
+
+
+###
+
+## @file
+# Core CI configuration for UefiPayloadPkg
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+trigger:
+- master
+pr:
+- master
+
+resources:
+  repositories:
+  - repository: edk2-platforms
+    type: github
+    endpoint: td36
+    name: tianocore/edk2-platforms
+  - repository: edk2-non-osi
+    type: github
+    endpoint: td36
+    name: tianocore/edk2-non-osi
+  - repository: FSP
+    type: github
+    endpoint: td36
+    name: intel/FSP
+ 
+jobs:
+  - job: Edk2Platform_CI
+    pool:
+      vmImage: 'windows-latest'
+
+    strategy:
+      matrix:
+        WHISKEYLAKEOPENBOARD_WHISKEYLAKEURVP:
+          Board.Name: "WhiskeylakeURvp"
+        WHISKEYLAKEOPENBOARD_UPXTREME:
+          Board.Name: "UpXtreme"
+
+    steps:
+    - template: edk2platforms-run-steps.yml
+      parameters:
+        board_name: $(Board.Name)
+
+
+
+
+parameters:
+- name: board_name
+  type: string
+  default: ''
+
+steps:
+- checkout: self
+  submodules: true
+- checkout: edk2-non-osi
+- checkout: FSP
+- checkout: edk2-platforms
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: "3.8.x"
+    architecture: "x64"
+
+- powershell: |
+    choco install iasl -y --version=2017.11.10
+    echo "##vso[task.setvariable variable=IASL_PREFIX;]C:\tools\ASL\"
+    choco install nasm -y
+    echo "##vso[task.setvariable variable=NASM_PREFIX;]C:\Program Files\NASM\"
+  displayName: Windows EDK II Prerequisites
+
+- script: python build_bios.py --platform ${{ parameters.board_name}}
+  displayName: Build platform ${{ parameters.board_name}}
+  workingDirectory: edk2-platforms\Platform\Intel
+###
+
+
+  - bash : |
+      . edksetup.sh
+      echo $PATH
+    displayName: Set Path of build
+    workingDirectory: edk2/
+
+
+    ###
+    - ${{ if contains(parameters.pool_name, 'ubuntu') }}:
+  - bash: |
+      sudo apt-get update
+      sudo apt-get install gcc g++ make uuid-dev nasm
+      sudo apt-get install -y iasl
+    displayName: Update apt and Install required tools
+  - script: |
+      source edksetup.sh
+      cd ../edk2-platforms/Platform/Intel
+      echo this is $PATH
+      python build_bios.py --platform ${{ parameters.board_name}}
+    displayName: Build platform ${{ parameters.board_name}}
+    workingDirectory: edk2/
+
+- ${{ if contains(parameters.pool_name, 'windows') }}:
+  - powershell: |
+      choco install iasl -y --version=2017.11.10
+      echo "##vso[task.setvariable variable=IASL_PREFIX;]C:\tools\ASL\"
+      choco install nasm -y
+      echo "##vso[task.setvariable variable=NASM_PREFIX;]C:\Program Files\NASM\"
+    displayName: Windows EDK II Prerequisites
+  - script: python build_bios.py --platform ${{ parameters.board_name}}
+    displayName: Build platform ${{ parameters.board_name}}
+    workingDirectory: edk2-platforms/Platform/Intel
