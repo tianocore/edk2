@@ -142,8 +142,10 @@ INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
 !if $(SERIAL_DRIVER_ENABLE) == TRUE
 INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 !endif
-!if $(PS2_KEYBOARD_ENABLE) == TRUE
+!if $(SIO_BUS_ENABLE) == TRUE
 INF OvmfPkg/SioBusDxe/SioBusDxe.inf
+!endif
+!if $(PS2_KEYBOARD_ENABLE) == TRUE
 INF MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
 !endif
 INF MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
@@ -171,8 +173,9 @@ INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
 INF MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
 INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 INF MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+!if $(RAM_DISK_ENABLE) == TRUE
 INF MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
-
+!endif
 INF FatPkg/EnhancedFatDxe/Fat.inf
 
 #
