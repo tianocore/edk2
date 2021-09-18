@@ -28,6 +28,8 @@
 
   DEFINE SOURCE_DEBUG_ENABLE          = FALSE
   DEFINE PS2_KEYBOARD_ENABLE          = FALSE
+  DEFINE RAM_DISK_ENABLE              = FALSE
+  DEFINE SIO_BUS_ENABLE               = FALSE
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
 
   #
@@ -536,8 +538,10 @@
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
-  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 
+!if $(RAM_DISK_ENABLE) == TRUE
+  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+!endif
   #
   # SD/eMMC Support
   #
@@ -562,8 +566,10 @@
 !if $(SERIAL_DRIVER_ENABLE) == TRUE
   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 !endif
-!if $(PS2_KEYBOARD_ENABLE) == TRUE
+!if $(SIO_BUS_ENABLE) == TRUE
   OvmfPkg/SioBusDxe/SioBusDxe.inf
+!endif
+!if $(PS2_KEYBOARD_ENABLE) == TRUE
   MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
 !endif
   MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
