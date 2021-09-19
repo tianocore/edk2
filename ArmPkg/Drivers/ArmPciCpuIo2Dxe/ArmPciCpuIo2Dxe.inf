@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -38,7 +39,7 @@
   UefiBootServicesTableLib
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdPciIoTranslation
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation
 
 [Protocols]
   gEfiCpuIo2ProtocolGuid                         ## PRODUCES

@@ -248,7 +248,7 @@
   # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xFFFFFFFFFFFFFFFF
 
-  gArmTokenSpaceGuid.PcdPciIoTranslation|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
 
   #
   # Set video resolution for boot options and for text setup.

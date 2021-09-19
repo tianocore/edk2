@@ -37,7 +37,7 @@
   gFdtClientProtocolGuid                                      ## CONSUMES
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdPciIoTranslation                      ## PRODUCES
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation                ## PRODUCES
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress           ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration  ## PRODUCES
 

@@ -49,7 +49,7 @@
   gArmTokenSpaceGuid.PcdPciMmio64Translation
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdPciIoTranslation
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
 
 [Depex]
