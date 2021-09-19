@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -283,7 +283,7 @@ PeiMemoryDiscoveredNotify (
     return EFI_DEVICE_ERROR;
   }
 
-  if (PcdGet32 (PcdFspsUpdDataAddress) == 0 && (FspsHeaderPtr->CfgRegionSize != 0) && (FspsHeaderPtr->CfgRegionOffset != 0)) {
+  if (GetFspsUpdDataAddress () == 0 && (FspsHeaderPtr->CfgRegionSize != 0) && (FspsHeaderPtr->CfgRegionOffset != 0)) {
     //
     // Copy default FSP-S UPD data from Flash
     //
@@ -292,7 +292,7 @@ PeiMemoryDiscoveredNotify (
     SourceData = (UINTN *)((UINTN)FspsHeaderPtr->ImageBase + (UINTN)FspsHeaderPtr->CfgRegionOffset);
     CopyMem (FspsUpdDataPtr, SourceData, (UINTN)FspsHeaderPtr->CfgRegionSize);
   } else {
-    FspsUpdDataPtr = (FSPS_UPD_COMMON *)PcdGet32 (PcdFspsUpdDataAddress);
+    FspsUpdDataPtr = (FSPS_UPD_COMMON *) GetFspsUpdDataAddress ();
     ASSERT (FspsUpdDataPtr != NULL);
   }
 

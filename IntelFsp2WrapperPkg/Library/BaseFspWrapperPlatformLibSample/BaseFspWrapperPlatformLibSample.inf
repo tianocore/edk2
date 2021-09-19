@@ -1,7 +1,7 @@
 ## @file
 #  Sample to provide FSP wrapper platform related function.
 #
-#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -35,6 +35,12 @@
 [Sources]
   FspWrapperPlatformLibSample.c
 
+[Sources.IA32]
+  IA32/FspHelper.c
+
+[Sources.X64]
+  IA32/FspHelper.c
+
 
 ################################################################################
 #
@@ -48,5 +54,14 @@
   IntelFsp2Pkg/IntelFsp2Pkg.dec
   IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
 
+[Pcd.IA32]
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress    ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress    ## CONSUMES
+
+[Pcd.X64]
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress64  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress64  ## CONSUMES
+
 [LibraryClasses]
+  PcdLib
 

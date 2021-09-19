@@ -1,7 +1,7 @@
 /** @file
   Provide FSP wrapper platform related function.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -75,6 +75,28 @@ VOID
 EFIAPI
 CallFspWrapperResetSystem (
   IN UINT32    FspStatusResetType
+  );
+
+/**
+  Get the Fspm Upd Data Address from the PCD
+
+  @return FSPM UPD Data Address
+**/
+UINTN
+EFIAPI
+GetFspmUpdDataAddress (
+  VOID
+  );
+
+/**
+  Get the Fsps Upd Data Address from the PCD
+
+  @return FSPS UPD Data Address
+**/
+UINTN
+EFIAPI
+GetFspsUpdDataAddress (
+  VOID
   );
 
 #endif
