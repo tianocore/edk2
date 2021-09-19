@@ -2,6 +2,7 @@
 *  High memory node enumeration DXE driver for ARM Virtual Machines
 *
 *  Copyright (c) 2015-2016, Linaro Ltd. All rights reserved.
+*  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
