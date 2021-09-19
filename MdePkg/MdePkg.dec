@@ -2302,6 +2302,10 @@
   # @Prompt PCI Express Base Address.
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
 
+  ## This value is used to set the base address of PCI MMIO window that provides I/O access.
+  # @Prompt PCI I/O Memory Map Window Base Address.
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0|UINT64|0x0000001b
+
   ## This value is used to set the size of PCI express hierarchy. The default is 256 MB.
   # @Prompt PCI Express Base Size.
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|0x10000000|UINT64|0x0000000f
