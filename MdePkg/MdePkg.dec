@@ -2306,6 +2306,14 @@
   # @Prompt PCI I/O Memory Map Window Base Address.
   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0|UINT64|0x00000040
 
+  ## This value is used for the 32-bit PCI memory map I/O base address translation.
+  # @Prompt 32-bit PCI Memory Map I/O Base Address translation.
+  gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation|0x0|UINT64|0x00000041
+
+  ## This value is used for the 64-bit PCI memory map I/O base address translation.
+  # @Prompt 64-bit PCI Memory Map I/O Base Address translation.
+  gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation|0x0|UINT64|0x00000042
+
   ## This value is used to set the size of PCI express hierarchy. The default is 256 MB.
   # @Prompt PCI Express Base Size.
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|0x10000000|UINT64|0x0000000f
