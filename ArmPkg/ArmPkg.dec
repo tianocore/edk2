@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011 - 2021, ARM Limited. All rights reserved.
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -337,7 +338,7 @@
   #   UINT64 Mmio32CpuBase; // mapping target in 64-bit cpu-physical space
   #   UINT64 Mmio64CpuBase; // mapping target in 64-bit cpu-physical space
   #
-  #   PcdPciIoTranslation     = IoCpuBase     - PcdPciIoBase;
+  #   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation = IoCpuBase - PcdPciIoBase;
   #   PcdPciMmio32Translation = Mmio32CpuBase - (UINT64)PcdPciMmio32Base;
   #   PcdPciMmio64Translation = Mmio64CpuBase - PcdPciMmio64Base;
   #
@@ -356,7 +357,7 @@
   #   UINT64 TranslatedMmio64Address;   // output parameter
   #
   #   TranslatedIoAddress     = UntranslatedIoAddress +
-  #                             PcdPciIoTranslation;
+  #                             gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation;
   #   TranslatedMmio32Address = (UINT64)UntranslatedMmio32Address +
   #                             PcdPciMmio32Translation;
   #   TranslatedMmio64Address = UntranslatedMmio64Address +
@@ -369,7 +370,6 @@
   #
   gArmTokenSpaceGuid.PcdPciIoBase|0x0|UINT64|0x00000050
   gArmTokenSpaceGuid.PcdPciIoSize|0x0|UINT64|0x00000051
-  gArmTokenSpaceGuid.PcdPciIoTranslation|0x0|UINT64|0x00000052
   gArmTokenSpaceGuid.PcdPciMmio32Base|0x0|UINT32|0x00000053
   gArmTokenSpaceGuid.PcdPciMmio32Size|0x0|UINT32|0x00000054
   gArmTokenSpaceGuid.PcdPciMmio32Translation|0x0|UINT64|0x00000055
