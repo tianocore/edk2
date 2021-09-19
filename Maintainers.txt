@@ -463,6 +463,12 @@ R: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Min Xu <min.m.xu@intel.com> [mxu9]
 R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
 
+OvmfPkg: FDT related modules
+F: OvmfPkg/Fdt/Cc: Leif Lindholm <leif@nuviainc.com>
+R: Leif Lindholm <leif@nuviainc.com>
+R: Gerd Hoffmann <kraxel@redhat.com>
+R: Abner Chang <abner.chang@hpe.com>
+
 OvmfPkg: LsiScsi driver
 F: OvmfPkg/LsiScsiDxe/
 R: Gary Lin <glin@suse.com>
