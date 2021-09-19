@@ -24,17 +24,16 @@
 # The following information is for reference only and not required by the build
 # tools.
 #
-#  VALID_ARCHITECTURES           = ARM AARCH64
+#  VALID_ARCHITECTURES           = ARM AARCH64 RISCV64
 #
 
 [Sources]
-  QemuFwCfgLib.c
+  QemuFwCfgLibMMIO.c
 
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  ArmVirtPkg/ArmVirtPkg.dec
 
 [LibraryClasses]
   BaseLib
