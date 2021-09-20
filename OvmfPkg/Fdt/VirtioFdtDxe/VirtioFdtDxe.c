@@ -2,6 +2,7 @@
 *  Virtio FDT client protocol driver for virtio,mmio DT node
 *
 *  Copyright (c) 2014 - 2016, Linaro Ltd. All rights reserved.<BR>
+*  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
