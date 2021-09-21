@@ -62,6 +62,8 @@ UINT32          PciDevice = 0;
 #define XMIT_WRITE(dev)         (((dev) << 1) | 0)
 #define XMIT_READ(dev)          (((dev) << 1) | 1)
 
+#define SMBUS_TIMEOUT           (10 * 1000 * 100)
+
 STATIC
 UINT16
 EFIAPI
@@ -368,6 +370,88 @@ SmbusWriteOperation (
 }
 
 STATIC
+BOOLEAN
+HostCompleted(
+  IN UINT8 Status
+  )
+{
+  if (Status & SMBHSTSTS_HOST_BUSY)
+    return 0;
+
+  Status &= ~(SMBHSTSTS_BYTE_DONE | SMBHSTSTS_INUSE_STS | SMBHSTSTS_SMBALERT_STS);
+
+  return Status != 0;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+SmbusBlockWriteOperation (
+  IN CONST  UINT16                    IoBase,
+  IN CONST  EFI_SMBUS_HC_PROTOCOL     *This,
+  IN        EFI_SMBUS_DEVICE_ADDRESS  SlaveAddress,
+  IN        EFI_SMBUS_DEVICE_COMMAND  Command,
+  IN        BOOLEAN                   PecCheck,
+  IN OUT    UINTN                     *Length,
+  IN OUT    VOID                      *Buffer
+  )
+{
+  EFI_STATUS                           Status;
+  UINT8                                *Buf = Buffer;
+  UINT8                                SmbusStatus;
+  UINTN                                BytesWritten = 0;
+  UINTN                                Loops = SMBUS_TIMEOUT;
+
+  if (!Buffer || !Length) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  /* Set up for a byte data read. */
+  Status = SmbusSetupCommand (IoBase, I801_BLOCK_DATA, XMIT_WRITE(SlaveAddress.SmbusDeviceAddress));
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  IoWrite8 (IoBase + SMBHSTCMD, Command);
+
+  /* Set number of bytes to transfer */
+  IoWrite8(IoBase + SMBHSTDAT0, *Length);
+
+  /* Sent first byte.  */
+  IoWrite8(IoBase + SMBBLKDAT, *Buf++);
+
+  /* Start the command */
+  Status = SmbusExecuteCommand(IoBase);
+  if (EFI_ERROR(Status)) {
+    return Status;
+  }
+
+  do {
+    SmbusStatus = IoRead8(IoBase + SMBHSTSTAT);
+
+    if (SmbusStatus & SMBHSTSTS_BYTE_DONE) {
+      BytesWritten++;
+      if (BytesWritten < *Length)
+        IoWrite8(IoBase + SMBBLKDAT, *Buf++);
+      /* Clear the bytes done byte. */
+      IoWrite8(IoBase + SMBHSTSTAT, SMBHSTSTS_BYTE_DONE);
+    }
+  } while (--Loops && !HostCompleted(SmbusStatus));
+
+  if (Loops == 0)
+    return RETURN_TIMEOUT;
+
+  SmbusStatus &= ~(SMBHSTSTS_BYTE_DONE | SMBHSTSTS_INUSE_STS | SMBHSTSTS_SMBALERT_STS);
+  if (SmbusStatus != SMBHSTSTS_INTR)
+    return RETURN_DEVICE_ERROR;
+
+  if (BytesWritten < *Length)
+    return RETURN_DEVICE_ERROR;
+
+  return EFI_SUCCESS;
+}
+
+STATIC
 EFI_STATUS
 EFIAPI
 SmbusExecuteOperation (
@@ -409,6 +493,16 @@ SmbusExecuteOperation (
     );
   } else if (Operation == EfiSmbusWriteByte) {
     return SmbusWriteOperation (
+      IoBase,
+      This,
+      SlaveAddress,
+      Command,
+      PecCheck,
+      Length,
+      Buffer
+    );
+  } else if (Operation == EfiSmbusWriteBlock) {
+    return SmbusBlockWriteOperation (
       IoBase,
       This,
       SlaveAddress,
