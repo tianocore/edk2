@@ -325,3 +325,70 @@ ArmClearMemoryRegionReadOnly (
   }
   return Status;
 }
+
+/**
+  Placeholder function to fulfill API.
+
+  @param [in]  MemoryTable
+  @param [out] TranslationTableBase
+  @param [out] TranslationTableSize
+
+  @retval EFI_UNSUPPORTED         This function is not implemented by the
+                                  callee.
+
+**/
+EFI_STATUS
+EFIAPI
+ArmConfigureMmu (
+  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable,
+  OUT VOID                          **TranslationTableBase OPTIONAL,
+  OUT UINTN                         *TranslationTableSize  OPTIONAL
+  )
+{
+  DEBUG ((DEBUG_ERROR, "%a() interface not implemented!\n", __FUNCTION__));
+  ASSERT (FALSE);
+  return EFI_UNSUPPORTED;
+}
+
+/**
+  Placeholder function to fulfill API.
+
+  @param [in]  Entry
+  @param [in]  Value
+  @param [in]  RegionStart
+
+**/
+VOID
+EFIAPI
+ArmReplaceLiveTranslationEntry (
+  IN  UINT64  *Entry,
+  IN  UINT64  Value,
+  IN  UINT64  RegionStart
+  )
+{
+  DEBUG ((DEBUG_ERROR, "%a() interface not implemented!\n", __FUNCTION__));
+  ASSERT (FALSE);
+}
+
+/**
+  Placeholder function to fulfill API.
+
+  @param [in]  BaseAddress
+  @param [in]  Length
+  @param [in]  Attributes
+
+  @retval EFI_UNSUPPORTED         This function is not implemented by the
+                                  callee.
+
+**/
+EFI_STATUS
+ArmSetMemoryAttributes (
+  IN EFI_PHYSICAL_ADDRESS      BaseAddress,
+  IN UINT64                    Length,
+  IN UINT64                    Attributes
+  )
+{
+  DEBUG ((DEBUG_ERROR, "%a() interface not implemented!\n", __FUNCTION__));
+  ASSERT (FALSE);
+  return EFI_UNSUPPORTED;
+}
