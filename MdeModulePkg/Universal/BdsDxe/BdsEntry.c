@@ -649,6 +649,80 @@ BdsFormalizeEfiGlobalVariable (
 }
 
 /**
+  Returns the boot option type of a device
+  @param DevicePath             The path of device whose boot option type
+                                to be returned
+  @retval -1                    Device type not found
+  @retval > -1                  Device type found
+**/
+STATIC
+UINT8
+BootOptionType (
+  IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL      *Node;
+  EFI_DEVICE_PATH_PROTOCOL      *NextNode;
+
+  for (Node = DevicePath; !IsDevicePathEndType (Node); Node = NextDevicePathNode (Node)) {
+    if (DevicePathType (Node) == MESSAGING_DEVICE_PATH) {
+      //
+      // Make sure the device path points to the driver device.
+      //
+      NextNode = NextDevicePathNode (Node);
+      if (DevicePathSubType(NextNode) == MSG_DEVICE_LOGICAL_UNIT_DP) {
+        //
+        // if the next node type is Device Logical Unit, which specify the Logical Unit Number (LUN),
+        // skip it
+        //
+        NextNode = NextDevicePathNode (NextNode);
+      }
+      if (IsDevicePathEndType (NextNode))
+        return DevicePathSubType (Node);
+    }
+  }
+
+  return (UINT8) -1;
+}
+
+STATIC
+BOOLEAN
+IsBootTypeMatch(
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *BootOption,
+  IN UINT8 OverrideType
+  ) {
+  switch (OverrideType) {
+  case BootOverridePXE:
+    if (StrCmp(BootOption->Description, L"iPXE Network boot") == 0)
+      return 1;
+    }
+    break;
+  case BootOverrideSATA:
+    if (BootOptionType(BootOption->FilePath) == MSG_SATA_DP)
+      return 1;
+    break;
+  case BootOverrideNVME:
+    if (BootOptionType(BootOption->FilePath) == MSG_NVME_NAMESPACE_DP)
+      return 1;
+    break;
+  case BootOverrideCD:
+      if (BootOptionType(BootOption->FilePath) == MSG_UFS_DP ||
+          BootOptionType(BootOption->FilePath) == MSG_ATAPI_DP)
+        return 1;
+    break;
+  case BootOverrideSetupMenu:
+    if (StrCmp(BootOption->Description, L"UiApp") == 0)
+      return 1;
+    break;
+  case BootOverrideUSB:
+    if (BootOptionType(BootOption->FilePath) == MSG_USB_DP)
+      return 1;
+    break;
+  }
+  // No match
+  return 0;
+}
+/**
 
   Service routine for BdsInstance->Entry(). Devices are connected, the
   consoles are initialized, and the boot options are tried.
@@ -955,6 +1029,30 @@ BdsEntry (
     }
     DEBUG ((EFI_D_INFO, "[Bds]=============End Load Options Dumping=============\n"));
   );
+
+  //
+  // Override the boot option type from the Board SMBUS settings.
+  //
+
+  UINT16 OverrideBoot;
+  UINT8 OverrideBootType;
+  UINTN OverrideBootTypeSize;
+  // Fetch Board Settings
+  Status = gRT->GetVariable(BOARD_BOOT_OVERRIDE_NAME,
+                            &gEfiBoardBootOverrideVariableGuid, NULL,
+                            &OverrideBootTypeSize, &OverrideBootType);
+  LoadOptions = EfiBootManagerGetLoadOptions(&LoadOptionCount, LoadOptionTypeBoot);
+  if (EFI_ERROR(Status)) {
+    DEBUG((EFI_D_ERROR, "Fetching Board Boot type override errored with %x\n", Status));
+  } else {
+    for (Index = 0; Index < LoadOptionCount; Index++) {
+      if (IsBootTypeMatch(&LoadOptions[Index], OverrideBootType)) {
+        OverrideBoot = Index;
+        BootNext = &OverrideBoot;
+        break;
+      }
+    }
+  }
 
   //
   // BootManagerMenu doesn't contain the correct information when return status is EFI_NOT_FOUND.

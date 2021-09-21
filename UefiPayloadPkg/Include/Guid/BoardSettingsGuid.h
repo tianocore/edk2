@@ -13,6 +13,7 @@
 /// Board information GUID
 ///
 extern EFI_GUID gEfiBoardSettingsVariableGuid;
+extern EFI_GUID gEfiBoardBootOverrideVariableGuid;
 
 #pragma pack(1)
 
@@ -40,8 +41,27 @@ typedef struct {
 #define PRIMARY_VIDEO_SLOT5 6
 #define PRIMARY_VIDEO_SLOT6 7
 
+typedef struct {
+  UINT16 StructSize;
+  UINT32 Checksum;
+  UINT8  Flags;
+  UINT8  BootOptionOverride;
+} BOARD_BOOT_OVERRIDE;
+
+enum BoardBootOverride {
+  BootOverrideNone = 0,
+  BootOverridePXE = 1,
+  BootOverrideSATA = 2,
+  BootOverrideNVME = 3,
+  BootOverrideCD = 4,
+  BootOverrideSetupMenu = 5,
+  BootOverrideUSB = 6,
+  BootOverrideMax
+};
+
 #pragma pack()
 
 #define BOARD_SETTINGS_NAME L"BoardSettings"
+#define BOARD_BOOT_OVERRIDE_NAME L"BoardBootOverride"
 
 #endif // __BOARD_SETTINGS_GUID_H__

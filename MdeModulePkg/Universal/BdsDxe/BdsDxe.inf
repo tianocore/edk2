@@ -37,6 +37,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
 
 [LibraryClasses]
   DevicePathLib
@@ -73,6 +74,7 @@
   gConnectConInEventGuid                        ## SOMETIMES_CONSUMES ## Event
   gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
   gEfiEventReadyToBootGuid                      ## CONSUMES           ## Event
+  gEfiBoardBootOverrideVariableGuid             ## CONSUMES
 
 [Protocols]
   gEfiBdsArchProtocolGuid                       ## PRODUCES

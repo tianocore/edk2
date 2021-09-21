@@ -8,12 +8,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "SMBusConfigLoader.h"
-#include <Library/SmbusLib.h>
-#include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
 #include <Library/PciLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/SmbusLib.h>
+#include <Library/TimerLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Guid/GlobalVariable.h>
 #include <Guid/AuthenticatedVariableFormat.h>
@@ -83,6 +84,62 @@ ReadBoardOptionFromEEPROM (
     Value = SmBusProcessCall(SMBUS_LIB_ADDRESS(0x57, 0, 0, 0), ((Index & 0xff) << 8) | ((Index & 0xff00) >> 8), &Status);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Failed to read SMBUS byte at offset 0x%x\n", Index));
+      return Status;
+    }
+    CopyMem(&Buffer[Index-BOARD_SETTINGS_OFFSET], &Value, sizeof(Value));
+  }
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+WriteToEEPROM(const IN UINT8 Data, const IN UINT16 Offset) {
+  EFI_STATUS Status;
+
+  UINT8 buffer[2] = {
+    Offset & 0xff,
+    Data,
+  };
+
+  for (INTN retry = 3; retry > 0; retry--) {
+    SmBusWriteBlock(SMBUS_LIB_ADDRESS(0x57, Offset >> 8, sizeof(buffer), 0),
+                    buffer, &Status);
+    if (!EFI_ERROR(Status))
+      break;
+    /* Maximum of 5 milliseconds write duration */
+    MicroSecondDelay(5000);
+  }
+
+  if (EFI_ERROR(Status)) {
+    DEBUG(
+          (DEBUG_ERROR, "Failed to write SMBUS byte at offset 0x%x\n", Offset));
+    return Status;
+  }
+  return EFI_SUCCESS;
+  }
+
+/**
+  ReadBootOverrideFromEEPROM
+
+  @param Buffer         Pointer to the Buffer Array
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+ReadBootOverrideFromEEPROM(IN OUT UINT8 *Buffer, IN UINT32 Size) {
+  EFI_STATUS Status;
+  UINT16 Index;
+  UINT16 Value;
+
+  for (Index = BOARD_BOOT_OVERRIDE_OFFSET;
+       Index < BOARD_BOOT_OVERRIDE_OFFSET + Size; Index += 2) {
+    Value = SmBusProcessCall(SMBUS_LIB_ADDRESS(0x57, 0, 0, 0),
+                             ((Index & 0xff) << 8) | ((Index & 0xff00) >> 8),
+                             &Status);
+    if (EFI_ERROR(Status)) {
+      DEBUG((DEBUG_ERROR, "Failed to read SMBUS byte at offset 0x%x\n", Index));
       return Status;
     }
     CopyMem(&Buffer[Index-BOARD_SETTINGS_OFFSET], &Value, sizeof(Value));
@@ -162,6 +219,8 @@ InstallSMBusConfigLoader (
   UINT32                    CRC32Array;
   UINT32                    HostCBackup;
   UINT8                     Array[sizeof(BOARD_SETTINGS)];
+  BOARD_BOOT_OVERRIDE       BootOverride;
+  UINT8                     BootOverrideType;
 
   DEBUG ((DEBUG_INFO, "SMBusConfigLoader: InstallSMBusConfigLoader\n"));
 
@@ -169,6 +228,13 @@ InstallSMBusConfigLoader (
   if (BaseAddress == 0) {
     return EFI_NOT_FOUND;
   }
+
+  // Always clear the Boot Override.
+  Status =
+      gRT->SetVariable(BOARD_BOOT_OVERRIDE_NAME,           // Variable Name
+                       &gEfiBoardBootOverrideVariableGuid, // Variable Guid
+                       (EFI_VARIABLE_BOOTSERVICE_ACCESS), // Variable Attributes
+                       sizeof(BootOverrideType), &BootOverrideType);
 
   ZeroMem(&BoardSettings, sizeof(BOARD_SETTINGS));
 
@@ -195,6 +261,44 @@ InstallSMBusConfigLoader (
   if (EFI_ERROR(Status) || (CRC32Array != BoardSettings.Signature)) {
     BoardSettings.PrimaryVideo = 0;
     BoardSettings.SecureBoot = 1;
+  }
+
+  Status = ReadBootOverrideFromEEPROM((UINT8 *)&BootOverride, sizeof(BootOverride));
+  if (!EFI_ERROR(Status)) {
+    DEBUG((DEBUG_INFO, "SMBusConfigLoader: Boot Override:\n"));
+    DEBUG((DEBUG_INFO,
+           "SMBusConfigLoader: StructSize: %04x - CRC: %08x - "
+           "Flags: %02x - BootOptionOverride: %02x\n",
+           BootOverride.StructSize, BootOverride.Checksum,
+           BootOverride.Flags, BootOverride.BootOptionOverride
+           ));
+    CRC32Array = CalculateCrc32((UINT8 *)&BootOverride.Flags, sizeof(BOARD_BOOT_OVERRIDE) - OFFSET_OF(BOARD_BOOT_OVERRIDE, Flags));
+    if (CRC32Array != BootOverride.Checksum) {
+      DEBUG((DEBUG_ERROR,"SMBusConfigLoader: Boot Override, Checksum invalid\n"));
+    } else {
+      BootOverrideType = BootOverride.BootOptionOverride;
+
+      Status = gRT->SetVariable(
+          BOARD_BOOT_OVERRIDE_NAME,           // Variable Name
+          &gEfiBoardBootOverrideVariableGuid, // Variable Guid
+          (EFI_VARIABLE_BOOTSERVICE_ACCESS),  // Variable Attributes
+          sizeof(BootOverrideType), &BootOverrideType);
+
+      BOOLEAN DoOnce = BootOverride.Flags & 1;
+      if (DoOnce) {
+        UINT8 *Byte = (UINT8 *)&BootOverride;
+        BootOverride.Flags = 0;
+        BootOverride.BootOptionOverride = 0;
+        BootOverride.Checksum = CalculateCrc32(
+            (UINT8 *)&BootOverride.Flags,
+            sizeof(BOARD_BOOT_OVERRIDE) - OFFSET_OF(BOARD_BOOT_OVERRIDE, Flags));
+        for (INTN Index = OFFSET_OF(BOARD_BOOT_OVERRIDE, Checksum); Index < sizeof(BOARD_BOOT_OVERRIDE); Index++) {
+          Status = WriteToEEPROM(*(Byte + Index), BOARD_BOOT_OVERRIDE_OFFSET + Index);
+          if (EFI_ERROR(Status))
+            DEBUG((DEBUG_ERROR, "SMBusConfigLoader: error writing boot override flags\n"));
+        }
+      }
+    }
   }
 
   // Set SecureBootEnable. Only affects SecureBootSetupDxe.

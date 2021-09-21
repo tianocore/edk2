@@ -36,6 +36,7 @@
   gEfiBoardSettingsVariableGuid
   gEfiSecureBootEnableDisableGuid
   gEfiGlobalVariableGuid
+  gEfiBoardBootOverrideVariableGuid
 
 [LibraryClasses]
   UefiDriverEntryPoint
@@ -43,6 +44,7 @@
   SmbusLib
   UefiRuntimeServicesTableLib
   PciLib
+  TimerLib
 
 [Depex]
   gEfiSmbusHcProtocolGuid AND

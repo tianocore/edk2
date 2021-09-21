@@ -9,11 +9,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _BDS_MODULE_H_
 #define _BDS_MODULE_H_
 
-#include <Uefi.h>
-#include <Guid/GlobalVariable.h>
 #include <Guid/ConnectConInEvent.h>
-#include <Guid/StatusCodeDataTypeVariable.h>
 #include <Guid/EventGroup.h>
+#include <Guid/GlobalVariable.h>
+#include <Guid/StatusCodeDataTypeVariable.h>
+#include <Uefi.h>
+
+#include <Guid/BoardSettingsGuid.h>
 
 #include <Protocol/Bds.h>
 #include <Protocol/LoadedImage.h>
