@@ -13,7 +13,7 @@
   FILE_GUID                      = da8f0232-fb14-42f0-922c-63104d2c70bd
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ArmMmuLib
+  LIBRARY_CLASS                  = ArmMmuLib | DXE_DRIVER PEIM PEI_CORE DXE_CORE DXE_RUNTIME_DRIVER SEC
 
 [Defines.AARCH64]
   CONSTRUCTOR                    = ArmMmuBaseLibConstructor
