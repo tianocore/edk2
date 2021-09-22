@@ -22,11 +22,11 @@ IoMmuDxeEntryPoint (
   EFI_HANDLE  Handle;
 
   //
-  // When SEV is enabled, install IoMmu protocol otherwise install the
+  // When SEV or TDX is enabled, install IoMmu protocol otherwise install the
   // placeholder protocol so that other dependent module can run.
   //
-  if (MemEncryptSevIsEnabled ()) {
-    Status = AmdSevInstallIoMmuProtocol ();
+  if (MemEncryptSevIsEnabled () || MemEncryptTdxIsEnabled ()) {
+    Status = InstallIoMmuProtocol ();
   } else {
     Handle = NULL;
 
