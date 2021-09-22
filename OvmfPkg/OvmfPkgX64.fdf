@@ -213,6 +213,7 @@ READ_LOCK_STATUS   = TRUE
 APRIORI DXE {
   INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  INF  OvmfPkg/TdxDxe/TdxDxe.inf
   INF  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
 !if $(SMM_REQUIRE) == FALSE
   INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
@@ -317,6 +318,8 @@ INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
 
 INF MdeModulePkg/Logo/LogoDxe.inf
+
+INF OvmfPkg/TdxDxe/TdxDxe.inf
 
 #
 # Network modules
