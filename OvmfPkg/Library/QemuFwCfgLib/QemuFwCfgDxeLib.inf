@@ -43,6 +43,7 @@
   IoLib
   MemoryAllocationLib
   MemEncryptSevLib
+  MemEncryptTdxLib
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
