@@ -1,0 +1,13 @@
+// /** @file
+// Timer Architectural Protocol module using Local APIC Timer
+//
+// Copyright (c) 2011 - 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Timer Architectural Protocol module using Local APIC Timer"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Timer Architectural Protocol module using Local APIC Timer."

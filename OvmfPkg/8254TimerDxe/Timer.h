@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Cpu.h>
 #include <Protocol/Legacy8259.h>
 #include <Protocol/Timer.h>
+#include <Protocol/TimerSelector.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>

@@ -369,6 +369,15 @@
   ## The Tdx accept page size. 0x1000(4k),0x200000(2M)
   gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize|0x1000|UINT64|0x5a
 
+  ## This PCD specifies the Local APIC Interrupt Vector for the HPET Timer.
+  # @Prompt HPET local APIC vector.
+  gUefiOvmfPkgTokenSpaceGuid.PcdHpetLocalApicVector|0x40|UINT8|0x5b
+
+  ## This PCD specifies the default period of the HPET Timer in 100 ns units.
+  #  The default value of 100000 100 ns units is the same as 10 ms.
+  # @Prompt Default period of HPET timer.
+  gUefiOvmfPkgTokenSpaceGuid.PcdHpetDefaultTimerPeriod|100000|UINT64|0x5c
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
@@ -410,6 +419,11 @@
 
   ## TDX relocated Mailbox base address
   gUefiOvmfPkgTokenSpaceGuid.PcdTdRelocatedMailboxBase|0|UINT64|0x60
+
+  ## Timer selector
+  #  There are multiple timer in Ovmf. This PCD indicates which Timer is installed.
+  #  The default Timer is 8254 (0x0). See TimerSelector.h for more definition.
+  gUefiOvmfPkgTokenSpaceGuid.PcdTimerSelector|0|UINT32|0x61
 
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c

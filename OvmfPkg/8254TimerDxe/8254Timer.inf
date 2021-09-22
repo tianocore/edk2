@@ -36,6 +36,9 @@
   gEfiLegacy8259ProtocolGuid    ## CONSUMES
   gEfiTimerArchProtocolGuid     ## PRODUCES
 
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdTimerSelector
+
 [Depex]
   gEfiCpuArchProtocolGuid AND gEfiLegacy8259ProtocolGuid
 [UserExtensions.TianoCore."ExtraFiles"]

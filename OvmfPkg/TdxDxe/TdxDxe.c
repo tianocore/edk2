@@ -23,6 +23,7 @@
 #include <Library/UefiLib.h>
 #include <Library/HobLib.h>
 #include <Protocol/Cpu.h>
+#include <Protocol/TimerSelector.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <IndustryStandard/Tdx.h>
 #include <IndustryStandard/IntelTdx.h>
@@ -130,6 +131,8 @@ TdxDxeEntryPoint (
   if(GuidHob == NULL) {
     return EFI_UNSUPPORTED;
   }
+
+  PcdSet32S (PcdTimerSelector, TimerSelectorLocalApic);
 
   PlatformInfo = (EFI_HOB_PLATFORM_INFO *) GET_GUID_HOB_DATA (GuidHob);
 

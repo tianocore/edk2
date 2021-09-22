@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "8259.h"
+#include <Library/PcdLib.h>
 
 //
 // Global for the Legacy 8259 Protocol that is produced by this driver
