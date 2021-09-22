@@ -26,15 +26,20 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
+#  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
   DebugLib
   MemEncryptSevLib
+  MemEncryptTdxLib
   MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                     ## SOMETIME_PRODUCES

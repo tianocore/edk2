@@ -1,9 +1,9 @@
 /** @file
 
   The protocol provides support to allocate, free, map and umap a DMA buffer
-  for bus master (e.g PciHostBridge). When SEV is enabled, the DMA operations
-  must be performed on unencrypted buffer hence we use a bounce buffer to map
-  the guest buffer into an unencrypted DMA buffer.
+  for bus master (e.g PciHostBridge). When SEV or TDX is enabled, the DMA
+  operations must be performed on unencrypted buffer hence we use a bounce
+  buffer to map the guest buffer into an unencrypted DMA buffer.
 
   Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
@@ -12,6 +12,8 @@
 
 **/
 
+#include <Library/PcdLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 #include "AmdSevIoMmu.h"
 
 #define MAP_INFO_SIG SIGNATURE_64 ('M', 'A', 'P', '_', 'I', 'N', 'F', 'O')
@@ -74,7 +76,7 @@ typedef struct {
 
 /**
   Provides the controller-specific addresses required to access system memory
-  from a DMA bus master. On SEV guest, the DMA operations must be performed on
+  from a DMA bus master. On SEV/TDX guest, the DMA operations must be performed on
   shared buffer hence we allocate a bounce buffer to map the HostAddress to a
   DeviceAddress. The Encryption attribute is removed from the DeviceAddress
   buffer.
@@ -246,14 +248,29 @@ IoMmuMap (
     goto FreeMapInfo;
   }
 
-  //
-  // Clear the memory encryption mask on the plaintext buffer.
-  //
-  Status = MemEncryptSevClearPageEncMask (
-             0,
-             MapInfo->PlainTextAddress,
-             MapInfo->NumberOfPages
-             );
+  if (CC_GUEST_IS_SEV (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    //
+    // Clear the memory encryption mask on the plaintext buffer.
+    //
+    Status = MemEncryptSevClearPageEncMask (
+               0,
+               MapInfo->PlainTextAddress,
+               MapInfo->NumberOfPages
+               );
+  } else if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    //
+    // Set the memory shared bit.
+    //
+    Status = MemEncryptTdxSetPageSharedBit (
+               0,
+               MapInfo->PlainTextAddress,
+               MapInfo->NumberOfPages
+               );
+
+  } else {
+    ASSERT (FALSE);
+  }
+
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     CpuDeadLoop ();
@@ -353,7 +370,7 @@ IoMmuUnmapWorker (
   }
 
   MapInfo = (MAP_INFO *)Mapping;
-
+  Status  = EFI_SUCCESS;
   //
   // set CommonBufferHeader to suppress incorrect compiler/analyzer warnings
   //
@@ -399,15 +416,30 @@ IoMmuUnmapWorker (
     break;
   }
 
-  //
-  // Restore the memory encryption mask on the area we used to hold the
-  // plaintext.
-  //
-  Status = MemEncryptSevSetPageEncMask (
-             0,
-             MapInfo->PlainTextAddress,
-             MapInfo->NumberOfPages
-             );
+  if (CC_GUEST_IS_SEV (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    //
+    // Restore the memory encryption mask on the area we used to hold the
+    // plaintext.
+    //
+    Status = MemEncryptSevSetPageEncMask (
+               0,
+               MapInfo->PlainTextAddress,
+               MapInfo->NumberOfPages
+               );
+  } else if (CC_GUEST_IS_TDX (PcdGet64 (PcdConfidentialComputingGuestAttr))) {
+    //
+    // Restore the memory shared bit mask on the area we used to hold the
+    // plaintext.
+    //
+    Status = MemEncryptTdxClearPageSharedBit (
+               0,
+               MapInfo->PlainTextAddress,
+               MapInfo->NumberOfPages
+               );
+  } else {
+    ASSERT (FALSE);
+  }
+
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     CpuDeadLoop ();
@@ -731,7 +763,7 @@ IoMmuSetAttribute (
   return EFI_UNSUPPORTED;
 }
 
-EDKII_IOMMU_PROTOCOL  mAmdSev = {
+EDKII_IOMMU_PROTOCOL  mIoMmu = {
   EDKII_IOMMU_PROTOCOL_REVISION,
   IoMmuSetAttribute,
   IoMmuMap,
@@ -763,7 +795,7 @@ EDKII_IOMMU_PROTOCOL  mAmdSev = {
 STATIC
 VOID
 EFIAPI
-AmdSevExitBoot (
+IoMmuExitBoot (
   IN EFI_EVENT Event,
   IN VOID      *EventToSignal
   )
@@ -771,11 +803,11 @@ AmdSevExitBoot (
   //
   // (1) The NotifyFunctions of all the events in
   //     EFI_EVENT_GROUP_EXIT_BOOT_SERVICES will have been queued before
-  //     AmdSevExitBoot() is entered.
+  //     IoMmuExitBoot() is entered.
   //
-  // (2) AmdSevExitBoot() is executing minimally at TPL_CALLBACK.
+  // (2) IoMmuExitBoot() is executing minimally at TPL_CALLBACK.
   //
-  // (3) AmdSevExitBoot() has been queued in unspecified order relative to the
+  // (3) IoMmuExitBoot() has been queued in unspecified order relative to the
   //     NotifyFunctions of all the other events in
   //     EFI_EVENT_GROUP_EXIT_BOOT_SERVICES whose NotifyTpl is the same as
   //     Event's.
@@ -783,13 +815,13 @@ AmdSevExitBoot (
   // Consequences:
   //
   // - If Event's NotifyTpl is TPL_CALLBACK, then some other NotifyFunctions
-  //   queued at TPL_CALLBACK may be invoked after AmdSevExitBoot() returns.
+  //   queued at TPL_CALLBACK may be invoked after IoMmuExitBoot() returns.
   //
   // - If Event's NotifyTpl is TPL_NOTIFY, then some other NotifyFunctions
-  //   queued at TPL_NOTIFY may be invoked after AmdSevExitBoot() returns; plus
+  //   queued at TPL_NOTIFY may be invoked after IoMmuExitBoot() returns; plus
   //   *all* NotifyFunctions queued at TPL_CALLBACK will be invoked strictly
   //   after all NotifyFunctions queued at TPL_NOTIFY, including
-  //   AmdSevExitBoot(), have been invoked.
+  //   IoMmuExitBoot(), have been invoked.
   //
   // - By signaling EventToSignal here, whose NotifyTpl is TPL_CALLBACK, we
   //   queue EventToSignal's NotifyFunction after the NotifyFunctions of *all*
@@ -815,7 +847,7 @@ AmdSevExitBoot (
 STATIC
 VOID
 EFIAPI
-AmdSevUnmapAllMappings (
+IoMmuUnmapAllMappings (
   IN EFI_EVENT Event,
   IN VOID      *Context
   )
@@ -834,7 +866,7 @@ AmdSevUnmapAllMappings (
     NextNode = GetNextNode (&mMapInfos, Node);
     MapInfo = CR (Node, MAP_INFO, Link, MAP_INFO_SIG);
     IoMmuUnmapWorker (
-      &mAmdSev, // This
+      &mIoMmu,  // This
       MapInfo,  // Mapping
       TRUE      // MemoryMapLocked
       );
@@ -847,7 +879,7 @@ AmdSevUnmapAllMappings (
 **/
 EFI_STATUS
 EFIAPI
-AmdSevInstallIoMmuProtocol (
+InstallIoMmuProtocol (
   VOID
   )
 {
@@ -863,7 +895,7 @@ AmdSevInstallIoMmuProtocol (
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,      // Type
                   TPL_CALLBACK,           // NotifyTpl
-                  AmdSevUnmapAllMappings, // NotifyFunction
+                  IoMmuUnmapAllMappings,  // NotifyFunction
                   NULL,                   // NotifyContext
                   &UnmapAllMappingsEvent  // Event
                   );
@@ -878,7 +910,7 @@ AmdSevInstallIoMmuProtocol (
   Status = gBS->CreateEvent (
                   EVT_SIGNAL_EXIT_BOOT_SERVICES, // Type
                   TPL_CALLBACK,                  // NotifyTpl
-                  AmdSevExitBoot,                // NotifyFunction
+                  IoMmuExitBoot,                 // NotifyFunction
                   UnmapAllMappingsEvent,         // NotifyContext
                   &ExitBootEvent                 // Event
                   );
@@ -889,7 +921,7 @@ AmdSevInstallIoMmuProtocol (
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEdkiiIoMmuProtocolGuid, &mAmdSev,
+                  &gEdkiiIoMmuProtocolGuid, &mIoMmu,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
