@@ -19,7 +19,10 @@
 #include <Library/QemuFwCfgS3Lib.h>           // QemuFwCfgS3Enabled()
 #include <Library/UefiBootServicesTableLib.h> // gBS
 
+#include <Protocol/QemuAcpiTableNotify.h>
 #include "AcpiPlatform.h"
+EFI_HANDLE                       mQemuAcpiHandle = NULL;
+QEMU_ACPI_TABLE_NOTIFY_PROTOCOL  mAcpiNotifyProtocol;
 
 //
 // The user structure for the ordered collection that will track the fw_cfg
@@ -1273,7 +1276,16 @@ UninstallAcpiTables:
       AcpiProtocol->UninstallAcpiTable (AcpiProtocol, InstalledKey[Installed]);
     }
   } else {
-    DEBUG ((DEBUG_INFO, "%a: installed %d tables\n", __FUNCTION__, Installed));
+    //
+    // Install a protocol to notify that the ACPI table provided by Qemu is
+    // ready.
+    //
+    gBS->InstallProtocolInterface (
+           &mQemuAcpiHandle,
+           &gQemuAcpiTableNotifyProtocolGuid,
+           EFI_NATIVE_INTERFACE,
+           &mAcpiNotifyProtocol
+           );
   }
 
   for (SeenPointerEntry = OrderedCollectionMin (SeenPointers);
