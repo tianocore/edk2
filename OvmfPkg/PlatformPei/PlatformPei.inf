@@ -118,7 +118,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled
   gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed
-  gUefiCpuPkgTokenSpaceGuid.PcdConfidentialComputingCategory
+  gUefiCpuPkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress

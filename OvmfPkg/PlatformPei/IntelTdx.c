@@ -20,6 +20,7 @@
 #include <Library/QemuFwCfgLib.h>
 #include <Library/PeiServicesLib.h>
 #include <WorkArea.h>
+#include <ConfidentialComputingGuestAttr.h>
 #include "Platform.h"
 
 /**
@@ -263,17 +264,12 @@ IntelTdxInitialize (
 {
   EFI_HOB_PLATFORM_INFO       PlatformInfoHob;
   RETURN_STATUS               PcdStatus;
-  UINT32                      ConfidentialComputingCategory;
-  CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER   *CcWorkAreaHeader;
 
   if (!PlatformPeiIsTdxGuest ()) {
     return;
   }
 
-  CcWorkAreaHeader = (CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER *) FixedPcdGet32 (PcdOvmfWorkAreaBase);
-  ConfidentialComputingCategory = *((UINT32 *)CcWorkAreaHeader);
-
-  PcdStatus = PcdSet32S (PcdConfidentialComputingCategory, ConfidentialComputingCategory);
+  PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrIntelTdx);
   ASSERT_RETURN_ERROR (PcdStatus);
 
   PcdStatus = PcdSetBoolS (PcdIa32EferChangeAllowed, FALSE);
