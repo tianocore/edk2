@@ -1,0 +1,44 @@
+## @file
+#  Library for TDX Memory Encryption
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = MemEncryptTdxLib
+  FILE_GUID                      = 7E6651B2-B775-4593-A410-FC05B8C61993
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemEncryptTdxLib|PEIM DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+# VALID_ARCHITECTURES           = X64
+#
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Sources]
+  VirtualMemory.h
+  MemoryEncryption.c
+
+[LibraryClasses]
+  BaseLib
+  CacheMaintenanceLib
+  CpuLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  TdxLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
