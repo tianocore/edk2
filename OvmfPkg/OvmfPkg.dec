@@ -153,6 +153,7 @@
   gEfiLegacyInterruptProtocolGuid       = {0x31ce593d, 0x108a, 0x485d, {0xad, 0xb2, 0x78, 0xf2, 0x1f, 0x29, 0x66, 0xbe}}
   gEfiVgaMiniPortProtocolGuid           = {0xc7735a2f, 0x88f5, 0x4882, {0xae, 0x63, 0xfa, 0xac, 0x8c, 0x8b, 0x86, 0xb3}}
   gOvmfLoadedX86LinuxKernelProtocolGuid = {0xa3edc05d, 0xb618, 0x4ff6, {0x95, 0x52, 0x76, 0xd7, 0x88, 0x63, 0x43, 0xc8}}
+  gQemuAcpiTableNotifyProtocolGuid      = {0x928939b2, 0x4235, 0x462f, {0x95, 0x80, 0xf6, 0xa2, 0xb2, 0xc2, 0x1a, 0x4f}}
 
 [PcdsFixedAtBuild]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|0x0|UINT32|0
@@ -402,6 +403,9 @@
   ## This PCD adds a communication channel between OVMF's SmmCpuFeaturesLib
   #  instance in PiSmmCpuDxeSmm, and CpuHotplugSmm.
   gUefiOvmfPkgTokenSpaceGuid.PcdCpuHotEjectDataAddress|0|UINT64|0x46
+
+  ## TDX relocated Mailbox base address
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdRelocatedMailboxBase|0|UINT64|0x60
 
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
