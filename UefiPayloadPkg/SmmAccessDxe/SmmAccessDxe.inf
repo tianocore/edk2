@@ -1,0 +1,51 @@
+## @file
+# SMM Access 2 Protocol Dxe Driver
+#
+# This module produces the SMM Access 2 Protocol.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmAccessDxe
+  FILE_GUID                      = 47579CF5-1E4F-4b41-99BB-A5C334846D3B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmmAccessEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmAccessDxe.c
+  SmmAccessDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  HobLib
+
+[Guids]
+  gEfiSmmSmramMemoryGuid
+
+[Protocols]
+  gEfiSmmAccess2ProtocolGuid                    ## PRODUCES
+
+[Depex]
+  TRUE
