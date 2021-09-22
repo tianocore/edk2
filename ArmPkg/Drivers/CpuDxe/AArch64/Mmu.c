@@ -305,7 +305,7 @@ EfiAttributeToArmAttribute (
 
   // Determine protection attributes
   if ((EfiAttributes & EFI_MEMORY_RO) != 0) {
-    ArmAttributes |= TT_AP_RO_RO;
+    ArmAttributes |= TT_AP_NO_RO;
   }
 
   // Process eXecute Never attribute

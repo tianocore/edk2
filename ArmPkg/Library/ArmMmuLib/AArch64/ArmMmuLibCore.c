@@ -393,7 +393,7 @@ GcdAttributeToPageAttribute (
   }
 
   if ((GcdAttributes & EFI_MEMORY_RO) != 0) {
-    PageAttributes |= TT_AP_RO_RO;
+    PageAttributes |= TT_AP_NO_RO;
   }
 
   return PageAttributes | TT_AF;
@@ -492,7 +492,7 @@ ArmSetMemoryRegionReadOnly (
   return SetMemoryRegionAttribute (
            BaseAddress,
            Length,
-           TT_AP_RO_RO,
+           TT_AP_NO_RO,
            ~TT_ADDRESS_MASK_BLOCK_ENTRY
            );
 }
@@ -506,7 +506,7 @@ ArmClearMemoryRegionReadOnly (
   return SetMemoryRegionAttribute (
            BaseAddress,
            Length,
-           TT_AP_RW_RW,
+           TT_AP_NO_RW,
            ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK)
            );
 }
