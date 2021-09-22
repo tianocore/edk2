@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef _OVMF_INTEL_TDX__H_
-#define _OVMF_INTEL_TDX__H_
+#ifndef OVMF_INTEL_TDX_H_
+#define OVMF_INTEL_TDX_H_
 
 #include <PiPei.h>
 #include <Library/BaseLib.h>
@@ -51,7 +51,6 @@ typedef enum {
     UINT8                   Errors[256];
     UINT8                   Pad3[0xf8];
   } MP_WAKEUP_MAILBOX;
-
 
 //
 // AP relocation code information including code address and size,
