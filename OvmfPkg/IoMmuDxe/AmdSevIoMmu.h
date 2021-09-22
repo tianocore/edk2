@@ -21,6 +21,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/MemEncryptTdxLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -32,6 +33,17 @@
 EFI_STATUS
 EFIAPI
 AmdSevInstallIoMmuProtocol (
+  VOID
+  );
+
+/**
+  Install IOMMU protocol to provide the DMA support for PciHostBridge and
+  MemEncryptSevLib.
+
+**/
+EFI_STATUS
+EFIAPI
+IntelTdxInstallIoMmuProtocol (
   VOID
   );
 
