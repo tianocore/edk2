@@ -590,7 +590,6 @@ class PackageBuildClassObject(BuildData):
 # @var OutputDirectory:   To store value for OutputDirectory
 # @var FlashDefinition:   To store value for FlashDefinition
 # @var BuildNumber:       To store value for BuildNumber
-# @var MakefileName:      To store value for MakefileName
 # @var SkuIds:            To store value for SkuIds, it is a set structure as
 #                         { 'SkuName' : SkuId, '!include' : includefilename, ...}
 # @var Modules:           To store value for Modules, it is a list structure as
@@ -614,7 +613,6 @@ class PlatformBuildClassObject(BuildData):
         self.OutputDirectory         = ''
         self.FlashDefinition         = ''
         self.BuildNumber             = ''
-        self.MakefileName            = ''
 
         self.SkuIds                  = {}
         self.Modules                 = []
