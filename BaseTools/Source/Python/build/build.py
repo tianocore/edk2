@@ -4,7 +4,7 @@
 #  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 #  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
-#  Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
+#  Copyright (c) 2020 - 2021, ARM Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -1307,6 +1307,9 @@ class Build():
         # run
         if Target == 'run':
             return True
+
+        # Fetch the MakeFileName.
+        self.MakeFileName = AutoGenObject.MakeFileName
 
         # build modules
         if BuildModule:
