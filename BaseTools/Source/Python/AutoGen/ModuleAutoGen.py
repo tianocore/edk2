@@ -254,7 +254,6 @@ class ModuleAutoGen(AutoGen):
         self.AutoGenDepSet = set()
         self.ReferenceModules = []
         self.ConstPcd                  = {}
-        self.Makefile         = None
         self.FileDependCache  = {}
 
     def __init_platform_info__(self):
