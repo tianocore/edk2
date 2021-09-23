@@ -35,7 +35,23 @@ Main16:
     OneTimeCall TransitionFromReal16To32BitFlat
 
 BITS    32
+%ifdef ARCH_X64
 
+    ; Clear the WorkArea header. The SEV probe routines will populate the
+    ; work area when detected.
+    mov     byte[WORK_AREA_GUEST_TYPE], 0
+
+    jmp SearchBfv
+
+;
+; Entry point of Main32
+;
+Main32:
+    OneTimeCall InitTdx
+
+SearchBfv:
+
+%endif
     ;
     ; Search for the Boot Firmware Volume (BFV)
     ;
