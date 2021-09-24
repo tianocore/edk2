@@ -13,6 +13,23 @@
 #include <Library/PcdLib.h>
 #include <Library/HobLib.h>
 
+
+/** Library Constructor
+
+  @retval RETURN_SUCCESS  Success.
+**/
+EFI_STATUS
+EFIAPI
+PlatformHookSerialPortConstructor (
+  VOID
+  )
+{
+  // Nothing to do here. This constructor is added to
+  // enable the chain of constructor invocation for
+  // dependent libraries.
+  return RETURN_SUCCESS;
+}
+
 /**
   Performs platform specific initialization required for the CPU to access
   the hardware associated with a SerialPortLib instance.  This function does
