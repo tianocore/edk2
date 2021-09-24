@@ -933,6 +933,7 @@ PciTestSupportedAttribute (
   )
 {
   EFI_TPL OldTpl;
+  UINT16  CommandValue;
 
   //
   // Preserve the original value
@@ -943,10 +944,12 @@ PciTestSupportedAttribute (
   // Raise TPL to high level to disable timer interrupt while the BAR is probed
   //
   OldTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  CommandValue = *Command | *OldCommand;
 
-  PCI_SET_COMMAND_REGISTER (PciIoDevice, *Command);
-  PCI_READ_COMMAND_REGISTER (PciIoDevice, Command);
+  PCI_SET_COMMAND_REGISTER (PciIoDevice, CommandValue);
+  PCI_READ_COMMAND_REGISTER (PciIoDevice, &CommandValue);
 
+  *Command = *Command & CommandValue;
   //
   // Write back the original value
   //
