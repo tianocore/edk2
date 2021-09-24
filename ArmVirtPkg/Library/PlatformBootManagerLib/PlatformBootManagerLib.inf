@@ -33,6 +33,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
   ShellPkg/ShellPkg.dec
 
 [LibraryClasses]
