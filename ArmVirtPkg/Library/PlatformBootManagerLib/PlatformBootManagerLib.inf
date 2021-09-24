@@ -48,6 +48,7 @@
   QemuBootOrderLib
   QemuLoadImageLib
   ReportStatusCodeLib
+  TpmPlatformHierarchyLib
   UefiBootManagerLib
   UefiBootServicesTableLib
   UefiLib
