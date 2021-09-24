@@ -232,6 +232,7 @@
   SecurityPkg/Library/HashLibTpm2/HashLibTpm2.inf
 
   SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
+  SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 
   #
   # TCG Storage.
