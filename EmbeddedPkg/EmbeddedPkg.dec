@@ -86,6 +86,7 @@
 [PcdsFeatureFlag.common]
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000053
+  gEmbeddedTokenSpaceGuid.PcdAndroidBootLoadFile2|FALSE|BOOLEAN|0x0000005b
 
 [PcdsFixedAtBuild.common]
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b

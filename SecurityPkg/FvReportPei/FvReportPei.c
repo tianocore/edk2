@@ -344,6 +344,8 @@ CheckStoredHashFv (
                              StoredHashFvPpi->FvNumber, BootMode);
     if (!EFI_ERROR (Status)) {
 
+      DEBUG ((DEBUG_INFO, "OBB verification passed (%r)\r\n", Status));
+
       //
       // Report the FVs to PEI core and/or DXE core.
       //
