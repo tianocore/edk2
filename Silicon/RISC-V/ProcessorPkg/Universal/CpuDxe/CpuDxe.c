@@ -1,7 +1,7 @@
 /** @file
   RISC-V CPU DXE driver.
 
-  Copyright (c) 2016 - 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -269,7 +269,7 @@ CpuSetMemoryAttributes (
   )
 {
   DEBUG ((DEBUG_INFO, "%a: Set memory attributes not supported yet\n", __FUNCTION__));
-  return EFI_UNSUPPORTED;
+  return EFI_SUCCESS;
 }
 
 /**
