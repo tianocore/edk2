@@ -36,6 +36,14 @@ Main16:
 
 BITS    32
 
+%ifdef ARCH_X64
+
+    ; Clear the WorkArea header. The SEV probe routines will populate the
+    ; work area when detected.
+    mov     byte[WORK_AREA_GUEST_TYPE], 0
+
+%endif
+
     ;
     ; Search for the Boot Firmware Volume (BFV)
     ;
