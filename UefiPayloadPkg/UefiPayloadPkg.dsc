@@ -31,7 +31,7 @@
   DEFINE RAM_DISK_ENABLE              = FALSE
   DEFINE SIO_BUS_ENABLE               = FALSE
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
-
+  DEFINE SECURITY_STUB_ENABLE         = TRUE
   #
   # SBL:      UEFI payload for Slim Bootloader
   # COREBOOT: UEFI payload for coreboot
@@ -453,7 +453,9 @@
   #
   # Components that produce the architectural protocols
   #
+!if $(SECURITY_STUB_ENABLE) == TRUE
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
   UefiCpuPkg/CpuDxe/CpuDxe.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Application/UiApp/UiApp.inf {
