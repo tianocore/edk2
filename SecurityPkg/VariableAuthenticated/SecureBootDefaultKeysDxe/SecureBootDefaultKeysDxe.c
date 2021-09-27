@@ -3,6 +3,7 @@
 
 Copyright (c) 2021, ARM Ltd. All rights reserved.<BR>
 Copyright (c) 2021, Semihalf All rights reserved.<BR>
+Copyright (c) 2021, Ampere Computing LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -23,10 +24,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param[in]  ImageHandle        The image handle of the driver.
   @param[in]  SystemTable        The system table.
 
-  @retval EFI_ALREADY_STARTED    The driver already exists in system.
-  @retval EFI_OUT_OF_RESOURCES   Fail to execute entry point due to lack of resources.
-  @retval EFI_SUCCESS            All the related protocols are installed on the driver.
-  @retval Others                 Fail to get the SecureBootEnable variable.
+  @retval EFI_SUCCESS            The secure default keys are initialized successfully.
+  @retval EFI_UNSUPPORTED        One of the secure default keys already exists.
+  @retval EFI_NOT_FOUND          One of the PK, KEK, or DB default keys is not found.
+  @retval Others                 Fail to initialize the secure default keys.
 
 **/
 EFI_STATUS
@@ -56,14 +57,20 @@ SecureBootDefaultKeysEntryPoint (
   }
 
   Status = SecureBootInitDbtDefault ();
-  if (EFI_ERROR (Status)) {
+  if (Status == EFI_NOT_FOUND) {
     DEBUG ((DEBUG_INFO, "%a: dbtDefault not initialized\n", __FUNCTION__));
+  } else if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize dbtDefault: %r\n", __FUNCTION__, Status));
+    return Status;
   }
 
   Status = SecureBootInitDbxDefault ();
-  if (EFI_ERROR (Status)) {
+  if (Status == EFI_NOT_FOUND) {
     DEBUG ((DEBUG_INFO, "%a: dbxDefault not initialized\n", __FUNCTION__));
+  } else if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize dbxDefault: %r\n", __FUNCTION__, Status));
+    return Status;
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
