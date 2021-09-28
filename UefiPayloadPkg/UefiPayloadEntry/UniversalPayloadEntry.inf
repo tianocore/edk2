@@ -25,6 +25,7 @@
   LoadDxeCore.c
   MemoryAllocation.c
   PrintHob.c
+  AcpiTable.c
 
 [Sources.Ia32]
   X64/VirtualMemory.h
@@ -61,7 +62,6 @@
   gEfiGraphicsDeviceInfoHobGuid
   gUefiAcpiBoardInfoGuid
   gEfiSmbiosTableGuid
-  gEfiAcpiTableGuid
   gUefiSerialPortInfoGuid
   gUniversalPayloadExtraDataGuid
   gPcdDataBaseHobGuid
