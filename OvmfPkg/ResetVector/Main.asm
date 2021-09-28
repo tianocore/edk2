@@ -40,6 +40,20 @@ BITS    32
     ; work area when detected.
     mov     byte[WORK_AREA_GUEST_TYPE], 0
 
+%ifdef ARCH_X64
+
+    jmp SearchBfv
+
+;
+; Entry point of Main32
+;
+Main32:
+    OneTimeCall InitTdx
+
+SearchBfv:
+
+%endif
+
     ;
     ; Search for the Boot Firmware Volume (BFV)
     ;

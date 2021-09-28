@@ -177,9 +177,29 @@ resetVector:
 ;
 ; This is where the processor will begin execution
 ;
+; In IA32 we follow the standard reset vector flow. While in X64, Td guest
+; may be supported. Td guest requires the startup mode to be 32-bit
+; protected mode but the legacy VM startup mode is 16-bit real mode.
+; To make NASM generate such shared entry code that behaves correctly in
+; both 16-bit and 32-bit mode, more BITS directives are added.
+;
+%ifdef ARCH_IA32
     nop
     nop
     jmp     EarlyBspInitReal16
+
+%else
+
+    mov     eax, cr0
+    test    al, 1
+    jz      .Real
+BITS 32
+    jmp     Main32
+BITS 16
+.Real:
+    jmp     EarlyBspInitReal16
+
+%endif
 
 ALIGN   16
 
