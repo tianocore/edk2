@@ -260,6 +260,8 @@ BuildHobs (
   UNIVERSAL_PAYLOAD_EXTRA_DATA     *ExtraData;
   UINT8                            *GuidHob;
   EFI_HOB_FIRMWARE_VOLUME          *FvHob;
+  UNIVERSAL_PAYLOAD_ACPI_TABLE     *AcpiTable;
+  ACPI_BOARD_INFO                  *AcpiBoardInfo;
 
   Hob.Raw = (UINT8 *) BootloaderParameter;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
@@ -350,6 +352,16 @@ BuildHobs (
 
   *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) ExtraData->Entry[0].Base;
   ASSERT ((*DxeFv)->FvLength == ExtraData->Entry[0].Size);
+
+  //
+  // Create guid hob for acpi board information
+  //
+  GuidHob = GetFirstGuidHob(&gUniversalPayloadAcpiTableGuid);
+  if (GuidHob != NULL) {
+    AcpiTable = (UNIVERSAL_PAYLOAD_ACPI_TABLE *) GET_GUID_HOB_DATA (GuidHob);
+    AcpiBoardInfo = BuildHobFromAcpi ((UINT64)AcpiTable->Rsdp);
+    ASSERT (AcpiBoardInfo != NULL);
+  }
 
   //
   // Update DXE FV information to first fv hob in the hob list, which
