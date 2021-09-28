@@ -2,7 +2,7 @@
   Build a table, each item is (Key, Info) pair.
   And give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2021, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016-2019 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -589,6 +589,18 @@ TABLE_ITEM  ProcessorUpgradeTable[] = {
   {
     0x3C,
     L"Socket BGA1528"
+  },
+  {
+    0x3D,
+    L"Socket LGA4189"
+  },
+  {
+    0x3E,
+    L"Socket LGA1200"
+  },
+  {
+    0x3F,
+    L"Socket LGA4677"
   }
 };
 
