@@ -1,7 +1,7 @@
 /** @file
   Industry Standard Definitions of SMBIOS Table Specification v3.3.0.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 (C) Copyright 2015 - 2019 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -810,7 +810,10 @@ typedef enum {
   ProcessorUpgradeSocketLGA2066   = 0x39,
   ProcessorUpgradeSocketBGA1392   = 0x3A,
   ProcessorUpgradeSocketBGA1510   = 0x3B,
-  ProcessorUpgradeSocketBGA1528   = 0x3C
+  ProcessorUpgradeSocketBGA1528   = 0x3C,
+  ProcessorUpgradeSocketLGA4189   = 0x3D,
+  ProcessorUpgradeSocketLGA1200   = 0x3E,
+  ProcessorUpgradeSocketLGA4677   = 0x3F
 } PROCESSOR_UPGRADE;
 
 ///
