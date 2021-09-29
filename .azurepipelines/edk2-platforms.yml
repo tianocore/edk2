@@ -1,0 +1,71 @@
+## @file
+# Azure Pipeline build file for WhiskeylakeOpenBoard in Edk2platforms on windows and ubuntu
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+trigger:
+  - master
+  - stable/*
+pr:
+  branches:
+    include:
+    - master
+    - stable/*
+  paths:
+    include:
+    - BaseTools
+    - CryptoPkg
+    - FatPkg
+    - IntelFsp2WrapperPkg
+    - MdeModulePkg
+    - MdePkg
+    - NetworkPkg
+    - PcAtChipsetPkg
+    - SecurityPkg
+    - ShellPkg
+    - UefiCpuPkg
+
+resources:
+  repositories:
+  - repository: edk2-platforms
+    type: github
+    endpoint: tianocore
+    name: tianocore/edk2-platforms
+  - repository: edk2-non-osi
+    type: github
+    endpoint: tianocore
+    name: tianocore/edk2-non-osi
+  - repository: FSP
+    type: github
+    endpoint: tianocore
+    name: intel/FSP
+
+jobs:
+  - job: Edk2Platform_CI_Windows
+    pool:
+      vmImage: 'windows-latest'
+    strategy:
+      matrix:
+        WhiskeylakeOpenBoard_WhiskeylakeURvp:
+          Board.Name: "WhiskeylakeURvp"
+        WhiskeylakeOpenBoard_UpXtreme:
+          Board.Name: "UpXtreme"
+    steps:
+    - template: edk2platforms-run-steps.yml
+      parameters:
+        board_name: $(Board.Name)
+        pool_name: 'windows-latest'
+
+  - job: Edk2Platform_CI_Linux
+    pool:
+      vmImage: 'ubuntu-latest'
+    strategy:
+      matrix:
+          WhiskeylakeOpenBoard_WhiskeylakeURvp:
+            Board.Name: "WhiskeylakeURvp"
+    steps:
+    - template: edk2platforms-run-steps.yml
+      parameters:
+        board_name: $(Board.Name)
+        pool_name: 'ubuntu-latest'
