@@ -385,7 +385,7 @@ BuildGenericHob (
 **/
 EFI_STATUS
 EFIAPI
-PayloadEntry (
+_ModuleEntryPoint (
   IN UINTN                     BootloaderParameter
   )
 {
@@ -395,13 +395,10 @@ PayloadEntry (
   UINTN                         HobMemBase;
   UINTN                         HobMemTop;
   EFI_PEI_HOB_POINTERS          Hob;
+  SERIAL_PORT_INFO              SerialPortInfo;
+  UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *UniversalSerialPort;
 
-  // Call constructor for all libraries
-  ProcessLibraryConstructorList ();
-
-  DEBUG ((DEBUG_INFO, "GET_BOOTLOADER_PARAMETER() = 0x%lx\n", GET_BOOTLOADER_PARAMETER()));
-  DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof(UINTN)));
-
+  PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
   // Initialize floating point operating environment to be compliant with UEFI spec.
   InitializeFloatingPointUnits ();
 
@@ -411,6 +408,25 @@ PayloadEntry (
   HobMemTop  = HobMemBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
 
   HobConstructor ((VOID *)MemBase, (VOID *)HobMemTop, (VOID *)HobMemBase, (VOID *)HobMemTop);
+
+  //
+  // Build serial port info
+  //
+  Status = ParseSerialInfo (&SerialPortInfo);
+  if (!EFI_ERROR (Status)) {
+    UniversalSerialPort = BuildGuidHob (&gUniversalPayloadSerialPortInfoGuid, sizeof (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO));
+    ASSERT (UniversalSerialPort != NULL);
+    UniversalSerialPort->Header.Revision = UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION;
+    UniversalSerialPort->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO);
+    UniversalSerialPort->UseMmio         = (SerialPortInfo.Type == 1)?FALSE:TRUE;
+    UniversalSerialPort->RegisterBase    = SerialPortInfo.BaseAddr;
+    UniversalSerialPort->BaudRate        = SerialPortInfo.Baud;
+    UniversalSerialPort->RegisterStride  = (UINT8)SerialPortInfo.RegWidth;
+  }
+
+  // The library constructors might depend on serial port, so call it after serial port hob
+  ProcessLibraryConstructorList ();
+  DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof(UINTN)));
 
   // Build HOB based on information from Bootloader
   Status = BuildHobFromBl ();
