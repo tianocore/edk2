@@ -86,7 +86,8 @@ CoreGetNextLocateByProtocol (
 
 
 /**
-  Locates the requested handle(s) and returns them in Buffer.
+  Internal function for locating the requested handle(s) and returns them in Buffer.
+  The caller should already have acquired the ProtocolLock.
 
   @param  SearchType             The type of search to perform to locate the
                                  handles
@@ -104,8 +105,7 @@ CoreGetNextLocateByProtocol (
 
 **/
 EFI_STATUS
-EFIAPI
-CoreLocateHandle (
+InternalCoreLocateHandle (
   IN EFI_LOCATE_SEARCH_TYPE   SearchType,
   IN EFI_GUID                 *Protocol   OPTIONAL,
   IN VOID                     *SearchKey  OPTIONAL,
@@ -142,11 +142,6 @@ CoreLocateHandle (
   ResultSize = 0;
   ResultBuffer = (IHANDLE **) Buffer;
   Status = EFI_SUCCESS;
-
-  //
-  // Lock the protocol database
-  //
-  CoreAcquireProtocolLock ();
 
   //
   // Get the search function based on type
@@ -190,7 +185,6 @@ CoreLocateHandle (
   }
 
   if (EFI_ERROR(Status)) {
-    CoreReleaseProtocolLock ();
     return Status;
   }
 
@@ -247,10 +241,47 @@ CoreLocateHandle (
     }
   }
 
-  CoreReleaseProtocolLock ();
   return Status;
 }
 
+/**
+  Locates the requested handle(s) and returns them in Buffer.
+
+  @param  SearchType             The type of search to perform to locate the
+                                 handles
+  @param  Protocol               The protocol to search for
+  @param  SearchKey              Dependant on SearchType
+  @param  BufferSize             On input the size of Buffer.  On output the
+                                 size of data returned.
+  @param  Buffer                 The buffer to return the results in
+
+  @retval EFI_BUFFER_TOO_SMALL   Buffer too small, required buffer size is
+                                 returned in BufferSize.
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval EFI_SUCCESS            Successfully found the requested handle(s) and
+                                 returns them in Buffer.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreLocateHandle (
+  IN EFI_LOCATE_SEARCH_TYPE   SearchType,
+  IN EFI_GUID                 *Protocol   OPTIONAL,
+  IN VOID                     *SearchKey  OPTIONAL,
+  IN OUT UINTN                *BufferSize,
+  OUT EFI_HANDLE              *Buffer
+  )
+{
+  EFI_STATUS Status;
+
+  //
+  // Lock the protocol database
+  //
+  CoreAcquireProtocolLock ();
+  Status = InternalCoreLocateHandle(SearchType, Protocol, SearchKey, BufferSize, Buffer);
+  CoreReleaseProtocolLock ();
+  return Status;
+}
 
 
 /**
@@ -610,7 +641,6 @@ Done:
   return Status;
 }
 
-
 /**
   Function returns an array of handles that support the requested protocol
   in a buffer allocated from pool. This is a version of CoreLocateHandle()
@@ -657,7 +687,12 @@ CoreLocateHandleBuffer (
   BufferSize = 0;
   *NumberHandles = 0;
   *Buffer = NULL;
-  Status = CoreLocateHandle (
+
+  //
+  // Lock the protocol database
+  //
+  CoreAcquireProtocolLock();
+  Status = InternalCoreLocateHandle (
              SearchType,
              Protocol,
              SearchKey,
@@ -674,15 +709,17 @@ CoreLocateHandleBuffer (
     if (Status != EFI_INVALID_PARAMETER) {
       Status = EFI_NOT_FOUND;
     }
+    CoreReleaseProtocolLock ();
     return Status;
   }
 
   *Buffer = AllocatePool (BufferSize);
   if (*Buffer == NULL) {
+    CoreReleaseProtocolLock ();
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = CoreLocateHandle (
+  Status = InternalCoreLocateHandle (
              SearchType,
              Protocol,
              SearchKey,
@@ -695,6 +732,7 @@ CoreLocateHandleBuffer (
     *NumberHandles = 0;
   }
 
+  CoreReleaseProtocolLock ();
   return Status;
 }
 
