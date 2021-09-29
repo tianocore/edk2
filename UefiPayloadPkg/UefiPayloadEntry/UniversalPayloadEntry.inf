@@ -92,7 +92,6 @@
 
   gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemBase
   gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
-  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadStackTop
   gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES

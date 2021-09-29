@@ -169,12 +169,7 @@
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
-
-!if $(UNIVERSAL_PAYLOAD) == TRUE
   HobLib|UefiPayloadPkg/Library/DxeHobLib/DxeHobLib.inf
-!else
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-!endif
 
   #
   # UEFI & PI
@@ -217,11 +212,7 @@
   TimerLib|UefiPayloadPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   ResetSystemLib|UefiPayloadPkg/Library/ResetSystemLib/ResetSystemLib.inf
   SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
-!if $(UNIVERSAL_PAYLOAD) == TRUE
-  PlatformHookLib|UefiPayloadPkg/Library/UniversalPayloadPlatformHookLib/PlatformHookLib.inf
-!else
   PlatformHookLib|UefiPayloadPkg/Library/PlatformHookLib/PlatformHookLib.inf
-!endif
   PlatformBootManagerLib|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
 
@@ -366,6 +357,7 @@
 
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|$(MAX_LOGICAL_PROCESSORS)
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs|0
+  gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter|0
 
 ################################################################################
 #

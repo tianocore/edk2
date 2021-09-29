@@ -2,7 +2,7 @@
   This library will parse the coreboot table in memory and extract those required
   information.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -140,6 +140,7 @@ GetParameterBase (
   UINT8              *TmpPtr;
   UINT8              *CbTablePtr;
   UINTN              Idx;
+  EFI_STATUS         Status;
 
   //
   // coreboot could pass coreboot table to UEFI payload
@@ -193,7 +194,8 @@ GetParameterBase (
     return NULL;
   }
 
-  SET_BOOTLOADER_PARAMETER ((UINT32)(UINTN)CbTablePtr);
+  PcdSet64S (PcdBootloaderParameter, (UINTN)CbTablePtr);
+  ASSERT_EFI_STATUS (Status);
 
   return CbTablePtr;
 }
