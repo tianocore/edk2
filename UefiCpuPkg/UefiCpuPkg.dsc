@@ -20,7 +20,6 @@
 #
 # External libraries to build package
 #
-
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses]

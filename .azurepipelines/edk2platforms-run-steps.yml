@@ -1,0 +1,72 @@
+## @file
+# File templates/edk2platforms-run-steps.yml
+#
+# template file containing the steps to build
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+parameters:
+- name: board_name
+  type: string
+  default: ''
+- name: pool_name
+  type: string
+  default: ''
+
+steps:
+- checkout: self
+  submodules: true
+- checkout: edk2-non-osi
+- checkout: FSP
+- checkout: edk2-platforms
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: "3.8.x"
+    architecture: "x64"
+
+- ${{ if contains(parameters.pool_name, 'ubuntu') }}:
+  - bash: |
+      sudo apt-get update
+      sudo apt-get install gcc g++ make uuid-dev nasm iasl
+    displayName: Update apt and Install required tools
+  - script: |
+      source edksetup.sh
+      echo "##vso[task.setvariable variable=PATH;]$PATH"
+    displayName: Set env Path
+    workingDirectory: edk2/
+
+- ${{ if contains(parameters.pool_name, 'windows') }}:
+  - powershell: |
+      choco install iasl -y --version=2017.11.10
+      echo "##vso[task.setvariable variable=IASL_PREFIX;]C:\tools\ASL\"
+      choco install nasm -y
+      echo "##vso[task.setvariable variable=NASM_PREFIX;]C:\Program Files\NASM\"
+    displayName: Windows EDK II Prerequisites
+
+# Build WhiskeylakeOpenBoard in edk2platforms
+- script: python build_bios.py --platform ${{ parameters.board_name}}
+  displayName: Build platform ${{ parameters.board_name}}
+  workingDirectory: edk2-platforms/Platform/Intel
+
+# Copy the build logs to the artifact staging directory
+- task: CopyFiles@2
+  displayName: "Copy build logs"
+  inputs:
+    targetFolder: "$(Build.ArtifactStagingDirectory)"
+    SourceFolder:
+    contents: |
+      Build.log
+      BuildReport.log
+    flattenFolders: true
+  condition: succeededOrFailed()
+
+# Publish build artifacts to Azure Artifacts/TFS or a file share
+- task: PublishBuildArtifacts@1
+  continueOnError: true
+  displayName: "Publish build logs"
+  inputs:
+    pathtoPublish: "$(Build.ArtifactStagingDirectory)"
+    artifactName: "Build Logs $(System.JobName)"
+  condition: succeededOrFailed()
