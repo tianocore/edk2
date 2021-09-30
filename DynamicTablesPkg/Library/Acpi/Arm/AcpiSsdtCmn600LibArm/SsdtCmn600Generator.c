@@ -286,7 +286,7 @@ FixupCmn600Info (
 
   // Get the first Rd node in the "_CRS" object.
   // This is the PERIPHBASE node.
-  Status = AmlNameOpCrsGetFirstRdNode (NameOpCrsNode, &CmnPeriphBaseRdNode);
+  Status = AmlNameOpGetFirstRdNode (NameOpCrsNode, &CmnPeriphBaseRdNode);
   if (EFI_ERROR (Status)) {
     goto error_handler;
   }
@@ -309,7 +309,7 @@ FixupCmn600Info (
   // Get the QWord node corresponding to the ROOTNODEBASE.
   // It is the second Resource Data element in the BufferNode's
   // variable list of arguments.
-  Status = AmlNameOpCrsGetNextRdNode (
+  Status = AmlNameOpGetNextRdNode (
              CmnPeriphBaseRdNode,
              &CmnRootNodeBaseRdNode
              );
@@ -338,7 +338,7 @@ FixupCmn600Info (
   // Resource Data nodes.
   for (Index = 0; Index < Cmn600Info->DtcCount; Index++) {
     DtcInt = &Cmn600Info->DtcInterrupt[Index];
-    Status = AmlCodeGenCrsAddRdInterrupt (
+    Status = AmlCodeGenAddRdInterrupt (
                NameOpCrsNode,
                ((DtcInt->Flags &
                  EFI_ACPI_EXTENDED_INTERRUPT_FLAG_PRODUCER_CONSUMER_MASK) != 0),

@@ -275,7 +275,7 @@ FixupCrs (
   }
 
   // Get the first Rd node in the "_CRS" object.
-  Status = AmlNameOpCrsGetFirstRdNode (NameOpCrsNode, &QWordRdNode);
+  Status = AmlNameOpGetFirstRdNode (NameOpCrsNode, &QWordRdNode);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -298,7 +298,7 @@ FixupCrs (
   // Get the Interrupt node.
   // It is the second Resource Data element in the NameOpCrsNode's
   // variable list of arguments.
-  Status = AmlNameOpCrsGetNextRdNode (QWordRdNode, &InterruptRdNode);
+  Status = AmlNameOpGetNextRdNode (QWordRdNode, &InterruptRdNode);
   if (EFI_ERROR (Status)) {
     return Status;
   }
