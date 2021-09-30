@@ -139,3 +139,72 @@ IsValidAcpiId (
 
   return TRUE;
 }
+
+/** Convert a EisaId string to its compressed UINT32 equivalent.
+
+  Cf. ACPI 6.4 specification, s19.3.4 "ASL Macros": "Eisaid"
+
+  @param  [in]  EisaIdStr   Input EisaId string.
+  @param  [out] EisaIdInt   Output EisaId UINT32 (compressed).
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlGetEisaIdFromString (
+  IN  CONST CHAR8   * EisaIdStr,
+  OUT       UINT32  * EisaIdInt
+  )
+{
+  if ((EisaIdStr == NULL)         ||
+      (!IsValidPnpId (EisaIdStr)) ||
+      (EisaIdInt == NULL)) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  /* Cf. ACPI 6.4 specification, s19.3.4 "ASL Macros": "Eisaid"
+
+  Converts and compresses the 7-character text argument into its corresponding
+  4-byte numeric EISA ID encoding (Integer). This can be used when declaring
+  IDs for devices that are EISA IDs.
+
+  The algorithm used to convert the TextID is as shown in the following
+  example:
+    Starting with a seven character input string "PNP0303", we want to create
+    a DWordConst. This string contains a three character manufacturer code
+    "PNP", a three character hex product identifier "030", and a one character
+    revision identifier "3".
+    The compressed manufacturer code is created as follows:
+      1) Find hex ASCII value for each letter
+      2) Subtract 40h from each ASCII value
+      3) Retain 5 least significant bits for each letter and discard remaining
+         0's:
+
+      Byte 0:
+        Bit 7: reserved (0)
+        Bit 6-2: 1st character of compressed mfg code "P"
+        Bit 1-0: Upper 2 bits of 2nd character of mfg code "N"
+      Byte 1:
+        Bit 7-5: Lower 3 bits of 2nd character of mfg code "N"
+        Bit 4-0: 3rd character of mfg code "P"
+      Byte 2:
+        Bit 7-4: 1st hex digit of product number "0"
+        Bit 3-0: 2nd hex digit of product number "3"
+      Byte 3:
+        Bit 7-4: 3rd hex digit of product number "0"
+        Bit 3-0: 4th hex digit of product number "3"
+  */
+  *EisaIdInt = SwapBytes32 (
+    ((EisaIdStr[0] - 0x40) << 26)       |
+    ((EisaIdStr[1] - 0x40) << 21)       |
+    ((EisaIdStr[2] - 0x40) << 16)       |
+    (HexFromAscii (EisaIdStr[3]) << 12) |
+    (HexFromAscii (EisaIdStr[4]) << 8)  |
+    (HexFromAscii (EisaIdStr[5]) << 4)  |
+    (HexFromAscii (EisaIdStr[6]))
+    );
+
+  return EFI_SUCCESS;
+}
