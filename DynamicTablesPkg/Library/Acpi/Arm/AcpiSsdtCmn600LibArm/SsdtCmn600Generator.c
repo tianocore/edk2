@@ -338,8 +338,8 @@ FixupCmn600Info (
   // Resource Data nodes.
   for (Index = 0; Index < Cmn600Info->DtcCount; Index++) {
     DtcInt = &Cmn600Info->DtcInterrupt[Index];
-    Status = AmlCodeGenAddRdInterrupt (
-               NameOpCrsNode,
+
+    Status = AmlCodeGenRdInterrupt (
                ((DtcInt->Flags &
                  EFI_ACPI_EXTENDED_INTERRUPT_FLAG_PRODUCER_CONSUMER_MASK) != 0),
                ((DtcInt->Flags &
@@ -349,7 +349,9 @@ FixupCmn600Info (
                ((DtcInt->Flags &
                  EFI_ACPI_EXTENDED_INTERRUPT_FLAG_SHARABLE_MASK) != 0),
                (UINT32*)&DtcInt->Interrupt,
-               1
+               1,
+               NameOpCrsNode,
+               NULL
                );
     if (EFI_ERROR (Status)) {
       goto error_handler;

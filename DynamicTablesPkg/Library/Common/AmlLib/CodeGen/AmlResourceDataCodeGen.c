@@ -24,11 +24,15 @@
     If NewRdNode is not NULL, update its value to RdNode.
 
   @param [in]  RdNode       Newly created Resource Data node.
-  @param [in]  ParentNode   If not NULL, add the generated node
-                            to the end of the variable list of
-                            argument of the ParentNode, but
-                            before the "End Tag" Resource Data.
-                            Must be a BufferOpNode.
+                            RdNode is deleted if an error occurs.
+  @param [in]  ParentNode   If not NULL, ParentNode must:
+                             - be a NameOp node, i.e. have the AML_NAME_OP
+                               opcode (cf "Name ()" ASL statement)
+                             - contain a list of resource data elements
+                               (cf "ResourceTemplate ()" ASL statement)
+                            RdNode is then added at the end of the variable
+                            list of resource data elements, but before the
+                            "End Tag" Resource Data.
   @param [out] NewRdNode    If not NULL, update the its value to RdNode.
 
   @retval  EFI_SUCCESS            The function completed successfully.
@@ -43,57 +47,81 @@ LinkRdNode (
   OUT AML_DATA_NODE     ** NewRdNode
   )
 {
-  EFI_STATUS    Status;
-  EFI_STATUS    Status1;
+  EFI_STATUS        Status;
+  EFI_STATUS        Status1;
+  AML_OBJECT_NODE   *BufferOpNode;
 
   if (NewRdNode != NULL) {
     *NewRdNode = RdNode;
   }
 
-  // Add RdNode as the last element, but before the EndTag.
   if (ParentNode != NULL) {
-    Status = AmlAppendRdNode (ParentNode, RdNode);
+    // Check this is a NameOp node.
+    if ((!AmlNodeHasOpCode (ParentNode, AML_NAME_OP, 0))) {
+      ASSERT (0);
+      Status = EFI_INVALID_PARAMETER;
+      goto error_handler;
+    }
+
+    // Get the value which is represented as a BufferOp object node
+    // which is the 2nd fixed argument (i.e. index 1).
+    BufferOpNode = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                             ParentNode,
+                                             EAmlParseIndexTerm1
+                                             );
+    if ((BufferOpNode == NULL)                                             ||
+        (AmlGetNodeType ((AML_NODE_HANDLE)BufferOpNode) != EAmlNodeObject) ||
+        (!AmlNodeHasOpCode (BufferOpNode, AML_BUFFER_OP, 0))) {
+      ASSERT (0);
+      Status = EFI_INVALID_PARAMETER;
+      goto error_handler;
+    }
+
+    // Add RdNode as the last element, but before the EndTag.
+    Status = AmlAppendRdNode (BufferOpNode, RdNode);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
-      Status1 = AmlDeleteTree ((AML_NODE_HEADER*)RdNode);
-      ASSERT_EFI_ERROR (Status1);
-      // Return original error.
-      return Status;
+      goto error_handler;
     }
   }
 
-  return EFI_SUCCESS;
+  return Status;
+
+error_handler:
+  Status1 = AmlDeleteTree ((AML_NODE_HEADER*)RdNode);
+  ASSERT_EFI_ERROR (Status1);
+  // Return original error.
+  return Status;
 }
 
 /** Code generation for the "Interrupt ()" ASL function.
 
-  This function creates a Resource Data element corresponding to the
-  "Interrupt ()" ASL function and stores it in an AML Data Node.
-
   The Resource Data effectively created is an Extended Interrupt Resource
-  Data. See ACPI 6.3 specification, s6.4.3.6 "Extended Interrupt Descriptor"
-  for more information about Extended Interrupt Resource Data.
+  Data. Cf ACPI 6.4:
+   - s6.4.3.6 "Extended Interrupt Descriptor"
+   - s19.6.64 "Interrupt (Interrupt Resource Descriptor Macro)"
 
-  This function allocates memory to create a data node. It is the caller's
-  responsibility to either:
-   - attach this node to an AML tree;
-   - delete this node.
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
 
-  @param [in]  ResourceConsumer    The device consumes the specified interrupt
-                                   or produces it for use by a child device.
-  @param [in]  EdgeTriggered       The interrupt is edge triggered or
-                                   level triggered.
-  @param [in]  ActiveLow           The interrupt is active-high or active-low.
-  @param [in]  Shared              The interrupt can be shared with other
-                                   devices or not (Exclusive).
-  @param [in]  IrqList             Interrupt list. Must be non-NULL.
-  @param [in]  IrqCount            Interrupt count. Must be non-zero.
-  @param [in]  ParentNode          If not NULL, add the generated node
-                                   to the end of the variable list of
-                                   argument of the ParentNode, but
-                                   before the "End Tag" Resource Data.
-                                   Must be a BufferOpNode.
-  @param  [out] NewRdNode          If success, contains the generated node.
+  @param  [in]  ResourceConsumer The device consumes the specified interrupt
+                                 or produces it for use by a child device.
+  @param  [in]  EdgeTriggered    The interrupt is edge triggered or
+                                 level triggered.
+  @param  [in]  ActiveLow        The interrupt is active-high or active-low.
+  @param  [in]  Shared           The interrupt can be shared with other
+                                 devices or not (Exclusive).
+  @param  [in]  IrqList          Interrupt list. Must be non-NULL.
+  @param  [in]  IrqCount         Interrupt count. Must be non-zero.
+  @param  [in]  NameOpNode       NameOp object node defining a named object.
+                                 If provided, append the new resource data node
+                                 to the list of resource data elements of this
+                                 node.
+  @param  [out] NewRdNode        If provided and success,
+                                 contain the created node.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -101,15 +129,15 @@ LinkRdNode (
 **/
 EFI_STATUS
 EFIAPI
-AmlCodeGenInterrupt (
-  IN  BOOLEAN             ResourceConsumer,
-  IN  BOOLEAN             EdgeTriggered,
-  IN  BOOLEAN             ActiveLow,
-  IN  BOOLEAN             Shared,
-  IN  UINT32            * IrqList,
-  IN  UINT8               IrqCount,
-  IN  AML_OBJECT_NODE   * ParentNode,   OPTIONAL
-  OUT AML_DATA_NODE    ** NewRdNode     OPTIONAL
+AmlCodeGenRdInterrupt (
+  IN  BOOLEAN                 ResourceConsumer,
+  IN  BOOLEAN                 EdgeTriggered,
+  IN  BOOLEAN                 ActiveLow,
+  IN  BOOLEAN                 Shared,
+  IN  UINT32                  *IrqList,
+  IN  UINT8                   IrqCount,
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode, OPTIONAL
+  OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
   )
 {
   EFI_STATUS                               Status;
@@ -120,16 +148,19 @@ AmlCodeGenInterrupt (
 
   if ((IrqList == NULL) ||
       (IrqCount == 0)   ||
-      ((ParentNode == NULL) && (NewRdNode == NULL))) {
+      ((NameOpNode == NULL) && (NewRdNode == NULL))) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
+  // Header
   RdInterrupt.Header.Header.Bits.Name =
     ACPI_LARGE_EXTENDED_IRQ_DESCRIPTOR_NAME;
   RdInterrupt.Header.Header.Bits.Type = ACPI_LARGE_ITEM_FLAG;
   RdInterrupt.Header.Length = sizeof (EFI_ACPI_EXTENDED_INTERRUPT_DESCRIPTOR) -
                                 sizeof (ACPI_LARGE_RESOURCE_HEADER);
+
+  // Body
   RdInterrupt.InterruptVectorFlags = (ResourceConsumer ? BIT0 : 0) |
                                      (EdgeTriggered ? BIT1 : 0)    |
                                      (ActiveLow ? BIT2 : 0)        |
@@ -153,105 +184,7 @@ AmlCodeGenInterrupt (
     return Status;
   }
 
-  return LinkRdNode (RdNode, ParentNode, NewRdNode);
-}
-
-/** Add an Interrupt Resource Data node.
-
-  This function creates a Resource Data element corresponding to the
-  "Interrupt ()" ASL function, stores it in an AML Data Node.
-
-  It then adds it after the input NameOpNode in the list of resource data
-  element.
-
-  The Resource Data effectively created is an Extended Interrupt Resource
-  Data. See ACPI 6.3 specification, s6.4.3.6 "Extended Interrupt Descriptor"
-  for more information about Extended Interrupt Resource Data.
-
-  The Extended Interrupt contains one single interrupt.
-
-  This function allocates memory to create a data node. It is the caller's
-  responsibility to either:
-   - attach this node to an AML tree;
-   - delete this node.
-
-  Note:
-  The named node must be defined using the ASL "Name ()" statement.
-  E.g. Name (_CRS, ResourceTemplate () { ... })
-  Methods cannot be modified with this function.
-
-  @param  [in]  NameOpNode       NameOp object node defining a named object.
-                                 Must have an OpCode=AML_NAME_OP, SubOpCode=0.
-                                 NameOp object nodes are defined in ASL
-                                 using the "Name ()" function.
-  @param  [in]  ResourceConsumer The device consumes the specified interrupt
-                                 or produces it for use by a child device.
-  @param  [in]  EdgeTriggered    The interrupt is edge triggered or
-                                 level triggered.
-  @param  [in]  ActiveLow        The interrupt is active-high or active-low.
-  @param  [in]  Shared           The interrupt can be shared with other
-                                 devices or not (Exclusive).
-  @param  [in]  IrqList          Interrupt list. Must be non-NULL.
-  @param  [in]  IrqCount         Interrupt count. Must be non-zero.
-
-
-  @retval EFI_SUCCESS             The function completed successfully.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
-**/
-EFI_STATUS
-EFIAPI
-AmlCodeGenAddRdInterrupt (
-  IN  AML_OBJECT_NODE_HANDLE  NameOpNode,
-  IN  BOOLEAN                 ResourceConsumer,
-  IN  BOOLEAN                 EdgeTriggered,
-  IN  BOOLEAN                 ActiveLow,
-  IN  BOOLEAN                 Shared,
-  IN  UINT32                * IrqList,
-  IN  UINT8                   IrqCount
-  )
-{
-  EFI_STATUS              Status;
-
-  AML_OBJECT_NODE_HANDLE  BufferOpNode;
-
-  if ((IrqList == NULL)                                   ||
-      (IrqCount == 0)                                     ||
-      (!AmlNodeHasOpCode (NameOpNode, AML_NAME_OP, 0))) {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
-  }
-
-  // Get the value which is represented as a BufferOp object node
-  // which is the 2nd fixed argument (i.e. index 1).
-  BufferOpNode = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
-                                           NameOpNode,
-                                           EAmlParseIndexTerm1
-                                           );
-  if ((BufferOpNode == NULL)                                             ||
-      (AmlGetNodeType ((AML_NODE_HANDLE)BufferOpNode) != EAmlNodeObject) ||
-      (!AmlNodeHasOpCode (BufferOpNode, AML_BUFFER_OP, 0))) {
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
-  }
-
-  // Generate the Extended Interrupt Resource Data node,
-  // and attach it as the last variable argument of the BufferOpNode.
-  Status = AmlCodeGenInterrupt (
-             ResourceConsumer,
-             EdgeTriggered,
-             ActiveLow,
-             Shared,
-             IrqList,
-             IrqCount,
-             BufferOpNode,
-             NULL
-             );
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-  }
-
-  return Status;
+  return LinkRdNode (RdNode, NameOpNode, NewRdNode);
 }
 
 // DEPRECATED APIS
@@ -316,15 +249,15 @@ AmlCodeGenCrsAddRdInterrupt (
   IN  UINT8                   IrqCount
   )
 {
-  return AmlCodeGenAddRdInterrupt (
-           NameOpCrsNode,
-           NameOpNode,
+  return AmlCodeGenRdInterrupt (
            ResourceConsumer,
            EdgeTriggered,
            ActiveLow,
            Shared,
            IrqList,
-           IrqCount
+           IrqCount,
+           NameOpCrsNode,
+           NULL
            );
 }
 
