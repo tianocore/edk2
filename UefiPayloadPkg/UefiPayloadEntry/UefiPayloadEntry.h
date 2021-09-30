@@ -204,4 +204,17 @@ FvFindFileByTypeGuid (
   IN  EFI_GUID                    *Guid           OPTIONAL,
   OUT EFI_FFS_FILE_HEADER         **FileHeader
   );
+
+/**
+  Build ACPI board info HOB using infomation from ACPI table
+
+  @param  AcpiTableBase      ACPI table start address in memory
+
+  @retval  A pointer to ACPI board HOB ACPI_BOARD_INFO. Null if build HOB failure.
+**/
+ACPI_BOARD_INFO *
+BuildHobFromAcpi (
+  IN   UINT64                           AcpiTableBase
+  );
+
 #endif
