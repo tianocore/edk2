@@ -2,7 +2,7 @@
 # Create makefile for MS nmake and GNU make
 #
 # Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -177,11 +177,11 @@ class BuildFile(object):
 
         MakePath = AutoGenObject.BuildOption.get('MAKE', {}).get('PATH')
         if not MakePath:
-            self._FileType = ""
-        elif "nmake" in MakePath:
+            MakePath = AutoGenObject.ToolDefinition.get('MAKE', {}).get('PATH')
+        if "nmake" in MakePath:
             self._FileType = NMAKE_FILETYPE
         else:
-            self._FileType = "gmake"
+            self._FileType = GMAKE_FILETYPE
 
         if sys.platform == "win32":
             self._Platform = WIN32_PLATFORM

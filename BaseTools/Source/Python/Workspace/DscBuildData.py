@@ -19,8 +19,8 @@ from Common.Misc import *
 from types import *
 from Common.Expression import *
 from CommonDataClass.CommonClass import SkuInfoClass
-from Common.TargetTxtClassObject import TargetTxtDict
-from Common.ToolDefClassObject import ToolDefDict
+from Common.TargetTxtClassObject import TargetTxtDict,gDefaultTargetTxtFile
+from Common.ToolDefClassObject import ToolDefDict,gDefaultToolsDefFile
 from .MetaDataTable import *
 from .MetaFileTable import *
 from .MetaFileParser import *
@@ -3526,12 +3526,11 @@ class DscBuildData(PlatformBuildClassObject):
         self._ToolChainFamily = TAB_COMPILER_MSFT
         TargetObj = TargetTxtDict()
         TargetTxt = TargetObj.Target
-        BuildConfigurationFile = os.path.normpath(os.path.join(GlobalData.gConfDirectory, "target.txt"))
+        BuildConfigurationFile = os.path.normpath(os.path.join(GlobalData.gConfDirectory, gDefaultTargetTxtFile))
         if os.path.isfile(BuildConfigurationFile) == True:
             ToolDefinitionFile = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
             if ToolDefinitionFile == '':
-                ToolDefinitionFile = "tools_def.txt"
-                ToolDefinitionFile = os.path.normpath(mws.join(self.WorkspaceDir, 'Conf', ToolDefinitionFile))
+                ToolDefinitionFile = os.path.normpath(mws.join(self.WorkspaceDir, 'Conf', gDefaultToolsDefFile))
             if os.path.isfile(ToolDefinitionFile) == True:
                 ToolDefObj = ToolDefDict((os.path.join(os.getenv("WORKSPACE"), "Conf")))
                 ToolDefinition = ToolDefObj.ToolDef.ToolsDefTxtDatabase

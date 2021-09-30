@@ -25,6 +25,7 @@
   UefiPayloadEntry.c
   LoadDxeCore.c
   MemoryAllocation.c
+  AcpiTable.c
 
 [Sources.Ia32]
   X64/VirtualMemory.h

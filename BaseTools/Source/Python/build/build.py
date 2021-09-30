@@ -4,7 +4,7 @@
 #  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 #  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
-#  Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
+#  Copyright (c) 2020 - 2021, ARM Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -66,10 +66,6 @@ from AutoGen.AutoGen import CalculatePriorityValue
 
 ## standard targets of build command
 gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'clean', 'cleanall', 'cleanlib', 'run']
-
-## build configuration file
-gBuildConfiguration = "target.txt"
-gToolsDefinition = "tools_def.txt"
 
 TemporaryTablePattern = re.compile(r'^_\d+_\d+_[a-fA-F0-9]+$')
 TmpTableDict = {}
@@ -1308,6 +1304,9 @@ class Build():
         if Target == 'run':
             return True
 
+        # Fetch the MakeFileName.
+        self.MakeFileName = AutoGenObject.MakeFileName
+
         # build modules
         if BuildModule:
             BuildCommand = BuildCommand + [Target]
@@ -2183,8 +2182,6 @@ class Build():
             Pa.CreateLibModuelDirs()
             # Fetch the MakeFileName.
             self.MakeFileName = Pa.MakeFileName
-            if not self.MakeFileName:
-                self.MakeFileName = Pa.MakeFile
 
             Pa.DataPipe.DataContainer = {"LibraryBuildDirectoryList":Pa.LibraryBuildDirectoryList}
             Pa.DataPipe.DataContainer = {"ModuleBuildDirectoryList":Pa.ModuleBuildDirectoryList}
