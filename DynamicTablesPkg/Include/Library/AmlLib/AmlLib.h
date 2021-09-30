@@ -1,7 +1,7 @@
 /** @file
   AML Lib.
 
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -301,7 +301,7 @@ AmlNameOpUpdateString (
   IN  CONST CHAR8                   * NewName
   );
 
-/** Get the first Resource Data element contained in a "_CRS" object.
+/** Get the first Resource Data element contained in a named object.
 
   In the following ASL code, the function will return the Resource Data
   node corresponding to the "QWordMemory ()" ASL macro.
@@ -312,27 +312,26 @@ AmlNameOpUpdateString (
   )
 
   Note:
-   - The "_CRS" object must be declared using ASL "Name (Declare Named Object)".
-   - "_CRS" declared using ASL "Method (Declare Control Method)" is not
-     supported.
+  "_CRS" names defined as methods are not handled by this function.
+  They must be defined as names, using the "Name ()" statement.
 
   @ingroup UserApis
 
-  @param  [in] NameOpCrsNode  NameOp object node defining a "_CRS" object.
-                              Must have an OpCode=AML_NAME_OP, SubOpCode=0.
-                              NameOp object nodes are defined in ASL
-                              using the "Name ()" function.
-  @param  [out] OutRdNode     Pointer to the first Resource Data element of
-                              the "_CRS" object. A Resource Data element
-                              is stored in a data node.
+  @param  [in] NameOpNode   NameOp object node defining a named object.
+                            Must have an OpCode=AML_NAME_OP, SubOpCode=0.
+                            NameOp object nodes are defined in ASL
+                            using the "Name ()" function.
+  @param  [out] OutRdNode   Pointer to the first Resource Data element of
+                            the named object. A Resource Data element
+                            is stored in a data node.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
 **/
 EFI_STATUS
 EFIAPI
-AmlNameOpCrsGetFirstRdNode (
-  IN  AML_OBJECT_NODE_HANDLE   NameOpCrsNode,
+AmlNameOpGetFirstRdNode (
+  IN  AML_OBJECT_NODE_HANDLE   NameOpNode,
   OUT AML_DATA_NODE_HANDLE   * OutRdNode
   );
 
@@ -347,13 +346,14 @@ AmlNameOpCrsGetFirstRdNode (
     }
   )
 
-  The CurrRdNode Resource Data node must be defined in an object named "_CRS"
-  and defined by a "Name ()" ASL function.
+  Note:
+  "_CRS" names defined as methods are not handled by this function.
+  They must be defined as names, using the "Name ()" statement.
 
   @ingroup UserApis
 
   @param  [in]  CurrRdNode   Pointer to the current Resource Data element of
-                             the "_CRS" variable.
+                             the named object.
   @param  [out] OutRdNode    Pointer to the Resource Data element following
                              the CurrRdNode.
                              Contain a NULL pointer if CurrRdNode is the
@@ -366,7 +366,7 @@ AmlNameOpCrsGetFirstRdNode (
 **/
 EFI_STATUS
 EFIAPI
-AmlNameOpCrsGetNextRdNode (
+AmlNameOpGetNextRdNode (
   IN  AML_DATA_NODE_HANDLE    CurrRdNode,
   OUT AML_DATA_NODE_HANDLE  * OutRdNode
   );
@@ -423,7 +423,7 @@ AmlUpdateRdQWord (
   This function creates a Resource Data element corresponding to the
   "Interrupt ()" ASL function, stores it in an AML Data Node.
 
-  It then adds it after the input CurrRdNode in the list of resource data
+  It then adds it after the input NameOpNode in the list of resource data
   element.
 
   The Resource Data effectively created is an Extended Interrupt Resource
@@ -437,14 +437,9 @@ AmlUpdateRdQWord (
    - attach this node to an AML tree;
    - delete this node.
 
-  Note: The _CRS node must be defined using the ASL Name () function.
-        e.g. Name (_CRS, ResourceTemplate () {
-               ...
-             }
+  @ingroup CodeGenApis
 
-  @ingroup UserApis
-
-  @param  [in]  NameOpCrsNode    NameOp object node defining a "_CRS" object.
+  @param  [in]  NameOpNode       NameOp object node defining a named object.
                                  Must have an OpCode=AML_NAME_OP, SubOpCode=0.
                                  NameOp object nodes are defined in ASL
                                  using the "Name ()" function.
@@ -465,8 +460,8 @@ AmlUpdateRdQWord (
 **/
 EFI_STATUS
 EFIAPI
-AmlCodeGenCrsAddRdInterrupt (
-  IN  AML_OBJECT_NODE_HANDLE  NameOpCrsNode,
+AmlCodeGenAddRdInterrupt (
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode,
   IN  BOOLEAN                 ResourceConsumer,
   IN  BOOLEAN                 EdgeTriggered,
   IN  BOOLEAN                 ActiveLow,
@@ -627,5 +622,143 @@ AmlCodeGenScope (
   IN        AML_NODE_HANDLE           ParentNode,     OPTIONAL
   OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
   );
+
+// DEPRECATED APIS
+#ifndef DISABLE_NEW_DEPRECATED_INTERFACES
+
+/** DEPRECATED API
+
+  Get the first Resource Data element contained in a "_CRS" object.
+
+  In the following ASL code, the function will return the Resource Data
+  node corresponding to the "QWordMemory ()" ASL macro.
+  Name (_CRS, ResourceTemplate() {
+      QWordMemory (...) {...},
+      Interrupt (...) {...}
+    }
+  )
+
+  Note:
+   - The "_CRS" object must be declared using ASL "Name (Declare Named Object)".
+   - "_CRS" declared using ASL "Method (Declare Control Method)" is not
+     supported.
+
+  @ingroup UserApis
+
+  @param  [in] NameOpCrsNode  NameOp object node defining a "_CRS" object.
+                              Must have an OpCode=AML_NAME_OP, SubOpCode=0.
+                              NameOp object nodes are defined in ASL
+                              using the "Name ()" function.
+  @param  [out] OutRdNode     Pointer to the first Resource Data element of
+                              the "_CRS" object. A Resource Data element
+                              is stored in a data node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlNameOpCrsGetFirstRdNode (
+  IN  AML_OBJECT_NODE_HANDLE   NameOpCrsNode,
+  OUT AML_DATA_NODE_HANDLE   * OutRdNode
+  );
+
+/** DEPRECATED API
+
+  Get the Resource Data element following the CurrRdNode Resource Data.
+
+  In the following ASL code, if CurrRdNode corresponds to the first
+  "QWordMemory ()" ASL macro, the function will return the Resource Data
+  node corresponding to the "Interrupt ()" ASL macro.
+  Name (_CRS, ResourceTemplate() {
+      QwordMemory (...) {...},
+      Interrupt (...) {...}
+    }
+  )
+
+  The CurrRdNode Resource Data node must be defined in an object named "_CRS"
+  and defined by a "Name ()" ASL function.
+
+  @ingroup UserApis
+
+  @param  [in]  CurrRdNode   Pointer to the current Resource Data element of
+                             the "_CRS" variable.
+  @param  [out] OutRdNode    Pointer to the Resource Data element following
+                             the CurrRdNode.
+                             Contain a NULL pointer if CurrRdNode is the
+                             last Resource Data element in the list.
+                             The "End Tag" is not considered as a resource
+                             data element and is not returned.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlNameOpCrsGetNextRdNode (
+  IN  AML_DATA_NODE_HANDLE    CurrRdNode,
+  OUT AML_DATA_NODE_HANDLE  * OutRdNode
+  );
+
+/** DEPRECATED API
+
+  Add an Interrupt Resource Data node.
+
+  This function creates a Resource Data element corresponding to the
+  "Interrupt ()" ASL function, stores it in an AML Data Node.
+
+  It then adds it after the input CurrRdNode in the list of resource data
+  element.
+
+  The Resource Data effectively created is an Extended Interrupt Resource
+  Data. See ACPI 6.3 specification, s6.4.3.6 "Extended Interrupt Descriptor"
+  for more information about Extended Interrupt Resource Data.
+
+  The Extended Interrupt contains one single interrupt.
+
+  This function allocates memory to create a data node. It is the caller's
+  responsibility to either:
+   - attach this node to an AML tree;
+   - delete this node.
+
+  Note: The _CRS node must be defined using the ASL Name () function.
+        e.g. Name (_CRS, ResourceTemplate () {
+               ...
+             }
+
+  @ingroup CodeGenApis
+
+  @param  [in]  NameOpCrsNode    NameOp object node defining a "_CRS" object.
+                                 Must have an OpCode=AML_NAME_OP, SubOpCode=0.
+                                 NameOp object nodes are defined in ASL
+                                 using the "Name ()" function.
+  @param  [in]  ResourceConsumer The device consumes the specified interrupt
+                                 or produces it for use by a child device.
+  @param  [in]  EdgeTriggered    The interrupt is edge triggered or
+                                 level triggered.
+  @param  [in]  ActiveLow        The interrupt is active-high or active-low.
+  @param  [in]  Shared           The interrupt can be shared with other
+                                 devices or not (Exclusive).
+  @param  [in]  IrqList          Interrupt list. Must be non-NULL.
+  @param  [in]  IrqCount         Interrupt count. Must be non-zero.
+
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenCrsAddRdInterrupt (
+  IN  AML_OBJECT_NODE_HANDLE  NameOpCrsNode,
+  IN  BOOLEAN                 ResourceConsumer,
+  IN  BOOLEAN                 EdgeTriggered,
+  IN  BOOLEAN                 ActiveLow,
+  IN  BOOLEAN                 Shared,
+  IN  UINT32                * IrqList,
+  IN  UINT8                   IrqCount
+  );
+
+#endif // DISABLE_NEW_DEPRECATED_INTERFACES
 
 #endif // AML_LIB_H_
