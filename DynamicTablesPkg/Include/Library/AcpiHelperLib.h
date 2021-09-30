@@ -73,4 +73,21 @@ IsValidAcpiId (
   IN  CONST CHAR8  * Hid
   );
 
+/** Convert a EisaId string to its compressed UINT32 equivalent.
+
+  Cf. ACPI 6.4 specification, s19.3.4 "ASL Macros": "Eisaid"
+
+  @param  [in]  EisaIdStr   Input EisaId string.
+  @param  [out] EisaIdInt   Output EisaId UINT32 (compressed).
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlGetEisaIdFromString (
+  IN  CONST CHAR8   * EisaIdStr,
+  OUT       UINT32  * EisaIdInt
+  );
+
 #endif // ACPI_HELPER_LIB_H_
