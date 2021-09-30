@@ -116,4 +116,18 @@ ParseGfxDeviceInfo (
   OUT EFI_PEI_GRAPHICS_DEVICE_INFO_HOB       *GfxDeviceInfo
   );
 
+/**
+  Parse and handle the misc info provided by bootloader
+
+  @retval RETURN_SUCCESS           The misc information was parsed successfully.
+  @retval RETURN_NOT_FOUND         Could not find required misc info.
+  @retval RETURN_OUT_OF_RESOURCES  Insufficant memory space.
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseMiscInfo (
+  VOID
+  );
+
 #endif

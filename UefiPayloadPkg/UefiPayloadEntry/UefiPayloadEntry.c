@@ -322,6 +322,14 @@ BuildHobFromBl (
   }
 
   //
+  // Parse the misc info provided by bootloader
+  //
+  Status = ParseMiscInfo ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "Error when parsing misc info, Status = %r\n", Status));
+  }
+
+  //
   // Parse platform specific information.
   //
   Status = ParsePlatformInfo ();

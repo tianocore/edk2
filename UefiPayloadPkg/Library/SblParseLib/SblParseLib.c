@@ -1,7 +1,7 @@
 /** @file
   This library will parse the Slim Bootloader to get required information.
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -15,7 +15,7 @@
 #include <Library/HobLib.h>
 #include <Library/BlParseLib.h>
 #include <IndustryStandard/Acpi.h>
-
+#include <UniversalPayload/PciRootBridges.h>
 
 /**
   This function retrieves the parameter base address from boot loader.
@@ -219,5 +219,48 @@ ParseGfxDeviceInfo (
   CopyMem (GfxDeviceInfo, BlGfxDeviceInfo, sizeof (EFI_PEI_GRAPHICS_DEVICE_INFO_HOB));
 
   return RETURN_SUCCESS;
+}
+
+/**
+  Parse and handle the misc info provided by bootloader
+
+  @retval RETURN_SUCCESS           The misc information was parsed successfully.
+  @retval RETURN_NOT_FOUND         Could not find required misc info.
+  @retval RETURN_OUT_OF_RESOURCES  Insufficant memory space.
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseMiscInfo (
+  VOID
+  )
+{
+  RETURN_STATUS                          Status;
+  UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES     *BlRootBridgesHob;
+  UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES     *PldRootBridgesHob;
+
+  Status = RETURN_NOT_FOUND;
+  BlRootBridgesHob = (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES *) GetGuidHobDataFromSbl (
+                       &gUniversalPayloadPciRootBridgeInfoGuid
+                     );
+  if (BlRootBridgesHob != NULL) {
+    //
+    // Migrate bootloader root bridge info hob from bootloader to payload.
+    //
+    PldRootBridgesHob = BuildGuidHob (
+                                      &gUniversalPayloadPciRootBridgeInfoGuid,
+                                      BlRootBridgesHob->Header.Length
+                                     );
+    ASSERT (PldRootBridgesHob != NULL);
+    if (PldRootBridgesHob != NULL) {
+      CopyMem (PldRootBridgesHob, BlRootBridgesHob, BlRootBridgesHob->Header.Length);
+      DEBUG ((DEBUG_INFO, "Create PCI root bridge info guid hob\n"));
+      Status = RETURN_SUCCESS;
+    } else {
+      Status = RETURN_OUT_OF_RESOURCES;
+    }
+  }
+
+  return Status;
 }
 
