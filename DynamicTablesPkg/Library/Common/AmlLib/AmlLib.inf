@@ -1,7 +1,7 @@
 ## @file
 #  AML Generation Library
 #
-#  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -66,6 +66,7 @@
   DynamicTablesPkg/DynamicTablesPkg.dec
 
 [LibraryClasses]
+  AcpiHelperLib
   BaseLib
 
 [BuildOptions]
