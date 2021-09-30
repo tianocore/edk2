@@ -17,6 +17,10 @@
   Include
 
 [LibraryClasses]
+  ##  @libraryclass  Defines a set of Acpi helper methods
+  #   independent from the Dynamic Tables Framework.
+  AcpiHelperLib|Include/Library/AcpiHelperLib.h
+
   ##  @libraryclass  Defines a set of APIs for Dynamic AML generation.
   AmlLib|Include/Library/AmlLib/AmlLib.h
 
