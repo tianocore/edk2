@@ -1,7 +1,7 @@
 ## @file
 # Ssdt CMN-600 Table Generator
 #
-#  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -29,6 +29,7 @@
   DynamicTablesPkg/DynamicTablesPkg.dec
 
 [LibraryClasses]
+  AcpiHelperLib
   AmlLib
   BaseLib
 

@@ -1,0 +1,25 @@
+## @file
+#  Acpi Helper
+#
+#  Copyright (c) 2021, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = AcpiHelperLib
+  FILE_GUID      = 45968FB4-A724-46FC-822D-F9E557601F9B
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = AcpiHelperLib
+
+[Sources]
+  AcpiHelper.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
