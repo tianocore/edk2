@@ -22,15 +22,16 @@
 
 /** Convert a hex number to its ASCII code.
 
- @param [in]  x   Hex number to convert.
-                  Must be 0 <= x < 16.
+ @param [in]  Hex   Hex number to convert.
+                    Must be 0 <= x < 16.
 
  @return The ASCII code corresponding to x.
+         -1 if error.
 **/
 UINT8
 EFIAPI
 AsciiFromHex (
-  IN  UINT8   x
+  IN  UINT8   Hex
   );
 
 /** Check if a HID is a valid PNP ID.
