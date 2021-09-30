@@ -34,6 +34,21 @@ AsciiFromHex (
   IN  UINT8   Hex
   );
 
+/** Convert an ASCII char representing an hexadecimal number
+    to its integer value.
+
+ @param [in]  Char  Char to convert.
+                    Must be between '0'-'9' or 'A'-'F' or 'a'-'f'.
+
+ @return The corresponding integer (between 0-16).
+         -1 if error.
+**/
+UINT8
+EFIAPI
+HexFromAscii (
+  IN  CHAR8   Char
+  );
+
 /** Check if a HID is a valid PNP ID.
 
   @param     [in] Hid     The Hid to validate.

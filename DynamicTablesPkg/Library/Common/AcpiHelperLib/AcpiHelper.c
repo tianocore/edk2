@@ -38,6 +38,37 @@ AsciiFromHex (
   return (UINT8)-1;
 }
 
+/** Convert an ASCII char representing an hexadecimal number
+    to its integer value.
+
+ @param [in]  Char  Char to convert.
+                    Must be between '0'-'9' or 'A'-'F' or 'a'-'f'.
+
+ @return The corresponding integer (between 0-16).
+         -1 if error.
+**/
+UINT8
+EFIAPI
+HexFromAscii (
+  IN  CHAR8   Char
+  )
+{
+  if ((Char >= '0') && (Char <= '9')) {
+    return (UINT8)(Char - '0');
+  }
+
+  if ((Char >= 'A') && (Char <= 'F')) {
+    return (UINT8)(Char - 'A' + 10);
+  }
+
+  if ((Char >= 'a') && (Char <= 'f')) {
+    return (UINT8)(Char - 'a' + 10);
+  }
+
+  ASSERT (FALSE);
+  return (UINT8)-1;
+}
+
 /** Check if a HID is a valid PNP ID.
 
   @param     [in] Hid     The Hid to validate.
