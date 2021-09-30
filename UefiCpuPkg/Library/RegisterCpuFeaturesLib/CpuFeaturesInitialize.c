@@ -153,8 +153,9 @@ CpuInitDataInitialize (
   CpuFeaturesData->AcpiCpuData= AcpiCpuData;
 
   CpuStatus = &AcpiCpuData->CpuFeatureInitData.CpuStatus;
-  Location = AllocateZeroPool (sizeof (EFI_CPU_PHYSICAL_LOCATION) * NumberOfCpus);
+  Location = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (EFI_CPU_PHYSICAL_LOCATION) * NumberOfCpus));
   ASSERT (Location != NULL);
+  ZeroMem (Location, sizeof (EFI_CPU_PHYSICAL_LOCATION) * NumberOfCpus);
   AcpiCpuData->CpuFeatureInitData.ApLocation = (EFI_PHYSICAL_ADDRESS)(UINTN)Location;
 
   for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
@@ -205,12 +206,14 @@ CpuInitDataInitialize (
   //
   // Collect valid core count in each package because not all cores are valid.
   //
-  ThreadCountPerPackage = AllocateZeroPool (sizeof (UINT32) * CpuStatus->PackageCount);
+  ThreadCountPerPackage = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (UINT32) * CpuStatus->PackageCount));
   ASSERT (ThreadCountPerPackage != NULL);
+  ZeroMem (ThreadCountPerPackage, sizeof (UINT32) * CpuStatus->PackageCount);
   CpuStatus->ThreadCountPerPackage = (EFI_PHYSICAL_ADDRESS)(UINTN)ThreadCountPerPackage;
 
-  ThreadCountPerCore = AllocateZeroPool (sizeof (UINT8) * CpuStatus->PackageCount * CpuStatus->MaxCoreCount);
+  ThreadCountPerCore = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (UINT8) * CpuStatus->PackageCount * CpuStatus->MaxCoreCount));
   ASSERT (ThreadCountPerCore != NULL);
+  ZeroMem (ThreadCountPerCore, sizeof (UINT8) * CpuStatus->PackageCount * CpuStatus->MaxCoreCount);
   CpuStatus->ThreadCountPerCore = (EFI_PHYSICAL_ADDRESS)(UINTN)ThreadCountPerCore;
 
   for (ProcessorNumber = 0; ProcessorNumber < NumberOfCpus; ProcessorNumber++) {
