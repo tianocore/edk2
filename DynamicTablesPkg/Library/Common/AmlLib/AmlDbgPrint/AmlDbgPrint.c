@@ -2,7 +2,7 @@
   AML Print Function.
 
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -199,7 +199,7 @@ AmlDbgPrintNodeHeader (
 
   DEBUG ((
     DEBUG_INFO,
-    "%3d | %-15s | ",
+    "%3d | %-15a | ",
     Level,
     NodeTypeStrTbl[Node->NodeType]
     ));
@@ -227,7 +227,7 @@ AmlDbgPrintDataNode (
 
   AmlDbgPrintNodeHeader ((AML_NODE_HEADER*)DataNode, Level);
 
-  DEBUG ((DEBUG_INFO, "%-36s | ", NodeDataTypeStrTbl[DataNode->DataType]));
+  DEBUG ((DEBUG_INFO, "%-36a | ", NodeDataTypeStrTbl[DataNode->DataType]));
   DEBUG ((DEBUG_INFO, "0x%04x | ", DataNode->Size));
 
   if ((DataNode->DataType == EAmlNodeDataTypeNameString) ||
@@ -300,13 +300,13 @@ AmlDbgPrintObjectNode (
 
   // Print a string corresponding to the field object OpCode/SubOpCode.
   if (AmlNodeHasAttribute (ObjectNode, AML_IS_FIELD_ELEMENT)) {
-    DEBUG ((DEBUG_INFO, "%-15s ", AmlGetFieldOpCodeStr (
+    DEBUG ((DEBUG_INFO, "%-15a ", AmlGetFieldOpCodeStr (
                                     ObjectNode->AmlByteEncoding->OpCode,
                                     0
                                     )));
   } else {
     // Print a string corresponding to the object OpCode/SubOpCode.
-    DEBUG ((DEBUG_INFO, "%-15s | ", AmlGetOpCodeStr (
+    DEBUG ((DEBUG_INFO, "%-15a | ", AmlGetOpCodeStr (
                                       ObjectNode->AmlByteEncoding->OpCode,
                                       ObjectNode->AmlByteEncoding->SubOpCode)
                                       ));
@@ -378,19 +378,19 @@ AmlDbgPrintTableHeader (
   DEBUG ((DEBUG_INFO, "Lvl | Node Type       |\n"));
   DEBUG ((
     DEBUG_INFO,
-    "    | %-15s | Signature| Length     | Rev | CSum | OemId  | "
+    "    | %-15a | Signature| Length     | Rev | CSum | OemId  | "
       "OemTableId       | OemRev   | CreatorId| CreatorRev\n",
     NodeTypeStrTbl[EAmlNodeRoot]
     ));
   DEBUG ((
     DEBUG_INFO,
-    "    | %-15s | Op   | SubOp| OpName          | MaxI| Attribute  | "
+    "    | %-15a | Op   | SubOp| OpName          | MaxI| Attribute  | "
       "PkgLen | NodeName (opt)\n",
     NodeTypeStrTbl[EAmlNodeObject]
     ));
   DEBUG ((
     DEBUG_INFO,
-    "    | %-15s | Data Type                            | Size   | "
+    "    | %-15a | Data Type                            | Size   | "
       "Buffer\n",
     NodeTypeStrTbl[EAmlNodeData]
     ));
