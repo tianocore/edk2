@@ -107,4 +107,14 @@ FindDuplicateValue (
   IN        PFN_IS_EQUAL    EqualTestFunction
   );
 
+/** Parse and print a CmObjDesc.
+
+  @param [in]  CmObjDesc  The CmObjDesc to parse and print.
+**/
+VOID
+EFIAPI
+ParseCmObjDesc (
+  IN  CONST CM_OBJ_DESCRIPTOR * CmObjDesc
+  );
+
 #endif // TABLE_HELPER_LIB_H_
