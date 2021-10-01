@@ -2,7 +2,7 @@
   Intel FSP Header File definition from Intel Firmware Support Package External
   Architecture Specification v2.0 and above.
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -44,14 +44,28 @@ typedef struct {
   UINT8   Reserved1[2];
   ///
   /// Byte 0x0A: Indicates compliance with a revision of this specification in the BCD format.
+  ///            For revision v2.3 the value will be 0x23.
   ///
   UINT8   SpecVersion;
   ///
   /// Byte 0x0B: Revision of the FSP Information Header.
+  ///            The Current value for this field is 0x6.
   ///
   UINT8   HeaderRevision;
   ///
   /// Byte 0x0C: Revision of the FSP binary.
+  ///            Major.Minor.Revision.Build
+  ///            If FSP HeaderRevision is <= 5, the ImageRevision can be decoded as follows:
+  ///               7 : 0  - Build Number
+  ///              15 : 8  - Revision
+  ///              23 : 16 - Minor Version
+  ///              31 : 24 - Major Version
+  ///            If FSP HeaderRevision is >= 6, ImageRevision specifies the low-order bytes of the build number and revision
+  ///            while ExtendedImageRevision specifies the high-order bytes of the build number and revision.
+  ///               7 : 0  - Low Byte of Build Number
+  ///              15 : 8  - Low Byte of Revision
+  ///              23 : 16 - Minor Version
+  ///              31 : 24 - Major Version
   ///
   UINT32  ImageRevision;
   ///
@@ -116,6 +130,23 @@ typedef struct {
   ///            If the value is set to 0x00000000, then this API is not available in this component.
   ///
   UINT32  FspMultiPhaseSiInitEntryOffset;
+  ///
+  /// Byte 0x4C: Extended revision of the FSP binary.
+  ///            This value is only valid if FSP HeaderRevision is >= 6.
+  ///            ExtendedImageRevision specifies the high-order byte of the revision and build number in the FSP binary revision.
+  ///               7 : 0 - High Byte of Build Number
+  ///              15 : 8 - High Byte of Revision
+  ///            The FSP binary build number can be decoded as follows:
+  ///            Build Number = (ExtendedImageRevision[7:0] << 8) | ImageRevision[7:0]
+  ///            Revision = (ExtendedImageRevision[15:8] << 8) | ImageRevision[15:8]
+  ///            Minor Version = ImageRevision[23:16]
+  ///            Major Version = ImageRevision[31:24]
+  ///
+  UINT16  ExtendedImageRevision;
+  ///
+  /// Byte 0x4E: Reserved4.
+  ///
+  UINT16  Reserved4;
 } FSP_INFO_HEADER;
 
 ///
