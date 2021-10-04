@@ -240,11 +240,12 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscBiosVendor)
   SmbiosRecord->BiosSegment = (UINT16)(FixedPcdGet32 (PcdFdBaseAddress) / SIZE_64KB);
   if (BiosPhysicalSize < SIZE_16MB) {
     SmbiosRecord->BiosSize = Base2ToByteWith64KUnit (BiosPhysicalSize) - 1;
-    SmbiosRecord->ExtendedBiosSize.Size = BiosPhysicalSize / SIZE_1MB;
-    SmbiosRecord->ExtendedBiosSize.Unit = 0; // Size is in MB
   } else {
     SmbiosRecord->BiosSize = 0xFF;
-    if (BiosPhysicalSize > 0x3FFF) {
+    if (BiosPhysicalSize < SIZE_16GB) {
+      SmbiosRecord->ExtendedBiosSize.Size = BiosPhysicalSize / SIZE_1MB;
+      SmbiosRecord->ExtendedBiosSize.Unit = 0; // Size is in MB
+    } else {
       SmbiosRecord->ExtendedBiosSize.Size = BiosPhysicalSize / SIZE_1GB;
       SmbiosRecord->ExtendedBiosSize.Unit = 1; // Size is in GB
     }
