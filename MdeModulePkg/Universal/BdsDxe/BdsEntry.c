@@ -685,21 +685,67 @@ BootOptionType (
   return (UINT8) -1;
 }
 
+STATIC UINT16 GetSATAPort(IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePathNode)
+{
+  EFI_DEVICE_PATH_PROTOCOL *ChildDevicePathNode;
+  SATA_DEVICE_PATH *SataDevicePath;
+
+  while (!IsDevicePathEnd(DevicePathNode)) {
+    ChildDevicePathNode = NextDevicePathNode(DevicePathNode);
+    if ((DevicePathType(DevicePathNode) == HARDWARE_DEVICE_PATH) &&
+        (DevicePathSubType(DevicePathNode) == HW_PCI_DP) &&
+        (DevicePathType(ChildDevicePathNode) == MESSAGING_DEVICE_PATH) &&
+        (DevicePathSubType(ChildDevicePathNode) == MSG_SATA_DP)) {
+      //
+      // We find the valid SATA device path
+      //
+      SataDevicePath = (SATA_DEVICE_PATH *)ChildDevicePathNode;
+      return SataDevicePath->HBAPortNumber;
+    }
+    DevicePathNode = ChildDevicePathNode;
+  }
+  return 0xFFFF;
+}
+
+STATIC UINT8 GetUSBPort(IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePathNode)
+{
+  EFI_DEVICE_PATH_PROTOCOL *ChildDevicePathNode;
+  USB_DEVICE_PATH *USBDevicePath;
+
+  while (!IsDevicePathEnd(DevicePathNode)) {
+    ChildDevicePathNode = NextDevicePathNode(DevicePathNode);
+    if ((DevicePathType(DevicePathNode) == HARDWARE_DEVICE_PATH) &&
+        (DevicePathSubType(DevicePathNode) == HW_PCI_DP) &&
+        (DevicePathType(ChildDevicePathNode) == MESSAGING_DEVICE_PATH) &&
+        (DevicePathSubType(ChildDevicePathNode) == MSG_USB_DP)) {
+      //
+      // We find the valid SATA device path
+      //
+      USBDevicePath = (USB_DEVICE_PATH *)ChildDevicePathNode;
+      return USBDevicePath->ParentPortNumber;
+    }
+    DevicePathNode = ChildDevicePathNode;
+  }
+  return 0xFF;
+}
+
 STATIC
 BOOLEAN
 IsBootTypeMatch(
   IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *BootOption,
-  IN UINT8 OverrideType
-  ) {
-  switch (OverrideType) {
+  IN CONST BOOT_OVERRIDE Override
+  )
+{
+  switch (Override.Type) {
   case BootOverridePXE:
     if (StrCmp(BootOption->Description, L"iPXE Network boot") == 0)
       return 1;
-    }
     break;
   case BootOverrideSATA:
-    if (BootOptionType(BootOption->FilePath) == MSG_SATA_DP)
-      return 1;
+    if (BootOptionType(BootOption->FilePath) == MSG_SATA_DP) {
+      if (GetSATAPort(BootOption->FilePath) == Override.Port)
+        return 1;
+    }
     break;
   case BootOverrideNVME:
     if (BootOptionType(BootOption->FilePath) == MSG_NVME_NAMESPACE_DP)
@@ -715,13 +761,16 @@ IsBootTypeMatch(
       return 1;
     break;
   case BootOverrideUSB:
-    if (BootOptionType(BootOption->FilePath) == MSG_USB_DP)
-      return 1;
+    if (BootOptionType(BootOption->FilePath) == MSG_USB_DP) {
+      if (GetUSBPort(BootOption->FilePath) == Override.Port)
+        return 1;
+    }
     break;
   }
   // No match
   return 0;
 }
+
 /**
 
   Service routine for BdsInstance->Entry(). Devices are connected, the
@@ -1034,21 +1083,21 @@ BdsEntry (
   // Override the boot option type from the Board SMBUS settings.
   //
 
-  UINT16 OverrideBoot;
-  UINT8 OverrideBootType;
-  UINTN OverrideBootTypeSize;
+  UINT16 NextBootInt;
+  BOOT_OVERRIDE OverrideBoot;
+  UINTN OverrideBootSize;
   // Fetch Board Settings
   Status = gRT->GetVariable(BOARD_BOOT_OVERRIDE_NAME,
                             &gEfiBoardBootOverrideVariableGuid, NULL,
-                            &OverrideBootTypeSize, &OverrideBootType);
+                            &OverrideBootSize, &OverrideBoot);
   LoadOptions = EfiBootManagerGetLoadOptions(&LoadOptionCount, LoadOptionTypeBoot);
   if (EFI_ERROR(Status)) {
     DEBUG((EFI_D_ERROR, "Fetching Board Boot type override errored with %x\n", Status));
   } else {
     for (Index = 0; Index < LoadOptionCount; Index++) {
-      if (IsBootTypeMatch(&LoadOptions[Index], OverrideBootType)) {
-        OverrideBoot = Index;
-        BootNext = &OverrideBoot;
+      if (IsBootTypeMatch(&LoadOptions[Index], OverrideBoot)) {
+        NextBootInt = Index;
+        BootNext = &NextBootInt;
         break;
       }
     }

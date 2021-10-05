@@ -46,6 +46,7 @@ typedef struct {
   UINT32 Checksum;
   UINT8  Flags;
   UINT8  BootOptionOverride;
+  UINT8  Port;
 } BOARD_BOOT_OVERRIDE;
 
 enum BoardBootOverride {
@@ -58,6 +59,11 @@ enum BoardBootOverride {
   BootOverrideUSB = 6,
   BootOverrideMax
 };
+
+typedef struct {
+  UINT8 Type;
+  UINT8 Port;
+} BOOT_OVERRIDE;
 
 #pragma pack()
 

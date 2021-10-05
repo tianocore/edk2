@@ -219,8 +219,8 @@ InstallSMBusConfigLoader (
   UINT32                    CRC32Array;
   UINT32                    HostCBackup;
   UINT8                     Array[sizeof(BOARD_SETTINGS)];
-  BOARD_BOOT_OVERRIDE       BootOverride;
-  UINT8                     BootOverrideType;
+  BOARD_BOOT_OVERRIDE       BoardBootOverride;
+  BOOT_OVERRIDE             BootOverride;
 
   DEBUG ((DEBUG_INFO, "SMBusConfigLoader: InstallSMBusConfigLoader\n"));
 
@@ -234,7 +234,7 @@ InstallSMBusConfigLoader (
       gRT->SetVariable(BOARD_BOOT_OVERRIDE_NAME,           // Variable Name
                        &gEfiBoardBootOverrideVariableGuid, // Variable Guid
                        (EFI_VARIABLE_BOOTSERVICE_ACCESS), // Variable Attributes
-                       sizeof(BootOverrideType), &BootOverrideType);
+                       sizeof(BootOverride), &BootOverride);
 
   ZeroMem(&BoardSettings, sizeof(BOARD_SETTINGS));
 
@@ -263,34 +263,35 @@ InstallSMBusConfigLoader (
     BoardSettings.SecureBoot = 1;
   }
 
-  Status = ReadBootOverrideFromEEPROM((UINT8 *)&BootOverride, sizeof(BootOverride));
+  Status = ReadBootOverrideFromEEPROM((UINT8 *)&BoardBootOverride, sizeof(BoardBootOverride));
   if (!EFI_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "SMBusConfigLoader: Boot Override:\n"));
     DEBUG((DEBUG_INFO,
            "SMBusConfigLoader: StructSize: %04x - CRC: %08x - "
            "Flags: %02x - BootOptionOverride: %02x\n",
-           BootOverride.StructSize, BootOverride.Checksum,
-           BootOverride.Flags, BootOverride.BootOptionOverride
+           BoardBootOverride.StructSize, BoardBootOverride.Checksum,
+           BoardBootOverride.Flags, BoardBootOverride.BootOptionOverride
            ));
-    CRC32Array = CalculateCrc32((UINT8 *)&BootOverride.Flags, sizeof(BOARD_BOOT_OVERRIDE) - OFFSET_OF(BOARD_BOOT_OVERRIDE, Flags));
-    if (CRC32Array != BootOverride.Checksum) {
+    CRC32Array = CalculateCrc32((UINT8 *)&BoardBootOverride.Flags, sizeof(BOARD_BOOT_OVERRIDE) - OFFSET_OF(BOARD_BOOT_OVERRIDE, Flags));
+    if (CRC32Array != BoardBootOverride.Checksum) {
       DEBUG((DEBUG_ERROR,"SMBusConfigLoader: Boot Override, Checksum invalid\n"));
     } else {
-      BootOverrideType = BootOverride.BootOptionOverride;
+      BootOverride.Type = BoardBootOverride.BootOptionOverride;
+      BootOverride.Port = BoardBootOverride.Port;
 
       Status = gRT->SetVariable(
           BOARD_BOOT_OVERRIDE_NAME,           // Variable Name
           &gEfiBoardBootOverrideVariableGuid, // Variable Guid
           (EFI_VARIABLE_BOOTSERVICE_ACCESS),  // Variable Attributes
-          sizeof(BootOverrideType), &BootOverrideType);
+          sizeof(BootOverride), &BootOverride);
 
-      BOOLEAN DoOnce = BootOverride.Flags & 1;
+      BOOLEAN DoOnce = BoardBootOverride.Flags & 1;
       if (DoOnce) {
-        UINT8 *Byte = (UINT8 *)&BootOverride;
-        BootOverride.Flags = 0;
-        BootOverride.BootOptionOverride = 0;
-        BootOverride.Checksum = CalculateCrc32(
-            (UINT8 *)&BootOverride.Flags,
+        UINT8 *Byte = (UINT8 *)&BoardBootOverride;
+        BoardBootOverride.Flags = 0;
+        BoardBootOverride.BootOptionOverride = 0;
+        BoardBootOverride.Checksum = CalculateCrc32(
+            (UINT8 *)&BoardBootOverride.Flags,
             sizeof(BOARD_BOOT_OVERRIDE) - OFFSET_OF(BOARD_BOOT_OVERRIDE, Flags));
         for (INTN Index = OFFSET_OF(BOARD_BOOT_OVERRIDE, Checksum); Index < sizeof(BOARD_BOOT_OVERRIDE); Index++) {
           Status = WriteToEEPROM(*(Byte + Index), BOARD_BOOT_OVERRIDE_OFFSET + Index);
