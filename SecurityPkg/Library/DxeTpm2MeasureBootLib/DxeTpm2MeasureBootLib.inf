@@ -1,5 +1,5 @@
 ## @file
-#  Provides security service for TPM 2.0 measured boot
+#  Provides security service for TPM 2.0 measured boot and Confidential Computing measure boot.
 #
 #  Spec Compliance Info:
 #    "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 1.03 v51"
@@ -61,6 +61,7 @@
 
 [Protocols]
   gEfiTcg2ProtocolGuid                  ## SOMETIMES_CONSUMES
+  gEfiCcMeasurementProtocolGuid         ## SOMETIMES_CONSUMES
   gEfiFirmwareVolumeBlockProtocolGuid   ## SOMETIMES_CONSUMES
   gEfiBlockIoProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiDiskIoProtocolGuid                ## SOMETIMES_CONSUMES
