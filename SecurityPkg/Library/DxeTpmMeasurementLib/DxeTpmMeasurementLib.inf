@@ -1,5 +1,7 @@
 ## @file
-#  Provides TPM measurement functions for TPM1.2 and TPM 2.0
+#  Provides below measurement functions:
+#    1. TPM measurement functions for TPM1.2 and TPM 2.0
+#    2. Confidential Computing (CC) measurement functions
 #
 #  This library provides TpmMeasureAndLogData() to measure and log data, and
 #  extend the measurement result into a specific PCR.
@@ -40,5 +42,6 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEfiTcgProtocolGuid           ## SOMETIMES_CONSUMES
-  gEfiTcg2ProtocolGuid          ## SOMETIMES_CONSUMES
+  gEfiTcgProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiTcg2ProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiCcMeasurementProtocolGuid     ## SOMETIMES_CONSUMES
