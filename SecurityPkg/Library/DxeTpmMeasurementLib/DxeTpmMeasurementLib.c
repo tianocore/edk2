@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi.h>
-
+#include <Protocol/TdProtocol.h>
 
 
 /**
@@ -150,6 +150,73 @@ Tpm20MeasureAndLogData (
 }
 
 /**
+  Tdx measure and log data, and extend the measurement result into a
+  specific TDX RTMR.
+
+  @param[in]  PcrIndex         PCR Index.
+  @param[in]  EventType        Event type.
+  @param[in]  EventLog         Measurement event log.
+  @param[in]  LogLen           Event log length in bytes.
+  @param[in]  HashData         The start of the data buffer to be hashed, extended.
+  @param[in]  HashDataLen      The length, in bytes, of the buffer referenced by HashData
+
+  @retval EFI_SUCCESS           Operation completed successfully.
+  @retval EFI_UNSUPPORTED       Tdx device not available.
+  @retval EFI_OUT_OF_RESOURCES  Out of memory.
+  @retval EFI_DEVICE_ERROR      The operation was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+TdxMeasureAndLogData (
+  IN UINT32             PcrIndex,
+  IN UINT32             EventType,
+  IN VOID               *EventLog,
+  IN UINT32             LogLen,
+  IN VOID               *HashData,
+  IN UINT64             HashDataLen
+  )
+{
+  EFI_STATUS                Status;
+  EFI_TD_PROTOCOL           *TdProtocol;
+  EFI_TD_EVENT              *TdEvent;
+  UINT32                    MrIndex;
+
+  Status = gBS->LocateProtocol (&gEfiTdProtocolGuid, NULL, (VOID **) &TdProtocol);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = TdProtocol->MapPcrToMrIndex (TdProtocol, PcrIndex, &MrIndex);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  TdEvent = (EFI_TD_EVENT *) AllocateZeroPool (LogLen + sizeof (EFI_TD_EVENT));
+  if(TdEvent == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  TdEvent->Size = (UINT32) LogLen + sizeof (EFI_TD_EVENT) - sizeof (TdEvent->Event);
+  TdEvent->Header.HeaderSize    = sizeof (EFI_TD_EVENT_HEADER);
+  TdEvent->Header.HeaderVersion = EFI_TD_EVENT_HEADER_VERSION;
+  TdEvent->Header.MrIndex       = MrIndex;
+  TdEvent->Header.EventType     = EventType;
+  CopyMem (&TdEvent->Event[0], EventLog, LogLen);
+
+  Status = TdProtocol->HashLogExtendEvent (
+                           TdProtocol,
+                           0,
+                           (EFI_PHYSICAL_ADDRESS) (UINTN) HashData,
+                           HashDataLen,
+                           TdEvent
+                           );
+  FreePool (TdEvent);
+
+  return Status;
+}
+
+
+/**
   Tpm measure and log data, and extend the measurement result into a specific PCR.
 
   @param[in]  PcrIndex         PCR Index.
@@ -178,9 +245,9 @@ TpmMeasureAndLogData (
   EFI_STATUS  Status;
 
   //
-  // Try to measure using Tpm20 protocol
+  // Try to measure using Td protocol
   //
-  Status = Tpm20MeasureAndLogData(
+  Status = TdxMeasureAndLogData (
              PcrIndex,
              EventType,
              EventLog,
@@ -188,6 +255,20 @@ TpmMeasureAndLogData (
              HashData,
              HashDataLen
              );
+
+  if (EFI_ERROR (Status)) {
+    //
+    // Try to measure using Tpm20 protocol
+    //
+    Status = Tpm20MeasureAndLogData(
+               PcrIndex,
+               EventType,
+               EventLog,
+               LogLen,
+               HashData,
+               HashDataLen
+               );
+  }
 
   if (EFI_ERROR (Status)) {
     //
