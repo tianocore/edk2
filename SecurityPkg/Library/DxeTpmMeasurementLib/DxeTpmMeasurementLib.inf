@@ -40,5 +40,6 @@
   UefiBootServicesTableLib
 
 [Protocols]
-  gEfiTcgProtocolGuid           ## SOMETIMES_CONSUMES
-  gEfiTcg2ProtocolGuid          ## SOMETIMES_CONSUMES
+  gEfiTcgProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiTcg2ProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiTeeMeasurementProtocolGuid    ## SOMETIMES_CONSUMES
