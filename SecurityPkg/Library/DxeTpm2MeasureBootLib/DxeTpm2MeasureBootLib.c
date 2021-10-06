@@ -1,5 +1,6 @@
 /** @file
-  The library instance provides security service of TPM2 measure boot.
+  The library instance provides security service of TPM2 measure boot and
+  Confidential Computing (CC) measure boot.
 
   Caution: This file requires additional review when modified.
   This library will have external input - PE/COFF image and GPT partition.
@@ -41,6 +42,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeCoffLib.h>
 #include <Library/SecurityManagementLib.h>
 #include <Library/HobLib.h>
+#include <Protocol/CcMeasurement.h>
+
+typedef struct {
+  EFI_TCG2_PROTOCOL             *Tcg2Protocol;
+  EFI_CC_MEASUREMENT_PROTOCOL   *CcProtocol;
+} MEASURE_BOOT_PROTOCOLS;
 
 //
 // Flag to check GPT partition. It only need be measured once.
@@ -54,6 +61,62 @@ UINTN                             mTcg2ImageSize;
 //
 EFI_HANDLE                        mTcg2CacheMeasuredHandle  = NULL;
 MEASURED_HOB_DATA                 *mTcg2MeasuredHobData     = NULL;
+
+/**
+  Create CcEvent from Tcg2Event.
+
+  CcEvent is similar to Tcg2Event except the MrIndex.
+
+  @param  CcProtocol  Pointer to the located Cc Measurement protocol instance.
+  @param  Tcg2Event   Pointer to the Tcg2Event.
+  @param  EventSize   Size of the Event.
+  @param  EfiCcEvent  The created CcEvent
+
+  @retval EFI_SUCCESS           Successfully create the CcEvent
+  @retval EFI_INVALID_PARAMETER The input parameter is invalid
+  @retval EFI_UNSUPPORTED       The input PCRIndex cannot be mapped to Cc MR
+  @retval EFI_OUT_OF_RESOURCES  Out of resource
+**/
+EFI_STATUS
+CreateCcEventFromTcg2Event (
+  IN  EFI_CC_MEASUREMENT_PROTOCOL   *CcProtocol,
+  IN  EFI_TCG2_EVENT                *Tcg2Event,
+  IN  UINT32                        EventSize,
+  IN OUT EFI_CC_EVENT               **EfiCcEvent
+  )
+{
+  UINT32            MrIndex;
+  EFI_STATUS        Status;
+  EFI_CC_EVENT      *CcEvent;
+
+  if (Tcg2Event == NULL || CcProtocol == NULL || EfiCcEvent == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *EfiCcEvent = NULL;
+
+  Status = CcProtocol->MapPcrToMrIndex (CcProtocol, Tcg2Event->Header.PCRIndex, &MrIndex);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Cannot map PcrIndex(%d) to MrIndex\n", Tcg2Event->Header.PCRIndex));
+    return Status;
+  }
+
+  CcEvent = (EFI_CC_EVENT *)AllocateZeroPool (Tcg2Event->Size);
+  if (CcEvent == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  CcEvent->Size                 = Tcg2Event->Size;
+  CcEvent->Header.HeaderSize    = Tcg2Event->Header.HeaderSize;
+  CcEvent->Header.HeaderVersion = Tcg2Event->Header.HeaderVersion;
+  CcEvent->Header.MrIndex       = MrIndex;
+  CcEvent->Header.EventType     = Tcg2Event->Header.EventType;
+  CopyMem (CcEvent->Event, Tcg2Event->Event, EventSize);
+
+  *EfiCcEvent = CcEvent;
+
+  return EFI_SUCCESS;
+}
 
 /**
   Reads contents of a PE/COFF image in memory buffer.
@@ -109,7 +172,7 @@ DxeTpm2MeasureBootLibImageRead (
   Caution: This function may receive untrusted input.
   The GPT partition table is external input, so this function should parse partition data carefully.
 
-  @param Tcg2Protocol            Pointer to the located TCG2 protocol instance.
+  @param MeasureBootProtocols    Pointer to the located MeasureBoot protocol instances (i.e. TCG2/Td protocol).
   @param GptHandle               Handle that GPT partition was installed.
 
   @retval EFI_SUCCESS            Successfully measure GPT table.
@@ -121,8 +184,8 @@ DxeTpm2MeasureBootLibImageRead (
 EFI_STATUS
 EFIAPI
 Tcg2MeasureGptTable (
-  IN  EFI_TCG2_PROTOCOL  *Tcg2Protocol,
-  IN  EFI_HANDLE         GptHandle
+  IN  MEASURE_BOOT_PROTOCOLS  *MeasureBootProtocols,
+  IN  EFI_HANDLE              GptHandle
   )
 {
   EFI_STATUS                        Status;
@@ -134,11 +197,27 @@ Tcg2MeasureGptTable (
   UINTN                             NumberOfPartition;
   UINT32                            Index;
   EFI_TCG2_EVENT                    *Tcg2Event;
+  EFI_CC_EVENT                      *CcEvent;
   EFI_GPT_DATA                      *GptData;
   UINT32                            EventSize;
+  EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
+  EFI_CC_MEASUREMENT_PROTOCOL       *CcProtocol;
 
   if (mTcg2MeasureGptCount > 0) {
     return EFI_SUCCESS;
+  }
+
+  PrimaryHeader = NULL;
+  EntryPtr      = NULL;
+  CcEvent       = NULL;
+  Tcg2Event     = NULL;
+
+  Tcg2Protocol  = MeasureBootProtocols->Tcg2Protocol;
+  CcProtocol    = MeasureBootProtocols->CcProtocol;
+
+  if (Tcg2Protocol == NULL && CcProtocol == NULL) {
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
   }
 
   Status = gBS->HandleProtocol (GptHandle, &gEfiBlockIoProtocolGuid, (VOID**)&BlockIo);
@@ -149,6 +228,7 @@ Tcg2MeasureGptTable (
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
+
   //
   // Read the EFI Partition Table Header
   //
@@ -156,6 +236,7 @@ Tcg2MeasureGptTable (
   if (PrimaryHeader == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   Status = DiskIo->ReadDisk (
                      DiskIo,
                      BlockIo->Media->MediaId,
@@ -164,10 +245,20 @@ Tcg2MeasureGptTable (
                      (UINT8 *)PrimaryHeader
                      );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Failed to Read Partition Table Header!\n"));
+    DEBUG ((DEBUG_ERROR, "Failed to Read Partition Table Header!\n"));
     FreePool (PrimaryHeader);
     return EFI_DEVICE_ERROR;
   }
+
+  //
+  // PrimaryHeader->SizeOfPartitionEntry should not be zero
+  //
+  if (PrimaryHeader->SizeOfPartitionEntry == 0) {
+    DEBUG ((DEBUG_ERROR, "SizeOfPartitionEntry should not be zero!\n"));
+    FreePool (PrimaryHeader);
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
   //
   // Read the partition entry.
   //
@@ -202,15 +293,14 @@ Tcg2MeasureGptTable (
   }
 
   //
-  // Prepare Data for Measurement
+  // Prepare Data for Measurement (CcProtocol and Tcg2Protocol)
   //
   EventSize = (UINT32)(sizeof (EFI_GPT_DATA) - sizeof (GptData->Partitions)
                         + NumberOfPartition * PrimaryHeader->SizeOfPartitionEntry);
   Tcg2Event = (EFI_TCG2_EVENT *) AllocateZeroPool (EventSize + sizeof (EFI_TCG2_EVENT) - sizeof(Tcg2Event->Event));
   if (Tcg2Event == NULL) {
-    FreePool (PrimaryHeader);
-    FreePool (EntryPtr);
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
   }
 
   Tcg2Event->Size = EventSize + sizeof (EFI_TCG2_EVENT) - sizeof(Tcg2Event->Event);
@@ -243,22 +333,57 @@ Tcg2MeasureGptTable (
   }
 
   //
-  // Measure the GPT data
+  // Measure the GPT data by Tcg2Protocol
   //
-  Status = Tcg2Protocol->HashLogExtendEvent (
-             Tcg2Protocol,
-             0,
-             (EFI_PHYSICAL_ADDRESS) (UINTN) (VOID *) GptData,
-             (UINT64) EventSize,
-             Tcg2Event
-             );
-  if (!EFI_ERROR (Status)) {
-    mTcg2MeasureGptCount++;
+  if (Tcg2Protocol != NULL) {
+    Status = Tcg2Protocol->HashLogExtendEvent (
+               Tcg2Protocol,
+               0,
+               (EFI_PHYSICAL_ADDRESS) (UINTN) (VOID *) GptData,
+               (UINT64) EventSize,
+               Tcg2Event
+               );
+    if (!EFI_ERROR (Status)) {
+      mTcg2MeasureGptCount++;
+    }
+    DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - Tcg2 MeasureGptTable - %r\n", Status));
+
+  } else if (CcProtocol != NULL) {
+
+    //
+    // Measure the GPT data by TdProtocol
+    //
+    Status = CreateCcEventFromTcg2Event (CcProtocol, Tcg2Event, EventSize, &CcEvent);
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
+
+    Status = CcProtocol->HashLogExtendEvent (
+               CcProtocol,
+               0,
+               (EFI_PHYSICAL_ADDRESS) (UINTN) (VOID *) GptData,
+               (UINT64) EventSize,
+               CcEvent
+               );
+    if (!EFI_ERROR (Status)) {
+      mTcg2MeasureGptCount++;
+    }
+    DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - Cc MeasureGptTable - %r\n", Status));
   }
 
-  FreePool (PrimaryHeader);
-  FreePool (EntryPtr);
-  FreePool (Tcg2Event);
+Exit:
+  if (PrimaryHeader != NULL) {
+    FreePool (PrimaryHeader);
+  }
+  if (EntryPtr != NULL) {
+    FreePool (EntryPtr);
+  }
+  if (Tcg2Event != NULL) {
+    FreePool (Tcg2Event);
+  }
+  if (CcEvent != NULL) {
+    FreePool (CcEvent);
+  }
 
   return Status;
 }
@@ -271,12 +396,12 @@ Tcg2MeasureGptTable (
   PE/COFF image is external input, so this function will validate its data structure
   within this image buffer before use.
 
-  @param[in] Tcg2Protocol   Pointer to the located TCG2 protocol instance.
-  @param[in] ImageAddress   Start address of image buffer.
-  @param[in] ImageSize      Image size
-  @param[in] LinkTimeBase   Address that the image is loaded into memory.
-  @param[in] ImageType      Image subsystem type.
-  @param[in] FilePath       File path is corresponding to the input image.
+  @param[in] MeasureBootProtocols   Pointer to the located MeasureBoot protocol instances.
+  @param[in] ImageAddress           Start address of image buffer.
+  @param[in] ImageSize              Image size
+  @param[in] LinkTimeBase           Address that the image is loaded into memory.
+  @param[in] ImageType              Image subsystem type.
+  @param[in] FilePath               File path is corresponding to the input image.
 
   @retval EFI_SUCCESS            Successfully measure image.
   @retval EFI_OUT_OF_RESOURCES   No enough resource to measure image.
@@ -287,7 +412,7 @@ Tcg2MeasureGptTable (
 EFI_STATUS
 EFIAPI
 Tcg2MeasurePeImage (
-  IN  EFI_TCG2_PROTOCOL         *Tcg2Protocol,
+  IN  MEASURE_BOOT_PROTOCOLS    *MeasureBootProtocols,
   IN  EFI_PHYSICAL_ADDRESS      ImageAddress,
   IN  UINTN                     ImageSize,
   IN  UINTN                     LinkTimeBase,
@@ -300,9 +425,22 @@ Tcg2MeasurePeImage (
   EFI_IMAGE_LOAD_EVENT              *ImageLoad;
   UINT32                            FilePathSize;
   UINT32                            EventSize;
+  EFI_CC_EVENT                      *CcEvent;
+  EFI_CC_MEASUREMENT_PROTOCOL       *CcProtocol;
+  EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
 
   Status        = EFI_UNSUPPORTED;
   ImageLoad     = NULL;
+  CcEvent       = NULL;
+
+  Tcg2Protocol  = MeasureBootProtocols->Tcg2Protocol;
+  CcProtocol    = MeasureBootProtocols->CcProtocol;
+
+  if (Tcg2Protocol == NULL && CcProtocol == NULL) {
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
+  }
+
   FilePathSize  = (UINT32) GetDevicePathSize (FilePath);
 
   //
@@ -334,7 +472,7 @@ Tcg2MeasurePeImage (
       break;
     default:
       DEBUG ((
-        EFI_D_ERROR,
+        DEBUG_ERROR,
         "Tcg2MeasurePeImage: Unknown subsystem type %d",
         ImageType
         ));
@@ -352,26 +490,123 @@ Tcg2MeasurePeImage (
   //
   // Log the PE data
   //
-  Status = Tcg2Protocol->HashLogExtendEvent (
-             Tcg2Protocol,
-             PE_COFF_IMAGE,
-             ImageAddress,
-             ImageSize,
-             Tcg2Event
-             );
-  if (Status == EFI_VOLUME_FULL) {
-    //
-    // Volume full here means the image is hashed and its result is extended to PCR.
-    // But the event log can't be saved since log area is full.
-    // Just return EFI_SUCCESS in order not to block the image load.
-    //
-    Status = EFI_SUCCESS;
+  if (Tcg2Protocol != NULL) {
+    Status = Tcg2Protocol->HashLogExtendEvent (
+               Tcg2Protocol,
+               PE_COFF_IMAGE,
+               ImageAddress,
+               ImageSize,
+               Tcg2Event
+               );
+    if (Status == EFI_VOLUME_FULL) {
+      //
+      // Volume full here means the image is hashed and its result is extended to PCR.
+      // But the event log can't be saved since log area is full.
+      // Just return EFI_SUCCESS in order not to block the image load.
+      //
+      Status = EFI_SUCCESS;
+    }
+    DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - Tcg2 MeasurePeImage - %r\n", Status));
+
+  } else if (CcProtocol != NULL) {
+
+    Status = CreateCcEventFromTcg2Event (CcProtocol, Tcg2Event, EventSize, &CcEvent);
+    if (EFI_ERROR (Status)) {
+      goto Finish;
+    }
+
+    Status = CcProtocol->HashLogExtendEvent (
+               CcProtocol,
+               PE_COFF_IMAGE,
+               ImageAddress,
+               ImageSize,
+               CcEvent
+               );
+    if (Status == EFI_VOLUME_FULL) {
+      //
+      // Volume full here means the image is hashed and its result is extended to PCR.
+      // But the event log can't be saved since log area is full.
+      // Just return EFI_SUCCESS in order not to block the image load.
+      //
+      Status = EFI_SUCCESS;
+    }
+    DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - Cc MeasurePeImage - %r\n", Status));
   }
 
 Finish:
-  FreePool (Tcg2Event);
+  if (Tcg2Event != NULL) {
+    FreePool (Tcg2Event);
+  }
+
+  if (CcEvent != NULL) {
+    FreePool (CcEvent);
+  }
 
   return Status;
+}
+
+/**
+  Get the measure boot protocols.
+
+  There are 2 measure boot, TCG2 protocol based and Cc measurement protocol based.
+
+  @param  MeasureBootProtocols  Pointer to the located measure boot protocol instances.
+
+  @retval EFI_SUCCESS           Sucessfully locate the measure boot protocol instances (at least one instance).
+  @retval EFI_UNSUPPORTED       Measure boot is not supported.
+**/
+EFI_STATUS
+EFIAPI
+GetMeasureBootProtocols (
+  MEASURE_BOOT_PROTOCOLS    *MeasureBootProtocols
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_TCG2_PROTOCOL                   *Tcg2Protocol;
+  EFI_CC_MEASUREMENT_PROTOCOL         *CcProtocol;
+  EFI_TCG2_BOOT_SERVICE_CAPABILITY    Tcg2ProtocolCapability;
+  EFI_CC_BOOT_SERVICE_CAPABILITY      CcProtocolCapability;
+
+  CcProtocol = NULL;
+  Status = gBS->LocateProtocol (&gEfiCcMeasurementProtocolGuid, NULL, (VOID **) &CcProtocol);
+  if (EFI_ERROR (Status)) {
+    //
+    // Cc Measurement protocol is not installed.
+    //
+    DEBUG ((DEBUG_VERBOSE, "CcMeasurementProtocol is not installed. - %r\n", Status));
+  } else {
+    ZeroMem (&CcProtocolCapability, sizeof (CcProtocolCapability));
+    CcProtocolCapability.Size = sizeof (CcProtocolCapability);
+    Status = CcProtocol->GetCapability (CcProtocol, &CcProtocolCapability);
+    if (EFI_ERROR (Status) || CcProtocolCapability.CcType.Type == EFI_CC_TYPE_NONE) {
+      DEBUG ((DEBUG_ERROR, " CcProtocol->GetCapability returns : %x, %r\n", CcProtocolCapability.CcType.Type, Status));
+      CcProtocol = NULL;
+    }
+  }
+
+  Tcg2Protocol = NULL;
+  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
+  if (EFI_ERROR (Status)) {
+    //
+    // Tcg2 protocol is not installed. So, TPM2 is not present.
+    //
+    DEBUG ((DEBUG_VERBOSE, "Tcg2Protocol is not installed. - %r\n", Status));
+  } else {
+    Tcg2ProtocolCapability.Size = (UINT8) sizeof (Tcg2ProtocolCapability);
+    Status = Tcg2Protocol->GetCapability (Tcg2Protocol, &Tcg2ProtocolCapability);
+    if (EFI_ERROR (Status) || (!Tcg2ProtocolCapability.TPMPresentFlag)) {
+      //
+      // TPM device doesn't work or activate.
+      //
+      DEBUG ((DEBUG_ERROR, "TPMPresentFlag=FALSE %r\n", Status));
+      Tcg2Protocol = NULL;
+    }
+  }
+
+  MeasureBootProtocols->Tcg2Protocol = Tcg2Protocol;
+  MeasureBootProtocols->CcProtocol   = CcProtocol;
+
+  return (Tcg2Protocol == NULL && CcProtocol == NULL) ? EFI_UNSUPPORTED: EFI_SUCCESS;
 }
 
 /**
@@ -422,9 +657,8 @@ DxeTpm2MeasureBootHandler (
   IN  BOOLEAN                          BootPolicy
   )
 {
-  EFI_TCG2_PROTOCOL                   *Tcg2Protocol;
+  MEASURE_BOOT_PROTOCOLS              MeasureBootProtocols;
   EFI_STATUS                          Status;
-  EFI_TCG2_BOOT_SERVICE_CAPABILITY    ProtocolCapability;
   EFI_DEVICE_PATH_PROTOCOL            *DevicePathNode;
   EFI_DEVICE_PATH_PROTOCOL            *OrigDevicePathNode;
   EFI_HANDLE                          Handle;
@@ -435,28 +669,23 @@ DxeTpm2MeasureBootHandler (
   EFI_PHYSICAL_ADDRESS                FvAddress;
   UINT32                              Index;
 
-  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
+  MeasureBootProtocols.Tcg2Protocol = NULL;
+  MeasureBootProtocols.CcProtocol   = NULL;
+
+  Status = GetMeasureBootProtocols(&MeasureBootProtocols);
+
   if (EFI_ERROR (Status)) {
     //
-    // Tcg2 protocol is not installed. So, TPM2 is not present.
+    // None of Measured boot protocols (Tcg2, Cc) is installed.
     // Don't do any measurement, and directly return EFI_SUCCESS.
     //
-    DEBUG ((EFI_D_VERBOSE, "DxeTpm2MeasureBootHandler - Tcg2 - %r\n", Status));
+    DEBUG ((DEBUG_INFO, "None of Tcg2Protocol/CcMeasurementProtocol is installed.\n"));
     return EFI_SUCCESS;
   }
 
-  ProtocolCapability.Size = (UINT8) sizeof (ProtocolCapability);
-  Status = Tcg2Protocol->GetCapability (
-                           Tcg2Protocol,
-                           &ProtocolCapability
-                           );
-  if (EFI_ERROR (Status) || (!ProtocolCapability.TPMPresentFlag)) {
-    //
-    // TPM device doesn't work or activate.
-    //
-    DEBUG ((EFI_D_ERROR, "DxeTpm2MeasureBootHandler (%r) - TPMPresentFlag - %x\n", Status, ProtocolCapability.TPMPresentFlag));
-    return EFI_SUCCESS;
-  }
+  DEBUG ((DEBUG_INFO, "Tcg2Protocol = %p, TdProtocol = %p\n",
+                      MeasureBootProtocols.Tcg2Protocol,
+                      MeasureBootProtocols.CcProtocol));
 
   //
   // Copy File Device Path
@@ -502,8 +731,8 @@ DxeTpm2MeasureBootHandler (
             //
             // Measure GPT disk.
             //
-            Status = Tcg2MeasureGptTable (Tcg2Protocol, Handle);
-            DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - Tcg2MeasureGptTable - %r\n", Status));
+            Status = Tcg2MeasureGptTable (&MeasureBootProtocols, Handle);
+
             if (!EFI_ERROR (Status)) {
               //
               // GPT disk check done.
@@ -647,14 +876,13 @@ DxeTpm2MeasureBootHandler (
     // Measure PE image into TPM log.
     //
     Status = Tcg2MeasurePeImage (
-               Tcg2Protocol,
+               &MeasureBootProtocols,
                (EFI_PHYSICAL_ADDRESS) (UINTN) FileBuffer,
                FileSize,
                (UINTN) ImageContext.ImageAddress,
                ImageContext.ImageType,
                DevicePathNode
                );
-    DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - Tcg2MeasurePeImage - %r\n", Status));
   }
 
   //
@@ -665,7 +893,7 @@ Finish:
     FreePool (OrigDevicePathNode);
   }
 
-  DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - %r\n", Status));
 
   return Status;
 }
