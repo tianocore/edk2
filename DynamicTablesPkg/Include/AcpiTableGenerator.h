@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -63,6 +63,10 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             The SSDT CMN-600 generator collates the CMN-600 information
             from the Configuration Manager and patches the SSDT CMN-600
             template to build the SSDT CMN-600 table.
+  - SSDT Cpu-Topology:
+            The SSDT Cpu-Topology generator collates the cpu and LPI
+            information from the Configuration Manager and generates a
+            SSDT table describing the CPU hierarchy.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -88,6 +92,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdSrat,                          ///< SRAT Generator
   EStdAcpiTableIdSsdtSerialPort,                ///< SSDT Serial-Port Generator
   EStdAcpiTableIdSsdtCmn600,                    ///< SSDT Cmn-600 Generator
+  EStdAcpiTableIdSsdtCpuTopology,               ///< SSDT Cpu Topology
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
