@@ -6,13 +6,11 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#include <IndustryStandard/DebugPort2Table.h>
 #include <Library/AcpiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/AcpiTable.h>
 
 // Module specific include files.
@@ -20,7 +18,6 @@
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
 #include <Library/AcpiHelperLib.h>
-#include <Library/AmlLib/AmlLib.h>
 #include <Library/SsdtSerialPortFixupLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
