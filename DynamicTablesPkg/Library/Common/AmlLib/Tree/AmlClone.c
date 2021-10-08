@@ -43,8 +43,6 @@ AmlCloneNode (
     return EFI_INVALID_PARAMETER;
   }
 
-  *ClonedNode = NULL;
-
   if (IS_AML_DATA_NODE (Node)) {
     DataNode = (AML_DATA_NODE*)Node;
     Status = AmlCreateDataNode (

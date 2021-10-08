@@ -148,7 +148,6 @@ AmlCodeGenString (
     return EFI_INVALID_PARAMETER;
   }
 
-  ObjectNode = NULL;
   DataNode = NULL;
 
   Status = AmlCreateObjectNode (
@@ -187,10 +186,7 @@ AmlCodeGenString (
   return Status;
 
 error_handler:
-  if (ObjectNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
-  }
-
+  AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
   return Status;
 }
 
