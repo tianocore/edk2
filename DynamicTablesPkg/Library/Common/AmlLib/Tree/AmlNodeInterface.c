@@ -513,6 +513,13 @@ AmlUpdateDataNode (
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
+
+      Status = AmlSetRdListCheckSum (ParentNode, 0);
+      if (EFI_ERROR (Status)) {
+        ASSERT (0);
+        return Status;
+      }
+
       break;
     }
     case EAmlNodeDataTypeFieldPkgLen:
