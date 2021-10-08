@@ -619,6 +619,59 @@ AmlCodeGenScope (
   OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
   );
 
+/** AML code generation for a method returning a NameString.
+
+  AmlCodeGenMethodRetNameString (
+    "MET0", "_CRS", 1, TRUE, 3, ParentNode, NewObjectNode
+    );
+  is equivalent of the following ASL code:
+    Method(MET0, 1, Serialized, 3) {
+      Return (_CRS)
+    }
+
+  The ASL parameters "ReturnType" and "ParameterTypes" are not asked
+  in this function. They are optional parameters in ASL.
+
+  @ingroup CodeGenApis
+
+  @param [in]  MethodNameString     The new Method's name.
+                                    Must be a NULL-terminated ASL NameString
+                                    e.g.: "MET0", "_SB.MET0", etc.
+                                    The input string is copied.
+  @param [in]  ReturnedNameString   The name of the object returned by the
+                                    method. Optional parameter, can be:
+                                     - NULL (ignored).
+                                     - A NULL-terminated ASL NameString.
+                                       e.g.: "MET0", "_SB.MET0", etc.
+                                       The input string is copied.
+  @param [in]  NumArgs              Number of arguments.
+                                    Must be 0 <= NumArgs <= 6.
+  @param [in]  IsSerialized         TRUE is equivalent to Serialized.
+                                    FALSE is equivalent to NotSerialized.
+                                    Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel            Synchronization level for the method.
+                                    Must be 0 <= SyncLevel <= 15.
+                                    Default is 0 in ASL.
+  @param [in]  ParentNode           If provided, set ParentNode as the parent
+                                    of the node created.
+  @param [out] NewObjectNode        If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethodRetNameString (
+  IN  CONST CHAR8                   * MethodNameString,
+  IN  CONST CHAR8                   * ReturnedNameString,  OPTIONAL
+  IN        UINT8                     NumArgs,
+  IN        BOOLEAN                   IsSerialized,
+  IN        UINT8                     SyncLevel,
+  IN        AML_NODE_HANDLE           ParentNode,          OPTIONAL
+  OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode        OPTIONAL
+  );
+
 // DEPRECATED APIS
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
