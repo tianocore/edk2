@@ -566,8 +566,7 @@ AmlAppendRdNode (
   )
 {
   EFI_STATUS        Status;
-  AML_DATA_NODE   * CurrRdNode;
-  AML_RD_HEADER     RdDataType;
+  AML_DATA_NODE   * LastRdNode;
 
   if (!AmlNodeCompareOpCode (BufferOpNode, AML_BUFFER_OP, 0)  ||
       !IS_AML_DATA_NODE (NewRdNode)                           ||
@@ -576,56 +575,39 @@ AmlAppendRdNode (
     return EFI_INVALID_PARAMETER;
   }
 
-  // Get the first Resource data node in the variable list of
-  // argument of the BufferOp node.
-  CurrRdNode = (AML_DATA_NODE*)AmlGetNextVariableArgument (
+  // To avoid re-computing checksums, if a new resource data elements is
+  // added/removed/modified in a list of resource data elements, the AmlLib
+  // resets the checksum to 0.
+  // It is possible to have only one Resource Data in a BufferOp with
+  // no EndTag, but it should not be possible to add a new Resource Data
+  // in the list in this case.
+  Status = AmlSetRdListCheckSum (BufferOpNode, 0);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // Get the last Resource data node in the variable list of argument of the
+  // BufferOp node. This must be an EndTag, otherwise setting the checksum
+  // would have failed.
+  LastRdNode = (AML_DATA_NODE*)AmlGetPreviousVariableArgument (
                                  (AML_NODE_HEADER*)BufferOpNode,
                                  NULL
                                  );
-  if ((CurrRdNode == NULL)             ||
-      !IS_AML_DATA_NODE (CurrRdNode)   ||
-      (CurrRdNode->DataType != EAmlNodeDataTypeResourceData)) {
+  if ((LastRdNode == NULL)             ||
+      !IS_AML_DATA_NODE (LastRdNode)   ||
+      (LastRdNode->DataType != EAmlNodeDataTypeResourceData)) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  // Iterate through the Resource Data nodes to find the End Tag.
-  while (TRUE) {
-    Status = AmlGetResourceDataType (CurrRdNode, &RdDataType);
-    if (EFI_ERROR (Status)) {
-      ASSERT (0);
-      return Status;
-    }
-
-    // If the Resource Data is an End Tag,
-    // add the new node before and return.
-    if (AmlRdCompareDescId (
-          &RdDataType,
-          AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME))) {
-      Status = AmlVarListAddBefore (
-                 (AML_NODE_HEADER*)CurrRdNode,
-                 (AML_NODE_HEADER*)NewRdNode)
-                 ;
-      if (EFI_ERROR (Status)) {
-        ASSERT (0);
-      }
-      return Status;
-    }
-
-    // Get the next Resource Data node.
-    // If this was the last node and no End Tag was found, return error.
-    // It is possible to have only one Resource Data in a BufferOp,
-    // but it should not be possible to add a new Resource Data in the list
-    // in this case.
-    CurrRdNode = (AML_DATA_NODE*)AmlGetSiblingVariableArgument (
-                                   (AML_NODE_HEADER*)CurrRdNode
-                                   );
-    if (!IS_AML_DATA_NODE (CurrRdNode)  ||
-        (CurrRdNode->DataType != EAmlNodeDataTypeResourceData)) {
-      ASSERT (0);
-      return EFI_INVALID_PARAMETER;
-    }
-  } // while
+  // Add NewRdNode before the EndTag.
+  Status = AmlVarListAddBefore (
+             (AML_NODE_HEADER*)LastRdNode,
+             (AML_NODE_HEADER*)NewRdNode)
+             ;
+  ASSERT_EFI_ERROR (Status);
+  return Status;
 }
 
 /** Replace the fixed argument at the Index of the ParentNode with the NewNode.
