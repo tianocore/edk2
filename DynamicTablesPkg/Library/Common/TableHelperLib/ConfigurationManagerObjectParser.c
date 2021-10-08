@@ -368,6 +368,39 @@ STATIC CONST CM_OBJ_PARSER CmArmCmn600InfoParser[] = {
   {"DtcFlags[3]", 4, "0x%x", NULL}
 };
 
+/** A parser for the EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE structure.
+*/
+STATIC CONST CM_OBJ_PARSER AcpiGenericAddressParser[] = {
+  {"AddressSpaceId", 1, "%d", NULL},
+  {"RegisterBitWidth", 1, "%d", NULL},
+  {"RegisterBitOffset", 1, "%d", NULL},
+  {"AccessSize", 1, "%d", NULL},
+  {"Address", 8, "0x%llx", NULL},
+};
+
+/** A parser for EArmObjLpiInfo.
+*/
+STATIC CONST CM_OBJ_PARSER CmArmLpiInfoParser[] = {
+  {"MinResidency", 4, "0x%llx", NULL},
+  {"WorstCaseWakeLatency", 4, "0x%llx", NULL},
+  {"Flags", 4, "0x%llx", NULL},
+  {"ArchFlags", 4, "0x%llx", NULL},
+  {"ResCntFreq", 4, "0x%llx", NULL},
+  {"EnableParentState", 4, "0x%llx", NULL},
+  {"IsInteger", 1, "%d", NULL},
+  {"IntegerEntryMethod", 8, "0x%llx", NULL},
+  {"RegisterEntryMethod", sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser)},
+  {"ResidencyCounterRegister", sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser)},
+  {"UsageCounterRegister", sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser)},
+  {"StateName", 16, "0x%a", NULL},
+};
+
 /** A parser for Arm namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY ArmNamespaceObjectParser[] = {
@@ -440,6 +473,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY ArmNamespaceObjectParser[] = {
     ARRAY_SIZE (CmArmSerialPortInfoParser)},
   {"EArmObjCmn600Info", CmArmCmn600InfoParser,
     ARRAY_SIZE (CmArmCmn600InfoParser)},
+  {"EArmObjLpiInfo", CmArmLpiInfoParser,
+      ARRAY_SIZE (CmArmLpiInfoParser)},
   {"EArmObjMax", NULL, 0},
 };
 
