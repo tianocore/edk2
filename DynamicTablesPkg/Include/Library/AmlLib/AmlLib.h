@@ -672,6 +672,50 @@ AmlCodeGenMethodRetNameString (
   OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode        OPTIONAL
   );
 
+/** Create a _LPI name.
+
+  AmlCreateLpiNode ("_LPI", 0, 1, ParentNode, &LpiNode) is
+  equivalent of the following ASL code:
+    Name (_LPI, Package (
+                  0,  // Revision
+                  1,  // LevelId
+                  0   // Count
+                  ))
+
+  This function doesn't define any LPI state. As shown above, the count
+  of _LPI state is set to 0.
+  The AmlAddLpiState () function must be used to add LPI states.
+
+  Cf ACPI 6.3 specification, s8.4.4 "Lower Power Idle States".
+
+  @ingroup CodeGenApis
+
+  @param [in]  LpiNameString  The new LPI 's object name.
+                              Must be a NULL-terminated ASL NameString
+                              e.g.: "_LPI", "DEV0.PLPI", etc.
+                              The input string is copied.
+  @param [in]  Revision       Revision number of the _LPI states.
+  @param [in]  LevelId        A platform defined number that identifies the
+                              level of hierarchy of the processor node to
+                              which the LPI states apply.
+  @param [in]  ParentNode     If provided, set ParentNode as the parent
+                              of the node created.
+  @param [out] NewLpiNode     If success, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreateLpiNode (
+  IN  CONST CHAR8                   * LpiNameString,
+  IN        UINT16                    Revision,
+  IN        UINT64                    LevelId,
+  IN        AML_NODE_HANDLE           ParentNode,  OPTIONAL
+  OUT       AML_OBJECT_NODE_HANDLE  * NewLpiNode   OPTIONAL
+  );
+
 // DEPRECATED APIS
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
