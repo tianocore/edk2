@@ -970,3 +970,187 @@ error_handler1:
 
   return Status;
 }
+
+/** AML code generation for a Method object node.
+
+  AmlCodeGenMethod ("MET0", 1, TRUE, 3, ParentNode, NewObjectNode) is
+  equivalent of the following ASL code:
+    Method(MET0, 1, Serialized, 3) {}
+
+  ACPI 6.4, s20.2.5.2 "Named Objects Encoding":
+    DefMethod := MethodOp PkgLength NameString MethodFlags TermList
+    MethodOp := 0x14
+
+  The ASL parameters "ReturnType" and "ParameterTypes" are not asked
+  in this function. They are optional parameters in ASL.
+
+  @param [in]  NameString     The new Method's name.
+                              Must be a NULL-terminated ASL NameString
+                              e.g.: "MET0", "_SB.MET0", etc.
+                              The input string is copied.
+  @param [in]  NumArgs        Number of arguments.
+                              Must be 0 <= NumArgs <= 6.
+  @param [in]  IsSerialized   TRUE is equivalent to Serialized.
+                              FALSE is equivalent to NotSerialized.
+                              Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel      Synchronization level for the method.
+                              Must be 0 <= SyncLevel <= 15.
+                              Default is 0 in ASL.
+  @param [in]  ParentNode     If provided, set ParentNode as the parent
+                              of the node created.
+  @param [out] NewObjectNode  If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethod (
+  IN  CONST CHAR8              * NameString,
+  IN        UINT8                NumArgs,
+  IN        BOOLEAN              IsSerialized,
+  IN        UINT8                SyncLevel,
+  IN        AML_NODE_HEADER    * ParentNode,     OPTIONAL
+  OUT       AML_OBJECT_NODE   ** NewObjectNode   OPTIONAL
+  )
+{
+  EFI_STATUS        Status;
+  UINT32            PkgLen;
+  UINT8             Flags;
+  AML_OBJECT_NODE * ObjectNode;
+  AML_DATA_NODE   * DataNode;
+  CHAR8           * AmlNameString;
+  UINT32            AmlNameStringSize;
+
+  if ((NameString == NULL)    ||
+      (NumArgs > 6)           ||
+      (SyncLevel > 15)        ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL))) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ObjectNode = NULL;
+  DataNode = NULL;
+
+  // ACPI 6.4, s20.2.5.2 "Named Objects Encoding":
+  //   DefMethod := MethodOp PkgLength NameString MethodFlags TermList
+  //   MethodOp := 0x14
+  // So:
+  //  1- Create the NameString
+  //  2- Compute the size to write in the PkgLen
+  //  3- Create nodes for the NameString and Method object node
+  //  4- Set the NameString DataNode as a fixed argument
+  //  5- Create and link the MethodFlags node
+
+  // 1- Create the NameString
+  Status = ConvertAslNameToAmlName (NameString, &AmlNameString);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlGetNameStringSize (AmlNameString, &AmlNameStringSize);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler1;
+  }
+
+  // 2- Compute the size to write in the PkgLen
+  //    Add 1 byte (ByteData) for MethodFlags.
+  Status = AmlComputePkgLength (AmlNameStringSize + 1, &PkgLen);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler1;
+  }
+
+  //  3- Create nodes for the NameString and Method object node
+  Status = AmlCreateObjectNode (
+             AmlGetByteEncodingByOpCode (AML_METHOD_OP, 0),
+             PkgLen,
+             &ObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler1;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8*)AmlNameString,
+             AmlNameStringSize,
+             &DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler2;
+  }
+
+  //  4- Set the NameString DataNode as a fixed argument
+  Status = AmlSetFixedArgument (
+             ObjectNode,
+             EAmlParseIndexTerm0,
+             (AML_NODE_HEADER*)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler2;
+  }
+
+  DataNode = NULL;
+
+  //  5- Create and link the MethodFlags node
+  Flags = NumArgs                   |
+          (IsSerialized ? BIT3 : 0) |
+          (SyncLevel << 4);
+
+  Status = AmlCreateDataNode (EAmlNodeDataTypeUInt, &Flags, 1, &DataNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler2;
+  }
+
+  Status = AmlSetFixedArgument (
+             ObjectNode,
+             EAmlParseIndexTerm1,
+             (AML_NODE_HEADER*)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler2;
+  }
+
+  // Data node is attached so set the pointer to
+  // NULL to ensure correct error handling.
+  DataNode = NULL;
+
+  Status = LinkNode (
+             ObjectNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler2;
+  }
+
+  // Free AmlNameString before returning as it is copied
+  // in the call to AmlCreateDataNode().
+  goto error_handler1;
+
+error_handler2:
+  if (ObjectNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
+  }
+  if (DataNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
+  }
+
+error_handler1:
+  if (AmlNameString != NULL) {
+    FreePool (AmlNameString);
+  }
+  return Status;
+}
