@@ -122,11 +122,13 @@ AddAcpiHeader (
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (Generator != NULL);
   ASSERT (AcpiHeader != NULL);
+  ASSERT (AcpiTableInfo != NULL);
   ASSERT (Length >= sizeof (EFI_ACPI_DESCRIPTION_HEADER));
 
   if ((CfgMgrProtocol == NULL) ||
       (Generator == NULL) ||
       (AcpiHeader == NULL) ||
+      (AcpiTableInfo == NULL) ||
       (Length < sizeof (EFI_ACPI_DESCRIPTION_HEADER))
     ) {
     return EFI_INVALID_PARAMETER;
