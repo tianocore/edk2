@@ -1,7 +1,7 @@
 /** @file
   AML Utility.
 
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -192,7 +192,6 @@ AmlComputeSize (
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 AmlNodeGetIntegerValue (

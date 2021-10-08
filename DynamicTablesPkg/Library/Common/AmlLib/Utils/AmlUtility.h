@@ -1,7 +1,7 @@
 /** @file
   AML Utility.
 
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -37,6 +37,22 @@ EFIAPI
 AmlComputeSize (
   IN      CONST AML_NODE_HEADER   * Node,
   IN  OUT       UINT32            * Size
+  );
+
+/** Get the value contained in an integer node.
+
+  @param  [in]  Node    Pointer to an integer node.
+                        Must be an object node.
+  @param  [out] Value   Value contained in the integer node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlNodeGetIntegerValue (
+  IN  AML_OBJECT_NODE   * Node,
+  OUT UINT64            * Value
   );
 
 /** Set the value contained in an integer node.
