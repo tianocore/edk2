@@ -1,7 +1,7 @@
 /** @file
   AML Code Generation.
 
-  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -234,6 +234,85 @@ AmlCodeGenInteger (
     AmlDeleteTree ((AML_NODE_HEADER*)*NewObjectNode);
   }
 
+  return Status;
+}
+
+/** AML code generation for a Package object node.
+
+  The package generated is empty. New elements can be added via its
+  list of variable arguments.
+
+  @param [out] NewObjectNode   If success, contains the created
+                               Package object node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+AmlCodeGenPackage (
+  OUT AML_OBJECT_NODE    ** NewObjectNode
+  )
+{
+  EFI_STATUS        Status;
+  AML_DATA_NODE   * DataNode;
+  UINT8             NodeCount;
+
+  if (NewObjectNode == NULL) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  NodeCount = 0;
+
+  // Create an object node.
+  // PkgLen is 2:
+  //  - one byte to store the PkgLength
+  //  - one byte for the NumElements.
+  // Cf ACPI6.3, s20.2.5 "Term Objects Encoding"
+  // DefPackage  := PackageOp PkgLength NumElements PackageElementList
+  // NumElements := ByteData
+  Status = AmlCreateObjectNode (
+             AmlGetByteEncodingByOpCode (AML_PACKAGE_OP, 0),
+             2,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // NumElements is a ByteData.
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeUInt,
+             &NodeCount,
+             sizeof (NodeCount),
+             &DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  Status = AmlSetFixedArgument (
+             *NewObjectNode,
+             EAmlParseIndexTerm0,
+             (AML_NODE_HEADER*)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  return Status;
+
+error_handler:
+  AmlDeleteTree ((AML_NODE_HEADER*)*NewObjectNode);
+  if (DataNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
+  }
   return Status;
 }
 
