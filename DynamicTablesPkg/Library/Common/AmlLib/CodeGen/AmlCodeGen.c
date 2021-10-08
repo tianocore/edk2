@@ -12,6 +12,7 @@
 
 #include <AmlCoreInterface.h>
 #include <AmlEncoding/Aml.h>
+#include <Api/AmlApiHelper.h>
 #include <CodeGen/AmlResourceDataCodeGen.h>
 #include <Tree/AmlNode.h>
 #include <Tree/AmlTree.h>
@@ -1572,5 +1573,463 @@ error_handler:
   if (IntegerNode != NULL) {
     AmlDeleteTree ((AML_NODE_HANDLE)IntegerNode);
   }
+  return Status;
+}
+
+/** Add an _LPI state to a LPI node created using AmlCreateLpiNode.
+
+  AmlAddLpiState increments the Count of LPI states in the LPI node by one,
+  and adds the following package:
+    Package() {
+      MinResidency,
+      WorstCaseWakeLatency,
+      Flags,
+      ArchFlags,
+      ResCntFreq,
+      EnableParentState,
+      (GenericRegisterDescriptor != NULL) ?           // Entry method. If a
+        ResourceTemplate(GenericRegisterDescriptor) : // Register is given,
+        Integer,                                      // use it. Use the
+                                                      // Integer otherwise.
+      ResourceTemplate() {                            // NULL Residency Counter
+        Register (SystemMemory, 0, 0, 0, 0)
+      },
+      ResourceTemplate() {                            // NULL Usage Counter
+        Register (SystemMemory, 0, 0, 0, 0)
+      },
+      ""                                              // NULL State Name
+    },
+
+  Cf ACPI 6.3 specification, s8.4.4 "Lower Power Idle States".
+
+  @param [in]  MinResidency               Minimum Residency.
+  @param [in]  WorstCaseWakeLatency       Worst case wake-up latency.
+  @param [in]  Flags                      Flags.
+  @param [in]  ArchFlags                  Architectural flags.
+  @param [in]  ResCntFreq                 Residency Counter Frequency.
+  @param [in]  EnableParentState          Enabled Parent State.
+  @param [in]  GenericRegisterDescriptor  Entry Method.
+                                          If not NULL, use this Register to
+                                          describe the entry method address.
+  @param [in]  Integer                    Entry Method.
+                                          If GenericRegisterDescriptor is NULL,
+                                          take this value.
+  @param [in]  ResidencyCounterRegister   If not NULL, use it to populate the
+                                          residency counter register.
+  @param [in]  UsageCounterRegister       If not NULL, use it to populate the
+                                          usage counter register.
+  @param [in]  StateName                  If not NULL, use it to populate the
+                                          state name.
+  @param [in]  LpiNode                    Lpi node created with the function
+                                          AmlCreateLpiNode to which the new LPI
+                                          state is appended.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddLpiState (
+  IN  UINT32                                    MinResidency,
+  IN  UINT32                                    WorstCaseWakeLatency,
+  IN  UINT32                                    Flags,
+  IN  UINT32                                    ArchFlags,
+  IN  UINT32                                    ResCntFreq,
+  IN  UINT32                                    EnableParentState,
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * GenericRegisterDescriptor,  OPTIONAL
+  IN  UINT64                                    Integer,                    OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * ResidencyCounterRegister,   OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * UsageCounterRegister,       OPTIONAL
+  IN  CHAR8                                   * StateName,                  OPTIONAL
+  IN  AML_OBJECT_NODE_HANDLE                    LpiNode
+  )
+{
+  EFI_STATUS                Status;
+  AML_DATA_NODE_HANDLE      RdNode;
+  AML_OBJECT_NODE_HANDLE    PackageNode;
+  AML_OBJECT_NODE_HANDLE    IntegerNode;
+  AML_OBJECT_NODE_HANDLE    StringNode;
+  AML_OBJECT_NODE_HANDLE    NewLpiPackageNode;
+  AML_OBJECT_NODE_HANDLE    ResourceTemplateNode;
+
+  UINT32                    Index;
+  AML_OBJECT_NODE_HANDLE    CountNode;
+  UINT64                    Count;
+
+  if ((LpiNode == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)LpiNode) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (LpiNode, AML_NAME_OP, 0))) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  RdNode = 0;
+  StringNode = NULL;
+  IntegerNode = NULL;
+  ResourceTemplateNode = NULL;
+
+  // AmlCreateLpiNode () created a LPI container such as:
+  //  Name (_LPI, Package (
+  //                0,  // Revision
+  //                1,  // LevelId
+  //                0   // Count
+  //                ))
+  // Get the LPI container, a PackageOp object node stored as the 2nd fixed
+  // argument (i.e. index 1) of LpiNode.
+  PackageNode = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                          LpiNode,
+                                          EAmlParseIndexTerm1
+                                          );
+  if ((PackageNode == NULL)                                             ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PackageNode) != EAmlNodeObject) ||
+      (!AmlNodeHasOpCode (PackageNode, AML_PACKAGE_OP, 0))) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CountNode = NULL;
+  // The third variable argument is the LPI Count node.
+  for (Index = 0; Index < 3; Index++) {
+    CountNode = (AML_OBJECT_NODE_HANDLE)AmlGetNextVariableArgument (
+                                          (AML_NODE_HANDLE)PackageNode,
+                                          (AML_NODE_HANDLE)CountNode
+                                          );
+    if (CountNode == NULL) {
+      ASSERT (0);
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  Status = AmlNodeGetIntegerValue (CountNode, &Count);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+  Status = AmlUpdateInteger (CountNode, Count + 1);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlCodeGenPackage (&NewLpiPackageNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // MinResidency
+  Status = AmlCodeGenInteger (MinResidency, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    IntegerNode = NULL;
+    goto error_handler;
+  }
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewLpiPackageNode,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  IntegerNode = NULL;
+
+  // WorstCaseWakeLatency
+  Status = AmlCodeGenInteger (WorstCaseWakeLatency, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    IntegerNode = NULL;
+    goto error_handler;
+  }
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewLpiPackageNode,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  IntegerNode = NULL;
+
+  // Flags
+  Status = AmlCodeGenInteger (Flags, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    IntegerNode = NULL;
+    goto error_handler;
+  }
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewLpiPackageNode,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  IntegerNode = NULL;
+
+  // ArchFlags
+  Status = AmlCodeGenInteger (ArchFlags, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    IntegerNode = NULL;
+    goto error_handler;
+  }
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewLpiPackageNode,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  IntegerNode = NULL;
+
+  // ResCntFreq
+  Status = AmlCodeGenInteger (ResCntFreq, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    IntegerNode = NULL;
+    goto error_handler;
+  }
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewLpiPackageNode,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  IntegerNode = NULL;
+
+  // EnableParentState
+  Status = AmlCodeGenInteger (EnableParentState, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    IntegerNode = NULL;
+    goto error_handler;
+  }
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewLpiPackageNode,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  IntegerNode = NULL;
+
+  // Entry Method
+  if (GenericRegisterDescriptor != NULL) {
+    // Entry Method: As a Register resource data
+    Status = AmlCodeGenResourceTemplate (&ResourceTemplateNode);
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      ResourceTemplateNode = NULL;
+      goto error_handler;
+    }
+    Status = AmlCodeGenRdRegister (
+               GenericRegisterDescriptor->AddressSpaceId,
+               GenericRegisterDescriptor->RegisterBitWidth,
+               GenericRegisterDescriptor->RegisterBitOffset,
+               GenericRegisterDescriptor->Address,
+               GenericRegisterDescriptor->AccessSize,
+               NULL,
+               &RdNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      RdNode = NULL;
+      goto error_handler;
+    }
+
+    Status = AmlAppendRdNode (ResourceTemplateNode, RdNode);
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      goto error_handler;
+    }
+    RdNode = NULL;
+
+    Status = AmlVarListAddTail (
+               (AML_NODE_HANDLE)NewLpiPackageNode,
+               (AML_NODE_HANDLE)ResourceTemplateNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      goto error_handler;
+    }
+    ResourceTemplateNode = NULL;
+  } else {
+    // Entry Method: As an integer
+    Status = AmlCodeGenInteger (Integer, &IntegerNode);
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      IntegerNode = NULL;
+      goto error_handler;
+    }
+    Status = AmlVarListAddTail (
+               (AML_NODE_HANDLE)NewLpiPackageNode,
+               (AML_NODE_HANDLE)IntegerNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      goto error_handler;
+    }
+    IntegerNode = NULL;
+  }
+
+  // Residency Counter Register.
+  Status = AmlCodeGenResourceTemplate (&ResourceTemplateNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    ResourceTemplateNode = NULL;
+    goto error_handler;
+  }
+  if (ResidencyCounterRegister != NULL) {
+    Status = AmlCodeGenRdRegister (
+               ResidencyCounterRegister->AddressSpaceId,
+               ResidencyCounterRegister->RegisterBitWidth,
+               ResidencyCounterRegister->RegisterBitOffset,
+               ResidencyCounterRegister->Address,
+               ResidencyCounterRegister->AccessSize,
+               NULL,
+               &RdNode
+               );
+  } else {
+    Status = AmlCodeGenRdRegister (
+               EFI_ACPI_6_4_SYSTEM_MEMORY,
+               0,
+               0,
+               0,
+               0,
+               NULL,
+               &RdNode
+               );
+  }
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    RdNode = NULL;
+    goto error_handler;
+  }
+
+  Status = AmlAppendRdNode (ResourceTemplateNode, RdNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  RdNode = NULL;
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewLpiPackageNode,
+             (AML_NODE_HANDLE)ResourceTemplateNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  ResourceTemplateNode = NULL;
+
+  // Usage Counter Register.
+  Status = AmlCodeGenResourceTemplate (&ResourceTemplateNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    ResourceTemplateNode = NULL;
+    goto error_handler;
+  }
+  if (UsageCounterRegister != NULL) {
+    Status = AmlCodeGenRdRegister (
+               UsageCounterRegister->AddressSpaceId,
+               UsageCounterRegister->RegisterBitWidth,
+               UsageCounterRegister->RegisterBitOffset,
+               UsageCounterRegister->Address,
+               UsageCounterRegister->AccessSize,
+               NULL,
+               &RdNode
+               );
+  } else {
+    Status = AmlCodeGenRdRegister (
+               EFI_ACPI_6_4_SYSTEM_MEMORY,
+               0,
+               0,
+               0,
+               0,
+               NULL,
+               &RdNode
+               );
+  }
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    RdNode = NULL;
+    goto error_handler;
+  }
+
+  Status = AmlAppendRdNode (ResourceTemplateNode, RdNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  RdNode = NULL;
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewLpiPackageNode,
+             (AML_NODE_HANDLE)ResourceTemplateNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  ResourceTemplateNode = NULL;
+
+  // State name.
+  if (UsageCounterRegister != NULL) {
+    Status = AmlCodeGenString (StateName, &StringNode);
+  } else {
+    Status = AmlCodeGenString ("", &StringNode);
+  }
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    StringNode = NULL;
+    goto error_handler;
+  }
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)NewLpiPackageNode,
+             (AML_NODE_HANDLE)StringNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+  StringNode = NULL;
+
+  // Add the new LPI state to the LpiNode.
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PackageNode,
+             (AML_NODE_HANDLE)NewLpiPackageNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  return Status;
+
+error_handler:
+  if (RdNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)RdNode);
+  }
+  if (NewLpiPackageNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)NewLpiPackageNode);
+  }
+  if (StringNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)StringNode);
+  }
+  if (IntegerNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)IntegerNode);
+  }
+  if (ResourceTemplateNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)ResourceTemplateNode);
+  }
+
   return Status;
 }
