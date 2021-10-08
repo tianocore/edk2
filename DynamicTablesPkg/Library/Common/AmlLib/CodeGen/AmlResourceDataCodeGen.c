@@ -33,7 +33,9 @@
                             RdNode is then added at the end of the variable
                             list of resource data elements, but before the
                             "End Tag" Resource Data.
-  @param [out] NewRdNode    If not NULL, update the its value to RdNode.
+  @param [out] NewRdNode    If not NULL:
+                             - and Success, contains RdNode.
+                             - and Error, reset to NULL.
 
   @retval  EFI_SUCCESS            The function completed successfully.
   @retval  EFI_INVALID_PARAMETER  Invalid parameter.
@@ -52,7 +54,7 @@ LinkRdNode (
   AML_OBJECT_NODE   *BufferOpNode;
 
   if (NewRdNode != NULL) {
-    *NewRdNode = RdNode;
+    *NewRdNode = NULL;
   }
 
   if (ParentNode != NULL) {
@@ -83,6 +85,10 @@ LinkRdNode (
       ASSERT (0);
       goto error_handler;
     }
+  }
+
+  if (NewRdNode != NULL) {
+    *NewRdNode = RdNode;
   }
 
   return Status;
