@@ -12,6 +12,7 @@
 
 #include <AmlCoreInterface.h>
 #include <AmlEncoding/Aml.h>
+#include <CodeGen/AmlResourceDataCodeGen.h>
 #include <Tree/AmlNode.h>
 #include <Tree/AmlTree.h>
 #include <String/AmlString.h>
@@ -313,6 +314,195 @@ error_handler:
   if (DataNode != NULL) {
     AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
   }
+  return Status;
+}
+
+/** AML code generation for a Buffer object node.
+
+  To create a Buffer object node with an empty buffer,
+  call the function with (Buffer=NULL, BufferSize=0).
+
+  @param [in]  Buffer          Buffer to set for the created Buffer
+                               object node. The Buffer's content is copied.
+                               NULL if there is no buffer to set for
+                               the Buffer node.
+  @param [in]  BufferSize      Size of the Buffer.
+                               0 if there is no buffer to set for
+                               the Buffer node.
+  @param [out] NewObjectNode   If success, contains the created
+                               Buffer object node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+AmlCodeGenBuffer (
+  IN  CONST UINT8             * Buffer,       OPTIONAL
+  IN        UINT32              BufferSize,   OPTIONAL
+  OUT       AML_OBJECT_NODE  ** NewObjectNode
+  )
+{
+  EFI_STATUS        Status;
+  AML_OBJECT_NODE * BufferNode;
+  AML_OBJECT_NODE * BufferSizeNode;
+  UINT32            BufferSizeNodeSize;
+  AML_DATA_NODE   * DataNode;
+  UINT32            PkgLen;
+
+  // Buffer and BufferSize must be either both set, or both clear.
+  if ((NewObjectNode == NULL)                 ||
+      ((Buffer == NULL) != (BufferSize == 0))) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  BufferNode = NULL;
+  DataNode = NULL;
+
+  // Cf ACPI 6.3 specification, s20.2.5.4 "Type 2 Opcodes Encoding"
+  // DefBuffer := BufferOp PkgLength BufferSize ByteList
+  // BufferOp  := 0x11
+  // BufferSize := TermArg => Integer
+
+  Status = AmlCodeGenInteger (BufferSize, &BufferSizeNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // Get the number of bytes required to encode the BufferSizeNode.
+  Status = AmlComputeSize (
+             (AML_NODE_HEADER*)BufferSizeNode,
+             &BufferSizeNodeSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  // Compute the size to write in the PkgLen.
+  Status = AmlComputePkgLength (BufferSizeNodeSize + BufferSize, &PkgLen);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  // Create an object node for the buffer.
+  Status = AmlCreateObjectNode (
+             AmlGetByteEncodingByOpCode (AML_BUFFER_OP, 0),
+             PkgLen,
+             &BufferNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  // Set the BufferSizeNode as a fixed argument of the BufferNode.
+  Status = AmlSetFixedArgument (
+             BufferNode,
+             EAmlParseIndexTerm0,
+             (AML_NODE_HEADER*)BufferSizeNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  // BufferSizeNode is now attached.
+  BufferSizeNode = NULL;
+
+  // If there is a buffer, create a DataNode and attach it to the BufferNode.
+  if (Buffer != NULL) {
+    Status = AmlCreateDataNode (
+               EAmlNodeDataTypeRaw,
+               Buffer,
+               BufferSize,
+               &DataNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      goto error_handler;
+    }
+
+    Status = AmlVarListAddTail (
+               (AML_NODE_HEADER*)BufferNode,
+               (AML_NODE_HEADER*)DataNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      goto error_handler;
+    }
+  }
+
+  *NewObjectNode = BufferNode;
+  return Status;
+
+error_handler:
+  if (BufferSizeNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER*)BufferSizeNode);
+  }
+  if (BufferNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER*)BufferNode);
+  }
+  if (DataNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
+  }
+  return Status;
+}
+
+/** AML code generation for a ResourceTemplate.
+
+  "ResourceTemplate" is a macro defined in ACPI 6.3, s19.3.3
+  "ASL Resource Templates". It allows to store resource data elements.
+
+  In AML, a ResourceTemplate is implemented as a Buffer storing resource
+  data elements. An EndTag resource data descriptor must be at the end
+  of the list of resource data elements.
+  This function generates a Buffer node with an EndTag resource data
+  descriptor. It can be seen as an empty list of resource data elements.
+
+  @param [out] NewObjectNode   If success, contains the created
+                               ResourceTemplate object node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+AmlCodeGenResourceTemplate (
+  OUT AML_OBJECT_NODE    ** NewObjectNode
+  )
+{
+  EFI_STATUS          Status;
+  AML_OBJECT_NODE   * BufferNode;
+
+  if (NewObjectNode == NULL) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Create a BufferNode with an empty buffer.
+  Status = AmlCodeGenBuffer (NULL, 0, &BufferNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // Create an EndTag resource data element and attach it to the Buffer.
+  Status = AmlCodeGenEndTag (0, BufferNode, NULL);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    AmlDeleteTree ((AML_NODE_HEADER*)BufferNode);
+    return Status;
+  }
+
+  *NewObjectNode = BufferNode;
   return Status;
 }
 
