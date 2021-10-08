@@ -22,7 +22,9 @@
   @param [in]  Node           Newly created node.
   @param [in]  ParentNode     If provided, set ParentNode as the parent
                               of the node created.
-  @param [out] NewObjectNode  If success, contains the created object node.
+  @param [out] NewObjectNode  If not NULL:
+                               - and Success, contains the created Node.
+                               - and Error, reset to NULL.
 
   @retval  EFI_SUCCESS            The function completed successfully.
   @retval  EFI_INVALID_PARAMETER  Invalid parameter.
@@ -39,7 +41,7 @@ LinkNode (
   EFI_STATUS    Status;
 
   if (NewObjectNode != NULL) {
-    *NewObjectNode = Node;
+    *NewObjectNode = NULL;
   }
 
   // Add RdNode as the last element.
@@ -49,6 +51,10 @@ LinkNode (
       ASSERT (0);
       return Status;
     }
+  }
+
+  if (NewObjectNode != NULL) {
+    *NewObjectNode = Node;
   }
 
   return EFI_SUCCESS;

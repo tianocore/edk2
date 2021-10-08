@@ -79,7 +79,9 @@ AmlDeleteRootNode (
 
   @param  [in]  SdtHeader       Pointer to an ACPI DSDT/SSDT header to copy
                                 the data from.
-  @param  [out] NewRootNodePtr  The created AML_ROOT_NODE.
+  @param  [out] NewRootNodePtr  If success, contains the created
+                                AML_ROOT_NODE.
+                                Otherwise reset to NULL.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -100,6 +102,8 @@ AmlCreateRootNode (
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
+  *NewRootNodePtr = NULL;
 
   RootNode = AllocateZeroPool (sizeof (AML_ROOT_NODE));
   if (RootNode == NULL) {
@@ -163,7 +167,9 @@ AmlDeleteObjectNode (
   @param  [in]  PkgLength         PkgLength of the node if the AmlByteEncoding
                                   has the PkgLen attribute.
                                   0 otherwise.
-  @param  [out] NewObjectNodePtr  The created AML_OBJECT_NODE.
+  @param  [out] NewObjectNodePtr  If success, contains the created
+                                  AML_OBJECT_NODE.
+                                  Otherwise reset to NULL.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -185,6 +191,8 @@ AmlCreateObjectNode (
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
+  *NewObjectNodePtr = NULL;
 
   ObjectNode = AllocateZeroPool (sizeof (AML_OBJECT_NODE));
   if (ObjectNode == NULL) {
@@ -252,7 +260,9 @@ AmlDeleteDataNode (
                                 this node. Data is copied from there.
   @param  [in]  DataSize        Number of bytes to consider at the address
                                 pointed by Data.
-  @param  [out] NewDataNodePtr  The created AML_DATA_NODE.
+  @param  [out] NewDataNodePtr  If success, contains the created
+                                AML_DATA_NODE.
+                                Otherwise reset to NULL.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -283,6 +293,8 @@ AmlCreateDataNode (
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
+  *NewDataNodePtr = NULL;
 
   DataNode = AllocateZeroPool (sizeof (AML_DATA_NODE));
   if (DataNode == NULL) {
