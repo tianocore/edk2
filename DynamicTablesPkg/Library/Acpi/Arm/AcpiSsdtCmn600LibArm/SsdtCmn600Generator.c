@@ -10,13 +10,11 @@
   - Generic ACPI for Arm Components 1.0 Platform Design Document
 **/
 
-#include <IndustryStandard/DebugPort2Table.h>
 #include <Library/AcpiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/AcpiTable.h>
 
 // Module specific include files.
