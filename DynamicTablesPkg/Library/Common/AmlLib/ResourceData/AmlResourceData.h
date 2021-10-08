@@ -171,4 +171,25 @@ AmlRdGetSize (
   IN  CONST AML_RD_HEADER   * Header
   );
 
+/** Set the Checksum of an EndTag resource data.
+
+  ACPI 6.4, s6.4.2.9 "End Tag":
+  "This checksum is generated such that adding it to the sum of all the data
+  bytes will produce a zero sum."
+  "If the checksum field is zero, the resource data is treated as if the
+  checksum operation succeeded. Configuration proceeds normally."
+
+  @param  [in]  Header     Pointer to the first byte of a resource data.
+  @param  [in]  CheckSum   Checksum value to set.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlRdSetEndTagChecksum (
+  IN  CONST AML_RD_HEADER   * Header,
+  IN        UINT8             CheckSum
+  );
+
 #endif // AML_RESOURCE_DATA_H_
