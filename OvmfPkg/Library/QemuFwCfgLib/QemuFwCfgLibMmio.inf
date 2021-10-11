@@ -27,13 +27,12 @@
 #
 
 [Sources]
-  QemuFwCfgLib.c
+  QemuFwCfgLibMmio.c
 
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  ArmVirtPkg/ArmVirtPkg.dec
 
 [LibraryClasses]
   BaseLib
