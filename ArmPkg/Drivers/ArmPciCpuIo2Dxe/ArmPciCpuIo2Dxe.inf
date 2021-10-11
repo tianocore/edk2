@@ -38,7 +38,7 @@
   UefiBootServicesTableLib
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdPciIoTranslation
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation
 
 [Protocols]
   gEfiCpuIo2ProtocolGuid                         ## PRODUCES
