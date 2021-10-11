@@ -1,5 +1,6 @@
 /** @file
-*  High memory node enumeration DXE driver for ARM Virtual Machines
+*  High memory node enumeration DXE driver for ARM and RISC-V
+*  Virtual Machines
 *
 *  Copyright (c) 2015-2016, Linaro Ltd. All rights reserved.
 *
