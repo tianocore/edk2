@@ -338,8 +338,8 @@
   #   UINT64 Mmio64CpuBase; // mapping target in 64-bit cpu-physical space
   #
   #   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation = IoCpuBase - PcdPciIoBase;
-  #   PcdPciMmio32Translation = Mmio32CpuBase - (UINT64)PcdPciMmio32Base;
-  #   PcdPciMmio64Translation = Mmio64CpuBase - PcdPciMmio64Base;
+  #   gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation = Mmio32CpuBase - (UINT64)PcdPciMmio32Base;
+  #   gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation = Mmio64CpuBase - PcdPciMmio64Base;
   #
   # because (a) the target address space (ie. the cpu-physical space) is
   # 64-bit, and (b) the translation values are meant as offsets for *modular*
@@ -358,9 +358,9 @@
   #   TranslatedIoAddress     = UntranslatedIoAddress +
   #                             gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation;
   #   TranslatedMmio32Address = (UINT64)UntranslatedMmio32Address +
-  #                             PcdPciMmio32Translation;
+  #                             gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation;
   #   TranslatedMmio64Address = UntranslatedMmio64Address +
-  #                             PcdPciMmio64Translation;
+  #                             gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation;
   #
   #  The modular arithmetic performed in UINT64 ensures that the translation
   #  works correctly regardless of the relation between IoCpuBase and
@@ -371,10 +371,8 @@
   gArmTokenSpaceGuid.PcdPciIoSize|0x0|UINT64|0x00000051
   gArmTokenSpaceGuid.PcdPciMmio32Base|0x0|UINT32|0x00000053
   gArmTokenSpaceGuid.PcdPciMmio32Size|0x0|UINT32|0x00000054
-  gArmTokenSpaceGuid.PcdPciMmio32Translation|0x0|UINT64|0x00000055
   gArmTokenSpaceGuid.PcdPciMmio64Base|0x0|UINT64|0x00000056
   gArmTokenSpaceGuid.PcdPciMmio64Size|0x0|UINT64|0x00000057
-  gArmTokenSpaceGuid.PcdPciMmio64Translation|0x0|UINT64|0x00000058
 
   #
   # Inclusive range of allowed PCI buses.
