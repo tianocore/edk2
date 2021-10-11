@@ -68,7 +68,12 @@ CoreConnectController (
   //
   // Make sure ControllerHandle is valid
   //
+  CoreAcquireProtocolLock ();
+
   Status = CoreValidateHandle (ControllerHandle);
+
+  CoreReleaseProtocolLock ();
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -268,7 +273,12 @@ AddSortedDriverBindingProtocol (
   //
   // Make sure the DriverBindingHandle is valid
   //
+  CoreAcquireProtocolLock ();
+
   Status = CoreValidateHandle (DriverBindingHandle);
+
+  CoreReleaseProtocolLock ();
+
   if (EFI_ERROR (Status)) {
     return;
   }
@@ -746,8 +756,11 @@ CoreDisconnectController (
   //
   // Make sure ControllerHandle is valid
   //
+  CoreAcquireProtocolLock ();
+
   Status = CoreValidateHandle (ControllerHandle);
   if (EFI_ERROR (Status)) {
+    CoreReleaseProtocolLock ();
     return Status;
   }
 
@@ -757,9 +770,12 @@ CoreDisconnectController (
   if (ChildHandle != NULL) {
     Status = CoreValidateHandle (ChildHandle);
     if (EFI_ERROR (Status)) {
+      CoreReleaseProtocolLock ();
       return Status;
     }
   }
+
+  CoreReleaseProtocolLock ();
 
   Handle = ControllerHandle;
 
