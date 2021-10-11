@@ -27,8 +27,6 @@
   FdtPciHostBridgeLib.c
 
 [Packages]
-  ArmPkg/ArmPkg.dec
-  ArmVirtPkg/ArmVirtPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
@@ -44,8 +42,8 @@
   PciPcdProducerLib
 
 [FixedPcd]
-  gArmTokenSpaceGuid.PcdPciMmio32Translation
-  gArmTokenSpaceGuid.PcdPciMmio64Translation
+  gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation
+  gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation
