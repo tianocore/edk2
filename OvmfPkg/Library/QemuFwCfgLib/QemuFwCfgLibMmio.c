@@ -4,6 +4,7 @@
 
   Copyright (C) 2013 - 2014, Red Hat, Inc.
   Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -239,7 +240,7 @@ MmioReadBytes (
   UINT8 *Ptr;
   UINT8 *End;
 
-#ifdef MDE_CPU_AARCH64
+#if defined(MDE_CPU_AARCH64) || defined(MDE_CPU_RISCV64)
   Left = Size & 7;
 #else
   Left = Size & 3;
@@ -249,7 +250,7 @@ MmioReadBytes (
   Ptr = Buffer;
   End = Ptr + Size;
 
-#ifdef MDE_CPU_AARCH64
+#if defined(MDE_CPU_AARCH64) || defined(MDE_CPU_RISCV64)
   while (Ptr < End) {
     *(UINT64 *)Ptr = MmioRead64 (mFwCfgDataAddress);
     Ptr += 8;
@@ -322,7 +323,7 @@ DmaTransferBytes (
   //
   // This will fire off the transfer.
   //
-#ifdef MDE_CPU_AARCH64
+#if defined(MDE_CPU_AARCH64) || defined(MDE_CPU_RISCV64)
   MmioWrite64 (mFwCfgDmaAddress, SwapBytes64 ((UINT64)&Access));
 #else
   MmioWrite32 ((UINT32)(mFwCfgDmaAddress + 4), SwapBytes32 ((UINT32)&Access));
