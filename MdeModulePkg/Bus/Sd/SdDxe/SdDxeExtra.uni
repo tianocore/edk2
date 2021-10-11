@@ -1,6 +1,5 @@
 // /** @file
-// SD memory card device driver to manage the SD memory card device and provide interface for upper layer
-// access.
+// SdDxe Localized Strings and Content
 //
 // Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 //
@@ -8,8 +7,8 @@
 //
 // **/
 
+#string STR_PROPERTIES_MODULE_NAME
+#language en-US
+"SD Device Driver"
 
-#string STR_MODULE_ABSTRACT             #language en-US "SD device driver to manage the SD memory card device and provide interface for upper layer access"
-
-#string STR_MODULE_DESCRIPTION          #language en-US "This driver follows the UEFI driver model and layers on the SdMmcPassThru protocol. It installs BlockIo and BlockIo2 protocols on the SD device."
 
