@@ -188,22 +188,21 @@ CoreReinstallProtocolInterface (
   PROTOCOL_INTERFACE        *Prot;
   PROTOCOL_ENTRY            *ProtEntry;
 
-  Status = CoreValidateHandle (UserHandle);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   if (Protocol == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-
-  Handle = (IHANDLE *) UserHandle;
 
   //
   // Lock the protocol database
   //
   CoreAcquireProtocolLock ();
 
+  Status = CoreValidateHandle (UserHandle);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  Handle = (IHANDLE *) UserHandle;
   //
   // Check that Protocol exists on UserHandle, and Interface matches the interface in the database
   //
