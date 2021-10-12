@@ -1,7 +1,7 @@
 /** @file
   AML Utility.
 
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -192,7 +192,6 @@ AmlComputeSize (
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 AmlNodeGetIntegerValue (
@@ -903,4 +902,80 @@ AmlPropagateInformation (
   }
 
   return EFI_SUCCESS;
+}
+
+/** Find and set the EndTag's Checksum of a list of Resource Data elements.
+
+  Lists of Resource Data elements end with an EndTag (most of the time). This
+  function finds the EndTag (if present) in a list of Resource Data elements
+  and sets the checksum.
+
+  ACPI 6.4, s6.4.2.9 "End Tag":
+  "This checksum is generated such that adding it to the sum of all the data
+  bytes will produce a zero sum."
+  "If the checksum field is zero, the resource data is treated as if the
+  checksum operation succeeded. Configuration proceeds normally."
+
+  To avoid re-computing checksums, if a new resource data elements is
+  added/removed/modified in a list of resource data elements, the AmlLib
+  resets the checksum to 0.
+
+  @param [in]  BufferOpNode   Node having a list of Resource Data elements.
+  @param [in]  CheckSum       CheckSum to store in the EndTag.
+                              To ignore/avoid computing the checksum,
+                              give 0.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_NOT_FOUND           No EndTag found.
+**/
+EFI_STATUS
+EFIAPI
+AmlSetRdListCheckSum (
+  IN  AML_OBJECT_NODE   * BufferOpNode,
+  IN  UINT8               CheckSum
+  )
+{
+  EFI_STATUS        Status;
+  AML_DATA_NODE   * LastRdNode;
+  AML_RD_HEADER     RdDataType;
+
+  if (!AmlNodeCompareOpCode (BufferOpNode, AML_BUFFER_OP, 0)) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Get the last Resource data node in the variable list of
+  // argument of the BufferOp node.
+  LastRdNode = (AML_DATA_NODE*)AmlGetPreviousVariableArgument (
+                                 (AML_NODE_HEADER*)BufferOpNode,
+                                 NULL
+                                 );
+  if ((LastRdNode == NULL)             ||
+      !IS_AML_DATA_NODE (LastRdNode)   ||
+      (LastRdNode->DataType != EAmlNodeDataTypeResourceData)) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlGetResourceDataType (LastRdNode, &RdDataType);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // Check the LastRdNode is an EndTag.
+  // It is possible to have only one Resource Data in a BufferOp with
+  // no EndTag. Return EFI_NOT_FOUND is such case.
+  if (!AmlRdCompareDescId (
+        &RdDataType,
+        AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME))) {
+    ASSERT (0);
+    return EFI_NOT_FOUND;
+  }
+
+  Status = AmlRdSetEndTagChecksum (LastRdNode->Buffer, CheckSum);
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
 }

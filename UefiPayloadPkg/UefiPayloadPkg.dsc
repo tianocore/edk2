@@ -31,7 +31,7 @@
   DEFINE RAM_DISK_ENABLE              = FALSE
   DEFINE SIO_BUS_ENABLE               = FALSE
   DEFINE UNIVERSAL_PAYLOAD            = FALSE
-
+  DEFINE SECURITY_STUB_ENABLE         = TRUE
   #
   # SBL:      UEFI payload for Slim Bootloader
   # COREBOOT: UEFI payload for coreboot
@@ -169,12 +169,7 @@
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
-
-!if $(UNIVERSAL_PAYLOAD) == TRUE
   HobLib|UefiPayloadPkg/Library/DxeHobLib/DxeHobLib.inf
-!else
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-!endif
 
   #
   # UEFI & PI
@@ -217,11 +212,7 @@
   TimerLib|UefiPayloadPkg/Library/AcpiTimerLib/AcpiTimerLib.inf
   ResetSystemLib|UefiPayloadPkg/Library/ResetSystemLib/ResetSystemLib.inf
   SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
-!if $(UNIVERSAL_PAYLOAD) == TRUE
-  PlatformHookLib|UefiPayloadPkg/Library/UniversalPayloadPlatformHookLib/PlatformHookLib.inf
-!else
   PlatformHookLib|UefiPayloadPkg/Library/PlatformHookLib/PlatformHookLib.inf
-!endif
   PlatformBootManagerLib|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
 
@@ -366,6 +357,7 @@
 
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|$(MAX_LOGICAL_PROCESSORS)
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs|0
+  gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter|0
 
 ################################################################################
 #
@@ -461,7 +453,9 @@
   #
   # Components that produce the architectural protocols
   #
+!if $(SECURITY_STUB_ENABLE) == TRUE
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
   UefiCpuPkg/CpuDxe/CpuDxe.inf
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Application/UiApp/UiApp.inf {

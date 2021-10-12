@@ -58,6 +58,7 @@ typedef enum ArmObjectID {
   EArmObjGenericInitiatorAffinityInfo, ///< 34 - Generic Initiator Affinity
   EArmObjSerialPortInfo,               ///< 35 - Generic Serial Port Info
   EArmObjCmn600Info,                   ///< 36 - CMN-600 Info
+  EArmObjLpiInfo,                      ///< 37 - Lpi Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -395,21 +396,21 @@ typedef struct CmArmGTBlockInfo {
 } CM_ARM_GTBLOCK_INFO;
 
 /** A structure that describes the
-    SBSA Generic Watchdog information for the Platform.
+    Arm Generic Watchdog information for the Platform.
 
     ID: EArmObjPlatformGenericWatchdogInfo
 */
 typedef struct CmArmGenericWatchdogInfo {
-  /// The physical base address of the SBSA Watchdog control frame
+  /// The physical base address of the Arm Watchdog control frame
   UINT64  ControlFrameAddress;
 
-  /// The physical base address of the SBSA Watchdog refresh frame
+  /// The physical base address of the Arm Watchdog refresh frame
   UINT64  RefreshFrameAddress;
 
   /// The watchdog interrupt
   UINT32  TimerGSIV;
 
-  /** The flags for the watchdog as described by the SBSA watchdog
+  /** The flags for the watchdog as described by the Arm watchdog
       structure in the ACPI specification.
   */
   UINT32  Flags;
@@ -711,6 +712,10 @@ typedef struct CmArmProcHierarchyInfo {
   /// the NoOfPrivateResources is 0, in which case it is recommended to set
   /// this field to CM_NULL_TOKEN.
   CM_OBJECT_TOKEN   PrivateResourcesArrayToken;
+  /// Optional field: Reference Token for the Lpi state of this processor.
+  /// Token identifying a CM_ARM_OBJ_REF structure, itself referencing
+  /// CM_ARM_LPI_INFO objects.
+  CM_OBJECT_TOKEN   LpiToken;
 } CM_ARM_PROC_HIERARCHY_INFO;
 
 /** A structure that describes the Cache Type Structure (Type 1) in PPTT
@@ -877,6 +882,69 @@ typedef struct CmArmCmn600Info {
   /// constant and does not vary with the DTC count.
   CM_ARM_EXTENDED_INTERRUPT  DtcInterrupt[4];
 } CM_ARM_CMN_600_INFO;
+
+/** A structure that describes the Lpi information.
+
+  The Low Power Idle states are described in DSDT/SSDT and associated
+  to cpus/clusters in the cpu topology.
+
+  ID: EArmObjLpiInfo
+*/
+typedef struct CmArmLpiInfo {
+  /** Minimum Residency. Time in microseconds after which a
+      state becomes more energy efficient than any shallower state.
+  */
+  UINT32                                  MinResidency;
+
+  /** Worst case time in microseconds from a wake interrupt
+      being asserted to the return to a running state
+  */
+  UINT32                                  WorstCaseWakeLatency;
+
+  /** Flags.
+  */
+  UINT32                                  Flags;
+
+  /** Architecture specific context loss flags.
+  */
+  UINT32                                  ArchFlags;
+
+  /** Residency counter frequency in cycles-per-second (Hz).
+  */
+  UINT32                                  ResCntFreq;
+
+  /** Every shallower power state in the parent is also enabled.
+  */
+  UINT32                                  EnableParentState;
+
+  /** The EntryMethod _LPI field can be described as an integer
+      or in a Register resource data descriptor.
+
+  If IsInteger is TRUE, the IntegerEntryMethod field is used.
+  If IsInteger is FALSE, the RegisterEntryMethod field is used.
+  */
+  BOOLEAN                                 IsInteger;
+
+  /** EntryMethod described as an Integer.
+  */
+  UINT64                                  IntegerEntryMethod;
+
+  /** EntryMethod described as a EFI_ACPI_GENERIC_REGISTER_DESCRIPTOR.
+  */
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  RegisterEntryMethod;
+
+  /** Residency counter register.
+  */
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  ResidencyCounterRegister;
+
+  /** Usage counter register.
+  */
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  UsageCounterRegister;
+
+  /** String representing the Lpi state
+  */
+  CHAR8                                   StateName[16];
+} CM_ARM_LPI_INFO;
 
 #pragma pack()
 
