@@ -199,6 +199,43 @@
   $(OPENSSL_PATH)/crypto/dso/dso_vms.c
   $(OPENSSL_PATH)/crypto/dso/dso_win32.c
   $(OPENSSL_PATH)/crypto/ebcdic.c
+  $(OPENSSL_PATH)/crypto/ec/curve25519.c
+  $(OPENSSL_PATH)/crypto/ec/curve448/arch_32/f_impl.c
+  $(OPENSSL_PATH)/crypto/ec/curve448/curve448.c
+  $(OPENSSL_PATH)/crypto/ec/curve448/curve448_tables.c
+  $(OPENSSL_PATH)/crypto/ec/curve448/eddsa.c
+  $(OPENSSL_PATH)/crypto/ec/curve448/f_generic.c
+  $(OPENSSL_PATH)/crypto/ec/curve448/scalar.c
+  $(OPENSSL_PATH)/crypto/ec/ec2_oct.c
+  $(OPENSSL_PATH)/crypto/ec/ec2_smpl.c
+  $(OPENSSL_PATH)/crypto/ec/ec_ameth.c
+  $(OPENSSL_PATH)/crypto/ec/ec_asn1.c
+  $(OPENSSL_PATH)/crypto/ec/ec_check.c
+  $(OPENSSL_PATH)/crypto/ec/ec_curve.c
+  $(OPENSSL_PATH)/crypto/ec/ec_cvt.c
+  $(OPENSSL_PATH)/crypto/ec/ec_err.c
+  $(OPENSSL_PATH)/crypto/ec/ec_key.c
+  $(OPENSSL_PATH)/crypto/ec/ec_kmeth.c
+  $(OPENSSL_PATH)/crypto/ec/ec_lib.c
+  $(OPENSSL_PATH)/crypto/ec/ec_mult.c
+  $(OPENSSL_PATH)/crypto/ec/ec_oct.c
+  $(OPENSSL_PATH)/crypto/ec/ec_pmeth.c
+  $(OPENSSL_PATH)/crypto/ec/ec_print.c
+  $(OPENSSL_PATH)/crypto/ec/ecdh_kdf.c
+  $(OPENSSL_PATH)/crypto/ec/ecdh_ossl.c
+  $(OPENSSL_PATH)/crypto/ec/ecdsa_ossl.c
+  $(OPENSSL_PATH)/crypto/ec/ecdsa_sign.c
+  $(OPENSSL_PATH)/crypto/ec/ecdsa_vrf.c
+  $(OPENSSL_PATH)/crypto/ec/eck_prn.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_mont.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_nist.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_nistp224.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_nistp256.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_nistp521.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_nistputil.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_oct.c
+  $(OPENSSL_PATH)/crypto/ec/ecp_smpl.c
+  $(OPENSSL_PATH)/crypto/ec/ecx_meth.c
   $(OPENSSL_PATH)/crypto/err/err.c
   $(OPENSSL_PATH)/crypto/err/err_prn.c
   $(OPENSSL_PATH)/crypto/evp/bio_b64.c
@@ -384,6 +421,10 @@
   $(OPENSSL_PATH)/crypto/siphash/siphash.c
   $(OPENSSL_PATH)/crypto/siphash/siphash_ameth.c
   $(OPENSSL_PATH)/crypto/siphash/siphash_pmeth.c
+  $(OPENSSL_PATH)/crypto/sm2/sm2_crypt.c
+  $(OPENSSL_PATH)/crypto/sm2/sm2_err.c
+  $(OPENSSL_PATH)/crypto/sm2/sm2_pmeth.c
+  $(OPENSSL_PATH)/crypto/sm2/sm2_sign.c
   $(OPENSSL_PATH)/crypto/sm3/m_sm3.c
   $(OPENSSL_PATH)/crypto/sm3/sm3.c
   $(OPENSSL_PATH)/crypto/sm4/sm4.c
@@ -496,6 +537,15 @@
   $(OPENSSL_PATH)/crypto/conf/conf_local.h
   $(OPENSSL_PATH)/crypto/dh/dh_local.h
   $(OPENSSL_PATH)/crypto/dso/dso_local.h
+  $(OPENSSL_PATH)/crypto/ec/ec_local.h
+  $(OPENSSL_PATH)/crypto/ec/curve448/curve448_local.h
+  $(OPENSSL_PATH)/crypto/ec/curve448/curve448utils.h
+  $(OPENSSL_PATH)/crypto/ec/curve448/ed448.h
+  $(OPENSSL_PATH)/crypto/ec/curve448/field.h
+  $(OPENSSL_PATH)/crypto/ec/curve448/point_448.h
+  $(OPENSSL_PATH)/crypto/ec/curve448/word.h
+  $(OPENSSL_PATH)/crypto/ec/curve448/arch_32/arch_intrinsics.h
+  $(OPENSSL_PATH)/crypto/ec/curve448/arch_32/f_impl.h
   $(OPENSSL_PATH)/crypto/evp/evp_local.h
   $(OPENSSL_PATH)/crypto/hmac/hmac_local.h
   $(OPENSSL_PATH)/crypto/lhash/lhash_local.h
