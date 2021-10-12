@@ -853,6 +853,7 @@ FillExchangeInfoData (
   UINTN                            Size;
   IA32_SEGMENT_DESCRIPTOR          *Selector;
   IA32_CR4                         Cr4;
+  UINT32                           StdRangeMax;
 
   ExchangeInfo                  = CpuMpData->MpCpuExchangeInfo;
   ExchangeInfo->StackStart      = CpuMpData->Buffer;
@@ -891,6 +892,16 @@ FillExchangeInfoData (
   ExchangeInfo->SevEsIsEnabled  = CpuMpData->SevEsIsEnabled;
   ExchangeInfo->SevSnpIsEnabled = CpuMpData->SevSnpIsEnabled;
   ExchangeInfo->GhcbBase        = (UINTN) CpuMpData->GhcbBase;
+
+  if (ExchangeInfo->SevSnpIsEnabled) {
+    AsmCpuid (CPUID_SIGNATURE, &StdRangeMax, NULL, NULL, NULL);
+    if (StdRangeMax >= CPUID_EXTENDED_TOPOLOGY) {
+      CPUID_EXTENDED_TOPOLOGY_EBX ExtTopoEbx;
+
+      AsmCpuid (CPUID_EXTENDED_TOPOLOGY, NULL, &ExtTopoEbx.Uint32, NULL, NULL);
+      ExchangeInfo->ExtTopoAvail = !!ExtTopoEbx.Bits.LogicalProcessors;
+    }
+  }
 
   //
   // Get the BSP's data of GDT and IDT
