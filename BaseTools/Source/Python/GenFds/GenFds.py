@@ -153,7 +153,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
             FdfFilename = GenFdsGlobalVariable.ReplaceWorkspaceMacro(FdfFilename)
 
             if FdfFilename[0:2] == '..':
-                FdfFilename = os.path.realpath(FdfFilename)
+                FdfFilename = os.path.abspath(FdfFilename)
             if not os.path.isabs(FdfFilename):
                 FdfFilename = mws.join(GenFdsGlobalVariable.WorkSpaceDir, FdfFilename)
             if not os.path.exists(FdfFilename):
@@ -175,7 +175,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
             ActivePlatform = GenFdsGlobalVariable.ReplaceWorkspaceMacro(ActivePlatform)
 
             if ActivePlatform[0:2] == '..':
-                ActivePlatform = os.path.realpath(ActivePlatform)
+                ActivePlatform = os.path.abspath(ActivePlatform)
 
             if not os.path.isabs (ActivePlatform):
                 ActivePlatform = mws.join(GenFdsGlobalVariable.WorkSpaceDir, ActivePlatform)
@@ -299,7 +299,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
         for Key in GenFdsGlobalVariable.OutputDirDict:
             OutputDir = GenFdsGlobalVariable.OutputDirDict[Key]
             if OutputDir[0:2] == '..':
-                OutputDir = os.path.realpath(OutputDir)
+                OutputDir = os.path.abspath(OutputDir)
 
             if OutputDir[1] != ':':
                 OutputDir = os.path.join (GenFdsGlobalVariable.WorkSpaceDir, OutputDir)

@@ -707,8 +707,8 @@ class FfsInfStatement(FfsInfStatementClassObject):
                                   FileName,
                                   'DEBUG'
                                   )
-        OutputPath = os.path.realpath(OutputPath)
-        DebugPath = os.path.realpath(DebugPath)
+        OutputPath = os.path.abspath(OutputPath)
+        DebugPath = os.path.abspath(DebugPath)
         return OutputPath, DebugPath
 
     ## __GenSimpleFileSection__() method
