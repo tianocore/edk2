@@ -40,7 +40,6 @@ MemoryStateToGhcbOp (
   return Cmd;
 }
 
-STATIC
 VOID
 SnpPageStateFailureTerminate (
   VOID
