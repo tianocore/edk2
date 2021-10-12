@@ -2856,6 +2856,55 @@ RemoveEntryList (
 //
 // Math Services
 //
+/**
+  Prototype for comparison function for any two element types.
+
+  @param[in] Buffer1                  The pointer to first buffer.
+  @param[in] Buffer2                  The pointer to second buffer.
+
+  @retval 0                           Buffer1 equal to Buffer2.
+  @return <0                          Buffer1 is less than Buffer2.
+  @return >0                          Buffer1 is greater than Buffer2.
+**/
+typedef
+INTN
+(EFIAPI *BASE_SORT_COMPARE)(
+  IN CONST VOID                 *Buffer1,
+  IN CONST VOID                 *Buffer2
+  );
+
+/**
+  This function is identical to perform QuickSort,
+  except that is uses the pre-allocated buffer so the in place sorting does not need to
+  allocate and free buffers constantly.
+
+  Each element must be equal sized.
+
+  if BufferToSort is NULL, then ASSERT.
+  if CompareFunction is NULL, then ASSERT.
+  if BufferOneElement is NULL, then ASSERT.
+  if ElementSize is < 1, then ASSERT.
+
+  if Count is < 2 then perform no action.
+
+  @param[in, out] BufferToSort   on call a Buffer of (possibly sorted) elements
+                                 on return a buffer of sorted elements
+  @param[in] Count               the number of elements in the buffer to sort
+  @param[in] ElementSize         Size of an element in bytes
+  @param[in] CompareFunction     The function to call to perform the comparison
+                                 of any 2 elements
+  @param[out] BufferOneElement   Caller provided buffer whose size equals to ElementSize.
+                                 It's used by QuickSort() for swapping in sorting.
+**/
+VOID
+EFIAPI
+QuickSort (
+  IN OUT VOID                           *BufferToSort,
+  IN CONST UINTN                        Count,
+  IN CONST UINTN                        ElementSize,
+  IN       BASE_SORT_COMPARE            CompareFunction,
+  OUT VOID                              *BufferOneElement
+  );
 
 /**
   Shifts a 64-bit integer left between 0 and 63 bits. The low bits are filled

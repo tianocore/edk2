@@ -32,6 +32,7 @@
   SwapBytes16.c
   LongJump.c
   SetJump.c
+  QuickSort.c
   RShiftU64.c
   RRotU64.c
   RRotU32.c
