@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   {                                                                              \
     TCG_RESULT ret = (arg);                                                      \
     if (ret != TcgResultSuccess) {                                               \
-      DEBUG ((DEBUG_INFO, "ERROR_CHECK failed at %a:%u\n", __FILE__, __LINE__)); \
+      DEBUG ((DEBUG_INFO, "ERROR_CHECK failed at %a:%u\n", __FILE__, DEBUG_LINE_NUMBER)); \
       return ret;                                                                \
     }                                                                            \
   }
@@ -34,7 +34,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define NULL_CHECK(arg)                                                                   \
   do {                                                                                    \
     if ((arg) == NULL) {                                                                  \
-      DEBUG ((DEBUG_INFO, "NULL_CHECK(%a) failed at %a:%u\n", #arg, __FILE__, __LINE__)); \
+      DEBUG ((DEBUG_INFO, "NULL_CHECK(%a) failed at %a:%u\n", #arg, __FILE__, DEBUG_LINE_NUMBER)); \
       return TcgResultFailureNullPointer;                                                 \
     }                                                                                     \
   } while (0)
