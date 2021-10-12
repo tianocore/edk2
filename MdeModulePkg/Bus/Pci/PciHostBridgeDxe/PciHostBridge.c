@@ -874,7 +874,7 @@ NotifyPhase (
           Translation = GetTranslationByResourceType (RootBridge, Index);
           if ((Translation & Alignment) != 0) {
             DEBUG ((DEBUG_ERROR, "[%a:%d] Translation %lx is not aligned to %lx!\n",
-              __FUNCTION__, __LINE__, Translation, Alignment
+              __FUNCTION__, DEBUG_LINE_NUMBER, Translation, Alignment
               ));
             ASSERT ((Translation & Alignment) == 0);
             //
