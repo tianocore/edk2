@@ -158,7 +158,7 @@ SMBIOS_MISC_TABLE_FUNCTION(MiscNumberOfInstallableLanguages)
   Status = SmbiosMiscAddRecord ((UINT8*)SmbiosRecord, NULL);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "[%a]:[%dL] Smbios Type13 Table Log Failed! %r \n",
-            __FUNCTION__, __LINE__, Status));
+            __FUNCTION__, DEBUG_LINE_NUMBER, Status));
   }
 
   FreePool (SmbiosRecord);

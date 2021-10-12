@@ -689,7 +689,7 @@ AddSmbiosProcessorTypeTable (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "[%a]:[%dL] Smbios Type04 Table Log Failed! %r \n",
-            __FUNCTION__, __LINE__, Status));
+            __FUNCTION__, DEBUG_LINE_NUMBER, Status));
   }
   FreePool (Type4Record);
 
