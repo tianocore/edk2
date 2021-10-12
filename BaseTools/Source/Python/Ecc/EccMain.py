@@ -105,7 +105,7 @@ class Ecc(object):
 
     def InitDefaultConfigIni(self):
         paths = map(lambda p: os.path.join(p, 'Ecc', 'config.ini'), sys.path)
-        paths = (os.path.realpath('config.ini'),) + tuple(paths)
+        paths = (os.path.abspath('config.ini'),) + tuple(paths)
         for path in paths:
             if os.path.exists(path):
                 self.ConfigFile = path
