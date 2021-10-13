@@ -365,6 +365,28 @@ Tpm2NvUndefineSpace (
   );
 
 /**
+  This command allows removal of a platform-created NV Index that has TPMA_NV_POLICY_DELETE SET.
+
+  @param[in]  NvIndex             The NV Index.
+  @param[in]  IndexAuthSession    Auth session context for the Index auth/policy
+  @param[in]  PlatAuthSession     Auth session context for the Platform auth/policy
+
+  @retval EFI_SUCCESS             Operation completed successfully.
+  @retval EFI_NOT_FOUND           The command was returned successfully, but NvIndex is not found.
+  @retval EFI_UNSUPPORTED         Selected NvIndex does not support deletion through this call.
+  @retval EFI_SECURITY_VIOLATION  Deletion is not authorized by current policy session.
+  @retval EFI_INVALID_PARAMETER   The command was unsuccessful.
+  @retval EFI_DEVICE_ERROR        The command was unsuccessful.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2NvUndefineSpaceSpecial (
+  IN      TPMI_RH_NV_INDEX          NvIndex,
+  IN      TPMS_AUTH_COMMAND         *IndexAuthSession OPTIONAL,
+  IN      TPMS_AUTH_COMMAND         *PlatAuthSession OPTIONAL
+  );
+
+/**
   This command reads a value from an area in NV memory previously defined by TPM2_NV_DefineSpace().
 
   @param[in]     AuthHandle         the handle indicating the source of the authorization value.
