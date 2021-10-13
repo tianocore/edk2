@@ -43,6 +43,7 @@
   MemoryAllocationLib
   OrderedCollectionLib
   PcdLib
+  QemuFwCfgLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
