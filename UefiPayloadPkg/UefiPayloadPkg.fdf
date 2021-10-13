@@ -97,7 +97,9 @@ INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
 INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
 
+!if $(SECURITY_STUB_ENABLE) == TRUE
 INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
 INF UefiCpuPkg/CpuDxe/CpuDxe.inf
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF MdeModulePkg/Application/UiApp/UiApp.inf
