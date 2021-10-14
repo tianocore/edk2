@@ -33,6 +33,7 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/MicrocodeLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
@@ -772,6 +773,18 @@ SetSevEsJumpTable (
 VOID
 SevEsPlaceApHlt (
   CPU_MP_DATA                *CpuMpData
+  );
+
+/**
+ Check if the specified confidential computing attribute is active.
+
+ @retval TRUE   The specified Attr is active.
+ @retval FALSE  The specified Attr is not active.
+**/
+BOOLEAN
+EFIAPI
+ConfidentialComputingGuestHas (
+  CONFIDENTIAL_COMPUTING_GUEST_ATTR     Attr
   );
 
 #endif
