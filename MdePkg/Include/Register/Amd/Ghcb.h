@@ -24,7 +24,7 @@
 #define VC_EXCEPTION 29
 
 #define GHCB_VERSION_MIN     1
-#define GHCB_VERSION_MAX     1
+#define GHCB_VERSION_MAX     2
 
 #define GHCB_STANDARD_USAGE  0
 
