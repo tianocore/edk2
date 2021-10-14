@@ -295,10 +295,11 @@ GetApLoopMode (
       ApLoopMode = ApInHltLoop;
     }
 
-    if (ConfidentialComputingGuestHas (CCAttrAmdSevEs)) {
+    if (ConfidentialComputingGuestHas (CCAttrAmdSevEs) &&
+        !ConfidentialComputingGuestHas (CCAttrAmdSevSnp)) {
       //
-      // For SEV-ES, force AP in Hlt-loop mode in order to use the GHCB
-      // protocol for starting APs
+      // For SEV-ES (SEV-SNP is also considered SEV-ES), force AP in Hlt-loop
+      // mode in order to use the GHCB protocol for starting APs
       //
       ApLoopMode = ApInHltLoop;
     }
@@ -758,7 +759,7 @@ ApWakeupFunction (
       // to allow the APs to issue an AP_RESET_HOLD before the BSP possibly
       // performs another INIT-SIPI-SIPI sequence.
       //
-      if (!CpuMpData->SevEsIsEnabled) {
+      if (!CpuMpData->UseSevEsAPMethod) {
         InterlockedDecrement ((UINT32 *) &CpuMpData->MpCpuExchangeInfo->NumApsExecuting);
       }
     }
@@ -772,7 +773,7 @@ ApWakeupFunction (
       //
       while (TRUE) {
         DisableInterrupts ();
-        if (CpuMpData->SevEsIsEnabled) {
+        if (CpuMpData->UseSevEsAPMethod) {
           SevEsPlaceApHlt (CpuMpData);
         } else {
           CpuSleep ();
@@ -1056,9 +1057,12 @@ AllocateResetVector (
                                     );
     //
     // The AP reset stack is only used by SEV-ES guests. Do not allocate it
-    // if SEV-ES is not enabled.
+    // if SEV-ES is not enabled. An SEV-SNP guest is also considered
+    // an SEV-ES guest, but uses a different method of AP startup, eliminating
+    // the need for the allocation.
     //
-    if (ConfidentialComputingGuestHas (CCAttrAmdSevEs)) {
+    if (ConfidentialComputingGuestHas (CCAttrAmdSevEs) &&
+        !ConfidentialComputingGuestHas (CCAttrAmdSevSnp)) {
       //
       // Stack location is based on ProcessorNumber, so use the total number
       // of processors for calculating the total stack area.
@@ -1108,7 +1112,7 @@ FreeResetVector (
   // perform the restore as this will overwrite memory which has data
   // needed by SEV-ES.
   //
-  if (!CpuMpData->SevEsIsEnabled) {
+  if (!CpuMpData->UseSevEsAPMethod) {
     RestoreWakeupBuffer (CpuMpData);
   }
 }
@@ -1144,7 +1148,7 @@ WakeUpAP (
   ResetVectorRequired = FALSE;
 
   if (CpuMpData->WakeUpByInitSipiSipi ||
-      CpuMpData->InitFlag   != ApInitDone) {
+      CpuMpData->InitFlag != ApInitDone) {
     ResetVectorRequired = TRUE;
     AllocateResetVector (CpuMpData);
     AllocateSevEsAPMemory (CpuMpData);
@@ -1185,7 +1189,7 @@ WakeUpAP (
     }
     if (ResetVectorRequired) {
       //
-      // For SEV-ES, the initial AP boot address will be defined by
+      // For SEV-ES and SEV-SNP, the initial AP boot address will be defined by
       // PcdSevEsWorkAreaBase. The Segment/Rip must be the jump address
       // from the original INIT-SIPI-SIPI.
       //
@@ -1195,8 +1199,14 @@ WakeUpAP (
 
       //
       // Wakeup all APs
+      //   Must use the INIT-SIPI-SIPI method for initial configuration in
+      //   order to obtain the APIC ID.
       //
-      SendInitSipiSipiAllExcludingSelf ((UINT32) ExchangeInfo->BufferStart);
+      if (CpuMpData->SevSnpIsEnabled && CpuMpData->InitFlag != ApInitConfig) {
+        SevSnpCreateAP (CpuMpData, -1);
+      } else {
+        SendInitSipiSipiAllExcludingSelf ((UINT32) ExchangeInfo->BufferStart);
+      }
     }
     if (CpuMpData->InitFlag == ApInitConfig) {
       if (PcdGet32 (PcdCpuBootLogicalProcessorNumber) > 0) {
@@ -1286,7 +1296,7 @@ WakeUpAP (
       CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
 
       //
-      // For SEV-ES, the initial AP boot address will be defined by
+      // For SEV-ES and SEV-SNP, the initial AP boot address will be defined by
       // PcdSevEsWorkAreaBase. The Segment/Rip must be the jump address
       // from the original INIT-SIPI-SIPI.
       //
@@ -1294,10 +1304,14 @@ WakeUpAP (
         SetSevEsJumpTable (ExchangeInfo->BufferStart);
       }
 
-      SendInitSipiSipi (
-        CpuInfoInHob[ProcessorNumber].ApicId,
-        (UINT32) ExchangeInfo->BufferStart
-        );
+      if (CpuMpData->SevSnpIsEnabled && CpuMpData->InitFlag != ApInitConfig) {
+        SevSnpCreateAP (CpuMpData, (INTN) ProcessorNumber);
+      } else {
+        SendInitSipiSipi (
+          CpuInfoInHob[ProcessorNumber].ApicId,
+          (UINT32) ExchangeInfo->BufferStart
+          );
+      }
     }
     //
     // Wait specified AP waken up
@@ -1832,6 +1846,11 @@ MpInitLibInitialize (
   CpuMpData->SevSnpIsEnabled = ConfidentialComputingGuestHas (CCAttrAmdSevSnp);
   CpuMpData->SevEsAPBuffer  = (UINTN) -1;
   CpuMpData->GhcbBase       = PcdGet64 (PcdGhcbBase);
+  CpuMpData->UseSevEsAPMethod = CpuMpData->SevEsIsEnabled && !CpuMpData->SevSnpIsEnabled;
+
+  if (CpuMpData->SevSnpIsEnabled) {
+    ASSERT ((PcdGet64 (PcdGhcbHypervisorFeatures) & GHCB_HV_FEATURES_SNP_AP_CREATE) == GHCB_HV_FEATURES_SNP_AP_CREATE);
+  }
 
   //
   // Make sure no memory usage outside of the allocated buffer.
