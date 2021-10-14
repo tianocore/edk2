@@ -219,7 +219,7 @@ ConfigureCacheArchitectureInformation (
     CacheSize32 = CacheSize16;
   } else if ((CacheSize64 / 64) < MAX_INT16) {
     CacheSize16 = (1 << 15) | (CacheSize64 / 64);
-    CacheSize32 = CacheSize16;
+    CacheSize32 = (1 << 31) | (CacheSize64 / 64);
   } else {
     if ((CacheSize64 / 1024) <= 2047) {
       CacheSize32 = CacheSize64;
