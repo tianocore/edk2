@@ -143,4 +143,28 @@ InternalMemEncryptSevClearMmioPageEncMask (
   IN  PHYSICAL_ADDRESS        PhysicalAddress,
   IN  UINTN                   Length
   );
+
+/**
+  Create 1GB identity mapping for the specified virtual address range.
+
+  The function is preliminary used by the SEV-SNP page state change
+  APIs to build the page table required before issuing the PVALIDATE
+  instruction. The function must be removed after the EDK2 core is
+  enhanced to do the lazy validation.
+
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
+  @param[in]  VirtualAddress          Virtual address
+  @param[in]  Length                  Length of virtual address range
+
+  @retval RETURN_INVALID_PARAMETER    Number of pages is zero.
+
+**/
+RETURN_STATUS
+EFIAPI
+InternalMemEncryptSevCreateIdentityMap1G (
+  IN    PHYSICAL_ADDRESS      Cr3BaseAddress,
+  IN    PHYSICAL_ADDRESS      PhysicalAddress,
+  IN    UINTN                 Length
+  );
 #endif
