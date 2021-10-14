@@ -49,6 +49,113 @@ SevEsProtocolFailure (
 }
 
 /**
+  Determine if SEV-SNP is active.
+
+  @retval TRUE   SEV-SNP is enabled
+  @retval FALSE  SEV-SNP is not enabled
+
+**/
+STATIC
+BOOLEAN
+SevSnpIsEnabled (
+  VOID
+  )
+{
+  MSR_SEV_STATUS_REGISTER           Msr;
+
+  //
+  // Read the SEV_STATUS MSR to determine whether SEV-SNP is active.
+  //
+  Msr.Uint32 = AsmReadMsr32 (MSR_SEV_STATUS);
+
+  //
+  // Check MSR_0xC0010131 Bit 2 (Sev-Snp Enabled)
+  //
+  if (Msr.Bits.SevSnpBit) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+#if 0
+/**
+ Register the GHCB GPA
+
+*/
+STATIC
+VOID
+SevSnpGhcbRegister (
+  EFI_PHYSICAL_ADDRESS   Address
+  )
+{
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+  EFI_PHYSICAL_ADDRESS      GuestFrameNumber;
+
+  GuestFrameNumber = RShiftU64 ((UINT64) Address, EFI_PAGE_SHIFT);
+
+  //
+  // Use the GHCB MSR Protocol to request to register the GPA.
+  //
+  Msr.GhcbPhysicalAddress = 0;
+  Msr.GhcbGpaRegister.Function = GHCB_INFO_GHCB_GPA_REGISTER_REQUEST;
+  Msr.GhcbGpaRegister.GuestFrameNumber = GuestFrameNumber;
+  AsmWriteMsr64 (MSR_SEV_ES_GHCB, Msr.GhcbPhysicalAddress);
+
+  AsmVmgExit ();
+
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+
+  //
+  // If hypervisor responded with a different GPA than requested then fail.
+  //
+  if ((Msr.GhcbGpaRegister.Function != GHCB_INFO_GHCB_GPA_REGISTER_RESPONSE) ||
+      (Msr.GhcbGpaRegister.GuestFrameNumber != GuestFrameNumber)) {
+    SevEsProtocolFailure (GHCB_TERMINATE_GHCB_GENERAL);
+  }
+}
+#endif
+/**
+ Verify that Hypervisor supports the SNP feature.
+
+ */
+STATIC
+BOOLEAN
+HypervisorSnpFeatureCheck (
+  VOID
+  )
+{
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+  UINT64                    Features;
+
+  //
+  // Use the GHCB MSR Protocol to query the hypervisor capabilities
+  //
+  Msr.GhcbPhysicalAddress = 0;
+  Msr.GhcbHypervisorFeatures.Function = GHCB_HYPERVISOR_FEATURES_REQUEST;
+  AsmWriteMsr64 (MSR_SEV_ES_GHCB, Msr.GhcbPhysicalAddress);
+
+  AsmVmgExit ();
+
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+
+  Features =  (UINT64) Msr.GhcbHypervisorFeatures.Features;
+
+  if (!(Features & GHCB_HV_FEATURES_SNP)) {
+    return FALSE;
+  }
+
+#if 0
+  if ((Msr.GhcbHypervisorFeatures.Function != GHCB_HYPERVISOR_FEATURES_RESPONSE) ||
+      (!(Features & GHCB_HV_FEATURES_SNP))) {
+    return FALSE;
+  }
+#endif
+  
+  return TRUE;
+}
+
+/**
   Validate the SEV-ES/GHCB protocol level.
 
   Verify that the level of SEV-ES/GHCB protocol supported by the hypervisor
@@ -86,6 +193,27 @@ SevEsProtocolCheck (
   if ((Msr.GhcbProtocol.SevEsProtocolMin > GHCB_VERSION_MAX) ||
       (Msr.GhcbProtocol.SevEsProtocolMax < GHCB_VERSION_MIN)) {
     SevEsProtocolFailure (GHCB_TERMINATE_GHCB_PROTOCOL);
+  }
+
+  //
+  // We cannot use the MemEncryptSevSnpIsEnabled () because the
+  // ProcessLibraryConstructorList () is not called yet.
+  //
+  if (SevSnpIsEnabled ()) {
+    //
+    // Check if hypervisor supports the SNP feature
+    //
+    if (!HypervisorSnpFeatureCheck ()) {
+      SevEsProtocolFailure (GHCB_TERMINATE_GHCB_PROTOCOL);
+    }
+
+    //
+    // Unlike the SEV-ES guest, the SNP requires that GHCB GPA must be
+    // registered with the Hypervisor before the use. This can be done
+    // using the new VMGEXIT defined in the GHCB v2. Register the GPA
+    // before it is used.
+    //
+    //SevSnpGhcbRegister ((EFI_PHYSICAL_ADDRESS) (UINTN) FixedPcdGet32 (PcdOvmfSecGhcbBase));
   }
 
   //
