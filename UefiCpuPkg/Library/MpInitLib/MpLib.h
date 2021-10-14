@@ -34,6 +34,9 @@
 #include <Library/PcdLib.h>
 #include <Library/MicrocodeLib.h>
 
+#include <Register/Amd/Fam17Msr.h>
+#include <Register/Amd/Ghcb.h>
+
 #include <Guid/MicrocodePatchHob.h>
 
 #define WAKEUP_AP_SIGNAL SIGNATURE_32 ('S', 'T', 'A', 'P')
@@ -739,6 +742,36 @@ GetProcessorNumber (
 EFI_STATUS
 PlatformShadowMicrocode (
   IN OUT CPU_MP_DATA             *CpuMpData
+  );
+
+/**
+  Allocate the SEV-ES AP jump table buffer.
+
+  @param[in, out]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+AllocateSevEsAPMemory (
+  IN OUT CPU_MP_DATA          *CpuMpData
+  );
+
+/**
+  Program the SEV-ES AP jump table buffer.
+
+  @param[in]  SipiVector  The SIPI vector used for the AP Reset
+**/
+VOID
+SetSevEsJumpTable (
+  IN UINTN  SipiVector
+  );
+
+/**
+  The function puts the AP in halt loop.
+
+  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+SevEsPlaceApHlt (
+  CPU_MP_DATA                *CpuMpData
   );
 
 #endif
