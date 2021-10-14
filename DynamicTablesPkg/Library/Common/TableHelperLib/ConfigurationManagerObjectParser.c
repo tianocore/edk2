@@ -641,7 +641,7 @@ PrintCmObjDesc (
         ));
     }
     DEBUG ((DEBUG_ERROR, "\n"));
-    Data += Parser[Index].Length;
+    Data = (UINT8*)Data + Parser[Index].Length;
   } // for
 }
 
