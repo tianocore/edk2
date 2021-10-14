@@ -54,5 +54,12 @@
 [FeaturePcd.ARM, FeaturePcd.AARCH64]
   gArmTokenSpaceGuid.PcdFfaEnable
 
+#
+# This configuration fails for CLANGPDB, which does not support PIE in the GCC
+# sense. Such however is required for ARM family StandaloneMmCore
+# self-relocation, and thus the CLANGPDB toolchain is unsupported for ARM and
+# AARCH64 for this module.
+#
 [BuildOptions]
-  GCC:*_*_*_CC_FLAGS = -fpie
+  GCC:*_*_ARM_CC_FLAGS = -fpie
+  GCC:*_*_AARCH64_CC_FLAGS = -fpie
