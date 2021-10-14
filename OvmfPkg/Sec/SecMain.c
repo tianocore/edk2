@@ -848,6 +848,11 @@ SecCoreStartupWithStack (
   SecCoreData.BootFirmwareVolumeSize = (UINTN) BootFv->FvLength;
 
   //
+  // Validate the System RAM used in the SEC Phase
+  //
+  SecValidateSystemRam ();
+
+  //
   // Make sure the 8259 is masked before initializing the Debug Agent and the debug timer is enabled
   //
   IoWrite8 (0x21, 0xff);
