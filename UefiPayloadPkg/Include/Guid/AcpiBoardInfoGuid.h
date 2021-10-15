@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __ACPI_BOARD_INFO_GUID_H__
-#define __ACPI_BOARD_INFO_GUID_H__
+#ifndef ACPI_BOARD_INFO_GUID_H_
+#define ACPI_BOARD_INFO_GUID_H_
 
 ///
 /// Board information GUID

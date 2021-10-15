@@ -190,7 +190,7 @@ FvFindFileByTypeGuid (
 
   @param  FileHeader            A pointer to the file header that contains the set of sections to
                                 be searched.
-  @param  SearchType            The value of the section type to search.
+  @param  SectionType            The value of the section type to search.
   @param  SectionData           A pointer to the discovered section, if successful.
 
   @retval EFI_SUCCESS           The section was found.

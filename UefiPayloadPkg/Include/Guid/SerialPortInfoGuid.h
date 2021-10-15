@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __SERIAL_PORT_INFO_GUID_H__
-#define __SERIAL_PORT_INFO_GUID_H__
+#ifndef SERIAL_PORT_INFO_GUID_H_
+#define SERIAL_PORT_INFO_GUID_H_
 
 ///
 /// Serial Port Information GUID

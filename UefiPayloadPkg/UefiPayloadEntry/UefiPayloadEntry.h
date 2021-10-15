@@ -1,9 +1,9 @@
 /** @file
-*
-* Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
+
+  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #ifndef __UEFI_PAYLOAD_ENTRY_H__

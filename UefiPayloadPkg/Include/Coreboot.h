@@ -245,5 +245,6 @@ struct cb_cbmem_tab {
   (void *)(((UINT8 *) (_rec)) + sizeof(*(_rec)) \
     + (sizeof((_rec)->map[0]) * (_idx)))
 
+typedef struct cb_memory  CB_MEMORY;
 
 #endif // _COREBOOT_PEI_H_INCLUDED_

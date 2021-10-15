@@ -141,7 +141,7 @@ ParseSystemTable (
 /**
   Find the serial port information
 
-  @param  SERIAL_PORT_INFO   Pointer to serial port info structure
+  @param[out]  SerialPortInfo     Pointer to serial port info structure
 
   @retval RETURN_SUCCESS     Successfully find the serial port information.
   @retval RETURN_NOT_FOUND   Failed to find the serial port information .

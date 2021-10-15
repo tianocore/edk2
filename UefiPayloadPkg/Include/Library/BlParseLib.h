@@ -6,15 +6,15 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#ifndef BOOTLOADER_PARSE_LIB_
+#define BOOTLOADER_PARSE_LIB_
+
 #include <PiPei.h>
 #include <Guid/GraphicsInfoHob.h>
 #include <Guid/MemoryMapInfoGuid.h>
 #include <Guid/SerialPortInfoGuid.h>
 #include <Guid/SystemTableInfoGuid.h>
 #include <Guid/AcpiBoardInfoGuid.h>
-
-#ifndef __BOOTLOADER_PARSE_LIB__
-#define __BOOTLOADER_PARSE_LIB__
 
 #define GET_BOOTLOADER_PARAMETER()      PcdGet64 (PcdBootloaderParameter)
 
@@ -73,7 +73,7 @@ ParseSystemTable (
 /**
   Find the serial port information
 
-  @param  SERIAL_PORT_INFO   Pointer to serial port info structure
+  @param  SerialPortInfo     Pointer to serial port info structure
 
   @retval RETURN_SUCCESS     Successfully find the serial port information.
   @retval RETURN_NOT_FOUND   Failed to find the serial port information .

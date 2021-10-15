@@ -43,22 +43,6 @@ ResetSystemLibConstructor (
   return EFI_SUCCESS;
 }
 
-
-VOID
-AcpiPmControl (
-  UINTN   SuspendType
-  )
-{
-  UINTN              PmCtrlReg;
-
-  ASSERT (SuspendType <= 7);
-
-  PmCtrlReg = (UINTN)mAcpiBoardInfo.PmCtrlRegBase;
-  IoAndThenOr16 (PmCtrlReg, (UINT16) ~0x3c00, (UINT16) (SuspendType << 10));
-  IoOr16 (PmCtrlReg, BIT13);
-  CpuDeadLoop ();
-}
-
 /**
   Calling this function causes a system-wide reset. This sets
   all circuitry within the system to its initial state. This type of reset

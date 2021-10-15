@@ -322,7 +322,7 @@ ParseCbMemTable (
   )
 {
   EFI_STATUS               Status;
-  struct cb_memory         *rec;
+  CB_MEMORY                *Rec;
   struct cb_memory_range   *Range;
   UINT64                   Start;
   UINT64                   Size;
@@ -339,13 +339,13 @@ ParseCbMemTable (
   //
   // Get the coreboot memory table
   //
-  rec = (struct cb_memory *)FindCbTag (CB_TAG_MEMORY);
-  if (rec == NULL) {
+  Rec = (CB_MEMORY *)FindCbTag (CB_TAG_MEMORY);
+  if (Rec == NULL) {
     return Status;
   }
 
-  for (Index = 0; Index < MEM_RANGE_COUNT(rec); Index++) {
-    Range = MEM_RANGE_PTR(rec, Index);
+  for (Index = 0; Index < MEM_RANGE_COUNT(Rec); Index++) {
+    Range = MEM_RANGE_PTR(Rec, Index);
     Start = cb_unpack64(Range->start);
     Size = cb_unpack64(Range->size);
 
@@ -380,7 +380,7 @@ ParseMemoryInfo (
   IN  VOID                  *Params
   )
 {
-  struct cb_memory         *rec;
+  CB_MEMORY                *Rec;
   struct cb_memory_range   *Range;
   UINTN                    Index;
   MEMORY_MAP_ENTRY         MemoryMap;
@@ -388,13 +388,13 @@ ParseMemoryInfo (
   //
   // Get the coreboot memory table
   //
-  rec = (struct cb_memory *)FindCbTag (CB_TAG_MEMORY);
-  if (rec == NULL) {
+  Rec = (CB_MEMORY *)FindCbTag (CB_TAG_MEMORY);
+  if (Rec == NULL) {
     return RETURN_NOT_FOUND;
   }
 
-  for (Index = 0; Index < MEM_RANGE_COUNT(rec); Index++) {
-    Range = MEM_RANGE_PTR(rec, Index);
+  for (Index = 0; Index < MEM_RANGE_COUNT(Rec); Index++) {
+    Range = MEM_RANGE_PTR(Rec, Index);
     MemoryMap.Base = cb_unpack64(Range->start);
     MemoryMap.Size = cb_unpack64(Range->size);
     MemoryMap.Type = (UINT8)Range->type;
@@ -449,7 +449,7 @@ ParseSystemTable (
 /**
   Find the serial port information
 
-  @param  SERIAL_PORT_INFO   Pointer to serial port info structure
+  @param  SerialPortInfo     Pointer to serial port info structure
 
   @retval RETURN_SUCCESS     Successfully find the serial port information.
   @retval RETURN_NOT_FOUND   Failed to find the serial port information .

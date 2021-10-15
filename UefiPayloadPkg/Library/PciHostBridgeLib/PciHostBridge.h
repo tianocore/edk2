@@ -8,8 +8,8 @@
 
 **/
 
-#ifndef _PCI_HOST_BRIDGE_H
-#define _PCI_HOST_BRIDGE_H
+#ifndef PCI_HOST_BRIDGE_H_
+#define PCI_HOST_BRIDGE_H_
 
 #include <UniversalPayload/PciRootBridges.h>
 

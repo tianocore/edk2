@@ -1,4 +1,4 @@
-/**@file
+/** @file
   Defined the platform specific device path which will be filled to
   ConIn/ConOut variables.
 
