@@ -205,7 +205,7 @@ PcatPciRootBridgeParseBars (
       //
       // IO Bar
       //
-      if (Command & EFI_PCI_COMMAND_IO_SPACE) {
+      if ((Command & EFI_PCI_COMMAND_IO_SPACE) != 0) {
         Mask = 0xfffffffc;
         Base = OriginalValue & Mask;
         Length = ((~(Value & Mask)) & Mask) + 0x04;
@@ -227,7 +227,7 @@ PcatPciRootBridgeParseBars (
       //
       // Mem Bar
       //
-      if (Command & EFI_PCI_COMMAND_MEMORY_SPACE) {
+      if ((Command & EFI_PCI_COMMAND_MEMORY_SPACE) != 0) {
 
         Mask = 0xfffffff0;
         Base = OriginalValue & Mask;
@@ -306,9 +306,14 @@ ScanForRootBridges (
   UINT64     Base;
   UINT64     Limit;
   UINT64     Value;
-  PCI_ROOT_BRIDGE_APERTURE Io, Mem, MemAbove4G, PMem, PMemAbove4G, *MemAperture;
-  PCI_ROOT_BRIDGE *RootBridges;
-  UINTN      BarOffsetEnd;
+  PCI_ROOT_BRIDGE_APERTURE Io;
+  PCI_ROOT_BRIDGE_APERTURE Mem;
+  PCI_ROOT_BRIDGE_APERTURE MemAbove4G;
+  PCI_ROOT_BRIDGE_APERTURE PMem;
+  PCI_ROOT_BRIDGE_APERTURE PMemAbove4G;
+  PCI_ROOT_BRIDGE_APERTURE *MemAperture;
+  PCI_ROOT_BRIDGE          *RootBridges;
+  UINTN                    BarOffsetEnd;
 
 
   *NumberOfRootBridges = 0;

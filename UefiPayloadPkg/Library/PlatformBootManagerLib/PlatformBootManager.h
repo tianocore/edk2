@@ -1,12 +1,12 @@
-/**@file
+/** @file
    Head file for BDS Platform specific code
 
 Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _PLATFORM_BOOT_MANAGER_H
-#define _PLATFORM_BOOT_MANAGER_H
+#ifndef PLATFORM_BOOT_MANAGER_H_
+#define PLATFORM_BOOT_MANAGER_H_
 
 #include <PiDxe.h>
 #include <Protocol/LoadedImage.h>
