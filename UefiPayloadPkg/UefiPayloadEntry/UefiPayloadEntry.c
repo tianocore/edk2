@@ -406,7 +406,9 @@ _ModuleEntryPoint (
   SERIAL_PORT_INFO              SerialPortInfo;
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *UniversalSerialPort;
 
-  PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
+  Status = PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
+  ASSERT_EFI_ERROR (Status);
+
   // Initialize floating point operating environment to be compliant with UEFI spec.
   InitializeFloatingPointUnits ();
 
