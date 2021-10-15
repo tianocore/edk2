@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __MEMORY_MAP_INFO_GUID_H__
-#define __MEMORY_MAP_INFO_GUID_H__
+#ifndef MEMORY_MAP_INFO_GUID_H_
+#define MEMORY_MAP_INFO_GUID_H_
 
 #include <Library/PcdLib.h>
 

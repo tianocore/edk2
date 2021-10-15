@@ -15,6 +15,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 UNIVERSAL_PAYLOAD_PLATFORM_BOOT_MANAGER_OVERRIDE_PROTOCOL  *mUniversalPayloadPlatformBootManagerOverrideInstance = NULL;
 
+/**
+  Signal EndOfDxe event and install SMM Ready to lock protocol.
+
+**/
 VOID
 InstallReadyToLock (
   VOID

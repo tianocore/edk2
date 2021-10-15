@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __SYSTEM_TABLE_INFO_GUID_H__
-#define __SYSTEM_TABLE_INFO_GUID_H__
+#ifndef SYSTEM_TABLE_INFO_GUID_H_
+#define SYSTEM_TABLE_INFO_GUID_H_
 
 ///
 /// System Table Information GUID

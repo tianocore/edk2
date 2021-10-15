@@ -196,7 +196,10 @@ PrintResourceDiscriptorHob (
 
 /**
   Print the information in Acpi Guid Hob.
+
   @param[in] HobRaw          A pointer to the start of gUniversalPayloadAcpiTableGuid HOB.
+  @param[in] HobLength       The size of the HOB data buffer.
+
   @retval EFI_SUCCESS        If it completed successfully.
 **/
 EFI_STATUS
@@ -217,6 +220,8 @@ PrintAcpiGuidHob (
 /**
   Print the information in Serial Guid Hob.
   @param[in] HobRaw          A pointer to the start of gUniversalPayloadSerialPortInfoGuid HOB.
+  @param[in] HobLength       The size of the HOB data buffer.
+
   @retval EFI_SUCCESS        If it completed successfully.
 **/
 EFI_STATUS
@@ -240,6 +245,7 @@ PrintSerialGuidHob (
 /**
   Print the information in Smbios Guid Hob.
   @param[in] HobRaw          A pointer to the start of gUniversalPayloadSmbios3TableGuid HOB.
+  @param[in] HobLength       The size of the HOB data buffer.
   @retval EFI_SUCCESS        If it completed successfully.
 **/
 EFI_STATUS
@@ -260,6 +266,8 @@ PrintSmbios3GuidHob (
 /**
   Print the information in Smbios Guid Hob.
   @param[in] HobRaw          A pointer to the start of gUniversalPayloadSmbiosTableGuid HOB.
+  @param[in] HobLength       The size of the HOB data buffer.
+
   @retval EFI_SUCCESS        If it completed successfully.
 **/
 EFI_STATUS
@@ -280,6 +288,8 @@ PrintSmbiosTablGuidHob (
 /**
   Print the information in Acpi BoardInfo Guid Hob.
   @param[in] HobRaw          A pointer to the start of gUefiAcpiBoardInfoGuid HOB.
+  @param[in] HobLength       The size of the HOB data buffer.
+
   @retval EFI_SUCCESS        If it completed successfully.
 **/
 EFI_STATUS
@@ -307,6 +317,7 @@ PrintAcpiBoardInfoGuidHob (
 /**
   Print the information in Pci RootBridge Info Guid Hob.
   @param[in] HobRaw          A pointer to the start of gUniversalPayloadPciRootBridgeInfoGuid HOB.
+  @param[in] HobLength       The size of the HOB data buffer.
 
   @retval EFI_SUCCESS        If it completed successfully.
 **/
@@ -362,6 +373,8 @@ PrintPciRootBridgeInfoGuidHob (
 /**
   Print the information in Extra Data Guid Hob.
   @param[in]  HobRaw         A pointer to the start of gUniversalPayloadExtraDataGuid HOB.
+  @param[in] HobLength       The size of the HOB data buffer.
+
   @retval EFI_SUCCESS        If it completed successfully.
 **/
 EFI_STATUS
@@ -394,6 +407,8 @@ PrintExtraDataGuidHob (
 /**
   Print the information in MemoryTypeInfoGuidHob.
   @param[in] HobRaw          A pointer to the start of gEfiMemoryTypeInformationGuid HOB.
+  @param[in] HobLength       The size of the HOB data buffer.
+
   @retval EFI_SUCCESS        If it completed successfully.
 **/
 EFI_STATUS
@@ -414,7 +429,7 @@ PrintMemoryTypeInfoGuidHob (
 /**
   Print the information in EdkiiBootManagerMenuFileGuid.
   @param[in] HobRaw          A pointer to the start of gEdkiiBootManagerMenuFileGuid HOB.
-  @param[in] HobLength       The size of the data buffer.
+  @param[in] HobLength       The size of the HOB data buffer.
   @retval EFI_SUCCESS        If it completed successfully.
 **/
 EFI_STATUS
