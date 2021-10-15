@@ -194,8 +194,8 @@ GetParameterBase (
     return NULL;
   }
 
-  PcdSet64S (PcdBootloaderParameter, (UINTN)CbTablePtr);
-  ASSERT_EFI_STATUS (Status);
+  Status = PcdSet64S (PcdBootloaderParameter, (UINTN)CbTablePtr);
+  ASSERT_EFI_ERROR (Status);
 
   return CbTablePtr;
 }
