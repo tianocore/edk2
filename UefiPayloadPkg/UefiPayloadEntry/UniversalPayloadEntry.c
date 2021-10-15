@@ -114,18 +114,19 @@ AddNewHob (
 }
 
 /**
-  Found the Resource Descriptor HOB that contains a range
+  Found the Resource Descriptor HOB that contains a range (Base, Top)
 
+  @param[in] HobList    Hob start address
   @param[in] Base       Memory start address
-  @param[in] Top        Memory Top.
+  @param[in] Top        Memory end address.
 
-  @return     The pointer to the Resource Descriptor HOB.
+  @retval     The pointer to the Resource Descriptor HOB.
 **/
 EFI_HOB_RESOURCE_DESCRIPTOR *
 FindResourceDescriptorByRange (
-  VOID                      *HobList,
-  EFI_PHYSICAL_ADDRESS      Base,
-  EFI_PHYSICAL_ADDRESS      Top
+  IN VOID                      *HobList,
+  IN EFI_PHYSICAL_ADDRESS      Base,
+  IN EFI_PHYSICAL_ADDRESS      Top
   )
 {
   EFI_PEI_HOB_POINTERS             Hob;
@@ -171,7 +172,7 @@ FindResourceDescriptorByRange (
   @param[in] MinimalNeededSize       Minimal needed size.
   @param[in] ExceptResourceHob       Ignore this Resource Descriptor.
 
-  @return     The pointer to the Resource Descriptor HOB.
+  @retval     The pointer to the Resource Descriptor HOB.
 **/
 EFI_HOB_RESOURCE_DESCRIPTOR *
 FindAnotherHighestBelow4GResourceDescriptor (
@@ -239,6 +240,9 @@ FindAnotherHighestBelow4GResourceDescriptor (
 
 /**
   It will build HOBs based on information from bootloaders.
+
+  @param[in]  BootloaderParameter   The starting memory address of bootloader parameter block.
+  @param[out] DxeFv                 The pointer to the DXE FV in memory.
 
   @retval EFI_SUCCESS        If it completed successfully.
   @retval Others             If it failed to build required HOBs.
@@ -375,6 +379,8 @@ BuildHobs (
 
 /**
   Entry point to the C language phase of UEFI payload.
+
+  @param[in]   BootloaderParameter    The starting address of bootloader parameter block.
 
   @retval      It will not return if SUCCESS, and return error when passing bootloader parameter.
 **/
