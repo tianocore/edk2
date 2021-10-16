@@ -25,7 +25,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
@@ -34,7 +33,6 @@
   BaseMemoryLib
   MemoryAllocationLib
   UefiBootServicesTableLib
-  SortLib
 
 [Protocols]
   gEfiMpServiceProtocolGuid
