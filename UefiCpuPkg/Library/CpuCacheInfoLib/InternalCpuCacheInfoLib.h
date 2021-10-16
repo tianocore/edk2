@@ -17,7 +17,6 @@
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/SortLib.h>
 #include <Library/CpuCacheInfoLib.h>
 
 typedef union {
