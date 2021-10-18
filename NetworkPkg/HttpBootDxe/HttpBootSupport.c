@@ -681,11 +681,11 @@ HttpBootCheckImageType (
   }
 
   FilePost = FilePath + AsciiStrLen (FilePath) - 4;
-  if (AsciiStrCmp (FilePost, ".efi") == 0) {
+  if (AsciiStriCmp (FilePost, ".efi") == 0) {
     *ImageType = ImageTypeEfi;
-  } else if (AsciiStrCmp (FilePost, ".iso") == 0) {
+  } else if (AsciiStriCmp (FilePost, ".iso") == 0) {
     *ImageType = ImageTypeVirtualCd;
-  } else if (AsciiStrCmp (FilePost, ".img") == 0) {
+  } else if (AsciiStriCmp (FilePost, ".img") == 0) {
     *ImageType = ImageTypeVirtualDisk;
   } else {
     *ImageType = ImageTypeMax;
