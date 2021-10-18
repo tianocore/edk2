@@ -160,6 +160,13 @@ IsEnableNonExecNeeded (
   }
 
   //
+  // Intel TDX sets this flag to FALSE.
+  //
+  if (!PcdGetBool (PcdIa32EferChangeAllowed)) {
+    return FALSE;
+  }
+
+  //
   // XD flag (BIT63) in page table entry is only valid if IA32_EFER.NXE is set.
   // Features controlled by Following PCDs need this feature to be enabled.
   //
