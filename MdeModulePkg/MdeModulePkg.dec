@@ -2138,6 +2138,11 @@
   # @Prompt GHCB Pool Size
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize|0|UINT64|0x00030008
 
+  ## This dynamic PCD indicates if IA32_EFER can be changed. The default value is TRUE but in
+  #  Intel TDX change of IA32_EFER is not allowed.
+  # @Prompt The flag which indicates if IA32_EFER is allowed to be changed.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed|TRUE|BOOLEAN|0x00030009
+
 [PcdsDynamicEx]
   ## This dynamic PCD enables the default variable setting.
   #  Its value is the default store ID value. The default value is zero as Standard default.
