@@ -2,6 +2,113 @@
 
 ## EDK2 RISC-V Platform Project
 
+### EDK2 RISC-V Design and the Boot Processes
+RISC-V edk2 port is designed base on edk2 boot phases and leverage [RISC-V OpenSBI](https://github.com/riscv/opensbi) (which is the implementation of [RISC-V SBI](https://github.com/riscv/riscv-sbi-doc)) as an edk2 library. The design concept is to leverage RISC-V SBI implementation, the basic RISC-V HARTs and the platform initialization. However, it still keeps the edk2 build mechanism and the boot processes. RISC-V OpenSBI is built as
+an library and linked with edk2 SEC module. The design diagram and the boot flow is shown in below figure,
+
+#### RISC-V EDK2 Port Design Diagrams
+![RISC-V EDK2 Port](https://github.com/tianocore/edk2-platforms/blob/master/Platform/RISC-V/PlatformPkg/Documents/Media/RiscVEdk2BootProcess.svg?raw=true)
+
+#### SEC Phase
+As the most of edk2 platforms SEC implementations, RISC-V edk2 port SEC module initiates the fundamental platform
+boot environment. RISC-V edk2 SEC module linked with [RiscVOpensbiLib](#riscvopensbilib-library) that pulls in the OpenSBI core source files into the build as a library. SEC module invokes sbi_init() to execute through the OpenSBI
+initialization flow. Afterwards, SEC phase hands off to PEI phase via OpenSBI with the ***NextAddress*** and ***NextMode*** are configured.
+The entire SEC phase with ***RiscVOpensbiLib*** is executed in the Machine-mode (M-mode) which is the highest
+and the mandatory privilege mode of RISC-V HART. The SBI implementation is also executed in the M-mode that
+provides the Supervisor Binary Interface for the entities run in the Supervisor-mode (S-mode). The default
+privilege mode is configured to S-mode for the next phase after SEC, that says the PEI, DXE and BDS phases are
+default executed in S-mode unless the corresponding [PCDs](#risc-v-platform-pcd-settings) are configured
+differently from the default settings according to the OEM platform design.
+
+##### RiscVOpensbiLib Library
+[Indicated as #1 in the figure](#risc-v-edk2-port-design-diagrams)
+> ***RiscVOpensbiLib*** is a edk2 wrapper library of OpenSBI. SEC module is the only consumer of ***RiscVOpensbiLib*** across the entire edk2 boot processes. The sub-module under ***RiscVOpensbiLib*** is updated
+to align with OpenSBI project. As mentioned earlier, ***RiscVOpensbiLib*** provides the RISC-V SBI
+implementation and initialize the OpenSBI boot flow. SEC module is also linked with below libraries,
+- edk2 [OpenSbiPlatformLib](#OpenSbiPlatformLib-library) library that provides the generic RISC-V platform initialization code.
+- edk2 [RiscVSpecifialPlatformLib](#RiscVSpecifialPlatformLib-library) library which is provided by the RISC-V
+platform vendor for the platform-specific initialization. The underlying implementation of above two edk2 libraries
+are from OpenSBI project. edk2 libraries are introduced as the wrapper libraries that separates and organizes OpenSBI core and platform code based on edk2 framework and the the build mechanism for edk2 RISC-V platforms. ***RiscVOpensbiLib*** library is located under [RISC-V ProcessorPkg](https://github.com/tianocore/edk2-platforms/tree/master/Silicon/RISC-V/ProcessorPkg) while the platform code (e.g. OpenSbiPlatformLib) is located under [RISC-V PlatformPkg](https://github.com/tianocore/edk2-platforms/tree/master/Platform/RISC-V/PlatformPkg).
+- edk2 [RiscVSpecifialPlatformLib](#riscvspecifialplatformlib) library is provided by the platform vendor and located under edk2 RISC-V platform-specific folder.
+
+##### OpenSbiPlatformLib Library
+[Indicated as #2 in the figure](#risc-v-edk2-port-design-diagrams)
+> ***OpenSbiPlatformLib*** provides the generic RISC-V platform initialization code. Platform vendor can just utilize this library if they don't have additional requirements on the platform initialization.
+
+##### RiscVSpecifialPlatformLib Library
+[Indicated as #3 in the figure](#risc-v-edk2-port-design-diagrams)
+> The major use case of this library is to facilitate the interfaces for platform vendors to provide the special
+platform initialization based on the generic platform initialization library.
+
+##### Edk2OpensbiPlatformWrapperLib Library
+[Indicated as #4 in the figure](#risc-v-edk2-port-design-diagrams)
+> In order to providing the flexibility to edk2 RISC-V firmware solution, ***Edk2OpensbiPlatformWrapperLib*** is the wrapper library of [OpenSbiPlatformLib](#OpenSbiPlatformLib-library) to provide the interfaces for OEM. The ***platform_ops_address***in the generic platform structure is replaced with ***Edk2OpensbiplatformOps*** in SEC
+module. The platform function invoked by OpenSBI core is hooked to ***Edk2OpensbiPlatformWrapperLib***. This gives
+a change to OEM for implementing platform-specific initialization before and after the generic platform code. OEM
+can override this library under their platform folder on demand without touching ***RiscVOpensbiLib*** library
+source files and other common source files.
+
+##### Next Phase Address and Privilege Mode
+[Indicated as #5 in the figure](#risc-v-edk2-port-design-diagrams)
+> Once OpenSBI finishes the boot initialization, it will jump to the next phase with the default privilege set to
+S-mode. In order to facilitate the flexibility for a variant of platform demands. EDK2 RISC-V provides the [PCDs](#risc-v-platform-pcd-settings) as the configurable privilege for the next phase. Whether to have PEI or later
+phases executed in the default S-mode or to keep the RISC-V edk2 boot phase privilege in M-mode is at platform design discretion. The SEC module sets the next phase address to the PEI Core entry point with a configurable
+privilege according to the PCD.
+
+#### PEI Phase
+SEC module hands off the boot process to PEI core in the privilege configured by ***PcdPeiCorePrivilegeMode*** PCD *(TODO, currently the privilege is forced to S-mode)*. PEI and later phases are allowed to executed in M-mode
+if the platform doesn't require Hypervisor-extended Supervisor mode (HS-mode) for the virtualization. RISC-V edk2 port provides its own instance ***PeiCoreEntryPoint*** library [(indicated as #7 in the figure)](#risc-v-edk2-port-design-diagrams) and linked with [PlatformSecPpiLib](#platformsecppilib-library) in order to support the S-mode PEI phase. PEI core requires [RiscVFirmwareContextLib](#riscVfirmwarecontextlib-library) library to retrieve the information of RISC-V HARTs and platform (e.g. FDT) configurations that built up in SEC phase. ***PeiServicePointer*** is also maintained in the ***RISC-V OpenSBI FirmwareContext*** structure and the pointer is retrieved by [PeiServiceTablePointerOpensbi](#peiservicetablepointeropensbi-library) library.
+
+##### PlatformSecPpiLib Library
+[Indicated as #8 in the figure](#risc-v-edk2-port-design-diagrams)
+
+> Some platform has the PEI protocol interface (PPI) prepared in SEC phase and pass the PPI description to PEI phase for the installation. That means the PPI code resides in SEC module and executed in PEI phase. Due to the SEC
+(with OpenSBI) is protected by the RISC-V Physical Memory Protection (PMP) through [OpenSBI firmware domain](#edk2-opensbi-firmware-domain), the SEC can be only accessed and executed when RISC-V HART is operated in M-mode. The SEC PPI passed to PEI is not able to be executed by any PEI modules. Thus we have ***PlatformSecPpiLib*** library for the platforms that requires to install the PPI at the early stage of PEI core instead of installing PPI
+during PEI dispatcher that maybe too late for some platform use cases. ***PlatformSecPpiLib*** is currently
+executed in S-mode because we force to switch RISC-V boot HART to S-mode when SEC hands of boot process to PEI
+phase. ***PlatformSecPpiLib*** can also executed in M-mode once we have the full implementation of [***PcdPeiCorePrivilegeMode***.](#risc-v-platform-pcd-settings)
+
+##### RiscVFirmwareContextLib Library
+[Indicated as #9 in the figure](#risc-v-edk2-port-design-diagrams)
+
+> The ***OpenSBI FirmwareContext*** is a structure member in sbi_platform, that can carry the firmware
+solution-defined information to edk2 boot phases after SEC. edk2 defines its own ***FirmwareContext*** as below in
+the current implementation.
+
+    typedef struct {
+        UINT64              BootHartId;
+        VOID                *PeiServiceTable;      // PEI Service table
+        UINT64              FlattenedDeviceTree;   // Pointer to Flattened Device tree
+        UINT64              SecPeiHandOffData;     // This is EFI_SEC_PEI_HAND_OFF passed to PEI Core.
+        EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC  *HartSpecific[RISC_V_MAX_HART_SUPPORTED];
+    } EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT;
+
+> ***RiscVFirmwareContextLib*** library is used by PEI module for obtaining the ***FirmwareContext*** pointer.
+
+##### PeiServiceTablePointerOpensbi Library
+[Indicated as #10 in the figure](#risc-v-edk2-port-design-diagrams)
+
+> ***PeiServiceTablePointerOpensbi*** is the library that provides Get/Set PeiServiceTablePointer. ***RiscVFirmwareContextLib*** is the underlying library for the operations on PEI service table pointer.
+
+##### PEI OpenSBI PPI
+[Indicated as #11 in the figure](#risc-v-edk2-port-design-diagrams)
+
+> edk2 PEI OpenSBI PPI *(TODO)* provides the unified interface for all PEI drivers to invoke SBI services.
+
+#### DXE Phase
+DXE IPL PEI module hands off the boot process to DXE Core in the privilege configured by PcdDxeCorePrivilegeMode PCD *(TODO, currently is not implemented yet)*. edk2 DXE OpenSBI protocol *(TODO, indicated as #12 in the figure)* provides the unified interface for all DXE drivers to invoke SBI services.
+
+#### BDS Phase
+The implementation of RISC-V edk2 port in BDS phase is the same as it is in DXE phase which is executed in the
+privilege configured by PcdDxeCorePrivilegeMode PCD *(TODO, currently the privilege is forced to S-mode)*. The
+OpenSBI is also provided through edk2 DXE OpenSBI Protocol*(TODO, indicated as #12 in the figure)*. However, BDS must transits the privilege mode to S-mode before it handing off the boot process to S-mode OS, OS boot loader or EFI application.
+
+#### EDK2 OpenSBI Firmware Domain
+
+![RISC-V EDK2 FW Domain](https://github.com/tianocore/edk2-platforms/blob/master/Platform/RISC-V/PlatformPkg/Documents/Media/RiscVEdk2FwDomain.svg?raw=true)
+
+OpenSBI implements the firmware domain mechanism to protect the root firmware (which is the OpenSBI itself) as the M-mode only access and execute region. RISC-V edk2 port configures the root firmware domain via [PCDs](#risc-v-platform-pcd-settings) to protect SEC firmware volume, memory and OpenSBI stuff. The firmware region (non-root firmware) that accommodates PEI and DXE phase FV regions, while EFI variable region is reported as a separate firmware region as it shows in above figure.
+
 ### EDK2 Build Architecture for RISC-V
 The edk2 build architecture which is supported and verified on edk2 code base for
 RISC-V platforms is `RISCV64`.
@@ -49,18 +156,9 @@ Then you can build the edk2 firmware image for RISC-V platforms.
 build -a RISCV64 -t GCC5 -p Platform/SiFive/U5SeriesPkg/FreedomU540HiFiveUnleashedBoard/U540.dsc
 ```
 
-## RISC-V OpenSBI Library
-RISC-V [OpenSBI](https://github.com/riscv/opensbi) is the implementation of
-[RISC-V SBI (Supervisor Binary Interface) specification](https://github.com/riscv/riscv-sbi-doc).
-For EDK2 UEFI firmware solution, RISC-V OpenSBI is integrated as a library
-[(submoudule)](Silicon/RISC-V/ProcessorPkg/Library/RiscVOpensbiLib/opensbi) in EDK2
-RISC-V Processor Package. The RISC-V OpenSBI library is built in SEC driver without
-any modifications and provides the interfaces for supervisor mode execution environment
-to execute privileged operations.
-
 ## RISC-V Platform PCD settings
 ### EDK2 Firmware Volume Settings
-EDK2 Firmware volume related PCDs which declared in platform FDF file.
+EDK2 Firmware volume related PCDs which is declared in platform FDF file.
 
 | **PCD name** |**Usage**|
 |--------------|---------|
@@ -86,10 +184,14 @@ The PCD settings regard to EFI Variable
 ### RISC-V Physical Memory Protection (PMP) Region Settings
 Below PCDs could be set in platform FDF file.
 
-| **PCD name** |**Usage**|
-|--------------|---------|
-|PcdFwStartAddress| The starting address of firmware region to protected by PMP|
-|PcdFwEndAddress| The ending address of firmware region to protected by PMP|
+| **PCD name** |**Usage**|**Access Permission in M-mode**|**Access Permission in S-mode**|
+|--------------|---------|---------|---------|
+|PcdRootFirmwareDomainBaseAddress| The starting address of root firmware domain protected by PMP|Full access|No Access|
+|PcdRootFirmwareDomainSize| The size of root firmware domain|-|-|
+|PcdFirmwareDomainBaseAddress| The starting address of firmware domain that can be accessed and executed in S-mode|Full access|Readable and Executable|
+|PcdFirmwareDomainSize| The size of firmware domain|-|-|
+|PcdVariableFirmwareRegionBaseAddress| The starting address of EFI variable region that can be accessed in S-mode|Full access|Readale and Writable|
+|PcdVariableFirmwareRegionSize| The size of EFI variable firmware region|-|-|
 
 ### RISC-V Processor HART Settings
 
@@ -98,6 +200,7 @@ Below PCDs could be set in platform FDF file.
 |PcdHartCount| Number of RISC-V HARTs, the value is processor-implementation specific|
 |PcdBootHartId| The ID of RISC-V HART to execute main fimrware code and boot system to OS|
 |PcdBootableHartNumber|The bootable HART number, which is incorporate with RISC-V OpenSBI platform hart_index2id value|
+|PcdBootableHartIndexToId| if PcdBootableHartNumber == 0, hart_index2id is built from Device Tree, otherwise this is an array of HART index to HART ID|
 
 ### RISC-V OpenSBI Settings
 
@@ -109,6 +212,7 @@ Below PCDs could be set in platform FDF file.
 |PcdTemporaryRamBase| The base address of temporary memory for PEI phase|
 |PcdTemporaryRamSize| The temporary memory size for PEI phase|
 |PcdPeiCorePrivilegeMode|The target RISC-V privilege mode for edk2 PEI phase|
+|PcdDxeCorePrivilegeMode (TODO)|The target RISC-V privilege mode for edk2 DXE phase|
 
 ## Supported Operating Systems
 Currently support boot to EFI Shell and Linux kernel.
