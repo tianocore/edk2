@@ -93,10 +93,10 @@ ParseMemoryInfo (
   IN  VOID                       *Params
   )
 {
-  MEMROY_MAP_INFO               *MemoryMapInfo;
+  MEMORY_MAP_INFO               *MemoryMapInfo;
   UINTN                          Idx;
 
-  MemoryMapInfo = (MEMROY_MAP_INFO *) GetGuidHobDataFromSbl (&gLoaderMemoryMapInfoGuid);
+  MemoryMapInfo = (MEMORY_MAP_INFO *) GetGuidHobDataFromSbl (&gLoaderMemoryMapInfoGuid);
   if (MemoryMapInfo == NULL) {
     ASSERT (FALSE);
     return RETURN_NOT_FOUND;

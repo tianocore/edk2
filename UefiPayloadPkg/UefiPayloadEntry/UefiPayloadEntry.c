@@ -24,7 +24,7 @@ STATIC UINT32 mTopOfLowerUsableDram = 0;
 **/
 EFI_STATUS
 MemInfoCallbackMmio (
-  IN MEMROY_MAP_ENTRY          *MemoryMapEntry,
+  IN MEMORY_MAP_ENTRY          *MemoryMapEntry,
   IN VOID                      *Params
   )
 {
