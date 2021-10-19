@@ -383,7 +383,7 @@ ParseMemoryInfo (
   struct cb_memory         *rec;
   struct cb_memory_range   *Range;
   UINTN                    Index;
-  MEMROY_MAP_ENTRY         MemoryMap;
+  MEMORY_MAP_ENTRY         MemoryMap;
 
   //
   // Get the coreboot memory table
