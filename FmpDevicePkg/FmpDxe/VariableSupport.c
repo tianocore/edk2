@@ -3,7 +3,7 @@
   firmware updates.
 
   Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
-  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -729,29 +729,30 @@ SetLastAttemptVersionInVariable (
 static
 EFI_STATUS
 LockFmpVariable (
-  IN EFI_STATUS                    PreviousStatus,
-  IN EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock,
-  IN CHAR16                        *VariableName
+  IN EFI_STATUS                      PreviousStatus,
+  IN EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy,
+  IN CHAR16                          *VariableName
   )
 {
   EFI_STATUS  Status;
 
-  Status = VariableLock->RequestToLock (
-                           VariableLock,
-                           VariableName,
-                           &gEfiCallerIdGuid
-                           );
-  if (!EFI_ERROR (Status)) {
-    return PreviousStatus;
+  // If success, go ahead and set the policies to protect the target variables.
+  Status = RegisterBasicVariablePolicy (VariablePolicy,
+                                        &gEfiCallerIdGuid,
+                                        VariableName,
+                                        VARIABLE_POLICY_NO_MIN_SIZE,
+                                        VARIABLE_POLICY_NO_MAX_SIZE,
+                                        VARIABLE_POLICY_NO_MUST_ATTR,
+                                        VARIABLE_POLICY_NO_CANT_ATTR,
+                                        VARIABLE_POLICY_TYPE_LOCK_NOW);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to lock variable %g %s. Status = %r\n",
+            mImageIdName,
+            &gEfiCallerIdGuid,
+            VariableName,
+            Status
+           ));
   }
-
-  DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to lock variable %g %s.  Status = %r\n",
-    mImageIdName,
-    &gEfiCallerIdGuid,
-    VariableName,
-    Status
-    ));
-
   if (EFI_ERROR (PreviousStatus)) {
     return PreviousStatus;
   }
@@ -773,26 +774,22 @@ LockAllFmpVariables (
   FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   )
 {
-  EFI_STATUS                    Status;
-  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
+  EFI_STATUS                        Status;
+  EDKII_VARIABLE_POLICY_PROTOCOL    *VariablePolicy;
 
-  VariableLock = NULL;
-  Status = gBS->LocateProtocol (
-                  &gEdkiiVariableLockProtocolGuid,
-                  NULL,
-                  (VOID **)&VariableLock
-                  );
-  if (EFI_ERROR (Status) || VariableLock == NULL) {
-    DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to locate Variable Lock Protocol (%r).\n", mImageIdName, Status));
-    return EFI_UNSUPPORTED;
+  // Locate the VariablePolicy protocol.
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID**)&VariablePolicy );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "FmpDxe %a - Could not locate VariablePolicy protocol! %r\n", __FUNCTION__, Status));
+    return Status;
   }
 
   Status = EFI_SUCCESS;
-  Status = LockFmpVariable (Status, VariableLock, Private->VersionVariableName);
-  Status = LockFmpVariable (Status, VariableLock, Private->LsvVariableName);
-  Status = LockFmpVariable (Status, VariableLock, Private->LastAttemptStatusVariableName);
-  Status = LockFmpVariable (Status, VariableLock, Private->LastAttemptVersionVariableName);
-  Status = LockFmpVariable (Status, VariableLock, Private->FmpStateVariableName);
+  Status = LockFmpVariable (Status, VariablePolicy, Private->VersionVariableName);
+  Status = LockFmpVariable (Status, VariablePolicy, Private->LsvVariableName);
+  Status = LockFmpVariable (Status, VariablePolicy, Private->LastAttemptStatusVariableName);
+  Status = LockFmpVariable (Status, VariablePolicy, Private->LastAttemptVersionVariableName);
+  Status = LockFmpVariable (Status, VariablePolicy, Private->FmpStateVariableName);
 
   return Status;
 }

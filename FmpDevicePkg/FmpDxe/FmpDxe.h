@@ -4,7 +4,7 @@
   information provided through PCDs and libraries.
 
   Copyright (c) Microsoft Corporation.<BR>
-  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -33,11 +33,11 @@
 #include <Library/FmpDependencyDeviceLib.h>
 #include <Protocol/FirmwareManagement.h>
 #include <Protocol/FirmwareManagementProgress.h>
-#include <Protocol/VariableLock.h>
 #include <Guid/SystemResourceTable.h>
 #include <Guid/EventGroup.h>
 #include <LastAttemptStatus.h>
 #include <FmpLastAttemptStatus.h>
+#include <Library/VariablePolicyHelperLib.h>
 
 #define VERSION_STRING_NOT_SUPPORTED  L"VERSION STRING NOT SUPPORTED"
 #define VERSION_STRING_NOT_AVAILABLE  L"VERSION STRING NOT AVAILABLE"
