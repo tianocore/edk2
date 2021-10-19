@@ -4,7 +4,7 @@
 #  information provided through PCDs and libraries.
 #
 #  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
-#  Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -55,14 +55,15 @@
   FmpDependencyLib
   FmpDependencyCheckLib
   FmpDependencyDeviceLib
+  VariablePolicyHelperLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
 
 [Protocols]
-  gEdkiiVariableLockProtocolGuid                ## CONSUMES
   gEfiFirmwareManagementProtocolGuid            ## PRODUCES
   gEdkiiFirmwareManagementProgressProtocolGuid  ## PRODUCES
+  gEdkiiVariablePolicyProtocolGuid              ## CONSUMES
 
 [Pcd]
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceStorageAccessEnable              ## CONSUMES
