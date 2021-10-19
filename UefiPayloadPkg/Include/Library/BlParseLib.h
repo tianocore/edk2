@@ -19,7 +19,7 @@
 #define GET_BOOTLOADER_PARAMETER()      PcdGet64 (PcdBootloaderParameter)
 
 typedef RETURN_STATUS \
-        (*BL_MEM_INFO_CALLBACK) (MEMROY_MAP_ENTRY *MemoryMapEntry, VOID *Param);
+        (*BL_MEM_INFO_CALLBACK) (MEMORY_MAP_ENTRY *MemoryMapEntry, VOID *Param);
 
 /**
   This function retrieves the parameter base address from boot loader.
