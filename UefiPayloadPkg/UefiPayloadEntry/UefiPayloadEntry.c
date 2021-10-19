@@ -103,7 +103,7 @@ MemInfoCallbackMmio (
 **/
 EFI_STATUS
 FindToludCallback (
-  IN MEMROY_MAP_ENTRY          *MemoryMapEntry,
+  IN MEMORY_MAP_ENTRY          *MemoryMapEntry,
   IN VOID                      *Params
   )
 {
@@ -168,7 +168,7 @@ FindToludCallback (
 **/
 EFI_STATUS
 MemInfoCallback (
-  IN MEMROY_MAP_ENTRY          *MemoryMapEntry,
+  IN MEMORY_MAP_ENTRY          *MemoryMapEntry,
   IN VOID                      *Params
   )
 {
