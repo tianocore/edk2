@@ -283,7 +283,9 @@ typedef struct AcpiParser {
   FNPTR_PRINT_FORMATTER PrintFormatter;
 
   /// Optional pointer which may be set to request the parser to update
-  /// a pointer to the field data. If unused this must be set to NULL.
+  /// a pointer to the field data. This value is set after the FieldValidator
+  /// has been called and therefore should not be used by the FieldValidator.
+  /// If unused this must be set to NULL.
   VOID**                ItemPtr;
 
   /// Optional pointer to a field validator function.
