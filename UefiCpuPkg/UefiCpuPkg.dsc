@@ -61,6 +61,7 @@
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   VmgExitLib|UefiCpuPkg/Library/VmgExitLibNull/VmgExitLibNull.inf
   MicrocodeLib|UefiCpuPkg/Library/MicrocodeLib/MicrocodeLib.inf
+  SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
 
 [LibraryClasses.common.SEC]
   PlatformSecLib|UefiCpuPkg/Library/PlatformSecLibNull/PlatformSecLibNull.inf
@@ -119,6 +120,7 @@
   UefiCpuPkg/Library/CpuTimerLib/BaseCpuTimerLib.inf
   UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
   UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
+  UefiCpuPkg/MicrocodeMeasurementDxe/MicrocodeMeasurementDxe.inf
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/CpuDxe/CpuDxe.inf
