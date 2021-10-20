@@ -36,7 +36,6 @@
   HobLib
 
 [Guids]
-  gUefiSystemTableInfoGuid
   gUefiSerialPortInfoGuid
   gLoaderMemoryMapInfoGuid
   gEfiGraphicsInfoHobGuid

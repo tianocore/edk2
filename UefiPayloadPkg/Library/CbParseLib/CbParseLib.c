@@ -410,9 +410,9 @@ ParseMemoryInfo (
 
 
 /**
-  Acquire acpi table and smbios table from coreboot
+  Acquire SMBIOS table from coreboot.
 
-  @param  SystemTableInfo          Pointer to the system table info
+  @param  SmbiosTable               Pointer to the SMBIOS table info.
 
   @retval RETURN_SUCCESS            Successfully find out the tables.
   @retval RETURN_NOT_FOUND          Failed to find the tables.
@@ -420,8 +420,8 @@ ParseMemoryInfo (
 **/
 RETURN_STATUS
 EFIAPI
-ParseSystemTable (
-  OUT SYSTEM_TABLE_INFO     *SystemTableInfo
+ParseSmbiosTable (
+  OUT UNIVERSAL_PAYLOAD_SMBIOS_TABLE     *SmbiosTable
   )
 {
   EFI_STATUS       Status;
@@ -432,17 +432,38 @@ ParseSystemTable (
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
-  SystemTableInfo->SmbiosTableBase = (UINT64) (UINTN)MemTable;
-  SystemTableInfo->SmbiosTableSize = MemTableSize;
+  SmbiosTable->SmBiosEntryPoint = (UINT64) (UINTN)MemTable;
+
+  return RETURN_SUCCESS;
+}
+
+
+/**
+  Acquire ACPI table from coreboot.
+
+  @param  AcpiTableHob              Pointer to the ACPI table info.
+
+  @retval RETURN_SUCCESS            Successfully find out the tables.
+  @retval RETURN_NOT_FOUND          Failed to find the tables.
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseAcpiTableInfo (
+  OUT UNIVERSAL_PAYLOAD_ACPI_TABLE        *AcpiTableHob
+  )
+{
+  EFI_STATUS       Status;
+  VOID             *MemTable;
+  UINT32           MemTableSize;
 
   Status = ParseCbMemTable (SIGNATURE_32 ('I', 'P', 'C', 'A'), &MemTable, &MemTableSize);
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
-  SystemTableInfo->AcpiTableBase = (UINT64) (UINTN)MemTable;
-  SystemTableInfo->AcpiTableSize = MemTableSize;
+  AcpiTableHob->Rsdp = (UINT64) (UINTN)MemTable;
 
-  return Status;
+  return RETURN_SUCCESS;
 }
 
 
