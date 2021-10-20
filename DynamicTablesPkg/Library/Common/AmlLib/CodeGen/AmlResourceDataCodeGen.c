@@ -91,7 +91,7 @@ LinkRdNode (
     *NewRdNode = RdNode;
   }
 
-  return Status;
+  return EFI_SUCCESS;
 
 error_handler:
   Status1 = AmlDeleteTree ((AML_NODE_HEADER*)RdNode);
