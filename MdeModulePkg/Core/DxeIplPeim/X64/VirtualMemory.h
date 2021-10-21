@@ -19,6 +19,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define SYS_CODE64_SEL 0x38
 
+#define PAGETABLE_ENTRY_MASK        ((1UL << 9) - 1)
+#define PML4_OFFSET(x)              ( (x >> 39) & PAGETABLE_ENTRY_MASK)
+#define PDP_OFFSET(x)               ( (x >> 30) & PAGETABLE_ENTRY_MASK)
+#define PDE_OFFSET(x)               ( (x >> 21) & PAGETABLE_ENTRY_MASK)
+#define PTE_OFFSET(x)               ( (x >> 12) & PAGETABLE_ENTRY_MASK)
 
 #pragma pack(1)
 
@@ -203,6 +208,7 @@ EnableExecuteDisableBit (
   @param[in]      StackSize             Stack size.
   @param[in]      GhcbBase              GHCB page area base address.
   @param[in]      GhcbSize              GHCB page area size.
+  @param[in]      SharedBitMask         Bit mask for Tdx shared memory.
 
 **/
 VOID
@@ -212,7 +218,8 @@ Split2MPageTo4K (
   IN EFI_PHYSICAL_ADDRESS               StackBase,
   IN UINTN                              StackSize,
   IN EFI_PHYSICAL_ADDRESS               GhcbBase,
-  IN UINTN                              GhcbSize
+  IN UINTN                              GhcbSize,
+  IN UINT64                             SharedBitMask
   );
 
 /**
@@ -326,5 +333,62 @@ VOID *
 AllocatePageTableMemory (
   IN UINTN           Pages
   );
+
+#ifdef MDE_CPU_X64
+/**
+  This function sets the shared bit for the memory region specified by
+  PhysicalAddress and Length from the current page table  context.
+
+  The function iterates through the PhysicalAddress one page at a time, and set
+  or clears the memory encryption in the page table. If it encounters
+  that a given physical address range is part of large page then it attempts to
+  change the attribute at one go (based on size), otherwise it splits the
+  large pages into smaller (e.g 2M page into 4K pages) and then try to set or
+  clear the encryption bit on the smallest page size.
+
+  @param[in]  PageTableBaseAddress    Base Address of Page table
+  @param[in]  Page5LevelSupport       Indicates if Level-5 paging supported
+  @param[in]  PhysicalAddress         The physical address that is the start
+                                      address of a memory region.
+  @param[in]  Pages                   Number of pages of memory region
+
+  @retval EFI_SUCCESS                 The shared bit is set successfully.
+  @retval EFI_INVALID_PARAMETER       Number of pages is zero.
+  @retval EFI_NO_MAPPING              Physical address is not mapped in PageTable
+**/
+EFI_STATUS
+SetMemorySharedBit (
+  IN    PHYSICAL_ADDRESS         PageTableBaseAddress,
+  IN    BOOLEAN                  Page5LevelSupport,
+  IN    UINT64                   SharedBitMask,
+  IN    PHYSICAL_ADDRESS         PhysicalAddress,
+  IN    UINTN                    Pages
+  );
+
+/**
+  TDVMALL is a leaf function 0 for TDCALL. It helps invoke services from the
+  host VMM to pass/receive information.
+
+  @param[in]     Leaf        Number of sub-functions
+  @param[in]     Arg1        Arg1
+  @param[in]     Arg2        Arg2
+  @param[in]     Arg3        Arg3
+  @param[in]     Arg4        Arg4
+  @param[in,out] Results     Returned result of the sub-function
+
+  @return EFI_SUCCESS
+  @return Other           See individual sub-functions
+
+**/
+EFI_STATUS
+DxeIplTdVmCall (
+  IN UINT64          Leaf,
+  IN UINT64          Arg1,
+  IN UINT64          Arg2,
+  IN UINT64          Arg3,
+  IN UINT64          Arg4,
+  IN OUT VOID        *Results
+  );
+#endif
 
 #endif

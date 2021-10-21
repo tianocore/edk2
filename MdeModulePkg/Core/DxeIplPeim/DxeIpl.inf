@@ -118,6 +118,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize                            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask                    ## CONSUMES
 
 [Pcd.IA32,Pcd.X64,Pcd.ARM,Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES

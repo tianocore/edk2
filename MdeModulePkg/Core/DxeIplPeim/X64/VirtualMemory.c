@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Register/Intel/Cpuid.h>
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
+#include <IndustryStandard/Tdx.h>
 
 //
 // Global variable to keep track current available memory used as page table.
@@ -340,6 +341,7 @@ AllocatePageTableMemory (
   @param[in]      StackSize             Stack size.
   @param[in]      GhcbBase              GHCB page area base address.
   @param[in]      GhcbSize              GHCB page area size.
+  @param[in]      SharedBitMask         Bit mask for Tdx shared memory.
 
 **/
 VOID
@@ -349,7 +351,8 @@ Split2MPageTo4K (
   IN EFI_PHYSICAL_ADDRESS               StackBase,
   IN UINTN                              StackSize,
   IN EFI_PHYSICAL_ADDRESS               GhcbBase,
-  IN UINTN                              GhcbSize
+  IN UINTN                              GhcbSize,
+  IN UINT64                             SharedBitMask
   )
 {
   EFI_PHYSICAL_ADDRESS                  PhysicalAddress4K;
@@ -361,6 +364,10 @@ Split2MPageTo4K (
   // Make sure AddressEncMask is contained to smallest supported address field
   //
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
+  if (SharedBitMask != 0) {
+    ASSERT (AddressEncMask == 0);
+    AddressEncMask = SharedBitMask;
+  }
 
   PageTableEntry = AllocatePageTableMemory (1);
   ASSERT (PageTableEntry != NULL);
@@ -418,6 +425,7 @@ Split2MPageTo4K (
   @param[in]      StackSize             Stack size.
   @param[in]      GhcbBase              GHCB page area base address.
   @param[in]      GhcbSize              GHCB page area size.
+  @param[in]      SharedBitMask         Bit mask for Tdx shared memory.
 
 **/
 VOID
@@ -427,7 +435,8 @@ Split1GPageTo2M (
   IN EFI_PHYSICAL_ADDRESS               StackBase,
   IN UINTN                              StackSize,
   IN EFI_PHYSICAL_ADDRESS               GhcbBase,
-  IN UINTN                              GhcbSize
+  IN UINTN                              GhcbSize,
+  IN UINT64                             SharedBitMask
   )
 {
   EFI_PHYSICAL_ADDRESS                  PhysicalAddress2M;
@@ -439,6 +448,11 @@ Split1GPageTo2M (
   // Make sure AddressEncMask is contained to smallest supported address field
   //
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
+
+  if (SharedBitMask != 0) {
+    ASSERT (AddressEncMask == 0);
+    AddressEncMask = *PageEntry1G & SharedBitMask;
+  }
 
   PageDirectoryEntry = AllocatePageTableMemory (1);
   ASSERT (PageDirectoryEntry != NULL);
@@ -454,7 +468,7 @@ Split1GPageTo2M (
       //
       // Need to split this 2M page that covers NULL or stack range.
       //
-      Split2MPageTo4K (PhysicalAddress2M, (UINT64 *) PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
+      Split2MPageTo4K (PhysicalAddress2M, (UINT64 *) PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize, SharedBitMask == 0 ? 0 : AddressEncMask);
     } else {
       //
       // Fill in the Page Directory entries
@@ -646,6 +660,296 @@ EnablePageTableProtection (
   //
   AsmWriteCr0 (AsmReadCr0() | CR0_WP);
 }
+
+#ifdef MDE_CPU_X64
+/**
+  Set the memory shared bit
+
+  @param[in,out]      PageTablePointer  Page table entry pointer (PTE).
+  @param[in]          PhysicalAddress   The physical address that is the start
+                                        address of a memory region
+  @param[in]          Length            Length of the memory region
+  @param[in]          SharedBitMask     Shared bit mask
+
+  @retval             Return status of DxeIplTdVmCall
+**/
+UINT64
+SetSharedBit(
+  IN   OUT     UINT64*                PageTablePointer,
+  IN           PHYSICAL_ADDRESS       PhysicalAddress,
+  IN           UINT64                 Length,
+  IN           UINT64                 SharedBitMask
+  )
+{
+  UINT64      Status;
+
+  *PageTablePointer |= SharedBitMask;
+  PhysicalAddress   |= SharedBitMask;
+
+  Status = TdVmCall (TDVMCALL_MAPGPA, PhysicalAddress, Length, 0, 0, NULL);
+
+  return Status;
+}
+
+/**
+  This function sets the shared bit for the memory region specified by
+  PhysicalAddress and Length from the current page table  context.
+
+  The function iterates through the PhysicalAddress one page at a time, and set
+  or clears the memory encryption in the page table. If it encounters
+  that a given physical address range is part of large page then it attempts to
+  change the attribute at one go (based on size), otherwise it splits the
+  large pages into smaller (e.g 2M page into 4K pages) and then try to set or
+  clear the encryption bit on the smallest page size.
+
+  @param[in]  PageTableBaseAddress    Base Address of Page table
+  @param[in]  Page5LevelSupport       Indicates if Level-5 paging supported
+  @param[in]  SharedBitMask           Shared bit mask for the memory region
+  @param[in]  PhysicalAddress         The physical address that is the start
+                                      address of a memory region.
+  @param[in]  Pages                   Number of pages of memory region
+
+  @retval EFI_SUCCESS                 The shared bit is set successfully.
+  @retval EFI_INVALID_PARAMETER       Number of pages is zero.
+  @retval EFI_NO_MAPPING              Physical address is not mapped in PageTable
+**/
+EFI_STATUS
+SetMemorySharedBit (
+  IN    PHYSICAL_ADDRESS         PageTableBaseAddress,
+  IN    BOOLEAN                  Page5LevelSupport,
+  IN    UINT64                   SharedBitMask,
+  IN    PHYSICAL_ADDRESS         PhysicalAddress,
+  IN    UINTN                    Pages
+  )
+{
+  EFI_STATUS                     Status;
+  PAGE_MAP_AND_DIRECTORY_POINTER *PageMapLevel4Entry;
+  PAGE_MAP_AND_DIRECTORY_POINTER *PageUpperDirectoryPointerEntry;
+  PAGE_MAP_AND_DIRECTORY_POINTER *PageDirectoryPointerEntry;
+  PAGE_TABLE_1G_ENTRY            *PageDirectory1GEntry;
+  PAGE_TABLE_ENTRY               *PageDirectory2MEntry;
+  PAGE_TABLE_4K_ENTRY            *PageTableEntry;
+  UINT64                         PgTableMask;
+  UINT64                         ActiveSharedBitMask;
+  UINTN                          Length;
+
+  if (Pages == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status              = EFI_SUCCESS;
+  PageMapLevel4Entry  = NULL;
+  PgTableMask         = SharedBitMask | EFI_PAGE_MASK;
+  Length              = EFI_PAGES_TO_SIZE (Pages);
+
+  //
+  // If 5-level pages, adjust PageTableBaseAddress to point to first 4-level page directory,
+  // we will only have 1
+  //
+  if (Page5LevelSupport) {
+    PageTableBaseAddress = *(UINT64 *)PageTableBaseAddress & ~PgTableMask;
+  }
+
+  while (Length > 0) {
+    PageMapLevel4Entry  = (VOID*) (PageTableBaseAddress & ~PgTableMask);
+    PageMapLevel4Entry += PML4_OFFSET (PhysicalAddress);
+    if (!PageMapLevel4Entry->Bits.Present) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a:%a: bad PML4 for Physical=0x%Lx\n",
+        gEfiCallerBaseName,
+        __FUNCTION__,
+        PhysicalAddress
+        ));
+      Status = EFI_NO_MAPPING;
+      break;
+    }
+
+    PageDirectory1GEntry  = (VOID *)((PageMapLevel4Entry->Bits.PageTableBaseAddress << 12) & ~PgTableMask);
+    PageDirectory1GEntry += PDP_OFFSET (PhysicalAddress);
+    if (!PageDirectory1GEntry->Bits.Present) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a:%a: bad PDPE for Physical=0x%Lx\n",
+        gEfiCallerBaseName,
+        __FUNCTION__,
+        PhysicalAddress
+        ));
+      Status = EFI_NO_MAPPING;
+      break;
+    }
+
+    //
+    // If the MustBe1 bit is not 1, it's not actually a 1GB entry
+    //
+    if (PageDirectory1GEntry->Bits.MustBe1) {
+      //
+      // Valid 1GB page
+      // If we have at least 1GB to go, we can just update this entry
+      //
+      if ((PhysicalAddress & (BIT30 - 1)) == 0 && Length >= BIT30) {
+        SetSharedBit (&PageDirectory1GEntry->Uint64, PhysicalAddress, BIT30, SharedBitMask);
+        DEBUG ((
+          DEBUG_VERBOSE,
+          "%a:%a: updated 1GB entry for Physical=0x%Lx\n",
+          gEfiCallerBaseName,
+          __FUNCTION__,
+          PhysicalAddress
+          ));
+        PhysicalAddress += BIT30;
+        Length          -= BIT30;
+      } else {
+        //
+        // We must split the page
+        //
+        DEBUG ((
+          DEBUG_VERBOSE,
+          "%a:%a: splitting 1GB page for Physical=0x%Lx\n",
+          gEfiCallerBaseName,
+          __FUNCTION__,
+          PhysicalAddress
+          ));
+        Split1GPageTo2M (
+          (UINT64)PageDirectory1GEntry->Bits.PageTableBaseAddress << 30,
+          (UINT64 *)PageDirectory1GEntry,
+          0, 0, 0, 0,
+          SharedBitMask
+          );
+        continue;
+      }
+    } else {
+      //
+      // Actually a PDP
+      //
+      PageUpperDirectoryPointerEntry = (PAGE_MAP_AND_DIRECTORY_POINTER *)PageDirectory1GEntry;
+      PageDirectory2MEntry = (VOID *)((PageUpperDirectoryPointerEntry->Bits.PageTableBaseAddress <<12) & ~PgTableMask);
+      PageDirectory2MEntry += PDE_OFFSET (PhysicalAddress);
+      if (!PageDirectory2MEntry->Bits.Present) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a:%a: bad PDE for Physical=0x%Lx\n",
+          gEfiCallerBaseName,
+          __FUNCTION__,
+          PhysicalAddress
+          ));
+        Status = EFI_NO_MAPPING;
+        break;
+      }
+      //
+      // If the MustBe1 bit is not a 1, it's not a 2MB entry
+      //
+      if (PageDirectory2MEntry->Bits.MustBe1) {
+        //
+        // Valid 2MB page
+        // If we have at least 2MB left to go, we can just update this entry
+        //
+        if ((PhysicalAddress & (BIT21-1)) == 0 && Length >= BIT21) {
+          SetSharedBit (&PageDirectory2MEntry->Uint64, PhysicalAddress, BIT21, SharedBitMask);
+          PhysicalAddress += BIT21;
+          Length          -= BIT21;
+        } else {
+          //
+          // We must split up this page into 4K pages
+          //
+          DEBUG ((
+            DEBUG_VERBOSE,
+            "%a:%a: splitting 2MB page for Physical=0x%Lx\n",
+            gEfiCallerBaseName,
+            __FUNCTION__,
+            PhysicalAddress
+            ));
+
+          ActiveSharedBitMask = PageDirectory2MEntry->Uint64 & SharedBitMask;
+
+          Split2MPageTo4K (
+            (UINT64)PageDirectory2MEntry->Bits.PageTableBaseAddress << 21,
+            (UINT64 *)PageDirectory2MEntry,
+            0, 0, 0, 0,
+            ActiveSharedBitMask
+            );
+          continue;
+        }
+      } else {
+        PageDirectoryPointerEntry =(PAGE_MAP_AND_DIRECTORY_POINTER *)PageDirectory2MEntry;
+        PageTableEntry = (VOID *)((PageDirectoryPointerEntry->Bits.PageTableBaseAddress <<12) & ~PgTableMask);
+        PageTableEntry += PTE_OFFSET(PhysicalAddress);
+        if (!PageTableEntry->Bits.Present) {
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a:%a: bad PTE for Physical=0x%Lx\n",
+            gEfiCallerBaseName,
+            __FUNCTION__,
+            PhysicalAddress
+            ));
+          Status = EFI_NO_MAPPING;
+          break;
+        }
+        SetSharedBit (&PageTableEntry->Uint64, PhysicalAddress, EFI_PAGE_SIZE, SharedBitMask);
+        PhysicalAddress += EFI_PAGE_SIZE;
+        Length          -= EFI_PAGE_SIZE;
+      }
+    }
+  }
+
+  return Status;
+}
+
+/**
+  Set the shared bit for mmio region in Tdx guest.
+
+  In Tdx guest there are 2 ways to access mmio, TdVmcall or direct access.
+  For direct access, the shared bit of the PageTableEntry should be set.
+  The mmio region information is retrieved from hob list.
+
+  @param[in]  PageTableBaseAddress    Base Address of Page table.
+  @param[in]  Page5LevelSupport       Indicates if Level-5 paging is supported.
+
+  @retval EFI_SUCCESS                 The shared bit is set successfully.
+  @retval EFI_UNSUPPORTED             Setting the shared bit of memory region
+                                      is not supported
+**/
+EFI_STATUS
+DxeIplSetMmioSharedBit (
+  IN UINT64    PageTableBaseAddress,
+  IN BOOLEAN   Page5LevelSupport
+  )
+{
+  EFI_PEI_HOB_POINTERS      Hob;
+  UINT64                    SharedBitMask;
+
+  //
+  // Check if we have a valid memory shared bit mask
+  //
+  SharedBitMask = PcdGet64 (PcdTdxSharedBitMask) & PAGING_1G_ADDRESS_MASK_64;
+  if (SharedBitMask == 0) {
+    return EFI_UNSUPPORTED;
+  }
+
+
+  Hob.Raw = (UINT8 *) GetHobList ();
+
+  //
+  // Parse the HOB list until end of list or matching type is found.
+  //
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR
+        && Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO) {
+
+      SetMemorySharedBit (
+        PageTableBaseAddress,
+        Page5LevelSupport,
+        SharedBitMask,
+        Hob.ResourceDescriptor->PhysicalStart,
+        EFI_SIZE_TO_PAGES (Hob.ResourceDescriptor->ResourceLength));
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  return EFI_SUCCESS;
+}
+
+#endif
 
 /**
   Allocates and fills in the Page Directory and Page Table Entries to
@@ -851,7 +1155,7 @@ CreateIdentityMappingPageTables (
 
         for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
           if (ToSplitPageTable (PageAddress, SIZE_1GB, StackBase, StackSize, GhcbBase, GhcbSize)) {
-            Split1GPageTo2M (PageAddress, (UINT64 *) PageDirectory1GEntry, StackBase, StackSize, GhcbBase, GhcbSize);
+            Split1GPageTo2M (PageAddress, (UINT64 *) PageDirectory1GEntry, StackBase, StackSize, GhcbBase, GhcbSize, 0);
           } else {
             //
             // Fill in the Page Directory entries
@@ -885,7 +1189,7 @@ CreateIdentityMappingPageTables (
               //
               // Need to split this 2M page that covers NULL or stack range.
               //
-              Split2MPageTo4K (PageAddress, (UINT64 *) PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
+              Split2MPageTo4K (PageAddress, (UINT64 *) PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize, 0);
             } else {
               //
               // Fill in the Page Directory entries
@@ -921,6 +1225,15 @@ CreateIdentityMappingPageTables (
     ZeroMem (PageMapLevel5Entry, (512 - IndexOfPml5Entries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
   }
 
+#ifdef MDE_CPU_X64
+  //
+  // Set shared bit for TDX
+  //
+  if (PcdGet64 (PcdTdxSharedBitMask) != 0) {
+    DxeIplSetMmioSharedBit ((UINTN)PageMap, Page5LevelSupport);
+  }
+#endif
+
   //
   // Protect the page table by marking the memory used for page table to be
   // read-only.
@@ -936,4 +1249,3 @@ CreateIdentityMappingPageTables (
 
   return (UINTN)PageMap;
 }
-

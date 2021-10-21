@@ -123,7 +123,7 @@ Create4GPageTablesIa32Pae (
         //
         // Need to split this 2M page that covers stack range.
         //
-        Split2MPageTo4K (PhysicalAddress, (UINT64 *) PageDirectoryEntry, StackBase, StackSize, 0, 0);
+        Split2MPageTo4K (PhysicalAddress, (UINT64 *) PageDirectoryEntry, StackBase, StackSize, 0, 0, 0);
       } else {
         //
         // Fill in the Page Directory entries

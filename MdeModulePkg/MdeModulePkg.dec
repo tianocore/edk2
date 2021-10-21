@@ -2143,6 +2143,12 @@
   # @Prompt The flag which indicates if IA32_EFER is allowed to be changed.
   gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed|TRUE|BOOLEAN|0x00030009
 
+  ## This PCD holds the shared bit mask for page table entries when Tdx is enabled.
+  #  This mask should be applied to mmio region when creating 1:1 virtual to physical
+  #  mapping tables.
+  # @Prompt The shared bit mask when Intel Tdx is enabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask|0x0|UINT64|0x0003000a
+
 [PcdsDynamicEx]
   ## This dynamic PCD enables the default variable setting.
   #  Its value is the default store ID value. The default value is zero as Standard default.
