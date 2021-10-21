@@ -43,6 +43,7 @@
   X64/VirtualMemory.h
   X64/VirtualMemory.c
   X64/DxeLoadFunc.c
+  X64/DxeIplTdVmcall.nasm
 
 [Sources.EBC]
   Ebc/DxeLoadFunc.c
@@ -118,6 +119,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize                            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdIa32EferChangeAllowed               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask                    ## CONSUMES
 
 [Pcd.IA32,Pcd.X64,Pcd.ARM,Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
