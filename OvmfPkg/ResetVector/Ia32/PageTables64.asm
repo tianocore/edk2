@@ -42,10 +42,6 @@ BITS    32
 ;
 SetCr3ForPageTables64:
 
-    ; Clear the WorkArea header. The SEV probe routines will populate the
-    ; work area when detected.
-    mov     byte[WORK_AREA_GUEST_TYPE], 0
-
     ; Check whether the SEV is active and populate the SevEsWorkArea
     OneTimeCall   CheckSevFeatures
 
