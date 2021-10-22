@@ -30,17 +30,20 @@
   IoLibMmioBuffer.c
   BaseIoLibIntrinsicInternal.h
   IoHighLevel.c
+  IoLibTdx.h
 
 [Sources.IA32]
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
   IoLib.c
+  IoLibInternalTdxNull.c
   Ia32/IoFifoSev.nasm
 
 [Sources.X64]
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
   IoLib.c
+  IoLibInternalTdx.c
   X64/IoFifoSev.nasm
 
 [Packages]
