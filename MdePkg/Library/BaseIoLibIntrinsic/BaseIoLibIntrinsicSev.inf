@@ -51,3 +51,5 @@
   BaseLib
   RegisterFilterLib
 
+[LibraryClasses.X64]
+  TdxLib
