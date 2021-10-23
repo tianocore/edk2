@@ -215,4 +215,18 @@ MemEncryptSevClearMmioPageEncMask (
   IN UINTN                    NumPages
   );
 
+/**
+  Pre-validate the system RAM when SEV-SNP is enabled in the guest VM.
+
+  @param[in]  BaseAddress             Base address
+  @param[in]  NumPages                Number of pages starting from the base address
+
+**/
+VOID
+EFIAPI
+MemEncryptSevSnpPreValidateSystemRam (
+  IN PHYSICAL_ADDRESS           BaseAddress,
+  IN UINTN                      NumPages
+  );
+
 #endif // _MEM_ENCRYPT_SEV_LIB_H_
