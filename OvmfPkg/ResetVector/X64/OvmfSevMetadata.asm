@@ -43,6 +43,16 @@ _Descriptor:
   DD OVMF_SEV_METADATA_VERSION                        ; Version
   DD (OvmfSevGuidedStructureEnd - _Descriptor - 16) / 12 ; Number of sections
 
+; Region need to be pre-validated by the hypervisor
+PreValidate1:
+  DD  SNP_SEC_MEM_BASE_DESC_1
+  DD  SNP_SEC_MEM_SIZE_DESC_1
+  DD  OVMF_SECTION_TYPE_SNP_SEC_MEM
+PreValidate2:
+  DD  SNP_SEC_MEM_BASE_DESC_2
+  DD  SNP_SEC_MEM_SIZE_DESC_2
+  DD  OVMF_SECTION_TYPE_SNP_SEC_MEM
+
 ; SEV-SNP Secrets page
 SevSnpSecrets:
   DD  SEV_SNP_SECRETS_BASE
@@ -55,5 +65,10 @@ CpuidSec:
   DD  CPUID_SIZE
   DD  OVMF_SECTION_TYPE_CPUID
 
+; Region need to be pre-validated by the hypervisor
+PreValidate3:
+  DD  SNP_SEC_MEM_BASE_DESC_3
+  DD  SNP_SEC_MEM_SIZE_DESC_3
+  DD  OVMF_SECTION_TYPE_SNP_SEC_MEM
 OvmfSevGuidedStructureEnd:
   ALIGN   16
