@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011 - 2021, ARM Limited. All rights reserved.
+# Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -379,3 +380,10 @@
   #
   gArmTokenSpaceGuid.PcdPciBusMin|0x0|UINT32|0x00000059
   gArmTokenSpaceGuid.PcdPciBusMax|0x0|UINT32|0x0000005A
+
+[PcdsDynamicEx]
+  #
+  # This dynamic PCD hold the GUID of a firmware FFS which contains
+  # the LinuxBoot payload.
+  #
+  gArmTokenSpaceGuid.PcdLinuxBootFileGuid|{0x0}|VOID*|0x0000005C
