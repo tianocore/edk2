@@ -2399,5 +2399,9 @@
   # @Prompt FSB Clock.
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000|UINT32|0x0000000c
 
+  ## This dynamic PCD indicates the memory encryption attribute of the guest.
+  # @Prompt Memory encryption attribute
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0|UINT64|0x0000002e
+
 [UserExtensions.TianoCore."ExtraFiles"]
   MdePkgExtra.uni
