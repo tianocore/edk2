@@ -821,6 +821,8 @@ InitializeRamRegions (
 {
   QemuInitializeRam ();
 
+  SevInitializeRam ();
+
   if (mS3Supported && mBootMode != BOOT_ON_S3_RESUME) {
     //
     // This is the memory range that will be used for PEI on S3 resume
