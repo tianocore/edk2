@@ -10,9 +10,12 @@
 
 #include <Uefi/UefiBaseType.h>
 #include <Library/BaseLib.h>
+#include <Library/PcdLib.h>
+#include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
 
 #include "SnpPageStateChange.h"
+#include "VirtualMemory.h"
 
 typedef struct {
   UINT64    StartAddress;
@@ -69,12 +72,31 @@ MemEncryptSevSnpPreValidateSystemRam (
 {
   PHYSICAL_ADDRESS          EndAddress;
   SNP_PRE_VALIDATED_RANGE   OverlapRange;
+  EFI_STATUS                Status;
 
   if (!MemEncryptSevSnpIsEnabled ()) {
     return;
   }
 
   EndAddress = BaseAddress + EFI_PAGES_TO_SIZE (NumPages);
+
+  //
+  // The page table used in PEI can address up to 4GB memory. If we are asked to
+  // validate a range above the 4GB, then create an identity mapping so that the
+  // PVALIDATE instruction can execute correctly. If the page table entry is not
+  // present then PVALIDATE will #GP.
+  //
+  if (BaseAddress >= SIZE_4GB) {
+    Status = InternalMemEncryptSevCreateIdentityMap1G (
+                0,
+                BaseAddress,
+                EFI_PAGES_TO_SIZE (NumPages)
+                );
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      CpuDeadLoop ();
+    }
+  }
 
   while (BaseAddress < EndAddress) {
     //
