@@ -69,4 +69,27 @@ SevEsIsEnabled (
   VOID
   );
 
+/**
+ Validate System RAM used for decompressing the PEI and DXE firmware volumes
+ when SEV-SNP is active. The PCDs SecValidatedStart and SecValidatedEnd are
+ set in OvmfPkg/FvmainCompactScratchEnd.fdf.inc.
+
+**/
+VOID
+SecValidateSystemRam (
+  VOID
+  );
+
+/**
+  Determine if SEV-SNP is active.
+
+  @retval TRUE   SEV-SNP is enabled
+  @retval FALSE  SEV-SNP is not enabled
+
+**/
+BOOLEAN
+SevSnpIsEnabled (
+  VOID
+  );
+
 #endif
