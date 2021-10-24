@@ -357,6 +357,13 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase|0|UINT32|0x58
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize|0|UINT32|0x59
 
+  ## The base address and size of a CPUID Area that contains the hypervisor
+  #  provided CPUID results. In the case of SEV-SNP, the CPUID results are
+  #  filtered by the SEV-SNP firmware. If this is set in the .fdf, the
+  #  platform is responsible to reserve this area from DXE phase overwrites.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase|0|UINT32|0x60
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize|0|UINT32|0x61
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
