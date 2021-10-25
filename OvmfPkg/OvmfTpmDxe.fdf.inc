@@ -5,6 +5,7 @@
 !if $(TPM2_ENABLE) == TRUE
 !if $(TPM1_ENABLE) == TRUE
 INF  SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
+INF  SecurityPkg/Tcg/TcgConfigDxe/TcgConfigDxe.inf
 !endif
 INF  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
 INF  SecurityPkg/Tcg/Tcg2PlatformDxe/Tcg2PlatformDxe.inf
