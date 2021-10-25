@@ -15,24 +15,192 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <PiDxe.h>
 
+#include <IndustryStandard/QemuTpm.h>
+#include <IndustryStandard/TcgPhysicalPresence.h>
+
 #include <Protocol/TcgService.h>
 #include <Protocol/VariableLock.h>
+#include <Library/HobLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiBootManagerLib.h>
 #include <Library/UefiLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
+#include <Library/QemuFwCfgLib.h>
 #include <Library/HiiLib.h>
-#include <Guid/EventGroup.h>
 #include <Guid/PhysicalPresenceData.h>
 #include <Library/TcgPpVendorLib.h>
 
 #define CONFIRM_BUFFER_SIZE         4096
 
 EFI_HII_HANDLE mPpStringPackHandle;
+
+STATIC volatile QEMU_TPM_PPI *mPpi;
+
+#define TPM_PPI_PROVISION_FLAGS(PpiFlags) \
+  ((PpiFlags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION) != 0) \
+  ? QEMU_TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ \
+  : QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ
+
+#define TPM_PPI_CLEAR_FLAGS(PpiFlags) \
+  ((PpiFlags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR) != 0) \
+  ? QEMU_TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ \
+  : QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ
+
+#define TPM_PPI_CLEAR_MAINT_FLAGS(PpiFlags) \
+  ((PpiFlags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR) != 0 && \
+   (PpiFlags.PPFlags & TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_MAINTENANCE) != 0) \
+  ? QEMU_TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ \
+  : QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ
+
+/**
+  Reads QEMU PPI config from fw_cfg.
+
+  @param[out]  The Config structure to read to.
+
+  @retval EFI_SUCCESS           Operation completed successfully.
+  @retval EFI_PROTOCOL_ERROR    Invalid fw_cfg entry size.
+**/
+STATIC
+EFI_STATUS
+QemuTpmReadConfig (
+  OUT QEMU_FWCFG_TPM_CONFIG *Config
+  )
+{
+  EFI_STATUS           Status;
+  FIRMWARE_CONFIG_ITEM FwCfgItem;
+  UINTN                FwCfgSize;
+
+  Status = QemuFwCfgFindFile ("etc/tpm/config", &FwCfgItem, &FwCfgSize);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (FwCfgSize != sizeof (*Config)) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  QemuFwCfgSelectItem (FwCfgItem);
+  QemuFwCfgReadBytes (sizeof (*Config), Config);
+  return EFI_SUCCESS;
+}
+
+
+/**
+  Initilalize the QEMU PPI memory region's function array
+**/
+STATIC
+VOID
+QemuTpmInitPPIFunc(
+  EFI_PHYSICAL_PRESENCE_FLAGS     PpiFlags
+  )
+{
+  ZeroMem ((void *)mPpi->Func, sizeof(mPpi->Func));
+
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_ENABLE] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_DISABLE] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_ACTIVATE] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_DEACTIVATE] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_CLEAR] = TPM_PPI_CLEAR_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_ENABLE_ACTIVATE] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_DEACTIVATE_DISABLE] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_SET_OWNER_INSTALL_TRUE] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_SET_OWNER_INSTALL_FALSE] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_ENABLE_ACTIVATE_OWNER_TRUE] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_DEACTIVATE_DISABLE_OWNER_FALSE] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_SET_OPERATOR_AUTH] = TPM_PPI_PROVISION_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE] = TPM_PPI_CLEAR_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_FALSE] = QEMU_TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ;
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_SET_NO_PPI_PROVISION_TRUE] = QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ;
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_FALSE] = QEMU_TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ;
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_SET_NO_PPI_CLEAR_TRUE] = QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ;
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_FALSE] = QEMU_TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ;
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_SET_NO_PPI_MAINTENANCE_TRUE] = QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ;
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR] = TPM_PPI_CLEAR_MAINT_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE] = TPM_PPI_CLEAR_MAINT_FLAGS(PpiFlags);
+  mPpi->Func[TCG_PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR] = TPM_PPI_CLEAR_MAINT_FLAGS(PpiFlags);
+}
+
+
+/**
+  Initializes QEMU PPI memory region.
+
+  @retval EFI_SUCCESS           Operation completed successfully.
+  @retval EFI_PROTOCOL_ERROR    PPI address is invalid.
+**/
+STATIC
+EFI_STATUS
+QemuTpmInitPPI (
+  VOID
+  )
+{
+  EFI_STATUS                      Status;
+  QEMU_FWCFG_TPM_CONFIG           Config;
+  EFI_PHYSICAL_ADDRESS            PpiAddress64;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
+  EFI_PHYSICAL_PRESENCE_FLAGS     PpiFlags;
+
+  if (mPpi != NULL) {
+    return EFI_SUCCESS;
+  }
+
+  Status = QemuTpmReadConfig (&Config);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (Config.TpmVersion != QEMU_TPM_VERSION_1_2) {
+    DEBUG ((DEBUG_ERROR, "[TPM] Not setting up PPI. This is not a TPM 1.2.\n"));
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  mPpi = (QEMU_TPM_PPI *)(UINTN)Config.PpiAddress;
+  if (mPpi == NULL) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  DEBUG ((DEBUG_INFO, "[TPM] mPpi=%p version=%d\n", mPpi, Config.TpmVersion));
+
+  PpiAddress64 = (UINTN)mPpi;
+  if ((PpiAddress64 & ~(UINT64)EFI_PAGE_MASK) !=
+      ((PpiAddress64 + sizeof *mPpi - 1) & ~(UINT64)EFI_PAGE_MASK)) {
+    DEBUG ((DEBUG_ERROR, "[TPM] mPpi crosses a page boundary\n"));
+    goto InvalidPpiAddress;
+  }
+
+  Status = gDS->GetMemorySpaceDescriptor (PpiAddress64, &Descriptor);
+  if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
+    ASSERT_EFI_ERROR (Status);
+    goto InvalidPpiAddress;
+  }
+  if (!EFI_ERROR (Status) &&
+      (Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo &&
+       Descriptor.GcdMemoryType != EfiGcdMemoryTypeNonExistent)) {
+    DEBUG ((DEBUG_ERROR, "[TPM] mPpi has an invalid memory type\n"));
+    goto InvalidPpiAddress;
+  }
+
+  PpiFlags.PPFlags = 0;
+  QemuTpmInitPPIFunc(PpiFlags);
+
+  if (mPpi->In == 0) {
+    mPpi->In = 1;
+    mPpi->Request = PHYSICAL_PRESENCE_NO_ACTION;
+    mPpi->LastRequest = PHYSICAL_PRESENCE_NO_ACTION;
+    mPpi->NextStep = PHYSICAL_PRESENCE_NO_ACTION;
+  }
+
+  return EFI_SUCCESS;
+
+InvalidPpiAddress:
+  mPpi = NULL;
+  return EFI_PROTOCOL_ERROR;
+}
 
 /**
   Get string by string id from HII Interface.
@@ -506,7 +674,7 @@ TcgPhysicalPresenceLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  mPpStringPackHandle = HiiAddPackages (&gEfiPhysicalPresenceGuid, ImageHandle, DxeTcgPhysicalPresenceLibStrings, NULL);
+  mPpStringPackHandle = HiiAddPackages (&gEfiPhysicalPresenceGuid, ImageHandle, TcgPhysicalPresenceLibQemuStrings, NULL);
   ASSERT (mPpStringPackHandle != NULL);
 
   return EFI_SUCCESS;
@@ -875,6 +1043,10 @@ UserConfirm (
     return FALSE;
   }
 
+  // Console for user interaction
+  // We need to connect all trusted consoles for TCG PP. Here we treat all consoles in OVMF to be trusted consoles.
+  EfiBootManagerConnectAllDefaultConsoles ();
+
   TmpStr1 = PhysicalPresenceGetStringById (STRING_TOKEN (TPM_REJECT_KEY));
   BufSize -= StrSize (ConfirmText);
   UnicodeSPrint (ConfirmText + StrLen (ConfirmText), BufSize, TmpStr1, TmpStr2);
@@ -975,7 +1147,7 @@ HaveValidTpmRequest  (
 
     default:
       if (TcgPpData->PPRequest >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-        IsRequestValid = TcgPpVendorLibHasValidRequest (TcgPpData->PPRequest, Flags.PPFlags, RequestConfirmed);
+        IsRequestValid = FALSE; // vendor-specifc commands are not supported
         if (!IsRequestValid) {
           return FALSE;
         } else {
@@ -1015,60 +1187,47 @@ HaveValidTpmRequest  (
   @param[in] Flags                The physical presence interface flags.
 
 **/
+STATIC
 VOID
 ExecutePendingTpmRequest (
   IN      EFI_TCG_PROTOCOL            *TcgProtocol,
-  IN      EFI_PHYSICAL_PRESENCE       *TcgPpData,
   IN      EFI_PHYSICAL_PRESENCE_FLAGS Flags
   )
 {
   EFI_STATUS                        Status;
-  UINTN                             DataSize;
   BOOLEAN                           RequestConfirmed;
+  EFI_PHYSICAL_PRESENCE             TcgPpData;
   EFI_PHYSICAL_PRESENCE_FLAGS       NewFlags;
-  BOOLEAN                           ResetRequired;
-  UINT32                            NewPPFlags;
 
-  if (!HaveValidTpmRequest(TcgPpData, Flags, &RequestConfirmed)) {
+  DEBUG ((DEBUG_INFO, "[TPM] Flags=%x, PPRequest=%x\n", Flags.PPFlags, mPpi->Request));
+
+  TcgPpData.PPRequest = (UINT8)mPpi->Request;
+
+  if (!HaveValidTpmRequest(&TcgPpData, Flags, &RequestConfirmed)) {
     //
     // Invalid operation request.
     //
-    TcgPpData->PPResponse = TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
-    TcgPpData->LastPPRequest = TcgPpData->PPRequest;
-    TcgPpData->PPRequest = PHYSICAL_PRESENCE_NO_ACTION;
-    DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-    Status = gRT->SetVariable (
-                    PHYSICAL_PRESENCE_VARIABLE,
-                    &gEfiPhysicalPresenceGuid,
-                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    DataSize,
-                    TcgPpData
-                    );
+    mPpi->Response = TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
+    mPpi->LastRequest = mPpi->Request;
+    mPpi->Request = TCG_PHYSICAL_PRESENCE_NO_ACTION;
+    mPpi->RequestParameter = 0;
     return;
   }
 
-  ResetRequired = FALSE;
-  if (TcgPpData->PPRequest >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-    NewFlags = Flags;
-    NewPPFlags = NewFlags.PPFlags;
-    TcgPpData->PPResponse = TcgPpVendorLibExecutePendingRequest (TcgPpData->PPRequest, &NewPPFlags, &ResetRequired);
-    NewFlags.PPFlags = (UINT8)NewPPFlags;
-  } else {
-    if (!RequestConfirmed) {
-      //
-      // Print confirm text and wait for approval.
-      //
-      RequestConfirmed = UserConfirm (TcgPpData->PPRequest);
-    }
+  if (!RequestConfirmed) {
+    //
+    // Print confirm text and wait for approval.
+    //
+    RequestConfirmed = UserConfirm (mPpi->Request);
+  }
 
-    //
-    // Execute requested physical presence command
-    //
-    TcgPpData->PPResponse = TCG_PP_OPERATION_RESPONSE_USER_ABORT;
-    NewFlags = Flags;
-    if (RequestConfirmed) {
-      TcgPpData->PPResponse = ExecutePhysicalPresence (TcgProtocol, TcgPpData->PPRequest, &NewFlags);
-    }
+  //
+  // Execute requested physical presence command
+  //
+  mPpi->Response = TCG_PP_OPERATION_RESPONSE_USER_ABORT;
+  NewFlags = Flags;
+  if (RequestConfirmed) {
+    mPpi->Response = ExecutePhysicalPresence (TcgProtocol, mPpi->Request, &NewFlags);
   }
 
   //
@@ -1085,39 +1244,32 @@ ExecutePendingTpmRequest (
     if (EFI_ERROR (Status)) {
       return;
     }
+
+    //
+    // Update the flags for the commands following PPFlags changes
+    //
+    QemuTpmInitPPIFunc(NewFlags);
+
+    DEBUG ((DEBUG_INFO, "[TPM] New PPFlags = %x\n", NewFlags.PPFlags));
   }
 
   //
   // Clear request
   //
   if ((NewFlags.PPFlags & TCG_VENDOR_LIB_FLAG_RESET_TRACK) == 0) {
-    TcgPpData->LastPPRequest = TcgPpData->PPRequest;
-    TcgPpData->PPRequest = PHYSICAL_PRESENCE_NO_ACTION;
+    mPpi->LastRequest = mPpi->Request;
+    mPpi->Request = PHYSICAL_PRESENCE_NO_ACTION;
+    mPpi->RequestParameter = 0;
   }
 
-  //
-  // Save changes
-  //
-  DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-  Status = gRT->SetVariable (
-                  PHYSICAL_PRESENCE_VARIABLE,
-                  &gEfiPhysicalPresenceGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  DataSize,
-                  TcgPpData
-                  );
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  if (TcgPpData->PPResponse == TCG_PP_OPERATION_RESPONSE_USER_ABORT) {
+  if (mPpi->Response == TCG_PP_OPERATION_RESPONSE_USER_ABORT) {
     return;
   }
 
   //
   // Reset system to make new TPM settings in effect
   //
-  switch (TcgPpData->LastPPRequest) {
+  switch (mPpi->LastRequest) {
     case PHYSICAL_PRESENCE_ACTIVATE:
     case PHYSICAL_PRESENCE_DEACTIVATE:
     case PHYSICAL_PRESENCE_CLEAR:
@@ -1131,17 +1283,10 @@ ExecutePendingTpmRequest (
     case PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE:
       break;
     default:
-      if (TcgPpData->LastPPRequest >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-        if (ResetRequired) {
-          break;
-        } else {
-          return ;
-        }
-      }
-      if (TcgPpData->PPRequest != PHYSICAL_PRESENCE_NO_ACTION) {
-        break;
-      }
-      return;
+    if (mPpi->Request != TCG_PHYSICAL_PRESENCE_NO_ACTION) {
+      break;
+    }
+    return;
   }
 
   Print (L"Rebooting system to make TPM settings in effect\n");
@@ -1172,10 +1317,24 @@ TcgPhysicalPresenceLibProcessRequest (
   BOOLEAN                           LifetimeLock;
   BOOLEAN                           CmdEnable;
   UINTN                             DataSize;
-  EFI_PHYSICAL_PRESENCE             TcgPpData;
   EFI_TCG_PROTOCOL                  *TcgProtocol;
-  EDKII_VARIABLE_LOCK_PROTOCOL      *VariableLockProtocol;
+//  EDKII_VARIABLE_LOCK_PROTOCOL      *VariableLockProtocol;
   EFI_PHYSICAL_PRESENCE_FLAGS       PpiFlags;
+
+  Status = QemuTpmInitPPI ();
+  if (EFI_ERROR (Status)) {
+    return ;
+  }
+
+  DEBUG ((DEBUG_INFO, "[TPM] Detected a TPM 1.2\n"));
+
+  //
+  // Check S4 resume
+  //
+  if (GetBootModeHob () == BOOT_ON_S4_RESUME) {
+    DEBUG ((DEBUG_INFO, "S4 Resume, Skip TPM PP process!\n"));
+    return ;
+  }
 
   Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&TcgProtocol);
   if (EFI_ERROR (Status)) {
@@ -1213,6 +1372,7 @@ TcgPhysicalPresenceLibProcessRequest (
   // This flags variable controls whether physical presence is required for TPM command.
   // It should be protected from malicious software. We set it as read-only variable here.
   //
+#if 0
   Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLockProtocol);
   if (!EFI_ERROR (Status)) {
     Status = VariableLockProtocol->RequestToLock (
@@ -1225,37 +1385,13 @@ TcgPhysicalPresenceLibProcessRequest (
       ASSERT_EFI_ERROR (Status);
     }
   }
+#endif
 
-  //
-  // Initialize physical presence variable.
-  //
-  DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-  Status = gRT->GetVariable (
-                  PHYSICAL_PRESENCE_VARIABLE,
-                  &gEfiPhysicalPresenceGuid,
-                  NULL,
-                  &DataSize,
-                  &TcgPpData
-                  );
-  if (EFI_ERROR (Status)) {
-    ZeroMem ((VOID*)&TcgPpData, sizeof (TcgPpData));
-    DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-    Status   = gRT->SetVariable (
-                      PHYSICAL_PRESENCE_VARIABLE,
-                      &gEfiPhysicalPresenceGuid,
-                      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                      DataSize,
-                      &TcgPpData
-                      );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "[TPM] Set physical presence variable failed, Status = %r\n", Status));
-      return;
-    }
-  }
+  QemuTpmInitPPIFunc(PpiFlags);
 
-  DEBUG ((DEBUG_INFO, "[TPM] Flags=%x, PPRequest=%x\n", PpiFlags.PPFlags, TcgPpData.PPRequest));
+  DEBUG ((DEBUG_INFO, "[TPM] Flags=%x, PPRequest=%x\n", PpiFlags.PPFlags, mPpi->Request));
 
-  if (TcgPpData.PPRequest == PHYSICAL_PRESENCE_NO_ACTION) {
+  if (mPpi->Request == PHYSICAL_PRESENCE_NO_ACTION) {
     //
     // No operation request
     //
@@ -1291,111 +1427,13 @@ TcgPhysicalPresenceLibProcessRequest (
   //
   // Execute pending TPM request.
   //
-  ExecutePendingTpmRequest (TcgProtocol, &TcgPpData, PpiFlags);
-  DEBUG ((DEBUG_INFO, "[TPM] PPResponse = %x\n", TcgPpData.PPResponse));
+  ExecutePendingTpmRequest (TcgProtocol, PpiFlags);
+  DEBUG ((DEBUG_INFO, "[TPM] PPResponse = %x\n", mPpi->Response));
 
   //
   // Lock physical presence.
   //
   TpmPhysicalPresence (TcgProtocol, TPM_PHYSICAL_PRESENCE_NOTPRESENT | TPM_PHYSICAL_PRESENCE_LOCK);
-}
-
-/**
-  Check if the pending TPM request needs user input to confirm.
-
-  The TPM request may come from OS. This API will check if TPM request exists and need user
-  input to confirmation.
-
-  @retval    TRUE        TPM needs input to confirm user physical presence.
-  @retval    FALSE       TPM doesn't need input to confirm user physical presence.
-
-**/
-BOOLEAN
-EFIAPI
-TcgPhysicalPresenceLibNeedUserConfirm(
-  VOID
-  )
-{
-  EFI_STATUS                   Status;
-  EFI_PHYSICAL_PRESENCE        TcgPpData;
-  UINTN                        DataSize;
-  BOOLEAN                      RequestConfirmed;
-  BOOLEAN                      LifetimeLock;
-  BOOLEAN                      CmdEnable;
-  EFI_TCG_PROTOCOL             *TcgProtocol;
-  EFI_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
-
-  Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&TcgProtocol);
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
-
-  //
-  // Check Tpm requests
-  //
-  DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-  Status = gRT->GetVariable (
-                  PHYSICAL_PRESENCE_VARIABLE,
-                  &gEfiPhysicalPresenceGuid,
-                  NULL,
-                  &DataSize,
-                  &TcgPpData
-                  );
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
-
-  DataSize = sizeof (EFI_PHYSICAL_PRESENCE_FLAGS);
-  Status = gRT->GetVariable (
-                  PHYSICAL_PRESENCE_FLAGS_VARIABLE,
-                  &gEfiPhysicalPresenceGuid,
-                  NULL,
-                  &DataSize,
-                  &PpiFlags
-                  );
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
-
-  if (TcgPpData.PPRequest == PHYSICAL_PRESENCE_NO_ACTION) {
-    //
-    // No operation request
-    //
-    return FALSE;
-  }
-
-  if (!HaveValidTpmRequest(&TcgPpData, PpiFlags, &RequestConfirmed)) {
-    //
-    // Invalid operation request.
-    //
-    return FALSE;
-  }
-
-  //
-  // Check Tpm Capability
-  //
-  Status = GetTpmCapability (TcgProtocol, &LifetimeLock, &CmdEnable);
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
-
-  if (!CmdEnable) {
-    if (LifetimeLock) {
-      //
-      // physicalPresenceCMDEnable is locked, can't execute physical presence command.
-      //
-      return FALSE;
-    }
-  }
-
-  if (!RequestConfirmed) {
-    //
-    // Need UI to confirm
-    //
-    return TRUE;
-  }
-
-  return FALSE;
 }
 
 /**
@@ -1416,40 +1454,16 @@ TcgPhysicalPresenceLibSubmitRequestToPreOSFunction (
   IN UINT32                 OperationRequest
   )
 {
-  EFI_STATUS                        Status;
-  UINTN                             DataSize;
-  EFI_PHYSICAL_PRESENCE             PpData;
+  EFI_STATUS Status;
 
   DEBUG ((DEBUG_INFO, "[TPM] SubmitRequestToPreOSFunction, Request = %x\n", OperationRequest));
 
-  //
-  // Get the Physical Presence variable
-  //
-  DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-  Status = gRT->GetVariable (
-                  PHYSICAL_PRESENCE_VARIABLE,
-                  &gEfiPhysicalPresenceGuid,
-                  NULL,
-                  &DataSize,
-                  &PpData
-                  );
+  Status = QemuTpmInitPPI ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
     return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
   }
 
-  PpData.PPRequest = (UINT8)OperationRequest;
-  Status = gRT->SetVariable (
-                    PHYSICAL_PRESENCE_VARIABLE,
-                    &gEfiPhysicalPresenceGuid,
-                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                    DataSize,
-                    &PpData
-                    );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "[TPM] Set PP variable failure! Status = %r\n", Status));
-    return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
-  }
+  mPpi->Request = OperationRequest;
 
   return TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS;
 }

@@ -12,6 +12,7 @@
 #include <Protocol/FirmwareVolume2.h>
 #include <Library/PlatformBmPrintScLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
+#include <Library/TcgPhysicalPresenceLib.h>
 #include <Library/XenPlatformLib.h>
 
 
@@ -396,6 +397,7 @@ PlatformBootManagerBeforeConsole (
   //
   // Process TPM PPI request; this may require keyboard input
   //
+  TcgPhysicalPresenceLibProcessRequest ();
   Tcg2PhysicalPresenceLibProcessRequest (NULL);
 
   //
