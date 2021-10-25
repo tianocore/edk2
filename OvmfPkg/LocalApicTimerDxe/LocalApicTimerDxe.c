@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "XenTimerDxe.h"
+#include "LocalApicTimerDxe.h"
 
 //
 // The handle onto which the Timer Architectural Protocol will be installed
@@ -353,4 +353,3 @@ TimerDriverInitialize (
 
   return Status;
 }
-
