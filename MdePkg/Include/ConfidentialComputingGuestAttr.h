@@ -22,4 +22,7 @@ typedef enum {
   CCAttrIntelTdx    = 0x200,
 } CONFIDENTIAL_COMPUTING_GUEST_ATTR;
 
+#define CC_GUEST_IS_TDX(x)   ((x) == CCAttrIntelTdx)
+#define CC_GUEST_IS_SEV(x)   ((x) == CCAttrAmdSev || (x) == CCAttrAmdSevEs || (x) == CCAttrAmdSevSnp)
+
 #endif
