@@ -86,6 +86,9 @@
   #
   QemuLoadImageLib|Include/Library/QemuLoadImageLib.h
 
+  ##  @libraryclass  QEMU Physical Presence Interface
+  TcgPhysicalPresenceLibQemu|Include/Library/QemuPPI.h
+
   ##  @libraryclass  Serialize (and deserialize) variables
   #
   SerializeVariablesLib|Include/Library/SerializeVariablesLib.h

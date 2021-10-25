@@ -54,6 +54,7 @@
   ReportStatusCodeLib
   UefiLib
   PlatformBmPrintScLib
+  TcgPhysicalPresenceLib
   Tcg2PhysicalPresenceLib
   XenPlatformLib
 
