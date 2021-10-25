@@ -10,7 +10,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = XenTimerDxe
+  BASE_NAME                      = LocalApicTimerDxe
   FILE_GUID                      = 52fe8196-f9de-4d07-b22f-51f77a0e7c41
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -30,8 +30,8 @@
   LocalApicLib
 
 [Sources]
-  XenTimerDxe.h
-  XenTimerDxe.c
+  LocalApicTimerDxe.h
+  LocalApicTimerDxe.c
 
 [Protocols]
   gEfiCpuArchProtocolGuid       ## CONSUMES
