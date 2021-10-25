@@ -16,9 +16,8 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = DxeTcgPhysicalPresenceLib
-  MODULE_UNI_FILE                = DxeTcgPhysicalPresenceLib.uni
-  FILE_GUID                      = EBC43A46-34AC-4F07-A7F5-A5394619361C
+  BASE_NAME                      = TcgPhysicalPresenceLibQemu
+  FILE_GUID                      = DA5A2055-ACD6-49A1-8277-857f3A47BB0C
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = TcgPhysicalPresenceLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
@@ -37,19 +36,22 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
   SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
+  DxeServicesTableLib
+  HobLib
+  QemuFwCfgLib
+  UefiBootManagerLib
   UefiLib
   UefiBootServicesTableLib
-  UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
   BaseMemoryLib
   DebugLib
   PrintLib
   HiiLib
-  TcgPpVendorLib
 
 [Protocols]
   gEfiTcgProtocolGuid                   ## SOMETIMES_CONSUMES
@@ -57,8 +59,6 @@
 
 [Guids]
   ## SOMETIMES_CONSUMES ## HII
-  ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
-  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
   ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresenceFlags"
   ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresenceFlags"
   gEfiPhysicalPresenceGuid
