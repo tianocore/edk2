@@ -47,6 +47,7 @@
   HiiLib
   PcdLib
   PrintLib
+  TcgPhysicalPresenceLib
   Tpm12DeviceLib
 
 [Guids]
