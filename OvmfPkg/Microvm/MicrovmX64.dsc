@@ -656,7 +656,7 @@
 
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-  OvmfPkg/XenTimerDxe/XenTimerDxe.inf
+  OvmfPkg/LocalApicTimerDxe/XenTimerDxe.inf
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   UefiCpuPkg/CpuDxe/CpuDxe.inf
   OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf

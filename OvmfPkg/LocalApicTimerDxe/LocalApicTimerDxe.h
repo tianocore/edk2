@@ -7,8 +7,8 @@ Copyright (c) 2019, Citrix Systems, Inc.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _TIMER_H_
-#define _TIMER_H_
+#ifndef LOCAL_APIC_TIMER_H_
+#define LOCAL_APIC_TIMER_H_
 
 #include <PiDxe.h>
 
