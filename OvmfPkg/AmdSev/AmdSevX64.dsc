@@ -579,6 +579,8 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 !endif
 
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|100000000
+
 [PcdsDynamicHii]
 !if $(TPM_ENABLE) == TRUE && $(TPM_CONFIG_ENABLE) == TRUE
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L"TCG2_VERSION"|gTcg2ConfigFormSetGuid|0x0|"1.3"|NV,BS
@@ -670,10 +672,9 @@
   }
 
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-  OvmfPkg/8259InterruptControllerDxe/8259.inf
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   UefiCpuPkg/CpuDxe/CpuDxe.inf
-  OvmfPkg/8254TimerDxe/8254Timer.inf
+  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
   OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
   OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
