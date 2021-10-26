@@ -94,7 +94,6 @@ QemuTpmInitPPI (
   QEMU_FWCFG_TPM_CONFIG           Config;
   EFI_PHYSICAL_ADDRESS            PpiAddress64;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
-  UINTN                           Idx;
 
   if (mPpi != NULL) {
     return EFI_SUCCESS;
@@ -103,6 +102,11 @@ QemuTpmInitPPI (
   Status = QemuTpmReadConfig (&Config);
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  if (Config.TpmVersion != QEMU_TPM_VERSION_2) {
+    DEBUG ((DEBUG_ERROR, "[TPM2PP] Not setting up PPI. This is not a TPM 2.\n"));
+    return EFI_PROTOCOL_ERROR;
   }
 
   mPpi = (QEMU_TPM_PPI *)(UINTN)Config.PpiAddress;
@@ -131,21 +135,18 @@ QemuTpmInitPPI (
     goto InvalidPpiAddress;
   }
 
-  for (Idx = 0; Idx < ARRAY_SIZE (mPpi->Func); Idx++) {
-    mPpi->Func[Idx] = 0;
-  }
-  if (Config.TpmVersion == QEMU_TPM_VERSION_2) {
-    mPpi->Func[TCG2_PHYSICAL_PRESENCE_NO_ACTION] = TPM_PPI_FLAGS;
-    mPpi->Func[TCG2_PHYSICAL_PRESENCE_CLEAR] = TPM_PPI_FLAGS;
-    mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR] = TPM_PPI_FLAGS;
-    mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR_2] = TPM_PPI_FLAGS;
-    mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR_3] = TPM_PPI_FLAGS;
-    mPpi->Func[TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS] = TPM_PPI_FLAGS;
-    mPpi->Func[TCG2_PHYSICAL_PRESENCE_CHANGE_EPS] = TPM_PPI_FLAGS;
-    mPpi->Func[TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS] = TPM_PPI_FLAGS;
-    mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID] = TPM_PPI_FLAGS;
-    mPpi->Func[TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID] = TPM_PPI_FLAGS;
-  }
+  ZeroMem ((void *)mPpi->Func, sizeof(mPpi->Func));
+
+  mPpi->Func[TCG2_PHYSICAL_PRESENCE_NO_ACTION] = TPM_PPI_FLAGS;
+  mPpi->Func[TCG2_PHYSICAL_PRESENCE_CLEAR] = TPM_PPI_FLAGS;
+  mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR] = TPM_PPI_FLAGS;
+  mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR_2] = TPM_PPI_FLAGS;
+  mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR_3] = TPM_PPI_FLAGS;
+  mPpi->Func[TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS] = TPM_PPI_FLAGS;
+  mPpi->Func[TCG2_PHYSICAL_PRESENCE_CHANGE_EPS] = TPM_PPI_FLAGS;
+  mPpi->Func[TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS] = TPM_PPI_FLAGS;
+  mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID] = TPM_PPI_FLAGS;
+  mPpi->Func[TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID] = TPM_PPI_FLAGS;
 
   if (mPpi->In == 0) {
     mPpi->In = 1;
@@ -833,9 +834,10 @@ Tcg2PhysicalPresenceLibProcessRequest (
 
   Status = QemuTpmInitPPI ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "[TPM2PP] no PPI\n"));
     return ;
   }
+
+  DEBUG ((DEBUG_INFO, "[TPM2PP] Detected a TPM 2\n"));
 
   //
   // Check S4 resume
