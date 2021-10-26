@@ -174,7 +174,7 @@ TimerDriverSetTimerPeriod (
     //
     DisableApicTimerInterrupt ();
   } else {
-    TimerFrequency = PcdGet32 (PcdFSBClock) / DivideValue;
+    TimerFrequency = PcdGet32 (PcdFSBClock) / (UINT32)DivideValue;
 
     //
     // Convert TimerPeriod into local APIC counts
