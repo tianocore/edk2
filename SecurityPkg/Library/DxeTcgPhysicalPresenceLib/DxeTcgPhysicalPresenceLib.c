@@ -1398,3 +1398,58 @@ TcgPhysicalPresenceLibNeedUserConfirm(
   return FALSE;
 }
 
+/**
+  The handler for TPM physical presence function:
+  Submit TPM Operation Request to Pre-OS Environment and
+  Submit TPM Operation Request to Pre-OS Environment 2.
+
+  Caution: This function may receive untrusted input.
+
+  @param[in]      OperationRequest TPM physical presence operation request.
+
+  @return Return Code for Submit TPM Operation Request to Pre-OS Environment and
+          Submit TPM Operation Request to Pre-OS Environment 2.
+**/
+UINT32
+EFIAPI
+TcgPhysicalPresenceLibSubmitRequestToPreOSFunction (
+  IN UINT32                 OperationRequest
+  )
+{
+  EFI_STATUS                        Status;
+  UINTN                             DataSize;
+  EFI_PHYSICAL_PRESENCE             PpData;
+
+  DEBUG ((DEBUG_INFO, "[TPM] SubmitRequestToPreOSFunction, Request = %x\n", OperationRequest));
+
+  //
+  // Get the Physical Presence variable
+  //
+  DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
+  Status = gRT->GetVariable (
+                  PHYSICAL_PRESENCE_VARIABLE,
+                  &gEfiPhysicalPresenceGuid,
+                  NULL,
+                  &DataSize,
+                  &PpData
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
+    return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
+  }
+
+  PpData.PPRequest = (UINT8)OperationRequest;
+  Status = gRT->SetVariable (
+                    PHYSICAL_PRESENCE_VARIABLE,
+                    &gEfiPhysicalPresenceGuid,
+                    EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                    DataSize,
+                    &PpData
+                    );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[TPM] Set PP variable failure! Status = %r\n", Status));
+    return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
+  }
+
+  return TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS;
+}

@@ -8,6 +8,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "TcgConfigImpl.h"
 
+#include <IndustryStandard/TcgPhysicalPresence.h>
+#include <Library/TcgPhysicalPresenceLib.h>
+
 CHAR16                          mTcgStorageName[] = L"TCG_CONFIGURATION";
 
 TCG_CONFIG_PRIVATE_DATA         mTcgConfigPrivateDateTemplate = {
@@ -299,37 +302,23 @@ SavePpRequest (
   )
 {
   EFI_STATUS                       Status;
-  UINTN                            DataSize;
-  EFI_PHYSICAL_PRESENCE            PpData;
+  UINT32                           ReturnCode;
 
   //
-  // Save TPM command to variable.
+  // Submit TPM command to PreOS fuction
   //
-  DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-  Status = gRT->GetVariable (
-                  PHYSICAL_PRESENCE_VARIABLE,
-                  &gEfiPhysicalPresenceGuid,
-                  NULL,
-                  &DataSize,
-                  &PpData
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  ReturnCode = TcgPhysicalPresenceLibSubmitRequestToPreOSFunction (PpRequest);
+  if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
+    Status = EFI_SUCCESS;
+  } else if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE) {
+    Status = EFI_OUT_OF_RESOURCES;
+  } else if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED) {
+    Status = EFI_UNSUPPORTED;
+  } else {
+    Status = EFI_DEVICE_ERROR;
   }
 
-  PpData.PPRequest = PpRequest;
-  Status = gRT->SetVariable (
-                  PHYSICAL_PRESENCE_VARIABLE,
-                  &gEfiPhysicalPresenceGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                  DataSize,
-                  &PpData
-                  );
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
