@@ -45,4 +45,24 @@ TcgPhysicalPresenceLibNeedUserConfirm (
   VOID
   );
 
+/**
+  The handler for TPM physical presence function:
+  Submit TPM Operation Request to Pre-OS Environment and
+  Submit TPM Operation Request to Pre-OS Environment 2.
+
+  This API should be invoked in OS runtime phase to interface with ACPI method.
+
+  Caution: This function may receive untrusted input.
+
+  @param[in]      OperationRequest TPM physical presence operation request.
+
+  @return Return Code for Submit TPM Operation Request to Pre-OS Environment and
+          Submit TPM Operation Request to Pre-OS Environment 2.
+**/
+UINT32
+EFIAPI
+TcgPhysicalPresenceLibSubmitRequestToPreOSFunction (
+  IN UINT32  OperationRequest
+  );
+
 #endif
