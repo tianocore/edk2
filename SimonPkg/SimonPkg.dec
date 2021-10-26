@@ -1,0 +1,15 @@
+## @file
+#   Example package dec file
+#
+# Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = SimonPkg
+  PACKAGE_GUID                   = 39FBA1D6-6DCE-4a75-B150-017A53B4548B
+  PACKAGE_VERSION                = 0.01
+
+[Includes]
+  Include
+

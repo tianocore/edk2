@@ -1,0 +1,28 @@
+## @file
+#   A simple, basic, application showing how the Hello application 
+#
+# Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = HelloWorld
+  FILE_GUID                      = FDBA06BF-0785-40fe-9266-4A9BE8731C24
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = UefiMain
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  HelloWorld.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib
+

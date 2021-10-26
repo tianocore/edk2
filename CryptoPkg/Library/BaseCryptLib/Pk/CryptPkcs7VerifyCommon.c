@@ -864,8 +864,12 @@ Pkcs7Verify (
   // For generic PKCS#7 handling, InData may be NULL if the content is present
   // in PKCS#7 structure. So ignore NULL checking here.
   //
-  DataBio = BIO_new_mem_buf (InData, (int) DataLength);
+  DataBio = BIO_new (BIO_s_mem ());
   if (DataBio == NULL) {
+    goto _Exit;
+  }
+
+  if (BIO_write (DataBio, InData, (int) DataLength) <= 0) {
     goto _Exit;
   }
 
