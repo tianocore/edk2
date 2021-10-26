@@ -662,6 +662,10 @@
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
+!if $(CSM_ENABLE) == FALSE
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|100000000
+!endif
+
 [PcdsDynamicDefault.X64]
   # IPv4 and IPv6 PXE Boot support.
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
@@ -771,10 +775,14 @@
   }
 
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
-  OvmfPkg/8259InterruptControllerDxe/8259.inf
   UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
   UefiCpuPkg/CpuDxe/CpuDxe.inf
+!ifdef $(CSM_ENABLE)
+  OvmfPkg/8259InterruptControllerDxe/8259.inf
   OvmfPkg/8254TimerDxe/8254Timer.inf
+!else
+  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+!endif
   OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
   OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
