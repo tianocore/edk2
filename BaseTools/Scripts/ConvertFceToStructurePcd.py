@@ -142,7 +142,7 @@ class parser_lst(object):
                       line.append(struct)
                       unparse.append(line)
                   else:
-                    if uint not in ['UINT8', 'UINT16', 'UINT32', 'UINT64']:
+                    if uint not in ['UINT8', 'UINT16', 'UINT32', 'UINT64', 'BOOLEAN']:
                       line = [offset, t_name, 0, uint]
                       line.append(struct)
                       unparse.append(line)
@@ -569,7 +569,7 @@ class mainprocess(object):
     for i in List:
       for j in i:
         tmp = j.split("|")
-        if (('L"' in j) and ("[" in j)) or (tmp[1].strip() == '{0x0, 0x0}'):
+        if (('L"' in j) and ("[" in j)) or (tmp[1].split("#")[0].strip() == '{0x0, 0x0}'):
           tmp[0] = tmp[0][:tmp[0].index('[')]
           List[List.index(i)][i.index(j)] = "|".join(tmp)
         else:
