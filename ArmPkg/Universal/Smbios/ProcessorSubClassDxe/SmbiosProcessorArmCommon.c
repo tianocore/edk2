@@ -88,22 +88,19 @@ HasSmcArm64SocId (
   VOID
   )
 {
-  ARM_SMC_ARGS                   Args;
   INT32                          SmcCallStatus;
   BOOLEAN                        Arm64SocIdSupported;
+  UINTN                          SmcParam;
 
   Arm64SocIdSupported = FALSE;
 
-  Args.Arg0 = SMCCC_VERSION;
-  ArmCallSmc (&Args);
-  SmcCallStatus = (INT32)Args.Arg0;
+  SmcCallStatus = ArmCallSmc0 (SMCCC_VERSION, NULL, NULL, NULL);
 
   if (SmcCallStatus < 0 || (SmcCallStatus >> 16) >= 1) {
-    Args.Arg0 = SMCCC_ARCH_FEATURES;
-    Args.Arg1 = SMCCC_ARCH_SOC_ID;
-    ArmCallSmc (&Args);
+    SmcParam = SMCCC_ARCH_SOC_ID;
+    SmcCallStatus = (INT32)ArmCallSmc1 (SMCCC_ARCH_FEATURES, &SmcParam, NULL, NULL);
 
-    if (Args.Arg0 >= 0) {
+    if (SmcCallStatus >= 0) {
       Arm64SocIdSupported = TRUE;
     }
   }
@@ -125,30 +122,26 @@ SmbiosGetSmcArm64SocId (
   OUT INT32 *SocRevision
   )
 {
-  ARM_SMC_ARGS  Args;
   INT32         SmcCallStatus;
   EFI_STATUS    Status;
+  UINTN         SmcParam;
 
   Status = EFI_SUCCESS;
 
-  Args.Arg0 = SMCCC_ARCH_SOC_ID;
-  Args.Arg1 = 0;
-  ArmCallSmc (&Args);
-  SmcCallStatus = (INT32)Args.Arg0;
+  SmcParam = 0;
+  SmcCallStatus = (INT32)ArmCallSmc1 (SMCCC_ARCH_SOC_ID, &SmcParam, NULL, NULL);
 
   if (SmcCallStatus >= 0) {
-    *Jep106Code = (INT32)Args.Arg0;
+    *Jep106Code = (INT32)SmcParam;
   } else {
     Status = EFI_UNSUPPORTED;
   }
 
-  Args.Arg0 = SMCCC_ARCH_SOC_ID;
-  Args.Arg1 = 1;
-  ArmCallSmc (&Args);
-  SmcCallStatus = (INT32)Args.Arg0;
+  SmcParam = 1;
+  SmcCallStatus = (INT32)ArmCallSmc1 (SMCCC_ARCH_SOC_ID, &SmcParam, NULL, NULL);
 
   if (SmcCallStatus >= 0) {
-    *SocRevision = (INT32)Args.Arg0;
+    *SocRevision = (INT32)SmcParam;
   } else {
     Status = EFI_UNSUPPORTED;
   }
