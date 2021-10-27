@@ -114,11 +114,29 @@ INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe
 !if $(DISABLE_RESET_SYSTEM) == FALSE
 INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 !endif
-
 INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
-!if $(EMU_VARIABLE_ENABLE) == TRUE
-INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+#
+# SMM Support
+#
+!if $(SMM_SUPPORT) == TRUE
+  INF UefiPayloadPkg/SmmAccessDxe/SmmAccessDxe.inf
+  INF UefiPayloadPkg/SmmControlRuntimeDxe/SmmControlRuntimeDxe.inf
+  INF UefiPayloadPkg/BlSupportSmm/BlSupportSmm.inf
+  INF MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
+  INF MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
+  INF UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
+  INF UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
+  INF UefiPayloadPkg/PchSmiDispatchSmm/PchSmiDispatchSmm.inf
+!endif
+
+!if $(VARIABLE_SUPPORT) == "EMU"
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!elseif $(VARIABLE_SUPPORT) == "SPI"
+  INF UefiPayloadPkg/FvbRuntimeDxe/FvbSmm.inf
+  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 !endif
 
 INF UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
@@ -267,6 +285,20 @@ INF ShellPkg/Application/Shell/Shell.inf
 [Rule.Common.DXE_RUNTIME_DRIVER]
   FILE DRIVER = $(NAMED_GUID) {
     DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+[Rule.Common.DXE_SMM_DRIVER]
+  FILE SMM = $(NAMED_GUID) {
+    SMM_DEPEX SMM_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.SMM_CORE]
+  FILE SMM_CORE = $(NAMED_GUID) {
     PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI       STRING="$(MODULE_NAME)" Optional
     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
