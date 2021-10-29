@@ -2,7 +2,7 @@
 Elf64 convert solution
 
 Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
-Portions copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+Portions copyright (c) 2013-2022, ARM Ltd. All rights reserved.<BR>
 Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -186,8 +186,8 @@ InitializeElf64 (
   }
 
   if (mExportFlag) {
-    if (mEhdr->e_machine != EM_X86_64) {
-      Error (NULL, 0, 3000, "Unsupported", "--prm option currently only supports X64 arch.");
+    if ((mEhdr->e_machine != EM_X86_64) && (mEhdr->e_machine != EM_AARCH64)) {
+      Error (NULL, 0, 3000, "Unsupported", "--prm option currently only supports X64 and AArch64 archs.");
       return FALSE;
     }
   }
