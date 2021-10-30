@@ -15,6 +15,8 @@
 #include <Protocol/DebugSupport.h>
 #include <Register/Amd/Ghcb.h>
 
+#define VE_EXCEPTION  20
+
 /**
   Perform VMGEXIT.
 
@@ -138,6 +140,32 @@ VmgIsOffsetValid (
 EFI_STATUS
 EFIAPI
 VmgExitHandleVc (
+  IN OUT EFI_EXCEPTION_TYPE  *ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT  SystemContext
+  );
+
+/**
+  Handle a #VE exception.
+
+  Performs the necessary processing to handle a #VE exception.
+
+  The base library function returns an error equal to VE_EXCEPTION,
+  to be propagated to the standard exception handling stack.
+
+  @param[in, out]  ExceptionType  Pointer to an EFI_EXCEPTION_TYPE to be set
+                                  as value to use on error.
+  @param[in, out]  SystemContext  Pointer to EFI_SYSTEM_CONTEXT
+
+  @retval  EFI_SUCCESS            Exception handled
+  @retval  EFI_UNSUPPORTED        #VE not supported, (new) exception value to
+                                  propagate provided
+  @retval  EFI_PROTOCOL_ERROR     #VE handling failed, (new) exception value to
+                                  propagate provided
+
+**/
+EFI_STATUS
+EFIAPI
+VmTdExitHandleVe (
   IN OUT EFI_EXCEPTION_TYPE  *ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
