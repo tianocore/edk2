@@ -25,6 +25,8 @@
   VmgExitVcHandler.c
   VmgExitVcHandler.h
   PeiDxeVmgExitVcHandler.c
+  VmTdExitVeHandler.c
+  X64/TdVmcallCpuid.nasm
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -38,3 +40,5 @@
   LocalApicLib
   MemEncryptSevLib
 
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdIgnoreVeHalt
