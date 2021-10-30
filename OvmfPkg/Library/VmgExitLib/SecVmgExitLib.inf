@@ -25,6 +25,8 @@
   VmgExitVcHandler.c
   VmgExitVcHandler.h
   SecVmgExitVcHandler.c
+  VmTdExitVeHandler.c
+  X64/TdVmcallCpuid.nasm
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -44,4 +46,3 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
-
