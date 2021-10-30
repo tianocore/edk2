@@ -25,6 +25,7 @@
   VmgExitVcHandler.c
   VmgExitVcHandler.h
   SecVmgExitVcHandler.c
+  VmTdExitVeHandler.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,4 +43,4 @@
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
-
+  gUefiOvmfPkgTokenSpaceGuid.PcdIgnoreVeHalt

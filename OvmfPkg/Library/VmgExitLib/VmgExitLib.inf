@@ -25,6 +25,7 @@
   VmgExitVcHandler.c
   VmgExitVcHandler.h
   PeiDxeVmgExitVcHandler.c
+  VmTdExitVeHandler.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -37,4 +38,7 @@
   DebugLib
   LocalApicLib
   MemEncryptSevLib
+  TdxLib
 
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdIgnoreVeHalt
