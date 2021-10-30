@@ -78,7 +78,9 @@ The library is incorporated with RedfishLib ***[[13]](#[0])*** to encode and dec
 
    2. Enable below macros in EmulatorPkg.dsc
    ```C
+  NETWORK_SNP_ENABLE = TRUE
   NETWORK_HTTP_ENABLE = TRUE
+  NETWORK_IP6_ENABLE = TRUE
   SECURE_BOOT_ENABLE = TRUE
   REDFISH_ENABLE = TRUE
    ```
@@ -95,6 +97,20 @@ The library is incorporated with RedfishLib ***[[13]](#[0])*** to encode and dec
    - Execute the EFI shell command "ifconfig -l" under EFI shell and look for MAC address information, then assign the MAC address to below PCD.
    ```c
    gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceDevicePath.DevicePath|{DEVICE_PATH("MAC(000000000000,0x1)")}
+   ```
+
+   - Assign the network adapter instaleld on the host (working machine) that will be emulated as the network interface in edk2 Emulator.
+
+   ```c
+    #
+    # For Windows based host, use a number to refer to network adapter
+    #
+    gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"1"
+    or
+    #
+    # For Linux based host, use the device name of network adapter
+    #
+    gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"en0"
    ```
 
    5. Configure the Redfish service on the EDK2 Emulator platform
