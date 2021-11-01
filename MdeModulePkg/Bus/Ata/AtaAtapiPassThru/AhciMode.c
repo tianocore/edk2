@@ -1833,18 +1833,17 @@ AhciAtaSmartSupport (
                    ATA_ATAPI_TIMEOUT,
                    NULL
                    );
-
-        if (!EFI_ERROR (Status)) {
-          Status = AhciAtaSmartReturnStatusCheck (
-                     PciIo,
-                     AhciRegisters,
-                     (UINT8)Port,
-                     (UINT8)PortMultiplier,
-                     AtaStatusBlock
-                     );
-        }
       }
     }
+
+    AhciAtaSmartReturnStatusCheck (
+      PciIo,
+      AhciRegisters,
+      (UINT8)Port,
+      (UINT8)PortMultiplier,
+      AtaStatusBlock
+      );
+
     DEBUG ((EFI_D_INFO, "Enabled S.M.A.R.T feature at port [%d] PortMultiplier [%d]!\n",
             Port, PortMultiplier));
   }
