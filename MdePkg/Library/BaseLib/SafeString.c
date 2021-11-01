@@ -17,7 +17,7 @@
     if (!(Expression)) { \
       DEBUG ((DEBUG_VERBOSE, \
         "%a(%d) %a: SAFE_STRING_CONSTRAINT_CHECK(%a) failed.  Return %r\n", \
-        __FILE__, __LINE__, __FUNCTION__, #Expression, Status)); \
+        __FILE__, DEBUG_LINE_NUMBER, __FUNCTION__, DEBUG_EXPRESSION_STRING (Expression), Status)); \
       return Status; \
     } \
   } while (FALSE)
