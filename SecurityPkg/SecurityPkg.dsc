@@ -84,6 +84,14 @@
   # Add support for GCC stack protector
   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
+  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
+
+[LibraryClasses.ARM]
+  RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+
+[LibraryClasses.RISCV64]
+  RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
@@ -381,4 +389,3 @@
    MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:256
   INTEL:*_*_IA32_DLINK_FLAGS = /ALIGN:256
         *_*_*_CC_FLAGS       = -D DISABLE_NEW_DEPRECATED_INTERFACES
-
