@@ -68,6 +68,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCodRelocationDevPath                     ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCoDRelocationFileName                    ## CONSUMES
 
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset ## CONSUMES
+
 [Protocols]
   gEsrtManagementProtocolGuid                   ## CONSUMES
   gEfiFirmwareManagementProtocolGuid            ## CONSUMES
