@@ -1739,6 +1739,7 @@ RelocateCapsuleToRam (
   UINT8                         *StringBuf;
   UINTN                         StringSize;
   UINTN                         TotalStringSize;
+  UINTN                         CapsulesToProcess;
 
   CapsuleOnDiskBuf = NULL;
   BlockDescriptors = NULL;
@@ -1778,6 +1779,13 @@ RelocateCapsuleToRam (
     TotalStringSize += StrSize (CapsuleOnDiskBuf[Index].FileInfo->FileName);
   }
 
+  // If Persist Across Reset isn't supported, skip the file name strings capsule
+  if (!FeaturePcdGet (PcdSupportUpdateCapsuleReset)) {
+    CapsulesToProcess = CapsuleOnDiskNum;
+    goto BuildGather;
+  }
+  CapsulesToProcess = CapsuleOnDiskNum + 1;
+
   FileNameCapsule = AllocateZeroPool (sizeof (EFI_CAPSULE_HEADER) + TotalStringSize);
   if (FileNameCapsule == NULL) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate memory for name capsule.\n"));
@@ -1804,18 +1812,23 @@ RelocateCapsuleToRam (
   //
   // 3. Build Gather list for the capsules
   //
-  Status = BuildGatherList (CapsuleBuffer, CapsuleSize, CapsuleOnDiskNum + 1, &BlockDescriptors);
+BuildGather:
+  Status = BuildGatherList (CapsuleBuffer, CapsuleSize, CapsulesToProcess, &BlockDescriptors);
   if (EFI_ERROR (Status) || BlockDescriptors == NULL) {
     FreePool (CapsuleBuffer);
     FreePool (CapsuleSize);
-    FreePool (FileNameCapsule);
+    if (FileNameCapsule != NULL) {
+      FreePool (FileNameCapsule);
+    }
     return EFI_OUT_OF_RESOURCES;
   }
 
   //
   // 4. Call UpdateCapsule() service
   //
-  Status = gRT->UpdateCapsule((EFI_CAPSULE_HEADER **) CapsuleBuffer, CapsuleOnDiskNum + 1, (UINTN) BlockDescriptors);
+  Status = gRT->UpdateCapsule ((EFI_CAPSULE_HEADER **) CapsuleBuffer,
+                               CapsulesToProcess,
+                               (UINTN) BlockDescriptors);
 
   return Status;
 }
