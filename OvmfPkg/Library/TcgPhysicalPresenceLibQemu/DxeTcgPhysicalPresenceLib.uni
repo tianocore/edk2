@@ -1,0 +1,22 @@
+// /** @file
+// Executes pending TPM 1.2 requests from OS or BIOS and Locks TPM
+//
+// This library will check and execute TPM 1.2 request from OS or BIOS. The request may
+// ask for user confirmation before execution. This Library will also lock TPM physical
+// presence at last.
+//
+// Caution: This module requires additional review when modified.
+// This driver will have external input - variable.
+// This external input must be validated carefully to avoid security issue.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Executes pending TPM 1.2 requests from OS or BIOS and Locks TPM"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library will ask for user confirmation for the pending TPM physical present requests. Once confirmed, it will execute the request, and locks TPM physical presence at last. Caution: This module requires additional review when modified. This driver will have external input - variable. This external input must be validated carefully to avoid security issue."
+

@@ -1,0 +1,46 @@
+/** @file
+  String definitions for TPM 1.2 physical presence confirm text.
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US "English"
+
+#string TPM_HEAD_STR                  #language en-US    "A configuration change was requested to %s this computer's TPM (Trusted Platform Module)\n\n"
+#string TPM_PPI_HEAD_STR              #language en-US    "A configuration change was requested to allow the Operating System to %s the computer's TPM (Trusted Platform Module) without asking for user confirmation in the future.\n\n"
+#string TPM_UPGRADE_HEAD_STR          #language en-US    "A configuration change was requested to %s to the TPM's (Trusted Platform Module) firmware.\n\n"
+
+#string TPM_ACCEPT_KEY                #language en-US    "Press F10 "
+#string TPM_CAUTION_KEY               #language en-US    "Press F12 "
+#string TPM_REJECT_KEY                #language en-US    "to %s the TPM \nPress ESC to reject this change request and continue\n"
+
+#string TPM_ENABLE                    #language en-US    "enable"
+#string TPM_DISABLE                   #language en-US    "disable"
+#string TPM_ACTIVATE                  #language en-US    "activate"
+#string TPM_DEACTIVATE                #language en-US    "deactivate"
+#string TPM_CLEAR                     #language en-US    "clear"
+#string TPM_ENABLE_ACTIVATE           #language en-US    "enable and activate"
+#string TPM_DEACTIVATE_DISABLE        #language en-US    "deactivate and disable"
+#string TPM_ALLOW_TAKE_OWNERSHIP      #language en-US    "allow a user to take ownership of"
+#string TPM_DISALLOW_TAKE_OWNERSHIP   #language en-US    "disallow a user to take ownership of"
+#string TPM_TURN_ON                   #language en-US    "enable, activate, and allow a user to take ownership of"
+#string TPM_TURN_OFF                  #language en-US    "deactivate, disable, and disallow a user to take ownership of"
+#string TPM_CLEAR_TURN_ON             #language en-US    "clear, enable, and activate"
+#string TPM_ENABLE_ACTIVATE_CLEAR     #language en-US    "enable, activate and clear"
+#string TPM_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE        #language en-US    "enable, activate, clear, enable, and activate"
+#string TPM_UNOWNED_FIELD_UPGRADE     #language en-US    "allow field upgrade"
+
+#string TPM_NO_PPI_PROVISION          #language en-US    "provision"
+#string TPM_NO_PPI_MAINTAIN           #language en-US    "maintain"
+#string TPM_NO_PPI_INFO               #language en-US    "to approve future Operating System requests "
+
+#string TPM_WARNING_MAINTAIN          #language en-US    "WARNING: Allowing changes to the TPM's firmware may affect the operation of the TPM and may erase information stored on the TPM.\nYou may lose all created keys and access to data encrypted by these keys.\n\n"
+#string TPM_WARNING                   #language en-US    "WARNING: Doing so might prevent security applications that rely on the TPM from functioning as expected\n\n"
+#string TPM_WARNING_CLEAR             #language en-US    "WARNING: Clearing erases information stored on the TPM. You will lose all created keys and access to data encrypted by these keys. "
+#string TPM_WARNING_CLEAR_CONT        #language en-US    "Take ownership as soon as possible after this step.\n\n"
+#string TPM_NOTE_OFF                  #language en-US    "NOTE: This action will turn off the TPM\n\n"
+#string TPM_NOTE_ON                   #language en-US    "NOTE: This action will turn on the TPM\n\n"
+#string TPM_NOTE_CLEAR                #language en-US    "NOTE: This action does not clear the TPM, but by approving this configuration change, future actions to clear the TPM will not require user confirmation.\n\n"
