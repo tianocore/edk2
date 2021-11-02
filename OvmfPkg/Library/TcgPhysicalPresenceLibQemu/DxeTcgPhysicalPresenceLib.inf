@@ -1,0 +1,64 @@
+## @file
+#  Executes pending TPM 1.2 requests from OS or BIOS and Locks TPM
+#
+#  This library will check and execute TPM 1.2 request from OS or BIOS. The request may
+#  ask for user confirmation before execution. This Library will also lock TPM physical
+#  presence at last.
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable.
+#  This external input must be validated carefully to avoid security issue.
+#
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeTcgPhysicalPresenceLib
+  MODULE_UNI_FILE                = DxeTcgPhysicalPresenceLib.uni
+  FILE_GUID                      = EBC43A46-34AC-4F07-A7F5-A5394619361C
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TcgPhysicalPresenceLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = TcgPhysicalPresenceLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeTcgPhysicalPresenceLib.c
+  PhysicalPresenceStrings.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  HiiLib
+  TcgPpVendorLib
+
+[Protocols]
+  gEfiTcgProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEdkiiVariableLockProtocolGuid        ## SOMETIMES_CONSUMES
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## HII
+  ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresenceFlags"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresenceFlags"
+  gEfiPhysicalPresenceGuid
