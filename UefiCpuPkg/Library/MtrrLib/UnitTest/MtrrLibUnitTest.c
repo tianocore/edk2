@@ -599,7 +599,7 @@ UnitTestMtrrGetFixedMtrr (
     }
 
     Result = MtrrGetFixedMtrr (&FixedSettings);
-    UT_ASSERT_EQUAL (Result, &FixedSettings);
+    UT_ASSERT_EQUAL ((UINTN)Result, (UINTN)&FixedSettings);
     UT_ASSERT_MEM_EQUAL (&FixedSettings, &ExpectedFixedSettings, sizeof (FixedSettings));
   }
 
@@ -612,7 +612,7 @@ UnitTestMtrrGetFixedMtrr (
   ZeroMem (&FixedSettings, sizeof (FixedSettings));
   ZeroMem (&ExpectedFixedSettings, sizeof (ExpectedFixedSettings));
   Result = MtrrGetFixedMtrr (&FixedSettings);
-  UT_ASSERT_EQUAL (Result, &FixedSettings);
+  UT_ASSERT_EQUAL ((UINTN)Result, (UINTN)&FixedSettings);
   UT_ASSERT_MEM_EQUAL (&ExpectedFixedSettings, &FixedSettings, sizeof (ExpectedFixedSettings));
 
   return UNIT_TEST_PASSED;
@@ -653,7 +653,7 @@ UnitTestMtrrGetAllMtrrs (
     AsmWriteMsr64 (MSR_IA32_MTRR_PHYSMASK0 + (Index << 1), VariableMtrr[Index].Mask);
   }
   Result = MtrrGetAllMtrrs (&Mtrrs);
-  UT_ASSERT_EQUAL (Result, &Mtrrs);
+  UT_ASSERT_EQUAL ((UINTN)Result, (UINTN)&Mtrrs);
   UT_ASSERT_MEM_EQUAL (Mtrrs.Variables.Mtrr, VariableMtrr, sizeof (MTRR_VARIABLE_SETTING) * SystemParameter.VariableMtrrCount);
 
   //
@@ -665,7 +665,7 @@ UnitTestMtrrGetAllMtrrs (
   SystemParameter.MtrrSupported = FALSE;
   InitializeMtrrRegs (&SystemParameter);
   Result = MtrrGetAllMtrrs (&Mtrrs);
-  UT_ASSERT_EQUAL (Result, &Mtrrs);
+  UT_ASSERT_EQUAL ((UINTN)Result, (UINTN)&Mtrrs);
   UT_ASSERT_MEM_EQUAL (&ExpectedMtrrs, &Mtrrs, sizeof (ExpectedMtrrs));
 
   //
@@ -718,7 +718,7 @@ UnitTestMtrrSetAllMtrrs (
     GenerateRandomMtrrPair (SystemParameter.PhysicalAddressBits, GenerateRandomCacheType (), &Mtrrs.Variables.Mtrr[Index], NULL);
   }
   Result = MtrrSetAllMtrrs (&Mtrrs);
-  UT_ASSERT_EQUAL (Result, &Mtrrs);
+  UT_ASSERT_EQUAL ((UINTN)Result, (UINTN)&Mtrrs);
 
   UT_ASSERT_EQUAL (AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE), Mtrrs.MtrrDefType);
   for (Index = 0; Index < SystemParameter.VariableMtrrCount; Index++) {
