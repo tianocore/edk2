@@ -899,8 +899,19 @@ AddNamedComponentNodes (
       return Status;
     }
 
-    if ((NodeList->IdMappingCount > 0) &&
-        (NodeList->IdMappingToken != CM_NULL_TOKEN)) {
+    if (NodeList->IdMappingCount > 0) {
+      if (NodeList->IdMappingToken == CM_NULL_TOKEN) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: IORT: Invalid Id Mapping token,"
+          " Token = 0x%x, Status =%r\n",
+          NodeList->IdMappingToken,
+          Status
+          ));
+        return Status;
+      }
+
       // Ids for Named Component
       IdMapArray = (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE*)((UINT8*)NcNode +
                     NcNode->Node.IdReference);
@@ -1004,8 +1015,19 @@ AddRootComplexNodes (
     RcNode->Reserved1[1] = EFI_ACPI_RESERVED_BYTE;
     RcNode->Reserved1[2] = EFI_ACPI_RESERVED_BYTE;
 
-    if ((NodeList->IdMappingCount > 0) &&
-        (NodeList->IdMappingToken != CM_NULL_TOKEN)) {
+    if (NodeList->IdMappingCount > 0) {
+      if (NodeList->IdMappingToken == CM_NULL_TOKEN) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: IORT: Invalid Id Mapping token,"
+          " Token = 0x%x, Status =%r\n",
+          NodeList->IdMappingToken,
+          Status
+          ));
+        return Status;
+      }
+
       // Ids for Root Complex
       IdMapArray = (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE*)((UINT8*)RcNode +
                     RcNode->Node.IdReference);
@@ -1233,8 +1255,19 @@ AddSmmuV1V2Nodes (
       }
     }
 
-    if ((NodeList->IdMappingCount > 0) &&
-        (NodeList->IdMappingToken != CM_NULL_TOKEN)) {
+    if (NodeList->IdMappingCount > 0) {
+      if (NodeList->IdMappingToken == CM_NULL_TOKEN) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: IORT: Invalid Id Mapping token,"
+          " Token = 0x%x, Status =%r\n",
+          NodeList->IdMappingToken,
+          Status
+          ));
+        return Status;
+      }
+
       // Ids for SMMU v1/v2 Node
       IdMapArray = (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE*)((UINT8*)SmmuNode +
                     SmmuNode->Node.IdReference);
@@ -1349,8 +1382,19 @@ AddSmmuV3Nodes (
       SmmuV3Node->DeviceIdMappingIndex = NodeList->DeviceIdMappingIndex;
     }
 
-    if ((NodeList->IdMappingCount > 0) &&
-        (NodeList->IdMappingToken != CM_NULL_TOKEN)) {
+    if (NodeList->IdMappingCount > 0) {
+      if (NodeList->IdMappingToken == CM_NULL_TOKEN) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: IORT: Invalid Id Mapping token,"
+          " Token = 0x%x, Status =%r\n",
+          NodeList->IdMappingToken,
+          Status
+          ));
+        return Status;
+      }
+
       // Ids for SMMUv3 node
       IdMapArray = (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE*)((UINT8*)SmmuV3Node +
                     SmmuV3Node->Node.IdReference);
@@ -1463,8 +1507,19 @@ AddPmcgNodes (
       return Status;
     }
 
-    if ((NodeList->IdMappingCount > 0) &&
-        (NodeList->IdMappingToken != CM_NULL_TOKEN)) {
+    if (NodeList->IdMappingCount > 0) {
+      if (NodeList->IdMappingToken == CM_NULL_TOKEN) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: IORT: Invalid Id Mapping token,"
+          " Token = 0x%x, Status =%r\n",
+          NodeList->IdMappingToken,
+          Status
+          ));
+        return Status;
+      }
+
       // Ids for PMCG node
       IdMapArray = (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE*)((UINT8*)PmcgNode +
                     PmcgNode->Node.IdReference);
