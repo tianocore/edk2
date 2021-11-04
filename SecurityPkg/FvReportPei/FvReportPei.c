@@ -150,10 +150,12 @@ VerifyHashedFv (
   FvHashValue = HashValue;
   for (FvIndex = 0; FvIndex < FvNumber; ++FvIndex) {
     //
-    // FV must be meant for verified boot and/or measured boot.
+    // Not meant for verified boot and/or measured boot?
     //
-    ASSERT ((FvInfo[FvIndex].Flag & HASHED_FV_FLAG_VERIFIED_BOOT) != 0 ||
-            (FvInfo[FvIndex].Flag & HASHED_FV_FLAG_MEASURED_BOOT) != 0);
+    if ((FvInfo[FvIndex].Flag & HASHED_FV_FLAG_VERIFIED_BOOT) == 0 &&
+          (FvInfo[FvIndex].Flag & HASHED_FV_FLAG_MEASURED_BOOT) == 0) {
+      continue;
+    }
 
     //
     // Skip any FV not meant for current boot mode.
