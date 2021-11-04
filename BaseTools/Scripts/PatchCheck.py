@@ -374,7 +374,7 @@ class GitDiffCheck:
                     # they are identified by their path.
                     #
                     self.force_crlf = False
-                if self.filename == '.gitmodules' or \
+                if self.filename.startswith('.git') or \
                    self.filename == 'BaseTools/Conf/diff.order':
                     #
                     # .gitmodules and diff orderfiles are used internally by git
