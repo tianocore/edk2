@@ -387,6 +387,10 @@ class DscBuildData(PlatformBuildClassObject):
                 for i in range(0, len(LanguageCodes), 3):
                     LanguageList.append(LanguageCodes[i:i + 3])
                 self._ISOLanguages = LanguageList
+            elif Name == TAB_DSC_DEFINES_VPD_AUTHENTICATED_VARIABLE_STORE:
+                if TAB_DSC_DEFINES_VPD_AUTHENTICATED_VARIABLE_STORE not in gCommandLineDefines:
+                    gCommandLineDefines[TAB_DSC_DEFINES_VPD_AUTHENTICATED_VARIABLE_STORE] = Record[2].strip()
+
             elif Name == TAB_DSC_DEFINES_VPD_TOOL_GUID:
                 #
                 # try to convert GUID to a real UUID value to see whether the GUID is format
