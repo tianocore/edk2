@@ -67,6 +67,9 @@
   HashApiLib|CryptoPkg/Library/BaseHashApiLib/BaseHashApiLib.inf
   RngLib|MdePkg/Library/BaseRngLibNull/BaseRngLibNull.inf
 
+[LibraryClasses.IA32]
+  NULL|MdePkg/Library/VsIntrinsicLib/VsIntrinsicLib.inf
+
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
   # It is not possible to prevent the ARM compiler for generic intrinsic functions.
