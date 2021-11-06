@@ -1,0 +1,38 @@
+## @file
+#  Visual Studio 2017 C compiler intrinsic Library implementation.
+#
+#  Since the C compiler does very aggressive full program optimizations there are cases
+#  where some small number of compiler inserted functions can not be avoided.
+#  To handle that case this NULL library can be injected into all 32bit modules
+#  so that the link time dependency is met and the modules compile.
+#
+#  The routines are based on src delivered with the visual studio product.  it is
+#  critical that calling convention, stack usage, register usage, etc is in line
+#  with what the compiler expects as there is no way to influence the behaviors
+#  for compiler inserted functions.
+#
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VsIntrinsicLib
+  MODULE_UNI_FILE                = VsIntrinsicLib.uni
+  FILE_GUID                      = ed449fc0-3265-40ed-91b8-435b8df0aa5f
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources]
+
+[Sources.Ia32]
+  IA32/Llmul.asm
+  IA32/Llshr.asm
+
+[Packages]
+  MdePkg/MdePkg.dec
