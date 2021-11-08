@@ -170,7 +170,7 @@ int main(int argc, CHAR8 *argv[])
     fprintf(stderr, "Invalid option value, Device Path can't be NULL");
     return STATUS_ERROR;
   }
-  Str16 = (CHAR16 *)malloc(1024);
+  Str16 = (CHAR16 *)malloc((strlen (Str) + 1) * sizeof (CHAR16));
   if (Str16 == NULL) {
     fprintf(stderr, "Resource, memory cannot be allocated");
     return STATUS_ERROR;
