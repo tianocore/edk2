@@ -75,6 +75,10 @@
   ## PRODUCES            ## Variable:L"certdbv"
   gEfiCertDbGuid
 
+  ## CONSUMES            ## Variable:L"PhysicalPresenceFlags"
+  ## PRODUCES            ## Variable:L"PhysicalPresenceFlags"
+  gEfiPhysicalPresenceGuid
+
   ## CONSUMES            ## Variable:L"VendorKeysNv"
   ## PRODUCES            ## Variable:L"VendorKeysNv"
   gEfiVendorKeysNvGuid

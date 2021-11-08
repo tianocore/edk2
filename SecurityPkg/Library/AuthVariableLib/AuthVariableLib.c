@@ -89,6 +89,17 @@ VARIABLE_ENTRY_PROPERTY  mAuthVarEntry[] = {
       MAX_UINTN
     }
   },
+  {
+    &gEfiPhysicalPresenceGuid,
+    PHYSICAL_PRESENCE_FLAGS_VARIABLE,
+    {
+      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
+      VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY,
+      VARIABLE_ATTRIBUTE_NV_BS,
+      sizeof (EFI_PHYSICAL_PRESENCE_FLAGS),
+      MAX_UINTN
+    }
+  }
 };
 
 VOID  **mAuthVarAddressPointer[9];

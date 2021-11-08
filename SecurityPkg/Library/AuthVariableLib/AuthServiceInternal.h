@@ -30,6 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Guid/AuthenticatedVariableFormat.h>
 #include <Guid/ImageAuthentication.h>
+#include <Guid/PhysicalPresenceData.h>
 
 #define TWO_BYTE_ENCODE  0x82
 
