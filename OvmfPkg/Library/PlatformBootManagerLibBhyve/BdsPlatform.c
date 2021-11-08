@@ -372,7 +372,9 @@ PlatformBootManagerBeforeConsole (
 
   //
   // Process TPM PPI request
+  // For variable creation and locking to work, this has to be done before End-of-Dxe.
   //
+  TcgPhysicalPresenceLibProcessRequest ();
   Tcg2PhysicalPresenceLibProcessRequest (NULL);
 
   //
