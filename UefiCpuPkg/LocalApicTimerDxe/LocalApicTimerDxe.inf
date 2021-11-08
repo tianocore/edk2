@@ -1,6 +1,13 @@
 ## @file
 # Local APIC timer driver that provides Timer Arch protocol.
-# PcdFSBClock is defined in MdePkg and it should be set by the consumer.
+#
+# This driver is to support fixed frequency. If a real platform happens
+# to have fixed frequency, then it can be used. In this case the consumer
+# should set PcdFSBClock which is defined in MdePkg.
+#
+# Another restriction is that LocalApicTimerDxe cannot coexist with
+# SourceLevelDebug (which rely on Local Apic Timer). Anyone who choose
+# this driver as the DXE timer dirver should be aware of it.
 #
 # Copyright (c) 2005 - 2019, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2019, Citrix Systems, Inc.
@@ -15,13 +22,17 @@
   FILE_GUID                      = 52fe8196-f9de-4d07-b22f-51f77a0e7c41
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-
   ENTRY_POINT                    = TimerDriverInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
 
 [Packages]
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
-  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   UefiBootServicesTableLib
