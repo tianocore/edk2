@@ -1,5 +1,5 @@
 ## @file
-#  This driver measures Microcode Patches to TPM.
+#  This driver measures microcode patches to TPM.
 #
 #  This driver consumes gEdkiiMicrocodePatchHobGuid, packs all unique
 #  microcode patch found in gEdkiiMicrocodePatchHobGuid to a binary blob,
@@ -23,7 +23,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
@@ -43,7 +43,6 @@
   UefiDriverEntryPoint
   DebugLib
   PrintLib
-  SortLib
   HobLib
   MicrocodeLib
   TpmMeasurementLib

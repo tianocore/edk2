@@ -1,5 +1,5 @@
 // /** @file
-// This driver measures Microcode Patches to TPM.
+// This driver measures microcode patches to TPM.
 //
 // This driver consumes gEdkiiMicrocodePatchHobGuid, packs all uniquemicrocode patch found in gEdkiiMicrocodePatchHobGuid to a binary blob, and measures the binary blob to TPM.
 //

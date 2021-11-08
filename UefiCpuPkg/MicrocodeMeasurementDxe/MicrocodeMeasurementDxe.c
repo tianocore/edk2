@@ -1,5 +1,5 @@
 /** @file
-  This driver measures Microcode Patches to TPM.
+  This driver measures microcode patches to TPM.
 
 Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -17,52 +17,122 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/PrintLib.h>
-#include <Library/SortLib.h>
 #include <Library/HobLib.h>
 #include <Library/MicrocodeLib.h>
 #include <Library/TpmMeasurementLib.h>
-
 
 #define CPU_MICROCODE_MEASUREMENT_DESCRIPTION  "Microcode Measurement"
 #define CPU_MICROCODE_MEASUREMENT_EVENT_LOG_DESCRIPTION_LEN  sizeof(CPU_MICROCODE_MEASUREMENT_DESCRIPTION)
 
 #pragma pack(1)
 typedef struct {
-  UINTN    Address;
-  UINTN    Size;
-}MICROCODE_PATCH_TYPE;
-
-typedef struct {
   UINT8    Description[CPU_MICROCODE_MEASUREMENT_EVENT_LOG_DESCRIPTION_LEN];
   UINTN    NumberOfMicrocodePatchesMeasured;
   UINTN    SizeOfMicrocodePatchesMeasured;
-}CPU_MICROCODE_MEASUREMENT_EVENT_LOG;
+} CPU_MICROCODE_MEASUREMENT_EVENT_LOG;
 #pragma pack()
 
-STATIC BOOLEAN mMicrocodeMeasured = FALSE;
 
 /**
-  Helper Function. Microcode patches list comparison function instance for PerformQuickSort.
+  The function is called by QuickSort to compare the order of offsets of
+  two microcode patches in RAM relative to their base address. Elements
+  will be in ascending order.
 
-  @param[in] Buffer1                  The pointer to first buffer.
-  @param[in] Buffer2                  The pointer to second buffer.
+  @param[in] Offset1   The pointer to the offset of first microcode patch.
+  @param[in] Offset2   The pointer to the offset of second microcode patch.
 
-  @return 0                           Buffer1 equal to Buffer2.
-  @return <0                          Buffer1 is less than Buffer2.
-  @return >0                          Buffer1 is greater than Buffer2.
+  @return 1                   The offset of first microcode patch is bigger than that of the second.
+  @return -1                  The offset of first microcode patch is smaller than that of the second.
+  @return 0                   The offset of first microcode patch equals to that of the second.
 **/
 INTN
 EFIAPI
-MicrocodePatchesListSortFunction (
-  IN CONST VOID                 *Buffer1,
-  IN CONST VOID                 *Buffer2
+MicrocodePatchOffsetCompareFunction (
+  IN CONST VOID                 *Offset1,
+  IN CONST VOID                 *Offset2
   )
 {
-  return ((MICROCODE_PATCH_TYPE*)Buffer2)->Address - ((MICROCODE_PATCH_TYPE*)Buffer1)->Address;
+  if (*(UINTN*)(Offset1) > *(UINTN*)(Offset2)) {
+    return 1;
+  } else if (*(UINTN*)(Offset1) < *(UINTN*)(Offset2)) {
+    return -1;
+  } else {
+    return 0;
+  }
 }
 
 /**
-  Measure Microcode Patches Binary Blob with EV_CPU_MICROCODE to PCR[1].
+  This function remove duplicate and invalid offsets in PatchOffsetList.
+  Invalid offset means MAX_UINTN in PatchOffsetList or MAX_UINT64 in the
+  field EDKII_MICROCODE_PATCH_HOB.ProcessorSpecificPatchOffset[].
+
+  @param[in, out] PatchOffsetList        On Call as the raw list; On Return as the clean list.
+  @param[in, out] PatchOffsetListCount   On Call as the count of raw list; On Return as count
+                                         of the clean list.
+**/
+VOID
+EFIAPI
+RemoveDuplicateAndInvalidOffset (
+  IN OUT UINTN                 **PatchOffsetList,
+  IN OUT UINTN                 *PatchOffsetListCount
+  )
+{
+  UINT32                Index;
+  UINTN                 *NewPatchOffsetList;
+  UINTN                 *Walker;
+  UINTN                 NewPatchOffsetListCount;
+  UINTN                 LastPatchOffset;
+  UINTN                 QuickSortBuffer;
+
+  NewPatchOffsetList            = NULL;
+  Walker                        = NULL;
+  NewPatchOffsetListCount       = 0;
+  LastPatchOffset               = MAX_UINTN;
+  QuickSortBuffer               = 0;
+
+  //
+  // The order matters when packing all applied microcode patches to a single binary blob.
+  // Therefore it is a must to do sorting before packing.
+  // NOTE: We assumed that the order of address of every microcode patch in RAM is the same
+  // with the order of those in the Microcode Firmware Volume in FLASH. If any future updates
+  // made this assumption untenable, then needs a new solution to measure microcode patches.
+  //
+  QuickSort (
+             *PatchOffsetList,
+             *PatchOffsetListCount,
+             sizeof (UINTN),
+             MicrocodePatchOffsetCompareFunction,
+             (VOID*) &QuickSortBuffer
+             );
+  for (Index = 0; Index < *PatchOffsetListCount; Index++) {
+    if (*((*PatchOffsetList)+Index) != MAX_UINTN &&
+        *((*PatchOffsetList)+Index) != LastPatchOffset) {
+      NewPatchOffsetListCount += 1;
+      LastPatchOffset         = *((*PatchOffsetList)+Index);
+    }
+  }
+
+  LastPatchOffset    = MAX_UINTN;
+  NewPatchOffsetList = AllocatePool (NewPatchOffsetListCount * sizeof (UINTN));
+  Walker             = NewPatchOffsetList;
+  for (Index = 0; Index < *PatchOffsetListCount; Index++) {
+    if (*((*PatchOffsetList)+Index) != MAX_UINTN &&
+        *((*PatchOffsetList)+Index) != LastPatchOffset) {
+      *Walker          = *((*PatchOffsetList)+Index);
+      LastPatchOffset  = *((*PatchOffsetList)+Index);
+      Walker           += 1;
+    }
+  }
+
+  FreePool (*PatchOffsetList);
+  *PatchOffsetList      = NewPatchOffsetList;
+  *PatchOffsetListCount = NewPatchOffsetListCount;
+}
+
+/**
+  Callback function, called after signaling of the Ready to Boot Event.
+  Measure microcode patches binary blob with event type EV_CPU_MICROCODE
+  to PCR[1] in TPM.
 
   @param[in] Event      Event whose notification function is being invoked.
   @param[in] Context    Pointer to the notification function's context.
@@ -82,13 +152,12 @@ MeasureMicrocodePatches (
   UINT32                                EventLogSize;
   EFI_HOB_GUID_TYPE                     *GuidHob;
   EDKII_MICROCODE_PATCH_HOB             *MicrocodePatchHob;
-  UINTN                                 SumOfAllPatchesSizeInMicrocodePatchHob;
+  UINTN                                 *PatchOffsetList;
+  UINTN                                 PatchOffsetListCount;
   UINT32                                Index;
-  MICROCODE_PATCH_TYPE                  *MicrocodePatchesList;
-  UINTN                                 LastPackedMicrocodeAddress;
+  UINTN                                 SumOfAllPatchesSizeAfterClean;
   UINT8                                 *MicrocodePatchesBlob;
   UINT64                                MicrocodePatchesBlobSize;
-
 
   PCRIndex  = 1;
   EventType = EV_CPU_MICROCODE;
@@ -100,16 +169,11 @@ MeasureMicrocodePatches (
   EventLog.NumberOfMicrocodePatchesMeasured = 0;
   EventLog.SizeOfMicrocodePatchesMeasured   = 0;
   EventLogSize                              = sizeof (CPU_MICROCODE_MEASUREMENT_EVENT_LOG);
-  SumOfAllPatchesSizeInMicrocodePatchHob    = 0;
-  LastPackedMicrocodeAddress                = 0;
+  PatchOffsetList                           = NULL;
+  PatchOffsetListCount                      = 0;
+  SumOfAllPatchesSizeAfterClean             = 0;
   MicrocodePatchesBlob                      = NULL;
   MicrocodePatchesBlobSize                  = 0;
-
-
-  if (TRUE == mMicrocodeMeasured) {
-    DEBUG((DEBUG_INFO, "INFO: mMicrocodeMeasured = TRUE, Skip.\n"));
-    return;
-  }
 
   GuidHob = GetFirstGuidHob (&gEdkiiMicrocodePatchHobGuid);
   if (NULL == GuidHob) {
@@ -117,84 +181,43 @@ MeasureMicrocodePatches (
     return;
   }
 
-  MicrocodePatchHob = GET_GUID_HOB_DATA (GuidHob);
-  DEBUG ((DEBUG_INFO, "INFO: Got MicrocodePatchHob with microcode patches starting address:0x%x, microcode patches region size:0x%x, Processor Count:0x%x\n", MicrocodePatchHob->MicrocodePatchAddress, MicrocodePatchHob->MicrocodePatchRegionSize, MicrocodePatchHob->ProcessorCount));
+  MicrocodePatchHob    = GET_GUID_HOB_DATA (GuidHob);
+  DEBUG ((DEBUG_INFO, "INFO: Got MicrocodePatchHob with microcode patches starting address:0x%x, microcode patches region size:0x%x, processor count:0x%x\n", MicrocodePatchHob->MicrocodePatchAddress, MicrocodePatchHob->MicrocodePatchRegionSize, MicrocodePatchHob->ProcessorCount));
 
-  //
-  // Extract all microcode patches to a list from MicrocodePatchHob
-  //
-  MicrocodePatchesList = AllocatePool (MicrocodePatchHob->ProcessorCount * sizeof (MICROCODE_PATCH_TYPE));
-  if (NULL == MicrocodePatchesList) {
-    DEBUG ((DEBUG_ERROR, "ERROR: AllocatePool to MicrocodePatchesList Failed!\n"));
-    return;
-  }
+  PatchOffsetList      = AllocatePool (MicrocodePatchHob->ProcessorCount * sizeof (UINTN));
   for (Index = 0; Index < MicrocodePatchHob->ProcessorCount; Index++) {
-    if (MAX_UINT64 == MicrocodePatchHob->ProcessorSpecificPatchOffset[Index]) {
-      //
-      // If no microcode patch was found in a slot, set the address of the microcode patch
-      // in that slot to MAX_UINTN, and the size to 0, thus indicates no patch in that slot.
-      //
-      MicrocodePatchesList[Index].Address = MAX_UINTN;
-      MicrocodePatchesList[Index].Size    = 0;
+    PatchOffsetList[Index] = (UINTN)(MicrocodePatchHob->ProcessorSpecificPatchOffset[Index]);
+  }
+  PatchOffsetListCount = MicrocodePatchHob->ProcessorCount;
 
-      DEBUG ((DEBUG_INFO, "INFO: Processor#%d: detected no microcode patch\n", Index));
-    } else {
-      MicrocodePatchesList[Index].Address     = (UINTN)(MicrocodePatchHob->MicrocodePatchAddress + MicrocodePatchHob->ProcessorSpecificPatchOffset[Index]);
-      MicrocodePatchesList[Index].Size        = ((CPU_MICROCODE_HEADER*)((UINTN)(MicrocodePatchHob->MicrocodePatchAddress + MicrocodePatchHob->ProcessorSpecificPatchOffset[Index])))->TotalSize;
-      SumOfAllPatchesSizeInMicrocodePatchHob  += MicrocodePatchesList[Index].Size;
+  RemoveDuplicateAndInvalidOffset (&PatchOffsetList, &PatchOffsetListCount);
 
-      DEBUG ((DEBUG_INFO, "INFO: Processor#%d: Microcode patch address: 0x%x, size: 0x%x\n", Index, MicrocodePatchesList[Index].Address, MicrocodePatchesList[Index].Size));
-    }
+  for (Index = 0; Index < PatchOffsetListCount; Index++) {
+    SumOfAllPatchesSizeAfterClean += GetMicrocodeLength ((CPU_MICROCODE_HEADER*)((UINTN)(MicrocodePatchHob->MicrocodePatchAddress + PatchOffsetList[Index])));
   }
 
-  //
-  // The order matters when pack all microcode patches to a binary blob. Therefore do
-  // Sorting before packing.
-  // NOTE: We assumed that the order of addresses of all unique microcode patch in RAM
-  // is the same with the order of those in the Microcode Firmware Volume. If any future
-  // updates made this assumption untenable, then please find a new solution to measure
-  // microcode patches.
-  //
-  PerformQuickSort (
-               MicrocodePatchesList,
-               MicrocodePatchHob->ProcessorCount,
-               sizeof (MICROCODE_PATCH_TYPE),
-               MicrocodePatchesListSortFunction
-               );
-  for (Index = 0; Index < MicrocodePatchHob->ProcessorCount; Index++) {
-    DEBUG ((DEBUG_INFO, "INFO: After sorting: Processor#%d: Microcode patch address: 0x%x, size: 0x%x\n", Index, MicrocodePatchesList[Index].Address, MicrocodePatchesList[Index].Size));
-  }
+  EventLog.NumberOfMicrocodePatchesMeasured = PatchOffsetListCount;
+  EventLog.SizeOfMicrocodePatchesMeasured   = SumOfAllPatchesSizeAfterClean;
 
-  MicrocodePatchesBlob = AllocateZeroPool (SumOfAllPatchesSizeInMicrocodePatchHob);
+  MicrocodePatchesBlob = AllocateZeroPool (SumOfAllPatchesSizeAfterClean);
   if (NULL == MicrocodePatchesBlob) {
-    DEBUG ((DEBUG_ERROR, "ERROR - AllocateZeroPool to MicrocodePatchesBlob failed!\n"));
-    FreePool (MicrocodePatchesList);
+    DEBUG ((DEBUG_ERROR, "ERROR: AllocateZeroPool to MicrocodePatchesBlob failed!\n"));
+    FreePool (PatchOffsetList);
     return;
   }
 
-  //
-  // LastPackedMicrocodeAddress is used to skip duplicate microcode patch here.
-  //
-  for (Index = 0; Index < MicrocodePatchHob->ProcessorCount; Index++) {
-    if (MicrocodePatchesList[Index].Address != LastPackedMicrocodeAddress &&
-        MicrocodePatchesList[Index].Address != MAX_UINTN) {
-
-      CopyMem (
-               (VOID *)(MicrocodePatchesBlob + MicrocodePatchesBlobSize),
-               (VOID *)(MicrocodePatchesList[Index].Address),
-               (UINTN)(MicrocodePatchesList[Index].Size)
-               );
-      MicrocodePatchesBlobSize                  += MicrocodePatchesList[Index].Size;
-      LastPackedMicrocodeAddress                = MicrocodePatchesList[Index].Address;
-      EventLog.NumberOfMicrocodePatchesMeasured += 1;
-      EventLog.SizeOfMicrocodePatchesMeasured   += MicrocodePatchesList[Index].Size;
-
-    }
+  for (Index = 0; Index < PatchOffsetListCount; Index++) {
+    CopyMem (
+             (VOID *)(MicrocodePatchesBlob + MicrocodePatchesBlobSize),
+             (VOID *)((UINTN)(MicrocodePatchHob->MicrocodePatchAddress + PatchOffsetList[Index])),
+             (UINTN)(GetMicrocodeLength ((CPU_MICROCODE_HEADER*)((UINTN)(MicrocodePatchHob->MicrocodePatchAddress + PatchOffsetList[Index]))))
+             );
+    MicrocodePatchesBlobSize += GetMicrocodeLength ((CPU_MICROCODE_HEADER*)((UINTN)(MicrocodePatchHob->MicrocodePatchAddress + PatchOffsetList[Index])));
   }
 
   if (0 == MicrocodePatchesBlobSize) {
-    DEBUG ((DEBUG_INFO, "INFO: No Microcode Patches Was Applied"));
-    FreePool (MicrocodePatchesList);
+    DEBUG ((DEBUG_INFO, "INFO: No microcode patch is ever applied, skip the measurement of microcode!\n"));
+    FreePool (PatchOffsetList);
     FreePool (MicrocodePatchesBlob);
     return;
   }
@@ -208,20 +231,20 @@ MeasureMicrocodePatches (
                MicrocodePatchesBlobSize   // HashDataLen
                );
   if (!EFI_ERROR (Status)) {
-    mMicrocodeMeasured = TRUE;
     gBS->CloseEvent (Event);
+    DEBUG ((DEBUG_INFO, "INFO: %d Microcode patches are successfully extended to TPM! The total size measured to TPM is 0x%x\n", PatchOffsetListCount, MicrocodePatchesBlobSize));
   } else {
-    FreePool (MicrocodePatchesList);
-    FreePool (MicrocodePatchesBlob);
-    DEBUG ((DEBUG_ERROR, "ERROR - TpmMeasureAndLogData failed with %a!\n", Status));
+    DEBUG ((DEBUG_ERROR, "ERROR: TpmMeasureAndLogData failed with status %a!\n", Status));
   }
 
+  FreePool (PatchOffsetList);
+  FreePool (MicrocodePatchesBlob);
   return;
 }
 
 /**
 
-  Driver to produce Microcode measurement.
+  Driver to produce microcode measurement.
 
   @param ImageHandle     Module's image handle
   @param SystemTable     Pointer of EFI_SYSTEM_TABLE
