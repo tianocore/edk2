@@ -1,9 +1,9 @@
 /** @file
-*
-* Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
-*
-*  SPDX-License-Identifier: BSD-2-Clause-Patent
-*
+
+  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
 #ifndef __UEFI_PAYLOAD_ENTRY_H__
@@ -27,7 +27,6 @@
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
 #include <Guid/SerialPortInfoGuid.h>
-#include <Guid/SystemTableInfoGuid.h>
 #include <Guid/MemoryMapInfoGuid.h>
 #include <Guid/AcpiBoardInfoGuid.h>
 #include <Guid/GraphicsInfoHob.h>
@@ -35,6 +34,7 @@
 #include <UniversalPayload/AcpiTable.h>
 #include <UniversalPayload/UniversalPayload.h>
 #include <UniversalPayload/ExtraData.h>
+#include <UniversalPayload/SerialPortInfo.h>
 #include <Guid/PcdDataBaseSignatureGuid.h>
 
 #define LEGACY_8259_MASK_REGISTER_MASTER  0x21
@@ -204,4 +204,17 @@ FvFindFileByTypeGuid (
   IN  EFI_GUID                    *Guid           OPTIONAL,
   OUT EFI_FFS_FILE_HEADER         **FileHeader
   );
+
+/**
+  Build ACPI board info HOB using infomation from ACPI table
+
+  @param  AcpiTableBase      ACPI table start address in memory
+
+  @retval  A pointer to ACPI board HOB ACPI_BOARD_INFO. Null if build HOB failure.
+**/
+ACPI_BOARD_INFO *
+BuildHobFromAcpi (
+  IN   UINT64                           AcpiTableBase
+  );
+
 #endif

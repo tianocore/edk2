@@ -338,8 +338,17 @@
   # The size of this header is used early boot, and is provided through
   # a fixed PCD. It need to be kept in sync with any changes to the
   # header definition.
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader|0|UINT32|0x51
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader|4|UINT32|0x51
 
+  ## The base address and size of the TDX Cfv base and size.
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase|0|UINT32|0x52
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataOffset|0|UINT32|0x53
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize|0|UINT32|0x54
+
+  ## The base address and size of the TDX Bfv base and size.
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase|0|UINT32|0x55
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset|0|UINT32|0x56
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize|0|UINT32|0x57
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2

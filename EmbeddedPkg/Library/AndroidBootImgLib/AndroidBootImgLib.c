@@ -10,13 +10,15 @@
 #include <libfdt.h>
 #include <Library/AndroidBootImgLib.h>
 #include <Library/PrintLib.h>
+#include <Library/DevicePathLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 
 #include <Protocol/AndroidBootImg.h>
+#include <Protocol/LoadFile2.h>
 #include <Protocol/LoadedImage.h>
 
-#include <libfdt.h>
+#include <Guid/LinuxEfiInitrdMedia.h>
 
 #define FDT_ADDITIONAL_ENTRIES_SIZE 0x400
 
@@ -25,7 +27,15 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL                End;
 } MEMORY_DEVICE_PATH;
 
+typedef struct {
+  VENDOR_DEVICE_PATH                      VendorMediaNode;
+  EFI_DEVICE_PATH_PROTOCOL                EndNode;
+} RAMDISK_DEVICE_PATH;
+
 STATIC ANDROID_BOOTIMG_PROTOCOL                 *mAndroidBootImg;
+STATIC VOID                                     *mRamdiskData = NULL;
+STATIC UINTN                                    mRamdiskSize = 0;
+STATIC EFI_HANDLE                               mRamDiskLoadFileHandle = NULL;
 
 STATIC CONST MEMORY_DEVICE_PATH mMemoryDevicePathTemplate =
 {
@@ -46,6 +56,99 @@ STATIC CONST MEMORY_DEVICE_PATH mMemoryDevicePathTemplate =
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
     { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0 }
   } // End
+};
+
+STATIC CONST RAMDISK_DEVICE_PATH mRamdiskDevicePath =
+{
+  {
+    {
+      MEDIA_DEVICE_PATH,
+      MEDIA_VENDOR_DP,
+      { sizeof (VENDOR_DEVICE_PATH), 0 }
+    },
+    LINUX_EFI_INITRD_MEDIA_GUID
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0 }
+  }
+};
+
+/**
+  Causes the driver to load a specified file.
+
+  @param  This       Protocol instance pointer.
+  @param  FilePath   The device specific path of the file to load.
+  @param  BootPolicy Should always be FALSE.
+  @param  BufferSize On input the size of Buffer in bytes. On output with a return
+                     code of EFI_SUCCESS, the amount of data transferred to
+                     Buffer. On output with a return code of EFI_BUFFER_TOO_SMALL,
+                     the size of Buffer required to retrieve the requested file.
+  @param  Buffer     The memory buffer to transfer the file to. IF Buffer is NULL,
+                     then no the size of the requested file is returned in
+                     BufferSize.
+
+  @retval EFI_SUCCESS           The file was loaded.
+  @retval EFI_UNSUPPORTED       BootPolicy is TRUE.
+  @retval EFI_INVALID_PARAMETER FilePath is not a valid device path, or
+                                BufferSize is NULL.
+  @retval EFI_NO_MEDIA          No medium was present to load the file.
+  @retval EFI_DEVICE_ERROR      The file was not loaded due to a device error.
+  @retval EFI_NO_RESPONSE       The remote system did not respond.
+  @retval EFI_NOT_FOUND         The file was not found
+  @retval EFI_ABORTED           The file load process was manually canceled.
+  @retval EFI_BUFFER_TOO_SMALL  The BufferSize is too small to read the current
+                                directory entry. BufferSize has been updated with
+                                the size needed to complete the request.
+
+
+**/
+EFI_STATUS
+EFIAPI
+AndroidBootImgLoadFile2 (
+  IN EFI_LOAD_FILE2_PROTOCOL    *This,
+  IN EFI_DEVICE_PATH_PROTOCOL   *FilePath,
+  IN BOOLEAN                    BootPolicy,
+  IN OUT UINTN                  *BufferSize,
+  IN VOID                       *Buffer OPTIONAL
+  )
+
+{
+  // Verify if the valid parameters
+  if (This == NULL ||
+      BufferSize == NULL ||
+      FilePath == NULL ||
+      !IsDevicePathValid (FilePath, 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (BootPolicy) {
+    return EFI_UNSUPPORTED;
+  }
+
+  // Check if the given buffer size is big enough
+  // EFI_BUFFER_TOO_SMALL to allow caller to allocate a bigger buffer
+  if (mRamdiskSize == 0) {
+    return EFI_NOT_FOUND;
+  }
+  if (Buffer == NULL || *BufferSize < mRamdiskSize) {
+    *BufferSize = mRamdiskSize;
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  // Copy InitRd
+  CopyMem (Buffer, mRamdiskData, mRamdiskSize);
+  *BufferSize = mRamdiskSize;
+
+  return EFI_SUCCESS;
+}
+
+///
+/// Load File Protocol instance
+///
+STATIC EFI_LOAD_FILE2_PROTOCOL  mAndroidBootImgLoadFile2 = {
+  AndroidBootImgLoadFile2
 };
 
 EFI_STATUS
@@ -217,6 +320,60 @@ AndroidBootImgUpdateArgs (
 }
 
 EFI_STATUS
+AndroidBootImgInstallLoadFile2 (
+  IN  VOID                  *RamdiskData,
+  IN  UINTN                  RamdiskSize
+  )
+{
+  mRamDiskLoadFileHandle = NULL;
+  mRamdiskData = RamdiskData;
+  mRamdiskSize = RamdiskSize;
+  return gBS->InstallMultipleProtocolInterfaces (
+                &mRamDiskLoadFileHandle,
+                &gEfiLoadFile2ProtocolGuid,
+                &mAndroidBootImgLoadFile2,
+                &gEfiDevicePathProtocolGuid,
+                &mRamdiskDevicePath,
+                NULL
+                );
+}
+
+EFI_STATUS
+AndroidBootImgUninstallLoadFile2 (
+  VOID
+  )
+{
+  EFI_STATUS Status;
+
+  Status = EFI_SUCCESS;
+  mRamdiskData = NULL;
+  mRamdiskSize = 0;
+  if (mRamDiskLoadFileHandle != NULL) {
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+                    mRamDiskLoadFileHandle,
+                    &gEfiLoadFile2ProtocolGuid,
+                    &mAndroidBootImgLoadFile2,
+                    &gEfiDevicePathProtocolGuid,
+                    &mRamdiskDevicePath,
+                    NULL
+                    );
+    mRamDiskLoadFileHandle = NULL;
+  }
+  return Status;
+}
+
+BOOLEAN AndroidBootImgAcpiSupported (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  VOID       *AcpiTable;
+
+  Status = EfiGetSystemConfigurationTable (&gEfiAcpiTableGuid, &AcpiTable);
+  return !EFI_ERROR (Status);
+}
+
+EFI_STATUS
 AndroidBootImgLocateFdt (
   IN  VOID                  *BootImg,
   IN  VOID                 **FdtBase
@@ -327,23 +484,30 @@ AndroidBootImgUpdateFdt (
     goto Fdt_Exit;
   }
 
-  ChosenNode = AndroidBootImgGetChosenNode(UpdatedFdtBase);
-  if (!ChosenNode) {
-    goto Fdt_Exit;
-  }
+  if (FeaturePcdGet (PcdAndroidBootLoadFile2)) {
+    Status = AndroidBootImgInstallLoadFile2 (RamdiskData, RamdiskSize);
+    if (EFI_ERROR (Status)) {
+      goto Fdt_Exit;
+    }
+  } else {
+    ChosenNode = AndroidBootImgGetChosenNode(UpdatedFdtBase);
+    if (!ChosenNode) {
+      goto Fdt_Exit;
+    }
 
-  Status = AndroidBootImgSetProperty64 (UpdatedFdtBase, ChosenNode,
-                                        "linux,initrd-start",
-                                        (UINTN)RamdiskData);
-  if (EFI_ERROR (Status)) {
-    goto Fdt_Exit;
-  }
+    Status = AndroidBootImgSetProperty64 (UpdatedFdtBase, ChosenNode,
+                                          "linux,initrd-start",
+                                          (UINTN)RamdiskData);
+    if (EFI_ERROR (Status)) {
+      goto Fdt_Exit;
+    }
 
-  Status = AndroidBootImgSetProperty64 (UpdatedFdtBase, ChosenNode,
-                                        "linux,initrd-end",
-                                        (UINTN)RamdiskData + RamdiskSize);
-  if (EFI_ERROR (Status)) {
-    goto Fdt_Exit;
+    Status = AndroidBootImgSetProperty64 (UpdatedFdtBase, ChosenNode,
+                                          "linux,initrd-end",
+                                          (UINTN)RamdiskData + RamdiskSize);
+    if (EFI_ERROR (Status)) {
+      goto Fdt_Exit;
+    }
   }
 
   if (mAndroidBootImg->UpdateDtb) {
@@ -351,12 +515,13 @@ AndroidBootImgUpdateFdt (
     if (EFI_ERROR (Status)) {
       goto Fdt_Exit;
     }
-
-    Status = gBS->InstallConfigurationTable (
-                    &gFdtTableGuid,
-                    (VOID *)(UINTN)NewFdtBase
-                    );
+  } else {
+    NewFdtBase = UpdatedFdtBase;
   }
+  Status = gBS->InstallConfigurationTable (
+                  &gFdtTableGuid,
+                  (VOID *)(UINTN)NewFdtBase
+                  );
 
   if (!EFI_ERROR (Status)) {
     return EFI_SUCCESS;
@@ -384,10 +549,13 @@ AndroidBootImgBoot (
   UINTN                               RamdiskSize;
   IN  VOID                           *FdtBase;
 
+  NewKernelArg = NULL;
+  ImageHandle = NULL;
+
   Status = gBS->LocateProtocol (&gAndroidBootImgProtocolGuid, NULL,
                                 (VOID **) &mAndroidBootImg);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
 
   Status = AndroidBootImgGetKernelInfo (
@@ -396,19 +564,19 @@ AndroidBootImgBoot (
             &KernelSize
             );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
 
   NewKernelArg = AllocateZeroPool (ANDROID_BOOTIMG_KERNEL_ARGS_SIZE);
   if (NewKernelArg == NULL) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate memory\n"));
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
   }
 
   Status = AndroidBootImgUpdateArgs (Buffer, NewKernelArg);
   if (EFI_ERROR (Status)) {
-    FreePool (NewKernelArg);
-    return Status;
+    goto Exit;
   }
 
   Status = AndroidBootImgGetRamdiskInfo (
@@ -417,19 +585,24 @@ AndroidBootImgBoot (
             &RamdiskSize
             );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Exit;
   }
 
-  Status = AndroidBootImgLocateFdt (Buffer, &FdtBase);
-  if (EFI_ERROR (Status)) {
-    FreePool (NewKernelArg);
-    return Status;
-  }
+  if (AndroidBootImgAcpiSupported ()) {
+    Status = AndroidBootImgInstallLoadFile2 (RamdiskData, RamdiskSize);
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
+  } else {
+    Status = AndroidBootImgLocateFdt (Buffer, &FdtBase);
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
 
-  Status = AndroidBootImgUpdateFdt (Buffer, FdtBase, RamdiskData, RamdiskSize);
-  if (EFI_ERROR (Status)) {
-    FreePool (NewKernelArg);
-    return Status;
+    Status = AndroidBootImgUpdateFdt (Buffer, FdtBase, RamdiskData, RamdiskSize);
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
   }
 
   KernelDevicePath = mMemoryDevicePathTemplate;
@@ -442,21 +615,15 @@ AndroidBootImgBoot (
                            (EFI_DEVICE_PATH *)&KernelDevicePath,
                            (VOID*)(UINTN)Kernel, KernelSize, &ImageHandle);
   if (EFI_ERROR (Status)) {
-    //
-    // With EFI_SECURITY_VIOLATION retval, the Image was loaded and an ImageHandle was created
-    // with a valid EFI_LOADED_IMAGE_PROTOCOL, but the image can not be started right now.
-    // If the caller doesn't have the option to defer the execution of an image, we should
-    // unload image for the EFI_SECURITY_VIOLATION to avoid resource leak.
-    //
-    if (Status == EFI_SECURITY_VIOLATION) {
-      gBS->UnloadImage (ImageHandle);
-    }
-    return Status;
+    goto Exit;
   }
 
   // Set kernel arguments
   Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid,
                                 (VOID **) &ImageInfo);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
   ImageInfo->LoadOptions = NewKernelArg;
   ImageInfo->LoadOptionsSize = StrLen (NewKernelArg) * sizeof (CHAR16);
 
@@ -466,5 +633,19 @@ AndroidBootImgBoot (
   Status = gBS->StartImage (ImageHandle, NULL, NULL);
   // Clear the Watchdog Timer if the image returns
   gBS->SetWatchdogTimer (0, 0x10000, 0, NULL);
-  return EFI_SUCCESS;
+
+Exit:
+  //Unload image as it will not be used anymore
+  if (ImageHandle != NULL) {
+    gBS->UnloadImage (ImageHandle);
+    ImageHandle = NULL;
+  }
+  if (EFI_ERROR (Status)) {
+    if (NewKernelArg != NULL) {
+      FreePool (NewKernelArg);
+      NewKernelArg = NULL;
+    }
+  }
+  AndroidBootImgUninstallLoadFile2 ();
+  return Status;
 }

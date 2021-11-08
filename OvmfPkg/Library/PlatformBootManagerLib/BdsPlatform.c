@@ -8,6 +8,7 @@
 
 #include "BdsPlatform.h"
 #include <Guid/RootBridgesConnectedEventGroup.h>
+#include <Guid/SerialPortLibVendor.h>
 #include <Protocol/FirmwareVolume2.h>
 #include <Library/PlatformBmPrintScLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
@@ -387,8 +388,19 @@ PlatformBootManagerBeforeConsole (
     SaveS3BootScript ();
   }
 
+  // We need to connect all trusted consoles for TCG PP. Here we treat all
+  // consoles in OVMF to be trusted consoles.
+  PlatformInitializeConsole (
+    XenDetected() ? gXenPlatformConsole : gPlatformConsole);
+
+  //
+  // Process TPM PPI request; this may require keyboard input
+  //
+  Tcg2PhysicalPresenceLibProcessRequest (NULL);
+
   //
   // Prevent further changes to LockBoxes or SMRAM.
+  // Any TPM 2 Physical Presence Interface opcode must be handled before.
   //
   Handle = NULL;
   Status = gBS->InstallProtocolInterface (&Handle,
@@ -401,9 +413,6 @@ PlatformBootManagerBeforeConsole (
   // installation.
   //
   EfiBootManagerDispatchDeferredImages ();
-
-  PlatformInitializeConsole (
-    XenDetected() ? gXenPlatformConsole : gPlatformConsole);
 
   FrontPageTimeout = GetFrontPageTimeoutFromQemu ();
   PcdStatus = PcdSet16S (PcdPlatformBootTimeOut, FrontPageTimeout);
@@ -659,6 +668,43 @@ PrepareLpcBridgeDevicePath (
   EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
 
   return EFI_SUCCESS;
+}
+
+typedef struct {
+  VENDOR_DEVICE_PATH        Guid;
+  EFI_DEVICE_PATH_PROTOCOL  End;
+} SERIAL_DEVICE_PATH;
+
+SERIAL_DEVICE_PATH serialDevicePath = {
+  {
+    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, { sizeof (VENDOR_DEVICE_PATH), 0} },
+    EDKII_SERIAL_PORT_LIB_VENDOR_GUID
+  },
+  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0 } }
+};
+
+VOID
+PrepareMicrovmDevicePath (
+  VOID
+  )
+{
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  UINT16                    HostBridgeDevId;
+
+  HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
+  if (HostBridgeDevId != MICROVM_PSEUDO_DEVICE_ID) {
+    return;
+  }
+
+  DevicePath = (EFI_DEVICE_PATH_PROTOCOL*)&serialDevicePath;
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
+
+  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
 }
 
 EFI_STATUS
@@ -1021,6 +1067,8 @@ PlatformInitializeConsole (
   //
   VisitAllPciInstances (DetectAndPreparePlatformPciDevicePath);
 
+  PrepareMicrovmDevicePath ();
+
   //
   // Have chance to connect the platform default console,
   // the platform default console is the minimum device group
@@ -1233,6 +1281,8 @@ PciAcpiInitialization (
       PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x6a), PciHostIrqs[2]); // G
       PciWrite8 (PCI_LIB_ADDRESS (0, 0x1f, 0, 0x6b), PciHostIrqs[3]); // H
       break;
+    case MICROVM_PSEUDO_DEVICE_ID:
+      return;
     default:
       if (XenDetected ()) {
         //
@@ -1510,11 +1560,6 @@ PlatformBootManagerAfterConsole (
   // Set PCI Interrupt Line registers and ACPI SCI_EN
   //
   PciAcpiInitialization ();
-
-  //
-  // Process TPM PPI request
-  //
-  Tcg2PhysicalPresenceLibProcessRequest (NULL);
 
   //
   // Process QEMU's -kernel command line option

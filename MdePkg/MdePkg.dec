@@ -991,6 +991,9 @@
   ## Include/Ppi/MmConfiguration.h
   gEfiPeiMmConfigurationPpi       =  { 0xc109319, 0xc149, 0x450e, { 0xa3, 0xe3, 0xb9, 0xba, 0xdd, 0x9d, 0xc3, 0xa4 } }
 
+  ## Include/Ppi/MmCommunication.h
+  gEfiPeiMmCommunicationPpiGuid   =  { 0xae933e1c, 0xcc47, 0x4e38, { 0x8f, 0xe, 0xe2, 0xf6, 0x1d, 0x26, 0x5, 0xdf } }
+
   #
   # PPIs defined in PI 1.7.
   #
@@ -2301,6 +2304,18 @@
   ## This value is used to set the base address of PCI express hierarchy.
   # @Prompt PCI Express Base Address.
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000|UINT64|0x0000000a
+
+  ## This value is used to set the base address of PCI MMIO window that provides I/O access.
+  # @Prompt PCI I/O Memory Map Window Base Address.
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0|UINT64|0x00000040
+
+  ## This value is used for the 32-bit PCI memory map I/O base address translation.
+  # @Prompt 32-bit PCI Memory Map I/O Base Address translation.
+  gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation|0x0|UINT64|0x00000041
+
+  ## This value is used for the 64-bit PCI memory map I/O base address translation.
+  # @Prompt 64-bit PCI Memory Map I/O Base Address translation.
+  gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation|0x0|UINT64|0x00000042
 
   ## This value is used to set the size of PCI express hierarchy. The default is 256 MB.
   # @Prompt PCI Express Base Size.

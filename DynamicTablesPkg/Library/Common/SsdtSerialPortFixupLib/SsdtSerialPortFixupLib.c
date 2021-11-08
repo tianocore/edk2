@@ -16,15 +16,14 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/AcpiTable.h>
 
 // Module specific include files.
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <Library/AcpiHelperLib.h>
 #include <Library/AmlLib/AmlLib.h>
-#include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 /** C array containing the compiled AML template.
@@ -275,7 +274,7 @@ FixupCrs (
   }
 
   // Get the first Rd node in the "_CRS" object.
-  Status = AmlNameOpCrsGetFirstRdNode (NameOpCrsNode, &QWordRdNode);
+  Status = AmlNameOpGetFirstRdNode (NameOpCrsNode, &QWordRdNode);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -298,7 +297,7 @@ FixupCrs (
   // Get the Interrupt node.
   // It is the second Resource Data element in the NameOpCrsNode's
   // variable list of arguments.
-  Status = AmlNameOpCrsGetNextRdNode (QWordRdNode, &InterruptRdNode);
+  Status = AmlNameOpGetNextRdNode (QWordRdNode, &InterruptRdNode);
   if (EFI_ERROR (Status)) {
     return Status;
   }

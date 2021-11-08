@@ -168,31 +168,6 @@ BuildResourceDescriptorHob (
   Hob->ResourceLength    = NumberOfBytes;
 }
 
-VOID
-EFIAPI
-BuildFvHobs (
-  IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
-  IN UINT64                       NumberOfBytes,
-  IN EFI_RESOURCE_ATTRIBUTE_TYPE  *ResourceAttribute
-  )
-{
-
-  EFI_RESOURCE_ATTRIBUTE_TYPE Resource;
-
-  BuildFvHob (PhysicalStart, NumberOfBytes);
-
-  if (ResourceAttribute == NULL) {
-    Resource = (EFI_RESOURCE_ATTRIBUTE_PRESENT    |
-                EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-                EFI_RESOURCE_ATTRIBUTE_TESTED |
-                EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE);
-  } else {
-    Resource = *ResourceAttribute;
-  }
-
-  BuildResourceDescriptorHob (EFI_RESOURCE_FIRMWARE_DEVICE, Resource, PhysicalStart, NumberOfBytes);
-}
-
 /**
   Returns the next instance of a HOB type from the starting HOB.
 
@@ -283,7 +258,8 @@ EFIAPI
 GetNextGuidHob (
   IN CONST EFI_GUID         *Guid,
   IN CONST VOID             *HobStart
-  ){
+  )
+{
   EFI_PEI_HOB_POINTERS  GuidHob;
 
   GuidHob.Raw = (UINT8 *) HobStart;

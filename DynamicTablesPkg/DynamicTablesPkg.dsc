@@ -35,9 +35,11 @@
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
   PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
 
 [Components.common]
+  DynamicTablesPkg/Library/Common/AcpiHelperLib/AcpiHelperLib.inf
   DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
   DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
@@ -50,4 +52,3 @@
   # Inhibit C6305: Potential mismatch between sizeof and countof quantities.
   *_VS2017_*_CC_FLAGS = /wd6305 /analyze
 !endif
-

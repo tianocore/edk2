@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef __MEMORY_MAP_INFO_GUID_H__
-#define __MEMORY_MAP_INFO_GUID_H__
+#ifndef MEMORY_MAP_INFO_GUID_H_
+#define MEMORY_MAP_INFO_GUID_H_
 
 #include <Library/PcdLib.h>
 
@@ -23,14 +23,14 @@ typedef struct {
   UINT8  Type;
   UINT8  Flag;
   UINT8  Reserved[6];
-} MEMROY_MAP_ENTRY;
+} MEMORY_MAP_ENTRY;
 
 typedef struct {
   UINT8  Revision;
   UINT8  Reserved0[3];
   UINT32 Count;
-  MEMROY_MAP_ENTRY  Entry[0];
-} MEMROY_MAP_INFO;
+  MEMORY_MAP_ENTRY  Entry[0];
+} MEMORY_MAP_INFO;
 #pragma pack()
 
 #endif

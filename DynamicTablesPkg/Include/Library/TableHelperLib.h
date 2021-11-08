@@ -12,17 +12,7 @@
 #ifndef TABLE_HELPER_LIB_H_
 #define TABLE_HELPER_LIB_H_
 
-/** Is a character upper case
-*/
-#define IS_UPPER_CHAR(x) ((x >= 'A') && (x <= 'Z'))
-
-/** Is a character a decimal digit
-*/
-#define IS_DIGIT(x) ((x >= '0') && (x <= '9'))
-
-/** Is a character an upper case hexadecimal digit
-*/
-#define IS_UPPER_HEX(x) (((x >= 'A') && (x <= 'F')) || IS_DIGIT (x))
+#include <Library/AmlLib/AmlLib.h>
 
 /** The GetCgfMgrInfo function gets the CM_STD_OBJ_CONFIGURATION_MANAGER_INFO
     object from the Configuration Manager.
@@ -74,6 +64,39 @@ AddAcpiHeader (
   IN      CONST UINT32                                        Length
   );
 
+/** Build a RootNode containing SSDT ACPI header information using the AmlLib.
+
+  The function utilizes the ACPI table Generator and the Configuration
+  Manager protocol to obtain any information required for constructing the
+  header. It then creates a RootNode. The SSDT ACPI header is part of the
+  RootNode.
+
+  This is essentially a wrapper around AmlCodeGenDefinitionBlock ()
+  from the AmlLib.
+
+  @param [in]   CfgMgrProtocol Pointer to the Configuration Manager
+                               protocol interface.
+  @param [in]   Generator      Pointer to the ACPI table Generator.
+  @param [in]   AcpiTableInfo  Pointer to the ACPI table info structure.
+  @param [out]  RootNode       If success, contains the created RootNode.
+                               The SSDT ACPI header is part of the RootNode.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @retval EFI_NOT_FOUND         The required object information is not found.
+  @retval EFI_BAD_BUFFER_SIZE   The size returned by the Configuration
+                                Manager is less than the Object size for the
+                                requested object.
+**/
+EFI_STATUS
+EFIAPI
+AddSsdtAcpiHeader (
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
+  IN      CONST ACPI_TABLE_GENERATOR                  * CONST Generator,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
+      OUT       AML_ROOT_NODE_HANDLE                  *       RootNode
+  );
+
 /**
   Function prototype for testing if two arbitrary objects are equal.
 
@@ -119,41 +142,14 @@ FindDuplicateValue (
   IN        PFN_IS_EQUAL    EqualTestFunction
   );
 
-/** Convert a hex number to its ASCII code.
+/** Parse and print a CmObjDesc.
 
- @param [in]  x   Hex number to convert.
-                  Must be 0 <= x < 16.
-
- @return The ASCII code corresponding to x.
+  @param [in]  CmObjDesc  The CmObjDesc to parse and print.
 **/
-UINT8
+VOID
 EFIAPI
-AsciiFromHex (
-  IN  UINT8   x
-  );
-
-/** Check if a HID is a valid PNP ID.
-
-  @param     [in] Hid     The Hid to validate.
-
-  @retval    TRUE         The Hid is a valid PNP ID.
-  @retval    FALSE        The Hid is not a valid PNP ID.
-**/
-BOOLEAN
-IsValidPnpId (
-  IN  CONST CHAR8  * Hid
-  );
-
-/** Check if a HID is a valid ACPI ID.
-
-  @param     [in] Hid     The Hid to validate.
-
-  @retval    TRUE         The Hid is a valid ACPI ID.
-  @retval    FALSE        The Hid is not a valid ACPI ID.
-**/
-BOOLEAN
-IsValidAcpiId (
-  IN  CONST CHAR8  * Hid
+ParseCmObjDesc (
+  IN  CONST CM_OBJ_DESCRIPTOR * CmObjDesc
   );
 
 #endif // TABLE_HELPER_LIB_H_

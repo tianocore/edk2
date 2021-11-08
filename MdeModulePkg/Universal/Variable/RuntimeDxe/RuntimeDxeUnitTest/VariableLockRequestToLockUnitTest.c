@@ -287,7 +287,7 @@ LockingAnUnlockedVariableShouldFail (
   // With a policy, make sure that writes still work, since the variable doesn't exist.
   will_return( StubGetVariableNull, TEST_POLICY_ATTRIBUTES_NULL );    // Attributes
   will_return( StubGetVariableNull, 0 );                              // Size
-  will_return( StubGetVariableNull, NULL );                           // DataPtr
+  will_return( StubGetVariableNull, (UINTN)NULL );                    // DataPtr
   will_return( StubGetVariableNull, EFI_NOT_FOUND);                   // Status
 
   Status = VariableLockRequestToLock (NULL, TEST_VAR_1_NAME, &mTestGuid1);
@@ -342,7 +342,7 @@ LockingALockedVariableWithMatchingDataShouldSucceed (
   Data = 1;
   will_return( StubGetVariableNull, TEST_POLICY_ATTRIBUTES_NULL );    // Attributes
   will_return( StubGetVariableNull, sizeof (Data) );                  // Size
-  will_return( StubGetVariableNull, &Data );                          // DataPtr
+  will_return( StubGetVariableNull, (UINTN)&Data );                   // DataPtr
   will_return( StubGetVariableNull, EFI_SUCCESS);                     // Status
 
   Status = VariableLockRequestToLock (NULL, TEST_VAR_1_NAME, &mTestGuid1);
@@ -397,7 +397,7 @@ LockingALockedVariableWithNonMatchingDataShouldFail (
   Data = 2;
   will_return( StubGetVariableNull, TEST_POLICY_ATTRIBUTES_NULL );    // Attributes
   will_return( StubGetVariableNull, sizeof (Data) );                  // Size
-  will_return( StubGetVariableNull, &Data );                          // DataPtr
+  will_return( StubGetVariableNull, (UINTN)&Data );                   // DataPtr
   will_return( StubGetVariableNull, EFI_SUCCESS);                     // Status
 
   Status = VariableLockRequestToLock (NULL, TEST_VAR_1_NAME, &mTestGuid1);

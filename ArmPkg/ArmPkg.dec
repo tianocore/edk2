@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
 # Copyright (c) 2011 - 2021, ARM Limited. All rights reserved.
+# Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -337,9 +338,9 @@
   #   UINT64 Mmio32CpuBase; // mapping target in 64-bit cpu-physical space
   #   UINT64 Mmio64CpuBase; // mapping target in 64-bit cpu-physical space
   #
-  #   PcdPciIoTranslation     = IoCpuBase     - PcdPciIoBase;
-  #   PcdPciMmio32Translation = Mmio32CpuBase - (UINT64)PcdPciMmio32Base;
-  #   PcdPciMmio64Translation = Mmio64CpuBase - PcdPciMmio64Base;
+  #   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation = IoCpuBase - PcdPciIoBase;
+  #   gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation = Mmio32CpuBase - (UINT64)PcdPciMmio32Base;
+  #   gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation = Mmio64CpuBase - PcdPciMmio64Base;
   #
   # because (a) the target address space (ie. the cpu-physical space) is
   # 64-bit, and (b) the translation values are meant as offsets for *modular*
@@ -356,11 +357,11 @@
   #   UINT64 TranslatedMmio64Address;   // output parameter
   #
   #   TranslatedIoAddress     = UntranslatedIoAddress +
-  #                             PcdPciIoTranslation;
+  #                             gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation;
   #   TranslatedMmio32Address = (UINT64)UntranslatedMmio32Address +
-  #                             PcdPciMmio32Translation;
+  #                             gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation;
   #   TranslatedMmio64Address = UntranslatedMmio64Address +
-  #                             PcdPciMmio64Translation;
+  #                             gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation;
   #
   #  The modular arithmetic performed in UINT64 ensures that the translation
   #  works correctly regardless of the relation between IoCpuBase and
@@ -369,16 +370,20 @@
   #
   gArmTokenSpaceGuid.PcdPciIoBase|0x0|UINT64|0x00000050
   gArmTokenSpaceGuid.PcdPciIoSize|0x0|UINT64|0x00000051
-  gArmTokenSpaceGuid.PcdPciIoTranslation|0x0|UINT64|0x00000052
   gArmTokenSpaceGuid.PcdPciMmio32Base|0x0|UINT32|0x00000053
   gArmTokenSpaceGuid.PcdPciMmio32Size|0x0|UINT32|0x00000054
-  gArmTokenSpaceGuid.PcdPciMmio32Translation|0x0|UINT64|0x00000055
   gArmTokenSpaceGuid.PcdPciMmio64Base|0x0|UINT64|0x00000056
   gArmTokenSpaceGuid.PcdPciMmio64Size|0x0|UINT64|0x00000057
-  gArmTokenSpaceGuid.PcdPciMmio64Translation|0x0|UINT64|0x00000058
 
   #
   # Inclusive range of allowed PCI buses.
   #
   gArmTokenSpaceGuid.PcdPciBusMin|0x0|UINT32|0x00000059
   gArmTokenSpaceGuid.PcdPciBusMax|0x0|UINT32|0x0000005A
+
+[PcdsDynamicEx]
+  #
+  # This dynamic PCD hold the GUID of a firmware FFS which contains
+  # the LinuxBoot payload.
+  #
+  gArmTokenSpaceGuid.PcdLinuxBootFileGuid|{0x0}|VOID*|0x0000005C

@@ -2,7 +2,7 @@
   AML grammar definitions.
 
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
-  Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -802,4 +802,89 @@ AmlComputePkgLengthWidth (
 
   // Length < 2^6
   return 1;
+}
+
+/** Given a length, compute the value of a PkgLen.
+
+  In AML, some object have a PkgLen, telling the size of the AML object.
+  It can be encoded in 1 to 4 bytes. The bytes used to encode the PkgLen is
+  itself counted in the PkgLen value.
+  This means that if an AML object sees its size increment/decrement,
+  the number of bytes used to encode the PkgLen value can itself
+  increment/decrement.
+
+  For instance, the AML encoding of a DeviceOp is:
+    DefDevice := DeviceOp PkgLength NameString TermList
+  If:
+   - sizeof (NameString) = 4 (the name is "DEV0" for instance);
+   - sizeof (TermList) = (2^6-6)
+  then the PkgLen is encoded on 1 byte. Indeed, its value is:
+    sizeof (PkgLen) + sizeof (NameString) + sizeof (TermList) =
+    sizeof (PkgLen) + 4 + (2^6-6)
+  So:
+    PkgLen = sizeof (PkgLen) + (2^6-2)
+
+  The input arguments Length and PkgLen represent, for the DefDevice:
+    DefDevice := DeviceOp PkgLength NameString TermList
+                                    |------Length-----|
+                          |--------*PgkLength---------|
+
+  @param  [in]  Length  The length to encode as a PkgLen.
+                        Length cannot exceed 2^28 - 4 (4 bytes for the
+                        PkgLen encoding).
+                        The size of the PkgLen encoding bytes should not be
+                        counted in this length value.
+  @param  [out] PkgLen  If success, contains the value of the PkgLen,
+                        ready to encode in the PkgLen format.
+                        This value takes into account the size of PkgLen
+                        encoding.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlComputePkgLength (
+  IN  UINT32    Length,
+  OUT UINT32  * PkgLen
+  )
+{
+  UINT32  PkgLenWidth;
+  UINT32  ReComputedPkgLenWidth;
+
+  if (PkgLen == NULL) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Compute the PkgLenWidth.
+  PkgLenWidth = AmlComputePkgLengthWidth (Length);
+  if (PkgLenWidth == 0) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Add it to the Length.
+  Length += PkgLenWidth;
+
+  // Check that adding the PkgLenWidth didn't trigger a domino effect,
+  // increasing the encoding width of the PkgLen again.
+  // The PkgLen is encoded in at most 4 bytes. It is possible to increase
+  // the PkgLen width if its encoding is less than 3 bytes.
+  ReComputedPkgLenWidth = AmlComputePkgLengthWidth (Length);
+  if (ReComputedPkgLenWidth != PkgLenWidth) {
+    if ((ReComputedPkgLenWidth != 0)   &&
+        (ReComputedPkgLenWidth < 4)) {
+      // No need to recompute the PkgLen since a new threshold cannot
+      // be reached by incrementing the value by one.
+      Length += 1;
+    } else {
+      ASSERT (0);
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  *PkgLen = Length;
+
+  return EFI_SUCCESS;
 }

@@ -1,0 +1,49 @@
+## @file
+#  Bootloader Support SMM module
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BlSupportSmm
+  FILE_GUID                      = AA292DE7-E11E-42E6-846B-5813A5A8D982
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = BlSupportSmm
+
+[Sources]
+  BlSupportSmm.c
+  BlSupportSmm.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  SmmServicesTableLib
+  MemoryAllocationLib
+  BaseLib
+  IoLib
+  HobLib
+
+[Guids]
+  gS3CommunicationGuid
+  gEfiSmmSmramMemoryGuid
+  gSmmRegisterInfoGuid
+
+[Protocols]
+  gEfiSmmSwDispatch2ProtocolGuid
+  gEfiMpServiceProtocolGuid
+  gEfiSmmReadyToLockProtocolGuid
+
+[Depex]
+  gEfiSmmSwDispatch2ProtocolGuid

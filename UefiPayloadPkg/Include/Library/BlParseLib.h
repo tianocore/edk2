@@ -2,25 +2,25 @@
   This library will parse the coreboot table in memory and extract those required
   information.
 
-  Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#ifndef BOOTLOADER_PARSE_LIB_
+#define BOOTLOADER_PARSE_LIB_
+
 #include <PiPei.h>
 #include <Guid/GraphicsInfoHob.h>
 #include <Guid/MemoryMapInfoGuid.h>
 #include <Guid/SerialPortInfoGuid.h>
-#include <Guid/SystemTableInfoGuid.h>
 #include <Guid/AcpiBoardInfoGuid.h>
+#include <UniversalPayload/AcpiTable.h>
+#include <UniversalPayload/SmbiosTable.h>
 
-#ifndef __BOOTLOADER_PARSE_LIB__
-#define __BOOTLOADER_PARSE_LIB__
-
-#define GET_BOOTLOADER_PARAMETER()      (*(UINTN *)(UINTN)(PcdGet32(PcdPayloadStackTop) - sizeof(UINT64)))
-#define SET_BOOTLOADER_PARAMETER(Value) GET_BOOTLOADER_PARAMETER()=Value
+#define GET_BOOTLOADER_PARAMETER()      PcdGet64 (PcdBootloaderParameter)
 
 typedef RETURN_STATUS \
-        (*BL_MEM_INFO_CALLBACK) (MEMROY_MAP_ENTRY *MemoryMapEntry, VOID *Param);
+        (*BL_MEM_INFO_CALLBACK) (MEMORY_MAP_ENTRY *MemoryMapEntry, VOID *Param);
 
 /**
   This function retrieves the parameter base address from boot loader.
@@ -56,9 +56,9 @@ ParseMemoryInfo (
   );
 
 /**
-  Acquire acpi table and smbios table from slim bootloader
+  Acquire SMBIOS table from bootloader.
 
-  @param  SystemTableInfo           Pointer to the system table info
+  @param  SmbiosTable           Pointer to the system table info
 
   @retval RETURN_SUCCESS            Successfully find out the tables.
   @retval RETURN_NOT_FOUND          Failed to find the tables.
@@ -66,15 +66,29 @@ ParseMemoryInfo (
 **/
 RETURN_STATUS
 EFIAPI
-ParseSystemTable (
-  OUT SYSTEM_TABLE_INFO     *SystemTableInfo
+ParseSmbiosTable (
+  OUT UNIVERSAL_PAYLOAD_SMBIOS_TABLE     *SmbiosTable
   );
 
+/**
+  Acquire ACPI table from bootloader.
+
+  @param  AcpiTableHob              Pointer to the ACPI table info.
+
+  @retval RETURN_SUCCESS            Successfully find out the tables.
+  @retval RETURN_NOT_FOUND          Failed to find the tables.
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseAcpiTableInfo (
+  OUT UNIVERSAL_PAYLOAD_ACPI_TABLE        *AcpiTableHob
+  );
 
 /**
   Find the serial port information
 
-  @param  SERIAL_PORT_INFO   Pointer to serial port info structure
+  @param  SerialPortInfo     Pointer to serial port info structure
 
   @retval RETURN_SUCCESS     Successfully find the serial port information.
   @retval RETURN_NOT_FOUND   Failed to find the serial port information .
@@ -115,6 +129,20 @@ RETURN_STATUS
 EFIAPI
 ParseGfxDeviceInfo (
   OUT EFI_PEI_GRAPHICS_DEVICE_INFO_HOB       *GfxDeviceInfo
+  );
+
+/**
+  Parse and handle the misc info provided by bootloader
+
+  @retval RETURN_SUCCESS           The misc information was parsed successfully.
+  @retval RETURN_NOT_FOUND         Could not find required misc info.
+  @retval RETURN_OUT_OF_RESOURCES  Insufficant memory space.
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseMiscInfo (
+  VOID
   );
 
 #endif

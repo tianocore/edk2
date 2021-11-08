@@ -25,19 +25,18 @@
   UefiPayloadEntry.c
   LoadDxeCore.c
   MemoryAllocation.c
+  AcpiTable.c
 
 [Sources.Ia32]
   X64/VirtualMemory.h
   X64/VirtualMemory.c
   Ia32/DxeLoadFunc.c
   Ia32/IdtVectorAsm.nasm
-  Ia32/SecEntry.nasm
 
 [Sources.X64]
   X64/VirtualMemory.h
   X64/VirtualMemory.c
   X64/DxeLoadFunc.c
-  X64/SecEntry.nasm
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -60,12 +59,12 @@
 [Guids]
   gEfiMemoryTypeInformationGuid
   gEfiFirmwareFileSystem2Guid
-  gUefiSystemTableInfoGuid
   gEfiGraphicsInfoHobGuid
   gEfiGraphicsDeviceInfoHobGuid
   gUefiAcpiBoardInfoGuid
   gUniversalPayloadSmbiosTableGuid
   gUniversalPayloadAcpiTableGuid
+  gUniversalPayloadSerialPortInfoGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
@@ -86,7 +85,7 @@
 
   gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemBase
   gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
-  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadStackTop
+  gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter
   gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES

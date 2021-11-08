@@ -1,11 +1,11 @@
 /** @file
   PCCT table parser
 
-  Copyright (c) 2020, Arm Limited.
+  Copyright (c) 2021, Arm Limited.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-    - ACPI 6.3 Specification - January 2019
+    - ACPI 6.4 Specification - January 2021
 **/
 
 #include <Library/BaseMemoryLib.h>
@@ -77,7 +77,7 @@ ValidateRangeLength8 (
 }
 
 /**
-  This function validates address space for type 0 structure.
+  This function validates address space for Memory/IO GAS.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
@@ -86,16 +86,16 @@ ValidateRangeLength8 (
 STATIC
 VOID
 EFIAPI
-ValidatePccType0Gas (
+ValidatePccMemoryIoGas (
   IN UINT8* Ptr,
   IN VOID*  Context
   )
 {
   switch (*(UINT8*)Ptr) {
 #if !(defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
-    case EFI_ACPI_6_3_SYSTEM_IO:
+    case EFI_ACPI_6_4_SYSTEM_IO:
 #endif //if not (defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
-    case EFI_ACPI_6_3_SYSTEM_MEMORY:
+    case EFI_ACPI_6_4_SYSTEM_MEMORY:
       return;
     default:
       IncrementErrorCount ();
@@ -120,10 +120,10 @@ ValidatePccGas (
 {
   switch (*(UINT8*)Ptr) {
 #if !(defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
-    case EFI_ACPI_6_3_SYSTEM_IO:
+    case EFI_ACPI_6_4_SYSTEM_IO:
 #endif //if not (defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
-    case EFI_ACPI_6_3_FUNCTIONAL_FIXED_HARDWARE:
-    case EFI_ACPI_6_3_SYSTEM_MEMORY:
+    case EFI_ACPI_6_4_FUNCTIONAL_FIXED_HARDWARE:
+    case EFI_ACPI_6_4_SYSTEM_MEMORY:
       return;
     default:
       IncrementErrorCount ();
@@ -148,10 +148,10 @@ ValidatePccDoorbellGas (
 {
   // For slave subspaces this field is optional, if not present the field
   // should just contain zeros.
-  if (*PccSubspaceType == EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) {
+  if (*PccSubspaceType == EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) {
     if (IsZeroBuffer (
           Ptr,
-          sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE)
+          sizeof (EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE)
           )) {
       return;
     }
@@ -180,14 +180,14 @@ ValidatePccIntAckGas (
   // edge driven the register may be omitted. A value of 0x0 on all
   // 12 bytes of the GAS structure indicates the register is not
   // present.
-  if (((*PccGlobalFlags & EFI_ACPI_6_3_PCCT_FLAGS_PLATFORM_INTERRUPT) !=
-       EFI_ACPI_6_3_PCCT_FLAGS_PLATFORM_INTERRUPT) ||
+  if (((*PccGlobalFlags & EFI_ACPI_6_4_PCCT_FLAGS_PLATFORM_INTERRUPT) !=
+       EFI_ACPI_6_4_PCCT_FLAGS_PLATFORM_INTERRUPT) ||
       ((*ExtendedPccSubspaceInterruptFlags &
-       EFI_ACPI_6_3_PCCT_SUBSPACE_PLATFORM_INTERRUPT_FLAGS_MODE) ==
-       EFI_ACPI_6_3_PCCT_SUBSPACE_PLATFORM_INTERRUPT_FLAGS_MODE)) {
+       EFI_ACPI_6_4_PCCT_SUBSPACE_PLATFORM_INTERRUPT_FLAGS_MODE) ==
+       EFI_ACPI_6_4_PCCT_SUBSPACE_PLATFORM_INTERRUPT_FLAGS_MODE)) {
     if (IsZeroBuffer (
           Ptr,
-          sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE)
+          sizeof (EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE)
           )) {
       return;
     }
@@ -212,7 +212,7 @@ ValidatePccErrStatusGas (
   )
 {
   // This field is ignored by the OSPM on slave channels.
-  if (*PccSubspaceType == EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) {
+  if (*PccSubspaceType == EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) {
     return;
   }
 
@@ -236,9 +236,9 @@ ValidatePlatInterrupt (
 {
   // If a slave subspace is present in the PCCT, then the global Platform
   // Interrupt flag must be set to 1.
-  if ((*PccSubspaceType == EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) &&
-      ((*PccGlobalFlags & EFI_ACPI_6_3_PCCT_FLAGS_PLATFORM_INTERRUPT) !=
-        EFI_ACPI_6_3_PCCT_FLAGS_PLATFORM_INTERRUPT)) {
+  if ((*PccSubspaceType == EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC) &&
+      ((*PccGlobalFlags & EFI_ACPI_6_4_PCCT_FLAGS_PLATFORM_INTERRUPT) !=
+        EFI_ACPI_6_4_PCCT_FLAGS_PLATFORM_INTERRUPT)) {
     IncrementErrorCount ();
     Print (
       L"\nError: Global Platform interrupt flag must be set to 1" \
@@ -274,7 +274,7 @@ STATIC CONST ACPI_PARSER PccSubspaceType0Parser[] = {
   {L"Base Address", 8, 8, L"0x%lx", NULL, NULL, NULL, NULL},
   {L"Memory Range Length", 8, 16, L"0x%lx", NULL, NULL, ValidateRangeLength8,
     NULL},
-  {L"Doorbell Register", 12, 24, NULL, DumpGas, NULL, ValidatePccType0Gas,
+  {L"Doorbell Register", 12, 24, NULL, DumpGas, NULL, ValidatePccMemoryIoGas,
     NULL},
   {L"Doorbell Preserve", 8, 36, L"0x%lx", NULL, NULL, NULL, NULL},
   {L"Doorbell Write", 8, 44, L"0x%lx", NULL, NULL, NULL, NULL},
@@ -365,6 +365,29 @@ STATIC CONST ACPI_PARSER PccSubspaceType3Parser[] = {
   {L"Error Status Register", 12, 144, NULL, DumpGas, NULL,
     ValidatePccErrStatusGas, NULL},
   {L"Error Status Mask", 8, 156, L"0x%lx", NULL, NULL, NULL, NULL},
+};
+
+/**
+  An ACPI_PARSER array describing the HW Registers based Communications
+  Subspace Structure - Type 5
+*/
+STATIC CONST ACPI_PARSER PccSubspaceType5Parser[] = {
+  PCC_SUBSPACE_HEADER (),
+  {L"Version", 2, 2, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Base Address", 8, 4, L"0x%lx", NULL, NULL, NULL, NULL},
+  {L"Shared Memory Range Length", 8, 12, L"0x%lx", NULL, NULL, NULL, NULL},
+  {L"Doorbell Register", 12, 20, NULL, DumpGas, NULL,
+    ValidatePccMemoryIoGas, NULL},
+  {L"Doorbell Preserve", 8, 32, L"0x%lx", NULL, NULL, NULL, NULL},
+  {L"Doorbell Write", 8, 40, L"0x%lx", NULL, NULL, NULL, NULL},
+  {L"Command Complete Check Register", 12, 48, NULL, DumpGas, NULL,
+    ValidatePccMemoryIoGas, NULL},
+  {L"Command Complete Check Mask", 8, 60, L"0x%lx", NULL, NULL, NULL, NULL},
+  {L"Error Status Register", 12, 68, NULL, DumpGas, NULL,
+    ValidatePccMemoryIoGas, NULL},
+  {L"Error Status Mask", 8, 80, L"0x%lx", NULL, NULL, NULL, NULL},
+  {L"Nominal Latency", 4, 88, L"0x%x", NULL, NULL, NULL, NULL},
+  {L"Minimum Request Turnaround Time", 4, 92, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
 /**
@@ -483,6 +506,29 @@ DumpPccSubspaceType4 (
 }
 
 /**
+  This function parses the PCC Subspace type 5.
+
+  @param [in] Ptr     Pointer to the start of the Subspace Structure.
+  @param [in] Length  Length of the Subspace Structure.
+**/
+STATIC
+VOID
+DumpPccSubspaceType5 (
+  IN UINT8* Ptr,
+  IN UINT8  Length
+  )
+{
+  ParseAcpi (
+    TRUE,
+    2,
+    "Subspace Type 5",
+    Ptr,
+    Length,
+    PARSER_PARAMS (PccSubspaceType5Parser)
+    );
+}
+
+/**
   This function parses the ACPI PCCT table including its sub-structures
   of type 0 through 4.
   When trace is enabled this function parses the PCCT table and
@@ -563,32 +609,38 @@ ParseAcpiPcct (
     }
 
     switch (*PccSubspaceType) {
-      case EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_GENERIC:
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_GENERIC:
         DumpPccSubspaceType0 (
           PccSubspacePtr,
           *PccSubspaceLength
           );
         break;
-      case EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_1_HW_REDUCED_COMMUNICATIONS:
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_1_HW_REDUCED_COMMUNICATIONS:
         DumpPccSubspaceType1 (
           PccSubspacePtr,
           *PccSubspaceLength
           );
         break;
-      case EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_2_HW_REDUCED_COMMUNICATIONS:
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_2_HW_REDUCED_COMMUNICATIONS:
         DumpPccSubspaceType2 (
           PccSubspacePtr,
           *PccSubspaceLength
           );
         break;
-      case EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_3_EXTENDED_PCC:
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_3_EXTENDED_PCC:
         DumpPccSubspaceType3 (
           PccSubspacePtr,
           *PccSubspaceLength
           );
         break;
-      case EFI_ACPI_6_3_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC:
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC:
         DumpPccSubspaceType4 (
+          PccSubspacePtr,
+          *PccSubspaceLength
+          );
+        break;
+      case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_5_HW_REGISTERS_COMMUNICATIONS:
+        DumpPccSubspaceType5 (
           PccSubspacePtr,
           *PccSubspaceLength
           );

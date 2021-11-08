@@ -440,6 +440,12 @@ F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
 R: Rebecca Cran <rebecca@bsdio.com> [bcran]
 R: Peter Grehan <grehan@freebsd.org> [grehan-freebsd]
 
+OvmfPkg: microvm-related modules
+F: OvmfPkg/Microvm/
+F: OvmfPkg/Include/IndustryStandard/Microvm.h
+F: OvmfPkg/Library/ResetSystemLib/*Microvm.*
+R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
+
 OvmfPkg: CSM modules
 F: OvmfPkg/Csm/
 R: David Woodhouse <dwmw2@infradead.org> [dwmw2]
@@ -462,6 +468,12 @@ R: James Bottomley <jejb@linux.ibm.com> [jejb]
 R: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Min Xu <min.m.xu@intel.com> [mxu9]
 R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
+
+OvmfPkg: FDT related modules
+F: OvmfPkg/Fdt
+R: Leif Lindholm <leif@nuviainc.com>
+R: Gerd Hoffmann <kraxel@redhat.com>
+R: Abner Chang <abner.chang@hpe.com>
 
 OvmfPkg: LsiScsi driver
 F: OvmfPkg/LsiScsiDxe/

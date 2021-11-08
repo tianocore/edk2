@@ -63,3 +63,5 @@
   ## BY_START
   gEfiDevicePathProtocolGuid
 
+[UserExtensions.TianoCore."ExtraFiles"]
+  EmmcDxeExtra.uni

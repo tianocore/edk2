@@ -282,6 +282,7 @@ CpuCacheInfoCollectCpuCacheInfoData (
   UINTN                     LocalCacheInfoCount;
   UINTN                     Index;
   UINTN                     NextIndex;
+  CPU_CACHE_INFO            SortBuffer;
 
   //
   // Get number of Packages and Package ID.
@@ -369,7 +370,7 @@ CpuCacheInfoCollectCpuCacheInfoData (
     //
     // Sort LocalCacheInfo array by CPU package ID, core type, cache level and cache type.
     //
-    PerformQuickSort (LocalCacheInfo, LocalCacheInfoCount, sizeof (*LocalCacheInfo), (SORT_COMPARE) CpuCacheInfoCompare);
+    QuickSort (LocalCacheInfo, LocalCacheInfoCount, sizeof (*LocalCacheInfo), CpuCacheInfoCompare, (VOID*) &SortBuffer);
     CopyMem (CacheInfo, LocalCacheInfo, sizeof (*CacheInfo) * LocalCacheInfoCount);
     DEBUG_CODE (
       CpuCacheInfoPrintCpuCacheInfoTable (CacheInfo, LocalCacheInfoCount);

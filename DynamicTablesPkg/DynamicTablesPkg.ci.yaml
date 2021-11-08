@@ -5,6 +5,28 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        # "The #ifndef at the start of an include file should use
+        # both prefix and postfix underscore characters, '_'"
+        # This error is not triggered for the latest BaseTools code.
+        # @TODO The error should be re-enabled when the python packages
+        # containing the BaseTools are updated to the latest version.
+        "8003", "DISABLE_NEW_DEPRECATED_INTERFACES",
+        "9005", "@defgroup",      # Use extra Doxygen commands
+        "9005", "@ingroup",       # Use extra Doxygen commands
+        "9005", "@mainpage",      # Use extra Doxygen commands
+        "9005", "@ref",           # Use extra Doxygen commands
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+        ]
+    },
+
     ## options defined .pytool/Plugin/CompilerPlugin
     "CompilerPlugin": {
         "DscPath": "DynamicTablesPkg.dsc"
@@ -23,6 +45,7 @@
     ## options defined .pytool/Plugin/DependencyCheck
     "DependencyCheck": {
         "AcceptableDependencies": [
+            "ArmPkg/ArmPkg.dec",
             "ArmPlatformPkg/ArmPlatformPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
             "DynamicTablesPkg/DynamicTablesPkg.dec",
@@ -77,19 +100,25 @@
            "CCIDX",
            "CCSIDR",
            "countof",
+           "edynamic",
            "EOBJECT",
            "invoc",
+           "ITARGETSR",
            "GTBLOCK",
            "lgreater",
            "lless",
            "MPIDR",
            "PERIPHBASE",
+           "phandle",
            "pytool",
+           "Rdword",
            "Roadmap",
            "ROOTNODEBASE",
            "ssdtcmn",
            "ssdtserialporttemplate",
            "SMMUV",
+           "ssdtpcieosctemplate",
+           "SSDTPC",
            "standardised",
            "TABLEEX",
            "TNSID",

@@ -2,7 +2,7 @@
   This library will parse the coreboot table in memory and extract those required
   information.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -140,6 +140,7 @@ GetParameterBase (
   UINT8              *TmpPtr;
   UINT8              *CbTablePtr;
   UINTN              Idx;
+  EFI_STATUS         Status;
 
   //
   // coreboot could pass coreboot table to UEFI payload
@@ -193,7 +194,8 @@ GetParameterBase (
     return NULL;
   }
 
-  SET_BOOTLOADER_PARAMETER ((UINT32)(UINTN)CbTablePtr);
+  Status = PcdSet64S (PcdBootloaderParameter, (UINTN)CbTablePtr);
+  ASSERT_EFI_ERROR (Status);
 
   return CbTablePtr;
 }
@@ -320,7 +322,7 @@ ParseCbMemTable (
   )
 {
   EFI_STATUS               Status;
-  struct cb_memory         *rec;
+  CB_MEMORY                *Rec;
   struct cb_memory_range   *Range;
   UINT64                   Start;
   UINT64                   Size;
@@ -337,13 +339,13 @@ ParseCbMemTable (
   //
   // Get the coreboot memory table
   //
-  rec = (struct cb_memory *)FindCbTag (CB_TAG_MEMORY);
-  if (rec == NULL) {
+  Rec = (CB_MEMORY *)FindCbTag (CB_TAG_MEMORY);
+  if (Rec == NULL) {
     return Status;
   }
 
-  for (Index = 0; Index < MEM_RANGE_COUNT(rec); Index++) {
-    Range = MEM_RANGE_PTR(rec, Index);
+  for (Index = 0; Index < MEM_RANGE_COUNT(Rec); Index++) {
+    Range = MEM_RANGE_PTR(Rec, Index);
     Start = cb_unpack64(Range->start);
     Size = cb_unpack64(Range->size);
 
@@ -378,21 +380,21 @@ ParseMemoryInfo (
   IN  VOID                  *Params
   )
 {
-  struct cb_memory         *rec;
+  CB_MEMORY                *Rec;
   struct cb_memory_range   *Range;
   UINTN                    Index;
-  MEMROY_MAP_ENTRY         MemoryMap;
+  MEMORY_MAP_ENTRY         MemoryMap;
 
   //
   // Get the coreboot memory table
   //
-  rec = (struct cb_memory *)FindCbTag (CB_TAG_MEMORY);
-  if (rec == NULL) {
+  Rec = (CB_MEMORY *)FindCbTag (CB_TAG_MEMORY);
+  if (Rec == NULL) {
     return RETURN_NOT_FOUND;
   }
 
-  for (Index = 0; Index < MEM_RANGE_COUNT(rec); Index++) {
-    Range = MEM_RANGE_PTR(rec, Index);
+  for (Index = 0; Index < MEM_RANGE_COUNT(Rec); Index++) {
+    Range = MEM_RANGE_PTR(Rec, Index);
     MemoryMap.Base = cb_unpack64(Range->start);
     MemoryMap.Size = cb_unpack64(Range->size);
     MemoryMap.Type = (UINT8)Range->type;
@@ -408,9 +410,9 @@ ParseMemoryInfo (
 
 
 /**
-  Acquire acpi table and smbios table from coreboot
+  Acquire SMBIOS table from coreboot.
 
-  @param  SystemTableInfo          Pointer to the system table info
+  @param  SmbiosTable               Pointer to the SMBIOS table info.
 
   @retval RETURN_SUCCESS            Successfully find out the tables.
   @retval RETURN_NOT_FOUND          Failed to find the tables.
@@ -418,8 +420,8 @@ ParseMemoryInfo (
 **/
 RETURN_STATUS
 EFIAPI
-ParseSystemTable (
-  OUT SYSTEM_TABLE_INFO     *SystemTableInfo
+ParseSmbiosTable (
+  OUT UNIVERSAL_PAYLOAD_SMBIOS_TABLE     *SmbiosTable
   )
 {
   EFI_STATUS       Status;
@@ -430,24 +432,45 @@ ParseSystemTable (
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
-  SystemTableInfo->SmbiosTableBase = (UINT64) (UINTN)MemTable;
-  SystemTableInfo->SmbiosTableSize = MemTableSize;
+  SmbiosTable->SmBiosEntryPoint = (UINT64) (UINTN)MemTable;
+
+  return RETURN_SUCCESS;
+}
+
+
+/**
+  Acquire ACPI table from coreboot.
+
+  @param  AcpiTableHob              Pointer to the ACPI table info.
+
+  @retval RETURN_SUCCESS            Successfully find out the tables.
+  @retval RETURN_NOT_FOUND          Failed to find the tables.
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseAcpiTableInfo (
+  OUT UNIVERSAL_PAYLOAD_ACPI_TABLE        *AcpiTableHob
+  )
+{
+  EFI_STATUS       Status;
+  VOID             *MemTable;
+  UINT32           MemTableSize;
 
   Status = ParseCbMemTable (SIGNATURE_32 ('I', 'P', 'C', 'A'), &MemTable, &MemTableSize);
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
-  SystemTableInfo->AcpiTableBase = (UINT64) (UINTN)MemTable;
-  SystemTableInfo->AcpiTableSize = MemTableSize;
+  AcpiTableHob->Rsdp = (UINT64) (UINTN)MemTable;
 
-  return Status;
+  return RETURN_SUCCESS;
 }
 
 
 /**
   Find the serial port information
 
-  @param  SERIAL_PORT_INFO   Pointer to serial port info structure
+  @param  SerialPortInfo     Pointer to serial port info structure
 
   @retval RETURN_SUCCESS     Successfully find the serial port information.
   @retval RETURN_NOT_FOUND   Failed to find the serial port information .
@@ -558,3 +581,19 @@ ParseGfxDeviceInfo (
   return RETURN_NOT_FOUND;
 }
 
+/**
+  Parse and handle the misc info provided by bootloader
+
+  @retval RETURN_SUCCESS           The misc information was parsed successfully.
+  @retval RETURN_NOT_FOUND         Could not find required misc info.
+  @retval RETURN_OUT_OF_RESOURCES  Insufficant memory space.
+
+**/
+RETURN_STATUS
+EFIAPI
+ParseMiscInfo (
+  VOID
+  )
+{
+  return RETURN_SUCCESS;
+}
