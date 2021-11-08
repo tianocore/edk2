@@ -54,8 +54,8 @@ volatile UINT64  mTimerPeriod = 0;
 VOID
 EFIAPI
 TimerInterruptHandler (
-  IN EFI_EXCEPTION_TYPE InterruptType,
-  IN EFI_SYSTEM_CONTEXT SystemContext
+  IN EFI_EXCEPTION_TYPE  InterruptType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
   EFI_TPL  OriginalTPL;
@@ -63,9 +63,6 @@ TimerInterruptHandler (
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   if (mTimerNotifyFunction != NULL) {
-    //
-    // @bug : This does not handle missed timer interrupts
-    //
     mTimerNotifyFunction (mTimerPeriod);
   }
 
@@ -109,8 +106,8 @@ TimerInterruptHandler (
 EFI_STATUS
 EFIAPI
 TimerDriverRegisterHandler (
-  IN EFI_TIMER_ARCH_PROTOCOL *This,
-  IN EFI_TIMER_NOTIFY        NotifyFunction
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  IN EFI_TIMER_NOTIFY         NotifyFunction
   )
 {
   //
@@ -160,8 +157,8 @@ TimerDriverRegisterHandler (
 EFI_STATUS
 EFIAPI
 TimerDriverSetTimerPeriod (
-  IN EFI_TIMER_ARCH_PROTOCOL *This,
-  IN UINT64                  TimerPeriod
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  IN UINT64                   TimerPeriod
   )
 {
   UINT64  TimerCount;
@@ -169,6 +166,11 @@ TimerDriverSetTimerPeriod (
   UINT32  DivideValue = 1;
 
   if (TimerPeriod == 0) {
+    //
+    // Stop the timer
+    //
+    InitializeApicTimer (0, 0, FALSE, LOCAL_APIC_TIMER_VECTOR);
+
     //
     // Disable timer interrupt for a TimerPeriod of 0
     //
@@ -231,8 +233,8 @@ TimerDriverSetTimerPeriod (
 EFI_STATUS
 EFIAPI
 TimerDriverGetTimerPeriod (
-  IN EFI_TIMER_ARCH_PROTOCOL *This,
-  OUT UINT64                 *TimerPeriod
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  OUT UINT64                  *TimerPeriod
   )
 {
   if (TimerPeriod == NULL) {
@@ -264,7 +266,7 @@ TimerDriverGetTimerPeriod (
 EFI_STATUS
 EFIAPI
 TimerDriverGenerateSoftInterrupt (
-  IN EFI_TIMER_ARCH_PROTOCOL *This
+  IN EFI_TIMER_ARCH_PROTOCOL  *This
   )
 {
   EFI_TPL  OriginalTPL;
@@ -276,9 +278,6 @@ TimerDriverGenerateSoftInterrupt (
     OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
     if (mTimerNotifyFunction != NULL) {
-      //
-      // @bug : This does not handle missed timer interrupts
-      //
       mTimerNotifyFunction (mTimerPeriod);
     }
 
@@ -304,8 +303,8 @@ TimerDriverGenerateSoftInterrupt (
 EFI_STATUS
 EFIAPI
 TimerDriverInitialize (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
