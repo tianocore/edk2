@@ -165,7 +165,7 @@ TimerDriverSetTimerPeriod (
 {
   UINT64  TimerCount;
   UINT32  TimerFrequency;
-  UINTN   DivideValue = 1;
+  UINT32  DivideValue = 1;
 
   if (TimerPeriod == 0) {
     //
@@ -193,7 +193,7 @@ TimerDriverSetTimerPeriod (
     //
     // Program the timer with the new count value
     //
-    InitializeApicTimer(DivideValue, TimerCount, TRUE, LOCAL_APIC_TIMER_VECTOR);
+    InitializeApicTimer(DivideValue, (UINT32)TimerCount, TRUE, LOCAL_APIC_TIMER_VECTOR);
 
     //
     // Enable timer interrupt

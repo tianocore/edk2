@@ -154,7 +154,7 @@ GetSystemMemorySizeBelow4gb (
     HighestAddress = GetHighestSystemMemoryAddress (TRUE);
     ASSERT (HighestAddress > 0 && HighestAddress <= BASE_4GB);
 
-    return HighestAddress;
+    return (UINT32)HighestAddress;
   }
 
   //

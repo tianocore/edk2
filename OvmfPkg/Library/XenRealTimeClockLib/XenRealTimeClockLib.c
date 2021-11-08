@@ -53,9 +53,9 @@ EpochToEfiTime (
   m  = (((da * 5) + 308) / 153) - 2;
   d  = da - (((m + 4) * 153) / 5) + 122;
 
-  Time->Year  = y - 4800 + ((m + 2) / 12);
+  Time->Year  = (UINT16)(y - 4800 + ((m + 2) / 12));
   Time->Month = ((m + 2) % 12) + 1;
-  Time->Day   = d + 1;
+  Time->Day   = (UINT8)(d + 1);
 
   ss = EpochSeconds % 60;
   a  = (EpochSeconds - ss) / 60;
@@ -63,9 +63,9 @@ EpochToEfiTime (
   b = (a - mm) / 60;
   hh = b % 24;
 
-  Time->Hour        = hh;
-  Time->Minute      = mm;
-  Time->Second      = ss;
+  Time->Hour        = (UINT8)hh;
+  Time->Minute      = (UINT8)mm;
+  Time->Second      = (UINT8)ss;
   Time->Nanosecond  = 0;
 
 }
