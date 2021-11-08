@@ -55,6 +55,7 @@
   UefiLib
   PlatformBmPrintScLib
   Tcg2PhysicalPresenceLib
+  TcgPhysicalPresenceLib
   XenPlatformLib
 
 [Pcd]

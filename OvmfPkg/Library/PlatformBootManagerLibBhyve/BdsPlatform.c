@@ -12,6 +12,7 @@
 #include <Protocol/FirmwareVolume2.h>
 #include <Library/PlatformBmPrintScLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
+#include <Library/TcgPhysicalPresenceLib.h>
 
 #include <Protocol/BlockIo.h>
 
@@ -403,7 +404,9 @@ PlatformBootManagerBeforeConsole (
 
   //
   // Process TPM PPI request
+  // For variable creation and locking to work, this has to be done before End-of-Dxe.
   //
+  TcgPhysicalPresenceLibProcessRequest ();
   Tcg2PhysicalPresenceLibProcessRequest (NULL);
 
   //

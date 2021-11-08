@@ -51,6 +51,7 @@
   UefiLib
   PlatformBmPrintScLib
   Tcg2PhysicalPresenceLib
+  TcgPhysicalPresenceLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
