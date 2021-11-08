@@ -402,23 +402,6 @@ PlatformBootManagerBeforeConsole (
   EfiEventGroupSignal (&gRootBridgesConnectedEventGroupGuid);
 
   //
-  // We can't signal End-of-Dxe earlier than this. Namely, End-of-Dxe triggers
-  // the preparation of S3 system information. That logic has a hard dependency
-  // on the presence of the FACS ACPI table. Since our ACPI tables are only
-  // installed after PCI enumeration completes, we must not trigger the S3 save
-  // earlier, hence we can't signal End-of-Dxe earlier.
-  //
-  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
-
-  if (PcdGetBool (PcdAcpiS3Enable)) {
-    //
-    // Save the boot script too. Note that this will require us to emit the
-    // DxeSmmReadyToLock event just below, which in turn locks down SMM.
-    //
-    SaveS3BootScript ();
-  }
-
-  //
   // We need to connect all trusted consoles for TCG PP. Here we treat all
   // consoles in OVMF to be trusted consoles.
   //
@@ -434,6 +417,23 @@ PlatformBootManagerBeforeConsole (
   // Process TPM PPI request; this may require keyboard input
   //
   Tcg2PhysicalPresenceLibProcessRequest (NULL);
+
+  //
+  // We can't signal End-of-Dxe earlier than this. Namely, End-of-Dxe triggers
+  // the preparation of S3 system information. That logic has a hard dependency
+  // on the presence of the FACS ACPI table. Since our ACPI tables are only
+  // installed after PCI enumeration completes, we must not trigger the S3 save
+  // earlier, hence we can't signal End-of-Dxe earlier.
+  //
+  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
+
+  if (PcdGetBool (PcdAcpiS3Enable)) {
+    //
+    // Save the boot script too. Note that this will require us to emit the
+    // DxeSmmReadyToLock event just below, which in turn locks down SMM.
+    //
+    SaveS3BootScript ();
+  }
 
   //
   // Prevent further changes to LockBoxes or SMRAM.

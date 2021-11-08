@@ -397,15 +397,6 @@ PlatformBootManagerBeforeConsole (
   //
   EfiEventGroupSignal (&gRootBridgesConnectedEventGroupGuid);
 
-  //
-  // We can't signal End-of-Dxe earlier than this. Namely, End-of-Dxe triggers
-  // the preparation of S3 system information. That logic has a hard dependency
-  // on the presence of the FACS ACPI table. Since our ACPI tables are only
-  // installed after PCI enumeration completes, we must not trigger the S3 save
-  // earlier, hence we can't signal End-of-Dxe earlier.
-  //
-  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
-
   // We need to connect all trusted consoles for TCG PP. Here we treat all
   // consoles in OVMF to be trusted consoles.
   PlatformInitializeConsole (gPlatformConsole);
@@ -414,6 +405,15 @@ PlatformBootManagerBeforeConsole (
   // Process TPM PPI request
   //
   Tcg2PhysicalPresenceLibProcessRequest (NULL);
+
+  //
+  // We can't signal End-of-Dxe earlier than this. Namely, End-of-Dxe triggers
+  // the preparation of S3 system information. That logic has a hard dependency
+  // on the presence of the FACS ACPI table. Since our ACPI tables are only
+  // installed after PCI enumeration completes, we must not trigger the S3 save
+  // earlier, hence we can't signal End-of-Dxe earlier.
+  //
+  EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
 
   //
   // Prevent further changes to LockBoxes or SMRAM.
