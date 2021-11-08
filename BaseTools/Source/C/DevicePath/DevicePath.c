@@ -144,6 +144,40 @@ Returns:
   *UniString = '\0';
 }
 
+
+/**
+  Returns the length of a Null-terminated ASCII string.
+
+  This function returns the number of ASCII characters in the Null-terminated
+  ASCII string specified by String.
+
+  If Length > 0 and Destination is NULL, then ASSERT().
+  If Length > 0 and Source is NULL, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero and String contains more than
+  PcdMaximumAsciiStringLength ASCII characters, not including the Null-terminator,
+  then ASSERT().
+
+  @param  String  A pointer to a Null-terminated ASCII string.
+
+  @return The length of String.
+
+**/
+UINTN
+EFIAPI
+AsciiStrLen (
+  IN      CONST CHAR8               *String
+  )
+{
+  UINTN                             Length;
+
+  ASSERT (String != NULL);
+
+  for (Length = 0; *String != '\0'; String++, Length++) {
+
+  }
+  return Length;
+}
+
 int main(int argc, CHAR8 *argv[])
 {
   CHAR8 * Str;
@@ -170,7 +204,7 @@ int main(int argc, CHAR8 *argv[])
     fprintf(stderr, "Invalid option value, Device Path can't be NULL");
     return STATUS_ERROR;
   }
-  Str16 = (CHAR16 *)malloc(1024);
+  Str16 = (CHAR16 *)malloc((AsciiStrLen (Str) + 1) * sizeof (CHAR16));
   if (Str16 == NULL) {
     fprintf(stderr, "Resource, memory cannot be allocated");
     return STATUS_ERROR;
