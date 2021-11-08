@@ -172,6 +172,7 @@
   }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
   UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
+  UefiCpuPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
