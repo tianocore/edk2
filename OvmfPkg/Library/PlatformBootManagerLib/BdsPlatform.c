@@ -371,6 +371,16 @@ PlatformBootManagerBeforeConsole (
   //
   EfiEventGroupSignal (&gRootBridgesConnectedEventGroupGuid);
 
+  // We need to connect all trusted consoles for TCG PP. Here we treat all
+  // consoles in OVMF to be trusted consoles.
+  PlatformInitializeConsole (
+    XenDetected() ? gXenPlatformConsole : gPlatformConsole);
+
+  //
+  // Process TPM PPI request; this may require keyboard input
+  //
+  Tcg2PhysicalPresenceLibProcessRequest (NULL);
+
   //
   // We can't signal End-of-Dxe earlier than this. Namely, End-of-Dxe triggers
   // the preparation of S3 system information. That logic has a hard dependency
@@ -387,16 +397,6 @@ PlatformBootManagerBeforeConsole (
     //
     SaveS3BootScript ();
   }
-
-  // We need to connect all trusted consoles for TCG PP. Here we treat all
-  // consoles in OVMF to be trusted consoles.
-  PlatformInitializeConsole (
-    XenDetected() ? gXenPlatformConsole : gPlatformConsole);
-
-  //
-  // Process TPM PPI request; this may require keyboard input
-  //
-  Tcg2PhysicalPresenceLibProcessRequest (NULL);
 
   //
   // Prevent further changes to LockBoxes or SMRAM.
