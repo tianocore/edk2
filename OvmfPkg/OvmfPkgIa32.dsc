@@ -763,7 +763,7 @@
   OvmfPkg/8259InterruptControllerDxe/8259.inf
   OvmfPkg/8254TimerDxe/8254Timer.inf
 !else
-  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+  UefiCpuPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
 !endif
   OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
   OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
