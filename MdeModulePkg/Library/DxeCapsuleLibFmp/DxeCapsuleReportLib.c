@@ -1,14 +1,13 @@
 /** @file
   DXE capsule report related function.
 
-  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <PiDxe.h>
 #include <Protocol/FirmwareManagement.h>
-#include <Protocol/VariableLock.h>
 #include <Guid/CapsuleReport.h>
 #include <Guid/FmpCapsule.h>
 #include <Guid/CapsuleVendor.h>
@@ -26,6 +25,7 @@
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/CapsuleLib.h>
+#include <Library/VariablePolicyHelperLib.h>
 
 #include <IndustryStandard/WindowsUxCapsule.h>
 
@@ -92,6 +92,40 @@ GetNewCapsuleResultIndex (
   }
 
   return CurrentIndex + 1;
+}
+
+/**
+  Lock Variable by variable policy.
+
+  @param[in] VariableGuid         The Guid of the variable to be locked
+  @param[in] VariableName         The name of the variable to be locked
+  @param[in] VariablePolicy       The pointer of variable lock policy
+**/
+VOID
+LockVariable (
+  IN CONST  EFI_GUID                 VariableGuid,
+  IN CHAR16                          *VariableName,
+  IN EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy
+  )
+{
+  EFI_STATUS                       Status;
+
+  // Set the policies to protect the target variables
+  Status = RegisterBasicVariablePolicy (VariablePolicy,
+                                        &VariableGuid,
+                                        VariableName,
+                                        VARIABLE_POLICY_NO_MIN_SIZE,
+                                        VARIABLE_POLICY_NO_MAX_SIZE,
+                                        VARIABLE_POLICY_NO_MUST_ATTR,
+                                        VARIABLE_POLICY_NO_CANT_ATTR,
+                                        VARIABLE_POLICY_TYPE_LOCK_NOW);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "DxeCapsuleLibFmp: Failed to lock variable %g %s.  Status = %r\n",
+            &VariableGuid,
+            VariableName,
+            Status));
+    ASSERT_EFI_ERROR (Status);
+  }
 }
 
 /**
@@ -269,16 +303,17 @@ RecordFmpCapsuleStatusVariable (
 
 /**
   Initialize CapsuleMax variables.
+
+  @param[in] VariablePolicy       The pointer of variable lock policy
 **/
 VOID
 InitCapsuleMaxVariable (
-  VOID
+  EDKII_VARIABLE_POLICY_PROTOCOL   *VariablePolicy
   )
 {
   EFI_STATUS                       Status;
   UINTN                            Size;
   CHAR16                           CapsuleMaxStr[sizeof("Capsule####")];
-  EDKII_VARIABLE_LOCK_PROTOCOL     *VariableLock;
 
   UnicodeSPrint(
     CapsuleMaxStr,
@@ -297,25 +332,22 @@ InitCapsuleMaxVariable (
                   );
   if (!EFI_ERROR(Status)) {
     // Lock it per UEFI spec.
-    Status = gBS->LocateProtocol(&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLock);
-    if (!EFI_ERROR(Status)) {
-      Status = VariableLock->RequestToLock(VariableLock, L"CapsuleMax", &gEfiCapsuleReportGuid);
-      ASSERT_EFI_ERROR(Status);
-    }
+    LockVariable (gEfiCapsuleReportGuid, L"CapsuleMax", VariablePolicy);
   }
 }
 
 /**
   Initialize CapsuleLast variables.
+
+  @param[in] VariablePolicy       The pointer of variable lock policy
 **/
 VOID
 InitCapsuleLastVariable (
-  VOID
+  EDKII_VARIABLE_POLICY_PROTOCOL   *VariablePolicy
   )
 {
   EFI_STATUS                       Status;
   EFI_BOOT_MODE                    BootMode;
-  EDKII_VARIABLE_LOCK_PROTOCOL     *VariableLock;
   VOID                             *CapsuleResult;
   UINTN                            Size;
   CHAR16                           CapsuleLastStr[sizeof("Capsule####")];
@@ -372,11 +404,7 @@ InitCapsuleLastVariable (
     }
 
     // Lock it in normal boot path per UEFI spec.
-    Status = gBS->LocateProtocol(&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLock);
-    if (!EFI_ERROR(Status)) {
-      Status = VariableLock->RequestToLock(VariableLock, L"CapsuleLast", &gEfiCapsuleReportGuid);
-      ASSERT_EFI_ERROR(Status);
-    }
+    LockVariable (gEfiCapsuleReportGuid, L"CapsuleLast", VariablePolicy);
   }
 }
 
@@ -430,26 +458,21 @@ InitCapsuleUpdateVariable (
 
 /**
   Initialize capsule relocation info variable.
+
+  @param[in] VariablePolicy       The pointer of variable lock policy
 **/
 VOID
 InitCapsuleRelocationInfo (
-  VOID
+  EDKII_VARIABLE_POLICY_PROTOCOL   *VariablePolicy
   )
 {
-  EFI_STATUS                   Status;
-  EDKII_VARIABLE_LOCK_PROTOCOL *VariableLock;
-
   CoDClearCapsuleRelocationInfo();
 
   //
   // Unlock Capsule On Disk relocation Info variable only when Capsule On Disk flag is enabled
   //
   if (!CoDCheckCapsuleOnDiskFlag()) {
-    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
-    if (!EFI_ERROR (Status)) {
-      Status = VariableLock->RequestToLock (VariableLock, COD_RELOCATION_INFO_VAR_NAME, &gEfiCapsuleVendorGuid);
-      ASSERT_EFI_ERROR (Status);
-    }
+    LockVariable (gEfiCapsuleVendorGuid, COD_RELOCATION_INFO_VAR_NAME, VariablePolicy);
   }
 }
 
@@ -461,10 +484,19 @@ InitCapsuleVariable (
   VOID
   )
 {
+  EFI_STATUS                       Status;
+  EDKII_VARIABLE_POLICY_PROTOCOL   *VariablePolicy;
+
+  // Locate the VariablePolicy protocol
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID**)&VariablePolicy);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "DxeCapsuleReportLib %a - Could not locate VariablePolicy protocol! %r\n", __FUNCTION__, Status));
+    ASSERT_EFI_ERROR (Status);
+  }
   InitCapsuleUpdateVariable();
-  InitCapsuleMaxVariable();
-  InitCapsuleLastVariable();
-  InitCapsuleRelocationInfo();
+  InitCapsuleMaxVariable (VariablePolicy);
+  InitCapsuleLastVariable (VariablePolicy);
+  InitCapsuleRelocationInfo (VariablePolicy);
 
   //
   // No need to clear L"Capsule####", because OS/APP should refer L"CapsuleLast"
