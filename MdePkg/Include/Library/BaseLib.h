@@ -4759,6 +4759,72 @@ SpeculationBarrier (
   VOID
   );
 
+#if defined (MDE_CPU_X64) || defined (MDE_CPU_IA32)
+
+/**
+  The TDCALL instruction causes a VM exit to the Intel TDX module.  It is
+  used to call guest-side Intel TDX functions, either local or a TD exit
+  to the host VMM, as selected by Leaf.
+
+  @param[in]      Leaf        Leaf number of TDCALL instruction
+  @param[in]      Arg1        Arg1
+  @param[in]      Arg2        Arg2
+  @param[in]      Arg3        Arg3
+  @param[in,out]  Results  Returned result of the Leaf function
+
+  @return 0               A successful call
+  @return Other           See individual leaf functions
+**/
+UINTN
+EFIAPI
+TdCall (
+  IN UINT64    Leaf,
+  IN UINT64    Arg1,
+  IN UINT64    Arg2,
+  IN UINT64    Arg3,
+  IN OUT VOID  *Results
+  );
+
+/**
+  TDVMALL is a leaf function 0 for TDCALL. It helps invoke services from the
+  host VMM to pass/receive information.
+
+  @param[in]     Leaf        Number of sub-functions
+  @param[in]     Arg1        Arg1
+  @param[in]     Arg2        Arg2
+  @param[in]     Arg3        Arg3
+  @param[in]     Arg4        Arg4
+  @param[in,out] Results     Returned result of the sub-function
+
+  @return 0               A successful call
+  @return Other           See individual sub-functions
+
+**/
+UINTN
+EFIAPI
+TdVmCall (
+  IN UINT64    Leaf,
+  IN UINT64    Arg1,
+  IN UINT64    Arg2,
+  IN UINT64    Arg3,
+  IN UINT64    Arg4,
+  IN OUT VOID  *Results
+  );
+
+/**
+  Probe if TD is enabled.
+
+  @return TRUE    TD is enabled.
+  @return FALSE   TD is not enabled.
+**/
+BOOLEAN
+EFIAPI
+TdIsEnabled (
+  VOID
+  );
+
+#endif
+
 #if defined (MDE_CPU_X64)
 //
 // The page size for the PVALIDATE instruction
