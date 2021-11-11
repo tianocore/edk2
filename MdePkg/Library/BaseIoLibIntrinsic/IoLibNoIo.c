@@ -1,11 +1,12 @@
 /** @file
   I/O library for non I/O read and write access (memory map I/O read and
-  write only) architecture, such as ARM and RISC-V processor.
+  write only) architecture, such as ARM, RISC-V and LoongArch processor.
 
   Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
   Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
