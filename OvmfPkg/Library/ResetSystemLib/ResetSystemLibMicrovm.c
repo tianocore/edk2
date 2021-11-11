@@ -18,7 +18,7 @@
 
 static UINTN MicrovmGedBase (VOID)
 {
-  VOID *Address = (VOID*) MICROVM_GED_MMIO_BASE_REGS;
+  VOID *Address = (VOID*)(UINTN) MICROVM_GED_MMIO_BASE_REGS;
 
   if (EfiGoneVirtual ()) {
     EfiConvertPointer (0, &Address);
