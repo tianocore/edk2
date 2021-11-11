@@ -8,6 +8,7 @@
 #  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 #  Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Portions Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -25,7 +26,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64 LOONGARCH64
 #
 
 [Sources.IA32]
@@ -60,6 +61,10 @@
 
 [Sources.RISCV64]
   RiscV/Cpu.S
+
+[Sources.LOONGARCH64]
+  LoongArch/CpuFlushTlb.S | GCC
+  LoongArch/CpuSleep.S    | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
