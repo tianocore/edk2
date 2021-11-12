@@ -17,7 +17,19 @@
 #include <Library/DxeServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Guid/ConfidentialComputingSevSnpBlob.h>
 #include <Library/PcdLib.h>
+
+STATIC CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION mSnpBootDxeTable = {
+  SIGNATURE_32('A','M','D','E'),
+  1,
+  0,
+  (UINT64)(UINTN) FixedPcdGet32 (PcdOvmfSnpSecretsBase),
+  FixedPcdGet32 (PcdOvmfSnpSecretsSize),
+  (UINT64)(UINTN) FixedPcdGet32 (PcdOvmfCpuidBase),
+  FixedPcdGet32 (PcdOvmfCpuidSize),
+};
 
 EFI_STATUS
 EFIAPI
@@ -128,6 +140,17 @@ AmdSevDxeEntryPoint (
       ASSERT (FALSE);
       CpuDeadLoop ();
     }
+  }
+
+  //
+  // If its SEV-SNP active guest then install the CONFIDENTIAL_COMPUTING_SEV_SNP_BLOB.
+  // It contains the location for both the Secrets and CPUID page.
+  //
+  if (MemEncryptSevSnpIsEnabled ()) {
+    return gBS->InstallConfigurationTable (
+                  &gConfidentialComputingSevSnpBlobGuid,
+                  &mSnpBootDxeTable
+                  );
   }
 
   return EFI_SUCCESS;
