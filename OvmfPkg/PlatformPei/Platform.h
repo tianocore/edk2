@@ -102,6 +102,11 @@ AmdSevInitialize (
   VOID
   );
 
+VOID
+SevInitializeRam (
+  VOID
+  );
+
 extern EFI_BOOT_MODE mBootMode;
 
 extern BOOLEAN mS3Supported;
