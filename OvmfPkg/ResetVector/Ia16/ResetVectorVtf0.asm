@@ -64,6 +64,20 @@ tdxMetadataOffsetStart:
     DB      0x86, 0x5e, 0x46, 0x85, 0xa7, 0xbf, 0x8e, 0xc2
 tdxMetadataOffsetEnd:
 
+;
+; SEV metadata descriptor
+;
+; Provide the start offset of the metadata blob within the OVMF binary.
+
+; GUID : dc886566-984a-4798-A75e-5585a7bf67cc
+;
+OvmfSevMetadataOffsetStart:
+  DD      (fourGigabytes - OvmfSevMetadataGuid)
+  DW      OvmfSevMetadataOffsetEnd - OvmfSevMetadataOffsetStart
+  DB      0x66, 0x65, 0x88, 0xdc, 0x4a, 0x98, 0x98, 0x47
+  DB      0xA7, 0x5e, 0x55, 0x85, 0xa7, 0xbf, 0x67, 0xcc
+OvmfSevMetadataOffsetEnd:
+
 %endif
 
 ; SEV Hash Table Block
