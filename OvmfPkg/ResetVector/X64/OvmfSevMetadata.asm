@@ -17,6 +17,16 @@ BITS  64
 ; AMD SEV-SNP specific sections
 %define OVMF_SECTION_TYPE_SNP_SECRETS     0x2
 
+;
+; The section contains the hypervisor pre-populated CPUID values.
+; In the case of SEV-SNP, the CPUID values are filtered and measured by
+; the SEV-SNP firmware.
+; The CPUID format is documented in SEV-SNP firmware spec 0.9 section 7.1
+; (CPUID function structure).
+;
+%define OVMF_SECTION_TYPE_CPUID           0x3
+
+
 ALIGN 16
 
 TIMES (15 - ((OvmfSevGuidedStructureEnd - OvmfSevGuidedStructureStart + 15) % 16)) DB 0
@@ -38,6 +48,12 @@ SevSnpSecrets:
   DD  SEV_SNP_SECRETS_BASE
   DD  SEV_SNP_SECRETS_SIZE
   DD  OVMF_SECTION_TYPE_SNP_SECRETS
+
+; CPUID values
+CpuidSec:
+  DD  CPUID_BASE
+  DD  CPUID_SIZE
+  DD  OVMF_SECTION_TYPE_CPUID
 
 OvmfSevGuidedStructureEnd:
   ALIGN   16
