@@ -24,6 +24,12 @@
 
 #include "Platform.h"
 
+STATIC
+UINT64
+GetHypervisorFeature (
+  VOID
+  );
+
 /**
   Initialize SEV-SNP support if running as an SEV-SNP guest.
 
@@ -36,10 +42,21 @@ AmdSevSnpInitialize (
 {
   EFI_PEI_HOB_POINTERS          Hob;
   EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceHob;
+  UINT64                        HvFeatures;
+  EFI_STATUS                    PcdStatus;
 
   if (!MemEncryptSevSnpIsEnabled ()) {
     return;
   }
+
+  //
+  // Query the hypervisor feature using the VmgExit and set the value in the
+  // hypervisor features PCD.
+  //
+  HvFeatures = GetHypervisorFeature ();
+  PcdStatus = PcdSet64S (PcdGhcbHypervisorFeatures, HvFeatures);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
 
   //
   // Iterate through the system RAM and validate it.
@@ -89,6 +106,45 @@ SevEsProtocolFailure (
 
   ASSERT (FALSE);
   CpuDeadLoop ();
+}
+
+/**
+ Get the hypervisor features bitmap
+
+**/
+STATIC
+UINT64
+GetHypervisorFeature (
+  VOID
+  )
+{
+  UINT64                          Status;
+  GHCB                            *Ghcb;
+  MSR_SEV_ES_GHCB_REGISTER        Msr;
+  BOOLEAN                         InterruptState;
+  UINT64                          Features;
+
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+  Ghcb = Msr.Ghcb;
+
+  //
+  // Initialize the GHCB
+  //
+  VmgInit (Ghcb, &InterruptState);
+
+  //
+  // Query the Hypervisor Features.
+  //
+  Status = VmgExit (Ghcb, SVM_EXIT_HYPERVISOR_FEATURES, 0, 0);
+  if ((Status != 0)) {
+    SevEsProtocolFailure (GHCB_TERMINATE_GHCB_GENERAL);
+  }
+
+  Features = Ghcb->SaveArea.SwExitInfo2;
+
+  VmgDone (Ghcb, InterruptState);
+
+  return Features;
 }
 
 /**
