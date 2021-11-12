@@ -95,7 +95,7 @@ SevEsProtocolCheck (
   AsmWriteMsr64 (MSR_SEV_ES_GHCB, Msr.GhcbPhysicalAddress);
 
   Ghcb = Msr.Ghcb;
-  SetMem (Ghcb, sizeof (*Ghcb), 0);
+  SetMem (Ghcb, FixedPcdGet32 (PcdOvmfSecGhcbSize), 0);
 
   //
   // Set the version to the maximum that can be supported
