@@ -17,6 +17,7 @@
 #include <Register/Cpuid.h>
 
 #include "VirtualMemory.h"
+#include "SnpPageStateChange.h"
 
 STATIC BOOLEAN mAddressEncMaskChecked = FALSE;
 STATIC UINT64  mAddressEncMask;
@@ -695,10 +696,12 @@ SetMemoryEncDec (
   PAGE_MAP_AND_DIRECTORY_POINTER *PageDirectoryPointerEntry;
   PAGE_TABLE_1G_ENTRY            *PageDirectory1GEntry;
   PAGE_TABLE_ENTRY               *PageDirectory2MEntry;
+  PHYSICAL_ADDRESS               OrigPhysicalAddress;
   PAGE_TABLE_4K_ENTRY            *PageTableEntry;
   UINT64                         PgTableMask;
   UINT64                         AddressEncMask;
   BOOLEAN                        IsWpEnabled;
+  UINTN                          OrigLength;
   RETURN_STATUS                  Status;
 
   //
@@ -750,6 +753,22 @@ SetMemoryEncDec (
   }
 
   Status = EFI_SUCCESS;
+
+  //
+  // To maintain the security gurantees we must set the page to shared in the RMP
+  // table before clearing the memory encryption mask from the current page table.
+  //
+  // The InternalSetPageState() is used for setting the page state in the RMP table.
+  //
+  if ((Mode == ClearCBit) && MemEncryptSevSnpIsEnabled ()) {
+    InternalSetPageState (PhysicalAddress, EFI_SIZE_TO_PAGES (Length), SevSnpPageShared, FALSE);
+  }
+
+  //
+  // Save the specified length and physical address (we need it later).
+  //
+  OrigLength = Length;
+  OrigPhysicalAddress = PhysicalAddress;
 
   while (Length != 0)
   {
@@ -922,6 +941,21 @@ SetMemoryEncDec (
   // Flush TLB
   //
   CpuFlushTlb();
+
+  //
+  // SEV-SNP requires that all the private pages (i.e pages mapped encrypted) must be
+  // added in the RMP table before the access.
+  //
+  // The InternalSetPageState() is used for setting the page state in the RMP table.
+  //
+  if ((Mode == SetCBit) && MemEncryptSevSnpIsEnabled ()) {
+    InternalSetPageState (
+      OrigPhysicalAddress,
+      EFI_SIZE_TO_PAGES (OrigLength),
+      SevSnpPagePrivate,
+      FALSE
+      );
+  }
 
 Done:
   //
