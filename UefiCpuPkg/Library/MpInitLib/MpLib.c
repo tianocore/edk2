@@ -295,7 +295,7 @@ GetApLoopMode (
       ApLoopMode = ApInHltLoop;
     }
 
-    if (PcdGetBool (PcdSevEsIsEnabled)) {
+    if (ConfidentialComputingGuestHas (CCAttrAmdSevEs)) {
       //
       // For SEV-ES, force AP in Hlt-loop mode in order to use the GHCB
       // protocol for starting APs
@@ -1046,7 +1046,7 @@ AllocateResetVector (
     // The AP reset stack is only used by SEV-ES guests. Do not allocate it
     // if SEV-ES is not enabled.
     //
-    if (PcdGetBool (PcdSevEsIsEnabled)) {
+    if (ConfidentialComputingGuestHas (CCAttrAmdSevEs)) {
       //
       // Stack location is based on ProcessorNumber, so use the total number
       // of processors for calculating the total stack area.
@@ -1816,7 +1816,7 @@ MpInitLibInitialize (
   CpuMpData->CpuData          = (CPU_AP_DATA *) (CpuMpData + 1);
   CpuMpData->CpuInfoInHob     = (UINT64) (UINTN) (CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock(&CpuMpData->MpLock);
-  CpuMpData->SevEsIsEnabled = PcdGetBool (PcdSevEsIsEnabled);
+  CpuMpData->SevEsIsEnabled = ConfidentialComputingGuestHas (CCAttrAmdSevEs);
   CpuMpData->SevEsAPBuffer  = (UINTN) -1;
   CpuMpData->GhcbBase       = PcdGet64 (PcdGhcbBase);
 
@@ -2705,4 +2705,71 @@ MpInitLibStartupAllCPUs (
            ProcedureArgument,
            NULL
            );
+}
+
+/**
+  The function check if the specified Attr is set.
+
+  @param[in]  CurrentAttr   The current attribute.
+  @param[in]  Attr          The attribute to check.
+
+  @retval  TRUE      The specified Attr is set.
+  @retval  FALSE     The specified Attr is not set.
+
+**/
+STATIC
+BOOLEAN
+AmdMemEncryptionAttrCheck (
+  IN  UINT64                                CurrentAttr,
+  IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR     Attr
+  )
+{
+  switch (Attr) {
+    case CCAttrAmdSev:
+      //
+      // SEV is automatically enabled if SEV-ES or SEV-SNP is active.
+      //
+      return CurrentAttr >= CCAttrAmdSev;
+    case CCAttrAmdSevEs:
+      //
+      // SEV-ES is automatically enabled if SEV-SNP is active.
+      //
+      return CurrentAttr >= CCAttrAmdSevEs;
+    case CCAttrAmdSevSnp:
+      return CurrentAttr == CCAttrAmdSevSnp;
+    default:
+      return FALSE;
+  }
+}
+
+/**
+  Check if the specified confidential computing attribute is active.
+
+  @param[in]  Attr          The attribute to check.
+
+  @retval TRUE   The specified Attr is active.
+  @retval FALSE  The specified Attr is not active.
+
+**/
+BOOLEAN
+EFIAPI
+ConfidentialComputingGuestHas (
+  IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR     Attr
+  )
+{
+  UINT64    CurrentAttr;
+
+  //
+  // Get the current CC attribute.
+  //
+  CurrentAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
+
+  //
+  // If attr is for the AMD group then call AMD specific checks.
+  //
+  if (((RShiftU64 (CurrentAttr, 8)) & 0xff) == 1) {
+    return AmdMemEncryptionAttrCheck (CurrentAttr, Attr);
+  }
+
+  return (CurrentAttr == Attr);
 }
