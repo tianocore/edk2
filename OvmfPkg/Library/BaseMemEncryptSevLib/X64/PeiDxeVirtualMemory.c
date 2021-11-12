@@ -673,6 +673,7 @@ Done:
   @param[in]  Mode                    Set or Clear mode
   @param[in]  CacheFlush              Flush the caches before applying the
                                       encryption mask
+  @param[in]  Mmio                    The physical address specified is Mmio
 
   @retval RETURN_SUCCESS              The attributes were cleared for the
                                       memory region.
@@ -688,7 +689,8 @@ SetMemoryEncDec (
   IN    PHYSICAL_ADDRESS         PhysicalAddress,
   IN    UINTN                    Length,
   IN    MAP_RANGE_MODE           Mode,
-  IN    BOOLEAN                  CacheFlush
+  IN    BOOLEAN                  CacheFlush,
+  IN    BOOLEAN                  Mmio
   )
 {
   PAGE_MAP_AND_DIRECTORY_POINTER *PageMapLevel4Entry;
@@ -711,14 +713,15 @@ SetMemoryEncDec (
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u\n",
+    "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u Mmio=%u\n",
     gEfiCallerBaseName,
     __FUNCTION__,
     Cr3BaseAddress,
     PhysicalAddress,
     (UINT64)Length,
     (Mode == SetCBit) ? "Encrypt" : "Decrypt",
-    (UINT32)CacheFlush
+    (UINT32)CacheFlush,
+    (UINT32)Mmio
     ));
 
   //
@@ -760,7 +763,7 @@ SetMemoryEncDec (
   //
   // The InternalSetPageState() is used for setting the page state in the RMP table.
   //
-  if ((Mode == ClearCBit) && MemEncryptSevSnpIsEnabled ()) {
+  if (!Mmio && (Mode == ClearCBit) && MemEncryptSevSnpIsEnabled ()) {
     InternalSetPageState (PhysicalAddress, EFI_SIZE_TO_PAGES (Length), SevSnpPageShared, FALSE);
   }
 
@@ -998,7 +1001,8 @@ InternalMemEncryptSevSetMemoryDecrypted (
            PhysicalAddress,
            Length,
            ClearCBit,
-           TRUE
+           TRUE,
+           FALSE
            );
 }
 
@@ -1031,7 +1035,8 @@ InternalMemEncryptSevSetMemoryEncrypted (
            PhysicalAddress,
            Length,
            SetCBit,
-           TRUE
+           TRUE,
+           FALSE
            );
 }
 
@@ -1064,6 +1069,7 @@ InternalMemEncryptSevClearMmioPageEncMask (
            PhysicalAddress,
            Length,
            ClearCBit,
-           FALSE
+           FALSE,
+           TRUE
            );
 }
