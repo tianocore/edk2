@@ -481,7 +481,17 @@ SmmInitPageTable (
   // Additional SMM IDT initialization for SMM stack guard
   //
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-    InitializeIDTSmmStackGuard ();
+    DEBUG ((DEBUG_INFO, "Initialize IDT IST field for SMM Stack Guard\n"));
+    InitializeIdtIst (EXCEPT_IA32_PAGE_FAULT, 1);
+  }
+
+  //
+  // Additional SMM IDT initialization for SMM CET shadow stack
+  //
+  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+    DEBUG ((DEBUG_INFO, "Initialize IDT IST field for SMM Shadow Stack\n"));
+    InitializeIdtIst (EXCEPT_IA32_PAGE_FAULT, 1);
+    InitializeIdtIst (EXCEPT_IA32_MACHINE_CHECK, 1);
   }
 
   //

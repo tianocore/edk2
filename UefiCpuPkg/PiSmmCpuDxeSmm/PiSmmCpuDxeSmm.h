@@ -558,6 +558,20 @@ InitializeIDTSmmStackGuard (
   );
 
 /**
+  Initialize IDT IST Field.
+
+  @param[in]  ExceptionType       Exception type.
+  @param[in]  Ist                 IST value.
+
+**/
+VOID
+EFIAPI
+InitializeIdtIst (
+  IN EFI_EXCEPTION_TYPE            ExceptionType,
+  IN UINT8                         Ist
+  );
+
+/**
   Initialize Gdt for all processors.
 
   @param[in]   Cr3          CR3 value.
