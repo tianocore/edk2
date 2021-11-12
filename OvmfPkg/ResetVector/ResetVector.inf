@@ -55,6 +55,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize
 
 [FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretSize
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase
