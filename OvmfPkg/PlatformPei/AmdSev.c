@@ -24,6 +24,40 @@
 #include "Platform.h"
 
 /**
+  Initialize SEV-SNP support if running as an SEV-SNP guest.
+
+**/
+STATIC
+VOID
+AmdSevSnpInitialize (
+  VOID
+  )
+{
+  EFI_PEI_HOB_POINTERS          Hob;
+  EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceHob;
+
+  if (!MemEncryptSevSnpIsEnabled ()) {
+    return;
+  }
+
+  //
+  // Iterate through the system RAM and validate it.
+  //
+  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+    if (Hob.Raw != NULL && GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      ResourceHob = Hob.ResourceDescriptor;
+
+      if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
+        MemEncryptSevSnpPreValidateSystemRam (
+          ResourceHob->PhysicalStart,
+          EFI_SIZE_TO_PAGES ((UINTN) ResourceHob->ResourceLength)
+          );
+      }
+    }
+  }
+}
+
+/**
   Handle an SEV-SNP/GHCB protocol check failure.
 
   Notify the hypervisor using the VMGEXIT instruction that the SEV-SNP guest
@@ -235,6 +269,14 @@ AmdSevInitialize (
   if (!MemEncryptSevIsEnabled ()) {
     return;
   }
+
+  //
+  // Check and perform SEV-SNP initialization if required. This need to be
+  // done before the GHCB page is made shared in the AmdSevEsInitialize(). This
+  // is because the system RAM must be validated before it is made shared.
+  // The AmdSevSnpInitialize() validates the system RAM.
+  //
+  AmdSevSnpInitialize ();
 
   //
   // Set Memory Encryption Mask PCD
