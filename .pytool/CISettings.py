@@ -84,7 +84,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "X64",
                 "ARM",
                 "AARCH64",
-                "RISCV64")
+                "RISCV64",
+                "LOONGARCH64")
 
     def GetTargetsSupported(self):
         ''' return iterable of edk2 target tags supported by this build '''
@@ -175,6 +176,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                     scopes += ("gcc_arm_linux",)
                 if "RISCV64" in self.ActualArchitectures:
                     scopes += ("gcc_riscv64_unknown",)
+                if "LOONGARCH64" in self.ActualArchitectures:
+                    scopes += ("gcc_loongarch64_unknown_linux",)
             self.ActualScopes = scopes
         return self.ActualScopes
 
