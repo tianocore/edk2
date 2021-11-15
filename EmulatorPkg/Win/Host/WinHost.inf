@@ -86,7 +86,7 @@
 
 [BuildOptions]
   MSFT:*_*_*_DLINK_FLAGS            == /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
-  MSFT:*_*_*_CC_FLAGS               == /nologo /W4 /WX /Gy /c /D UNICODE /Od /Oy- /FIAutoGen.h /EHs-c- /GF /Gs8192 /Zi /Gm /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
+  MSFT:*_*_*_CC_FLAGS                = /nologo /W4 /WX /Gy /c /D UNICODE /Od /Oy- /FIAutoGen.h /EHs-c- /GF /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
   MSFT:*_*_*_PP_FLAGS               == /nologo /E /TC /FIAutoGen.h
 
   MSFT:*_VS2015_IA32_DLINK_FLAGS     = /LIBPATH:"%VS2015_PREFIX%Lib" /LIBPATH:"%VS2015_PREFIX%VC\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib vcruntimed.lib ucrtd.lib
