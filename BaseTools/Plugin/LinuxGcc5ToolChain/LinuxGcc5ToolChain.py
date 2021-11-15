@@ -5,6 +5,7 @@
 #
 # Copyright (c) Microsoft Corporation
 # Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+# Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 import os
@@ -41,6 +42,12 @@ class LinuxGcc5ToolChain(IUefiBuildPlugin):
             ret = self._check_riscv64()
             if ret != 0:
                 self.Logger.critical("Failed in check riscv64")
+                return ret
+
+            # Check LoongArch64 compiler
+            ret = self._check_loongarch64()
+            if ret != 0:
+                self.Logger.critical("Failed in check loongarch64")
                 return ret
 
         return 0
@@ -119,5 +126,29 @@ class LinuxGcc5ToolChain(IUefiBuildPlugin):
 
         prefix = os.path.join(install_path, "lib")
         shell_environment.GetEnvironment().set_shell_var("LD_LIBRARY_PATH", prefix)
+
+        return 0
+
+    def _check_loongarch64(self):
+        # check to see if full path already configured
+        if shell_environment.GetEnvironment().get_shell_var("GCC5_LOONGARCH64_PREFIX") is not None:
+            self.Logger.info("GCC5_LOONGARCH64_PREFIX is already set.")
+
+        else:
+            # now check for install dir.  If set then set the Prefix
+            install_path = shell_environment.GetEnvironment(
+            ).get_shell_var("GCC5_LOONGARCH64_INSTALL")
+            if install_path is None:
+                return 0
+
+            # make GCC5_LOONGARCH64_PREFIX to align with tools_def.txt
+            prefix = os.path.join(install_path, "bin", "loongarch64-unknown-linux-gnu-")
+            shell_environment.GetEnvironment().set_shell_var("GCC5_LOONGARCH64_PREFIX", prefix)
+
+        # now confirm it exists
+        if not os.path.exists(shell_environment.GetEnvironment().get_shell_var("GCC5_LOONGARCH64_PREFIX") + "gcc"):
+            self.Logger.error(
+                "Path for GCC5_LOONGARCH64_PREFIX toolchain is invalid")
+            return -2
 
         return 0
