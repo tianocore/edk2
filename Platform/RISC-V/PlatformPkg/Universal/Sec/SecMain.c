@@ -166,6 +166,8 @@ FindFfsFileAndSection (
   UINT32                      Size;
   EFI_PHYSICAL_ADDRESS        EndOfFile;
 
+  DEBUG ((DEBUG_INFO, "%a: DBT FV at 0x%x\n", __FUNCTION__, Fv));
+
   if (Fv->Signature != EFI_FVH_SIGNATURE) {
     DEBUG ((DEBUG_ERROR, "%a: FV at %p does not have FV header signature\n", __FUNCTION__, Fv));
     return EFI_VOLUME_CORRUPTED;
@@ -181,17 +183,20 @@ FindFfsFileAndSection (
 
     CurrentAddress = (EndOfFile + 7) & ~(7ULL);
     if (CurrentAddress > EndOfFirmwareVolume) {
+      DEBUG ((DEBUG_ERROR, "%a: FV corrupted\n", __FUNCTION__));
       return EFI_VOLUME_CORRUPTED;
     }
 
     File = (EFI_FFS_FILE_HEADER*)(UINTN) CurrentAddress;
     Size = *(UINT32*) File->Size & 0xffffff;
     if (Size < (sizeof (*File) + sizeof (EFI_COMMON_SECTION_HEADER))) {
+      DEBUG ((DEBUG_ERROR, "%a: FV corrupted\n", __FUNCTION__));
       return EFI_VOLUME_CORRUPTED;
     }
 
     EndOfFile = CurrentAddress + Size;
     if (EndOfFile > EndOfFirmwareVolume) {
+      DEBUG ((DEBUG_ERROR, "%a: FV corrupted\n", __FUNCTION__));
       return EFI_VOLUME_CORRUPTED;
     }
 
@@ -199,6 +204,7 @@ FindFfsFileAndSection (
     // Look for the request file type
     //
     if (File->Type != FileType) {
+      DEBUG ((DEBUG_INFO, "%a: (File->Type != FileType), find next FFS\n", __FUNCTION__));
       continue;
     }
 
@@ -208,9 +214,15 @@ FindFfsFileAndSection (
                SectionType,
                FoundSection
                );
-    if (!EFI_ERROR (Status) || (Status == EFI_VOLUME_CORRUPTED)) {
+    if (!EFI_ERROR(Status)) {
+      DEBUG ((DEBUG_INFO, "%a: Get firmware file section\n", __FUNCTION__));
       return Status;
     }
+    if (Status == EFI_VOLUME_CORRUPTED) {
+      DEBUG ((DEBUG_ERROR, "%a: FV corrupted\n", __FUNCTION__));
+      return Status;
+    }
+    DEBUG ((DEBUG_INFO, "%a: Find next FFS\n", __FUNCTION__));
   }
 }
 
