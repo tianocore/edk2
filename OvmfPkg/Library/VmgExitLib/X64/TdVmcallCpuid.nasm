@@ -73,6 +73,8 @@ SECTION .text
     xor ebp, ebp
     xor r8d, r8d
     xor r9d, r9d
+    xor r14, r14
+    xor r15, r15
 %endmacro
 
 %macro tdcall_regs_postamble 0
@@ -89,15 +91,12 @@ SECTION .text
 %endmacro
 
 ;------------------------------------------------------------------------------
-; 0   => RAX = TDCALL leaf
+; 0   => RAX = TDCALL leaf / TDVMCALL
 ; M   => RCX = TDVMCALL register behavior
-; 1   => R10 = standard vs. vendor
-; RDI => R11 = TDVMCALL function / nr
-; RSI =  R12 = p1
+; 0xa => R11 = TDVMCALL function / CPUID
+; RCX => R12 = p1
 ; RDX => R13 = p2
-; RCX => R14 = p3
-; R8  => R15 = p4
-
+;
 ;  UINT64
 ;  EFIAPI
 ;  TdVmCallCpuid (
@@ -120,9 +119,9 @@ ASM_PFX(TdVmCallCpuid):
 
        tdcall
 
-       ; Panic if TDCALL reports failure.
+       ; ignore return data if TDCALL reports failure.
        test rax, rax
-       jnz .panic
+       jnz .no_return_data
 
        ; Propagate TDVMCALL success/failure to return value.
        mov rax, r10
@@ -145,6 +144,3 @@ ASM_PFX(TdVmCallCpuid):
        tdcall_pop_regs
 
        ret
-
-.panic:
-       ud2

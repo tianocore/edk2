@@ -441,67 +441,67 @@ VmTdExitHandleVe (
 
   switch (ReturnData.VeInfo.ExitReason) {
     case EXIT_REASON_CPUID:
-    Status = CpuIdExit (Regs, &ReturnData.VeInfo);
-    DEBUG ((DEBUG_VERBOSE,
-          "CPUID #VE happened, ExitReasion is %d, ExitQualification = 0x%x.\n",
-          ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val
-          ));
-    break;
+      Status = CpuIdExit (Regs, &ReturnData.VeInfo);
+      DEBUG ((DEBUG_VERBOSE,
+            "CPUID #VE happened, ExitReasion is %d, ExitQualification = 0x%x.\n",
+            ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val
+            ));
+      break;
 
     case EXIT_REASON_HLT:
-    if (FixedPcdGetBool (PcdIgnoreVeHalt) == FALSE) {
-      Status = TdVmCall (EXIT_REASON_HLT, 0, 0, 0, 0, 0);
-    }
-    break;
+      if (FixedPcdGetBool (PcdIgnoreVeHalt) == FALSE) {
+        Status = TdVmCall (EXIT_REASON_HLT, 0, 0, 0, 0, 0);
+      }
+      break;
 
     case EXIT_REASON_IO_INSTRUCTION:
-    Status = IoExit (Regs, &ReturnData.VeInfo);
-    DEBUG ((DEBUG_VERBOSE ,
-          "IO_Instruction #VE happened, ExitReasion is %d, ExitQualification = 0x%x.\n",
-          ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val
-          ));
-    break;
+      Status = IoExit (Regs, &ReturnData.VeInfo);
+      DEBUG ((DEBUG_VERBOSE ,
+            "IO_Instruction #VE happened, ExitReasion is %d, ExitQualification = 0x%x.\n",
+            ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val
+            ));
+      break;
 
     case EXIT_REASON_MSR_READ:
-    Status = ReadMsrExit (Regs, &ReturnData.VeInfo);
-    DEBUG ((DEBUG_VERBOSE ,
-          "RDMSR #VE happened, ExitReasion is %d, ExitQualification = 0x%x. Regs->Rcx=0x%llx, Status = 0x%llx\n",
-          ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val, Regs->Rcx, Status
-          ));
-    break;
+      Status = ReadMsrExit (Regs, &ReturnData.VeInfo);
+      DEBUG ((DEBUG_VERBOSE ,
+            "RDMSR #VE happened, ExitReasion is %d, ExitQualification = 0x%x. Regs->Rcx=0x%llx, Status = 0x%llx\n",
+            ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val, Regs->Rcx, Status
+            ));
+      break;
 
     case EXIT_REASON_MSR_WRITE:
-    Status = WriteMsrExit (Regs, &ReturnData.VeInfo);
-    DEBUG ((DEBUG_VERBOSE ,
-          "WRMSR #VE happened, ExitReasion is %d, ExitQualification = 0x%x. Regs->Rcx=0x%llx, Status = 0x%llx\n",
-          ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val, Regs->Rcx, Status
-          ));
-    break;
+      Status = WriteMsrExit (Regs, &ReturnData.VeInfo);
+      DEBUG ((DEBUG_VERBOSE ,
+            "WRMSR #VE happened, ExitReasion is %d, ExitQualification = 0x%x. Regs->Rcx=0x%llx, Status = 0x%llx\n",
+            ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val, Regs->Rcx, Status
+            ));
+      break;
 
     case EXIT_REASON_EPT_VIOLATION:
-    Status = MmioExit (Regs, &ReturnData.VeInfo);
-    DEBUG ((DEBUG_VERBOSE ,
-          "MMIO #VE happened, ExitReasion is %d, ExitQualification = 0x%x.\n",
-          ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val
-          ));
-    break;
+      Status = MmioExit (Regs, &ReturnData.VeInfo);
+      DEBUG ((DEBUG_VERBOSE ,
+            "MMIO #VE happened, ExitReasion is %d, ExitQualification = 0x%x.\n",
+            ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val
+            ));
+      break;
 
     case EXIT_REASON_VMCALL:
     case EXIT_REASON_MWAIT_INSTRUCTION:
     case EXIT_REASON_MONITOR_INSTRUCTION:
     case EXIT_REASON_WBINVD:
     case EXIT_REASON_RDPMC:
-    /* Handle as nops. */
-    break;
+      /* Handle as nops. */
+      break;
 
     default:
-    DEBUG ((DEBUG_ERROR,
-          "Unsupported #VE happened, ExitReason is %d, ExitQualification = 0x%x.\n",
-          ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val
-          ));
+      DEBUG ((DEBUG_ERROR,
+            "Unsupported #VE happened, ExitReason is %d, ExitQualification = 0x%x.\n",
+            ReturnData.VeInfo.ExitReason, ReturnData.VeInfo.ExitQualification.Val
+            ));
 
-    ASSERT (FALSE);
-    CpuDeadLoop ();
+      ASSERT (FALSE);
+      CpuDeadLoop ();
   }
   if (Status) {
     DEBUG ((DEBUG_ERROR,
