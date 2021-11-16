@@ -886,6 +886,13 @@ AhciPrintStatusBlock (
   )
 {
   //
+  // Skip NULL pointer
+  //
+  if (AtaStatusBlock == NULL) {
+    return;
+  }
+
+  //
   // Only print status and error since we have all of the rest printed as
   // a part of command block print.
   //
