@@ -17,12 +17,16 @@
 
 UINT64  mNumberOfDuplicatedAcceptedPages;
 
+#define TDX_ACCEPTPAGE_MAX_RETRIED  3
+
 // PageSize is mapped to PageLevel like below:
 // 4KB - 0, 2MB - 1
 UINT32  mTdxAcceptPageLevelMap[2] = {
   SIZE_4KB,
   SIZE_2MB
 };
+
+#define INVALID_ACCEPT_PAGELEVEL  ARRAY_SIZE(mTdxAcceptPageLevelMap)
 
 /**
   This function gets the PageLevel according to the input page size.
@@ -44,7 +48,7 @@ GetGpaPageLevel (
     }
   }
 
-  return Index == ARRAY_SIZE (mTdxAcceptPageLevelMap) ? -1 : Index;
+  return Index;
 }
 
 /**
@@ -57,9 +61,9 @@ GetGpaPageLevel (
   PageLevel if possible.
 
   @param[in]  StartAddress      Guest physical address of the private
-                                page to accept.
+                                page to accept. [63:52] and [11:0] must be 0.
   @param[in]  NumberOfPages     Number of the pages to be accepted.
-  @param[in]  PageSize          GPA page size. Only accept 1G/2M/4K size.
+  @param[in]  PageSize          GPA page size. Only accept 2M/4K size.
 
   @return EFI_SUCCESS           Accept successfully
   @return others                Indicate other errors
@@ -78,17 +82,29 @@ TdAcceptPages (
   UINT64      Index;
   UINT32      GpaPageLevel;
   UINT32      PageSize2;
+  UINTN       Retried;
 
+  Retried = 0;
+
+  if ((StartAddress & ~0xFFFFFFFFFF000ULL) != 0) {
+    ASSERT (FALSE);
+    DEBUG ((DEBUG_ERROR, "Accept page address(0x%llx) is not valid. [63:52] and [11:0] must be 0\n", StartAddress));
+    return EFI_INVALID_PARAMETER;
+  }
   Address = StartAddress;
 
   GpaPageLevel = GetGpaPageLevel (PageSize);
-  if (GpaPageLevel == -1) {
+  if (GpaPageLevel == INVALID_ACCEPT_PAGELEVEL) {
+    ASSERT (FALSE);
     DEBUG ((DEBUG_ERROR, "Accept page size must be 4K/2M. Invalid page size - 0x%llx\n", PageSize));
     return EFI_INVALID_PARAMETER;
   }
 
   Status = EFI_SUCCESS;
   for (Index = 0; Index < NumberOfPages; Index++) {
+    Retried = 0;
+
+DoAcceptPage:
     TdxStatus = TdCall (TDCALL_TDACCEPTPAGE, Address | GpaPageLevel, 0, 0, 0);
     if (TdxStatus != TDX_EXIT_REASON_SUCCESS) {
         if ((TdxStatus & ~0xFFFFULL) == TDX_EXIT_REASON_PAGE_ALREADY_ACCEPTED) {
@@ -120,8 +136,22 @@ TdAcceptPages (
               break;
             }
           }
-        }else {
-
+        } else if ((TdxStatus & ~0xFFFFULL) == TDX_EXIT_REASON_OPERAND_BUSY) {
+          //
+          // Concurrent TDG.MEM.PAGE.ACCEPT is using the same Secure EPT entry
+          // So try it again. There is a max retried count. If Retried exceeds the max count,
+          // report the error and quit.
+          //
+          Retried += 1;
+          if (Retried > TDX_ACCEPTPAGE_MAX_RETRIED) {
+            DEBUG ((DEBUG_ERROR, "Address %llx (%d) failed to be accepted because of OPERAND_BUSY. Retried %d time.\n",
+              Address, Index, Retried));
+            Status = EFI_INVALID_PARAMETER;
+            break;
+          } else {
+            goto DoAcceptPage;
+          }
+        } else {
           //
           // Other errors
           //

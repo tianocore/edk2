@@ -19,7 +19,7 @@
   all-0 using the TD ephemeral private key.
 
   @param[in]  StartAddress     Guest physical address of the private page
-                               to accept.
+                               to accept. [63:52] and [11:0] must be 0.
   @param[in]  NumberOfPages    Number of the pages to be accepted.
   @param[in]  PageSize         GPA page size. Accept 2M/4K page size.
 
