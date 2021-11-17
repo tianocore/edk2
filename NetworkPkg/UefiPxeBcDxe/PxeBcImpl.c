@@ -1951,7 +1951,7 @@ EfiPxeBcSetParameters (
 
   if (NewSendGUID != NULL) {
     if (*NewSendGUID && EFI_ERROR (NetLibGetSystemGuid (&SystemGuid))) {
-      DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
+      DEBUG ((DEBUG_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
       return EFI_INVALID_PARAMETER;
     }
     Mode->SendGUID = *NewSendGUID;
@@ -2418,4 +2418,3 @@ EfiPxeLoadFile (
 }
 
 EFI_LOAD_FILE_PROTOCOL  gLoadFileProtocolTemplate = { EfiPxeLoadFile };
-

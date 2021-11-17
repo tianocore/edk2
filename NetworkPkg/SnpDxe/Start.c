@@ -66,7 +66,7 @@ PxeStart (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.start()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.start()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -75,7 +75,7 @@ PxeStart (
     // UNDI could not be started. Return UNDI error.
     //
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "\nsnp->undi.start()  %xh:%xh\n",
       Snp->Cdb.StatCode,
       Snp->Cdb.StatFlags)

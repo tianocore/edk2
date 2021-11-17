@@ -489,7 +489,7 @@ HttpBootFormCallback (
 
       if (Status == EFI_INVALID_PARAMETER) {
 
-        DEBUG ((EFI_D_ERROR, "HttpBootFormCallback: %r.\n", Status));
+        DEBUG ((DEBUG_ERROR, "HttpBootFormCallback: %r.\n", Status));
 
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
@@ -500,7 +500,7 @@ HttpBootFormCallback (
           );
       } else if (Status == EFI_ACCESS_DENIED) {
 
-        DEBUG ((EFI_D_ERROR, "HttpBootFormCallback: %r.\n", Status));
+        DEBUG ((DEBUG_ERROR, "HttpBootFormCallback: %r.\n", Status));
 
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
