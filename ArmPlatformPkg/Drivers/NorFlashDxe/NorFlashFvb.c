@@ -187,14 +187,14 @@ ValidateFvHeader (
       || (FwVolHeader->FvLength  != FvLength)
       )
   {
-    DEBUG ((EFI_D_INFO, "%a: No Firmware Volume header present\n",
+    DEBUG ((DEBUG_INFO, "%a: No Firmware Volume header present\n",
       __FUNCTION__));
     return EFI_NOT_FOUND;
   }
 
   // Check the Firmware Volume Guid
   if( CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiSystemNvDataFvGuid) == FALSE ) {
-    DEBUG ((EFI_D_INFO, "%a: Firmware Volume Guid non-compatible\n",
+    DEBUG ((DEBUG_INFO, "%a: Firmware Volume Guid non-compatible\n",
       __FUNCTION__));
     return EFI_NOT_FOUND;
   }
@@ -202,7 +202,7 @@ ValidateFvHeader (
   // Verify the header checksum
   Checksum = CalculateSum16((UINT16*)FwVolHeader, FwVolHeader->HeaderLength);
   if (Checksum != 0) {
-    DEBUG ((EFI_D_INFO, "%a: FV checksum is invalid (Checksum:0x%X)\n",
+    DEBUG ((DEBUG_INFO, "%a: FV checksum is invalid (Checksum:0x%X)\n",
       __FUNCTION__, Checksum));
     return EFI_NOT_FOUND;
   }
@@ -212,14 +212,14 @@ ValidateFvHeader (
   // Check the Variable Store Guid
   if (!CompareGuid (&VariableStoreHeader->Signature, &gEfiVariableGuid) &&
       !CompareGuid (&VariableStoreHeader->Signature, &gEfiAuthenticatedVariableGuid)) {
-    DEBUG ((EFI_D_INFO, "%a: Variable Store Guid non-compatible\n",
+    DEBUG ((DEBUG_INFO, "%a: Variable Store Guid non-compatible\n",
       __FUNCTION__));
     return EFI_NOT_FOUND;
   }
 
   VariableStoreLength = PcdGet32 (PcdFlashNvStorageVariableSize) - FwVolHeader->HeaderLength;
   if (VariableStoreHeader->Size != VariableStoreLength) {
-    DEBUG ((EFI_D_INFO, "%a: Variable Store Length does not match\n",
+    DEBUG ((DEBUG_INFO, "%a: Variable Store Length does not match\n",
       __FUNCTION__));
     return EFI_NOT_FOUND;
   }
@@ -386,7 +386,7 @@ FvbGetBlockSize (
   DEBUG ((DEBUG_BLKIO, "FvbGetBlockSize(Lba=%ld, BlockSize=0x%x, LastBlock=%ld)\n", Lba, Instance->Media.BlockSize, Instance->Media.LastBlock));
 
   if (Lba > Instance->Media.LastBlock) {
-    DEBUG ((EFI_D_ERROR, "FvbGetBlockSize: ERROR - Parameter LBA %ld is beyond the last Lba (%ld).\n", Lba, Instance->Media.LastBlock));
+    DEBUG ((DEBUG_ERROR, "FvbGetBlockSize: ERROR - Parameter LBA %ld is beyond the last Lba (%ld).\n", Lba, Instance->Media.LastBlock));
     Status = EFI_INVALID_PARAMETER;
   } else {
     // This is easy because in this platform each NorFlash device has equal sized blocks.
@@ -472,7 +472,7 @@ FvbRead (
   if ((Offset               >= BlockSize) ||
       (*NumBytes            >  BlockSize) ||
       ((Offset + *NumBytes) >  BlockSize)) {
-    DEBUG ((EFI_D_ERROR, "FvbRead: ERROR - EFI_BAD_BUFFER_SIZE: (Offset=0x%x + NumBytes=0x%x) > BlockSize=0x%x\n", Offset, *NumBytes, BlockSize ));
+    DEBUG ((DEBUG_ERROR, "FvbRead: ERROR - EFI_BAD_BUFFER_SIZE: (Offset=0x%x + NumBytes=0x%x) > BlockSize=0x%x\n", Offset, *NumBytes, BlockSize ));
     return EFI_BAD_BUFFER_SIZE;
   }
 
@@ -635,7 +635,7 @@ FvbEraseBlocks (
   // Detect WriteDisabled state
   if (Instance->Media.ReadOnly == TRUE) {
     // Firmware volume is in WriteDisabled state
-    DEBUG ((EFI_D_ERROR, "FvbEraseBlocks: ERROR - Device is in WriteDisabled state.\n"));
+    DEBUG ((DEBUG_ERROR, "FvbEraseBlocks: ERROR - Device is in WriteDisabled state.\n"));
     return EFI_ACCESS_DENIED;
   }
 
@@ -665,7 +665,7 @@ FvbEraseBlocks (
       ));
     if ((NumOfLba == 0) || ((Instance->StartLba + StartingLba + NumOfLba - 1) > Instance->Media.LastBlock)) {
       VA_END (Args);
-      DEBUG ((EFI_D_ERROR, "FvbEraseBlocks: ERROR - Lba range goes past the last Lba.\n"));
+      DEBUG ((DEBUG_ERROR, "FvbEraseBlocks: ERROR - Lba range goes past the last Lba.\n"));
       Status = EFI_INVALID_PARAMETER;
       goto EXIT;
     }
@@ -737,4 +737,3 @@ FvbVirtualNotifyEvent (
   EfiConvertPointer (0x0, (VOID**)&mFlashNvStorageVariableBase);
   return;
 }
-

@@ -201,7 +201,7 @@ NorFlashUnlockAndEraseSingleBlock (
   } while ((Index < NOR_FLASH_ERASE_RETRY) && (Status == EFI_WRITE_PROTECTED));
 
   if (Index == NOR_FLASH_ERASE_RETRY) {
-    DEBUG((EFI_D_ERROR,"EraseSingleBlock(BlockAddress=0x%08x: Block Locked Error (try to erase %d times)\n", BlockAddress,Index));
+    DEBUG((DEBUG_ERROR,"EraseSingleBlock(BlockAddress=0x%08x: Block Locked Error (try to erase %d times)\n", BlockAddress,Index));
   }
 
   if (!EfiAtRuntime ()) {
@@ -249,7 +249,7 @@ NorFlashWriteFullBlock (
 
   Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
   if (EFI_ERROR(Status)) {
-    DEBUG((EFI_D_ERROR, "WriteSingleBlock: ERROR - Failed to Unlock and Erase the single block at 0x%X\n", BlockAddress));
+    DEBUG((DEBUG_ERROR, "WriteSingleBlock: ERROR - Failed to Unlock and Erase the single block at 0x%X\n", BlockAddress));
     goto EXIT;
   }
 
@@ -310,7 +310,7 @@ EXIT:
   }
 
   if (EFI_ERROR(Status)) {
-    DEBUG((EFI_D_ERROR, "NOR FLASH Programming [WriteSingleBlock] failed at address 0x%08x. Exit Status = \"%r\".\n", WordAddress, Status));
+    DEBUG((DEBUG_ERROR, "NOR FLASH Programming [WriteSingleBlock] failed at address 0x%08x. Exit Status = \"%r\".\n", WordAddress, Status));
   }
   return Status;
 }
@@ -329,13 +329,13 @@ NorFlashInitialise (
 
   Status = NorFlashPlatformInitialization ();
   if (EFI_ERROR(Status)) {
-    DEBUG((EFI_D_ERROR,"NorFlashInitialise: Fail to initialize Nor Flash devices\n"));
+    DEBUG((DEBUG_ERROR,"NorFlashInitialise: Fail to initialize Nor Flash devices\n"));
     return Status;
   }
 
   Status = NorFlashPlatformGetDevices (&NorFlashDevices, &mNorFlashDeviceCount);
   if (EFI_ERROR(Status)) {
-    DEBUG((EFI_D_ERROR,"NorFlashInitialise: Fail to get Nor Flash devices\n"));
+    DEBUG((DEBUG_ERROR,"NorFlashInitialise: Fail to get Nor Flash devices\n"));
     return Status;
   }
 
@@ -366,7 +366,7 @@ NorFlashInitialise (
       &mNorFlashInstances[Index]
     );
     if (EFI_ERROR(Status)) {
-      DEBUG((EFI_D_ERROR,"NorFlashInitialise: Fail to create instance for NorFlash[%d]\n",Index));
+      DEBUG((DEBUG_ERROR,"NorFlashInitialise: Fail to create instance for NorFlash[%d]\n",Index));
     }
   }
 

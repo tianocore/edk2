@@ -26,7 +26,7 @@ LcdIdentify (
   VOID
   )
 {
-  DEBUG ((EFI_D_WARN, "Probing ID registers at 0x%lx for a PL111\n",
+  DEBUG ((DEBUG_WARN, "Probing ID registers at 0x%lx for a PL111\n",
     PL111_REG_CLCD_PERIPH_ID_0));
 
   // Check if this is a PL111
