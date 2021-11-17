@@ -351,7 +351,7 @@ HashLogExtendEvent (
 
 Done:
   if ((Status == EFI_DEVICE_ERROR) || (Status == EFI_TIMEOUT)) {
-    DEBUG ((EFI_D_ERROR, "HashLogExtendEvent - %r. Disable TPM.\n", Status));
+    DEBUG ((DEBUG_ERROR, "HashLogExtendEvent - %r. Disable TPM.\n", Status));
     BuildGuidHob (&gTpmErrorHobGuid,0);
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
@@ -844,12 +844,12 @@ PeimEntryMA (
   EFI_BOOT_MODE                     BootMode;
 
   if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
-    DEBUG ((EFI_D_ERROR, "No TPM12 instance required!\n"));
+    DEBUG ((DEBUG_ERROR, "No TPM12 instance required!\n"));
     return EFI_UNSUPPORTED;
   }
 
   if (GetFirstGuidHob (&gTpmErrorHobGuid) != NULL) {
-    DEBUG ((EFI_D_ERROR, "TPM error!\n"));
+    DEBUG ((DEBUG_ERROR, "TPM error!\n"));
     return EFI_DEVICE_ERROR;
   }
 
@@ -913,7 +913,7 @@ PeimEntryMA (
 
 Done:
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TPM error! Build Hob\n"));
+    DEBUG ((DEBUG_ERROR, "TPM error! Build Hob\n"));
     BuildGuidHob (&gTpmErrorHobGuid,0);
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
