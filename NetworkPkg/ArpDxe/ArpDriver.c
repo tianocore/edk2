@@ -492,7 +492,7 @@ ArpDriverBindingStop (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "ArpDriverBindingStop: Open ArpSb failed, %r.\n", Status));
+    DEBUG ((DEBUG_ERROR, "ArpDriverBindingStop: Open ArpSb failed, %r.\n", Status));
     return EFI_DEVICE_ERROR;
   }
 
@@ -578,7 +578,7 @@ ArpServiceBindingCreateChild (
   //
   Instance = AllocateZeroPool (sizeof(ARP_INSTANCE_DATA));
   if (Instance == NULL) {
-    DEBUG ((EFI_D_ERROR, "ArpSBCreateChild: Failed to allocate memory for Instance.\n"));
+    DEBUG ((DEBUG_ERROR, "ArpSBCreateChild: Failed to allocate memory for Instance.\n"));
 
     return EFI_OUT_OF_RESOURCES;
   }
@@ -746,7 +746,7 @@ ArpServiceBindingDestroyChild (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "ArpSBDestroyChild: Failed to uninstall the arp protocol, %r.\n",
+    DEBUG ((DEBUG_ERROR, "ArpSBDestroyChild: Failed to uninstall the arp protocol, %r.\n",
       Status));
 
     Instance->InDestroy = FALSE;
@@ -808,4 +808,3 @@ ArpDriverEntryPoint (
            &gArpComponentName2
            );
 }
-

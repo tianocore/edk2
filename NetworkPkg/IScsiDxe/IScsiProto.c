@@ -260,7 +260,7 @@ IScsiCreateConnection (
     }
 
     if (EFI_ERROR(Status)) {
-      DEBUG ((EFI_D_ERROR, "The configuration of Target address or DNS server address is invalid!\n"));
+      DEBUG ((DEBUG_ERROR, "The configuration of Target address or DNS server address is invalid!\n"));
       FreePool (Conn);
       return NULL;
     }

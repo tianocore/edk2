@@ -46,7 +46,7 @@ PxeInit (
 
     if (Status != EFI_SUCCESS) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "\nSnp->PxeInit()  AllocateBuffer  %xh (%r)\n",
         Status,
         Status)
@@ -91,7 +91,7 @@ PxeInit (
   Snp->Cdb.IFnum      = Snp->IfNum;
   Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
 
-  DEBUG ((EFI_D_NET, "\nSnp->undi.initialize()  "));
+  DEBUG ((DEBUG_NET, "\nSnp->undi.initialize()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -121,7 +121,7 @@ PxeInit (
     Status            = EFI_SUCCESS;
   } else {
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "\nSnp->undi.initialize()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
