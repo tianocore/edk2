@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "IScsiImpl.h"
 
-EFI_AUTHENTICATION_INFO_PROTOCOL gIScsiAuthenticationInfo = {
+EFI_AUTHENTICATION_INFO_PROTOCOL  gIScsiAuthenticationInfo = {
   IScsiGetAuthenticationInfo,
   IScsiSetAuthenticationInfo
 };

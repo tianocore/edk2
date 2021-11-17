@@ -148,7 +148,7 @@ EFIAPI
 TlsGetSessionData (
   IN     EFI_TLS_PROTOCOL              *This,
   IN     EFI_TLS_SESSION_DATA_TYPE     DataType,
-  IN OUT VOID                          *Data,  OPTIONAL
+  IN OUT VOID                          *Data, OPTIONAL
   IN OUT UINTN                         *DataSize
   );
 
@@ -196,7 +196,7 @@ TlsBuildResponsePacket (
   IN     EFI_TLS_PROTOCOL              *This,
   IN     UINT8                         *RequestBuffer, OPTIONAL
   IN     UINTN                         RequestSize, OPTIONAL
-     OUT UINT8                         *Buffer, OPTIONAL
+  OUT UINT8                         *Buffer, OPTIONAL
   IN OUT UINTN                         *BufferSize
   );
 
@@ -303,4 +303,3 @@ TlsConfigurationGetData (
   );
 
 #endif
-

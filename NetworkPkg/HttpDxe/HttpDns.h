@@ -26,7 +26,7 @@ EFI_STATUS
 HttpDns4 (
   IN     HTTP_PROTOCOL            *HttpInstance,
   IN     CHAR16                   *HostName,
-     OUT EFI_IPv4_ADDRESS         *IpAddress
+  OUT EFI_IPv4_ADDRESS         *IpAddress
   );
 
 /**
@@ -46,7 +46,7 @@ EFI_STATUS
 HttpDns6 (
   IN     HTTP_PROTOCOL            *HttpInstance,
   IN     CHAR16                   *HostName,
-     OUT EFI_IPv6_ADDRESS         *IpAddress
+  OUT EFI_IPv6_ADDRESS         *IpAddress
   );
 
 #endif

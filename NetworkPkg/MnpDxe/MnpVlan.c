@@ -9,13 +9,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "MnpImpl.h"
 #include "MnpVlan.h"
 
-VLAN_DEVICE_PATH          mVlanDevicePathTemplate = {
+VLAN_DEVICE_PATH  mVlanDevicePathTemplate = {
   {
     MESSAGING_DEVICE_PATH,
     MSG_VLAN_DP,
     {
-      (UINT8) (sizeof (VLAN_DEVICE_PATH)),
-      (UINT8) ((sizeof (VLAN_DEVICE_PATH)) >> 8)
+      (UINT8)(sizeof (VLAN_DEVICE_PATH)),
+      (UINT8)((sizeof (VLAN_DEVICE_PATH)) >> 8)
     }
   },
   0
@@ -26,7 +26,6 @@ EFI_VLAN_CONFIG_PROTOCOL  mVlanConfigProtocolTemplate = {
   VlanConfigFind,
   VlanConfigRemove
 };
-
 
 /**
   Create a child handle for the VLAN ID.
@@ -44,7 +43,7 @@ MnpCreateVlanChild (
   IN     EFI_HANDLE                  ImageHandle,
   IN     EFI_HANDLE                  ControllerHandle,
   IN     UINT16                      VlanId,
-     OUT EFI_DEVICE_PATH_PROTOCOL    **Devicepath OPTIONAL
+  OUT EFI_DEVICE_PATH_PROTOCOL    **Devicepath OPTIONAL
   )
 {
   EFI_HANDLE                ChildHandle;
@@ -59,7 +58,7 @@ MnpCreateVlanChild (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath,
+                  (VOID **)&ParentDevicePath,
                   ImageHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -73,10 +72,10 @@ MnpCreateVlanChild (
   //
   CopyMem (&VlanNode, &mVlanDevicePathTemplate, sizeof (VLAN_DEVICE_PATH));
   VlanNode.VlanId = VlanId;
-  VlanDevicePath = AppendDevicePathNode (
-                     ParentDevicePath,
-                     (EFI_DEVICE_PATH_PROTOCOL *) &VlanNode
-                     );
+  VlanDevicePath  = AppendDevicePathNode (
+                      ParentDevicePath,
+                      (EFI_DEVICE_PATH_PROTOCOL *)&VlanNode
+                      );
   if (VlanDevicePath == NULL) {
     return NULL;
   }
@@ -118,7 +117,7 @@ BOOLEAN
 MnpRemoveVlanTag (
   IN OUT MNP_DEVICE_DATA   *MnpDeviceData,
   IN OUT NET_BUF           *Nbuf,
-     OUT UINT16            *VlanId
+  OUT UINT16            *VlanId
   )
 {
   UINT8     *Packet;
@@ -137,8 +136,8 @@ MnpRemoveVlanTag (
   //
   // Check whether this is VLAN tagged frame by Ether Type
   //
-  *VlanId      = 0;
-  ProtocolType = NTOHS (*(UINT16 *) (Packet + ProtocolOffset));
+  *VlanId = 0;
+  ProtocolType = NTOHS (*(UINT16 *)(Packet + ProtocolOffset));
   if (ProtocolType != ETHER_TYPE_VLAN) {
     //
     // Not a VLAN tagged frame
@@ -146,7 +145,7 @@ MnpRemoveVlanTag (
     return FALSE;
   }
 
-  VlanTag.Uint16 = NTOHS (*(UINT16 *) (Packet + ProtocolOffset + sizeof (ProtocolType)));
+  VlanTag.Uint16 = NTOHS (*(UINT16 *)(Packet + ProtocolOffset + sizeof (ProtocolType)));
   *VlanId = VlanTag.Bits.Vid;
 
   //
@@ -161,7 +160,6 @@ MnpRemoveVlanTag (
 
   return TRUE;
 }
-
 
 /**
   Build the vlan packet to transmit from the TxData passed in.
@@ -179,26 +177,26 @@ VOID
 MnpInsertVlanTag (
   IN     MNP_SERVICE_DATA                    *MnpServiceData,
   IN     EFI_MANAGED_NETWORK_TRANSMIT_DATA   *TxData,
-     OUT UINT16                              *ProtocolType,
+  OUT UINT16                              *ProtocolType,
   IN OUT UINT8                               **Packet,
   IN OUT UINT32                              *Length
   )
 {
-  VLAN_TCI                *VlanTci;
-  UINT16                  *Tpid;
-  UINT16                  *EtherType;
-  MNP_DEVICE_DATA         *MnpDeviceData;
-  EFI_SIMPLE_NETWORK_MODE *SnpMode;
+  VLAN_TCI                 *VlanTci;
+  UINT16                   *Tpid;
+  UINT16                   *EtherType;
+  MNP_DEVICE_DATA          *MnpDeviceData;
+  EFI_SIMPLE_NETWORK_MODE  *SnpMode;
 
   MnpDeviceData = MnpServiceData->MnpDeviceData;
-  SnpMode       = MnpDeviceData->Snp->Mode;
+  SnpMode = MnpDeviceData->Snp->Mode;
 
   *ProtocolType = ETHER_TYPE_VLAN;
   *Length = *Length + NET_VLAN_TAG_LEN;
   *Packet = *Packet - NET_VLAN_TAG_LEN;
 
-  Tpid    = (UINT16 *) (*Packet + SnpMode->MediaHeaderSize - sizeof (*ProtocolType));
-  VlanTci = (VLAN_TCI *) (UINTN) (Tpid + 1);
+  Tpid    = (UINT16 *)(*Packet + SnpMode->MediaHeaderSize - sizeof (*ProtocolType));
+  VlanTci = (VLAN_TCI *)(UINTN)(Tpid + 1);
   if (TxData->HeaderLength != 0) {
     //
     // Media header is in packet, move DA+SA 4 bytes left
@@ -213,14 +211,14 @@ MnpInsertVlanTag (
     //
     // Media header not in packet, VLAN TCI and original protocol type becomes payload
     //
-    EtherType  = (UINT16 *) (UINTN) (VlanTci + 1);
+    EtherType  = (UINT16 *)(UINTN)(VlanTci + 1);
     *EtherType = HTONS (TxData->ProtocolType);
   }
 
-  VlanTci->Bits.Vid      = MnpServiceData->VlanId;
-  VlanTci->Bits.Cfi      = VLAN_TCI_CFI_CANONICAL_MAC;
+  VlanTci->Bits.Vid = MnpServiceData->VlanId;
+  VlanTci->Bits.Cfi = VLAN_TCI_CFI_CANONICAL_MAC;
   VlanTci->Bits.Priority = MnpServiceData->Priority;
-  VlanTci->Uint16        = HTONS (VlanTci->Uint16);
+  VlanTci->Uint16 = HTONS (VlanTci->Uint16);
 }
 
 /**
@@ -240,33 +238,35 @@ MnpCheckVlanVariable (
   IN     MNP_DEVICE_DATA   *MnpDeviceData,
   IN     VLAN_TCI          *Buffer,
   IN     UINTN             NumberOfVlan,
-     OUT UINTN             *NewNumberOfVlan
+  OUT UINTN             *NewNumberOfVlan
   )
 {
-  UINTN             Index;
-  UINTN             Index2;
-  UINTN             Count;
-  BOOLEAN           FoundDuplicateItem;
-  EFI_STATUS        Status;
+  UINTN       Index;
+  UINTN       Index2;
+  UINTN       Count;
+  BOOLEAN     FoundDuplicateItem;
+  EFI_STATUS  Status;
 
   Count = 0;
-  FoundDuplicateItem  = FALSE;
+  FoundDuplicateItem = FALSE;
   Status = EFI_SUCCESS;
 
   for (Index = 0; Index < NumberOfVlan; Index++) {
-   for (Index2 = Index + 1; Index2 < NumberOfVlan; Index2++) {
-     if (Buffer[Index].Bits.Vid == Buffer[Index2].Bits.Vid) {
-       FoundDuplicateItem = TRUE;
-       Count++;
-       break;
-     }
-   }
-   if (FoundDuplicateItem) {
-    for (Index2 = Index +1; Index2 < NumberOfVlan; Index++, Index2++) {
-      CopyMem (Buffer + Index, Buffer + Index2, sizeof (VLAN_TCI));
+    for (Index2 = Index + 1; Index2 < NumberOfVlan; Index2++) {
+      if (Buffer[Index].Bits.Vid == Buffer[Index2].Bits.Vid) {
+        FoundDuplicateItem = TRUE;
+        Count++;
+        break;
+      }
     }
-   }
-   FoundDuplicateItem = FALSE;
+
+    if (FoundDuplicateItem) {
+      for (Index2 = Index +1; Index2 < NumberOfVlan; Index++, Index2++) {
+        CopyMem (Buffer + Index, Buffer + Index2, sizeof (VLAN_TCI));
+      }
+    }
+
+    FoundDuplicateItem = FALSE;
   }
 
   *NewNumberOfVlan = NumberOfVlan - Count;
@@ -294,8 +294,8 @@ MnpCheckVlanVariable (
 EFI_STATUS
 MnpGetVlanVariable (
   IN     MNP_DEVICE_DATA   *MnpDeviceData,
-     OUT UINTN             *NumberOfVlan,
-     OUT VLAN_TCI          **VlanVariable
+  OUT UINTN             *NumberOfVlan,
+  OUT VLAN_TCI          **VlanVariable
   )
 {
   UINTN       BufferSize;
@@ -306,15 +306,15 @@ MnpGetVlanVariable (
   //
   // Get VLAN configuration from EFI Variable
   //
-  Buffer = NULL;
+  Buffer     = NULL;
   BufferSize = 0;
-  Status = gRT->GetVariable (
-                  MnpDeviceData->MacString,
-                  &gEfiVlanConfigProtocolGuid,
-                  NULL,
-                  &BufferSize,
-                  NULL
-                  );
+  Status     = gRT->GetVariable (
+                      MnpDeviceData->MacString,
+                      &gEfiVlanConfigProtocolGuid,
+                      NULL,
+                      &BufferSize,
+                      NULL
+                      );
   if (Status != EFI_BUFFER_TOO_SMALL) {
     return EFI_NOT_FOUND;
   }
@@ -374,7 +374,6 @@ MnpSetVlanVariable (
                 VlanVariable
                 );
 }
-
 
 /**
   Create a VLAN device or modify the configuration parameter of an
@@ -478,7 +477,7 @@ VlanConfigSet (
     }
   }
 
-  MnpServiceData->VlanId = VlanId;
+  MnpServiceData->VlanId   = VlanId;
   MnpServiceData->Priority = Priority;
   if (IsAdd) {
     MnpDeviceData->NumberOfVlan++;
@@ -516,13 +515,14 @@ VlanConfigSet (
         break;
       }
     }
+
     ASSERT (Index < NumberOfVlan);
 
     NewVariable = OldVariable;
     OldVariable = NULL;
   }
 
-  NewVariable[Index].Bits.Vid      = VlanId;
+  NewVariable[Index].Bits.Vid = VlanId;
   NewVariable[Index].Bits.Priority = Priority;
 
   Status = MnpSetVlanVariable (MnpDeviceData, NumberOfVlan, NewVariable);
@@ -535,7 +535,6 @@ Exit:
 
   return Status;
 }
-
 
 /**
   Find configuration information for specified VLAN or all configured VLANs.
@@ -561,8 +560,8 @@ EFIAPI
 VlanConfigFind (
   IN     EFI_VLAN_CONFIG_PROTOCOL    *This,
   IN     UINT16                      *VlanId OPTIONAL,
-     OUT UINT16                      *NumberOfVlan,
-     OUT EFI_VLAN_FIND_DATA          **Entries
+  OUT UINT16                      *NumberOfVlan,
+  OUT EFI_VLAN_FIND_DATA          **Entries
   )
 {
   MNP_DEVICE_DATA     *MnpDeviceData;
@@ -570,12 +569,12 @@ VlanConfigFind (
   LIST_ENTRY          *Entry;
   EFI_VLAN_FIND_DATA  *VlanData;
 
-  if ((This == NULL) || (VlanId != NULL && *VlanId > 4094) || (NumberOfVlan == NULL) || (Entries == NULL)) {
+  if ((This == NULL) || ((VlanId != NULL) && (*VlanId > 4094)) || (NumberOfVlan == NULL) || (Entries == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   *NumberOfVlan = 0;
-  *Entries      = NULL;
+  *Entries = NULL;
 
   MnpDeviceData = MNP_DEVICE_DATA_FROM_THIS (This);
   if (MnpDeviceData->NumberOfVlan == 0) {
@@ -586,7 +585,7 @@ VlanConfigFind (
     //
     // Return all current VLAN configuration
     //
-    *NumberOfVlan = (UINT16) MnpDeviceData->NumberOfVlan;
+    *NumberOfVlan = (UINT16)MnpDeviceData->NumberOfVlan;
     VlanData = AllocateZeroPool (*NumberOfVlan * sizeof (EFI_VLAN_FIND_DATA));
     if (VlanData == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -596,7 +595,7 @@ VlanConfigFind (
     NET_LIST_FOR_EACH (Entry, &MnpDeviceData->ServiceList) {
       MnpServiceData = MNP_SERVICE_DATA_FROM_LINK (Entry);
 
-      VlanData->VlanId = MnpServiceData->VlanId;
+      VlanData->VlanId   = MnpServiceData->VlanId;
       VlanData->Priority = MnpServiceData->Priority;
       VlanData++;
     }
@@ -616,7 +615,8 @@ VlanConfigFind (
   if (VlanData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  VlanData->VlanId = MnpServiceData->VlanId;
+
+  VlanData->VlanId   = MnpServiceData->VlanId;
   VlanData->Priority = MnpServiceData->Priority;
 
   *NumberOfVlan = 1;
@@ -624,7 +624,6 @@ VlanConfigFind (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Remove the configured VLAN device.
@@ -716,7 +715,7 @@ VlanConfigRemove (
     NET_LIST_FOR_EACH (Entry, &MnpDeviceData->ServiceList) {
       MnpServiceData = MNP_SERVICE_DATA_FROM_LINK (Entry);
 
-      VlanData->Bits.Vid      = MnpServiceData->VlanId;
+      VlanData->Bits.Vid = MnpServiceData->VlanId;
       VlanData->Bits.Priority = MnpServiceData->Priority;
       VlanData++;
     }

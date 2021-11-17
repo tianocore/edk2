@@ -10,13 +10,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _HTTP_BOOT_CONFIG_H_
 #define _HTTP_BOOT_CONFIG_H_
 
-
 #include "HttpBootConfigNVDataStruc.h"
 
-typedef struct _HTTP_BOOT_FORM_CALLBACK_INFO   HTTP_BOOT_FORM_CALLBACK_INFO;
+typedef struct _HTTP_BOOT_FORM_CALLBACK_INFO HTTP_BOOT_FORM_CALLBACK_INFO;
 
-extern   UINT8                            HttpBootDxeStrings[];
-extern   UINT8                            HttpBootConfigVfrBin[];
+extern   UINT8  HttpBootDxeStrings[];
+extern   UINT8  HttpBootConfigVfrBin[];
 
 #pragma pack()
 
@@ -31,13 +30,13 @@ extern   UINT8                            HttpBootConfigVfrBin[];
   )
 
 struct _HTTP_BOOT_FORM_CALLBACK_INFO {
-  UINT32                           Signature;
-  BOOLEAN                          Initialized;
-  EFI_HANDLE                       ChildHandle;
-  EFI_DEVICE_PATH_PROTOCOL         *HiiVendorDevicePath;
-  EFI_HII_HANDLE                   RegisteredHandle;
-  EFI_HII_CONFIG_ACCESS_PROTOCOL   ConfigAccess;
-  HTTP_BOOT_CONFIG_IFR_NVDATA      HttpBootNvData;
+  UINT32                            Signature;
+  BOOLEAN                           Initialized;
+  EFI_HANDLE                        ChildHandle;
+  EFI_DEVICE_PATH_PROTOCOL          *HiiVendorDevicePath;
+  EFI_HII_HANDLE                    RegisteredHandle;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL    ConfigAccess;
+  HTTP_BOOT_CONFIG_IFR_NVDATA       HttpBootNvData;
 };
 
 /**

@@ -284,7 +284,6 @@ TcpInstallDevicePath (
   IN SOCKET *Sock
   );
 
-
 //
 // Functions in TcpOutput.c
 //

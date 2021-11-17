@@ -16,13 +16,12 @@
 // the holes are filled in, then the download or upload has completed.
 //
 typedef struct {
-  LIST_ENTRY                Link;
-  INTN                      Start;
-  INTN                      End;
-  INTN                      Round;
-  INTN                      Bound;
+  LIST_ENTRY    Link;
+  INTN          Start;
+  INTN          End;
+  INTN          Round;
+  INTN          Bound;
 } MTFTP6_BLOCK_RANGE;
-
 
 /**
   Initialize the block range for either RRQ or WRQ. RRQ and WRQ have
@@ -51,7 +50,6 @@ Mtftp6InitBlockRange (
   IN UINT16                 End
   );
 
-
 /**
   Get the first valid block number on the range list.
 
@@ -65,7 +63,6 @@ INTN
 Mtftp6GetNextBlockNum (
   IN LIST_ENTRY             *Head
   );
-
 
 /**
   Set the last block number of the block range list. It
@@ -83,7 +80,6 @@ Mtftp6SetLastBlockNum (
   IN LIST_ENTRY             *Head,
   IN UINT16                 Last
   );
-
 
 /**
   Remove the block number from the block range list.
@@ -106,7 +102,6 @@ Mtftp6RemoveBlockNum (
   OUT UINT64                *BlockCounter
   );
 
-
 /**
   Build and transmit the request packet for the Mtftp6 instance.
 
@@ -124,7 +119,6 @@ Mtftp6SendRequest (
   IN UINT16                 Operation
   );
 
-
 /**
   Build and send an error packet.
 
@@ -141,9 +135,8 @@ EFI_STATUS
 Mtftp6SendError (
   IN MTFTP6_INSTANCE        *Instance,
   IN UINT16                 ErrCode,
-  IN UINT8*                 ErrInfo
+  IN UINT8 *ErrInfo
   );
-
 
 /**
   Send the packet for the Mtftp6 instance.
@@ -160,7 +153,6 @@ Mtftp6TransmitPacket (
   IN MTFTP6_INSTANCE        *Instance,
   IN NET_BUF                *Packet
   );
-
 
 /**
   Check packet for GetInfo callback routine.
@@ -183,7 +175,6 @@ Mtftp6CheckPacket (
   IN EFI_MTFTP6_PACKET      *Packet
   );
 
-
 /**
   The dummy configure routine for create a new Udp6 Io.
 
@@ -199,7 +190,6 @@ Mtftp6ConfigDummyUdpIo (
   IN UDP_IO                 *UdpIo,
   IN VOID                   *Context
   );
-
 
 /**
   The configure routine for the Mtftp6 instance to transmit/receive.
@@ -224,7 +214,6 @@ Mtftp6ConfigUdpIo (
   IN UINT16                 LocalPort
   );
 
-
 /**
   Clean up the current Mtftp6 operation.
 
@@ -237,7 +226,6 @@ Mtftp6OperationClean (
   IN MTFTP6_INSTANCE        *Instance,
   IN EFI_STATUS             Result
   );
-
 
 /**
   Start the Mtftp6 instance to perform the operation, such as read file,
@@ -260,7 +248,6 @@ Mtftp6OperationStart (
   IN UINT16                 OpCode
   );
 
-
 /**
   The timer ticking routine for the Mtftp6 instance.
 
@@ -274,7 +261,6 @@ Mtftp6OnTimerTick (
   IN EFI_EVENT              Event,
   IN VOID                   *Context
   );
-
 
 /**
   The packet process callback for Mtftp6 upload.
@@ -294,7 +280,6 @@ Mtftp6WrqInput (
   IN VOID                   *Context
   );
 
-
 /**
   Start the Mtftp6 instance to upload. It will first init some states,
   then send the WRQ request packet, and start to receive the packet.
@@ -311,7 +296,6 @@ Mtftp6WrqStart (
   IN MTFTP6_INSTANCE        *Instance,
   IN UINT16                 Operation
   );
-
 
 /**
   The packet process callback for Mtftp6 download.
@@ -330,7 +314,6 @@ Mtftp6RrqInput (
   IN EFI_STATUS             IoStatus,
   IN VOID                   *Context
   );
-
 
 /**
   Start the Mtftp6 instance to download. It first initializes some

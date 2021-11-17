@@ -70,109 +70,108 @@ extern EFI_DNS6_PROTOCOL             mDns6Protocol;
 //
 // DNS related
 //
-#define DNS_SERVER_PORT   53
+#define DNS_SERVER_PORT  53
 
-#define DNS_PROTOCOL_UDP   EFI_IP_PROTO_UDP
-#define DNS_PROTOCOL_TCP   EFI_IP_PROTO_TCP
+#define DNS_PROTOCOL_UDP  EFI_IP_PROTO_UDP
+#define DNS_PROTOCOL_TCP  EFI_IP_PROTO_TCP
 
-#define DNS_STATE_UNCONFIGED     0
-#define DNS_STATE_CONFIGED       1
-#define DNS_STATE_DESTROY        2
+#define DNS_STATE_UNCONFIGED  0
+#define DNS_STATE_CONFIGED    1
+#define DNS_STATE_DESTROY     2
 
-#define DNS_DEFAULT_TIMEOUT      2
+#define DNS_DEFAULT_TIMEOUT  2
 
-#define DNS_TIME_TO_GETMAP       5
+#define DNS_TIME_TO_GETMAP  5
 
 #pragma pack(1)
 
-typedef union _DNS_FLAGS  DNS_FLAGS;
+typedef union _DNS_FLAGS DNS_FLAGS;
 
 typedef struct {
-  LIST_ENTRY             AllCacheLink;
-  EFI_DNS4_CACHE_ENTRY   DnsCache;
+  LIST_ENTRY              AllCacheLink;
+  EFI_DNS4_CACHE_ENTRY    DnsCache;
 } DNS4_CACHE;
 
 typedef struct {
-  LIST_ENTRY             AllCacheLink;
-  EFI_DNS6_CACHE_ENTRY   DnsCache;
+  LIST_ENTRY              AllCacheLink;
+  EFI_DNS6_CACHE_ENTRY    DnsCache;
 } DNS6_CACHE;
 
 typedef struct {
-  LIST_ENTRY             AllServerLink;
-  EFI_IPv4_ADDRESS       Dns4ServerIp;
+  LIST_ENTRY          AllServerLink;
+  EFI_IPv4_ADDRESS    Dns4ServerIp;
 } DNS4_SERVER_IP;
 
 typedef struct {
-  LIST_ENTRY             AllServerLink;
-  EFI_IPv6_ADDRESS       Dns6ServerIp;
+  LIST_ENTRY          AllServerLink;
+  EFI_IPv6_ADDRESS    Dns6ServerIp;
 } DNS6_SERVER_IP;
 
 typedef struct {
-  UINT32                     RetryCounting;
-  UINT32                     PacketToLive;
-  CHAR16                     *QueryHostName;
-  EFI_IPv4_ADDRESS           QueryIpAddress;
-  BOOLEAN                    GeneralLookUp;
-  EFI_DNS4_COMPLETION_TOKEN  *Token;
+  UINT32                       RetryCounting;
+  UINT32                       PacketToLive;
+  CHAR16                       *QueryHostName;
+  EFI_IPv4_ADDRESS             QueryIpAddress;
+  BOOLEAN                      GeneralLookUp;
+  EFI_DNS4_COMPLETION_TOKEN    *Token;
 } DNS4_TOKEN_ENTRY;
 
 typedef struct {
-  UINT32                     RetryCounting;
-  UINT32                     PacketToLive;
-  CHAR16                     *QueryHostName;
-  EFI_IPv6_ADDRESS           QueryIpAddress;
-  BOOLEAN                    GeneralLookUp;
-  EFI_DNS6_COMPLETION_TOKEN  *Token;
+  UINT32                       RetryCounting;
+  UINT32                       PacketToLive;
+  CHAR16                       *QueryHostName;
+  EFI_IPv6_ADDRESS             QueryIpAddress;
+  BOOLEAN                      GeneralLookUp;
+  EFI_DNS6_COMPLETION_TOKEN    *Token;
 } DNS6_TOKEN_ENTRY;
 
 union _DNS_FLAGS {
   struct {
-    UINT16     RCode:4;
-    UINT16     Zero:3;
-    UINT16     RA:1;
-    UINT16     RD:1;
-    UINT16     TC:1;
-    UINT16     AA:1;
-    UINT16     OpCode:4;
-    UINT16     QR:1;
+    UINT16    RCode  : 4;
+    UINT16    Zero   : 3;
+    UINT16    RA     : 1;
+    UINT16    RD     : 1;
+    UINT16    TC     : 1;
+    UINT16    AA     : 1;
+    UINT16    OpCode : 4;
+    UINT16    QR     : 1;
   } Bits;
-  UINT16  Uint16;
+  UINT16    Uint16;
 };
 
 #define DNS_FLAGS_QR_QUERY     0
 #define DNS_FLAGS_QR_RESPONSE  1
 
-#define DNS_FLAGS_OPCODE_STANDARD     0
-#define DNS_FLAGS_OPCODE_INVERSE      1
-#define DNS_FLAGS_OPCODE_SERVER_STATE 2
+#define DNS_FLAGS_OPCODE_STANDARD      0
+#define DNS_FLAGS_OPCODE_INVERSE       1
+#define DNS_FLAGS_OPCODE_SERVER_STATE  2
 
 #define DNS_FLAGS_RCODE_NO_ERROR    0
 #define DNS_FLAGS_RCODE_NAME_ERROR  3
 
 typedef struct {
-  UINT16      Identification;
-  DNS_FLAGS   Flags;
-  UINT16      QuestionsNum;
-  UINT16      AnswersNum;
-  UINT16      AuthorityNum;
-  UINT16      AditionalNum;
+  UINT16       Identification;
+  DNS_FLAGS    Flags;
+  UINT16       QuestionsNum;
+  UINT16       AnswersNum;
+  UINT16       AuthorityNum;
+  UINT16       AditionalNum;
 } DNS_HEADER;
 
 typedef struct {
-  UINT16      Type;
-  UINT16      Class;
+  UINT16    Type;
+  UINT16    Class;
 } DNS_QUERY_SECTION;
 
 typedef struct {
-  UINT16      Type;
-  UINT16      Class;
-  UINT32      Ttl;
-  UINT16      DataLength;
+  UINT16    Type;
+  UINT16    Class;
+  UINT32    Ttl;
+  UINT16    DataLength;
 } DNS_ANSWER_SECTION;
 
 #define DNS4_DOMAIN  L"in-addr.arpa"
 #define DNS6_DOMAIN  L"IP6.ARPA"
-
 
 #pragma pack()
 
@@ -272,7 +271,7 @@ EFIAPI
 GetDns4TokenEntry (
   IN     NET_MAP                   *TokensMap,
   IN     EFI_DNS4_COMPLETION_TOKEN *Token,
-     OUT DNS4_TOKEN_ENTRY          **TokenEntry
+  OUT DNS4_TOKEN_ENTRY          **TokenEntry
   );
 
 /**
@@ -291,7 +290,7 @@ EFIAPI
 GetDns6TokenEntry (
   IN     NET_MAP                   *TokensMap,
   IN     EFI_DNS6_COMPLETION_TOKEN *Token,
-     OUT DNS6_TOKEN_ENTRY          **TokenEntry
+  OUT DNS6_TOKEN_ENTRY          **TokenEntry
   );
 
 /**
@@ -569,7 +568,7 @@ IsValidDnsResponse (
   IN     UINT16       Identification,
   IN     UINT16       Type,
   IN     UINT16       Class,
-     OUT NET_MAP_ITEM **Item
+  OUT NET_MAP_ITEM **Item
   );
 
 /**
@@ -589,7 +588,7 @@ ParseDnsResponse (
   IN OUT DNS_INSTANCE              *Instance,
   IN     UINT8                     *RxString,
   IN     UINT32                    Length,
-     OUT BOOLEAN                   *Completed
+  OUT BOOLEAN                   *Completed
   );
 
 /**
@@ -709,7 +708,6 @@ DnsOnTimerUpdate (
   IN EFI_EVENT              Event,
   IN VOID                   *Context
   );
-
 
 /**
   Retrieve mode data of this DNS instance.
@@ -953,7 +951,6 @@ Dns4Cancel (
   IN  EFI_DNS4_PROTOCOL          *This,
   IN  EFI_DNS4_COMPLETION_TOKEN  *Token
   );
-
 
 /**
   Retrieve mode data of this DNS instance.

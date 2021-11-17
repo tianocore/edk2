@@ -5,10 +5,11 @@ Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __EFI_HTTP_BOOT_IMPL_H__
 #define __EFI_HTTP_BOOT_IMPL_H__
 
-#define HTTP_BOOT_CHECK_MEDIA_WAITING_TIME          EFI_TIMER_PERIOD_SECONDS(20)
+#define HTTP_BOOT_CHECK_MEDIA_WAITING_TIME  EFI_TIMER_PERIOD_SECONDS(20)
 
 /**
   Attempt to complete a DHCPv4 D.O.R.A or DHCPv6 S.R.A.A sequence to retrieve the boot resource information.

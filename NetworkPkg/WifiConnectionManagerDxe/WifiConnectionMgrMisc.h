@@ -58,7 +58,6 @@ WifiMgrReadFileToBuffer (
   OUT  UINTN                          *PrivateKeyDataSize
   );
 
-
 /**
   Get the Nic data by the NicIndex.
 

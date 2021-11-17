@@ -75,22 +75,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Standard Media Types defined in
 // http://www.iana.org/assignments/media-types
 //
-#define HTTP_CONTENT_TYPE_APP_EFI           "application/efi"
-#define HTTP_CONTENT_TYPE_APP_IMG           "application/vnd.efi-img"
-#define HTTP_CONTENT_TYPE_APP_ISO           "application/vnd.efi-iso"
+#define HTTP_CONTENT_TYPE_APP_EFI  "application/efi"
+#define HTTP_CONTENT_TYPE_APP_IMG  "application/vnd.efi-img"
+#define HTTP_CONTENT_TYPE_APP_ISO  "application/vnd.efi-iso"
 
 //
 // Protocol instances
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gHttpBootDxeDriverBinding;
-extern EFI_COMPONENT_NAME2_PROTOCOL gHttpBootDxeComponentName2;
-extern EFI_COMPONENT_NAME_PROTOCOL  gHttpBootDxeComponentName;
+extern EFI_DRIVER_BINDING_PROTOCOL   gHttpBootDxeDriverBinding;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gHttpBootDxeComponentName2;
+extern EFI_COMPONENT_NAME_PROTOCOL   gHttpBootDxeComponentName;
 
 //
 // Private data structure
 //
-typedef struct _HTTP_BOOT_PRIVATE_DATA      HTTP_BOOT_PRIVATE_DATA;
-typedef struct _HTTP_BOOT_VIRTUAL_NIC       HTTP_BOOT_VIRTUAL_NIC;
+typedef struct _HTTP_BOOT_PRIVATE_DATA  HTTP_BOOT_PRIVATE_DATA;
+typedef struct _HTTP_BOOT_VIRTUAL_NIC   HTTP_BOOT_VIRTUAL_NIC;
 
 typedef enum  {
   ImageTypeEfi,
@@ -111,17 +111,17 @@ typedef enum  {
 #include "HttpBootConfig.h"
 
 typedef union {
-  HTTP_BOOT_DHCP4_PACKET_CACHE              Dhcp4;
-  HTTP_BOOT_DHCP6_PACKET_CACHE              Dhcp6;
+  HTTP_BOOT_DHCP4_PACKET_CACHE    Dhcp4;
+  HTTP_BOOT_DHCP6_PACKET_CACHE    Dhcp6;
 } HTTP_BOOT_DHCP_PACKET_CACHE;
 
 struct _HTTP_BOOT_VIRTUAL_NIC {
-  UINT32                                    Signature;
-  EFI_HANDLE                                Controller;
-  EFI_HANDLE                                ImageHandle;
-  EFI_LOAD_FILE_PROTOCOL                    LoadFile;
-  EFI_DEVICE_PATH_PROTOCOL                  *DevicePath;
-  HTTP_BOOT_PRIVATE_DATA                    *Private;
+  UINT32                      Signature;
+  EFI_HANDLE                  Controller;
+  EFI_HANDLE                  ImageHandle;
+  EFI_LOAD_FILE_PROTOCOL      LoadFile;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  HTTP_BOOT_PRIVATE_DATA      *Private;
 };
 
 #define HTTP_BOOT_PRIVATE_DATA_FROM_CALLBACK_INFO(Callback) \
@@ -141,87 +141,86 @@ struct _HTTP_BOOT_VIRTUAL_NIC {
     )
 
 struct _HTTP_BOOT_PRIVATE_DATA {
-  UINT32                                    Signature;
-  EFI_HANDLE                                Controller;
+  UINT32                                       Signature;
+  EFI_HANDLE                                   Controller;
 
-  HTTP_BOOT_VIRTUAL_NIC                     *Ip4Nic;
-  HTTP_BOOT_VIRTUAL_NIC                     *Ip6Nic;
+  HTTP_BOOT_VIRTUAL_NIC                        *Ip4Nic;
+  HTTP_BOOT_VIRTUAL_NIC                        *Ip6Nic;
 
   //
   // Consumed children
   //
-  EFI_HANDLE                                Ip6Child;
-  EFI_HANDLE                                Dhcp4Child;
-  EFI_HANDLE                                Dhcp6Child;
-  HTTP_IO                                   HttpIo;
-  BOOLEAN                                   HttpCreated;
+  EFI_HANDLE                                   Ip6Child;
+  EFI_HANDLE                                   Dhcp4Child;
+  EFI_HANDLE                                   Dhcp6Child;
+  HTTP_IO                                      HttpIo;
+  BOOLEAN                                      HttpCreated;
 
   //
   // Consumed protocol
   //
-  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *Nii;
-  EFI_IP6_PROTOCOL                          *Ip6;
-  EFI_IP4_CONFIG2_PROTOCOL                  *Ip4Config2;
-  EFI_IP6_CONFIG_PROTOCOL                   *Ip6Config;
-  EFI_DHCP4_PROTOCOL                        *Dhcp4;
-  EFI_DHCP6_PROTOCOL                        *Dhcp6;
-  EFI_DEVICE_PATH_PROTOCOL                  *ParentDevicePath;
-
+  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL    *Nii;
+  EFI_IP6_PROTOCOL                             *Ip6;
+  EFI_IP4_CONFIG2_PROTOCOL                     *Ip4Config2;
+  EFI_IP6_CONFIG_PROTOCOL                      *Ip6Config;
+  EFI_DHCP4_PROTOCOL                           *Dhcp4;
+  EFI_DHCP6_PROTOCOL                           *Dhcp6;
+  EFI_DEVICE_PATH_PROTOCOL                     *ParentDevicePath;
 
   //
   // Produced protocol
   //
-  EFI_LOAD_FILE_PROTOCOL                    LoadFile;
-  EFI_DEVICE_PATH_PROTOCOL                  *DevicePath;
-  UINT32                                    Id;
-  EFI_HTTP_BOOT_CALLBACK_PROTOCOL           *HttpBootCallback;
-  EFI_HTTP_BOOT_CALLBACK_PROTOCOL           LoadFileCallback;
+  EFI_LOAD_FILE_PROTOCOL                       LoadFile;
+  EFI_DEVICE_PATH_PROTOCOL                     *DevicePath;
+  UINT32                                       Id;
+  EFI_HTTP_BOOT_CALLBACK_PROTOCOL              *HttpBootCallback;
+  EFI_HTTP_BOOT_CALLBACK_PROTOCOL              LoadFileCallback;
 
   //
   // Data for the default HTTP Boot callback protocol
   //
-  UINT64                                    FileSize;
-  UINT64                                    ReceivedSize;
-  UINT32                                    Percentage;
+  UINT64                                       FileSize;
+  UINT64                                       ReceivedSize;
+  UINT32                                       Percentage;
 
   //
   // HII callback info block
   //
-  HTTP_BOOT_FORM_CALLBACK_INFO              CallbackInfo;
+  HTTP_BOOT_FORM_CALLBACK_INFO                 CallbackInfo;
 
   //
   // Mode data
   //
-  BOOLEAN                                   UsingIpv6;
-  BOOLEAN                                   Started;
-  EFI_IP_ADDRESS                            StationIp;
-  EFI_IP_ADDRESS                            SubnetMask;
-  EFI_IP_ADDRESS                            GatewayIp;
-  EFI_IP_ADDRESS                            ServerIp;
-  UINT16                                    Port;
-  UINT32                                    DnsServerCount;
-  EFI_IP_ADDRESS                            *DnsServerIp;
+  BOOLEAN                                      UsingIpv6;
+  BOOLEAN                                      Started;
+  EFI_IP_ADDRESS                               StationIp;
+  EFI_IP_ADDRESS                               SubnetMask;
+  EFI_IP_ADDRESS                               GatewayIp;
+  EFI_IP_ADDRESS                               ServerIp;
+  UINT16                                       Port;
+  UINT32                                       DnsServerCount;
+  EFI_IP_ADDRESS                               *DnsServerIp;
 
   //
   // The URI string attempt to download through HTTP, may point to
   // the memory in cached DHCP offer, or to the memory in FilePathUri.
   //
-  CHAR8                                     *BootFileUri;
-  VOID                                      *BootFileUriParser;
-  UINTN                                     BootFileSize;
-  BOOLEAN                                   NoGateway;
-  HTTP_BOOT_IMAGE_TYPE                      ImageType;
+  CHAR8                                        *BootFileUri;
+  VOID                                         *BootFileUriParser;
+  UINTN                                        BootFileSize;
+  BOOLEAN                                      NoGateway;
+  HTTP_BOOT_IMAGE_TYPE                         ImageType;
 
   //
   // URI string extracted from the input FilePath parameter.
   //
-  CHAR8                                     *FilePathUri;
-  VOID                                      *FilePathUriParser;
+  CHAR8                                        *FilePathUri;
+  VOID                                         *FilePathUriParser;
 
   //
   // Cached HTTP data
   //
-  LIST_ENTRY                                CacheList;
+  LIST_ENTRY                                   CacheList;
 
   //
   // Cached DHCP offer
@@ -252,20 +251,20 @@ struct _HTTP_BOOT_PRIVATE_DATA {
   //   (OfferIndex is 0-based.)
   //
   //
-  UINT32                                    SelectIndex;
-  UINT32                                    SelectProxyType;
-  HTTP_BOOT_DHCP_PACKET_CACHE               OfferBuffer[HTTP_BOOT_OFFER_MAX_NUM];
-  UINT32                                    OfferNum;
-  UINT32                                    OfferCount[HttpOfferTypeMax];
-  UINT32                                    OfferIndex[HttpOfferTypeMax][HTTP_BOOT_OFFER_MAX_NUM];
+  UINT32                         SelectIndex;
+  UINT32                         SelectProxyType;
+  HTTP_BOOT_DHCP_PACKET_CACHE    OfferBuffer[HTTP_BOOT_OFFER_MAX_NUM];
+  UINT32                         OfferNum;
+  UINT32                         OfferCount[HttpOfferTypeMax];
+  UINT32                         OfferIndex[HttpOfferTypeMax][HTTP_BOOT_OFFER_MAX_NUM];
 };
 
-#define HTTP_BOOT_PRIVATE_DATA_SIGNATURE          SIGNATURE_32 ('H', 'B', 'P', 'D')
-#define HTTP_BOOT_VIRTUAL_NIC_SIGNATURE           SIGNATURE_32 ('H', 'B', 'V', 'N')
-#define HTTP_BOOT_PRIVATE_DATA_FROM_LOADFILE(a)   CR (a, HTTP_BOOT_PRIVATE_DATA, LoadFile, HTTP_BOOT_PRIVATE_DATA_SIGNATURE)
-#define HTTP_BOOT_PRIVATE_DATA_FROM_ID(a)         CR (a, HTTP_BOOT_PRIVATE_DATA, Id, HTTP_BOOT_PRIVATE_DATA_SIGNATURE)
-#define HTTP_BOOT_VIRTUAL_NIC_FROM_LOADFILE(a)    CR (a, HTTP_BOOT_VIRTUAL_NIC, LoadFile, HTTP_BOOT_VIRTUAL_NIC_SIGNATURE)
-extern EFI_LOAD_FILE_PROTOCOL               gHttpBootDxeLoadFile;
+#define HTTP_BOOT_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('H', 'B', 'P', 'D')
+#define HTTP_BOOT_VIRTUAL_NIC_SIGNATURE   SIGNATURE_32 ('H', 'B', 'V', 'N')
+#define HTTP_BOOT_PRIVATE_DATA_FROM_LOADFILE(a)  CR (a, HTTP_BOOT_PRIVATE_DATA, LoadFile, HTTP_BOOT_PRIVATE_DATA_SIGNATURE)
+#define HTTP_BOOT_PRIVATE_DATA_FROM_ID(a)        CR (a, HTTP_BOOT_PRIVATE_DATA, Id, HTTP_BOOT_PRIVATE_DATA_SIGNATURE)
+#define HTTP_BOOT_VIRTUAL_NIC_FROM_LOADFILE(a)   CR (a, HTTP_BOOT_VIRTUAL_NIC, LoadFile, HTTP_BOOT_VIRTUAL_NIC_SIGNATURE)
+extern EFI_LOAD_FILE_PROTOCOL  gHttpBootDxeLoadFile;
 
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
@@ -522,4 +521,5 @@ HttpBootIp6DxeDriverBindingStop (
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   );
+
 #endif

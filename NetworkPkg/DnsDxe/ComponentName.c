@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user-readable name of the EFI Driver.
 
@@ -91,7 +92,6 @@ DnsComponentNameGetControllerName (
   OUT CHAR16                        **ControllerName
   );
 
-
 ///
 /// Component Name Protocol instance
 ///
@@ -107,8 +107,8 @@ EFI_COMPONENT_NAME_PROTOCOL  gDnsComponentName = {
 ///
 GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_COMPONENT_NAME2_PROTOCOL  gDnsComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     DnsComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) DnsComponentNameGetControllerName,
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)DnsComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)DnsComponentNameGetControllerName,
   "en"
 };
 
@@ -116,12 +116,12 @@ EFI_COMPONENT_NAME2_PROTOCOL  gDnsComponentName2 = {
 /// Table of driver names
 ///
 GLOBAL_REMOVE_IF_UNREFERENCED
-EFI_UNICODE_STRING_TABLE mDnsDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE  mDnsDriverNameTable[] = {
   { "eng;en", (CHAR16 *)L"DNS Network Service Driver" },
-  { NULL, NULL }
+  { NULL,     NULL                                    }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE *gDnsControllerNameTable = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gDnsControllerNameTable = NULL;
 
 /**
   Retrieves a Unicode string that is the user-readable name of the EFI Driver.
@@ -177,9 +177,9 @@ UpdateDns4Name (
   EFI_DNS4_PROTOCOL             *Dns4
   )
 {
-  EFI_STATUS                       Status;
-  CHAR16                           HandleName[80];
-  EFI_DNS4_MODE_DATA               ModeData;
+  EFI_STATUS          Status;
+  CHAR16              HandleName[80];
+  EFI_DNS4_MODE_DATA  ModeData;
 
   if (Dns4 == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -208,6 +208,7 @@ UpdateDns4Name (
   if (ModeData.DnsCacheList != NULL) {
     FreePool (ModeData.DnsCacheList);
   }
+
   if (ModeData.DnsServerList != NULL) {
     FreePool (ModeData.DnsServerList);
   }
@@ -252,10 +253,10 @@ UpdateDns6Name (
   EFI_DNS6_PROTOCOL             *Dns6
   )
 {
-  EFI_STATUS                       Status;
-  CHAR16                           HandleName[128];
-  EFI_DNS6_MODE_DATA               ModeData;
-  CHAR16                           Address[sizeof"ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"];
+  EFI_STATUS          Status;
+  CHAR16              HandleName[128];
+  EFI_DNS6_MODE_DATA  ModeData;
+  CHAR16              Address[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"];
 
   if (Dns6 == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -274,6 +275,7 @@ UpdateDns6Name (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   UnicodeSPrint (
     HandleName,
     sizeof (HandleName),
@@ -285,6 +287,7 @@ UpdateDns6Name (
   if (ModeData.DnsCacheList != NULL) {
     FreePool (ModeData.DnsCacheList);
   }
+
   if (ModeData.DnsServerList != NULL) {
     FreePool (ModeData.DnsServerList);
   }
@@ -364,9 +367,9 @@ DnsComponentNameGetControllerName (
   OUT CHAR16                        **ControllerName
   )
 {
-  EFI_STATUS                    Status;
-  EFI_DNS4_PROTOCOL             *Dns4;
-  EFI_DNS6_PROTOCOL             *Dns6;
+  EFI_STATUS         Status;
+  EFI_DNS4_PROTOCOL  *Dns4;
+  EFI_DNS6_PROTOCOL  *Dns6;
 
   //
   // ChildHandle must be NULL for a Device Driver

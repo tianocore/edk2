@@ -10,7 +10,6 @@
 #ifndef __EFI_DHCP6_IO_H__
 #define __EFI_DHCP6_IO_H__
 
-
 /**
   Clean up the specific nodes in the retry list.
 

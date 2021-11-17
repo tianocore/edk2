@@ -10,38 +10,38 @@
 #ifndef __EFI_IP6_ROUTE_H__
 #define __EFI_IP6_ROUTE_H__
 
-#define IP6_DIRECT_ROUTE          0x00000001
-#define IP6_PACKET_TOO_BIG        0x00000010
+#define IP6_DIRECT_ROUTE    0x00000001
+#define IP6_PACKET_TOO_BIG  0x00000010
 
-#define IP6_ROUTE_CACHE_HASH_SIZE 31
+#define IP6_ROUTE_CACHE_HASH_SIZE  31
 ///
 /// Max NO. of cache entry per hash bucket
 ///
-#define IP6_ROUTE_CACHE_MAX       32
+#define IP6_ROUTE_CACHE_MAX  32
 
-#define IP6_ROUTE_CACHE_HASH(Ip1, Ip2) Ip6RouteCacheHash ((Ip1), (Ip2))
+#define IP6_ROUTE_CACHE_HASH(Ip1, Ip2)  Ip6RouteCacheHash ((Ip1), (Ip2))
 
 typedef struct {
-  LIST_ENTRY                Link;
-  INTN                      RefCnt;
-  UINT32                    Flag;
-  UINT8                     PrefixLength;
-  EFI_IPv6_ADDRESS          Destination;
-  EFI_IPv6_ADDRESS          NextHop;
+  LIST_ENTRY          Link;
+  INTN                RefCnt;
+  UINT32              Flag;
+  UINT8               PrefixLength;
+  EFI_IPv6_ADDRESS    Destination;
+  EFI_IPv6_ADDRESS    NextHop;
 } IP6_ROUTE_ENTRY;
 
 typedef struct {
-  LIST_ENTRY                Link;
-  INTN                      RefCnt;
-  UINTN                     Tag;
-  EFI_IPv6_ADDRESS          Destination;
-  EFI_IPv6_ADDRESS          Source;
-  EFI_IPv6_ADDRESS          NextHop;
+  LIST_ENTRY          Link;
+  INTN                RefCnt;
+  UINTN               Tag;
+  EFI_IPv6_ADDRESS    Destination;
+  EFI_IPv6_ADDRESS    Source;
+  EFI_IPv6_ADDRESS    NextHop;
 } IP6_ROUTE_CACHE_ENTRY;
 
 typedef struct {
-  LIST_ENTRY                CacheBucket[IP6_ROUTE_CACHE_HASH_SIZE];
-  UINT8                     CacheNum[IP6_ROUTE_CACHE_HASH_SIZE];
+  LIST_ENTRY    CacheBucket[IP6_ROUTE_CACHE_HASH_SIZE];
+  UINT8         CacheNum[IP6_ROUTE_CACHE_HASH_SIZE];
 } IP6_ROUTE_CACHE;
 
 //
@@ -54,10 +54,10 @@ typedef struct {
 //
 
 typedef struct _IP6_ROUTE_TABLE {
-  INTN                      RefCnt;
-  UINT32                    TotalNum;
-  LIST_ENTRY                RouteArea[IP6_PREFIX_NUM];
-  IP6_ROUTE_CACHE           Cache;
+  INTN               RefCnt;
+  UINT32             TotalNum;
+  LIST_ENTRY         RouteArea[IP6_PREFIX_NUM];
+  IP6_ROUTE_CACHE    Cache;
 } IP6_ROUTE_TABLE;
 
 /**

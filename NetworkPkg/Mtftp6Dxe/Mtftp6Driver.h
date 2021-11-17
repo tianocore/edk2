@@ -13,9 +13,9 @@
 
 #include <Protocol/ServiceBinding.h>
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gMtftp6ComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gMtftp6ComponentName2;
-extern EFI_UNICODE_STRING_TABLE     *gMtftp6ControllerNameTable;
+extern EFI_COMPONENT_NAME_PROTOCOL   gMtftp6ComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gMtftp6ComponentName2;
+extern EFI_UNICODE_STRING_TABLE      *gMtftp6ControllerNameTable;
 
 /**
   Test to see if this driver supports Controller. This service
