@@ -43,7 +43,7 @@ MmcGetCardStatus (
     CmdArg = MmcHostInstance->CardInfo.RCA << 16;
     Status = MmcHost->SendCommand (MmcHost, MMC_CMD13, CmdArg);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "MmcGetCardStatus(MMC_CMD13): Error and Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "MmcGetCardStatus(MMC_CMD13): Error and Status = %r\n", Status));
       return Status;
     }
 
@@ -163,7 +163,7 @@ MmcTransferBlock (
 
   Status = MmcHost->SendCommand (MmcHost, Cmd, CmdArg);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a(MMC_CMD%d): Error %r\n", __func__, Cmd, Status));
+    DEBUG ((DEBUG_ERROR, "%a(MMC_CMD%d): Error %r\n", __func__, Cmd, Status));
     return Status;
   }
 
@@ -171,20 +171,20 @@ MmcTransferBlock (
     // Read Data
     Status = MmcHost->ReadBlockData (MmcHost, Lba, BufferSize, Buffer);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_BLKIO, "%a(): Error Read Block Data and Status = %r\n", __func__, Status));
+      DEBUG ((DEBUG_BLKIO, "%a(): Error Read Block Data and Status = %r\n", __func__, Status));
       MmcStopTransmission (MmcHost);
       return Status;
     }
     Status = MmcNotifyState (MmcHostInstance, MmcProgrammingState);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a() : Error MmcProgrammingState\n", __func__));
+      DEBUG ((DEBUG_ERROR, "%a() : Error MmcProgrammingState\n", __func__));
       return Status;
     }
   } else {
     // Write Data
     Status = MmcHost->WriteBlockData (MmcHost, Lba, BufferSize, Buffer);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_BLKIO, "%a(): Error Write Block Data and Status = %r\n", __func__, Status));
+      DEBUG ((DEBUG_BLKIO, "%a(): Error Write Block Data and Status = %r\n", __func__, Status));
       MmcStopTransmission (MmcHost);
       return Status;
     }
@@ -209,14 +209,14 @@ MmcTransferBlock (
   if (BufferSize > This->Media->BlockSize) {
     Status = MmcHost->SendCommand (MmcHost, MMC_CMD12, 0);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_BLKIO, "%a(): Error and Status:%r\n", __func__, Status));
+      DEBUG ((DEBUG_BLKIO, "%a(): Error and Status:%r\n", __func__, Status));
     }
     MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1b, Response);
   }
 
   Status = MmcNotifyState (MmcHostInstance, MmcTransferState);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MmcIoBlocks() : Error MmcTransferState\n"));
+    DEBUG ((DEBUG_ERROR, "MmcIoBlocks() : Error MmcTransferState\n"));
     return Status;
   }
   return Status;
@@ -318,7 +318,7 @@ MmcIoBlocks (
     }
 
     if (0 == Timeout) {
-      DEBUG ((EFI_D_ERROR, "The Card is busy\n"));
+      DEBUG ((DEBUG_ERROR, "The Card is busy\n"));
       return EFI_NOT_READY;
     }
 
@@ -346,7 +346,7 @@ MmcIoBlocks (
     }
     Status = MmcTransferBlock (This, Cmd, Transfer, MediaId, Lba, ConsumeSize, Buffer);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a(): Failed to transfer block and Status:%r\n", __func__, Status));
+      DEBUG ((DEBUG_ERROR, "%a(): Failed to transfer block and Status:%r\n", __func__, Status));
     }
 
     RemainingBlock -= BlockCount;

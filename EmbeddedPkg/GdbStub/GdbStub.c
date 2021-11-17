@@ -91,7 +91,7 @@ GdbStubEntry (
                   &Handles
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Debug Support Protocol not found\n"));
+    DEBUG ((DEBUG_ERROR, "Debug Support Protocol not found\n"));
 
     return Status;
   }
@@ -116,7 +116,7 @@ GdbStubEntry (
   FreePool (Handles);
 
   if (!IsaSupported) {
-    DEBUG ((EFI_D_ERROR, "Debug Support Protocol does not support our ISA\n"));
+    DEBUG ((DEBUG_ERROR, "Debug Support Protocol does not support our ISA\n"));
 
     return EFI_NOT_FOUND;
   }
@@ -124,8 +124,8 @@ GdbStubEntry (
   Status = DebugSupport->GetMaximumProcessorIndex (DebugSupport, &gMaxProcessorIndex);
   ASSERT_EFI_ERROR (Status);
 
-  DEBUG ((EFI_D_INFO, "Debug Support Protocol ISA %x\n", DebugSupport->Isa));
-  DEBUG ((EFI_D_INFO, "Debug Support Protocol Processor Index %d\n", gMaxProcessorIndex));
+  DEBUG ((DEBUG_INFO, "Debug Support Protocol ISA %x\n", DebugSupport->Isa));
+  DEBUG ((DEBUG_INFO, "Debug Support Protocol Processor Index %d\n", gMaxProcessorIndex));
 
   // Call processor-specific init routine
   InitializeProcessor ();
