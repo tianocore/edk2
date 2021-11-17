@@ -250,7 +250,7 @@ SetPersistTimer:
   if (!TCP_TIMER_ON (Tcb->EnabledTimer, TCP_TIMER_REXMIT)) {
 
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "TcpDataToSend: enter persistent state for TCB %p\n",
       Tcb)
       );
@@ -562,7 +562,7 @@ TcpGetSegmentSock (
 
   if (Nbuf == NULL) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "TcpGetSegmentSock: failed to allocate a netbuf for TCB %p\n",
       Tcb)
       );
@@ -678,7 +678,7 @@ TcpRetransmit (
       (TCP_SEQ_GT (Seq, Tcb->RetxmitSeqMax) || TCP_SEQ_BETWEEN (Tcb->SndWl2 + Tcb->SndWnd, Seq, Tcb->SndWl2 + Tcb->SndWnd + (1 << Tcb->SndWndScale)))) {
     Len = TCP_SUB_SEQ (Tcb->SndNxt, Seq);
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "TcpRetransmit: retransmission without regard to the receiver window for TCB %p\n",
       Tcb)
       );
@@ -688,7 +688,7 @@ TcpRetransmit (
 
   } else {
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "TcpRetransmit: retransmission cancelled because send window too small for TCB %p\n",
       Tcb)
       );
@@ -845,7 +845,7 @@ TcpToSendData (
 
     if (Nbuf == NULL) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "TcpToSendData: failed to get a segment for TCB %p\n",
         Tcb)
         );
@@ -874,7 +874,7 @@ TcpToSendData (
           TCP_SEQ_LT (End + 1, Tcb->SndWnd + Tcb->SndWl2)
             ) {
         DEBUG (
-          (EFI_D_NET,
+          (DEBUG_NET,
           "TcpToSendData: send FIN to peer for TCB %p in state %s\n",
           Tcb,
           mTcpStateName[Tcb->State])
@@ -892,7 +892,7 @@ TcpToSendData (
 
     if (TcpVerifySegment (Nbuf) == 0 || TcpCheckSndQue (&Tcb->SndQue) == 0) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "TcpToSendData: discard a broken segment for TCB %p\n",
         Tcb)
         );
@@ -904,7 +904,7 @@ TcpToSendData (
     //
     if (Seg->End == Seg->Seq) {
       DEBUG (
-        (EFI_D_WARN,
+        (DEBUG_WARN,
         "TcpToSendData: created a empty segment for TCB %p, free it now\n",
         Tcb)
         );
@@ -959,7 +959,7 @@ TcpToSendData (
     if ((Tcb->CongestState == TCP_CONGEST_OPEN) && !TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RTT_ON)) {
 
       DEBUG (
-        (EFI_D_NET,
+        (DEBUG_NET,
         "TcpToSendData: set RTT measure sequence %d for TCB %p\n",
         Seq,
         Tcb)
@@ -1090,7 +1090,7 @@ TcpToSendAck (
   }
 
   DEBUG (
-    (EFI_D_NET,
+    (DEBUG_NET,
     "TcpToSendAck: scheduled a delayed ACK for TCB %p\n",
     Tcb)
     );
@@ -1248,4 +1248,3 @@ TcpVerifySegment (
 
   return 1;
 }
-

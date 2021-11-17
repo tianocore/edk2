@@ -67,7 +67,7 @@ MnpAddFreeNbuf (
   for (Index = 0; Index < Count; Index++) {
     Nbuf = NetbufAlloc (MnpDeviceData->BufferLength + MnpDeviceData->PaddingSize);
     if (Nbuf == NULL) {
-      DEBUG ((EFI_D_ERROR, "MnpAddFreeNbuf: NetBufAlloc failed.\n"));
+      DEBUG ((DEBUG_ERROR, "MnpAddFreeNbuf: NetBufAlloc failed.\n"));
 
       Status = EFI_OUT_OF_RESOURCES;
       break;
@@ -121,7 +121,7 @@ MnpAllocNbuf (
   if (FreeNbufQue->BufNum == 0) {
     if ((MnpDeviceData->NbufCnt + MNP_NET_BUFFER_INCREASEMENT) > MNP_MAX_NET_BUFFER_NUM) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "MnpAllocNbuf: The maximum NET_BUF size is reached for MNP driver instance %p.\n",
         MnpDeviceData)
         );
@@ -133,7 +133,7 @@ MnpAllocNbuf (
     Status = MnpAddFreeNbuf (MnpDeviceData, MNP_NET_BUFFER_INCREASEMENT);
     if (EFI_ERROR (Status)) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "MnpAllocNbuf: Failed to add NET_BUFs into the FreeNbufQue, %r.\n",
         Status)
         );
@@ -230,12 +230,12 @@ MnpAddFreeTxBuf (
   for (Index = 0; Index < Count; Index++) {
     TxBufWrap = (MNP_TX_BUF_WRAP*) AllocatePool (OFFSET_OF (MNP_TX_BUF_WRAP, TxBuf) + MnpDeviceData->BufferLength );
     if (TxBufWrap == NULL) {
-      DEBUG ((EFI_D_ERROR, "MnpAddFreeTxBuf: TxBuf Alloc failed.\n"));
+      DEBUG ((DEBUG_ERROR, "MnpAddFreeTxBuf: TxBuf Alloc failed.\n"));
 
       Status = EFI_OUT_OF_RESOURCES;
       break;
     }
-    DEBUG ((EFI_D_INFO, "MnpAddFreeTxBuf: Add TxBufWrap %p, TxBuf %p\n", TxBufWrap, TxBufWrap->TxBuf));
+    DEBUG ((DEBUG_INFO, "MnpAddFreeTxBuf: Add TxBufWrap %p, TxBuf %p\n", TxBufWrap, TxBufWrap->TxBuf));
     TxBufWrap->Signature = MNP_TX_BUF_WRAP_SIGNATURE;
     TxBufWrap->InUse     = FALSE;
     InsertTailList (&MnpDeviceData->FreeTxBufList, &TxBufWrap->WrapEntry);
@@ -288,7 +288,7 @@ MnpAllocTxBuf (
     if (IsListEmpty (&MnpDeviceData->FreeTxBufList)) {
       if ((MnpDeviceData->TxBufCount + MNP_TX_BUFFER_INCREASEMENT) > MNP_MAX_TX_BUFFER_NUM) {
         DEBUG (
-          (EFI_D_ERROR,
+          (DEBUG_ERROR,
           "MnpAllocTxBuf: The maximum TxBuf size is reached for MNP driver instance %p.\n",
           MnpDeviceData)
           );
@@ -300,7 +300,7 @@ MnpAllocTxBuf (
       Status = MnpAddFreeTxBuf (MnpDeviceData, MNP_TX_BUFFER_INCREASEMENT);
       if (IsListEmpty (&MnpDeviceData->FreeTxBufList)) {
         DEBUG (
-          (EFI_D_ERROR,
+          (DEBUG_ERROR,
           "MnpAllocNbuf: Failed to add TxBuf into the FreeTxBufList, %r.\n",
           Status)
           );
@@ -349,7 +349,7 @@ MnpFreeTxBuf (
   TxBufWrap = NET_LIST_USER_STRUCT (TxBuf, MNP_TX_BUF_WRAP, TxBuf);
   if (TxBufWrap->Signature != MNP_TX_BUF_WRAP_SIGNATURE) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "MnpFreeTxBuf: Signature check failed in MnpFreeTxBuf.\n")
       );
     return;
@@ -357,7 +357,7 @@ MnpFreeTxBuf (
 
   if (!TxBufWrap->InUse) {
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "MnpFreeTxBuf: Duplicated recycle report from SNP.\n")
       );
     return;
@@ -491,7 +491,7 @@ MnpInitializeDeviceData (
   NetbufQueInit (&MnpDeviceData->FreeNbufQue);
   Status = MnpAddFreeNbuf (MnpDeviceData, MNP_INIT_NET_BUFFER_NUM);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MnpInitializeDeviceData: MnpAddFreeNbuf failed, %r.\n", Status));
+    DEBUG ((DEBUG_ERROR, "MnpInitializeDeviceData: MnpAddFreeNbuf failed, %r.\n", Status));
 
     goto ERROR;
   }
@@ -524,7 +524,7 @@ MnpInitializeDeviceData (
                   &MnpDeviceData->PollTimer
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MnpInitializeDeviceData: CreateEvent for poll timer failed.\n"));
+    DEBUG ((DEBUG_ERROR, "MnpInitializeDeviceData: CreateEvent for poll timer failed.\n"));
 
     goto ERROR;
   }
@@ -540,7 +540,7 @@ MnpInitializeDeviceData (
                   &MnpDeviceData->TimeoutCheckTimer
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MnpInitializeDeviceData: CreateEvent for packet timeout check failed.\n"));
+    DEBUG ((DEBUG_ERROR, "MnpInitializeDeviceData: CreateEvent for packet timeout check failed.\n"));
 
     goto ERROR;
   }
@@ -556,7 +556,7 @@ MnpInitializeDeviceData (
                   &MnpDeviceData->MediaDetectTimer
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MnpInitializeDeviceData: CreateEvent for media detection failed.\n"));
+    DEBUG ((DEBUG_ERROR, "MnpInitializeDeviceData: CreateEvent for media detection failed.\n"));
 
     goto ERROR;
   }
@@ -1222,7 +1222,7 @@ MnpStart (
       //
       Status = MnpStartSnp (MnpDeviceData->Snp);
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "MnpStart: MnpStartSnp failed, %r.\n", Status));
+        DEBUG ((DEBUG_ERROR, "MnpStart: MnpStartSnp failed, %r.\n", Status));
 
         goto ErrorExit;
       }
@@ -1237,7 +1237,7 @@ MnpStart (
                       );
       if (EFI_ERROR (Status)) {
         DEBUG (
-          (EFI_D_ERROR,
+          (DEBUG_ERROR,
           "MnpStart, gBS->SetTimer for TimeoutCheckTimer %r.\n",
           Status)
           );
@@ -1255,7 +1255,7 @@ MnpStart (
                       );
       if (EFI_ERROR (Status)) {
         DEBUG (
-          (EFI_D_ERROR,
+          (DEBUG_ERROR,
           "MnpStart, gBS->SetTimer for MediaDetectTimer %r.\n",
           Status)
           );
@@ -1274,7 +1274,7 @@ MnpStart (
 
     Status      = gBS->SetTimer (MnpDeviceData->PollTimer, TimerOpType, MNP_SYS_POLL_INTERVAL);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "MnpStart: gBS->SetTimer for PollTimer failed, %r.\n", Status));
+      DEBUG ((DEBUG_ERROR, "MnpStart: gBS->SetTimer for PollTimer failed, %r.\n", Status));
 
       goto ErrorExit;
     }
@@ -1610,7 +1610,7 @@ MnpConfigReceiveFilters (
       MCastFilterCnt  = MnpDeviceData->GroupAddressCount;
       MCastFilter     = AllocatePool (sizeof (EFI_MAC_ADDRESS) * MCastFilterCnt);
       if (MCastFilter == NULL) {
-        DEBUG ((EFI_D_ERROR, "MnpConfigReceiveFilters: Failed to allocate memory resource for MCastFilter.\n"));
+        DEBUG ((DEBUG_ERROR, "MnpConfigReceiveFilters: Failed to allocate memory resource for MCastFilter.\n"));
 
         return EFI_OUT_OF_RESOURCES;
       }
@@ -1672,7 +1672,7 @@ MnpConfigReceiveFilters (
   DEBUG_CODE (
     if (EFI_ERROR (Status)) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "MnpConfigReceiveFilters: Snp->ReceiveFilters failed, %r.\n",
         Status)
         );
@@ -1729,7 +1729,7 @@ MnpGroupOpAddCtrlBlk (
     GroupAddress = AllocatePool (sizeof (MNP_GROUP_ADDRESS));
     if (GroupAddress == NULL) {
 
-      DEBUG ((EFI_D_ERROR, "MnpGroupOpFormCtrlBlk: Failed to allocate memory resource.\n"));
+      DEBUG ((DEBUG_ERROR, "MnpGroupOpFormCtrlBlk: Failed to allocate memory resource.\n"));
 
       return EFI_OUT_OF_RESOURCES;
     }
@@ -1861,7 +1861,7 @@ MnpGroupOp (
     //
     NewCtrlBlk = AllocatePool (sizeof (MNP_GROUP_CONTROL_BLOCK));
     if (NewCtrlBlk == NULL) {
-      DEBUG ((EFI_D_ERROR, "MnpGroupOp: Failed to allocate memory resource.\n"));
+      DEBUG ((DEBUG_ERROR, "MnpGroupOp: Failed to allocate memory resource.\n"));
 
       return EFI_OUT_OF_RESOURCES;
     }

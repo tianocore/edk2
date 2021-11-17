@@ -246,7 +246,7 @@ SnpUndi32CallbackMap (
   }
 
   if (Index >= MAX_MAP_LENGTH) {
-    DEBUG ((EFI_D_INFO, "SNP maplist is FULL\n"));
+    DEBUG ((DEBUG_INFO, "SNP maplist is FULL\n"));
     *DevAddrPtr = 0;
     return ;
   }
@@ -306,7 +306,7 @@ SnpUndi32CallbackUnmap (
   }
 
   if (Index >= MAX_MAP_LENGTH) {
-    DEBUG ((EFI_D_ERROR, "SNP could not find a mapping, failed to unmap.\n"));
+    DEBUG ((DEBUG_ERROR, "SNP could not find a mapping, failed to unmap.\n"));
     return ;
   }
 

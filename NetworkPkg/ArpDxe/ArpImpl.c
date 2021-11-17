@@ -306,7 +306,7 @@ RESTART_RECEIVE:
 
   DEBUG_CODE (
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "ArpOnFrameRcvd: ArpService->Mnp->Receive "
+      DEBUG ((DEBUG_ERROR, "ArpOnFrameRcvd: ArpService->Mnp->Receive "
         "failed, %r\n.", Status));
     }
   );
@@ -360,7 +360,7 @@ ArpOnFrameSentDpc (
 
   DEBUG_CODE (
     if (EFI_ERROR (TxToken->Status)) {
-      DEBUG ((EFI_D_ERROR, "ArpOnFrameSent: TxToken->Status, %r.\n", TxToken->Status));
+      DEBUG ((DEBUG_ERROR, "ArpOnFrameSent: TxToken->Status, %r.\n", TxToken->Status));
     }
   );
 
@@ -952,7 +952,7 @@ ArpConfigureInstance (
 
       OldConfigData->StationAddress = AllocatePool (OldConfigData->SwAddressLength);
       if (OldConfigData->StationAddress == NULL) {
-        DEBUG ((EFI_D_ERROR, "ArpConfigInstance: AllocatePool for the StationAddress "
+        DEBUG ((DEBUG_ERROR, "ArpConfigInstance: AllocatePool for the StationAddress "
           "failed.\n"));
         return EFI_OUT_OF_RESOURCES;
       }
@@ -1044,7 +1044,7 @@ ArpSendFrame (
   //
   TxToken = AllocatePool (sizeof(EFI_MANAGED_NETWORK_COMPLETION_TOKEN));
   if (TxToken == NULL) {
-    DEBUG ((EFI_D_ERROR, "ArpSendFrame: Allocate memory for TxToken failed.\n"));
+    DEBUG ((DEBUG_ERROR, "ArpSendFrame: Allocate memory for TxToken failed.\n"));
     return;
   }
 
@@ -1063,7 +1063,7 @@ ArpSendFrame (
                   &TxToken->Event
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "ArpSendFrame: CreateEvent failed for TxToken->Event.\n"));
+    DEBUG ((DEBUG_ERROR, "ArpSendFrame: CreateEvent failed for TxToken->Event.\n"));
     goto CLEAN_EXIT;
   }
 
@@ -1072,7 +1072,7 @@ ArpSendFrame (
   //
   TxData = AllocatePool (sizeof(EFI_MANAGED_NETWORK_TRANSMIT_DATA));
   if (TxData == NULL) {
-    DEBUG ((EFI_D_ERROR, "ArpSendFrame: Allocate memory for TxData failed.\n"));
+    DEBUG ((DEBUG_ERROR, "ArpSendFrame: Allocate memory for TxData failed.\n"));
     goto CLEAN_EXIT;
   }
 
@@ -1091,7 +1091,7 @@ ArpSendFrame (
   //
   Packet = AllocatePool (TotalLength);
   if (Packet == NULL) {
-    DEBUG ((EFI_D_ERROR, "ArpSendFrame: Allocate memory for Packet failed.\n"));
+    DEBUG ((DEBUG_ERROR, "ArpSendFrame: Allocate memory for Packet failed.\n"));
     ASSERT (Packet != NULL);
   }
 
@@ -1189,7 +1189,7 @@ ArpSendFrame (
   //
   Status = ArpService->Mnp->Transmit (ArpService->Mnp, TxToken);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Mnp->Transmit failed, %r.\n", Status));
+    DEBUG ((DEBUG_ERROR, "Mnp->Transmit failed, %r.\n", Status));
     goto CLEAN_EXIT;
   }
 
@@ -1604,7 +1604,7 @@ ArpFindCacheEntry (
   //
   FindData = AllocatePool (FoundCount * FoundEntryLength);
   if (FindData == NULL) {
-    DEBUG ((EFI_D_ERROR, "ArpFindCacheEntry: Failed to allocate memory.\n"));
+    DEBUG ((DEBUG_ERROR, "ArpFindCacheEntry: Failed to allocate memory.\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto CLEAN_EXIT;
   }
@@ -1664,4 +1664,3 @@ CLEAN_EXIT:
 
   return Status;
 }
-
