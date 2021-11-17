@@ -54,4 +54,3 @@ VerifyEKUsInPkcs7Signature (
   ASSERT (FALSE);
   return RETURN_UNSUPPORTED;
 }
-

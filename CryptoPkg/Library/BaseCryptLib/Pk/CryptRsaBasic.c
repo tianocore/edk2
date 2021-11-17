@@ -34,7 +34,7 @@ RsaNew (
   //
   // Allocates & Initializes RSA Context by OpenSSL RSA_new()
   //
-  return (VOID *) RSA_new ();
+  return (VOID *)RSA_new ();
 }
 
 /**
@@ -52,7 +52,7 @@ RsaFree (
   //
   // Free OpenSSL RSA Context
   //
-  RSA_free ((RSA *) RsaContext);
+  RSA_free ((RSA *)RsaContext);
 }
 
 /**
@@ -99,7 +99,7 @@ RsaSetKey (
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL || BnSize > INT_MAX) {
+  if ((RsaContext == NULL) || (BnSize > INT_MAX)) {
     return FALSE;
   }
 
@@ -115,7 +115,7 @@ RsaSetKey (
   //
   // Retrieve the components from RSA object.
   //
-  RsaKey = (RSA *) RsaContext;
+  RsaKey = (RSA *)RsaContext;
   RSA_get0_key (RsaKey, (const BIGNUM **)&BnN, (const BIGNUM **)&BnE, (const BIGNUM **)&BnD);
   RSA_get0_factors (RsaKey, (const BIGNUM **)&BnP, (const BIGNUM **)&BnQ);
   RSA_get0_crt_params (RsaKey, (const BIGNUM **)&BnDp, (const BIGNUM **)&BnDq, (const BIGNUM **)&BnQInv);
@@ -126,118 +126,127 @@ RsaSetKey (
   //       (N, e) are needed.
   //
   switch (KeyTag) {
-
-  //
-  // RSA Public Modulus (N), Public Exponent (e) and Private Exponent (d)
-  //
-  case RsaKeyN:
-  case RsaKeyE:
-  case RsaKeyD:
-    if (BnN == NULL) {
-      BnN = BN_new ();
-    }
-    if (BnE == NULL) {
-      BnE = BN_new ();
-    }
-    if (BnD == NULL) {
-      BnD = BN_new ();
-    }
-
-    if ((BnN == NULL) || (BnE == NULL) || (BnD == NULL)) {
-      return FALSE;
-    }
-
-    switch (KeyTag) {
+    //
+    // RSA Public Modulus (N), Public Exponent (e) and Private Exponent (d)
+    //
     case RsaKeyN:
-      BnN = BN_bin2bn (BigNumber, (UINT32)BnSize, BnN);
-      break;
     case RsaKeyE:
-      BnE = BN_bin2bn (BigNumber, (UINT32)BnSize, BnE);
-      break;
     case RsaKeyD:
-      BnD = BN_bin2bn (BigNumber, (UINT32)BnSize, BnD);
+      if (BnN == NULL) {
+        BnN = BN_new ();
+      }
+
+      if (BnE == NULL) {
+        BnE = BN_new ();
+      }
+
+      if (BnD == NULL) {
+        BnD = BN_new ();
+      }
+
+      if ((BnN == NULL) || (BnE == NULL) || (BnD == NULL)) {
+        return FALSE;
+      }
+
+      switch (KeyTag) {
+        case RsaKeyN:
+          BnN = BN_bin2bn (BigNumber, (UINT32)BnSize, BnN);
+          break;
+        case RsaKeyE:
+          BnE = BN_bin2bn (BigNumber, (UINT32)BnSize, BnE);
+          break;
+        case RsaKeyD:
+          BnD = BN_bin2bn (BigNumber, (UINT32)BnSize, BnD);
+          break;
+        default:
+          return FALSE;
+      }
+
+      if (RSA_set0_key (RsaKey, BN_dup (BnN), BN_dup (BnE), BN_dup (BnD)) == 0) {
+        return FALSE;
+      }
+
       break;
-    default:
-      return FALSE;
-    }
-    if (RSA_set0_key (RsaKey, BN_dup(BnN), BN_dup(BnE), BN_dup(BnD)) == 0) {
-      return FALSE;
-    }
 
-    break;
-
-  //
-  // RSA Secret Prime Factor of Modulus (p and q)
-  //
-  case RsaKeyP:
-  case RsaKeyQ:
-    if (BnP == NULL) {
-      BnP = BN_new ();
-    }
-    if (BnQ == NULL) {
-      BnQ = BN_new ();
-    }
-    if ((BnP == NULL) || (BnQ == NULL)) {
-      return FALSE;
-    }
-
-    switch (KeyTag) {
+    //
+    // RSA Secret Prime Factor of Modulus (p and q)
+    //
     case RsaKeyP:
-      BnP = BN_bin2bn (BigNumber, (UINT32)BnSize, BnP);
-      break;
     case RsaKeyQ:
-      BnQ = BN_bin2bn (BigNumber, (UINT32)BnSize, BnQ);
+      if (BnP == NULL) {
+        BnP = BN_new ();
+      }
+
+      if (BnQ == NULL) {
+        BnQ = BN_new ();
+      }
+
+      if ((BnP == NULL) || (BnQ == NULL)) {
+        return FALSE;
+      }
+
+      switch (KeyTag) {
+        case RsaKeyP:
+          BnP = BN_bin2bn (BigNumber, (UINT32)BnSize, BnP);
+          break;
+        case RsaKeyQ:
+          BnQ = BN_bin2bn (BigNumber, (UINT32)BnSize, BnQ);
+          break;
+        default:
+          return FALSE;
+      }
+
+      if (RSA_set0_factors (RsaKey, BN_dup (BnP), BN_dup (BnQ)) == 0) {
+        return FALSE;
+      }
+
       break;
-    default:
-      return FALSE;
-    }
-    if (RSA_set0_factors (RsaKey, BN_dup(BnP), BN_dup(BnQ)) == 0) {
-      return FALSE;
-    }
 
-    break;
-
-  //
-  // p's CRT Exponent (== d mod (p - 1)),  q's CRT Exponent (== d mod (q - 1)),
-  // and CRT Coefficient (== 1/q mod p)
-  //
-  case RsaKeyDp:
-  case RsaKeyDq:
-  case RsaKeyQInv:
-    if (BnDp == NULL) {
-      BnDp = BN_new ();
-    }
-    if (BnDq == NULL) {
-      BnDq = BN_new ();
-    }
-    if (BnQInv == NULL) {
-      BnQInv = BN_new ();
-    }
-    if ((BnDp == NULL) || (BnDq == NULL) || (BnQInv == NULL)) {
-      return FALSE;
-    }
-
-    switch (KeyTag) {
+    //
+    // p's CRT Exponent (== d mod (p - 1)),  q's CRT Exponent (== d mod (q - 1)),
+    // and CRT Coefficient (== 1/q mod p)
+    //
     case RsaKeyDp:
-      BnDp = BN_bin2bn (BigNumber, (UINT32)BnSize, BnDp);
-      break;
     case RsaKeyDq:
-      BnDq = BN_bin2bn (BigNumber, (UINT32)BnSize, BnDq);
-      break;
     case RsaKeyQInv:
-      BnQInv = BN_bin2bn (BigNumber, (UINT32)BnSize, BnQInv);
+      if (BnDp == NULL) {
+        BnDp = BN_new ();
+      }
+
+      if (BnDq == NULL) {
+        BnDq = BN_new ();
+      }
+
+      if (BnQInv == NULL) {
+        BnQInv = BN_new ();
+      }
+
+      if ((BnDp == NULL) || (BnDq == NULL) || (BnQInv == NULL)) {
+        return FALSE;
+      }
+
+      switch (KeyTag) {
+        case RsaKeyDp:
+          BnDp = BN_bin2bn (BigNumber, (UINT32)BnSize, BnDp);
+          break;
+        case RsaKeyDq:
+          BnDq = BN_bin2bn (BigNumber, (UINT32)BnSize, BnDq);
+          break;
+        case RsaKeyQInv:
+          BnQInv = BN_bin2bn (BigNumber, (UINT32)BnSize, BnQInv);
+          break;
+        default:
+          return FALSE;
+      }
+
+      if (RSA_set0_crt_params (RsaKey, BN_dup (BnDp), BN_dup (BnDq), BN_dup (BnQInv)) == 0) {
+        return FALSE;
+      }
+
       break;
+
     default:
       return FALSE;
-    }
-    if (RSA_set0_crt_params (RsaKey, BN_dup(BnDp), BN_dup(BnDq), BN_dup(BnQInv)) == 0) {
-      return FALSE;
-    }
-
-    break;
-
-  default:
-    return FALSE;
   }
 
   return TRUE;
@@ -272,17 +281,17 @@ RsaPkcs1Verify (
   IN  UINTN        SigSize
   )
 {
-  INT32    DigestType;
-  UINT8    *SigBuf;
+  INT32  DigestType;
+  UINT8  *SigBuf;
 
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL || MessageHash == NULL || Signature == NULL) {
+  if ((RsaContext == NULL) || (MessageHash == NULL) || (Signature == NULL)) {
     return FALSE;
   }
 
-  if (SigSize > INT_MAX || SigSize == 0) {
+  if ((SigSize > INT_MAX) || (SigSize == 0)) {
     return FALSE;
   }
 
@@ -291,37 +300,37 @@ RsaPkcs1Verify (
   //   Only MD5, SHA-1, SHA-256, SHA-384 or SHA-512 algorithm is supported.
   //
   switch (HashSize) {
-  case MD5_DIGEST_SIZE:
-    DigestType = NID_md5;
-    break;
+    case MD5_DIGEST_SIZE:
+      DigestType = NID_md5;
+      break;
 
-  case SHA1_DIGEST_SIZE:
-    DigestType = NID_sha1;
-    break;
+    case SHA1_DIGEST_SIZE:
+      DigestType = NID_sha1;
+      break;
 
-  case SHA256_DIGEST_SIZE:
-    DigestType = NID_sha256;
-    break;
+    case SHA256_DIGEST_SIZE:
+      DigestType = NID_sha256;
+      break;
 
-  case SHA384_DIGEST_SIZE:
-    DigestType = NID_sha384;
-    break;
+    case SHA384_DIGEST_SIZE:
+      DigestType = NID_sha384;
+      break;
 
-  case SHA512_DIGEST_SIZE:
-    DigestType = NID_sha512;
-    break;
+    case SHA512_DIGEST_SIZE:
+      DigestType = NID_sha512;
+      break;
 
-  default:
-    return FALSE;
+    default:
+      return FALSE;
   }
 
-  SigBuf = (UINT8 *) Signature;
-  return (BOOLEAN) RSA_verify (
-                     DigestType,
-                     MessageHash,
-                     (UINT32) HashSize,
-                     SigBuf,
-                     (UINT32) SigSize,
-                     (RSA *) RsaContext
-                     );
+  SigBuf = (UINT8 *)Signature;
+  return (BOOLEAN)RSA_verify (
+                    DigestType,
+                    MessageHash,
+                    (UINT32)HashSize,
+                    SigBuf,
+                    (UINT32)SigSize,
+                    (RSA *)RsaContext
+                    );
 }

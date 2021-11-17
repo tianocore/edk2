@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "TestBaseCryptLib.h"
 
-VOID    *mDh1;
-VOID    *mDh2;
+VOID  *mDh1;
+VOID  *mDh2;
 
 UNIT_TEST_STATUS
 EFIAPI
@@ -40,6 +40,7 @@ TestVerifyDhCleanUp (
     DhFree (mDh1);
     mDh1 = NULL;
   }
+
   if (mDh2 != NULL) {
     DhFree (mDh2);
     mDh2 = NULL;
@@ -52,24 +53,24 @@ TestVerifyDhGenerateKey (
   UNIT_TEST_CONTEXT           Context
   )
 {
-  UINT8   Prime[64];
-  UINT8   PublicKey1[64];
-  UINTN   PublicKey1Length;
-  UINT8   PublicKey2[64];
-  UINTN   PublicKey2Length;
-  UINT8   Key1[64];
-  UINTN   Key1Length;
-  UINT8   Key2[64];
-  UINTN   Key2Length;
-  BOOLEAN Status;
+  UINT8    Prime[64];
+  UINT8    PublicKey1[64];
+  UINTN    PublicKey1Length;
+  UINT8    PublicKey2[64];
+  UINTN    PublicKey2Length;
+  UINT8    Key1[64];
+  UINTN    Key1Length;
+  UINT8    Key2[64];
+  UINTN    Key2Length;
+  BOOLEAN  Status;
 
   //
   // Initialize Key Length
   //
   PublicKey1Length = sizeof (PublicKey1);
   PublicKey2Length = sizeof (PublicKey2);
-  Key1Length       = sizeof (Key1);
-  Key2Length       = sizeof (Key2);
+  Key1Length = sizeof (Key1);
+  Key2Length = sizeof (Key2);
 
   Status = DhGenerateParameter (mDh1, 2, 64, Prime);
   UT_ASSERT_TRUE (Status);
@@ -96,11 +97,11 @@ TestVerifyDhGenerateKey (
   return UNIT_TEST_PASSED;
 }
 
-TEST_DESC mDhTest[] = {
-    //
-    // -----Description--------------------------------Class---------------------Function----------------Pre-----------------Post------------Context
-    //
-    {"TestVerifyDhGenerateKey()",        "CryptoPkg.BaseCryptLib.Dh",   TestVerifyDhGenerateKey,  TestVerifyDhPreReq, TestVerifyDhCleanUp, NULL},
+TEST_DESC  mDhTest[] = {
+  //
+  // -----Description--------------------------------Class---------------------Function----------------Pre-----------------Post------------Context
+  //
+  { "TestVerifyDhGenerateKey()", "CryptoPkg.BaseCryptLib.Dh", TestVerifyDhGenerateKey, TestVerifyDhPreReq, TestVerifyDhCleanUp, NULL },
 };
 
-UINTN mDhTestNum = ARRAY_SIZE(mDhTest);
+UINTN  mDhTestNum = ARRAY_SIZE (mDhTest);

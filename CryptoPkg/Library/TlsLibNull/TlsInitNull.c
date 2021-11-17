@@ -26,7 +26,7 @@ TlsInitialize (
   VOID
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return FALSE;
 }
 
@@ -42,7 +42,7 @@ TlsCtxFree (
   IN   VOID                  *TlsCtx
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return;
 }
 
@@ -64,7 +64,7 @@ TlsCtxNew (
   IN     UINT8                    MinorVer
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -83,7 +83,7 @@ TlsFree (
   IN     VOID                     *Tls
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 /**
@@ -105,7 +105,6 @@ TlsNew (
   IN     VOID                     *TlsCtx
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return NULL;
 }
-
