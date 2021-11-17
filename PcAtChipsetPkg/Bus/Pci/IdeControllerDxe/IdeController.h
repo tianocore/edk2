@@ -26,24 +26,25 @@
 //
 // Global Variables definitions
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gIdeControllerDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gIdeControllerComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gIdeControllerComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gIdeControllerDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gIdeControllerComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gIdeControllerComponentName2;
 
 ///
 /// Supports 2 channel max
 ///
-#define ICH_IDE_MAX_CHANNEL 0x02
+#define ICH_IDE_MAX_CHANNEL  0x02
 
 ///
 /// Supports 2 devices max
 ///
-#define ICH_IDE_MAX_DEVICES 0x02
-#define ICH_IDE_ENUMER_ALL  FALSE
+#define ICH_IDE_MAX_DEVICES  0x02
+#define ICH_IDE_ENUMER_ALL   FALSE
 
 //
 // Driver binding functions declaration
 //
+
 /**
   Register Driver Binding protocol for this driver.
 
@@ -110,6 +111,7 @@ IdeControllerStop (
 //
 // IDE controller init functions declaration
 //
+
 /**
   Returns the information about the specified IDE channel.
 
@@ -388,6 +390,7 @@ IdeInitSetTiming (
 //
 // Forward reference declaration
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the EFI Driver.
 
