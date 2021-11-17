@@ -40,9 +40,9 @@ ArmMmuPeiLibConstructor (
   if ((UINTN)FileInfo.Buffer <= (UINTN)ArmReplaceLiveTranslationEntry &&
       ((UINTN)FileInfo.Buffer + FileInfo.BufferSize >=
        (UINTN)ArmReplaceLiveTranslationEntry + ArmReplaceLiveTranslationEntrySize)) {
-    DEBUG ((EFI_D_INFO, "ArmMmuLib: skipping cache maintenance on XIP PEIM\n"));
+    DEBUG ((DEBUG_INFO, "ArmMmuLib: skipping cache maintenance on XIP PEIM\n"));
   } else {
-    DEBUG ((EFI_D_INFO, "ArmMmuLib: performing cache maintenance on shadowed PEIM\n"));
+    DEBUG ((DEBUG_INFO, "ArmMmuLib: performing cache maintenance on shadowed PEIM\n"));
     //
     // The ArmReplaceLiveTranslationEntry () helper function may be invoked
     // with the MMU off so we have to ensure that it gets cleaned to the PoC
