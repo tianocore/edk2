@@ -283,8 +283,8 @@ VerifyMailboxChecksum (
   // and ToBeCheckSum field to validate the mail box.
   //
   if (CheckSum != Mailbox->CheckSum && CheckSum != Mailbox->ToBeCheckSum) {
-    DEBUG ((EFI_D_ERROR, "DebugAgent: Mailbox checksum error, stack or heap crashed!\n"));
-    DEBUG ((EFI_D_ERROR, "DebugAgent: CheckSum = %x, Mailbox->CheckSum = %x, Mailbox->ToBeCheckSum = %x\n", CheckSum, Mailbox->CheckSum, Mailbox->ToBeCheckSum));
+    DEBUG ((DEBUG_ERROR, "DebugAgent: Mailbox checksum error, stack or heap crashed!\n"));
+    DEBUG ((DEBUG_ERROR, "DebugAgent: CheckSum = %x, Mailbox->CheckSum = %x, Mailbox->ToBeCheckSum = %x\n", CheckSum, Mailbox->CheckSum, Mailbox->ToBeCheckSum));
     CpuDeadLoop ();
   }
 }
@@ -2637,4 +2637,3 @@ InterruptProcess (
 
   return;
 }
-
