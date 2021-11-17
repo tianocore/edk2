@@ -18,7 +18,7 @@ extern CONST EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto;
 CONST EFI_PEI_PPI_DESCRIPTOR  mEdkiiCryptoPpiList = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEdkiiCryptoPpiGuid,
-  (EDKII_CRYPTO_PPI *) &mEdkiiCrypto
+  (EDKII_CRYPTO_PPI *)&mEdkiiCrypto
 };
 
 /**
@@ -47,11 +47,11 @@ CryptoPeiEntry (
   // always shadow this module in memory in Post-Mem.
   //
   Status = PeiServicesLocatePpi (
-              &gEfiPeiMemoryDiscoveredPpiGuid,
-              0,
-              NULL,
-              (VOID **)&MemoryDiscoveredPpi
-              );
+             &gEfiPeiMemoryDiscoveredPpiGuid,
+             0,
+             NULL,
+             (VOID **)&MemoryDiscoveredPpi
+             );
   if (Status == EFI_NOT_FOUND) {
     //
     // CryptoPei is dispatched before gEfiPeiMemoryDiscoveredPpiGuid
@@ -81,7 +81,7 @@ CryptoPeiEntry (
       //
       // CryptoPei was also dispatched before gEfiPeiMemoryDiscoveredPpiGuid
       //
-      DEBUG((DEBUG_INFO, "CryptoPeiEntry: ReInstall Post-Memmory Crypto PPI\n"));
+      DEBUG ((DEBUG_INFO, "CryptoPeiEntry: ReInstall Post-Memmory Crypto PPI\n"));
       Status = PeiServicesReInstallPpi (
                  EdkiiCryptoPpiDescriptor,
                  &mEdkiiCryptoPpiList

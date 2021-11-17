@@ -27,7 +27,7 @@ TlsInHandshake (
   IN     VOID                     *Tls
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return FALSE;
 }
 
@@ -63,11 +63,11 @@ TlsDoHandshake (
   IN     VOID                     *Tls,
   IN     UINT8                    *BufferIn, OPTIONAL
   IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
+  OUT UINT8                    *BufferOut, OPTIONAL
   IN OUT UINTN                    *BufferOutSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -102,11 +102,11 @@ TlsHandleAlert (
   IN     VOID                     *Tls,
   IN     UINT8                    *BufferIn, OPTIONAL
   IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
+  OUT UINT8                    *BufferOut, OPTIONAL
   IN OUT UINTN                    *BufferOutSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -136,7 +136,7 @@ TlsCloseNotify (
   IN OUT UINTN                    *BufferSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -162,7 +162,7 @@ TlsCtrlTrafficOut (
   IN     UINTN                    BufferSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -188,9 +188,10 @@ TlsCtrlTrafficIn (
   IN     UINTN                    BufferSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
+
 /**
   Attempts to read bytes from the specified TLS connection into the buffer.
 
@@ -214,7 +215,7 @@ TlsRead (
   IN     UINTN                    BufferSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -241,7 +242,6 @@ TlsWrite (
   IN     UINTN                    BufferSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
-

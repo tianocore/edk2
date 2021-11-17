@@ -55,11 +55,9 @@ GetSignerCertificate (
   OUT VOID       **SignerCert
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_NOT_READY;
-
 }
-
 
 /**
   Determines if the specified EKU represented in ASN1 form is present
@@ -80,10 +78,9 @@ IsEkuInCertificate (
   IN VOID *Asn1ToFind
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_NOT_READY;
 }
-
 
 /**
   Determines if the specified EKUs are present in a signing certificate.
@@ -99,14 +96,14 @@ IsEkuInCertificate (
   @retval EFI_NOT_FOUND             One or more EKU's were not found in the signature.
 **/
 EFI_STATUS
-CheckEKUs(
+CheckEKUs (
   IN CONST VOID     *SignerCert,
   IN CONST CHAR8    *RequiredEKUs[],
   IN CONST UINT32   RequiredEKUsSize,
   IN BOOLEAN        RequireAllPresent
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_NOT_READY;
 }
 
@@ -150,7 +147,6 @@ VerifyEKUsInPkcs7Signature (
   IN BOOLEAN        RequireAllPresent
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_NOT_READY;
 }
-

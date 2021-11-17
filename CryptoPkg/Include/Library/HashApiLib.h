@@ -12,7 +12,7 @@
 #ifndef __HASH_API_LIB_H_
 #define __HASH_API_LIB_H_
 
-typedef VOID  *HASH_API_CONTEXT;
+typedef VOID *HASH_API_CONTEXT;
 
 /**
   Retrieves the size, in bytes, of the context buffer required for hash operations.

@@ -11,7 +11,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /*
  * Floating point to integer conversion.
  */
-__declspec(naked) void _ftol2 (void)
+__declspec(naked) void
+_ftol2 (
+  void
+  )
 {
   _asm {
     fistp qword ptr [esp-8]
