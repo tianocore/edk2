@@ -29,7 +29,7 @@ ResetCold (
   VOID
   )
 {
-  IoWrite8 ((UINTN) PcdGet64 (PcdResetControlRegister), PcdGet8 (PcdResetControlValueColdReset));
+  IoWrite8 ((UINTN)PcdGet64 (PcdResetControlRegister), PcdGet8 (PcdResetControlValueColdReset));
 }
 
 /**
@@ -45,7 +45,7 @@ ResetWarm (
   VOID
   )
 {
-  IoWrite8 ((UINTN) PcdGet64 (PcdResetControlRegister), PcdGet8 (PcdResetControlValueColdReset));
+  IoWrite8 ((UINTN)PcdGet64 (PcdResetControlRegister), PcdGet8 (PcdResetControlValueColdReset));
 }
 
 /**
@@ -63,7 +63,6 @@ ResetShutdown (
 {
   ASSERT (FALSE);
 }
-
 
 /**
   This function causes a systemwide reset. The exact type of the reset is
@@ -108,23 +107,23 @@ ResetSystem (
   )
 {
   switch (ResetType) {
-  case EfiResetWarm:
-    ResetWarm ();
-    break;
+    case EfiResetWarm:
+      ResetWarm ();
+      break;
 
-  case EfiResetCold:
-    ResetCold ();
-    break;
+    case EfiResetCold:
+      ResetCold ();
+      break;
 
-  case EfiResetShutdown:
-    ResetShutdown ();
-    return;
+    case EfiResetShutdown:
+      ResetShutdown ();
+      return;
 
-  case EfiResetPlatformSpecific:
-    ResetPlatformSpecific (DataSize, ResetData);
-    return;
+    case EfiResetPlatformSpecific:
+      ResetPlatformSpecific (DataSize, ResetData);
+      return;
 
-  default:
-    return;
+    default:
+      return;
   }
 }

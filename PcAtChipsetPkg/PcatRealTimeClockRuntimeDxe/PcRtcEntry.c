@@ -12,12 +12,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 PC_RTC_MODULE_GLOBALS  mModuleGlobal;
 
-EFI_HANDLE             mHandle = NULL;
+EFI_HANDLE  mHandle = NULL;
 
-STATIC EFI_EVENT       mVirtualAddrChangeEvent;
+STATIC EFI_EVENT  mVirtualAddrChangeEvent;
 
-UINTN                  mRtcIndexRegister;
-UINTN                  mRtcTargetRegister;
+UINTN  mRtcIndexRegister;
+UINTN  mRtcTargetRegister;
 
 /**
   Returns the current time and date information, and the time-keeping capabilities
@@ -87,7 +87,6 @@ PcRtcEfiGetWakeupTime (
   return PcRtcGetWakeupTime (Enabled, Pending, Time, &mModuleGlobal);
 }
 
-
 /**
   Sets the system wakeup alarm clock time.
 
@@ -132,8 +131,8 @@ LibRtcVirtualNotifyEvent (
   // stored physical addresses to virtual address. After the OS transitions to
   // calling in virtual mode, all future runtime calls will be made in virtual
   // mode.
-  EfiConvertPointer (0x0, (VOID**)&mRtcIndexRegister);
-  EfiConvertPointer (0x0, (VOID**)&mRtcTargetRegister);
+  EfiConvertPointer (0x0, (VOID **)&mRtcIndexRegister);
+  EfiConvertPointer (0x0, (VOID **)&mRtcTargetRegister);
 }
 
 /**
@@ -163,7 +162,7 @@ InitializePcRtc (
   mModuleGlobal.CenturyRtcAddress = GetCenturyRtcAddress ();
 
   if (FeaturePcdGet (PcdRtcUseMmio)) {
-    mRtcIndexRegister = (UINTN)PcdGet64 (PcdRtcIndexRegister64);
+    mRtcIndexRegister  = (UINTN)PcdGet64 (PcdRtcIndexRegister64);
     mRtcTargetRegister = (UINTN)PcdGet64 (PcdRtcTargetRegister64);
   }
 
@@ -190,8 +189,8 @@ InitializePcRtc (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  gRT->GetTime       = PcRtcEfiGetTime;
-  gRT->SetTime       = PcRtcEfiSetTime;
+  gRT->GetTime = PcRtcEfiGetTime;
+  gRT->SetTime = PcRtcEfiSetTime;
   gRT->GetWakeupTime = PcRtcEfiGetWakeupTime;
   gRT->SetWakeupTime = PcRtcEfiSetWakeupTime;
 
