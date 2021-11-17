@@ -36,7 +36,7 @@ PostCode (
   IN UINT32  Value
   )
 {
-  DEBUG((EFI_D_INFO, "POST %08x\n", Value));
+  DEBUG((DEBUG_INFO, "POST %08x\n", Value));
   return Value;
 }
 
@@ -72,7 +72,7 @@ PostCodeWithDescription (
   IN CONST CHAR8  *Description  OPTIONAL
   )
 {
-  DEBUG((EFI_D_INFO, "POST %08x - %s\n", Value, Description));
+  DEBUG((DEBUG_INFO, "POST %08x - %s\n", Value, Description));
   return Value;
 }
 
