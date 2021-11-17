@@ -591,7 +591,7 @@ Ip6DriverBindingStart (
                          0,
                          NULL
                          );
-      DEBUG ((EFI_D_WARN, "Ip6DriverBindingStart: Clean the invalid ManualAddress configuration.\n"));
+      DEBUG ((DEBUG_WARN, "Ip6DriverBindingStart: Clean the invalid ManualAddress configuration.\n"));
     }
   }
 
@@ -616,7 +616,7 @@ Ip6DriverBindingStart (
                          0,
                          NULL
                          );
-      DEBUG ((EFI_D_WARN, "Ip6DriverBindingStart: Clean the invalid Gateway configuration.\n"));
+      DEBUG ((DEBUG_WARN, "Ip6DriverBindingStart: Clean the invalid Gateway configuration.\n"));
     }
   }
 

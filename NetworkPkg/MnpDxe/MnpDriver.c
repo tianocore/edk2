@@ -164,14 +164,14 @@ MnpDriverBindingStart (
   //
   MnpDeviceData = AllocateZeroPool (sizeof (MNP_DEVICE_DATA));
   if (MnpDeviceData == NULL) {
-    DEBUG ((EFI_D_ERROR, "MnpDriverBindingStart(): Failed to allocate the Mnp Device Data.\n"));
+    DEBUG ((DEBUG_ERROR, "MnpDriverBindingStart(): Failed to allocate the Mnp Device Data.\n"));
 
     return EFI_OUT_OF_RESOURCES;
   }
 
   Status = MnpInitializeDeviceData (MnpDeviceData, This->DriverBindingHandle, ControllerHandle);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "MnpDriverBindingStart: MnpInitializeDeviceData failed, %r.\n", Status));
+    DEBUG ((DEBUG_ERROR, "MnpDriverBindingStart: MnpInitializeDeviceData failed, %r.\n", Status));
 
     FreePool (MnpDeviceData);
     return Status;
@@ -342,7 +342,7 @@ MnpDriverBindingStop (
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "MnpDriverBindingStop: try to stop unknown Controller.\n"));
+      DEBUG ((DEBUG_ERROR, "MnpDriverBindingStop: try to stop unknown Controller.\n"));
       return EFI_DEVICE_ERROR;
     }
 
@@ -468,7 +468,7 @@ MnpServiceBindingCreateChild (
                   );
   if (EFI_ERROR (Status)) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "MnpServiceBindingCreateChild: Failed to install the MNP protocol, %r.\n",
       Status)
       );
@@ -614,7 +614,7 @@ MnpServiceBindingDestroyChild (
                   );
   if (EFI_ERROR (Status)) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "MnpServiceBindingDestroyChild: Failed to uninstall the ManagedNetwork protocol, %r.\n",
       Status)
       );

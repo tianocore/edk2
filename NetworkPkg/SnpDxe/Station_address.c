@@ -44,13 +44,13 @@ PxeGetStnAddr (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.station_addr()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.station_addr()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "\nsnp->undi.station_addr()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -132,13 +132,13 @@ PxeSetStnAddr (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.station_addr()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.station_addr()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "\nsnp->undi.station_addr()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)

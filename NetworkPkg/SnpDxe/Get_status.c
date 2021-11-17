@@ -71,13 +71,13 @@ PxeGetStatus (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nSnp->undi.get_status()  "));
+  DEBUG ((DEBUG_NET, "\nSnp->undi.get_status()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
-      (EFI_D_NET,
+      (DEBUG_NET,
       "\nSnp->undi.get_status()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)

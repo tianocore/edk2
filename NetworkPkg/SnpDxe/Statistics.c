@@ -133,7 +133,7 @@ SnpUndi32Statistics (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.statistics()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.statistics()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -143,7 +143,7 @@ SnpUndi32Statistics (
 
   case PXE_STATCODE_UNSUPPORTED:
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "\nsnp->undi.statistics()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -154,7 +154,7 @@ SnpUndi32Statistics (
 
   default:
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "\nsnp->undi.statistics()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)

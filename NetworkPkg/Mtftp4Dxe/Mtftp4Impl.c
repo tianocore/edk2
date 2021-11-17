@@ -130,9 +130,9 @@ Mtftp4GetInfoCheckPacket (
   case EFI_MTFTP4_OPCODE_ERROR:
     ErrorHeader = (EFI_MTFTP4_ERROR_HEADER *) Packet;
     if (ErrorHeader->ErrorCode == EFI_MTFTP4_ERRORCODE_FILE_NOT_FOUND) {
-      DEBUG ((EFI_D_ERROR, "TFTP error code 1 (File Not Found)\n"));
+      DEBUG ((DEBUG_ERROR, "TFTP error code 1 (File Not Found)\n"));
     } else {
-      DEBUG ((EFI_D_ERROR, "TFTP error code %d\n", ErrorHeader->ErrorCode));
+      DEBUG ((DEBUG_ERROR, "TFTP error code %d\n", ErrorHeader->ErrorCode));
     }
     State->Status = EFI_TFTP_ERROR;
     break;

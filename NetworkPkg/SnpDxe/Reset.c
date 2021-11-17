@@ -37,13 +37,13 @@ PxeReset (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.reset()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.reset()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "\nsnp->undi32.reset()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -98,7 +98,7 @@ SnpUndi32Reset (
   // Resolve Warning 4 unreferenced parameter problem
   //
   ExtendedVerification = 0;
-  DEBUG ((EFI_D_WARN, "ExtendedVerification = %d is not implemented!\n", ExtendedVerification));
+  DEBUG ((DEBUG_WARN, "ExtendedVerification = %d is not implemented!\n", ExtendedVerification));
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;

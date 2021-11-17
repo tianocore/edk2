@@ -76,7 +76,7 @@ PxeReceive (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.receive ()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.receive ()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
 
@@ -86,7 +86,7 @@ PxeReceive (
 
   case PXE_STATCODE_NO_DATA:
     DEBUG (
-      (EFI_D_NET,
+      (DEBUG_NET,
       "\nsnp->undi.receive ()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -96,7 +96,7 @@ PxeReceive (
 
   default:
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "\nsnp->undi.receive()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)

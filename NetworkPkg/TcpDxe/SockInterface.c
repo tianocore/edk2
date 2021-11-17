@@ -107,7 +107,7 @@ SockBufferToken (
   if (NULL == SockToken) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockBufferIOToken: No Memory to allocate SockToken\n")
       );
 
@@ -192,7 +192,7 @@ SockDestroyChild (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockDestroyChild: Open protocol installed on socket failed with %r\n",
       Status)
       );
@@ -213,7 +213,7 @@ SockDestroyChild (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockDestroyChild: Get the lock to access socket failed with %r\n",
       Status)
       );
@@ -229,7 +229,7 @@ SockDestroyChild (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockDestroyChild: Protocol detach socket failed with %r\n",
       Status)
       );
@@ -280,7 +280,7 @@ SockCreateChild (
   if (NULL == Sock) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockCreateChild: No resource to create a new socket\n")
       );
 
@@ -291,7 +291,7 @@ SockCreateChild (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockCreateChild: Get the lock to access socket failed with %r\n",
       Status)
       );
@@ -306,7 +306,7 @@ SockCreateChild (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockCreateChild: Protocol failed to attach a socket with %r\n",
       Status)
       );
@@ -371,7 +371,7 @@ SockConfigure (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockConfigure: Get the access for socket failed with %r",
       Status)
       );
@@ -425,7 +425,7 @@ SockConnect (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockConnect: Get the access for socket failed with %r",
       Status)
       );
@@ -504,7 +504,7 @@ SockAccept (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockAccept: Get the access for socket failed with %r",
       Status)
       );
@@ -557,7 +557,7 @@ SockAccept (
       Socket->Parent->ConnCnt--;
 
       DEBUG (
-        (EFI_D_NET,
+        (DEBUG_NET,
         "SockAccept: Accept a socket, now conncount is %d",
         Socket->Parent->ConnCnt)
         );
@@ -619,7 +619,7 @@ SockSend (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockSend: Get the access for socket failed with %r",
       Status)
       );
@@ -686,7 +686,7 @@ SockSend (
 
     if (NULL == SockToken) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "SockSend: Failed to buffer IO token into socket processing SndToken List\n",
         Status)
         );
@@ -699,7 +699,7 @@ SockSend (
 
     if (EFI_ERROR (Status)) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "SockSend: Failed to process Snd Data\n",
         Status)
         );
@@ -750,7 +750,7 @@ SockRcv (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockRcv: Get the access for socket failed with %r",
       Status)
       );
@@ -848,7 +848,7 @@ SockFlush (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockFlush: Get the access for socket failed with %r",
       Status)
       );
@@ -866,7 +866,7 @@ SockFlush (
   if (EFI_ERROR (Status)) {
 
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockFlush: Protocol failed handling SOCK_FLUSH with %r",
       Status)
       );
@@ -919,7 +919,7 @@ SockClose (
   Status = EfiAcquireLockOrFail (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockClose: Get the access for socket failed with %r",
       Status)
       );
@@ -990,7 +990,7 @@ SockCancel (
   Status = EfiAcquireLockOrFail (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockCancel: Get the access for socket failed with %r",
       Status)
       );
@@ -1099,7 +1099,7 @@ SockRoute (
   Status = EfiAcquireLockOrFail (&(Sock->Lock));
   if (EFI_ERROR (Status)) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "SockRoute: Get the access for socket failed with %r",
       Status)
       );
@@ -1123,4 +1123,3 @@ Exit:
   EfiReleaseLock (&(Sock->Lock));
   return Status;
 }
-
