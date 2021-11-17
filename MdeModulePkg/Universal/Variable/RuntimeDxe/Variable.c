@@ -281,15 +281,15 @@ RecordVarErrorFlag (
   VAR_ERROR_FLAG            TempFlag;
 
   DEBUG_CODE (
-    DEBUG ((EFI_D_ERROR, "RecordVarErrorFlag (0x%02x) %s:%g - 0x%08x - 0x%x\n", Flag, VariableName, VendorGuid, Attributes, VariableSize));
+    DEBUG ((DEBUG_ERROR, "RecordVarErrorFlag (0x%02x) %s:%g - 0x%08x - 0x%x\n", Flag, VariableName, VendorGuid, Attributes, VariableSize));
     if (Flag == VAR_ERROR_FLAG_SYSTEM_ERROR) {
       if (AtRuntime ()) {
-        DEBUG ((EFI_D_ERROR, "CommonRuntimeVariableSpace = 0x%x - CommonVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonRuntimeVariableSpace, mVariableModuleGlobal->CommonVariableTotalSize));
+        DEBUG ((DEBUG_ERROR, "CommonRuntimeVariableSpace = 0x%x - CommonVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonRuntimeVariableSpace, mVariableModuleGlobal->CommonVariableTotalSize));
       } else {
-        DEBUG ((EFI_D_ERROR, "CommonVariableSpace = 0x%x - CommonVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonVariableSpace, mVariableModuleGlobal->CommonVariableTotalSize));
+        DEBUG ((DEBUG_ERROR, "CommonVariableSpace = 0x%x - CommonVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonVariableSpace, mVariableModuleGlobal->CommonVariableTotalSize));
       }
     } else {
-      DEBUG ((EFI_D_ERROR, "CommonMaxUserVariableSpace = 0x%x - CommonUserVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonMaxUserVariableSpace, mVariableModuleGlobal->CommonUserVariableTotalSize));
+      DEBUG ((DEBUG_ERROR, "CommonMaxUserVariableSpace = 0x%x - CommonUserVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonMaxUserVariableSpace, mVariableModuleGlobal->CommonUserVariableTotalSize));
     }
   );
 
@@ -369,7 +369,7 @@ InitializeVarErrorFlag (
   }
 
   Flag = mCurrentBootVarErrFlag;
-  DEBUG ((EFI_D_INFO, "Initialize variable error flag (%02x)\n", Flag));
+  DEBUG ((DEBUG_INFO, "Initialize variable error flag (%02x)\n", Flag));
 
   Status = FindVariable (
              VAR_ERROR_FLAG_NAME,
@@ -1532,7 +1532,7 @@ AutoUpdateLangVariable (
                                    ISO_639_2_ENTRY_SIZE + 1, Attributes, 0, 0, &Variable, NULL);
         }
 
-        DEBUG ((EFI_D_INFO, "Variable Driver Auto Update PlatformLang, PlatformLang:%a, Lang:%a Status: %r\n", BestPlatformLang, BestLang, Status));
+        DEBUG ((DEBUG_INFO, "Variable Driver Auto Update PlatformLang, PlatformLang:%a, Lang:%a Status: %r\n", BestPlatformLang, BestLang, Status));
       }
     }
 
@@ -1581,7 +1581,7 @@ AutoUpdateLangVariable (
                                    AsciiStrSize (BestPlatformLang), Attributes, 0, 0, &Variable, NULL);
         }
 
-        DEBUG ((EFI_D_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a Status: %r\n", BestLang, BestPlatformLang, Status));
+        DEBUG ((DEBUG_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a Status: %r\n", BestLang, BestPlatformLang, Status));
       }
     }
   }
@@ -1659,14 +1659,14 @@ UpdateVariable (
       //
       // Trying to update NV variable prior to the installation of EFI_VARIABLE_WRITE_ARCH_PROTOCOL
       //
-      DEBUG ((EFI_D_ERROR, "Update NV variable before EFI_VARIABLE_WRITE_ARCH_PROTOCOL ready - %r\n", EFI_NOT_AVAILABLE_YET));
+      DEBUG ((DEBUG_ERROR, "Update NV variable before EFI_VARIABLE_WRITE_ARCH_PROTOCOL ready - %r\n", EFI_NOT_AVAILABLE_YET));
       return EFI_NOT_AVAILABLE_YET;
     } else if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
       //
       // Trying to update volatile authenticated variable prior to the installation of EFI_VARIABLE_WRITE_ARCH_PROTOCOL
       // The authenticated variable perhaps is not initialized, just return here.
       //
-      DEBUG ((EFI_D_ERROR, "Update AUTH variable before EFI_VARIABLE_WRITE_ARCH_PROTOCOL ready - %r\n", EFI_NOT_AVAILABLE_YET));
+      DEBUG ((DEBUG_ERROR, "Update AUTH variable before EFI_VARIABLE_WRITE_ARCH_PROTOCOL ready - %r\n", EFI_NOT_AVAILABLE_YET));
       return EFI_NOT_AVAILABLE_YET;
     }
   }
@@ -2764,7 +2764,7 @@ VariableServiceSetVariable (
       // 2. The only attribute differing is EFI_VARIABLE_APPEND_WRITE
       //
       Status = EFI_INVALID_PARAMETER;
-      DEBUG ((EFI_D_INFO, "[Variable]: Rewritten a preexisting variable(0x%08x) with different attributes(0x%08x) - %g:%s\n", Variable.CurrPtr->Attributes, Attributes, VendorGuid, VariableName));
+      DEBUG ((DEBUG_INFO, "[Variable]: Rewritten a preexisting variable(0x%08x) with different attributes(0x%08x) - %g:%s\n", Variable.CurrPtr->Attributes, Attributes, VendorGuid, VariableName));
       goto Done;
     }
   }
@@ -3264,7 +3264,7 @@ FlushHobVariableToFlash (
       //
       // All HOB variables have been flushed in flash.
       //
-      DEBUG ((EFI_D_INFO, "Variable driver: all HOB variables have been flushed in flash.\n"));
+      DEBUG ((DEBUG_INFO, "Variable driver: all HOB variables have been flushed in flash.\n"));
       if (mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.HobFlushComplete != NULL) {
         *(mVariableModuleGlobal->VariableGlobal.VariableRuntimeCacheContext.HobFlushComplete) = TRUE;
       }
@@ -3333,7 +3333,7 @@ VariableWriteServiceInitialize (
                                             GetVariableHeaderSize (mVariableModuleGlobal->VariableGlobal.AuthFormat);
     Status = AuthVariableLibInitialize (&mAuthContextIn, &mAuthContextOut);
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "Variable driver will work with auth variable support!\n"));
+      DEBUG ((DEBUG_INFO, "Variable driver will work with auth variable support!\n"));
       mVariableModuleGlobal->VariableGlobal.AuthSupport = TRUE;
       if (mAuthContextOut.AuthVarEntry != NULL) {
         for (Index = 0; Index < mAuthContextOut.AuthVarEntryCount; Index++) {
@@ -3347,8 +3347,8 @@ VariableWriteServiceInitialize (
         }
       }
     } else if (Status == EFI_UNSUPPORTED) {
-      DEBUG ((EFI_D_INFO, "NOTICE - AuthVariableLibInitialize() returns %r!\n", Status));
-      DEBUG ((EFI_D_INFO, "Variable driver will continue to work without auth variable support!\n"));
+      DEBUG ((DEBUG_INFO, "NOTICE - AuthVariableLibInitialize() returns %r!\n", Status));
+      DEBUG ((DEBUG_INFO, "Variable driver will continue to work without auth variable support!\n"));
       mVariableModuleGlobal->VariableGlobal.AuthSupport = FALSE;
       Status = EFI_SUCCESS;
     }
@@ -3550,7 +3550,7 @@ GetHobVariableStore (
         return EFI_OUT_OF_RESOURCES;
       }
     } else {
-      DEBUG ((EFI_D_ERROR, "HOB Variable Store header is corrupted!\n"));
+      DEBUG ((DEBUG_ERROR, "HOB Variable Store header is corrupted!\n"));
     }
   }
 
@@ -3598,14 +3598,14 @@ VariableCommonInitialize (
   // has been initialized in InitNonVolatileVariableStore().
   //
   if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
-    DEBUG ((EFI_D_INFO, "Variable driver will work with auth variable format!\n"));
+    DEBUG ((DEBUG_INFO, "Variable driver will work with auth variable format!\n"));
     //
     // Set AuthSupport to FALSE first, VariableWriteServiceInitialize() will initialize it.
     //
     mVariableModuleGlobal->VariableGlobal.AuthSupport = FALSE;
     VariableGuid = &gEfiAuthenticatedVariableGuid;
   } else {
-    DEBUG ((EFI_D_INFO, "Variable driver will work without auth variable support!\n"));
+    DEBUG ((DEBUG_INFO, "Variable driver will work without auth variable support!\n"));
     mVariableModuleGlobal->VariableGlobal.AuthSupport = FALSE;
     VariableGuid = &gEfiVariableGuid;
   }
@@ -3750,4 +3750,3 @@ GetFvbInfoByAddress (
 
   return Status;
 }
-

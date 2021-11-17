@@ -38,7 +38,7 @@ XhcReadCapReg8 (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcReadCapReg: Pci Io read error - %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "XhcReadCapReg: Pci Io read error - %r at %d\n", Status, Offset));
     Data = 0xFF;
   }
 
@@ -74,7 +74,7 @@ XhcReadCapReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcReadCapReg: Pci Io read error - %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "XhcReadCapReg: Pci Io read error - %r at %d\n", Status, Offset));
     Data = 0xFFFFFFFF;
   }
 
@@ -112,7 +112,7 @@ XhcReadOpReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcReadOpReg: Pci Io Read error - %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "XhcReadOpReg: Pci Io Read error - %r at %d\n", Status, Offset));
     Data = 0xFFFFFFFF;
   }
 
@@ -148,7 +148,7 @@ XhcWriteOpReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcWriteOpReg: Pci Io Write error: %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "XhcWriteOpReg: Pci Io Write error: %r at %d\n", Status, Offset));
   }
 }
 
@@ -185,7 +185,7 @@ XhcWriteDoorBellReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcWriteOpReg: Pci Io Write error: %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "XhcWriteOpReg: Pci Io Write error: %r at %d\n", Status, Offset));
   }
 }
 
@@ -219,7 +219,7 @@ XhcReadRuntimeReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcReadRuntimeReg: Pci Io Read error - %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "XhcReadRuntimeReg: Pci Io Read error - %r at %d\n", Status, Offset));
     Data = 0xFFFFFFFF;
   }
 
@@ -255,7 +255,7 @@ XhcWriteRuntimeReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcWriteRuntimeReg: Pci Io Write error: %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "XhcWriteRuntimeReg: Pci Io Write error: %r at %d\n", Status, Offset));
   }
 }
 
@@ -289,7 +289,7 @@ XhcReadExtCapReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcReadExtCapReg: Pci Io Read error - %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "XhcReadExtCapReg: Pci Io Read error - %r at %d\n", Status, Offset));
     Data = 0xFFFFFFFF;
   }
 
@@ -325,7 +325,7 @@ XhcWriteExtCapReg (
                              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcWriteExtCapReg: Pci Io Write error: %r at %d\n", Status, Offset));
+    DEBUG ((DEBUG_ERROR, "XhcWriteExtCapReg: Pci Io Write error: %r at %d\n", Status, Offset));
   }
 }
 
@@ -508,7 +508,7 @@ XhcSetBiosOwnership (
     return;
   }
 
-  DEBUG ((EFI_D_INFO, "XhcSetBiosOwnership: called to set BIOS ownership\n"));
+  DEBUG ((DEBUG_INFO, "XhcSetBiosOwnership: called to set BIOS ownership\n"));
 
   Buffer = XhcReadExtCapReg (Xhc, Xhc->UsbLegSupOffset);
   Buffer = ((Buffer & (~USBLEGSP_OS_SEMAPHORE)) | USBLEGSP_BIOS_SEMAPHORE);
@@ -532,7 +532,7 @@ XhcClearBiosOwnership (
     return;
   }
 
-  DEBUG ((EFI_D_INFO, "XhcClearBiosOwnership: called to clear BIOS ownership\n"));
+  DEBUG ((DEBUG_INFO, "XhcClearBiosOwnership: called to clear BIOS ownership\n"));
 
   Buffer = XhcReadExtCapReg (Xhc, Xhc->UsbLegSupOffset);
   Buffer = ((Buffer & (~USBLEGSP_BIOS_SEMAPHORE)) | USBLEGSP_OS_SEMAPHORE);
@@ -666,7 +666,7 @@ XhcResetHC (
 
   Status = EFI_SUCCESS;
 
-  DEBUG ((EFI_D_INFO, "XhcResetHC!\n"));
+  DEBUG ((DEBUG_INFO, "XhcResetHC!\n"));
   //
   // Host can only be reset when it is halt. If not so, halt it
   //
@@ -748,4 +748,3 @@ XhcRunHC (
   Status = XhcWaitOpRegBit (Xhc, XHC_USBSTS_OFFSET, XHC_USBSTS_HALT, FALSE, Timeout);
   return Status;
 }
-

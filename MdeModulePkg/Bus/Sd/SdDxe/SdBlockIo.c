@@ -30,7 +30,7 @@ AsyncIoCallback (
   Request = (SD_REQUEST *) Context;
 
   DEBUG_CODE_BEGIN ();
-    DEBUG ((EFI_D_INFO, "Sd Async Request: CmdIndex[%d] Arg[%08x] %r\n",
+    DEBUG ((DEBUG_INFO, "Sd Async Request: CmdIndex[%d] Arg[%08x] %r\n",
             Request->SdMmcCmdBlk.CommandIndex, Request->SdMmcCmdBlk.CommandArgument,
             Request->Packet.TransactionStatus));
   DEBUG_CODE_END ();
@@ -86,7 +86,7 @@ SdSetRca (
 
   Status = PassThru->PassThru (PassThru, Device->Slot, &Packet, NULL);
   if (!EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "Set RCA succeeds with Resp0 = 0x%x\n", SdMmcStatusBlk.Resp0));
+    DEBUG ((DEBUG_INFO, "Set RCA succeeds with Resp0 = 0x%x\n", SdMmcStatusBlk.Resp0));
     *Rca = (UINT16)(SdMmcStatusBlk.Resp0 >> 16);
   }
 
@@ -1378,4 +1378,3 @@ SdEraseBlocks (
 
   return Status;
 }
-

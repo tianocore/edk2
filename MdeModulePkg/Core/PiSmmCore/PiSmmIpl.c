@@ -991,7 +991,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
      }
      SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
    }
-   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x, Status = %r \n", FixLoadingAddress, Status));
+   DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x, Status = %r \n", FixLoadingAddress, Status));
    return Status;
 }
 /**
@@ -1068,7 +1068,7 @@ ExecuteSmmCoreFromSmram (
       //
       gSmmCorePrivate->SmramRangeCount --;
     } else {
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR: Loading module at fixed address at address failed\n"));
+      DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED ERROR: Loading module at fixed address at address failed\n"));
       //
       // Allocate memory for the image being loaded from the EFI_SRAM_DESCRIPTOR
       // specified by SmramRange
@@ -1749,7 +1749,7 @@ SmmIplEntry (
         //
         // Print the SMRAM base
         //
-        DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: TSEG BASE is %x. \n", mLMFAConfigurationTable->SmramBase));
+        DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED INFO: TSEG BASE is %x. \n", mLMFAConfigurationTable->SmramBase));
       }
 
       //

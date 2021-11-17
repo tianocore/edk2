@@ -78,7 +78,7 @@ BdsDxeOnConnectConInCallBack (
     // Should not enter this case, if enter, the keyboard will not work.
     // May need platfrom policy to connect keyboard.
     //
-    DEBUG ((EFI_D_WARN, "[Bds] Connect ConIn failed - %r!!!\n", Status));
+    DEBUG ((DEBUG_WARN, "[Bds] Connect ConIn failed - %r!!!\n", Status));
   }
 }
 /**
@@ -315,11 +315,11 @@ BdsWait (
   EFI_STATUS            Status;
   UINT16                TimeoutRemain;
 
-  DEBUG ((EFI_D_INFO, "[Bds]BdsWait ...Zzzzzzzzzzzz...\n"));
+  DEBUG ((DEBUG_INFO, "[Bds]BdsWait ...Zzzzzzzzzzzz...\n"));
 
   TimeoutRemain = PcdGet16 (PcdPlatformBootTimeOut);
   while (TimeoutRemain != 0) {
-    DEBUG ((EFI_D_INFO, "[Bds]BdsWait(%d)..Zzzz...\n", (UINTN) TimeoutRemain));
+    DEBUG ((DEBUG_INFO, "[Bds]BdsWait(%d)..Zzzz...\n", (UINTN) TimeoutRemain));
     PlatformBootManagerWaitCallback (TimeoutRemain);
 
     BdsReadKeys (); // BUGBUG: Only reading can signal HotkeyTriggered
@@ -353,7 +353,7 @@ BdsWait (
   if (PcdGet16 (PcdPlatformBootTimeOut) != 0 && TimeoutRemain == 0) {
     PlatformBootManagerWaitCallback (0);
   }
-  DEBUG ((EFI_D_INFO, "[Bds]Exit the waiting!\n"));
+  DEBUG ((DEBUG_INFO, "[Bds]Exit the waiting!\n"));
 }
 
 /**
@@ -610,7 +610,7 @@ BdsFormalizeOSIndicationVariable (
       (Attributes != (EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE))
      ){
 
-    DEBUG ((EFI_D_ERROR, "[Bds] Unformalized OsIndications variable exists. Delete it\n"));
+    DEBUG ((DEBUG_ERROR, "[Bds] Unformalized OsIndications variable exists. Delete it\n"));
     Status = gRT->SetVariable (
                     EFI_OS_INDICATIONS_VARIABLE_NAME,
                     &gEfiGlobalVariableGuid,
@@ -693,7 +693,7 @@ BdsEntry (
   //
   PERF_CROSSMODULE_END("DXE");
   PERF_CROSSMODULE_BEGIN("BDS");
-  DEBUG ((EFI_D_INFO, "[Bds] Entry...\n"));
+  DEBUG ((DEBUG_INFO, "[Bds] Entry...\n"));
 
   //
   // Fill in FirmwareVendor and FirmwareRevision from PCDs
@@ -943,17 +943,17 @@ BdsEntry (
 
   DEBUG_CODE (
     EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType;
-    DEBUG ((EFI_D_INFO, "[Bds]OsIndication: %016x\n", OsIndication));
-    DEBUG ((EFI_D_INFO, "[Bds]=============Begin Load Options Dumping ...=============\n"));
+    DEBUG ((DEBUG_INFO, "[Bds]OsIndication: %016x\n", OsIndication));
+    DEBUG ((DEBUG_INFO, "[Bds]=============Begin Load Options Dumping ...=============\n"));
     for (LoadOptionType = 0; LoadOptionType < LoadOptionTypeMax; LoadOptionType++) {
       DEBUG ((
-        EFI_D_INFO, "  %s Options:\n",
+        DEBUG_INFO, "  %s Options:\n",
         mBdsLoadOptionName[LoadOptionType]
         ));
       LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionType);
       for (Index = 0; Index < LoadOptionCount; Index++) {
         DEBUG ((
-          EFI_D_INFO, "    %s%04x: %s \t\t 0x%04x\n",
+          DEBUG_INFO, "    %s%04x: %s \t\t 0x%04x\n",
           mBdsLoadOptionName[LoadOptionType],
           LoadOptions[Index].OptionNumber,
           LoadOptions[Index].Description,
@@ -962,7 +962,7 @@ BdsEntry (
       }
       EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
     }
-    DEBUG ((EFI_D_INFO, "[Bds]=============End Load Options Dumping=============\n"));
+    DEBUG ((DEBUG_INFO, "[Bds]=============End Load Options Dumping=============\n"));
   );
 
   //
@@ -1092,7 +1092,7 @@ BdsEntry (
   }
   EfiBootManagerFreeLoadOption (&PlatformDefaultBootOption);
 
-  DEBUG ((EFI_D_ERROR, "[Bds] Unable to boot!\n"));
+  DEBUG ((DEBUG_ERROR, "[Bds] Unable to boot!\n"));
   PlatformBootManagerUnableToBoot ();
   CpuDeadLoop ();
 }

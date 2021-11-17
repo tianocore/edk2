@@ -485,7 +485,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
      }
      SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
    }
-   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status = %r \n", (VOID *)(UINTN)(ImageContext->ImageAddress), Status));
+   DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status = %r \n", (VOID *)(UINTN)(ImageContext->ImageAddress), Status));
    return Status;
 }
 
@@ -648,7 +648,7 @@ CoreLoadPeImage (
           //
           // If the code memory is not ready, invoke CoreAllocatePage with AllocateAnyPages to load the driver.
           //
-          DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Loading module at fixed address failed since specified memory is not available.\n"));
+          DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED ERROR: Loading module at fixed address failed since specified memory is not available.\n"));
 
           Status = CoreAllocatePages (
                      AllocateAnyPages,
@@ -1587,8 +1587,8 @@ CoreStartImage (
     // Do not ASSERT here, because image might be loaded via EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED
     // But it can not be started.
     //
-    DEBUG ((EFI_D_ERROR, "Image type %s can't be started ", GetMachineTypeName(Image->Machine)));
-    DEBUG ((EFI_D_ERROR, "on %s UEFI system.\n", GetMachineTypeName(mDxeCoreImageMachineType)));
+    DEBUG ((DEBUG_ERROR, "Image type %s can't be started ", GetMachineTypeName(Image->Machine)));
+    DEBUG ((DEBUG_ERROR, "on %s UEFI system.\n", GetMachineTypeName(mDxeCoreImageMachineType)));
     return EFI_UNSUPPORTED;
   }
 

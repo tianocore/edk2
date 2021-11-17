@@ -76,7 +76,7 @@ AtapiPeimEntry (
   AtapiBlkIoDev->PpiDescriptor2.Guid                 = &gEfiPeiVirtualBlockIo2PpiGuid;
   AtapiBlkIoDev->PpiDescriptor2.Ppi                  = &AtapiBlkIoDev->AtapiBlkIo2;
 
-  DEBUG ((EFI_D_INFO, "Atatpi Device Count is %d\n", AtapiBlkIoDev->DeviceCount));
+  DEBUG ((DEBUG_INFO, "Atatpi Device Count is %d\n", AtapiBlkIoDev->DeviceCount));
   if (AtapiBlkIoDev->DeviceCount != 0) {
     Status = PeiServicesInstallPpi (&AtapiBlkIoDev->PpiDescriptor);
     if (EFI_ERROR (Status)) {
@@ -189,11 +189,11 @@ AtapiGetBlockDeviceMediaInfo (
   //
   // probe media and retrieve latest media information
   //
-  DEBUG ((EFI_D_INFO, "Atatpi GetInfo DevicePosition is %d\n", AtapiBlkIoDev->DeviceInfo[Index].DevicePosition));
-  DEBUG ((EFI_D_INFO, "Atatpi GetInfo DeviceType is   %d\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.DeviceType));
-  DEBUG ((EFI_D_INFO, "Atatpi GetInfo MediaPresent is %d\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.MediaPresent));
-  DEBUG ((EFI_D_INFO, "Atatpi GetInfo BlockSize is  0x%x\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.BlockSize));
-  DEBUG ((EFI_D_INFO, "Atatpi GetInfo LastBlock is  0x%x\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.LastBlock));
+  DEBUG ((DEBUG_INFO, "Atatpi GetInfo DevicePosition is %d\n", AtapiBlkIoDev->DeviceInfo[Index].DevicePosition));
+  DEBUG ((DEBUG_INFO, "Atatpi GetInfo DeviceType is   %d\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.DeviceType));
+  DEBUG ((DEBUG_INFO, "Atatpi GetInfo MediaPresent is %d\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.MediaPresent));
+  DEBUG ((DEBUG_INFO, "Atatpi GetInfo BlockSize is  0x%x\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.BlockSize));
+  DEBUG ((DEBUG_INFO, "Atatpi GetInfo LastBlock is  0x%x\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.LastBlock));
 
   Status = DetectMedia (
              AtapiBlkIoDev,
@@ -205,11 +205,11 @@ AtapiGetBlockDeviceMediaInfo (
     return EFI_DEVICE_ERROR;
   }
 
-  DEBUG ((EFI_D_INFO, "Atatpi GetInfo DevicePosition is %d\n", AtapiBlkIoDev->DeviceInfo[Index].DevicePosition));
-  DEBUG ((EFI_D_INFO, "Atatpi GetInfo DeviceType is   %d\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.DeviceType));
-  DEBUG ((EFI_D_INFO, "Atatpi GetInfo MediaPresent is %d\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.MediaPresent));
-  DEBUG ((EFI_D_INFO, "Atatpi GetInfo BlockSize is  0x%x\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.BlockSize));
-  DEBUG ((EFI_D_INFO, "Atatpi GetInfo LastBlock is  0x%x\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.LastBlock));
+  DEBUG ((DEBUG_INFO, "Atatpi GetInfo DevicePosition is %d\n", AtapiBlkIoDev->DeviceInfo[Index].DevicePosition));
+  DEBUG ((DEBUG_INFO, "Atatpi GetInfo DeviceType is   %d\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.DeviceType));
+  DEBUG ((DEBUG_INFO, "Atatpi GetInfo MediaPresent is %d\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.MediaPresent));
+  DEBUG ((DEBUG_INFO, "Atatpi GetInfo BlockSize is  0x%x\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.BlockSize));
+  DEBUG ((DEBUG_INFO, "Atatpi GetInfo LastBlock is  0x%x\n", AtapiBlkIoDev->DeviceInfo[Index].MediaInfo.LastBlock));
 
   //
   // Get media info from AtapiBlkIoDev
@@ -549,7 +549,7 @@ AtapiEnumerateDevices (
   // Allow SATA Devices to spin-up. This is needed if
   // SEC and PEI phase is too short, for example Release Build.
   //
-  DEBUG ((EFI_D_INFO, "Delay for %d seconds for SATA devices to spin-up\n", PcdGet16 (PcdSataSpinUpDelayInSecForRecoveryPath)));
+  DEBUG ((DEBUG_INFO, "Delay for %d seconds for SATA devices to spin-up\n", PcdGet16 (PcdSataSpinUpDelayInSecForRecoveryPath)));
   MicroSecondDelay (PcdGet16 (PcdSataSpinUpDelayInSecForRecoveryPath) * 1000 * 1000); //
 
   //
@@ -600,10 +600,10 @@ AtapiEnumerateDevices (
         CopyMem (&(AtapiBlkIoDev->DeviceInfo[DeviceCount].MediaInfo), &MediaInfo, sizeof (MediaInfo));
         CopyMem (&(AtapiBlkIoDev->DeviceInfo[DeviceCount].MediaInfo2), &MediaInfo2, sizeof (MediaInfo2));
 
-        DEBUG ((EFI_D_INFO, "Atatpi Device Position is %d\n", DevicePosition));
-        DEBUG ((EFI_D_INFO, "Atatpi DeviceType is   %d\n", MediaInfo.DeviceType));
-        DEBUG ((EFI_D_INFO, "Atatpi MediaPresent is %d\n", MediaInfo.MediaPresent));
-        DEBUG ((EFI_D_INFO, "Atatpi BlockSize is  0x%x\n", MediaInfo.BlockSize));
+        DEBUG ((DEBUG_INFO, "Atatpi Device Position is %d\n", DevicePosition));
+        DEBUG ((DEBUG_INFO, "Atatpi DeviceType is   %d\n", MediaInfo.DeviceType));
+        DEBUG ((DEBUG_INFO, "Atatpi MediaPresent is %d\n", MediaInfo.MediaPresent));
+        DEBUG ((DEBUG_INFO, "Atatpi BlockSize is  0x%x\n", MediaInfo.BlockSize));
 
         if (EFI_ERROR (Status)) {
           AtapiBlkIoDev->DeviceInfo[DeviceCount].MediaInfo.MediaPresent = FALSE;
@@ -1764,7 +1764,7 @@ DetectMedia (
               SenseBuffers,
               &SenseCounts
               );
-    DEBUG ((EFI_D_INFO, "Atapi Request Sense Count is %d\n", SenseCounts));
+    DEBUG ((DEBUG_INFO, "Atapi Request Sense Count is %d\n", SenseCounts));
     if (IsDeviceStateUnclear (SenseBuffers, SenseCounts) || IsNoMedia (SenseBuffers, SenseCounts)) {
       //
       // We are not sure whether the media is present or not, try again

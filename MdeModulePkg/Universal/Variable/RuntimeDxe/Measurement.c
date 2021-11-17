@@ -121,8 +121,8 @@ MeasureVariable (
        );
   }
 
-  DEBUG ((EFI_D_INFO, "VariableDxe: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)7, (UINTN)EV_EFI_VARIABLE_DRIVER_CONFIG));
-  DEBUG ((EFI_D_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
+  DEBUG ((DEBUG_INFO, "VariableDxe: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)7, (UINTN)EV_EFI_VARIABLE_DRIVER_CONFIG));
+  DEBUG ((DEBUG_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
 
   Status = TpmMeasureAndLogData (
              7,
@@ -257,7 +257,7 @@ SecureBootHook (
              VariableData,
              VariableDataSize
              );
-  DEBUG ((EFI_D_INFO, "MeasureBootPolicyVariable - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "MeasureBootPolicyVariable - %r\n", Status));
 
   if (VariableData != NULL) {
     FreePool (VariableData);
