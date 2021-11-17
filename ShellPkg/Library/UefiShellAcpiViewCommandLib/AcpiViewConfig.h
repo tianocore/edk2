@@ -136,9 +136,9 @@ SetReportOption (
   ACPI table is to be examined by the AcpiView code.
 **/
 typedef struct {
-  UINT32              Type;    ///< 32bit signature of the selected ACPI table.
-  CONST CHAR16*       Name;    ///< User friendly name of the selected ACPI table.
-  BOOLEAN             Found;   ///< The selected table has been found in the system.
+  UINT32          Type;        ///< 32bit signature of the selected ACPI table.
+  CONST CHAR16    *Name;       ///< User friendly name of the selected ACPI table.
+  BOOLEAN         Found;       ///< The selected table has been found in the system.
 } SELECTED_ACPI_TABLE;
 
 /**
@@ -149,7 +149,7 @@ typedef struct {
 VOID
 EFIAPI
 GetSelectedAcpiTable (
-  OUT SELECTED_ACPI_TABLE** SelectedAcpiTable
+  OUT SELECTED_ACPI_TABLE **SelectedAcpiTable
   );
 
 /**
@@ -162,7 +162,7 @@ GetSelectedAcpiTable (
 VOID
 EFIAPI
 SelectAcpiTable (
-  CONST CHAR16* TableName
+  CONST CHAR16 *TableName
   );
 
 /**

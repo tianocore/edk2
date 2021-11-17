@@ -35,7 +35,7 @@ HttpCommandHandler (
   )
 {
   gEfiShellParametersProtocol = ShellParameters;
-  gEfiShellProtocol           = Shell;
+  gEfiShellProtocol = Shell;
 
   return RunHttp (gImageHandle, SystemTable);
 }
@@ -64,7 +64,7 @@ HttpCommandGetHelp (
            );
 }
 
-EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL mHttpDynamicCommand = {
+EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  mHttpDynamicCommand = {
   HTTP_APP_NAME,
   HttpCommandHandler,
   HttpCommandGetHelp
@@ -89,7 +89,7 @@ HttpCommandInitialize (
   IN EFI_SYSTEM_TABLE         *SystemTable
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
   mHttpHiiHandle = InitializeHiiPackage (ImageHandle);
   if (mHttpHiiHandle == NULL) {
@@ -118,9 +118,9 @@ EFI_STATUS
 EFIAPI
 HttpUnload (
   IN EFI_HANDLE               ImageHandle
-)
+  )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
   Status = gBS->UninstallProtocolInterface (
                   ImageHandle,

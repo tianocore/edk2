@@ -27,8 +27,8 @@
     }                                 \
   } while(FALSE)
 
-extern EFI_SHELL_PARAMETERS_PROTOCOL *gEfiShellParametersProtocol;
-extern EFI_SHELL_PROTOCOL            *gEfiShellProtocol;
+extern EFI_SHELL_PARAMETERS_PROTOCOL  *gEfiShellParametersProtocol;
+extern EFI_SHELL_PROTOCOL             *gEfiShellProtocol;
 
 /**
   Return a clean, fully-qualified version of an input path.  If the return value
@@ -58,9 +58,9 @@ extern EFI_SHELL_PROTOCOL            *gEfiShellProtocol;
                         Path.  The caller must free this memory when it is no
                         longer needed.
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
-FullyQualifyPath(
+FullyQualifyPath (
   IN     CONST CHAR16     *Path
   );
 
@@ -78,7 +78,7 @@ FullyQualifyPath(
 
   @return                       The information about the file.
 **/
-EFI_FILE_INFO*
+EFI_FILE_INFO *
 EFIAPI
 ShellGetFileInfo (
   IN SHELL_FILE_HANDLE          FileHandle
@@ -141,7 +141,7 @@ ShellSetFileInfo (
 **/
 EFI_STATUS
 EFIAPI
-ShellOpenFileByDevicePath(
+ShellOpenFileByDevicePath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL     **FilePath,
   OUT SHELL_FILE_HANDLE               *FileHandle,
   IN UINT64                           OpenMode,
@@ -179,7 +179,7 @@ ShellOpenFileByDevicePath(
 **/
 EFI_STATUS
 EFIAPI
-ShellOpenFileByName(
+ShellOpenFileByName (
   IN CONST CHAR16               *FileName,
   OUT SHELL_FILE_HANDLE         *FileHandle,
   IN UINT64                     OpenMode,
@@ -215,7 +215,7 @@ ShellOpenFileByName(
 **/
 EFI_STATUS
 EFIAPI
-ShellCreateDirectory(
+ShellCreateDirectory (
   IN CONST CHAR16             *DirectoryName,
   OUT SHELL_FILE_HANDLE       *FileHandle
   );
@@ -251,7 +251,7 @@ ShellCreateDirectory(
 **/
 EFI_STATUS
 EFIAPI
-ShellReadFile(
+ShellReadFile (
   IN SHELL_FILE_HANDLE          FileHandle,
   IN OUT UINTN                  *ReadSize,
   OUT VOID                      *Buffer
@@ -285,7 +285,7 @@ ShellReadFile(
 **/
 EFI_STATUS
 EFIAPI
-ShellWriteFile(
+ShellWriteFile (
   IN SHELL_FILE_HANDLE          FileHandle,
   IN OUT UINTN                  *BufferSize,
   IN VOID                       *Buffer
@@ -426,7 +426,7 @@ EFI_STATUS
 EFIAPI
 ShellFindFirstFile (
   IN      SHELL_FILE_HANDLE       DirHandle,
-     OUT  EFI_FILE_INFO         **Buffer
+  OUT  EFI_FILE_INFO         **Buffer
   );
 
 /** Retrieve next entries from a directory.
@@ -451,7 +451,7 @@ ShellFindFirstFile (
 **/
 EFI_STATUS
 EFIAPI
-ShellFindNextFile(
+ShellFindNextFile (
   IN      SHELL_FILE_HANDLE       DirHandle,
   IN OUT  EFI_FILE_INFO          *Buffer,
   IN OUT  BOOLEAN                *NoFile
@@ -486,7 +486,7 @@ ShellGetFileSize (
 **/
 BOOLEAN
 EFIAPI
-ShellGetExecutionBreakFlag(
+ShellGetExecutionBreakFlag (
   VOID
   );
 
@@ -501,7 +501,7 @@ ShellGetExecutionBreakFlag(
   @retval NULL                  The named environment variable does not exist.
   @return != NULL               The pointer to the value of the environment variable.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
 ShellGetEnvironmentVariable (
   IN CONST CHAR16                *EnvKey
@@ -589,10 +589,10 @@ ShellExecute (
   @retval NULL                  The directory does not exist.
   @retval != NULL               The directory.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
 ShellGetCurrentDir (
-  IN CHAR16                     * CONST DeviceName OPTIONAL
+  IN CHAR16                     *CONST DeviceName OPTIONAL
   );
 
 /**
@@ -696,7 +696,7 @@ ShellFindFilePathEx (
   );
 
 typedef enum {
-  TypeFlag  = 0,    ///< A flag that is present or not present only (IE "-a").
+  TypeFlag = 0,     ///< A flag that is present or not present only (IE "-a").
   TypeValue,        ///< A flag that has some data following it with a space (IE "-a 1").
   TypePosition,     ///< Some data that did not follow a parameter (IE "filename.txt").
   TypeStart,        ///< A flag that has variable value appended to the end (IE "-ad", "-afd", "-adf", etc...).
@@ -707,16 +707,15 @@ typedef enum {
 } SHELL_PARAM_TYPE;
 
 typedef struct {
-  CHAR16             *Name;
-  SHELL_PARAM_TYPE   Type;
+  CHAR16              *Name;
+  SHELL_PARAM_TYPE    Type;
 } SHELL_PARAM_ITEM;
 
-
 /// Helper structure for no parameters (besides -? and -b)
-extern SHELL_PARAM_ITEM EmptyParamList[];
+extern SHELL_PARAM_ITEM  EmptyParamList[];
 
 /// Helper structure for -sfo only (besides -? and -b)
-extern SHELL_PARAM_ITEM SfoParamList[];
+extern SHELL_PARAM_ITEM  SfoParamList[];
 
 /**
   Checks the command line arguments passed against the list of valid ones.
@@ -753,7 +752,7 @@ ShellCommandLineParseEx (
   );
 
 /// Make it easy to upgrade from older versions of the shell library.
-#define ShellCommandLineParse(CheckList,CheckPackage,ProblemParam,AutoPageBreak) ShellCommandLineParseEx(CheckList,CheckPackage,ProblemParam,AutoPageBreak,FALSE)
+#define ShellCommandLineParse(CheckList, CheckPackage, ProblemParam, AutoPageBreak)  ShellCommandLineParseEx(CheckList,CheckPackage,ProblemParam,AutoPageBreak,FALSE)
 
 /**
   Frees shell variable list that was returned from ShellCommandLineParse.
@@ -788,8 +787,8 @@ ShellCommandLineFreeVarList (
 BOOLEAN
 EFIAPI
 ShellCommandLineGetFlag (
-  IN CONST LIST_ENTRY         * CONST CheckPackage,
-  IN CONST CHAR16             * CONST KeyString
+  IN CONST LIST_ENTRY         *CONST CheckPackage,
+  IN CONST CHAR16             *CONST KeyString
   );
 
 /**
@@ -805,7 +804,7 @@ ShellCommandLineGetFlag (
   @retval NULL                  The flag is not on the command line.
   @retval !=NULL                The pointer to unicode string of the value.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
 ShellCommandLineGetValue (
   IN CONST LIST_ENTRY              *CheckPackage,
@@ -825,10 +824,10 @@ ShellCommandLineGetValue (
   @retval NULL                  The flag is not on the command line.
   @retval !=NULL                The pointer to unicode string of the value.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
 ShellCommandLineGetRawValue (
-  IN CONST LIST_ENTRY              * CONST CheckPackage,
+  IN CONST LIST_ENTRY              *CONST CheckPackage,
   IN UINTN                         Position
   );
 
@@ -844,7 +843,7 @@ ShellCommandLineGetRawValue (
 **/
 UINTN
 EFIAPI
-ShellCommandLineGetCount(
+ShellCommandLineGetCount (
   IN CONST LIST_ENTRY              *CheckPackage
   );
 
@@ -919,7 +918,7 @@ ShellInitialize (
 **/
 EFI_STATUS
 EFIAPI
-ShellPrintEx(
+ShellPrintEx (
   IN INT32                Col OPTIONAL,
   IN INT32                Row OPTIONAL,
   IN CONST CHAR16         *Format,
@@ -960,7 +959,7 @@ ShellPrintEx(
 **/
 EFI_STATUS
 EFIAPI
-ShellPrintHiiEx(
+ShellPrintHiiEx (
   IN INT32                Col OPTIONAL,
   IN INT32                Row OPTIONAL,
   IN CONST CHAR8          *Language OPTIONAL,
@@ -982,7 +981,7 @@ ShellPrintHiiEx(
 **/
 EFI_STATUS
 EFIAPI
-ShellIsDirectory(
+ShellIsDirectory (
   IN CONST CHAR16 *DirName
   );
 
@@ -1001,7 +1000,7 @@ ShellIsDirectory(
 **/
 EFI_STATUS
 EFIAPI
-ShellIsFile(
+ShellIsFile (
   IN CONST CHAR16 *Name
   );
 
@@ -1020,7 +1019,7 @@ ShellIsFile(
 **/
 EFI_STATUS
 EFIAPI
-ShellIsFileInPath(
+ShellIsFileInPath (
   IN CONST CHAR16 *Name
   );
 
@@ -1038,7 +1037,7 @@ ShellIsFileInPath(
 **/
 UINTN
 EFIAPI
-ShellStrToUintn(
+ShellStrToUintn (
   IN CONST CHAR16 *String
   );
 
@@ -1055,7 +1054,7 @@ ShellStrToUintn(
 **/
 UINTN
 EFIAPI
-ShellHexStrToUintn(
+ShellHexStrToUintn (
   IN CONST CHAR16 *String
   );
 
@@ -1091,7 +1090,7 @@ ShellHexStrToUintn(
 
   @return                       The Destination after appending the Source.
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
 StrnCatGrow (
   IN OUT CHAR16           **Destination,
@@ -1129,7 +1128,7 @@ StrnCatGrow (
 **/
 EFI_STATUS
 EFIAPI
-ShellCopySearchAndReplace(
+ShellCopySearchAndReplace (
   IN CHAR16 CONST                     *SourceString,
   IN OUT CHAR16                       *NewString,
   IN UINTN                            NewSize,
@@ -1301,9 +1300,9 @@ ShellIsHexOrDecimalNumber (
 **/
 EFI_STATUS
 EFIAPI
-ShellConvertStringToUint64(
+ShellConvertStringToUint64 (
   IN CONST CHAR16   *String,
-     OUT   UINT64   *Value,
+  OUT   UINT64   *Value,
   IN CONST BOOLEAN  ForceHex,
   IN CONST BOOLEAN  StopAtSpace
   );
@@ -1319,7 +1318,7 @@ ShellConvertStringToUint64(
 **/
 EFI_STATUS
 EFIAPI
-ShellFileExists(
+ShellFileExists (
   IN CONST CHAR16 *Name
   );
 
@@ -1338,9 +1337,9 @@ ShellFileExists(
 
   @sa ShellFileHandleReadLine
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
-ShellFileHandleReturnLine(
+ShellFileHandleReturnLine (
   IN SHELL_FILE_HANDLE            Handle,
   IN OUT BOOLEAN                *Ascii
   );
@@ -1373,7 +1372,7 @@ ShellFileHandleReturnLine(
 **/
 EFI_STATUS
 EFIAPI
-ShellFileHandleReadLine(
+ShellFileHandleReadLine (
   IN SHELL_FILE_HANDLE          Handle,
   IN OUT CHAR16                 *Buffer,
   IN OUT UINTN                  *Size,
@@ -1406,7 +1405,7 @@ ShellFileHandleReadLine(
 **/
 EFI_STATUS
 EFIAPI
-ShellDeleteFileByName(
+ShellDeleteFileByName (
   IN CONST CHAR16               *FileName
   );
 

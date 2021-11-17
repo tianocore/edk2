@@ -22,7 +22,7 @@ LineDup (
   IN  EFI_EDITOR_LINE *Src
   )
 {
-  EFI_EDITOR_LINE *Dest;
+  EFI_EDITOR_LINE  *Dest;
 
   //
   // allocate for the line structure
@@ -31,6 +31,7 @@ LineDup (
   if (Dest == NULL) {
     return NULL;
   }
+
   //
   // allocate and set the line buffer
   //
@@ -44,10 +45,10 @@ LineDup (
   // set the other structure members
   //
   Dest->Signature = LINE_LIST_SIGNATURE;
-  Dest->Size      = Src->Size;
+  Dest->Size = Src->Size;
   Dest->TotalSize = Dest->Size;
-  Dest->Type      = Src->Type;
-  Dest->Link      = Src->Link;
+  Dest->Type = Src->Type;
+  Dest->Link = Src->Link;
 
   return Dest;
 }
@@ -63,22 +64,12 @@ LineFree (
   )
 {
   if (Src == NULL) {
-    return ;
+    return;
   }
+
   //
   // free the line buffer and then the line structure itself
   //
   SHELL_FREE_NON_NULL (Src->Buffer);
   SHELL_FREE_NON_NULL (Src);
-
 }
-
-
-
-
-
-
-
-
-
-

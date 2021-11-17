@@ -10,10 +10,10 @@
 
 #include "UefiShellLevel3CommandsLib.h"
 
-STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
-  {L"-sfo", TypeFlag},
-  {NULL,    TypeMax}
-  };
+STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
+  { L"-sfo", TypeFlag },
+  { NULL,    TypeMax  }
+};
 
 /**
   Function for 'cls' command.
@@ -40,35 +40,35 @@ ShellCommandRunCls (
   //
   // Initialize variables
   //
-  ShellStatus   = SHELL_SUCCESS;
-  ProblemParam  = NULL;
-  Background    = 0;
-  Foreground    = 0;
+  ShellStatus  = SHELL_SUCCESS;
+  ProblemParam = NULL;
+  Background   = 0;
+  Foreground   = 0;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
   //
-  Status = ShellInitialize();
-  ASSERT_EFI_ERROR(Status);
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
 
   //
   // parse the command line
   //
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR(Status)) {
-    if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"cls", ProblemParam);
-      FreePool(ProblemParam);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"cls", ProblemParam);
+      FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      ASSERT(FALSE);
+      ASSERT (FALSE);
     }
   } else {
     //
     // check for "-?"
     //
-    if (ShellCommandLineGetFlag(Package, L"-?")) {
-      ASSERT(FALSE);
+    if (ShellCommandLineGetFlag (Package, L"-?")) {
+      ASSERT (FALSE);
     } else if (ShellCommandLineGetFlag (Package, L"-sfo")) {
       if (ShellCommandLineGetCount (Package) > 1) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"cls");
@@ -95,7 +95,7 @@ ShellCommandRunCls (
       BackColorStr = ShellCommandLineGetRawValue (Package, 1);
       ForeColorStr = ShellCommandLineGetRawValue (Package, 2);
 
-      if (BackColorStr == NULL && ForeColorStr == NULL) {
+      if ((BackColorStr == NULL) && (ForeColorStr == NULL)) {
         //
         // clear screen
         //
@@ -211,6 +211,7 @@ ShellCommandRunCls (
       }
     }
   }
+
   //
   // free the command line package
   //
@@ -221,4 +222,3 @@ ShellCommandRunCls (
   //
   return (ShellStatus);
 }
-

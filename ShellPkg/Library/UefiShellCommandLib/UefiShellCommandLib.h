@@ -41,24 +41,24 @@
 #include <Library/UefiLib.h>
 #include <Library/OrderedCollectionLib.h>
 
-typedef struct{
-  LIST_ENTRY                  Link;
-  CHAR16                      *CommandString;
-  SHELL_GET_MAN_FILENAME      GetManFileName;
-  SHELL_RUN_COMMAND           CommandHandler;
-  BOOLEAN                     LastError;
-  EFI_HII_HANDLE              HiiHandle;
-  EFI_STRING_ID               ManFormatHelp;
+typedef struct {
+  LIST_ENTRY                Link;
+  CHAR16                    *CommandString;
+  SHELL_GET_MAN_FILENAME    GetManFileName;
+  SHELL_RUN_COMMAND         CommandHandler;
+  BOOLEAN                   LastError;
+  EFI_HII_HANDLE            HiiHandle;
+  EFI_STRING_ID             ManFormatHelp;
 } SHELL_COMMAND_INTERNAL_LIST_ENTRY;
 
 typedef struct {
-  LIST_ENTRY Link;
-  SCRIPT_FILE *Data;
+  LIST_ENTRY     Link;
+  SCRIPT_FILE    *Data;
 } SCRIPT_FILE_LIST;
 
 typedef struct {
-  EFI_FILE_PROTOCOL *FileHandle;
-  CHAR16            *Path;
+  EFI_FILE_PROTOCOL    *FileHandle;
+  CHAR16               *Path;
 } SHELL_COMMAND_FILE_HANDLE;
 
 //
@@ -72,13 +72,12 @@ typedef struct {
   // instead, it *aliases* the FileName or FullName field of the
   // EFI_SHELL_FILE_INFO object that was first encountered with this name.
   //
-  CONST CHAR16 *Alias;
+  CONST CHAR16    *Alias;
   //
   // A list of EFI_SHELL_FILE_INFO objects whose FileName or FullName fields
   // compare equal to Alias, according to gUnicodeCollation->StriColl().
   //
-  LIST_ENTRY SameNameList;
+  LIST_ENTRY      SameNameList;
 } SHELL_SORT_UNIQUE_NAME;
 
 #endif //_UEFI_COMMAND_LIB_INTERNAL_HEADER_
-

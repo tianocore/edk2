@@ -29,7 +29,7 @@ VOID
 EFIAPI
 ParseAcpiSsdt (
   IN BOOLEAN Trace,
-  IN UINT8*  Ptr,
+  IN UINT8 *Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
   )

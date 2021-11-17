@@ -22,7 +22,6 @@
 #define SCAN_CONTROL_W  23
 #define SCAN_CONTROL_Z  26
 
-
 typedef
 EFI_STATUS
 (*MENU_ITEM_FUNCTION) (
@@ -30,9 +29,9 @@ EFI_STATUS
   );
 
 typedef struct _EDITOR_MENU_ITEM {
-  EFI_STRING_ID           NameToken;
-  CHAR16                  FunctionKeyToken;
-  MENU_ITEM_FUNCTION  Function;
+  EFI_STRING_ID         NameToken;
+  CHAR16                FunctionKeyToken;
+  MENU_ITEM_FUNCTION    Function;
 } EDITOR_MENU_ITEM;
 
 /**
