@@ -309,7 +309,7 @@ CommonCExceptionHandler(
     }
   }
   else {
-    DEBUG((EFI_D_ERROR, "Unknown exception type %d\n", ExceptionType));
+    DEBUG((DEBUG_ERROR, "Unknown exception type %d\n", ExceptionType));
     ASSERT(FALSE);
   }
 
@@ -347,4 +347,3 @@ InitializeCpuExceptionHandlersEx (
 {
   return InitializeCpuExceptionHandlers (VectorInfo);
 }
-
