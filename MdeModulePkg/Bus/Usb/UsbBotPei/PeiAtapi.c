@@ -270,7 +270,7 @@ PeiUsbReadCapacity (
   LastBlock = ((UINT32) Data.LastLba3 << 24) | (Data.LastLba2 << 16) | (Data.LastLba1 << 8) | Data.LastLba0;
 
   if (LastBlock == 0xFFFFFFFF) {
-    DEBUG ((EFI_D_INFO, "The usb device LBA count is larger than 0xFFFFFFFF!\n"));
+    DEBUG ((DEBUG_INFO, "The usb device LBA count is larger than 0xFFFFFFFF!\n"));
   }
 
   PeiBotDevice->Media.LastBlock    = LastBlock;
@@ -341,7 +341,7 @@ PeiUsbReadFormattedCapacity (
   } else {
     LastBlock = ((UINT32) FormatData.LastLba3 << 24) | (FormatData.LastLba2 << 16) | (FormatData.LastLba1 << 8) | FormatData.LastLba0;
     if (LastBlock == 0xFFFFFFFF) {
-      DEBUG ((EFI_D_INFO, "The usb device LBA count is larger than 0xFFFFFFFF!\n"));
+      DEBUG ((DEBUG_INFO, "The usb device LBA count is larger than 0xFFFFFFFF!\n"));
     }
 
     PeiBotDevice->Media.LastBlock = LastBlock;

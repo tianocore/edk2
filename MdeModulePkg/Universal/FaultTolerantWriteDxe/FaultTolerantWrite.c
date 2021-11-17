@@ -89,7 +89,7 @@ FtwAllocate (
   // Check if there is enough space for the coming allocation
   //
   if (FTW_WRITE_TOTAL_SIZE (NumberOfWrites, PrivateDataSize) > FtwDevice->FtwWorkSpaceHeader->WriteQueueSize) {
-    DEBUG ((EFI_D_ERROR, "Ftw: Allocate() request exceed Workspace, Caller: %g\n", CallerId));
+    DEBUG ((DEBUG_ERROR, "Ftw: Allocate() request exceed Workspace, Caller: %g\n", CallerId));
     return EFI_BUFFER_TOO_SMALL;
   }
   //
@@ -153,7 +153,7 @@ FtwAllocate (
   }
 
   DEBUG (
-    (EFI_D_INFO,
+    (DEBUG_INFO,
     "Ftw: Allocate() success, Caller:%g, # %d\n",
     CallerId,
     NumberOfWrites)
@@ -358,8 +358,8 @@ FtwWrite (
       // Ftw Write Header is not allocated
       // Additional private data is not NULL, the private data size can't be determined.
       //
-      DEBUG ((EFI_D_ERROR, "Ftw: no allocates space for write record!\n"));
-      DEBUG ((EFI_D_ERROR, "Ftw: Allocate service should be called before Write service!\n"));
+      DEBUG ((DEBUG_ERROR, "Ftw: no allocates space for write record!\n"));
+      DEBUG ((DEBUG_ERROR, "Ftw: Allocate service should be called before Write service!\n"));
       return EFI_NOT_READY;
     }
   }
@@ -396,7 +396,7 @@ FtwWrite (
 
   Status = Fvb->GetPhysicalAddress (Fvb, &FvbPhysicalAddress);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Ftw: Write(), Get FVB physical address - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Ftw: Write(), Get FVB physical address - %r\n", Status));
     return EFI_ABORTED;
   }
 
@@ -405,12 +405,12 @@ FtwWrite (
   //
   Status = Fvb->GetBlockSize (Fvb, 0, &BlockSize, &NumberOfBlocks);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Ftw: Write(), Get block size - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Ftw: Write(), Get block size - %r\n", Status));
     return EFI_ABORTED;
   }
 
   NumberOfWriteBlocks = FTW_BLOCKS (Offset + Length, BlockSize);
-  DEBUG ((EFI_D_INFO, "Ftw: Write(), BlockSize - 0x%x, NumberOfWriteBlock - 0x%x\n", BlockSize, NumberOfWriteBlocks));
+  DEBUG ((DEBUG_INFO, "Ftw: Write(), BlockSize - 0x%x, NumberOfWriteBlock - 0x%x\n", BlockSize, NumberOfWriteBlocks));
   WriteLength = NumberOfWriteBlocks * BlockSize;
 
   //
@@ -611,7 +611,7 @@ FtwWrite (
   FreePool (SpareBuffer);
 
   DEBUG (
-    (EFI_D_INFO,
+    (DEBUG_INFO,
     "Ftw: Write() success, (Lba:Offset)=(%lx:0x%x), Length: 0x%x\n",
     Lba,
     Offset,
@@ -674,7 +674,7 @@ FtwRestart (
   //
   Status = Fvb->GetBlockSize (Fvb, 0, &BlockSize, &NumberOfBlocks);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Ftw: Restart(), Get block size - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Ftw: Restart(), Get block size - %r\n", Status));
     return EFI_ABORTED;
   }
 
@@ -714,7 +714,7 @@ FtwRestart (
     return EFI_ABORTED;
   }
 
-  DEBUG ((EFI_D_INFO, "%a(): success\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a(): success\n", __FUNCTION__));
   return EFI_SUCCESS;
 }
 
@@ -769,7 +769,7 @@ FtwAbort (
 
   FtwDevice->FtwLastWriteHeader->Complete = FTW_VALID_STATE;
 
-  DEBUG ((EFI_D_INFO, "%a(): success\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a(): success\n", __FUNCTION__));
   return EFI_SUCCESS;
 }
 
@@ -880,8 +880,7 @@ FtwGetLastWrite (
     Status = EFI_SUCCESS;
   }
 
-  DEBUG ((EFI_D_INFO, "%a(): success\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a(): success\n", __FUNCTION__));
 
   return Status;
 }
-

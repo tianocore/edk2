@@ -194,7 +194,7 @@ RamDiskPublishNfit (
          >= PrivateData->StartingAddr + PrivateData->Size)) {
       MemoryFound = TRUE;
       DEBUG ((
-        EFI_D_INFO,
+        DEBUG_INFO,
         "RamDiskPublishNfit: RAM disk with reserved memory type, will publish to NFIT.\n"
         ));
       break;
@@ -237,7 +237,7 @@ RamDiskPublishNfit (
     // A NFIT is already in the ACPI table.
     //
     DEBUG ((
-      EFI_D_INFO,
+      DEBUG_INFO,
       "RamDiskPublishNfit: A NFIT is already exist in the ACPI Table.\n"
       ));
 
@@ -300,7 +300,7 @@ RamDiskPublishNfit (
     // No NFIT is in the ACPI table, we will create one here.
     //
     DEBUG ((
-      EFI_D_INFO,
+      DEBUG_INFO,
       "RamDiskPublishNfit: No NFIT is in the ACPI Table, will create one.\n"
       ));
 

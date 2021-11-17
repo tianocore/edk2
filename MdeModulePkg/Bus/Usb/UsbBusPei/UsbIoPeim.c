@@ -119,7 +119,7 @@ PeiUsbControlTransfer (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "PeiUsbControlTransfer: %r\n", Status));
+  DEBUG ((DEBUG_INFO, "PeiUsbControlTransfer: %r\n", Status));
   return Status;
 }
 
@@ -232,7 +232,7 @@ PeiUsbBulkTransfer (
     PeiUsbDev->DataToggle = (UINT16) (PeiUsbDev->DataToggle ^ (1 << EndpointIndex));
   }
 
-  DEBUG ((EFI_D_INFO, "PeiUsbBulkTransfer: %r\n", Status));
+  DEBUG ((DEBUG_INFO, "PeiUsbBulkTransfer: %r\n", Status));
   return Status;
 }
 
