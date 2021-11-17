@@ -47,6 +47,7 @@ CpuMemoryServiceRead (
   IN  UINTN                             Count,
   IN  OUT VOID                          *Buffer
   )
+
 /*++
 
 Routine Description:
@@ -101,6 +102,7 @@ CpuMemoryServiceWrite (
   IN  UINTN                             Count,
   IN  OUT VOID                          *Buffer
   )
+
 /*++
 
 Routine Description:
@@ -154,6 +156,7 @@ CpuIoServiceRead (
   IN  UINTN                             Count,
   IN  OUT VOID                          *UserBuffer
   )
+
 /*++
 
 Routine Description:
@@ -186,7 +189,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  Address = (UINTN) UserAddress;
+  Address = (UINTN)UserAddress;
 
   if (Width >= EfiCpuIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
@@ -212,6 +215,7 @@ CpuIoServiceWrite (
   IN  UINTN                             Count,
   IN  OUT VOID                          *UserBuffer
   )
+
 /*++
 
 Routine Description:
@@ -248,7 +252,7 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
-  Address = (UINTN) UserAddress;
+  Address = (UINTN)UserAddress;
 
   if (Width >= EfiCpuIoWidthMaximum) {
     return EFI_INVALID_PARAMETER;
@@ -264,7 +268,6 @@ Returns:
   //
   return EFI_SUCCESS;
 }
-
 
 /*++
 
@@ -295,7 +298,7 @@ CpuIoCheckAddressRange (
   IN  UINT64                            Limit
   )
 {
-  UINTN AlignMask;
+  UINTN  AlignMask;
 
   if (Address > Limit) {
     return EFI_UNSUPPORTED;
@@ -304,7 +307,7 @@ CpuIoCheckAddressRange (
   //
   // For FiFo type, the target address won't increase during the access, so treat count as 1
   //
-  if (Width >= EfiCpuIoWidthFifoUint8 && Width <= EfiCpuIoWidthFifoUint64) {
+  if ((Width >= EfiCpuIoWidthFifoUint8) && (Width <= EfiCpuIoWidthFifoUint64)) {
     Count = 1;
   }
 
@@ -314,11 +317,9 @@ CpuIoCheckAddressRange (
   }
 
   AlignMask = (1 << Width) - 1;
-  if ((UINTN) Buffer & AlignMask) {
+  if ((UINTN)Buffer & AlignMask) {
     return EFI_UNSUPPORTED;
   }
 
   return EFI_SUCCESS;
 }
-
-

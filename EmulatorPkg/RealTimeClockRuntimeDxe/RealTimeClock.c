@@ -43,9 +43,10 @@ InitializeRealTimeClock (
 EFI_STATUS
 EFIAPI
 EmuGetTime (
-  OUT EFI_TIME                                 * Time,
-  OUT EFI_TIME_CAPABILITIES                    * Capabilities OPTIONAL
+  OUT EFI_TIME                                 *Time,
+  OUT EFI_TIME_CAPABILITIES                    *Capabilities OPTIONAL
   )
+
 /*++
 
 Routine Description:
@@ -67,13 +68,11 @@ Returns:
 
 **/
 {
-
   //
   // Check parameter for null pointer
   //
   if (Time == NULL) {
     return EFI_INVALID_PARAMETER;
-
   }
 
   gEmuThunk->GetTime (Time, Capabilities);
@@ -86,6 +85,7 @@ EFIAPI
 EmuSetTime (
   IN EFI_TIME   *Time
   )
+
 /*++
 
 Routine Description:
@@ -106,11 +106,12 @@ Returns:
 
 **/
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
   if (Time == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Make sure that the time fields are valid
   //
@@ -118,6 +119,7 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   return EFI_UNSUPPORTED;
 }
 
@@ -128,6 +130,7 @@ EmuGetWakeupTime (
   OUT BOOLEAN        *Pending,
   OUT EFI_TIME       *Time
   )
+
 /*++
 
 Routine Description:
@@ -162,6 +165,7 @@ EmuSetWakeupTime (
   IN BOOLEAN      Enable,
   OUT EFI_TIME    *Time
   )
+
 /*++
 
 Routine Description:
@@ -196,6 +200,7 @@ InitializeRealTimeClock (
   IN EFI_HANDLE                            ImageHandle,
   IN EFI_SYSTEM_TABLE                      *SystemTable
   )
+
 /*++
 
 Routine Description:
@@ -214,8 +219,8 @@ Returns:
   EFI_STATUS  Status;
   EFI_HANDLE  Handle;
 
-  SystemTable->RuntimeServices->GetTime       = EmuGetTime;
-  SystemTable->RuntimeServices->SetTime       = EmuSetTime;
+  SystemTable->RuntimeServices->GetTime = EmuGetTime;
+  SystemTable->RuntimeServices->SetTime = EmuSetTime;
   SystemTable->RuntimeServices->GetWakeupTime = EmuGetWakeupTime;
   SystemTable->RuntimeServices->SetWakeupTime = EmuSetWakeupTime;
 
@@ -233,6 +238,7 @@ EFI_STATUS
 RtcTimeFieldsValid (
   IN EFI_TIME *Time
   )
+
 /*++
 
 Routine Description:
@@ -242,18 +248,19 @@ Routine Description:
   Returns:
 **/
 {
-  if (Time->Year < 1998 ||
-      Time->Year > 2099 ||
-      Time->Month < 1 ||
-      Time->Month > 12 ||
+  if ((Time->Year < 1998) ||
+      (Time->Year > 2099) ||
+      (Time->Month < 1) ||
+      (Time->Month > 12) ||
       (!DayValid (Time)) ||
-      Time->Hour > 23 ||
-      Time->Minute > 59 ||
-      Time->Second > 59 ||
-      Time->Nanosecond > 999999999 ||
-      (!(Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE || (Time->TimeZone >= -1440 && Time->TimeZone <= 1440))) ||
+      (Time->Hour > 23) ||
+      (Time->Minute > 59) ||
+      (Time->Second > 59) ||
+      (Time->Nanosecond > 999999999) ||
+      (!((Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE) || ((Time->TimeZone >= -1440) && (Time->TimeZone <= 1440)))) ||
       (Time->Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT)))
-      ) {
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -265,13 +272,13 @@ DayValid (
   IN  EFI_TIME  *Time
   )
 {
-
   STATIC const INTN  DayOfMonth[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-  if (Time->Day < 1 ||
-      Time->Day > DayOfMonth[Time->Month - 1] ||
-      (Time->Month == 2 && (!IsLeapYear (Time) && Time->Day > 28))
-      ) {
+  if ((Time->Day < 1) ||
+      (Time->Day > DayOfMonth[Time->Month - 1]) ||
+      ((Time->Month == 2) && (!IsLeapYear (Time) && (Time->Day > 28)))
+      )
+  {
     return FALSE;
   }
 

@@ -8,13 +8,9 @@
 
 **/
 
-
 #include <PiDxe.h>
 #include <Library/SerialPortLib.h>
 #include <Library/EmuThunkLib.h>
-
-
-
 
 /**
   Initialize the serial device hardware.
@@ -67,7 +63,6 @@ SerialPortWrite (
   return gEmuThunk->WriteStdErr (Buffer, NumberOfBytes);
 }
 
-
 /**
   Read data from serial device and save the datas in buffer.
 
@@ -113,5 +108,3 @@ SerialPortPoll (
 {
   return FALSE;
 }
-
-

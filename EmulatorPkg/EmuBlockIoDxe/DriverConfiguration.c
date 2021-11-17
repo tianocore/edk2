@@ -47,7 +47,7 @@ EmuBlockIoDriverConfigurationForceDefaults (
 //
 // EFI Driver Configuration Protocol
 //
-EFI_DRIVER_CONFIGURATION_PROTOCOL gEmuBlockIoDriverConfiguration = {
+EFI_DRIVER_CONFIGURATION_PROTOCOL  gEmuBlockIoDriverConfiguration = {
   EmuBlockIoDriverConfigurationSetOptions,
   EmuBlockIoDriverConfigurationOptionsValid,
   EmuBlockIoDriverConfigurationForceDefaults,
@@ -110,13 +110,13 @@ EmuBlockIoDriverConfigurationSetOptions (
   OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED               *ActionRequired
   )
 {
-  EFI_STATUS            Status;
-  EFI_BLOCK_IO_PROTOCOL *BlockIo;
-  CHAR8                 *SupportedLanguage;
+  EFI_STATUS             Status;
+  EFI_BLOCK_IO_PROTOCOL  *BlockIo;
+  CHAR8                  *SupportedLanguage;
 
   SupportedLanguage = This->SupportedLanguages;
 
-  Status            = EFI_UNSUPPORTED;
+  Status = EFI_UNSUPPORTED;
   while (*SupportedLanguage != 0) {
     if (AsciiStrnCmp (Language, SupportedLanguage, 3) == 0) {
       Status = EFI_SUCCESS;
@@ -129,7 +129,7 @@ EmuBlockIoDriverConfigurationSetOptions (
     return Status;
   }
 
-  if (ActionRequired == NULL || ControllerHandle == NULL) {
+  if ((ActionRequired == NULL) || (ControllerHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -151,11 +151,11 @@ EmuBlockIoDriverConfigurationSetOptions (
 
   if (!EFI_ERROR (Status)) {
     gBS->CloseProtocol (
-          ControllerHandle,
-          &gEmuIoThunkProtocolGuid,
-          gEmuBlockIoDriverBinding.DriverBindingHandle,
-          ControllerHandle
-          );
+           ControllerHandle,
+           &gEmuIoThunkProtocolGuid,
+           gEmuBlockIoDriverBinding.DriverBindingHandle,
+           ControllerHandle
+           );
 
     return EFI_UNSUPPORTED;
   }
@@ -211,8 +211,8 @@ EmuBlockIoDriverConfigurationOptionsValid (
   IN  EFI_HANDLE                                      ChildHandle  OPTIONAL
   )
 {
-  EFI_STATUS            Status;
-  EFI_BLOCK_IO_PROTOCOL *BlockIo;
+  EFI_STATUS             Status;
+  EFI_BLOCK_IO_PROTOCOL  *BlockIo;
 
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
@@ -236,11 +236,11 @@ EmuBlockIoDriverConfigurationOptionsValid (
 
   if (!EFI_ERROR (Status)) {
     gBS->CloseProtocol (
-          ControllerHandle,
-          &gEmuIoThunkProtocolGuid,
-          gEmuBlockIoDriverBinding.DriverBindingHandle,
-          ControllerHandle
-          );
+           ControllerHandle,
+           &gEmuIoThunkProtocolGuid,
+           gEmuBlockIoDriverBinding.DriverBindingHandle,
+           ControllerHandle
+           );
 
     return EFI_UNSUPPORTED;
   }
@@ -287,14 +287,14 @@ EmuBlockIoDriverConfigurationForceDefaults (
   OUT EFI_DRIVER_CONFIGURATION_ACTION_REQUIRED               *ActionRequired
   )
 {
-  EFI_STATUS            Status;
-  EFI_BLOCK_IO_PROTOCOL *BlockIo;
+  EFI_STATUS             Status;
+  EFI_BLOCK_IO_PROTOCOL  *BlockIo;
 
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
   }
 
-  if (ActionRequired == NULL || ControllerHandle == NULL) {
+  if ((ActionRequired == NULL) || (ControllerHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -312,11 +312,11 @@ EmuBlockIoDriverConfigurationForceDefaults (
 
   if (!EFI_ERROR (Status)) {
     gBS->CloseProtocol (
-          ControllerHandle,
-          &gEmuIoThunkProtocolGuid,
-          gEmuBlockIoDriverBinding.DriverBindingHandle,
-          ControllerHandle
-          );
+           ControllerHandle,
+           &gEmuIoThunkProtocolGuid,
+           gEmuBlockIoDriverBinding.DriverBindingHandle,
+           ControllerHandle
+           );
 
     return EFI_UNSUPPORTED;
   }

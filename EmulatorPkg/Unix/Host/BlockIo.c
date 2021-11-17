@@ -7,40 +7,36 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Host.h"
 
-#define EMU_BLOCK_IO_PRIVATE_SIGNATURE SIGNATURE_32 ('E', 'M', 'b', 'k')
+#define EMU_BLOCK_IO_PRIVATE_SIGNATURE  SIGNATURE_32 ('E', 'M', 'b', 'k')
 typedef struct {
-  UINTN                       Signature;
+  UINTN                    Signature;
 
-  EMU_IO_THUNK_PROTOCOL       *Thunk;
+  EMU_IO_THUNK_PROTOCOL    *Thunk;
 
-  char                        *Filename;
-  UINTN                       ReadMode;
-  UINTN                       Mode;
+  char                     *Filename;
+  UINTN                    ReadMode;
+  UINTN                    Mode;
 
-  int                         fd;
+  int                      fd;
 
-  BOOLEAN                     RemovableMedia;
-  BOOLEAN                     WriteProtected;
+  BOOLEAN                  RemovableMedia;
+  BOOLEAN                  WriteProtected;
 
-  UINT64                      NumberOfBlocks;
-  UINT32                      BlockSize;
+  UINT64                   NumberOfBlocks;
+  UINT32                   BlockSize;
 
-  EMU_BLOCK_IO_PROTOCOL       EmuBlockIo;
-  EFI_BLOCK_IO_MEDIA          *Media;
-
+  EMU_BLOCK_IO_PROTOCOL    EmuBlockIo;
+  EFI_BLOCK_IO_MEDIA       *Media;
 } EMU_BLOCK_IO_PRIVATE;
 
 #define EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS(a) \
          CR(a, EMU_BLOCK_IO_PRIVATE, EmuBlockIo, EMU_BLOCK_IO_PRIVATE_SIGNATURE)
-
-
 
 EFI_STATUS
 EmuBlockIoReset (
   IN EMU_BLOCK_IO_PROTOCOL    *This,
   IN BOOLEAN                  ExtendedVerification
   );
-
 
 /*++
 
@@ -55,12 +51,12 @@ SetFilePointer64 (
   IN  INT32                      MoveMethod
   )
 {
-  EFI_STATUS    Status;
-  off_t         res;
-  off_t         offset = DistanceToMove;
+  EFI_STATUS  Status;
+  off_t       res;
+  off_t       offset = DistanceToMove;
 
   Status = EFI_SUCCESS;
-  res = lseek (Private->fd, offset, (int)MoveMethod);
+  res    = lseek (Private->fd, offset, (int)MoveMethod);
   if (res == -1) {
     Status = EFI_INVALID_PARAMETER;
   }
@@ -72,16 +68,14 @@ SetFilePointer64 (
   return Status;
 }
 
-
 EFI_STATUS
 EmuBlockIoOpenDevice (
   IN EMU_BLOCK_IO_PRIVATE   *Private
   )
 {
-  EFI_STATUS            Status;
-  UINT64                FileSize;
-  struct statfs         buf;
-
+  EFI_STATUS     Status;
+  UINT64         FileSize;
+  struct statfs  buf;
 
   //
   // If the device is already opened, close it
@@ -95,9 +89,9 @@ EmuBlockIoOpenDevice (
   //
   Private->fd = open (Private->Filename, Private->Mode, 0644);
   if (Private->fd < 0) {
-    printf ("EmuOpenBlock: Could not open %s: %s\n", Private->Filename, strerror(errno));
-    Private->Media->MediaPresent  = FALSE;
-    Status                        = EFI_NO_MEDIA;
+    printf ("EmuOpenBlock: Could not open %s: %s\n", Private->Filename, strerror (errno));
+    Private->Media->MediaPresent = FALSE;
+    Status = EFI_NO_MEDIA;
     goto Done;
   }
 
@@ -120,49 +114,51 @@ EmuBlockIoOpenDevice (
 
   if (FileSize == 0) {
     // lseek fails on a real device. ioctl calls are OS specific
-#if __APPLE__
-    {
-      UINT32 BlockSize;
+ #if __APPLE__
+      {
+        UINT32  BlockSize;
 
-      if (ioctl (Private->fd, DKIOCGETBLOCKSIZE, &BlockSize) == 0) {
-        Private->Media->BlockSize = BlockSize;
+        if (ioctl (Private->fd, DKIOCGETBLOCKSIZE, &BlockSize) == 0) {
+          Private->Media->BlockSize = BlockSize;
+        }
+
+        if (ioctl (Private->fd, DKIOCGETBLOCKCOUNT, &Private->NumberOfBlocks) == 0) {
+          if ((Private->NumberOfBlocks == 0) && (BlockSize == 0x800)) {
+            // A DVD is ~ 4.37 GB so make up a number
+            Private->Media->LastBlock = (0x100000000ULL/0x800) - 1;
+          } else {
+            Private->Media->LastBlock = Private->NumberOfBlocks - 1;
+          }
+        }
+
+        ioctl (Private->fd, DKIOCGETMAXBLOCKCOUNTWRITE, &Private->Media->OptimalTransferLengthGranularity);
       }
-      if (ioctl (Private->fd, DKIOCGETBLOCKCOUNT, &Private->NumberOfBlocks) == 0) {
-        if ((Private->NumberOfBlocks == 0) && (BlockSize == 0x800)) {
-          // A DVD is ~ 4.37 GB so make up a number
-          Private->Media->LastBlock = (0x100000000ULL/0x800) - 1;
-        } else {
+ #else
+      {
+        size_t  BlockSize;
+        UINT64  DiskSize;
+
+        if (ioctl (Private->fd, BLKSSZGET, &BlockSize) == 0) {
+          Private->Media->BlockSize = BlockSize;
+        }
+
+        if (ioctl (Private->fd, BLKGETSIZE64, &DiskSize) == 0) {
+          Private->NumberOfBlocks   = DivU64x32 (DiskSize, (UINT32)BlockSize);
           Private->Media->LastBlock = Private->NumberOfBlocks - 1;
         }
       }
-      ioctl (Private->fd, DKIOCGETMAXBLOCKCOUNTWRITE, &Private->Media->OptimalTransferLengthGranularity);
-    }
-#else
-    {
-      size_t BlockSize;
-      UINT64 DiskSize;
-
-      if (ioctl (Private->fd, BLKSSZGET, &BlockSize) == 0) {
-        Private->Media->BlockSize = BlockSize;
-      }
-      if (ioctl (Private->fd, BLKGETSIZE64, &DiskSize) == 0) {
-        Private->NumberOfBlocks = DivU64x32 (DiskSize, (UINT32)BlockSize);
-        Private->Media->LastBlock = Private->NumberOfBlocks - 1;
-      }
-    }
-#endif
-
+ #endif
   } else {
     Private->Media->BlockSize = Private->BlockSize;
-    Private->NumberOfBlocks = DivU64x32 (FileSize, Private->Media->BlockSize);
+    Private->NumberOfBlocks   = DivU64x32 (FileSize, Private->Media->BlockSize);
     Private->Media->LastBlock = Private->NumberOfBlocks - 1;
 
     if (fstatfs (Private->fd, &buf) == 0) {
-#if __APPLE__
-      Private->Media->OptimalTransferLengthGranularity = buf.f_iosize/buf.f_bsize;
-#else
-      Private->Media->OptimalTransferLengthGranularity = buf.f_bsize/buf.f_bsize;
-#endif
+ #if __APPLE__
+        Private->Media->OptimalTransferLengthGranularity = buf.f_iosize/buf.f_bsize;
+ #else
+        Private->Media->OptimalTransferLengthGranularity = buf.f_bsize/buf.f_bsize;
+ #endif
     }
   }
 
@@ -179,84 +175,78 @@ Done:
   return Status;
 }
 
-
 EFI_STATUS
 EmuBlockIoCreateMapping (
   IN     EMU_BLOCK_IO_PROTOCOL    *This,
   IN     EFI_BLOCK_IO_MEDIA       *Media
   )
 {
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE    *Private;
+  EFI_STATUS            Status;
+  EMU_BLOCK_IO_PRIVATE  *Private;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   Private->Media = Media;
 
-  Media->MediaId          = 0;
+  Media->MediaId = 0;
   Media->RemovableMedia   = Private->RemovableMedia;
   Media->MediaPresent     = TRUE;
   Media->LogicalPartition = FALSE;
-  Media->ReadOnly         = Private->WriteProtected;
-  Media->WriteCaching     = FALSE;
-  Media->IoAlign          = 1;
-  Media->LastBlock        = 0; // Filled in by OpenDevice
+  Media->ReadOnly     = Private->WriteProtected;
+  Media->WriteCaching = FALSE;
+  Media->IoAlign   = 1;
+  Media->LastBlock = 0;        // Filled in by OpenDevice
 
   // EFI_BLOCK_IO_PROTOCOL_REVISION2
-  Media->LowestAlignedLba              = 0;
+  Media->LowestAlignedLba = 0;
   Media->LogicalBlocksPerPhysicalBlock = 0;
-
 
   // EFI_BLOCK_IO_PROTOCOL_REVISION3
   Media->OptimalTransferLengthGranularity = 0;
 
   Status = EmuBlockIoOpenDevice (Private);
 
-
   return Status;
 }
-
 
 EFI_STATUS
 EmuBlockIoError (
   IN EMU_BLOCK_IO_PRIVATE      *Private
   )
 {
-  EFI_STATUS            Status;
-  BOOLEAN               ReinstallBlockIoFlag;
-
+  EFI_STATUS  Status;
+  BOOLEAN     ReinstallBlockIoFlag;
 
   switch (errno) {
+    case EAGAIN:
+      Status = EFI_NO_MEDIA;
+      Private->Media->ReadOnly     = FALSE;
+      Private->Media->MediaPresent = FALSE;
+      ReinstallBlockIoFlag = FALSE;
+      break;
 
-  case EAGAIN:
-    Status                        = EFI_NO_MEDIA;
-    Private->Media->ReadOnly      = FALSE;
-    Private->Media->MediaPresent  = FALSE;
-    ReinstallBlockIoFlag          = FALSE;
-    break;
+    case EACCES:
+      Private->Media->ReadOnly     = FALSE;
+      Private->Media->MediaPresent = TRUE;
+      Private->Media->MediaId += 1;
+      ReinstallBlockIoFlag     = TRUE;
+      Status = EFI_MEDIA_CHANGED;
+      break;
 
-  case EACCES:
-    Private->Media->ReadOnly      = FALSE;
-    Private->Media->MediaPresent  = TRUE;
-    Private->Media->MediaId += 1;
-    ReinstallBlockIoFlag  = TRUE;
-    Status                = EFI_MEDIA_CHANGED;
-    break;
+    case EROFS:
+      Private->Media->ReadOnly = TRUE;
+      ReinstallBlockIoFlag     = FALSE;
+      Status = EFI_WRITE_PROTECTED;
+      break;
 
-  case EROFS:
-    Private->Media->ReadOnly  = TRUE;
-    ReinstallBlockIoFlag      = FALSE;
-    Status                    = EFI_WRITE_PROTECTED;
-    break;
-
-  default:
-    ReinstallBlockIoFlag  = FALSE;
-    Status                = EFI_DEVICE_ERROR;
-    break;
+    default:
+      ReinstallBlockIoFlag = FALSE;
+      Status = EFI_DEVICE_ERROR;
+      break;
   }
+
   return Status;
 }
-
 
 EFI_STATUS
 EmuBlockIoReadWriteCommon (
@@ -290,7 +280,7 @@ EmuBlockIoReadWriteCommon (
     return EFI_MEDIA_CHANGED;
   }
 
-  if ((UINTN) Buffer % Private->Media->IoAlign != 0) {
+  if ((UINTN)Buffer % Private->Media->IoAlign != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -313,6 +303,7 @@ EmuBlockIoReadWriteCommon (
     DEBUG ((DEBUG_INIT, "ReadBlocks: Attempted to read off end of device\n"));
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Seek to End of File
   //
@@ -326,7 +317,6 @@ EmuBlockIoReadWriteCommon (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Read BufferSize bytes from Lba into Buffer.
@@ -368,16 +358,16 @@ EmuBlockIoReadBlocks (
   IN     EFI_LBA                LBA,
   IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
   IN     UINTN                  BufferSize,
-     OUT VOID                   *Buffer
+  OUT VOID                   *Buffer
   )
 {
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE    *Private;
-  ssize_t                 len;
+  EFI_STATUS            Status;
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  ssize_t               len;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  Status  = EmuBlockIoReadWriteCommon (Private, MediaId, LBA, BufferSize, Buffer, "UnixReadBlocks");
+  Status = EmuBlockIoReadWriteCommon (Private, MediaId, LBA, BufferSize, Buffer, "UnixReadBlocks");
   if (EFI_ERROR (Status)) {
     goto Done;
   }
@@ -403,9 +393,9 @@ Done:
       return EFI_SUCCESS;
     }
   }
+
   return Status;
 }
-
 
 /**
   Write BufferSize bytes from Lba into Buffer.
@@ -448,14 +438,13 @@ EmuBlockIoWriteBlocks (
   IN     VOID                   *Buffer
   )
 {
-  EMU_BLOCK_IO_PRIVATE    *Private;
-  ssize_t                 len;
-  EFI_STATUS              Status;
-
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  ssize_t               len;
+  EFI_STATUS            Status;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
-  Status  = EmuBlockIoReadWriteCommon (Private, MediaId, LBA, BufferSize, Buffer, "UnixWriteBlocks");
+  Status = EmuBlockIoReadWriteCommon (Private, MediaId, LBA, BufferSize, Buffer, "UnixWriteBlocks");
   if (EFI_ERROR (Status)) {
     goto Done;
   }
@@ -486,7 +475,6 @@ Done:
   return Status;
 }
 
-
 /**
   Flush the Block Device.
 
@@ -515,17 +503,16 @@ EmuBlockIoFlushBlocks (
   IN OUT EFI_BLOCK_IO2_TOKEN      *Token
   )
 {
-  EMU_BLOCK_IO_PRIVATE *Private;
+  EMU_BLOCK_IO_PRIVATE  *Private;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
   if (Private->fd >= 0) {
     fsync (Private->fd);
-#if __APPLE__
-    fcntl (Private->fd, F_FULLFSYNC);
-#endif
+ #if __APPLE__
+      fcntl (Private->fd, F_FULLFSYNC);
+ #endif
   }
-
 
   if (Token != NULL) {
     if (Token->Event != NULL) {
@@ -537,7 +524,6 @@ EmuBlockIoFlushBlocks (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Reset the block device hardware.
@@ -558,7 +544,7 @@ EmuBlockIoReset (
   IN BOOLEAN                  ExtendedVerification
   )
 {
-  EMU_BLOCK_IO_PRIVATE *Private;
+  EMU_BLOCK_IO_PRIVATE  *Private;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -570,17 +556,16 @@ EmuBlockIoReset (
   return EFI_SUCCESS;
 }
 
-
 char *
 StdDupUnicodeToAscii (
   IN  CHAR16 *Str
   )
 {
-  UINTN   Size;
-  char    *Ascii;
-  char    *Ptr;
+  UINTN  Size;
+  char   *Ascii;
+  char   *Ptr;
 
-  Size = StrLen (Str) + 1;
+  Size  = StrLen (Str) + 1;
   Ascii = malloc (Size);
   if (Ascii == NULL) {
     return NULL;
@@ -589,13 +574,13 @@ StdDupUnicodeToAscii (
   for (Ptr = Ascii; *Str != '\0'; Ptr++, Str++) {
     *Ptr = *Str;
   }
+
   *Ptr = 0;
 
   return Ascii;
 }
 
-
-EMU_BLOCK_IO_PROTOCOL gEmuBlockIoProtocol = {
+EMU_BLOCK_IO_PROTOCOL  gEmuBlockIoProtocol = {
   GasketEmuBlockIoReset,
   GasketEmuBlockIoReadBlocks,
   GasketEmuBlockIoWriteBlocks,
@@ -624,11 +609,10 @@ EmuBlockIoThunkOpen (
     return EFI_OUT_OF_RESOURCES;
   }
 
-
   Private->Signature = EMU_BLOCK_IO_PRIVATE_SIGNATURE;
   Private->Thunk     = This;
   CopyMem (&Private->EmuBlockIo, &gEmuBlockIoProtocol, sizeof (gEmuBlockIoProtocol));
-  Private->fd        = -1;
+  Private->fd = -1;
   Private->BlockSize = 512;
 
   Private->Filename = StdDupUnicodeToAscii (This->ConfigString);
@@ -642,12 +626,14 @@ EmuBlockIoThunkOpen (
     Private->WriteProtected = FALSE;
   } else {
     for (*Str++ = '\0'; *Str != 0; Str++) {
-      if (*Str == 'R' || *Str == 'F') {
-        Private->RemovableMedia = (BOOLEAN) (*Str == 'R');
+      if ((*Str == 'R') || (*Str == 'F')) {
+        Private->RemovableMedia = (BOOLEAN)(*Str == 'R');
       }
-      if (*Str == 'O' || *Str == 'W') {
-        Private->WriteProtected  = (BOOLEAN) (*Str == 'O');
+
+      if ((*Str == 'O') || (*Str == 'W')) {
+        Private->WriteProtected = (BOOLEAN)(*Str == 'O');
       }
+
       if (*Str == ':') {
         Private->BlockSize = strtol (++Str, NULL, 0);
         break;
@@ -661,7 +647,6 @@ EmuBlockIoThunkOpen (
   This->Private   = Private;
   return EFI_SUCCESS;
 }
-
 
 EFI_STATUS
 EmuBlockIoThunkClose (
@@ -680,6 +665,7 @@ EmuBlockIoThunkClose (
     if (Private->Filename != NULL) {
       free (Private->Filename);
     }
+
     free (This->Private);
     This->Private = NULL;
   }
@@ -687,9 +673,7 @@ EmuBlockIoThunkClose (
   return EFI_SUCCESS;
 }
 
-
-
-EMU_IO_THUNK_PROTOCOL gBlockIoThunkIo = {
+EMU_IO_THUNK_PROTOCOL  gBlockIoThunkIo = {
   &gEmuBlockIoProtocolGuid,
   NULL,
   NULL,

@@ -7,7 +7,6 @@ bbe
 
 #include "EmuBlockIo.h"
 
-
 /**
   Reset the block device hardware.
 
@@ -28,9 +27,9 @@ EmuBlockIo2Reset (
   IN BOOLEAN                 ExtendedVerification
   )
 {
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE    *Private;
-  EFI_TPL                 OldTpl;
+  EFI_STATUS            Status;
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  EFI_TPL               OldTpl;
 
   Private = EMU_BLOCK_IO2_PRIVATE_DATA_FROM_THIS (This);
 
@@ -83,12 +82,12 @@ EmuBlockIo2ReadBlocksEx (
   IN     EFI_LBA                LBA,
   IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
   IN     UINTN                  BufferSize,
-     OUT VOID                  *Buffer
+  OUT VOID                  *Buffer
   )
 {
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE    *Private;
-  EFI_TPL                 OldTpl;
+  EFI_STATUS            Status;
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  EFI_TPL               OldTpl;
 
   Private = EMU_BLOCK_IO2_PRIVATE_DATA_FROM_THIS (This);
 
@@ -99,7 +98,6 @@ EmuBlockIo2ReadBlocksEx (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
 
 /**
   Write BufferSize bytes from Lba into Buffer.
@@ -143,9 +141,9 @@ EmuBlockIo2WriteBlocksEx (
   IN     VOID                   *Buffer
   )
 {
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE    *Private;
-  EFI_TPL                 OldTpl;
+  EFI_STATUS            Status;
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  EFI_TPL               OldTpl;
 
   Private = EMU_BLOCK_IO2_PRIVATE_DATA_FROM_THIS (This);
 
@@ -156,8 +154,6 @@ EmuBlockIo2WriteBlocksEx (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
-
 
 /**
   Flush the Block Device.
@@ -188,9 +184,9 @@ EmuBlockIo2Flush (
   IN OUT EFI_BLOCK_IO2_TOKEN      *Token
   )
 {
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE    *Private;
-  EFI_TPL                 OldTpl;
+  EFI_STATUS            Status;
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  EFI_TPL               OldTpl;
 
   Private = EMU_BLOCK_IO2_PRIVATE_DATA_FROM_THIS (This);
 
@@ -201,8 +197,6 @@ EmuBlockIo2Flush (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
-
 
 /**
   Reset the Block Device.
@@ -222,9 +216,9 @@ EmuBlockIoReset (
   IN BOOLEAN                        ExtendedVerification
   )
 {
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE    *Private;
-  EFI_TPL                 OldTpl;
+  EFI_STATUS            Status;
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  EFI_TPL               OldTpl;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -235,7 +229,6 @@ EmuBlockIoReset (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
 
 /**
   Read BufferSize bytes from Lba into Buffer.
@@ -266,10 +259,10 @@ EmuBlockIoReadBlocks (
   OUT VOID                          *Buffer
   )
 {
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE    *Private;
-  EFI_TPL                 OldTpl;
-  EFI_BLOCK_IO2_TOKEN     Token;
+  EFI_STATUS            Status;
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  EFI_TPL               OldTpl;
+  EFI_BLOCK_IO2_TOKEN   Token;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -281,7 +274,6 @@ EmuBlockIoReadBlocks (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
 
 /**
   Write BufferSize bytes from Lba into Buffer.
@@ -313,10 +305,10 @@ EmuBlockIoWriteBlocks (
   IN VOID                           *Buffer
   )
 {
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE    *Private;
-  EFI_TPL                 OldTpl;
-  EFI_BLOCK_IO2_TOKEN     Token;
+  EFI_STATUS            Status;
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  EFI_TPL               OldTpl;
+  EFI_BLOCK_IO2_TOKEN   Token;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -345,10 +337,10 @@ EmuBlockIoFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL  *This
   )
 {
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE    *Private;
-  EFI_TPL                 OldTpl;
-  EFI_BLOCK_IO2_TOKEN     Token;
+  EFI_STATUS            Status;
+  EMU_BLOCK_IO_PRIVATE  *Private;
+  EFI_TPL               OldTpl;
+  EFI_BLOCK_IO2_TOKEN   Token;
 
   Private = EMU_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -360,8 +352,6 @@ EmuBlockIoFlushBlocks (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
-
 
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
@@ -413,8 +403,8 @@ EmuBlockIoDriverBindingSupported (
   IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS              Status;
-  EMU_IO_THUNK_PROTOCOL   *EmuIoThunk;
+  EFI_STATUS             Status;
+  EMU_IO_THUNK_PROTOCOL  *EmuIoThunk;
 
   //
   // Open the IO Abstraction(s) needed to perform the supported test
@@ -443,14 +433,13 @@ EmuBlockIoDriverBindingSupported (
   // Close the I/O Abstraction(s) used to perform the supported test
   //
   gBS->CloseProtocol (
-        Handle,
-        &gEmuIoThunkProtocolGuid,
-        This->DriverBindingHandle,
-        Handle
-        );
+         Handle,
+         &gEmuIoThunkProtocolGuid,
+         This->DriverBindingHandle,
+         Handle
+         );
   return Status;
 }
-
 
 /**
   Starts a device controller or a bus controller.
@@ -495,9 +484,9 @@ EmuBlockIoDriverBindingStart (
   IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
   )
 {
-  EFI_STATUS                  Status;
-  EMU_IO_THUNK_PROTOCOL       *EmuIoThunk;
-  EMU_BLOCK_IO_PRIVATE        *Private = NULL;
+  EFI_STATUS             Status;
+  EMU_IO_THUNK_PROTOCOL  *EmuIoThunk;
+  EMU_BLOCK_IO_PRIVATE   *Private = NULL;
 
   //
   // Grab the protocols we need
@@ -532,7 +521,7 @@ EmuBlockIoDriverBindingStart (
 
   Private->Signature = EMU_BLOCK_IO_PRIVATE_SIGNATURE;
   Private->IoThunk   = EmuIoThunk;
-  Private->Io        = EmuIoThunk->Interface;
+  Private->Io = EmuIoThunk->Interface;
   Private->EfiHandle = Handle;
 
   Private->BlockIo.Revision    = EFI_BLOCK_IO_PROTOCOL_REVISION2;
@@ -542,8 +531,8 @@ EmuBlockIoDriverBindingStart (
   Private->BlockIo.WriteBlocks = EmuBlockIoWriteBlocks;
   Private->BlockIo.FlushBlocks = EmuBlockIoFlushBlocks;
 
-  Private->BlockIo2.Media         = &Private->Media;
-  Private->BlockIo2.Reset         = EmuBlockIo2Reset;
+  Private->BlockIo2.Media = &Private->Media;
+  Private->BlockIo2.Reset = EmuBlockIo2Reset;
   Private->BlockIo2.ReadBlocksEx  = EmuBlockIo2ReadBlocksEx;
   Private->BlockIo2.WriteBlocksEx = EmuBlockIo2WriteBlocksEx;
   Private->BlockIo2.FlushBlocksEx = EmuBlockIo2Flush;
@@ -573,8 +562,10 @@ EmuBlockIoDriverBindingStart (
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEfiBlockIoProtocolGuid,    &Private->BlockIo,
-                  &gEfiBlockIo2ProtocolGuid,   &Private->BlockIo2,
+                  &gEfiBlockIoProtocolGuid,
+                  &Private->BlockIo,
+                  &gEfiBlockIo2ProtocolGuid,
+                  &Private->BlockIo2,
                   NULL
                   );
 
@@ -586,20 +577,18 @@ Done:
       }
 
       gBS->FreePool (Private);
-
     }
 
     gBS->CloseProtocol (
-          Handle,
-          &gEmuIoThunkProtocolGuid,
-          This->DriverBindingHandle,
-          Handle
-          );
+           Handle,
+           &gEmuIoThunkProtocolGuid,
+           This->DriverBindingHandle,
+           Handle
+           );
   }
 
   return Status;
 }
-
 
 /**
   Stops a device controller or a bus controller.
@@ -636,9 +625,9 @@ EmuBlockIoDriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_BLOCK_IO_PROTOCOL   *BlockIo;
-  EFI_STATUS              Status;
-  EMU_BLOCK_IO_PRIVATE *Private;
+  EFI_BLOCK_IO_PROTOCOL  *BlockIo;
+  EFI_STATUS             Status;
+  EMU_BLOCK_IO_PRIVATE   *Private;
 
   //
   // Get our context back
@@ -659,8 +648,10 @@ EmuBlockIoDriverBindingStop (
 
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   Private->EfiHandle,
-                  &gEfiBlockIoProtocolGuid,   &Private->BlockIo,
-                  &gEfiBlockIo2ProtocolGuid,  &Private->BlockIo2,
+                  &gEfiBlockIoProtocolGuid,
+                  &Private->BlockIo,
+                  &gEfiBlockIo2ProtocolGuid,
+                  &Private->BlockIo2,
                   NULL
                   );
   if (!EFI_ERROR (Status)) {
@@ -686,11 +677,7 @@ EmuBlockIoDriverBindingStop (
   return Status;
 }
 
-
-
-
-
-EFI_DRIVER_BINDING_PROTOCOL gEmuBlockIoDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gEmuBlockIoDriverBinding = {
   EmuBlockIoDriverBindingSupported,
   EmuBlockIoDriverBindingStart,
   EmuBlockIoDriverBindingStop,
@@ -698,9 +685,6 @@ EFI_DRIVER_BINDING_PROTOCOL gEmuBlockIoDriverBinding = {
   NULL,
   NULL
 };
-
-
-
 
 /**
   The user Entry Point for module EmuBlockIo . The user code starts with this function.
@@ -719,7 +703,7 @@ InitializeEmuBlockIo (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   Status = EfiLibInstallAllDriverProtocols2 (
              ImageHandle,
@@ -735,9 +719,5 @@ InitializeEmuBlockIo (
              );
   ASSERT_EFI_ERROR (Status);
 
-
   return Status;
 }
-
-
-

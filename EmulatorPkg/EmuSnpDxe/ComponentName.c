@@ -17,6 +17,7 @@ Abstract:
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -63,7 +64,6 @@ EmuSnpDriverComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -143,7 +143,6 @@ EmuSnpDriverComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   );
 
-
 //
 // EFI Component Name Protocol
 //
@@ -156,14 +155,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gEmuSnpDriverComponen
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gEmuSnpDriverComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) EmuSnpDriverComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) EmuSnpDriverComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gEmuSnpDriverComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)EmuSnpDriverComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)EmuSnpDriverComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mEmuSnpDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mEmuSnpDriverNameTable[] = {
   {
     "eng;en",
     L"Emu SNP Driver"

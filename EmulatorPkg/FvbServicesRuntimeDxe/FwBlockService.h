@@ -17,15 +17,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define FVB_VIRTUAL   1
 
 typedef struct {
-  EFI_LOCK                    FvbDevLock;
-  UINTN                       FvBase[2];
-  UINTN                       NumOfBlocks;
-  EFI_FIRMWARE_VOLUME_HEADER  VolumeHeader;
+  EFI_LOCK                      FvbDevLock;
+  UINTN                         FvBase[2];
+  UINTN                         NumOfBlocks;
+  EFI_FIRMWARE_VOLUME_HEADER    VolumeHeader;
 } EFI_FW_VOL_INSTANCE;
 
 typedef struct {
-  UINT32              NumFv;
-  EFI_FW_VOL_INSTANCE *FvInstance[2];
+  UINT32                 NumFv;
+  EFI_FW_VOL_INSTANCE    *FvInstance[2];
 } ESAL_FWB_GLOBAL;
 
 //
@@ -33,18 +33,18 @@ typedef struct {
 //
 #define FVB_DEVICE_FROM_THIS(a)         CR (a, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
 #define FVB_EXTEND_DEVICE_FROM_THIS(a)  CR (a, EFI_FW_VOL_BLOCK_DEVICE, FvbExtension, FVB_DEVICE_SIGNATURE)
-#define FVB_DEVICE_SIGNATURE            SIGNATURE_32 ('F', 'V', 'B', 'N')
+#define FVB_DEVICE_SIGNATURE  SIGNATURE_32 ('F', 'V', 'B', 'N')
 
 typedef struct {
-  MEMMAP_DEVICE_PATH        MemMapDevPath;
-  EFI_DEVICE_PATH_PROTOCOL  EndDevPath;
+  MEMMAP_DEVICE_PATH          MemMapDevPath;
+  EFI_DEVICE_PATH_PROTOCOL    EndDevPath;
 } FV_DEVICE_PATH;
 
 typedef struct {
-  UINTN                               Signature;
-  FV_DEVICE_PATH                      DevicePath;
-  UINTN                               Instance;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  FwVolBlockInstance;
+  UINTN                                 Signature;
+  FV_DEVICE_PATH                        DevicePath;
+  UINTN                                 Instance;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    FwVolBlockInstance;
 } EFI_FW_VOL_BLOCK_DEVICE;
 
 EFI_STATUS
@@ -121,7 +121,6 @@ FvbInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 ;
-
 
 VOID
 EFIAPI
