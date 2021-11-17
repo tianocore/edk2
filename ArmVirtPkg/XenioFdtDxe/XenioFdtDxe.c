@@ -38,7 +38,7 @@ InitializeXenioFdtDxe (
                         (CONST VOID **)&Reg, &AddressCells, &SizeCells,
                         &RegSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_WARN, "%a: No 'xen,xen' compatible DT node found\n",
+    DEBUG ((DEBUG_WARN, "%a: No 'xen,xen' compatible DT node found\n",
       __FUNCTION__));
     return EFI_UNSUPPORTED;
   }
@@ -55,12 +55,12 @@ InitializeXenioFdtDxe (
   Handle = NULL;
   Status = XenIoMmioInstall (&Handle, RegBase);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: XenIoMmioInstall () failed on a new handle "
+    DEBUG ((DEBUG_ERROR, "%a: XenIoMmioInstall () failed on a new handle "
       "(Status == %r)\n", __FUNCTION__, Status));
     return Status;
   }
 
-  DEBUG ((EFI_D_INFO, "Found Xen node with Grant table @ 0x%Lx\n", RegBase));
+  DEBUG ((DEBUG_INFO, "Found Xen node with Grant table @ 0x%Lx\n", RegBase));
 
   return EFI_SUCCESS;
 }

@@ -57,7 +57,7 @@ GetXenArmAcpiRsdp (
                         (CONST VOID **)&Reg, &AddressCells, &SizeCells,
                         &RegSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_WARN, "%a: No 'xen,guest-acpi' compatible DT node found\n",
+    DEBUG ((DEBUG_WARN, "%a: No 'xen,guest-acpi' compatible DT node found\n",
       __FUNCTION__));
     return EFI_NOT_FOUND;
   }
@@ -127,7 +127,7 @@ InstallXenArmTables (
   //
   Status = GetXenArmAcpiRsdp (&XenAcpiRsdpStructurePtr);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "%a: No RSDP table found\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: No RSDP table found\n", __FUNCTION__));
     return Status;
   }
 

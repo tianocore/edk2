@@ -70,7 +70,7 @@ ArmVirtTimerFdtClientLibConstructor (
   HypIntrNum = PropSize < 48 ? 0 : SwapBytes32 (InterruptProp[3].Number)
                                    + (InterruptProp[3].Type ? 16 : 0);
 
-  DEBUG ((EFI_D_INFO, "Found Timer interrupts %d, %d, %d, %d\n",
+  DEBUG ((DEBUG_INFO, "Found Timer interrupts %d, %d, %d, %d\n",
     SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum));
 
   PcdStatus = PcdSet32S (PcdArmArchTimerSecIntrNum, SecIntrNum);
