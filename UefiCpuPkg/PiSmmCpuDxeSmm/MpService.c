@@ -1788,8 +1788,8 @@ InitializeSmmCpuSemaphores (
   GlobalSemaphoresSize = (sizeof (SMM_CPU_SEMAPHORE_GLOBAL) / sizeof (VOID *)) * SemaphoreSize;
   CpuSemaphoresSize    = (sizeof (SMM_CPU_SEMAPHORE_CPU) / sizeof (VOID *)) * ProcessorCount * SemaphoreSize;
   TotalSize = GlobalSemaphoresSize + CpuSemaphoresSize;
-  DEBUG((EFI_D_INFO, "One Semaphore Size    = 0x%x\n", SemaphoreSize));
-  DEBUG((EFI_D_INFO, "Total Semaphores Size = 0x%x\n", TotalSize));
+  DEBUG((DEBUG_INFO, "One Semaphore Size    = 0x%x\n", SemaphoreSize));
+  DEBUG((DEBUG_INFO, "Total Semaphores Size = 0x%x\n", TotalSize));
   Pages = EFI_SIZE_TO_PAGES (TotalSize);
   SemaphoreBlock = AllocatePages (Pages);
   ASSERT (SemaphoreBlock != NULL);

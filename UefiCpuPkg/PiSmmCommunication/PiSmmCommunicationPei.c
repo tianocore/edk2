@@ -197,8 +197,8 @@ InternalSmstGetVendorTableByGuid (
     // 32 PEI + 64 DXE
     //
     Smst64 = (EFI_SMM_SYSTEM_TABLE2_64 *)Smst;
-    DEBUG ((EFI_D_INFO, "InitCommunicationContext - SmmConfigurationTable: %x\n", Smst64->SmmConfigurationTable));
-    DEBUG ((EFI_D_INFO, "InitCommunicationContext - NumberOfTableEntries: %x\n", Smst64->NumberOfTableEntries));
+    DEBUG ((DEBUG_INFO, "InitCommunicationContext - SmmConfigurationTable: %x\n", Smst64->SmmConfigurationTable));
+    DEBUG ((DEBUG_INFO, "InitCommunicationContext - NumberOfTableEntries: %x\n", Smst64->NumberOfTableEntries));
     SmmConfigurationTable64 = (EFI_CONFIGURATION_TABLE64 *)(UINTN)Smst64->SmmConfigurationTable;
     NumberOfTableEntries = (UINTN)Smst64->NumberOfTableEntries;
     for (Index = 0; Index < NumberOfTableEntries; Index++) {
@@ -208,8 +208,8 @@ InternalSmstGetVendorTableByGuid (
     }
     return NULL;
   } else {
-    DEBUG ((EFI_D_INFO, "InitCommunicationContext - SmmConfigurationTable: %x\n", Smst->SmmConfigurationTable));
-    DEBUG ((EFI_D_INFO, "InitCommunicationContext - NumberOfTableEntries: %x\n", Smst->NumberOfTableEntries));
+    DEBUG ((DEBUG_INFO, "InitCommunicationContext - SmmConfigurationTable: %x\n", Smst->SmmConfigurationTable));
+    DEBUG ((DEBUG_INFO, "InitCommunicationContext - NumberOfTableEntries: %x\n", Smst->NumberOfTableEntries));
     SmmConfigurationTable = Smst->SmmConfigurationTable;
     NumberOfTableEntries = Smst->NumberOfTableEntries;
     for (Index = 0; Index < NumberOfTableEntries; Index++) {
@@ -239,8 +239,8 @@ InitCommunicationContext (
   SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *) GET_GUID_HOB_DATA (GuidHob);
   SmmS3ResumeState = (SMM_S3_RESUME_STATE *)(UINTN)SmramDescriptor->CpuStart;
 
-  DEBUG ((EFI_D_INFO, "InitCommunicationContext - SmmS3ResumeState: %x\n", SmmS3ResumeState));
-  DEBUG ((EFI_D_INFO, "InitCommunicationContext - Smst: %x\n", SmmS3ResumeState->Smst));
+  DEBUG ((DEBUG_INFO, "InitCommunicationContext - SmmS3ResumeState: %x\n", SmmS3ResumeState));
+  DEBUG ((DEBUG_INFO, "InitCommunicationContext - Smst: %x\n", SmmS3ResumeState->Smst));
 
   SmmCommunicationContext = (EFI_SMM_COMMUNICATION_CONTEXT *)InternalSmstGetVendorTableByGuid (
                                                                SmmS3ResumeState->Signature,
@@ -283,7 +283,7 @@ Communicate (
   UINTN                            Size;
   EFI_SMM_COMMUNICATION_CONTEXT    *SmmCommunicationContext;
 
-  DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei Communicate Enter\n"));
+  DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei Communicate Enter\n"));
 
   if (CommBuffer == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -316,18 +316,18 @@ Communicate (
   // Check SMRAM locked, it should be done after SMRAM lock.
   //
   if (!SmmAccess->LockState) {
-    DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei LockState - %x\n", (UINTN)SmmAccess->LockState));
+    DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei LockState - %x\n", (UINTN)SmmAccess->LockState));
     return EFI_NOT_STARTED;
   }
 
   SmmCommunicationContext = GetCommunicationContext ();
-  DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei BufferPtrAddress - 0x%016lx, BufferPtr: 0x%016lx\n", SmmCommunicationContext->BufferPtrAddress, *(EFI_PHYSICAL_ADDRESS *)(UINTN)SmmCommunicationContext->BufferPtrAddress));
+  DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei BufferPtrAddress - 0x%016lx, BufferPtr: 0x%016lx\n", SmmCommunicationContext->BufferPtrAddress, *(EFI_PHYSICAL_ADDRESS *)(UINTN)SmmCommunicationContext->BufferPtrAddress));
 
   //
   // No need to check if BufferPtr is 0, because it is in PEI phase.
   //
   *(EFI_PHYSICAL_ADDRESS *)(UINTN)SmmCommunicationContext->BufferPtrAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer;
-  DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei CommBuffer - %x\n", (UINTN)CommBuffer));
+  DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei CommBuffer - %x\n", (UINTN)CommBuffer));
 
   //
   // Send command
@@ -349,7 +349,7 @@ Communicate (
   //
   *(EFI_PHYSICAL_ADDRESS *)(UINTN)SmmCommunicationContext->BufferPtrAddress = 0;
 
-  DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei Communicate Exit\n"));
+  DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei Communicate Exit\n"));
 
   return EFI_SUCCESS;
 }
@@ -394,7 +394,7 @@ PiSmmCommunicationPeiEntryPoint (
   // Check SMRAM locked, it should be done before SMRAM lock.
   //
   if (SmmAccess->LockState) {
-    DEBUG ((EFI_D_INFO, "PiSmmCommunicationPei LockState - %x\n", (UINTN)SmmAccess->LockState));
+    DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei LockState - %x\n", (UINTN)SmmAccess->LockState));
     return EFI_ACCESS_DENIED;
   }
 
