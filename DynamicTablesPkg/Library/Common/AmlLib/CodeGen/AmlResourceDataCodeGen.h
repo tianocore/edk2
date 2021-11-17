@@ -142,9 +142,9 @@ AmlCodeGenRdRegister (
 EFI_STATUS
 EFIAPI
 AmlCodeGenEndTag (
-  IN  UINT8               CheckSum,   OPTIONAL
-  IN  AML_OBJECT_NODE   * ParentNode, OPTIONAL
-  OUT AML_DATA_NODE    ** NewRdNode   OPTIONAL
+  IN  UINT8               CheckSum, OPTIONAL
+  IN  AML_OBJECT_NODE   *ParentNode, OPTIONAL
+  OUT AML_DATA_NODE    **NewRdNode   OPTIONAL
   );
 
 #endif // AML_RESOURCE_DATA_CODE_GEN_H_

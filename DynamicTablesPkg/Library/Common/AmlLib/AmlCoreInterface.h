@@ -68,8 +68,8 @@ EFI_STATUS
 EFIAPI
 AmlSerializeTree (
   IN      AML_ROOT_NODE_HANDLE    RootNode,
-  IN      UINT8                 * Buffer,     OPTIONAL
-  IN  OUT UINT32                * BufferSize
+  IN      UINT8                 *Buffer, OPTIONAL
+  IN  OUT UINT32                *BufferSize
   );
 
 /** Clone a node.
@@ -90,7 +90,7 @@ EFI_STATUS
 EFIAPI
 AmlCloneNode (
   IN  AML_NODE_HANDLE   Node,
-  OUT AML_NODE_HANDLE * ClonedNode
+  OUT AML_NODE_HANDLE *ClonedNode
   );
 
 /**
@@ -303,7 +303,7 @@ EFI_STATUS
 EFIAPI
 AmlGetRootNodeInfo (
   IN  AML_ROOT_NODE_HANDLE            RootNode,
-  OUT EFI_ACPI_DESCRIPTION_HEADER   * SdtHeaderBuffer
+  OUT EFI_ACPI_DESCRIPTION_HEADER   *SdtHeaderBuffer
   );
 
 /** Get the ObjectNode information.
@@ -334,10 +334,10 @@ EFI_STATUS
 EFIAPI
 AmlGetObjectNodeInfo (
   IN  AML_OBJECT_NODE_HANDLE    ObjectNode,
-  OUT UINT8                   * OpCode,           OPTIONAL
-  OUT UINT8                   * SubOpCode,        OPTIONAL
-  OUT UINT32                  * PkgLen,           OPTIONAL
-  OUT BOOLEAN                 * IsNameSpaceNode   OPTIONAL
+  OUT UINT8                   *OpCode, OPTIONAL
+  OUT UINT8                   *SubOpCode, OPTIONAL
+  OUT UINT32                  *PkgLen, OPTIONAL
+  OUT BOOLEAN                 *IsNameSpaceNode   OPTIONAL
   );
 
 /** Returns the count of the fixed arguments for the input Node.
@@ -369,7 +369,7 @@ EFI_STATUS
 EFIAPI
 AmlGetNodeDataType (
   IN  AML_DATA_NODE_HANDLE    DataNode,
-  OUT EAML_NODE_DATA_TYPE   * DataType
+  OUT EAML_NODE_DATA_TYPE   *DataType
   );
 
 /** Get the descriptor Id of the resource data element
@@ -393,7 +393,7 @@ EFI_STATUS
 EFIAPI
 AmlGetResourceDataType (
   IN  AML_DATA_NODE_HANDLE    DataNode,
-  OUT AML_RD_HEADER         * ResourceDataType
+  OUT AML_RD_HEADER         *ResourceDataType
   );
 
 /** Get the data buffer and size of the DataNode.
@@ -423,8 +423,8 @@ EFI_STATUS
 EFIAPI
 AmlGetDataNodeBuffer (
   IN      AML_DATA_NODE_HANDLE    DataNode,
-      OUT UINT8                 * Buffer,     OPTIONAL
-  IN  OUT UINT32                * BufferSize
+  OUT UINT8                 *Buffer, OPTIONAL
+  IN  OUT UINT32                *BufferSize
   );
 
 /** Update the ACPI DSDT/SSDT table header.
@@ -445,7 +445,7 @@ EFI_STATUS
 EFIAPI
 AmlUpdateRootNode (
   IN        AML_ROOT_NODE_HANDLE            RootNode,
-  IN  CONST EFI_ACPI_DESCRIPTION_HEADER   * SdtHeader
+  IN  CONST EFI_ACPI_DESCRIPTION_HEADER   *SdtHeader
   );
 
 /** Update an object node representing an integer with a new value.
@@ -498,7 +498,7 @@ EFIAPI
 AmlUpdateDataNode (
   IN  AML_DATA_NODE_HANDLE    DataNode,
   IN  EAML_NODE_DATA_TYPE     DataType,
-  IN  UINT8                 * Buffer,
+  IN  UINT8                 *Buffer,
   IN  UINT32                  Size
   );
 
@@ -682,10 +682,10 @@ AmlGetPreviousVariableArgument (
 **/
 typedef
 BOOLEAN
-(EFIAPI * EDKII_AML_TREE_ENUM_CALLBACK) (
+(EFIAPI *EDKII_AML_TREE_ENUM_CALLBACK)(
   IN       AML_NODE_HANDLE     Node,
-  IN  OUT  VOID              * Context,    OPTIONAL
-  IN  OUT  EFI_STATUS        * Status      OPTIONAL
+  IN  OUT  VOID              *Context, OPTIONAL
+  IN  OUT  EFI_STATUS        *Status      OPTIONAL
   );
 
 /** Enumerate all nodes of the subtree under the input Node in the AML
@@ -714,8 +714,8 @@ EFIAPI
 AmlEnumTree (
   IN      AML_NODE_HANDLE                 Node,
   IN      EDKII_AML_TREE_ENUM_CALLBACK    CallBack,
-  IN  OUT VOID                          * Context,  OPTIONAL
-      OUT EFI_STATUS                    * Status    OPTIONAL
+  IN  OUT VOID                          *Context, OPTIONAL
+  OUT EFI_STATUS                    *Status    OPTIONAL
   );
 
 /**
@@ -760,8 +760,8 @@ EFI_STATUS
 EFIAPI
 AmlGetAslPathName (
   IN      AML_NODE_HANDLE     Node,
-      OUT CHAR8             * Buffer,
-  IN  OUT UINT32            * BufferSize
+  OUT CHAR8             *Buffer,
+  IN  OUT UINT32            *BufferSize
   );
 
 #endif // AML_CORE_INTERFACE_H_
