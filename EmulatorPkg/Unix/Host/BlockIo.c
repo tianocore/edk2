@@ -166,7 +166,7 @@ EmuBlockIoOpenDevice (
     }
   }
 
-  DEBUG ((EFI_D_INIT, "%HEmuOpenBlock: opened %a%N\n", Private->Filename));
+  DEBUG ((DEBUG_INIT, "%HEmuOpenBlock: opened %a%N\n", Private->Filename));
   Status = EFI_SUCCESS;
 
 Done:
@@ -282,7 +282,7 @@ EmuBlockIoReadWriteCommon (
   }
 
   if (!Private->Media->MediaPresent) {
-    DEBUG ((EFI_D_INIT, "%s: No Media\n", CallerName));
+    DEBUG ((DEBUG_INIT, "%s: No Media\n", CallerName));
     return EFI_NO_MEDIA;
   }
 
@@ -299,18 +299,18 @@ EmuBlockIoReadWriteCommon (
   //
   BlockSize = Private->Media->BlockSize;
   if (BufferSize == 0) {
-    DEBUG ((EFI_D_INIT, "%s: Zero length read\n", CallerName));
+    DEBUG ((DEBUG_INIT, "%s: Zero length read\n", CallerName));
     return EFI_SUCCESS;
   }
 
   if ((BufferSize % BlockSize) != 0) {
-    DEBUG ((EFI_D_INIT, "%s: Invalid read size\n", CallerName));
+    DEBUG ((DEBUG_INIT, "%s: Invalid read size\n", CallerName));
     return EFI_BAD_BUFFER_SIZE;
   }
 
   LastBlock = Lba + (BufferSize / BlockSize) - 1;
   if (LastBlock > Private->Media->LastBlock) {
-    DEBUG ((EFI_D_INIT, "ReadBlocks: Attempted to read off end of device\n"));
+    DEBUG ((DEBUG_INIT, "ReadBlocks: Attempted to read off end of device\n"));
     return EFI_INVALID_PARAMETER;
   }
   //
@@ -320,7 +320,7 @@ EmuBlockIoReadWriteCommon (
   Status = SetFilePointer64 (Private, DistanceToMove, &DistanceMoved, SEEK_SET);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INIT, "WriteBlocks: SetFilePointer failed\n"));
+    DEBUG ((DEBUG_INIT, "WriteBlocks: SetFilePointer failed\n"));
     return EmuBlockIoError (Private);
   }
 
@@ -384,7 +384,7 @@ EmuBlockIoReadBlocks (
 
   len = read (Private->fd, Buffer, BufferSize);
   if (len != BufferSize) {
-    DEBUG ((EFI_D_INIT, "ReadBlocks: ReadFile failed.\n"));
+    DEBUG ((DEBUG_INIT, "ReadBlocks: ReadFile failed.\n"));
     Status = EmuBlockIoError (Private);
     goto Done;
   }
@@ -462,7 +462,7 @@ EmuBlockIoWriteBlocks (
 
   len = write (Private->fd, Buffer, BufferSize);
   if (len != BufferSize) {
-    DEBUG ((EFI_D_INIT, "ReadBlocks: WriteFile failed.\n"));
+    DEBUG ((DEBUG_INIT, "ReadBlocks: WriteFile failed.\n"));
     Status = EmuBlockIoError (Private);
     goto Done;
   }
@@ -698,5 +698,3 @@ EMU_IO_THUNK_PROTOCOL gBlockIoThunkIo = {
   GasketBlockIoThunkClose,
   NULL
 };
-
-
