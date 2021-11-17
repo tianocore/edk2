@@ -501,7 +501,7 @@ TcpCloneTcb (
 
   Clone->Sk = SockClone (Tcb->Sk);
   if (Clone->Sk == NULL) {
-    DEBUG ((EFI_D_ERROR, "TcpCloneTcb: failed to clone a sock\n"));
+    DEBUG ((DEBUG_ERROR, "TcpCloneTcb: failed to clone a sock\n"));
     FreePool (Clone);
     return NULL;
   }
@@ -608,7 +608,7 @@ TcpSetState (
   ASSERT (State < (sizeof (mTcpStateName) / sizeof (CHAR16 *)));
 
   DEBUG (
-    (EFI_D_NET,
+    (DEBUG_NET,
     "Tcb (%p) state %s --> %s\n",
     Tcb,
     mTcpStateName[Tcb->State],
@@ -757,7 +757,7 @@ TcpOnAppClose (
   if (!IsListEmpty (&Tcb->RcvQue) || GET_RCV_DATASIZE (Tcb->Sk) != 0) {
 
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "TcpOnAppClose: connection reset because data is lost for TCB %p\n",
       Tcb)
       );
@@ -857,7 +857,7 @@ TcpOnAppConsume (
       if (TcpOld < Tcb->RcvMss) {
 
         DEBUG (
-          (EFI_D_NET,
+          (DEBUG_NET,
           "TcpOnAppConsume: send a window update for a window closed Tcb %p\n",
           Tcb)
           );
@@ -866,7 +866,7 @@ TcpOnAppConsume (
       } else if (Tcb->DelayedAck == 0) {
 
         DEBUG (
-          (EFI_D_NET,
+          (DEBUG_NET,
           "TcpOnAppConsume: scheduled a delayed ACK to update window for Tcb %p\n",
           Tcb)
           );
@@ -895,7 +895,7 @@ TcpOnAppAbort (
   )
 {
   DEBUG (
-    (EFI_D_WARN,
+    (DEBUG_WARN,
     "TcpOnAppAbort: connection reset issued by application for TCB %p\n",
     Tcb)
     );
@@ -1039,4 +1039,3 @@ TcpInstallDevicePath (
 
   return Status;
 }
-

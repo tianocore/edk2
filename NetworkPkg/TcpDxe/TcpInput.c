@@ -68,7 +68,7 @@ TcpFastRecover (
     Tcb->CWnd = Tcb->Ssthresh + 3 * Tcb->SndMss;
 
     DEBUG (
-      (EFI_D_NET,
+      (DEBUG_NET,
       "TcpFastRecover: enter fast retransmission for TCB %p, recover point is %d\n",
       Tcb,
       Tcb->Recover)
@@ -91,7 +91,7 @@ TcpFastRecover (
     //
     Tcb->CWnd += Tcb->SndMss;
     DEBUG (
-      (EFI_D_NET,
+      (DEBUG_NET,
       "TcpFastRecover: received another duplicated ACK (%d) for TCB %p\n",
       Seg->Ack,
       Tcb)
@@ -115,7 +115,7 @@ TcpFastRecover (
 
       Tcb->CongestState = TCP_CONGEST_OPEN;
       DEBUG (
-        (EFI_D_NET,
+        (DEBUG_NET,
         "TcpFastRecover: received a full ACK(%d) for TCB %p, exit fast recovery\n",
         Seg->Ack,
         Tcb)
@@ -144,7 +144,7 @@ TcpFastRecover (
       Tcb->CWnd -= Acked;
 
       DEBUG (
-        (EFI_D_NET,
+        (DEBUG_NET,
         "TcpFastRecover: received a partial ACK(%d) for TCB %p\n",
         Seg->Ack,
         Tcb)
@@ -182,7 +182,7 @@ TcpFastLossRecover (
       Tcb->CongestState = TCP_CONGEST_OPEN;
 
       DEBUG (
-        (EFI_D_NET,
+        (DEBUG_NET,
         "TcpFastLossRecover: received a full ACK(%d) for TCB %p\n",
         Seg->Ack,
         Tcb)
@@ -196,7 +196,7 @@ TcpFastLossRecover (
       //
       TcpRetransmit (Tcb, Seg->Ack);
       DEBUG (
-        (EFI_D_NET,
+        (DEBUG_NET,
         "TcpFastLossRecover: received a partial ACK(%d) for TCB %p\n",
         Seg->Ack,
         Tcb)
@@ -258,7 +258,7 @@ TcpComputeRtt (
   }
 
   DEBUG (
-    (EFI_D_NET,
+    (DEBUG_NET,
     "TcpComputeRtt: new RTT for TCB %p computed SRTT: %d RTTVAR: %d RTO: %d\n",
     Tcb,
     Tcb->SRtt,
@@ -423,7 +423,7 @@ TcpDeliverData (
 
     if (TcpVerifySegment (Nbuf) == 0) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "TcpToSendData: discard a broken segment for TCB %p\n",
         Tcb)
         );
@@ -454,7 +454,7 @@ TcpDeliverData (
       //
       if (!IsListEmpty (&Tcb->RcvQue)) {
         DEBUG (
-          (EFI_D_ERROR,
+          (DEBUG_ERROR,
           "TcpDeliverData: data received after FIN from peer of TCB %p, reset connection\n",
           Tcb)
           );
@@ -464,7 +464,7 @@ TcpDeliverData (
       }
 
       DEBUG (
-        (EFI_D_NET,
+        (DEBUG_NET,
         "TcpDeliverData: processing FIN from peer of TCB %p\n",
         Tcb)
         );
@@ -498,7 +498,7 @@ TcpDeliverData (
         } else {
 
           DEBUG (
-            (EFI_D_WARN,
+            (DEBUG_WARN,
             "Connection closed immediately because app disables TIME_WAIT timer for %p\n",
             Tcb)
             );
@@ -771,7 +771,7 @@ TcpInput (
   ASSERT (Head != NULL);
 
   if (Nbuf->TotalSize < sizeof (TCP_HEAD)) {
-    DEBUG ((EFI_D_NET, "TcpInput: received a malformed packet\n"));
+    DEBUG ((DEBUG_NET, "TcpInput: received a malformed packet\n"));
     goto DISCARD;
   }
 
@@ -779,7 +779,7 @@ TcpInput (
 
   if ((Head->HeadLen < 5) || (Len < 0)) {
 
-    DEBUG ((EFI_D_NET, "TcpInput: received a malformed packet\n"));
+    DEBUG ((DEBUG_NET, "TcpInput: received a malformed packet\n"));
 
     goto DISCARD;
   }
@@ -793,7 +793,7 @@ TcpInput (
   Checksum = TcpChecksum (Nbuf, Checksum);
 
   if (Checksum != 0) {
-    DEBUG ((EFI_D_ERROR, "TcpInput: received a checksum error packet\n"));
+    DEBUG ((DEBUG_ERROR, "TcpInput: received a checksum error packet\n"));
     goto DISCARD;
   }
 
@@ -815,7 +815,7 @@ TcpInput (
           );
 
   if ((Tcb == NULL) || (Tcb->State == TCP_CLOSED)) {
-    DEBUG ((EFI_D_NET, "TcpInput: send reset because no TCB found\n"));
+    DEBUG ((DEBUG_NET, "TcpInput: send reset because no TCB found\n"));
 
     Tcb = NULL;
     goto SEND_RESET;
@@ -829,7 +829,7 @@ TcpInput (
   //
   if (TcpParseOption (Nbuf->Tcp, &Option) == -1) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "TcpInput: reset the peer because of malformed option for TCB %p\n",
       Tcb)
       );
@@ -852,7 +852,7 @@ TcpInput (
     //
     if (TCP_FLG_ON (Seg->Flag, TCP_FLG_RST)) {
       DEBUG (
-        (EFI_D_WARN,
+        (DEBUG_WARN,
         "TcpInput: discard a reset segment for TCB %p in listening\n",
         Tcb)
         );
@@ -866,7 +866,7 @@ TcpInput (
     //
     if (TCP_FLG_ON (Seg->Flag, TCP_FLG_ACK)) {
       DEBUG (
-        (EFI_D_WARN,
+        (DEBUG_WARN,
         "TcpInput: send reset because of segment with ACK for TCB %p in listening\n",
         Tcb)
         );
@@ -886,7 +886,7 @@ TcpInput (
       Tcb     = TcpCloneTcb (Parent);
       if (Tcb == NULL) {
         DEBUG (
-          (EFI_D_ERROR,
+          (DEBUG_ERROR,
           "TcpInput: discard a segment because failed to clone a child for TCB %p\n",
           Tcb)
           );
@@ -895,7 +895,7 @@ TcpInput (
       }
 
       DEBUG (
-        (EFI_D_NET,
+        (DEBUG_NET,
         "TcpInput: create a child for TCB %p in listening\n",
         Tcb)
         );
@@ -915,7 +915,7 @@ TcpInput (
       TcpSetTimer (Tcb, TCP_TIMER_CONNECT, Tcb->ConnectTimeout);
       if (TcpTrimInWnd (Tcb, Nbuf) == 0) {
         DEBUG (
-          (EFI_D_ERROR,
+          (DEBUG_ERROR,
           "TcpInput: discard a broken segment for TCB %p\n",
           Tcb)
           );
@@ -935,7 +935,7 @@ TcpInput (
     if (TCP_FLG_ON (Seg->Flag, TCP_FLG_ACK) && (Seg->Ack != Tcb->Iss + 1)) {
 
       DEBUG (
-        (EFI_D_WARN,
+        (DEBUG_WARN,
         "TcpInput: send reset because of wrong ACK received for TCB %p in SYN_SENT\n",
         Tcb)
         );
@@ -951,7 +951,7 @@ TcpInput (
       if (TCP_FLG_ON (Seg->Flag, TCP_FLG_ACK)) {
 
         DEBUG (
-          (EFI_D_WARN,
+          (DEBUG_WARN,
           "TcpInput: connection reset by peer for TCB %p in SYN_SENT\n",
           Tcb)
           );
@@ -961,7 +961,7 @@ TcpInput (
       } else {
 
         DEBUG (
-          (EFI_D_WARN,
+          (DEBUG_WARN,
           "TcpInput: discard a reset segment because of no ACK for TCB %p in SYN_SENT\n",
           Tcb)
           );
@@ -1005,7 +1005,7 @@ TcpInput (
 
         if (TcpTrimInWnd (Tcb, Nbuf) == 0) {
           DEBUG (
-            (EFI_D_ERROR,
+            (DEBUG_ERROR,
             "TcpInput: discard a broken segment for TCB %p\n",
             Tcb)
             );
@@ -1016,7 +1016,7 @@ TcpInput (
         TCP_SET_FLG (Tcb->CtrlFlag, TCP_CTRL_ACK_NOW);
 
         DEBUG (
-          (EFI_D_NET,
+          (DEBUG_NET,
           "TcpInput: connection established for TCB %p in SYN_SENT\n",
           Tcb)
           );
@@ -1032,7 +1032,7 @@ TcpInput (
 
         if (TcpAdjustSndQue (Tcb, Tcb->SndNxt) == 0 || TcpTrimInWnd (Tcb, Nbuf) == 0) {
           DEBUG (
-            (EFI_D_ERROR,
+            (DEBUG_ERROR,
             "TcpInput: discard a broken segment for TCB %p\n",
             Tcb)
             );
@@ -1041,7 +1041,7 @@ TcpInput (
         }
 
         DEBUG (
-          (EFI_D_WARN,
+          (DEBUG_WARN,
           "TcpInput: simultaneous open for TCB %p in SYN_SENT\n",
           Tcb)
           );
@@ -1070,7 +1070,7 @@ TcpInput (
   //
   if (TcpSeqAcceptable (Tcb, Seg) == 0) {
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "TcpInput: sequence acceptance test failed for segment of TCB %p\n",
       Tcb)
       );
@@ -1095,7 +1095,7 @@ TcpInput (
   //
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_RST)) {
 
-    DEBUG ((EFI_D_WARN, "TcpInput: connection reset for TCB %p\n", Tcb));
+    DEBUG ((DEBUG_WARN, "TcpInput: connection reset for TCB %p\n", Tcb));
 
     if (Tcb->State == TCP_SYN_RCVD) {
 
@@ -1126,7 +1126,7 @@ TcpInput (
   //
   if (TcpTrimInWnd (Tcb, Nbuf) == 0) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "TcpInput: discard a broken segment for TCB %p\n",
       Tcb)
       );
@@ -1144,7 +1144,7 @@ TcpInput (
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_SYN)) {
 
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "TcpInput: connection reset because received extra SYN for TCB %p\n",
       Tcb)
       );
@@ -1157,7 +1157,7 @@ TcpInput (
   //
   if (!TCP_FLG_ON (Seg->Flag, TCP_FLG_ACK)) {
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "TcpInput: segment discard because of no ACK for connected TCB %p\n",
       Tcb)
       );
@@ -1186,7 +1186,7 @@ TcpInput (
       TcpDeliverData (Tcb);
 
       DEBUG (
-        (EFI_D_NET,
+        (DEBUG_NET,
         "TcpInput: connection established for TCB %p in SYN_RCVD\n",
         Tcb)
         );
@@ -1196,7 +1196,7 @@ TcpInput (
       //
     } else {
       DEBUG (
-        (EFI_D_WARN,
+        (DEBUG_WARN,
         "TcpInput: send reset because of wrong ACK for TCB %p in SYN_RCVD\n",
         Tcb)
         );
@@ -1208,7 +1208,7 @@ TcpInput (
   if (TCP_SEQ_LT (Seg->Ack, Tcb->SndUna)) {
 
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "TcpInput: ignore the out-of-data ACK for connected TCB %p\n",
       Tcb)
       );
@@ -1218,7 +1218,7 @@ TcpInput (
   } else if (TCP_SEQ_GT (Seg->Ack, Tcb->SndNxt)) {
 
     DEBUG (
-      (EFI_D_WARN,
+      (DEBUG_WARN,
       "TcpInput: discard segment for future ACK for connected TCB %p\n",
       Tcb)
       );
@@ -1309,7 +1309,7 @@ TcpInput (
 
     if (TcpAdjustSndQue (Tcb, Seg->Ack) == 0) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "TcpInput: discard a broken segment for TCB %p\n",
         Tcb)
         );
@@ -1347,7 +1347,7 @@ TcpInput (
       }
 
       DEBUG (
-        (EFI_D_WARN,
+        (DEBUG_WARN,
         "TcpInput: peer shrinks the window for connected TCB %p\n",
         Tcb)
         );
@@ -1375,14 +1375,14 @@ TcpInput (
         // 2^Rcv.Wind.Shift before moving the SndNxt to the left.
         //
         DEBUG (
-          (EFI_D_WARN,
+          (DEBUG_WARN,
           "TcpInput: peer advise negative useable window for connected TCB %p\n",
           Tcb)
           );
         Usable = TCP_SUB_SEQ (Tcb->SndNxt, Right);
         if ((Usable >> Tcb->SndWndScale) > 0) {
           DEBUG (
-            (EFI_D_WARN,
+            (DEBUG_WARN,
             "TcpInput: SndNxt is out of window by more than window scale for TCB %p\n",
             Tcb)
             );
@@ -1409,7 +1409,7 @@ NO_UPDATE:
   {
 
     DEBUG (
-      (EFI_D_NET,
+      (DEBUG_NET,
       "TcpInput: local FIN is ACKed by peer for connected TCB %p\n",
       Tcb)
       );
@@ -1452,7 +1452,7 @@ NO_UPDATE:
       } else {
 
         DEBUG (
-          (EFI_D_WARN,
+          (DEBUG_WARN,
           "Connection closed immediately because app disables TIME_WAIT timer for %p\n",
           Tcb)
           );
@@ -1481,7 +1481,7 @@ NO_UPDATE:
     } else {
 
       DEBUG (
-        (EFI_D_WARN,
+        (DEBUG_WARN,
         "Connection closed immediately because app disables TIME_WAIT timer for %p\n",
         Tcb)
         );
@@ -1505,7 +1505,7 @@ StepSix:
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_URG) && !TCP_FIN_RCVD (Tcb->State)) {
 
     DEBUG (
-      (EFI_D_NET,
+      (DEBUG_NET,
       "TcpInput: received urgent data from peer for connected TCB %p\n",
       Tcb)
       );
@@ -1531,7 +1531,7 @@ StepSix:
     if (TCP_FIN_RCVD (Tcb->State)) {
 
       DEBUG (
-        (EFI_D_WARN,
+        (DEBUG_WARN,
         "TcpInput: connection reset because data is lost for connected TCB %p\n",
         Tcb)
         );
@@ -1541,7 +1541,7 @@ StepSix:
 
     if (TCP_LOCAL_CLOSED (Tcb->State) && (Nbuf->TotalSize != 0)) {
       DEBUG (
-        (EFI_D_WARN,
+        (DEBUG_WARN,
         "TcpInput: connection reset because data is lost for connected TCB %p\n",
         Tcb)
         );
@@ -1551,7 +1551,7 @@ StepSix:
 
     if (TcpQueueData (Tcb, Nbuf) == 0) {
       DEBUG (
-        (EFI_D_ERROR,
+        (DEBUG_ERROR,
         "TcpInput: discard a broken segment for TCB %p\n",
         Tcb)
         );
@@ -1615,7 +1615,7 @@ DISCARD:
   //
   // Tcb is a child of Parent, and it doesn't survive
   //
-  DEBUG ((EFI_D_WARN, "TcpInput: Discard a packet\n"));
+  DEBUG ((DEBUG_WARN, "TcpInput: Discard a packet\n"));
   NetbufFree (Nbuf);
 
   if ((Parent != NULL) && (Tcb != NULL)) {

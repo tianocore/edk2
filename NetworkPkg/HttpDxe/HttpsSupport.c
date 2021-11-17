@@ -680,7 +680,7 @@ TlsConfigureSession (
   //
   Status = TlsConfigCipherList (HttpInstance);
   if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
-    DEBUG ((EFI_D_ERROR, "TlsConfigCipherList: return %r error.\n", Status));
+    DEBUG ((DEBUG_ERROR, "TlsConfigCipherList: return %r error.\n", Status));
     return Status;
   }
 
@@ -689,7 +689,7 @@ TlsConfigureSession (
   //
   Status = TlsConfigCertificate (HttpInstance);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TLS Certificate Config Error!\n"));
+    DEBUG ((DEBUG_ERROR, "TLS Certificate Config Error!\n"));
     return Status;
   }
 
@@ -1874,7 +1874,7 @@ HttpsReceive (
     FreePool (GetSessionDataBuffer);
 
     if(HttpInstance->TlsSessionState == EfiTlsSessionError) {
-      DEBUG ((EFI_D_ERROR, "TLS Session State Error!\n"));
+      DEBUG ((DEBUG_ERROR, "TLS Session State Error!\n"));
       return EFI_ABORTED;
     }
 
@@ -1887,4 +1887,3 @@ HttpsReceive (
 
   return Status;
 }
-
