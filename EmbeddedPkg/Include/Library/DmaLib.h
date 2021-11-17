@@ -51,9 +51,6 @@ typedef enum {
   MapOperationMaximum
 } DMA_MAP_OPERATION;
 
-
-
-
 /**
   Provides the DMA controller-specific addresses needed to access system memory.
 
@@ -84,9 +81,6 @@ DmaMap (
   OUT    VOID                           **Mapping
   );
 
-
-
-
 /**
   Completes the DmaMapBusMasterRead, DmaMapBusMasterWrite, or DmaMapBusMasterCommonBuffer
   operation and releases any corresponding resources.
@@ -102,7 +96,6 @@ EFIAPI
 DmaUnmap (
   IN  VOID                         *Mapping
   );
-
 
 /**
   Allocates pages that are suitable for an DmaMap() of type MapOperationBusMasterCommonBuffer.
@@ -129,7 +122,6 @@ DmaAllocateBuffer (
   OUT VOID                         **HostAddress
   );
 
-
 /**
   Frees memory that was allocated with DmaAllocateBuffer().
 
@@ -147,7 +139,6 @@ DmaFreeBuffer (
   IN  UINTN                        Pages,
   IN  VOID                         *HostAddress
   );
-
 
 /**
   Allocates pages that are suitable for an DmaMap() of type
@@ -176,6 +167,5 @@ DmaAllocateAlignedBuffer (
   IN  UINTN                        Alignment,
   OUT VOID                         **HostAddress
   );
-
 
 #endif

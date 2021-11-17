@@ -115,7 +115,7 @@ NonCoherentIoMmuMap (
   OUT    VOID                                       **Mapping
   )
 {
-  DMA_MAP_OPERATION     DmaOperation;
+  DMA_MAP_OPERATION  DmaOperation;
 
   switch (Operation) {
     case EdkiiIoMmuOperationBusMasterRead:
@@ -138,8 +138,13 @@ NonCoherentIoMmuMap (
       return EFI_INVALID_PARAMETER;
   }
 
-  return DmaMap (DmaOperation, HostAddress, NumberOfBytes,
-           DeviceAddress, Mapping);
+  return DmaMap (
+           DmaOperation,
+           HostAddress,
+           NumberOfBytes,
+           DeviceAddress,
+           Mapping
+           );
 }
 
 /**
@@ -236,7 +241,6 @@ STATIC EDKII_IOMMU_PROTOCOL  mNonCoherentIoMmuOps = {
   NonCoherentIoMmuFreeBuffer,
 };
 
-
 EFI_STATUS
 EFIAPI
 NonCoherentIoMmuDxeEntryPoint (
@@ -244,7 +248,10 @@ NonCoherentIoMmuDxeEntryPoint (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  return gBS->InstallMultipleProtocolInterfaces (&ImageHandle,
-                &gEdkiiIoMmuProtocolGuid, &mNonCoherentIoMmuOps,
-                NULL);
+  return gBS->InstallMultipleProtocolInterfaces (
+                &ImageHandle,
+                &gEdkiiIoMmuProtocolGuid,
+                &mNonCoherentIoMmuOps,
+                NULL
+                );
 }

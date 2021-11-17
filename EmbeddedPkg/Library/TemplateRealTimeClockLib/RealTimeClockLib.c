@@ -15,7 +15,6 @@
 #include <Library/IoLib.h>
 #include <Library/RealTimeClockLib.h>
 
-
 /**
   Returns the current time and date information, and the time-keeping capabilities
   of the hardware platform.
@@ -42,7 +41,6 @@ LibGetTime (
   return EFI_DEVICE_ERROR;
 }
 
-
 /**
   Sets the current local time and date information.
 
@@ -64,7 +62,6 @@ LibSetTime (
   //
   return EFI_DEVICE_ERROR;
 }
-
 
 /**
   Returns the current wakeup alarm clock setting.
@@ -90,7 +87,6 @@ LibGetWakeupTime (
   return EFI_UNSUPPORTED;
 }
 
-
 /**
   Sets the system wakeup alarm clock time.
 
@@ -115,8 +111,6 @@ LibSetWakeupTime (
   return EFI_UNSUPPORTED;
 }
 
-
-
 /**
   This is the declaration of an EFI image entry point. This can be the entry point to an application
   written to this specification, an EFI boot service driver, or an EFI runtime driver.
@@ -139,7 +133,6 @@ LibRtcInitialize (
   //
   return EFI_SUCCESS;
 }
-
 
 /**
   Fixup internal data so that EFI can be call in virtual mode.
@@ -164,6 +157,3 @@ LibRtcVirtualNotifyEvent (
   //
   return;
 }
-
-
-

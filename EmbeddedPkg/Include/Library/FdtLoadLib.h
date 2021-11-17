@@ -21,7 +21,7 @@
 **/
 EFI_STATUS
 InstallFdtFromSemihosting (
-  IN  CONST CHAR16*   FileName
+  IN  CONST CHAR16 *FileName
   );
 
 /**

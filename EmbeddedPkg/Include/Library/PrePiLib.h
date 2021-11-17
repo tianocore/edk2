@@ -31,7 +31,6 @@ FfsFindNextVolume (
   IN OUT EFI_PEI_FV_HANDLE          *VolumeHandle
   );
 
-
 /**
   This service enables discovery of additional firmware files.
 
@@ -53,7 +52,6 @@ FfsFindNextFile (
   IN OUT EFI_PEI_FILE_HANDLE    *FileHandle
   );
 
-
 /**
   This service enables discovery sections of a given type within a valid FFS file.
 
@@ -73,7 +71,6 @@ FfsFindSectionData (
   IN EFI_PEI_FILE_HANDLE        FileHandle,
   OUT VOID                      **SectionData
   );
-
 
 /**
   Find a file in the volume by name
@@ -101,7 +98,6 @@ FfsFindFileByName (
   OUT       EFI_PEI_FILE_HANDLE *FileHandle
   );
 
-
 /**
   Get information about the file by name.
 
@@ -124,7 +120,6 @@ FfsGetFileInfo (
   IN CONST  EFI_PEI_FILE_HANDLE   FileHandle,
   OUT EFI_FV_FILE_INFO            *FileInfo
   );
-
 
 /**
   Get Information about the volume by name
@@ -149,8 +144,6 @@ FfsGetVolumeInfo (
   OUT EFI_FV_INFO             *VolumeInfo
   );
 
-
-
 /**
   Get Fv image from the FV type file, then add FV & FV2 Hob.
 
@@ -165,7 +158,6 @@ EFIAPI
 FfsProcessFvFile (
   IN  EFI_PEI_FILE_HANDLE   FvFileHandle
   );
-
 
 /**
   Search through every FV until you find a file of type FileType
@@ -186,7 +178,6 @@ FfsAnyFvFindFirstFile (
   OUT EFI_PEI_FILE_HANDLE   *FileHandle
   );
 
-
 /**
   Get Fv image from the FV type file, then add FV & FV2 Hob.
 
@@ -203,7 +194,6 @@ FfsProcessFvFile (
   IN  EFI_PEI_FILE_HANDLE   FvFileHandle
   );
 
-
 /**
   This service enables PEIMs to ascertain the present value of the boot mode.
 
@@ -216,7 +206,6 @@ EFIAPI
 GetBootMode (
   VOID
   );
-
 
 /**
   This service enables PEIMs to update the boot mode variable.
@@ -247,7 +236,6 @@ GetHobList (
   VOID
   );
 
-
 /**
   Updates the pointer to the HOB list.
 
@@ -260,7 +248,7 @@ SetHobList (
   IN  VOID      *HobList
   );
 
-EFI_HOB_HANDOFF_INFO_TABLE*
+EFI_HOB_HANDOFF_INFO_TABLE *
 HobConstructor (
   IN VOID   *EfiMemoryBegin,
   IN UINTN  EfiMemoryLength,
@@ -283,7 +271,6 @@ CreateHob (
   IN  UINT16    HobType,
   IN  UINT16    HobLenght
   );
-
 
 /**
   Returns the next instance of a HOB type from the starting HOB.
@@ -370,7 +357,6 @@ EFIAPI
 GetFirstGuidHob (
   IN CONST EFI_GUID         *Guid
   );
-
 
 /**
   Builds a HOB for a loaded PE32 module.
@@ -511,7 +497,6 @@ BuildFvHobs (
   IN EFI_RESOURCE_ATTRIBUTE_TYPE  *ResourceAttribute  OPTIONAL
   );
 
-
 /**
   Builds a EFI_HOB_TYPE_FV2 HOB.
 
@@ -605,7 +590,6 @@ UpdateStackHob (
   IN UINT64                      Length
   );
 
-
 /**
   Builds a HOB for the BSP store.
 
@@ -648,7 +632,6 @@ BuildMemoryAllocationHob (
   IN EFI_MEMORY_TYPE             MemoryType
   );
 
-
 VOID
 EFIAPI
 BuildExtractSectionHob (
@@ -662,7 +645,6 @@ EFIAPI
 BuildPeCoffLoaderHob (
   VOID
   );
-
 
 /**
   Allocates one or more 4KB pages of type EfiBootServicesData.
@@ -701,7 +683,6 @@ AllocatePool (
   IN UINTN  AllocationSize
   );
 
-
 /**
   Allocates one or more 4KB pages of type EfiBootServicesData at a specified alignment.
 
@@ -725,7 +706,6 @@ AllocateAlignedPages (
   IN UINTN  Alignment
   );
 
-
 EFI_STATUS
 EFIAPI
 LoadPeCoffImage (
@@ -745,7 +725,7 @@ LoadDxeCoreFromFfsFile (
 EFI_STATUS
 EFIAPI
 LoadDxeCoreFromFv (
-  IN UINTN  *FvInstance,   OPTIONAL
+  IN UINTN  *FvInstance, OPTIONAL
   IN UINTN  StackSize
   );
 

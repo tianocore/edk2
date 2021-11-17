@@ -26,12 +26,12 @@ EFI_HANDLE  mHandle = NULL;
 // variable instead.
 //
 typedef struct {
-  INT16           TimeZone;
-  UINT8           Daylight;
+  INT16    TimeZone;
+  UINT8    Daylight;
 } NON_VOLATILE_TIME_SETTINGS;
 
-STATIC CONST CHAR16 mTimeSettingsVariableName[] = L"RtcTimeSettings";
-STATIC NON_VOLATILE_TIME_SETTINGS mTimeSettings;
+STATIC CONST CHAR16                mTimeSettingsVariableName[] = L"RtcTimeSettings";
+STATIC NON_VOLATILE_TIME_SETTINGS  mTimeSettings;
 
 /**
   Returns the current time and date information, and the time-keeping capabilities
@@ -67,8 +67,6 @@ GetTime (
   return LibGetTime (Time, Capabilities);
 }
 
-
-
 /**
   Sets the current local time and date information.
 
@@ -85,20 +83,20 @@ SetTime (
   IN EFI_TIME                *Time
   )
 {
-  EFI_STATUS        Status;
-  BOOLEAN           TimeSettingsChanged;
+  EFI_STATUS  Status;
+  BOOLEAN     TimeSettingsChanged;
 
-  if (Time == NULL || !IsTimeValid (Time)) {
+  if ((Time == NULL) || !IsTimeValid (Time)) {
     return EFI_INVALID_PARAMETER;
   }
 
   TimeSettingsChanged = FALSE;
-  if (mTimeSettings.TimeZone != Time->TimeZone ||
-      mTimeSettings.Daylight != Time->Daylight) {
-
+  if ((mTimeSettings.TimeZone != Time->TimeZone) ||
+      (mTimeSettings.Daylight != Time->Daylight))
+  {
     mTimeSettings.TimeZone = Time->TimeZone;
     mTimeSettings.Daylight = Time->Daylight;
-    TimeSettingsChanged = TRUE;
+    TimeSettingsChanged    = TRUE;
   }
 
   Status = LibSetTime (Time);
@@ -114,14 +112,15 @@ SetTime (
                EFI_VARIABLE_BOOTSERVICE_ACCESS |
                EFI_VARIABLE_RUNTIME_ACCESS,
                sizeof (mTimeSettings),
-               (VOID *)&mTimeSettings);
+               (VOID *)&mTimeSettings
+               );
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
   }
+
   return EFI_SUCCESS;
 }
-
 
 /**
   Returns the current wakeup alarm clock setting.
@@ -143,7 +142,7 @@ GetWakeupTime (
   OUT EFI_TIME    *Time
   )
 {
-  if (Time == NULL || Enabled == NULL || Pending == NULL) {
+  if ((Time == NULL) || (Enabled == NULL) || (Pending == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -156,7 +155,6 @@ GetWakeupTime (
 
   return LibGetWakeupTime (Enabled, Pending, Time);
 }
-
 
 /**
   Sets the system wakeup alarm clock time.
@@ -180,8 +178,6 @@ SetWakeupTime (
 {
   return LibSetWakeupTime (Enabled, Time);
 }
-
-
 
 /**
   This is the declaration of an EFI image entry point. This can be the entry point to an application
@@ -208,21 +204,30 @@ InitializeRealTimeClock (
     return Status;
   }
 
-  Size = sizeof (mTimeSettings);
-  Status = EfiGetVariable ((CHAR16 *)mTimeSettingsVariableName,
-             &gEfiCallerIdGuid, NULL, &Size, (VOID *)&mTimeSettings);
+  Size   = sizeof (mTimeSettings);
+  Status = EfiGetVariable (
+             (CHAR16 *)mTimeSettingsVariableName,
+             &gEfiCallerIdGuid,
+             NULL,
+             &Size,
+             (VOID *)&mTimeSettings
+             );
   if (EFI_ERROR (Status) ||
       !IsValidTimeZone (mTimeSettings.TimeZone) ||
-      !IsValidDaylight (mTimeSettings.Daylight)) {
-    DEBUG ((DEBUG_WARN, "%a: using default timezone/daylight settings\n",
-      __FUNCTION__));
+      !IsValidDaylight (mTimeSettings.Daylight))
+  {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: using default timezone/daylight settings\n",
+      __FUNCTION__
+      ));
 
     mTimeSettings.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
     mTimeSettings.Daylight = 0;
   }
 
-  SystemTable->RuntimeServices->GetTime       = GetTime;
-  SystemTable->RuntimeServices->SetTime       = SetTime;
+  SystemTable->RuntimeServices->GetTime = GetTime;
+  SystemTable->RuntimeServices->SetTime = SetTime;
   SystemTable->RuntimeServices->GetWakeupTime = GetWakeupTime;
   SystemTable->RuntimeServices->SetWakeupTime = SetWakeupTime;
 
@@ -235,4 +240,3 @@ InitializeRealTimeClock (
 
   return Status;
 }
-
