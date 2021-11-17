@@ -126,7 +126,7 @@ CpuS3DataOnEndOfDxe (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  DEBUG ((EFI_D_VERBOSE, "%a\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a\n", __FUNCTION__));
   MtrrGetAllMtrrs (&AcpiCpuDataEx->MtrrTable);
 
   //
