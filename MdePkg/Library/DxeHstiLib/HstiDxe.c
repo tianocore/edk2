@@ -161,15 +161,15 @@ InternalHstiIsValidTable (
   // basic check for header
   //
   if (HstiData == NULL) {
-    DEBUG ((EFI_D_ERROR, "HstiData == NULL\n"));
+    DEBUG ((DEBUG_ERROR, "HstiData == NULL\n"));
     return FALSE;
   }
   if (HstiSize < sizeof(ADAPTER_INFO_PLATFORM_SECURITY)) {
-    DEBUG ((EFI_D_ERROR, "HstiSize < sizeof(ADAPTER_INFO_PLATFORM_SECURITY)\n"));
+    DEBUG ((DEBUG_ERROR, "HstiSize < sizeof(ADAPTER_INFO_PLATFORM_SECURITY)\n"));
     return FALSE;
   }
   if (((HstiSize - sizeof(ADAPTER_INFO_PLATFORM_SECURITY)) / 3) < Hsti->SecurityFeaturesSize) {
-    DEBUG ((EFI_D_ERROR, "((HstiSize - sizeof(ADAPTER_INFO_PLATFORM_SECURITY)) / 3) < SecurityFeaturesSize\n"));
+    DEBUG ((DEBUG_ERROR, "((HstiSize - sizeof(ADAPTER_INFO_PLATFORM_SECURITY)) / 3) < SecurityFeaturesSize\n"));
     return FALSE;
   }
 
@@ -177,7 +177,7 @@ InternalHstiIsValidTable (
   // Check Version
   //
   if (Hsti->Version != PLATFORM_SECURITY_VERSION_VNEXTCS) {
-    DEBUG ((EFI_D_ERROR, "Version != PLATFORM_SECURITY_VERSION_VNEXTCS\n"));
+    DEBUG ((DEBUG_ERROR, "Version != PLATFORM_SECURITY_VERSION_VNEXTCS\n"));
     return FALSE;
   }
 
@@ -186,8 +186,8 @@ InternalHstiIsValidTable (
   //
   if ((Hsti->Role < PLATFORM_SECURITY_ROLE_PLATFORM_REFERENCE) ||
       (Hsti->Role > PLATFORM_SECURITY_ROLE_IMPLEMENTOR_ODM)) {
-    DEBUG ((EFI_D_ERROR, "Role < PLATFORM_SECURITY_ROLE_PLATFORM_REFERENCE ||\n"));
-    DEBUG ((EFI_D_ERROR, "Role > PLATFORM_SECURITY_ROLE_IMPLEMENTOR_ODM\n"));
+    DEBUG ((DEBUG_ERROR, "Role < PLATFORM_SECURITY_ROLE_PLATFORM_REFERENCE ||\n"));
+    DEBUG ((DEBUG_ERROR, "Role > PLATFORM_SECURITY_ROLE_IMPLEMENTOR_ODM\n"));
     return FALSE;
   }
 
@@ -200,7 +200,7 @@ InternalHstiIsValidTable (
     }
   }
   if (Index == sizeof(Hsti->ImplementationID)/sizeof(Hsti->ImplementationID[0])) {
-    DEBUG ((EFI_D_ERROR, "ImplementationID has no NUL CHAR\n"));
+    DEBUG ((DEBUG_ERROR, "ImplementationID has no NUL CHAR\n"));
     return FALSE;
   }
 
@@ -211,11 +211,11 @@ InternalHstiIsValidTable (
   // basic check for ErrorString
   //
   if (ErrorStringSize == 0) {
-    DEBUG ((EFI_D_ERROR, "ErrorStringSize == 0\n"));
+    DEBUG ((DEBUG_ERROR, "ErrorStringSize == 0\n"));
     return FALSE;
   }
   if ((ErrorStringSize & BIT0) != 0) {
-    DEBUG ((EFI_D_ERROR, "(ErrorStringSize & BIT0) != 0\n"));
+    DEBUG ((DEBUG_ERROR, "(ErrorStringSize & BIT0) != 0\n"));
     return FALSE;
   }
 
@@ -232,11 +232,11 @@ InternalHstiIsValidTable (
   // check the length of ErrorString
   //
   if (ErrorChar != 0) {
-    DEBUG ((EFI_D_ERROR, "ErrorString has no NUL CHAR\n"));
+    DEBUG ((DEBUG_ERROR, "ErrorString has no NUL CHAR\n"));
     return FALSE;
   }
   if (ErrorStringLength == (ErrorStringSize/2)) {
-    DEBUG ((EFI_D_ERROR, "ErrorString Length incorrect\n"));
+    DEBUG ((DEBUG_ERROR, "ErrorString Length incorrect\n"));
     return FALSE;
   }
 
