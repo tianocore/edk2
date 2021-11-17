@@ -42,10 +42,12 @@ TpmMeasurementGetFvName (
   if (FvBase >= MAX_ADDRESS) {
     return NULL;
   }
+
   if (FvLength >= MAX_ADDRESS - FvBase) {
     return NULL;
   }
-  if (FvLength < sizeof(EFI_FIRMWARE_VOLUME_HEADER)) {
+
+  if (FvLength < sizeof (EFI_FIRMWARE_VOLUME_HEADER)) {
     return NULL;
   }
 
@@ -53,12 +55,15 @@ TpmMeasurementGetFvName (
   if (FvHeader->Signature != EFI_FVH_SIGNATURE) {
     return NULL;
   }
-  if (FvHeader->ExtHeaderOffset < sizeof(EFI_FIRMWARE_VOLUME_HEADER)) {
+
+  if (FvHeader->ExtHeaderOffset < sizeof (EFI_FIRMWARE_VOLUME_HEADER)) {
     return NULL;
   }
-  if (FvHeader->ExtHeaderOffset + sizeof(EFI_FIRMWARE_VOLUME_EXT_HEADER) > FvLength) {
+
+  if (FvHeader->ExtHeaderOffset + sizeof (EFI_FIRMWARE_VOLUME_EXT_HEADER) > FvLength) {
     return NULL;
   }
+
   FvExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *)(UINTN)(FvBase + FvHeader->ExtHeaderOffset);
 
   return &FvExtHeader->FvName;
@@ -86,38 +91,39 @@ MeasureFirmwareBlob (
   IN UINT64                         FirmwareBlobLength
   )
 {
-  EFI_PLATFORM_FIRMWARE_BLOB        FvBlob;
-  PLATFORM_FIRMWARE_BLOB2_STRUCT    FvBlob2;
-  VOID                              *FvName;
-  UINT32                            EventType;
-  VOID                              *EventLog;
-  UINT32                            EventLogSize;
-  EFI_STATUS                        Status;
+  EFI_PLATFORM_FIRMWARE_BLOB      FvBlob;
+  PLATFORM_FIRMWARE_BLOB2_STRUCT  FvBlob2;
+  VOID                            *FvName;
+  UINT32                          EventType;
+  VOID                            *EventLog;
+  UINT32                          EventLogSize;
+  EFI_STATUS                      Status;
 
   FvName = TpmMeasurementGetFvName (FirmwareBlobBase, FirmwareBlobLength);
 
   if (((Description != NULL) || (FvName != NULL)) &&
-      (PcdGet32(PcdTcgPfpMeasurementRevision) >= TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2_REV_105)) {
+      (PcdGet32 (PcdTcgPfpMeasurementRevision) >= TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2_REV_105))
+  {
     if (Description != NULL) {
-      AsciiSPrint((CHAR8*)FvBlob2.BlobDescription, sizeof(FvBlob2.BlobDescription), "%a", Description);
+      AsciiSPrint ((CHAR8 *)FvBlob2.BlobDescription, sizeof (FvBlob2.BlobDescription), "%a", Description);
     } else {
-      AsciiSPrint((CHAR8*)FvBlob2.BlobDescription, sizeof(FvBlob2.BlobDescription), "Fv(%g)", FvName);
+      AsciiSPrint ((CHAR8 *)FvBlob2.BlobDescription, sizeof (FvBlob2.BlobDescription), "Fv(%g)", FvName);
     }
 
-    FvBlob2.BlobDescriptionSize = sizeof(FvBlob2.BlobDescription);
-    FvBlob2.BlobBase = FirmwareBlobBase;
+    FvBlob2.BlobDescriptionSize = sizeof (FvBlob2.BlobDescription);
+    FvBlob2.BlobBase   = FirmwareBlobBase;
     FvBlob2.BlobLength = FirmwareBlobLength;
 
-    EventType = EV_EFI_PLATFORM_FIRMWARE_BLOB2;
-    EventLog = &FvBlob2;
-    EventLogSize = sizeof(FvBlob2);
+    EventType    = EV_EFI_PLATFORM_FIRMWARE_BLOB2;
+    EventLog     = &FvBlob2;
+    EventLogSize = sizeof (FvBlob2);
   } else {
-    FvBlob.BlobBase = FirmwareBlobBase;
+    FvBlob.BlobBase   = FirmwareBlobBase;
     FvBlob.BlobLength = FirmwareBlobLength;
 
-    EventType = EV_EFI_PLATFORM_FIRMWARE_BLOB;
-    EventLog = &FvBlob;
-    EventLogSize = sizeof(FvBlob);
+    EventType    = EV_EFI_PLATFORM_FIRMWARE_BLOB;
+    EventLog     = &FvBlob;
+    EventLogSize = sizeof (FvBlob);
   }
 
   Status = TpmMeasureAndLogData (
@@ -125,7 +131,7 @@ MeasureFirmwareBlob (
              EventType,
              EventLog,
              EventLogSize,
-             (VOID*)(UINTN)FirmwareBlobBase,
+             (VOID *)(UINTN)FirmwareBlobBase,
              FirmwareBlobLength
              );
 
@@ -156,33 +162,34 @@ MeasureHandoffTable (
   IN UINTN                          TableLength
   )
 {
-  EFI_HANDOFF_TABLE_POINTERS        HandoffTables;
-  HANDOFF_TABLE_POINTERS2_STRUCT    HandoffTables2;
-  UINT32                            EventType;
-  VOID                              *EventLog;
-  UINT32                            EventLogSize;
-  EFI_STATUS                        Status;
+  EFI_HANDOFF_TABLE_POINTERS      HandoffTables;
+  HANDOFF_TABLE_POINTERS2_STRUCT  HandoffTables2;
+  UINT32                          EventType;
+  VOID                            *EventLog;
+  UINT32                          EventLogSize;
+  EFI_STATUS                      Status;
 
   if ((Description != NULL) &&
-      (PcdGet32(PcdTcgPfpMeasurementRevision) >= TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2_REV_105)) {
-    AsciiSPrint((CHAR8*)HandoffTables2.TableDescription, sizeof(HandoffTables2.TableDescription), "%a", Description);
+      (PcdGet32 (PcdTcgPfpMeasurementRevision) >= TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2_REV_105))
+  {
+    AsciiSPrint ((CHAR8 *)HandoffTables2.TableDescription, sizeof (HandoffTables2.TableDescription), "%a", Description);
 
-    HandoffTables2.TableDescriptionSize = sizeof(HandoffTables2.TableDescription);
+    HandoffTables2.TableDescriptionSize = sizeof (HandoffTables2.TableDescription);
     HandoffTables2.NumberOfTables = 1;
     CopyGuid (&(HandoffTables2.TableEntry[0].VendorGuid), TableGuid);
     HandoffTables2.TableEntry[0].VendorTable = TableAddress;
 
-    EventType = EV_EFI_HANDOFF_TABLES2;
-    EventLog = &HandoffTables2;
-    EventLogSize = sizeof(HandoffTables2);
+    EventType    = EV_EFI_HANDOFF_TABLES2;
+    EventLog     = &HandoffTables2;
+    EventLogSize = sizeof (HandoffTables2);
   } else {
     HandoffTables.NumberOfTables = 1;
     CopyGuid (&(HandoffTables.TableEntry[0].VendorGuid), TableGuid);
     HandoffTables.TableEntry[0].VendorTable = TableAddress;
 
-    EventType = EV_EFI_HANDOFF_TABLES;
-    EventLog = &HandoffTables;
-    EventLogSize = sizeof(HandoffTables);
+    EventType    = EV_EFI_HANDOFF_TABLES;
+    EventLog     = &HandoffTables;
+    EventLogSize = sizeof (HandoffTables);
   }
 
   Status = TpmMeasureAndLogData (

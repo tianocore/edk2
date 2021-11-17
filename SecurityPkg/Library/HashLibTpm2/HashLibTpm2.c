@@ -17,15 +17,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 
 typedef struct {
-  TPM_ALG_ID AlgoId;
-  UINT32     Mask;
+  TPM_ALG_ID    AlgoId;
+  UINT32        Mask;
 } TPM2_HASH_MASK;
 
-TPM2_HASH_MASK mTpm2HashMask[] = {
-  {TPM_ALG_SHA1,         HASH_ALG_SHA1},
-  {TPM_ALG_SHA256,       HASH_ALG_SHA256},
-  {TPM_ALG_SHA384,       HASH_ALG_SHA384},
-  {TPM_ALG_SHA512,       HASH_ALG_SHA512},
+TPM2_HASH_MASK  mTpm2HashMask[] = {
+  { TPM_ALG_SHA1,   HASH_ALG_SHA1   },
+  { TPM_ALG_SHA256, HASH_ALG_SHA256 },
+  { TPM_ALG_SHA384, HASH_ALG_SHA384 },
+  { TPM_ALG_SHA512, HASH_ALG_SHA512 },
 };
 
 /**
@@ -38,11 +38,11 @@ Tpm2GetAlgoFromHashMask (
   VOID
   )
 {
-  UINT32 HashMask;
-  UINTN  Index;
+  UINT32  HashMask;
+  UINTN   Index;
 
   HashMask = PcdGet32 (PcdTpm2HashMask);
-  for (Index = 0; Index < sizeof(mTpm2HashMask)/sizeof(mTpm2HashMask[0]); Index++) {
+  for (Index = 0; Index < sizeof (mTpm2HashMask)/sizeof (mTpm2HashMask[0]); Index++) {
     if (mTpm2HashMask[Index].Mask == HashMask) {
       return mTpm2HashMask[Index].AlgoId;
     }
@@ -65,9 +65,9 @@ HashStart (
   OUT HASH_HANDLE    *HashHandle
   )
 {
-  TPMI_DH_OBJECT        SequenceHandle;
-  EFI_STATUS            Status;
-  TPM_ALG_ID            AlgoId;
+  TPMI_DH_OBJECT  SequenceHandle;
+  EFI_STATUS      Status;
+  TPM_ALG_ID      AlgoId;
 
   AlgoId = Tpm2GetAlgoFromHashMask ();
 
@@ -75,6 +75,7 @@ HashStart (
   if (!EFI_ERROR (Status)) {
     *HashHandle = (HASH_HANDLE)SequenceHandle;
   }
+
   return Status;
 }
 
@@ -95,20 +96,19 @@ HashUpdate (
   IN UINTN          DataToHashLen
   )
 {
-  UINT8            *Buffer;
-  UINT64           HashLen;
-  TPM2B_MAX_BUFFER HashBuffer;
-  EFI_STATUS       Status;
+  UINT8             *Buffer;
+  UINT64            HashLen;
+  TPM2B_MAX_BUFFER  HashBuffer;
+  EFI_STATUS        Status;
 
   Buffer = (UINT8 *)(UINTN)DataToHash;
-  for (HashLen = DataToHashLen; HashLen > sizeof(HashBuffer.buffer); HashLen -= sizeof(HashBuffer.buffer)) {
+  for (HashLen = DataToHashLen; HashLen > sizeof (HashBuffer.buffer); HashLen -= sizeof (HashBuffer.buffer)) {
+    HashBuffer.size = sizeof (HashBuffer.buffer);
+    CopyMem (HashBuffer.buffer, Buffer, sizeof (HashBuffer.buffer));
+    Buffer += sizeof (HashBuffer.buffer);
 
-    HashBuffer.size = sizeof(HashBuffer.buffer);
-    CopyMem(HashBuffer.buffer, Buffer, sizeof(HashBuffer.buffer));
-    Buffer += sizeof(HashBuffer.buffer);
-
-    Status = Tpm2SequenceUpdate((TPMI_DH_OBJECT)HashHandle, &HashBuffer);
-    if (EFI_ERROR(Status)) {
+    Status = Tpm2SequenceUpdate ((TPMI_DH_OBJECT)HashHandle, &HashBuffer);
+    if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
   }
@@ -117,9 +117,9 @@ HashUpdate (
   // Last one
   //
   HashBuffer.size = (UINT16)HashLen;
-  CopyMem(HashBuffer.buffer, Buffer, (UINTN)HashLen);
-  Status = Tpm2SequenceUpdate((TPMI_DH_OBJECT)HashHandle, &HashBuffer);
-  if (EFI_ERROR(Status)) {
+  CopyMem (HashBuffer.buffer, Buffer, (UINTN)HashLen);
+  Status = Tpm2SequenceUpdate ((TPMI_DH_OBJECT)HashHandle, &HashBuffer);
+  if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -147,24 +147,23 @@ HashCompleteAndExtend (
   OUT TPML_DIGEST_VALUES *DigestList
   )
 {
-  UINT8            *Buffer;
-  UINT64           HashLen;
-  TPM2B_MAX_BUFFER HashBuffer;
-  EFI_STATUS       Status;
-  TPM_ALG_ID       AlgoId;
-  TPM2B_DIGEST     Result;
+  UINT8             *Buffer;
+  UINT64            HashLen;
+  TPM2B_MAX_BUFFER  HashBuffer;
+  EFI_STATUS        Status;
+  TPM_ALG_ID        AlgoId;
+  TPM2B_DIGEST      Result;
 
   AlgoId = Tpm2GetAlgoFromHashMask ();
 
   Buffer = (UINT8 *)(UINTN)DataToHash;
-  for (HashLen = DataToHashLen; HashLen > sizeof(HashBuffer.buffer); HashLen -= sizeof(HashBuffer.buffer)) {
+  for (HashLen = DataToHashLen; HashLen > sizeof (HashBuffer.buffer); HashLen -= sizeof (HashBuffer.buffer)) {
+    HashBuffer.size = sizeof (HashBuffer.buffer);
+    CopyMem (HashBuffer.buffer, Buffer, sizeof (HashBuffer.buffer));
+    Buffer += sizeof (HashBuffer.buffer);
 
-    HashBuffer.size = sizeof(HashBuffer.buffer);
-    CopyMem(HashBuffer.buffer, Buffer, sizeof(HashBuffer.buffer));
-    Buffer += sizeof(HashBuffer.buffer);
-
-    Status = Tpm2SequenceUpdate((TPMI_DH_OBJECT)HashHandle, &HashBuffer);
-    if (EFI_ERROR(Status)) {
+    Status = Tpm2SequenceUpdate ((TPMI_DH_OBJECT)HashHandle, &HashBuffer);
+    if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
   }
@@ -173,9 +172,9 @@ HashCompleteAndExtend (
   // Last one
   //
   HashBuffer.size = (UINT16)HashLen;
-  CopyMem(HashBuffer.buffer, Buffer, (UINTN)HashLen);
+  CopyMem (HashBuffer.buffer, Buffer, (UINTN)HashLen);
 
-  ZeroMem(DigestList, sizeof(*DigestList));
+  ZeroMem (DigestList, sizeof (*DigestList));
   DigestList->count = HASH_COUNT;
 
   if (AlgoId == TPM_ALG_NULL) {
@@ -191,7 +190,7 @@ HashCompleteAndExtend (
                &HashBuffer,
                &Result
                );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
 
@@ -203,9 +202,11 @@ HashCompleteAndExtend (
                DigestList
                );
   }
-  if (EFI_ERROR(Status)) {
+
+  if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -228,55 +229,57 @@ HashAndExtend (
   OUT TPML_DIGEST_VALUES            *DigestList
   )
 {
-  EFI_STATUS         Status;
-  UINT8              *Buffer;
-  UINT64             HashLen;
-  TPMI_DH_OBJECT     SequenceHandle;
-  TPM2B_MAX_BUFFER   HashBuffer;
-  TPM_ALG_ID         AlgoId;
-  TPM2B_EVENT        EventData;
-  TPM2B_DIGEST       Result;
+  EFI_STATUS        Status;
+  UINT8             *Buffer;
+  UINT64            HashLen;
+  TPMI_DH_OBJECT    SequenceHandle;
+  TPM2B_MAX_BUFFER  HashBuffer;
+  TPM_ALG_ID        AlgoId;
+  TPM2B_EVENT       EventData;
+  TPM2B_DIGEST      Result;
 
-  DEBUG((EFI_D_VERBOSE, "\n HashAndExtend Entry \n"));
+  DEBUG ((EFI_D_VERBOSE, "\n HashAndExtend Entry \n"));
 
   SequenceHandle = 0xFFFFFFFF; // Know bad value
 
   AlgoId = Tpm2GetAlgoFromHashMask ();
 
-  if ((AlgoId == TPM_ALG_NULL) && (DataToHashLen <= sizeof(EventData.buffer))) {
+  if ((AlgoId == TPM_ALG_NULL) && (DataToHashLen <= sizeof (EventData.buffer))) {
     EventData.size = (UINT16)DataToHashLen;
     CopyMem (EventData.buffer, DataToHash, DataToHashLen);
     Status = Tpm2PcrEvent (PcrIndex, &EventData, DigestList);
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
+
     return EFI_SUCCESS;
   }
 
-  Status = Tpm2HashSequenceStart(AlgoId, &SequenceHandle);
-  if (EFI_ERROR(Status)) {
+  Status = Tpm2HashSequenceStart (AlgoId, &SequenceHandle);
+  if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
-  DEBUG((EFI_D_VERBOSE, "\n Tpm2HashSequenceStart Success \n"));
+
+  DEBUG ((EFI_D_VERBOSE, "\n Tpm2HashSequenceStart Success \n"));
 
   Buffer = (UINT8 *)(UINTN)DataToHash;
-  for (HashLen = DataToHashLen; HashLen > sizeof(HashBuffer.buffer); HashLen -= sizeof(HashBuffer.buffer)) {
+  for (HashLen = DataToHashLen; HashLen > sizeof (HashBuffer.buffer); HashLen -= sizeof (HashBuffer.buffer)) {
+    HashBuffer.size = sizeof (HashBuffer.buffer);
+    CopyMem (HashBuffer.buffer, Buffer, sizeof (HashBuffer.buffer));
+    Buffer += sizeof (HashBuffer.buffer);
 
-    HashBuffer.size = sizeof(HashBuffer.buffer);
-    CopyMem(HashBuffer.buffer, Buffer, sizeof(HashBuffer.buffer));
-    Buffer += sizeof(HashBuffer.buffer);
-
-    Status = Tpm2SequenceUpdate(SequenceHandle, &HashBuffer);
-    if (EFI_ERROR(Status)) {
+    Status = Tpm2SequenceUpdate (SequenceHandle, &HashBuffer);
+    if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
   }
-  DEBUG((EFI_D_VERBOSE, "\n Tpm2SequenceUpdate Success \n"));
+
+  DEBUG ((EFI_D_VERBOSE, "\n Tpm2SequenceUpdate Success \n"));
 
   HashBuffer.size = (UINT16)HashLen;
-  CopyMem(HashBuffer.buffer, Buffer, (UINTN)HashLen);
+  CopyMem (HashBuffer.buffer, Buffer, (UINTN)HashLen);
 
-  ZeroMem(DigestList, sizeof(*DigestList));
+  ZeroMem (DigestList, sizeof (*DigestList));
   DigestList->count = HASH_COUNT;
 
   if (AlgoId == TPM_ALG_NULL) {
@@ -286,20 +289,22 @@ HashAndExtend (
                &HashBuffer,
                DigestList
                );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
-    DEBUG((EFI_D_VERBOSE, "\n Tpm2EventSequenceComplete Success \n"));
+
+    DEBUG ((EFI_D_VERBOSE, "\n Tpm2EventSequenceComplete Success \n"));
   } else {
     Status = Tpm2SequenceComplete (
                SequenceHandle,
                &HashBuffer,
                &Result
                );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
-    DEBUG((EFI_D_VERBOSE, "\n Tpm2SequenceComplete Success \n"));
+
+    DEBUG ((EFI_D_VERBOSE, "\n Tpm2SequenceComplete Success \n"));
 
     DigestList->count = 1;
     DigestList->digests[0].hashAlg = AlgoId;
@@ -308,10 +313,11 @@ HashAndExtend (
                PcrIndex,
                DigestList
                );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
-    DEBUG((EFI_D_VERBOSE, "\n Tpm2PcrExtend Success \n"));
+
+    DEBUG ((EFI_D_VERBOSE, "\n Tpm2PcrExtend Success \n"));
   }
 
   return EFI_SUCCESS;

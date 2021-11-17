@@ -40,7 +40,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 UINT32
 EFIAPI
 Tcg2PpVendorLibExecutePendingRequest (
-  IN TPM2B_AUTH             *PlatformAuth,  OPTIONAL
+  IN TPM2B_AUTH             *PlatformAuth, OPTIONAL
   IN UINT32                 OperationRequest,
   IN OUT UINT32             *ManagementFlags,
   OUT BOOLEAN               *ResetRequired

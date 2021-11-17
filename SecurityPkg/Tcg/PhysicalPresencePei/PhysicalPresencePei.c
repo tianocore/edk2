@@ -33,11 +33,11 @@ LockTpmPhysicalPresence (
 //
 // Global definitions for lock physical presence PPI and its descriptor.
 //
-PEI_LOCK_PHYSICAL_PRESENCE_PPI    mLockPhysicalPresencePpi = {
+PEI_LOCK_PHYSICAL_PRESENCE_PPI  mLockPhysicalPresencePpi = {
   LockTpmPhysicalPresence
 };
 
-EFI_PEI_PPI_DESCRIPTOR       mLockPhysicalPresencePpiList = {
+EFI_PEI_PPI_DESCRIPTOR  mLockPhysicalPresencePpiList = {
   EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
   &gPeiLockPhysicalPresencePpiGuid,
   &mLockPhysicalPresencePpi
@@ -58,10 +58,10 @@ LockTpmPhysicalPresence (
   IN CONST  EFI_PEI_SERVICES             **PeiServices
   )
 {
-  EFI_STATUS                         Status;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI    *Variable;
-  UINTN                              DataSize;
-  EFI_PHYSICAL_PRESENCE              TcgPpData;
+  EFI_STATUS                       Status;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI  *Variable;
+  UINTN                            DataSize;
+  EFI_PHYSICAL_PRESENCE            TcgPpData;
 
   //
   // The CRTM has sensed the physical presence assertion of the user. For example,
@@ -85,14 +85,14 @@ LockTpmPhysicalPresence (
              );
   if (!EFI_ERROR (Status)) {
     DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-    Status = Variable->GetVariable (
-                         Variable,
-                         PHYSICAL_PRESENCE_VARIABLE,
-                         &gEfiPhysicalPresenceGuid,
-                         NULL,
-                         &DataSize,
-                         &TcgPpData
-                         );
+    Status   = Variable->GetVariable (
+                           Variable,
+                           PHYSICAL_PRESENCE_VARIABLE,
+                           &gEfiPhysicalPresenceGuid,
+                           NULL,
+                           &DataSize,
+                           &TcgPpData
+                           );
     if (!EFI_ERROR (Status)) {
       if (TcgPpData.PPRequest != 0) {
         return FALSE;

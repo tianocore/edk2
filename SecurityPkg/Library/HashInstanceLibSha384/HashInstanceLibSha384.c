@@ -51,10 +51,10 @@ Sha384HashInit (
   OUT HASH_HANDLE    *HashHandle
   )
 {
-  VOID     *Sha384Ctx;
-  UINTN    CtxSize;
+  VOID   *Sha384Ctx;
+  UINTN  CtxSize;
 
-  CtxSize = Sha384GetContextSize ();
+  CtxSize   = Sha384GetContextSize ();
   Sha384Ctx = AllocatePool (CtxSize);
   ASSERT (Sha384Ctx != NULL);
 
@@ -82,7 +82,7 @@ Sha384HashUpdate (
   IN UINTN          DataToHashLen
   )
 {
-  VOID     *Sha384Ctx;
+  VOID  *Sha384Ctx;
 
   Sha384Ctx = (VOID *)HashHandle;
   Sha384Update (Sha384Ctx, DataToHash, DataToHashLen);
@@ -105,8 +105,8 @@ Sha384HashFinal (
   OUT TPML_DIGEST_VALUES *DigestList
   )
 {
-  UINT8         Digest[SHA384_DIGEST_SIZE];
-  VOID          *Sha384Ctx;
+  UINT8  Digest[SHA384_DIGEST_SIZE];
+  VOID   *Sha384Ctx;
 
   Sha384Ctx = (VOID *)HashHandle;
   Sha384Final (Sha384Ctx, Digest);
@@ -145,5 +145,6 @@ HashInstanceLibSha384Constructor (
     //
     return EFI_SUCCESS;
   }
+
   return Status;
 }

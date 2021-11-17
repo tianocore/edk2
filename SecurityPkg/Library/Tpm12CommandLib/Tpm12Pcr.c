@@ -16,14 +16,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack(1)
 
 typedef struct {
-  TPM_RQU_COMMAND_HDR   Hdr;
-  TPM_PCRINDEX          PcrIndex;
-  TPM_DIGEST            TpmDigest;
+  TPM_RQU_COMMAND_HDR    Hdr;
+  TPM_PCRINDEX           PcrIndex;
+  TPM_DIGEST             TpmDigest;
 } TPM_CMD_EXTEND;
 
 typedef struct {
-  TPM_RSP_COMMAND_HDR   Hdr;
-  TPM_DIGEST            TpmDigest;
+  TPM_RSP_COMMAND_HDR    Hdr;
+  TPM_DIGEST             TpmDigest;
 } TPM_RSP_EXTEND;
 
 #pragma pack()
@@ -57,10 +57,10 @@ Tpm12Extend (
   //
   // send Tpm command TPM_ORD_Extend
   //
-  Command.Hdr.tag       = SwapBytes16 (TPM_TAG_RQU_COMMAND);
+  Command.Hdr.tag = SwapBytes16 (TPM_TAG_RQU_COMMAND);
   Command.Hdr.paramSize = SwapBytes32 (sizeof (Command));
   Command.Hdr.ordinal   = SwapBytes32 (TPM_ORD_Extend);
-  Command.PcrIndex      = SwapBytes32 (PcrIndex);
+  Command.PcrIndex = SwapBytes32 (PcrIndex);
   CopyMem (&Command.TpmDigest, DigestToExtend, sizeof (Command.TpmDigest));
   Length = sizeof (Response);
   Status = Tpm12SubmitCommand (sizeof (Command), (UINT8 *)&Command, &Length, (UINT8 *)&Response);
@@ -68,8 +68,8 @@ Tpm12Extend (
     return Status;
   }
 
-  if (SwapBytes32(Response.Hdr.returnCode) != TPM_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm12Extend: Response Code error! 0x%08x\r\n", SwapBytes32(Response.Hdr.returnCode)));
+  if (SwapBytes32 (Response.Hdr.returnCode) != TPM_SUCCESS) {
+    DEBUG ((EFI_D_ERROR, "Tpm12Extend: Response Code error! 0x%08x\r\n", SwapBytes32 (Response.Hdr.returnCode)));
     return EFI_DEVICE_ERROR;
   }
 

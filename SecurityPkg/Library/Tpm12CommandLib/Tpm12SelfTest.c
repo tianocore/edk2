@@ -36,7 +36,7 @@ Tpm12ContinueSelfTest (
   //
   // send Tpm command TPM_ORD_ContinueSelfTest
   //
-  Command.tag       = SwapBytes16 (TPM_TAG_RQU_COMMAND);
+  Command.tag = SwapBytes16 (TPM_TAG_RQU_COMMAND);
   Command.paramSize = SwapBytes32 (sizeof (Command));
   Command.ordinal   = SwapBytes32 (TPM_ORD_ContinueSelfTest);
   Length = sizeof (Response);

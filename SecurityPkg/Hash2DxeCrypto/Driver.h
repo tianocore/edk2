@@ -26,11 +26,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define HASH2_SERVICE_DATA_SIGNATURE  SIGNATURE_32 ('H', 'S', '2', 'S')
 
 typedef struct {
-  UINT32                        Signature;
-  EFI_HANDLE                    ServiceHandle;
-  EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
+  UINT32                          Signature;
+  EFI_HANDLE                      ServiceHandle;
+  EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
 
-  LIST_ENTRY                    ChildrenList;
+  LIST_ENTRY                      ChildrenList;
 } HASH2_SERVICE_DATA;
 
 #define HASH2_SERVICE_DATA_FROM_THIS(a) \
@@ -41,17 +41,17 @@ typedef struct {
   HASH2_SERVICE_DATA_SIGNATURE \
   )
 
-#define HASH2_INSTANCE_DATA_SIGNATURE   SIGNATURE_32 ('H', 's', '2', 'I')
+#define HASH2_INSTANCE_DATA_SIGNATURE  SIGNATURE_32 ('H', 's', '2', 'I')
 
 typedef struct {
-  UINT32                           Signature;
-  HASH2_SERVICE_DATA               *Hash2ServiceData;
-  EFI_HANDLE                       Handle;
-  LIST_ENTRY                       InstEntry;
-  EFI_HASH2_PROTOCOL               Hash2Protocol;
-  VOID                             *HashContext;
-  VOID                             *HashInfoContext;
-  BOOLEAN                          Updated;
+  UINT32                Signature;
+  HASH2_SERVICE_DATA    *Hash2ServiceData;
+  EFI_HANDLE            Handle;
+  LIST_ENTRY            InstEntry;
+  EFI_HASH2_PROTOCOL    Hash2Protocol;
+  VOID                  *HashContext;
+  VOID                  *HashInfoContext;
+  BOOLEAN               Updated;
 } HASH2_INSTANCE_DATA;
 
 #define HASH2_INSTANCE_DATA_FROM_THIS(a) \
@@ -121,6 +121,6 @@ Hash2ServiceBindingDestroyChild (
   IN EFI_HANDLE                      ChildHandle
   );
 
-extern EFI_HASH2_PROTOCOL mHash2Protocol;
+extern EFI_HASH2_PROTOCOL  mHash2Protocol;
 
 #endif

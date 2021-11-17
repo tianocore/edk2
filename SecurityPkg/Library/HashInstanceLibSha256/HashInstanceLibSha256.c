@@ -51,10 +51,10 @@ Sha256HashInit (
   OUT HASH_HANDLE    *HashHandle
   )
 {
-  VOID     *Sha256Ctx;
-  UINTN    CtxSize;
+  VOID   *Sha256Ctx;
+  UINTN  CtxSize;
 
-  CtxSize = Sha256GetContextSize ();
+  CtxSize   = Sha256GetContextSize ();
   Sha256Ctx = AllocatePool (CtxSize);
   ASSERT (Sha256Ctx != NULL);
 
@@ -82,7 +82,7 @@ Sha256HashUpdate (
   IN UINTN          DataToHashLen
   )
 {
-  VOID     *Sha256Ctx;
+  VOID  *Sha256Ctx;
 
   Sha256Ctx = (VOID *)HashHandle;
   Sha256Update (Sha256Ctx, DataToHash, DataToHashLen);
@@ -105,8 +105,8 @@ Sha256HashFinal (
   OUT TPML_DIGEST_VALUES *DigestList
   )
 {
-  UINT8         Digest[SHA256_DIGEST_SIZE];
-  VOID          *Sha256Ctx;
+  UINT8  Digest[SHA256_DIGEST_SIZE];
+  VOID   *Sha256Ctx;
 
   Sha256Ctx = (VOID *)HashHandle;
   Sha256Final (Sha256Ctx, Digest);
@@ -145,5 +145,6 @@ HashInstanceLibSha256Constructor (
     //
     return EFI_SUCCESS;
   }
+
   return Status;
 }

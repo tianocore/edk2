@@ -14,17 +14,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 
 typedef struct {
-  TPMI_ALG_HASH              HashAlgo;
-  UINT16                     HashSize;
-  UINT32                     HashMask;
+  TPMI_ALG_HASH    HashAlgo;
+  UINT16           HashSize;
+  UINT32           HashMask;
 } INTERNAL_HASH_INFO;
 
-STATIC INTERNAL_HASH_INFO mHashInfo[] = {
-  {TPM_ALG_SHA1,          SHA1_DIGEST_SIZE,     HASH_ALG_SHA1},
-  {TPM_ALG_SHA256,        SHA256_DIGEST_SIZE,   HASH_ALG_SHA256},
-  {TPM_ALG_SM3_256,       SM3_256_DIGEST_SIZE,  HASH_ALG_SM3_256},
-  {TPM_ALG_SHA384,        SHA384_DIGEST_SIZE,   HASH_ALG_SHA384},
-  {TPM_ALG_SHA512,        SHA512_DIGEST_SIZE,   HASH_ALG_SHA512},
+STATIC INTERNAL_HASH_INFO  mHashInfo[] = {
+  { TPM_ALG_SHA1,    SHA1_DIGEST_SIZE,    HASH_ALG_SHA1    },
+  { TPM_ALG_SHA256,  SHA256_DIGEST_SIZE,  HASH_ALG_SHA256  },
+  { TPM_ALG_SM3_256, SM3_256_DIGEST_SIZE, HASH_ALG_SM3_256 },
+  { TPM_ALG_SHA384,  SHA384_DIGEST_SIZE,  HASH_ALG_SHA384  },
+  { TPM_ALG_SHA512,  SHA512_DIGEST_SIZE,  HASH_ALG_SHA512  },
 };
 
 /**
@@ -42,11 +42,12 @@ GetHashSizeFromAlgo (
 {
   UINTN  Index;
 
-  for (Index = 0; Index < sizeof(mHashInfo)/sizeof(mHashInfo[0]); Index++) {
+  for (Index = 0; Index < sizeof (mHashInfo)/sizeof (mHashInfo[0]); Index++) {
     if (mHashInfo[Index].HashAlgo == HashAlgo) {
       return mHashInfo[Index].HashSize;
     }
   }
+
   return 0;
 }
 
@@ -65,11 +66,12 @@ GetHashMaskFromAlgo (
 {
   UINTN  Index;
 
-  for (Index = 0; Index < sizeof(mHashInfo)/sizeof(mHashInfo[0]); Index++) {
+  for (Index = 0; Index < sizeof (mHashInfo)/sizeof (mHashInfo[0]); Index++) {
     if (mHashInfo[Index].HashAlgo == HashAlgo) {
       return mHashInfo[Index].HashMask;
     }
   }
+
   return 0;
 }
 
@@ -97,12 +99,12 @@ CopyAuthSessionCommand (
   //
   if (AuthSessionIn != NULL) {
     //  sessionHandle
-    WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(AuthSessionIn->sessionHandle));
-    Buffer += sizeof(UINT32);
+    WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32 (AuthSessionIn->sessionHandle));
+    Buffer += sizeof (UINT32);
 
     // nonce
     WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (AuthSessionIn->nonce.size));
-    Buffer += sizeof(UINT16);
+    Buffer += sizeof (UINT16);
 
     CopyMem (Buffer, AuthSessionIn->nonce.buffer, AuthSessionIn->nonce.size);
     Buffer += AuthSessionIn->nonce.size;
@@ -113,26 +115,26 @@ CopyAuthSessionCommand (
 
     // hmac
     WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (AuthSessionIn->hmac.size));
-    Buffer += sizeof(UINT16);
+    Buffer += sizeof (UINT16);
 
     CopyMem (Buffer, AuthSessionIn->hmac.buffer, AuthSessionIn->hmac.size);
     Buffer += AuthSessionIn->hmac.size;
   } else {
     //  sessionHandle
-    WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(TPM_RS_PW));
-    Buffer += sizeof(UINT32);
+    WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32 (TPM_RS_PW));
+    Buffer += sizeof (UINT32);
 
     // nonce = nullNonce
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(0));
-    Buffer += sizeof(UINT16);
+    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (0));
+    Buffer += sizeof (UINT16);
 
     // sessionAttributes = 0
     *(UINT8 *)Buffer = 0x00;
     Buffer++;
 
     // hmac = nullAuth
-    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(0));
-    Buffer += sizeof(UINT16);
+    WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (0));
+    Buffer += sizeof (UINT16);
   }
 
   return (UINT32)((UINTN)Buffer - (UINTN)AuthSessionOut);
@@ -154,8 +156,8 @@ CopyAuthSessionResponse (
   OUT     TPMS_AUTH_RESPONSE         *AuthSessionOut OPTIONAL
   )
 {
-  UINT8                      *Buffer;
-  TPMS_AUTH_RESPONSE         LocalAuthSessionOut;
+  UINT8               *Buffer;
+  TPMS_AUTH_RESPONSE  LocalAuthSessionOut;
 
   if (AuthSessionOut == NULL) {
     AuthSessionOut = &LocalAuthSessionOut;
@@ -165,8 +167,8 @@ CopyAuthSessionResponse (
 
   // nonce
   AuthSessionOut->nonce.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
-  Buffer += sizeof(UINT16);
-  if (AuthSessionOut->nonce.size > sizeof(TPMU_HA)) {
+  Buffer += sizeof (UINT16);
+  if (AuthSessionOut->nonce.size > sizeof (TPMU_HA)) {
     DEBUG ((DEBUG_ERROR, "CopyAuthSessionResponse - nonce.size error %x\n", AuthSessionOut->nonce.size));
     return 0;
   }
@@ -175,13 +177,13 @@ CopyAuthSessionResponse (
   Buffer += AuthSessionOut->nonce.size;
 
   // sessionAttributes
-  *(UINT8 *)&AuthSessionOut->sessionAttributes = *(UINT8 *)Buffer;
+  *(UINT8 *) &AuthSessionOut->sessionAttributes = *(UINT8 *)Buffer;
   Buffer++;
 
   // hmac
   AuthSessionOut->hmac.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
-  Buffer += sizeof(UINT16);
-  if (AuthSessionOut->hmac.size > sizeof(TPMU_HA)) {
+  Buffer += sizeof (UINT16);
+  if (AuthSessionOut->hmac.size > sizeof (TPMU_HA)) {
     DEBUG ((DEBUG_ERROR, "CopyAuthSessionResponse - hmac.size error %x\n", AuthSessionOut->hmac.size));
     return 0;
   }
@@ -203,37 +205,42 @@ CopyAuthSessionResponse (
 **/
 BOOLEAN
 EFIAPI
-IsHashAlgSupportedInHashAlgorithmMask(
+IsHashAlgSupportedInHashAlgorithmMask (
   IN TPMI_ALG_HASH  HashAlg,
   IN UINT32         HashAlgorithmMask
   )
 {
   switch (HashAlg) {
-  case TPM_ALG_SHA1:
-    if ((HashAlgorithmMask & HASH_ALG_SHA1) != 0) {
-      return TRUE;
-    }
-    break;
-  case TPM_ALG_SHA256:
-    if ((HashAlgorithmMask & HASH_ALG_SHA256) != 0) {
-      return TRUE;
-    }
-    break;
-  case TPM_ALG_SHA384:
-    if ((HashAlgorithmMask & HASH_ALG_SHA384) != 0) {
-      return TRUE;
-    }
-    break;
-  case TPM_ALG_SHA512:
-    if ((HashAlgorithmMask & HASH_ALG_SHA512) != 0) {
-      return TRUE;
-    }
-    break;
-  case TPM_ALG_SM3_256:
-    if ((HashAlgorithmMask & HASH_ALG_SM3_256) != 0) {
-      return TRUE;
-    }
-    break;
+    case TPM_ALG_SHA1:
+      if ((HashAlgorithmMask & HASH_ALG_SHA1) != 0) {
+        return TRUE;
+      }
+
+      break;
+    case TPM_ALG_SHA256:
+      if ((HashAlgorithmMask & HASH_ALG_SHA256) != 0) {
+        return TRUE;
+      }
+
+      break;
+    case TPM_ALG_SHA384:
+      if ((HashAlgorithmMask & HASH_ALG_SHA384) != 0) {
+        return TRUE;
+      }
+
+      break;
+    case TPM_ALG_SHA512:
+      if ((HashAlgorithmMask & HASH_ALG_SHA512) != 0) {
+        return TRUE;
+      }
+
+      break;
+    case TPM_ALG_SM3_256:
+      if ((HashAlgorithmMask & HASH_ALG_SM3_256) != 0) {
+        return TRUE;
+      }
+
+      break;
   }
 
   return FALSE;
@@ -256,26 +263,28 @@ CopyDigestListToBuffer (
   IN UINT32                         HashAlgorithmMask
   )
 {
-  UINTN  Index;
-  UINT16 DigestSize;
-  UINT32 DigestListCount;
-  UINT32 *DigestListCountPtr;
+  UINTN   Index;
+  UINT16  DigestSize;
+  UINT32  DigestListCount;
+  UINT32  *DigestListCountPtr;
 
-  DigestListCountPtr = (UINT32 *) Buffer;
-  DigestListCount = 0;
-  Buffer = (UINT8 *)Buffer + sizeof(DigestList->count);
+  DigestListCountPtr = (UINT32 *)Buffer;
+  DigestListCount    = 0;
+  Buffer = (UINT8 *)Buffer + sizeof (DigestList->count);
   for (Index = 0; Index < DigestList->count; Index++) {
-    if (!IsHashAlgSupportedInHashAlgorithmMask(DigestList->digests[Index].hashAlg, HashAlgorithmMask)) {
+    if (!IsHashAlgSupportedInHashAlgorithmMask (DigestList->digests[Index].hashAlg, HashAlgorithmMask)) {
       DEBUG ((EFI_D_ERROR, "WARNING: TPM2 Event log has HashAlg unsupported by PCR bank (0x%x)\n", DigestList->digests[Index].hashAlg));
       continue;
     }
-    CopyMem (Buffer, &DigestList->digests[Index].hashAlg, sizeof(DigestList->digests[Index].hashAlg));
-    Buffer = (UINT8 *)Buffer + sizeof(DigestList->digests[Index].hashAlg);
+
+    CopyMem (Buffer, &DigestList->digests[Index].hashAlg, sizeof (DigestList->digests[Index].hashAlg));
+    Buffer     = (UINT8 *)Buffer + sizeof (DigestList->digests[Index].hashAlg);
     DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
     CopyMem (Buffer, &DigestList->digests[Index].digest, DigestSize);
     Buffer = (UINT8 *)Buffer + DigestSize;
     DigestListCount++;
   }
+
   WriteUnaligned32 (DigestListCountPtr, DigestListCount);
 
   return Buffer;
@@ -294,14 +303,14 @@ GetDigestListSize (
   IN TPML_DIGEST_VALUES             *DigestList
   )
 {
-  UINTN  Index;
-  UINT16 DigestSize;
-  UINT32 TotalSize;
+  UINTN   Index;
+  UINT16  DigestSize;
+  UINT32  TotalSize;
 
-  TotalSize = sizeof(DigestList->count);
+  TotalSize = sizeof (DigestList->count);
   for (Index = 0; Index < DigestList->count; Index++) {
     DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
-    TotalSize += sizeof(DigestList->digests[Index].hashAlg) + DigestSize;
+    TotalSize += sizeof (DigestList->digests[Index].hashAlg) + DigestSize;
   }
 
   return TotalSize;
@@ -325,8 +334,8 @@ GetDigestFromDigestList (
   OUT VOID              *Digest
   )
 {
-  UINTN  Index;
-  UINT16 DigestSize;
+  UINTN   Index;
+  UINT16  DigestSize;
 
   DigestSize = GetHashSizeFromAlgo (HashAlg);
   for (Index = 0; Index < DigestList->count; Index++) {
