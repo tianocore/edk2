@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/TcgStorageOpalLib.h>
 
-
 /**
 
   The function retrieves the MSID from the device specified
@@ -64,7 +63,7 @@ GetRevertTimeOut (
 
 **/
 TCG_RESULT
-OpalPyrite2PsidRevert(
+OpalPyrite2PsidRevert (
   OPAL_SESSION              *AdminSpSession,
   UINT32                    EstimateTimeCost
   );
@@ -81,7 +80,7 @@ OpalPyrite2PsidRevert(
 
 **/
 TCG_RESULT
-OpalPyrite2AdminRevert(
+OpalPyrite2AdminRevert (
   OPAL_SESSION    *LockingSpSession,
   BOOLEAN         KeepUserData,
   UINT8           *MethodStatus,

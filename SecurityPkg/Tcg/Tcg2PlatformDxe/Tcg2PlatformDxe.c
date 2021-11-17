@@ -30,8 +30,8 @@ SmmReadyToLockEventCallBack (
   IN VOID       *Context
   )
 {
-  EFI_STATUS   Status;
-  VOID         *Interface;
+  EFI_STATUS  Status;
+  VOID        *Interface;
 
   //
   // Try to locate it because EfiCreateProtocolNotifyEvent will trigger it once when registration.
@@ -43,7 +43,7 @@ SmmReadyToLockEventCallBack (
                   &Interface
                   );
   if (EFI_ERROR (Status)) {
-    return ;
+    return;
   }
 
   ConfigureTpmPlatformHierarchy ();

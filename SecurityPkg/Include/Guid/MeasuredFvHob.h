@@ -20,11 +20,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0xb2360b42, 0x7173, 0x420a, { 0x86, 0x96, 0x46, 0xca, 0x6b, 0xab, 0x10, 0x60 } \
   }
 
-extern EFI_GUID gMeasuredFvHobGuid;
+extern EFI_GUID  gMeasuredFvHobGuid;
 
 typedef struct {
-  UINT32                     Num;
-  EFI_PLATFORM_FIRMWARE_BLOB MeasuredFvBuf[1];
+  UINT32                        Num;
+  EFI_PLATFORM_FIRMWARE_BLOB    MeasuredFvBuf[1];
 } MEASURED_HOB_DATA;
 
 #endif

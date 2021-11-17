@@ -43,7 +43,7 @@ RdRandGetSeed128 (
   // Chose an arbitrary key and zero the feed_forward_value (FFV)
   //
   for (Index = 0; Index < 16; Index++) {
-    Key[Index] = (UINT8) Index;
+    Key[Index] = (UINT8)Index;
     Ffv[Index] = 0;
   }
 
@@ -99,7 +99,7 @@ RdRandGenerateEntropy (
 
   Status     = EFI_NOT_READY;
   BlockCount = Length / 16;
-  Ptr        = (UINT8 *)Entropy;
+  Ptr = (UINT8 *)Entropy;
 
   //
   // Generate high-quality seed for DRBG Entropy
@@ -109,6 +109,7 @@ RdRandGenerateEntropy (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     CopyMem (Ptr, Seed, 16);
 
     BlockCount--;
@@ -122,6 +123,7 @@ RdRandGenerateEntropy (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   CopyMem (Ptr, Seed, (Length % 16));
 
   return Status;

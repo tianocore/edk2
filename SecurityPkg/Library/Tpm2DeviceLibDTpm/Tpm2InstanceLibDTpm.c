@@ -79,7 +79,7 @@ Tpm2InstanceLibDTpmConstructor (
   VOID
   )
 {
-  EFI_STATUS               Status;
+  EFI_STATUS  Status;
 
   Status = Tpm2RegisterTpm2DeviceLib (&mDTpm2InternalTpm2Device);
   if ((Status == EFI_SUCCESS) || (Status == EFI_UNSUPPORTED)) {
@@ -88,9 +88,11 @@ Tpm2InstanceLibDTpmConstructor (
     //
     if (Status == EFI_SUCCESS) {
       Status = InternalTpm2DeviceLibDTpmCommonConstructor ();
-      DumpPtpInfo ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+      DumpPtpInfo ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
     }
+
     return EFI_SUCCESS;
   }
+
   return Status;
 }

@@ -56,10 +56,10 @@ InternalTpm2DeviceLibDTpmCommonConstructor (
   //
   // Always cache current active TpmInterfaceType for StandaloneMm implementation
   //
-  mActiveTpmInterfaceType = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  mActiveTpmInterfaceType = Tpm2GetPtpInterface ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
 
   if (mActiveTpmInterfaceType == Tpm2PtpInterfaceCrb) {
-    mCRBIdleByPass = Tpm2GetIdleByPass((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+    mCRBIdleByPass = Tpm2GetIdleByPass ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
   }
 
   return EFI_SUCCESS;

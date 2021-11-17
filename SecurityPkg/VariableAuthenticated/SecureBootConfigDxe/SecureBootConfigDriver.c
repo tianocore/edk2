@@ -27,13 +27,13 @@ SecureBootConfigDriverEntryPoint (
   IN EFI_SYSTEM_TABLE    *SystemTable
   )
 {
-  EFI_STATUS                       Status;
-  SECUREBOOT_CONFIG_PRIVATE_DATA   *PrivateData;
+  EFI_STATUS                      Status;
+  SECUREBOOT_CONFIG_PRIVATE_DATA  *PrivateData;
 
   //
   // If already started, return.
   //
-    Status = gBS->OpenProtocol (
+  Status = gBS->OpenProtocol (
                   ImageHandle,
                   &gEfiCallerIdGuid,
                   NULL,
@@ -100,13 +100,13 @@ SecureBootConfigDriverUnload (
   IN EFI_HANDLE  ImageHandle
   )
 {
-  EFI_STATUS                  Status;
-  SECUREBOOT_CONFIG_PRIVATE_DATA   *PrivateData;
+  EFI_STATUS                      Status;
+  SECUREBOOT_CONFIG_PRIVATE_DATA  *PrivateData;
 
   Status = gBS->HandleProtocol (
                   ImageHandle,
                   &gEfiCallerIdGuid,
-                  (VOID **) &PrivateData
+                  (VOID **)&PrivateData
                   );
   if (EFI_ERROR (Status)) {
     return Status;

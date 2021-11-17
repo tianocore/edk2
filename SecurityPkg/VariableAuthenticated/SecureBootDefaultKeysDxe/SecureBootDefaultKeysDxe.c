@@ -41,7 +41,7 @@ SecureBootDefaultKeysEntryPoint (
 
   Status = SecureBootInitPKDefault ();
   if (EFI_ERROR (Status)) {
-    DEBUG((DEBUG_ERROR, "%a: Cannot initialize PKDefault: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize PKDefault: %r\n", __FUNCTION__, Status));
     return Status;
   }
 
@@ -50,6 +50,7 @@ SecureBootDefaultKeysEntryPoint (
     DEBUG ((DEBUG_ERROR, "%a: Cannot initialize KEKDefault: %r\n", __FUNCTION__, Status));
     return Status;
   }
+
   Status = SecureBootInitDbDefault ();
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Cannot initialize dbDefault: %r\n", __FUNCTION__, Status));

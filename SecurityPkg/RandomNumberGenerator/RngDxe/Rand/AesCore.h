@@ -28,4 +28,4 @@ AesEncrypt (
   OUT UINT8        *OutData
   );
 
-#endif  // __AES_CORE_H__
+#endif // __AES_CORE_H__
