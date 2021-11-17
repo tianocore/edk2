@@ -451,7 +451,7 @@ UsbCbiExecCommand (
   Status = UsbCbiSendCommand (UsbCbi, Cmd, CmdLen, Timeout);
   if (EFI_ERROR (Status)) {
     gBS->Stall(10 * USB_MASS_1_MILLISECOND);
-    DEBUG ((EFI_D_ERROR, "UsbCbiExecCommand: UsbCbiSendCommand (%r)\n",Status));
+    DEBUG ((DEBUG_ERROR, "UsbCbiExecCommand: UsbCbiSendCommand (%r)\n",Status));
     return Status;
   }
 
@@ -463,7 +463,7 @@ UsbCbiExecCommand (
 
   Status   = UsbCbiDataTransfer (UsbCbi, DataDir, Data, &TransLen, Timeout);
   if (UsbCbi->InterruptEndpoint == NULL) {
-    DEBUG ((EFI_D_ERROR, "UsbCbiExecCommand: UsbCbiDataTransfer (%r)\n",Status));
+    DEBUG ((DEBUG_ERROR, "UsbCbiExecCommand: UsbCbiDataTransfer (%r)\n",Status));
     return Status;
   }
 
@@ -472,7 +472,7 @@ UsbCbiExecCommand (
   //
   Status = UsbCbiGetStatus (UsbCbi, Timeout, &Result);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbCbiExecCommand: UsbCbiGetStatus (%r)\n",Status));
+    DEBUG ((DEBUG_ERROR, "UsbCbiExecCommand: UsbCbiGetStatus (%r)\n",Status));
     return Status;
   }
 

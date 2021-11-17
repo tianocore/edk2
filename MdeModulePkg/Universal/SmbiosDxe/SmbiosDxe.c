@@ -426,10 +426,10 @@ SmbiosAdd (
     //
     if ((EntryPointStructure != NULL) &&
         (EntryPointStructure->TableLength + StructureSize > SMBIOS_TABLE_MAX_LENGTH)) {
-      DEBUG ((EFI_D_INFO, "SmbiosAdd: Total length exceeds max 32-bit table length with type = %d size = 0x%x\n", Record->Type, StructureSize));
+      DEBUG ((DEBUG_INFO, "SmbiosAdd: Total length exceeds max 32-bit table length with type = %d size = 0x%x\n", Record->Type, StructureSize));
     } else {
       Smbios32BitTable = TRUE;
-      DEBUG ((EFI_D_INFO, "SmbiosAdd: Smbios type %d with size 0x%x is added to 32-bit table\n", Record->Type, StructureSize));
+      DEBUG ((DEBUG_INFO, "SmbiosAdd: Smbios type %d with size 0x%x is added to 32-bit table\n", Record->Type, StructureSize));
     }
   }
 
@@ -443,9 +443,9 @@ SmbiosAdd (
     //
     if ((Smbios30EntryPointStructure != NULL) &&
         (Smbios30EntryPointStructure->TableMaximumSize + StructureSize > SMBIOS_3_0_TABLE_MAX_LENGTH)) {
-      DEBUG ((EFI_D_INFO, "SmbiosAdd: Total length exceeds max 64-bit table length with type = %d size = 0x%x\n", Record->Type, StructureSize));
+      DEBUG ((DEBUG_INFO, "SmbiosAdd: Total length exceeds max 64-bit table length with type = %d size = 0x%x\n", Record->Type, StructureSize));
     } else {
-      DEBUG ((EFI_D_INFO, "SmbiosAdd: Smbios type %d with size 0x%x is added to 64-bit table\n", Record->Type, StructureSize));
+      DEBUG ((DEBUG_INFO, "SmbiosAdd: Smbios type %d with size 0x%x is added to 64-bit table\n", Record->Type, StructureSize));
       Smbios64BitTable = TRUE;
     }
   }
@@ -691,9 +691,9 @@ SmbiosUpdateString (
           // in the Structure Table Length field of the SMBIOS Structure Table Entry Point,
           // which is a WORD field limited to 65,535 bytes.
           //
-          DEBUG ((EFI_D_INFO, "SmbiosUpdateString: Total length exceeds max 32-bit table length\n"));
+          DEBUG ((DEBUG_INFO, "SmbiosUpdateString: Total length exceeds max 32-bit table length\n"));
         } else {
-          DEBUG ((EFI_D_INFO, "SmbiosUpdateString: New smbios record add to 32-bit table\n"));
+          DEBUG ((DEBUG_INFO, "SmbiosUpdateString: New smbios record add to 32-bit table\n"));
           SmbiosEntry->Smbios32BitTable = TRUE;
         }
       }
@@ -704,9 +704,9 @@ SmbiosUpdateString (
         //
         if ((Smbios30EntryPointStructure != NULL) &&
             (Smbios30EntryPointStructure->TableMaximumSize + InputStrLen - TargetStrLen > SMBIOS_3_0_TABLE_MAX_LENGTH)) {
-          DEBUG ((EFI_D_INFO, "SmbiosUpdateString: Total length exceeds max 64-bit table length\n"));
+          DEBUG ((DEBUG_INFO, "SmbiosUpdateString: Total length exceeds max 64-bit table length\n"));
         } else {
-          DEBUG ((EFI_D_INFO, "SmbiosUpdateString: New smbios record add to 64-bit table\n"));
+          DEBUG ((DEBUG_INFO, "SmbiosUpdateString: New smbios record add to 64-bit table\n"));
           SmbiosEntry->Smbios64BitTable = TRUE;
         }
       }
@@ -852,10 +852,10 @@ SmbiosRemove (
       // configuration table without depending on PI SMBIOS protocol.
       //
       if (SmbiosEntry->Smbios32BitTable) {
-        DEBUG ((EFI_D_INFO, "SmbiosRemove: remove from 32-bit table\n"));
+        DEBUG ((DEBUG_INFO, "SmbiosRemove: remove from 32-bit table\n"));
       }
       if (SmbiosEntry->Smbios64BitTable) {
-        DEBUG ((EFI_D_INFO, "SmbiosRemove: remove from 64-bit table\n"));
+        DEBUG ((DEBUG_INFO, "SmbiosRemove: remove from 64-bit table\n"));
       }
       //
       // Update the whole SMBIOS table again based on which table the removed SMBIOS record is in.
@@ -1058,7 +1058,7 @@ SmbiosCreateTable (
     // It should be done only once.
     // Allocate memory (below 4GB).
     //
-    DEBUG ((EFI_D_INFO, "SmbiosCreateTable: Initialize 32-bit entry point structure\n"));
+    DEBUG ((DEBUG_INFO, "SmbiosCreateTable: Initialize 32-bit entry point structure\n"));
     EntryPointStructureData.MajorVersion  = mPrivateData.Smbios.MajorVersion;
     EntryPointStructureData.MinorVersion  = mPrivateData.Smbios.MinorVersion;
     EntryPointStructureData.SmbiosBcdRevision = (UINT8) ((PcdGet16 (PcdSmbiosVersion) >> 4) & 0xf0) | (UINT8) (PcdGet16 (PcdSmbiosVersion) & 0x0f);
@@ -1070,7 +1070,7 @@ SmbiosCreateTable (
                     &PhysicalAddress
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "SmbiosCreateTable () could not allocate EntryPointStructure < 4GB\n"));
+      DEBUG ((DEBUG_ERROR, "SmbiosCreateTable () could not allocate EntryPointStructure < 4GB\n"));
       Status = gBS->AllocatePages (
                       AllocateAnyPages,
                       EfiRuntimeServicesData,
@@ -1143,7 +1143,7 @@ SmbiosCreateTable (
     // If new SMBIOS table size exceeds the previous allocated page,
     // it is time to re-allocate memory (below 4GB).
     //
-    DEBUG ((EFI_D_INFO, "%a() re-allocate SMBIOS 32-bit table\n",
+    DEBUG ((DEBUG_INFO, "%a() re-allocate SMBIOS 32-bit table\n",
       __FUNCTION__));
     if (EntryPointStructure->TableAddress != 0) {
       //
@@ -1165,7 +1165,7 @@ SmbiosCreateTable (
                     &PhysicalAddress
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "SmbiosCreateTable() could not allocate SMBIOS table < 4GB\n"));
+      DEBUG ((DEBUG_ERROR, "SmbiosCreateTable() could not allocate SMBIOS table < 4GB\n"));
       EntryPointStructure->TableAddress = 0;
       return EFI_OUT_OF_RESOURCES;
     } else {
@@ -1250,7 +1250,7 @@ SmbiosCreate64BitTable (
     // It should be done only once.
     // Allocate memory at any address.
     //
-    DEBUG ((EFI_D_INFO, "SmbiosCreateTable: Initialize 64-bit entry point structure\n"));
+    DEBUG ((DEBUG_INFO, "SmbiosCreateTable: Initialize 64-bit entry point structure\n"));
     Smbios30EntryPointStructureData.MajorVersion  = mPrivateData.Smbios.MajorVersion;
     Smbios30EntryPointStructureData.MinorVersion  = mPrivateData.Smbios.MinorVersion;
     Smbios30EntryPointStructureData.DocRev        = PcdGet8 (PcdSmbiosDocRev);
@@ -1261,7 +1261,7 @@ SmbiosCreate64BitTable (
                     &PhysicalAddress
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "SmbiosCreate64BitTable() could not allocate Smbios30EntryPointStructure\n"));
+      DEBUG ((DEBUG_ERROR, "SmbiosCreate64BitTable() could not allocate Smbios30EntryPointStructure\n"));
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -1312,7 +1312,7 @@ SmbiosCreate64BitTable (
     // If new SMBIOS table size exceeds the previous allocated page,
     // it is time to re-allocate memory at anywhere.
     //
-    DEBUG ((EFI_D_INFO, "%a() re-allocate SMBIOS 64-bit table\n",
+    DEBUG ((DEBUG_INFO, "%a() re-allocate SMBIOS 64-bit table\n",
       __FUNCTION__));
     if (Smbios30EntryPointStructure->TableAddress != 0) {
       //
@@ -1333,7 +1333,7 @@ SmbiosCreate64BitTable (
                     &PhysicalAddress
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "SmbiosCreateTable() could not allocate SMBIOS 64-bit table\n"));
+      DEBUG ((DEBUG_ERROR, "SmbiosCreateTable() could not allocate SMBIOS 64-bit table\n"));
       Smbios30EntryPointStructure->TableAddress = 0;
       return EFI_OUT_OF_RESOURCES;
     } else {

@@ -302,10 +302,10 @@ PeiLoadFixAddressHook(
   //
   TotalReservedMemorySize += PeiMemorySize;
 
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressRuntimeCodePageNumber= 0x%x.\n", PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber)));
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressBootTimeCodePageNumber= 0x%x.\n", PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber)));
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressPeiCodePageNumber= 0x%x.\n", PcdGet32(PcdLoadFixAddressPeiCodePageNumber)));
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Total Reserved Memory Size = 0x%lx.\n", TotalReservedMemorySize));
+  DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressRuntimeCodePageNumber= 0x%x.\n", PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber)));
+  DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressBootTimeCodePageNumber= 0x%x.\n", PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber)));
+  DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED INFO: PcdLoadFixAddressPeiCodePageNumber= 0x%x.\n", PcdGet32(PcdLoadFixAddressPeiCodePageNumber)));
+  DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED INFO: Total Reserved Memory Size = 0x%lx.\n", TotalReservedMemorySize));
   //
   // Loop through the system memory typed HOB to merge the adjacent memory range
   //
@@ -433,12 +433,12 @@ PeiLoadFixAddressHook(
     // The LMFA feature is enabled as load module at fixed absolute address.
     //
     TopLoadingAddress = (EFI_PHYSICAL_ADDRESS)PcdGet64(PcdLoadModuleAtFixAddressEnable);
-    DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Loading module at fixed absolute address.\n"));
+    DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED INFO: Loading module at fixed absolute address.\n"));
     //
     // validate the Address. Loop the resource descriptor HOB to make sure the address is in valid memory range
     //
     if ((TopLoadingAddress & EFI_PAGE_MASK) != 0) {
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:Top Address 0x%lx is invalid since top address should be page align. \n", TopLoadingAddress));
+      DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED ERROR:Top Address 0x%lx is invalid since top address should be page align. \n", TopLoadingAddress));
       ASSERT (FALSE);
     }
     //
@@ -470,11 +470,11 @@ PeiLoadFixAddressHook(
       }
     }
     if (CurrentResourceHob != NULL) {
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO:Top Address 0x%lx is valid \n",  TopLoadingAddress));
+      DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED INFO:Top Address 0x%lx is valid \n",  TopLoadingAddress));
       TopLoadingAddress += MINIMUM_INITIAL_MEMORY_SIZE;
     } else {
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:Top Address 0x%lx is invalid \n",  TopLoadingAddress));
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:The recommended Top Address for the platform is: \n"));
+      DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED ERROR:Top Address 0x%lx is invalid \n",  TopLoadingAddress));
+      DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED ERROR:The recommended Top Address for the platform is: \n"));
       //
       // Print the recommended Top address range.
       //
@@ -494,7 +494,7 @@ PeiLoadFixAddressHook(
               // See if Top address specified by user is valid.
               //
               if (ResourceHob->ResourceLength > TotalReservedMemorySize && PeiLoadFixAddressIsMemoryRangeAvailable(PrivateData, ResourceHob)) {
-                 DEBUG ((EFI_D_INFO, "(0x%lx, 0x%lx)\n",
+                 DEBUG ((DEBUG_INFO, "(0x%lx, 0x%lx)\n",
                           (ResourceHob->PhysicalStart + TotalReservedMemorySize -MINIMUM_INITIAL_MEMORY_SIZE),
                           (ResourceHob->PhysicalStart + ResourceHob->ResourceLength -MINIMUM_INITIAL_MEMORY_SIZE)
                         ));
@@ -541,7 +541,7 @@ PeiLoadFixAddressHook(
       }
     }
     if (CurrentResourceHob == NULL) {
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED ERROR:The System Memory is too small\n"));
+      DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED ERROR:The System Memory is too small\n"));
       //
       // Assert here
       //
@@ -613,7 +613,7 @@ PeiLoadFixAddressHook(
   // Cache the top address for Loading Module at Fixed Address feature
   //
   PrivateData->LoadModuleAtFixAddressTopAddress = TopLoadingAddress - MINIMUM_INITIAL_MEMORY_SIZE;
-  DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: Top address = 0x%lx\n",  PrivateData->LoadModuleAtFixAddressTopAddress));
+  DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED INFO: Top address = 0x%lx\n",  PrivateData->LoadModuleAtFixAddressTopAddress));
   //
   // reinstall the PEI memory relative to TopLoadingAddress
   //
@@ -732,7 +732,7 @@ PeiCheckAndSwitchStack (
       // If Loading Module at Fixed Address is enabled, Allocating memory range for Pei code range.
       //
       LoadFixPeiCodeBegin = AllocatePages((UINTN)PcdGet32(PcdLoadFixAddressPeiCodePageNumber));
-      DEBUG ((EFI_D_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = 0x%lX, PeiCodeTop= 0x%lX\n", (UINT64)(UINTN)LoadFixPeiCodeBegin, (UINT64)((UINTN)LoadFixPeiCodeBegin + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE)));
+      DEBUG ((DEBUG_INFO, "LOADING MODULE FIXED INFO: PeiCodeBegin = 0x%lX, PeiCodeTop= 0x%lX\n", (UINT64)(UINTN)LoadFixPeiCodeBegin, (UINT64)((UINTN)LoadFixPeiCodeBegin + PcdGet32(PcdLoadFixAddressPeiCodePageNumber) * EFI_PAGE_SIZE)));
     }
 
     //
@@ -746,7 +746,7 @@ PeiCheckAndSwitchStack (
     NewStackSize = RShiftU64 (Private->PhysicalMemoryLength, 1);
     NewStackSize = ALIGN_VALUE (NewStackSize, EFI_PAGE_SIZE);
     NewStackSize = MIN (PcdGet32(PcdPeiCoreMaxPeiStackSize), NewStackSize);
-    DEBUG ((EFI_D_INFO, "Old Stack size %d, New stack size %d\n", (UINT32)SecCoreData->StackSize, (UINT32)NewStackSize));
+    DEBUG ((DEBUG_INFO, "Old Stack size %d, New stack size %d\n", (UINT32)SecCoreData->StackSize, (UINT32)NewStackSize));
     ASSERT (NewStackSize >= SecCoreData->StackSize);
 
     //
@@ -768,7 +768,7 @@ PeiCheckAndSwitchStack (
     //
     // Build Stack HOB that describes the permanent memory stack
     //
-    DEBUG ((EFI_D_INFO, "Stack Hob: BaseAddress=0x%lX Length=0x%lX\n", TopOfNewStack - NewStackSize, NewStackSize));
+    DEBUG ((DEBUG_INFO, "Stack Hob: BaseAddress=0x%lX Length=0x%lX\n", TopOfNewStack - NewStackSize, NewStackSize));
     BuildStackHob (TopOfNewStack - NewStackSize, NewStackSize);
 
     //
@@ -803,7 +803,7 @@ PeiCheckAndSwitchStack (
         Private->HeapOffset = (UINTN)((UINTN)SecCoreData->PeiTemporaryRamBase - BaseOfNewHeap);
       }
 
-      DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
+      DEBUG ((DEBUG_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
 
       //
       // Calculate new HandOffTable and PrivateData address in permanent memory's stack
@@ -871,7 +871,7 @@ PeiCheckAndSwitchStack (
         Private->HeapOffset = (UINTN)((UINTN)SecCoreData->PeiTemporaryRamBase - BaseOfNewHeap);
       }
 
-      DEBUG ((EFI_D_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
+      DEBUG ((DEBUG_INFO, "Heap Offset = 0x%lX Stack Offset = 0x%lX\n", (UINT64) Private->HeapOffset, (UINT64) Private->StackOffset));
 
       //
       // Migrate Heap
@@ -1730,6 +1730,3 @@ PeiRegisterForShadow (
 
   return EFI_SUCCESS;
 }
-
-
-

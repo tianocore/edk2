@@ -56,7 +56,7 @@ GetEsrtEntry (
   }
 
   if (RepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
-    DEBUG((EFI_D_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
+    DEBUG((DEBUG_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
     Status = EFI_ABORTED;
     goto EXIT;
   }
@@ -137,7 +137,7 @@ InsertEsrtEntry(
     // if exist, update Esrt cache repository
     //
     if (RepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
-      DEBUG((EFI_D_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
+      DEBUG((DEBUG_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
       //
       // Repository is corrupt. Clear Repository before insert new entry
       //
@@ -245,7 +245,7 @@ DeleteEsrtEntry(
   }
 
   if ((RepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY)) != 0) {
-    DEBUG((EFI_D_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
+    DEBUG((DEBUG_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
     //
     // Repository is corrupt. Clear Repository before insert new entry
     //
@@ -347,7 +347,7 @@ UpdateEsrtEntry(
     // if exist, update Esrt cache repository
     //
     if (RepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
-      DEBUG((EFI_D_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
+      DEBUG((DEBUG_ERROR, "Repository Corrupt. Need to rebuild Repository.\n"));
       //
       // Repository is corrupt. Clear Repository before insert new entry
       //

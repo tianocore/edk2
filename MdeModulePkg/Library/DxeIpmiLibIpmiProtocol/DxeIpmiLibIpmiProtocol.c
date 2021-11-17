@@ -54,7 +54,7 @@ IpmiSubmitCommand (
       //
       // Dxe Ipmi Protocol is not installed. So, IPMI device is not present.
       //
-      DEBUG ((EFI_D_ERROR, "IpmiSubmitCommand in Dxe Phase under SMS Status - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "IpmiSubmitCommand in Dxe Phase under SMS Status - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }

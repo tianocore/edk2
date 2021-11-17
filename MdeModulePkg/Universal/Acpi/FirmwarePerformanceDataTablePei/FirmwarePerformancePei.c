@@ -100,7 +100,7 @@ FpdtStatusCodeListenerPei (
   AcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *) (UINTN) S3PerformanceTablePointer;
   ASSERT (AcpiS3PerformanceTable != NULL);
   if (AcpiS3PerformanceTable->Header.Signature != EFI_ACPI_5_0_FPDT_S3_PERFORMANCE_TABLE_SIGNATURE) {
-    DEBUG ((EFI_D_ERROR, "FPDT S3 performance data in ACPI memory get corrupted\n"));
+    DEBUG ((DEBUG_ERROR, "FPDT S3 performance data in ACPI memory get corrupted\n"));
     return EFI_ABORTED;
   }
   AcpiS3ResumeRecord = &AcpiS3PerformanceTable->S3Resume;
@@ -112,9 +112,9 @@ FpdtStatusCodeListenerPei (
   AcpiS3ResumeRecord->ResumeCount++;
   AcpiS3ResumeRecord->AverageResume = DivU64x32 (S3ResumeTotal + AcpiS3ResumeRecord->FullResume, AcpiS3ResumeRecord->ResumeCount);
 
-  DEBUG ((EFI_D_INFO, "FPDT: S3 Resume Performance - ResumeCount   = %d\n", AcpiS3ResumeRecord->ResumeCount));
-  DEBUG ((EFI_D_INFO, "FPDT: S3 Resume Performance - FullResume    = %ld\n", AcpiS3ResumeRecord->FullResume));
-  DEBUG ((EFI_D_INFO, "FPDT: S3 Resume Performance - AverageResume = %ld\n", AcpiS3ResumeRecord->AverageResume));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - ResumeCount   = %d\n", AcpiS3ResumeRecord->ResumeCount));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - FullResume    = %ld\n", AcpiS3ResumeRecord->FullResume));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - AverageResume = %ld\n", AcpiS3ResumeRecord->AverageResume));
 
   //
   // Update S3 Suspend Performance Record.
@@ -132,8 +132,8 @@ FpdtStatusCodeListenerPei (
   AcpiS3SuspendRecord->SuspendStart = S3SuspendRecord.SuspendStart;
   AcpiS3SuspendRecord->SuspendEnd   = S3SuspendRecord.SuspendEnd;
 
-  DEBUG ((EFI_D_INFO, "FPDT: S3 Suspend Performance - SuspendStart = %ld\n", AcpiS3SuspendRecord->SuspendStart));
-  DEBUG ((EFI_D_INFO, "FPDT: S3 Suspend Performance - SuspendEnd   = %ld\n", AcpiS3SuspendRecord->SuspendEnd));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Suspend Performance - SuspendStart = %ld\n", AcpiS3SuspendRecord->SuspendStart));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Suspend Performance - SuspendEnd   = %ld\n", AcpiS3SuspendRecord->SuspendEnd));
 
   Status = PeiServicesLocatePpi (
              &gEfiPeiReadOnlyVariable2PpiGuid,

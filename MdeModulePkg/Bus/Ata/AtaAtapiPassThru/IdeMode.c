@@ -252,36 +252,36 @@ DumpAllIdeRegisters (
 
   DEBUG_CODE_BEGIN ();
   if ((StatusBlock.AtaStatus & ATA_STSREG_DWF) != 0) {
-    DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Write Fault\n", StatusBlock.AtaStatus));
+    DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Write Fault\n", StatusBlock.AtaStatus));
   }
 
   if ((StatusBlock.AtaStatus & ATA_STSREG_CORR) != 0) {
-    DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Corrected Data\n", StatusBlock.AtaStatus));
+    DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Corrected Data\n", StatusBlock.AtaStatus));
   }
 
   if ((StatusBlock.AtaStatus & ATA_STSREG_ERR) != 0) {
     if ((StatusBlock.AtaError & ATA_ERRREG_BBK) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Bad Block Detected\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Bad Block Detected\n", StatusBlock.AtaError));
     }
 
     if ((StatusBlock.AtaError & ATA_ERRREG_UNC) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Uncorrectable Data\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Uncorrectable Data\n", StatusBlock.AtaError));
     }
 
     if ((StatusBlock.AtaError & ATA_ERRREG_MC) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Media Change\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Media Change\n", StatusBlock.AtaError));
     }
 
     if ((StatusBlock.AtaError & ATA_ERRREG_ABRT) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Abort\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Abort\n", StatusBlock.AtaError));
     }
 
     if ((StatusBlock.AtaError & ATA_ERRREG_TK0NF) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Track 0 Not Found\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Track 0 Not Found\n", StatusBlock.AtaError));
     }
 
     if ((StatusBlock.AtaError & ATA_ERRREG_AMNF) != 0) {
-      DEBUG ((EFI_D_ERROR, "CheckRegisterStatus()-- %02x : Error : Address Mark Not Found\n", StatusBlock.AtaError));
+      DEBUG ((DEBUG_ERROR, "CheckRegisterStatus()-- %02x : Error : Address Mark Not Found\n", StatusBlock.AtaError));
     }
   }
   DEBUG_CODE_END ();
@@ -1162,7 +1162,7 @@ AtaUdmStatusWait (
     IoPortForBmis = (UINT16) (IdeRegisters->BusMasterBaseAddr + BMIS_OFFSET);
     RegisterValue = IdeReadPortB (PciIo, IoPortForBmis);
     if (((RegisterValue & BMIS_ERROR) != 0) || (Timeout == 0)) {
-      DEBUG ((EFI_D_ERROR, "ATA UDMA operation fails\n"));
+      DEBUG ((DEBUG_ERROR, "ATA UDMA operation fails\n"));
       Status = EFI_DEVICE_ERROR;
       break;
     }
@@ -1217,7 +1217,7 @@ AtaUdmStatusCheck (
   RegisterValue = IdeReadPortB (PciIo, IoPortForBmis);
 
   if ((RegisterValue & BMIS_ERROR) != 0) {
-    DEBUG ((EFI_D_ERROR, "ATA UDMA operation fails\n"));
+    DEBUG ((DEBUG_ERROR, "ATA UDMA operation fails\n"));
     return EFI_DEVICE_ERROR;
   }
 
@@ -2077,7 +2077,7 @@ IdeAtaSmartReturnStatusCheck (
     //
     // The threshold exceeded condition is not detected by the device
     //
-    DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is not detected\n"));
+    DEBUG ((DEBUG_INFO, "The S.M.A.R.T threshold exceeded condition is not detected\n"));
     REPORT_STATUS_CODE (
           EFI_PROGRESS_CODE,
           (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_UNDERTHRESHOLD)
@@ -2086,7 +2086,7 @@ IdeAtaSmartReturnStatusCheck (
     //
     // The threshold exceeded condition is detected by the device
     //
-    DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is detected\n"));
+    DEBUG ((DEBUG_INFO, "The S.M.A.R.T threshold exceeded condition is detected\n"));
     REPORT_STATUS_CODE (
          EFI_PROGRESS_CODE,
          (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_OVERTHRESHOLD)
@@ -2126,7 +2126,7 @@ IdeAtaSmartSupport (
     //
     // S.M.A.R.T is not supported by the device
     //
-    DEBUG ((EFI_D_INFO, "S.M.A.R.T feature is not supported at [%a] channel [%a] device!\n",
+    DEBUG ((DEBUG_INFO, "S.M.A.R.T feature is not supported at [%a] channel [%a] device!\n",
             (Channel == 1) ? "secondary" : "primary", (Device == 1) ? "slave" : "master"));
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
@@ -2195,7 +2195,7 @@ IdeAtaSmartSupport (
       }
     }
 
-    DEBUG ((EFI_D_INFO, "Enabled S.M.A.R.T feature at [%a] channel [%a] device!\n",
+    DEBUG ((DEBUG_INFO, "Enabled S.M.A.R.T feature at [%a] channel [%a] device!\n",
            (Channel == 1) ? "secondary" : "primary", (Device == 1) ? "slave" : "master"));
 
   }
@@ -2392,7 +2392,7 @@ DetectAndConfigIdeDevice (
 
     Status = WaitForBSYClear (PciIo, IdeRegisters, 350000000);
     if (EFI_ERROR (Status)) {
-      DEBUG((EFI_D_ERROR, "New detecting method: Send Execute Diagnostic Command: WaitForBSYClear: Status: %d\n", Status));
+      DEBUG((DEBUG_ERROR, "New detecting method: Send Execute Diagnostic Command: WaitForBSYClear: Status: %d\n", Status));
       continue;
     }
 
@@ -2453,7 +2453,7 @@ DetectAndConfigIdeDevice (
       continue;
     }
 
-    DEBUG ((EFI_D_INFO, "[%a] channel [%a] [%a] device\n",
+    DEBUG ((DEBUG_INFO, "[%a] channel [%a] [%a] device\n",
             (IdeChannel == 1) ? "secondary" : "primary  ", (IdeDevice == 1) ? "slave " : "master",
             DeviceType == EfiIdeCdrom ? "cdrom   " : "harddisk"));
     //
@@ -2484,7 +2484,7 @@ DetectAndConfigIdeDevice (
                         &SupportedModes
                         );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Calculate Mode Fail, Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Calculate Mode Fail, Status = %r\n", Status));
       continue;
     }
 
@@ -2503,7 +2503,7 @@ DetectAndConfigIdeDevice (
       Status = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
 
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
+        DEBUG ((DEBUG_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
       }
     }
@@ -2520,7 +2520,7 @@ DetectAndConfigIdeDevice (
       Status = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
 
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
+        DEBUG ((DEBUG_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
       }
     } else if (SupportedModes->MultiWordDmaMode.Valid) {
@@ -2529,7 +2529,7 @@ DetectAndConfigIdeDevice (
       Status = SetDeviceTransferMode (Instance, IdeChannel, IdeDevice, &TransferMode, NULL);
 
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
+        DEBUG ((DEBUG_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
       }
     }
@@ -2619,7 +2619,7 @@ IdeModeInitialization (
                         &MaxDevices
                         );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[GetChannel, Status=%x]", Status));
+      DEBUG ((DEBUG_ERROR, "[GetChannel, Status=%x]", Status));
       continue;
     }
 
@@ -2658,4 +2658,3 @@ IdeModeInitialization (
 ErrorExit:
   return Status;
 }
-
