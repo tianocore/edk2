@@ -30,4 +30,3 @@ AsmWriteDr5 (
     _emit   0xe8
   }
 }
-

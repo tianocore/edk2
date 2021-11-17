@@ -26,7 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#define IO_LIB_ADDRESS(Segment,Port) \
+#define IO_LIB_ADDRESS(Segment, Port) \
   ( ((Port) & 0xffff) | (((Segment) & 0xffff) << 16) )
 
 /**
@@ -2804,6 +2804,4 @@ MmioWriteBuffer64 (
   IN  CONST UINT64 *Buffer
   );
 
-
 #endif
-

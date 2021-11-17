@@ -36,7 +36,7 @@ IoLibConstructor (
 {
   EFI_STATUS  Status;
 
-  Status = gBS->LocateProtocol (&gEfiCpuIo2ProtocolGuid, NULL, (VOID **) &mCpuIo);
+  Status = gBS->LocateProtocol (&gEfiCpuIo2ProtocolGuid, NULL, (VOID **)&mCpuIo);
   ASSERT_EFI_ERROR (Status);
 
   return Status;

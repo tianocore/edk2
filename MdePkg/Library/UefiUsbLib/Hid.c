@@ -54,14 +54,14 @@ UsbGetHidDescriptor (
   EFI_STATUS              Result;
   EFI_USB_DEVICE_REQUEST  Request;
 
-  ASSERT(UsbIo != NULL);
-  ASSERT(HidDescriptor != NULL);
+  ASSERT (UsbIo != NULL);
+  ASSERT (HidDescriptor != NULL);
 
   Request.RequestType = USB_HID_GET_DESCRIPTOR_REQ_TYPE;
   Request.Request     = USB_REQ_GET_DESCRIPTOR;
-  Request.Value       = (UINT16) (USB_DESC_TYPE_HID << 8);
-  Request.Index       = Interface;
-  Request.Length      = (UINT16) sizeof (EFI_USB_HID_DESCRIPTOR);
+  Request.Value  = (UINT16)(USB_DESC_TYPE_HID << 8);
+  Request.Index  = Interface;
+  Request.Length = (UINT16)sizeof (EFI_USB_HID_DESCRIPTOR);
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,
@@ -74,7 +74,6 @@ UsbGetHidDescriptor (
                     );
 
   return Result;
-
 }
 
 /**
@@ -119,9 +118,9 @@ UsbGetReportDescriptor (
   //
   Request.RequestType = USB_HID_GET_DESCRIPTOR_REQ_TYPE;
   Request.Request     = USB_REQ_GET_DESCRIPTOR;
-  Request.Value       = (UINT16) (USB_DESC_TYPE_REPORT << 8);
-  Request.Index       = Interface;
-  Request.Length      = DescriptorLength;
+  Request.Value  = (UINT16)(USB_DESC_TYPE_REPORT << 8);
+  Request.Index  = Interface;
+  Request.Length = DescriptorLength;
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,
@@ -134,7 +133,6 @@ UsbGetReportDescriptor (
                     );
 
   return Result;
-
 }
 
 /**
@@ -173,10 +171,10 @@ UsbGetProtocolRequest (
   // Fill Device request packet
   //
   Request.RequestType = USB_HID_CLASS_GET_REQ_TYPE;
-  Request.Request = EFI_USB_GET_PROTOCOL_REQUEST;
-  Request.Value   = 0;
-  Request.Index   = Interface;
-  Request.Length  = 1;
+  Request.Request     = EFI_USB_GET_PROTOCOL_REQUEST;
+  Request.Value  = 0;
+  Request.Index  = Interface;
+  Request.Length = 1;
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,
@@ -190,8 +188,6 @@ UsbGetProtocolRequest (
 
   return Result;
 }
-
-
 
 /**
   Set the HID protocol of the specified USB HID interface.
@@ -227,10 +223,10 @@ UsbSetProtocolRequest (
   // Fill Device request packet
   //
   Request.RequestType = USB_HID_CLASS_SET_REQ_TYPE;
-  Request.Request = EFI_USB_SET_PROTOCOL_REQUEST;
-  Request.Value   = Protocol;
-  Request.Index   = Interface;
-  Request.Length  = 0;
+  Request.Request     = EFI_USB_SET_PROTOCOL_REQUEST;
+  Request.Value  = Protocol;
+  Request.Index  = Interface;
+  Request.Length = 0;
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,
@@ -243,7 +239,6 @@ UsbSetProtocolRequest (
                     );
   return Result;
 }
-
 
 /**
   Set the idle rate of the specified USB HID report.
@@ -280,10 +275,10 @@ UsbSetIdleRequest (
   // Fill Device request packet
   //
   Request.RequestType = USB_HID_CLASS_SET_REQ_TYPE;
-  Request.Request = EFI_USB_SET_IDLE_REQUEST;
-  Request.Value   = (UINT16) ((Duration << 8) | ReportId);
-  Request.Index   = Interface;
-  Request.Length  = 0;
+  Request.Request     = EFI_USB_SET_IDLE_REQUEST;
+  Request.Value  = (UINT16)((Duration << 8) | ReportId);
+  Request.Index  = Interface;
+  Request.Length = 0;
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,
@@ -296,7 +291,6 @@ UsbSetIdleRequest (
                     );
   return Result;
 }
-
 
 /**
   Get the idle rate of the specified USB HID report.
@@ -335,10 +329,10 @@ UsbGetIdleRequest (
   // Fill Device request packet
   //
   Request.RequestType = USB_HID_CLASS_GET_REQ_TYPE;
-  Request.Request = EFI_USB_GET_IDLE_REQUEST;
-  Request.Value   = ReportId;
-  Request.Index   = Interface;
-  Request.Length  = 1;
+  Request.Request     = EFI_USB_GET_IDLE_REQUEST;
+  Request.Value  = ReportId;
+  Request.Index  = Interface;
+  Request.Length = 1;
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,
@@ -352,8 +346,6 @@ UsbGetIdleRequest (
 
   return Result;
 }
-
-
 
 /**
   Set the report descriptor of the specified USB HID interface.
@@ -398,10 +390,10 @@ UsbSetReportRequest (
   // Fill Device request packet
   //
   Request.RequestType = USB_HID_CLASS_SET_REQ_TYPE;
-  Request.Request = EFI_USB_SET_REPORT_REQUEST;
-  Request.Value   = (UINT16) ((ReportType << 8) | ReportId);
-  Request.Index   = Interface;
-  Request.Length  = ReportLen;
+  Request.Request     = EFI_USB_SET_REPORT_REQUEST;
+  Request.Value  = (UINT16)((ReportType << 8) | ReportId);
+  Request.Index  = Interface;
+  Request.Length = ReportLen;
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,
@@ -415,7 +407,6 @@ UsbSetReportRequest (
 
   return Result;
 }
-
 
 /**
   Get the report descriptor of the specified USB HID interface.
@@ -463,10 +454,10 @@ UsbGetReportRequest (
   // Fill Device request packet
   //
   Request.RequestType = USB_HID_CLASS_GET_REQ_TYPE;
-  Request.Request = EFI_USB_GET_REPORT_REQUEST;
-  Request.Value   = (UINT16) ((ReportType << 8) | ReportId);
-  Request.Index   = Interface;
-  Request.Length  = ReportLen;
+  Request.Request     = EFI_USB_GET_REPORT_REQUEST;
+  Request.Value  = (UINT16)((ReportType << 8) | ReportId);
+  Request.Index  = Interface;
+  Request.Length = ReportLen;
 
   Result = UsbIo->UsbControlTransfer (
                     UsbIo,

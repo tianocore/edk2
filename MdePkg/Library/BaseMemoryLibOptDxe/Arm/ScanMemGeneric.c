@@ -32,15 +32,17 @@ InternalMemScanMem16 (
   IN      UINT16                    Value
   )
 {
-  CONST UINT16                      *Pointer;
+  CONST UINT16  *Pointer;
 
-  Pointer = (CONST UINT16*)Buffer;
+  Pointer = (CONST UINT16 *)Buffer;
   do {
     if (*Pointer == Value) {
       return Pointer;
     }
+
     ++Pointer;
   } while (--Length != 0);
+
   return NULL;
 }
 
@@ -63,15 +65,17 @@ InternalMemScanMem32 (
   IN      UINT32                    Value
   )
 {
-  CONST UINT32                      *Pointer;
+  CONST UINT32  *Pointer;
 
-  Pointer = (CONST UINT32*)Buffer;
+  Pointer = (CONST UINT32 *)Buffer;
   do {
     if (*Pointer == Value) {
       return Pointer;
     }
+
     ++Pointer;
   } while (--Length != 0);
+
   return NULL;
 }
 
@@ -94,15 +98,17 @@ InternalMemScanMem64 (
   IN      UINT64                    Value
   )
 {
-  CONST UINT64                      *Pointer;
+  CONST UINT64  *Pointer;
 
-  Pointer = (CONST UINT64*)Buffer;
+  Pointer = (CONST UINT64 *)Buffer;
   do {
     if (*Pointer == Value) {
       return Pointer;
     }
+
     ++Pointer;
   } while (--Length != 0);
+
   return NULL;
 }
 
@@ -123,8 +129,8 @@ InternalMemIsZeroBuffer (
   IN UINTN       Length
   )
 {
-  CONST UINT8 *BufferData;
-  UINTN       Index;
+  CONST UINT8  *BufferData;
+  UINTN        Index;
 
   BufferData = Buffer;
   for (Index = 0; Index < Length; Index++) {
@@ -132,5 +138,6 @@ InternalMemIsZeroBuffer (
       return FALSE;
     }
   }
+
   return TRUE;
 }

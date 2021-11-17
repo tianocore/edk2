@@ -187,7 +187,7 @@ InitializeListHead (
   ASSERT (ListHead != NULL);
 
   ListHead->ForwardLink = ListHead;
-  ListHead->BackLink = ListHead;
+  ListHead->BackLink    = ListHead;
   return ListHead;
 }
 
@@ -226,7 +226,7 @@ InsertHeadList (
   ASSERT_VERIFY_NODE_IN_VALID_LIST (ListHead, Entry, FALSE);
 
   Entry->ForwardLink = ListHead->ForwardLink;
-  Entry->BackLink = ListHead;
+  Entry->BackLink    = ListHead;
   Entry->ForwardLink->BackLink = Entry;
   ListHead->ForwardLink = Entry;
   return ListHead;
@@ -267,7 +267,7 @@ InsertTailList (
   ASSERT_VERIFY_NODE_IN_VALID_LIST (ListHead, Entry, FALSE);
 
   Entry->ForwardLink = ListHead;
-  Entry->BackLink = ListHead->BackLink;
+  Entry->BackLink    = ListHead->BackLink;
   Entry->BackLink->ForwardLink = Entry;
   ListHead->BackLink = Entry;
   return ListHead;
@@ -524,7 +524,7 @@ SwapListEntries (
   IN OUT  LIST_ENTRY                *SecondEntry
   )
 {
-  LIST_ENTRY                    *Ptr;
+  LIST_ENTRY  *Ptr;
 
   if (FirstEntry == SecondEntry) {
     return SecondEntry;

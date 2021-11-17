@@ -28,7 +28,7 @@ InvalidateInstructionCache (
   VOID
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 /**
@@ -64,7 +64,7 @@ InvalidateInstructionCacheRange (
   )
 {
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return Address;
 }
 
@@ -84,7 +84,7 @@ WriteBackInvalidateDataCache (
   VOID
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 /**
@@ -121,7 +121,7 @@ WriteBackInvalidateDataCacheRange (
   )
 {
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return Address;
 }
 
@@ -141,7 +141,7 @@ WriteBackDataCache (
   VOID
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 /**
@@ -177,7 +177,7 @@ WriteBackDataCacheRange (
   )
 {
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return Address;
 }
 
@@ -198,7 +198,7 @@ InvalidateDataCache (
   VOID
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 /**
@@ -236,6 +236,6 @@ InvalidateDataCacheRange (
   )
 {
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return Address;
 }

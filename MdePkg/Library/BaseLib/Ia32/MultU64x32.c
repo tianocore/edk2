@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Multiples a 64-bit unsigned integer by a 32-bit unsigned integer
   and generates a 64-bit unsigned result.
@@ -38,4 +35,3 @@ InternalMathMultU64x32 (
     add     edx, ecx
   }
 }
-

@@ -18,10 +18,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Bit mask used to determine if RdRand instruction is supported.
 //
-#define RDRAND_MASK                  BIT30
+#define RDRAND_MASK  BIT30
 
-
-STATIC BOOLEAN mRdRandSupported;
+STATIC BOOLEAN  mRdRandSupported;
 
 /**
   The constructor function checks whether or not RDRAND instruction is supported

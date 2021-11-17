@@ -19,8 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Uses the recommended value defined in Section 7.3.17 of "Intel 64 and IA-32
 // Architectures Software Developer's Manual".
 //
-#define GETRANDOM_RETRY_LIMIT           10
-
+#define GETRANDOM_RETRY_LIMIT  10
 
 /**
   Generates a 16-bit random number.

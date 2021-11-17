@@ -16,7 +16,6 @@
 
 #include "UefiDevicePathLib.h"
 
-
 /**
   Retrieves the device path protocol from a handle.
 

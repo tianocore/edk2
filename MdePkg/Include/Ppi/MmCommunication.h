@@ -11,7 +11,6 @@
 
 **/
 
-
 #ifndef MM_COMMUNICATION_PPI_H_
 #define MM_COMMUNICATION_PPI_H_
 
@@ -20,7 +19,7 @@
     0xae933e1c, 0xcc47, 0x4e38, { 0x8f, 0xe, 0xe2, 0xf6, 0x1d, 0x26, 0x5, 0xdf } \
   }
 
-typedef struct _EFI_PEI_MM_COMMUNICATION_PPI  EFI_PEI_MM_COMMUNICATION_PPI;
+typedef struct _EFI_PEI_MM_COMMUNICATION_PPI EFI_PEI_MM_COMMUNICATION_PPI;
 
 /**
   Communicates with a registered handler.
@@ -64,9 +63,9 @@ EFI_STATUS
 /// MMI handler.
 ///
 struct _EFI_PEI_MM_COMMUNICATION_PPI {
-  EFI_PEI_MM_COMMUNICATE  Communicate;
+  EFI_PEI_MM_COMMUNICATE    Communicate;
 };
 
-extern EFI_GUID gEfiPeiMmCommunicationPpiGuid;
+extern EFI_GUID  gEfiPeiMmCommunicationPpiGuid;
 
 #endif

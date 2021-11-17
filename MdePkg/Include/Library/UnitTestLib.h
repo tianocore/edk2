@@ -13,7 +13,7 @@
 ///
 /// Unit Test Status
 ///
-typedef UINT32  UNIT_TEST_STATUS;
+typedef UINT32 UNIT_TEST_STATUS;
 #define UNIT_TEST_PASSED                      (0)
 #define UNIT_TEST_ERROR_PREREQUISITE_NOT_MET  (1)
 #define UNIT_TEST_ERROR_TEST_FAILED           (2)
@@ -34,24 +34,24 @@ typedef UINT32  UNIT_TEST_STATUS;
 /// Unit Test Framework Handle
 ///
 struct UNIT_TEST_FRAMEWORK_OBJECT;
-typedef struct UNIT_TEST_FRAMEWORK_OBJECT  *UNIT_TEST_FRAMEWORK_HANDLE;
+typedef struct UNIT_TEST_FRAMEWORK_OBJECT *UNIT_TEST_FRAMEWORK_HANDLE;
 
 ///
 /// Unit Test Suite Handle
 ///
 struct UNIT_TEST_SUITE_OBJECT;
-typedef struct UNIT_TEST_SUITE_OBJECT  *UNIT_TEST_SUITE_HANDLE;
+typedef struct UNIT_TEST_SUITE_OBJECT *UNIT_TEST_SUITE_HANDLE;
 
 ///
 /// Unit Test Handle
 ///
 struct UNIT_TEST_OBJECT;
-typedef struct UNIT_TEST_OBJECT  *UNIT_TEST_HANDLE;
+typedef struct UNIT_TEST_OBJECT *UNIT_TEST_HANDLE;
 
 ///
 /// Unit Test Context
 ///
-typedef VOID*  UNIT_TEST_CONTEXT;
+typedef VOID *UNIT_TEST_CONTEXT;
 
 /**
   The prototype for a single UnitTest case function.

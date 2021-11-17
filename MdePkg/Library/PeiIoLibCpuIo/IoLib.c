@@ -8,14 +8,12 @@
 
 **/
 
-
 #include <PiPei.h>
 
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
-
 
 /**
   Reads registers in the EFI CPU I/O space.
@@ -42,12 +40,12 @@ IoReadFifoWorker (
   IN      VOID                      *Buffer
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
-  EFI_STATUS                        Status;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
+  EFI_STATUS              Status;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
 
   Status = CpuIo->Io.Read (PeiServices, CpuIo, Width, Port, Count, Buffer);
@@ -79,12 +77,12 @@ IoWriteFifoWorker (
   IN      VOID                      *Buffer
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
-  EFI_STATUS                        Status;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
+  EFI_STATUS              Status;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
 
   Status = CpuIo->Io.Write (PeiServices, CpuIo, Width, Port, Count, Buffer);
@@ -111,14 +109,14 @@ IoRead8 (
   IN      UINTN                     Port
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
 
-  return CpuIo->IoRead8 (PeiServices, CpuIo, (UINT64) Port);
+  return CpuIo->IoRead8 (PeiServices, CpuIo, (UINT64)Port);
 }
 
 /**
@@ -143,14 +141,14 @@ IoWrite8 (
   IN      UINT8                     Value
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
 
-  CpuIo->IoWrite8 (PeiServices, CpuIo, (UINT64) Port, Value);
+  CpuIo->IoWrite8 (PeiServices, CpuIo, (UINT64)Port, Value);
   return Value;
 }
 
@@ -175,17 +173,17 @@ IoRead16 (
   IN      UINTN                     Port
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Port is aligned on a 16-bit boundary.
   //
   ASSERT ((Port & 1) == 0);
-  return CpuIo->IoRead16 (PeiServices, CpuIo, (UINT64) Port);
+  return CpuIo->IoRead16 (PeiServices, CpuIo, (UINT64)Port);
 }
 
 /**
@@ -211,17 +209,17 @@ IoWrite16 (
   IN      UINT16                    Value
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Port is aligned on a 16-bit boundary.
   //
   ASSERT ((Port & 1) == 0);
-  CpuIo->IoWrite16 (PeiServices, CpuIo, (UINT64) Port, Value);
+  CpuIo->IoWrite16 (PeiServices, CpuIo, (UINT64)Port, Value);
   return Value;
 }
 
@@ -246,17 +244,17 @@ IoRead32 (
   IN      UINTN                     Port
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Port is aligned on a 32-bit boundary.
   //
   ASSERT ((Port & 3) == 0);
-  return CpuIo->IoRead32 (PeiServices, CpuIo, (UINT64) Port);
+  return CpuIo->IoRead32 (PeiServices, CpuIo, (UINT64)Port);
 }
 
 /**
@@ -282,17 +280,17 @@ IoWrite32 (
   IN      UINT32                    Value
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Port is aligned on a 32-bit boundary.
   //
   ASSERT ((Port & 3) == 0);
-  CpuIo->IoWrite32 (PeiServices, CpuIo, (UINT64) Port, Value);
+  CpuIo->IoWrite32 (PeiServices, CpuIo, (UINT64)Port, Value);
   return Value;
 }
 
@@ -317,17 +315,17 @@ IoRead64 (
   IN      UINTN                     Port
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Port is aligned on a 64-bit boundary.
   //
   ASSERT ((Port & 7) == 0);
-  return CpuIo->IoRead64 (PeiServices, CpuIo, (UINT64) Port);
+  return CpuIo->IoRead64 (PeiServices, CpuIo, (UINT64)Port);
 }
 
 /**
@@ -353,18 +351,18 @@ IoWrite64 (
   IN      UINT64                    Value
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Port is aligned on a 64-bit boundary.
   //
   ASSERT ((Port & 7) == 0);
-  CpuIo->IoWrite64 (PeiServices, CpuIo, (UINT64) Port, Value);
-  return Value;;
+  CpuIo->IoWrite64 (PeiServices, CpuIo, (UINT64)Port, Value);
+  return Value;
 }
 
 /**
@@ -571,14 +569,14 @@ MmioRead8 (
   IN      UINTN                     Address
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
 
-  return CpuIo->MemRead8 (PeiServices, CpuIo, (UINT64) Address);
+  return CpuIo->MemRead8 (PeiServices, CpuIo, (UINT64)Address);
 }
 
 /**
@@ -603,14 +601,14 @@ MmioWrite8 (
   IN      UINT8                     Value
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
 
-  CpuIo->MemWrite8 (PeiServices, CpuIo, (UINT64) Address, Value);
+  CpuIo->MemWrite8 (PeiServices, CpuIo, (UINT64)Address, Value);
   return Value;
 }
 
@@ -635,18 +633,17 @@ MmioRead16 (
   IN      UINTN                     Address
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Address is aligned on a 16-bit boundary.
   //
   ASSERT ((Address & 1) == 0);
-  return CpuIo->MemRead16 (PeiServices, CpuIo, (UINT64) Address);
-
+  return CpuIo->MemRead16 (PeiServices, CpuIo, (UINT64)Address);
 }
 
 /**
@@ -672,17 +669,17 @@ MmioWrite16 (
   IN      UINT16                    Value
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Address is aligned on a 16-bit boundary.
   //
   ASSERT ((Address & 1) == 0);
-  CpuIo->MemWrite16 (PeiServices, CpuIo, (UINT64) Address, Value);
+  CpuIo->MemWrite16 (PeiServices, CpuIo, (UINT64)Address, Value);
   return Value;
 }
 
@@ -707,18 +704,17 @@ MmioRead32 (
   IN      UINTN                     Address
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Address is aligned on a 32-bit boundary.
   //
   ASSERT ((Address & 3) == 0);
-  return CpuIo->MemRead32 (PeiServices, CpuIo, (UINT64) Address);
-
+  return CpuIo->MemRead32 (PeiServices, CpuIo, (UINT64)Address);
 }
 
 /**
@@ -744,17 +740,17 @@ MmioWrite32 (
   IN      UINT32                    Value
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Address is aligned on a 32-bit boundary.
   //
   ASSERT ((Address & 3) == 0);
-  CpuIo->MemWrite32 (PeiServices, CpuIo, (UINT64) Address, Value);
+  CpuIo->MemWrite32 (PeiServices, CpuIo, (UINT64)Address, Value);
   return Value;
 }
 
@@ -779,18 +775,17 @@ MmioRead64 (
   IN      UINTN                     Address
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Address is aligned on a 64-bit boundary.
   //
   ASSERT ((Address & (sizeof (UINT64) - 1)) == 0);
-  return CpuIo->MemRead64 (PeiServices, CpuIo, (UINT64) Address);
-
+  return CpuIo->MemRead64 (PeiServices, CpuIo, (UINT64)Address);
 }
 
 /**
@@ -814,16 +809,16 @@ MmioWrite64 (
   IN      UINT64                    Value
   )
 {
-  CONST EFI_PEI_SERVICES            **PeiServices;
-  EFI_PEI_CPU_IO_PPI                *CpuIo;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  EFI_PEI_CPU_IO_PPI      *CpuIo;
 
   PeiServices = GetPeiServicesTablePointer ();
-  CpuIo       = (*PeiServices)->CpuIo;
+  CpuIo = (*PeiServices)->CpuIo;
   ASSERT (CpuIo != NULL);
   //
   // Make sure Address is aligned on a 64-bit boundary.
   //
   ASSERT ((Address & 7) == 0);
-  CpuIo->MemWrite64 (PeiServices, CpuIo, (UINT64) Address, Value);
+  CpuIo->MemWrite64 (PeiServices, CpuIo, (UINT64)Address, Value);
   return Value;
 }

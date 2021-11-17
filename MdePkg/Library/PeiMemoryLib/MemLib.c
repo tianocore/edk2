@@ -30,7 +30,7 @@ InternalMemCopyMem (
 {
   (*GetPeiServicesTablePointer ())->CopyMem (
                                       Destination,
-                                      (VOID*)Source,
+                                      (VOID *)Source,
                                       Length
                                       );
   return Destination;

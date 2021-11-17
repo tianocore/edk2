@@ -95,7 +95,6 @@ InternalMathARShiftU64 (
          ((INTN)Operand < 0 ? ~((UINTN)-1 >> Count) : 0);
 }
 
-
 /**
   Rotates a 64-bit integer left between 0 and 63 bits, filling
   the low bits with the high bits that were rotated.
@@ -165,8 +164,8 @@ InternalMathSwapBytes64 (
   UINT64  LowerBytes;
   UINT64  HigherBytes;
 
-  LowerBytes  = (UINT64) SwapBytes32 ((UINT32) Operand);
-  HigherBytes = (UINT64) SwapBytes32 ((UINT32) (Operand >> 32));
+  LowerBytes  = (UINT64)SwapBytes32 ((UINT32)Operand);
+  HigherBytes = (UINT64)SwapBytes32 ((UINT32)(Operand >> 32));
 
   return (LowerBytes << 32 | HigherBytes);
 }
@@ -194,7 +193,6 @@ InternalMathMultU64x32 (
 {
   return Multiplicand * Multiplier;
 }
-
 
 /**
   Multiplies a 64-bit unsigned integer by a 64-bit unsigned integer
@@ -296,6 +294,7 @@ InternalMathDivRemU64x32 (
   if (Remainder != NULL) {
     *Remainder = (UINT32)(Dividend % Divisor);
   }
+
   return Dividend / Divisor;
 }
 
@@ -327,6 +326,7 @@ InternalMathDivRemU64x64 (
   if (Remainder != NULL) {
     *Remainder = Dividend % Divisor;
   }
+
   return Dividend / Divisor;
 }
 
@@ -358,5 +358,6 @@ InternalMathDivRemS64x64 (
   if (Remainder != NULL) {
     *Remainder = Dividend % Divisor;
   }
+
   return Dividend / Divisor;
 }

@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Switches the endianess of a 64-bit integer.
 
@@ -34,4 +31,3 @@ InternalMathSwapBytes64 (
     bswap   edx
   }
 }
-

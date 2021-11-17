@@ -7,7 +7,6 @@
 
 **/
 
-
 #include <Base.h>
 
 #include <Library/BaseLib.h>
@@ -51,7 +50,7 @@
   @param  M Additional bits to assert to be zero.
 
 **/
-#define ASSERT_INVALID_PCI_ADDRESS(A,M) \
+#define ASSERT_INVALID_PCI_ADDRESS(A, M) \
   ASSERT (((A) & (~0xffff0ff | (M))) == 0)
 
 /**
@@ -114,7 +113,7 @@ PciCf8Read8 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoRead8 (PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3));
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
@@ -152,7 +151,7 @@ PciCf8Write8 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoWrite8 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
@@ -197,7 +196,7 @@ PciCf8Or8 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoOr8 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
@@ -242,7 +241,7 @@ PciCf8And8 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoAnd8 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
@@ -290,7 +289,7 @@ PciCf8AndThenOr8 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoAndThenOr8 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
@@ -338,7 +337,7 @@ PciCf8BitFieldRead8 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldRead8 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
@@ -390,7 +389,7 @@ PciCf8BitFieldWrite8 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldWrite8 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
@@ -446,7 +445,7 @@ PciCf8BitFieldOr8 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldOr8 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
@@ -502,7 +501,7 @@ PciCf8BitFieldAnd8 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldAnd8 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
@@ -549,7 +548,7 @@ PciCf8BitFieldAnd8 (
 **/
 UINT8
 EFIAPI
-PciCf8BitFieldAndThenOr8(
+PciCf8BitFieldAndThenOr8 (
   IN      UINTN                     Address,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit,
@@ -563,7 +562,7 @@ PciCf8BitFieldAndThenOr8(
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 0);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldAndThenOr8 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 3),
@@ -606,7 +605,7 @@ PciCf8Read16 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoRead16 (PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2));
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
@@ -645,7 +644,7 @@ PciCf8Write16 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoWrite16 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
@@ -691,7 +690,7 @@ PciCf8Or16 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoOr16 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
@@ -737,7 +736,7 @@ PciCf8And16 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoAnd16 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
@@ -786,7 +785,7 @@ PciCf8AndThenOr16 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoAndThenOr16 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
@@ -835,7 +834,7 @@ PciCf8BitFieldRead16 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldRead16 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
@@ -888,7 +887,7 @@ PciCf8BitFieldWrite16 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldWrite16 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
@@ -945,7 +944,7 @@ PciCf8BitFieldOr16 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldOr16 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
@@ -1002,7 +1001,7 @@ PciCf8BitFieldAnd16 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldAnd16 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
@@ -1050,7 +1049,7 @@ PciCf8BitFieldAnd16 (
 **/
 UINT16
 EFIAPI
-PciCf8BitFieldAndThenOr16(
+PciCf8BitFieldAndThenOr16 (
   IN      UINTN                     Address,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit,
@@ -1064,7 +1063,7 @@ PciCf8BitFieldAndThenOr16(
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 1);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldAndThenOr16 (
              PCI_CONFIGURATION_DATA_PORT + (UINT16)(Address & 2),
@@ -1107,7 +1106,7 @@ PciCf8Read32 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoRead32 (PCI_CONFIGURATION_DATA_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
@@ -1146,7 +1145,7 @@ PciCf8Write32 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoWrite32 (
              PCI_CONFIGURATION_DATA_PORT,
@@ -1192,7 +1191,7 @@ PciCf8Or32 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoOr32 (
              PCI_CONFIGURATION_DATA_PORT,
@@ -1238,7 +1237,7 @@ PciCf8And32 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoAnd32 (
              PCI_CONFIGURATION_DATA_PORT,
@@ -1287,7 +1286,7 @@ PciCf8AndThenOr32 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoAndThenOr32 (
              PCI_CONFIGURATION_DATA_PORT,
@@ -1336,7 +1335,7 @@ PciCf8BitFieldRead32 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldRead32 (
              PCI_CONFIGURATION_DATA_PORT,
@@ -1389,7 +1388,7 @@ PciCf8BitFieldWrite32 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldWrite32 (
              PCI_CONFIGURATION_DATA_PORT,
@@ -1446,7 +1445,7 @@ PciCf8BitFieldOr32 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldOr32 (
              PCI_CONFIGURATION_DATA_PORT,
@@ -1503,7 +1502,7 @@ PciCf8BitFieldAnd32 (
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldAnd32 (
              PCI_CONFIGURATION_DATA_PORT,
@@ -1551,7 +1550,7 @@ PciCf8BitFieldAnd32 (
 **/
 UINT32
 EFIAPI
-PciCf8BitFieldAndThenOr32(
+PciCf8BitFieldAndThenOr32 (
   IN      UINTN                     Address,
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit,
@@ -1565,15 +1564,15 @@ PciCf8BitFieldAndThenOr32(
 
   ASSERT_INVALID_PCI_ADDRESS (Address, 3);
   InterruptState = SaveAndDisableInterrupts ();
-  AddressPort = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
+  AddressPort    = IoRead32 (PCI_CONFIGURATION_ADDRESS_PORT);
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, PCI_TO_CF8_ADDRESS (Address));
   Result = IoBitFieldAndThenOr32 (
-               PCI_CONFIGURATION_DATA_PORT,
-               StartBit,
-               EndBit,
-               AndData,
-               OrData
-               );
+             PCI_CONFIGURATION_DATA_PORT,
+             StartBit,
+             EndBit,
+             AndData,
+             OrData
+             );
   IoWrite32 (PCI_CONFIGURATION_ADDRESS_PORT, AddressPort);
   SetInterruptState (InterruptState);
   return Result;
@@ -1611,7 +1610,7 @@ PciCf8ReadBuffer (
   OUT     VOID                      *Buffer
   )
 {
-  UINTN   ReturnValue;
+  UINTN  ReturnValue;
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x100);
@@ -1633,39 +1632,39 @@ PciCf8ReadBuffer (
     //
     *(volatile UINT8 *)Buffer = PciCf8Read8 (StartAddress);
     StartAddress += sizeof (UINT8);
-    Size -= sizeof (UINT8);
-    Buffer = (UINT8*)Buffer + 1;
+    Size  -= sizeof (UINT8);
+    Buffer = (UINT8 *)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (StartAddress & 2) != 0) {
+  if ((Size >= sizeof (UINT16)) && ((StartAddress & 2) != 0)) {
     //
     // Read a word if StartAddress is word aligned
     //
-    WriteUnaligned16 ((UINT16 *)Buffer, (UINT16) PciCf8Read16 (StartAddress));
+    WriteUnaligned16 ((UINT16 *)Buffer, (UINT16)PciCf8Read16 (StartAddress));
 
     StartAddress += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size  -= sizeof (UINT16);
+    Buffer = (UINT16 *)Buffer + 1;
   }
 
   while (Size >= sizeof (UINT32)) {
     //
     // Read as many double words as possible
     //
-    WriteUnaligned32 ((UINT32 *)Buffer, (UINT32) PciCf8Read32 (StartAddress));
+    WriteUnaligned32 ((UINT32 *)Buffer, (UINT32)PciCf8Read32 (StartAddress));
     StartAddress += sizeof (UINT32);
-    Size -= sizeof (UINT32);
-    Buffer = (UINT32*)Buffer + 1;
+    Size  -= sizeof (UINT32);
+    Buffer = (UINT32 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT16)) {
     //
     // Read the last remaining word if exist
     //
-    WriteUnaligned16 ((UINT16 *)Buffer, (UINT16) PciCf8Read16 (StartAddress));
+    WriteUnaligned16 ((UINT16 *)Buffer, (UINT16)PciCf8Read16 (StartAddress));
     StartAddress += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size  -= sizeof (UINT16);
+    Buffer = (UINT16 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT8)) {
@@ -1711,7 +1710,7 @@ PciCf8WriteBuffer (
   IN      VOID                      *Buffer
   )
 {
-  UINTN   ReturnValue;
+  UINTN  ReturnValue;
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x100);
@@ -1731,47 +1730,47 @@ PciCf8WriteBuffer (
     //
     // Write a byte if StartAddress is byte aligned
     //
-    PciCf8Write8 (StartAddress, *(UINT8*)Buffer);
+    PciCf8Write8 (StartAddress, *(UINT8 *)Buffer);
     StartAddress += sizeof (UINT8);
-    Size -= sizeof (UINT8);
-    Buffer = (UINT8*)Buffer + 1;
+    Size  -= sizeof (UINT8);
+    Buffer = (UINT8 *)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (StartAddress & 2) != 0) {
+  if ((Size >= sizeof (UINT16)) && ((StartAddress & 2) != 0)) {
     //
     // Write a word if StartAddress is word aligned
     //
-    PciCf8Write16 (StartAddress, ReadUnaligned16 ((UINT16*)Buffer));
+    PciCf8Write16 (StartAddress, ReadUnaligned16 ((UINT16 *)Buffer));
     StartAddress += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size  -= sizeof (UINT16);
+    Buffer = (UINT16 *)Buffer + 1;
   }
 
   while (Size >= sizeof (UINT32)) {
     //
     // Write as many double words as possible
     //
-    PciCf8Write32 (StartAddress, ReadUnaligned32 ((UINT32*)Buffer));
+    PciCf8Write32 (StartAddress, ReadUnaligned32 ((UINT32 *)Buffer));
     StartAddress += sizeof (UINT32);
-    Size -= sizeof (UINT32);
-    Buffer = (UINT32*)Buffer + 1;
+    Size  -= sizeof (UINT32);
+    Buffer = (UINT32 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT16)) {
     //
     // Write the last remaining word if exist
     //
-    PciCf8Write16 (StartAddress, ReadUnaligned16 ((UINT16*)Buffer));
+    PciCf8Write16 (StartAddress, ReadUnaligned16 ((UINT16 *)Buffer));
     StartAddress += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size  -= sizeof (UINT16);
+    Buffer = (UINT16 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT8)) {
     //
     // Write the last remaining byte if exist
     //
-    PciCf8Write8 (StartAddress, *(UINT8*)Buffer);
+    PciCf8Write8 (StartAddress, *(UINT8 *)Buffer);
   }
 
   return ReturnValue;

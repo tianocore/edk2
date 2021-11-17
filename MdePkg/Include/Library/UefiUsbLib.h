@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __USB_DXE_LIB_H__
 #define __USB_DXE_LIB_H__
 
@@ -39,7 +38,6 @@ UsbGetHidDescriptor (
   IN  UINT8                      Interface,
   OUT EFI_USB_HID_DESCRIPTOR     *HidDescriptor
   );
-
 
 /**
   Get the report descriptor of the specified USB HID interface.

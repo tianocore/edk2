@@ -11,7 +11,7 @@
 #include <Library/DebugLib.h>
 #include <Library/TimerLib.h>
 
-#define DEFAULT_DELAY_TIME_IN_MICROSECONDS 10
+#define DEFAULT_DELAY_TIME_IN_MICROSECONDS  10
 
 /**
  Using the TimerLib GetPerformanceCounterProperties() we delay
@@ -26,21 +26,21 @@ CalculateMinimumDecentDelayInMicroseconds (
   VOID
   )
 {
-  UINT64 CounterHz;
+  UINT64  CounterHz;
 
   // Get the counter properties
   CounterHz = GetPerformanceCounterProperties (NULL, NULL);
   // Make sure we won't divide by zero
   if (CounterHz == 0) {
-    ASSERT(CounterHz != 0); // Assert so the developer knows something is wrong
+    ASSERT (CounterHz != 0); // Assert so the developer knows something is wrong
     return DEFAULT_DELAY_TIME_IN_MICROSECONDS;
   }
+
   // Calculate the minimum delay based on 1.5 microseconds divided by the hertz.
   // We calculate the length of a cycle (1/CounterHz) and multiply it by 1.5 microseconds
   // This ensures that the performance counter has increased by at least one
-  return (UINT32)(MAX (DivU64x64Remainder (1500000,CounterHz, NULL), 1));
+  return (UINT32)(MAX (DivU64x64Remainder (1500000, CounterHz, NULL), 1));
 }
-
 
 /**
   Generates a 16-bit random number.
@@ -60,7 +60,7 @@ GetRandomNumber16 (
   )
 {
   UINT32  Index;
-  UINT8  *RandPtr;
+  UINT8   *RandPtr;
   UINT32  DelayInMicroSeconds;
 
   ASSERT (Rand != NULL);
@@ -68,15 +68,17 @@ GetRandomNumber16 (
   if (Rand == NULL) {
     return FALSE;
   }
+
   DelayInMicroSeconds = CalculateMinimumDecentDelayInMicroseconds ();
-  RandPtr = (UINT8*)Rand;
+  RandPtr = (UINT8 *)Rand;
   // Get 2 bytes of random ish data
-  for (Index = 0; Index < sizeof(UINT16); Index ++) {
+  for (Index = 0; Index < sizeof (UINT16); Index++) {
     *RandPtr = (UINT8)(GetPerformanceCounter () & 0xFF);
     // Delay to give the performance counter a chance to change
     MicroSecondDelay (DelayInMicroSeconds);
     RandPtr++;
   }
+
   return TRUE;
 }
 
@@ -98,7 +100,7 @@ GetRandomNumber32 (
   )
 {
   UINT32  Index;
-  UINT8  *RandPtr;
+  UINT8   *RandPtr;
   UINT32  DelayInMicroSeconds;
 
   ASSERT (Rand != NULL);
@@ -107,15 +109,16 @@ GetRandomNumber32 (
     return FALSE;
   }
 
-  RandPtr = (UINT8 *) Rand;
+  RandPtr = (UINT8 *)Rand;
   DelayInMicroSeconds = CalculateMinimumDecentDelayInMicroseconds ();
   // Get 4 bytes of random ish data
-  for (Index = 0; Index < sizeof(UINT32); Index ++) {
+  for (Index = 0; Index < sizeof (UINT32); Index++) {
     *RandPtr = (UINT8)(GetPerformanceCounter () & 0xFF);
     // Delay to give the performance counter a chance to change
     MicroSecondDelay (DelayInMicroSeconds);
     RandPtr++;
   }
+
   return TRUE;
 }
 
@@ -137,7 +140,7 @@ GetRandomNumber64 (
   )
 {
   UINT32  Index;
-  UINT8  *RandPtr;
+  UINT8   *RandPtr;
   UINT32  DelayInMicroSeconds;
 
   ASSERT (Rand != NULL);
@@ -149,7 +152,7 @@ GetRandomNumber64 (
   RandPtr = (UINT8 *)Rand;
   DelayInMicroSeconds = CalculateMinimumDecentDelayInMicroseconds ();
   // Get 8 bytes of random ish data
-  for (Index = 0; Index < sizeof(UINT64); Index ++) {
+  for (Index = 0; Index < sizeof (UINT64); Index++) {
     *RandPtr = (UINT8)(GetPerformanceCounter () & 0xFF);
     // Delay to give the performance counter a chance to change
     MicroSecondDelay (DelayInMicroSeconds);

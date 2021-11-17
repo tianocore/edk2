@@ -20,7 +20,6 @@
 #include <Library/BaseLib.h>
 #include <Library/SmmServicesTableLib.h>
 
-
 /**
   Reads registers in the EFI CPU I/O space.
 

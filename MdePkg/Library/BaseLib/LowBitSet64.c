@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 #include "BaseLibInternals.h"
 
 /**
@@ -31,7 +28,7 @@ LowBitSet64 (
   IN      UINT64                    Operand
   )
 {
-  INTN                              BitIndex;
+  INTN  BitIndex;
 
   if (Operand == 0) {
     return -1;
@@ -39,6 +36,9 @@ LowBitSet64 (
 
   for (BitIndex = 0;
        (Operand & 1) == 0;
-       BitIndex++, Operand = RShiftU64 (Operand, 1));
+       BitIndex++, Operand = RShiftU64 (Operand, 1))
+  {
+  }
+
   return BitIndex;
 }

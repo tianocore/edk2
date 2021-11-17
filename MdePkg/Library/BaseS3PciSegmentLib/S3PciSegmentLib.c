@@ -8,7 +8,6 @@
 
 **/
 
-
 #include <Base.h>
 
 #include <Library/DebugLib.h>
@@ -50,7 +49,7 @@ InternalSavePciSegmentWriteValueToBootScript (
   IN VOID                   *Buffer
   )
 {
-  RETURN_STATUS                Status;
+  RETURN_STATUS  Status;
 
   Status = S3BootScriptSavePciCfg2Write (
              Width,
@@ -783,8 +782,6 @@ S3PciSegmentBitFieldAndThenOr16 (
   return InternalSavePciSegmentWrite16ValueToBootScript (Address, PciSegmentBitFieldAndThenOr16 (Address, StartBit, EndBit, AndData, OrData));
 }
 
-
-
 /**
   Saves a 32-bit PCI configuration value to the boot script.
 
@@ -1183,7 +1180,7 @@ S3PciSegmentReadBuffer (
   OUT VOID                     *Buffer
   )
 {
-  RETURN_STATUS    Status;
+  RETURN_STATUS  Status;
 
   Status = S3BootScriptSavePciCfg2Write (
              S3BootScriptWidthUint8,
@@ -1229,7 +1226,7 @@ S3PciSegmentWriteBuffer (
   IN VOID                      *Buffer
   )
 {
-  RETURN_STATUS    Status;
+  RETURN_STATUS  Status;
 
   Status = S3BootScriptSavePciCfg2Write (
              S3BootScriptWidthUint8,

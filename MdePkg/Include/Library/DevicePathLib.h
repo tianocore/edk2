@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __DEVICE_PATH_LIB_H__
 #define __DEVICE_PATH_LIB_H__
 
-#define END_DEVICE_PATH_LENGTH               (sizeof (EFI_DEVICE_PATH_PROTOCOL))
+#define END_DEVICE_PATH_LENGTH  (sizeof (EFI_DEVICE_PATH_PROTOCOL))
 
 /**
   Determine whether a given device path is valid.
@@ -292,7 +292,7 @@ DuplicateDevicePath (
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 AppendDevicePath (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *FirstDevicePath,  OPTIONAL
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *FirstDevicePath, OPTIONAL
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *SecondDevicePath  OPTIONAL
   );
 
@@ -324,7 +324,7 @@ AppendDevicePath (
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 AppendDevicePathNode (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath,     OPTIONAL
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath, OPTIONAL
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode  OPTIONAL
   );
 
@@ -352,7 +352,7 @@ AppendDevicePathNode (
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 AppendDevicePathInstance (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath,        OPTIONAL
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath, OPTIONAL
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePathInstance OPTIONAL
   );
 
@@ -474,7 +474,7 @@ DevicePathFromHandle (
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 FileDevicePath (
-  IN EFI_HANDLE                      Device,     OPTIONAL
+  IN EFI_HANDLE                      Device, OPTIONAL
   IN CONST CHAR16                    *FileName
   );
 

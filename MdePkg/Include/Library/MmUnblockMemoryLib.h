@@ -39,6 +39,6 @@ EFIAPI
 MmUnblockMemoryRequest (
   IN PHYSICAL_ADDRESS       UnblockAddress,
   IN UINT64                 NumberOfPages
-);
+  );
 
 #endif // MM_UNBLOCK_MEMORY_LIB_H_

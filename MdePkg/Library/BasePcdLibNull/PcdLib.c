@@ -12,7 +12,6 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 
-
 /**
   This function provides a means by which SKU support can be established in the PCD infrastructure.
 
@@ -56,8 +55,6 @@ LibPcdGet8 (
   return 0;
 }
 
-
-
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
 
@@ -78,8 +75,6 @@ LibPcdGet16 (
 
   return 0;
 }
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -102,8 +97,6 @@ LibPcdGet32 (
   return 0;
 }
 
-
-
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
 
@@ -124,8 +117,6 @@ LibPcdGet64 (
 
   return 0;
 }
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -148,8 +139,6 @@ LibPcdGetPtr (
   return 0;
 }
 
-
-
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
 
@@ -171,8 +160,6 @@ LibPcdGetBool (
   return 0;
 }
 
-
-
 /**
   This function provides a means by which to retrieve the size of a given PCD token.
 
@@ -191,8 +178,6 @@ LibPcdGetSize (
 
   return 0;
 }
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -220,8 +205,6 @@ LibPcdGetEx8 (
   return 0;
 }
 
-
-
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
 
@@ -248,8 +231,6 @@ LibPcdGetEx16 (
   return 0;
 }
 
-
-
 /**
   Returns the 32-bit value for the token specified by TokenNumber and Guid.
   If Guid is NULL, then ASSERT().
@@ -272,8 +253,6 @@ LibPcdGetEx32 (
 
   return 0;
 }
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -301,8 +280,6 @@ LibPcdGetEx64 (
   return 0;
 }
 
-
-
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
 
@@ -328,8 +305,6 @@ LibPcdGetExPtr (
 
   return 0;
 }
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -357,8 +332,6 @@ LibPcdGetExBool (
   return 0;
 }
 
-
-
 /**
   This function provides a means by which to retrieve the size of a given PCD token.
 
@@ -384,7 +357,6 @@ LibPcdGetExSize (
 
   return 0;
 }
-
 
 /**
   This function provides a means by which to set a value for a given PCD token.
@@ -742,15 +714,13 @@ LibPcdSetExBoolS (
 VOID
 EFIAPI
 LibPcdCallbackOnSet (
-  IN CONST GUID               *Guid,       OPTIONAL
+  IN CONST GUID               *Guid, OPTIONAL
   IN UINTN                    TokenNumber,
   IN PCD_CALLBACK             NotificationFunction
   )
 {
   ASSERT (FALSE);
 }
-
-
 
 /**
   Disable a notification function that was established with LibPcdCallbackonSet().
@@ -769,15 +739,13 @@ LibPcdCallbackOnSet (
 VOID
 EFIAPI
 LibPcdCancelCallback (
-  IN CONST GUID               *Guid,       OPTIONAL
+  IN CONST GUID               *Guid, OPTIONAL
   IN UINTN                    TokenNumber,
   IN PCD_CALLBACK             NotificationFunction
   )
 {
   ASSERT (FALSE);
 }
-
-
 
 /**
   Retrieves the next token in a token space.
@@ -801,7 +769,7 @@ LibPcdCancelCallback (
 UINTN
 EFIAPI
 LibPcdGetNextToken (
-  IN CONST GUID               *Guid,       OPTIONAL
+  IN CONST GUID               *Guid, OPTIONAL
   IN UINTN                    TokenNumber
   )
 {
@@ -809,8 +777,6 @@ LibPcdGetNextToken (
 
   return 0;
 }
-
-
 
 /**
   Used to retrieve the list of available PCD token space GUIDs.
@@ -835,7 +801,6 @@ LibPcdGetNextTokenSpace (
 
   return NULL;
 }
-
 
 /**
   Sets a value of a patchable PCD entry that is type pointer.
@@ -877,14 +842,15 @@ LibPatchPcdSetPtr (
   }
 
   if ((*SizeOfBuffer > MaximumDatumSize) ||
-      (*SizeOfBuffer == MAX_ADDRESS)) {
+      (*SizeOfBuffer == MAX_ADDRESS))
+  {
     *SizeOfBuffer = MaximumDatumSize;
     return NULL;
   }
 
   CopyMem (PatchVariable, Buffer, *SizeOfBuffer);
 
-  return (VOID *) Buffer;
+  return (VOID *)Buffer;
 }
 
 /**
@@ -927,7 +893,8 @@ LibPatchPcdSetPtrS (
   }
 
   if ((*SizeOfBuffer > MaximumDatumSize) ||
-      (*SizeOfBuffer == MAX_ADDRESS)) {
+      (*SizeOfBuffer == MAX_ADDRESS))
+  {
     *SizeOfBuffer = MaximumDatumSize;
     return RETURN_INVALID_PARAMETER;
   }
@@ -981,7 +948,8 @@ LibPatchPcdSetPtrAndSize (
   }
 
   if ((*SizeOfBuffer > MaximumDatumSize) ||
-      (*SizeOfBuffer == MAX_ADDRESS)) {
+      (*SizeOfBuffer == MAX_ADDRESS))
+  {
     *SizeOfBuffer = MaximumDatumSize;
     return NULL;
   }
@@ -989,7 +957,7 @@ LibPatchPcdSetPtrAndSize (
   CopyMem (PatchVariable, Buffer, *SizeOfBuffer);
   *SizeOfPatchVariable = *SizeOfBuffer;
 
-  return (VOID *) Buffer;
+  return (VOID *)Buffer;
 }
 
 /**
@@ -1036,7 +1004,8 @@ LibPatchPcdSetPtrAndSizeS (
   }
 
   if ((*SizeOfBuffer > MaximumDatumSize) ||
-      (*SizeOfBuffer == MAX_ADDRESS)) {
+      (*SizeOfBuffer == MAX_ADDRESS))
+  {
     *SizeOfBuffer = MaximumDatumSize;
     return RETURN_INVALID_PARAMETER;
   }
@@ -1110,4 +1079,3 @@ LibPcdGetSku (
 
   return 0;
 }
-

@@ -34,10 +34,10 @@ MmioReadBuffer8 (
   OUT UINT8       *Buffer
   )
 {
-  UINT8   *ReturnBuffer;
+  UINT8  *ReturnBuffer;
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
-  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN) Buffer));
+  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
   ReturnBuffer = Buffer;
 
@@ -78,20 +78,20 @@ MmioReadBuffer16 (
   OUT UINT16      *Buffer
   )
 {
-  UINT16    *ReturnBuffer;
+  UINT16  *ReturnBuffer;
 
   ASSERT ((StartAddress & (sizeof (UINT16) - 1)) == 0);
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
-  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN) Buffer));
+  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
   ASSERT ((Length & (sizeof (UINT16) - 1)) == 0);
-  ASSERT (((UINTN) Buffer & (sizeof (UINT16) - 1)) == 0);
+  ASSERT (((UINTN)Buffer & (sizeof (UINT16) - 1)) == 0);
 
   ReturnBuffer = Buffer;
 
   while (Length != 0) {
-    *(Buffer++) = MmioRead16 (StartAddress);
+    *(Buffer++)   = MmioRead16 (StartAddress);
     StartAddress += sizeof (UINT16);
     Length -= sizeof (UINT16);
   }
@@ -129,20 +129,20 @@ MmioReadBuffer32 (
   OUT UINT32      *Buffer
   )
 {
-  UINT32    *ReturnBuffer;
+  UINT32  *ReturnBuffer;
 
   ASSERT ((StartAddress & (sizeof (UINT32) - 1)) == 0);
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
-  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN) Buffer));
+  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
   ASSERT ((Length & (sizeof (UINT32) - 1)) == 0);
-  ASSERT (((UINTN) Buffer & (sizeof (UINT32) - 1)) == 0);
+  ASSERT (((UINTN)Buffer & (sizeof (UINT32) - 1)) == 0);
 
   ReturnBuffer = Buffer;
 
   while (Length != 0) {
-    *(Buffer++) = MmioRead32 (StartAddress);
+    *(Buffer++)   = MmioRead32 (StartAddress);
     StartAddress += sizeof (UINT32);
     Length -= sizeof (UINT32);
   }
@@ -180,27 +180,26 @@ MmioReadBuffer64 (
   OUT UINT64      *Buffer
   )
 {
-  UINT64    *ReturnBuffer;
+  UINT64  *ReturnBuffer;
 
   ASSERT ((StartAddress & (sizeof (UINT64) - 1)) == 0);
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
-  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN) Buffer));
+  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
   ASSERT ((Length & (sizeof (UINT64) - 1)) == 0);
-  ASSERT (((UINTN) Buffer & (sizeof (UINT64) - 1)) == 0);
+  ASSERT (((UINTN)Buffer & (sizeof (UINT64) - 1)) == 0);
 
   ReturnBuffer = Buffer;
 
   while (Length != 0) {
-    *(Buffer++) = MmioRead64 (StartAddress);
+    *(Buffer++)   = MmioRead64 (StartAddress);
     StartAddress += sizeof (UINT64);
     Length -= sizeof (UINT64);
   }
 
   return ReturnBuffer;
 }
-
 
 /**
   Copy data from system memory to the MMIO region by using 8-bit access.
@@ -228,19 +227,18 @@ MmioWriteBuffer8 (
   IN  CONST UINT8   *Buffer
   )
 {
-  VOID* ReturnBuffer;
+  VOID  *ReturnBuffer;
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
-  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN) Buffer));
+  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
-  ReturnBuffer = (UINT8 *) Buffer;
+  ReturnBuffer = (UINT8 *)Buffer;
 
   while (Length-- != 0) {
-     MmioWrite8 (StartAddress++, *(Buffer++));
+    MmioWrite8 (StartAddress++, *(Buffer++));
   }
 
   return ReturnBuffer;
-
 }
 
 /**
@@ -274,17 +272,17 @@ MmioWriteBuffer16 (
   IN  CONST UINT16 *Buffer
   )
 {
-  UINT16    *ReturnBuffer;
+  UINT16  *ReturnBuffer;
 
   ASSERT ((StartAddress & (sizeof (UINT16) - 1)) == 0);
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
-  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN) Buffer));
+  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
   ASSERT ((Length & (sizeof (UINT16) - 1)) == 0);
-  ASSERT (((UINTN) Buffer & (sizeof (UINT16) - 1)) == 0);
+  ASSERT (((UINTN)Buffer & (sizeof (UINT16) - 1)) == 0);
 
-  ReturnBuffer = (UINT16 *) Buffer;
+  ReturnBuffer = (UINT16 *)Buffer;
 
   while (Length != 0) {
     MmioWrite16 (StartAddress, *(Buffer++));
@@ -295,7 +293,6 @@ MmioWriteBuffer16 (
 
   return ReturnBuffer;
 }
-
 
 /**
   Copy data from system memory to the MMIO region by using 32-bit access.
@@ -328,17 +325,17 @@ MmioWriteBuffer32 (
   IN  CONST UINT32 *Buffer
   )
 {
-  UINT32    *ReturnBuffer;
+  UINT32  *ReturnBuffer;
 
   ASSERT ((StartAddress & (sizeof (UINT32) - 1)) == 0);
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
-  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN) Buffer));
+  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
   ASSERT ((Length & (sizeof (UINT32) - 1)) == 0);
-  ASSERT (((UINTN) Buffer & (sizeof (UINT32) - 1)) == 0);
+  ASSERT (((UINTN)Buffer & (sizeof (UINT32) - 1)) == 0);
 
-  ReturnBuffer = (UINT32 *) Buffer;
+  ReturnBuffer = (UINT32 *)Buffer;
 
   while (Length != 0) {
     MmioWrite32 (StartAddress, *(Buffer++));
@@ -381,17 +378,17 @@ MmioWriteBuffer64 (
   IN  CONST UINT64 *Buffer
   )
 {
-  UINT64    *ReturnBuffer;
+  UINT64  *ReturnBuffer;
 
   ASSERT ((StartAddress & (sizeof (UINT64) - 1)) == 0);
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
-  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN) Buffer));
+  ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
   ASSERT ((Length & (sizeof (UINT64) - 1)) == 0);
-  ASSERT (((UINTN) Buffer & (sizeof (UINT64) - 1)) == 0);
+  ASSERT (((UINTN)Buffer & (sizeof (UINT64) - 1)) == 0);
 
-  ReturnBuffer = (UINT64 *) Buffer;
+  ReturnBuffer = (UINT64 *)Buffer;
 
   while (Length != 0) {
     MmioWrite64 (StartAddress, *(Buffer++));
@@ -402,4 +399,3 @@ MmioWriteBuffer64 (
 
   return ReturnBuffer;
 }
-

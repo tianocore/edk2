@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Writes the current value of 64-bit MMX Register #3 (MM3).
 
@@ -29,4 +26,3 @@ AsmWriteMm3 (
     emms
   }
 }
-

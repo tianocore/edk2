@@ -28,4 +28,3 @@ AsmWriteDr6 (
     mov     dr6, eax
   }
 }
-

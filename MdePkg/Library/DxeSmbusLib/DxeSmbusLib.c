@@ -7,14 +7,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "InternalSmbusLib.h"
-
 
 //
 // Global variable to cache pointer to Smbus protocol.
 //
-EFI_SMBUS_HC_PROTOCOL      *mSmbus = NULL;
+EFI_SMBUS_HC_PROTOCOL  *mSmbus = NULL;
 
 /**
   The constructor function caches the pointer to Smbus protocol.
@@ -37,7 +35,7 @@ SmbusLibConstructor (
 {
   EFI_STATUS  Status;
 
-  Status = gBS->LocateProtocol (&gEfiSmbusHcProtocolGuid, NULL, (VOID**) &mSmbus);
+  Status = gBS->LocateProtocol (&gEfiSmbusHcProtocolGuid, NULL, (VOID **)&mSmbus);
   ASSERT_EFI_ERROR (Status);
   ASSERT (mSmbus != NULL);
 
@@ -73,7 +71,7 @@ InternalSmBusExec (
   IN     UINTN                      SmBusAddress,
   IN     UINTN                      Length,
   IN OUT VOID                       *Buffer,
-     OUT RETURN_STATUS              *Status        OPTIONAL
+  OUT RETURN_STATUS              *Status        OPTIONAL
   )
 {
   RETURN_STATUS             ReturnStatus;

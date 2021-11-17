@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// Declare the EFI/UEFI Specification Revision to which this driver is implemented
 ///
-extern CONST UINT32       _gPeimRevision;
-
+extern CONST UINT32  _gPeimRevision;
 
 /**
   The entry point of PE/COFF Image for a PEIM.
@@ -34,7 +33,6 @@ _ModuleEntryPoint (
   IN EFI_PEI_FILE_HANDLE       FileHandle,
   IN CONST EFI_PEI_SERVICES    **PeiServices
   );
-
 
 /**
   Required by the EBC compiler and identical in functionality to _ModuleEntryPoint().

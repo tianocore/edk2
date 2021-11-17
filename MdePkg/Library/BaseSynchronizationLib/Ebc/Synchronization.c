@@ -34,7 +34,7 @@ InternalSyncCompareExchange16 (
   )
 {
   return *Value != CompareValue ? *Value :
-           ((*Value = ExchangeValue), CompareValue);
+         ((*Value = ExchangeValue), CompareValue);
 }
 
 /**
@@ -65,7 +65,7 @@ InternalSyncCompareExchange32 (
   )
 {
   return *Value != CompareValue ? *Value :
-           ((*Value = ExchangeValue), CompareValue);
+         ((*Value = ExchangeValue), CompareValue);
 }
 
 /**
@@ -93,7 +93,7 @@ InternalSyncCompareExchange64 (
   )
 {
   return *Value != CompareValue ? *Value :
-           ((*Value = ExchangeValue), CompareValue);
+         ((*Value = ExchangeValue), CompareValue);
 }
 
 /**

@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Performs an atomic compare exchange operation on a 32-bit unsigned integer.
 
@@ -41,4 +38,3 @@ InternalSyncCompareExchange32 (
     lock    cmpxchg [ecx], edx
   }
 }
-

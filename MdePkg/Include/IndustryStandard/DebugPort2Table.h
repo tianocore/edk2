@@ -8,7 +8,6 @@
 
 **/
 
-
 #ifndef _DEBUG_PORT_2_TABLE_H_
 #define _DEBUG_PORT_2_TABLE_H_
 
@@ -23,21 +22,21 @@
 // Debug Device Information structure.
 //
 typedef struct {
-  UINT8                                     Revision;
-  UINT16                                    Length;
-  UINT8                                     NumberofGenericAddressRegisters;
-  UINT16                                    NameSpaceStringLength;
-  UINT16                                    NameSpaceStringOffset;
-  UINT16                                    OemDataLength;
-  UINT16                                    OemDataOffset;
-  UINT16                                    PortType;
-  UINT16                                    PortSubtype;
-  UINT8                                     Reserved[2];
-  UINT16                                    BaseAddressRegisterOffset;
-  UINT16                                    AddressSizeOffset;
+  UINT8     Revision;
+  UINT16    Length;
+  UINT8     NumberofGenericAddressRegisters;
+  UINT16    NameSpaceStringLength;
+  UINT16    NameSpaceStringOffset;
+  UINT16    OemDataLength;
+  UINT16    OemDataOffset;
+  UINT16    PortType;
+  UINT16    PortSubtype;
+  UINT8     Reserved[2];
+  UINT16    BaseAddressRegisterOffset;
+  UINT16    AddressSizeOffset;
 } EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT;
 
-#define EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION      0x00
+#define EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION  0x00
 
 #define EFI_ACPI_DBG2_PORT_TYPE_SERIAL                                                 0x8000
 #define   EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550                                 0x0000
@@ -60,9 +59,9 @@ typedef struct {
 // Debug Port 2 Table definition.
 //
 typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER               Header;
-  UINT32                                    OffsetDbgDeviceInfo;
-  UINT32                                    NumberDbgDeviceInfo;
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  UINT32                         OffsetDbgDeviceInfo;
+  UINT32                         NumberDbgDeviceInfo;
 } EFI_ACPI_DEBUG_PORT_2_DESCRIPTION_TABLE;
 
 #pragma pack()
@@ -70,6 +69,6 @@ typedef struct {
 //
 // DBG2 Revision (defined in spec)
 //
-#define EFI_ACPI_DEBUG_PORT_2_TABLE_REVISION      0x00
+#define EFI_ACPI_DEBUG_PORT_2_TABLE_REVISION  0x00
 
 #endif

@@ -15,7 +15,6 @@
 
 **/
 
-
 #include "BaseIoLibIntrinsicInternal.h"
 
 /**
@@ -38,13 +37,14 @@ IoRead8 (
   IN      UINTN                     Port
   )
 {
-  UINT8   Data;
-  BOOLEAN Flag;
+  UINT8    Data;
+  BOOLEAN  Flag;
 
   Flag = FilterBeforeIoRead (FilterWidth8, Port, &Data);
   if (Flag) {
     __asm__ __volatile__ ("inb %w1,%b0" : "=a" (Data) : "d" ((UINT16)Port));
   }
+
   FilterAfterIoRead (FilterWidth8, Port, &Data);
 
   return Data;
@@ -72,15 +72,16 @@ IoWrite8 (
   IN      UINT8                     Value
   )
 {
-  BOOLEAN Flag;
+  BOOLEAN  Flag;
 
   Flag = FilterBeforeIoWrite (FilterWidth8, Port, &Value);
   if (Flag) {
     __asm__ __volatile__ ("outb %b0,%w1" : : "a" (Value), "d" ((UINT16)Port));
   }
+
   FilterAfterIoWrite (FilterWidth8, Port, &Value);
 
-  return Value;;
+  return Value;
 }
 
 /**
@@ -111,8 +112,9 @@ IoRead16 (
 
   Flag = FilterBeforeIoRead (FilterWidth16, Port, &Data);
   if (Flag) {
-     __asm__ __volatile__ ("inw %w1,%w0" : "=a" (Data) : "d" ((UINT16)Port));
+    __asm__ __volatile__ ("inw %w1,%w0" : "=a" (Data) : "d" ((UINT16)Port));
   }
+
   FilterAfterIoRead (FilterWidth16, Port, &Data);
 
   return Data;
@@ -141,8 +143,7 @@ IoWrite16 (
   IN      UINT16                    Value
   )
 {
-
-  BOOLEAN Flag;
+  BOOLEAN  Flag;
 
   ASSERT ((Port & 1) == 0);
 
@@ -150,9 +151,10 @@ IoWrite16 (
   if (Flag) {
     __asm__ __volatile__ ("outw %w0,%w1" : : "a" (Value), "d" ((UINT16)Port));
   }
+
   FilterAfterIoWrite (FilterWidth16, Port, &Value);
 
-  return Value;;
+  return Value;
 }
 
 /**
@@ -185,6 +187,7 @@ IoRead32 (
   if (Flag) {
     __asm__ __volatile__ ("inl %w1,%0" : "=a" (Data) : "d" ((UINT16)Port));
   }
+
   FilterAfterIoRead (FilterWidth32, Port, &Data);
 
   return Data;
@@ -221,8 +224,8 @@ IoWrite32 (
   if (Flag) {
     __asm__ __volatile__ ("outl %0,%w1" : : "a" (Value), "d" ((UINT16)Port));
   }
+
   FilterAfterIoWrite (FilterWidth32, Port, &Value);
 
   return Value;
 }
-

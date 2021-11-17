@@ -13,18 +13,18 @@
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
 
-#define APIC_SVR        0x0f0
-#define APIC_LVTERR     0x370
-#define APIC_TMICT      0x380
-#define APIC_TMCCT      0x390
-#define APIC_TDCR       0x3e0
+#define APIC_SVR     0x0f0
+#define APIC_LVTERR  0x370
+#define APIC_TMICT   0x380
+#define APIC_TMCCT   0x390
+#define APIC_TDCR    0x3e0
 
 //
 // The following array is used in calculating the frequency of local APIC
 // timer. Refer to IA-32 developers' manual for more details.
 //
 GLOBAL_REMOVE_IF_UNREFERENCED
-CONST UINT8                           mTimerLibLocalApicDivisor[] = {
+CONST UINT8  mTimerLibLocalApicDivisor[] = {
   0x02, 0x04, 0x08, 0x10,
   0x02, 0x04, 0x08, 0x10,
   0x20, 0x40, 0x80, 0x01,
@@ -48,10 +48,10 @@ InternalX86GetApicBase (
   VOID
   )
 {
-  UINTN                             MsrValue;
-  UINTN                             ApicBase;
+  UINTN  MsrValue;
+  UINTN  ApicBase;
 
-  MsrValue = (UINTN) AsmReadMsr64 (27);
+  MsrValue = (UINTN)AsmReadMsr64 (27);
   ApicBase = MsrValue & 0xffffff000ULL;
 
   //
@@ -91,7 +91,7 @@ InternalX86GetTimerFrequency (
   )
 {
   return
-    PcdGet32(PcdFSBClock) /
+    PcdGet32 (PcdFSBClock) /
     mTimerLibLocalApicDivisor[MmioBitFieldRead32 (ApicBase + APIC_TDCR, 0, 3)];
 }
 
@@ -148,10 +148,10 @@ InternalX86Delay (
   IN      UINT32                    Delay
   )
 {
-  INT32                             Ticks;
-  UINT32                            Times;
-  UINT32                            InitCount;
-  UINT32                            StartTick;
+  INT32   Ticks;
+  UINT32  Times;
+  UINT32  InitCount;
+  UINT32  StartTick;
 
   //
   // In case Delay is too larger, separate it into several small delay slot.
@@ -162,13 +162,13 @@ InternalX86Delay (
   //
   InitCount = InternalX86GetInitTimerCount (ApicBase);
   ASSERT (InitCount != 0);
-  Times     = Delay / (InitCount / 2);
-  Delay     = Delay % (InitCount / 2);
+  Times = Delay / (InitCount / 2);
+  Delay = Delay % (InitCount / 2);
 
   //
   // Get Start Tick and do delay
   //
-  StartTick  = InternalX86GetTimerTick (ApicBase);
+  StartTick = InternalX86GetTimerTick (ApicBase);
   do {
     //
     // Wait until time out by Delay value
@@ -211,7 +211,7 @@ MicroSecondDelay (
   IN      UINTN                     MicroSeconds
   )
 {
-  UINTN                             ApicBase;
+  UINTN  ApicBase;
 
   ApicBase = InternalX86GetApicBase ();
   InternalX86Delay (
@@ -243,7 +243,7 @@ NanoSecondDelay (
   IN      UINTN                     NanoSeconds
   )
 {
-  UINTN                             ApicBase;
+  UINTN  ApicBase;
 
   ApicBase = InternalX86GetApicBase ();
   InternalX86Delay (
@@ -305,11 +305,11 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  OUT      UINT64                    *StartValue,  OPTIONAL
+  OUT      UINT64                    *StartValue, OPTIONAL
   OUT      UINT64                    *EndValue     OPTIONAL
   )
 {
-  UINTN                             ApicBase;
+  UINTN  ApicBase;
 
   ApicBase = InternalX86GetApicBase ();
 
@@ -321,7 +321,7 @@ GetPerformanceCounterProperties (
     *EndValue = 0;
   }
 
-  return (UINT64) InternalX86GetTimerFrequency (ApicBase);
+  return (UINT64)InternalX86GetTimerFrequency (ApicBase);
 }
 
 /**
@@ -360,9 +360,9 @@ GetTimeInNanoSecond (
   // Since 2^29 < 1,000,000,000 = 0x3B9ACA00 < 2^30, Remainder should < 2^(64-30) = 2^34,
   // i.e. highest bit set in Remainder should <= 33.
   //
-  Shift = MAX (0, HighBitSet64 (Remainder) - 33);
-  Remainder = RShiftU64 (Remainder, (UINTN) Shift);
-  Frequency = RShiftU64 (Frequency, (UINTN) Shift);
+  Shift        = MAX (0, HighBitSet64 (Remainder) - 33);
+  Remainder    = RShiftU64 (Remainder, (UINTN)Shift);
+  Frequency    = RShiftU64 (Frequency, (UINTN)Shift);
   NanoSeconds += DivU64x64Remainder (MultU64x32 (Remainder, 1000000000u), Frequency, NULL);
 
   return NanoSeconds;

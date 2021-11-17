@@ -7,9 +7,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
-
-
 #include <PiPei.h>
 
 #include <Ppi/Pcd.h>
@@ -36,8 +33,8 @@ GetPcdPpiPointer (
   VOID
   )
 {
-  EFI_STATUS        Status;
-  PCD_PPI           *PcdPpi;
+  EFI_STATUS  Status;
+  PCD_PPI     *PcdPpi;
 
   Status = PeiServicesLocatePpi (&gPcdPpiGuid, 0, NULL, (VOID **)&PcdPpi);
   ASSERT_EFI_ERROR (Status);
@@ -59,8 +56,8 @@ GetPiPcdPpiPointer (
   VOID
   )
 {
-  EFI_STATUS        Status;
-  EFI_PEI_PCD_PPI   *PiPcdPpi;
+  EFI_STATUS       Status;
+  EFI_PEI_PCD_PPI  *PiPcdPpi;
 
   Status = PeiServicesLocatePpi (&gEfiPeiPcdPpiGuid, 0, NULL, (VOID **)&PiPcdPpi);
   ASSERT_EFI_ERROR (Status);
@@ -82,8 +79,8 @@ GetPcdInfoPpiPointer (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  GET_PCD_INFO_PPI      *PcdInfoPpi;
+  EFI_STATUS        Status;
+  GET_PCD_INFO_PPI  *PcdInfoPpi;
 
   Status = PeiServicesLocatePpi (&gGetPcdInfoPpiGuid, 0, NULL, (VOID **)&PcdInfoPpi);
   ASSERT_EFI_ERROR (Status);
@@ -131,12 +128,10 @@ LibPcdSetSku (
   IN UINTN   SkuId
   )
 {
-  GetPiPcdPpiPointer()->SetSku (SkuId);
+  GetPiPcdPpiPointer ()->SetSku (SkuId);
 
   return SkuId;
 }
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -157,8 +152,6 @@ LibPcdGet8 (
   return (GetPcdPpiPointer ())->Get8 (TokenNumber);
 }
 
-
-
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
 
@@ -177,8 +170,6 @@ LibPcdGet16 (
 {
   return (GetPcdPpiPointer ())->Get16 (TokenNumber);
 }
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -199,8 +190,6 @@ LibPcdGet32 (
   return (GetPcdPpiPointer ())->Get32 (TokenNumber);
 }
 
-
-
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
 
@@ -219,8 +208,6 @@ LibPcdGet64 (
 {
   return (GetPcdPpiPointer ())->Get64 (TokenNumber);
 }
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -241,8 +228,6 @@ LibPcdGetPtr (
   return (GetPcdPpiPointer ())->GetPtr (TokenNumber);
 }
 
-
-
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
 
@@ -262,8 +247,6 @@ LibPcdGetBool (
   return (GetPcdPpiPointer ())->GetBool (TokenNumber);
 }
 
-
-
 /**
   This function provides a means by which to retrieve the size of a given PCD token.
 
@@ -280,8 +263,6 @@ LibPcdGetSize (
 {
   return (GetPcdPpiPointer ())->GetSize (TokenNumber);
 }
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -309,8 +290,6 @@ LibPcdGetEx8 (
   return (GetPiPcdPpiPointer ())->Get8 (Guid, TokenNumber);
 }
 
-
-
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
 
@@ -332,13 +311,10 @@ LibPcdGetEx16 (
   IN UINTN             TokenNumber
   )
 {
-
   ASSERT (Guid != NULL);
 
   return (GetPiPcdPpiPointer ())->Get16 (Guid, TokenNumber);
 }
-
-
 
 /**
   Returns the 32-bit value for the token specified by TokenNumber and Guid.
@@ -362,9 +338,6 @@ LibPcdGetEx32 (
 
   return (GetPiPcdPpiPointer ())->Get32 (Guid, TokenNumber);
 }
-
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -390,8 +363,6 @@ LibPcdGetEx64 (
   ASSERT (Guid != NULL);
   return (GetPiPcdPpiPointer ())->Get64 (Guid, TokenNumber);
 }
-
-
 
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
@@ -419,8 +390,6 @@ LibPcdGetExPtr (
   return (GetPiPcdPpiPointer ())->GetPtr (Guid, TokenNumber);
 }
 
-
-
 /**
   This function provides a means by which to retrieve a value for a given PCD token.
 
@@ -446,8 +415,6 @@ LibPcdGetExBool (
   return (GetPiPcdPpiPointer ())->GetBool (Guid, TokenNumber);
 }
 
-
-
 /**
   This function provides a means by which to retrieve the size of a given PCD token.
 
@@ -472,7 +439,6 @@ LibPcdGetExSize (
   ASSERT (Guid != NULL);
   return (GetPiPcdPpiPointer ())->GetSize (Guid, TokenNumber);
 }
-
 
 /**
   This function provides a means by which to set a value for a given PCD token.
@@ -598,7 +564,7 @@ LibPcdSetPtrS (
     ASSERT (Buffer != NULL);
   }
 
-  return (GetPcdPpiPointer ())->SetPtr (TokenNumber, SizeOfBuffer, (VOID *) Buffer);
+  return (GetPcdPpiPointer ())->SetPtr (TokenNumber, SizeOfBuffer, (VOID *)Buffer);
 }
 
 /**
@@ -829,23 +795,21 @@ LibPcdSetExBoolS (
 VOID
 EFIAPI
 LibPcdCallbackOnSet (
-  IN CONST GUID               *Guid,       OPTIONAL
+  IN CONST GUID               *Guid, OPTIONAL
   IN UINTN                    TokenNumber,
   IN PCD_CALLBACK             NotificationFunction
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   ASSERT (NotificationFunction != NULL);
 
-  Status = (GetPiPcdPpiPointer ())->CallbackOnSet (Guid, TokenNumber, (EFI_PEI_PCD_PPI_CALLBACK) NotificationFunction);
+  Status = (GetPiPcdPpiPointer ())->CallbackOnSet (Guid, TokenNumber, (EFI_PEI_PCD_PPI_CALLBACK)NotificationFunction);
 
   ASSERT_EFI_ERROR (Status);
 
   return;
 }
-
-
 
 /**
   Disable a notification function that was established with LibPcdCallbackonSet().
@@ -863,23 +827,21 @@ LibPcdCallbackOnSet (
 VOID
 EFIAPI
 LibPcdCancelCallback (
-  IN CONST GUID               *Guid,       OPTIONAL
+  IN CONST GUID               *Guid, OPTIONAL
   IN UINTN                    TokenNumber,
   IN PCD_CALLBACK             NotificationFunction
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   ASSERT (NotificationFunction != NULL);
 
-  Status = (GetPiPcdPpiPointer ())->CancelCallback (Guid, TokenNumber, (EFI_PEI_PCD_PPI_CALLBACK) NotificationFunction);
+  Status = (GetPiPcdPpiPointer ())->CancelCallback (Guid, TokenNumber, (EFI_PEI_PCD_PPI_CALLBACK)NotificationFunction);
 
   ASSERT_EFI_ERROR (Status);
 
   return;
 }
-
-
 
 /**
   Retrieves the next token in a token space.
@@ -903,18 +865,17 @@ LibPcdCancelCallback (
 UINTN
 EFIAPI
 LibPcdGetNextToken (
-  IN CONST GUID               *Guid,       OPTIONAL
+  IN CONST GUID               *Guid, OPTIONAL
   IN UINTN                    TokenNumber
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   Status = (GetPiPcdPpiPointer ())->GetNextToken (Guid, &TokenNumber);
   ASSERT (!EFI_ERROR (Status) || TokenNumber == 0);
 
   return TokenNumber;
 }
-
 
 /**
   Used to retrieve the list of available PCD token space GUIDs.
@@ -937,10 +898,8 @@ LibPcdGetNextTokenSpace (
 {
   (GetPiPcdPpiPointer ())->GetNextTokenSpace (&TokenSpaceGuid);
 
-  return (GUID *) TokenSpaceGuid;
+  return (GUID *)TokenSpaceGuid;
 }
-
-
 
 /**
   Sets a value of a patchable PCD entry that is type pointer.
@@ -982,14 +941,15 @@ LibPatchPcdSetPtr (
   }
 
   if ((*SizeOfBuffer > MaximumDatumSize) ||
-      (*SizeOfBuffer == MAX_ADDRESS)) {
+      (*SizeOfBuffer == MAX_ADDRESS))
+  {
     *SizeOfBuffer = MaximumDatumSize;
     return NULL;
   }
 
   CopyMem (PatchVariable, Buffer, *SizeOfBuffer);
 
-  return (VOID *) Buffer;
+  return (VOID *)Buffer;
 }
 
 /**
@@ -1032,7 +992,8 @@ LibPatchPcdSetPtrS (
   }
 
   if ((*SizeOfBuffer > MaximumDatumSize) ||
-      (*SizeOfBuffer == MAX_ADDRESS)) {
+      (*SizeOfBuffer == MAX_ADDRESS))
+  {
     *SizeOfBuffer = MaximumDatumSize;
     return RETURN_INVALID_PARAMETER;
   }
@@ -1041,7 +1002,6 @@ LibPatchPcdSetPtrS (
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   Sets a value and size of a patchable PCD entry that is type pointer.
@@ -1087,7 +1047,8 @@ LibPatchPcdSetPtrAndSize (
   }
 
   if ((*SizeOfBuffer > MaximumDatumSize) ||
-      (*SizeOfBuffer == MAX_ADDRESS)) {
+      (*SizeOfBuffer == MAX_ADDRESS))
+  {
     *SizeOfBuffer = MaximumDatumSize;
     return NULL;
   }
@@ -1095,7 +1056,7 @@ LibPatchPcdSetPtrAndSize (
   CopyMem (PatchVariable, Buffer, *SizeOfBuffer);
   *SizeOfPatchVariable = *SizeOfBuffer;
 
-  return (VOID *) Buffer;
+  return (VOID *)Buffer;
 }
 
 /**
@@ -1142,7 +1103,8 @@ LibPatchPcdSetPtrAndSizeS (
   }
 
   if ((*SizeOfBuffer > MaximumDatumSize) ||
-      (*SizeOfBuffer == MAX_ADDRESS)) {
+      (*SizeOfBuffer == MAX_ADDRESS))
+  {
     *SizeOfBuffer = MaximumDatumSize;
     return RETURN_INVALID_PARAMETER;
   }
@@ -1172,9 +1134,9 @@ LibPcdGetInfo (
   OUT       PCD_INFO        *PcdInfo
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
-  Status = GetPcdInfoPpiPointer()->GetInfo (TokenNumber, (EFI_PCD_INFO *) PcdInfo);
+  Status = GetPcdInfoPpiPointer ()->GetInfo (TokenNumber, (EFI_PCD_INFO *)PcdInfo);
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -1199,9 +1161,9 @@ LibPcdGetInfoEx (
   OUT       PCD_INFO        *PcdInfo
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
-  Status = GetPiPcdInfoPpiPointer()->GetInfo (Guid, TokenNumber, (EFI_PCD_INFO *) PcdInfo);
+  Status = GetPiPcdInfoPpiPointer ()->GetInfo (Guid, TokenNumber, (EFI_PCD_INFO *)PcdInfo);
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -1218,5 +1180,5 @@ LibPcdGetSku (
   VOID
   )
 {
-  return GetPiPcdInfoPpiPointer()->GetSku ();
+  return GetPiPcdInfoPpiPointer ()->GetSku ();
 }

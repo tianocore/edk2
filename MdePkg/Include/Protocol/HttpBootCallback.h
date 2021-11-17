@@ -17,7 +17,7 @@
     0xba23b311, 0x343d, 0x11e6, {0x91, 0x85, 0x58, 0x20, 0xb1, 0xd6, 0x52, 0x99} \
   }
 
-typedef struct _EFI_HTTP_BOOT_CALLBACK_PROTOCOL  EFI_HTTP_BOOT_CALLBACK_PROTOCOL;
+typedef struct _EFI_HTTP_BOOT_CALLBACK_PROTOCOL EFI_HTTP_BOOT_CALLBACK_PROTOCOL;
 
 ///
 /// EFI_HTTP_BOOT_CALLBACK_DATA_TYPE
@@ -72,13 +72,13 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EFI_HTTP_BOOT_CALLBACK) (
+(EFIAPI *EFI_HTTP_BOOT_CALLBACK)(
   IN EFI_HTTP_BOOT_CALLBACK_PROTOCOL    *This,
   IN EFI_HTTP_BOOT_CALLBACK_DATA_TYPE   DataType,
   IN BOOLEAN                            Received,
   IN UINT32                             DataLength,
   IN VOID                               *Data   OPTIONAL
- );
+  );
 
 ///
 /// EFI HTTP Boot Callback Protocol is invoked when the HTTP Boot driver is about to transmit or
@@ -86,9 +86,9 @@ EFI_STATUS
 /// as the Load File Protocol for the HTTP Boot.
 ///
 struct _EFI_HTTP_BOOT_CALLBACK_PROTOCOL {
-  EFI_HTTP_BOOT_CALLBACK Callback;
+  EFI_HTTP_BOOT_CALLBACK    Callback;
 };
 
-extern EFI_GUID gEfiHttpBootCallbackProtocolGuid;
+extern EFI_GUID  gEfiHttpBootCallbackProtocolGuid;
 
 #endif
