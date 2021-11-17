@@ -600,14 +600,14 @@ UhciExecuteTransfer (
   }
 
   if (!Finished) {
-    DEBUG ((EFI_D_ERROR, "UhciExecuteTransfer: execution not finished for %dms\n", (UINT32)TimeOut));
+    DEBUG ((DEBUG_ERROR, "UhciExecuteTransfer: execution not finished for %dms\n", (UINT32)TimeOut));
     UhciDumpQh (Qh);
     UhciDumpTds (Td);
 
     Status = EFI_TIMEOUT;
 
   } else if (QhResult->Result != EFI_USB_NOERROR) {
-    DEBUG ((EFI_D_ERROR, "UhciExecuteTransfer: execution failed with result %x\n", QhResult->Result));
+    DEBUG ((DEBUG_ERROR, "UhciExecuteTransfer: execution failed with result %x\n", QhResult->Result));
     UhciDumpQh (Qh);
     UhciDumpTds (Td);
 

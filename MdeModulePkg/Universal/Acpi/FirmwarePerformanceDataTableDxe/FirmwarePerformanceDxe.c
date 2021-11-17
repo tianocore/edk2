@@ -248,7 +248,7 @@ FpdtAllocateS3PerformanceTableMemory (
                                                              EFI_SIZE_TO_PAGES (sizeof (S3_PERFORMANCE_TABLE))
                                                              );
       }
-      DEBUG ((EFI_D_INFO, "FPDT: ACPI S3 Performance Table address = 0x%x\n", mAcpiS3PerformanceTable));
+      DEBUG ((DEBUG_INFO, "FPDT: ACPI S3 Performance Table address = 0x%x\n", mAcpiS3PerformanceTable));
       if (mAcpiS3PerformanceTable != NULL) {
         CopyMem (mAcpiS3PerformanceTable, &mS3PerformanceTableTemplate, sizeof (mS3PerformanceTableTemplate));
       }
@@ -526,11 +526,11 @@ FpdtStatusCodeListenerDxe (
     //
     // Dump FPDT Boot Performance record.
     //
-    DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ResetEnd                = %ld\n", mAcpiBootPerformanceTable->BasicBoot.ResetEnd));
-    DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - OsLoaderLoadImageStart  = 0\n"));
-    DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - OsLoaderStartImageStart = %ld\n", mAcpiBootPerformanceTable->BasicBoot.OsLoaderStartImageStart));
-    DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ExitBootServicesEntry   = 0\n"));
-    DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ExitBootServicesExit    = 0\n"));
+    DEBUG ((DEBUG_INFO, "FPDT: Boot Performance - ResetEnd                = %ld\n", mAcpiBootPerformanceTable->BasicBoot.ResetEnd));
+    DEBUG ((DEBUG_INFO, "FPDT: Boot Performance - OsLoaderLoadImageStart  = 0\n"));
+    DEBUG ((DEBUG_INFO, "FPDT: Boot Performance - OsLoaderStartImageStart = %ld\n", mAcpiBootPerformanceTable->BasicBoot.OsLoaderStartImageStart));
+    DEBUG ((DEBUG_INFO, "FPDT: Boot Performance - ExitBootServicesEntry   = 0\n"));
+    DEBUG ((DEBUG_INFO, "FPDT: Boot Performance - ExitBootServicesExit    = 0\n"));
   } else if (Data != NULL && CompareGuid (&Data->Type, &gEdkiiFpdtExtendedFirmwarePerformanceGuid)) {
     //
     // Get the Boot performance table and then install it to ACPI table.
@@ -615,10 +615,10 @@ FpdtExitBootServicesEventNotify (
   //
   // Dump FPDT Boot Performance record.
   //
-  DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ResetEnd                = %ld\n", mAcpiBootPerformanceTable->BasicBoot.ResetEnd));
-  DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - OsLoaderLoadImageStart  = %ld\n", mAcpiBootPerformanceTable->BasicBoot.OsLoaderLoadImageStart));
-  DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - OsLoaderStartImageStart = %ld\n", mAcpiBootPerformanceTable->BasicBoot.OsLoaderStartImageStart));
-  DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ExitBootServicesEntry   = %ld\n", mAcpiBootPerformanceTable->BasicBoot.ExitBootServicesEntry));
+  DEBUG ((DEBUG_INFO, "FPDT: Boot Performance - ResetEnd                = %ld\n", mAcpiBootPerformanceTable->BasicBoot.ResetEnd));
+  DEBUG ((DEBUG_INFO, "FPDT: Boot Performance - OsLoaderLoadImageStart  = %ld\n", mAcpiBootPerformanceTable->BasicBoot.OsLoaderLoadImageStart));
+  DEBUG ((DEBUG_INFO, "FPDT: Boot Performance - OsLoaderStartImageStart = %ld\n", mAcpiBootPerformanceTable->BasicBoot.OsLoaderStartImageStart));
+  DEBUG ((DEBUG_INFO, "FPDT: Boot Performance - ExitBootServicesEntry   = %ld\n", mAcpiBootPerformanceTable->BasicBoot.ExitBootServicesEntry));
   //
   // ExitBootServicesExit will be updated later, so don't dump it here.
   //

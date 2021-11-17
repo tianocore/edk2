@@ -343,7 +343,7 @@ I2cHostDriverStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "I2cHost: Open I2C bus configuration error, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "I2cHost: Open I2C bus configuration error, Status = %r\n", Status));
     return Status;
   }
 
@@ -359,7 +359,7 @@ I2cHostDriverStart (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "I2cHost: Open I2C master error, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "I2cHost: Open I2C master error, Status = %r\n", Status));
     goto Exit;
   }
 
@@ -368,7 +368,7 @@ I2cHostDriverStart (
   //
   I2cHostContext = AllocateZeroPool (sizeof (I2C_HOST_CONTEXT));
   if (I2cHostContext == NULL) {
-    DEBUG ((EFI_D_ERROR, "I2cHost: there is no enough memory to allocate.\n"));
+    DEBUG ((DEBUG_ERROR, "I2cHost: there is no enough memory to allocate.\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
@@ -387,7 +387,7 @@ I2cHostDriverStart (
   //
   Status = I2cMaster->Reset (I2cMaster);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "I2cHost: I2C controller reset failed!\n"));
+    DEBUG ((DEBUG_ERROR, "I2cHost: I2C controller reset failed!\n"));
     goto Exit;
   }
 
@@ -402,7 +402,7 @@ I2cHostDriverStart (
                   &I2cHostContext->I2cEvent
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "I2cHost: create complete event error, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "I2cHost: create complete event error, Status = %r\n", Status));
     goto Exit;
   }
 
@@ -417,7 +417,7 @@ I2cHostDriverStart (
                   &I2cHostContext->I2cBusConfigurationEvent
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "I2cHost: create bus available event error, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "I2cHost: create bus available event error, Status = %r\n", Status));
     goto Exit;
   }
 
@@ -438,7 +438,7 @@ I2cHostDriverStart (
                   );
 Exit:
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "I2cHost: Start() function failed, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "I2cHost: Start() function failed, Status = %r\n", Status));
     if (I2cBusConfigurationManagement != NULL) {
       gBS->CloseProtocol (
                       Controller,
@@ -514,7 +514,7 @@ I2cHostDriverStop (
 
   TplPrevious = EfiGetCurrentTpl ();
   if (TplPrevious > TPL_I2C_SYNC) {
-    DEBUG ((EFI_D_ERROR, "I2cHost: TPL %d is too high in Stop.\n", TplPrevious));
+    DEBUG ((DEBUG_ERROR, "I2cHost: TPL %d is too high in Stop.\n", TplPrevious));
     return EFI_DEVICE_ERROR;
   }
 
@@ -982,7 +982,7 @@ I2cHostQueueRequest (
   //
   TplPrevious = EfiGetCurrentTpl ();
   if ((TplPrevious > TPL_I2C_SYNC) || ((Event == NULL) && (TplPrevious > TPL_CALLBACK))) {
-    DEBUG ((EFI_D_ERROR, "ERROR - TPL %d is too high!\n", TplPrevious));
+    DEBUG ((DEBUG_ERROR, "ERROR - TPL %d is too high!\n", TplPrevious));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -991,7 +991,7 @@ I2cHostQueueRequest (
   //
   I2cRequest = AllocateZeroPool (sizeof (I2C_REQUEST));
   if (I2cRequest == NULL) {
-    DEBUG ((EFI_D_ERROR, "WARNING - Failed to allocate I2C_REQUEST!\n"));
+    DEBUG ((DEBUG_ERROR, "WARNING - Failed to allocate I2C_REQUEST!\n"));
     return EFI_OUT_OF_RESOURCES;
   }
 

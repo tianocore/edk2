@@ -1003,7 +1003,7 @@ PciHostBridgeAdjustAllocation (
     Status = RejectPciDevice (PciResNode->PciDev);
     if (Status == EFI_SUCCESS) {
       DEBUG ((
-        EFI_D_ERROR,
+        DEBUG_ERROR,
         "PciBus: [%02x|%02x|%02x] was rejected due to resource confliction.\n",
         PciResNode->PciDev->BusNumber, PciResNode->PciDev->DeviceNumber, PciResNode->PciDev->FunctionNumber
         ));
@@ -2207,4 +2207,3 @@ AddHostBridgeEnumerator (
 
   return EFI_SUCCESS;
 }
-

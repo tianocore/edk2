@@ -86,7 +86,7 @@ IsValidWorkSpace (
     return TRUE;
   }
 
-  DEBUG ((EFI_D_INFO, "Ftw: Work block header check mismatch\n"));
+  DEBUG ((DEBUG_INFO, "Ftw: Work block header check mismatch\n"));
   return FALSE;
 }
 
@@ -287,7 +287,7 @@ WorkSpaceRefresh (
             &FtwDevice->FtwLastWriteHeader
             );
   RemainingSpaceSize = FtwDevice->FtwWorkSpaceSize - ((UINTN) FtwDevice->FtwLastWriteHeader - (UINTN) FtwDevice->FtwWorkSpace);
-  DEBUG ((EFI_D_INFO, "Ftw: Remaining work space size - %x\n", RemainingSpaceSize));
+  DEBUG ((DEBUG_INFO, "Ftw: Remaining work space size - %x\n", RemainingSpaceSize));
   //
   // If FtwGetLastWriteHeader() returns error, or the remaining space size is even not enough to contain
   // one EFI_FAULT_TOLERANT_WRITE_HEADER + one EFI_FAULT_TOLERANT_WRITE_RECORD(It will cause that the header
@@ -300,7 +300,7 @@ WorkSpaceRefresh (
     //
     Status = FtwReclaimWorkSpace (FtwDevice, TRUE);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Ftw: Reclaim workspace - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Ftw: Reclaim workspace - %r\n", Status));
       return EFI_ABORTED;
     }
     //
@@ -370,7 +370,7 @@ FtwReclaimWorkSpace (
   UINT8                                   *Ptr;
   EFI_LBA                                 WorkSpaceLbaOffset;
 
-  DEBUG ((EFI_D_INFO, "Ftw: start to reclaim work space\n"));
+  DEBUG ((DEBUG_INFO, "Ftw: start to reclaim work space\n"));
 
   WorkSpaceLbaOffset = FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba;
 
@@ -601,7 +601,7 @@ FtwReclaimWorkSpace (
 
   FreePool (SpareBuffer);
 
-  DEBUG ((EFI_D_INFO, "Ftw: reclaim work space successfully\n"));
+  DEBUG ((DEBUG_INFO, "Ftw: reclaim work space successfully\n"));
 
   return EFI_SUCCESS;
 }

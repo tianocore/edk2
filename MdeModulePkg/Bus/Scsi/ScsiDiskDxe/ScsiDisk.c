@@ -1420,7 +1420,7 @@ ScsiDiskAsyncUnmapNotify (
   Status = CheckHostAdapterStatus (CommandPacket->HostAdapterStatus);
   if (EFI_ERROR(Status)) {
     DEBUG ((
-      EFI_D_ERROR,
+      DEBUG_ERROR,
       "ScsiDiskAsyncUnmapNotify: Host adapter indicating error status 0x%x.\n",
       CommandPacket->HostAdapterStatus
       ));
@@ -1432,7 +1432,7 @@ ScsiDiskAsyncUnmapNotify (
   Status = CheckTargetStatus (CommandPacket->TargetStatus);
   if (EFI_ERROR(Status)) {
     DEBUG ((
-      EFI_D_ERROR,
+      DEBUG_ERROR,
       "ScsiDiskAsyncUnmapNotify: Target indicating error status 0x%x.\n",
       CommandPacket->HostAdapterStatus
       ));
@@ -1614,7 +1614,7 @@ ScsiDiskUnmap (
   Status = CheckHostAdapterStatus (CommandPacket->HostAdapterStatus);
   if (EFI_ERROR(Status)) {
     DEBUG ((
-      EFI_D_ERROR,
+      DEBUG_ERROR,
       "ScsiDiskUnmap: Host adapter indicating error status 0x%x.\n",
       CommandPacket->HostAdapterStatus
       ));
@@ -1626,7 +1626,7 @@ ScsiDiskUnmap (
   Status = CheckTargetStatus (CommandPacket->TargetStatus);
   if (EFI_ERROR(Status)) {
     DEBUG ((
-      EFI_D_ERROR,
+      DEBUG_ERROR,
       "ScsiDiskUnmap: Target indicating error status 0x%x.\n",
       CommandPacket->HostAdapterStatus
       ));
@@ -2510,7 +2510,7 @@ ScsiDiskInquiryDevice (
         // Sanity checks for coping with broken devices
         //
         if (PageLength > sizeof SupportedVpdPages->SupportedVpdPageList) {
-          DEBUG ((EFI_D_WARN,
+          DEBUG ((DEBUG_WARN,
             "%a: invalid PageLength (%u) in Supported VPD Pages page\n",
             __FUNCTION__, (UINT32)PageLength));
           PageLength = 0;
@@ -2519,7 +2519,7 @@ ScsiDiskInquiryDevice (
         if ((PageLength > 0) &&
             (SupportedVpdPages->SupportedVpdPageList[0] !=
              EFI_SCSI_PAGE_CODE_SUPPORTED_VPD)) {
-          DEBUG ((EFI_D_WARN,
+          DEBUG ((DEBUG_WARN,
             "%a: Supported VPD Pages page doesn't start with code 0x%02x\n",
             __FUNCTION__, EFI_SCSI_PAGE_CODE_SUPPORTED_VPD));
           PageLength = 0;
@@ -2535,7 +2535,7 @@ ScsiDiskInquiryDevice (
           if ((Index > 0) &&
               (SupportedVpdPages->SupportedVpdPageList[Index] <=
                SupportedVpdPages->SupportedVpdPageList[Index - 1])) {
-            DEBUG ((EFI_D_WARN,
+            DEBUG ((DEBUG_WARN,
               "%a: non-ascending code in Supported VPD Pages page @ %u\n",
               __FUNCTION__, Index));
             Index = 0;
@@ -2861,30 +2861,30 @@ DetectMediaParsingSenseKeys (
     ScsiDiskDevice->BlkIo.Media->MediaPresent = FALSE;
     ScsiDiskDevice->BlkIo.Media->LastBlock    = 0;
     *Action = ACTION_NO_ACTION;
-    DEBUG ((EFI_D_VERBOSE, "ScsiDisk: ScsiDiskIsNoMedia\n"));
+    DEBUG ((DEBUG_VERBOSE, "ScsiDisk: ScsiDiskIsNoMedia\n"));
     return EFI_SUCCESS;
   }
 
   if (ScsiDiskIsMediaChange (SenseData, NumberOfSenseKeys)) {
     ScsiDiskDevice->BlkIo.Media->MediaId++;
-    DEBUG ((EFI_D_VERBOSE, "ScsiDisk: ScsiDiskIsMediaChange!\n"));
+    DEBUG ((DEBUG_VERBOSE, "ScsiDisk: ScsiDiskIsMediaChange!\n"));
     return EFI_SUCCESS;
   }
 
   if (ScsiDiskIsResetBefore (SenseData, NumberOfSenseKeys)) {
     *Action = ACTION_RETRY_COMMAND_LATER;
-    DEBUG ((EFI_D_VERBOSE, "ScsiDisk: ScsiDiskIsResetBefore!\n"));
+    DEBUG ((DEBUG_VERBOSE, "ScsiDisk: ScsiDiskIsResetBefore!\n"));
     return EFI_SUCCESS;
   }
 
   if (ScsiDiskIsMediaError (SenseData, NumberOfSenseKeys)) {
-    DEBUG ((EFI_D_VERBOSE, "ScsiDisk: ScsiDiskIsMediaError\n"));
+    DEBUG ((DEBUG_VERBOSE, "ScsiDisk: ScsiDiskIsMediaError\n"));
     *Action = ACTION_RETRY_WITH_BACKOFF_ALGO;
     return EFI_DEVICE_ERROR;
   }
 
   if (ScsiDiskIsHardwareError (SenseData, NumberOfSenseKeys)) {
-    DEBUG ((EFI_D_VERBOSE, "ScsiDisk: ScsiDiskIsHardwareError\n"));
+    DEBUG ((DEBUG_VERBOSE, "ScsiDisk: ScsiDiskIsHardwareError\n"));
     *Action = ACTION_RETRY_WITH_BACKOFF_ALGO;
     return EFI_DEVICE_ERROR;
   }
@@ -2892,7 +2892,7 @@ DetectMediaParsingSenseKeys (
   if (!ScsiDiskIsDriveReady (SenseData, NumberOfSenseKeys, &RetryLater)) {
     if (RetryLater) {
       *Action = ACTION_RETRY_COMMAND_LATER;
-      DEBUG ((EFI_D_VERBOSE, "ScsiDisk: ScsiDiskDriveNotReady!\n"));
+      DEBUG ((DEBUG_VERBOSE, "ScsiDisk: ScsiDiskDriveNotReady!\n"));
       return EFI_SUCCESS;
     }
     *Action = ACTION_NO_ACTION;
@@ -2900,7 +2900,7 @@ DetectMediaParsingSenseKeys (
   }
 
   *Action = ACTION_RETRY_WITH_BACKOFF_ALGO;
-  DEBUG ((EFI_D_VERBOSE, "ScsiDisk: Sense Key = 0x%x ASC = 0x%x!\n", SenseData->Sense_Key, SenseData->Addnl_Sense_Code));
+  DEBUG ((DEBUG_VERBOSE, "ScsiDisk: Sense Key = 0x%x ASC = 0x%x!\n", SenseData->Sense_Key, SenseData->Addnl_Sense_Code));
   return EFI_SUCCESS;
 }
 
@@ -4206,7 +4206,7 @@ BackOff:
   }
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
-    DEBUG ((EFI_D_ERROR, "ScsiDiskRead10: Check Condition happened!\n"));
+    DEBUG ((DEBUG_ERROR, "ScsiDiskRead10: Check Condition happened!\n"));
     Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
@@ -4330,7 +4330,7 @@ BackOff:
   }
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
-    DEBUG ((EFI_D_ERROR, "ScsiDiskWrite10: Check Condition happened!\n"));
+    DEBUG ((DEBUG_ERROR, "ScsiDiskWrite10: Check Condition happened!\n"));
     Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
@@ -4453,7 +4453,7 @@ BackOff:
   }
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
-    DEBUG ((EFI_D_ERROR, "ScsiDiskRead16: Check Condition happened!\n"));
+    DEBUG ((DEBUG_ERROR, "ScsiDiskRead16: Check Condition happened!\n"));
     Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
@@ -4577,7 +4577,7 @@ BackOff:
   }
 
   if ((TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) || (EFI_ERROR (ReturnStatus))) {
-    DEBUG ((EFI_D_ERROR, "ScsiDiskWrite16: Check Condition happened!\n"));
+    DEBUG ((DEBUG_ERROR, "ScsiDiskWrite16: Check Condition happened!\n"));
     Status = DetectMediaParsingSenseKeys (ScsiDiskDevice, ScsiDiskDevice->SenseData, SenseDataLength / sizeof (EFI_SCSI_SENSE_DATA), &Action);
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
@@ -4686,7 +4686,7 @@ ScsiDiskNotify (
   }
 
   if (Request->TargetStatus == EFI_EXT_SCSI_STATUS_TARGET_CHECK_CONDITION) {
-    DEBUG ((EFI_D_ERROR, "ScsiDiskNotify: Check Condition happened!\n"));
+    DEBUG ((DEBUG_ERROR, "ScsiDiskNotify: Check Condition happened!\n"));
 
     Status = DetectMediaParsingSenseKeys (
                ScsiDiskDevice,
@@ -5948,7 +5948,7 @@ DetermineInstallEraseBlock (
     if (((CapacityData16->LowestAlignLogic2 & BIT7) == 0) ||
         ((CapacityData16->LowestAlignLogic2 & BIT6) == 0)) {
       DEBUG ((
-        EFI_D_VERBOSE,
+        DEBUG_VERBOSE,
         "ScsiDisk EraseBlock: Either TPE or TPRZ is not set: 0x%x.\n",
         CapacityData16->LowestAlignLogic2
         ));
@@ -5958,7 +5958,7 @@ DetermineInstallEraseBlock (
     }
   } else {
     DEBUG ((
-      EFI_D_VERBOSE,
+      DEBUG_VERBOSE,
       "ScsiDisk EraseBlock: ReadCapacity16 failed with status %r.\n",
       CommandStatus
       ));
@@ -5973,7 +5973,7 @@ DetermineInstallEraseBlock (
   if ((ScsiDiskDevice->UnmapInfo.MaxLbaCnt == 0) ||
       (ScsiDiskDevice->UnmapInfo.MaxBlkDespCnt == 0)) {
     DEBUG ((
-      EFI_D_VERBOSE,
+      DEBUG_VERBOSE,
       "ScsiDisk EraseBlock: The device server does not implement the UNMAP command.\n"
       ));
 

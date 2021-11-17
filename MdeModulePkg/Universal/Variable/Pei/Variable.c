@@ -608,14 +608,14 @@ GetVariableStore (
             // Let FvHeader point to spare block.
             //
             FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) FtwLastWriteData->SpareAddress;
-            DEBUG ((EFI_D_INFO, "PeiVariable: NV storage is backed up in spare block: 0x%x\n", (UINTN) FtwLastWriteData->SpareAddress));
+            DEBUG ((DEBUG_INFO, "PeiVariable: NV storage is backed up in spare block: 0x%x\n", (UINTN) FtwLastWriteData->SpareAddress));
           } else if ((FtwLastWriteData->TargetAddress > NvStorageBase) && (FtwLastWriteData->TargetAddress < (NvStorageBase + NvStorageSize))) {
             StoreInfo->FtwLastWriteData = FtwLastWriteData;
             //
             // Flash NV storage from the offset is backed up in spare block.
             //
             BackUpOffset = (UINT32) (FtwLastWriteData->TargetAddress - NvStorageBase);
-            DEBUG ((EFI_D_INFO, "PeiVariable: High partial NV storage from offset: %x is backed up in spare block: 0x%x\n", BackUpOffset, (UINTN) FtwLastWriteData->SpareAddress));
+            DEBUG ((DEBUG_INFO, "PeiVariable: High partial NV storage from offset: %x is backed up in spare block: 0x%x\n", BackUpOffset, (UINTN) FtwLastWriteData->SpareAddress));
             //
             // At least one block data in flash NV storage is still valid, so still leave FvHeader point to NV storage base.
             //
@@ -626,7 +626,7 @@ GetVariableStore (
         // Check if the Firmware Volume is not corrupted
         //
         if ((FvHeader->Signature != EFI_FVH_SIGNATURE) || (!CompareGuid (&gEfiSystemNvDataFvGuid, &FvHeader->FileSystemGuid))) {
-          DEBUG ((EFI_D_ERROR, "Firmware Volume for Variable Store is corrupted\n"));
+          DEBUG ((DEBUG_ERROR, "Firmware Volume for Variable Store is corrupted\n"));
           break;
         }
 

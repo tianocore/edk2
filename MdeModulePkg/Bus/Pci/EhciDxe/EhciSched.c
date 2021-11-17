@@ -377,7 +377,7 @@ EhcUnlinkQhFromAsync (
   Status = EhcSetAndWaitDoorBell (Ehc, EHC_GENERIC_TIMEOUT);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EhcUnlinkQhFromAsync: Failed to synchronize with doorbell\n"));
+    DEBUG ((DEBUG_ERROR, "EhcUnlinkQhFromAsync: Failed to synchronize with doorbell\n"));
   }
 }
 
@@ -636,13 +636,13 @@ EhcCheckUrbResult (
         //
         PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->ShortReadStop, sizeof (EHC_QTD));
         if (QtdHw->AltNext == QTD_LINK (PciAddr, FALSE)) {
-          DEBUG ((EFI_D_VERBOSE, "EhcCheckUrbResult: Short packet read, break\n"));
+          DEBUG ((DEBUG_VERBOSE, "EhcCheckUrbResult: Short packet read, break\n"));
 
           Finished = TRUE;
           goto ON_EXIT;
         }
 
-        DEBUG ((EFI_D_VERBOSE, "EhcCheckUrbResult: Short packet read, continue\n"));
+        DEBUG ((DEBUG_VERBOSE, "EhcCheckUrbResult: Short packet read, continue\n"));
       }
     }
   }
@@ -713,13 +713,13 @@ EhcExecTransfer (
   }
 
   if (!Finished) {
-    DEBUG ((EFI_D_ERROR, "EhcExecTransfer: transfer not finished in %dms\n", (UINT32)TimeOut));
+    DEBUG ((DEBUG_ERROR, "EhcExecTransfer: transfer not finished in %dms\n", (UINT32)TimeOut));
     EhcDumpQh (Urb->Qh, NULL, FALSE);
 
     Status = EFI_TIMEOUT;
 
   } else if (Urb->Result != EFI_USB_NOERROR) {
-    DEBUG ((EFI_D_ERROR, "EhcExecTransfer: transfer failed with %x\n", Urb->Result));
+    DEBUG ((DEBUG_ERROR, "EhcExecTransfer: transfer failed with %x\n", Urb->Result));
     EhcDumpQh (Urb->Qh, NULL, FALSE);
 
     Status = EFI_DEVICE_ERROR;
@@ -1069,7 +1069,7 @@ EhcMonitorAsyncRequests (
     //
     Status = EhcFlushAsyncIntMap (Ehc, Urb);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "EhcMonitorAsyncRequests: Fail to Flush AsyncInt Mapped Memeory\n"));
+      DEBUG ((DEBUG_ERROR, "EhcMonitorAsyncRequests: Fail to Flush AsyncInt Mapped Memeory\n"));
     }
 
     //

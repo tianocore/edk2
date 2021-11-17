@@ -304,7 +304,7 @@ EmmcPeimHcReset (
   Status  = EmmcPeimHcRwMmio (Bar + EMMC_HC_SW_RST, FALSE, sizeof (SwReset), &SwReset);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EmmcPeimHcReset: write full 1 fails: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "EmmcPeimHcReset: write full 1 fails: %r\n", Status));
     return Status;
   }
 
@@ -316,7 +316,7 @@ EmmcPeimHcReset (
              EMMC_TIMEOUT
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "EmmcPeimHcReset: reset done with %r\n", Status));
+    DEBUG ((DEBUG_INFO, "EmmcPeimHcReset: reset done with %r\n", Status));
     return Status;
   }
   //
@@ -556,7 +556,7 @@ EmmcPeimHcClockSupply (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "BaseClkFreq %dMHz Divisor %d ClockFreq %dKhz\n", BaseClkFreq, Divisor, ClockFreq));
+  DEBUG ((DEBUG_INFO, "BaseClkFreq %dMHz Divisor %d ClockFreq %dKhz\n", BaseClkFreq, Divisor, ClockFreq));
 
   Status = EmmcPeimHcRwMmio (Bar + EMMC_HC_CTRL_VER, TRUE, sizeof (ControllerVer), &ControllerVer);
   if (EFI_ERROR (Status)) {
@@ -578,7 +578,7 @@ EmmcPeimHcClockSupply (
     ASSERT (Divisor <= 0x80);
     ClockCtrl = (Divisor & 0xFF) << 8;
   } else {
-    DEBUG ((EFI_D_ERROR, "Unknown SD Host Controller Spec version [0x%x]!!!\n", ControllerVer));
+    DEBUG ((DEBUG_ERROR, "Unknown SD Host Controller Spec version [0x%x]!!!\n", ControllerVer));
     return EFI_UNSUPPORTED;
   }
 
@@ -596,7 +596,7 @@ EmmcPeimHcClockSupply (
   ClockCtrl |= BIT0;
   Status = EmmcPeimHcRwMmio (Bar + EMMC_HC_CLOCK_CTRL, FALSE, sizeof (ClockCtrl), &ClockCtrl);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Set SDCLK Frequency Select and Internal Clock Enable fields fails\n"));
+    DEBUG ((DEBUG_ERROR, "Set SDCLK Frequency Select and Internal Clock Enable fields fails\n"));
     return Status;
   }
 
@@ -936,7 +936,7 @@ BuildAdmaDescTable (
   // for 32-bit address descriptor table.
   //
   if ((Data & (BIT0 | BIT1)) != 0) {
-    DEBUG ((EFI_D_INFO, "The buffer [0x%x] to construct ADMA desc is not aligned to 4 bytes boundary!\n", Data));
+    DEBUG ((DEBUG_INFO, "The buffer [0x%x] to construct ADMA desc is not aligned to 4 bytes boundary!\n", Data));
   }
 
   Entries = DivU64x32 ((DataLen + ADMA_MAX_DATA_PER_LINE - 1), ADMA_MAX_DATA_PER_LINE);
@@ -2330,7 +2330,7 @@ EmmcPeimTuningClkForHs200 (
     }
   } while (++Retry < 40);
 
-  DEBUG ((EFI_D_ERROR, "EmmcPeimTuningClkForHs200: Send tuning block fails at %d times with HostCtrl2 %02x\n", Retry, HostCtrl2));
+  DEBUG ((DEBUG_ERROR, "EmmcPeimTuningClkForHs200: Send tuning block fails at %d times with HostCtrl2 %02x\n", Retry, HostCtrl2));
   //
   // Abort the tuning procedure and reset the tuning circuit.
   //
@@ -2720,7 +2720,7 @@ EmmcPeimSetBusMode (
 
   Status = EmmcPeimGetCsd (Slot, Rca, &Slot->Csd);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EmmcPeimSetBusMode: EmmcPeimGetCsd fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "EmmcPeimSetBusMode: EmmcPeimGetCsd fails with %r\n", Status));
     return Status;
   }
 
@@ -2732,13 +2732,13 @@ EmmcPeimSetBusMode (
 
   Status = EmmcPeimSelect (Slot, Rca);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EmmcPeimSetBusMode: EmmcPeimSelect fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "EmmcPeimSetBusMode: EmmcPeimSelect fails with %r\n", Status));
     return Status;
   }
 
   Status = EmmcPeimHcGetCapability (Slot->EmmcHcBase, &Capability);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EmmcPeimSetBusMode: EmmcPeimHcGetCapability fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "EmmcPeimSetBusMode: EmmcPeimHcGetCapability fails with %r\n", Status));
     return Status;
   }
 
@@ -2756,7 +2756,7 @@ EmmcPeimSetBusMode (
   //
   Status = EmmcPeimGetExtCsd (Slot, &Slot->ExtCsd);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EmmcPeimSetBusMode: EmmcPeimGetExtCsd fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "EmmcPeimSetBusMode: EmmcPeimGetExtCsd fails with %r\n", Status));
     return Status;
   }
   //
@@ -2802,7 +2802,7 @@ EmmcPeimSetBusMode (
     return EFI_SUCCESS;
   }
 
-  DEBUG ((EFI_D_INFO, "HsTiming %d ClockFreq %d BusWidth %d Ddr %a\n", HsTiming, ClockFreq, BusWidth, IsDdr ? "TRUE":"FALSE"));
+  DEBUG ((DEBUG_INFO, "HsTiming %d ClockFreq %d BusWidth %d Ddr %a\n", HsTiming, ClockFreq, BusWidth, IsDdr ? "TRUE":"FALSE"));
 
   if (HsTiming == 3) {
     //
@@ -2847,7 +2847,7 @@ EmmcPeimIdentification (
 
   Status = EmmcPeimReset (Slot);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EmmcPeimIdentification: EmmcPeimReset fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "EmmcPeimIdentification: EmmcPeimReset fails with %r\n", Status));
     return Status;
   }
 
@@ -2856,12 +2856,12 @@ EmmcPeimIdentification (
   do {
     Status = EmmcPeimGetOcr (Slot, &Ocr);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "EmmcPeimIdentification: EmmcPeimGetOcr fails with %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "EmmcPeimIdentification: EmmcPeimGetOcr fails with %r\n", Status));
       return Status;
     }
 
     if (Retry++ == 100) {
-      DEBUG ((EFI_D_ERROR, "EmmcPeimIdentification: EmmcPeimGetOcr fails too many times\n"));
+      DEBUG ((DEBUG_ERROR, "EmmcPeimIdentification: EmmcPeimGetOcr fails too many times\n"));
       return EFI_DEVICE_ERROR;
     }
     MicroSecondDelay (10 * 1000);
@@ -2869,7 +2869,7 @@ EmmcPeimIdentification (
 
   Status = EmmcPeimGetAllCid (Slot);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EmmcPeimIdentification: EmmcPeimGetAllCid fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "EmmcPeimIdentification: EmmcPeimGetAllCid fails with %r\n", Status));
     return Status;
   }
   //
@@ -2879,16 +2879,15 @@ EmmcPeimIdentification (
   Rca    = 1;
   Status = EmmcPeimSetRca (Slot, Rca);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "EmmcPeimIdentification: EmmcPeimSetRca fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "EmmcPeimIdentification: EmmcPeimSetRca fails with %r\n", Status));
     return Status;
   }
   //
   // Enter Data Tranfer Mode.
   //
-  DEBUG ((EFI_D_INFO, "Found a EMMC device at slot [%d], RCA [%d]\n", Slot, Rca));
+  DEBUG ((DEBUG_INFO, "Found a EMMC device at slot [%d], RCA [%d]\n", Slot, Rca));
 
   Status = EmmcPeimSetBusMode (Slot, Rca);
 
   return Status;
 }
-

@@ -317,7 +317,7 @@ FindFileEx (
   } else {
     if (IS_FFS_FILE2 (*FileHeader)) {
       if (!IsFfs3Fv) {
-        DEBUG ((EFI_D_ERROR, "It is a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &(*FileHeader)->Name));
+        DEBUG ((DEBUG_ERROR, "It is a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &(*FileHeader)->Name));
       }
       FileLength = FFS_FILE2_SIZE (*FileHeader);
       ASSERT (FileLength > 0x00FFFFFF);
@@ -345,7 +345,7 @@ FindFileEx (
     case EFI_FILE_HEADER_INVALID:
       if (IS_FFS_FILE2 (FfsFileHeader)) {
         if (!IsFfs3Fv) {
-          DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsFileHeader->Name));
+          DEBUG ((DEBUG_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsFileHeader->Name));
         }
         FileOffset    += sizeof (EFI_FFS_FILE_HEADER2);
         FfsFileHeader =  (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsFileHeader + sizeof (EFI_FFS_FILE_HEADER2));
@@ -368,7 +368,7 @@ FindFileEx (
         ASSERT (FileLength > 0x00FFFFFF);
         FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
         if (!IsFfs3Fv) {
-          DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsFileHeader->Name));
+          DEBUG ((DEBUG_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsFileHeader->Name));
           FileOffset += FileOccupiedSize;
           FfsFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsFileHeader + FileOccupiedSize);
           break;
@@ -424,7 +424,7 @@ FindFileEx (
     case EFI_FILE_DELETED:
       if (IS_FFS_FILE2 (FfsFileHeader)) {
         if (!IsFfs3Fv) {
-          DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsFileHeader->Name));
+          DEBUG ((DEBUG_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsFileHeader->Name));
         }
         FileLength = FFS_FILE2_SIZE (FfsFileHeader);
         ASSERT (FileLength > 0x00FFFFFF);
@@ -509,7 +509,7 @@ PeiInitializeFv (
   PrivateData->Fv[PrivateData->FvCount].FvHandle = FvHandle;
   PrivateData->Fv[PrivateData->FvCount].AuthenticationStatus = 0;
   DEBUG ((
-    EFI_D_INFO,
+    DEBUG_INFO,
     "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n",
     (UINT32) PrivateData->FvCount,
     (VOID *) BfvHeader,
@@ -607,7 +607,7 @@ FirmwareVolumeInfoPpiNotifyCallback (
     //
     Status = FvPpi->ProcessVolume (FvPpi, FvInfo2Ppi.FvInfo, FvInfo2Ppi.FvInfoSize, &FvHandle);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Fail to process new found FV, FV may be corrupted!\n"));
+      DEBUG ((DEBUG_ERROR, "Fail to process new found FV, FV may be corrupted!\n"));
       return Status;
     }
 
@@ -618,7 +618,7 @@ FirmwareVolumeInfoPpiNotifyCallback (
       if (PrivateData->Fv[FvIndex].FvHandle == FvHandle) {
         if (IsFvInfo2 && (FvInfo2Ppi.AuthenticationStatus != PrivateData->Fv[FvIndex].AuthenticationStatus)) {
           PrivateData->Fv[FvIndex].AuthenticationStatus = FvInfo2Ppi.AuthenticationStatus;
-          DEBUG ((EFI_D_INFO, "Update AuthenticationStatus of the %dth FV to 0x%x!\n", FvIndex, FvInfo2Ppi.AuthenticationStatus));
+          DEBUG ((DEBUG_INFO, "Update AuthenticationStatus of the %dth FV to 0x%x!\n", FvIndex, FvInfo2Ppi.AuthenticationStatus));
         }
         DEBUG ((DEBUG_INFO, "The FV %p has already been processed!\n", FvInfo2Ppi.FvInfo));
         return EFI_SUCCESS;
@@ -651,7 +651,7 @@ FirmwareVolumeInfoPpiNotifyCallback (
     PrivateData->Fv[PrivateData->FvCount].AuthenticationStatus = FvInfo2Ppi.AuthenticationStatus;
     CurFvCount = PrivateData->FvCount;
     DEBUG ((
-      EFI_D_INFO,
+      DEBUG_INFO,
       "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n",
       (UINT32) CurFvCount,
       (VOID *) FvInfo2Ppi.FvInfo,
@@ -687,12 +687,12 @@ FirmwareVolumeInfoPpiNotifyCallback (
           }
         }
 
-        DEBUG ((EFI_D_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, CurFvCount, FvHandle));
+        DEBUG ((DEBUG_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, CurFvCount, FvHandle));
         ProcessFvFile (PrivateData, &PrivateData->Fv[CurFvCount], FileHandle);
       }
     } while (FileHandle != NULL);
   } else {
-    DEBUG ((EFI_D_ERROR, "Fail to process FV %p because no corresponding EFI_FIRMWARE_VOLUME_PPI is found!\n", FvInfo2Ppi.FvInfo));
+    DEBUG ((DEBUG_ERROR, "Fail to process FV %p because no corresponding EFI_FIRMWARE_VOLUME_PPI is found!\n", FvInfo2Ppi.FvInfo));
 
     AddUnknownFormatFvInfo (PrivateData, &FvInfo2Ppi);
   }
@@ -808,7 +808,7 @@ ProcessSection (
     if (IS_SECTION2 (Section)) {
       ASSERT (SECTION2_SIZE (Section) > 0x00FFFFFF);
       if (!IsFfs3Fv) {
-        DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted section in a non-FFS3 formatted FV.\n"));
+        DEBUG ((DEBUG_ERROR, "Found a FFS3 formatted section in a non-FFS3 formatted FV.\n"));
         SectionLength = SECTION2_SIZE (Section);
         //
         // SectionLength is adjusted it is 4 byte aligned.
@@ -1404,7 +1404,7 @@ ProcessFvFile (
       //
       // this FILE has been dispatched, it will not be dispatched again.
       //
-      DEBUG ((EFI_D_INFO, "FV file %p has been dispatched!\r\n", ParentFvFileHandle));
+      DEBUG ((DEBUG_INFO, "FV file %p has been dispatched!\r\n", ParentFvFileHandle));
       return EFI_SUCCESS;
     }
     HobPtr.Raw = GET_NEXT_HOB (HobPtr);
@@ -1628,7 +1628,7 @@ PeiFfsFvPpiProcessVolume (
   //
   Status = VerifyFv ((EFI_FIRMWARE_VOLUME_HEADER*) Buffer);
   if (EFI_ERROR(Status)) {
-    DEBUG ((EFI_D_ERROR, "Fail to verify FV which address is 0x%11p", Buffer));
+    DEBUG ((DEBUG_ERROR, "Fail to verify FV which address is 0x%11p", Buffer));
     return EFI_VOLUME_CORRUPTED;
   }
 
@@ -1810,7 +1810,7 @@ PeiFfsFvPpiGetFileInfo (
   if (IS_FFS_FILE2 (FileHeader)) {
     ASSERT (FFS_FILE2_SIZE (FileHeader) > 0x00FFFFFF);
     if (!FwVolInstance->IsFfs3Fv) {
-      DEBUG ((EFI_D_ERROR, "It is a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FileHeader->Name));
+      DEBUG ((DEBUG_ERROR, "It is a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FileHeader->Name));
       return EFI_INVALID_PARAMETER;
     }
     FileInfo->BufferSize = FFS_FILE2_SIZE (FileHeader) - sizeof (EFI_FFS_FILE_HEADER2);
@@ -2029,7 +2029,7 @@ PeiFfsFvPpiFindSectionByType2 (
   if (IS_FFS_FILE2 (FfsFileHeader)) {
     ASSERT (FFS_FILE2_SIZE (FfsFileHeader) > 0x00FFFFFF);
     if (!FwVolInstance->IsFfs3Fv) {
-      DEBUG ((EFI_D_ERROR, "It is a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsFileHeader->Name));
+      DEBUG ((DEBUG_ERROR, "It is a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsFileHeader->Name));
       return EFI_NOT_FOUND;
     }
     Section = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) FfsFileHeader + sizeof (EFI_FFS_FILE_HEADER2));
@@ -2344,7 +2344,7 @@ ThirdPartyFvPpiNotifyCallback (
     //
     Status = FvPpi->ProcessVolume (FvPpi, FvInfo, FvInfoSize, &FvHandle);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Fail to process the FV 0x%p, FV may be corrupted!\n", FvInfo));
+      DEBUG ((DEBUG_ERROR, "Fail to process the FV 0x%p, FV may be corrupted!\n", FvInfo));
       continue;
     }
 
@@ -2390,7 +2390,7 @@ ThirdPartyFvPpiNotifyCallback (
     PrivateData->Fv[PrivateData->FvCount].AuthenticationStatus = AuthenticationStatus;
     CurFvCount = PrivateData->FvCount;
     DEBUG ((
-      EFI_D_INFO,
+      DEBUG_INFO,
       "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n",
       (UINT32) CurFvCount,
       (VOID *) FvInfo,
@@ -2426,7 +2426,7 @@ ThirdPartyFvPpiNotifyCallback (
           }
         }
 
-        DEBUG ((EFI_D_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, CurFvCount, FvHandle));
+        DEBUG ((DEBUG_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, CurFvCount, FvHandle));
         ProcessFvFile (PrivateData, &PrivateData->Fv[CurFvCount], FileHandle);
       }
     } while (FileHandle != NULL);

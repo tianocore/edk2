@@ -309,7 +309,7 @@ IdentifyAtaDevice (
     return EFI_UNSUPPORTED;
   }
 
-  DEBUG ((EFI_D_INFO, "AtaBus - Identify Device: Port %x PortMultiplierPort %x\n", AtaDevice->Port, AtaDevice->PortMultiplierPort));
+  DEBUG ((DEBUG_INFO, "AtaBus - Identify Device: Port %x PortMultiplierPort %x\n", AtaDevice->Port, AtaDevice->PortMultiplierPort));
 
   //
   // Check whether the WORD 88 (supported UltraDMA by drive) is valid
@@ -674,7 +674,7 @@ AtaNonBlockingCallBack (
   }
 
   DEBUG ((
-    EFI_D_BLKIO,
+    DEBUG_BLKIO,
     "NON-BLOCKING EVENT FINISHED!- STATUS = %r\n",
     Task->Token->TransactionStatus
     ));
@@ -683,7 +683,7 @@ AtaNonBlockingCallBack (
   // Reduce the SubEventCount, till it comes to zero.
   //
   (*Task->UnsignalledEventCount) --;
-  DEBUG ((EFI_D_BLKIO, "UnsignalledEventCount = %d\n", *Task->UnsignalledEventCount));
+  DEBUG ((DEBUG_BLKIO, "UnsignalledEventCount = %d\n", *Task->UnsignalledEventCount));
 
   //
   // Remove the SubTask from the Task list.
@@ -696,7 +696,7 @@ AtaNonBlockingCallBack (
     //
     if (!(*Task->IsError)) {
       gBS->SignalEvent (Task->Token->Event);
-      DEBUG ((EFI_D_BLKIO, "Signal the upper layer event!\n"));
+      DEBUG ((DEBUG_BLKIO, "Signal the upper layer event!\n"));
     }
 
     FreePool (Task->UnsignalledEventCount);
@@ -709,8 +709,8 @@ AtaNonBlockingCallBack (
     if (!IsListEmpty (&AtaDevice->AtaTaskList)) {
       Entry   = GetFirstNode (&AtaDevice->AtaTaskList);
       AtaTask = ATA_ASYN_TASK_FROM_ENTRY (Entry);
-      DEBUG ((EFI_D_BLKIO, "Start to embark a new Ata Task\n"));
-      DEBUG ((EFI_D_BLKIO, "AtaTask->NumberOfBlocks = %x; AtaTask->Token=%x\n", AtaTask->NumberOfBlocks, AtaTask->Token));
+      DEBUG ((DEBUG_BLKIO, "Start to embark a new Ata Task\n"));
+      DEBUG ((DEBUG_BLKIO, "AtaTask->NumberOfBlocks = %x; AtaTask->Token=%x\n", AtaTask->NumberOfBlocks, AtaTask->Token));
       Status = AccessAtaDevice (
                  AtaTask->AtaDevice,
                  AtaTask->Buffer,
@@ -729,7 +729,7 @@ AtaNonBlockingCallBack (
   }
 
   DEBUG ((
-    EFI_D_BLKIO,
+    DEBUG_BLKIO,
     "PACKET INFO: Write=%s, Length=%x, LowCylinder=%x, HighCylinder=%x, SectionNumber=%x\n",
     Task->Packet.OutDataBuffer != NULL ? L"YES" : L"NO",
     Task->Packet.OutDataBuffer != NULL ? Task->Packet.OutTransferLength : Task->Packet.InTransferLength,
@@ -838,13 +838,13 @@ AccessAtaDevice(
       FreePool (EventCount);
       return EFI_OUT_OF_RESOURCES;
     }
-    DEBUG ((EFI_D_BLKIO, "Allocation IsError Addr=%x\n", IsError));
+    DEBUG ((DEBUG_BLKIO, "Allocation IsError Addr=%x\n", IsError));
     *IsError = FALSE;
     TempCount   = (NumberOfBlocks + MaxTransferBlockNumber - 1) / MaxTransferBlockNumber;
     *EventCount = TempCount;
-    DEBUG ((EFI_D_BLKIO, "AccessAtaDevice, NumberOfBlocks=%x\n", NumberOfBlocks));
-    DEBUG ((EFI_D_BLKIO, "AccessAtaDevice, MaxTransferBlockNumber=%x\n", MaxTransferBlockNumber));
-    DEBUG ((EFI_D_BLKIO, "AccessAtaDevice, EventCount=%x\n", TempCount));
+    DEBUG ((DEBUG_BLKIO, "AccessAtaDevice, NumberOfBlocks=%x\n", NumberOfBlocks));
+    DEBUG ((DEBUG_BLKIO, "AccessAtaDevice, MaxTransferBlockNumber=%x\n", MaxTransferBlockNumber));
+    DEBUG ((DEBUG_BLKIO, "AccessAtaDevice, EventCount=%x\n", TempCount));
   } else {
     while (!IsListEmpty (&AtaDevice->AtaTaskList) || !IsListEmpty (&AtaDevice->AtaSubTaskList)) {
       //
@@ -906,7 +906,7 @@ AccessAtaDevice(
       //
       // Blocking Mode.
       //
-      DEBUG ((EFI_D_BLKIO, "Blocking AccessAtaDevice, TransferBlockNumber=%x; StartLba = %x\n", TransferBlockNumber, StartLba));
+      DEBUG ((DEBUG_BLKIO, "Blocking AccessAtaDevice, TransferBlockNumber=%x; StartLba = %x\n", TransferBlockNumber, StartLba));
       Status = TransferAtaDevice (AtaDevice, NULL, Buffer, StartLba, (UINT32) TransferBlockNumber, IsWrite, NULL);
     }
 

@@ -323,10 +323,10 @@ GraphicsOutputDriverBindingStart (
     // Use default device infomation when the device info HOB doesn't exist
     //
     DeviceInfo = &mDefaultGraphicsDeviceInfo;
-    DEBUG ((EFI_D_INFO, "[%a]: GraphicsDeviceInfo HOB doesn't exist!\n", gEfiCallerBaseName));
+    DEBUG ((DEBUG_INFO, "[%a]: GraphicsDeviceInfo HOB doesn't exist!\n", gEfiCallerBaseName));
   } else {
     DeviceInfo = (EFI_PEI_GRAPHICS_DEVICE_INFO_HOB *) (GET_GUID_HOB_DATA (HobStart));
-    DEBUG ((EFI_D_INFO, "[%a]: GraphicsDeviceInfo HOB:\n"
+    DEBUG ((DEBUG_INFO, "[%a]: GraphicsDeviceInfo HOB:\n"
             "  VendorId = %04x, DeviceId = %04x,\n"
             "  RevisionId = %02x, BarIndex = %x,\n"
             "  SubsystemVendorId = %04x, SubsystemId = %04x\n",
@@ -395,7 +395,7 @@ GraphicsOutputDriverBindingStart (
         }
         Status = PciIo->GetBarAttributes (PciIo, Index, NULL, (VOID**) &Resources);
         if (!EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_INFO, "[%a]: BAR[%d]: Base = %lx, Length = %lx\n",
+          DEBUG ((DEBUG_INFO, "[%a]: BAR[%d]: Base = %lx, Length = %lx\n",
                   gEfiCallerBaseName, Index, Resources->AddrRangeMin, Resources->AddrLen));
           if ((Resources->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR) &&
             (Resources->Len == (UINT16) (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3)) &&
@@ -403,7 +403,7 @@ GraphicsOutputDriverBindingStart (
               (Resources->AddrLen >= GraphicsInfo->FrameBufferSize)
               ) {
             FrameBufferBase = Resources->AddrRangeMin;
-            DEBUG ((EFI_D_INFO, "[%a]: ... matched!\n", gEfiCallerBaseName));
+            DEBUG ((DEBUG_INFO, "[%a]: ... matched!\n", gEfiCallerBaseName));
             break;
           }
         }

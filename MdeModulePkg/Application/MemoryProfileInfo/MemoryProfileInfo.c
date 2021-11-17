@@ -1027,7 +1027,7 @@ GetUefiMemoryProfileData (
 
   Status = gBS->LocateProtocol (&gEdkiiMemoryProfileGuid, NULL, (VOID **) &ProfileProtocol);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UefiMemoryProfile: Locate MemoryProfile protocol - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UefiMemoryProfile: Locate MemoryProfile protocol - %r\n", Status));
     return Status;
   }
 
@@ -1136,7 +1136,7 @@ GetSmramProfileData (
 
   Status = gBS->LocateProtocol (&gEfiSmmCommunicationProtocolGuid, NULL, (VOID **) &SmmCommunication);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfile: Locate SmmCommunication protocol - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SmramProfile: Locate SmmCommunication protocol - %r\n", Status));
     return Status;
   }
 
@@ -1157,7 +1157,7 @@ GetSmramProfileData (
              (VOID **) &PiSmmCommunicationRegionTable
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfile: Get PiSmmCommunicationRegionTable - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SmramProfile: Get PiSmmCommunicationRegionTable - %r\n", Status));
     return Status;
   }
   ASSERT (PiSmmCommunicationRegionTable != NULL);
@@ -1193,7 +1193,7 @@ GetSmramProfileData (
   CommSize = sizeof (EFI_GUID) + sizeof (UINTN) + CommHeader->MessageLength;
   Status = SmmCommunication->Communicate (SmmCommunication, CommBuffer, &CommSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfile: SmmCommunication - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SmramProfile: SmmCommunication - %r\n", Status));
     return Status;
   }
 
@@ -1349,12 +1349,12 @@ UefiMain (
 
   Status = GetUefiMemoryProfileData ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "GetUefiMemoryProfileData - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "GetUefiMemoryProfileData - %r\n", Status));
   }
 
   Status = GetSmramProfileData ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "GetSmramProfileData - %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "GetSmramProfileData - %r\n", Status));
   }
 
   return EFI_SUCCESS;

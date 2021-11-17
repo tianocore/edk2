@@ -523,7 +523,7 @@ DriverHealthManagerRepairNotify (
   IN UINTN        Limit
   )
 {
-  DEBUG ((EFI_D_INFO, "[DriverHealthManagement]RepairNotify: %d/%d\n", Value, Limit));
+  DEBUG ((DEBUG_INFO, "[DriverHealthManagement]RepairNotify: %d/%d\n", Value, Limit));
   return EFI_SUCCESS;
 }
 
@@ -958,7 +958,7 @@ DriverHealthManagerCallback (
     return EFI_INVALID_PARAMETER;
   }
 
-  DEBUG ((EFI_D_ERROR, "QuestionId = %x\n", QuestionId));
+  DEBUG ((DEBUG_ERROR, "QuestionId = %x\n", QuestionId));
 
   //
   // We will have returned from processing a callback - user either hit ESC to exit, or selected
@@ -983,5 +983,3 @@ DriverHealthManagerCallback (
 
   return EFI_SUCCESS;
 }
-
-

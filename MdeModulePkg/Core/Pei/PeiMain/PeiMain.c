@@ -508,7 +508,7 @@ PeiCore (
   //
   // Enter DxeIpl to load Dxe core.
   //
-  DEBUG ((EFI_D_INFO, "DXE IPL Entry\n"));
+  DEBUG ((DEBUG_INFO, "DXE IPL Entry\n"));
   Status = TempPtr.DxeIpl->Entry (
                              TempPtr.DxeIpl,
                              &PrivateData.Ps,

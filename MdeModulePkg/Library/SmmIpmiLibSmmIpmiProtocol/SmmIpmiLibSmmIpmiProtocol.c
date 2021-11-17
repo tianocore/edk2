@@ -55,7 +55,7 @@ IpmiSubmitCommand (
       //
       // Smm Ipmi Protocol is not installed. So, IPMI device is not present.
       //
-      DEBUG ((EFI_D_ERROR, "IpmiSubmitCommand for SMM Status - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "IpmiSubmitCommand for SMM Status - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }

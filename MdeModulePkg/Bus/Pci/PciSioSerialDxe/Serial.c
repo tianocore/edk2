@@ -943,7 +943,7 @@ SerialControllerDriverStart (
         Node = NextDevicePathNode (Node);
       } while (!IsDevicePathEnd (Node));
       Status = CreateSerialDevice (Controller, Uart, ParentDevicePath, FALSE, Acpi->UID, ParentIo, NULL, NULL);
-      DEBUG ((EFI_D_INFO, "PciSioSerial: Create SIO child serial device - %r\n", Status));
+      DEBUG ((DEBUG_INFO, "PciSioSerial: Create SIO child serial device - %r\n", Status));
     }
   } else {
     Status = ParentIo.PciIo->Pci.Read (ParentIo.PciIo, EfiPciIoWidthUint8, 0, sizeof (Pci), &Pci);
@@ -1024,7 +1024,7 @@ SerialControllerDriverStart (
           }
 
           Status = CreateSerialDevice (Controller, Uart, ParentDevicePath, FALSE, 0, ParentIo, PciSerialParameter, PciDeviceInfo);
-          DEBUG ((EFI_D_INFO, "PciSioSerial: Create PCI child serial device (single) - %r\n", Status));
+          DEBUG ((DEBUG_INFO, "PciSioSerial: Create PCI child serial device (single) - %r\n", Status));
           if (!EFI_ERROR (Status)) {
             PciDeviceInfo->ChildCount++;
           }
@@ -1045,7 +1045,7 @@ SerialControllerDriverStart (
               //
               Status = CreateSerialDevice (Controller, Uart, ParentDevicePath, TRUE, PciSerialCount, ParentIo, PciSerialParameter, PciDeviceInfo);
               PciSerialCount++;
-              DEBUG ((EFI_D_INFO, "PciSioSerial: Create PCI child serial device (multiple) - %r\n", Status));
+              DEBUG ((DEBUG_INFO, "PciSioSerial: Create PCI child serial device (multiple) - %r\n", Status));
               if (!EFI_ERROR (Status)) {
                 PciDeviceInfo->ChildCount++;
               }

@@ -468,7 +468,7 @@ ReportStatusCodeEx (
     // The local variable Buffer not large enough to hold the extended data associated
     // with the status code being reported.
     //
-    DEBUG ((EFI_D_ERROR, "Status code extended data is too large to be reported!\n"));
+    DEBUG ((DEBUG_ERROR, "Status code extended data is too large to be reported!\n"));
     return EFI_OUT_OF_RESOURCES;
   }
   StatusCodeData = (EFI_STATUS_CODE_DATA  *) Buffer;

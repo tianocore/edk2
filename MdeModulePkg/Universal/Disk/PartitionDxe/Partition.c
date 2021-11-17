@@ -417,7 +417,7 @@ PartitionDriverBindingStop (
     // bus driver. Hence, additional check is needed here.
     //
     if (HasChildren (ControllerHandle)) {
-      DEBUG((EFI_D_ERROR, "PartitionDriverBindingStop: Still has child.\n"));
+      DEBUG((DEBUG_ERROR, "PartitionDriverBindingStop: Still has child.\n"));
       return EFI_DEVICE_ERROR;
     }
 
@@ -486,7 +486,7 @@ PartitionDriverBindingStop (
 
     if (BlockIo2 != NULL) {
       Status = BlockIo2->FlushBlocksEx (BlockIo2, NULL);
-      DEBUG((EFI_D_ERROR, "PartitionDriverBindingStop: FlushBlocksEx returned with %r\n", Status));
+      DEBUG((DEBUG_ERROR, "PartitionDriverBindingStop: FlushBlocksEx returned with %r\n", Status));
     } else {
       Status = EFI_SUCCESS;
     }
@@ -1372,4 +1372,3 @@ HasChildren (
 
   return (BOOLEAN) (Index < EntryCount);
 }
-

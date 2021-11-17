@@ -312,7 +312,7 @@ CheckRemainingDevicePath (
                   ((!SystemHasControllerNode) && (RemainingHasControllerNode)  && (RemainingControllerNumber == 0)) ||
                   ((SystemHasControllerNode)  && (RemainingHasControllerNode)  && (SystemControllerNumber == RemainingControllerNumber)) ||
                   ((!SystemHasControllerNode) && (!RemainingHasControllerNode))) {
-                  DEBUG ((EFI_D_ERROR, "This I2C device has been already started.\n"));
+                  DEBUG ((DEBUG_ERROR, "This I2C device has been already started.\n"));
                   Status = EFI_UNSUPPORTED;
                   break;
               }
@@ -572,7 +572,7 @@ I2cBusDriverStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
-    DEBUG ((EFI_D_ERROR, "I2cBus: open I2C host error, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "I2cBus: open I2C host error, Status = %r\n", Status));
     return Status;
   }
 
@@ -586,7 +586,7 @@ I2cBusDriverStart (
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "I2cBus: open private protocol error, Status = %r.\n", Status));
+      DEBUG ((DEBUG_ERROR, "I2cBus: open private protocol error, Status = %r.\n", Status));
       return Status;
     }
   }
@@ -603,7 +603,7 @@ I2cBusDriverStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
-    DEBUG ((EFI_D_ERROR, "I2cBus: open I2C enumerate error, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "I2cBus: open I2C enumerate error, Status = %r\n", Status));
     goto Error;
   }
 
@@ -616,7 +616,7 @@ I2cBusDriverStart (
                    EFI_OPEN_PROTOCOL_BY_DRIVER
                    );
   if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
-    DEBUG ((EFI_D_ERROR, "I2cBus: open device path error, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "I2cBus: open device path error, Status = %r\n", Status));
     goto Error;
   }
 
@@ -637,7 +637,7 @@ I2cBusDriverStart (
     //
     I2cBusContext = AllocateZeroPool (sizeof (I2C_BUS_CONTEXT));
     if (I2cBusContext == NULL) {
-      DEBUG ((EFI_D_ERROR, "I2cBus: there is no enough memory to allocate.\n"));
+      DEBUG ((DEBUG_ERROR, "I2cBus: there is no enough memory to allocate.\n"));
       Status = EFI_OUT_OF_RESOURCES;
       goto Error;
     }
@@ -676,7 +676,7 @@ I2cBusDriverStart (
                     NULL
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "I2cBus: install private protocol error, Status = %r.\n", Status));
+      DEBUG ((DEBUG_ERROR, "I2cBus: install private protocol error, Status = %r.\n", Status));
       goto Error;
     }
   }
@@ -690,7 +690,7 @@ I2cBusDriverStart (
 
 Error:
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "I2cBus: Start() function failed, Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "I2cBus: Start() function failed, Status = %r\n", Status));
     if (ParentDevicePath != NULL) {
       gBS->CloseProtocol (
             Controller,
@@ -921,7 +921,7 @@ RegisterI2cDevice (
     //  Determine if the device info is valid
     //
     if ((Device->DeviceGuid == NULL) || (Device->SlaveAddressCount == 0) || (Device->SlaveAddressArray == NULL)) {
-      DEBUG ((EFI_D_ERROR, "Invalid EFI_I2C_DEVICE reported by I2c Enumerate protocol.\n"));
+      DEBUG ((DEBUG_ERROR, "Invalid EFI_I2C_DEVICE reported by I2c Enumerate protocol.\n"));
       continue;
     }
 

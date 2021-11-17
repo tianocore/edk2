@@ -56,7 +56,7 @@ HandOffToDxeCore (
              (VOID **)&VectorHandoffInfoPpi
              );
   if (Status == EFI_SUCCESS) {
-    DEBUG ((EFI_D_INFO, "Vector Hand-off Info PPI is gotten, GUIDed HOB is created!\n"));
+    DEBUG ((DEBUG_INFO, "Vector Hand-off Info PPI is gotten, GUIDed HOB is created!\n"));
     VectorInfo = VectorHandoffInfoPpi->Info;
     Index = 1;
     while (VectorInfo->Attribute != EFI_VECTOR_HANDOFF_LAST_ENTRY) {

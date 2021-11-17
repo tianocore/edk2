@@ -439,7 +439,7 @@ SmmEndOfDxeHandler (
   EFI_SMM_SX_REGISTER_CONTEXT       EntryRegisterContext;
   EFI_HANDLE                        S3EntryHandle;
 
-  DEBUG ((EFI_D_INFO, "SmmEndOfDxeHandler\n"));
+  DEBUG ((DEBUG_INFO, "SmmEndOfDxeHandler\n"));
 
   //
   // Install SMM EndOfDxe protocol

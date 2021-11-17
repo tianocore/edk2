@@ -168,7 +168,7 @@ PageFaultHandler (
   AddressEncMask = PageFaultContext->AddressEncMask;
 
   PFAddress = AsmReadCr2 ();
-  DEBUG ((EFI_D_ERROR, "CapsuleX64 - PageFaultHandler: Cr2 - %lx\n", PFAddress));
+  DEBUG ((DEBUG_ERROR, "CapsuleX64 - PageFaultHandler: Cr2 - %lx\n", PFAddress));
 
   if (PFAddress >= PhyMask + SIZE_4KB) {
     return PageFaultContext->OriginalHandler;

@@ -588,7 +588,7 @@ InitializeSdBlockIoPeim (
         continue;
       }
       if (Capability.SlotType != 0x1) {
-        DEBUG ((EFI_D_INFO, "The slot at 0x%x is not embedded slot type\n", MmioBase[Index]));
+        DEBUG ((DEBUG_INFO, "The slot at 0x%x is not embedded slot type\n", MmioBase[Index]));
         Status = EFI_UNSUPPORTED;
         continue;
       }

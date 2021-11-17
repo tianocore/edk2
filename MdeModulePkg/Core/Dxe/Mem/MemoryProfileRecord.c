@@ -611,7 +611,7 @@ MemoryProfileInit (
 
   RegisterDxeCore (HobStart, &mMemoryProfileContext);
 
-  DEBUG ((EFI_D_INFO, "MemoryProfileInit MemoryProfileContext - 0x%x\n", &mMemoryProfileContext));
+  DEBUG ((DEBUG_INFO, "MemoryProfileInit MemoryProfileContext - 0x%x\n", &mMemoryProfileContext));
 }
 
 /**

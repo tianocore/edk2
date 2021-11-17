@@ -2025,7 +2025,7 @@ UnicodeToEfiKey (
           continue;
         }
         else {
-          DEBUG ((EFI_D_ERROR, "Unexpected state in escape2\n"));
+          DEBUG ((DEBUG_ERROR, "Unexpected state in escape2\n"));
         }
       }
       TerminalDevice->ResetState = RESET_STATE_DEFAULT;

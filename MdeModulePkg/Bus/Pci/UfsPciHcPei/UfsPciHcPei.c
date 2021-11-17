@@ -99,7 +99,7 @@ InitializeUfsHcPeim (
 
   Private = (UFS_HC_PEI_PRIVATE_DATA *) AllocateZeroPool (sizeof (UFS_HC_PEI_PRIVATE_DATA));
   if (Private == NULL) {
-    DEBUG ((EFI_D_ERROR, "Failed to allocate memory for UFS_HC_PEI_PRIVATE_DATA! \n"));
+    DEBUG ((DEBUG_ERROR, "Failed to allocate memory for UFS_HC_PEI_PRIVATE_DATA! \n"));
     return EFI_OUT_OF_RESOURCES;
   }
 

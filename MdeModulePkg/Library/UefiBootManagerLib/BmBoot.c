@@ -1807,7 +1807,7 @@ EfiBootManagerBoot (
     }
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[Bds] Failed to create Boot#### for a temporary boot - %r!\n", Status));
+      DEBUG ((DEBUG_ERROR, "[Bds] Failed to create Boot#### for a temporary boot - %r!\n", Status));
       BootOption->Status = Status;
       return ;
     }
@@ -1830,7 +1830,7 @@ EfiBootManagerBoot (
   //    the boot option.
   //
   if (BmIsBootManagerMenuFilePath (BootOption->FilePath)) {
-    DEBUG ((EFI_D_INFO, "[Bds] Booting Boot Manager Menu.\n"));
+    DEBUG ((DEBUG_INFO, "[Bds] Booting Boot Manager Menu.\n"));
     BmStopHotkeyService (NULL, NULL);
   } else {
     EfiSignalEventReadyToBoot();
@@ -2440,7 +2440,7 @@ BmRegisterBootManagerMenu (
                &DevicePath
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_WARN, "[Bds]BootManagerMenu FFS section can not be found, skip its boot option registration\n"));
+      DEBUG ((DEBUG_WARN, "[Bds]BootManagerMenu FFS section can not be found, skip its boot option registration\n"));
       return EFI_NOT_FOUND;
     }
     ASSERT (DevicePath != NULL);

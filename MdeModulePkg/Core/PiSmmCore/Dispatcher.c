@@ -283,7 +283,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
     }
     SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
   }
-  DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x, Status = %r\n", FixLoadingAddress, Status));
+  DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x, Status = %r\n", FixLoadingAddress, Status));
   return Status;
 }
 /**
@@ -464,7 +464,7 @@ SmmLoadImage (
       PageCount = 0;
       DstBuffer = (UINTN)gLoadModuleAtFixAddressSmramBase;
     } else {
-       DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));
+       DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));
        //
        // allocate the memory to load the SMM driver
        //

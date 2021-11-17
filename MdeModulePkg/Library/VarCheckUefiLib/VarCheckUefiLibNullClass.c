@@ -836,7 +836,7 @@ SetVariableCheckHandlerUefiDefined (
         // only permit the creation of variables with a UEFI Specification-defined
         // VendorGuid when these variables are documented in the UEFI Specification.
         //
-        DEBUG ((EFI_D_INFO, "UEFI Variable Check fail %r - %s not in %g namespace\n", EFI_INVALID_PARAMETER, VariableName, VendorGuid));
+        DEBUG ((DEBUG_INFO, "UEFI Variable Check fail %r - %s not in %g namespace\n", EFI_INVALID_PARAMETER, VariableName, VendorGuid));
         return EFI_INVALID_PARAMETER;
       }
     }
@@ -855,7 +855,7 @@ SetVariableCheckHandlerUefiDefined (
                Data
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "UEFI Variable Check function fail %r - %g:%s\n", Status, VendorGuid, VariableName));
+      DEBUG ((DEBUG_INFO, "UEFI Variable Check function fail %r - %g:%s\n", Status, VendorGuid, VariableName));
       return Status;
     }
   }

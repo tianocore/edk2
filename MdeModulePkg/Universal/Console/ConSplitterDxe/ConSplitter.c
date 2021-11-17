@@ -330,7 +330,7 @@ ToggleStateSyncKeyNotify (
                                     );
     }
     mConIn.PhysicalKeyToggleState = KeyData->KeyState.KeyToggleState;
-    DEBUG ((EFI_D_INFO, "Current toggle state is 0x%02x\n", mConIn.PhysicalKeyToggleState));
+    DEBUG ((DEBUG_INFO, "Current toggle state is 0x%02x\n", mConIn.PhysicalKeyToggleState));
   }
 
   return EFI_SUCCESS;
@@ -3615,7 +3615,7 @@ ConSplitterTextInReadKeyStroke (
   // Signal ConnectConIn event on first call in Lazy ConIn mode
   //
   if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
-    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));
+    DEBUG ((DEBUG_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));
     gBS->SignalEvent (Private->ConnectConInEvent);
     mConInIsConnect = TRUE;
   }
@@ -3809,7 +3809,7 @@ ConSplitterTextInReadKeyStrokeEx (
   // Signal ConnectConIn event on first call in Lazy ConIn mode
   //
   if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
-    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));
+    DEBUG ((DEBUG_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));
     gBS->SignalEvent (Private->ConnectConInEvent);
     mConInIsConnect = TRUE;
   }
