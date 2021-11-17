@@ -235,10 +235,9 @@ PeHotRelocateImageEx (
     ASSERT (FALSE);
     // break omitted - ARM instruction encoding not implemented
   default:
-    DEBUG ((EFI_D_ERROR, "PeHotRelocateEx:unknown fixed type\n"));
+    DEBUG ((DEBUG_ERROR, "PeHotRelocateEx:unknown fixed type\n"));
     return RETURN_UNSUPPORTED;
   }
 
   return RETURN_SUCCESS;
 }
-
