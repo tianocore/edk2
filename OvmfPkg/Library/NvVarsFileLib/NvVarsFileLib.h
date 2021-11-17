@@ -36,7 +36,6 @@ LoadNvVarsFromFs (
   EFI_HANDLE                            FsHandle
   );
 
-
 /**
   Saves the non-volatile variables into the NvVars file on the
   given file system.
@@ -52,4 +51,3 @@ SaveNvVarsToFs (
   );
 
 #endif
-

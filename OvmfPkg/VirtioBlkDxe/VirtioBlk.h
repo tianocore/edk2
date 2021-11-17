@@ -18,8 +18,7 @@
 
 #include <IndustryStandard/Virtio.h>
 
-
-#define VBLK_SIG SIGNATURE_32 ('V', 'B', 'L', 'K')
+#define VBLK_SIG  SIGNATURE_32 ('V', 'B', 'L', 'K')
 
 typedef struct {
   //
@@ -29,18 +28,17 @@ typedef struct {
   //
   //                     field                    init function       init dpth
   //                     ---------------------    ------------------  ---------
-  UINT32                 Signature;            // DriverBindingStart  0
-  VIRTIO_DEVICE_PROTOCOL *VirtIo;              // DriverBindingStart  0
-  EFI_EVENT              ExitBoot;             // DriverBindingStart  0
-  VRING                  Ring;                 // VirtioRingInit      2
-  EFI_BLOCK_IO_PROTOCOL  BlockIo;              // VirtioBlkInit       1
-  EFI_BLOCK_IO_MEDIA     BlockIoMedia;         // VirtioBlkInit       1
-  VOID                   *RingMap;             // VirtioRingMap       2
+  UINT32                    Signature;         // DriverBindingStart  0
+  VIRTIO_DEVICE_PROTOCOL    *VirtIo;           // DriverBindingStart  0
+  EFI_EVENT                 ExitBoot;          // DriverBindingStart  0
+  VRING                     Ring;              // VirtioRingInit      2
+  EFI_BLOCK_IO_PROTOCOL     BlockIo;           // VirtioBlkInit       1
+  EFI_BLOCK_IO_MEDIA        BlockIoMedia;      // VirtioBlkInit       1
+  VOID                      *RingMap;          // VirtioRingMap       2
 } VBLK_DEV;
 
 #define VIRTIO_BLK_FROM_BLOCK_IO(BlockIoPointer) \
         CR (BlockIoPointer, VBLK_DEV, BlockIo, VBLK_SIG)
-
 
 /**
 
@@ -86,7 +84,6 @@ VirtioBlkDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
   );
 
-
 /**
 
   After we've pronounced support for a specific device in
@@ -124,7 +121,6 @@ VirtioBlkDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
   );
 
-
 /**
 
   Stop driving a virtio-blk device and remove its BlockIo interface.
@@ -157,7 +153,6 @@ VirtioBlkDriverBindingStop (
   IN EFI_HANDLE                  *ChildHandleBuffer
   );
 
-
 //
 // UEFI Spec 2.3.1 + Errata C, 12.8 EFI Block I/O Protocol
 // Driver Writer's Guide for UEFI 2.3.1 v1.01,
@@ -169,7 +164,6 @@ VirtioBlkReset (
   IN EFI_BLOCK_IO_PROTOCOL *This,
   IN BOOLEAN               ExtendedVerification
   );
-
 
 /**
 
@@ -199,7 +193,6 @@ VirtioBlkReadBlocks (
   OUT VOID                  *Buffer
   );
 
-
 /**
 
   WriteBlocks() operation for virtio-blk.
@@ -228,7 +221,6 @@ VirtioBlkWriteBlocks (
   IN VOID                  *Buffer
   );
 
-
 /**
 
   FlushBlocks() operation for virtio-blk.
@@ -251,7 +243,6 @@ EFIAPI
 VirtioBlkFlushBlocks (
   IN EFI_BLOCK_IO_PROTOCOL *This
   );
-
 
 //
 // The purpose of the following scaffolding (EFI_COMPONENT_NAME_PROTOCOL and

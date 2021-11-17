@@ -21,8 +21,8 @@ InstallProtocolInterfaces (
   IN EFI_FW_VOL_BLOCK_DEVICE *FvbDevice
   )
 {
-  EFI_HANDLE FvbHandle;
-  EFI_STATUS Status;
+  EFI_HANDLE  FvbHandle;
+  EFI_STATUS  Status;
 
   ASSERT (FeaturePcdGet (PcdSmmSmramRequire));
 

@@ -37,19 +37,26 @@ XenHypercallHvmGetParam (
   IN UINT32        Index
   )
 {
-  xen_hvm_param_t     Parameter;
-  INTN                Error;
+  xen_hvm_param_t  Parameter;
+  INTN             Error;
 
   Parameter.domid = DOMID_SELF;
   Parameter.index = Index;
-  Error = XenHypercall2 (__HYPERVISOR_hvm_op,
-                         HVMOP_get_param, (INTN) &Parameter);
+  Error = XenHypercall2 (
+            __HYPERVISOR_hvm_op,
+            HVMOP_get_param,
+            (INTN)&Parameter
+            );
   if (Error != 0) {
-    DEBUG ((DEBUG_ERROR,
-            "XenHypercall: Error %Ld trying to get HVM parameter %d\n",
-            (INT64)Error, Index));
+    DEBUG ((
+      DEBUG_ERROR,
+      "XenHypercall: Error %Ld trying to get HVM parameter %d\n",
+      (INT64)Error,
+      Index
+      ));
     return 0;
   }
+
   return Parameter.value;
 }
 
@@ -60,8 +67,11 @@ XenHypercallMemoryOp (
   IN OUT VOID *Arguments
   )
 {
-  return XenHypercall2 (__HYPERVISOR_memory_op,
-                        Operation, (INTN) Arguments);
+  return XenHypercall2 (
+           __HYPERVISOR_memory_op,
+           Operation,
+           (INTN)Arguments
+           );
 }
 
 INTN
@@ -71,6 +81,9 @@ XenHypercallEventChannelOp (
   IN OUT VOID *Arguments
   )
 {
-  return XenHypercall2 (__HYPERVISOR_event_channel_op,
-                        Operation, (INTN) Arguments);
+  return XenHypercall2 (
+           __HYPERVISOR_event_channel_op,
+           Operation,
+           (INTN)Arguments
+           );
 }

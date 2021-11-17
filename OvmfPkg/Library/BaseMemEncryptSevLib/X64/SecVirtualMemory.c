@@ -25,9 +25,9 @@ InternalGetMemEncryptionAddressMask (
   VOID
   )
 {
-  UINT64                            EncryptionMask;
+  UINT64  EncryptionMask;
 
-  EncryptionMask = MemEncryptSevGetEncryptionMask ();
+  EncryptionMask  = MemEncryptSevGetEncryptionMask ();
   EncryptionMask &= PAGING_1G_ADDRESS_MASK_64;
 
   return EncryptionMask;

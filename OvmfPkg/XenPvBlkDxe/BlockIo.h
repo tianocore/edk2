@@ -98,5 +98,5 @@ XenPvBlkDxeBlockIoReset (
   IN BOOLEAN                 ExtendedVerification
   );
 
-extern EFI_BLOCK_IO_MEDIA  gXenPvBlkDxeBlockIoMedia;
+extern EFI_BLOCK_IO_MEDIA     gXenPvBlkDxeBlockIoMedia;
 extern EFI_BLOCK_IO_PROTOCOL  gXenPvBlkDxeBlockIo;

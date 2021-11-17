@@ -19,19 +19,18 @@
 
 #include <IndustryStandard/Virtio.h>
 
-#define VIRTIO_PCI_DEVICE_SIGNATURE   SIGNATURE_32 ('V', 'P', 'C', 'I')
+#define VIRTIO_PCI_DEVICE_SIGNATURE  SIGNATURE_32 ('V', 'P', 'C', 'I')
 
 typedef struct {
-  UINT32                 Signature;
-  VIRTIO_DEVICE_PROTOCOL VirtioDevice;
-  EFI_PCI_IO_PROTOCOL   *PciIo;
-  UINT64                 OriginalPciAttributes;
-  UINT32                 DeviceSpecificConfigurationOffset;
+  UINT32                    Signature;
+  VIRTIO_DEVICE_PROTOCOL    VirtioDevice;
+  EFI_PCI_IO_PROTOCOL       *PciIo;
+  UINT64                    OriginalPciAttributes;
+  UINT32                    DeviceSpecificConfigurationOffset;
 } VIRTIO_PCI_DEVICE;
 
 #define VIRTIO_PCI_DEVICE_FROM_VIRTIO_DEVICE(Device) \
     CR (Device, VIRTIO_PCI_DEVICE, VirtioDevice, VIRTIO_PCI_DEVICE_SIGNATURE)
-
 
 EFI_STATUS
 EFIAPI
@@ -185,4 +184,5 @@ VirtioPciUnmapSharedBuffer (
   IN  VIRTIO_DEVICE_PROTOCOL        *This,
   IN  VOID                          *Mapping
   );
+
 #endif // _VIRTIO_PCI_DEVICE_DXE_H_

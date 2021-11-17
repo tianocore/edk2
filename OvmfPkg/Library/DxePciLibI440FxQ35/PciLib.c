@@ -15,7 +15,6 @@
 
 **/
 
-
 #include <Base.h>
 
 #include <IndustryStandard/Q35MchIch9.h>
@@ -25,7 +24,7 @@
 #include <Library/PciExpressLib.h>
 #include <Library/PcdLib.h>
 
-STATIC BOOLEAN mRunningOnQ35;
+STATIC BOOLEAN  mRunningOnQ35;
 
 RETURN_STATUS
 EFIAPI

@@ -11,8 +11,8 @@
 #ifndef __BHYVE_H__
 #define __BHYVE_H__
 
-#define BHYVE_ACPI_TIMER_IO_ADDR 0x408
+#define BHYVE_ACPI_TIMER_IO_ADDR  0x408
 
-#define BHYVE_PM_REG 0x404
+#define BHYVE_PM_REG  0x404
 
 #endif // __BHYVE_H__

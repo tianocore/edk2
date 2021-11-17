@@ -12,7 +12,6 @@
 
 #include <Library/PciCapLib.h>
 
-
 /**
   Create a PCI_CAP_DEV object from the PCI Segment:Bus:Device.Function
   quadruplet. The config space accessors are based upon PciSegmentLib.
@@ -59,7 +58,6 @@ PciCapPciSegmentDeviceInit (
   IN  UINT8          Function,
   OUT PCI_CAP_DEV    **PciDevice
   );
-
 
 /**
   Free the resources used by PciDevice.

@@ -19,7 +19,6 @@ BhyveGetGraphicsMode (
   UINT16              *Depth
   );
 
-
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
@@ -70,10 +69,10 @@ EmuGopDriverBindingSupported (
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
   )
 {
-  EFI_STATUS                Status;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
-  PCI_TYPE00                Pci;
-  UINT16                    Width, Height, Depth;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
+  UINT16               Width, Height, Depth;
 
   //
   // Open the IO Abstraction(s) needed to perform the supported test
@@ -81,7 +80,7 @@ EmuGopDriverBindingSupported (
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIo,
+                  (VOID **)&PciIo,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -107,11 +106,11 @@ EmuGopDriverBindingSupported (
   }
 
   Status = EFI_UNSUPPORTED;
-  if (Pci.Hdr.VendorId == 0xFB5D && Pci.Hdr.DeviceId == 0x40FB) {
-    DEBUG((DEBUG_INFO, "BHYVE framebuffer device detected\n"));
+  if ((Pci.Hdr.VendorId == 0xFB5D) && (Pci.Hdr.DeviceId == 0x40FB)) {
+    DEBUG ((DEBUG_INFO, "BHYVE framebuffer device detected\n"));
     Status = EFI_SUCCESS;
 
-    BhyveGetGraphicsMode(PciIo, &Width, &Height, &Depth);
+    BhyveGetGraphicsMode (PciIo, &Width, &Height, &Depth);
     PcdSet32S (PcdVideoHorizontalResolution, Width);
     PcdSet32S (PcdVideoVerticalResolution, Height);
   }
@@ -121,15 +120,14 @@ Done:
   // Close the PCI I/O Protocol
   //
   gBS->CloseProtocol (
-        Handle,
-        &gEfiPciIoProtocolGuid,
-        This->DriverBindingHandle,
-        Handle
-        );
+         Handle,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         Handle
+         );
 
   return Status;
 }
-
 
 /**
   Starts a device controller or a bus controller.
@@ -174,28 +172,28 @@ EmuGopDriverBindingStart (
   IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
   )
 {
-  BHYVE_FBUF_MEMREGS      Memregs;
-  GOP_PRIVATE_DATA        *Private;
-  EFI_STATUS              Status;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *MmioDesc;
+  BHYVE_FBUF_MEMREGS                 Memregs;
+  GOP_PRIVATE_DATA                   *Private;
+  EFI_STATUS                         Status;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *MmioDesc;
 
   //
   // Allocate Private context data for SGO inteface.
   //
   Private = NULL;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (GOP_PRIVATE_DATA),
-                  (VOID **)&Private
-                  );
+  Status  = gBS->AllocatePool (
+                   EfiBootServicesData,
+                   sizeof (GOP_PRIVATE_DATA),
+                   (VOID **)&Private
+                   );
   if (EFI_ERROR (Status)) {
     goto Done;
   }
 
   // Set up context record
   //
-  Private->Signature           = GOP_PRIVATE_DATA_SIGNATURE;
-  Private->Handle              = Handle;
+  Private->Signature = GOP_PRIVATE_DATA_SIGNATURE;
+  Private->Handle    = Handle;
   Private->ControllerNameTable = NULL;
 
   //
@@ -204,7 +202,7 @@ EmuGopDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &Private->PciIo,
+                  (VOID **)&Private->PciIo,
                   This->DriverBindingHandle,
                   Handle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -217,24 +215,30 @@ EmuGopDriverBindingStart (
   // Check if fbuf mmio BAR is present
   //
   MmioDesc = NULL;
-  Status = Private->PciIo->GetBarAttributes (
-                      Private->PciIo,
-                      PCI_BAR_IDX0,
-                      NULL,
-                      (VOID**) &MmioDesc
-                      );
+  Status   = Private->PciIo->GetBarAttributes (
+                               Private->PciIo,
+                               PCI_BAR_IDX0,
+                               NULL,
+                               (VOID **)&MmioDesc
+                               );
   if (EFI_ERROR (Status) ||
-      MmioDesc->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) {
+      (MmioDesc->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM))
+  {
     DEBUG ((DEBUG_INFO, "BHYVE GOP: No mmio bar\n"));
   } else {
-    DEBUG ((DEBUG_INFO, "BHYVE GOP: Using mmio bar @ 0x%lx\n",
-            MmioDesc->AddrRangeMin));
-    BhyveGetMemregs(Private, &Memregs);
+    DEBUG ((
+      DEBUG_INFO,
+      "BHYVE GOP: Using mmio bar @ 0x%lx\n",
+      MmioDesc->AddrRangeMin
+      ));
+    BhyveGetMemregs (Private, &Memregs);
     Private->FbSize = Memregs.FbSize;
   }
+
   if (MmioDesc != NULL) {
     FreePool (MmioDesc);
   }
+
   if (EFI_ERROR (Status)) {
     goto Done;
   }
@@ -243,18 +247,22 @@ EmuGopDriverBindingStart (
   // Check if fbuf frame-buffer BAR is present
   //
   MmioDesc = NULL;
-  Status = Private->PciIo->GetBarAttributes (
-                      Private->PciIo,
-                      PCI_BAR_IDX1,
-                      NULL,
-                      (VOID**) &MmioDesc
-                      );
+  Status   = Private->PciIo->GetBarAttributes (
+                               Private->PciIo,
+                               PCI_BAR_IDX1,
+                               NULL,
+                               (VOID **)&MmioDesc
+                               );
   if (EFI_ERROR (Status) ||
-      MmioDesc->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) {
+      (MmioDesc->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM))
+  {
     DEBUG ((DEBUG_INFO, "BHYVE GOP: No frame-buffer bar\n"));
   } else {
-    DEBUG ((DEBUG_INFO, "BHYVE GOP: Using frame-buffer bar @ 0x%lx\n",
-            MmioDesc->AddrRangeMin));
+    DEBUG ((
+      DEBUG_INFO,
+      "BHYVE GOP: Using frame-buffer bar @ 0x%lx\n",
+      MmioDesc->AddrRangeMin
+      ));
     Private->FbAddr = MmioDesc->AddrRangeMin;
     // XXX assert BAR is >= size
   }
@@ -262,12 +270,17 @@ EmuGopDriverBindingStart (
   if (MmioDesc != NULL) {
     FreePool (MmioDesc);
   }
+
   if (EFI_ERROR (Status)) {
     goto Done;
   }
 
-  DEBUG ((DEBUG_INFO, "BHYVE GOP: Framebuf addr 0x%lx, size %x\n",
-         Private->FbAddr, Private->FbSize));
+  DEBUG ((
+    DEBUG_INFO,
+    "BHYVE GOP: Framebuf addr 0x%lx, size %x\n",
+    Private->FbAddr,
+    Private->FbSize
+    ));
 
   Status = EmuGopConstructor (Private);
   if (EFI_ERROR (Status)) {
@@ -279,18 +292,19 @@ EmuGopDriverBindingStart (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Private->Handle,
-                  &gEfiGraphicsOutputProtocolGuid,    &Private->GraphicsOutput,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  &Private->GraphicsOutput,
                   NULL
                   );
 
-  DEBUG((DEBUG_INFO, "BHYVE framebuffer device started\n"));
+  DEBUG ((DEBUG_INFO, "BHYVE framebuffer device started\n"));
 
   //
   // Install int10 handler
   //
-#ifndef CSM_ENABLE
-  InstallVbeShim (L"Framebuffer", Private->FbAddr);
-#endif
+ #ifndef CSM_ENABLE
+    InstallVbeShim (L"Framebuffer", Private->FbAddr);
+ #endif
 
 Done:
   if (EFI_ERROR (Status)) {
@@ -308,8 +322,6 @@ Done:
 
   return Status;
 }
-
-
 
 /**
   Stops a device controller or a bus controller.
@@ -346,11 +358,11 @@ EmuGopDriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;
-  EFI_STATUS                   Status;
-  GOP_PRIVATE_DATA             *Private;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
+  EFI_STATUS                    Status;
+  GOP_PRIVATE_DATA              *Private;
 
-  DEBUG((DEBUG_INFO, "BHYVE framebuffer device stopping\n"));
+  DEBUG ((DEBUG_INFO, "BHYVE framebuffer device stopping\n"));
 
   Status = gBS->OpenProtocol (
                   Handle,
@@ -377,7 +389,8 @@ EmuGopDriverBindingStop (
   //
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   Private->Handle,
-                  &gEfiGraphicsOutputProtocolGuid,    &Private->GraphicsOutput,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  &Private->GraphicsOutput,
                   NULL
                   );
   if (!EFI_ERROR (Status)) {
@@ -390,11 +403,11 @@ EmuGopDriverBindingStop (
     }
 
     gBS->CloseProtocol (
-          Handle,
-          &gEfiPciIoProtocolGuid,
-          This->DriverBindingHandle,
-          Private->Handle
-          );
+           Handle,
+           &gEfiPciIoProtocolGuid,
+           This->DriverBindingHandle,
+           Private->Handle
+           );
 
     //
     // Free our instance data
@@ -402,18 +415,16 @@ EmuGopDriverBindingStop (
     FreeUnicodeStringTable (Private->ControllerNameTable);
 
     gBS->FreePool (Private);
-
   }
 
   return Status;
 }
 
-
 ///
 /// This protocol provides the services required to determine if a driver supports a given controller.
 /// If a controller is supported, then it also provides routines to start and stop the controller.
 ///
-EFI_DRIVER_BINDING_PROTOCOL gEmuGopDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gEmuGopDriverBinding = {
   EmuGopDriverBindingSupported,
   EmuGopDriverBindingStart,
   EmuGopDriverBindingStop,
@@ -421,8 +432,6 @@ EFI_DRIVER_BINDING_PROTOCOL gEmuGopDriverBinding = {
   NULL,
   NULL
 };
-
-
 
 /**
   The user Entry Point for module EmuGop. The user code starts with this function.
@@ -441,7 +450,7 @@ InitializeEmuGop (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
@@ -452,7 +461,6 @@ InitializeEmuGop (
              &gEmuGopComponentName2
              );
   ASSERT_EFI_ERROR (Status);
-
 
   return Status;
 }
@@ -465,21 +473,20 @@ BhyveGetGraphicsMode (
   UINT16              *Depth
   )
 {
-  BHYVE_FBUF_MEMREGS BhyveRegs;
-  UINT64       Offset;
-  EFI_STATUS   Status;
-
+  BHYVE_FBUF_MEMREGS  BhyveRegs;
+  UINT64              Offset;
+  EFI_STATUS          Status;
 
   Offset = (UINT64)&BhyveRegs.Width - (UINT64)&BhyveRegs;
 
   Status = PciIo->Mem.Read (
-      PciIo,
-      EfiPciIoWidthUint16,
-      PCI_BAR_IDX0,
-      Offset,
-      3,
-      &BhyveRegs.Width
-      );
+                        PciIo,
+                        EfiPciIoWidthUint16,
+                        PCI_BAR_IDX0,
+                        Offset,
+                        3,
+                        &BhyveRegs.Width
+                        );
 
   *Width  = BhyveRegs.Width;
   *Height = BhyveRegs.Height;
@@ -498,9 +505,9 @@ BhyveSetGraphicsMode (
   UINT16             Depth
   )
 {
-  BHYVE_FBUF_MEMREGS BhyveRegs;
-  UINT64       Offset;
-  EFI_STATUS   Status;
+  BHYVE_FBUF_MEMREGS  BhyveRegs;
+  UINT64              Offset;
+  EFI_STATUS          Status;
 
   DEBUG ((DEBUG_INFO, "BHYVE Set Graphics Mode: w %d, h %d\n", Width, Height));
 
@@ -510,13 +517,13 @@ BhyveSetGraphicsMode (
   Offset = (UINT64)&BhyveRegs.Width - (UINT64)&BhyveRegs;
 
   Status = Private->PciIo->Mem.Write (
-      Private->PciIo,
-      EfiPciIoWidthUint16,
-      PCI_BAR_IDX0,
-      Offset,
-      3,
-      &BhyveRegs.Width
-      );
+                                 Private->PciIo,
+                                 EfiPciIoWidthUint16,
+                                 PCI_BAR_IDX0,
+                                 Offset,
+                                 3,
+                                 &BhyveRegs.Width
+                                 );
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -526,18 +533,23 @@ BhyveGetMemregs (
   BHYVE_FBUF_MEMREGS *Memregs
   )
 {
-  EFI_STATUS   Status;
+  EFI_STATUS  Status;
 
   Status = Private->PciIo->Mem.Read (
-      Private->PciIo,
-      EfiPciIoWidthUint32,
-      PCI_BAR_IDX0,
-      0,
-      3,
-      Memregs
-      );
+                                 Private->PciIo,
+                                 EfiPciIoWidthUint32,
+                                 PCI_BAR_IDX0,
+                                 0,
+                                 3,
+                                 Memregs
+                                 );
   ASSERT_EFI_ERROR (Status);
 
-  DEBUG ((DEBUG_INFO, "BHYVE Get Memregs, size %d width %d height %d\n",
-         Memregs->FbSize, Memregs->Width, Memregs->Height));
+  DEBUG ((
+    DEBUG_INFO,
+    "BHYVE Get Memregs, size %d width %d height %d\n",
+    Memregs->FbSize,
+    Memregs->Width,
+    Memregs->Height
+    ));
 }

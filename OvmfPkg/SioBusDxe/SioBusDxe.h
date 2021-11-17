@@ -37,13 +37,11 @@ typedef struct {
   UINT64                 OriginalAttributes;
 } SIO_BUS_DRIVER_PRIVATE_DATA;
 
-
 //
 // Global Variables
 //
-extern EFI_COMPONENT_NAME_PROTOCOL  gSioBusComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gSioBusComponentName2;
-
+extern EFI_COMPONENT_NAME_PROTOCOL   gSioBusComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gSioBusComponentName2;
 
 //
 // EFI Component Name Functions
@@ -159,7 +157,6 @@ SioBusComponentNameGetControllerName (
   IN  CHAR8                          *Language,
   OUT CHAR16                         **ControllerName
   );
-
 
 //
 // Driver Binding Protocol interfaces
@@ -322,4 +319,4 @@ SioBusDriverBindingStop (
   IN  EFI_HANDLE                     *ChildHandleBuffer
   );
 
-#endif  // __SIO_BUS_DXE_H__
+#endif // __SIO_BUS_DXE_H__

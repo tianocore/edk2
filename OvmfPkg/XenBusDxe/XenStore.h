@@ -240,7 +240,7 @@ XenStoreUnregisterWatch (
   is the NUL string, the returned value contains the path string
   <DirectoryPath>.
 
-  @param DirectoryPath	The NUL terminated directory prefix for new path.
+  @param DirectoryPath  The NUL terminated directory prefix for new path.
   @param Node           The NUL terminated basename for the new path.
 
   @return  A buffer containing the joined path.
@@ -250,7 +250,6 @@ XenStoreJoin (
   IN CONST CHAR8 *DirectoryPath,
   IN CONST CHAR8 *Node
   );
-
 
 /**
   Initialize the XenStore states and rings.
@@ -273,7 +272,6 @@ VOID
 XenStoreDeinit (
   IN XENBUS_DEVICE *Dev
   );
-
 
 //
 // XENBUS protocol

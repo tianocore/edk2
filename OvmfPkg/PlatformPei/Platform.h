@@ -102,18 +102,18 @@ AmdSevInitialize (
   VOID
   );
 
-extern EFI_BOOT_MODE mBootMode;
+extern EFI_BOOT_MODE  mBootMode;
 
-extern BOOLEAN mS3Supported;
+extern BOOLEAN  mS3Supported;
 
-extern UINT8 mPhysMemAddressWidth;
+extern UINT8  mPhysMemAddressWidth;
 
-extern UINT32 mMaxCpuCount;
+extern UINT32  mMaxCpuCount;
 
-extern UINT16 mHostBridgeDevId;
+extern UINT16  mHostBridgeDevId;
 
-extern BOOLEAN mQ35SmramAtDefaultSmbase;
+extern BOOLEAN  mQ35SmramAtDefaultSmbase;
 
-extern UINT32 mQemuUc32Base;
+extern UINT32  mQemuUc32Base;
 
 #endif // _PLATFORM_PEI_H_INCLUDED_

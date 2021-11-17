@@ -50,4 +50,3 @@ SetLinuxDescriptorTables (
   );
 
 #endif
-

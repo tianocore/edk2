@@ -32,7 +32,6 @@
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetReset (
@@ -42,7 +41,6 @@ VirtioNetReset (
 {
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Modifies or resets the current station address, if supported.
@@ -63,7 +61,6 @@ VirtioNetReset (
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetStationAddress (
@@ -74,7 +71,6 @@ VirtioNetStationAddress (
 {
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Resets or collects the statistics on a network interface.
@@ -102,7 +98,6 @@ VirtioNetStationAddress (
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetStatistics (
@@ -114,7 +109,6 @@ VirtioNetStatistics (
 {
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Performs read and write operations on the NVRAM device attached to a  network
@@ -139,7 +133,6 @@ VirtioNetStatistics (
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetNvData (

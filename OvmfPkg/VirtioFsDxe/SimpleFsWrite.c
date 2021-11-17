@@ -16,11 +16,11 @@ VirtioFsSimpleFileWrite (
   IN     VOID              *Buffer
   )
 {
-  VIRTIO_FS_FILE *VirtioFsFile;
-  VIRTIO_FS      *VirtioFs;
-  EFI_STATUS     Status;
-  UINTN          Transferred;
-  UINTN          Left;
+  VIRTIO_FS_FILE  *VirtioFsFile;
+  VIRTIO_FS       *VirtioFs;
+  EFI_STATUS      Status;
+  UINTN           Transferred;
+  UINTN           Left;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
   VirtioFs     = VirtioFsFile->OwnerFs;
@@ -28,39 +28,42 @@ VirtioFsSimpleFileWrite (
   if (VirtioFsFile->IsDirectory) {
     return EFI_UNSUPPORTED;
   }
+
   if (!VirtioFsFile->IsOpenForWriting) {
     return EFI_ACCESS_DENIED;
   }
 
-  Status      = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
   Transferred = 0;
-  Left        = *BufferSize;
+  Left = *BufferSize;
   while (Left > 0) {
-    UINT32 WriteSize;
+    UINT32  WriteSize;
 
     //
     // Honor the write buffer size limit.
     //
     WriteSize = (UINT32)MIN ((UINTN)VirtioFs->MaxWrite, Left);
-    Status = VirtioFsFuseWrite (
-               VirtioFs,
-               VirtioFsFile->NodeId,
-               VirtioFsFile->FuseHandle,
-               VirtioFsFile->FilePosition + Transferred,
-               &WriteSize,
-               (UINT8 *)Buffer + Transferred
-               );
-    if (!EFI_ERROR (Status) && WriteSize == 0) {
+    Status    = VirtioFsFuseWrite (
+                  VirtioFs,
+                  VirtioFsFile->NodeId,
+                  VirtioFsFile->FuseHandle,
+                  VirtioFsFile->FilePosition + Transferred,
+                  &WriteSize,
+                  (UINT8 *)Buffer + Transferred
+                  );
+    if (!EFI_ERROR (Status) && (WriteSize == 0)) {
       //
       // Progress should have been made.
       //
       Status = EFI_DEVICE_ERROR;
     }
+
     if (EFI_ERROR (Status)) {
       break;
     }
+
     Transferred += WriteSize;
-    Left        -= WriteSize;
+    Left -= WriteSize;
   }
 
   *BufferSize = Transferred;

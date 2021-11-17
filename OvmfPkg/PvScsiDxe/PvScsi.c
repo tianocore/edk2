@@ -26,7 +26,7 @@
 // Higher versions will be used before lower, 0x10-0xffffffef is the version
 // range for IHV (Indie Hardware Vendors)
 //
-#define PVSCSI_BINDING_VERSION      0x10
+#define PVSCSI_BINDING_VERSION  0x10
 
 //
 // Ext SCSI Pass Thru utilities
@@ -122,7 +122,7 @@ PvScsiWriteCmdDesc (
   IN UINTN              DescWordsCount
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   if (DescWordsCount > PVSCSI_MAX_CMD_DATA_WORDS) {
     return EFI_INVALID_PARAMETER;
@@ -163,10 +163,10 @@ PvScsiIsReqRingFull (
   IN CONST PVSCSI_DEV   *Dev
   )
 {
-  PVSCSI_RINGS_STATE *RingsState;
-  UINT32             ReqNumEntries;
+  PVSCSI_RINGS_STATE  *RingsState;
+  UINT32              ReqNumEntries;
 
-  RingsState = Dev->RingDesc.RingState;
+  RingsState    = Dev->RingDesc.RingState;
   ReqNumEntries = 1U << RingsState->ReqNumEntriesLog2;
   return (RingsState->ReqProdIdx - RingsState->CmpConsIdx) >= ReqNumEntries;
 }
@@ -180,10 +180,10 @@ PvScsiGetCurrentRequest (
   IN CONST PVSCSI_DEV   *Dev
   )
 {
-  PVSCSI_RINGS_STATE *RingState;
-  UINT32             ReqNumEntries;
+  PVSCSI_RINGS_STATE  *RingState;
+  UINT32              ReqNumEntries;
 
-  RingState = Dev->RingDesc.RingState;
+  RingState     = Dev->RingDesc.RingState;
   ReqNumEntries = 1U << RingState->ReqNumEntriesLog2;
   return Dev->RingDesc.RingReqs +
          (RingState->ReqProdIdx & (ReqNumEntries - 1));
@@ -198,10 +198,10 @@ PvScsiGetCurrentResponse (
   IN CONST PVSCSI_DEV   *Dev
   )
 {
-  PVSCSI_RINGS_STATE *RingState;
-  UINT32             CmpNumEntries;
+  PVSCSI_RINGS_STATE  *RingState;
+  UINT32              CmpNumEntries;
 
-  RingState = Dev->RingDesc.RingState;
+  RingState     = Dev->RingDesc.RingState;
   CmpNumEntries = 1U << RingState->CmpNumEntriesLog2;
   return Dev->RingDesc.RingCmps +
          (RingState->CmpConsIdx & (CmpNumEntries - 1));
@@ -216,8 +216,8 @@ PvScsiWaitForRequestCompletion (
   IN CONST PVSCSI_DEV   *Dev
   )
 {
-  EFI_STATUS Status;
-  UINT32     IntrStatus;
+  EFI_STATUS  Status;
+  UINT32      IntrStatus;
 
   //
   // Note: We don't yet support Timeout according to
@@ -226,7 +226,7 @@ PvScsiWaitForRequestCompletion (
   // This is consistent with some other Scsi PassThru drivers
   // such as VirtioScsi.
   //
-  for (;;) {
+  for ( ; ;) {
     Status = PvScsiMmioRead32 (Dev, PvScsiRegOffsetIntrStatus, &IntrStatus);
     if (EFI_ERROR (Status)) {
       return Status;
@@ -261,9 +261,9 @@ ReportHostAdapterError (
   OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet
   )
 {
-  Packet->InTransferLength = 0;
+  Packet->InTransferLength  = 0;
   Packet->OutTransferLength = 0;
-  Packet->SenseDataLength = 0;
+  Packet->SenseDataLength   = 0;
   Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OTHER;
   Packet->TargetStatus = EFI_EXT_SCSI_STATUS_TARGET_GOOD;
   return EFI_DEVICE_ERROR;
@@ -278,9 +278,9 @@ ReportHostAdapterOverrunError (
   OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet
   )
 {
-  Packet->SenseDataLength = 0;
+  Packet->SenseDataLength   = 0;
   Packet->HostAdapterStatus =
-            EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
+    EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
   Packet->TargetStatus = EFI_EXT_SCSI_STATUS_TARGET_GOOD;
   return EFI_BAD_BUFFER_SIZE;
 }
@@ -299,7 +299,7 @@ PopulateRequest (
   OUT PVSCSI_RING_REQ_DESC                          *Request
   )
 {
-  UINT8 TargetValue;
+  UINT8  TargetValue;
 
   //
   // We only use first byte of target identifer
@@ -313,15 +313,15 @@ PopulateRequest (
       //
       // Bidirectional transfer was requested
       //
-      (Packet->InTransferLength > 0 && Packet->OutTransferLength > 0) ||
+      ((Packet->InTransferLength > 0) && (Packet->OutTransferLength > 0)) ||
       (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_BIDIRECTIONAL) ||
       //
       // Command Descriptor Block bigger than this constant should be considered
       // out-of-band. We currently don't support these CDBs.
       //
       (Packet->CdbLength > PVSCSI_CDB_MAX_SIZE)
-      ) {
-
+      )
+  {
     //
     // This error code doesn't require updates to the Packet output fields
     //
@@ -348,8 +348,8 @@ PopulateRequest (
       ((Packet->InTransferLength > 0) &&
        ((Packet->InDataBuffer == NULL) ||
         (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_WRITE)
-        )
-       ) ||
+       )
+      ) ||
       //
       // Trying to send, but source pointer is NULL, or contradicting
       // transfer direction
@@ -357,10 +357,10 @@ PopulateRequest (
       ((Packet->OutTransferLength > 0) &&
        ((Packet->OutDataBuffer == NULL) ||
         (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ)
-        )
        )
-      ) {
-
+      )
+      )
+  {
     //
     // This error code doesn't require updates to the Packet output fields
     //
@@ -374,6 +374,7 @@ PopulateRequest (
     Packet->InTransferLength = sizeof (Dev->DmaBuf->Data);
     return ReportHostAdapterOverrunError (Packet);
   }
+
   if (Packet->OutTransferLength > sizeof (Dev->DmaBuf->Data)) {
     Packet->OutTransferLength = sizeof (Dev->DmaBuf->Data);
     return ReportHostAdapterOverrunError (Packet);
@@ -384,27 +385,27 @@ PopulateRequest (
   //
   ZeroMem (Request, sizeof (*Request));
 
-  Request->Bus = 0;
+  Request->Bus    = 0;
   Request->Target = TargetValue;
   //
   // This cast is safe as PVSCSI_DEV.MaxLun is defined as UINT8
   //
-  Request->Lun[1] = (UINT8)Lun;
+  Request->Lun[1]   = (UINT8)Lun;
   Request->SenseLen = Packet->SenseDataLength;
   //
   // DMA communication buffer SenseData overflow is not possible
   // due to Packet->SenseDataLength defined as UINT8
   //
   Request->SenseAddr = PVSCSI_DMA_BUF_DEV_ADDR (Dev, SenseData);
-  Request->CdbLen = Packet->CdbLength;
+  Request->CdbLen    = Packet->CdbLength;
   CopyMem (Request->Cdb, Packet->Cdb, Packet->CdbLength);
   Request->VcpuHint = 0;
   Request->Tag = PVSCSI_SIMPLE_QUEUE_TAG;
   if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ) {
-    Request->Flags = PVSCSI_FLAG_CMD_DIR_TOHOST;
+    Request->Flags   = PVSCSI_FLAG_CMD_DIR_TOHOST;
     Request->DataLen = Packet->InTransferLength;
   } else {
-    Request->Flags = PVSCSI_FLAG_CMD_DIR_TODEVICE;
+    Request->Flags   = PVSCSI_FLAG_CMD_DIR_TODEVICE;
     Request->DataLen = Packet->OutTransferLength;
     CopyMem (
       Dev->DmaBuf->Data,
@@ -412,6 +413,7 @@ PopulateRequest (
       Packet->OutTransferLength
       );
   }
+
   Request->DataAddr = PVSCSI_DMA_BUF_DEV_ADDR (Dev, Data);
 
   return EFI_SUCCESS;
@@ -437,6 +439,7 @@ HandleResponse (
   if (Packet->SenseDataLength > Response->SenseLen) {
     Packet->SenseDataLength = (UINT8)Response->SenseLen;
   }
+
   //
   // Copy sense data from DMA communication buffer
   //
@@ -482,18 +485,19 @@ HandleResponse (
       } else {
         Packet->OutTransferLength = (UINT32)Response->DataLen;
       }
+
       Packet->HostAdapterStatus =
-                EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
+        EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
       return EFI_SUCCESS;
 
     case PvScsiBtStatDatarun:
       Packet->HostAdapterStatus =
-                EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
+        EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
       return EFI_SUCCESS;
 
     case PvScsiBtStatSelTimeout:
       Packet->HostAdapterStatus =
-                EFI_EXT_SCSI_STATUS_HOST_ADAPTER_SELECTION_TIMEOUT;
+        EFI_EXT_SCSI_STATUS_HOST_ADAPTER_SELECTION_TIMEOUT;
       return EFI_TIMEOUT;
 
     case PvScsiBtStatBusFree:
@@ -506,13 +510,13 @@ HandleResponse (
 
     case PvScsiBtStatSensFailed:
       Packet->HostAdapterStatus =
-                EFI_EXT_SCSI_STATUS_HOST_ADAPTER_REQUEST_SENSE_FAILED;
+        EFI_EXT_SCSI_STATUS_HOST_ADAPTER_REQUEST_SENSE_FAILED;
       break;
 
     case PvScsiBtStatTagReject:
     case PvScsiBtStatBadMsg:
       Packet->HostAdapterStatus =
-          EFI_EXT_SCSI_STATUS_HOST_ADAPTER_MESSAGE_REJECT;
+        EFI_EXT_SCSI_STATUS_HOST_ADAPTER_MESSAGE_REJECT;
       break;
 
     case PvScsiBtStatBusReset:
@@ -545,13 +549,14 @@ IsTargetInitialized (
   IN UINT8                                          *Target
   )
 {
-  UINTN Idx;
+  UINTN  Idx;
 
   for (Idx = 0; Idx < TARGET_MAX_BYTES; ++Idx) {
     if (Target[Idx] != 0xFF) {
       return TRUE;
     }
   }
+
   return FALSE;
 }
 
@@ -572,8 +577,8 @@ PvScsiPassThru (
 {
   PVSCSI_DEV            *Dev;
   EFI_STATUS            Status;
-  PVSCSI_RING_REQ_DESC *Request;
-  PVSCSI_RING_CMP_DESC *Response;
+  PVSCSI_RING_REQ_DESC  *Request;
+  PVSCSI_RING_CMP_DESC  *Response;
 
   Dev = PVSCSI_FROM_PASS_THRU (This);
 
@@ -616,7 +621,7 @@ PvScsiPassThru (
   }
 
   Response = PvScsiGetCurrentResponse (Dev);
-  Status = HandleResponse (Dev, Packet, Response);
+  Status   = HandleResponse (Dev, Packet, Response);
 
   //
   // Reads from response must complete before releasing completion entry
@@ -637,9 +642,9 @@ PvScsiGetNextTargetLun (
   IN OUT UINT64                                     *Lun
   )
 {
-  UINT8      *TargetPtr;
-  UINT8      LastTarget;
-  PVSCSI_DEV *Dev;
+  UINT8       *TargetPtr;
+  UINT8       LastTarget;
+  PVSCSI_DEV  *Dev;
 
   if (Target == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -668,7 +673,7 @@ PvScsiGetNextTargetLun (
   // Increment (target, LUN) pair if valid on input
   //
   Dev = PVSCSI_FROM_PASS_THRU (This);
-  if (LastTarget > Dev->MaxTarget || *Lun > Dev->MaxLun) {
+  if ((LastTarget > Dev->MaxTarget) || (*Lun > Dev->MaxLun)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -711,7 +716,7 @@ PvScsiBuildDevicePath (
   TargetValue = *Target;
 
   Dev = PVSCSI_FROM_PASS_THRU (This);
-  if (TargetValue > Dev->MaxTarget || Lun > Dev->MaxLun) {
+  if ((TargetValue > Dev->MaxTarget) || (Lun > Dev->MaxLun)) {
     return EFI_NOT_FOUND;
   }
 
@@ -724,8 +729,8 @@ PvScsiBuildDevicePath (
   ScsiDevicePath->Header.SubType   = MSG_SCSI_DP;
   ScsiDevicePath->Header.Length[0] = (UINT8)sizeof (*ScsiDevicePath);
   ScsiDevicePath->Header.Length[1] = (UINT8)(sizeof (*ScsiDevicePath) >> 8);
-  ScsiDevicePath->Pun              = TargetValue;
-  ScsiDevicePath->Lun              = (UINT16)Lun;
+  ScsiDevicePath->Pun = TargetValue;
+  ScsiDevicePath->Lun = (UINT16)Lun;
 
   *DevicePath = &ScsiDevicePath->Header;
   return EFI_SUCCESS;
@@ -741,22 +746,24 @@ PvScsiGetTargetLun (
   OUT UINT64                                        *Lun
   )
 {
-  SCSI_DEVICE_PATH *ScsiDevicePath;
-  PVSCSI_DEV       *Dev;
+  SCSI_DEVICE_PATH  *ScsiDevicePath;
+  PVSCSI_DEV        *Dev;
 
-  if (DevicePath == NULL || Target == NULL || *Target == NULL || Lun == NULL) {
+  if ((DevicePath == NULL) || (Target == NULL) || (*Target == NULL) || (Lun == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (DevicePath->Type    != MESSAGING_DEVICE_PATH ||
-      DevicePath->SubType != MSG_SCSI_DP) {
+  if ((DevicePath->Type    != MESSAGING_DEVICE_PATH) ||
+      (DevicePath->SubType != MSG_SCSI_DP))
+  {
     return EFI_UNSUPPORTED;
   }
 
   ScsiDevicePath = (SCSI_DEVICE_PATH *)DevicePath;
   Dev = PVSCSI_FROM_PASS_THRU (This);
-  if (ScsiDevicePath->Pun > Dev->MaxTarget ||
-      ScsiDevicePath->Lun > Dev->MaxLun) {
+  if ((ScsiDevicePath->Pun > Dev->MaxTarget) ||
+      (ScsiDevicePath->Lun > Dev->MaxLun))
+  {
     return EFI_NOT_FOUND;
   }
 
@@ -800,9 +807,9 @@ PvScsiGetNextTarget (
   IN OUT UINT8                                      **Target
   )
 {
-  UINT8      *TargetPtr;
-  UINT8      LastTarget;
-  PVSCSI_DEV *Dev;
+  UINT8       *TargetPtr;
+  UINT8       LastTarget;
+  PVSCSI_DEV  *Dev;
 
   if (Target == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -849,7 +856,7 @@ PvScsiSetPciAttributes (
   IN OUT PVSCSI_DEV *Dev
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   //
   // Backup original PCI Attributes
@@ -927,8 +934,8 @@ PvScsiAllocateSharedPages (
   OUT PVSCSI_DMA_DESC               *DmaDesc
   )
 {
-  EFI_STATUS Status;
-  UINTN      NumberOfBytes;
+  EFI_STATUS  Status;
+  UINTN       NumberOfBytes;
 
   Status = Dev->PciIo->AllocateBuffer (
                          Dev->PciIo,
@@ -990,7 +997,7 @@ PvScsiInitRings (
   IN OUT PVSCSI_DEV *Dev
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = PvScsiAllocateSharedPages (
              Dev,
@@ -1001,6 +1008,7 @@ PvScsiInitRings (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   ZeroMem (Dev->RingDesc.RingState, EFI_PAGE_SIZE);
 
   Status = PvScsiAllocateSharedPages (
@@ -1012,6 +1020,7 @@ PvScsiInitRings (
   if (EFI_ERROR (Status)) {
     goto FreeRingState;
   }
+
   ZeroMem (Dev->RingDesc.RingReqs, EFI_PAGE_SIZE);
 
   Status = PvScsiAllocateSharedPages (
@@ -1023,6 +1032,7 @@ PvScsiInitRings (
   if (EFI_ERROR (Status)) {
     goto FreeRingReqs;
   }
+
   ZeroMem (Dev->RingDesc.RingCmps, EFI_PAGE_SIZE);
 
   return EFI_SUCCESS;
@@ -1081,20 +1091,20 @@ PvScsiSetupRings (
   )
 {
   union {
-    PVSCSI_CMD_DESC_SETUP_RINGS Cmd;
-    UINT32                      Uint32;
+    PVSCSI_CMD_DESC_SETUP_RINGS    Cmd;
+    UINT32                         Uint32;
   } AlignedCmd;
-  PVSCSI_CMD_DESC_SETUP_RINGS *Cmd;
+  PVSCSI_CMD_DESC_SETUP_RINGS  *Cmd;
 
   Cmd = &AlignedCmd.Cmd;
 
   ZeroMem (Cmd, sizeof (*Cmd));
   Cmd->ReqRingNumPages = 1;
   Cmd->CmpRingNumPages = 1;
-  Cmd->RingsStatePPN = RShiftU64 (
-                         Dev->RingDesc.RingStateDmaDesc.DeviceAddress,
-                         EFI_PAGE_SHIFT
-                         );
+  Cmd->RingsStatePPN   = RShiftU64 (
+                           Dev->RingDesc.RingStateDmaDesc.DeviceAddress,
+                           EFI_PAGE_SHIFT
+                           );
   Cmd->ReqRingPPNs[0] = RShiftU64 (
                           Dev->RingDesc.RingReqsDmaDesc.DeviceAddress,
                           EFI_PAGE_SHIFT
@@ -1122,13 +1132,13 @@ PvScsiInit (
   IN OUT PVSCSI_DEV *Dev
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   //
   // Init configuration
   //
   Dev->MaxTarget = PcdGet8 (PcdPvScsiMaxTargetLimit);
-  Dev->MaxLun = PcdGet8 (PcdPvScsiMaxLunLimit);
+  Dev->MaxLun    = PcdGet8 (PcdPvScsiMaxLunLimit);
   Dev->WaitForCmpStallInUsecs = PcdGet32 (PcdPvScsiWaitForCmpStallInUsecs);
 
   //
@@ -1179,8 +1189,8 @@ PvScsiInit (
   //
   // Populate the exported interface's attributes
   //
-  Dev->PassThru.Mode             = &Dev->PassThruMode;
-  Dev->PassThru.PassThru         = &PvScsiPassThru;
+  Dev->PassThru.Mode     = &Dev->PassThruMode;
+  Dev->PassThru.PassThru = &PvScsiPassThru;
   Dev->PassThru.GetNextTargetLun = &PvScsiGetNextTargetLun;
   Dev->PassThru.BuildDevicePath  = &PvScsiBuildDevicePath;
   Dev->PassThru.GetTargetLun     = &PvScsiGetTargetLun;
@@ -1266,7 +1276,7 @@ PvScsiExitBoot (
   IN  VOID      *Context
   )
 {
-  PVSCSI_DEV *Dev;
+  PVSCSI_DEV  *Dev;
 
   Dev = Context;
   DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
@@ -1293,9 +1303,9 @@ PvScsiDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
   )
 {
-  EFI_STATUS          Status;
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  PCI_TYPE00          Pci;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -1321,7 +1331,8 @@ PvScsiDriverBindingSupported (
   }
 
   if ((Pci.Hdr.VendorId != PCI_VENDOR_ID_VMWARE) ||
-      (Pci.Hdr.DeviceId != PCI_DEVICE_ID_VMWARE_PVSCSI)) {
+      (Pci.Hdr.DeviceId != PCI_DEVICE_ID_VMWARE_PVSCSI))
+  {
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
@@ -1348,10 +1359,10 @@ PvScsiDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
   )
 {
-  PVSCSI_DEV *Dev;
-  EFI_STATUS Status;
+  PVSCSI_DEV  *Dev;
+  EFI_STATUS  Status;
 
-  Dev = (PVSCSI_DEV *) AllocateZeroPool (sizeof (*Dev));
+  Dev = (PVSCSI_DEV *)AllocateZeroPool (sizeof (*Dev));
   if (Dev == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1430,9 +1441,9 @@ PvScsiDriverBindingStop (
   IN EFI_HANDLE                  *ChildHandleBuffer
   )
 {
-  EFI_STATUS                      Status;
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *PassThru;
-  PVSCSI_DEV                      *Dev;
+  EFI_STATUS                       Status;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *PassThru;
+  PVSCSI_DEV                       *Dev;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -1473,7 +1484,7 @@ PvScsiDriverBindingStop (
   return EFI_SUCCESS;
 }
 
-STATIC EFI_DRIVER_BINDING_PROTOCOL mPvScsiDriverBinding = {
+STATIC EFI_DRIVER_BINDING_PROTOCOL  mPvScsiDriverBinding = {
   &PvScsiDriverBindingSupported,
   &PvScsiDriverBindingStart,
   &PvScsiDriverBindingStop,
@@ -1486,12 +1497,12 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL mPvScsiDriverBinding = {
 // Component Name
 //
 
-STATIC EFI_UNICODE_STRING_TABLE mDriverNameTable[] = {
+STATIC EFI_UNICODE_STRING_TABLE  mDriverNameTable[] = {
   { "eng;en", L"PVSCSI Host Driver" },
   { NULL,     NULL                  }
 };
 
-STATIC EFI_COMPONENT_NAME_PROTOCOL mComponentName;
+STATIC EFI_COMPONENT_NAME_PROTOCOL  mComponentName;
 
 STATIC
 EFI_STATUS
@@ -1525,15 +1536,15 @@ PvScsiGetDeviceName (
   return EFI_UNSUPPORTED;
 }
 
-STATIC EFI_COMPONENT_NAME_PROTOCOL mComponentName = {
+STATIC EFI_COMPONENT_NAME_PROTOCOL  mComponentName = {
   &PvScsiGetDriverName,
   &PvScsiGetDeviceName,
   "eng" // SupportedLanguages, ISO 639-2 language codes
 };
 
-STATIC EFI_COMPONENT_NAME2_PROTOCOL mComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     &PvScsiGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) &PvScsiGetDeviceName,
+STATIC EFI_COMPONENT_NAME2_PROTOCOL  mComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)&PvScsiGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)&PvScsiGetDeviceName,
   "en" // SupportedLanguages, RFC 4646 language codes
 };
 

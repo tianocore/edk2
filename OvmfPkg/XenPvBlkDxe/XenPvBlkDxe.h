@@ -12,9 +12,9 @@
 
 #include <Uefi.h>
 
-#define xen_mb() MemoryFence()
-#define xen_rmb() MemoryFence()
-#define xen_wmb() MemoryFence()
+#define xen_mb()   MemoryFence()
+#define xen_rmb()  MemoryFence()
+#define xen_wmb()  MemoryFence()
 
 //
 // Libraries
@@ -27,7 +27,6 @@
 #include <Library/DevicePathLib.h>
 #include <Library/DebugLib.h>
 
-
 //
 // UEFI Driver Model Protocols
 //
@@ -35,32 +34,27 @@
 #include <Protocol/ComponentName2.h>
 #include <Protocol/ComponentName.h>
 
-
 //
 // Consumed Protocols
 //
 #include <Protocol/XenBus.h>
-
 
 //
 // Produced Protocols
 //
 #include <Protocol/BlockIo.h>
 
-
 //
 // Driver Version
 //
 #define XEN_PV_BLK_DXE_VERSION  0x00000010
 
-
 //
 // Protocol instances
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gXenPvBlkDxeDriverBinding;
+extern EFI_DRIVER_BINDING_PROTOCOL   gXenPvBlkDxeDriverBinding;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gXenPvBlkDxeComponentName2;
-extern EFI_COMPONENT_NAME_PROTOCOL  gXenPvBlkDxeComponentName;
-
+extern EFI_COMPONENT_NAME_PROTOCOL   gXenPvBlkDxeComponentName;
 
 //
 // Include files with function prototypes
@@ -68,6 +62,5 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gXenPvBlkDxeComponentName;
 #include "DriverBinding.h"
 #include "ComponentName.h"
 #include "BlockIo.h"
-
 
 #endif

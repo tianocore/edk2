@@ -13,7 +13,6 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
 
-
 /**
   This function will be called following a call to the
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL Read function.
@@ -39,7 +38,6 @@ PlatformFvbDataRead (
 {
 }
 
-
 /**
   This function will be called following a call to the
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL Write function.
@@ -61,18 +59,18 @@ PlatformFvbDataWritten (
   IN        UINT8                               *Buffer
   )
 {
-  STATIC EFI_EVENT EventToSignal = NULL;
+  STATIC EFI_EVENT  EventToSignal = NULL;
 
   if (!EfiAtRuntime ()) {
     if (EventToSignal == NULL) {
-      EventToSignal = (EFI_EVENT)(UINTN) PcdGet64 (PcdEmuVariableEvent);
+      EventToSignal = (EFI_EVENT)(UINTN)PcdGet64 (PcdEmuVariableEvent);
     }
+
     if (EventToSignal != NULL) {
       gBS->SignalEvent (EventToSignal);
     }
   }
 }
-
 
 /**
   This function will be called following a call to the
@@ -93,5 +91,3 @@ PlatformFvbBlocksErased (
   )
 {
 }
-
-

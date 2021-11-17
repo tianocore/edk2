@@ -16,7 +16,6 @@
 
 #include <IndustryStandard/Virtio.h>
 
-
 /**
 
   Configure a virtio ring.
@@ -51,7 +50,6 @@ VirtioRingInit (
   IN  UINT16                 QueueSize,
   OUT VRING                  *Ring
   );
-
 
 /**
 
@@ -99,16 +97,14 @@ VirtioRingUninit (
   IN OUT VRING                  *Ring
   );
 
-
 //
 // Internal use structure for tracking the submission of a multi-descriptor
 // request.
 //
 typedef struct {
-  UINT16 HeadDescIdx;
-  UINT16 NextDescIdx;
+  UINT16    HeadDescIdx;
+  UINT16    NextDescIdx;
 } DESC_INDICES;
-
 
 /**
 
@@ -128,7 +124,6 @@ VirtioPrepare (
   IN OUT VRING        *Ring,
   OUT    DESC_INDICES *Indices
   );
-
 
 /**
 
@@ -178,7 +173,6 @@ VirtioAppendDesc (
   IN OUT DESC_INDICES *Indices
   );
 
-
 /**
 
   Notify the host about the descriptor chain just built, and wait until the
@@ -215,7 +209,6 @@ VirtioFlush (
   IN     DESC_INDICES           *Indices,
   OUT    UINT32                 *UsedLen    OPTIONAL
   );
-
 
 /**
 
@@ -313,4 +306,5 @@ VirtioMapAllBytesInSharedBuffer (
   OUT EFI_PHYSICAL_ADDRESS    *DeviceAddress,
   OUT VOID                    **Mapping
   );
+
 #endif // _VIRTIO_LIB_H_

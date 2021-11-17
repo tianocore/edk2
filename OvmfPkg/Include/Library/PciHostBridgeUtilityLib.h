@@ -13,9 +13,7 @@
 #ifndef __PCI_HOST_BRIDGE_UTILITY_LIB_H__
 #define __PCI_HOST_BRIDGE_UTILITY_LIB_H__
 
-
 #include <Library/PciHostBridgeLib.h>
-
 
 /**
   Utility function to initialize a PCI_ROOT_BRIDGE structure.
@@ -82,7 +80,6 @@ PciHostBridgeUtilityInitRootBridge (
   OUT PCI_ROOT_BRIDGE          *RootBus
   );
 
-
 /**
   Utility function to uninitialize a PCI_ROOT_BRIDGE structure set up with
   PciHostBridgeUtilityInitRootBridge().
@@ -97,7 +94,6 @@ EFIAPI
 PciHostBridgeUtilityUninitRootBridge (
   IN PCI_ROOT_BRIDGE *RootBus
   );
-
 
 /**
   Utility function to return all the root bridge instances in an array.
@@ -145,7 +141,6 @@ PciHostBridgeUtilityGetRootBridges (
   IN  PCI_ROOT_BRIDGE_APERTURE *PMemAbove4G
   );
 
-
 /**
   Utility function to free root bridge instances array from
   PciHostBridgeUtilityGetRootBridges().
@@ -159,7 +154,6 @@ PciHostBridgeUtilityFreeRootBridges (
   IN PCI_ROOT_BRIDGE *Bridges,
   IN UINTN           Count
   );
-
 
 /**
   Utility function to inform the platform that the resource conflict happens.
@@ -180,6 +174,5 @@ EFIAPI
 PciHostBridgeUtilityResourceConflict (
   IN VOID  *Configuration
   );
-
 
 #endif // __PCI_HOST_BRIDGE_UTILITY_LIB_H__
