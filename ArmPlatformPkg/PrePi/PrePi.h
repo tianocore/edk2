@@ -21,7 +21,7 @@
 #include <Library/SerialPortLib.h>
 #include <Library/ArmPlatformLib.h>
 
-extern UINT64 mSystemMemoryEnd;
+extern UINT64  mSystemMemoryEnd;
 
 RETURN_STATUS
 EFIAPI

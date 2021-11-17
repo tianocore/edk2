@@ -21,37 +21,37 @@
 // Global variables
 //
 
-BOOLEAN mDisplayInitialized = FALSE;
+BOOLEAN  mDisplayInitialized = FALSE;
 
-LCD_INSTANCE mLcdTemplate = {
+LCD_INSTANCE  mLcdTemplate = {
   LCD_INSTANCE_SIGNATURE,
-  NULL, // Handle
-  { // ModeInfo
-    0, // Version
-    0, // HorizontalResolution
-    0, // VerticalResolution
+  NULL,                                        // Handle
+  {               // ModeInfo
+    0,            // Version
+    0,            // HorizontalResolution
+    0,            // VerticalResolution
     PixelBltOnly, // PixelFormat
-    { 0 }, // PixelInformation
-    0, // PixelsPerScanLine
+    { 0 },        // PixelInformation
+    0,            // PixelsPerScanLine
   },
   {
-    0, // MaxMode;
-    0, // Mode;
+    0,    // MaxMode;
+    0,    // Mode;
     NULL, // Info;
-    0, // SizeOfInfo;
-    0, // FrameBufferBase;
-    0 // FrameBufferSize;
+    0,    // SizeOfInfo;
+    0,    // FrameBufferBase;
+    0     // FrameBufferSize;
   },
-  { // Gop
-    LcdGraphicsQueryMode,  // QueryMode
-    LcdGraphicsSetMode,    // SetMode
-    LcdGraphicsBlt,        // Blt
-    NULL                     // *Mode
+  {                       // Gop
+    LcdGraphicsQueryMode, // QueryMode
+    LcdGraphicsSetMode,   // SetMode
+    LcdGraphicsBlt,       // Blt
+    NULL                  // *Mode
   },
   { // DevicePath
     {
       {
-        HARDWARE_DEVICE_PATH, HW_VENDOR_DP,
+        HARDWARE_DEVICE_PATH,                  HW_VENDOR_DP,
         {
           (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
           (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
@@ -75,19 +75,19 @@ LCD_INSTANCE mLcdTemplate = {
 
 EFI_STATUS
 LcdInstanceContructor (
-  OUT LCD_INSTANCE** NewInstance
+  OUT LCD_INSTANCE **NewInstance
   )
 {
-  LCD_INSTANCE* Instance;
+  LCD_INSTANCE  *Instance;
 
   Instance = AllocateCopyPool (sizeof (LCD_INSTANCE), &mLcdTemplate);
   if (Instance == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Instance->Gop.Mode          = &Instance->Mode;
+  Instance->Gop.Mode = &Instance->Mode;
   Instance->Gop.Mode->MaxMode = LcdPlatformGetMaxMode ();
-  Instance->Mode.Info         = &Instance->ModeInfo;
+  Instance->Mode.Info = &Instance->ModeInfo;
 
   *NewInstance = Instance;
   return EFI_SUCCESS;
@@ -99,12 +99,12 @@ LcdInstanceContructor (
 
 EFI_STATUS
 InitializeDisplay (
-  IN LCD_INSTANCE* Instance
+  IN LCD_INSTANCE *Instance
   )
 {
-  EFI_STATUS             Status;
-  EFI_PHYSICAL_ADDRESS   VramBaseAddress;
-  UINTN                  VramSize;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  VramBaseAddress;
+  UINTN                 VramSize;
 
   Status = LcdPlatformGetVram (&VramBaseAddress, &VramSize);
   if (EFI_ERROR (Status)) {
@@ -123,7 +123,7 @@ InitializeDisplay (
   }
 
   // Setup all the relevant mode information
-  Instance->Gop.Mode->SizeOfInfo      = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
+  Instance->Gop.Mode->SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
   Instance->Gop.Mode->FrameBufferBase = VramBaseAddress;
 
   // Set the flag before changing the mode, to avoid infinite loops
@@ -148,8 +148,8 @@ LcdGraphicsOutputDxeInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS  Status;
-  LCD_INSTANCE* Instance;
+  EFI_STATUS    Status;
+  LCD_INSTANCE  *Instance;
 
   Status = LcdIdentify ();
   if (EFI_ERROR (Status)) {
@@ -246,8 +246,8 @@ LcdGraphicsQueryMode (
   OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION   **Info
   )
 {
-  EFI_STATUS Status;
-  LCD_INSTANCE *Instance;
+  EFI_STATUS    Status;
+  LCD_INSTANCE  *Instance;
 
   Instance = LCD_INSTANCE_FROM_GOP_THIS (This);
 
@@ -263,7 +263,8 @@ LcdGraphicsQueryMode (
   if ((This == NULL) ||
       (Info == NULL) ||
       (SizeOfInfo == NULL) ||
-      (ModeNumber >= This->Mode->MaxMode)) {
+      (ModeNumber >= This->Mode->MaxMode))
+  {
     DEBUG ((DEBUG_ERROR, "LcdGraphicsQueryMode: ERROR - For mode number %d : Invalid Parameter.\n", ModeNumber));
     Status = EFI_INVALID_PARAMETER;
     goto EXIT;
@@ -296,10 +297,10 @@ LcdGraphicsSetMode (
   IN UINT32                         ModeNumber
   )
 {
-  EFI_STATUS                      Status;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL   FillColour;
-  LCD_INSTANCE*                   Instance;
-  LCD_BPP                         Bpp;
+  EFI_STATUS                     Status;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  FillColour;
+  LCD_INSTANCE                   *Instance;
+  LCD_BPP                        Bpp;
 
   Instance = LCD_INSTANCE_FROM_GOP_THIS (This);
 
@@ -333,9 +334,10 @@ LcdGraphicsSetMode (
     DEBUG ((DEBUG_ERROR, "LcdGraphicsSetMode: ERROR - Couldn't get bytes per pixel, status: %r\n", Status));
     goto EXIT;
   }
+
   This->Mode->FrameBufferSize =  Instance->ModeInfo.VerticalResolution
-                                 * Instance->ModeInfo.PixelsPerScanLine
-                                 * GetBytesPerPixel (Bpp);
+                                * Instance->ModeInfo.PixelsPerScanLine
+                                * GetBytesPerPixel (Bpp);
 
   // Set the hardware to the new mode
   Status = LcdSetMode (ModeNumber);
@@ -352,17 +354,17 @@ LcdGraphicsSetMode (
 
   // Fill the entire visible area with the same colour.
   Status = This->Blt (
-      This,
-      &FillColour,
-      EfiBltVideoFill,
-      0,
-      0,
-      0,
-      0,
-      This->Mode->Info->HorizontalResolution,
-      This->Mode->Info->VerticalResolution,
-      0
-      );
+                   This,
+                   &FillColour,
+                   EfiBltVideoFill,
+                   0,
+                   0,
+                   0,
+                   0,
+                   This->Mode->Info->HorizontalResolution,
+                   This->Mode->Info->VerticalResolution,
+                   0
+                   );
 
 EXIT:
   return Status;
@@ -374,21 +376,21 @@ GetBytesPerPixel (
   )
 {
   switch (Bpp) {
-  case LcdBitsPerPixel_24:
-    return 4;
+    case LcdBitsPerPixel_24:
+      return 4;
 
-  case LcdBitsPerPixel_16_565:
-  case LcdBitsPerPixel_16_555:
-  case LcdBitsPerPixel_12_444:
-    return 2;
+    case LcdBitsPerPixel_16_565:
+    case LcdBitsPerPixel_16_555:
+    case LcdBitsPerPixel_12_444:
+      return 2;
 
-  case LcdBitsPerPixel_8:
-  case LcdBitsPerPixel_4:
-  case LcdBitsPerPixel_2:
-  case LcdBitsPerPixel_1:
-    return 1;
+    case LcdBitsPerPixel_8:
+    case LcdBitsPerPixel_4:
+    case LcdBitsPerPixel_2:
+    case LcdBitsPerPixel_1:
+      return 1;
 
-  default:
-    return 0;
+    default:
+      return 0;
   }
 }
