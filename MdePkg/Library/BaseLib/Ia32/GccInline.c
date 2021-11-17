@@ -7,7 +7,6 @@
 
 **/
 
-
 #include "BaseLibInternals.h"
 
 /**
@@ -77,13 +76,13 @@ AsmReadEflags (
   VOID
   )
 {
-  UINTN Eflags;
+  UINTN  Eflags;
 
   __asm__ __volatile__ (
     "pushfl     \n\t"
     "popl %0        "
     : "=r" (Eflags)
-    );
+  );
 
   return Eflags;
 }
@@ -108,9 +107,8 @@ InternalX86FxSave (
     "fxsave %0"
     :
     : "m" (*Buffer)  // %0
-    );
+  );
 }
-
 
 /**
   Restores the current floating point/SSE/SSE2 context from a buffer.
@@ -132,9 +130,8 @@ InternalX86FxRestore (
     "fxrstor %0"
     :
     : "m" (*Buffer)  // %0
-    );
+  );
 }
-
 
 /**
   Reads the current value of 64-bit MMX Register #0 (MM0).
@@ -160,11 +157,10 @@ AsmReadMm0 (
     "pop  %%eax          \n\t"
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
-    );
+  );
 
   return Data;
 }
-
 
 /**
   Reads the current value of 64-bit MMX Register #1 (MM1).
@@ -190,11 +186,10 @@ AsmReadMm1 (
     "pop  %%eax          \n\t"
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
-    );
+  );
 
   return Data;
 }
-
 
 /**
   Reads the current value of 64-bit MMX Register #2 (MM2).
@@ -220,11 +215,10 @@ AsmReadMm2 (
     "pop  %%eax          \n\t"
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
-    );
+  );
 
   return Data;
 }
-
 
 /**
   Reads the current value of 64-bit MMX Register #3 (MM3).
@@ -250,11 +244,10 @@ AsmReadMm3 (
     "pop  %%eax          \n\t"
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
-    );
+  );
 
   return Data;
 }
-
 
 /**
   Reads the current value of 64-bit MMX Register #4 (MM4).
@@ -280,11 +273,10 @@ AsmReadMm4 (
     "pop  %%eax          \n\t"
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
-    );
+  );
 
   return Data;
 }
-
 
 /**
   Reads the current value of 64-bit MMX Register #5 (MM5).
@@ -310,11 +302,10 @@ AsmReadMm5 (
     "pop  %%eax          \n\t"
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
-    );
+  );
 
   return Data;
 }
-
 
 /**
   Reads the current value of 64-bit MMX Register #6 (MM6).
@@ -340,11 +331,10 @@ AsmReadMm6 (
     "pop  %%eax          \n\t"
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
-    );
+  );
 
   return Data;
 }
-
 
 /**
   Reads the current value of 64-bit MMX Register #7 (MM7).
@@ -370,11 +360,10 @@ AsmReadMm7 (
     "pop  %%eax          \n\t"
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
-    );
+  );
 
   return Data;
 }
-
 
 /**
   Writes the current value of 64-bit MMX Register #0 (MM0).
@@ -395,9 +384,8 @@ AsmWriteMm0 (
     "movq %0, %%mm0"  // %0
     :
     : "m" (Value)
-    );
+  );
 }
-
 
 /**
   Writes the current value of 64-bit MMX Register #1 (MM1).
@@ -418,9 +406,8 @@ AsmWriteMm1 (
     "movq %0, %%mm1"  // %0
     :
     : "m" (Value)
-    );
+  );
 }
-
 
 /**
   Writes the current value of 64-bit MMX Register #2 (MM2).
@@ -441,9 +428,8 @@ AsmWriteMm2 (
     "movq %0, %%mm2"  // %0
     :
     : "m" (Value)
-    );
+  );
 }
-
 
 /**
   Writes the current value of 64-bit MMX Register #3 (MM3).
@@ -464,9 +450,8 @@ AsmWriteMm3 (
     "movq %0, %%mm3"  // %0
     :
     : "m" (Value)
-    );
+  );
 }
-
 
 /**
   Writes the current value of 64-bit MMX Register #4 (MM4).
@@ -487,9 +472,8 @@ AsmWriteMm4 (
     "movq %0, %%mm4"  // %0
     :
     : "m" (Value)
-    );
+  );
 }
-
 
 /**
   Writes the current value of 64-bit MMX Register #5 (MM5).
@@ -510,9 +494,8 @@ AsmWriteMm5 (
     "movq %0, %%mm5"  // %0
     :
     : "m" (Value)
-    );
+  );
 }
-
 
 /**
   Writes the current value of 64-bit MMX Register #6 (MM6).
@@ -533,9 +516,8 @@ AsmWriteMm6 (
     "movq %0, %%mm6"  // %0
     :
     : "m" (Value)
-    );
+  );
 }
-
 
 /**
   Writes the current value of 64-bit MMX Register #7 (MM7).
@@ -556,9 +538,8 @@ AsmWriteMm7 (
     "movq %0, %%mm7"  // %0
     :
     : "m" (Value)
-    );
+  );
 }
-
 
 /**
   Reads the current value of Time Stamp Counter (TSC).
@@ -580,7 +561,7 @@ AsmReadTsc (
   __asm__ __volatile__ (
     "rdtsc"
     : "=A" (Data)
-    );
+  );
 
   return Data;
 }

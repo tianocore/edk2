@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __PCI_CF8_LIB_H__
 #define __PCI_CF8_LIB_H__
 
-
 /**
   Macro that converts PCI Bus, PCI Device, PCI Function and PCI Register to an
   address that can be passed to the PCI Library functions.
@@ -30,7 +29,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @return The encode PCI address.
 
 **/
-#define PCI_CF8_LIB_ADDRESS(Bus,Device,Function,Offset) \
+#define PCI_CF8_LIB_ADDRESS(Bus, Device, Function, Offset) \
   (((Offset) & 0xfff) | (((Function) & 0x07) << 12) | (((Device) & 0x1f) << 15) | (((Bus) & 0xff) << 20))
 
 /**

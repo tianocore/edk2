@@ -56,6 +56,7 @@ FilterAfterIoRead (
   IN UINTN            Address,
   IN VOID             *Buffer
   );
+
 /**
   Filter IO Write operation before wirte IO port.
   It is used to filter IO operation.
@@ -79,13 +80,13 @@ FilterBeforeIoWrite (
   IN VOID             *Buffer
   );
 
-  /**
-  Trace IO Write operation after wirte IO port.
-  It is used to trace IO operation.
+/**
+Trace IO Write operation after wirte IO port.
+It is used to trace IO operation.
 
-  @param[in]       Width    Signifies the width of the I/O operation.
-  @param[in]       Address  The base address of the I/O operation.
-  @param[in]       Buffer   The source buffer from which to BeforeWrite data.
+@param[in]       Width    Signifies the width of the I/O operation.
+@param[in]       Address  The base address of the I/O operation.
+@param[in]       Buffer   The source buffer from which to BeforeWrite data.
 
 **/
 VOID

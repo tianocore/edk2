@@ -28,4 +28,3 @@ AsmReadPmc (
     rdpmc
   }
 }
-

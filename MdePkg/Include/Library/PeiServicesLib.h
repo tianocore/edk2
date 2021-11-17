@@ -329,7 +329,6 @@ PeiServicesResetSystem (
   VOID
   );
 
-
 /**
   This service is a wrapper for the PEI Service FfsFindByName(), except the pointer to the PEI Services
   Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface
@@ -358,7 +357,6 @@ PeiServicesFfsFindFileByName (
   IN CONST  EFI_PEI_FV_HANDLE   VolumeHandle,
   OUT       EFI_PEI_FILE_HANDLE *FileHandle
   );
-
 
 /**
   This service is a wrapper for the PEI Service FfsGetFileInfo(), except the pointer to the PEI Services
@@ -434,7 +432,6 @@ PeiServicesFfsGetVolumeInfo (
   IN  EFI_PEI_FV_HANDLE       VolumeHandle,
   OUT EFI_FV_INFO             *VolumeInfo
   );
-
 
 /**
   This service is a wrapper for the PEI Service RegisterForShadow(), except the pointer to the PEI Services

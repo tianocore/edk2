@@ -59,6 +59,6 @@ PciSegmentRegisterForRuntimeAccess (
 
     SegmentInfo = GetPciSegmentInfo (&Count);
     PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count);
-  );
+    );
   return RETURN_SUCCESS;
 }

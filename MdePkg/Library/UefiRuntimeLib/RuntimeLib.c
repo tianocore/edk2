@@ -21,11 +21,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// Driver Lib Module Globals
 ///
-EFI_EVENT              mEfiVirtualNotifyEvent;
-EFI_EVENT              mEfiExitBootServicesEvent;
-BOOLEAN                mEfiGoneVirtual         = FALSE;
-BOOLEAN                mEfiAtRuntime           = FALSE;
-EFI_RUNTIME_SERVICES   *mInternalRT;
+EFI_EVENT             mEfiVirtualNotifyEvent;
+EFI_EVENT             mEfiExitBootServicesEvent;
+BOOLEAN               mEfiGoneVirtual = FALSE;
+BOOLEAN               mEfiAtRuntime   = FALSE;
+EFI_RUNTIME_SERVICES  *mInternalRT;
 
 /**
   Set AtRuntime flag as TRUE after ExitBootServices.
@@ -62,7 +62,7 @@ RuntimeLibVirtualNotifyEvent (
   //
   // Update global for Runtime Services Table and IO
   //
-  EfiConvertPointer (0, (VOID **) &mInternalRT);
+  EfiConvertPointer (0, (VOID **)&mInternalRT);
 
   mEfiGoneVirtual = TRUE;
 }
@@ -192,7 +192,6 @@ EfiGoneVirtual (
   return mEfiGoneVirtual;
 }
 
-
 /**
   This service is a wrapper for the UEFI Runtime Service ResetSystem().
 
@@ -234,7 +233,6 @@ EfiResetSystem (
   mInternalRT->ResetSystem (ResetType, ResetStatus, DataSize, ResetData);
 }
 
-
 /**
   This service is a wrapper for the UEFI Runtime Service GetTime().
 
@@ -266,7 +264,6 @@ EfiGetTime (
   return mInternalRT->GetTime (Time, Capabilities);
 }
 
-
 /**
   This service is a wrapper for the UEFI Runtime Service SetTime().
 
@@ -297,7 +294,6 @@ EfiSetTime (
 {
   return mInternalRT->SetTime (Time);
 }
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service GetWakeupTime().
@@ -331,8 +327,6 @@ EfiGetWakeupTime (
   return mInternalRT->GetWakeupTime (Enabled, Pending, Time);
 }
 
-
-
 /**
   This service is a wrapper for the UEFI Runtime Service SetWakeupTime()
 
@@ -364,7 +358,6 @@ EfiSetWakeupTime (
 {
   return mInternalRT->SetWakeupTime (Enable, Time);
 }
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service GetVariable().
@@ -409,7 +402,6 @@ EfiGetVariable (
   return mInternalRT->GetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
 }
 
-
 /**
   This service is a wrapper for the UEFI Runtime Service GetNextVariableName().
 
@@ -450,7 +442,6 @@ EfiGetNextVariableName (
 {
   return mInternalRT->GetNextVariableName (VariableNameSize, VariableName, VendorGuid);
 }
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service GetNextVariableName()
@@ -494,7 +485,6 @@ EfiSetVariable (
   return mInternalRT->SetVariable (VariableName, VendorGuid, Attributes, DataSize, Data);
 }
 
-
 /**
   This service is a wrapper for the UEFI Runtime Service GetNextHighMonotonicCount().
 
@@ -519,7 +509,6 @@ EfiGetNextHighMonotonicCount (
 {
   return mInternalRT->GetNextHighMonotonicCount (HighCount);
 }
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service ConvertPointer().
@@ -548,7 +537,6 @@ EfiConvertPointer (
 {
   return gRT->ConvertPointer (DebugDisposition, Address);
 }
-
 
 /**
   Determines the new virtual address that is to be used on subsequent memory accesses.
@@ -581,7 +569,6 @@ EfiConvertFunctionPointer (
 {
   return EfiConvertPointer (DebugDisposition, Address);
 }
-
 
 /**
   Convert the standard Lib double linked list to a virtual mapping.
@@ -623,19 +610,19 @@ EfiConvertList (
 
     EfiConvertPointer (
       Link->ForwardLink == ListHead ? DebugDisposition : 0,
-      (VOID **) &Link->ForwardLink
+      (VOID **)&Link->ForwardLink
       );
 
     EfiConvertPointer (
       Link->BackLink == ListHead ? DebugDisposition : 0,
-      (VOID **) &Link->BackLink
+      (VOID **)&Link->BackLink
       );
 
     Link = NextLink;
   } while (Link != ListHead);
+
   return EFI_SUCCESS;
 }
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service SetVirtualAddressMap().
@@ -676,10 +663,9 @@ EfiSetVirtualAddressMap (
                         MemoryMapSize,
                         DescriptorSize,
                         DescriptorVersion,
-                        (EFI_MEMORY_DESCRIPTOR *) VirtualMap
+                        (EFI_MEMORY_DESCRIPTOR *)VirtualMap
                         );
 }
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service UpdateCapsule().
@@ -729,7 +715,6 @@ EfiUpdateCapsule (
                         ScatterGatherList
                         );
 }
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service QueryCapsuleCapabilities().
@@ -781,7 +766,6 @@ EfiQueryCapsuleCapabilities (
                         ResetType
                         );
 }
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service QueryVariableInfo().

@@ -32,7 +32,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @return The encode PCI address.
 
 **/
-#define PCI_EXPRESS_LIB_ADDRESS(Bus,Device,Function,Offset) PCI_ECAM_ADDRESS ((Bus), (Device), (Function), (Offset))
+#define PCI_EXPRESS_LIB_ADDRESS(Bus, Device, Function, Offset)  PCI_ECAM_ADDRESS ((Bus), (Device), (Function), (Offset))
 
 /**
   Registers a PCI device so PCI configuration registers may be accessed after

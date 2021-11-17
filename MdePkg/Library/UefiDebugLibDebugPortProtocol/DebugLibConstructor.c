@@ -15,16 +15,16 @@
 //
 // BOOLEAN value to indicate if it is at the post ExitBootServices pahse
 //
-BOOLEAN     mPostEBS = FALSE;
+BOOLEAN  mPostEBS = FALSE;
 
-static EFI_EVENT   mExitBootServicesEvent;
+static EFI_EVENT  mExitBootServicesEvent;
 
 //
 // Pointer to SystemTable
 // This library instance may have a cycle consume with UefiBootServicesTableLib
 // because of the constructors.
 //
-EFI_BOOT_SERVICES     *mDebugBS;
+EFI_BOOT_SERVICES  *mDebugBS;
 
 /**
   This routine sets the mPostEBS for exit boot servies true
@@ -38,7 +38,7 @@ VOID
 EFIAPI
 ExitBootServicesCallback (
   EFI_EVENT   Event,
-  VOID*       Context
+  VOID *Context
   )
 {
   mPostEBS = TRUE;
@@ -57,7 +57,7 @@ ExitBootServicesCallback (
 **/
 EFI_STATUS
 EFIAPI
-DxeDebugLibConstructor(
+DxeDebugLibConstructor (
   IN EFI_HANDLE                 ImageHandle,
   IN EFI_SYSTEM_TABLE           *SystemTable
   )
@@ -86,7 +86,7 @@ DxeDebugLibConstructor(
 **/
 EFI_STATUS
 EFIAPI
-DxeDebugLibDestructor(
+DxeDebugLibDestructor (
   IN EFI_HANDLE                 ImageHandle,
   IN EFI_SYSTEM_TABLE           *SystemTable
   )

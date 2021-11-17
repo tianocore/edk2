@@ -16,7 +16,6 @@
 
 #include "UefiDevicePathLib.h"
 
-
 /**
   Retrieves the device path protocol from a handle.
 
@@ -42,10 +41,11 @@ DevicePathFromHandle (
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiDevicePathProtocolGuid,
-                  (VOID *) &DevicePath
+                  (VOID *)&DevicePath
                   );
   if (EFI_ERROR (Status)) {
     DevicePath = NULL;
   }
+
   return DevicePath;
 }

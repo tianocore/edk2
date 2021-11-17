@@ -10,9 +10,10 @@
   Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics.
 **/
 
-long _InterlockedDecrement(
-   long * lpAddend
-);
+long
+_InterlockedDecrement (
+  long *lpAddend
+  );
 
 #pragma intrinsic(_InterlockedDecrement)
 
@@ -37,4 +38,3 @@ InternalSyncDecrement (
 {
   return _InterlockedDecrement ((long *)(Value));
 }
-

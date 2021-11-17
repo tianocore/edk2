@@ -10,13 +10,13 @@
 #include "PciSegmentLibCommon.h"
 
 typedef struct {
-  UINT32  Register : 12;
-  UINT32  Function : 3;
-  UINT32  Device : 5;
-  UINT32  Bus : 8;
-  UINT32  Reserved1 : 4;
-  UINT32  Segment : 16;
-  UINT32  Reserved2 : 16;
+  UINT32    Register  : 12;
+  UINT32    Function  : 3;
+  UINT32    Device    : 5;
+  UINT32    Bus       : 8;
+  UINT32    Reserved1 : 4;
+  UINT32    Segment   : 16;
+  UINT32    Reserved2 : 16;
 } PCI_SEGMENT_LIB_ADDRESS_STRUCTURE;
 
 /**
@@ -41,22 +41,25 @@ PciSegmentLibGetEcamAddress (
     if (SegmentInfo->SegmentNumber == ((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Segment) {
       break;
     }
+
     SegmentInfo++;
     Count--;
   }
+
   ASSERT (Count != 0);
   ASSERT (
     (((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Reserved1 == 0) &&
     (((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Reserved2 == 0)
-  );
+    );
   ASSERT (((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Bus >= SegmentInfo->StartBusNumber);
   ASSERT (((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Bus <= SegmentInfo->EndBusNumber);
 
   Address = SegmentInfo->BaseAddress + PCI_ECAM_ADDRESS (
-    ((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Bus,
-    ((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Device,
-    ((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Function,
-    ((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Register);
+                                         ((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Bus,
+                                         ((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Device,
+                                         ((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Function,
+                                         ((PCI_SEGMENT_LIB_ADDRESS_STRUCTURE *)&Address)->Register
+                                         );
 
   if (sizeof (UINTN) == sizeof (UINT32)) {
     ASSERT (Address < BASE_4GB);
@@ -84,8 +87,8 @@ PciSegmentRead8 (
   IN UINT64                    Address
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioRead8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count));
@@ -112,8 +115,8 @@ PciSegmentWrite8 (
   IN UINT8                     Value
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioWrite8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), Value);
@@ -143,8 +146,8 @@ PciSegmentOr8 (
   IN UINT8                     OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioOr8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), OrData);
@@ -173,8 +176,8 @@ PciSegmentAnd8 (
   IN UINT8                     AndData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioAnd8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), AndData);
@@ -208,8 +211,8 @@ PciSegmentAndThenOr8 (
   IN UINT8                     OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioAndThenOr8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), AndData, OrData);
@@ -244,8 +247,8 @@ PciSegmentBitFieldRead8 (
   IN UINTN                     EndBit
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldRead8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit);
@@ -284,8 +287,8 @@ PciSegmentBitFieldWrite8 (
   IN UINT8                     Value
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldWrite8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, Value);
@@ -327,8 +330,8 @@ PciSegmentBitFieldOr8 (
   IN UINT8                     OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldOr8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, OrData);
@@ -370,8 +373,8 @@ PciSegmentBitFieldAnd8 (
   IN UINT8                     AndData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldAnd8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData);
@@ -417,8 +420,8 @@ PciSegmentBitFieldAndThenOr8 (
   IN UINT8                     OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldAndThenOr8 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData, OrData);
@@ -444,8 +447,8 @@ PciSegmentRead16 (
   IN UINT64                    Address
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioRead16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count));
@@ -473,8 +476,8 @@ PciSegmentWrite16 (
   IN UINT16                    Value
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioWrite16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), Value);
@@ -507,8 +510,8 @@ PciSegmentOr16 (
   IN UINT16                    OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioOr16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), OrData);
@@ -539,8 +542,8 @@ PciSegmentAnd16 (
   IN UINT16                    AndData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioAnd16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), AndData);
@@ -575,8 +578,8 @@ PciSegmentAndThenOr16 (
   IN UINT16                    OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioAndThenOr16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), AndData, OrData);
@@ -612,8 +615,8 @@ PciSegmentBitFieldRead16 (
   IN UINTN                     EndBit
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldRead16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit);
@@ -653,8 +656,8 @@ PciSegmentBitFieldWrite16 (
   IN UINT16                    Value
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldWrite16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, Value);
@@ -697,8 +700,8 @@ PciSegmentBitFieldOr16 (
   IN UINT16                    OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldOr16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, OrData);
@@ -741,8 +744,8 @@ PciSegmentBitFieldAnd16 (
   IN UINT16                    AndData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldAnd16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData);
@@ -789,8 +792,9 @@ PciSegmentBitFieldAndThenOr16 (
   IN UINT16                    OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
+
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldAndThenOr16 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData, OrData);
 }
@@ -815,8 +819,8 @@ PciSegmentRead32 (
   IN UINT64                    Address
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioRead32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count));
@@ -844,8 +848,8 @@ PciSegmentWrite32 (
   IN UINT32                    Value
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioWrite32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), Value);
@@ -876,8 +880,8 @@ PciSegmentOr32 (
   IN UINT32                    OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioOr32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), OrData);
@@ -908,8 +912,8 @@ PciSegmentAnd32 (
   IN UINT32                    AndData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioAnd32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), AndData);
@@ -944,8 +948,8 @@ PciSegmentAndThenOr32 (
   IN UINT32                    OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioAndThenOr32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), AndData, OrData);
@@ -981,8 +985,8 @@ PciSegmentBitFieldRead32 (
   IN UINTN                     EndBit
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldRead32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit);
@@ -1022,8 +1026,8 @@ PciSegmentBitFieldWrite32 (
   IN UINT32                    Value
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldWrite32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, Value);
@@ -1065,8 +1069,8 @@ PciSegmentBitFieldOr32 (
   IN UINT32                    OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldOr32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, OrData);
@@ -1108,8 +1112,8 @@ PciSegmentBitFieldAnd32 (
   IN UINT32                    AndData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
 
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldAnd32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData);
@@ -1156,8 +1160,9 @@ PciSegmentBitFieldAndThenOr32 (
   IN UINT32                    OrData
   )
 {
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
+
   SegmentInfo = GetPciSegmentInfo (&Count);
   return MmioBitFieldAndThenOr32 (PciSegmentLibGetEcamAddress (Address, SegmentInfo, Count), StartBit, EndBit, AndData, OrData);
 }
@@ -1193,15 +1198,15 @@ PciSegmentReadBuffer (
   OUT VOID                     *Buffer
   )
 {
-  UINTN                        ReturnValue;
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
-  UINTN                        Address;
+  UINTN             ReturnValue;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
+  UINTN             Address;
 
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
 
   SegmentInfo = GetPciSegmentInfo (&Count);
-  Address = PciSegmentLibGetEcamAddress (StartAddress, SegmentInfo, Count);
+  Address     = PciSegmentLibGetEcamAddress (StartAddress, SegmentInfo, Count);
 
   if (Size == 0) {
     return 0;
@@ -1220,18 +1225,18 @@ PciSegmentReadBuffer (
     //
     *(volatile UINT8 *)Buffer = MmioRead8 (Address);
     Address += sizeof (UINT8);
-    Size -= sizeof (UINT8);
-    Buffer = (UINT8*)Buffer + 1;
+    Size    -= sizeof (UINT8);
+    Buffer   = (UINT8 *)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (Address & BIT1) != 0) {
+  if ((Size >= sizeof (UINT16)) && ((Address & BIT1) != 0)) {
     //
     // Read a word if StartAddress is word aligned
     //
     WriteUnaligned16 (Buffer, MmioRead16 (Address));
     Address += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size    -= sizeof (UINT16);
+    Buffer   = (UINT16 *)Buffer + 1;
   }
 
   while (Size >= sizeof (UINT32)) {
@@ -1240,8 +1245,8 @@ PciSegmentReadBuffer (
     //
     WriteUnaligned32 (Buffer, MmioRead32 (Address));
     Address += sizeof (UINT32);
-    Size -= sizeof (UINT32);
-    Buffer = (UINT32*)Buffer + 1;
+    Size    -= sizeof (UINT32);
+    Buffer   = (UINT32 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT16)) {
@@ -1250,8 +1255,8 @@ PciSegmentReadBuffer (
     //
     WriteUnaligned16 (Buffer, MmioRead16 (Address));
     Address += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size    -= sizeof (UINT16);
+    Buffer   = (UINT16 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT8)) {
@@ -1296,15 +1301,15 @@ PciSegmentWriteBuffer (
   IN VOID                      *Buffer
   )
 {
-  UINTN                        ReturnValue;
-  UINTN                        Count;
-  PCI_SEGMENT_INFO             *SegmentInfo;
-  UINTN                        Address;
+  UINTN             ReturnValue;
+  UINTN             Count;
+  PCI_SEGMENT_INFO  *SegmentInfo;
+  UINTN             Address;
 
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
 
   SegmentInfo = GetPciSegmentInfo (&Count);
-  Address = PciSegmentLibGetEcamAddress (StartAddress, SegmentInfo, Count);
+  Address     = PciSegmentLibGetEcamAddress (StartAddress, SegmentInfo, Count);
 
   if (Size == 0) {
     return 0;
@@ -1321,20 +1326,20 @@ PciSegmentWriteBuffer (
     //
     // Write a byte if StartAddress is byte aligned
     //
-    MmioWrite8 (Address, *(UINT8*)Buffer);
+    MmioWrite8 (Address, *(UINT8 *)Buffer);
     Address += sizeof (UINT8);
-    Size -= sizeof (UINT8);
-    Buffer = (UINT8*)Buffer + 1;
+    Size    -= sizeof (UINT8);
+    Buffer   = (UINT8 *)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (Address & BIT1) != 0) {
+  if ((Size >= sizeof (UINT16)) && ((Address & BIT1) != 0)) {
     //
     // Write a word if StartAddress is word aligned
     //
     MmioWrite16 (Address, ReadUnaligned16 (Buffer));
     Address += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size    -= sizeof (UINT16);
+    Buffer   = (UINT16 *)Buffer + 1;
   }
 
   while (Size >= sizeof (UINT32)) {
@@ -1343,8 +1348,8 @@ PciSegmentWriteBuffer (
     //
     MmioWrite32 (Address, ReadUnaligned32 (Buffer));
     Address += sizeof (UINT32);
-    Size -= sizeof (UINT32);
-    Buffer = (UINT32*)Buffer + 1;
+    Size    -= sizeof (UINT32);
+    Buffer   = (UINT32 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT16)) {
@@ -1353,15 +1358,15 @@ PciSegmentWriteBuffer (
     //
     MmioWrite16 (Address, ReadUnaligned16 (Buffer));
     Address += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size    -= sizeof (UINT16);
+    Buffer   = (UINT16 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT8)) {
     //
     // Write the last remaining byte if exist
     //
-    MmioWrite8 (Address, *(UINT8*)Buffer);
+    MmioWrite8 (Address, *(UINT8 *)Buffer);
   }
 
   return ReturnValue;

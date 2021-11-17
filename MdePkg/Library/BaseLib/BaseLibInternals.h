@@ -326,12 +326,11 @@ VOID
 EFIAPI
 InternalSwitchStack (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,   OPTIONAL
-  IN      VOID                      *Context2,   OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack,
   IN      VA_LIST                   Marker
   );
-
 
 /**
   Worker function that returns a bit field from Operand.
@@ -352,7 +351,6 @@ BitFieldReadUint (
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit
   );
-
 
 /**
   Worker function that reads a bit field from Operand, performs a bitwise OR,
@@ -379,7 +377,6 @@ BitFieldOrUint (
   IN      UINTN                     OrData
   );
 
-
 /**
   Worker function that reads a bit field from Operand, performs a bitwise AND,
   and returns the result.
@@ -405,7 +402,6 @@ BitFieldAndUint (
   IN      UINTN                     AndData
   );
 
-
 /**
   Worker function that checks ASSERT condition for JumpBuffer
 
@@ -422,7 +418,6 @@ EFIAPI
 InternalAssertJumpBuffer (
   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
   );
-
 
 /**
   Restores the CPU context that was saved with SetJump().
@@ -441,7 +436,6 @@ InternalLongJump (
   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
   IN      UINTN                     Value
   );
-
 
 /**
   Check if a Unicode character is a decimal character.
@@ -462,7 +456,6 @@ InternalIsDecimalDigitCharacter (
   IN      CHAR16                    Char
   );
 
-
 /**
   Convert a Unicode character to numerical value.
 
@@ -481,7 +474,6 @@ EFIAPI
 InternalHexCharToUintn (
   IN      CHAR16                    Char
   );
-
 
 /**
   Check if a Unicode character is a hexadecimal character.
@@ -503,7 +495,6 @@ InternalIsHexaDecimalDigitCharacter (
   IN      CHAR16                    Char
   );
 
-
 /**
   Check if a ASCII character is a decimal character.
 
@@ -522,7 +513,6 @@ EFIAPI
 InternalAsciiIsDecimalDigitCharacter (
   IN      CHAR8                     Char
   );
-
 
 /**
   Check if a ASCII character is a hexadecimal character.
@@ -544,7 +534,6 @@ InternalAsciiIsHexaDecimalDigitCharacter (
   IN      CHAR8                    Char
   );
 
-
 /**
   Convert a ASCII character to numerical value.
 
@@ -564,301 +553,300 @@ InternalAsciiHexCharToUintn (
   IN      CHAR8                    Char
   );
 
-
 //
 // Ia32 and x64 specific functions
 //
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
-/**
-  Reads the current Global Descriptor Table Register(GDTR) descriptor.
+  /**
+    Reads the current Global Descriptor Table Register(GDTR) descriptor.
 
-  Reads and returns the current GDTR descriptor and returns it in Gdtr. This
-  function is only available on IA-32 and x64.
+    Reads and returns the current GDTR descriptor and returns it in Gdtr. This
+    function is only available on IA-32 and x64.
 
-  @param  Gdtr  The pointer to a GDTR descriptor.
+    @param  Gdtr  The pointer to a GDTR descriptor.
 
-**/
-VOID
-EFIAPI
-InternalX86ReadGdtr (
+  **/
+  VOID
+  EFIAPI
+  InternalX86ReadGdtr (
   OUT     IA32_DESCRIPTOR           *Gdtr
   );
 
-/**
-  Writes the current Global Descriptor Table Register (GDTR) descriptor.
+  /**
+    Writes the current Global Descriptor Table Register (GDTR) descriptor.
 
-  Writes and the current GDTR descriptor specified by Gdtr. This function is
-  only available on IA-32 and x64.
+    Writes and the current GDTR descriptor specified by Gdtr. This function is
+    only available on IA-32 and x64.
 
-  @param  Gdtr  The pointer to a GDTR descriptor.
+    @param  Gdtr  The pointer to a GDTR descriptor.
 
-**/
-VOID
-EFIAPI
-InternalX86WriteGdtr (
+  **/
+  VOID
+  EFIAPI
+  InternalX86WriteGdtr (
   IN      CONST IA32_DESCRIPTOR     *Gdtr
   );
 
-/**
-  Reads the current Interrupt Descriptor Table Register(GDTR) descriptor.
+  /**
+    Reads the current Interrupt Descriptor Table Register(GDTR) descriptor.
 
-  Reads and returns the current IDTR descriptor and returns it in Idtr. This
-  function is only available on IA-32 and x64.
+    Reads and returns the current IDTR descriptor and returns it in Idtr. This
+    function is only available on IA-32 and x64.
 
-  @param  Idtr  The pointer to an IDTR descriptor.
+    @param  Idtr  The pointer to an IDTR descriptor.
 
-**/
-VOID
-EFIAPI
-InternalX86ReadIdtr (
+  **/
+  VOID
+  EFIAPI
+  InternalX86ReadIdtr (
   OUT     IA32_DESCRIPTOR           *Idtr
   );
 
-/**
-  Writes the current Interrupt Descriptor Table Register(GDTR) descriptor.
+  /**
+    Writes the current Interrupt Descriptor Table Register(GDTR) descriptor.
 
-  Writes the current IDTR descriptor and returns it in Idtr. This function is
-  only available on IA-32 and x64.
+    Writes the current IDTR descriptor and returns it in Idtr. This function is
+    only available on IA-32 and x64.
 
-  @param  Idtr  The pointer to an IDTR descriptor.
+    @param  Idtr  The pointer to an IDTR descriptor.
 
-**/
-VOID
-EFIAPI
-InternalX86WriteIdtr (
+  **/
+  VOID
+  EFIAPI
+  InternalX86WriteIdtr (
   IN      CONST IA32_DESCRIPTOR     *Idtr
   );
 
-/**
-  Save the current floating point/SSE/SSE2 context to a buffer.
+  /**
+    Save the current floating point/SSE/SSE2 context to a buffer.
 
-  Saves the current floating point/SSE/SSE2 state to the buffer specified by
-  Buffer. Buffer must be aligned on a 16-byte boundary. This function is only
-  available on IA-32 and x64.
+    Saves the current floating point/SSE/SSE2 state to the buffer specified by
+    Buffer. Buffer must be aligned on a 16-byte boundary. This function is only
+    available on IA-32 and x64.
 
-  @param  Buffer  The pointer to a buffer to save the floating point/SSE/SSE2 context.
+    @param  Buffer  The pointer to a buffer to save the floating point/SSE/SSE2 context.
 
-**/
-VOID
-EFIAPI
-InternalX86FxSave (
+  **/
+  VOID
+  EFIAPI
+  InternalX86FxSave (
   OUT     IA32_FX_BUFFER            *Buffer
   );
 
-/**
-  Restores the current floating point/SSE/SSE2 context from a buffer.
+  /**
+    Restores the current floating point/SSE/SSE2 context from a buffer.
 
-  Restores the current floating point/SSE/SSE2 state from the buffer specified
-  by Buffer. Buffer must be aligned on a 16-byte boundary. This function is
-  only available on IA-32 and x64.
+    Restores the current floating point/SSE/SSE2 state from the buffer specified
+    by Buffer. Buffer must be aligned on a 16-byte boundary. This function is
+    only available on IA-32 and x64.
 
-  @param  Buffer  The pointer to a buffer to save the floating point/SSE/SSE2 context.
+    @param  Buffer  The pointer to a buffer to save the floating point/SSE/SSE2 context.
 
-**/
-VOID
-EFIAPI
-InternalX86FxRestore (
+  **/
+  VOID
+  EFIAPI
+  InternalX86FxRestore (
   IN      CONST IA32_FX_BUFFER      *Buffer
   );
 
-/**
-  Enables the 32-bit paging mode on the CPU.
+  /**
+    Enables the 32-bit paging mode on the CPU.
 
-  Enables the 32-bit paging mode on the CPU. CR0, CR3, CR4, and the page tables
-  must be properly initialized prior to calling this service. This function
-  assumes the current execution mode is 32-bit protected mode. This function is
-  only available on IA-32. After the 32-bit paging mode is enabled, control is
-  transferred to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
+    Enables the 32-bit paging mode on the CPU. CR0, CR3, CR4, and the page tables
+    must be properly initialized prior to calling this service. This function
+    assumes the current execution mode is 32-bit protected mode. This function is
+    only available on IA-32. After the 32-bit paging mode is enabled, control is
+    transferred to the function specified by EntryPoint using the new stack
+    specified by NewStack and passing in the parameters specified by Context1 and
+    Context2. Context1 and Context2 are optional and may be NULL. The function
+    EntryPoint must never return.
 
-  There are a number of constraints that must be followed before calling this
-  function:
-  1)  Interrupts must be disabled.
-  2)  The caller must be in 32-bit protected mode with flat descriptors. This
-      means all descriptors must have a base of 0 and a limit of 4GB.
-  3)  CR0 and CR4 must be compatible with 32-bit protected mode with flat
-      descriptors.
-  4)  CR3 must point to valid page tables that will be used once the transition
-      is complete, and those page tables must guarantee that the pages for this
-      function and the stack are identity mapped.
+    There are a number of constraints that must be followed before calling this
+    function:
+    1)  Interrupts must be disabled.
+    2)  The caller must be in 32-bit protected mode with flat descriptors. This
+        means all descriptors must have a base of 0 and a limit of 4GB.
+    3)  CR0 and CR4 must be compatible with 32-bit protected mode with flat
+        descriptors.
+    4)  CR3 must point to valid page tables that will be used once the transition
+        is complete, and those page tables must guarantee that the pages for this
+        function and the stack are identity mapped.
 
-  @param  EntryPoint  A pointer to function to call with the new stack after
-                      paging is enabled.
-  @param  Context1    A pointer to the context to pass into the EntryPoint
-                      function as the first parameter after paging is enabled.
-  @param  Context2    A pointer to the context to pass into the EntryPoint
-                      function as the second parameter after paging is enabled.
-  @param  NewStack    A pointer to the new stack to use for the EntryPoint
-                      function after paging is enabled.
+    @param  EntryPoint  A pointer to function to call with the new stack after
+                        paging is enabled.
+    @param  Context1    A pointer to the context to pass into the EntryPoint
+                        function as the first parameter after paging is enabled.
+    @param  Context2    A pointer to the context to pass into the EntryPoint
+                        function as the second parameter after paging is enabled.
+    @param  NewStack    A pointer to the new stack to use for the EntryPoint
+                        function after paging is enabled.
 
-**/
-VOID
-EFIAPI
-InternalX86EnablePaging32 (
+  **/
+  VOID
+  EFIAPI
+  InternalX86EnablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack
   );
 
-/**
-  Disables the 32-bit paging mode on the CPU.
+  /**
+    Disables the 32-bit paging mode on the CPU.
 
-  Disables the 32-bit paging mode on the CPU and returns to 32-bit protected
-  mode. This function assumes the current execution mode is 32-paged protected
-  mode. This function is only available on IA-32. After the 32-bit paging mode
-  is disabled, control is transferred to the function specified by EntryPoint
-  using the new stack specified by NewStack and passing in the parameters
-  specified by Context1 and Context2. Context1 and Context2 are optional and
-  may be NULL. The function EntryPoint must never return.
+    Disables the 32-bit paging mode on the CPU and returns to 32-bit protected
+    mode. This function assumes the current execution mode is 32-paged protected
+    mode. This function is only available on IA-32. After the 32-bit paging mode
+    is disabled, control is transferred to the function specified by EntryPoint
+    using the new stack specified by NewStack and passing in the parameters
+    specified by Context1 and Context2. Context1 and Context2 are optional and
+    may be NULL. The function EntryPoint must never return.
 
-  There are a number of constraints that must be followed before calling this
-  function:
-  1)  Interrupts must be disabled.
-  2)  The caller must be in 32-bit paged mode.
-  3)  CR0, CR3, and CR4 must be compatible with 32-bit paged mode.
-  4)  CR3 must point to valid page tables that guarantee that the pages for
-      this function and the stack are identity mapped.
+    There are a number of constraints that must be followed before calling this
+    function:
+    1)  Interrupts must be disabled.
+    2)  The caller must be in 32-bit paged mode.
+    3)  CR0, CR3, and CR4 must be compatible with 32-bit paged mode.
+    4)  CR3 must point to valid page tables that guarantee that the pages for
+        this function and the stack are identity mapped.
 
-  @param  EntryPoint  A pointer to function to call with the new stack after
-                      paging is disabled.
-  @param  Context1    A pointer to the context to pass into the EntryPoint
-                      function as the first parameter after paging is disabled.
-  @param  Context2    A pointer to the context to pass into the EntryPoint
-                      function as the second parameter after paging is
-                      disabled.
-  @param  NewStack    A pointer to the new stack to use for the EntryPoint
-                      function after paging is disabled.
+    @param  EntryPoint  A pointer to function to call with the new stack after
+                        paging is disabled.
+    @param  Context1    A pointer to the context to pass into the EntryPoint
+                        function as the first parameter after paging is disabled.
+    @param  Context2    A pointer to the context to pass into the EntryPoint
+                        function as the second parameter after paging is
+                        disabled.
+    @param  NewStack    A pointer to the new stack to use for the EntryPoint
+                        function after paging is disabled.
 
-**/
-VOID
-EFIAPI
-InternalX86DisablePaging32 (
+  **/
+  VOID
+  EFIAPI
+  InternalX86DisablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack
   );
 
-/**
-  Enables the 64-bit paging mode on the CPU.
+  /**
+    Enables the 64-bit paging mode on the CPU.
 
-  Enables the 64-bit paging mode on the CPU. CR0, CR3, CR4, and the page tables
-  must be properly initialized prior to calling this service. This function
-  assumes the current execution mode is 32-bit protected mode with flat
-  descriptors. This function is only available on IA-32. After the 64-bit
-  paging mode is enabled, control is transferred to the function specified by
-  EntryPoint using the new stack specified by NewStack and passing in the
-  parameters specified by Context1 and Context2. Context1 and Context2 are
-  optional and may be 0. The function EntryPoint must never return.
+    Enables the 64-bit paging mode on the CPU. CR0, CR3, CR4, and the page tables
+    must be properly initialized prior to calling this service. This function
+    assumes the current execution mode is 32-bit protected mode with flat
+    descriptors. This function is only available on IA-32. After the 64-bit
+    paging mode is enabled, control is transferred to the function specified by
+    EntryPoint using the new stack specified by NewStack and passing in the
+    parameters specified by Context1 and Context2. Context1 and Context2 are
+    optional and may be 0. The function EntryPoint must never return.
 
-  @param  Cs          The 16-bit selector to load in the CS before EntryPoint
-                      is called. The descriptor in the GDT that this selector
-                      references must be setup for long mode.
-  @param  EntryPoint  The 64-bit virtual address of the function to call with
-                      the new stack after paging is enabled.
-  @param  Context1    The 64-bit virtual address of the context to pass into
-                      the EntryPoint function as the first parameter after
-                      paging is enabled.
-  @param  Context2    The 64-bit virtual address of the context to pass into
-                      the EntryPoint function as the second parameter after
-                      paging is enabled.
-  @param  NewStack    The 64-bit virtual address of the new stack to use for
-                      the EntryPoint function after paging is enabled.
+    @param  Cs          The 16-bit selector to load in the CS before EntryPoint
+                        is called. The descriptor in the GDT that this selector
+                        references must be setup for long mode.
+    @param  EntryPoint  The 64-bit virtual address of the function to call with
+                        the new stack after paging is enabled.
+    @param  Context1    The 64-bit virtual address of the context to pass into
+                        the EntryPoint function as the first parameter after
+                        paging is enabled.
+    @param  Context2    The 64-bit virtual address of the context to pass into
+                        the EntryPoint function as the second parameter after
+                        paging is enabled.
+    @param  NewStack    The 64-bit virtual address of the new stack to use for
+                        the EntryPoint function after paging is enabled.
 
-**/
-VOID
-EFIAPI
-InternalX86EnablePaging64 (
+  **/
+  VOID
+  EFIAPI
+  InternalX86EnablePaging64 (
   IN      UINT16                    Cs,
   IN      UINT64                    EntryPoint,
-  IN      UINT64                    Context1,  OPTIONAL
-  IN      UINT64                    Context2,  OPTIONAL
+  IN      UINT64                    Context1, OPTIONAL
+  IN      UINT64                    Context2, OPTIONAL
   IN      UINT64                    NewStack
   );
 
-/**
-  Disables the 64-bit paging mode on the CPU.
+  /**
+    Disables the 64-bit paging mode on the CPU.
 
-  Disables the 64-bit paging mode on the CPU and returns to 32-bit protected
-  mode. This function assumes the current execution mode is 64-paging mode.
-  This function is only available on x64. After the 64-bit paging mode is
-  disabled, control is transferred to the function specified by EntryPoint
-  using the new stack specified by NewStack and passing in the parameters
-  specified by Context1 and Context2. Context1 and Context2 are optional and
-  may be 0. The function EntryPoint must never return.
+    Disables the 64-bit paging mode on the CPU and returns to 32-bit protected
+    mode. This function assumes the current execution mode is 64-paging mode.
+    This function is only available on x64. After the 64-bit paging mode is
+    disabled, control is transferred to the function specified by EntryPoint
+    using the new stack specified by NewStack and passing in the parameters
+    specified by Context1 and Context2. Context1 and Context2 are optional and
+    may be 0. The function EntryPoint must never return.
 
-  @param  Cs          The 16-bit selector to load in the CS before EntryPoint
-                      is called. The descriptor in the GDT that this selector
-                      references must be setup for 32-bit protected mode.
-  @param  EntryPoint  The 64-bit virtual address of the function to call with
-                      the new stack after paging is disabled.
-  @param  Context1    The 64-bit virtual address of the context to pass into
-                      the EntryPoint function as the first parameter after
-                      paging is disabled.
-  @param  Context2    The 64-bit virtual address of the context to pass into
-                      the EntryPoint function as the second parameter after
-                      paging is disabled.
-  @param  NewStack    The 64-bit virtual address of the new stack to use for
-                      the EntryPoint function after paging is disabled.
+    @param  Cs          The 16-bit selector to load in the CS before EntryPoint
+                        is called. The descriptor in the GDT that this selector
+                        references must be setup for 32-bit protected mode.
+    @param  EntryPoint  The 64-bit virtual address of the function to call with
+                        the new stack after paging is disabled.
+    @param  Context1    The 64-bit virtual address of the context to pass into
+                        the EntryPoint function as the first parameter after
+                        paging is disabled.
+    @param  Context2    The 64-bit virtual address of the context to pass into
+                        the EntryPoint function as the second parameter after
+                        paging is disabled.
+    @param  NewStack    The 64-bit virtual address of the new stack to use for
+                        the EntryPoint function after paging is disabled.
 
-**/
-VOID
-EFIAPI
-InternalX86DisablePaging64 (
+  **/
+  VOID
+  EFIAPI
+  InternalX86DisablePaging64 (
   IN      UINT16                    Cs,
   IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
+  IN      UINT32                    Context1, OPTIONAL
+  IN      UINT32                    Context2, OPTIONAL
   IN      UINT32                    NewStack
   );
 
-/**
-  Generates a 16-bit random number through RDRAND instruction.
+  /**
+    Generates a 16-bit random number through RDRAND instruction.
 
-  @param[out]  Rand     Buffer pointer to store the random result.
+    @param[out]  Rand     Buffer pointer to store the random result.
 
-  @retval TRUE          RDRAND call was successful.
-  @retval FALSE         Failed attempts to call RDRAND.
+    @retval TRUE          RDRAND call was successful.
+    @retval FALSE         Failed attempts to call RDRAND.
 
- **/
-BOOLEAN
-EFIAPI
-InternalX86RdRand16 (
+   **/
+  BOOLEAN
+  EFIAPI
+  InternalX86RdRand16 (
   OUT     UINT16                    *Rand
   );
 
-/**
-  Generates a 32-bit random number through RDRAND instruction.
+  /**
+    Generates a 32-bit random number through RDRAND instruction.
 
-  @param[out]  Rand     Buffer pointer to store the random result.
+    @param[out]  Rand     Buffer pointer to store the random result.
 
-  @retval TRUE          RDRAND call was successful.
-  @retval FALSE         Failed attempts to call RDRAND.
+    @retval TRUE          RDRAND call was successful.
+    @retval FALSE         Failed attempts to call RDRAND.
 
-**/
-BOOLEAN
-EFIAPI
-InternalX86RdRand32 (
+  **/
+  BOOLEAN
+  EFIAPI
+  InternalX86RdRand32 (
   OUT     UINT32                    *Rand
   );
 
-/**
-  Generates a 64-bit random number through RDRAND instruction.
+  /**
+    Generates a 64-bit random number through RDRAND instruction.
 
 
-  @param[out]  Rand     Buffer pointer to store the random result.
+    @param[out]  Rand     Buffer pointer to store the random result.
 
-  @retval TRUE          RDRAND call was successful.
-  @retval FALSE         Failed attempts to call RDRAND.
+    @retval TRUE          RDRAND call was successful.
+    @retval FALSE         Failed attempts to call RDRAND.
 
-**/
-BOOLEAN
-EFIAPI
-InternalX86RdRand64  (
+  **/
+  BOOLEAN
+  EFIAPI
+  InternalX86RdRand64  (
   OUT     UINT64                    *Rand
   );
 

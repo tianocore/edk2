@@ -39,4 +39,3 @@ AsmMonitor (
     _emit   0xc8
   }
 }
-

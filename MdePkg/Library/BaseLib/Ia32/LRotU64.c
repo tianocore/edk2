@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Rotates a 64-bit integer left between 0 and 63 bits, filling
   the low bits with the high bits that were rotated.
@@ -43,7 +40,6 @@ InternalMathLRotU64 (
     mov     ecx, eax
     mov     eax, edx
     mov     edx, ecx
-L0:
+    L0 :
   }
 }
-

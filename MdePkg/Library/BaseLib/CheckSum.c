@@ -34,19 +34,18 @@ CalculateSum8 (
   IN      UINTN                     Length
   )
 {
-  UINT8     Sum;
-  UINTN     Count;
+  UINT8  Sum;
+  UINTN  Count;
 
   ASSERT (Buffer != NULL);
-  ASSERT (Length <= (MAX_ADDRESS - ((UINTN) Buffer) + 1));
+  ASSERT (Length <= (MAX_ADDRESS - ((UINTN)Buffer) + 1));
 
   for (Sum = 0, Count = 0; Count < Length; Count++) {
-    Sum = (UINT8) (Sum + *(Buffer + Count));
+    Sum = (UINT8)(Sum + *(Buffer + Count));
   }
 
   return Sum;
 }
-
 
 /**
   Returns the two's complement checksum of all elements in a buffer
@@ -73,14 +72,14 @@ CalculateCheckSum8 (
   IN      UINTN                     Length
   )
 {
-  UINT8     CheckSum;
+  UINT8  CheckSum;
 
   CheckSum = CalculateSum8 (Buffer, Length);
 
   //
   // Return the checksum based on 2's complement.
   //
-  return (UINT8) (0x100 - CheckSum);
+  return (UINT8)(0x100 - CheckSum);
 }
 
 /**
@@ -109,23 +108,22 @@ CalculateSum16 (
   IN      UINTN                     Length
   )
 {
-  UINT16    Sum;
-  UINTN     Count;
-  UINTN     Total;
+  UINT16  Sum;
+  UINTN   Count;
+  UINTN   Total;
 
   ASSERT (Buffer != NULL);
-  ASSERT (((UINTN) Buffer & 0x1) == 0);
+  ASSERT (((UINTN)Buffer & 0x1) == 0);
   ASSERT ((Length & 0x1) == 0);
-  ASSERT (Length <= (MAX_ADDRESS - ((UINTN) Buffer) + 1));
+  ASSERT (Length <= (MAX_ADDRESS - ((UINTN)Buffer) + 1));
 
   Total = Length / sizeof (*Buffer);
   for (Sum = 0, Count = 0; Count < Total; Count++) {
-    Sum = (UINT16) (Sum + *(Buffer + Count));
+    Sum = (UINT16)(Sum + *(Buffer + Count));
   }
 
   return Sum;
 }
-
 
 /**
   Returns the two's complement checksum of all elements in a buffer of
@@ -154,16 +152,15 @@ CalculateCheckSum16 (
   IN      UINTN                     Length
   )
 {
-  UINT16     CheckSum;
+  UINT16  CheckSum;
 
   CheckSum = CalculateSum16 (Buffer, Length);
 
   //
   // Return the checksum based on 2's complement.
   //
-  return (UINT16) (0x10000 - CheckSum);
+  return (UINT16)(0x10000 - CheckSum);
 }
-
 
 /**
   Returns the sum of all elements in a buffer of 32-bit values. During
@@ -191,14 +188,14 @@ CalculateSum32 (
   IN      UINTN                     Length
   )
 {
-  UINT32    Sum;
-  UINTN     Count;
-  UINTN     Total;
+  UINT32  Sum;
+  UINTN   Count;
+  UINTN   Total;
 
   ASSERT (Buffer != NULL);
-  ASSERT (((UINTN) Buffer & 0x3) == 0);
+  ASSERT (((UINTN)Buffer & 0x3) == 0);
   ASSERT ((Length & 0x3) == 0);
-  ASSERT (Length <= (MAX_ADDRESS - ((UINTN) Buffer) + 1));
+  ASSERT (Length <= (MAX_ADDRESS - ((UINTN)Buffer) + 1));
 
   Total = Length / sizeof (*Buffer);
   for (Sum = 0, Count = 0; Count < Total; Count++) {
@@ -207,7 +204,6 @@ CalculateSum32 (
 
   return Sum;
 }
-
 
 /**
   Returns the two's complement checksum of all elements in a buffer of
@@ -236,16 +232,15 @@ CalculateCheckSum32 (
   IN      UINTN                     Length
   )
 {
-  UINT32     CheckSum;
+  UINT32  CheckSum;
 
   CheckSum = CalculateSum32 (Buffer, Length);
 
   //
   // Return the checksum based on 2's complement.
   //
-  return (UINT32) ((UINT32)(-1) - CheckSum + 1);
+  return (UINT32)((UINT32)(-1) - CheckSum + 1);
 }
-
 
 /**
   Returns the sum of all elements in a buffer of 64-bit values.  During
@@ -273,14 +268,14 @@ CalculateSum64 (
   IN      UINTN                     Length
   )
 {
-  UINT64    Sum;
-  UINTN     Count;
-  UINTN     Total;
+  UINT64  Sum;
+  UINTN   Count;
+  UINTN   Total;
 
   ASSERT (Buffer != NULL);
-  ASSERT (((UINTN) Buffer & 0x7) == 0);
+  ASSERT (((UINTN)Buffer & 0x7) == 0);
   ASSERT ((Length & 0x7) == 0);
-  ASSERT (Length <= (MAX_ADDRESS - ((UINTN) Buffer) + 1));
+  ASSERT (Length <= (MAX_ADDRESS - ((UINTN)Buffer) + 1));
 
   Total = Length / sizeof (*Buffer);
   for (Sum = 0, Count = 0; Count < Total; Count++) {
@@ -289,7 +284,6 @@ CalculateSum64 (
 
   return Sum;
 }
-
 
 /**
   Returns the two's complement checksum of all elements in a buffer of
@@ -318,14 +312,14 @@ CalculateCheckSum64 (
   IN      UINTN                     Length
   )
 {
-  UINT64     CheckSum;
+  UINT64  CheckSum;
 
   CheckSum = CalculateSum64 (Buffer, Length);
 
   //
   // Return the checksum based on 2's complement.
   //
-  return (UINT64) ((UINT64)(-1) - CheckSum + 1);
+  return (UINT64)((UINT64)(-1) - CheckSum + 1);
 }
 
 GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT32  mCrcTable[256] = {
@@ -602,7 +596,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT32  mCrcTable[256] = {
 **/
 UINT32
 EFIAPI
-CalculateCrc32(
+CalculateCrc32 (
   IN  VOID                         *Buffer,
   IN  UINTN                        Length
   )
@@ -612,14 +606,14 @@ CalculateCrc32(
   UINT8   *Ptr;
 
   ASSERT (Buffer != NULL);
-  ASSERT (Length <= (MAX_ADDRESS - ((UINTN) Buffer) + 1));
+  ASSERT (Length <= (MAX_ADDRESS - ((UINTN)Buffer) + 1));
 
   //
   // Compute CRC
   //
   Crc = 0xffffffff;
   for (Index = 0, Ptr = Buffer; Index < Length; Index++, Ptr++) {
-    Crc = (Crc >> 8) ^ mCrcTable[(UINT8) Crc ^ *Ptr];
+    Crc = (Crc >> 8) ^ mCrcTable[(UINT8)Crc ^ *Ptr];
   }
 
   return Crc ^ 0xffffffff;

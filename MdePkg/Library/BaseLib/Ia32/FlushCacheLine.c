@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Flushes a cache line from all the instruction and data caches within the
   coherency domain of the CPU.
@@ -49,4 +46,3 @@ Done:
 
   return LinearAddress;
 }
-

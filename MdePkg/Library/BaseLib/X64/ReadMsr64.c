@@ -12,7 +12,10 @@
 
 #include <Library/RegisterFilterLib.h>
 
-unsigned __int64 __readmsr (int register);
+unsigned __int64
+__readmsr (
+  int register
+  );
 
 #pragma intrinsic(__readmsr)
 
@@ -30,15 +33,15 @@ AsmReadMsr64 (
   IN UINT32  Index
   )
 {
-  UINT64                            Value;
-  BOOLEAN                           Flag;
+  UINT64   Value;
+  BOOLEAN  Flag;
 
   Flag = FilterBeforeMsrRead (Index, &Value);
   if (Flag) {
     Value = __readmsr (Index);
   }
+
   FilterAfterMsrRead (Index, &Value);
 
   return Value;
 }
-

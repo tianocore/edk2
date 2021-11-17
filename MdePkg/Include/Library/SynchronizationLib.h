@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// Definitions for SPIN_LOCK
 ///
-typedef volatile UINTN              SPIN_LOCK;
-
+typedef volatile UINTN SPIN_LOCK;
 
 /**
   Retrieves the architecture-specific spin lock alignment requirements for
@@ -37,7 +36,6 @@ GetSpinLockProperties (
   VOID
   );
 
-
 /**
   Initializes a spin lock to the released state and returns the spin lock.
 
@@ -59,7 +57,6 @@ EFIAPI
 InitializeSpinLock (
   OUT      SPIN_LOCK                 *SpinLock
   );
-
 
 /**
   Waits until a spin lock can be placed in the acquired state.
@@ -87,7 +84,6 @@ AcquireSpinLock (
   IN OUT  SPIN_LOCK                 *SpinLock
   );
 
-
 /**
   Attempts to place a spin lock in the acquired state.
 
@@ -111,7 +107,6 @@ AcquireSpinLockOrFail (
   IN OUT  SPIN_LOCK                 *SpinLock
   );
 
-
 /**
   Releases a spin lock.
 
@@ -131,7 +126,6 @@ EFIAPI
 ReleaseSpinLock (
   IN OUT  SPIN_LOCK                 *SpinLock
   );
-
 
 /**
   Performs an atomic increment of a 32-bit unsigned integer.
@@ -153,7 +147,6 @@ InterlockedIncrement (
   IN      volatile UINT32           *Value
   );
 
-
 /**
   Performs an atomic decrement of a 32-bit unsigned integer.
 
@@ -173,7 +166,6 @@ EFIAPI
 InterlockedDecrement (
   IN      volatile UINT32           *Value
   );
-
 
 /**
   Performs an atomic compare exchange operation on a 16-bit unsigned integer.
@@ -228,7 +220,6 @@ InterlockedCompareExchange32 (
   IN      UINT32                    ExchangeValue
   );
 
-
 /**
   Performs an atomic compare exchange operation on a 64-bit unsigned integer.
 
@@ -255,7 +246,6 @@ InterlockedCompareExchange64 (
   IN      UINT64                    ExchangeValue
   );
 
-
 /**
   Performs an atomic compare exchange operation on a pointer value.
 
@@ -277,11 +267,9 @@ InterlockedCompareExchange64 (
 VOID *
 EFIAPI
 InterlockedCompareExchangePointer (
-  IN OUT  VOID                      * volatile *Value,
+  IN OUT  VOID                      *volatile *Value,
   IN      VOID                      *CompareValue,
   IN      VOID                      *ExchangeValue
   );
 
 #endif
-
-

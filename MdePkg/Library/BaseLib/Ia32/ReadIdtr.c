@@ -6,9 +6,7 @@
 
 **/
 
-
 #include "BaseLibInternals.h"
-
 
 /**
   Reads the current Interrupt Descriptor Table Register(GDTR) descriptor.

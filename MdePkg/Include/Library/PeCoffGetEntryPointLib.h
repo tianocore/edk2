@@ -76,7 +76,6 @@ PeCoffLoaderGetPdbPointer (
   IN VOID  *Pe32Data
   );
 
-
 /**
   Returns the size of the PE/COFF headers
 

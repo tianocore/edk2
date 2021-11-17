@@ -333,4 +333,3 @@ IoWriteFifo32 (
 {
   ASSERT (FALSE);
 }
-

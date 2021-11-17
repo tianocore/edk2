@@ -6,9 +6,7 @@
 
 **/
 
-
 #include "BaseLibInternals.h"
-
 
 /**
   Writes the current Global Descriptor Table Register (GDTR) descriptor.
@@ -30,4 +28,3 @@ InternalX86WriteGdtr (
     lgdt    fword ptr [eax]
   }
 }
-

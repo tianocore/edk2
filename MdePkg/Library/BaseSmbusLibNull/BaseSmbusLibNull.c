@@ -130,6 +130,7 @@ SmBusReceiveByte (
   if (Status != NULL) {
     *Status = RETURN_UNSUPPORTED;
   }
+
   return 0;
 }
 
@@ -175,6 +176,7 @@ SmBusSendByte (
   if (Status != NULL) {
     *Status = RETURN_UNSUPPORTED;
   }
+
   return 0;
 }
 
@@ -216,6 +218,7 @@ SmBusReadDataByte (
   if (Status != NULL) {
     *Status = RETURN_UNSUPPORTED;
   }
+
   return 0;
 }
 
@@ -260,6 +263,7 @@ SmBusWriteDataByte (
   if (Status != NULL) {
     *Status = RETURN_UNSUPPORTED;
   }
+
   return 0;
 }
 
@@ -301,6 +305,7 @@ SmBusReadDataWord (
   if (Status != NULL) {
     *Status = RETURN_UNSUPPORTED;
   }
+
   return 0;
 }
 
@@ -345,6 +350,7 @@ SmBusWriteDataWord (
   if (Status != NULL) {
     *Status = RETURN_UNSUPPORTED;
   }
+
   return 0;
 }
 
@@ -389,6 +395,7 @@ SmBusProcessCall (
   if (Status != NULL) {
     *Status = RETURN_UNSUPPORTED;
   }
+
   return 0;
 }
 
@@ -437,6 +444,7 @@ SmBusReadBlock (
   if (Status != NULL) {
     *Status = RETURN_UNSUPPORTED;
   }
+
   return 0;
 }
 
@@ -483,6 +491,7 @@ SmBusWriteBlock (
   if (Status != NULL) {
     *Status = RETURN_UNSUPPORTED;
   }
+
   return 0;
 }
 
@@ -534,5 +543,6 @@ SmBusBlockProcessCall (
   if (Status != NULL) {
     *Status = RETURN_UNSUPPORTED;
   }
+
   return 0;
 }

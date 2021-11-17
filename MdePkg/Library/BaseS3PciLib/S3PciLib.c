@@ -9,7 +9,6 @@
 
 **/
 
-
 #include <Base.h>
 
 #include <Library/DebugLib.h>
@@ -41,11 +40,11 @@ InternalSavePciWriteValueToBootScript (
   IN VOID                   *Buffer
   )
 {
-  RETURN_STATUS                Status;
+  RETURN_STATUS  Status;
 
   Status = S3BootScriptSavePciCfgWrite (
              Width,
-             PCILIB_TO_COMMON_ADDRESS(Address),
+             PCILIB_TO_COMMON_ADDRESS (Address),
              1,
              Buffer
              );
@@ -1202,7 +1201,7 @@ S3PciReadBuffer (
   OUT VOID                     *Buffer
   )
 {
-  RETURN_STATUS    Status;
+  RETURN_STATUS  Status;
 
   Status = S3BootScriptSavePciCfgWrite (
              S3BootScriptWidthUint8,
@@ -1210,7 +1209,7 @@ S3PciReadBuffer (
              PciReadBuffer (StartAddress, Size, Buffer),
              Buffer
              );
- ASSERT (Status == RETURN_SUCCESS);
+  ASSERT (Status == RETURN_SUCCESS);
 
   return Size;
 }
@@ -1248,7 +1247,7 @@ S3PciWriteBuffer (
   IN VOID                      *Buffer
   )
 {
-  RETURN_STATUS    Status;
+  RETURN_STATUS  Status;
 
   Status = S3BootScriptSavePciCfgWrite (
              S3BootScriptWidthUint8,

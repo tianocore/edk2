@@ -28,7 +28,7 @@ InternalMemCopyMem (
   IN      UINTN                     Length
   )
 {
-  gBS->CopyMem (Destination, (VOID*)Source, Length);
+  gBS->CopyMem (Destination, (VOID *)Source, Length);
   return Destination;
 }
 

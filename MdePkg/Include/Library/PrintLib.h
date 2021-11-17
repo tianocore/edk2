@@ -192,10 +192,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// Flags bitmask values use in UnicodeValueToString() and
 /// AsciiValueToString()
 ///
-#define LEFT_JUSTIFY      0x01
-#define COMMA_TYPE        0x08
-#define PREFIX_ZERO       0x20
-#define RADIX_HEX         0x80
+#define LEFT_JUSTIFY  0x01
+#define COMMA_TYPE    0x08
+#define PREFIX_ZERO   0x20
+#define RADIX_HEX     0x80
 
 /**
   Produces a Null-terminated Unicode string in an output buffer based on
@@ -825,7 +825,6 @@ AsciiSPrintUnicodeFormat (
   IN  CONST CHAR16  *FormatString,
   ...
   );
-
 
 /**
   Converts a decimal value to a Null-terminated Ascii string.

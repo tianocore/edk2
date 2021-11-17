@@ -15,7 +15,6 @@
 #include <Library/IoLib.h>
 #include <Library/S3BootScriptLib.h>
 
-
 /**
   Saves an I/O port value to the boot script.
 
@@ -36,7 +35,7 @@ InternalSaveIoWriteValueToBootScript (
   IN VOID                   *Buffer
   )
 {
-  RETURN_STATUS                Status;
+  RETURN_STATUS  Status;
 
   Status = S3BootScriptSaveIoWrite (
              Width,
@@ -1490,7 +1489,7 @@ InternalSaveMmioWriteValueToBootScript (
   IN VOID                   *Buffer
   )
 {
-  RETURN_STATUS            Status;
+  RETURN_STATUS  Status;
 
   Status = S3BootScriptSaveMemWrite (
              Width,
@@ -2957,7 +2956,7 @@ S3MmioReadBuffer8 (
   OUT UINT8       *Buffer
   )
 {
-  UINT8       *ReturnBuffer;
+  UINT8          *ReturnBuffer;
   RETURN_STATUS  Status;
 
   ReturnBuffer = MmioReadBuffer8 (StartAddress, Length, Buffer);
@@ -3004,8 +3003,8 @@ S3MmioReadBuffer16 (
   OUT UINT16      *Buffer
   )
 {
-  UINT16       *ReturnBuffer;
-  RETURN_STATUS   Status;
+  UINT16         *ReturnBuffer;
+  RETURN_STATUS  Status;
 
   ReturnBuffer = MmioReadBuffer16 (StartAddress, Length, Buffer);
 
@@ -3051,7 +3050,7 @@ S3MmioReadBuffer32 (
   OUT UINT32      *Buffer
   )
 {
-  UINT32      *ReturnBuffer;
+  UINT32         *ReturnBuffer;
   RETURN_STATUS  Status;
 
   ReturnBuffer = MmioReadBuffer32 (StartAddress, Length, Buffer);
@@ -3098,7 +3097,7 @@ S3MmioReadBuffer64 (
   OUT UINT64      *Buffer
   )
 {
-  UINT64      *ReturnBuffer;
+  UINT64         *ReturnBuffer;
   RETURN_STATUS  Status;
 
   ReturnBuffer = MmioReadBuffer64 (StartAddress, Length, Buffer);
@@ -3113,7 +3112,6 @@ S3MmioReadBuffer64 (
 
   return ReturnBuffer;
 }
-
 
 /**
   Copy data from system memory to MMIO region by using 8-bit access
@@ -3142,7 +3140,7 @@ S3MmioWriteBuffer8 (
   IN  CONST UINT8   *Buffer
   )
 {
-  UINT8       *ReturnBuffer;
+  UINT8          *ReturnBuffer;
   RETURN_STATUS  Status;
 
   ReturnBuffer = MmioWriteBuffer8 (StartAddress, Length, Buffer);
@@ -3190,7 +3188,7 @@ S3MmioWriteBuffer16 (
   IN  CONST UINT16 *Buffer
   )
 {
-  UINT16      *ReturnBuffer;
+  UINT16         *ReturnBuffer;
   RETURN_STATUS  Status;
 
   ReturnBuffer = MmioWriteBuffer16 (StartAddress, Length, Buffer);
@@ -3205,7 +3203,6 @@ S3MmioWriteBuffer16 (
 
   return ReturnBuffer;
 }
-
 
 /**
   Copy data from system memory to MMIO region by using 32-bit access
@@ -3239,7 +3236,7 @@ S3MmioWriteBuffer32 (
   IN  CONST UINT32 *Buffer
   )
 {
-  UINT32      *ReturnBuffer;
+  UINT32         *ReturnBuffer;
   RETURN_STATUS  Status;
 
   ReturnBuffer = MmioWriteBuffer32 (StartAddress, Length, Buffer);
@@ -3287,7 +3284,7 @@ S3MmioWriteBuffer64 (
   IN  CONST UINT64 *Buffer
   )
 {
-  UINT64      *ReturnBuffer;
+  UINT64         *ReturnBuffer;
   RETURN_STATUS  Status;
 
   ReturnBuffer = MmioWriteBuffer64 (StartAddress, Length, Buffer);
@@ -3302,4 +3299,3 @@ S3MmioWriteBuffer64 (
 
   return ReturnBuffer;
 }
-

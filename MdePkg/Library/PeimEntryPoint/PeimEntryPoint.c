@@ -6,9 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include <PiPei.h>
-
 
 #include <Library/PeimEntryPoint.h>
 #include <Library/DebugLib.h>
@@ -50,7 +48,6 @@ _ModuleEntryPoint (
   //
   return ProcessModuleEntryPointList (FileHandle, PeiServices);
 }
-
 
 /**
   Required by the EBC compiler and identical in functionality to _ModuleEntryPoint().

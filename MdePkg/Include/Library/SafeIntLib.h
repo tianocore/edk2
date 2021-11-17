@@ -8,6 +8,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __INT_SAFE_LIB_H__
 #define __INT_SAFE_LIB_H__
 
@@ -40,14 +41,14 @@
 #define SafeIntnToChar16    SafeIntnToUint16
 #define SafeUintnToChar16   SafeUintnToUint16
 
-#define SafeChar16ToInt8    SafeUint16ToInt8
-#define SafeChar16ToUint8   SafeUint16ToUint8
-#define SafeChar16ToChar8   SafeUint16ToChar8
-#define SafeChar16ToInt16   SafeUint16ToInt16
+#define SafeChar16ToInt8   SafeUint16ToInt8
+#define SafeChar16ToUint8  SafeUint16ToUint8
+#define SafeChar16ToChar8  SafeUint16ToChar8
+#define SafeChar16ToInt16  SafeUint16ToInt16
 
-#define SafeChar16Mult      SafeUint16Mult
-#define SafeChar16Sub       SafeUint16Sub
-#define SafeChar16Add       SafeUint16Add
+#define SafeChar16Mult  SafeUint16Mult
+#define SafeChar16Sub   SafeUint16Sub
+#define SafeChar16Add   SafeUint16Add
 
 //
 // Conversion functions
@@ -711,7 +712,6 @@ SafeInt32ToUint16 (
   IN  INT32   Operand,
   OUT UINT16  *Result
   );
-
 
 /**
   INT32 -> UINT32 conversion

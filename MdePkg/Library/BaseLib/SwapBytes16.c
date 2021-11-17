@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 #include "BaseLibInternals.h"
 
 /**
@@ -29,5 +26,5 @@ SwapBytes16 (
   IN      UINT16                    Value
   )
 {
-  return (UINT16) ((Value<< 8) | (Value>> 8));
+  return (UINT16)((Value<< 8) | (Value>> 8));
 }

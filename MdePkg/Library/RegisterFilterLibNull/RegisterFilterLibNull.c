@@ -81,13 +81,13 @@ FilterBeforeIoWrite (
   return TRUE;
 }
 
-  /**
-  Trace IO Write operation after wirte IO port.
-  It is used to trace IO operation.
+/**
+Trace IO Write operation after wirte IO port.
+It is used to trace IO operation.
 
-  @param[in]       Width    Signifies the width of the I/O operation.
-  @param[in]       Address  The base address of the I/O operation.
-  @param[in]       Buffer   The source buffer from which to Write data.
+@param[in]       Width    Signifies the width of the I/O operation.
+@param[in]       Address  The base address of the I/O operation.
+@param[in]       Buffer   The source buffer from which to Write data.
 
 **/
 VOID
@@ -268,4 +268,3 @@ FilterAfterMsrWrite (
 {
   return;
 }
-

@@ -20,12 +20,11 @@
 //
 // Macro definitions for RISC-V architecture.
 //
-#define RV_X(x, s, n) (((x) >> (s)) & ((1<<(n))-1))
-#define RISCV_IMM_BITS 12
-#define RISCV_IMM_REACH (1LL<<RISCV_IMM_BITS)
+#define RV_X(x, s, n)  (((x) >> (s)) & ((1<<(n))-1))
+#define RISCV_IMM_BITS   12
+#define RISCV_IMM_REACH  (1LL<<RISCV_IMM_BITS)
 #define RISCV_CONST_HIGH_PART(VALUE) \
   (((VALUE) + (RISCV_IMM_REACH/2)) & ~(RISCV_IMM_REACH-1))
-
 
 /**
   Performs an Itanium-based specific relocation fixup and is a no-op on other
@@ -47,7 +46,6 @@ PeCoffLoaderRelocateImageEx (
   IN UINT64      Adjust
   );
 
-
 /**
   Performs an Itanium-based specific re-relocation fixup and is a no-op on other
   instruction sets. This is used to re-relocated the image into the EFI virtual
@@ -68,7 +66,6 @@ PeHotRelocateImageEx (
   IN OUT CHAR8   **FixupData,
   IN UINT64      Adjust
   );
-
 
 /**
   Returns TRUE if the machine type of PE/COFF image is supported. Supported

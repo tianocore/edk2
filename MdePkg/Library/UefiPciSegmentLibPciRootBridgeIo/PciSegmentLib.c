@@ -11,8 +11,8 @@
 //
 // Global variable to record data of PCI Root Bridge I/O Protocol instances
 //
-PCI_ROOT_BRIDGE_DATA   *mPciRootBridgeData     = NULL;
-UINTN                  mNumberOfPciRootBridges = 0;
+PCI_ROOT_BRIDGE_DATA  *mPciRootBridgeData     = NULL;
+UINTN                 mNumberOfPciRootBridges = 0;
 
 /**
   The constructor function caches data of PCI Root Bridge I/O Protocol instances.
@@ -34,12 +34,12 @@ PciSegmentLibConstructor (
   IN EFI_SYSTEM_TABLE          *SystemTable
   )
 {
-  EFI_STATUS                           Status;
-  UINTN                                Index;
-  UINTN                                HandleCount;
-  EFI_HANDLE                           *HandleBuffer;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL      *PciRootBridgeIo;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR    *Descriptors;
+  EFI_STATUS                         Status;
+  UINTN                              Index;
+  UINTN                              HandleCount;
+  EFI_HANDLE                         *HandleBuffer;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL    *PciRootBridgeIo;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptors;
 
   HandleCount     = 0;
   HandleBuffer    = NULL;
@@ -68,14 +68,14 @@ PciSegmentLibConstructor (
     Status = gBS->HandleProtocol (
                     HandleBuffer[Index],
                     &gEfiPciRootBridgeIoProtocolGuid,
-                    (VOID **) &PciRootBridgeIo
+                    (VOID **)&PciRootBridgeIo
                     );
     ASSERT_EFI_ERROR (Status);
 
     mPciRootBridgeData[Index].PciRootBridgeIo = PciRootBridgeIo;
     mPciRootBridgeData[Index].SegmentNumber   = PciRootBridgeIo->SegmentNumber;
 
-    Status = PciRootBridgeIo->Configuration (PciRootBridgeIo, (VOID **) &Descriptors);
+    Status = PciRootBridgeIo->Configuration (PciRootBridgeIo, (VOID **)&Descriptors);
     ASSERT_EFI_ERROR (Status);
 
     while (Descriptors->Desc != ACPI_END_TAG_DESCRIPTOR) {
@@ -84,12 +84,14 @@ PciSegmentLibConstructor (
         mPciRootBridgeData[Index].MaxBusNumber = Descriptors->AddrRangeMax;
         break;
       }
+
       Descriptors++;
     }
+
     ASSERT (Descriptors->Desc != ACPI_END_TAG_DESCRIPTOR);
   }
 
-  FreePool(HandleBuffer);
+  FreePool (HandleBuffer);
 
   return EFI_SUCCESS;
 }
@@ -135,9 +137,9 @@ PciSegmentLibSearchForRootBridge (
   IN UINT64                    Address
   )
 {
-  UINTN                              Index;
-  UINT64                             SegmentNumber;
-  UINT64                             BusNumber;
+  UINTN   Index;
+  UINT64  SegmentNumber;
+  UINT64  BusNumber;
 
   for (Index = 0; Index < mNumberOfPciRootBridges; Index++) {
     //
@@ -149,11 +151,12 @@ PciSegmentLibSearchForRootBridge (
       // Matches the bus number of address with bus number range of protocol instance.
       //
       BusNumber = BitFieldRead64 (Address, 20, 27);
-      if (BusNumber >= mPciRootBridgeData[Index].MinBusNumber && BusNumber <= mPciRootBridgeData[Index].MaxBusNumber) {
+      if ((BusNumber >= mPciRootBridgeData[Index].MinBusNumber) && (BusNumber <= mPciRootBridgeData[Index].MaxBusNumber)) {
         return mPciRootBridgeData[Index].PciRootBridgeIo;
       }
     }
   }
+
   return NULL;
 }
 
@@ -177,8 +180,8 @@ DxePciSegmentLibPciRootBridgeIoReadWorker (
   IN  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width
   )
 {
-  UINT32                               Data;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL      *PciRootBridgeIo;
+  UINT32                           Data;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo;
 
   PciRootBridgeIo = PciSegmentLibSearchForRootBridge (Address);
   ASSERT (PciRootBridgeIo != NULL);
@@ -217,7 +220,7 @@ DxePciSegmentLibPciRootBridgeIoWriteWorker (
   IN  UINT32                                 Data
   )
 {
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL      *PciRootBridgeIo;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo;
 
   PciRootBridgeIo = PciSegmentLibSearchForRootBridge (Address);
   ASSERT (PciRootBridgeIo != NULL);
@@ -282,7 +285,7 @@ PciSegmentRead8 (
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 0);
 
-  return (UINT8) DxePciSegmentLibPciRootBridgeIoReadWorker (Address, EfiPciWidthUint8);
+  return (UINT8)DxePciSegmentLibPciRootBridgeIoReadWorker (Address, EfiPciWidthUint8);
 }
 
 /**
@@ -308,7 +311,7 @@ PciSegmentWrite8 (
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 0);
 
-  return (UINT8) DxePciSegmentLibPciRootBridgeIoWriteWorker (Address, EfiPciWidthUint8, Value);
+  return (UINT8)DxePciSegmentLibPciRootBridgeIoWriteWorker (Address, EfiPciWidthUint8, Value);
 }
 
 /**
@@ -335,7 +338,7 @@ PciSegmentOr8 (
   IN UINT8                     OrData
   )
 {
-  return PciSegmentWrite8 (Address, (UINT8) (PciSegmentRead8 (Address) | OrData));
+  return PciSegmentWrite8 (Address, (UINT8)(PciSegmentRead8 (Address) | OrData));
 }
 
 /**
@@ -361,7 +364,7 @@ PciSegmentAnd8 (
   IN UINT8                     AndData
   )
 {
-  return PciSegmentWrite8 (Address, (UINT8) (PciSegmentRead8 (Address) & AndData));
+  return PciSegmentWrite8 (Address, (UINT8)(PciSegmentRead8 (Address) & AndData));
 }
 
 /**
@@ -392,7 +395,7 @@ PciSegmentAndThenOr8 (
   IN UINT8                     OrData
   )
 {
-  return PciSegmentWrite8 (Address, (UINT8) ((PciSegmentRead8 (Address) & AndData) | OrData));
+  return PciSegmentWrite8 (Address, (UINT8)((PciSegmentRead8 (Address) & AndData) | OrData));
 }
 
 /**
@@ -618,7 +621,7 @@ PciSegmentRead16 (
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 1);
 
-  return (UINT16) DxePciSegmentLibPciRootBridgeIoReadWorker (Address, EfiPciWidthUint16);
+  return (UINT16)DxePciSegmentLibPciRootBridgeIoReadWorker (Address, EfiPciWidthUint16);
 }
 
 /**
@@ -645,7 +648,7 @@ PciSegmentWrite16 (
 {
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (Address, 1);
 
-  return (UINT16) DxePciSegmentLibPciRootBridgeIoWriteWorker (Address, EfiPciWidthUint16, Value);
+  return (UINT16)DxePciSegmentLibPciRootBridgeIoWriteWorker (Address, EfiPciWidthUint16, Value);
 }
 
 /**
@@ -675,7 +678,7 @@ PciSegmentOr16 (
   IN UINT16                    OrData
   )
 {
-  return PciSegmentWrite16 (Address, (UINT16) (PciSegmentRead16 (Address) | OrData));
+  return PciSegmentWrite16 (Address, (UINT16)(PciSegmentRead16 (Address) | OrData));
 }
 
 /**
@@ -703,7 +706,7 @@ PciSegmentAnd16 (
   IN UINT16                    AndData
   )
 {
-  return PciSegmentWrite16 (Address, (UINT16) (PciSegmentRead16 (Address) & AndData));
+  return PciSegmentWrite16 (Address, (UINT16)(PciSegmentRead16 (Address) & AndData));
 }
 
 /**
@@ -735,7 +738,7 @@ PciSegmentAndThenOr16 (
   IN UINT16                    OrData
   )
 {
-  return PciSegmentWrite16 (Address, (UINT16) ((PciSegmentRead16 (Address) & AndData) | OrData));
+  return PciSegmentWrite16 (Address, (UINT16)((PciSegmentRead16 (Address) & AndData) | OrData));
 }
 
 /**
@@ -1319,7 +1322,7 @@ PciSegmentReadBuffer (
   OUT VOID                     *Buffer
   )
 {
-  UINTN                                ReturnValue;
+  UINTN  ReturnValue;
 
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (StartAddress, 0);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
@@ -1341,18 +1344,18 @@ PciSegmentReadBuffer (
     //
     *(volatile UINT8 *)Buffer = PciSegmentRead8 (StartAddress);
     StartAddress += sizeof (UINT8);
-    Size -= sizeof (UINT8);
-    Buffer = (UINT8*)Buffer + 1;
+    Size  -= sizeof (UINT8);
+    Buffer = (UINT8 *)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (StartAddress & BIT1) != 0) {
+  if ((Size >= sizeof (UINT16)) && ((StartAddress & BIT1) != 0)) {
     //
     // Read a word if StartAddress is word aligned
     //
     WriteUnaligned16 (Buffer, PciSegmentRead16 (StartAddress));
     StartAddress += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size  -= sizeof (UINT16);
+    Buffer = (UINT16 *)Buffer + 1;
   }
 
   while (Size >= sizeof (UINT32)) {
@@ -1361,8 +1364,8 @@ PciSegmentReadBuffer (
     //
     WriteUnaligned32 (Buffer, PciSegmentRead32 (StartAddress));
     StartAddress += sizeof (UINT32);
-    Size -= sizeof (UINT32);
-    Buffer = (UINT32*)Buffer + 1;
+    Size  -= sizeof (UINT32);
+    Buffer = (UINT32 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT16)) {
@@ -1371,8 +1374,8 @@ PciSegmentReadBuffer (
     //
     WriteUnaligned16 (Buffer, PciSegmentRead16 (StartAddress));
     StartAddress += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size  -= sizeof (UINT16);
+    Buffer = (UINT16 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT8)) {
@@ -1417,7 +1420,7 @@ PciSegmentWriteBuffer (
   IN VOID                      *Buffer
   )
 {
-  UINTN                                ReturnValue;
+  UINTN  ReturnValue;
 
   ASSERT_INVALID_PCI_SEGMENT_ADDRESS (StartAddress, 0);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
@@ -1437,20 +1440,20 @@ PciSegmentWriteBuffer (
     //
     // Write a byte if StartAddress is byte aligned
     //
-    PciSegmentWrite8 (StartAddress, *(UINT8*)Buffer);
+    PciSegmentWrite8 (StartAddress, *(UINT8 *)Buffer);
     StartAddress += sizeof (UINT8);
-    Size -= sizeof (UINT8);
-    Buffer = (UINT8*)Buffer + 1;
+    Size  -= sizeof (UINT8);
+    Buffer = (UINT8 *)Buffer + 1;
   }
 
-  if (Size >= sizeof (UINT16) && (StartAddress & BIT1) != 0) {
+  if ((Size >= sizeof (UINT16)) && ((StartAddress & BIT1) != 0)) {
     //
     // Write a word if StartAddress is word aligned
     //
     PciSegmentWrite16 (StartAddress, ReadUnaligned16 (Buffer));
     StartAddress += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size  -= sizeof (UINT16);
+    Buffer = (UINT16 *)Buffer + 1;
   }
 
   while (Size >= sizeof (UINT32)) {
@@ -1459,8 +1462,8 @@ PciSegmentWriteBuffer (
     //
     PciSegmentWrite32 (StartAddress, ReadUnaligned32 (Buffer));
     StartAddress += sizeof (UINT32);
-    Size -= sizeof (UINT32);
-    Buffer = (UINT32*)Buffer + 1;
+    Size  -= sizeof (UINT32);
+    Buffer = (UINT32 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT16)) {
@@ -1469,15 +1472,15 @@ PciSegmentWriteBuffer (
     //
     PciSegmentWrite16 (StartAddress, ReadUnaligned16 (Buffer));
     StartAddress += sizeof (UINT16);
-    Size -= sizeof (UINT16);
-    Buffer = (UINT16*)Buffer + 1;
+    Size  -= sizeof (UINT16);
+    Buffer = (UINT16 *)Buffer + 1;
   }
 
   if (Size >= sizeof (UINT8)) {
     //
     // Write the last remaining byte if exist
     //
-    PciSegmentWrite8 (StartAddress, *(UINT8*)Buffer);
+    PciSegmentWrite8 (StartAddress, *(UINT8 *)Buffer);
   }
 
   return ReturnValue;

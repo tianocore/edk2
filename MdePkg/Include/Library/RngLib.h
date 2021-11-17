@@ -77,4 +77,4 @@ GetRandomNumber128 (
   OUT     UINT64                    *Rand
   );
 
-#endif  // __RNG_LIB_H__
+#endif // __RNG_LIB_H__
