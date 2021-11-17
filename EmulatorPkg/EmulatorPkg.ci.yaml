@@ -22,6 +22,12 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            "EmuBlockIoDxe/EmuBlockIo.c",
+            "EmuGopDxe/GopInput.c",
+            "EmuSimpleFileSystemDxe/EmuSimpleFileSystem.c",
+            "FvbServicesRuntimeDxe/FWBlockService.c",
+            "Win/Host/WinInclude.h"
+
         ]
     },
     ## options defined .pytool/Plugin/CompilerPlugin
