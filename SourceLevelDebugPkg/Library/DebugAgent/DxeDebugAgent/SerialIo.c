@@ -368,7 +368,7 @@ InstallSerialIo (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Debug Agent: Failed to install EFI Serial IO Protocol on Debug Port!\n"));
+    DEBUG ((DEBUG_ERROR, "Debug Agent: Failed to install EFI Serial IO Protocol on Debug Port!\n"));
   }
 }
 

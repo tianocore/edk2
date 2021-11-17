@@ -64,7 +64,7 @@ PeCoffLoaderExtraActionCommon (
   ASSERT (ImageContext != NULL);
 
   if (ImageContext->PdbPointer != NULL) {
-    DEBUG((EFI_D_ERROR, "    PDB = %a\n", ImageContext->PdbPointer));
+    DEBUG((DEBUG_ERROR, "    PDB = %a\n", ImageContext->PdbPointer));
   }
 
   //
