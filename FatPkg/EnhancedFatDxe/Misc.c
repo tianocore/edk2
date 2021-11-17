@@ -377,7 +377,7 @@ FatDiskIo (
 
   if (EFI_ERROR (Status)) {
     Volume->DiskError = TRUE;
-    DEBUG ((EFI_D_ERROR, "FatDiskIo: error %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "FatDiskIo: error %r\n", Status));
   }
 
   return Status;
