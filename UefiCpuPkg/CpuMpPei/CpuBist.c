@@ -227,7 +227,7 @@ CollectBistDataFromPpi (
       BspCpuInstance.InfoRecord.IA32HealthFlags.Uint32  = SecPlatformInformation->IA32HealthFlags.Uint32;
       CpuInstance = &BspCpuInstance;
     } else {
-      DEBUG ((EFI_D_INFO, "Does not find any stored CPU BIST information from PPI!\n"));
+      DEBUG ((DEBUG_INFO, "Does not find any stored CPU BIST information from PPI!\n"));
     }
   }
   for (ProcessorNumber = 0; ProcessorNumber < NumberOfProcessors; ProcessorNumber ++) {
@@ -250,7 +250,7 @@ CollectBistDataFromPpi (
         (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_SELF_TEST)
         );
     }
-    DEBUG ((EFI_D_INFO, "  APICID - 0x%08x, BIST - 0x%08x\n",
+    DEBUG ((DEBUG_INFO, "  APICID - 0x%08x, BIST - 0x%08x\n",
             (UINT32) ProcessorInfo.ProcessorId,
             BistData
             ));
@@ -288,4 +288,3 @@ CollectBistDataFromPpi (
     ASSERT_EFI_ERROR(Status);
   }
 }
-
