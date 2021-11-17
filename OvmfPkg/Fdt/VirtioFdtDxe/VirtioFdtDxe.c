@@ -57,7 +57,7 @@ InitializeVirtioFdtDxe (
     Status = FdtClient->GetNodeProperty (FdtClient, Node, "reg",
                           (CONST VOID **)&Reg, &RegSize);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a: GetNodeProperty () failed (Status == %r)\n",
+      DEBUG ((DEBUG_ERROR, "%a: GetNodeProperty () failed (Status == %r)\n",
         __FUNCTION__, Status));
       continue;
     }
@@ -73,7 +73,7 @@ InitializeVirtioFdtDxe (
                                   HW_VENDOR_DP,
                                   sizeof (VIRTIO_TRANSPORT_DEVICE_PATH));
     if (DevicePath == NULL) {
-      DEBUG ((EFI_D_ERROR, "%a: Out of memory\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: Out of memory\n", __FUNCTION__));
       continue;
     }
 
@@ -88,7 +88,7 @@ InitializeVirtioFdtDxe (
                      &gEfiDevicePathProtocolGuid, EFI_NATIVE_INTERFACE,
                      DevicePath);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a: Failed to install the EFI_DEVICE_PATH "
+      DEBUG ((DEBUG_ERROR, "%a: Failed to install the EFI_DEVICE_PATH "
         "protocol on a new handle (Status == %r)\n",
         __FUNCTION__, Status));
       FreePool (DevicePath);
@@ -97,7 +97,7 @@ InitializeVirtioFdtDxe (
 
     Status = VirtioMmioInstallDevice (RegBase, Handle);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a: Failed to install VirtIO transport @ 0x%Lx "
+      DEBUG ((DEBUG_ERROR, "%a: Failed to install VirtIO transport @ 0x%Lx "
         "on handle %p (Status == %r)\n", __FUNCTION__, RegBase,
         Handle, Status));
 
@@ -110,7 +110,7 @@ InitializeVirtioFdtDxe (
   }
 
   if (EFI_ERROR (FindNodeStatus) && FindNodeStatus != EFI_NOT_FOUND) {
-     DEBUG ((EFI_D_ERROR, "%a: Error occurred while iterating DT nodes "
+     DEBUG ((DEBUG_ERROR, "%a: Error occurred while iterating DT nodes "
        "(FindNodeStatus == %r)\n", __FUNCTION__, FindNodeStatus));
   }
 
