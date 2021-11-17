@@ -361,7 +361,7 @@ FfsProcessSection (
         //
         // GetInfo failed
         //
-        DEBUG ((EFI_D_ERROR, "Decompress GetInfo Failed - %r\n", Status));
+        DEBUG ((DEBUG_ERROR, "Decompress GetInfo Failed - %r\n", Status));
         return EFI_NOT_FOUND;
       }
       //
@@ -415,7 +415,7 @@ FfsProcessSection (
         //
         // Decompress failed
         //
-        DEBUG ((EFI_D_ERROR, "Decompress Failed - %r\n", Status));
+        DEBUG ((DEBUG_ERROR, "Decompress Failed - %r\n", Status));
         return EFI_NOT_FOUND;
       } else {
         return FfsProcessSection (
@@ -874,5 +874,3 @@ FfsProcessFvFile (
 
   return EFI_SUCCESS;
 }
-
-

@@ -74,8 +74,8 @@ CompareBuffer (
 
   for (i = 0; i < (BufferSize >> 3); i++) {
     if (*BufferA64 != *BufferB64) {
-      DEBUG ((EFI_D_ERROR, "CompareBuffer: Error at %i", i));
-      DEBUG ((EFI_D_ERROR, "(0x%lX) != (0x%lX)\n", *BufferA64, *BufferB64));
+      DEBUG ((DEBUG_ERROR, "CompareBuffer: Error at %i", i));
+      DEBUG ((DEBUG_ERROR, "(0x%lX) != (0x%lX)\n", *BufferA64, *BufferB64));
       return FALSE;
     }
     BufferA64++;

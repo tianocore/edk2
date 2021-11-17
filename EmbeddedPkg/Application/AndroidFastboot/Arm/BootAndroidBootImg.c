@@ -162,14 +162,14 @@ BootAndroidBootImg (
              StrSize (LoadOptions),
              LoadOptions);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Couldn't Boot Linux: %d\n", Status));
+    DEBUG ((DEBUG_ERROR, "Couldn't Boot Linux: %d\n", Status));
     Status = EFI_DEVICE_ERROR;
     goto FreeLoadOptions;
   }
 
   // If we got here we do a confused face because BootLinuxFdt returned,
   // reporting success.
-  DEBUG ((EFI_D_ERROR, "WARNING: BdsBootLinuxFdt returned EFI_SUCCESS.\n"));
+  DEBUG ((DEBUG_ERROR, "WARNING: BdsBootLinuxFdt returned EFI_SUCCESS.\n"));
   return EFI_SUCCESS;
 
 FreeLoadOptions:

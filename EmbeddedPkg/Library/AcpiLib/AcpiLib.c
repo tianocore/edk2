@@ -108,7 +108,7 @@ LocateAndInstallAcpiFromFvConditional (
         AcpiTableSize = ((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Length;
         ASSERT (SectionSize >= AcpiTableSize);
 
-        DEBUG ((EFI_D_ERROR, "- Found '%c%c%c%c' ACPI Table\n",
+        DEBUG ((DEBUG_ERROR, "- Found '%c%c%c%c' ACPI Table\n",
             (((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Signature & 0xFF),
             ((((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Signature >> 8) & 0xFF),
             ((((EFI_ACPI_DESCRIPTION_HEADER *) AcpiTable)->Signature >> 16) & 0xFF),
