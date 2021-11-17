@@ -751,7 +751,7 @@ SmmRestoreCpu (
   IA32_IDT_GATE_DESCRIPTOR      IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
   EFI_STATUS                    Status;
 
-  DEBUG ((EFI_D_INFO, "SmmRestoreCpu()\n"));
+  DEBUG ((DEBUG_INFO, "SmmRestoreCpu()\n"));
 
   mSmmS3Flag = TRUE;
 
@@ -759,7 +759,7 @@ SmmRestoreCpu (
   // See if there is enough context to resume PEI Phase
   //
   if (mSmmS3ResumeState == NULL) {
-    DEBUG ((EFI_D_ERROR, "No context to return to PEI Phase\n"));
+    DEBUG ((DEBUG_ERROR, "No context to return to PEI Phase\n"));
     CpuDeadLoop ();
   }
 
@@ -822,17 +822,17 @@ SmmRestoreCpu (
   //
   mRestoreSmmConfigurationInS3 = TRUE;
 
-  DEBUG (( EFI_D_INFO, "SMM S3 Return CS                = %x\n", SmmS3ResumeState->ReturnCs));
-  DEBUG (( EFI_D_INFO, "SMM S3 Return Entry Point       = %x\n", SmmS3ResumeState->ReturnEntryPoint));
-  DEBUG (( EFI_D_INFO, "SMM S3 Return Context1          = %x\n", SmmS3ResumeState->ReturnContext1));
-  DEBUG (( EFI_D_INFO, "SMM S3 Return Context2          = %x\n", SmmS3ResumeState->ReturnContext2));
-  DEBUG (( EFI_D_INFO, "SMM S3 Return Stack Pointer     = %x\n", SmmS3ResumeState->ReturnStackPointer));
+  DEBUG (( DEBUG_INFO, "SMM S3 Return CS                = %x\n", SmmS3ResumeState->ReturnCs));
+  DEBUG (( DEBUG_INFO, "SMM S3 Return Entry Point       = %x\n", SmmS3ResumeState->ReturnEntryPoint));
+  DEBUG (( DEBUG_INFO, "SMM S3 Return Context1          = %x\n", SmmS3ResumeState->ReturnContext1));
+  DEBUG (( DEBUG_INFO, "SMM S3 Return Context2          = %x\n", SmmS3ResumeState->ReturnContext2));
+  DEBUG (( DEBUG_INFO, "SMM S3 Return Stack Pointer     = %x\n", SmmS3ResumeState->ReturnStackPointer));
 
   //
   // If SMM is in 32-bit mode, then use SwitchStack() to resume PEI Phase
   //
   if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) {
-    DEBUG ((EFI_D_INFO, "Call SwitchStack() to return to S3 Resume in PEI Phase\n"));
+    DEBUG ((DEBUG_INFO, "Call SwitchStack() to return to S3 Resume in PEI Phase\n"));
 
     SwitchStack (
       (SWITCH_STACK_ENTRY_POINT)(UINTN)SmmS3ResumeState->ReturnEntryPoint,
@@ -846,7 +846,7 @@ SmmRestoreCpu (
   // If SMM is in 64-bit mode, then use AsmDisablePaging64() to resume PEI Phase
   //
   if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_64) {
-    DEBUG ((EFI_D_INFO, "Call AsmDisablePaging64() to return to S3 Resume in PEI Phase\n"));
+    DEBUG ((DEBUG_INFO, "Call AsmDisablePaging64() to return to S3 Resume in PEI Phase\n"));
     //
     // Disable interrupt of Debug timer, since new IDT table is for IA32 and will not work in long mode.
     //
@@ -867,7 +867,7 @@ SmmRestoreCpu (
   //
   // Can not resume PEI Phase
   //
-  DEBUG ((EFI_D_ERROR, "No context to return to PEI Phase\n"));
+  DEBUG ((DEBUG_ERROR, "No context to return to PEI Phase\n"));
   CpuDeadLoop ();
 }
 
@@ -904,8 +904,8 @@ InitSmmS3ResumeState (
   } else {
     SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *) GET_GUID_HOB_DATA (GuidHob);
 
-    DEBUG ((EFI_D_INFO, "SMM S3 SMRAM Structure = %x\n", SmramDescriptor));
-    DEBUG ((EFI_D_INFO, "SMM S3 Structure = %x\n", SmramDescriptor->CpuStart));
+    DEBUG ((DEBUG_INFO, "SMM S3 SMRAM Structure = %x\n", SmramDescriptor));
+    DEBUG ((DEBUG_INFO, "SMM S3 Structure = %x\n", SmramDescriptor->CpuStart));
 
     SmmS3ResumeState = (SMM_S3_RESUME_STATE *)(UINTN)SmramDescriptor->CpuStart;
     ZeroMem (SmmS3ResumeState, sizeof (SMM_S3_RESUME_STATE));
