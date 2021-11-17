@@ -95,7 +95,7 @@ PxeFillHeader (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nSnp->undi.fill_header()  "));
+  DEBUG ((DEBUG_NET, "\nSnp->undi.fill_header()  "));
 
   (*Snp->IssueUndi32Command) ((UINT64) (UINTN) &Snp->Cdb);
 
@@ -105,7 +105,7 @@ PxeFillHeader (
 
   case PXE_STATCODE_INVALID_PARAMETER:
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "\nSnp->undi.fill_header()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -115,7 +115,7 @@ PxeFillHeader (
 
   default:
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "\nSnp->undi.fill_header()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -171,15 +171,15 @@ PxeTransmit (
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nSnp->undi.transmit()  "));
-  DEBUG ((EFI_D_NET, "\nSnp->Cdb.OpCode  == %x", Snp->Cdb.OpCode));
-  DEBUG ((EFI_D_NET, "\nSnp->Cdb.CPBaddr == %LX", Snp->Cdb.CPBaddr));
-  DEBUG ((EFI_D_NET, "\nSnp->Cdb.DBaddr  == %LX", Snp->Cdb.DBaddr));
-  DEBUG ((EFI_D_NET, "\nCpb->FrameAddr   == %LX\n", Cpb->FrameAddr));
+  DEBUG ((DEBUG_NET, "\nSnp->undi.transmit()  "));
+  DEBUG ((DEBUG_NET, "\nSnp->Cdb.OpCode  == %x", Snp->Cdb.OpCode));
+  DEBUG ((DEBUG_NET, "\nSnp->Cdb.CPBaddr == %LX", Snp->Cdb.CPBaddr));
+  DEBUG ((DEBUG_NET, "\nSnp->Cdb.DBaddr  == %LX", Snp->Cdb.DBaddr));
+  DEBUG ((DEBUG_NET, "\nCpb->FrameAddr   == %LX\n", Cpb->FrameAddr));
 
   (*Snp->IssueUndi32Command) ((UINT64) (UINTN) &Snp->Cdb);
 
-  DEBUG ((EFI_D_NET, "\nexit Snp->undi.transmit()  "));
+  DEBUG ((DEBUG_NET, "\nexit Snp->undi.transmit()  "));
 
   //
   // we will unmap the buffers in get_status call, not here
@@ -193,7 +193,7 @@ PxeTransmit (
   case PXE_STATCODE_BUSY:
     Status = EFI_NOT_READY;
     DEBUG (
-      (EFI_D_NET,
+      (DEBUG_NET,
       "\nSnp->undi.transmit()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
@@ -202,7 +202,7 @@ PxeTransmit (
 
   default:
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "\nSnp->undi.transmit()  %xh:%xh\n",
       Snp->Cdb.StatFlags,
       Snp->Cdb.StatCode)
