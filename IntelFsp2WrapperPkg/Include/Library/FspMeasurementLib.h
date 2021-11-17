@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _FSP_MEASUREMENT_LIB_H_
 #define _FSP_MEASUREMENT_LIB_H_
 
-#define FSP_MEASURE_FSP       BIT0
-#define FSP_MEASURE_FSPT      BIT1
-#define FSP_MEASURE_FSPM      BIT2
-#define FSP_MEASURE_FSPS      BIT3
-#define FSP_MEASURE_FSPUPD    BIT31
+#define FSP_MEASURE_FSP     BIT0
+#define FSP_MEASURE_FSPT    BIT1
+#define FSP_MEASURE_FSPM    BIT2
+#define FSP_MEASURE_FSPS    BIT3
+#define FSP_MEASURE_FSPUPD  BIT31
 
 /**
   Measure a FSP FirmwareBlob.
@@ -36,4 +36,5 @@ MeasureFspFirmwareBlob (
   IN EFI_PHYSICAL_ADDRESS           FirmwareBlobBase,
   IN UINT64                         FirmwareBlobLength
   );
+
 #endif
