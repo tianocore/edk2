@@ -54,7 +54,7 @@ ArmPsciResetSystemLibConstructor (
   } else if (AsciiStrnCmp (Prop, "smc", 3) == 0) {
     mArmPsciMethod = 2;
   } else {
-    DEBUG ((EFI_D_ERROR, "%a: Unknown PSCI method \"%a\"\n", __FUNCTION__,
+    DEBUG ((DEBUG_ERROR, "%a: Unknown PSCI method \"%a\"\n", __FUNCTION__,
       Prop));
     return EFI_NOT_FOUND;
   }
@@ -92,7 +92,7 @@ ResetCold (
     break;
 
   default:
-    DEBUG ((EFI_D_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
   }
 }
 
@@ -141,7 +141,7 @@ ResetShutdown (
     break;
 
   default:
-    DEBUG ((EFI_D_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
   }
 }
 
