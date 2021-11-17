@@ -18,6 +18,7 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            "PayloadLoaderPeim/ElfLib/ElfCommon.h"
         ]
     },
     ## options defined .pytool/Plugin/CompilerPlugin

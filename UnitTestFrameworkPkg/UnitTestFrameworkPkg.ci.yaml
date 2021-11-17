@@ -15,6 +15,7 @@
         ##     "<ErrorID>", "<KeyWord>"
         ## ]
         "ExceptionList": [
+            "9005", "@MRT"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [

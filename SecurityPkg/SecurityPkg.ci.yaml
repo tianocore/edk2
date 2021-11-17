@@ -18,6 +18,8 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            "Library/TcgStorageCoreLib/TcgStorageUtil.c",
+            "Library/Tpm2CommandLib/Tpm2NVStorage.c"
         ]
     },
     "CompilerPlugin": {

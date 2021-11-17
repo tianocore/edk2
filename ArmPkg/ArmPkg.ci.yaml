@@ -19,7 +19,8 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Library/ArmSoftFloatLib/berkeley-softfloat-3"
+            "Library/ArmSoftFloatLib/berkeley-softfloat-3",
+            "Library/CompilerIntrinsicsLib"
         ]
     },
 
