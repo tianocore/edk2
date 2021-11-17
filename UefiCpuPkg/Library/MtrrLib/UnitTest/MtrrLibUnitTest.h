@@ -29,21 +29,21 @@
 #include <Register/Cpuid.h>
 #include <Register/Msr.h>
 
-#define UNIT_TEST_APP_NAME        "MtrrLib Unit Tests"
-#define UNIT_TEST_APP_VERSION     "1.0"
+#define UNIT_TEST_APP_NAME     "MtrrLib Unit Tests"
+#define UNIT_TEST_APP_VERSION  "1.0"
 
-#define SCRATCH_BUFFER_SIZE       SIZE_16KB
+#define SCRATCH_BUFFER_SIZE  SIZE_16KB
 
 typedef struct {
-  UINT8                  PhysicalAddressBits;
-  BOOLEAN                MtrrSupported;
-  BOOLEAN                FixedMtrrSupported;
-  MTRR_MEMORY_CACHE_TYPE DefaultCacheType;
-  UINT32                 VariableMtrrCount;
+  UINT8                     PhysicalAddressBits;
+  BOOLEAN                   MtrrSupported;
+  BOOLEAN                   FixedMtrrSupported;
+  MTRR_MEMORY_CACHE_TYPE    DefaultCacheType;
+  UINT32                    VariableMtrrCount;
 } MTRR_LIB_SYSTEM_PARAMETER;
 
-extern UINT32                           mFixedMtrrsIndex[];
-extern BOOLEAN                          mRandomInput;
+extern UINT32   mFixedMtrrsIndex[];
+extern BOOLEAN  mRandomInput;
 
 /**
   Initialize the MTRR registers.
@@ -129,7 +129,7 @@ VOID
 GenerateRandomMtrrPair (
   IN  UINT32                 PhysicalAddressBits,
   IN  MTRR_MEMORY_CACHE_TYPE CacheType,
-  OUT MTRR_VARIABLE_SETTING  *MtrrPair,       OPTIONAL
+  OUT MTRR_VARIABLE_SETTING  *MtrrPair, OPTIONAL
   OUT MTRR_MEMORY_RANGE      *MtrrMemoryRange OPTIONAL
   );
 
@@ -192,4 +192,5 @@ GenerateRandomNumbers (
   CHAR8         *FilePath,
   UINTN         Count
   );
+
 #endif

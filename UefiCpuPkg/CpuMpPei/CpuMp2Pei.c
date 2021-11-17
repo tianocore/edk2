@@ -404,7 +404,7 @@ EdkiiPeiStartupAllCPUs (
 //
 // CPU MP2 PPI to be installed
 //
-EDKII_PEI_MP_SERVICES2_PPI            mMpServices2Ppi = {
+EDKII_PEI_MP_SERVICES2_PPI  mMpServices2Ppi = {
   EdkiiPeiGetNumberOfProcessors,
   EdkiiPeiGetProcessorInfo,
   EdkiiPeiStartupAllAPs,
@@ -414,4 +414,3 @@ EDKII_PEI_MP_SERVICES2_PPI            mMpServices2Ppi = {
   EdkiiPeiWhoAmI,
   EdkiiPeiStartupAllCPUs
 };
-

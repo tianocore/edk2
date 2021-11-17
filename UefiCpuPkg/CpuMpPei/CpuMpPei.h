@@ -29,7 +29,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-extern EFI_PEI_PPI_DESCRIPTOR   mPeiCpuMpPpiDesc;
+extern EFI_PEI_PPI_DESCRIPTOR  mPeiCpuMpPpiDesc;
 
 /**
   This service retrieves the number of logical processor in the platform
@@ -395,7 +395,7 @@ EFIAPI
 SecPlatformInformation2 (
   IN CONST EFI_PEI_SERVICES                   **PeiServices,
   IN OUT UINT64                               *StructureSize,
-     OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
+  OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
   );
 
 /**

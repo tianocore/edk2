@@ -46,7 +46,7 @@ SmmGetProcessorInfo (
   //
   // Check parameter
   //
-  if (ProcessorNumber >= mMaxNumberOfCpus || ProcessorInfoBuffer == NULL) {
+  if ((ProcessorNumber >= mMaxNumberOfCpus) || (ProcessorInfoBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -90,8 +90,9 @@ SmmSwitchBsp (
     return EFI_NOT_FOUND;
   }
 
-  if (gSmmCpuPrivate->Operation[ProcessorNumber] != SmmCpuNone ||
-      gSmst->CurrentlyExecutingCpu == ProcessorNumber) {
+  if ((gSmmCpuPrivate->Operation[ProcessorNumber] != SmmCpuNone) ||
+      (gSmst->CurrentlyExecutingCpu == ProcessorNumber))
+  {
     return EFI_UNSUPPORTED;
   }
 
@@ -132,7 +133,7 @@ SmmAddProcessor (
   //
   // Check parameter
   //
-  if (ProcessorNumber == NULL || ProcessorId == INVALID_APIC_ID) {
+  if ((ProcessorNumber == NULL) || (ProcessorId == INVALID_APIC_ID)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -151,10 +152,11 @@ SmmAddProcessor (
   // of the APIC ID to SMBASE.
   //
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
-    if (mCpuHotPlugData.ApicId[Index] == ProcessorId &&
-        gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId == INVALID_APIC_ID) {
+    if ((mCpuHotPlugData.ApicId[Index] == ProcessorId) &&
+        (gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId == INVALID_APIC_ID))
+    {
       gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId = ProcessorId;
-      gSmmCpuPrivate->ProcessorInfo[Index].StatusFlag = 0;
+      gSmmCpuPrivate->ProcessorInfo[Index].StatusFlag  = 0;
       GetProcessorLocationByApicId (
         (UINT32)ProcessorId,
         &gSmmCpuPrivate->ProcessorInfo[Index].Location.Package,
@@ -197,8 +199,9 @@ SmmRemoveProcessor (
   //
   // Check parameter
   //
-  if (ProcessorNumber >= mMaxNumberOfCpus ||
-      gSmmCpuPrivate->ProcessorInfo[ProcessorNumber].ProcessorId == INVALID_APIC_ID) {
+  if ((ProcessorNumber >= mMaxNumberOfCpus) ||
+      (gSmmCpuPrivate->ProcessorInfo[ProcessorNumber].ProcessorId == INVALID_APIC_ID))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -241,8 +244,8 @@ SmmWhoAmI (
   OUT      UINTN                        *ProcessorNumber
   )
 {
-  UINTN  Index;
-  UINT64 ApicId;
+  UINTN   Index;
+  UINT64  ApicId;
 
   //
   // Check parameter
@@ -259,6 +262,7 @@ SmmWhoAmI (
       return EFI_SUCCESS;
     }
   }
+
   //
   // This should not happen
   //
@@ -276,7 +280,7 @@ SmmCpuUpdate (
   VOID
   )
 {
-  UINTN   Index;
+  UINTN  Index;
 
   //
   // Handle pending BSP switch operations
@@ -330,10 +334,10 @@ SmmCpuUpdate (
 EFI_STATUS
 EFIAPI
 SmmRegisterExceptionHandler (
-    IN EFI_SMM_CPU_SERVICE_PROTOCOL  *This,
-    IN EFI_EXCEPTION_TYPE            ExceptionType,
-    IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
-    )
+  IN EFI_SMM_CPU_SERVICE_PROTOCOL  *This,
+  IN EFI_EXCEPTION_TYPE            ExceptionType,
+  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
+  )
 {
   return RegisterCpuInterruptHandler (ExceptionType, InterruptHandler);
 }
@@ -352,7 +356,7 @@ InitializeSmmCpuServices (
   IN EFI_HANDLE  Handle
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = gSmst->SmmInstallProtocolInterface (
                     &Handle,
@@ -363,4 +367,3 @@ InitializeSmmCpuServices (
   ASSERT_EFI_ERROR (Status);
   return Status;
 }
-

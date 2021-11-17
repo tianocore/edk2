@@ -20,7 +20,7 @@
     0xa694c467, 0x697a, 0x446b, { 0xb9, 0x29, 0x5b, 0x14, 0xa0, 0xcf, 0x39, 0xf } \
   }
 
-EFI_GUID mRegisterCpuFeaturesHobGuid = REGISTER_CPU_FEATURES_GUID;
+EFI_GUID  mRegisterCpuFeaturesHobGuid = REGISTER_CPU_FEATURES_GUID;
 
 /**
   Worker function to get CPU_FEATURES_DATA pointer.
@@ -32,16 +32,16 @@ GetCpuFeaturesData (
   VOID
   )
 {
-  CPU_FEATURES_DATA       *CpuInitData;
-  EFI_HOB_GUID_TYPE       *GuidHob;
-  VOID                    *DataInHob;
-  UINT64                  Data64;
+  CPU_FEATURES_DATA  *CpuInitData;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  VOID               *DataInHob;
+  UINT64             Data64;
 
   CpuInitData = NULL;
-  GuidHob = GetFirstGuidHob (&mRegisterCpuFeaturesHobGuid);
+  GuidHob     = GetFirstGuidHob (&mRegisterCpuFeaturesHobGuid);
   if (GuidHob != NULL) {
-    DataInHob = GET_GUID_HOB_DATA (GuidHob);
-    CpuInitData = (CPU_FEATURES_DATA *) (*(UINTN *) DataInHob);
+    DataInHob   = GET_GUID_HOB_DATA (GuidHob);
+    CpuInitData = (CPU_FEATURES_DATA *)(*(UINTN *)DataInHob);
     ASSERT (CpuInitData != NULL);
   } else {
     CpuInitData = AllocateZeroPool (sizeof (CPU_FEATURES_DATA));
@@ -49,10 +49,10 @@ GetCpuFeaturesData (
     //
     // Build location of CPU MP DATA buffer in HOB
     //
-    Data64 = (UINT64) (UINTN) CpuInitData;
+    Data64 = (UINT64)(UINTN)CpuInitData;
     BuildGuidDataHob (
       &mRegisterCpuFeaturesHobGuid,
-      (VOID *) &Data64,
+      (VOID *)&Data64,
       sizeof (UINT64)
       );
   }
@@ -70,8 +70,8 @@ GetMpService (
   VOID
   )
 {
-  EFI_STATUS                 Status;
-  MP_SERVICES                MpService;
+  EFI_STATUS   Status;
+  MP_SERVICES  MpService;
 
   //
   // Get MP Services2 Ppi
@@ -98,9 +98,9 @@ GetProcessorIndex (
   IN CPU_FEATURES_DATA        *CpuFeaturesData
   )
 {
-  EFI_STATUS                 Status;
-  EDKII_PEI_MP_SERVICES2_PPI *CpuMp2Ppi;
-  UINTN                      ProcessorIndex;
+  EFI_STATUS                  Status;
+  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  UINTN                       ProcessorIndex;
 
   CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
 
@@ -130,18 +130,18 @@ GetProcessorInformation (
   OUT EFI_PROCESSOR_INFORMATION        *ProcessorInfoBuffer
   )
 {
-  EDKII_PEI_MP_SERVICES2_PPI *CpuMp2Ppi;
-  EFI_STATUS                 Status;
-  CPU_FEATURES_DATA          *CpuFeaturesData;
+  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  EFI_STATUS                  Status;
+  CPU_FEATURES_DATA           *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
 
   Status = CpuMp2Ppi->GetProcessorInfo (
-               CpuMp2Ppi,
-               ProcessorNumber,
-               ProcessorInfoBuffer
-               );
+                        CpuMp2Ppi,
+                        ProcessorNumber,
+                        ProcessorInfoBuffer
+                        );
   return Status;
 }
 
@@ -159,9 +159,9 @@ StartupAllAPsWorker (
   IN  EFI_EVENT                        MpEvent
   )
 {
-  EFI_STATUS                           Status;
-  EDKII_PEI_MP_SERVICES2_PPI           *CpuMp2Ppi;
-  CPU_FEATURES_DATA                    *CpuFeaturesData;
+  EFI_STATUS                  Status;
+  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  CPU_FEATURES_DATA           *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
@@ -170,12 +170,12 @@ StartupAllAPsWorker (
   // Wakeup all APs for data collection.
   //
   Status = CpuMp2Ppi->StartupAllAPs (
-                 CpuMp2Ppi,
-                 Procedure,
-                 FALSE,
-                 0,
-                 CpuFeaturesData
-                 );
+                        CpuMp2Ppi,
+                        Procedure,
+                        FALSE,
+                        0,
+                        CpuFeaturesData
+                        );
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -191,9 +191,9 @@ StartupAllCPUsWorker (
   IN  EFI_AP_PROCEDURE                 Procedure
   )
 {
-  EFI_STATUS                           Status;
-  EDKII_PEI_MP_SERVICES2_PPI           *CpuMp2Ppi;
-  CPU_FEATURES_DATA                    *CpuFeaturesData;
+  EFI_STATUS                  Status;
+  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  CPU_FEATURES_DATA           *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
 
@@ -201,12 +201,12 @@ StartupAllCPUsWorker (
   // Get MP Services2 Ppi
   //
   CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
-  Status = CpuMp2Ppi->StartupAllCPUs (
-                 CpuMp2Ppi,
-                 Procedure,
-                 0,
-                 CpuFeaturesData
-                 );
+  Status    = CpuMp2Ppi->StartupAllCPUs (
+                           CpuMp2Ppi,
+                           Procedure,
+                           0,
+                           CpuFeaturesData
+                           );
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -220,9 +220,9 @@ SwitchNewBsp (
   IN  UINTN                            ProcessorNumber
   )
 {
-  EFI_STATUS                           Status;
-  EDKII_PEI_MP_SERVICES2_PPI           *CpuMp2Ppi;
-  CPU_FEATURES_DATA                    *CpuFeaturesData;
+  EFI_STATUS                  Status;
+  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  CPU_FEATURES_DATA           *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
@@ -231,10 +231,10 @@ SwitchNewBsp (
   // Wakeup all APs for data collection.
   //
   Status = CpuMp2Ppi->SwitchBSP (
-                 CpuMp2Ppi,
-                 ProcessorNumber,
-                 TRUE
-                 );
+                        CpuMp2Ppi,
+                        ProcessorNumber,
+                        TRUE
+                        );
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -254,9 +254,9 @@ GetNumberOfProcessor (
   OUT UINTN                            *NumberOfEnabledProcessors
   )
 {
-  EFI_STATUS                 Status;
-  EDKII_PEI_MP_SERVICES2_PPI *CpuMp2Ppi;
-  CPU_FEATURES_DATA          *CpuFeaturesData;
+  EFI_STATUS                  Status;
+  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  CPU_FEATURES_DATA           *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
@@ -265,10 +265,10 @@ GetNumberOfProcessor (
   // Get the number of CPUs
   //
   Status = CpuMp2Ppi->GetNumberOfProcessors (
-                         CpuMp2Ppi,
-                         NumberOfCpus,
-                         NumberOfEnabledProcessors
-                         );
+                        CpuMp2Ppi,
+                        NumberOfCpus,
+                        NumberOfEnabledProcessors
+                        );
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -286,8 +286,8 @@ CpuFeaturesInitialize (
   VOID
   )
 {
-  CPU_FEATURES_DATA          *CpuFeaturesData;
-  UINTN                      OldBspNumber;
+  CPU_FEATURES_DATA  *CpuFeaturesData;
+  UINTN              OldBspNumber;
 
   CpuFeaturesData = GetCpuFeaturesData ();
 
@@ -306,4 +306,3 @@ CpuFeaturesInitialize (
     SwitchNewBsp (CpuFeaturesData->BspNumber);
   }
 }
-

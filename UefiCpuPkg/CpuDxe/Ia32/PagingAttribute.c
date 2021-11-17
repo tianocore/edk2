@@ -8,7 +8,6 @@
 
 #include "CpuPageTable.h"
 
-
 /**
   Get paging details.
 
@@ -27,8 +26,8 @@ GetPagingDetails (
   if (PageTableBase != NULL) {
     *PageTableBase = &PagingContextData->Ia32.PageTableBase;
   }
+
   if (Attributes != NULL) {
     *Attributes = &PagingContextData->Ia32.Attributes;
   }
 }
-

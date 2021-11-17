@@ -31,7 +31,6 @@ SmmMpGetNumberOfProcessors (
   OUT      UINTN                *NumberOfProcessors
   );
 
-
 /**
   This service allows the caller to invoke a procedure one of the application processors (AP). This
   function uses an optional token parameter to support blocking and non-blocking modes. If the token
@@ -181,7 +180,6 @@ SmmMpBroadcastProcedure (
   IN OUT   MM_COMPLETION                  *Token,
   IN OUT   EFI_STATUS                     *CPUStatus
   );
-
 
 /**
   This service allows the caller to set a startup procedure that will be executed when an AP powers

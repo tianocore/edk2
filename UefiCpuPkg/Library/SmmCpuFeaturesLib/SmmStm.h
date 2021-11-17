@@ -45,7 +45,6 @@ SmmStmExceptionHandler (
   IN OUT STM_PROTECTION_EXCEPTION_STACK_FRAME Context
   );
 
-
 /**
 
   Get STM state.
@@ -174,6 +173,6 @@ GetStmResource (
 VOID
 EFIAPI
 SmmCpuFeaturesLibStmSmiEntryFixupAddress (
- );
+  );
 
 #endif
