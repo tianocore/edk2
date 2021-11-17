@@ -20,7 +20,6 @@
 #define ELF_NEXT_ENTRY(EntryType, Current, EntrySize) \
               ((EntryType *) ((UINT8 *)Current + EntrySize))
 
-
 /**
   Return the section header specified by Index.
 

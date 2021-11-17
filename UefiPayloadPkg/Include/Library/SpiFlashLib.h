@@ -117,7 +117,6 @@ SpiReadPchSoftStrap (
   OUT    UINT8              *SoftStrapValue
   );
 
-
 /**
   Read data from the flash part.
 
@@ -212,4 +211,3 @@ SpiGetRegionAddress (
   );
 
 #endif
-

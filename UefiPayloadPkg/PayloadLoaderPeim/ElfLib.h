@@ -11,35 +11,34 @@
 
 #include <PiPei.h>
 
-#define  ELF_CLASS32   1
-#define  ELF_CLASS64   2
+#define  ELF_CLASS32  1
+#define  ELF_CLASS64  2
 
-#define  ELF_PT_LOAD   1
+#define  ELF_PT_LOAD  1
 
 typedef struct {
-  RETURN_STATUS ParseStatus;             ///< Return the status after ParseElfImage().
-  UINT8         *FileBase;               ///< The source location in memory.
-  UINTN         FileSize;                ///< The size including sections that don't require loading.
-  UINT8         *PreferredImageAddress;  ///< The preferred image to be loaded. No relocation is needed if loaded to this address.
-  BOOLEAN       ReloadRequired;          ///< The image needs a new memory location for running.
-  UINT8         *ImageAddress;           ///< The destination memory address set by caller.
-  UINTN         ImageSize;               ///< The memory size for loading and execution.
-  UINT32        EiClass;
-  UINT32        ShNum;
-  UINT32        PhNum;
-  UINTN         ShStrOff;
-  UINTN         ShStrLen;
-  UINTN         EntryPoint;              ///< Return the actual entry point after LoadElfImage().
+  RETURN_STATUS    ParseStatus;            ///< Return the status after ParseElfImage().
+  UINT8            *FileBase;              ///< The source location in memory.
+  UINTN            FileSize;               ///< The size including sections that don't require loading.
+  UINT8            *PreferredImageAddress; ///< The preferred image to be loaded. No relocation is needed if loaded to this address.
+  BOOLEAN          ReloadRequired;         ///< The image needs a new memory location for running.
+  UINT8            *ImageAddress;          ///< The destination memory address set by caller.
+  UINTN            ImageSize;              ///< The memory size for loading and execution.
+  UINT32           EiClass;
+  UINT32           ShNum;
+  UINT32           PhNum;
+  UINTN            ShStrOff;
+  UINTN            ShStrLen;
+  UINTN            EntryPoint;           ///< Return the actual entry point after LoadElfImage().
 } ELF_IMAGE_CONTEXT;
 
-
 typedef struct {
-  UINT32      PtType;
-  UINTN       Offset;
-  UINTN       Length;
-  UINTN       MemLen;
-  UINTN       MemAddr;
-  UINTN       Alignment;
+  UINT32    PtType;
+  UINTN     Offset;
+  UINTN     Length;
+  UINTN     MemLen;
+  UINTN     MemAddr;
+  UINTN     Alignment;
 } SEGMENT_INFO;
 
 /**
@@ -119,4 +118,5 @@ GetElfSectionPos (
   OUT UINTN                 *Offset,
   OUT UINTN                 *Size
   );
+
 #endif /* ELF_LIB_H_ */
