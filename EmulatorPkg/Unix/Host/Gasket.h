@@ -65,7 +65,6 @@ GasketSecFree (
   IN  VOID *Ptr
   );
 
-
 RETURN_STATUS
 EFIAPI
 GasketSecPeCoffGetEntryPoint (
@@ -116,7 +115,6 @@ GasketQueryPerformanceCounter (
   VOID
   );
 
-
 VOID
 EFIAPI
 GasketSecSleep (
@@ -155,9 +153,7 @@ GasketSecGetNextProtocol (
   OUT EMU_IO_THUNK_PROTOCOL   **Instance  OPTIONAL
   );
 
-
 // PPIs produced by SEC
-
 
 EFI_STATUS
 EFIAPI
@@ -173,7 +169,6 @@ GasketSecEmuThunkAddress (
   VOID
   );
 
-
 EFI_STATUS
 EFIAPI
 GasketSecUnixUnixFwhAddress (
@@ -181,15 +176,13 @@ GasketSecUnixUnixFwhAddress (
   IN OUT EFI_PHYSICAL_ADDRESS  *FwhBase
   );
 
-
-
 //
 // Reverse (UNIX to EFIAPI) gaskets
 //
 
 typedef
 void
-(EFIAPI *CALL_BACK) (
+(EFIAPI *CALL_BACK)(
   UINT64 Delta
   );
 
@@ -209,7 +202,6 @@ ReverseGasketUint64Uint64 (
 //
 // Gasket functions for EFI_EMU_UGA_IO_PROTOCOL
 //
-
 
 EFI_STATUS
 EFIAPI
@@ -247,7 +239,6 @@ GasketX11RegisterKeyNotify (
   IN EMU_GRAPHICS_WINDOW_REGISTER_KEY_NOTIFY_CALLBACK     BreakCallBack,
   IN VOID                                                 *Context
   );
-
 
 EFI_STATUS
 EFIAPI
@@ -291,14 +282,11 @@ GasketPthreadMutexLock (
   IN VOID *Mutex
   );
 
-
-
 UINTN
 EFIAPI
 GasketPthreadMutexUnLock (
   IN VOID *Mutex
   );
-
 
 UINTN
 EFIAPI
@@ -306,20 +294,17 @@ GasketPthreadMutexTryLock (
   IN VOID *Mutex
   );
 
-
 VOID *
 EFIAPI
 GasketPthreadMutexInit (
   IN VOID
   );
 
-
 UINTN
 EFIAPI
 GasketPthreadMutexDestroy (
   IN VOID *Mutex
   );
-
 
 UINTN
 EFIAPI
@@ -335,7 +320,6 @@ EFIAPI
 GasketPthreadExit (
   IN VOID *ValuePtr
   );
-
 
 UINTN
 EFIAPI
@@ -354,7 +338,6 @@ EFIAPI
 GasketPthreadClose (
   IN  EMU_IO_THUNK_PROTOCOL   *This
   );
-
 
 // PosixFileSystem
 
@@ -468,7 +451,7 @@ GasketEmuBlockIoReadBlocks (
   IN     EFI_LBA                LBA,
   IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
   IN     UINTN                  BufferSize,
-     OUT VOID                   *Buffer
+  OUT VOID                   *Buffer
   );
 
 EFI_STATUS
@@ -639,7 +622,4 @@ GasketSnpReceive (
   OUT UINT16                              *Protocol   OPTIONAL
   );
 
-
 #endif
-
-

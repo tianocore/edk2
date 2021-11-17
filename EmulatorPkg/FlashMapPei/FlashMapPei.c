@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "PiPei.h"
 
 #include <Guid/SystemNvDataGuid.h>
@@ -27,6 +26,7 @@ PeimInitializeFlashMap (
   IN       EFI_PEI_FILE_HANDLE       FileHandle,
   IN CONST EFI_PEI_SERVICES          **PeiServices
   )
+
 /*++
 
 Routine Description:
@@ -54,11 +54,11 @@ Returns:
   // Get the Fwh Information PPI
   //
   Status = PeiServicesLocatePpi (
-            &gEmuThunkPpiGuid, // GUID
-            0,                 // INSTANCE
-            &PpiDescriptor,     // EFI_PEI_PPI_DESCRIPTOR
-            (VOID **)&Thunk       // PPI
-            );
+             &gEmuThunkPpiGuid, // GUID
+             0,                 // INSTANCE
+             &PpiDescriptor,    // EFI_PEI_PPI_DESCRIPTOR
+             (VOID **)&Thunk    // PPI
+             );
   ASSERT_EFI_ERROR (Status);
 
   //

@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Host.h"
 #include <pthread.h>
 
-
 UINTN
 EFIAPI
 PthreadMutexLock (
@@ -21,8 +20,6 @@ PthreadMutexLock (
 {
   return (UINTN)pthread_mutex_lock ((pthread_mutex_t *)Mutex);
 }
-
-
 
 UINTN
 EFIAPI
@@ -33,7 +30,6 @@ PthreadMutexUnLock (
   return (UINTN)pthread_mutex_unlock ((pthread_mutex_t *)Mutex);
 }
 
-
 UINTN
 EFIAPI
 PthreadMutexTryLock (
@@ -43,24 +39,22 @@ PthreadMutexTryLock (
   return (UINTN)pthread_mutex_trylock ((pthread_mutex_t *)Mutex);
 }
 
-
 VOID *
 PthreadMutexInit (
   IN VOID
   )
 {
-  pthread_mutex_t *Mutex;
-  int             err;
+  pthread_mutex_t  *Mutex;
+  int              err;
 
   Mutex = malloc (sizeof (pthread_mutex_t));
-  err = pthread_mutex_init (Mutex, NULL);
+  err   = pthread_mutex_init (Mutex, NULL);
   if (err == 0) {
     return Mutex;
   }
 
   return NULL;
 }
-
 
 UINTN
 PthreadMutexDestroy (
@@ -76,11 +70,11 @@ PthreadMutexDestroy (
 
 // Can't store this data on PthreadCreate stack so we need a global
 typedef struct {
-  pthread_mutex_t             Mutex;
-  THREAD_THUNK_THREAD_ENTRY   Start;
+  pthread_mutex_t              Mutex;
+  THREAD_THUNK_THREAD_ENTRY    Start;
 } THREAD_MANGLE;
 
-THREAD_MANGLE mThreadMangle = {
+THREAD_MANGLE  mThreadMangle = {
   PTHREAD_MUTEX_INITIALIZER,
   NULL
 };
@@ -90,11 +84,11 @@ SecFakePthreadStart (
   VOID  *Context
   )
 {
-  THREAD_THUNK_THREAD_ENTRY Start;
-  sigset_t                  SigMask;
+  THREAD_THUNK_THREAD_ENTRY  Start;
+  sigset_t                   SigMask;
 
   // Save global on the stack before we unlock
-  Start   = mThreadMangle.Start;
+  Start = mThreadMangle.Start;
   pthread_mutex_unlock (&mThreadMangle.Mutex);
 
   // Mask all signals to the APs
@@ -109,7 +103,7 @@ SecFakePthreadStart (
   // This is a great example of how all problems in computer
   // science can be solved by adding another level of indirection
   //
- return  (VOID *)ReverseGasketUint64 ((UINTN)Start, (UINTN)Context);
+  return (VOID *)ReverseGasketUint64 ((UINTN)Start, (UINTN)Context);
 }
 
 UINTN
@@ -120,8 +114,8 @@ PthreadCreate (
   IN  VOID                      *Context
   )
 {
-  int         err;
-  BOOLEAN     EnabledOnEntry;
+  int      err;
+  BOOLEAN  EnabledOnEntry;
 
   //
   // Threads inherit interrupt state so disable interrupts before we start thread
@@ -135,7 +129,7 @@ PthreadCreate (
 
   // Acquire lock for global, SecFakePthreadStart runs in a different thread.
   pthread_mutex_lock (&mThreadMangle.Mutex);
-  mThreadMangle.Start   = Start;
+  mThreadMangle.Start = Start;
 
   err = pthread_create (Thread, Attribute, SecFakePthreadStart, Context);
   if (err != 0) {
@@ -151,7 +145,6 @@ PthreadCreate (
   return err;
 }
 
-
 VOID
 PthreadExit (
   IN VOID *ValuePtr
@@ -160,7 +153,6 @@ PthreadExit (
   pthread_exit (ValuePtr);
   return;
 }
-
 
 UINTN
 PthreadSelf (
@@ -173,8 +165,7 @@ PthreadSelf (
   return (UINTN)pthread_self ();
 }
 
-
-EMU_THREAD_THUNK_PROTOCOL gPthreadThunk = {
+EMU_THREAD_THUNK_PROTOCOL  gPthreadThunk = {
   GasketPthreadMutexLock,
   GasketPthreadMutexUnLock,
   GasketPthreadMutexTryLock,
@@ -184,7 +175,6 @@ EMU_THREAD_THUNK_PROTOCOL gPthreadThunk = {
   GasketPthreadExit,
   GasketPthreadSelf
 };
-
 
 EFI_STATUS
 PthreadOpen (
@@ -206,7 +196,6 @@ PthreadOpen (
   return EFI_SUCCESS;
 }
 
-
 EFI_STATUS
 PthreadClose (
   IN  EMU_IO_THUNK_PROTOCOL   *This
@@ -215,8 +204,7 @@ PthreadClose (
   return EFI_SUCCESS;
 }
 
-
-EMU_IO_THUNK_PROTOCOL gPthreadThunkIo = {
+EMU_IO_THUNK_PROTOCOL  gPthreadThunkIo = {
   &gEmuThreadThunkProtocolGuid,
   NULL,
   NULL,
@@ -225,5 +213,3 @@ EMU_IO_THUNK_PROTOCOL gPthreadThunkIo = {
   GasketPthreadClose,
   NULL
 };
-
-

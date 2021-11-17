@@ -13,18 +13,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_EMU_SYSTEM_CONFIG_GUID  \
  { 0x9C4FB516, 0x3A1E, 0xD847, { 0xA1, 0xA1, 0x70, 0x58, 0xB6, 0x98, 0x67, 0x32 } }
 
-
 #pragma pack(1)
 typedef struct {
   //
   // Console output mode
   //
-  UINT32        ConOutColumn;
-  UINT32        ConOutRow;
+  UINT32    ConOutColumn;
+  UINT32    ConOutRow;
 } EMU_SYSTEM_CONFIGURATION;
 #pragma pack()
 
-
-extern EFI_GUID   gEmuSystemConfigGuid;
+extern EFI_GUID  gEmuSystemConfigGuid;
 
 #endif

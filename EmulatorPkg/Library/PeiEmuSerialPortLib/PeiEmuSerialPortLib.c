@@ -9,15 +9,12 @@
 
 **/
 
-
 #include <PiPei.h>
 #include <Library/SerialPortLib.h>
 #include <Library/PeiServicesLib.h>
 
 #include <Ppi/EmuThunk.h>
 #include <Protocol/EmuThunk.h>
-
-
 
 /**
   Initialize the serial device hardware.
@@ -63,27 +60,26 @@ SerialPortWrite (
   IN UINTN     NumberOfBytes
   )
 {
-  EMU_THUNK_PPI           *ThunkPpi;
-  EFI_STATUS              Status;
-  EMU_THUNK_PROTOCOL      *Thunk;
+  EMU_THUNK_PPI       *ThunkPpi;
+  EFI_STATUS          Status;
+  EMU_THUNK_PROTOCOL  *Thunk;
 
   //
   // Locate EmuThunkPpi for retrieving standard output handle
   //
   Status = PeiServicesLocatePpi (
-              &gEmuThunkPpiGuid,
-              0,
-              NULL,
-              (VOID **) &ThunkPpi
+             &gEmuThunkPpiGuid,
+             0,
+             NULL,
+             (VOID **)&ThunkPpi
              );
   if (!EFI_ERROR (Status)) {
-    Thunk  = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
+    Thunk = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
     return Thunk->WriteStdErr (Buffer, NumberOfBytes);
   }
 
   return 0;
 }
-
 
 /**
   Read data from serial device and save the datas in buffer.
@@ -130,4 +126,3 @@ SerialPortPoll (
 {
   return FALSE;
 }
-

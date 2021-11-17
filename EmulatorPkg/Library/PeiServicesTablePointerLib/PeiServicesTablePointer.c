@@ -16,7 +16,6 @@
 
 #include <Ppi/MemoryDiscovered.h>
 
-
 CONST EFI_PEI_SERVICES  **gPeiServices = NULL;
 
 /**
@@ -33,7 +32,7 @@ CONST EFI_PEI_SERVICES  **gPeiServices = NULL;
 VOID
 EFIAPI
 SetPeiServicesTablePointer (
-  IN CONST EFI_PEI_SERVICES ** PeiServicesTablePointer
+  IN CONST EFI_PEI_SERVICES **PeiServicesTablePointer
   )
 {
   ASSERT (PeiServicesTablePointer != NULL);
@@ -64,8 +63,6 @@ GetPeiServicesTablePointer (
   return gPeiServices;
 }
 
-
-
 /**
   Notification service to be called when gEmuThunkPpiGuid is installed.
 
@@ -91,13 +88,11 @@ PeiServicesTablePointerNotifyCallback (
   return EFI_SUCCESS;
 }
 
-
-EFI_PEI_NOTIFY_DESCRIPTOR mNotifyOnThunkList = {
+EFI_PEI_NOTIFY_DESCRIPTOR  mNotifyOnThunkList = {
   (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiMemoryDiscoveredPpiGuid,
   PeiServicesTablePointerNotifyCallback
 };
-
 
 /**
   Constructor register notification on when PPI updates. If PPI is
@@ -117,7 +112,7 @@ PeiServicesTablePointerLibConstructor (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   gPeiServices = (CONST EFI_PEI_SERVICES  **)PeiServices;
 
@@ -153,4 +148,3 @@ MigratePeiServicesTablePointer (
   //
   return;
 }
-

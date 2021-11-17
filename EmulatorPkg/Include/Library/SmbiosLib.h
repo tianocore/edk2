@@ -15,12 +15,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/SmBios.h>
 #include <Protocol/Smbios.h>
 
-
 ///
 /// Cache copy of the SMBIOS Protocol pointer
 ///
-extern EFI_SMBIOS_PROTOCOL *gSmbios;
-
+extern EFI_SMBIOS_PROTOCOL  *gSmbios;
 
 ///
 /// Template for SMBIOS table initialization.
@@ -38,7 +36,6 @@ typedef struct {
   CHAR8               **StringArray;
 } SMBIOS_TEMPLATE_ENTRY;
 
-
 /**
   Create an initial SMBIOS Table from an array of SMBIOS_TEMPLATE_ENTRY
   entries. SMBIOS_TEMPLATE_ENTRY.NULL indicates the end of the table.
@@ -53,8 +50,6 @@ EFIAPI
 SmbiosLibInitializeFromTemplate (
   IN  SMBIOS_TEMPLATE_ENTRY   *Template
   );
-
-
 
 /**
   Create SMBIOS record.
@@ -91,7 +86,6 @@ SmbiosLibCreateEntry (
   IN  SMBIOS_STRUCTURE *SmbiosEntry,
   IN  CHAR8            **StringArray
   );
-
 
 /**
   Update the string associated with an existing SMBIOS record.
@@ -155,7 +149,6 @@ SmbiosLibReadString (
   IN EFI_SMBIOS_STRING  StringNumber
   );
 
-
 /**
   Allow the caller to discover a specific SMBIOS entry, and patch it if necissary.
 
@@ -189,8 +182,5 @@ EFIAPI
 SmbiosLibRemove (
   OUT EFI_SMBIOS_HANDLE SmbiosHandle
   );
-
-
-
 
 #endif

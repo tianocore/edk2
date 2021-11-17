@@ -17,8 +17,8 @@
 #include <Library/UefiLib.h>
 #include <Protocol/ShellParameters.h>
 
-UINTN  Argc;
-CHAR16 **Argv;
+UINTN   Argc;
+CHAR16  **Argv;
 
 /**
 
@@ -31,15 +31,15 @@ GetArg (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  EFI_SHELL_PARAMETERS_PROTOCOL *ShellParameters;
+  EFI_STATUS                     Status;
+  EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters;
 
   Status = gBS->HandleProtocol (
                   gImageHandle,
                   &gEfiShellParametersProtocolGuid,
-                  (VOID**)&ShellParameters
+                  (VOID **)&ShellParameters
                   );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -84,8 +84,8 @@ UefiMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS    Status;
-  RETURN_STATUS ReturnStatus;
+  EFI_STATUS     Status;
+  RETURN_STATUS  ReturnStatus;
 
   UINT8             HostIpAssignmentType;
   EFI_IPv4_ADDRESS  HostIpAddress;
@@ -94,8 +94,8 @@ UefiMain (
   EFI_IPv4_ADDRESS  RedfishServiceIpMask;
   UINTN             RedfishServiceIpPort;
 
-  Status = GetArg();
-  if (EFI_ERROR(Status)) {
+  Status = GetArg ();
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -104,39 +104,41 @@ UefiMain (
   // RedfishPlatformConfig.efi -s HostIpAddress HostIpMask RedfishServiceIpAddress RedfishServiceIpMask RedfishServiceIpPort
   // RedfishPlatformConfig.efi -a RedfishServiceIpAddress RedfishServiceIpMask RedfishServiceIpPort
   //
-  if (Argc != 7 && Argc != 5) {
-
-    PrintHelp();
+  if ((Argc != 7) && (Argc != 5)) {
+    PrintHelp ();
     return EFI_UNSUPPORTED;
   }
 
-  if (StrCmp(Argv[1], L"-s") == 0) {
-
+  if (StrCmp (Argv[1], L"-s") == 0) {
     HostIpAssignmentType = 1;
 
     Status = NetLibStrToIp4 (Argv[2], &HostIpAddress);
     if (EFI_ERROR (Status)) {
-      PrintHelp();
+      PrintHelp ();
       return Status;
     }
+
     Status = NetLibStrToIp4 (Argv[3], &HostIpMask);
     if (EFI_ERROR (Status)) {
-      PrintHelp();
+      PrintHelp ();
       return Status;
     }
+
     Status = NetLibStrToIp4 (Argv[4], &RedfishServiceIpAddress);
     if (EFI_ERROR (Status)) {
-      PrintHelp();
+      PrintHelp ();
       return Status;
     }
+
     Status = NetLibStrToIp4 (Argv[5], &RedfishServiceIpMask);
     if (EFI_ERROR (Status)) {
-      PrintHelp();
+      PrintHelp ();
       return Status;
     }
+
     ReturnStatus = StrDecimalToUintnS (Argv[6], NULL, &RedfishServiceIpPort);
     if (RETURN_ERROR (ReturnStatus)) {
-      PrintHelp();
+      PrintHelp ();
       return Status;
     }
 
@@ -214,24 +216,24 @@ UefiMain (
     Print (L"RedfishServiceIpMask: %s has been set Successfully!\n", Argv[5]);
     Print (L"RedfishServiceIpPort: %s has been set Successfully!\n", Argv[6]);
     Print (L"Please Restart!\n");
-
-  } else if (StrCmp(Argv[1], L"-a") == 0) {
-
+  } else if (StrCmp (Argv[1], L"-a") == 0) {
     HostIpAssignmentType = 3;
 
     Status = NetLibStrToIp4 (Argv[2], &RedfishServiceIpAddress);
     if (EFI_ERROR (Status)) {
-      PrintHelp();
+      PrintHelp ();
       return Status;
     }
+
     Status = NetLibStrToIp4 (Argv[3], &RedfishServiceIpMask);
     if (EFI_ERROR (Status)) {
-      PrintHelp();
+      PrintHelp ();
       return Status;
     }
+
     ReturnStatus = StrDecimalToUintnS (Argv[4], NULL, &RedfishServiceIpPort);
     if (RETURN_ERROR (ReturnStatus)) {
-      PrintHelp();
+      PrintHelp ();
       return Status;
     }
 
@@ -285,12 +287,10 @@ UefiMain (
     Print (L"RedfishServiceIpMask: %s has been set Successfully!\n", Argv[3]);
     Print (L"RedfishServiceIpPort: %s has been set Successfully!\n", Argv[4]);
     Print (L"Please Restart!\n");
-  } else if (StrCmp(Argv[1], L"-h") == 0 || StrCmp(Argv[1], L"-help") == 0) {
-
-    PrintHelp();
+  } else if ((StrCmp (Argv[1], L"-h") == 0) || (StrCmp (Argv[1], L"-help") == 0)) {
+    PrintHelp ();
   } else {
-
-    PrintHelp();
+    PrintHelp ();
     return EFI_UNSUPPORTED;
   }
 
