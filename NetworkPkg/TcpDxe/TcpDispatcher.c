@@ -269,7 +269,7 @@ TcpBind (
       if (*RandomPort <= TCP_PORT_KNOWN) {
         if (Cycle) {
           DEBUG (
-            (EFI_D_ERROR,
+            (DEBUG_ERROR,
             "TcpBind: no port can be allocated for this pcb\n")
             );
           return EFI_OUT_OF_RESOURCES;
@@ -359,7 +359,7 @@ TcpAttachPcb (
 
   if (Tcb == NULL) {
 
-    DEBUG ((EFI_D_ERROR, "TcpConfigurePcb: failed to allocate a TCB\n"));
+    DEBUG ((DEBUG_ERROR, "TcpConfigurePcb: failed to allocate a TCB\n"));
 
     return EFI_OUT_OF_RESOURCES;
   }
@@ -540,7 +540,7 @@ TcpConfigurePcb (
 
   if (EFI_ERROR (Status)) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "TcpConfigurePcb: Bind endpoint failed with %r\n",
       Status)
       );

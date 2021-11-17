@@ -905,7 +905,7 @@ TcpServiceBindingCreateChild (
   Sock = SockCreateChild (&mTcpDefaultSockData);
   if (NULL == Sock) {
     DEBUG (
-      (EFI_D_ERROR,
+      (DEBUG_ERROR,
       "TcpDriverBindingCreateChild: No resource to create a Tcp Child\n")
       );
 
