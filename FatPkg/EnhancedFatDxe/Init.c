@@ -90,7 +90,7 @@ FatAllocateVolume (
   //
   // Volume installed
   //
-  DEBUG ((EFI_D_INIT, "Installed Fat filesystem on %p\n", Handle));
+  DEBUG ((DEBUG_INIT, "Installed Fat filesystem on %p\n", Handle));
   Volume->Valid = TRUE;
 
 Done:
@@ -217,7 +217,7 @@ FatOpenDevice (
   Status  = DiskIo->ReadDisk (DiskIo, Volume->MediaId, 0, sizeof (FatBs), &FatBs);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INIT, "FatOpenDevice: read of part_lba failed %r\n", Status));
+    DEBUG ((DEBUG_INIT, "FatOpenDevice: read of part_lba failed %r\n", Status));
     return Status;
   }
 
