@@ -125,7 +125,7 @@ FatExchangeCachePage (
     RealSize  = (UINTN)1 << PageAlignment;
     MaxSize   = DiskCache->LimitAddress - EntryPos;
     if (MaxSize < RealSize) {
-      DEBUG ((EFI_D_INFO, "FatDiskIo: Cache Page OutBound occurred! \n"));
+      DEBUG ((DEBUG_INFO, "FatDiskIo: Cache Page OutBound occurred! \n"));
       RealSize = (UINTN) MaxSize;
     }
   }
