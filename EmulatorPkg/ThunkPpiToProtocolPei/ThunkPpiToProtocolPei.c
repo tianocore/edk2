@@ -47,7 +47,7 @@ Returns:
   EMU_THUNK_PPI           *Thunk;
   VOID                    *Ptr;
 
-  DEBUG ((EFI_D_ERROR, "Emu Thunk PEIM Loaded\n"));
+  DEBUG ((DEBUG_ERROR, "Emu Thunk PEIM Loaded\n"));
 
   Status = PeiServicesLocatePpi (
               &gEmuThunkPpiGuid,        // GUID
