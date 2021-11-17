@@ -25,6 +25,7 @@ FatHashLongName (
 {
   UINT32  HashValue;
   CHAR16  UpCasedLongFileName[EFI_PATH_STRING_LENGTH];
+
   StrnCpyS (
     UpCasedLongFileName,
     ARRAY_SIZE (UpCasedLongFileName),
@@ -52,6 +53,7 @@ FatHashShortName (
   )
 {
   UINT32  HashValue;
+
   gBS->CalculateCrc32 (ShortNameString, FAT_NAME_LEN, &HashValue);
   return (HashValue & HASH_TABLE_MASK);
 }
@@ -73,10 +75,12 @@ FatLongNameHashSearch (
   )
 {
   FAT_DIRENT  **PreviousHashNode;
+
   for (PreviousHashNode   = &ODir->LongNameHashTable[FatHashLongName (LongNameString)];
        *PreviousHashNode != NULL;
        PreviousHashNode   = &(*PreviousHashNode)->LongNameForwardLink
-      ) {
+       )
+  {
     if (FatStriCmp (LongNameString, (*PreviousHashNode)->FileString) == 0) {
       break;
     }
@@ -102,10 +106,12 @@ FatShortNameHashSearch (
   )
 {
   FAT_DIRENT  **PreviousHashNode;
+
   for (PreviousHashNode   = &ODir->ShortNameHashTable[FatHashShortName (ShortNameString)];
        *PreviousHashNode != NULL;
        PreviousHashNode   = &(*PreviousHashNode)->ShortNameForwardLink
-      ) {
+       )
+  {
     if (CompareMem (ShortNameString, (*PreviousHashNode)->Entry.FileName, FAT_NAME_LEN) == 0) {
       break;
     }
@@ -134,17 +140,17 @@ FatInsertToHashTable (
   //
   // Insert hash table index for short name
   //
-  HashTableIndex                = FatHashShortName (DirEnt->Entry.FileName);
-  HashTable                     = ODir->ShortNameHashTable;
-  DirEnt->ShortNameForwardLink  = HashTable[HashTableIndex];
-  HashTable[HashTableIndex]     = DirEnt;
+  HashTableIndex = FatHashShortName (DirEnt->Entry.FileName);
+  HashTable = ODir->ShortNameHashTable;
+  DirEnt->ShortNameForwardLink = HashTable[HashTableIndex];
+  HashTable[HashTableIndex]    = DirEnt;
   //
   // Insert hash table index for long name
   //
-  HashTableIndex                = FatHashLongName (DirEnt->FileString);
-  HashTable                     = ODir->LongNameHashTable;
-  DirEnt->LongNameForwardLink   = HashTable[HashTableIndex];
-  HashTable[HashTableIndex]     = DirEnt;
+  HashTableIndex = FatHashLongName (DirEnt->FileString);
+  HashTable = ODir->LongNameHashTable;
+  DirEnt->LongNameForwardLink = HashTable[HashTableIndex];
+  HashTable[HashTableIndex]   = DirEnt;
 }
 
 /**
@@ -162,5 +168,5 @@ FatDeleteFromHashTable (
   )
 {
   *FatShortNameHashSearch (ODir, DirEnt->Entry.FileName) = DirEnt->ShortNameForwardLink;
-  *FatLongNameHashSearch (ODir, DirEnt->FileString)      = DirEnt->LongNameForwardLink;
+  *FatLongNameHashSearch (ODir, DirEnt->FileString) = DirEnt->LongNameForwardLink;
 }

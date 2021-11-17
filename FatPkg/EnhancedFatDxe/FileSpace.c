@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Fat.h"
 
-
 /**
 
   Get the FAT entry of the volume, which is identified with the Index.
@@ -32,24 +31,26 @@ FatLoadFatEntry (
   EFI_STATUS  Status;
 
   if (Index > (Volume->MaxCluster + 1)) {
-    Volume->FatEntryBuffer = (UINT32) -1;
+    Volume->FatEntryBuffer = (UINT32)-1;
     return &Volume->FatEntryBuffer;
   }
+
   //
   // Compute buffer position needed
   //
   switch (Volume->FatType) {
-  case Fat12:
-    Pos = FAT_POS_FAT12 (Index);
-    break;
+    case Fat12:
+      Pos = FAT_POS_FAT12 (Index);
+      break;
 
-  case Fat16:
-    Pos = FAT_POS_FAT16 (Index);
-    break;
+    case Fat16:
+      Pos = FAT_POS_FAT16 (Index);
+      break;
 
-  default:
-    Pos = FAT_POS_FAT32 (Index);
+    default:
+      Pos = FAT_POS_FAT32 (Index);
   }
+
   //
   // Set the position and read the buffer
   //
@@ -63,7 +64,7 @@ FatLoadFatEntry (
              NULL
              );
   if (EFI_ERROR (Status)) {
-    Volume->FatEntryBuffer = (UINT32) -1;
+    Volume->FatEntryBuffer = (UINT32)-1;
   }
 
   return &Volume->FatEntryBuffer;
@@ -95,27 +96,27 @@ FatGetFatEntry (
   Pos = FatLoadFatEntry (Volume, Index);
 
   if (Index > (Volume->MaxCluster + 1)) {
-    return (UINTN) -1;
+    return (UINTN)-1;
   }
 
   switch (Volume->FatType) {
-  case Fat12:
-    En12   = Pos;
-    Accum = En12[0] | (En12[1] << 8);
-    Accum = FAT_ODD_CLUSTER_FAT12 (Index) ? (Accum >> 4) : (Accum & FAT_CLUSTER_MASK_FAT12);
-    Accum = Accum | ((Accum >= FAT_CLUSTER_SPECIAL_FAT12) ? FAT_CLUSTER_SPECIAL_EXT : 0);
-    break;
+    case Fat12:
+      En12  = Pos;
+      Accum = En12[0] | (En12[1] << 8);
+      Accum = FAT_ODD_CLUSTER_FAT12 (Index) ? (Accum >> 4) : (Accum & FAT_CLUSTER_MASK_FAT12);
+      Accum = Accum | ((Accum >= FAT_CLUSTER_SPECIAL_FAT12) ? FAT_CLUSTER_SPECIAL_EXT : 0);
+      break;
 
-  case Fat16:
-    En16   = Pos;
-    Accum = *En16;
-    Accum = Accum | ((Accum >= FAT_CLUSTER_SPECIAL_FAT16) ? FAT_CLUSTER_SPECIAL_EXT : 0);
-    break;
+    case Fat16:
+      En16  = Pos;
+      Accum = *En16;
+      Accum = Accum | ((Accum >= FAT_CLUSTER_SPECIAL_FAT16) ? FAT_CLUSTER_SPECIAL_EXT : 0);
+      break;
 
-  default:
-    En32   = Pos;
-    Accum = *En32 & FAT_CLUSTER_MASK_FAT32;
-    Accum = Accum | ((Accum >= FAT_CLUSTER_SPECIAL_FAT32) ? FAT_CLUSTER_SPECIAL_EXT : 0);
+    default:
+      En32  = Pos;
+      Accum = *En32 & FAT_CLUSTER_MASK_FAT32;
+      Accum = Accum | ((Accum >= FAT_CLUSTER_SPECIAL_FAT32) ? FAT_CLUSTER_SPECIAL_EXT : 0);
   }
 
   return Accum;
@@ -155,16 +156,17 @@ FatSetFatEntry (
   }
 
   OriginalVal = FatGetFatEntry (Volume, Index);
-  if (Value == FAT_CLUSTER_FREE && OriginalVal != FAT_CLUSTER_FREE) {
+  if ((Value == FAT_CLUSTER_FREE) && (OriginalVal != FAT_CLUSTER_FREE)) {
     Volume->FatInfoSector.FreeInfo.ClusterCount += 1;
     if (Index < Volume->FatInfoSector.FreeInfo.NextCluster) {
-      Volume->FatInfoSector.FreeInfo.NextCluster = (UINT32) Index;
+      Volume->FatInfoSector.FreeInfo.NextCluster = (UINT32)Index;
     }
-  } else if (Value != FAT_CLUSTER_FREE && OriginalVal == FAT_CLUSTER_FREE) {
+  } else if ((Value != FAT_CLUSTER_FREE) && (OriginalVal == FAT_CLUSTER_FREE)) {
     if (Volume->FatInfoSector.FreeInfo.ClusterCount != 0) {
       Volume->FatInfoSector.FreeInfo.ClusterCount -= 1;
     }
   }
+
   //
   // Make sure the entry is in memory
   //
@@ -174,37 +176,39 @@ FatSetFatEntry (
   // Update the value
   //
   switch (Volume->FatType) {
-  case Fat12:
-    En12   = Pos;
-    Accum = En12[0] | (En12[1] << 8);
-    Value = Value & FAT_CLUSTER_MASK_FAT12;
+    case Fat12:
+      En12  = Pos;
+      Accum = En12[0] | (En12[1] << 8);
+      Value = Value & FAT_CLUSTER_MASK_FAT12;
 
-    if (FAT_ODD_CLUSTER_FAT12 (Index)) {
-      Accum = (Value << 4) | (Accum & 0xF);
-    } else {
-      Accum = Value | (Accum & FAT_CLUSTER_UNMASK_FAT12);
-    }
+      if (FAT_ODD_CLUSTER_FAT12 (Index)) {
+        Accum = (Value << 4) | (Accum & 0xF);
+      } else {
+        Accum = Value | (Accum & FAT_CLUSTER_UNMASK_FAT12);
+      }
 
-    En12[0]  = (UINT8) (Accum & 0xFF);
-    En12[1]  = (UINT8) (Accum >> 8);
-    break;
+      En12[0] = (UINT8)(Accum & 0xFF);
+      En12[1] = (UINT8)(Accum >> 8);
+      break;
 
-  case Fat16:
-    En16   = Pos;
-    *En16  = (UINT16) Value;
-    break;
+    case Fat16:
+      En16  = Pos;
+      *En16 = (UINT16)Value;
+      break;
 
-  default:
-    En32   = Pos;
-    *En32  = (*En32 & FAT_CLUSTER_UNMASK_FAT32) | (UINT32) (Value & FAT_CLUSTER_MASK_FAT32);
+    default:
+      En32  = Pos;
+      *En32 = (*En32 & FAT_CLUSTER_UNMASK_FAT32) | (UINT32)(Value & FAT_CLUSTER_MASK_FAT32);
   }
+
   //
   // If the volume's dirty bit is not set, set it now
   //
-  if (!Volume->FatDirty && Volume->FatType != Fat12) {
+  if (!Volume->FatDirty && (Volume->FatType != Fat12)) {
     Volume->FatDirty = TRUE;
     FatAccessVolumeDirty (Volume, WriteFat, &Volume->DirtyValue);
   }
+
   //
   // Write the updated fat entry value to the volume
   // The fat is the first fat, and other fat will be in sync
@@ -239,11 +243,10 @@ FatFreeClusters (
   IN UINTN                Cluster
   )
 {
-  UINTN LastCluster;
+  UINTN  LastCluster;
 
   while (!FAT_END_OF_FAT_CHAIN (Cluster)) {
-    if (Cluster == FAT_CLUSTER_FREE || Cluster >= FAT_CLUSTER_SPECIAL) {
-
+    if ((Cluster == FAT_CLUSTER_FREE) || (Cluster >= FAT_CLUSTER_SPECIAL)) {
       DEBUG ((DEBUG_INIT | DEBUG_ERROR, "FatShrinkEof: cluster chain corrupt\n"));
       return EFI_VOLUME_CORRUPTED;
     }
@@ -271,27 +274,27 @@ FatAllocateCluster (
   IN FAT_VOLUME   *Volume
   )
 {
-  UINTN Cluster;
+  UINTN  Cluster;
 
   //
   // Start looking at FatFreePos for the next unallocated cluster
   //
   if (Volume->DiskError) {
-    return (UINTN) FAT_CLUSTER_LAST;
+    return (UINTN)FAT_CLUSTER_LAST;
   }
 
-  for (;;) {
+  for ( ; ;) {
     //
     // If the end of the list, return no available cluster
     //
     if (Volume->FatInfoSector.FreeInfo.NextCluster > (Volume->MaxCluster + 1)) {
-      if (Volume->FreeInfoValid && 0 < (INT32) (Volume->FatInfoSector.FreeInfo.ClusterCount)) {
+      if (Volume->FreeInfoValid && (0 < (INT32)(Volume->FatInfoSector.FreeInfo.ClusterCount))) {
         Volume->FreeInfoValid = FALSE;
       }
 
       FatComputeFreeInfo (Volume);
       if (Volume->FatInfoSector.FreeInfo.NextCluster > (Volume->MaxCluster + 1)) {
-        return (UINTN) FAT_CLUSTER_LAST;
+        return (UINTN)FAT_CLUSTER_LAST;
       }
     }
 
@@ -299,6 +302,7 @@ FatAllocateCluster (
     if (Cluster == FAT_CLUSTER_FREE) {
       break;
     }
+
     //
     // Try the next cluster
     //
@@ -327,7 +331,7 @@ FatSizeToClusters (
   IN UINTN            Size
   )
 {
-  UINTN Clusters;
+  UINTN  Clusters;
 
   Clusters = Size >> Volume->ClusterAlignment;
   if ((Size & (Volume->ClusterSize - 1)) > 0) {
@@ -358,7 +362,7 @@ FatShrinkEof (
   UINTN       Cluster;
   UINTN       LastCluster;
 
-  Volume  = OFile->Volume;
+  Volume = OFile->Volume;
   ASSERT_VOLUME_LOCKED (Volume);
 
   NewSize = FatSizeToClusters (Volume, OFile->FileSize);
@@ -370,10 +374,8 @@ FatShrinkEof (
   LastCluster = FAT_CLUSTER_FREE;
 
   if (NewSize != 0) {
-
     for (CurSize = 0; CurSize < NewSize; CurSize++) {
-      if (Cluster == FAT_CLUSTER_FREE || Cluster >= FAT_CLUSTER_SPECIAL) {
-
+      if ((Cluster == FAT_CLUSTER_FREE) || (Cluster >= FAT_CLUSTER_SPECIAL)) {
         DEBUG ((DEBUG_INIT | DEBUG_ERROR, "FatShrinkEof: cluster chain corrupt\n"));
         return EFI_VOLUME_CORRUPTED;
       }
@@ -382,8 +384,7 @@ FatShrinkEof (
       Cluster     = FatGetFatEntry (Volume, Cluster);
     }
 
-    FatSetFatEntry (Volume, LastCluster, (UINTN) FAT_CLUSTER_LAST);
-
+    FatSetFatEntry (Volume, LastCluster, (UINTN)FAT_CLUSTER_LAST);
   } else {
     //
     // Check to see if the file is already completely truncated
@@ -391,18 +392,20 @@ FatShrinkEof (
     if (Cluster == FAT_CLUSTER_FREE) {
       return EFI_SUCCESS;
     }
+
     //
     // The file is being completely truncated.
     //
-    OFile->FileCluster      = FAT_CLUSTER_FREE;
+    OFile->FileCluster = FAT_CLUSTER_FREE;
   }
+
   //
   // Set CurrentCluster == FileCluster
   // to force a recalculation of Position related stuffs
   //
   OFile->FileCurrentCluster = OFile->FileCluster;
   OFile->FileLastCluster    = LastCluster;
-  OFile->Dirty              = TRUE;
+  OFile->Dirty = TRUE;
   //
   // Free the remaining cluster chain
   //
@@ -450,42 +453,41 @@ FatGrowEof (
   // If the file is already large enough, do nothing
   //
   CurSize = FatSizeToClusters (Volume, OFile->FileSize);
-  NewSize = FatSizeToClusters (Volume, (UINTN) NewSizeInBytes);
+  NewSize = FatSizeToClusters (Volume, (UINTN)NewSizeInBytes);
 
   if (CurSize < NewSize) {
     //
     // If we haven't found the files last cluster do it now
     //
     if ((OFile->FileCluster != 0) && (OFile->FileLastCluster == 0)) {
-      Cluster       = OFile->FileCluster;
-      ClusterCount  = 0;
+      Cluster = OFile->FileCluster;
+      ClusterCount = 0;
 
       while (!FAT_END_OF_FAT_CHAIN (Cluster)) {
-        if (Cluster < FAT_MIN_CLUSTER || Cluster > Volume->MaxCluster + 1) {
-
+        if ((Cluster < FAT_MIN_CLUSTER) || (Cluster > Volume->MaxCluster + 1)) {
           DEBUG (
             (DEBUG_INIT | DEBUG_ERROR,
-            "FatGrowEof: cluster chain corrupt\n")
+             "FatGrowEof: cluster chain corrupt\n")
             );
           Status = EFI_VOLUME_CORRUPTED;
           goto Done;
         }
 
         ClusterCount++;
-        OFile->FileLastCluster  = Cluster;
-        Cluster                 = FatGetFatEntry (Volume, Cluster);
+        OFile->FileLastCluster = Cluster;
+        Cluster = FatGetFatEntry (Volume, Cluster);
       }
 
       if (ClusterCount != CurSize) {
         DEBUG (
           (DEBUG_INIT | DEBUG_ERROR,
-          "FatGrowEof: cluster chain size does not match file size\n")
+           "FatGrowEof: cluster chain size does not match file size\n")
           );
         Status = EFI_VOLUME_CORRUPTED;
         goto Done;
       }
-
     }
+
     //
     // Loop until we've allocated enough space
     //
@@ -495,7 +497,7 @@ FatGrowEof (
       NewCluster = FatAllocateCluster (Volume);
       if (FAT_END_OF_FAT_CHAIN (NewCluster)) {
         if (LastCluster != FAT_CLUSTER_FREE) {
-          FatSetFatEntry (Volume, LastCluster, (UINTN) FAT_CLUSTER_LAST);
+          FatSetFatEntry (Volume, LastCluster, (UINTN)FAT_CLUSTER_LAST);
           OFile->FileLastCluster = LastCluster;
         }
 
@@ -503,7 +505,7 @@ FatGrowEof (
         goto Done;
       }
 
-      if (NewCluster < FAT_MIN_CLUSTER || NewCluster > Volume->MaxCluster + 1) {
+      if ((NewCluster < FAT_MIN_CLUSTER) || (NewCluster > Volume->MaxCluster + 1)) {
         Status = EFI_VOLUME_CORRUPTED;
         goto Done;
       }
@@ -511,12 +513,12 @@ FatGrowEof (
       if (LastCluster != 0) {
         FatSetFatEntry (Volume, LastCluster, NewCluster);
       } else {
-        OFile->FileCluster        = NewCluster;
+        OFile->FileCluster = NewCluster;
         OFile->FileCurrentCluster = NewCluster;
       }
 
       LastCluster = NewCluster;
-      CurSize += 1;
+      CurSize    += 1;
 
       //
       // Terminate the cluster list
@@ -529,12 +531,12 @@ FatGrowEof (
       // a second time.  There are other, less predictable scenarios
       // where this could happen, as well.
       //
-      FatSetFatEntry (Volume, LastCluster, (UINTN) FAT_CLUSTER_LAST);
+      FatSetFatEntry (Volume, LastCluster, (UINTN)FAT_CLUSTER_LAST);
       OFile->FileLastCluster = LastCluster;
     }
   }
 
-  OFile->FileSize = (UINTN) NewSizeInBytes;
+  OFile->FileSize = (UINTN)NewSizeInBytes;
   OFile->Dirty    = TRUE;
   return EFI_SUCCESS;
 
@@ -569,7 +571,7 @@ FatOFilePosition (
   UINTN       StartPos;
   UINTN       Run;
 
-  Volume      = OFile->Volume;
+  Volume = OFile->Volume;
   ClusterSize = Volume->ClusterSize;
 
   ASSERT_VOLUME_LOCKED (Volume);
@@ -579,8 +581,8 @@ FatOFilePosition (
   // from its fixed info in the fat bpb
   //
   if (OFile->IsFixedRootDir) {
-    OFile->PosDisk  = Volume->RootPos + Position;
-    Run             = OFile->FileSize - Position;
+    OFile->PosDisk = Volume->RootPos + Position;
+    Run = OFile->FileSize - Position;
   } else {
     //
     // Run the file's cluster chain to find the current position
@@ -594,32 +596,32 @@ FatOFilePosition (
     // when OFile->FileCluster is updated, so make a check of this
     // and invalidate the original OFile->Position in this case
     //
-    Cluster     = OFile->FileCurrentCluster;
-    StartPos    = OFile->Position;
-    if (Position < StartPos || OFile->FileCluster == Cluster) {
-      StartPos  = 0;
-      Cluster   = OFile->FileCluster;
+    Cluster  = OFile->FileCurrentCluster;
+    StartPos = OFile->Position;
+    if ((Position < StartPos) || (OFile->FileCluster == Cluster)) {
+      StartPos = 0;
+      Cluster  = OFile->FileCluster;
     }
 
     while (StartPos + ClusterSize <= Position) {
       StartPos += ClusterSize;
-      if (Cluster == FAT_CLUSTER_FREE || (Cluster >= FAT_CLUSTER_SPECIAL)) {
-        DEBUG ((DEBUG_INIT | DEBUG_ERROR, "FatOFilePosition:"" cluster chain corrupt\n"));
+      if ((Cluster == FAT_CLUSTER_FREE) || (Cluster >= FAT_CLUSTER_SPECIAL)) {
+        DEBUG ((DEBUG_INIT | DEBUG_ERROR, "FatOFilePosition:" " cluster chain corrupt\n"));
         return EFI_VOLUME_CORRUPTED;
       }
 
       Cluster = FatGetFatEntry (Volume, Cluster);
     }
 
-    if (Cluster < FAT_MIN_CLUSTER || Cluster > Volume->MaxCluster + 1) {
+    if ((Cluster < FAT_MIN_CLUSTER) || (Cluster > Volume->MaxCluster + 1)) {
       return EFI_VOLUME_CORRUPTED;
     }
 
-    OFile->PosDisk            = Volume->FirstClusterPos +
-                                LShiftU64 (Cluster - FAT_MIN_CLUSTER, Volume->ClusterAlignment) +
-                                Position - StartPos;
+    OFile->PosDisk = Volume->FirstClusterPos +
+                     LShiftU64 (Cluster - FAT_MIN_CLUSTER, Volume->ClusterAlignment) +
+                     Position - StartPos;
     OFile->FileCurrentCluster = Cluster;
-    OFile->Position           = StartPos;
+    OFile->Position = StartPos;
 
     //
     // Compute the number of consecutive clusters in the file
@@ -654,7 +656,8 @@ FatPhysicalDirSize (
   IN UINTN                 Cluster
   )
 {
-  UINTN Size;
+  UINTN  Size;
+
   ASSERT_VOLUME_LOCKED (Volume);
   //
   // Run the cluster chain for the OFile
@@ -666,15 +669,15 @@ FatPhysicalDirSize (
   //
   if (Cluster != 0) {
     while (!FAT_END_OF_FAT_CHAIN (Cluster)) {
-      if (Cluster == FAT_CLUSTER_FREE || Cluster >= FAT_CLUSTER_SPECIAL) {
+      if ((Cluster == FAT_CLUSTER_FREE) || (Cluster >= FAT_CLUSTER_SPECIAL)) {
         DEBUG (
           (DEBUG_INIT | DEBUG_ERROR,
-          "FATDirSize: cluster chain corrupt\n")
+           "FATDirSize: cluster chain corrupt\n")
           );
         return 0;
       }
 
-      Size += Volume->ClusterSize;
+      Size   += Volume->ClusterSize;
       Cluster = FatGetFatEntry (Volume, Cluster);
     }
   }
@@ -700,8 +703,9 @@ FatPhysicalFileSize (
 {
   UINTN   ClusterSizeMask;
   UINT64  PhysicalSize;
+
   ClusterSizeMask = Volume->ClusterSize - 1;
-  PhysicalSize    = (RealSize + ClusterSizeMask) & (~((UINT64) ClusterSizeMask));
+  PhysicalSize    = (RealSize + ClusterSizeMask) & (~((UINT64)ClusterSizeMask));
   return PhysicalSize;
 }
 
@@ -717,15 +721,14 @@ FatComputeFreeInfo (
   IN FAT_VOLUME *Volume
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   //
   // If we don't have valid info, compute it now
   //
   if (!Volume->FreeInfoValid) {
-
-    Volume->FreeInfoValid                        = TRUE;
-    Volume->FatInfoSector.FreeInfo.ClusterCount  = 0;
+    Volume->FreeInfoValid = TRUE;
+    Volume->FatInfoSector.FreeInfo.ClusterCount = 0;
     for (Index = Volume->MaxCluster + 1; Index >= FAT_MIN_CLUSTER; Index--) {
       if (Volume->DiskError) {
         break;
@@ -733,11 +736,11 @@ FatComputeFreeInfo (
 
       if (FatGetFatEntry (Volume, Index) == FAT_CLUSTER_FREE) {
         Volume->FatInfoSector.FreeInfo.ClusterCount += 1;
-        Volume->FatInfoSector.FreeInfo.NextCluster = (UINT32) Index;
+        Volume->FatInfoSector.FreeInfo.NextCluster   = (UINT32)Index;
       }
     }
 
-    Volume->FatInfoSector.Signature          = FAT_INFO_SIGNATURE;
+    Volume->FatInfoSector.Signature = FAT_INFO_SIGNATURE;
     Volume->FatInfoSector.InfoBeginSignature = FAT_INFO_BEGIN_SIGNATURE;
     Volume->FatInfoSector.InfoEndSignature   = FAT_INFO_END_SIGNATURE;
   }
