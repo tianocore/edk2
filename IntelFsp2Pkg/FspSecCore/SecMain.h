@@ -8,7 +8,6 @@
 #ifndef _SEC_CORE_H_
 #define _SEC_CORE_H_
 
-
 #include <PiPei.h>
 #include <Ppi/TemporaryRamSupport.h>
 
@@ -27,7 +26,7 @@
 typedef VOID (*PEI_CORE_ENTRY) ( \
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData, \
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList \
-);
+  );
 
 typedef struct _SEC_IDT_TABLE {
   //
@@ -36,8 +35,8 @@ typedef struct _SEC_IDT_TABLE {
   // Note: For IA32, only the 4 bytes immediately preceding IDT is used to store
   // EFI_PEI_SERVICES**
   //
-  UINT64            PeiService;
-  UINT64            IdtTable[FixedPcdGet8 (PcdFspMaxInterruptSupported)];
+  UINT64    PeiService;
+  UINT64    IdtTable[FixedPcdGet8 (PcdFspMaxInterruptSupported)];
 } SEC_IDT_TABLE;
 
 /**
@@ -80,7 +79,6 @@ SecTemporaryRamSupport (
   IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
   IN UINTN                    CopySize
   );
-
 
 /**
 
