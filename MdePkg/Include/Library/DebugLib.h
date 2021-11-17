@@ -448,7 +448,7 @@ UnitTestDebugAssert (
     do {                                                                                 \
       if (DebugAssertEnabled ()) {                                                       \
         if (EFI_ERROR (StatusParameter)) {                                               \
-          DEBUG ((EFI_D_ERROR, "\nASSERT_EFI_ERROR (Status = %r)\n", StatusParameter));  \
+          DEBUG ((DEBUG_ERROR, "\nASSERT_EFI_ERROR (Status = %r)\n", StatusParameter));  \
           _ASSERT (!EFI_ERROR (StatusParameter));                                        \
         }                                                                                \
       }                                                                                  \
