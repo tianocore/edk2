@@ -21,7 +21,7 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#define MMC_TRACE(txt)  DEBUG((EFI_D_BLKIO, "MMC: " txt "\n"))
+#define MMC_TRACE(txt)  DEBUG((DEBUG_BLKIO, "MMC: " txt "\n"))
 
 #define MMC_IOBLOCKS_READ       0
 #define MMC_IOBLOCKS_WRITE      1
