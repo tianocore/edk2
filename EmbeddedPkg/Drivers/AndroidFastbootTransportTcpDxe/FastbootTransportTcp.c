@@ -99,7 +99,7 @@ SubmitRecieveToken (
   FragmentBuffer = AllocatePool (RX_FRAGMENT_SIZE);
   ASSERT (FragmentBuffer != NULL);
   if (FragmentBuffer == NULL) {
-    DEBUG ((EFI_D_ERROR, "TCP Fastboot out of resources"));
+    DEBUG ((DEBUG_ERROR, "TCP Fastboot out of resources"));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -109,7 +109,7 @@ SubmitRecieveToken (
 
   Status = mTcpConnection->Receive (mTcpConnection, &mReceiveToken[mNextSubmitIndex]);
    if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TCP Receive: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "TCP Receive: %r\n", Status));
     FreePool (FragmentBuffer);
   }
 
@@ -140,7 +140,7 @@ ConnectionClosed (
 
   Status = mTcpListener->Accept (mTcpListener, &mAcceptToken);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TCP Accept: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "TCP Accept: %r\n", Status));
   }
 }
 
@@ -195,7 +195,7 @@ DataReceived (
 
   NewEntry = AllocatePool (sizeof (FASTBOOT_TCP_PACKET_LIST));
   if (NewEntry == NULL) {
-    DEBUG ((EFI_D_ERROR, "TCP Fastboot: Out of resources\n"));
+    DEBUG ((DEBUG_ERROR, "TCP Fastboot: Out of resources\n"));
     return;
   }
 
@@ -215,7 +215,7 @@ DataReceived (
     NewEntry->Buffer = NULL;
     NewEntry->BufferSize = 0;
 
-    DEBUG ((EFI_D_ERROR, "\nTCP Fastboot Receive error: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "\nTCP Fastboot Receive error: %r\n", Status));
   }
 
   InsertTailList (&mPacketListHead, &NewEntry->Link);
@@ -244,10 +244,10 @@ ConnectionAccepted (
   Status = AcceptToken->CompletionToken.Status;
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TCP Fastboot: Connection Error: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "TCP Fastboot: Connection Error: %r\n", Status));
     return;
   }
-  DEBUG ((EFI_D_ERROR, "TCP Fastboot: Connection Received.\n"));
+  DEBUG ((DEBUG_ERROR, "TCP Fastboot: Connection Received.\n"));
 
   //
   // Accepting a new TCP connection creates a new instance of the TCP protocol.
@@ -263,7 +263,7 @@ ConnectionAccepted (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Open TCP Connection: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Open TCP Connection: %r\n", Status));
     return;
   }
 
@@ -335,7 +335,7 @@ TcpFastbootTransportStart (
                   &HandleBuffer
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Find TCP Service Binding: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Find TCP Service Binding: %r\n", Status));
     return Status;
   }
 
@@ -351,13 +351,13 @@ TcpFastbootTransportStart (
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Open TCP Service Binding: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Open TCP Service Binding: %r\n", Status));
     return Status;
   }
 
   Status = mTcpServiceBinding->CreateChild (mTcpServiceBinding, &mTcpHandle);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TCP ServiceBinding Create: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "TCP ServiceBinding Create: %r\n", Status));
     return Status;
   }
 
@@ -370,7 +370,7 @@ TcpFastbootTransportStart (
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Open TCP Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Open TCP Protocol: %r\n", Status));
   }
 
   //
@@ -423,7 +423,7 @@ TcpFastbootTransportStart (
     } while (!Ip4ModeData.IsConfigured);
     Status = mTcpListener->Configure (mTcpListener, &TcpConfigData);
   } else if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TCP Configure: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "TCP Configure: %r\n", Status));
     return Status;
   }
 
@@ -443,7 +443,7 @@ TcpFastbootTransportStart (
 
   Status = mTcpListener->Accept (mTcpListener, &mAcceptToken);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TCP Accept: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "TCP Accept: %r\n", Status));
     return Status;
   }
 
@@ -539,7 +539,7 @@ DataSent (
 
   Status = mTransmitToken.CompletionToken.Status;
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TCP Fastboot transmit result: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "TCP Fastboot transmit result: %r\n", Status));
     gBS->SignalEvent (*(EFI_EVENT *) Context);
   }
 
@@ -584,7 +584,7 @@ TcpFastbootTransportSend (
 
   Status = mTcpConnection->Transmit (mTcpConnection, &mTransmitToken);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TCP Transmit: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "TCP Transmit: %r\n", Status));
     return Status;
   }
 
@@ -642,7 +642,7 @@ TcpFastbootTransportEntryPoint (
     (VOID **) &mTextOut
     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Open Text Output Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Open Text Output Protocol: %r\n", Status));
     return Status;
   }
 
@@ -653,7 +653,7 @@ TcpFastbootTransportEntryPoint (
                   &mTransportProtocol
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Install transport Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Install transport Protocol: %r\n", Status));
   }
 
   return Status;
