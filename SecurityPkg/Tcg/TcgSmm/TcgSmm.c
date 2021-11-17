@@ -62,13 +62,13 @@ PhysicalPresenceCallback (
                            &PpData
                            );
 
-  DEBUG ((EFI_D_INFO, "[TPM] PP callback, Parameter = %x\n", mTcgNvs->PhysicalPresence.Parameter));
+  DEBUG ((DEBUG_INFO, "[TPM] PP callback, Parameter = %x\n", mTcgNvs->PhysicalPresence.Parameter));
   if (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_RETURN_REQUEST_RESPONSE_TO_OS) {
     if (EFI_ERROR (Status)) {
       mTcgNvs->PhysicalPresence.ReturnCode  = PP_RETURN_TPM_OPERATION_RESPONSE_FAILURE;
       mTcgNvs->PhysicalPresence.LastRequest = 0;
       mTcgNvs->PhysicalPresence.Response    = 0;
-      DEBUG ((EFI_D_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
     mTcgNvs->PhysicalPresence.ReturnCode  = PP_RETURN_TPM_OPERATION_RESPONSE_SUCCESS;
@@ -78,7 +78,7 @@ PhysicalPresenceCallback (
           || (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2)) {
     if (EFI_ERROR (Status)) {
       mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
-      DEBUG ((EFI_D_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
     if (mTcgNvs->PhysicalPresence.Request == PHYSICAL_PRESENCE_SET_OPERATOR_AUTH) {
@@ -124,7 +124,7 @@ PhysicalPresenceCallback (
   } else if (mTcgNvs->PhysicalPresence.Parameter == ACPI_FUNCTION_GET_USER_CONFIRMATION_STATUS_FOR_REQUEST) {
     if (EFI_ERROR (Status)) {
       mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION;
-      DEBUG ((EFI_D_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "[TPM] Get PP variable failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
     //
@@ -140,7 +140,7 @@ PhysicalPresenceCallback (
                              );
     if (EFI_ERROR (Status)) {
       mTcgNvs->PhysicalPresence.ReturnCode = TCG_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION;
-      DEBUG ((EFI_D_ERROR, "[TPM] Get PP flags failure! Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "[TPM] Get PP flags failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
 
@@ -257,7 +257,7 @@ MemoryClearCallback (
                              );
     if (EFI_ERROR (Status)) {
       mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_GENERAL_FAILURE;
-      DEBUG ((EFI_D_ERROR, "[TPM] Get MOR variable failure! Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "[TPM] Get MOR variable failure! Status = %r\n", Status));
       return EFI_SUCCESS;
     }
 
@@ -267,7 +267,7 @@ MemoryClearCallback (
     MorControl &= ~MOR_CLEAR_MEMORY_BIT_MASK;
   } else {
     mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_GENERAL_FAILURE;
-    DEBUG ((EFI_D_ERROR, "[TPM] MOR Parameter error! Parameter = %x\n", mTcgNvs->MemoryClear.Parameter));
+    DEBUG ((DEBUG_ERROR, "[TPM] MOR Parameter error! Parameter = %x\n", mTcgNvs->MemoryClear.Parameter));
     return EFI_SUCCESS;
   }
 
@@ -281,7 +281,7 @@ MemoryClearCallback (
                            );
   if (EFI_ERROR (Status)) {
     mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_GENERAL_FAILURE;
-    DEBUG ((EFI_D_ERROR, "[TPM] Set MOR variable failure! Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "[TPM] Set MOR variable failure! Status = %r\n", Status));
   }
 
   return EFI_SUCCESS;
@@ -424,7 +424,7 @@ InitializeTcgSmm (
   EFI_HANDLE                     SwHandle;
 
   if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
-    DEBUG ((EFI_D_ERROR, "No TPM12 instance required!\n"));
+    DEBUG ((DEBUG_ERROR, "No TPM12 instance required!\n"));
     return EFI_UNSUPPORTED;
   }
 
@@ -460,4 +460,3 @@ InitializeTcgSmm (
 
   return EFI_SUCCESS;
 }
-
