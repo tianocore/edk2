@@ -416,7 +416,7 @@ AddSingleStep (
   }
 
   InvalidateInstructionCacheRange ((VOID *)mSingleStepPC, mSingleStepDataSize);
-  //DEBUG((EFI_D_ERROR, "AddSingleStep at 0x%08x (was: 0x%08x is:0x%08x)\n", SystemContext.SystemContextArm->PC, mSingleStepData, *(UINT32 *)mSingleStepPC));
+  //DEBUG((DEBUG_ERROR, "AddSingleStep at 0x%08x (was: 0x%08x is:0x%08x)\n", SystemContext.SystemContextArm->PC, mSingleStepData, *(UINT32 *)mSingleStepPC));
 }
 
 
@@ -437,7 +437,7 @@ RemoveSingleStep (
   if (mSingleStepDataSize == sizeof (UINT16)) {
     *(UINT16 *)mSingleStepPC = (UINT16)mSingleStepData;
   } else {
-    //DEBUG((EFI_D_ERROR, "RemoveSingleStep at 0x%08x (was: 0x%08x is:0x%08x)\n", SystemContext.SystemContextArm->PC, *(UINT32 *)mSingleStepPC, mSingleStepData));
+    //DEBUG((DEBUG_ERROR, "RemoveSingleStep at 0x%08x (was: 0x%08x is:0x%08x)\n", SystemContext.SystemContextArm->PC, *(UINT32 *)mSingleStepPC, mSingleStepData));
     *(UINT32 *)mSingleStepPC = mSingleStepData;
   }
   InvalidateInstructionCacheRange ((VOID *)mSingleStepPC, mSingleStepDataSize);
@@ -556,7 +556,7 @@ SetBreakpoint (
   *(UINT32 *)Address = GDB_ARM_BKPT;
   InvalidateInstructionCacheRange ((VOID *)Address, 4);
 
-  //DEBUG((EFI_D_ERROR, "SetBreakpoint at 0x%08x (was: 0x%08x is:0x%08x)\n", Address, Breakpoint->Instruction, *(UINT32 *)Address));
+  //DEBUG((DEBUG_ERROR, "SetBreakpoint at 0x%08x (was: 0x%08x is:0x%08x)\n", Address, Breakpoint->Instruction, *(UINT32 *)Address));
 }
 
 VOID
@@ -579,7 +579,7 @@ ClearBreakpoint (
   *(UINT32 *)Address = Breakpoint->Instruction;
   InvalidateInstructionCacheRange ((VOID *)Address, 4);
 
-  //DEBUG((EFI_D_ERROR, "ClearBreakpoint at 0x%08x (was: 0x%08x is:0x%08x)\n", Address, GDB_ARM_BKPT, *(UINT32 *)Address));
+  //DEBUG((DEBUG_ERROR, "ClearBreakpoint at 0x%08x (was: 0x%08x is:0x%08x)\n", Address, GDB_ARM_BKPT, *(UINT32 *)Address));
 
   FreePool (Breakpoint);
 }
@@ -607,7 +607,7 @@ InsertBreakPoint (
       break;
 
     default  :
-      DEBUG((EFI_D_ERROR, "Insert breakpoint default: %x\n", Type));
+      DEBUG((DEBUG_ERROR, "Insert breakpoint default: %x\n", Type));
       SendError (GDB_EINVALIDBRKPOINTTYPE);
       return;
   }
@@ -694,4 +694,3 @@ ValidateException (
 
   return TRUE;
 }
-

@@ -161,7 +161,7 @@ HandleFlash (
   } else if (EFI_ERROR (Status)) {
     SEND_LITERAL ("FAILError flashing partition.");
     mTextOut->OutputString (mTextOut, L"Error flashing partition.\r\n");
-    DEBUG ((EFI_D_ERROR, "Couldn't flash image:  %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Couldn't flash image:  %r\n", Status));
   } else {
     mTextOut->OutputString (mTextOut, L"Done.\r\n");
     SEND_LITERAL ("OKAY");
@@ -184,7 +184,7 @@ HandleErase (
   Status = mPlatform->ErasePartition (PartitionName);
   if (EFI_ERROR (Status)) {
     SEND_LITERAL ("FAILCheck device console.");
-    DEBUG ((EFI_D_ERROR, "Couldn't erase image:  %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Couldn't erase image:  %r\n", Status));
   } else {
     SEND_LITERAL ("OKAY");
   }
@@ -212,7 +212,7 @@ HandleBoot (
 
   Status = BootAndroidBootImg (mNumDataBytes, mDataBuffer);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Failed to boot downloaded image: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Failed to boot downloaded image: %r\n", Status));
   }
   // We shouldn't get here
 }
@@ -286,13 +286,13 @@ AcceptCmd (
     gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
 
     // Shouldn't get here
-    DEBUG ((EFI_D_ERROR, "Fastboot: gRT->ResetSystem didn't work\n"));
+    DEBUG ((DEBUG_ERROR, "Fastboot: gRT->ResetSystem didn't work\n"));
   } else if (MATCH_CMD_LITERAL ("powerdown", Command)) {
     SEND_LITERAL ("OKAY");
     gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
 
     // Shouldn't get here
-    DEBUG ((EFI_D_ERROR, "Fastboot: gRT->ResetSystem didn't work\n"));
+    DEBUG ((DEBUG_ERROR, "Fastboot: gRT->ResetSystem didn't work\n"));
   } else if (MATCH_CMD_LITERAL ("oem", Command)) {
     // The "oem" command isn't in the specification, but it was observed in the
     // wild, followed by a space, followed by the actual command.
@@ -430,25 +430,25 @@ FastbootAppEntryPoint (
     (VOID **) &mTransport
     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't open Fastboot Transport Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't open Fastboot Transport Protocol: %r\n", Status));
     return Status;
   }
 
   Status = gBS->LocateProtocol (&gAndroidFastbootPlatformProtocolGuid, NULL, (VOID **) &mPlatform);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't open Fastboot Platform Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't open Fastboot Platform Protocol: %r\n", Status));
     return Status;
   }
 
   Status = mPlatform->Init ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't initialise Fastboot Platform Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't initialise Fastboot Platform Protocol: %r\n", Status));
     return Status;
   }
 
   Status = gBS->LocateProtocol (&gEfiSimpleTextOutProtocolGuid, NULL, (VOID **) &mTextOut);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "Fastboot: Couldn't open Text Output Protocol: %r\n", Status
       ));
     return Status;
@@ -456,14 +456,14 @@ FastbootAppEntryPoint (
 
   Status = gBS->LocateProtocol (&gEfiSimpleTextInProtocolGuid, NULL, (VOID **) &TextIn);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't open Text Input Protocol: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't open Text Input Protocol: %r\n", Status));
     return Status;
   }
 
   // Disable watchdog
   Status = gBS->SetWatchdogTimer (0, 0x10000, 0, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't disable watchdog timer: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't disable watchdog timer: %r\n", Status));
   }
 
   // Create event for receipt of data from the host
@@ -497,7 +497,7 @@ FastbootAppEntryPoint (
     ReceiveEvent
     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fastboot: Couldn't start transport: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Fastboot: Couldn't start transport: %r\n", Status));
     return Status;
   }
 
@@ -521,7 +521,7 @@ FastbootAppEntryPoint (
 
   mTransport->Stop ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Warning: Fastboot Transport Stop: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Warning: Fastboot Transport Stop: %r\n", Status));
   }
   mPlatform->UnInit ();
 
