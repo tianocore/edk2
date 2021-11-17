@@ -13,7 +13,6 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/EfiResetSystemLib.h>
 
-
 /**
   Resets the entire platform.
 
@@ -37,8 +36,6 @@ ResetSystemViaLib (
   LibResetSystem (ResetType, ResetStatus, DataSize, ResetData);
   return;
 }
-
-
 
 EFI_STATUS
 EFIAPI
@@ -65,4 +62,3 @@ InitializeReset (
 
   return Status;
 }
-

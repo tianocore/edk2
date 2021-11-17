@@ -22,7 +22,7 @@
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-#define IP4_ADDR_TO_STRING(IpAddr, IpAddrString) UnicodeSPrint (       \
+#define IP4_ADDR_TO_STRING(IpAddr, IpAddrString)  UnicodeSPrint (      \
                                                    IpAddrString,       \
                                                    16 * 2,             \
                                                    L"%d.%d.%d.%d",     \
@@ -37,42 +37,42 @@
 // (This isn't actually a packet size - it's just the size of the buffers we
 //  pass to the TCP driver to fill with received data.)
 // We can achieve much better performance by doing this in larger chunks.
-#define RX_FRAGMENT_SIZE 2048
+#define RX_FRAGMENT_SIZE  2048
 
-STATIC EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *mTextOut;
+STATIC EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *mTextOut;
 
-STATIC EFI_TCP4_PROTOCOL *mTcpConnection;
-STATIC EFI_TCP4_PROTOCOL *mTcpListener;
+STATIC EFI_TCP4_PROTOCOL  *mTcpConnection;
+STATIC EFI_TCP4_PROTOCOL  *mTcpListener;
 
-STATIC EFI_EVENT mReceiveEvent;
+STATIC EFI_EVENT  mReceiveEvent;
 
-STATIC EFI_SERVICE_BINDING_PROTOCOL *mTcpServiceBinding;
+STATIC EFI_SERVICE_BINDING_PROTOCOL  *mTcpServiceBinding;
 STATIC EFI_HANDLE                    mTcpHandle = NULL;
 
 // We only ever use one IO token for receive and one for transmit. To save
 // repeatedly allocating and freeing, just allocate statically and re-use.
-#define NUM_RX_TOKENS 16
-#define TOKEN_NEXT(Index) (((Index) + 1) % NUM_RX_TOKENS)
+#define NUM_RX_TOKENS  16
+#define TOKEN_NEXT(Index)  (((Index) + 1) % NUM_RX_TOKENS)
 
-STATIC UINTN                     mNextSubmitIndex;
-STATIC UINTN                     mNextReceiveIndex;
-STATIC EFI_TCP4_IO_TOKEN         mReceiveToken[NUM_RX_TOKENS];
-STATIC EFI_TCP4_RECEIVE_DATA     mRxData[NUM_RX_TOKENS];
-STATIC EFI_TCP4_IO_TOKEN         mTransmitToken;
-STATIC EFI_TCP4_TRANSMIT_DATA    mTxData;
+STATIC UINTN                   mNextSubmitIndex;
+STATIC UINTN                   mNextReceiveIndex;
+STATIC EFI_TCP4_IO_TOKEN       mReceiveToken[NUM_RX_TOKENS];
+STATIC EFI_TCP4_RECEIVE_DATA   mRxData[NUM_RX_TOKENS];
+STATIC EFI_TCP4_IO_TOKEN       mTransmitToken;
+STATIC EFI_TCP4_TRANSMIT_DATA  mTxData;
 // We also reuse the accept token
-STATIC EFI_TCP4_LISTEN_TOKEN     mAcceptToken;
+STATIC EFI_TCP4_LISTEN_TOKEN  mAcceptToken;
 // .. and the close token
-STATIC EFI_TCP4_CLOSE_TOKEN      mCloseToken;
+STATIC EFI_TCP4_CLOSE_TOKEN  mCloseToken;
 
 // List type for queued received packets
 typedef struct _FASTBOOT_TCP_PACKET_LIST {
-  LIST_ENTRY  Link;
-  VOID       *Buffer;
-  UINTN       BufferSize;
+  LIST_ENTRY    Link;
+  VOID          *Buffer;
+  UINTN         BufferSize;
 } FASTBOOT_TCP_PACKET_LIST;
 
-STATIC LIST_ENTRY mPacketListHead;
+STATIC LIST_ENTRY  mPacketListHead;
 
 STATIC
 VOID
@@ -91,8 +91,8 @@ SubmitRecieveToken (
   VOID
   )
 {
-  EFI_STATUS             Status;
-  VOID                  *FragmentBuffer;
+  EFI_STATUS  Status;
+  VOID        *FragmentBuffer;
 
   Status = EFI_SUCCESS;
 
@@ -108,7 +108,7 @@ SubmitRecieveToken (
   mRxData[mNextSubmitIndex].FragmentTable[0].FragmentBuffer = FragmentBuffer;
 
   Status = mTcpConnection->Receive (mTcpConnection, &mReceiveToken[mNextSubmitIndex]);
-   if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "TCP Receive: %r\n", Status));
     FreePool (FragmentBuffer);
   }
@@ -128,7 +128,7 @@ ConnectionClosed (
   IN VOID      *Context
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   // Possible bug in EDK2 TCP4 driver: closing a connection doesn't remove its
   // PCB from the list of live connections. Subsequent attempts to Configure()
@@ -150,7 +150,7 @@ CloseReceiveEvents (
   VOID
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   for (Index = 0; Index < NUM_RX_TOKENS; Index++) {
     gBS->CloseEvent (mReceiveToken[Index].CompletionToken.Event);
@@ -168,7 +168,7 @@ DataReceived (
   IN VOID     *Context
   )
 {
-  EFI_STATUS                 Status;
+  EFI_STATUS                Status;
   FASTBOOT_TCP_PACKET_LIST  *NewEntry;
   EFI_TCP4_IO_TOKEN         *ReceiveToken;
 
@@ -208,11 +208,11 @@ DataReceived (
       = ReceiveToken->Packet.RxData->FragmentTable[0].FragmentLength;
 
     // Prepare to receive more data
-    SubmitRecieveToken();
+    SubmitRecieveToken ();
   } else {
     // Fatal receive error. Put an entry with NULL in the queue, signifying
     // to return EFI_DEVICE_ERROR from TcpFastbootTransportReceive.
-    NewEntry->Buffer = NULL;
+    NewEntry->Buffer     = NULL;
     NewEntry->BufferSize = 0;
 
     DEBUG ((EFI_D_ERROR, "\nTCP Fastboot Receive error: %r\n", Status));
@@ -223,7 +223,6 @@ DataReceived (
   Status = gBS->SignalEvent (mReceiveEvent);
   ASSERT_EFI_ERROR (Status);
 }
-
 
 /*
   Event notify function to be called when we accept an incoming TCP connection.
@@ -236,17 +235,18 @@ ConnectionAccepted (
   IN VOID     *Context
   )
 {
-  EFI_TCP4_LISTEN_TOKEN *AcceptToken;
+  EFI_TCP4_LISTEN_TOKEN  *AcceptToken;
   EFI_STATUS             Status;
   UINTN                  Index;
 
-  AcceptToken = (EFI_TCP4_LISTEN_TOKEN *) Context;
+  AcceptToken = (EFI_TCP4_LISTEN_TOKEN *)Context;
   Status = AcceptToken->CompletionToken.Status;
 
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "TCP Fastboot: Connection Error: %r\n", Status));
     return;
   }
+
   DEBUG ((EFI_D_ERROR, "TCP Fastboot: Connection Received.\n"));
 
   //
@@ -257,7 +257,7 @@ ConnectionAccepted (
   Status = gBS->OpenProtocol (
                   AcceptToken->NewChildHandle,
                   &gEfiTcp4ProtocolGuid,
-                  (VOID **) &mTcpConnection,
+                  (VOID **)&mTcpConnection,
                   gImageHandle,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -267,7 +267,7 @@ ConnectionAccepted (
     return;
   }
 
-  mNextSubmitIndex = 0;
+  mNextSubmitIndex  = 0;
   mNextReceiveIndex = 0;
 
   for (Index = 0; Index < NUM_RX_TOKENS; Index++) {
@@ -282,7 +282,7 @@ ConnectionAccepted (
   }
 
   for (Index = 0; Index < NUM_RX_TOKENS; Index++) {
-    SubmitRecieveToken();
+    SubmitRecieveToken ();
   }
 }
 
@@ -295,23 +295,29 @@ TcpFastbootTransportStart (
   EFI_EVENT ReceiveEvent
   )
 {
-  EFI_STATUS                    Status;
-  EFI_HANDLE                    NetDeviceHandle;
-  EFI_HANDLE                   *HandleBuffer;
-  EFI_IP4_MODE_DATA             Ip4ModeData;
-  UINTN                         NumHandles;
-  CHAR16                        IpAddrString[16];
-  UINTN                         Index;
+  EFI_STATUS         Status;
+  EFI_HANDLE         NetDeviceHandle;
+  EFI_HANDLE         *HandleBuffer;
+  EFI_IP4_MODE_DATA  Ip4ModeData;
+  UINTN              NumHandles;
+  CHAR16             IpAddrString[16];
+  UINTN              Index;
 
-  EFI_TCP4_CONFIG_DATA TcpConfigData = {
+  EFI_TCP4_CONFIG_DATA  TcpConfigData = {
     0x00,                                           // IPv4 Type of Service
     255,                                            // IPv4 Time to Live
     {                                               // AccessPoint:
       TRUE,                                         // Use default address
-      { {0, 0, 0, 0} },                             // IP Address  (ignored - use default)
-      { {0, 0, 0, 0} },                             // Subnet mask (ignored - use default)
+      {
+        { 0, 0, 0, 0 }
+      },                                            // IP Address  (ignored - use default)
+      {
+        { 0, 0, 0, 0 }
+      },                                            // Subnet mask (ignored - use default)
       FixedPcdGet32 (PcdAndroidFastbootTcpPort),    // Station port
-      { {0, 0, 0, 0} },                             // Remote address: accept any
+      {
+        { 0, 0, 0, 0 }
+      },                                            // Remote address: accept any
       0,                                            // Remote Port: accept any
       FALSE                                         // ActiveFlag: be a "server"
     },
@@ -343,13 +349,13 @@ TcpFastbootTransportStart (
   NetDeviceHandle = HandleBuffer[0];
 
   Status =  gBS->OpenProtocol (
-                    NetDeviceHandle,
-                    &gEfiTcp4ServiceBindingProtocolGuid,
-                    (VOID **) &mTcpServiceBinding,
-                    gImageHandle,
-                    NULL,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
+                   NetDeviceHandle,
+                   &gEfiTcp4ServiceBindingProtocolGuid,
+                   (VOID **)&mTcpServiceBinding,
+                   gImageHandle,
+                   NULL,
+                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Open TCP Service Binding: %r\n", Status));
     return Status;
@@ -362,13 +368,13 @@ TcpFastbootTransportStart (
   }
 
   Status =  gBS->OpenProtocol (
-                    mTcpHandle,
-                    &gEfiTcp4ProtocolGuid,
-                    (VOID **) &mTcpListener,
-                    gImageHandle,
-                    NULL,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
+                   mTcpHandle,
+                   &gEfiTcp4ProtocolGuid,
+                   (VOID **)&mTcpListener,
+                   gImageHandle,
+                   NULL,
+                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Open TCP Protocol: %r\n", Status));
   }
@@ -378,12 +384,12 @@ TcpFastbootTransportStart (
   //
 
   for (Index = 0; Index < NUM_RX_TOKENS; Index++) {
-    mRxData[Index].UrgentFlag = FALSE;
+    mRxData[Index].UrgentFlag    = FALSE;
     mRxData[Index].FragmentCount = 1;
     mReceiveToken[Index].Packet.RxData = &mRxData[Index];
   }
 
-  mTxData.Push = TRUE;
+  mTxData.Push   = TRUE;
   mTxData.Urgent = FALSE;
   mTxData.FragmentCount = 1;
   mTransmitToken.Packet.TxData = &mTxData;
@@ -414,13 +420,17 @@ TcpFastbootTransportStart (
   if (Status == EFI_NO_MAPPING) {
     // Wait until the IP configuration process (probably DHCP) has finished
     do {
-      Status = mTcpListener->GetModeData (mTcpListener,
-                               NULL, NULL,
+      Status = mTcpListener->GetModeData (
+                               mTcpListener,
+                               NULL,
+                               NULL,
                                &Ip4ModeData,
-                               NULL, NULL
+                               NULL,
+                               NULL
                                );
       ASSERT_EFI_ERROR (Status);
     } while (!Ip4ModeData.IsConfigured);
+
     Status = mTcpListener->Configure (mTcpListener, &TcpConfigData);
   } else if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "TCP Configure: %r\n", Status));
@@ -434,7 +444,7 @@ TcpFastbootTransportStart (
 
   mTextOut->OutputString (mTextOut, L"TCP Fastboot transport configured.");
   mTextOut->OutputString (mTextOut, L"\r\nIP address: ");
-  mTextOut->OutputString (mTextOut ,IpAddrString);
+  mTextOut->OutputString (mTextOut, IpAddrString);
   mTextOut->OutputString (mTextOut, L"\r\n");
 
   //
@@ -462,8 +472,8 @@ TcpFastbootTransportStop (
   EFI_TCP4_CLOSE_TOKEN      CloseToken;
   EFI_STATUS                Status;
   UINTN                     EventIndex;
-  FASTBOOT_TCP_PACKET_LIST *Entry;
-  FASTBOOT_TCP_PACKET_LIST *NextEntry;
+  FASTBOOT_TCP_PACKET_LIST  *Entry;
+  FASTBOOT_TCP_PACKET_LIST  *NextEntry;
 
   // Close any existing TCP connection, blocking until it's done.
   if (mTcpConnection != NULL) {
@@ -494,7 +504,6 @@ TcpFastbootTransportStop (
     ASSERT_EFI_ERROR (Status);
   }
 
-
   gBS->CloseEvent (mAcceptToken.CompletionToken.Event);
 
   // Stop listening for connections.
@@ -506,14 +515,15 @@ TcpFastbootTransportStop (
   Status = mTcpServiceBinding->DestroyChild (mTcpServiceBinding, mTcpHandle);
 
   // Free any data the user didn't pick up
-  Entry = (FASTBOOT_TCP_PACKET_LIST *) GetFirstNode (&mPacketListHead);
+  Entry = (FASTBOOT_TCP_PACKET_LIST *)GetFirstNode (&mPacketListHead);
   while (!IsNull (&mPacketListHead, &Entry->Link)) {
-    NextEntry = (FASTBOOT_TCP_PACKET_LIST *) GetNextNode (&mPacketListHead, &Entry->Link);
+    NextEntry = (FASTBOOT_TCP_PACKET_LIST *)GetNextNode (&mPacketListHead, &Entry->Link);
 
     RemoveEntryList (&Entry->Link);
     if (Entry->Buffer) {
       FreePool (Entry->Buffer);
     }
+
     FreePool (Entry);
 
     Entry = NextEntry;
@@ -535,12 +545,12 @@ DataSent (
   VOID     *Context
   )
 {
-  EFI_STATUS           Status;
+  EFI_STATUS  Status;
 
   Status = mTransmitToken.CompletionToken.Status;
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "TCP Fastboot transmit result: %r\n", Status));
-    gBS->SignalEvent (*(EFI_EVENT *) Context);
+    gBS->SignalEvent (*(EFI_EVENT *)Context);
   }
 
   FreePool (mTransmitToken.Packet.TxData->FragmentTable[0].FragmentBuffer);
@@ -553,7 +563,7 @@ TcpFastbootTransportSend (
   IN        EFI_EVENT *FatalErrorEvent
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   if (BufferSize > 512) {
     return EFI_INVALID_PARAMETER;
@@ -578,9 +588,9 @@ TcpFastbootTransportSend (
 
   mTxData.FragmentTable[0].FragmentLength = BufferSize;
   mTxData.FragmentTable[0].FragmentBuffer = AllocateCopyPool (
-                                             BufferSize,
-                                             Buffer
-                                             );
+                                              BufferSize,
+                                              Buffer
+                                              );
 
   Status = mTcpConnection->Transmit (mTcpConnection, &mTransmitToken);
   if (EFI_ERROR (Status)) {
@@ -591,27 +601,26 @@ TcpFastbootTransportSend (
   return EFI_SUCCESS;
 }
 
-
 EFI_STATUS
 TcpFastbootTransportReceive (
   OUT UINTN  *BufferSize,
   OUT VOID  **Buffer
   )
 {
-  FASTBOOT_TCP_PACKET_LIST *Entry;
+  FASTBOOT_TCP_PACKET_LIST  *Entry;
 
   if (IsListEmpty (&mPacketListHead)) {
     return EFI_NOT_READY;
   }
 
-  Entry = (FASTBOOT_TCP_PACKET_LIST *) GetFirstNode (&mPacketListHead);
+  Entry = (FASTBOOT_TCP_PACKET_LIST *)GetFirstNode (&mPacketListHead);
 
   if (Entry->Buffer == NULL) {
     // There was an error receiving this packet.
     return EFI_DEVICE_ERROR;
   }
 
-  *Buffer = Entry->Buffer;
+  *Buffer     = Entry->Buffer;
   *BufferSize = Entry->BufferSize;
 
   RemoveEntryList (&Entry->Link);
@@ -620,7 +629,7 @@ TcpFastbootTransportReceive (
   return EFI_SUCCESS;
 }
 
-FASTBOOT_TRANSPORT_PROTOCOL mTransportProtocol = {
+FASTBOOT_TRANSPORT_PROTOCOL  mTransportProtocol = {
   TcpFastbootTransportStart,
   TcpFastbootTransportStop,
   TcpFastbootTransportSend,
@@ -633,14 +642,13 @@ TcpFastbootTransportEntryPoint (
   IN EFI_SYSTEM_TABLE *SystemTable
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
-
-  Status = gBS->LocateProtocol(
-    &gEfiSimpleTextOutProtocolGuid,
-    NULL,
-    (VOID **) &mTextOut
-    );
+  Status = gBS->LocateProtocol (
+                  &gEfiSimpleTextOutProtocolGuid,
+                  NULL,
+                  (VOID **)&mTextOut
+                  );
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "Fastboot: Open Text Output Protocol: %r\n", Status));
     return Status;
