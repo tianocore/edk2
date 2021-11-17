@@ -40,8 +40,8 @@ LcdPlatformInitializeDisplay (
 **/
 EFI_STATUS
 LcdPlatformGetVram (
-  OUT EFI_PHYSICAL_ADDRESS*                 VramBaseAddress,
-  OUT UINTN*                                VramSize
+  OUT EFI_PHYSICAL_ADDRESS *VramBaseAddress,
+  OUT UINTN *VramSize
   )
 {
   ASSERT (FALSE);
@@ -137,7 +137,7 @@ LcdPlatformGetTimings (
 EFI_STATUS
 LcdPlatformGetBpp (
   IN  UINT32                                ModeNumber,
-  OUT LCD_BPP*                              Bpp
+  OUT LCD_BPP *Bpp
   )
 {
   ASSERT (FALSE);

@@ -18,7 +18,7 @@ PrimaryMain (
   PrePiMain (UefiMemoryBase, StacksBase, StartTimeStamp);
 
   // We must never return
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 VOID
@@ -27,6 +27,5 @@ SecondaryMain (
   )
 {
   // We must never get into this function on UniCore system
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
-
