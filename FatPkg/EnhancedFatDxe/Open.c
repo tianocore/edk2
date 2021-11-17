@@ -168,7 +168,7 @@ FatOFileOpen (
 
   (*NewIFile)->ReadOnly = (BOOLEAN)!WriteMode;
 
-  DEBUG ((EFI_D_INFO, "FSOpen: Open '%S' %r\n", FileName, Status));
+  DEBUG ((DEBUG_INFO, "FSOpen: Open '%S' %r\n", FileName, Status));
   return FatOFileFlush (OFile);
 }
 
