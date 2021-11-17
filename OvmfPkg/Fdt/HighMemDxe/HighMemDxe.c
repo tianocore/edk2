@@ -80,7 +80,7 @@ InitializeHighMemDxe (
                         CurSize, EFI_MEMORY_WB);
 
         if (EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_ERROR,
+          DEBUG ((DEBUG_ERROR,
             "%a: Failed to add System RAM @ 0x%lx - 0x%lx (%r)\n",
             __FUNCTION__, CurBase, CurBase + CurSize - 1, Status));
           continue;
@@ -114,11 +114,11 @@ InitializeHighMemDxe (
         Status = Cpu->SetMemoryAttributes (Cpu, CurBase, CurSize, Attributes);
 
         if (EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_ERROR,
+          DEBUG ((DEBUG_ERROR,
             "%a: Failed to set System RAM @ 0x%lx - 0x%lx attribute (%r)\n",
             __FUNCTION__, CurBase, CurBase + CurSize - 1, Status));
         } else {
-          DEBUG ((EFI_D_INFO, "%a: Add System RAM @ 0x%lx - 0x%lx\n",
+          DEBUG ((DEBUG_INFO, "%a: Add System RAM @ 0x%lx - 0x%lx\n",
             __FUNCTION__, CurBase, CurBase + CurSize - 1));
         }
       }
