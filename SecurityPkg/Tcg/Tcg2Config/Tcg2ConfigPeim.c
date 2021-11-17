@@ -104,11 +104,11 @@ Tcg2ConfigPeimEntryPoint (
   //
   // Although we have SetupVariable info, we still need detect TPM device manually.
   //
-  DEBUG ((EFI_D_INFO, "Tcg2Configuration.TpmDevice from Setup: %x\n", Tcg2Configuration.TpmDevice));
+  DEBUG ((DEBUG_INFO, "Tcg2Configuration.TpmDevice from Setup: %x\n", Tcg2Configuration.TpmDevice));
 
   if (PcdGetBool (PcdTpmAutoDetection)) {
     TpmDevice = DetectTpmDevice (Tcg2Configuration.TpmDevice);
-    DEBUG ((EFI_D_INFO, "TpmDevice final: %x\n", TpmDevice));
+    DEBUG ((DEBUG_INFO, "TpmDevice final: %x\n", TpmDevice));
     if (TpmDevice != TPM_DEVICE_NULL) {
       Tcg2Configuration.TpmDevice = TpmDevice;
     }
@@ -129,7 +129,7 @@ Tcg2ConfigPeimEntryPoint (
       Size = sizeof(mTpmInstanceId[Index].TpmInstanceGuid);
       Status = PcdSetPtrS (PcdTpmInstanceGuid, &Size, &mTpmInstanceId[Index].TpmInstanceGuid);
       ASSERT_EFI_ERROR (Status);
-      DEBUG ((EFI_D_INFO, "TpmDevice PCD: %g\n", &mTpmInstanceId[Index].TpmInstanceGuid));
+      DEBUG ((DEBUG_INFO, "TpmDevice PCD: %g\n", &mTpmInstanceId[Index].TpmInstanceGuid));
       break;
     }
   }
