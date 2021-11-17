@@ -11,7 +11,7 @@
 
 #include <Guid/IdleLoopEvent.h>
 
-BOOLEAN                   mIsFlushingGCD;
+BOOLEAN  mIsFlushingGCD;
 
 /**
   This function flushes the range of addresses from Start to Start+Length
@@ -49,7 +49,6 @@ CpuFlushCpuDataCache (
   IN EFI_CPU_FLUSH_TYPE              FlushType
   )
 {
-
   switch (FlushType) {
     case EfiCpuFlushTypeWriteBack:
       WriteBackDataCacheRange ((VOID *)(UINTN)Start, (UINTN)Length);
@@ -66,7 +65,6 @@ CpuFlushCpuDataCache (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   This function enables interrupt processing by the processor.
@@ -88,7 +86,6 @@ CpuEnableInterrupt (
   return EFI_SUCCESS;
 }
 
-
 /**
   This function disables interrupt processing by the processor.
 
@@ -108,7 +105,6 @@ CpuDisableInterrupt (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   This function retrieves the processor's current interrupt state a returns it in
@@ -134,10 +130,9 @@ CpuGetInterruptState (
     return EFI_INVALID_PARAMETER;
   }
 
-  *State = ArmGetInterruptState();
+  *State = ArmGetInterruptState ();
   return EFI_SUCCESS;
 }
-
 
 /**
   This function generates an INIT on the processor. If this function succeeds, then the
@@ -209,8 +204,8 @@ IdleLoopEventCallback (
 //
 // Globals used to initialize the protocol
 //
-EFI_HANDLE            mCpuHandle = NULL;
-EFI_CPU_ARCH_PROTOCOL mCpu = {
+EFI_HANDLE             mCpuHandle = NULL;
+EFI_CPU_ARCH_PROTOCOL  mCpu = {
   CpuFlushCpuDataCache,
   CpuEnableInterrupt,
   CpuDisableInterrupt,
@@ -239,17 +234,18 @@ CpuDxeInitialize (
   )
 {
   EFI_STATUS  Status;
-  EFI_EVENT    IdleLoopEvent;
+  EFI_EVENT   IdleLoopEvent;
 
   InitializeExceptions (&mCpu);
 
   InitializeDma (&mCpu);
 
   Status = gBS->InstallMultipleProtocolInterfaces (
-                &mCpuHandle,
-                &gEfiCpuArchProtocolGuid,           &mCpu,
-                NULL
-                );
+                  &mCpuHandle,
+                  &gEfiCpuArchProtocolGuid,
+                  &mCpu,
+                  NULL
+                  );
 
   //
   // Make sure GCD and MMU settings match. This API calls gDS->SetMemorySpaceAttributes ()
@@ -262,8 +258,8 @@ CpuDxeInitialize (
 
   // If the platform is a MPCore system then install the Configuration Table describing the
   // secondary core states
-  if (ArmIsMpCore()) {
-    PublishArmProcessorTable();
+  if (ArmIsMpCore ()) {
+    PublishArmProcessorTable ();
   }
 
   //

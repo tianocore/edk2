@@ -21,7 +21,7 @@ PHYSICAL_ADDRESS        gExceptionVectorAlignmentMask = ARM_VECTOR_TABLE_ALIGNME
 UINTN                   gDebuggerNoHandlerValue = 0; // todo: define for AArch64
 
 #define EL0_STACK_SIZE  EFI_PAGES_TO_SIZE(2)
-STATIC UINTN mNewStackBase[EL0_STACK_SIZE / sizeof (UINTN)];
+STATIC UINTN  mNewStackBase[EL0_STACK_SIZE / sizeof (UINTN)];
 
 VOID
 RegisterEl0Stack (
@@ -33,20 +33,20 @@ ArchVectorConfig (
   IN  UINTN       VectorBaseAddress
   )
 {
-  UINTN             HcrReg;
+  UINTN  HcrReg;
 
   // Round down sp by 16 bytes alignment
   RegisterEl0Stack (
     (VOID *)(((UINTN)mNewStackBase + EL0_STACK_SIZE) & ~0xFUL)
     );
 
-  if (ArmReadCurrentEL() == AARCH64_EL2) {
-    HcrReg = ArmReadHcr();
+  if (ArmReadCurrentEL () == AARCH64_EL2) {
+    HcrReg = ArmReadHcr ();
 
     // Trap General Exceptions. All exceptions that would be routed to EL1 are routed to EL2
     HcrReg |= ARM_HCR_TGE;
 
-    ArmWriteHcr(HcrReg);
+    ArmWriteHcr (HcrReg);
   }
 
   return RETURN_SUCCESS;

@@ -16,9 +16,9 @@ ArmGenericTimerEnableTimer (
   VOID
   )
 {
-  UINTN TimerCtrlReg;
+  UINTN  TimerCtrlReg;
 
-  TimerCtrlReg = ArmReadCntpCtl ();
+  TimerCtrlReg  = ArmReadCntpCtl ();
   TimerCtrlReg |= ARM_ARCH_TIMER_ENABLE;
   ArmWriteCntpCtl (TimerCtrlReg);
 }
@@ -37,9 +37,9 @@ ArmGenericTimerDisableTimer (
   VOID
   )
 {
-  UINTN TimerCtrlReg;
+  UINTN  TimerCtrlReg;
 
-  TimerCtrlReg = ArmReadCntpCtl ();
+  TimerCtrlReg  = ArmReadCntpCtl ();
   TimerCtrlReg &= ~ARM_ARCH_TIMER_ENABLE;
   ArmWriteCntpCtl (TimerCtrlReg);
 }
@@ -70,7 +70,6 @@ ArmGenericTimerGetTimerVal (
 {
   return ArmReadCntpTval ();
 }
-
 
 VOID
 EFIAPI

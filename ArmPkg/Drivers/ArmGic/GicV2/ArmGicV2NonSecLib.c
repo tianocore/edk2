@@ -10,7 +10,6 @@
 #include <Library/IoLib.h>
 #include <Library/ArmGicLib.h>
 
-
 VOID
 EFIAPI
 ArmGicV2EnableInterruptInterface (
