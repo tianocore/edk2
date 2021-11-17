@@ -48,7 +48,7 @@ Returns:
   EFI_PHYSICAL_ADDRESS    FdFixUp;
   UINT64                  FdSize;
 
-  DEBUG ((EFI_D_ERROR, "EmulatorPkg Flash Map PEIM Loaded\n"));
+  DEBUG ((DEBUG_ERROR, "EmulatorPkg Flash Map PEIM Loaded\n"));
 
   //
   // Get the Fwh Information PPI
