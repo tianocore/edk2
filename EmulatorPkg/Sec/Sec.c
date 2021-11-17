@@ -80,7 +80,7 @@ _ModuleEntryPoint (
   EMU_MAGIC_PAGE()->PpiList = PpiList;
   ProcessLibraryConstructorList ();
 
-  DEBUG ((EFI_D_ERROR, "SEC Has Started\n"));
+  DEBUG ((DEBUG_ERROR, "SEC Has Started\n"));
 
   //
   // Add Our PPIs to the list
@@ -136,5 +136,3 @@ _ModuleEntryPoint (
   ASSERT (FALSE);
   return;
 }
-
-
