@@ -80,7 +80,7 @@ EfiCreateEventLegacyBootEx (
   ASSERT (LegacyBootEvent != NULL);
 
   if (gST->Hdr.Revision < EFI_2_00_SYSTEM_TABLE_REVISION) {
-    DEBUG ((EFI_D_ERROR, "EFI1.1 can't support LegacyBootEvent!"));
+    DEBUG ((DEBUG_ERROR, "EFI1.1 can't support LegacyBootEvent!"));
     ASSERT (FALSE);
 
     return EFI_UNSUPPORTED;
@@ -175,7 +175,7 @@ EfiCreateEventReadyToBootEx (
   ASSERT (ReadyToBootEvent != NULL);
 
   if (gST->Hdr.Revision < EFI_2_00_SYSTEM_TABLE_REVISION) {
-    DEBUG ((EFI_D_ERROR, "EFI1.1 can't support ReadyToBootEvent!"));
+    DEBUG ((DEBUG_ERROR, "EFI1.1 can't support ReadyToBootEvent!"));
     ASSERT (FALSE);
 
     return EFI_UNSUPPORTED;
@@ -327,4 +327,3 @@ EfiInitializeFwVolDevicepathNode (
 
   CopyGuid (&FvDevicePathNode->FvFileName, NameGuid);
 }
-

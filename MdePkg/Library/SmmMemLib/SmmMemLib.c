@@ -97,7 +97,7 @@ SmmMemLibInternalCalculateMaximumSupportAddress (
   // Save the maximum support address in one global variable
   //
   mSmmMemLibInternalMaximumSupportAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)(LShiftU64 (1, PhysicalAddressBits) - 1);
-  DEBUG ((EFI_D_INFO, "mSmmMemLibInternalMaximumSupportAddress = 0x%lx\n", mSmmMemLibInternalMaximumSupportAddress));
+  DEBUG ((DEBUG_INFO, "mSmmMemLibInternalMaximumSupportAddress = 0x%lx\n", mSmmMemLibInternalMaximumSupportAddress));
 }
 
 /**
@@ -129,7 +129,7 @@ SmmIsBufferOutsideSmmValid (
     // Overflow happen
     //
     DEBUG ((
-      EFI_D_ERROR,
+      DEBUG_ERROR,
       "SmmIsBufferOutsideSmmValid: Overflow: Buffer (0x%lx) - Length (0x%lx), MaximumSupportAddress (0x%lx)\n",
       Buffer,
       Length,
@@ -142,13 +142,13 @@ SmmIsBufferOutsideSmmValid (
     if (((Buffer >= mSmmMemLibInternalSmramRanges[Index].CpuStart) && (Buffer < mSmmMemLibInternalSmramRanges[Index].CpuStart + mSmmMemLibInternalSmramRanges[Index].PhysicalSize)) ||
         ((mSmmMemLibInternalSmramRanges[Index].CpuStart >= Buffer) && (mSmmMemLibInternalSmramRanges[Index].CpuStart < Buffer + Length))) {
       DEBUG ((
-        EFI_D_ERROR,
+        DEBUG_ERROR,
         "SmmIsBufferOutsideSmmValid: Overlap: Buffer (0x%lx) - Length (0x%lx), ",
         Buffer,
         Length
         ));
       DEBUG ((
-        EFI_D_ERROR,
+        DEBUG_ERROR,
         "CpuStart (0x%lx) - PhysicalSize (0x%lx)\n",
         mSmmMemLibInternalSmramRanges[Index].CpuStart,
         mSmmMemLibInternalSmramRanges[Index].PhysicalSize
@@ -176,7 +176,7 @@ SmmIsBufferOutsideSmmValid (
 
     if (!InValidCommunicationRegion) {
       DEBUG ((
-        EFI_D_ERROR,
+        DEBUG_ERROR,
         "SmmIsBufferOutsideSmmValid: Not in ValidCommunicationRegion: Buffer (0x%lx) - Length (0x%lx)\n",
         Buffer,
         Length
@@ -191,7 +191,7 @@ SmmIsBufferOutsideSmmValid (
       if (((Buffer >= mSmmMemLibGcdMemSpace[Index].BaseAddress) && (Buffer < mSmmMemLibGcdMemSpace[Index].BaseAddress + mSmmMemLibGcdMemSpace[Index].Length)) ||
           ((mSmmMemLibGcdMemSpace[Index].BaseAddress >= Buffer) && (mSmmMemLibGcdMemSpace[Index].BaseAddress < Buffer + Length))) {
         DEBUG ((
-          EFI_D_ERROR,
+          DEBUG_ERROR,
           "SmmIsBufferOutsideSmmValid: In Untested Memory Region: Buffer (0x%lx) - Length (0x%lx)\n",
           Buffer,
           Length
@@ -213,7 +213,7 @@ SmmIsBufferOutsideSmmValid (
             if (((Buffer >= Entry->PhysicalStart) && (Buffer < Entry->PhysicalStart + LShiftU64 (Entry->NumberOfPages, EFI_PAGE_SHIFT))) ||
                 ((Entry->PhysicalStart >= Buffer) && (Entry->PhysicalStart < Buffer + Length))) {
               DEBUG ((
-                EFI_D_ERROR,
+                DEBUG_ERROR,
                 "SmmIsBufferOutsideSmmValid: In RuntimeCode Region: Buffer (0x%lx) - Length (0x%lx)\n",
                 Buffer,
                 Length
@@ -255,7 +255,7 @@ SmmCopyMemToSmram (
   )
 {
   if (!SmmIsBufferOutsideSmmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)SourceBuffer, Length)) {
-    DEBUG ((EFI_D_ERROR, "SmmCopyMemToSmram: Security Violation: Source (0x%x), Length (0x%x)\n", SourceBuffer, Length));
+    DEBUG ((DEBUG_ERROR, "SmmCopyMemToSmram: Security Violation: Source (0x%x), Length (0x%x)\n", SourceBuffer, Length));
     return EFI_SECURITY_VIOLATION;
   }
   CopyMem (DestinationBuffer, SourceBuffer, Length);
@@ -288,7 +288,7 @@ SmmCopyMemFromSmram (
   )
 {
   if (!SmmIsBufferOutsideSmmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)DestinationBuffer, Length)) {
-    DEBUG ((EFI_D_ERROR, "SmmCopyMemFromSmram: Security Violation: Destination (0x%x), Length (0x%x)\n", DestinationBuffer, Length));
+    DEBUG ((DEBUG_ERROR, "SmmCopyMemFromSmram: Security Violation: Destination (0x%x), Length (0x%x)\n", DestinationBuffer, Length));
     return EFI_SECURITY_VIOLATION;
   }
   CopyMem (DestinationBuffer, SourceBuffer, Length);
@@ -322,11 +322,11 @@ SmmCopyMem (
   )
 {
   if (!SmmIsBufferOutsideSmmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)DestinationBuffer, Length)) {
-    DEBUG ((EFI_D_ERROR, "SmmCopyMem: Security Violation: Destination (0x%x), Length (0x%x)\n", DestinationBuffer, Length));
+    DEBUG ((DEBUG_ERROR, "SmmCopyMem: Security Violation: Destination (0x%x), Length (0x%x)\n", DestinationBuffer, Length));
     return EFI_SECURITY_VIOLATION;
   }
   if (!SmmIsBufferOutsideSmmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)SourceBuffer, Length)) {
-    DEBUG ((EFI_D_ERROR, "SmmCopyMem: Security Violation: Source (0x%x), Length (0x%x)\n", SourceBuffer, Length));
+    DEBUG ((DEBUG_ERROR, "SmmCopyMem: Security Violation: Source (0x%x), Length (0x%x)\n", SourceBuffer, Length));
     return EFI_SECURITY_VIOLATION;
   }
   CopyMem (DestinationBuffer, SourceBuffer, Length);
@@ -358,7 +358,7 @@ SmmSetMem (
   )
 {
   if (!SmmIsBufferOutsideSmmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Length)) {
-    DEBUG ((EFI_D_ERROR, "SmmSetMem: Security Violation: Source (0x%x), Length (0x%x)\n", Buffer, Length));
+    DEBUG ((DEBUG_ERROR, "SmmSetMem: Security Violation: Source (0x%x), Length (0x%x)\n", Buffer, Length));
     return EFI_SECURITY_VIOLATION;
   }
   SetMem (Buffer, Length, Value);
