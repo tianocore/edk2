@@ -14,11 +14,11 @@
 ///
 ///  L"\u0000"
 ///
-#define UNICODE_FORMAT_LEN         6
-#define UNICODE_FORMAT_CHAR_LEN    2
-#define UNICODE_FORMAT_CHAR_SIZE   3
+#define UNICODE_FORMAT_LEN        6
+#define UNICODE_FORMAT_CHAR_LEN   2
+#define UNICODE_FORMAT_CHAR_SIZE  3
 
-#define UTF8_BUFFER_FOR_UCS2_MAX_SIZE   3
+#define UTF8_BUFFER_FOR_UCS2_MAX_SIZE  3
 
 /**
   Convert a UCS2 string to a UTF8 encoded string.

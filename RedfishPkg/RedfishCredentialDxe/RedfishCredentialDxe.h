@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef EDKII_REDFISH_CREDENTIAL_DXE_H_
 #define EDKII_REDFISH_CREDENTIAL_DXE_H_
 
@@ -72,4 +73,5 @@ RedfishCredentialStopService (
   IN     EDKII_REDFISH_CREDENTIAL_PROTOCOL    *This,
   IN     EDKII_REDFISH_CREDENTIAL_STOP_SERVICE_TYPE ServiceStopType
   );
+
 #endif
