@@ -55,10 +55,10 @@ DebugPortInitialize (
   IN DEBUG_PORT_CONTINUE  Function
   )
 {
-  RETURN_STATUS      Status;
+  RETURN_STATUS  Status;
 
   Status = SerialPortInitialize ();
-  if (RETURN_ERROR(Status)) {
+  if (RETURN_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Debug Serial Port: Initialization failed!\n"));
   }
 
@@ -95,7 +95,7 @@ DebugPortReadBuffer (
   IN UINTN                 Timeout
   )
 {
-  if (NumberOfBytes != 1 || Buffer == NULL || Timeout != 0) {
+  if ((NumberOfBytes != 1) || (Buffer == NULL) || (Timeout != 0)) {
     return 0;
   }
 
