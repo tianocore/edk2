@@ -37,7 +37,7 @@ BOOLEAN
 EFIAPI
 AmlNameOpCompareName (
   IN  AML_OBJECT_NODE_HANDLE    NameOpNode,
-  IN  CHAR8                   * AslName
+  IN  CHAR8                   *AslName
   );
 
 /** Check whether ObjectNode has the input OpCode/SubOpcode couple.

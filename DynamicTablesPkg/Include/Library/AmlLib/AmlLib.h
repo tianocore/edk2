@@ -40,21 +40,21 @@
 
 #ifndef AML_HANDLE
 
-/** Node handle.
-*/
-typedef void* AML_NODE_HANDLE;
+  /** Node handle.
+  */
+  typedef void *AML_NODE_HANDLE;
 
-/** Root Node handle.
-*/
-typedef void* AML_ROOT_NODE_HANDLE;
+  /** Root Node handle.
+  */
+  typedef void *AML_ROOT_NODE_HANDLE;
 
-/** Object Node handle.
-*/
-typedef void* AML_OBJECT_NODE_HANDLE;
+  /** Object Node handle.
+  */
+  typedef void *AML_OBJECT_NODE_HANDLE;
 
-/** Data Node handle.
-*/
-typedef void* AML_DATA_NODE_HANDLE;
+  /** Data Node handle.
+  */
+  typedef void *AML_DATA_NODE_HANDLE;
 
 #endif // AML_HANDLE
 
@@ -78,8 +78,8 @@ typedef void* AML_DATA_NODE_HANDLE;
 EFI_STATUS
 EFIAPI
 AmlParseDefinitionBlock (
-  IN  CONST EFI_ACPI_DESCRIPTION_HEADER   * DefinitionBlock,
-  OUT       AML_ROOT_NODE_HANDLE          * RootPtr
+  IN  CONST EFI_ACPI_DESCRIPTION_HEADER   *DefinitionBlock,
+  OUT       AML_ROOT_NODE_HANDLE          *RootPtr
   );
 
 /** Serialize an AML definition block.
@@ -102,7 +102,7 @@ EFI_STATUS
 EFIAPI
 AmlSerializeDefinitionBlock (
   IN  AML_ROOT_NODE_HANDLE              RootNode,
-  OUT EFI_ACPI_DESCRIPTION_HEADER    ** Table
+  OUT EFI_ACPI_DESCRIPTION_HEADER    **Table
   );
 
 /** Clone a node and its children (clone a tree branch).
@@ -124,7 +124,7 @@ EFI_STATUS
 EFIAPI
 AmlCloneTree (
   IN  AML_NODE_HANDLE   Node,
-  OUT AML_NODE_HANDLE * ClonedNode
+  OUT AML_NODE_HANDLE *ClonedNode
   );
 
 /** Delete a Node and its children.
@@ -213,8 +213,8 @@ EFI_STATUS
 EFIAPI
 AmlFindNode (
   IN  AML_NODE_HANDLE       ReferenceNode,
-  IN  CHAR8               * AslPath,
-  OUT AML_NODE_HANDLE     * OutNode
+  IN  CHAR8               *AslPath,
+  OUT AML_NODE_HANDLE     *OutNode
   );
 
 /**
@@ -248,7 +248,7 @@ EFI_STATUS
 EFIAPI
 AmlDeviceOpUpdateName (
   IN  AML_OBJECT_NODE_HANDLE    DeviceOpNode,
-  IN  CHAR8                   * NewNameString
+  IN  CHAR8                   *NewNameString
   );
 
 /** Update an integer value defined by a NameOp object node.
@@ -298,7 +298,7 @@ EFI_STATUS
 EFIAPI
 AmlNameOpUpdateString (
   IN        AML_OBJECT_NODE_HANDLE    NameOpNode,
-  IN  CONST CHAR8                   * NewName
+  IN  CONST CHAR8                   *NewName
   );
 
 /** Get the first Resource Data element contained in a named object.
@@ -332,7 +332,7 @@ EFI_STATUS
 EFIAPI
 AmlNameOpGetFirstRdNode (
   IN  AML_OBJECT_NODE_HANDLE   NameOpNode,
-  OUT AML_DATA_NODE_HANDLE   * OutRdNode
+  OUT AML_DATA_NODE_HANDLE   *OutRdNode
   );
 
 /** Get the Resource Data element following the CurrRdNode Resource Data.
@@ -368,7 +368,7 @@ EFI_STATUS
 EFIAPI
 AmlNameOpGetNextRdNode (
   IN  AML_DATA_NODE_HANDLE    CurrRdNode,
-  OUT AML_DATA_NODE_HANDLE  * OutRdNode
+  OUT AML_DATA_NODE_HANDLE  *OutRdNode
   );
 
 /** Update the first interrupt of an Interrupt resource data node.
@@ -495,11 +495,11 @@ AmlCodeGenRdInterrupt (
 EFI_STATUS
 EFIAPI
 AmlCodeGenDefinitionBlock (
-  IN  CONST CHAR8                 * TableSignature,
-  IN  CONST CHAR8                 * OemId,
-  IN  CONST CHAR8                 * OemTableId,
+  IN  CONST CHAR8                 *TableSignature,
+  IN  CONST CHAR8                 *OemId,
+  IN  CONST CHAR8                 *OemTableId,
   IN        UINT32                  OemRevision,
-  OUT       AML_ROOT_NODE_HANDLE  * NewRootNode
+  OUT       AML_ROOT_NODE_HANDLE  *NewRootNode
   );
 
 /** AML code generation for a Name object node, containing a String.
@@ -527,10 +527,10 @@ AmlCodeGenDefinitionBlock (
 EFI_STATUS
 EFIAPI
 AmlCodeGenNameString (
-  IN  CONST CHAR8                   * NameString,
-  IN        CHAR8                   * String,
-  IN        AML_NODE_HANDLE           ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
+  IN  CONST CHAR8                   *NameString,
+  IN        CHAR8                   *String,
+  IN        AML_NODE_HANDLE           ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
   );
 
 /** AML code generation for a Name object node, containing an Integer.
@@ -557,10 +557,10 @@ AmlCodeGenNameString (
 EFI_STATUS
 EFIAPI
 AmlCodeGenNameInteger (
-  IN  CONST CHAR8                   * NameString,
+  IN  CONST CHAR8                   *NameString,
   IN        UINT64                    Integer,
-  IN        AML_NODE_HANDLE           ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
   );
 
 /** AML code generation for a Device object node.
@@ -586,9 +586,9 @@ AmlCodeGenNameInteger (
 EFI_STATUS
 EFIAPI
 AmlCodeGenDevice (
-  IN  CONST CHAR8                   * NameString,
-  IN        AML_NODE_HANDLE           ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
+  IN  CONST CHAR8                   *NameString,
+  IN        AML_NODE_HANDLE           ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
   );
 
 /** AML code generation for a Scope object node.
@@ -614,9 +614,9 @@ AmlCodeGenDevice (
 EFI_STATUS
 EFIAPI
 AmlCodeGenScope (
-  IN  CONST CHAR8                   * NameString,
-  IN        AML_NODE_HANDLE           ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
+  IN  CONST CHAR8                   *NameString,
+  IN        AML_NODE_HANDLE           ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
   );
 
 /** AML code generation for a method returning a NameString.
@@ -663,13 +663,13 @@ AmlCodeGenScope (
 EFI_STATUS
 EFIAPI
 AmlCodeGenMethodRetNameString (
-  IN  CONST CHAR8                   * MethodNameString,
-  IN  CONST CHAR8                   * ReturnedNameString,  OPTIONAL
+  IN  CONST CHAR8                   *MethodNameString,
+  IN  CONST CHAR8                   *ReturnedNameString, OPTIONAL
   IN        UINT8                     NumArgs,
   IN        BOOLEAN                   IsSerialized,
   IN        UINT8                     SyncLevel,
-  IN        AML_NODE_HANDLE           ParentNode,          OPTIONAL
-  OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode        OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode        OPTIONAL
   );
 
 /** Create a _LPI name.
@@ -709,11 +709,11 @@ AmlCodeGenMethodRetNameString (
 EFI_STATUS
 EFIAPI
 AmlCreateLpiNode (
-  IN  CONST CHAR8                   * LpiNameString,
+  IN  CONST CHAR8                   *LpiNameString,
   IN        UINT16                    Revision,
   IN        UINT64                    LevelId,
-  IN        AML_NODE_HANDLE           ParentNode,  OPTIONAL
-  OUT       AML_OBJECT_NODE_HANDLE  * NewLpiNode   OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE_HANDLE  *NewLpiNode   OPTIONAL
   );
 
 /** Add an _LPI state to a LPI node created using AmlCreateLpiNode ().
@@ -779,147 +779,147 @@ AmlAddLpiState (
   IN  UINT32                                    ArchFlags,
   IN  UINT32                                    ResCntFreq,
   IN  UINT32                                    EnableParentState,
-  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * GenericRegisterDescriptor,  OPTIONAL
-  IN  UINT64                                    Integer,                    OPTIONAL
-  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * ResidencyCounterRegister,   OPTIONAL
-  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * UsageCounterRegister,       OPTIONAL
-  IN  CHAR8                                   * StateName,                  OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *GenericRegisterDescriptor, OPTIONAL
+  IN  UINT64                                    Integer, OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *ResidencyCounterRegister, OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *UsageCounterRegister, OPTIONAL
+  IN  CHAR8                                   *StateName, OPTIONAL
   IN  AML_OBJECT_NODE_HANDLE                    LpiNode
   );
 
 // DEPRECATED APIS
 #ifndef DISABLE_NEW_DEPRECATED_INTERFACES
 
-/** DEPRECATED API
+  /** DEPRECATED API
 
-  Get the first Resource Data element contained in a "_CRS" object.
+    Get the first Resource Data element contained in a "_CRS" object.
 
-  In the following ASL code, the function will return the Resource Data
-  node corresponding to the "QWordMemory ()" ASL macro.
-  Name (_CRS, ResourceTemplate() {
-      QWordMemory (...) {...},
-      Interrupt (...) {...}
-    }
-  )
+    In the following ASL code, the function will return the Resource Data
+    node corresponding to the "QWordMemory ()" ASL macro.
+    Name (_CRS, ResourceTemplate() {
+        QWordMemory (...) {...},
+        Interrupt (...) {...}
+      }
+    )
 
-  Note:
-   - The "_CRS" object must be declared using ASL "Name (Declare Named Object)".
-   - "_CRS" declared using ASL "Method (Declare Control Method)" is not
-     supported.
+    Note:
+     - The "_CRS" object must be declared using ASL "Name (Declare Named Object)".
+     - "_CRS" declared using ASL "Method (Declare Control Method)" is not
+       supported.
 
-  @ingroup UserApis
+    @ingroup UserApis
 
-  @param  [in] NameOpCrsNode  NameOp object node defining a "_CRS" object.
-                              Must have an OpCode=AML_NAME_OP, SubOpCode=0.
-                              NameOp object nodes are defined in ASL
-                              using the "Name ()" function.
-  @param  [out] OutRdNode     Pointer to the first Resource Data element of
-                              the "_CRS" object. A Resource Data element
-                              is stored in a data node.
+    @param  [in] NameOpCrsNode  NameOp object node defining a "_CRS" object.
+                                Must have an OpCode=AML_NAME_OP, SubOpCode=0.
+                                NameOp object nodes are defined in ASL
+                                using the "Name ()" function.
+    @param  [out] OutRdNode     Pointer to the first Resource Data element of
+                                the "_CRS" object. A Resource Data element
+                                is stored in a data node.
 
-  @retval EFI_SUCCESS             The function completed successfully.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-**/
-EFI_STATUS
-EFIAPI
-AmlNameOpCrsGetFirstRdNode (
+    @retval EFI_SUCCESS             The function completed successfully.
+    @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  **/
+  EFI_STATUS
+  EFIAPI
+  AmlNameOpCrsGetFirstRdNode (
   IN  AML_OBJECT_NODE_HANDLE   NameOpCrsNode,
-  OUT AML_DATA_NODE_HANDLE   * OutRdNode
+  OUT AML_DATA_NODE_HANDLE   *OutRdNode
   );
 
-/** DEPRECATED API
+  /** DEPRECATED API
 
-  Get the Resource Data element following the CurrRdNode Resource Data.
+    Get the Resource Data element following the CurrRdNode Resource Data.
 
-  In the following ASL code, if CurrRdNode corresponds to the first
-  "QWordMemory ()" ASL macro, the function will return the Resource Data
-  node corresponding to the "Interrupt ()" ASL macro.
-  Name (_CRS, ResourceTemplate() {
-      QwordMemory (...) {...},
-      Interrupt (...) {...}
-    }
-  )
+    In the following ASL code, if CurrRdNode corresponds to the first
+    "QWordMemory ()" ASL macro, the function will return the Resource Data
+    node corresponding to the "Interrupt ()" ASL macro.
+    Name (_CRS, ResourceTemplate() {
+        QwordMemory (...) {...},
+        Interrupt (...) {...}
+      }
+    )
 
-  The CurrRdNode Resource Data node must be defined in an object named "_CRS"
-  and defined by a "Name ()" ASL function.
+    The CurrRdNode Resource Data node must be defined in an object named "_CRS"
+    and defined by a "Name ()" ASL function.
 
-  @ingroup UserApis
+    @ingroup UserApis
 
-  @param  [in]  CurrRdNode   Pointer to the current Resource Data element of
-                             the "_CRS" variable.
-  @param  [out] OutRdNode    Pointer to the Resource Data element following
-                             the CurrRdNode.
-                             Contain a NULL pointer if CurrRdNode is the
-                             last Resource Data element in the list.
-                             The "End Tag" is not considered as a resource
-                             data element and is not returned.
+    @param  [in]  CurrRdNode   Pointer to the current Resource Data element of
+                               the "_CRS" variable.
+    @param  [out] OutRdNode    Pointer to the Resource Data element following
+                               the CurrRdNode.
+                               Contain a NULL pointer if CurrRdNode is the
+                               last Resource Data element in the list.
+                               The "End Tag" is not considered as a resource
+                               data element and is not returned.
 
-  @retval EFI_SUCCESS             The function completed successfully.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-**/
-EFI_STATUS
-EFIAPI
-AmlNameOpCrsGetNextRdNode (
+    @retval EFI_SUCCESS             The function completed successfully.
+    @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  **/
+  EFI_STATUS
+  EFIAPI
+  AmlNameOpCrsGetNextRdNode (
   IN  AML_DATA_NODE_HANDLE    CurrRdNode,
-  OUT AML_DATA_NODE_HANDLE  * OutRdNode
+  OUT AML_DATA_NODE_HANDLE  *OutRdNode
   );
 
-/** DEPRECATED API
+  /** DEPRECATED API
 
-  Add an Interrupt Resource Data node.
+    Add an Interrupt Resource Data node.
 
-  This function creates a Resource Data element corresponding to the
-  "Interrupt ()" ASL function, stores it in an AML Data Node.
+    This function creates a Resource Data element corresponding to the
+    "Interrupt ()" ASL function, stores it in an AML Data Node.
 
-  It then adds it after the input CurrRdNode in the list of resource data
-  element.
+    It then adds it after the input CurrRdNode in the list of resource data
+    element.
 
-  The Resource Data effectively created is an Extended Interrupt Resource
-  Data. See ACPI 6.3 specification, s6.4.3.6 "Extended Interrupt Descriptor"
-  for more information about Extended Interrupt Resource Data.
+    The Resource Data effectively created is an Extended Interrupt Resource
+    Data. See ACPI 6.3 specification, s6.4.3.6 "Extended Interrupt Descriptor"
+    for more information about Extended Interrupt Resource Data.
 
-  The Extended Interrupt contains one single interrupt.
+    The Extended Interrupt contains one single interrupt.
 
-  This function allocates memory to create a data node. It is the caller's
-  responsibility to either:
-   - attach this node to an AML tree;
-   - delete this node.
+    This function allocates memory to create a data node. It is the caller's
+    responsibility to either:
+     - attach this node to an AML tree;
+     - delete this node.
 
-  Note: The _CRS node must be defined using the ASL Name () function.
-        e.g. Name (_CRS, ResourceTemplate () {
-               ...
-             }
+    Note: The _CRS node must be defined using the ASL Name () function.
+          e.g. Name (_CRS, ResourceTemplate () {
+                 ...
+               }
 
-  @ingroup CodeGenApis
+    @ingroup CodeGenApis
 
-  @param  [in]  NameOpCrsNode    NameOp object node defining a "_CRS" object.
-                                 Must have an OpCode=AML_NAME_OP, SubOpCode=0.
-                                 NameOp object nodes are defined in ASL
-                                 using the "Name ()" function.
-  @param  [in]  ResourceConsumer The device consumes the specified interrupt
-                                 or produces it for use by a child device.
-  @param  [in]  EdgeTriggered    The interrupt is edge triggered or
-                                 level triggered.
-  @param  [in]  ActiveLow        The interrupt is active-high or active-low.
-  @param  [in]  Shared           The interrupt can be shared with other
-                                 devices or not (Exclusive).
-  @param  [in]  IrqList          Interrupt list. Must be non-NULL.
-  @param  [in]  IrqCount         Interrupt count. Must be non-zero.
+    @param  [in]  NameOpCrsNode    NameOp object node defining a "_CRS" object.
+                                   Must have an OpCode=AML_NAME_OP, SubOpCode=0.
+                                   NameOp object nodes are defined in ASL
+                                   using the "Name ()" function.
+    @param  [in]  ResourceConsumer The device consumes the specified interrupt
+                                   or produces it for use by a child device.
+    @param  [in]  EdgeTriggered    The interrupt is edge triggered or
+                                   level triggered.
+    @param  [in]  ActiveLow        The interrupt is active-high or active-low.
+    @param  [in]  Shared           The interrupt can be shared with other
+                                   devices or not (Exclusive).
+    @param  [in]  IrqList          Interrupt list. Must be non-NULL.
+    @param  [in]  IrqCount         Interrupt count. Must be non-zero.
 
 
-  @retval EFI_SUCCESS             The function completed successfully.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
-**/
-EFI_STATUS
-EFIAPI
-AmlCodeGenCrsAddRdInterrupt (
+    @retval EFI_SUCCESS             The function completed successfully.
+    @retval EFI_INVALID_PARAMETER   Invalid parameter.
+    @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+  **/
+  EFI_STATUS
+  EFIAPI
+  AmlCodeGenCrsAddRdInterrupt (
   IN  AML_OBJECT_NODE_HANDLE  NameOpCrsNode,
   IN  BOOLEAN                 ResourceConsumer,
   IN  BOOLEAN                 EdgeTriggered,
   IN  BOOLEAN                 ActiveLow,
   IN  BOOLEAN                 Shared,
-  IN  UINT32                * IrqList,
+  IN  UINT32                *IrqList,
   IN  UINT8                   IrqCount
   );
 
