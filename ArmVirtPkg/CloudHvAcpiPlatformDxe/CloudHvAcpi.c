@@ -26,13 +26,13 @@ FindAcpiTableProtocol (
   VOID
   )
 {
-  EFI_STATUS              Status;
-  EFI_ACPI_TABLE_PROTOCOL *AcpiTable;
+  EFI_STATUS               Status;
+  EFI_ACPI_TABLE_PROTOCOL  *AcpiTable;
 
   Status = gBS->LocateProtocol (
                   &gEfiAcpiTableProtocolGuid,
                   NULL,
-                  (VOID**)&AcpiTable
+                  (VOID **)&AcpiTable
                   );
   ASSERT_EFI_ERROR (Status);
   return AcpiTable;
@@ -55,15 +55,15 @@ InstallCloudHvAcpiTables (
   IN     EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol
   )
 {
-  UINTN          InstalledKey;
-  UINTN          TableSize;
-  UINTN          AcpiTableLength;
-  UINT64         RsdpPtr;
-  UINT64         XsdtPtr;
-  UINT64         TableOffset;
-  UINT64         AcpiTablePtr;
-  UINT64         *DsdtPtr;
-  EFI_STATUS     Status;
+  UINTN       InstalledKey;
+  UINTN       TableSize;
+  UINTN       AcpiTableLength;
+  UINT64      RsdpPtr;
+  UINT64      XsdtPtr;
+  UINT64      TableOffset;
+  UINT64      AcpiTablePtr;
+  UINT64      *DsdtPtr;
+  EFI_STATUS  Status;
 
   if (AcpiProtocol == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -72,12 +72,12 @@ InstallCloudHvAcpiTables (
   RsdpPtr = PcdGet64 (PcdCloudHvAcpiRsdpBaseAddress);
   XsdtPtr = ((EFI_ACPI_6_3_ROOT_SYSTEM_DESCRIPTION_POINTER *)RsdpPtr)->XsdtAddress;
   AcpiTableLength = ((EFI_ACPI_COMMON_HEADER *)XsdtPtr)->Length;
-  TableOffset = sizeof (EFI_ACPI_DESCRIPTION_HEADER);
+  TableOffset     = sizeof (EFI_ACPI_DESCRIPTION_HEADER);
   DsdtPtr = NULL;
 
   while (TableOffset < AcpiTableLength) {
     AcpiTablePtr = *(UINT64 *)(XsdtPtr + TableOffset);
-    TableSize = ((EFI_ACPI_COMMON_HEADER *)AcpiTablePtr)->Length;
+    TableSize    = ((EFI_ACPI_COMMON_HEADER *)AcpiTablePtr)->Length;
 
     //
     // Install ACPI tables from XSDT
@@ -89,7 +89,7 @@ InstallCloudHvAcpiTables (
                              &InstalledKey
                              );
     if (EFI_ERROR (Status)) {
-        return Status;
+      return Status;
     }
 
     //
@@ -97,7 +97,8 @@ InstallCloudHvAcpiTables (
     //
     if ((DsdtPtr == NULL) &&
         (EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE ==
-         ((EFI_ACPI_COMMON_HEADER *)AcpiTablePtr)->Signature)) {
+         ((EFI_ACPI_COMMON_HEADER *)AcpiTablePtr)->Signature))
+    {
       DsdtPtr = (UINT64 *)((EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE *)AcpiTablePtr)->XDsdt;
     }
 
@@ -113,12 +114,12 @@ InstallCloudHvAcpiTables (
   // Install DSDT table
   //
   TableSize = ((EFI_ACPI_COMMON_HEADER *)DsdtPtr)->Length;
-  Status = AcpiProtocol->InstallAcpiTable (
-                           AcpiProtocol,
-                           DsdtPtr,
-                           TableSize,
-                           &InstalledKey
-                           );
+  Status    = AcpiProtocol->InstallAcpiTable (
+                              AcpiProtocol,
+                              DsdtPtr,
+                              TableSize,
+                              &InstalledKey
+                              );
 
   return Status;
 }
@@ -142,18 +143,18 @@ CloudHvAcpiPlatformEntryPoint (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS                         Status;
+  EFI_STATUS  Status;
 
   Status = InstallCloudHvAcpiTables (FindAcpiTableProtocol ());
 
   if (EFI_ERROR (Status)) {
-     DEBUG ((
-       DEBUG_ERROR,
-       "%a: Fail to install Acpi table: %r\n",
-       __FUNCTION__,
-       Status
-       ));
-     CpuDeadLoop ();
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Fail to install Acpi table: %r\n",
+      __FUNCTION__,
+      Status
+      ));
+    CpuDeadLoop ();
   }
 
   return EFI_SUCCESS;
