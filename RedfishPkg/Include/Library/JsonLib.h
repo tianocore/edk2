@@ -7,17 +7,18 @@
     SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef JSON_LIB_H_
 #define JSON_LIB_H_
 
-typedef    VOID*    EDKII_JSON_VALUE;
-typedef    VOID*    EDKII_JSON_ARRAY;
-typedef    VOID*    EDKII_JSON_OBJECT;
+typedef    VOID  *EDKII_JSON_VALUE;
+typedef    VOID  *EDKII_JSON_ARRAY;
+typedef    VOID  *EDKII_JSON_OBJECT;
 
 ///
 /// Map to json_int_t in jansson.h
 ///
-typedef    INT64   EDKII_JSON_INT_T; // #JSON_INTEGER_IS_LONG_LONG is set to 1
+typedef    INT64 EDKII_JSON_INT_T;   // #JSON_INTEGER_IS_LONG_LONG is set to 1
                                      // in jansson_Config.h
 
 ///
@@ -25,28 +26,28 @@ typedef    INT64   EDKII_JSON_INT_T; // #JSON_INTEGER_IS_LONG_LONG is set to 1
 /// See below URI for the JSON encoding flags reference.
 /// https://jansson.readthedocs.io/en/2.13/apiref.html#encoding
 ///
-#define EDKII_JSON_MAX_INDENT        0x1F
-#define EDKII_JSON_INDENT(n)         ((n) & EDKII_JSON_MAX_INDENT)
+#define EDKII_JSON_MAX_INDENT  0x1F
+#define EDKII_JSON_INDENT(n)  ((n) & EDKII_JSON_MAX_INDENT)
 
-#define EDKII_JSON_COMPACT           0x20
-#define EDKII_JSON_ENSURE_ASCII      0x40
-#define EDKII_JSON_SORT_KEYS         0x80
-#define EDKII_JSON_PRESERVE_ORDER    0x100
-#define EDKII_JSON_ENCODE_ANY        0x200
-#define EDKII_JSON_ESCAPE_SLASH      0x400
-#define EDKII_JSON_REAL_PRECISION(n) (((n) & 0x1F) << 11)
-#define EDKII_JSON_EMBED             0x10000
+#define EDKII_JSON_COMPACT         0x20
+#define EDKII_JSON_ENSURE_ASCII    0x40
+#define EDKII_JSON_SORT_KEYS       0x80
+#define EDKII_JSON_PRESERVE_ORDER  0x100
+#define EDKII_JSON_ENCODE_ANY      0x200
+#define EDKII_JSON_ESCAPE_SLASH    0x400
+#define EDKII_JSON_REAL_PRECISION(n)  (((n) & 0x1F) << 11)
+#define EDKII_JSON_EMBED  0x10000
 
 ///
 /// Map to the definitions in jansson.h
 /// See below URI for the JSON decoding flags reference.
 /// https://jansson.readthedocs.io/en/2.13/apiref.html?highlight=json_loadb#decoding
 ///
-#define EDKII_JSON_REJECT_DUPLICATES  0x1
-#define EDKII_JSON_DISABLE_EOF_CHECK  0x2
-#define EDKII_JSON_DECODE_ANY         0x4
-#define EDKII_JSON_DECODE_INT_AS_REAL 0x8
-#define EDKII_JSON_ALLOW_NUL          0x10
+#define EDKII_JSON_REJECT_DUPLICATES   0x1
+#define EDKII_JSON_DISABLE_EOF_CHECK   0x2
+#define EDKII_JSON_DECODE_ANY          0x4
+#define EDKII_JSON_DECODE_INT_AS_REAL  0x8
+#define EDKII_JSON_ALLOW_NUL           0x10
 
 #define EDKII_JSON_ARRAY_FOREACH(Array, Index, Value) \
   for(Index = 0; \
@@ -63,28 +64,28 @@ typedef    INT64   EDKII_JSON_INT_T; // #JSON_INTEGER_IS_LONG_LONG is set to 1
 ///
 ///  Map to the json_error_t in jansson.h
 ///
-#define EDKII_JSON_ERROR_TEXT_LENGTH   160
-#define EDKII_JSON_ERROR_SOURCE_LENGTH 80
+#define EDKII_JSON_ERROR_TEXT_LENGTH    160
+#define EDKII_JSON_ERROR_SOURCE_LENGTH  80
 typedef struct {
-    INTN    Line;
-    INTN    Column;
-    INTN    Position;
-    CHAR8   Source [EDKII_JSON_ERROR_SOURCE_LENGTH];
-    CHAR8   Text [EDKII_JSON_ERROR_TEXT_LENGTH];
+  INTN     Line;
+  INTN     Column;
+  INTN     Position;
+  CHAR8    Source[EDKII_JSON_ERROR_SOURCE_LENGTH];
+  CHAR8    Text[EDKII_JSON_ERROR_TEXT_LENGTH];
 } EDKII_JSON_ERROR;
 
 ///
 ///  Map to the json_type in jansson.h
 ///
 typedef enum {
-    EdkiiJsonTypeObject,
-    EdkiiJsonTypeArray,
-    EdkiiJsonTypeString,
-    EdkiiJsonTypeInteger,
-    EdkiiJsonTypeReal,
-    EdkiiJsonTypeTrue,
-    EdkiiJsonTypeFalse,
-    EdkiiJsonTypeNull
+  EdkiiJsonTypeObject,
+  EdkiiJsonTypeArray,
+  EdkiiJsonTypeString,
+  EdkiiJsonTypeInteger,
+  EdkiiJsonTypeReal,
+  EdkiiJsonTypeTrue,
+  EdkiiJsonTypeFalse,
+  EdkiiJsonTypeNull
 } EDKII_JSON_TYPE;
 
 /**
@@ -499,7 +500,7 @@ JsonValueGetAsciiString (
   @retval      Return the associated Unicode string in JSON value or NULL.
 
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
 JsonValueGetUnicodeString (
   IN    EDKII_JSON_VALUE    Json
@@ -549,7 +550,7 @@ JsonValueGetBoolean (
   @retval      Return the associated Ascii string in JSON value or NULL on errors.
 
 **/
-CONST CHAR8*
+CONST CHAR8 *
 EFIAPI
 JsonValueGetString (
   IN    EDKII_JSON_VALUE    Json
@@ -583,7 +584,7 @@ JsonObjectSize (
                JsonObj is not an JSON object, key count is zero or on other errors.
 
 **/
-CHAR8**
+CHAR8 **
 JsonObjectGetKeys (
   IN    EDKII_JSON_OBJECT    JsonObj,
   OUT   UINTN                *KeyCount
@@ -766,7 +767,7 @@ JsonDumpString (
 EDKII_JSON_VALUE
 EFIAPI
 JsonLoadString (
-  IN    CONST CHAR8*     String,
+  IN    CONST CHAR8 *String,
   IN    UINT64           Flags,
   IN    EDKII_JSON_ERROR *Error
   );
@@ -835,6 +836,7 @@ EFIAPI
 JsonIncreaseReference (
   IN EDKII_JSON_VALUE JsonValue
   );
+
 /**
   Returns an opaque iterator which can be used to iterate over all key-value pairs
   in object, or NULL if object is empty
@@ -883,7 +885,7 @@ CHAR8 *
 EFIAPI
 JsonObjectIteratorKey (
   IN VOID *Iterator
-);
+  );
 
 /**
   Returns the pointer of iterator by key.
@@ -895,7 +897,7 @@ VOID *
 EFIAPI
 JsonObjectKeyToIterator (
   IN CHAR8 *Key
-);
+  );
 
 /**
   Returns the json type of this json value
@@ -905,7 +907,8 @@ JsonObjectKeyToIterator (
 **/
 EDKII_JSON_TYPE
 EFIAPI
-JsonGetType(
+JsonGetType (
   IN EDKII_JSON_VALUE JsonValue
   );
+
 #endif

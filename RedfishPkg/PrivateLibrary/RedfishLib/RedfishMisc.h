@@ -22,7 +22,7 @@
 #include <Protocol/EdkIIRedfishCredential.h>
 #include <redfish.h>
 
-#define ARRAY_SIZE(Array) (sizeof (Array) / sizeof ((Array)[0]))
+#define ARRAY_SIZE(Array)  (sizeof (Array) / sizeof ((Array)[0]))
 
 /**
   Creates a REDFISH_SERVICE which can be later used to access the Redfish resources.
