@@ -24,7 +24,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __INI_PARSING_LIB_H__
 #define __INI_PARSING_LIB_H__
 
@@ -157,4 +156,3 @@ CloseIniFile (
   );
 
 #endif
-
