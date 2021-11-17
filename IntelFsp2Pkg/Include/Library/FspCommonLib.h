@@ -60,7 +60,7 @@ GetFspApiParameter2 (
 
   @retval FSP entry stack pointer.
 **/
-VOID*
+VOID *
 EFIAPI
 GetFspEntryStack (
   VOID
@@ -282,7 +282,6 @@ GetPhaseStatusCode (
   VOID
   );
 
-
 /**
   This function sets FSP Phase StatusCode.
 
@@ -305,4 +304,5 @@ EFIAPI
 FspApiReturnStatusReset (
   IN UINT32   FspResetType
   );
+
 #endif

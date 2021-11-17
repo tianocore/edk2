@@ -28,8 +28,8 @@ DisableCacheAsRam (
   if (DisableCar) {
     AsmInvd ();
   } else {
-    AsmWbinvd();
+    AsmWbinvd ();
   }
 
-  return ;
+  return;
 }

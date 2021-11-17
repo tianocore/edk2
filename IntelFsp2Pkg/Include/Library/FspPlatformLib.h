@@ -32,7 +32,6 @@ FspGetSystemMemorySize (
   IN OUT UINT64              *HighMemoryLength
   );
 
-
 /**
   Set a new stack frame for the continuation function.
 

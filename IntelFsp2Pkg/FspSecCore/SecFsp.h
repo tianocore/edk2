@@ -31,7 +31,7 @@
 
 **/
 UINT64
-FspGetExceptionHandler(
+FspGetExceptionHandler (
   IN  UINT64  IdtEntryTemplate
   );
 
@@ -52,7 +52,6 @@ FspGlobalDataInit (
   IN UINT8                    ApiIdx
   );
 
-
 /**
 
   Adjust the FSP data pointers after the stack is migrated to memory.
@@ -64,7 +63,6 @@ VOID
 FspDataPointerFixUp (
   IN UINT32   OffsetGap
   );
-
 
 /**
   This interface returns the base address of FSP binary.
