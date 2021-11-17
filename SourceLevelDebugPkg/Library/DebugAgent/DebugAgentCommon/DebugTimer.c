@@ -48,10 +48,10 @@ InitializeDebugTimer (
   DisableApicTimerInterrupt ();
 
   if (DumpFlag) {
-    DEBUG ((EFI_D_INFO, "Debug Timer: FSB Clock    = %d\n", PcdGet32(PcdFSBClock)));
-    DEBUG ((EFI_D_INFO, "Debug Timer: Divisor      = %d\n", ApicTimerDivisor));
-    DEBUG ((EFI_D_INFO, "Debug Timer: Frequency    = %d\n", ApicTimerFrequency));
-    DEBUG ((EFI_D_INFO, "Debug Timer: InitialCount = %d\n", InitialCount));
+    DEBUG ((DEBUG_INFO, "Debug Timer: FSB Clock    = %d\n", PcdGet32(PcdFSBClock)));
+    DEBUG ((DEBUG_INFO, "Debug Timer: Divisor      = %d\n", ApicTimerDivisor));
+    DEBUG ((DEBUG_INFO, "Debug Timer: Frequency    = %d\n", ApicTimerFrequency));
+    DEBUG ((DEBUG_INFO, "Debug Timer: InitialCount = %d\n", InitialCount));
   }
   if (TimerFrequency != NULL) {
     *TimerFrequency = ApicTimerFrequency;
@@ -140,4 +140,3 @@ IsDebugTimerTimeout (
 
   return (BOOLEAN) (Delta >= TimeoutTicker);
 }
-
