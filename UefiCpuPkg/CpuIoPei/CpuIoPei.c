@@ -900,7 +900,7 @@ CpuIoInitialize (
     //
     // Shadow completed and running from memory
     //
-    DEBUG ((EFI_D_INFO, "CpuIO PPI has been loaded into memory.  Reinstalled PPI=0x%x\n", &gCpuIoPpi));
+    DEBUG ((DEBUG_INFO, "CpuIO PPI has been loaded into memory.  Reinstalled PPI=0x%x\n", &gCpuIoPpi));
   } else {
     Status = PeiServicesInstallPpi (&gPpiList);
     ASSERT_EFI_ERROR (Status);

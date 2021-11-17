@@ -513,7 +513,7 @@ S3ResumeBootOs (
           EFI_ERROR_CODE | EFI_ERROR_MAJOR,
           (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_OS_WAKE_ERROR)
           );
-        DEBUG (( EFI_D_ERROR, "Unsupported for 32bit DXE transfer to 64bit OS waking vector!\r\n"));
+        DEBUG (( DEBUG_ERROR, "Unsupported for 32bit DXE transfer to 64bit OS waking vector!\r\n"));
         ASSERT (FALSE);
         CpuDeadLoop ();
         return ;
@@ -1136,4 +1136,3 @@ PeimS3ResumeEntryPoint (
 
   return EFI_SUCCESS;
 }
-
