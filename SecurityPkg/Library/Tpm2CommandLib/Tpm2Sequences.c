@@ -134,7 +134,7 @@ Tpm2HashSequenceStart (
   }
 
   if (ResultBufSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "HashSequenceStart: Failed ExecuteCommand: Buffer Too Small\r\n"));
+    DEBUG ((DEBUG_ERROR, "HashSequenceStart: Failed ExecuteCommand: Buffer Too Small\r\n"));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -143,7 +143,7 @@ Tpm2HashSequenceStart (
   //
   RespSize = SwapBytes32(Res.Header.paramSize);
   if (RespSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "HashSequenceStart: Response size too large! %d\r\n", RespSize));
+    DEBUG ((DEBUG_ERROR, "HashSequenceStart: Response size too large! %d\r\n", RespSize));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -151,7 +151,7 @@ Tpm2HashSequenceStart (
   // Fail if command failed
   //
   if (SwapBytes32(Res.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "HashSequenceStart: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "HashSequenceStart: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
@@ -231,7 +231,7 @@ Tpm2SequenceUpdate (
   }
 
   if (ResultBufSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "SequenceUpdate: Failed ExecuteCommand: Buffer Too Small\r\n"));
+    DEBUG ((DEBUG_ERROR, "SequenceUpdate: Failed ExecuteCommand: Buffer Too Small\r\n"));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -240,7 +240,7 @@ Tpm2SequenceUpdate (
   //
   RespSize = SwapBytes32(Res.Header.paramSize);
   if (RespSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "SequenceUpdate: Response size too large! %d\r\n", RespSize));
+    DEBUG ((DEBUG_ERROR, "SequenceUpdate: Response size too large! %d\r\n", RespSize));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -248,7 +248,7 @@ Tpm2SequenceUpdate (
   // Fail if command failed
   //
   if (SwapBytes32(Res.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "SequenceUpdate: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "SequenceUpdate: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
@@ -340,7 +340,7 @@ Tpm2EventSequenceComplete (
   }
 
   if (ResultBufSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "EventSequenceComplete: Failed ExecuteCommand: Buffer Too Small\r\n"));
+    DEBUG ((DEBUG_ERROR, "EventSequenceComplete: Failed ExecuteCommand: Buffer Too Small\r\n"));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -349,7 +349,7 @@ Tpm2EventSequenceComplete (
   //
   RespSize = SwapBytes32(Res.Header.paramSize);
   if (RespSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "EventSequenceComplete: Response size too large! %d\r\n", RespSize));
+    DEBUG ((DEBUG_ERROR, "EventSequenceComplete: Response size too large! %d\r\n", RespSize));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -357,7 +357,7 @@ Tpm2EventSequenceComplete (
   // Fail if command failed
   //
   if (SwapBytes32(Res.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "EventSequenceComplete: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "EventSequenceComplete: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
@@ -382,7 +382,7 @@ Tpm2EventSequenceComplete (
 
     DigestSize = GetHashSizeFromAlgo (Results->digests[Index].hashAlg);
     if (DigestSize == 0) {
-      DEBUG ((EFI_D_ERROR, "EventSequenceComplete: Unknown hash algorithm %d\r\n", Results->digests[Index].hashAlg));
+      DEBUG ((DEBUG_ERROR, "EventSequenceComplete: Unknown hash algorithm %d\r\n", Results->digests[Index].hashAlg));
       return EFI_DEVICE_ERROR;
     }
     CopyMem(
@@ -466,7 +466,7 @@ Tpm2SequenceComplete (
   }
 
   if (ResultBufSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "SequenceComplete: Failed ExecuteCommand: Buffer Too Small\r\n"));
+    DEBUG ((DEBUG_ERROR, "SequenceComplete: Failed ExecuteCommand: Buffer Too Small\r\n"));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -475,7 +475,7 @@ Tpm2SequenceComplete (
   //
   RespSize = SwapBytes32(Res.Header.paramSize);
   if (RespSize > sizeof(Res)) {
-    DEBUG ((EFI_D_ERROR, "SequenceComplete: Response size too large! %d\r\n", RespSize));
+    DEBUG ((DEBUG_ERROR, "SequenceComplete: Response size too large! %d\r\n", RespSize));
     return EFI_BUFFER_TOO_SMALL;
   }
 
@@ -483,7 +483,7 @@ Tpm2SequenceComplete (
   // Fail if command failed
   //
   if (SwapBytes32(Res.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "SequenceComplete: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "SequenceComplete: Response Code error! 0x%08x\r\n", SwapBytes32(Res.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 

@@ -458,7 +458,7 @@ EnrollPlatformKey (
   DataSize = PkCert->SignatureListSize;
   Status = CreateTimeBasedPayload (&DataSize, (UINT8**) &PkCert);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     goto ON_EXIT;
   }
 
@@ -471,7 +471,7 @@ EnrollPlatformKey (
                   );
   if (EFI_ERROR (Status)) {
     if (Status == EFI_OUT_OF_RESOURCES) {
-      DEBUG ((EFI_D_ERROR, "Enroll PK failed with out of resource.\n"));
+      DEBUG ((DEBUG_ERROR, "Enroll PK failed with out of resource.\n"));
     }
     goto ON_EXIT;
   }
@@ -600,7 +600,7 @@ EnrollRsa2048ToKek (
          | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
   Status = CreateTimeBasedPayload (&KekSigListSize, (UINT8**) &KekSigList);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     goto ON_EXIT;
   }
 
@@ -724,7 +724,7 @@ EnrollX509ToKek (
           | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
   Status = CreateTimeBasedPayload (&KekSigListSize, (UINT8**) &KekSigList);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     goto ON_EXIT;
   }
 
@@ -897,7 +897,7 @@ EnrollX509toSigDB (
           | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
   Status = CreateTimeBasedPayload (&SigDBSize, (UINT8**) &Data);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     goto ON_EXIT;
   }
 
@@ -2243,7 +2243,7 @@ EnrollImageSignatureToSigDB (
           | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS;
   Status = CreateTimeBasedPayload (&SigDBSize, (UINT8**) &Data);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+    DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
     goto ON_EXIT;
   }
 
@@ -2700,7 +2700,7 @@ DeleteKeyExchangeKey (
   if ((Attr & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
     Status = CreateTimeBasedPayload (&DataSize, &OldData);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+      DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
       goto ON_EXIT;
     }
   }
@@ -2901,7 +2901,7 @@ DeleteSignature (
   if ((Attr & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
     Status = CreateTimeBasedPayload (&DataSize, &OldData);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Fail to create time-based data payload: %r", Status));
+      DEBUG ((DEBUG_ERROR, "Fail to create time-based data payload: %r", Status));
       goto ON_EXIT;
     }
   }
