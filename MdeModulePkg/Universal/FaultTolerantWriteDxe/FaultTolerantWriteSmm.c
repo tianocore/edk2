@@ -324,13 +324,13 @@ SmmFaultTolerantWriteHandler (
   TempCommBufferSize = *CommBufferSize;
 
   if (TempCommBufferSize < SMM_FTW_COMMUNICATE_HEADER_SIZE) {
-    DEBUG ((EFI_D_ERROR, "SmmFtwHandler: SMM communication buffer size invalid!\n"));
+    DEBUG ((DEBUG_ERROR, "SmmFtwHandler: SMM communication buffer size invalid!\n"));
     return EFI_SUCCESS;
   }
   CommBufferPayloadSize = TempCommBufferSize - SMM_FTW_COMMUNICATE_HEADER_SIZE;
 
   if (!FtwSmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SmmFtwHandler: SMM communication buffer in SMRAM or overflow!\n"));
+    DEBUG ((DEBUG_ERROR, "SmmFtwHandler: SMM communication buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
 
@@ -340,7 +340,7 @@ SmmFaultTolerantWriteHandler (
     //
     // It will be not safe to expose the operations after End Of Dxe.
     //
-    DEBUG ((EFI_D_ERROR, "SmmFtwHandler: Not safe to do the operation: %x after End Of Dxe, so access denied!\n", SmmFtwFunctionHeader->Function));
+    DEBUG ((DEBUG_ERROR, "SmmFtwHandler: Not safe to do the operation: %x after End Of Dxe, so access denied!\n", SmmFtwFunctionHeader->Function));
     SmmFtwFunctionHeader->ReturnStatus = EFI_ACCESS_DENIED;
     return EFI_SUCCESS;
   }
@@ -348,7 +348,7 @@ SmmFaultTolerantWriteHandler (
   switch (SmmFtwFunctionHeader->Function) {
     case FTW_FUNCTION_GET_MAX_BLOCK_SIZE:
       if (CommBufferPayloadSize < sizeof (SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER)) {
-        DEBUG ((EFI_D_ERROR, "GetMaxBlockSize: SMM communication buffer size invalid!\n"));
+        DEBUG ((DEBUG_ERROR, "GetMaxBlockSize: SMM communication buffer size invalid!\n"));
         return EFI_SUCCESS;
       }
       SmmGetMaxBlockSizeHeader = (SMM_FTW_GET_MAX_BLOCK_SIZE_HEADER *) SmmFtwFunctionHeader->Data;
@@ -361,7 +361,7 @@ SmmFaultTolerantWriteHandler (
 
     case FTW_FUNCTION_ALLOCATE:
       if (CommBufferPayloadSize < sizeof (SMM_FTW_ALLOCATE_HEADER)) {
-        DEBUG ((EFI_D_ERROR, "Allocate: SMM communication buffer size invalid!\n"));
+        DEBUG ((DEBUG_ERROR, "Allocate: SMM communication buffer size invalid!\n"));
         return EFI_SUCCESS;
       }
       SmmFtwAllocateHeader = (SMM_FTW_ALLOCATE_HEADER *) SmmFtwFunctionHeader->Data;
@@ -375,7 +375,7 @@ SmmFaultTolerantWriteHandler (
 
     case FTW_FUNCTION_WRITE:
       if (CommBufferPayloadSize < OFFSET_OF (SMM_FTW_WRITE_HEADER, Data)) {
-        DEBUG ((EFI_D_ERROR, "Write: SMM communication buffer size invalid!\n"));
+        DEBUG ((DEBUG_ERROR, "Write: SMM communication buffer size invalid!\n"));
         return EFI_SUCCESS;
       }
       SmmFtwWriteHeader = (SMM_FTW_WRITE_HEADER *) SmmFtwFunctionHeader->Data;
@@ -395,7 +395,7 @@ SmmFaultTolerantWriteHandler (
       // SMRAM range check already covered before
       //
       if (InfoSize > CommBufferPayloadSize) {
-        DEBUG ((EFI_D_ERROR, "Write: Data size exceed communication buffer size limit!\n"));
+        DEBUG ((DEBUG_ERROR, "Write: Data size exceed communication buffer size limit!\n"));
         Status = EFI_ACCESS_DENIED;
         break;
       }
@@ -431,7 +431,7 @@ SmmFaultTolerantWriteHandler (
 
     case FTW_FUNCTION_RESTART:
       if (CommBufferPayloadSize < sizeof (SMM_FTW_RESTART_HEADER)) {
-        DEBUG ((EFI_D_ERROR, "Restart: SMM communication buffer size invalid!\n"));
+        DEBUG ((DEBUG_ERROR, "Restart: SMM communication buffer size invalid!\n"));
         return EFI_SUCCESS;
       }
       SmmFtwRestartHeader = (SMM_FTW_RESTART_HEADER *) SmmFtwFunctionHeader->Data;
@@ -451,7 +451,7 @@ SmmFaultTolerantWriteHandler (
 
     case FTW_FUNCTION_GET_LAST_WRITE:
       if (CommBufferPayloadSize < OFFSET_OF (SMM_FTW_GET_LAST_WRITE_HEADER, Data)) {
-        DEBUG ((EFI_D_ERROR, "GetLastWrite: SMM communication buffer size invalid!\n"));
+        DEBUG ((DEBUG_ERROR, "GetLastWrite: SMM communication buffer size invalid!\n"));
         return EFI_SUCCESS;
       }
       SmmFtwGetLastWriteHeader = (SMM_FTW_GET_LAST_WRITE_HEADER *) SmmFtwFunctionHeader->Data;
@@ -469,7 +469,7 @@ SmmFaultTolerantWriteHandler (
       // SMRAM range check already covered before
       //
       if (InfoSize > CommBufferPayloadSize) {
-        DEBUG ((EFI_D_ERROR, "Data size exceed communication buffer size limit!\n"));
+        DEBUG ((DEBUG_ERROR, "Data size exceed communication buffer size limit!\n"));
         Status = EFI_ACCESS_DENIED;
         break;
       }

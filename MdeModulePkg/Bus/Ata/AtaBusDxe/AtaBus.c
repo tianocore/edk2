@@ -358,7 +358,7 @@ RegisterAtaDevice (
   // If yes, then install Storage Security Protocol at the ata device handle.
   //
   if ((AtaDevice->IdentifyData->trusted_computing_support & BIT0) != 0) {
-    DEBUG ((EFI_D_INFO, "Found TCG support in Port %x PortMultiplierPort %x\n", Port, PortMultiplierPort));
+    DEBUG ((DEBUG_INFO, "Found TCG support in Port %x PortMultiplierPort %x\n", Port, PortMultiplierPort));
     Status = gBS->InstallProtocolInterface (
                     &AtaDevice->Handle,
                     &gEfiStorageSecurityCommandProtocolGuid,
@@ -368,7 +368,7 @@ RegisterAtaDevice (
     if (EFI_ERROR (Status)) {
       goto Done;
     }
-    DEBUG ((EFI_D_INFO, "Successfully Install Storage Security Protocol on the ATA device\n"));
+    DEBUG ((DEBUG_INFO, "Successfully Install Storage Security Protocol on the ATA device\n"));
   }
 
   gBS->OpenProtocol (
@@ -387,7 +387,7 @@ Done:
 
   if (EFI_ERROR (Status) && (AtaDevice != NULL)) {
     ReleaseAtaResources (AtaDevice);
-    DEBUG ((EFI_D_ERROR | EFI_D_INIT, "Failed to initialize Port %x PortMultiplierPort %x, status = %r\n", Port, PortMultiplierPort, Status));
+    DEBUG ((DEBUG_ERROR | DEBUG_INIT, "Failed to initialize Port %x PortMultiplierPort %x, status = %r\n", Port, PortMultiplierPort, Status));
   }
   return Status;
 }
@@ -1537,7 +1537,7 @@ AtaStorageSecurityReceiveData (
   ATA_DEVICE                       *Private;
   EFI_TPL                          OldTpl;
 
-  DEBUG ((EFI_D_INFO, "EFI Storage Security Protocol - Read\n"));
+  DEBUG ((DEBUG_INFO, "EFI Storage Security Protocol - Read\n"));
   if ((PayloadBuffer == NULL || PayloadTransferSize == NULL) && PayloadBufferSize != 0) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1647,7 +1647,7 @@ AtaStorageSecuritySendData (
   ATA_DEVICE                       *Private;
   EFI_TPL                          OldTpl;
 
-  DEBUG ((EFI_D_INFO, "EFI Storage Security Protocol - Send\n"));
+  DEBUG ((DEBUG_INFO, "EFI Storage Security Protocol - Send\n"));
   if ((PayloadBuffer == NULL) && (PayloadBufferSize != 0)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1709,4 +1709,3 @@ InitializeAtaBus(
 
   return Status;
 }
-

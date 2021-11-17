@@ -304,7 +304,7 @@ SdPeimHcReset (
   Status  = SdPeimHcRwMmio (Bar + SD_HC_SW_RST, FALSE, sizeof (SwReset), &SwReset);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimHcReset: write full 1 fails: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimHcReset: write full 1 fails: %r\n", Status));
     return Status;
   }
 
@@ -316,7 +316,7 @@ SdPeimHcReset (
              SD_TIMEOUT
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "SdPeimHcReset: reset done with %r\n", Status));
+    DEBUG ((DEBUG_INFO, "SdPeimHcReset: reset done with %r\n", Status));
     return Status;
   }
   //
@@ -556,7 +556,7 @@ SdPeimHcClockSupply (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "BaseClkFreq %dMHz Divisor %d ClockFreq %dKhz\n", BaseClkFreq, Divisor, ClockFreq));
+  DEBUG ((DEBUG_INFO, "BaseClkFreq %dMHz Divisor %d ClockFreq %dKhz\n", BaseClkFreq, Divisor, ClockFreq));
 
   Status = SdPeimHcRwMmio (Bar + SD_HC_CTRL_VER, TRUE, sizeof (ControllerVer), &ControllerVer);
   if (EFI_ERROR (Status)) {
@@ -578,7 +578,7 @@ SdPeimHcClockSupply (
     ASSERT (Divisor <= 0x80);
     ClockCtrl = (Divisor & 0xFF) << 8;
   } else {
-    DEBUG ((EFI_D_ERROR, "Unknown SD Host Controller Spec version [0x%x]!!!\n", ControllerVer));
+    DEBUG ((DEBUG_ERROR, "Unknown SD Host Controller Spec version [0x%x]!!!\n", ControllerVer));
     return EFI_UNSUPPORTED;
   }
 
@@ -596,7 +596,7 @@ SdPeimHcClockSupply (
   ClockCtrl |= BIT0;
   Status = SdPeimHcRwMmio (Bar + SD_HC_CLOCK_CTRL, FALSE, sizeof (ClockCtrl), &ClockCtrl);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Set SDCLK Frequency Select and Internal Clock Enable fields fails\n"));
+    DEBUG ((DEBUG_ERROR, "Set SDCLK Frequency Select and Internal Clock Enable fields fails\n"));
     return Status;
   }
 
@@ -936,7 +936,7 @@ BuildAdmaDescTable (
   // for 32-bit address descriptor table.
   //
   if ((Data & (BIT0 | BIT1)) != 0) {
-    DEBUG ((EFI_D_INFO, "The buffer [0x%x] to construct ADMA desc is not aligned to 4 bytes boundary!\n", Data));
+    DEBUG ((DEBUG_INFO, "The buffer [0x%x] to construct ADMA desc is not aligned to 4 bytes boundary!\n", Data));
   }
 
   Entries = DivU64x32 ((DataLen + ADMA_MAX_DATA_PER_LINE - 1), ADMA_MAX_DATA_PER_LINE);
@@ -2549,7 +2549,7 @@ SdPeimTuningClock (
     }
   } while (++Retry < 40);
 
-  DEBUG ((EFI_D_ERROR, "SdPeimTuningClock: Send tuning block fails at %d times with HostCtrl2 %02x\n", Retry, HostCtrl2));
+  DEBUG ((DEBUG_ERROR, "SdPeimTuningClock: Send tuning block fails at %d times with HostCtrl2 %02x\n", Retry, HostCtrl2));
   //
   // Abort the tuning procedure and reset the tuning circuit.
   //
@@ -2638,7 +2638,7 @@ SdPeimSetBusMode (
 
   Status = SdPeimGetCsd (Slot, Rca, &Slot->Csd);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimSetBusMode: SdPeimGetCsd fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimSetBusMode: SdPeimGetCsd fails with %r\n", Status));
     return Status;
   }
 
@@ -2649,14 +2649,14 @@ SdPeimSetBusMode (
 
   Status = SdPeimSelect (Slot, Rca);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimSetBusMode: SdPeimSelect fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimSetBusMode: SdPeimSelect fails with %r\n", Status));
     return Status;
   }
 
   BusWidth = 4;
   Status = SdPeimSwitchBusWidth (Slot, Rca, BusWidth);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimSetBusMode: SdPeimSwitchBusWidth fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimSetBusMode: SdPeimSwitchBusWidth fails with %r\n", Status));
     return Status;
   }
 
@@ -2689,16 +2689,16 @@ SdPeimSetBusMode (
     AccessMode = 0;
   }
 
-  DEBUG ((EFI_D_INFO, "SdPeimSetBusMode: AccessMode %d ClockFreq %d BusWidth %d\n", AccessMode, ClockFreq, BusWidth));
+  DEBUG ((DEBUG_INFO, "SdPeimSetBusMode: AccessMode %d ClockFreq %d BusWidth %d\n", AccessMode, ClockFreq, BusWidth));
 
   Status = SdPeimSwitch (Slot, AccessMode, 0xF, 0xF, 0xF, TRUE, SwitchResp);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimSetBusMode: SdPeimSwitch fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimSetBusMode: SdPeimSwitch fails with %r\n", Status));
     return Status;
   }
 
   if ((SwitchResp[16] & 0xF) != AccessMode) {
-    DEBUG ((EFI_D_ERROR, "SdPeimSetBusMode: SdPeimSwitch to AccessMode %d ClockFreq %d BusWidth %d fails! The Switch response is 0x%1x\n", AccessMode, ClockFreq, BusWidth, SwitchResp[16] & 0xF));
+    DEBUG ((DEBUG_ERROR, "SdPeimSetBusMode: SdPeimSwitch to AccessMode %d ClockFreq %d BusWidth %d fails! The Switch response is 0x%1x\n", AccessMode, ClockFreq, BusWidth, SwitchResp[16] & 0xF));
     return EFI_DEVICE_ERROR;
   }
   //
@@ -2725,19 +2725,19 @@ SdPeimSetBusMode (
 
   Status = SdPeimHcClockSupply (Slot->SdHcBase, ClockFreq * 1000);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimSetBusMode: SdPeimHcClockSupply %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimSetBusMode: SdPeimHcClockSupply %r\n", Status));
     return Status;
   }
 
   if ((AccessMode == 3) || ((AccessMode == 2) && (Capability.TuningSDR50 != 0))) {
     Status = SdPeimTuningClock (Slot);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "SdPeimSetBusMode: SdPeimTuningClock fails with %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "SdPeimSetBusMode: SdPeimTuningClock fails with %r\n", Status));
       return Status;
     }
   }
 
-  DEBUG ((EFI_D_INFO, "SdPeimSetBusMode: SdPeimSetBusMode %r\n", Status));
+  DEBUG ((DEBUG_INFO, "SdPeimSetBusMode: SdPeimSetBusMode %r\n", Status));
 
   return Status;
 }
@@ -2776,7 +2776,7 @@ SdPeimIdentification (
   //
   Status = SdPeimReset (Slot);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimIdentification: Executing Cmd0 fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimIdentification: Executing Cmd0 fails with %r\n", Status));
     return Status;
   }
   //
@@ -2784,7 +2784,7 @@ SdPeimIdentification (
   //
   Status = SdPeimVoltageCheck (Slot, 0x1, 0xFF);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimIdentification: Executing Cmd8 fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimIdentification: Executing Cmd8 fails with %r\n", Status));
     return Status;
   }
   //
@@ -2792,7 +2792,7 @@ SdPeimIdentification (
   //
   Status = SdioSendOpCond (Slot, 0, FALSE);
   if (!EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimIdentification: Found SDIO device, ignore it as we don't support\n"));
+    DEBUG ((DEBUG_ERROR, "SdPeimIdentification: Found SDIO device, ignore it as we don't support\n"));
     return EFI_DEVICE_ERROR;
   }
   //
@@ -2800,7 +2800,7 @@ SdPeimIdentification (
   //
   Status = SdPeimSendOpCond (Slot, 0, 0, FALSE, FALSE, FALSE, &Ocr);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimIdentification: Executing SdPeimSendOpCond fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimIdentification: Executing SdPeimSendOpCond fails with %r\n", Status));
     return EFI_DEVICE_ERROR;
   }
 
@@ -2863,12 +2863,12 @@ SdPeimIdentification (
   do {
     Status = SdPeimSendOpCond (Slot, 0, Ocr, S18r, Xpc, TRUE, &Ocr);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "SdPeimIdentification: SdPeimSendOpCond fails with %r Ocr %x, S18r %x, Xpc %x\n", Status, Ocr, S18r, Xpc));
+      DEBUG ((DEBUG_ERROR, "SdPeimIdentification: SdPeimSendOpCond fails with %r Ocr %x, S18r %x, Xpc %x\n", Status, Ocr, S18r, Xpc));
       return EFI_DEVICE_ERROR;
     }
 
     if (Retry++ == 100) {
-      DEBUG ((EFI_D_ERROR, "SdPeimIdentification: SdPeimSendOpCond fails too many times\n"));
+      DEBUG ((DEBUG_ERROR, "SdPeimIdentification: SdPeimSendOpCond fails too many times\n"));
       return EFI_DEVICE_ERROR;
     }
     MicroSecondDelay (10 * 1000);
@@ -2885,7 +2885,7 @@ SdPeimIdentification (
        ((Ocr & BIT24) != 0)) {
     Status = SdPeimVoltageSwitch (Slot);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "SdPeimIdentification: Executing SdPeimVoltageSwitch fails with %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "SdPeimIdentification: Executing SdPeimVoltageSwitch fails with %r\n", Status));
       Status = EFI_DEVICE_ERROR;
       goto Error;
     } else {
@@ -2897,7 +2897,7 @@ SdPeimIdentification (
 
       SdPeimHcRwMmio (Slot->SdHcBase + SD_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
       if (((PresentState >> 20) & 0xF) != 0) {
-        DEBUG ((EFI_D_ERROR, "SdPeimIdentification: SwitchVoltage fails with PresentState = 0x%x\n", PresentState));
+        DEBUG ((DEBUG_ERROR, "SdPeimIdentification: SwitchVoltage fails with PresentState = 0x%x\n", PresentState));
         Status = EFI_DEVICE_ERROR;
         goto Error;
       }
@@ -2908,7 +2908,7 @@ SdPeimIdentification (
 
       SdPeimHcRwMmio (Slot->SdHcBase + SD_HC_HOST_CTRL2, TRUE, sizeof (HostCtrl2), &HostCtrl2);
       if ((HostCtrl2 & BIT3) == 0) {
-        DEBUG ((EFI_D_ERROR, "SdPeimIdentification: SwitchVoltage fails with HostCtrl2 = 0x%x\n", HostCtrl2));
+        DEBUG ((DEBUG_ERROR, "SdPeimIdentification: SwitchVoltage fails with HostCtrl2 = 0x%x\n", HostCtrl2));
         Status = EFI_DEVICE_ERROR;
         goto Error;
       }
@@ -2919,29 +2919,29 @@ SdPeimIdentification (
 
       SdPeimHcRwMmio (Slot->SdHcBase + SD_HC_PRESENT_STATE, TRUE, sizeof (PresentState), &PresentState);
       if (((PresentState >> 20) & 0xF) != 0xF) {
-        DEBUG ((EFI_D_ERROR, "SdPeimIdentification: SwitchVoltage fails with PresentState = 0x%x, It should be 0xF\n", PresentState));
+        DEBUG ((DEBUG_ERROR, "SdPeimIdentification: SwitchVoltage fails with PresentState = 0x%x, It should be 0xF\n", PresentState));
         Status = EFI_DEVICE_ERROR;
         goto Error;
       }
     }
-    DEBUG ((EFI_D_INFO, "SdPeimIdentification: Switch to 1.8v signal voltage success\n"));
+    DEBUG ((DEBUG_INFO, "SdPeimIdentification: Switch to 1.8v signal voltage success\n"));
   }
 
   Status = SdPeimAllSendCid (Slot);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimIdentification: Executing SdPeimAllSendCid fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimIdentification: Executing SdPeimAllSendCid fails with %r\n", Status));
     return Status;
   }
 
   Status = SdPeimSetRca (Slot, &Rca);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SdPeimIdentification: Executing SdPeimSetRca fails with %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SdPeimIdentification: Executing SdPeimSetRca fails with %r\n", Status));
     return Status;
   }
   //
   // Enter Data Tranfer Mode.
   //
-  DEBUG ((EFI_D_INFO, "Found a SD device at slot [%d]\n", Slot));
+  DEBUG ((DEBUG_INFO, "Found a SD device at slot [%d]\n", Slot));
 
   Status = SdPeimSetBusMode (Slot, Rca, ((Ocr & BIT24) != 0));
 

@@ -741,7 +741,7 @@ InitializeEmmcBlockIoPeim (
         continue;
       }
       if (Capability.SlotType != 0x1) {
-        DEBUG ((EFI_D_INFO, "The slot at 0x%x is not embedded slot type\n", MmioBase[Index]));
+        DEBUG ((DEBUG_INFO, "The slot at 0x%x is not embedded slot type\n", MmioBase[Index]));
         Status = EFI_UNSUPPORTED;
         continue;
       }
@@ -773,12 +773,12 @@ InitializeEmmcBlockIoPeim (
 
       ExtCsd = &Slot->ExtCsd;
       if (ExtCsd->ExtCsdRev < 5) {
-        DEBUG ((EFI_D_ERROR, "The EMMC device version is too low, we don't support!!!\n"));
+        DEBUG ((DEBUG_ERROR, "The EMMC device version is too low, we don't support!!!\n"));
         Status = EFI_UNSUPPORTED;
         continue;
       }
       if ((ExtCsd->PartitioningSupport & BIT0) != BIT0) {
-        DEBUG ((EFI_D_ERROR, "The EMMC device doesn't support Partition Feature!!!\n"));
+        DEBUG ((DEBUG_ERROR, "The EMMC device doesn't support Partition Feature!!!\n"));
         Status = EFI_UNSUPPORTED;
         continue;
       }

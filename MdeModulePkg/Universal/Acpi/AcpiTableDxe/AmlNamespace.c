@@ -263,9 +263,9 @@ AmlInsertNodeToTree (
   //
   // Oops!!!, There must be something wrong.
   //
-  DEBUG ((EFI_D_ERROR, "AML: Override Happen - %a!\n", NameString));
-  DEBUG ((EFI_D_ERROR, "AML: Existing Node - %x\n", AmlNodeList->Buffer));
-  DEBUG ((EFI_D_ERROR, "AML: New Buffer - %x\n", Buffer));
+  DEBUG ((DEBUG_ERROR, "AML: Override Happen - %a!\n", NameString));
+  DEBUG ((DEBUG_ERROR, "AML: Existing Node - %x\n", AmlNodeList->Buffer));
+  DEBUG ((DEBUG_ERROR, "AML: New Buffer - %x\n", Buffer));
 
   return NULL;
 }
@@ -476,14 +476,14 @@ AmlDumpNodeInfo (
   CurrentLink = AmlParentNodeList->Children.ForwardLink;
 
   if (Level == 0) {
-    DEBUG ((EFI_D_ERROR, "\\"));
+    DEBUG ((DEBUG_ERROR, "\\"));
   } else {
     for (Index = 0; Index < Level; Index++) {
-      DEBUG ((EFI_D_ERROR, "    "));
+      DEBUG ((DEBUG_ERROR, "    "));
     }
     AmlPrintNameSeg (AmlParentNodeList->Name);
   }
-  DEBUG ((EFI_D_ERROR, "\n"));
+  DEBUG ((DEBUG_ERROR, "\n"));
 
   while (CurrentLink != &AmlParentNodeList->Children) {
     CurrentAmlNodeList = EFI_AML_NODE_LIST_FROM_LINK (CurrentLink);
@@ -543,7 +543,7 @@ AmlFindPath (
   }
 
   DEBUG_CODE_BEGIN ();
-  DEBUG ((EFI_D_ERROR, "AcpiSdt: NameSpace:\n"));
+  DEBUG ((DEBUG_ERROR, "AcpiSdt: NameSpace:\n"));
   AmlDumpNodeInfo (AmlRootNodeList, 0);
   DEBUG_CODE_END ();
 
@@ -579,9 +579,9 @@ AmlFindPath (
   //
   if (CurrentAmlNodeList != NULL) {
     DEBUG_CODE_BEGIN ();
-    DEBUG ((EFI_D_ERROR, "AcpiSdt: Search from: \\"));
+    DEBUG ((DEBUG_ERROR, "AcpiSdt: Search from: \\"));
     AmlPrintNameSeg (CurrentAmlNodeList->Name);
-    DEBUG ((EFI_D_ERROR, "\n"));
+    DEBUG ((DEBUG_ERROR, "\n"));
     DEBUG_CODE_END ();
     AmlNodeList = AmlFindNodeInTheTree (
                     AmlPath,

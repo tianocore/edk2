@@ -141,7 +141,7 @@ PartitionInstallElToritoChildHandles (
                        Catalog
                        );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "EltCheckDevice: error reading catalog %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "EltCheckDevice: error reading catalog %r\n", Status));
       continue;
     }
     //
@@ -149,7 +149,7 @@ PartitionInstallElToritoChildHandles (
     // to make sure it looks like a Catalog header
     //
     if (Catalog->Catalog.Indicator != ELTORITO_ID_CATALOG || Catalog->Catalog.Id55AA != 0xAA55) {
-      DEBUG ((EFI_D_ERROR, "EltCheckBootCatalog: El Torito boot catalog header IDs not correct\n"));
+      DEBUG ((DEBUG_ERROR, "EltCheckBootCatalog: El Torito boot catalog header IDs not correct\n"));
       continue;
     }
 
@@ -160,7 +160,7 @@ PartitionInstallElToritoChildHandles (
     }
 
     if ((Check & 0xFFFF) != 0) {
-      DEBUG ((EFI_D_ERROR, "EltCheckBootCatalog: El Torito boot catalog header checksum failed\n"));
+      DEBUG ((DEBUG_ERROR, "EltCheckBootCatalog: El Torito boot catalog header checksum failed\n"));
       continue;
     }
 
@@ -203,7 +203,7 @@ PartitionInstallElToritoChildHandles (
         break;
 
       default:
-        DEBUG ((EFI_D_INIT, "EltCheckDevice: unsupported El Torito boot media type %x\n", Catalog->Boot.MediaType));
+        DEBUG ((DEBUG_INIT, "EltCheckDevice: unsupported El Torito boot media type %x\n", Catalog->Boot.MediaType));
         SectorCount   = 0;
         SubBlockSize  = Media->BlockSize;
         break;

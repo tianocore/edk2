@@ -2384,8 +2384,8 @@ CoreInitializeMemoryServices (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "CoreInitializeMemoryServices:\n"));
-  DEBUG ((EFI_D_INFO, "  BaseAddress - 0x%lx Length - 0x%lx MinimalMemorySizeNeeded - 0x%lx\n", BaseAddress, Length, MinimalMemorySizeNeeded));
+  DEBUG ((DEBUG_INFO, "CoreInitializeMemoryServices:\n"));
+  DEBUG ((DEBUG_INFO, "  BaseAddress - 0x%lx Length - 0x%lx MinimalMemorySizeNeeded - 0x%lx\n", BaseAddress, Length, MinimalMemorySizeNeeded));
 
   //
   // If no memory regions are found that are big enough to initialize the DXE core, then ASSERT().

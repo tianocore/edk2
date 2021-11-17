@@ -769,7 +769,7 @@ FvIsBeingProcessed (
     for (Link = mFvHandleList.ForwardLink; Link != &mFvHandleList; Link = Link->ForwardLink) {
       KnownHandle = CR(Link, KNOWN_HANDLE, Link, KNOWN_HANDLE_SIGNATURE);
       if (CompareGuid (&FvNameGuid, &KnownHandle->FvNameGuid)) {
-        DEBUG ((EFI_D_ERROR, "FvImage on FvHandle %p and %p has the same FvNameGuid %g.\n", FvHandle, KnownHandle->Handle, &FvNameGuid));
+        DEBUG ((DEBUG_ERROR, "FvImage on FvHandle %p and %p has the same FvNameGuid %g.\n", FvHandle, KnownHandle->Handle, &FvNameGuid));
         return NULL;
       }
     }

@@ -208,9 +208,9 @@ BmSetMemoryTypeInformationVariable (
   //
   // Use a heuristic to adjust the Memory Type Information for the next boot
   //
-  DEBUG ((EFI_D_INFO, "Memory  Previous  Current    Next   \n"));
-  DEBUG ((EFI_D_INFO, " Type    Pages     Pages     Pages  \n"));
-  DEBUG ((EFI_D_INFO, "======  ========  ========  ========\n"));
+  DEBUG ((DEBUG_INFO, "Memory  Previous  Current    Next   \n"));
+  DEBUG ((DEBUG_INFO, " Type    Pages     Pages     Pages  \n"));
+  DEBUG ((DEBUG_INFO, "======  ========  ========  ========\n"));
 
   for (Index = 0; PreviousMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
 
@@ -253,7 +253,7 @@ BmSetMemoryTypeInformationVariable (
       MemoryTypeInformationModified = TRUE;
     }
 
-    DEBUG ((EFI_D_INFO, "  %02x    %08x  %08x  %08x\n", PreviousMemoryTypeInformation[Index].Type, Previous, Current, Next));
+    DEBUG ((DEBUG_INFO, "  %02x    %08x  %08x  %08x\n", PreviousMemoryTypeInformation[Index].Type, Previous, Current, Next));
   }
 
   //
@@ -276,14 +276,14 @@ BmSetMemoryTypeInformationVariable (
       // entry/resume cycle will not fail.
       //
       if (MemoryTypeInformationModified) {
-        DEBUG ((EFI_D_INFO, "Memory Type Information settings change.\n"));
+        DEBUG ((DEBUG_INFO, "Memory Type Information settings change.\n"));
         if (Boot && PcdGetBool (PcdResetOnMemoryTypeInformationChange)) {
-          DEBUG ((EFI_D_INFO, "...Warm Reset!!!\n"));
+          DEBUG ((DEBUG_INFO, "...Warm Reset!!!\n"));
           gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
         }
       }
     } else {
-      DEBUG ((EFI_D_ERROR, "Memory Type Information settings cannot be saved. OS S4 may fail!\n"));
+      DEBUG ((DEBUG_ERROR, "Memory Type Information settings cannot be saved. OS S4 may fail!\n"));
     }
   }
   FreePool (PreviousMemoryTypeInformation);
@@ -385,7 +385,7 @@ BmPrintDp (
   CHAR16                              *Str;
 
   Str = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
-  DEBUG ((EFI_D_INFO, "%s", Str));
+  DEBUG ((DEBUG_INFO, "%s", Str));
   if (Str != NULL) {
     FreePool (Str);
   }

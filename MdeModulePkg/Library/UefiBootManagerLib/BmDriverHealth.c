@@ -129,7 +129,7 @@ BmDisplayMessages (
                      DriverHealthInfo->ChildHandle
                      );
 
-  DEBUG ((EFI_D_INFO, "Controller: %s\n", ControllerName));
+  DEBUG ((DEBUG_INFO, "Controller: %s\n", ControllerName));
   Print (L"Controller: %s\n", ControllerName);
   for (Index = 0; DriverHealthInfo->MessageList[Index].HiiHandle != NULL; Index++) {
     String = HiiGetString (
@@ -139,7 +139,7 @@ BmDisplayMessages (
                );
     if (String != NULL) {
       Print (L"  %s\n", String);
-      DEBUG ((EFI_D_INFO, "  %s\n", String));
+      DEBUG ((DEBUG_INFO, "  %s\n", String));
       FreePool (String);
     }
   }
@@ -167,7 +167,7 @@ BmRepairNotify (
   IN UINTN        Limit
   )
 {
-  DEBUG ((EFI_D_INFO, "[BDS]RepairNotify: %d/%d\n", Value, Limit));
+  DEBUG ((DEBUG_INFO, "[BDS]RepairNotify: %d/%d\n", Value, Limit));
   Print (L"[BDS]RepairNotify: %d/%d\n", Value, Limit);
 
   return EFI_SUCCESS;
@@ -556,7 +556,7 @@ BmRepairAllControllers (
                          DriverHealthInfo[Index].ChildHandle
                          );
       DEBUG ((
-        EFI_D_INFO,
+        DEBUG_INFO,
         "%02d: %s - %s\n",
         Index,
         ControllerName,
@@ -579,7 +579,7 @@ BmRepairAllControllers (
   }
 
   if (RebootRequired) {
-    DEBUG ((EFI_D_INFO, "[BDS] One of the Driver Health instances requires rebooting.\n"));
+    DEBUG ((DEBUG_INFO, "[BDS] One of the Driver Health instances requires rebooting.\n"));
     gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
   }
 }

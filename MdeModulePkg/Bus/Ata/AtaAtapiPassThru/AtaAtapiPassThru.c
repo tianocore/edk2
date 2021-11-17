@@ -682,7 +682,7 @@ AtaAtapiPassThruStart (
   Instance              = NULL;
   OriginalPciAttributes = 0;
 
-  DEBUG ((EFI_D_INFO, "==AtaAtapiPassThru Start== Controller = %x\n", Controller));
+  DEBUG ((DEBUG_INFO, "==AtaAtapiPassThru Start== Controller = %x\n", Controller));
 
   Status  = gBS->OpenProtocol (
                    Controller,
@@ -694,7 +694,7 @@ AtaAtapiPassThruStart (
                    );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Open Ide_Controller_Init Error, Status=%r", Status));
+    DEBUG ((DEBUG_ERROR, "Open Ide_Controller_Init Error, Status=%r", Status));
     goto ErrorExit;
   }
 
@@ -707,7 +707,7 @@ AtaAtapiPassThruStart (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Get Pci_Io Protocol Error, Status=%r", Status));
+    DEBUG ((DEBUG_ERROR, "Get Pci_Io Protocol Error, Status=%r", Status));
     goto ErrorExit;
   }
 
@@ -872,7 +872,7 @@ AtaAtapiPassThruStop (
   EFI_PCI_IO_PROTOCOL               *PciIo;
   EFI_AHCI_REGISTERS                *AhciRegisters;
 
-  DEBUG ((EFI_D_INFO, "==AtaAtapiPassThru Stop== Controller = %x\n", Controller));
+  DEBUG ((DEBUG_INFO, "==AtaAtapiPassThru Stop== Controller = %x\n", Controller));
 
   Status = gBS->OpenProtocol (
                   Controller,
@@ -2646,4 +2646,3 @@ Exit:
 
   return EFI_SUCCESS;
 }
-

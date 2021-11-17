@@ -142,7 +142,7 @@ TimestampDriverInitialize (
     mTimestampProperties.EndValue = mTimerLibStartValue - mTimerLibEndValue;
   }
 
-  DEBUG ((EFI_D_INFO, "TimerFrequency:0x%lx, TimerLibStartTime:0x%lx, TimerLibEndtime:0x%lx\n", mTimestampProperties.Frequency, mTimerLibStartValue, mTimerLibEndValue));
+  DEBUG ((DEBUG_INFO, "TimerFrequency:0x%lx, TimerLibStartTime:0x%lx, TimerLibEndtime:0x%lx\n", mTimestampProperties.Frequency, mTimerLibStartValue, mTimerLibEndValue));
 
   //
   // Install the Timestamp Protocol onto a new handle
