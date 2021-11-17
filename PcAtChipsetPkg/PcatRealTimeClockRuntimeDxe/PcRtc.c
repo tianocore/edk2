@@ -1348,7 +1348,7 @@ PcRtcAcpiTableChangeCallback (
     if (!EFI_ERROR (Status)) {
       Century = (UINT8) (Time.Year / 100);
       Century = DecimalToBcd8 (Century);
-      DEBUG ((EFI_D_INFO, "PcRtc: Write 0x%x to CMOS location 0x%x\n", Century, mModuleGlobal.CenturyRtcAddress));
+      DEBUG ((DEBUG_INFO, "PcRtc: Write 0x%x to CMOS location 0x%x\n", Century, mModuleGlobal.CenturyRtcAddress));
       RtcWrite (mModuleGlobal.CenturyRtcAddress, Century);
     }
   }
