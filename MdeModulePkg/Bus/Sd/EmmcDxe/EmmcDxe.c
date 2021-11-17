@@ -314,12 +314,12 @@ DiscoverAllPartitions (
   DumpExtCsd (ExtCsd);
 
   if (ExtCsd->ExtCsdRev < 5) {
-    DEBUG ((EFI_D_ERROR, "The EMMC device version is too low, we don't support!!!\n"));
+    DEBUG ((DEBUG_ERROR, "The EMMC device version is too low, we don't support!!!\n"));
     return EFI_UNSUPPORTED;
   }
 
   if ((ExtCsd->PartitioningSupport & BIT0) != BIT0) {
-    DEBUG ((EFI_D_ERROR, "The EMMC device doesn't support Partition Feature!!!\n"));
+    DEBUG ((DEBUG_ERROR, "The EMMC device doesn't support Partition Feature!!!\n"));
     return EFI_UNSUPPORTED;
   }
 
@@ -1202,4 +1202,3 @@ InitializeEmmcDxe (
 
   return Status;
 }
-

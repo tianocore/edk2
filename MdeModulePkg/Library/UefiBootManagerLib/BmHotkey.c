@@ -353,7 +353,7 @@ BmHotkeyCallback (
     return EFI_SUCCESS;
   }
 
-  DEBUG ((EFI_D_INFO, "[Bds]BmHotkeyCallback: %04x:%04x\n", KeyData->Key.ScanCode, KeyData->Key.UnicodeChar));
+  DEBUG ((DEBUG_INFO, "[Bds]BmHotkeyCallback: %04x:%04x\n", KeyData->Key.ScanCode, KeyData->Key.UnicodeChar));
 
   EfiAcquireLock (&mBmHotkeyLock);
   for ( Link = GetFirstNode (&mBmHotkeyList)
@@ -399,12 +399,12 @@ BmHotkeyCallback (
             mBmLoadOptionName[LoadOptionTypeBoot], Hotkey->BootOption
             );
           Status = EfiBootManagerVariableToLoadOption (OptionName, &mBmHotkeyBootOption);
-          DEBUG ((EFI_D_INFO, "[Bds]Hotkey for %s pressed - %r\n", OptionName, Status));
+          DEBUG ((DEBUG_INFO, "[Bds]Hotkey for %s pressed - %r\n", OptionName, Status));
           if (EFI_ERROR (Status)) {
             mBmHotkeyBootOption.OptionNumber = LoadOptionNumberUnassigned;
           }
         } else {
-          DEBUG ((EFI_D_INFO, "[Bds]Continue key pressed!\n"));
+          DEBUG ((DEBUG_INFO, "[Bds]Continue key pressed!\n"));
         }
       }
     } else {
@@ -503,7 +503,7 @@ BmUnregisterHotkeyNotify (
                           );
       if (!EFI_ERROR (Status)) {
         Status = TxtInEx->UnregisterKeyNotify (TxtInEx, NotifyHandle);
-        DEBUG ((EFI_D_INFO, "[Bds]UnregisterKeyNotify: %04x/%04x %r\n", Hotkey->KeyData[KeyIndex].Key.ScanCode, Hotkey->KeyData[KeyIndex].Key.UnicodeChar, Status));
+        DEBUG ((DEBUG_INFO, "[Bds]UnregisterKeyNotify: %04x/%04x %r\n", Hotkey->KeyData[KeyIndex].Key.ScanCode, Hotkey->KeyData[KeyIndex].Key.UnicodeChar, Status));
       }
     }
   }
@@ -542,7 +542,7 @@ BmRegisterHotkeyNotify (
                         &NotifyHandle
                         );
     DEBUG ((
-      EFI_D_INFO,
+      DEBUG_INFO,
       "[Bds]RegisterKeyNotify: %04x/%04x %08x/%02x %r\n",
       Hotkey->KeyData[Index].Key.ScanCode,
       Hotkey->KeyData[Index].Key.UnicodeChar,
@@ -830,7 +830,7 @@ BmStopHotkeyService (
   LIST_ENTRY            *Link;
   BM_HOTKEY             *Hotkey;
 
-  DEBUG ((EFI_D_INFO, "[Bds]Stop Hotkey Service!\n"));
+  DEBUG ((DEBUG_INFO, "[Bds]Stop Hotkey Service!\n"));
   gBS->CloseEvent (Event);
 
   EfiAcquireLock (&mBmHotkeyLock);
@@ -873,7 +873,7 @@ EfiBootManagerStartHotkeyService (
   }
 
   if (mBmHotkeySupportCount == 0) {
-    DEBUG ((EFI_D_INFO, "Bds: BootOptionSupport NV variable forbids starting the hotkey service.\n"));
+    DEBUG ((DEBUG_INFO, "Bds: BootOptionSupport NV variable forbids starting the hotkey service.\n"));
     return EFI_UNSUPPORTED;
   }
 

@@ -120,7 +120,7 @@ InstallMemoryAttributesTable (
 
   if (!mMemoryAttributesTableEnable) {
     DEBUG ((DEBUG_VERBOSE, "Cannot install Memory Attributes Table "));
-    DEBUG ((EFI_D_VERBOSE, "because Runtime Driver Section Alignment is not %dK.\n", RUNTIME_PAGE_ALLOCATION_GRANULARITY >> 10));
+    DEBUG ((DEBUG_VERBOSE, "because Runtime Driver Section Alignment is not %dK.\n", RUNTIME_PAGE_ALLOCATION_GRANULARITY >> 10));
     return ;
   }
 
@@ -182,10 +182,10 @@ InstallMemoryAttributesTable (
   MemoryAttributesTable->NumberOfEntries = RuntimeEntryCount;
   MemoryAttributesTable->DescriptorSize  = (UINT32)DescriptorSize;
   MemoryAttributesTable->Reserved        = 0;
-  DEBUG ((EFI_D_VERBOSE, "MemoryAttributesTable:\n"));
-  DEBUG ((EFI_D_VERBOSE, "  Version              - 0x%08x\n", MemoryAttributesTable->Version));
-  DEBUG ((EFI_D_VERBOSE, "  NumberOfEntries      - 0x%08x\n", MemoryAttributesTable->NumberOfEntries));
-  DEBUG ((EFI_D_VERBOSE, "  DescriptorSize       - 0x%08x\n", MemoryAttributesTable->DescriptorSize));
+  DEBUG ((DEBUG_VERBOSE, "MemoryAttributesTable:\n"));
+  DEBUG ((DEBUG_VERBOSE, "  Version              - 0x%08x\n", MemoryAttributesTable->Version));
+  DEBUG ((DEBUG_VERBOSE, "  NumberOfEntries      - 0x%08x\n", MemoryAttributesTable->NumberOfEntries));
+  DEBUG ((DEBUG_VERBOSE, "  DescriptorSize       - 0x%08x\n", MemoryAttributesTable->DescriptorSize));
   MemoryAttributesEntry = (EFI_MEMORY_DESCRIPTOR *)(MemoryAttributesTable + 1);
   MemoryMap = MemoryMapStart;
   for (Index = 0; Index < MemoryMapSize/DescriptorSize; Index++) {
@@ -194,12 +194,12 @@ InstallMemoryAttributesTable (
     case EfiRuntimeServicesData:
       CopyMem (MemoryAttributesEntry, MemoryMap, DescriptorSize);
       MemoryAttributesEntry->Attribute &= (EFI_MEMORY_RO|EFI_MEMORY_XP|EFI_MEMORY_RUNTIME);
-      DEBUG ((EFI_D_VERBOSE, "Entry (0x%x)\n", MemoryAttributesEntry));
-      DEBUG ((EFI_D_VERBOSE, "  Type              - 0x%x\n", MemoryAttributesEntry->Type));
-      DEBUG ((EFI_D_VERBOSE, "  PhysicalStart     - 0x%016lx\n", MemoryAttributesEntry->PhysicalStart));
-      DEBUG ((EFI_D_VERBOSE, "  VirtualStart      - 0x%016lx\n", MemoryAttributesEntry->VirtualStart));
-      DEBUG ((EFI_D_VERBOSE, "  NumberOfPages     - 0x%016lx\n", MemoryAttributesEntry->NumberOfPages));
-      DEBUG ((EFI_D_VERBOSE, "  Attribute         - 0x%016lx\n", MemoryAttributesEntry->Attribute));
+      DEBUG ((DEBUG_VERBOSE, "Entry (0x%x)\n", MemoryAttributesEntry));
+      DEBUG ((DEBUG_VERBOSE, "  Type              - 0x%x\n", MemoryAttributesEntry->Type));
+      DEBUG ((DEBUG_VERBOSE, "  PhysicalStart     - 0x%016lx\n", MemoryAttributesEntry->PhysicalStart));
+      DEBUG ((DEBUG_VERBOSE, "  VirtualStart      - 0x%016lx\n", MemoryAttributesEntry->VirtualStart));
+      DEBUG ((DEBUG_VERBOSE, "  NumberOfPages     - 0x%016lx\n", MemoryAttributesEntry->NumberOfPages));
+      DEBUG ((DEBUG_VERBOSE, "  Attribute         - 0x%016lx\n", MemoryAttributesEntry->Attribute));
       MemoryAttributesEntry = NEXT_MEMORY_DESCRIPTOR(MemoryAttributesEntry, DescriptorSize);
       break;
     }

@@ -120,7 +120,7 @@ XhcGetCapability (
   *MaxSpeed       = EFI_USB_SPEED_SUPER;
   *PortNumber     = (UINT8) (Xhc->HcSParams1.Data.MaxPorts);
   *Is64BitCapable = (UINT8) Xhc->Support64BitDma;
-  DEBUG ((EFI_D_INFO, "XhcGetCapability: %d ports, 64 bit %d\n", *PortNumber, *Is64BitCapable));
+  DEBUG ((DEBUG_INFO, "XhcGetCapability: %d ports, 64 bit %d\n", *PortNumber, *Is64BitCapable));
 
   gBS->RestoreTPL (OldTpl);
 
@@ -216,7 +216,7 @@ XhcReset (
   }
 
 ON_EXIT:
-  DEBUG ((EFI_D_INFO, "XhcReset: status %r\n", Status));
+  DEBUG ((DEBUG_INFO, "XhcReset: status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
 
   return Status;
@@ -260,7 +260,7 @@ XhcGetState (
     *State = EfiUsbHcStateOperational;
   }
 
-  DEBUG ((EFI_D_INFO, "XhcGetState: current state %d\n", *State));
+  DEBUG ((DEBUG_INFO, "XhcGetState: current state %d\n", *State));
   gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
@@ -336,7 +336,7 @@ XhcSetState (
     Status = EFI_INVALID_PARAMETER;
   }
 
-  DEBUG ((EFI_D_INFO, "XhcSetState: status %r\n", Status));
+  DEBUG ((DEBUG_INFO, "XhcSetState: status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
 
   return Status;
@@ -530,7 +530,7 @@ XhcSetRootHubPortFeature (
     break;
 
   case EfiUsbPortReset:
-    DEBUG ((EFI_D_INFO, "XhcUsbPortReset!\n"));
+    DEBUG ((DEBUG_INFO, "XhcUsbPortReset!\n"));
     //
     // Make sure Host Controller not halt before reset it
     //
@@ -538,7 +538,7 @@ XhcSetRootHubPortFeature (
       Status = XhcRunHC (Xhc, XHC_GENERIC_TIMEOUT);
 
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_INFO, "XhcSetRootHubPortFeature :failed to start HC - %r\n", Status));
+        DEBUG ((DEBUG_INFO, "XhcSetRootHubPortFeature :failed to start HC - %r\n", Status));
         break;
       }
     }
@@ -571,7 +571,7 @@ XhcSetRootHubPortFeature (
   }
 
 ON_EXIT:
-  DEBUG ((EFI_D_INFO, "XhcSetRootHubPortFeature: status %r\n", Status));
+  DEBUG ((DEBUG_INFO, "XhcSetRootHubPortFeature: status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
 
   return Status;
@@ -706,7 +706,7 @@ XhcClearRootHubPortFeature (
   }
 
 ON_EXIT:
-  DEBUG ((EFI_D_INFO, "XhcClearRootHubPortFeature: status %r\n", Status));
+  DEBUG ((DEBUG_INFO, "XhcClearRootHubPortFeature: status %r\n", Status));
   gBS->RestoreTPL (OldTpl);
 
   return Status;
@@ -914,7 +914,7 @@ XhcControlTransfer (
   Len             = 0;
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
-    DEBUG ((EFI_D_ERROR, "XhcControlTransfer: HC halted at entrance\n"));
+    DEBUG ((DEBUG_ERROR, "XhcControlTransfer: HC halted at entrance\n"));
     goto ON_EXIT;
   }
 
@@ -1043,7 +1043,7 @@ XhcControlTransfer (
         // Don't support multi-TT feature for super speed hub now.
         //
         MTT = 0;
-        DEBUG ((EFI_D_ERROR, "XHCI: Don't support multi-TT feature for Hub now. (force to disable MTT)\n"));
+        DEBUG ((DEBUG_ERROR, "XHCI: Don't support multi-TT feature for Hub now. (force to disable MTT)\n"));
       } else {
         MTT = 0;
       }
@@ -1162,7 +1162,7 @@ XhcControlTransfer (
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcControlTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((DEBUG_ERROR, "XhcControlTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
 
   gBS->RestoreTPL (OldTpl);
@@ -1250,7 +1250,7 @@ XhcBulkTransfer (
   Status          = EFI_DEVICE_ERROR;
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
-    DEBUG ((EFI_D_ERROR, "XhcBulkTransfer: HC is halted\n"));
+    DEBUG ((DEBUG_ERROR, "XhcBulkTransfer: HC is halted\n"));
     goto ON_EXIT;
   }
 
@@ -1282,7 +1282,7 @@ XhcBulkTransfer (
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((DEBUG_ERROR, "XhcBulkTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
   gBS->RestoreTPL (OldTpl);
 
@@ -1386,14 +1386,14 @@ XhcAsyncInterruptTransfer (
     }
 
     Status = XhciDelAsyncIntTransfer (Xhc, DeviceAddress, EndPointAddress);
-    DEBUG ((EFI_D_INFO, "XhcAsyncInterruptTransfer: remove old transfer for addr %d, Status = %r\n", DeviceAddress, Status));
+    DEBUG ((DEBUG_INFO, "XhcAsyncInterruptTransfer: remove old transfer for addr %d, Status = %r\n", DeviceAddress, Status));
     goto ON_EXIT;
   }
 
   Status = EFI_SUCCESS;
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
-    DEBUG ((EFI_D_ERROR, "XhcAsyncInterruptTransfer: HC is halt\n"));
+    DEBUG ((DEBUG_ERROR, "XhcAsyncInterruptTransfer: HC is halt\n"));
     Status = EFI_DEVICE_ERROR;
     goto ON_EXIT;
   }
@@ -1508,7 +1508,7 @@ XhcSyncInterruptTransfer (
   Status          = EFI_DEVICE_ERROR;
 
   if (XhcIsHalt (Xhc) || XhcIsSysError (Xhc)) {
-    DEBUG ((EFI_D_ERROR, "EhcSyncInterruptTransfer: HC is halt\n"));
+    DEBUG ((DEBUG_ERROR, "EhcSyncInterruptTransfer: HC is halt\n"));
     goto ON_EXIT;
   }
 
@@ -1536,7 +1536,7 @@ XhcSyncInterruptTransfer (
 
 ON_EXIT:
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcSyncInterruptTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
+    DEBUG ((DEBUG_ERROR, "XhcSyncInterruptTransfer: error - %r, transfer - %x\n", Status, *TransferResult));
   }
   gBS->RestoreTPL (OldTpl);
 
@@ -1805,14 +1805,14 @@ XhcCreateUsbHc (
   Xhc->UsbLegSupOffset = XhcGetCapabilityAddr (Xhc, XHC_CAP_USB_LEGACY);
   Xhc->DebugCapSupOffset = XhcGetCapabilityAddr (Xhc, XHC_CAP_USB_DEBUG);
 
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: Capability length 0x%x\n", Xhc->CapLength));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: HcSParams1 0x%x\n", Xhc->HcSParams1));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: HcSParams2 0x%x\n", Xhc->HcSParams2));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: HcCParams 0x%x\n", Xhc->HcCParams));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: DBOff 0x%x\n", Xhc->DBOff));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: RTSOff 0x%x\n", Xhc->RTSOff));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: UsbLegSupOffset 0x%x\n", Xhc->UsbLegSupOffset));
-  DEBUG ((EFI_D_INFO, "XhcCreateUsb3Hc: DebugCapSupOffset 0x%x\n", Xhc->DebugCapSupOffset));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: Capability length 0x%x\n", Xhc->CapLength));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: HcSParams1 0x%x\n", Xhc->HcSParams1));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: HcSParams2 0x%x\n", Xhc->HcSParams2));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: HcCParams 0x%x\n", Xhc->HcCParams));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: DBOff 0x%x\n", Xhc->DBOff));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: RTSOff 0x%x\n", Xhc->RTSOff));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: UsbLegSupOffset 0x%x\n", Xhc->UsbLegSupOffset));
+  DEBUG ((DEBUG_INFO, "XhcCreateUsb3Hc: DebugCapSupOffset 0x%x\n", Xhc->DebugCapSupOffset));
 
   //
   // Create AsyncRequest Polling Timer
@@ -1972,7 +1972,7 @@ XhcDriverBindingStart (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcDriverBindingStart: failed to enable controller\n"));
+    DEBUG ((DEBUG_ERROR, "XhcDriverBindingStart: failed to enable controller\n"));
     goto CLOSE_PCIIO;
   }
 
@@ -1982,7 +1982,7 @@ XhcDriverBindingStart (
   Xhc = XhcCreateUsbHc (PciIo, HcDevicePath, OriginalPciAttributes);
 
   if (Xhc == NULL) {
-    DEBUG ((EFI_D_ERROR, "XhcDriverBindingStart: failed to create USB2_HC\n"));
+    DEBUG ((DEBUG_ERROR, "XhcDriverBindingStart: failed to create USB2_HC\n"));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -2000,7 +2000,7 @@ XhcDriverBindingStart (
     if (!EFI_ERROR (Status)) {
       Xhc->Support64BitDma = TRUE;
     } else {
-      DEBUG ((EFI_D_WARN,
+      DEBUG ((DEBUG_WARN,
         "%a: failed to enable 64-bit DMA on 64-bit capable controller @ %p (%r)\n",
         __FUNCTION__, Controller, Status));
     }
@@ -2032,7 +2032,7 @@ XhcDriverBindingStart (
   //
   Status = gBS->SetTimer (Xhc->PollTimer, TimerPeriodic, XHC_ASYNC_TIMER_INTERVAL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcDriverBindingStart: failed to start async interrupt monitor\n"));
+    DEBUG ((DEBUG_ERROR, "XhcDriverBindingStart: failed to start async interrupt monitor\n"));
     XhcHaltHC (Xhc, XHC_GENERIC_TIMEOUT);
     goto FREE_POOL;
   }
@@ -2078,11 +2078,11 @@ XhcDriverBindingStart (
                   &Xhc->Usb2Hc
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcDriverBindingStart: failed to install USB2_HC Protocol\n"));
+    DEBUG ((DEBUG_ERROR, "XhcDriverBindingStart: failed to install USB2_HC Protocol\n"));
     goto FREE_POOL;
   }
 
-  DEBUG ((EFI_D_INFO, "XhcDriverBindingStart: XHCI started for controller @ %x\n", Controller));
+  DEBUG ((DEBUG_INFO, "XhcDriverBindingStart: XHCI started for controller @ %x\n", Controller));
   return EFI_SUCCESS;
 
 FREE_POOL:
@@ -2233,4 +2233,3 @@ XhcDriverBindingStop (
 
   return EFI_SUCCESS;
 }
-

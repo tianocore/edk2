@@ -34,7 +34,7 @@ AsyncIoCallback (
   Request = (EMMC_REQUEST *) Context;
 
   DEBUG_CODE_BEGIN ();
-    DEBUG ((EFI_D_INFO, "Emmc Async Request: CmdIndex[%d] Arg[%08x] %r\n",
+    DEBUG ((DEBUG_INFO, "Emmc Async Request: CmdIndex[%d] Arg[%08x] %r\n",
             Request->SdMmcCmdBlk.CommandIndex, Request->SdMmcCmdBlk.CommandArgument,
             Request->Packet.TransactionStatus));
   DEBUG_CODE_END ();
@@ -2158,4 +2158,3 @@ EmmcEraseBlocks (
 
   return Status;
 }
-

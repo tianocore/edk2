@@ -231,9 +231,9 @@ UpdateBlocksAndVolumes (
             ) {
           continue;
         }
-        DEBUG ((EFI_D_INFO, "PeiCdExpress InterfaceType is %d\n", Media2.InterfaceType));
-        DEBUG ((EFI_D_INFO, "PeiCdExpress MediaPresent is %d\n", Media2.MediaPresent));
-        DEBUG ((EFI_D_INFO, "PeiCdExpress BlockSize is  0x%x\n", Media2.BlockSize));
+        DEBUG ((DEBUG_INFO, "PeiCdExpress InterfaceType is %d\n", Media2.InterfaceType));
+        DEBUG ((DEBUG_INFO, "PeiCdExpress MediaPresent is %d\n", Media2.MediaPresent));
+        DEBUG ((DEBUG_INFO, "PeiCdExpress BlockSize is  0x%x\n", Media2.BlockSize));
       } else {
         Status = BlockIoPpi->GetBlockDeviceMediaInfo (
                               PeiServices,
@@ -248,14 +248,14 @@ UpdateBlocksAndVolumes (
             ) {
           continue;
         }
-        DEBUG ((EFI_D_INFO, "PeiCdExpress DeviceType is %d\n", Media.DeviceType));
-        DEBUG ((EFI_D_INFO, "PeiCdExpress MediaPresent is %d\n", Media.MediaPresent));
-        DEBUG ((EFI_D_INFO, "PeiCdExpress BlockSize is  0x%x\n", Media.BlockSize));
+        DEBUG ((DEBUG_INFO, "PeiCdExpress DeviceType is %d\n", Media.DeviceType));
+        DEBUG ((DEBUG_INFO, "PeiCdExpress MediaPresent is %d\n", Media.MediaPresent));
+        DEBUG ((DEBUG_INFO, "PeiCdExpress BlockSize is  0x%x\n", Media.BlockSize));
       }
 
-      DEBUG ((EFI_D_INFO, "PeiCdExpress Status is %d\n", Status));
+      DEBUG ((DEBUG_INFO, "PeiCdExpress Status is %d\n", Status));
 
-      DEBUG ((EFI_D_INFO, "IndexBlockDevice is %d\n", IndexBlockDevice));
+      DEBUG ((DEBUG_INFO, "IndexBlockDevice is %d\n", IndexBlockDevice));
       PrivateData->CapsuleData[PrivateData->CapsuleCount].IndexBlock = IndexBlockDevice;
       if (BlockIo2) {
         PrivateData->CapsuleData[PrivateData->CapsuleCount].BlockIo2 = BlockIo2Ppi;
@@ -263,7 +263,7 @@ UpdateBlocksAndVolumes (
         PrivateData->CapsuleData[PrivateData->CapsuleCount].BlockIo  = BlockIoPpi;
       }
       Status = FindRecoveryCapsules (PrivateData);
-      DEBUG ((EFI_D_INFO, "Status is %d\n", Status));
+      DEBUG ((DEBUG_INFO, "Status is %d\n", Status));
 
       if (EFI_ERROR (Status)) {
         continue;
