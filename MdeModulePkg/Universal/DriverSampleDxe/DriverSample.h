@@ -62,47 +62,47 @@ extern UINT8  DriverSampleStrings[];
 #define DYNAMIC_ONE_OF_VAR_OFFSET        OFFSET_OF (DRIVER_SAMPLE_CONFIGURATION, DynamicOneof)
 #define DYNAMIC_ORDERED_LIST_VAR_OFFSET  OFFSET_OF (DRIVER_SAMPLE_CONFIGURATION, DynamicOrderedList)
 
-#define DEFAULT_CLASS_MANUFACTURING_VALUE     0xFF
-#define DEFAULT_CLASS_STANDARD_VALUE          0x0
+#define DEFAULT_CLASS_MANUFACTURING_VALUE  0xFF
+#define DEFAULT_CLASS_STANDARD_VALUE       0x0
 
 //
 // Number of name in Name/Value storage
 //
-#define NAME_VALUE_NAME_NUMBER       3
+#define NAME_VALUE_NAME_NUMBER  3
 
-#define DRIVER_SAMPLE_PRIVATE_SIGNATURE SIGNATURE_32 ('D', 'S', 'p', 's')
+#define DRIVER_SAMPLE_PRIVATE_SIGNATURE  SIGNATURE_32 ('D', 'S', 'p', 's')
 
 typedef struct {
-  UINTN                            Signature;
+  UINTN                                  Signature;
 
-  EFI_HANDLE                       DriverHandle[2];
-  EFI_HII_HANDLE                   HiiHandle[2];
-  DRIVER_SAMPLE_CONFIGURATION      Configuration;
-  MY_EFI_VARSTORE_DATA             VarStoreConfig;
-  MY_EFI_BITS_VARSTORE_DATA        BitsVarStoreConfig;
-  MY_EFI_UNION_DATA                UnionConfig;
+  EFI_HANDLE                             DriverHandle[2];
+  EFI_HII_HANDLE                         HiiHandle[2];
+  DRIVER_SAMPLE_CONFIGURATION            Configuration;
+  MY_EFI_VARSTORE_DATA                   VarStoreConfig;
+  MY_EFI_BITS_VARSTORE_DATA              BitsVarStoreConfig;
+  MY_EFI_UNION_DATA                      UnionConfig;
 
   //
   // Name/Value storage Name list
   //
-  EFI_STRING_ID                    NameStringId[NAME_VALUE_NAME_NUMBER];
-  EFI_STRING                       NameValueName[NAME_VALUE_NAME_NUMBER];
+  EFI_STRING_ID                          NameStringId[NAME_VALUE_NAME_NUMBER];
+  EFI_STRING                             NameValueName[NAME_VALUE_NAME_NUMBER];
 
   //
   // Consumed protocol
   //
-  EFI_HII_DATABASE_PROTOCOL        *HiiDatabase;
-  EFI_HII_STRING_PROTOCOL          *HiiString;
-  EFI_HII_CONFIG_ROUTING_PROTOCOL  *HiiConfigRouting;
-  EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL *HiiKeywordHandler;
-  EFI_HII_POPUP_PROTOCOL              *HiiPopup;
+  EFI_HII_DATABASE_PROTOCOL              *HiiDatabase;
+  EFI_HII_STRING_PROTOCOL                *HiiString;
+  EFI_HII_CONFIG_ROUTING_PROTOCOL        *HiiConfigRouting;
+  EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL    *HiiKeywordHandler;
+  EFI_HII_POPUP_PROTOCOL                 *HiiPopup;
 
-  EFI_FORM_BROWSER2_PROTOCOL       *FormBrowser2;
+  EFI_FORM_BROWSER2_PROTOCOL             *FormBrowser2;
 
   //
   // Produced protocol
   //
-  EFI_HII_CONFIG_ACCESS_PROTOCOL   ConfigAccess;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL         ConfigAccess;
 } DRIVER_SAMPLE_PRIVATE_DATA;
 
 #define DRIVER_SAMPLE_PRIVATE_FROM_THIS(a)  CR (a, DRIVER_SAMPLE_PRIVATE_DATA, ConfigAccess, DRIVER_SAMPLE_PRIVATE_SIGNATURE)
@@ -113,8 +113,8 @@ typedef struct {
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH             VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL       End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
 #pragma pack()

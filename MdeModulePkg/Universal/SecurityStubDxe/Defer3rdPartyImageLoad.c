@@ -11,27 +11,27 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // The structure to save the deferred 3rd party image information.
 //
 typedef struct {
-  EFI_DEVICE_PATH_PROTOCOL          *ImageDevicePath;
-  BOOLEAN                           BootOption;
-  BOOLEAN                           Loaded;
+  EFI_DEVICE_PATH_PROTOCOL    *ImageDevicePath;
+  BOOLEAN                     BootOption;
+  BOOLEAN                     Loaded;
 } DEFERRED_3RD_PARTY_IMAGE_INFO;
 
 //
 // The table to save the deferred 3rd party image item.
 //
 typedef struct {
-  UINTN                             Count;         ///< deferred 3rd party image count
-  DEFERRED_3RD_PARTY_IMAGE_INFO     *ImageInfo;    ///< deferred 3rd party image item
+  UINTN                            Count;          ///< deferred 3rd party image count
+  DEFERRED_3RD_PARTY_IMAGE_INFO    *ImageInfo;     ///< deferred 3rd party image item
 } DEFERRED_3RD_PARTY_IMAGE_TABLE;
 
-BOOLEAN                          mImageLoadedAfterEndOfDxe   = FALSE;
-BOOLEAN                          mEndOfDxe                   = FALSE;
-DEFERRED_3RD_PARTY_IMAGE_TABLE   mDeferred3rdPartyImage = {
+BOOLEAN                         mImageLoadedAfterEndOfDxe = FALSE;
+BOOLEAN                         mEndOfDxe = FALSE;
+DEFERRED_3RD_PARTY_IMAGE_TABLE  mDeferred3rdPartyImage = {
   0,       // Deferred image count
   NULL     // The deferred image info
 };
 
-EFI_DEFERRED_IMAGE_LOAD_PROTOCOL mDeferredImageLoad   = {
+EFI_DEFERRED_IMAGE_LOAD_PROTOCOL  mDeferredImageLoad = {
   GetDefferedImageInfo
 };
 
@@ -49,15 +49,15 @@ FileFromFv (
   IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File
   )
 {
-  EFI_STATUS                        Status;
-  EFI_HANDLE                        DeviceHandle;
-  EFI_DEVICE_PATH_PROTOCOL          *TempDevicePath;
+  EFI_STATUS                Status;
+  EFI_HANDLE                DeviceHandle;
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
 
   //
   // First check to see if File is from a Firmware Volume
   //
   DeviceHandle   = NULL;
-  TempDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) File;
+  TempDevicePath = (EFI_DEVICE_PATH_PROTOCOL *)File;
   Status = gBS->LocateDevicePath (
                   &gEfiFirmwareVolume2ProtocolGuid,
                   &TempDevicePath,
@@ -94,8 +94,8 @@ LookupImage (
   IN        BOOLEAN                     BootOption
   )
 {
-  UINTN                                 Index;
-  UINTN                                 DevicePathSize;
+  UINTN  Index;
+  UINTN  DevicePathSize;
 
   DevicePathSize = GetDevicePathSize (ImageDevicePath);
 
@@ -122,7 +122,7 @@ QueueImage (
   IN        BOOLEAN                     BootOption
   )
 {
-  DEFERRED_3RD_PARTY_IMAGE_INFO         *ImageInfo;
+  DEFERRED_3RD_PARTY_IMAGE_INFO  *ImageInfo;
 
   //
   // Expand memory for the new deferred image.
@@ -131,10 +131,11 @@ QueueImage (
                 mDeferred3rdPartyImage.Count * sizeof (DEFERRED_3RD_PARTY_IMAGE_INFO),
                 (mDeferred3rdPartyImage.Count + 1) * sizeof (DEFERRED_3RD_PARTY_IMAGE_INFO),
                 mDeferred3rdPartyImage.ImageInfo
-  );
+                );
   if (ImageInfo == NULL) {
     return;
   }
+
   mDeferred3rdPartyImage.ImageInfo = ImageInfo;
 
   //
@@ -145,11 +146,11 @@ QueueImage (
   if (ImageInfo->ImageDevicePath == NULL) {
     return;
   }
+
   ImageInfo->BootOption = BootOption;
   ImageInfo->Loaded     = FALSE;
   mDeferred3rdPartyImage.Count++;
 }
-
 
 /**
   Returns information about a deferred image.
@@ -183,14 +184,14 @@ EFIAPI
 GetDefferedImageInfo (
   IN     EFI_DEFERRED_IMAGE_LOAD_PROTOCOL  *This,
   IN     UINTN                             ImageIndex,
-     OUT EFI_DEVICE_PATH_PROTOCOL          **ImageDevicePath,
-     OUT VOID                              **Image,
-     OUT UINTN                             *ImageSize,
-     OUT BOOLEAN                           *BootOption
+  OUT EFI_DEVICE_PATH_PROTOCOL          **ImageDevicePath,
+  OUT VOID                              **Image,
+  OUT UINTN                             *ImageSize,
+  OUT BOOLEAN                           *BootOption
   )
 {
-  UINTN                                    Index;
-  UINTN                                    NewCount;
+  UINTN  Index;
+  UINTN  NewCount;
 
   if ((This == NULL) || (ImageSize == NULL) || (Image == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -227,9 +228,9 @@ GetDefferedImageInfo (
   // Get the request deferred image.
   //
   *ImageDevicePath = mDeferred3rdPartyImage.ImageInfo[ImageIndex].ImageDevicePath;
-  *BootOption      = mDeferred3rdPartyImage.ImageInfo[ImageIndex].BootOption;
-  *Image           = NULL;
-  *ImageSize       = 0;
+  *BootOption = mDeferred3rdPartyImage.ImageInfo[ImageIndex].BootOption;
+  *Image     = NULL;
+  *ImageSize = 0;
 
   return EFI_SUCCESS;
 }
@@ -270,8 +271,8 @@ DxeSmmReadyToLock (
   IN VOID       *Context
   )
 {
-  EFI_STATUS                Status;
-  VOID                      *Interface;
+  EFI_STATUS  Status;
+  VOID        *Interface;
 
   Status = gBS->LocateProtocol (&gEfiDxeSmmReadyToLockProtocolGuid, NULL, &Interface);
   if (EFI_ERROR (Status)) {
@@ -315,7 +316,7 @@ Defer3rdPartyImageLoad (
   IN  BOOLEAN                          BootPolicy
   )
 {
-  DEFERRED_3RD_PARTY_IMAGE_INFO        *ImageInfo;
+  DEFERRED_3RD_PARTY_IMAGE_INFO  *ImageInfo;
 
   //
   // Ignore if File is NULL.
@@ -335,13 +336,15 @@ Defer3rdPartyImageLoad (
     DevicePathStr = ConvertDevicePathToText (File, FALSE, FALSE);
     DEBUG ((
       DEBUG_INFO,
-      "[Security] 3rd party image[%p] %s EndOfDxe: %s.\n", ImageInfo,
-      mEndOfDxe ? L"can be loaded after": L"is deferred to load before",
+      "[Security] 3rd party image[%p] %s EndOfDxe: %s.\n",
+      ImageInfo,
+      mEndOfDxe ? L"can be loaded after" : L"is deferred to load before",
       DevicePathStr
       ));
     if (DevicePathStr != NULL) {
-      FreePool (DevicePathStr);
-    }
+    FreePool (DevicePathStr);
+  }
+
     );
 
   if (mEndOfDxe) {
@@ -353,6 +356,7 @@ Defer3rdPartyImageLoad (
     if (ImageInfo != NULL) {
       ImageInfo->Loaded = TRUE;
     }
+
     return EFI_SUCCESS;
   } else {
     //
@@ -362,6 +366,7 @@ Defer3rdPartyImageLoad (
     if (ImageInfo == NULL) {
       QueueImage (File, BootPolicy);
     }
+
     return EFI_ACCESS_DENIED;
   }
 }
@@ -374,10 +379,10 @@ Defer3rdPartyImageLoadInitialize (
   VOID
   )
 {
-  EFI_STATUS                           Status;
-  EFI_HANDLE                           Handle;
-  EFI_EVENT                            Event;
-  VOID                                 *Registration;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+  EFI_EVENT   Event;
+  VOID        *Registration;
 
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (

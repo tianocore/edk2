@@ -9,19 +9,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_PCI_LIB_H_
 #define _EFI_PCI_LIB_H_
 
-
 typedef struct {
-  EFI_HANDLE            Handle;
+  EFI_HANDLE    Handle;
 } EFI_DEVICE_HANDLE_EXTENDED_DATA_PAYLOAD;
 
 typedef struct {
-  UINT32                             Bar;
-  UINT16                             DevicePathSize;
-  UINT16                             ReqResSize;
-  UINT16                             AllocResSize;
-  UINT8                              *DevicePath;
-  UINT8                              *ReqRes;
-  UINT8                              *AllocRes;
+  UINT32    Bar;
+  UINT16    DevicePathSize;
+  UINT16    ReqResSize;
+  UINT16    AllocResSize;
+  UINT8     *DevicePath;
+  UINT8     *ReqRes;
+  UINT8     *AllocRes;
 } EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA_PAYLOAD;
 
 typedef enum {
@@ -176,4 +175,5 @@ PciProgramResizableBar (
   IN PCI_IO_DEVICE                *PciIoDevice,
   IN PCI_RESIZABLE_BAR_OPERATION  ResizableBarOp
   );
+
 #endif

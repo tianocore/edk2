@@ -17,12 +17,12 @@
 //
 
 STATIC
-EFI_UNICODE_STRING_TABLE mDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE  mDriverNameTable[] = {
   { "eng;en", L"PCI I/O protocol emulation driver for non-discoverable devices" },
-  { NULL,     NULL                   }
+  { NULL,     NULL                                                              }
 };
 
-EFI_COMPONENT_NAME_PROTOCOL gComponentName;
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName;
 
 /**
   Retrieves a Unicode string that is the user readable name of the UEFI Driver.
@@ -103,14 +103,14 @@ NonDiscoverablePciGetDeviceName (
   return EFI_UNSUPPORTED;
 }
 
-EFI_COMPONENT_NAME_PROTOCOL gComponentName = {
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName = {
   &NonDiscoverablePciGetDriverName,
   &NonDiscoverablePciGetDeviceName,
   "eng" // SupportedLanguages, ISO 639-2 language codes
 };
 
-EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     &NonDiscoverablePciGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) &NonDiscoverablePciGetDeviceName,
+EFI_COMPONENT_NAME2_PROTOCOL  gComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)&NonDiscoverablePciGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)&NonDiscoverablePciGetDeviceName,
   "en" // SupportedLanguages, RFC 4646 language codes
 };

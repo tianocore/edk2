@@ -33,7 +33,6 @@ RegisterVariablePolicy (
   IN CONST VARIABLE_POLICY_ENTRY    *NewPolicy
   );
 
-
 /**
   This API function checks to see whether the parameters to SetVariable would
   be allowed according to the current variable policies.
@@ -63,7 +62,6 @@ ValidateSetVariable (
   IN  VOID                         *Data
   );
 
-
 /**
   This API function disables the variable policy enforcement. If it's
   already been called once, will return EFI_ALREADY_STARTED.
@@ -80,7 +78,6 @@ EFIAPI
 DisableVariablePolicy (
   VOID
   );
-
 
 /**
   This API function will dump the entire contents of the variable policy table.
@@ -105,7 +102,6 @@ DumpVariablePolicy (
   IN OUT  UINT32        *Size
   );
 
-
 /**
   This API function returns whether or not the policy engine is
   currently being enforced.
@@ -121,7 +117,6 @@ IsVariablePolicyEnabled (
   VOID
   );
 
-
 /**
   This API function locks the interface so that no more policy updates
   can be performed or changes made to the enforcement until the next boot.
@@ -135,7 +130,6 @@ EFIAPI
 LockVariablePolicy (
   VOID
   );
-
 
 /**
   This API function returns whether or not the policy interface is locked
@@ -151,7 +145,6 @@ EFIAPI
 IsVariablePolicyInterfaceLocked (
   VOID
   );
-
 
 /**
   This helper function initializes the library and sets
@@ -173,7 +166,6 @@ InitVariablePolicyLib (
   IN  EFI_GET_VARIABLE    GetVariableHelper
   );
 
-
 /**
   This helper function returns whether or not the library is currently initialized.
 
@@ -186,7 +178,6 @@ EFIAPI
 IsVariablePolicyLibInitialized (
   VOID
   );
-
 
 /**
   This helper function tears down  the library.
@@ -202,6 +193,5 @@ EFIAPI
 DeinitVariablePolicyLib (
   VOID
   );
-
 
 #endif // _VARIABLE_POLICY_LIB_H_

@@ -30,7 +30,7 @@
 //
 // Define the maximum message length
 //
-#define MAX_DEBUG_MESSAGE_LENGTH 0x100
+#define MAX_DEBUG_MESSAGE_LENGTH  0x100
 
 extern RUNTIME_MEMORY_STATUSCODE_HEADER  *mMmMemoryStatusCodeTable;
 
@@ -44,7 +44,6 @@ EFI_STATUS
 EfiSerialStatusCodeInitializeWorker (
   VOID
   );
-
 
 /**
   Convert status code value and extended data to readable ASCII string, send string to serial I/O device.

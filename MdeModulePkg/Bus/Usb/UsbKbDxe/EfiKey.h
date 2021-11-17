@@ -5,9 +5,9 @@ Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef _EFI_USB_KB_H_
 #define _EFI_USB_KB_H_
-
 
 #include <Uefi.h>
 
@@ -34,59 +34,59 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/Usb.h>
 
-#define KEYBOARD_TIMER_INTERVAL         200000  // 0.02s
+#define KEYBOARD_TIMER_INTERVAL  200000         // 0.02s
 
-#define MAX_KEY_ALLOWED     32
+#define MAX_KEY_ALLOWED  32
 
-#define HZ                  1000 * 1000 * 10
-#define USBKBD_REPEAT_DELAY ((HZ) / 2)
-#define USBKBD_REPEAT_RATE  ((HZ) / 50)
+#define HZ                   1000 * 1000 * 10
+#define USBKBD_REPEAT_DELAY  ((HZ) / 2)
+#define USBKBD_REPEAT_RATE   ((HZ) / 50)
 
-#define CLASS_HID           3
-#define SUBCLASS_BOOT       1
-#define PROTOCOL_KEYBOARD   1
+#define CLASS_HID          3
+#define SUBCLASS_BOOT      1
+#define PROTOCOL_KEYBOARD  1
 
-#define BOOT_PROTOCOL       0
-#define REPORT_PROTOCOL     1
+#define BOOT_PROTOCOL    0
+#define REPORT_PROTOCOL  1
 
 typedef struct {
-  BOOLEAN  Down;
-  UINT8    KeyCode;
+  BOOLEAN    Down;
+  UINT8      KeyCode;
 } USB_KEY;
 
 typedef struct {
-  VOID          *Buffer[MAX_KEY_ALLOWED + 1];
-  UINTN         Head;
-  UINTN         Tail;
-  UINTN         ItemSize;
+  VOID     *Buffer[MAX_KEY_ALLOWED + 1];
+  UINTN    Head;
+  UINTN    Tail;
+  UINTN    ItemSize;
 } USB_SIMPLE_QUEUE;
 
-#define USB_KB_DEV_SIGNATURE  SIGNATURE_32 ('u', 'k', 'b', 'd')
-#define USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('u', 'k', 'b', 'x')
+#define USB_KB_DEV_SIGNATURE                   SIGNATURE_32 ('u', 'k', 'b', 'd')
+#define USB_KB_CONSOLE_IN_EX_NOTIFY_SIGNATURE  SIGNATURE_32 ('u', 'k', 'b', 'x')
 
 typedef struct _KEYBOARD_CONSOLE_IN_EX_NOTIFY {
-  UINTN                                 Signature;
-  EFI_KEY_DATA                          KeyData;
-  EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
-  LIST_ENTRY                            NotifyEntry;
+  UINTN                      Signature;
+  EFI_KEY_DATA               KeyData;
+  EFI_KEY_NOTIFY_FUNCTION    KeyNotificationFn;
+  LIST_ENTRY                 NotifyEntry;
 } KEYBOARD_CONSOLE_IN_EX_NOTIFY;
 
 #define USB_NS_KEY_SIGNATURE  SIGNATURE_32 ('u', 'n', 's', 'k')
 
 typedef struct {
-  UINTN                         Signature;
-  LIST_ENTRY                    Link;
+  UINTN                 Signature;
+  LIST_ENTRY            Link;
 
   //
   // The number of EFI_NS_KEY_MODIFIER children definitions
   //
-  UINTN                         KeyCount;
+  UINTN                 KeyCount;
 
   //
   // NsKey[0] : Non-spacing key
   // NsKey[1] ~ NsKey[KeyCount] : Physical keys
   //
-  EFI_KEY_DESCRIPTOR            *NsKey;
+  EFI_KEY_DESCRIPTOR    *NsKey;
 } USB_NS_KEY;
 
 #define USB_NS_KEY_FORM_FROM_LINK(a)  CR (a, USB_NS_KEY, Link, USB_NS_KEY_SIGNATURE)
@@ -95,64 +95,64 @@ typedef struct {
 /// Structure to describe USB keyboard device
 ///
 typedef struct {
-  UINTN                             Signature;
-  EFI_HANDLE                        ControllerHandle;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
-  EFI_EVENT                         DelayedRecoveryEvent;
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL    SimpleInput;
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL SimpleInputEx;
-  EFI_USB_IO_PROTOCOL               *UsbIo;
+  UINTN                                Signature;
+  EFI_HANDLE                           ControllerHandle;
+  EFI_DEVICE_PATH_PROTOCOL             *DevicePath;
+  EFI_EVENT                            DelayedRecoveryEvent;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL       SimpleInput;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    SimpleInputEx;
+  EFI_USB_IO_PROTOCOL                  *UsbIo;
 
-  EFI_USB_INTERFACE_DESCRIPTOR      InterfaceDescriptor;
-  EFI_USB_ENDPOINT_DESCRIPTOR       IntEndpointDescriptor;
+  EFI_USB_INTERFACE_DESCRIPTOR         InterfaceDescriptor;
+  EFI_USB_ENDPOINT_DESCRIPTOR          IntEndpointDescriptor;
 
-  USB_SIMPLE_QUEUE                  UsbKeyQueue;
-  USB_SIMPLE_QUEUE                  EfiKeyQueue;
-  USB_SIMPLE_QUEUE                  EfiKeyQueueForNotify;
-  BOOLEAN                           CtrlOn;
-  BOOLEAN                           AltOn;
-  BOOLEAN                           ShiftOn;
-  BOOLEAN                           NumLockOn;
-  BOOLEAN                           CapsOn;
-  BOOLEAN                           ScrollOn;
-  UINT8                             LastKeyCodeArray[8];
-  UINT8                             CurKeyCode;
+  USB_SIMPLE_QUEUE                     UsbKeyQueue;
+  USB_SIMPLE_QUEUE                     EfiKeyQueue;
+  USB_SIMPLE_QUEUE                     EfiKeyQueueForNotify;
+  BOOLEAN                              CtrlOn;
+  BOOLEAN                              AltOn;
+  BOOLEAN                              ShiftOn;
+  BOOLEAN                              NumLockOn;
+  BOOLEAN                              CapsOn;
+  BOOLEAN                              ScrollOn;
+  UINT8                                LastKeyCodeArray[8];
+  UINT8                                CurKeyCode;
 
-  EFI_EVENT                         TimerEvent;
+  EFI_EVENT                            TimerEvent;
 
-  UINT8                             RepeatKey;
-  EFI_EVENT                         RepeatTimer;
+  UINT8                                RepeatKey;
+  EFI_EVENT                            RepeatTimer;
 
-  EFI_UNICODE_STRING_TABLE          *ControllerNameTable;
+  EFI_UNICODE_STRING_TABLE             *ControllerNameTable;
 
-  BOOLEAN                           LeftCtrlOn;
-  BOOLEAN                           LeftAltOn;
-  BOOLEAN                           LeftShiftOn;
-  BOOLEAN                           LeftLogoOn;
-  BOOLEAN                           RightCtrlOn;
-  BOOLEAN                           RightAltOn;
-  BOOLEAN                           RightShiftOn;
-  BOOLEAN                           RightLogoOn;
-  BOOLEAN                           MenuKeyOn;
-  BOOLEAN                           SysReqOn;
-  BOOLEAN                           AltGrOn;
+  BOOLEAN                              LeftCtrlOn;
+  BOOLEAN                              LeftAltOn;
+  BOOLEAN                              LeftShiftOn;
+  BOOLEAN                              LeftLogoOn;
+  BOOLEAN                              RightCtrlOn;
+  BOOLEAN                              RightAltOn;
+  BOOLEAN                              RightShiftOn;
+  BOOLEAN                              RightLogoOn;
+  BOOLEAN                              MenuKeyOn;
+  BOOLEAN                              SysReqOn;
+  BOOLEAN                              AltGrOn;
 
-  BOOLEAN                         IsSupportPartialKey;
+  BOOLEAN                              IsSupportPartialKey;
 
-  EFI_KEY_STATE                     KeyState;
+  EFI_KEY_STATE                        KeyState;
   //
   // Notification function list
   //
-  LIST_ENTRY                        NotifyList;
-  EFI_EVENT                         KeyNotifyProcessEvent;
+  LIST_ENTRY                           NotifyList;
+  EFI_EVENT                            KeyNotifyProcessEvent;
 
   //
   // Non-spacing key list
   //
-  LIST_ENTRY                        NsKeyList;
-  USB_NS_KEY                        *CurrentNsKey;
-  EFI_KEY_DESCRIPTOR                *KeyConvertionTable;
-  EFI_EVENT                         KeyboardLayoutEvent;
+  LIST_ENTRY                           NsKeyList;
+  USB_NS_KEY                           *CurrentNsKey;
+  EFI_KEY_DESCRIPTOR                   *KeyConvertionTable;
+  EFI_EVENT                            KeyboardLayoutEvent;
 } USB_KB_DEV;
 
 //
@@ -175,23 +175,24 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gUsbKeyboardComponentName2;
 // So the number of valid non-modifier USB keycodes is 0x62, and the number of
 // valid keycodes is 0x6A.
 //
-#define NUMBER_OF_VALID_NON_MODIFIER_USB_KEYCODE      0x62
-#define NUMBER_OF_VALID_USB_KEYCODE                   0x6A
+#define NUMBER_OF_VALID_NON_MODIFIER_USB_KEYCODE  0x62
+#define NUMBER_OF_VALID_USB_KEYCODE               0x6A
 //
 // 0x0 to 0x3 are reserved for typical keyboard status or keyboard errors.
 //
-#define USBKBD_VALID_KEYCODE(Key) ((UINT8) (Key) > 3)
+#define USBKBD_VALID_KEYCODE(Key)  ((UINT8) (Key) > 3)
 
 typedef struct {
-  UINT8 NumLock : 1;
-  UINT8 CapsLock : 1;
-  UINT8 ScrollLock : 1;
-  UINT8 Resrvd : 5;
+  UINT8    NumLock    : 1;
+  UINT8    CapsLock   : 1;
+  UINT8    ScrollLock : 1;
+  UINT8    Resrvd     : 5;
 } LED_MAP;
 
 //
 // Functions of Driver Binding Protocol
 //
+
 /**
   Check whether USB keyboard driver supports this device.
 
@@ -263,6 +264,7 @@ USBKeyboardDriverBindingStop (
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -376,6 +378,7 @@ UsbKeyboardComponentNameGetControllerName (
 //
 // Functions of Simple Text Input Protocol
 //
+
 /**
   Reset the input device and optionally run diagnostics
 
@@ -421,6 +424,7 @@ USBKeyboardReadKeyStroke (
 //
 // Simple Text Input Ex protocol functions
 //
+
 /**
   Resets the input device hardware.
 
@@ -610,4 +614,3 @@ KeyNotifyProcessHandler (
   );
 
 #endif
-

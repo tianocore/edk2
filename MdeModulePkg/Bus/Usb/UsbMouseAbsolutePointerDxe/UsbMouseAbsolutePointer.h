@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _USB_MOUSE_ABSOLUTE_POINTER_H_
 #define _USB_MOUSE_ABSOLUTE_POINTER_H_
 
-
 #include <Uefi.h>
 
 #include <Protocol/AbsolutePointer.h>
@@ -27,14 +26,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/Usb.h>
 
-#define CLASS_HID               3
-#define SUBCLASS_BOOT           1
-#define PROTOCOL_MOUSE          2
+#define CLASS_HID       3
+#define SUBCLASS_BOOT   1
+#define PROTOCOL_MOUSE  2
 
-#define BOOT_PROTOCOL           0
-#define REPORT_PROTOCOL         1
+#define BOOT_PROTOCOL    0
+#define REPORT_PROTOCOL  1
 
-#define USB_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE SIGNATURE_32 ('u', 'm', 's', 't')
+#define USB_MOUSE_ABSOLUTE_POINTER_DEV_SIGNATURE  SIGNATURE_32 ('u', 'm', 's', 't')
 
 //
 // A common header for usb standard descriptor.
@@ -42,8 +41,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #pragma pack(1)
 typedef struct {
-  UINT8                   Len;
-  UINT8                   Type;
+  UINT8    Len;
+  UINT8    Type;
 } USB_DESC_HEAD;
 #pragma pack()
 
@@ -51,33 +50,33 @@ typedef struct {
 /// Button range and status
 ///
 typedef struct {
-  BOOLEAN ButtonDetected;
-  UINT8   ButtonMinIndex;
-  UINT8   ButtonMaxIndex;
-  UINT8   Reserved;
+  BOOLEAN    ButtonDetected;
+  UINT8      ButtonMinIndex;
+  UINT8      ButtonMaxIndex;
+  UINT8      Reserved;
 } USB_MOUSE_BUTTON_DATA;
 
 ///
 /// Device instance of USB mouse.
 ///
 typedef struct {
-  UINTN                         Signature;
-  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
-  EFI_EVENT                     DelayedRecoveryEvent;
-  EFI_USB_IO_PROTOCOL           *UsbIo;
-  EFI_USB_INTERFACE_DESCRIPTOR  InterfaceDescriptor;
-  EFI_USB_ENDPOINT_DESCRIPTOR   IntEndpointDescriptor;
-  UINT8                         NumberOfButtons;
-  INT32                         XLogicMax;
-  INT32                         XLogicMin;
-  INT32                         YLogicMax;
-  INT32                         YLogicMin;
-  EFI_ABSOLUTE_POINTER_PROTOCOL AbsolutePointerProtocol;
-  EFI_ABSOLUTE_POINTER_STATE    State;
-  EFI_ABSOLUTE_POINTER_MODE     Mode;
-  BOOLEAN                       StateChanged;
-  USB_MOUSE_BUTTON_DATA         PrivateData;
-  EFI_UNICODE_STRING_TABLE      *ControllerNameTable;
+  UINTN                            Signature;
+  EFI_DEVICE_PATH_PROTOCOL         *DevicePath;
+  EFI_EVENT                        DelayedRecoveryEvent;
+  EFI_USB_IO_PROTOCOL              *UsbIo;
+  EFI_USB_INTERFACE_DESCRIPTOR     InterfaceDescriptor;
+  EFI_USB_ENDPOINT_DESCRIPTOR      IntEndpointDescriptor;
+  UINT8                            NumberOfButtons;
+  INT32                            XLogicMax;
+  INT32                            XLogicMin;
+  INT32                            YLogicMax;
+  INT32                            YLogicMin;
+  EFI_ABSOLUTE_POINTER_PROTOCOL    AbsolutePointerProtocol;
+  EFI_ABSOLUTE_POINTER_STATE       State;
+  EFI_ABSOLUTE_POINTER_MODE        Mode;
+  BOOLEAN                          StateChanged;
+  USB_MOUSE_BUTTON_DATA            PrivateData;
+  EFI_UNICODE_STRING_TABLE         *ControllerNameTable;
 } USB_MOUSE_ABSOLUTE_POINTER_DEV;
 
 ///
@@ -85,21 +84,21 @@ typedef struct {
 ///
 
 typedef union {
-  UINT8   Uint8;
-  UINT16  Uint16;
-  UINT32  Uint32;
-  INT8    Int8;
-  INT16   Int16;
-  INT32   Int32;
-  UINT8   *LongData;
+  UINT8     Uint8;
+  UINT16    Uint16;
+  UINT32    Uint32;
+  INT8      Int8;
+  INT16     Int16;
+  INT32     Int32;
+  UINT8     *LongData;
 } HID_DATA;
 
 typedef struct {
-  UINT16    Format;
-  UINT8     Size;
-  UINT8     Type;
-  UINT8     Tag;
-  HID_DATA  Data;
+  UINT16      Format;
+  UINT8       Size;
+  UINT8       Type;
+  UINT8       Tag;
+  HID_DATA    Data;
 } HID_ITEM;
 
 #define USB_MOUSE_ABSOLUTE_POINTER_DEV_FROM_MOUSE_PROTOCOL(a) \

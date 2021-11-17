@@ -43,14 +43,13 @@ enum {
 //
 // All of base memories are 4K(0x1000) alignment
 //
-#define ALIGN(v, a)                          (UINTN)((((v) - 1) | ((a) - 1)) + 1)
-#define NVME_MEM_BASE(Private)               ((UINTN)(Private->Buffer))
-#define NVME_ASQ_BASE(Private)               (ALIGN (NVME_MEM_BASE(Private) + ((NvmeBaseMemPageOffset (BASEMEM_ASQ))                                * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
-#define NVME_ACQ_BASE(Private)               (ALIGN (NVME_MEM_BASE(Private) + ((NvmeBaseMemPageOffset (BASEMEM_ACQ))                                * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
-#define NVME_SQ_BASE(Private, Index)         (ALIGN (NVME_MEM_BASE(Private) + ((NvmeBaseMemPageOffset (BASEMEM_SQ) + ((Index)*(NVME_MAX_QUEUES-1))) * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
-#define NVME_CQ_BASE(Private, Index)         (ALIGN (NVME_MEM_BASE(Private) + ((NvmeBaseMemPageOffset (BASEMEM_CQ) + ((Index)*(NVME_MAX_QUEUES-1))) * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
-#define NVME_PRP_BASE(Private)               (ALIGN (NVME_MEM_BASE(Private) + ((NvmeBaseMemPageOffset (BASEMEM_PRP))                                * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
-
+#define ALIGN(v, a)                   (UINTN)((((v) - 1) | ((a) - 1)) + 1)
+#define NVME_MEM_BASE(Private)        ((UINTN)(Private->Buffer))
+#define NVME_ASQ_BASE(Private)        (ALIGN (NVME_MEM_BASE(Private) + ((NvmeBaseMemPageOffset (BASEMEM_ASQ))                                * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
+#define NVME_ACQ_BASE(Private)        (ALIGN (NVME_MEM_BASE(Private) + ((NvmeBaseMemPageOffset (BASEMEM_ACQ))                                * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
+#define NVME_SQ_BASE(Private, Index)  (ALIGN (NVME_MEM_BASE(Private) + ((NvmeBaseMemPageOffset (BASEMEM_SQ) + ((Index)*(NVME_MAX_QUEUES-1))) * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
+#define NVME_CQ_BASE(Private, Index)  (ALIGN (NVME_MEM_BASE(Private) + ((NvmeBaseMemPageOffset (BASEMEM_CQ) + ((Index)*(NVME_MAX_QUEUES-1))) * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
+#define NVME_PRP_BASE(Private)        (ALIGN (NVME_MEM_BASE(Private) + ((NvmeBaseMemPageOffset (BASEMEM_PRP))                                * EFI_PAGE_SIZE), EFI_PAGE_SIZE))
 
 /**
   Transfer MMIO Data to memory.

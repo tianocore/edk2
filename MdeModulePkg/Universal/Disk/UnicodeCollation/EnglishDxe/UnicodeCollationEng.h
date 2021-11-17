@@ -9,8 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _UNICODE_COLLATION_ENG_H_
 #define _UNICODE_COLLATION_ENG_H_
 
-
-
 #include <Uefi.h>
 
 #include <Protocol/UnicodeCollation.h>
@@ -33,16 +31,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Macro to map character a to upper case.
 //
-#define TO_UPPER(a)      (CHAR16) ((a) <= 0xFF ? mEngUpperMap[a] : (a))
+#define TO_UPPER(a)  (CHAR16) ((a) <= 0xFF ? mEngUpperMap[a] : (a))
 
 //
 // Macro to map character a to lower case.
 //
-#define TO_LOWER(a)      (CHAR16) ((a) <= 0xFF ? mEngLowerMap[a] : (a))
+#define TO_LOWER(a)  (CHAR16) ((a) <= 0xFF ? mEngLowerMap[a] : (a))
 
 //
 // Prototypes
 //
+
 /**
   Performs a case-insensitive comparison of two Null-terminated strings.
 
@@ -178,4 +177,3 @@ InitializeUnicodeCollationEng (
   );
 
 #endif
-

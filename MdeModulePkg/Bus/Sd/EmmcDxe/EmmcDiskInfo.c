@@ -32,9 +32,9 @@ EmmcDiskInfoInquiry (
   IN OUT UINT32                  *InquiryDataSize
   )
 {
-  EFI_STATUS        Status;
-  EMMC_PARTITION    *Partition;
-  EMMC_DEVICE       *Device;
+  EFI_STATUS      Status;
+  EMMC_PARTITION  *Partition;
+  EMMC_DEVICE     *Device;
 
   Partition = EMMC_PARTITION_DATA_FROM_DISKINFO (This);
   Device    = Partition->Device;

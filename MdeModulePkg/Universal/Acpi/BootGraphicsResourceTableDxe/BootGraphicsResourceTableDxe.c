@@ -132,14 +132,14 @@ EFI_BOOT_LOGO_PROTOCOL  mBootLogoProtocolTemplate = {
 ///
 /// Boot Logo 2 Protocol instance
 ///
-EDKII_BOOT_LOGO2_PROTOCOL mBootLogo2ProtocolTemplate = {
+EDKII_BOOT_LOGO2_PROTOCOL  mBootLogo2ProtocolTemplate = {
   SetBootLogo2,
   GetBootLogo2
 };
 
 EFI_EVENT                      mBootGraphicsReadyToBootEvent;
 UINTN                          mBootGraphicsResourceTableKey = 0;
-BOOLEAN                        mIsLogoValid = FALSE;
+BOOLEAN                        mIsLogoValid    = FALSE;
 EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *mLogoBltBuffer = NULL;
 UINTN                          mLogoDestX  = 0;
 UINTN                          mLogoDestY  = 0;
@@ -152,16 +152,16 @@ BOOLEAN                        mAcpiBgrtBufferChanged = FALSE;
 //
 // ACPI Boot Graphics Resource Table template
 //
-EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE mBootGraphicsResourceTableTemplate = {
+EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE  mBootGraphicsResourceTableTemplate = {
   {
     EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE,
     sizeof (EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE),
-    EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE_REVISION,     // Revision
-    0x00,  // Checksum will be updated at runtime
+    EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE_REVISION, // Revision
+    0x00,                                               // Checksum will be updated at runtime
     //
     // It is expected that these values will be updated at EntryPoint.
     //
-    {0x00},     // OEM ID is a 6 bytes long field
+    { 0x00 },   // OEM ID is a 6 bytes long field
     0x00,       // OEM Table ID(8 bytes long)
     0x00,       // OEM Revision
     0x00,       // Creator ID
@@ -258,7 +258,7 @@ SetBootLogo2 (
   //
   // Width and height are not allowed to be zero.
   //
-  if (Width == 0 || Height == 0) {
+  if ((Width == 0) || (Height == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -270,14 +270,17 @@ SetBootLogo2 (
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
   }
+
   Status = SafeUintnToUint32 (DestinationY, &Result32);
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
   }
+
   Status = SafeUintnToUint32 (Width, &Result32);
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
   }
+
   Status = SafeUintnToUint32 (Height, &Result32);
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
@@ -295,6 +298,7 @@ SetBootLogo2 (
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
+
   Status = SafeUintnMult (
              BufferSize,
              sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL),
@@ -382,8 +386,9 @@ GetBootLogo2 (
   //
   // Make sure none of the boot logo location parameters are NULL.
   //
-  if (BltBuffer == NULL || DestinationX == NULL || DestinationY == NULL ||
-      Width == NULL || Height == NULL) {
+  if ((BltBuffer == NULL) || (DestinationX == NULL) || (DestinationY == NULL) ||
+      (Width == NULL) || (Height == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -393,8 +398,8 @@ GetBootLogo2 (
   *BltBuffer    = mLogoBltBuffer;
   *DestinationX = mLogoDestX;
   *DestinationY = mLogoDestY;
-  *Width        = mLogoWidth;
-  *Height       = mLogoHeight;
+  *Width  = mLogoWidth;
+  *Height = mLogoHeight;
 
   return EFI_SUCCESS;
 }
@@ -425,7 +430,7 @@ BgrtReadyToBootEventNotify (
   Status = gBS->LocateProtocol (
                   &gEfiAcpiTableProtocolGuid,
                   NULL,
-                  (VOID **) &AcpiTableProtocol
+                  (VOID **)&AcpiTableProtocol
                   );
   if (EFI_ERROR (Status)) {
     return;

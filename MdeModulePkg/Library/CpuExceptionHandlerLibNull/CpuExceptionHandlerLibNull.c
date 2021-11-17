@@ -138,4 +138,3 @@ InitializeCpuExceptionHandlersEx (
 {
   return InitializeCpuExceptionHandlers (VectorInfo);
 }
-

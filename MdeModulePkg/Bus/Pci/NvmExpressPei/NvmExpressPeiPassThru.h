@@ -11,8 +11,6 @@
 #ifndef _NVM_EXPRESS_PEI_PASSTHRU_H_
 #define _NVM_EXPRESS_PEI_PASSTHRU_H_
 
-
-
 /**
   Sends an NVM Express Command Packet to an NVM Express controller or namespace. This function only
   supports blocking execution of the command.

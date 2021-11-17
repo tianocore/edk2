@@ -72,15 +72,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/HiiLib.h>
 
 #if !defined (EFI_REMOVABLE_MEDIA_FILE_NAME)
-    #if defined (MDE_CPU_EBC)
-        //
-        // Uefi specification only defines the default boot file name for IA32, X64
-        // and IPF processor, so need define boot file name for EBC architecture here.
-        //
-        #define EFI_REMOVABLE_MEDIA_FILE_NAME L"\\EFI\\BOOT\\BOOTEBC.EFI"
-    #else
-        #error "Can not determine the default boot file name for unknown processor type!"
-    #endif
+  #if defined (MDE_CPU_EBC)
+    //
+    // Uefi specification only defines the default boot file name for IA32, X64
+    // and IPF processor, so need define boot file name for EBC architecture here.
+    //
+    #define EFI_REMOVABLE_MEDIA_FILE_NAME  L"\\EFI\\BOOT\\BOOTEBC.EFI"
+  #else
+    #error "Can not determine the default boot file name for unknown processor type!"
+  #endif
 #endif
 
 typedef enum {
@@ -95,21 +95,21 @@ typedef enum {
 
 typedef
 CHAR16 *
-(* BM_GET_BOOT_DESCRIPTION) (
+(*BM_GET_BOOT_DESCRIPTION) (
   IN EFI_HANDLE          Handle
   );
 
 //
 // PlatformRecovery#### is the load option with the longest name
 //
-#define BM_OPTION_NAME_LEN                          sizeof ("PlatformRecovery####")
+#define BM_OPTION_NAME_LEN  sizeof ("PlatformRecovery####")
 extern CHAR16  *mBmLoadOptionName[];
 
 //
 // Maximum number of reconnect retry to repair controller; it is to limit the
 // number of recursive call of BmRepairAllControllers.
 //
-#define MAX_RECONNECT_REPAIR                        10
+#define MAX_RECONNECT_REPAIR  10
 
 /**
   Visitor function to be called by BmForEachVariable for each variable
@@ -139,11 +139,11 @@ BmForEachVariable (
   VOID                        *Context
   );
 
-#define BM_BOOT_DESCRIPTION_ENTRY_SIGNATURE SIGNATURE_32 ('b', 'm', 'd', 'h')
+#define BM_BOOT_DESCRIPTION_ENTRY_SIGNATURE  SIGNATURE_32 ('b', 'm', 'd', 'h')
 typedef struct {
-  UINT32                                    Signature;
-  LIST_ENTRY                                Link;
-  EFI_BOOT_MANAGER_BOOT_DESCRIPTION_HANDLER Handler;
+  UINT32                                       Signature;
+  LIST_ENTRY                                   Link;
+  EFI_BOOT_MANAGER_BOOT_DESCRIPTION_HANDLER    Handler;
 } BM_BOOT_DESCRIPTION_ENTRY;
 
 /**
@@ -157,19 +157,19 @@ BmRepairAllControllers (
   UINTN       ReconnectRepairCount
   );
 
-#define BM_HOTKEY_SIGNATURE SIGNATURE_32 ('b', 'm', 'h', 'k')
+#define BM_HOTKEY_SIGNATURE  SIGNATURE_32 ('b', 'm', 'h', 'k')
 typedef struct {
-  UINT32                    Signature;
-  LIST_ENTRY                Link;
+  UINT32          Signature;
+  LIST_ENTRY      Link;
 
-  BOOLEAN                   IsContinue;
-  UINT16                    BootOption;
-  UINT8                     CodeCount;
-  UINT8                     WaitingKey;
-  EFI_KEY_DATA              KeyData[3];
+  BOOLEAN         IsContinue;
+  UINT16          BootOption;
+  UINT8           CodeCount;
+  UINT8           WaitingKey;
+  EFI_KEY_DATA    KeyData[3];
 } BM_HOTKEY;
 
-#define BM_HOTKEY_FROM_LINK(a) CR (a, BM_HOTKEY, Link, BM_HOTKEY_SIGNATURE)
+#define BM_HOTKEY_FROM_LINK(a)  CR (a, BM_HOTKEY, Link, BM_HOTKEY_SIGNATURE)
 
 /**
   Get the Option Number that wasn't used.
@@ -465,4 +465,5 @@ BmGetNextLoadOptionBuffer (
   OUT EFI_DEVICE_PATH_PROTOCOL          **FullPath,
   OUT UINTN                             *FileSize
   );
+
 #endif // _INTERNAL_BM_H_

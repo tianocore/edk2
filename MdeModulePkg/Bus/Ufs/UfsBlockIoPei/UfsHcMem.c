@@ -21,22 +21,22 @@ UfsPeimAllocMemBlock (
   IN  UINTN                    Pages
   )
 {
-  UFS_PEIM_MEM_BLOCK           *Block;
-  VOID                         *BufHost;
-  VOID                         *Mapping;
-  EFI_PHYSICAL_ADDRESS         MappedAddr;
-  EFI_STATUS                   Status;
-  VOID                         *TempPtr;
+  UFS_PEIM_MEM_BLOCK    *Block;
+  VOID                  *BufHost;
+  VOID                  *Mapping;
+  EFI_PHYSICAL_ADDRESS  MappedAddr;
+  EFI_STATUS            Status;
+  VOID                  *TempPtr;
 
   TempPtr = NULL;
   Block   = NULL;
 
-  Status = PeiServicesAllocatePool (sizeof(UFS_PEIM_MEM_BLOCK), &TempPtr);
+  Status = PeiServicesAllocatePool (sizeof (UFS_PEIM_MEM_BLOCK), &TempPtr);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
 
-  ZeroMem ((VOID*)(UINTN)TempPtr, sizeof(UFS_PEIM_MEM_BLOCK));
+  ZeroMem ((VOID *)(UINTN)TempPtr, sizeof (UFS_PEIM_MEM_BLOCK));
 
   //
   // each bit in the bit array represents UFS_PEIM_MEM_UNIT
@@ -44,18 +44,18 @@ UfsPeimAllocMemBlock (
   //
   ASSERT (UFS_PEIM_MEM_UNIT * 8 <= EFI_PAGE_SIZE);
 
-  Block = (UFS_PEIM_MEM_BLOCK*)(UINTN)TempPtr;
-  Block->BufLen   = EFI_PAGES_TO_SIZE (Pages);
-  Block->BitsLen  = Block->BufLen / (UFS_PEIM_MEM_UNIT * 8);
+  Block = (UFS_PEIM_MEM_BLOCK *)(UINTN)TempPtr;
+  Block->BufLen  = EFI_PAGES_TO_SIZE (Pages);
+  Block->BitsLen = Block->BufLen / (UFS_PEIM_MEM_UNIT * 8);
 
   Status = PeiServicesAllocatePool (Block->BitsLen, &TempPtr);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
 
-  ZeroMem ((VOID*)(UINTN)TempPtr, Block->BitsLen);
+  ZeroMem ((VOID *)(UINTN)TempPtr, Block->BitsLen);
 
-  Block->Bits = (UINT8*)(UINTN)TempPtr;
+  Block->Bits = (UINT8 *)(UINTN)TempPtr;
 
   Status = IoMmuAllocateBuffer (
              Pages,
@@ -67,10 +67,10 @@ UfsPeimAllocMemBlock (
     return NULL;
   }
 
-  ZeroMem ((VOID*)(UINTN)BufHost, EFI_PAGES_TO_SIZE (Pages));
+  ZeroMem ((VOID *)(UINTN)BufHost, EFI_PAGES_TO_SIZE (Pages));
 
-  Block->BufHost = (UINT8 *) (UINTN) BufHost;
-  Block->Buf     = (UINT8 *) (UINTN) MappedAddr;
+  Block->BufHost = (UINT8 *)(UINTN)BufHost;
+  Block->Buf     = (UINT8 *)(UINTN)MappedAddr;
   Block->Mapping = Mapping;
   Block->Next    = NULL;
 
@@ -111,18 +111,18 @@ UfsPeimAllocMemFromBlock (
   IN  UINTN               Units
   )
 {
-  UINTN                   Byte;
-  UINT8                   Bit;
-  UINTN                   StartByte;
-  UINT8                   StartBit;
-  UINTN                   Available;
-  UINTN                   Count;
+  UINTN  Byte;
+  UINT8  Bit;
+  UINTN  StartByte;
+  UINT8  StartBit;
+  UINTN  Available;
+  UINTN  Count;
 
   ASSERT ((Block != 0) && (Units != 0));
 
-  StartByte  = 0;
-  StartBit   = 0;
-  Available  = 0;
+  StartByte = 0;
+  StartBit  = 0;
+  Available = 0;
 
   for (Byte = 0, Bit = 0; Byte < Block->BitsLen;) {
     //
@@ -138,13 +138,12 @@ UfsPeimAllocMemFromBlock (
       }
 
       UFS_PEIM_NEXT_BIT (Byte, Bit);
-
     } else {
       UFS_PEIM_NEXT_BIT (Byte, Bit);
 
-      Available  = 0;
-      StartByte  = Byte;
-      StartBit   = Bit;
+      Available = 0;
+      StartByte = Byte;
+      StartBit  = Bit;
     }
   }
 
@@ -155,13 +154,13 @@ UfsPeimAllocMemFromBlock (
   //
   // Mark the memory as allocated
   //
-  Byte  = StartByte;
-  Bit   = StartBit;
+  Byte = StartByte;
+  Bit  = StartBit;
 
   for (Count = 0; Count < Units; Count++) {
     ASSERT (!UFS_PEIM_MEM_BIT_IS_SET (Block->Bits[Byte], Bit));
 
-    Block->Bits[Byte] = (UINT8) (Block->Bits[Byte] | (UINT8) UFS_PEIM_MEM_BIT (Bit));
+    Block->Bits[Byte] = (UINT8)(Block->Bits[Byte] | (UINT8)UFS_PEIM_MEM_BIT (Bit));
     UFS_PEIM_NEXT_BIT (Byte, Bit);
   }
 
@@ -200,8 +199,7 @@ UfsPeimIsMemBlockEmpty (
   IN UFS_PEIM_MEM_BLOCK     *Block
   )
 {
-  UINTN                   Index;
-
+  UINTN  Index;
 
   for (Index = 0; Index < Block->BitsLen; Index++) {
     if (Block->Bits[Index] != 0) {
@@ -211,8 +209,6 @@ UfsPeimIsMemBlockEmpty (
 
   return TRUE;
 }
-
-
 
 /**
   Initialize the memory management pool for the host controller.
@@ -228,9 +224,9 @@ UfsPeimInitMemPool (
   IN  UFS_PEIM_HC_PRIVATE_DATA  *Private
   )
 {
-  UFS_PEIM_MEM_POOL          *Pool;
-  EFI_STATUS                 Status;
-  VOID                       *TempPtr;
+  UFS_PEIM_MEM_POOL  *Pool;
+  EFI_STATUS         Status;
+  VOID               *TempPtr;
 
   TempPtr = NULL;
   Pool    = NULL;
@@ -240,7 +236,7 @@ UfsPeimInitMemPool (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ZeroMem ((VOID*)(UINTN)TempPtr, sizeof (UFS_PEIM_MEM_POOL));
+  ZeroMem ((VOID *)(UINTN)TempPtr, sizeof (UFS_PEIM_MEM_POOL));
 
   Pool = (UFS_PEIM_MEM_POOL *)((UINTN)TempPtr);
 
@@ -268,7 +264,7 @@ UfsPeimFreeMemPool (
   IN UFS_PEIM_MEM_POOL       *Pool
   )
 {
-  UFS_PEIM_MEM_BLOCK         *Block;
+  UFS_PEIM_MEM_BLOCK  *Block;
 
   ASSERT (Pool->Head != NULL);
 
@@ -300,16 +296,16 @@ UfsPeimAllocateMem (
   IN  UINTN                    Size
   )
 {
-  UFS_PEIM_MEM_BLOCK         *Head;
-  UFS_PEIM_MEM_BLOCK         *Block;
-  UFS_PEIM_MEM_BLOCK         *NewBlock;
-  VOID                       *Mem;
-  UINTN                      AllocSize;
-  UINTN                      Pages;
+  UFS_PEIM_MEM_BLOCK  *Head;
+  UFS_PEIM_MEM_BLOCK  *Block;
+  UFS_PEIM_MEM_BLOCK  *NewBlock;
+  VOID                *Mem;
+  UINTN               AllocSize;
+  UINTN               Pages;
 
-  Mem       = NULL;
+  Mem = NULL;
   AllocSize = UFS_PEIM_MEM_ROUND (Size);
-  Head      = Pool->Head;
+  Head = Pool->Head;
   ASSERT (Head != NULL);
 
   //
@@ -373,17 +369,17 @@ UfsPeimFreeMem (
   IN UINTN                Size
   )
 {
-  UFS_PEIM_MEM_BLOCK      *Head;
-  UFS_PEIM_MEM_BLOCK      *Block;
-  UINT8                   *ToFree;
-  UINTN                   AllocSize;
-  UINTN                   Byte;
-  UINTN                   Bit;
-  UINTN                   Count;
+  UFS_PEIM_MEM_BLOCK  *Head;
+  UFS_PEIM_MEM_BLOCK  *Block;
+  UINT8               *ToFree;
+  UINTN               AllocSize;
+  UINTN               Byte;
+  UINTN               Bit;
+  UINTN               Count;
 
-  Head      = Pool->Head;
+  Head = Pool->Head;
   AllocSize = UFS_PEIM_MEM_ROUND (Size);
-  ToFree    = (UINT8 *) Mem;
+  ToFree    = (UINT8 *)Mem;
 
   for (Block = Head; Block != NULL; Block = Block->Next) {
     //
@@ -394,8 +390,8 @@ UfsPeimFreeMem (
       //
       // compute the start byte and bit in the bit array
       //
-      Byte  = ((ToFree - Block->Buf) / UFS_PEIM_MEM_UNIT) / 8;
-      Bit   = ((ToFree - Block->Buf) / UFS_PEIM_MEM_UNIT) % 8;
+      Byte = ((ToFree - Block->Buf) / UFS_PEIM_MEM_UNIT) / 8;
+      Bit  = ((ToFree - Block->Buf) / UFS_PEIM_MEM_UNIT) % 8;
 
       //
       // reset associated bits in bit array
@@ -403,7 +399,7 @@ UfsPeimFreeMem (
       for (Count = 0; Count < (AllocSize / UFS_PEIM_MEM_UNIT); Count++) {
         ASSERT (UFS_PEIM_MEM_BIT_IS_SET (Block->Bits[Byte], Bit));
 
-        Block->Bits[Byte] = (UINT8) (Block->Bits[Byte] ^ UFS_PEIM_MEM_BIT (Bit));
+        Block->Bits[Byte] = (UINT8)(Block->Bits[Byte] ^ UFS_PEIM_MEM_BIT (Bit));
         UFS_PEIM_NEXT_BIT (Byte, Bit);
       }
 
@@ -425,5 +421,5 @@ UfsPeimFreeMem (
     UfsPeimFreeMemBlock (Pool, Block);
   }
 
-  return ;
+  return;
 }

@@ -37,7 +37,7 @@ UiCustomizeFrontPage (
   //
   // Create empty line.
   //
-  UiCreateEmptyLine(HiiHandle, StartOpCodeHandle);
+  UiCreateEmptyLine (HiiHandle, StartOpCodeHandle);
 
   //
   // Find third party drivers which need to be shown in the front page.
@@ -47,17 +47,17 @@ UiCustomizeFrontPage (
   //
   // Create empty line.
   //
-  UiCreateEmptyLine(HiiHandle, StartOpCodeHandle);
+  UiCreateEmptyLine (HiiHandle, StartOpCodeHandle);
 
   //
   // Create "Continue" menu.
   //
-  UiCreateContinueMenu(HiiHandle, StartOpCodeHandle);
+  UiCreateContinueMenu (HiiHandle, StartOpCodeHandle);
 
   //
   // Create reset menu.
   //
-  UiCreateResetMenu(HiiHandle, StartOpCodeHandle);
+  UiCreateResetMenu (HiiHandle, StartOpCodeHandle);
 }
 
 /**
@@ -88,7 +88,7 @@ UiFrontPageCallbackHandler (
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if (UiSupportLibCallbackHandler (HiiHandle, Action, QuestionId, Type, Value, ActionRequest, &Status)) {
     return Status;
@@ -128,12 +128,14 @@ UiCustomizeFrontPageBanner (
 {
   if ((LineIndex == 5) && LeftOrRight) {
     // Update STR_CUSTOMIZE_BANNER_LINE5_LEFT
-    if (PcdGetBool(PcdTestKeyUsed)) {
+    if (PcdGetBool (PcdTestKeyUsed)) {
       if (BannerStr != NULL) {
-        FreePool(*BannerStr);
+        FreePool (*BannerStr);
       }
-      *BannerStr = HiiGetString(gFrontPagePrivate.HiiHandle, STRING_TOKEN(STR_TEST_KEY_USED), NULL);
+
+      *BannerStr = HiiGetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_TEST_KEY_USED), NULL);
     }
   }
+
   return;
 }

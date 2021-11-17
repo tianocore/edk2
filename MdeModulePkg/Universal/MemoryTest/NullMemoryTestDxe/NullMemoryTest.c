@@ -6,12 +6,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "NullMemoryTest.h"
 
-UINT64                            mTestedSystemMemory = 0;
-UINT64                            mTotalSystemMemory  = 0;
-EFI_HANDLE                        mGenericMemoryTestHandle;
+UINT64      mTestedSystemMemory = 0;
+UINT64      mTotalSystemMemory  = 0;
+EFI_HANDLE  mGenericMemoryTestHandle;
 
 EFI_GENERIC_MEMORY_TEST_PROTOCOL  mGenericMemoryTest = {
   InitializeMemoryTest,
@@ -69,7 +68,8 @@ ConvertToTestedMemory (
   IN UINT64           Capabilities
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
+
   Status = gDS->RemoveMemorySpace (
                   BaseAddress,
                   Length
@@ -84,6 +84,7 @@ ConvertToTestedMemory (
                     (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
                     );
   }
+
   return Status;
 }
 
@@ -112,17 +113,18 @@ InitializeMemoryTest (
   OUT BOOLEAN                                  *RequireSoftECCInit
   )
 {
-  EFI_STATUS                      Status;
-  UINTN                           NumberOfDescriptors;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR *MemorySpaceMap;
-  UINTN                           Index;
+  EFI_STATUS                       Status;
+  UINTN                            NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
+  UINTN                            Index;
 
   gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeReserved &&
-        (MemorySpaceMap[Index].Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
-          (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED)
-          ) {
+    if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeReserved) &&
+        ((MemorySpaceMap[Index].Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
+         (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED))
+        )
+    {
       //
       // For those reserved memory that have not been tested, simply promote to system memory.
       //
@@ -133,9 +135,10 @@ InitializeMemoryTest (
                  );
       ASSERT_EFI_ERROR (Status);
       mTestedSystemMemory += MemorySpaceMap[Index].Length;
-      mTotalSystemMemory += MemorySpaceMap[Index].Length;
+      mTotalSystemMemory  += MemorySpaceMap[Index].Length;
     } else if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeSystemMemory) ||
-               (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMoreReliable)) {
+               (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMoreReliable))
+    {
       mTotalSystemMemory += MemorySpaceMap[Index].Length;
     }
   }
@@ -179,12 +182,11 @@ GenPerformMemoryTest (
   IN BOOLEAN                                   TestAbort
   )
 {
-  *ErrorOut         = FALSE;
+  *ErrorOut = FALSE;
   *TestedMemorySize = mTestedSystemMemory;
   *TotalMemorySize  = mTotalSystemMemory;
 
   return EFI_NOT_FOUND;
-
 }
 
 /**
@@ -232,10 +234,10 @@ GenCompatibleRangeTest (
   IN UINT64                                    Length
   )
 {
-  EFI_STATUS                      Status;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
-  EFI_PHYSICAL_ADDRESS            CurrentBase;
-  UINT64                          CurrentLength;
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Descriptor;
+  EFI_PHYSICAL_ADDRESS             CurrentBase;
+  UINT64                           CurrentLength;
 
   //
   // Check if the parameter is below 16MB
@@ -243,6 +245,7 @@ GenCompatibleRangeTest (
   if (StartAddress + Length > SIZE_16MB) {
     return EFI_INVALID_PARAMETER;
   }
+
   CurrentBase = StartAddress;
   do {
     //
@@ -257,14 +260,16 @@ GenCompatibleRangeTest (
       return Status;
     }
 
-    if (Descriptor.GcdMemoryType == EfiGcdMemoryTypeReserved &&
-        (Descriptor.Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
-          (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED)
-          ) {
+    if ((Descriptor.GcdMemoryType == EfiGcdMemoryTypeReserved) &&
+        ((Descriptor.Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
+         (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED))
+        )
+    {
       CurrentLength = Descriptor.BaseAddress + Descriptor.Length - CurrentBase;
       if (CurrentBase + CurrentLength > StartAddress + Length) {
         CurrentLength = StartAddress + Length - CurrentBase;
       }
+
       Status = ConvertToTestedMemory (
                  CurrentBase,
                  CurrentLength,
@@ -274,11 +279,12 @@ GenCompatibleRangeTest (
         return Status;
       }
     }
+
     CurrentBase = Descriptor.BaseAddress + Descriptor.Length;
   } while (CurrentBase < StartAddress + Length);
+
   //
   // Here means the required range already be tested, so just return success.
   //
   return EFI_SUCCESS;
 }
-

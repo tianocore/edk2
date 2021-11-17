@@ -63,4 +63,3 @@ SaveAndSetDebugTimerInterrupt (
 {
   return FALSE;
 }
-

@@ -10,10 +10,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-extern EFI_GET_VARIABLE   mGetVariableHelper;
-extern UINT8              *mPolicyTable;
-STATIC BOOLEAN            mIsVirtualAddrConverted;
-STATIC EFI_EVENT          mVariablePolicyLibVirtualAddressChangeEvent  = NULL;
+extern EFI_GET_VARIABLE  mGetVariableHelper;
+extern UINT8             *mPolicyTable;
+STATIC BOOLEAN           mIsVirtualAddrConverted;
+STATIC EFI_EVENT         mVariablePolicyLibVirtualAddressChangeEvent = NULL;
 
 /**
   For the RuntimeDxe version of this lib, convert internal pointer addresses to virtual addresses.
@@ -35,7 +35,6 @@ VariablePolicyLibVirtualAddressCallback (
   mIsVirtualAddrConverted = TRUE;
 }
 
-
 /**
   An extra init hook that enables the RuntimeDxe library instance to
   register VirtualAddress change callbacks. Among other things.
@@ -49,14 +48,15 @@ VariablePolicyExtraInit (
   VOID
   )
 {
-  return gBS->CreateEventEx (EVT_NOTIFY_SIGNAL,
-                              TPL_NOTIFY,
-                              VariablePolicyLibVirtualAddressCallback,
-                              NULL,
-                              &gEfiEventVirtualAddressChangeGuid,
-                              &mVariablePolicyLibVirtualAddressChangeEvent);
+  return gBS->CreateEventEx (
+                EVT_NOTIFY_SIGNAL,
+                TPL_NOTIFY,
+                VariablePolicyLibVirtualAddressCallback,
+                NULL,
+                &gEfiEventVirtualAddressChangeGuid,
+                &mVariablePolicyLibVirtualAddressChangeEvent
+                );
 }
-
 
 /**
   An extra deinit hook that enables the RuntimeDxe library instance to
@@ -76,8 +76,7 @@ VariablePolicyExtraDeinit (
   Status = EFI_SUCCESS;
   if (mIsVirtualAddrConverted) {
     Status = gBS->CloseEvent (mVariablePolicyLibVirtualAddressChangeEvent);
-  }
-  else {
+  } else {
     Status = EFI_SUCCESS;
   }
 

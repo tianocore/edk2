@@ -17,17 +17,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // The StartValue in TimerLib
 //
-UINT64 mTimerLibStartValue = 0;
+UINT64  mTimerLibStartValue = 0;
 
 //
 // The EndValue in TimerLib
 //
-UINT64 mTimerLibEndValue = 0;
+UINT64  mTimerLibEndValue = 0;
 
 //
 // The properties of timestamp
 //
-EFI_TIMESTAMP_PROPERTIES mTimestampProperties = {
+EFI_TIMESTAMP_PROPERTIES  mTimestampProperties = {
   0,
   0
 };
@@ -56,15 +56,16 @@ TimestampDriverGetTimestamp (
   // The timestamp of Timestamp Protocol
   //
   UINT64  TimestampValue;
+
   TimestampValue = 0;
 
   //
   // Get the timestamp
   //
   if (mTimerLibStartValue > mTimerLibEndValue) {
-    TimestampValue = mTimerLibStartValue - GetPerformanceCounter();
+    TimestampValue = mTimerLibStartValue - GetPerformanceCounter ();
   } else {
-    TimestampValue = GetPerformanceCounter() - mTimerLibStartValue;
+    TimestampValue = GetPerformanceCounter () - mTimerLibStartValue;
   }
 
   return TimestampValue;
@@ -83,7 +84,7 @@ TimestampDriverGetTimestamp (
 **/
 EFI_STATUS
 EFIAPI
-TimestampDriverGetProperties(
+TimestampDriverGetProperties (
   OUT   EFI_TIMESTAMP_PROPERTIES       *Properties
   )
 {
@@ -94,7 +95,7 @@ TimestampDriverGetProperties(
   //
   // Get timestamp properties
   //
-  CopyMem((VOID *) Properties, (VOID *) &mTimestampProperties, sizeof (mTimestampProperties));
+  CopyMem ((VOID *)Properties, (VOID *)&mTimestampProperties, sizeof (mTimestampProperties));
 
   return EFI_SUCCESS;
 }
@@ -126,12 +127,13 @@ TimestampDriverInitialize (
   EFI_STATUS  Status;
 
   EFI_HANDLE  TimestampHandle;
+
   TimestampHandle = NULL;
 
   //
   // Get the start value, end value and frequency in Timerlib
   //
-  mTimestampProperties.Frequency = GetPerformanceCounterProperties(&mTimerLibStartValue, &mTimerLibEndValue);
+  mTimestampProperties.Frequency = GetPerformanceCounterProperties (&mTimerLibStartValue, &mTimerLibEndValue);
 
   //
   // Set the EndValue

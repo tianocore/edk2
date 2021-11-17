@@ -56,7 +56,7 @@ SdReadBlocks (
   IN     UINT32                 MediaId,
   IN     EFI_LBA                Lba,
   IN     UINTN                  BufferSize,
-     OUT VOID                   *Buffer
+  OUT VOID                   *Buffer
   );
 
 /**
@@ -157,7 +157,7 @@ SdReadBlocksEx (
   IN     EFI_LBA                Lba,
   IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
   IN     UINTN                  BufferSize,
-     OUT VOID                   *Buffer
+  OUT VOID                   *Buffer
   );
 
 /**
@@ -249,4 +249,3 @@ SdEraseBlocks (
   );
 
 #endif
-

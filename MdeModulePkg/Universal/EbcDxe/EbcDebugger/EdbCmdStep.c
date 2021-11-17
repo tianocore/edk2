@@ -23,7 +23,7 @@ IsEBCCALL (
   IN UINTN            Address
   )
 {
-  if (GET_OPCODE(Address) != OPCODE_CALL) {
+  if (GET_OPCODE (Address) != OPCODE_CALL) {
     return FALSE;
   }
 
@@ -49,7 +49,7 @@ IsEBCRET (
   IN UINTN            Address
   )
 {
-  if (GET_OPCODE(Address) != OPCODE_RET) {
+  if (GET_OPCODE (Address) != OPCODE_RET) {
     return FALSE;
   }
 
@@ -105,7 +105,7 @@ DebuggerStepOver (
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
 {
-  if (IsEBCCALL((UINTN)SystemContext.SystemContextEbc->Ip)) {
+  if (IsEBCCALL ((UINTN)SystemContext.SystemContextEbc->Ip)) {
     //
     // Check CALL (NOTE: CALLEX is exclusive)
     //
@@ -140,7 +140,7 @@ DebuggerStepOut (
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
 {
-  if (IsEBCRET((UINTN)SystemContext.SystemContextEbc->Ip)) {
+  if (IsEBCRET ((UINTN)SystemContext.SystemContextEbc->Ip)) {
     //
     // Check RET
     //

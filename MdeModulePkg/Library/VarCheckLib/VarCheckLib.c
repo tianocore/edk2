@@ -15,36 +15,36 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/GlobalVariable.h>
 #include <Guid/HardwareErrorVariable.h>
 
-BOOLEAN mVarCheckLibEndOfDxe    = FALSE;
+BOOLEAN  mVarCheckLibEndOfDxe = FALSE;
 
-#define VAR_CHECK_TABLE_SIZE    0x8
+#define VAR_CHECK_TABLE_SIZE  0x8
 
-UINTN                                   mVarCheckLibEndOfDxeCallbackCount = 0;
-UINTN                                   mVarCheckLibEndOfDxeCallbackMaxCount = 0;
-VAR_CHECK_END_OF_DXE_CALLBACK           *mVarCheckLibEndOfDxeCallback = NULL;
+UINTN                          mVarCheckLibEndOfDxeCallbackCount    = 0;
+UINTN                          mVarCheckLibEndOfDxeCallbackMaxCount = 0;
+VAR_CHECK_END_OF_DXE_CALLBACK  *mVarCheckLibEndOfDxeCallback = NULL;
 
-UINTN                                   mVarCheckLibAddressPointerCount = 0;
-UINTN                                   mVarCheckLibAddressPointerMaxCount = 0;
-VOID                                    ***mVarCheckLibAddressPointer = NULL;
+UINTN  mVarCheckLibAddressPointerCount    = 0;
+UINTN  mVarCheckLibAddressPointerMaxCount = 0;
+VOID   ***mVarCheckLibAddressPointer = NULL;
 
-UINTN                                   mNumberOfVarCheckHandler = 0;
-UINTN                                   mMaxNumberOfVarCheckHandler = 0;
-VAR_CHECK_SET_VARIABLE_CHECK_HANDLER    *mVarCheckHandlerTable = NULL;
+UINTN                                 mNumberOfVarCheckHandler    = 0;
+UINTN                                 mMaxNumberOfVarCheckHandler = 0;
+VAR_CHECK_SET_VARIABLE_CHECK_HANDLER  *mVarCheckHandlerTable = NULL;
 
 typedef struct {
-  EFI_GUID                      Guid;
-  VAR_CHECK_VARIABLE_PROPERTY   VariableProperty;
-  //CHAR16                        *Name;
+  EFI_GUID                       Guid;
+  VAR_CHECK_VARIABLE_PROPERTY    VariableProperty;
+  // CHAR16                        *Name;
 } VAR_CHECK_VARIABLE_ENTRY;
 
-UINTN                                   mNumberOfVarCheckVariable = 0;
-UINTN                                   mMaxNumberOfVarCheckVariable = 0;
-VARIABLE_ENTRY_PROPERTY                 **mVarCheckVariableTable = NULL;
+UINTN                    mNumberOfVarCheckVariable    = 0;
+UINTN                    mMaxNumberOfVarCheckVariable = 0;
+VARIABLE_ENTRY_PROPERTY  **mVarCheckVariableTable     = NULL;
 
 //
 // Handle variables with wildcard name specially.
 //
-VARIABLE_ENTRY_PROPERTY mVarCheckVariableWithWildcardName[] = {
+VARIABLE_ENTRY_PROPERTY  mVarCheckVariableWithWildcardName[] = {
   {
     &gEfiGlobalVariableGuid,
     L"Boot####",
@@ -109,7 +109,7 @@ VarCheckInternalIsHexaDecimalDigitCharacter (
   IN CHAR16             Char
   )
 {
-  return (BOOLEAN) ((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F'));
+  return (BOOLEAN)((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F'));
 }
 
 /**
@@ -129,24 +129,26 @@ VariablePropertyGetWithWildcardName (
   IN BOOLEAN                        WildcardMatch
   )
 {
-  UINTN     Index;
-  UINTN     NameLength;
+  UINTN  Index;
+  UINTN  NameLength;
 
   NameLength = StrLen (VariableName) - 4;
   for (Index = 0; Index < sizeof (mVarCheckVariableWithWildcardName)/sizeof (mVarCheckVariableWithWildcardName[0]); Index++) {
-    if (CompareGuid (mVarCheckVariableWithWildcardName[Index].Guid, VendorGuid)){
+    if (CompareGuid (mVarCheckVariableWithWildcardName[Index].Guid, VendorGuid)) {
       if (WildcardMatch) {
         if ((StrLen (VariableName) == StrLen (mVarCheckVariableWithWildcardName[Index].Name)) &&
             (StrnCmp (VariableName, mVarCheckVariableWithWildcardName[Index].Name, NameLength) == 0) &&
             VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength]) &&
             VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 1]) &&
             VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 2]) &&
-            VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 3])) {
+            VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 3]))
+        {
           return &mVarCheckVariableWithWildcardName[Index].VariableProperty;
         }
       }
+
       if (StrCmp (mVarCheckVariableWithWildcardName[Index].Name, VariableName) == 0) {
-        return  &mVarCheckVariableWithWildcardName[Index].VariableProperty;
+        return &mVarCheckVariableWithWildcardName[Index].VariableProperty;
       }
     }
   }
@@ -176,8 +178,8 @@ VariablePropertyGetFunction (
   CHAR16                    *VariableName;
 
   for (Index = 0; Index < mNumberOfVarCheckVariable; Index++) {
-    Entry = (VAR_CHECK_VARIABLE_ENTRY *) mVarCheckVariableTable[Index];
-    VariableName = (CHAR16 *) ((UINTN) Entry + sizeof (*Entry));
+    Entry = (VAR_CHECK_VARIABLE_ENTRY *)mVarCheckVariableTable[Index];
+    VariableName = (CHAR16 *)((UINTN)Entry + sizeof (*Entry));
     if (CompareGuid (&Entry->Guid, Guid) && (StrCmp (VariableName, Name) == 0)) {
       return &Entry->VariableProperty;
     }
@@ -206,7 +208,7 @@ VarCheckAddTableEntry (
   IN UINTN          Entry
   )
 {
-  UINTN     *TempTable;
+  UINTN  *TempTable;
 
   //
   // Check whether the table is enough to store new entry.
@@ -263,7 +265,7 @@ VarCheckLibRegisterEndOfDxeCallback (
   IN VAR_CHECK_END_OF_DXE_CALLBACK  Callback
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if (Callback == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -274,11 +276,11 @@ VarCheckLibRegisterEndOfDxeCallback (
   }
 
   Status = VarCheckAddTableEntry (
-           (UINTN **) &mVarCheckLibEndOfDxeCallback,
-           &mVarCheckLibEndOfDxeCallbackMaxCount,
-           &mVarCheckLibEndOfDxeCallbackCount,
-           (UINTN) Callback
-           );
+             (UINTN **)&mVarCheckLibEndOfDxeCallback,
+             &mVarCheckLibEndOfDxeCallbackMaxCount,
+             &mVarCheckLibEndOfDxeCallbackCount,
+             (UINTN)Callback
+             );
 
   DEBUG ((DEBUG_INFO, "VarCheckLibRegisterEndOfDxeCallback - 0x%x %r\n", Callback, Status));
 
@@ -303,23 +305,24 @@ VarCheckLibInitializeAtEndOfDxe (
   IN OUT UINTN                  *AddressPointerCount OPTIONAL
   )
 {
-  VOID                          *TempTable;
-  UINTN                         TotalCount;
-  UINTN                         Index;
+  VOID   *TempTable;
+  UINTN  TotalCount;
+  UINTN  Index;
 
   for (Index = 0; Index < mVarCheckLibEndOfDxeCallbackCount; Index++) {
     //
     // Invoke the callback registered by VarCheckLibRegisterEndOfDxeCallback().
     //
-    mVarCheckLibEndOfDxeCallback[Index] ();
+    mVarCheckLibEndOfDxeCallback[Index]();
   }
+
   if (mVarCheckLibEndOfDxeCallback != NULL) {
     //
     // Free the callback buffer.
     //
-    mVarCheckLibEndOfDxeCallbackCount = 0;
+    mVarCheckLibEndOfDxeCallbackCount    = 0;
     mVarCheckLibEndOfDxeCallbackMaxCount = 0;
-    FreePool ((VOID *) mVarCheckLibEndOfDxeCallback);
+    FreePool ((VOID *)mVarCheckLibEndOfDxeCallback);
     mVarCheckLibEndOfDxeCallback = NULL;
   }
 
@@ -330,11 +333,12 @@ VarCheckLibInitializeAtEndOfDxe (
       //
       // Free the address pointer buffer.
       //
-      mVarCheckLibAddressPointerCount = 0;
+      mVarCheckLibAddressPointerCount    = 0;
       mVarCheckLibAddressPointerMaxCount = 0;
-      FreePool ((VOID *) mVarCheckLibAddressPointer);
+      FreePool ((VOID *)mVarCheckLibAddressPointer);
       mVarCheckLibAddressPointer = NULL;
     }
+
     return NULL;
   }
 
@@ -343,29 +347,29 @@ VarCheckLibInitializeAtEndOfDxe (
   // Also cover VarCheckHandler and the entries, and VarCheckVariable and the entries.
   //
   TotalCount = mVarCheckLibAddressPointerCount + (mNumberOfVarCheckHandler + 1) + (mNumberOfVarCheckVariable + 1);
-  TempTable = ReallocateRuntimePool (
-                mVarCheckLibAddressPointerMaxCount * sizeof (VOID **),
-                TotalCount * sizeof (VOID **),
-                (VOID *) mVarCheckLibAddressPointer
-                );
+  TempTable  = ReallocateRuntimePool (
+                 mVarCheckLibAddressPointerMaxCount * sizeof (VOID **),
+                 TotalCount * sizeof (VOID **),
+                 (VOID *)mVarCheckLibAddressPointer
+                 );
 
   if (TempTable != NULL) {
-    mVarCheckLibAddressPointer = (VOID ***) TempTable;
+    mVarCheckLibAddressPointer = (VOID ***)TempTable;
 
     //
     // Cover VarCheckHandler and the entries.
     //
-    mVarCheckLibAddressPointer[mVarCheckLibAddressPointerCount++] = (VOID **) &mVarCheckHandlerTable;
+    mVarCheckLibAddressPointer[mVarCheckLibAddressPointerCount++] = (VOID **)&mVarCheckHandlerTable;
     for (Index = 0; Index < mNumberOfVarCheckHandler; Index++) {
-      mVarCheckLibAddressPointer[mVarCheckLibAddressPointerCount++] = (VOID **) &mVarCheckHandlerTable[Index];
+      mVarCheckLibAddressPointer[mVarCheckLibAddressPointerCount++] = (VOID **)&mVarCheckHandlerTable[Index];
     }
 
     //
     // Cover VarCheckVariable and the entries.
     //
-    mVarCheckLibAddressPointer[mVarCheckLibAddressPointerCount++] = (VOID **) &mVarCheckVariableTable;
+    mVarCheckLibAddressPointer[mVarCheckLibAddressPointerCount++] = (VOID **)&mVarCheckVariableTable;
     for (Index = 0; Index < mNumberOfVarCheckVariable; Index++) {
-      mVarCheckLibAddressPointer[mVarCheckLibAddressPointerCount++] = (VOID **) &mVarCheckVariableTable[Index];
+      mVarCheckLibAddressPointer[mVarCheckLibAddressPointerCount++] = (VOID **)&mVarCheckVariableTable[Index];
     }
 
     ASSERT (mVarCheckLibAddressPointerCount == TotalCount);
@@ -395,7 +399,7 @@ VarCheckLibRegisterAddressPointer (
   IN VOID                       **AddressPointer
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if (AddressPointer == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -405,12 +409,12 @@ VarCheckLibRegisterAddressPointer (
     return EFI_ACCESS_DENIED;
   }
 
-  Status = VarCheckAddTableEntry(
-           (UINTN **) &mVarCheckLibAddressPointer,
-           &mVarCheckLibAddressPointerMaxCount,
-           &mVarCheckLibAddressPointerCount,
-           (UINTN) AddressPointer
-           );
+  Status = VarCheckAddTableEntry (
+             (UINTN **)&mVarCheckLibAddressPointer,
+             &mVarCheckLibAddressPointerMaxCount,
+             &mVarCheckLibAddressPointerCount,
+             (UINTN)AddressPointer
+             );
 
   DEBUG ((DEBUG_INFO, "VarCheckLibRegisterAddressPointer - 0x%x %r\n", AddressPointer, Status));
 
@@ -437,7 +441,7 @@ VarCheckLibRegisterSetVariableCheckHandler (
   IN VAR_CHECK_SET_VARIABLE_CHECK_HANDLER   Handler
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if (Handler == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -447,12 +451,12 @@ VarCheckLibRegisterSetVariableCheckHandler (
     return EFI_ACCESS_DENIED;
   }
 
-  Status =  VarCheckAddTableEntry(
-             (UINTN **) &mVarCheckHandlerTable,
-             &mMaxNumberOfVarCheckHandler,
-             &mNumberOfVarCheckHandler,
-             (UINTN) Handler
-             );
+  Status =  VarCheckAddTableEntry (
+              (UINTN **)&mVarCheckHandlerTable,
+              &mMaxNumberOfVarCheckHandler,
+              &mNumberOfVarCheckHandler,
+              (UINTN)Handler
+              );
 
   DEBUG ((DEBUG_INFO, "VarCheckLibRegisterSetVariableCheckHandler - 0x%x %r\n", Handler, Status));
 
@@ -482,12 +486,12 @@ VarCheckLibVariablePropertySet (
   IN VAR_CHECK_VARIABLE_PROPERTY    *VariableProperty
   )
 {
-  EFI_STATUS                    Status;
-  VAR_CHECK_VARIABLE_ENTRY      *Entry;
-  CHAR16                        *VariableName;
-  VAR_CHECK_VARIABLE_PROPERTY   *Property;
+  EFI_STATUS                   Status;
+  VAR_CHECK_VARIABLE_ENTRY     *Entry;
+  CHAR16                       *VariableName;
+  VAR_CHECK_VARIABLE_PROPERTY  *Property;
 
-  if (Name == NULL || Name[0] == 0 || Guid == NULL) {
+  if ((Name == NULL) || (Name[0] == 0) || (Guid == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -516,16 +520,17 @@ VarCheckLibVariablePropertySet (
     if (Entry == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    VariableName = (CHAR16 *) ((UINTN) Entry + sizeof (*Entry));
+
+    VariableName = (CHAR16 *)((UINTN)Entry + sizeof (*Entry));
     StrCpyS (VariableName, StrSize (Name)/sizeof (CHAR16), Name);
     CopyGuid (&Entry->Guid, Guid);
     CopyMem (&Entry->VariableProperty, VariableProperty, sizeof (*VariableProperty));
 
-    Status = VarCheckAddTableEntry(
-               (UINTN **) &mVarCheckVariableTable,
+    Status = VarCheckAddTableEntry (
+               (UINTN **)&mVarCheckVariableTable,
                &mMaxNumberOfVarCheckVariable,
                &mNumberOfVarCheckVariable,
-               (UINTN) Entry
+               (UINTN)Entry
                );
 
     if (EFI_ERROR (Status)) {
@@ -556,9 +561,9 @@ VarCheckLibVariablePropertyGet (
   OUT VAR_CHECK_VARIABLE_PROPERTY   *VariableProperty
   )
 {
-  VAR_CHECK_VARIABLE_PROPERTY   *Property;
+  VAR_CHECK_VARIABLE_PROPERTY  *Property;
 
-  if (Name == NULL || Name[0] == 0 || Guid == NULL) {
+  if ((Name == NULL) || (Name[0] == 0) || (Guid == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -608,9 +613,9 @@ VarCheckLibSetVariableCheck (
   IN VAR_CHECK_REQUEST_SOURCE   RequestSource
   )
 {
-  EFI_STATUS                    Status;
-  UINTN                         Index;
-  VAR_CHECK_VARIABLE_PROPERTY   *Property;
+  EFI_STATUS                   Status;
+  UINTN                        Index;
+  VAR_CHECK_VARIABLE_PROPERTY  *Property;
 
   if (!mVarCheckLibEndOfDxe) {
     //
@@ -630,6 +635,7 @@ VarCheckLibSetVariableCheck (
       DEBUG ((DEBUG_INFO, "Variable Check ReadOnly variable fail %r - %g:%s\n", EFI_WRITE_PROTECTED, VendorGuid, VariableName));
       return EFI_WRITE_PROTECTED;
     }
+
     if (!((((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) && (DataSize == 0)) || (Attributes == 0))) {
       //
       // Not to delete variable.
@@ -638,6 +644,7 @@ VarCheckLibSetVariableCheck (
         DEBUG ((DEBUG_INFO, "Variable Check Attributes(0x%08x to 0x%08x) fail %r - %g:%s\n", Property->Attributes, Attributes, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
         return EFI_INVALID_PARAMETER;
       }
+
       if (DataSize != 0) {
         if ((DataSize < Property->MinSize) || (DataSize > Property->MaxSize)) {
           DEBUG ((DEBUG_INFO, "Variable Check DataSize fail(0x%x not in 0x%x - 0x%x) %r - %g:%s\n", DataSize, Property->MinSize, Property->MaxSize, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
@@ -648,24 +655,26 @@ VarCheckLibSetVariableCheck (
   }
 
   for (Index = 0; Index < mNumberOfVarCheckHandler; Index++) {
-    Status = mVarCheckHandlerTable[Index] (
-               VariableName,
-               VendorGuid,
-               Attributes,
-               DataSize,
-               Data
-               );
-    if (Status == EFI_WRITE_PROTECTED && RequestSource == VarCheckFromTrusted) {
+    Status = mVarCheckHandlerTable[Index](
+                                          VariableName,
+                                          VendorGuid,
+                                          Attributes,
+                                          DataSize,
+                                          Data
+                                          );
+    if ((Status == EFI_WRITE_PROTECTED) && (RequestSource == VarCheckFromTrusted)) {
       //
       // If RequestSource is trusted, then allow variable to be set even if it
       // is write protected.
       //
       continue;
     }
+
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_INFO, "Variable Check handler fail %r - %g:%s\n", Status, VendorGuid, VariableName));
       return Status;
     }
   }
+
   return EFI_SUCCESS;
 }

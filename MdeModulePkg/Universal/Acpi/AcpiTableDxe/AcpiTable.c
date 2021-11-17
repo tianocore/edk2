@@ -14,8 +14,8 @@
 //
 // Handle to install ACPI Table Protocol
 //
-EFI_HANDLE    mHandle = NULL;
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE   *mPrivateData = NULL;
+EFI_HANDLE                                             mHandle = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE  *mPrivateData = NULL;
 
 /**
   Entry point of the ACPI table driver.
@@ -37,8 +37,8 @@ InitializeAcpiTableDxe (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  EFI_STATUS                Status;
-  EFI_ACPI_TABLE_INSTANCE   *PrivateData;
+  EFI_STATUS               Status;
+  EFI_ACPI_TABLE_INSTANCE  *PrivateData;
 
   //
   // Initialize our protocol
@@ -77,8 +77,8 @@ InitializeAcpiTableDxe (
                     NULL
                     );
   }
+
   ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
-

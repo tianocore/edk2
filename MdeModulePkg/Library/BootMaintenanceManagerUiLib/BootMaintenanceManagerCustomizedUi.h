@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __CUSTOMIZED_UI_H__
 #define __CUSTOMIZED_UI_H__
 
-
 /**
   Customize menus in the page.
 

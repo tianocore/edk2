@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Ehci.h"
 
 /**
@@ -57,7 +56,6 @@ EhcDumpStatus (
   DEBUG ((DEBUG_VERBOSE, "\n"));
 }
 
-
 /**
   Dump the fields of a QTD.
 
@@ -71,8 +69,8 @@ EhcDumpQtd (
   IN CHAR8                *Msg
   )
 {
-  QTD_HW                  *QtdHw;
-  UINTN                   Index;
+  QTD_HW  *QtdHw;
+  UINTN   Index;
 
   if (Msg != NULL) {
     DEBUG ((DEBUG_VERBOSE, Msg));
@@ -89,13 +87,10 @@ EhcDumpQtd (
 
   if (QtdHw->Pid == QTD_PID_SETUP) {
     DEBUG ((DEBUG_VERBOSE, "PID          : Setup\n"));
-
   } else if (QtdHw->Pid == QTD_PID_INPUT) {
     DEBUG ((DEBUG_VERBOSE, "PID          : IN\n"));
-
   } else if (QtdHw->Pid == QTD_PID_OUTPUT) {
     DEBUG ((DEBUG_VERBOSE, "PID          : OUT\n"));
-
   }
 
   DEBUG ((DEBUG_VERBOSE, "Error Count  : %d\n", QtdHw->ErrCnt));
@@ -108,7 +103,6 @@ EhcDumpQtd (
     DEBUG ((DEBUG_VERBOSE, "Page[%d]      : 0x%x\n", (UINT32)Index, QtdHw->Page[Index]));
   }
 }
-
 
 /**
   Dump the queue head.
@@ -125,17 +119,22 @@ EhcDumpQh (
   IN BOOLEAN              DumpBuf
   )
 {
-  EHC_QTD                 *Qtd;
-  QH_HW                   *QhHw;
-  LIST_ENTRY              *Entry;
-  UINTN                   Index;
+  EHC_QTD     *Qtd;
+  QH_HW       *QhHw;
+  LIST_ENTRY  *Entry;
+  UINTN       Index;
 
   if (Msg != NULL) {
     DEBUG ((DEBUG_VERBOSE, Msg));
   }
 
-  DEBUG ((DEBUG_VERBOSE, "Queue head @ 0x%p, interval %ld, next qh %p\n",
-                                Qh, (UINT64)Qh->Interval, Qh->NextQh));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "Queue head @ 0x%p, interval %ld, next qh %p\n",
+    Qh,
+    (UINT64)Qh->Interval,
+    Qh->NextQh
+    ));
 
   QhHw = &Qh->QhHw;
 
@@ -166,10 +165,8 @@ EhcDumpQh (
 
   if (QhHw->Pid == QTD_PID_SETUP) {
     DEBUG ((DEBUG_VERBOSE, "PID           : Setup\n"));
-
   } else if (QhHw->Pid == QTD_PID_INPUT) {
     DEBUG ((DEBUG_VERBOSE, "PID           : IN\n"));
-
   } else if (QhHw->Pid == QTD_PID_OUTPUT) {
     DEBUG ((DEBUG_VERBOSE, "PID           : OUT\n"));
   }
@@ -196,7 +193,6 @@ EhcDumpQh (
   }
 }
 
-
 /**
   Dump the buffer in the form of hex.
 
@@ -210,11 +206,11 @@ EhcDumpBuf (
   IN UINTN                Len
   )
 {
-  UINTN                   Index;
+  UINTN  Index;
 
   for (Index = 0; Index < Len; Index++) {
     if (Index % 16 == 0) {
-      DEBUG ((DEBUG_VERBOSE,"\n"));
+      DEBUG ((DEBUG_VERBOSE, "\n"));
     }
 
     DEBUG ((DEBUG_VERBOSE, "%02x ", Buf[Index]));

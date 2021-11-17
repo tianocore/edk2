@@ -7,12 +7,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include <Uefi.h>
 
-
 #include <Library/UefiLib.h>
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -60,7 +57,6 @@ UsbBusComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -140,7 +136,6 @@ UsbBusComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   );
 
-
 //
 // EFI Component Name Protocol
 //
@@ -153,16 +148,15 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  mUsbBusComponentName 
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL mUsbBusComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) UsbBusComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) UsbBusComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  mUsbBusComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)UsbBusComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)UsbBusComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUsbBusDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mUsbBusDriverNameTable[] = {
   { "eng;en", L"Usb Bus Driver" },
-  { NULL , NULL }
+  { NULL,     NULL              }
 };
 
 /**

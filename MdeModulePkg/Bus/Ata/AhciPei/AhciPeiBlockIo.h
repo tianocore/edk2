@@ -14,7 +14,7 @@
 //
 // ATA hard disk device for EFI_PEI_BLOCK_DEVICE_TYPE
 //
-#define EDKII_PEI_BLOCK_DEVICE_TYPE_ATA_HARD_DISK     8
+#define EDKII_PEI_BLOCK_DEVICE_TYPE_ATA_HARD_DISK  8
 
 /**
   Gets the count of block I/O devices that one specific block driver detects.

@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// This default instance of EFI_PEI_PCI_CFG2_PPI install assigned to EFI_PEI_SERVICE.PciCfg
 /// when PeiCore's initialization.
 ///
-EFI_PEI_PCI_CFG2_PPI gPeiDefaultPciCfg2Ppi = {
+EFI_PEI_PCI_CFG2_PPI  gPeiDefaultPciCfg2Ppi = {
   PeiDefaultPciCfg2Read,
   PeiDefaultPciCfg2Write,
   PeiDefaultPciCfg2Modify

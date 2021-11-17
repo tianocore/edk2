@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Uhci.h"
 
-
 /**
   Read a UHCI register.
 
@@ -29,13 +28,13 @@ UhciReadReg (
   EFI_STATUS  Status;
 
   Status = PciIo->Io.Read (
-                      PciIo,
-                      EfiPciIoWidthUint16,
-                      USB_BAR_INDEX,
-                      Offset,
-                      1,
-                      &Data
-                      );
+                       PciIo,
+                       EfiPciIoWidthUint16,
+                       USB_BAR_INDEX,
+                       Offset,
+                       1,
+                       &Data
+                       );
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "UhciReadReg: PciIo Io.Read error: %r at offset %d\n", Status, Offset));
@@ -45,7 +44,6 @@ UhciReadReg (
 
   return Data;
 }
-
 
 /**
   Write data to UHCI register.
@@ -65,19 +63,18 @@ UhciWriteReg (
   EFI_STATUS  Status;
 
   Status = PciIo->Io.Write (
-                      PciIo,
-                      EfiPciIoWidthUint16,
-                      USB_BAR_INDEX,
-                      Offset,
-                      1,
-                      &Data
-                      );
+                       PciIo,
+                       EfiPciIoWidthUint16,
+                       USB_BAR_INDEX,
+                       Offset,
+                       1,
+                       &Data
+                       );
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "UhciWriteReg: PciIo Io.Write error: %r at offset %d\n", Status, Offset));
   }
 }
-
 
 /**
   Set a bit of the UHCI Register.
@@ -97,10 +94,9 @@ UhciSetRegBit (
   UINT16  Data;
 
   Data = UhciReadReg (PciIo, Offset);
-  Data = (UINT16) (Data |Bit);
+  Data = (UINT16)(Data |Bit);
   UhciWriteReg (PciIo, Offset, Data);
 }
-
 
 /**
   Clear a bit of the UHCI Register.
@@ -120,10 +116,9 @@ UhciClearRegBit (
   UINT16  Data;
 
   Data = UhciReadReg (PciIo, Offset);
-  Data = (UINT16) (Data & ~Bit);
+  Data = (UINT16)(Data & ~Bit);
   UhciWriteReg (PciIo, Offset, Data);
 }
-
 
 /**
   Clear all the interrutp status bits, these bits
@@ -149,7 +144,6 @@ UhciAckAllInterrupt (
   }
 }
 
-
 /**
   Stop the host controller.
 
@@ -166,8 +160,8 @@ UhciStopHc (
   IN UINTN             Timeout
   )
 {
-  UINT16                UsbSts;
-  UINTN                 Index;
+  UINT16  UsbSts;
+  UINTN   Index;
 
   UhciClearRegBit (Uhc->PciIo, USBCMD_OFFSET, USBCMD_RS);
 
@@ -188,7 +182,6 @@ UhciStopHc (
   return EFI_TIMEOUT;
 }
 
-
 /**
   Check whether the host controller operates well.
 
@@ -203,7 +196,7 @@ UhciIsHcWorking (
   IN EFI_PCI_IO_PROTOCOL     *PciIo
   )
 {
-  UINT16                UsbSts;
+  UINT16  UsbSts;
 
   UsbSts = UhciReadReg (PciIo, USBSTS_OFFSET);
 
@@ -214,7 +207,6 @@ UhciIsHcWorking (
 
   return TRUE;
 }
-
 
 /**
   Set the UHCI frame list base address. It can't use
@@ -230,16 +222,16 @@ UhciSetFrameListBaseAddr (
   IN VOID                    *Addr
   )
 {
-  EFI_STATUS              Status;
-  UINT32                  Data;
+  EFI_STATUS  Status;
+  UINT32      Data;
 
-  Data = (UINT32) ((UINTN) Addr & 0xFFFFF000);
+  Data = (UINT32)((UINTN)Addr & 0xFFFFF000);
 
   Status = PciIo->Io.Write (
                        PciIo,
                        EfiPciIoWidthUint32,
                        USB_BAR_INDEX,
-                       (UINT64) USB_FRAME_BASE_OFFSET,
+                       (UINT64)USB_FRAME_BASE_OFFSET,
                        1,
                        &Data
                        );
@@ -248,7 +240,6 @@ UhciSetFrameListBaseAddr (
     DEBUG ((DEBUG_ERROR, "UhciSetFrameListBaseAddr: PciIo Io.Write error: %r\n", Status));
   }
 }
-
 
 /**
   Disable USB Emulation.
@@ -261,7 +252,7 @@ UhciTurnOffUsbEmulation (
   IN EFI_PCI_IO_PROTOCOL     *PciIo
   )
 {
-  UINT16            Command;
+  UINT16  Command;
 
   Command = 0;
 

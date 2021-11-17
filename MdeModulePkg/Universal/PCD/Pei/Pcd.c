@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// Instance of PCD_PPI protocol is EDKII native implementation.
 /// This protocol instance support dynamic and dynamicEx type PCDs.
 ///
-PCD_PPI mPcdPpiInstance = {
+PCD_PPI  mPcdPpiInstance = {
   PeiPcdSetSku,
 
   PeiPcdGet8,
@@ -72,8 +72,8 @@ EFI_PEI_PCD_PPI  mEfiPcdPpiInstance = {
   PeiPcdSet64Ex,
   PeiPcdSetPtrEx,
   PeiPcdSetBoolEx,
-  (EFI_PEI_PCD_PPI_CALLBACK_ON_SET) PeiRegisterCallBackOnSet,
-  (EFI_PEI_PCD_PPI_CANCEL_CALLBACK) PcdUnRegisterCallBackOnSet,
+  (EFI_PEI_PCD_PPI_CALLBACK_ON_SET)PeiRegisterCallBackOnSet,
+  (EFI_PEI_PCD_PPI_CANCEL_CALLBACK)PcdUnRegisterCallBackOnSet,
   PeiPcdGetNextToken,
   PeiPcdGetNextTokenSpace
 };
@@ -82,7 +82,7 @@ EFI_PEI_PCD_PPI  mEfiPcdPpiInstance = {
 /// Instance of GET_PCD_INFO_PPI protocol is EDKII native implementation.
 /// This protocol instance support dynamic and dynamicEx type PCDs.
 ///
-GET_PCD_INFO_PPI mGetPcdInfoInstance = {
+GET_PCD_INFO_PPI  mGetPcdInfoInstance = {
   PeiGetPcdInfoGetInfo,
   PeiGetPcdInfoGetInfoEx,
   PeiGetPcdInfoGetSku
@@ -144,79 +144,85 @@ PcdSetNvStoreDefaultIdCallBack (
   IN       UINTN            TokenDataSize
   )
 {
-  EFI_STATUS Status;
-  UINT16     DefaultId;
-  SKU_ID     SkuId;
-  UINTN      FullSize;
-  UINTN      Index;
-  UINT8      *DataBuffer;
-  UINT8      *VarStoreHobData;
-  UINT8      *BufferEnd;
-  BOOLEAN    IsFound;
-  VARIABLE_STORE_HEADER *NvStoreBuffer;
-  PCD_DEFAULT_DATA      *DataHeader;
-  PCD_DEFAULT_INFO      *DefaultInfo;
-  PCD_DATA_DELTA        *DeltaData;
+  EFI_STATUS             Status;
+  UINT16                 DefaultId;
+  SKU_ID                 SkuId;
+  UINTN                  FullSize;
+  UINTN                  Index;
+  UINT8                  *DataBuffer;
+  UINT8                  *VarStoreHobData;
+  UINT8                  *BufferEnd;
+  BOOLEAN                IsFound;
+  VARIABLE_STORE_HEADER  *NvStoreBuffer;
+  PCD_DEFAULT_DATA       *DataHeader;
+  PCD_DEFAULT_INFO       *DefaultInfo;
+  PCD_DATA_DELTA         *DeltaData;
 
-  DefaultId = *(UINT16 *) TokenData;
-  SkuId     = GetPcdDatabase()->SystemSkuId;
+  DefaultId = *(UINT16 *)TokenData;
+  SkuId     = GetPcdDatabase ()->SystemSkuId;
   IsFound   = FALSE;
 
   if (PeiPcdGetSizeEx (&gEfiMdeModulePkgTokenSpaceGuid, PcdToken (PcdNvStoreDefaultValueBuffer)) > sizeof (PCD_NV_STORE_DEFAULT_BUFFER_HEADER)) {
-    DataBuffer = (UINT8 *) PeiPcdGetPtrEx (&gEfiMdeModulePkgTokenSpaceGuid, PcdToken (PcdNvStoreDefaultValueBuffer));
-    FullSize   = ((PCD_NV_STORE_DEFAULT_BUFFER_HEADER *) DataBuffer)->Length;
-    DataHeader = (PCD_DEFAULT_DATA *) (DataBuffer + sizeof (PCD_NV_STORE_DEFAULT_BUFFER_HEADER));
+    DataBuffer = (UINT8 *)PeiPcdGetPtrEx (&gEfiMdeModulePkgTokenSpaceGuid, PcdToken (PcdNvStoreDefaultValueBuffer));
+    FullSize   = ((PCD_NV_STORE_DEFAULT_BUFFER_HEADER *)DataBuffer)->Length;
+    DataHeader = (PCD_DEFAULT_DATA *)(DataBuffer + sizeof (PCD_NV_STORE_DEFAULT_BUFFER_HEADER));
     //
     // The first section data includes NV storage default setting.
     //
-    NvStoreBuffer   = (VARIABLE_STORE_HEADER *) ((UINT8 *) DataHeader + sizeof (DataHeader->DataSize) + DataHeader->HeaderSize);
-    VarStoreHobData = (UINT8 *) BuildGuidHob (&NvStoreBuffer->Signature, NvStoreBuffer->Size);
+    NvStoreBuffer   = (VARIABLE_STORE_HEADER *)((UINT8 *)DataHeader + sizeof (DataHeader->DataSize) + DataHeader->HeaderSize);
+    VarStoreHobData = (UINT8 *)BuildGuidHob (&NvStoreBuffer->Signature, NvStoreBuffer->Size);
     ASSERT (VarStoreHobData != NULL);
     CopyMem (VarStoreHobData, NvStoreBuffer, NvStoreBuffer->Size);
     //
     // Find the matched SkuId and DefaultId in the first section
     //
-    DefaultInfo    = &(DataHeader->DefaultInfo[0]);
-    BufferEnd      = (UINT8 *) DataHeader + sizeof (DataHeader->DataSize) + DataHeader->HeaderSize;
-    while ((UINT8 *) DefaultInfo < BufferEnd) {
-      if (DefaultInfo->DefaultId == DefaultId && DefaultInfo->SkuId == SkuId) {
+    DefaultInfo = &(DataHeader->DefaultInfo[0]);
+    BufferEnd   = (UINT8 *)DataHeader + sizeof (DataHeader->DataSize) + DataHeader->HeaderSize;
+    while ((UINT8 *)DefaultInfo < BufferEnd) {
+      if ((DefaultInfo->DefaultId == DefaultId) && (DefaultInfo->SkuId == SkuId)) {
         IsFound = TRUE;
         break;
       }
-      DefaultInfo ++;
+
+      DefaultInfo++;
     }
+
     //
     // Find the matched SkuId and DefaultId in the remaining section
     //
-    Index      = sizeof (PCD_NV_STORE_DEFAULT_BUFFER_HEADER) + ((DataHeader->DataSize + 7) & (~7));
-    DataHeader = (PCD_DEFAULT_DATA *) (DataBuffer + Index);
+    Index = sizeof (PCD_NV_STORE_DEFAULT_BUFFER_HEADER) + ((DataHeader->DataSize + 7) & (~7));
+    DataHeader = (PCD_DEFAULT_DATA *)(DataBuffer + Index);
     while (!IsFound && Index < FullSize && DataHeader->DataSize != 0xFFFFFFFF) {
       DefaultInfo = &(DataHeader->DefaultInfo[0]);
-      BufferEnd   = (UINT8 *) DataHeader + sizeof (DataHeader->DataSize) + DataHeader->HeaderSize;
-      while ((UINT8 *) DefaultInfo < BufferEnd) {
-        if (DefaultInfo->DefaultId == DefaultId && DefaultInfo->SkuId == SkuId) {
+      BufferEnd   = (UINT8 *)DataHeader + sizeof (DataHeader->DataSize) + DataHeader->HeaderSize;
+      while ((UINT8 *)DefaultInfo < BufferEnd) {
+        if ((DefaultInfo->DefaultId == DefaultId) && (DefaultInfo->SkuId == SkuId)) {
           IsFound = TRUE;
           break;
         }
-        DefaultInfo ++;
+
+        DefaultInfo++;
       }
+
       if (IsFound) {
-        DeltaData = (PCD_DATA_DELTA *) BufferEnd;
-        BufferEnd = (UINT8 *) DataHeader + DataHeader->DataSize;
-        while ((UINT8 *) DeltaData < BufferEnd) {
-          *(VarStoreHobData + DeltaData->Offset) = (UINT8) DeltaData->Value;
-          DeltaData ++;
+        DeltaData = (PCD_DATA_DELTA *)BufferEnd;
+        BufferEnd = (UINT8 *)DataHeader + DataHeader->DataSize;
+        while ((UINT8 *)DeltaData < BufferEnd) {
+          *(VarStoreHobData + DeltaData->Offset) = (UINT8)DeltaData->Value;
+          DeltaData++;
         }
+
         break;
       }
-      Index      = (Index + DataHeader->DataSize + 7) & (~7) ;
-      DataHeader = (PCD_DEFAULT_DATA *) (DataBuffer + Index);
+
+      Index = (Index + DataHeader->DataSize + 7) & (~7);
+      DataHeader = (PCD_DEFAULT_DATA *)(DataBuffer + Index);
     }
   }
 
   Status = PcdUnRegisterCallBackOnSet (
              &gEfiMdeModulePkgTokenSpaceGuid,
-             PcdToken(PcdSetNvStoreDefaultId),
+             PcdToken (PcdSetNvStoreDefaultId),
              PcdSetNvStoreDefaultIdCallBack
              );
   ASSERT_EFI_ERROR (Status);
@@ -239,17 +245,17 @@ EndOfPeiSignalPpiNotifyCallback (
   IN VOID                       *Ppi
   )
 {
-  PEI_PCD_DATABASE       *Database;
-  EFI_BOOT_MODE          BootMode;
-  EFI_STATUS             Status;
-  UINTN                  Instance;
-  EFI_PEI_FV_HANDLE      VolumeHandle;
-  EFI_PEI_FILE_HANDLE    FileHandle;
-  VOID                   *PcdDb;
-  UINT32                 Length;
-  PEI_PCD_DATABASE       *PeiPcdDb;
+  PEI_PCD_DATABASE     *Database;
+  EFI_BOOT_MODE        BootMode;
+  EFI_STATUS           Status;
+  UINTN                Instance;
+  EFI_PEI_FV_HANDLE    VolumeHandle;
+  EFI_PEI_FILE_HANDLE  FileHandle;
+  VOID                 *PcdDb;
+  UINT32               Length;
+  PEI_PCD_DATABASE     *PeiPcdDb;
 
-  Status = PeiServicesGetBootMode(&BootMode);
+  Status = PeiServicesGetBootMode (&BootMode);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -259,8 +265,8 @@ EndOfPeiSignalPpiNotifyCallback (
     return EFI_SUCCESS;
   }
 
-  PeiPcdDb = GetPcdDatabase();
-  if (PeiPcdDb->SystemSkuId != (SKU_ID) 0) {
+  PeiPcdDb = GetPcdDatabase ();
+  if (PeiPcdDb->SystemSkuId != (SKU_ID)0) {
     //
     // SkuId has been set. Don't need to report it to DXE phase.
     //
@@ -270,8 +276,8 @@ EndOfPeiSignalPpiNotifyCallback (
   //
   // Get full PCD database from PcdPeim FileHandle
   //
-  Instance    = 0;
-  FileHandle  = NULL;
+  Instance   = 0;
+  FileHandle = NULL;
   while (TRUE) {
     //
     // Traverse all firmware volume instances
@@ -286,13 +292,14 @@ EndOfPeiSignalPpiNotifyCallback (
     // Find PcdDb file from the beginning in this firmware volume.
     //
     FileHandle = NULL;
-    Status = PeiServicesFfsFindFileByName (&gEfiCallerIdGuid, VolumeHandle, &FileHandle);
+    Status     = PeiServicesFfsFindFileByName (&gEfiCallerIdGuid, VolumeHandle, &FileHandle);
     if (!EFI_ERROR (Status)) {
       //
       // Find PcdPeim FileHandle in this volume
       //
       break;
     }
+
     //
     // We cannot find PcdPeim in this firmware volume, then search the next volume.
     //
@@ -304,14 +311,14 @@ EndOfPeiSignalPpiNotifyCallback (
   //
   Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb);
   ASSERT_EFI_ERROR (Status);
-  Length = PeiPcdDb->LengthForAllSkus;
+  Length   = PeiPcdDb->LengthForAllSkus;
   Database = BuildGuidHob (&gPcdDataBaseHobGuid, Length);
   CopyMem (Database, PcdDb, Length);
 
   return EFI_SUCCESS;
 }
 
-EFI_PEI_NOTIFY_DESCRIPTOR mEndOfPeiSignalPpiNotifyList[] = {
+EFI_PEI_NOTIFY_DESCRIPTOR  mEndOfPeiSignalPpiNotifyList[] = {
   {
     (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiEndOfPeiSignalPpiGuid,
@@ -337,25 +344,25 @@ PcdPeimInit (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = PeiServicesRegisterForShadow (FileHandle);
   if (Status == EFI_ALREADY_STARTED) {
     //
     // This is now starting in memory, the second time starting.
     //
-    EFI_PEI_PPI_DESCRIPTOR *OldPpiList;
-    EFI_PEI_PPI_DESCRIPTOR *OldPpiList2;
-    VOID *Ppi;
-    VOID *Ppi2;
+    EFI_PEI_PPI_DESCRIPTOR  *OldPpiList;
+    EFI_PEI_PPI_DESCRIPTOR  *OldPpiList2;
+    VOID                    *Ppi;
+    VOID                    *Ppi2;
 
     OldPpiList = NULL;
-    Status = PeiServicesLocatePpi (
-               &gPcdPpiGuid,
-               0,
-               &OldPpiList,
-               &Ppi
-               );
+    Status     = PeiServicesLocatePpi (
+                   &gPcdPpiGuid,
+                   0,
+                   &OldPpiList,
+                   &Ppi
+                   );
     ASSERT_EFI_ERROR (Status);
 
     if (OldPpiList != NULL) {
@@ -378,12 +385,12 @@ PcdPeimInit (
     }
 
     OldPpiList = NULL;
-    Status = PeiServicesLocatePpi (
-               &gEfiPeiPcdPpiGuid,
-               0,
-               &OldPpiList,
-               &Ppi
-               );
+    Status     = PeiServicesLocatePpi (
+                   &gEfiPeiPcdPpiGuid,
+                   0,
+                   &OldPpiList,
+                   &Ppi
+                   );
     ASSERT_EFI_ERROR (Status);
 
     if (OldPpiList != NULL) {
@@ -427,7 +434,7 @@ PcdPeimInit (
 
   Status = PeiRegisterCallBackOnSet (
              &gEfiMdeModulePkgTokenSpaceGuid,
-             PcdToken(PcdSetNvStoreDefaultId),
+             PcdToken (PcdSetNvStoreDefaultId),
              PcdSetNvStoreDefaultIdCallBack
              );
   ASSERT_EFI_ERROR (Status);
@@ -496,7 +503,7 @@ PeiGetPcdInfoGetSku (
   VOID
   )
 {
-  return (UINTN) GetPcdDatabase()->SystemSkuId;
+  return (UINTN)GetPcdDatabase ()->SystemSkuId;
 }
 
 /**
@@ -526,21 +533,21 @@ PeiPcdSetSku (
   IN  UINTN                  SkuId
   )
 {
-  PEI_PCD_DATABASE  *PeiPcdDb;
-  SKU_ID            *SkuIdTable;
-  UINTN             Index;
-  EFI_STATUS            Status;
-  UINTN                 Instance;
-  EFI_PEI_FV_HANDLE     VolumeHandle;
-  EFI_PEI_FILE_HANDLE   FileHandle;
-  VOID                  *PcdDb;
-  UINT32                Length;
-  PCD_DATABASE_SKU_DELTA *SkuDelta;
-  PCD_DATA_DELTA         *SkuDeltaData;
+  PEI_PCD_DATABASE        *PeiPcdDb;
+  SKU_ID                  *SkuIdTable;
+  UINTN                   Index;
+  EFI_STATUS              Status;
+  UINTN                   Instance;
+  EFI_PEI_FV_HANDLE       VolumeHandle;
+  EFI_PEI_FILE_HANDLE     FileHandle;
+  VOID                    *PcdDb;
+  UINT32                  Length;
+  PCD_DATABASE_SKU_DELTA  *SkuDelta;
+  PCD_DATA_DELTA          *SkuDeltaData;
 
-  DEBUG ((DEBUG_INFO, "PcdPei - SkuId 0x%lx is to be set.\n", (SKU_ID) SkuId));
+  DEBUG ((DEBUG_INFO, "PcdPei - SkuId 0x%lx is to be set.\n", (SKU_ID)SkuId));
 
-  PeiPcdDb = GetPcdDatabase();
+  PeiPcdDb = GetPcdDatabase ();
 
   if (SkuId == PeiPcdDb->SystemSkuId) {
     //
@@ -550,19 +557,19 @@ PeiPcdSetSku (
     return;
   }
 
-  if (PeiPcdDb->SystemSkuId != (SKU_ID) 0) {
+  if (PeiPcdDb->SystemSkuId != (SKU_ID)0) {
     DEBUG ((DEBUG_ERROR, "PcdPei - The SKU Id could be changed only once."));
     DEBUG ((
       DEBUG_ERROR,
       "PcdPei - The SKU Id was set to 0x%lx already, it could not be set to 0x%lx any more.",
       PeiPcdDb->SystemSkuId,
-      (SKU_ID) SkuId
+      (SKU_ID)SkuId
       ));
     ASSERT (FALSE);
     return;
   }
 
-  SkuIdTable = (SKU_ID *) ((UINT8 *) PeiPcdDb + PeiPcdDb->SkuIdTableOffset);
+  SkuIdTable = (SKU_ID *)((UINT8 *)PeiPcdDb + PeiPcdDb->SkuIdTableOffset);
   for (Index = 0; Index < SkuIdTable[0]; Index++) {
     if (SkuId == SkuIdTable[Index + 1]) {
       DEBUG ((DEBUG_INFO, "PcdPei - SkuId is found in SkuId table.\n"));
@@ -574,8 +581,8 @@ PeiPcdSetSku (
     //
     // Get full PCD database from PcdPeim FileHandle
     //
-    Instance    = 0;
-    FileHandle  = NULL;
+    Instance   = 0;
+    FileHandle = NULL;
     while (TRUE) {
       //
       // Traverse all firmware volume instances
@@ -590,13 +597,14 @@ PeiPcdSetSku (
       // Find PcdDb file from the beginning in this firmware volume.
       //
       FileHandle = NULL;
-      Status = PeiServicesFfsFindFileByName (&gEfiCallerIdGuid, VolumeHandle, &FileHandle);
+      Status     = PeiServicesFfsFindFileByName (&gEfiCallerIdGuid, VolumeHandle, &FileHandle);
       if (!EFI_ERROR (Status)) {
         //
         // Find PcdPeim FileHandle in this volume
         //
         break;
       }
+
       //
       // We cannot find PcdPeim in this firmware volume, then search the next volume.
       //
@@ -608,28 +616,30 @@ PeiPcdSetSku (
     //
     Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb);
     ASSERT_EFI_ERROR (Status);
-    Length = PeiPcdDb->LengthForAllSkus;
-    Index  = (PeiPcdDb->Length + 7) & (~7);
+    Length   = PeiPcdDb->LengthForAllSkus;
+    Index    = (PeiPcdDb->Length + 7) & (~7);
     SkuDelta = NULL;
     while (Index < Length) {
-      SkuDelta = (PCD_DATABASE_SKU_DELTA *) ((UINT8 *) PcdDb + Index);
-      if (SkuDelta->SkuId == SkuId && SkuDelta->SkuIdCompared == 0) {
+      SkuDelta = (PCD_DATABASE_SKU_DELTA *)((UINT8 *)PcdDb + Index);
+      if ((SkuDelta->SkuId == SkuId) && (SkuDelta->SkuIdCompared == 0)) {
         break;
       }
+
       Index = (Index + SkuDelta->Length + 7) & (~7);
     }
 
     //
     // Patch the delta data into current PCD database
     //
-    if (Index < Length && SkuDelta != NULL) {
-      SkuDeltaData = (PCD_DATA_DELTA *) (SkuDelta + 1);
-      while ((UINT8 *) SkuDeltaData < (UINT8 *) SkuDelta + SkuDelta->Length) {
-        *((UINT8 *) PeiPcdDb + SkuDeltaData->Offset) = (UINT8) SkuDeltaData->Value;
-        SkuDeltaData ++;
+    if ((Index < Length) && (SkuDelta != NULL)) {
+      SkuDeltaData = (PCD_DATA_DELTA *)(SkuDelta + 1);
+      while ((UINT8 *)SkuDeltaData < (UINT8 *)SkuDelta + SkuDelta->Length) {
+        *((UINT8 *)PeiPcdDb + SkuDeltaData->Offset) = (UINT8)SkuDeltaData->Value;
+        SkuDeltaData++;
       }
-      PeiPcdDb->SystemSkuId = (SKU_ID) SkuId;
-      DEBUG ((DEBUG_INFO, "PcdPei - Set current SKU Id to 0x%lx.\n", (SKU_ID) SkuId));
+
+      PeiPcdDb->SystemSkuId = (SKU_ID)SkuId;
+      DEBUG ((DEBUG_INFO, "PcdPei - Set current SKU Id to 0x%lx.\n", (SKU_ID)SkuId));
       return;
     }
   }
@@ -659,7 +669,7 @@ PeiPcdGet8 (
   IN UINTN                    TokenNumber
   )
 {
-  return *((UINT8 *) GetWorker (TokenNumber, sizeof (UINT8)));
+  return *((UINT8 *)GetWorker (TokenNumber, sizeof (UINT8)));
 }
 
 /**
@@ -763,7 +773,7 @@ PeiPcdGetBool (
   IN UINTN                    TokenNumber
   )
 {
-  return *((BOOLEAN *) GetWorker (TokenNumber, sizeof (BOOLEAN)));
+  return *((BOOLEAN *)GetWorker (TokenNumber, sizeof (BOOLEAN)));
 }
 
 /**
@@ -783,12 +793,12 @@ PeiPcdGetSize (
   IN UINTN                    TokenNumber
   )
 {
-  PEI_PCD_DATABASE    *PeiPcdDb;
-  UINTN               Size;
-  UINTN               MaxSize;
-  UINT32              LocalTokenCount;
+  PEI_PCD_DATABASE  *PeiPcdDb;
+  UINTN             Size;
+  UINTN             MaxSize;
+  UINT32            LocalTokenCount;
 
-  PeiPcdDb        = GetPcdDatabase ();
+  PeiPcdDb = GetPcdDatabase ();
   LocalTokenCount = PeiPcdDb->LocalTokenCount;
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -812,7 +822,6 @@ PeiPcdGetSize (
   } else {
     return Size;
   }
-
 }
 
 /**
@@ -836,7 +845,7 @@ PeiPcdGet8Ex (
   IN UINTN                      ExTokenNumber
   )
 {
-  return *((UINT8 *) ExGetWorker (Guid, ExTokenNumber, sizeof (UINT8)));
+  return *((UINT8 *)ExGetWorker (Guid, ExTokenNumber, sizeof (UINT8)));
 }
 
 /**
@@ -956,7 +965,7 @@ PeiPcdGetBoolEx (
   IN UINTN                        ExTokenNumber
   )
 {
-  return *((BOOLEAN *) ExGetWorker (Guid, ExTokenNumber, sizeof (BOOLEAN)));
+  return *((BOOLEAN *)ExGetWorker (Guid, ExTokenNumber, sizeof (BOOLEAN)));
 }
 
 /**
@@ -1347,7 +1356,7 @@ PeiRegisterCallBackOnSet (
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
 {
-  if (!FeaturePcdGet(PcdPeiFullPcdDatabaseEnable)) {
+  if (!FeaturePcdGet (PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1378,7 +1387,7 @@ PcdUnRegisterCallBackOnSet (
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
 {
-  if (!FeaturePcdGet(PcdPeiFullPcdDatabaseEnable)) {
+  if (!FeaturePcdGet (PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1421,45 +1430,48 @@ PeiPcdGetNextToken (
   IN OUT  UINTN                   *TokenNumber
   )
 {
-  UINTN               GuidTableIdx;
-  PEI_PCD_DATABASE    *PeiPcdDb;
-  EFI_GUID            *MatchGuid;
-  EFI_GUID            *GuidTable;
-  DYNAMICEX_MAPPING   *ExMapTable;
-  UINTN               Index;
-  BOOLEAN             Found;
-  BOOLEAN             PeiExMapTableEmpty;
-  UINTN               PeiNexTokenNumber;
+  UINTN              GuidTableIdx;
+  PEI_PCD_DATABASE   *PeiPcdDb;
+  EFI_GUID           *MatchGuid;
+  EFI_GUID           *GuidTable;
+  DYNAMICEX_MAPPING  *ExMapTable;
+  UINTN              Index;
+  BOOLEAN            Found;
+  BOOLEAN            PeiExMapTableEmpty;
+  UINTN              PeiNexTokenNumber;
 
   if (!FeaturePcdGet (PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
   }
 
-  PeiPcdDb          = GetPcdDatabase ();
+  PeiPcdDb = GetPcdDatabase ();
   PeiNexTokenNumber = PeiPcdDb->LocalTokenCount - PeiPcdDb->ExTokenCount;
-  GuidTable         = (EFI_GUID *)((UINT8 *)PeiPcdDb + PeiPcdDb->GuidTableOffset);
+  GuidTable = (EFI_GUID *)((UINT8 *)PeiPcdDb + PeiPcdDb->GuidTableOffset);
 
   if (PeiPcdDb->ExTokenCount == 0) {
     PeiExMapTableEmpty = TRUE;
   } else {
     PeiExMapTableEmpty = FALSE;
   }
+
   if (Guid == NULL) {
     if (*TokenNumber > PeiNexTokenNumber) {
       return EFI_NOT_FOUND;
     }
+
     (*TokenNumber)++;
     if (*TokenNumber > PeiNexTokenNumber) {
       *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
       return EFI_NOT_FOUND;
     }
+
     return EFI_SUCCESS;
   } else {
     if (PeiExMapTableEmpty) {
       return EFI_NOT_FOUND;
     }
 
-    MatchGuid = ScanGuid (GuidTable, PeiPcdDb->GuidTableCount * sizeof(EFI_GUID), Guid);
+    MatchGuid = ScanGuid (GuidTable, PeiPcdDb->GuidTableCount * sizeof (EFI_GUID), Guid);
 
     if (MatchGuid == NULL) {
       return EFI_NOT_FOUND;
@@ -1487,7 +1499,7 @@ PeiPcdGetNextToken (
       //
       if (*TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
         *TokenNumber = ExMapTable[Index].ExTokenNumber;
-         return EFI_SUCCESS;
+        return EFI_SUCCESS;
       }
 
       for ( ; Index < PeiPcdDb->ExTokenCount; Index++) {
@@ -1540,15 +1552,15 @@ PeiPcdGetNextTokenSpace (
   IN OUT CONST EFI_GUID          **Guid
   )
 {
-  UINTN               GuidTableIdx;
-  EFI_GUID            *MatchGuid;
-  PEI_PCD_DATABASE    *PeiPcdDb;
-  DYNAMICEX_MAPPING   *ExMapTable;
-  UINTN               Index;
-  UINTN               Index2;
-  BOOLEAN             Found;
-  BOOLEAN             PeiExMapTableEmpty;
-  EFI_GUID            *GuidTable;
+  UINTN              GuidTableIdx;
+  EFI_GUID           *MatchGuid;
+  PEI_PCD_DATABASE   *PeiPcdDb;
+  DYNAMICEX_MAPPING  *ExMapTable;
+  UINTN              Index;
+  UINTN              Index2;
+  BOOLEAN            Found;
+  BOOLEAN            PeiExMapTableEmpty;
+  EFI_GUID           *GuidTable;
 
   if (!FeaturePcdGet (PcdPeiFullPcdDatabaseEnable)) {
     return EFI_UNSUPPORTED;
@@ -1579,7 +1591,7 @@ PeiPcdGetNextTokenSpace (
     return EFI_SUCCESS;
   }
 
-  MatchGuid = ScanGuid (GuidTable, PeiPcdDb->GuidTableCount * sizeof(GuidTable[0]), *Guid);
+  MatchGuid = ScanGuid (GuidTable, PeiPcdDb->GuidTableCount * sizeof (GuidTable[0]), *Guid);
 
   if (MatchGuid == NULL) {
     return EFI_NOT_FOUND;
@@ -1600,7 +1612,7 @@ PeiPcdGetNextTokenSpace (
     for ( ; Index < PeiPcdDb->ExTokenCount; Index++ ) {
       if (ExMapTable[Index].ExGuidIndex != GuidTableIdx) {
         Found = FALSE;
-        for (Index2 = 0 ; Index2 < Index; Index2++) {
+        for (Index2 = 0; Index2 < Index; Index2++) {
           if (ExMapTable[Index2].ExGuidIndex == ExMapTable[Index].ExGuidIndex) {
             //
             // This token namespace should have been found and output at preceding getting.
@@ -1609,17 +1621,18 @@ PeiPcdGetNextTokenSpace (
             break;
           }
         }
+
         if (!Found) {
           *Guid = (EFI_GUID *)((UINT8 *)PeiPcdDb + PeiPcdDb->GuidTableOffset) + ExMapTable[Index].ExGuidIndex;
           return EFI_SUCCESS;
         }
       }
     }
+
     *Guid = NULL;
   }
 
   return EFI_NOT_FOUND;
-
 }
 
 /**
@@ -1642,9 +1655,9 @@ GetPtrTypeSize (
   IN    PEI_PCD_DATABASE  *Database
   )
 {
-  INTN        SizeTableIdx;
-  UINTN       LocalTokenNumber;
-  SIZE_INFO   *SizeTable;
+  INTN       SizeTableIdx;
+  UINTN      LocalTokenNumber;
+  SIZE_INFO  *SizeTable;
 
   SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, Database);
 
@@ -1660,13 +1673,13 @@ GetPtrTypeSize (
   // PCD entry.
   //
   if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
-      //
-      // We have only two entry for VPD enabled PCD entry:
-      // 1) MAX Size.
-      // 2) Current Size
-      // We consider current size is equal to MAX size.
-      //
-      return *MaxSize;
+    //
+    // We have only two entry for VPD enabled PCD entry:
+    // 1) MAX Size.
+    // 2) Current Size
+    // We consider current size is equal to MAX size.
+    //
+    return *MaxSize;
   } else {
     //
     // We have only two entry for Non-Sku enabled PCD entry:
@@ -1698,10 +1711,10 @@ SetPtrTypeSize (
   IN          PEI_PCD_DATABASE  *Database
   )
 {
-  INTN        SizeTableIdx;
-  UINTN       LocalTokenNumber;
-  SIZE_INFO   *SizeTable;
-  UINTN       MaxSize;
+  INTN       SizeTableIdx;
+  UINTN      LocalTokenNumber;
+  SIZE_INFO  *SizeTable;
+  UINTN      MaxSize;
 
   SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, Database);
 
@@ -1717,16 +1730,17 @@ SetPtrTypeSize (
   // PCD entry.
   //
   if ((LocalTokenNumber & PCD_TYPE_VPD) != 0) {
-      //
-      // We shouldn't come here as we don't support SET for VPD
-      //
-      ASSERT (FALSE);
-      return FALSE;
+    //
+    // We shouldn't come here as we don't support SET for VPD
+    //
+    ASSERT (FALSE);
+    return FALSE;
   } else {
     if ((*CurrentSize > MaxSize) ||
-      (*CurrentSize == MAX_ADDRESS)) {
-       *CurrentSize = MaxSize;
-       return FALSE;
+        (*CurrentSize == MAX_ADDRESS))
+    {
+      *CurrentSize = MaxSize;
+      return FALSE;
     }
 
     //
@@ -1734,8 +1748,7 @@ SetPtrTypeSize (
     // 1) MAX SIZE
     // 2) Current Size
     //
-    SizeTable[SizeTableIdx + 1] = (SIZE_INFO) *CurrentSize;
+    SizeTable[SizeTableIdx + 1] = (SIZE_INFO)*CurrentSize;
     return TRUE;
   }
-
 }

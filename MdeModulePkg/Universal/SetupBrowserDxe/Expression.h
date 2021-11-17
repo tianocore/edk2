@@ -218,6 +218,7 @@ EvaluateExpression (
   IN FORM_BROWSER_FORM     *Form,
   IN OUT FORM_EXPRESSION   *Expression
   );
+
 /**
   Return the result of the expression list. Check the expression list and
   return the highest priority express result.

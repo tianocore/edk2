@@ -35,7 +35,6 @@ DebuggerExtIoIB (
   return EFI_DEBUG_CONTINUE;
 }
 
-
 /**
 
   DebuggerCommand - IW.
@@ -119,7 +118,6 @@ DebuggerExtIoOB (
   return EFI_DEBUG_CONTINUE;
 }
 
-
 /**
 
   DebuggerCommand - OW.
@@ -146,7 +144,6 @@ DebuggerExtIoOW (
   //
   return EFI_DEBUG_CONTINUE;
 }
-
 
 /**
 

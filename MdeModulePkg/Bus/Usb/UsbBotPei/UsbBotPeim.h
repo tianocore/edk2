@@ -278,7 +278,7 @@ InitUsbBot (
   IN  PEI_USB_IO_PPI                            *UsbIoPpi
   );
 
-#define USBCDROM    1 // let the device type value equal to USBCDROM, which is defined by PI spec.
+#define USBCDROM  1   // let the device type value equal to USBCDROM, which is defined by PI spec.
                       // Therefore the CdExpressPei module can do recovery on UsbCdrom.
 #define USBFLOPPY   2 // for those that use ReadCapacity(0x25) command to retrieve media capacity
 #define USBFLOPPY2  3 // for those that use ReadFormatCapacity(0x23) command to retrieve media capacity
@@ -288,24 +288,24 @@ InitUsbBot (
 //
 #define PEI_BOT_DEVICE_SIGNATURE  SIGNATURE_32 ('U', 'B', 'O', 'T')
 typedef struct {
-  UINTN                           Signature;
-  EFI_PEI_RECOVERY_BLOCK_IO_PPI   BlkIoPpi;
-  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  BlkIo2Ppi;
-  EFI_PEI_PPI_DESCRIPTOR          BlkIoPpiList;
-  EFI_PEI_PPI_DESCRIPTOR          BlkIo2PpiList;
-  EFI_PEI_BLOCK_IO_MEDIA          Media;
-  EFI_PEI_BLOCK_IO2_MEDIA         Media2;
-  PEI_USB_IO_PPI                  *UsbIoPpi;
-  EFI_USB_INTERFACE_DESCRIPTOR    *BotInterface;
-  EFI_USB_ENDPOINT_DESCRIPTOR     *BulkInEndpoint;
-  EFI_USB_ENDPOINT_DESCRIPTOR     *BulkOutEndpoint;
-  UINTN                           AllocateAddress;
-  UINTN                           DeviceType;
-  ATAPI_REQUEST_SENSE_DATA        *SensePtr;
+  UINTN                             Signature;
+  EFI_PEI_RECOVERY_BLOCK_IO_PPI     BlkIoPpi;
+  EFI_PEI_RECOVERY_BLOCK_IO2_PPI    BlkIo2Ppi;
+  EFI_PEI_PPI_DESCRIPTOR            BlkIoPpiList;
+  EFI_PEI_PPI_DESCRIPTOR            BlkIo2PpiList;
+  EFI_PEI_BLOCK_IO_MEDIA            Media;
+  EFI_PEI_BLOCK_IO2_MEDIA           Media2;
+  PEI_USB_IO_PPI                    *UsbIoPpi;
+  EFI_USB_INTERFACE_DESCRIPTOR      *BotInterface;
+  EFI_USB_ENDPOINT_DESCRIPTOR       *BulkInEndpoint;
+  EFI_USB_ENDPOINT_DESCRIPTOR       *BulkOutEndpoint;
+  UINTN                             AllocateAddress;
+  UINTN                             DeviceType;
+  ATAPI_REQUEST_SENSE_DATA          *SensePtr;
 } PEI_BOT_DEVICE;
 
-#define PEI_BOT_DEVICE_FROM_THIS(a) CR (a, PEI_BOT_DEVICE, BlkIoPpi, PEI_BOT_DEVICE_SIGNATURE)
-#define PEI_BOT_DEVICE2_FROM_THIS(a) CR (a, PEI_BOT_DEVICE, BlkIo2Ppi, PEI_BOT_DEVICE_SIGNATURE)
+#define PEI_BOT_DEVICE_FROM_THIS(a)   CR (a, PEI_BOT_DEVICE, BlkIoPpi, PEI_BOT_DEVICE_SIGNATURE)
+#define PEI_BOT_DEVICE2_FROM_THIS(a)  CR (a, PEI_BOT_DEVICE, BlkIo2Ppi, PEI_BOT_DEVICE_SIGNATURE)
 
 /**
   Send ATAPI command using BOT protocol.

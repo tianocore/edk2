@@ -22,7 +22,6 @@ BootLogoEnableLogo (
   VOID
   );
 
-
 /**
   Use SystemTable ConOut to turn on video based Simple Text Out consoles. The
   Simple Text Out screens will now be synced up with all non-video output devices.

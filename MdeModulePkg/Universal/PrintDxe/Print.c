@@ -43,7 +43,6 @@ PrintDxeUnicodeValueToString (
   DEBUG ((DEBUG_ERROR, "PrintDxe: Please consider using the UnicodeValueToStringS service in EFI_PRINT2S_PROTOCOL.\n"));
   ASSERT (FALSE);
   return 0;
-
 }
 
 /**
@@ -69,17 +68,15 @@ PrintDxeAsciiValueToString (
   IN  UINTN      Width
   )
 {
-
   DEBUG ((DEBUG_ERROR, "PrintDxe: The AsciiValueToString service in EFI_PRINT2_PROTOCOL is no longer supported for security reason.\n"));
   DEBUG ((DEBUG_ERROR, "PrintDxe: Please consider using the AsciiValueToStringS service in EFI_PRINT2S_PROTOCOL.\n"));
   ASSERT (FALSE);
   return 0;
-
 }
 
 EFI_HANDLE  mPrintThunkHandle = NULL;
 
-CONST EFI_PRINT2_PROTOCOL mPrint2Protocol = {
+CONST EFI_PRINT2_PROTOCOL  mPrint2Protocol = {
   UnicodeBSPrint,
   UnicodeSPrint,
   UnicodeBSPrintAsciiFormat,
@@ -92,7 +89,7 @@ CONST EFI_PRINT2_PROTOCOL mPrint2Protocol = {
   PrintDxeAsciiValueToString
 };
 
-CONST EFI_PRINT2S_PROTOCOL mPrint2SProtocol = {
+CONST EFI_PRINT2S_PROTOCOL  mPrint2SProtocol = {
   UnicodeBSPrint,
   UnicodeSPrint,
   UnicodeBSPrintAsciiFormat,
@@ -128,8 +125,10 @@ PrintEntryPoint (
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mPrintThunkHandle,
-                  &gEfiPrint2ProtocolGuid, &mPrint2Protocol,
-                  &gEfiPrint2SProtocolGuid, &mPrint2SProtocol,
+                  &gEfiPrint2ProtocolGuid,
+                  &mPrint2Protocol,
+                  &gEfiPrint2SProtocolGuid,
+                  &mPrint2SProtocol,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

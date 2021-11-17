@@ -30,37 +30,36 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Name of  Variable for Non-FMP ESRT Repository
 //
-#define EFI_ESRT_NONFMP_VARIABLE_NAME    L"EsrtNonFmp"
+#define EFI_ESRT_NONFMP_VARIABLE_NAME  L"EsrtNonFmp"
 
 //
 // Name of Variable for FMP
 //
-#define EFI_ESRT_FMP_VARIABLE_NAME       L"EsrtFmp"
+#define EFI_ESRT_FMP_VARIABLE_NAME  L"EsrtFmp"
 
 //
 // Attribute of Cached ESRT entry
 //
-#define ESRT_FROM_FMP                    0x00000001
-#define ESRT_FROM_NONFMP                 0x00000002
+#define ESRT_FROM_FMP     0x00000001
+#define ESRT_FROM_NONFMP  0x00000002
 
 typedef struct {
-  EFI_HANDLE            Handle;
+  EFI_HANDLE    Handle;
   //
   // Ready to boot event
   //
-  EFI_EVENT             Event;
+  EFI_EVENT     Event;
 
   //
   // Updates to Fmp storage must be locked.
   //
-  EFI_LOCK              FmpLock;
+  EFI_LOCK      FmpLock;
 
   //
   // Update to Non-Fmp storage must be locked
   //
-  EFI_LOCK              NonFmpLock;
+  EFI_LOCK      NonFmpLock;
 } ESRT_PRIVATE_DATA;
-
 
 /**
   Find Esrt Entry stored in ESRT repository.
@@ -90,7 +89,7 @@ GetEsrtEntry (
 
 **/
 EFI_STATUS
-InsertEsrtEntry(
+InsertEsrtEntry (
   IN EFI_SYSTEM_RESOURCE_ENTRY *Entry,
   UINTN                        Attribute
   );
@@ -106,7 +105,7 @@ InsertEsrtEntry(
 
 **/
 EFI_STATUS
-DeleteEsrtEntry(
+DeleteEsrtEntry (
   IN  EFI_GUID        *FwClass,
   IN  UINTN           Attribute
   );
@@ -122,7 +121,7 @@ DeleteEsrtEntry(
 
 **/
 EFI_STATUS
-UpdateEsrtEntry(
+UpdateEsrtEntry (
   IN EFI_SYSTEM_RESOURCE_ENTRY *Entry,
   UINTN                        Attribute
   );
@@ -155,7 +154,7 @@ SetEsrtEntryFromFmpInfo (
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeGetEsrtEntry(
+EsrtDxeGetEsrtEntry (
   IN     EFI_GUID                  *FwClass,
   IN OUT EFI_SYSTEM_RESOURCE_ENTRY *Entry
   );
@@ -172,7 +171,7 @@ EsrtDxeGetEsrtEntry(
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeUpdateEsrtEntry(
+EsrtDxeUpdateEsrtEntry (
   IN EFI_SYSTEM_RESOURCE_ENTRY *Entry
   );
 
@@ -187,7 +186,7 @@ EsrtDxeUpdateEsrtEntry(
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeUnRegisterEsrtEntry(
+EsrtDxeUnRegisterEsrtEntry (
   IN  EFI_GUID        *FwClass
   );
 
@@ -201,7 +200,7 @@ EsrtDxeUnRegisterEsrtEntry(
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeRegisterEsrtEntry(
+EsrtDxeRegisterEsrtEntry (
   IN EFI_SYSTEM_RESOURCE_ENTRY *Entry
   );
 
@@ -217,7 +216,7 @@ EsrtDxeRegisterEsrtEntry(
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeSyncFmp(
+EsrtDxeSyncFmp (
   VOID
   );
 
@@ -230,9 +229,8 @@ EsrtDxeSyncFmp(
 **/
 EFI_STATUS
 EFIAPI
-EsrtDxeLockEsrtRepository(
+EsrtDxeLockEsrtRepository (
   VOID
   );
 
 #endif // #ifndef _EFI_ESRT_IMPL_H_
-

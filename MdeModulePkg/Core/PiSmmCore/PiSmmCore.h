@@ -62,10 +62,10 @@
 // Used to build a table of SMI Handlers that the SMM Core registers
 //
 typedef struct {
-  EFI_SMM_HANDLER_ENTRY_POINT2  Handler;
-  EFI_GUID                      *HandlerType;
-  EFI_HANDLE                    DispatchHandle;
-  BOOLEAN                       UnRegister;
+  EFI_SMM_HANDLER_ENTRY_POINT2    Handler;
+  EFI_GUID                        *HandlerType;
+  EFI_HANDLE                      DispatchHandle;
+  BOOLEAN                         UnRegister;
 } SMM_CORE_SMI_HANDLERS;
 
 //
@@ -74,89 +74,89 @@ typedef struct {
 
 #define SMI_ENTRY_SIGNATURE  SIGNATURE_32('s','m','i','e')
 
- typedef struct {
-  UINTN       Signature;
-  LIST_ENTRY  AllEntries;  // All entries
+typedef struct {
+  UINTN         Signature;
+  LIST_ENTRY    AllEntries; // All entries
 
-  EFI_GUID    HandlerType; // Type of interrupt
-  LIST_ENTRY  SmiHandlers; // All handlers
+  EFI_GUID      HandlerType; // Type of interrupt
+  LIST_ENTRY    SmiHandlers; // All handlers
 } SMI_ENTRY;
 
 #define SMI_HANDLER_SIGNATURE  SIGNATURE_32('s','m','i','h')
 
- typedef struct {
-  UINTN                         Signature;
-  LIST_ENTRY                    Link;        // Link on SMI_ENTRY.SmiHandlers
-  EFI_SMM_HANDLER_ENTRY_POINT2  Handler;     // The smm handler's entry point
-  UINTN                         CallerAddr;  // The address of caller who register the SMI handler.
-  SMI_ENTRY                     *SmiEntry;
-  VOID                          *Context;    // for profile
-  UINTN                         ContextSize; // for profile
+typedef struct {
+  UINTN                           Signature;
+  LIST_ENTRY                      Link;       // Link on SMI_ENTRY.SmiHandlers
+  EFI_SMM_HANDLER_ENTRY_POINT2    Handler;    // The smm handler's entry point
+  UINTN                           CallerAddr; // The address of caller who register the SMI handler.
+  SMI_ENTRY                       *SmiEntry;
+  VOID                            *Context;    // for profile
+  UINTN                           ContextSize; // for profile
 } SMI_HANDLER;
 
 //
 // Structure for recording the state of an SMM Driver
 //
-#define EFI_SMM_DRIVER_ENTRY_SIGNATURE SIGNATURE_32('s', 'd','r','v')
+#define EFI_SMM_DRIVER_ENTRY_SIGNATURE  SIGNATURE_32('s', 'd','r','v')
 
 typedef struct {
-  UINTN                           Signature;
-  LIST_ENTRY                      Link;             // mDriverList
+  UINTN                            Signature;
+  LIST_ENTRY                       Link;            // mDriverList
 
-  LIST_ENTRY                      ScheduledLink;    // mScheduledQueue
+  LIST_ENTRY                       ScheduledLink;   // mScheduledQueue
 
-  EFI_HANDLE                      FvHandle;
-  EFI_GUID                        FileName;
-  EFI_DEVICE_PATH_PROTOCOL        *FvFileDevicePath;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL   *Fv;
+  EFI_HANDLE                       FvHandle;
+  EFI_GUID                         FileName;
+  EFI_DEVICE_PATH_PROTOCOL         *FvFileDevicePath;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL    *Fv;
 
-  VOID                            *Depex;
-  UINTN                           DepexSize;
+  VOID                             *Depex;
+  UINTN                            DepexSize;
 
-  BOOLEAN                         Before;
-  BOOLEAN                         After;
-  EFI_GUID                        BeforeAfterGuid;
+  BOOLEAN                          Before;
+  BOOLEAN                          After;
+  EFI_GUID                         BeforeAfterGuid;
 
-  BOOLEAN                         Dependent;
-  BOOLEAN                         Scheduled;
-  BOOLEAN                         Initialized;
-  BOOLEAN                         DepexProtocolError;
+  BOOLEAN                          Dependent;
+  BOOLEAN                          Scheduled;
+  BOOLEAN                          Initialized;
+  BOOLEAN                          DepexProtocolError;
 
-  EFI_HANDLE                      ImageHandle;
-  EFI_LOADED_IMAGE_PROTOCOL       *LoadedImage;
+  EFI_HANDLE                       ImageHandle;
+  EFI_LOADED_IMAGE_PROTOCOL        *LoadedImage;
   //
   // Image EntryPoint in SMRAM
   //
-  PHYSICAL_ADDRESS                ImageEntryPoint;
+  PHYSICAL_ADDRESS                 ImageEntryPoint;
   //
   // Image Buffer in SMRAM
   //
-  PHYSICAL_ADDRESS                ImageBuffer;
+  PHYSICAL_ADDRESS                 ImageBuffer;
   //
   // Image Page Number
   //
-  UINTN                           NumberOfPage;
-  EFI_HANDLE                      SmmImageHandle;
-  EFI_LOADED_IMAGE_PROTOCOL       SmmLoadedImage;
+  UINTN                            NumberOfPage;
+  EFI_HANDLE                       SmmImageHandle;
+  EFI_LOADED_IMAGE_PROTOCOL        SmmLoadedImage;
 } EFI_SMM_DRIVER_ENTRY;
 
-#define EFI_HANDLE_SIGNATURE            SIGNATURE_32('s','h','d','l')
+#define EFI_HANDLE_SIGNATURE  SIGNATURE_32('s','h','d','l')
 
 ///
 /// IHANDLE - contains a list of protocol handles
 ///
 typedef struct {
-  UINTN               Signature;
+  UINTN         Signature;
   /// All handles list of IHANDLE
-  LIST_ENTRY          AllHandles;
+  LIST_ENTRY    AllHandles;
   /// List of PROTOCOL_INTERFACE's for this handle
-  LIST_ENTRY          Protocols;
-  UINTN               LocateRequest;
+  LIST_ENTRY    Protocols;
+  UINTN         LocateRequest;
 } IHANDLE;
 
 #define ASSERT_IS_HANDLE(a)  ASSERT((a)->Signature == EFI_HANDLE_SIGNATURE)
 
-#define PROTOCOL_ENTRY_SIGNATURE        SIGNATURE_32('s','p','t','e')
+#define PROTOCOL_ENTRY_SIGNATURE  SIGNATURE_32('s','p','t','e')
 
 ///
 /// PROTOCOL_ENTRY - each different protocol has 1 entry in the protocol
@@ -164,15 +164,15 @@ typedef struct {
 /// with a list of registered notifies.
 ///
 typedef struct {
-  UINTN               Signature;
+  UINTN         Signature;
   /// Link Entry inserted to mProtocolDatabase
-  LIST_ENTRY          AllEntries;
+  LIST_ENTRY    AllEntries;
   /// ID of the protocol
-  EFI_GUID            ProtocolID;
+  EFI_GUID      ProtocolID;
   /// All protocol interfaces
-  LIST_ENTRY          Protocols;
+  LIST_ENTRY    Protocols;
   /// Registered notification handlers
-  LIST_ENTRY          Notify;
+  LIST_ENTRY    Notify;
 } PROTOCOL_ENTRY;
 
 #define PROTOCOL_INTERFACE_SIGNATURE  SIGNATURE_32('s','p','i','f')
@@ -182,33 +182,33 @@ typedef struct {
 /// with a protocol interface structure
 ///
 typedef struct {
-  UINTN                       Signature;
+  UINTN             Signature;
   /// Link on IHANDLE.Protocols
-  LIST_ENTRY                  Link;
+  LIST_ENTRY        Link;
   /// Back pointer
-  IHANDLE                     *Handle;
+  IHANDLE           *Handle;
   /// Link on PROTOCOL_ENTRY.Protocols
-  LIST_ENTRY                  ByProtocol;
+  LIST_ENTRY        ByProtocol;
   /// The protocol ID
-  PROTOCOL_ENTRY              *Protocol;
+  PROTOCOL_ENTRY    *Protocol;
   /// The interface value
-  VOID                        *Interface;
+  VOID              *Interface;
 } PROTOCOL_INTERFACE;
 
-#define PROTOCOL_NOTIFY_SIGNATURE       SIGNATURE_32('s','p','t','n')
+#define PROTOCOL_NOTIFY_SIGNATURE  SIGNATURE_32('s','p','t','n')
 
 ///
 /// PROTOCOL_NOTIFY - used for each register notification for a protocol
 ///
 typedef struct {
-  UINTN               Signature;
-  PROTOCOL_ENTRY      *Protocol;
+  UINTN                Signature;
+  PROTOCOL_ENTRY       *Protocol;
   /// All notifications for this protocol
-  LIST_ENTRY          Link;
+  LIST_ENTRY           Link;
   /// Notification function
-  EFI_SMM_NOTIFY_FN   Function;
+  EFI_SMM_NOTIFY_FN    Function;
   /// Last position notified
-  LIST_ENTRY          *Position;
+  LIST_ENTRY           *Position;
 } PROTOCOL_NOTIFY;
 
 //
@@ -689,8 +689,8 @@ EFI_STATUS
 EFIAPI
 SmmDriverDispatchHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context, OPTIONAL
+  IN OUT VOID                     *CommBuffer, OPTIONAL
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -711,8 +711,8 @@ EFI_STATUS
 EFIAPI
 SmmLegacyBootHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context, OPTIONAL
+  IN OUT VOID                     *CommBuffer, OPTIONAL
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -733,8 +733,8 @@ EFI_STATUS
 EFIAPI
 SmmReadyToLockHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context, OPTIONAL
+  IN OUT VOID                     *CommBuffer, OPTIONAL
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -755,8 +755,8 @@ EFI_STATUS
 EFIAPI
 SmmEndOfDxeHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context, OPTIONAL
+  IN OUT VOID                     *CommBuffer, OPTIONAL
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -777,8 +777,8 @@ EFI_STATUS
 EFIAPI
 SmmExitBootServicesHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context, OPTIONAL
+  IN OUT VOID                     *CommBuffer, OPTIONAL
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -799,8 +799,8 @@ EFI_STATUS
 EFIAPI
 SmmReadyToBootHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context, OPTIONAL
+  IN OUT VOID                     *CommBuffer, OPTIONAL
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -822,8 +822,8 @@ EFI_STATUS
 EFIAPI
 SmmS3SmmInitDoneHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context, OPTIONAL
+  IN OUT VOID        *CommBuffer, OPTIONAL
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
@@ -845,8 +845,8 @@ EFI_STATUS
 EFIAPI
 SmmEndOfS3ResumeHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context, OPTIONAL
+  IN OUT VOID        *CommBuffer, OPTIONAL
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
@@ -873,7 +873,7 @@ SmmEfiNotAvailableYetArg5 (
   );
 
 //
-//Functions used during debug builds
+// Functions used during debug builds
 //
 
 /**
@@ -1206,10 +1206,10 @@ SmiHandlerProfileUnregisterHandler (
   IN UINTN                          ContextSize OPTIONAL
   );
 
-extern UINTN                    mFullSmramRangeCount;
-extern EFI_SMRAM_DESCRIPTOR     *mFullSmramRanges;
+extern UINTN                 mFullSmramRangeCount;
+extern EFI_SMRAM_DESCRIPTOR  *mFullSmramRanges;
 
-extern EFI_SMM_DRIVER_ENTRY       *mSmmCoreDriverEntry;
+extern EFI_SMM_DRIVER_ENTRY  *mSmmCoreDriverEntry;
 
 extern EFI_LOADED_IMAGE_PROTOCOL  *mSmmCoreLoadedImage;
 
@@ -1218,8 +1218,8 @@ extern EFI_LOADED_IMAGE_PROTOCOL  *mSmmCoreLoadedImage;
 //
 
 typedef struct {
-  LIST_ENTRY  Link;
-  UINTN       NumberOfPages;
+  LIST_ENTRY    Link;
+  UINTN         NumberOfPages;
 } FREE_PAGE_LIST;
 
 extern LIST_ENTRY  mSmmMemoryMap;
@@ -1245,31 +1245,31 @@ extern LIST_ENTRY  mSmmMemoryMap;
 //
 #define MAX_POOL_INDEX  (MAX_POOL_SHIFT - MIN_POOL_SHIFT + 1)
 
-#define POOL_HEAD_SIGNATURE   SIGNATURE_32('s','p','h','d')
+#define POOL_HEAD_SIGNATURE  SIGNATURE_32('s','p','h','d')
 
 typedef struct {
-  UINT32            Signature;
-  BOOLEAN           Available;
-  EFI_MEMORY_TYPE   Type;
-  UINTN             Size;
+  UINT32             Signature;
+  BOOLEAN            Available;
+  EFI_MEMORY_TYPE    Type;
+  UINTN              Size;
 } POOL_HEADER;
 
-#define POOL_TAIL_SIGNATURE   SIGNATURE_32('s','p','t','l')
+#define POOL_TAIL_SIGNATURE  SIGNATURE_32('s','p','t','l')
 
 typedef struct {
-  UINT32            Signature;
-  UINT32            Reserved;
-  UINTN             Size;
+  UINT32    Signature;
+  UINT32    Reserved;
+  UINTN     Size;
 } POOL_TAIL;
 
-#define POOL_OVERHEAD (sizeof(POOL_HEADER) + sizeof(POOL_TAIL))
+#define POOL_OVERHEAD  (sizeof(POOL_HEADER) + sizeof(POOL_TAIL))
 
 #define HEAD_TO_TAIL(a)   \
   ((POOL_TAIL *) (((CHAR8 *) (a)) + (a)->Size - sizeof(POOL_TAIL)));
 
 typedef struct {
-  POOL_HEADER  Header;
-  LIST_ENTRY   Link;
+  POOL_HEADER    Header;
+  LIST_ENTRY     Link;
 } FREE_POOL_HEADER;
 
 typedef enum {

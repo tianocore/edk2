@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_PCI_OPTION_ROM_SUPPORT_H_
 #define _EFI_PCI_OPTION_ROM_SUPPORT_H_
 
-
 /**
   Initialize a PCI LoadFile2 instance.
 

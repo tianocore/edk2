@@ -11,18 +11,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PciRootBridge.h"
 #include "PciHostResource.h"
 
-EFI_CPU_IO2_PROTOCOL        *mCpuIo;
+EFI_CPU_IO2_PROTOCOL  *mCpuIo;
 
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mAcpiAddressSpaceTypeStr[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR16  *mAcpiAddressSpaceTypeStr[] = {
   L"Mem", L"I/O", L"Bus"
 };
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mPciResourceTypeStr[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR16  *mPciResourceTypeStr[] = {
   L"I/O", L"Mem", L"PMem", L"Mem64", L"PMem64", L"Bus"
 };
 
-EDKII_IOMMU_PROTOCOL        *mIoMmu;
-EFI_EVENT                   mIoMmuEvent;
-VOID                        *mIoMmuRegistration;
+EDKII_IOMMU_PROTOCOL  *mIoMmu;
+EFI_EVENT             mIoMmuEvent;
+VOID                  *mIoMmuRegistration;
 
 /**
   This routine gets translation offset from a root bridge instance by resource type.
@@ -97,17 +97,19 @@ IntersectIoDescriptor (
   IN  CONST EFI_GCD_IO_SPACE_DESCRIPTOR *Descriptor
   )
 {
-  UINT64                                IntersectionBase;
-  UINT64                                IntersectionEnd;
-  EFI_STATUS                            Status;
+  UINT64      IntersectionBase;
+  UINT64      IntersectionEnd;
+  EFI_STATUS  Status;
 
   if (Descriptor->GcdIoType == EfiGcdIoTypeIo) {
     return EFI_SUCCESS;
   }
 
   IntersectionBase = MAX (Base, Descriptor->BaseAddress);
-  IntersectionEnd = MIN (Base + Length,
-                      Descriptor->BaseAddress + Descriptor->Length);
+  IntersectionEnd  = MIN (
+                       Base + Length,
+                       Descriptor->BaseAddress + Descriptor->Length
+                       );
   if (IntersectionBase >= IntersectionEnd) {
     //
     // The descriptor and the aperture don't overlap.
@@ -116,19 +118,36 @@ IntersectIoDescriptor (
   }
 
   if (Descriptor->GcdIoType == EfiGcdIoTypeNonExistent) {
-    Status = gDS->AddIoSpace (EfiGcdIoTypeIo, IntersectionBase,
-                    IntersectionEnd - IntersectionBase);
+    Status = gDS->AddIoSpace (
+                    EfiGcdIoTypeIo,
+                    IntersectionBase,
+                    IntersectionEnd - IntersectionBase
+                    );
 
-    DEBUG ((EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
-      "%a: %a: add [%Lx, %Lx): %r\n", gEfiCallerBaseName, __FUNCTION__,
-      IntersectionBase, IntersectionEnd, Status));
+    DEBUG ((
+      EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
+      "%a: %a: add [%Lx, %Lx): %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      IntersectionBase,
+      IntersectionEnd,
+      Status
+      ));
     return Status;
   }
 
-  DEBUG ((DEBUG_ERROR, "%a: %a: desc [%Lx, %Lx) type %u conflicts with "
-    "aperture [%Lx, %Lx)\n", gEfiCallerBaseName, __FUNCTION__,
-    Descriptor->BaseAddress, Descriptor->BaseAddress + Descriptor->Length,
-    (UINT32)Descriptor->GcdIoType, Base, Base + Length));
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a: %a: desc [%Lx, %Lx) type %u conflicts with "
+    "aperture [%Lx, %Lx)\n",
+    gEfiCallerBaseName,
+    __FUNCTION__,
+    Descriptor->BaseAddress,
+    Descriptor->BaseAddress + Descriptor->Length,
+    (UINT32)Descriptor->GcdIoType,
+    Base,
+    Base + Length
+    ));
   return EFI_INVALID_PARAMETER;
 }
 
@@ -148,15 +167,20 @@ AddIoSpace (
   IN  UINT64                        Length
   )
 {
-  EFI_STATUS                        Status;
-  UINTN                             Index;
-  UINTN                             NumberOfDescriptors;
-  EFI_GCD_IO_SPACE_DESCRIPTOR       *IoSpaceMap;
+  EFI_STATUS                   Status;
+  UINTN                        Index;
+  UINTN                        NumberOfDescriptors;
+  EFI_GCD_IO_SPACE_DESCRIPTOR  *IoSpaceMap;
 
   Status = gDS->GetIoSpaceMap (&NumberOfDescriptors, &IoSpaceMap);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: GetIoSpaceMap(): %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: GetIoSpaceMap(): %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return Status;
   }
 
@@ -179,11 +203,13 @@ AddIoSpace (
 
     for (CheckBase = Base;
          CheckBase < Base + Length;
-         CheckBase = Descriptor.BaseAddress + Descriptor.Length) {
-      CheckStatus = gDS->GetIoSpaceDescriptor (CheckBase, &Descriptor);
-      ASSERT_EFI_ERROR (CheckStatus);
-      ASSERT (Descriptor.GcdIoType == EfiGcdIoTypeIo);
-    }
+         CheckBase = Descriptor.BaseAddress + Descriptor.Length)
+  {
+    CheckStatus = gDS->GetIoSpaceDescriptor (CheckBase, &Descriptor);
+    ASSERT_EFI_ERROR (CheckStatus);
+    ASSERT (Descriptor.GcdIoType == EfiGcdIoTypeIo);
+  }
+
     );
 
 FreeIoSpaceMap:
@@ -239,18 +265,21 @@ IntersectMemoryDescriptor (
   IN  CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR *Descriptor
   )
 {
-  UINT64                                    IntersectionBase;
-  UINT64                                    IntersectionEnd;
-  EFI_STATUS                                Status;
+  UINT64      IntersectionBase;
+  UINT64      IntersectionEnd;
+  EFI_STATUS  Status;
 
-  if (Descriptor->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo &&
-      (Descriptor->Capabilities & Capabilities) == Capabilities) {
+  if ((Descriptor->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
+      ((Descriptor->Capabilities & Capabilities) == Capabilities))
+  {
     return EFI_SUCCESS;
   }
 
   IntersectionBase = MAX (Base, Descriptor->BaseAddress);
-  IntersectionEnd = MIN (Base + Length,
-                      Descriptor->BaseAddress + Descriptor->Length);
+  IntersectionEnd  = MIN (
+                       Base + Length,
+                       Descriptor->BaseAddress + Descriptor->Length
+                       );
   if (IntersectionBase >= IntersectionEnd) {
     //
     // The descriptor and the aperture don't overlap.
@@ -259,21 +288,39 @@ IntersectMemoryDescriptor (
   }
 
   if (Descriptor->GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
-    Status = gDS->AddMemorySpace (EfiGcdMemoryTypeMemoryMappedIo,
-                    IntersectionBase, IntersectionEnd - IntersectionBase,
-                    Capabilities);
+    Status = gDS->AddMemorySpace (
+                    EfiGcdMemoryTypeMemoryMappedIo,
+                    IntersectionBase,
+                    IntersectionEnd - IntersectionBase,
+                    Capabilities
+                    );
 
-    DEBUG ((EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
-      "%a: %a: add [%Lx, %Lx): %r\n", gEfiCallerBaseName, __FUNCTION__,
-      IntersectionBase, IntersectionEnd, Status));
+    DEBUG ((
+      EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
+      "%a: %a: add [%Lx, %Lx): %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      IntersectionBase,
+      IntersectionEnd,
+      Status
+      ));
     return Status;
   }
 
-  DEBUG ((DEBUG_ERROR, "%a: %a: desc [%Lx, %Lx) type %u cap %Lx conflicts "
-    "with aperture [%Lx, %Lx) cap %Lx\n", gEfiCallerBaseName, __FUNCTION__,
-    Descriptor->BaseAddress, Descriptor->BaseAddress + Descriptor->Length,
-    (UINT32)Descriptor->GcdMemoryType, Descriptor->Capabilities,
-    Base, Base + Length, Capabilities));
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a: %a: desc [%Lx, %Lx) type %u cap %Lx conflicts "
+    "with aperture [%Lx, %Lx) cap %Lx\n",
+    gEfiCallerBaseName,
+    __FUNCTION__,
+    Descriptor->BaseAddress,
+    Descriptor->BaseAddress + Descriptor->Length,
+    (UINT32)Descriptor->GcdMemoryType,
+    Descriptor->Capabilities,
+    Base,
+    Base + Length,
+    Capabilities
+    ));
   return EFI_INVALID_PARAMETER;
 }
 
@@ -295,21 +342,30 @@ AddMemoryMappedIoSpace (
   IN  UINT64                            Capabilities
   )
 {
-  EFI_STATUS                            Status;
-  UINTN                                 Index;
-  UINTN                                 NumberOfDescriptors;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR       *MemorySpaceMap;
+  EFI_STATUS                       Status;
+  UINTN                            Index;
+  UINTN                            NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
 
   Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: GetMemorySpaceMap(): %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: GetMemorySpaceMap(): %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return Status;
   }
 
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    Status = IntersectMemoryDescriptor (Base, Length, Capabilities,
-               &MemorySpaceMap[Index]);
+    Status = IntersectMemoryDescriptor (
+               Base,
+               Length,
+               Capabilities,
+               &MemorySpaceMap[Index]
+               );
     if (EFI_ERROR (Status)) {
       goto FreeMemorySpaceMap;
     }
@@ -327,12 +383,14 @@ AddMemoryMappedIoSpace (
 
     for (CheckBase = Base;
          CheckBase < Base + Length;
-         CheckBase = Descriptor.BaseAddress + Descriptor.Length) {
-      CheckStatus = gDS->GetMemorySpaceDescriptor (CheckBase, &Descriptor);
-      ASSERT_EFI_ERROR (CheckStatus);
-      ASSERT (Descriptor.GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo);
-      ASSERT ((Descriptor.Capabilities & Capabilities) == Capabilities);
-    }
+         CheckBase = Descriptor.BaseAddress + Descriptor.Length)
+  {
+    CheckStatus = gDS->GetMemorySpaceDescriptor (CheckBase, &Descriptor);
+    ASSERT_EFI_ERROR (CheckStatus);
+    ASSERT (Descriptor.GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo);
+    ASSERT ((Descriptor.Capabilities & Capabilities) == Capabilities);
+  }
+
     );
 
 FreeMemorySpaceMap:
@@ -355,10 +413,10 @@ IoMmuProtocolCallback (
   IN  VOID            *Context
   )
 {
-  EFI_STATUS   Status;
+  EFI_STATUS  Status;
 
   Status = gBS->LocateProtocol (&gEdkiiIoMmuProtocolGuid, NULL, (VOID **)&mIoMmu);
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     gBS->CloseEvent (mIoMmuEvent);
   }
 }
@@ -381,24 +439,24 @@ InitializePciHostBridge (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS                  Status;
-  PCI_HOST_BRIDGE_INSTANCE    *HostBridge;
-  PCI_ROOT_BRIDGE_INSTANCE    *RootBridge;
-  PCI_ROOT_BRIDGE             *RootBridges;
-  UINTN                       RootBridgeCount;
-  UINTN                       Index;
-  PCI_ROOT_BRIDGE_APERTURE    *MemApertures[4];
-  UINTN                       MemApertureIndex;
-  BOOLEAN                     ResourceAssigned;
-  LIST_ENTRY                  *Link;
-  UINT64                      HostAddress;
+  EFI_STATUS                Status;
+  PCI_HOST_BRIDGE_INSTANCE  *HostBridge;
+  PCI_ROOT_BRIDGE_INSTANCE  *RootBridge;
+  PCI_ROOT_BRIDGE           *RootBridges;
+  UINTN                     RootBridgeCount;
+  UINTN                     Index;
+  PCI_ROOT_BRIDGE_APERTURE  *MemApertures[4];
+  UINTN                     MemApertureIndex;
+  BOOLEAN                   ResourceAssigned;
+  LIST_ENTRY                *Link;
+  UINT64                    HostAddress;
 
   RootBridges = PciHostBridgeGetRootBridges (&RootBridgeCount);
   if ((RootBridges == NULL) || (RootBridgeCount == 0)) {
     return EFI_UNSUPPORTED;
   }
 
-  Status = gBS->LocateProtocol (&gEfiCpuIo2ProtocolGuid, NULL, (VOID **) &mCpuIo);
+  Status = gBS->LocateProtocol (&gEfiCpuIo2ProtocolGuid, NULL, (VOID **)&mCpuIo);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -407,10 +465,10 @@ InitializePciHostBridge (
   HostBridge = AllocateZeroPool (sizeof (PCI_HOST_BRIDGE_INSTANCE));
   ASSERT (HostBridge != NULL);
 
-  HostBridge->Signature        = PCI_HOST_BRIDGE_SIGNATURE;
-  HostBridge->CanRestarted     = TRUE;
+  HostBridge->Signature    = PCI_HOST_BRIDGE_SIGNATURE;
+  HostBridge->CanRestarted = TRUE;
   InitializeListHead (&HostBridge->RootBridges);
-  ResourceAssigned             = FALSE;
+  ResourceAssigned = FALSE;
 
   //
   // Create Root Bridge Device Handle in this Host Bridge
@@ -439,8 +497,10 @@ InitializePciHostBridge (
       // Base and Limit in PCI_ROOT_BRIDGE_APERTURE are device address.
       // For GCD resource manipulation, we need to use host address.
       //
-      HostAddress = TO_HOST_ADDRESS (RootBridges[Index].Io.Base,
-        RootBridges[Index].Io.Translation);
+      HostAddress = TO_HOST_ADDRESS (
+                      RootBridges[Index].Io.Base,
+                      RootBridges[Index].Io.Translation
+                      );
 
       Status = AddIoSpace (
                  HostAddress,
@@ -478,8 +538,10 @@ InitializePciHostBridge (
         // Base and Limit in PCI_ROOT_BRIDGE_APERTURE are device address.
         // For GCD resource manipulation, we need to use host address.
         //
-        HostAddress = TO_HOST_ADDRESS (MemApertures[MemApertureIndex]->Base,
-          MemApertures[MemApertureIndex]->Translation);
+        HostAddress = TO_HOST_ADDRESS (
+                        MemApertures[MemApertureIndex]->Base,
+                        MemApertures[MemApertureIndex]->Translation
+                        );
         Status = AddMemoryMappedIoSpace (
                    HostAddress,
                    MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
@@ -494,6 +556,7 @@ InitializePciHostBridge (
         if (EFI_ERROR (Status)) {
           DEBUG ((DEBUG_WARN, "PciHostBridge driver failed to set EFI_MEMORY_UC to MMIO aperture - %r.\n", Status));
         }
+
         if (ResourceAssigned) {
           Status = gDS->AllocateMemorySpace (
                           EfiGcdAllocateAddress,
@@ -508,6 +571,7 @@ InitializePciHostBridge (
         }
       }
     }
+
     //
     // Insert Root Bridge Handle Instance
     //
@@ -520,17 +584,18 @@ InitializePciHostBridge (
   //
   if (!ResourceAssigned) {
     HostBridge->ResAlloc.NotifyPhase = NotifyPhase;
-    HostBridge->ResAlloc.GetNextRootBridge = GetNextRootBridge;
-    HostBridge->ResAlloc.GetAllocAttributes = GetAttributes;
+    HostBridge->ResAlloc.GetNextRootBridge   = GetNextRootBridge;
+    HostBridge->ResAlloc.GetAllocAttributes  = GetAttributes;
     HostBridge->ResAlloc.StartBusEnumeration = StartBusEnumeration;
-    HostBridge->ResAlloc.SetBusNumbers = SetBusNumbers;
+    HostBridge->ResAlloc.SetBusNumbers   = SetBusNumbers;
     HostBridge->ResAlloc.SubmitResources = SubmitResources;
     HostBridge->ResAlloc.GetProposedResources = GetProposedResources;
     HostBridge->ResAlloc.PreprocessController = PreprocessController;
 
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &HostBridge->Handle,
-                    &gEfiPciHostBridgeResourceAllocationProtocolGuid, &HostBridge->ResAlloc,
+                    &gEfiPciHostBridgeResourceAllocationProtocolGuid,
+                    &HostBridge->ResAlloc,
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);
@@ -539,18 +604,22 @@ InitializePciHostBridge (
   for (Link = GetFirstNode (&HostBridge->RootBridges)
        ; !IsNull (&HostBridge->RootBridges, Link)
        ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-       ) {
+       )
+  {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     RootBridge->RootBridgeIo.ParentHandle = HostBridge->Handle;
 
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &RootBridge->Handle,
-                    &gEfiDevicePathProtocolGuid, RootBridge->DevicePath,
-                    &gEfiPciRootBridgeIoProtocolGuid, &RootBridge->RootBridgeIo,
+                    &gEfiDevicePathProtocolGuid,
+                    RootBridge->DevicePath,
+                    &gEfiPciRootBridgeIoProtocolGuid,
+                    &RootBridge->RootBridgeIo,
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);
   }
+
   PciHostBridgeFreeRootBridges (RootBridges, RootBridgeCount);
 
   if (!EFI_ERROR (Status)) {
@@ -576,20 +645,21 @@ ResourceConflict (
   IN  PCI_HOST_BRIDGE_INSTANCE *HostBridge
   )
 {
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Resources;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
-  EFI_ACPI_END_TAG_DESCRIPTOR       *End;
-  PCI_ROOT_BRIDGE_INSTANCE          *RootBridge;
-  LIST_ENTRY                        *Link;
-  UINTN                             RootBridgeCount;
-  PCI_RESOURCE_TYPE                 Index;
-  PCI_RES_NODE                      *ResAllocNode;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Resources;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+  EFI_ACPI_END_TAG_DESCRIPTOR        *End;
+  PCI_ROOT_BRIDGE_INSTANCE           *RootBridge;
+  LIST_ENTRY                         *Link;
+  UINTN                              RootBridgeCount;
+  PCI_RESOURCE_TYPE                  Index;
+  PCI_RES_NODE                       *ResAllocNode;
 
   RootBridgeCount = 0;
   for (Link = GetFirstNode (&HostBridge->RootBridges)
        ; !IsNull (&HostBridge->RootBridges, Link)
        ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-       ) {
+       )
+  {
     RootBridgeCount++;
   }
 
@@ -602,61 +672,63 @@ ResourceConflict (
   for (Link = GetFirstNode (&HostBridge->RootBridges), Descriptor = Resources
        ; !IsNull (&HostBridge->RootBridges, Link)
        ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-       ) {
+       )
+  {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     for (Index = TypeIo; Index < TypeMax; Index++) {
       ResAllocNode = &RootBridge->ResAllocNode[Index];
 
       Descriptor->Desc = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Descriptor->Len = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Descriptor->Len  = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
       Descriptor->AddrRangeMin = ResAllocNode->Base;
       Descriptor->AddrRangeMax = ResAllocNode->Alignment;
-      Descriptor->AddrLen      = ResAllocNode->Length;
+      Descriptor->AddrLen = ResAllocNode->Length;
       Descriptor->SpecificFlag = 0;
       switch (ResAllocNode->Type) {
+        case TypeIo:
+          Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_IO;
+          break;
 
-      case TypeIo:
-        Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_IO;
-        break;
+        case TypePMem32:
+          Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
+        case TypeMem32:
+          Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+          Descriptor->AddrSpaceGranularity = 32;
+          break;
 
-      case TypePMem32:
-        Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
-      case TypeMem32:
-        Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
-        Descriptor->AddrSpaceGranularity = 32;
-        break;
+        case TypePMem64:
+          Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
+        case TypeMem64:
+          Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+          Descriptor->AddrSpaceGranularity = 64;
+          break;
 
-      case TypePMem64:
-        Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
-      case TypeMem64:
-        Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
-        Descriptor->AddrSpaceGranularity = 64;
-        break;
+        case TypeBus:
+          Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_BUS;
+          break;
 
-      case TypeBus:
-        Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_BUS;
-        break;
-
-      default:
-        break;
+        default:
+          break;
       }
 
       Descriptor++;
     }
+
     //
     // Terminate the root bridge resources.
     //
-    End = (EFI_ACPI_END_TAG_DESCRIPTOR *) Descriptor;
-    End->Desc = ACPI_END_TAG_DESCRIPTOR;
+    End = (EFI_ACPI_END_TAG_DESCRIPTOR *)Descriptor;
+    End->Desc     = ACPI_END_TAG_DESCRIPTOR;
     End->Checksum = 0x0;
 
-    Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) (End + 1);
+    Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)(End + 1);
   }
+
   //
   // Terminate the host bridge resources.
   //
-  End = (EFI_ACPI_END_TAG_DESCRIPTOR *) Descriptor;
-  End->Desc = ACPI_END_TAG_DESCRIPTOR;
+  End = (EFI_ACPI_END_TAG_DESCRIPTOR *)Descriptor;
+  End->Desc     = ACPI_END_TAG_DESCRIPTOR;
   End->Checksum = 0x0;
 
   DEBUG ((DEBUG_ERROR, "Call PciHostBridgeResourceConflict().\n"));
@@ -686,7 +758,7 @@ AllocateResource (
   UINT64  Limit
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   if (BaseAddress < Limit) {
     //
@@ -725,9 +797,11 @@ AllocateResource (
       if (!EFI_ERROR (Status)) {
         return BaseAddress;
       }
+
       BaseAddress += LShiftU64 (1, BitsOfAlignment);
     }
   }
+
   return MAX_UINT64;
 }
 
@@ -750,327 +824,370 @@ NotifyPhase (
   IN EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PHASE    Phase
   )
 {
-  PCI_HOST_BRIDGE_INSTANCE              *HostBridge;
-  PCI_ROOT_BRIDGE_INSTANCE              *RootBridge;
-  LIST_ENTRY                            *Link;
-  EFI_PHYSICAL_ADDRESS                  BaseAddress;
-  UINTN                                 BitsOfAlignment;
-  UINT64                                Alignment;
-  EFI_STATUS                            Status;
-  EFI_STATUS                            ReturnStatus;
-  PCI_RESOURCE_TYPE                     Index;
-  PCI_RESOURCE_TYPE                     Index1;
-  PCI_RESOURCE_TYPE                     Index2;
-  BOOLEAN                               ResNodeHandled[TypeMax];
-  UINT64                                MaxAlignment;
-  UINT64                                Translation;
+  PCI_HOST_BRIDGE_INSTANCE  *HostBridge;
+  PCI_ROOT_BRIDGE_INSTANCE  *RootBridge;
+  LIST_ENTRY                *Link;
+  EFI_PHYSICAL_ADDRESS      BaseAddress;
+  UINTN                     BitsOfAlignment;
+  UINT64                    Alignment;
+  EFI_STATUS                Status;
+  EFI_STATUS                ReturnStatus;
+  PCI_RESOURCE_TYPE         Index;
+  PCI_RESOURCE_TYPE         Index1;
+  PCI_RESOURCE_TYPE         Index2;
+  BOOLEAN                   ResNodeHandled[TypeMax];
+  UINT64                    MaxAlignment;
+  UINT64                    Translation;
 
   HostBridge = PCI_HOST_BRIDGE_FROM_THIS (This);
 
   switch (Phase) {
-  case EfiPciHostBridgeBeginEnumeration:
-    if (!HostBridge->CanRestarted) {
-      return EFI_NOT_READY;
-    }
-    //
-    // Reset Root Bridge
-    //
-    for (Link = GetFirstNode (&HostBridge->RootBridges)
-          ; !IsNull (&HostBridge->RootBridges, Link)
-          ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-          ) {
-      RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
-      for (Index = TypeIo; Index < TypeMax; Index++) {
-        RootBridge->ResAllocNode[Index].Type   = Index;
-        RootBridge->ResAllocNode[Index].Base   = 0;
-        RootBridge->ResAllocNode[Index].Length = 0;
-        RootBridge->ResAllocNode[Index].Status = ResNone;
+    case EfiPciHostBridgeBeginEnumeration:
+      if (!HostBridge->CanRestarted) {
+        return EFI_NOT_READY;
+      }
+
+      //
+      // Reset Root Bridge
+      //
+      for (Link = GetFirstNode (&HostBridge->RootBridges)
+           ; !IsNull (&HostBridge->RootBridges, Link)
+           ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+           )
+      {
+        RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
+        for (Index = TypeIo; Index < TypeMax; Index++) {
+          RootBridge->ResAllocNode[Index].Type   = Index;
+          RootBridge->ResAllocNode[Index].Base   = 0;
+          RootBridge->ResAllocNode[Index].Length = 0;
+          RootBridge->ResAllocNode[Index].Status = ResNone;
+
+          RootBridge->ResourceSubmitted = FALSE;
+        }
+      }
+
+      HostBridge->CanRestarted = TRUE;
+      break;
+
+    case EfiPciHostBridgeBeginBusAllocation:
+      //
+      // No specific action is required here, can perform any chipset specific programing
+      //
+      HostBridge->CanRestarted = FALSE;
+      break;
+
+    case EfiPciHostBridgeEndBusAllocation:
+      //
+      // No specific action is required here, can perform any chipset specific programing
+      //
+      break;
+
+    case EfiPciHostBridgeBeginResourceAllocation:
+      //
+      // No specific action is required here, can perform any chipset specific programing
+      //
+      break;
+
+    case EfiPciHostBridgeAllocateResources:
+      ReturnStatus = EFI_SUCCESS;
+
+      //
+      // Make sure the resource for all root bridges has been submitted.
+      //
+      for (Link = GetFirstNode (&HostBridge->RootBridges)
+           ; !IsNull (&HostBridge->RootBridges, Link)
+           ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+           )
+      {
+        RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
+        if (!RootBridge->ResourceSubmitted) {
+          return EFI_NOT_READY;
+        }
+      }
+
+      DEBUG ((DEBUG_INFO, "PciHostBridge: NotifyPhase (AllocateResources)\n"));
+      for (Link = GetFirstNode (&HostBridge->RootBridges)
+           ; !IsNull (&HostBridge->RootBridges, Link)
+           ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+           )
+      {
+        for (Index = TypeIo; Index < TypeBus; Index++) {
+          ResNodeHandled[Index] = FALSE;
+        }
+
+        RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
+        DEBUG ((DEBUG_INFO, " RootBridge: %s\n", RootBridge->DevicePathStr));
+
+        for (Index1 = TypeIo; Index1 < TypeBus; Index1++) {
+          if (RootBridge->ResAllocNode[Index1].Status == ResNone) {
+            ResNodeHandled[Index1] = TRUE;
+          } else {
+            //
+            // Allocate the resource node with max alignment at first
+            //
+            MaxAlignment = 0;
+            Index = TypeMax;
+            for (Index2 = TypeIo; Index2 < TypeBus; Index2++) {
+              if (ResNodeHandled[Index2]) {
+                continue;
+              }
+
+              if (MaxAlignment <= RootBridge->ResAllocNode[Index2].Alignment) {
+                MaxAlignment = RootBridge->ResAllocNode[Index2].Alignment;
+                Index = Index2;
+              }
+            }
+
+            ASSERT (Index < TypeMax);
+            ResNodeHandled[Index] = TRUE;
+            Alignment = RootBridge->ResAllocNode[Index].Alignment;
+            BitsOfAlignment = LowBitSet64 (Alignment + 1);
+            BaseAddress     = MAX_UINT64;
+
+            //
+            // RESTRICTION: To simplify the situation, we require the alignment of
+            // Translation must be larger than any BAR alignment in the same root
+            // bridge, so that resource allocation alignment can be applied to
+            // both device address and host address.
+            //
+            Translation = GetTranslationByResourceType (RootBridge, Index);
+            if ((Translation & Alignment) != 0) {
+              DEBUG ((
+                DEBUG_ERROR,
+                "[%a:%d] Translation %lx is not aligned to %lx!\n",
+                __FUNCTION__,
+                DEBUG_LINE_NUMBER,
+                Translation,
+                Alignment
+                ));
+              ASSERT ((Translation & Alignment) == 0);
+              //
+              // This may be caused by too large alignment or too small
+              // Translation; pick the 1st possibility and return out of resource,
+              // which can also go thru the same process for out of resource
+              // outside the loop.
+              //
+              ReturnStatus = EFI_OUT_OF_RESOURCES;
+              continue;
+            }
+
+            switch (Index) {
+              case TypeIo:
+                //
+                // Base and Limit in PCI_ROOT_BRIDGE_APERTURE are device address.
+                // For AllocateResource is manipulating GCD resource, we need to use
+                // host address here.
+                //
+                BaseAddress = AllocateResource (
+                                FALSE,
+                                RootBridge->ResAllocNode[Index].Length,
+                                MIN (15, BitsOfAlignment),
+                                TO_HOST_ADDRESS (
+                                  ALIGN_VALUE (RootBridge->Io.Base, Alignment + 1),
+                                  RootBridge->Io.Translation
+                                  ),
+                                TO_HOST_ADDRESS (
+                                  RootBridge->Io.Limit,
+                                  RootBridge->Io.Translation
+                                  )
+                                );
+                break;
+
+              case TypeMem64:
+                BaseAddress = AllocateResource (
+                                TRUE,
+                                RootBridge->ResAllocNode[Index].Length,
+                                MIN (63, BitsOfAlignment),
+                                TO_HOST_ADDRESS (
+                                  ALIGN_VALUE (RootBridge->MemAbove4G.Base, Alignment + 1),
+                                  RootBridge->MemAbove4G.Translation
+                                  ),
+                                TO_HOST_ADDRESS (
+                                  RootBridge->MemAbove4G.Limit,
+                                  RootBridge->MemAbove4G.Translation
+                                  )
+                                );
+                if (BaseAddress != MAX_UINT64) {
+                  break;
+                }
+
+              //
+              // If memory above 4GB is not available, try memory below 4GB
+              //
+
+              case TypeMem32:
+                BaseAddress = AllocateResource (
+                                TRUE,
+                                RootBridge->ResAllocNode[Index].Length,
+                                MIN (31, BitsOfAlignment),
+                                TO_HOST_ADDRESS (
+                                  ALIGN_VALUE (RootBridge->Mem.Base, Alignment + 1),
+                                  RootBridge->Mem.Translation
+                                  ),
+                                TO_HOST_ADDRESS (
+                                  RootBridge->Mem.Limit,
+                                  RootBridge->Mem.Translation
+                                  )
+                                );
+                break;
+
+              case TypePMem64:
+                BaseAddress = AllocateResource (
+                                TRUE,
+                                RootBridge->ResAllocNode[Index].Length,
+                                MIN (63, BitsOfAlignment),
+                                TO_HOST_ADDRESS (
+                                  ALIGN_VALUE (RootBridge->PMemAbove4G.Base, Alignment + 1),
+                                  RootBridge->PMemAbove4G.Translation
+                                  ),
+                                TO_HOST_ADDRESS (
+                                  RootBridge->PMemAbove4G.Limit,
+                                  RootBridge->PMemAbove4G.Translation
+                                  )
+                                );
+                if (BaseAddress != MAX_UINT64) {
+                  break;
+                }
+
+              //
+              // If memory above 4GB is not available, try memory below 4GB
+              //
+              case TypePMem32:
+                BaseAddress = AllocateResource (
+                                TRUE,
+                                RootBridge->ResAllocNode[Index].Length,
+                                MIN (31, BitsOfAlignment),
+                                TO_HOST_ADDRESS (
+                                  ALIGN_VALUE (RootBridge->PMem.Base, Alignment + 1),
+                                  RootBridge->PMem.Translation
+                                  ),
+                                TO_HOST_ADDRESS (
+                                  RootBridge->PMem.Limit,
+                                  RootBridge->PMem.Translation
+                                  )
+                                );
+                break;
+
+              default:
+                ASSERT (FALSE);
+                break;
+            }
+
+            DEBUG ((
+              DEBUG_INFO,
+              "  %s: Base/Length/Alignment = %lx/%lx/%lx - ",
+              mPciResourceTypeStr[Index],
+              BaseAddress,
+              RootBridge->ResAllocNode[Index].Length,
+              Alignment
+              ));
+            if (BaseAddress != MAX_UINT64) {
+              RootBridge->ResAllocNode[Index].Base   = BaseAddress;
+              RootBridge->ResAllocNode[Index].Status = ResAllocated;
+              DEBUG ((DEBUG_INFO, "Success\n"));
+            } else {
+              ReturnStatus = EFI_OUT_OF_RESOURCES;
+              DEBUG ((DEBUG_ERROR, "Out Of Resource!\n"));
+            }
+          }
+        }
+      }
+
+      if (ReturnStatus == EFI_OUT_OF_RESOURCES) {
+        ResourceConflict (HostBridge);
+      }
+
+      //
+      // Set resource to zero for nodes where allocation fails
+      //
+      for (Link = GetFirstNode (&HostBridge->RootBridges)
+           ; !IsNull (&HostBridge->RootBridges, Link)
+           ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+           )
+      {
+        RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
+        for (Index = TypeIo; Index < TypeBus; Index++) {
+          if (RootBridge->ResAllocNode[Index].Status != ResAllocated) {
+            RootBridge->ResAllocNode[Index].Length = 0;
+          }
+        }
+      }
+
+      return ReturnStatus;
+
+    case EfiPciHostBridgeSetResources:
+      //
+      // HostBridgeInstance->CanRestarted = FALSE;
+      //
+      break;
+
+    case EfiPciHostBridgeFreeResources:
+      //
+      // HostBridgeInstance->CanRestarted = FALSE;
+      //
+      ReturnStatus = EFI_SUCCESS;
+      for (Link = GetFirstNode (&HostBridge->RootBridges)
+           ; !IsNull (&HostBridge->RootBridges, Link)
+           ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+           )
+      {
+        RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
+        for (Index = TypeIo; Index < TypeBus; Index++) {
+          if (RootBridge->ResAllocNode[Index].Status == ResAllocated) {
+            switch (Index) {
+              case TypeIo:
+                Status = gDS->FreeIoSpace (RootBridge->ResAllocNode[Index].Base, RootBridge->ResAllocNode[Index].Length);
+                if (EFI_ERROR (Status)) {
+                  ReturnStatus = Status;
+                }
+
+                break;
+
+              case TypeMem32:
+              case TypePMem32:
+              case TypeMem64:
+              case TypePMem64:
+                Status = gDS->FreeMemorySpace (RootBridge->ResAllocNode[Index].Base, RootBridge->ResAllocNode[Index].Length);
+                if (EFI_ERROR (Status)) {
+                  ReturnStatus = Status;
+                }
+
+                break;
+
+              default:
+                ASSERT (FALSE);
+                break;
+            }
+
+            RootBridge->ResAllocNode[Index].Type   = Index;
+            RootBridge->ResAllocNode[Index].Base   = 0;
+            RootBridge->ResAllocNode[Index].Length = 0;
+            RootBridge->ResAllocNode[Index].Status = ResNone;
+          }
+        }
 
         RootBridge->ResourceSubmitted = FALSE;
       }
-    }
 
-    HostBridge->CanRestarted = TRUE;
-    break;
+      HostBridge->CanRestarted = TRUE;
+      return ReturnStatus;
 
-  case EfiPciHostBridgeBeginBusAllocation:
-    //
-    // No specific action is required here, can perform any chipset specific programing
-    //
-    HostBridge->CanRestarted = FALSE;
-    break;
+    case EfiPciHostBridgeEndResourceAllocation:
+      //
+      // The resource allocation phase is completed.  No specific action is required
+      // here. This notification can be used to perform any chipset specific programming.
+      //
+      break;
 
-  case EfiPciHostBridgeEndBusAllocation:
-    //
-    // No specific action is required here, can perform any chipset specific programing
-    //
-    break;
+    case EfiPciHostBridgeEndEnumeration:
+      //
+      // The Host Bridge Enumeration is completed. No specific action is required here.
+      // This notification can be used to perform any chipset specific programming.
+      //
+      break;
 
-  case EfiPciHostBridgeBeginResourceAllocation:
-    //
-    // No specific action is required here, can perform any chipset specific programing
-    //
-    break;
-
-  case EfiPciHostBridgeAllocateResources:
-    ReturnStatus = EFI_SUCCESS;
-
-    //
-    // Make sure the resource for all root bridges has been submitted.
-    //
-    for (Link = GetFirstNode (&HostBridge->RootBridges)
-         ; !IsNull (&HostBridge->RootBridges, Link)
-         ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-         ) {
-      RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
-      if (!RootBridge->ResourceSubmitted) {
-        return EFI_NOT_READY;
-      }
-    }
-
-    DEBUG ((DEBUG_INFO, "PciHostBridge: NotifyPhase (AllocateResources)\n"));
-    for (Link = GetFirstNode (&HostBridge->RootBridges)
-         ; !IsNull (&HostBridge->RootBridges, Link)
-         ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-         ) {
-      for (Index = TypeIo; Index < TypeBus; Index++) {
-        ResNodeHandled[Index] = FALSE;
-      }
-
-      RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
-      DEBUG ((DEBUG_INFO, " RootBridge: %s\n", RootBridge->DevicePathStr));
-
-      for (Index1 = TypeIo; Index1 < TypeBus; Index1++) {
-        if (RootBridge->ResAllocNode[Index1].Status == ResNone) {
-          ResNodeHandled[Index1] = TRUE;
-        } else {
-          //
-          // Allocate the resource node with max alignment at first
-          //
-          MaxAlignment = 0;
-          Index = TypeMax;
-          for (Index2 = TypeIo; Index2 < TypeBus; Index2++) {
-            if (ResNodeHandled[Index2]) {
-              continue;
-            }
-            if (MaxAlignment <= RootBridge->ResAllocNode[Index2].Alignment) {
-              MaxAlignment = RootBridge->ResAllocNode[Index2].Alignment;
-              Index = Index2;
-            }
-          }
-
-          ASSERT (Index < TypeMax);
-          ResNodeHandled[Index] = TRUE;
-          Alignment = RootBridge->ResAllocNode[Index].Alignment;
-          BitsOfAlignment = LowBitSet64 (Alignment + 1);
-          BaseAddress = MAX_UINT64;
-
-          //
-          // RESTRICTION: To simplify the situation, we require the alignment of
-          // Translation must be larger than any BAR alignment in the same root
-          // bridge, so that resource allocation alignment can be applied to
-          // both device address and host address.
-          //
-          Translation = GetTranslationByResourceType (RootBridge, Index);
-          if ((Translation & Alignment) != 0) {
-            DEBUG ((DEBUG_ERROR, "[%a:%d] Translation %lx is not aligned to %lx!\n",
-              __FUNCTION__, DEBUG_LINE_NUMBER, Translation, Alignment
-              ));
-            ASSERT ((Translation & Alignment) == 0);
-            //
-            // This may be caused by too large alignment or too small
-            // Translation; pick the 1st possibility and return out of resource,
-            // which can also go thru the same process for out of resource
-            // outside the loop.
-            //
-            ReturnStatus = EFI_OUT_OF_RESOURCES;
-            continue;
-          }
-
-          switch (Index) {
-          case TypeIo:
-            //
-            // Base and Limit in PCI_ROOT_BRIDGE_APERTURE are device address.
-            // For AllocateResource is manipulating GCD resource, we need to use
-            // host address here.
-            //
-            BaseAddress = AllocateResource (
-                            FALSE,
-                            RootBridge->ResAllocNode[Index].Length,
-                            MIN (15, BitsOfAlignment),
-                            TO_HOST_ADDRESS (ALIGN_VALUE (RootBridge->Io.Base, Alignment + 1),
-                              RootBridge->Io.Translation),
-                            TO_HOST_ADDRESS (RootBridge->Io.Limit,
-                              RootBridge->Io.Translation)
-                            );
-            break;
-
-          case TypeMem64:
-            BaseAddress = AllocateResource (
-                            TRUE,
-                            RootBridge->ResAllocNode[Index].Length,
-                            MIN (63, BitsOfAlignment),
-                            TO_HOST_ADDRESS (ALIGN_VALUE (RootBridge->MemAbove4G.Base, Alignment + 1),
-                              RootBridge->MemAbove4G.Translation),
-                            TO_HOST_ADDRESS (RootBridge->MemAbove4G.Limit,
-                              RootBridge->MemAbove4G.Translation)
-                            );
-            if (BaseAddress != MAX_UINT64) {
-              break;
-            }
-            //
-            // If memory above 4GB is not available, try memory below 4GB
-            //
-
-          case TypeMem32:
-            BaseAddress = AllocateResource (
-                            TRUE,
-                            RootBridge->ResAllocNode[Index].Length,
-                            MIN (31, BitsOfAlignment),
-                            TO_HOST_ADDRESS (ALIGN_VALUE (RootBridge->Mem.Base, Alignment + 1),
-                              RootBridge->Mem.Translation),
-                            TO_HOST_ADDRESS (RootBridge->Mem.Limit,
-                              RootBridge->Mem.Translation)
-                            );
-            break;
-
-          case TypePMem64:
-            BaseAddress = AllocateResource (
-                            TRUE,
-                            RootBridge->ResAllocNode[Index].Length,
-                            MIN (63, BitsOfAlignment),
-                            TO_HOST_ADDRESS (ALIGN_VALUE (RootBridge->PMemAbove4G.Base, Alignment + 1),
-                              RootBridge->PMemAbove4G.Translation),
-                            TO_HOST_ADDRESS (RootBridge->PMemAbove4G.Limit,
-                              RootBridge->PMemAbove4G.Translation)
-                            );
-            if (BaseAddress != MAX_UINT64) {
-              break;
-            }
-            //
-            // If memory above 4GB is not available, try memory below 4GB
-            //
-          case TypePMem32:
-            BaseAddress = AllocateResource (
-                            TRUE,
-                            RootBridge->ResAllocNode[Index].Length,
-                            MIN (31, BitsOfAlignment),
-                            TO_HOST_ADDRESS (ALIGN_VALUE (RootBridge->PMem.Base, Alignment + 1),
-                              RootBridge->PMem.Translation),
-                            TO_HOST_ADDRESS (RootBridge->PMem.Limit,
-                              RootBridge->PMem.Translation)
-                            );
-            break;
-
-          default:
-            ASSERT (FALSE);
-            break;
-          }
-
-          DEBUG ((DEBUG_INFO, "  %s: Base/Length/Alignment = %lx/%lx/%lx - ",
-                  mPciResourceTypeStr[Index], BaseAddress, RootBridge->ResAllocNode[Index].Length, Alignment));
-          if (BaseAddress != MAX_UINT64) {
-            RootBridge->ResAllocNode[Index].Base = BaseAddress;
-            RootBridge->ResAllocNode[Index].Status = ResAllocated;
-            DEBUG ((DEBUG_INFO, "Success\n"));
-          } else {
-            ReturnStatus = EFI_OUT_OF_RESOURCES;
-            DEBUG ((DEBUG_ERROR, "Out Of Resource!\n"));
-          }
-        }
-      }
-    }
-
-    if (ReturnStatus == EFI_OUT_OF_RESOURCES) {
-      ResourceConflict (HostBridge);
-    }
-
-    //
-    // Set resource to zero for nodes where allocation fails
-    //
-    for (Link = GetFirstNode (&HostBridge->RootBridges)
-          ; !IsNull (&HostBridge->RootBridges, Link)
-          ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-          ) {
-      RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
-      for (Index = TypeIo; Index < TypeBus; Index++) {
-        if (RootBridge->ResAllocNode[Index].Status != ResAllocated) {
-          RootBridge->ResAllocNode[Index].Length = 0;
-        }
-      }
-    }
-    return ReturnStatus;
-
-  case EfiPciHostBridgeSetResources:
-    //
-    // HostBridgeInstance->CanRestarted = FALSE;
-    //
-    break;
-
-  case EfiPciHostBridgeFreeResources:
-    //
-    // HostBridgeInstance->CanRestarted = FALSE;
-    //
-    ReturnStatus = EFI_SUCCESS;
-    for (Link = GetFirstNode (&HostBridge->RootBridges)
-         ; !IsNull (&HostBridge->RootBridges, Link)
-         ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-         ) {
-      RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
-      for (Index = TypeIo; Index < TypeBus; Index++) {
-        if (RootBridge->ResAllocNode[Index].Status == ResAllocated) {
-          switch (Index) {
-          case TypeIo:
-            Status = gDS->FreeIoSpace (RootBridge->ResAllocNode[Index].Base, RootBridge->ResAllocNode[Index].Length);
-            if (EFI_ERROR (Status)) {
-              ReturnStatus = Status;
-            }
-            break;
-
-          case TypeMem32:
-          case TypePMem32:
-          case TypeMem64:
-          case TypePMem64:
-            Status = gDS->FreeMemorySpace (RootBridge->ResAllocNode[Index].Base, RootBridge->ResAllocNode[Index].Length);
-            if (EFI_ERROR (Status)) {
-              ReturnStatus = Status;
-            }
-            break;
-
-          default:
-            ASSERT (FALSE);
-            break;
-          }
-
-          RootBridge->ResAllocNode[Index].Type = Index;
-          RootBridge->ResAllocNode[Index].Base = 0;
-          RootBridge->ResAllocNode[Index].Length = 0;
-          RootBridge->ResAllocNode[Index].Status = ResNone;
-        }
-      }
-
-      RootBridge->ResourceSubmitted = FALSE;
-    }
-
-    HostBridge->CanRestarted = TRUE;
-    return ReturnStatus;
-
-  case EfiPciHostBridgeEndResourceAllocation:
-    //
-    // The resource allocation phase is completed.  No specific action is required
-    // here. This notification can be used to perform any chipset specific programming.
-    //
-    break;
-
-  case EfiPciHostBridgeEndEnumeration:
-    //
-    // The Host Bridge Enumeration is completed. No specific action is required here.
-    // This notification can be used to perform any chipset specific programming.
-    //
-    break;
-
-  default:
-    return EFI_INVALID_PARAMETER;
+    default:
+      return EFI_INVALID_PARAMETER;
   }
 
   return EFI_SUCCESS;
@@ -1109,19 +1226,20 @@ GetNextRootBridge (
   }
 
   HostBridge = PCI_HOST_BRIDGE_FROM_THIS (This);
-  ReturnNext = (BOOLEAN) (*RootBridgeHandle == NULL);
+  ReturnNext = (BOOLEAN)(*RootBridgeHandle == NULL);
 
   for (Link = GetFirstNode (&HostBridge->RootBridges)
-      ; !IsNull (&HostBridge->RootBridges, Link)
-      ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-      ) {
+       ; !IsNull (&HostBridge->RootBridges, Link)
+       ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+       )
+  {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (ReturnNext) {
       *RootBridgeHandle = RootBridge->Handle;
       return EFI_SUCCESS;
     }
 
-    ReturnNext = (BOOLEAN) (*RootBridgeHandle == RootBridge->Handle);
+    ReturnNext = (BOOLEAN)(*RootBridgeHandle == RootBridge->Handle);
   }
 
   if (ReturnNext) {
@@ -1166,9 +1284,10 @@ GetAttributes (
 
   HostBridge = PCI_HOST_BRIDGE_FROM_THIS (This);
   for (Link = GetFirstNode (&HostBridge->RootBridges)
-      ; !IsNull (&HostBridge->RootBridges, Link)
-      ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-      ) {
+       ; !IsNull (&HostBridge->RootBridges, Link)
+       ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+       )
+  {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (RootBridgeHandle == RootBridge->Handle) {
       *Attributes = RootBridge->AllocationAttributes;
@@ -1201,11 +1320,11 @@ StartBusEnumeration (
   OUT VOID                                             **Configuration
   )
 {
-  LIST_ENTRY                *Link;
-  PCI_HOST_BRIDGE_INSTANCE  *HostBridge;
-  PCI_ROOT_BRIDGE_INSTANCE  *RootBridge;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
-  EFI_ACPI_END_TAG_DESCRIPTOR       *End;
+  LIST_ENTRY                         *Link;
+  PCI_HOST_BRIDGE_INSTANCE           *HostBridge;
+  PCI_ROOT_BRIDGE_INSTANCE           *RootBridge;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+  EFI_ACPI_END_TAG_DESCRIPTOR        *End;
 
   if (Configuration == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1215,7 +1334,8 @@ StartBusEnumeration (
   for (Link = GetFirstNode (&HostBridge->RootBridges)
        ; !IsNull (&HostBridge->RootBridges, Link)
        ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-       ) {
+       )
+  {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (RootBridgeHandle == RootBridge->Handle) {
       *Configuration = AllocatePool (sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR));
@@ -1223,20 +1343,20 @@ StartBusEnumeration (
         return EFI_OUT_OF_RESOURCES;
       }
 
-      Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) *Configuration;
-      Descriptor->Desc                  = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-      Descriptor->Len                   = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
-      Descriptor->ResType               = ACPI_ADDRESS_SPACE_TYPE_BUS;
-      Descriptor->GenFlag               = 0;
-      Descriptor->SpecificFlag          = 0;
-      Descriptor->AddrSpaceGranularity  = 0;
-      Descriptor->AddrRangeMin          = RootBridge->Bus.Base;
-      Descriptor->AddrRangeMax          = 0;
+      Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)*Configuration;
+      Descriptor->Desc    = ACPI_ADDRESS_SPACE_DESCRIPTOR;
+      Descriptor->Len     = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+      Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_BUS;
+      Descriptor->GenFlag = 0;
+      Descriptor->SpecificFlag = 0;
+      Descriptor->AddrSpaceGranularity = 0;
+      Descriptor->AddrRangeMin = RootBridge->Bus.Base;
+      Descriptor->AddrRangeMax = 0;
       Descriptor->AddrTranslationOffset = 0;
-      Descriptor->AddrLen               = RootBridge->Bus.Limit - RootBridge->Bus.Base + 1;
+      Descriptor->AddrLen = RootBridge->Bus.Limit - RootBridge->Bus.Base + 1;
 
-      End = (EFI_ACPI_END_TAG_DESCRIPTOR *) (Descriptor + 1);
-      End->Desc = ACPI_END_TAG_DESCRIPTOR;
+      End = (EFI_ACPI_END_TAG_DESCRIPTOR *)(Descriptor + 1);
+      End->Desc     = ACPI_END_TAG_DESCRIPTOR;
       End->Checksum = 0x0;
 
       return EFI_SUCCESS;
@@ -1267,18 +1387,18 @@ SetBusNumbers (
   IN VOID                                             *Configuration
   )
 {
-  LIST_ENTRY                *Link;
-  PCI_HOST_BRIDGE_INSTANCE  *HostBridge;
-  PCI_ROOT_BRIDGE_INSTANCE  *RootBridge;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
-  EFI_ACPI_END_TAG_DESCRIPTOR       *End;
+  LIST_ENTRY                         *Link;
+  PCI_HOST_BRIDGE_INSTANCE           *HostBridge;
+  PCI_ROOT_BRIDGE_INSTANCE           *RootBridge;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+  EFI_ACPI_END_TAG_DESCRIPTOR        *End;
 
   if (Configuration == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration;
-  End = (EFI_ACPI_END_TAG_DESCRIPTOR *) (Descriptor + 1);
+  Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)Configuration;
+  End = (EFI_ACPI_END_TAG_DESCRIPTOR *)(Descriptor + 1);
 
   //
   // Check the Configuration is valid
@@ -1286,7 +1406,8 @@ SetBusNumbers (
   if ((Descriptor->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR) ||
       (Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_BUS) ||
       (End->Desc != ACPI_END_TAG_DESCRIPTOR)
-     ) {
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1294,25 +1415,27 @@ SetBusNumbers (
   for (Link = GetFirstNode (&HostBridge->RootBridges)
        ; !IsNull (&HostBridge->RootBridges, Link)
        ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-       ) {
+       )
+  {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (RootBridgeHandle == RootBridge->Handle) {
-
       if (Descriptor->AddrLen == 0) {
         return EFI_INVALID_PARAMETER;
       }
 
       if ((Descriptor->AddrRangeMin < RootBridge->Bus.Base) ||
           (Descriptor->AddrRangeMin + Descriptor->AddrLen - 1 > RootBridge->Bus.Limit)
-         ) {
+          )
+      {
         return EFI_INVALID_PARAMETER;
       }
+
       //
       // Update the Bus Range
       //
-      RootBridge->ResAllocNode[TypeBus].Base    = Descriptor->AddrRangeMin;
-      RootBridge->ResAllocNode[TypeBus].Length  = Descriptor->AddrLen;
-      RootBridge->ResAllocNode[TypeBus].Status  = ResAllocated;
+      RootBridge->ResAllocNode[TypeBus].Base   = Descriptor->AddrRangeMin;
+      RootBridge->ResAllocNode[TypeBus].Length = Descriptor->AddrLen;
+      RootBridge->ResAllocNode[TypeBus].Status = ResAllocated;
       return EFI_SUCCESS;
     }
   }
@@ -1340,11 +1463,11 @@ SubmitResources (
   IN VOID                                             *Configuration
   )
 {
-  LIST_ENTRY                        *Link;
-  PCI_HOST_BRIDGE_INSTANCE          *HostBridge;
-  PCI_ROOT_BRIDGE_INSTANCE          *RootBridge;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
-  PCI_RESOURCE_TYPE                 Type;
+  LIST_ENTRY                         *Link;
+  PCI_HOST_BRIDGE_INSTANCE           *HostBridge;
+  PCI_ROOT_BRIDGE_INSTANCE           *RootBridge;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+  PCI_RESOURCE_TYPE                  Type;
 
   //
   // Check the input parameter: Configuration
@@ -1357,7 +1480,8 @@ SubmitResources (
   for (Link = GetFirstNode (&HostBridge->RootBridges)
        ; !IsNull (&HostBridge->RootBridges, Link)
        ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-       ) {
+       )
+  {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (RootBridgeHandle == RootBridge->Handle) {
       DEBUG ((DEBUG_INFO, "PciHostBridge: SubmitResources for %s\n", RootBridge->DevicePathStr));
@@ -1366,52 +1490,62 @@ SubmitResources (
       // If the Configuration includes one or more invalid resource descriptors, all the resource
       // descriptors are ignored and the function returns EFI_INVALID_PARAMETER.
       //
-      for (Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
+      for (Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)Configuration; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
         if (Descriptor->ResType > ACPI_ADDRESS_SPACE_TYPE_BUS) {
           return EFI_INVALID_PARAMETER;
         }
 
-        DEBUG ((DEBUG_INFO, " %s: Granularity/SpecificFlag = %ld / %02x%s\n",
-                mAcpiAddressSpaceTypeStr[Descriptor->ResType], Descriptor->AddrSpaceGranularity, Descriptor->SpecificFlag,
-                (Descriptor->SpecificFlag & EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) != 0 ? L" (Prefetchable)" : L""
-                ));
+        DEBUG ((
+          DEBUG_INFO,
+          " %s: Granularity/SpecificFlag = %ld / %02x%s\n",
+          mAcpiAddressSpaceTypeStr[Descriptor->ResType],
+          Descriptor->AddrSpaceGranularity,
+          Descriptor->SpecificFlag,
+          (Descriptor->SpecificFlag & EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) != 0 ? L" (Prefetchable)" : L""
+          ));
         DEBUG ((DEBUG_INFO, "      Length/Alignment = 0x%lx / 0x%lx\n", Descriptor->AddrLen, Descriptor->AddrRangeMax));
         switch (Descriptor->ResType) {
-        case ACPI_ADDRESS_SPACE_TYPE_MEM:
-          if (Descriptor->AddrSpaceGranularity != 32 && Descriptor->AddrSpaceGranularity != 64) {
-            return EFI_INVALID_PARAMETER;
-          }
-          if (Descriptor->AddrSpaceGranularity == 32 && Descriptor->AddrLen >= SIZE_4GB) {
-            return EFI_INVALID_PARAMETER;
-          }
-          //
-          // If the PCI root bridge does not support separate windows for nonprefetchable and
-          // prefetchable memory, then the PCI bus driver needs to include requests for
-          // prefetchable memory in the nonprefetchable memory pool.
-          //
-          if (((RootBridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM) != 0) &&
-              ((Descriptor->SpecificFlag & EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) != 0)
-             ) {
-            return EFI_INVALID_PARAMETER;
-          }
-        case ACPI_ADDRESS_SPACE_TYPE_IO:
-          //
-          // Check aligment, it should be of the form 2^n-1
-          //
-          if (GetPowerOfTwo64 (Descriptor->AddrRangeMax + 1) != (Descriptor->AddrRangeMax + 1)) {
-            return EFI_INVALID_PARAMETER;
-          }
-          break;
-        default:
-          ASSERT (FALSE);
-          break;
+          case ACPI_ADDRESS_SPACE_TYPE_MEM:
+            if ((Descriptor->AddrSpaceGranularity != 32) && (Descriptor->AddrSpaceGranularity != 64)) {
+              return EFI_INVALID_PARAMETER;
+            }
+
+            if ((Descriptor->AddrSpaceGranularity == 32) && (Descriptor->AddrLen >= SIZE_4GB)) {
+              return EFI_INVALID_PARAMETER;
+            }
+
+            //
+            // If the PCI root bridge does not support separate windows for nonprefetchable and
+            // prefetchable memory, then the PCI bus driver needs to include requests for
+            // prefetchable memory in the nonprefetchable memory pool.
+            //
+            if (((RootBridge->AllocationAttributes & EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM) != 0) &&
+                ((Descriptor->SpecificFlag & EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) != 0)
+                )
+            {
+              return EFI_INVALID_PARAMETER;
+            }
+
+          case ACPI_ADDRESS_SPACE_TYPE_IO:
+            //
+            // Check aligment, it should be of the form 2^n-1
+            //
+            if (GetPowerOfTwo64 (Descriptor->AddrRangeMax + 1) != (Descriptor->AddrRangeMax + 1)) {
+              return EFI_INVALID_PARAMETER;
+            }
+
+            break;
+          default:
+            ASSERT (FALSE);
+            break;
         }
       }
+
       if (Descriptor->Desc != ACPI_END_TAG_DESCRIPTOR) {
         return EFI_INVALID_PARAMETER;
       }
 
-      for (Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
+      for (Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)Configuration; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
         if (Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) {
           if (Descriptor->AddrSpaceGranularity == 32) {
             if ((Descriptor->SpecificFlag & EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) != 0) {
@@ -1431,10 +1565,12 @@ SubmitResources (
           ASSERT (Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_IO);
           Type = TypeIo;
         }
+
         RootBridge->ResAllocNode[Type].Length    = Descriptor->AddrLen;
         RootBridge->ResAllocNode[Type].Alignment = Descriptor->AddrRangeMax;
         RootBridge->ResAllocNode[Type].Status    = ResSubmitted;
       }
+
       RootBridge->ResourceSubmitted = TRUE;
       return EFI_SUCCESS;
     }
@@ -1466,21 +1602,22 @@ GetProposedResources (
   OUT VOID                                             **Configuration
   )
 {
-  LIST_ENTRY                        *Link;
-  PCI_HOST_BRIDGE_INSTANCE          *HostBridge;
-  PCI_ROOT_BRIDGE_INSTANCE          *RootBridge;
-  UINTN                             Index;
-  UINTN                             Number;
-  VOID                              *Buffer;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
-  EFI_ACPI_END_TAG_DESCRIPTOR       *End;
-  UINT64                            ResStatus;
+  LIST_ENTRY                         *Link;
+  PCI_HOST_BRIDGE_INSTANCE           *HostBridge;
+  PCI_ROOT_BRIDGE_INSTANCE           *RootBridge;
+  UINTN                              Index;
+  UINTN                              Number;
+  VOID                               *Buffer;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+  EFI_ACPI_END_TAG_DESCRIPTOR        *End;
+  UINT64                             ResStatus;
 
   HostBridge = PCI_HOST_BRIDGE_FROM_THIS (This);
   for (Link = GetFirstNode (&HostBridge->RootBridges)
-      ; !IsNull (&HostBridge->RootBridges, Link)
-      ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-      ) {
+       ; !IsNull (&HostBridge->RootBridges, Link)
+       ; Link = GetNextNode (&HostBridge->RootBridges, Link)
+       )
+  {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (RootBridgeHandle == RootBridge->Handle) {
       for (Index = 0, Number = 0; Index < TypeBus; Index++) {
@@ -1494,52 +1631,54 @@ GetProposedResources (
         return EFI_OUT_OF_RESOURCES;
       }
 
-      Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Buffer;
+      Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)Buffer;
       for (Index = 0; Index < TypeBus; Index++) {
         ResStatus = RootBridge->ResAllocNode[Index].Status;
         if (ResStatus != ResNone) {
-          Descriptor->Desc                  = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-          Descriptor->Len                   = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;;
-          Descriptor->GenFlag               = 0;
+          Descriptor->Desc    = ACPI_ADDRESS_SPACE_DESCRIPTOR;
+          Descriptor->Len     = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
+          Descriptor->GenFlag = 0;
           //
           // AddrRangeMin in Resource Descriptor here should be device address
           // instead of host address, or else PCI bus driver cannot set correct
           // address into PCI BAR registers.
           // Base in ResAllocNode is a host address, so conversion is needed.
           //
-          Descriptor->AddrRangeMin          = TO_DEVICE_ADDRESS (RootBridge->ResAllocNode[Index].Base,
-            GetTranslationByResourceType (RootBridge, Index));
-          Descriptor->AddrRangeMax          = 0;
+          Descriptor->AddrRangeMin = TO_DEVICE_ADDRESS (
+                                       RootBridge->ResAllocNode[Index].Base,
+                                       GetTranslationByResourceType (RootBridge, Index)
+                                       );
+          Descriptor->AddrRangeMax = 0;
           Descriptor->AddrTranslationOffset = (ResStatus == ResAllocated) ? EFI_RESOURCE_SATISFIED : PCI_RESOURCE_LESS;
-          Descriptor->AddrLen               = RootBridge->ResAllocNode[Index].Length;
+          Descriptor->AddrLen = RootBridge->ResAllocNode[Index].Length;
 
           switch (Index) {
+            case TypeIo:
+              Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_IO;
+              break;
 
-          case TypeIo:
-            Descriptor->ResType              = ACPI_ADDRESS_SPACE_TYPE_IO;
-            break;
+            case TypePMem32:
+              Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
+            case TypeMem32:
+              Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+              Descriptor->AddrSpaceGranularity = 32;
+              break;
 
-          case TypePMem32:
-            Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
-          case TypeMem32:
-            Descriptor->ResType              = ACPI_ADDRESS_SPACE_TYPE_MEM;
-            Descriptor->AddrSpaceGranularity = 32;
-            break;
-
-          case TypePMem64:
-            Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
-          case TypeMem64:
-            Descriptor->ResType              = ACPI_ADDRESS_SPACE_TYPE_MEM;
-            Descriptor->AddrSpaceGranularity = 64;
-            break;
+            case TypePMem64:
+              Descriptor->SpecificFlag = EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE;
+            case TypeMem64:
+              Descriptor->ResType = ACPI_ADDRESS_SPACE_TYPE_MEM;
+              Descriptor->AddrSpaceGranularity = 64;
+              break;
           }
 
           Descriptor++;
         }
       }
-      End = (EFI_ACPI_END_TAG_DESCRIPTOR *) Descriptor;
-      End->Desc      = ACPI_END_TAG_DESCRIPTOR;
-      End->Checksum  = 0;
+
+      End = (EFI_ACPI_END_TAG_DESCRIPTOR *)Descriptor;
+      End->Desc     = ACPI_END_TAG_DESCRIPTOR;
+      End->Checksum = 0;
 
       *Configuration = Buffer;
 
@@ -1577,7 +1716,7 @@ PreprocessController (
   PCI_HOST_BRIDGE_INSTANCE  *HostBridge;
   PCI_ROOT_BRIDGE_INSTANCE  *RootBridge;
 
-  if ((UINT32) Phase > EfiPciBeforeResourceCollection) {
+  if ((UINT32)Phase > EfiPciBeforeResourceCollection) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1585,7 +1724,8 @@ PreprocessController (
   for (Link = GetFirstNode (&HostBridge->RootBridges)
        ; !IsNull (&HostBridge->RootBridges, Link)
        ; Link = GetNextNode (&HostBridge->RootBridges, Link)
-       ) {
+       )
+  {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (RootBridgeHandle == RootBridge->Handle) {
       return EFI_SUCCESS;

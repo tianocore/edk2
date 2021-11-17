@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // This the global main table to keep track of the interrupts
 //
-IDT_ENTRY                 *IdtEntryTable  = NULL;
+IDT_ENTRY  *IdtEntryTable = NULL;
 
 /**
   Read IDT Gate Descriptor from IDT Table.
@@ -26,13 +26,13 @@ ReadIdtGateDescriptor (
   OUT IA32_IDT_GATE_DESCRIPTOR  *IdtGateDescriptor
   )
 {
- IA32_DESCRIPTOR            IdtrValue;
- IA32_IDT_GATE_DESCRIPTOR   *IdtTable;
+  IA32_DESCRIPTOR           IdtrValue;
+  IA32_IDT_GATE_DESCRIPTOR  *IdtTable;
 
- AsmReadIdtr (&IdtrValue);
- IdtTable = (IA32_IDT_GATE_DESCRIPTOR *) IdtrValue.Base;
+  AsmReadIdtr (&IdtrValue);
+  IdtTable = (IA32_IDT_GATE_DESCRIPTOR *)IdtrValue.Base;
 
- CopyMem ((VOID *) IdtGateDescriptor, (VOID *) &(IdtTable)[Vector], sizeof (IA32_IDT_GATE_DESCRIPTOR));
+  CopyMem ((VOID *)IdtGateDescriptor, (VOID *)&(IdtTable)[Vector], sizeof (IA32_IDT_GATE_DESCRIPTOR));
 }
 
 /**
@@ -48,13 +48,13 @@ WriteIdtGateDescriptor (
   IA32_IDT_GATE_DESCRIPTOR  *IdtGateDescriptor
   )
 {
- IA32_DESCRIPTOR            IdtrValue;
- IA32_IDT_GATE_DESCRIPTOR   *IdtTable;
+  IA32_DESCRIPTOR           IdtrValue;
+  IA32_IDT_GATE_DESCRIPTOR  *IdtTable;
 
- AsmReadIdtr (&IdtrValue);
- IdtTable = (IA32_IDT_GATE_DESCRIPTOR *) IdtrValue.Base;
+  AsmReadIdtr (&IdtrValue);
+  IdtTable = (IA32_IDT_GATE_DESCRIPTOR *)IdtrValue.Base;
 
- CopyMem ((VOID *) &(IdtTable)[Vector], (VOID *) IdtGateDescriptor, sizeof (IA32_IDT_GATE_DESCRIPTOR));
+  CopyMem ((VOID *)&(IdtTable)[Vector], (VOID *)IdtGateDescriptor, sizeof (IA32_IDT_GATE_DESCRIPTOR));
 }
 
 /**
@@ -75,9 +75,9 @@ HookEntry (
   IN CALLBACK_FUNC                 NewCallback
   )
 {
-  BOOLEAN     OldIntFlagState;
+  BOOLEAN  OldIntFlagState;
 
-  CreateEntryStub (ExceptionType, (VOID **) &IdtEntryTable[ExceptionType].StubEntry);
+  CreateEntryStub (ExceptionType, (VOID **)&IdtEntryTable[ExceptionType].StubEntry);
 
   //
   // Disables CPU interrupts and returns the previous interrupt state
@@ -91,7 +91,7 @@ HookEntry (
   //
   // stores orignal interrupt handle
   //
-  IdtEntryTable[ExceptionType].OrigVector = (DEBUG_PROC) GetInterruptHandleFromIdt (&(IdtEntryTable[ExceptionType].OrigDesc));
+  IdtEntryTable[ExceptionType].OrigVector = (DEBUG_PROC)GetInterruptHandleFromIdt (&(IdtEntryTable[ExceptionType].OrigDesc));
 
   //
   // encodes new IDT Gate descriptor by stub entry
@@ -112,7 +112,7 @@ HookEntry (
   //
   SetInterruptState (OldIntFlagState);
 
-  return ;
+  return;
 }
 
 /**
@@ -126,7 +126,7 @@ UnhookEntry (
   IN EFI_EXCEPTION_TYPE           ExceptionType
   )
 {
-  BOOLEAN     OldIntFlagState;
+  BOOLEAN  OldIntFlagState;
 
   //
   // Disables CPU interrupts and returns the previous interrupt state
@@ -143,7 +143,7 @@ UnhookEntry (
   //
   SetInterruptState (OldIntFlagState);
 
-  return ;
+  return;
 }
 
 /**
@@ -223,7 +223,6 @@ RegisterExceptionCallback (
 {
   return ManageIdtEntryTable (ExceptionCallback, ExceptionType);
 }
-
 
 /**
   Invalidates processor instruction cache for a memory range. Subsequent execution in this range
@@ -341,8 +340,8 @@ PlInitializeDebugSupportDriver (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  for (ExceptionType = 0; ExceptionType < NUM_IDT_ENTRIES; ExceptionType ++) {
-    IdtEntryTable[ExceptionType].StubEntry = (DEBUG_PROC) (UINTN) AllocatePool (StubSize);
+  for (ExceptionType = 0; ExceptionType < NUM_IDT_ENTRIES; ExceptionType++) {
+    IdtEntryTable[ExceptionType].StubEntry = (DEBUG_PROC)(UINTN)AllocatePool (StubSize);
     if (IdtEntryTable[ExceptionType].StubEntry == NULL) {
       goto ErrorCleanup;
     }
@@ -352,6 +351,7 @@ PlInitializeDebugSupportDriver (
     //
     CopyMem ((VOID *)(UINTN)IdtEntryTable[ExceptionType].StubEntry, InterruptEntryStub, StubSize);
   }
+
   return EFI_SUCCESS;
 
 ErrorCleanup:
@@ -361,6 +361,7 @@ ErrorCleanup:
       FreePool ((VOID *)(UINTN)IdtEntryTable[ExceptionType].StubEntry);
     }
   }
+
   FreePool (IdtEntryTable);
 
   return EFI_OUT_OF_RESOURCES;

@@ -103,7 +103,7 @@ UpdateStatusBar (
 VOID
 EFIAPI
 CreateDialog (
-  OUT EFI_INPUT_KEY  *Key,        OPTIONAL
+  OUT EFI_INPUT_KEY  *Key, OPTIONAL
   ...
   );
 
@@ -153,6 +153,7 @@ FormExitTimeout (
 //
 // Print Functions
 //
+
 /**
   Prints a unicode string to the default console, at
   the supplied cursor position, using L"%s" format.
@@ -171,7 +172,6 @@ PrintStringAt (
   IN UINTN     Row,
   IN CHAR16    *String
   );
-
 
 /**
   Prints a unicode string with the specified width to the default console, at
@@ -237,6 +237,7 @@ ClearLines (
 //
 // Color Setting Functions
 //
+
 /**
   Get OEM/Vendor specific popup attribute colors.
 

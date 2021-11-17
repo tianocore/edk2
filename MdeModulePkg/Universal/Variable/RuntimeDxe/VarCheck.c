@@ -30,7 +30,7 @@ VarCheckRegisterSetVariableCheckHandler (
   IN VAR_CHECK_SET_VARIABLE_CHECK_HANDLER   Handler
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
   Status = VarCheckLibRegisterSetVariableCheckHandler (Handler);
@@ -62,7 +62,7 @@ VarCheckVariablePropertySet (
   IN VAR_CHECK_VARIABLE_PROPERTY    *VariableProperty
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
   Status = VarCheckLibVariablePropertySet (Name, Guid, VariableProperty);
@@ -91,7 +91,7 @@ VarCheckVariablePropertyGet (
   OUT VAR_CHECK_VARIABLE_PROPERTY   *VariableProperty
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
   Status = VarCheckLibVariablePropertyGet (Name, Guid, VariableProperty);
@@ -99,4 +99,3 @@ VarCheckVariablePropertyGet (
 
   return Status;
 }
-

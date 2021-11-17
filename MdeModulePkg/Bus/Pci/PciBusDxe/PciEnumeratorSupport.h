@@ -209,8 +209,8 @@ PciTestSupportedAttribute (
   IN     PCI_IO_DEVICE                      *PciIoDevice,
   IN OUT UINT16                             *Command,
   IN OUT UINT16                             *BridgeControl,
-     OUT UINT16                             *OldCommand,
-     OUT UINT16                             *OldBridgeControl
+  OUT UINT16                             *OldCommand,
+  OUT UINT16                             *OldBridgeControl
   );
 
 /**

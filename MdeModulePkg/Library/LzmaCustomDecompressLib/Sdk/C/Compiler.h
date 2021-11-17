@@ -27,7 +27,7 @@
 
 #endif
 
-#define UNUSED_VAR(x) (void)x;
+#define UNUSED_VAR(x)  (void)x;
 /* #define UNUSED_VAR(x) x=x; */
 
 #endif

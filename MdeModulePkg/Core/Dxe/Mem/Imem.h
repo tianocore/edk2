@@ -20,33 +20,32 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // | 0x80000000..0xFFFFFFFF       - OS reserved        |
 // +---------------------------------------------------+
 //
-#define MEMORY_TYPE_OS_RESERVED_MIN                 0x80000000
-#define MEMORY_TYPE_OS_RESERVED_MAX                 0xFFFFFFFF
-#define MEMORY_TYPE_OEM_RESERVED_MIN                0x70000000
-#define MEMORY_TYPE_OEM_RESERVED_MAX                0x7FFFFFFF
+#define MEMORY_TYPE_OS_RESERVED_MIN   0x80000000
+#define MEMORY_TYPE_OS_RESERVED_MAX   0xFFFFFFFF
+#define MEMORY_TYPE_OEM_RESERVED_MIN  0x70000000
+#define MEMORY_TYPE_OEM_RESERVED_MAX  0x7FFFFFFF
 
 //
 // MEMORY_MAP_ENTRY
 //
 
-#define MEMORY_MAP_SIGNATURE   SIGNATURE_32('m','m','a','p')
+#define MEMORY_MAP_SIGNATURE  SIGNATURE_32('m','m','a','p')
 typedef struct {
-  UINTN           Signature;
-  LIST_ENTRY      Link;
-  BOOLEAN         FromPages;
+  UINTN              Signature;
+  LIST_ENTRY         Link;
+  BOOLEAN            FromPages;
 
-  EFI_MEMORY_TYPE Type;
-  UINT64          Start;
-  UINT64          End;
+  EFI_MEMORY_TYPE    Type;
+  UINT64             Start;
+  UINT64             End;
 
-  UINT64          VirtualStart;
-  UINT64          Attribute;
+  UINT64             VirtualStart;
+  UINT64             Attribute;
 } MEMORY_MAP;
 
 //
 // Internal prototypes
 //
-
 
 /**
   Internal function.  Used by the pool functions to allocate pages
@@ -68,8 +67,6 @@ CoreAllocatePoolPages (
   IN BOOLEAN            NeedGuard
   );
 
-
-
 /**
   Internal function.  Frees pool pages allocated via AllocatePoolPages ()
 
@@ -82,8 +79,6 @@ CoreFreePoolPages (
   IN EFI_PHYSICAL_ADDRESS   Memory,
   IN UINTN                  NumberOfPages
   );
-
-
 
 /**
   Internal function to allocate pool of a particular type.
@@ -103,8 +98,6 @@ CoreAllocatePoolI (
   IN BOOLEAN          NeedGuard
   );
 
-
-
 /**
   Internal function to free a pool entry.
   Caller must have the memory lock held
@@ -122,8 +115,6 @@ CoreFreePoolI (
   OUT EFI_MEMORY_TYPE   *PoolType OPTIONAL
   );
 
-
-
 /**
   Enter critical section by gaining lock on gMemoryLock.
 
@@ -132,7 +123,6 @@ VOID
 CoreAcquireMemoryLock (
   VOID
   );
-
 
 /**
   Exit critical section by releasing lock on gMemoryLock.
@@ -176,7 +166,7 @@ CoreInternalAllocatePages (
 // Internal Global data
 //
 
-extern EFI_LOCK           gMemoryLock;
-extern LIST_ENTRY         gMemoryMap;
-extern LIST_ENTRY         mGcdMemorySpaceMap;
+extern EFI_LOCK    gMemoryLock;
+extern LIST_ENTRY  gMemoryMap;
+extern LIST_ENTRY  mGcdMemorySpaceMap;
 #endif

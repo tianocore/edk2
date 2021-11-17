@@ -475,12 +475,12 @@ PreprocessController (
 EFI_STATUS
 EFIAPI
 PciHotPlugRequestNotify (
-  IN EFI_PCI_HOTPLUG_REQUEST_PROTOCOL * This,
+  IN EFI_PCI_HOTPLUG_REQUEST_PROTOCOL *This,
   IN EFI_PCI_HOTPLUG_OPERATION        Operation,
   IN EFI_HANDLE                       Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL         * RemainingDevicePath OPTIONAL,
+  IN EFI_DEVICE_PATH_PROTOCOL         *RemainingDevicePath OPTIONAL,
   IN OUT UINT8                        *NumberOfChildren,
-  IN OUT EFI_HANDLE                   * ChildHandleBuffer
+  IN OUT EFI_HANDLE                   *ChildHandleBuffer
   );
 
 /**

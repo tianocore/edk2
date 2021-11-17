@@ -26,27 +26,27 @@
 
 #include <IndustryStandard/Sd.h>
 
-typedef struct _SD_PEIM_HC_PRIVATE_DATA SD_PEIM_HC_PRIVATE_DATA;
-typedef struct _SD_PEIM_HC_SLOT         SD_PEIM_HC_SLOT;
-typedef struct _SD_TRB                  SD_TRB;
+typedef struct _SD_PEIM_HC_PRIVATE_DATA  SD_PEIM_HC_PRIVATE_DATA;
+typedef struct _SD_PEIM_HC_SLOT          SD_PEIM_HC_SLOT;
+typedef struct _SD_TRB                   SD_TRB;
 
 #include "SdHci.h"
 #include "SdHcMem.h"
 
-#define SD_PEIM_SIG               SIGNATURE_32 ('S', 'D', 'C', 'P')
-#define SD_PEIM_SLOT_SIG          SIGNATURE_32 ('S', 'D', 'C', 'S')
+#define SD_PEIM_SIG       SIGNATURE_32 ('S', 'D', 'C', 'P')
+#define SD_PEIM_SLOT_SIG  SIGNATURE_32 ('S', 'D', 'C', 'S')
 
-#define SD_PEIM_MAX_SLOTS         6
+#define SD_PEIM_MAX_SLOTS  6
 
 struct _SD_PEIM_HC_SLOT {
-  UINT32                            Signature;
-  EFI_PEI_BLOCK_IO2_MEDIA           Media;
+  UINT32                     Signature;
+  EFI_PEI_BLOCK_IO2_MEDIA    Media;
 
-  UINTN                             SdHcBase;
-  SD_HC_SLOT_CAP                    Capability;
-  SD_CSD                            Csd;
-  BOOLEAN                           SectorAddressing;
-  SD_PEIM_HC_PRIVATE_DATA           *Private;
+  UINTN                      SdHcBase;
+  SD_HC_SLOT_CAP             Capability;
+  SD_CSD                     Csd;
+  BOOLEAN                    SectorAddressing;
+  SD_PEIM_HC_PRIVATE_DATA    *Private;
 };
 
 struct _SD_PEIM_HC_PRIVATE_DATA {
@@ -67,27 +67,27 @@ struct _SD_PEIM_HC_PRIVATE_DATA {
   UINT8                             TotalBlkIoDevices;
 };
 
-#define SD_TIMEOUT                  MultU64x32((UINT64)(3), 1000000)
-#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS(a) CR (a, SD_PEIM_HC_PRIVATE_DATA, BlkIoPpi, SD_PEIM_SIG)
-#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS2(a) CR (a, SD_PEIM_HC_PRIVATE_DATA, BlkIo2Ppi, SD_PEIM_SIG)
-#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY(a) CR (a, SD_PEIM_HC_PRIVATE_DATA, EndOfPeiNotifyList, SD_PEIM_SIG)
+#define SD_TIMEOUT  MultU64x32((UINT64)(3), 1000000)
+#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS(a)         CR (a, SD_PEIM_HC_PRIVATE_DATA, BlkIoPpi, SD_PEIM_SIG)
+#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS2(a)        CR (a, SD_PEIM_HC_PRIVATE_DATA, BlkIo2Ppi, SD_PEIM_SIG)
+#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY(a)  CR (a, SD_PEIM_HC_PRIVATE_DATA, EndOfPeiNotifyList, SD_PEIM_SIG)
 
 struct _SD_TRB {
-  SD_PEIM_HC_SLOT                   *Slot;
-  UINT16                            BlockSize;
+  SD_PEIM_HC_SLOT         *Slot;
+  UINT16                  BlockSize;
 
-  SD_COMMAND_PACKET                 *Packet;
-  VOID                              *Data;
-  UINT32                            DataLen;
-  BOOLEAN                           Read;
-  EFI_PHYSICAL_ADDRESS              DataPhy;
-  VOID                              *DataMap;
-  SD_HC_TRANSFER_MODE               Mode;
+  SD_COMMAND_PACKET       *Packet;
+  VOID                    *Data;
+  UINT32                  DataLen;
+  BOOLEAN                 Read;
+  EFI_PHYSICAL_ADDRESS    DataPhy;
+  VOID                    *DataMap;
+  SD_HC_TRANSFER_MODE     Mode;
 
-  UINT64                            Timeout;
+  UINT64                  Timeout;
 
-  SD_HC_ADMA_DESC_LINE              *AdmaDesc;
-  UINTN                             AdmaDescSize;
+  SD_HC_ADMA_DESC_LINE    *AdmaDesc;
+  UINTN                   AdmaDescSize;
 };
 
 /**
