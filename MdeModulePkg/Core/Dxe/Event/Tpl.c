@@ -60,7 +60,7 @@ CoreRaiseTpl (
 
   OldTpl = gEfiCurrentTpl;
   if (OldTpl > NewTpl) {
-    DEBUG ((EFI_D_ERROR, "FATAL ERROR - RaiseTpl with OldTpl(0x%x) > NewTpl(0x%x)\n", OldTpl, NewTpl));
+    DEBUG ((DEBUG_ERROR, "FATAL ERROR - RaiseTpl with OldTpl(0x%x) > NewTpl(0x%x)\n", OldTpl, NewTpl));
     ASSERT (FALSE);
   }
   ASSERT (VALID_TPL (NewTpl));
@@ -101,7 +101,7 @@ CoreRestoreTpl (
 
   OldTpl = gEfiCurrentTpl;
   if (NewTpl > OldTpl) {
-    DEBUG ((EFI_D_ERROR, "FATAL ERROR - RestoreTpl with NewTpl(0x%x) > OldTpl(0x%x)\n", NewTpl, OldTpl));
+    DEBUG ((DEBUG_ERROR, "FATAL ERROR - RestoreTpl with NewTpl(0x%x) > OldTpl(0x%x)\n", NewTpl, OldTpl));
     ASSERT (FALSE);
   }
   ASSERT (VALID_TPL (NewTpl));

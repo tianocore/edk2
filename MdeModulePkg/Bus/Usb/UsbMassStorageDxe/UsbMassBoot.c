@@ -58,7 +58,7 @@ UsbBootRequestSense (
                         &CmdResult
                         );
   if (EFI_ERROR (Status) || CmdResult != USB_MASS_CMD_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "UsbBootRequestSense: (%r) CmdResult=0x%x\n", Status, CmdResult));
+    DEBUG ((DEBUG_ERROR, "UsbBootRequestSense: (%r) CmdResult=0x%x\n", Status, CmdResult));
     if (!EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;
     }
@@ -131,7 +131,7 @@ UsbBootRequestSense (
     break;
   }
 
-  DEBUG ((EFI_D_INFO, "UsbBootRequestSense: (%r) with error code (%x) sense key %x/%x/%x\n",
+  DEBUG ((DEBUG_INFO, "UsbBootRequestSense: (%r) with error code (%x) sense key %x/%x/%x\n",
           Status,
           SenseData.ErrorCode,
           USB_BOOT_SENSE_KEY (SenseData.SenseKey),
@@ -191,7 +191,7 @@ UsbBootExecCmd (
                            );
 
   if (Status == EFI_TIMEOUT) {
-    DEBUG ((EFI_D_ERROR, "UsbBootExecCmd: %r to Exec 0x%x Cmd\n", Status, *(UINT8 *)Cmd));
+    DEBUG ((DEBUG_ERROR, "UsbBootExecCmd: %r to Exec 0x%x Cmd\n", Status, *(UINT8 *)Cmd));
     return EFI_TIMEOUT;
   }
 
@@ -206,7 +206,7 @@ UsbBootExecCmd (
   //
   // If command execution failed, then retrieve error info via sense request.
   //
-  DEBUG ((EFI_D_ERROR, "UsbBootExecCmd: %r to Exec 0x%x Cmd (Result = %x)\n", Status, *(UINT8 *)Cmd, CmdResult));
+  DEBUG ((DEBUG_ERROR, "UsbBootExecCmd: %r to Exec 0x%x Cmd (Result = %x)\n", Status, *(UINT8 *)Cmd, CmdResult));
   return UsbBootRequestSense (UsbMass);
 }
 
@@ -631,7 +631,7 @@ UsbBootGetParams (
 
   Status = UsbBootInquiry (UsbMass);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbBootGetParams: UsbBootInquiry (%r)\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbBootGetParams: UsbBootInquiry (%r)\n", Status));
     return Status;
   }
 
@@ -643,7 +643,7 @@ UsbBootGetParams (
        (UsbMass->Pdt != USB_PDT_CDROM) &&
        (UsbMass->Pdt != USB_PDT_OPTICAL) &&
        (UsbMass->Pdt != USB_PDT_SIMPLE_DIRECT)) {
-    DEBUG ((EFI_D_ERROR, "UsbBootGetParams: Found an unsupported peripheral type[%d]\n", UsbMass->Pdt));
+    DEBUG ((DEBUG_ERROR, "UsbBootGetParams: Found an unsupported peripheral type[%d]\n", UsbMass->Pdt));
     return EFI_UNSUPPORTED;
   }
 
@@ -695,7 +695,7 @@ UsbBootDetectMedia (
 
   Status = UsbBootIsUnitReady (UsbMass);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: UsbBootIsUnitReady (%r)\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbBootDetectMedia: UsbBootIsUnitReady (%r)\n", Status));
   }
 
   //
@@ -719,7 +719,7 @@ UsbBootDetectMedia (
 
     Status = UsbBootReadCapacity (UsbMass);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "UsbBootDetectMedia: UsbBootReadCapacity (%r)\n", Status));
+      DEBUG ((DEBUG_ERROR, "UsbBootDetectMedia: UsbBootReadCapacity (%r)\n", Status));
     }
   }
 

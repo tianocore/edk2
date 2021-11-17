@@ -80,7 +80,7 @@ PeiInstallPeiMemory (
 {
   PEI_CORE_INSTANCE                     *PrivateData;
 
-  DEBUG ((EFI_D_INFO, "PeiInstallPeiMemory MemoryBegin 0x%LX, MemoryLength 0x%LX\n", MemoryBegin, MemoryLength));
+  DEBUG ((DEBUG_INFO, "PeiInstallPeiMemory MemoryBegin 0x%LX, MemoryLength 0x%LX\n", MemoryBegin, MemoryLength));
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
   //
@@ -89,7 +89,7 @@ PeiInstallPeiMemory (
   // simply return EFI_SUCCESS in release tip to ignore it.
   //
   if (PrivateData->PeiMemoryInstalled) {
-    DEBUG ((EFI_D_ERROR, "ERROR: PeiInstallPeiMemory is called more than once!\n"));
+    DEBUG ((DEBUG_ERROR, "ERROR: PeiInstallPeiMemory is called more than once!\n"));
     ASSERT (FALSE);
     return EFI_SUCCESS;
   }
@@ -676,8 +676,8 @@ PeiAllocatePages (
     if (!EFI_ERROR (Status)) {
       return Status;
     }
-    DEBUG ((EFI_D_ERROR, "AllocatePages failed: No 0x%lx Pages is available.\n", (UINT64) Pages));
-    DEBUG ((EFI_D_ERROR, "There is only left 0x%lx pages memory resource to be allocated.\n", (UINT64) RemainingPages));
+    DEBUG ((DEBUG_ERROR, "AllocatePages failed: No 0x%lx Pages is available.\n", (UINT64) Pages));
+    DEBUG ((DEBUG_ERROR, "There is only left 0x%lx pages memory resource to be allocated.\n", (UINT64) RemainingPages));
     return  EFI_OUT_OF_RESOURCES;
   } else {
     //

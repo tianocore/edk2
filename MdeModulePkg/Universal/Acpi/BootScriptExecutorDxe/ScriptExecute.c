@@ -164,7 +164,7 @@ S3BootScriptExecutorEntryFunction (
           );
       } else {
         // Unsupported for 32bit DXE, 64bit OS vector
-        DEBUG (( EFI_D_ERROR, "Unsupported for 32bit DXE transfer to 64bit OS waking vector!\r\n"));
+        DEBUG (( DEBUG_ERROR, "Unsupported for 32bit DXE transfer to 64bit OS waking vector!\r\n"));
         ASSERT (FALSE);
       }
     } else {
@@ -494,4 +494,3 @@ BootScriptExecutorEntryPoint (
 
     return EFI_SUCCESS;
 }
-

@@ -201,7 +201,7 @@ DiscoverUserArea (
 
   Status = SdSetRca (Device, &Rca);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "DiscoverUserArea(): Assign new Rca = 0x%x fails with %r\n", Rca, Status));
+    DEBUG ((DEBUG_ERROR, "DiscoverUserArea(): Assign new Rca = 0x%x fails with %r\n", Rca, Status));
     return Status;
   }
 
@@ -221,7 +221,7 @@ DiscoverUserArea (
 
   Status = SdSelect (Device, Rca);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "DiscoverUserArea(): Reselect the device 0x%x fails with %r\n", Rca, Status));
+    DEBUG ((DEBUG_ERROR, "DiscoverUserArea(): Reselect the device 0x%x fails with %r\n", Rca, Status));
     return Status;
   }
 
@@ -905,4 +905,3 @@ InitializeSdDxe (
 
   return Status;
 }
-

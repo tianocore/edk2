@@ -463,7 +463,7 @@ FvCheck (
           (FileState == EFI_FILE_HEADER_CONSTRUCTION)) {
         if (IS_FFS_FILE2 (FfsHeader)) {
           if (!FvDevice->IsFfs3Fv) {
-            DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsHeader->Name));
+            DEBUG ((DEBUG_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsHeader->Name));
           }
           FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + sizeof (EFI_FFS_FILE_HEADER2));
         } else {
@@ -508,7 +508,7 @@ FvCheck (
     if (IS_FFS_FILE2 (CacheFfsHeader)) {
       ASSERT (FFS_FILE2_SIZE (CacheFfsHeader) > 0x00FFFFFF);
       if (!FvDevice->IsFfs3Fv) {
-        DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &CacheFfsHeader->Name));
+        DEBUG ((DEBUG_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &CacheFfsHeader->Name));
         FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (CacheFfsHeader));
         //
         // Adjust pointer to the next 8-byte aligned boundary.
@@ -725,5 +725,3 @@ FwVolDriverInit (
                           );
   return EFI_SUCCESS;
 }
-
-

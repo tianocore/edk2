@@ -71,7 +71,7 @@ InternalGetVarErrorFlag (
                   &ErrorFlag
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "%s - not found\n", VAR_ERROR_FLAG_NAME));
+    DEBUG ((DEBUG_INFO, "%s - not found\n", VAR_ERROR_FLAG_NAME));
     return VAR_ERROR_FLAG_NO_ERROR;
   }
   return ErrorFlag;
@@ -115,16 +115,16 @@ IsUserVariable (
     //
     // No property, it is user variable.
     //
-    DEBUG ((EFI_D_INFO, "PlatformVarCleanup - User variable: %g:%s\n", Guid, Name));
+    DEBUG ((DEBUG_INFO, "PlatformVarCleanup - User variable: %g:%s\n", Guid, Name));
     return TRUE;
   }
 
-//  DEBUG ((EFI_D_INFO, "PlatformVarCleanup - Variable Property: %g:%s\n", Guid, Name));
-//  DEBUG ((EFI_D_INFO, "  Revision  - 0x%04x\n", Property.Revision));
-//  DEBUG ((EFI_D_INFO, "  Property  - 0x%04x\n", Property.Property));
-//  DEBUG ((EFI_D_INFO, "  Attribute - 0x%08x\n", Property.Attributes));
-//  DEBUG ((EFI_D_INFO, "  MinSize   - 0x%x\n", Property.MinSize));
-//  DEBUG ((EFI_D_INFO, "  MaxSize   - 0x%x\n", Property.MaxSize));
+//  DEBUG ((DEBUG_INFO, "PlatformVarCleanup - Variable Property: %g:%s\n", Guid, Name));
+//  DEBUG ((DEBUG_INFO, "  Revision  - 0x%04x\n", Property.Revision));
+//  DEBUG ((DEBUG_INFO, "  Property  - 0x%04x\n", Property.Property));
+//  DEBUG ((DEBUG_INFO, "  Attribute - 0x%08x\n", Property.Attributes));
+//  DEBUG ((DEBUG_INFO, "  MinSize   - 0x%x\n", Property.MinSize));
+//  DEBUG ((DEBUG_INFO, "  MaxSize   - 0x%x\n", Property.MaxSize));
 
   return FALSE;
 }
@@ -276,7 +276,7 @@ CreateUserVariableNode (
 
   mUserVariableCount = Index;
   ASSERT (mUserVariableCount <= MAX_USER_VARIABLE_COUNT);
-  DEBUG ((EFI_D_INFO, "PlatformVarCleanup - User variable count: 0x%04x\n", mUserVariableCount));
+  DEBUG ((DEBUG_INFO, "PlatformVarCleanup - User variable count: 0x%04x\n", mUserVariableCount));
 
   FreePool (VarName);
   FreePool (Data);
@@ -515,7 +515,7 @@ DeleteUserVariable (
       UserVariableNameNode = USER_VARIABLE_NAME_FROM_LINK (NameLink);
 
       if (!UserVariableNameNode->Deleted && (DeleteAll || ((VariableCleanupData != NULL) && (VariableCleanupData->UserVariable[UserVariableNameNode->Index] == TRUE)))) {
-        DEBUG ((EFI_D_INFO, "PlatformVarCleanup - Delete variable: %g:%s\n", &UserVariableNode->Guid, UserVariableNameNode->Name));
+        DEBUG ((DEBUG_INFO, "PlatformVarCleanup - Delete variable: %g:%s\n", &UserVariableNode->Guid, UserVariableNameNode->Name));
         if ((UserVariableNameNode->Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
           DataSize = 0;
           Data = NULL;
@@ -538,7 +538,7 @@ DeleteUserVariable (
         if (!EFI_ERROR (Status)) {
           UserVariableNameNode->Deleted = TRUE;
         } else {
-          DEBUG ((EFI_D_INFO, "PlatformVarCleanup - Delete variable fail: %g:%s\n", &UserVariableNode->Guid, UserVariableNameNode->Name));
+          DEBUG ((DEBUG_INFO, "PlatformVarCleanup - Delete variable fail: %g:%s\n", &UserVariableNode->Guid, UserVariableNameNode->Name));
         }
       }
     }
@@ -1052,8 +1052,8 @@ PlatformVarCleanup (
     //
     // This sample does not support system variables cleanup.
     //
-    DEBUG ((EFI_D_ERROR, "NOTICE - VAR_ERROR_FLAG_SYSTEM_ERROR\n"));
-    DEBUG ((EFI_D_ERROR, "Platform should have mechanism to reset system to manufacture mode\n"));
+    DEBUG ((DEBUG_ERROR, "NOTICE - VAR_ERROR_FLAG_SYSTEM_ERROR\n"));
+    DEBUG ((DEBUG_ERROR, "Platform should have mechanism to reset system to manufacture mode\n"));
     return EFI_UNSUPPORTED;
   }
 
@@ -1232,7 +1232,7 @@ PlatformVarCleanupLibConstructor (
   EFI_STATUS    Status;
 
   mLastVarErrorFlag = InternalGetVarErrorFlag ();
-  DEBUG ((EFI_D_INFO, "mLastVarErrorFlag - 0x%02x\n", mLastVarErrorFlag));
+  DEBUG ((DEBUG_INFO, "mLastVarErrorFlag - 0x%02x\n", mLastVarErrorFlag));
 
   //
   // Register EFI_END_OF_DXE_EVENT_GROUP_GUID event.

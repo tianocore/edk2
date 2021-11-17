@@ -209,17 +209,17 @@ FrameBufferBltLibVideoFill (
   // BltBuffer to Video: Source is BltBuffer, destination is Video
   //
   if (DestinationY + Height > Configure->Height) {
-    DEBUG ((EFI_D_VERBOSE, "VideoFill: Past screen (Y)\n"));
+    DEBUG ((DEBUG_VERBOSE, "VideoFill: Past screen (Y)\n"));
     return RETURN_INVALID_PARAMETER;
   }
 
   if (DestinationX + Width > Configure->Width) {
-    DEBUG ((EFI_D_VERBOSE, "VideoFill: Past screen (X)\n"));
+    DEBUG ((DEBUG_VERBOSE, "VideoFill: Past screen (X)\n"));
     return RETURN_INVALID_PARAMETER;
   }
 
   if (Width == 0 || Height == 0) {
-    DEBUG ((EFI_D_VERBOSE, "VideoFill: Width or Height is 0\n"));
+    DEBUG ((DEBUG_VERBOSE, "VideoFill: Width or Height is 0\n"));
     return RETURN_INVALID_PARAMETER;
   }
 
@@ -235,7 +235,7 @@ FrameBufferBltLibVideoFill (
       (((Uint32 << Configure->PixelShl[2]) >> Configure->PixelShr[2]) &
        Configure->PixelMasks.BlueMask)
       );
-  DEBUG ((EFI_D_VERBOSE, "VideoFill: color=0x%x, wide-fill=0x%x\n",
+  DEBUG ((DEBUG_VERBOSE, "VideoFill: color=0x%x, wide-fill=0x%x\n",
           Uint32, WideFill));
 
   //
@@ -267,7 +267,7 @@ FrameBufferBltLibVideoFill (
   }
 
   if (UseWideFill && (DestinationX == 0) && (Width == Configure->PixelsPerScanLine)) {
-    DEBUG ((EFI_D_VERBOSE, "VideoFill (wide, one-shot)\n"));
+    DEBUG ((DEBUG_VERBOSE, "VideoFill (wide, one-shot)\n"));
     Offset = DestinationY * Configure->PixelsPerScanLine;
     Offset = Configure->BytesPerPixel * Offset;
     Destination = Configure->FrameBuffer + Offset;
@@ -288,7 +288,7 @@ FrameBufferBltLibVideoFill (
       Destination = Configure->FrameBuffer + Offset;
 
       if (UseWideFill && (((UINTN) Destination & 7) == 0)) {
-        DEBUG ((EFI_D_VERBOSE, "VideoFill (wide)\n"));
+        DEBUG ((DEBUG_VERBOSE, "VideoFill (wide)\n"));
         SizeInBytes = WidthInBytes;
         if (SizeInBytes >= 8) {
           SetMem64 (Destination, SizeInBytes & ~7, WideFill);
@@ -299,7 +299,7 @@ FrameBufferBltLibVideoFill (
           CopyMem (Destination, &WideFill, SizeInBytes);
         }
       } else {
-        DEBUG ((EFI_D_VERBOSE, "VideoFill (not wide)\n"));
+        DEBUG ((DEBUG_VERBOSE, "VideoFill (not wide)\n"));
         if (!LineBufferReady) {
           CopyMem (Configure->LineBuffer, &WideFill, Configure->BytesPerPixel);
           for (IndexX = 1; IndexX < Width; ) {

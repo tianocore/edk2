@@ -137,7 +137,7 @@ InternalDumpData (
 {
   UINTN  Index;
   for (Index = 0; Index < Size; Index++) {
-    DEBUG ((EFI_D_VERBOSE, "%02x", (UINTN)Data[Index]));
+    DEBUG ((DEBUG_VERBOSE, "%02x", (UINTN)Data[Index]));
   }
 }
 
@@ -164,15 +164,15 @@ InternalDumpHex (
   Count = Size / COLUME_SIZE;
   Left  = Size % COLUME_SIZE;
   for (Index = 0; Index < Count; Index++) {
-    DEBUG ((EFI_D_VERBOSE, "%04x: ", Index * COLUME_SIZE));
+    DEBUG ((DEBUG_VERBOSE, "%04x: ", Index * COLUME_SIZE));
     InternalDumpData (Data + Index * COLUME_SIZE, COLUME_SIZE);
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   }
 
   if (Left != 0) {
-    DEBUG ((EFI_D_VERBOSE, "%04x: ", Index * COLUME_SIZE));
+    DEBUG ((DEBUG_VERBOSE, "%04x: ", Index * COLUME_SIZE));
     InternalDumpData (Data + Index * COLUME_SIZE, Left);
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   }
 }
 
@@ -282,7 +282,7 @@ FilterSmbiosEntry (
   CHAR8                 *String;
   UINTN                 StringLen;
 
-  DEBUG ((EFI_D_INFO, "Smbios Table (Type - %d):\n", ((SMBIOS_STRUCTURE *)TableEntry)->Type));
+  DEBUG ((DEBUG_INFO, "Smbios Table (Type - %d):\n", ((SMBIOS_STRUCTURE *)TableEntry)->Type));
   DEBUG_CODE (InternalDumpHex (TableEntry, TableEntrySize););
 
   //
@@ -310,7 +310,7 @@ FilterSmbiosEntry (
                 // set ' ' for string field
                 String = GetSmbiosStringById (TableEntry, StringId, &StringLen);
                 ASSERT (String != NULL);
-                //DEBUG ((EFI_D_INFO,"StrId(0x%x)-%a(%d)\n", StringId, String, StringLen));
+                //DEBUG ((DEBUG_INFO,"StrId(0x%x)-%a(%d)\n", StringId, String, StringLen));
                 SetMem (String, StringLen, ' ');
               }
             }
@@ -322,7 +322,7 @@ FilterSmbiosEntry (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "Filter Smbios Table (Type - %d):\n", ((SMBIOS_STRUCTURE *)TableEntry)->Type));
+  DEBUG ((DEBUG_INFO, "Filter Smbios Table (Type - %d):\n", ((SMBIOS_STRUCTURE *)TableEntry)->Type));
   DEBUG_CODE (InternalDumpHex (TableEntry, TableEntrySize););
 }
 
@@ -494,22 +494,22 @@ MeasureSmbiosTable (
                (VOID **) &Smbios3Table
                );
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "Smbios3Table:\n"));
-      DEBUG ((EFI_D_INFO, "  AnchorString                - '%c%c%c%c%c'\n",
+      DEBUG ((DEBUG_INFO, "Smbios3Table:\n"));
+      DEBUG ((DEBUG_INFO, "  AnchorString                - '%c%c%c%c%c'\n",
         Smbios3Table->AnchorString[0],
         Smbios3Table->AnchorString[1],
         Smbios3Table->AnchorString[2],
         Smbios3Table->AnchorString[3],
         Smbios3Table->AnchorString[4]
         ));
-      DEBUG ((EFI_D_INFO, "  EntryPointStructureChecksum - 0x%02x\n", Smbios3Table->EntryPointStructureChecksum));
-      DEBUG ((EFI_D_INFO, "  EntryPointLength            - 0x%02x\n", Smbios3Table->EntryPointLength));
-      DEBUG ((EFI_D_INFO, "  MajorVersion                - 0x%02x\n", Smbios3Table->MajorVersion));
-      DEBUG ((EFI_D_INFO, "  MinorVersion                - 0x%02x\n", Smbios3Table->MinorVersion));
-      DEBUG ((EFI_D_INFO, "  DocRev                      - 0x%02x\n", Smbios3Table->DocRev));
-      DEBUG ((EFI_D_INFO, "  EntryPointRevision          - 0x%02x\n", Smbios3Table->EntryPointRevision));
-      DEBUG ((EFI_D_INFO, "  TableMaximumSize            - 0x%08x\n", Smbios3Table->TableMaximumSize));
-      DEBUG ((EFI_D_INFO, "  TableAddress                - 0x%016lx\n", Smbios3Table->TableAddress));
+      DEBUG ((DEBUG_INFO, "  EntryPointStructureChecksum - 0x%02x\n", Smbios3Table->EntryPointStructureChecksum));
+      DEBUG ((DEBUG_INFO, "  EntryPointLength            - 0x%02x\n", Smbios3Table->EntryPointLength));
+      DEBUG ((DEBUG_INFO, "  MajorVersion                - 0x%02x\n", Smbios3Table->MajorVersion));
+      DEBUG ((DEBUG_INFO, "  MinorVersion                - 0x%02x\n", Smbios3Table->MinorVersion));
+      DEBUG ((DEBUG_INFO, "  DocRev                      - 0x%02x\n", Smbios3Table->DocRev));
+      DEBUG ((DEBUG_INFO, "  EntryPointRevision          - 0x%02x\n", Smbios3Table->EntryPointRevision));
+      DEBUG ((DEBUG_INFO, "  TableMaximumSize            - 0x%08x\n", Smbios3Table->TableMaximumSize));
+      DEBUG ((DEBUG_INFO, "  TableAddress                - 0x%016lx\n", Smbios3Table->TableAddress));
     }
   }
 
@@ -519,38 +519,38 @@ MeasureSmbiosTable (
                (VOID **) &SmbiosTable
                );
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "SmbiosTable:\n"));
-      DEBUG ((EFI_D_INFO, "  AnchorString                - '%c%c%c%c'\n",
+      DEBUG ((DEBUG_INFO, "SmbiosTable:\n"));
+      DEBUG ((DEBUG_INFO, "  AnchorString                - '%c%c%c%c'\n",
         SmbiosTable->AnchorString[0],
         SmbiosTable->AnchorString[1],
         SmbiosTable->AnchorString[2],
         SmbiosTable->AnchorString[3]
         ));
-      DEBUG ((EFI_D_INFO, "  EntryPointStructureChecksum - 0x%02x\n", SmbiosTable->EntryPointStructureChecksum));
-      DEBUG ((EFI_D_INFO, "  EntryPointLength            - 0x%02x\n", SmbiosTable->EntryPointLength));
-      DEBUG ((EFI_D_INFO, "  MajorVersion                - 0x%02x\n", SmbiosTable->MajorVersion));
-      DEBUG ((EFI_D_INFO, "  MinorVersion                - 0x%02x\n", SmbiosTable->MinorVersion));
-      DEBUG ((EFI_D_INFO, "  MaxStructureSize            - 0x%08x\n", SmbiosTable->MaxStructureSize));
-      DEBUG ((EFI_D_INFO, "  EntryPointRevision          - 0x%02x\n", SmbiosTable->EntryPointRevision));
-      DEBUG ((EFI_D_INFO, "  FormattedArea               - '%c%c%c%c%c'\n",
+      DEBUG ((DEBUG_INFO, "  EntryPointStructureChecksum - 0x%02x\n", SmbiosTable->EntryPointStructureChecksum));
+      DEBUG ((DEBUG_INFO, "  EntryPointLength            - 0x%02x\n", SmbiosTable->EntryPointLength));
+      DEBUG ((DEBUG_INFO, "  MajorVersion                - 0x%02x\n", SmbiosTable->MajorVersion));
+      DEBUG ((DEBUG_INFO, "  MinorVersion                - 0x%02x\n", SmbiosTable->MinorVersion));
+      DEBUG ((DEBUG_INFO, "  MaxStructureSize            - 0x%08x\n", SmbiosTable->MaxStructureSize));
+      DEBUG ((DEBUG_INFO, "  EntryPointRevision          - 0x%02x\n", SmbiosTable->EntryPointRevision));
+      DEBUG ((DEBUG_INFO, "  FormattedArea               - '%c%c%c%c%c'\n",
         SmbiosTable->FormattedArea[0],
         SmbiosTable->FormattedArea[1],
         SmbiosTable->FormattedArea[2],
         SmbiosTable->FormattedArea[3],
         SmbiosTable->FormattedArea[4]
         ));
-      DEBUG ((EFI_D_INFO, "  IntermediateAnchorString    - '%c%c%c%c%c'\n",
+      DEBUG ((DEBUG_INFO, "  IntermediateAnchorString    - '%c%c%c%c%c'\n",
         SmbiosTable->IntermediateAnchorString[0],
         SmbiosTable->IntermediateAnchorString[1],
         SmbiosTable->IntermediateAnchorString[2],
         SmbiosTable->IntermediateAnchorString[3],
         SmbiosTable->IntermediateAnchorString[4]
         ));
-      DEBUG ((EFI_D_INFO, "  IntermediateChecksum        - 0x%02x\n", SmbiosTable->IntermediateChecksum));
-      DEBUG ((EFI_D_INFO, "  TableLength                 - 0x%04x\n", SmbiosTable->TableLength));
-      DEBUG ((EFI_D_INFO, "  TableAddress                - 0x%08x\n", SmbiosTable->TableAddress));
-      DEBUG ((EFI_D_INFO, "  NumberOfSmbiosStructures    - 0x%04x\n", SmbiosTable->NumberOfSmbiosStructures));
-      DEBUG ((EFI_D_INFO, "  SmbiosBcdRevision           - 0x%02x\n", SmbiosTable->SmbiosBcdRevision));
+      DEBUG ((DEBUG_INFO, "  IntermediateChecksum        - 0x%02x\n", SmbiosTable->IntermediateChecksum));
+      DEBUG ((DEBUG_INFO, "  TableLength                 - 0x%04x\n", SmbiosTable->TableLength));
+      DEBUG ((DEBUG_INFO, "  TableAddress                - 0x%08x\n", SmbiosTable->TableAddress));
+      DEBUG ((DEBUG_INFO, "  NumberOfSmbiosStructures    - 0x%04x\n", SmbiosTable->NumberOfSmbiosStructures));
+      DEBUG ((DEBUG_INFO, "  SmbiosBcdRevision           - 0x%02x\n", SmbiosTable->SmbiosBcdRevision));
     }
   }
 

@@ -119,13 +119,13 @@ IntersectIoDescriptor (
     Status = gDS->AddIoSpace (EfiGcdIoTypeIo, IntersectionBase,
                     IntersectionEnd - IntersectionBase);
 
-    DEBUG ((EFI_ERROR (Status) ? EFI_D_ERROR : EFI_D_VERBOSE,
+    DEBUG ((EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
       "%a: %a: add [%Lx, %Lx): %r\n", gEfiCallerBaseName, __FUNCTION__,
       IntersectionBase, IntersectionEnd, Status));
     return Status;
   }
 
-  DEBUG ((EFI_D_ERROR, "%a: %a: desc [%Lx, %Lx) type %u conflicts with "
+  DEBUG ((DEBUG_ERROR, "%a: %a: desc [%Lx, %Lx) type %u conflicts with "
     "aperture [%Lx, %Lx)\n", gEfiCallerBaseName, __FUNCTION__,
     Descriptor->BaseAddress, Descriptor->BaseAddress + Descriptor->Length,
     (UINT32)Descriptor->GcdIoType, Base, Base + Length));
@@ -155,7 +155,7 @@ AddIoSpace (
 
   Status = gDS->GetIoSpaceMap (&NumberOfDescriptors, &IoSpaceMap);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: %a: GetIoSpaceMap(): %r\n",
+    DEBUG ((DEBUG_ERROR, "%a: %a: GetIoSpaceMap(): %r\n",
       gEfiCallerBaseName, __FUNCTION__, Status));
     return Status;
   }
@@ -263,13 +263,13 @@ IntersectMemoryDescriptor (
                     IntersectionBase, IntersectionEnd - IntersectionBase,
                     Capabilities);
 
-    DEBUG ((EFI_ERROR (Status) ? EFI_D_ERROR : EFI_D_VERBOSE,
+    DEBUG ((EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
       "%a: %a: add [%Lx, %Lx): %r\n", gEfiCallerBaseName, __FUNCTION__,
       IntersectionBase, IntersectionEnd, Status));
     return Status;
   }
 
-  DEBUG ((EFI_D_ERROR, "%a: %a: desc [%Lx, %Lx) type %u cap %Lx conflicts "
+  DEBUG ((DEBUG_ERROR, "%a: %a: desc [%Lx, %Lx) type %u cap %Lx conflicts "
     "with aperture [%Lx, %Lx) cap %Lx\n", gEfiCallerBaseName, __FUNCTION__,
     Descriptor->BaseAddress, Descriptor->BaseAddress + Descriptor->Length,
     (UINT32)Descriptor->GcdMemoryType, Descriptor->Capabilities,
@@ -302,7 +302,7 @@ AddMemoryMappedIoSpace (
 
   Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: %a: GetMemorySpaceMap(): %r\n",
+    DEBUG ((DEBUG_ERROR, "%a: %a: GetMemorySpaceMap(): %r\n",
       gEfiCallerBaseName, __FUNCTION__, Status));
     return Status;
   }
@@ -828,7 +828,7 @@ NotifyPhase (
       }
     }
 
-    DEBUG ((EFI_D_INFO, "PciHostBridge: NotifyPhase (AllocateResources)\n"));
+    DEBUG ((DEBUG_INFO, "PciHostBridge: NotifyPhase (AllocateResources)\n"));
     for (Link = GetFirstNode (&HostBridge->RootBridges)
          ; !IsNull (&HostBridge->RootBridges, Link)
          ; Link = GetNextNode (&HostBridge->RootBridges, Link)
@@ -838,7 +838,7 @@ NotifyPhase (
       }
 
       RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
-      DEBUG ((EFI_D_INFO, " RootBridge: %s\n", RootBridge->DevicePathStr));
+      DEBUG ((DEBUG_INFO, " RootBridge: %s\n", RootBridge->DevicePathStr));
 
       for (Index1 = TypeIo; Index1 < TypeBus; Index1++) {
         if (RootBridge->ResAllocNode[Index1].Status == ResNone) {
@@ -1360,7 +1360,7 @@ SubmitResources (
        ) {
     RootBridge = ROOT_BRIDGE_FROM_LINK (Link);
     if (RootBridgeHandle == RootBridge->Handle) {
-      DEBUG ((EFI_D_INFO, "PciHostBridge: SubmitResources for %s\n", RootBridge->DevicePathStr));
+      DEBUG ((DEBUG_INFO, "PciHostBridge: SubmitResources for %s\n", RootBridge->DevicePathStr));
       //
       // Check the resource descriptors.
       // If the Configuration includes one or more invalid resource descriptors, all the resource
@@ -1371,11 +1371,11 @@ SubmitResources (
           return EFI_INVALID_PARAMETER;
         }
 
-        DEBUG ((EFI_D_INFO, " %s: Granularity/SpecificFlag = %ld / %02x%s\n",
+        DEBUG ((DEBUG_INFO, " %s: Granularity/SpecificFlag = %ld / %02x%s\n",
                 mAcpiAddressSpaceTypeStr[Descriptor->ResType], Descriptor->AddrSpaceGranularity, Descriptor->SpecificFlag,
                 (Descriptor->SpecificFlag & EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE) != 0 ? L" (Prefetchable)" : L""
                 ));
-        DEBUG ((EFI_D_INFO, "      Length/Alignment = 0x%lx / 0x%lx\n", Descriptor->AddrLen, Descriptor->AddrRangeMax));
+        DEBUG ((DEBUG_INFO, "      Length/Alignment = 0x%lx / 0x%lx\n", Descriptor->AddrLen, Descriptor->AddrRangeMax));
         switch (Descriptor->ResType) {
         case ACPI_ADDRESS_SPACE_TYPE_MEM:
           if (Descriptor->AddrSpaceGranularity != 32 && Descriptor->AddrSpaceGranularity != 64) {

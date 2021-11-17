@@ -492,7 +492,7 @@ DiskIoCreateSubtask (
     }
   }
   DEBUG ((
-    EFI_D_BLKIO,
+    DEBUG_BLKIO,
     "  %c:Lba/Offset/Length/WorkingBuffer/Buffer = %016lx/%08x/%08x/%08x/%08x\n",
     Write ? 'W': 'R', Lba, Offset, Length, WorkingBuffer, Buffer
     ));
@@ -540,7 +540,7 @@ DiskIoCreateSubtaskList (
   VOID                  *WorkingBuffer;
   LIST_ENTRY            *Link;
 
-  DEBUG ((EFI_D_BLKIO, "DiskIo: Create subtasks for task: Offset/BufferSize/Buffer = %016lx/%08x/%08x\n", Offset, BufferSize, Buffer));
+  DEBUG ((DEBUG_BLKIO, "DiskIo: Create subtasks for task: Offset/BufferSize/Buffer = %016lx/%08x/%08x\n", Offset, BufferSize, Buffer));
 
   BlockSize = Instance->BlockIo->Media->BlockSize;
   IoAlign   = Instance->BlockIo->Media->IoAlign;
@@ -668,7 +668,7 @@ DiskIoCreateSubtaskList (
           //
           // If there is not enough memory, downgrade to blocking access
           //
-          DEBUG ((EFI_D_VERBOSE, "DiskIo: No enough memory so downgrade to blocking access\n"));
+          DEBUG ((DEBUG_VERBOSE, "DiskIo: No enough memory so downgrade to blocking access\n"));
           if (!DiskIoCreateSubtaskList (Instance, Write, Offset, BufferSize, BufferPtr, TRUE, SharedWorkingBuffer, Subtasks)) {
             goto Done;
           }
@@ -970,7 +970,7 @@ DiskIo2ReadWriteDisk (
       // Task->Token should be set to NULL by the DiskIo2OnReadWriteComplete
       // It it's not, that means the non-blocking request was downgraded to blocking request.
       //
-      DEBUG ((EFI_D_VERBOSE, "DiskIo: Non-blocking request was downgraded to blocking request, signal event directly.\n"));
+      DEBUG ((DEBUG_VERBOSE, "DiskIo: Non-blocking request was downgraded to blocking request, signal event directly.\n"));
       Task->Token->TransactionStatus = Status;
       gBS->SignalEvent (Task->Token->Event);
     }

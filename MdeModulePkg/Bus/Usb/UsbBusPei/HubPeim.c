@@ -409,7 +409,7 @@ PeiDoHubConfig (
   PeiUsbDevice->DownStreamPortNo = HubDescriptor->NbrPorts;
 
   if (PeiUsbDevice->DeviceSpeed == EFI_USB_SPEED_SUPER) {
-    DEBUG ((EFI_D_INFO, "PeiDoHubConfig: Set Hub Depth as 0x%x\n", PeiUsbDevice->Tier));
+    DEBUG ((DEBUG_INFO, "PeiDoHubConfig: Set Hub Depth as 0x%x\n", PeiUsbDevice->Tier));
     PeiUsbHubCtrlSetHubDepth (
       PeiServices,
       PeiUsbDevice,
@@ -427,12 +427,12 @@ PeiDoHubConfig (
                 EfiUsbPortPower
                 );
       if (EFI_ERROR (Status)) {
-        DEBUG (( EFI_D_ERROR, "PeiDoHubConfig: PeiHubSetPortFeature EfiUsbPortPower failed %x\n", Index));
+        DEBUG (( DEBUG_ERROR, "PeiDoHubConfig: PeiHubSetPortFeature EfiUsbPortPower failed %x\n", Index));
         continue;
       }
     }
 
-    DEBUG (( EFI_D_INFO, "PeiDoHubConfig: HubDescriptor.PwrOn2PwrGood: 0x%x\n", HubDescriptor->PwrOn2PwrGood));
+    DEBUG (( DEBUG_INFO, "PeiDoHubConfig: HubDescriptor.PwrOn2PwrGood: 0x%x\n", HubDescriptor->PwrOn2PwrGood));
     if (HubDescriptor->PwrOn2PwrGood > 0) {
       MicroSecondDelay (HubDescriptor->PwrOn2PwrGood * USB_SET_PORT_POWER_STALL);
     }
@@ -536,7 +536,7 @@ PeiResetHubPort (
   }
 
   if (Index == USB_WAIT_PORT_STS_CHANGE_LOOP) {
-    DEBUG ((EFI_D_ERROR, "PeiResetHubPort: reset not finished in time on port %d\n", PortNum));
+    DEBUG ((DEBUG_ERROR, "PeiResetHubPort: reset not finished in time on port %d\n", PortNum));
     return;
   }
 

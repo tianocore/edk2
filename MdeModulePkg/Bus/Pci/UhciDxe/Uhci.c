@@ -323,7 +323,7 @@ Uhci2GetCapability (
 
   Uhc->RootPorts = *PortNumber;
 
-  DEBUG ((EFI_D_INFO, "Uhci2GetCapability: %d ports\n", (UINT32)Uhc->RootPorts));
+  DEBUG ((DEBUG_INFO, "Uhci2GetCapability: %d ports\n", (UINT32)Uhc->RootPorts));
   return EFI_SUCCESS;
 }
 
@@ -378,7 +378,7 @@ Uhci2GetRootHubPortStatus (
   }
 
   if ((PortSC & USBPORTSC_SUSP) != 0) {
-    DEBUG ((EFI_D_INFO, "Uhci2GetRootHubPortStatus: port %d is suspended\n", PortNumber));
+    DEBUG ((DEBUG_INFO, "Uhci2GetRootHubPortStatus: port %d is suspended\n", PortNumber));
     PortStatus->PortStatus |= USB_PORT_STAT_SUSPEND;
   }
 
@@ -1880,4 +1880,3 @@ UhciDriverBindingStop (
 
   return EFI_SUCCESS;
 }
-

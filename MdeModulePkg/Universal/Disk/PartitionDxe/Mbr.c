@@ -71,7 +71,7 @@ PartitionValidMbr (
       // with INT 13h
       //
 
-      DEBUG((EFI_D_INFO, "PartitionValidMbr: Bad MBR partition size EndingLBA(%1x) > LastLBA(%1x)\n", EndingLBA, LastLba));
+      DEBUG((DEBUG_INFO, "PartitionValidMbr: Bad MBR partition size EndingLBA(%1x) > LastLBA(%1x)\n", EndingLBA, LastLba));
 
       return FALSE;
     }

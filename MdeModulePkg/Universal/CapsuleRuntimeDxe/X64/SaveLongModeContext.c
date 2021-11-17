@@ -186,7 +186,7 @@ PrepareContextForCapsulePei (
         &Registration
         );
   } else {
-      DEBUG ((EFI_D_ERROR, "FATAL ERROR: CapsuleLongModeBuffer cannot be saved: %r. Capsule in PEI may fail!\n", Status));
+      DEBUG ((DEBUG_ERROR, "FATAL ERROR: CapsuleLongModeBuffer cannot be saved: %r. Capsule in PEI may fail!\n", Status));
       gBS->FreePages (LongModeBuffer.StackBaseAddress, EFI_SIZE_TO_PAGES (LongModeBuffer.StackSize));
   }
 }
