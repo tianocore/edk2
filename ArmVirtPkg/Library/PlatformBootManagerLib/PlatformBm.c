@@ -186,7 +186,7 @@ FilterAndProcess (
     //
     // This is not an error, just an informative condition.
     //
-    DEBUG ((EFI_D_VERBOSE, "%a: %g: %r\n", __FUNCTION__, ProtocolGuid,
+    DEBUG ((DEBUG_VERBOSE, "%a: %g: %r\n", __FUNCTION__, ProtocolGuid,
       Status));
     return;
   }
@@ -247,7 +247,7 @@ IsPciDisplay (
   Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint32, 0 /* Offset */,
                         sizeof Pci / sizeof (UINT32), &Pci);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: %s: %r\n", __FUNCTION__, ReportText, Status));
+    DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __FUNCTION__, ReportText, Status));
     return FALSE;
   }
 
@@ -390,7 +390,7 @@ Connect (
                   NULL,   // RemainingDevicePath -- produce all children
                   FALSE   // Recursive
                   );
-  DEBUG ((EFI_ERROR (Status) ? EFI_D_ERROR : EFI_D_VERBOSE, "%a: %s: %r\n",
+  DEBUG ((EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE, "%a: %s: %r\n",
     __FUNCTION__, ReportText, Status));
 }
 
@@ -412,26 +412,26 @@ AddOutput (
 
   DevicePath = DevicePathFromHandle (Handle);
   if (DevicePath == NULL) {
-    DEBUG ((EFI_D_ERROR, "%a: %s: handle %p: device path not found\n",
+    DEBUG ((DEBUG_ERROR, "%a: %s: handle %p: device path not found\n",
       __FUNCTION__, ReportText, Handle));
     return;
   }
 
   Status = EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: %s: adding to ConOut: %r\n", __FUNCTION__,
+    DEBUG ((DEBUG_ERROR, "%a: %s: adding to ConOut: %r\n", __FUNCTION__,
       ReportText, Status));
     return;
   }
 
   Status = EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a: %s: adding to ErrOut: %r\n", __FUNCTION__,
+    DEBUG ((DEBUG_ERROR, "%a: %s: adding to ErrOut: %r\n", __FUNCTION__,
       ReportText, Status));
     return;
   }
 
-  DEBUG ((EFI_D_VERBOSE, "%a: %s: added to ConOut and ErrOut\n", __FUNCTION__,
+  DEBUG ((DEBUG_VERBOSE, "%a: %s: added to ConOut and ErrOut\n", __FUNCTION__,
     ReportText));
 }
 
@@ -611,7 +611,7 @@ RemoveStaleFvFileOptions (
       DevicePathString = ConvertDevicePathToText(BootOptions[Index].FilePath,
                            FALSE, FALSE);
       DEBUG ((
-        EFI_ERROR (Status) ? EFI_D_WARN : EFI_D_VERBOSE,
+        EFI_ERROR (Status) ? DEBUG_WARN : DEBUG_VERBOSE,
         "%a: removing stale Boot#%04x %s: %r\n",
         __FUNCTION__,
         (UINT32)BootOptions[Index].OptionNumber,
