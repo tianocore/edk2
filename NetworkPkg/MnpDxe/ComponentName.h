@@ -12,9 +12,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
 
-extern EFI_COMPONENT_NAME2_PROTOCOL gMnpComponentName2;
-extern EFI_COMPONENT_NAME_PROTOCOL  gMnpComponentName;
-extern EFI_UNICODE_STRING_TABLE     *gMnpControllerNameTable;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gMnpComponentName2;
+extern EFI_COMPONENT_NAME_PROTOCOL   gMnpComponentName;
+extern EFI_UNICODE_STRING_TABLE      *gMnpControllerNameTable;
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -60,7 +60,7 @@ EFIAPI
 MnpComponentNameGetDriverName (
   IN     EFI_COMPONENT_NAME_PROTOCOL   *This,
   IN     CHAR8                         *Language,
-     OUT CHAR16                        **DriverName
+  OUT CHAR16                        **DriverName
   );
 
 /**
@@ -138,7 +138,7 @@ MnpComponentNameGetControllerName (
   IN     EFI_HANDLE                    ControllerHandle,
   IN     EFI_HANDLE                    ChildHandle        OPTIONAL,
   IN     CHAR8                         *Language,
-     OUT CHAR16                        **ControllerName
+  OUT CHAR16                        **ControllerName
   );
 
 #endif

@@ -16,10 +16,10 @@
 extern UINT8  Ip6ConfigBin[];
 extern UINT8  Ip6DxeStrings[];
 
-#define IP6_ETHERNET              L"Ethernet"
-#define IP6_EXPERIMENTAL_ETHERNET L"Experimental Ethernet"
-#define IP6_ADDRESS_DELIMITER     L' '
-#define IP6_LINK_LOCAL_PREFIX     L"FE80::"
+#define IP6_ETHERNET               L"Ethernet"
+#define IP6_EXPERIMENTAL_ETHERNET  L"Experimental Ethernet"
+#define IP6_ADDRESS_DELIMITER      L' '
+#define IP6_LINK_LOCAL_PREFIX      L"FE80::"
 
 typedef enum {
   Ip6InterfaceTypeEthernet = 1,

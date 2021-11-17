@@ -16,7 +16,7 @@
 
 #include "Mtftp6Impl.h"
 
-EFI_MTFTP6_PROTOCOL gMtftp6ProtocolTemplate = {
+EFI_MTFTP6_PROTOCOL  gMtftp6ProtocolTemplate = {
   EfiMtftp6GetModeData,
   EfiMtftp6Configure,
   EfiMtftp6GetInfo,
@@ -25,7 +25,7 @@ EFI_MTFTP6_PROTOCOL gMtftp6ProtocolTemplate = {
   EfiMtftp6WriteFile,
   EfiMtftp6ReadDirectory,
   EfiMtftp6Poll
-  };
+};
 
 /**
   Returns the current operating mode data for the MTFTP6 instance.
@@ -52,7 +52,7 @@ EfiMtftp6GetModeData (
   MTFTP6_INSTANCE  *Instance;
   EFI_TPL          OldTpl;
 
-  if (This == NULL || ModeData == NULL) {
+  if ((This == NULL) || (ModeData == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -79,13 +79,12 @@ EfiMtftp6GetModeData (
   // Set the current support options in mode data.
   //
   ModeData->SupportedOptionCount = MTFTP6_SUPPORTED_OPTIONS_NUM;
-  ModeData->SupportedOptions     = (UINT8 **) mMtftp6SupportedOptions;
+  ModeData->SupportedOptions     = (UINT8 **)mMtftp6SupportedOptions;
 
   gBS->RestoreTPL (OldTpl);
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Initializes, changes, or resets the default operational setting for
@@ -132,18 +131,18 @@ EfiMtftp6Configure (
   IN EFI_MTFTP6_CONFIG_DATA *MtftpConfigData     OPTIONAL
   )
 {
-  MTFTP6_SERVICE            *Service;
-  MTFTP6_INSTANCE           *Instance;
-  EFI_UDP6_PROTOCOL         *Udp6;
-  EFI_UDP6_CONFIG_DATA      Udp6Cfg;
-  EFI_STATUS                Status;
-  EFI_TPL                   OldTpl;
+  MTFTP6_SERVICE        *Service;
+  MTFTP6_INSTANCE       *Instance;
+  EFI_UDP6_PROTOCOL     *Udp6;
+  EFI_UDP6_CONFIG_DATA  Udp6Cfg;
+  EFI_STATUS            Status;
+  EFI_TPL               OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (MtftpConfigData != NULL && !NetIp6IsValidUnicast (&MtftpConfigData->ServerIp)) {
+  if ((MtftpConfigData != NULL) && !NetIp6IsValidUnicast (&MtftpConfigData->ServerIp)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -167,6 +166,7 @@ EfiMtftp6Configure (
       Status = EFI_ACCESS_DENIED;
       goto ON_EXIT;
     }
+
     //
     // Allocate the configure buffer of the instance and store the user's data.
     //
@@ -195,7 +195,7 @@ EfiMtftp6Configure (
         Status = gBS->OpenProtocol (
                         Instance->UdpIo->UdpHandle,
                         &gEfiUdp6ProtocolGuid,
-                        (VOID **) &Udp6,
+                        (VOID **)&Udp6,
                         Service->Image,
                         Instance->Handle,
                         EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -219,17 +219,17 @@ EfiMtftp6Configure (
     Udp6Cfg.AcceptPromiscuous  = FALSE;
     Udp6Cfg.AcceptAnyPort      = FALSE;
     Udp6Cfg.AllowDuplicatePort = FALSE;
-    Udp6Cfg.TrafficClass       = 0;
-    Udp6Cfg.HopLimit           = 128;
-    Udp6Cfg.ReceiveTimeout     = 0;
-    Udp6Cfg.TransmitTimeout    = 0;
-    Udp6Cfg.StationPort        = Instance->Config->LocalPort;
-    Udp6Cfg.RemotePort         = Instance->Config->InitialServerPort;
+    Udp6Cfg.TrafficClass    = 0;
+    Udp6Cfg.HopLimit        = 128;
+    Udp6Cfg.ReceiveTimeout  = 0;
+    Udp6Cfg.TransmitTimeout = 0;
+    Udp6Cfg.StationPort     = Instance->Config->LocalPort;
+    Udp6Cfg.RemotePort      = Instance->Config->InitialServerPort;
 
     CopyMem (
       &Udp6Cfg.StationAddress,
       &Instance->Config->StationIp,
-      sizeof(EFI_IPv6_ADDRESS)
+      sizeof (EFI_IPv6_ADDRESS)
       );
 
     CopyMem (
@@ -252,15 +252,16 @@ ON_EXIT:
       FreePool (Instance->Config);
       Instance->Config = NULL;
     }
+
     if (Instance->UdpIo != NULL) {
       UdpIoFreeIo (Instance->UdpIo);
       Instance->UdpIo = NULL;
     }
   }
+
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
 
 /**
   Get the information of the download from the server.
@@ -329,16 +330,17 @@ EfiMtftp6GetInfo (
   OUT EFI_MTFTP6_PACKET        **Packet              OPTIONAL
   )
 {
-  EFI_STATUS                Status;
-  EFI_MTFTP6_TOKEN          Token;
-  MTFTP6_GETINFO_CONTEXT    Context;
+  EFI_STATUS              Status;
+  EFI_MTFTP6_TOKEN        Token;
+  MTFTP6_GETINFO_CONTEXT  Context;
 
-  if (This == NULL ||
-      Filename == NULL ||
-      PacketLength == NULL ||
-      (OptionCount != 0 && OptionList == NULL) ||
-      (OverrideData != NULL && !NetIp6IsValidUnicast (&OverrideData->ServerIp))
-      ) {
+  if ((This == NULL) ||
+      (Filename == NULL) ||
+      (PacketLength == NULL) ||
+      ((OptionCount != 0) && (OptionList == NULL)) ||
+      ((OverrideData != NULL) && !NetIp6IsValidUnicast (&OverrideData->ServerIp))
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -346,23 +348,23 @@ EfiMtftp6GetInfo (
     *Packet = NULL;
   }
 
-  *PacketLength         = 0;
+  *PacketLength = 0;
 
-  Context.Packet        = Packet;
-  Context.PacketLen     = PacketLength;
-  Context.Status        = EFI_SUCCESS;
+  Context.Packet    = Packet;
+  Context.PacketLen = PacketLength;
+  Context.Status    = EFI_SUCCESS;
 
   //
   // Fill fields of the Token for GetInfo operation.
   //
-  Token.Status          = EFI_SUCCESS;
-  Token.Event           = NULL;
-  Token.OverrideData    = OverrideData;
-  Token.Filename        = Filename;
-  Token.ModeStr         = ModeStr;
-  Token.OptionCount     = OptionCount;
-  Token.OptionList      = OptionList;
-  Token.BufferSize      = 0;
+  Token.Status = EFI_SUCCESS;
+  Token.Event  = NULL;
+  Token.OverrideData = OverrideData;
+  Token.Filename     = Filename;
+  Token.ModeStr     = ModeStr;
+  Token.OptionCount = OptionCount;
+  Token.OptionList  = OptionList;
+  Token.BufferSize  = 0;
   Token.Buffer          = NULL;
   Token.Context         = &Context;
   Token.CheckPacket     = Mtftp6CheckPacket;
@@ -383,7 +385,6 @@ EfiMtftp6GetInfo (
 
   return Status;
 }
-
 
 /**
   Parse the options in an MTFTPv6 OACK packet.
@@ -431,7 +432,6 @@ EfiMtftp6ParseOptions (
 
   return Mtftp6ParseStart (Packet, PacketLen, OptionCount, OptionList);
 }
-
 
 /**
   Download a file from an MTFTPv6 server.
@@ -483,7 +483,6 @@ EfiMtftp6ReadFile (
 {
   return Mtftp6OperationStart (This, Token, EFI_MTFTP6_OPCODE_RRQ);
 }
-
 
 /**
   Send a file to an MTFTPv6 server.
@@ -537,7 +536,6 @@ EfiMtftp6WriteFile (
   return Mtftp6OperationStart (This, Token, EFI_MTFTP6_OPCODE_WRQ);
 }
 
-
 /**
   Download a data file directory from an MTFTPv6 server.
 
@@ -588,7 +586,6 @@ EfiMtftp6ReadDirectory (
   return Mtftp6OperationStart (This, Token, EFI_MTFTP6_OPCODE_DIR);
 }
 
-
 /**
   Polls for incoming data packets and processes outgoing data packets.
 
@@ -619,8 +616,8 @@ EfiMtftp6Poll (
   IN EFI_MTFTP6_PROTOCOL    *This
   )
 {
-  MTFTP6_INSTANCE           *Instance;
-  EFI_UDP6_PROTOCOL         *Udp6;
+  MTFTP6_INSTANCE    *Instance;
+  EFI_UDP6_PROTOCOL  *Udp6;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;

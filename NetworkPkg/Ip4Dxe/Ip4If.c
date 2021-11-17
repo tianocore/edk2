@@ -121,7 +121,6 @@ Ip4CancelFrameArp (
   IN VOID                   *Context
   );
 
-
 /**
   Wrap a transmit request into a newly allocated IP4_LINK_TX_TOKEN.
 
@@ -154,8 +153,10 @@ Ip4WrapLinkTxToken (
   EFI_STATUS                            Status;
   UINT32                                Count;
 
-  Token = AllocatePool (sizeof (IP4_LINK_TX_TOKEN) + \
-            (Packet->BlockOpNum - 1) * sizeof (EFI_MANAGED_NETWORK_FRAGMENT_DATA));
+  Token = AllocatePool (
+            sizeof (IP4_LINK_TX_TOKEN) + \
+            (Packet->BlockOpNum - 1) * sizeof (EFI_MANAGED_NETWORK_FRAGMENT_DATA)
+            );
 
   if (Token == NULL) {
     return NULL;
@@ -166,15 +167,15 @@ Ip4WrapLinkTxToken (
 
   Token->Interface  = Interface;
   Token->IpInstance = IpInstance;
-  Token->IpSb       = IpSb;
-  Token->CallBack   = CallBack;
-  Token->Packet     = Packet;
-  Token->Context    = Context;
+  Token->IpSb     = IpSb;
+  Token->CallBack = CallBack;
+  Token->Packet   = Packet;
+  Token->Context  = Context;
   CopyMem (&Token->DstMac, &mZeroMacAddress, sizeof (Token->DstMac));
   CopyMem (&Token->SrcMac, &Interface->Mac, sizeof (Token->SrcMac));
 
-  MnpToken          = &(Token->MnpToken);
-  MnpToken->Status  = EFI_NOT_READY;
+  MnpToken = &(Token->MnpToken);
+  MnpToken->Status = EFI_NOT_READY;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
@@ -189,23 +190,22 @@ Ip4WrapLinkTxToken (
     return NULL;
   }
 
-  MnpTxData                     = &Token->MnpTxData;
-  MnpToken->Packet.TxData       = MnpTxData;
+  MnpTxData = &Token->MnpTxData;
+  MnpToken->Packet.TxData = MnpTxData;
 
   MnpTxData->DestinationAddress = &Token->DstMac;
-  MnpTxData->SourceAddress      = &Token->SrcMac;
-  MnpTxData->ProtocolType       = IP4_ETHER_PROTO;
-  MnpTxData->DataLength         = Packet->TotalSize;
-  MnpTxData->HeaderLength       = 0;
+  MnpTxData->SourceAddress = &Token->SrcMac;
+  MnpTxData->ProtocolType  = IP4_ETHER_PROTO;
+  MnpTxData->DataLength    = Packet->TotalSize;
+  MnpTxData->HeaderLength  = 0;
 
-  Count                         = Packet->BlockOpNum;
+  Count = Packet->BlockOpNum;
 
-  NetbufBuildExt (Packet, (NET_FRAGMENT *) MnpTxData->FragmentTable, &Count);
-  MnpTxData->FragmentCount      = (UINT16)Count;
+  NetbufBuildExt (Packet, (NET_FRAGMENT *)MnpTxData->FragmentTable, &Count);
+  MnpTxData->FragmentCount = (UINT16)Count;
 
   return Token;
 }
-
 
 /**
   Free the link layer transmit token. It will close the event
@@ -225,7 +225,6 @@ Ip4FreeLinkTxToken (
   FreePool (Token);
 }
 
-
 /**
   Create an IP_ARP_QUE structure to request ARP service.
 
@@ -242,8 +241,8 @@ Ip4CreateArpQue (
   IN IP4_ADDR               DestIp
   )
 {
-  IP4_ARP_QUE               *ArpQue;
-  EFI_STATUS                Status;
+  IP4_ARP_QUE  *ArpQue;
+  EFI_STATUS   Status;
 
   ArpQue = AllocatePool (sizeof (IP4_ARP_QUE));
 
@@ -270,12 +269,11 @@ Ip4CreateArpQue (
     return NULL;
   }
 
-  ArpQue->Ip  = DestIp;
+  ArpQue->Ip = DestIp;
   CopyMem (&ArpQue->Mac, &mZeroMacAddress, sizeof (ArpQue->Mac));
 
   return ArpQue;
 }
-
 
 /**
   Remove all the transmit requests queued on the ARP queue, then free it.
@@ -301,7 +299,6 @@ Ip4FreeArpQue (
   gBS->CloseEvent (ArpQue->OnResolved);
   FreePool (ArpQue);
 }
-
 
 /**
   Create a link layer receive token to wrap the receive request
@@ -338,8 +335,8 @@ Ip4CreateLinkRxToken (
   Token->CallBack   = CallBack;
   Token->Context    = Context;
 
-  MnpToken          = &Token->MnpToken;
-  MnpToken->Status  = EFI_NOT_READY;
+  MnpToken = &Token->MnpToken;
+  MnpToken->Status = EFI_NOT_READY;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
@@ -358,7 +355,6 @@ Ip4CreateLinkRxToken (
   return Token;
 }
 
-
 /**
   Free the link layer request token. It will close the event
   then free the memory used.
@@ -371,13 +367,11 @@ Ip4FreeFrameRxToken (
   IN IP4_LINK_RX_TOKEN      *Token
   )
 {
-
   NET_CHECK_SIGNATURE (Token, IP4_FRAME_RX_SIGNATURE);
 
   gBS->CloseEvent (Token->MnpToken.Event);
   FreePool (Token);
 }
-
 
 /**
   Remove all the frames on the ARP queue that pass the FrameToCancel,
@@ -398,9 +392,9 @@ Ip4CancelFrameArp (
   IN VOID                   *Context
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IP4_LINK_TX_TOKEN         *Token;
+  LIST_ENTRY         *Entry;
+  LIST_ENTRY         *Next;
+  IP4_LINK_TX_TOKEN  *Token;
 
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &ArpQue->Frames) {
     Token = NET_LIST_USER_STRUCT (Entry, IP4_LINK_TX_TOKEN, Link);
@@ -413,7 +407,6 @@ Ip4CancelFrameArp (
     }
   }
 }
-
 
 /**
   Remove all the frames on the interface that pass the FrameToCancel,
@@ -436,10 +429,10 @@ Ip4CancelFrames (
   IN VOID                   *Context
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IP4_ARP_QUE               *ArpQue;
-  IP4_LINK_TX_TOKEN         *Token;
+  LIST_ENTRY         *Entry;
+  LIST_ENTRY         *Next;
+  IP4_ARP_QUE        *ArpQue;
+  IP4_LINK_TX_TOKEN  *Token;
 
   //
   // Cancel all the pending frames on ARP requests
@@ -467,7 +460,6 @@ Ip4CancelFrames (
   }
 }
 
-
 /**
   Create an IP4_INTERFACE. Delay the creation of ARP instance until
   the interface is configured.
@@ -488,8 +480,8 @@ Ip4CreateInterface (
   IN  EFI_HANDLE                    ImageHandle
   )
 {
-  IP4_INTERFACE             *Interface;
-  EFI_SIMPLE_NETWORK_MODE   SnpMode;
+  IP4_INTERFACE            *Interface;
+  EFI_SIMPLE_NETWORK_MODE  SnpMode;
 
   if (Mnp == NULL) {
     return NULL;
@@ -503,17 +495,17 @@ Ip4CreateInterface (
 
   Interface->Signature = IP4_INTERFACE_SIGNATURE;
   InitializeListHead (&Interface->Link);
-  Interface->RefCnt     = 1;
+  Interface->RefCnt = 1;
 
-  Interface->Ip         = IP4_ALLZERO_ADDRESS;
+  Interface->Ip = IP4_ALLZERO_ADDRESS;
   Interface->SubnetMask = IP4_ALLZERO_ADDRESS;
   Interface->Configured = FALSE;
 
   Interface->Controller = Controller;
-  Interface->Image      = ImageHandle;
-  Interface->Mnp        = Mnp;
-  Interface->Arp        = NULL;
-  Interface->ArpHandle  = NULL;
+  Interface->Image     = ImageHandle;
+  Interface->Mnp       = Mnp;
+  Interface->Arp       = NULL;
+  Interface->ArpHandle = NULL;
 
   InitializeListHead (&Interface->ArpQues);
   InitializeListHead (&Interface->SentFrames);
@@ -530,14 +522,13 @@ Ip4CreateInterface (
 
   CopyMem (&Interface->Mac, &SnpMode.CurrentAddress, sizeof (Interface->Mac));
   CopyMem (&Interface->BroadcastMac, &SnpMode.BroadcastAddress, sizeof (Interface->BroadcastMac));
-  Interface->HwaddrLen    = SnpMode.HwAddressSize;
+  Interface->HwaddrLen = SnpMode.HwAddressSize;
 
   InitializeListHead (&Interface->IpInstances);
   Interface->PromiscRecv = FALSE;
 
   return Interface;
 }
-
 
 /**
   Set the interface's address, create and configure
@@ -559,8 +550,8 @@ Ip4SetAddress (
   IN     IP4_ADDR           SubnetMask
   )
 {
-  EFI_ARP_CONFIG_DATA       ArpConfig;
-  EFI_STATUS                Status;
+  EFI_ARP_CONFIG_DATA  ArpConfig;
+  EFI_STATUS           Status;
 
   NET_CHECK_SIGNATURE (Interface, IP4_INTERFACE_SIGNATURE);
 
@@ -572,10 +563,10 @@ Ip4SetAddress (
   // RFC793. If that isn't the case, we are aggregating the
   // networks, use the subnet's mask instead.
   //
-  Interface->Ip             = IpAddr;
-  Interface->SubnetMask     = SubnetMask;
-  Interface->SubnetBrdcast  = (IpAddr | ~SubnetMask);
-  Interface->NetBrdcast     = (IpAddr | ~SubnetMask);
+  Interface->Ip = IpAddr;
+  Interface->SubnetMask    = SubnetMask;
+  Interface->SubnetBrdcast = (IpAddr | ~SubnetMask);
+  Interface->NetBrdcast    = (IpAddr | ~SubnetMask);
 
   //
   // Do clean up for Arp child
@@ -621,7 +612,7 @@ Ip4SetAddress (
     Status = gBS->OpenProtocol (
                     Interface->ArpHandle,
                     &gEfiArpProtocolGuid,
-                    (VOID **) &Interface->Arp,
+                    (VOID **)&Interface->Arp,
                     Interface->Image,
                     Interface->Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -631,13 +622,13 @@ Ip4SetAddress (
       goto ON_ERROR;
     }
 
-    IpAddr                    = HTONL (IpAddr);
+    IpAddr = HTONL (IpAddr);
     ArpConfig.SwAddressType   = IP4_ETHER_PROTO;
     ArpConfig.SwAddressLength = 4;
     ArpConfig.StationAddress  = &IpAddr;
     ArpConfig.EntryTimeOut    = 0;
-    ArpConfig.RetryCount      = 0;
-    ArpConfig.RetryTimeOut    = 0;
+    ArpConfig.RetryCount   = 0;
+    ArpConfig.RetryTimeOut = 0;
 
     Status = Interface->Arp->Configure (Interface->Arp, &ArpConfig);
 
@@ -667,7 +658,6 @@ ON_ERROR:
   return Status;
 }
 
-
 /**
   Filter function to cancel all the frame related to an IP instance.
 
@@ -686,14 +676,12 @@ Ip4CancelInstanceFrame (
   IN VOID              *Context
   )
 {
-  if (Frame->IpInstance == (IP4_PROTOCOL *) Context) {
+  if (Frame->IpInstance == (IP4_PROTOCOL *)Context) {
     return TRUE;
   }
 
   return FALSE;
 }
-
-
 
 /**
   If there is a pending receive request, cancel it. Don't call
@@ -712,8 +700,8 @@ Ip4CancelReceive (
   IN IP4_INTERFACE          *Interface
   )
 {
-  EFI_TPL                   OldTpl;
-  IP4_LINK_RX_TOKEN         *Token;
+  EFI_TPL            OldTpl;
+  IP4_LINK_RX_TOKEN  *Token;
 
   if ((Token = Interface->RecvRequest) != NULL) {
     OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
@@ -724,7 +712,6 @@ Ip4CancelReceive (
     gBS->RestoreTPL (OldTpl);
   }
 }
-
 
 /**
   Free the interface used by IpInstance. All the IP instance with
@@ -773,11 +760,11 @@ Ip4FreeInterface (
 
   if (Interface->Arp != NULL) {
     gBS->CloseProtocol (
-          Interface->ArpHandle,
-          &gEfiArpProtocolGuid,
-          Interface->Image,
-          Interface->Controller
-          );
+           Interface->ArpHandle,
+           &gEfiArpProtocolGuid,
+           Interface->Image,
+           Interface->Controller
+           );
 
     NetLibDestroyServiceChild (
       Interface->Controller,
@@ -808,13 +795,13 @@ Ip4SendFrameToDefaultRoute (
   IN  IP4_ARP_QUE               *ArpQue
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IP4_ROUTE_CACHE_ENTRY     *RtCacheEntry;
-  IP4_LINK_TX_TOKEN         *Token;
-  IP4_ADDR                  Gateway;
-  EFI_STATUS                Status;
-  IP4_ROUTE_ENTRY           *DefaultRoute;
+  LIST_ENTRY             *Entry;
+  LIST_ENTRY             *Next;
+  IP4_ROUTE_CACHE_ENTRY  *RtCacheEntry;
+  IP4_LINK_TX_TOKEN      *Token;
+  IP4_ADDR               Gateway;
+  EFI_STATUS             Status;
+  IP4_ROUTE_ENTRY        *DefaultRoute;
 
   //
   // ARP resolve failed when using /32 subnet mask.
@@ -830,18 +817,22 @@ Ip4SendFrameToDefaultRoute (
     if (Token->IpInstance != NULL) {
       RtCacheEntry = Ip4FindRouteCache (Token->IpInstance->RouteTable, NTOHL (ArpQue->Ip), Token->Interface->Ip);
     }
+
     if (RtCacheEntry == NULL) {
       RtCacheEntry = Ip4FindRouteCache (Token->IpSb->DefaultRouteTable, NTOHL (ArpQue->Ip), Token->Interface->Ip);
     }
+
     if (RtCacheEntry == NULL) {
-      Status= EFI_NO_MAPPING;
+      Status = EFI_NO_MAPPING;
       goto ON_ERROR;
     }
-    DefaultRoute = (IP4_ROUTE_ENTRY*)RtCacheEntry->Tag;
+
+    DefaultRoute = (IP4_ROUTE_ENTRY *)RtCacheEntry->Tag;
     if (DefaultRoute == NULL) {
-      Status= EFI_NO_MAPPING;
+      Status = EFI_NO_MAPPING;
       goto ON_ERROR;
     }
+
     //
     // Try to send the frame to the default route.
     //
@@ -850,15 +841,17 @@ Ip4SendFrameToDefaultRoute (
       //
       // ARP resolve for the default route is failed, return error to caller.
       //
-      Status= EFI_NO_MAPPING;
+      Status = EFI_NO_MAPPING;
       goto ON_ERROR;
     }
+
     RtCacheEntry->NextHop = Gateway;
-    Status = Ip4SendFrame (Token->Interface,Token->IpInstance,Token->Packet,Gateway,Token->CallBack,Token->Context,Token->IpSb);
+    Status = Ip4SendFrame (Token->Interface, Token->IpInstance, Token->Packet, Gateway, Token->CallBack, Token->Context, Token->IpSb);
     if (EFI_ERROR (Status)) {
-      Status= EFI_NO_MAPPING;
+      Status = EFI_NO_MAPPING;
       goto ON_ERROR;
     }
+
     Ip4FreeRouteCacheEntry (RtCacheEntry);
   }
 
@@ -868,11 +861,11 @@ ON_ERROR:
   if (RtCacheEntry != NULL) {
     Ip4FreeRouteCacheEntry (RtCacheEntry);
   }
+
   Token->CallBack (Token->IpInstance, Token->Packet, Status, 0, Token->Context);
   Ip4FreeLinkTxToken (Token);
   return Status;
 }
-
 
 /**
   Callback function when ARP request are finished. It will cancel
@@ -889,15 +882,15 @@ Ip4OnArpResolvedDpc (
   IN VOID                   *Context
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IP4_ARP_QUE               *ArpQue;
-  IP4_INTERFACE             *Interface;
-  IP4_LINK_TX_TOKEN         *Token;
-  EFI_STATUS                Status;
-  EFI_STATUS                IoStatus;
+  LIST_ENTRY         *Entry;
+  LIST_ENTRY         *Next;
+  IP4_ARP_QUE        *ArpQue;
+  IP4_INTERFACE      *Interface;
+  IP4_LINK_TX_TOKEN  *Token;
+  EFI_STATUS         Status;
+  EFI_STATUS         IoStatus;
 
-  ArpQue = (IP4_ARP_QUE *) Context;
+  ArpQue = (IP4_ARP_QUE *)Context;
   NET_CHECK_SIGNATURE (ArpQue, IP4_FRAME_ARP_SIGNATURE);
 
   RemoveEntryList (&ArpQue->Link);
@@ -919,6 +912,7 @@ Ip4OnArpResolvedDpc (
       //
       IoStatus = Ip4SendFrameToDefaultRoute (ArpQue);
     }
+
     goto ON_EXIT;
   }
 
@@ -927,13 +921,13 @@ Ip4OnArpResolvedDpc (
   // queue. It isn't necessary for us to cache the ARP binding because
   // we always check the ARP cache first before transmit.
   //
-  IoStatus = EFI_SUCCESS;
+  IoStatus  = EFI_SUCCESS;
   Interface = ArpQue->Interface;
 
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &ArpQue->Frames) {
     RemoveEntryList (Entry);
 
-    Token         = NET_LIST_USER_STRUCT (Entry, IP4_LINK_TX_TOKEN, Link);
+    Token = NET_LIST_USER_STRUCT (Entry, IP4_LINK_TX_TOKEN, Link);
     CopyMem (&Token->DstMac, &ArpQue->Mac, sizeof (Token->DstMac));
 
     //
@@ -980,8 +974,6 @@ Ip4OnArpResolved (
   QueueDpc (TPL_CALLBACK, Ip4OnArpResolvedDpc, Context);
 }
 
-
-
 /**
   Callback function when frame transmission is finished. It will
   call the frame owner's callback function to tell it the result.
@@ -995,20 +987,20 @@ Ip4OnFrameSentDpc (
   IN VOID                    *Context
   )
 {
-  IP4_LINK_TX_TOKEN         *Token;
+  IP4_LINK_TX_TOKEN  *Token;
 
-  Token = (IP4_LINK_TX_TOKEN *) Context;
+  Token = (IP4_LINK_TX_TOKEN *)Context;
   NET_CHECK_SIGNATURE (Token, IP4_FRAME_TX_SIGNATURE);
 
   RemoveEntryList (&Token->Link);
 
   Token->CallBack (
-          Token->IpInstance,
-          Token->Packet,
-          Token->MnpToken.Status,
-          0,
-          Token->Context
-          );
+           Token->IpInstance,
+           Token->Packet,
+           Token->MnpToken.Status,
+           0,
+           Token->Context
+           );
 
   Ip4FreeLinkTxToken (Token);
 }
@@ -1032,8 +1024,6 @@ Ip4OnFrameSent (
   //
   QueueDpc (TPL_CALLBACK, Ip4OnFrameSentDpc, Context);
 }
-
-
 
 /**
   Send a frame from the interface. If the next hop is broadcast or
@@ -1069,11 +1059,11 @@ Ip4SendFrame (
   IN IP4_SERVICE            *IpSb
   )
 {
-  IP4_LINK_TX_TOKEN         *Token;
-  LIST_ENTRY                *Entry;
-  IP4_ARP_QUE               *ArpQue;
-  EFI_ARP_PROTOCOL          *Arp;
-  EFI_STATUS                Status;
+  IP4_LINK_TX_TOKEN  *Token;
+  LIST_ENTRY         *Entry;
+  IP4_ARP_QUE        *ArpQue;
+  EFI_ARP_PROTOCOL   *Arp;
+  EFI_STATUS         Status;
 
   ASSERT (Interface->Configured);
 
@@ -1092,9 +1082,7 @@ Ip4SendFrame (
   if (NextHop == IP4_ALLONE_ADDRESS) {
     CopyMem (&Token->DstMac, &Interface->BroadcastMac, sizeof (Token->DstMac));
     goto SEND_NOW;
-
   } else if (IP4_IS_MULTICAST (NextHop)) {
-
     Status = Ip4GetMulticastMac (Interface->Mnp, NextHop, &Token->DstMac);
 
     if (EFI_ERROR (Status)) {
@@ -1120,7 +1108,6 @@ Ip4SendFrame (
 
   if (Status == EFI_SUCCESS) {
     goto SEND_NOW;
-
   } else if (Status != EFI_NOT_READY) {
     goto ON_ERROR;
   }
@@ -1187,7 +1174,6 @@ ON_ERROR:
   return Status;
 }
 
-
 /**
   Call back function when the received packet is freed.
   Check Ip4OnFrameReceived for information.
@@ -1201,15 +1187,14 @@ Ip4RecycleFrame (
   IN VOID                   *Context
   )
 {
-  IP4_LINK_RX_TOKEN         *Frame;
+  IP4_LINK_RX_TOKEN  *Frame;
 
-  Frame = (IP4_LINK_RX_TOKEN *) Context;
+  Frame = (IP4_LINK_RX_TOKEN *)Context;
   NET_CHECK_SIGNATURE (Frame, IP4_FRAME_RX_SIGNATURE);
 
   gBS->SignalEvent (Frame->MnpToken.Packet.RxData->RecycleEvent);
   Ip4FreeFrameRxToken (Frame);
 }
-
 
 /**
   Received a frame from MNP, wrap it in net buffer then deliver
@@ -1235,7 +1220,7 @@ Ip4OnFrameReceivedDpc (
   NET_BUF                               *Packet;
   UINT32                                Flag;
 
-  Token = (IP4_LINK_RX_TOKEN *) Context;
+  Token = (IP4_LINK_RX_TOKEN *)Context;
   NET_CHECK_SIGNATURE (Token, IP4_FRAME_RX_SIGNATURE);
 
   //
@@ -1251,7 +1236,7 @@ Ip4OnFrameReceivedDpc (
     Token->CallBack (Token->IpInstance, NULL, MnpToken->Status, 0, Token->Context);
     Ip4FreeFrameRxToken (Token);
 
-    return ;
+    return;
   }
 
   //
@@ -1269,7 +1254,7 @@ Ip4OnFrameReceivedDpc (
     Token->CallBack (Token->IpInstance, NULL, EFI_OUT_OF_RESOURCES, 0, Token->Context);
     Ip4FreeFrameRxToken (Token);
 
-    return ;
+    return;
   }
 
   Flag  = (MnpRxData->BroadcastFlag ? IP4_LINK_BROADCAST : 0);
@@ -1299,7 +1284,6 @@ Ip4OnFrameReceived (
   QueueDpc (TPL_CALLBACK, Ip4OnFrameReceivedDpc, Context);
 }
 
-
 /**
   Request to receive the packet from the interface.
 
@@ -1323,8 +1307,8 @@ Ip4ReceiveFrame (
   IN  VOID                  *Context
   )
 {
-  IP4_LINK_RX_TOKEN *Token;
-  EFI_STATUS        Status;
+  IP4_LINK_RX_TOKEN  *Token;
+  EFI_STATUS         Status;
 
   NET_CHECK_SIGNATURE (Interface, IP4_INTERFACE_SIGNATURE);
 
@@ -1345,5 +1329,6 @@ Ip4ReceiveFrame (
     Ip4FreeFrameRxToken (Token);
     return Status;
   }
+
   return EFI_SUCCESS;
 }

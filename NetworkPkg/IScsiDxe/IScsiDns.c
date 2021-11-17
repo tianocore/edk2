@@ -22,7 +22,7 @@ IScsiCommonNotify (
   IN VOID                *Context
   )
 {
-  *((BOOLEAN *) Context) = TRUE;
+  *((BOOLEAN *)Context) = TRUE;
 }
 
 /**
@@ -45,28 +45,28 @@ IScsiDns4 (
   IN OUT ISCSI_SESSION_CONFIG_NVDATA     *NvData
   )
 {
-  EFI_STATUS                      Status;
-  EFI_DNS4_PROTOCOL               *Dns4;
-  EFI_DNS4_CONFIG_DATA            Dns4CfgData;
-  EFI_DNS4_COMPLETION_TOKEN       Token;
-  BOOLEAN                         IsDone;
-  EFI_HANDLE                      Dns4Handle;
-  EFI_IP4_CONFIG2_PROTOCOL        *Ip4Config2;
-  EFI_IPv4_ADDRESS                *DnsServerList;
-  UINTN                           DnsServerListCount;
-  UINTN                           DataSize;
-  CHAR16                          *HostName;
+  EFI_STATUS                 Status;
+  EFI_DNS4_PROTOCOL          *Dns4;
+  EFI_DNS4_CONFIG_DATA       Dns4CfgData;
+  EFI_DNS4_COMPLETION_TOKEN  Token;
+  BOOLEAN                    IsDone;
+  EFI_HANDLE                 Dns4Handle;
+  EFI_IP4_CONFIG2_PROTOCOL   *Ip4Config2;
+  EFI_IPv4_ADDRESS           *DnsServerList;
+  UINTN                      DnsServerListCount;
+  UINTN                      DataSize;
+  CHAR16                     *HostName;
 
-  DnsServerList      = NULL;
+  DnsServerList = NULL;
   DnsServerListCount = 0;
-  Dns4Handle         = NULL;
-  Dns4               = NULL;
+  Dns4Handle = NULL;
+  Dns4 = NULL;
   ZeroMem (&Token, sizeof (EFI_DNS4_COMPLETION_TOKEN));
 
   //
   // Get DNS server list from EFI IPv4 Configuration II protocol.
   //
-  Status = gBS->HandleProtocol (Controller, &gEfiIp4Config2ProtocolGuid, (VOID **) &Ip4Config2);
+  Status = gBS->HandleProtocol (Controller, &gEfiIp4Config2ProtocolGuid, (VOID **)&Ip4Config2);
   if (!EFI_ERROR (Status)) {
     //
     // Get the required size.
@@ -79,7 +79,7 @@ IScsiDns4 (
         return EFI_OUT_OF_RESOURCES;
       }
 
-      Status   = Ip4Config2->GetData (Ip4Config2, Ip4Config2DataTypeDnsServer, &DataSize, DnsServerList);
+      Status = Ip4Config2->GetData (Ip4Config2, Ip4Config2DataTypeDnsServer, &DataSize, DnsServerList);
       if (EFI_ERROR (Status)) {
         FreePool (DnsServerList);
         DnsServerList = NULL;
@@ -88,7 +88,6 @@ IScsiDns4 (
       }
     }
   }
-
 
   //
   // Create a DNS child instance and get the protocol.
@@ -106,7 +105,7 @@ IScsiDns4 (
   Status = gBS->OpenProtocol (
                   Dns4Handle,
                   &gEfiDns4ProtocolGuid,
-                  (VOID **) &Dns4,
+                  (VOID **)&Dns4,
                   Image,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -120,11 +119,11 @@ IScsiDns4 (
   //
   ZeroMem (&Dns4CfgData, sizeof (Dns4CfgData));
   Dns4CfgData.DnsServerListCount = DnsServerListCount;
-  Dns4CfgData.DnsServerList      = DnsServerList;
-  Dns4CfgData.EnableDnsCache     = TRUE;
+  Dns4CfgData.DnsServerList  = DnsServerList;
+  Dns4CfgData.EnableDnsCache = TRUE;
   IP4_COPY_ADDRESS (&Dns4CfgData.StationIp, &NvData->LocalIp);
   IP4_COPY_ADDRESS (&Dns4CfgData.SubnetMask, &NvData->SubnetMask);
-  Dns4CfgData.Protocol           = EFI_IP_PROTO_UDP;
+  Dns4CfgData.Protocol = EFI_IP_PROTO_UDP;
   Status = Dns4->Configure (
                    Dns4,
                    &Dns4CfgData
@@ -152,9 +151,9 @@ IScsiDns4 (
   // Start asynchronous name resolution.
   //
   Token.Status = EFI_NOT_READY;
-  IsDone       = FALSE;
+  IsDone = FALSE;
 
-  HostName = (CHAR16 *) AllocateZeroPool (ISCSI_NAME_MAX_SIZE);
+  HostName = (CHAR16 *)AllocateZeroPool (ISCSI_NAME_MAX_SIZE);
   if (HostName == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -183,10 +182,12 @@ IScsiDns4 (
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
-    if (Token.RspData.H2AData->IpCount == 0 || Token.RspData.H2AData->IpList == NULL) {
+
+    if ((Token.RspData.H2AData->IpCount == 0) || (Token.RspData.H2AData->IpList == NULL)) {
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
+
     //
     // We just return the first IP address from DNS protocol.
     //
@@ -199,10 +200,12 @@ Exit:
   if (Token.Event != NULL) {
     gBS->CloseEvent (Token.Event);
   }
+
   if (Token.RspData.H2AData != NULL) {
     if (Token.RspData.H2AData->IpList != NULL) {
       FreePool (Token.RspData.H2AData->IpList);
     }
+
     FreePool (Token.RspData.H2AData);
   }
 
@@ -249,34 +252,34 @@ IScsiDns6 (
   IN OUT ISCSI_SESSION_CONFIG_NVDATA     *NvData
   )
 {
-  EFI_STATUS                      Status;
-  EFI_DNS6_PROTOCOL               *Dns6;
-  EFI_DNS6_CONFIG_DATA            Dns6ConfigData;
-  EFI_DNS6_COMPLETION_TOKEN       Token;
-  EFI_HANDLE                      Dns6Handle;
-  EFI_IP6_CONFIG_PROTOCOL         *Ip6Config;
-  EFI_IPv6_ADDRESS                *DnsServerList;
-  UINTN                           DnsServerListCount;
-  UINTN                           DataSize;
-  BOOLEAN                         IsDone;
-  CHAR16                          *HostName;
+  EFI_STATUS                 Status;
+  EFI_DNS6_PROTOCOL          *Dns6;
+  EFI_DNS6_CONFIG_DATA       Dns6ConfigData;
+  EFI_DNS6_COMPLETION_TOKEN  Token;
+  EFI_HANDLE                 Dns6Handle;
+  EFI_IP6_CONFIG_PROTOCOL    *Ip6Config;
+  EFI_IPv6_ADDRESS           *DnsServerList;
+  UINTN                      DnsServerListCount;
+  UINTN                      DataSize;
+  BOOLEAN                    IsDone;
+  CHAR16                     *HostName;
 
-  DnsServerList       = NULL;
-  DnsServerListCount  = 0;
-  Dns6                = NULL;
-  Dns6Handle          = NULL;
+  DnsServerList = NULL;
+  DnsServerListCount = 0;
+  Dns6 = NULL;
+  Dns6Handle = NULL;
   ZeroMem (&Token, sizeof (EFI_DNS6_COMPLETION_TOKEN));
 
   //
   // Get DNS server list from EFI IPv6 Configuration protocol.
   //
-  Status = gBS->HandleProtocol (Controller, &gEfiIp6ConfigProtocolGuid, (VOID **) &Ip6Config);
+  Status = gBS->HandleProtocol (Controller, &gEfiIp6ConfigProtocolGuid, (VOID **)&Ip6Config);
   if (!EFI_ERROR (Status)) {
     //
     // Get the required size.
     //
     DataSize = 0;
-    Status = Ip6Config->GetData (Ip6Config, Ip6ConfigDataTypeDnsServer, &DataSize, NULL);
+    Status   = Ip6Config->GetData (Ip6Config, Ip6ConfigDataTypeDnsServer, &DataSize, NULL);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       DnsServerList = AllocatePool (DataSize);
       if (DnsServerList == NULL) {
@@ -309,7 +312,7 @@ IScsiDns6 (
   Status = gBS->OpenProtocol (
                   Dns6Handle,
                   &gEfiDns6ProtocolGuid,
-                  (VOID **) &Dns6,
+                  (VOID **)&Dns6,
                   Image,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -325,7 +328,7 @@ IScsiDns6 (
   Dns6ConfigData.DnsServerCount = (UINT32)DnsServerListCount;
   Dns6ConfigData.DnsServerList  = DnsServerList;
   Dns6ConfigData.EnableDnsCache = TRUE;
-  Dns6ConfigData.Protocol       = EFI_IP_PROTO_UDP;
+  Dns6ConfigData.Protocol = EFI_IP_PROTO_UDP;
   Status = Dns6->Configure (
                    Dns6,
                    &Dns6ConfigData
@@ -335,7 +338,7 @@ IScsiDns6 (
   }
 
   Token.Status = EFI_NOT_READY;
-  IsDone       = FALSE;
+  IsDone = FALSE;
   //
   // Create event to set the  IsDone flag when name resolution is finished.
   //
@@ -353,7 +356,7 @@ IScsiDns6 (
   //
   // Start asynchronous name resolution.
   //
-  HostName = (CHAR16 *) AllocateZeroPool (ISCSI_NAME_MAX_SIZE);
+  HostName = (CHAR16 *)AllocateZeroPool (ISCSI_NAME_MAX_SIZE);
   if (HostName == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -381,10 +384,12 @@ IScsiDns6 (
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
-    if (Token.RspData.H2AData->IpCount == 0 || Token.RspData.H2AData->IpList == NULL) {
+
+    if ((Token.RspData.H2AData->IpCount == 0) || (Token.RspData.H2AData->IpList == NULL)) {
       Status = EFI_DEVICE_ERROR;
       goto Exit;
     }
+
     //
     // We just return the first IPv6 address from DNS protocol.
     //
@@ -397,10 +402,12 @@ Exit:
   if (Token.Event != NULL) {
     gBS->CloseEvent (Token.Event);
   }
+
   if (Token.RspData.H2AData != NULL) {
     if (Token.RspData.H2AData->IpList != NULL) {
       FreePool (Token.RspData.H2AData->IpList);
     }
+
     FreePool (Token.RspData.H2AData);
   }
 
@@ -426,4 +433,3 @@ Exit:
 
   return Status;
 }
-

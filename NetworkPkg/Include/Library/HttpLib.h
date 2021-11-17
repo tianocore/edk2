@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/Http.h>
 
-
 /**
   Decode a percent-encoded URI component to the ASCII character.
 
@@ -35,8 +34,8 @@ EFIAPI
 UriPercentDecode (
   IN      CHAR8            *Buffer,
   IN      UINT32            BufferLength,
-     OUT  CHAR8            *ResultBuffer,
-     OUT  UINT32           *ResultLength
+  OUT  CHAR8            *ResultBuffer,
+  OUT  UINT32           *ResultLength
   );
 
 /**
@@ -63,7 +62,7 @@ HttpParseUrl (
   IN      CHAR8              *Url,
   IN      UINT32             Length,
   IN      BOOLEAN            IsConnectMethod,
-     OUT  VOID               **UrlParser
+  OUT  VOID               **UrlParser
   );
 
 /**
@@ -87,7 +86,7 @@ EFIAPI
 HttpUrlGetHostName (
   IN      CHAR8              *Url,
   IN      VOID               *UrlParser,
-     OUT  CHAR8              **HostName
+  OUT  CHAR8              **HostName
   );
 
 /**
@@ -110,7 +109,7 @@ EFIAPI
 HttpUrlGetIp4 (
   IN      CHAR8              *Url,
   IN      VOID               *UrlParser,
-     OUT  EFI_IPv4_ADDRESS   *Ip4Address
+  OUT  EFI_IPv4_ADDRESS   *Ip4Address
   );
 
 /**
@@ -133,7 +132,7 @@ EFIAPI
 HttpUrlGetIp6 (
   IN      CHAR8              *Url,
   IN      VOID               *UrlParser,
-     OUT  EFI_IPv6_ADDRESS   *Ip6Address
+  OUT  EFI_IPv6_ADDRESS   *Ip6Address
   );
 
 /**
@@ -156,7 +155,7 @@ EFIAPI
 HttpUrlGetPort (
   IN      CHAR8              *Url,
   IN      VOID               *UrlParser,
-     OUT  UINT16             *Port
+  OUT  UINT16             *Port
   );
 
 /**
@@ -180,7 +179,7 @@ EFIAPI
 HttpUrlGetPath (
   IN      CHAR8              *Url,
   IN      VOID               *UrlParser,
-     OUT  CHAR8              **Path
+  OUT  CHAR8              **Path
   );
 
 /**
@@ -229,12 +228,12 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *HTTP_BODY_PARSER_CALLBACK) (
+(EFIAPI *HTTP_BODY_PARSER_CALLBACK)(
   IN HTTP_BODY_PARSE_EVENT      EventType,
   IN CHAR8                      *Data,
   IN UINTN                      Length,
   IN VOID                       *Context
-);
+  );
 
 /**
   Initialize a HTTP message-body parser.
@@ -266,7 +265,7 @@ HttpInitMsgParser (
   IN     EFI_HTTP_HEADER               *Headers,
   IN     HTTP_BODY_PARSER_CALLBACK     Callback,
   IN     VOID                          *Context,
-    OUT  VOID                          **MsgParser
+  OUT  VOID                          **MsgParser
   );
 
 /**
@@ -339,7 +338,6 @@ HttpFreeMsgParser (
   IN  VOID           *MsgParser
   );
 
-
 /**
   Find a specified header field according to the field name.
 
@@ -374,9 +372,9 @@ HttpFindHeader (
 EFI_STATUS
 EFIAPI
 HttpSetFieldNameAndValue (
-   IN  OUT   EFI_HTTP_HEADER       *HttpHeader,
-   IN  CONST CHAR8                 *FieldName,
-   IN  CONST CHAR8                 *FieldValue
+  IN  OUT   EFI_HTTP_HEADER       *HttpHeader,
+  IN  CONST CHAR8                 *FieldName,
+  IN  CONST CHAR8                 *FieldValue
   );
 
 /**
@@ -394,8 +392,8 @@ CHAR8 *
 EFIAPI
 HttpGetFieldNameAndValue (
   IN     CHAR8   *String,
-     OUT CHAR8   **FieldName,
-     OUT CHAR8   **FieldValue
+  OUT CHAR8   **FieldName,
+  OUT CHAR8   **FieldValue
   );
 
 /**
@@ -438,8 +436,8 @@ EFIAPI
 HttpGenRequestMessage (
   IN     CONST EFI_HTTP_MESSAGE        *Message,
   IN     CONST CHAR8                   *Url,
-     OUT CHAR8                         **RequestMsg,
-     OUT UINTN                         *RequestMsgSize
+  OUT CHAR8                         **RequestMsg,
+  OUT UINTN                         *RequestMsgSize
   );
 
 /**
@@ -480,11 +478,10 @@ HttpIsValidHttpHeader (
 // A wrapper structure to hold the HTTP headers.
 //
 typedef struct {
-  UINTN                       MaxHeaderCount;
-  UINTN                       HeaderCount;
-  EFI_HTTP_HEADER             *Headers;
+  UINTN              MaxHeaderCount;
+  UINTN              HeaderCount;
+  EFI_HTTP_HEADER    *Headers;
 } HTTP_IO_HEADER;
-
 
 /**
   Create a HTTP_IO_HEADER to hold the HTTP header items.
@@ -531,4 +528,3 @@ HttpIoSetHeader (
   );
 
 #endif
-

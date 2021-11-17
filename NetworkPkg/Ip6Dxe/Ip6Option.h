@@ -10,20 +10,20 @@
 #ifndef __EFI_IP6_OPTION_H__
 #define __EFI_IP6_OPTION_H__
 
-#define IP6_FRAGMENT_OFFSET_MASK (~0x3)
+#define IP6_FRAGMENT_OFFSET_MASK  (~0x3)
 
 typedef struct _IP6_FRAGMENT_HEADER {
-  UINT8                     NextHeader;
-  UINT8                     Reserved;
-  UINT16                    FragmentOffset;
-  UINT32                    Identification;
+  UINT8     NextHeader;
+  UINT8     Reserved;
+  UINT16    FragmentOffset;
+  UINT32    Identification;
 } IP6_FRAGMENT_HEADER;
 
 typedef struct _IP6_ROUTING_HEADER {
-  UINT8                     NextHeader;
-  UINT8                     HeaderLen;
-  UINT8                     RoutingType;
-  UINT8                     SegmentsLeft;
+  UINT8    NextHeader;
+  UINT8    HeaderLen;
+  UINT8    RoutingType;
+  UINT8    SegmentsLeft;
 } IP6_ROUTING_HEADER;
 
 typedef enum {
@@ -35,11 +35,11 @@ typedef enum {
   Ip6OptionParameterProblem = 0x80,
   Ip6OptionMask             = 0xc0,
 
-  Ip6OptionEtherSource      = 1,
-  Ip6OptionEtherTarget      = 2,
-  Ip6OptionPrefixInfo       = 3,
-  Ip6OptionRedirected       = 4,
-  Ip6OptionMtu              = 5
+  Ip6OptionEtherSource = 1,
+  Ip6OptionEtherTarget = 2,
+  Ip6OptionPrefixInfo  = 3,
+  Ip6OptionRedirected  = 4,
+  Ip6OptionMtu         = 5
 } IP6_OPTION_TYPE;
 
 /**

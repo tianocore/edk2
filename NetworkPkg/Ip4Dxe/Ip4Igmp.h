@@ -16,15 +16,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define IGMP_V2_MEMBERSHIP_REPORT  0x16
 #define IGMP_LEAVE_GROUP           0x17
 
-#define IGMP_V1ROUTER_PRESENT      400
-#define IGMP_UNSOLICIATED_REPORT   10
+#define IGMP_V1ROUTER_PRESENT     400
+#define IGMP_UNSOLICIATED_REPORT  10
 
 #pragma pack(1)
 typedef struct {
-  UINT8                   Type;
-  UINT8                   MaxRespTime;
-  UINT16                  Checksum;
-  IP4_ADDR                Group;
+  UINT8       Type;
+  UINT8       MaxRespTime;
+  UINT16      Checksum;
+  IP4_ADDR    Group;
 } IGMP_HEAD;
 #pragma pack()
 
@@ -35,12 +35,12 @@ typedef struct {
 /// "idle member" state.
 ///
 typedef struct {
-  LIST_ENTRY              Link;
-  INTN                    RefCnt;
-  IP4_ADDR                Address;
-  INTN                    DelayTime;
-  BOOLEAN                 ReportByUs;
-  EFI_MAC_ADDRESS         Mac;
+  LIST_ENTRY         Link;
+  INTN               RefCnt;
+  IP4_ADDR           Address;
+  INTN               DelayTime;
+  BOOLEAN            ReportByUs;
+  EFI_MAC_ADDRESS    Mac;
 } IGMP_GROUP;
 
 ///
@@ -49,8 +49,8 @@ typedef struct {
 /// connected network is v1 or v2.
 ///
 typedef struct {
-  INTN                    Igmpv1QuerySeen;
-  LIST_ENTRY              Groups;
+  INTN          Igmpv1QuerySeen;
+  LIST_ENTRY    Groups;
 } IGMP_SERVICE_DATA;
 
 /**
@@ -198,4 +198,5 @@ Ip4FindGroup (
   IN IGMP_SERVICE_DATA      *IgmpCtrl,
   IN IP4_ADDR               Address
   );
+
 #endif

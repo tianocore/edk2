@@ -10,9 +10,8 @@
 #ifndef __EFI_DHCP6_UTILITY_H__
 #define __EFI_DHCP6_UTILITY_H__
 
-
-#define  DHCP6_10_BIT_MASK             0x3ff
-#define  DHCP6_DAD_ADDITIONAL_DELAY    30000000 // 3 seconds
+#define  DHCP6_10_BIT_MASK           0x3ff
+#define  DHCP6_DAD_ADDITIONAL_DELAY  30000000   // 3 seconds
 
 /**
   Generate client Duid in the format of Duid-llt.
@@ -282,7 +281,7 @@ Dhcp6ParseAddrOption (
   IN     EFI_DHCP6_IA            *CurrentIa,
   IN     UINT8                   *IaInnerOpt,
   IN     UINT16                  IaInnerLen,
-     OUT UINT32                  *AddrNum,
+  OUT UINT32                  *AddrNum,
   IN OUT EFI_DHCP6_IA_ADDRESS    *AddrBuf
   );
 
@@ -310,7 +309,6 @@ Dhcp6GenerateIaCb (
   IN  UINT32                   T2
   );
 
-
 /**
   Cache the current IA configuration information.
 
@@ -324,7 +322,6 @@ EFI_STATUS
 Dhcp6CacheIa (
   IN DHCP6_INSTANCE           *Instance
   );
-
 
 /**
   Append CacheIa to the current IA. Meanwhile, clear CacheIa.ValidLifetime to 0.
@@ -351,4 +348,5 @@ Dhcp6GetMappingTimeOut (
   IN  EFI_IP6_CONFIG_PROTOCOL       *Ip6Cfg,
   OUT UINTN                         *TimeOut
   );
+
 #endif

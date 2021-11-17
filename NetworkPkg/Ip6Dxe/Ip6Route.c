@@ -25,13 +25,13 @@ Ip6RouteCacheHash (
   IN EFI_IPv6_ADDRESS       *Ip2
   )
 {
-  UINT32 Prefix1;
-  UINT32 Prefix2;
+  UINT32  Prefix1;
+  UINT32  Prefix2;
 
-  Prefix1 = *((UINT32 *) ((UINTN *) (Ip1)));
-  Prefix2 = *((UINT32 *) ((UINTN *) (Ip2)));
+  Prefix1 = *((UINT32 *)((UINTN *)(Ip1)));
+  Prefix2 = *((UINT32 *)((UINTN *)(Ip2)));
 
-  return ((UINT32) (Prefix1 ^ Prefix2) % IP6_ROUTE_CACHE_HASH_SIZE);
+  return ((UINT32)(Prefix1 ^ Prefix2) % IP6_ROUTE_CACHE_HASH_SIZE);
 }
 
 /**
@@ -54,7 +54,7 @@ Ip6CreateRouteEntry (
   IN EFI_IPv6_ADDRESS       *GatewayAddress OPTIONAL
   )
 {
-  IP6_ROUTE_ENTRY           *RtEntry;
+  IP6_ROUTE_ENTRY  *RtEntry;
 
   RtEntry = AllocateZeroPool (sizeof (IP6_ROUTE_ENTRY));
 
@@ -62,8 +62,8 @@ Ip6CreateRouteEntry (
     return NULL;
   }
 
-  RtEntry->RefCnt       = 1;
-  RtEntry->Flag         = 0;
+  RtEntry->RefCnt = 1;
+  RtEntry->Flag   = 0;
   RtEntry->PrefixLength = PrefixLength;
 
   if (Destination != NULL) {
@@ -121,9 +121,9 @@ Ip6FindRouteEntry (
   IN EFI_IPv6_ADDRESS       *NextHop     OPTIONAL
   )
 {
-  LIST_ENTRY                *Entry;
-  IP6_ROUTE_ENTRY           *RtEntry;
-  INTN                      Index;
+  LIST_ENTRY       *Entry;
+  IP6_ROUTE_ENTRY  *RtEntry;
+  INTN             Index;
 
   ASSERT (Destination != NULL || NextHop != NULL);
 
@@ -144,7 +144,6 @@ Ip6FindRouteEntry (
           return RtEntry;
         }
       }
-
     }
   }
 
@@ -172,7 +171,7 @@ Ip6CreateRouteCacheEntry (
   IN UINTN                  Tag
   )
 {
-  IP6_ROUTE_CACHE_ENTRY     *RtCacheEntry;
+  IP6_ROUTE_CACHE_ENTRY  *RtCacheEntry;
 
   RtCacheEntry = AllocatePool (sizeof (IP6_ROUTE_CACHE_ENTRY));
 
@@ -227,16 +226,16 @@ Ip6FindRouteCache (
   IN EFI_IPv6_ADDRESS       *Src
   )
 {
-  LIST_ENTRY                *Entry;
-  IP6_ROUTE_CACHE_ENTRY     *RtCacheEntry;
-  UINT32                    Index;
+  LIST_ENTRY             *Entry;
+  IP6_ROUTE_CACHE_ENTRY  *RtCacheEntry;
+  UINT32                 Index;
 
   Index = IP6_ROUTE_CACHE_HASH (Dest, Src);
 
   NET_LIST_FOR_EACH (Entry, &RtTable->Cache.CacheBucket[Index]) {
     RtCacheEntry = NET_LIST_USER_STRUCT (Entry, IP6_ROUTE_CACHE_ENTRY, Link);
 
-    if (EFI_IP6_EQUAL (Dest, &RtCacheEntry->Destination)&& EFI_IP6_EQUAL (Src, &RtCacheEntry->Source)) {
+    if (EFI_IP6_EQUAL (Dest, &RtCacheEntry->Destination) && EFI_IP6_EQUAL (Src, &RtCacheEntry->Source)) {
       NET_GET_REF (RtCacheEntry);
       return RtCacheEntry;
     }
@@ -265,15 +264,15 @@ Ip6BuildEfiRouteTable (
   OUT EFI_IP6_ROUTE_TABLE   **EfiRouteTable OPTIONAL
   )
 {
-  LIST_ENTRY                *Entry;
-  IP6_ROUTE_ENTRY           *RtEntry;
-  EFI_IP6_ROUTE_TABLE       *EfiTable;
-  UINT32                    Count;
-  INT32                     Index;
+  LIST_ENTRY           *Entry;
+  IP6_ROUTE_ENTRY      *RtEntry;
+  EFI_IP6_ROUTE_TABLE  *EfiTable;
+  UINT32               Count;
+  INT32                Index;
 
   ASSERT (EfiRouteCount != NULL);
 
-  Count          = RouteTable->TotalNum;
+  Count = RouteTable->TotalNum;
   *EfiRouteCount = Count;
 
   if ((EfiRouteTable == NULL) || (Count == 0)) {
@@ -295,7 +294,6 @@ Ip6BuildEfiRouteTable (
   Count = 0;
 
   for (Index = IP6_PREFIX_MAX; Index >= 0; Index--) {
-
     NET_LIST_FOR_EACH (Entry, &(RouteTable->RouteArea[Index])) {
       RtEntry = NET_LIST_USER_STRUCT (Entry, IP6_ROUTE_ENTRY, Link);
 
@@ -329,8 +327,8 @@ Ip6CreateRouteTable (
   VOID
   )
 {
-  IP6_ROUTE_TABLE           *RtTable;
-  UINT32                    Index;
+  IP6_ROUTE_TABLE  *RtTable;
+  UINT32           Index;
 
   RtTable = AllocatePool (sizeof (IP6_ROUTE_TABLE));
   if (RtTable == NULL) {
@@ -364,16 +362,16 @@ Ip6CleanRouteTable (
   IN OUT IP6_ROUTE_TABLE        *RtTable
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IP6_ROUTE_ENTRY           *RtEntry;
-  IP6_ROUTE_CACHE_ENTRY     *RtCacheEntry;
-  UINT32                    Index;
+  LIST_ENTRY             *Entry;
+  LIST_ENTRY             *Next;
+  IP6_ROUTE_ENTRY        *RtEntry;
+  IP6_ROUTE_CACHE_ENTRY  *RtCacheEntry;
+  UINT32                 Index;
 
   ASSERT (RtTable->RefCnt > 0);
 
   if (--RtTable->RefCnt > 0) {
-    return ;
+    return;
   }
 
   //
@@ -414,14 +412,13 @@ Ip6PurgeRouteCache (
   IN UINTN                  Tag
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IP6_ROUTE_CACHE_ENTRY     *RtCacheEntry;
-  UINT32                    Index;
+  LIST_ENTRY             *Entry;
+  LIST_ENTRY             *Next;
+  IP6_ROUTE_CACHE_ENTRY  *RtCacheEntry;
+  UINT32                 Index;
 
   for (Index = 0; Index < IP6_ROUTE_CACHE_HASH_SIZE; Index++) {
     NET_LIST_FOR_EACH_SAFE (Entry, Next, &RtCache->CacheBucket[Index]) {
-
       RtCacheEntry = NET_LIST_USER_STRUCT (Entry, IP6_ROUTE_CACHE_ENTRY, Link);
 
       if (RtCacheEntry->Tag == Tag) {
@@ -453,9 +450,9 @@ Ip6AddRoute (
   IN EFI_IPv6_ADDRESS       *GatewayAddress
   )
 {
-  LIST_ENTRY                *ListHead;
-  LIST_ENTRY                *Entry;
-  IP6_ROUTE_ENTRY           *Route;
+  LIST_ENTRY       *ListHead;
+  LIST_ENTRY       *Entry;
+  IP6_ROUTE_ENTRY  *Route;
 
   ListHead = &RtTable->RouteArea[PrefixLength];
 
@@ -466,7 +463,8 @@ Ip6AddRoute (
     Route = NET_LIST_USER_STRUCT (Entry, IP6_ROUTE_ENTRY, Link);
 
     if (NetIp6IsNetEqual (Destination, &Route->Destination, PrefixLength) &&
-        EFI_IP6_EQUAL (GatewayAddress, &Route->NextHop)) {
+        EFI_IP6_EQUAL (GatewayAddress, &Route->NextHop))
+    {
       return EFI_ACCESS_DENIED;
     }
   }
@@ -512,11 +510,11 @@ Ip6DelRoute (
   IN EFI_IPv6_ADDRESS       *GatewayAddress
   )
 {
-  LIST_ENTRY                *ListHead;
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IP6_ROUTE_ENTRY           *Route;
-  UINT32                    TotalNum;
+  LIST_ENTRY       *ListHead;
+  LIST_ENTRY       *Entry;
+  LIST_ENTRY       *Next;
+  IP6_ROUTE_ENTRY  *Route;
+  UINT32           TotalNum;
 
   ListHead = &RtTable->RouteArea[PrefixLength];
   TotalNum = RtTable->TotalNum;
@@ -524,14 +522,15 @@ Ip6DelRoute (
   NET_LIST_FOR_EACH_SAFE (Entry, Next, ListHead) {
     Route = NET_LIST_USER_STRUCT (Entry, IP6_ROUTE_ENTRY, Link);
 
-    if (Destination != NULL && !NetIp6IsNetEqual (Destination, &Route->Destination, PrefixLength)) {
-      continue;
-    }
-    if (GatewayAddress != NULL && !EFI_IP6_EQUAL (GatewayAddress, &Route->NextHop)) {
+    if ((Destination != NULL) && !NetIp6IsNetEqual (Destination, &Route->Destination, PrefixLength)) {
       continue;
     }
 
-    Ip6PurgeRouteCache (&RtTable->Cache, (UINTN) Route);
+    if ((GatewayAddress != NULL) && !EFI_IP6_EQUAL (GatewayAddress, &Route->NextHop)) {
+      continue;
+    }
+
+    Ip6PurgeRouteCache (&RtTable->Cache, (UINTN)Route);
     RemoveEntryList (Entry);
     Ip6FreeRouteEntry (Route);
 
@@ -561,12 +560,12 @@ Ip6Route (
   IN EFI_IPv6_ADDRESS       *Src
   )
 {
-  IP6_ROUTE_TABLE           *RtTable;
-  LIST_ENTRY                *ListHead;
-  IP6_ROUTE_CACHE_ENTRY     *RtCacheEntry;
-  IP6_ROUTE_ENTRY           *RtEntry;
-  EFI_IPv6_ADDRESS          NextHop;
-  UINT32                    Index;
+  IP6_ROUTE_TABLE        *RtTable;
+  LIST_ENTRY             *ListHead;
+  IP6_ROUTE_CACHE_ENTRY  *RtCacheEntry;
+  IP6_ROUTE_ENTRY        *RtEntry;
+  EFI_IPv6_ADDRESS       NextHop;
+  UINT32                 Index;
 
   RtTable = IpSb->RouteTable;
 
@@ -614,7 +613,7 @@ Ip6Route (
   //
   // Create a route cache entry, and tag it as spawned from this route entry
   //
-  RtCacheEntry = Ip6CreateRouteCacheEntry (Dest, Src, &NextHop, (UINTN) RtEntry);
+  RtCacheEntry = Ip6CreateRouteCacheEntry (Dest, Src, &NextHop, (UINTN)RtEntry);
 
   if (RtCacheEntry == NULL) {
     return NULL;
@@ -626,4 +625,3 @@ Ip6Route (
 
   return RtCacheEntry;
 }
-

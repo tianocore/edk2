@@ -9,12 +9,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "MnpImpl.h"
 #include "MnpVlan.h"
 
-EFI_SERVICE_BINDING_PROTOCOL    mMnpServiceBindingProtocol = {
+EFI_SERVICE_BINDING_PROTOCOL  mMnpServiceBindingProtocol = {
   MnpServiceBindingCreateChild,
   MnpServiceBindingDestroyChild
 };
 
-EFI_MANAGED_NETWORK_PROTOCOL    mMnpProtocolTemplate = {
+EFI_MANAGED_NETWORK_PROTOCOL  mMnpProtocolTemplate = {
   MnpGetModeData,
   MnpConfigure,
   MnpMcastIpToMac,
@@ -25,7 +25,7 @@ EFI_MANAGED_NETWORK_PROTOCOL    mMnpProtocolTemplate = {
   MnpPoll
 };
 
-EFI_MANAGED_NETWORK_CONFIG_DATA mMnpDefaultConfigData = {
+EFI_MANAGED_NETWORK_CONFIG_DATA  mMnpDefaultConfigData = {
   10000000,
   10000000,
   0,
@@ -88,7 +88,6 @@ MnpAddFreeNbuf (
   return Status;
 }
 
-
 /**
   Allocate a free NET_BUF from MnpDeviceData->FreeNbufQue. If there is none
   in the queue, first try to allocate some and add them into the queue, then
@@ -105,15 +104,15 @@ MnpAllocNbuf (
   IN OUT MNP_DEVICE_DATA   *MnpDeviceData
   )
 {
-  EFI_STATUS    Status;
-  NET_BUF_QUEUE *FreeNbufQue;
-  NET_BUF       *Nbuf;
-  EFI_TPL       OldTpl;
+  EFI_STATUS     Status;
+  NET_BUF_QUEUE  *FreeNbufQue;
+  NET_BUF        *Nbuf;
+  EFI_TPL        OldTpl;
 
   NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
   FreeNbufQue = &MnpDeviceData->FreeNbufQue;
-  OldTpl      = gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   //
   // Check whether there are available buffers, or else try to add some.
@@ -122,8 +121,8 @@ MnpAllocNbuf (
     if ((MnpDeviceData->NbufCnt + MNP_NET_BUFFER_INCREASEMENT) > MNP_MAX_NET_BUFFER_NUM) {
       DEBUG (
         (EFI_D_ERROR,
-        "MnpAllocNbuf: The maximum NET_BUF size is reached for MNP driver instance %p.\n",
-        MnpDeviceData)
+         "MnpAllocNbuf: The maximum NET_BUF size is reached for MNP driver instance %p.\n",
+         MnpDeviceData)
         );
 
       Nbuf = NULL;
@@ -134,8 +133,8 @@ MnpAllocNbuf (
     if (EFI_ERROR (Status)) {
       DEBUG (
         (EFI_D_ERROR,
-        "MnpAllocNbuf: Failed to add NET_BUFs into the FreeNbufQue, %r.\n",
-        Status)
+         "MnpAllocNbuf: Failed to add NET_BUFs into the FreeNbufQue, %r.\n",
+         Status)
         );
 
       //
@@ -159,7 +158,6 @@ ON_EXIT:
 
   return Nbuf;
 }
-
 
 /**
   Try to reclaim the Nbuf into the buffer pool.
@@ -219,22 +217,23 @@ MnpAddFreeTxBuf (
   IN     UINTN             Count
   )
 {
-  EFI_STATUS        Status;
-  UINT32            Index;
-  MNP_TX_BUF_WRAP   *TxBufWrap;
+  EFI_STATUS       Status;
+  UINT32           Index;
+  MNP_TX_BUF_WRAP  *TxBufWrap;
 
   NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
   ASSERT ((Count > 0) && (MnpDeviceData->BufferLength > 0));
 
   Status = EFI_SUCCESS;
   for (Index = 0; Index < Count; Index++) {
-    TxBufWrap = (MNP_TX_BUF_WRAP*) AllocatePool (OFFSET_OF (MNP_TX_BUF_WRAP, TxBuf) + MnpDeviceData->BufferLength );
+    TxBufWrap = (MNP_TX_BUF_WRAP *)AllocatePool (OFFSET_OF (MNP_TX_BUF_WRAP, TxBuf) + MnpDeviceData->BufferLength);
     if (TxBufWrap == NULL) {
       DEBUG ((EFI_D_ERROR, "MnpAddFreeTxBuf: TxBuf Alloc failed.\n"));
 
       Status = EFI_OUT_OF_RESOURCES;
       break;
     }
+
     DEBUG ((EFI_D_INFO, "MnpAddFreeTxBuf: Add TxBufWrap %p, TxBuf %p\n", TxBufWrap, TxBufWrap->TxBuf));
     TxBufWrap->Signature = MNP_TX_BUF_WRAP_SIGNATURE;
     TxBufWrap->InUse     = FALSE;
@@ -262,11 +261,11 @@ MnpAllocTxBuf (
   IN OUT MNP_DEVICE_DATA   *MnpDeviceData
   )
 {
-  EFI_TPL           OldTpl;
-  UINT8             *TxBuf;
-  EFI_STATUS        Status;
-  LIST_ENTRY        *Entry;
-  MNP_TX_BUF_WRAP   *TxBufWrap;
+  EFI_TPL          OldTpl;
+  UINT8            *TxBuf;
+  EFI_STATUS       Status;
+  LIST_ENTRY       *Entry;
+  MNP_TX_BUF_WRAP  *TxBufWrap;
 
   NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
@@ -289,8 +288,8 @@ MnpAllocTxBuf (
       if ((MnpDeviceData->TxBufCount + MNP_TX_BUFFER_INCREASEMENT) > MNP_MAX_TX_BUFFER_NUM) {
         DEBUG (
           (EFI_D_ERROR,
-          "MnpAllocTxBuf: The maximum TxBuf size is reached for MNP driver instance %p.\n",
-          MnpDeviceData)
+           "MnpAllocTxBuf: The maximum TxBuf size is reached for MNP driver instance %p.\n",
+           MnpDeviceData)
           );
 
         TxBuf = NULL;
@@ -301,8 +300,8 @@ MnpAllocTxBuf (
       if (IsListEmpty (&MnpDeviceData->FreeTxBufList)) {
         DEBUG (
           (EFI_D_ERROR,
-          "MnpAllocNbuf: Failed to add TxBuf into the FreeTxBufList, %r.\n",
-          Status)
+           "MnpAllocNbuf: Failed to add TxBuf into the FreeTxBufList, %r.\n",
+           Status)
           );
 
         TxBuf = NULL;
@@ -337,8 +336,8 @@ MnpFreeTxBuf (
   IN OUT UINT8             *TxBuf
   )
 {
-  MNP_TX_BUF_WRAP   *TxBufWrap;
-  EFI_TPL           OldTpl;
+  MNP_TX_BUF_WRAP  *TxBufWrap;
+  EFI_TPL          OldTpl;
 
   NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
@@ -350,7 +349,7 @@ MnpFreeTxBuf (
   if (TxBufWrap->Signature != MNP_TX_BUF_WRAP_SIGNATURE) {
     DEBUG (
       (EFI_D_ERROR,
-      "MnpFreeTxBuf: Signature check failed in MnpFreeTxBuf.\n")
+       "MnpFreeTxBuf: Signature check failed in MnpFreeTxBuf.\n")
       );
     return;
   }
@@ -358,7 +357,7 @@ MnpFreeTxBuf (
   if (!TxBufWrap->InUse) {
     DEBUG (
       (EFI_D_WARN,
-      "MnpFreeTxBuf: Duplicated recycle report from SNP.\n")
+       "MnpFreeTxBuf: Duplicated recycle report from SNP.\n")
       );
     return;
   }
@@ -383,16 +382,16 @@ MnpRecycleTxBuf (
   IN OUT MNP_DEVICE_DATA   *MnpDeviceData
   )
 {
-  UINT8                         *TxBuf;
-  EFI_SIMPLE_NETWORK_PROTOCOL   *Snp;
-  EFI_STATUS                    Status;
+  UINT8                        *TxBuf;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
+  EFI_STATUS                   Status;
 
   Snp = MnpDeviceData->Snp;
   ASSERT (Snp != NULL);
 
   do {
-    TxBuf = NULL;
-    Status = Snp->GetStatus (Snp, NULL, (VOID **) &TxBuf);
+    TxBuf  = NULL;
+    Status = Snp->GetStatus (Snp, NULL, (VOID **)&TxBuf);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -424,12 +423,12 @@ MnpInitializeDeviceData (
   IN     EFI_HANDLE        ControllerHandle
   )
 {
-  EFI_STATUS                  Status;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
-  EFI_SIMPLE_NETWORK_MODE     *SnpMode;
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
+  EFI_SIMPLE_NETWORK_MODE      *SnpMode;
 
-  MnpDeviceData->Signature        = MNP_DEVICE_DATA_SIGNATURE;
-  MnpDeviceData->ImageHandle      = ImageHandle;
+  MnpDeviceData->Signature   = MNP_DEVICE_DATA_SIGNATURE;
+  MnpDeviceData->ImageHandle = ImageHandle;
   MnpDeviceData->ControllerHandle = ControllerHandle;
 
   //
@@ -443,7 +442,7 @@ MnpInitializeDeviceData (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiSimpleNetworkProtocolGuid,
-                  (VOID **) &Snp,
+                  (VOID **)&Snp,
                   ImageHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -455,7 +454,7 @@ MnpInitializeDeviceData (
   //
   // Get MTU from Snp.
   //
-  SnpMode            = Snp->Mode;
+  SnpMode = Snp->Mode;
   MnpDeviceData->Snp = Snp;
 
   //
@@ -594,16 +593,15 @@ ERROR:
     // Close the Simple Network Protocol.
     //
     gBS->CloseProtocol (
-          ControllerHandle,
-          &gEfiSimpleNetworkProtocolGuid,
-          ImageHandle,
-          ControllerHandle
-          );
+           ControllerHandle,
+           &gEfiSimpleNetworkProtocolGuid,
+           ImageHandle,
+           ControllerHandle
+           );
   }
 
   return Status;
 }
-
 
 /**
   Destroy the MNP device context data.
@@ -618,9 +616,9 @@ MnpDestroyDeviceData (
   IN     EFI_HANDLE        ImageHandle
   )
 {
-  LIST_ENTRY         *Entry;
-  LIST_ENTRY         *NextEntry;
-  MNP_TX_BUF_WRAP    *TxBufWrap;
+  LIST_ENTRY       *Entry;
+  LIST_ENTRY       *NextEntry;
+  MNP_TX_BUF_WRAP  *TxBufWrap;
 
   NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
@@ -646,7 +644,7 @@ MnpDestroyDeviceData (
   //
   // Free the Tx buffer pool.
   //
-  NET_LIST_FOR_EACH_SAFE(Entry, NextEntry, &MnpDeviceData->AllTxBufList) {
+  NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &MnpDeviceData->AllTxBufList) {
     TxBufWrap = NET_LIST_USER_STRUCT (Entry, MNP_TX_BUF_WRAP, AllEntry);
     RemoveEntryList (Entry);
     FreePool (TxBufWrap);
@@ -676,7 +674,6 @@ MnpDestroyDeviceData (
          MnpDeviceData->ControllerHandle
          );
 }
-
 
 /**
   Create mnp service context data.
@@ -753,7 +750,7 @@ MnpCreateServiceData (
     Status = gBS->OpenProtocol (
                     MnpDeviceData->ControllerHandle,
                     &gEfiVlanConfigProtocolGuid,
-                    (VOID **) &VlanConfig,
+                    (VOID **)&VlanConfig,
                     MnpDeviceData->ImageHandle,
                     MnpServiceHandle,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -775,8 +772,8 @@ MnpCreateServiceData (
   }
 
   MnpServiceData->ServiceHandle = MnpServiceHandle;
-  MnpServiceData->VlanId        = VlanId;
-  MnpServiceData->Priority      = Priority;
+  MnpServiceData->VlanId   = VlanId;
+  MnpServiceData->Priority = Priority;
 
   //
   // Install the MNP Service Binding Protocol
@@ -888,7 +885,7 @@ MnpDestoryChildEntry (
   MNP_INSTANCE_DATA             *Instance;
   EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
 
-  ServiceBinding = (EFI_SERVICE_BINDING_PROTOCOL *) Context;
+  ServiceBinding = (EFI_SERVICE_BINDING_PROTOCOL *)Context;
   Instance = CR (Entry, MNP_INSTANCE_DATA, InstEntry, MNP_INSTANCE_DATA_SIGNATURE);
   return ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
 }
@@ -907,9 +904,9 @@ MnpDestroyServiceChild (
   IN OUT MNP_SERVICE_DATA    *MnpServiceData
   )
 {
-  LIST_ENTRY                         *List;
-  EFI_STATUS                         Status;
-  UINTN                              ListLength;
+  LIST_ENTRY  *List;
+  EFI_STATUS  Status;
+  UINTN       ListLength;
 
   List = &MnpServiceData->ChildrenList;
 
@@ -919,7 +916,7 @@ MnpDestroyServiceChild (
              &MnpServiceData->ServiceBinding,
              &ListLength
              );
-  if (EFI_ERROR (Status) || ListLength != 0) {
+  if (EFI_ERROR (Status) || (ListLength != 0)) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -1007,7 +1004,6 @@ MnpInitializeInstanceData (
   Instance->MnpServiceData = MnpServiceData;
 }
 
-
 /**
   Check whether the token specified by Arg matches the token in Item.
 
@@ -1033,8 +1029,8 @@ MnpTokenExist (
   EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token;
   EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *TokenInItem;
 
-  Token       = (EFI_MANAGED_NETWORK_COMPLETION_TOKEN *) Arg;
-  TokenInItem = (EFI_MANAGED_NETWORK_COMPLETION_TOKEN *) Item->Key;
+  Token = (EFI_MANAGED_NETWORK_COMPLETION_TOKEN *)Arg;
+  TokenInItem = (EFI_MANAGED_NETWORK_COMPLETION_TOKEN *)Item->Key;
 
   if ((Token == TokenInItem) || (Token->Event == TokenInItem->Event)) {
     //
@@ -1079,7 +1075,7 @@ MnpCancelTokens (
     return EFI_SUCCESS;
   }
 
-  TokenToCancel = (EFI_MANAGED_NETWORK_COMPLETION_TOKEN *) Item->Key;
+  TokenToCancel = (EFI_MANAGED_NETWORK_COMPLETION_TOKEN *)Item->Key;
 
   //
   // Remove the item from the map.
@@ -1101,7 +1097,6 @@ MnpCancelTokens (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Start and initialize the simple network.
@@ -1136,7 +1131,6 @@ MnpStartSnp (
   return Status;
 }
 
-
 /**
   Stop the simple network.
 
@@ -1151,8 +1145,8 @@ MnpStopSnp (
   IN  MNP_DEVICE_DATA   *MnpDeviceData
   )
 {
-  EFI_STATUS  Status;
-  EFI_SIMPLE_NETWORK_PROTOCOL     *Snp;
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
 
   Snp = MnpDeviceData->Snp;
   ASSERT (Snp != NULL);
@@ -1168,7 +1162,7 @@ MnpStopSnp (
   //
   // Shut down the simple network.
   //
-  Status  = Snp->Shutdown (Snp);
+  Status = Snp->Shutdown (Snp);
   if (!EFI_ERROR (Status)) {
     //
     // Stop the simple network.
@@ -1178,7 +1172,6 @@ MnpStopSnp (
 
   return Status;
 }
-
 
 /**
   Start the managed network, this function is called when one instance is configured
@@ -1201,13 +1194,13 @@ MnpStart (
   IN     BOOLEAN             EnableSystemPoll
   )
 {
-  EFI_STATUS      Status;
-  EFI_TIMER_DELAY TimerOpType;
-  MNP_DEVICE_DATA *MnpDeviceData;
+  EFI_STATUS       Status;
+  EFI_TIMER_DELAY  TimerOpType;
+  MNP_DEVICE_DATA  *MnpDeviceData;
 
   NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
 
-  Status        = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
   MnpDeviceData = MnpServiceData->MnpDeviceData;
 
   if (!IsConfigUpdate) {
@@ -1238,8 +1231,8 @@ MnpStart (
       if (EFI_ERROR (Status)) {
         DEBUG (
           (EFI_D_ERROR,
-          "MnpStart, gBS->SetTimer for TimeoutCheckTimer %r.\n",
-          Status)
+           "MnpStart, gBS->SetTimer for TimeoutCheckTimer %r.\n",
+           Status)
           );
 
         goto ErrorExit;
@@ -1256,8 +1249,8 @@ MnpStart (
       if (EFI_ERROR (Status)) {
         DEBUG (
           (EFI_D_ERROR,
-          "MnpStart, gBS->SetTimer for MediaDetectTimer %r.\n",
-          Status)
+           "MnpStart, gBS->SetTimer for MediaDetectTimer %r.\n",
+           Status)
           );
 
         goto ErrorExit;
@@ -1272,7 +1265,7 @@ MnpStart (
     //
     TimerOpType = EnableSystemPoll ? TimerPeriodic : TimerCancel;
 
-    Status      = gBS->SetTimer (MnpDeviceData->PollTimer, TimerOpType, MNP_SYS_POLL_INTERVAL);
+    Status = gBS->SetTimer (MnpDeviceData->PollTimer, TimerOpType, MNP_SYS_POLL_INTERVAL);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "MnpStart: gBS->SetTimer for PollTimer failed, %r.\n", Status));
 
@@ -1291,7 +1284,6 @@ ErrorExit:
   return Status;
 }
 
-
 /**
   Stop the managed network.
 
@@ -1306,8 +1298,8 @@ MnpStop (
   IN OUT MNP_SERVICE_DATA    *MnpServiceData
   )
 {
-  EFI_STATUS      Status;
-  MNP_DEVICE_DATA *MnpDeviceData;
+  EFI_STATUS       Status;
+  MNP_DEVICE_DATA  *MnpDeviceData;
 
   NET_CHECK_SIGNATURE (MnpServiceData, MNP_SERVICE_DATA_SIGNATURE);
   MnpDeviceData = MnpServiceData->MnpDeviceData;
@@ -1338,7 +1330,7 @@ MnpStop (
     //
     //  The system poll in on, cancel the poll timer.
     //
-    Status  = gBS->SetTimer (MnpDeviceData->PollTimer, TimerCancel, 0);
+    Status = gBS->SetTimer (MnpDeviceData->PollTimer, TimerCancel, 0);
     MnpDeviceData->EnableSystemPoll = FALSE;
   }
 
@@ -1359,7 +1351,6 @@ MnpStop (
   return Status;
 }
 
-
 /**
   Flush the instance's received data.
 
@@ -1371,8 +1362,8 @@ MnpFlushRcvdDataQueue (
   IN OUT MNP_INSTANCE_DATA   *Instance
   )
 {
-  EFI_TPL         OldTpl;
-  MNP_RXDATA_WRAP *RxDataWrap;
+  EFI_TPL          OldTpl;
+  MNP_RXDATA_WRAP  *RxDataWrap;
 
   NET_CHECK_SIGNATURE (Instance, MNP_INSTANCE_DATA_SIGNATURE);
 
@@ -1387,7 +1378,7 @@ MnpFlushRcvdDataQueue (
     //
     // Recycle the RxDataWrap.
     //
-    MnpRecycleRxData (NULL, (VOID *) RxDataWrap);
+    MnpRecycleRxData (NULL, (VOID *)RxDataWrap);
     Instance->RcvdPacketQueueSize--;
   }
 
@@ -1395,7 +1386,6 @@ MnpFlushRcvdDataQueue (
 
   gBS->RestoreTPL (OldTpl);
 }
-
 
 /**
   Configure the Instance using ConfigData.
@@ -1416,12 +1406,12 @@ MnpConfigureInstance (
   IN     EFI_MANAGED_NETWORK_CONFIG_DATA   *ConfigData OPTIONAL
   )
 {
-  EFI_STATUS                      Status;
-  MNP_SERVICE_DATA                *MnpServiceData;
-  MNP_DEVICE_DATA                 *MnpDeviceData;
-  EFI_MANAGED_NETWORK_CONFIG_DATA *OldConfigData;
-  EFI_MANAGED_NETWORK_CONFIG_DATA *NewConfigData;
-  BOOLEAN                         IsConfigUpdate;
+  EFI_STATUS                       Status;
+  MNP_SERVICE_DATA                 *MnpServiceData;
+  MNP_DEVICE_DATA                  *MnpDeviceData;
+  EFI_MANAGED_NETWORK_CONFIG_DATA  *OldConfigData;
+  EFI_MANAGED_NETWORK_CONFIG_DATA  *NewConfigData;
+  BOOLEAN                          IsConfigUpdate;
 
   NET_CHECK_SIGNATURE (Instance, MNP_INSTANCE_DATA_SIGNATURE);
 
@@ -1432,16 +1422,16 @@ MnpConfigureInstance (
     return EFI_UNSUPPORTED;
   }
 
-  Status          = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
 
-  MnpServiceData  = Instance->MnpServiceData;
-  MnpDeviceData   = MnpServiceData->MnpDeviceData;
+  MnpServiceData = Instance->MnpServiceData;
+  MnpDeviceData  = MnpServiceData->MnpDeviceData;
   NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
-  IsConfigUpdate  = (BOOLEAN) ((Instance->Configured) && (ConfigData != NULL));
+  IsConfigUpdate = (BOOLEAN)((Instance->Configured) && (ConfigData != NULL));
 
-  OldConfigData   = &Instance->ConfigData;
-  NewConfigData   = ConfigData;
+  OldConfigData = &Instance->ConfigData;
+  NewConfigData = ConfigData;
   if (NewConfigData == NULL) {
     //
     // Restore back the default config data if a reset of this instance
@@ -1513,16 +1503,16 @@ MnpConfigureInstance (
   //
   CopyMem (OldConfigData, NewConfigData, sizeof (*OldConfigData));
 
-  Instance->Configured = (BOOLEAN) (ConfigData != NULL);
+  Instance->Configured = (BOOLEAN)(ConfigData != NULL);
   if (Instance->Configured) {
     //
     // The instance is configured, start the Mnp.
     //
     Status = MnpStart (
-              MnpServiceData,
-              IsConfigUpdate,
-              (BOOLEAN) !NewConfigData->DisableBackgroundPolling
-              );
+               MnpServiceData,
+               IsConfigUpdate,
+               (BOOLEAN) !NewConfigData->DisableBackgroundPolling
+               );
   } else {
     //
     // The instance is changed to the unconfigured state, stop the Mnp.
@@ -1549,16 +1539,16 @@ MnpConfigReceiveFilters (
   IN MNP_DEVICE_DATA     *MnpDeviceData
   )
 {
-  EFI_STATUS                  Status;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
-  EFI_MAC_ADDRESS             *MCastFilter;
-  UINT32                      MCastFilterCnt;
-  UINT32                      EnableFilterBits;
-  UINT32                      DisableFilterBits;
-  BOOLEAN                     ResetMCastFilters;
-  LIST_ENTRY                  *Entry;
-  UINT32                      Index;
-  MNP_GROUP_ADDRESS           *GroupAddress;
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
+  EFI_MAC_ADDRESS              *MCastFilter;
+  UINT32                       MCastFilterCnt;
+  UINT32                       EnableFilterBits;
+  UINT32                       DisableFilterBits;
+  BOOLEAN                      ResetMCastFilters;
+  LIST_ENTRY                   *Entry;
+  UINT32                       Index;
+  MNP_GROUP_ADDRESS            *GroupAddress;
 
   NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
@@ -1607,8 +1597,8 @@ MnpConfigReceiveFilters (
       //
       // Allocate pool for the multicast addresses.
       //
-      MCastFilterCnt  = MnpDeviceData->GroupAddressCount;
-      MCastFilter     = AllocatePool (sizeof (EFI_MAC_ADDRESS) * MCastFilterCnt);
+      MCastFilterCnt = MnpDeviceData->GroupAddressCount;
+      MCastFilter    = AllocatePool (sizeof (EFI_MAC_ADDRESS) * MCastFilterCnt);
       if (MCastFilter == NULL) {
         DEBUG ((EFI_D_ERROR, "MnpConfigReceiveFilters: Failed to allocate memory resource for MCastFilter.\n"));
 
@@ -1620,7 +1610,6 @@ MnpConfigReceiveFilters (
       //
       Index = 0;
       NET_LIST_FOR_EACH (Entry, &MnpDeviceData->GroupAddressList) {
-
         GroupAddress = NET_LIST_USER_STRUCT (Entry, MNP_GROUP_ADDRESS, AddrEntry);
         CopyMem (MCastFilter + Index, &GroupAddress->Address, sizeof (*(MCastFilter + Index)));
         Index++;
@@ -1671,13 +1660,14 @@ MnpConfigReceiveFilters (
                   );
   DEBUG_CODE (
     if (EFI_ERROR (Status)) {
-      DEBUG (
-        (EFI_D_ERROR,
-        "MnpConfigReceiveFilters: Snp->ReceiveFilters failed, %r.\n",
-        Status)
-        );
-    }
-  );
+    DEBUG (
+      (EFI_D_ERROR,
+       "MnpConfigReceiveFilters: Snp->ReceiveFilters failed, %r.\n",
+       Status)
+      );
+  }
+
+    );
 
   if (MCastFilter != NULL) {
     //
@@ -1688,7 +1678,6 @@ MnpConfigReceiveFilters (
 
   return Status;
 }
-
 
 /**
   Add a group address control block which controls the MacAddress for
@@ -1728,7 +1717,6 @@ MnpGroupOpAddCtrlBlk (
     //
     GroupAddress = AllocatePool (sizeof (MNP_GROUP_ADDRESS));
     if (GroupAddress == NULL) {
-
       DEBUG ((EFI_D_ERROR, "MnpGroupOpFormCtrlBlk: Failed to allocate memory resource.\n"));
 
       return EFI_OUT_OF_RESOURCES;
@@ -1757,7 +1745,6 @@ MnpGroupOpAddCtrlBlk (
   return EFI_SUCCESS;
 }
 
-
 /**
   Delete a group control block from the instance. If the controlled group address's
   reference count reaches zero, the group address is removed too.
@@ -1774,8 +1761,8 @@ MnpGroupOpDelCtrlBlk (
   IN MNP_GROUP_CONTROL_BLOCK     *CtrlBlk
   )
 {
-  MNP_DEVICE_DATA   *MnpDeviceData;
-  MNP_GROUP_ADDRESS *GroupAddress;
+  MNP_DEVICE_DATA    *MnpDeviceData;
+  MNP_GROUP_ADDRESS  *GroupAddress;
 
   NET_CHECK_SIGNATURE (Instance, MNP_INSTANCE_DATA_SIGNATURE);
 
@@ -1810,7 +1797,6 @@ MnpGroupOpDelCtrlBlk (
   return FALSE;
 }
 
-
 /**
   Do the group operations for this instance.
 
@@ -1834,27 +1820,27 @@ MnpGroupOp (
   IN     MNP_GROUP_CONTROL_BLOCK   *CtrlBlk OPTIONAL
   )
 {
-  MNP_DEVICE_DATA         *MnpDeviceData;
-  LIST_ENTRY              *Entry;
-  LIST_ENTRY              *NextEntry;
-  MNP_GROUP_ADDRESS       *GroupAddress;
-  EFI_SIMPLE_NETWORK_MODE *SnpMode;
-  MNP_GROUP_CONTROL_BLOCK *NewCtrlBlk;
-  EFI_STATUS              Status;
-  BOOLEAN                 AddressExist;
-  BOOLEAN                 NeedUpdate;
+  MNP_DEVICE_DATA          *MnpDeviceData;
+  LIST_ENTRY               *Entry;
+  LIST_ENTRY               *NextEntry;
+  MNP_GROUP_ADDRESS        *GroupAddress;
+  EFI_SIMPLE_NETWORK_MODE  *SnpMode;
+  MNP_GROUP_CONTROL_BLOCK  *NewCtrlBlk;
+  EFI_STATUS               Status;
+  BOOLEAN                  AddressExist;
+  BOOLEAN                  NeedUpdate;
 
   NET_CHECK_SIGNATURE (Instance, MNP_INSTANCE_DATA_SIGNATURE);
 
   MnpDeviceData = Instance->MnpServiceData->MnpDeviceData;
-  SnpMode       = MnpDeviceData->Snp->Mode;
+  SnpMode = MnpDeviceData->Snp->Mode;
 
   if (JoinFlag) {
     //
     // A new group address is to be added.
     //
-    GroupAddress  = NULL;
-    AddressExist  = FALSE;
+    GroupAddress = NULL;
+    AddressExist = FALSE;
 
     //
     // Allocate memory for the control block.
@@ -1885,12 +1871,12 @@ MnpGroupOp (
     // Add the GroupAddress for this instance.
     //
     Status = MnpGroupOpAddCtrlBlk (
-              Instance,
-              NewCtrlBlk,
-              GroupAddress,
-              MacAddress,
-              SnpMode->HwAddressSize
-              );
+               Instance,
+               NewCtrlBlk,
+               GroupAddress,
+               MacAddress,
+               SnpMode->HwAddressSize
+               );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1911,12 +1897,11 @@ MnpGroupOp (
       NeedUpdate = FALSE;
 
       NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Instance->GroupCtrlBlkList) {
-
         NewCtrlBlk = NET_LIST_USER_STRUCT (
-                      Entry,
-                      MNP_GROUP_CONTROL_BLOCK,
-                      CtrlBlkEntry
-                      );
+                       Entry,
+                       MNP_GROUP_CONTROL_BLOCK,
+                       CtrlBlkEntry
+                       );
         //
         // Update is required if the group address left is no longer used
         // by other instances.

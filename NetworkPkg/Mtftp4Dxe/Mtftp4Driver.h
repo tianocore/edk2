@@ -126,6 +126,4 @@ Mtftp4ServiceBindingDestroyChild (
   IN EFI_HANDLE                   ChildHandle
   );
 
-
-
 #endif

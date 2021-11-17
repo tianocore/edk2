@@ -14,39 +14,38 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #pragma pack(1)
 
-#define IP4_ETHER_PROTO       0x0800
+#define IP4_ETHER_PROTO  0x0800
 
-#define DHCP4_OPCODE_REQUEST         1
-#define DHCP4_MAGIC                  0x63538263 /// network byte order
-#define DHCP4_TAG_EOP                255  /// End Option
+#define DHCP4_OPCODE_REQUEST  1
+#define DHCP4_MAGIC           0x63538263  /// network byte order
+#define DHCP4_TAG_EOP         255         /// End Option
 
-#define DHCP4_TAG_TYPE               53
-#define DHCP4_MSG_REQUEST            3
-#define DHCP4_MSG_INFORM             8
+#define DHCP4_TAG_TYPE     53
+#define DHCP4_MSG_REQUEST  3
+#define DHCP4_MSG_INFORM   8
 
-#define DHCP4_TAG_PARA_LIST          55
-#define DHCP4_TAG_DNS_SERVER         6
+#define DHCP4_TAG_PARA_LIST   55
+#define DHCP4_TAG_DNS_SERVER  6
 
+#define DHCP6_TAG_DNS_REQUEST  6
+#define DHCP6_TAG_DNS_SERVER   23
 
-#define DHCP6_TAG_DNS_REQUEST        6
-#define DHCP6_TAG_DNS_SERVER         23
-
-#define DNS_CHECK_MEDIA_GET_DHCP_WAITING_TIME    EFI_TIMER_PERIOD_SECONDS(20)
+#define DNS_CHECK_MEDIA_GET_DHCP_WAITING_TIME  EFI_TIMER_PERIOD_SECONDS(20)
 
 //
 // The required Dns4 server information.
 //
 typedef struct {
-  UINT32                     *ServerCount;
-  EFI_IPv4_ADDRESS           *ServerList;
+  UINT32              *ServerCount;
+  EFI_IPv4_ADDRESS    *ServerList;
 } DNS4_SERVER_INFOR;
 
 //
 // The required Dns6 server information.
 //
 typedef struct {
-  UINT32                     *ServerCount;
-  EFI_IPv6_ADDRESS           *ServerList;
+  UINT32              *ServerCount;
+  EFI_IPv6_ADDRESS    *ServerList;
 } DNS6_SERVER_INFOR;
 
 #pragma pack()

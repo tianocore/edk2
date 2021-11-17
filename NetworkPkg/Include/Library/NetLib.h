@@ -15,16 +15,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 
-typedef UINT32          IP4_ADDR;
-typedef UINT32          TCP_SEQNO;
-typedef UINT16          TCP_PORTNO;
+typedef UINT32  IP4_ADDR;
+typedef UINT32  TCP_SEQNO;
+typedef UINT16  TCP_PORTNO;
 
+#define  NET_ETHER_ADDR_LEN   6
+#define  NET_IFTYPE_ETHERNET  0x01
 
-#define  NET_ETHER_ADDR_LEN    6
-#define  NET_IFTYPE_ETHERNET   0x01
-
-#define  NET_VLAN_TAG_LEN      4
-#define  ETHER_TYPE_VLAN       0x8100
+#define  NET_VLAN_TAG_LEN  4
+#define  ETHER_TYPE_VLAN   0x8100
 
 #define  EFI_IP_PROTO_UDP      0x11
 #define  EFI_IP_PROTO_TCP      0x06
@@ -37,63 +36,62 @@ typedef UINT16          TCP_PORTNO;
 //
 // The address classification
 //
-#define  IP4_ADDR_CLASSA       1     // Deprecated
-#define  IP4_ADDR_CLASSB       2     // Deprecated
-#define  IP4_ADDR_CLASSC       3     // Deprecated
-#define  IP4_ADDR_CLASSD       4
-#define  IP4_ADDR_CLASSE       5
+#define  IP4_ADDR_CLASSA  1          // Deprecated
+#define  IP4_ADDR_CLASSB  2          // Deprecated
+#define  IP4_ADDR_CLASSC  3          // Deprecated
+#define  IP4_ADDR_CLASSD  4
+#define  IP4_ADDR_CLASSE  5
 
-#define  IP4_MASK_NUM          33
-#define  IP6_PREFIX_NUM        129
+#define  IP4_MASK_NUM    33
+#define  IP6_PREFIX_NUM  129
 
-#define  IP4_MASK_MAX          32
-#define  IP6_PREFIX_MAX        128
+#define  IP4_MASK_MAX    32
+#define  IP6_PREFIX_MAX  128
 
-#define  IP6_HOP_BY_HOP        0
-#define  IP6_DESTINATION       60
-#define  IP6_ROUTING           43
-#define  IP6_FRAGMENT          44
-#define  IP6_AH                51
-#define  IP6_ESP               50
-#define  IP6_NO_NEXT_HEADER    59
+#define  IP6_HOP_BY_HOP      0
+#define  IP6_DESTINATION     60
+#define  IP6_ROUTING         43
+#define  IP6_FRAGMENT        44
+#define  IP6_AH              51
+#define  IP6_ESP             50
+#define  IP6_NO_NEXT_HEADER  59
 
-#define  IP_VERSION_4          4
-#define  IP_VERSION_6          6
+#define  IP_VERSION_4  4
+#define  IP_VERSION_6  6
 
-#define  IP6_PREFIX_LENGTH     64
+#define  IP6_PREFIX_LENGTH  64
 
 //
 // DNS QTYPE values
 //
-#define  DNS_TYPE_A            1
-#define  DNS_TYPE_NS           2
-#define  DNS_TYPE_CNAME        5
-#define  DNS_TYPE_SOA          6
-#define  DNS_TYPE_WKS          11
-#define  DNS_TYPE_PTR          12
-#define  DNS_TYPE_HINFO        13
-#define  DNS_TYPE_MINFO        14
-#define  DNS_TYPE_MX           15
-#define  DNS_TYPE_TXT          16
-#define  DNS_TYPE_AAAA         28
-#define  DNS_TYPE_SRV_RR       33
-#define  DNS_TYPE_AXFR         252
-#define  DNS_TYPE_MAILB        253
-#define  DNS_TYPE_ANY          255
+#define  DNS_TYPE_A       1
+#define  DNS_TYPE_NS      2
+#define  DNS_TYPE_CNAME   5
+#define  DNS_TYPE_SOA     6
+#define  DNS_TYPE_WKS     11
+#define  DNS_TYPE_PTR     12
+#define  DNS_TYPE_HINFO   13
+#define  DNS_TYPE_MINFO   14
+#define  DNS_TYPE_MX      15
+#define  DNS_TYPE_TXT     16
+#define  DNS_TYPE_AAAA    28
+#define  DNS_TYPE_SRV_RR  33
+#define  DNS_TYPE_AXFR    252
+#define  DNS_TYPE_MAILB   253
+#define  DNS_TYPE_ANY     255
 
 //
 // DNS QCLASS values
 //
-#define  DNS_CLASS_INET        1
-#define  DNS_CLASS_CH          3
-#define  DNS_CLASS_HS          4
-#define  DNS_CLASS_ANY         255
+#define  DNS_CLASS_INET  1
+#define  DNS_CLASS_CH    3
+#define  DNS_CLASS_HS    4
+#define  DNS_CLASS_ANY   255
 
 //
 // Number of 100ns units time Interval for network media state detect
 //
 #define MEDIA_STATE_DETECT_TIME_INTERVAL  1000000U
-
 
 #pragma pack(1)
 
@@ -101,9 +99,9 @@ typedef UINT16          TCP_PORTNO;
 // Ethernet head definition
 //
 typedef struct {
-  UINT8                 DstMac [NET_ETHER_ADDR_LEN];
-  UINT8                 SrcMac [NET_ETHER_ADDR_LEN];
-  UINT16                EtherType;
+  UINT8     DstMac[NET_ETHER_ADDR_LEN];
+  UINT8     SrcMac[NET_ETHER_ADDR_LEN];
+  UINT16    EtherType;
 } ETHER_HEAD;
 
 //
@@ -111,11 +109,11 @@ typedef struct {
 //
 typedef union {
   struct {
-    UINT16              Vid      : 12;  // Unique VLAN identifier (0 to 4094)
-    UINT16              Cfi      : 1;   // Canonical Format Indicator
-    UINT16              Priority : 3;   // 802.1Q priority level (0 to 7)
+    UINT16    Vid      : 12;            // Unique VLAN identifier (0 to 4094)
+    UINT16    Cfi      : 1;             // Canonical Format Indicator
+    UINT16    Priority : 3;             // 802.1Q priority level (0 to 7)
   } Bits;
-  UINT16                Uint16;
+  UINT16    Uint16;
 } VLAN_TCI;
 
 #define VLAN_TCI_CFI_CANONICAL_MAC      0
@@ -128,83 +126,82 @@ typedef union {
 // directly. This is why there is an internal representation.
 //
 typedef struct {
-  UINT8                 HeadLen : 4;
-  UINT8                 Ver     : 4;
-  UINT8                 Tos;
-  UINT16                TotalLen;
-  UINT16                Id;
-  UINT16                Fragment;
-  UINT8                 Ttl;
-  UINT8                 Protocol;
-  UINT16                Checksum;
-  IP4_ADDR              Src;
-  IP4_ADDR              Dst;
+  UINT8       HeadLen : 4;
+  UINT8       Ver     : 4;
+  UINT8       Tos;
+  UINT16      TotalLen;
+  UINT16      Id;
+  UINT16      Fragment;
+  UINT8       Ttl;
+  UINT8       Protocol;
+  UINT16      Checksum;
+  IP4_ADDR    Src;
+  IP4_ADDR    Dst;
 } IP4_HEAD;
-
 
 //
 // ICMP head definition. Each ICMP message is categorized as either an error
 // message or query message. Two message types have their own head format.
 //
 typedef struct {
-  UINT8                 Type;
-  UINT8                 Code;
-  UINT16                Checksum;
+  UINT8     Type;
+  UINT8     Code;
+  UINT16    Checksum;
 } IP4_ICMP_HEAD;
 
 typedef struct {
-  IP4_ICMP_HEAD         Head;
-  UINT32                Fourth; // 4th filed of the head, it depends on Type.
-  IP4_HEAD              IpHead;
+  IP4_ICMP_HEAD    Head;
+  UINT32           Fourth;      // 4th filed of the head, it depends on Type.
+  IP4_HEAD         IpHead;
 } IP4_ICMP_ERROR_HEAD;
 
 typedef struct {
-  IP4_ICMP_HEAD         Head;
-  UINT16                Id;
-  UINT16                Seq;
+  IP4_ICMP_HEAD    Head;
+  UINT16           Id;
+  UINT16           Seq;
 } IP4_ICMP_QUERY_HEAD;
 
 typedef struct {
-  UINT8                 Type;
-  UINT8                 Code;
-  UINT16                Checksum;
+  UINT8     Type;
+  UINT8     Code;
+  UINT16    Checksum;
 } IP6_ICMP_HEAD;
 
 typedef struct {
-  IP6_ICMP_HEAD         Head;
-  UINT32                Fourth;
-  EFI_IP6_HEADER        IpHead;
+  IP6_ICMP_HEAD     Head;
+  UINT32            Fourth;
+  EFI_IP6_HEADER    IpHead;
 } IP6_ICMP_ERROR_HEAD;
 
 typedef struct {
-  IP6_ICMP_HEAD         Head;
-  UINT32                Fourth;
+  IP6_ICMP_HEAD    Head;
+  UINT32           Fourth;
 } IP6_ICMP_INFORMATION_HEAD;
 
 //
 // UDP header definition
 //
 typedef struct {
-  UINT16                SrcPort;
-  UINT16                DstPort;
-  UINT16                Length;
-  UINT16                Checksum;
+  UINT16    SrcPort;
+  UINT16    DstPort;
+  UINT16    Length;
+  UINT16    Checksum;
 } EFI_UDP_HEADER;
 
 //
 // TCP header definition
 //
 typedef struct {
-  TCP_PORTNO            SrcPort;
-  TCP_PORTNO            DstPort;
-  TCP_SEQNO             Seq;
-  TCP_SEQNO             Ack;
-  UINT8                 Res     : 4;
-  UINT8                 HeadLen : 4;
-  UINT8                 Flag;
-  UINT16                Wnd;
-  UINT16                Checksum;
-  UINT16                Urg;
+  TCP_PORTNO    SrcPort;
+  TCP_PORTNO    DstPort;
+  TCP_SEQNO     Seq;
+  TCP_SEQNO     Ack;
+  UINT8         Res     : 4;
+  UINT8         HeadLen : 4;
+  UINT8         Flag;
+  UINT16        Wnd;
+  UINT16        Checksum;
+  UINT16        Urg;
 } TCP_HEAD;
 
 #pragma pack()
@@ -221,11 +218,11 @@ typedef struct {
 
 #define NTOHS(x)  SwapBytes16 (x)
 
-#define HTONS(x)   NTOHS(x)
-#define NTOHLL(x)  SwapBytes64 (x)
-#define HTONLL(x)  NTOHLL(x)
-#define NTOHLLL(x) Ip6Swap128 (x)
-#define HTONLLL(x) NTOHLLL(x)
+#define HTONS(x)    NTOHS(x)
+#define NTOHLL(x)   SwapBytes64 (x)
+#define HTONLL(x)   NTOHLL(x)
+#define NTOHLLL(x)  Ip6Swap128 (x)
+#define HTONLLL(x)  NTOHLLL(x)
 
 //
 // Test the IP's attribute, All the IPs are in host byte order.
@@ -236,7 +233,7 @@ typedef struct {
 #define IP4_NET_EQUAL(Ip1, Ip2, NetMask)  (((Ip1) & (NetMask)) == ((Ip2) & (NetMask)))
 #define IP4_IS_VALID_NETMASK(Ip)          (NetGetMaskLength (Ip) != (IP4_MASK_MAX + 1))
 
-#define IP6_IS_MULTICAST(Ip6)             (((Ip6)->Addr[0]) == 0xFF)
+#define IP6_IS_MULTICAST(Ip6)  (((Ip6)->Addr[0]) == 0xFF)
 
 //
 // Convert the EFI_IP4_ADDRESS to plain UINT32 IP4 address.
@@ -247,17 +244,17 @@ typedef struct {
 
 #define EFI_IP6_EQUAL(Ip1, Ip2)  (CompareMem ((Ip1), (Ip2), sizeof (EFI_IPv6_ADDRESS)) == 0)
 
-#define IP4_COPY_ADDRESS(Dest, Src) (CopyMem ((Dest), (Src), sizeof (EFI_IPv4_ADDRESS)))
-#define IP6_COPY_ADDRESS(Dest, Src) (CopyMem ((Dest), (Src), sizeof (EFI_IPv6_ADDRESS)))
-#define IP6_COPY_LINK_ADDRESS(Mac1, Mac2) (CopyMem ((Mac1), (Mac2), sizeof (EFI_MAC_ADDRESS)))
+#define IP4_COPY_ADDRESS(Dest, Src)        (CopyMem ((Dest), (Src), sizeof (EFI_IPv4_ADDRESS)))
+#define IP6_COPY_ADDRESS(Dest, Src)        (CopyMem ((Dest), (Src), sizeof (EFI_IPv6_ADDRESS)))
+#define IP6_COPY_LINK_ADDRESS(Mac1, Mac2)  (CopyMem ((Mac1), (Mac2), sizeof (EFI_MAC_ADDRESS)))
 
 //
 // The debug level definition. This value is also used as the
 // syslog's severity level. Don't change it.
 //
-#define NETDEBUG_LEVEL_TRACE   5
-#define NETDEBUG_LEVEL_WARNING 4
-#define NETDEBUG_LEVEL_ERROR   3
+#define NETDEBUG_LEVEL_TRACE    5
+#define NETDEBUG_LEVEL_WARNING  4
+#define NETDEBUG_LEVEL_ERROR    3
 
 //
 // Network debug message is sent out as syslog packet.
@@ -357,7 +354,6 @@ NetDebugOutput (
   IN UINT8                     *Message
   );
 
-
 /**
   Return the length of the mask.
 
@@ -454,7 +450,6 @@ NetIp6IsValidUnicast (
   IN EFI_IPv6_ADDRESS       *Ip6
   );
 
-
 /**
   Check whether the incoming Ipv6 address is the unspecified address or not.
 
@@ -531,8 +526,7 @@ Ip6Swap128 (
   EFI_IPv6_ADDRESS *Ip6
   );
 
-extern IP4_ADDR gIp4AllMasks[IP4_MASK_NUM];
-
+extern IP4_ADDR  gIp4AllMasks[IP4_MASK_NUM];
 
 extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 
@@ -542,10 +536,10 @@ extern EFI_IPv4_ADDRESS  mZeroIp4Addr;
 #define NET_IS_LOWER_CASE_CHAR(Ch)  (('a' <= (Ch)) && ((Ch) <= 'z'))
 #define NET_IS_UPPER_CASE_CHAR(Ch)  (('A' <= (Ch)) && ((Ch) <= 'Z'))
 
-#define TICKS_PER_MS            10000U
-#define TICKS_PER_SECOND        10000000U
+#define TICKS_PER_MS      10000U
+#define TICKS_PER_SECOND  10000000U
 
-#define NET_RANDOM(Seed)        ((UINT32) ((UINT32) (Seed) * 1103515245UL + 12345) % 4294967295UL)
+#define NET_RANDOM(Seed)  ((UINT32) ((UINT32) (Seed) * 1103515245UL + 12345) % 4294967295UL)
 
 /**
   Extract a UINT32 from a byte stream.
@@ -601,7 +595,6 @@ NetRandomInitSeed (
   VOID
   );
 
-
 #define NET_LIST_USER_STRUCT(Entry, Type, Field)        \
           BASE_CR(Entry, Type, Field)
 
@@ -634,7 +627,6 @@ NetRandomInitSeed (
 
 #define NET_LIST_TAIL(ListHead, Type, Field)  \
           NET_LIST_USER_STRUCT((ListHead)->BackLink, Type, Field)
-
 
 /**
   Remove the first node entry on the list, and return the removed node entry.
@@ -734,7 +726,7 @@ NetListInsertBefore (
 **/
 typedef
 EFI_STATUS
-(EFIAPI *NET_DESTROY_LINK_LIST_CALLBACK) (
+(EFIAPI *NET_DESTROY_LINK_LIST_CALLBACK)(
   IN LIST_ENTRY         *Entry,
   IN VOID               *Context   OPTIONAL
   );
@@ -766,7 +758,7 @@ EFIAPI
 NetDestroyLinkList (
   IN   LIST_ENTRY                       *List,
   IN   NET_DESTROY_LINK_LIST_CALLBACK   CallBack,
-  IN   VOID                             *Context,    OPTIONAL
+  IN   VOID                             *Context, OPTIONAL
   OUT  UINTN                            *ListLength  OPTIONAL
   );
 
@@ -795,15 +787,15 @@ NetIsInHandleBuffer (
 // tokens. The drivers can share code to manage those objects.
 //
 typedef struct {
-  LIST_ENTRY                Link;
-  VOID                      *Key;
-  VOID                      *Value;
+  LIST_ENTRY    Link;
+  VOID          *Key;
+  VOID          *Value;
 } NET_MAP_ITEM;
 
 typedef struct {
-  LIST_ENTRY                Used;
-  LIST_ENTRY                Recycled;
-  UINTN                     Count;
+  LIST_ENTRY    Used;
+  LIST_ENTRY    Recycled;
+  UINTN         Count;
 } NET_MAP;
 
 #define NET_MAP_INCREAMENT  64
@@ -1031,7 +1023,7 @@ NetMapRemoveTail (
 
 typedef
 EFI_STATUS
-(EFIAPI *NET_MAP_CALLBACK) (
+(EFIAPI *NET_MAP_CALLBACK)(
   IN NET_MAP                *Map,
   IN NET_MAP_ITEM           *Item,
   IN VOID                   *Arg
@@ -1064,10 +1056,10 @@ NetMapIterate (
   IN VOID                   *Arg      OPTIONAL
   );
 
-
 //
 // Helper functions to implement driver binding and service binding protocols.
 //
+
 /**
   Create a child of the service that is identified by ServiceBindingGuid.
 
@@ -1310,7 +1302,6 @@ NetLibDetectMediaWaitTimeout (
   OUT EFI_STATUS            *MediaState
   );
 
-
 /**
   Create an IPv4 device path node.
 
@@ -1376,7 +1367,6 @@ NetLibCreateIPv6DPathNode (
   IN UINT16                RemotePort,
   IN UINT16                Protocol
   );
-
 
 /**
   Find the UNDI/SNP handle from controller and protocol GUID.
@@ -1538,15 +1528,14 @@ NetLibIp6ToStr (
 //
 // Various signatures
 //
-#define  NET_BUF_SIGNATURE    SIGNATURE_32 ('n', 'b', 'u', 'f')
-#define  NET_VECTOR_SIGNATURE SIGNATURE_32 ('n', 'v', 'e', 'c')
-#define  NET_QUE_SIGNATURE    SIGNATURE_32 ('n', 'b', 'q', 'u')
+#define  NET_BUF_SIGNATURE     SIGNATURE_32 ('n', 'b', 'u', 'f')
+#define  NET_VECTOR_SIGNATURE  SIGNATURE_32 ('n', 'v', 'e', 'c')
+#define  NET_QUE_SIGNATURE     SIGNATURE_32 ('n', 'b', 'q', 'u')
 
-
-#define  NET_PROTO_DATA       64   // Opaque buffer for protocols
-#define  NET_BUF_HEAD         1    // Trim or allocate space from head
-#define  NET_BUF_TAIL         0    // Trim or allocate space from tail
-#define  NET_VECTOR_OWN_FIRST 0x01  // We allocated the 1st block in the vector
+#define  NET_PROTO_DATA        64   // Opaque buffer for protocols
+#define  NET_BUF_HEAD          1    // Trim or allocate space from head
+#define  NET_BUF_TAIL          0    // Trim or allocate space from tail
+#define  NET_VECTOR_OWN_FIRST  0x01 // We allocated the 1st block in the vector
 
 #define NET_CHECK_SIGNATURE(PData, SIGNATURE) \
   ASSERT (((PData) != NULL) && ((PData)->Signature == (SIGNATURE)))
@@ -1555,39 +1544,39 @@ NetLibIp6ToStr (
 // Single memory block in the vector.
 //
 typedef struct {
-  UINT32              Len;        // The block's length
-  UINT8               *Bulk;      // The block's Data
+  UINT32    Len;                  // The block's length
+  UINT8     *Bulk;                // The block's Data
 } NET_BLOCK;
 
-typedef VOID (EFIAPI *NET_VECTOR_EXT_FREE) (VOID *Arg);
+typedef VOID (EFIAPI *NET_VECTOR_EXT_FREE)(VOID *Arg);
 
 //
-//NET_VECTOR contains several blocks to hold all packet's
-//fragments and other house-keeping stuff for sharing. It
-//doesn't specify the where actual packet fragment begins.
+// NET_VECTOR contains several blocks to hold all packet's
+// fragments and other house-keeping stuff for sharing. It
+// doesn't specify the where actual packet fragment begins.
 //
 typedef struct {
-  UINT32              Signature;
-  INTN                RefCnt;  // Reference count to share NET_VECTOR.
-  NET_VECTOR_EXT_FREE Free;    // external function to free NET_VECTOR
-  VOID                *Arg;    // opaque argument to Free
-  UINT32              Flag;    // Flags, NET_VECTOR_OWN_FIRST
-  UINT32              Len;     // Total length of the associated BLOCKs
+  UINT32                 Signature;
+  INTN                   RefCnt; // Reference count to share NET_VECTOR.
+  NET_VECTOR_EXT_FREE    Free;   // external function to free NET_VECTOR
+  VOID                   *Arg;   // opaque argument to Free
+  UINT32                 Flag;   // Flags, NET_VECTOR_OWN_FIRST
+  UINT32                 Len;    // Total length of the associated BLOCKs
 
-  UINT32              BlockNum;
-  NET_BLOCK           Block[1];
+  UINT32                 BlockNum;
+  NET_BLOCK              Block[1];
 } NET_VECTOR;
 
 //
-//NET_BLOCK_OP operates on the NET_BLOCK. It specifies
-//where the actual fragment begins and ends
+// NET_BLOCK_OP operates on the NET_BLOCK. It specifies
+// where the actual fragment begins and ends
 //
 typedef struct {
-  UINT8               *BlockHead;   // Block's head, or the smallest valid Head
-  UINT8               *BlockTail;   // Block's tail. BlockTail-BlockHead=block length
-  UINT8               *Head;        // 1st byte of the data in the block
-  UINT8               *Tail;        // Tail of the data in the block, Tail-Head=Size
-  UINT32              Size;         // The size of the data
+  UINT8     *BlockHead;             // Block's head, or the smallest valid Head
+  UINT8     *BlockTail;             // Block's tail. BlockTail-BlockHead=block length
+  UINT8     *Head;                  // 1st byte of the data in the block
+  UINT8     *Tail;                  // Tail of the data in the block, Tail-Head=Size
+  UINT32    Size;                   // The size of the data
 } NET_BLOCK_OP;
 
 typedef union {
@@ -1596,44 +1585,44 @@ typedef union {
 } NET_IP_HEAD;
 
 //
-//NET_BUF is the buffer manage structure used by the
-//network stack. Every network packet may be fragmented. The Vector points to
-//memory blocks used by each fragment, and BlockOp
-//specifies where each fragment begins and ends.
+// NET_BUF is the buffer manage structure used by the
+// network stack. Every network packet may be fragmented. The Vector points to
+// memory blocks used by each fragment, and BlockOp
+// specifies where each fragment begins and ends.
 //
-//It also contains an opaque area for the protocol to store
-//per-packet information. Protocol must be careful not
-//to overwrite the members after that.
+// It also contains an opaque area for the protocol to store
+// per-packet information. Protocol must be careful not
+// to overwrite the members after that.
 //
 typedef struct {
-  UINT32         Signature;
-  INTN           RefCnt;
-  LIST_ENTRY     List;                       // The List this NET_BUF is on
+  UINT32            Signature;
+  INTN              RefCnt;
+  LIST_ENTRY        List;                    // The List this NET_BUF is on
 
-  NET_IP_HEAD    Ip;                         // Network layer header, for fast access
-  TCP_HEAD       *Tcp;                       // Transport layer header, for fast access
-  EFI_UDP_HEADER *Udp;                       // User Datagram Protocol header
-  UINT8          ProtoData [NET_PROTO_DATA]; //Protocol specific data
+  NET_IP_HEAD       Ip;                        // Network layer header, for fast access
+  TCP_HEAD          *Tcp;                      // Transport layer header, for fast access
+  EFI_UDP_HEADER    *Udp;                      // User Datagram Protocol header
+  UINT8             ProtoData[NET_PROTO_DATA]; // Protocol specific data
 
-  NET_VECTOR     *Vector;                    // The vector containing the packet
+  NET_VECTOR        *Vector;                 // The vector containing the packet
 
-  UINT32         BlockOpNum;                 // Total number of BlockOp in the buffer
-  UINT32         TotalSize;                  // Total size of the actual packet
-  NET_BLOCK_OP   BlockOp[1];                 // Specify the position of actual packet
+  UINT32            BlockOpNum;              // Total number of BlockOp in the buffer
+  UINT32            TotalSize;               // Total size of the actual packet
+  NET_BLOCK_OP      BlockOp[1];              // Specify the position of actual packet
 } NET_BUF;
 
 //
-//A queue of NET_BUFs. It is a thin extension of
-//NET_BUF functions.
+// A queue of NET_BUFs. It is a thin extension of
+// NET_BUF functions.
 //
 typedef struct {
-  UINT32              Signature;
-  INTN                RefCnt;
-  LIST_ENTRY          List;       // The List this buffer queue is on
+  UINT32        Signature;
+  INTN          RefCnt;
+  LIST_ENTRY    List;             // The List this buffer queue is on
 
-  LIST_ENTRY          BufList;    // list of queued buffers
-  UINT32              BufSize;    // total length of DATA in the buffers
-  UINT32              BufNum;     // total number of buffers on the chain
+  LIST_ENTRY    BufList;          // list of queued buffers
+  UINT32        BufSize;          // total length of DATA in the buffers
+  UINT32        BufNum;           // total number of buffers on the chain
 } NET_BUF_QUEUE;
 
 //
@@ -1641,19 +1630,19 @@ typedef struct {
 //
 #pragma pack(1)
 typedef struct {
-  IP4_ADDR            SrcIp;
-  IP4_ADDR            DstIp;
-  UINT8               Reserved;
-  UINT8               Protocol;
-  UINT16              Len;
+  IP4_ADDR    SrcIp;
+  IP4_ADDR    DstIp;
+  UINT8       Reserved;
+  UINT8       Protocol;
+  UINT16      Len;
 } NET_PSEUDO_HDR;
 
 typedef struct {
   EFI_IPv6_ADDRESS    SrcIp;
   EFI_IPv6_ADDRESS    DstIp;
   UINT32              Len;
-  UINT32              Reserved:24;
-  UINT32              NextHeader:8;
+  UINT32              Reserved   : 24;
+  UINT32              NextHeader : 8;
 } NET_IP6_PSEUDO_HDR;
 #pragma pack()
 
@@ -1663,13 +1652,13 @@ typedef struct {
 // the two in case that NET_BLOCK be enhanced later.
 //
 typedef struct {
-  UINT32              Len;
-  UINT8               *Bulk;
+  UINT32    Len;
+  UINT8     *Bulk;
 } NET_FRAGMENT;
 
-#define NET_GET_REF(PData)      ((PData)->RefCnt++)
-#define NET_PUT_REF(PData)      ((PData)->RefCnt--)
-#define NETBUF_FROM_PROTODATA(Info) BASE_CR((Info), NET_BUF, ProtoData)
+#define NET_GET_REF(PData)           ((PData)->RefCnt++)
+#define NET_PUT_REF(PData)           ((PData)->RefCnt--)
+#define NETBUF_FROM_PROTODATA(Info)  BASE_CR((Info), NET_BUF, ProtoData)
 
 #define NET_BUF_SHARED(Buf) \
   (((Buf)->RefCnt > 1) || ((Buf)->Vector->RefCnt > 1))
@@ -1844,7 +1833,7 @@ NetbufReserve (
                               or NULL, if there is no sufficient space.
 
 **/
-UINT8*
+UINT8 *
 EFIAPI
 NetbufAllocSpace (
   IN OUT NET_BUF            *Nbuf,
@@ -2103,7 +2092,6 @@ NetbufQueTrim (
   IN OUT NET_BUF_QUEUE      *NbufQue,
   IN UINT32                 Len
   );
-
 
 /**
   Flush the net buffer queue.

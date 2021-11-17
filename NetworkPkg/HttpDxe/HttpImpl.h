@@ -11,13 +11,12 @@
 #ifndef __EFI_HTTP_IMPL_H__
 #define __EFI_HTTP_IMPL_H__
 
-#define HTTP_DEFAULT_PORT        80
-#define HTTP_END_OF_HDR_STR      "\r\n\r\n"
-#define HTTP_CRLF_STR            "\r\n"
-#define HTTP_VERSION_STR         HTTP_VERSION
-#define HTTP_VERSION_CRLF_STR    " HTTP/1.1\r\n"
-#define HTTP_ERROR_OR_NOT_SUPPORT_STATUS_CODE         300
-
+#define HTTP_DEFAULT_PORT                      80
+#define HTTP_END_OF_HDR_STR                    "\r\n\r\n"
+#define HTTP_CRLF_STR                          "\r\n"
+#define HTTP_VERSION_STR                       HTTP_VERSION
+#define HTTP_VERSION_CRLF_STR                  " HTTP/1.1\r\n"
+#define HTTP_ERROR_OR_NOT_SUPPORT_STATUS_CODE  300
 
 /**
   Returns the operational parameters for the current HTTP child instance.

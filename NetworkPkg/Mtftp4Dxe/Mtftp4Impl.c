@@ -7,9 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Mtftp4Impl.h"
-
 
 /**
   Clean up the MTFTP session to get ready for new operation.
@@ -24,10 +22,10 @@ Mtftp4CleanOperation (
   IN     EFI_STATUS             Result
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  MTFTP4_BLOCK_RANGE        *Block;
-  EFI_MTFTP4_TOKEN          *Token;
+  LIST_ENTRY          *Entry;
+  LIST_ENTRY          *Next;
+  MTFTP4_BLOCK_RANGE  *Block;
+  EFI_MTFTP4_TOKEN    *Token;
 
   //
   // Free various resources.
@@ -71,7 +69,7 @@ Mtftp4CleanOperation (
 
   ZeroMem (&Instance->RequestOption, sizeof (MTFTP4_OPTION));
 
-  Instance->Operation     = 0;
+  Instance->Operation = 0;
 
   Instance->BlkSize       = MTFTP4_DEFAULT_BLKSIZE;
   Instance->WindowSize    = 1;
@@ -88,9 +86,8 @@ Mtftp4CleanOperation (
   Instance->Timeout       = 0;
   Instance->McastIp       = 0;
   Instance->McastPort     = 0;
-  Instance->Master        = TRUE;
+  Instance->Master = TRUE;
 }
-
 
 /**
   Check packet for GetInfo.
@@ -115,41 +112,42 @@ Mtftp4GetInfoCheckPacket (
   IN EFI_MTFTP4_PACKET      *Packet
   )
 {
-  MTFTP4_GETINFO_STATE      *State;
-  EFI_STATUS                Status;
-  UINT16                    OpCode;
+  MTFTP4_GETINFO_STATE     *State;
+  EFI_STATUS               Status;
+  UINT16                   OpCode;
   EFI_MTFTP4_ERROR_HEADER  *ErrorHeader;
 
-  State   = (MTFTP4_GETINFO_STATE *) Token->Context;
-  OpCode   = NTOHS (Packet->OpCode);
+  State  = (MTFTP4_GETINFO_STATE *)Token->Context;
+  OpCode = NTOHS (Packet->OpCode);
 
   //
   // Set the GetInfo's return status according to the OpCode.
   //
   switch (OpCode) {
-  case EFI_MTFTP4_OPCODE_ERROR:
-    ErrorHeader = (EFI_MTFTP4_ERROR_HEADER *) Packet;
-    if (ErrorHeader->ErrorCode == EFI_MTFTP4_ERRORCODE_FILE_NOT_FOUND) {
-      DEBUG ((EFI_D_ERROR, "TFTP error code 1 (File Not Found)\n"));
-    } else {
-      DEBUG ((EFI_D_ERROR, "TFTP error code %d\n", ErrorHeader->ErrorCode));
-    }
-    State->Status = EFI_TFTP_ERROR;
-    break;
+    case EFI_MTFTP4_OPCODE_ERROR:
+      ErrorHeader = (EFI_MTFTP4_ERROR_HEADER *)Packet;
+      if (ErrorHeader->ErrorCode == EFI_MTFTP4_ERRORCODE_FILE_NOT_FOUND) {
+        DEBUG ((EFI_D_ERROR, "TFTP error code 1 (File Not Found)\n"));
+      } else {
+        DEBUG ((EFI_D_ERROR, "TFTP error code %d\n", ErrorHeader->ErrorCode));
+      }
 
-  case EFI_MTFTP4_OPCODE_OACK:
-    State->Status = EFI_SUCCESS;
-    break;
+      State->Status = EFI_TFTP_ERROR;
+      break;
 
-  default:
-    State->Status = EFI_PROTOCOL_ERROR;
+    case EFI_MTFTP4_OPCODE_OACK:
+      State->Status = EFI_SUCCESS;
+      break;
+
+    default:
+      State->Status = EFI_PROTOCOL_ERROR;
   }
 
   //
   // Allocate buffer then copy the packet over. Use gBS->AllocatePool
   // in case AllocatePool will implements something tricky.
   //
-  Status = gBS->AllocatePool (EfiBootServicesData, PacketLen, (VOID **) State->Packet);
+  Status = gBS->AllocatePool (EfiBootServicesData, PacketLen, (VOID **)State->Packet);
 
   if (EFI_ERROR (Status)) {
     State->Status = EFI_OUT_OF_RESOURCES;
@@ -161,7 +159,6 @@ Mtftp4GetInfoCheckPacket (
 
   return EFI_ABORTED;
 }
-
 
 /**
   Check whether the override data is valid.
@@ -183,10 +180,10 @@ Mtftp4OverrideValid (
   IN EFI_MTFTP4_OVERRIDE_DATA *Override
   )
 {
-  EFI_MTFTP4_CONFIG_DATA    *Config;
-  IP4_ADDR                  Ip;
-  IP4_ADDR                  Netmask;
-  IP4_ADDR                  Gateway;
+  EFI_MTFTP4_CONFIG_DATA  *Config;
+  IP4_ADDR                Ip;
+  IP4_ADDR                Netmask;
+  IP4_ADDR                Gateway;
 
   CopyMem (&Ip, &Override->ServerIp, sizeof (IP4_ADDR));
   if (IP4_IS_UNSPECIFIED (NTOHL (Ip)) || IP4_IS_LOCAL_BROADCAST (NTOHL (Ip))) {
@@ -203,16 +200,15 @@ Mtftp4OverrideValid (
     CopyMem (&Ip, &Config->StationIp, sizeof (IP4_ADDR));
 
     Netmask = NTOHL (Netmask);
-    Ip      = NTOHL (Ip);
+    Ip = NTOHL (Ip);
 
-    if ((Netmask != 0 && !NetIp4IsUnicast (Gateway, Netmask)) || !IP4_NET_EQUAL (Gateway, Ip, Netmask)) {
+    if (((Netmask != 0) && !NetIp4IsUnicast (Gateway, Netmask)) || !IP4_NET_EQUAL (Gateway, Ip, Netmask)) {
       return FALSE;
     }
   }
 
   return TRUE;
 }
-
 
 /**
   Poll the UDP to get the IP4 default address, which may be retrieved
@@ -236,10 +232,10 @@ Mtftp4GetMapping (
   IN EFI_UDP4_CONFIG_DATA   *UdpCfgData
   )
 {
-  MTFTP4_SERVICE            *Service;
-  EFI_IP4_MODE_DATA         Ip4Mode;
-  EFI_UDP4_PROTOCOL         *Udp;
-  EFI_STATUS                Status;
+  MTFTP4_SERVICE     *Service;
+  EFI_IP4_MODE_DATA  Ip4Mode;
+  EFI_UDP4_PROTOCOL  *Udp;
+  EFI_STATUS         Status;
 
   ASSERT (Instance->Config.UseDefaultSetting);
 
@@ -259,16 +255,15 @@ Mtftp4GetMapping (
     Udp->Poll (Udp);
 
     if (!EFI_ERROR (Udp->GetModeData (Udp, NULL, &Ip4Mode, NULL, NULL)) &&
-        Ip4Mode.IsConfigured) {
-
+        Ip4Mode.IsConfigured)
+    {
       Udp->Configure (Udp, NULL);
-      return (BOOLEAN) (Udp->Configure (Udp, UdpCfgData) == EFI_SUCCESS);
+      return (BOOLEAN)(Udp->Configure (Udp, UdpCfgData) == EFI_SUCCESS);
     }
   }
 
   return FALSE;
 }
-
 
 /**
   Configure the UDP port for unicast receiving.
@@ -286,10 +281,10 @@ Mtftp4ConfigUnicastPort (
   IN MTFTP4_PROTOCOL        *Instance
   )
 {
-  EFI_MTFTP4_CONFIG_DATA    *Config;
-  EFI_UDP4_CONFIG_DATA      UdpConfig;
-  EFI_STATUS                Status;
-  IP4_ADDR                  Ip;
+  EFI_MTFTP4_CONFIG_DATA  *Config;
+  EFI_UDP4_CONFIG_DATA    UdpConfig;
+  EFI_STATUS              Status;
+  IP4_ADDR                Ip;
 
   Config = &Instance->Config;
 
@@ -298,15 +293,15 @@ Mtftp4ConfigUnicastPort (
   UdpConfig.AcceptAnyPort      = FALSE;
   UdpConfig.AllowDuplicatePort = FALSE;
   UdpConfig.TypeOfService      = 0;
-  UdpConfig.TimeToLive         = 64;
-  UdpConfig.DoNotFragment      = FALSE;
-  UdpConfig.ReceiveTimeout     = 0;
-  UdpConfig.TransmitTimeout    = 0;
-  UdpConfig.UseDefaultAddress  = Config->UseDefaultSetting;
+  UdpConfig.TimeToLive        = 64;
+  UdpConfig.DoNotFragment     = FALSE;
+  UdpConfig.ReceiveTimeout    = 0;
+  UdpConfig.TransmitTimeout   = 0;
+  UdpConfig.UseDefaultAddress = Config->UseDefaultSetting;
   IP4_COPY_ADDRESS (&UdpConfig.StationAddress, &Config->StationIp);
   IP4_COPY_ADDRESS (&UdpConfig.SubnetMask, &Config->SubnetMask);
-  UdpConfig.StationPort        = Config->LocalPort;
-  UdpConfig.RemotePort         = 0;
+  UdpConfig.StationPort = Config->LocalPort;
+  UdpConfig.RemotePort  = 0;
 
   Ip = HTONL (Instance->ServerIp);
   IP4_COPY_ADDRESS (&UdpConfig.RemoteAddress, &Ip);
@@ -333,9 +328,9 @@ Mtftp4ConfigUnicastPort (
       UdpIo->Protocol.Udp4->Configure (UdpIo->Protocol.Udp4, NULL);
     }
   }
+
   return Status;
 }
-
 
 /**
   Start the MTFTP session to do the operation, such as read file,
@@ -369,7 +364,8 @@ Mtftp4Start (
   // Validate the parameters
   //
   if ((This == NULL) || (Token == NULL) || (Token->Filename == NULL) ||
-      ((Token->OptionCount != 0) && (Token->OptionList == NULL))) {
+      ((Token->OptionCount != 0) && (Token->OptionList == NULL)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -377,7 +373,8 @@ Mtftp4Start (
   // User must provide at least one method to collect the data for download.
   //
   if (((Operation == EFI_MTFTP4_OPCODE_RRQ) || (Operation == EFI_MTFTP4_OPCODE_DIR)) &&
-      ((Token->Buffer == NULL) && (Token->CheckPacket == NULL))) {
+      ((Token->Buffer == NULL) && (Token->CheckPacket == NULL)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -385,13 +382,14 @@ Mtftp4Start (
   // User must provide at least one method to provide the data for upload.
   //
   if ((Operation == EFI_MTFTP4_OPCODE_WRQ) &&
-     ((Token->Buffer == NULL) && (Token->PacketNeeded == NULL))) {
+      ((Token->Buffer == NULL) && (Token->PacketNeeded == NULL)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   Instance = MTFTP4_PROTOCOL_FROM_THIS (This);
 
-  Status      = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
   TokenStatus = EFI_SUCCESS;
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
@@ -418,7 +416,7 @@ Mtftp4Start (
   // operations.
   //
   Instance->Operation = Operation;
-  Override            = Token->OverrideData;
+  Override = Token->OverrideData;
 
   if (Token->OptionCount != 0) {
     Status = Mtftp4ParseOption (
@@ -438,34 +436,34 @@ Mtftp4Start (
   //
   // Set the operation parameters from the configuration or override data.
   //
-  Config                  = &Instance->Config;
-  Instance->Token         = Token;
-  Instance->BlkSize       = MTFTP4_DEFAULT_BLKSIZE;
-  Instance->WindowSize    = MTFTP4_DEFAULT_WINDOWSIZE;
+  Config = &Instance->Config;
+  Instance->Token      = Token;
+  Instance->BlkSize    = MTFTP4_DEFAULT_BLKSIZE;
+  Instance->WindowSize = MTFTP4_DEFAULT_WINDOWSIZE;
 
   CopyMem (&Instance->ServerIp, &Config->ServerIp, sizeof (IP4_ADDR));
-  Instance->ServerIp      = NTOHL (Instance->ServerIp);
+  Instance->ServerIp = NTOHL (Instance->ServerIp);
 
   Instance->ListeningPort = Config->InitialServerPort;
   Instance->ConnectedPort = 0;
 
   CopyMem (&Instance->Gateway, &Config->GatewayIp, sizeof (IP4_ADDR));
-  Instance->Gateway       = NTOHL (Instance->Gateway);
+  Instance->Gateway = NTOHL (Instance->Gateway);
 
-  Instance->MaxRetry      = Config->TryCount;
-  Instance->Timeout       = Config->TimeoutValue;
-  Instance->Master        = TRUE;
+  Instance->MaxRetry = Config->TryCount;
+  Instance->Timeout  = Config->TimeoutValue;
+  Instance->Master   = TRUE;
 
   if (Override != NULL) {
     CopyMem (&Instance->ServerIp, &Override->ServerIp, sizeof (IP4_ADDR));
     CopyMem (&Instance->Gateway, &Override->GatewayIp, sizeof (IP4_ADDR));
 
-    Instance->ServerIp      = NTOHL (Instance->ServerIp);
-    Instance->Gateway       = NTOHL (Instance->Gateway);
+    Instance->ServerIp = NTOHL (Instance->ServerIp);
+    Instance->Gateway  = NTOHL (Instance->Gateway);
 
     Instance->ListeningPort = Override->ServerPort;
-    Instance->MaxRetry      = Override->TryCount;
-    Instance->Timeout       = Override->TimeoutValue;
+    Instance->MaxRetry = Override->TryCount;
+    Instance->Timeout  = Override->TimeoutValue;
   }
 
   if (Instance->ListeningPort == 0) {
@@ -508,7 +506,7 @@ Mtftp4Start (
     goto ON_ERROR;
   }
 
-  gBS->RestoreTPL(OldTpl);
+  gBS->RestoreTPL (OldTpl);
 
   if (Token->Event != NULL) {
     return EFI_SUCCESS;
@@ -531,7 +529,6 @@ ON_ERROR:
   return Status;
 }
 
-
 /**
   Reads the current operational settings.
 
@@ -551,7 +548,7 @@ EFI_STATUS
 EFIAPI
 EfiMtftp4GetModeData (
   IN     EFI_MTFTP4_PROTOCOL    *This,
-     OUT EFI_MTFTP4_MODE_DATA  *ModeData
+  OUT EFI_MTFTP4_MODE_DATA  *ModeData
   )
 {
   MTFTP4_PROTOCOL  *Instance;
@@ -563,10 +560,10 @@ EfiMtftp4GetModeData (
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  Instance                         = MTFTP4_PROTOCOL_FROM_THIS (This);
-  CopyMem(&ModeData->ConfigData, &Instance->Config, sizeof (Instance->Config));
+  Instance = MTFTP4_PROTOCOL_FROM_THIS (This);
+  CopyMem (&ModeData->ConfigData, &Instance->Config, sizeof (Instance->Config));
   ModeData->SupportedOptionCount   = MTFTP4_SUPPORTED_OPTIONS;
-  ModeData->SupportedOptoins       = (UINT8 **) mMtftp4SupportedOptions;
+  ModeData->SupportedOptoins       = (UINT8 **)mMtftp4SupportedOptions;
   ModeData->UnsupportedOptionCount = 0;
   ModeData->UnsupportedOptoins     = NULL;
 
@@ -574,8 +571,6 @@ EfiMtftp4GetModeData (
 
   return EFI_SUCCESS;
 }
-
-
 
 /**
   Initializes, changes, or resets the default operational setting for this
@@ -631,12 +626,12 @@ EfiMtftp4Configure (
   IN EFI_MTFTP4_CONFIG_DATA *ConfigData
   )
 {
-  MTFTP4_PROTOCOL           *Instance;
-  EFI_TPL                   OldTpl;
-  IP4_ADDR                  Ip;
-  IP4_ADDR                  Netmask;
-  IP4_ADDR                  Gateway;
-  IP4_ADDR                  ServerIp;
+  MTFTP4_PROTOCOL  *Instance;
+  EFI_TPL          OldTpl;
+  IP4_ADDR         Ip;
+  IP4_ADDR         Netmask;
+  IP4_ADDR         Gateway;
+  IP4_ADDR         ServerIp;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -655,7 +650,6 @@ EfiMtftp4Configure (
     Instance->State = MTFTP4_STATE_UNCONFIGED;
 
     gBS->RestoreTPL (OldTpl);
-
   } else {
     //
     // Configure the parameters for new operation.
@@ -665,24 +659,24 @@ EfiMtftp4Configure (
     CopyMem (&Gateway, &ConfigData->GatewayIp, sizeof (IP4_ADDR));
     CopyMem (&ServerIp, &ConfigData->ServerIp, sizeof (IP4_ADDR));
 
-    Ip       = NTOHL (Ip);
+    Ip = NTOHL (Ip);
     Netmask  = NTOHL (Netmask);
     Gateway  = NTOHL (Gateway);
     ServerIp = NTOHL (ServerIp);
 
-    if (ServerIp == 0 || IP4_IS_LOCAL_BROADCAST (ServerIp)) {
+    if ((ServerIp == 0) || IP4_IS_LOCAL_BROADCAST (ServerIp)) {
       return EFI_INVALID_PARAMETER;
     }
 
     if (!ConfigData->UseDefaultSetting &&
-        ((!IP4_IS_VALID_NETMASK (Netmask) || (Netmask != 0 && !NetIp4IsUnicast (Ip, Netmask))))) {
-
+        ((!IP4_IS_VALID_NETMASK (Netmask) || ((Netmask != 0) && !NetIp4IsUnicast (Ip, Netmask)))))
+    {
       return EFI_INVALID_PARAMETER;
     }
 
     if ((Gateway != 0) &&
-        ((Netmask != 0xFFFFFFFF && !IP4_NET_EQUAL (Gateway, Ip, Netmask)) || (Netmask != 0 && !NetIp4IsUnicast (Gateway, Netmask)))) {
-
+        (((Netmask != 0xFFFFFFFF) && !IP4_NET_EQUAL (Gateway, Ip, Netmask)) || ((Netmask != 0) && !NetIp4IsUnicast (Gateway, Netmask))))
+    {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -693,7 +687,7 @@ EfiMtftp4Configure (
       return EFI_ACCESS_DENIED;
     }
 
-    CopyMem(&Instance->Config, ConfigData, sizeof (*ConfigData));;
+    CopyMem (&Instance->Config, ConfigData, sizeof (*ConfigData));
     Instance->State = MTFTP4_STATE_CONFIGED;
 
     gBS->RestoreTPL (OldTpl);
@@ -701,8 +695,6 @@ EfiMtftp4Configure (
 
   return EFI_SUCCESS;
 }
-
-
 
 /**
   Parses the options in an MTFTPv4 OACK packet.
@@ -740,15 +732,15 @@ EfiMtftp4ParseOptions (
   IN     EFI_MTFTP4_PROTOCOL    *This,
   IN     UINT32                 PacketLen,
   IN     EFI_MTFTP4_PACKET      *Packet,
-     OUT UINT32                 *OptionCount,
-     OUT EFI_MTFTP4_OPTION      **OptionList          OPTIONAL
+  OUT UINT32                 *OptionCount,
+  OUT EFI_MTFTP4_OPTION      **OptionList          OPTIONAL
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   if ((This == NULL) || (PacketLen < MTFTP4_OPCODE_LEN) ||
-      (Packet == NULL) || (OptionCount == NULL)) {
-
+      (Packet == NULL) || (OptionCount == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -764,7 +756,6 @@ EfiMtftp4ParseOptions (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Downloads a file from an MTFTPv4 server.
@@ -805,7 +796,6 @@ EfiMtftp4ReadFile (
 {
   return Mtftp4Start (This, Token, EFI_MTFTP4_OPCODE_RRQ);
 }
-
 
 /**
   Sends a data file to an MTFTPv4 server. May be unsupported in some EFI implementations
@@ -866,7 +856,6 @@ EfiMtftp4WriteFile (
 {
   return Mtftp4Start (This, Token, EFI_MTFTP4_OPCODE_WRQ);
 }
-
 
 /**
   Downloads a data file "directory" from an MTFTPv4 server.
@@ -937,7 +926,6 @@ EfiMtftp4ReadDirectory (
   return Mtftp4Start (This, Token, EFI_MTFTP4_OPCODE_DIR);
 }
 
-
 /**
   Gets information about a file from an MTFTPv4 server.
 
@@ -1001,16 +989,17 @@ EfiMtftp4GetInfo (
   IN     UINT8                    *ModeStr             OPTIONAL,
   IN     UINT8                    OptionCount,
   IN     EFI_MTFTP4_OPTION        *OptionList          OPTIONAL,
-     OUT UINT32                   *PacketLength,
-     OUT EFI_MTFTP4_PACKET        **Packet             OPTIONAL
+  OUT UINT32                   *PacketLength,
+  OUT EFI_MTFTP4_PACKET        **Packet             OPTIONAL
   )
 {
-  EFI_MTFTP4_TOKEN          Token;
-  MTFTP4_GETINFO_STATE      State;
-  EFI_STATUS                Status;
+  EFI_MTFTP4_TOKEN      Token;
+  MTFTP4_GETINFO_STATE  State;
+  EFI_STATUS            Status;
 
   if ((This == NULL) || (Filename == NULL) || (PacketLength == NULL) ||
-      ((OptionCount != 0) && (OptionList == NULL))) {
+      ((OptionCount != 0) && (OptionList == NULL)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1018,29 +1007,29 @@ EfiMtftp4GetInfo (
     *Packet = NULL;
   }
 
-  *PacketLength         = 0;
-  State.Packet          = Packet;
-  State.PacketLen       = PacketLength;
-  State.Status          = EFI_SUCCESS;
+  *PacketLength   = 0;
+  State.Packet    = Packet;
+  State.PacketLen = PacketLength;
+  State.Status    = EFI_SUCCESS;
 
   //
   // Fill in the Token to issue an synchronous ReadFile operation
   //
-  Token.Status          = EFI_SUCCESS;
-  Token.Event           = NULL;
-  Token.OverrideData    = OverrideData;
-  Token.Filename        = Filename;
-  Token.ModeStr         = ModeStr;
-  Token.OptionCount     = OptionCount;
-  Token.OptionList      = OptionList;
-  Token.BufferSize      = 0;
+  Token.Status = EFI_SUCCESS;
+  Token.Event  = NULL;
+  Token.OverrideData = OverrideData;
+  Token.Filename     = Filename;
+  Token.ModeStr     = ModeStr;
+  Token.OptionCount = OptionCount;
+  Token.OptionList  = OptionList;
+  Token.BufferSize  = 0;
   Token.Buffer          = NULL;
   Token.Context         = &State;
   Token.CheckPacket     = Mtftp4GetInfoCheckPacket;
   Token.TimeoutCallback = NULL;
   Token.PacketNeeded    = NULL;
 
-  Status                = EfiMtftp4ReadFile (This, &Token);
+  Status = EfiMtftp4ReadFile (This, &Token);
 
   if (EFI_ABORTED == Status) {
     return State.Status;
@@ -1079,9 +1068,9 @@ EfiMtftp4Poll (
   IN EFI_MTFTP4_PROTOCOL    *This
   )
 {
-  MTFTP4_PROTOCOL           *Instance;
-  EFI_UDP4_PROTOCOL         *Udp;
-  EFI_STATUS                Status;
+  MTFTP4_PROTOCOL    *Instance;
+  EFI_UDP4_PROTOCOL  *Udp;
+  EFI_STATUS         Status;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1095,13 +1084,13 @@ EfiMtftp4Poll (
     return EFI_DEVICE_ERROR;
   }
 
-  Udp = Instance->UnicastPort->Protocol.Udp4;
+  Udp    = Instance->UnicastPort->Protocol.Udp4;
   Status = Udp->Poll (Udp);
   Mtftp4OnTimerTick (NULL, Instance->Service);
   return Status;
 }
 
-EFI_MTFTP4_PROTOCOL gMtftp4ProtocolTemplate = {
+EFI_MTFTP4_PROTOCOL  gMtftp4ProtocolTemplate = {
   EfiMtftp4GetModeData,
   EfiMtftp4Configure,
   EfiMtftp4GetInfo,

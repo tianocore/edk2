@@ -29,67 +29,67 @@ extern EFI_COMPONENT_NAME_PROTOCOL   gTcpComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gTcpComponentName2;
 extern EFI_UNICODE_STRING_TABLE      *gTcpControllerNameTable;
 
-extern LIST_ENTRY                    mTcpRunQue;
-extern LIST_ENTRY                    mTcpListenQue;
-extern TCP_SEQNO                     mTcpGlobalIss;
-extern UINT32                        mTcpTick;
+extern LIST_ENTRY  mTcpRunQue;
+extern LIST_ENTRY  mTcpListenQue;
+extern TCP_SEQNO   mTcpGlobalIss;
+extern UINT32      mTcpTick;
 
 ///
 /// 30 seconds.
 ///
-#define TCP6_KEEP_NEIGHBOR_TIME    30
+#define TCP6_KEEP_NEIGHBOR_TIME  30
 ///
 /// 5 seconds, since 1 tick equals 200ms.
 ///
-#define TCP6_REFRESH_NEIGHBOR_TICK 25
+#define TCP6_REFRESH_NEIGHBOR_TICK  25
 
-#define TCP_EXPIRE_TIME            65535
+#define TCP_EXPIRE_TIME  65535
 
 ///
 /// The implementation selects the initial send sequence number and the unit to
 /// be added when it is increased.
 ///
-#define TCP_BASE_ISS               0x4d7e980b
-#define TCP_ISS_INCREMENT_1        2048
-#define TCP_ISS_INCREMENT_2        100
+#define TCP_BASE_ISS         0x4d7e980b
+#define TCP_ISS_INCREMENT_1  2048
+#define TCP_ISS_INCREMENT_2  100
 
 typedef union {
-  EFI_TCP4_CONFIG_DATA  Tcp4CfgData;
-  EFI_TCP6_CONFIG_DATA  Tcp6CfgData;
+  EFI_TCP4_CONFIG_DATA    Tcp4CfgData;
+  EFI_TCP6_CONFIG_DATA    Tcp6CfgData;
 } TCP_CONFIG_DATA;
 
 typedef union {
-  EFI_TCP4_ACCESS_POINT  Tcp4Ap;
-  EFI_TCP6_ACCESS_POINT  Tcp6Ap;
+  EFI_TCP4_ACCESS_POINT    Tcp4Ap;
+  EFI_TCP6_ACCESS_POINT    Tcp6Ap;
 } TCP_ACCESS_POINT;
 
 typedef struct _TCP4_MODE_DATA {
-  EFI_TCP4_CONNECTION_STATE       *Tcp4State;
-  EFI_TCP4_CONFIG_DATA            *Tcp4ConfigData;
-  EFI_IP4_MODE_DATA               *Ip4ModeData;
-  EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData;
-  EFI_SIMPLE_NETWORK_MODE         *SnpModeData;
+  EFI_TCP4_CONNECTION_STATE          *Tcp4State;
+  EFI_TCP4_CONFIG_DATA               *Tcp4ConfigData;
+  EFI_IP4_MODE_DATA                  *Ip4ModeData;
+  EFI_MANAGED_NETWORK_CONFIG_DATA    *MnpConfigData;
+  EFI_SIMPLE_NETWORK_MODE            *SnpModeData;
 } TCP4_MODE_DATA;
 
 typedef struct _TCP6_MODE_DATA {
-  EFI_TCP6_CONNECTION_STATE       *Tcp6State;
-  EFI_TCP6_CONFIG_DATA            *Tcp6ConfigData;
-  EFI_IP6_MODE_DATA               *Ip6ModeData;
-  EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData;
-  EFI_SIMPLE_NETWORK_MODE         *SnpModeData;
+  EFI_TCP6_CONNECTION_STATE          *Tcp6State;
+  EFI_TCP6_CONFIG_DATA               *Tcp6ConfigData;
+  EFI_IP6_MODE_DATA                  *Ip6ModeData;
+  EFI_MANAGED_NETWORK_CONFIG_DATA    *MnpConfigData;
+  EFI_SIMPLE_NETWORK_MODE            *SnpModeData;
 } TCP6_MODE_DATA;
 
 typedef struct _TCP4_ROUTE_INFO {
-  BOOLEAN           DeleteRoute;
-  EFI_IPv4_ADDRESS  *SubnetAddress;
-  EFI_IPv4_ADDRESS  *SubnetMask;
-  EFI_IPv4_ADDRESS  *GatewayAddress;
+  BOOLEAN             DeleteRoute;
+  EFI_IPv4_ADDRESS    *SubnetAddress;
+  EFI_IPv4_ADDRESS    *SubnetMask;
+  EFI_IPv4_ADDRESS    *GatewayAddress;
 } TCP4_ROUTE_INFO;
 
 typedef struct {
-  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
-  UINTN                         NumberOfChildren;
-  EFI_HANDLE                    *ChildHandleBuffer;
+  EFI_SERVICE_BINDING_PROTOCOL    *ServiceBinding;
+  UINTN                           NumberOfChildren;
+  EFI_HANDLE                      *ChildHandleBuffer;
 } TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 //
@@ -155,8 +155,8 @@ Tcp4GetModeData (
 EFI_STATUS
 EFIAPI
 Tcp4Configure (
-  IN EFI_TCP4_PROTOCOL        * This,
-  IN EFI_TCP4_CONFIG_DATA     * TcpConfigData OPTIONAL
+  IN EFI_TCP4_PROTOCOL        *This,
+  IN EFI_TCP4_CONFIG_DATA     *TcpConfigData OPTIONAL
   );
 
 /**

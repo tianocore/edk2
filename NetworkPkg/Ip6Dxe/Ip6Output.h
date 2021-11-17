@@ -10,7 +10,7 @@
 #ifndef __EFI_IP6_OUTPUT_H__
 #define __EFI_IP6_OUTPUT_H__
 
-extern UINT32 mIp6Id;
+extern UINT32  mIp6Id;
 
 /**
   Output all the available source addresses to the list entry head SourceList. The

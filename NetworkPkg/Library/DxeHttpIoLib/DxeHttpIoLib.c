@@ -29,7 +29,7 @@ HttpIoNotifyDpc (
   IN VOID                *Context
   )
 {
-  *((BOOLEAN *) Context) = TRUE;
+  *((BOOLEAN *)Context) = TRUE;
 }
 
 /**
@@ -63,8 +63,8 @@ HttpIoDestroyIo (
   IN HTTP_IO                *HttpIo
   )
 {
-  EFI_HTTP_PROTOCOL         *Http;
-  EFI_EVENT                 Event;
+  EFI_HTTP_PROTOCOL  *Http;
+  EFI_EVENT          Event;
 
   if (HttpIo == NULL) {
     return;
@@ -137,18 +137,18 @@ HttpIoCreateIo (
   OUT HTTP_IO               *HttpIo
   )
 {
-  EFI_STATUS                Status;
-  EFI_HTTP_CONFIG_DATA      HttpConfigData;
-  EFI_HTTPv4_ACCESS_POINT   Http4AccessPoint;
-  EFI_HTTPv6_ACCESS_POINT   Http6AccessPoint;
-  EFI_HTTP_PROTOCOL         *Http;
-  EFI_EVENT                 Event;
+  EFI_STATUS               Status;
+  EFI_HTTP_CONFIG_DATA     HttpConfigData;
+  EFI_HTTPv4_ACCESS_POINT  Http4AccessPoint;
+  EFI_HTTPv6_ACCESS_POINT  Http6AccessPoint;
+  EFI_HTTP_PROTOCOL        *Http;
+  EFI_EVENT                Event;
 
   if ((Image == NULL) || (Controller == NULL) || (HttpIo == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (IpVersion != IP_VERSION_4 && IpVersion != IP_VERSION_6) {
+  if ((IpVersion != IP_VERSION_4) && (IpVersion != IP_VERSION_6)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -171,7 +171,7 @@ HttpIoCreateIo (
   Status = gBS->OpenProtocol (
                   HttpIo->Handle,
                   &gEfiHttpProtocolGuid,
-                  (VOID **) &Http,
+                  (VOID **)&Http,
                   Image,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -183,31 +183,31 @@ HttpIoCreateIo (
   //
   // Init the configuration data and configure the HTTP child.
   //
-  HttpIo->Image       = Image;
-  HttpIo->Controller  = Controller;
-  HttpIo->IpVersion   = IpVersion;
-  HttpIo->Http        = Http;
-  HttpIo->Callback    = Callback;
-  HttpIo->Context     = Context;
-  HttpIo->Timeout     = PcdGet32 (PcdHttpIoTimeout);
+  HttpIo->Image = Image;
+  HttpIo->Controller = Controller;
+  HttpIo->IpVersion  = IpVersion;
+  HttpIo->Http     = Http;
+  HttpIo->Callback = Callback;
+  HttpIo->Context  = Context;
+  HttpIo->Timeout  = PcdGet32 (PcdHttpIoTimeout);
 
   if (ConfigData != NULL) {
     if (HttpIo->IpVersion == IP_VERSION_4) {
-      HttpConfigData.LocalAddressIsIPv6  = FALSE;
-      HttpConfigData.HttpVersion         = ConfigData->Config4.HttpVersion;
-      HttpConfigData.TimeOutMillisec     = ConfigData->Config4.RequestTimeOut;
+      HttpConfigData.LocalAddressIsIPv6 = FALSE;
+      HttpConfigData.HttpVersion     = ConfigData->Config4.HttpVersion;
+      HttpConfigData.TimeOutMillisec = ConfigData->Config4.RequestTimeOut;
 
       Http4AccessPoint.UseDefaultAddress = ConfigData->Config4.UseDefaultAddress;
-      Http4AccessPoint.LocalPort         = ConfigData->Config4.LocalPort;
+      Http4AccessPoint.LocalPort = ConfigData->Config4.LocalPort;
       IP4_COPY_ADDRESS (&Http4AccessPoint.LocalAddress, &ConfigData->Config4.LocalIp);
       IP4_COPY_ADDRESS (&Http4AccessPoint.LocalSubnet, &ConfigData->Config4.SubnetMask);
       HttpConfigData.AccessPoint.IPv4Node = &Http4AccessPoint;
     } else {
       HttpConfigData.LocalAddressIsIPv6 = TRUE;
-      HttpConfigData.HttpVersion         = ConfigData->Config6.HttpVersion;
-      HttpConfigData.TimeOutMillisec     = ConfigData->Config6.RequestTimeOut;
+      HttpConfigData.HttpVersion     = ConfigData->Config6.HttpVersion;
+      HttpConfigData.TimeOutMillisec = ConfigData->Config6.RequestTimeOut;
 
-      Http6AccessPoint.LocalPort         = ConfigData->Config6.LocalPort;
+      Http6AccessPoint.LocalPort = ConfigData->Config6.LocalPort;
       IP6_COPY_ADDRESS (&Http6AccessPoint.LocalAddress, &ConfigData->Config6.LocalIp);
       HttpConfigData.AccessPoint.IPv6Node = &Http6AccessPoint;
     }
@@ -231,7 +231,8 @@ HttpIoCreateIo (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  HttpIo->ReqToken.Event = Event;
+
+  HttpIo->ReqToken.Event   = Event;
   HttpIo->ReqToken.Message = &HttpIo->ReqMessage;
 
   Status = gBS->CreateEvent (
@@ -244,7 +245,8 @@ HttpIoCreateIo (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  HttpIo->RspToken.Event = Event;
+
+  HttpIo->RspToken.Event   = Event;
   HttpIo->RspToken.Message = &HttpIo->RspMessage;
 
   //
@@ -260,6 +262,7 @@ HttpIoCreateIo (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
+
   HttpIo->TimeoutEvent = Event;
   return EFI_SUCCESS;
 
@@ -296,26 +299,26 @@ HttpIoSendRequest (
   IN  VOID                   *Body
   )
 {
-  EFI_STATUS                 Status;
-  EFI_HTTP_PROTOCOL          *Http;
+  EFI_STATUS         Status;
+  EFI_HTTP_PROTOCOL  *Http;
 
-  if (HttpIo == NULL || HttpIo->Http == NULL) {
+  if ((HttpIo == NULL) || (HttpIo->Http == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  HttpIo->ReqToken.Status  = EFI_NOT_READY;
+  HttpIo->ReqToken.Status = EFI_NOT_READY;
   HttpIo->ReqToken.Message->Data.Request = Request;
   HttpIo->ReqToken.Message->HeaderCount  = HeaderCount;
-  HttpIo->ReqToken.Message->Headers      = Headers;
-  HttpIo->ReqToken.Message->BodyLength   = BodyLength;
-  HttpIo->ReqToken.Message->Body         = Body;
+  HttpIo->ReqToken.Message->Headers    = Headers;
+  HttpIo->ReqToken.Message->BodyLength = BodyLength;
+  HttpIo->ReqToken.Message->Body = Body;
 
   if (HttpIo->Callback != NULL) {
     Status = HttpIo->Callback (
-               HttpIoRequest,
-               HttpIo->ReqToken.Message,
-               HttpIo->Context
-               );
+                       HttpIoRequest,
+                       HttpIo->ReqToken.Message,
+                       HttpIo->Context
+                       );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -366,26 +369,27 @@ HttpIoRecvResponse (
   OUT     HTTP_IO_RESPONSE_DATA    *ResponseData
   )
 {
-  EFI_STATUS                 Status;
-  EFI_HTTP_PROTOCOL          *Http;
+  EFI_STATUS         Status;
+  EFI_HTTP_PROTOCOL  *Http;
 
-  if (HttpIo == NULL || HttpIo->Http == NULL || ResponseData == NULL) {
+  if ((HttpIo == NULL) || (HttpIo->Http == NULL) || (ResponseData == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // Queue the response token to HTTP instances.
   //
-  HttpIo->RspToken.Status  = EFI_NOT_READY;
+  HttpIo->RspToken.Status = EFI_NOT_READY;
   if (RecvMsgHeader) {
     HttpIo->RspToken.Message->Data.Response = &ResponseData->Response;
   } else {
     HttpIo->RspToken.Message->Data.Response = NULL;
   }
-  HttpIo->RspToken.Message->HeaderCount   = 0;
-  HttpIo->RspToken.Message->Headers       = NULL;
-  HttpIo->RspToken.Message->BodyLength    = ResponseData->BodyLength;
-  HttpIo->RspToken.Message->Body          = ResponseData->Body;
+
+  HttpIo->RspToken.Message->HeaderCount = 0;
+  HttpIo->RspToken.Message->Headers     = NULL;
+  HttpIo->RspToken.Message->BodyLength  = ResponseData->BodyLength;
+  HttpIo->RspToken.Message->Body = ResponseData->Body;
 
   Http = HttpIo->Http;
   HttpIo->IsRxDone = FALSE;
@@ -437,12 +441,13 @@ HttpIoRecvResponse (
   }
 
   if ((HttpIo->Callback != NULL) &&
-      (HttpIo->RspToken.Status == EFI_SUCCESS || HttpIo->RspToken.Status == EFI_HTTP_ERROR)) {
+      ((HttpIo->RspToken.Status == EFI_SUCCESS) || (HttpIo->RspToken.Status == EFI_HTTP_ERROR)))
+  {
     Status = HttpIo->Callback (
-               HttpIoResponse,
-               HttpIo->RspToken.Message,
-               HttpIo->Context
-               );
+                       HttpIoResponse,
+                       HttpIo->RspToken.Message,
+                       HttpIo->Context
+                       );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -477,15 +482,16 @@ HttpIoGetContentLength (
   OUT    UINTN                *ContentLength
   )
 {
-  EFI_HTTP_HEADER       *Header;
+  EFI_HTTP_HEADER  *Header;
 
   Header = HttpFindHeader (HeaderCount, Headers, HTTP_HEADER_CONTENT_LENGTH);
   if (Header == NULL) {
     return EFI_NOT_FOUND;
   }
 
-  return AsciiStrDecimalToUintnS (Header->FieldValue, (CHAR8 **) NULL, ContentLength);
+  return AsciiStrDecimalToUintnS (Header->FieldValue, (CHAR8 **)NULL, ContentLength);
 }
+
 /**
   Send HTTP request in chunks.
 
@@ -502,95 +508,99 @@ HttpIoSendChunkedTransfer (
   IN  HTTP_IO                    *HttpIo,
   IN  HTTP_IO_SEND_CHUNK_PROCESS *SendChunkProcess,
   IN  EFI_HTTP_MESSAGE           *RequestMessage
-)
+  )
 {
-  EFI_STATUS            Status;
-  EFI_HTTP_HEADER       *NewHeaders;
-  EFI_HTTP_HEADER       *ContentLengthHeader;
-  UINTN                 AddNewHeader;
-  UINTN                 HeaderCount;
-  CHAR8                 *MessageBody;
-  UINTN                 MessageBodyLength;
-  UINTN                 ChunkLength;
-  CHAR8                 ChunkLengthStr [HTTP_IO_CHUNK_SIZE_STRING_LEN];
-  EFI_HTTP_REQUEST_DATA *SentRequestData;
+  EFI_STATUS             Status;
+  EFI_HTTP_HEADER        *NewHeaders;
+  EFI_HTTP_HEADER        *ContentLengthHeader;
+  UINTN                  AddNewHeader;
+  UINTN                  HeaderCount;
+  CHAR8                  *MessageBody;
+  UINTN                  MessageBodyLength;
+  UINTN                  ChunkLength;
+  CHAR8                  ChunkLengthStr[HTTP_IO_CHUNK_SIZE_STRING_LEN];
+  EFI_HTTP_REQUEST_DATA  *SentRequestData;
 
-  AddNewHeader        = 0;
-  NewHeaders          = NULL;
-  MessageBody         = NULL;
+  AddNewHeader = 0;
+  NewHeaders   = NULL;
+  MessageBody  = NULL;
   ContentLengthHeader = NULL;
   MessageBodyLength   = 0;
 
   switch (*SendChunkProcess) {
-  case HttpIoSendChunkHeaderZeroContent:
+    case HttpIoSendChunkHeaderZeroContent:
       ContentLengthHeader = HttpFindHeader (RequestMessage->HeaderCount, RequestMessage->Headers, HTTP_HEADER_CONTENT_LENGTH);
       if (ContentLengthHeader == NULL) {
         AddNewHeader = 1;
       }
 
-      NewHeaders = AllocateZeroPool ((RequestMessage->HeaderCount + AddNewHeader) * sizeof(EFI_HTTP_HEADER));
-      CopyMem ((VOID*)NewHeaders, (VOID *)RequestMessage->Headers, RequestMessage->HeaderCount * sizeof (EFI_HTTP_HEADER));
+      NewHeaders = AllocateZeroPool ((RequestMessage->HeaderCount + AddNewHeader) * sizeof (EFI_HTTP_HEADER));
+      CopyMem ((VOID *)NewHeaders, (VOID *)RequestMessage->Headers, RequestMessage->HeaderCount * sizeof (EFI_HTTP_HEADER));
       if (AddNewHeader == 0) {
         //
         // Override content-length to Transfer-Encoding.
         //
         ContentLengthHeader = HttpFindHeader (RequestMessage->HeaderCount, NewHeaders, HTTP_HEADER_CONTENT_LENGTH);
-        ContentLengthHeader->FieldName = NULL;
+        ContentLengthHeader->FieldName  = NULL;
         ContentLengthHeader->FieldValue = NULL;
       } else {
         ContentLengthHeader = NewHeaders + RequestMessage->HeaderCount;
       }
+
       HttpSetFieldNameAndValue (ContentLengthHeader, HTTP_HEADER_TRANSFER_ENCODING, HTTP_HEADER_TRANSFER_ENCODING_CHUNKED);
       HeaderCount = RequestMessage->HeaderCount + AddNewHeader;
       MessageBodyLength = 0;
-      MessageBody = NULL;
+      MessageBody     = NULL;
       SentRequestData = RequestMessage->Data.Request;
       break;
 
-  case HttpIoSendChunkContent:
-      HeaderCount = 0;
-      NewHeaders = NULL;
+    case HttpIoSendChunkContent:
+      HeaderCount     = 0;
+      NewHeaders      = NULL;
       SentRequestData = NULL;
       if (RequestMessage->BodyLength > HTTP_IO_MAX_SEND_PAYLOAD) {
         MessageBodyLength = HTTP_IO_MAX_SEND_PAYLOAD;
       } else {
         MessageBodyLength = RequestMessage->BodyLength;
       }
+
       AsciiSPrint (
-          ChunkLengthStr,
-          HTTP_IO_CHUNK_SIZE_STRING_LEN,
-          "%x%c%c",
-          MessageBodyLength,
-          CHUNKED_TRANSFER_CODING_CR,
-          CHUNKED_TRANSFER_CODING_LF
-          );
+        ChunkLengthStr,
+        HTTP_IO_CHUNK_SIZE_STRING_LEN,
+        "%x%c%c",
+        MessageBodyLength,
+        CHUNKED_TRANSFER_CODING_CR,
+        CHUNKED_TRANSFER_CODING_LF
+        );
       ChunkLength = AsciiStrLen (ChunkLengthStr);
       MessageBody = AllocatePool (ChunkLength + MessageBodyLength + 2);
       if (MessageBody == NULL) {
-        DEBUG((DEBUG_ERROR, "Not enough memory for chunk transfer\n"));
+        DEBUG ((DEBUG_ERROR, "Not enough memory for chunk transfer\n"));
         return EFI_OUT_OF_RESOURCES;
       }
+
       //
       // Build up the chunk transfer paylaod.
       //
       CopyMem (MessageBody, ChunkLengthStr, ChunkLength);
       CopyMem (MessageBody + ChunkLength, RequestMessage->Body, MessageBodyLength);
-      *(MessageBody + ChunkLength + MessageBodyLength) = CHUNKED_TRANSFER_CODING_CR;
+      *(MessageBody + ChunkLength + MessageBodyLength)     = CHUNKED_TRANSFER_CODING_CR;
       *(MessageBody + ChunkLength + MessageBodyLength + 1) = CHUNKED_TRANSFER_CODING_LF;
       //
       // Change variables for the next chunk trasnfer.
       //
       RequestMessage->BodyLength -= MessageBodyLength;
       RequestMessage->Body = (VOID *)((CHAR8 *)RequestMessage->Body + MessageBodyLength);
-      MessageBodyLength += (ChunkLength + 2);
+      MessageBodyLength   += (ChunkLength + 2);
       if (RequestMessage->BodyLength == 0) {
         *SendChunkProcess = HttpIoSendChunkEndChunk;
       }
+
       break;
 
-  case HttpIoSendChunkEndChunk:
-      HeaderCount = 0;
-      NewHeaders = NULL;
+    case HttpIoSendChunkEndChunk:
+      HeaderCount     = 0;
+      NewHeaders      = NULL;
       SentRequestData = NULL;
       AsciiSPrint (
         ChunkLengthStr,
@@ -601,17 +611,18 @@ HttpIoSendChunkedTransfer (
         CHUNKED_TRANSFER_CODING_CR,
         CHUNKED_TRANSFER_CODING_LF
         );
-      MessageBody = AllocatePool (AsciiStrLen(ChunkLengthStr));
+      MessageBody = AllocatePool (AsciiStrLen (ChunkLengthStr));
       if (MessageBody == NULL) {
-        DEBUG((DEBUG_ERROR, "Not enough memory for the end chunk transfer\n"));
+        DEBUG ((DEBUG_ERROR, "Not enough memory for the end chunk transfer\n"));
         return EFI_OUT_OF_RESOURCES;
       }
+
       CopyMem (MessageBody, ChunkLengthStr, AsciiStrLen (ChunkLengthStr));
       MessageBodyLength = AsciiStrLen (ChunkLengthStr);
       *SendChunkProcess = HttpIoSendChunkFinish;
       break;
 
-  default:
+    default:
       return EFI_INVALID_PARAMETER;
   }
 
@@ -627,16 +638,20 @@ HttpIoSendChunkedTransfer (
     if (ContentLengthHeader->FieldName != NULL) {
       FreePool (ContentLengthHeader->FieldName);
     }
+
     if (ContentLengthHeader->FieldValue != NULL) {
       FreePool (ContentLengthHeader->FieldValue);
     }
   }
+
   if (NewHeaders != NULL) {
     FreePool (NewHeaders);
   }
+
   if (MessageBody != NULL) {
     FreePool (MessageBody);
   }
+
   return Status;
 }
 
@@ -668,18 +683,18 @@ HttpIoGetChunkedTransferContent (
   OUT    UINTN                *ContentLength
   )
 {
-  EFI_HTTP_HEADER       *Header;
-  CHAR8                 ChunkSizeAscii [256];
-  EFI_STATUS            Status;
-  UINTN                 Index;
-  HTTP_IO_RESPONSE_DATA ResponseData;
-  UINTN                 TotalLength;
-  UINTN                 MaxTotalLength;
-  LIST_ENTRY            *HttpChunks;
-  HTTP_IO_CHUNKS        *ThisChunk;
-  LIST_ENTRY            *ThisListEntry;
+  EFI_HTTP_HEADER        *Header;
+  CHAR8                  ChunkSizeAscii[256];
+  EFI_STATUS             Status;
+  UINTN                  Index;
+  HTTP_IO_RESPONSE_DATA  ResponseData;
+  UINTN                  TotalLength;
+  UINTN                  MaxTotalLength;
+  LIST_ENTRY             *HttpChunks;
+  HTTP_IO_CHUNKS         *ThisChunk;
+  LIST_ENTRY             *ThisListEntry;
 
-  if (ChunkListHead == NULL || ContentLength == NULL) {
+  if ((ChunkListHead == NULL) || (ContentLength == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -692,20 +707,22 @@ HttpIoGetChunkedTransferContent (
   if (AsciiStrCmp (Header->FieldValue, HTTP_HEADER_TRANSFER_ENCODING_CHUNKED) != 0) {
     return EFI_NOT_FOUND;
   }
+
   //
   // Loop to get all chunks.
   //
-  TotalLength = 0;
+  TotalLength    = 0;
   MaxTotalLength = PcdGet32 (PcdMaxHttpChunkTransfer);
-  HttpChunks = (LIST_ENTRY *)AllocateZeroPool (sizeof (LIST_ENTRY));
+  HttpChunks     = (LIST_ENTRY *)AllocateZeroPool (sizeof (LIST_ENTRY));
   if (HttpChunks == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ExitDeleteChunks;
   }
+
   InitializeListHead (HttpChunks);
   DEBUG ((DEBUG_INFO, "     Chunked transfer\n"));
   while (TRUE) {
-    ZeroMem((VOID *)&ResponseData, sizeof(HTTP_IO_RESPONSE_DATA));
+    ZeroMem ((VOID *)&ResponseData, sizeof (HTTP_IO_RESPONSE_DATA));
     ResponseData.BodyLength = HTTP_IO_CHUNKED_TRANSFER_CODING_DATA_LENGTH;
     ResponseData.Body = ChunkSizeAscii;
     Status = HttpIoRecvResponse (
@@ -716,6 +733,7 @@ HttpIoGetChunkedTransferContent (
     if (EFI_ERROR (Status)) {
       goto ExitDeleteChunks;
     }
+
     //
     // Decoding Chunked Transfer Coding.
     // Only decode chunk-size and last chunk.
@@ -724,13 +742,14 @@ HttpIoGetChunkedTransferContent (
     //
     // Break if this is last chunk.
     //
-    if (ChunkSizeAscii [0] == CHUNKED_TRANSFER_CODING_LAST_CHUNK) {
+    if (ChunkSizeAscii[0] == CHUNKED_TRANSFER_CODING_LAST_CHUNK) {
       //
       // Check if this is a valid Last-Chunk.
       //
-      if ((ChunkSizeAscii [1] != CHUNKED_TRANSFER_CODING_CR) ||
-          (ChunkSizeAscii [2] != CHUNKED_TRANSFER_CODING_LF)
-          ) {
+      if ((ChunkSizeAscii[1] != CHUNKED_TRANSFER_CODING_CR) ||
+          (ChunkSizeAscii[2] != CHUNKED_TRANSFER_CODING_LF)
+          )
+      {
         DEBUG ((DEBUG_ERROR, "     This is an invalid Last-chunk\n"));
         Status = EFI_INVALID_PARAMETER;
         goto ExitDeleteChunks;
@@ -746,12 +765,13 @@ HttpIoGetChunkedTransferContent (
 
       InitializeListHead (&ThisChunk->NextChunk);
       ThisChunk->Length = ResponseData.BodyLength - 1 - 2; // Minus sizeof '0' and CRLF.
-      ThisChunk->Data = (CHAR8 *)AllocatePool (ThisChunk->Length);
+      ThisChunk->Data   = (CHAR8 *)AllocatePool (ThisChunk->Length);
       if (ThisChunk->Data == NULL) {
         FreePool ((UINT8 *)ThisChunk);
         Status = EFI_OUT_OF_RESOURCES;
         goto ExitDeleteChunks;
       }
+
       CopyMem ((UINT8 *)ThisChunk->Data, (UINT8 *)ResponseData.Body + 1, ThisChunk->Length);
       TotalLength += ThisChunk->Length;
       InsertTailList (HttpChunks, &ThisChunk->NextChunk);
@@ -762,16 +782,18 @@ HttpIoGetChunkedTransferContent (
     // Get the chunk length
     //
     Index = 0;
-    while ((ChunkSizeAscii [Index] != CHUNKED_TRANSFER_CODING_EXTENSION_SEPARATOR) &&
-           (ChunkSizeAscii [Index] != (CHAR8)CHUNKED_TRANSFER_CODING_CR) &&
-           (Index != HTTP_IO_CHUNKED_TRANSFER_CODING_DATA_LENGTH)) {
-      Index ++;
+    while ((ChunkSizeAscii[Index] != CHUNKED_TRANSFER_CODING_EXTENSION_SEPARATOR) &&
+           (ChunkSizeAscii[Index] != (CHAR8)CHUNKED_TRANSFER_CODING_CR) &&
+           (Index != HTTP_IO_CHUNKED_TRANSFER_CODING_DATA_LENGTH))
+    {
+      Index++;
     }
 
     if (Index == HTTP_IO_CHUNKED_TRANSFER_CODING_DATA_LENGTH) {
       Status = EFI_NOT_FOUND;
       goto ExitDeleteChunks;
     }
+
     ChunkSizeAscii[Index] = 0;
     AsciiStrHexToUintnS (ChunkSizeAscii, NULL, ContentLength);
     DEBUG ((DEBUG_INFO, "     Length of this chunk %d\n", *ContentLength));
@@ -783,6 +805,7 @@ HttpIoGetChunkedTransferContent (
       Status = EFI_OUT_OF_RESOURCES;
       goto ExitDeleteChunks;
     }
+
     ResponseData.BodyLength = *ContentLength;
     ResponseData.Body = (CHAR8 *)AllocatePool (*ContentLength);
     if (ResponseData.Body == NULL) {
@@ -790,9 +813,10 @@ HttpIoGetChunkedTransferContent (
       Status = EFI_OUT_OF_RESOURCES;
       goto ExitDeleteChunks;
     }
+
     InitializeListHead (&ThisChunk->NextChunk);
     ThisChunk->Length = *ContentLength;
-    ThisChunk->Data = ResponseData.Body;
+    ThisChunk->Data   = ResponseData.Body;
     InsertTailList (HttpChunks, &ThisChunk->NextChunk);
     Status = HttpIoRecvResponse (
                HttpIo,
@@ -802,10 +826,11 @@ HttpIoGetChunkedTransferContent (
     if (EFI_ERROR (Status)) {
       goto ExitDeleteChunks;
     }
+
     //
     // Read CRLF
     //
-    ZeroMem((VOID *)&ResponseData, sizeof(HTTP_IO_RESPONSE_DATA));
+    ZeroMem ((VOID *)&ResponseData, sizeof (HTTP_IO_RESPONSE_DATA));
     ResponseData.BodyLength = 2;
     ResponseData.Body = ChunkSizeAscii;
     Status = HttpIoRecvResponse (
@@ -816,19 +841,22 @@ HttpIoGetChunkedTransferContent (
     if (EFI_ERROR (Status)) {
       goto ExitDeleteChunks;
     }
+
     //
     // Verify the end of chunk payload.
     //
-    if ((ChunkSizeAscii [0] != CHUNKED_TRANSFER_CODING_CR) ||
-        (ChunkSizeAscii [1] != CHUNKED_TRANSFER_CODING_LF)
-       ) {
-       DEBUG ((DEBUG_ERROR, "     This is an invalid End-of-chunk notation.\n"));
-       goto ExitDeleteChunks;
+    if ((ChunkSizeAscii[0] != CHUNKED_TRANSFER_CODING_CR) ||
+        (ChunkSizeAscii[1] != CHUNKED_TRANSFER_CODING_LF)
+        )
+    {
+      DEBUG ((DEBUG_ERROR, "     This is an invalid End-of-chunk notation.\n"));
+      goto ExitDeleteChunks;
     }
+
     TotalLength += *ContentLength;
     if (TotalLength > MaxTotalLength) {
-       DEBUG ((DEBUG_ERROR, "     Total chunk transfer payload exceeds the size defined by PcdMaxHttpChunkTransfer.\n"));
-       goto ExitDeleteChunks;
+      DEBUG ((DEBUG_ERROR, "     Total chunk transfer payload exceeds the size defined by PcdMaxHttpChunkTransfer.\n"));
+      goto ExitDeleteChunks;
     }
   }
 
@@ -839,16 +867,19 @@ HttpIoGetChunkedTransferContent (
 
 ExitDeleteChunks:
   if (HttpChunks != NULL) {
-    while (!IsListEmpty(HttpChunks)) {
+    while (!IsListEmpty (HttpChunks)) {
       ThisListEntry = GetFirstNode (HttpChunks);
       RemoveEntryList (ThisListEntry);
       ThisChunk = (HTTP_IO_CHUNKS *)ThisListEntry;
       if (ThisChunk->Data != NULL) {
         FreePool (ThisChunk->Data);
       }
-      FreePool(ThisListEntry);
+
+      FreePool (ThisListEntry);
     }
+
     FreePool (HttpChunks);
   }
+
   return Status;
 }

@@ -13,41 +13,41 @@
 #define IP6_GET_TICKS(Ms)  (((Ms) + IP6_TIMER_INTERVAL_IN_MS - 1) / IP6_TIMER_INTERVAL_IN_MS)
 
 enum {
-  IP6_INF_ROUTER_LIFETIME        = 0xFFFF,
+  IP6_INF_ROUTER_LIFETIME = 0xFFFF,
 
   IP6_MAX_RTR_SOLICITATION_DELAY = 1000, ///< 1000 milliseconds
   IP6_MAX_RTR_SOLICITATIONS      = 3,
   IP6_RTR_SOLICITATION_INTERVAL  = 4000,
 
-  IP6_MIN_RANDOM_FACTOR_SCALED   = 1,
-  IP6_MAX_RANDOM_FACTOR_SCALED   = 3,
-  IP6_RANDOM_FACTOR_SCALE        = 2,
+  IP6_MIN_RANDOM_FACTOR_SCALED = 1,
+  IP6_MAX_RANDOM_FACTOR_SCALED = 3,
+  IP6_RANDOM_FACTOR_SCALE      = 2,
 
-  IP6_MAX_MULTICAST_SOLICIT      = 3,
-  IP6_MAX_UNICAST_SOLICIT        = 3,
-  IP6_MAX_ANYCAST_DELAY_TIME     = 1,
-  IP6_MAX_NEIGHBOR_ADV           = 3,
-  IP6_REACHABLE_TIME             = 30000,
-  IP6_RETRANS_TIMER              = 1000,
-  IP6_DELAY_FIRST_PROBE_TIME     = 5000,
+  IP6_MAX_MULTICAST_SOLICIT  = 3,
+  IP6_MAX_UNICAST_SOLICIT    = 3,
+  IP6_MAX_ANYCAST_DELAY_TIME = 1,
+  IP6_MAX_NEIGHBOR_ADV       = 3,
+  IP6_REACHABLE_TIME         = 30000,
+  IP6_RETRANS_TIMER          = 1000,
+  IP6_DELAY_FIRST_PROBE_TIME = 5000,
 
-  IP6_MIN_LINK_MTU               = 1280,
-  IP6_MAX_LINK_MTU               = 1500,
+  IP6_MIN_LINK_MTU = 1280,
+  IP6_MAX_LINK_MTU = 1500,
 
-  IP6_IS_ROUTER_FLAG             = 0x80,
-  IP6_SOLICITED_FLAG             = 0x40,
-  IP6_OVERRIDE_FLAG              = 0x20,
+  IP6_IS_ROUTER_FLAG = 0x80,
+  IP6_SOLICITED_FLAG = 0x40,
+  IP6_OVERRIDE_FLAG  = 0x20,
 
-  IP6_M_ADDR_CONFIG_FLAG         = 0x80,
-  IP6_O_CONFIG_FLAG              = 0x40,
+  IP6_M_ADDR_CONFIG_FLAG = 0x80,
+  IP6_O_CONFIG_FLAG      = 0x40,
 
-  IP6_ON_LINK_FLAG               = 0x80,
-  IP6_AUTO_CONFIG_FLAG           = 0x40,
+  IP6_ON_LINK_FLAG     = 0x80,
+  IP6_AUTO_CONFIG_FLAG = 0x40,
 
-  IP6_ND_LENGTH                  = 24,
-  IP6_RA_LENGTH                  = 16,
-  IP6_REDITECT_LENGTH            = 40,
-  IP6_DAD_ENTRY_SIGNATURE        = SIGNATURE_32 ('I', 'P', 'D', 'E')
+  IP6_ND_LENGTH           = 24,
+  IP6_RA_LENGTH           = 16,
+  IP6_REDITECT_LENGTH     = 40,
+  IP6_DAD_ENTRY_SIGNATURE = SIGNATURE_32 ('I', 'P', 'D', 'E')
 };
 
 typedef
@@ -57,38 +57,38 @@ VOID
   );
 
 typedef struct _IP6_OPTION_HEADER {
-  UINT8                     Type;
-  UINT8                     Length;
+  UINT8    Type;
+  UINT8    Length;
 } IP6_OPTION_HEADER;
 
 STATIC_ASSERT (sizeof (IP6_OPTION_HEADER) == 2, "IP6_OPTION_HEADER is expected to be exactly 2 bytes long.");
 
 typedef struct _IP6_ETHE_ADDR_OPTION {
-  UINT8                     Type;
-  UINT8                     Length;
-  UINT8                     EtherAddr[6];
+  UINT8    Type;
+  UINT8    Length;
+  UINT8    EtherAddr[6];
 } IP6_ETHER_ADDR_OPTION;
 
 STATIC_ASSERT (sizeof (IP6_ETHER_ADDR_OPTION) == 8, "IP6_ETHER_ADDR_OPTION is expected to be exactly 8 bytes long.");
 
 typedef struct _IP6_MTU_OPTION {
-  UINT8                     Type;
-  UINT8                     Length;
-  UINT16                    Reserved;
-  UINT32                    Mtu;
+  UINT8     Type;
+  UINT8     Length;
+  UINT16    Reserved;
+  UINT32    Mtu;
 } IP6_MTU_OPTION;
 
 STATIC_ASSERT (sizeof (IP6_MTU_OPTION) == 8, "IP6_MTU_OPTION is expected to be exactly 8 bytes long.");
 
 typedef struct _IP6_PREFIX_INFO_OPTION {
-  UINT8                     Type;
-  UINT8                     Length;
-  UINT8                     PrefixLength;
-  UINT8                     Reserved1;
-  UINT32                    ValidLifetime;
-  UINT32                    PreferredLifetime;
-  UINT32                    Reserved2;
-  EFI_IPv6_ADDRESS          Prefix;
+  UINT8               Type;
+  UINT8               Length;
+  UINT8               PrefixLength;
+  UINT8               Reserved1;
+  UINT32              ValidLifetime;
+  UINT32              PreferredLifetime;
+  UINT32              Reserved2;
+  EFI_IPv6_ADDRESS    Prefix;
 } IP6_PREFIX_INFO_OPTION;
 
 STATIC_ASSERT (sizeof (IP6_PREFIX_INFO_OPTION) == 32, "IP6_PREFIX_INFO_OPTION is expected to be exactly 32 bytes long.");
@@ -102,25 +102,25 @@ VOID
   );
 
 typedef struct _IP6_DAD_ENTRY {
-  UINT32                    Signature;
-  LIST_ENTRY                Link;
-  UINT32                    MaxTransmit;
-  UINT32                    Transmit;
-  UINT32                    Receive;
-  UINT32                    RetransTick;
-  IP6_ADDRESS_INFO          *AddressInfo;
-  EFI_IPv6_ADDRESS          Destination;
-  IP6_DAD_CALLBACK          Callback;
-  VOID                      *Context;
+  UINT32              Signature;
+  LIST_ENTRY          Link;
+  UINT32              MaxTransmit;
+  UINT32              Transmit;
+  UINT32              Receive;
+  UINT32              RetransTick;
+  IP6_ADDRESS_INFO    *AddressInfo;
+  EFI_IPv6_ADDRESS    Destination;
+  IP6_DAD_CALLBACK    Callback;
+  VOID                *Context;
 } IP6_DAD_ENTRY;
 
 typedef struct _IP6_DELAY_JOIN_LIST {
-  LIST_ENTRY                Link;
-  UINT32                    DelayTime; ///< in tick per 50 milliseconds
-  IP6_INTERFACE             *Interface;
-  IP6_ADDRESS_INFO          *AddressInfo;
-  IP6_DAD_CALLBACK          DadCallback;
-  VOID                      *Context;
+  LIST_ENTRY          Link;
+  UINT32              DelayTime;       ///< in tick per 50 milliseconds
+  IP6_INTERFACE       *Interface;
+  IP6_ADDRESS_INFO    *AddressInfo;
+  IP6_DAD_CALLBACK    DadCallback;
+  VOID                *Context;
 } IP6_DELAY_JOIN_LIST;
 
 typedef struct _IP6_NEIGHBOR_ENTRY {
@@ -142,20 +142,20 @@ typedef struct _IP6_NEIGHBOR_ENTRY {
 } IP6_NEIGHBOR_ENTRY;
 
 typedef struct _IP6_DEFAULT_ROUTER {
-  LIST_ENTRY                Link;
-  INTN                      RefCnt;
-  UINT16                    Lifetime;
-  EFI_IPv6_ADDRESS          Router;
-  IP6_NEIGHBOR_ENTRY        *NeighborCache;
+  LIST_ENTRY            Link;
+  INTN                  RefCnt;
+  UINT16                Lifetime;
+  EFI_IPv6_ADDRESS      Router;
+  IP6_NEIGHBOR_ENTRY    *NeighborCache;
 } IP6_DEFAULT_ROUTER;
 
 typedef struct _IP6_PREFIX_LIST_ENTRY {
-  LIST_ENTRY                Link;
-  INTN                      RefCnt;
-  UINT32                    ValidLifetime;
-  UINT32                    PreferredLifetime;
-  UINT8                     PrefixLength;
-  EFI_IPv6_ADDRESS          Prefix;
+  LIST_ENTRY          Link;
+  INTN                RefCnt;
+  UINT32              ValidLifetime;
+  UINT32              PreferredLifetime;
+  UINT8               PrefixLength;
+  EFI_IPv6_ADDRESS    Prefix;
 } IP6_PREFIX_LIST_ENTRY;
 
 /**

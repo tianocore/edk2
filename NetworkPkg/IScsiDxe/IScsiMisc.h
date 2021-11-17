@@ -14,49 +14,47 @@ typedef struct _ISCSI_DRIVER_DATA ISCSI_DRIVER_DATA;
 ///
 /// IPv4 Device Path Node Length
 ///
-#define IP4_NODE_LEN_NEW_VERSIONS    27
+#define IP4_NODE_LEN_NEW_VERSIONS  27
 
 ///
 /// IPv6 Device Path Node Length
 ///
-#define IP6_NODE_LEN_OLD_VERSIONS    43
-#define IP6_NODE_LEN_NEW_VERSIONS    60
+#define IP6_NODE_LEN_OLD_VERSIONS  43
+#define IP6_NODE_LEN_NEW_VERSIONS  60
 
 ///
 /// The ignored field StaticIpAddress's offset in old IPv6 Device Path
 ///
-#define IP6_OLD_IPADDRESS_OFFSET      42
-
+#define IP6_OLD_IPADDRESS_OFFSET  42
 
 #pragma pack(1)
 typedef struct _ISCSI_SESSION_CONFIG_NVDATA {
-  UINT16            TargetPort;
-  UINT8             Enabled;
-  UINT8             IpMode;
+  UINT16              TargetPort;
+  UINT8               Enabled;
+  UINT8               IpMode;
 
-  EFI_IP_ADDRESS    LocalIp;
-  EFI_IPv4_ADDRESS  SubnetMask;
-  EFI_IP_ADDRESS    Gateway;
+  EFI_IP_ADDRESS      LocalIp;
+  EFI_IPv4_ADDRESS    SubnetMask;
+  EFI_IP_ADDRESS      Gateway;
 
-  BOOLEAN           InitiatorInfoFromDhcp;
-  BOOLEAN           TargetInfoFromDhcp;
+  BOOLEAN             InitiatorInfoFromDhcp;
+  BOOLEAN             TargetInfoFromDhcp;
 
-  CHAR8             TargetName[ISCSI_NAME_MAX_SIZE];
-  EFI_IP_ADDRESS    TargetIp;
-  UINT8             PrefixLength;
-  UINT8             BootLun[8];
+  CHAR8               TargetName[ISCSI_NAME_MAX_SIZE];
+  EFI_IP_ADDRESS      TargetIp;
+  UINT8               PrefixLength;
+  UINT8               BootLun[8];
 
-  UINT16            ConnectTimeout; ///< timeout value in milliseconds.
-  UINT8             ConnectRetryCount;
-  UINT8             IsId[6];
+  UINT16              ConnectTimeout; ///< timeout value in milliseconds.
+  UINT8               ConnectRetryCount;
+  UINT8               IsId[6];
 
-  BOOLEAN           RedirectFlag;
-  UINT16            OriginalTargetPort;     // The port of proxy/virtual target.
-  EFI_IP_ADDRESS    OriginalTargetIp;       // The address of proxy/virtual target.
+  BOOLEAN             RedirectFlag;
+  UINT16              OriginalTargetPort;   // The port of proxy/virtual target.
+  EFI_IP_ADDRESS      OriginalTargetIp;     // The address of proxy/virtual target.
 
-  BOOLEAN           DnsMode;  // Flag indicate whether the Target address is expressed as URL format.
-  CHAR8             TargetUrl[ISCSI_TARGET_URI_MAX_SIZE];
-
+  BOOLEAN             DnsMode; // Flag indicate whether the Target address is expressed as URL format.
+  CHAR8               TargetUrl[ISCSI_TARGET_URI_MAX_SIZE];
 } ISCSI_SESSION_CONFIG_NVDATA;
 #pragma pack()
 
@@ -185,7 +183,6 @@ IScsiHexToBin (
   IN     CHAR8  *HexStr
   );
 
-
 /**
   Convert the decimal-constant string or hex-constant string into a numerical value.
 
@@ -294,7 +291,6 @@ ISCSI_NIC_INFO *
 IScsiGetNicInfoByIndex (
   IN UINT8      NicIndex
   );
-
 
 /**
   Get the NIC's PCI location and return it according to the composited
@@ -469,4 +465,5 @@ IScsiTestManagedDevice (
   IN  EFI_HANDLE       DriverBindingHandle,
   IN  EFI_GUID         *ProtocolGuid
   );
+
 #endif
