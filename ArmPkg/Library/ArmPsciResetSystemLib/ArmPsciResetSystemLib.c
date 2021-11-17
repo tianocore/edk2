@@ -65,7 +65,7 @@ LibResetSystem (
   ArmCallSmc (&ArmSmcArgs);
 
   // We should never be here
-  DEBUG ((EFI_D_ERROR, "%a: PSCI Reset failed\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a: PSCI Reset failed\n", __FUNCTION__));
   CpuDeadLoop ();
   return EFI_UNSUPPORTED;
 }
