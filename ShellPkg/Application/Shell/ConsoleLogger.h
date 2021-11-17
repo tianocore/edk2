@@ -12,31 +12,31 @@
 
 #define CONSOLE_LOGGER_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('c', 'o', 'P', 'D')
 
-typedef struct _CONSOLE_LOGGER_PRIVATE_DATA{
-  UINTN                             Signature;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   OurConOut;        ///< the protocol we installed onto the system table
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL   *OldConOut;       ///< old protocol to reinstall upon exiting
-  EFI_HANDLE                        OldConHandle;     ///< old protocol handle
-  UINTN                             ScreenCount;      ///< How many screens worth of data to save
-  CHAR16                            *Buffer;          ///< Buffer to save data
-  UINTN                             BufferSize;       ///< size of buffer in bytes
+typedef struct _CONSOLE_LOGGER_PRIVATE_DATA {
+  UINTN                              Signature;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    OurConOut;       ///< the protocol we installed onto the system table
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *OldConOut;      ///< old protocol to reinstall upon exiting
+  EFI_HANDLE                         OldConHandle;    ///< old protocol handle
+  UINTN                              ScreenCount;     ///< How many screens worth of data to save
+  CHAR16                             *Buffer;         ///< Buffer to save data
+  UINTN                              BufferSize;      ///< size of buffer in bytes
 
-                                                      //  start row is the top of the screen
-  UINTN                             OriginalStartRow; ///< What the originally visible start row was
-  UINTN                             CurrentStartRow;  ///< what the currently visible start row is
+  //  start row is the top of the screen
+  UINTN                              OriginalStartRow; ///< What the originally visible start row was
+  UINTN                              CurrentStartRow;  ///< what the currently visible start row is
 
-  UINTN                             RowsPerScreen;    ///< how many rows the screen can display
-  UINTN                             ColsPerScreen;    ///< how many columns the screen can display
+  UINTN                              RowsPerScreen;   ///< how many rows the screen can display
+  UINTN                              ColsPerScreen;   ///< how many columns the screen can display
 
-  INT32                             *Attributes;      ///< Buffer for Attribute to be saved for each character
-  UINTN                             AttribSize;       ///< Size of Attributes in bytes
+  INT32                              *Attributes;     ///< Buffer for Attribute to be saved for each character
+  UINTN                              AttribSize;      ///< Size of Attributes in bytes
 
-  EFI_SIMPLE_TEXT_OUTPUT_MODE       HistoryMode;      ///< mode of the history log
-  BOOLEAN                           Enabled;          ///< Set to FALSE when a break is requested.
-  UINTN                             RowCounter;       ///< Initial row of each print job.
+  EFI_SIMPLE_TEXT_OUTPUT_MODE        HistoryMode;     ///< mode of the history log
+  BOOLEAN                            Enabled;         ///< Set to FALSE when a break is requested.
+  UINTN                              RowCounter;      ///< Initial row of each print job.
 } CONSOLE_LOGGER_PRIVATE_DATA;
 
-#define CONSOLE_LOGGER_PRIVATE_DATA_FROM_THIS(a) CR (a, CONSOLE_LOGGER_PRIVATE_DATA, OurConOut, CONSOLE_LOGGER_PRIVATE_DATA_SIGNATURE)
+#define CONSOLE_LOGGER_PRIVATE_DATA_FROM_THIS(a)  CR (a, CONSOLE_LOGGER_PRIVATE_DATA, OurConOut, CONSOLE_LOGGER_PRIVATE_DATA_SIGNATURE)
 
 /**
   Install our intermediate ConOut into the system table to
@@ -52,7 +52,7 @@ typedef struct _CONSOLE_LOGGER_PRIVATE_DATA{
   @sa InstallProtocolInterface
 **/
 EFI_STATUS
-ConsoleLoggerInstall(
+ConsoleLoggerInstall (
   IN CONST UINTN ScreensToSave,
   OUT CONSOLE_LOGGER_PRIVATE_DATA **ConsoleInfo
   );
@@ -67,7 +67,7 @@ ConsoleLoggerInstall(
   @return other           The operation failed.  This was from UninstallProtocolInterface.
 **/
 EFI_STATUS
-ConsoleLoggerUninstall(
+ConsoleLoggerUninstall (
   IN OUT CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo
   );
 
@@ -84,7 +84,7 @@ ConsoleLoggerUninstall(
   @param[in] ConsoleInfo  The pointer to the instance of the console logger information.
 **/
 EFI_STATUS
-ConsoleLoggerDisplayHistory(
+ConsoleLoggerDisplayHistory (
   IN CONST BOOLEAN  Forward,
   IN CONST UINTN    Rows,
   IN CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo
@@ -100,7 +100,7 @@ ConsoleLoggerDisplayHistory(
   @sa UpdateDisplayFromHistory
 **/
 EFI_STATUS
-ConsoleLoggerStopHistory(
+ConsoleLoggerStopHistory (
   IN CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo
   );
 
@@ -112,7 +112,7 @@ ConsoleLoggerStopHistory(
   @return other           The operation failed.
 **/
 EFI_STATUS
-UpdateDisplayFromHistory(
+UpdateDisplayFromHistory (
   IN CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo
   );
 
@@ -151,7 +151,7 @@ ConsoleLoggerReset (
 **/
 EFI_STATUS
 EFIAPI
-ConsoleLoggerOutputString(
+ConsoleLoggerOutputString (
   IN  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *This,
   IN  CHAR16                          *WString
   );
@@ -309,9 +309,8 @@ ConsoleLoggerEnableCursor (
   history buffers.
 **/
 EFI_STATUS
-ConsoleLoggerResetBuffers(
+ConsoleLoggerResetBuffers (
   IN CONSOLE_LOGGER_PRIVATE_DATA *ConsoleInfo
   );
 
 #endif //_CONSOLE_LOGGER_HEADER_
-

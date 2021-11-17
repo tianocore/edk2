@@ -11,14 +11,14 @@
 #include "AcpiViewConfig.h"
 
 // Report variables
-STATIC BOOLEAN        mConsistencyCheck;
-STATIC BOOLEAN        mColourHighlighting;
-STATIC EREPORT_OPTION mReportType;
-STATIC BOOLEAN        mMandatoryTableValidate;
-STATIC UINTN          mMandatoryTableSpec;
+STATIC BOOLEAN         mConsistencyCheck;
+STATIC BOOLEAN         mColourHighlighting;
+STATIC EREPORT_OPTION  mReportType;
+STATIC BOOLEAN         mMandatoryTableValidate;
+STATIC UINTN           mMandatoryTableSpec;
 
 // User selection of which ACPI table should be checked
-SELECTED_ACPI_TABLE mSelectedAcpiTable;
+SELECTED_ACPI_TABLE  mSelectedAcpiTable;
 
 /**
  Reset the AcpiView user configuration to defaults
@@ -30,12 +30,12 @@ AcpiConfigSetDefaults (
   )
 {
   mReportType = ReportAll;
-  mSelectedAcpiTable.Type = 0;
-  mSelectedAcpiTable.Name = NULL;
+  mSelectedAcpiTable.Type  = 0;
+  mSelectedAcpiTable.Name  = NULL;
   mSelectedAcpiTable.Found = FALSE;
   mConsistencyCheck = TRUE;
   mMandatoryTableValidate = FALSE;
-  mMandatoryTableSpec = 0;
+  mMandatoryTableSpec     = 0;
 }
 
 /**
@@ -52,22 +52,24 @@ ConvertStrToAcpiSignature (
   IN CONST CHAR16 *Str
   )
 {
-  UINT8 Index;
-  CHAR8 Ptr[4];
+  UINT8  Index;
+  CHAR8  Ptr[4];
 
   ZeroMem (Ptr, sizeof (Ptr));
   Index = 0;
 
   // Convert to Upper case and convert to ASCII
   while ((Index < 4) && (Str[Index] != 0)) {
-    if (Str[Index] >= L'a' && Str[Index] <= L'z') {
+    if ((Str[Index] >= L'a') && (Str[Index] <= L'z')) {
       Ptr[Index] = (CHAR8)(Str[Index] - (L'a' - L'A'));
     } else {
       Ptr[Index] = (CHAR8)Str[Index];
     }
+
     Index++;
   }
-  return *(UINT32 *) Ptr;
+
+  return *(UINT32 *)Ptr;
 }
 
 /**

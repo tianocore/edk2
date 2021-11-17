@@ -11,8 +11,6 @@
 
 #include "TextEditorTypes.h"
 
-
-
 /**
   Free a EFI_EDITOR_LINE structure.
 
@@ -35,10 +33,5 @@ EFI_EDITOR_LINE *
 LineDup (
   IN  EFI_EDITOR_LINE *Src
   );
-
-
-
-
-
 
 #endif

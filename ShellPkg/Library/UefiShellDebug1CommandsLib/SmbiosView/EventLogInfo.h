@@ -14,28 +14,28 @@
 #pragma pack(1)
 
 typedef struct {
-  UINT8 Type;
-  UINT8 Length;
-  UINT8 Year;
-  UINT8 Month;
-  UINT8 Day;
-  UINT8 Hour;
-  UINT8 Minute;
-  UINT8 Second;
-  UINT8 LogVariableData[1];
+  UINT8    Type;
+  UINT8    Length;
+  UINT8    Year;
+  UINT8    Month;
+  UINT8    Day;
+  UINT8    Hour;
+  UINT8    Minute;
+  UINT8    Second;
+  UINT8    LogVariableData[1];
 } LOG_RECORD_FORMAT;
 
 typedef struct {
-  UINT8 OEMReserved[5];
-  UINT8 Metw;           // Multiple Event Time Window
-  UINT8 Meci;           // Multiple Event Count Increment
-  UINT8 CMOSAddress;    // Pre-boot Event Log Reset - CMOS Address
-  UINT8 CMOSBitIndex;   // Pre-boot Event Log Reset - CMOS Bit Index
-  UINT8 StartingOffset; // CMOS Checksum - Starting Offset
-  UINT8 ByteCount;      // CMOS Checksum - Byte Count
-  UINT8 ChecksumOffset; // CMOS Checksum - Checksum Offset
-  UINT8 Reserved[3];
-  UINT8 HeaderRevision;
+  UINT8    OEMReserved[5];
+  UINT8    Metw;           // Multiple Event Time Window
+  UINT8    Meci;           // Multiple Event Count Increment
+  UINT8    CMOSAddress;    // Pre-boot Event Log Reset - CMOS Address
+  UINT8    CMOSBitIndex;   // Pre-boot Event Log Reset - CMOS Bit Index
+  UINT8    StartingOffset; // CMOS Checksum - Starting Offset
+  UINT8    ByteCount;      // CMOS Checksum - Byte Count
+  UINT8    ChecksumOffset; // CMOS Checksum - Checksum Offset
+  UINT8    Reserved[3];
+  UINT8    HeaderRevision;
 } LOG_HEADER_TYPE1_FORMAT;
 
 #pragma pack()

@@ -33,7 +33,7 @@ TftpCommandHandler (
   )
 {
   gEfiShellParametersProtocol = ShellParameters;
-  gEfiShellProtocol           = Shell;
+  gEfiShellProtocol = Shell;
   return RunTftp (gImageHandle, SystemTable);
 }
 
@@ -57,7 +57,7 @@ TftpCommandGetHelp (
   return HiiGetString (mTftpHiiHandle, STRING_TOKEN (STR_GET_HELP_TFTP), Language);
 }
 
-EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL mTftpDynamicCommand = {
+EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  mTftpDynamicCommand = {
   L"tftp",
   TftpCommandHandler,
   TftpCommandGetHelp
@@ -82,7 +82,8 @@ TftpCommandInitialize (
   IN EFI_SYSTEM_TABLE         *SystemTable
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
+
   mTftpHiiHandle = InitializeHiiPackage (ImageHandle);
   if (mTftpHiiHandle == NULL) {
     return EFI_ABORTED;
@@ -110,9 +111,10 @@ EFI_STATUS
 EFIAPI
 TftpUnload (
   IN EFI_HANDLE               ImageHandle
-)
+  )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
+
   Status = gBS->UninstallProtocolInterface (
                   ImageHandle,
                   &gEfiShellDynamicCommandProtocolGuid,
@@ -121,6 +123,7 @@ TftpUnload (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   HiiRemovePackages (mTftpHiiHandle);
   return EFI_SUCCESS;
 }

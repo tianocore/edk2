@@ -34,11 +34,13 @@ ShellAppMain (
   )
 {
   UINTN  Index;
+
   if (Argc == 1) {
     Print (L"Argv[1] = NULL\n");
   }
+
   for (Index = 1; Index < Argc; Index++) {
-    Print(L"Argv[%d]: \"%s\"\n", Index, Argv[Index]);
+    Print (L"Argv[%d]: \"%s\"\n", Index, Argv[Index]);
   }
 
   return 0;

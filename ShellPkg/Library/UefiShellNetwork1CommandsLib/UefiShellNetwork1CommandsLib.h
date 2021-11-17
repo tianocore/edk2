@@ -38,7 +38,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
 
-extern EFI_HII_HANDLE gShellNetwork1HiiHandle;
+extern EFI_HII_HANDLE  gShellNetwork1HiiHandle;
 
 /**
   Function for 'ping' command.
@@ -67,4 +67,3 @@ ShellCommandRunIfconfig (
   );
 
 #endif
-

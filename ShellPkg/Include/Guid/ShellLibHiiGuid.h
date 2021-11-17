@@ -69,17 +69,17 @@
     0x5f5f605d, 0x1583, 0x4a2d, {0xa6, 0xb2, 0xeb, 0x12, 0xda, 0xb4, 0xa2, 0xb6 } \
   }
 
-extern EFI_GUID gHandleParsingHiiGuid;
-extern EFI_GUID gShellDebug1HiiGuid;
-extern EFI_GUID gShellDriver1HiiGuid;
-extern EFI_GUID gShellInstall1HiiGuid;
-extern EFI_GUID gShellLevel1HiiGuid;
-extern EFI_GUID gShellLevel2HiiGuid;
-extern EFI_GUID gShellLevel3HiiGuid;
-extern EFI_GUID gShellNetwork1HiiGuid;
-extern EFI_GUID gShellNetwork2HiiGuid;
-extern EFI_GUID gShellTftpHiiGuid;
-extern EFI_GUID gShellHttpHiiGuid;
-extern EFI_GUID gShellBcfgHiiGuid;
+extern EFI_GUID  gHandleParsingHiiGuid;
+extern EFI_GUID  gShellDebug1HiiGuid;
+extern EFI_GUID  gShellDriver1HiiGuid;
+extern EFI_GUID  gShellInstall1HiiGuid;
+extern EFI_GUID  gShellLevel1HiiGuid;
+extern EFI_GUID  gShellLevel2HiiGuid;
+extern EFI_GUID  gShellLevel3HiiGuid;
+extern EFI_GUID  gShellNetwork1HiiGuid;
+extern EFI_GUID  gShellNetwork2HiiGuid;
+extern EFI_GUID  gShellTftpHiiGuid;
+extern EFI_GUID  gShellHttpHiiGuid;
+extern EFI_GUID  gShellBcfgHiiGuid;
 
 #endif

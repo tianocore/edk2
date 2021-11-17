@@ -42,8 +42,8 @@
 #include <Library/SortLib.h>
 #include <Library/FileHandleLib.h>
 
-extern CONST  CHAR16                            mFileName[];
-extern        EFI_HII_HANDLE                    gShellLevel2HiiHandle;
+extern CONST  CHAR16          mFileName[];
+extern        EFI_HII_HANDLE  gShellLevel2HiiHandle;
 
 /**
   Function for 'attrib' command.
@@ -256,9 +256,9 @@ ShellCommandRunMv (
   @retval NULL            a fully qualified path could not be discovered.
   @retval other           pointer to a fuly qualified path.
 **/
-CHAR16*
-GetFullyQualifiedPath(
-  IN CONST CHAR16* Path
+CHAR16 *
+GetFullyQualifiedPath (
+  IN CONST CHAR16 *Path
   );
 
 /**
@@ -285,7 +285,7 @@ VerifyIntermediateDirectories (
 
 **/
 INTN
-StrniCmp(
+StrniCmp (
   IN CONST CHAR16 *Source,
   IN CONST CHAR16 *Target,
   IN CONST UINTN  Count
@@ -334,7 +334,7 @@ ShellCommandRunVol (
   @retval SHELL_SUCCESS   The source file was copied to the destination
 **/
 SHELL_STATUS
-CopySingleFile(
+CopySingleFile (
   IN CONST CHAR16 *Source,
   IN CONST CHAR16 *Dest,
   OUT VOID        **Resp,
@@ -354,10 +354,9 @@ CopySingleFile(
   @retval SHELL_DEVICE_ERROR  A device error occurred reading this Node.
 **/
 SHELL_STATUS
-CascadeDelete(
+CascadeDelete (
   IN EFI_SHELL_FILE_INFO  *Node,
   IN CONST BOOLEAN        Quiet
   );
 
 #endif
-

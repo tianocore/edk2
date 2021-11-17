@@ -15,17 +15,16 @@
 #define _SHELL_ENVIRONMENT_VARIABLE_HEADER_
 
 typedef struct {
-  LIST_ENTRY  Link;
-  CHAR16      *Key;
-  CHAR16      *Val;
-  UINT32      Atts;
+  LIST_ENTRY    Link;
+  CHAR16        *Key;
+  CHAR16        *Val;
+  UINT32        Atts;
 } ENV_VAR_LIST;
 
 //
 // The list is used to cache the environment variables.
 //
-extern ENV_VAR_LIST    gShellEnvVarList;
-
+extern ENV_VAR_LIST  gShellEnvVarList;
 
 /**
   Reports whether an environment variable is Volatile or Non-Volatile.
@@ -73,7 +72,7 @@ IsVolatileEnv (
   @retval other                 An error occurred
   @sa SetVariable
 **/
-#define SHELL_SET_ENVIRONMENT_VARIABLE_NV(EnvVarName,BufferSize,Buffer)  \
+#define SHELL_SET_ENVIRONMENT_VARIABLE_NV(EnvVarName, BufferSize, Buffer)  \
   (gRT->SetVariable((CHAR16*)EnvVarName,                          \
   &gShellVariableGuid,                                            \
   EFI_VARIABLE_NON_VOLATILE|EFI_VARIABLE_BOOTSERVICE_ACCESS,      \
@@ -93,7 +92,7 @@ IsVolatileEnv (
   @retval other                 An error occurred
   @sa SetVariable
 **/
-#define SHELL_GET_ENVIRONMENT_VARIABLE(EnvVarName,BufferSize,Buffer)    \
+#define SHELL_GET_ENVIRONMENT_VARIABLE(EnvVarName, BufferSize, Buffer)    \
   (gRT->GetVariable((CHAR16*)EnvVarName,                        \
   &gShellVariableGuid,                                          \
   0,                                                            \
@@ -114,7 +113,7 @@ IsVolatileEnv (
   @retval other                 An error occurred
   @sa SetVariable
 **/
-#define SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(EnvVarName,Atts,BufferSize,Buffer)    \
+#define SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(EnvVarName, Atts, BufferSize, Buffer)    \
   (gRT->GetVariable((CHAR16*)EnvVarName,                        \
   &gShellVariableGuid,                                          \
   Atts,                                                            \
@@ -134,7 +133,7 @@ IsVolatileEnv (
   @retval other                 An error occurred
   @sa SetVariable
 **/
-#define SHELL_SET_ENVIRONMENT_VARIABLE_V(EnvVarName,BufferSize,Buffer) \
+#define SHELL_SET_ENVIRONMENT_VARIABLE_V(EnvVarName, BufferSize, Buffer) \
   (gRT->SetVariable((CHAR16*)EnvVarName,                      \
   &gShellVariableGuid,                                        \
   EFI_VARIABLE_BOOTSERVICE_ACCESS,                            \
@@ -150,7 +149,7 @@ IsVolatileEnv (
   @retval EFI_SUCCESS           the list was created successfully.
 **/
 EFI_STATUS
-GetEnvironmentVariableList(
+GetEnvironmentVariableList (
   IN OUT LIST_ENTRY *List
   );
 
@@ -167,7 +166,7 @@ GetEnvironmentVariableList(
   @retval EFI_SUCCESS           The list was Set successfully.
 **/
 EFI_STATUS
-SetEnvironmentVariableList(
+SetEnvironmentVariableList (
   IN LIST_ENTRY *List
   );
 
@@ -187,7 +186,7 @@ SetEnvironmentVariableList(
   @sa SetEnvironmentVariableList
 **/
 EFI_STATUS
-SetEnvironmentVariables(
+SetEnvironmentVariables (
   IN CONST CHAR16 **Environment
   );
 
@@ -197,7 +196,7 @@ SetEnvironmentVariables(
   @param[in] List               The pointer to pointer to list.
 **/
 VOID
-FreeEnvironmentVariableList(
+FreeEnvironmentVariableList (
   IN LIST_ENTRY *List
   );
 
@@ -279,4 +278,3 @@ ShellFreeEnvVarList (
   );
 
 #endif //_SHELL_ENVIRONMENT_VARIABLE_HEADER_
-

@@ -16,7 +16,7 @@
 // the resource section. Thus the application can use '-?' option to show help message in
 // Shell.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringHelpTokenId = STRING_TOKEN (STR_GET_HELP_DP);
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID  mStringHelpTokenId = STRING_TOKEN (STR_GET_HELP_DP);
 
 /**
   Entry point of Tftp standalone application.
@@ -35,7 +35,8 @@ DpAppInitialize (
   IN EFI_SYSTEM_TABLE         *SystemTable
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
+
   mDpHiiHandle = InitializeHiiPackage (ImageHandle);
   if (mDpHiiHandle == NULL) {
     return EFI_ABORTED;

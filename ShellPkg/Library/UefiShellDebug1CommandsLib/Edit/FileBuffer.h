@@ -60,7 +60,7 @@ FileBufferRefresh (
 **/
 EFI_STATUS
 FileBufferHandleInput (
-  IN CONST EFI_INPUT_KEY * Key
+  IN CONST EFI_INPUT_KEY *Key
   );
 
 /**
