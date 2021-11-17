@@ -74,7 +74,7 @@ SerialPortGetBaseAddress (
   //
   // Enumerate all FDT nodes looking for a PL011 and capture its base address
   //
-  for (Prev = 0;; Prev = Node) {
+  for (Prev = 0; ; Prev = Node) {
     Node = fdt_next_node (DeviceTreeBase, Prev, NULL);
     if (Node < 0) {
       break;
@@ -89,11 +89,11 @@ SerialPortGetBaseAddress (
     // Iterate over the NULL-separated items in the compatible string
     //
     for (CompatibleItem = Compatible; CompatibleItem < Compatible + Len;
-      CompatibleItem += 1 + AsciiStrLen (CompatibleItem)) {
-
+         CompatibleItem += 1 + AsciiStrLen (CompatibleItem))
+    {
       if (AsciiStrCmp (CompatibleItem, "arm,pl011") == 0) {
         NodeStatus = fdt_getprop (DeviceTreeBase, Node, "status", &Len);
-        if (NodeStatus != NULL && AsciiStrCmp (NodeStatus, "okay") != 0) {
+        if ((NodeStatus != NULL) && (AsciiStrCmp (NodeStatus, "okay") != 0)) {
           continue;
         }
 
@@ -101,13 +101,14 @@ SerialPortGetBaseAddress (
         if (Len != 16) {
           return 0;
         }
+
         UartBase = (UINTN)fdt64_to_cpu (ReadUnaligned64 (RegProperty));
 
         BaudRate = (UINTN)FixedPcdGet64 (PcdUartDefaultBaudRate);
         ReceiveFifoDepth = 0; // Use the default value for Fifo depth
-        Parity = (EFI_PARITY_TYPE)FixedPcdGet8 (PcdUartDefaultParity);
+        Parity   = (EFI_PARITY_TYPE)FixedPcdGet8 (PcdUartDefaultParity);
         DataBits = FixedPcdGet8 (PcdUartDefaultDataBits);
-        StopBits = (EFI_STOP_BITS_TYPE) FixedPcdGet8 (PcdUartDefaultStopBits);
+        StopBits = (EFI_STOP_BITS_TYPE)FixedPcdGet8 (PcdUartDefaultStopBits);
 
         Status = PL011UartInitializePort (
                    UartBase,
@@ -124,6 +125,7 @@ SerialPortGetBaseAddress (
       }
     }
   }
+
   return 0;
 }
 
@@ -144,12 +146,13 @@ SerialPortWrite (
   IN UINTN     NumberOfBytes
   )
 {
-  UINT64 SerialRegisterBase;
+  UINT64  SerialRegisterBase;
 
   SerialRegisterBase = SerialPortGetBaseAddress ();
   if (SerialRegisterBase != 0) {
     return PL011UartWrite ((UINTN)SerialRegisterBase, Buffer, NumberOfBytes);
   }
+
   return 0;
 }
 
@@ -168,7 +171,7 @@ EFIAPI
 SerialPortRead (
   OUT UINT8     *Buffer,
   IN  UINTN     NumberOfBytes
-)
+  )
 {
   return 0;
 }
@@ -273,4 +276,3 @@ SerialPortSetAttributes (
 {
   return RETURN_UNSUPPORTED;
 }
-
