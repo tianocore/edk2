@@ -69,7 +69,7 @@ GetDuration (
   Error = (BOOLEAN)(Duration > Measurement->EndTimeStamp);
 
   if (Error) {
-    DEBUG ((EFI_D_ERROR, ALit_TimerLibError));
+    DEBUG ((DEBUG_ERROR, ALit_TimerLibError));
     Duration = 0;
   }
   return Duration;
