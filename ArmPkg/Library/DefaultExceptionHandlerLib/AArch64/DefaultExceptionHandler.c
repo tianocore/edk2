@@ -22,14 +22,14 @@
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
 
-STATIC CHAR8 *gExceptionTypeString[] = {
+STATIC CHAR8  *gExceptionTypeString[] = {
   "Synchronous",
   "IRQ",
   "FIQ",
   "SError"
 };
 
-STATIC BOOLEAN mRecursiveException;
+STATIC BOOLEAN  mRecursiveException;
 
 CHAR8 *
 GetImageName (
@@ -45,43 +45,75 @@ DescribeInstructionOrDataAbort (
   IN UINTN Iss
   )
 {
-  CHAR8 *AbortCause;
+  CHAR8  *AbortCause;
 
   switch (Iss & 0x3f) {
-    case 0x0: AbortCause = "Address size fault, zeroth level of translation or translation table base register";  break;
-    case 0x1: AbortCause = "Address size fault, first level";  break;
-    case 0x2: AbortCause = "Address size fault, second level";  break;
-    case 0x3: AbortCause = "Address size fault, third level";  break;
-    case 0x4: AbortCause = "Translation fault, zeroth level";  break;
-    case 0x5: AbortCause = "Translation fault, first level";  break;
-    case 0x6: AbortCause = "Translation fault, second level";  break;
-    case 0x7: AbortCause = "Translation fault, third level";  break;
-    case 0x9: AbortCause = "Access flag fault, first level";  break;
-    case 0xa: AbortCause = "Access flag fault, second level";  break;
-    case 0xb: AbortCause = "Access flag fault, third level";  break;
-    case 0xd: AbortCause = "Permission fault, first level";  break;
-    case 0xe: AbortCause = "Permission fault, second level";  break;
-    case 0xf: AbortCause = "Permission fault, third level";  break;
-    case 0x10: AbortCause = "Synchronous external abort";  break;
-    case 0x18: AbortCause = "Synchronous parity error on memory access";  break;
-    case 0x11: AbortCause = "Asynchronous external abort";  break;
-    case 0x19: AbortCause = "Asynchronous parity error on memory access";  break;
-    case 0x14: AbortCause = "Synchronous external abort on translation table walk, zeroth level";  break;
-    case 0x15: AbortCause = "Synchronous external abort on translation table walk, first level";  break;
-    case 0x16: AbortCause = "Synchronous external abort on translation table walk, second level";  break;
-    case 0x17: AbortCause = "Synchronous external abort on translation table walk, third level";  break;
-    case 0x1c: AbortCause = "Synchronous parity error on memory access on translation table walk, zeroth level";  break;
-    case 0x1d: AbortCause = "Synchronous parity error on memory access on translation table walk, first level";  break;
-    case 0x1e: AbortCause = "Synchronous parity error on memory access on translation table walk, second level";  break;
-    case 0x1f: AbortCause = "Synchronous parity error on memory access on translation table walk, third level";  break;
-    case 0x21: AbortCause = "Alignment fault";  break;
-    case 0x22: AbortCause = "Debug event";  break;
-    case 0x30: AbortCause = "TLB conflict abort";  break;
+    case 0x0: AbortCause = "Address size fault, zeroth level of translation or translation table base register";
+      break;
+    case 0x1: AbortCause = "Address size fault, first level";
+      break;
+    case 0x2: AbortCause = "Address size fault, second level";
+      break;
+    case 0x3: AbortCause = "Address size fault, third level";
+      break;
+    case 0x4: AbortCause = "Translation fault, zeroth level";
+      break;
+    case 0x5: AbortCause = "Translation fault, first level";
+      break;
+    case 0x6: AbortCause = "Translation fault, second level";
+      break;
+    case 0x7: AbortCause = "Translation fault, third level";
+      break;
+    case 0x9: AbortCause = "Access flag fault, first level";
+      break;
+    case 0xa: AbortCause = "Access flag fault, second level";
+      break;
+    case 0xb: AbortCause = "Access flag fault, third level";
+      break;
+    case 0xd: AbortCause = "Permission fault, first level";
+      break;
+    case 0xe: AbortCause = "Permission fault, second level";
+      break;
+    case 0xf: AbortCause = "Permission fault, third level";
+      break;
+    case 0x10: AbortCause = "Synchronous external abort";
+      break;
+    case 0x18: AbortCause = "Synchronous parity error on memory access";
+      break;
+    case 0x11: AbortCause = "Asynchronous external abort";
+      break;
+    case 0x19: AbortCause = "Asynchronous parity error on memory access";
+      break;
+    case 0x14: AbortCause = "Synchronous external abort on translation table walk, zeroth level";
+      break;
+    case 0x15: AbortCause = "Synchronous external abort on translation table walk, first level";
+      break;
+    case 0x16: AbortCause = "Synchronous external abort on translation table walk, second level";
+      break;
+    case 0x17: AbortCause = "Synchronous external abort on translation table walk, third level";
+      break;
+    case 0x1c: AbortCause = "Synchronous parity error on memory access on translation table walk, zeroth level";
+      break;
+    case 0x1d: AbortCause = "Synchronous parity error on memory access on translation table walk, first level";
+      break;
+    case 0x1e: AbortCause = "Synchronous parity error on memory access on translation table walk, second level";
+      break;
+    case 0x1f: AbortCause = "Synchronous parity error on memory access on translation table walk, third level";
+      break;
+    case 0x21: AbortCause = "Alignment fault";
+      break;
+    case 0x22: AbortCause = "Debug event";
+      break;
+    case 0x30: AbortCause = "TLB conflict abort";
+      break;
     case 0x33:
-    case 0x34: AbortCause = "IMPLEMENTATION DEFINED";  break;
+    case 0x34: AbortCause = "IMPLEMENTATION DEFINED";
+      break;
     case 0x35:
-    case 0x36: AbortCause = "Domain fault"; break;
-    default: AbortCause = ""; break;
+    case 0x36: AbortCause = "Domain fault";
+      break;
+    default: AbortCause = "";
+      break;
   }
 
   DEBUG ((EFI_D_ERROR, "\n%a: %a\n", AbortType, AbortCause));
@@ -93,21 +125,26 @@ DescribeExceptionSyndrome (
   IN UINT32 Esr
   )
 {
-  CHAR8 *Message;
-  UINTN Ec;
-  UINTN Iss;
+  CHAR8  *Message;
+  UINTN  Ec;
+  UINTN  Iss;
 
-  Ec = Esr >> 26;
+  Ec  = Esr >> 26;
   Iss = Esr & 0x00ffffff;
 
   switch (Ec) {
-    case 0x15: Message = "SVC executed in AArch64"; break;
+    case 0x15: Message = "SVC executed in AArch64";
+      break;
     case 0x20:
-    case 0x21: DescribeInstructionOrDataAbort ("Instruction abort", Iss); return;
-    case 0x22: Message = "PC alignment fault"; break;
-    case 0x23: Message = "SP alignment fault"; break;
+    case 0x21: DescribeInstructionOrDataAbort ("Instruction abort", Iss);
+      return;
+    case 0x22: Message = "PC alignment fault";
+      break;
+    case 0x23: Message = "SP alignment fault";
+      break;
     case 0x24:
-    case 0x25: DescribeInstructionOrDataAbort ("Data abort", Iss); return;
+    case 0x25: DescribeInstructionOrDataAbort ("Data abort", Iss);
+      return;
     default: return;
   }
 
@@ -115,23 +152,25 @@ DescribeExceptionSyndrome (
 }
 
 #ifndef MDEPKG_NDEBUG
-STATIC
-CONST CHAR8 *
-BaseName (
+  STATIC
+  CONST CHAR8 *
+  BaseName (
   IN  CONST CHAR8 *FullName
   )
-{
-  CONST CHAR8 *Str;
+  {
+    CONST CHAR8  *Str;
 
-  Str = FullName + AsciiStrLen (FullName);
+    Str = FullName + AsciiStrLen (FullName);
 
-  while (--Str > FullName) {
-    if (*Str == '/' || *Str == '\\') {
-      return Str + 1;
+    while (--Str > FullName) {
+      if ((*Str == '/') || (*Str == '\\')) {
+        return Str + 1;
+      }
     }
+
+    return Str;
   }
-  return Str;
-}
+
 #endif
 
 /**
@@ -154,75 +193,93 @@ DefaultExceptionHandler (
   INT32  Offset;
 
   if (mRecursiveException) {
-    STATIC CHAR8 CONST Message[] = "\nRecursive exception occurred while dumping the CPU state\n";
+    STATIC CHAR8 CONST  Message[] = "\nRecursive exception occurred while dumping the CPU state\n";
 
     SerialPortWrite ((UINT8 *)Message, sizeof Message - 1);
     if (gST->ConOut != NULL) {
       AsciiPrint (Message);
     }
+
     CpuDeadLoop ();
   }
+
   mRecursiveException = TRUE;
 
-  CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n\n%a Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
-  SerialPortWrite ((UINT8 *) Buffer, CharCount);
+  CharCount = AsciiSPrint (Buffer, sizeof (Buffer), "\n\n%a Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
+  SerialPortWrite ((UINT8 *)Buffer, CharCount);
   if (gST->ConOut != NULL) {
     AsciiPrint (Buffer);
   }
 
   DEBUG_CODE_BEGIN ();
-    CHAR8  *Pdb, *PrevPdb;
-    UINTN  ImageBase;
-    UINTN  PeCoffSizeOfHeader;
-    UINT64 *Fp;
-    UINT64 RootFp[2];
-    UINTN  Idx;
+  CHAR8   *Pdb, *PrevPdb;
+  UINTN   ImageBase;
+  UINTN   PeCoffSizeOfHeader;
+  UINT64  *Fp;
+  UINT64  RootFp[2];
+  UINTN   Idx;
+
+  PrevPdb = Pdb = GetImageName (SystemContext.SystemContextAArch64->ELR, &ImageBase, &PeCoffSizeOfHeader);
+  if (Pdb != NULL) {
+    DEBUG ((
+      EFI_D_ERROR,
+      "PC 0x%012lx (0x%012lx+0x%08x) [ 0] %a\n",
+      SystemContext.SystemContextAArch64->ELR,
+      ImageBase,
+      SystemContext.SystemContextAArch64->ELR - ImageBase,
+      BaseName (Pdb)
+      ));
+  } else {
+    DEBUG ((EFI_D_ERROR, "PC 0x%012lx\n", SystemContext.SystemContextAArch64->ELR));
+  }
+
+  if ((UINT64 *)SystemContext.SystemContextAArch64->FP != 0) {
+    Idx = 0;
+
+    RootFp[0] = ((UINT64 *)SystemContext.SystemContextAArch64->FP)[0];
+    RootFp[1] = ((UINT64 *)SystemContext.SystemContextAArch64->FP)[1];
+    if (RootFp[1] != SystemContext.SystemContextAArch64->LR) {
+      RootFp[0] = SystemContext.SystemContextAArch64->FP;
+      RootFp[1] = SystemContext.SystemContextAArch64->LR;
+    }
+
+    for (Fp = RootFp; Fp[0] != 0; Fp = (UINT64 *)Fp[0]) {
+      Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
+      if (Pdb != NULL) {
+        if (Pdb != PrevPdb) {
+          Idx++;
+          PrevPdb = Pdb;
+        }
+
+        DEBUG ((
+          EFI_D_ERROR,
+          "PC 0x%012lx (0x%012lx+0x%08x) [% 2d] %a\n",
+          Fp[1],
+          ImageBase,
+          Fp[1] - ImageBase,
+          Idx,
+          BaseName (Pdb)
+          ));
+      } else {
+        DEBUG ((EFI_D_ERROR, "PC 0x%012lx\n", Fp[1]));
+      }
+    }
 
     PrevPdb = Pdb = GetImageName (SystemContext.SystemContextAArch64->ELR, &ImageBase, &PeCoffSizeOfHeader);
     if (Pdb != NULL) {
-      DEBUG ((EFI_D_ERROR, "PC 0x%012lx (0x%012lx+0x%08x) [ 0] %a\n",
-        SystemContext.SystemContextAArch64->ELR, ImageBase,
-        SystemContext.SystemContextAArch64->ELR - ImageBase, BaseName (Pdb)));
-    } else {
-      DEBUG ((EFI_D_ERROR, "PC 0x%012lx\n", SystemContext.SystemContextAArch64->ELR));
+      DEBUG ((EFI_D_ERROR, "\n[ 0] %a\n", Pdb));
     }
 
-    if ((UINT64 *)SystemContext.SystemContextAArch64->FP != 0) {
-      Idx = 0;
-
-      RootFp[0] = ((UINT64 *)SystemContext.SystemContextAArch64->FP)[0];
-      RootFp[1] = ((UINT64 *)SystemContext.SystemContextAArch64->FP)[1];
-      if (RootFp[1] != SystemContext.SystemContextAArch64->LR) {
-        RootFp[0] = SystemContext.SystemContextAArch64->FP;
-        RootFp[1] = SystemContext.SystemContextAArch64->LR;
-      }
-      for (Fp = RootFp; Fp[0] != 0; Fp = (UINT64 *)Fp[0]) {
-        Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
-        if (Pdb != NULL) {
-          if (Pdb != PrevPdb) {
-            Idx++;
-            PrevPdb = Pdb;
-          }
-          DEBUG ((EFI_D_ERROR, "PC 0x%012lx (0x%012lx+0x%08x) [% 2d] %a\n",
-            Fp[1], ImageBase, Fp[1] - ImageBase, Idx, BaseName (Pdb)));
-        } else {
-          DEBUG ((EFI_D_ERROR, "PC 0x%012lx\n", Fp[1]));
-        }
-      }
-      PrevPdb = Pdb = GetImageName (SystemContext.SystemContextAArch64->ELR, &ImageBase, &PeCoffSizeOfHeader);
-      if (Pdb != NULL) {
-        DEBUG ((EFI_D_ERROR, "\n[ 0] %a\n", Pdb));
-      }
-
-      Idx = 0;
-      for (Fp = RootFp; Fp[0] != 0; Fp = (UINT64 *)Fp[0]) {
-        Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
-        if (Pdb != NULL && Pdb != PrevPdb) {
-          DEBUG ((EFI_D_ERROR, "[% 2d] %a\n", ++Idx, Pdb));
-          PrevPdb = Pdb;
-        }
+    Idx = 0;
+    for (Fp = RootFp; Fp[0] != 0; Fp = (UINT64 *)Fp[0]) {
+      Pdb = GetImageName (Fp[1], &ImageBase, &PeCoffSizeOfHeader);
+      if ((Pdb != NULL) && (Pdb != PrevPdb)) {
+        DEBUG ((EFI_D_ERROR, "[% 2d] %a\n", ++Idx, Pdb));
+        PrevPdb = Pdb;
       }
     }
+  }
+
   DEBUG_CODE_END ();
 
   DEBUG ((EFI_D_ERROR, "\n  X0 0x%016lx   X1 0x%016lx   X2 0x%016lx   X3 0x%016lx\n", SystemContext.SystemContextAArch64->X0, SystemContext.SystemContextAArch64->X1, SystemContext.SystemContextAArch64->X2, SystemContext.SystemContextAArch64->X3));
@@ -255,19 +312,22 @@ DefaultExceptionHandler (
 
   DEBUG ((EFI_D_ERROR, "\n  SP 0x%016lx  ELR 0x%016lx  SPSR 0x%08lx  FPSR 0x%08lx\n ESR 0x%08lx          FAR 0x%016lx\n", SystemContext.SystemContextAArch64->SP, SystemContext.SystemContextAArch64->ELR, SystemContext.SystemContextAArch64->SPSR, SystemContext.SystemContextAArch64->FPSR, SystemContext.SystemContextAArch64->ESR, SystemContext.SystemContextAArch64->FAR));
 
-  DEBUG ((EFI_D_ERROR, "\n ESR : EC 0x%02x  IL 0x%x  ISS 0x%08x\n", (SystemContext.SystemContextAArch64->ESR & 0xFC000000) >> 26, (SystemContext.SystemContextAArch64->ESR >> 25) & 0x1, SystemContext.SystemContextAArch64->ESR & 0x1FFFFFF ));
+  DEBUG ((EFI_D_ERROR, "\n ESR : EC 0x%02x  IL 0x%x  ISS 0x%08x\n", (SystemContext.SystemContextAArch64->ESR & 0xFC000000) >> 26, (SystemContext.SystemContextAArch64->ESR >> 25) & 0x1, SystemContext.SystemContextAArch64->ESR & 0x1FFFFFF));
 
   DescribeExceptionSyndrome (SystemContext.SystemContextAArch64->ESR);
 
   DEBUG ((EFI_D_ERROR, "\nStack dump:\n"));
   for (Offset = -256; Offset < 256; Offset += 32) {
-    DEBUG  ((EFI_D_ERROR, "%c %013lx: %016lx %016lx %016lx %016lx\n",
+    DEBUG ((
+      EFI_D_ERROR,
+      "%c %013lx: %016lx %016lx %016lx %016lx\n",
       Offset == 0 ? '>' : ' ',
       SystemContext.SystemContextAArch64->SP + Offset,
       *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset),
       *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset + 8),
       *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset + 16),
-      *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset + 24)));
+      *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset + 24)
+      ));
   }
 
   ASSERT (FALSE);

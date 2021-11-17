@@ -31,7 +31,7 @@ ResetCold (
   VOID
   )
 {
-  ARM_SMC_ARGS ArmSmcArgs;
+  ARM_SMC_ARGS  ArmSmcArgs;
 
   // Send a PSCI 0.2 SYSTEM_RESET command
   ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
@@ -66,7 +66,7 @@ ResetShutdown (
   VOID
   )
 {
-  ARM_SMC_ARGS ArmSmcArgs;
+  ARM_SMC_ARGS  ArmSmcArgs;
 
   // Send a PSCI 0.2 SYSTEM_OFF command
   ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
@@ -117,23 +117,23 @@ ResetSystem (
   )
 {
   switch (ResetType) {
-  case EfiResetWarm:
-    ResetWarm ();
-    break;
+    case EfiResetWarm:
+      ResetWarm ();
+      break;
 
-  case EfiResetCold:
-    ResetCold ();
-    break;
+    case EfiResetCold:
+      ResetCold ();
+      break;
 
-  case EfiResetShutdown:
-    ResetShutdown ();
-    return;
+    case EfiResetShutdown:
+      ResetShutdown ();
+      return;
 
-  case EfiResetPlatformSpecific:
-    ResetPlatformSpecific (DataSize, ResetData);
-    return;
+    case EfiResetPlatformSpecific:
+      ResetPlatformSpecific (DataSize, ResetData);
+      return;
 
-  default:
-    return;
+    default:
+      return;
   }
 }

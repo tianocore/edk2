@@ -37,24 +37,27 @@ SearchGcdMemorySpaces (
   OUT UINTN                             *EndIndex
   )
 {
-  UINTN           Index;
+  UINTN  Index;
 
   *StartIndex = 0;
   *EndIndex   = 0;
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
     if ((BaseAddress >= MemorySpaceMap[Index].BaseAddress) &&
-        (BaseAddress < (MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length))) {
+        (BaseAddress < (MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length)))
+    {
       *StartIndex = Index;
     }
+
     if (((BaseAddress + Length - 1) >= MemorySpaceMap[Index].BaseAddress) &&
-        ((BaseAddress + Length - 1) < (MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length))) {
+        ((BaseAddress + Length - 1) < (MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length)))
+    {
       *EndIndex = Index;
       return EFI_SUCCESS;
     }
   }
+
   return EFI_NOT_FOUND;
 }
-
 
 /**
   Sets the attributes for a specified range in Gcd Memory Space Map.
@@ -88,14 +91,21 @@ SetGcdMemorySpaceAttributes (
   EFI_PHYSICAL_ADDRESS  RegionStart;
   UINT64                RegionLength;
 
-  DEBUG ((DEBUG_GCD, "SetGcdMemorySpaceAttributes[0x%lX; 0x%lX] = 0x%lX\n",
-      BaseAddress, BaseAddress + Length, Attributes));
+  DEBUG ((
+    DEBUG_GCD,
+    "SetGcdMemorySpaceAttributes[0x%lX; 0x%lX] = 0x%lX\n",
+    BaseAddress,
+    BaseAddress + Length,
+    Attributes
+    ));
 
   // We do not support a smaller granularity than 4KB on ARM Architecture
   if ((Length & EFI_PAGE_MASK) != 0) {
-    DEBUG ((DEBUG_WARN,
-            "Warning: We do not support smaller granularity than 4KB on ARM Architecture (passed length: 0x%lX).\n",
-            Length));
+    DEBUG ((
+      DEBUG_WARN,
+      "Warning: We do not support smaller granularity than 4KB on ARM Architecture (passed length: 0x%lX).\n",
+      Length
+      ));
   }
 
   //
@@ -120,6 +130,7 @@ SetGcdMemorySpaceAttributes (
     if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
       continue;
     }
+
     //
     // Calculate the start and end address of the overlapping range
     //
@@ -128,11 +139,13 @@ SetGcdMemorySpaceAttributes (
     } else {
       RegionStart = MemorySpaceMap[Index].BaseAddress;
     }
+
     if ((BaseAddress + Length - 1) < (MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length)) {
       RegionLength = BaseAddress + Length - RegionStart;
     } else {
       RegionLength = MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length - RegionStart;
     }
+
     //
     // Set memory attributes according to MTRR attribute and the original attribute of descriptor
     //

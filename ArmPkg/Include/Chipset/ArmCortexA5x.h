@@ -12,7 +12,7 @@
 //
 // Cortex A5x feature bit definitions
 //
-#define A5X_FEATURE_SMP     (1 << 6)
+#define A5X_FEATURE_SMP  (1 << 6)
 
 //
 // Helper functions to access CPU Extended Control Register
