@@ -28,6 +28,7 @@ ReportPrint (
   } else {
     DEBUG ((DEBUG_INFO, String));
   }
+
   VA_END (Marker);
 }
 
