@@ -236,11 +236,11 @@ AcpiS3ContextSaveOnEndOfDxe (
   EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs;
   VOID                                          *Interface;
 
-  DEBUG ((EFI_D_INFO, "AcpiS3ContextSave!\n"));
+  DEBUG ((DEBUG_INFO, "AcpiS3ContextSave!\n"));
 
   Status = gBS->LocateProtocol (&gEfiLockBoxProtocolGuid, NULL, &Interface);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO | EFI_D_WARN, "ACPI S3 context can't be saved without LockBox!\n"));
+    DEBUG ((DEBUG_INFO | DEBUG_WARN, "ACPI S3 context can't be saved without LockBox!\n"));
     goto Done;
   }
 
@@ -291,12 +291,12 @@ AcpiS3ContextSaveOnEndOfDxe (
   AcpiS3Context->S3DebugBufferAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateMemoryBelow4G (EfiReservedMemoryType, EFI_PAGE_SIZE);
   SetMem ((VOID *)(UINTN)AcpiS3Context->S3DebugBufferAddress, EFI_PAGE_SIZE, 0xff);
 
-  DEBUG((EFI_D_INFO, "AcpiS3Context: AcpiFacsTable is 0x%8x\n", AcpiS3Context->AcpiFacsTable));
-  DEBUG((EFI_D_INFO, "AcpiS3Context: IdtrProfile is 0x%8x\n", AcpiS3Context->IdtrProfile));
-  DEBUG((EFI_D_INFO, "AcpiS3Context: S3NvsPageTableAddress is 0x%8x\n", AcpiS3Context->S3NvsPageTableAddress));
-  DEBUG((EFI_D_INFO, "AcpiS3Context: S3DebugBufferAddress is 0x%8x\n", AcpiS3Context->S3DebugBufferAddress));
-  DEBUG((EFI_D_INFO, "AcpiS3Context: BootScriptStackBase is 0x%8x\n", AcpiS3Context->BootScriptStackBase));
-  DEBUG((EFI_D_INFO, "AcpiS3Context: BootScriptStackSize is 0x%8x\n", AcpiS3Context->BootScriptStackSize));
+  DEBUG((DEBUG_INFO, "AcpiS3Context: AcpiFacsTable is 0x%8x\n", AcpiS3Context->AcpiFacsTable));
+  DEBUG((DEBUG_INFO, "AcpiS3Context: IdtrProfile is 0x%8x\n", AcpiS3Context->IdtrProfile));
+  DEBUG((DEBUG_INFO, "AcpiS3Context: S3NvsPageTableAddress is 0x%8x\n", AcpiS3Context->S3NvsPageTableAddress));
+  DEBUG((DEBUG_INFO, "AcpiS3Context: S3DebugBufferAddress is 0x%8x\n", AcpiS3Context->S3DebugBufferAddress));
+  DEBUG((DEBUG_INFO, "AcpiS3Context: BootScriptStackBase is 0x%8x\n", AcpiS3Context->BootScriptStackBase));
+  DEBUG((DEBUG_INFO, "AcpiS3Context: BootScriptStackSize is 0x%8x\n", AcpiS3Context->BootScriptStackSize));
 
   Status = SaveLockBox (
              &gEfiAcpiVariableGuid,
@@ -322,4 +322,3 @@ Done:
   Status = gBS->CloseEvent (Event);
   ASSERT_EFI_ERROR (Status);
 }
-

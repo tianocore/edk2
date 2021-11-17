@@ -380,7 +380,7 @@ GroupMultipleLegacyBootOption4SameType (
       //
       // Legacy Boot Option
       //
-      DEBUG ((EFI_D_ERROR, "[BootManagerDxe] ==== Find Legacy Boot Option  0x%x! ==== \n", Index));
+      DEBUG ((DEBUG_ERROR, "[BootManagerDxe] ==== Find Legacy Boot Option  0x%x! ==== \n", Index));
       ASSERT ((((BBS_BBS_DEVICE_PATH *) BootOption.FilePath)->DeviceType & 0xF) < ARRAY_SIZE (DeviceTypeIndex));
       NextIndex = &DeviceTypeIndex[((BBS_BBS_DEVICE_PATH *) BootOption.FilePath)->DeviceType & 0xF];
 
@@ -926,4 +926,3 @@ BootManagerUiLibDestructor (
 
   return EFI_SUCCESS;
 }
-

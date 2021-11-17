@@ -66,7 +66,7 @@ CoreInitializeDebugImageInfoTable (
              );
   if (EFI_ERROR (Status)) {
     if (PcdGet64 (PcdMaxEfiSystemTablePointerAddress) != 0) {
-      DEBUG ((EFI_D_INFO, "Allocate memory for EFI_SYSTEM_TABLE_POINTER below PcdMaxEfiSystemTablePointerAddress failed. \
+      DEBUG ((DEBUG_INFO, "Allocate memory for EFI_SYSTEM_TABLE_POINTER below PcdMaxEfiSystemTablePointerAddress failed. \
                           Retry to allocate memroy as close to the top of memory as feasible.\n"));
     }
     //
@@ -278,5 +278,3 @@ CoreRemoveDebugImageInfoEntry (
   }
   mDebugInfoTableHeader.UpdateStatus &= ~EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
 }
-
-

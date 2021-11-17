@@ -503,7 +503,7 @@ UsbHcAllocateMem (
   NewBlock = UsbHcAllocMemBlock (Pool, Pages);
 
   if (NewBlock == NULL) {
-    DEBUG ((EFI_D_ERROR, "UsbHcAllocateMem: failed to allocate block\n"));
+    DEBUG ((DEBUG_ERROR, "UsbHcAllocateMem: failed to allocate block\n"));
     return NULL;
   }
 

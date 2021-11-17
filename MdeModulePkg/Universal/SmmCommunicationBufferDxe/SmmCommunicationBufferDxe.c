@@ -71,16 +71,16 @@ SmmCommunicationBufferEntryPoint (
   Entry->NumberOfPages = DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES;
   Entry->Attribute     = 0;
 
-  DEBUG ((EFI_D_INFO, "PiSmmCommunicationRegionTable:(0x%x)\n", PiSmmCommunicationRegionTable));
-  DEBUG ((EFI_D_INFO, "  Version         - 0x%x\n", PiSmmCommunicationRegionTable->Version));
-  DEBUG ((EFI_D_INFO, "  NumberOfEntries - 0x%x\n", PiSmmCommunicationRegionTable->NumberOfEntries));
-  DEBUG ((EFI_D_INFO, "  DescriptorSize  - 0x%x\n", PiSmmCommunicationRegionTable->DescriptorSize));
-  DEBUG ((EFI_D_INFO, "Entry:(0x%x)\n", Entry));
-  DEBUG ((EFI_D_INFO, "  Type            - 0x%x\n", Entry->Type));
-  DEBUG ((EFI_D_INFO, "  PhysicalStart   - 0x%lx\n", Entry->PhysicalStart));
-  DEBUG ((EFI_D_INFO, "  VirtualStart    - 0x%lx\n", Entry->VirtualStart));
-  DEBUG ((EFI_D_INFO, "  NumberOfPages   - 0x%lx\n", Entry->NumberOfPages));
-  DEBUG ((EFI_D_INFO, "  Attribute       - 0x%lx\n", Entry->Attribute));
+  DEBUG ((DEBUG_INFO, "PiSmmCommunicationRegionTable:(0x%x)\n", PiSmmCommunicationRegionTable));
+  DEBUG ((DEBUG_INFO, "  Version         - 0x%x\n", PiSmmCommunicationRegionTable->Version));
+  DEBUG ((DEBUG_INFO, "  NumberOfEntries - 0x%x\n", PiSmmCommunicationRegionTable->NumberOfEntries));
+  DEBUG ((DEBUG_INFO, "  DescriptorSize  - 0x%x\n", PiSmmCommunicationRegionTable->DescriptorSize));
+  DEBUG ((DEBUG_INFO, "Entry:(0x%x)\n", Entry));
+  DEBUG ((DEBUG_INFO, "  Type            - 0x%x\n", Entry->Type));
+  DEBUG ((DEBUG_INFO, "  PhysicalStart   - 0x%lx\n", Entry->PhysicalStart));
+  DEBUG ((DEBUG_INFO, "  VirtualStart    - 0x%lx\n", Entry->VirtualStart));
+  DEBUG ((DEBUG_INFO, "  NumberOfPages   - 0x%lx\n", Entry->NumberOfPages));
+  DEBUG ((DEBUG_INFO, "  Attribute       - 0x%lx\n", Entry->Attribute));
 
   //
   // Publish this table, so that other driver can use the buffer.

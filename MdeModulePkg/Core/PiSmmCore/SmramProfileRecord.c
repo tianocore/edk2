@@ -676,7 +676,7 @@ SmramProfileInit (
 
   RegisterSmmCore (&mSmramProfileContext);
 
-  DEBUG ((EFI_D_INFO, "SmramProfileInit SmramProfileContext - 0x%x\n", &mSmramProfileContext));
+  DEBUG ((DEBUG_INFO, "SmramProfileInit SmramProfileContext - 0x%x\n", &mSmramProfileContext));
 }
 
 /**
@@ -1530,7 +1530,7 @@ SmramProfileReadyToLock (
     return;
   }
 
-  DEBUG ((EFI_D_INFO, "SmramProfileReadyToLock\n"));
+  DEBUG ((DEBUG_INFO, "SmramProfileReadyToLock\n"));
   mSmramReadyToLock = TRUE;
 }
 
@@ -2168,7 +2168,7 @@ SmramProfileHandlerGetData (
   // Sanity check
   //
   if (!SmmIsBufferOutsideSmmValid ((UINTN) SmramProfileGetData.ProfileBuffer, (UINTN) ProfileSize)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetData: SMM ProfileBuffer in SMRAM or overflow!\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetData: SMM ProfileBuffer in SMRAM or overflow!\n"));
     SmramProfileParameterGetData->ProfileSize = ProfileSize;
     SmramProfileParameterGetData->Header.ReturnStatus = (UINT64) (INT64) (INTN) EFI_ACCESS_DENIED;
     goto Done;
@@ -2219,7 +2219,7 @@ SmramProfileHandlerGetDataByOffset (
   // Sanity check
   //
   if (!SmmIsBufferOutsideSmmValid ((UINTN) SmramProfileGetDataByOffset.ProfileBuffer, (UINTN) SmramProfileGetDataByOffset.ProfileSize)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetDataByOffset: SMM ProfileBuffer in SMRAM or overflow!\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetDataByOffset: SMM ProfileBuffer in SMRAM or overflow!\n"));
     SmramProfileParameterGetDataByOffset->Header.ReturnStatus = (UINT64) (INT64) (INTN) EFI_ACCESS_DENIED;
     goto Done;
   }
@@ -2261,7 +2261,7 @@ SmramProfileHandler (
   UINTN                                    TempCommBufferSize;
   SMRAM_PROFILE_PARAMETER_RECORDING_STATE  *ParameterRecordingState;
 
-  DEBUG ((EFI_D_ERROR, "SmramProfileHandler Enter\n"));
+  DEBUG ((DEBUG_ERROR, "SmramProfileHandler Enter\n"));
 
   //
   // If input is invalid, stop processing this SMI
@@ -2273,12 +2273,12 @@ SmramProfileHandler (
   TempCommBufferSize = *CommBufferSize;
 
   if (TempCommBufferSize < sizeof (SMRAM_PROFILE_PARAMETER_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
     return EFI_SUCCESS;
   }
 
   if (mSmramReadyToLock && !SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer in SMRAM or overflow!\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
 
@@ -2293,33 +2293,33 @@ SmramProfileHandler (
 
   switch (SmramProfileParameterHeader->Command) {
   case SMRAM_PROFILE_COMMAND_GET_PROFILE_INFO:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetInfo\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetInfo\n"));
     if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+      DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
       return EFI_SUCCESS;
     }
     SmramProfileHandlerGetInfo ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_INFO *) (UINTN) CommBuffer);
     break;
   case SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetData\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetData\n"));
     if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+      DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
       return EFI_SUCCESS;
     }
     SmramProfileHandlerGetData ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA *) (UINTN) CommBuffer);
     break;
   case SMRAM_PROFILE_COMMAND_GET_PROFILE_DATA_BY_OFFSET:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetDataByOffset\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetDataByOffset\n"));
     if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+      DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
       return EFI_SUCCESS;
     }
     SmramProfileHandlerGetDataByOffset ((SMRAM_PROFILE_PARAMETER_GET_PROFILE_DATA_BY_OFFSET *) (UINTN) CommBuffer);
     break;
   case SMRAM_PROFILE_COMMAND_GET_RECORDING_STATE:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerGetRecordingState\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandlerGetRecordingState\n"));
     if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_RECORDING_STATE)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+      DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
       return EFI_SUCCESS;
     }
     ParameterRecordingState = (SMRAM_PROFILE_PARAMETER_RECORDING_STATE *) (UINTN) CommBuffer;
@@ -2327,9 +2327,9 @@ SmramProfileHandler (
     ParameterRecordingState->Header.ReturnStatus = 0;
     break;
   case SMRAM_PROFILE_COMMAND_SET_RECORDING_STATE:
-    DEBUG ((EFI_D_ERROR, "SmramProfileHandlerSetRecordingState\n"));
+    DEBUG ((DEBUG_ERROR, "SmramProfileHandlerSetRecordingState\n"));
     if (TempCommBufferSize != sizeof (SMRAM_PROFILE_PARAMETER_RECORDING_STATE)) {
-      DEBUG ((EFI_D_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
+      DEBUG ((DEBUG_ERROR, "SmramProfileHandler: SMM communication buffer size invalid!\n"));
       return EFI_SUCCESS;
     }
     ParameterRecordingState = (SMRAM_PROFILE_PARAMETER_RECORDING_STATE *) (UINTN) CommBuffer;
@@ -2350,7 +2350,7 @@ SmramProfileHandler (
     break;
   }
 
-  DEBUG ((EFI_D_ERROR, "SmramProfileHandler Exit\n"));
+  DEBUG ((DEBUG_ERROR, "SmramProfileHandler Exit\n"));
 
   return EFI_SUCCESS;
 }
@@ -2402,20 +2402,20 @@ DumpSmramRange (
   SmramProfileGettingStatus = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
 
-  DEBUG ((EFI_D_INFO, "FullSmramRange address - 0x%08x\n", mFullSmramRanges));
+  DEBUG ((DEBUG_INFO, "FullSmramRange address - 0x%08x\n", mFullSmramRanges));
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile begin =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile begin =======\n"));
 
-  DEBUG ((EFI_D_INFO, "FullSmramRange:\n"));
+  DEBUG ((DEBUG_INFO, "FullSmramRange:\n"));
   for (Index = 0; Index < mFullSmramRangeCount; Index++) {
-    DEBUG ((EFI_D_INFO, "  FullSmramRange (0x%x)\n", Index));
-    DEBUG ((EFI_D_INFO, "    PhysicalStart      - 0x%016lx\n", mFullSmramRanges[Index].PhysicalStart));
-    DEBUG ((EFI_D_INFO, "    CpuStart           - 0x%016lx\n", mFullSmramRanges[Index].CpuStart));
-    DEBUG ((EFI_D_INFO, "    PhysicalSize       - 0x%016lx\n", mFullSmramRanges[Index].PhysicalSize));
-    DEBUG ((EFI_D_INFO, "    RegionState        - 0x%016lx\n", mFullSmramRanges[Index].RegionState));
+    DEBUG ((DEBUG_INFO, "  FullSmramRange (0x%x)\n", Index));
+    DEBUG ((DEBUG_INFO, "    PhysicalStart      - 0x%016lx\n", mFullSmramRanges[Index].PhysicalStart));
+    DEBUG ((DEBUG_INFO, "    CpuStart           - 0x%016lx\n", mFullSmramRanges[Index].CpuStart));
+    DEBUG ((DEBUG_INFO, "    PhysicalSize       - 0x%016lx\n", mFullSmramRanges[Index].PhysicalSize));
+    DEBUG ((DEBUG_INFO, "    RegionState        - 0x%016lx\n", mFullSmramRanges[Index].RegionState));
   }
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile end =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile end =======\n"));
 
   mSmramProfileGettingStatus = SmramProfileGettingStatus;
 }
@@ -2444,20 +2444,20 @@ DumpFreePagesList (
   SmramProfileGettingStatus = mSmramProfileGettingStatus;
   mSmramProfileGettingStatus = TRUE;
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile begin =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile begin =======\n"));
 
-  DEBUG ((EFI_D_INFO, "FreePagesList:\n"));
+  DEBUG ((DEBUG_INFO, "FreePagesList:\n"));
   FreePageList = &mSmmMemoryMap;
   for (Node = FreePageList->BackLink, Index = 0;
        Node != FreePageList;
        Node = Node->BackLink, Index++) {
     Pages = BASE_CR (Node, FREE_PAGE_LIST, Link);
-    DEBUG ((EFI_D_INFO, "  Index - 0x%x\n", Index));
-    DEBUG ((EFI_D_INFO, "    PhysicalStart - 0x%016lx\n", (PHYSICAL_ADDRESS) (UINTN) Pages));
-    DEBUG ((EFI_D_INFO, "    NumberOfPages - 0x%08x\n", Pages->NumberOfPages));
+    DEBUG ((DEBUG_INFO, "  Index - 0x%x\n", Index));
+    DEBUG ((DEBUG_INFO, "    PhysicalStart - 0x%016lx\n", (PHYSICAL_ADDRESS) (UINTN) Pages));
+    DEBUG ((DEBUG_INFO, "    NumberOfPages - 0x%08x\n", Pages->NumberOfPages));
   }
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile end =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile end =======\n"));
 
   mSmramProfileGettingStatus = SmramProfileGettingStatus;
 }
@@ -2646,21 +2646,21 @@ DumpSmramProfile (
   mSmramProfileGettingStatus = TRUE;
 
   Context = &ContextData->Context;
-  DEBUG ((EFI_D_INFO, "======= SmramProfile begin =======\n"));
-  DEBUG ((EFI_D_INFO, "MEMORY_PROFILE_CONTEXT\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile begin =======\n"));
+  DEBUG ((DEBUG_INFO, "MEMORY_PROFILE_CONTEXT\n"));
 
-  DEBUG ((EFI_D_INFO, "  CurrentTotalUsage     - 0x%016lx\n", Context->CurrentTotalUsage));
-  DEBUG ((EFI_D_INFO, "  PeakTotalUsage        - 0x%016lx\n", Context->PeakTotalUsage));
+  DEBUG ((DEBUG_INFO, "  CurrentTotalUsage     - 0x%016lx\n", Context->CurrentTotalUsage));
+  DEBUG ((DEBUG_INFO, "  PeakTotalUsage        - 0x%016lx\n", Context->PeakTotalUsage));
   for (TypeIndex = 0; TypeIndex < sizeof (Context->CurrentTotalUsageByType) / sizeof (Context->CurrentTotalUsageByType[0]); TypeIndex++) {
     if ((Context->CurrentTotalUsageByType[TypeIndex] != 0) ||
         (Context->PeakTotalUsageByType[TypeIndex] != 0)) {
-      DEBUG ((EFI_D_INFO, "  CurrentTotalUsage[0x%02x]  - 0x%016lx (%a)\n", TypeIndex, Context->CurrentTotalUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
-      DEBUG ((EFI_D_INFO, "  PeakTotalUsage[0x%02x]     - 0x%016lx (%a)\n", TypeIndex, Context->PeakTotalUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
+      DEBUG ((DEBUG_INFO, "  CurrentTotalUsage[0x%02x]  - 0x%016lx (%a)\n", TypeIndex, Context->CurrentTotalUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
+      DEBUG ((DEBUG_INFO, "  PeakTotalUsage[0x%02x]     - 0x%016lx (%a)\n", TypeIndex, Context->PeakTotalUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
     }
   }
-  DEBUG ((EFI_D_INFO, "  TotalImageSize        - 0x%016lx\n", Context->TotalImageSize));
-  DEBUG ((EFI_D_INFO, "  ImageCount            - 0x%08x\n", Context->ImageCount));
-  DEBUG ((EFI_D_INFO, "  SequenceCount         - 0x%08x\n", Context->SequenceCount));
+  DEBUG ((DEBUG_INFO, "  TotalImageSize        - 0x%016lx\n", Context->TotalImageSize));
+  DEBUG ((DEBUG_INFO, "  ImageCount            - 0x%08x\n", Context->ImageCount));
+  DEBUG ((DEBUG_INFO, "  SequenceCount         - 0x%08x\n", Context->SequenceCount));
 
   SmramDriverInfoList = ContextData->DriverInfoList;
   for (DriverLink = SmramDriverInfoList->ForwardLink, DriverIndex = 0;
@@ -2673,23 +2673,23 @@ DumpSmramProfile (
                    MEMORY_PROFILE_DRIVER_INFO_SIGNATURE
                    );
     DriverInfo = &DriverInfoData->DriverInfo;
-    DEBUG ((EFI_D_INFO, "  MEMORY_PROFILE_DRIVER_INFO (0x%x)\n", DriverIndex));
-    DEBUG ((EFI_D_INFO, "    FileName            - %g\n", &DriverInfo->FileName));
-    DEBUG ((EFI_D_INFO, "    ImageBase           - 0x%016lx\n", DriverInfo->ImageBase));
-    DEBUG ((EFI_D_INFO, "    ImageSize           - 0x%016lx\n", DriverInfo->ImageSize));
-    DEBUG ((EFI_D_INFO, "    EntryPoint          - 0x%016lx\n", DriverInfo->EntryPoint));
-    DEBUG ((EFI_D_INFO, "    ImageSubsystem      - 0x%04x\n", DriverInfo->ImageSubsystem));
-    DEBUG ((EFI_D_INFO, "    FileType            - 0x%02x\n", DriverInfo->FileType));
-    DEBUG ((EFI_D_INFO, "    CurrentUsage        - 0x%016lx\n", DriverInfo->CurrentUsage));
-    DEBUG ((EFI_D_INFO, "    PeakUsage           - 0x%016lx\n", DriverInfo->PeakUsage));
+    DEBUG ((DEBUG_INFO, "  MEMORY_PROFILE_DRIVER_INFO (0x%x)\n", DriverIndex));
+    DEBUG ((DEBUG_INFO, "    FileName            - %g\n", &DriverInfo->FileName));
+    DEBUG ((DEBUG_INFO, "    ImageBase           - 0x%016lx\n", DriverInfo->ImageBase));
+    DEBUG ((DEBUG_INFO, "    ImageSize           - 0x%016lx\n", DriverInfo->ImageSize));
+    DEBUG ((DEBUG_INFO, "    EntryPoint          - 0x%016lx\n", DriverInfo->EntryPoint));
+    DEBUG ((DEBUG_INFO, "    ImageSubsystem      - 0x%04x\n", DriverInfo->ImageSubsystem));
+    DEBUG ((DEBUG_INFO, "    FileType            - 0x%02x\n", DriverInfo->FileType));
+    DEBUG ((DEBUG_INFO, "    CurrentUsage        - 0x%016lx\n", DriverInfo->CurrentUsage));
+    DEBUG ((DEBUG_INFO, "    PeakUsage           - 0x%016lx\n", DriverInfo->PeakUsage));
     for (TypeIndex = 0; TypeIndex < sizeof (DriverInfo->CurrentUsageByType) / sizeof (DriverInfo->CurrentUsageByType[0]); TypeIndex++) {
       if ((DriverInfo->CurrentUsageByType[TypeIndex] != 0) ||
           (DriverInfo->PeakUsageByType[TypeIndex] != 0)) {
-        DEBUG ((EFI_D_INFO, "    CurrentUsage[0x%02x]     - 0x%016lx (%a)\n", TypeIndex, DriverInfo->CurrentUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
-        DEBUG ((EFI_D_INFO, "    PeakUsage[0x%02x]        - 0x%016lx (%a)\n", TypeIndex, DriverInfo->PeakUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
+        DEBUG ((DEBUG_INFO, "    CurrentUsage[0x%02x]     - 0x%016lx (%a)\n", TypeIndex, DriverInfo->CurrentUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
+        DEBUG ((DEBUG_INFO, "    PeakUsage[0x%02x]        - 0x%016lx (%a)\n", TypeIndex, DriverInfo->PeakUsageByType[TypeIndex], ProfileMemoryTypeToStr (TypeIndex)));
       }
     }
-    DEBUG ((EFI_D_INFO, "    AllocRecordCount    - 0x%08x\n", DriverInfo->AllocRecordCount));
+    DEBUG ((DEBUG_INFO, "    AllocRecordCount    - 0x%08x\n", DriverInfo->AllocRecordCount));
 
     AllocInfoList = DriverInfoData->AllocInfoList;
     for (AllocLink = AllocInfoList->ForwardLink, AllocIndex = 0;
@@ -2702,25 +2702,25 @@ DumpSmramProfile (
                      MEMORY_PROFILE_ALLOC_INFO_SIGNATURE
                      );
       AllocInfo = &AllocInfoData->AllocInfo;
-      DEBUG ((EFI_D_INFO, "    MEMORY_PROFILE_ALLOC_INFO (0x%x)\n", AllocIndex));
-      DEBUG ((EFI_D_INFO, "      CallerAddress  - 0x%016lx (Offset: 0x%08x)\n", AllocInfo->CallerAddress, AllocInfo->CallerAddress - DriverInfo->ImageBase));
-      DEBUG ((EFI_D_INFO, "      SequenceId     - 0x%08x\n", AllocInfo->SequenceId));
+      DEBUG ((DEBUG_INFO, "    MEMORY_PROFILE_ALLOC_INFO (0x%x)\n", AllocIndex));
+      DEBUG ((DEBUG_INFO, "      CallerAddress  - 0x%016lx (Offset: 0x%08x)\n", AllocInfo->CallerAddress, AllocInfo->CallerAddress - DriverInfo->ImageBase));
+      DEBUG ((DEBUG_INFO, "      SequenceId     - 0x%08x\n", AllocInfo->SequenceId));
       if ((AllocInfo->Action & MEMORY_PROFILE_ACTION_USER_DEFINED_MASK) != 0) {
         if (AllocInfoData->ActionString != NULL) {
-          DEBUG ((EFI_D_INFO, "      Action         - 0x%08x (%a)\n", AllocInfo->Action, AllocInfoData->ActionString));
+          DEBUG ((DEBUG_INFO, "      Action         - 0x%08x (%a)\n", AllocInfo->Action, AllocInfoData->ActionString));
         } else {
-          DEBUG ((EFI_D_INFO, "      Action         - 0x%08x (UserDefined-0x%08x)\n", AllocInfo->Action, AllocInfo->Action));
+          DEBUG ((DEBUG_INFO, "      Action         - 0x%08x (UserDefined-0x%08x)\n", AllocInfo->Action, AllocInfo->Action));
         }
       } else {
-        DEBUG ((EFI_D_INFO, "      Action         - 0x%08x (%a)\n", AllocInfo->Action, ProfileActionToStr (AllocInfo->Action)));
+        DEBUG ((DEBUG_INFO, "      Action         - 0x%08x (%a)\n", AllocInfo->Action, ProfileActionToStr (AllocInfo->Action)));
       }
-      DEBUG ((EFI_D_INFO, "      MemoryType     - 0x%08x (%a)\n", AllocInfo->MemoryType, ProfileMemoryTypeToStr (AllocInfo->MemoryType)));
-      DEBUG ((EFI_D_INFO, "      Buffer         - 0x%016lx\n", AllocInfo->Buffer));
-      DEBUG ((EFI_D_INFO, "      Size           - 0x%016lx\n", AllocInfo->Size));
+      DEBUG ((DEBUG_INFO, "      MemoryType     - 0x%08x (%a)\n", AllocInfo->MemoryType, ProfileMemoryTypeToStr (AllocInfo->MemoryType)));
+      DEBUG ((DEBUG_INFO, "      Buffer         - 0x%016lx\n", AllocInfo->Buffer));
+      DEBUG ((DEBUG_INFO, "      Size           - 0x%016lx\n", AllocInfo->Size));
     }
   }
 
-  DEBUG ((EFI_D_INFO, "======= SmramProfile end =======\n"));
+  DEBUG ((DEBUG_INFO, "======= SmramProfile end =======\n"));
 
   mSmramProfileGettingStatus = SmramProfileGettingStatus;
 }
@@ -2743,4 +2743,3 @@ DumpSmramInfo (
     }
   );
 }
-

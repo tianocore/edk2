@@ -280,7 +280,7 @@ VarCheckLibRegisterEndOfDxeCallback (
            (UINTN) Callback
            );
 
-  DEBUG ((EFI_D_INFO, "VarCheckLibRegisterEndOfDxeCallback - 0x%x %r\n", Callback, Status));
+  DEBUG ((DEBUG_INFO, "VarCheckLibRegisterEndOfDxeCallback - 0x%x %r\n", Callback, Status));
 
   return Status;
 }
@@ -412,7 +412,7 @@ VarCheckLibRegisterAddressPointer (
            (UINTN) AddressPointer
            );
 
-  DEBUG ((EFI_D_INFO, "VarCheckLibRegisterAddressPointer - 0x%x %r\n", AddressPointer, Status));
+  DEBUG ((DEBUG_INFO, "VarCheckLibRegisterAddressPointer - 0x%x %r\n", AddressPointer, Status));
 
   return Status;
 }
@@ -454,7 +454,7 @@ VarCheckLibRegisterSetVariableCheckHandler (
              (UINTN) Handler
              );
 
-  DEBUG ((EFI_D_INFO, "VarCheckLibRegisterSetVariableCheckHandler - 0x%x %r\n", Handler, Status));
+  DEBUG ((DEBUG_INFO, "VarCheckLibRegisterSetVariableCheckHandler - 0x%x %r\n", Handler, Status));
 
   return Status;
 }
@@ -627,7 +627,7 @@ VarCheckLibSetVariableCheck (
   //
   if ((Property != NULL) && (Property->Revision == VAR_CHECK_VARIABLE_PROPERTY_REVISION)) {
     if ((RequestSource != VarCheckFromTrusted) && ((Property->Property & VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY) != 0)) {
-      DEBUG ((EFI_D_INFO, "Variable Check ReadOnly variable fail %r - %g:%s\n", EFI_WRITE_PROTECTED, VendorGuid, VariableName));
+      DEBUG ((DEBUG_INFO, "Variable Check ReadOnly variable fail %r - %g:%s\n", EFI_WRITE_PROTECTED, VendorGuid, VariableName));
       return EFI_WRITE_PROTECTED;
     }
     if (!((((Attributes & EFI_VARIABLE_APPEND_WRITE) == 0) && (DataSize == 0)) || (Attributes == 0))) {
@@ -635,12 +635,12 @@ VarCheckLibSetVariableCheck (
       // Not to delete variable.
       //
       if ((Property->Attributes != 0) && ((Attributes & (~EFI_VARIABLE_APPEND_WRITE)) != Property->Attributes)) {
-        DEBUG ((EFI_D_INFO, "Variable Check Attributes(0x%08x to 0x%08x) fail %r - %g:%s\n", Property->Attributes, Attributes, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
+        DEBUG ((DEBUG_INFO, "Variable Check Attributes(0x%08x to 0x%08x) fail %r - %g:%s\n", Property->Attributes, Attributes, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
         return EFI_INVALID_PARAMETER;
       }
       if (DataSize != 0) {
         if ((DataSize < Property->MinSize) || (DataSize > Property->MaxSize)) {
-          DEBUG ((EFI_D_INFO, "Variable Check DataSize fail(0x%x not in 0x%x - 0x%x) %r - %g:%s\n", DataSize, Property->MinSize, Property->MaxSize, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
+          DEBUG ((DEBUG_INFO, "Variable Check DataSize fail(0x%x not in 0x%x - 0x%x) %r - %g:%s\n", DataSize, Property->MinSize, Property->MaxSize, EFI_INVALID_PARAMETER, VendorGuid, VariableName));
           return EFI_INVALID_PARAMETER;
         }
       }
@@ -663,7 +663,7 @@ VarCheckLibSetVariableCheck (
       continue;
     }
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "Variable Check handler fail %r - %g:%s\n", Status, VendorGuid, VariableName));
+      DEBUG ((DEBUG_INFO, "Variable Check handler fail %r - %g:%s\n", Status, VendorGuid, VariableName));
       return Status;
     }
   }

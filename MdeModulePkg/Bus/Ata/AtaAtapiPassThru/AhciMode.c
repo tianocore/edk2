@@ -1723,7 +1723,7 @@ AhciAtaSmartReturnStatusCheck (
       //
       // The threshold exceeded condition is not detected by the device
       //
-      DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is not detected\n"));
+      DEBUG ((DEBUG_INFO, "The S.M.A.R.T threshold exceeded condition is not detected\n"));
       REPORT_STATUS_CODE (
             EFI_PROGRESS_CODE,
             (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_UNDERTHRESHOLD)
@@ -1732,7 +1732,7 @@ AhciAtaSmartReturnStatusCheck (
       //
       // The threshold exceeded condition is detected by the device
       //
-      DEBUG ((EFI_D_INFO, "The S.M.A.R.T threshold exceeded condition is detected\n"));
+      DEBUG ((DEBUG_INFO, "The S.M.A.R.T threshold exceeded condition is detected\n"));
       REPORT_STATUS_CODE (
            EFI_PROGRESS_CODE,
            (EFI_IO_BUS_ATA_ATAPI | EFI_IOB_ATA_BUS_SMART_OVERTHRESHOLD)
@@ -1775,7 +1775,7 @@ AhciAtaSmartSupport (
     //
     // S.M.A.R.T is not supported by the device
     //
-    DEBUG ((EFI_D_INFO, "S.M.A.R.T feature is not supported at port [%d] PortMultiplier [%d]!\n",
+    DEBUG ((DEBUG_INFO, "S.M.A.R.T feature is not supported at port [%d] PortMultiplier [%d]!\n",
             Port, PortMultiplier));
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
@@ -1851,7 +1851,7 @@ AhciAtaSmartSupport (
       AtaStatusBlock
       );
 
-    DEBUG ((EFI_D_INFO, "Enabled S.M.A.R.T feature at port [%d] PortMultiplier [%d]!\n",
+    DEBUG ((DEBUG_INFO, "Enabled S.M.A.R.T feature at port [%d] PortMultiplier [%d]!\n",
             Port, PortMultiplier));
   }
 
@@ -2785,7 +2785,7 @@ AhciModeInitialization (
                       NULL
                       );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_WARN,
+      DEBUG ((DEBUG_WARN,
         "AhciModeInitialization: failed to enable 64-bit DMA on 64-bit capable controller (%r)\n",
         Status));
     }
@@ -2991,7 +2991,7 @@ AhciModeInitialization (
                           &SupportedModes
                           );
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Calculate Mode Fail, Status = %r\n", Status));
+        DEBUG ((DEBUG_ERROR, "Calculate Mode Fail, Status = %r\n", Status));
         continue;
       }
 
@@ -3022,7 +3022,7 @@ AhciModeInitialization (
 
       Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode), ATA_ATAPI_TIMEOUT);
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
+        DEBUG ((DEBUG_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
       }
 
@@ -3061,4 +3061,3 @@ AhciModeInitialization (
 
   return EFI_SUCCESS;
 }
-
