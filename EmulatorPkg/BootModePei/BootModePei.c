@@ -69,7 +69,7 @@ Returns:
   EFI_STATUS    Status;
   EFI_BOOT_MODE BootMode;
 
-  DEBUG ((EFI_D_ERROR, "Emu Boot Mode PEIM Loaded\n"));
+  DEBUG ((DEBUG_ERROR, "Emu Boot Mode PEIM Loaded\n"));
 
   BootMode  = FixedPcdGet32 (PcdEmuBootMode);
 
