@@ -203,7 +203,7 @@ InitializeDebugAgent (
                       sizeof (EFI_VECTOR_HANDOFF_INFO) * mVectorHandoffInfoCount
                       );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "DebugAgent: Cannot install configuration table for persisted vector handoff info!\n"));
+      DEBUG ((DEBUG_ERROR, "DebugAgent: Cannot install configuration table for persisted vector handoff info!\n"));
       CpuDeadLoop ();
     }
     //
@@ -336,7 +336,7 @@ InitializeDebugAgent (
 
   case DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64:
     if (Context == NULL) {
-      DEBUG ((EFI_D_ERROR, "DebugAgent: Input parameter Context cannot be NULL!\n"));
+      DEBUG ((DEBUG_ERROR, "DebugAgent: Input parameter Context cannot be NULL!\n"));
       CpuDeadLoop ();
     } else {
       Ia32Idtr =  (IA32_DESCRIPTOR *) Context;
@@ -378,9 +378,8 @@ InitializeDebugAgent (
     // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this
     // Debug Agent library instance.
     //
-    DEBUG ((EFI_D_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
+    DEBUG ((DEBUG_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
     CpuDeadLoop ();
     break;
   }
 }
-

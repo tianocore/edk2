@@ -411,7 +411,7 @@ InitializeDebugAgent (
     //
     // If reaches here, it means Debug Port initialization failed.
     //
-    DEBUG ((EFI_D_ERROR, "Debug Agent: Debug port initialization failed.\n"));
+    DEBUG ((DEBUG_ERROR, "Debug Agent: Debug port initialization failed.\n"));
 
     break;
 
@@ -432,7 +432,7 @@ InitializeDebugAgent (
     //
     Status = PeiServicesInstallPpi (&mVectorHandoffInfoPpiList[0]);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to install Vector Handoff Info PPI!\n"));
+      DEBUG ((DEBUG_ERROR, "DebugAgent: Failed to install Vector Handoff Info PPI!\n"));
       CpuDeadLoop ();
     }
     //
@@ -464,7 +464,7 @@ InitializeDebugAgent (
                  &Address
                  );
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to allocate pages!\n"));
+        DEBUG ((DEBUG_ERROR, "DebugAgent: Failed to allocate pages!\n"));
         CpuDeadLoop ();
       }
       NewMailbox = (DEBUG_AGENT_MAILBOX *) (UINTN) Address;
@@ -494,14 +494,14 @@ InitializeDebugAgent (
 
   case DEBUG_AGENT_INIT_PEI:
     if (Context == NULL) {
-      DEBUG ((EFI_D_ERROR, "DebugAgent: Input parameter Context cannot be NULL!\n"));
+      DEBUG ((DEBUG_ERROR, "DebugAgent: Input parameter Context cannot be NULL!\n"));
       CpuDeadLoop ();
     }
     //
     // Check if Debug Agent has initialized before
     //
     if (IsDebugAgentInitialzed()) {
-      DEBUG ((EFI_D_WARN, "Debug Agent: It has already initialized in SEC Core!\n"));
+      DEBUG ((DEBUG_WARN, "Debug Agent: It has already initialized in SEC Core!\n"));
       break;
     }
     //
@@ -509,7 +509,7 @@ InitializeDebugAgent (
     //
     Status = PeiServicesInstallPpi (&mVectorHandoffInfoPpiList[0]);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to install Vector Handoff Info PPI!\n"));
+      DEBUG ((DEBUG_ERROR, "DebugAgent: Failed to install Vector Handoff Info PPI!\n"));
       CpuDeadLoop ();
     }
     //
@@ -521,7 +521,7 @@ InitializeDebugAgent (
     //
     Mailbox = AllocateZeroPool (sizeof (DEBUG_AGENT_MAILBOX));
     if (Mailbox == NULL) {
-      DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to allocate memory!\n"));
+      DEBUG ((DEBUG_ERROR, "DebugAgent: Failed to allocate memory!\n"));
       CpuDeadLoop ();
     } else {
       MailboxLocation = (UINT64)(UINTN)Mailbox;
@@ -550,7 +550,7 @@ InitializeDebugAgent (
     //
     Status = PeiServicesNotifyPpi (&mDebugAgentMemoryDiscoveredNotifyList[0]);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to register memory discovered callback function!\n"));
+      DEBUG ((DEBUG_ERROR, "DebugAgent: Failed to register memory discovered callback function!\n"));
       CpuDeadLoop ();
     }
     //
@@ -571,7 +571,7 @@ InitializeDebugAgent (
 
   case DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64:
     if (Context == NULL) {
-      DEBUG ((EFI_D_ERROR, "DebugAgent: Input parameter Context cannot be NULL!\n"));
+      DEBUG ((DEBUG_ERROR, "DebugAgent: Input parameter Context cannot be NULL!\n"));
       CpuDeadLoop ();
     } else {
       Ia32Idtr =  (IA32_DESCRIPTOR *) Context;
@@ -604,7 +604,7 @@ InitializeDebugAgent (
     // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this
     // Debug Agent library instance.
     //
-    DEBUG ((EFI_D_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
+    DEBUG ((DEBUG_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
     CpuDeadLoop ();
     break;
   }

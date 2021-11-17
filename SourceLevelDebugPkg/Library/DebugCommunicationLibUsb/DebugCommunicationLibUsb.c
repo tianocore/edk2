@@ -617,7 +617,7 @@ InitializeUsbDebugHardware (
   if (((MmioRead32((UINTN)&UsbDebugPortRegister->ControlStatus) & (USB_DEBUG_PORT_OWNER | USB_DEBUG_PORT_IN_USE))
        != (USB_DEBUG_PORT_OWNER | USB_DEBUG_PORT_IN_USE)) || (Handle->Initialized == USBDBG_RESET)) {
     DEBUG ((
-      EFI_D_INFO,
+      DEBUG_INFO,
       "UsbDbg: Need to reset the host controller. ControlStatus = %08x\n",
       MmioRead32((UINTN)&UsbDebugPortRegister->ControlStatus)
       ));
@@ -625,7 +625,7 @@ InitializeUsbDebugHardware (
     // If the host controller is halted, then reset and restart it.
     //
     if ((MmioRead32((UINTN)UsbStatus) & BIT12) != 0) {
-      DEBUG ((EFI_D_INFO, "UsbDbg: Reset the host controller.\n"));
+      DEBUG ((DEBUG_INFO, "UsbDbg: Reset the host controller.\n"));
       //
       // reset the host controller.
       //
@@ -662,7 +662,7 @@ InitializeUsbDebugHardware (
 
   if (Handle->Initialized != USBDBG_INIT_DONE ||
       (MmioRead32 ((UINTN) &UsbDebugPortRegister->ControlStatus) & USB_DEBUG_PORT_ENABLE) == 0) {
-    DEBUG ((EFI_D_INFO, "UsbDbg: Reset the debug port.\n"));
+    DEBUG ((DEBUG_INFO, "UsbDbg: Reset the debug port.\n"));
     //
     // Reset the debug port
     //
@@ -1058,7 +1058,7 @@ DebugPortInitialize (
 
   Status = CalculateUsbDebugPortBar(&Handle.DebugPortOffset, &Handle.DebugPortBarNumber);
   if (RETURN_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbDbg: the pci device pointed by PcdUsbEhciPciAddress is not EHCI host controller or does not support debug port capability!\n"));
+    DEBUG ((DEBUG_ERROR, "UsbDbg: the pci device pointed by PcdUsbEhciPciAddress is not EHCI host controller or does not support debug port capability!\n"));
     goto Exit;
   }
 
@@ -1085,10 +1085,10 @@ DebugPortInitialize (
   Handle.Initialized = USBDBG_RESET;
 
   if (NeedReinitializeHardware(&Handle)) {
-    DEBUG ((EFI_D_ERROR, "UsbDbg: Start EHCI debug port initialization!\n"));
+    DEBUG ((DEBUG_ERROR, "UsbDbg: Start EHCI debug port initialization!\n"));
     Status = InitializeUsbDebugHardware (&Handle);
     if (RETURN_ERROR(Status)) {
-      DEBUG ((EFI_D_ERROR, "UsbDbg: Failed, please check if USB debug cable is plugged into EHCI debug port correctly!\n"));
+      DEBUG ((DEBUG_ERROR, "UsbDbg: Failed, please check if USB debug cable is plugged into EHCI debug port correctly!\n"));
       goto Exit;
     }
   }
@@ -1103,4 +1103,3 @@ Exit:
 
   return (DEBUG_PORT_HANDLE)(UINTN)&mDebugCommunicationLibUsbDebugPortHandle;
 }
-
