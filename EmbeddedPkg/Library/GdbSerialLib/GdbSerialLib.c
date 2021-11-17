@@ -199,8 +199,8 @@ GdbGetChar (
 
   Char = IoRead8 (gPort);
 
-  // Make this an EFI_D_INFO after we get everything debugged.
-  DEBUG ((EFI_D_ERROR, "<%c<", Char));
+  // Make this an DEBUG_INFO after we get everything debugged.
+  DEBUG ((DEBUG_ERROR, "<%c<", Char));
   return Char;
 }
 
@@ -221,8 +221,8 @@ GdbPutChar (
 {
   UINT8   Data;
 
-  // Make this an EFI_D_INFO after we get everything debugged.
-  DEBUG ((EFI_D_ERROR, ">%c>", Char));
+  // Make this an DEBUG_INFO after we get everything debugged.
+  DEBUG ((DEBUG_ERROR, ">%c>", Char));
 
   // Wait for the serial port to be ready
   do {
@@ -250,7 +250,3 @@ GdbPutString (
     String++;
   }
 }
-
-
-
-

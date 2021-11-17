@@ -208,7 +208,7 @@ FindCompatibleNodeReg (
   }
 
   if ((*RegSize % 16) != 0) {
-    DEBUG ((EFI_D_ERROR,
+    DEBUG ((DEBUG_ERROR,
       "%a: '%a' compatible node has invalid 'reg' property (size == 0x%x)\n",
       __FUNCTION__, CompatibleString, *RegSize));
     return EFI_NOT_FOUND;
@@ -261,13 +261,13 @@ FindNextMemoryNodeReg (
       //
       Status = GetNodeProperty (This, Next, "reg", Reg, RegSize);
       if (EFI_ERROR (Status)) {
-        DEBUG ((EFI_D_WARN,
+        DEBUG ((DEBUG_WARN,
           "%a: ignoring memory node with no 'reg' property\n",
           __FUNCTION__));
         continue;
       }
       if ((*RegSize % 16) != 0) {
-        DEBUG ((EFI_D_WARN,
+        DEBUG ((DEBUG_WARN,
           "%a: ignoring memory node with invalid 'reg' property (size == 0x%x)\n",
           __FUNCTION__, *RegSize));
         continue;
@@ -391,14 +391,14 @@ InitializeFdtClientDxe (
   DeviceTreeBase = (VOID *)(UINTN)*(UINT64 *)GET_GUID_HOB_DATA (Hob);
 
   if (fdt_check_header (DeviceTreeBase) != 0) {
-    DEBUG ((EFI_D_ERROR, "%a: No DTB found @ 0x%p\n", __FUNCTION__,
+    DEBUG ((DEBUG_ERROR, "%a: No DTB found @ 0x%p\n", __FUNCTION__,
       DeviceTreeBase));
     return EFI_NOT_FOUND;
   }
 
   mDeviceTreeBase = DeviceTreeBase;
 
-  DEBUG ((EFI_D_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, mDeviceTreeBase));
+  DEBUG ((DEBUG_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, mDeviceTreeBase));
 
   //
   // Register a protocol notify for the EDKII Platform Has Device Tree
