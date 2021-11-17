@@ -73,7 +73,7 @@ InternalConstructorWorker (
     //
     Status = gBS->InstallConfigurationTable (&gEfiVectorHandoffTableGuid, (VOID *) &mVectorHandoffInfoDebugAgent[0]);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "DebugAgent: Cannot install configuration table for persisted vector handoff info!\n"));
+      DEBUG ((DEBUG_ERROR, "DebugAgent: Cannot install configuration table for persisted vector handoff info!\n"));
       CpuDeadLoop ();
     }
   }
@@ -91,7 +91,7 @@ InternalConstructorWorker (
                   &Address
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "DebugAgent: Cannot install configuration table for mailbox!\n"));
+    DEBUG ((DEBUG_ERROR, "DebugAgent: Cannot install configuration table for mailbox!\n"));
     CpuDeadLoop ();
   }
 
@@ -115,7 +115,7 @@ InternalConstructorWorker (
 
   Status = gBS->InstallConfigurationTable (&gEfiDebugAgentGuid, (VOID *) mMailboxPointer);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "DebugAgent: Failed to install configuration for mailbox!\n"));
+    DEBUG ((DEBUG_ERROR, "DebugAgent: Failed to install configuration for mailbox!\n"));
     CpuDeadLoop ();
   }
 }
@@ -402,7 +402,7 @@ InitializeDebugAgent (
     // Check if Debug Agent has been initialized before
     //
     if (IsDebugAgentInitialzed ()) {
-      DEBUG ((EFI_D_INFO, "Debug Agent: The former agent will be overwritten by the new one!\n"));
+      DEBUG ((DEBUG_INFO, "Debug Agent: The former agent will be overwritten by the new one!\n"));
     }
 
     mMultiProcessorDebugSupport = TRUE;
@@ -537,7 +537,7 @@ InitializeDebugAgent (
     // Only DEBUG_AGENT_INIT_PREMEM_SEC and DEBUG_AGENT_INIT_POSTMEM_SEC are allowed for this
     // Debug Agent library instance.
     //
-    DEBUG ((EFI_D_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
+    DEBUG ((DEBUG_ERROR, "Debug Agent: The InitFlag value is not allowed!\n"));
     CpuDeadLoop ();
     break;
   }
