@@ -9,6 +9,6 @@
 #ifndef _TOP_OF_TEMPORARY_RAM_H_
 #define _TOP_OF_TEMPORARY_RAM_H_
 
-extern EFI_GUID gTopOfTemporaryRamPpiGuid;
+extern EFI_GUID  gTopOfTemporaryRamPpiGuid;
 
 #endif
