@@ -64,7 +64,7 @@ GetNextHob (
 
   ASSERT (HobStart != NULL);
 
-  Hob.Raw = (UINT8 *) HobStart;
+  Hob.Raw = (UINT8 *)HobStart;
   //
   // Parse the HOB list until end of list or matching type is found.
   //
@@ -72,8 +72,10 @@ GetNextHob (
     if (Hob.Header->HobType == Type) {
       return Hob.Raw;
     }
+
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
+
   return NULL;
 }
 
@@ -96,7 +98,7 @@ GetFirstHob (
   IN UINT16                 Type
   )
 {
-  VOID      *HobList;
+  VOID  *HobList;
 
   HobList = GetHobList ();
   return GetNextHob (Type, HobList);
@@ -133,13 +135,15 @@ GetNextGuidHob (
 {
   EFI_PEI_HOB_POINTERS  GuidHob;
 
-  GuidHob.Raw = (UINT8 *) HobStart;
+  GuidHob.Raw = (UINT8 *)HobStart;
   while ((GuidHob.Raw = GetNextHob (EFI_HOB_TYPE_GUID_EXTENSION, GuidHob.Raw)) != NULL) {
     if (CompareGuid (Guid, &GuidHob.Guid->Name)) {
       break;
     }
+
     GuidHob.Raw = GET_NEXT_HOB (GuidHob);
   }
+
   return GuidHob.Raw;
 }
 
@@ -167,7 +171,7 @@ GetFirstGuidHob (
   IN CONST EFI_GUID         *Guid
   )
 {
-  VOID      *HobList;
+  VOID  *HobList;
 
   HobList = GetHobList ();
   return GetNextGuidHob (Guid, HobList);
@@ -192,13 +196,12 @@ GetBootModeHob (
   VOID
   )
 {
-  EFI_HOB_HANDOFF_INFO_TABLE    *HandOffHob;
+  EFI_HOB_HANDOFF_INFO_TABLE  *HandOffHob;
 
-  HandOffHob = (EFI_HOB_HANDOFF_INFO_TABLE *) GetHobList ();
+  HandOffHob = (EFI_HOB_HANDOFF_INFO_TABLE *)GetHobList ();
 
   return HandOffHob->BootMode;
 }
-
 
 /**
   Builds a HOB that describes a chunk of system memory with Owner GUID.
@@ -246,7 +249,6 @@ BuildCvHob (
 {
   ASSERT (FALSE);
 }
-
 
 /**
   Builds a HOB for the BSP store.

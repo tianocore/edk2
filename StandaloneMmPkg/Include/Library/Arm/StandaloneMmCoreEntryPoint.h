@@ -16,35 +16,35 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CPU_INFO_FLAG_PRIMARY_CPU  0x00000001
 
 typedef struct {
-  UINT8  Type;       /* type of the structure */
-  UINT8  Version;    /* version of this structure */
-  UINT16 Size;      /* size of this structure in bytes */
-  UINT32 Attr;      /* attributes: unused bits SBZ */
+  UINT8     Type;    /* type of the structure */
+  UINT8     Version; /* version of this structure */
+  UINT16    Size;    /* size of this structure in bytes */
+  UINT32    Attr;    /* attributes: unused bits SBZ */
 } EFI_PARAM_HEADER;
 
 typedef struct {
-  UINT64 Mpidr;
-  UINT32 LinearId;
-  UINT32 Flags;
+  UINT64    Mpidr;
+  UINT32    LinearId;
+  UINT32    Flags;
 } EFI_SECURE_PARTITION_CPU_INFO;
 
 typedef struct {
-  EFI_PARAM_HEADER              Header;
-  UINT64                        SpMemBase;
-  UINT64                        SpMemLimit;
-  UINT64                        SpImageBase;
-  UINT64                        SpStackBase;
-  UINT64                        SpHeapBase;
-  UINT64                        SpNsCommBufBase;
-  UINT64                        SpSharedBufBase;
-  UINT64                        SpImageSize;
-  UINT64                        SpPcpuStackSize;
-  UINT64                        SpHeapSize;
-  UINT64                        SpNsCommBufSize;
-  UINT64                        SpPcpuSharedBufSize;
-  UINT32                        NumSpMemRegions;
-  UINT32                        NumCpus;
-  EFI_SECURE_PARTITION_CPU_INFO *CpuInfo;
+  EFI_PARAM_HEADER                 Header;
+  UINT64                           SpMemBase;
+  UINT64                           SpMemLimit;
+  UINT64                           SpImageBase;
+  UINT64                           SpStackBase;
+  UINT64                           SpHeapBase;
+  UINT64                           SpNsCommBufBase;
+  UINT64                           SpSharedBufBase;
+  UINT64                           SpImageSize;
+  UINT64                           SpPcpuStackSize;
+  UINT64                           SpHeapSize;
+  UINT64                           SpNsCommBufSize;
+  UINT64                           SpPcpuSharedBufSize;
+  UINT32                           NumSpMemRegions;
+  UINT32                           NumCpus;
+  EFI_SECURE_PARTITION_CPU_INFO    *CpuInfo;
 } EFI_SECURE_PARTITION_BOOT_INFO;
 
 typedef
@@ -56,7 +56,7 @@ EFI_STATUS
   );
 
 typedef struct {
-  PI_MM_ARM_TF_CPU_DRIVER_ENTRYPOINT *ArmTfCpuDriverEpPtr;
+  PI_MM_ARM_TF_CPU_DRIVER_ENTRYPOINT    *ArmTfCpuDriverEpPtr;
 } ARM_TF_CPU_DRIVER_EP_DESCRIPTOR;
 
 typedef RETURN_STATUS (*REGION_PERMISSION_UPDATE_FUNC) (
@@ -91,7 +91,6 @@ UpdateMmFoundationPeCoffPermissions (
   IN  REGION_PERMISSION_UPDATE_FUNC           ReadWriteUpdater
   );
 
-
 /**
   Privileged firmware assigns RO & Executable attributes to all memory occupied
   by the Boot Firmware Volume. This function locates the section information of
@@ -110,11 +109,10 @@ EFIAPI
 GetStandaloneMmCorePeCoffSections (
   IN        VOID                            *TeData,
   IN  OUT   PE_COFF_LOADER_IMAGE_CONTEXT    *ImageContext,
-      OUT   EFI_PHYSICAL_ADDRESS            *ImageBase,
+  OUT   EFI_PHYSICAL_ADDRESS            *ImageBase,
   IN  OUT   UINT32                          *SectionHeaderOffset,
   IN  OUT   UINT16                          *NumberOfSections
   );
-
 
 /**
   Privileged firmware assigns RO & Executable attributes to all memory occupied
@@ -135,7 +133,6 @@ LocateStandaloneMmCorePeCoffData (
   IN  OUT   UINTN                           *TeDataSize
   );
 
-
 /**
   Use the boot information passed by privileged firmware to populate a HOB list
   suitable for consumption by the MM Core and drivers.
@@ -151,7 +148,6 @@ CreateHobListFromBootInfo (
   IN  OUT  PI_MM_ARM_TF_CPU_DRIVER_ENTRYPOINT *CpuDriverEntryPoint,
   IN       EFI_SECURE_PARTITION_BOOT_INFO     *PayloadBootInfo
   );
-
 
 /**
   The entry point of Standalone MM Foundation.
@@ -170,7 +166,6 @@ _ModuleEntryPoint (
   IN UINT64  cookie1,
   IN UINT64  cookie2
   );
-
 
 /**
   Auto generated function that calls the library constructors for all of the module's dependent libraries.
@@ -194,7 +189,6 @@ ProcessLibraryConstructorList (
   IN EFI_HANDLE             ImageHandle,
   IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
   );
-
 
 /**
   Auto generated function that calls a set of module entry points.
