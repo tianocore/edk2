@@ -47,7 +47,7 @@ PL061Locate (
       return EFI_SUCCESS;
     }
   }
-  DEBUG ((EFI_D_ERROR, "%a, failed to locate gpio %d\n", __func__, Gpio));
+  DEBUG ((DEBUG_ERROR, "%a, failed to locate gpio %d\n", __func__, Gpio));
   return EFI_INVALID_PARAMETER;
 }
 
@@ -375,7 +375,7 @@ PL061InstallProtocol (
     // Create the mPL061PlatformGpio
     mPL061PlatformGpio = (PLATFORM_GPIO_CONTROLLER *)AllocateZeroPool (sizeof (PLATFORM_GPIO_CONTROLLER) + sizeof (GPIO_CONTROLLER));
     if (mPL061PlatformGpio == NULL) {
-      DEBUG ((EFI_D_ERROR, "%a: failed to allocate PLATFORM_GPIO_CONTROLLER\n", __func__));
+      DEBUG ((DEBUG_ERROR, "%a: failed to allocate PLATFORM_GPIO_CONTROLLER\n", __func__));
       return EFI_BAD_BUFFER_SIZE;
     }
 
