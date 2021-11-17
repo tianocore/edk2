@@ -76,8 +76,8 @@ FatFindPartitions (
   IN  PEI_FAT_PRIVATE_DATA  *PrivateData
   )
 {
-  BOOLEAN Found;
-  UINTN   Index;
+  BOOLEAN  Found;
+  UINTN    Index;
 
   do {
     Found = FALSE;

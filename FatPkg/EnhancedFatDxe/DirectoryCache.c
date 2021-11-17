@@ -84,8 +84,8 @@ FatDiscardODir (
   FAT_ODIR    *ODir;
   FAT_VOLUME  *Volume;
 
-  Volume  = OFile->Volume;
-  ODir    = OFile->ODir;
+  Volume = OFile->Volume;
+  ODir   = OFile->ODir;
   if (!OFile->DirEnt->Invalid) {
     //
     // If OFile does not represent a deleted file, then we will cache the directory
@@ -107,6 +107,7 @@ FatDiscardODir (
       ODir = NULL;
     }
   }
+
   //
   // Release ODir Structure
   //
@@ -130,19 +131,20 @@ FatRequestODir (
   IN FAT_OFILE    *OFile
   )
 {
-  UINTN           DirCacheTag;
-  FAT_VOLUME      *Volume;
-  FAT_ODIR        *ODir;
-  FAT_ODIR        *CurrentODir;
-  LIST_ENTRY      *CurrentODirLink;
+  UINTN       DirCacheTag;
+  FAT_VOLUME  *Volume;
+  FAT_ODIR    *ODir;
+  FAT_ODIR    *CurrentODir;
+  LIST_ENTRY  *CurrentODirLink;
 
-  Volume      = OFile->Volume;
-  ODir        = NULL;
+  Volume = OFile->Volume;
+  ODir   = NULL;
   DirCacheTag = OFile->FileCluster;
   for (CurrentODirLink  = Volume->DirCacheList.ForwardLink;
        CurrentODirLink != &Volume->DirCacheList;
        CurrentODirLink  = CurrentODirLink->ForwardLink
-      ) {
+       )
+  {
     CurrentODir = ODIR_FROM_DIRCACHELINK (CurrentODirLink);
     if (CurrentODir->DirCacheTag == DirCacheTag) {
       RemoveEntryList (&CurrentODir->DirCacheLink);
@@ -175,6 +177,7 @@ FatCleanupODirCache (
   )
 {
   FAT_ODIR  *ODir;
+
   while (Volume->DirCacheCount > 0) {
     ODir = ODIR_FROM_DIRCACHELINK (Volume->DirCacheList.BackLink);
     RemoveEntryList (&ODir->DirCacheLink);

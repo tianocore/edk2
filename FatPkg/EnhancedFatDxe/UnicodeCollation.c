@@ -55,8 +55,8 @@ InitializeUnicodeCollationSupportWorker (
     return Status;
   }
 
-  Iso639Language = (BOOLEAN) (ProtocolGuid == &gEfiUnicodeCollationProtocolGuid);
-  GetEfiGlobalVariable2 (VariableName, (VOID**) &Language, NULL);
+  Iso639Language = (BOOLEAN)(ProtocolGuid == &gEfiUnicodeCollationProtocolGuid);
+  GetEfiGlobalVariable2 (VariableName, (VOID **)&Language, NULL);
 
   ReturnStatus = EFI_UNSUPPORTED;
   for (Index = 0; Index < NumHandles; Index++) {
@@ -66,7 +66,7 @@ InitializeUnicodeCollationSupportWorker (
     Status = gBS->OpenProtocol (
                     Handles[Index],
                     ProtocolGuid,
-                    (VOID **) &Uci,
+                    (VOID **)&Uci,
                     AgentHandle,
                     NULL,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -121,8 +121,7 @@ InitializeUnicodeCollationSupport (
   IN EFI_HANDLE    AgentHandle
   )
 {
-
-  EFI_STATUS       Status;
+  EFI_STATUS  Status;
 
   Status = EFI_UNSUPPORTED;
 
@@ -133,7 +132,7 @@ InitializeUnicodeCollationSupport (
              AgentHandle,
              &gEfiUnicodeCollation2ProtocolGuid,
              L"PlatformLang",
-             (CONST CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang)
+             (CONST CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultPlatformLang)
              );
   //
   // If the attempt to use Unicode Collation 2 Protocol fails, then we fall back
@@ -144,13 +143,12 @@ InitializeUnicodeCollationSupport (
                AgentHandle,
                &gEfiUnicodeCollationProtocolGuid,
                L"Lang",
-               (CONST CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultLang)
+               (CONST CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultLang)
                );
   }
 
   return Status;
 }
-
 
 /**
   Performs a case-insensitive comparison of two Null-terminated Unicode strings.
@@ -179,7 +177,6 @@ FatStriCmp (
                                        );
 }
 
-
 /**
   Uppercase a string.
 
@@ -198,7 +195,6 @@ FatStrUpr (
   mUnicodeCollationInterface->StrUpr (mUnicodeCollationInterface, String);
 }
 
-
 /**
   Lowercase a string
 
@@ -216,7 +212,6 @@ FatStrLwr (
 
   mUnicodeCollationInterface->StrLwr (mUnicodeCollationInterface, String);
 }
-
 
 /**
   Convert FAT string to unicode string.
@@ -237,12 +232,11 @@ FatFatToStr (
 {
   ASSERT (Fat != NULL);
   ASSERT (String != NULL);
-  ASSERT (((UINTN) String & 0x01) == 0);
+  ASSERT (((UINTN)String & 0x01) == 0);
   ASSERT (mUnicodeCollationInterface != NULL);
 
   mUnicodeCollationInterface->FatToStr (mUnicodeCollationInterface, FatSize, Fat, String);
 }
-
 
 /**
   Convert unicode string to Fat string.

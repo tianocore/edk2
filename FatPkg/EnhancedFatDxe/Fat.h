@@ -35,42 +35,42 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // The FAT signature
 //
-#define FAT_VOLUME_SIGNATURE         SIGNATURE_32 ('f', 'a', 't', 'v')
-#define FAT_IFILE_SIGNATURE          SIGNATURE_32 ('f', 'a', 't', 'i')
-#define FAT_ODIR_SIGNATURE           SIGNATURE_32 ('f', 'a', 't', 'd')
-#define FAT_DIRENT_SIGNATURE         SIGNATURE_32 ('f', 'a', 't', 'e')
-#define FAT_OFILE_SIGNATURE          SIGNATURE_32 ('f', 'a', 't', 'o')
-#define FAT_TASK_SIGNATURE           SIGNATURE_32 ('f', 'a', 't', 'T')
-#define FAT_SUBTASK_SIGNATURE        SIGNATURE_32 ('f', 'a', 't', 'S')
+#define FAT_VOLUME_SIGNATURE   SIGNATURE_32 ('f', 'a', 't', 'v')
+#define FAT_IFILE_SIGNATURE    SIGNATURE_32 ('f', 'a', 't', 'i')
+#define FAT_ODIR_SIGNATURE     SIGNATURE_32 ('f', 'a', 't', 'd')
+#define FAT_DIRENT_SIGNATURE   SIGNATURE_32 ('f', 'a', 't', 'e')
+#define FAT_OFILE_SIGNATURE    SIGNATURE_32 ('f', 'a', 't', 'o')
+#define FAT_TASK_SIGNATURE     SIGNATURE_32 ('f', 'a', 't', 'T')
+#define FAT_SUBTASK_SIGNATURE  SIGNATURE_32 ('f', 'a', 't', 'S')
 
-#define ASSERT_VOLUME_LOCKED(a)      ASSERT_LOCKED (&FatFsLock)
+#define ASSERT_VOLUME_LOCKED(a)  ASSERT_LOCKED (&FatFsLock)
 
-#define IFILE_FROM_FHAND(a)          CR (a, FAT_IFILE, Handle, FAT_IFILE_SIGNATURE)
+#define IFILE_FROM_FHAND(a)  CR (a, FAT_IFILE, Handle, FAT_IFILE_SIGNATURE)
 
-#define DIRENT_FROM_LINK(a)          CR (a, FAT_DIRENT, Link, FAT_DIRENT_SIGNATURE)
+#define DIRENT_FROM_LINK(a)  CR (a, FAT_DIRENT, Link, FAT_DIRENT_SIGNATURE)
 
-#define VOLUME_FROM_ROOT_DIRENT(a)   CR (a, FAT_VOLUME, RootDirEnt, FAT_VOLUME_SIGNATURE)
+#define VOLUME_FROM_ROOT_DIRENT(a)  CR (a, FAT_VOLUME, RootDirEnt, FAT_VOLUME_SIGNATURE)
 
-#define VOLUME_FROM_VOL_INTERFACE(a) CR (a, FAT_VOLUME, VolumeInterface, FAT_VOLUME_SIGNATURE);
+#define VOLUME_FROM_VOL_INTERFACE(a)  CR (a, FAT_VOLUME, VolumeInterface, FAT_VOLUME_SIGNATURE);
 
-#define ODIR_FROM_DIRCACHELINK(a)    CR (a, FAT_ODIR, DirCacheLink, FAT_ODIR_SIGNATURE)
+#define ODIR_FROM_DIRCACHELINK(a)  CR (a, FAT_ODIR, DirCacheLink, FAT_ODIR_SIGNATURE)
 
-#define OFILE_FROM_CHECKLINK(a)      CR (a, FAT_OFILE, CheckLink, FAT_OFILE_SIGNATURE)
+#define OFILE_FROM_CHECKLINK(a)  CR (a, FAT_OFILE, CheckLink, FAT_OFILE_SIGNATURE)
 
-#define OFILE_FROM_CHILDLINK(a)      CR (a, FAT_OFILE, ChildLink, FAT_OFILE_SIGNATURE)
+#define OFILE_FROM_CHILDLINK(a)  CR (a, FAT_OFILE, ChildLink, FAT_OFILE_SIGNATURE)
 
 //
 // Minimum sector size is 512B, Maximum sector size is 4096B
 // Max sectors per cluster is 128
 //
-#define MAX_BLOCK_ALIGNMENT               12
-#define MIN_BLOCK_ALIGNMENT               9
-#define MAX_SECTORS_PER_CLUSTER_ALIGNMENT 7
+#define MAX_BLOCK_ALIGNMENT                12
+#define MIN_BLOCK_ALIGNMENT                9
+#define MAX_SECTORS_PER_CLUSTER_ALIGNMENT  7
 
 //
 // Efi Time Definition
 //
-#define IS_LEAP_YEAR(a)                   (((a) % 4 == 0) && (((a) % 100 != 0) || ((a) % 400 == 0)))
+#define IS_LEAP_YEAR(a)  (((a) % 4 == 0) && (((a) % 100 != 0) || ((a) % 400 == 0)))
 
 //
 // Minimum fat page size is 8K, maximum fat page alignment is 32K
@@ -87,26 +87,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Used in 8.3 generation algorithm
 //
-#define MAX_SPEC_RETRY          4
-#define SPEC_BASE_TAG_LEN       6
-#define HASH_BASE_TAG_LEN       2
-#define HASH_VALUE_TAG_LEN      (SPEC_BASE_TAG_LEN - HASH_BASE_TAG_LEN)
+#define MAX_SPEC_RETRY      4
+#define SPEC_BASE_TAG_LEN   6
+#define HASH_BASE_TAG_LEN   2
+#define HASH_VALUE_TAG_LEN  (SPEC_BASE_TAG_LEN - HASH_BASE_TAG_LEN)
 
 //
 // Path name separator is back slash
 //
-#define PATH_NAME_SEPARATOR     L'\\'
+#define PATH_NAME_SEPARATOR  L'\\'
 
+#define EFI_PATH_STRING_LENGTH   260
+#define EFI_FILE_STRING_LENGTH   255
+#define FAT_MAX_ALLOCATE_SIZE    0xA00000
+#define LC_ISO_639_2_ENTRY_SIZE  3
+#define MAX_LANG_CODE_SIZE       100
 
-#define EFI_PATH_STRING_LENGTH  260
-#define EFI_FILE_STRING_LENGTH  255
-#define FAT_MAX_ALLOCATE_SIZE   0xA00000
-#define LC_ISO_639_2_ENTRY_SIZE 3
-#define MAX_LANG_CODE_SIZE      100
-
-#define FAT_MAX_DIR_CACHE_COUNT 8
-#define FAT_MAX_DIRENTRY_COUNT  0xFFFF
-typedef CHAR8                   LC_ISO_639_2;
+#define FAT_MAX_DIR_CACHE_COUNT  8
+#define FAT_MAX_DIRENTRY_COUNT   0xFFFF
+typedef CHAR8 LC_ISO_639_2;
 
 //
 // The fat types we support
@@ -128,12 +127,12 @@ typedef enum {
 // Used in FatDiskIo
 //
 typedef enum {
-  ReadDisk     = 0,  // raw disk read
-  WriteDisk    = 1,  // raw disk write
-  ReadFat      = 2,  // read fat cache
-  WriteFat     = 3,  // write fat cache
-  ReadData     = 6,  // read data cache
-  WriteData    = 7   // write data cache
+  ReadDisk  = 0,     // raw disk read
+  WriteDisk = 1,     // raw disk write
+  ReadFat   = 2,     // read fat cache
+  WriteFat  = 3,     // write fat cache
+  ReadData  = 6,     // read data cache
+  WriteData = 7      // write data cache
 } IO_MODE;
 
 #define CACHE_ENABLED(a)  ((a) >= 2)
@@ -144,19 +143,19 @@ typedef enum {
 // Disk cache tag
 //
 typedef struct {
-  UINTN   PageNo;
-  UINTN   RealSize;
-  BOOLEAN Dirty;
+  UINTN      PageNo;
+  UINTN      RealSize;
+  BOOLEAN    Dirty;
 } CACHE_TAG;
 
 typedef struct {
-  UINT64    BaseAddress;
-  UINT64    LimitAddress;
-  UINT8     *CacheBase;
-  BOOLEAN   Dirty;
-  UINT8     PageAlignment;
-  UINTN     GroupMask;
-  CACHE_TAG CacheTag[FAT_DATACACHE_GROUP_COUNT];
+  UINT64       BaseAddress;
+  UINT64       LimitAddress;
+  UINT8        *CacheBase;
+  BOOLEAN      Dirty;
+  UINT8        PageAlignment;
+  UINTN        GroupMask;
+  CACHE_TAG    CacheTag[FAT_DATACACHE_GROUP_COUNT];
 } DISK_CACHE;
 
 //
@@ -170,88 +169,88 @@ typedef struct {
 //
 
 typedef struct _FAT_DIRENT FAT_DIRENT;
-typedef struct _FAT_ODIR FAT_ODIR;
-typedef struct _FAT_OFILE FAT_OFILE;
+typedef struct _FAT_ODIR   FAT_ODIR;
+typedef struct _FAT_OFILE  FAT_OFILE;
 typedef struct _FAT_VOLUME FAT_VOLUME;
 
 struct _FAT_DIRENT {
-  UINTN               Signature;
-  UINT16              EntryPos;               // The position of this directory entry in the parent directory file
-  UINT8               EntryCount;             // The count of the directory entry in the parent directory file
-  BOOLEAN             Invalid;                // Indicate whether this directory entry is valid
-  CHAR16              *FileString;            // The unicode long file name for this directory entry
-  FAT_OFILE           *OFile;                 // The OFile of the corresponding directory entry
-  FAT_DIRENT          *ShortNameForwardLink;  // Hash successor link for short filename
-  FAT_DIRENT          *LongNameForwardLink;   // Hash successor link for long filename
-  LIST_ENTRY          Link;                   // Connection of every directory entry
-  FAT_DIRECTORY_ENTRY Entry;                  // The physical directory entry stored in disk
+  UINTN                  Signature;
+  UINT16                 EntryPos;              // The position of this directory entry in the parent directory file
+  UINT8                  EntryCount;            // The count of the directory entry in the parent directory file
+  BOOLEAN                Invalid;               // Indicate whether this directory entry is valid
+  CHAR16                 *FileString;           // The unicode long file name for this directory entry
+  FAT_OFILE              *OFile;                // The OFile of the corresponding directory entry
+  FAT_DIRENT             *ShortNameForwardLink; // Hash successor link for short filename
+  FAT_DIRENT             *LongNameForwardLink;  // Hash successor link for long filename
+  LIST_ENTRY             Link;                  // Connection of every directory entry
+  FAT_DIRECTORY_ENTRY    Entry;                 // The physical directory entry stored in disk
 };
 
 struct _FAT_ODIR {
-  UINTN               Signature;
-  UINT32              CurrentEndPos;          // Current end position of the directory
-  UINT32              CurrentPos;             // Current position of the directory
-  LIST_ENTRY          *CurrentCursor;         // Current directory entry pointer
-  LIST_ENTRY          ChildList;              // List of all directory entries
-  BOOLEAN             EndOfDir;               // Indicate whether we have reached the end of the directory
-  LIST_ENTRY          DirCacheLink;           // Linked in Volume->DirCacheList when discarded
-  UINTN               DirCacheTag;            // The identification of the directory when in directory cache
-  FAT_DIRENT          *LongNameHashTable[HASH_TABLE_SIZE];
-  FAT_DIRENT          *ShortNameHashTable[HASH_TABLE_SIZE];
+  UINTN         Signature;
+  UINT32        CurrentEndPos;                // Current end position of the directory
+  UINT32        CurrentPos;                   // Current position of the directory
+  LIST_ENTRY    *CurrentCursor;               // Current directory entry pointer
+  LIST_ENTRY    ChildList;                    // List of all directory entries
+  BOOLEAN       EndOfDir;                     // Indicate whether we have reached the end of the directory
+  LIST_ENTRY    DirCacheLink;                 // Linked in Volume->DirCacheList when discarded
+  UINTN         DirCacheTag;                  // The identification of the directory when in directory cache
+  FAT_DIRENT    *LongNameHashTable[HASH_TABLE_SIZE];
+  FAT_DIRENT    *ShortNameHashTable[HASH_TABLE_SIZE];
 };
 
 typedef struct {
-  UINTN               Signature;
-  EFI_FILE_PROTOCOL   Handle;
-  UINT64              Position;
-  BOOLEAN             ReadOnly;
-  FAT_OFILE          *OFile;
-  LIST_ENTRY          Tasks;                  // List of all FAT_TASKs
-  LIST_ENTRY          Link;                   // Link to other IFiles
+  UINTN                Signature;
+  EFI_FILE_PROTOCOL    Handle;
+  UINT64               Position;
+  BOOLEAN              ReadOnly;
+  FAT_OFILE            *OFile;
+  LIST_ENTRY           Tasks;                 // List of all FAT_TASKs
+  LIST_ENTRY           Link;                  // Link to other IFiles
 } FAT_IFILE;
 
 typedef struct {
-  UINTN               Signature;
-  EFI_FILE_IO_TOKEN   *FileIoToken;
-  FAT_IFILE           *IFile;
-  LIST_ENTRY          Subtasks;               // List of all FAT_SUBTASKs
-  LIST_ENTRY          Link;                   // Link to other FAT_TASKs
+  UINTN                Signature;
+  EFI_FILE_IO_TOKEN    *FileIoToken;
+  FAT_IFILE            *IFile;
+  LIST_ENTRY           Subtasks;              // List of all FAT_SUBTASKs
+  LIST_ENTRY           Link;                  // Link to other FAT_TASKs
 } FAT_TASK;
 
 typedef struct {
-  UINTN               Signature;
-  EFI_DISK_IO2_TOKEN  DiskIo2Token;
-  FAT_TASK            *Task;
-  BOOLEAN             Write;
-  UINT64              Offset;
-  VOID                *Buffer;
-  UINTN               BufferSize;
-  LIST_ENTRY          Link;
+  UINTN                 Signature;
+  EFI_DISK_IO2_TOKEN    DiskIo2Token;
+  FAT_TASK              *Task;
+  BOOLEAN               Write;
+  UINT64                Offset;
+  VOID                  *Buffer;
+  UINTN                 BufferSize;
+  LIST_ENTRY            Link;
 } FAT_SUBTASK;
 
 //
 // FAT_OFILE - Each opened file
 //
 struct _FAT_OFILE {
-  UINTN               Signature;
-  FAT_VOLUME          *Volume;
+  UINTN         Signature;
+  FAT_VOLUME    *Volume;
   //
   // A permanent error code to return to all accesses to
   // this opened file
   //
-  EFI_STATUS          Error;
+  EFI_STATUS    Error;
   //
   // A list of the IFILE instances for this OFile
   //
-  LIST_ENTRY          Opens;
+  LIST_ENTRY    Opens;
 
   //
   // The dynamic information
   //
-  UINTN               FileSize;
-  UINTN               FileCluster;
-  UINTN               FileCurrentCluster;
-  UINTN               FileLastCluster;
+  UINTN         FileSize;
+  UINTN         FileCluster;
+  UINTN         FileCurrentCluster;
+  UINTN         FileLastCluster;
 
   //
   // Dirty is set if there have been any updates to the
@@ -261,120 +260,120 @@ struct _FAT_OFILE {
   // PreserveLastMod is set if the last modification of the
   // file is specified by SetInfo API
   //
-  BOOLEAN             Dirty;
-  BOOLEAN             IsFixedRootDir;
-  BOOLEAN             PreserveLastModification;
-  BOOLEAN             Archive;
+  BOOLEAN       Dirty;
+  BOOLEAN       IsFixedRootDir;
+  BOOLEAN       PreserveLastModification;
+  BOOLEAN       Archive;
   //
   // Set by an OFile SetPosition
   //
-  UINTN               Position; // within file
-  UINT64              PosDisk;  // on the disk
-  UINTN               PosRem;   // remaining in this disk run
+  UINTN         Position;       // within file
+  UINT64        PosDisk;        // on the disk
+  UINTN         PosRem;         // remaining in this disk run
   //
   // The opened parent, full path length and currently opened child files
   //
-  FAT_OFILE           *Parent;
-  UINTN               FullPathLen;
-  LIST_ENTRY          ChildHead;
-  LIST_ENTRY          ChildLink;
+  FAT_OFILE     *Parent;
+  UINTN         FullPathLen;
+  LIST_ENTRY    ChildHead;
+  LIST_ENTRY    ChildLink;
 
   //
   // The opened directory structure for a directory; if this
   // OFile represents a file, then ODir = NULL
   //
-  FAT_ODIR            *ODir;
+  FAT_ODIR      *ODir;
   //
   // The directory entry for the Ofile
   //
-  FAT_DIRENT          *DirEnt;
+  FAT_DIRENT    *DirEnt;
 
   //
   // Link in Volume's reference list
   //
-  LIST_ENTRY          CheckLink;
+  LIST_ENTRY    CheckLink;
 };
 
 struct _FAT_VOLUME {
-  UINTN                           Signature;
+  UINTN                              Signature;
 
-  EFI_HANDLE                      Handle;
-  BOOLEAN                         Valid;
-  BOOLEAN                         DiskError;
+  EFI_HANDLE                         Handle;
+  BOOLEAN                            Valid;
+  BOOLEAN                            DiskError;
 
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL VolumeInterface;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL    VolumeInterface;
 
   //
   // If opened, the parent handle and BlockIo interface
   //
-  EFI_BLOCK_IO_PROTOCOL           *BlockIo;
-  EFI_DISK_IO_PROTOCOL            *DiskIo;
-  EFI_DISK_IO2_PROTOCOL           *DiskIo2;
-  UINT32                          MediaId;
-  BOOLEAN                         ReadOnly;
+  EFI_BLOCK_IO_PROTOCOL              *BlockIo;
+  EFI_DISK_IO_PROTOCOL               *DiskIo;
+  EFI_DISK_IO2_PROTOCOL              *DiskIo2;
+  UINT32                             MediaId;
+  BOOLEAN                            ReadOnly;
 
   //
   // Computed values from fat bpb info
   //
-  UINT64                          VolumeSize;
-  UINT64                          FatPos;           // Disk pos of fat tables
-  UINT64                          RootPos;          // Disk pos of root directory
-  UINT64                          FirstClusterPos;  // Disk pos of first cluster
-  UINTN                           FatSize;          // Number of bytes in each fat
-  UINTN                           MaxCluster;       // Max cluster number
-  UINTN                           ClusterSize;      // Cluster size of fat partition
-  UINT8                           ClusterAlignment; // Equal to log_2 (clustersize);
-  FAT_VOLUME_TYPE                 FatType;
+  UINT64                             VolumeSize;
+  UINT64                             FatPos;           // Disk pos of fat tables
+  UINT64                             RootPos;          // Disk pos of root directory
+  UINT64                             FirstClusterPos;  // Disk pos of first cluster
+  UINTN                              FatSize;          // Number of bytes in each fat
+  UINTN                              MaxCluster;       // Max cluster number
+  UINTN                              ClusterSize;      // Cluster size of fat partition
+  UINT8                              ClusterAlignment; // Equal to log_2 (clustersize);
+  FAT_VOLUME_TYPE                    FatType;
 
   //
   // Current part of fat table that's present
   //
-  UINT64                          FatEntryPos;    // Location of buffer
-  UINTN                           FatEntrySize;   // Size of buffer
-  UINT32                          FatEntryBuffer; // The buffer
-  FAT_INFO_SECTOR                 FatInfoSector;  // Free cluster info
-  UINTN                           FreeInfoPos;    // Pos with the free cluster info
-  BOOLEAN                         FreeInfoValid;  // If free cluster info is valid
+  UINT64                             FatEntryPos;    // Location of buffer
+  UINTN                              FatEntrySize;   // Size of buffer
+  UINT32                             FatEntryBuffer; // The buffer
+  FAT_INFO_SECTOR                    FatInfoSector;  // Free cluster info
+  UINTN                              FreeInfoPos;    // Pos with the free cluster info
+  BOOLEAN                            FreeInfoValid;  // If free cluster info is valid
   //
   // Unpacked Fat BPB info
   //
-  UINTN                           NumFats;
-  UINTN                           RootEntries;    // < FAT32, root dir is fixed size
-  UINTN                           RootCluster;    // >= FAT32, root cluster chain head
+  UINTN                              NumFats;
+  UINTN                              RootEntries; // < FAT32, root dir is fixed size
+  UINTN                              RootCluster; // >= FAT32, root cluster chain head
   //
   // info for marking the volume dirty or not
   //
-  BOOLEAN                         FatDirty;       // If fat-entries have been updated
-  UINT32                          DirtyValue;
-  UINT32                          NotDirtyValue;
+  BOOLEAN                            FatDirty;    // If fat-entries have been updated
+  UINT32                             DirtyValue;
+  UINT32                             NotDirtyValue;
 
   //
   // The root directory entry and opened root file
   //
-  FAT_DIRENT                      RootDirEnt;
+  FAT_DIRENT                         RootDirEnt;
   //
   // File Name of root OFile, it is empty string
   //
-  CHAR16                          RootFileString[1];
-  FAT_OFILE                       *Root;
+  CHAR16                             RootFileString[1];
+  FAT_OFILE                          *Root;
 
   //
   // New OFiles are added to this list so they
   // can be cleaned up if they aren't referenced.
   //
-  LIST_ENTRY                      CheckRef;
+  LIST_ENTRY                         CheckRef;
 
   //
   // Directory cache List
   //
-  LIST_ENTRY                      DirCacheList;
-  UINTN                           DirCacheCount;
+  LIST_ENTRY                         DirCacheList;
+  UINTN                              DirCacheCount;
 
   //
   // Disk Cache for this volume
   //
-  VOID                            *CacheBuffer;
-  DISK_CACHE                      DiskCache[CacheMaxType];
+  VOID                               *CacheBuffer;
+  DISK_CACHE                         DiskCache[CacheMaxType];
 };
 
 //
@@ -481,7 +480,7 @@ FatGetInfo (
   IN     EFI_FILE_PROTOCOL      *FHand,
   IN     EFI_GUID               *Type,
   IN OUT UINTN                  *BufferSize,
-     OUT VOID                   *Buffer
+  OUT VOID                   *Buffer
   )
 ;
 
@@ -621,7 +620,7 @@ EFIAPI
 FatRead (
   IN     EFI_FILE_PROTOCOL    *FHand,
   IN OUT UINTN                *BufferSize,
-     OUT VOID                 *Buffer
+  OUT VOID                 *Buffer
   )
 ;
 
@@ -696,6 +695,7 @@ FatWriteEx (
 //
 // DiskCache.c
 //
+
 /**
 
   Initialize the disk cache according to Volume's FatType.
@@ -771,6 +771,7 @@ FatVolumeFlushCache (
 //
 // Flush.c
 //
+
 /**
 
   Flush the data associated with an open file.
@@ -859,6 +860,7 @@ FatCleanupVolume (
 //
 // FileSpace.c
 //
+
 /**
 
   Shrink the end of the open file base on the file size.
@@ -961,6 +963,7 @@ FatComputeFreeInfo (
 //
 // Init.c
 //
+
 /**
 
   Allocates volume structure, detects FAT file system, installs protocol,
@@ -1018,6 +1021,7 @@ FatAbandonVolume (
 //
 // Misc.c
 //
+
 /**
 
   Create the task
@@ -1251,6 +1255,7 @@ FatIsValidTime (
 //
 // UnicodeCollation.c
 //
+
 /**
   Initialize Unicode Collation support.
 
@@ -1398,6 +1403,7 @@ FatAllocateIFile (
 //
 // OpenVolume.c
 //
+
 /**
 
   Implements Simple File System Protocol interface function OpenVolume().
@@ -1420,6 +1426,7 @@ FatOpenVolume (
 //
 // ReadWrite.c
 //
+
 /**
 
   This function reads data from a file or writes data to a file.
@@ -1501,6 +1508,7 @@ FatTruncateOFile (
 //
 // DirectoryManage.c
 //
+
 /**
 
   Set the OFile's current directory cursor to the list head.
@@ -1718,7 +1726,7 @@ FatLocateOFile (
   IN OUT FAT_OFILE      **PtrOFile,
   IN     CHAR16         *FileName,
   IN     UINT8          Attributes,
-     OUT CHAR16         *NewFileName
+  OUT CHAR16         *NewFileName
   );
 
 /**
@@ -1759,6 +1767,7 @@ FatSetVolumeEntry (
 //
 // Hash.c
 //
+
 /**
 
   Search the long name hash table for the directory entry.
@@ -1822,6 +1831,7 @@ FatDeleteFromHashTable (
 //
 // FileName.c
 //
+
 /**
 
   This function checks whether the input FileName is a valid 8.3 short name.
@@ -1928,7 +1938,7 @@ FatCheckSum (
   The position after Name in the Path
 
 **/
-CHAR16*
+CHAR16 *
 FatGetNextNameComponent (
   IN  CHAR16            *Path,
   OUT CHAR16            *Name
@@ -1956,6 +1966,7 @@ FatFileNameIsValid (
 //
 // DirectoryCache.c
 //
+
 /**
 
   Discard the directory structure when an OFile will be freed.
@@ -1998,11 +2009,11 @@ FatCleanupODirCache (
 //
 // Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL     gFatDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL     gFatComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL    gFatComponentName2;
-extern EFI_LOCK                        FatFsLock;
-extern EFI_LOCK                        FatTaskLock;
-extern EFI_FILE_PROTOCOL               FatFileInterface;
+extern EFI_DRIVER_BINDING_PROTOCOL   gFatDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gFatComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gFatComponentName2;
+extern EFI_LOCK                      FatFsLock;
+extern EFI_LOCK                      FatTaskLock;
+extern EFI_FILE_PROTOCOL             FatFileInterface;
 
 #endif
