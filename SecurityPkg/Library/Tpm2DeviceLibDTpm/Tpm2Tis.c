@@ -221,22 +221,22 @@ Tpm2TisTpmCommand (
   DEBUG_CODE (
     UINTN  DebugSize;
 
-    DEBUG ((EFI_D_VERBOSE, "Tpm2TisTpmCommand Send - "));
+    DEBUG ((DEBUG_VERBOSE, "Tpm2TisTpmCommand Send - "));
     if (SizeIn > 0x100) {
       DebugSize = 0x40;
     } else {
       DebugSize = SizeIn;
     }
     for (Index = 0; Index < DebugSize; Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
+      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
     }
     if (DebugSize != SizeIn) {
-      DEBUG ((EFI_D_VERBOSE, "...... "));
+      DEBUG ((DEBUG_VERBOSE, "...... "));
       for (Index = SizeIn - 0x20; Index < SizeIn; Index++) {
-        DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
+        DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
       }
     }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   );
   TpmOutSize = 0;
 
@@ -333,11 +333,11 @@ Tpm2TisTpmCommand (
     }
   }
   DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "Tpm2TisTpmCommand ReceiveHeader - "));
+    DEBUG ((DEBUG_VERBOSE, "Tpm2TisTpmCommand ReceiveHeader - "));
     for (Index = 0; Index < sizeof (TPM2_RESPONSE_HEADER); Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
+      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
     }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   );
   //
   // Check the response data header (tag,parasize and returncode )
@@ -345,7 +345,7 @@ Tpm2TisTpmCommand (
   CopyMem (&Data16, BufferOut, sizeof (UINT16));
   // TPM2 should not use this RSP_COMMAND
   if (SwapBytes16 (Data16) == TPM_ST_RSP_COMMAND) {
-    DEBUG ((EFI_D_ERROR, "TPM2: TPM_ST_RSP error - %x\n", TPM_ST_RSP_COMMAND));
+    DEBUG ((DEBUG_ERROR, "TPM2: TPM_ST_RSP error - %x\n", TPM_ST_RSP_COMMAND));
     Status = EFI_UNSUPPORTED;
     goto Exit;
   }
@@ -377,11 +377,11 @@ Tpm2TisTpmCommand (
   }
 Exit:
   DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "Tpm2TisTpmCommand Receive - "));
+    DEBUG ((DEBUG_VERBOSE, "Tpm2TisTpmCommand Receive - "));
     for (Index = 0; Index < TpmOutSize; Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
+      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
     }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   );
   MmioWrite8((UINTN)&TisReg->Status, TIS_PC_STS_READY);
   return Status;
