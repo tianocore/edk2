@@ -337,7 +337,7 @@ InitializeGraphicsConsoleTextMode (
 
   DEBUG_CODE (
     for (Index = 0; Index < ValidCount; Index++) {
-      DEBUG ((EFI_D_INFO, "Graphics - Mode %d, Column = %d, Row = %d\n",
+      DEBUG ((DEBUG_INFO, "Graphics - Mode %d, Column = %d, Row = %d\n",
                            Index, NewModeBuffer[Index].Columns, NewModeBuffer[Index].Rows));
     }
   );
@@ -551,7 +551,7 @@ GraphicsConsoleControllerDriverStart (
     }
   }
 
-  DEBUG ((EFI_D_INFO, "GraphicsConsole video resolution %d x %d\n", HorizontalResolution, VerticalResolution));
+  DEBUG ((DEBUG_INFO, "GraphicsConsole video resolution %d x %d\n", HorizontalResolution, VerticalResolution));
 
   //
   // Initialize the mode which GraphicsConsole supports.
@@ -2132,5 +2132,3 @@ InitializeGraphicsConsole (
 
   return Status;
 }
-
-

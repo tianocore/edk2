@@ -215,7 +215,7 @@ DumpBridgeResource (
 
   if ((BridgeResource != NULL) && (BridgeResource->Length != 0)) {
     DEBUG ((
-      EFI_D_INFO, "Type = %s; Base = 0x%lx;\tLength = 0x%lx;\tAlignment = 0x%lx\n",
+      DEBUG_INFO, "Type = %s; Base = 0x%lx;\tLength = 0x%lx;\tAlignment = 0x%lx\n",
       mBarTypeStr[MIN (BridgeResource->ResType, PciBarTypeMaxType)],
       BridgeResource->PciDev->PciBar[BridgeResource->Bar].BaseAddress,
       BridgeResource->Length, BridgeResource->Alignment
@@ -228,7 +228,7 @@ DumpBridgeResource (
       if (Resource->ResourceUsage == PciResUsageTypical) {
         Bar = Resource->Virtual ? Resource->PciDev->VfPciBar : Resource->PciDev->PciBar;
         DEBUG ((
-          EFI_D_INFO, "   Base = 0x%lx;\tLength = 0x%lx;\tAlignment = 0x%lx;\tOwner = %s [%02x|%02x|%02x:",
+          DEBUG_INFO, "   Base = 0x%lx;\tLength = 0x%lx;\tAlignment = 0x%lx;\tOwner = %s [%02x|%02x|%02x:",
           Bar[Resource->Bar].BaseAddress, Resource->Length, Resource->Alignment,
           IS_PCI_BRIDGE (&Resource->PciDev->Pci)     ? L"PPB" :
           IS_CARDBUS_BRIDGE (&Resource->PciDev->Pci) ? L"P2C" :
@@ -244,20 +244,20 @@ DumpBridgeResource (
           //
           // The resource requirement comes from the device itself.
           //
-          DEBUG ((EFI_D_INFO, "%02x]", Bar[Resource->Bar].Offset));
+          DEBUG ((DEBUG_INFO, "%02x]", Bar[Resource->Bar].Offset));
         } else {
           //
           // The resource requirement comes from the subordinate devices.
           //
-          DEBUG ((EFI_D_INFO, "**]"));
+          DEBUG ((DEBUG_INFO, "**]"));
         }
       } else {
-        DEBUG ((EFI_D_INFO, "   Base = Padding;\tLength = 0x%lx;\tAlignment = 0x%lx", Resource->Length, Resource->Alignment));
+        DEBUG ((DEBUG_INFO, "   Base = Padding;\tLength = 0x%lx;\tAlignment = 0x%lx", Resource->Length, Resource->Alignment));
       }
       if (BridgeResource->ResType != Resource->ResType) {
-        DEBUG ((EFI_D_INFO, "; Type = %s", mBarTypeStr[MIN (Resource->ResType, PciBarTypeMaxType)]));
+        DEBUG ((DEBUG_INFO, "; Type = %s", mBarTypeStr[MIN (Resource->ResType, PciBarTypeMaxType)]));
       }
-      DEBUG ((EFI_D_INFO, "\n"));
+      DEBUG ((DEBUG_INFO, "\n"));
     }
   }
 }
@@ -321,7 +321,7 @@ DumpResourceMap (
   PCI_RESOURCE_NODE    **ChildResources;
   UINTN                ChildResourceCount;
 
-  DEBUG ((EFI_D_INFO, "PciBus: Resource Map for "));
+  DEBUG ((DEBUG_INFO, "PciBus: Resource Map for "));
 
   Status = gBS->OpenProtocol (
                   Bridge->Handle,
@@ -333,7 +333,7 @@ DumpResourceMap (
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((
-      EFI_D_INFO, "Bridge [%02x|%02x|%02x]\n",
+      DEBUG_INFO, "Bridge [%02x|%02x|%02x]\n",
       Bridge->BusNumber, Bridge->DeviceNumber, Bridge->FunctionNumber
       ));
   } else {
@@ -342,7 +342,7 @@ DumpResourceMap (
             FALSE,
             FALSE
             );
-    DEBUG ((EFI_D_INFO, "Root Bridge %s\n", Str != NULL ? Str : L""));
+    DEBUG ((DEBUG_INFO, "Root Bridge %s\n", Str != NULL ? Str : L""));
     if (Str != NULL) {
       FreePool (Str);
     }
@@ -351,7 +351,7 @@ DumpResourceMap (
   for (Index = 0; Index < ResourceCount; Index++) {
     DumpBridgeResource (Resources[Index]);
   }
-  DEBUG ((EFI_D_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "\n"));
 
   for ( Link = Bridge->ChildList.ForwardLink
       ; Link != &Bridge->ChildList
@@ -622,7 +622,7 @@ PciHostBridgeResourceAllocator (
         // If SubmitResources returns error, PciBus isn't able to start.
         // It's a fatal error so assertion is added.
         //
-        DEBUG ((EFI_D_INFO, "PciBus: HostBridge->SubmitResources() - %r\n", Status));
+        DEBUG ((DEBUG_INFO, "PciBus: HostBridge->SubmitResources() - %r\n", Status));
         ASSERT_EFI_ERROR (Status);
       }
 
@@ -654,7 +654,7 @@ PciHostBridgeResourceAllocator (
     // Notify platform to start to program the resource
     //
     Status = NotifyPhase (PciResAlloc, EfiPciHostBridgeAllocateResources);
-    DEBUG ((EFI_D_INFO, "PciBus: HostBridge->NotifyPhase(AllocateResources) - %r\n", Status));
+    DEBUG ((DEBUG_INFO, "PciBus: HostBridge->NotifyPhase(AllocateResources) - %r\n", Status));
     if (!FeaturePcdGet (PcdPciBusHotplugDeviceSupport)) {
       //
       // If Hot Plug is not supported
@@ -1340,9 +1340,9 @@ PciScanBus (
             TempReservedBusNum = PciDevice->ReservedBusNum;
 
             if (Func == 0) {
-              DEBUG ((EFI_D_INFO, "PCI-IOV ScanBus - SubBusNumber - 0x%x\n", *SubBusNumber));
+              DEBUG ((DEBUG_INFO, "PCI-IOV ScanBus - SubBusNumber - 0x%x\n", *SubBusNumber));
             } else {
-              DEBUG ((EFI_D_INFO, "PCI-IOV ScanBus - SubBusNumber - 0x%x (Update)\n", *SubBusNumber));
+              DEBUG ((DEBUG_INFO, "PCI-IOV ScanBus - SubBusNumber - 0x%x (Update)\n", *SubBusNumber));
             }
           }
         }
@@ -1522,7 +1522,7 @@ PciHostBridgeEnumerator (
     return Status;
   }
 
-  DEBUG((EFI_D_INFO, "PCI Bus First Scanning\n"));
+  DEBUG((DEBUG_INFO, "PCI Bus First Scanning\n"));
   RootBridgeHandle = NULL;
   while (PciResAlloc->GetNextRootBridge (PciResAlloc, &RootBridgeHandle) == EFI_SUCCESS) {
 
@@ -1601,7 +1601,7 @@ PciHostBridgeEnumerator (
     Status = AllRootHPCInitialized (STALL_1_SECOND * 15);
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Some root HPC failed to initialize\n"));
+      DEBUG ((DEBUG_ERROR, "Some root HPC failed to initialize\n"));
       return Status;
     }
 
@@ -1614,7 +1614,7 @@ PciHostBridgeEnumerator (
       return Status;
     }
 
-    DEBUG((EFI_D_INFO, "PCI Bus Second Scanning\n"));
+    DEBUG((DEBUG_INFO, "PCI Bus Second Scanning\n"));
     RootBridgeHandle = NULL;
     while (PciResAlloc->GetNextRootBridge (PciResAlloc, &RootBridgeHandle) == EFI_SUCCESS) {
 

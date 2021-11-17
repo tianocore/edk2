@@ -474,7 +474,7 @@ InternalPeiInstallPpi (
     //
     if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_PPI) == 0) {
       PpiListPointer->CurrentCount = LastCount;
-      DEBUG((EFI_D_ERROR, "ERROR -> InstallPpi: %g %p\n", PpiList->Guid, PpiList->Ppi));
+      DEBUG((DEBUG_ERROR, "ERROR -> InstallPpi: %g %p\n", PpiList->Guid, PpiList->Ppi));
       return  EFI_INVALID_PARAMETER;
     }
 
@@ -495,7 +495,7 @@ InternalPeiInstallPpi (
       PpiListPointer->MaxCount = PpiListPointer->MaxCount + PPI_GROWTH_STEP;
     }
 
-    DEBUG((EFI_D_INFO, "Install PPI: %g\n", PpiList->Guid));
+    DEBUG((DEBUG_INFO, "Install PPI: %g\n", PpiList->Guid));
     PpiListPointer->PpiPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR *) PpiList;
     Index++;
     PpiListPointer->CurrentCount++;
@@ -613,7 +613,7 @@ PeiReInstallPpi (
   //
   // Replace the old PPI with the new one.
   //
-  DEBUG((EFI_D_INFO, "Reinstall PPI: %g\n", NewPpi->Guid));
+  DEBUG((DEBUG_INFO, "Reinstall PPI: %g\n", NewPpi->Guid));
   PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi = (EFI_PEI_PPI_DESCRIPTOR *) NewPpi;
 
   //
@@ -807,7 +807,7 @@ InternalPeiNotifyPpi (
       DispatchNotifyListPointer->CurrentCount++;
     }
 
-    DEBUG((EFI_D_INFO, "Register PPI Notify: %g\n", NotifyList->Guid));
+    DEBUG((DEBUG_INFO, "Register PPI Notify: %g\n", NotifyList->Guid));
 
     if (Single) {
       //
@@ -978,7 +978,7 @@ ProcessNotify (
           (((INT32 *)SearchGuid)[1] == ((INT32 *)CheckGuid)[1]) &&
           (((INT32 *)SearchGuid)[2] == ((INT32 *)CheckGuid)[2]) &&
           (((INT32 *)SearchGuid)[3] == ((INT32 *)CheckGuid)[3])) {
-        DEBUG ((EFI_D_INFO, "Notify: PPI Guid: %g, Peim notify entry point: %p\n",
+        DEBUG ((DEBUG_INFO, "Notify: PPI Guid: %g, Peim notify entry point: %p\n",
           SearchGuid,
           NotifyDescriptor->Notify
           ));
@@ -1115,4 +1115,3 @@ ConvertPeiCorePpiPointers (
     ConvertPpiPointersFv (PrivateData, (UINTN) OrgImageBase, (UINTN) MigratedImageBase, PeiCoreModuleSize);
   }
 }
-

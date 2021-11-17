@@ -345,7 +345,7 @@ OnEndOfDxe (
 {
   EFI_STATUS    Status;
 
-  DEBUG ((EFI_D_INFO, "[Variable]END_OF_DXE is signaled\n"));
+  DEBUG ((DEBUG_INFO, "[Variable]END_OF_DXE is signaled\n"));
   MorLockInitAtEndOfDxe ();
   Status = LockVariablePolicy ();
   ASSERT_EFI_ERROR (Status);
@@ -638,4 +638,3 @@ VariableServiceInitialize (
 
   return EFI_SUCCESS;
 }
-

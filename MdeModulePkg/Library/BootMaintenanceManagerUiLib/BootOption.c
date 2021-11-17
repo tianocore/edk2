@@ -611,7 +611,7 @@ BOpt_GetOptionNumber (
       continue;
     }
     UnicodeSPrint (StrTemp, sizeof (StrTemp), L"%s%04x", Type, (UINTN) OptionNumber);
-    DEBUG((EFI_D_ERROR,"Option = %s\n", StrTemp));
+    DEBUG((DEBUG_ERROR,"Option = %s\n", StrTemp));
     GetEfiGlobalVariable2 (StrTemp, (VOID **) &OptionBuffer, &OptionSize);
     if (NULL == OptionBuffer) {
       //
@@ -1002,4 +1002,3 @@ CreateDriverOptionFromFile (
 {
   return ReSendForm(FilePath, FORM_DRV_ADD_FILE_ID);
 }
-

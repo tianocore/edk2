@@ -89,7 +89,7 @@ CalculateBestPioMode (
   if ((IdentifyData->AtaData.field_validity & 0x02) == 0x02) {
 
     AdvancedPioMode = IdentifyData->AtaData.advanced_pio_modes;
-    DEBUG ((EFI_D_INFO, "CalculateBestPioMode: AdvancedPioMode = %x\n", AdvancedPioMode));
+    DEBUG ((DEBUG_INFO, "CalculateBestPioMode: AdvancedPioMode = %x\n", AdvancedPioMode));
 
     for (Index = 0; Index < 8; Index++) {
       if ((AdvancedPioMode & 0x01) != 0) {
@@ -203,7 +203,7 @@ CalculateBestUdmaMode (
   }
 
   DeviceUDmaMode = IdentifyData->AtaData.ultra_dma_mode;
-  DEBUG ((EFI_D_INFO, "CalculateBestUdmaMode: DeviceUDmaMode = %x\n", DeviceUDmaMode));
+  DEBUG ((DEBUG_INFO, "CalculateBestUdmaMode: DeviceUDmaMode = %x\n", DeviceUDmaMode));
   DeviceUDmaMode &= 0x3f;
   TempMode = 0;                 // initialize it to UDMA-0
 
@@ -362,7 +362,7 @@ SataControllerStart (
   UINT64                            Supports;
   UINT8                             MaxPortNumber;
 
-  DEBUG ((EFI_D_INFO, "SataControllerStart start\n"));
+  DEBUG ((DEBUG_INFO, "SataControllerStart start\n"));
 
   Private = NULL;
 
@@ -378,7 +378,7 @@ SataControllerStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "SataControllerStart error. return status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "SataControllerStart error. return status = %r\n", Status));
     return Status;
   }
 
@@ -419,7 +419,7 @@ SataControllerStart (
   }
 
   DEBUG ((
-    EFI_D_INFO,
+    DEBUG_INFO,
     "Original PCI Attributes = 0x%llx\n",
     Private->OriginalPciAttributes
     ));
@@ -434,7 +434,7 @@ SataControllerStart (
     goto Done;
   }
 
-  DEBUG ((EFI_D_INFO, "Supported PCI Attributes = 0x%llx\n", Supports));
+  DEBUG ((DEBUG_INFO, "Supported PCI Attributes = 0x%llx\n", Supports));
 
   Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
   Status = PciIo->Attributes (
@@ -447,7 +447,7 @@ SataControllerStart (
     goto Done;
   }
 
-  DEBUG ((EFI_D_INFO, "Enabled PCI Attributes = 0x%llx\n", Supports));
+  DEBUG ((DEBUG_INFO, "Enabled PCI Attributes = 0x%llx\n", Supports));
   Private->PciAttributesChanged = TRUE;
 
   Status = PciIo->Pci.Read (
@@ -561,7 +561,7 @@ Done:
     }
   }
 
-  DEBUG ((EFI_D_INFO, "SataControllerStart end with %r\n", Status));
+  DEBUG ((DEBUG_INFO, "SataControllerStart end with %r\n", Status));
 
   return Status;
 }
@@ -1048,7 +1048,7 @@ IdeInitCalculateMode (
   } else {
     (*SupportedModes)->PioMode.Valid = FALSE;
   }
-  DEBUG ((EFI_D_INFO, "IdeInitCalculateMode: PioMode = %x\n", (*SupportedModes)->PioMode.Mode));
+  DEBUG ((DEBUG_INFO, "IdeInitCalculateMode: PioMode = %x\n", (*SupportedModes)->PioMode.Mode));
 
   Status = CalculateBestUdmaMode (
             IdentifyData,
@@ -1063,7 +1063,7 @@ IdeInitCalculateMode (
   } else {
     (*SupportedModes)->UdmaMode.Valid = FALSE;
   }
-  DEBUG ((EFI_D_INFO, "IdeInitCalculateMode: UdmaMode = %x\n", (*SupportedModes)->UdmaMode.Mode));
+  DEBUG ((DEBUG_INFO, "IdeInitCalculateMode: UdmaMode = %x\n", (*SupportedModes)->UdmaMode.Mode));
 
   //
   // The modes other than PIO and UDMA are not supported
@@ -1105,4 +1105,3 @@ IdeInitSetTiming (
 {
   return EFI_SUCCESS;
 }
-
