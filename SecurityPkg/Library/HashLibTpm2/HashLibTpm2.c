@@ -237,7 +237,7 @@ HashAndExtend (
   TPM2B_EVENT        EventData;
   TPM2B_DIGEST       Result;
 
-  DEBUG((EFI_D_VERBOSE, "\n HashAndExtend Entry \n"));
+  DEBUG((DEBUG_VERBOSE, "\n HashAndExtend Entry \n"));
 
   SequenceHandle = 0xFFFFFFFF; // Know bad value
 
@@ -257,7 +257,7 @@ HashAndExtend (
   if (EFI_ERROR(Status)) {
     return EFI_DEVICE_ERROR;
   }
-  DEBUG((EFI_D_VERBOSE, "\n Tpm2HashSequenceStart Success \n"));
+  DEBUG((DEBUG_VERBOSE, "\n Tpm2HashSequenceStart Success \n"));
 
   Buffer = (UINT8 *)(UINTN)DataToHash;
   for (HashLen = DataToHashLen; HashLen > sizeof(HashBuffer.buffer); HashLen -= sizeof(HashBuffer.buffer)) {
@@ -271,7 +271,7 @@ HashAndExtend (
       return EFI_DEVICE_ERROR;
     }
   }
-  DEBUG((EFI_D_VERBOSE, "\n Tpm2SequenceUpdate Success \n"));
+  DEBUG((DEBUG_VERBOSE, "\n Tpm2SequenceUpdate Success \n"));
 
   HashBuffer.size = (UINT16)HashLen;
   CopyMem(HashBuffer.buffer, Buffer, (UINTN)HashLen);
@@ -289,7 +289,7 @@ HashAndExtend (
     if (EFI_ERROR(Status)) {
       return EFI_DEVICE_ERROR;
     }
-    DEBUG((EFI_D_VERBOSE, "\n Tpm2EventSequenceComplete Success \n"));
+    DEBUG((DEBUG_VERBOSE, "\n Tpm2EventSequenceComplete Success \n"));
   } else {
     Status = Tpm2SequenceComplete (
                SequenceHandle,
@@ -299,7 +299,7 @@ HashAndExtend (
     if (EFI_ERROR(Status)) {
       return EFI_DEVICE_ERROR;
     }
-    DEBUG((EFI_D_VERBOSE, "\n Tpm2SequenceComplete Success \n"));
+    DEBUG((DEBUG_VERBOSE, "\n Tpm2SequenceComplete Success \n"));
 
     DigestList->count = 1;
     DigestList->digests[0].hashAlg = AlgoId;
@@ -311,7 +311,7 @@ HashAndExtend (
     if (EFI_ERROR(Status)) {
       return EFI_DEVICE_ERROR;
     }
-    DEBUG((EFI_D_VERBOSE, "\n Tpm2PcrExtend Success \n"));
+    DEBUG((DEBUG_VERBOSE, "\n Tpm2PcrExtend Success \n"));
   }
 
   return EFI_SUCCESS;

@@ -1203,11 +1203,11 @@ TcgPhysicalPresenceLibProcessRequest (
                       &PpiFlags
                       );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[TPM] Set physical presence flag failed, Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "[TPM] Set physical presence flag failed, Status = %r\n", Status));
       return ;
     }
   }
-  DEBUG ((EFI_D_INFO, "[TPM] PpiFlags = %x\n", PpiFlags.PPFlags));
+  DEBUG ((DEBUG_INFO, "[TPM] PpiFlags = %x\n", PpiFlags.PPFlags));
 
   //
   // This flags variable controls whether physical presence is required for TPM command.
@@ -1221,7 +1221,7 @@ TcgPhysicalPresenceLibProcessRequest (
                                      &gEfiPhysicalPresenceGuid
                                      );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[TPM] Error when lock variable %s, Status = %r\n", PHYSICAL_PRESENCE_FLAGS_VARIABLE, Status));
+      DEBUG ((DEBUG_ERROR, "[TPM] Error when lock variable %s, Status = %r\n", PHYSICAL_PRESENCE_FLAGS_VARIABLE, Status));
       ASSERT_EFI_ERROR (Status);
     }
   }
@@ -1248,12 +1248,12 @@ TcgPhysicalPresenceLibProcessRequest (
                       &TcgPpData
                       );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[TPM] Set physical presence variable failed, Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "[TPM] Set physical presence variable failed, Status = %r\n", Status));
       return;
     }
   }
 
-  DEBUG ((EFI_D_INFO, "[TPM] Flags=%x, PPRequest=%x\n", PpiFlags.PPFlags, TcgPpData.PPRequest));
+  DEBUG ((DEBUG_INFO, "[TPM] Flags=%x, PPRequest=%x\n", PpiFlags.PPFlags, TcgPpData.PPRequest));
 
   if (TcgPpData.PPRequest == PHYSICAL_PRESENCE_NO_ACTION) {
     //
@@ -1292,7 +1292,7 @@ TcgPhysicalPresenceLibProcessRequest (
   // Execute pending TPM request.
   //
   ExecutePendingTpmRequest (TcgProtocol, &TcgPpData, PpiFlags);
-  DEBUG ((EFI_D_INFO, "[TPM] PPResponse = %x\n", TcgPpData.PPResponse));
+  DEBUG ((DEBUG_INFO, "[TPM] PPResponse = %x\n", TcgPpData.PPResponse));
 
   //
   // Lock physical presence.
@@ -1397,4 +1397,3 @@ TcgPhysicalPresenceLibNeedUserConfirm(
 
   return FALSE;
 }
-

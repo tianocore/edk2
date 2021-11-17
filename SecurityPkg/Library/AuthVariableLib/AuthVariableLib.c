@@ -153,9 +153,9 @@ AuthVariableLibInitialize (
 
   Status = AuthServiceInternalFindVariable (EFI_PLATFORM_KEY_NAME, &gEfiGlobalVariableGuid, (VOID **) &Data, &DataSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_INFO, "Variable %s does not exist.\n", EFI_PLATFORM_KEY_NAME));
+    DEBUG ((DEBUG_INFO, "Variable %s does not exist.\n", EFI_PLATFORM_KEY_NAME));
   } else {
-    DEBUG ((EFI_D_INFO, "Variable %s exists.\n", EFI_PLATFORM_KEY_NAME));
+    DEBUG ((DEBUG_INFO, "Variable %s exists.\n", EFI_PLATFORM_KEY_NAME));
   }
 
   //
@@ -238,9 +238,9 @@ AuthVariableLibInitialize (
     return Status;
   }
 
-  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_SETUP_MODE_NAME, mPlatformMode));
-  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_SECURE_BOOT_MODE_NAME, SecureBootMode));
-  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_SECURE_BOOT_ENABLE_NAME, SecureBootEnable));
+  DEBUG ((DEBUG_INFO, "Variable %s is %x\n", EFI_SETUP_MODE_NAME, mPlatformMode));
+  DEBUG ((DEBUG_INFO, "Variable %s is %x\n", EFI_SECURE_BOOT_MODE_NAME, SecureBootMode));
+  DEBUG ((DEBUG_INFO, "Variable %s is %x\n", EFI_SECURE_BOOT_ENABLE_NAME, SecureBootEnable));
 
   //
   // Initialize "CustomMode" in STANDARD_SECURE_BOOT_MODE state.
@@ -257,7 +257,7 @@ AuthVariableLibInitialize (
     return Status;
   }
 
-  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_CUSTOM_MODE_NAME, CustomMode));
+  DEBUG ((DEBUG_INFO, "Variable %s is %x\n", EFI_CUSTOM_MODE_NAME, CustomMode));
 
   //
   // Check "certdb" variable's existence.
@@ -289,7 +289,7 @@ AuthVariableLibInitialize (
     //
     Status = CleanCertsFromDb();
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Clean up CertDB fail! Status %x\n", Status));
+      DEBUG ((DEBUG_ERROR, "Clean up CertDB fail! Status %x\n", Status));
       return Status;
     }
   }
@@ -347,7 +347,7 @@ AuthVariableLibInitialize (
     return Status;
   }
 
-  DEBUG ((EFI_D_INFO, "Variable %s is %x\n", EFI_VENDOR_KEYS_VARIABLE_NAME, mVendorKeyState));
+  DEBUG ((DEBUG_INFO, "Variable %s is %x\n", EFI_VENDOR_KEYS_VARIABLE_NAME, mVendorKeyState));
 
   AuthVarLibContextOut->StructVersion = AUTH_VAR_LIB_CONTEXT_OUT_STRUCT_VERSION;
   AuthVarLibContextOut->StructSize = sizeof (AUTH_VAR_LIB_CONTEXT_OUT);
