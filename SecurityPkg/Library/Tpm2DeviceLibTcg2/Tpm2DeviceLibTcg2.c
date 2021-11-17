@@ -46,7 +46,7 @@ Tpm2SubmitCommand (
       //
       // Tcg2 protocol is not installed. So, TPM2 is not present.
       //
-      DEBUG ((EFI_D_ERROR, "Tpm2SubmitCommand - Tcg2 - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Tpm2SubmitCommand - Tcg2 - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }
@@ -90,7 +90,7 @@ Tpm2RequestUseTpm (
       //
       // Tcg2 protocol is not installed. So, TPM2 is not present.
       //
-      DEBUG ((EFI_D_ERROR, "Tpm2RequestUseTpm - Tcg2 - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Tpm2RequestUseTpm - Tcg2 - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }

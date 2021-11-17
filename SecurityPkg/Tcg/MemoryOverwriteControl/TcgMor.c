@@ -40,7 +40,7 @@ OnReadyToBoot (
   //
   // Clear MOR_CLEAR_MEMORY_BIT
   //
-  DEBUG ((EFI_D_INFO, "TcgMor: Clear MorClearMemory bit\n"));
+  DEBUG ((DEBUG_INFO, "TcgMor: Clear MorClearMemory bit\n"));
   mMorControl &= 0xFE;
 
   DataSize = sizeof (mMorControl);
@@ -168,7 +168,7 @@ InitiateTPerReset (
       // Found a  TCG device.
       //
       TcgFlag = TRUE;
-      DEBUG ((EFI_D_INFO, "This device is a TCG protocol device\n"));
+      DEBUG ((DEBUG_INFO, "This device is a TCG protocol device\n"));
       break;
     }
 
@@ -177,13 +177,13 @@ InitiateTPerReset (
       // Found a IEEE 1667 device.
       //
       IeeeFlag = TRUE;
-      DEBUG ((EFI_D_INFO, "This device is a IEEE 1667 protocol device\n"));
+      DEBUG ((DEBUG_INFO, "This device is a IEEE 1667 protocol device\n"));
       break;
     }
   }
 
   if (!TcgFlag && !IeeeFlag) {
-    DEBUG ((EFI_D_INFO, "Neither a TCG nor IEEE 1667 protocol device is found\n"));
+    DEBUG ((DEBUG_INFO, "Neither a TCG nor IEEE 1667 protocol device is found\n"));
     goto Exit;
   }
 
@@ -203,9 +203,9 @@ InitiateTPerReset (
                     );
 
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "Send TPer Reset Command Successfully !\n"));
+      DEBUG ((DEBUG_INFO, "Send TPer Reset Command Successfully !\n"));
     } else {
-      DEBUG ((EFI_D_INFO, "Send TPer Reset Command Fail !\n"));
+      DEBUG ((DEBUG_INFO, "Send TPer Reset Command Fail !\n"));
     }
   }
 
@@ -213,7 +213,7 @@ InitiateTPerReset (
     //
     // TBD : Perform a TPer Reset via IEEE 1667 Protocol
     //
-    DEBUG ((EFI_D_INFO, "IEEE 1667 Protocol didn't support yet!\n"));
+    DEBUG ((DEBUG_INFO, "IEEE 1667 Protocol didn't support yet!\n"));
   }
 
 Exit:
@@ -336,7 +336,7 @@ MorDriverEntryPoint (
                     DataSize,
                     &mMorControl
                     );
-    DEBUG ((EFI_D_INFO, "TcgMor: Create MOR variable! Status = %r\n", Status));
+    DEBUG ((DEBUG_INFO, "TcgMor: Create MOR variable! Status = %r\n", Status));
   } else {
     //
     // Create a Ready To Boot Event and Clear the MorControl bit in the call back function.
@@ -355,7 +355,7 @@ MorDriverEntryPoint (
     //
     // Register EFI_END_OF_DXE_EVENT_GROUP_GUID event.
     //
-    DEBUG ((EFI_D_INFO, "TcgMor: Create EndofDxe Event for Mor TPer Reset!\n"));
+    DEBUG ((DEBUG_INFO, "TcgMor: Create EndofDxe Event for Mor TPer Reset!\n"));
     Status = gBS->CreateEventEx (
                     EVT_NOTIFY_SIGNAL,
                     TPL_CALLBACK,
@@ -371,5 +371,3 @@ MorDriverEntryPoint (
 
   return Status;
 }
-
-

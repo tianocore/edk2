@@ -47,7 +47,7 @@ Tpm12SubmitCommand (
       //
       // TCG protocol is not installed. So, TPM12 is not present.
       //
-      DEBUG ((EFI_D_ERROR, "Tpm12SubmitCommand - TCG - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Tpm12SubmitCommand - TCG - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }
@@ -91,7 +91,7 @@ Tpm12RequestUseTpm (
       //
       // TCG protocol is not installed. So, TPM12 is not present.
       //
-      DEBUG ((EFI_D_ERROR, "Tpm12RequestUseTpm - TCG - %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Tpm12RequestUseTpm - TCG - %r\n", Status));
       return EFI_NOT_FOUND;
     }
   }

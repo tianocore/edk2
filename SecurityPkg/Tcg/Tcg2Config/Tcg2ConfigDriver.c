@@ -355,7 +355,7 @@ Tcg2ConfigDriverEntryPoint (
                   &Tcg2DeviceDetection
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_DEVICE_DETECTION_NAME\n"));
+    DEBUG ((DEBUG_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_DEVICE_DETECTION_NAME\n"));
     Status = gRT->SetVariable (
                     TCG2_DEVICE_DETECTION_NAME,
                     &gTcg2ConfigFormSetGuid,
@@ -377,7 +377,7 @@ Tcg2ConfigDriverEntryPoint (
                   &Tcg2Configuration
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_NAME\n"));
+    DEBUG ((DEBUG_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_NAME\n"));
   }
 
   //
