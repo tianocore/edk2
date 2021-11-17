@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MmServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 
-#define MAX_IO_PORT_ADDRESS   0xFFFF
+#define MAX_IO_PORT_ADDRESS  0xFFFF
 
 /**
   Reads memory-mapped registers.

@@ -453,5 +453,5 @@ GetProcessorLocation2ByApicId (
   OUT UINT32  *Core     OPTIONAL,
   OUT UINT32  *Thread   OPTIONAL
   );
-#endif
 
+#endif

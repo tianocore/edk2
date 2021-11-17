@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// SMM MP Protocol instance
 ///
-EFI_MM_MP_PROTOCOL  mSmmMp  = {
+EFI_MM_MP_PROTOCOL  mSmmMp = {
   EFI_MM_MP_PROTOCOL_REVISION,
   0,
   SmmMpGetNumberOfProcessors,
@@ -124,13 +124,13 @@ SmmMpDispatchProcedure (
   )
 {
   return InternalSmmStartupThisAp (
-    Procedure,
-    CpuNumber,
-    ProcedureArguments,
-    Token,
-    TimeoutInMicroseconds,
-    CPUStatus
-    );
+           Procedure,
+           CpuNumber,
+           ProcedureArguments,
+           Token,
+           TimeoutInMicroseconds,
+           CPUStatus
+           );
 }
 
 /**
@@ -210,13 +210,13 @@ SmmMpBroadcastProcedure (
   IN OUT   EFI_STATUS                    *CPUStatus
   )
 {
-  return InternalSmmStartupAllAPs(
-    Procedure,
-    TimeoutInMicroseconds,
-    ProcedureArguments,
-    Token,
-    CPUStatus
-    );
+  return InternalSmmStartupAllAPs (
+           Procedure,
+           TimeoutInMicroseconds,
+           ProcedureArguments,
+           Token,
+           CPUStatus
+           );
 }
 
 /**
@@ -333,7 +333,7 @@ SmmMpWaitForProcedure (
   IN       MM_COMPLETION                 Token
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   do {
     Status = SmmMpCheckForProcedure (This, Token);
@@ -341,4 +341,3 @@ SmmMpWaitForProcedure (
 
   return Status;
 }
-

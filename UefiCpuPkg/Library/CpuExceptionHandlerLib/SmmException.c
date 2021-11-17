@@ -9,16 +9,17 @@
 #include <PiSmm.h>
 #include "CpuExceptionCommon.h"
 
-CONST UINTN   mDoFarReturnFlag   = 1;
+CONST UINTN  mDoFarReturnFlag = 1;
 
 //
 // Spin lock for CPU information display
 //
-SPIN_LOCK        mDisplayMessageSpinLock;
+SPIN_LOCK  mDisplayMessageSpinLock;
 
-RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
-EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
-EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
+RESERVED_VECTORS_DATA      mReservedVectorsData[CPU_EXCEPTION_NUM];
+EFI_CPU_INTERRUPT_HANDLER  mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
+EXCEPTION_HANDLER_DATA     mExceptionHandlerData;
+
 /**
   Common exception handler.
 
@@ -57,7 +58,7 @@ InitializeCpuExceptionHandlers (
   IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
   )
 {
-  mExceptionHandlerData.ReservedVectors          = mReservedVectorsData;
+  mExceptionHandlerData.ReservedVectors = mReservedVectorsData;
   mExceptionHandlerData.ExternalInterruptHandler = mExternalInterruptHandlerTable;
   InitializeSpinLock (&mExceptionHandlerData.DisplayMessageSpinLock);
   return InitializeCpuExceptionHandlersWorker (VectorInfo, &mExceptionHandlerData);

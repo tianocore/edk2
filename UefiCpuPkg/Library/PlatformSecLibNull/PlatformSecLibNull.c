@@ -52,7 +52,7 @@ EFIAPI
 SecPlatformInformation (
   IN CONST EFI_PEI_SERVICES                     **PeiServices,
   IN OUT   UINT64                               *StructureSize,
-     OUT   EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
+  OUT   EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
   )
 {
   return EFI_SUCCESS;

@@ -24,27 +24,27 @@
 //
 #define  RESERVED_FIRMWARE_VARIABLE_MTRR_NUMBER  2
 
-#define  MTRR_NUMBER_OF_FIXED_MTRR      11
+#define  MTRR_NUMBER_OF_FIXED_MTRR  11
 
 //
 // Structure to describe a fixed MTRR
 //
 typedef struct {
-  UINT32  Msr;
-  UINT32  BaseAddress;
-  UINT32  Length;
+  UINT32    Msr;
+  UINT32    BaseAddress;
+  UINT32    Length;
 } FIXED_MTRR;
 
 //
 // Structure to describe a variable MTRR
 //
 typedef struct {
-  UINT64  BaseAddress;
-  UINT64  Length;
-  UINT64  Type;
-  UINT32  Msr;
-  BOOLEAN Valid;
-  BOOLEAN Used;
+  UINT64     BaseAddress;
+  UINT64     Length;
+  UINT64     Type;
+  UINT32     Msr;
+  BOOLEAN    Valid;
+  BOOLEAN    Used;
 } VARIABLE_MTRR;
 
 //
@@ -59,14 +59,14 @@ typedef struct _MTRR_VARIABLE_SETTING_ {
 // Array for variable MTRRs
 //
 typedef struct _MTRR_VARIABLE_SETTINGS_ {
-  MTRR_VARIABLE_SETTING   Mtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
+  MTRR_VARIABLE_SETTING    Mtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
 } MTRR_VARIABLE_SETTINGS;
 
 //
 // Array for fixed MTRRs
 //
 typedef  struct  _MTRR_FIXED_SETTINGS_ {
-  UINT64       Mtrr[MTRR_NUMBER_OF_FIXED_MTRR];
+  UINT64    Mtrr[MTRR_NUMBER_OF_FIXED_MTRR];
 } MTRR_FIXED_SETTINGS;
 
 //
@@ -98,9 +98,9 @@ typedef enum {
 #define  MTRR_CACHE_INVALID_TYPE     7
 
 typedef struct {
-  UINT64                 BaseAddress;
-  UINT64                 Length;
-  MTRR_MEMORY_CACHE_TYPE Type;
+  UINT64                    BaseAddress;
+  UINT64                    Length;
+  MTRR_MEMORY_CACHE_TYPE    Type;
 } MTRR_MEMORY_RANGE;
 
 /**
@@ -168,7 +168,6 @@ MtrrSetMemoryAttribute (
   IN MTRR_MEMORY_CACHE_TYPE  Attribute
   );
 
-
 /**
   This function will get the memory cache type of the specific address.
   This function is mainly for debugging purposes.
@@ -184,7 +183,6 @@ MtrrGetMemoryAttribute (
   IN PHYSICAL_ADDRESS   Address
   );
 
-
 /**
   This function gets the content in fixed MTRRs
 
@@ -193,12 +191,11 @@ MtrrGetMemoryAttribute (
   @return The pointer of FixedSettings
 
 **/
-MTRR_FIXED_SETTINGS*
+MTRR_FIXED_SETTINGS *
 EFIAPI
 MtrrGetFixedMtrr (
   OUT MTRR_FIXED_SETTINGS         *FixedSettings
   );
-
 
 /**
   This function gets the content in all MTRRs (variable and fixed)
@@ -214,7 +211,6 @@ MtrrGetAllMtrrs (
   OUT MTRR_SETTINGS                *MtrrSetting
   );
 
-
 /**
   This function sets all MTRRs (variable and fixed)
 
@@ -228,7 +224,6 @@ EFIAPI
 MtrrSetAllMtrrs (
   IN MTRR_SETTINGS                *MtrrSetting
   );
-
 
 /**
   Get the attribute of variable MTRRs.
@@ -252,7 +247,6 @@ MtrrGetMemoryAttributeInVariableMtrr (
   IN  UINT64                    MtrrValidAddressMask,
   OUT VARIABLE_MTRR             *VariableMtrr
   );
-
 
 /**
   This function prints all MTRRs for debugging.
@@ -361,4 +355,5 @@ MtrrSetMemoryAttributesInMtrrSettings (
   IN     CONST MTRR_MEMORY_RANGE *Ranges,
   IN     UINTN                   RangeCount
   );
+
 #endif // _MTRR_LIB_H_

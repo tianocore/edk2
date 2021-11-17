@@ -19,19 +19,19 @@
 #define PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_XD_ACTIVATED     BIT31
 // Other bits are reserved for future use
 typedef struct {
-  UINT32  PageTableBase;
-  UINT32  Reserved;
-  UINT32  Attributes;
+  UINT32    PageTableBase;
+  UINT32    Reserved;
+  UINT32    Attributes;
 } PAGE_TABLE_LIB_PAGING_CONTEXT_IA32;
 
 typedef struct {
-  UINT64  PageTableBase;
-  UINT32  Attributes;
+  UINT64    PageTableBase;
+  UINT32    Attributes;
 } PAGE_TABLE_LIB_PAGING_CONTEXT_X64;
 
 typedef union {
-  PAGE_TABLE_LIB_PAGING_CONTEXT_IA32  Ia32;
-  PAGE_TABLE_LIB_PAGING_CONTEXT_X64   X64;
+  PAGE_TABLE_LIB_PAGING_CONTEXT_IA32    Ia32;
+  PAGE_TABLE_LIB_PAGING_CONTEXT_X64     X64;
 } PAGE_TABLE_LIB_PAGING_CONTEXT_DATA;
 
 typedef struct {
@@ -41,8 +41,8 @@ typedef struct {
   // #define IMAGE_FILE_MACHINE_I386            0x014c
   // #define IMAGE_FILE_MACHINE_X64             0x8664
   //
-  UINT16                                 MachineType;
-  PAGE_TABLE_LIB_PAGING_CONTEXT_DATA     ContextData;
+  UINT16                                MachineType;
+  PAGE_TABLE_LIB_PAGING_CONTEXT_DATA    ContextData;
 } PAGE_TABLE_LIB_PAGING_CONTEXT;
 
 #define PAGE_TABLE_POOL_ALIGNMENT   BASE_2MB
@@ -52,11 +52,10 @@ typedef struct {
   (~(EFI_PHYSICAL_ADDRESS)(PAGE_TABLE_POOL_ALIGNMENT - 1))
 
 typedef struct {
-  VOID            *NextPool;
-  UINTN           Offset;
-  UINTN           FreePages;
+  VOID     *NextPool;
+  UINTN    Offset;
+  UINTN    FreePages;
 } PAGE_TABLE_POOL;
-
 
 /**
   Allocates one or more 4KB pages for page table.
@@ -68,7 +67,7 @@ typedef struct {
 **/
 typedef
 VOID *
-(EFIAPI *PAGE_TABLE_LIB_ALLOCATE_PAGES) (
+(EFIAPI *PAGE_TABLE_LIB_ALLOCATE_PAGES)(
   IN UINTN  Pages
   );
 

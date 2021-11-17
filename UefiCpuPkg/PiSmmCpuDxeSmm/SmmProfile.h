@@ -80,7 +80,6 @@ PageFaultIdtHandlerSmmProfile (
   VOID
   );
 
-
 /**
   Check if feature is supported by a processor.
 
@@ -122,14 +121,14 @@ GuardPagePFHandler (
 //
 // The flag indicates if execute-disable is supported by processor.
 //
-extern BOOLEAN    mXdSupported;
+extern BOOLEAN  mXdSupported;
 //
 // The flag indicates if execute-disable is enabled on processor.
 //
-extern BOOLEAN    mXdEnabled;
+extern BOOLEAN  mXdEnabled;
 //
 // The flag indicates if #DB will be setup in #PF handler.
 //
-extern BOOLEAN    mSetupDebugTrap;
+extern BOOLEAN  mSetupDebugTrap;
 
 #endif // _SMM_PROFILE_H_

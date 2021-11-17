@@ -38,7 +38,7 @@ EFIAPI
 SecPlatformInformationPostMemory (
   IN CONST EFI_PEI_SERVICES                     **PeiServices,
   IN OUT   UINT64                               *StructureSize,
-     OUT   EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
+  OUT   EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
   );
 
 /**
@@ -143,16 +143,16 @@ GetPerformancePostMemory (
   );
 
 typedef struct {
-  UINT64                                StructureSize;
-  EFI_SEC_PLATFORM_INFORMATION_RECORD   *PlatformInformationRecord;
+  UINT64                                 StructureSize;
+  EFI_SEC_PLATFORM_INFORMATION_RECORD    *PlatformInformationRecord;
 } SEC_PLATFORM_INFORMATION_CONTEXT;
 
 typedef struct {
-  EFI_HOB_GUID_TYPE                     Header;
-  UINT8                                 Revision;
-  UINT8                                 Reserved[3];
-  FIRMWARE_SEC_PERFORMANCE              FirmwareSecPerformance;
-  SEC_PLATFORM_INFORMATION_CONTEXT      Context;
+  EFI_HOB_GUID_TYPE                   Header;
+  UINT8                               Revision;
+  UINT8                               Reserved[3];
+  FIRMWARE_SEC_PERFORMANCE            FirmwareSecPerformance;
+  SEC_PLATFORM_INFORMATION_CONTEXT    Context;
 } SEC_PLATFORM_INFORMATION_CONTEXT_HOB;
 
 #endif
