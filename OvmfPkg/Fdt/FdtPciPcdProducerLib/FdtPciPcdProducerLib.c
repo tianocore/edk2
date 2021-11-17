@@ -57,7 +57,7 @@ GetPciIoTranslation (
   Status = FdtClient->GetNodeProperty (FdtClient, Node, "ranges", &Prop, &Len);
   if (EFI_ERROR (Status) || Len == 0 ||
       Len % sizeof (DTB_PCI_HOST_RANGE_RECORD) != 0) {
-    DEBUG ((EFI_D_ERROR, "%a: 'ranges' not found or invalid\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: 'ranges' not found or invalid\n", __FUNCTION__));
     return RETURN_PROTOCOL_ERROR;
   }
 
@@ -135,7 +135,7 @@ FdtPciPcdProducerLibConstructor (
         // to abort in the general case. So leave it up to the actual driver to
         // complain about this if it wants to, and just issue a warning here.
         //
-        DEBUG ((EFI_D_WARN,
+        DEBUG ((DEBUG_WARN,
           "%a: 'pci-host-ecam-generic' device encountered with no I/O range\n",
           __FUNCTION__));
       }
