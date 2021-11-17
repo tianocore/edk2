@@ -253,7 +253,7 @@ RemoveStaleFvFileOptions (
       DevicePathString = ConvertDevicePathToText(BootOptions[Index].FilePath,
                            FALSE, FALSE);
       DEBUG ((
-        EFI_ERROR (Status) ? EFI_D_WARN : DEBUG_VERBOSE,
+        EFI_ERROR (Status) ? DEBUG_WARN : DEBUG_VERBOSE,
         "%a: removing stale Boot#%04x %s: %r\n",
         __FUNCTION__,
         (UINT32)BootOptions[Index].OptionNumber,

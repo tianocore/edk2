@@ -125,7 +125,7 @@ QemuFwCfgInitialize (
                          (CONST VOID **)&Reg, &AddressCells, &SizeCells,
                          &RegSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_WARN,
+    DEBUG ((DEBUG_WARN,
       "%a: No 'qemu,fw-cfg-mmio' compatible DT node found (Status == %r)\n",
       __FUNCTION__, Status));
     return EFI_SUCCESS;
@@ -156,7 +156,7 @@ QemuFwCfgInitialize (
   mFwCfgSelectorAddress = FwCfgSelectorAddress;
   mFwCfgDataAddress     = FwCfgDataAddress;
 
-  DEBUG ((EFI_D_INFO, "Found FwCfg @ 0x%Lx/0x%Lx\n", FwCfgSelectorAddress,
+  DEBUG ((DEBUG_INFO, "Found FwCfg @ 0x%Lx/0x%Lx\n", FwCfgSelectorAddress,
     FwCfgDataAddress));
 
   if (SwapBytes64 (Reg[1]) >= 0x18) {
@@ -168,7 +168,7 @@ QemuFwCfgInitialize (
     //
     ASSERT (FwCfgDmaAddress <= MAX_UINTN - FwCfgDmaSize + 1);
 
-    DEBUG ((EFI_D_INFO, "Found FwCfg DMA @ 0x%Lx\n", FwCfgDmaAddress));
+    DEBUG ((DEBUG_INFO, "Found FwCfg DMA @ 0x%Lx\n", FwCfgDmaAddress));
   } else {
     FwCfgDmaAddress = 0;
   }
