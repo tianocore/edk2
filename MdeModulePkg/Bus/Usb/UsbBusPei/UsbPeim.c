@@ -221,7 +221,7 @@ PeiHubEnumeration (
 
   UsbIoPpi    = &PeiUsbDevice->UsbIoPpi;
 
-  DEBUG ((EFI_D_INFO, "PeiHubEnumeration: DownStreamPortNo: %x\n", PeiUsbDevice->DownStreamPortNo));
+  DEBUG ((DEBUG_INFO, "PeiHubEnumeration: DownStreamPortNo: %x\n", PeiUsbDevice->DownStreamPortNo));
 
   for (Index = 0; Index < PeiUsbDevice->DownStreamPortNo; Index++) {
 
@@ -236,7 +236,7 @@ PeiHubEnumeration (
       continue;
     }
 
-    DEBUG ((EFI_D_INFO, "USB Status --- Port: %x ConnectChange[%04x] Status[%04x]\n", Index, PortStatus.PortChangeStatus, PortStatus.PortStatus));
+    DEBUG ((DEBUG_INFO, "USB Status --- Port: %x ConnectChange[%04x] Status[%04x]\n", Index, PortStatus.PortChangeStatus, PortStatus.PortStatus));
     //
     // Only handle connection/enable/overcurrent/reset change.
     //
@@ -305,7 +305,7 @@ PeiHubEnumeration (
         }
 
         NewPeiUsbDevice->DeviceSpeed = (UINT8) PeiUsbGetDeviceSpeed (PortStatus.PortStatus);
-        DEBUG ((EFI_D_INFO, "Device Speed =%d\n", PeiUsbDevice->DeviceSpeed));
+        DEBUG ((DEBUG_INFO, "Device Speed =%d\n", PeiUsbDevice->DeviceSpeed));
 
         if (USB_BIT_IS_SET (PortStatus.PortStatus, USB_PORT_STAT_SUPER_SPEED)){
           NewPeiUsbDevice->MaxPacketSize0 = 512;
@@ -339,7 +339,7 @@ PeiHubEnumeration (
         if (EFI_ERROR (Status)) {
           continue;
         }
-        DEBUG ((EFI_D_INFO, "PeiHubEnumeration: PeiConfigureUsbDevice Success\n"));
+        DEBUG ((DEBUG_INFO, "PeiHubEnumeration: PeiConfigureUsbDevice Success\n"));
 
         Status = PeiServicesInstallPpi (&NewPeiUsbDevice->UsbIoPpiList);
 
@@ -445,7 +445,7 @@ PeiUsbEnumeration (
     return EFI_INVALID_PARAMETER;
   }
 
-  DEBUG ((EFI_D_INFO, "PeiUsbEnumeration: NumOfRootPort: %x\n", NumOfRootPort));
+  DEBUG ((DEBUG_INFO, "PeiUsbEnumeration: NumOfRootPort: %x\n", NumOfRootPort));
 
   for (Index = 0; Index < NumOfRootPort; Index++) {
     //
@@ -466,7 +466,7 @@ PeiUsbEnumeration (
                   &PortStatus
                   );
     }
-    DEBUG ((EFI_D_INFO, "USB Status --- Port: %x ConnectChange[%04x] Status[%04x]\n", Index, PortStatus.PortChangeStatus, PortStatus.PortStatus));
+    DEBUG ((DEBUG_INFO, "USB Status --- Port: %x ConnectChange[%04x] Status[%04x]\n", Index, PortStatus.PortChangeStatus, PortStatus.PortStatus));
     //
     // Only handle connection/enable/overcurrent/reset change.
     //
@@ -555,7 +555,7 @@ PeiUsbEnumeration (
         }
 
         PeiUsbDevice->DeviceSpeed = (UINT8) PeiUsbGetDeviceSpeed (PortStatus.PortStatus);
-        DEBUG ((EFI_D_INFO, "Device Speed =%d\n", PeiUsbDevice->DeviceSpeed));
+        DEBUG ((DEBUG_INFO, "Device Speed =%d\n", PeiUsbDevice->DeviceSpeed));
 
         if (USB_BIT_IS_SET (PortStatus.PortStatus, USB_PORT_STAT_SUPER_SPEED)){
           PeiUsbDevice->MaxPacketSize0 = 512;
@@ -580,7 +580,7 @@ PeiUsbEnumeration (
         if (EFI_ERROR (Status)) {
           continue;
         }
-        DEBUG ((EFI_D_INFO, "PeiUsbEnumeration: PeiConfigureUsbDevice Success\n"));
+        DEBUG ((DEBUG_INFO, "PeiUsbEnumeration: PeiConfigureUsbDevice Success\n"));
 
         Status = PeiServicesInstallPpi (&PeiUsbDevice->UsbIoPpiList);
 
@@ -685,13 +685,13 @@ PeiConfigureUsbDevice (
                );
 
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, "PeiUsbGet Device Descriptor the %d time Success\n", Retry));
+      DEBUG ((DEBUG_INFO, "PeiUsbGet Device Descriptor the %d time Success\n", Retry));
       break;
     }
   }
 
   if (Retry == 3) {
-    DEBUG ((EFI_D_ERROR, "PeiUsbGet Device Descriptor fail: %x %r\n", Retry, Status));
+    DEBUG ((DEBUG_ERROR, "PeiUsbGet Device Descriptor fail: %x %r\n", Retry, Status));
     return Status;
   }
 
@@ -710,7 +710,7 @@ PeiConfigureUsbDevice (
             );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "PeiUsbSetDeviceAddress Failed: %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "PeiUsbSetDeviceAddress Failed: %r\n", Status));
     return Status;
   }
   MicroSecondDelay (USB_SET_DEVICE_ADDRESS_STALL);
@@ -730,7 +730,7 @@ PeiConfigureUsbDevice (
             );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "PeiUsbGetDescriptor First Failed\n"));
+    DEBUG ((DEBUG_ERROR, "PeiUsbGetDescriptor First Failed\n"));
     return Status;
   }
 
@@ -801,7 +801,7 @@ PeiUsbGetAllConfiguration (
             );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "PeiUsbGet Config Descriptor First Failed\n"));
+    DEBUG ((DEBUG_ERROR, "PeiUsbGet Config Descriptor First Failed\n"));
     return Status;
   }
   MicroSecondDelay (USB_GET_CONFIG_DESCRIPTOR_STALL);
@@ -836,7 +836,7 @@ PeiUsbGetAllConfiguration (
             );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "PeiUsbGet Config Descriptor all Failed\n"));
+    DEBUG ((DEBUG_ERROR, "PeiUsbGet Config Descriptor all Failed\n"));
     return Status;
   }
   //
@@ -1046,7 +1046,7 @@ ResetRootPort (
                          );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "SetRootHubPortFeature EfiUsbPortReset Failed\n"));
+      DEBUG ((DEBUG_ERROR, "SetRootHubPortFeature EfiUsbPortReset Failed\n"));
       return;
     }
 
@@ -1067,7 +1067,7 @@ ResetRootPort (
                          );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "ClearRootHubPortFeature EfiUsbPortReset Failed\n"));
+      DEBUG ((DEBUG_ERROR, "ClearRootHubPortFeature EfiUsbPortReset Failed\n"));
       return;
     }
 
@@ -1098,7 +1098,7 @@ ResetRootPort (
     }
 
     if (Index == USB_WAIT_PORT_STS_CHANGE_LOOP) {
-      DEBUG ((EFI_D_ERROR, "ResetRootPort: reset not finished in time on port %d\n", PortNum));
+      DEBUG ((DEBUG_ERROR, "ResetRootPort: reset not finished in time on port %d\n", PortNum));
       return;
     }
 
@@ -1148,7 +1148,7 @@ ResetRootPort (
                          );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "SetRootHubPortFeature EfiUsbPortReset Failed\n"));
+      DEBUG ((DEBUG_ERROR, "SetRootHubPortFeature EfiUsbPortReset Failed\n"));
       return;
     }
 
@@ -1169,7 +1169,7 @@ ResetRootPort (
                          );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "ClearRootHubPortFeature EfiUsbPortReset Failed\n"));
+      DEBUG ((DEBUG_ERROR, "ClearRootHubPortFeature EfiUsbPortReset Failed\n"));
       return;
     }
 
@@ -1200,7 +1200,7 @@ ResetRootPort (
     }
 
     if (Index == USB_WAIT_PORT_STS_CHANGE_LOOP) {
-      DEBUG ((EFI_D_ERROR, "ResetRootPort: reset not finished in time on port %d\n", PortNum));
+      DEBUG ((DEBUG_ERROR, "ResetRootPort: reset not finished in time on port %d\n", PortNum));
       return;
     }
 
@@ -1239,5 +1239,3 @@ ResetRootPort (
   }
   return;
 }
-
-

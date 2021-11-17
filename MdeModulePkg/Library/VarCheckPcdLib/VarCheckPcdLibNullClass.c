@@ -63,7 +63,7 @@ VarCheckPcdInternalDumpHex (
 
     Val[Index * 3]  = 0;
     Str[Index]      = 0;
-    DEBUG ((EFI_D_INFO, "%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str));
+    DEBUG ((DEBUG_INFO, "%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str));
 
     Data += Size;
     Offset += Size;
@@ -116,7 +116,7 @@ VarCheckPcdValidData (
         //
         // No match
         //
-        DEBUG ((EFI_D_INFO, "VarCheckPcdValidData fail: ValidList mismatch (0x%lx)\n", OneData));
+        DEBUG ((DEBUG_INFO, "VarCheckPcdValidData fail: ValidList mismatch (0x%lx)\n", OneData));
         DEBUG_CODE (VarCheckPcdInternalDumpHex (2, 0, PcdValidData->Length, (UINT8 *) PcdValidData););
         return FALSE;
       }
@@ -136,7 +136,7 @@ VarCheckPcdValidData (
           return TRUE;
         }
       }
-      DEBUG ((EFI_D_INFO, "VarCheckPcdValidData fail: ValidRange mismatch (0x%lx)\n", OneData));
+      DEBUG ((DEBUG_INFO, "VarCheckPcdValidData fail: ValidRange mismatch (0x%lx)\n", OneData));
       DEBUG_CODE (VarCheckPcdInternalDumpHex (2, 0, PcdValidData->Length, (UINT8 *) PcdValidData););
       return FALSE;
       break;
@@ -199,14 +199,14 @@ SetVariableCheckHandlerPcd (
       //
       // Found the Pcd Variable that could be used to do check.
       //
-      DEBUG ((EFI_D_INFO, "VarCheckPcdVariable - %s:%g with Attributes = 0x%08x Size = 0x%x\n", VariableName, VendorGuid, Attributes, DataSize));
+      DEBUG ((DEBUG_INFO, "VarCheckPcdVariable - %s:%g with Attributes = 0x%08x Size = 0x%x\n", VariableName, VendorGuid, Attributes, DataSize));
       if ((PcdVariable->Attributes != 0) && PcdVariable->Attributes != Attributes) {
-        DEBUG ((EFI_D_INFO, "VarCheckPcdVariable fail for Attributes - 0x%08x\n", PcdVariable->Attributes));
+        DEBUG ((DEBUG_INFO, "VarCheckPcdVariable fail for Attributes - 0x%08x\n", PcdVariable->Attributes));
         return EFI_SECURITY_VIOLATION;
       }
 
       if (DataSize == 0) {
-        DEBUG ((EFI_D_INFO, "VarCheckPcdVariable - CHECK PASS with DataSize == 0 !\n"));
+        DEBUG ((DEBUG_INFO, "VarCheckPcdVariable - CHECK PASS with DataSize == 0 !\n"));
         return EFI_SUCCESS;
       }
 
@@ -227,7 +227,7 @@ SetVariableCheckHandlerPcd (
         PcdValidData = (VAR_CHECK_PCD_VALID_DATA_HEADER *) HEADER_ALIGN (((UINTN) PcdValidData + PcdValidData->Length));
       }
 
-      DEBUG ((EFI_D_INFO, "VarCheckPcdVariable - ALL CHECK PASS!\n"));
+      DEBUG ((DEBUG_INFO, "VarCheckPcdVariable - ALL CHECK PASS!\n"));
       return EFI_SUCCESS;
     }
     //
@@ -257,11 +257,11 @@ DumpPcdValidData (
   UINT64    OneValue;
   UINT8     *Ptr;
 
-  DEBUG ((EFI_D_INFO, "  VAR_CHECK_PCD_VALID_DATA_HEADER\n"));
-  DEBUG ((EFI_D_INFO, "    Type          - 0x%02x\n", PcdValidData->Type));
-  DEBUG ((EFI_D_INFO, "    Length        - 0x%02x\n", PcdValidData->Length));
-  DEBUG ((EFI_D_INFO, "    VarOffset     - 0x%04x\n", PcdValidData->VarOffset));
-  DEBUG ((EFI_D_INFO, "    StorageWidth  - 0x%02x\n", PcdValidData->StorageWidth));
+  DEBUG ((DEBUG_INFO, "  VAR_CHECK_PCD_VALID_DATA_HEADER\n"));
+  DEBUG ((DEBUG_INFO, "    Type          - 0x%02x\n", PcdValidData->Type));
+  DEBUG ((DEBUG_INFO, "    Length        - 0x%02x\n", PcdValidData->Length));
+  DEBUG ((DEBUG_INFO, "    VarOffset     - 0x%04x\n", PcdValidData->VarOffset));
+  DEBUG ((DEBUG_INFO, "    StorageWidth  - 0x%02x\n", PcdValidData->StorageWidth));
 
   switch (PcdValidData->Type) {
     case VarCheckPcdValidList:
@@ -271,16 +271,16 @@ DumpPcdValidData (
         CopyMem (&OneValue, Ptr, PcdValidData->StorageWidth);
         switch (PcdValidData->StorageWidth) {
           case sizeof (UINT8):
-            DEBUG ((EFI_D_INFO, "    ValidList   - 0x%02x\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    ValidList   - 0x%02x\n", OneValue));
             break;
           case sizeof (UINT16):
-            DEBUG ((EFI_D_INFO, "    ValidList   - 0x%04x\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    ValidList   - 0x%04x\n", OneValue));
             break;
           case sizeof (UINT32):
-            DEBUG ((EFI_D_INFO, "    ValidList   - 0x%08x\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    ValidList   - 0x%08x\n", OneValue));
             break;
           case sizeof (UINT64):
-            DEBUG ((EFI_D_INFO, "    ValidList   - 0x%016lx\n", OneValue));
+            DEBUG ((DEBUG_INFO, "    ValidList   - 0x%016lx\n", OneValue));
             break;
           default:
             ASSERT (FALSE);
@@ -302,20 +302,20 @@ DumpPcdValidData (
 
         switch (PcdValidData->StorageWidth) {
           case sizeof (UINT8):
-            DEBUG ((EFI_D_INFO, "    Minimum       - 0x%02x\n", Minimum));
-            DEBUG ((EFI_D_INFO, "    Maximum       - 0x%02x\n", Maximum));
+            DEBUG ((DEBUG_INFO, "    Minimum       - 0x%02x\n", Minimum));
+            DEBUG ((DEBUG_INFO, "    Maximum       - 0x%02x\n", Maximum));
             break;
           case sizeof (UINT16):
-            DEBUG ((EFI_D_INFO, "    Minimum       - 0x%04x\n", Minimum));
-            DEBUG ((EFI_D_INFO, "    Maximum       - 0x%04x\n", Maximum));
+            DEBUG ((DEBUG_INFO, "    Minimum       - 0x%04x\n", Minimum));
+            DEBUG ((DEBUG_INFO, "    Maximum       - 0x%04x\n", Maximum));
             break;
           case sizeof (UINT32):
-            DEBUG ((EFI_D_INFO, "    Minimum       - 0x%08x\n", Minimum));
-            DEBUG ((EFI_D_INFO, "    Maximum       - 0x%08x\n", Maximum));
+            DEBUG ((DEBUG_INFO, "    Minimum       - 0x%08x\n", Minimum));
+            DEBUG ((DEBUG_INFO, "    Maximum       - 0x%08x\n", Maximum));
             break;
           case sizeof (UINT64):
-            DEBUG ((EFI_D_INFO, "    Minimum       - 0x%016lx\n", Minimum));
-            DEBUG ((EFI_D_INFO, "    Maximum       - 0x%016lx\n", Maximum));
+            DEBUG ((DEBUG_INFO, "    Minimum       - 0x%016lx\n", Minimum));
+            DEBUG ((DEBUG_INFO, "    Maximum       - 0x%016lx\n", Maximum));
             break;
           default:
             ASSERT (FALSE);
@@ -343,14 +343,14 @@ DumpPcdVariable (
 {
   VAR_CHECK_PCD_VALID_DATA_HEADER *PcdValidData;
 
-  DEBUG ((EFI_D_INFO, "VAR_CHECK_PCD_VARIABLE_HEADER\n"));
-  DEBUG ((EFI_D_INFO, "  Revision        - 0x%04x\n", PcdVariable->Revision));
-  DEBUG ((EFI_D_INFO, "  HeaderLength    - 0x%04x\n", PcdVariable->HeaderLength));
-  DEBUG ((EFI_D_INFO, "  Length          - 0x%08x\n", PcdVariable->Length));
-  DEBUG ((EFI_D_INFO, "  Type            - 0x%02x\n", PcdVariable->Type));
-  DEBUG ((EFI_D_INFO, "  Attributes      - 0x%08x\n", PcdVariable->Attributes));
-  DEBUG ((EFI_D_INFO, "  Guid            - %g\n", &PcdVariable->Guid));
-  DEBUG ((EFI_D_INFO, "  Name            - %s\n", PcdVariable + 1));
+  DEBUG ((DEBUG_INFO, "VAR_CHECK_PCD_VARIABLE_HEADER\n"));
+  DEBUG ((DEBUG_INFO, "  Revision        - 0x%04x\n", PcdVariable->Revision));
+  DEBUG ((DEBUG_INFO, "  HeaderLength    - 0x%04x\n", PcdVariable->HeaderLength));
+  DEBUG ((DEBUG_INFO, "  Length          - 0x%08x\n", PcdVariable->Length));
+  DEBUG ((DEBUG_INFO, "  Type            - 0x%02x\n", PcdVariable->Type));
+  DEBUG ((DEBUG_INFO, "  Attributes      - 0x%08x\n", PcdVariable->Attributes));
+  DEBUG ((DEBUG_INFO, "  Guid            - %g\n", &PcdVariable->Guid));
+  DEBUG ((DEBUG_INFO, "  Name            - %s\n", PcdVariable + 1));
 
   //
   // For Pcd ValidData header align.
@@ -383,7 +383,7 @@ DumpVarCheckPcd (
 {
   VAR_CHECK_PCD_VARIABLE_HEADER     *PcdVariable;
 
-  DEBUG ((EFI_D_INFO, "DumpVarCheckPcd\n"));
+  DEBUG ((DEBUG_INFO, "DumpVarCheckPcd\n"));
 
   //
   // For Pcd Variable header align.
@@ -436,7 +436,7 @@ LocateVarCheckPcdBin (
     mVarCheckPcdBinSize = VarCheckPcdBinSize;
     FreePool (VarCheckPcdBin);
 
-    DEBUG ((EFI_D_INFO, "VarCheckPcdBin - at 0x%x size = 0x%x\n", mVarCheckPcdBin, mVarCheckPcdBinSize));
+    DEBUG ((DEBUG_INFO, "VarCheckPcdBin - at 0x%x size = 0x%x\n", mVarCheckPcdBin, mVarCheckPcdBinSize));
 
 #ifdef DUMP_VAR_CHECK_PCD
     DEBUG_CODE (
@@ -444,7 +444,7 @@ LocateVarCheckPcdBin (
     );
 #endif
   } else {
-    DEBUG ((EFI_D_INFO, "[VarCheckPcd] No VarCheckPcdBin found at the first RAW section\n"));
+    DEBUG ((DEBUG_INFO, "[VarCheckPcd] No VarCheckPcdBin found at the first RAW section\n"));
   }
 }
 

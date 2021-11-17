@@ -235,7 +235,7 @@ GetPeCoffImageFixLoadingAssignedAddress(
      }
      SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
    }
-   DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status= %r \n", (VOID *)(UINTN)FixLoadingAddress, Status));
+   DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address 0x%11p. Status= %r \n", (VOID *)(UINTN)FixLoadingAddress, Status));
    return Status;
 }
 /**
@@ -333,7 +333,7 @@ LoadAndRelocatePeCoffImage (
        (!IsS3Boot && (PcdGetBool (PcdShadowPeimOnBoot) || IsRegisterForShadow)) ||
        (IsS3Boot && PcdGetBool (PcdShadowPeimOnS3Boot)))
      ) {
-    DEBUG ((EFI_D_INFO|EFI_D_LOAD, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN) Pe32Data));
+    DEBUG ((DEBUG_INFO|DEBUG_LOAD, "The image at 0x%08x without reloc section can't be loaded into memory\n", (UINTN) Pe32Data));
   }
 
   //
@@ -367,7 +367,7 @@ LoadAndRelocatePeCoffImage (
     if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0 && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME)) {
       Status = GetPeCoffImageFixLoadingAssignedAddress(&ImageContext, Private);
       if (EFI_ERROR (Status)){
-        DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));
+        DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));
         //
         // The PEIM is not assigned valid address, try to allocate page to load it.
         //
@@ -697,12 +697,12 @@ PeiLoadImageLoadImage (
     // Print debug message: Loading PEIM at 0x12345678 EntryPoint=0x12345688 Driver.efi
     //
     if (Machine != EFI_IMAGE_MACHINE_IA64) {
-      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%11p EntryPoint=0x%11p ", (VOID *)(UINTN)ImageAddress, (VOID *)(UINTN)*EntryPoint));
+      DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading PEIM at 0x%11p EntryPoint=0x%11p ", (VOID *)(UINTN)ImageAddress, (VOID *)(UINTN)*EntryPoint));
     } else {
       //
       // For IPF Image, the real entry point should be print.
       //
-      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%11p EntryPoint=0x%11p ", (VOID *)(UINTN)ImageAddress, (VOID *)(UINTN)(*(UINT64 *)(UINTN)*EntryPoint)));
+      DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Loading PEIM at 0x%11p EntryPoint=0x%11p ", (VOID *)(UINTN)ImageAddress, (VOID *)(UINTN)(*(UINT64 *)(UINTN)*EntryPoint)));
     }
 
     //
@@ -741,12 +741,12 @@ PeiLoadImageLoadImage (
         EfiFileName[Index] = 0;
       }
 
-      DEBUG ((EFI_D_INFO | EFI_D_LOAD, "%a", EfiFileName));
+      DEBUG ((DEBUG_INFO | DEBUG_LOAD, "%a", EfiFileName));
     }
 
   DEBUG_CODE_END ();
 
-  DEBUG ((EFI_D_INFO | EFI_D_LOAD, "\n"));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "\n"));
 
   return EFI_SUCCESS;
 
@@ -961,7 +961,3 @@ InitializeImageServices (
     PeiServicesReInstallPpi (PrivateData->XipLoadFile, &gPpiLoadFilePpiList);
   }
 }
-
-
-
-

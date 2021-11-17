@@ -231,7 +231,7 @@ PciSearchDevice (
   PciIoDevice = NULL;
 
   DEBUG ((
-    EFI_D_INFO,
+    DEBUG_INFO,
     "PciBus: Discovered %s @ [%02x|%02x|%02x]\n",
     IS_PCI_BRIDGE (Pci) ?     L"PPB" :
     IS_CARDBUS_BRIDGE (Pci) ? L"P2C" :
@@ -398,7 +398,7 @@ DumpPpbPaddingResource (
 
     if ((Type != PciBarTypeUnknown) && ((ResourceType == PciBarTypeUnknown) || (ResourceType == Type))) {
       DEBUG ((
-        EFI_D_INFO,
+        DEBUG_INFO,
         "   Padding: Type = %s; Alignment = 0x%lx;\tLength = 0x%lx\n",
         mBarTypeStr[Type], Descriptor->AddrRangeMax, Descriptor->AddrLen
         ));
@@ -425,7 +425,7 @@ DumpPciBars (
     }
 
     DEBUG ((
-      EFI_D_INFO,
+      DEBUG_INFO,
       "   BAR[%d]: Type = %s; Alignment = 0x%lx;\tLength = 0x%lx;\tOffset = 0x%02x\n",
       Index, mBarTypeStr[MIN (PciIoDevice->PciBar[Index].BarType, PciBarTypeMaxType)],
       PciIoDevice->PciBar[Index].Alignment, PciIoDevice->PciBar[Index].Length, PciIoDevice->PciBar[Index].Offset
@@ -438,13 +438,13 @@ DumpPciBars (
     }
 
     DEBUG ((
-      EFI_D_INFO,
+      DEBUG_INFO,
       " VFBAR[%d]: Type = %s; Alignment = 0x%lx;\tLength = 0x%lx;\tOffset = 0x%02x\n",
       Index, mBarTypeStr[MIN (PciIoDevice->VfPciBar[Index].BarType, PciBarTypeMaxType)],
       PciIoDevice->VfPciBar[Index].Alignment, PciIoDevice->VfPciBar[Index].Length, PciIoDevice->VfPciBar[Index].Offset
       ));
   }
-  DEBUG ((EFI_D_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "\n"));
 }
 
 /**
@@ -1903,7 +1903,7 @@ PciParseBar (
       // Fix the length to support some special 64 bit BAR
       //
       if (Value == 0) {
-        DEBUG ((EFI_D_INFO, "[PciBus]BAR probing for upper 32bit of MEM64 BAR returns 0, change to 0xFFFFFFFF.\n"));
+        DEBUG ((DEBUG_INFO, "[PciBus]BAR probing for upper 32bit of MEM64 BAR returns 0, change to 0xFFFFFFFF.\n"));
         Value = (UINT32) -1;
       } else {
         Value |= ((UINT32)(-1) << HighBitSet32 (Value));
@@ -2282,7 +2282,7 @@ CreatePciIoDevice (
                               &Data32
                               );
           DEBUG ((
-            EFI_D_INFO,
+            DEBUG_INFO,
             " ARI: forwarding enabled for PPB[%02x:%02x:%02x]\n",
             Bridge->BusNumber,
             Bridge->DeviceNumber,
@@ -2291,7 +2291,7 @@ CreatePciIoDevice (
         }
       }
 
-      DEBUG ((EFI_D_INFO, " ARI: CapOffset = 0x%x\n", PciIoDevice->AriCapabilityOffset));
+      DEBUG ((DEBUG_INFO, " ARI: CapOffset = 0x%x\n", PciIoDevice->AriCapabilityOffset));
     }
   }
 
@@ -2401,12 +2401,12 @@ CreatePciIoDevice (
       PciIoDevice->ReservedBusNum = (UINT16)(EFI_PCI_BUS_OF_RID (LastVF) - Bus + 1);
 
       DEBUG ((
-        EFI_D_INFO,
+        DEBUG_INFO,
         " SR-IOV: SupportedPageSize = 0x%x; SystemPageSize = 0x%x; FirstVFOffset = 0x%x;\n",
         SupportedPageSize, PciIoDevice->SystemPageSize >> 12, FirstVFOffset
         ));
       DEBUG ((
-        EFI_D_INFO,
+        DEBUG_INFO,
         "         InitialVFs = 0x%x; ReservedBusNum = 0x%x; CapOffset = 0x%x\n",
         PciIoDevice->InitialVFs, PciIoDevice->ReservedBusNum, PciIoDevice->SrIovCapabilityOffset
         ));
@@ -2421,7 +2421,7 @@ CreatePciIoDevice (
                NULL
                );
     if (!EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_INFO, " MR-IOV: CapOffset = 0x%x\n", PciIoDevice->MrIovCapabilityOffset));
+      DEBUG ((DEBUG_INFO, " MR-IOV: CapOffset = 0x%x\n", PciIoDevice->MrIovCapabilityOffset));
     }
   }
 
@@ -2869,4 +2869,3 @@ ResetAllPpbBusNumber (
     }
   }
 }
-

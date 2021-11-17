@@ -266,13 +266,13 @@ UsbBotDataTransfer (
                             );
   if (EFI_ERROR (Status)) {
     if (USB_IS_ERROR (Result, EFI_USB_ERR_STALL)) {
-      DEBUG ((EFI_D_INFO, "UsbBotDataTransfer: (%r)\n", Status));
-      DEBUG ((EFI_D_INFO, "UsbBotDataTransfer: DataIn Stall\n"));
+      DEBUG ((DEBUG_INFO, "UsbBotDataTransfer: (%r)\n", Status));
+      DEBUG ((DEBUG_INFO, "UsbBotDataTransfer: DataIn Stall\n"));
       UsbClearEndpointStall (UsbBot->UsbIo, Endpoint->EndpointAddress);
     } else if (USB_IS_ERROR (Result, EFI_USB_ERR_NAK)) {
       Status = EFI_NOT_READY;
     } else {
-      DEBUG ((EFI_D_ERROR, "UsbBotDataTransfer: (%r)\n", Status));
+      DEBUG ((DEBUG_ERROR, "UsbBotDataTransfer: (%r)\n", Status));
     }
     if(Status == EFI_TIMEOUT){
       UsbBotResetDevice(UsbBot, FALSE);
@@ -416,7 +416,7 @@ UsbBotExecCommand (
   //
   Status = UsbBotSendCommand (UsbBot, Cmd, CmdLen, DataDir, DataLen, Lun);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbBotExecCommand: UsbBotSendCommand (%r)\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbBotExecCommand: UsbBotSendCommand (%r)\n", Status));
     return Status;
   }
 
@@ -433,7 +433,7 @@ UsbBotExecCommand (
   //
   Status = UsbBotGetStatus (UsbBot, DataLen, &Result);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbBotExecCommand: UsbBotGetStatus (%r)\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbBotExecCommand: UsbBotGetStatus (%r)\n", Status));
     return Status;
   }
 
@@ -604,4 +604,3 @@ UsbBotCleanUp (
   FreePool (Context);
   return EFI_SUCCESS;
 }
-

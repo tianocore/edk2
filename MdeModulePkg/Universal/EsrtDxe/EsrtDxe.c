@@ -485,10 +485,10 @@ EsrtDxeLockEsrtRepository(
   Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
   if (!EFI_ERROR (Status)) {
     Status = VariableLock->RequestToLock (VariableLock, EFI_ESRT_FMP_VARIABLE_NAME, &gEfiCallerIdGuid);
-    DEBUG((EFI_D_INFO, "EsrtDxe Lock EsrtFmp Variable Status 0x%x", Status));
+    DEBUG((DEBUG_INFO, "EsrtDxe Lock EsrtFmp Variable Status 0x%x", Status));
 
     Status = VariableLock->RequestToLock (VariableLock, EFI_ESRT_NONFMP_VARIABLE_NAME, &gEfiCallerIdGuid);
-    DEBUG((EFI_D_INFO, "EsrtDxe Lock EsrtNonFmp Variable Status 0x%x", Status));
+    DEBUG((DEBUG_INFO, "EsrtDxe Lock EsrtNonFmp Variable Status 0x%x", Status));
   }
 
   return Status;
@@ -539,7 +539,7 @@ EsrtReadyToBootEventNotify (
   }
 
   if (NonFmpRepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
-    DEBUG((EFI_D_ERROR, "NonFmp Repository Corrupt. Need to rebuild NonFmp Repository.\n"));
+    DEBUG((DEBUG_ERROR, "NonFmp Repository Corrupt. Need to rebuild NonFmp Repository.\n"));
     NonFmpRepositorySize = 0;
   }
 
@@ -558,7 +558,7 @@ EsrtReadyToBootEventNotify (
   }
 
   if (FmpRepositorySize % sizeof(EFI_SYSTEM_RESOURCE_ENTRY) != 0) {
-    DEBUG((EFI_D_ERROR, "Fmp Repository Corrupt. Need to rebuild Fmp Repository.\n"));
+    DEBUG((DEBUG_ERROR, "Fmp Repository Corrupt. Need to rebuild Fmp Repository.\n"));
     FmpRepositorySize = 0;
   }
 
@@ -573,7 +573,7 @@ EsrtReadyToBootEventNotify (
 
   EsrtTable = AllocatePool(sizeof(EFI_SYSTEM_RESOURCE_TABLE) + NonFmpRepositorySize + FmpRepositorySize);
   if (EsrtTable == NULL) {
-    DEBUG ((EFI_D_ERROR, "Esrt table memory allocation failure\n"));
+    DEBUG ((DEBUG_ERROR, "Esrt table memory allocation failure\n"));
     goto EXIT;
   }
 

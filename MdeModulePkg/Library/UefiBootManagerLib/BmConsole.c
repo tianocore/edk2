@@ -199,7 +199,7 @@ EfiBootManagerGetGopDevicePath (
           //
           // Recursively look for GOP child in this frame buffer handle
           //
-          DEBUG ((EFI_D_INFO, "[Bds] Looking for GOP child deeper ... \n"));
+          DEBUG ((DEBUG_INFO, "[Bds] Looking for GOP child deeper ... \n"));
           TempDevicePath = GopPool;
           ReturnDevicePath = EfiBootManagerGetGopDevicePath (OpenInfoBuffer[Index].ControllerHandle);
           GopPool = AppendDevicePathInstance (GopPool, ReturnDevicePath);
@@ -340,7 +340,7 @@ BmUpdateSystemTableConsole (
     //
     Instance  = GetNextDevicePathInstance (&VarConsole, &DevicePathSize);
     if (Instance == NULL) {
-      DEBUG ((EFI_D_ERROR, "[Bds] No valid console instance is found for %s!\n", VarName));
+      DEBUG ((DEBUG_ERROR, "[Bds] No valid console instance is found for %s!\n", VarName));
       // We should not ASSERT when all the console devices are removed.
       // ASSERT_EFI_ERROR (EFI_NOT_FOUND);
       FreePool (FullDevicePath);

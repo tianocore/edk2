@@ -172,7 +172,7 @@ UsbMassReadBlocks (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbMassReadBlocks: UsbBootReadBlocks (%r) -> Reset\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbMassReadBlocks: UsbBootReadBlocks (%r) -> Reset\n", Status));
     UsbMassReset (This, TRUE);
   }
 
@@ -292,7 +292,7 @@ UsbMassWriteBlocks (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbMassWriteBlocks: UsbBootWriteBlocks (%r) -> Reset\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbMassWriteBlocks: UsbBootWriteBlocks (%r) -> Reset\n", Status));
     UsbMassReset (This, TRUE);
   }
 
@@ -491,7 +491,7 @@ UsbMassInitMultiLun (
 
   for (Index = 0; Index <= MaxLun; Index++) {
 
-    DEBUG ((EFI_D_INFO, "UsbMassInitMultiLun: Start to initialize No.%d logic unit\n", Index));
+    DEBUG ((DEBUG_INFO, "UsbMassInitMultiLun: Start to initialize No.%d logic unit\n", Index));
 
     UsbIo   = NULL;
     UsbMass = AllocateZeroPool (sizeof (USB_MASS_DEVICE));
@@ -514,7 +514,7 @@ UsbMassInitMultiLun (
     //
     Status = UsbMassInitMedia (UsbMass);
     if ((EFI_ERROR (Status)) && (Status != EFI_NO_MEDIA)) {
-      DEBUG ((EFI_D_ERROR, "UsbMassInitMultiLun: UsbMassInitMedia (%r)\n", Status));
+      DEBUG ((DEBUG_ERROR, "UsbMassInitMultiLun: UsbMassInitMedia (%r)\n", Status));
       FreePool (UsbMass);
       continue;
     }
@@ -531,7 +531,7 @@ UsbMassInitMultiLun (
     UsbMass->DevicePath = AppendDevicePathNode (DevicePath, &LunNode.Header);
 
     if (UsbMass->DevicePath == NULL) {
-      DEBUG ((EFI_D_ERROR, "UsbMassInitMultiLun: failed to create device logic unit device path\n"));
+      DEBUG ((DEBUG_ERROR, "UsbMassInitMultiLun: failed to create device logic unit device path\n"));
       Status = EFI_OUT_OF_RESOURCES;
       FreePool (UsbMass);
       continue;
@@ -554,7 +554,7 @@ UsbMassInitMultiLun (
                     );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "UsbMassInitMultiLun: InstallMultipleProtocolInterfaces (%r)\n", Status));
+      DEBUG ((DEBUG_ERROR, "UsbMassInitMultiLun: InstallMultipleProtocolInterfaces (%r)\n", Status));
       FreePool (UsbMass->DevicePath);
       FreePool (UsbMass);
       continue;
@@ -573,7 +573,7 @@ UsbMassInitMultiLun (
                     );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "UsbMassInitMultiLun: OpenUsbIoProtocol By Child (%r)\n", Status));
+      DEBUG ((DEBUG_ERROR, "UsbMassInitMultiLun: OpenUsbIoProtocol By Child (%r)\n", Status));
       gBS->UninstallMultipleProtocolInterfaces (
              UsbMass->Controller,
              &gEfiDevicePathProtocolGuid,
@@ -589,7 +589,7 @@ UsbMassInitMultiLun (
       continue;
     }
     ReturnStatus = EFI_SUCCESS;
-    DEBUG ((EFI_D_INFO, "UsbMassInitMultiLun: Success to initialize No.%d logic unit\n", Index));
+    DEBUG ((DEBUG_INFO, "UsbMassInitMultiLun: Success to initialize No.%d logic unit\n", Index));
   }
 
   return ReturnStatus;
@@ -633,7 +633,7 @@ UsbMassInitNonLun (
                   );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbMassInitNonLun: OpenUsbIoProtocol By Driver (%r)\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbMassInitNonLun: OpenUsbIoProtocol By Driver (%r)\n", Status));
     goto ON_ERROR;
   }
 
@@ -654,7 +654,7 @@ UsbMassInitNonLun (
   //
   Status = UsbMassInitMedia (UsbMass);
   if ((EFI_ERROR (Status)) && (Status != EFI_NO_MEDIA)) {
-    DEBUG ((EFI_D_ERROR, "UsbMassInitNonLun: UsbMassInitMedia (%r)\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbMassInitNonLun: UsbMassInitMedia (%r)\n", Status));
     goto ON_ERROR;
   }
 
@@ -810,7 +810,7 @@ USBMassDriverBindingStart (
   Status = UsbMassInitTransport (This, Controller, &Transport, &Context, &MaxLun);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: UsbMassInitTransport (%r)\n", Status));
+    DEBUG ((DEBUG_ERROR, "USBMassDriverBindingStart: UsbMassInitTransport (%r)\n", Status));
     goto Exit;
   }
   if (MaxLun == 0) {
@@ -819,7 +819,7 @@ USBMassDriverBindingStart (
     //
     Status = UsbMassInitNonLun (This, Controller, Transport, Context);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: UsbMassInitNonLun (%r)\n", Status));
+      DEBUG ((DEBUG_ERROR, "USBMassDriverBindingStart: UsbMassInitNonLun (%r)\n", Status));
     }
   } else {
     //
@@ -835,7 +835,7 @@ USBMassDriverBindingStart (
                     );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: OpenDevicePathProtocol By Driver (%r)\n", Status));
+      DEBUG ((DEBUG_ERROR, "USBMassDriverBindingStart: OpenDevicePathProtocol By Driver (%r)\n", Status));
       goto Exit;
     }
 
@@ -849,7 +849,7 @@ USBMassDriverBindingStart (
                     );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: OpenUsbIoProtocol By Driver (%r)\n", Status));
+      DEBUG ((DEBUG_ERROR, "USBMassDriverBindingStart: OpenUsbIoProtocol By Driver (%r)\n", Status));
       gBS->CloseProtocol (
              Controller,
              &gEfiDevicePathProtocolGuid,
@@ -877,7 +877,7 @@ USBMassDriverBindingStart (
               This->DriverBindingHandle,
               Controller
               );
-      DEBUG ((EFI_D_ERROR, "USBMassDriverBindingStart: UsbMassInitMultiLun (%r) with Maxlun=%d\n", Status, MaxLun));
+      DEBUG ((DEBUG_ERROR, "USBMassDriverBindingStart: UsbMassInitMultiLun (%r) with Maxlun=%d\n", Status, MaxLun));
     }
   }
 Exit:
@@ -953,7 +953,7 @@ USBMassDriverBindingStop (
             This->DriverBindingHandle,
             Controller
             );
-      DEBUG ((EFI_D_INFO, "Success to stop multi-lun root handle\n"));
+      DEBUG ((DEBUG_INFO, "Success to stop multi-lun root handle\n"));
       return EFI_SUCCESS;
     }
 
@@ -989,7 +989,7 @@ USBMassDriverBindingStop (
     UsbMass->Transport->CleanUp (UsbMass->Context);
     FreePool (UsbMass);
 
-    DEBUG ((EFI_D_INFO, "Success to stop non-multi-lun root handle\n"));
+    DEBUG ((DEBUG_INFO, "Success to stop non-multi-lun root handle\n"));
     return EFI_SUCCESS;
   }
 
@@ -1012,7 +1012,7 @@ USBMassDriverBindingStop (
                     );
     if (EFI_ERROR (Status)) {
       AllChildrenStopped = FALSE;
-      DEBUG ((EFI_D_ERROR, "Fail to stop No.%d multi-lun child handle when opening blockio\n", (UINT32)Index));
+      DEBUG ((DEBUG_ERROR, "Fail to stop No.%d multi-lun child handle when opening blockio\n", (UINT32)Index));
       continue;
     }
 
@@ -1041,7 +1041,7 @@ USBMassDriverBindingStop (
       // Fail to uninstall Block I/O Protocol and Device Path Protocol, so re-open USB I/O Protocol by child.
       //
       AllChildrenStopped = FALSE;
-      DEBUG ((EFI_D_ERROR, "Fail to stop No.%d multi-lun child handle when uninstalling blockio and devicepath\n", (UINT32)Index));
+      DEBUG ((DEBUG_ERROR, "Fail to stop No.%d multi-lun child handle when uninstalling blockio and devicepath\n", (UINT32)Index));
 
       gBS->OpenProtocol (
              Controller,
@@ -1066,7 +1066,7 @@ USBMassDriverBindingStop (
     return EFI_DEVICE_ERROR;
   }
 
-  DEBUG ((EFI_D_INFO, "Success to stop all %d multi-lun children handles\n", (UINT32) NumberOfChildren));
+  DEBUG ((DEBUG_INFO, "Success to stop all %d multi-lun children handles\n", (UINT32) NumberOfChildren));
   return EFI_SUCCESS;
 }
 
