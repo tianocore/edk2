@@ -47,7 +47,7 @@ Returns:
   EFI_RESOURCE_ATTRIBUTE_TYPE Attributes;
 
 
-  DEBUG ((EFI_D_ERROR, "Emu Autoscan PEIM Loaded\n"));
+  DEBUG ((DEBUG_ERROR, "Emu Autoscan PEIM Loaded\n"));
 
   //
   // Get the PEI UNIX Autoscan PPI
