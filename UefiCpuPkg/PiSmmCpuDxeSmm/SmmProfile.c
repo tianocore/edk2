@@ -514,14 +514,14 @@ InitProtectedMemRange (
 
   mSplitMemRangeCount = NumberOfSpliteRange;
 
-  DEBUG ((EFI_D_INFO, "SMM Profile Memory Ranges:\n"));
+  DEBUG ((DEBUG_INFO, "SMM Profile Memory Ranges:\n"));
   for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
-    DEBUG ((EFI_D_INFO, "mProtectionMemRange[%d].Base = %lx\n", Index, mProtectionMemRange[Index].Range.Base));
-    DEBUG ((EFI_D_INFO, "mProtectionMemRange[%d].Top  = %lx\n", Index, mProtectionMemRange[Index].Range.Top));
+    DEBUG ((DEBUG_INFO, "mProtectionMemRange[%d].Base = %lx\n", Index, mProtectionMemRange[Index].Range.Base));
+    DEBUG ((DEBUG_INFO, "mProtectionMemRange[%d].Top  = %lx\n", Index, mProtectionMemRange[Index].Range.Top));
   }
   for (Index = 0; Index < mSplitMemRangeCount; Index++) {
-    DEBUG ((EFI_D_INFO, "mSplitMemRange[%d].Base = %lx\n", Index, mSplitMemRange[Index].Base));
-    DEBUG ((EFI_D_INFO, "mSplitMemRange[%d].Top  = %lx\n", Index, mSplitMemRange[Index].Top));
+    DEBUG ((DEBUG_INFO, "mSplitMemRange[%d].Base = %lx\n", Index, mSplitMemRange[Index].Base));
+    DEBUG ((DEBUG_INFO, "mSplitMemRange[%d].Top  = %lx\n", Index, mSplitMemRange[Index].Top));
   }
 }
 
@@ -671,7 +671,7 @@ InitPaging (
   //
   // Go through page table and set several page table entries to absent or execute-disable.
   //
-  DEBUG ((EFI_D_INFO, "Patch page table start ...\n"));
+  DEBUG ((DEBUG_INFO, "Patch page table start ...\n"));
   for (Pml5Index = 0; Pml5Index < NumberOfPml5Entries; Pml5Index++) {
     if ((Pml5[Pml5Index] & IA32_PG_P) == 0) {
       //
@@ -760,7 +760,7 @@ InitPaging (
   // Flush TLB
   //
   CpuFlushTlb ();
-  DEBUG ((EFI_D_INFO, "Patch page table done!\n"));
+  DEBUG ((DEBUG_INFO, "Patch page table done!\n"));
   //
   // Set execute-disable flag
   //
@@ -786,7 +786,7 @@ GetSmiCommandPort (
   ASSERT (Fadt != NULL);
 
   mSmiCommandPort = Fadt->SmiCmd;
-  DEBUG ((EFI_D_INFO, "mSmiCommandPort = %x\n", mSmiCommandPort));
+  DEBUG ((DEBUG_INFO, "mSmiCommandPort = %x\n", mSmiCommandPort));
 }
 
 /**

@@ -608,14 +608,14 @@ PiCpuSmmEntry (
   // Save the PcdCpuSmmCodeAccessCheckEnable value into a global variable.
   //
   mSmmCodeAccessCheckEnable = PcdGetBool (PcdCpuSmmCodeAccessCheckEnable);
-  DEBUG ((EFI_D_INFO, "PcdCpuSmmCodeAccessCheckEnable = %d\n", mSmmCodeAccessCheckEnable));
+  DEBUG ((DEBUG_INFO, "PcdCpuSmmCodeAccessCheckEnable = %d\n", mSmmCodeAccessCheckEnable));
 
   //
   // Save the PcdPteMemoryEncryptionAddressOrMask value into a global variable.
   // Make sure AddressEncMask is contained to smallest supported address field.
   //
   mAddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
-  DEBUG ((EFI_D_INFO, "mAddressEncMask = 0x%lx\n", mAddressEncMask));
+  DEBUG ((DEBUG_INFO, "mAddressEncMask = 0x%lx\n", mAddressEncMask));
 
   //
   // If support CPU hot plug, we need to allocate resources for possibly hot-added processors
@@ -767,7 +767,7 @@ PiCpuSmmEntry (
   TileDataSize = ALIGN_VALUE(TileDataSize, SIZE_4KB);
   TileSize = TileDataSize + TileCodeSize - 1;
   TileSize = 2 * GetPowerOfTwo32 ((UINT32)TileSize);
-  DEBUG ((EFI_D_INFO, "SMRAM TileSize = 0x%08x (0x%08x, 0x%08x)\n", TileSize, TileCodeSize, TileDataSize));
+  DEBUG ((DEBUG_INFO, "SMRAM TileSize = 0x%08x (0x%08x, 0x%08x)\n", TileSize, TileCodeSize, TileDataSize));
 
   //
   // If the TileSize is larger than space available for the SMI Handler of
@@ -797,7 +797,7 @@ PiCpuSmmEntry (
     Buffer = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
   }
   ASSERT (Buffer != NULL);
-  DEBUG ((EFI_D_INFO, "SMRAM SaveState Buffer (0x%08x, 0x%08x)\n", Buffer, EFI_PAGES_TO_SIZE(BufferPages)));
+  DEBUG ((DEBUG_INFO, "SMRAM SaveState Buffer (0x%08x, 0x%08x)\n", Buffer, EFI_PAGES_TO_SIZE(BufferPages)));
 
   //
   // Allocate buffer for pointers to array in  SMM_CPU_PRIVATE_DATA.
@@ -842,7 +842,7 @@ PiCpuSmmEntry (
       ASSERT_EFI_ERROR (Status);
       mCpuHotPlugData.ApicId[Index] = gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId;
 
-      DEBUG ((EFI_D_INFO, "CPU[%03x]  APIC ID=%04x  SMBASE=%08x  SaveState=%08x  Size=%08x\n",
+      DEBUG ((DEBUG_INFO, "CPU[%03x]  APIC ID=%04x  SMBASE=%08x  SaveState=%08x  Size=%08x\n",
         Index,
         (UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId,
         mCpuHotPlugData.SmBase[Index],
@@ -1072,7 +1072,7 @@ PiCpuSmmEntry (
   GetAcpiS3EnableFlag ();
   InitSmmS3ResumeState (Cr3);
 
-  DEBUG ((EFI_D_INFO, "SMM CPU Module exit from SMRAM with EFI_SUCCESS\n"));
+  DEBUG ((DEBUG_INFO, "SMM CPU Module exit from SMRAM with EFI_SUCCESS\n"));
 
   return EFI_SUCCESS;
 }
@@ -1162,7 +1162,7 @@ FindSmramInfo (
     }
   } while (Found);
 
-  DEBUG ((EFI_D_INFO, "SMRR Base: 0x%x, SMRR Size: 0x%x\n", *SmrrBase, *SmrrSize));
+  DEBUG ((DEBUG_INFO, "SMRR Base: 0x%x, SMRR Size: 0x%x\n", *SmrrBase, *SmrrSize));
 }
 
 /**
