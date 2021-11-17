@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Forward reference for pure ANSI compatability
 //
-typedef struct _EFI_PRINT2_PROTOCOL  EFI_PRINT2_PROTOCOL;
+typedef struct _EFI_PRINT2_PROTOCOL EFI_PRINT2_PROTOCOL;
 
 /**
   Produces a Null-terminated Unicode string in an output buffer based on
@@ -496,20 +496,19 @@ UINTN
   );
 
 struct _EFI_PRINT2_PROTOCOL {
-  UNICODE_BS_PRINT                     UnicodeBSPrint;
-  UNICODE_S_PRINT                      UnicodeSPrint;
-  UNICODE_BS_PRINT_ASCII_FORMAT        UnicodeBSPrintAsciiFormat;
-  UNICODE_S_PRINT_ASCII_FORMAT         UnicodeSPrintAsciiFormat;
-  UNICODE_VALUE_TO_STRING              UnicodeValueToString;
-  ASCII_BS_PRINT                       AsciiBSPrint;
-  ASCII_S_PRINT                        AsciiSPrint;
-  ASCII_BS_PRINT_UNICODE_FORMAT        AsciiBSPrintUnicodeFormat;
-  ASCII_S_PRINT_UNICODE_FORMAT         AsciiSPrintUnicodeFormat;
-  ASCII_VALUE_TO_STRING                AsciiValueToString;
+  UNICODE_BS_PRINT                 UnicodeBSPrint;
+  UNICODE_S_PRINT                  UnicodeSPrint;
+  UNICODE_BS_PRINT_ASCII_FORMAT    UnicodeBSPrintAsciiFormat;
+  UNICODE_S_PRINT_ASCII_FORMAT     UnicodeSPrintAsciiFormat;
+  UNICODE_VALUE_TO_STRING          UnicodeValueToString;
+  ASCII_BS_PRINT                   AsciiBSPrint;
+  ASCII_S_PRINT                    AsciiSPrint;
+  ASCII_BS_PRINT_UNICODE_FORMAT    AsciiBSPrintUnicodeFormat;
+  ASCII_S_PRINT_UNICODE_FORMAT     AsciiSPrintUnicodeFormat;
+  ASCII_VALUE_TO_STRING            AsciiValueToString;
 };
 
-extern EFI_GUID gEfiPrint2ProtocolGuid;
-
+extern EFI_GUID  gEfiPrint2ProtocolGuid;
 
 #define EFI_PRINT2S_PROTOCOL_GUID  \
   { 0xcc252d2, 0xc106, 0x4661, { 0xb5, 0xbd, 0x31, 0x47, 0xa4, 0xf8, 0x1f, 0x92 } }
@@ -517,7 +516,7 @@ extern EFI_GUID gEfiPrint2ProtocolGuid;
 //
 // Forward reference for pure ANSI compatability
 //
-typedef struct _EFI_PRINT2S_PROTOCOL  EFI_PRINT2S_PROTOCOL;
+typedef struct _EFI_PRINT2S_PROTOCOL EFI_PRINT2S_PROTOCOL;
 
 /**
   Converts a decimal value to a Null-terminated Unicode string.
@@ -640,18 +639,18 @@ RETURN_STATUS
   );
 
 struct _EFI_PRINT2S_PROTOCOL {
-  UNICODE_BS_PRINT                     UnicodeBSPrint;
-  UNICODE_S_PRINT                      UnicodeSPrint;
-  UNICODE_BS_PRINT_ASCII_FORMAT        UnicodeBSPrintAsciiFormat;
-  UNICODE_S_PRINT_ASCII_FORMAT         UnicodeSPrintAsciiFormat;
-  UNICODE_VALUE_TO_STRING_S            UnicodeValueToStringS;
-  ASCII_BS_PRINT                       AsciiBSPrint;
-  ASCII_S_PRINT                        AsciiSPrint;
-  ASCII_BS_PRINT_UNICODE_FORMAT        AsciiBSPrintUnicodeFormat;
-  ASCII_S_PRINT_UNICODE_FORMAT         AsciiSPrintUnicodeFormat;
-  ASCII_VALUE_TO_STRING_S              AsciiValueToStringS;
+  UNICODE_BS_PRINT                 UnicodeBSPrint;
+  UNICODE_S_PRINT                  UnicodeSPrint;
+  UNICODE_BS_PRINT_ASCII_FORMAT    UnicodeBSPrintAsciiFormat;
+  UNICODE_S_PRINT_ASCII_FORMAT     UnicodeSPrintAsciiFormat;
+  UNICODE_VALUE_TO_STRING_S        UnicodeValueToStringS;
+  ASCII_BS_PRINT                   AsciiBSPrint;
+  ASCII_S_PRINT                    AsciiSPrint;
+  ASCII_BS_PRINT_UNICODE_FORMAT    AsciiBSPrintUnicodeFormat;
+  ASCII_S_PRINT_UNICODE_FORMAT     AsciiSPrintUnicodeFormat;
+  ASCII_VALUE_TO_STRING_S          AsciiValueToStringS;
 };
 
-extern EFI_GUID gEfiPrint2SProtocolGuid;
+extern EFI_GUID  gEfiPrint2SProtocolGuid;
 
 #endif

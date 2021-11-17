@@ -31,7 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Please make sure the PCD Serivce PEIM Version is consistent with
 // the version of the generated PEIM PCD Database by build tool.
 //
-#define PCD_SERVICE_PEIM_VERSION      7
+#define PCD_SERVICE_PEIM_VERSION  7
 
 //
 // PCD_PEI_SERVICE_DRIVER_VERSION is defined in Autogen.h.
@@ -827,6 +827,7 @@ PeiGetPcdInfo (
   );
 
 /* Internal Function definitions */
+
 /**
   Get PCD database from GUID HOB in PEI phase.
 
@@ -963,9 +964,9 @@ ExGetWorker (
   );
 
 typedef struct {
-  UINTN   TokenNumber;
-  UINTN   Size;
-  UINT32  LocalTokenNumberAlias;
+  UINTN     TokenNumber;
+  UINTN     Size;
+  UINT32    LocalTokenNumberAlias;
 } EX_PCD_ENTRY_ATTRIBUTE;
 
 /**
@@ -1079,4 +1080,3 @@ SetPtrTypeSize (
   );
 
 #endif
-

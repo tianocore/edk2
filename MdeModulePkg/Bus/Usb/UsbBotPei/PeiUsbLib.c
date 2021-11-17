@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "UsbPeim.h"
 #include "PeiUsbLib.h"
 
-
 /**
   Clear a given usb feature.
 
@@ -39,23 +38,23 @@ PeiUsbClearDeviceFeature (
   ASSERT (UsbIoPpi != NULL);
 
   switch (Recipient) {
-  case EfiUsbDevice:
-    DevReq.RequestType = USB_DEV_CLEAR_FEATURE_REQ_TYPE_D;
-    break;
+    case EfiUsbDevice:
+      DevReq.RequestType = USB_DEV_CLEAR_FEATURE_REQ_TYPE_D;
+      break;
 
-  case EfiUsbInterface:
-    DevReq.RequestType = USB_DEV_CLEAR_FEATURE_REQ_TYPE_I;
-    break;
+    case EfiUsbInterface:
+      DevReq.RequestType = USB_DEV_CLEAR_FEATURE_REQ_TYPE_I;
+      break;
 
-  case EfiUsbEndpoint:
-    DevReq.RequestType = USB_DEV_CLEAR_FEATURE_REQ_TYPE_E;
-    break;
+    case EfiUsbEndpoint:
+      DevReq.RequestType = USB_DEV_CLEAR_FEATURE_REQ_TYPE_E;
+      break;
   }
 
-  DevReq.Request      = USB_DEV_CLEAR_FEATURE;
-  DevReq.Value        = Value;
-  DevReq.Index        = Target;
-  DevReq.Length       = 0;
+  DevReq.Request = USB_DEV_CLEAR_FEATURE;
+  DevReq.Value   = Value;
+  DevReq.Index   = Target;
+  DevReq.Length  = 0;
 
   return UsbIoPpi->UsbControlTransfer (
                      PeiServices,
@@ -67,7 +66,6 @@ PeiUsbClearDeviceFeature (
                      0
                      );
 }
-
 
 /**
   Clear Endpoint Halt.
@@ -93,18 +91,18 @@ PeiUsbClearEndpointHalt (
   EFI_USB_ENDPOINT_DESCRIPTOR   *EndpointDescriptor;
   UINT8                         EndpointIndex;
 
-
   //
   // Check its interface
   //
   Status = UsbIoPpi->UsbGetInterfaceDescriptor (
-                      PeiServices,
-                      UsbIoPpi,
-                      &InterfaceDesc
-                      );
+                       PeiServices,
+                       UsbIoPpi,
+                       &InterfaceDesc
+                       );
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   for (EndpointIndex = 0; EndpointIndex < InterfaceDesc->NumEndpoints; EndpointIndex++) {
     Status = UsbIoPpi->UsbGetEndpointDescriptor (PeiServices, UsbIoPpi, EndpointIndex, &EndpointDescriptor);
     if (EFI_ERROR (Status)) {
@@ -121,14 +119,12 @@ PeiUsbClearEndpointHalt (
   }
 
   Status = PeiUsbClearDeviceFeature (
-            PeiServices,
-            UsbIoPpi,
-            EfiUsbEndpoint,
-            EfiUsbEndpointHalt,
-            EndpointAddress
-            );
+             PeiServices,
+             UsbIoPpi,
+             EfiUsbEndpoint,
+             EfiUsbEndpointHalt,
+             EndpointAddress
+             );
 
   return Status;
 }
-
-

@@ -7,6 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef _RESET_UTILITY_LIB_H_
 #define _RESET_UTILITY_LIB_H_
 

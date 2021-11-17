@@ -102,4 +102,3 @@ ResetSystem (
 {
   ASSERT (FALSE);
 }
-

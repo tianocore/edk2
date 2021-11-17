@@ -9,9 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _NULL_MEMORY_TEST_H_
 #define _NULL_MEMORY_TEST_H_
 
-
 #include <PiDxe.h>
-
 
 #include <Protocol/GenericMemoryTest.h>
 

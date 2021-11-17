@@ -45,28 +45,28 @@ SmmCommunicationBufferEntryPoint (
   EDKII_PI_SMM_COMMUNICATION_REGION_TABLE  *PiSmmCommunicationRegionTable;
   EFI_MEMORY_DESCRIPTOR                    *Entry;
 
-  DescriptorSize = sizeof(EFI_MEMORY_DESCRIPTOR);
+  DescriptorSize = sizeof (EFI_MEMORY_DESCRIPTOR);
   //
   // Make sure Size != sizeof(EFI_MEMORY_DESCRIPTOR). This will
   // prevent people from having pointer math bugs in their code.
   // now you have to use *DescriptorSize to make things work.
   //
-  DescriptorSize += sizeof(UINT64) - (DescriptorSize % sizeof (UINT64));
+  DescriptorSize += sizeof (UINT64) - (DescriptorSize % sizeof (UINT64));
 
   //
   // Allocate and fill PiSmmCommunicationRegionTable
   //
-  PiSmmCommunicationRegionTable = AllocateReservedPool (sizeof(EDKII_PI_SMM_COMMUNICATION_REGION_TABLE) + DescriptorSize);
-  ASSERT(PiSmmCommunicationRegionTable != NULL);
-  ZeroMem (PiSmmCommunicationRegionTable, sizeof(EDKII_PI_SMM_COMMUNICATION_REGION_TABLE) + DescriptorSize);
+  PiSmmCommunicationRegionTable = AllocateReservedPool (sizeof (EDKII_PI_SMM_COMMUNICATION_REGION_TABLE) + DescriptorSize);
+  ASSERT (PiSmmCommunicationRegionTable != NULL);
+  ZeroMem (PiSmmCommunicationRegionTable, sizeof (EDKII_PI_SMM_COMMUNICATION_REGION_TABLE) + DescriptorSize);
 
-  PiSmmCommunicationRegionTable->Version         = EDKII_PI_SMM_COMMUNICATION_REGION_TABLE_VERSION;
+  PiSmmCommunicationRegionTable->Version = EDKII_PI_SMM_COMMUNICATION_REGION_TABLE_VERSION;
   PiSmmCommunicationRegionTable->NumberOfEntries = 1;
   PiSmmCommunicationRegionTable->DescriptorSize  = DescriptorSize;
   Entry = (EFI_MEMORY_DESCRIPTOR *)(PiSmmCommunicationRegionTable + 1);
-  Entry->Type          = EfiConventionalMemory;
+  Entry->Type = EfiConventionalMemory;
   Entry->PhysicalStart = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedPages (DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES);
-  ASSERT(Entry->PhysicalStart != 0);
+  ASSERT (Entry->PhysicalStart != 0);
   Entry->VirtualStart  = 0;
   Entry->NumberOfPages = DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES;
   Entry->Attribute     = 0;

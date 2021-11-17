@@ -41,14 +41,14 @@ typedef struct _FV_FILESYSTEM_INSTANCE   FV_FILESYSTEM_INSTANCE;
 // these structs per FV.
 //
 struct _FV_FILESYSTEM_INSTANCE {
-  UINT32                           Signature;
-  LIST_ENTRY                       FileInfoHead;
-  LIST_ENTRY                       FileHead;
-  EFI_DRIVER_BINDING_PROTOCOL      *DriverBinding;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL    *FvProtocol;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  SimpleFs;
-  FV_FILESYSTEM_FILE               *Root;
-  CHAR16                           *VolumeLabel;
+  UINT32                             Signature;
+  LIST_ENTRY                         FileInfoHead;
+  LIST_ENTRY                         FileHead;
+  EFI_DRIVER_BINDING_PROTOCOL        *DriverBinding;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL      *FvProtocol;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL    SimpleFs;
+  FV_FILESYSTEM_FILE                 *Root;
+  CHAR16                             *VolumeLabel;
 };
 
 //
@@ -57,59 +57,58 @@ struct _FV_FILESYSTEM_INSTANCE {
 // be created once for each FV.
 //
 struct _FV_FILESYSTEM_FILE {
-  UINT32                           Signature;
-  LIST_ENTRY                       Link;
-  FV_FILESYSTEM_FILE_INFO          *DirReadNext;
-  FV_FILESYSTEM_INSTANCE           *Instance;
-  EFI_FILE_PROTOCOL                FileProtocol;
-  FV_FILESYSTEM_FILE_INFO          *FvFileInfo;
-  UINT64                           Position;
+  UINT32                     Signature;
+  LIST_ENTRY                 Link;
+  FV_FILESYSTEM_FILE_INFO    *DirReadNext;
+  FV_FILESYSTEM_INSTANCE     *Instance;
+  EFI_FILE_PROTOCOL          FileProtocol;
+  FV_FILESYSTEM_FILE_INFO    *FvFileInfo;
+  UINT64                     Position;
 };
 
 //
 // Struct representing the info of a file.
 //
 struct _FV_FILESYSTEM_FILE_INFO {
-  UINT32                           Signature;
-  LIST_ENTRY                       Link;
-  EFI_GUID                         NameGuid;
-  EFI_FV_FILETYPE                  Type;
-  EFI_FILE_INFO                    FileInfo;
+  UINT32             Signature;
+  LIST_ENTRY         Link;
+  EFI_GUID           NameGuid;
+  EFI_FV_FILETYPE    Type;
+  EFI_FILE_INFO      FileInfo;
 };
 
-#define FVFS_FILE_SIGNATURE        SIGNATURE_32 ('f', 'v', 'f', 'i')
-#define FVFS_FILE_INFO_SIGNATURE   SIGNATURE_32 ('f', 'v', 'i', 'n')
-#define FVFS_INSTANCE_SIGNATURE    SIGNATURE_32 ('f', 'v', 'f', 's')
+#define FVFS_FILE_SIGNATURE       SIGNATURE_32 ('f', 'v', 'f', 'i')
+#define FVFS_FILE_INFO_SIGNATURE  SIGNATURE_32 ('f', 'v', 'i', 'n')
+#define FVFS_INSTANCE_SIGNATURE   SIGNATURE_32 ('f', 'v', 'f', 's')
 
-#define FVFS_INSTANCE_FROM_SIMPLE_FS_THIS(This) CR (  \
+#define FVFS_INSTANCE_FROM_SIMPLE_FS_THIS(This)  CR ( \
           This,                                       \
           FV_FILESYSTEM_INSTANCE,                     \
           SimpleFs,                                   \
           FVFS_INSTANCE_SIGNATURE                     \
           )
 
-#define FVFS_FILE_FROM_FILE_THIS(This) CR (           \
+#define FVFS_FILE_FROM_FILE_THIS(This)  CR (          \
           This,                                       \
           FV_FILESYSTEM_FILE,                         \
           FileProtocol,                               \
           FVFS_FILE_SIGNATURE                         \
           )
 
-#define FVFS_FILE_INFO_FROM_LINK(This) CR (           \
+#define FVFS_FILE_INFO_FROM_LINK(This)  CR (          \
           This,                                       \
           FV_FILESYSTEM_FILE_INFO,                    \
           Link,                                       \
           FVFS_FILE_INFO_SIGNATURE                    \
           )
 
-#define FVFS_FILE_FROM_LINK(FileLink) CR (FileLink, FV_FILESYSTEM_FILE, Link, FVFS_FILE_SIGNATURE)
+#define FVFS_FILE_FROM_LINK(FileLink)  CR (FileLink, FV_FILESYSTEM_FILE, Link, FVFS_FILE_SIGNATURE)
 
-#define FVFS_GET_FIRST_FILE(Instance) FVFS_FILE_FROM_LINK (GetFirstNode (&Instance->FileHead))
+#define FVFS_GET_FIRST_FILE(Instance)  FVFS_FILE_FROM_LINK (GetFirstNode (&Instance->FileHead))
 
-#define FVFS_GET_FIRST_FILE_INFO(Instance) FVFS_FILE_INFO_FROM_LINK (GetFirstNode (&Instance->FileInfoHead))
+#define FVFS_GET_FIRST_FILE_INFO(Instance)  FVFS_FILE_INFO_FROM_LINK (GetFirstNode (&Instance->FileInfoHead))
 
-
-#define FV_FILETYPE_IS_EXECUTABLE(Type) ((Type) == EFI_FV_FILETYPE_PEIM                  || \
+#define FV_FILETYPE_IS_EXECUTABLE(Type)  ((Type) == EFI_FV_FILETYPE_PEIM                  ||\
                                          (Type) == EFI_FV_FILETYPE_DRIVER                || \
                                          (Type) == EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER  || \
                                          (Type) == EFI_FV_FILETYPE_APPLICATION)
@@ -138,7 +137,7 @@ EFI_STATUS
 EFIAPI
 FvSimpleFileSystemOpenVolume (
   IN     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This,
-     OUT EFI_FILE_PROTOCOL               **RootFile
+  OUT EFI_FILE_PROTOCOL               **RootFile
   );
 
 /**
@@ -241,7 +240,7 @@ EFI_STATUS
 EFIAPI
 FvSimpleFileSystemOpen (
   IN     EFI_FILE_PROTOCOL    *This,
-     OUT EFI_FILE_PROTOCOL    **NewHandle,
+  OUT EFI_FILE_PROTOCOL    **NewHandle,
   IN     CHAR16               *FileName,
   IN     UINT64               OpenMode,
   IN     UINT64               Attributes
@@ -287,7 +286,7 @@ EFIAPI
 FvSimpleFileSystemRead (
   IN     EFI_FILE_PROTOCOL      *This,
   IN OUT UINTN                  *BufferSize,
-     OUT VOID                   *Buffer
+  OUT VOID                   *Buffer
   );
 
 /**
@@ -334,7 +333,7 @@ EFI_STATUS
 EFIAPI
 FvSimpleFileSystemGetPosition (
   IN     EFI_FILE_PROTOCOL    *This,
-     OUT UINT64               *Position
+  OUT UINT64               *Position
   );
 
 /**
@@ -420,7 +419,7 @@ FvSimpleFileSystemGetInfo (
   IN     EFI_FILE_PROTOCOL    *This,
   IN     EFI_GUID             *InformationType,
   IN OUT UINTN                *BufferSize,
-     OUT VOID                 *Buffer
+  OUT VOID                 *Buffer
   );
 
 /**

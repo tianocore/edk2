@@ -14,9 +14,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // SD Host Controller SlotInfo Register Offset
 //
-#define SD_MMC_HC_SLOT_OFFSET         0x40
+#define SD_MMC_HC_SLOT_OFFSET  0x40
 
-#define SD_MMC_HC_MAX_SLOT            6
+#define SD_MMC_HC_MAX_SLOT  6
 
 //
 // SD Host Controller MMIO Register Offset
@@ -60,17 +60,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // SD Host Controller bits to HOST_CTRL2 register
 //
-#define SD_MMC_HC_CTRL_UHS_MASK       0x0007
-#define SD_MMC_HC_CTRL_UHS_SDR12      0x0000
-#define SD_MMC_HC_CTRL_UHS_SDR25      0x0001
-#define SD_MMC_HC_CTRL_UHS_SDR50      0x0002
-#define SD_MMC_HC_CTRL_UHS_SDR104     0x0003
-#define SD_MMC_HC_CTRL_UHS_DDR50      0x0004
-#define SD_MMC_HC_CTRL_MMC_LEGACY     0x0000
-#define SD_MMC_HC_CTRL_MMC_HS_SDR     0x0001
-#define SD_MMC_HC_CTRL_MMC_HS_DDR     0x0004
-#define SD_MMC_HC_CTRL_MMC_HS200      0x0003
-#define SD_MMC_HC_CTRL_MMC_HS400      0x0005
+#define SD_MMC_HC_CTRL_UHS_MASK    0x0007
+#define SD_MMC_HC_CTRL_UHS_SDR12   0x0000
+#define SD_MMC_HC_CTRL_UHS_SDR25   0x0001
+#define SD_MMC_HC_CTRL_UHS_SDR50   0x0002
+#define SD_MMC_HC_CTRL_UHS_SDR104  0x0003
+#define SD_MMC_HC_CTRL_UHS_DDR50   0x0004
+#define SD_MMC_HC_CTRL_MMC_LEGACY  0x0000
+#define SD_MMC_HC_CTRL_MMC_HS_SDR  0x0001
+#define SD_MMC_HC_CTRL_MMC_HS_DDR  0x0004
+#define SD_MMC_HC_CTRL_MMC_HS200   0x0003
+#define SD_MMC_HC_CTRL_MMC_HS400   0x0005
 
 #define SD_MMC_HC_CTRL_DRIVER_STRENGTH_MASK  0x0030
 
@@ -97,113 +97,113 @@ typedef enum {
 //
 // The maximum data length of each descriptor line
 //
-#define ADMA_MAX_DATA_PER_LINE_16B     SIZE_64KB
-#define ADMA_MAX_DATA_PER_LINE_26B     SIZE_64MB
+#define ADMA_MAX_DATA_PER_LINE_16B  SIZE_64KB
+#define ADMA_MAX_DATA_PER_LINE_26B  SIZE_64MB
 
 //
 // ADMA descriptor for 32b addressing.
 //
 typedef struct {
-  UINT32 Valid:1;
-  UINT32 End:1;
-  UINT32 Int:1;
-  UINT32 Reserved:1;
-  UINT32 Act:2;
-  UINT32 UpperLength:10;
-  UINT32 LowerLength:16;
-  UINT32 Address;
+  UINT32    Valid       : 1;
+  UINT32    End         : 1;
+  UINT32    Int         : 1;
+  UINT32    Reserved    : 1;
+  UINT32    Act         : 2;
+  UINT32    UpperLength : 10;
+  UINT32    LowerLength : 16;
+  UINT32    Address;
 } SD_MMC_HC_ADMA_32_DESC_LINE;
 
 //
 // ADMA descriptor for 64b addressing.
 //
 typedef struct {
-  UINT32 Valid:1;
-  UINT32 End:1;
-  UINT32 Int:1;
-  UINT32 Reserved:1;
-  UINT32 Act:2;
-  UINT32 UpperLength:10;
-  UINT32 LowerLength:16;
-  UINT32 LowerAddress;
-  UINT32 UpperAddress;
+  UINT32    Valid       : 1;
+  UINT32    End         : 1;
+  UINT32    Int         : 1;
+  UINT32    Reserved    : 1;
+  UINT32    Act         : 2;
+  UINT32    UpperLength : 10;
+  UINT32    LowerLength : 16;
+  UINT32    LowerAddress;
+  UINT32    UpperAddress;
 } SD_MMC_HC_ADMA_64_V3_DESC_LINE;
 
 typedef struct {
-  UINT32 Valid:1;
-  UINT32 End:1;
-  UINT32 Int:1;
-  UINT32 Reserved:1;
-  UINT32 Act:2;
-  UINT32 UpperLength:10;
-  UINT32 LowerLength:16;
-  UINT32 LowerAddress;
-  UINT32 UpperAddress;
-  UINT32 Reserved1;
+  UINT32    Valid       : 1;
+  UINT32    End         : 1;
+  UINT32    Int         : 1;
+  UINT32    Reserved    : 1;
+  UINT32    Act         : 2;
+  UINT32    UpperLength : 10;
+  UINT32    LowerLength : 16;
+  UINT32    LowerAddress;
+  UINT32    UpperAddress;
+  UINT32    Reserved1;
 } SD_MMC_HC_ADMA_64_V4_DESC_LINE;
 
-#define SD_MMC_SDMA_BOUNDARY          512 * 1024
-#define SD_MMC_SDMA_ROUND_UP(x, n)    (((x) + n) & ~(n - 1))
+#define SD_MMC_SDMA_BOUNDARY  512 * 1024
+#define SD_MMC_SDMA_ROUND_UP(x, n)  (((x) + n) & ~(n - 1))
 
 typedef struct {
-  UINT8    FirstBar:3;        // bit 0:2
-  UINT8    Reserved:1;        // bit 3
-  UINT8    SlotNum:3;         // bit 4:6
-  UINT8    Reserved1:1;       // bit 7
+  UINT8    FirstBar  : 3;     // bit 0:2
+  UINT8    Reserved  : 1;     // bit 3
+  UINT8    SlotNum   : 3;     // bit 4:6
+  UINT8    Reserved1 : 1;     // bit 7
 } SD_MMC_HC_SLOT_INFO;
 
 typedef struct {
-  UINT32   TimeoutFreq:6;     // bit 0:5
-  UINT32   Reserved:1;        // bit 6
-  UINT32   TimeoutUnit:1;     // bit 7
-  UINT32   BaseClkFreq:8;     // bit 8:15
-  UINT32   MaxBlkLen:2;       // bit 16:17
-  UINT32   BusWidth8:1;       // bit 18
-  UINT32   Adma2:1;           // bit 19
-  UINT32   Reserved2:1;       // bit 20
-  UINT32   HighSpeed:1;       // bit 21
-  UINT32   Sdma:1;            // bit 22
-  UINT32   SuspRes:1;         // bit 23
-  UINT32   Voltage33:1;       // bit 24
-  UINT32   Voltage30:1;       // bit 25
-  UINT32   Voltage18:1;       // bit 26
-  UINT32   SysBus64V4:1;      // bit 27
-  UINT32   SysBus64V3:1;      // bit 28
-  UINT32   AsyncInt:1;        // bit 29
-  UINT32   SlotType:2;        // bit 30:31
-  UINT32   Sdr50:1;           // bit 32
-  UINT32   Sdr104:1;          // bit 33
-  UINT32   Ddr50:1;           // bit 34
-  UINT32   Reserved3:1;       // bit 35
-  UINT32   DriverTypeA:1;     // bit 36
-  UINT32   DriverTypeC:1;     // bit 37
-  UINT32   DriverTypeD:1;     // bit 38
-  UINT32   DriverType4:1;     // bit 39
-  UINT32   TimerCount:4;      // bit 40:43
-  UINT32   Reserved4:1;       // bit 44
-  UINT32   TuningSDR50:1;     // bit 45
-  UINT32   RetuningMod:2;     // bit 46:47
-  UINT32   ClkMultiplier:8;   // bit 48:55
-  UINT32   Reserved5:7;       // bit 56:62
-  UINT32   Hs400:1;           // bit 63
+  UINT32    TimeoutFreq   : 6; // bit 0:5
+  UINT32    Reserved      : 1; // bit 6
+  UINT32    TimeoutUnit   : 1; // bit 7
+  UINT32    BaseClkFreq   : 8; // bit 8:15
+  UINT32    MaxBlkLen     : 2; // bit 16:17
+  UINT32    BusWidth8     : 1; // bit 18
+  UINT32    Adma2         : 1; // bit 19
+  UINT32    Reserved2     : 1; // bit 20
+  UINT32    HighSpeed     : 1; // bit 21
+  UINT32    Sdma          : 1; // bit 22
+  UINT32    SuspRes       : 1; // bit 23
+  UINT32    Voltage33     : 1; // bit 24
+  UINT32    Voltage30     : 1; // bit 25
+  UINT32    Voltage18     : 1; // bit 26
+  UINT32    SysBus64V4    : 1; // bit 27
+  UINT32    SysBus64V3    : 1; // bit 28
+  UINT32    AsyncInt      : 1; // bit 29
+  UINT32    SlotType      : 2; // bit 30:31
+  UINT32    Sdr50         : 1; // bit 32
+  UINT32    Sdr104        : 1; // bit 33
+  UINT32    Ddr50         : 1; // bit 34
+  UINT32    Reserved3     : 1; // bit 35
+  UINT32    DriverTypeA   : 1; // bit 36
+  UINT32    DriverTypeC   : 1; // bit 37
+  UINT32    DriverTypeD   : 1; // bit 38
+  UINT32    DriverType4   : 1; // bit 39
+  UINT32    TimerCount    : 4; // bit 40:43
+  UINT32    Reserved4     : 1; // bit 44
+  UINT32    TuningSDR50   : 1; // bit 45
+  UINT32    RetuningMod   : 2; // bit 46:47
+  UINT32    ClkMultiplier : 8; // bit 48:55
+  UINT32    Reserved5     : 7; // bit 56:62
+  UINT32    Hs400         : 1; // bit 63
 } SD_MMC_HC_SLOT_CAP;
 
 //
 // SD Host controller version
 //
-#define SD_MMC_HC_CTRL_VER_100        0x00
-#define SD_MMC_HC_CTRL_VER_200        0x01
-#define SD_MMC_HC_CTRL_VER_300        0x02
-#define SD_MMC_HC_CTRL_VER_400        0x03
-#define SD_MMC_HC_CTRL_VER_410        0x04
-#define SD_MMC_HC_CTRL_VER_420        0x05
+#define SD_MMC_HC_CTRL_VER_100  0x00
+#define SD_MMC_HC_CTRL_VER_200  0x01
+#define SD_MMC_HC_CTRL_VER_300  0x02
+#define SD_MMC_HC_CTRL_VER_400  0x03
+#define SD_MMC_HC_CTRL_VER_410  0x04
+#define SD_MMC_HC_CTRL_VER_420  0x05
 
 //
 // SD Host controller V4 enhancements
 //
-#define SD_MMC_HC_V4_EN               BIT12
-#define SD_MMC_HC_64_ADDR_EN          BIT13
-#define SD_MMC_HC_26_DATA_LEN_ADMA_EN BIT10
+#define SD_MMC_HC_V4_EN                BIT12
+#define SD_MMC_HC_64_ADDR_EN           BIT13
+#define SD_MMC_HC_26_DATA_LEN_ADMA_EN  BIT10
 
 /**
   Dump the content of SD/MMC host controller's Capability Register.
@@ -233,8 +233,8 @@ EFI_STATUS
 EFIAPI
 SdMmcHcGetSlotInfo (
   IN     EFI_PCI_IO_PROTOCOL   *PciIo,
-     OUT UINT8                 *FirstBar,
-     OUT UINT8                 *SlotNum
+  OUT UINT8                 *FirstBar,
+  OUT UINT8                 *SlotNum
   );
 
 /**
@@ -417,7 +417,7 @@ EFI_STATUS
 SdMmcHcGetCapability (
   IN     EFI_PCI_IO_PROTOCOL  *PciIo,
   IN     UINT8                Slot,
-     OUT SD_MMC_HC_SLOT_CAP   *Capability
+  OUT SD_MMC_HC_SLOT_CAP   *Capability
   );
 
 /**
@@ -435,7 +435,7 @@ EFI_STATUS
 SdMmcHcGetMaxCurrent (
   IN     EFI_PCI_IO_PROTOCOL  *PciIo,
   IN     UINT8                Slot,
-     OUT UINT64               *MaxCurrent
+  OUT UINT64               *MaxCurrent
   );
 
 /**
@@ -457,7 +457,7 @@ EFI_STATUS
 SdMmcHcCardDetect (
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot,
-     OUT BOOLEAN            *MediaPresent
+  OUT BOOLEAN            *MediaPresent
   );
 
 /**

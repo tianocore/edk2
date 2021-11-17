@@ -41,60 +41,57 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Driver Binding Externs
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gConSplitterConInDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gConSplitterConInComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterConInComponentName2;
-extern EFI_DRIVER_BINDING_PROTOCOL  gConSplitterSimplePointerDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gConSplitterSimplePointerComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterSimplePointerComponentName2;
-extern EFI_DRIVER_BINDING_PROTOCOL  gConSplitterAbsolutePointerDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gConSplitterAbsolutePointerComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterAbsolutePointerComponentName2;
-extern EFI_DRIVER_BINDING_PROTOCOL  gConSplitterConOutDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gConSplitterConOutComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterConOutComponentName2;
-extern EFI_DRIVER_BINDING_PROTOCOL  gConSplitterStdErrDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gConSplitterStdErrComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2;
-
+extern EFI_DRIVER_BINDING_PROTOCOL   gConSplitterConInDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gConSplitterConInComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gConSplitterConInComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gConSplitterSimplePointerDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gConSplitterSimplePointerComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gConSplitterSimplePointerComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gConSplitterAbsolutePointerDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gConSplitterAbsolutePointerComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gConSplitterAbsolutePointerComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gConSplitterConOutDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gConSplitterConOutComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gConSplitterConOutComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gConSplitterStdErrDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gConSplitterStdErrComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gConSplitterStdErrComponentName2;
 
 //
 // These definitions were in the old Hii protocol, but are not in the new UEFI
 // version. So they are defined locally.
 //
-#define UNICODE_NARROW_CHAR   0xFFF0
-#define UNICODE_WIDE_CHAR     0xFFF1
-
+#define UNICODE_NARROW_CHAR  0xFFF0
+#define UNICODE_WIDE_CHAR    0xFFF1
 
 //
 // Private Data Structures
 //
 #define CONSOLE_SPLITTER_ALLOC_UNIT  32
 
-
 typedef struct {
-  UINTN   Column;
-  UINTN   Row;
+  UINTN    Column;
+  UINTN    Row;
 } CONSOLE_OUT_MODE;
 
 typedef struct {
-  UINTN   Columns;
-  UINTN   Rows;
+  UINTN    Columns;
+  UINTN    Rows;
 } TEXT_OUT_SPLITTER_QUERY_DATA;
 
-#define KEY_STATE_VALID_EXPOSED (EFI_TOGGLE_STATE_VALID | EFI_KEY_STATE_EXPOSED)
+#define KEY_STATE_VALID_EXPOSED  (EFI_TOGGLE_STATE_VALID | EFI_KEY_STATE_EXPOSED)
 
-#define TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE    SIGNATURE_32 ('T', 'i', 'S', 'n')
+#define TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE  SIGNATURE_32 ('T', 'i', 'S', 'n')
 
 //
 // Private data for Text In Ex Splitter Notify
 //
 typedef struct _TEXT_IN_EX_SPLITTER_NOTIFY {
-  UINTN                                 Signature;
-  VOID                                  **NotifyHandleList;
-  EFI_KEY_DATA                          KeyData;
-  EFI_KEY_NOTIFY_FUNCTION               KeyNotificationFn;
-  LIST_ENTRY                            NotifyEntry;
+  UINTN                      Signature;
+  VOID                       **NotifyHandleList;
+  EFI_KEY_DATA               KeyData;
+  EFI_KEY_NOTIFY_FUNCTION    KeyNotificationFn;
+  LIST_ENTRY                 NotifyEntry;
 } TEXT_IN_EX_SPLITTER_NOTIFY;
 
 #define TEXT_IN_EX_SPLITTER_NOTIFY_FROM_THIS(a)  \
@@ -104,55 +101,54 @@ typedef struct _TEXT_IN_EX_SPLITTER_NOTIFY {
       TEXT_IN_EX_SPLITTER_NOTIFY_SIGNATURE       \
       )
 
-#define TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('T', 'i', 'S', 'p')
+#define TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('T', 'i', 'S', 'p')
 
 //
 // Private data for the Console In splitter
 //
 typedef struct {
-  UINT64                             Signature;
-  EFI_HANDLE                         VirtualHandle;
+  UINT64                               Signature;
+  EFI_HANDLE                           VirtualHandle;
 
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     TextIn;
-  UINTN                              CurrentNumberOfConsoles;
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     **TextInList;
-  UINTN                              TextInListCount;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL       TextIn;
+  UINTN                                CurrentNumberOfConsoles;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL       **TextInList;
+  UINTN                                TextInListCount;
 
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  TextInEx;
-  UINTN                              CurrentNumberOfExConsoles;
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  **TextInExList;
-  UINTN                              TextInExListCount;
-  LIST_ENTRY                         NotifyList;
-  EFI_KEY_DATA                       *KeyQueue;
-  UINTN                              CurrentNumberOfKeys;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    TextInEx;
+  UINTN                                CurrentNumberOfExConsoles;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    **TextInExList;
+  UINTN                                TextInExListCount;
+  LIST_ENTRY                           NotifyList;
+  EFI_KEY_DATA                         *KeyQueue;
+  UINTN                                CurrentNumberOfKeys;
   //
   // It will be initialized and synced between console input devices
   // for toggle state sync.
   //
-  EFI_KEY_TOGGLE_STATE               PhysicalKeyToggleState;
+  EFI_KEY_TOGGLE_STATE                 PhysicalKeyToggleState;
   //
   // It will be initialized and used to record if virtual KeyState
   // has been required to be exposed.
   //
-  BOOLEAN                            VirtualKeyStateExported;
+  BOOLEAN                              VirtualKeyStateExported;
 
+  EFI_SIMPLE_POINTER_PROTOCOL          SimplePointer;
+  EFI_SIMPLE_POINTER_MODE              SimplePointerMode;
+  UINTN                                CurrentNumberOfPointers;
+  EFI_SIMPLE_POINTER_PROTOCOL          **PointerList;
+  UINTN                                PointerListCount;
 
-  EFI_SIMPLE_POINTER_PROTOCOL        SimplePointer;
-  EFI_SIMPLE_POINTER_MODE            SimplePointerMode;
-  UINTN                              CurrentNumberOfPointers;
-  EFI_SIMPLE_POINTER_PROTOCOL        **PointerList;
-  UINTN                              PointerListCount;
+  EFI_ABSOLUTE_POINTER_PROTOCOL        AbsolutePointer;
+  EFI_ABSOLUTE_POINTER_MODE            AbsolutePointerMode;
+  UINTN                                CurrentNumberOfAbsolutePointers;
+  EFI_ABSOLUTE_POINTER_PROTOCOL        **AbsolutePointerList;
+  UINTN                                AbsolutePointerListCount;
+  BOOLEAN                              AbsoluteInputEventSignalState;
 
-  EFI_ABSOLUTE_POINTER_PROTOCOL      AbsolutePointer;
-  EFI_ABSOLUTE_POINTER_MODE          AbsolutePointerMode;
-  UINTN                              CurrentNumberOfAbsolutePointers;
-  EFI_ABSOLUTE_POINTER_PROTOCOL      **AbsolutePointerList;
-  UINTN                              AbsolutePointerListCount;
-  BOOLEAN                            AbsoluteInputEventSignalState;
-
-  BOOLEAN                            KeyEventSignalState;
-  BOOLEAN                            InputEventSignalState;
-  EFI_EVENT                          ConnectConInEvent;
+  BOOLEAN                              KeyEventSignalState;
+  BOOLEAN                              InputEventSignalState;
+  EFI_EVENT                            ConnectConInEvent;
 } TEXT_IN_SPLITTER_PRIVATE_DATA;
 
 #define TEXT_IN_SPLITTER_PRIVATE_DATA_FROM_THIS(a)  \
@@ -182,44 +178,42 @@ typedef struct {
       TEXT_IN_SPLITTER_PRIVATE_DATA_SIGNATURE                       \
       )
 
-
 #define TEXT_OUT_SPLITTER_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('T', 'o', 'S', 'p')
 
 typedef struct {
-  EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL            *UgaDraw;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL       *GraphicsOutput;
+  EFI_UGA_DRAW_PROTOCOL              *UgaDraw;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *TextOut;
 } TEXT_OUT_AND_GOP_DATA;
 
 //
 // Private data for the Console Out splitter
 //
 typedef struct {
-  UINT64                                Signature;
-  EFI_HANDLE                            VirtualHandle;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       TextOut;
-  EFI_SIMPLE_TEXT_OUTPUT_MODE           TextOutMode;
+  UINT64                                  Signature;
+  EFI_HANDLE                              VirtualHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL         TextOut;
+  EFI_SIMPLE_TEXT_OUTPUT_MODE             TextOutMode;
 
-  EFI_UGA_DRAW_PROTOCOL                 UgaDraw;
-  UINT32                                UgaHorizontalResolution;
-  UINT32                                UgaVerticalResolution;
-  UINT32                                UgaColorDepth;
-  UINT32                                UgaRefreshRate;
+  EFI_UGA_DRAW_PROTOCOL                   UgaDraw;
+  UINT32                                  UgaHorizontalResolution;
+  UINT32                                  UgaVerticalResolution;
+  UINT32                                  UgaColorDepth;
+  UINT32                                  UgaRefreshRate;
 
-  EFI_GRAPHICS_OUTPUT_PROTOCOL          GraphicsOutput;
-  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *GraphicsOutputModeBuffer;
-  UINTN                                 CurrentNumberOfGraphicsOutput;
-  UINTN                                 CurrentNumberOfUgaDraw;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL            GraphicsOutput;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION    *GraphicsOutputModeBuffer;
+  UINTN                                   CurrentNumberOfGraphicsOutput;
+  UINTN                                   CurrentNumberOfUgaDraw;
 
-  UINTN                                 CurrentNumberOfConsoles;
-  TEXT_OUT_AND_GOP_DATA                 *TextOutList;
-  UINTN                                 TextOutListCount;
-  TEXT_OUT_SPLITTER_QUERY_DATA          *TextOutQueryData;
-  UINTN                                 TextOutQueryDataCount;
-  INT32                                 *TextOutModeMap;
+  UINTN                                   CurrentNumberOfConsoles;
+  TEXT_OUT_AND_GOP_DATA                   *TextOutList;
+  UINTN                                   TextOutListCount;
+  TEXT_OUT_SPLITTER_QUERY_DATA            *TextOutQueryData;
+  UINTN                                   TextOutQueryDataCount;
+  INT32                                   *TextOutModeMap;
 
-  BOOLEAN                               AddingConOutDevice;
-
+  BOOLEAN                                 AddingConOutDevice;
 } TEXT_OUT_SPLITTER_PRIVATE_DATA;
 
 #define TEXT_OUT_SPLITTER_PRIVATE_DATA_FROM_THIS(a) \
@@ -306,7 +300,6 @@ EFI_STATUS
 ConSplitterTextOutConstructor (
   TEXT_OUT_SPLITTER_PRIVATE_DATA      *ConOutPrivate
   );
-
 
 /**
   Test to see if Console In Device could be supported on the Controller.
@@ -557,7 +550,6 @@ ConSplitterStdErrDriverBindingStop (
   IN  EFI_HANDLE                      *ChildHandleBuffer
   );
 
-
 /**
   Test to see if Absolute Pointer protocol could be supported on the Controller.
 
@@ -657,7 +649,6 @@ ConSplitterAbsolutePointerDeleteDevice (
 // Absolute Pointer protocol interfaces
 //
 
-
 /**
   Resets the pointer device hardware.
 
@@ -675,7 +666,6 @@ ConSplitterAbsolutePointerReset (
   IN EFI_ABSOLUTE_POINTER_PROTOCOL   *This,
   IN BOOLEAN                         ExtendedVerification
   );
-
 
 /**
   Retrieves the current state of a pointer device.
@@ -764,7 +754,6 @@ ConSplitterComponentNameGetDriverName (
   OUT CHAR16                       **DriverName
   );
 
-
 /**
   Retrieves a Unicode string that is the user readable name of the controller
   that is being managed by a driver.
@@ -842,7 +831,6 @@ ConSplitterConInComponentNameGetControllerName (
   IN  CHAR8                                           *Language,
   OUT CHAR16                                          **ControllerName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -1054,7 +1042,6 @@ ConSplitterConOutComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   );
 
-
 /**
   Retrieves a Unicode string that is the user readable name of the controller
   that is being managed by a driver.
@@ -1132,7 +1119,6 @@ ConSplitterStdErrComponentNameGetControllerName (
   IN  CHAR8                                           *Language,
   OUT CHAR16                                          **ControllerName
   );
-
 
 //
 // TextIn Constructor/Destructor functions
@@ -1342,7 +1328,6 @@ ConSplitterTextInResetEx (
   IN BOOLEAN                            ExtendedVerification
   );
 
-
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
   be used to test for existance of a keystroke via WaitForEvent () call.
@@ -1366,7 +1351,6 @@ ConSplitterTextInReadKeyStrokeEx (
   OUT EFI_KEY_DATA                      *KeyData
   );
 
-
 /**
   Set certain state for the input device.
 
@@ -1388,7 +1372,6 @@ ConSplitterTextInSetState (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN EFI_KEY_TOGGLE_STATE               *KeyToggleState
   );
-
 
 /**
   Register a notification function for a particular keystroke for the input device.
@@ -1420,7 +1403,6 @@ ConSplitterTextInRegisterKeyNotify (
   IN EFI_KEY_NOTIFY_FUNCTION            KeyNotificationFunction,
   OUT VOID                              **NotifyHandle
   );
-
 
 /**
   Remove a registered notification function from a particular keystroke.
@@ -1459,7 +1441,6 @@ ConSplitterTextInWaitForKey (
   IN  EFI_EVENT                       Event,
   IN  VOID                            *Context
   );
-
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
@@ -1721,7 +1702,6 @@ ConSplitterTextOutSetCursorPosition (
   IN  UINTN                              Row
   );
 
-
 /**
   Makes the cursor visible or invisible
 
@@ -1806,7 +1786,7 @@ ConSplitterGraphicsOutputQueryMode (
 EFI_STATUS
 EFIAPI
 ConSplitterGraphicsOutputSetMode (
-  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL * This,
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL *This,
   IN  UINT32                       ModeNumber
   );
 
@@ -1870,7 +1850,6 @@ ConSplitterGraphicsOutputBlt (
   IN  UINTN                                         Height,
   IN  UINTN                                         Delta         OPTIONAL
   );
-
 
 /**
   Return the current video mode information.

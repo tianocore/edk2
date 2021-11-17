@@ -22,7 +22,7 @@ MemoryStatusCodeInitializeWorker (
   //
   // Create memory status code GUID'ed HOB.
   //
-  MEMORY_STATUSCODE_PACKET_HEADER *PacketHeader;
+  MEMORY_STATUSCODE_PACKET_HEADER  *PacketHeader;
 
   //
   // Build GUID'ed HOB with PCD defined size.
@@ -34,12 +34,11 @@ MemoryStatusCodeInitializeWorker (
   ASSERT (PacketHeader != NULL);
 
   PacketHeader->MaxRecordsNumber = (PcdGet16 (PcdStatusCodeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
-  PacketHeader->PacketIndex      = 0;
-  PacketHeader->RecordIndex      = 0;
+  PacketHeader->PacketIndex = 0;
+  PacketHeader->RecordIndex = 0;
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Report status code into GUID'ed HOB.
@@ -78,10 +77,9 @@ MemoryStatusCodeReportWorker (
   IN CONST EFI_STATUS_CODE_DATA *Data OPTIONAL
   )
 {
-
-  EFI_PEI_HOB_POINTERS              Hob;
-  MEMORY_STATUSCODE_PACKET_HEADER   *PacketHeader;
-  MEMORY_STATUSCODE_RECORD          *Record;
+  EFI_PEI_HOB_POINTERS             Hob;
+  MEMORY_STATUSCODE_PACKET_HEADER  *PacketHeader;
+  MEMORY_STATUSCODE_RECORD         *Record;
 
   //
   // Find GUID'ed HOBs to locate current record buffer.
@@ -89,8 +87,8 @@ MemoryStatusCodeReportWorker (
   Hob.Raw = GetFirstGuidHob (&gMemoryStatusCodeRecordGuid);
   ASSERT (Hob.Raw != NULL);
 
-  PacketHeader = (MEMORY_STATUSCODE_PACKET_HEADER *) GET_GUID_HOB_DATA (Hob.Guid);
-  Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
+  PacketHeader = (MEMORY_STATUSCODE_PACKET_HEADER *)GET_GUID_HOB_DATA (Hob.Guid);
+  Record = (MEMORY_STATUSCODE_RECORD *)(PacketHeader + 1);
   Record = &Record[PacketHeader->RecordIndex++];
 
   //
@@ -113,9 +111,8 @@ MemoryStatusCodeReportWorker (
     // Wrap around record index.
     //
     PacketHeader->RecordIndex = 0;
-    PacketHeader->PacketIndex ++;
+    PacketHeader->PacketIndex++;
   }
 
   return EFI_SUCCESS;
 }
-

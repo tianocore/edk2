@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_EHCI_DEBUG_H_
 #define _EFI_EHCI_DEBUG_H_
 
-
 /**
   Dump the fields of a QTD.
 
@@ -23,7 +22,6 @@ EhcDumpQtd (
   IN EHC_QTD              *Qtd,
   IN CHAR8                *Msg
   );
-
 
 /**
   Dump the queue head.
@@ -40,7 +38,6 @@ EhcDumpQh (
   IN BOOLEAN              DumpBuf
   );
 
-
 /**
   Dump the buffer in the form of hex.
 
@@ -53,6 +50,5 @@ EhcDumpBuf (
   IN UINT8                *Buf,
   IN UINTN                Len
   );
-
 
 #endif

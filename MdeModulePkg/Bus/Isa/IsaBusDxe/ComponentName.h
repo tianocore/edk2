@@ -13,8 +13,8 @@
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gIsaBusComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gIsaBusComponentName2;
+extern EFI_COMPONENT_NAME_PROTOCOL   gIsaBusComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gIsaBusComponentName2;
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -62,7 +62,6 @@ IsaBusComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller

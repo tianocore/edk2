@@ -12,7 +12,6 @@
 #ifndef _DXE_CORE_MEMORY_ALLOCATION_SERVICES_H_
 #define _DXE_CORE_MEMORY_ALLOCATION_SERVICES_H_
 
-
 /**
   Allocates pages from the memory map.
 
@@ -40,8 +39,6 @@ CoreAllocatePages (
   IN OUT EFI_PHYSICAL_ADDRESS  *Memory
   );
 
-
-
 /**
   Frees previous allocated pages.
 
@@ -59,7 +56,6 @@ CoreFreePages (
   IN EFI_PHYSICAL_ADDRESS   Memory,
   IN UINTN                  NumberOfPages
   );
-
 
 /**
   Allocate pool of a particular type.

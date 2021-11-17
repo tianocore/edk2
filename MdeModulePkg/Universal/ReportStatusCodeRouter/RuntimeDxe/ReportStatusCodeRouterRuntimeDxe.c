@@ -10,24 +10,24 @@
 
 #include "ReportStatusCodeRouterRuntimeDxe.h"
 
-EFI_HANDLE   mHandle                    = NULL;
-LIST_ENTRY   mCallbackListHead          = INITIALIZE_LIST_HEAD_VARIABLE (mCallbackListHead);
-EFI_EVENT    mVirtualAddressChangeEvent = NULL;
+EFI_HANDLE  mHandle = NULL;
+LIST_ENTRY  mCallbackListHead = INITIALIZE_LIST_HEAD_VARIABLE (mCallbackListHead);
+EFI_EVENT   mVirtualAddressChangeEvent = NULL;
 
 //
 // Report operation nest status.
 // If it is set, then the report operation has nested.
 //
-UINT32       mStatusCodeNestStatus = 0;
+UINT32  mStatusCodeNestStatus = 0;
 
-EFI_STATUS_CODE_PROTOCOL  mStatusCodeProtocol  = {
+EFI_STATUS_CODE_PROTOCOL  mStatusCodeProtocol = {
   ReportDispatcher
 };
 
 EFI_RSC_HANDLER_PROTOCOL  mRscHandlerProtocol = {
   Register,
   Unregister
-  };
+};
 
 /**
   Event callback function to invoke status code handler in list.
@@ -48,7 +48,7 @@ RscHandlerNotification (
   EFI_PHYSICAL_ADDRESS        Address;
   RSC_DATA_ENTRY              *RscData;
 
-  CallbackEntry = (RSC_HANDLER_CALLBACK_ENTRY *) Context;
+  CallbackEntry = (RSC_HANDLER_CALLBACK_ENTRY *)Context;
 
   //
   // Traverse the status code data buffer to parse all
@@ -56,7 +56,7 @@ RscHandlerNotification (
   //
   Address = CallbackEntry->StatusCodeDataBuffer;
   while (Address < CallbackEntry->EndPointer) {
-    RscData = (RSC_DATA_ENTRY *) (UINTN) Address;
+    RscData = (RSC_DATA_ENTRY *)(UINTN)Address;
     CallbackEntry->RscHandlerCallback (
                      RscData->Type,
                      RscData->Value,
@@ -107,9 +107,9 @@ Register (
   IN EFI_TPL                    Tpl
   )
 {
-  EFI_STATUS                    Status;
-  LIST_ENTRY                    *Link;
-  RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
+  EFI_STATUS                  Status;
+  LIST_ENTRY                  *Link;
+  RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
 
   if (Callback == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -128,9 +128,9 @@ Register (
   CallbackEntry = AllocateRuntimeZeroPool (sizeof (RSC_HANDLER_CALLBACK_ENTRY));
   ASSERT (CallbackEntry != NULL);
 
-  CallbackEntry->Signature          = RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE;
+  CallbackEntry->Signature = RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE;
   CallbackEntry->RscHandlerCallback = Callback;
-  CallbackEntry->Tpl                = Tpl;
+  CallbackEntry->Tpl = Tpl;
 
   //
   // If TPL of registered callback funtion is not TPL_HIGH_LEVEL, then event should be created
@@ -141,9 +141,9 @@ Register (
   // buffer and event trigger.
   //
   if (Tpl != TPL_HIGH_LEVEL) {
-    CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) (UINTN) AllocatePool (EFI_PAGE_SIZE);
-    CallbackEntry->BufferSize           = EFI_PAGE_SIZE;
-    CallbackEntry->EndPointer           = CallbackEntry->StatusCodeDataBuffer;
+    CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePool (EFI_PAGE_SIZE);
+    CallbackEntry->BufferSize = EFI_PAGE_SIZE;
+    CallbackEntry->EndPointer = CallbackEntry->StatusCodeDataBuffer;
     Status = gBS->CreateEvent (
                     EVT_NOTIFY_SIGNAL,
                     Tpl,
@@ -179,8 +179,8 @@ Unregister (
   IN EFI_RSC_HANDLER_CALLBACK Callback
   )
 {
-  LIST_ENTRY                    *Link;
-  RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
+  LIST_ENTRY                  *Link;
+  RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
 
   if (Callback == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -193,9 +193,10 @@ Unregister (
       // If the function is found in list, delete it and return.
       //
       if (CallbackEntry->Tpl != TPL_HIGH_LEVEL) {
-        FreePool ((VOID *) (UINTN) CallbackEntry->StatusCodeDataBuffer);
+        FreePool ((VOID *)(UINTN)CallbackEntry->StatusCodeDataBuffer);
         gBS->CloseEvent (CallbackEntry->Event);
       }
+
       RemoveEntryList (&CallbackEntry->Node);
       FreePool (CallbackEntry);
       return EFI_SUCCESS;
@@ -233,12 +234,12 @@ ReportDispatcher (
   IN EFI_STATUS_CODE_DATA     *Data      OPTIONAL
   )
 {
-  LIST_ENTRY                    *Link;
-  RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
-  RSC_DATA_ENTRY                *RscData;
-  EFI_STATUS                    Status;
-  VOID                          *NewBuffer;
-  EFI_PHYSICAL_ADDRESS          FailSafeEndPointer;
+  LIST_ENTRY                  *Link;
+  RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
+  RSC_DATA_ENTRY              *RscData;
+  EFI_STATUS                  Status;
+  VOID                        *NewBuffer;
+  EFI_PHYSICAL_ADDRESS        FailSafeEndPointer;
 
   //
   // Use atom operation to avoid the reentant of report.
@@ -270,8 +271,8 @@ ReportDispatcher (
     // allowed TPL to report status code. Related data should also be stored in data buffer.
     //
     FailSafeEndPointer = CallbackEntry->EndPointer;
-    CallbackEntry->EndPointer  = ALIGN_VARIABLE (CallbackEntry->EndPointer);
-    RscData = (RSC_DATA_ENTRY *) (UINTN) CallbackEntry->EndPointer;
+    CallbackEntry->EndPointer = ALIGN_VARIABLE (CallbackEntry->EndPointer);
+    RscData = (RSC_DATA_ENTRY *)(UINTN)CallbackEntry->EndPointer;
     CallbackEntry->EndPointer += sizeof (RSC_DATA_ENTRY);
     if (Data != NULL) {
       CallbackEntry->EndPointer += (Data->Size + Data->HeaderSize - sizeof (EFI_STATUS_CODE_DATA));
@@ -285,13 +286,13 @@ ReportDispatcher (
         NewBuffer = ReallocatePool (
                       CallbackEntry->BufferSize,
                       CallbackEntry->BufferSize * 2,
-                      (VOID *) (UINTN) CallbackEntry->StatusCodeDataBuffer
+                      (VOID *)(UINTN)CallbackEntry->StatusCodeDataBuffer
                       );
         if (NewBuffer != NULL) {
-          FailSafeEndPointer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer + (FailSafeEndPointer - CallbackEntry->StatusCodeDataBuffer);
-          CallbackEntry->EndPointer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer + (CallbackEntry->EndPointer - CallbackEntry->StatusCodeDataBuffer);
-          RscData = (RSC_DATA_ENTRY *) (UINTN) ((UINTN) NewBuffer + ((UINTN) RscData - CallbackEntry->StatusCodeDataBuffer));
-          CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS) (UINTN) NewBuffer;
+          FailSafeEndPointer = (EFI_PHYSICAL_ADDRESS)(UINTN)NewBuffer + (FailSafeEndPointer - CallbackEntry->StatusCodeDataBuffer);
+          CallbackEntry->EndPointer = (EFI_PHYSICAL_ADDRESS)(UINTN)NewBuffer + (CallbackEntry->EndPointer - CallbackEntry->StatusCodeDataBuffer);
+          RscData = (RSC_DATA_ENTRY *)(UINTN)((UINTN)NewBuffer + ((UINTN)RscData - CallbackEntry->StatusCodeDataBuffer));
+          CallbackEntry->StatusCodeDataBuffer = (EFI_PHYSICAL_ADDRESS)(UINTN)NewBuffer;
           CallbackEntry->BufferSize *= 2;
         }
       }
@@ -305,12 +306,13 @@ ReportDispatcher (
       continue;
     }
 
-    RscData->Type      = Type;
-    RscData->Value     = Value;
-    RscData->Instance  = Instance;
+    RscData->Type     = Type;
+    RscData->Value    = Value;
+    RscData->Instance = Instance;
     if (CallerId != NULL) {
       CopyGuid (&RscData->CallerId, CallerId);
     }
+
     if (Data != NULL) {
       CopyMem (&RscData->Data, Data, Data->HeaderSize + Data->Size);
     } else {
@@ -346,13 +348,13 @@ VirtualAddressChangeCallBack (
   IN VOID             *Context
   )
 {
-  EFI_STATUS          Status;
-  LIST_ENTRY                    *Link;
-  RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
+  EFI_STATUS                  Status;
+  LIST_ENTRY                  *Link;
+  RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
 
   for (Link = GetFirstNode (&mCallbackListHead); !IsNull (&mCallbackListHead, Link); Link = GetNextNode (&mCallbackListHead, Link)) {
     CallbackEntry = CR (Link, RSC_HANDLER_CALLBACK_ENTRY, Node, RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE);
-    Status = EfiConvertFunctionPointer (0, (VOID **) &CallbackEntry->RscHandlerCallback);
+    Status = EfiConvertFunctionPointer (0, (VOID **)&CallbackEntry->RscHandlerCallback);
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -383,7 +385,7 @@ GenericStatusCodeRuntimeDxeEntry (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS     Status;
+  EFI_STATUS  Status;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mHandle,

@@ -46,7 +46,6 @@ FtwGetMaxBlockSize (
   OUT UINTN                                 *BlockSize
   );
 
-
 /**
   Allocates space for the protocol to maintain information about writes.
   Since writes must be completed in a fault-tolerant manner and multiple
@@ -76,7 +75,6 @@ FtwAllocate (
   IN UINTN                                  PrivateDataSize,
   IN UINTN                                  NumberOfWrites
   );
-
 
 /**
   Starts a target block update. This records information about the write
@@ -117,7 +115,6 @@ FtwWrite (
   IN VOID                                   *Buffer
   );
 
-
 /**
   Restarts a previously interrupted write. The caller must provide the
   block protocol needed to complete the interrupted write.
@@ -137,7 +134,6 @@ FtwRestart (
   IN EFI_HANDLE                             FvBlockHandle
   );
 
-
 /**
   Aborts all previously allocated writes.
 
@@ -153,7 +149,6 @@ EFIAPI
 FtwAbort (
   IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL      *This
   );
-
 
 /**
   Starts a target block update. This function records information about the write

@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Uhci.h"
 
-
 /**
   Allocate a block of memory to be used by the buffer pool.
 
@@ -25,13 +24,13 @@ UsbHcAllocMemBlock (
   IN  UINTN               Pages
   )
 {
-  USBHC_MEM_BLOCK         *Block;
-  EFI_PCI_IO_PROTOCOL     *PciIo;
-  VOID                    *BufHost;
-  VOID                    *Mapping;
-  EFI_PHYSICAL_ADDRESS    MappedAddr;
-  UINTN                   Bytes;
-  EFI_STATUS              Status;
+  USBHC_MEM_BLOCK       *Block;
+  EFI_PCI_IO_PROTOCOL   *PciIo;
+  VOID                  *BufHost;
+  VOID                  *Mapping;
+  EFI_PHYSICAL_ADDRESS  MappedAddr;
+  UINTN                 Bytes;
+  EFI_STATUS            Status;
 
   PciIo = Pool->PciIo;
 
@@ -46,9 +45,9 @@ UsbHcAllocMemBlock (
   //
   ASSERT (USBHC_MEM_UNIT * 8 <= EFI_PAGE_SIZE);
 
-  Block->BufLen   = EFI_PAGES_TO_SIZE (Pages);
-  Block->BitsLen  = Block->BufLen / (USBHC_MEM_UNIT * 8);
-  Block->Bits     = AllocateZeroPool (Block->BitsLen);
+  Block->BufLen  = EFI_PAGES_TO_SIZE (Pages);
+  Block->BitsLen = Block->BufLen / (USBHC_MEM_UNIT * 8);
+  Block->Bits    = AllocateZeroPool (Block->BitsLen);
 
   if (Block->Bits == NULL) {
     gBS->FreePool (Block);
@@ -72,7 +71,7 @@ UsbHcAllocMemBlock (
     goto FREE_BITARRAY;
   }
 
-  Bytes = EFI_PAGES_TO_SIZE (Pages);
+  Bytes  = EFI_PAGES_TO_SIZE (Pages);
   Status = PciIo->Map (
                     PciIo,
                     EfiPciIoOperationBusMasterCommonBuffer,
@@ -95,9 +94,9 @@ UsbHcAllocMemBlock (
     goto FREE_BUFFER;
   }
 
-  Block->BufHost  = BufHost;
-  Block->Buf      = (UINT8 *) ((UINTN) MappedAddr);
-  Block->Mapping  = Mapping;
+  Block->BufHost = BufHost;
+  Block->Buf     = (UINT8 *)((UINTN)MappedAddr);
+  Block->Mapping = Mapping;
 
   return Block;
 
@@ -109,7 +108,6 @@ FREE_BITARRAY:
   gBS->FreePool (Block);
   return NULL;
 }
-
 
 /**
   Free the memory block from the memory pool.
@@ -124,7 +122,7 @@ UsbHcFreeMemBlock (
   IN USBHC_MEM_BLOCK      *Block
   )
 {
-  EFI_PCI_IO_PROTOCOL     *PciIo;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
 
   ASSERT ((Pool != NULL) && (Block != NULL));
 
@@ -139,7 +137,6 @@ UsbHcFreeMemBlock (
   gBS->FreePool (Block->Bits);
   gBS->FreePool (Block);
 }
-
 
 /**
   Alloc some memory from the block.
@@ -157,18 +154,18 @@ UsbHcAllocMemFromBlock (
   IN  UINTN               Units
   )
 {
-  UINTN                   Byte;
-  UINT8                   Bit;
-  UINTN                   StartByte;
-  UINT8                   StartBit;
-  UINTN                   Available;
-  UINTN                   Count;
+  UINTN  Byte;
+  UINT8  Bit;
+  UINTN  StartByte;
+  UINT8  StartBit;
+  UINTN  Available;
+  UINTN  Count;
 
   ASSERT ((Block != 0) && (Units != 0));
 
-  StartByte  = 0;
-  StartBit   = 0;
-  Available  = 0;
+  StartByte = 0;
+  StartBit  = 0;
+  Available = 0;
 
   for (Byte = 0, Bit = 0; Byte < Block->BitsLen;) {
     //
@@ -184,13 +181,12 @@ UsbHcAllocMemFromBlock (
       }
 
       NEXT_BIT (Byte, Bit);
-
     } else {
       NEXT_BIT (Byte, Bit);
 
-      Available  = 0;
-      StartByte  = Byte;
-      StartBit   = Bit;
+      Available = 0;
+      StartByte = Byte;
+      StartBit  = Bit;
     }
   }
 
@@ -201,13 +197,13 @@ UsbHcAllocMemFromBlock (
   //
   // Mark the memory as allocated
   //
-  Byte  = StartByte;
-  Bit   = StartBit;
+  Byte = StartByte;
+  Bit  = StartBit;
 
   for (Count = 0; Count < Units; Count++) {
     ASSERT (!USB_HC_BIT_IS_SET (Block->Bits[Byte], Bit));
 
-    Block->Bits[Byte] = (UINT8) (Block->Bits[Byte] | (UINT8) USB_HC_BIT (Bit));
+    Block->Bits[Byte] = (UINT8)(Block->Bits[Byte] | (UINT8)USB_HC_BIT (Bit));
     NEXT_BIT (Byte, Bit);
   }
 
@@ -230,13 +226,13 @@ UsbHcGetPciAddressForHostMem (
   IN UINTN                Size
   )
 {
-  USBHC_MEM_BLOCK         *Head;
-  USBHC_MEM_BLOCK         *Block;
-  UINTN                   AllocSize;
-  EFI_PHYSICAL_ADDRESS    PhyAddr;
-  UINTN                   Offset;
+  USBHC_MEM_BLOCK       *Head;
+  USBHC_MEM_BLOCK       *Block;
+  UINTN                 AllocSize;
+  EFI_PHYSICAL_ADDRESS  PhyAddr;
+  UINTN                 Offset;
 
-  Head      = Pool->Head;
+  Head = Pool->Head;
   AllocSize = USBHC_MEM_ROUND (Size);
 
   if (Mem == NULL) {
@@ -248,7 +244,7 @@ UsbHcGetPciAddressForHostMem (
     // scan the memory block list for the memory block that
     // completely contains the allocated memory.
     //
-    if ((Block->BufHost <= (UINT8 *) Mem) && (((UINT8 *) Mem + AllocSize) <= (Block->BufHost + Block->BufLen))) {
+    if ((Block->BufHost <= (UINT8 *)Mem) && (((UINT8 *)Mem + AllocSize) <= (Block->BufHost + Block->BufLen))) {
       break;
     }
   }
@@ -257,8 +253,8 @@ UsbHcGetPciAddressForHostMem (
   //
   // calculate the pci memory address for host memory address.
   //
-  Offset = (UINT8 *)Mem - Block->BufHost;
-  PhyAddr = (EFI_PHYSICAL_ADDRESS)(UINTN) (Block->Buf + Offset);
+  Offset  = (UINT8 *)Mem - Block->BufHost;
+  PhyAddr = (EFI_PHYSICAL_ADDRESS)(UINTN)(Block->Buf + Offset);
   return PhyAddr;
 }
 
@@ -280,7 +276,6 @@ UsbHcInsertMemBlockToPool (
   Head->Next  = Block;
 }
 
-
 /**
   Is the memory block empty?
 
@@ -295,7 +290,7 @@ UsbHcIsMemBlockEmpty (
   IN USBHC_MEM_BLOCK     *Block
   )
 {
-  UINTN                   Index;
+  UINTN  Index;
 
   for (Index = 0; Index < Block->BitsLen; Index++) {
     if (Block->Bits[Index] != 0) {
@@ -305,7 +300,6 @@ UsbHcIsMemBlockEmpty (
 
   return TRUE;
 }
-
 
 /**
   Unlink the memory block from the pool's list.
@@ -320,19 +314,18 @@ UsbHcUnlinkMemBlock (
   IN USBHC_MEM_BLOCK      *BlockToUnlink
   )
 {
-  USBHC_MEM_BLOCK         *Block;
+  USBHC_MEM_BLOCK  *Block;
 
   ASSERT ((Head != NULL) && (BlockToUnlink != NULL));
 
   for (Block = Head; Block != NULL; Block = Block->Next) {
     if (Block->Next == BlockToUnlink) {
-      Block->Next         = BlockToUnlink->Next;
+      Block->Next = BlockToUnlink->Next;
       BlockToUnlink->Next = NULL;
       break;
     }
   }
 }
-
 
 /**
   Initialize the memory management pool for the host controller.
@@ -353,7 +346,7 @@ UsbHcInitMemPool (
   IN UINT32               Which4G
   )
 {
-  USBHC_MEM_POOL          *Pool;
+  USBHC_MEM_POOL  *Pool;
 
   Pool = AllocatePool (sizeof (USBHC_MEM_POOL));
 
@@ -374,7 +367,6 @@ UsbHcInitMemPool (
   return Pool;
 }
 
-
 /**
   Release the memory management pool.
 
@@ -389,7 +381,7 @@ UsbHcFreeMemPool (
   IN USBHC_MEM_POOL       *Pool
   )
 {
-  USBHC_MEM_BLOCK *Block;
+  USBHC_MEM_BLOCK  *Block;
 
   ASSERT (Pool->Head != NULL);
 
@@ -408,7 +400,6 @@ UsbHcFreeMemPool (
   return EFI_SUCCESS;
 }
 
-
 /**
   Allocate some memory from the host controller's memory pool
   which can be used to communicate with host controller.
@@ -425,16 +416,16 @@ UsbHcAllocateMem (
   IN  UINTN               Size
   )
 {
-  USBHC_MEM_BLOCK         *Head;
-  USBHC_MEM_BLOCK         *Block;
-  USBHC_MEM_BLOCK         *NewBlock;
-  VOID                    *Mem;
-  UINTN                   AllocSize;
-  UINTN                   Pages;
+  USBHC_MEM_BLOCK  *Head;
+  USBHC_MEM_BLOCK  *Block;
+  USBHC_MEM_BLOCK  *NewBlock;
+  VOID             *Mem;
+  UINTN            AllocSize;
+  UINTN            Pages;
 
-  Mem       = NULL;
+  Mem = NULL;
   AllocSize = USBHC_MEM_ROUND (Size);
-  Head      = Pool->Head;
+  Head = Pool->Head;
   ASSERT (Head != NULL);
 
   //
@@ -485,7 +476,6 @@ UsbHcAllocateMem (
   return Mem;
 }
 
-
 /**
   Free the allocated memory back to the memory pool.
 
@@ -501,17 +491,17 @@ UsbHcFreeMem (
   IN UINTN                Size
   )
 {
-  USBHC_MEM_BLOCK         *Head;
-  USBHC_MEM_BLOCK         *Block;
-  UINT8                   *ToFree;
-  UINTN                   AllocSize;
-  UINTN                   Byte;
-  UINTN                   Bit;
-  UINTN                   Count;
+  USBHC_MEM_BLOCK  *Head;
+  USBHC_MEM_BLOCK  *Block;
+  UINT8            *ToFree;
+  UINTN            AllocSize;
+  UINTN            Byte;
+  UINTN            Bit;
+  UINTN            Count;
 
-  Head      = Pool->Head;
+  Head = Pool->Head;
   AllocSize = USBHC_MEM_ROUND (Size);
-  ToFree    = (UINT8 *) Mem;
+  ToFree    = (UINT8 *)Mem;
 
   for (Block = Head; Block != NULL; Block = Block->Next) {
     //
@@ -522,8 +512,8 @@ UsbHcFreeMem (
       //
       // compute the start byte and bit in the bit array
       //
-      Byte  = ((ToFree - Block->Buf) / USBHC_MEM_UNIT) / 8;
-      Bit   = ((ToFree - Block->Buf) / USBHC_MEM_UNIT) % 8;
+      Byte = ((ToFree - Block->Buf) / USBHC_MEM_UNIT) / 8;
+      Bit  = ((ToFree - Block->Buf) / USBHC_MEM_UNIT) % 8;
 
       //
       // reset associated bits in bit array
@@ -531,7 +521,7 @@ UsbHcFreeMem (
       for (Count = 0; Count < (AllocSize / USBHC_MEM_UNIT); Count++) {
         ASSERT (USB_HC_BIT_IS_SET (Block->Bits[Byte], Bit));
 
-        Block->Bits[Byte] = (UINT8) (Block->Bits[Byte] ^ USB_HC_BIT (Bit));
+        Block->Bits[Byte] = (UINT8)(Block->Bits[Byte] ^ USB_HC_BIT (Bit));
         NEXT_BIT (Byte, Bit);
       }
 
@@ -554,5 +544,5 @@ UsbHcFreeMem (
     UsbHcFreeMemBlock (Pool, Block);
   }
 
-  return ;
+  return;
 }

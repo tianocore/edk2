@@ -39,8 +39,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH             VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL       End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } FORM_DEVICE_PATH;
 
 /**
@@ -124,4 +124,5 @@ DriverHealthManagerFakeRouteConfig (
   IN  CONST EFI_STRING                       Configuration,
   OUT EFI_STRING                             *Progress
   );
+
 #endif

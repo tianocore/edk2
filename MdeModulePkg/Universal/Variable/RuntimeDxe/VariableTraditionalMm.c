@@ -41,8 +41,8 @@ VariableNotifySmmReady (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  EFI_HANDLE            Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   Handle = NULL;
   Status = gBS->InstallProtocolInterface (
@@ -62,8 +62,8 @@ VariableNotifySmmWriteReady (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  EFI_HANDLE            Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   Handle = NULL;
   Status = gBS->InstallProtocolInterface (
@@ -109,8 +109,8 @@ VariableHaveTcgProtocols (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  VOID                  *Interface;
+  EFI_STATUS  Status;
+  VOID        *Interface;
 
   Status = gBS->LocateProtocol (
                   &gEfiTcg2ProtocolGuid,

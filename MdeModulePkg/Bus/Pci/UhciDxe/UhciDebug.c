@@ -28,7 +28,6 @@ UhciDumpQh (
   DEBUG ((EFI_D_VERBOSE, " Vertical Link - %x\n\n", QhSw->QhHw.VerticalLink));
 }
 
-
 /**
   Dump the content of TD structure.
 
@@ -40,32 +39,31 @@ UhciDumpTds (
   IN UHCI_TD_SW           *TdSw
   )
 {
-  UHCI_TD_SW              *CurTdSw;
+  UHCI_TD_SW  *CurTdSw;
 
   CurTdSw = TdSw;
 
   while (CurTdSw != NULL) {
-    DEBUG ((EFI_D_VERBOSE, "TdSw @ 0x%p\n",           CurTdSw));
-    DEBUG ((EFI_D_VERBOSE, "TdSw.NextTd   - 0x%p\n",  CurTdSw->NextTd));
-    DEBUG ((EFI_D_VERBOSE, "TdSw.DataLen  - %d\n",    CurTdSw->DataLen));
-    DEBUG ((EFI_D_VERBOSE, "TdSw.Data     - 0x%p\n",  CurTdSw->Data));
+    DEBUG ((EFI_D_VERBOSE, "TdSw @ 0x%p\n", CurTdSw));
+    DEBUG ((EFI_D_VERBOSE, "TdSw.NextTd   - 0x%p\n", CurTdSw->NextTd));
+    DEBUG ((EFI_D_VERBOSE, "TdSw.DataLen  - %d\n", CurTdSw->DataLen));
+    DEBUG ((EFI_D_VERBOSE, "TdSw.Data     - 0x%p\n", CurTdSw->Data));
     DEBUG ((EFI_D_VERBOSE, "TdHw:\n"));
-    DEBUG ((EFI_D_VERBOSE, " NextLink     - 0x%x\n",  CurTdSw->TdHw.NextLink));
-    DEBUG ((EFI_D_VERBOSE, " ActualLen    - %d\n",    CurTdSw->TdHw.ActualLen));
-    DEBUG ((EFI_D_VERBOSE, " Status       - 0x%x\n",  CurTdSw->TdHw.Status));
-    DEBUG ((EFI_D_VERBOSE, " IOC          - %d\n",    CurTdSw->TdHw.IntOnCpl));
-    DEBUG ((EFI_D_VERBOSE, " IsIsoCh      - %d\n",    CurTdSw->TdHw.IsIsoch));
-    DEBUG ((EFI_D_VERBOSE, " LowSpeed     - %d\n",    CurTdSw->TdHw.LowSpeed));
-    DEBUG ((EFI_D_VERBOSE, " ErrorCount   - %d\n",    CurTdSw->TdHw.ErrorCount));
-    DEBUG ((EFI_D_VERBOSE, " ShortPacket  - %d\n",    CurTdSw->TdHw.ShortPacket));
-    DEBUG ((EFI_D_VERBOSE, " PidCode      - 0x%x\n",  CurTdSw->TdHw.PidCode));
-    DEBUG ((EFI_D_VERBOSE, " DevAddr      - %d\n",    CurTdSw->TdHw.DeviceAddr));
-    DEBUG ((EFI_D_VERBOSE, " EndPoint     - %d\n",    CurTdSw->TdHw.EndPoint));
-    DEBUG ((EFI_D_VERBOSE, " DataToggle   - %d\n",    CurTdSw->TdHw.DataToggle));
-    DEBUG ((EFI_D_VERBOSE, " MaxPacketLen - %d\n",    CurTdSw->TdHw.MaxPacketLen));
-    DEBUG ((EFI_D_VERBOSE, " DataBuffer   - 0x%x\n\n",CurTdSw->TdHw.DataBuffer));
+    DEBUG ((EFI_D_VERBOSE, " NextLink     - 0x%x\n", CurTdSw->TdHw.NextLink));
+    DEBUG ((EFI_D_VERBOSE, " ActualLen    - %d\n", CurTdSw->TdHw.ActualLen));
+    DEBUG ((EFI_D_VERBOSE, " Status       - 0x%x\n", CurTdSw->TdHw.Status));
+    DEBUG ((EFI_D_VERBOSE, " IOC          - %d\n", CurTdSw->TdHw.IntOnCpl));
+    DEBUG ((EFI_D_VERBOSE, " IsIsoCh      - %d\n", CurTdSw->TdHw.IsIsoch));
+    DEBUG ((EFI_D_VERBOSE, " LowSpeed     - %d\n", CurTdSw->TdHw.LowSpeed));
+    DEBUG ((EFI_D_VERBOSE, " ErrorCount   - %d\n", CurTdSw->TdHw.ErrorCount));
+    DEBUG ((EFI_D_VERBOSE, " ShortPacket  - %d\n", CurTdSw->TdHw.ShortPacket));
+    DEBUG ((EFI_D_VERBOSE, " PidCode      - 0x%x\n", CurTdSw->TdHw.PidCode));
+    DEBUG ((EFI_D_VERBOSE, " DevAddr      - %d\n", CurTdSw->TdHw.DeviceAddr));
+    DEBUG ((EFI_D_VERBOSE, " EndPoint     - %d\n", CurTdSw->TdHw.EndPoint));
+    DEBUG ((EFI_D_VERBOSE, " DataToggle   - %d\n", CurTdSw->TdHw.DataToggle));
+    DEBUG ((EFI_D_VERBOSE, " MaxPacketLen - %d\n", CurTdSw->TdHw.MaxPacketLen));
+    DEBUG ((EFI_D_VERBOSE, " DataBuffer   - 0x%x\n\n", CurTdSw->TdHw.DataBuffer));
 
     CurTdSw = CurTdSw->NextTd;
   }
 }
-

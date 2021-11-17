@@ -30,7 +30,7 @@ BmmCreateTimeOutMenu (
 
 **/
 VOID
-BmmCreateBootNextMenu(
+BmmCreateBootNextMenu (
   IN EFI_HII_HANDLE              HiiHandle,
   IN VOID                        *StartOpCodeHandle
   );
@@ -116,7 +116,7 @@ EFI_STATUS
   IN  CHAR16                   *DriverName,
   OUT CHAR16                   **NewName,
   OUT BOOLEAN                  *EmptyLineAfter
-);
+  );
 
 /**
   Search the drivers in the system which need to show in the front page

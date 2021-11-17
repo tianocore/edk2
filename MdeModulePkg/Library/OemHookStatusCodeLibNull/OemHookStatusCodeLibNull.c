@@ -6,7 +6,6 @@
 
 **/
 
-
 /**
   Initialize OEM status code device .
 
@@ -53,4 +52,3 @@ OemHookStatusCodeReport (
 {
   return EFI_SUCCESS;
 }
-

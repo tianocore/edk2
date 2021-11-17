@@ -11,16 +11,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Uefi.h>
 
-#define EDB_BYTECODE_NUMBER_IN_LINE     5
+#define EDB_BYTECODE_NUMBER_IN_LINE  5
 
 #ifdef EFI32
-#define EDB_PRINT_ADDRESS_FORMAT    L"%08x: "
+  #define EDB_PRINT_ADDRESS_FORMAT  L"%08x: "
 #else
-// To use 012l instead of 016l because space is not enough
-#define EDB_PRINT_ADDRESS_FORMAT    L"%012lx: "
+  // To use 012l instead of 016l because space is not enough
+  #define EDB_PRINT_ADDRESS_FORMAT  L"%012lx: "
 #endif
 
-#define OPCODE_MAX 0x40
+#define OPCODE_MAX  0x40
 
 #define EDB_INSTRUCTION_NAME_MAX_LENGTH     10
 #define EDB_INSTRUCTION_NAME_MAX_SIZE       (EDB_INSTRUCTION_NAME_MAX_LENGTH * sizeof(CHAR16))

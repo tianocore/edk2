@@ -56,8 +56,8 @@ FtwCalculateCrc32 (
   IN  UINTN                        Length
   )
 {
-  EFI_STATUS    Status;
-  UINT32        ReturnValue;
+  EFI_STATUS  Status;
+  UINT32      ReturnValue;
 
   Status = gBS->CalculateCrc32 (Buffer, Length, &ReturnValue);
   ASSERT_EFI_ERROR (Status);
@@ -73,16 +73,16 @@ FtwNotifySmmReady (
   VOID
   )
 {
-  EFI_HANDLE          FtwHandle;
-  EFI_STATUS          Status;
+  EFI_HANDLE  FtwHandle;
+  EFI_STATUS  Status;
 
   FtwHandle = NULL;
-  Status = gBS->InstallProtocolInterface (
-                  &FtwHandle,
-                  &gEfiSmmFaultTolerantWriteProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
+  Status    = gBS->InstallProtocolInterface (
+                     &FtwHandle,
+                     &gEfiSmmFaultTolerantWriteProtocolGuid,
+                     EFI_NATIVE_INTERFACE,
+                     NULL
+                     );
   ASSERT_EFI_ERROR (Status);
 }
 

@@ -20,10 +20,10 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-extern EFI_SYSTEM_RESOURCE_TABLE *mEsrtTable;
-extern BOOLEAN                   mIsVirtualAddrConverted;
-EFI_EVENT                 mDxeRuntimeCapsuleLibVirtualAddressChangeEvent  = NULL;
-EFI_EVENT                 mDxeRuntimeCapsuleLibReadyToBootEvent  = NULL;
+extern EFI_SYSTEM_RESOURCE_TABLE  *mEsrtTable;
+extern BOOLEAN                    mIsVirtualAddrConverted;
+EFI_EVENT                         mDxeRuntimeCapsuleLibVirtualAddressChangeEvent = NULL;
+EFI_EVENT                         mDxeRuntimeCapsuleLibReadyToBootEvent = NULL;
 
 /**
   Convert EsrtTable physical address to virtual address.
@@ -58,18 +58,19 @@ DxeCapsuleLibReadyToBootEventNotify (
   IN VOID             *Context
   )
 {
-  UINTN                       Index;
-  EFI_CONFIGURATION_TABLE     *ConfigEntry;
-  EFI_SYSTEM_RESOURCE_TABLE   *EsrtTable;
+  UINTN                      Index;
+  EFI_CONFIGURATION_TABLE    *ConfigEntry;
+  EFI_SYSTEM_RESOURCE_TABLE  *EsrtTable;
 
   //
   // Get Esrt table first
   //
   ConfigEntry = gST->ConfigurationTable;
   for (Index = 0; Index < gST->NumberOfTableEntries; Index++) {
-    if (CompareGuid(&gEfiSystemResourceTableGuid, &ConfigEntry->VendorGuid)) {
+    if (CompareGuid (&gEfiSystemResourceTableGuid, &ConfigEntry->VendorGuid)) {
       break;
     }
+
     ConfigEntry++;
   }
 
@@ -80,12 +81,13 @@ DxeCapsuleLibReadyToBootEventNotify (
     //
     // Search Esrt to check given capsule is qualified
     //
-    EsrtTable = (EFI_SYSTEM_RESOURCE_TABLE *) ConfigEntry->VendorTable;
+    EsrtTable = (EFI_SYSTEM_RESOURCE_TABLE *)ConfigEntry->VendorTable;
 
     mEsrtTable = AllocateRuntimeCopyPool (
                    sizeof (EFI_SYSTEM_RESOURCE_TABLE) +
                    EsrtTable->FwResourceCount * sizeof (EFI_SYSTEM_RESOURCE_ENTRY),
-                   EsrtTable);
+                   EsrtTable
+                   );
     ASSERT (mEsrtTable != NULL);
 
     //
@@ -110,7 +112,7 @@ DxeRuntimeCapsuleLibConstructor (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS     Status;
+  EFI_STATUS  Status;
 
   //
   // Make sure we can handle virtual address changes.
@@ -156,7 +158,7 @@ DxeRuntimeCapsuleLibDestructor (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   //
   // Close the VirtualAddressChange event.

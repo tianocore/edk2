@@ -52,8 +52,8 @@ EfiDevicePathInstanceCount (
   IN EFI_DEVICE_PATH_PROTOCOL      *DevicePath
   )
 {
-  UINTN Count;
-  UINTN Size;
+  UINTN  Count;
+  UINTN  Size;
 
   Count = 0;
   while (GetNextDevicePathInstance (&DevicePath, &Size) != NULL) {

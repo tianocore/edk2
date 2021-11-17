@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// Forward declaration for the _ESRT_MANAGEMENT_PROTOCOL.
 ///
-typedef struct _ESRT_MANAGEMENT_PROTOCOL  ESRT_MANAGEMENT_PROTOCOL;
+typedef struct _ESRT_MANAGEMENT_PROTOCOL ESRT_MANAGEMENT_PROTOCOL;
 
 /**
   Get Variable name and data by Esrt Entry FwClass
@@ -41,7 +41,6 @@ EFI_STATUS
   IN OUT EFI_SYSTEM_RESOURCE_ENTRY *Entry
   );
 
-
 /**
   Update one ESRT entry in ESRT Cache.
 
@@ -58,7 +57,6 @@ EFI_STATUS
   IN EFI_SYSTEM_RESOURCE_ENTRY *Entry
   );
 
-
 /**
   Non-FMP instance to unregister Esrt Entry from ESRT Cache.
 
@@ -73,7 +71,6 @@ EFI_STATUS
 (EFIAPI *UNREGISTER_ESRT_ENTRY)(
   IN  EFI_GUID        *FwClass
   );
-
 
 /**
   Non-FMP instance to register one ESRT entry into ESRT Cache.
@@ -91,7 +88,6 @@ EFI_STATUS
   IN EFI_SYSTEM_RESOURCE_ENTRY *Entry
   );
 
-
 /**
   This function syn up Cached ESRT with data from FMP instances
   Function should be called after Connect All in order to locate all FMP protocols
@@ -108,7 +104,6 @@ EFI_STATUS
   VOID
   );
 
-
 /**
   This function locks up Esrt repository to be readonly. It should be called
   before gEfiEndOfDxeEventGroupGuid event signaled
@@ -122,17 +117,15 @@ EFI_STATUS
   VOID
   );
 
-
 struct _ESRT_MANAGEMENT_PROTOCOL {
-  GET_ESRT_ENTRY        GetEsrtEntry;
-  UPDATE_ESRT_ENTRY     UpdateEsrtEntry;
-  REGISTER_ESRT_ENTRY   RegisterEsrtEntry;
-  UNREGISTER_ESRT_ENTRY UnRegisterEsrtEntry;
-  SYNC_ESRT_FMP         SyncEsrtFmp;
-  LOCK_ESRT_REPOSITORY  LockEsrtRepository;
+  GET_ESRT_ENTRY           GetEsrtEntry;
+  UPDATE_ESRT_ENTRY        UpdateEsrtEntry;
+  REGISTER_ESRT_ENTRY      RegisterEsrtEntry;
+  UNREGISTER_ESRT_ENTRY    UnRegisterEsrtEntry;
+  SYNC_ESRT_FMP            SyncEsrtFmp;
+  LOCK_ESRT_REPOSITORY     LockEsrtRepository;
 };
 
-extern EFI_GUID gEsrtManagementProtocolGuid;
+extern EFI_GUID  gEsrtManagementProtocolGuid;
 
 #endif // #ifndef _ESRT_MANAGEMENT_H_
-

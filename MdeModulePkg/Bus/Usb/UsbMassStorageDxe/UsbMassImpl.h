@@ -10,14 +10,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_USBMASS_IMPL_H_
 #define _EFI_USBMASS_IMPL_H_
 
-#define  USB_MASS_SIGNATURE    SIGNATURE_32 ('U', 's', 'b', 'M')
+#define  USB_MASS_SIGNATURE  SIGNATURE_32 ('U', 's', 'b', 'M')
 
 #define USB_MASS_DEVICE_FROM_BLOCK_IO(a) \
         CR (a, USB_MASS_DEVICE, BlockIo, USB_MASS_SIGNATURE)
 
 #define USB_MASS_DEVICE_FROM_DISK_INFO(a) \
         CR (a, USB_MASS_DEVICE, DiskInfo, USB_MASS_SIGNATURE)
-
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gUsbMassStorageComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gUsbMassStorageComponentName2;
@@ -254,7 +253,6 @@ UsbMassStorageGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller

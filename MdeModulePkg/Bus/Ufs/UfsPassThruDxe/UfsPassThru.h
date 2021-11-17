@@ -28,7 +28,7 @@
 
 #include "UfsPassThruHci.h"
 
-#define UFS_PASS_THRU_SIG           SIGNATURE_32 ('U', 'F', 'S', 'P')
+#define UFS_PASS_THRU_SIG  SIGNATURE_32 ('U', 'F', 'S', 'P')
 
 //
 // Lun 0~7 is for 8 common luns.
@@ -38,46 +38,46 @@
 //  Lun 10: BOOT
 //  Lun 11: RPMB
 //
-#define UFS_MAX_LUNS                12
-#define UFS_WLUN_PREFIX             0xC1
-#define UFS_INIT_COMPLETION_TIMEOUT 600000
+#define UFS_MAX_LUNS                 12
+#define UFS_WLUN_PREFIX              0xC1
+#define UFS_INIT_COMPLETION_TIMEOUT  600000
 
 typedef struct {
-  UINT8    Lun[UFS_MAX_LUNS];
-  UINT16   BitMask:12;              // Bit 0~7 is 1/1 mapping to common luns. Bit 8~11 is 1/1 mapping to well-known luns.
-  UINT16   Rsvd:4;
+  UINT8     Lun[UFS_MAX_LUNS];
+  UINT16    BitMask : 12;           // Bit 0~7 is 1/1 mapping to common luns. Bit 8~11 is 1/1 mapping to well-known luns.
+  UINT16    Rsvd    : 4;
 } UFS_EXPOSED_LUNS;
 
 typedef struct _UFS_PASS_THRU_PRIVATE_DATA {
-  UINT32                              Signature;
-  EFI_HANDLE                          Handle;
-  EFI_EXT_SCSI_PASS_THRU_MODE         ExtScsiPassThruMode;
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL     ExtScsiPassThru;
-  EFI_UFS_DEVICE_CONFIG_PROTOCOL      UfsDevConfig;
-  EDKII_UFS_HOST_CONTROLLER_PROTOCOL  *UfsHostController;
-  UINTN                               UfsHcBase;
-  EDKII_UFS_HC_INFO                   UfsHcInfo;
-  EDKII_UFS_HC_DRIVER_INTERFACE       UfsHcDriverInterface;
+  UINT32                                Signature;
+  EFI_HANDLE                            Handle;
+  EFI_EXT_SCSI_PASS_THRU_MODE           ExtScsiPassThruMode;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL       ExtScsiPassThru;
+  EFI_UFS_DEVICE_CONFIG_PROTOCOL        UfsDevConfig;
+  EDKII_UFS_HOST_CONTROLLER_PROTOCOL    *UfsHostController;
+  UINTN                                 UfsHcBase;
+  EDKII_UFS_HC_INFO                     UfsHcInfo;
+  EDKII_UFS_HC_DRIVER_INTERFACE         UfsHcDriverInterface;
 
-  UINT8                               TaskTag;
+  UINT8                                 TaskTag;
 
-  VOID                                *UtpTrlBase;
-  UINT8                               Nutrs;
-  VOID                                *TrlMapping;
-  VOID                                *UtpTmrlBase;
-  UINT8                               Nutmrs;
-  VOID                                *TmrlMapping;
+  VOID                                  *UtpTrlBase;
+  UINT8                                 Nutrs;
+  VOID                                  *TrlMapping;
+  VOID                                  *UtpTmrlBase;
+  UINT8                                 Nutmrs;
+  VOID                                  *TmrlMapping;
 
-  UFS_EXPOSED_LUNS                    Luns;
+  UFS_EXPOSED_LUNS                      Luns;
 
   //
   // For Non-blocking operation.
   //
-  EFI_EVENT                           TimerEvent;
-  LIST_ENTRY                          Queue;
+  EFI_EVENT                             TimerEvent;
+  LIST_ENTRY                            Queue;
 } UFS_PASS_THRU_PRIVATE_DATA;
 
-#define UFS_PASS_THRU_TRANS_REQ_SIG   SIGNATURE_32 ('U', 'F', 'S', 'T')
+#define UFS_PASS_THRU_TRANS_REQ_SIG  SIGNATURE_32 ('U', 'F', 'S', 'T')
 
 typedef struct {
   UINT32                                        Signature;
@@ -100,12 +100,12 @@ typedef struct {
 #define UFS_PASS_THRU_TRANS_REQ_FROM_THIS(a) \
     CR(a, UFS_PASS_THRU_TRANS_REQ, TransferList, UFS_PASS_THRU_TRANS_REQ_SIG)
 
-#define UFS_TIMEOUT                   EFI_TIMER_PERIOD_SECONDS(3)
-#define UFS_HC_ASYNC_TIMER            EFI_TIMER_PERIOD_MILLISECONDS(1)
+#define UFS_TIMEOUT         EFI_TIMER_PERIOD_SECONDS(3)
+#define UFS_HC_ASYNC_TIMER  EFI_TIMER_PERIOD_MILLISECONDS(1)
 
-#define ROUNDUP8(x) (((x) % 8 == 0) ? (x) : ((x) / 8 + 1) * 8)
+#define ROUNDUP8(x)  (((x) % 8 == 0) ? (x) : ((x) / 8 + 1) * 8)
 
-#define IS_ALIGNED(addr, size)        (((UINTN) (addr) & (size - 1)) == 0)
+#define IS_ALIGNED(addr, size)  (((UINTN) (addr) & (size - 1)) == 0)
 
 #define UFS_PASS_THRU_PRIVATE_DATA_FROM_THIS(a) \
   CR (a, \
@@ -129,19 +129,20 @@ typedef struct {
       )
 
 typedef struct _UFS_DEVICE_MANAGEMENT_REQUEST_PACKET {
-  UINT64           Timeout;
-  VOID             *DataBuffer;
-  UINT8            Opcode;
-  UINT8            DescId;
-  UINT8            Index;
-  UINT8            Selector;
-  UINT32           TransferLength;
-  UINT8            DataDirection;
+  UINT64    Timeout;
+  VOID      *DataBuffer;
+  UINT8     Opcode;
+  UINT8     DescId;
+  UINT8     Index;
+  UINT8     Selector;
+  UINT32    TransferLength;
+  UINT8     DataDirection;
 } UFS_DEVICE_MANAGEMENT_REQUEST_PACKET;
 
 //
 // function prototype
 //
+
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
@@ -273,6 +274,7 @@ UfsPassThruDriverBindingStop (
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -319,7 +321,6 @@ UfsPassThruComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -699,9 +700,9 @@ EFI_STATUS
 UfsAllocateAlignCommonBuffer (
   IN     UFS_PASS_THRU_PRIVATE_DATA    *Private,
   IN     UINTN                         Size,
-     OUT VOID                          **CmdDescHost,
-     OUT EFI_PHYSICAL_ADDRESS          *CmdDescPhyAddr,
-     OUT VOID                          **CmdDescMapping
+  OUT VOID                          **CmdDescHost,
+  OUT EFI_PHYSICAL_ADDRESS          *CmdDescPhyAddr,
+  OUT VOID                          **CmdDescMapping
   );
 
 /**
@@ -737,7 +738,7 @@ EFI_STATUS
 UfsReadFlag (
   IN     UFS_PASS_THRU_PRIVATE_DATA   *Private,
   IN     UINT8                        FlagId,
-     OUT UINT8                        *Value
+  OUT UINT8                        *Value
   );
 
 /**
@@ -991,9 +992,9 @@ GetUfsHcInfo (
   IN UFS_PASS_THRU_PRIVATE_DATA  *Private
   );
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gUfsPassThruComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gUfsPassThruComponentName2;
-extern EFI_DRIVER_BINDING_PROTOCOL  gUfsPassThruDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL     gUfsPassThruComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL    gUfsPassThruComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL     gUfsPassThruDriverBinding;
 extern EDKII_UFS_HC_PLATFORM_PROTOCOL  *mUfsHcPlatform;
 
 #endif

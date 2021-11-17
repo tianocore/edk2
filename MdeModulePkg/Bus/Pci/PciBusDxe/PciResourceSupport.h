@@ -17,18 +17,18 @@ typedef enum {
 #define PCI_RESOURCE_SIGNATURE  SIGNATURE_32 ('p', 'c', 'r', 'c')
 
 typedef struct {
-  UINT32              Signature;
-  LIST_ENTRY          Link;
-  LIST_ENTRY          ChildList;
-  PCI_IO_DEVICE       *PciDev;
-  UINT64              Alignment;
-  UINT64              Offset;
-  UINT8               Bar;
-  PCI_BAR_TYPE        ResType;
-  UINT64              Length;
-  BOOLEAN             Reserved;
-  PCI_RESOURCE_USAGE  ResourceUsage;
-  BOOLEAN             Virtual;
+  UINT32                Signature;
+  LIST_ENTRY            Link;
+  LIST_ENTRY            ChildList;
+  PCI_IO_DEVICE         *PciDev;
+  UINT64                Alignment;
+  UINT64                Offset;
+  UINT8                 Bar;
+  PCI_BAR_TYPE          ResType;
+  UINT64                Length;
+  BOOLEAN               Reserved;
+  PCI_RESOURCE_USAGE    ResourceUsage;
+  BOOLEAN               Virtual;
 } PCI_RESOURCE_NODE;
 
 #define RESOURCE_NODE_FROM_LINK(a) \

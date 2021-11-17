@@ -28,7 +28,7 @@ DebuggerHelp (
   IN OUT EFI_SYSTEM_CONTEXT        SystemContext
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   //
   // if no argument, print all the command title
@@ -41,6 +41,7 @@ DebuggerHelp (
         EDBPrint (DebuggerPrivate->DebuggerCommandSet[Index].CommandTitle);
       }
     }
+
     return EFI_DEBUG_CONTINUE;
   }
 

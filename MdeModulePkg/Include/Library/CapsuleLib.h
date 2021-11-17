@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // BOOLEAN Variable to indicate whether system is in the capsule on disk state.
 //
-#define COD_RELOCATION_INFO_VAR_NAME   L"CodRelocationInfo"
+#define COD_RELOCATION_INFO_VAR_NAME  L"CodRelocationInfo"
 
 /**
   The firmware checks whether the capsule image is supported
@@ -96,7 +96,7 @@ ProcessCapsules (
 **/
 BOOLEAN
 EFIAPI
-CoDCheckCapsuleOnDiskFlag(
+CoDCheckCapsuleOnDiskFlag (
   VOID
   );
 
@@ -108,7 +108,7 @@ CoDCheckCapsuleOnDiskFlag(
 **/
 EFI_STATUS
 EFIAPI
-CoDClearCapsuleOnDiskFlag(
+CoDClearCapsuleOnDiskFlag (
   VOID
   );
 
@@ -136,7 +136,7 @@ CoDClearCapsuleOnDiskFlag(
 **/
 EFI_STATUS
 EFIAPI
-CoDRelocateCapsule(
+CoDRelocateCapsule (
   UINTN     MaxRetry
   );
 

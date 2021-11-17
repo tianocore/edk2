@@ -206,7 +206,6 @@ GetRootBridgeByHandle (
   EFI_HANDLE RootBridgeHandle
   );
 
-
 /**
   Judge whether Pci device existed.
 
@@ -248,7 +247,6 @@ PCI_IO_DEVICE *
 LocateVgaDevice (
   IN PCI_IO_DEVICE        *Bridge
   );
-
 
 /**
   Destroy a pci device node.

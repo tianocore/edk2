@@ -12,24 +12,24 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // stall 1 second, its unit is 100ns
 //
-#define STALL_1_SECOND        1000000
+#define STALL_1_SECOND  1000000
 
 //
 // PCI Hot Plug controller private data
 //
 typedef struct {
-  EFI_EVENT Event;
-  BOOLEAN   Found;
-  BOOLEAN   Initialized;
-  VOID      *Padding;
+  EFI_EVENT    Event;
+  BOOLEAN      Found;
+  BOOLEAN      Initialized;
+  VOID         *Padding;
 } ROOT_HPC_DATA;
 
 //
 // Reference of some global variables
 //
-extern EFI_PCI_HOT_PLUG_INIT_PROTOCOL *gPciHotPlugInit;
-extern EFI_HPC_LOCATION               *gPciRootHpcPool;
-extern ROOT_HPC_DATA                  *gPciRootHpcData;
+extern EFI_PCI_HOT_PLUG_INIT_PROTOCOL  *gPciHotPlugInit;
+extern EFI_HPC_LOCATION                *gPciRootHpcPool;
+extern ROOT_HPC_DATA                   *gPciRootHpcData;
 
 /**
   Event notification function to set Hot Plug controller status.

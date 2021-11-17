@@ -33,7 +33,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Please make sure the PCD Serivce DXE Version is consistent with
 // the version of the generated DXE PCD Database by build tool.
 //
-#define PCD_SERVICE_DXE_VERSION      7
+#define PCD_SERVICE_DXE_VERSION  7
 
 //
 // PCD_DXE_SERVICE_DRIVER_VERSION is defined in Autogen.h.
@@ -42,7 +42,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   #error "Please make sure the version of PCD DXE Service and the generated PCD DXE Database match."
 #endif
 
-extern UINTN     mVpdBaseAddress;
+extern UINTN  mVpdBaseAddress;
 
 /**
   Retrieve additional information associated with a PCD token in the default token space.
@@ -102,6 +102,7 @@ DxeGetPcdInfoGetSku (
 //
 // Protocol Interface function declaration.
 //
+
 /**
   Sets the SKU value for subsequent calls to set or get PCD token values.
 
@@ -493,7 +494,6 @@ DxePcdSet64 (
   IN UINT64            Value
   );
 
-
 /**
   Sets a value of a specified size for a given PCD token.
 
@@ -546,7 +546,6 @@ DxePcdSetBool (
   IN UINTN             TokenNumber,
   IN BOOLEAN           Value
   );
-
 
 /**
   Sets an 8-bit value for a given PCD token.
@@ -802,11 +801,11 @@ DxePcdGetNextTokenSpace (
   );
 
 typedef struct {
-  LIST_ENTRY              Node;
-  PCD_PROTOCOL_CALLBACK   CallbackFn;
+  LIST_ENTRY               Node;
+  PCD_PROTOCOL_CALLBACK    CallbackFn;
 } CALLBACK_FN_ENTRY;
 
-#define CR_FNENTRY_FROM_LISTNODE(Record, Type, Field) BASE_CR(Record, Type, Field)
+#define CR_FNENTRY_FROM_LISTNODE(Record, Type, Field)  BASE_CR(Record, Type, Field)
 
 //
 // Internal Functions
@@ -1170,26 +1169,25 @@ UpdatePcdDatabase (
   IN BOOLEAN       IsPeiDb
   );
 
-extern  PCD_DATABASE   mPcdDatabase;
+extern  PCD_DATABASE  mPcdDatabase;
 
-extern  UINT32         mPcdTotalTokenCount;
-extern  UINT32         mPeiLocalTokenCount;
-extern  UINT32         mDxeLocalTokenCount;
-extern  UINT32         mPeiNexTokenCount;
-extern  UINT32         mDxeNexTokenCount;
-extern  UINT32         mPeiExMapppingTableSize;
-extern  UINT32         mDxeExMapppingTableSize;
-extern  UINT32         mPeiGuidTableSize;
-extern  UINT32         mDxeGuidTableSize;
+extern  UINT32  mPcdTotalTokenCount;
+extern  UINT32  mPeiLocalTokenCount;
+extern  UINT32  mDxeLocalTokenCount;
+extern  UINT32  mPeiNexTokenCount;
+extern  UINT32  mDxeNexTokenCount;
+extern  UINT32  mPeiExMapppingTableSize;
+extern  UINT32  mDxeExMapppingTableSize;
+extern  UINT32  mPeiGuidTableSize;
+extern  UINT32  mDxeGuidTableSize;
 
-extern  BOOLEAN        mPeiExMapTableEmpty;
-extern  BOOLEAN        mDxeExMapTableEmpty;
-extern  BOOLEAN        mPeiDatabaseEmpty;
+extern  BOOLEAN  mPeiExMapTableEmpty;
+extern  BOOLEAN  mDxeExMapTableEmpty;
+extern  BOOLEAN  mPeiDatabaseEmpty;
 
-extern  EFI_GUID     **TmpTokenSpaceBuffer;
-extern  UINTN          TmpTokenSpaceBufferCount;
+extern  EFI_GUID  **TmpTokenSpaceBuffer;
+extern  UINTN     TmpTokenSpaceBufferCount;
 
-extern EFI_LOCK mPcdDatabaseLock;
+extern EFI_LOCK  mPcdDatabaseLock;
 
 #endif
-

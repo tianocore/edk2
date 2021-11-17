@@ -20,9 +20,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUdfComponentName = {
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUdfComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) UdfComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) UdfComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gUdfComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)UdfComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)UdfComponentNameGetControllerName,
   "en"
 };
 
@@ -30,7 +30,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUdfComponentName2 = 
 // Driver name table for Udf module.
 // It is shared by the implementation of ComponentName & ComponentName2 Protocol.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUdfDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mUdfDriverNameTable[] = {
   {
     "eng;en",
     L"UDF File System Driver"
@@ -89,12 +89,12 @@ UdfComponentNameGetDriverName (
   )
 {
   return LookupUnicodeString2 (
-    Language,
-    This->SupportedLanguages,
-    mUdfDriverNameTable,
-    DriverName,
-    (BOOLEAN)(This == &gUdfComponentName)
-    );
+           Language,
+           This->SupportedLanguages,
+           mUdfDriverNameTable,
+           DriverName,
+           (BOOLEAN)(This == &gUdfComponentName)
+           );
 }
 
 /**

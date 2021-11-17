@@ -29,13 +29,13 @@ ReadFileFromVol (
   OUT VOID                        **Buffer
   )
 {
-  EFI_STATUS                        Status;
-  EFI_FILE_HANDLE                   RootDir;
-  EFI_FILE_HANDLE                   Handle;
-  UINTN                             FileInfoSize;
-  EFI_FILE_INFO                     *FileInfo;
-  UINTN                             TempBufferSize;
-  VOID                              *TempBuffer;
+  EFI_STATUS       Status;
+  EFI_FILE_HANDLE  RootDir;
+  EFI_FILE_HANDLE  Handle;
+  UINTN            FileInfoSize;
+  EFI_FILE_INFO    *FileInfo;
+  UINTN            TempBufferSize;
+  VOID             *TempBuffer;
 
   //
   // Open the root directory
@@ -65,7 +65,7 @@ ReadFileFromVol (
   //
   // Get the file information
   //
-  FileInfoSize = sizeof(EFI_FILE_INFO) + 1024;
+  FileInfoSize = sizeof (EFI_FILE_INFO) + 1024;
 
   FileInfo = AllocateZeroPool (FileInfoSize);
   if (FileInfo == NULL) {
@@ -88,8 +88,8 @@ ReadFileFromVol (
   //
   // Allocate buffer for the file data. The last CHAR16 is for L'\0'
   //
-  TempBufferSize = (UINTN) FileInfo->FileSize + sizeof(CHAR16);
-  TempBuffer = AllocateZeroPool (TempBufferSize);
+  TempBufferSize = (UINTN)FileInfo->FileSize + sizeof (CHAR16);
+  TempBuffer     = AllocateZeroPool (TempBufferSize);
   if (TempBuffer == NULL) {
     Handle->Close (Handle);
     gBS->FreePool (FileInfo);
@@ -148,13 +148,13 @@ ReadFileToBuffer (
   IN  BOOLEAN                     ScanFs
   )
 {
-  EFI_STATUS                        Status;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL   *Vol;
-  UINTN                             TempBufferSize;
-  VOID                              *TempBuffer;
-  UINTN                             NoHandles;
-  EFI_HANDLE                        *HandleBuffer;
-  UINTN                             Index;
+  EFI_STATUS                       Status;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *Vol;
+  UINTN                            TempBufferSize;
+  VOID                             *TempBuffer;
+  UINTN                            NoHandles;
+  EFI_HANDLE                       *HandleBuffer;
+  UINTN                            Index;
 
   //
   // Check parameters
@@ -170,6 +170,7 @@ ReadFileToBuffer (
     if (DebuggerPrivate->Vol == NULL) {
       return EFI_INVALID_PARAMETER;
     }
+
     //
     // Read file directly from Vol
     //
@@ -184,12 +185,12 @@ ReadFileToBuffer (
   // Get all Vol handle
   //
   Status = gBS->LocateHandleBuffer (
-                   ByProtocol,
-                   &gEfiSimpleFileSystemProtocolGuid,
-                   NULL,
-                   &NoHandles,
-                   &HandleBuffer
-                   );
+                  ByProtocol,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  NULL,
+                  &NoHandles,
+                  &HandleBuffer
+                  );
   if (EFI_ERROR (Status) && (NoHandles == 0)) {
     return EFI_NOT_FOUND;
   }
@@ -204,9 +205,9 @@ ReadFileToBuffer (
     Status = gBS->HandleProtocol (
                     HandleBuffer[Index],
                     &gEfiSimpleFileSystemProtocolGuid,
-                    (VOID**) &Vol
+                    (VOID **)&Vol
                     );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       continue;
     }
 
@@ -268,25 +269,26 @@ GetFileNameUnderDir (
   IN OUT UINTN                    *Index
   )
 {
-  EFI_STATUS                        Status;
-  EFI_FILE_HANDLE                   RootDir;
-  EFI_FILE_HANDLE                   Handle;
-  UINTN                             FileInfoSize;
-  EFI_FILE_INFO                     *FileInfo;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL   *Vol;
-  VOID                              *TempName;
-  UINTN                             FileIndex;
+  EFI_STATUS                       Status;
+  EFI_FILE_HANDLE                  RootDir;
+  EFI_FILE_HANDLE                  Handle;
+  UINTN                            FileInfoSize;
+  EFI_FILE_INFO                    *FileInfo;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *Vol;
+  VOID                             *TempName;
+  UINTN                            FileIndex;
 
   if (DebuggerPrivate->Vol == NULL) {
     Status = gBS->LocateProtocol (
                     &gEfiSimpleFileSystemProtocolGuid,
                     NULL,
-                    (VOID**) &DebuggerPrivate->Vol
+                    (VOID **)&DebuggerPrivate->Vol
                     );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       return NULL;
     }
   }
+
   Vol = DebuggerPrivate->Vol;
 
   //
@@ -311,6 +313,7 @@ GetFileNameUnderDir (
     RootDir->Close (RootDir);
     return NULL;
   }
+
   RootDir->Close (RootDir);
 
   //
@@ -325,7 +328,7 @@ GetFileNameUnderDir (
   //
   // Get the file information
   //
-  FileInfoSize = sizeof(EFI_FILE_INFO) + 1024;
+  FileInfoSize = sizeof (EFI_FILE_INFO) + 1024;
 
   FileInfo = AllocateZeroPool (FileInfoSize);
   if (FileInfo == NULL) {
@@ -337,12 +340,12 @@ GetFileNameUnderDir (
   // Walk through each file in the directory
   //
   FileIndex = 0;
-  TempName = NULL;
+  TempName  = NULL;
   while (TRUE) {
     //
     // Read a file entry
     //
-    FileInfoSize = sizeof(EFI_FILE_INFO) + 1024;
+    FileInfoSize = sizeof (EFI_FILE_INFO) + 1024;
 
     Status = Handle->Read (
                        Handle,
@@ -367,10 +370,11 @@ GetFileNameUnderDir (
 
       if (FileIndex == *Index) {
         TempName = StrDuplicate (FileInfo->FileName);
-        *Index = *Index + 1;
+        *Index   = *Index + 1;
         break;
       }
-      FileIndex ++;
+
+      FileIndex++;
     }
   }
 

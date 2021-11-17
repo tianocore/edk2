@@ -6,7 +6,6 @@
 
 **/
 
-
 #include <PiDxe.h>
 
 #include <Guid/MemoryProfile.h>
@@ -46,4 +45,3 @@ MemoryProfileLibRecord (
 {
   return EFI_UNSUPPORTED;
 }
-

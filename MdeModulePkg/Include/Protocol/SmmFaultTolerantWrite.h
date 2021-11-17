@@ -27,6 +27,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 typedef EFI_FAULT_TOLERANT_WRITE_PROTOCOL EFI_SMM_FAULT_TOLERANT_WRITE_PROTOCOL;
 
-extern EFI_GUID gEfiSmmFaultTolerantWriteProtocolGuid;
+extern EFI_GUID  gEfiSmmFaultTolerantWriteProtocolGuid;
 
 #endif

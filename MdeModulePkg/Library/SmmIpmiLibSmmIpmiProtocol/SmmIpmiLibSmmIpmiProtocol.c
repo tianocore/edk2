@@ -12,7 +12,7 @@
 #include <Library/SmmServicesTableLib.h>
 #include <Library/DebugLib.h>
 
-IPMI_PROTOCOL *mIpmiProtocol = NULL;
+IPMI_PROTOCOL  *mIpmiProtocol = NULL;
 
 /**
   This service enables submitting commands via Ipmi.
@@ -39,7 +39,7 @@ IpmiSubmitCommand (
   IN     UINT8     Command,
   IN     UINT8     *RequestData,
   IN     UINT32    RequestDataSize,
-     OUT UINT8     *ResponseData,
+  OUT UINT8     *ResponseData,
   IN OUT UINT32    *ResponseDataSize
   )
 {
@@ -47,10 +47,10 @@ IpmiSubmitCommand (
 
   if (mIpmiProtocol == NULL) {
     Status = gSmst->SmmLocateProtocol (
-                  &gSmmIpmiProtocolGuid,
-                  NULL,
-                  (VOID **) &mIpmiProtocol
-                  );
+                      &gSmmIpmiProtocolGuid,
+                      NULL,
+                      (VOID **)&mIpmiProtocol
+                      );
     if (EFI_ERROR (Status)) {
       //
       // Smm Ipmi Protocol is not installed. So, IPMI device is not present.
@@ -72,5 +72,6 @@ IpmiSubmitCommand (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   return EFI_SUCCESS;
 }

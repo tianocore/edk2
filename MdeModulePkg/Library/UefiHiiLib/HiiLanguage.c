@@ -6,7 +6,6 @@
 
 **/
 
-
 #include "InternalHiiLib.h"
 
 /**
@@ -87,4 +86,3 @@ HiiGetSupportedLanguages (
   //
   return SupportedLanguages;
 }
-

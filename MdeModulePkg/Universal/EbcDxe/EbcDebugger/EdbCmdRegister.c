@@ -80,6 +80,7 @@ DebuggerRegister (
     EDBPrint (L"Invalid Register Value\n");
     return EFI_DEBUG_CONTINUE;
   }
+
   RegVal = LXtoi (RegValStr);
 
   //

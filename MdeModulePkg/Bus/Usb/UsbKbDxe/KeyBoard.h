@@ -9,10 +9,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_KEYBOARD_H_
 #define _EFI_KEYBOARD_H_
 
-
 #include "EfiKey.h"
 
-#define USB_KEYBOARD_KEY_COUNT            105
+#define USB_KEYBOARD_KEY_COUNT  105
 
 #define USB_KEYBOARD_LANGUAGE_STR_LEN     5         // RFC4646 Language Code: "en-US"
 #define USB_KEYBOARD_DESCRIPTION_STR_LEN  (16 + 1)  // Description: "English Keyboard"
@@ -22,28 +21,29 @@ typedef struct {
   //
   // This 4-bytes total array length is required by PreparePackageList()
   //
-  UINT32                 Length;
+  UINT32                    Length;
 
   //
   // Keyboard Layout package definition
   //
-  EFI_HII_PACKAGE_HEADER PackageHeader;
-  UINT16                 LayoutCount;
+  EFI_HII_PACKAGE_HEADER    PackageHeader;
+  UINT16                    LayoutCount;
 
   //
   // EFI_HII_KEYBOARD_LAYOUT
   //
-  UINT16                 LayoutLength;
-  EFI_GUID               Guid;
-  UINT32                 LayoutDescriptorStringOffset;
-  UINT8                  DescriptorCount;
-  EFI_KEY_DESCRIPTOR     KeyDescriptor[USB_KEYBOARD_KEY_COUNT];
-  UINT16                 DescriptionCount;
-  CHAR16                 Language[USB_KEYBOARD_LANGUAGE_STR_LEN];
-  CHAR16                 Space;
-  CHAR16                 DescriptionString[USB_KEYBOARD_DESCRIPTION_STR_LEN];
+  UINT16                    LayoutLength;
+  EFI_GUID                  Guid;
+  UINT32                    LayoutDescriptorStringOffset;
+  UINT8                     DescriptorCount;
+  EFI_KEY_DESCRIPTOR        KeyDescriptor[USB_KEYBOARD_KEY_COUNT];
+  UINT16                    DescriptionCount;
+  CHAR16                    Language[USB_KEYBOARD_LANGUAGE_STR_LEN];
+  CHAR16                    Space;
+  CHAR16                    DescriptionString[USB_KEYBOARD_DESCRIPTION_STR_LEN];
 } USB_KEYBOARD_LAYOUT_PACK_BIN;
 #pragma pack()
+
 /**
   Uses USB I/O to check whether the device is a USB keyboard device.
 
@@ -192,7 +192,6 @@ UsbKeyCodeToEfiInputKey (
   OUT EFI_KEY_DATA    *KeyData
   );
 
-
 /**
   Create the queue.
 
@@ -216,7 +215,6 @@ DestroyQueue (
   IN OUT USB_SIMPLE_QUEUE   *Queue
   );
 
-
 /**
   Check whether the queue is empty.
 
@@ -230,7 +228,6 @@ BOOLEAN
 IsQueueEmpty (
   IN  USB_SIMPLE_QUEUE   *Queue
   );
-
 
 /**
   Check whether the queue is full.
@@ -246,7 +243,6 @@ IsQueueFull (
   IN  USB_SIMPLE_QUEUE   *Queue
   );
 
-
 /**
   Enqueue the item to the queue.
 
@@ -260,7 +256,6 @@ Enqueue (
   IN      VOID             *Item,
   IN      UINTN            ItemSize
   );
-
 
 /**
   Dequeue a item from the queue.
@@ -276,7 +271,7 @@ Enqueue (
 EFI_STATUS
 Dequeue (
   IN OUT  USB_SIMPLE_QUEUE *Queue,
-     OUT  VOID             *Item,
+  OUT  VOID             *Item,
   IN      UINTN            ItemSize
   );
 

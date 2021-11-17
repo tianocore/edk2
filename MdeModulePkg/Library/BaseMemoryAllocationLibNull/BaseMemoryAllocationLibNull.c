@@ -7,12 +7,10 @@
 
 **/
 
-
 #include <Uefi/UefiBaseType.h>
 
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-
 
 /**
   Allocates one or more 4KB pages of type EfiBootServicesData.

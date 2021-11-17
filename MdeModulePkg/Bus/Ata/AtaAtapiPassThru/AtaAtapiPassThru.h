@@ -5,6 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __ATA_ATAPI_PASS_THRU_H__
 #define __ATA_ATAPI_PASS_THRU_H__
 
@@ -36,14 +37,14 @@
 #include "IdeMode.h"
 #include "AhciMode.h"
 
-extern EFI_DRIVER_BINDING_PROTOCOL  gAtaAtapiPassThruDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gAtaAtapiPassThruComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gAtaAtapiPassThruComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gAtaAtapiPassThruDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gAtaAtapiPassThruComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gAtaAtapiPassThruComponentName2;
 
-extern EDKII_ATA_ATAPI_POLICY_PROTOCOL *mAtaAtapiPolicy;
+extern EDKII_ATA_ATAPI_POLICY_PROTOCOL  *mAtaAtapiPolicy;
 
-#define ATA_ATAPI_PASS_THRU_SIGNATURE  SIGNATURE_32 ('a', 'a', 'p', 't')
-#define ATA_ATAPI_DEVICE_SIGNATURE     SIGNATURE_32 ('a', 'd', 'e', 'v')
+#define ATA_ATAPI_PASS_THRU_SIGNATURE   SIGNATURE_32 ('a', 'a', 'p', 't')
+#define ATA_ATAPI_DEVICE_SIGNATURE      SIGNATURE_32 ('a', 'd', 'e', 'v')
 #define ATA_NONBLOCKING_TASK_SIGNATURE  SIGNATURE_32 ('a', 't', 's', 'k')
 
 typedef struct _ATA_NONBLOCK_TASK ATA_NONBLOCK_TASK;
@@ -66,88 +67,88 @@ typedef enum {
 // Ahci mode device info
 //
 typedef struct {
-  UINT32                            Signature;
-  LIST_ENTRY                        Link;
+  UINT32                 Signature;
+  LIST_ENTRY             Link;
 
-  UINT16                            Port;
-  UINT16                            PortMultiplier;
-  EFI_ATA_DEVICE_TYPE               Type;
+  UINT16                 Port;
+  UINT16                 PortMultiplier;
+  EFI_ATA_DEVICE_TYPE    Type;
 
-  EFI_IDENTIFY_DATA                 *IdentifyData;
+  EFI_IDENTIFY_DATA      *IdentifyData;
 } EFI_ATA_DEVICE_INFO;
 
 typedef struct {
-  UINT32                            Signature;
+  UINT32                              Signature;
 
-  EFI_HANDLE                        ControllerHandle;
-  EFI_PCI_IO_PROTOCOL               *PciIo;
-  EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeControllerInit;
+  EFI_HANDLE                          ControllerHandle;
+  EFI_PCI_IO_PROTOCOL                 *PciIo;
+  EFI_IDE_CONTROLLER_INIT_PROTOCOL    *IdeControllerInit;
 
-  EFI_ATA_PASS_THRU_MODE            AtaPassThruMode;
-  EFI_ATA_PASS_THRU_PROTOCOL        AtaPassThru;
-  EFI_EXT_SCSI_PASS_THRU_MODE       ExtScsiPassThruMode;
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL   ExtScsiPassThru;
+  EFI_ATA_PASS_THRU_MODE              AtaPassThruMode;
+  EFI_ATA_PASS_THRU_PROTOCOL          AtaPassThru;
+  EFI_EXT_SCSI_PASS_THRU_MODE         ExtScsiPassThruMode;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL     ExtScsiPassThru;
 
-  EFI_ATA_HC_WORK_MODE              Mode;
+  EFI_ATA_HC_WORK_MODE                Mode;
 
-  EFI_IDE_REGISTERS                 IdeRegisters[EfiIdeMaxChannel];
-  EFI_AHCI_REGISTERS                AhciRegisters;
+  EFI_IDE_REGISTERS                   IdeRegisters[EfiIdeMaxChannel];
+  EFI_AHCI_REGISTERS                  AhciRegisters;
 
   //
   // The attached device list
   //
-  LIST_ENTRY                        DeviceList;
-  UINT64                            EnabledPciAttributes;
-  UINT64                            OriginalPciAttributes;
+  LIST_ENTRY                          DeviceList;
+  UINT64                              EnabledPciAttributes;
+  UINT64                              OriginalPciAttributes;
 
   //
   // For AtaPassThru protocol, using the following bytes to record the previous call in
   // GetNextPort()/GetNextDevice().
   //
-  UINT16                            PreviousPort;
-  UINT16                            PreviousPortMultiplier;
+  UINT16                              PreviousPort;
+  UINT16                              PreviousPortMultiplier;
   //
   // For ExtScsiPassThru protocol, using the following bytes to record the previous call in
   // GetNextTarget()/GetNextTargetLun().
   //
-  UINT16                            PreviousTargetId;
-  UINT64                            PreviousLun;
+  UINT16                              PreviousTargetId;
+  UINT64                              PreviousLun;
 
   //
   // For Non-blocking.
   //
-  EFI_EVENT                         TimerEvent;
-  LIST_ENTRY                        NonBlockingTaskList;
+  EFI_EVENT                           TimerEvent;
+  LIST_ENTRY                          NonBlockingTaskList;
 } ATA_ATAPI_PASS_THRU_INSTANCE;
 
 //
 // Task for Non-blocking mode.
 //
 struct _ATA_NONBLOCK_TASK {
-  UINT32                            Signature;
-  LIST_ENTRY                        Link;
+  UINT32                              Signature;
+  LIST_ENTRY                          Link;
 
-  UINT16                            Port;
-  UINT16                            PortMultiplier;
-  EFI_ATA_PASS_THRU_COMMAND_PACKET  *Packet;
-  BOOLEAN                           IsStart;
-  EFI_EVENT                         Event;
-  UINT64                            RetryTimes;
-  BOOLEAN                           InfiniteWait;
-  VOID                              *Map;            // Pointer to map.
-  VOID                              *TableMap;       // Pointer to PRD table map.
-  EFI_ATA_DMA_PRD                   *MapBaseAddress; //  Pointer to range Base address for Map.
-  UINTN                             PageCount;       //  The page numbers used by PCIO freebuffer.
+  UINT16                              Port;
+  UINT16                              PortMultiplier;
+  EFI_ATA_PASS_THRU_COMMAND_PACKET    *Packet;
+  BOOLEAN                             IsStart;
+  EFI_EVENT                           Event;
+  UINT64                              RetryTimes;
+  BOOLEAN                             InfiniteWait;
+  VOID                                *Map;            // Pointer to map.
+  VOID                                *TableMap;       // Pointer to PRD table map.
+  EFI_ATA_DMA_PRD                     *MapBaseAddress; //  Pointer to range Base address for Map.
+  UINTN                               PageCount;       //  The page numbers used by PCIO freebuffer.
 };
 
 //
 // Timeout value which uses 100ns as a unit.
 // It means 3 second span.
 //
-#define ATA_ATAPI_TIMEOUT           EFI_TIMER_PERIOD_SECONDS(3)
-#define ATA_SPINUP_TIMEOUT          EFI_TIMER_PERIOD_SECONDS(10)
+#define ATA_ATAPI_TIMEOUT   EFI_TIMER_PERIOD_SECONDS(3)
+#define ATA_SPINUP_TIMEOUT  EFI_TIMER_PERIOD_SECONDS(10)
 
-#define IS_ALIGNED(addr, size)      (((UINTN) (addr) & (size - 1)) == 0)
+#define IS_ALIGNED(addr, size)  (((UINTN) (addr) & (size - 1)) == 0)
 
 #define ATA_PASS_THRU_PRIVATE_DATA_FROM_THIS(a) \
   CR (a, \
@@ -532,7 +533,7 @@ VOID
 EFIAPI
 AsyncNonBlockingTransferRoutine (
   EFI_EVENT  Event,
-  VOID*      Context
+  VOID *Context
   );
 
 /**
@@ -1296,4 +1297,3 @@ AtaPioDataInOut (
   );
 
 #endif
-

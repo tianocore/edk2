@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// This default instance of EFI_PEI_CPU_IO_PPI install assigned to EFI_PEI_SERVICE.CpuIo
 /// when PeiCore's initialization.
 ///
-EFI_PEI_CPU_IO_PPI gPeiDefaultCpuIoPpi = {
+EFI_PEI_CPU_IO_PPI  gPeiDefaultCpuIoPpi = {
   {
     PeiDefaultMemRead,
     PeiDefaultMemWrite

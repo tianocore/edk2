@@ -26,11 +26,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #pragma pack(1)
 typedef struct {
-  UINT8                   Len;
-  UINT8                   Type;
+  UINT8    Len;
+  UINT8    Type;
 } USB_DESC_HEAD;
 #pragma pack()
-
 
 //
 // Each USB device has a device descriptor. Each device may
@@ -42,13 +41,13 @@ typedef struct {
 // structure.
 //
 typedef struct {
-  EFI_USB_ENDPOINT_DESCRIPTOR   Desc;
-  UINT8                         Toggle;
+  EFI_USB_ENDPOINT_DESCRIPTOR    Desc;
+  UINT8                          Toggle;
 } USB_ENDPOINT_DESC;
 
 typedef struct {
-  EFI_USB_INTERFACE_DESCRIPTOR  Desc;
-  USB_ENDPOINT_DESC             **Endpoints;
+  EFI_USB_INTERFACE_DESCRIPTOR    Desc;
+  USB_ENDPOINT_DESC               **Endpoints;
 } USB_INTERFACE_SETTING;
 
 //
@@ -57,19 +56,19 @@ typedef struct {
 // It should sufice in most environments.
 //
 typedef struct {
-  USB_INTERFACE_SETTING*        Settings[USB_MAX_INTERFACE_SETTING];
-  UINTN                         NumOfSetting;
-  UINTN                         ActiveIndex;  // Index of active setting
+  USB_INTERFACE_SETTING    *Settings[USB_MAX_INTERFACE_SETTING];
+  UINTN                    NumOfSetting;
+  UINTN                    ActiveIndex;       // Index of active setting
 } USB_INTERFACE_DESC;
 
 typedef struct {
-  EFI_USB_CONFIG_DESCRIPTOR     Desc;
-  USB_INTERFACE_DESC            **Interfaces;
+  EFI_USB_CONFIG_DESCRIPTOR    Desc;
+  USB_INTERFACE_DESC           **Interfaces;
 } USB_CONFIG_DESC;
 
 typedef struct {
-  EFI_USB_DEVICE_DESCRIPTOR     Desc;
-  USB_CONFIG_DESC               **Configs;
+  EFI_USB_DEVICE_DESCRIPTOR    Desc;
+  USB_CONFIG_DESC              **Configs;
 } USB_DEVICE_DESC;
 
 /**
@@ -146,7 +145,7 @@ UsbFreeDevDesc (
   @return The created string descriptor or NULL.
 
 **/
-EFI_USB_STRING_DESCRIPTOR*
+EFI_USB_STRING_DESCRIPTOR *
 UsbGetOneString (
   IN     USB_DEVICE       *UsbDev,
   IN     UINT8            StringIndex,
@@ -224,4 +223,5 @@ UsbIoClearFeature (
   IN  UINT16              Feature,
   IN  UINT16              Index
   );
+
 #endif

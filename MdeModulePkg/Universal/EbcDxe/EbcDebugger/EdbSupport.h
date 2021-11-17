@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define EFI_DEBUGGER_LINE_NUMBER_IN_PAGE  0x10
 
-#define EFI_DEBUG_MAX_PRINT_BUFFER   (80 * 4)
+#define EFI_DEBUG_MAX_PRINT_BUFFER  (80 * 4)
 
 /**
 

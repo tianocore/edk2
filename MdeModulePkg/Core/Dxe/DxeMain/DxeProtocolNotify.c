@@ -39,34 +39,34 @@ EFI_CORE_PROTOCOL_NOTIFY_ENTRY  mArchProtocols[] = {
 // Optional protocols that the DXE Core will use if they are present
 //
 EFI_CORE_PROTOCOL_NOTIFY_ENTRY  mOptionalProtocols[] = {
-  { &gEfiSecurity2ArchProtocolGuid,        (VOID **)&gSecurity2,     NULL, NULL, FALSE },
-  { &gEfiSmmBase2ProtocolGuid,             (VOID **)&gSmmBase2,      NULL, NULL, FALSE },
-  { NULL,                                  (VOID **)NULL,            NULL, NULL, FALSE }
+  { &gEfiSecurity2ArchProtocolGuid, (VOID **)&gSecurity2, NULL, NULL, FALSE },
+  { &gEfiSmmBase2ProtocolGuid,      (VOID **)&gSmmBase2,  NULL, NULL, FALSE },
+  { NULL,                           (VOID **)NULL,        NULL, NULL, FALSE }
 };
 
 //
 // Following is needed to display missing architectural protocols in debug builds
 //
 typedef struct {
-  EFI_GUID  *ProtocolGuid;
-  CHAR8     *GuidString;
+  EFI_GUID    *ProtocolGuid;
+  CHAR8       *GuidString;
 } GUID_TO_STRING_PROTOCOL_ENTRY;
 
-GLOBAL_REMOVE_IF_UNREFERENCED CONST GUID_TO_STRING_PROTOCOL_ENTRY mMissingProtocols[] = {
-  { &gEfiSecurityArchProtocolGuid,         "Security"           },
-  { &gEfiCpuArchProtocolGuid,              "CPU"                },
-  { &gEfiMetronomeArchProtocolGuid,        "Metronome"          },
-  { &gEfiTimerArchProtocolGuid,            "Timer"              },
-  { &gEfiBdsArchProtocolGuid,              "Bds"                },
-  { &gEfiWatchdogTimerArchProtocolGuid,    "Watchdog Timer"     },
-  { &gEfiRuntimeArchProtocolGuid,          "Runtime"            },
-  { &gEfiVariableArchProtocolGuid,         "Variable"           },
-  { &gEfiVariableWriteArchProtocolGuid,    "Variable Write"     },
-  { &gEfiCapsuleArchProtocolGuid,          "Capsule"            },
-  { &gEfiMonotonicCounterArchProtocolGuid, "Monotonic Counter"  },
-  { &gEfiResetArchProtocolGuid,            "Reset"              },
-  { &gEfiRealTimeClockArchProtocolGuid,    "Real Time Clock"    },
-  { NULL,                                  ""                   }
+GLOBAL_REMOVE_IF_UNREFERENCED CONST GUID_TO_STRING_PROTOCOL_ENTRY  mMissingProtocols[] = {
+  { &gEfiSecurityArchProtocolGuid,         "Security"          },
+  { &gEfiCpuArchProtocolGuid,              "CPU"               },
+  { &gEfiMetronomeArchProtocolGuid,        "Metronome"         },
+  { &gEfiTimerArchProtocolGuid,            "Timer"             },
+  { &gEfiBdsArchProtocolGuid,              "Bds"               },
+  { &gEfiWatchdogTimerArchProtocolGuid,    "Watchdog Timer"    },
+  { &gEfiRuntimeArchProtocolGuid,          "Runtime"           },
+  { &gEfiVariableArchProtocolGuid,         "Variable"          },
+  { &gEfiVariableWriteArchProtocolGuid,    "Variable Write"    },
+  { &gEfiCapsuleArchProtocolGuid,          "Capsule"           },
+  { &gEfiMonotonicCounterArchProtocolGuid, "Monotonic Counter" },
+  { &gEfiResetArchProtocolGuid,            "Reset"             },
+  { &gEfiRealTimeClockArchProtocolGuid,    "Real Time Clock"   },
+  { NULL,                                  ""                  }
 };
 
 /**
@@ -88,9 +88,9 @@ CoreAllEfiServicesAvailable (
       return EFI_NOT_FOUND;
     }
   }
+
   return EFI_SUCCESS;
 }
-
 
 /**
   Notification event handler registered by CoreNotifyOnArchProtocolInstallation ().
@@ -170,14 +170,15 @@ GenericProtocolNotify (
     // Copy all the registered Image to new gRuntime protocol
     //
     for (Link = gRuntimeTemplate.ImageHead.ForwardLink; Link != &gRuntimeTemplate.ImageHead; Link = TempLinkNode.ForwardLink) {
-      CopyMem (&TempLinkNode, Link, sizeof(LIST_ENTRY));
+      CopyMem (&TempLinkNode, Link, sizeof (LIST_ENTRY));
       InsertTailList (&gRuntime->ImageHead, Link);
     }
+
     //
     // Copy all the registered Event to new gRuntime protocol
     //
     for (Link = gRuntimeTemplate.EventHead.ForwardLink; Link != &gRuntimeTemplate.EventHead; Link = TempLinkNode.ForwardLink) {
-      CopyMem (&TempLinkNode, Link, sizeof(LIST_ENTRY));
+      CopyMem (&TempLinkNode, Link, sizeof (LIST_ENTRY));
       InsertTailList (&gRuntime->EventHead, Link);
     }
 
@@ -213,28 +214,28 @@ CoreNotifyOnProtocolEntryTable (
 {
   EFI_STATUS  Status;
 
-  for (; Entry->ProtocolGuid != NULL; Entry++) {
+  for ( ; Entry->ProtocolGuid != NULL; Entry++) {
     //
     // Create the event
     //
     Status = CoreCreateEvent (
-              EVT_NOTIFY_SIGNAL,
-              TPL_CALLBACK,
-              GenericProtocolNotify,
-              Entry,
-              &Entry->Event
-              );
-    ASSERT_EFI_ERROR(Status);
+               EVT_NOTIFY_SIGNAL,
+               TPL_CALLBACK,
+               GenericProtocolNotify,
+               Entry,
+               &Entry->Event
+               );
+    ASSERT_EFI_ERROR (Status);
 
     //
     // Register for protocol notifactions on this event
     //
     Status = CoreRegisterProtocolNotify (
-              Entry->ProtocolGuid,
-              Entry->Event,
-              &Entry->Registration
-              );
-    ASSERT_EFI_ERROR(Status);
+               Entry->ProtocolGuid,
+               Entry->Event,
+               &Entry->Registration
+               );
+    ASSERT_EFI_ERROR (Status);
   }
 }
 
@@ -251,7 +252,6 @@ CoreNotifyOnProtocolInstallation (
   CoreNotifyOnProtocolEntryTable (mArchProtocols);
   CoreNotifyOnProtocolEntryTable (mOptionalProtocols);
 }
-
 
 /**
   Displays Architectural protocols that were not loaded and are required for DXE

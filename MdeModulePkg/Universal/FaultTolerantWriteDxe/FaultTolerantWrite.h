@@ -32,18 +32,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define FTW_ERASE_POLARITY  1
 
-#define FTW_ERASED_BYTE     ((UINT8) (255))
-#define FTW_POLARITY_REVERT ((UINT8) (255))
+#define FTW_ERASED_BYTE      ((UINT8) (255))
+#define FTW_POLARITY_REVERT  ((UINT8) (255))
 
 #define HEADER_ALLOCATED  0x1
 #define WRITES_ALLOCATED  0x2
 #define WRITES_COMPLETED  0x4
 
-#define BOOT_BLOCK_UPDATE 0x1
-#define SPARE_COMPLETED   0x2
-#define DEST_COMPLETED    0x4
+#define BOOT_BLOCK_UPDATE  0x1
+#define SPARE_COMPLETED    0x2
+#define DEST_COMPLETED     0x4
 
-#define FTW_BLOCKS(Length, BlockSize) ((UINTN) ((Length) / (BlockSize) + (((Length) & ((BlockSize) - 1)) ? 1 : 0)))
+#define FTW_BLOCKS(Length, BlockSize)  ((UINTN) ((Length) / (BlockSize) + (((Length) & ((BlockSize) - 1)) ? 1 : 0)))
 
 #define FTW_DEVICE_SIGNATURE  SIGNATURE_32 ('F', 'T', 'W', 'D')
 
@@ -51,31 +51,31 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // EFI Fault tolerant protocol private data structure
 //
 typedef struct {
-  UINTN                                   Signature;
-  EFI_HANDLE                              Handle;
-  EFI_FAULT_TOLERANT_WRITE_PROTOCOL       FtwInstance;
-  EFI_PHYSICAL_ADDRESS                    WorkSpaceAddress;   // Base address of working space range in flash.
-  EFI_PHYSICAL_ADDRESS                    SpareAreaAddress;   // Base address of spare range in flash.
-  UINTN                                   WorkSpaceLength;    // Size of working space range in flash.
-  UINTN                                   NumberOfWorkSpaceBlock; // Number of the blocks in work block for work space.
-  UINTN                                   WorkBlockSize;      // Block size in bytes of the work blocks in flash
-  UINTN                                   SpareAreaLength;    // Size of spare range in flash.
-  UINTN                                   NumberOfSpareBlock; // Number of the blocks in spare block.
-  UINTN                                   SpareBlockSize;     // Block size in bytes of the spare blocks in flash
-  EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *FtwWorkSpaceHeader;// Pointer to Working Space Header in memory buffer
-  EFI_FAULT_TOLERANT_WRITE_HEADER         *FtwLastWriteHeader;// Pointer to last record header in memory buffer
-  EFI_FAULT_TOLERANT_WRITE_RECORD         *FtwLastWriteRecord;// Pointer to last record in memory buffer
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL      *FtwFvBlock;        // FVB of working block
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL      *FtwBackupFvb;      // FVB of spare block
-  EFI_LBA                                 FtwSpareLba;        // Start LBA of spare block
-  EFI_LBA                                 FtwWorkBlockLba;    // Start LBA of working block that contains working space in its last block.
-  UINTN                                   NumberOfWorkBlock;  // Number of the blocks in work block.
-  EFI_LBA                                 FtwWorkSpaceLba;    // Start LBA of working space
-  UINTN                                   FtwWorkSpaceBase;   // Offset into the FtwWorkSpaceLba block.
-  UINTN                                   FtwWorkSpaceSize;   // Size of working space range that stores write record.
-  EFI_LBA                                 FtwWorkSpaceLbaInSpare; // Start LBA of working space in spare block.
-  UINTN                                   FtwWorkSpaceBaseInSpare;// Offset into the FtwWorkSpaceLbaInSpare block.
-  UINT8                                   *FtwWorkSpace;      // Point to Work Space in memory buffer
+  UINTN                                      Signature;
+  EFI_HANDLE                                 Handle;
+  EFI_FAULT_TOLERANT_WRITE_PROTOCOL          FtwInstance;
+  EFI_PHYSICAL_ADDRESS                       WorkSpaceAddress;        // Base address of working space range in flash.
+  EFI_PHYSICAL_ADDRESS                       SpareAreaAddress;        // Base address of spare range in flash.
+  UINTN                                      WorkSpaceLength;         // Size of working space range in flash.
+  UINTN                                      NumberOfWorkSpaceBlock;  // Number of the blocks in work block for work space.
+  UINTN                                      WorkBlockSize;           // Block size in bytes of the work blocks in flash
+  UINTN                                      SpareAreaLength;         // Size of spare range in flash.
+  UINTN                                      NumberOfSpareBlock;      // Number of the blocks in spare block.
+  UINTN                                      SpareBlockSize;          // Block size in bytes of the spare blocks in flash
+  EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER    *FtwWorkSpaceHeader;     // Pointer to Working Space Header in memory buffer
+  EFI_FAULT_TOLERANT_WRITE_HEADER            *FtwLastWriteHeader;     // Pointer to last record header in memory buffer
+  EFI_FAULT_TOLERANT_WRITE_RECORD            *FtwLastWriteRecord;     // Pointer to last record in memory buffer
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL         *FtwFvBlock;             // FVB of working block
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL         *FtwBackupFvb;           // FVB of spare block
+  EFI_LBA                                    FtwSpareLba;             // Start LBA of spare block
+  EFI_LBA                                    FtwWorkBlockLba;         // Start LBA of working block that contains working space in its last block.
+  UINTN                                      NumberOfWorkBlock;       // Number of the blocks in work block.
+  EFI_LBA                                    FtwWorkSpaceLba;         // Start LBA of working space
+  UINTN                                      FtwWorkSpaceBase;        // Offset into the FtwWorkSpaceLba block.
+  UINTN                                      FtwWorkSpaceSize;        // Size of working space range that stores write record.
+  EFI_LBA                                    FtwWorkSpaceLbaInSpare;  // Start LBA of working space in spare block.
+  UINTN                                      FtwWorkSpaceBaseInSpare; // Offset into the FtwWorkSpaceLbaInSpare block.
+  UINT8                                      *FtwWorkSpace;           // Point to Work Space in memory buffer
   //
   // Following a buffer of FtwWorkSpace[FTW_WORK_SPACE_SIZE],
   // Allocated with EFI_FTW_DEVICE.
@@ -87,6 +87,7 @@ typedef struct {
 //
 // Driver entry point
 //
+
 /**
   This function is the entry point of the Fault Tolerant Write driver.
 
@@ -558,6 +559,7 @@ IsErasedFlashBuffer (
   IN UINT8           *Buffer,
   IN UINTN           BufferSize
   );
+
 /**
   Initialize a work space when there is no work space.
 
@@ -571,6 +573,7 @@ EFI_STATUS
 InitWorkSpaceHeader (
   IN EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingHeader
   );
+
 /**
   Read from working block to refresh the work space in memory.
 
@@ -584,6 +587,7 @@ EFI_STATUS
 WorkSpaceRefresh (
   IN EFI_FTW_DEVICE  *FtwDevice
   );
+
 /**
   Check to see if it is a valid work space.
 
@@ -598,6 +602,7 @@ BOOLEAN
 IsValidWorkSpace (
   IN EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER *WorkingHeader
   );
+
 /**
   Reclaim the work space on the working block.
 
@@ -669,7 +674,6 @@ GetFvbCountAndBuffer (
   OUT EFI_HANDLE                          **Buffer
   );
 
-
 /**
   Allocate private data for FTW driver and initialize it.
 
@@ -684,7 +688,6 @@ EFI_STATUS
 InitFtwDevice (
   OUT EFI_FTW_DEVICE               **FtwData
   );
-
 
 /**
   Initialization for Fault Tolerant Write is done in this handler.

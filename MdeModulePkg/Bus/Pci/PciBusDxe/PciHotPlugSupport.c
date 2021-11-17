@@ -13,7 +13,6 @@ EFI_HPC_LOCATION                *gPciRootHpcPool = NULL;
 UINTN                           gPciRootHpcCount = 0;
 ROOT_HPC_DATA                   *gPciRootHpcData = NULL;
 
-
 /**
   Event notification function to set Hot Plug controller status.
 
@@ -28,10 +27,10 @@ PciHPCInitialized (
   IN VOID         *Context
   )
 {
-  ROOT_HPC_DATA   *HpcData;
+  ROOT_HPC_DATA  *HpcData;
 
-  HpcData               = (ROOT_HPC_DATA *) Context;
-  HpcData->Initialized  = TRUE;
+  HpcData = (ROOT_HPC_DATA *)Context;
+  HpcData->Initialized = TRUE;
 }
 
 /**
@@ -50,8 +49,8 @@ EfiCompareDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL *DevicePath2
   )
 {
-  UINTN Size1;
-  UINTN Size2;
+  UINTN  Size1;
+  UINTN  Size2;
 
   Size1 = GetDevicePathSize (DevicePath1);
   Size2 = GetDevicePathSize (DevicePath2);
@@ -100,7 +99,7 @@ InitializeHotPlugSupport (
   Status = gBS->LocateProtocol (
                   &gEfiPciHotPlugInitProtocolGuid,
                   NULL,
-                  (VOID **) &gPciHotPlugInit
+                  (VOID **)&gPciHotPlugInit
                   );
 
   if (EFI_ERROR (Status)) {
@@ -114,10 +113,9 @@ InitializeHotPlugSupport (
                               );
 
   if (!EFI_ERROR (Status)) {
-
-    gPciRootHpcPool   = HpcList;
-    gPciRootHpcCount  = HpcCount;
-    gPciRootHpcData   = AllocateZeroPool (sizeof (ROOT_HPC_DATA) * gPciRootHpcCount);
+    gPciRootHpcPool  = HpcList;
+    gPciRootHpcCount = HpcCount;
+    gPciRootHpcData  = AllocateZeroPool (sizeof (ROOT_HPC_DATA) * gPciRootHpcCount);
     if (gPciRootHpcData == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -143,12 +141,10 @@ IsRootPciHotPlugBus (
   OUT UINTN                           *HpIndex    OPTIONAL
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   for (Index = 0; Index < gPciRootHpcCount; Index++) {
-
     if (EfiCompareDevicePath (gPciRootHpcPool[Index].HpbDevicePath, HpbDevicePath)) {
-
       if (HpIndex != NULL) {
         *HpIndex = Index;
       }
@@ -177,12 +173,10 @@ IsRootPciHotPlugController (
   OUT UINTN                           *HpIndex
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   for (Index = 0; Index < gPciRootHpcCount; Index++) {
-
     if (EfiCompareDevicePath (gPciRootHpcPool[Index].HpcDevicePath, HpcDevicePath)) {
-
       if (HpIndex != NULL) {
         *HpIndex = Index;
       }
@@ -243,11 +237,10 @@ AllRootHPCInitialized (
   UINT32  Delay;
   UINTN   Index;
 
-  Delay = (UINT32) ((TimeoutInMicroSeconds / 30) + 1);
+  Delay = (UINT32)((TimeoutInMicroSeconds / 30) + 1);
 
   do {
     for (Index = 0; Index < gPciRootHpcCount; Index++) {
-
       if (gPciRootHpcData[Index].Found && !gPciRootHpcData[Index].Initialized) {
         break;
       }
@@ -263,7 +256,6 @@ AllRootHPCInitialized (
     gBS->Stall (30);
 
     Delay--;
-
   } while (Delay > 0);
 
   return EFI_TIMEOUT;
@@ -283,7 +275,6 @@ IsSHPC (
   IN PCI_IO_DEVICE                      *PciIoDevice
   )
 {
-
   EFI_STATUS  Status;
   UINT8       Offset;
 
@@ -293,11 +284,11 @@ IsSHPC (
 
   Offset = 0;
   Status = LocateCapabilityRegBlock (
-            PciIoDevice,
-            EFI_PCI_CAPABILITY_ID_SHPC,
-            &Offset,
-            NULL
-            );
+             PciIoDevice,
+             EFI_PCI_CAPABILITY_ID_SHPC,
+             &Offset,
+             NULL
+             );
 
   //
   // If the PCI-PCI bridge has the hot plug controller build-in,
@@ -331,10 +322,10 @@ SupportsPcieHotplug (
   IN PCI_IO_DEVICE                      *PciIoDevice
   )
 {
-  UINT32                       Offset;
-  EFI_STATUS                   Status;
-  PCI_REG_PCIE_CAPABILITY      Capability;
-  PCI_REG_PCIE_SLOT_CAPABILITY SlotCapability;
+  UINT32                        Offset;
+  EFI_STATUS                    Status;
+  PCI_REG_PCIE_CAPABILITY       Capability;
+  PCI_REG_PCIE_SLOT_CAPABILITY  SlotCapability;
 
   if (PciIoDevice == NULL) {
     return FALSE;
@@ -346,6 +337,7 @@ SupportsPcieHotplug (
   if (!PciIoDevice->IsPciExp) {
     return FALSE;
   }
+
   Offset = PciIoDevice->PciExpressCapabilityOffset +
            OFFSET_OF (PCI_CAPABILITY_PCIEXP, Capability);
   Status = PciIoDevice->PciIo.Pci.Read (
@@ -363,12 +355,13 @@ SupportsPcieHotplug (
   // Check the contents of the register
   //
   switch (Capability.Bits.DevicePortType) {
-  case PCIE_DEVICE_PORT_TYPE_ROOT_PORT:
-  case PCIE_DEVICE_PORT_TYPE_DOWNSTREAM_PORT:
-    break;
-  default:
-    return FALSE;
+    case PCIE_DEVICE_PORT_TYPE_ROOT_PORT:
+    case PCIE_DEVICE_PORT_TYPE_DOWNSTREAM_PORT:
+      break;
+    default:
+      return FALSE;
   }
+
   if (!Capability.Bits.SlotImplemented) {
     return FALSE;
   }
@@ -395,6 +388,7 @@ SupportsPcieHotplug (
   if (SlotCapability.Bits.HotPlugCapable) {
     return TRUE;
   }
+
   return FALSE;
 }
 
@@ -409,33 +403,33 @@ GetResourcePaddingForHpb (
   IN PCI_IO_DEVICE      *PciIoDevice
   )
 {
-  EFI_STATUS                        Status;
-  EFI_HPC_STATE                     State;
-  UINT64                            PciAddress;
-  EFI_HPC_PADDING_ATTRIBUTES        Attributes;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptors;
+  EFI_STATUS                         Status;
+  EFI_HPC_STATE                      State;
+  UINT64                             PciAddress;
+  EFI_HPC_PADDING_ATTRIBUTES         Attributes;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptors;
 
   if (IsPciHotPlugBus (PciIoDevice)) {
     //
     // If PCI-PCI bridge device is PCI Hot Plug bus.
     //
     PciAddress = EFI_PCI_ADDRESS (PciIoDevice->BusNumber, PciIoDevice->DeviceNumber, PciIoDevice->FunctionNumber, 0);
-    Status = gPciHotPlugInit->GetResourcePadding (
-                                gPciHotPlugInit,
-                                PciIoDevice->DevicePath,
-                                PciAddress,
-                                &State,
-                                (VOID **) &Descriptors,
-                                &Attributes
-                                );
+    Status     = gPciHotPlugInit->GetResourcePadding (
+                                    gPciHotPlugInit,
+                                    PciIoDevice->DevicePath,
+                                    PciAddress,
+                                    &State,
+                                    (VOID **)&Descriptors,
+                                    &Attributes
+                                    );
 
     if (EFI_ERROR (Status)) {
       return;
     }
 
-    if ((State & EFI_HPC_STATE_ENABLED) != 0 && (State & EFI_HPC_STATE_INITIALIZED) != 0) {
+    if (((State & EFI_HPC_STATE_ENABLED) != 0) && ((State & EFI_HPC_STATE_INITIALIZED) != 0)) {
       PciIoDevice->ResourcePaddingDescriptors = Descriptors;
-      PciIoDevice->PaddingAttributes          = Attributes;
+      PciIoDevice->PaddingAttributes = Attributes;
     }
 
     return;
@@ -475,10 +469,9 @@ IsPciHotPlugBus (
   //
   // Otherwise, see if it is a Root HPC
   //
-  if(IsRootPciHotPlugBus (PciIoDevice->DevicePath, NULL)) {
+  if (IsRootPciHotPlugBus (PciIoDevice->DevicePath, NULL)) {
     return TRUE;
   }
 
   return FALSE;
 }
-

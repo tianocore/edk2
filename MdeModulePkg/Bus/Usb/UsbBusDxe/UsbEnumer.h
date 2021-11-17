@@ -22,7 +22,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
             }                 \
           } while (0)
 
-
 //
 // Common interface used by usb bus enumeration process.
 // This interface is defined to mask the difference between
@@ -94,7 +93,7 @@ EFI_STATUS
   @return The endpoint descriptor or NULL.
 
 **/
-USB_ENDPOINT_DESC*
+USB_ENDPOINT_DESC *
 UsbGetEndpointDesc (
   IN USB_INTERFACE        *UsbIf,
   IN UINT8                EpAddr
@@ -194,4 +193,5 @@ UsbRootHubEnumeration (
   IN EFI_EVENT            Event,
   IN VOID                 *Context
   );
+
 #endif

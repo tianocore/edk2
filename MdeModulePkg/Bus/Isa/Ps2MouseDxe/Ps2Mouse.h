@@ -69,29 +69,29 @@ typedef enum {
 //
 // Driver Private Data
 //
-#define PS2_MOUSE_DEV_SIGNATURE SIGNATURE_32 ('p', 's', '2', 'm')
+#define PS2_MOUSE_DEV_SIGNATURE  SIGNATURE_32 ('p', 's', '2', 'm')
 
 typedef struct {
-  UINTN                               Signature;
+  UINTN                          Signature;
 
-  EFI_HANDLE                          Handle;
-  EFI_SIMPLE_POINTER_PROTOCOL         SimplePointerProtocol;
-  EFI_SIMPLE_POINTER_STATE            State;
-  EFI_SIMPLE_POINTER_MODE             Mode;
-  BOOLEAN                             StateChanged;
+  EFI_HANDLE                     Handle;
+  EFI_SIMPLE_POINTER_PROTOCOL    SimplePointerProtocol;
+  EFI_SIMPLE_POINTER_STATE       State;
+  EFI_SIMPLE_POINTER_MODE        Mode;
+  BOOLEAN                        StateChanged;
 
   //
   // PS2 Mouse device specific information
   //
-  MOUSE_SR                            SampleRate;
-  MOUSE_RE                            Resolution;
-  MOUSE_SF                            Scaling;
-  UINT8                               DataPackageSize;
+  MOUSE_SR                       SampleRate;
+  MOUSE_RE                       Resolution;
+  MOUSE_SF                       Scaling;
+  UINT8                          DataPackageSize;
 
-  EFI_EVENT                           TimerEvent;
+  EFI_EVENT                      TimerEvent;
 
-  EFI_UNICODE_STRING_TABLE            *ControllerNameTable;
-  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  EFI_UNICODE_STRING_TABLE       *ControllerNameTable;
+  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
 } PS2_MOUSE_DEV;
 
 #define PS2_MOUSE_DEV_FROM_THIS(a)  CR (a, PS2_MOUSE_DEV, SimplePointerProtocol, PS2_MOUSE_DEV_SIGNATURE)
@@ -99,6 +99,7 @@ typedef struct {
 //
 // Function prototypes
 //
+
 /**
   Test to see if this driver supports ControllerHandle. Any ControllerHandle
   than contains a IsaIo protocol can be supported.
@@ -170,6 +171,7 @@ PS2MouseDriverStop (
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -216,7 +218,6 @@ Ps2MouseComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller

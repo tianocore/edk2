@@ -5,6 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __SORT_LIB_H__
 #define __SORT_LIB_H__
 
@@ -51,7 +52,6 @@ PerformQuickSort (
   IN CONST UINTN                ElementSize,
   IN       SORT_COMPARE         CompareFunction
   );
-
 
 /**
   Function to compare 2 device paths for use as CompareFunction.

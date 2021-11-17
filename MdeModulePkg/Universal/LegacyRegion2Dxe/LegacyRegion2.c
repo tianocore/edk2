@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <LegacyRegion2.h>
 
-EFI_HANDLE   mLegacyRegion2Handle = NULL;
+EFI_HANDLE  mLegacyRegion2Handle = NULL;
 
 EFI_LEGACY_REGION2_PROTOCOL  mLegacyRegion2 = {
   LegacyRegion2Decode,
@@ -242,7 +242,8 @@ LegacyRegion2Install (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mLegacyRegion2Handle,
-                  &gEfiLegacyRegion2ProtocolGuid, &mLegacyRegion2,
+                  &gEfiLegacyRegion2ProtocolGuid,
+                  &mLegacyRegion2,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

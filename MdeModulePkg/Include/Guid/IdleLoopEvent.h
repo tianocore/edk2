@@ -13,6 +13,6 @@
 #define IDLE_LOOP_EVENT_GUID \
    { 0x3c8d294c, 0x5fc3, 0x4451, { 0xbb, 0x31, 0xc4, 0xc0, 0x32, 0x29, 0x5e, 0x6c } }
 
-extern EFI_GUID gIdleLoopEventGuid;
+extern EFI_GUID  gIdleLoopEventGuid;
 
 #endif

@@ -54,22 +54,22 @@ TrustTransferNvmeDevice (
   IN     UINTN                               TransferLength,
   IN     BOOLEAN                             IsTrustSend,
   IN     UINT64                              Timeout,
-     OUT UINTN                               *TransferLengthOut
+  OUT UINTN                               *TransferLengthOut
   )
 {
-  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET          CommandPacket;
-  EFI_NVM_EXPRESS_COMMAND                           Command;
-  EFI_NVM_EXPRESS_COMPLETION                        Completion;
-  EFI_STATUS                                        Status;
-  UINT16                                            SpecificData;
-  EDKII_PEI_NVM_EXPRESS_PASS_THRU_PPI               *NvmePassThru;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET  CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                   Command;
+  EFI_NVM_EXPRESS_COMPLETION                Completion;
+  EFI_STATUS                                Status;
+  UINT16                                    SpecificData;
+  EDKII_PEI_NVM_EXPRESS_PASS_THRU_PPI       *NvmePassThru;
 
   NvmePassThru = &Private->NvmePassThruPpi;
-  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
+  ZeroMem (&CommandPacket, sizeof (EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof (EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof (EFI_NVM_EXPRESS_COMPLETION));
 
-  CommandPacket.NvmeCmd        = &Command;
+  CommandPacket.NvmeCmd = &Command;
   CommandPacket.NvmeCompletion = &Completion;
 
   //
@@ -78,13 +78,13 @@ TrustTransferNvmeDevice (
   SpecificData = (((SecurityProtocolSpecificData << 8) & 0xFF00) | (SecurityProtocolSpecificData >> 8));
 
   if (IsTrustSend) {
-    Command.Cdw0.Opcode          = NVME_ADMIN_SECURITY_SEND_CMD;
+    Command.Cdw0.Opcode = NVME_ADMIN_SECURITY_SEND_CMD;
     CommandPacket.TransferBuffer = Buffer;
     CommandPacket.TransferLength = (UINT32)TransferLength;
     CommandPacket.NvmeCmd->Cdw10 = (UINT32)((SecurityProtocolId << 24) | (SpecificData << 8));
     CommandPacket.NvmeCmd->Cdw11 = (UINT32)TransferLength;
   } else {
-    Command.Cdw0.Opcode          = NVME_ADMIN_SECURITY_RECEIVE_CMD;
+    Command.Cdw0.Opcode = NVME_ADMIN_SECURITY_RECEIVE_CMD;
     CommandPacket.TransferBuffer = Buffer;
     CommandPacket.TransferLength = (UINT32)TransferLength;
     CommandPacket.NvmeCmd->Cdw10 = (UINT32)((SecurityProtocolId << 24) | (SpecificData << 8));
@@ -94,7 +94,7 @@ TrustTransferNvmeDevice (
   CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID;
   CommandPacket.NvmeCmd->Nsid  = NVME_CONTROLLER_NSID;
   CommandPacket.CommandTimeout = Timeout;
-  CommandPacket.QueueType      = NVME_ADMIN_QUEUE;
+  CommandPacket.QueueType = NVME_ADMIN_QUEUE;
 
   Status = NvmePassThru->PassThru (
                            NvmePassThru,
@@ -103,10 +103,10 @@ TrustTransferNvmeDevice (
                            );
 
   if (!IsTrustSend) {
-    if (EFI_ERROR (Status))  {
+    if (EFI_ERROR (Status)) {
       *TransferLengthOut = 0;
     } else {
-      *TransferLengthOut = (UINTN) TransferLength;
+      *TransferLengthOut = (UINTN)TransferLength;
     }
   }
 
@@ -130,9 +130,9 @@ NvmeStorageSecurityGetDeviceNo (
   OUT UINTN                                 *NumberofDevices
   )
 {
-  PEI_NVME_CONTROLLER_PRIVATE_DATA    *Private;
+  PEI_NVME_CONTROLLER_PRIVATE_DATA  *Private;
 
-  if (This == NULL || NumberofDevices == NULL) {
+  if ((This == NULL) || (NumberofDevices == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -176,9 +176,9 @@ NvmeStorageSecurityGetDevicePath (
   OUT EFI_DEVICE_PATH_PROTOCOL            **DevicePath
   )
 {
-  PEI_NVME_CONTROLLER_PRIVATE_DATA         *Private;
+  PEI_NVME_CONTROLLER_PRIVATE_DATA  *Private;
 
-  if (This == NULL || DevicePathLength == NULL || DevicePath == NULL) {
+  if ((This == NULL) || (DevicePathLength == NULL) || (DevicePath == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -295,8 +295,8 @@ NvmeStorageSecurityReceiveData (
   OUT UINTN                               *PayloadTransferSize
   )
 {
-  PEI_NVME_CONTROLLER_PRIVATE_DATA    *Private;
-  EFI_STATUS                          Status;
+  PEI_NVME_CONTROLLER_PRIVATE_DATA  *Private;
+  EFI_STATUS                        Status;
 
   if ((PayloadBuffer == NULL) || (PayloadTransferSize == NULL) || (PayloadBufferSize == 0)) {
     return EFI_INVALID_PARAMETER;
@@ -394,8 +394,8 @@ NvmeStorageSecuritySendData (
   IN VOID                                *PayloadBuffer
   )
 {
-  PEI_NVME_CONTROLLER_PRIVATE_DATA    *Private;
-  EFI_STATUS                          Status;
+  PEI_NVME_CONTROLLER_PRIVATE_DATA  *Private;
+  EFI_STATUS                        Status;
 
   if ((PayloadBuffer == NULL) && (PayloadBufferSize != 0)) {
     return EFI_INVALID_PARAMETER;

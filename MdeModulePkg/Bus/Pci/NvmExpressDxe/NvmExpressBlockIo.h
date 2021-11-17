@@ -167,7 +167,7 @@ NvmeBlockIoReadBlocksEx (
   IN     EFI_LBA                Lba,
   IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
   IN     UINTN                  BufferSize,
-     OUT VOID                  *Buffer
+  OUT VOID                  *Buffer
   );
 
 /**

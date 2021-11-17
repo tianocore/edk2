@@ -24,7 +24,7 @@ BrDummyMalloc (
 **/
 VOID
 BrDummyFree (
-  IN VOID *    Ptr
+  IN VOID *Ptr
   )
 {
   ASSERT (FALSE);
