@@ -29,55 +29,55 @@
 // 0xEC000-0xEFFFF  0x5f  0x96  5:4   00 = DRAM Disabled, 01= Read Only, 10 = Write Only, 11 = Normal
 // 0xF0000-0xFFFFF  0x59  0x90  5:4   00 = DRAM Disabled, 01= Read Only, 10 = Write Only, 11 = Normal
 //
-STATIC LEGACY_MEMORY_SECTION_INFO   mSectionArray[] = {
-  {0xC0000, SIZE_16KB, FALSE, FALSE},
-  {0xC4000, SIZE_16KB, FALSE, FALSE},
-  {0xC8000, SIZE_16KB, FALSE, FALSE},
-  {0xCC000, SIZE_16KB, FALSE, FALSE},
-  {0xD0000, SIZE_16KB, FALSE, FALSE},
-  {0xD4000, SIZE_16KB, FALSE, FALSE},
-  {0xD8000, SIZE_16KB, FALSE, FALSE},
-  {0xDC000, SIZE_16KB, FALSE, FALSE},
-  {0xE0000, SIZE_16KB, FALSE, FALSE},
-  {0xE4000, SIZE_16KB, FALSE, FALSE},
-  {0xE8000, SIZE_16KB, FALSE, FALSE},
-  {0xEC000, SIZE_16KB, FALSE, FALSE},
-  {0xF0000, SIZE_64KB, FALSE, FALSE}
+STATIC LEGACY_MEMORY_SECTION_INFO  mSectionArray[] = {
+  { 0xC0000, SIZE_16KB, FALSE, FALSE },
+  { 0xC4000, SIZE_16KB, FALSE, FALSE },
+  { 0xC8000, SIZE_16KB, FALSE, FALSE },
+  { 0xCC000, SIZE_16KB, FALSE, FALSE },
+  { 0xD0000, SIZE_16KB, FALSE, FALSE },
+  { 0xD4000, SIZE_16KB, FALSE, FALSE },
+  { 0xD8000, SIZE_16KB, FALSE, FALSE },
+  { 0xDC000, SIZE_16KB, FALSE, FALSE },
+  { 0xE0000, SIZE_16KB, FALSE, FALSE },
+  { 0xE4000, SIZE_16KB, FALSE, FALSE },
+  { 0xE8000, SIZE_16KB, FALSE, FALSE },
+  { 0xEC000, SIZE_16KB, FALSE, FALSE },
+  { 0xF0000, SIZE_64KB, FALSE, FALSE }
 };
 
 STATIC PAM_REGISTER_VALUE  mRegisterValues440[] = {
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM1), 0x01, 0x02},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM1), 0x10, 0x20},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM2), 0x01, 0x02},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM2), 0x10, 0x20},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM3), 0x01, 0x02},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM3), 0x10, 0x20},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM4), 0x01, 0x02},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM4), 0x10, 0x20},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM5), 0x01, 0x02},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM5), 0x10, 0x20},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM6), 0x01, 0x02},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM6), 0x10, 0x20},
-  {PMC_REGISTER_PIIX4 (PIIX4_PAM0), 0x10, 0x20}
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM1), 0x01, 0x02 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM1), 0x10, 0x20 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM2), 0x01, 0x02 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM2), 0x10, 0x20 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM3), 0x01, 0x02 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM3), 0x10, 0x20 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM4), 0x01, 0x02 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM4), 0x10, 0x20 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM5), 0x01, 0x02 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM5), 0x10, 0x20 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM6), 0x01, 0x02 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM6), 0x10, 0x20 },
+  { PMC_REGISTER_PIIX4 (PIIX4_PAM0), 0x10, 0x20 }
 };
 
 STATIC PAM_REGISTER_VALUE  mRegisterValuesQ35[] = {
-  {DRAMC_REGISTER_Q35 (MCH_PAM1), 0x01, 0x02},
-  {DRAMC_REGISTER_Q35 (MCH_PAM1), 0x10, 0x20},
-  {DRAMC_REGISTER_Q35 (MCH_PAM2), 0x01, 0x02},
-  {DRAMC_REGISTER_Q35 (MCH_PAM2), 0x10, 0x20},
-  {DRAMC_REGISTER_Q35 (MCH_PAM3), 0x01, 0x02},
-  {DRAMC_REGISTER_Q35 (MCH_PAM3), 0x10, 0x20},
-  {DRAMC_REGISTER_Q35 (MCH_PAM4), 0x01, 0x02},
-  {DRAMC_REGISTER_Q35 (MCH_PAM4), 0x10, 0x20},
-  {DRAMC_REGISTER_Q35 (MCH_PAM5), 0x01, 0x02},
-  {DRAMC_REGISTER_Q35 (MCH_PAM5), 0x10, 0x20},
-  {DRAMC_REGISTER_Q35 (MCH_PAM6), 0x01, 0x02},
-  {DRAMC_REGISTER_Q35 (MCH_PAM6), 0x10, 0x20},
-  {DRAMC_REGISTER_Q35 (MCH_PAM0), 0x10, 0x20}
+  { DRAMC_REGISTER_Q35 (MCH_PAM1), 0x01, 0x02 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM1), 0x10, 0x20 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM2), 0x01, 0x02 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM2), 0x10, 0x20 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM3), 0x01, 0x02 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM3), 0x10, 0x20 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM4), 0x01, 0x02 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM4), 0x10, 0x20 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM5), 0x01, 0x02 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM5), 0x10, 0x20 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM6), 0x01, 0x02 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM6), 0x10, 0x20 },
+  { DRAMC_REGISTER_Q35 (MCH_PAM0), 0x10, 0x20 }
 };
 
-STATIC PAM_REGISTER_VALUE *mRegisterValues;
+STATIC PAM_REGISTER_VALUE  *mRegisterValues;
 
 //
 // Handle used to install the Legacy Region Protocol
@@ -105,18 +105,19 @@ LegacyRegionManipulationInternal (
   OUT UINT32                  *Granularity
   )
 {
-  UINT32                        EndAddress;
-  UINTN                         Index;
-  UINTN                         StartIndex;
+  UINT32  EndAddress;
+  UINTN   Index;
+  UINTN   StartIndex;
 
   //
   // Validate input parameters.
   //
-  if (Length == 0 || Granularity == NULL) {
+  if ((Length == 0) || (Granularity == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   EndAddress = Start + Length - 1;
-  if ((Start < PAM_BASE_ADDRESS) || EndAddress > PAM_LIMIT_ADDRESS) {
+  if ((Start < PAM_BASE_ADDRESS) || (EndAddress > PAM_LIMIT_ADDRESS)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -130,6 +131,7 @@ LegacyRegionManipulationInternal (
       break;
     }
   }
+
   ASSERT (Index < ARRAY_SIZE (mSectionArray));
 
   //
@@ -145,10 +147,11 @@ LegacyRegionManipulationInternal (
       } else {
         PciAnd8 (
           mRegisterValues[Index].PAMRegPciLibAddress,
-          (UINT8) (~mRegisterValues[Index].ReadEnableData)
+          (UINT8)(~mRegisterValues[Index].ReadEnableData)
           );
       }
     }
+
     if (WriteEnable != NULL) {
       if (*WriteEnable) {
         PciOr8 (
@@ -158,7 +161,7 @@ LegacyRegionManipulationInternal (
       } else {
         PciAnd8 (
           mRegisterValues[Index].PAMRegPciLibAddress,
-          (UINT8) (~mRegisterValues[Index].WriteEnableData)
+          (UINT8)(~mRegisterValues[Index].WriteEnableData)
           );
       }
     }
@@ -171,6 +174,7 @@ LegacyRegionManipulationInternal (
       break;
     }
   }
+
   ASSERT (Index < ARRAY_SIZE (mSectionArray));
 
   return EFI_SUCCESS;
@@ -183,26 +187,27 @@ LegacyRegionGetInfoInternal (
   OUT LEGACY_MEMORY_SECTION_INFO    **Descriptor
   )
 {
-  UINTN    Index;
-  UINT8    PamValue;
+  UINTN  Index;
+  UINT8  PamValue;
 
   //
   // Check input parameters
   //
-  if (DescriptorCount == NULL || Descriptor == NULL) {
+  if ((DescriptorCount == NULL) || (Descriptor == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // Fill in current status of legacy region.
   //
-  *DescriptorCount = sizeof(mSectionArray) / sizeof (mSectionArray[0]);
+  *DescriptorCount = sizeof (mSectionArray) / sizeof (mSectionArray[0]);
   for (Index = 0; Index < *DescriptorCount; Index++) {
     PamValue = PciRead8 (mRegisterValues[Index].PAMRegPciLibAddress);
     mSectionArray[Index].ReadEnabled = FALSE;
     if ((PamValue & mRegisterValues[Index].ReadEnableData) != 0) {
       mSectionArray[Index].ReadEnabled = TRUE;
     }
+
     mSectionArray[Index].WriteEnabled = FALSE;
     if ((PamValue & mRegisterValues[Index].WriteEnableData) != 0) {
       mSectionArray[Index].WriteEnabled = TRUE;
@@ -250,7 +255,6 @@ LegacyRegion2Decode (
   return LegacyRegionManipulationInternal (Start, Length, On, NULL, Granularity);
 }
 
-
 /**
   Modify the hardware to disallow memory attribute changes in a region.
 
@@ -292,7 +296,6 @@ LegacyRegion2BootLock (
   return EFI_UNSUPPORTED;
 }
 
-
 /**
   Modify the hardware to disallow memory writes in a region.
 
@@ -327,7 +330,6 @@ LegacyRegion2Lock (
   WriteEnable = FALSE;
   return LegacyRegionManipulationInternal (Start, Length, NULL, &WriteEnable, Granularity);
 }
-
 
 /**
   Modify the hardware to allow memory writes in a region.
@@ -391,11 +393,11 @@ LegacyRegionGetInfo (
   OUT EFI_LEGACY_REGION_DESCRIPTOR  **Descriptor
   )
 {
-  LEGACY_MEMORY_SECTION_INFO   *SectionInfo;
-  UINT32                       SectionCount;
-  EFI_LEGACY_REGION_DESCRIPTOR *DescriptorArray;
-  UINTN                        Index;
-  UINTN                        DescriptorIndex;
+  LEGACY_MEMORY_SECTION_INFO    *SectionInfo;
+  UINT32                        SectionCount;
+  EFI_LEGACY_REGION_DESCRIPTOR  *DescriptorArray;
+  UINTN                         Index;
+  UINTN                         DescriptorIndex;
 
   //
   // Get section numbers and information
@@ -412,41 +414,43 @@ LegacyRegionGetInfo (
 
   DescriptorIndex = 0;
   for (Index = 0; Index < SectionCount; Index++) {
-    DescriptorArray[DescriptorIndex].Start       = SectionInfo[Index].Start;
-    DescriptorArray[DescriptorIndex].Length      = SectionInfo[Index].Length;
+    DescriptorArray[DescriptorIndex].Start  = SectionInfo[Index].Start;
+    DescriptorArray[DescriptorIndex].Length = SectionInfo[Index].Length;
     DescriptorArray[DescriptorIndex].Granularity = SectionInfo[Index].Length;
     if (SectionInfo[Index].ReadEnabled) {
-      DescriptorArray[DescriptorIndex].Attribute   = LegacyRegionDecoded;
+      DescriptorArray[DescriptorIndex].Attribute = LegacyRegionDecoded;
     } else {
-      DescriptorArray[DescriptorIndex].Attribute   = LegacyRegionNotDecoded;
+      DescriptorArray[DescriptorIndex].Attribute = LegacyRegionNotDecoded;
     }
+
     DescriptorIndex++;
 
     //
     // Create descriptor for writeability, according to lock status
     //
-    DescriptorArray[DescriptorIndex].Start       = SectionInfo[Index].Start;
-    DescriptorArray[DescriptorIndex].Length      = SectionInfo[Index].Length;
+    DescriptorArray[DescriptorIndex].Start  = SectionInfo[Index].Start;
+    DescriptorArray[DescriptorIndex].Length = SectionInfo[Index].Length;
     DescriptorArray[DescriptorIndex].Granularity = SectionInfo[Index].Length;
     if (SectionInfo[Index].WriteEnabled) {
       DescriptorArray[DescriptorIndex].Attribute = LegacyRegionWriteEnabled;
     } else {
       DescriptorArray[DescriptorIndex].Attribute = LegacyRegionWriteDisabled;
     }
+
     DescriptorIndex++;
 
     //
     // Chipset does not support bootlock.
     //
-    DescriptorArray[DescriptorIndex].Start       = SectionInfo[Index].Start;
-    DescriptorArray[DescriptorIndex].Length      = SectionInfo[Index].Length;
+    DescriptorArray[DescriptorIndex].Start  = SectionInfo[Index].Start;
+    DescriptorArray[DescriptorIndex].Length = SectionInfo[Index].Length;
     DescriptorArray[DescriptorIndex].Granularity = SectionInfo[Index].Length;
     DescriptorArray[DescriptorIndex].Attribute   = LegacyRegionNotLocked;
     DescriptorIndex++;
   }
 
-  *DescriptorCount = (UINT32) DescriptorIndex;
-  *Descriptor      = DescriptorArray;
+  *DescriptorCount = (UINT32)DescriptorIndex;
+  *Descriptor = DescriptorArray;
 
   return EFI_SUCCESS;
 }
@@ -470,17 +474,21 @@ LegacyRegionInit (
   //
   HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
   switch (HostBridgeDevId) {
-  case INTEL_82441_DEVICE_ID:
-    mRegisterValues = mRegisterValues440;
-    break;
-  case INTEL_Q35_MCH_DEVICE_ID:
-    mRegisterValues = mRegisterValuesQ35;
-    break;
-  default:
-    DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-            __FUNCTION__, HostBridgeDevId));
-    ASSERT (FALSE);
-    return RETURN_UNSUPPORTED;
+    case INTEL_82441_DEVICE_ID:
+      mRegisterValues = mRegisterValues440;
+      break;
+    case INTEL_Q35_MCH_DEVICE_ID:
+      mRegisterValues = mRegisterValuesQ35;
+      break;
+    default:
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+        __FUNCTION__,
+        HostBridgeDevId
+        ));
+      ASSERT (FALSE);
+      return RETURN_UNSUPPORTED;
   }
 
   //
@@ -488,11 +496,11 @@ LegacyRegionInit (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mHandle,
-                  &gEfiLegacyRegion2ProtocolGuid, &mLegacyRegion2,
+                  &gEfiLegacyRegion2ProtocolGuid,
+                  &mLegacyRegion2,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
-

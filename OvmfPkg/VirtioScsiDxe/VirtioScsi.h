@@ -18,7 +18,6 @@
 
 #include <IndustryStandard/Virtio.h>
 
-
 //
 // This driver supports 2-byte target identifiers and 4-byte LUN identifiers.
 //
@@ -30,11 +29,10 @@
 // AdapterId and our target identifiers.
 //
 #if TARGET_MAX_BYTES < 4
-#  error "virtio-scsi requires TARGET_MAX_BYTES >= 4"
+  #error "virtio-scsi requires TARGET_MAX_BYTES >= 4"
 #endif
 
-
-#define VSCSI_SIG SIGNATURE_32 ('V', 'S', 'C', 'S')
+#define VSCSI_SIG  SIGNATURE_32 ('V', 'S', 'C', 'S')
 
 typedef struct {
   //
@@ -44,22 +42,21 @@ typedef struct {
   //
   //                              field              init function       init depth
   //                              ----------------   ------------------  ----------
-  UINT32                          Signature;      // DriverBindingStart  0
-  VIRTIO_DEVICE_PROTOCOL          *VirtIo;        // DriverBindingStart  0
-  EFI_EVENT                       ExitBoot;       // DriverBindingStart  0
-  BOOLEAN                         InOutSupported; // VirtioScsiInit      1
-  UINT16                          MaxTarget;      // VirtioScsiInit      1
-  UINT32                          MaxLun;         // VirtioScsiInit      1
-  UINT32                          MaxSectors;     // VirtioScsiInit      1
-  VRING                           Ring;           // VirtioRingInit      2
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;       // VirtioScsiInit      1
-  EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;   // VirtioScsiInit      1
-  VOID                            *RingMap;       // VirtioRingMap       2
+  UINT32                             Signature;      // DriverBindingStart  0
+  VIRTIO_DEVICE_PROTOCOL             *VirtIo;        // DriverBindingStart  0
+  EFI_EVENT                          ExitBoot;       // DriverBindingStart  0
+  BOOLEAN                            InOutSupported; // VirtioScsiInit      1
+  UINT16                             MaxTarget;      // VirtioScsiInit      1
+  UINT32                             MaxLun;         // VirtioScsiInit      1
+  UINT32                             MaxSectors;     // VirtioScsiInit      1
+  VRING                              Ring;           // VirtioRingInit      2
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL    PassThru;       // VirtioScsiInit      1
+  EFI_EXT_SCSI_PASS_THRU_MODE        PassThruMode;   // VirtioScsiInit      1
+  VOID                               *RingMap;       // VirtioRingMap       2
 } VSCSI_DEV;
 
 #define VIRTIO_SCSI_FROM_PASS_THRU(PassThruPointer) \
         CR (PassThruPointer, VSCSI_DEV, PassThru, VSCSI_SIG)
-
 
 //
 // Probe, start and stop functions of this driver, called by the DXE core for
@@ -78,7 +75,6 @@ VirtioScsiDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
   );
 
-
 EFI_STATUS
 EFIAPI
 VirtioScsiDriverBindingStart (
@@ -86,7 +82,6 @@ VirtioScsiDriverBindingStart (
   IN EFI_HANDLE                  DeviceHandle,
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
   );
-
 
 EFI_STATUS
 EFIAPI
@@ -96,7 +91,6 @@ VirtioScsiDriverBindingStop (
   IN UINTN                       NumberOfChildren,
   IN EFI_HANDLE                  *ChildHandleBuffer
   );
-
 
 //
 // The next seven functions implement EFI_EXT_SCSI_PASS_THRU_PROTOCOL
@@ -115,7 +109,6 @@ VirtioScsiPassThru (
   IN     EFI_EVENT                                  Event   OPTIONAL
   );
 
-
 EFI_STATUS
 EFIAPI
 VirtioScsiGetNextTargetLun (
@@ -123,7 +116,6 @@ VirtioScsiGetNextTargetLun (
   IN OUT UINT8                           **Target,
   IN OUT UINT64                          *Lun
   );
-
 
 EFI_STATUS
 EFIAPI
@@ -134,7 +126,6 @@ VirtioScsiBuildDevicePath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL        **DevicePath
   );
 
-
 EFI_STATUS
 EFIAPI
 VirtioScsiGetTargetLun (
@@ -144,13 +135,11 @@ VirtioScsiGetTargetLun (
   OUT UINT64                          *Lun
   );
 
-
 EFI_STATUS
 EFIAPI
 VirtioScsiResetChannel (
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This
   );
-
 
 EFI_STATUS
 EFIAPI
@@ -160,14 +149,12 @@ VirtioScsiResetTargetLun (
   IN UINT64                          Lun
   );
 
-
 EFI_STATUS
 EFIAPI
 VirtioScsiGetNextTarget (
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
   IN OUT UINT8                       **Target
   );
-
 
 //
 // The purpose of the following scaffolding (EFI_COMPONENT_NAME_PROTOCOL and
@@ -188,7 +175,6 @@ VirtioScsiGetDriverName (
   IN  CHAR8                       *Language,
   OUT CHAR16                      **DriverName
   );
-
 
 EFI_STATUS
 EFIAPI

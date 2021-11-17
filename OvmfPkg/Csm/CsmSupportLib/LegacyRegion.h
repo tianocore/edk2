@@ -31,19 +31,19 @@
 // Describes Legacy Region blocks and status.
 //
 typedef struct {
-  UINT32  Start;
-  UINT32  Length;
-  BOOLEAN ReadEnabled;
-  BOOLEAN WriteEnabled;
+  UINT32     Start;
+  UINT32     Length;
+  BOOLEAN    ReadEnabled;
+  BOOLEAN    WriteEnabled;
 } LEGACY_MEMORY_SECTION_INFO;
 
 //
 // Provides a map of the PAM registers and bits used to set Read/Write access.
 //
 typedef struct {
-  UINTN   PAMRegPciLibAddress;
-  UINT8   ReadEnableData;
-  UINT8   WriteEnableData;
+  UINTN    PAMRegPciLibAddress;
+  UINT8    ReadEnableData;
+  UINT8    WriteEnableData;
 } PAM_REGISTER_VALUE;
 
 /**
@@ -200,4 +200,3 @@ LegacyRegionGetInfo (
   );
 
 #endif
-

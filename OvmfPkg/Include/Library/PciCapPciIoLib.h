@@ -14,7 +14,6 @@
 
 #include <Library/PciCapLib.h>
 
-
 /**
   Create a PCI_CAP_DEV object from an EFI_PCI_IO_PROTOCOL instance. The config
   space accessors are based upon EFI_PCI_IO_PROTOCOL.Pci.Read() and
@@ -35,7 +34,6 @@ PciCapPciIoDeviceInit (
   IN  EFI_PCI_IO_PROTOCOL *PciIo,
   OUT PCI_CAP_DEV         **PciDevice
   );
-
 
 /**
   Free the resources used by PciDevice.

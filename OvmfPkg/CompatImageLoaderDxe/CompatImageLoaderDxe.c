@@ -19,10 +19,10 @@
 
 #pragma pack (1)
 typedef struct {
-  UINT8   Type;
-  UINT8   Size;
-  UINT16  MachineType;
-  UINT32  EntryPoint;
+  UINT8     Type;
+  UINT8     Size;
+  UINT16    MachineType;
+  UINT32    EntryPoint;
 } PE_COMPAT_TYPE1;
 #pragma pack ()
 
@@ -45,13 +45,13 @@ GetCompatEntryPoint (
   IN  EFI_PHYSICAL_ADDRESS              ImageBase
   )
 {
-  EFI_IMAGE_DOS_HEADER                  *DosHdr;
-  UINTN                                 PeCoffHeaderOffset;
-  EFI_IMAGE_NT_HEADERS32                *Pe32;
-  EFI_IMAGE_SECTION_HEADER              *Section;
-  UINTN                                 NumberOfSections;
-  PE_COMPAT_TYPE1                       *PeCompat;
-  UINTN                                 PeCompatEnd;
+  EFI_IMAGE_DOS_HEADER      *DosHdr;
+  UINTN                     PeCoffHeaderOffset;
+  EFI_IMAGE_NT_HEADERS32    *Pe32;
+  EFI_IMAGE_SECTION_HEADER  *Section;
+  UINTN                     NumberOfSections;
+  PE_COMPAT_TYPE1           *PeCompat;
+  UINTN                     PeCompatEnd;
 
   DosHdr = (EFI_IMAGE_DOS_HEADER *)(UINTN)ImageBase;
   if (DosHdr->e_magic != EFI_IMAGE_DOS_SIGNATURE) {
@@ -70,22 +70,25 @@ GetCompatEntryPoint (
       //
       // Dereference the section contents to find the mixed mode entry point
       //
-      PeCompat = (PE_COMPAT_TYPE1 *)((UINTN)ImageBase + Section->VirtualAddress);
+      PeCompat    = (PE_COMPAT_TYPE1 *)((UINTN)ImageBase + Section->VirtualAddress);
       PeCompatEnd = (UINTN)(VOID *)PeCompat + Section->Misc.VirtualSize;
 
       while (PeCompat->Type != 0 && (UINTN)(VOID *)PeCompat < PeCompatEnd) {
-        if (PeCompat->Type == 1 &&
-            PeCompat->Size >= sizeof (PE_COMPAT_TYPE1) &&
-            EFI_IMAGE_MACHINE_TYPE_SUPPORTED (PeCompat->MachineType)) {
-
+        if ((PeCompat->Type == 1) &&
+            (PeCompat->Size >= sizeof (PE_COMPAT_TYPE1)) &&
+            EFI_IMAGE_MACHINE_TYPE_SUPPORTED (PeCompat->MachineType))
+        {
           return (EFI_IMAGE_ENTRY_POINT)((UINTN)ImageBase + PeCompat->EntryPoint);
         }
+
         PeCompat = (PE_COMPAT_TYPE1 *)((UINTN)PeCompat + PeCompat->Size);
         ASSERT ((UINTN)(VOID *)PeCompat < PeCompatEnd);
       }
     }
+
     Section++;
   }
+
   return NULL;
 }
 
@@ -99,7 +102,7 @@ RegisterImage (
   IN  OUT EFI_IMAGE_ENTRY_POINT                   *EntryPoint
   )
 {
-  EFI_IMAGE_ENTRY_POINT                           CompatEntryPoint;
+  EFI_IMAGE_ENTRY_POINT  CompatEntryPoint;
 
   CompatEntryPoint = GetCompatEntryPoint (ImageBase);
   if (CompatEntryPoint == NULL) {
@@ -121,7 +124,7 @@ UnregisterImage (
   return EFI_SUCCESS;
 }
 
-STATIC EDKII_PECOFF_IMAGE_EMULATOR_PROTOCOL mCompatLoaderPeCoffEmuProtocol = {
+STATIC EDKII_PECOFF_IMAGE_EMULATOR_PROTOCOL  mCompatLoaderPeCoffEmuProtocol = {
   IsImageSupported,
   RegisterImage,
   UnregisterImage,
@@ -136,8 +139,10 @@ CompatImageLoaderDxeEntryPoint (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  return gBS->InstallProtocolInterface (&ImageHandle,
+  return gBS->InstallProtocolInterface (
+                &ImageHandle,
                 &gEdkiiPeCoffImageEmulatorProtocolGuid,
                 EFI_NATIVE_INTERFACE,
-                &mCompatLoaderPeCoffEmuProtocol);
+                &mCompatLoaderPeCoffEmuProtocol
+                );
 }

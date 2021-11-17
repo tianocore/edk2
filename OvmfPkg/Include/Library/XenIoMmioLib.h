@@ -36,7 +36,6 @@ XenIoMmioInstall (
   IN       EFI_PHYSICAL_ADDRESS    GrantTableAddress
   );
 
-
 /**
 
   Uninstall the XENBUS_ROOT_DEVICE_PATH and XENIO_PROTOCOL protocols

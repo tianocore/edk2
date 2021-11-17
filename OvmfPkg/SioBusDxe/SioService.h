@@ -14,8 +14,8 @@
 #pragma pack(1)
 
 typedef struct {
-  EFI_ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR  Io;
-  EFI_ACPI_END_TAG_DESCRIPTOR                 End;
+  EFI_ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR    Io;
+  EFI_ACPI_END_TAG_DESCRIPTOR                   End;
 } SIO_RESOURCES_IO;
 
 #pragma pack()
@@ -38,9 +38,8 @@ typedef struct {
   EFI_SIO_PROTOCOL            Sio;
   UINT32                      DeviceIndex;
 } SIO_DEV;
-#define SIO_DEV_SIGNATURE      SIGNATURE_32 ('S', 'I', 'O', 'D')
-#define SIO_DEV_FROM_SIO(a)    CR (a, SIO_DEV, Sio, SIO_DEV_SIGNATURE)
-
+#define SIO_DEV_SIGNATURE  SIGNATURE_32 ('S', 'I', 'O', 'D')
+#define SIO_DEV_FROM_SIO(a)  CR (a, SIO_DEV, Sio, SIO_DEV_SIGNATURE)
 
 //
 // Super I/O Protocol interfaces
@@ -211,4 +210,4 @@ SioCreateAllChildDevices (
   IN EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath
   );
 
-#endif  // __SIO_SERVICE_H__
+#endif // __SIO_SERVICE_H__

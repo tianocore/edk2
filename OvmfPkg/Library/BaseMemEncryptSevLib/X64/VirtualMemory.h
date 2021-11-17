@@ -22,19 +22,19 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Uefi.h>
 
-#define SYS_CODE64_SEL 0x38
+#define SYS_CODE64_SEL  0x38
 
-#define PAGE_TABLE_POOL_ALIGNMENT   BASE_2MB
-#define PAGE_TABLE_POOL_UNIT_SIZE   SIZE_2MB
+#define PAGE_TABLE_POOL_ALIGNMENT  BASE_2MB
+#define PAGE_TABLE_POOL_UNIT_SIZE  SIZE_2MB
 #define PAGE_TABLE_POOL_UNIT_PAGES  \
   EFI_SIZE_TO_PAGES (PAGE_TABLE_POOL_UNIT_SIZE)
 #define PAGE_TABLE_POOL_ALIGN_MASK  \
   (~(EFI_PHYSICAL_ADDRESS)(PAGE_TABLE_POOL_ALIGNMENT - 1))
 
 typedef struct {
-  VOID            *NextPool;
-  UINTN           Offset;
-  UINTN           FreePages;
+  VOID     *NextPool;
+  UINTN    Offset;
+  UINTN    FreePages;
 } PAGE_TABLE_POOL;
 
 /**
@@ -143,4 +143,5 @@ InternalMemEncryptSevClearMmioPageEncMask (
   IN  PHYSICAL_ADDRESS        PhysicalAddress,
   IN  UINTN                   Length
   );
+
 #endif

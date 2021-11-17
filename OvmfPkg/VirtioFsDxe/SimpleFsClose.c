@@ -17,8 +17,8 @@ VirtioFsSimpleFileClose (
   IN EFI_FILE_PROTOCOL *This
   )
 {
-  VIRTIO_FS_FILE *VirtioFsFile;
-  VIRTIO_FS      *VirtioFs;
+  VIRTIO_FS_FILE  *VirtioFsFile;
+  VIRTIO_FS       *VirtioFs;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
   VirtioFs     = VirtioFsFile->OwnerFs;
@@ -34,16 +34,27 @@ VirtioFsSimpleFileClose (
   //
   if (VirtioFsFile->IsOpenForWriting) {
     if (!VirtioFsFile->IsDirectory) {
-      VirtioFsFuseFlush (VirtioFs, VirtioFsFile->NodeId,
-        VirtioFsFile->FuseHandle);
+      VirtioFsFuseFlush (
+        VirtioFs,
+        VirtioFsFile->NodeId,
+        VirtioFsFile->FuseHandle
+        );
     }
 
-    VirtioFsFuseFsyncFileOrDir (VirtioFs, VirtioFsFile->NodeId,
-      VirtioFsFile->FuseHandle, VirtioFsFile->IsDirectory);
+    VirtioFsFuseFsyncFileOrDir (
+      VirtioFs,
+      VirtioFsFile->NodeId,
+      VirtioFsFile->FuseHandle,
+      VirtioFsFile->IsDirectory
+      );
   }
 
-  VirtioFsFuseReleaseFileOrDir (VirtioFs, VirtioFsFile->NodeId,
-    VirtioFsFile->FuseHandle, VirtioFsFile->IsDirectory);
+  VirtioFsFuseReleaseFileOrDir (
+    VirtioFs,
+    VirtioFsFile->NodeId,
+    VirtioFsFile->FuseHandle,
+    VirtioFsFile->IsDirectory
+    );
 
   //
   // VirtioFsFile->FuseHandle is gone at this point, but VirtioFsFile->NodeId
@@ -63,6 +74,7 @@ VirtioFsSimpleFileClose (
   if (VirtioFsFile->FileInfoArray != NULL) {
     FreePool (VirtioFsFile->FileInfoArray);
   }
+
   FreePool (VirtioFsFile);
   return EFI_SUCCESS;
 }

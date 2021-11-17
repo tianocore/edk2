@@ -18,32 +18,32 @@
 #define _FW_BLOCK_SERVICE_H
 
 typedef struct {
-  UINTN                       FvBase;
-  UINTN                       NumOfBlocks;
-  EFI_FIRMWARE_VOLUME_HEADER  VolumeHeader;
+  UINTN                         FvBase;
+  UINTN                         NumOfBlocks;
+  EFI_FIRMWARE_VOLUME_HEADER    VolumeHeader;
 } EFI_FW_VOL_INSTANCE;
 
 typedef struct {
-  UINT32              NumFv;
-  EFI_FW_VOL_INSTANCE *FvInstance;
+  UINT32                 NumFv;
+  EFI_FW_VOL_INSTANCE    *FvInstance;
 } ESAL_FWB_GLOBAL;
 
-extern ESAL_FWB_GLOBAL *mFvbModuleGlobal;
+extern ESAL_FWB_GLOBAL  *mFvbModuleGlobal;
 
 //
 // Fvb Protocol instance data
 //
-#define FVB_DEVICE_FROM_THIS(a) CR (a, EFI_FW_VOL_BLOCK_DEVICE, \
+#define FVB_DEVICE_FROM_THIS(a)  CR (a, EFI_FW_VOL_BLOCK_DEVICE,\
                                   FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
 
-#define FVB_EXTEND_DEVICE_FROM_THIS(a) CR (a, EFI_FW_VOL_BLOCK_DEVICE, \
+#define FVB_EXTEND_DEVICE_FROM_THIS(a)  CR (a, EFI_FW_VOL_BLOCK_DEVICE,\
                                          FvbExtension, FVB_DEVICE_SIGNATURE)
 
-#define FVB_DEVICE_SIGNATURE            SIGNATURE_32 ('F', 'V', 'B', 'N')
+#define FVB_DEVICE_SIGNATURE  SIGNATURE_32 ('F', 'V', 'B', 'N')
 
 typedef struct {
-  MEDIA_FW_VOL_DEVICE_PATH  FvDevPath;
-  EFI_DEVICE_PATH_PROTOCOL  EndDevPath;
+  MEDIA_FW_VOL_DEVICE_PATH    FvDevPath;
+  EFI_DEVICE_PATH_PROTOCOL    EndDevPath;
 } FV_PIWG_DEVICE_PATH;
 
 typedef struct {
@@ -52,10 +52,10 @@ typedef struct {
 } FV_MEMMAP_DEVICE_PATH;
 
 typedef struct {
-  UINTN                               Signature;
-  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
-  UINTN                               Instance;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  FwVolBlockInstance;
+  UINTN                                 Signature;
+  EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
+  UINTN                                 Instance;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    FwVolBlockInstance;
 } EFI_FW_VOL_BLOCK_DEVICE;
 
 EFI_STATUS
@@ -91,7 +91,6 @@ FvbInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   );
-
 
 VOID
 EFIAPI

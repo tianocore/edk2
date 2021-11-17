@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __XENBUS_EVENT_CHANNEL_H
 #define __XENBUS_EVENT_CHANNEL_H
 

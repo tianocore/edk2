@@ -62,10 +62,10 @@ ValidateInfoStructure (
   IN VOID    *Buffer
   )
 {
-  UINTN  NameFieldByteOffset;
-  UINTN  NameFieldBytes;
-  UINTN  NameFieldChar16s;
-  CHAR16 *NameField;
+  UINTN   NameFieldByteOffset;
+  UINTN   NameFieldBytes;
+  UINTN   NameFieldChar16s;
+  CHAR16  *NameField;
 
   //
   // Make sure the internal function asking for validation passes in sane
@@ -92,7 +92,7 @@ ValidateInfoStructure (
   // agrees with the protocol caller-provided size.
   //
   if (IsSizeByInfoPresent) {
-    UINT64 *SizeByInfo;
+    UINT64  *SizeByInfo;
 
     SizeByInfo = Buffer;
     if (*SizeByInfo != SizeByProtocolCaller) {
@@ -176,15 +176,14 @@ Rename (
   IN     CHAR16         *NewFileName
   )
 {
-
-  VIRTIO_FS  *VirtioFs;
-  EFI_STATUS Status;
-  CHAR8      *Destination;
-  BOOLEAN    RootEscape;
-  UINT64     OldParentDirNodeId;
-  CHAR8      *OldLastComponent;
-  UINT64     NewParentDirNodeId;
-  CHAR8      *NewLastComponent;
+  VIRTIO_FS   *VirtioFs;
+  EFI_STATUS  Status;
+  CHAR8       *Destination;
+  BOOLEAN     RootEscape;
+  UINT64      OldParentDirNodeId;
+  CHAR8       *OldLastComponent;
+  UINT64      NewParentDirNodeId;
+  CHAR8       *NewLastComponent;
 
   VirtioFs = VirtioFsFile->OwnerFs;
 
@@ -198,21 +197,28 @@ Rename (
       //
       return EFI_SUCCESS;
     }
+
     return EFI_ACCESS_DENIED;
   }
 
   //
   // Compose the canonical pathname for the destination.
   //
-  Status = VirtioFsComposeRenameDestination (VirtioFsFile->CanonicalPathname,
-             NewFileName, &Destination, &RootEscape);
+  Status = VirtioFsComposeRenameDestination (
+             VirtioFsFile->CanonicalPathname,
+             NewFileName,
+             &Destination,
+             &RootEscape
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   if (RootEscape) {
     Status = EFI_NOT_FOUND;
     goto FreeDestination;
   }
+
   //
   // If the rename would leave VirtioFsFile->CanonicalPathname unchanged, then
   // EFI_FILE_PROTOCOL.SetInfo() isn't asking for a rename actually.
@@ -221,24 +227,29 @@ Rename (
     Status = EFI_SUCCESS;
     goto FreeDestination;
   }
+
   //
   // Check if the rename would break the canonical pathnames of other
   // VIRTIO_FS_FILE instances of the same VIRTIO_FS.
   //
   if (VirtioFsFile->IsDirectory) {
-    UINTN      PathLen;
-    LIST_ENTRY *OpenFilesEntry;
+    UINTN       PathLen;
+    LIST_ENTRY  *OpenFilesEntry;
 
     PathLen = AsciiStrLen (VirtioFsFile->CanonicalPathname);
     BASE_LIST_FOR_EACH (OpenFilesEntry, &VirtioFs->OpenFiles) {
-      VIRTIO_FS_FILE *OtherFile;
+      VIRTIO_FS_FILE  *OtherFile;
 
       OtherFile = VIRTIO_FS_FILE_FROM_OPEN_FILES_ENTRY (OpenFilesEntry);
-      if (OtherFile != VirtioFsFile &&
-          AsciiStrnCmp (VirtioFsFile->CanonicalPathname,
-            OtherFile->CanonicalPathname, PathLen) == 0 &&
-          (OtherFile->CanonicalPathname[PathLen] == '\0' ||
-           OtherFile->CanonicalPathname[PathLen] == '/')) {
+      if ((OtherFile != VirtioFsFile) &&
+          (AsciiStrnCmp (
+             VirtioFsFile->CanonicalPathname,
+             OtherFile->CanonicalPathname,
+             PathLen
+             ) == 0) &&
+          ((OtherFile->CanonicalPathname[PathLen] == '\0') ||
+           (OtherFile->CanonicalPathname[PathLen] == '/')))
+      {
         //
         // OtherFile refers to the same directory as VirtioFsFile, or is a
         // (possibly indirect) child of the directory referred to by
@@ -249,6 +260,7 @@ Rename (
       }
     }
   }
+
   //
   // From this point on, the file needs to be open for writing.
   //
@@ -256,26 +268,41 @@ Rename (
     Status = EFI_ACCESS_DENIED;
     goto FreeDestination;
   }
+
   //
   // Split both source and destination canonical pathnames into (most specific
   // parent directory, last component) pairs.
   //
-  Status = VirtioFsLookupMostSpecificParentDir (VirtioFs,
-             VirtioFsFile->CanonicalPathname, &OldParentDirNodeId,
-             &OldLastComponent);
+  Status = VirtioFsLookupMostSpecificParentDir (
+             VirtioFs,
+             VirtioFsFile->CanonicalPathname,
+             &OldParentDirNodeId,
+             &OldLastComponent
+             );
   if (EFI_ERROR (Status)) {
     goto FreeDestination;
   }
-  Status = VirtioFsLookupMostSpecificParentDir (VirtioFs, Destination,
-             &NewParentDirNodeId, &NewLastComponent);
+
+  Status = VirtioFsLookupMostSpecificParentDir (
+             VirtioFs,
+             Destination,
+             &NewParentDirNodeId,
+             &NewLastComponent
+             );
   if (EFI_ERROR (Status)) {
     goto ForgetOldParentDirNodeId;
   }
+
   //
   // Perform the rename. If the destination path exists, the rename will fail.
   //
-  Status = VirtioFsFuseRename (VirtioFs, OldParentDirNodeId, OldLastComponent,
-             NewParentDirNodeId, NewLastComponent);
+  Status = VirtioFsFuseRename (
+             VirtioFs,
+             OldParentDirNodeId,
+             OldLastComponent,
+             NewParentDirNodeId,
+             NewLastComponent
+             );
   if (EFI_ERROR (Status)) {
     goto ForgetNewParentDirNodeId;
   }
@@ -305,6 +332,7 @@ FreeDestination:
   if (Destination != NULL) {
     FreePool (Destination);
   }
+
   return Status;
 }
 
@@ -336,18 +364,18 @@ UpdateAttributes (
   IN     EFI_FILE_INFO  *NewFileInfo
   )
 {
-  VIRTIO_FS                          *VirtioFs;
-  EFI_STATUS                         Status;
-  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE FuseAttr;
-  EFI_FILE_INFO                      FileInfo;
-  BOOLEAN                            UpdateFileSize;
-  UINT64                             FileSize;
-  BOOLEAN                            UpdateAtime;
-  BOOLEAN                            UpdateMtime;
-  UINT64                             Atime;
-  UINT64                             Mtime;
-  BOOLEAN                            UpdateMode;
-  UINT32                             Mode;
+  VIRTIO_FS                           *VirtioFs;
+  EFI_STATUS                          Status;
+  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE  FuseAttr;
+  EFI_FILE_INFO                       FileInfo;
+  BOOLEAN                             UpdateFileSize;
+  UINT64                              FileSize;
+  BOOLEAN                             UpdateAtime;
+  BOOLEAN                             UpdateMtime;
+  UINT64                              Atime;
+  UINT64                              Mtime;
+  BOOLEAN                             UpdateMode;
+  UINT32                              Mode;
 
   VirtioFs = VirtioFsFile->OwnerFs;
 
@@ -359,28 +387,44 @@ UpdateAttributes (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   Status = VirtioFsFuseAttrToEfiFileInfo (&FuseAttr, &FileInfo);
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Collect the updates.
   //
   if (VirtioFsFile->IsDirectory) {
     UpdateFileSize = FALSE;
   } else {
-    VirtioFsGetFuseSizeUpdate (&FileInfo, NewFileInfo, &UpdateFileSize,
-      &FileSize);
+    VirtioFsGetFuseSizeUpdate (
+      &FileInfo,
+      NewFileInfo,
+      &UpdateFileSize,
+      &FileSize
+      );
   }
 
-  Status = VirtioFsGetFuseTimeUpdates (&FileInfo, NewFileInfo, &UpdateAtime,
-             &UpdateMtime, &Atime, &Mtime);
+  Status = VirtioFsGetFuseTimeUpdates (
+             &FileInfo,
+             NewFileInfo,
+             &UpdateAtime,
+             &UpdateMtime,
+             &Atime,
+             &Mtime
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = VirtioFsGetFuseModeUpdate (&FileInfo, NewFileInfo, &UpdateMode,
-             &Mode);
+  Status = VirtioFsGetFuseModeUpdate (
+             &FileInfo,
+             NewFileInfo,
+             &UpdateMode,
+             &Mode
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -391,14 +435,17 @@ UpdateAttributes (
   if (!UpdateFileSize && !UpdateAtime && !UpdateMtime && !UpdateMode) {
     return EFI_SUCCESS;
   }
+
   //
   // If the file is not open for writing, then only Mode may be updated (for
   // toggling EFI_FILE_READ_ONLY).
   //
   if (!VirtioFsFile->IsOpenForWriting &&
-      (UpdateFileSize || UpdateAtime || UpdateMtime)) {
+      (UpdateFileSize || UpdateAtime || UpdateMtime))
+  {
     return EFI_ACCESS_DENIED;
   }
+
   //
   // Send the FUSE_SETATTR request now.
   //
@@ -424,9 +471,9 @@ SetFileInfo (
   IN VOID              *Buffer
   )
 {
-  VIRTIO_FS_FILE *VirtioFsFile;
-  EFI_STATUS     Status;
-  EFI_FILE_INFO  *FileInfo;
+  VIRTIO_FS_FILE  *VirtioFsFile;
+  EFI_STATUS      Status;
+  EFI_FILE_INFO   *FileInfo;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
 
@@ -435,14 +482,17 @@ SetFileInfo (
   //
   Status = ValidateInfoStructure (
              BufferSize,                    // SizeByProtocolCaller
-             OFFSET_OF (EFI_FILE_INFO,
-               FileName) + sizeof (CHAR16), // MinimumStructSize
+             OFFSET_OF (
+               EFI_FILE_INFO,
+               FileName
+               ) + sizeof (CHAR16),         // MinimumStructSize
              TRUE,                          // IsSizeByInfoPresent
              Buffer
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   FileInfo = Buffer;
 
   //
@@ -452,6 +502,7 @@ SetFileInfo (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Update any attributes requested.
   //
@@ -475,10 +526,10 @@ SetFileSystemInfo (
   IN VOID              *Buffer
   )
 {
-  VIRTIO_FS_FILE       *VirtioFsFile;
-  VIRTIO_FS            *VirtioFs;
-  EFI_STATUS           Status;
-  EFI_FILE_SYSTEM_INFO *FileSystemInfo;
+  VIRTIO_FS_FILE        *VirtioFsFile;
+  VIRTIO_FS             *VirtioFs;
+  EFI_STATUS            Status;
+  EFI_FILE_SYSTEM_INFO  *FileSystemInfo;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
   VirtioFs     = VirtioFsFile->OwnerFs;
@@ -488,14 +539,17 @@ SetFileSystemInfo (
   //
   Status = ValidateInfoStructure (
              BufferSize,                       // SizeByProtocolCaller
-             OFFSET_OF (EFI_FILE_SYSTEM_INFO,
-               VolumeLabel) + sizeof (CHAR16), // MinimumStructSize
+             OFFSET_OF (
+               EFI_FILE_SYSTEM_INFO,
+               VolumeLabel
+               ) + sizeof (CHAR16),            // MinimumStructSize
              TRUE,                             // IsSizeByInfoPresent
              Buffer
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   FileSystemInfo = Buffer;
 
   //
@@ -509,6 +563,7 @@ SetFileSystemInfo (
   if (StrCmp (FileSystemInfo->VolumeLabel, VirtioFs->Label) == 0) {
     return EFI_SUCCESS;
   }
+
   return EFI_WRITE_PROTECTED;
 }
 
@@ -523,10 +578,10 @@ SetFileSystemVolumeLabelInfo (
   IN VOID              *Buffer
   )
 {
-  VIRTIO_FS_FILE               *VirtioFsFile;
-  VIRTIO_FS                    *VirtioFs;
-  EFI_STATUS                   Status;
-  EFI_FILE_SYSTEM_VOLUME_LABEL *FileSystemVolumeLabel;
+  VIRTIO_FS_FILE                *VirtioFsFile;
+  VIRTIO_FS                     *VirtioFs;
+  EFI_STATUS                    Status;
+  EFI_FILE_SYSTEM_VOLUME_LABEL  *FileSystemVolumeLabel;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
   VirtioFs     = VirtioFsFile->OwnerFs;
@@ -536,14 +591,17 @@ SetFileSystemVolumeLabelInfo (
   //
   Status = ValidateInfoStructure (
              BufferSize,                              // SizeByProtocolCaller
-             OFFSET_OF (EFI_FILE_SYSTEM_VOLUME_LABEL,
-               VolumeLabel) + sizeof (CHAR16),        // MinimumStructSize
+             OFFSET_OF (
+               EFI_FILE_SYSTEM_VOLUME_LABEL,
+               VolumeLabel
+               ) + sizeof (CHAR16),                   // MinimumStructSize
              FALSE,                                   // IsSizeByInfoPresent
              Buffer
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   FileSystemVolumeLabel = Buffer;
 
   //
@@ -554,6 +612,7 @@ SetFileSystemVolumeLabelInfo (
   if (StrCmp (FileSystemVolumeLabel->VolumeLabel, VirtioFs->Label) == 0) {
     return EFI_SUCCESS;
   }
+
   return EFI_WRITE_PROTECTED;
 }
 

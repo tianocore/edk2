@@ -13,8 +13,8 @@
 #include <Protocol/PciIo.h>     // EFI_PCI_IO_PROTOCOL
 
 typedef struct {
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  UINT64              PciAttributes;
+  EFI_PCI_IO_PROTOCOL    *PciIo;
+  UINT64                 PciAttributes;
 } ORIGINAL_ATTRIBUTES;
 
 typedef struct S3_CONTEXT S3_CONTEXT;
@@ -69,4 +69,3 @@ TransferS3ContextToBootScript (
   );
 
 #endif
-

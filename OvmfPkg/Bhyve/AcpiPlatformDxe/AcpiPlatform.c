@@ -27,7 +27,6 @@ InstallAcpiTable (
                          );
 }
 
-
 /**
   Locate the first instance of a protocol.  If the protocol requested is an
   FV protocol, then it will return the first FV that contains the ACPI table
@@ -45,15 +44,15 @@ LocateFvInstanceWithTables (
   OUT EFI_FIRMWARE_VOLUME2_PROTOCOL **Instance
   )
 {
-  EFI_STATUS                    Status;
-  EFI_HANDLE                    *HandleBuffer;
-  UINTN                         NumberOfHandles;
-  EFI_FV_FILETYPE               FileType;
-  UINT32                        FvStatus;
-  EFI_FV_FILE_ATTRIBUTES        Attributes;
-  UINTN                         Size;
-  UINTN                         Index;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL *FvInstance;
+  EFI_STATUS                     Status;
+  EFI_HANDLE                     *HandleBuffer;
+  UINTN                          NumberOfHandles;
+  EFI_FV_FILETYPE                FileType;
+  UINT32                         FvStatus;
+  EFI_FV_FILE_ATTRIBUTES         Attributes;
+  UINTN                          Size;
+  UINTN                          Index;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL  *FvInstance;
 
   FvStatus = 0;
 
@@ -61,12 +60,12 @@ LocateFvInstanceWithTables (
   // Locate protocol.
   //
   Status = gBS->LocateHandleBuffer (
-                   ByProtocol,
-                   &gEfiFirmwareVolume2ProtocolGuid,
-                   NULL,
-                   &NumberOfHandles,
-                   &HandleBuffer
-                   );
+                  ByProtocol,
+                  &gEfiFirmwareVolume2ProtocolGuid,
+                  NULL,
+                  &NumberOfHandles,
+                  &HandleBuffer
+                  );
   if (EFI_ERROR (Status)) {
     //
     // Defined errors at this time are not found and out of resources.
@@ -83,10 +82,10 @@ LocateFvInstanceWithTables (
     // This should not fail because of LocateHandleBuffer
     //
     Status = gBS->HandleProtocol (
-                     HandleBuffer[Index],
-                     &gEfiFirmwareVolume2ProtocolGuid,
-                     (VOID**) &FvInstance
-                     );
+                    HandleBuffer[Index],
+                    &gEfiFirmwareVolume2ProtocolGuid,
+                    (VOID **)&FvInstance
+                    );
     ASSERT_EFI_ERROR (Status);
 
     //
@@ -94,7 +93,7 @@ LocateFvInstanceWithTables (
     //
     Status = FvInstance->ReadFile (
                            FvInstance,
-                           (EFI_GUID*)PcdGetPtr (PcdAcpiTableStorageFile),
+                           (EFI_GUID *)PcdGetPtr (PcdAcpiTableStorageFile),
                            NULL,
                            &Size,
                            &FileType,
@@ -124,7 +123,6 @@ LocateFvInstanceWithTables (
   return Status;
 }
 
-
 /**
   Find ACPI tables in an FV and install them.
 
@@ -143,15 +141,15 @@ InstallOvmfFvTables (
   IN  EFI_ACPI_TABLE_PROTOCOL     *AcpiTable
   )
 {
-  EFI_STATUS                           Status;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL        *FwVol;
-  INTN                                 Instance;
-  EFI_ACPI_COMMON_HEADER               *CurrentTable;
-  UINTN                                TableHandle;
-  UINT32                               FvStatus;
-  UINTN                                TableSize;
-  UINTN                                Size;
-  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE    TableInstallFunction;
+  EFI_STATUS                         Status;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL      *FwVol;
+  INTN                               Instance;
+  EFI_ACPI_COMMON_HEADER             *CurrentTable;
+  UINTN                              TableHandle;
+  UINT32                             FvStatus;
+  UINTN                              TableSize;
+  UINTN                              Size;
+  EFI_ACPI_TABLE_INSTALL_ACPI_TABLE  TableInstallFunction;
 
   Instance     = 0;
   CurrentTable = NULL;
@@ -171,19 +169,19 @@ InstallOvmfFvTables (
   if (EFI_ERROR (Status)) {
     return EFI_ABORTED;
   }
+
   ASSERT (FwVol != NULL);
 
   //
   // Read tables from the storage file.
   //
   while (Status == EFI_SUCCESS) {
-
     Status = FwVol->ReadSection (
                       FwVol,
-                      (EFI_GUID*)PcdGetPtr (PcdAcpiTableStorageFile),
+                      (EFI_GUID *)PcdGetPtr (PcdAcpiTableStorageFile),
                       EFI_SECTION_RAW,
                       Instance,
-                      (VOID**) &CurrentTable,
+                      (VOID **)&CurrentTable,
                       &Size,
                       &FvStatus
                       );
@@ -193,7 +191,7 @@ InstallOvmfFvTables (
       //
       TableHandle = 0;
 
-      TableSize = ((EFI_ACPI_DESCRIPTION_HEADER *) CurrentTable)->Length;
+      TableSize = ((EFI_ACPI_DESCRIPTION_HEADER *)CurrentTable)->Length;
       ASSERT (Size >= TableSize);
 
       //
@@ -243,10 +241,9 @@ InstallAcpiTables (
   IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiTable
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = InstallOvmfFvTables (AcpiTable);
 
   return Status;
 }
-

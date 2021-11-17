@@ -17,7 +17,7 @@
 
 #include <IndustryStandard/Virtio.h>
 
-#define VIRTIO_RNG_SIG SIGNATURE_32 ('V', 'R', 'N', 'G')
+#define VIRTIO_RNG_SIG  SIGNATURE_32 ('V', 'R', 'N', 'G')
 
 typedef struct {
   //

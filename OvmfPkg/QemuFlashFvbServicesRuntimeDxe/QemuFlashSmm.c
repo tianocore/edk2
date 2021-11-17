@@ -21,7 +21,7 @@ QemuFlashBeforeProbe (
   IN  UINTN                   FdBlockCount
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   ASSERT (FeaturePcdGet (PcdSmmSmramRequire));
 

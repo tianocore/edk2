@@ -25,4 +25,3 @@ InstallAcpiTables (
   );
 
 #endif
-

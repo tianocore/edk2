@@ -28,7 +28,7 @@ typedef enum {
 //
 // The value of PcdQ35TsegMbytes is saved into this variable at module startup.
 //
-extern UINT16 mQ35TsegMbytes;
+extern UINT16  mQ35TsegMbytes;
 
 /**
   Save PcdQ35TsegMbytes into mQ35TsegMbytes.

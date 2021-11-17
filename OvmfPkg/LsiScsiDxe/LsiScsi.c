@@ -112,9 +112,9 @@ ReportHostAdapterOverrunError (
   OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet
   )
 {
-  Packet->SenseDataLength = 0;
+  Packet->SenseDataLength   = 0;
   Packet->HostAdapterStatus =
-            EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
+    EFI_EXT_SCSI_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN;
   Packet->TargetStatus = EFI_EXT_SCSI_STATUS_TARGET_GOOD;
   return EFI_BAD_BUFFER_SIZE;
 }
@@ -152,34 +152,36 @@ LsiScsiCheckRequest (
   IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet
   )
 {
-  if (Target > Dev->MaxTarget || Lun > Dev->MaxLun ||
-      Packet->DataDirection > EFI_EXT_SCSI_DATA_DIRECTION_BIDIRECTIONAL ||
+  if ((Target > Dev->MaxTarget) || (Lun > Dev->MaxLun) ||
+      (Packet->DataDirection > EFI_EXT_SCSI_DATA_DIRECTION_BIDIRECTIONAL) ||
       //
       // Trying to receive, but destination pointer is NULL, or contradicting
       // transfer direction
       //
-      (Packet->InTransferLength > 0 &&
-       (Packet->InDataBuffer == NULL ||
-        Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_WRITE
-         )
-        ) ||
+      ((Packet->InTransferLength > 0) &&
+       ((Packet->InDataBuffer == NULL) ||
+        (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_WRITE)
+       )
+      ) ||
 
       //
       // Trying to send, but source pointer is NULL, or contradicting transfer
       // direction
       //
-      (Packet->OutTransferLength > 0 &&
-       (Packet->OutDataBuffer == NULL ||
-        Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ
-         )
-        )
-    ) {
+      ((Packet->OutTransferLength > 0) &&
+       ((Packet->OutDataBuffer == NULL) ||
+        (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_READ)
+       )
+      )
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_BIDIRECTIONAL ||
-      (Packet->InTransferLength > 0 && Packet->OutTransferLength > 0) ||
-      Packet->CdbLength > sizeof Dev->Dma->Cdb) {
+  if ((Packet->DataDirection == EFI_EXT_SCSI_DATA_DIRECTION_BIDIRECTIONAL) ||
+      ((Packet->InTransferLength > 0) && (Packet->OutTransferLength > 0)) ||
+      (Packet->CdbLength > sizeof Dev->Dma->Cdb))
+  {
     return EFI_UNSUPPORTED;
   }
 
@@ -187,6 +189,7 @@ LsiScsiCheckRequest (
     Packet->InTransferLength = sizeof Dev->Dma->Data;
     return ReportHostAdapterOverrunError (Packet);
   }
+
   if (Packet->OutTransferLength > sizeof Dev->Dma->Data) {
     Packet->OutTransferLength = sizeof Dev->Dma->Data;
     return ReportHostAdapterOverrunError (Packet);
@@ -227,26 +230,26 @@ LsiScsiProcessRequest (
   IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet
   )
 {
-  EFI_STATUS Status;
-  UINT32     *Script;
-  UINT8      *Cdb;
-  UINT8      *MsgOut;
-  UINT8      *MsgIn;
-  UINT8      *ScsiStatus;
-  UINT8      *Data;
-  UINT8      DStat;
-  UINT8      SIst0;
-  UINT8      SIst1;
-  UINT32     Csbc;
-  UINT32     CsbcBase;
-  UINT32     Transferred;
+  EFI_STATUS  Status;
+  UINT32      *Script;
+  UINT8       *Cdb;
+  UINT8       *MsgOut;
+  UINT8       *MsgIn;
+  UINT8       *ScsiStatus;
+  UINT8       *Data;
+  UINT8       DStat;
+  UINT8       SIst0;
+  UINT8       SIst1;
+  UINT32      Csbc;
+  UINT32      CsbcBase;
+  UINT32      Transferred;
 
-  Script      = Dev->Dma->Script;
-  Cdb         = Dev->Dma->Cdb;
-  Data        = Dev->Dma->Data;
-  MsgIn       = Dev->Dma->MsgIn;
-  MsgOut      = &Dev->Dma->MsgOut;
-  ScsiStatus  = &Dev->Dma->Status;
+  Script     = Dev->Dma->Script;
+  Cdb        = Dev->Dma->Cdb;
+  Data       = Dev->Dma->Data;
+  MsgIn      = Dev->Dma->MsgIn;
+  MsgOut     = &Dev->Dma->MsgOut;
+  ScsiStatus = &Dev->Dma->Status;
 
   *ScsiStatus = 0xFF;
 
@@ -308,7 +311,7 @@ LsiScsiProcessRequest (
   //
   // 2. Select LUN.
   //
-  *MsgOut   = 0x80 | (UINT8) Lun; // 0x80: Identify bit
+  *MsgOut   = 0x80 | (UINT8)Lun;  // 0x80: Identify bit
   *Script++ = LSI_INS_TYPE_BLK | LSI_INS_BLK_SCSIP_MSG_OUT |
               (UINT32)sizeof Dev->Dma->MsgOut;
   *Script++ = LSI_SCSI_DMA_ADDR (Dev, MsgOut);
@@ -416,21 +419,23 @@ LsiScsiProcessRequest (
   // Poll the device registers (DSTAT, SIST0, and SIST1) until the SIR
   // bit sets.
   //
-  for(;;) {
+  for ( ; ;) {
     Status = In8 (Dev, LSI_REG_DSTAT, &DStat);
     if (EFI_ERROR (Status)) {
       goto Error;
     }
+
     Status = In8 (Dev, LSI_REG_SIST0, &SIst0);
     if (EFI_ERROR (Status)) {
       goto Error;
     }
+
     Status = In8 (Dev, LSI_REG_SIST1, &SIst1);
     if (EFI_ERROR (Status)) {
       goto Error;
     }
 
-    if (SIst0 != 0 || SIst1 != 0) {
+    if ((SIst0 != 0) || (SIst1 != 0)) {
       goto Error;
     }
 
@@ -449,7 +454,7 @@ LsiScsiProcessRequest (
   //   SCSI Message Code 0x00: COMMAND COMPLETE
   //   SCSI Status  Code 0x00: Good
   //
-  if (MsgIn[0] != 0 || *ScsiStatus != 0) {
+  if ((MsgIn[0] != 0) || (*ScsiStatus != 0)) {
     goto Error;
   }
 
@@ -499,20 +504,26 @@ LsiScsiProcessRequest (
   //
   Packet->SenseDataLength   = 0;
   Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OK;
-  Packet->TargetStatus      = EFI_EXT_SCSI_STATUS_TARGET_GOOD;
+  Packet->TargetStatus = EFI_EXT_SCSI_STATUS_TARGET_GOOD;
 
   return EFI_SUCCESS;
 
 Error:
-  DEBUG ((DEBUG_VERBOSE, "%a: dstat: %02X, sist0: %02X, sist1: %02X\n",
-    __FUNCTION__, DStat, SIst0, SIst1));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: dstat: %02X, sist0: %02X, sist1: %02X\n",
+    __FUNCTION__,
+    DStat,
+    SIst0,
+    SIst1
+    ));
   //
   // Update the request packet to reflect the status.
   //
   if (*ScsiStatus != 0xFF) {
-    Packet->TargetStatus    = *ScsiStatus;
+    Packet->TargetStatus = *ScsiStatus;
   } else {
-    Packet->TargetStatus    = EFI_EXT_SCSI_STATUS_TARGET_TASK_ABORTED;
+    Packet->TargetStatus = EFI_EXT_SCSI_STATUS_TARGET_TASK_ABORTED;
   }
 
   if (SIst0 & LSI_SIST0_PAR) {
@@ -564,10 +575,10 @@ LsiScsiPassThru (
   IN EFI_EVENT                                      Event     OPTIONAL
   )
 {
-  EFI_STATUS   Status;
-  LSI_SCSI_DEV *Dev;
+  EFI_STATUS    Status;
+  LSI_SCSI_DEV  *Dev;
 
-  Dev = LSI_SCSI_FROM_PASS_THRU (This);
+  Dev    = LSI_SCSI_FROM_PASS_THRU (This);
   Status = LsiScsiCheckRequest (Dev, *Target, Lun, Packet);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -584,10 +595,10 @@ LsiScsiGetNextTargetLun (
   IN OUT UINT64                      *Lun
   )
 {
-  LSI_SCSI_DEV *Dev;
-  UINTN        Idx;
-  UINT8        *Target;
-  UINT16       LastTarget;
+  LSI_SCSI_DEV  *Dev;
+  UINTN         Idx;
+  UINT8         *Target;
+  UINT16        LastTarget;
 
   //
   // the TargetPointer input parameter is unnecessarily a pointer-to-pointer
@@ -597,8 +608,9 @@ LsiScsiGetNextTargetLun (
   //
   // Search for first non-0xFF byte. If not found, return first target & LUN.
   //
-  for (Idx = 0; Idx < TARGET_MAX_BYTES && Target[Idx] == 0xFF; ++Idx)
-    ;
+  for (Idx = 0; Idx < TARGET_MAX_BYTES && Target[Idx] == 0xFF; ++Idx) {
+  }
+
   if (Idx == TARGET_MAX_BYTES) {
     SetMem (Target, TARGET_MAX_BYTES, 0x00);
     *Lun = 0;
@@ -611,7 +623,7 @@ LsiScsiGetNextTargetLun (
   // increment (target, LUN) pair if valid on input
   //
   Dev = LSI_SCSI_FROM_PASS_THRU (This);
-  if (LastTarget > Dev->MaxTarget || *Lun > Dev->MaxLun) {
+  if ((LastTarget > Dev->MaxTarget) || (*Lun > Dev->MaxLun)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -639,9 +651,9 @@ LsiScsiBuildDevicePath (
   IN OUT EFI_DEVICE_PATH_PROTOCOL    **DevicePath
   )
 {
-  UINT16           TargetValue;
-  LSI_SCSI_DEV     *Dev;
-  SCSI_DEVICE_PATH *ScsiDevicePath;
+  UINT16            TargetValue;
+  LSI_SCSI_DEV      *Dev;
+  SCSI_DEVICE_PATH  *ScsiDevicePath;
 
   if (DevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -649,7 +661,7 @@ LsiScsiBuildDevicePath (
 
   CopyMem (&TargetValue, Target, sizeof TargetValue);
   Dev = LSI_SCSI_FROM_PASS_THRU (This);
-  if (TargetValue > Dev->MaxTarget || Lun > Dev->MaxLun || Lun > 0xFFFF) {
+  if ((TargetValue > Dev->MaxTarget) || (Lun > Dev->MaxLun) || (Lun > 0xFFFF)) {
     return EFI_NOT_FOUND;
   }
 
@@ -660,10 +672,10 @@ LsiScsiBuildDevicePath (
 
   ScsiDevicePath->Header.Type      = MESSAGING_DEVICE_PATH;
   ScsiDevicePath->Header.SubType   = MSG_SCSI_DP;
-  ScsiDevicePath->Header.Length[0] = (UINT8)  sizeof *ScsiDevicePath;
-  ScsiDevicePath->Header.Length[1] = (UINT8) (sizeof *ScsiDevicePath >> 8);
-  ScsiDevicePath->Pun              = TargetValue;
-  ScsiDevicePath->Lun              = (UINT16) Lun;
+  ScsiDevicePath->Header.Length[0] = (UINT8)sizeof *ScsiDevicePath;
+  ScsiDevicePath->Header.Length[1] = (UINT8)(sizeof *ScsiDevicePath >> 8);
+  ScsiDevicePath->Pun = TargetValue;
+  ScsiDevicePath->Lun = (UINT16)Lun;
 
   *DevicePath = &ScsiDevicePath->Header;
   return EFI_SUCCESS;
@@ -678,24 +690,27 @@ LsiScsiGetTargetLun (
   OUT UINT64                          *Lun
   )
 {
-  SCSI_DEVICE_PATH *ScsiDevicePath;
-  LSI_SCSI_DEV     *Dev;
-  UINT8            *Target;
+  SCSI_DEVICE_PATH  *ScsiDevicePath;
+  LSI_SCSI_DEV      *Dev;
+  UINT8             *Target;
 
-  if (DevicePath == NULL || TargetPointer == NULL || *TargetPointer == NULL ||
-      Lun == NULL) {
+  if ((DevicePath == NULL) || (TargetPointer == NULL) || (*TargetPointer == NULL) ||
+      (Lun == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (DevicePath->Type    != MESSAGING_DEVICE_PATH ||
-      DevicePath->SubType != MSG_SCSI_DP) {
+  if ((DevicePath->Type    != MESSAGING_DEVICE_PATH) ||
+      (DevicePath->SubType != MSG_SCSI_DP))
+  {
     return EFI_UNSUPPORTED;
   }
 
-  ScsiDevicePath = (SCSI_DEVICE_PATH *) DevicePath;
+  ScsiDevicePath = (SCSI_DEVICE_PATH *)DevicePath;
   Dev = LSI_SCSI_FROM_PASS_THRU (This);
-  if (ScsiDevicePath->Pun > Dev->MaxTarget ||
-      ScsiDevicePath->Lun > Dev->MaxLun) {
+  if ((ScsiDevicePath->Pun > Dev->MaxTarget) ||
+      (ScsiDevicePath->Lun > Dev->MaxLun))
+  {
     return EFI_NOT_FOUND;
   }
 
@@ -734,10 +749,10 @@ LsiScsiGetNextTarget (
   IN OUT UINT8                       **TargetPointer
   )
 {
-  LSI_SCSI_DEV *Dev;
-  UINTN        Idx;
-  UINT8        *Target;
-  UINT16       LastTarget;
+  LSI_SCSI_DEV  *Dev;
+  UINTN         Idx;
+  UINT8         *Target;
+  UINT16        LastTarget;
 
   //
   // the TargetPointer input parameter is unnecessarily a pointer-to-pointer
@@ -747,8 +762,9 @@ LsiScsiGetNextTarget (
   //
   // Search for first non-0xFF byte. If not found, return first target.
   //
-  for (Idx = 0; Idx < TARGET_MAX_BYTES && Target[Idx] == 0xFF; ++Idx)
-    ;
+  for (Idx = 0; Idx < TARGET_MAX_BYTES && Target[Idx] == 0xFF; ++Idx) {
+  }
+
   if (Idx == TARGET_MAX_BYTES) {
     SetMem (Target, TARGET_MAX_BYTES, 0x00);
     return EFI_SUCCESS;
@@ -781,7 +797,7 @@ LsiScsiExitBoot (
   IN  VOID      *Context
   )
 {
-  LSI_SCSI_DEV *Dev;
+  LSI_SCSI_DEV  *Dev;
 
   Dev = Context;
   DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
@@ -805,9 +821,9 @@ LsiScsiControllerSupported (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
   )
 {
-  EFI_STATUS          Status;
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  PCI_TYPE00          Pci;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -832,8 +848,9 @@ LsiScsiControllerSupported (
     goto Done;
   }
 
-  if (Pci.Hdr.VendorId == LSI_LOGIC_PCI_VENDOR_ID &&
-      Pci.Hdr.DeviceId == LSI_53C895A_PCI_DEVICE_ID) {
+  if ((Pci.Hdr.VendorId == LSI_LOGIC_PCI_VENDOR_ID) &&
+      (Pci.Hdr.DeviceId == LSI_53C895A_PCI_DEVICE_ID))
+  {
     Status = EFI_SUCCESS;
   } else {
     Status = EFI_UNSUPPORTED;
@@ -857,10 +874,10 @@ LsiScsiControllerStart (
   IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
   )
 {
-  EFI_STATUS           Status;
-  LSI_SCSI_DEV         *Dev;
-  UINTN                Pages;
-  UINTN                BytesMapped;
+  EFI_STATUS    Status;
+  LSI_SCSI_DEV  *Dev;
+  UINTN         Pages;
+  UINTN         BytesMapped;
 
   Dev = AllocateZeroPool (sizeof (*Dev));
   if (Dev == NULL) {
@@ -878,7 +895,7 @@ LsiScsiControllerStart (
     "LSI 53C895A supports LUNs [0..127]"
     );
   Dev->MaxTarget = PcdGet8 (PcdLsiScsiMaxTargetLimit);
-  Dev->MaxLun = PcdGet8 (PcdLsiScsiMaxLunLimit);
+  Dev->MaxLun    = PcdGet8 (PcdLsiScsiMaxLunLimit);
   Dev->StallPerPollUsec = PcdGet32 (PcdLsiScsiStallPerPollUsec);
 
   Status = gBS->OpenProtocol (
@@ -920,7 +937,7 @@ LsiScsiControllerStart (
   //
   // Create buffers for data transfer
   //
-  Pages = EFI_SIZE_TO_PAGES (sizeof (*Dev->Dma));
+  Pages  = EFI_SIZE_TO_PAGES (sizeof (*Dev->Dma));
   Status = Dev->PciIo->AllocateBuffer (
                          Dev->PciIo,
                          AllocateAnyPages,
@@ -970,19 +987,19 @@ LsiScsiControllerStart (
   //
   // Host adapter channel, doesn't exist
   //
-  Dev->PassThruMode.AdapterId = MAX_UINT32;
+  Dev->PassThruMode.AdapterId  = MAX_UINT32;
   Dev->PassThruMode.Attributes =
     EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL |
     EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL;
 
-  Dev->PassThru.Mode = &Dev->PassThruMode;
+  Dev->PassThru.Mode     = &Dev->PassThruMode;
   Dev->PassThru.PassThru = &LsiScsiPassThru;
   Dev->PassThru.GetNextTargetLun = &LsiScsiGetNextTargetLun;
-  Dev->PassThru.BuildDevicePath = &LsiScsiBuildDevicePath;
-  Dev->PassThru.GetTargetLun = &LsiScsiGetTargetLun;
-  Dev->PassThru.ResetChannel = &LsiScsiResetChannel;
-  Dev->PassThru.ResetTargetLun = &LsiScsiResetTargetLun;
-  Dev->PassThru.GetNextTarget = &LsiScsiGetNextTarget;
+  Dev->PassThru.BuildDevicePath  = &LsiScsiBuildDevicePath;
+  Dev->PassThru.GetTargetLun     = &LsiScsiGetTargetLun;
+  Dev->PassThru.ResetChannel     = &LsiScsiResetChannel;
+  Dev->PassThru.ResetTargetLun   = &LsiScsiResetTargetLun;
+  Dev->PassThru.GetNextTarget    = &LsiScsiGetNextTarget;
 
   Status = gBS->InstallProtocolInterface (
                   &ControllerHandle,
@@ -1046,9 +1063,9 @@ LsiScsiControllerStop (
   IN EFI_HANDLE                  *ChildHandleBuffer
   )
 {
-  EFI_STATUS                      Status;
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *PassThru;
-  LSI_SCSI_DEV                    *Dev;
+  EFI_STATUS                       Status;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *PassThru;
+  LSI_SCSI_DEV                     *Dev;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -1113,7 +1130,7 @@ LsiScsiControllerStop (
 // C, 10.1 EFI Driver Binding Protocol.
 //
 STATIC
-EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gDriverBinding = {
   &LsiScsiControllerSupported,
   &LsiScsiControllerStart,
   &LsiScsiControllerStop,
@@ -1122,7 +1139,6 @@ EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
         // EfiLibInstallDriverBindingComponentName2() in LsiScsiEntryPoint()
   NULL  // DriverBindingHandle, ditto
 };
-
 
 //
 // The purpose of the following scaffolding (EFI_COMPONENT_NAME_PROTOCOL and
@@ -1137,13 +1153,13 @@ EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
 //
 
 STATIC
-EFI_UNICODE_STRING_TABLE mDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE  mDriverNameTable[] = {
   { "eng;en", L"LSI 53C895A SCSI Controller Driver" },
   { NULL,     NULL                                  }
 };
 
 STATIC
-EFI_COMPONENT_NAME_PROTOCOL gComponentName;
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName;
 
 EFI_STATUS
 EFIAPI
@@ -1176,16 +1192,16 @@ LsiScsiGetDeviceName (
 }
 
 STATIC
-EFI_COMPONENT_NAME_PROTOCOL gComponentName = {
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName = {
   &LsiScsiGetDriverName,
   &LsiScsiGetDeviceName,
   "eng" // SupportedLanguages, ISO 639-2 language codes
 };
 
 STATIC
-EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     &LsiScsiGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) &LsiScsiGetDeviceName,
+EFI_COMPONENT_NAME2_PROTOCOL  gComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)&LsiScsiGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)&LsiScsiGetDeviceName,
   "en" // SupportedLanguages, RFC 4646 language codes
 };
 

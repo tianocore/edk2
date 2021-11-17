@@ -18,7 +18,7 @@
 #include <Protocol/VirtioDevice.h>     // VIRTIO_DEVICE_PROTOCOL
 #include <Uefi/UefiBaseType.h>         // EFI_EVENT
 
-#define VIRTIO_FS_SIG SIGNATURE_64 ('V', 'I', 'R', 'T', 'I', 'O', 'F', 'S')
+#define VIRTIO_FS_SIG  SIGNATURE_64 ('V', 'I', 'R', 'T', 'I', 'O', 'F', 'S')
 
 #define VIRTIO_FS_FILE_SIG \
   SIGNATURE_64 ('V', 'I', 'O', 'F', 'S', 'F', 'I', 'L')
@@ -45,12 +45,12 @@
 // pathnames, separate limits could be used; a common limit is used purely for
 // simplicity.
 //
-#define VIRTIO_FS_MAX_PATHNAME_LENGTH ((UINTN)65535)
+#define VIRTIO_FS_MAX_PATHNAME_LENGTH  ((UINTN)65535)
 
 //
 // Maximum value for VIRTIO_FS_FILE.NumFileInfo.
 //
-#define VIRTIO_FS_FILE_MAX_FILE_INFO 256
+#define VIRTIO_FS_FILE_MAX_FILE_INFO  256
 
 //
 // Filesystem label encoded in UCS-2, transformed from the UTF-8 representation
@@ -71,17 +71,17 @@ typedef struct {
   //
   //                              field         init function       init depth
   //                              -----------   ------------------  ----------
-  UINT64                          Signature; // DriverBindingStart  0
-  VIRTIO_DEVICE_PROTOCOL          *Virtio;   // DriverBindingStart  0
-  VIRTIO_FS_LABEL                 Label;     // VirtioFsInit        1
-  UINT16                          QueueSize; // VirtioFsInit        1
-  VRING                           Ring;      // VirtioRingInit      2
-  VOID                            *RingMap;  // VirtioRingMap       2
-  UINT64                          RequestId; // FuseInitSession     1
-  UINT32                          MaxWrite;  // FuseInitSession     1
-  EFI_EVENT                       ExitBoot;  // DriverBindingStart  0
-  LIST_ENTRY                      OpenFiles; // DriverBindingStart  0
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL SimpleFs;  // DriverBindingStart  0
+  UINT64                             Signature; // DriverBindingStart  0
+  VIRTIO_DEVICE_PROTOCOL             *Virtio;   // DriverBindingStart  0
+  VIRTIO_FS_LABEL                    Label;     // VirtioFsInit        1
+  UINT16                             QueueSize; // VirtioFsInit        1
+  VRING                              Ring;      // VirtioRingInit      2
+  VOID                               *RingMap;  // VirtioRingMap       2
+  UINT64                             RequestId; // FuseInitSession     1
+  UINT32                             MaxWrite;  // FuseInitSession     1
+  EFI_EVENT                          ExitBoot;  // DriverBindingStart  0
+  LIST_ENTRY                         OpenFiles; // DriverBindingStart  0
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL    SimpleFs;  // DriverBindingStart  0
 } VIRTIO_FS;
 
 #define VIRTIO_FS_FROM_SIMPLE_FS(SimpleFsReference) \
@@ -95,8 +95,8 @@ typedef struct {
   //
   // The following fields originate from the owner of the buffer.
   //
-  VOID  *Buffer;
-  UINTN Size;
+  VOID     *Buffer;
+  UINTN    Size;
   //
   // All of the fields below, until the end of the structure, are
   // zero-initialized when the structure is initially validated.
@@ -105,16 +105,16 @@ typedef struct {
   // for VirtioOperationBusMasterRead or VirtioOperationBusMasterWrite. They
   // are again updated when the buffer is unmapped.
   //
-  BOOLEAN              Mapped;
-  EFI_PHYSICAL_ADDRESS MappedAddress;
-  VOID                 *Mapping;
+  BOOLEAN                 Mapped;
+  EFI_PHYSICAL_ADDRESS    MappedAddress;
+  VOID                    *Mapping;
   //
   // Transferred is updated after VirtioFlush() returns successfully:
   // - for VirtioOperationBusMasterRead, Transferred is set to Size;
   // - for VirtioOperationBusMasterWrite, Transferred is calculated from the
   //   UsedLen output parameter of VirtioFlush().
   //
-  UINTN Transferred;
+  UINTN                   Transferred;
 } VIRTIO_FS_IO_VECTOR;
 
 //
@@ -124,13 +124,13 @@ typedef struct {
   //
   // The following fields originate from the owner of the buffers.
   //
-  VIRTIO_FS_IO_VECTOR *IoVec;
-  UINTN               NumVec;
+  VIRTIO_FS_IO_VECTOR    *IoVec;
+  UINTN                  NumVec;
   //
   // TotalSize is calculated when the scatter-gather list is initially
   // validated.
   //
-  UINT32 TotalSize;
+  UINT32                 TotalSize;
 } VIRTIO_FS_SCATTER_GATHER_LIST;
 
 //
@@ -138,14 +138,14 @@ typedef struct {
 // FUSE file reference.
 //
 typedef struct {
-  UINT64            Signature;
-  EFI_FILE_PROTOCOL SimpleFile;
-  BOOLEAN           IsDirectory;
-  BOOLEAN           IsOpenForWriting;
-  VIRTIO_FS         *OwnerFs;
-  LIST_ENTRY        OpenFilesEntry;
-  CHAR8             *CanonicalPathname;
-  UINT64            FilePosition;
+  UINT64               Signature;
+  EFI_FILE_PROTOCOL    SimpleFile;
+  BOOLEAN              IsDirectory;
+  BOOLEAN              IsOpenForWriting;
+  VIRTIO_FS            *OwnerFs;
+  LIST_ENTRY           OpenFilesEntry;
+  CHAR8                *CanonicalPathname;
+  UINT64               FilePosition;
   //
   // In the FUSE wire protocol, every request except FUSE_INIT refers to a
   // file, namely by the "VIRTIO_FS_FUSE_REQUEST.NodeId" field; that is, by the
@@ -158,8 +158,8 @@ typedef struct {
   // function must send a FUSE request that needs the file handle *in addition*
   // to the inode number, FuseHandle will be at our disposal at once.
   //
-  UINT64 NodeId;
-  UINT64 FuseHandle;
+  UINT64    NodeId;
+  UINT64    FuseHandle;
   //
   // EFI_FILE_INFO objects cached for an in-flight directory read.
   //
@@ -170,10 +170,10 @@ typedef struct {
   // EFI_FILE_INFOs immediately. EFI_FILE_PROTOCOL.Read() invocations (on
   // directories) will be served from this EFI_FILE_INFO cache.
   //
-  UINT8 *FileInfoArray;
-  UINTN SingleFileInfoSize;
-  UINTN NumFileInfo;
-  UINTN NextFileInfo;
+  UINT8    *FileInfoArray;
+  UINTN    SingleFileInfoSize;
+  UINTN    NumFileInfo;
+  UINTN    NextFileInfo;
 } VIRTIO_FS_FILE;
 
 #define VIRTIO_FS_FILE_FROM_SIMPLE_FILE(SimpleFileReference) \
@@ -221,7 +221,7 @@ VirtioFsSgListsSubmit (
 EFI_STATUS
 VirtioFsFuseNewRequest (
   IN OUT VIRTIO_FS              *VirtioFs,
-     OUT VIRTIO_FS_FUSE_REQUEST *Request,
+  OUT VIRTIO_FS_FUSE_REQUEST *Request,
   IN     UINT32                 RequestSize,
   IN     VIRTIO_FS_FUSE_OPCODE  Opcode,
   IN     UINT64                 NodeId
@@ -243,22 +243,22 @@ EFI_STATUS
 VirtioFsAppendPath (
   IN     CHAR8   *LhsPath8,
   IN     CHAR16  *RhsPath16,
-     OUT CHAR8   **ResultPath8,
-     OUT BOOLEAN *RootEscape
+  OUT CHAR8   **ResultPath8,
+  OUT BOOLEAN *RootEscape
   );
 
 EFI_STATUS
 VirtioFsLookupMostSpecificParentDir (
   IN OUT VIRTIO_FS *VirtioFs,
   IN OUT CHAR8     *Path,
-     OUT UINT64    *DirNodeId,
-     OUT CHAR8     **LastComponent
+  OUT UINT64    *DirNodeId,
+  OUT CHAR8     **LastComponent
   );
 
 EFI_STATUS
 VirtioFsGetBasename (
   IN     CHAR8  *Path,
-     OUT CHAR16 *Basename     OPTIONAL,
+  OUT CHAR16 *Basename     OPTIONAL,
   IN OUT UINTN  *BasenameSize
   );
 
@@ -266,14 +266,14 @@ EFI_STATUS
 VirtioFsComposeRenameDestination (
   IN     CHAR8   *LhsPath8,
   IN     CHAR16  *RhsPath16,
-     OUT CHAR8   **ResultPath8,
-     OUT BOOLEAN *RootEscape
+  OUT CHAR8   **ResultPath8,
+  OUT BOOLEAN *RootEscape
   );
 
 EFI_STATUS
 VirtioFsFuseAttrToEfiFileInfo (
   IN     VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr,
-     OUT EFI_FILE_INFO                      *FileInfo
+  OUT EFI_FILE_INFO                      *FileInfo
   );
 
 EFI_STATUS
@@ -286,27 +286,27 @@ VOID
 VirtioFsGetFuseSizeUpdate (
   IN     EFI_FILE_INFO *Info,
   IN     EFI_FILE_INFO *NewInfo,
-     OUT BOOLEAN       *Update,
-     OUT UINT64        *Size
+  OUT BOOLEAN       *Update,
+  OUT UINT64        *Size
   );
 
 EFI_STATUS
 VirtioFsGetFuseTimeUpdates (
   IN     EFI_FILE_INFO *Info,
   IN     EFI_FILE_INFO *NewInfo,
-     OUT BOOLEAN       *UpdateAtime,
-     OUT BOOLEAN       *UpdateMtime,
-     OUT UINT64        *Atime,
-     OUT UINT64        *Mtime
+  OUT BOOLEAN       *UpdateAtime,
+  OUT BOOLEAN       *UpdateMtime,
+  OUT UINT64        *Atime,
+  OUT UINT64        *Mtime
   );
 
 EFI_STATUS
 VirtioFsGetFuseModeUpdate (
   IN     EFI_FILE_INFO *Info,
   IN     EFI_FILE_INFO *NewInfo,
-     OUT BOOLEAN       *Update,
-     OUT UINT32        *Mode
-     );
+  OUT BOOLEAN       *Update,
+  OUT UINT32        *Mode
+  );
 
 //
 // Wrapper functions for FUSE commands (primitives).
@@ -317,8 +317,8 @@ VirtioFsFuseLookup (
   IN OUT VIRTIO_FS                          *VirtioFs,
   IN     UINT64                             DirNodeId,
   IN     CHAR8                              *Name,
-     OUT UINT64                             *NodeId,
-     OUT VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr
+  OUT UINT64                             *NodeId,
+  OUT VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr
   );
 
 EFI_STATUS
@@ -331,7 +331,7 @@ EFI_STATUS
 VirtioFsFuseGetAttr (
   IN OUT VIRTIO_FS                          *VirtioFs,
   IN     UINT64                             NodeId,
-     OUT VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr
+  OUT VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr
   );
 
 EFI_STATUS
@@ -349,7 +349,7 @@ VirtioFsFuseMkDir (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    ParentNodeId,
   IN     CHAR8     *Name,
-     OUT UINT64    *NodeId
+  OUT UINT64    *NodeId
   );
 
 EFI_STATUS
@@ -365,7 +365,7 @@ VirtioFsFuseOpen (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    NodeId,
   IN     BOOLEAN   ReadWrite,
-     OUT UINT64    *FuseHandle
+  OUT UINT64    *FuseHandle
   );
 
 EFI_STATUS
@@ -376,7 +376,7 @@ VirtioFsFuseReadFileOrDir (
   IN     BOOLEAN   IsDir,
   IN     UINT64    Offset,
   IN OUT UINT32    *Size,
-     OUT VOID      *Data
+  OUT VOID      *Data
   );
 
 EFI_STATUS
@@ -393,8 +393,8 @@ EFI_STATUS
 VirtioFsFuseStatFs (
   IN OUT VIRTIO_FS                      *VirtioFs,
   IN     UINT64                         NodeId,
-     OUT VIRTIO_FS_FUSE_STATFS_RESPONSE *FilesysAttr
-     );
+  OUT VIRTIO_FS_FUSE_STATFS_RESPONSE *FilesysAttr
+  );
 
 EFI_STATUS
 VirtioFsFuseReleaseFileOrDir (
@@ -428,7 +428,7 @@ EFI_STATUS
 VirtioFsFuseOpenDir (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    NodeId,
-     OUT UINT64    *FuseHandle
+  OUT UINT64    *FuseHandle
   );
 
 EFI_STATUS
@@ -436,8 +436,8 @@ VirtioFsFuseOpenOrCreate (
   IN OUT VIRTIO_FS *VirtioFs,
   IN     UINT64    ParentNodeId,
   IN     CHAR8     *Name,
-     OUT UINT64    *NodeId,
-     OUT UINT64    *FuseHandle
+  OUT UINT64    *NodeId,
+  OUT UINT64    *FuseHandle
   );
 
 EFI_STATUS
@@ -489,21 +489,21 @@ VirtioFsSimpleFileGetInfo (
   IN     EFI_FILE_PROTOCOL *This,
   IN     EFI_GUID          *InformationType,
   IN OUT UINTN             *BufferSize,
-     OUT VOID              *Buffer
+  OUT VOID              *Buffer
   );
 
 EFI_STATUS
 EFIAPI
 VirtioFsSimpleFileGetPosition (
   IN     EFI_FILE_PROTOCOL *This,
-     OUT UINT64            *Position
+  OUT UINT64            *Position
   );
 
 EFI_STATUS
 EFIAPI
 VirtioFsSimpleFileOpen (
   IN     EFI_FILE_PROTOCOL *This,
-     OUT EFI_FILE_PROTOCOL **NewHandle,
+  OUT EFI_FILE_PROTOCOL **NewHandle,
   IN     CHAR16            *FileName,
   IN     UINT64            OpenMode,
   IN     UINT64            Attributes
@@ -514,7 +514,7 @@ EFIAPI
 VirtioFsSimpleFileRead (
   IN     EFI_FILE_PROTOCOL *This,
   IN OUT UINTN             *BufferSize,
-     OUT VOID              *Buffer
+  OUT VOID              *Buffer
   );
 
 EFI_STATUS

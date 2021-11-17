@@ -61,7 +61,6 @@ QemuFwCfgS3ScriptWriteBytes (
   return RETURN_UNSUPPORTED;
 }
 
-
 /**
   Produce ACPI S3 Boot Script opcodes that (optionally) select an fw_cfg item,
   and transfer data from it.
@@ -112,7 +111,6 @@ QemuFwCfgS3ScriptReadBytes (
   return RETURN_UNSUPPORTED;
 }
 
-
 /**
   Produce ACPI S3 Boot Script opcodes that (optionally) select an fw_cfg item,
   and increase its offset.
@@ -155,7 +153,6 @@ QemuFwCfgS3ScriptSkipBytes (
   ASSERT (FALSE);
   return RETURN_UNSUPPORTED;
 }
-
 
 /**
   Produce ACPI S3 Boot Script opcodes that check a value in ScratchBuffer.

@@ -18,10 +18,10 @@
 
 #include "Smbase.h"
 
-extern CONST UINT8 mPostSmmPen[];
-extern CONST UINT16 mPostSmmPenSize;
-extern CONST UINT8 mFirstSmiHandler[];
-extern CONST UINT16 mFirstSmiHandlerSize;
+extern CONST UINT8   mPostSmmPen[];
+extern CONST UINT16  mPostSmmPenSize;
+extern CONST UINT8   mFirstSmiHandler[];
+extern CONST UINT16  mFirstSmiHandlerSize;
 
 /**
   Allocate a non-SMRAM reserved memory page for the Post-SMM Pen for hot-added
@@ -50,8 +50,8 @@ SmbaseAllocatePostSmmPen (
   IN  CONST EFI_BOOT_SERVICES *BootServices
   )
 {
-  EFI_STATUS           Status;
-  EFI_PHYSICAL_ADDRESS Address;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  Address;
 
   //
   // The pen code must fit in one page, and the last byte must remain free for
@@ -59,14 +59,23 @@ SmbaseAllocatePostSmmPen (
   //
   if (mPostSmmPenSize >= EFI_PAGE_SIZE) {
     Status = EFI_BAD_BUFFER_SIZE;
-    DEBUG ((DEBUG_ERROR, "%a: mPostSmmPenSize=%u: %r\n", __FUNCTION__,
-      mPostSmmPenSize, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: mPostSmmPenSize=%u: %r\n",
+      __FUNCTION__,
+      mPostSmmPenSize,
+      Status
+      ));
     return Status;
   }
 
   Address = BASE_1MB - 1;
-  Status = BootServices->AllocatePages (AllocateMaxAddress,
-                           EfiReservedMemoryType, 1, &Address);
+  Status  = BootServices->AllocatePages (
+                            AllocateMaxAddress,
+                            EfiReservedMemoryType,
+                            1,
+                            &Address
+                            );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: AllocatePages(): %r\n", __FUNCTION__, Status));
     return Status;
@@ -133,10 +142,13 @@ SmbaseInstallFirstSmiHandler (
   VOID
   )
 {
-  FIRST_SMI_HANDLER_CONTEXT *Context;
+  FIRST_SMI_HANDLER_CONTEXT  *Context;
 
-  CopyMem ((VOID *)(UINTN)(SMM_DEFAULT_SMBASE + SMM_HANDLER_OFFSET),
-    mFirstSmiHandler, mFirstSmiHandlerSize);
+  CopyMem (
+    (VOID *)(UINTN)(SMM_DEFAULT_SMBASE + SMM_HANDLER_OFFSET),
+    mFirstSmiHandler,
+    mFirstSmiHandlerSize
+    );
 
   Context = (VOID *)(UINTN)SMM_DEFAULT_SMBASE;
   Context->ApicIdGate = MAX_UINT64;
@@ -189,20 +201,26 @@ SmbaseRelocate (
   IN UINT32  PenAddress
   )
 {
-  EFI_STATUS                         Status;
-  volatile UINT8                     *SmmVacated;
-  volatile FIRST_SMI_HANDLER_CONTEXT *Context;
-  UINT64                             ExchangeResult;
+  EFI_STATUS                          Status;
+  volatile UINT8                      *SmmVacated;
+  volatile FIRST_SMI_HANDLER_CONTEXT  *Context;
+  UINT64                              ExchangeResult;
 
   if (Smbase > MAX_UINT32) {
     Status = EFI_INVALID_PARAMETER;
-    DEBUG ((DEBUG_ERROR, "%a: ApicId=" FMT_APIC_ID " Smbase=0x%Lx: %r\n",
-      __FUNCTION__, ApicId, (UINT64)Smbase, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: ApicId=" FMT_APIC_ID " Smbase=0x%Lx: %r\n",
+      __FUNCTION__,
+      ApicId,
+      (UINT64)Smbase,
+      Status
+      ));
     return Status;
   }
 
   SmmVacated = (UINT8 *)(UINTN)PenAddress + (EFI_PAGE_SIZE - 1);
-  Context = (VOID *)(UINTN)SMM_DEFAULT_SMBASE;
+  Context    = (VOID *)(UINTN)SMM_DEFAULT_SMBASE;
 
   //
   // Clear AboutToLeaveSmm, so we notice when the hot-added CPU is just about
@@ -261,12 +279,21 @@ SmbaseRelocate (
   //
   // Un-gate SMBASE relocation for the hot-added CPU whose APIC ID is ApicId.
   //
-  ExchangeResult = InterlockedCompareExchange64 (&Context->ApicIdGate,
-                     MAX_UINT64, ApicId);
+  ExchangeResult = InterlockedCompareExchange64 (
+                     &Context->ApicIdGate,
+                     MAX_UINT64,
+                     ApicId
+                     );
   if (ExchangeResult != MAX_UINT64) {
     Status = EFI_PROTOCOL_ERROR;
-    DEBUG ((DEBUG_ERROR, "%a: ApicId=" FMT_APIC_ID " ApicIdGate=0x%Lx: %r\n",
-      __FUNCTION__, ApicId, ExchangeResult, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: ApicId=" FMT_APIC_ID " ApicIdGate=0x%Lx: %r\n",
+      __FUNCTION__,
+      ApicId,
+      ExchangeResult,
+      Status
+      ));
     return Status;
   }
 
