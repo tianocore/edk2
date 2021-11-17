@@ -588,7 +588,7 @@ TcgDxeHashLogExtendEventI (
 
 Done:
   if ((Status == EFI_DEVICE_ERROR) || (Status == EFI_TIMEOUT)) {
-    DEBUG ((EFI_D_ERROR, "TcgDxeHashLogExtendEventI - %r. Disable TPM.\n", Status));
+    DEBUG ((DEBUG_ERROR, "TcgDxeHashLogExtendEventI - %r. Disable TPM.\n", Status));
     TcgData->BsCap.TPMPresentFlag = FALSE;
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
@@ -1127,7 +1127,7 @@ OnReadyToBoot (
     //
     Status = MeasureHandoffTables ();
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "HOBs not Measured. Error!\n"));
+      DEBUG ((DEBUG_ERROR, "HOBs not Measured. Error!\n"));
     }
 
     //
@@ -1135,7 +1135,7 @@ OnReadyToBoot (
     //
     Status = MeasureAllBootVariables ();
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Boot Variables not Measured. Error!\n"));
+      DEBUG ((DEBUG_ERROR, "Boot Variables not Measured. Error!\n"));
     }
 
     //
@@ -1145,7 +1145,7 @@ OnReadyToBoot (
                EFI_CALLING_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
+      DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
     }
 
     //
@@ -1177,11 +1177,11 @@ OnReadyToBoot (
                EFI_RETURNING_FROM_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATION));
+      DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATION));
     }
   }
 
-  DEBUG ((EFI_D_INFO, "TPM TcgDxe Measure Data when ReadyToBoot\n"));
+  DEBUG ((DEBUG_INFO, "TPM TcgDxe Measure Data when ReadyToBoot\n"));
   //
   // Increase boot attempt counter.
   //
@@ -1260,7 +1260,7 @@ InstallAcpiTable (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG((EFI_D_ERROR, "Tcg Acpi Table installation failure"));
+    DEBUG((DEBUG_ERROR, "Tcg Acpi Table installation failure"));
   }
 }
 
@@ -1289,7 +1289,7 @@ OnExitBootServices (
              EFI_EXIT_BOOT_SERVICES_INVOCATION
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_INVOCATION));
+    DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_INVOCATION));
   }
 
   //
@@ -1299,7 +1299,7 @@ OnExitBootServices (
              EFI_EXIT_BOOT_SERVICES_SUCCEEDED
              );
   if (EFI_ERROR (Status)){
-    DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_SUCCEEDED));
+    DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_SUCCEEDED));
   }
 }
 
@@ -1328,7 +1328,7 @@ OnExitBootServicesFailed (
              EFI_EXIT_BOOT_SERVICES_FAILED
              );
   if (EFI_ERROR (Status)){
-    DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_FAILED));
+    DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_FAILED));
   }
 }
 
@@ -1381,25 +1381,25 @@ DriverEntry (
   VOID                              *Registration;
 
   if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
-    DEBUG ((EFI_D_ERROR, "No TPM12 instance required!\n"));
+    DEBUG ((DEBUG_ERROR, "No TPM12 instance required!\n"));
     return EFI_UNSUPPORTED;
   }
 
   if (GetFirstGuidHob (&gTpmErrorHobGuid) != NULL) {
-    DEBUG ((EFI_D_ERROR, "TPM error!\n"));
+    DEBUG ((DEBUG_ERROR, "TPM error!\n"));
     return EFI_DEVICE_ERROR;
   }
 
   Status = Tpm12RequestUseTpm ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TPM not detected!\n"));
+    DEBUG ((DEBUG_ERROR, "TPM not detected!\n"));
     return Status;
   }
 
   Status = GetTpmStatus (&mTcgDxeData.BsCap.TPMDeactivatedFlag);
   if (EFI_ERROR (Status)) {
     DEBUG ((
-      EFI_D_ERROR,
+      DEBUG_ERROR,
       "DriverEntry: TPM not working properly\n"
       ));
     return Status;

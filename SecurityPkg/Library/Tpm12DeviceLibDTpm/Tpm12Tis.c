@@ -266,22 +266,22 @@ Tpm12TisTpmCommand (
   DEBUG_CODE (
     UINTN  DebugSize;
 
-    DEBUG ((EFI_D_VERBOSE, "Tpm12TisTpmCommand Send - "));
+    DEBUG ((DEBUG_VERBOSE, "Tpm12TisTpmCommand Send - "));
     if (SizeIn > 0x100) {
       DebugSize = 0x40;
     } else {
       DebugSize = SizeIn;
     }
     for (Index = 0; Index < DebugSize; Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
+      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
     }
     if (DebugSize != SizeIn) {
-      DEBUG ((EFI_D_VERBOSE, "...... "));
+      DEBUG ((DEBUG_VERBOSE, "...... "));
       for (Index = SizeIn - 0x20; Index < SizeIn; Index++) {
-        DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
+        DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
       }
     }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   );
   TpmOutSize = 0;
 
@@ -352,11 +352,11 @@ Tpm12TisTpmCommand (
     }
   }
   DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "Tpm12TisTpmCommand ReceiveHeader - "));
+    DEBUG ((DEBUG_VERBOSE, "Tpm12TisTpmCommand ReceiveHeader - "));
     for (Index = 0; Index < sizeof (TPM_RSP_COMMAND_HDR); Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
+      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
     }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   );
   //
   // Check the response data header (tag, parasize and returncode)
@@ -364,7 +364,7 @@ Tpm12TisTpmCommand (
   CopyMem (&Data16, BufferOut, sizeof (UINT16));
   RspTag = SwapBytes16 (Data16);
   if (RspTag != TPM_TAG_RSP_COMMAND && RspTag != TPM_TAG_RSP_AUTH1_COMMAND && RspTag != TPM_TAG_RSP_AUTH2_COMMAND) {
-    DEBUG ((EFI_D_ERROR, "TPM12: Response tag error - current tag value is %x\n", RspTag));
+    DEBUG ((DEBUG_ERROR, "TPM12: Response tag error - current tag value is %x\n", RspTag));
     Status = EFI_UNSUPPORTED;
     goto Exit;
   }
@@ -396,11 +396,11 @@ Tpm12TisTpmCommand (
   }
 Exit:
   DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "Tpm12TisTpmCommand Receive - "));
+    DEBUG ((DEBUG_VERBOSE, "Tpm12TisTpmCommand Receive - "));
     for (Index = 0; Index < TpmOutSize; Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
+      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
     }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   );
   MmioWrite8((UINTN)&TisReg->Status, TIS_PC_STS_READY);
   return Status;

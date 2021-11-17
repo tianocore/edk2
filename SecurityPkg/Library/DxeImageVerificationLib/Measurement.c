@@ -253,8 +253,8 @@ MeasureVariable (
      VarSize
      );
 
-  DEBUG ((EFI_D_INFO, "DxeImageVerification: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)7, (UINTN)EV_EFI_VARIABLE_AUTHORITY));
-  DEBUG ((EFI_D_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
+  DEBUG ((DEBUG_INFO, "DxeImageVerification: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)7, (UINTN)EV_EFI_VARIABLE_AUTHORITY));
+  DEBUG ((DEBUG_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
 
   Status = TpmMeasureAndLogData (
              7,
@@ -295,7 +295,7 @@ SecureBootHook (
   }
 
   if (IsDataMeasured (VariableName, VendorGuid, Data, DataSize)) {
-    DEBUG ((EFI_D_ERROR, "MeasureSecureAuthorityVariable - IsDataMeasured\n"));
+    DEBUG ((DEBUG_ERROR, "MeasureSecureAuthorityVariable - IsDataMeasured\n"));
     return ;
   }
 
@@ -305,7 +305,7 @@ SecureBootHook (
              Data,
              DataSize
              );
-  DEBUG ((EFI_D_INFO, "MeasureBootPolicyVariable - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "MeasureBootPolicyVariable - %r\n", Status));
 
   if (!EFI_ERROR (Status)) {
     AddDataMeasured (VariableName, VendorGuid, Data, DataSize);

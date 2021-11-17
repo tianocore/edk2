@@ -124,7 +124,7 @@ Tpm2StartAuthSession (
     break;
   default:
     ASSERT (FALSE);
-    DEBUG ((EFI_D_ERROR, "Tpm2StartAuthSession - Symmetric->algorithm - %x\n", Symmetric->algorithm));
+    DEBUG ((DEBUG_ERROR, "Tpm2StartAuthSession - Symmetric->algorithm - %x\n", Symmetric->algorithm));
     return EFI_UNSUPPORTED;
   }
 
@@ -144,11 +144,11 @@ Tpm2StartAuthSession (
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2StartAuthSession - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2StartAuthSession - RecvBufferSize Error - %x\n", RecvBufferSize));
     return EFI_DEVICE_ERROR;
   }
   if (SwapBytes32(RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm2StartAuthSession - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "Tpm2StartAuthSession - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 

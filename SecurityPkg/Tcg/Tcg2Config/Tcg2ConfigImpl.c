@@ -960,7 +960,7 @@ InstallTcg2ConfigForm (
                   &Tcg2ConfigInfo
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_INFO_NAME\n"));
+    DEBUG ((DEBUG_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_INFO_NAME\n"));
   }
 
   return EFI_SUCCESS;

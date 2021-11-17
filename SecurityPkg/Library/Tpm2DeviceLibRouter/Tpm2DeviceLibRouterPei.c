@@ -123,7 +123,7 @@ Tpm2RegisterTpm2DeviceLib (
     //
     // In PEI phase, there will be shadow driver dispatched again.
     //
-    DEBUG ((EFI_D_INFO, "Tpm2RegisterTpm2DeviceLib - Override\n"));
+    DEBUG ((DEBUG_INFO, "Tpm2RegisterTpm2DeviceLib - Override\n"));
     CopyMem (Tpm2DeviceInterface, Tpm2Device, sizeof(*Tpm2Device));
     return EFI_SUCCESS;
   } else {
