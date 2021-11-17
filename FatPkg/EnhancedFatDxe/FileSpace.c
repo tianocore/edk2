@@ -244,7 +244,7 @@ FatFreeClusters (
   while (!FAT_END_OF_FAT_CHAIN (Cluster)) {
     if (Cluster == FAT_CLUSTER_FREE || Cluster >= FAT_CLUSTER_SPECIAL) {
 
-      DEBUG ((EFI_D_INIT | EFI_D_ERROR, "FatShrinkEof: cluster chain corrupt\n"));
+      DEBUG ((DEBUG_INIT | DEBUG_ERROR, "FatShrinkEof: cluster chain corrupt\n"));
       return EFI_VOLUME_CORRUPTED;
     }
 
@@ -374,7 +374,7 @@ FatShrinkEof (
     for (CurSize = 0; CurSize < NewSize; CurSize++) {
       if (Cluster == FAT_CLUSTER_FREE || Cluster >= FAT_CLUSTER_SPECIAL) {
 
-        DEBUG ((EFI_D_INIT | EFI_D_ERROR, "FatShrinkEof: cluster chain corrupt\n"));
+        DEBUG ((DEBUG_INIT | DEBUG_ERROR, "FatShrinkEof: cluster chain corrupt\n"));
         return EFI_VOLUME_CORRUPTED;
       }
 
@@ -464,7 +464,7 @@ FatGrowEof (
         if (Cluster < FAT_MIN_CLUSTER || Cluster > Volume->MaxCluster + 1) {
 
           DEBUG (
-            (EFI_D_INIT | EFI_D_ERROR,
+            (DEBUG_INIT | DEBUG_ERROR,
             "FatGrowEof: cluster chain corrupt\n")
             );
           Status = EFI_VOLUME_CORRUPTED;
@@ -478,7 +478,7 @@ FatGrowEof (
 
       if (ClusterCount != CurSize) {
         DEBUG (
-          (EFI_D_INIT | EFI_D_ERROR,
+          (DEBUG_INIT | DEBUG_ERROR,
           "FatGrowEof: cluster chain size does not match file size\n")
           );
         Status = EFI_VOLUME_CORRUPTED;
@@ -604,7 +604,7 @@ FatOFilePosition (
     while (StartPos + ClusterSize <= Position) {
       StartPos += ClusterSize;
       if (Cluster == FAT_CLUSTER_FREE || (Cluster >= FAT_CLUSTER_SPECIAL)) {
-        DEBUG ((EFI_D_INIT | EFI_D_ERROR, "FatOFilePosition:"" cluster chain corrupt\n"));
+        DEBUG ((DEBUG_INIT | DEBUG_ERROR, "FatOFilePosition:"" cluster chain corrupt\n"));
         return EFI_VOLUME_CORRUPTED;
       }
 
@@ -668,7 +668,7 @@ FatPhysicalDirSize (
     while (!FAT_END_OF_FAT_CHAIN (Cluster)) {
       if (Cluster == FAT_CLUSTER_FREE || Cluster >= FAT_CLUSTER_SPECIAL) {
         DEBUG (
-          (EFI_D_INIT | EFI_D_ERROR,
+          (DEBUG_INIT | DEBUG_ERROR,
           "FATDirSize: cluster chain corrupt\n")
           );
         return 0;
