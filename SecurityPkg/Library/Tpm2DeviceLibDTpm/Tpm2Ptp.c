@@ -154,22 +154,22 @@ PtpCrbTpmCommand (
   DEBUG_CODE (
     UINTN  DebugSize;
 
-    DEBUG ((EFI_D_VERBOSE, "PtpCrbTpmCommand Send - "));
+    DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand Send - "));
     if (SizeIn > 0x100) {
       DebugSize = 0x40;
     } else {
       DebugSize = SizeIn;
     }
     for (Index = 0; Index < DebugSize; Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
+      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
     }
     if (DebugSize != SizeIn) {
-      DEBUG ((EFI_D_VERBOSE, "...... "));
+      DEBUG ((DEBUG_VERBOSE, "...... "));
       for (Index = SizeIn - 0x20; Index < SizeIn; Index++) {
-        DEBUG ((EFI_D_VERBOSE, "%02x ", BufferIn[Index]));
+        DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
       }
     }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   );
   TpmOutSize         = 0;
 
@@ -286,11 +286,11 @@ PtpCrbTpmCommand (
     BufferOut[Index] = MmioRead8 ((UINTN)&CrbReg->CrbDataBuffer[Index]);
   }
   DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "PtpCrbTpmCommand ReceiveHeader - "));
+    DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand ReceiveHeader - "));
     for (Index = 0; Index < sizeof (TPM2_RESPONSE_HEADER); Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
+      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
     }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   );
   //
   // Check the response data header (tag, parasize and returncode)
@@ -298,7 +298,7 @@ PtpCrbTpmCommand (
   CopyMem (&Data16, BufferOut, sizeof (UINT16));
   // TPM2 should not use this RSP_COMMAND
   if (SwapBytes16 (Data16) == TPM_ST_RSP_COMMAND) {
-    DEBUG ((EFI_D_ERROR, "TPM2: TPM_ST_RSP error - %x\n", TPM_ST_RSP_COMMAND));
+    DEBUG ((DEBUG_ERROR, "TPM2: TPM_ST_RSP error - %x\n", TPM_ST_RSP_COMMAND));
     Status = EFI_UNSUPPORTED;
     goto GoIdle_Exit;
   }
@@ -321,11 +321,11 @@ PtpCrbTpmCommand (
   }
 
   DEBUG_CODE (
-    DEBUG ((EFI_D_VERBOSE, "PtpCrbTpmCommand Receive - "));
+    DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand Receive - "));
     for (Index = 0; Index < TpmOutSize; Index++) {
-      DEBUG ((EFI_D_VERBOSE, "%02x ", BufferOut[Index]));
+      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
     }
-    DEBUG ((EFI_D_VERBOSE, "\n"));
+    DEBUG ((DEBUG_VERBOSE, "\n"));
   );
 
 GoReady_Exit:
@@ -494,36 +494,36 @@ DumpPtpInfo (
   //
   // Dump InterfaceId Register for PTP
   //
-  DEBUG ((EFI_D_INFO, "InterfaceId - 0x%08x\n", InterfaceId.Uint32));
-  DEBUG ((EFI_D_INFO, "  InterfaceType    - 0x%02x\n", InterfaceId.Bits.InterfaceType));
+  DEBUG ((DEBUG_INFO, "InterfaceId - 0x%08x\n", InterfaceId.Uint32));
+  DEBUG ((DEBUG_INFO, "  InterfaceType    - 0x%02x\n", InterfaceId.Bits.InterfaceType));
   if (InterfaceId.Bits.InterfaceType != PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) {
-    DEBUG ((EFI_D_INFO, "  InterfaceVersion - 0x%02x\n", InterfaceId.Bits.InterfaceVersion));
-    DEBUG ((EFI_D_INFO, "  CapFIFO          - 0x%x\n", InterfaceId.Bits.CapFIFO));
-    DEBUG ((EFI_D_INFO, "  CapCRB           - 0x%x\n", InterfaceId.Bits.CapCRB));
+    DEBUG ((DEBUG_INFO, "  InterfaceVersion - 0x%02x\n", InterfaceId.Bits.InterfaceVersion));
+    DEBUG ((DEBUG_INFO, "  CapFIFO          - 0x%x\n", InterfaceId.Bits.CapFIFO));
+    DEBUG ((DEBUG_INFO, "  CapCRB           - 0x%x\n", InterfaceId.Bits.CapCRB));
   }
 
   //
   // Dump Capability Register for TIS and FIFO
   //
-  DEBUG ((EFI_D_INFO, "InterfaceCapability - 0x%08x\n", InterfaceCapability.Uint32));
+  DEBUG ((DEBUG_INFO, "InterfaceCapability - 0x%08x\n", InterfaceCapability.Uint32));
   if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) ||
       (InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO)) {
-    DEBUG ((EFI_D_INFO, "  InterfaceVersion - 0x%x\n", InterfaceCapability.Bits.InterfaceVersion));
+    DEBUG ((DEBUG_INFO, "  InterfaceVersion - 0x%x\n", InterfaceCapability.Bits.InterfaceVersion));
   }
 
   //
   // Dump StatusEx Register for PTP FIFO
   //
-  DEBUG ((EFI_D_INFO, "StatusEx - 0x%02x\n", StatusEx));
+  DEBUG ((DEBUG_INFO, "StatusEx - 0x%02x\n", StatusEx));
   if (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP) {
-    DEBUG ((EFI_D_INFO, "  TpmFamily - 0x%x\n", (StatusEx & PTP_FIFO_STS_EX_TPM_FAMILY) >> PTP_FIFO_STS_EX_TPM_FAMILY_OFFSET));
+    DEBUG ((DEBUG_INFO, "  TpmFamily - 0x%x\n", (StatusEx & PTP_FIFO_STS_EX_TPM_FAMILY) >> PTP_FIFO_STS_EX_TPM_FAMILY_OFFSET));
   }
 
   Vid = 0xFFFF;
   Did = 0xFFFF;
   Rid = 0xFF;
   PtpInterface = GetCachedPtpInterface ();
-  DEBUG ((EFI_D_INFO, "PtpInterface - %x\n", PtpInterface));
+  DEBUG ((DEBUG_INFO, "PtpInterface - %x\n", PtpInterface));
   switch (PtpInterface) {
   case Tpm2PtpInterfaceCrb:
     Vid = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Vid);
@@ -539,9 +539,9 @@ DumpPtpInfo (
   default:
     break;
   }
-  DEBUG ((EFI_D_INFO, "VID - 0x%04x\n", Vid));
-  DEBUG ((EFI_D_INFO, "DID - 0x%04x\n", Did));
-  DEBUG ((EFI_D_INFO, "RID - 0x%02x\n", Rid));
+  DEBUG ((DEBUG_INFO, "VID - 0x%04x\n", Vid));
+  DEBUG ((DEBUG_INFO, "DID - 0x%04x\n", Did));
+  DEBUG ((DEBUG_INFO, "RID - 0x%02x\n", Rid));
 }
 
 /**

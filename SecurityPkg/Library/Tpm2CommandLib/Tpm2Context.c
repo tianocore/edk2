@@ -67,14 +67,13 @@ Tpm2FlushContext (
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2FlushContext - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2FlushContext - RecvBufferSize Error - %x\n", RecvBufferSize));
     return EFI_DEVICE_ERROR;
   }
   if (SwapBytes32(RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm2FlushContext - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "Tpm2FlushContext - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
   return EFI_SUCCESS;
 }
-

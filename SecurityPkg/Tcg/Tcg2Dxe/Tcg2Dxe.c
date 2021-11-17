@@ -158,7 +158,7 @@ InternalDumpData (
 {
   UINTN  Index;
   for (Index = 0; Index < Size; Index++) {
-    DEBUG ((EFI_D_INFO, "%02x", (UINTN)Data[Index]));
+    DEBUG ((DEBUG_INFO, "%02x", (UINTN)Data[Index]));
   }
 }
 
@@ -261,15 +261,15 @@ InternalDumpHex (
   Count = Size / COLUME_SIZE;
   Left  = Size % COLUME_SIZE;
   for (Index = 0; Index < Count; Index++) {
-    DEBUG ((EFI_D_INFO, "%04x: ", Index * COLUME_SIZE));
+    DEBUG ((DEBUG_INFO, "%04x: ", Index * COLUME_SIZE));
     InternalDumpData (Data + Index * COLUME_SIZE, COLUME_SIZE);
-    DEBUG ((EFI_D_INFO, "\n"));
+    DEBUG ((DEBUG_INFO, "\n"));
   }
 
   if (Left != 0) {
-    DEBUG ((EFI_D_INFO, "%04x: ", Index * COLUME_SIZE));
+    DEBUG ((DEBUG_INFO, "%04x: ", Index * COLUME_SIZE));
     InternalDumpData (Data + Index * COLUME_SIZE, Left);
-    DEBUG ((EFI_D_INFO, "\n"));
+    DEBUG ((DEBUG_INFO, "\n"));
   }
 }
 
@@ -402,7 +402,7 @@ Tcg2GetCapability (
         ProtocolCapability->StructureVersion.Minor = 0;
         ProtocolCapability->ProtocolVersion.Major = 1;
         ProtocolCapability->ProtocolVersion.Minor = 0;
-        DEBUG ((EFI_D_ERROR, "TreeGetCapability (Compatible) - %r\n", EFI_SUCCESS));
+        DEBUG ((DEBUG_ERROR, "TreeGetCapability (Compatible) - %r\n", EFI_SUCCESS));
         return EFI_SUCCESS;
       }
     }
@@ -427,15 +427,15 @@ DumpEvent (
 {
   UINTN                     Index;
 
-  DEBUG ((EFI_D_INFO, "  Event:\n"));
-  DEBUG ((EFI_D_INFO, "    PCRIndex  - %d\n", EventHdr->PCRIndex));
-  DEBUG ((EFI_D_INFO, "    EventType - 0x%08x\n", EventHdr->EventType));
-  DEBUG ((EFI_D_INFO, "    Digest    - "));
+  DEBUG ((DEBUG_INFO, "  Event:\n"));
+  DEBUG ((DEBUG_INFO, "    PCRIndex  - %d\n", EventHdr->PCRIndex));
+  DEBUG ((DEBUG_INFO, "    EventType - 0x%08x\n", EventHdr->EventType));
+  DEBUG ((DEBUG_INFO, "    Digest    - "));
   for (Index = 0; Index < sizeof(TCG_DIGEST); Index++) {
-    DEBUG ((EFI_D_INFO, "%02x ", EventHdr->Digest.digest[Index]));
+    DEBUG ((DEBUG_INFO, "%02x ", EventHdr->Digest.digest[Index]));
   }
-  DEBUG ((EFI_D_INFO, "\n"));
-  DEBUG ((EFI_D_INFO, "    EventSize - 0x%08x\n", EventHdr->EventSize));
+  DEBUG ((DEBUG_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "    EventSize - 0x%08x\n", EventHdr->EventSize));
   InternalDumpHex ((UINT8 *)(EventHdr + 1), EventHdr->EventSize);
 }
 
@@ -455,33 +455,33 @@ DumpTcgEfiSpecIdEventStruct (
   UINT8                            *VendorInfo;
   UINT32                           NumberOfAlgorithms;
 
-  DEBUG ((EFI_D_INFO, "  TCG_EfiSpecIDEventStruct:\n"));
-  DEBUG ((EFI_D_INFO, "    signature          - '"));
+  DEBUG ((DEBUG_INFO, "  TCG_EfiSpecIDEventStruct:\n"));
+  DEBUG ((DEBUG_INFO, "    signature          - '"));
   for (Index = 0; Index < sizeof(TcgEfiSpecIdEventStruct->signature); Index++) {
-    DEBUG ((EFI_D_INFO, "%c", TcgEfiSpecIdEventStruct->signature[Index]));
+    DEBUG ((DEBUG_INFO, "%c", TcgEfiSpecIdEventStruct->signature[Index]));
   }
-  DEBUG ((EFI_D_INFO, "'\n"));
-  DEBUG ((EFI_D_INFO, "    platformClass      - 0x%08x\n", TcgEfiSpecIdEventStruct->platformClass));
-  DEBUG ((EFI_D_INFO, "    specVersion        - %d.%d%d\n", TcgEfiSpecIdEventStruct->specVersionMajor, TcgEfiSpecIdEventStruct->specVersionMinor, TcgEfiSpecIdEventStruct->specErrata));
-  DEBUG ((EFI_D_INFO, "    uintnSize          - 0x%02x\n", TcgEfiSpecIdEventStruct->uintnSize));
+  DEBUG ((DEBUG_INFO, "'\n"));
+  DEBUG ((DEBUG_INFO, "    platformClass      - 0x%08x\n", TcgEfiSpecIdEventStruct->platformClass));
+  DEBUG ((DEBUG_INFO, "    specVersion        - %d.%d%d\n", TcgEfiSpecIdEventStruct->specVersionMajor, TcgEfiSpecIdEventStruct->specVersionMinor, TcgEfiSpecIdEventStruct->specErrata));
+  DEBUG ((DEBUG_INFO, "    uintnSize          - 0x%02x\n", TcgEfiSpecIdEventStruct->uintnSize));
 
   CopyMem (&NumberOfAlgorithms, TcgEfiSpecIdEventStruct + 1, sizeof(NumberOfAlgorithms));
-  DEBUG ((EFI_D_INFO, "    NumberOfAlgorithms - 0x%08x\n", NumberOfAlgorithms));
+  DEBUG ((DEBUG_INFO, "    NumberOfAlgorithms - 0x%08x\n", NumberOfAlgorithms));
 
   DigestSize = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof(*TcgEfiSpecIdEventStruct) + sizeof(NumberOfAlgorithms));
   for (Index = 0; Index < NumberOfAlgorithms; Index++) {
-    DEBUG ((EFI_D_INFO, "    digest(%d)\n", Index));
-    DEBUG ((EFI_D_INFO, "      algorithmId      - 0x%04x\n", DigestSize[Index].algorithmId));
-    DEBUG ((EFI_D_INFO, "      digestSize       - 0x%04x\n", DigestSize[Index].digestSize));
+    DEBUG ((DEBUG_INFO, "    digest(%d)\n", Index));
+    DEBUG ((DEBUG_INFO, "      algorithmId      - 0x%04x\n", DigestSize[Index].algorithmId));
+    DEBUG ((DEBUG_INFO, "      digestSize       - 0x%04x\n", DigestSize[Index].digestSize));
   }
   VendorInfoSize = (UINT8 *)&DigestSize[NumberOfAlgorithms];
-  DEBUG ((EFI_D_INFO, "    VendorInfoSize     - 0x%02x\n", *VendorInfoSize));
+  DEBUG ((DEBUG_INFO, "    VendorInfoSize     - 0x%02x\n", *VendorInfoSize));
   VendorInfo = VendorInfoSize + 1;
-  DEBUG ((EFI_D_INFO, "    VendorInfo         - "));
+  DEBUG ((DEBUG_INFO, "    VendorInfo         - "));
   for (Index = 0; Index < *VendorInfoSize; Index++) {
-    DEBUG ((EFI_D_INFO, "%02x ", VendorInfo[Index]));
+    DEBUG ((DEBUG_INFO, "%02x ", VendorInfo[Index]));
   }
-  DEBUG ((EFI_D_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "\n"));
 }
 
 /**
@@ -524,34 +524,34 @@ DumpEvent2 (
   UINT32                    EventSize;
   UINT8                     *EventBuffer;
 
-  DEBUG ((EFI_D_INFO, "  Event:\n"));
-  DEBUG ((EFI_D_INFO, "    PCRIndex  - %d\n", TcgPcrEvent2->PCRIndex));
-  DEBUG ((EFI_D_INFO, "    EventType - 0x%08x\n", TcgPcrEvent2->EventType));
+  DEBUG ((DEBUG_INFO, "  Event:\n"));
+  DEBUG ((DEBUG_INFO, "    PCRIndex  - %d\n", TcgPcrEvent2->PCRIndex));
+  DEBUG ((DEBUG_INFO, "    EventType - 0x%08x\n", TcgPcrEvent2->EventType));
 
-  DEBUG ((EFI_D_INFO, "    DigestCount: 0x%08x\n", TcgPcrEvent2->Digest.count));
+  DEBUG ((DEBUG_INFO, "    DigestCount: 0x%08x\n", TcgPcrEvent2->Digest.count));
 
   DigestCount = TcgPcrEvent2->Digest.count;
   HashAlgo = TcgPcrEvent2->Digest.digests[0].hashAlg;
   DigestBuffer = (UINT8 *)&TcgPcrEvent2->Digest.digests[0].digest;
   for (DigestIndex = 0; DigestIndex < DigestCount; DigestIndex++) {
-    DEBUG ((EFI_D_INFO, "      HashAlgo : 0x%04x\n", HashAlgo));
-    DEBUG ((EFI_D_INFO, "      Digest(%d): ", DigestIndex));
+    DEBUG ((DEBUG_INFO, "      HashAlgo : 0x%04x\n", HashAlgo));
+    DEBUG ((DEBUG_INFO, "      Digest(%d): ", DigestIndex));
     DigestSize = GetHashSizeFromAlgo (HashAlgo);
     for (Index = 0; Index < DigestSize; Index++) {
-      DEBUG ((EFI_D_INFO, "%02x ", DigestBuffer[Index]));
+      DEBUG ((DEBUG_INFO, "%02x ", DigestBuffer[Index]));
     }
-    DEBUG ((EFI_D_INFO, "\n"));
+    DEBUG ((DEBUG_INFO, "\n"));
     //
     // Prepare next
     //
     CopyMem (&HashAlgo, DigestBuffer + DigestSize, sizeof(TPMI_ALG_HASH));
     DigestBuffer = DigestBuffer + DigestSize + sizeof(TPMI_ALG_HASH);
   }
-  DEBUG ((EFI_D_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "\n"));
   DigestBuffer = DigestBuffer - sizeof(TPMI_ALG_HASH);
 
   CopyMem (&EventSize, DigestBuffer, sizeof(TcgPcrEvent2->EventSize));
-  DEBUG ((EFI_D_INFO, "    EventSize - 0x%08x\n", EventSize));
+  DEBUG ((DEBUG_INFO, "    EventSize - 0x%08x\n", EventSize));
   EventBuffer = DigestBuffer + sizeof(TcgPcrEvent2->EventSize);
   InternalDumpHex (EventBuffer, EventSize);
 }
@@ -617,7 +617,7 @@ DumpEventLog (
   TCG_EfiSpecIDEventStruct  *TcgEfiSpecIdEventStruct;
   UINTN                     NumberOfEvents;
 
-  DEBUG ((EFI_D_INFO, "EventLogFormat: (0x%x)\n", EventLogFormat));
+  DEBUG ((DEBUG_INFO, "EventLogFormat: (0x%x)\n", EventLogFormat));
 
   switch (EventLogFormat) {
   case EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2:
@@ -627,11 +627,11 @@ DumpEventLog (
       EventHdr = (TCG_PCR_EVENT_HDR *)((UINTN)EventHdr + sizeof(TCG_PCR_EVENT_HDR) + EventHdr->EventSize);
     }
     if (FinalEventsTable == NULL) {
-      DEBUG ((EFI_D_INFO, "FinalEventsTable: NOT FOUND\n"));
+      DEBUG ((DEBUG_INFO, "FinalEventsTable: NOT FOUND\n"));
     } else {
-      DEBUG ((EFI_D_INFO, "FinalEventsTable:    (0x%x)\n", FinalEventsTable));
-      DEBUG ((EFI_D_INFO, "  Version:           (0x%x)\n", FinalEventsTable->Version));
-      DEBUG ((EFI_D_INFO, "  NumberOfEvents:    (0x%x)\n", FinalEventsTable->NumberOfEvents));
+      DEBUG ((DEBUG_INFO, "FinalEventsTable:    (0x%x)\n", FinalEventsTable));
+      DEBUG ((DEBUG_INFO, "  Version:           (0x%x)\n", FinalEventsTable->Version));
+      DEBUG ((DEBUG_INFO, "  NumberOfEvents:    (0x%x)\n", FinalEventsTable->NumberOfEvents));
 
       EventHdr = (TCG_PCR_EVENT_HDR *)(UINTN)(FinalEventsTable + 1);
       for (NumberOfEvents = 0; NumberOfEvents < FinalEventsTable->NumberOfEvents; NumberOfEvents++) {
@@ -657,11 +657,11 @@ DumpEventLog (
     }
 
     if (FinalEventsTable == NULL) {
-      DEBUG ((EFI_D_INFO, "FinalEventsTable: NOT FOUND\n"));
+      DEBUG ((DEBUG_INFO, "FinalEventsTable: NOT FOUND\n"));
     } else {
-      DEBUG ((EFI_D_INFO, "FinalEventsTable:    (0x%x)\n", FinalEventsTable));
-      DEBUG ((EFI_D_INFO, "  Version:           (0x%x)\n", FinalEventsTable->Version));
-      DEBUG ((EFI_D_INFO, "  NumberOfEvents:    (0x%x)\n", FinalEventsTable->NumberOfEvents));
+      DEBUG ((DEBUG_INFO, "FinalEventsTable:    (0x%x)\n", FinalEventsTable));
+      DEBUG ((DEBUG_INFO, "  Version:           (0x%x)\n", FinalEventsTable->Version));
+      DEBUG ((DEBUG_INFO, "  NumberOfEvents:    (0x%x)\n", FinalEventsTable->NumberOfEvents));
 
       TcgPcrEvent2 = (TCG_PCR_EVENT2 *)(UINTN)(FinalEventsTable + 1);
       for (NumberOfEvents = 0; NumberOfEvents < FinalEventsTable->NumberOfEvents; NumberOfEvents++) {
@@ -704,7 +704,7 @@ Tcg2GetEventLog (
 {
   UINTN  Index;
 
-  DEBUG ((EFI_D_INFO, "Tcg2GetEventLog ... (0x%x)\n", EventLogFormat));
+  DEBUG ((DEBUG_INFO, "Tcg2GetEventLog ... (0x%x)\n", EventLogFormat));
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -739,7 +739,7 @@ Tcg2GetEventLog (
 
   if (EventLogLocation != NULL) {
     *EventLogLocation = mTcgDxeData.EventLogAreaStruct[Index].Lasa;
-    DEBUG ((EFI_D_INFO, "Tcg2GetEventLog (EventLogLocation - %x)\n", *EventLogLocation));
+    DEBUG ((DEBUG_INFO, "Tcg2GetEventLog (EventLogLocation - %x)\n", *EventLogLocation));
   }
 
   if (EventLogLastEntry != NULL) {
@@ -748,15 +748,15 @@ Tcg2GetEventLog (
     } else {
       *EventLogLastEntry = (EFI_PHYSICAL_ADDRESS)(UINTN)mTcgDxeData.EventLogAreaStruct[Index].LastEvent;
     }
-    DEBUG ((EFI_D_INFO, "Tcg2GetEventLog (EventLogLastEntry - %x)\n", *EventLogLastEntry));
+    DEBUG ((DEBUG_INFO, "Tcg2GetEventLog (EventLogLastEntry - %x)\n", *EventLogLastEntry));
   }
 
   if (EventLogTruncated != NULL) {
     *EventLogTruncated = mTcgDxeData.EventLogAreaStruct[Index].EventLogTruncated;
-    DEBUG ((EFI_D_INFO, "Tcg2GetEventLog (EventLogTruncated - %x)\n", *EventLogTruncated));
+    DEBUG ((DEBUG_INFO, "Tcg2GetEventLog (EventLogTruncated - %x)\n", *EventLogTruncated));
   }
 
-  DEBUG ((EFI_D_INFO, "Tcg2GetEventLog - %r\n", EFI_SUCCESS));
+  DEBUG ((DEBUG_INFO, "Tcg2GetEventLog - %r\n", EFI_SUCCESS));
 
   // Dump Event Log for debug purpose
   if ((EventLogLocation != NULL) && (EventLogLastEntry != NULL)) {
@@ -979,8 +979,8 @@ TcgDxeLogEvent (
       // Increase the NumberOfEvents in FinalEventsTable
       //
       (mTcgDxeData.FinalEventsTable[Index])->NumberOfEvents ++;
-      DEBUG ((EFI_D_INFO, "FinalEventsTable->NumberOfEvents - 0x%x\n", (mTcgDxeData.FinalEventsTable[Index])->NumberOfEvents));
-      DEBUG ((EFI_D_INFO, "  Size - 0x%x\n", (UINTN)EventLogAreaStruct->EventLogSize));
+      DEBUG ((DEBUG_INFO, "FinalEventsTable->NumberOfEvents - 0x%x\n", (mTcgDxeData.FinalEventsTable[Index])->NumberOfEvents));
+      DEBUG ((DEBUG_INFO, "  Size - 0x%x\n", (UINTN)EventLogAreaStruct->EventLogSize));
     }
   }
 
@@ -1100,12 +1100,12 @@ TcgDxeLogHashEvent (
   UINT8                             *DigestBuffer;
   UINT32                            *EventSizePtr;
 
-  DEBUG ((EFI_D_INFO, "SupportedEventLogs - 0x%08x\n", mTcgDxeData.BsCap.SupportedEventLogs));
+  DEBUG ((DEBUG_INFO, "SupportedEventLogs - 0x%08x\n", mTcgDxeData.BsCap.SupportedEventLogs));
 
   RetStatus = EFI_SUCCESS;
   for (Index = 0; Index < sizeof(mTcg2EventInfo)/sizeof(mTcg2EventInfo[0]); Index++) {
     if ((mTcgDxeData.BsCap.SupportedEventLogs & mTcg2EventInfo[Index].LogFormat) != 0) {
-      DEBUG ((EFI_D_INFO, "  LogFormat - 0x%08x\n", mTcg2EventInfo[Index].LogFormat));
+      DEBUG ((DEBUG_INFO, "  LogFormat - 0x%08x\n", mTcg2EventInfo[Index].LogFormat));
       switch (mTcg2EventInfo[Index].LogFormat) {
       case EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2:
         Status = GetDigestFromDigestList (TPM_ALG_SHA1, DigestList, &NewEventHdr->Digest);
@@ -1223,7 +1223,7 @@ TcgDxeHashLogExtendEvent (
   }
 
   if (Status == EFI_DEVICE_ERROR) {
-    DEBUG ((EFI_D_ERROR, "TcgDxeHashLogExtendEvent - %r. Disable TPM.\n", Status));
+    DEBUG ((DEBUG_ERROR, "TcgDxeHashLogExtendEvent - %r. Disable TPM.\n", Status));
     mTcgDxeData.BsCap.TPMPresentFlag = FALSE;
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
@@ -1307,7 +1307,7 @@ Tcg2HashLogExtendEvent (
       }
     }
     if (Status == EFI_DEVICE_ERROR) {
-      DEBUG ((EFI_D_ERROR, "MeasurePeImageAndExtend - %r. Disable TPM.\n", Status));
+      DEBUG ((DEBUG_ERROR, "MeasurePeImageAndExtend - %r. Disable TPM.\n", Status));
       mTcgDxeData.BsCap.TPMPresentFlag = FALSE;
       REPORT_STATUS_CODE (
         EFI_ERROR_CODE | EFI_ERROR_MINOR,
@@ -1353,7 +1353,7 @@ Tcg2SubmitCommand (
 {
   EFI_STATUS    Status;
 
-  DEBUG ((EFI_D_INFO, "Tcg2SubmitCommand ...\n"));
+  DEBUG ((DEBUG_INFO, "Tcg2SubmitCommand ...\n"));
 
   if ((This == NULL) ||
       (InputParameterBlockSize == 0) || (InputParameterBlock == NULL) ||
@@ -1378,7 +1378,7 @@ Tcg2SubmitCommand (
              &OutputParameterBlockSize,
              OutputParameterBlock
              );
-  DEBUG ((EFI_D_INFO, "Tcg2SubmitCommand - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "Tcg2SubmitCommand - %r\n", Status));
   return Status;
 }
 
@@ -1424,7 +1424,7 @@ Tcg2SetActivePCRBanks (
   EFI_STATUS  Status;
   UINT32      ReturnCode;
 
-  DEBUG ((EFI_D_INFO, "Tcg2SetActivePCRBanks ... (0x%x)\n", ActivePcrBanks));
+  DEBUG ((DEBUG_INFO, "Tcg2SetActivePCRBanks ... (0x%x)\n", ActivePcrBanks));
 
   if (ActivePcrBanks == 0) {
     return EFI_INVALID_PARAMETER;
@@ -1451,7 +1451,7 @@ Tcg2SetActivePCRBanks (
     Status = EFI_DEVICE_ERROR;
   }
 
-  DEBUG ((EFI_D_INFO, "Tcg2SetActivePCRBanks - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "Tcg2SetActivePCRBanks - %r\n", Status));
 
   return Status;
 }
@@ -1532,7 +1532,7 @@ SetupEventLog (
   UINT32                          NumberOfAlgorithms;
   TCG_EfiStartupLocalityEvent     StartupLocalityEvent;
 
-  DEBUG ((EFI_D_INFO, "SetupEventLog\n"));
+  DEBUG ((DEBUG_INFO, "SetupEventLog\n"));
 
   //
   // 1. Create Log Area
@@ -1939,7 +1939,7 @@ MeasureSeparatorEvent (
   TCG_PCR_EVENT_HDR                 TcgEvent;
   UINT32                            EventData;
 
-  DEBUG ((EFI_D_INFO, "MeasureSeparatorEvent Pcr - %x\n", PCRIndex));
+  DEBUG ((DEBUG_INFO, "MeasureSeparatorEvent Pcr - %x\n", PCRIndex));
 
   EventData = 0;
   TcgEvent.PCRIndex  = PCRIndex;
@@ -1984,8 +1984,8 @@ MeasureVariable (
   UINTN                             VarNameLength;
   UEFI_VARIABLE_DATA                *VarLog;
 
-  DEBUG ((EFI_D_INFO, "Tcg2Dxe: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)PCRIndex, (UINTN)EventType));
-  DEBUG ((EFI_D_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
+  DEBUG ((DEBUG_INFO, "Tcg2Dxe: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)PCRIndex, (UINTN)EventType));
+  DEBUG ((DEBUG_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
 
   VarNameLength      = StrLen (VarName);
   TcgEvent.PCRIndex  = PCRIndex;
@@ -2335,11 +2335,11 @@ MeasureSecureBootPolicy (
 
   if (PcdGetBool (PcdFirmwareDebuggerInitialized)) {
     Status = MeasureLaunchOfFirmwareDebugger ();
-    DEBUG ((EFI_D_INFO, "MeasureLaunchOfFirmwareDebugger - %r\n", Status));
+    DEBUG ((DEBUG_INFO, "MeasureLaunchOfFirmwareDebugger - %r\n", Status));
   }
 
   Status = MeasureAllSecureVariables ();
-  DEBUG ((EFI_D_INFO, "MeasureAllSecureVariables - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "MeasureAllSecureVariables - %r\n", Status));
 
   //
   // We need measure Separator(7) here, because this event must be between SecureBootPolicy (Configure)
@@ -2348,7 +2348,7 @@ MeasureSecureBootPolicy (
   // the Authority measurement happen before ReadToBoot event.
   //
   Status = MeasureSeparatorEvent (7);
-  DEBUG ((EFI_D_INFO, "MeasureSeparatorEvent - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "MeasureSeparatorEvent - %r\n", Status));
   return ;
 }
 
@@ -2379,7 +2379,7 @@ OnReadyToBoot (
     //
     Status = MeasureHandoffTables ();
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "HOBs not Measured. Error!\n"));
+      DEBUG ((DEBUG_ERROR, "HOBs not Measured. Error!\n"));
     }
 
     //
@@ -2387,7 +2387,7 @@ OnReadyToBoot (
     //
     Status = MeasureAllBootVariables ();
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Boot Variables not Measured. Error!\n"));
+      DEBUG ((DEBUG_ERROR, "Boot Variables not Measured. Error!\n"));
     }
 
     //
@@ -2398,7 +2398,7 @@ OnReadyToBoot (
                EFI_CALLING_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
+      DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
     }
 
     //
@@ -2432,7 +2432,7 @@ OnReadyToBoot (
                EFI_RETURNING_FROM_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATION));
+      DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATION));
     }
 
     //
@@ -2444,11 +2444,11 @@ OnReadyToBoot (
                EFI_CALLING_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
+      DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
     }
   }
 
-  DEBUG ((EFI_D_INFO, "TPM2 Tcg2Dxe Measure Data when ReadyToBoot\n"));
+  DEBUG ((DEBUG_INFO, "TPM2 Tcg2Dxe Measure Data when ReadyToBoot\n"));
   //
   // Increase boot attempt counter.
   //
@@ -2482,7 +2482,7 @@ OnExitBootServices (
              EFI_EXIT_BOOT_SERVICES_INVOCATION
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_INVOCATION));
+    DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_INVOCATION));
   }
 
   //
@@ -2493,7 +2493,7 @@ OnExitBootServices (
              EFI_EXIT_BOOT_SERVICES_SUCCEEDED
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_SUCCEEDED));
+    DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_SUCCEEDED));
   }
 }
 
@@ -2523,7 +2523,7 @@ OnExitBootServicesFailed (
              EFI_EXIT_BOOT_SERVICES_FAILED
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_FAILED));
+    DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_FAILED));
   }
 
 }
@@ -2646,13 +2646,13 @@ DriverEntry (
   }
 
   if (GetFirstGuidHob (&gTpmErrorHobGuid) != NULL) {
-    DEBUG ((EFI_D_ERROR, "TPM2 error!\n"));
+    DEBUG ((DEBUG_ERROR, "TPM2 error!\n"));
     return EFI_DEVICE_ERROR;
   }
 
   Status = Tpm2RequestUseTpm ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TPM2 not detected!\n"));
+    DEBUG ((DEBUG_ERROR, "TPM2 not detected!\n"));
     return Status;
   }
 
@@ -2667,14 +2667,14 @@ DriverEntry (
   mTcgDxeData.BsCap.StructureVersion.Major = 1;
   mTcgDxeData.BsCap.StructureVersion.Minor = 1;
 
-  DEBUG ((EFI_D_INFO, "Tcg2.ProtocolVersion  - %02x.%02x\n", mTcgDxeData.BsCap.ProtocolVersion.Major, mTcgDxeData.BsCap.ProtocolVersion.Minor));
-  DEBUG ((EFI_D_INFO, "Tcg2.StructureVersion - %02x.%02x\n", mTcgDxeData.BsCap.StructureVersion.Major, mTcgDxeData.BsCap.StructureVersion.Minor));
+  DEBUG ((DEBUG_INFO, "Tcg2.ProtocolVersion  - %02x.%02x\n", mTcgDxeData.BsCap.ProtocolVersion.Major, mTcgDxeData.BsCap.ProtocolVersion.Minor));
+  DEBUG ((DEBUG_INFO, "Tcg2.StructureVersion - %02x.%02x\n", mTcgDxeData.BsCap.StructureVersion.Major, mTcgDxeData.BsCap.StructureVersion.Minor));
 
   Status = Tpm2GetCapabilityManufactureID (&mTcgDxeData.BsCap.ManufacturerID);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2GetCapabilityManufactureID fail!\n"));
+    DEBUG ((DEBUG_ERROR, "Tpm2GetCapabilityManufactureID fail!\n"));
   } else {
-    DEBUG ((EFI_D_INFO, "Tpm2GetCapabilityManufactureID - %08x\n", mTcgDxeData.BsCap.ManufacturerID));
+    DEBUG ((DEBUG_INFO, "Tpm2GetCapabilityManufactureID - %08x\n", mTcgDxeData.BsCap.ManufacturerID));
   }
 
   DEBUG_CODE (
@@ -2683,19 +2683,19 @@ DriverEntry (
 
     Status = Tpm2GetCapabilityFirmwareVersion (&FirmwareVersion1, &FirmwareVersion2);
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "Tpm2GetCapabilityFirmwareVersion fail!\n"));
+      DEBUG ((DEBUG_ERROR, "Tpm2GetCapabilityFirmwareVersion fail!\n"));
     } else {
-      DEBUG ((EFI_D_INFO, "Tpm2GetCapabilityFirmwareVersion - %08x %08x\n", FirmwareVersion1, FirmwareVersion2));
+      DEBUG ((DEBUG_INFO, "Tpm2GetCapabilityFirmwareVersion - %08x %08x\n", FirmwareVersion1, FirmwareVersion2));
     }
   );
 
   Status = Tpm2GetCapabilityMaxCommandResponseSize (&MaxCommandSize, &MaxResponseSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2GetCapabilityMaxCommandResponseSize fail!\n"));
+    DEBUG ((DEBUG_ERROR, "Tpm2GetCapabilityMaxCommandResponseSize fail!\n"));
   } else {
     mTcgDxeData.BsCap.MaxCommandSize  = (UINT16)MaxCommandSize;
     mTcgDxeData.BsCap.MaxResponseSize = (UINT16)MaxResponseSize;
-    DEBUG ((EFI_D_INFO, "Tpm2GetCapabilityMaxCommandResponseSize - %08x, %08x\n", MaxCommandSize, MaxResponseSize));
+    DEBUG ((DEBUG_INFO, "Tpm2GetCapabilityMaxCommandResponseSize - %08x, %08x\n", MaxCommandSize, MaxResponseSize));
   }
 
   //
@@ -2722,7 +2722,7 @@ DriverEntry (
   } else {
     mTcgDxeData.BsCap.NumberOfPCRBanks = PcdGet32 (PcdTcg2NumberOfPCRBanks);
     if (PcdGet32 (PcdTcg2NumberOfPCRBanks) > NumberOfPCRBanks) {
-      DEBUG ((EFI_D_ERROR, "ERROR: PcdTcg2NumberOfPCRBanks(0x%x) > NumberOfPCRBanks(0x%x)\n", PcdGet32 (PcdTcg2NumberOfPCRBanks), NumberOfPCRBanks));
+      DEBUG ((DEBUG_ERROR, "ERROR: PcdTcg2NumberOfPCRBanks(0x%x) > NumberOfPCRBanks(0x%x)\n", PcdGet32 (PcdTcg2NumberOfPCRBanks), NumberOfPCRBanks));
       mTcgDxeData.BsCap.NumberOfPCRBanks = NumberOfPCRBanks;
     }
   }
@@ -2735,10 +2735,10 @@ DriverEntry (
     mTcgDxeData.BsCap.SupportedEventLogs &= ~EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2;
   }
 
-  DEBUG ((EFI_D_INFO, "Tcg2.SupportedEventLogs - 0x%08x\n", mTcgDxeData.BsCap.SupportedEventLogs));
-  DEBUG ((EFI_D_INFO, "Tcg2.HashAlgorithmBitmap - 0x%08x\n", mTcgDxeData.BsCap.HashAlgorithmBitmap));
-  DEBUG ((EFI_D_INFO, "Tcg2.NumberOfPCRBanks      - 0x%08x\n", mTcgDxeData.BsCap.NumberOfPCRBanks));
-  DEBUG ((EFI_D_INFO, "Tcg2.ActivePcrBanks        - 0x%08x\n", mTcgDxeData.BsCap.ActivePcrBanks));
+  DEBUG ((DEBUG_INFO, "Tcg2.SupportedEventLogs - 0x%08x\n", mTcgDxeData.BsCap.SupportedEventLogs));
+  DEBUG ((DEBUG_INFO, "Tcg2.HashAlgorithmBitmap - 0x%08x\n", mTcgDxeData.BsCap.HashAlgorithmBitmap));
+  DEBUG ((DEBUG_INFO, "Tcg2.NumberOfPCRBanks      - 0x%08x\n", mTcgDxeData.BsCap.NumberOfPCRBanks));
+  DEBUG ((DEBUG_INFO, "Tcg2.ActivePcrBanks        - 0x%08x\n", mTcgDxeData.BsCap.ActivePcrBanks));
 
   if (mTcgDxeData.BsCap.TPMPresentFlag) {
     //
@@ -2795,7 +2795,7 @@ DriverEntry (
   // Install Tcg2Protocol
   //
   Status = InstallTcg2 ();
-  DEBUG ((EFI_D_INFO, "InstallTcg2 - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "InstallTcg2 - %r\n", Status));
 
   return Status;
 }

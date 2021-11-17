@@ -123,7 +123,7 @@ MorLockDriverEntryPointSmm (
   //
   // This driver link to Smm Variable driver
   //
-  DEBUG ((EFI_D_INFO, "MorLockDriverEntryPointSmm\n"));
+  DEBUG ((DEBUG_INFO, "MorLockDriverEntryPointSmm\n"));
 
   Status = gSmst->SmmLocateProtocol (
                   &gEfiSmmVariableProtocolGuid,
@@ -149,4 +149,3 @@ MorLockDriverEntryPointSmm (
 
   return Status;
 }
-

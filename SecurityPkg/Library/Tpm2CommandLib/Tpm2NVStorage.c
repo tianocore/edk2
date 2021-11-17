@@ -200,12 +200,12 @@ Tpm2NvReadPublic (
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvReadPublic - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvReadPublic - RecvBufferSize Error - %x\n", RecvBufferSize));
     return EFI_DEVICE_ERROR;
   }
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
   if (ResponseCode != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvReadPublic - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvReadPublic - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
   }
   switch (ResponseCode) {
   case TPM_RC_SUCCESS:
@@ -220,7 +220,7 @@ Tpm2NvReadPublic (
   }
 
   if (RecvBufferSize <= sizeof (TPM2_RESPONSE_HEADER) + sizeof (UINT16) + sizeof(UINT16)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvReadPublic - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvReadPublic - RecvBufferSize Error - %x\n", RecvBufferSize));
     return EFI_NOT_FOUND;
   }
 
@@ -240,7 +240,7 @@ Tpm2NvReadPublic (
   }
 
   if (RecvBufferSize != sizeof(TPM2_RESPONSE_HEADER) + sizeof(UINT16) + NvPublicSize + sizeof(UINT16) + NvNameSize) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvReadPublic - RecvBufferSize Error - NvPublicSize %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvReadPublic - RecvBufferSize Error - NvPublicSize %x\n", RecvBufferSize));
     return EFI_NOT_FOUND;
   }
 
@@ -354,14 +354,14 @@ Tpm2NvDefineSpace (
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvDefineSpace - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvDefineSpace - RecvBufferSize Error - %x\n", RecvBufferSize));
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
 
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
   if (ResponseCode != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvDefineSpace - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvDefineSpace - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
   }
   switch (ResponseCode) {
   case TPM_RC_SUCCESS:
@@ -462,14 +462,14 @@ Tpm2NvUndefineSpace (
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvUndefineSpace - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvUndefineSpace - RecvBufferSize Error - %x\n", RecvBufferSize));
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
 
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
   if (ResponseCode != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvUndefineSpace - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvUndefineSpace - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
   }
   switch (ResponseCode) {
   case TPM_RC_SUCCESS:
@@ -577,13 +577,13 @@ Tpm2NvRead (
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvRead - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvRead - RecvBufferSize Error - %x\n", RecvBufferSize));
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
   if (ResponseCode != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvRead - responseCode - %x\n", ResponseCode));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvRead - responseCode - %x\n", ResponseCode));
   }
   switch (ResponseCode) {
   case TPM_RC_SUCCESS:
@@ -723,13 +723,13 @@ Tpm2NvWrite (
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvWrite - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvWrite - RecvBufferSize Error - %x\n", RecvBufferSize));
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
   if (ResponseCode != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvWrite - responseCode - %x\n", ResponseCode));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvWrite - responseCode - %x\n", ResponseCode));
   }
   switch (ResponseCode) {
   case TPM_RC_SUCCESS:
@@ -843,14 +843,14 @@ Tpm2NvReadLock (
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvReadLock - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvReadLock - RecvBufferSize Error - %x\n", RecvBufferSize));
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
 
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
   if (ResponseCode != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvReadLock - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvReadLock - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
   }
   switch (ResponseCode) {
   case TPM_RC_SUCCESS:
@@ -930,14 +930,14 @@ Tpm2NvWriteLock (
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvWriteLock - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvWriteLock - RecvBufferSize Error - %x\n", RecvBufferSize));
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
 
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
   if (ResponseCode != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvWriteLock - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvWriteLock - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
   }
   switch (ResponseCode) {
   case TPM_RC_SUCCESS:
@@ -1014,14 +1014,14 @@ Tpm2NvGlobalWriteLock (
   }
 
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvGlobalWriteLock - RecvBufferSize Error - %x\n", RecvBufferSize));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvGlobalWriteLock - RecvBufferSize Error - %x\n", RecvBufferSize));
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
 
   ResponseCode = SwapBytes32(RecvBuffer.Header.responseCode);
   if (ResponseCode != TPM_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm2NvGlobalWriteLock - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+    DEBUG ((DEBUG_ERROR, "Tpm2NvGlobalWriteLock - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
   }
   switch (ResponseCode) {
   case TPM_RC_SUCCESS:

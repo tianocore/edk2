@@ -84,15 +84,15 @@ Tpm2CommandClear (
     CopyMem (LocalAuthSession.hmac.buffer, PlatformAuth->buffer, PlatformAuth->size);
   }
 
-  DEBUG ((EFI_D_INFO, "Tpm2ClearControl ... \n"));
+  DEBUG ((DEBUG_INFO, "Tpm2ClearControl ... \n"));
   Status = Tpm2ClearControl (TPM_RH_PLATFORM, AuthSession, NO);
-  DEBUG ((EFI_D_INFO, "Tpm2ClearControl - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "Tpm2ClearControl - %r\n", Status));
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-  DEBUG ((EFI_D_INFO, "Tpm2Clear ... \n"));
+  DEBUG ((DEBUG_INFO, "Tpm2Clear ... \n"));
   Status = Tpm2Clear (TPM_RH_PLATFORM, AuthSession);
-  DEBUG ((EFI_D_INFO, "Tpm2Clear - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "Tpm2Clear - %r\n", Status));
 
 Done:
   ZeroMem (&LocalAuthSession.hmac, sizeof(LocalAuthSession.hmac));
@@ -126,7 +126,7 @@ Tpm2CommandChangeEps (
   }
 
   Status = Tpm2ChangeEPS (TPM_RH_PLATFORM, AuthSession);
-  DEBUG ((EFI_D_INFO, "Tpm2ChangeEPS - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "Tpm2ChangeEPS - %r\n", Status));
 
   ZeroMem(&LocalAuthSession.hmac, sizeof(LocalAuthSession.hmac));
   return Status;
@@ -913,7 +913,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
                                      &gEfiTcg2PhysicalPresenceGuid
                                      );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[TPM2] Error when lock variable %s, Status = %r\n", TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE, Status));
+      DEBUG ((DEBUG_ERROR, "[TPM2] Error when lock variable %s, Status = %r\n", TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE, Status));
       ASSERT_EFI_ERROR (Status);
     }
   }
@@ -922,7 +922,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
   // Check S4 resume
   //
   if (GetBootModeHob () == BOOT_ON_S4_RESUME) {
-    DEBUG ((EFI_D_INFO, "S4 Resume, Skip TPM PP process!\n"));
+    DEBUG ((DEBUG_INFO, "S4 Resume, Skip TPM PP process!\n"));
     return ;
   }
 
@@ -947,7 +947,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
                       &PpiFlags
                       );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[TPM2] Set physical presence flag failed, Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "[TPM2] Set physical presence flag failed, Status = %r\n", Status));
       return ;
     }
     DEBUG((DEBUG_INFO, "[TPM2] Initial physical presence flags value is 0x%x\n", PpiFlags.PPFlags));
@@ -975,18 +975,18 @@ Tcg2PhysicalPresenceLibProcessRequest (
                       &TcgPpData
                       );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[TPM2] Set physical presence variable failed, Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "[TPM2] Set physical presence variable failed, Status = %r\n", Status));
       return ;
     }
   }
 
-  DEBUG ((EFI_D_INFO, "[TPM2] Flags=%x, PPRequest=%x (LastPPRequest=%x)\n", PpiFlags.PPFlags, TcgPpData.PPRequest, TcgPpData.LastPPRequest));
+  DEBUG ((DEBUG_INFO, "[TPM2] Flags=%x, PPRequest=%x (LastPPRequest=%x)\n", PpiFlags.PPFlags, TcgPpData.PPRequest, TcgPpData.LastPPRequest));
 
   //
   // Execute pending TPM request.
   //
   Tcg2ExecutePendingTpmRequest (PlatformAuth, &TcgPpData, &PpiFlags);
-  DEBUG ((EFI_D_INFO, "[TPM2] PPResponse = %x (LastPPRequest=%x, Flags=%x)\n", TcgPpData.PPResponse, TcgPpData.LastPPRequest, PpiFlags.PPFlags));
+  DEBUG ((DEBUG_INFO, "[TPM2] PPResponse = %x (LastPPRequest=%x, Flags=%x)\n", TcgPpData.PPResponse, TcgPpData.LastPPRequest, PpiFlags.PPFlags));
 
 }
 
@@ -1016,7 +1016,7 @@ Tcg2PhysicalPresenceLibNeedUserConfirm(
   // Check S4 resume
   //
   if (GetBootModeHob () == BOOT_ON_S4_RESUME) {
-    DEBUG ((EFI_D_INFO, "S4 Resume, Skip TPM PP process!\n"));
+    DEBUG ((DEBUG_INFO, "S4 Resume, Skip TPM PP process!\n"));
     return FALSE;
   }
 
@@ -1092,7 +1092,7 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   UINTN                             DataSize;
   EFI_TCG2_PHYSICAL_PRESENCE        PpData;
 
-  DEBUG ((EFI_D_INFO, "[TPM2] ReturnOperationResponseToOsFunction\n"));
+  DEBUG ((DEBUG_INFO, "[TPM2] ReturnOperationResponseToOsFunction\n"));
 
   //
   // Get the Physical Presence variable
@@ -1108,7 +1108,7 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   if (EFI_ERROR (Status)) {
     *MostRecentRequest = 0;
     *Response          = 0;
-    DEBUG ((EFI_D_ERROR, "[TPM2] Get PP variable failure! Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "[TPM2] Get PP variable failure! Status = %r\n", Status));
     return TCG_PP_RETURN_TPM_OPERATION_RESPONSE_FAILURE;
   }
 
@@ -1143,7 +1143,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
   EFI_TCG2_PHYSICAL_PRESENCE        PpData;
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  Flags;
 
-  DEBUG ((EFI_D_INFO, "[TPM2] SubmitRequestToPreOSFunction, Request = %x, %x\n", OperationRequest, RequestParameter));
+  DEBUG ((DEBUG_INFO, "[TPM2] SubmitRequestToPreOSFunction, Request = %x, %x\n", OperationRequest, RequestParameter));
 
   //
   // Get the Physical Presence variable
@@ -1157,7 +1157,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
                   &PpData
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[TPM2] Get PP variable failure! Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "[TPM2] Get PP variable failure! Status = %r\n", Status));
     return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
   }
 
@@ -1179,7 +1179,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
                     &PpData
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[TPM2] Set PP variable failure! Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "[TPM2] Set PP variable failure! Status = %r\n", Status));
       return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
     }
   }
@@ -1217,7 +1217,7 @@ Tcg2PhysicalPresenceLibGetManagementFlags (
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
   UINTN                             DataSize;
 
-  DEBUG ((EFI_D_INFO, "[TPM2] GetManagementFlags\n"));
+  DEBUG ((DEBUG_INFO, "[TPM2] GetManagementFlags\n"));
 
   DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE_FLAGS);
   Status = gRT->GetVariable (

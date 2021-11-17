@@ -33,13 +33,13 @@ TcgConfigDriverEntryPoint (
   EFI_TCG_PROTOCOL          *TcgProtocol;
 
   if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm12Guid)){
-    DEBUG ((EFI_D_ERROR, "No TPM12 instance required!\n"));
+    DEBUG ((DEBUG_ERROR, "No TPM12 instance required!\n"));
     return EFI_UNSUPPORTED;
   }
 
   Status = Tpm12RequestUseTpm ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TPM not detected!\n"));
+    DEBUG ((DEBUG_ERROR, "TPM not detected!\n"));
     return Status;
   }
 

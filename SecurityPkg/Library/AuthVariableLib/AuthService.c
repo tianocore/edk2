@@ -1752,7 +1752,7 @@ CleanCertsFromDb (
                         AuthVariableInfo.Attributes | EFI_VARIABLE_NON_VOLATILE
                         );
         CertCleaned = TRUE;
-        DEBUG((EFI_D_INFO, "Recovery!! Cert for Auth Variable %s Guid %g is removed for consistency\n", VariableName, &AuthVarGuid));
+        DEBUG((DEBUG_INFO, "Recovery!! Cert for Auth Variable %s Guid %g is removed for consistency\n", VariableName, &AuthVarGuid));
         FreePool(VariableName);
         break;
       }

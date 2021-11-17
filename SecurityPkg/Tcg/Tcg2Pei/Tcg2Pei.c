@@ -267,7 +267,7 @@ SyncPcrAllocationsAndPcrMask (
   UINT32                            Tpm2PcrMask;
   UINT32                            NewTpm2PcrMask;
 
-  DEBUG ((EFI_D_ERROR, "SyncPcrAllocationsAndPcrMask!\n"));
+  DEBUG ((DEBUG_ERROR, "SyncPcrAllocationsAndPcrMask!\n"));
 
   //
   // Determine the current TPM support and the Platform PCR mask.
@@ -297,9 +297,9 @@ SyncPcrAllocationsAndPcrMask (
   if ((TpmActivePcrBanks & Tpm2PcrMask) != TpmActivePcrBanks) {
     NewTpmActivePcrBanks = TpmActivePcrBanks & Tpm2PcrMask;
 
-    DEBUG ((EFI_D_INFO, "%a - Reallocating PCR banks from 0x%X to 0x%X.\n", __FUNCTION__, TpmActivePcrBanks, NewTpmActivePcrBanks));
+    DEBUG ((DEBUG_INFO, "%a - Reallocating PCR banks from 0x%X to 0x%X.\n", __FUNCTION__, TpmActivePcrBanks, NewTpmActivePcrBanks));
     if (NewTpmActivePcrBanks == 0) {
-      DEBUG ((EFI_D_ERROR, "%a - No viable PCRs active! Please set a less restrictive value for PcdTpm2HashMask!\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a - No viable PCRs active! Please set a less restrictive value for PcdTpm2HashMask!\n", __FUNCTION__));
       ASSERT (FALSE);
     } else {
       Status = Tpm2PcrAllocateBanks (NULL, (UINT32)TpmHashAlgorithmBitmap, NewTpmActivePcrBanks);
@@ -307,7 +307,7 @@ SyncPcrAllocationsAndPcrMask (
         //
         // We can't do much here, but we hope that this doesn't happen.
         //
-        DEBUG ((EFI_D_ERROR, "%a - Failed to reallocate PCRs!\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a - Failed to reallocate PCRs!\n", __FUNCTION__));
         ASSERT_EFI_ERROR (Status);
       }
       //
@@ -324,9 +324,9 @@ SyncPcrAllocationsAndPcrMask (
   if ((Tpm2PcrMask & TpmHashAlgorithmBitmap) != Tpm2PcrMask) {
     NewTpm2PcrMask = Tpm2PcrMask & TpmHashAlgorithmBitmap;
 
-    DEBUG ((EFI_D_INFO, "%a - Updating PcdTpm2HashMask from 0x%X to 0x%X.\n", __FUNCTION__, Tpm2PcrMask, NewTpm2PcrMask));
+    DEBUG ((DEBUG_INFO, "%a - Updating PcdTpm2HashMask from 0x%X to 0x%X.\n", __FUNCTION__, Tpm2PcrMask, NewTpm2PcrMask));
     if (NewTpm2PcrMask == 0) {
-      DEBUG ((EFI_D_ERROR, "%a - No viable PCRs supported! Please set a less restrictive value for PcdTpm2HashMask!\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a - No viable PCRs supported! Please set a less restrictive value for PcdTpm2HashMask!\n", __FUNCTION__));
       ASSERT (FALSE);
     }
 
@@ -365,7 +365,7 @@ LogHashEvent (
   RetStatus = EFI_SUCCESS;
   for (Index = 0; Index < sizeof(mTcg2EventInfo)/sizeof(mTcg2EventInfo[0]); Index++) {
     if ((SupportedEventLogs & mTcg2EventInfo[Index].LogFormat) != 0) {
-      DEBUG ((EFI_D_INFO, "  LogFormat - 0x%08x\n", mTcg2EventInfo[Index].LogFormat));
+      DEBUG ((DEBUG_INFO, "  LogFormat - 0x%08x\n", mTcg2EventInfo[Index].LogFormat));
       switch (mTcg2EventInfo[Index].LogFormat) {
       case EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2:
         Status = GetDigestFromDigestList (TPM_ALG_SHA1, DigestList, &NewEventHdr->Digest);
@@ -476,7 +476,7 @@ HashLogExtendEvent (
   }
 
   if (Status == EFI_DEVICE_ERROR) {
-    DEBUG ((EFI_D_ERROR, "HashLogExtendEvent - %r. Disable TPM.\n", Status));
+    DEBUG ((DEBUG_ERROR, "HashLogExtendEvent - %r. Disable TPM.\n", Status));
     BuildGuidHob (&gTpmErrorHobGuid,0);
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
@@ -1011,7 +1011,7 @@ PeimEntryMA (
   }
 
   if (GetFirstGuidHob (&gTpmErrorHobGuid) != NULL) {
-    DEBUG ((EFI_D_ERROR, "TPM2 error!\n"));
+    DEBUG ((DEBUG_ERROR, "TPM2 error!\n"));
     return EFI_DEVICE_ERROR;
   }
 
@@ -1075,7 +1075,7 @@ PeimEntryMA (
       for (PcrIndex = 0; PcrIndex < 8; PcrIndex++) {
         Status = MeasureSeparatorEventWithError (PcrIndex);
         if (EFI_ERROR (Status)) {
-          DEBUG ((EFI_D_ERROR, "Separator Event with Error not Measured. Error!\n"));
+          DEBUG ((DEBUG_ERROR, "Separator Event with Error not Measured. Error!\n"));
         }
       }
     }
@@ -1106,7 +1106,7 @@ PeimEntryMA (
 
 Done:
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "TPM2 error! Build Hob\n"));
+    DEBUG ((DEBUG_ERROR, "TPM2 error! Build Hob\n"));
     BuildGuidHob (&gTpmErrorHobGuid,0);
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,

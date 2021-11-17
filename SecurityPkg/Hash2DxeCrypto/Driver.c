@@ -142,7 +142,7 @@ Hash2ServiceBindingDestroyChild (
     }
   }
   if (Instance == NULL) {
-    DEBUG ((EFI_D_ERROR, "Hash2ServiceBindingDestroyChild - Invalid handle\n"));
+    DEBUG ((DEBUG_ERROR, "Hash2ServiceBindingDestroyChild - Invalid handle\n"));
     return EFI_UNSUPPORTED;
   }
 

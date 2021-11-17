@@ -164,7 +164,7 @@ TcgMeasureGptTable (
                      (UINT8 *)PrimaryHeader
                      );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Failed to Read Partition Table Header!\n"));
+    DEBUG ((DEBUG_ERROR, "Failed to Read Partition Table Header!\n"));
     FreePool (PrimaryHeader);
     return EFI_DEVICE_ERROR;
   }
@@ -355,7 +355,7 @@ TcgMeasurePeImage (
       break;
     default:
       DEBUG ((
-        EFI_D_ERROR,
+        DEBUG_ERROR,
         "TcgMeasurePeImage: Unknown subsystem type %d",
         ImageType
         ));

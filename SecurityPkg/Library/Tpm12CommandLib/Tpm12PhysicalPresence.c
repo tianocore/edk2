@@ -58,7 +58,7 @@ Tpm12PhysicalPresence (
   }
 
   if (SwapBytes32(Response.returnCode) != TPM_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "Tpm12PhysicalPresence: Response Code error! 0x%08x\r\n", SwapBytes32(Response.returnCode)));
+    DEBUG ((DEBUG_ERROR, "Tpm12PhysicalPresence: Response Code error! 0x%08x\r\n", SwapBytes32(Response.returnCode)));
     return EFI_DEVICE_ERROR;
   }
 

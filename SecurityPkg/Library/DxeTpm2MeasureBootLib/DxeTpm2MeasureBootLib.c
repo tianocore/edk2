@@ -164,7 +164,7 @@ Tcg2MeasureGptTable (
                      (UINT8 *)PrimaryHeader
                      );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Failed to Read Partition Table Header!\n"));
+    DEBUG ((DEBUG_ERROR, "Failed to Read Partition Table Header!\n"));
     FreePool (PrimaryHeader);
     return EFI_DEVICE_ERROR;
   }
@@ -334,7 +334,7 @@ Tcg2MeasurePeImage (
       break;
     default:
       DEBUG ((
-        EFI_D_ERROR,
+        DEBUG_ERROR,
         "Tcg2MeasurePeImage: Unknown subsystem type %d",
         ImageType
         ));
@@ -441,7 +441,7 @@ DxeTpm2MeasureBootHandler (
     // Tcg2 protocol is not installed. So, TPM2 is not present.
     // Don't do any measurement, and directly return EFI_SUCCESS.
     //
-    DEBUG ((EFI_D_VERBOSE, "DxeTpm2MeasureBootHandler - Tcg2 - %r\n", Status));
+    DEBUG ((DEBUG_VERBOSE, "DxeTpm2MeasureBootHandler - Tcg2 - %r\n", Status));
     return EFI_SUCCESS;
   }
 
@@ -454,7 +454,7 @@ DxeTpm2MeasureBootHandler (
     //
     // TPM device doesn't work or activate.
     //
-    DEBUG ((EFI_D_ERROR, "DxeTpm2MeasureBootHandler (%r) - TPMPresentFlag - %x\n", Status, ProtocolCapability.TPMPresentFlag));
+    DEBUG ((DEBUG_ERROR, "DxeTpm2MeasureBootHandler (%r) - TPMPresentFlag - %x\n", Status, ProtocolCapability.TPMPresentFlag));
     return EFI_SUCCESS;
   }
 
@@ -503,7 +503,7 @@ DxeTpm2MeasureBootHandler (
             // Measure GPT disk.
             //
             Status = Tcg2MeasureGptTable (Tcg2Protocol, Handle);
-            DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - Tcg2MeasureGptTable - %r\n", Status));
+            DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - Tcg2MeasureGptTable - %r\n", Status));
             if (!EFI_ERROR (Status)) {
               //
               // GPT disk check done.
@@ -654,7 +654,7 @@ DxeTpm2MeasureBootHandler (
                ImageContext.ImageType,
                DevicePathNode
                );
-    DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - Tcg2MeasurePeImage - %r\n", Status));
+    DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - Tcg2MeasurePeImage - %r\n", Status));
   }
 
   //
@@ -665,7 +665,7 @@ Finish:
     FreePool (OrigDevicePathNode);
   }
 
-  DEBUG ((EFI_D_INFO, "DxeTpm2MeasureBootHandler - %r\n", Status));
+  DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - %r\n", Status));
 
   return Status;
 }
