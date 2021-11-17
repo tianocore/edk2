@@ -21,8 +21,8 @@ IsElfFormat (
   IN  CONST UINT8             *ImageBase
   )
 {
-  Elf32_Ehdr                  *Elf32Hdr;
-  Elf64_Ehdr                  *Elf64Hdr;
+  Elf32_Ehdr  *Elf32Hdr;
+  Elf64_Ehdr  *Elf64Hdr;
 
   ASSERT (ImageBase != NULL);
 
@@ -35,7 +35,8 @@ IsElfFormat (
       (Elf32Hdr->e_ident[EI_MAG1] != ELFMAG1) ||
       (Elf32Hdr->e_ident[EI_MAG1] != ELFMAG1) ||
       (Elf32Hdr->e_ident[EI_MAG2] != ELFMAG2)
-     ) {
+      )
+  {
     return FALSE;
   }
 
@@ -101,6 +102,7 @@ IsElfFormat (
       return FALSE;
     }
   }
+
   return TRUE;
 }
 
@@ -120,13 +122,13 @@ CalculateElfFileSize (
   OUT UINTN                *FileSize
   )
 {
-  EFI_STATUS     Status;
-  UINTN          FileSize1;
-  UINTN          FileSize2;
-  Elf32_Ehdr     *Elf32Hdr;
-  Elf64_Ehdr     *Elf64Hdr;
-  UINTN          Offset;
-  UINTN          Size;
+  EFI_STATUS  Status;
+  UINTN       FileSize1;
+  UINTN       FileSize2;
+  Elf32_Ehdr  *Elf32Hdr;
+  Elf64_Ehdr  *Elf64Hdr;
+  UINTN       Offset;
+  UINTN       Size;
 
   if ((ElfCt == NULL) || (FileSize == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -134,22 +136,23 @@ CalculateElfFileSize (
 
   // Use last section as end of file
   Status = GetElfSectionPos (ElfCt, ElfCt->ShNum - 1, &Offset, &Size);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
+
   FileSize1 = Offset + Size;
 
   // Use end of section header as end of file
   FileSize2 = 0;
   if (ElfCt->EiClass == ELFCLASS32) {
-    Elf32Hdr   = (Elf32_Ehdr *)ElfCt->FileBase;
+    Elf32Hdr  = (Elf32_Ehdr *)ElfCt->FileBase;
     FileSize2 = Elf32Hdr->e_shoff + Elf32Hdr->e_shentsize * Elf32Hdr->e_shnum;
   } else if (ElfCt->EiClass == ELFCLASS64) {
-    Elf64Hdr   = (Elf64_Ehdr *)ElfCt->FileBase;
+    Elf64Hdr  = (Elf64_Ehdr *)ElfCt->FileBase;
     FileSize2 = (UINTN)(Elf64Hdr->e_shoff + Elf64Hdr->e_shentsize * Elf64Hdr->e_shnum);
   }
 
-  *FileSize = MAX(FileSize1, FileSize2);
+  *FileSize = MAX (FileSize1, FileSize2);
 
   return EFI_SUCCESS;
 }
@@ -174,8 +177,8 @@ GetElfSegmentInfo (
   OUT SEGMENT_INFO          *SegInfo
   )
 {
-  Elf32_Phdr       *Elf32Phdr;
-  Elf64_Phdr       *Elf64Phdr;
+  Elf32_Phdr  *Elf32Phdr;
+  Elf64_Phdr  *Elf64Phdr;
 
   if ((ImageBase == NULL) || (SegInfo == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -184,22 +187,22 @@ GetElfSegmentInfo (
   if (EiClass == ELFCLASS32) {
     Elf32Phdr = GetElf32SegmentByIndex (ImageBase, Index);
     if (Elf32Phdr != NULL) {
-      SegInfo->PtType  = Elf32Phdr->p_type;
-      SegInfo->Offset  = Elf32Phdr->p_offset;
-      SegInfo->Length  = Elf32Phdr->p_filesz;
-      SegInfo->MemLen  = Elf32Phdr->p_memsz;
-      SegInfo->MemAddr = Elf32Phdr->p_paddr;
+      SegInfo->PtType    = Elf32Phdr->p_type;
+      SegInfo->Offset    = Elf32Phdr->p_offset;
+      SegInfo->Length    = Elf32Phdr->p_filesz;
+      SegInfo->MemLen    = Elf32Phdr->p_memsz;
+      SegInfo->MemAddr   = Elf32Phdr->p_paddr;
       SegInfo->Alignment = Elf32Phdr->p_align;
       return EFI_SUCCESS;
     }
   } else if (EiClass == ELFCLASS64) {
     Elf64Phdr = GetElf64SegmentByIndex (ImageBase, Index);
     if (Elf64Phdr != NULL) {
-      SegInfo->PtType  = Elf64Phdr->p_type;
-      SegInfo->Offset  = (UINTN)Elf64Phdr->p_offset;
-      SegInfo->Length  = (UINTN)Elf64Phdr->p_filesz;
-      SegInfo->MemLen  = (UINTN)Elf64Phdr->p_memsz;
-      SegInfo->MemAddr = (UINTN)Elf64Phdr->p_paddr;
+      SegInfo->PtType    = Elf64Phdr->p_type;
+      SegInfo->Offset    = (UINTN)Elf64Phdr->p_offset;
+      SegInfo->Length    = (UINTN)Elf64Phdr->p_filesz;
+      SegInfo->MemLen    = (UINTN)Elf64Phdr->p_memsz;
+      SegInfo->MemAddr   = (UINTN)Elf64Phdr->p_paddr;
       SegInfo->Alignment = (UINTN)Elf64Phdr->p_align;
       return EFI_SUCCESS;
     }
@@ -228,20 +231,21 @@ ParseElfImage (
   OUT ELF_IMAGE_CONTEXT    *ElfCt
   )
 {
-  Elf32_Ehdr     *Elf32Hdr;
-  Elf64_Ehdr     *Elf64Hdr;
-  Elf32_Shdr     *Elf32Shdr;
-  Elf64_Shdr     *Elf64Shdr;
-  EFI_STATUS     Status;
-  UINT32         Index;
-  SEGMENT_INFO   SegInfo;
-  UINTN          End;
-  UINTN          Base;
+  Elf32_Ehdr    *Elf32Hdr;
+  Elf64_Ehdr    *Elf64Hdr;
+  Elf32_Shdr    *Elf32Shdr;
+  Elf64_Shdr    *Elf64Shdr;
+  EFI_STATUS    Status;
+  UINT32        Index;
+  SEGMENT_INFO  SegInfo;
+  UINTN         End;
+  UINTN         Base;
 
   if (ElfCt == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  ZeroMem (ElfCt, sizeof(ELF_IMAGE_CONTEXT));
+
+  ZeroMem (ElfCt, sizeof (ELF_IMAGE_CONTEXT));
 
   if (ImageBase == NULL) {
     return (ElfCt->ParseStatus = EFI_INVALID_PARAMETER);
@@ -258,35 +262,39 @@ ParseElfImage (
     if ((Elf32Hdr->e_type != ET_EXEC) && (Elf32Hdr->e_type != ET_DYN)) {
       return (ElfCt->ParseStatus = EFI_UNSUPPORTED);
     }
+
     Elf32Shdr = (Elf32_Shdr *)GetElf32SectionByIndex (ElfCt->FileBase, Elf32Hdr->e_shstrndx);
     if (Elf32Shdr == NULL) {
       return (ElfCt->ParseStatus = EFI_UNSUPPORTED);
     }
+
     ElfCt->EntryPoint = (UINTN)Elf32Hdr->e_entry;
-    ElfCt->ShNum      = Elf32Hdr->e_shnum;
-    ElfCt->PhNum      = Elf32Hdr->e_phnum;
-    ElfCt->ShStrLen   = Elf32Shdr->sh_size;
-    ElfCt->ShStrOff   = Elf32Shdr->sh_offset;
+    ElfCt->ShNum    = Elf32Hdr->e_shnum;
+    ElfCt->PhNum    = Elf32Hdr->e_phnum;
+    ElfCt->ShStrLen = Elf32Shdr->sh_size;
+    ElfCt->ShStrOff = Elf32Shdr->sh_offset;
   } else {
-    Elf64Hdr  = (Elf64_Ehdr *)Elf32Hdr;
+    Elf64Hdr = (Elf64_Ehdr *)Elf32Hdr;
     if ((Elf64Hdr->e_type != ET_EXEC) && (Elf64Hdr->e_type != ET_DYN)) {
       return (ElfCt->ParseStatus = EFI_UNSUPPORTED);
     }
+
     Elf64Shdr = (Elf64_Shdr *)GetElf64SectionByIndex (ElfCt->FileBase, Elf64Hdr->e_shstrndx);
     if (Elf64Shdr == NULL) {
       return (ElfCt->ParseStatus = EFI_UNSUPPORTED);
     }
+
     ElfCt->EntryPoint = (UINTN)Elf64Hdr->e_entry;
-    ElfCt->ShNum      = Elf64Hdr->e_shnum;
-    ElfCt->PhNum      = Elf64Hdr->e_phnum;
-    ElfCt->ShStrLen   = (UINT32)Elf64Shdr->sh_size;
-    ElfCt->ShStrOff   = (UINT32)Elf64Shdr->sh_offset;
+    ElfCt->ShNum    = Elf64Hdr->e_shnum;
+    ElfCt->PhNum    = Elf64Hdr->e_phnum;
+    ElfCt->ShStrLen = (UINT32)Elf64Shdr->sh_size;
+    ElfCt->ShStrOff = (UINT32)Elf64Shdr->sh_offset;
   }
 
   //
   // Get the preferred image base and required memory size when loaded to new location.
   //
-  End = 0;
+  End  = 0;
   Base = MAX_UINT32;
   ElfCt->ReloadRequired = FALSE;
   for (Index = 0; Index < ElfCt->PhNum; Index++) {
@@ -307,18 +315,20 @@ ParseElfImage (
     if (Base > (SegInfo.MemAddr & ~(EFI_PAGE_SIZE - 1))) {
       Base = SegInfo.MemAddr & ~(EFI_PAGE_SIZE - 1);
     }
+
     if (End < ALIGN_VALUE (SegInfo.MemAddr + SegInfo.MemLen, EFI_PAGE_SIZE) - 1) {
       End = ALIGN_VALUE (SegInfo.MemAddr + SegInfo.MemLen, EFI_PAGE_SIZE) - 1;
     }
   }
+
   //
   // 0 - MAX_UINT32  + 1 equals to 0.
   //
-  ElfCt->ImageSize             = End - Base + 1;
-  ElfCt->PreferredImageAddress = (VOID *) Base;
+  ElfCt->ImageSize = End - Base + 1;
+  ElfCt->PreferredImageAddress = (VOID *)Base;
 
   CalculateElfFileSize (ElfCt, &ElfCt->FileSize);
-  return (ElfCt->ParseStatus = EFI_SUCCESS);;
+  return (ElfCt->ParseStatus = EFI_SUCCESS);
 }
 
 /**
@@ -342,7 +352,7 @@ LoadElfImage (
   IN  ELF_IMAGE_CONTEXT       *ElfCt
   )
 {
-  EFI_STATUS          Status;
+  EFI_STATUS  Status;
 
   if (ElfCt == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -366,7 +376,6 @@ LoadElfImage (
   return Status;
 }
 
-
 /**
   Get a ELF section name from its index.
 
@@ -386,9 +395,9 @@ GetElfSectionName (
   OUT CHAR8                 **SectionName
   )
 {
-  Elf32_Shdr      *Elf32Shdr;
-  Elf64_Shdr      *Elf64Shdr;
-  CHAR8           *Name;
+  Elf32_Shdr  *Elf32Shdr;
+  Elf64_Shdr  *Elf64Shdr;
+  CHAR8       *Name;
 
   if ((ElfCt == NULL) || (SectionName == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -419,7 +428,6 @@ GetElfSectionName (
   return EFI_SUCCESS;
 }
 
-
 /**
   Get the offset and size of x-th ELF section.
 
@@ -442,8 +450,8 @@ GetElfSectionPos (
   OUT UINTN                 *Size
   )
 {
-  Elf32_Shdr      *Elf32Shdr;
-  Elf64_Shdr      *Elf64Shdr;
+  Elf32_Shdr  *Elf32Shdr;
+  Elf64_Shdr  *Elf64Shdr;
 
   if ((ElfCt == NULL) || (Offset == NULL) || (Size == NULL)) {
     return EFI_INVALID_PARAMETER;

@@ -36,43 +36,41 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Define two helper macro to extract the Capability field or Status field in FVB
 // bit fields
 //
-#define EFI_FVB2_CAPABILITIES (EFI_FVB2_READ_DISABLED_CAP | \
+#define EFI_FVB2_CAPABILITIES  (EFI_FVB2_READ_DISABLED_CAP |\
                               EFI_FVB2_READ_ENABLED_CAP | \
                               EFI_FVB2_WRITE_DISABLED_CAP | \
                               EFI_FVB2_WRITE_ENABLED_CAP | \
                               EFI_FVB2_LOCK_CAP \
                               )
 
-#define EFI_FVB2_STATUS (EFI_FVB2_READ_STATUS | EFI_FVB2_WRITE_STATUS | EFI_FVB2_LOCK_STATUS)
-
+#define EFI_FVB2_STATUS  (EFI_FVB2_READ_STATUS | EFI_FVB2_WRITE_STATUS | EFI_FVB2_LOCK_STATUS)
 
 typedef struct {
-  UINTN                       FvBase;
-  UINTN                       NumOfBlocks;
+  UINTN                         FvBase;
+  UINTN                         NumOfBlocks;
   //
   // Note!!!: VolumeHeader must be the last element
   // of the structure.
   //
-  EFI_FIRMWARE_VOLUME_HEADER  VolumeHeader;
+  EFI_FIRMWARE_VOLUME_HEADER    VolumeHeader;
 } EFI_FW_VOL_INSTANCE;
 
-
 typedef struct {
-  EFI_FW_VOL_INSTANCE         *FvInstance;
-  UINT32                      NumFv;
-  UINT32                      Flags;
+  EFI_FW_VOL_INSTANCE    *FvInstance;
+  UINT32                 NumFv;
+  UINT32                 Flags;
 } FWB_GLOBAL;
 
 //
 // Fvb Protocol instance data
 //
-#define FVB_DEVICE_FROM_THIS(a) CR(a, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
-#define FVB_EXTEND_DEVICE_FROM_THIS(a) CR(a, EFI_FW_VOL_BLOCK_DEVICE, FvbExtension, FVB_DEVICE_SIGNATURE)
-#define FVB_DEVICE_SIGNATURE       SIGNATURE_32('F','V','B','C')
+#define FVB_DEVICE_FROM_THIS(a)         CR(a, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
+#define FVB_EXTEND_DEVICE_FROM_THIS(a)  CR(a, EFI_FW_VOL_BLOCK_DEVICE, FvbExtension, FVB_DEVICE_SIGNATURE)
+#define FVB_DEVICE_SIGNATURE  SIGNATURE_32('F','V','B','C')
 
 typedef struct {
-  MEDIA_FW_VOL_DEVICE_PATH  FvDevPath;
-  EFI_DEVICE_PATH_PROTOCOL  EndDevPath;
+  MEDIA_FW_VOL_DEVICE_PATH    FvDevPath;
+  EFI_DEVICE_PATH_PROTOCOL    EndDevPath;
 } FV_PIWG_DEVICE_PATH;
 
 typedef struct {
@@ -124,7 +122,7 @@ EFI_STATUS
 EFIAPI
 FvbProtocolGetPhysicalAddress (
   IN CONST EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *This,
-       OUT EFI_PHYSICAL_ADDRESS                *Address
+  OUT EFI_PHYSICAL_ADDRESS                *Address
   );
 
 EFI_STATUS
@@ -179,9 +177,9 @@ FvbInitialize (
   VOID
   );
 
-extern FWB_GLOBAL              mFvbModuleGlobal;
-extern EFI_FW_VOL_BLOCK_DEVICE mFvbDeviceTemplate;
-extern FV_MEMMAP_DEVICE_PATH   mFvMemmapDevicePathTemplate;
-extern FV_PIWG_DEVICE_PATH     mFvPIWGDevicePathTemplate;
+extern FWB_GLOBAL               mFvbModuleGlobal;
+extern EFI_FW_VOL_BLOCK_DEVICE  mFvbDeviceTemplate;
+extern FV_MEMMAP_DEVICE_PATH    mFvMemmapDevicePathTemplate;
+extern FV_PIWG_DEVICE_PATH      mFvPIWGDevicePathTemplate;
 
 #endif

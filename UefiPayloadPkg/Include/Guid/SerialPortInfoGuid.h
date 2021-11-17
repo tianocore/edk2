@@ -12,20 +12,20 @@
 ///
 /// Serial Port Information GUID
 ///
-extern EFI_GUID gUefiSerialPortInfoGuid;
+extern EFI_GUID  gUefiSerialPortInfoGuid;
 
-#define PLD_SERIAL_TYPE_IO_MAPPED     1
-#define PLD_SERIAL_TYPE_MEMORY_MAPPED 2
+#define PLD_SERIAL_TYPE_IO_MAPPED      1
+#define PLD_SERIAL_TYPE_MEMORY_MAPPED  2
 
 typedef struct {
-  UINT8  Revision;
-  UINT8  Reserved0[3];
-  UINT32 Type;
-  UINT32 BaseAddr;
-  UINT32 Baud;
-  UINT32 RegWidth;
-  UINT32 InputHertz;
-  UINT32 UartPciAddr;
+  UINT8     Revision;
+  UINT8     Reserved0[3];
+  UINT32    Type;
+  UINT32    BaseAddr;
+  UINT32    Baud;
+  UINT32    RegWidth;
+  UINT32    InputHertz;
+  UINT32    UartPciAddr;
 } SERIAL_PORT_INFO;
 
 #endif

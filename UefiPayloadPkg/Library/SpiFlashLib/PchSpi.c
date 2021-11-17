@@ -35,8 +35,6 @@ ReleaseSpiBar0 (
 {
 }
 
-
-
 /**
   This function is to enable/disable BIOS Write Protect in SMM phase.
 
@@ -45,22 +43,22 @@ ReleaseSpiBar0 (
 **/
 VOID
 CpuSmmDisableBiosWriteProtect (
-   IN  BOOLEAN   EnableSmmSts
+  IN  BOOLEAN   EnableSmmSts
   )
 {
-  UINT32      Data32;
+  UINT32  Data32;
 
-  if(EnableSmmSts){
+  if (EnableSmmSts) {
     //
     // Disable BIOS Write Protect in SMM phase.
     //
-    Data32 = MmioRead32 ((UINTN) (0xFED30880)) | (UINT32) (BIT0);
+    Data32 = MmioRead32 ((UINTN)(0xFED30880)) | (UINT32)(BIT0);
     AsmWriteMsr32 (0x000001FE, Data32);
   } else {
     //
     // Enable BIOS Write Protect in SMM phase
     //
-    Data32 = MmioRead32 ((UINTN) (0xFED30880)) & (UINT32) (~BIT0);
+    Data32 = MmioRead32 ((UINTN)(0xFED30880)) & (UINT32)(~BIT0);
     AsmWriteMsr32 (0x000001FE, Data32);
   }
 
@@ -69,7 +67,6 @@ CpuSmmDisableBiosWriteProtect (
   //
   Data32 = MmioRead32 (0xFED30880);
 }
-
 
 /**
   This function is a hook for Spi to disable BIOS Write Protect.
@@ -88,7 +85,6 @@ DisableBiosWriteProtect (
   IN  UINT8         CpuSmmBwp
   )
 {
-
   //
   // Write clear BC_SYNC_SS prior to change WPD from 0 to 1.
   //
@@ -120,11 +116,10 @@ EnableBiosWriteProtect (
   IN  UINT8         CpuSmmBwp
   )
 {
-
   //
   // Disable the access to the BIOS space for write cycles
   //
-  MmioAnd8 (PchSpiBase + R_SPI_BCR, (UINT8) (~B_SPI_BCR_BIOSWE));
+  MmioAnd8 (PchSpiBase + R_SPI_BCR, (UINT8)(~B_SPI_BCR_BIOSWE));
 
   if (CpuSmmBwp != 0) {
     CpuSmmDisableBiosWriteProtect (FALSE);
@@ -145,13 +140,15 @@ SaveAndDisableSpiPrefetchCache (
   IN  UINTN         PchSpiBase
   )
 {
-  UINT8           BiosCtlSave;
+  UINT8  BiosCtlSave;
 
   BiosCtlSave = MmioRead8 (PchSpiBase + R_SPI_BCR) & B_SPI_BCR_SRC;
 
-  MmioAndThenOr32 (PchSpiBase + R_SPI_BCR, \
-    (UINT32) (~B_SPI_BCR_SRC), \
-    (UINT32) (V_SPI_BCR_SRC_PREF_DIS_CACHE_DIS <<  B_SPI_BCR_SRC));
+  MmioAndThenOr32 (
+    PchSpiBase + R_SPI_BCR, \
+    (UINT32)(~B_SPI_BCR_SRC), \
+    (UINT32)(V_SPI_BCR_SRC_PREF_DIS_CACHE_DIS <<  B_SPI_BCR_SRC)
+    );
 
   return BiosCtlSave;
 }
