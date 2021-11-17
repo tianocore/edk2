@@ -79,7 +79,7 @@ InitializePlatformPeim (
   EFI_STATUS                    Status;
   EFI_BOOT_MODE                 BootMode;
 
-  DEBUG ((EFI_D_LOAD | EFI_D_INFO, "Platform PEIM Loaded\n"));
+  DEBUG ((DEBUG_LOAD | DEBUG_INFO, "Platform PEIM Loaded\n"));
 
   Status = PeiServicesSetBootMode (ArmPlatformGetBootMode ());
   ASSERT_EFI_ERROR (Status);

@@ -95,7 +95,7 @@ InitializeMemory (
   UINTN                                 FdTop;
   UINTN                                 UefiMemoryBase;
 
-  DEBUG ((EFI_D_LOAD | EFI_D_INFO, "Memory Init PEIM Loaded\n"));
+  DEBUG ((DEBUG_LOAD | DEBUG_INFO, "Memory Init PEIM Loaded\n"));
 
   // Ensure PcdSystemMemorySize has been set
   ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
