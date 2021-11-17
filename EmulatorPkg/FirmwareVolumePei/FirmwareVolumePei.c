@@ -44,7 +44,7 @@ Returns:
   UINT64                      FdSize;
   UINTN                       Index;
 
-  DEBUG ((EFI_D_ERROR, "Unix Firmware Volume PEIM Loaded\n"));
+  DEBUG ((DEBUG_ERROR, "Unix Firmware Volume PEIM Loaded\n"));
 
   //
   // Get the Fwh Information PPI
