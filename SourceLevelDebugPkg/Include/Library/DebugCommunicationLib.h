@@ -9,7 +9,7 @@
 #ifndef __DEBUG_COMMUNICATION_LIB_H__
 #define __DEBUG_COMMUNICATION_LIB_H__
 
-typedef VOID *    DEBUG_PORT_HANDLE;
+typedef VOID *DEBUG_PORT_HANDLE;
 
 /**
   Caller provided function to be invoked at the end of DebugPortInitialize().
@@ -22,7 +22,7 @@ typedef VOID *    DEBUG_PORT_HANDLE;
 **/
 typedef
 VOID
-(EFIAPI * DEBUG_PORT_CONTINUE)(
+(EFIAPI *DEBUG_PORT_CONTINUE)(
   IN VOID                *Context,
   IN DEBUG_PORT_HANDLE   DebugPortHandle
   );
@@ -70,7 +70,6 @@ DebugPortInitialize (
   IN DEBUG_PORT_CONTINUE  Function
   );
 
-
 /**
   Read data from debug device and save the datas in buffer.
 
@@ -96,7 +95,6 @@ DebugPortReadBuffer (
   IN UINTN                 NumberOfBytes,
   IN UINTN                 Timeout
   );
-
 
 /**
   Write data from buffer to debug device.
@@ -143,4 +141,3 @@ DebugPortPollBuffer (
   );
 
 #endif
-

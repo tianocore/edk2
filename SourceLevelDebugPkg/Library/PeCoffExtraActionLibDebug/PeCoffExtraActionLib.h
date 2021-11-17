@@ -19,11 +19,11 @@
 
 #include <ImageDebugSupport.h>
 
-#define DEBUG_LOAD_IMAGE_METHOD_IO_HW_BREAKPOINT    1
-#define DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3           2
+#define DEBUG_LOAD_IMAGE_METHOD_IO_HW_BREAKPOINT  1
+#define DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3         2
 
-#define IO_HW_BREAKPOINT_VECTOR_NUM                 1
-#define SOFT_INT_VECTOR_NUM                         3
+#define IO_HW_BREAKPOINT_VECTOR_NUM  1
+#define SOFT_INT_VECTOR_NUM          3
 
 extern UINTN  AsmInterruptHandle;
 
@@ -70,4 +70,3 @@ RestoreIdtEntry1 (
   );
 
 #endif
-

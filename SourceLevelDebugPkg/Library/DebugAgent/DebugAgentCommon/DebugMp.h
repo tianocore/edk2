@@ -9,7 +9,7 @@
 #ifndef _DEBUG_MP_H_
 #define _DEBUG_MP_H_
 
-#define DEBUG_CPU_MAX_COUNT             256
+#define DEBUG_CPU_MAX_COUNT  256
 
 typedef struct {
   UINT32    CpuCount;                            ///< Processor count
@@ -17,21 +17,21 @@ typedef struct {
 } DEBUG_CPU_DATA;
 
 typedef struct {
-  SPIN_LOCK                 MpContextSpinLock;   ///< Lock for writing MP context
-  SPIN_LOCK                 DebugPortSpinLock;   ///< Lock for access debug port
-  SPIN_LOCK                 MailboxSpinLock;     ///< Lock for accessing mail box
-  UINT8                     CpuBreakMask[DEBUG_CPU_MAX_COUNT/8];        ///< Bitmask of all breaking CPUs
-  UINT8                     CpuStopStatusMask[DEBUG_CPU_MAX_COUNT/8];   ///< Bitmask of CPU stop status
-  UINT32                    ViewPointIndex;      ///< Current view point to be debugged
-  UINT32                    BspIndex;            ///< Processor index value of BSP
-  UINT32                    BreakAtCpuIndex;     ///< Processor index value of the current breaking CPU
-  UINT32                    DebugTimerInitCount; ///< Record BSP's init timer count
-  BOOLEAN                   IpiSentByAp;         ///< TRUE: IPI is sent by AP. FALSE: IPI is sent by BSP
-  BOOLEAN                   RunCommandSet;       ///< TRUE: RUN command is executing. FALSE: RUN command has been executed.
+  SPIN_LOCK    MpContextSpinLock;                        ///< Lock for writing MP context
+  SPIN_LOCK    DebugPortSpinLock;                        ///< Lock for access debug port
+  SPIN_LOCK    MailboxSpinLock;                          ///< Lock for accessing mail box
+  UINT8        CpuBreakMask[DEBUG_CPU_MAX_COUNT/8];      ///< Bitmask of all breaking CPUs
+  UINT8        CpuStopStatusMask[DEBUG_CPU_MAX_COUNT/8]; ///< Bitmask of CPU stop status
+  UINT32       ViewPointIndex;                           ///< Current view point to be debugged
+  UINT32       BspIndex;                                 ///< Processor index value of BSP
+  UINT32       BreakAtCpuIndex;                          ///< Processor index value of the current breaking CPU
+  UINT32       DebugTimerInitCount;                      ///< Record BSP's init timer count
+  BOOLEAN      IpiSentByAp;                              ///< TRUE: IPI is sent by AP. FALSE: IPI is sent by BSP
+  BOOLEAN      RunCommandSet;                            ///< TRUE: RUN command is executing. FALSE: RUN command has been executed.
 } DEBUG_MP_CONTEXT;
 
-extern DEBUG_MP_CONTEXT volatile   mDebugMpContext;
-extern DEBUG_CPU_DATA   volatile   mDebugCpuData;
+extern DEBUG_MP_CONTEXT volatile  mDebugMpContext;
+extern DEBUG_CPU_DATA   volatile  mDebugCpuData;
 
 /**
   Break the other processor by send IPI.
@@ -213,4 +213,3 @@ IsFirstBreakProcessor (
   );
 
 #endif
-

@@ -22,23 +22,23 @@ InitializeDebugTimer (
   IN  BOOLEAN    DumpFlag
   )
 {
-  UINTN       ApicTimerDivisor;
-  UINT32      InitialCount;
-  UINT32      ApicTimerFrequency;
+  UINTN   ApicTimerDivisor;
+  UINT32  InitialCount;
+  UINT32  ApicTimerFrequency;
 
   InitializeLocalApicSoftwareEnable (TRUE);
   GetApicTimerState (&ApicTimerDivisor, NULL, NULL);
-  ApicTimerFrequency = PcdGet32(PcdFSBClock) / (UINT32)ApicTimerDivisor;
+  ApicTimerFrequency = PcdGet32 (PcdFSBClock) / (UINT32)ApicTimerDivisor;
   //
   // Cpu Local Apic timer interrupt frequency, it is set to 0.1s
   //
   InitialCount = (UINT32)DivU64x32 (
-                   MultU64x64 (
-                     ApicTimerFrequency,
-                     DEBUG_TIMER_INTERVAL
-                     ),
-                   1000000u
-                   );
+                           MultU64x64 (
+                             ApicTimerFrequency,
+                             DEBUG_TIMER_INTERVAL
+                             ),
+                           1000000u
+                           );
 
   InitializeApicTimer (ApicTimerDivisor, InitialCount, TRUE, DEBUG_TIMER_VECTOR);
   //
@@ -48,14 +48,16 @@ InitializeDebugTimer (
   DisableApicTimerInterrupt ();
 
   if (DumpFlag) {
-    DEBUG ((EFI_D_INFO, "Debug Timer: FSB Clock    = %d\n", PcdGet32(PcdFSBClock)));
+    DEBUG ((EFI_D_INFO, "Debug Timer: FSB Clock    = %d\n", PcdGet32 (PcdFSBClock)));
     DEBUG ((EFI_D_INFO, "Debug Timer: Divisor      = %d\n", ApicTimerDivisor));
     DEBUG ((EFI_D_INFO, "Debug Timer: Frequency    = %d\n", ApicTimerFrequency));
     DEBUG ((EFI_D_INFO, "Debug Timer: InitialCount = %d\n", InitialCount));
   }
+
   if (TimerFrequency != NULL) {
     *TimerFrequency = ApicTimerFrequency;
   }
+
   return InitialCount;
 }
 
@@ -78,7 +80,7 @@ SaveAndSetDebugTimerInterrupt (
   IN BOOLEAN                EnableStatus
   )
 {
-  BOOLEAN     OldDebugTimerInterruptState;
+  BOOLEAN  OldDebugTimerInterruptState;
 
   OldDebugTimerInterruptState = GetApicTimerInterruptState ();
 
@@ -88,6 +90,7 @@ SaveAndSetDebugTimerInterrupt (
     } else {
       DisableApicTimerInterrupt ();
     }
+
     //
     // Validate the Debug Timer interrupt state
     // This will make additional delay after Local Apic Timer interrupt state is changed.
@@ -138,6 +141,5 @@ IsDebugTimerTimeout (
     Delta = TimerCycle - (CurrentTimer - Timer) + 1;
   }
 
-  return (BOOLEAN) (Delta >= TimeoutTicker);
+  return (BOOLEAN)(Delta >= TimeoutTicker);
 }
-
