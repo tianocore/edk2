@@ -37,10 +37,10 @@
 VOID
 EFIAPI
 InternalX86DisablePaging64 (
-  IN      UINT16                    CodeSelector,
-  IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
+  IN      UINT16 CodeSelector,
+  IN      UINT32 EntryPoint,
+  IN      UINT32 Context1, OPTIONAL
+  IN      UINT32                    Context2, OPTIONAL
   IN      UINT32                    NewStack
   )
 {

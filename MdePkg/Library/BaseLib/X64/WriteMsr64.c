@@ -12,7 +12,11 @@
 
 #include <Library/RegisterFilterLib.h>
 
-void __writemsr (unsigned long Register, unsigned __int64 Value);
+void
+__writemsr (
+  unsigned long     Register,
+  unsigned __int64  Value
+  );
 
 #pragma intrinsic(__writemsr)
 
@@ -32,14 +36,14 @@ AsmWriteMsr64 (
   IN UINT64  Value
   )
 {
-  BOOLEAN                           Flag;
+  BOOLEAN  Flag;
 
   Flag = FilterBeforeMsrWrite (Index, &Value);
   if (Flag) {
     __writemsr (Index, Value);
   }
+
   FilterAfterMsrWrite (Index, &Value);
 
   return Value;
 }
-

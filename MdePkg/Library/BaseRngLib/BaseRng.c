@@ -19,8 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Uses the recommended value defined in Section 7.3.17 of "Intel 64 and IA-32
 // Architectures Software Developer's Manual".
 //
-#define GETRANDOM_RETRY_LIMIT           10
-
+#define GETRANDOM_RETRY_LIMIT  10
 
 /**
   Generates a 16-bit random number.
@@ -36,7 +35,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN
 EFIAPI
 GetRandomNumber16 (
-  OUT     UINT16                    *Rand
+  OUT     UINT16  *Rand
   )
 {
   UINT32  Index;
@@ -77,7 +76,7 @@ GetRandomNumber16 (
 BOOLEAN
 EFIAPI
 GetRandomNumber32 (
-  OUT     UINT32                    *Rand
+  OUT     UINT32  *Rand
   )
 {
   UINT32  Index;
@@ -118,7 +117,7 @@ GetRandomNumber32 (
 BOOLEAN
 EFIAPI
 GetRandomNumber64 (
-  OUT     UINT64                    *Rand
+  OUT     UINT64  *Rand
   )
 {
   UINT32  Index;
@@ -159,7 +158,7 @@ GetRandomNumber64 (
 BOOLEAN
 EFIAPI
 GetRandomNumber128 (
-  OUT     UINT64                    *Rand
+  OUT     UINT64  *Rand
   )
 {
   ASSERT (Rand != NULL);
