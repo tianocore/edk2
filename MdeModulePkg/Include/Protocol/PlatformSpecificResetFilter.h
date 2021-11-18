@@ -18,8 +18,8 @@
 #define EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PROTOCOL_GUID \
   { 0x695d7835, 0x8d47, 0x4c11, { 0xab, 0x22, 0xfa, 0x8a, 0xcc, 0xe7, 0xae, 0x7a } }
 
-typedef EFI_RESET_NOTIFICATION_PROTOCOL  EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PROTOCOL;
+typedef EFI_RESET_NOTIFICATION_PROTOCOL EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PROTOCOL;
 
-extern EFI_GUID gEdkiiPlatformSpecificResetFilterProtocolGuid;
+extern EFI_GUID  gEdkiiPlatformSpecificResetFilterProtocolGuid;
 
 #endif

@@ -32,8 +32,8 @@ SdDiskInfoInquiry (
   IN OUT UINT32                  *InquiryDataSize
   )
 {
-  EFI_STATUS    Status;
-  SD_DEVICE     *Device;
+  EFI_STATUS  Status;
+  SD_DEVICE   *Device;
 
   Device = SD_DEVICE_DATA_FROM_DISKINFO (This);
 

@@ -32,9 +32,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 ChooseFile (
-  IN  EFI_DEVICE_PATH_PROTOCOL  *RootDirectory,
-  IN  CHAR16                    *FileType,  OPTIONAL
-  IN  CHOOSE_HANDLER            ChooseHandler,  OPTIONAL
+  IN  EFI_DEVICE_PATH_PROTOCOL *RootDirectory,
+  IN  CHAR16 *FileType, OPTIONAL
+  IN  CHOOSE_HANDLER            ChooseHandler, OPTIONAL
   OUT EFI_DEVICE_PATH_PROTOCOL  **File  OPTIONAL
   );
 

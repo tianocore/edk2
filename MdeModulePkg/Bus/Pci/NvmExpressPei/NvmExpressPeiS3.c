@@ -26,27 +26,27 @@
 **/
 BOOLEAN
 NvmeS3SkipThisController (
-  IN  EFI_DEVICE_PATH_PROTOCOL    *HcDevicePath,
-  IN  UINTN                       HcDevicePathLength
+  IN  EFI_DEVICE_PATH_PROTOCOL  *HcDevicePath,
+  IN  UINTN                     HcDevicePathLength
   )
 {
-  EFI_STATUS                  Status;
-  UINT8                       DummyData;
-  UINTN                       S3InitDevicesLength;
-  EFI_DEVICE_PATH_PROTOCOL    *S3InitDevices;
-  EFI_DEVICE_PATH_PROTOCOL    *DevicePathInst;
-  UINTN                       DevicePathInstLength;
-  BOOLEAN                     EntireEnd;
-  BOOLEAN                     Skip;
+  EFI_STATUS                Status;
+  UINT8                     DummyData;
+  UINTN                     S3InitDevicesLength;
+  EFI_DEVICE_PATH_PROTOCOL  *S3InitDevices;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePathInst;
+  UINTN                     DevicePathInstLength;
+  BOOLEAN                   EntireEnd;
+  BOOLEAN                   Skip;
 
   //
   // From the LockBox, get the list of device paths for devices need to be
   // initialized in S3.
   //
-  S3InitDevices       = NULL;
+  S3InitDevices = NULL;
   S3InitDevicesLength = sizeof (DummyData);
-  EntireEnd           = FALSE;
-  Skip                = TRUE;
+  EntireEnd = FALSE;
+  Skip   = TRUE;
   Status = RestoreLockBox (&gS3StorageDeviceInitListGuid, &DummyData, &S3InitDevicesLength);
   if (Status != EFI_BUFFER_TOO_SMALL) {
     return Skip;
@@ -83,7 +83,7 @@ NvmeS3SkipThisController (
     }
 
     DevicePathInst = S3InitDevices;
-    S3InitDevices  = (EFI_DEVICE_PATH_PROTOCOL *)((UINTN) S3InitDevices + DevicePathInstLength);
+    S3InitDevices  = (EFI_DEVICE_PATH_PROTOCOL *)((UINTN)S3InitDevices + DevicePathInstLength);
 
     if (HcDevicePathLength >= DevicePathInstLength) {
       continue;
@@ -97,7 +97,8 @@ NvmeS3SkipThisController (
           DevicePathInst,
           HcDevicePath,
           HcDevicePathLength - sizeof (EFI_DEVICE_PATH_PROTOCOL)
-          ) == 0) {
+          ) == 0)
+    {
       Skip = FALSE;
       break;
     }

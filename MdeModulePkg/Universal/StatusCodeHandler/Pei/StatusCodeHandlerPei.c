@@ -29,14 +29,14 @@ StatusCodeHandlerPeiEntry (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS                  Status;
-  EFI_PEI_RSC_HANDLER_PPI     *RscHandlerPpi;
+  EFI_STATUS               Status;
+  EFI_PEI_RSC_HANDLER_PPI  *RscHandlerPpi;
 
   Status = PeiServicesLocatePpi (
              &gEfiPeiRscHandlerPpiGuid,
              0,
              NULL,
-             (VOID **) &RscHandlerPpi
+             (VOID **)&RscHandlerPpi
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -46,11 +46,12 @@ StatusCodeHandlerPeiEntry (
   // if enable UseMemory, then initialize memory status code worker.
   //
   if (PcdGetBool (PcdStatusCodeUseSerial)) {
-    Status = SerialPortInitialize();
+    Status = SerialPortInitialize ();
     ASSERT_EFI_ERROR (Status);
     Status = RscHandlerPpi->Register (SerialStatusCodeReportWorker);
     ASSERT_EFI_ERROR (Status);
   }
+
   if (PcdGetBool (PcdStatusCodeUseMemory)) {
     Status = MemoryStatusCodeInitializeWorker ();
     ASSERT_EFI_ERROR (Status);
@@ -60,4 +61,3 @@ StatusCodeHandlerPeiEntry (
 
   return EFI_SUCCESS;
 }
-

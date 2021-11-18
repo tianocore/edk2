@@ -18,13 +18,12 @@
 **/
 CHAR16 *
 TrimString (
-  IN CHAR16    *String
+  IN CHAR16  *String
   )
 {
-  CHAR16       *TempString;
+  CHAR16  *TempString;
 
   for ( ; *String != L'\0' && *String == L' '; String++) {
-    ;
   }
 
   TempString = String + StrLen (String) - 1;
@@ -47,11 +46,11 @@ TrimString (
 **/
 VOID
 ReplaceLeft (
-  IN CHAR16         *Destination,
-  IN CONST CHAR16   *Source
+  IN CHAR16        *Destination,
+  IN CONST CHAR16  *Source
   )
 {
-  CONST CHAR16      *EndString;
+  CONST CHAR16  *EndString;
 
   EndString = Source + StrLen (Source);
   while (Source <= EndString) {
@@ -70,18 +69,18 @@ ReplaceLeft (
 **/
 CHAR16 *
 ExcludeTrailingBackslashes (
-  IN CHAR16                    *String
+  IN CHAR16  *String
   )
 {
-  CHAR16                       *TempString;
+  CHAR16  *TempString;
 
   switch (*(String + 1)) {
-  case L'\\':
-    break;
-  case L'\0':
-  default:
-    String++;
-    goto Exit;
+    case L'\\':
+      break;
+    case L'\0':
+    default:
+      String++;
+      goto Exit;
   }
 
   TempString = String;
@@ -109,14 +108,14 @@ Exit:
 **/
 CHAR16 *
 MangleFileName (
-  IN CHAR16        *FileName
+  IN CHAR16  *FileName
   )
 {
-  CHAR16           *FileNameSavedPointer;
-  CHAR16           *TempFileName;
-  UINTN            BackslashesNo;
+  CHAR16  *FileNameSavedPointer;
+  CHAR16  *TempFileName;
+  UINTN   BackslashesNo;
 
-  if (FileName == NULL || *FileName == L'\0') {
+  if ((FileName == NULL) || (*FileName == L'\0')) {
     FileName = NULL;
     goto Exit;
   }
@@ -149,55 +148,56 @@ MangleFileName (
       FileName = ExcludeTrailingBackslashes (FileName);
     } else if (*FileName == L'.') {
       switch (*(FileName + 1)) {
-      case L'\0':
-        *FileName = L'\0';
-        break;
-      case L'\\':
-        TempFileName = FileName + 1;
-        TempFileName = ExcludeTrailingBackslashes (TempFileName);
-        ReplaceLeft (FileName, TempFileName);
-        break;
-      case '.':
-        if ((*(FileName - 1) != L'\\') && ((*(FileName + 2) != L'\\') ||
-                                           (*(FileName + 2) != L'\0'))) {
-          FileName++;
-          continue;
-        }
-
-        BackslashesNo = 0;
-        TempFileName = FileName - 1;
-        while (TempFileName >= FileNameSavedPointer) {
-          if (*TempFileName == L'\\') {
-            if (++BackslashesNo == 2) {
-              break;
-            }
+        case L'\0':
+          *FileName = L'\0';
+          break;
+        case L'\\':
+          TempFileName = FileName + 1;
+          TempFileName = ExcludeTrailingBackslashes (TempFileName);
+          ReplaceLeft (FileName, TempFileName);
+          break;
+        case '.':
+          if ((*(FileName - 1) != L'\\') && ((*(FileName + 2) != L'\\') ||
+                                             (*(FileName + 2) != L'\0')))
+          {
+            FileName++;
+            continue;
           }
 
-          TempFileName--;
-        }
-
-        TempFileName++;
-
-        if ((*TempFileName == L'.') && (*(TempFileName + 1) == L'.')) {
-          FileName += 2;
-        } else {
-          if (*(FileName + 2) != L'\0') {
-            ReplaceLeft (TempFileName, FileName + 3);
-            if (*(TempFileName - 1) == L'\\') {
-              FileName = TempFileName;
-              ExcludeTrailingBackslashes (TempFileName - 1);
-              TempFileName = FileName;
+          BackslashesNo = 0;
+          TempFileName  = FileName - 1;
+          while (TempFileName >= FileNameSavedPointer) {
+            if (*TempFileName == L'\\') {
+              if (++BackslashesNo == 2) {
+                break;
+              }
             }
+
+            TempFileName--;
+          }
+
+          TempFileName++;
+
+          if ((*TempFileName == L'.') && (*(TempFileName + 1) == L'.')) {
+            FileName += 2;
           } else {
-            *TempFileName = L'\0';
+            if (*(FileName + 2) != L'\0') {
+              ReplaceLeft (TempFileName, FileName + 3);
+              if (*(TempFileName - 1) == L'\\') {
+                FileName = TempFileName;
+                ExcludeTrailingBackslashes (TempFileName - 1);
+                TempFileName = FileName;
+              }
+            } else {
+              *TempFileName = L'\0';
+            }
+
+            FileName = TempFileName;
           }
 
-          FileName = TempFileName;
-        }
-
-        break;
-      default:
-        FileName++;
+          break;
+        default:
+          FileName++;
       }
     } else {
       FileName++;
@@ -205,8 +205,8 @@ MangleFileName (
   }
 
   FileName = FileNameSavedPointer;
-  if ((StrLen (FileName) > 1) && (FileName [StrLen (FileName) - 1] == L'\\')) {
-    FileName [StrLen (FileName) - 1] = L'\0';
+  if ((StrLen (FileName) > 1) && (FileName[StrLen (FileName) - 1] == L'\\')) {
+    FileName[StrLen (FileName) - 1] = L'\0';
   }
 
 Exit:

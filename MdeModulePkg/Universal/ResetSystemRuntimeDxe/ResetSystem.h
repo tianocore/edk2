@@ -9,7 +9,6 @@
 #ifndef _RESET_SYSTEM_H_
 #define _RESET_SYSTEM_H_
 
-
 #include <PiDxe.h>
 
 #include <Protocol/Reset.h>
@@ -32,22 +31,22 @@
 //
 // The maximum recurstion depth to ResetSystem() by reset notification handlers
 //
-#define MAX_RESET_NOTIFY_DEPTH 10
+#define MAX_RESET_NOTIFY_DEPTH  10
 
 typedef struct {
-  UINT32                   Signature;
-  LIST_ENTRY               Link;
-  EFI_RESET_SYSTEM         ResetNotify;
+  UINT32              Signature;
+  LIST_ENTRY          Link;
+  EFI_RESET_SYSTEM    ResetNotify;
 } RESET_NOTIFY_ENTRY;
-#define RESET_NOTIFY_ENTRY_SIGNATURE    SIGNATURE_32('r', 's', 't', 'n')
-#define RESET_NOTIFY_ENTRY_FROM_LINK(a) CR (a, RESET_NOTIFY_ENTRY, Link, RESET_NOTIFY_ENTRY_SIGNATURE)
+#define RESET_NOTIFY_ENTRY_SIGNATURE  SIGNATURE_32('r', 's', 't', 'n')
+#define RESET_NOTIFY_ENTRY_FROM_LINK(a)  CR (a, RESET_NOTIFY_ENTRY, Link, RESET_NOTIFY_ENTRY_SIGNATURE)
 
 typedef struct {
-  UINT32                          Signature;
-  EFI_RESET_NOTIFICATION_PROTOCOL ResetNotification;
-  LIST_ENTRY                      ResetNotifies;
+  UINT32                             Signature;
+  EFI_RESET_NOTIFICATION_PROTOCOL    ResetNotification;
+  LIST_ENTRY                         ResetNotifies;
 } RESET_NOTIFICATION_INSTANCE;
-#define RESET_NOTIFICATION_INSTANCE_SIGNATURE    SIGNATURE_32('r', 's', 't', 'i')
+#define RESET_NOTIFICATION_INSTANCE_SIGNATURE  SIGNATURE_32('r', 's', 't', 'i')
 #define RESET_NOTIFICATION_INSTANCE_FROM_THIS(a) \
   CR (a, RESET_NOTIFICATION_INSTANCE, ResetNotification, RESET_NOTIFICATION_INSTANCE_SIGNATURE)
 
@@ -89,10 +88,10 @@ InitializeResetSystem (
 VOID
 EFIAPI
 RuntimeServiceResetSystem (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN VOID             *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   );
 
 #endif

@@ -6,7 +6,6 @@
 
 **/
 
-
 #include "InternalHiiLib.h"
 
 /**
@@ -30,7 +29,7 @@
 CHAR8 *
 EFIAPI
 HiiGetSupportedLanguages (
-  IN EFI_HII_HANDLE           HiiHandle
+  IN EFI_HII_HANDLE  HiiHandle
   )
 {
   EFI_STATUS  Status;
@@ -87,4 +86,3 @@ HiiGetSupportedLanguages (
   //
   return SupportedLanguages;
 }
-

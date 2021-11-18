@@ -20,14 +20,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gPciSioSerialComponen
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gPciSioSerialComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) SerialComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) SerialComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gPciSioSerialComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)SerialComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)SerialComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mSerialDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mSerialDriverNameTable[] = {
   {
     "eng;en",
     L"PCI SIO Serial Driver"
@@ -165,11 +164,11 @@ SerialComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 SerialComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   EFI_STATUS                Status;
@@ -217,7 +216,7 @@ SerialComponentNameGetControllerName (
     Status = gBS->OpenProtocol (
                     ChildHandle,
                     &gEfiSerialIoProtocolGuid,
-                    (VOID **) &SerialIo,
+                    (VOID **)&SerialIo,
                     gSerialControllerDriver.DriverBindingHandle,
                     ChildHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -250,11 +249,12 @@ SerialComponentNameGetControllerName (
 **/
 VOID
 AddName (
-  IN  SERIAL_DEV                               *SerialDevice,
-  IN  UINT32                                   Instance
+  IN  SERIAL_DEV  *SerialDevice,
+  IN  UINT32      Instance
   )
 {
-  CHAR16                                       SerialPortName[SERIAL_PORT_NAME_LEN];
+  CHAR16  SerialPortName[SERIAL_PORT_NAME_LEN];
+
   UnicodeSPrint (
     SerialPortName,
     sizeof (SerialPortName),
@@ -275,5 +275,4 @@ AddName (
     SerialPortName,
     FALSE
     );
-
 }

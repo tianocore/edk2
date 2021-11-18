@@ -11,22 +11,22 @@
 //
 // Driver name table
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mAtaAtapiPassThruDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mAtaAtapiPassThruDriverNameTable[] = {
   { "eng;en", L"AtaAtapiPassThru Driver" },
-  { NULL , NULL }
+  { NULL,     NULL                       }
 };
 
 //
 // Controller name table
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mAtaAtapiPassThruIdeControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mAtaAtapiPassThruIdeControllerNameTable[] = {
   { "eng;en", L"IDE Controller" },
-  { NULL , NULL }
+  { NULL,     NULL              }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mAtaAtapiPassThruAhciControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mAtaAtapiPassThruAhciControllerNameTable[] = {
   { "eng;en", L"AHCI Controller" },
-  { NULL , NULL }
+  { NULL,     NULL               }
 };
 
 //
@@ -41,9 +41,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gAtaAtapiPassThruComp
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gAtaAtapiPassThruComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) AtaAtapiPassThruComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) AtaAtapiPassThruComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gAtaAtapiPassThruComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)AtaAtapiPassThruComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)AtaAtapiPassThruComponentNameGetControllerName,
   "en"
 };
 
@@ -102,7 +102,6 @@ AtaAtapiPassThruComponentNameGetDriverName (
            (BOOLEAN)(This == &gAtaAtapiPassThruComponentName)
            );
 }
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -175,11 +174,11 @@ AtaAtapiPassThruComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 AtaAtapiPassThruComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   EFI_STATUS                    Status;
@@ -187,7 +186,7 @@ AtaAtapiPassThruComponentNameGetControllerName (
   VOID                          *Interface;
   ATA_ATAPI_PASS_THRU_INSTANCE  *Instance;
 
-  if (Language == NULL || ControllerName == NULL) {
+  if ((Language == NULL) || (ControllerName == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 

@@ -40,13 +40,12 @@ DebugPrint (
   ...
   )
 {
-  VA_LIST         Marker;
+  VA_LIST  Marker;
 
   VA_START (Marker, Format);
   DebugVPrint (ErrorLevel, Format, Marker);
   VA_END (Marker);
 }
-
 
 /**
   Prints a debug message to the debug output device if the specified
@@ -68,13 +67,13 @@ DebugPrint (
 VOID
 EFIAPI
 DebugBPrint (
-  IN  UINTN         ErrorLevel,
-  IN  CONST CHAR8   *Format,
-  IN  BASE_LIST     BaseListMarker
+  IN  UINTN        ErrorLevel,
+  IN  CONST CHAR8  *Format,
+  IN  BASE_LIST    BaseListMarker
   )
 {
-  EFI_STATUS      Status;
-  EDKII_DEBUG_PPI *DebugPpi;
+  EFI_STATUS       Status;
+  EDKII_DEBUG_PPI  *DebugPpi;
 
   //
   // If Format is NULL, then ASSERT().
@@ -89,11 +88,11 @@ DebugBPrint (
   }
 
   Status = PeiServicesLocatePpi (
-              &gEdkiiDebugPpiGuid,
-              0,
-              NULL,
-              (VOID **)&DebugPpi
-              );
+             &gEdkiiDebugPpiGuid,
+             0,
+             NULL,
+             (VOID **)&DebugPpi
+             );
   if (EFI_ERROR (Status)) {
     return;
   }
@@ -104,7 +103,6 @@ DebugBPrint (
               BaseListMarker
               );
 }
-
 
 /**
   Worker function that convert a VA_LIST to a BASE_LIST based on a
@@ -129,8 +127,8 @@ VaListToBaseList (
   IN  UINTN        Size
   )
 {
-  BASE_LIST       BaseListStart;
-  BOOLEAN         Long;
+  BASE_LIST  BaseListStart;
+  BOOLEAN    Long;
 
   ASSERT (Format != NULL);
 
@@ -138,7 +136,7 @@ VaListToBaseList (
 
   BaseListStart = BaseListMarker;
 
-  for (; *Format != '\0'; Format++) {
+  for ( ; *Format != '\0'; Format++) {
     //
     // Only format with prefix % is processed.
     //
@@ -152,25 +150,28 @@ VaListToBaseList (
     // Parse Flags and Width
     //
     for (Format++; TRUE; Format++) {
-      if (*Format == '.' || *Format == '-' || *Format == '+' || *Format == ' ') {
+      if ((*Format == '.') || (*Format == '-') || (*Format == '+') || (*Format == ' ')) {
         //
         // These characters in format field are omitted.
         //
         continue;
       }
-      if (*Format >= '0' && *Format <= '9') {
+
+      if ((*Format >= '0') && (*Format <= '9')) {
         //
         // These characters in format field are omitted.
         //
         continue;
       }
-      if (*Format == 'L' || *Format == 'l') {
+
+      if ((*Format == 'L') || (*Format == 'l')) {
         //
         // 'L" or "l" in format field means the number being printed is a UINT64
         //
         Long = TRUE;
         continue;
       }
+
       if (*Format == '*') {
         //
         // '*' in format field means the precision of the field is specified by
@@ -179,6 +180,7 @@ VaListToBaseList (
         BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
         continue;
       }
+
       if (*Format == '\0') {
         //
         // Make no output if Format string terminates unexpectedly when
@@ -186,6 +188,7 @@ VaListToBaseList (
         //
         Format--;
       }
+
       //
       // When valid argument type detected or format string terminates unexpectedly,
       // the inner loop is done.
@@ -199,13 +202,14 @@ VaListToBaseList (
     if ((*Format == 'p') && (sizeof (VOID *) > 4)) {
       Long = TRUE;
     }
-    if (*Format == 'p' || *Format == 'X' || *Format == 'x' || *Format == 'd' || *Format == 'u') {
+
+    if ((*Format == 'p') || (*Format == 'X') || (*Format == 'x') || (*Format == 'd') || (*Format == 'u')) {
       if (Long) {
         BASE_ARG (BaseListMarker, INT64) = VA_ARG (VaListMarker, INT64);
       } else {
         BASE_ARG (BaseListMarker, int) = VA_ARG (VaListMarker, int);
       }
-    } else if (*Format == 's' || *Format == 'S' || *Format == 'a' || *Format == 'g' || *Format == 't') {
+    } else if ((*Format == 's') || (*Format == 'S') || (*Format == 'a') || (*Format == 'g') || (*Format == 't')) {
       BASE_ARG (BaseListMarker, VOID *) = VA_ARG (VaListMarker, VOID *);
     } else if (*Format == 'c') {
       BASE_ARG (BaseListMarker, UINTN) = VA_ARG (VaListMarker, UINTN);
@@ -223,7 +227,6 @@ VaListToBaseList (
 
   return TRUE;
 }
-
 
 /**
   Prints a debug message to the debug output device if the specified
@@ -243,13 +246,13 @@ VaListToBaseList (
 VOID
 EFIAPI
 DebugVPrint (
-  IN  UINTN         ErrorLevel,
-  IN  CONST CHAR8   *Format,
-  IN  VA_LIST       VaListMarker
+  IN  UINTN        ErrorLevel,
+  IN  CONST CHAR8  *Format,
+  IN  VA_LIST      VaListMarker
   )
 {
-  UINT64            BaseListMarker[256 / sizeof (UINT64)];
-  BOOLEAN           Converted;
+  UINT64   BaseListMarker[256 / sizeof (UINT64)];
+  BOOLEAN  Converted;
 
   //
   // Convert the VaList to BaseList
@@ -267,7 +270,6 @@ DebugVPrint (
 
   DebugBPrint (ErrorLevel, Format, (BASE_LIST)BaseListMarker);
 }
-
 
 /**
   Prints an assert message containing a filename, line number, and description.
@@ -298,15 +300,15 @@ DebugAssert (
   IN CONST CHAR8  *Description
   )
 {
-  EFI_STATUS      Status;
-  EDKII_DEBUG_PPI *DebugPpi;
+  EFI_STATUS       Status;
+  EDKII_DEBUG_PPI  *DebugPpi;
 
   Status = PeiServicesLocatePpi (
-              &gEdkiiDebugPpiGuid,
-              0,
-              NULL,
-              (VOID **)&DebugPpi
-              );
+             &gEdkiiDebugPpiGuid,
+             0,
+             NULL,
+             (VOID **)&DebugPpi
+             );
   if (EFI_ERROR (Status)) {
     //
     // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
@@ -324,7 +326,6 @@ DebugAssert (
                 );
   }
 }
-
 
 /**
   Fills a target buffer with PcdDebugClearMemoryValue, and returns the target buffer.
@@ -353,7 +354,6 @@ DebugClearMemory (
   return SetMem (Buffer, Length, PcdGet8 (PcdDebugClearMemoryValue));
 }
 
-
 /**
   Returns TRUE if ASSERT() macros are enabled.
 
@@ -370,9 +370,8 @@ DebugAssertEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
 }
-
 
 /**
   Returns TRUE if DEBUG() macros are enabled.
@@ -390,9 +389,8 @@ DebugPrintEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
 }
-
 
 /**
   Returns TRUE if DEBUG_CODE() macros are enabled.
@@ -410,9 +408,8 @@ DebugCodeEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
 }
-
 
 /**
   Returns TRUE if DEBUG_CLEAR_MEMORY() macro is enabled.
@@ -430,9 +427,8 @@ DebugClearMemoryEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
 }
-
 
 /**
   Returns TRUE if any one of the bit is set both in ErrorLevel and PcdFixedDebugPrintErrorLevel.
@@ -446,9 +442,8 @@ DebugClearMemoryEnabled (
 BOOLEAN
 EFIAPI
 DebugPrintLevelEnabled (
-  IN  CONST UINTN        ErrorLevel
+  IN  CONST UINTN  ErrorLevel
   )
 {
-  return (BOOLEAN) ((ErrorLevel & PcdGet32(PcdFixedDebugPrintErrorLevel)) != 0);
+  return (BOOLEAN)((ErrorLevel & PcdGet32 (PcdFixedDebugPrintErrorLevel)) != 0);
 }
-
