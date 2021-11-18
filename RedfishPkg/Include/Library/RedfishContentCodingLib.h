@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef REDFISH_CONTENT_CODING_LIB_H_
 #define REDFISH_CONTENT_CODING_LIB_H_
 
@@ -75,4 +76,5 @@ RedfishContentDecode (
   OUT VOID  **DecodedContentPointer,
   OUT UINTN *DecodedLength
   );
+
 #endif

@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef REDFISH_HOST_INTERFACE_LIB_H_
 #define REDFISH_HOST_INTERFACE_LIB_H_
 
@@ -29,7 +30,8 @@ EFI_STATUS
 RedfishPlatformHostInterfaceDeviceDescriptor (
   IN UINT8 *DeviceType,
   OUT REDFISH_INTERFACE_DATA  **DeviceDescriptor
-);
+  );
+
 /**
   Get platform Redfish host interface protocol data.
   Caller should pass NULL in ProtocolRecord to retrive the first protocol record.
@@ -48,5 +50,6 @@ EFI_STATUS
 RedfishPlatformHostInterfaceProtocolData (
   IN OUT MC_HOST_INTERFACE_PROTOCOL_RECORD **ProtocolRecord,
   IN UINT8  IndexOfProtocolData
-);
+  );
+
 #endif

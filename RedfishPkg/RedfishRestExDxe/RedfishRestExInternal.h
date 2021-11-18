@@ -320,6 +320,7 @@ RedfishRestExEventService (
   IN      EFI_HTTP_MESSAGE       *RequestMessage OPTIONAL,
   IN      EFI_REST_EX_TOKEN      *RestExToken
   );
+
 /**
   Create a new TLS session becuase the previous on is closed.
   status.
@@ -333,8 +334,7 @@ RedfishRestExEventService (
 EFI_STATUS
 ResetHttpTslSession (
   IN   RESTEX_INSTANCE  *Instance
-);
-
+  );
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
@@ -379,7 +379,6 @@ RestExCreateInstance (
   IN  RESTEX_SERVICE         *Service,
   OUT RESTEX_INSTANCE        **Instance
   );
-
 
 /**
   Release all the resource used the RestEx service binding instance.
@@ -608,4 +607,5 @@ RedfishRestExServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
+
 #endif

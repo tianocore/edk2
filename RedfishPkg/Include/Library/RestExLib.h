@@ -37,6 +37,6 @@ RestExLibCreateChild (
   IN EFI_REST_EX_CONFIG_TYPE ConfigType,
   IN EFI_REST_EX_SERVICE_TYPE ServiceType,
   OUT EFI_HANDLE *ChildInstanceHandle
-);
+  );
 
 #endif
