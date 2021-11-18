@@ -12,8 +12,8 @@
 
 EFI_STATUS
 VolumeOpen (
-  IN  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This,
-  OUT EFI_FILE                        **Root
+  IN  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *This,
+  OUT EFI_FILE                         **Root
   );
 
 /**
@@ -79,7 +79,7 @@ FileClose (
 **/
 EFI_STATUS
 FileDelete (
-  IN EFI_FILE *This
+  IN EFI_FILE  *This
   );
 
 /**
@@ -127,9 +127,9 @@ FileRead (
 **/
 EFI_STATUS
 FileWrite (
-  IN     EFI_FILE *This,
-  IN OUT UINTN    *BufferSize,
-  IN     VOID     *Buffer
+  IN     EFI_FILE  *This,
+  IN OUT UINTN     *BufferSize,
+  IN     VOID      *Buffer
   );
 
 /**
@@ -145,8 +145,8 @@ FileWrite (
 **/
 EFI_STATUS
 FileGetPosition (
-  IN  EFI_FILE    *File,
-  OUT UINT64      *Position
+  IN  EFI_FILE  *File,
+  OUT UINT64    *Position
   );
 
 /**
@@ -164,8 +164,8 @@ FileGetPosition (
 **/
 EFI_STATUS
 FileSetPosition (
-  IN EFI_FILE *File,
-  IN UINT64   Position
+  IN EFI_FILE  *File,
+  IN UINT64    Position
   );
 
 /**
@@ -239,8 +239,7 @@ FileSetInfo (
 
 EFI_STATUS
 FileFlush (
-  IN EFI_FILE *File
+  IN EFI_FILE  *File
   );
 
 #endif // SEMIHOST_FS_H_
-

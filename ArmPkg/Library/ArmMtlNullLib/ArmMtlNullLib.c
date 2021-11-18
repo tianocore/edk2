@@ -34,7 +34,7 @@ MtlWaitUntilChannelFree (
 
   @retval UINT32*      Pointer to the payload.
 **/
-UINT32*
+UINT32 *
 MtlGetChannelPayload (
   IN  MTL_CHANNEL  *Channel
   )

@@ -11,14 +11,14 @@
 #define SEMIHOST_PRIVATE_H_
 
 typedef struct {
-  CHAR8   *FileName;
+  CHAR8    *FileName;
   UINTN    Mode;
   UINTN    NameLength;
 } SEMIHOST_FILE_OPEN_BLOCK;
 
 typedef struct {
   UINTN    Handle;
-  VOID    *Buffer;
+  VOID     *Buffer;
   UINTN    Length;
 } SEMIHOST_FILE_READ_WRITE_BLOCK;
 
@@ -28,127 +28,127 @@ typedef struct {
 } SEMIHOST_FILE_SEEK_BLOCK;
 
 typedef struct {
-  VOID    *Buffer;
+  VOID     *Buffer;
   UINTN    Identifier;
   UINTN    Length;
 } SEMIHOST_FILE_TMPNAME_BLOCK;
 
 typedef struct {
-  CHAR8   *FileName;
+  CHAR8    *FileName;
   UINTN    NameLength;
 } SEMIHOST_FILE_REMOVE_BLOCK;
 
 typedef struct {
-  CHAR8   *FileName;
+  CHAR8    *FileName;
   UINTN    FileNameLength;
-  CHAR8   *NewFileName;
+  CHAR8    *NewFileName;
   UINTN    NewFileNameLength;
 } SEMIHOST_FILE_RENAME_BLOCK;
 
 typedef struct {
-  CHAR8   *CommandLine;
+  CHAR8    *CommandLine;
   UINTN    CommandLength;
 } SEMIHOST_SYSTEM_BLOCK;
 
-#if defined(__CC_ARM)
+#if defined (__CC_ARM)
 
-#if defined(__thumb__)
-#define SWI 0xAB
-#else
-#define SWI 0x123456
-#endif
+  #if defined (__thumb__)
+#define SWI  0xAB
+  #else
+#define SWI  0x123456
+  #endif
 
 #define SEMIHOST_SUPPORTED  TRUE
 
-__swi(SWI)
+__swi (SWI)
 INT32
-_Semihost_SYS_OPEN(
-  IN UINTN                    SWI_0x01,
-  IN SEMIHOST_FILE_OPEN_BLOCK *OpenBlock
+_Semihost_SYS_OPEN (
+  IN UINTN                     SWI_0x01,
+  IN SEMIHOST_FILE_OPEN_BLOCK  *OpenBlock
   );
 
-__swi(SWI)
+__swi (SWI)
 INT32
-_Semihost_SYS_CLOSE(
-  IN UINTN  SWI_0x02,
-  IN UINT32 *Handle
+_Semihost_SYS_CLOSE (
+  IN UINTN   SWI_0x02,
+  IN UINT32  *Handle
   );
 
-__swi(SWI)
+__swi (SWI)
 VOID
-_Semihost_SYS_WRITEC(
-  IN UINTN    SWI_0x03,
-  IN CHAR8    *Character
+_Semihost_SYS_WRITEC (
+  IN UINTN  SWI_0x03,
+  IN CHAR8  *Character
   );
 
-__swi(SWI)
+__swi (SWI)
 VOID
-_Semihost_SYS_WRITE0(
-  IN UINTN SWI_0x04,
-  IN CHAR8 *String
+_Semihost_SYS_WRITE0 (
+  IN UINTN  SWI_0x04,
+  IN CHAR8  *String
   );
 
-__swi(SWI)
+__swi (SWI)
 UINT32
-_Semihost_SYS_WRITE(
-  IN     UINTN                          SWI_0x05,
-  IN OUT SEMIHOST_FILE_READ_WRITE_BLOCK *WriteBlock
+_Semihost_SYS_WRITE (
+  IN     UINTN                           SWI_0x05,
+  IN OUT SEMIHOST_FILE_READ_WRITE_BLOCK  *WriteBlock
   );
 
-__swi(SWI)
+__swi (SWI)
 UINT32
-_Semihost_SYS_READ(
-  IN     UINTN                          SWI_0x06,
-  IN OUT SEMIHOST_FILE_READ_WRITE_BLOCK *ReadBlock
+_Semihost_SYS_READ (
+  IN     UINTN                           SWI_0x06,
+  IN OUT SEMIHOST_FILE_READ_WRITE_BLOCK  *ReadBlock
   );
 
-__swi(SWI)
+__swi (SWI)
 CHAR8
-_Semihost_SYS_READC(
-  IN     UINTN SWI_0x07,
-  IN     UINTN Zero
+_Semihost_SYS_READC (
+  IN     UINTN  SWI_0x07,
+  IN     UINTN  Zero
   );
 
-__swi(SWI)
+__swi (SWI)
 INT32
-_Semihost_SYS_SEEK(
-  IN UINTN                    SWI_0x0A,
-  IN SEMIHOST_FILE_SEEK_BLOCK *SeekBlock
+_Semihost_SYS_SEEK (
+  IN UINTN                     SWI_0x0A,
+  IN SEMIHOST_FILE_SEEK_BLOCK  *SeekBlock
   );
 
-__swi(SWI)
+__swi (SWI)
 INT32
-_Semihost_SYS_FLEN(
-  IN UINTN  SWI_0x0C,
-  IN UINT32 *Handle
+_Semihost_SYS_FLEN (
+  IN UINTN   SWI_0x0C,
+  IN UINT32  *Handle
   );
 
-__swi(SWI)
+__swi (SWI)
 UINT32
-_Semihost_SYS_TMPNAME(
-  IN UINTN                       SWI_0x0D,
-  IN SEMIHOST_FILE_TMPNAME_BLOCK *TmpNameBlock
+_Semihost_SYS_TMPNAME (
+  IN UINTN                        SWI_0x0D,
+  IN SEMIHOST_FILE_TMPNAME_BLOCK  *TmpNameBlock
   );
 
-__swi(SWI)
+__swi (SWI)
 UINT32
-_Semihost_SYS_REMOVE(
-  IN UINTN                      SWI_0x0E,
-  IN SEMIHOST_FILE_REMOVE_BLOCK *RemoveBlock
+_Semihost_SYS_REMOVE (
+  IN UINTN                       SWI_0x0E,
+  IN SEMIHOST_FILE_REMOVE_BLOCK  *RemoveBlock
   );
 
-__swi(SWI)
+__swi (SWI)
 UINT32
-_Semihost_SYS_RENAME(
-  IN UINTN                      SWI_0x0F,
-  IN SEMIHOST_FILE_RENAME_BLOCK *RenameBlock
+_Semihost_SYS_RENAME (
+  IN UINTN                       SWI_0x0F,
+  IN SEMIHOST_FILE_RENAME_BLOCK  *RenameBlock
   );
 
-__swi(SWI)
+__swi (SWI)
 UINT32
-_Semihost_SYS_SYSTEM(
-  IN UINTN                 SWI_0x12,
-  IN SEMIHOST_SYSTEM_BLOCK *SystemBlock
+_Semihost_SYS_SYSTEM (
+  IN UINTN                  SWI_0x12,
+  IN SEMIHOST_SYSTEM_BLOCK  *SystemBlock
   );
 
 #define SEMIHOST_SYS_OPEN(OpenBlock)        _Semihost_SYS_OPEN(0x01, OpenBlock)
@@ -165,14 +165,14 @@ _Semihost_SYS_SYSTEM(
 #define SEMIHOST_SYS_RENAME(RenameBlock)    _Semihost_SYS_RENAME(0x0F, RenameBlock)
 #define SEMIHOST_SYS_SYSTEM(SystemBlock)    _Semihost_SYS_SYSTEM(0x12, SystemBlock)
 
-#elif defined(__GNUC__) // __CC_ARM
+#elif defined (__GNUC__) // __CC_ARM
 
 #define SEMIHOST_SUPPORTED  TRUE
 
 UINT32
 GccSemihostCall (
-  IN UINT32   Operation,
-  IN UINTN    SystemBlockAddress
+  IN UINT32  Operation,
+  IN UINTN   SystemBlockAddress
   ); // __attribute__ ((interrupt ("SVC")));
 
 #define SEMIHOST_SYS_OPEN(OpenBlock)        GccSemihostCall(0x01, (UINTN)(OpenBlock))
@@ -193,8 +193,8 @@ GccSemihostCall (
 
 #define SEMIHOST_SUPPORTED  FALSE
 
-#define SEMIHOST_SYS_OPEN(OpenBlock)        (-1)
-#define SEMIHOST_SYS_CLOSE(Handle)          (-1)
+#define SEMIHOST_SYS_OPEN(OpenBlock)  (-1)
+#define SEMIHOST_SYS_CLOSE(Handle)    (-1)
 #define SEMIHOST_SYS_WRITE0(String)
 #define SEMIHOST_SYS_WRITEC(Character)
 #define SEMIHOST_SYS_WRITE(WriteBlock)      (0)
