@@ -32,8 +32,8 @@
 /**
   Forward declarations:
 */
-typedef struct ConfigurationManagerProtocol EDKII_CONFIGURATION_MANAGER_PROTOCOL;
-typedef struct PlatformRepositoryInfo       EDKII_PLATFORM_REPOSITORY_INFO;
+typedef struct ConfigurationManagerProtocol  EDKII_CONFIGURATION_MANAGER_PROTOCOL;
+typedef struct PlatformRepositoryInfo        EDKII_PLATFORM_REPOSITORY_INFO;
 
 /** The GetObject function defines the interface implemented by the
     Configuration Manager Protocol for returning the Configuration
@@ -55,11 +55,11 @@ typedef struct PlatformRepositoryInfo       EDKII_PLATFORM_REPOSITORY_INFO;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_CONFIGURATION_MANAGER_GET_OBJECT) (
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST This,
+(EFIAPI *EDKII_CONFIGURATION_MANAGER_GET_OBJECT)(
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST This,
   IN  CONST CM_OBJECT_ID                                  CmObjectId,
   IN  CONST CM_OBJECT_TOKEN                               Token OPTIONAL,
-  IN  OUT   CM_OBJ_DESCRIPTOR                     * CONST CmObject
+  IN  OUT   CM_OBJ_DESCRIPTOR                     *CONST CmObject
   );
 
 /** The SetObject function defines the interface implemented by the
@@ -83,11 +83,11 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_CONFIGURATION_MANAGER_SET_OBJECT) (
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST This,
+(EFIAPI *EDKII_CONFIGURATION_MANAGER_SET_OBJECT)(
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST This,
   IN  CONST CM_OBJECT_ID                                  CmObjectId,
   IN  CONST CM_OBJECT_TOKEN                               Token OPTIONAL,
-  IN        CM_OBJ_DESCRIPTOR                     * CONST CmObject
+  IN        CM_OBJ_DESCRIPTOR                     *CONST CmObject
   );
 
 /** The EDKII_CONFIGURATION_MANAGER_PROTOCOL structure describes the
@@ -95,27 +95,27 @@ EFI_STATUS
 */
 typedef struct ConfigurationManagerProtocol {
   /// The Configuration Manager Protocol revision.
-  UINT32                                  Revision;
+  UINT32                                    Revision;
 
   /** The interface used to request information about
       the Configuration Manager Objects.
   */
-  EDKII_CONFIGURATION_MANAGER_GET_OBJECT  GetObject;
+  EDKII_CONFIGURATION_MANAGER_GET_OBJECT    GetObject;
 
   /** The interface used to update the information stored
       in the Configuration Manager repository.
   */
-  EDKII_CONFIGURATION_MANAGER_SET_OBJECT  SetObject;
+  EDKII_CONFIGURATION_MANAGER_SET_OBJECT    SetObject;
 
   /** Pointer to an implementation defined abstract repository
       provisioned by the Configuration Manager.
   */
-  EDKII_PLATFORM_REPOSITORY_INFO        * PlatRepoInfo;
+  EDKII_PLATFORM_REPOSITORY_INFO            *PlatRepoInfo;
 } EDKII_CONFIGURATION_MANAGER_PROTOCOL;
 
 /** The Configuration Manager Protocol GUID.
 */
-extern EFI_GUID gEdkiiConfigurationManagerProtocolGuid;
+extern EFI_GUID  gEdkiiConfigurationManagerProtocolGuid;
 
 #pragma pack()
 
