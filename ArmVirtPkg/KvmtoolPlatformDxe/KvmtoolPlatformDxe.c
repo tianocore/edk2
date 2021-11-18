@@ -73,7 +73,7 @@ KvmtoolPlatformDxeEntryPoint (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  EFI_STATUS                     Status;
+  EFI_STATUS  Status;
 
   Status = PlatformHasAcpiDt (ImageHandle);
   ASSERT_EFI_ERROR (Status);

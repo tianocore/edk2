@@ -35,7 +35,7 @@ InitMmu (
   // Get Virtual Memory Map from the Platform Library
   ArmVirtGetMemoryMap (&MemoryTable);
 
-  //Note: Because we called PeiServicesInstallPeiMemory() before to call InitMmu() the MMU Page Table resides in
+  // Note: Because we called PeiServicesInstallPeiMemory() before to call InitMmu() the MMU Page Table resides in
   //      DRAM (even at the top of DRAM as it is the first permanent memory allocation)
   Status = ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);
   if (EFI_ERROR (Status)) {
@@ -50,8 +50,8 @@ MemoryPeim (
   IN UINT64                             UefiMemorySize
   )
 {
-  EFI_RESOURCE_ATTRIBUTE_TYPE ResourceAttributes;
-  UINT64                      SystemMemoryTop;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttributes;
+  UINT64                       SystemMemoryTop;
 
   // Ensure PcdSystemMemorySize has been set
   ASSERT (PcdGet64 (PcdSystemMemorySize) != 0);
@@ -60,35 +60,35 @@ MemoryPeim (
   // Now, the permanent memory has been installed, we can call AllocatePages()
   //
   ResourceAttributes = (
-      EFI_RESOURCE_ATTRIBUTE_PRESENT |
-      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
-      EFI_RESOURCE_ATTRIBUTE_TESTED
-  );
+                        EFI_RESOURCE_ATTRIBUTE_PRESENT |
+                        EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+                        EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+                        EFI_RESOURCE_ATTRIBUTE_TESTED
+                        );
 
   SystemMemoryTop = PcdGet64 (PcdSystemMemoryBase) +
                     PcdGet64 (PcdSystemMemorySize);
 
   if (SystemMemoryTop - 1 > MAX_ALLOC_ADDRESS) {
     BuildResourceDescriptorHob (
-        EFI_RESOURCE_SYSTEM_MEMORY,
-        ResourceAttributes,
-        PcdGet64 (PcdSystemMemoryBase),
-        (UINT64)MAX_ALLOC_ADDRESS - PcdGet64 (PcdSystemMemoryBase) + 1
-        );
+      EFI_RESOURCE_SYSTEM_MEMORY,
+      ResourceAttributes,
+      PcdGet64 (PcdSystemMemoryBase),
+      (UINT64)MAX_ALLOC_ADDRESS - PcdGet64 (PcdSystemMemoryBase) + 1
+      );
     BuildResourceDescriptorHob (
-        EFI_RESOURCE_SYSTEM_MEMORY,
-        ResourceAttributes,
-        (UINT64)MAX_ALLOC_ADDRESS + 1,
-        SystemMemoryTop - MAX_ALLOC_ADDRESS - 1
-        );
+      EFI_RESOURCE_SYSTEM_MEMORY,
+      ResourceAttributes,
+      (UINT64)MAX_ALLOC_ADDRESS + 1,
+      SystemMemoryTop - MAX_ALLOC_ADDRESS - 1
+      );
   } else {
     BuildResourceDescriptorHob (
-        EFI_RESOURCE_SYSTEM_MEMORY,
-        ResourceAttributes,
-        PcdGet64 (PcdSystemMemoryBase),
-        PcdGet64 (PcdSystemMemorySize)
-        );
+      EFI_RESOURCE_SYSTEM_MEMORY,
+      ResourceAttributes,
+      PcdGet64 (PcdSystemMemoryBase),
+      PcdGet64 (PcdSystemMemorySize)
+      );
   }
 
   //
@@ -98,7 +98,7 @@ MemoryPeim (
   // that the contents we put there with the caches and MMU off will still
   // be visible after turning them on.
   //
-  InvalidateDataCacheRange ((VOID*)(UINTN)UefiMemoryBase, UefiMemorySize);
+  InvalidateDataCacheRange ((VOID *)(UINTN)UefiMemoryBase, UefiMemorySize);
 
   // Build Memory Allocation Hob
   InitMmu ();
