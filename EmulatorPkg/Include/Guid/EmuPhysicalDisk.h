@@ -13,6 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_EMU_PHYSICAL_DISK_GUID  \
  { 0xf2ba331a, 0x8985, 0x11db, { 0xa4, 0x06, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35 } }
 
-extern EFI_GUID   gEmuPhysicalDisksGuid;
+extern EFI_GUID  gEmuPhysicalDisksGuid;
 
 #endif

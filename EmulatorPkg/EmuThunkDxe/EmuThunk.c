@@ -22,15 +22,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // EmuThunk Device Path Protocol Instance
 //
-EMU_THUNK_DEVICE_PATH mEmuThunkDevicePath = {
+EMU_THUNK_DEVICE_PATH  mEmuThunkDevicePath = {
   {
     {
       {
         HARDWARE_DEVICE_PATH,
         HW_VENDOR_DP,
         {
-          (UINT8) (sizeof (EMU_VENDOR_DEVICE_PATH_NODE)),
-          (UINT8) ((sizeof (EMU_VENDOR_DEVICE_PATH_NODE)) >> 8)
+          (UINT8)(sizeof (EMU_VENDOR_DEVICE_PATH_NODE)),
+          (UINT8)((sizeof (EMU_VENDOR_DEVICE_PATH_NODE)) >> 8)
         }
       },
       EMU_THUNK_PROTOCOL_GUID
@@ -47,13 +47,13 @@ EMU_THUNK_DEVICE_PATH mEmuThunkDevicePath = {
   }
 };
 
-
 EFI_STATUS
 EFIAPI
 InitializeEmuThunk (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
+
 /*++
 
 Routine Description:
@@ -74,8 +74,10 @@ Returns:
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEmuThunkProtocolGuid,       gEmuThunk,
-                  &gEfiDevicePathProtocolGuid,  &mEmuThunkDevicePath,
+                  &gEmuThunkProtocolGuid,
+                  gEmuThunk,
+                  &gEfiDevicePathProtocolGuid,
+                  &mEmuThunkDevicePath,
                   NULL
                   );
 
