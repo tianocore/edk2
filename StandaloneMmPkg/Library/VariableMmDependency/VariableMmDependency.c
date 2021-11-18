@@ -30,8 +30,8 @@ VariableMmDependencyLibConstructor (
   IN EFI_SYSTEM_TABLE                     *SystemTable
   )
 {
-  EFI_STATUS            Status;
-  EFI_HANDLE            Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
