@@ -17,8 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EMU_SNP_PROTOCOL_GUID \
  { 0xFD5FBE54, 0x8C35, 0xB345, { 0x8A, 0x0F, 0x7A, 0xC8, 0xA5, 0xFD, 0x05, 0x21 } }
 
-typedef struct _EMU_SNP_PROTOCOL  EMU_SNP_PROTOCOL;
-
+typedef struct _EMU_SNP_PROTOCOL EMU_SNP_PROTOCOL;
 
 /**
   Register storage for SNP Mode.
@@ -36,7 +35,6 @@ EFI_STATUS
   IN EMU_SNP_PROTOCOL         *This,
   IN EFI_SIMPLE_NETWORK_MODE  *Mode
   );
-
 
 /**
   Changes the state of a network interface from "stopped" to "started".
@@ -425,29 +423,29 @@ EFI_STATUS
 //
 // Revision defined in EFI1.1
 //
-#define EMU_SNP_INTERFACE_REVISION   EMU_SNP_PROTOCOL_REVISION
+#define EMU_SNP_INTERFACE_REVISION  EMU_SNP_PROTOCOL_REVISION
 
 ///
 /// The EMU_SNP_PROTOCOL protocol abstracts OS network sercices
 /// from the EFI driver that produces EFI Simple Network Protocol.
 ///
 struct _EMU_SNP_PROTOCOL {
-  EMU_SNP_CREATE_MAPPING   CreateMapping;
-  EMU_SNP_START            Start;
-  EMU_SNP_STOP             Stop;
-  EMU_SNP_INITIALIZE       Initialize;
-  EMU_SNP_RESET            Reset;
-  EMU_SNP_SHUTDOWN         Shutdown;
-  EMU_SNP_RECEIVE_FILTERS  ReceiveFilters;
-  EMU_SNP_STATION_ADDRESS  StationAddress;
-  EMU_SNP_STATISTICS       Statistics;
-  EMU_SNP_MCAST_IP_TO_MAC  MCastIpToMac;
-  EMU_SNP_NVDATA           NvData;
-  EMU_SNP_GET_STATUS       GetStatus;
-  EMU_SNP_TRANSMIT         Transmit;
-  EMU_SNP_RECEIVE          Receive;
+  EMU_SNP_CREATE_MAPPING     CreateMapping;
+  EMU_SNP_START              Start;
+  EMU_SNP_STOP               Stop;
+  EMU_SNP_INITIALIZE         Initialize;
+  EMU_SNP_RESET              Reset;
+  EMU_SNP_SHUTDOWN           Shutdown;
+  EMU_SNP_RECEIVE_FILTERS    ReceiveFilters;
+  EMU_SNP_STATION_ADDRESS    StationAddress;
+  EMU_SNP_STATISTICS         Statistics;
+  EMU_SNP_MCAST_IP_TO_MAC    MCastIpToMac;
+  EMU_SNP_NVDATA             NvData;
+  EMU_SNP_GET_STATUS         GetStatus;
+  EMU_SNP_TRANSMIT           Transmit;
+  EMU_SNP_RECEIVE            Receive;
 };
 
-extern EFI_GUID gEmuSnpProtocolGuid;
+extern EFI_GUID  gEmuSnpProtocolGuid;
 
 #endif

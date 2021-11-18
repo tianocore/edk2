@@ -36,29 +36,28 @@ SecWriteStdErr (
   IN UINTN     NumberOfBytes
   )
 {
-  BOOL  Success;
-  DWORD CharCount;
+  BOOL   Success;
+  DWORD  CharCount;
 
   CharCount = (DWORD)NumberOfBytes;
-  Success = WriteFile (
-    GetStdHandle (STD_ERROR_HANDLE),
-    Buffer,
-    CharCount,
-    &CharCount,
-    NULL
-    );
+  Success   = WriteFile (
+                GetStdHandle (STD_ERROR_HANDLE),
+                Buffer,
+                CharCount,
+                &CharCount,
+                NULL
+                );
 
   return Success ? CharCount : 0;
 }
-
 
 EFI_STATUS
 SecConfigStdIn (
   VOID
   )
 {
-  BOOL     Success;
-  DWORD    Mode;
+  BOOL   Success;
+  DWORD  Mode;
 
   Success = GetConsoleMode (GetStdHandle (STD_INPUT_HANDLE), &Mode);
   if (Success) {
@@ -67,17 +66,17 @@ SecConfigStdIn (
     //
     Mode &= ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
 
-#if defined(NTDDI_VERSION) && defined (NTDDI_WIN10_TH2) && (NTDDI_VERSION > NTDDI_WIN10_TH2)
+ #if defined (NTDDI_VERSION) && defined (NTDDI_WIN10_TH2) && (NTDDI_VERSION > NTDDI_WIN10_TH2)
     //
     // Enable virtual terminal input for Win10 above TH2
     //
     Mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
-#endif
+ #endif
 
     Success = SetConsoleMode (GetStdHandle (STD_INPUT_HANDLE), Mode);
   }
 
-#if defined(NTDDI_VERSION) && defined (NTDDI_WIN10_TH2) && (NTDDI_VERSION > NTDDI_WIN10_TH2)
+ #if defined (NTDDI_VERSION) && defined (NTDDI_WIN10_TH2) && (NTDDI_VERSION > NTDDI_WIN10_TH2)
   //
   // Enable terminal mode for Win10 above TH2
   //
@@ -85,12 +84,13 @@ SecConfigStdIn (
     Success = GetConsoleMode (GetStdHandle (STD_OUTPUT_HANDLE), &Mode);
     if (Success) {
       Success = SetConsoleMode (
-        GetStdHandle (STD_OUTPUT_HANDLE),
-        Mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN
-      );
+                  GetStdHandle (STD_OUTPUT_HANDLE),
+                  Mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN
+                  );
     }
   }
-#endif
+
+ #endif
   return Success ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 }
 
@@ -100,17 +100,17 @@ SecWriteStdOut (
   IN UINTN     NumberOfBytes
   )
 {
-  BOOL  Success;
-  DWORD CharCount;
+  BOOL   Success;
+  DWORD  CharCount;
 
   CharCount = (DWORD)NumberOfBytes;
-  Success = WriteFile (
-    GetStdHandle (STD_OUTPUT_HANDLE),
-    Buffer,
-    CharCount,
-    &CharCount,
-    NULL
-    );
+  Success   = WriteFile (
+                GetStdHandle (STD_OUTPUT_HANDLE),
+                Buffer,
+                CharCount,
+                &CharCount,
+                NULL
+                );
 
   return Success ? CharCount : 0;
 }
@@ -120,34 +120,35 @@ SecPollStdIn (
   VOID
   )
 {
-  BOOL           Success;
-  INPUT_RECORD   Record;
-  DWORD          RecordNum;
+  BOOL          Success;
+  INPUT_RECORD  Record;
+  DWORD         RecordNum;
 
   do {
     Success = GetNumberOfConsoleInputEvents (GetStdHandle (STD_INPUT_HANDLE), &RecordNum);
     if (!Success || (RecordNum == 0)) {
       break;
     }
+
     Success = PeekConsoleInput (
-      GetStdHandle (STD_INPUT_HANDLE),
-      &Record,
-      1,
-      &RecordNum
-    );
+                GetStdHandle (STD_INPUT_HANDLE),
+                &Record,
+                1,
+                &RecordNum
+                );
     if (Success && (RecordNum == 1)) {
-      if (Record.EventType == KEY_EVENT && Record.Event.KeyEvent.bKeyDown) {
+      if ((Record.EventType == KEY_EVENT) && Record.Event.KeyEvent.bKeyDown) {
         return TRUE;
       } else {
         //
         // Consume the non-key event.
         //
         Success = ReadConsoleInput (
-          GetStdHandle (STD_INPUT_HANDLE),
-          &Record,
-          1,
-          &RecordNum
-        );
+                    GetStdHandle (STD_INPUT_HANDLE),
+                    &Record,
+                    1,
+                    &RecordNum
+                    );
       }
     }
   } while (Success);
@@ -161,29 +162,30 @@ SecReadStdIn (
   IN UINTN     NumberOfBytes
   )
 {
-  BOOL           Success;
-  INPUT_RECORD   Record;
-  DWORD          RecordNum;
-  UINTN          BytesReturn;
+  BOOL          Success;
+  INPUT_RECORD  Record;
+  DWORD         RecordNum;
+  UINTN         BytesReturn;
 
   if (!SecPollStdIn ()) {
     return 0;
   }
+
   Success = ReadConsoleInput (
-    GetStdHandle (STD_INPUT_HANDLE),
-    &Record,
-    1,
-    &RecordNum
-  );
+              GetStdHandle (STD_INPUT_HANDLE),
+              &Record,
+              1,
+              &RecordNum
+              );
   ASSERT (Success && (RecordNum == 1) && (Record.EventType == KEY_EVENT) && (Record.Event.KeyEvent.bKeyDown));
   NumberOfBytes = MIN (Record.Event.KeyEvent.wRepeatCount, NumberOfBytes);
   BytesReturn   = NumberOfBytes;
   while (NumberOfBytes-- != 0) {
     Buffer[NumberOfBytes] = Record.Event.KeyEvent.uChar.AsciiChar;
   }
+
   return BytesReturn;
 }
-
 
 VOID *
 SecAlloc (
@@ -208,13 +210,11 @@ SecFree (
   return TRUE;
 }
 
-
-
 //
 // Define a global that we can use to shut down the NT timer thread when
 // the timer is canceled.
 //
-BOOLEAN                 mCancelTimerThread = FALSE;
+BOOLEAN  mCancelTimerThread = FALSE;
 
 //
 // The notification function to call on every timer interrupt
@@ -224,25 +224,25 @@ EMU_SET_TIMER_CALLBACK  *mTimerNotifyFunction = NULL;
 //
 // The thread handle for this driver
 //
-HANDLE                  mNtMainThreadHandle;
+HANDLE  mNtMainThreadHandle;
 
 //
 // The timer value from the last timer interrupt
 //
-UINT32                  mNtLastTick;
+UINT32  mNtLastTick;
 
 //
 // Critical section used to update varibles shared between the main thread and
 // the timer interrupt thread.
 //
-CRITICAL_SECTION        mNtCriticalSection;
+CRITICAL_SECTION  mNtCriticalSection;
 
 //
 // Worker Functions
 //
-UINT                    mMMTimerThreadID = 0;
+UINT  mMMTimerThreadID = 0;
 
-volatile BOOLEAN        mInterruptEnabled = FALSE;
+volatile BOOLEAN  mInterruptEnabled = FALSE;
 
 VOID
 CALLBACK
@@ -252,13 +252,12 @@ MMTimerThread (
   DWORD dwUser,
   DWORD dw1,
   DWORD dw2
-)
+  )
 {
-  UINT32            CurrentTick;
-  UINT32            Delta;
+  UINT32  CurrentTick;
+  UINT32  Delta;
 
   if (!mCancelTimerThread) {
-
     //
     // Suspend the main thread until we are done.
     // Enter the critical section before suspending
@@ -313,7 +312,6 @@ MMTimerThread (
     //  If delay was more then 1 second, ignore it (probably debugging case)
     //
     if (Delta < 1000) {
-
       //
       // Only invoke the callback function if a Non-NULL handler has been
       // registered. Assume all other handlers are legal.
@@ -332,18 +330,17 @@ MMTimerThread (
     timeKillEvent (wTimerID);
     mMMTimerThreadID = 0;
   }
-
 }
 
 VOID
 SecSetTimer (
   IN  UINT64                  TimerPeriod,
   IN  EMU_SET_TIMER_CALLBACK  Callback
-)
+  )
 {
   //
-// If TimerPeriod is 0, then the timer thread should be canceled
-//
+  // If TimerPeriod is 0, then the timer thread should be canceled
+  //
   if (TimerPeriod == 0) {
     //
     // Cancel the timer thread
@@ -384,23 +381,24 @@ SecSetTimer (
     SetThreadPriority (
       GetCurrentThread (),
       THREAD_PRIORITY_HIGHEST
-    );
+      );
 
     mMMTimerThreadID = timeSetEvent (
-      (UINT)TimerPeriod,
-      0,
-      MMTimerThread,
-      (DWORD_PTR)NULL,
-      TIME_PERIODIC | TIME_KILL_SYNCHRONOUS | TIME_CALLBACK_FUNCTION
-    );
+                         (UINT)TimerPeriod,
+                         0,
+                         MMTimerThread,
+                         (DWORD_PTR)NULL,
+                         TIME_PERIODIC | TIME_KILL_SYNCHRONOUS | TIME_CALLBACK_FUNCTION
+                         );
   }
+
   mTimerNotifyFunction = Callback;
 }
 
 VOID
 SecInitializeThunk (
   VOID
-)
+  )
 {
   InitializeCriticalSection (&mNtCriticalSection);
 
@@ -412,7 +410,7 @@ SecInitializeThunk (
     0,
     FALSE,
     DUPLICATE_SAME_ACCESS
-  );
+    );
 }
 
 VOID
@@ -423,7 +421,6 @@ SecEnableInterrupt (
   mInterruptEnabled = TRUE;
 }
 
-
 VOID
 SecDisableInterrupt (
   VOID
@@ -431,7 +428,6 @@ SecDisableInterrupt (
 {
   mInterruptEnabled = FALSE;
 }
-
 
 UINT64
 SecQueryPerformanceFrequency (
@@ -450,8 +446,6 @@ SecQueryPerformanceCounter (
   return 0;
 }
 
-
-
 VOID
 SecSleep (
   IN  UINT64 Nanoseconds
@@ -459,7 +453,6 @@ SecSleep (
 {
   Sleep ((DWORD)DivU64x32 (Nanoseconds, 1000000));
 }
-
 
 VOID
 SecCpuSleep (
@@ -469,7 +462,6 @@ SecCpuSleep (
   Sleep (1);
 }
 
-
 VOID
 SecExit (
   UINTN   Status
@@ -478,31 +470,30 @@ SecExit (
   exit ((int)Status);
 }
 
-
 VOID
 SecGetTime (
   OUT  EFI_TIME               *Time,
   OUT EFI_TIME_CAPABILITIES   *Capabilities OPTIONAL
   )
 {
-  SYSTEMTIME            SystemTime;
-  TIME_ZONE_INFORMATION TimeZone;
+  SYSTEMTIME             SystemTime;
+  TIME_ZONE_INFORMATION  TimeZone;
 
   GetLocalTime (&SystemTime);
   GetTimeZoneInformation (&TimeZone);
 
-  Time->Year = (UINT16)SystemTime.wYear;
-  Time->Month = (UINT8)SystemTime.wMonth;
-  Time->Day = (UINT8)SystemTime.wDay;
-  Time->Hour = (UINT8)SystemTime.wHour;
-  Time->Minute = (UINT8)SystemTime.wMinute;
-  Time->Second = (UINT8)SystemTime.wSecond;
+  Time->Year       = (UINT16)SystemTime.wYear;
+  Time->Month      = (UINT8)SystemTime.wMonth;
+  Time->Day        = (UINT8)SystemTime.wDay;
+  Time->Hour       = (UINT8)SystemTime.wHour;
+  Time->Minute     = (UINT8)SystemTime.wMinute;
+  Time->Second     = (UINT8)SystemTime.wSecond;
   Time->Nanosecond = (UINT32)(SystemTime.wMilliseconds * 1000000);
-  Time->TimeZone = (INT16)TimeZone.Bias;
+  Time->TimeZone   = (INT16)TimeZone.Bias;
 
   if (Capabilities != NULL) {
     Capabilities->Resolution = 1;
-    Capabilities->Accuracy = 50000000;
+    Capabilities->Accuracy   = 50000000;
     Capabilities->SetsToZero = FALSE;
   }
 
@@ -517,9 +508,9 @@ SecSetTime (
   IN  EFI_TIME               *Time
   )
 {
-  TIME_ZONE_INFORMATION TimeZone;
-  SYSTEMTIME            SystemTime;
-  BOOL                  Flag;
+  TIME_ZONE_INFORMATION  TimeZone;
+  SYSTEMTIME             SystemTime;
+  BOOL                   Flag;
 
   //
   // Set Daylight savings time information and Time Zone
@@ -532,10 +523,10 @@ SecSetTime (
     return EFI_DEVICE_ERROR;
   }
 
-  SystemTime.wYear = Time->Year;
-  SystemTime.wMonth = Time->Month;
-  SystemTime.wDay = Time->Day;
-  SystemTime.wHour = Time->Hour;
+  SystemTime.wYear   = Time->Year;
+  SystemTime.wMonth  = Time->Month;
+  SystemTime.wDay    = Time->Day;
+  SystemTime.wHour   = Time->Hour;
   SystemTime.wMinute = Time->Minute;
   SystemTime.wSecond = Time->Second;
   SystemTime.wMilliseconds = (INT16)(Time->Nanosecond / 1000000);
@@ -549,7 +540,7 @@ SecSetTime (
   }
 }
 
-EMU_THUNK_PROTOCOL gEmuThunkProtocol = {
+EMU_THUNK_PROTOCOL  gEmuThunkProtocol = {
   SecWriteStdErr,
   SecConfigStdIn,
   SecWriteStdOut,
@@ -574,7 +565,5 @@ EMU_THUNK_PROTOCOL gEmuThunkProtocol = {
   GetNextThunkProtocol
 };
 
-
 #pragma warning(default : 4996)
 #pragma warning(default : 4232)
-

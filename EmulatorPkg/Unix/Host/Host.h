@@ -30,9 +30,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <sys/time.h>
 
 #if __CYGWIN__
-#include <sys/dirent.h>
+  #include <sys/dirent.h>
 #else
-#include <sys/dir.h>
+  #include <sys/dir.h>
 #endif
 
 #include <sys/mman.h>
@@ -56,19 +56,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <ifaddrs.h>
 
 #ifdef __APPLE__
-#include <net/if_dl.h>
-#include <net/bpf.h>
-#include <sys/param.h>
-#include <sys/mount.h>
-#include <sys/disk.h>
+  #include <net/if_dl.h>
+  #include <net/bpf.h>
+  #include <sys/param.h>
+  #include <sys/mount.h>
+  #include <sys/disk.h>
 #define _XOPEN_SOURCE
-#ifndef _Bool
-  #define _Bool char // for clang debug
-#endif
+  #ifndef _Bool
+#define _Bool  char  // for clang debug
+  #endif
 #else
-#include <termio.h>
-#include <sys/vfs.h>
-#include <linux/fs.h>
+  #include <termio.h>
+  #include <sys/vfs.h>
+  #include <linux/fs.h>
 #endif
 
 #include <utime.h>
@@ -120,30 +120,26 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/FileSystemInfo.h>
 #include <Guid/FileSystemVolumeLabelInfo.h>
 
-
 #include "Gasket.h"
 
-
-#define STACK_SIZE                0x20000
+#define STACK_SIZE  0x20000
 
 typedef struct {
-  EFI_PHYSICAL_ADDRESS  Address;
-  UINT64                Size;
+  EFI_PHYSICAL_ADDRESS    Address;
+  UINT64                  Size;
 } EMU_FD_INFO;
 
 typedef struct {
-  EFI_PHYSICAL_ADDRESS  Memory;
-  UINT64                Size;
+  EFI_PHYSICAL_ADDRESS    Memory;
+  UINT64                  Size;
 } EMU_SYSTEM_MEMORY;
 
-
-#define MAX_IMAGE_CONTEXT_TO_MOD_HANDLE_ARRAY_SIZE 0x100
+#define MAX_IMAGE_CONTEXT_TO_MOD_HANDLE_ARRAY_SIZE  0x100
 
 typedef struct {
-  PE_COFF_LOADER_IMAGE_CONTEXT   *ImageContext;
-  VOID                           *ModHandle;
+  PE_COFF_LOADER_IMAGE_CONTEXT    *ImageContext;
+  VOID                            *ModHandle;
 } IMAGE_CONTEXT_TO_MOD_HANDLE;
-
 
 EFI_STATUS
 EFIAPI
@@ -230,7 +226,6 @@ GasketSecUnixFdAddress (
   )
 ;
 
-
 EFI_STATUS
 GetImageReadFunction (
   IN PE_COFF_LOADER_IMAGE_CONTEXT          *ImageContext,
@@ -276,7 +271,6 @@ GasketSecTemporaryRamSupport (
   IN UINTN                    CopySize
   );
 
-
 RETURN_STATUS
 EFIAPI
 SecPeCoffGetEntryPoint (
@@ -296,12 +290,11 @@ SecPeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
 
-
 VOID
 PeiSwitchStacks (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack
   );
 
@@ -310,13 +303,13 @@ SecInitThunkProtocol (
   VOID
   );
 
-
 EFI_PHYSICAL_ADDRESS *
 MapMemory (
   INTN fd,
   UINT64 length,
   INTN   prot,
-  INTN   flags);
+  INTN   flags
+  );
 
 EFI_STATUS
 MapFile (
@@ -337,18 +330,31 @@ EfiSystemMemoryRange (
   IN  VOID *MemoryAddress
   );
 
+VOID
+SecSleep (
+  UINT64 Nanoseconds
+  );
 
-VOID SecSleep (UINT64 Nanoseconds);
-VOID SecEnableInterrupt (VOID);
-VOID SecDisableInterrupt (VOID);
-BOOLEAN SecInterruptEanbled (VOID);
+VOID
+SecEnableInterrupt (
+  VOID
+  );
 
+VOID
+SecDisableInterrupt (
+  VOID
+  );
 
-extern EMU_THUNK_PROTOCOL    gEmuThunkProtocol;
-extern EMU_IO_THUNK_PROTOCOL gX11ThunkIo;
-extern EMU_IO_THUNK_PROTOCOL gPosixFileSystemThunkIo;
-extern EMU_IO_THUNK_PROTOCOL gPthreadThunkIo;
-extern EMU_IO_THUNK_PROTOCOL gBlockIoThunkIo;
-extern EMU_IO_THUNK_PROTOCOL gSnpThunkIo;
+BOOLEAN
+SecInterruptEanbled (
+  VOID
+  );
+
+extern EMU_THUNK_PROTOCOL     gEmuThunkProtocol;
+extern EMU_IO_THUNK_PROTOCOL  gX11ThunkIo;
+extern EMU_IO_THUNK_PROTOCOL  gPosixFileSystemThunkIo;
+extern EMU_IO_THUNK_PROTOCOL  gPthreadThunkIo;
+extern EMU_IO_THUNK_PROTOCOL  gBlockIoThunkIo;
+extern EMU_IO_THUNK_PROTOCOL  gSnpThunkIo;
 
 #endif

@@ -11,53 +11,48 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Host.h"
 
 #ifdef __APPLE__
 
+  #include <Library/NetLib.h>
 
-#include <Library/NetLib.h>
-
-
-#define EMU_SNP_PRIVATE_SIGNATURE SIGNATURE_32('E', 'M', 's', 'n')
+#define EMU_SNP_PRIVATE_SIGNATURE  SIGNATURE_32('E', 'M', 's', 'n')
 typedef struct {
-  UINTN                       Signature;
+  UINTN                      Signature;
 
-  EMU_IO_THUNK_PROTOCOL       *Thunk;
-  EMU_SNP_PROTOCOL            EmuSnp;
-  EFI_SIMPLE_NETWORK_MODE     *Mode;
+  EMU_IO_THUNK_PROTOCOL      *Thunk;
+  EMU_SNP_PROTOCOL           EmuSnp;
+  EFI_SIMPLE_NETWORK_MODE    *Mode;
 
-  int                         BpfFd;
-  char                        *InterfaceName;
-  EFI_MAC_ADDRESS             MacAddress;
-  u_int                       ReadBufferSize;
-  VOID                        *ReadBuffer;
+  int                        BpfFd;
+  char                       *InterfaceName;
+  EFI_MAC_ADDRESS            MacAddress;
+  u_int                      ReadBufferSize;
+  VOID                       *ReadBuffer;
 
   //
   // Two walking pointers to manage the multiple packets that can be returned
   // in a single read.
   //
-  VOID                        *CurrentReadPointer;
-  VOID                        *EndReadPointer;
+  VOID                       *CurrentReadPointer;
+  VOID                       *EndReadPointer;
 
-  UINT32                      ReceivedPackets;
-  UINT32                      DroppedPackets;
-
+  UINT32                     ReceivedPackets;
+  UINT32                     DroppedPackets;
 } EMU_SNP_PRIVATE;
 
 #define EMU_SNP_PRIVATE_DATA_FROM_THIS(a) \
          CR(a, EMU_SNP_PRIVATE, EmuSnp, EMU_SNP_PRIVATE_SIGNATURE)
-
 
 //
 // Strange, but there doesn't appear to be any structure for the Ethernet header in edk2...
 //
 
 typedef struct {
-  UINT8   DstAddr[NET_ETHER_ADDR_LEN];
-  UINT8   SrcAddr[NET_ETHER_ADDR_LEN];
-  UINT16  Type;
+  UINT8     DstAddr[NET_ETHER_ADDR_LEN];
+  UINT8     SrcAddr[NET_ETHER_ADDR_LEN];
+  UINT16    Type;
 } ETHERNET_HEADER;
 
 /**
@@ -76,7 +71,7 @@ EmuSnpCreateMapping (
   IN     EFI_SIMPLE_NETWORK_MODE  *Mode
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -100,39 +95,37 @@ EmuSnpCreateMapping (
   return EFI_SUCCESS;
 }
 
-
-static struct bpf_insn mFilterInstructionTemplate[] = {
+static struct bpf_insn  mFilterInstructionTemplate[] = {
   // Load 4 bytes from the destination MAC address.
-  BPF_STMT (BPF_LD + BPF_W + BPF_ABS, OFFSET_OF (ETHERNET_HEADER, DstAddr[0])),
+  BPF_STMT (BPF_LD + BPF_W + BPF_ABS,  OFFSET_OF (ETHERNET_HEADER, DstAddr[0])),
 
   // Compare to first 4 bytes of fake MAC address.
-  BPF_JUMP (BPF_JMP + BPF_JEQ + BPF_K, 0x12345678, 0, 3 ),
+  BPF_JUMP (BPF_JMP + BPF_JEQ + BPF_K, 0x12345678,                 0,           3),
 
   // Load remaining 2 bytes from the destination MAC address.
-  BPF_STMT (BPF_LD + BPF_H + BPF_ABS, OFFSET_OF( ETHERNET_HEADER, DstAddr[4])),
+  BPF_STMT (BPF_LD + BPF_H + BPF_ABS,  OFFSET_OF (ETHERNET_HEADER, DstAddr[4])),
 
   // Compare to remaining 2 bytes of fake MAC address.
-  BPF_JUMP (BPF_JMP + BPF_JEQ + BPF_K, 0x9ABC, 5, 0 ),
+  BPF_JUMP (BPF_JMP + BPF_JEQ + BPF_K, 0x9ABC,                     5,           0),
 
   // Load 4 bytes from the destination MAC address.
-  BPF_STMT (BPF_LD + BPF_W + BPF_ABS, OFFSET_OF (ETHERNET_HEADER, DstAddr[0])),
+  BPF_STMT (BPF_LD + BPF_W + BPF_ABS,  OFFSET_OF (ETHERNET_HEADER, DstAddr[0])),
 
   // Compare to first 4 bytes of broadcast MAC address.
-  BPF_JUMP (BPF_JMP + BPF_JEQ + BPF_K, 0xFFFFFFFF, 0, 2),
+  BPF_JUMP (BPF_JMP + BPF_JEQ + BPF_K, 0xFFFFFFFF,                 0,           2),
 
   // Load remaining 2 bytes from the destination MAC address.
-  BPF_STMT (BPF_LD + BPF_H + BPF_ABS, OFFSET_OF( ETHERNET_HEADER, DstAddr[4])),
+  BPF_STMT (BPF_LD + BPF_H + BPF_ABS,  OFFSET_OF (ETHERNET_HEADER, DstAddr[4])),
 
   // Compare to remaining 2 bytes of broadcast MAC address.
-  BPF_JUMP (BPF_JMP + BPF_JEQ + BPF_K, 0xFFFF, 1, 0),
+  BPF_JUMP (BPF_JMP + BPF_JEQ + BPF_K, 0xFFFF,                     1,           0),
 
   // Reject packet.
-  BPF_STMT (BPF_RET + BPF_K, 0),
+  BPF_STMT (BPF_RET + BPF_K,           0),
 
   // Receive entire packet.
-  BPF_STMT (BPF_RET + BPF_K, -1)
+  BPF_STMT (BPF_RET + BPF_K,           -1)
 };
-
 
 EFI_STATUS
 OpenBpfFileDescriptor (
@@ -171,7 +164,6 @@ OpenBpfFileDescriptor (
   return EFI_OUT_OF_RESOURCES;
 }
 
-
 /**
   Changes the state of a network interface from "stopped" to "started".
 
@@ -189,15 +181,15 @@ EmuSnpStart (
   IN EMU_SNP_PROTOCOL  *This
   )
 {
-  EFI_STATUS         Status;
-  EMU_SNP_PRIVATE    *Private;
-  struct ifreq       BoundIf;
-  struct bpf_program BpfProgram;
-  struct bpf_insn    *FilterProgram;
+  EFI_STATUS          Status;
+  EMU_SNP_PRIVATE     *Private;
+  struct ifreq        BoundIf;
+  struct bpf_program  BpfProgram;
+  struct bpf_insn     *FilterProgram;
   u_int               Value;
   u_int               ReadBufferSize;
-  UINT16             Temp16;
-  UINT32             Temp32;
+  UINT16              Temp16;
+  UINT32              Temp32;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -282,7 +274,7 @@ EmuSnpStart (
     // Allocate read buffer.
     //
     Private->ReadBufferSize = ReadBufferSize;
-    Private->ReadBuffer = malloc (Private->ReadBufferSize);
+    Private->ReadBuffer     = malloc (Private->ReadBufferSize);
     if (Private->ReadBuffer == NULL) {
       goto ErrorExit;
     }
@@ -293,7 +285,7 @@ EmuSnpStart (
     // Install our packet filter: successful reads should only produce broadcast or unicast
     // packets directed to our fake MAC address.
     //
-    FilterProgram = malloc (sizeof (mFilterInstructionTemplate)) ;
+    FilterProgram = malloc (sizeof (mFilterInstructionTemplate));
     if ( FilterProgram == NULL ) {
       goto ErrorExit;
     }
@@ -308,7 +300,7 @@ EmuSnpStart (
     CopyMem (&Temp16, &Private->Mode->CurrentAddress.Addr[4], sizeof (UINT16));
     FilterProgram[3].k = NTOHS (Temp16);
 
-    BpfProgram.bf_len = sizeof (mFilterInstructionTemplate) / sizeof (struct bpf_insn);
+    BpfProgram.bf_len   = sizeof (mFilterInstructionTemplate) / sizeof (struct bpf_insn);
     BpfProgram.bf_insns = FilterProgram;
 
     if (ioctl (Private->BpfFd, BIOCSETF, &BpfProgram) < 0) {
@@ -324,7 +316,6 @@ EmuSnpStart (
       goto DeviceErrorExit;
     }
 
-
     Private->Mode->State = EfiSimpleNetworkStarted;
   }
 
@@ -337,9 +328,9 @@ ErrorExit:
     free (Private->ReadBuffer);
     Private->ReadBuffer = NULL;
   }
+
   return Status;
 }
-
 
 /**
   Changes the state of a network interface from "started" to "stopped".
@@ -358,7 +349,7 @@ EmuSnpStop (
   IN EMU_SNP_PROTOCOL  *This
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -381,7 +372,7 @@ EmuSnpStop (
   }
 
   if (Private->ReadBuffer != NULL) {
-    free (Private->ReadBuffer );
+    free (Private->ReadBuffer);
     Private->CurrentReadPointer = Private->EndReadPointer = Private->ReadBuffer = NULL;
   }
 
@@ -389,7 +380,6 @@ EmuSnpStop (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Resets a network adapter and allocates the transmit and receive buffers
@@ -424,7 +414,7 @@ EmuSnpInitialize (
   IN UINTN                               ExtraTxBufferSize  OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -441,7 +431,7 @@ EmuSnpInitialize (
       break;
   }
 
-  Private->Mode->MCastFilterCount = 0;
+  Private->Mode->MCastFilterCount     = 0;
   Private->Mode->ReceiveFilterSetting = 0;
   ZeroMem (Private->Mode->MCastFilter, sizeof (Private->Mode->MCastFilter));
 
@@ -449,7 +439,6 @@ EmuSnpInitialize (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Resets a network adapter and re-initializes it with the parameters that were
@@ -473,7 +462,7 @@ EmuSnpReset (
   IN BOOLEAN            ExtendedVerification
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -493,7 +482,6 @@ EmuSnpReset (
   return EFI_SUCCESS;
 }
 
-
 /**
   Resets a network adapter and leaves it in a state that is safe for
   another driver to initialize.
@@ -512,7 +500,7 @@ EmuSnpShutdown (
   IN EMU_SNP_PROTOCOL  *This
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -532,7 +520,7 @@ EmuSnpShutdown (
   Private->Mode->State = EfiSimpleNetworkStarted;
 
   Private->Mode->ReceiveFilterSetting = 0;
-  Private->Mode->MCastFilterCount = 0;
+  Private->Mode->MCastFilterCount     = 0;
   ZeroMem (Private->Mode->MCastFilter, sizeof (Private->Mode->MCastFilter));
 
   if (Private->BpfFd != 0) {
@@ -582,14 +570,13 @@ EmuSnpReceiveFilters (
   IN EFI_MAC_ADDRESS                              *MCastFilter OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
   // For now, just succeed...
   return EFI_SUCCESS;
 }
-
 
 /**
   Modifies or resets the current station address, if supported.
@@ -613,13 +600,12 @@ EmuSnpStationAddress (
   IN EFI_MAC_ADDRESS             *New OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Resets or collects the statistics on a network interface.
@@ -650,13 +636,12 @@ EmuSnpStatistics (
   OUT EFI_NETWORK_STATISTICS              *StatisticsTable  OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Converts a multicast IP address to a multicast HW MAC address.
@@ -687,13 +672,12 @@ EmuSnpMCastIpToMac (
   OUT EFI_MAC_ADDRESS                     *MAC
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Performs read and write operations on the NVRAM device attached to a
@@ -724,7 +708,7 @@ EmuSnpNvData (
   IN OUT VOID                             *Buffer
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -763,7 +747,7 @@ EmuSnpGetStatus (
   OUT VOID                                **TxBuf OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -773,7 +757,6 @@ EmuSnpGetStatus (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Places a packet in the transmit queue of a network interface.
@@ -819,8 +802,8 @@ EmuSnpTransmit (
   IN UINT16                               *Protocol OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
-  ETHERNET_HEADER    *EnetHeader;
+  EMU_SNP_PRIVATE  *Private;
+  ETHERNET_HEADER  *EnetHeader;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -837,15 +820,15 @@ EmuSnpTransmit (
       SrcAddr = &Private->Mode->CurrentAddress;
     }
 
-    EnetHeader = (ETHERNET_HEADER *) Buffer;
+    EnetHeader = (ETHERNET_HEADER *)Buffer;
 
     CopyMem (EnetHeader->DstAddr, DestAddr, NET_ETHER_ADDR_LEN);
     CopyMem (EnetHeader->SrcAddr, SrcAddr, NET_ETHER_ADDR_LEN);
 
-    EnetHeader->Type = HTONS(*Protocol);
+    EnetHeader->Type = HTONS (*Protocol);
   }
 
-  if (write  (Private->BpfFd, Buffer, BufferSize) < 0) {
+  if (write (Private->BpfFd, Buffer, BufferSize) < 0) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -895,11 +878,11 @@ EmuSnpReceive (
   OUT UINT16                              *Protocol   OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
-  struct bpf_hdr     *BpfHeader;
-  struct bpf_stat     BpfStats;
-  ETHERNET_HEADER    *EnetHeader;
-  ssize_t            Result;
+  EMU_SNP_PRIVATE  *Private;
+  struct bpf_hdr   *BpfHeader;
+  struct bpf_stat  BpfStats;
+  ETHERNET_HEADER  *EnetHeader;
+  ssize_t          Result;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -907,7 +890,7 @@ EmuSnpReceive (
     return EFI_NOT_STARTED;
   }
 
-  ZeroMem (&BpfStats, sizeof( BpfStats));
+  ZeroMem (&BpfStats, sizeof (BpfStats));
 
   if (ioctl (Private->BpfFd, BIOCGSTATS, &BpfStats) == 0) {
     Private->ReceivedPackets += BpfStats.bs_recv;
@@ -936,10 +919,10 @@ EmuSnpReceive (
     }
 
     Private->CurrentReadPointer = Private->ReadBuffer;
-    Private->EndReadPointer = Private->CurrentReadPointer + Result;
+    Private->EndReadPointer     = Private->CurrentReadPointer + Result;
   }
 
-  BpfHeader = Private->CurrentReadPointer;
+  BpfHeader  = Private->CurrentReadPointer;
   EnetHeader = Private->CurrentReadPointer + BpfHeader->bh_hdrlen;
 
   if (BpfHeader->bh_caplen > *BufferSize) {
@@ -972,8 +955,7 @@ EmuSnpReceive (
   return EFI_SUCCESS;
 }
 
-
-EMU_SNP_PROTOCOL gEmuSnpProtocol = {
+EMU_SNP_PROTOCOL  gEmuSnpProtocol = {
   GasketSnpCreateMapping,
   GasketSnpStart,
   GasketSnpStop,
@@ -1020,12 +1002,12 @@ GetInterfaceMacAddr (
     );
 
   Status = EFI_NOT_FOUND;
-  If = IfAddrs;
+  If     = IfAddrs;
   while (If != NULL) {
     IfSdl = (struct sockaddr_dl *)If->ifa_addr;
 
     if (IfSdl->sdl_family == AF_LINK) {
-      if (!AsciiStrCmp( Private->InterfaceName, If->ifa_name)) {
+      if (!AsciiStrCmp (Private->InterfaceName, If->ifa_name)) {
         CopyMem (&Private->MacAddress, LLADDR (IfSdl), NET_ETHER_ADDR_LEN);
 
         Status = EFI_SUCCESS;
@@ -1040,7 +1022,6 @@ Exit:
   freeifaddrs (IfAddrs);
   return Status;
 }
-
 
 EFI_STATUS
 EmuSnpThunkOpen (
@@ -1062,7 +1043,6 @@ EmuSnpThunkOpen (
     return EFI_OUT_OF_RESOURCES;
   }
 
-
   Private->Signature = EMU_SNP_PRIVATE_SIGNATURE;
   Private->Thunk     = This;
   CopyMem (&Private->EmuSnp, &gEmuSnpProtocol, sizeof (gEmuSnpProtocol));
@@ -1072,7 +1052,6 @@ EmuSnpThunkOpen (
   This->Private   = Private;
   return EFI_SUCCESS;
 }
-
 
 EFI_STATUS
 EmuSnpThunkClose (
@@ -1091,9 +1070,7 @@ EmuSnpThunkClose (
   return EFI_SUCCESS;
 }
 
-
-
-EMU_IO_THUNK_PROTOCOL gSnpThunkIo = {
+EMU_IO_THUNK_PROTOCOL  gSnpThunkIo = {
   &gEmuSnpProtocolGuid,
   NULL,
   NULL,

@@ -10,7 +10,6 @@
 #include <Uefi.h>
 #include <Protocol/EmuIoThunk.h>
 
-
 EFI_STATUS
 EFIAPI
 AddThunkProtocol (
@@ -25,5 +24,3 @@ GetNextThunkProtocol (
   IN  BOOLEAN                 EmuBusDriver,
   OUT EMU_IO_THUNK_PROTOCOL   **Instance
   );
-
-

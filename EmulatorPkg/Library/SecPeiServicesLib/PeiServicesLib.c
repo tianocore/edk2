@@ -6,14 +6,11 @@
 
 **/
 
-
 #include <PiPei.h>
 #include <Library/EmuMagicPageLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
-
-
 
 EFI_STATUS
 SecFfsFindNextFile (
@@ -28,7 +25,6 @@ SecFfsFindSectionData (
   IN EFI_PEI_FILE_HANDLE        FileHandle,
   OUT VOID                      **SectionData
   );
-
 
 /**
   This service enables a given PEIM to register an interface into the PEI Foundation.
@@ -103,20 +99,22 @@ PeiServicesLocatePpi (
   IN OUT VOID                   **Ppi
   )
 {
-  EFI_PEI_PPI_DESCRIPTOR *PpiList;
+  EFI_PEI_PPI_DESCRIPTOR  *PpiList;
 
   if (Instance != 0) {
     return EFI_NOT_FOUND;
   }
 
-  for (PpiList = EMU_MAGIC_PAGE()->PpiList; ; PpiList++) {
+  for (PpiList = EMU_MAGIC_PAGE ()->PpiList; ; PpiList++) {
     if (CompareGuid (PpiList->Guid, Guid)) {
       if (PpiDescriptor != NULL) {
         *PpiDescriptor = PpiList;
       }
+
       if (Ppi != NULL) {
         *Ppi = PpiList->Ppi;
       }
+
       return EFI_SUCCESS;
     }
 
@@ -124,7 +122,6 @@ PeiServicesLocatePpi (
       break;
     }
   }
-
 
   return EFI_NOT_FOUND;
 }
@@ -451,7 +448,6 @@ PeiServicesFfsGetFileInfo (
   return EFI_OUT_OF_RESOURCES;
 }
 
-
 /**
   This service is a wrapper for the PEI Service FfsFindByName(), except the pointer to the PEI Services
   Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface
@@ -484,7 +480,6 @@ PeiServicesFfsFindFileByName (
   ASSERT (FALSE);
   return EFI_OUT_OF_RESOURCES;
 }
-
 
 /**
   This service is a wrapper for the PEI Service FfsGetVolumeInfo(), except the pointer to the PEI Services
@@ -558,4 +553,3 @@ PeiServicesInstallFvInfoPpi (
   ASSERT (FALSE);
   return;
 }
-

@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _CPU_ARCHITECTURAL_PROTOCOL_DRIVER_H_
 #define _CPU_ARCHITECTURAL_PROTOCOL_DRIVER_H_
 
-
 #include <PiDxe.h>
 #include <IndustryStandard/SmBios.h>
 
@@ -32,25 +31,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
 
-
-
 //
 // Internal Data Structures
 //
-#define CPU_ARCH_PROT_PRIVATE_SIGNATURE SIGNATURE_32 ('c', 'a', 'p', 'd')
+#define CPU_ARCH_PROT_PRIVATE_SIGNATURE  SIGNATURE_32 ('c', 'a', 'p', 'd')
 
 typedef struct {
-  UINTN                 Signature;
-  EFI_HANDLE            Handle;
+  UINTN                    Signature;
+  EFI_HANDLE               Handle;
 
-  EFI_CPU_ARCH_PROTOCOL Cpu;
-  EFI_CPU_IO2_PROTOCOL  CpuIo;
+  EFI_CPU_ARCH_PROTOCOL    Cpu;
+  EFI_CPU_IO2_PROTOCOL     CpuIo;
 
   //
   // Local Data for CPU interface goes here
   //
-  BOOLEAN               InterruptState;
-
+  BOOLEAN                  InterruptState;
 } CPU_ARCH_PROTOCOL_PRIVATE;
 
 #define CPU_ARCH_PROTOCOL_PRIVATE_DATA_FROM_THIS(a) \
@@ -60,8 +56,6 @@ typedef struct {
       CPU_ARCH_PROT_PRIVATE_SIGNATURE \
       )
 
-
-
 typedef enum {
   CPU_STATE_IDLE,
   CPU_STATE_BLOCKED,
@@ -70,45 +64,39 @@ typedef enum {
   CPU_STATE_FINISHED
 } PROCESSOR_STATE;
 
-
 //
 // Define Individual Processor Data block.
 //
 typedef struct {
-  EFI_PROCESSOR_INFORMATION   Info;
-  EFI_AP_PROCEDURE            Procedure;
-  VOID                        *Parameter;
-  VOID                        *StateLock;
-  VOID                        *ProcedureLock;
-  PROCESSOR_STATE             State;
-  EFI_EVENT                   CheckThisAPEvent;
+  EFI_PROCESSOR_INFORMATION    Info;
+  EFI_AP_PROCEDURE             Procedure;
+  VOID                         *Parameter;
+  VOID                         *StateLock;
+  VOID                         *ProcedureLock;
+  PROCESSOR_STATE              State;
+  EFI_EVENT                    CheckThisAPEvent;
 } PROCESSOR_DATA_BLOCK;
-
 
 //
 // Define MP data block which consumes individual processor block.
 //
 typedef struct {
-  UINTN                       NumberOfProcessors;
-  UINTN                       NumberOfEnabledProcessors;
-  EFI_EVENT                   CheckAllAPsEvent;
-  EFI_EVENT                   WaitEvent;
-  UINTN                       FinishCount;
-  UINTN                       StartCount;
-  EFI_AP_PROCEDURE            Procedure;
-  VOID                        *ProcedureArgument;
-  BOOLEAN                     SingleThread;
-  UINTN                       StartedNumber;
-  PROCESSOR_DATA_BLOCK        *ProcessorData;
-  UINTN                       Timeout;
-  UINTN                       *FailedList;
-  UINTN                       FailedListIndex;
-  BOOLEAN                     TimeoutActive;
+  UINTN                   NumberOfProcessors;
+  UINTN                   NumberOfEnabledProcessors;
+  EFI_EVENT               CheckAllAPsEvent;
+  EFI_EVENT               WaitEvent;
+  UINTN                   FinishCount;
+  UINTN                   StartCount;
+  EFI_AP_PROCEDURE        Procedure;
+  VOID                    *ProcedureArgument;
+  BOOLEAN                 SingleThread;
+  UINTN                   StartedNumber;
+  PROCESSOR_DATA_BLOCK    *ProcessorData;
+  UINTN                   Timeout;
+  UINTN                   *FailedList;
+  UINTN                   FailedListIndex;
+  BOOLEAN                 TimeoutActive;
 } MP_SYSTEM_DATA;
-
-
-
-
 
 EFI_STATUS
 EFIAPI
@@ -231,6 +219,5 @@ CpuMpServicesWhoAmI (
   );
 
 extern EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate;
-
 
 #endif

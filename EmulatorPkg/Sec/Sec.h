@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __SEC_H___
 #define __SEC_H___
 
-
 #include <PiPei.h>
 #include <Library/EmuMagicPageLib.h>
 #include <Library/DebugLib.h>
@@ -20,7 +19,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 
 #include <Ppi/TemporaryRamSupport.h>
-
 
 //
 // I think this should be defined in a MdePkg include file?
@@ -40,6 +38,4 @@ SecTemporaryRamSupport (
   IN UINTN                    CopySize
   );
 
-
 #endif
-

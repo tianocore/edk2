@@ -16,8 +16,6 @@
 
 #include <Protocol/Timer.h>
 
-
-
 /**
   Stalls the CPU for at least the given number of microseconds.
 
@@ -36,7 +34,6 @@ MicroSecondDelay (
 {
   return NanoSecondDelay (MicroSeconds * 1000);
 }
-
 
 /**
   Stalls the CPU for at least the given number of nanoseconds.
@@ -57,7 +54,6 @@ NanoSecondDelay (
   gEmuThunk->Sleep (NanoSeconds);
   return NanoSeconds;
 }
-
 
 /**
   Retrieves the current value of a 64-bit free running performance counter.
@@ -105,14 +101,14 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  OUT      UINT64                    *StartValue,  OPTIONAL
+  OUT      UINT64                    *StartValue, OPTIONAL
   OUT      UINT64                    *EndValue     OPTIONAL
   )
 {
-
   if (StartValue != NULL) {
     *StartValue = 0ULL;
   }
+
   if (EndValue != NULL) {
     *EndValue = (UINT64)-1LL;
   }
@@ -156,9 +152,9 @@ GetTimeInNanoSecond (
   // Since 2^29 < 1,000,000,000 = 0x3B9ACA00 < 2^30, Remainder should < 2^(64-30) = 2^34,
   // i.e. highest bit set in Remainder should <= 33.
   //
-  Shift = MAX (0, HighBitSet64 (Remainder) - 33);
-  Remainder = RShiftU64 (Remainder, (UINTN) Shift);
-  Frequency = RShiftU64 (Frequency, (UINTN) Shift);
+  Shift        = MAX (0, HighBitSet64 (Remainder) - 33);
+  Remainder    = RShiftU64 (Remainder, (UINTN)Shift);
+  Frequency    = RShiftU64 (Frequency, (UINTN)Shift);
   NanoSeconds += DivU64x64Remainder (MultU64x32 (Remainder, 1000000000u), Frequency, NULL);
 
   return NanoSeconds;

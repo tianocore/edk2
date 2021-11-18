@@ -12,21 +12,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Host.h"
 
 #ifndef __APPLE__
 
-#define EMU_SNP_PRIVATE_SIGNATURE SIGNATURE_32('E', 'M', 's', 'n')
+#define EMU_SNP_PRIVATE_SIGNATURE  SIGNATURE_32('E', 'M', 's', 'n')
 typedef struct {
-  UINTN                       Signature;
+  UINTN                      Signature;
 
-  EMU_IO_THUNK_PROTOCOL       *Thunk;
+  EMU_IO_THUNK_PROTOCOL      *Thunk;
 
-
-  EMU_SNP_PROTOCOL            EmuSnp;
-  EFI_SIMPLE_NETWORK_MODE     *Mode;
-
+  EMU_SNP_PROTOCOL           EmuSnp;
+  EFI_SIMPLE_NETWORK_MODE    *Mode;
 } EMU_SNP_PRIVATE;
 
 #define EMU_SNP_PRIVATE_DATA_FROM_THIS(a) \
@@ -48,7 +45,7 @@ EmuSnpCreateMapping (
   IN     EFI_SIMPLE_NETWORK_MODE  *Mode
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -74,7 +71,7 @@ EmuSnpStart (
   IN EMU_SNP_PROTOCOL  *This
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -98,7 +95,7 @@ EmuSnpStop (
   IN EMU_SNP_PROTOCOL  *This
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -138,7 +135,7 @@ EmuSnpInitialize (
   IN UINTN                               ExtraTxBufferSize  OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -167,7 +164,7 @@ EmuSnpReset (
   IN BOOLEAN            ExtendedVerification
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -192,7 +189,7 @@ EmuSnpShutdown (
   IN EMU_SNP_PROTOCOL  *This
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -233,7 +230,7 @@ EmuSnpReceiveFilters (
   IN EFI_MAC_ADDRESS                              *MCastFilter OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -262,7 +259,7 @@ EmuSnpStationAddress (
   IN EFI_MAC_ADDRESS             *New OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -298,7 +295,7 @@ EmuSnpStatistics (
   OUT EFI_NETWORK_STATISTICS              *StatisticsTable  OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -334,7 +331,7 @@ EmuSnpMCastIpToMac (
   OUT EFI_MAC_ADDRESS                     *MAC
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -370,7 +367,7 @@ EmuSnpNvData (
   IN OUT VOID                             *Buffer
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -409,7 +406,7 @@ EmuSnpGetStatus (
   OUT VOID                                **TxBuf OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -460,7 +457,7 @@ EmuSnpTransmit (
   IN UINT16                               *Protocol OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -510,15 +507,14 @@ EmuSnpReceive (
   OUT UINT16                              *Protocol   OPTIONAL
   )
 {
-  EMU_SNP_PRIVATE    *Private;
+  EMU_SNP_PRIVATE  *Private;
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_THIS (This);
 
   return EFI_UNSUPPORTED;
 }
 
-
-EMU_SNP_PROTOCOL gEmuSnpProtocol = {
+EMU_SNP_PROTOCOL  gEmuSnpProtocol = {
   GasketSnpCreateMapping,
   GasketSnpStart,
   GasketSnpStop,
@@ -555,7 +551,6 @@ EmuSnpThunkOpen (
     return EFI_OUT_OF_RESOURCES;
   }
 
-
   Private->Signature = EMU_SNP_PRIVATE_SIGNATURE;
   Private->Thunk     = This;
   CopyMem (&Private->EmuSnp, &gEmuSnpProtocol, sizeof (gEmuSnpProtocol));
@@ -564,7 +559,6 @@ EmuSnpThunkOpen (
   This->Private   = Private;
   return EFI_SUCCESS;
 }
-
 
 EFI_STATUS
 EmuSnpThunkClose (
@@ -583,9 +577,7 @@ EmuSnpThunkClose (
   return EFI_SUCCESS;
 }
 
-
-
-EMU_IO_THUNK_PROTOCOL gSnpThunkIo = {
+EMU_IO_THUNK_PROTOCOL  gSnpThunkIo = {
   &gEmuSnpProtocolGuid,
   NULL,
   NULL,
