@@ -117,7 +117,7 @@ ArmPlatformInitialize (
 **/
 VOID
 ArmPlatformGetVirtualMemoryMap (
-  OUT ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap
+  OUT ARM_MEMORY_REGION_DESCRIPTOR **VirtualMemoryMap
   );
 
 /**

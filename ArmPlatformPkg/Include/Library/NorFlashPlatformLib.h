@@ -10,10 +10,10 @@
 #define _NORFLASHPLATFORMLIB_H_
 
 typedef struct {
-  UINTN       DeviceBaseAddress;    // Start address of the Device Base Address (DBA)
-  UINTN       RegionBaseAddress;    // Start address of one single region
-  UINTN       Size;
-  UINTN       BlockSize;
+  UINTN    DeviceBaseAddress;       // Start address of the Device Base Address (DBA)
+  UINTN    RegionBaseAddress;       // Start address of one single region
+  UINTN    Size;
+  UINTN    BlockSize;
 } NOR_FLASH_DESCRIPTION;
 
 EFI_STATUS
