@@ -20,7 +20,7 @@ InitSmmS3Cr3 (
 {
   mSmmS3ResumeState->SmmS3Cr3 = Gen4GPageTable (TRUE);
 
-  return ;
+  return;
 }
 
 /**

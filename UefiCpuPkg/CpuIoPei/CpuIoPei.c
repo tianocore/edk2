@@ -43,7 +43,7 @@ EFI_PEI_CPU_IO_PPI  gCpuIoPpi = {
 //
 // PPI Descriptor used to install the CPU I/O PPI
 //
-EFI_PEI_PPI_DESCRIPTOR gPpiList = {
+EFI_PEI_PPI_DESCRIPTOR  gPpiList = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiCpuIoPpiInstalledGuid,
   NULL
@@ -52,7 +52,7 @@ EFI_PEI_PPI_DESCRIPTOR gPpiList = {
 //
 // Lookup table for increment values based on transfer widths
 //
-UINT8 mInStride[] = {
+UINT8  mInStride[] = {
   1, // EfiPeiCpuIoWidthUint8
   2, // EfiPeiCpuIoWidthUint16
   4, // EfiPeiCpuIoWidthUint32
@@ -70,7 +70,7 @@ UINT8 mInStride[] = {
 //
 // Lookup table for increment values based on transfer widths
 //
-UINT8 mOutStride[] = {
+UINT8  mOutStride[] = {
   1, // EfiPeiCpuIoWidthUint8
   2, // EfiPeiCpuIoWidthUint16
   4, // EfiPeiCpuIoWidthUint32
@@ -131,14 +131,14 @@ CpuIoCheckParameter (
   // For FIFO type, the target address won't increase during the access,
   // so treat Count as 1
   //
-  if (Width >= EfiPeiCpuIoWidthFifoUint8 && Width <= EfiPeiCpuIoWidthFifoUint64) {
+  if ((Width >= EfiPeiCpuIoWidthFifoUint8) && (Width <= EfiPeiCpuIoWidthFifoUint64)) {
     Count = 1;
   }
 
   //
   // Check to see if Width is in the valid range for I/O Port operations
   //
-  Width = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
+  Width = (EFI_PEI_CPU_IO_PPI_WIDTH)(Width & 0x03);
   if (!MmioOperation && (Width == EfiPeiCpuIoWidthUint64)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -168,6 +168,7 @@ CpuIoCheckParameter (
     if (MaxCount < (Count - 1)) {
       return EFI_UNSUPPORTED;
     }
+
     if (Address > LShiftU64 (MaxCount - Count + 1, Width)) {
       return EFI_UNSUPPORTED;
     }
@@ -220,9 +221,9 @@ CpuMemoryServiceRead (
   //
   // Select loop based on the width of the transfer
   //
-  InStride = mInStride[Width];
+  InStride  = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
+  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH)(Width & 0x03);
   Aligned = (BOOLEAN)(((UINTN)Buffer & (mInStride[OperationWidth] - 1)) == 0x00);
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiPeiCpuIoWidthUint8) {
@@ -247,6 +248,7 @@ CpuMemoryServiceRead (
       }
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -294,9 +296,9 @@ CpuMemoryServiceWrite (
   //
   // Select loop based on the width of the transfer
   //
-  InStride = mInStride[Width];
+  InStride  = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
+  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH)(Width & 0x03);
   Aligned = (BOOLEAN)(((UINTN)Buffer & (mInStride[OperationWidth] - 1)) == 0x00);
   for (Uint8Buffer = Buffer; Count > 0; Address += InStride, Uint8Buffer += OutStride, Count--) {
     if (OperationWidth == EfiPeiCpuIoWidthUint8) {
@@ -321,6 +323,7 @@ CpuMemoryServiceWrite (
       }
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -368,31 +371,31 @@ CpuIoServiceRead (
   //
   // Select loop based on the width of the transfer
   //
-  InStride = mInStride[Width];
+  InStride  = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
+  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH)(Width & 0x03);
 
   //
   // Fifo operations supported for (mInStride[Width] == 0)
   //
   if (InStride == 0) {
     switch (OperationWidth) {
-    case EfiPeiCpuIoWidthUint8:
-      IoReadFifo8 ((UINTN)Address, Count, Buffer);
-      return EFI_SUCCESS;
-    case EfiPeiCpuIoWidthUint16:
-      IoReadFifo16 ((UINTN)Address, Count, Buffer);
-      return EFI_SUCCESS;
-    case EfiPeiCpuIoWidthUint32:
-      IoReadFifo32 ((UINTN)Address, Count, Buffer);
-      return EFI_SUCCESS;
-    default:
-      //
-      // The CpuIoCheckParameter call above will ensure that this
-      // path is not taken.
-      //
-      ASSERT (FALSE);
-      break;
+      case EfiPeiCpuIoWidthUint8:
+        IoReadFifo8 ((UINTN)Address, Count, Buffer);
+        return EFI_SUCCESS;
+      case EfiPeiCpuIoWidthUint16:
+        IoReadFifo16 ((UINTN)Address, Count, Buffer);
+        return EFI_SUCCESS;
+      case EfiPeiCpuIoWidthUint32:
+        IoReadFifo32 ((UINTN)Address, Count, Buffer);
+        return EFI_SUCCESS;
+      default:
+        //
+        // The CpuIoCheckParameter call above will ensure that this
+        // path is not taken.
+        //
+        ASSERT (FALSE);
+        break;
     }
   }
 
@@ -465,31 +468,31 @@ CpuIoServiceWrite (
   //
   // Select loop based on the width of the transfer
   //
-  InStride = mInStride[Width];
+  InStride  = mInStride[Width];
   OutStride = mOutStride[Width];
-  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH) (Width & 0x03);
+  OperationWidth = (EFI_PEI_CPU_IO_PPI_WIDTH)(Width & 0x03);
 
   //
   // Fifo operations supported for (mInStride[Width] == 0)
   //
   if (InStride == 0) {
     switch (OperationWidth) {
-    case EfiPeiCpuIoWidthUint8:
-      IoWriteFifo8 ((UINTN)Address, Count, Buffer);
-      return EFI_SUCCESS;
-    case EfiPeiCpuIoWidthUint16:
-      IoWriteFifo16 ((UINTN)Address, Count, Buffer);
-      return EFI_SUCCESS;
-    case EfiPeiCpuIoWidthUint32:
-      IoWriteFifo32 ((UINTN)Address, Count, Buffer);
-      return EFI_SUCCESS;
-    default:
-      //
-      // The CpuIoCheckParameter call above will ensure that this
-      // path is not taken.
-      //
-      ASSERT (FALSE);
-      break;
+      case EfiPeiCpuIoWidthUint8:
+        IoWriteFifo8 ((UINTN)Address, Count, Buffer);
+        return EFI_SUCCESS;
+      case EfiPeiCpuIoWidthUint16:
+        IoWriteFifo16 ((UINTN)Address, Count, Buffer);
+        return EFI_SUCCESS;
+      case EfiPeiCpuIoWidthUint32:
+        IoWriteFifo32 ((UINTN)Address, Count, Buffer);
+        return EFI_SUCCESS;
+      default:
+        //
+        // The CpuIoCheckParameter call above will ensure that this
+        // path is not taken.
+        //
+        ASSERT (FALSE);
+        break;
     }
   }
 

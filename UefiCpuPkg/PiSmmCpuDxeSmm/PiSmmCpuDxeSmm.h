@@ -74,69 +74,69 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef union {
   struct {
     // enable shadow stacks
-    UINT32  SH_STK_ENP:1;
+    UINT32    SH_STK_ENP              : 1;
     // enable the WRSS{D,Q}W instructions.
-    UINT32  WR_SHSTK_EN:1;
+    UINT32    WR_SHSTK_EN             : 1;
     // enable tracking of indirect call/jmp targets to be ENDBRANCH instruction.
-    UINT32  ENDBR_EN:1;
+    UINT32    ENDBR_EN                : 1;
     // enable legacy compatibility treatment for indirect call/jmp tracking.
-    UINT32  LEG_IW_EN:1;
+    UINT32    LEG_IW_EN               : 1;
     // enable use of no-track prefix on indirect call/jmp.
-    UINT32  NO_TRACK_EN:1;
+    UINT32    NO_TRACK_EN             : 1;
     // disable suppression of CET indirect branch tracking on legacy compatibility.
-    UINT32  SUPPRESS_DIS:1;
-    UINT32  RSVD:4;
+    UINT32    SUPPRESS_DIS            : 1;
+    UINT32    RSVD                    : 4;
     // indirect branch tracking is suppressed.
     // This bit can be written to 1 only if TRACKER is written as IDLE.
-    UINT32  SUPPRESS:1;
+    UINT32    SUPPRESS                : 1;
     // Value of the endbranch state machine
     // Values: IDLE (0), WAIT_FOR_ENDBRANCH(1).
-    UINT32  TRACKER:1;
+    UINT32    TRACKER                 : 1;
     // linear address of a bitmap in memory indicating valid
     // pages as target of CALL/JMP_indirect that do not land on ENDBRANCH when CET is enabled
     // and not suppressed. Valid when ENDBR_EN is 1. Must be machine canonical when written on
     // parts that support 64 bit mode. On parts that do not support 64 bit mode, the bits 63:32 are
     // reserved and must be 0. This value is extended by 12 bits at the low end to form the base address
     // (this automatically aligns the address on a 4-Kbyte boundary).
-    UINT32  EB_LEG_BITMAP_BASE_low:12;
-    UINT32  EB_LEG_BITMAP_BASE_high:32;
+    UINT32    EB_LEG_BITMAP_BASE_low  : 12;
+    UINT32    EB_LEG_BITMAP_BASE_high : 32;
   } Bits;
-  UINT64   Uint64;
+  UINT64    Uint64;
 } MSR_IA32_CET;
 
 //
 // MSRs required for configuration of SMM Code Access Check
 //
-#define EFI_MSR_SMM_MCA_CAP                    0x17D
-#define  SMM_CODE_ACCESS_CHK_BIT               BIT58
+#define EFI_MSR_SMM_MCA_CAP       0x17D
+#define  SMM_CODE_ACCESS_CHK_BIT  BIT58
 
-#define  SMM_FEATURE_CONTROL_LOCK_BIT          BIT0
-#define  SMM_CODE_CHK_EN_BIT                   BIT2
+#define  SMM_FEATURE_CONTROL_LOCK_BIT  BIT0
+#define  SMM_CODE_CHK_EN_BIT           BIT2
 
 ///
 /// Page Table Entry
 ///
-#define IA32_PG_P                   BIT0
-#define IA32_PG_RW                  BIT1
-#define IA32_PG_U                   BIT2
-#define IA32_PG_WT                  BIT3
-#define IA32_PG_CD                  BIT4
-#define IA32_PG_A                   BIT5
-#define IA32_PG_D                   BIT6
-#define IA32_PG_PS                  BIT7
-#define IA32_PG_PAT_2M              BIT12
-#define IA32_PG_PAT_4K              IA32_PG_PS
-#define IA32_PG_PMNT                BIT62
-#define IA32_PG_NX                  BIT63
+#define IA32_PG_P       BIT0
+#define IA32_PG_RW      BIT1
+#define IA32_PG_U       BIT2
+#define IA32_PG_WT      BIT3
+#define IA32_PG_CD      BIT4
+#define IA32_PG_A       BIT5
+#define IA32_PG_D       BIT6
+#define IA32_PG_PS      BIT7
+#define IA32_PG_PAT_2M  BIT12
+#define IA32_PG_PAT_4K  IA32_PG_PS
+#define IA32_PG_PMNT    BIT62
+#define IA32_PG_NX      BIT63
 
-#define PAGE_ATTRIBUTE_BITS         (IA32_PG_D | IA32_PG_A | IA32_PG_U | IA32_PG_RW | IA32_PG_P)
+#define PAGE_ATTRIBUTE_BITS  (IA32_PG_D | IA32_PG_A | IA32_PG_U | IA32_PG_RW | IA32_PG_P)
 //
 // Bits 1, 2, 5, 6 are reserved in the IA32 PAE PDPTE
 // X64 PAE PDPTE does not have such restriction
 //
-#define IA32_PAE_PDPTE_ATTRIBUTE_BITS    (IA32_PG_P)
+#define IA32_PAE_PDPTE_ATTRIBUTE_BITS  (IA32_PG_P)
 
-#define PAGE_PROGATE_BITS           (IA32_PG_NX | PAGE_ATTRIBUTE_BITS)
+#define PAGE_PROGATE_BITS  (IA32_PG_NX | PAGE_ATTRIBUTE_BITS)
 
 #define PAGING_4K_MASK  0xFFF
 #define PAGING_2M_MASK  0x1FFFFF
@@ -144,11 +144,11 @@ typedef union {
 
 #define PAGING_PAE_INDEX_MASK  0x1FF
 
-#define PAGING_4K_ADDRESS_MASK_64 0x000FFFFFFFFFF000ull
-#define PAGING_2M_ADDRESS_MASK_64 0x000FFFFFFFE00000ull
-#define PAGING_1G_ADDRESS_MASK_64 0x000FFFFFC0000000ull
+#define PAGING_4K_ADDRESS_MASK_64  0x000FFFFFFFFFF000ull
+#define PAGING_2M_ADDRESS_MASK_64  0x000FFFFFFFE00000ull
+#define PAGING_1G_ADDRESS_MASK_64  0x000FFFFFC0000000ull
 
-#define SMRR_MAX_ADDRESS       BASE_4GB
+#define SMRR_MAX_ADDRESS  BASE_4GB
 
 typedef enum {
   PageNone,
@@ -158,28 +158,28 @@ typedef enum {
 } PAGE_ATTRIBUTE;
 
 typedef struct {
-  PAGE_ATTRIBUTE   Attribute;
-  UINT64           Length;
-  UINT64           AddressMask;
+  PAGE_ATTRIBUTE    Attribute;
+  UINT64            Length;
+  UINT64            AddressMask;
 } PAGE_ATTRIBUTE_TABLE;
 
 //
 // Size of Task-State Segment defined in IA32 Manual
 //
-#define TSS_SIZE              104
-#define EXCEPTION_TSS_SIZE    (TSS_SIZE + 4) // Add 4 bytes SSP
-#define TSS_X64_IST1_OFFSET   36
-#define TSS_IA32_CR3_OFFSET   28
-#define TSS_IA32_ESP_OFFSET   56
-#define TSS_IA32_SSP_OFFSET   104
+#define TSS_SIZE             104
+#define EXCEPTION_TSS_SIZE   (TSS_SIZE + 4)  // Add 4 bytes SSP
+#define TSS_X64_IST1_OFFSET  36
+#define TSS_IA32_CR3_OFFSET  28
+#define TSS_IA32_ESP_OFFSET  56
+#define TSS_IA32_SSP_OFFSET  104
 
-#define CR0_WP                BIT16
+#define CR0_WP  BIT16
 
 //
 // Code select value
 //
-#define PROTECT_MODE_CODE_SEGMENT          0x08
-#define LONG_MODE_CODE_SEGMENT             0x38
+#define PROTECT_MODE_CODE_SEGMENT  0x08
+#define LONG_MODE_CODE_SEGMENT     0x38
 
 //
 // The size 0x20 must be bigger than
@@ -189,31 +189,31 @@ typedef struct {
 //
 #define BACK_BUF_SIZE  0x20
 
-#define EXCEPTION_VECTOR_NUMBER     0x20
+#define EXCEPTION_VECTOR_NUMBER  0x20
 
-#define INVALID_APIC_ID 0xFFFFFFFFFFFFFFFFULL
+#define INVALID_APIC_ID  0xFFFFFFFFFFFFFFFFULL
 
-typedef UINT32                              SMM_CPU_ARRIVAL_EXCEPTIONS;
-#define ARRIVAL_EXCEPTION_BLOCKED           0x1
-#define ARRIVAL_EXCEPTION_DELAYED           0x2
-#define ARRIVAL_EXCEPTION_SMI_DISABLED      0x4
+typedef UINT32 SMM_CPU_ARRIVAL_EXCEPTIONS;
+#define ARRIVAL_EXCEPTION_BLOCKED       0x1
+#define ARRIVAL_EXCEPTION_DELAYED       0x2
+#define ARRIVAL_EXCEPTION_SMI_DISABLED  0x4
 
 //
 // Wrapper used to convert EFI_AP_PROCEDURE2 and EFI_AP_PROCEDURE.
 //
 typedef struct {
-  EFI_AP_PROCEDURE  Procedure;
-  VOID              *ProcedureArgument;
+  EFI_AP_PROCEDURE    Procedure;
+  VOID                *ProcedureArgument;
 } PROCEDURE_WRAPPER;
 
 #define PROCEDURE_TOKEN_SIGNATURE  SIGNATURE_32 ('P', 'R', 'T', 'S')
 
 typedef struct {
-  UINTN                   Signature;
-  LIST_ENTRY              Link;
+  UINTN              Signature;
+  LIST_ENTRY         Link;
 
-  SPIN_LOCK               *SpinLock;
-  volatile UINT32         RunningApCount;
+  SPIN_LOCK          *SpinLock;
+  volatile UINT32    RunningApCount;
 } PROCEDURE_TOKEN;
 
 #define PROCEDURE_TOKEN_FROM_LINK(a)  CR (a, PROCEDURE_TOKEN, Link, PROCEDURE_TOKEN_SIGNATURE)
@@ -221,10 +221,10 @@ typedef struct {
 #define TOKEN_BUFFER_SIGNATURE  SIGNATURE_32 ('T', 'K', 'B', 'S')
 
 typedef struct {
-  UINTN                   Signature;
-  LIST_ENTRY              Link;
+  UINTN         Signature;
+  LIST_ENTRY    Link;
 
-  UINT8                   *Buffer;
+  UINT8         *Buffer;
 } TOKEN_BUFFER;
 
 #define TOKEN_BUFFER_FROM_LINK(a)  CR (a, TOKEN_BUFFER, Link, TOKEN_BUFFER_SIGNATURE)
@@ -237,33 +237,33 @@ typedef struct {
 #define SMM_CPU_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('s', 'c', 'p', 'u')
 
 typedef struct {
-  UINTN                           Signature;
+  UINTN                             Signature;
 
-  EFI_HANDLE                      SmmCpuHandle;
+  EFI_HANDLE                        SmmCpuHandle;
 
-  EFI_PROCESSOR_INFORMATION       *ProcessorInfo;
-  SMM_CPU_OPERATION               *Operation;
-  UINTN                           *CpuSaveStateSize;
-  VOID                            **CpuSaveState;
+  EFI_PROCESSOR_INFORMATION         *ProcessorInfo;
+  SMM_CPU_OPERATION                 *Operation;
+  UINTN                             *CpuSaveStateSize;
+  VOID                              **CpuSaveState;
 
-  EFI_SMM_RESERVED_SMRAM_REGION   SmmReservedSmramRegion[1];
-  EFI_SMM_ENTRY_CONTEXT           SmmCoreEntryContext;
-  EFI_SMM_ENTRY_POINT             SmmCoreEntry;
+  EFI_SMM_RESERVED_SMRAM_REGION     SmmReservedSmramRegion[1];
+  EFI_SMM_ENTRY_CONTEXT             SmmCoreEntryContext;
+  EFI_SMM_ENTRY_POINT               SmmCoreEntry;
 
-  EFI_SMM_CONFIGURATION_PROTOCOL  SmmConfiguration;
+  EFI_SMM_CONFIGURATION_PROTOCOL    SmmConfiguration;
 
-  PROCEDURE_WRAPPER               *ApWrapperFunc;
-  LIST_ENTRY                      TokenList;
-  LIST_ENTRY                      *FirstFreeToken;
+  PROCEDURE_WRAPPER                 *ApWrapperFunc;
+  LIST_ENTRY                        TokenList;
+  LIST_ENTRY                        *FirstFreeToken;
 } SMM_CPU_PRIVATE_DATA;
 
 extern SMM_CPU_PRIVATE_DATA  *gSmmCpuPrivate;
-extern CPU_HOT_PLUG_DATA      mCpuHotPlugData;
-extern UINTN                  mMaxNumberOfCpus;
-extern UINTN                  mNumberOfCpus;
-extern EFI_SMM_CPU_PROTOCOL   mSmmCpu;
-extern EFI_MM_MP_PROTOCOL     mSmmMp;
-extern UINTN                  mInternalCr3;
+extern CPU_HOT_PLUG_DATA     mCpuHotPlugData;
+extern UINTN                 mMaxNumberOfCpus;
+extern UINTN                 mNumberOfCpus;
+extern EFI_SMM_CPU_PROTOCOL  mSmmCpu;
+extern EFI_MM_MP_PROTOCOL    mSmmMp;
+extern UINTN                 mInternalCr3;
 
 ///
 /// The mode of the CPU at the time an SMI occurs
@@ -376,16 +376,16 @@ WriteSaveStateRegister (
   IN CONST VOID                   *Buffer
   );
 
-extern CONST UINT8                  gcSmmInitTemplate[];
-extern CONST UINT16                 gcSmmInitSize;
-X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr0;
-extern UINT32                       mSmmCr0;
-X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr3;
-extern UINT32                       mSmmCr4;
-X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr4;
-X86_ASSEMBLY_PATCH_LABEL            gPatchSmmInitStack;
-X86_ASSEMBLY_PATCH_LABEL            mPatchCetSupported;
-extern BOOLEAN                      mCetSupported;
+extern CONST UINT8        gcSmmInitTemplate[];
+extern CONST UINT16       gcSmmInitSize;
+X86_ASSEMBLY_PATCH_LABEL  gPatchSmmCr0;
+extern UINT32             mSmmCr0;
+X86_ASSEMBLY_PATCH_LABEL  gPatchSmmCr3;
+extern UINT32             mSmmCr4;
+X86_ASSEMBLY_PATCH_LABEL  gPatchSmmCr4;
+X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitStack;
+X86_ASSEMBLY_PATCH_LABEL  mPatchCetSupported;
+extern BOOLEAN            mCetSupported;
 
 /**
   Semaphore operation for all processor relocate SMMBase.
@@ -400,13 +400,13 @@ SmmRelocationSemaphoreComplete (
 /// The type of SMM CPU Information
 ///
 typedef struct {
-  SPIN_LOCK                         *Busy;
-  volatile EFI_AP_PROCEDURE2        Procedure;
-  volatile VOID                     *Parameter;
-  volatile UINT32                   *Run;
-  volatile BOOLEAN                  *Present;
-  PROCEDURE_TOKEN                   *Token;
-  EFI_STATUS                        *Status;
+  SPIN_LOCK                     *Busy;
+  volatile EFI_AP_PROCEDURE2    Procedure;
+  volatile VOID                 *Parameter;
+  volatile UINT32               *Run;
+  volatile BOOLEAN              *Present;
+  PROCEDURE_TOKEN               *Token;
+  EFI_STATUS                    *Status;
 } SMM_CPU_DATA_BLOCK;
 
 typedef enum {
@@ -432,56 +432,56 @@ typedef struct {
   VOID                          *StartupProcArgs;
 } SMM_DISPATCHER_MP_SYNC_DATA;
 
-#define SMM_PSD_OFFSET              0xfb00
+#define SMM_PSD_OFFSET  0xfb00
 
 ///
 /// All global semaphores' pointer
 ///
 typedef struct {
-  volatile UINT32      *Counter;
-  volatile BOOLEAN     *InsideSmm;
-  volatile BOOLEAN     *AllCpusInSync;
-  SPIN_LOCK            *PFLock;
-  SPIN_LOCK            *CodeAccessCheckLock;
+  volatile UINT32     *Counter;
+  volatile BOOLEAN    *InsideSmm;
+  volatile BOOLEAN    *AllCpusInSync;
+  SPIN_LOCK           *PFLock;
+  SPIN_LOCK           *CodeAccessCheckLock;
 } SMM_CPU_SEMAPHORE_GLOBAL;
 
 ///
 /// All semaphores for each processor
 ///
 typedef struct {
-  SPIN_LOCK                         *Busy;
-  volatile UINT32                   *Run;
-  volatile BOOLEAN                  *Present;
-  SPIN_LOCK                         *Token;
+  SPIN_LOCK           *Busy;
+  volatile UINT32     *Run;
+  volatile BOOLEAN    *Present;
+  SPIN_LOCK           *Token;
 } SMM_CPU_SEMAPHORE_CPU;
 
 ///
 /// All semaphores' information
 ///
 typedef struct {
-  SMM_CPU_SEMAPHORE_GLOBAL          SemaphoreGlobal;
-  SMM_CPU_SEMAPHORE_CPU             SemaphoreCpu;
+  SMM_CPU_SEMAPHORE_GLOBAL    SemaphoreGlobal;
+  SMM_CPU_SEMAPHORE_CPU       SemaphoreCpu;
 } SMM_CPU_SEMAPHORES;
 
-extern IA32_DESCRIPTOR                     gcSmiGdtr;
-extern EFI_PHYSICAL_ADDRESS                mGdtBuffer;
-extern UINTN                               mGdtBufferSize;
-extern IA32_DESCRIPTOR                     gcSmiIdtr;
-extern VOID                                *gcSmiIdtrPtr;
-extern UINT64                              gPhyMask;
-extern SMM_DISPATCHER_MP_SYNC_DATA         *mSmmMpSyncData;
-extern UINTN                               mSmmStackArrayBase;
-extern UINTN                               mSmmStackArrayEnd;
-extern UINTN                               mSmmStackSize;
-extern EFI_SMM_CPU_SERVICE_PROTOCOL        mSmmCpuService;
-extern IA32_DESCRIPTOR                     gcSmiInitGdtr;
-extern SMM_CPU_SEMAPHORES                  mSmmCpuSemaphores;
-extern UINTN                               mSemaphoreSize;
-extern SPIN_LOCK                           *mPFLock;
-extern SPIN_LOCK                           *mConfigSmmCodeAccessCheckLock;
-extern EFI_SMRAM_DESCRIPTOR                *mSmmCpuSmramRanges;
-extern UINTN                               mSmmCpuSmramRangeCount;
-extern UINT8                               mPhysicalAddressBits;
+extern IA32_DESCRIPTOR               gcSmiGdtr;
+extern EFI_PHYSICAL_ADDRESS          mGdtBuffer;
+extern UINTN                         mGdtBufferSize;
+extern IA32_DESCRIPTOR               gcSmiIdtr;
+extern VOID                          *gcSmiIdtrPtr;
+extern UINT64                        gPhyMask;
+extern SMM_DISPATCHER_MP_SYNC_DATA   *mSmmMpSyncData;
+extern UINTN                         mSmmStackArrayBase;
+extern UINTN                         mSmmStackArrayEnd;
+extern UINTN                         mSmmStackSize;
+extern EFI_SMM_CPU_SERVICE_PROTOCOL  mSmmCpuService;
+extern IA32_DESCRIPTOR               gcSmiInitGdtr;
+extern SMM_CPU_SEMAPHORES            mSmmCpuSemaphores;
+extern UINTN                         mSemaphoreSize;
+extern SPIN_LOCK                     *mPFLock;
+extern SPIN_LOCK                     *mConfigSmmCodeAccessCheckLock;
+extern EFI_SMRAM_DESCRIPTOR          *mSmmCpuSmramRanges;
+extern UINTN                         mSmmCpuSmramRangeCount;
+extern UINT8                         mPhysicalAddressBits;
 
 //
 // Copy of the PcdPteMemoryEncryptionAddressOrMask
@@ -499,7 +499,6 @@ UINT32
 Gen4GPageTable (
   IN      BOOLEAN                   Is32BitPageTable
   );
-
 
 /**
   Initialize global data for MP synchronization.
@@ -1080,12 +1079,11 @@ AllocateAlignedCodePages (
   IN UINTN            Alignment
   );
 
-
 //
 // S3 related global variable and function prototype.
 //
 
-extern BOOLEAN                mSmmS3Flag;
+extern BOOLEAN  mSmmS3Flag;
 
 /**
   Initialize SMM S3 resume state structure used during S3 Resume.
@@ -1285,7 +1283,7 @@ EdkiiSmmGetMemoryAttributes (
 VOID
 EFIAPI
 PiSmmCpuSmmInitFixupAddress (
- );
+  );
 
 /**
   This function fixes up the address of the global variable or function
@@ -1294,7 +1292,7 @@ PiSmmCpuSmmInitFixupAddress (
 VOID
 EFIAPI
 PiSmmCpuSmiEntryFixupAddress (
- );
+  );
 
 /**
   This function reads CR2 register when on-demand paging is enabled

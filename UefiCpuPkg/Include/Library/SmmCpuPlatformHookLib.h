@@ -13,10 +13,10 @@
 /// SMM Page Size Type
 ///
 typedef enum {
-    SmmPageSize4K,
-    SmmPageSize2M,
-    SmmPageSize1G,
-    MaxSmmPageSizeType
+  SmmPageSize4K,
+  SmmPageSize2M,
+  SmmPageSize1G,
+  MaxSmmPageSizeType
 } SMM_PAGE_SIZE_TYPE;
 
 /**

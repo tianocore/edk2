@@ -27,66 +27,66 @@
 
 #define CPU_FEATURE_ENTRY_SIGNATURE  SIGNATURE_32 ('C', 'F', 'E', 'S')
 
-#define CPU_FEATURE_NAME_SIZE        128
+#define CPU_FEATURE_NAME_SIZE  128
 
 typedef struct {
-  REGISTER_CPU_FEATURE_INFORMATION     CpuInfo;
-  UINT8                                *FeaturesSupportedMask;
-  LIST_ENTRY                           OrderList;
+  REGISTER_CPU_FEATURE_INFORMATION    CpuInfo;
+  UINT8                               *FeaturesSupportedMask;
+  LIST_ENTRY                          OrderList;
 } CPU_FEATURES_INIT_ORDER;
 
 typedef struct {
-  UINT32                       Signature;
-  LIST_ENTRY                   Link;
-  UINT8                        *FeatureMask;
-  CHAR8                        *FeatureName;
-  CPU_FEATURE_GET_CONFIG_DATA  GetConfigDataFunc;
-  CPU_FEATURE_SUPPORT          SupportFunc;
-  CPU_FEATURE_INITIALIZE       InitializeFunc;
-  UINT8                        *ThreadBeforeFeatureBitMask;
-  UINT8                        *ThreadAfterFeatureBitMask;
-  UINT8                        *CoreBeforeFeatureBitMask;
-  UINT8                        *CoreAfterFeatureBitMask;
-  UINT8                        *PackageBeforeFeatureBitMask;
-  UINT8                        *PackageAfterFeatureBitMask;
-  VOID                         *ConfigData;
-  BOOLEAN                      BeforeAll;
-  BOOLEAN                      AfterAll;
+  UINT32                         Signature;
+  LIST_ENTRY                     Link;
+  UINT8                          *FeatureMask;
+  CHAR8                          *FeatureName;
+  CPU_FEATURE_GET_CONFIG_DATA    GetConfigDataFunc;
+  CPU_FEATURE_SUPPORT            SupportFunc;
+  CPU_FEATURE_INITIALIZE         InitializeFunc;
+  UINT8                          *ThreadBeforeFeatureBitMask;
+  UINT8                          *ThreadAfterFeatureBitMask;
+  UINT8                          *CoreBeforeFeatureBitMask;
+  UINT8                          *CoreAfterFeatureBitMask;
+  UINT8                          *PackageBeforeFeatureBitMask;
+  UINT8                          *PackageAfterFeatureBitMask;
+  VOID                           *ConfigData;
+  BOOLEAN                        BeforeAll;
+  BOOLEAN                        AfterAll;
 } CPU_FEATURES_ENTRY;
 
 //
 // Flags used when program the register.
 //
 typedef struct {
-  volatile UINTN           MemoryMappedLock;        // Spinlock used to program mmio
-  volatile UINT32          *CoreSemaphoreCount;     // Semaphore containers used to program Core semaphore.
-  volatile UINT32          *PackageSemaphoreCount;  // Semaphore containers used to program Package semaphore.
+  volatile UINTN     MemoryMappedLock;              // Spinlock used to program mmio
+  volatile UINT32    *CoreSemaphoreCount;           // Semaphore containers used to program Core semaphore.
+  volatile UINT32    *PackageSemaphoreCount;        // Semaphore containers used to program Package semaphore.
 } PROGRAM_CPU_REGISTER_FLAGS;
 
 typedef union {
-  EFI_MP_SERVICES_PROTOCOL   *Protocol;
-  EDKII_PEI_MP_SERVICES2_PPI *Ppi;
+  EFI_MP_SERVICES_PROTOCOL      *Protocol;
+  EDKII_PEI_MP_SERVICES2_PPI    *Ppi;
 } MP_SERVICES;
 
 typedef struct {
-  UINTN                    FeaturesCount;
-  UINT32                   BitMaskSize;
-  LIST_ENTRY               FeatureList;
+  UINTN                         FeaturesCount;
+  UINT32                        BitMaskSize;
+  LIST_ENTRY                    FeatureList;
 
-  CPU_FEATURES_INIT_ORDER  *InitOrder;
-  UINT8                    *CapabilityPcd;
-  UINT8                    *SettingPcd;
+  CPU_FEATURES_INIT_ORDER       *InitOrder;
+  UINT8                         *CapabilityPcd;
+  UINT8                         *SettingPcd;
 
-  UINT32                   NumberOfCpus;
-  ACPI_CPU_DATA            *AcpiCpuData;
+  UINT32                        NumberOfCpus;
+  ACPI_CPU_DATA                 *AcpiCpuData;
 
-  CPU_REGISTER_TABLE       *RegisterTable;
-  CPU_REGISTER_TABLE       *PreSmmRegisterTable;
-  UINTN                    BspNumber;
+  CPU_REGISTER_TABLE            *RegisterTable;
+  CPU_REGISTER_TABLE            *PreSmmRegisterTable;
+  UINTN                         BspNumber;
 
-  PROGRAM_CPU_REGISTER_FLAGS  CpuFlags;
+  PROGRAM_CPU_REGISTER_FLAGS    CpuFlags;
 
-  MP_SERVICES              MpService;
+  MP_SERVICES                   MpService;
 } CPU_FEATURES_DATA;
 
 #define CPU_FEATURE_ENTRY_FROM_LINK(a) \

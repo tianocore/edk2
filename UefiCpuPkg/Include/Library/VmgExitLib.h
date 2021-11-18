@@ -15,7 +15,6 @@
 #include <Protocol/DebugSupport.h>
 #include <Register/Amd/Ghcb.h>
 
-
 /**
   Perform VMGEXIT.
 

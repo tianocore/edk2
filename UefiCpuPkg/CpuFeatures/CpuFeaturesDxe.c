@@ -18,7 +18,6 @@
 #include <Protocol/SmmConfiguration.h>
 #include <Guid/CpuFeaturesInitDone.h>
 
-
 /**
   Worker function to perform CPU feature initialization.
 
@@ -28,8 +27,8 @@ CpuFeaturesInitializeWorker (
   VOID
   )
 {
-  EFI_STATUS             Status;
-  EFI_HANDLE             Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   CpuFeaturesDetect ();
 
@@ -61,8 +60,8 @@ SmmConfigurationEventNotify (
   IN VOID                              *Context
   )
 {
-  EFI_STATUS                           Status;
-  EFI_SMM_CONFIGURATION_PROTOCOL       *SmmConfiguration;
+  EFI_STATUS                      Status;
+  EFI_SMM_CONFIGURATION_PROTOCOL  *SmmConfiguration;
 
   //
   // Make sure this notification is for this handler
@@ -133,4 +132,3 @@ CpuFeaturesDxeInitialize (
 
   return EFI_SUCCESS;
 }
-

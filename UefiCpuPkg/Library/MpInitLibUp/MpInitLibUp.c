@@ -63,11 +63,11 @@ MpInitLibInitialize (
 EFI_STATUS
 EFIAPI
 MpInitLibGetNumberOfProcessors (
-  OUT UINTN                     *NumberOfProcessors,       OPTIONAL
+  OUT UINTN                     *NumberOfProcessors, OPTIONAL
   OUT UINTN                     *NumberOfEnabledProcessors OPTIONAL
   )
 {
-  *NumberOfProcessors        = 1;
+  *NumberOfProcessors = 1;
   *NumberOfEnabledProcessors = 1;
   return EFI_SUCCESS;
 }
@@ -103,13 +103,15 @@ MpInitLibGetProcessorInfo (
   if (ProcessorInfoBuffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (ProcessorNumber != 0) {
     return EFI_NOT_FOUND;
   }
-  ProcessorInfoBuffer->ProcessorId      = 0;
-  ProcessorInfoBuffer->StatusFlag       = PROCESSOR_AS_BSP_BIT  |
-                                          PROCESSOR_ENABLED_BIT |
-                                          PROCESSOR_HEALTH_STATUS_BIT;
+
+  ProcessorInfoBuffer->ProcessorId = 0;
+  ProcessorInfoBuffer->StatusFlag  = PROCESSOR_AS_BSP_BIT  |
+                                     PROCESSOR_ENABLED_BIT |
+                                     PROCESSOR_HEALTH_STATUS_BIT;
   ProcessorInfoBuffer->Location.Package = 0;
   ProcessorInfoBuffer->Location.Core    = 0;
   ProcessorInfoBuffer->Location.Thread  = 0;
@@ -117,12 +119,13 @@ MpInitLibGetProcessorInfo (
     GuidHob = GetFirstGuidHob (&gEfiSecPlatformInformationPpiGuid);
     if (GuidHob != NULL) {
       SecPlatformInformation = GET_GUID_HOB_DATA (GuidHob);
-      HealthData->Uint32 = SecPlatformInformation->IA32HealthFlags.Uint32;
+      HealthData->Uint32     = SecPlatformInformation->IA32HealthFlags.Uint32;
     } else {
       DEBUG ((DEBUG_INFO, "Does not find any HOB stored CPU BIST information!\n"));
       HealthData->Uint32 = 0;
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -402,6 +405,7 @@ MpInitLibWhoAmI (
   if (ProcessorNumber == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   *ProcessorNumber = 0;
   return EFI_SUCCESS;
 }

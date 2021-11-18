@@ -86,14 +86,14 @@ typedef struct {
 } EFI_SMM_SYSTEM_TABLE2_64;
 
 typedef struct {
-  EFI_GUID                          VendorGuid;
-  UINT64                            VendorTable;
+  EFI_GUID    VendorGuid;
+  UINT64      VendorTable;
 } EFI_CONFIGURATION_TABLE64;
 #endif
 
 #if defined (MDE_CPU_X64)
-typedef EFI_SMM_SYSTEM_TABLE2 EFI_SMM_SYSTEM_TABLE2_64;
-typedef EFI_CONFIGURATION_TABLE EFI_CONFIGURATION_TABLE64;
+typedef EFI_SMM_SYSTEM_TABLE2    EFI_SMM_SYSTEM_TABLE2_64;
+typedef EFI_CONFIGURATION_TABLE  EFI_CONFIGURATION_TABLE64;
 #endif
 
 /**
@@ -118,9 +118,9 @@ Communicate (
   IN OUT UINTN                             *CommSize
   );
 
-EFI_PEI_SMM_COMMUNICATION_PPI      mSmmCommunicationPpi = { Communicate };
+EFI_PEI_SMM_COMMUNICATION_PPI  mSmmCommunicationPpi = { Communicate };
 
-EFI_PEI_PPI_DESCRIPTOR mPpiList = {
+EFI_PEI_PPI_DESCRIPTOR  mPpiList = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiSmmCommunicationPpiGuid,
   &mSmmCommunicationPpi
@@ -136,8 +136,8 @@ GetCommunicationContext (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE                *GuidHob;
-  EFI_SMM_COMMUNICATION_CONTEXT    *SmmCommunicationContext;
+  EFI_HOB_GUID_TYPE              *GuidHob;
+  EFI_SMM_COMMUNICATION_CONTEXT  *SmmCommunicationContext;
 
   GuidHob = GetFirstGuidHob (&gEfiPeiSmmCommunicationPpiGuid);
   ASSERT (GuidHob != NULL);
@@ -157,17 +157,17 @@ SetCommunicationContext (
   IN EFI_SMM_COMMUNICATION_CONTEXT    *SmmCommunicationContext
   )
 {
-  EFI_PEI_HOB_POINTERS             Hob;
-  UINTN                            BufferSize;
+  EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 BufferSize;
 
   BufferSize = sizeof (*SmmCommunicationContext);
-  Hob.Raw = BuildGuidHob (
-              &gEfiPeiSmmCommunicationPpiGuid,
-              BufferSize
-              );
+  Hob.Raw    = BuildGuidHob (
+                 &gEfiPeiSmmCommunicationPpiGuid,
+                 BufferSize
+                 );
   ASSERT (Hob.Raw);
 
-  CopyMem ((VOID *)Hob.Raw, SmmCommunicationContext, sizeof(*SmmCommunicationContext));
+  CopyMem ((VOID *)Hob.Raw, SmmCommunicationContext, sizeof (*SmmCommunicationContext));
 }
 
 /**
@@ -186,13 +186,13 @@ InternalSmstGetVendorTableByGuid (
   IN EFI_GUID                                      *VendorGuid
   )
 {
-  EFI_CONFIGURATION_TABLE                       *SmmConfigurationTable;
-  UINTN                                         NumberOfTableEntries;
-  UINTN                                         Index;
-  EFI_SMM_SYSTEM_TABLE2_64                      *Smst64;
-  EFI_CONFIGURATION_TABLE64                     *SmmConfigurationTable64;
+  EFI_CONFIGURATION_TABLE    *SmmConfigurationTable;
+  UINTN                      NumberOfTableEntries;
+  UINTN                      Index;
+  EFI_SMM_SYSTEM_TABLE2_64   *Smst64;
+  EFI_CONFIGURATION_TABLE64  *SmmConfigurationTable64;
 
-  if ((sizeof(UINTN) == sizeof(UINT32)) && (Signature == SMM_S3_RESUME_SMM_64)) {
+  if ((sizeof (UINTN) == sizeof (UINT32)) && (Signature == SMM_S3_RESUME_SMM_64)) {
     //
     // 32 PEI + 64 DXE
     //
@@ -200,23 +200,25 @@ InternalSmstGetVendorTableByGuid (
     DEBUG ((DEBUG_INFO, "InitCommunicationContext - SmmConfigurationTable: %x\n", Smst64->SmmConfigurationTable));
     DEBUG ((DEBUG_INFO, "InitCommunicationContext - NumberOfTableEntries: %x\n", Smst64->NumberOfTableEntries));
     SmmConfigurationTable64 = (EFI_CONFIGURATION_TABLE64 *)(UINTN)Smst64->SmmConfigurationTable;
-    NumberOfTableEntries = (UINTN)Smst64->NumberOfTableEntries;
+    NumberOfTableEntries    = (UINTN)Smst64->NumberOfTableEntries;
     for (Index = 0; Index < NumberOfTableEntries; Index++) {
       if (CompareGuid (&SmmConfigurationTable64[Index].VendorGuid, VendorGuid)) {
         return (VOID *)(UINTN)SmmConfigurationTable64[Index].VendorTable;
       }
     }
+
     return NULL;
   } else {
     DEBUG ((DEBUG_INFO, "InitCommunicationContext - SmmConfigurationTable: %x\n", Smst->SmmConfigurationTable));
     DEBUG ((DEBUG_INFO, "InitCommunicationContext - NumberOfTableEntries: %x\n", Smst->NumberOfTableEntries));
     SmmConfigurationTable = Smst->SmmConfigurationTable;
-    NumberOfTableEntries = Smst->NumberOfTableEntries;
+    NumberOfTableEntries  = Smst->NumberOfTableEntries;
     for (Index = 0; Index < NumberOfTableEntries; Index++) {
       if (CompareGuid (&SmmConfigurationTable[Index].VendorGuid, VendorGuid)) {
         return (VOID *)SmmConfigurationTable[Index].VendorTable;
       }
     }
+
     return NULL;
   }
 }
@@ -229,14 +231,14 @@ InitCommunicationContext (
   VOID
   )
 {
-  EFI_SMRAM_DESCRIPTOR                          *SmramDescriptor;
-  SMM_S3_RESUME_STATE                           *SmmS3ResumeState;
-  VOID                                          *GuidHob;
-  EFI_SMM_COMMUNICATION_CONTEXT                 *SmmCommunicationContext;
+  EFI_SMRAM_DESCRIPTOR           *SmramDescriptor;
+  SMM_S3_RESUME_STATE            *SmmS3ResumeState;
+  VOID                           *GuidHob;
+  EFI_SMM_COMMUNICATION_CONTEXT  *SmmCommunicationContext;
 
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
   ASSERT (GuidHob != NULL);
-  SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *) GET_GUID_HOB_DATA (GuidHob);
+  SmramDescriptor  = (EFI_SMRAM_DESCRIPTOR *)GET_GUID_HOB_DATA (GuidHob);
   SmmS3ResumeState = (SMM_S3_RESUME_STATE *)(UINTN)SmramDescriptor->CpuStart;
 
   DEBUG ((DEBUG_INFO, "InitCommunicationContext - SmmS3ResumeState: %x\n", SmmS3ResumeState));
@@ -251,7 +253,7 @@ InitCommunicationContext (
 
   SetCommunicationContext (SmmCommunicationContext);
 
-  return ;
+  return;
 }
 
 /**
@@ -276,12 +278,12 @@ Communicate (
   IN OUT UINTN                             *CommSize
   )
 {
-  EFI_STATUS                       Status;
-  PEI_SMM_CONTROL_PPI              *SmmControl;
-  PEI_SMM_ACCESS_PPI               *SmmAccess;
-  UINT8                            SmiCommand;
-  UINTN                            Size;
-  EFI_SMM_COMMUNICATION_CONTEXT    *SmmCommunicationContext;
+  EFI_STATUS                     Status;
+  PEI_SMM_CONTROL_PPI            *SmmControl;
+  PEI_SMM_ACCESS_PPI             *SmmAccess;
+  UINT8                          SmiCommand;
+  UINTN                          Size;
+  EFI_SMM_COMMUNICATION_CONTEXT  *SmmCommunicationContext;
 
   DEBUG ((DEBUG_INFO, "PiSmmCommunicationPei Communicate Enter\n"));
 
@@ -333,7 +335,7 @@ Communicate (
   // Send command
   //
   SmiCommand = (UINT8)SmmCommunicationContext->SwSmiNumber;
-  Size = sizeof(SmiCommand);
+  Size   = sizeof (SmiCommand);
   Status = SmmControl->Trigger (
                          (EFI_PEI_SERVICES **)GetPeiServicesTablePointer (),
                          SmmControl,
@@ -370,10 +372,10 @@ PiSmmCommunicationPeiEntryPoint (
   IN CONST EFI_PEI_SERVICES    **PeiServices
   )
 {
-  EFI_STATUS                      Status;
-  PEI_SMM_ACCESS_PPI              *SmmAccess;
-  EFI_BOOT_MODE                   BootMode;
-  UINTN                           Index;
+  EFI_STATUS          Status;
+  PEI_SMM_ACCESS_PPI  *SmmAccess;
+  EFI_BOOT_MODE       BootMode;
+  UINTN               Index;
 
   BootMode = GetBootModeHob ();
   if (BootMode != BOOT_ON_S3_RESUME) {

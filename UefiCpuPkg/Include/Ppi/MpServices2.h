@@ -16,7 +16,7 @@
     0x5cb9cb3d, 0x31a4, 0x480c, { 0x94, 0x98, 0x29, 0xd2, 0x69, 0xba, 0xcf, 0xba} \
   }
 
-typedef struct _EDKII_PEI_MP_SERVICES2_PPI  EDKII_PEI_MP_SERVICES2_PPI;
+typedef struct _EDKII_PEI_MP_SERVICES2_PPI EDKII_PEI_MP_SERVICES2_PPI;
 
 /**
   Get the number of CPU's.
@@ -35,7 +35,7 @@ typedef struct _EDKII_PEI_MP_SERVICES2_PPI  EDKII_PEI_MP_SERVICES2_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_MP_SERVICES_GET_NUMBER_OF_PROCESSORS) (
+(EFIAPI *EDKII_PEI_MP_SERVICES_GET_NUMBER_OF_PROCESSORS)(
   IN  EDKII_PEI_MP_SERVICES2_PPI     *This,
   OUT UINTN                          *NumberOfProcessors,
   OUT UINTN                          *NumberOfEnabledProcessors
@@ -57,7 +57,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_MP_SERVICES_GET_PROCESSOR_INFO) (
+(EFIAPI *EDKII_PEI_MP_SERVICES_GET_PROCESSOR_INFO)(
   IN  EDKII_PEI_MP_SERVICES2_PPI     *This,
   IN  UINTN                          ProcessorNumber,
   OUT EFI_PROCESSOR_INFORMATION     *ProcessorInfoBuffer
@@ -97,7 +97,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_MP_SERVICES_STARTUP_ALL_APS) (
+(EFIAPI *EDKII_PEI_MP_SERVICES_STARTUP_ALL_APS)(
   IN  EDKII_PEI_MP_SERVICES2_PPI     *This,
   IN  EFI_AP_PROCEDURE               Procedure,
   IN  BOOLEAN                        SingleThread,
@@ -139,7 +139,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_MP_SERVICES_STARTUP_THIS_AP) (
+(EFIAPI *EDKII_PEI_MP_SERVICES_STARTUP_THIS_AP)(
   IN  EDKII_PEI_MP_SERVICES2_PPI     *This,
   IN  EFI_AP_PROCEDURE               Procedure,
   IN  UINTN                          ProcessorNumber,
@@ -171,7 +171,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_MP_SERVICES_SWITCH_BSP) (
+(EFIAPI *EDKII_PEI_MP_SERVICES_SWITCH_BSP)(
   IN  EDKII_PEI_MP_SERVICES2_PPI     *This,
   IN  UINTN                          ProcessorNumber,
   IN  BOOLEAN                        EnableOldBSP
@@ -205,7 +205,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_MP_SERVICES_ENABLEDISABLEAP) (
+(EFIAPI *EDKII_PEI_MP_SERVICES_ENABLEDISABLEAP)(
   IN  EDKII_PEI_MP_SERVICES2_PPI     *This,
   IN  UINTN                          ProcessorNumber,
   IN  BOOLEAN                        EnableAP,
@@ -227,11 +227,10 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_MP_SERVICES_WHOAMI) (
+(EFIAPI *EDKII_PEI_MP_SERVICES_WHOAMI)(
   IN  EDKII_PEI_MP_SERVICES2_PPI     *This,
   OUT UINTN                          *ProcessorNumber
   );
-
 
 /**
   Activate all of the application proessors.
@@ -256,7 +255,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_MP_SERVICES_STARTUP_ALL_CPUS) (
+(EFIAPI *EDKII_PEI_MP_SERVICES_STARTUP_ALL_CPUS)(
   IN  EDKII_PEI_MP_SERVICES2_PPI     *This,
   IN  EFI_AP_PROCEDURE               Procedure,
   IN  UINTN                          TimeoutInMicroSeconds,
@@ -264,16 +263,16 @@ EFI_STATUS
   );
 
 struct _EDKII_PEI_MP_SERVICES2_PPI {
-  EDKII_PEI_MP_SERVICES_GET_NUMBER_OF_PROCESSORS  GetNumberOfProcessors;
-  EDKII_PEI_MP_SERVICES_GET_PROCESSOR_INFO        GetProcessorInfo;
-  EDKII_PEI_MP_SERVICES_STARTUP_ALL_APS           StartupAllAPs;
-  EDKII_PEI_MP_SERVICES_STARTUP_THIS_AP           StartupThisAP;
-  EDKII_PEI_MP_SERVICES_SWITCH_BSP                SwitchBSP;
-  EDKII_PEI_MP_SERVICES_ENABLEDISABLEAP           EnableDisableAP;
-  EDKII_PEI_MP_SERVICES_WHOAMI                    WhoAmI;
-  EDKII_PEI_MP_SERVICES_STARTUP_ALL_CPUS          StartupAllCPUs;
+  EDKII_PEI_MP_SERVICES_GET_NUMBER_OF_PROCESSORS    GetNumberOfProcessors;
+  EDKII_PEI_MP_SERVICES_GET_PROCESSOR_INFO          GetProcessorInfo;
+  EDKII_PEI_MP_SERVICES_STARTUP_ALL_APS             StartupAllAPs;
+  EDKII_PEI_MP_SERVICES_STARTUP_THIS_AP             StartupThisAP;
+  EDKII_PEI_MP_SERVICES_SWITCH_BSP                  SwitchBSP;
+  EDKII_PEI_MP_SERVICES_ENABLEDISABLEAP             EnableDisableAP;
+  EDKII_PEI_MP_SERVICES_WHOAMI                      WhoAmI;
+  EDKII_PEI_MP_SERVICES_STARTUP_ALL_CPUS            StartupAllCPUs;
 };
 
-extern EFI_GUID gEdkiiPeiMpServices2PpiGuid;
+extern EFI_GUID  gEdkiiPeiMpServices2PpiGuid;
 
 #endif
