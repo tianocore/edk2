@@ -38,42 +38,42 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Tcg2ConfigNvData.h"
 #include "Tcg2Internal.h"
 
-#define TCG2_PROTOCOL_VERSION_DEFAULT        0x0001
+#define TCG2_PROTOCOL_VERSION_DEFAULT  0x0001
 
 //
 // Tool generated IFR binary data and String package data
 //
-extern UINT8                        Tcg2ConfigBin[];
-extern UINT8                        Tcg2ConfigDxeStrings[];
+extern UINT8  Tcg2ConfigBin[];
+extern UINT8  Tcg2ConfigDxeStrings[];
 
 ///
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH                VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL          End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
 typedef struct {
-  UINTN                             Signature;
+  UINTN                               Signature;
 
-  EFI_HII_CONFIG_ACCESS_PROTOCOL    ConfigAccess;
-  EFI_HII_HANDLE                    HiiHandle;
-  EFI_HANDLE                        DriverHandle;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL      ConfigAccess;
+  EFI_HII_HANDLE                      HiiHandle;
+  EFI_HANDLE                          DriverHandle;
 
-  UINT8                             TpmDeviceDetected;
-  EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
-  EFI_TCG2_BOOT_SERVICE_CAPABILITY  ProtocolCapability;
-  UINT32                            PCRBanksDesired;
+  UINT8                               TpmDeviceDetected;
+  EFI_TCG2_PROTOCOL                   *Tcg2Protocol;
+  EFI_TCG2_BOOT_SERVICE_CAPABILITY    ProtocolCapability;
+  UINT32                              PCRBanksDesired;
 } TCG2_CONFIG_PRIVATE_DATA;
 
-extern TCG2_CONFIG_PRIVATE_DATA      mTcg2ConfigPrivateDateTemplate;
-extern TCG2_CONFIG_PRIVATE_DATA      *mTcg2ConfigPrivateDate;
-#define TCG2_CONFIG_PRIVATE_DATA_SIGNATURE     SIGNATURE_32 ('T', 'r', 'E', 'D')
+extern TCG2_CONFIG_PRIVATE_DATA  mTcg2ConfigPrivateDateTemplate;
+extern TCG2_CONFIG_PRIVATE_DATA  *mTcg2ConfigPrivateDate;
+#define TCG2_CONFIG_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('T', 'r', 'E', 'D')
 #define TCG2_CONFIG_PRIVATE_DATA_FROM_THIS(a)  CR (a, TCG2_CONFIG_PRIVATE_DATA, ConfigAccess, TCG2_CONFIG_PRIVATE_DATA_SIGNATURE)
 
-#define TPM_HID_PNP_SIZE                                           8
-#define TPM_HID_ACPI_SIZE                                          9
+#define TPM_HID_PNP_SIZE   8
+#define TPM_HID_ACPI_SIZE  9
 
 /**
   This function publish the TCG2 configuration Form for TPM device.
@@ -98,7 +98,7 @@ InstallTcg2ConfigForm (
 **/
 VOID
 UninstallTcg2ConfigForm (
-  IN OUT TCG2_CONFIG_PRIVATE_DATA    *PrivateData
+  IN OUT TCG2_CONFIG_PRIVATE_DATA  *PrivateData
   );
 
 /**
@@ -130,10 +130,10 @@ UninstallTcg2ConfigForm (
 EFI_STATUS
 EFIAPI
 Tcg2ExtractConfig (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL        *This,
-  IN CONST EFI_STRING                            Request,
-       OUT EFI_STRING                            *Progress,
-       OUT EFI_STRING                            *Results
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN CONST EFI_STRING                      Request,
+  OUT EFI_STRING                           *Progress,
+  OUT EFI_STRING                           *Results
   );
 
 /**
@@ -157,9 +157,9 @@ Tcg2ExtractConfig (
 EFI_STATUS
 EFIAPI
 Tcg2RouteConfig (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
-  IN CONST EFI_STRING                          Configuration,
-       OUT EFI_STRING                          *Progress
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                           *Progress
   );
 
 /**
@@ -187,12 +187,12 @@ Tcg2RouteConfig (
 EFI_STATUS
 EFIAPI
 Tcg2Callback (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
-  IN     EFI_BROWSER_ACTION                    Action,
-  IN     EFI_QUESTION_ID                       QuestionId,
-  IN     UINT8                                 Type,
-  IN     EFI_IFR_TYPE_VALUE                    *Value,
-     OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN     EFI_BROWSER_ACTION                Action,
+  IN     EFI_QUESTION_ID                   QuestionId,
+  IN     UINT8                             Type,
+  IN     EFI_IFR_TYPE_VALUE                *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST           *ActionRequest
   );
 
 #endif

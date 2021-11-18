@@ -29,12 +29,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 Tcg2MmDependencyDxeEntryPoint (
-  IN EFI_HANDLE                           ImageHandle,
-  IN EFI_SYSTEM_TABLE                     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS            Status;
-  EFI_HANDLE            Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   Handle = NULL;
   Status = gBS->InstallProtocolInterface (
