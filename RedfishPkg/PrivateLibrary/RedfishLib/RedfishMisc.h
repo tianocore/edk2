@@ -22,7 +22,7 @@
 #include <Protocol/EdkIIRedfishCredential.h>
 #include <redfish.h>
 
-#define ARRAY_SIZE(Array) (sizeof (Array) / sizeof ((Array)[0]))
+#define ARRAY_SIZE(Array)  (sizeof (Array) / sizeof ((Array)[0]))
 
 /**
   Creates a REDFISH_SERVICE which can be later used to access the Redfish resources.
@@ -43,10 +43,10 @@
 **/
 REDFISH_SERVICE
 RedfishCreateLibredfishService (
-  IN REDFISH_CONFIG_SERVICE_INFORMATION   *RedfishConfigServiceInfo,
-  IN EDKII_REDFISH_AUTH_METHOD       AuthMethod,
-  IN CHAR8                           *UserId,
-  IN CHAR8                           *Password
+  IN REDFISH_CONFIG_SERVICE_INFORMATION  *RedfishConfigServiceInfo,
+  IN EDKII_REDFISH_AUTH_METHOD           AuthMethod,
+  IN CHAR8                               *UserId,
+  IN CHAR8                               *Password
   );
 
 /**
@@ -74,9 +74,9 @@ RedfishCreateLibredfishService (
 **/
 EFI_STATUS
 RedfishGetAuthInfo (
-  OUT  EDKII_REDFISH_AUTH_METHOD          *AuthMethod,
-  OUT  CHAR8                              **UserId,
-  OUT  CHAR8                              **Password
+  OUT  EDKII_REDFISH_AUTH_METHOD  *AuthMethod,
+  OUT  CHAR8                      **UserId,
+  OUT  CHAR8                      **Password
   );
 
 #endif
