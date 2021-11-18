@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _PEI_CD_EXPRESS_H_
 #define _PEI_CD_EXPRESS_H_
 
-
 #include <PiPei.h>
 
 #include <Ppi/BlockIo.h>
@@ -26,44 +25,42 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeiServicesLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-
 #pragma pack(1)
 
-#define PEI_CD_EXPRESS_MAX_BLOCK_IO_PPI   8
-#define PEI_CD_EXPRESS_MAX_CAPSULE_NUMBER 16
+#define PEI_CD_EXPRESS_MAX_BLOCK_IO_PPI    8
+#define PEI_CD_EXPRESS_MAX_CAPSULE_NUMBER  16
 
-#define PEI_CD_BLOCK_SIZE                 0x800
-#define PEI_MEMMORY_PAGE_SIZE             0x1000
+#define PEI_CD_BLOCK_SIZE      0x800
+#define PEI_MEMMORY_PAGE_SIZE  0x1000
 
 //
 // Following are defined according to ISO-9660 specification
 //
-#define PEI_CD_STANDARD_ID                      "CD001"
-#define PEI_CD_EXPRESS_STANDARD_ID_SIZE         5
+#define PEI_CD_STANDARD_ID               "CD001"
+#define PEI_CD_EXPRESS_STANDARD_ID_SIZE  5
 
-#define PEI_CD_EXPRESS_VOLUME_TYPE_OFFSET       0
-#define PEI_CD_EXPRESS_STANDARD_ID_OFFSET       1
-#define PEI_CD_EXPRESS_VOLUME_SPACE_OFFSET      80
-#define PEI_CD_EXPRESS_ROOT_DIR_RECORD_OFFSET   156
+#define PEI_CD_EXPRESS_VOLUME_TYPE_OFFSET      0
+#define PEI_CD_EXPRESS_STANDARD_ID_OFFSET      1
+#define PEI_CD_EXPRESS_VOLUME_SPACE_OFFSET     80
+#define PEI_CD_EXPRESS_ROOT_DIR_RECORD_OFFSET  156
 
-#define PEI_CD_EXPRESS_VOLUME_TYPE_PRIMARY      1
-#define PEI_CD_EXPRESS_VOLUME_TYPE_TERMINATOR   255
+#define PEI_CD_EXPRESS_VOLUME_TYPE_PRIMARY     1
+#define PEI_CD_EXPRESS_VOLUME_TYPE_TERMINATOR  255
 
 #define PEI_CD_EXPRESS_DIR_FILE_REC_FLAG_ISDIR  0x02
 
 typedef struct {
-  UINTN                           CapsuleStartLBA;
-  UINTN                           CapsuleSize;
-  UINTN                           CapsuleBlockAlignedSize;
-  UINTN                           IndexBlock;
-  EFI_PEI_RECOVERY_BLOCK_IO_PPI   *BlockIo;
-  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *BlockIo2;
+  UINTN                             CapsuleStartLBA;
+  UINTN                             CapsuleSize;
+  UINTN                             CapsuleBlockAlignedSize;
+  UINTN                             IndexBlock;
+  EFI_PEI_RECOVERY_BLOCK_IO_PPI     *BlockIo;
+  EFI_PEI_RECOVERY_BLOCK_IO2_PPI    *BlockIo2;
 } PEI_CD_EXPRESS_CAPSULE_DATA;
 
-#define PEI_CD_EXPRESS_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('p', 'c', 'd', 'e')
+#define PEI_CD_EXPRESS_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('p', 'c', 'd', 'e')
 
 typedef struct {
-
   UINTN                                 Signature;
   EFI_PEI_DEVICE_RECOVERY_MODULE_PPI    DeviceRecoveryPpi;
   EFI_PEI_PPI_DESCRIPTOR                PpiDescriptor;
@@ -73,7 +70,6 @@ typedef struct {
   UINT8                                 *BlockBuffer;
   UINTN                                 CapsuleCount;
   PEI_CD_EXPRESS_CAPSULE_DATA           CapsuleData[PEI_CD_EXPRESS_MAX_CAPSULE_NUMBER];
-
 } PEI_CD_EXPRESS_PRIVATE_DATA;
 
 #define PEI_CD_EXPRESS_PRIVATE_DATA_FROM_THIS(a) \
@@ -84,17 +80,17 @@ typedef struct {
       )
 
 typedef struct {
-  UINT8   Length;
-  UINT8   ExtendedAttributeRecordLength;
-  UINT32  LocationOfExtent[2];
-  UINT32  DataLength[2];
-  UINT8   DateTime[7];
-  UINT8   Flag;
-  UINT8   FileUnitSize;
-  UINT8   InterleaveGapSize;
-  UINT32  VolumeSequenceNumber;
-  UINT8   FileIDLength;
-  UINT8   FileID[1];
+  UINT8     Length;
+  UINT8     ExtendedAttributeRecordLength;
+  UINT32    LocationOfExtent[2];
+  UINT32    DataLength[2];
+  UINT8     DateTime[7];
+  UINT8     Flag;
+  UINT8     FileUnitSize;
+  UINT8     InterleaveGapSize;
+  UINT32    VolumeSequenceNumber;
+  UINT8     FileIDLength;
+  UINT8     FileID[1];
 } PEI_CD_EXPRESS_DIR_FILE_RECORD;
 
 /**
@@ -129,8 +125,8 @@ BlockIoNotifyEntry (
 **/
 EFI_STATUS
 UpdateBlocksAndVolumes (
-  IN OUT PEI_CD_EXPRESS_PRIVATE_DATA     *PrivateData,
-  IN     BOOLEAN                         BlockIo2
+  IN OUT PEI_CD_EXPRESS_PRIVATE_DATA  *PrivateData,
+  IN     BOOLEAN                      BlockIo2
   );
 
 /**
@@ -159,9 +155,9 @@ UpdateBlocksAndVolumes (
 EFI_STATUS
 EFIAPI
 GetNumberRecoveryCapsules (
-  IN EFI_PEI_SERVICES                               **PeiServices,
-  IN EFI_PEI_DEVICE_RECOVERY_MODULE_PPI             *This,
-  OUT UINTN                                         *NumberRecoveryCapsules
+  IN EFI_PEI_SERVICES                    **PeiServices,
+  IN EFI_PEI_DEVICE_RECOVERY_MODULE_PPI  *This,
+  OUT UINTN                              *NumberRecoveryCapsules
   );
 
 /**
@@ -192,11 +188,11 @@ GetNumberRecoveryCapsules (
 EFI_STATUS
 EFIAPI
 GetRecoveryCapsuleInfo (
-  IN  EFI_PEI_SERVICES                              **PeiServices,
-  IN  EFI_PEI_DEVICE_RECOVERY_MODULE_PPI            *This,
-  IN  UINTN                                         CapsuleInstance,
-  OUT UINTN                                         *Size,
-  OUT EFI_GUID                                      *CapsuleType
+  IN  EFI_PEI_SERVICES                    **PeiServices,
+  IN  EFI_PEI_DEVICE_RECOVERY_MODULE_PPI  *This,
+  IN  UINTN                               CapsuleInstance,
+  OUT UINTN                               *Size,
+  OUT EFI_GUID                            *CapsuleType
   );
 
 /**
@@ -221,10 +217,10 @@ GetRecoveryCapsuleInfo (
 EFI_STATUS
 EFIAPI
 LoadRecoveryCapsule (
-  IN EFI_PEI_SERVICES                             **PeiServices,
-  IN EFI_PEI_DEVICE_RECOVERY_MODULE_PPI           *This,
-  IN UINTN                                        CapsuleInstance,
-  OUT VOID                                        *Buffer
+  IN EFI_PEI_SERVICES                    **PeiServices,
+  IN EFI_PEI_DEVICE_RECOVERY_MODULE_PPI  *This,
+  IN UINTN                               CapsuleInstance,
+  OUT VOID                               *Buffer
   );
 
 /**
@@ -239,7 +235,7 @@ LoadRecoveryCapsule (
 EFI_STATUS
 EFIAPI
 FindRecoveryCapsules (
-  IN OUT PEI_CD_EXPRESS_PRIVATE_DATA            *PrivateData
+  IN OUT PEI_CD_EXPRESS_PRIVATE_DATA  *PrivateData
   );
 
 /**
@@ -259,13 +255,12 @@ FindRecoveryCapsules (
 EFI_STATUS
 EFIAPI
 RetrieveCapsuleFileFromRoot (
-  IN OUT PEI_CD_EXPRESS_PRIVATE_DATA        *PrivateData,
-  IN EFI_PEI_RECOVERY_BLOCK_IO_PPI          *BlockIoPpi,
-  IN EFI_PEI_RECOVERY_BLOCK_IO2_PPI         *BlockIo2Ppi,
-  IN UINTN                                  IndexBlockDevice,
-  IN UINT32                                 Lba
+  IN OUT PEI_CD_EXPRESS_PRIVATE_DATA  *PrivateData,
+  IN EFI_PEI_RECOVERY_BLOCK_IO_PPI    *BlockIoPpi,
+  IN EFI_PEI_RECOVERY_BLOCK_IO2_PPI   *BlockIo2Ppi,
+  IN UINTN                            IndexBlockDevice,
+  IN UINT32                           Lba
   );
-
 
 /**
   This function compares two ASCII strings in case sensitive/insensitive way.
@@ -281,10 +276,10 @@ RetrieveCapsuleFileFromRoot (
 **/
 BOOLEAN
 StringCmp (
-  IN UINT8      *Source1,
-  IN UINT8      *Source2,
-  IN UINTN      Size,
-  IN BOOLEAN    CaseSensitive
+  IN UINT8    *Source1,
+  IN UINT8    *Source2,
+  IN UINTN    Size,
+  IN BOOLEAN  CaseSensitive
   );
 
 #pragma pack()

@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __EDKII_UFS_HC_PROTOCOL_H__
 #define __EDKII_UFS_HC_PROTOCOL_H__
 
@@ -22,8 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Forward reference for pure ANSI compatability
 //
-typedef struct _EDKII_UFS_HOST_CONTROLLER_PROTOCOL  EDKII_UFS_HOST_CONTROLLER_PROTOCOL;
-
+typedef struct _EDKII_UFS_HOST_CONTROLLER_PROTOCOL EDKII_UFS_HOST_CONTROLLER_PROTOCOL;
 
 /**
   Get the MMIO base address of UFS host controller.
@@ -39,7 +37,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EDKII_UFS_HC_GET_MMIO_BAR)(
   IN     EDKII_UFS_HOST_CONTROLLER_PROTOCOL     *This,
-     OUT UINTN                                  *MmioBar
+  OUT UINTN                                  *MmioBar
   );
 
 ///
@@ -90,8 +88,8 @@ EFI_STATUS
   IN     EDKII_UFS_HOST_CONTROLLER_OPERATION  Operation,
   IN     VOID                                 *HostAddress,
   IN OUT UINTN                                *NumberOfBytes,
-     OUT EFI_PHYSICAL_ADDRESS                 *DeviceAddress,
-     OUT VOID                                 **Mapping
+  OUT EFI_PHYSICAL_ADDRESS                 *DeviceAddress,
+  OUT VOID                                 **Mapping
   );
 
 /**
@@ -138,7 +136,7 @@ EFI_STATUS
   IN     EFI_ALLOCATE_TYPE                    Type,
   IN     EFI_MEMORY_TYPE                      MemoryType,
   IN     UINTN                                Pages,
-     OUT VOID                                 **HostAddress,
+  OUT VOID                                 **HostAddress,
   IN     UINT64                               Attributes
   );
 
@@ -180,7 +178,7 @@ EFI_STATUS
   );
 
 typedef enum {
-  EfiUfsHcWidthUint8      = 0,
+  EfiUfsHcWidthUint8 = 0,
   EfiUfsHcWidthUint16,
   EfiUfsHcWidthUint32,
   EfiUfsHcWidthUint64,
@@ -219,19 +217,19 @@ EFI_STATUS
 ///  UFS Host Controller Protocol structure.
 ///
 struct _EDKII_UFS_HOST_CONTROLLER_PROTOCOL {
-  EDKII_UFS_HC_GET_MMIO_BAR           GetUfsHcMmioBar;
-  EDKII_UFS_HC_ALLOCATE_BUFFER        AllocateBuffer;
-  EDKII_UFS_HC_FREE_BUFFER            FreeBuffer;
-  EDKII_UFS_HC_MAP                    Map;
-  EDKII_UFS_HC_UNMAP                  Unmap;
-  EDKII_UFS_HC_FLUSH                  Flush;
-  EDKII_UFS_HC_MMIO_READ_WRITE        Read;
-  EDKII_UFS_HC_MMIO_READ_WRITE        Write;
+  EDKII_UFS_HC_GET_MMIO_BAR       GetUfsHcMmioBar;
+  EDKII_UFS_HC_ALLOCATE_BUFFER    AllocateBuffer;
+  EDKII_UFS_HC_FREE_BUFFER        FreeBuffer;
+  EDKII_UFS_HC_MAP                Map;
+  EDKII_UFS_HC_UNMAP              Unmap;
+  EDKII_UFS_HC_FLUSH              Flush;
+  EDKII_UFS_HC_MMIO_READ_WRITE    Read;
+  EDKII_UFS_HC_MMIO_READ_WRITE    Write;
 };
 
 ///
 ///  UFS Host Controller Protocol GUID variable.
 ///
-extern EFI_GUID gEdkiiUfsHostControllerProtocolGuid;
+extern EFI_GUID  gEdkiiUfsHostControllerProtocolGuid;
 
 #endif

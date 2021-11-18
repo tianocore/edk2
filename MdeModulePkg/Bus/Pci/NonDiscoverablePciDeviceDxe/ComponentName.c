@@ -17,12 +17,12 @@
 //
 
 STATIC
-EFI_UNICODE_STRING_TABLE mDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE  mDriverNameTable[] = {
   { "eng;en", L"PCI I/O protocol emulation driver for non-discoverable devices" },
-  { NULL,     NULL                   }
+  { NULL,     NULL                                                              }
 };
 
-EFI_COMPONENT_NAME_PROTOCOL gComponentName;
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName;
 
 /**
   Retrieves a Unicode string that is the user readable name of the UEFI Driver.
@@ -49,9 +49,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 NonDiscoverablePciGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
-  IN  CHAR8                       *Language,
-  OUT CHAR16                      **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -93,24 +93,24 @@ STATIC
 EFI_STATUS
 EFIAPI
 NonDiscoverablePciGetDeviceName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
-  IN  EFI_HANDLE                  DeviceHandle,
-  IN  EFI_HANDLE                  ChildHandle,
-  IN  CHAR8                       *Language,
-  OUT CHAR16                      **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   DeviceHandle,
+  IN  EFI_HANDLE                   ChildHandle,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   return EFI_UNSUPPORTED;
 }
 
-EFI_COMPONENT_NAME_PROTOCOL gComponentName = {
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName = {
   &NonDiscoverablePciGetDriverName,
   &NonDiscoverablePciGetDeviceName,
   "eng" // SupportedLanguages, ISO 639-2 language codes
 };
 
-EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     &NonDiscoverablePciGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) &NonDiscoverablePciGetDeviceName,
+EFI_COMPONENT_NAME2_PROTOCOL  gComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)&NonDiscoverablePciGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)&NonDiscoverablePciGetDeviceName,
   "en" // SupportedLanguages, RFC 4646 language codes
 };

@@ -54,4 +54,4 @@
 //
 extern EFI_GUID  gS3StorageDeviceInitListGuid;
 
-#endif  // __S3_STORAGE_DEVICE_INIT_LIST_H__
+#endif // __S3_STORAGE_DEVICE_INIT_LIST_H__

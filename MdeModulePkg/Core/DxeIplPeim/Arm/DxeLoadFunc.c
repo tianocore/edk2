@@ -25,13 +25,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 HandOffToDxeCore (
-  IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
-  IN EFI_PEI_HOB_POINTERS   HobList
+  IN EFI_PHYSICAL_ADDRESS  DxeCoreEntryPoint,
+  IN EFI_PEI_HOB_POINTERS  HobList
   )
 {
-  VOID                *BaseOfStack;
-  VOID                *TopOfStack;
-  EFI_STATUS          Status;
+  VOID        *BaseOfStack;
+  VOID        *TopOfStack;
+  EFI_STATUS  Status;
 
   //
   // Allocate 128KB for the Stack
@@ -48,7 +48,7 @@ HandOffToDxeCore (
   // Compute the top of the stack we were allocated. Pre-allocate a UINTN
   // for safety.
   //
-  TopOfStack = (VOID *) ((UINTN) BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT);
+  TopOfStack = (VOID *)((UINTN)BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT);
   TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
   //
@@ -60,7 +60,7 @@ HandOffToDxeCore (
   //
   // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
   //
-  UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN) BaseOfStack, STACK_SIZE);
+  UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN)BaseOfStack, STACK_SIZE);
 
   SwitchStack (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,

@@ -34,17 +34,17 @@
 EFI_STATUS
 EFIAPI
 UfsRwUfsDescriptor (
-  IN EFI_UFS_DEVICE_CONFIG_PROTOCOL    *This,
-  IN BOOLEAN                           Read,
-  IN UINT8                             DescId,
-  IN UINT8                             Index,
-  IN UINT8                             Selector,
-  IN OUT UINT8                         *Descriptor,
-  IN OUT UINT32                        *DescSize
+  IN EFI_UFS_DEVICE_CONFIG_PROTOCOL  *This,
+  IN BOOLEAN                         Read,
+  IN UINT8                           DescId,
+  IN UINT8                           Index,
+  IN UINT8                           Selector,
+  IN OUT UINT8                       *Descriptor,
+  IN OUT UINT32                      *DescSize
   )
 {
-  EFI_STATUS                    Status;
-  UFS_PASS_THRU_PRIVATE_DATA    *Private;
+  EFI_STATUS                  Status;
+  UFS_PASS_THRU_PRIVATE_DATA  *Private;
 
   Private = UFS_PASS_THRU_PRIVATE_DATA_FROM_DEV_CONFIG (This);
 
@@ -64,6 +64,7 @@ UfsRwUfsDescriptor (
   if (Status == EFI_TIMEOUT) {
     Status = EFI_DEVICE_ERROR;
   }
+
   return Status;
 }
 
@@ -88,14 +89,14 @@ UfsRwUfsDescriptor (
 EFI_STATUS
 EFIAPI
 UfsRwUfsFlag (
-  IN EFI_UFS_DEVICE_CONFIG_PROTOCOL    *This,
-  IN BOOLEAN                           Read,
-  IN UINT8                             FlagId,
-  IN OUT UINT8                         *Flag
+  IN EFI_UFS_DEVICE_CONFIG_PROTOCOL  *This,
+  IN BOOLEAN                         Read,
+  IN UINT8                           FlagId,
+  IN OUT UINT8                       *Flag
   )
 {
-  EFI_STATUS                    Status;
-  UFS_PASS_THRU_PRIVATE_DATA    *Private;
+  EFI_STATUS                  Status;
+  UFS_PASS_THRU_PRIVATE_DATA  *Private;
 
   Private = UFS_PASS_THRU_PRIVATE_DATA_FROM_DEV_CONFIG (This);
 
@@ -107,6 +108,7 @@ UfsRwUfsFlag (
   if (Status == EFI_TIMEOUT) {
     Status = EFI_DEVICE_ERROR;
   }
+
   return Status;
 }
 
@@ -136,20 +138,20 @@ UfsRwUfsFlag (
 EFI_STATUS
 EFIAPI
 UfsRwUfsAttribute (
-  IN EFI_UFS_DEVICE_CONFIG_PROTOCOL    *This,
-  IN BOOLEAN                           Read,
-  IN UINT8                             AttrId,
-  IN UINT8                             Index,
-  IN UINT8                             Selector,
-  IN OUT UINT8                         *Attribute,
-  IN OUT UINT32                        *AttrSize
+  IN EFI_UFS_DEVICE_CONFIG_PROTOCOL  *This,
+  IN BOOLEAN                         Read,
+  IN UINT8                           AttrId,
+  IN UINT8                           Index,
+  IN UINT8                           Selector,
+  IN OUT UINT8                       *Attribute,
+  IN OUT UINT32                      *AttrSize
   )
 {
-  EFI_STATUS                    Status;
-  UFS_PASS_THRU_PRIVATE_DATA    *Private;
-  UINT32                        Attribute32;
+  EFI_STATUS                  Status;
+  UFS_PASS_THRU_PRIVATE_DATA  *Private;
+  UINT32                      Attribute32;
 
-  Private = UFS_PASS_THRU_PRIVATE_DATA_FROM_DEV_CONFIG (This);
+  Private     = UFS_PASS_THRU_PRIVATE_DATA_FROM_DEV_CONFIG (This);
   Attribute32 = 0;
 
   if ((This == NULL) || (Attribute == NULL) || (AttrSize == NULL)) {
@@ -186,5 +188,6 @@ UfsRwUfsAttribute (
       Status = EFI_DEVICE_ERROR;
     }
   }
+
   return Status;
 }

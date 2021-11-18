@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _SMBIOS_DXE_H_
 #define _SMBIOS_DXE_H_
 
-
 #include <PiDxe.h>
 
 #include <Protocol/Smbios.h>
@@ -27,26 +26,26 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/HobLib.h>
 #include <UniversalPayload/SmbiosTable.h>
 
-#define SMBIOS_INSTANCE_SIGNATURE SIGNATURE_32 ('S', 'B', 'i', 's')
+#define SMBIOS_INSTANCE_SIGNATURE  SIGNATURE_32 ('S', 'B', 'i', 's')
 typedef struct {
-  UINT32                Signature;
-  EFI_HANDLE            Handle;
+  UINT32                 Signature;
+  EFI_HANDLE             Handle;
   //
   // Produced protocol
   //
-  EFI_SMBIOS_PROTOCOL   Smbios;
+  EFI_SMBIOS_PROTOCOL    Smbios;
   //
   // Updates to record list must be locked.
   //
-  EFI_LOCK              DataLock;
+  EFI_LOCK               DataLock;
   //
   // List of EFI_SMBIOS_ENTRY structures.
   //
-  LIST_ENTRY            DataListHead;
+  LIST_ENTRY             DataListHead;
   //
   // List of allocated SMBIOS handle.
   //
-  LIST_ENTRY            AllocatedHandleListHead;
+  LIST_ENTRY             AllocatedHandleListHead;
 } SMBIOS_INSTANCE;
 
 #define SMBIOS_INSTANCE_FROM_THIS(this)  CR (this, SMBIOS_INSTANCE, Smbios, SMBIOS_INSTANCE_SIGNATURE)
@@ -60,13 +59,12 @@ typedef struct {
 //
 #define EFI_SMBIOS_RECORD_HEADER_VERSION  0x0100
 typedef struct {
-  UINT16      Version;
-  UINT16      HeaderSize;
-  UINTN       RecordSize;
-  EFI_HANDLE  ProducerHandle;
-  UINTN       NumberOfStrings;
+  UINT16        Version;
+  UINT16        HeaderSize;
+  UINTN         RecordSize;
+  EFI_HANDLE    ProducerHandle;
+  UINTN         NumberOfStrings;
 } EFI_SMBIOS_RECORD_HEADER;
-
 
 //
 // Private data structure to contain the SMBIOS record. One record per
@@ -74,15 +72,15 @@ typedef struct {
 //
 #define EFI_SMBIOS_ENTRY_SIGNATURE  SIGNATURE_32 ('S', 'r', 'e', 'c')
 typedef struct {
-  UINT32                    Signature;
-  LIST_ENTRY                Link;
-  EFI_SMBIOS_RECORD_HEADER  *RecordHeader;
-  UINTN                     RecordSize;
+  UINT32                      Signature;
+  LIST_ENTRY                  Link;
+  EFI_SMBIOS_RECORD_HEADER    *RecordHeader;
+  UINTN                       RecordSize;
   //
   // Indicate which table this record is added to.
   //
-  BOOLEAN                   Smbios32BitTable;
-  BOOLEAN                   Smbios64BitTable;
+  BOOLEAN                     Smbios32BitTable;
+  BOOLEAN                     Smbios64BitTable;
 } EFI_SMBIOS_ENTRY;
 
 #define SMBIOS_ENTRY_FROM_LINK(link)  CR (link, EFI_SMBIOS_ENTRY, Link, EFI_SMBIOS_ENTRY_SIGNATURE)
@@ -99,14 +97,13 @@ typedef struct {
   // Filter driver will register what record guid filter should be used.
   //
   EFI_SMBIOS_HANDLE    SmbiosHandle;
-
 } SMBIOS_HANDLE_ENTRY;
 
 #define SMBIOS_HANDLE_ENTRY_FROM_LINK(link)  CR (link, SMBIOS_HANDLE_ENTRY, Link, SMBIOS_HANDLE_ENTRY_SIGNATURE)
 
 typedef struct {
-  EFI_SMBIOS_TABLE_HEADER  Header;
-  UINT8                    Tailing[2];
+  EFI_SMBIOS_TABLE_HEADER    Header;
+  UINT8                      Tailing[2];
 } EFI_SMBIOS_TABLE_END_STRUCTURE;
 
 /**
@@ -119,8 +116,8 @@ typedef struct {
 VOID
 EFIAPI
 SmbiosTableConstruction (
-  BOOLEAN     Smbios32BitTable,
-  BOOLEAN     Smbios64BitTable
+  BOOLEAN  Smbios32BitTable,
+  BOOLEAN  Smbios64BitTable
   );
 
 /**
@@ -137,9 +134,9 @@ SmbiosTableConstruction (
 STATIC
 BOOLEAN
 IsValidSmbios30Table (
-  IN  VOID               *TableEntry,
-  OUT VOID               **TableAddress,
-  OUT UINTN              *TableMaximumSize
+  IN  VOID   *TableEntry,
+  OUT VOID   **TableAddress,
+  OUT UINTN  *TableMaximumSize
   );
 
 /**
@@ -156,9 +153,9 @@ IsValidSmbios30Table (
 STATIC
 BOOLEAN
 IsValidSmbios20Table (
-  IN  VOID               *TableEntry,
-  OUT VOID               **TableAddress,
-  OUT UINTN              *TableMaximumSize
+  IN  VOID   *TableEntry,
+  OUT VOID   **TableAddress,
+  OUT UINTN  *TableMaximumSize
   );
 
 /**
@@ -174,14 +171,14 @@ IsValidSmbios20Table (
 **/
 typedef
 BOOLEAN
-(* IS_SMBIOS_TABLE_VALID) (
-  IN  VOID               *TableEntry,
-  OUT VOID               **TableAddress,
-  OUT UINTN              *TableMaximumSize
+(*IS_SMBIOS_TABLE_VALID) (
+  IN  VOID   *TableEntry,
+  OUT VOID   **TableAddress,
+  OUT UINTN  *TableMaximumSize
   );
 typedef struct {
-  EFI_GUID               *Guid;
-  IS_SMBIOS_TABLE_VALID  IsValid;
+  EFI_GUID                 *Guid;
+  IS_SMBIOS_TABLE_VALID    IsValid;
 } IS_SMBIOS_TABLE_VALID_ENTRY;
 
 #endif

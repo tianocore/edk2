@@ -17,14 +17,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack(1)
 
 typedef struct {
-  UNIVERSAL_PAYLOAD_GENERIC_HEADER   Header;
-  EFI_PHYSICAL_ADDRESS               Rsdp;
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER    Header;
+  EFI_PHYSICAL_ADDRESS                Rsdp;
 } UNIVERSAL_PAYLOAD_ACPI_TABLE;
 
 #pragma pack()
 
-#define UNIVERSAL_PAYLOAD_ACPI_TABLE_REVISION 1
+#define UNIVERSAL_PAYLOAD_ACPI_TABLE_REVISION  1
 
-extern GUID gUniversalPayloadAcpiTableGuid;
+extern GUID  gUniversalPayloadAcpiTableGuid;
 
 #endif // UNIVERSAL_PAYLOAD_ACPI_TABLE_H_

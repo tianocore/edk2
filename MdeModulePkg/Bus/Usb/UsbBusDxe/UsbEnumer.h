@@ -22,7 +22,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
             }                 \
           } while (0)
 
-
 //
 // Common interface used by usb bus enumeration process.
 // This interface is defined to mask the difference between
@@ -32,7 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef
 EFI_STATUS
 (*USB_HUB_INIT) (
-  IN USB_INTERFACE        *UsbIf
+  IN USB_INTERFACE  *UsbIf
   );
 
 //
@@ -44,45 +43,45 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (*USB_HUB_GET_PORT_STATUS) (
-  IN  USB_INTERFACE       *UsbIf,
-  IN  UINT8               Port,
-  OUT EFI_USB_PORT_STATUS *PortState
+  IN  USB_INTERFACE        *UsbIf,
+  IN  UINT8                Port,
+  OUT EFI_USB_PORT_STATUS  *PortState
   );
 
 typedef
 VOID
 (*USB_HUB_CLEAR_PORT_CHANGE) (
-  IN USB_INTERFACE        *HubIf,
-  IN UINT8                Port
+  IN USB_INTERFACE  *HubIf,
+  IN UINT8          Port
   );
 
 typedef
 EFI_STATUS
 (*USB_HUB_SET_PORT_FEATURE) (
-  IN USB_INTERFACE        *UsbIf,
-  IN UINT8                Port,
-  IN EFI_USB_PORT_FEATURE Feature
+  IN USB_INTERFACE         *UsbIf,
+  IN UINT8                 Port,
+  IN EFI_USB_PORT_FEATURE  Feature
   );
 
 typedef
 EFI_STATUS
 (*USB_HUB_CLEAR_PORT_FEATURE) (
-  IN USB_INTERFACE        *UsbIf,
-  IN UINT8                Port,
-  IN EFI_USB_PORT_FEATURE Feature
+  IN USB_INTERFACE         *UsbIf,
+  IN UINT8                 Port,
+  IN EFI_USB_PORT_FEATURE  Feature
   );
 
 typedef
 EFI_STATUS
 (*USB_HUB_RESET_PORT) (
-  IN USB_INTERFACE        *UsbIf,
-  IN UINT8                Port
+  IN USB_INTERFACE  *UsbIf,
+  IN UINT8          Port
   );
 
 typedef
 EFI_STATUS
 (*USB_HUB_RELEASE) (
-  IN USB_INTERFACE        *UsbIf
+  IN USB_INTERFACE  *UsbIf
   );
 
 /**
@@ -94,10 +93,10 @@ EFI_STATUS
   @return The endpoint descriptor or NULL.
 
 **/
-USB_ENDPOINT_DESC*
+USB_ENDPOINT_DESC *
 UsbGetEndpointDesc (
-  IN USB_INTERFACE        *UsbIf,
-  IN UINT8                EpAddr
+  IN USB_INTERFACE  *UsbIf,
+  IN UINT8          EpAddr
   );
 
 /**
@@ -115,8 +114,8 @@ UsbGetEndpointDesc (
 **/
 EFI_STATUS
 UsbSelectSetting (
-  IN USB_INTERFACE_DESC   *IfDesc,
-  IN UINT8                Alternate
+  IN USB_INTERFACE_DESC  *IfDesc,
+  IN UINT8               Alternate
   );
 
 /**
@@ -133,8 +132,8 @@ UsbSelectSetting (
 **/
 EFI_STATUS
 UsbSelectConfig (
-  IN USB_DEVICE           *Device,
-  IN UINT8                ConfigIndex
+  IN USB_DEVICE  *Device,
+  IN UINT8       ConfigIndex
   );
 
 /**
@@ -147,7 +146,7 @@ UsbSelectConfig (
 **/
 EFI_STATUS
 UsbRemoveConfig (
-  IN USB_DEVICE           *Device
+  IN USB_DEVICE  *Device
   );
 
 /**
@@ -160,7 +159,7 @@ UsbRemoveConfig (
 **/
 EFI_STATUS
 UsbRemoveDevice (
-  IN USB_DEVICE           *Device
+  IN USB_DEVICE  *Device
   );
 
 /**
@@ -175,8 +174,8 @@ UsbRemoveDevice (
 VOID
 EFIAPI
 UsbHubEnumeration (
-  IN EFI_EVENT            Event,
-  IN VOID                 *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -191,7 +190,8 @@ UsbHubEnumeration (
 VOID
 EFIAPI
 UsbRootHubEnumeration (
-  IN EFI_EVENT            Event,
-  IN VOID                 *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
+
 #endif

@@ -37,13 +37,13 @@ typedef struct _PEI_IPMI_PPI PEI_IPMI_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PEI_IPMI_SUBMIT_COMMAND) (
+(EFIAPI *PEI_IPMI_SUBMIT_COMMAND)(
   IN     PEI_IPMI_PPI                      *This,
   IN     UINT8                             NetFunction,
   IN     UINT8                             Command,
   IN     UINT8                             *RequestData,
   IN     UINT32                            RequestDataSize,
-     OUT UINT8                             *ResponseData,
+  OUT UINT8                             *ResponseData,
   IN OUT UINT32                            *ResponseDataSize
   );
 
@@ -51,9 +51,9 @@ EFI_STATUS
 // IPMI PPI
 //
 struct _PEI_IPMI_PPI {
-  PEI_IPMI_SUBMIT_COMMAND       IpmiSubmitCommand;
+  PEI_IPMI_SUBMIT_COMMAND    IpmiSubmitCommand;
 };
 
-extern EFI_GUID gPeiIpmiPpiGuid;
+extern EFI_GUID  gPeiIpmiPpiGuid;
 
 #endif

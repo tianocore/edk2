@@ -9,7 +9,7 @@
 
 #include "ResetSystem.h"
 
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mResetTypeStr[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR16  *mResetTypeStr[] = {
   L"Cold", L"Warm", L"Shutdown", L"PlatformSpecific"
 };
 
@@ -42,13 +42,13 @@ UINTN  mResetNotifyDepth = 0;
 EFI_STATUS
 EFIAPI
 RegisterResetNotify (
-  IN EFI_RESET_NOTIFICATION_PROTOCOL *This,
-  IN EFI_RESET_SYSTEM                ResetFunction
+  IN EFI_RESET_NOTIFICATION_PROTOCOL  *This,
+  IN EFI_RESET_SYSTEM                 ResetFunction
   )
 {
-  RESET_NOTIFICATION_INSTANCE        *Instance;
-  LIST_ENTRY                         *Link;
-  RESET_NOTIFY_ENTRY                 *Entry;
+  RESET_NOTIFICATION_INSTANCE  *Instance;
+  LIST_ENTRY                   *Link;
+  RESET_NOTIFY_ENTRY           *Entry;
 
   if (ResetFunction == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -57,9 +57,10 @@ RegisterResetNotify (
   Instance = RESET_NOTIFICATION_INSTANCE_FROM_THIS (This);
 
   for ( Link = GetFirstNode (&Instance->ResetNotifies)
-      ; !IsNull (&Instance->ResetNotifies, Link)
-      ; Link = GetNextNode (&Instance->ResetNotifies, Link)
-      ) {
+        ; !IsNull (&Instance->ResetNotifies, Link)
+        ; Link = GetNextNode (&Instance->ResetNotifies, Link)
+        )
+  {
     Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
     if (Entry->ResetNotify == ResetFunction) {
       return EFI_ALREADY_STARTED;
@@ -71,6 +72,7 @@ RegisterResetNotify (
   if (Entry == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   Entry->Signature   = RESET_NOTIFY_ENTRY_SIGNATURE;
   Entry->ResetNotify = ResetFunction;
   InsertTailList (&Instance->ResetNotifies, &Entry->Link);
@@ -95,13 +97,13 @@ RegisterResetNotify (
 EFI_STATUS
 EFIAPI
 UnregisterResetNotify (
-  IN EFI_RESET_NOTIFICATION_PROTOCOL *This,
-  IN EFI_RESET_SYSTEM                ResetFunction
+  IN EFI_RESET_NOTIFICATION_PROTOCOL  *This,
+  IN EFI_RESET_SYSTEM                 ResetFunction
   )
 {
-  RESET_NOTIFICATION_INSTANCE        *Instance;
-  LIST_ENTRY                         *Link;
-  RESET_NOTIFY_ENTRY                 *Entry;
+  RESET_NOTIFICATION_INSTANCE  *Instance;
+  LIST_ENTRY                   *Link;
+  RESET_NOTIFY_ENTRY           *Entry;
 
   if (ResetFunction == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -110,9 +112,10 @@ UnregisterResetNotify (
   Instance = RESET_NOTIFICATION_INSTANCE_FROM_THIS (This);
 
   for ( Link = GetFirstNode (&Instance->ResetNotifies)
-      ; !IsNull (&Instance->ResetNotifies, Link)
-      ; Link = GetNextNode (&Instance->ResetNotifies, Link)
-      ) {
+        ; !IsNull (&Instance->ResetNotifies, Link)
+        ; Link = GetNextNode (&Instance->ResetNotifies, Link)
+        )
+  {
     Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
     if (Entry->ResetNotify == ResetFunction) {
       RemoveEntryList (&Entry->Link);
@@ -124,7 +127,7 @@ UnregisterResetNotify (
   return EFI_INVALID_PARAMETER;
 }
 
-RESET_NOTIFICATION_INSTANCE mResetNotification = {
+RESET_NOTIFICATION_INSTANCE  mResetNotification = {
   RESET_NOTIFICATION_INSTANCE_SIGNATURE,
   {
     RegisterResetNotify,
@@ -133,7 +136,7 @@ RESET_NOTIFICATION_INSTANCE mResetNotification = {
   INITIALIZE_LIST_HEAD_VARIABLE (mResetNotification.ResetNotifies)
 };
 
-RESET_NOTIFICATION_INSTANCE mPlatformSpecificResetFilter = {
+RESET_NOTIFICATION_INSTANCE  mPlatformSpecificResetFilter = {
   RESET_NOTIFICATION_INSTANCE_SIGNATURE,
   {
     RegisterResetNotify,
@@ -142,7 +145,7 @@ RESET_NOTIFICATION_INSTANCE mPlatformSpecificResetFilter = {
   INITIALIZE_LIST_HEAD_VARIABLE (mPlatformSpecificResetFilter.ResetNotifies)
 };
 
-RESET_NOTIFICATION_INSTANCE mPlatformSpecificResetHandler = {
+RESET_NOTIFICATION_INSTANCE  mPlatformSpecificResetHandler = {
   RESET_NOTIFICATION_INSTANCE_SIGNATURE,
   {
     RegisterResetNotify,
@@ -189,10 +192,14 @@ InitializeResetSystem (
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEfiResetArchProtocolGuid,         NULL,
-                  &gEfiResetNotificationProtocolGuid, &mResetNotification.ResetNotification,
-                  &gEdkiiPlatformSpecificResetFilterProtocolGuid, &mPlatformSpecificResetFilter.ResetNotification,
-                  &gEdkiiPlatformSpecificResetHandlerProtocolGuid, &mPlatformSpecificResetHandler.ResetNotification,
+                  &gEfiResetArchProtocolGuid,
+                  NULL,
+                  &gEfiResetNotificationProtocolGuid,
+                  &mResetNotification.ResetNotification,
+                  &gEdkiiPlatformSpecificResetFilterProtocolGuid,
+                  &mPlatformSpecificResetFilter.ResetNotification,
+                  &gEdkiiPlatformSpecificResetHandlerProtocolGuid,
+                  &mPlatformSpecificResetHandler.ResetNotification,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
@@ -218,10 +225,10 @@ InitializeResetSystem (
 VOID
 EFIAPI
 RuntimeServiceResetSystem (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN VOID             *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   )
 {
   LIST_ENTRY          *Link;
@@ -239,8 +246,10 @@ RuntimeServiceResetSystem (
 
   mResetNotifyDepth++;
   DEBUG ((
-    DEBUG_INFO, "DXE ResetSystem2: ResetType %s, Call Depth = %d.\n",
-    mResetTypeStr[ResetType], mResetNotifyDepth
+    DEBUG_INFO,
+    "DXE ResetSystem2: ResetType %s, Call Depth = %d.\n",
+    mResetTypeStr[ResetType],
+    mResetNotifyDepth
     ));
 
   if (mResetNotifyDepth <= MAX_RESET_NOTIFY_DEPTH) {
@@ -250,31 +259,36 @@ RuntimeServiceResetSystem (
       // EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PROTOCOL.
       //
       for ( Link = GetFirstNode (&mPlatformSpecificResetFilter.ResetNotifies)
-          ; !IsNull (&mPlatformSpecificResetFilter.ResetNotifies, Link)
-          ; Link = GetNextNode (&mPlatformSpecificResetFilter.ResetNotifies, Link)
-          ) {
+            ; !IsNull (&mPlatformSpecificResetFilter.ResetNotifies, Link)
+            ; Link = GetNextNode (&mPlatformSpecificResetFilter.ResetNotifies, Link)
+            )
+      {
         Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
         Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
       }
+
       //
       // Call reset notification functions registered through the
       // EFI_RESET_NOTIFICATION_PROTOCOL.
       //
       for ( Link = GetFirstNode (&mResetNotification.ResetNotifies)
-          ; !IsNull (&mResetNotification.ResetNotifies, Link)
-          ; Link = GetNextNode (&mResetNotification.ResetNotifies, Link)
-          ) {
+            ; !IsNull (&mResetNotification.ResetNotifies, Link)
+            ; Link = GetNextNode (&mResetNotification.ResetNotifies, Link)
+            )
+      {
         Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
         Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
       }
+
       //
       // call reset notification functions registered through the
       // EDKII_PLATFORM_SPECIFIC_RESET_HANDLER_PROTOCOL.
       //
       for ( Link = GetFirstNode (&mPlatformSpecificResetHandler.ResetNotifies)
-          ; !IsNull (&mPlatformSpecificResetHandler.ResetNotifies, Link)
-          ; Link = GetNextNode (&mPlatformSpecificResetHandler.ResetNotifies, Link)
-          ) {
+            ; !IsNull (&mPlatformSpecificResetHandler.ResetNotifies, Link)
+            ; Link = GetNextNode (&mPlatformSpecificResetHandler.ResetNotifies, Link)
+            )
+      {
         Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
         Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
       }
@@ -285,25 +299,25 @@ RuntimeServiceResetSystem (
   }
 
   switch (ResetType) {
-  case EfiResetWarm:
+    case EfiResetWarm:
 
-    ResetWarm ();
-    break;
+      ResetWarm ();
+      break;
 
- case EfiResetCold:
-    ResetCold ();
-    break;
+    case EfiResetCold:
+      ResetCold ();
+      break;
 
-  case EfiResetShutdown:
-    ResetShutdown ();
-    return ;
+    case EfiResetShutdown:
+      ResetShutdown ();
+      return;
 
-  case EfiResetPlatformSpecific:
-    ResetPlatformSpecific (DataSize, ResetData);
-    return;
+    case EfiResetPlatformSpecific:
+      ResetPlatformSpecific (DataSize, ResetData);
+      return;
 
-  default:
-    return ;
+    default:
+      return;
   }
 
   //

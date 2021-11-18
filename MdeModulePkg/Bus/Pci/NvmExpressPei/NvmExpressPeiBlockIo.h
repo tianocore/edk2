@@ -14,9 +14,9 @@
 //
 // Nvme device for EFI_PEI_BLOCK_DEVICE_TYPE
 //
-#define EDKII_PEI_BLOCK_DEVICE_TYPE_NVME    7
+#define EDKII_PEI_BLOCK_DEVICE_TYPE_NVME  7
 
-#define NVME_READ_MAX_RETRY                 3
+#define NVME_READ_MAX_RETRY  3
 
 /**
   Gets the count of block I/O devices that one specific block driver detects.

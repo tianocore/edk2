@@ -21,8 +21,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>
 
-#define NUM_IDT_ENTRIES                 0x78
-#define SYSTEM_TIMER_VECTOR             0x68
+#define NUM_IDT_ENTRIES      0x78
+#define SYSTEM_TIMER_VECTOR  0x68
 
 typedef
 VOID
@@ -32,20 +32,22 @@ VOID
 
 typedef
 VOID
-(EFIAPI *CALLBACK_FUNC) (
+(EFIAPI *CALLBACK_FUNC)(
   );
 
 typedef struct {
-  IA32_IDT_GATE_DESCRIPTOR  OrigDesc;
-  DEBUG_PROC                OrigVector;
-  IA32_IDT_GATE_DESCRIPTOR  NewDesc;
-  DEBUG_PROC                StubEntry;
-  CALLBACK_FUNC             RegisteredCallback;
+  IA32_IDT_GATE_DESCRIPTOR    OrigDesc;
+  DEBUG_PROC                  OrigVector;
+  IA32_IDT_GATE_DESCRIPTOR    NewDesc;
+  DEBUG_PROC                  StubEntry;
+  CALLBACK_FUNC               RegisteredCallback;
 } IDT_ENTRY;
 
-extern UINT8                     InterruptEntryStub[];
-extern UINT32                    StubSize;
-extern VOID                      (*OrigVector) (VOID);
+extern UINT8   InterruptEntryStub[];
+extern UINT32  StubSize;
+extern VOID    (*OrigVector) (
+  VOID
+  );
 extern IDT_ENTRY                 *IdtEntryTable;
 extern IA32_IDT_GATE_DESCRIPTOR  NullDesc;
 
@@ -79,8 +81,8 @@ FxStorSupport (
 **/
 VOID
 Vect2Desc (
-  IA32_IDT_GATE_DESCRIPTOR * DestDesc,
-  VOID (*Vector) (VOID)
+  IA32_IDT_GATE_DESCRIPTOR  *DestDesc,
+  VOID (                    *Vector )(VOID)
   );
 
 /**
@@ -113,7 +115,7 @@ PlInitializeDebugSupportDriver (
 EFI_STATUS
 EFIAPI
 PlUnloadDebugSupportDriver (
-  IN EFI_HANDLE                       ImageHandle
+  IN EFI_HANDLE  ImageHandle
   );
 
 /**
@@ -132,8 +134,8 @@ PlUnloadDebugSupportDriver (
 EFI_STATUS
 EFIAPI
 GetMaximumProcessorIndex (
-  IN EFI_DEBUG_SUPPORT_PROTOCOL       *This,
-  OUT UINTN                           *MaxProcessorIndex
+  IN EFI_DEBUG_SUPPORT_PROTOCOL  *This,
+  OUT UINTN                      *MaxProcessorIndex
   );
 
 /**
@@ -153,9 +155,9 @@ GetMaximumProcessorIndex (
 EFI_STATUS
 EFIAPI
 RegisterPeriodicCallback (
-  IN EFI_DEBUG_SUPPORT_PROTOCOL       *This,
-  IN UINTN                            ProcessorIndex,
-  IN EFI_PERIODIC_CALLBACK            PeriodicCallback
+  IN EFI_DEBUG_SUPPORT_PROTOCOL  *This,
+  IN UINTN                       ProcessorIndex,
+  IN EFI_PERIODIC_CALLBACK       PeriodicCallback
   );
 
 /**
@@ -178,10 +180,10 @@ RegisterPeriodicCallback (
 EFI_STATUS
 EFIAPI
 RegisterExceptionCallback (
-  IN EFI_DEBUG_SUPPORT_PROTOCOL       *This,
-  IN UINTN                            ProcessorIndex,
-  IN EFI_EXCEPTION_CALLBACK           ExceptionCallback,
-  IN EFI_EXCEPTION_TYPE               ExceptionType
+  IN EFI_DEBUG_SUPPORT_PROTOCOL  *This,
+  IN UINTN                       ProcessorIndex,
+  IN EFI_EXCEPTION_CALLBACK      ExceptionCallback,
+  IN EFI_EXCEPTION_TYPE          ExceptionType
   );
 
 /**
@@ -200,10 +202,10 @@ RegisterExceptionCallback (
 EFI_STATUS
 EFIAPI
 InvalidateInstructionCache (
-  IN EFI_DEBUG_SUPPORT_PROTOCOL       *This,
-  IN UINTN                            ProcessorIndex,
-  IN VOID                             *Start,
-  IN UINT64                           Length
+  IN EFI_DEBUG_SUPPORT_PROTOCOL  *This,
+  IN UINTN                       ProcessorIndex,
+  IN VOID                        *Start,
+  IN UINT64                      Length
   );
 
 /**
@@ -219,8 +221,8 @@ InvalidateInstructionCache (
 **/
 VOID
 CreateEntryStub (
-  IN EFI_EXCEPTION_TYPE     ExceptionType,
-  OUT VOID                  **Stub
+  IN EFI_EXCEPTION_TYPE  ExceptionType,
+  OUT VOID               **Stub
   );
 
 /**
@@ -256,8 +258,8 @@ GetInterruptHandleFromIdt (
 **/
 EFI_STATUS
 ManageIdtEntryTable (
-  CALLBACK_FUNC      NewCallback,
-  EFI_EXCEPTION_TYPE ExceptionType
+  CALLBACK_FUNC       NewCallback,
+  EFI_EXCEPTION_TYPE  ExceptionType
   );
 
 /**
@@ -274,8 +276,8 @@ ManageIdtEntryTable (
 **/
 VOID
 HookEntry (
-  IN EFI_EXCEPTION_TYPE            ExceptionType,
-  IN CALLBACK_FUNC                 NewCallback
+  IN EFI_EXCEPTION_TYPE  ExceptionType,
+  IN CALLBACK_FUNC       NewCallback
   );
 
 /**
@@ -286,7 +288,7 @@ HookEntry (
 **/
 VOID
 UnhookEntry (
-  IN EFI_EXCEPTION_TYPE           ExceptionType
+  IN EFI_EXCEPTION_TYPE  ExceptionType
   );
 
 #endif

@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __PLATFORM_BOOT_MANAGER_LIB_H_
 #define __PLATFORM_BOOT_MANAGER_LIB_H_
 #include <Library/UefiBootManagerLib.h>
@@ -50,7 +49,7 @@ PlatformBootManagerAfterConsole (
 VOID
 EFIAPI
 PlatformBootManagerWaitCallback (
-  UINT16          TimeoutRemain
+  UINT16  TimeoutRemain
   );
 
 /**

@@ -28,8 +28,8 @@
 **/
 EFI_STATUS
 InternalLocateProtocol (
-  IN  EFI_GUID  *Protocol,
-  IN  VOID      *Registration, OPTIONAL
+  IN  EFI_GUID *Protocol,
+  IN  VOID *Registration, OPTIONAL
   OUT VOID      **Interface
   );
 

@@ -16,26 +16,26 @@
 // It should be aligned with the definition in PiSmmCore.
 //
 typedef struct {
-  UINTN                           Signature;
+  UINTN                   Signature;
 
   ///
   /// The ImageHandle passed into the entry point of the SMM IPL.  This ImageHandle
   /// is used by the SMM Core to fill in the ParentImageHandle field of the Loaded
   /// Image Protocol for each SMM Driver that is dispatched by the SMM Core.
   ///
-  EFI_HANDLE                      SmmIplImageHandle;
+  EFI_HANDLE              SmmIplImageHandle;
 
   ///
   /// The number of SMRAM ranges passed from the SMM IPL to the SMM Core.  The SMM
   /// Core uses these ranges of SMRAM to initialize the SMM Core memory manager.
   ///
-  UINTN                           SmramRangeCount;
+  UINTN                   SmramRangeCount;
 
   ///
   /// A table of SMRAM ranges passed from the SMM IPL to the SMM Core.  The SMM
   /// Core uses these ranges of SMRAM to initialize the SMM Core memory manager.
   ///
-  EFI_SMRAM_DESCRIPTOR            *SmramRanges;
+  EFI_SMRAM_DESCRIPTOR    *SmramRanges;
 
   ///
   /// The SMM Foundation Entry Point.  The SMM Core fills in this field when the
@@ -46,48 +46,48 @@ typedef struct {
   /// the SMM Foundation Entry Point as soon as the SMM Configuration Protocol is
   /// available.
   ///
-  EFI_SMM_ENTRY_POINT             SmmEntryPoint;
+  EFI_SMM_ENTRY_POINT      SmmEntryPoint;
 
   ///
   /// Boolean flag set to TRUE while an SMI is being processed by the SMM Core.
   ///
-  BOOLEAN                         SmmEntryPointRegistered;
+  BOOLEAN                  SmmEntryPointRegistered;
 
   ///
   /// Boolean flag set to TRUE while an SMI is being processed by the SMM Core.
   ///
-  BOOLEAN                         InSmm;
+  BOOLEAN                  InSmm;
 
   ///
   /// This field is set by the SMM Core then the SMM Core is initialized.  This field is
   /// used by the SMM Base 2 Protocol and SMM Communication Protocol implementations in
   /// the SMM IPL.
   ///
-  EFI_SMM_SYSTEM_TABLE2           *Smst;
+  EFI_SMM_SYSTEM_TABLE2    *Smst;
 
   ///
   /// This field is used by the SMM Communicatioon Protocol to pass a buffer into
   /// a software SMI handler and for the software SMI handler to pass a buffer back to
   /// the caller of the SMM Communication Protocol.
   ///
-  VOID                            *CommunicationBuffer;
+  VOID                     *CommunicationBuffer;
 
   ///
   /// This field is used by the SMM Communicatioon Protocol to pass the size of a buffer,
   /// in bytes, into a software SMI handler and for the software SMI handler to pass the
   /// size, in bytes, of a buffer back to the caller of the SMM Communication Protocol.
   ///
-  UINTN                           BufferSize;
+  UINTN                    BufferSize;
 
   ///
   /// This field is used by the SMM Communication Protocol to pass the return status from
   /// a software SMI handler back to the caller of the SMM Communication Protocol.
   ///
-  EFI_STATUS                      ReturnStatus;
+  EFI_STATUS               ReturnStatus;
 
-  EFI_PHYSICAL_ADDRESS            PiSmmCoreImageBase;
-  UINT64                          PiSmmCoreImageSize;
-  EFI_PHYSICAL_ADDRESS            PiSmmCoreEntryPoint;
+  EFI_PHYSICAL_ADDRESS     PiSmmCoreImageBase;
+  UINT64                   PiSmmCoreImageSize;
+  EFI_PHYSICAL_ADDRESS     PiSmmCoreEntryPoint;
 } SMM_CORE_PRIVATE_DATA;
 
 /**
@@ -122,10 +122,10 @@ SmmInitializeMemoryServices (
 EFI_STATUS
 EFIAPI
 SmmAllocatePages (
-  IN      EFI_ALLOCATE_TYPE         Type,
-  IN      EFI_MEMORY_TYPE           MemoryType,
-  IN      UINTN                     NumberOfPages,
-  OUT     EFI_PHYSICAL_ADDRESS      *Memory
+  IN      EFI_ALLOCATE_TYPE     Type,
+  IN      EFI_MEMORY_TYPE       MemoryType,
+  IN      UINTN                 NumberOfPages,
+  OUT     EFI_PHYSICAL_ADDRESS  *Memory
   );
 
 /**
@@ -142,8 +142,8 @@ SmmAllocatePages (
 EFI_STATUS
 EFIAPI
 SmmFreePages (
-  IN      EFI_PHYSICAL_ADDRESS      Memory,
-  IN      UINTN                     NumberOfPages
+  IN      EFI_PHYSICAL_ADDRESS  Memory,
+  IN      UINTN                 NumberOfPages
   );
 
 /**
@@ -162,9 +162,9 @@ SmmFreePages (
 EFI_STATUS
 EFIAPI
 SmmAllocatePool (
-  IN      EFI_MEMORY_TYPE           PoolType,
-  IN      UINTN                     Size,
-  OUT     VOID                      **Buffer
+  IN      EFI_MEMORY_TYPE  PoolType,
+  IN      UINTN            Size,
+  OUT     VOID             **Buffer
   );
 
 /**
@@ -179,7 +179,7 @@ SmmAllocatePool (
 EFI_STATUS
 EFIAPI
 SmmFreePool (
-  IN      VOID                      *Buffer
+  IN      VOID  *Buffer
   );
 
 #endif

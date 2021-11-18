@@ -10,60 +10,60 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_EHCI_URB_H_
 #define _EFI_EHCI_URB_H_
 
-typedef struct _PEI_EHC_QTD PEI_EHC_QTD;
-typedef struct _PEI_EHC_QH  PEI_EHC_QH;
-typedef struct _PEI_URB     PEI_URB;
+typedef struct _PEI_EHC_QTD  PEI_EHC_QTD;
+typedef struct _PEI_EHC_QH   PEI_EHC_QH;
+typedef struct _PEI_URB      PEI_URB;
 
 #define EHC_CTRL_TRANSFER       0x01
 #define EHC_BULK_TRANSFER       0x02
 #define EHC_INT_TRANSFER_SYNC   0x04
 #define EHC_INT_TRANSFER_ASYNC  0x08
 
-#define EHC_QTD_SIG             SIGNATURE_32 ('U', 'S', 'B', 'T')
-#define EHC_QH_SIG              SIGNATURE_32 ('U', 'S', 'B', 'H')
-#define EHC_URB_SIG             SIGNATURE_32 ('U', 'S', 'B', 'R')
+#define EHC_QTD_SIG  SIGNATURE_32 ('U', 'S', 'B', 'T')
+#define EHC_QH_SIG   SIGNATURE_32 ('U', 'S', 'B', 'H')
+#define EHC_URB_SIG  SIGNATURE_32 ('U', 'S', 'B', 'R')
 
 //
 // Hardware related bit definitions
 //
-#define EHC_TYPE_ITD            0x00
-#define EHC_TYPE_QH             0x02
-#define EHC_TYPE_SITD           0x04
-#define EHC_TYPE_FSTN           0x06
+#define EHC_TYPE_ITD   0x00
+#define EHC_TYPE_QH    0x02
+#define EHC_TYPE_SITD  0x04
+#define EHC_TYPE_FSTN  0x06
 
-#define QH_NAK_RELOAD           3
-#define QH_HSHBW_MULTI          1
+#define QH_NAK_RELOAD   3
+#define QH_HSHBW_MULTI  1
 
-#define QTD_MAX_ERR             3
-#define QTD_PID_OUTPUT          0x00
-#define QTD_PID_INPUT           0x01
-#define QTD_PID_SETUP           0x02
+#define QTD_MAX_ERR     3
+#define QTD_PID_OUTPUT  0x00
+#define QTD_PID_INPUT   0x01
+#define QTD_PID_SETUP   0x02
 
-#define QTD_STAT_DO_OUT         0
-#define QTD_STAT_DO_SS          0
-#define QTD_STAT_DO_PING        0x01
-#define QTD_STAT_DO_CS          0x02
-#define QTD_STAT_TRANS_ERR      0x08
-#define QTD_STAT_BABBLE_ERR     0x10
-#define QTD_STAT_BUFF_ERR       0x20
-#define QTD_STAT_HALTED         0x40
-#define QTD_STAT_ACTIVE         0x80
-#define QTD_STAT_ERR_MASK       (QTD_STAT_TRANS_ERR | QTD_STAT_BABBLE_ERR | QTD_STAT_BUFF_ERR)
+#define QTD_STAT_DO_OUT      0
+#define QTD_STAT_DO_SS       0
+#define QTD_STAT_DO_PING     0x01
+#define QTD_STAT_DO_CS       0x02
+#define QTD_STAT_TRANS_ERR   0x08
+#define QTD_STAT_BABBLE_ERR  0x10
+#define QTD_STAT_BUFF_ERR    0x20
+#define QTD_STAT_HALTED      0x40
+#define QTD_STAT_ACTIVE      0x80
+#define QTD_STAT_ERR_MASK    (QTD_STAT_TRANS_ERR | QTD_STAT_BABBLE_ERR | QTD_STAT_BUFF_ERR)
 
-#define QTD_MAX_BUFFER          4
-#define QTD_BUF_LEN             4096
-#define QTD_BUF_MASK            0x0FFF
+#define QTD_MAX_BUFFER  4
+#define QTD_BUF_LEN     4096
+#define QTD_BUF_MASK    0x0FFF
 
-#define QH_MICROFRAME_0         0x01
-#define QH_MICROFRAME_1         0x02
-#define QH_MICROFRAME_2         0x04
-#define QH_MICROFRAME_3         0x08
-#define QH_MICROFRAME_4         0x10
-#define QH_MICROFRAME_5         0x20
-#define QH_MICROFRAME_6         0x40
-#define QH_MICROFRAME_7         0x80
+#define QH_MICROFRAME_0  0x01
+#define QH_MICROFRAME_1  0x02
+#define QH_MICROFRAME_2  0x04
+#define QH_MICROFRAME_3  0x08
+#define QH_MICROFRAME_4  0x10
+#define QH_MICROFRAME_5  0x20
+#define QH_MICROFRAME_6  0x40
+#define QH_MICROFRAME_7  0x80
 
-#define USB_ERR_SHORT_PACKET    0x200
+#define USB_ERR_SHORT_PACKET  0x200
 
 //
 // Fill in the hardware link point: pass in a EHC_QH/QH_HW
@@ -72,7 +72,7 @@ typedef struct _PEI_URB     PEI_URB;
 #define QH_LINK(Addr, Type, Term) \
           ((UINT32) ((EHC_LOW_32BIT (Addr) & 0xFFFFFFE0) | (Type) | ((Term) ? 1 : 0)))
 
-#define QTD_LINK(Addr, Term)      QH_LINK((Addr), 0, (Term))
+#define QTD_LINK(Addr, Term)  QH_LINK((Addr), 0, (Term))
 
 //
 // The defination of EHCI hardware used data structure for
@@ -82,77 +82,76 @@ typedef struct _PEI_URB     PEI_URB;
 //
 #pragma pack(1)
 typedef struct {
-  UINT32                  NextQtd;
-  UINT32                  AltNext;
+  UINT32    NextQtd;
+  UINT32    AltNext;
 
-  UINT32                  Status       : 8;
-  UINT32                  Pid          : 2;
-  UINT32                  ErrCnt       : 2;
-  UINT32                  CurPage      : 3;
-  UINT32                  Ioc          : 1;
-  UINT32                  TotalBytes   : 15;
-  UINT32                  DataToggle   : 1;
+  UINT32    Status     : 8;
+  UINT32    Pid        : 2;
+  UINT32    ErrCnt     : 2;
+  UINT32    CurPage    : 3;
+  UINT32    Ioc        : 1;
+  UINT32    TotalBytes : 15;
+  UINT32    DataToggle : 1;
 
-  UINT32                  Page[5];
-  UINT32                  PageHigh[5];
+  UINT32    Page[5];
+  UINT32    PageHigh[5];
 } QTD_HW;
 
 typedef struct {
-  UINT32                  HorizonLink;
+  UINT32    HorizonLink;
   //
   // Endpoint capabilities/Characteristics DWord 1 and DWord 2
   //
-  UINT32                  DeviceAddr   : 7;
-  UINT32                  Inactive     : 1;
-  UINT32                  EpNum        : 4;
-  UINT32                  EpSpeed      : 2;
-  UINT32                  DtCtrl       : 1;
-  UINT32                  ReclaimHead  : 1;
-  UINT32                  MaxPacketLen : 11;
-  UINT32                  CtrlEp       : 1;
-  UINT32                  NakReload    : 4;
+  UINT32    DeviceAddr   : 7;
+  UINT32    Inactive     : 1;
+  UINT32    EpNum        : 4;
+  UINT32    EpSpeed      : 2;
+  UINT32    DtCtrl       : 1;
+  UINT32    ReclaimHead  : 1;
+  UINT32    MaxPacketLen : 11;
+  UINT32    CtrlEp       : 1;
+  UINT32    NakReload    : 4;
 
-  UINT32                  SMask        : 8;
-  UINT32                  CMask        : 8;
-  UINT32                  HubAddr      : 7;
-  UINT32                  PortNum      : 7;
-  UINT32                  Multiplier   : 2;
+  UINT32    SMask        : 8;
+  UINT32    CMask        : 8;
+  UINT32    HubAddr      : 7;
+  UINT32    PortNum      : 7;
+  UINT32    Multiplier   : 2;
 
   //
   // Transaction execution overlay area
   //
-  UINT32                  CurQtd;
-  UINT32                  NextQtd;
-  UINT32                  AltQtd;
+  UINT32    CurQtd;
+  UINT32    NextQtd;
+  UINT32    AltQtd;
 
-  UINT32                  Status       : 8;
-  UINT32                  Pid          : 2;
-  UINT32                  ErrCnt       : 2;
-  UINT32                  CurPage      : 3;
-  UINT32                  Ioc          : 1;
-  UINT32                  TotalBytes   : 15;
-  UINT32                  DataToggle   : 1;
+  UINT32    Status     : 8;
+  UINT32    Pid        : 2;
+  UINT32    ErrCnt     : 2;
+  UINT32    CurPage    : 3;
+  UINT32    Ioc        : 1;
+  UINT32    TotalBytes : 15;
+  UINT32    DataToggle : 1;
 
-  UINT32                  Page[5];
-  UINT32                  PageHigh[5];
+  UINT32    Page[5];
+  UINT32    PageHigh[5];
 } QH_HW;
 #pragma pack()
-
 
 //
 // Endpoint address and its capabilities
 //
 typedef struct _USB_ENDPOINT {
-  UINT8                   DevAddr;
-  UINT8                   EpAddr;     // Endpoint address, no direction encoded in
-  EFI_USB_DATA_DIRECTION  Direction;
-  UINT8                   DevSpeed;
-  UINTN                   MaxPacket;
-  UINT8                   HubAddr;
-  UINT8                   HubPort;
-  UINT8                   Toggle;     // Data toggle, not used for control transfer
-  UINTN                   Type;
-  UINTN                   PollRate;   // Polling interval used by EHCI
+  UINT8                     DevAddr;
+  UINT8                     EpAddr;   // Endpoint address, no direction encoded in
+  EFI_USB_DATA_DIRECTION    Direction;
+  UINT8                     DevSpeed;
+  UINTN                     MaxPacket;
+  UINT8                     HubAddr;
+  UINT8                     HubPort;
+  UINT8                     Toggle;   // Data toggle, not used for control transfer
+  UINTN                     Type;
+  UINTN                     PollRate; // Polling interval used by EHCI
 } USB_ENDPOINT;
 
 //
@@ -160,14 +159,12 @@ typedef struct _USB_ENDPOINT {
 // QTD generated from a URB. Don't add fields before QtdHw.
 //
 struct _PEI_EHC_QTD {
-  QTD_HW                  QtdHw;
-  UINT32                  Signature;
-  EFI_LIST_ENTRY          QtdList;   // The list of QTDs to one end point
-  UINT8                   *Data;     // Buffer of the original data
-  UINTN                   DataLen;   // Original amount of data in this QTD
+  QTD_HW            QtdHw;
+  UINT32            Signature;
+  EFI_LIST_ENTRY    QtdList;         // The list of QTDs to one end point
+  UINT8             *Data;           // Buffer of the original data
+  UINTN             DataLen;         // Original amount of data in this QTD
 };
-
-
 
 //
 // Software QH structure. All three different transaction types
@@ -185,11 +182,11 @@ struct _PEI_EHC_QTD {
 // as the reclamation header. New transfer is inserted after this QH.
 //
 struct _PEI_EHC_QH {
-  QH_HW                   QhHw;
-  UINT32                  Signature;
-  PEI_EHC_QH              *NextQh;    // The queue head pointed to by horizontal link
-  EFI_LIST_ENTRY          Qtds;       // The list of QTDs to this queue head
-  UINTN                   Interval;
+  QH_HW             QhHw;
+  UINT32            Signature;
+  PEI_EHC_QH        *NextQh;          // The queue head pointed to by horizontal link
+  EFI_LIST_ENTRY    Qtds;             // The list of QTDs to this queue head
+  UINTN             Interval;
 };
 
 //
@@ -197,34 +194,34 @@ struct _PEI_EHC_QH {
 // usb requests.
 //
 struct _PEI_URB {
-  UINT32                          Signature;
-  EFI_LIST_ENTRY                  UrbList;
+  UINT32                             Signature;
+  EFI_LIST_ENTRY                     UrbList;
 
   //
   // Transaction information
   //
-  USB_ENDPOINT                    Ep;
-  EFI_USB_DEVICE_REQUEST          *Request;     // Control transfer only
-  VOID                            *RequestPhy;  // Address of the mapped request
-  VOID                            *RequestMap;
-  VOID                            *Data;
-  UINTN                           DataLen;
-  VOID                            *DataPhy;     // Address of the mapped user data
-  VOID                            *DataMap;
-  EFI_ASYNC_USB_TRANSFER_CALLBACK Callback;
-  VOID                            *Context;
+  USB_ENDPOINT                       Ep;
+  EFI_USB_DEVICE_REQUEST             *Request;    // Control transfer only
+  VOID                               *RequestPhy; // Address of the mapped request
+  VOID                               *RequestMap;
+  VOID                               *Data;
+  UINTN                              DataLen;
+  VOID                               *DataPhy;  // Address of the mapped user data
+  VOID                               *DataMap;
+  EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback;
+  VOID                               *Context;
 
   //
   // Schedule data
   //
-  PEI_EHC_QH                      *Qh;
+  PEI_EHC_QH                         *Qh;
 
   //
   // Transaction result
   //
-  UINT32                          Result;
-  UINTN                           Completed;    // completed data length
-  UINT8                           DataToggle;
+  UINT32                             Result;
+  UINTN                              Completed; // completed data length
+  UINT8                              DataToggle;
 };
 
 /**
@@ -243,12 +240,12 @@ struct _PEI_URB {
 **/
 PEI_EHC_QTD *
 EhcCreateQtd (
-  IN PEI_USB2_HC_DEV      *Ehc,
-  IN UINT8                *Data,
-  IN UINTN                DataLen,
-  IN UINT8                PktId,
-  IN UINT8                Toggle,
-  IN UINTN                MaxPacket
+  IN PEI_USB2_HC_DEV  *Ehc,
+  IN UINT8            *Data,
+  IN UINTN            DataLen,
+  IN UINT8            PktId,
+  IN UINT8            Toggle,
+  IN UINTN            MaxPacket
   )
 ;
 
@@ -263,8 +260,8 @@ EhcCreateQtd (
 **/
 PEI_EHC_QH *
 EhcCreateQh (
-  IN PEI_USB2_HC_DEV      *Ehci,
-  IN USB_ENDPOINT         *Ep
+  IN PEI_USB2_HC_DEV  *Ehci,
+  IN USB_ENDPOINT     *Ep
   )
 ;
 
@@ -277,8 +274,8 @@ EhcCreateQh (
 **/
 VOID
 EhcFreeUrb (
-  IN PEI_USB2_HC_DEV      *Ehc,
-  IN PEI_URB              *Urb
+  IN PEI_USB2_HC_DEV  *Ehc,
+  IN PEI_URB          *Urb
   )
 ;
 
@@ -305,20 +302,21 @@ EhcFreeUrb (
 **/
 PEI_URB *
 EhcCreateUrb (
-  IN PEI_USB2_HC_DEV                    *Ehc,
-  IN UINT8                              DevAddr,
-  IN UINT8                              EpAddr,
-  IN UINT8                              DevSpeed,
-  IN UINT8                              Toggle,
-  IN UINTN                              MaxPacket,
-  IN EFI_USB2_HC_TRANSACTION_TRANSLATOR *Hub,
-  IN UINTN                              Type,
-  IN EFI_USB_DEVICE_REQUEST             *Request,
-  IN VOID                               *Data,
-  IN UINTN                              DataLen,
-  IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
-  IN VOID                               *Context,
-  IN UINTN                              Interval
+  IN PEI_USB2_HC_DEV                     *Ehc,
+  IN UINT8                               DevAddr,
+  IN UINT8                               EpAddr,
+  IN UINT8                               DevSpeed,
+  IN UINT8                               Toggle,
+  IN UINTN                               MaxPacket,
+  IN EFI_USB2_HC_TRANSACTION_TRANSLATOR  *Hub,
+  IN UINTN                               Type,
+  IN EFI_USB_DEVICE_REQUEST              *Request,
+  IN VOID                                *Data,
+  IN UINTN                               DataLen,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK     Callback,
+  IN VOID                                *Context,
+  IN UINTN                               Interval
   )
 ;
+
 #endif

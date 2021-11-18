@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 EFI_HANDLE  mFileExplorerThunkHandle = NULL;
 
-CONST EFI_FILE_EXPLORER_PROTOCOL mFileExplorerProtocol = {
+CONST EFI_FILE_EXPLORER_PROTOCOL  mFileExplorerProtocol = {
   ChooseFile
 };
 
@@ -35,15 +35,16 @@ CONST EFI_FILE_EXPLORER_PROTOCOL mFileExplorerProtocol = {
 EFI_STATUS
 EFIAPI
 FileExplorerEntryPoint (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mFileExplorerThunkHandle,
-                  &gEfiFileExplorerProtocolGuid, &mFileExplorerProtocol,
+                  &gEfiFileExplorerProtocolGuid,
+                  &mFileExplorerProtocol,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

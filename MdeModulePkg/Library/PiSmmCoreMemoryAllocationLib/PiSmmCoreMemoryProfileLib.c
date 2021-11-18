@@ -15,7 +15,7 @@
 
 #include "PiSmmCoreMemoryProfileServices.h"
 
-EDKII_MEMORY_PROFILE_PROTOCOL *mLibProfileProtocol;
+EDKII_MEMORY_PROFILE_PROTOCOL  *mLibProfileProtocol;
 
 /**
   Check whether the start address of buffer is within any of the SMRAM ranges.
@@ -28,7 +28,7 @@ EDKII_MEMORY_PROFILE_PROTOCOL *mLibProfileProtocol;
 BOOLEAN
 EFIAPI
 BufferInSmram (
-  IN VOID *Buffer
+  IN VOID  *Buffer
   );
 
 /**
@@ -47,7 +47,7 @@ PiSmmCoreMemoryProfileLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   //
   // Locate Profile Protocol
@@ -89,12 +89,12 @@ PiSmmCoreMemoryProfileLibConstructor (
 EFI_STATUS
 EFIAPI
 MemoryProfileLibRecord (
-  IN PHYSICAL_ADDRESS           CallerAddress,
-  IN MEMORY_PROFILE_ACTION      Action,
-  IN EFI_MEMORY_TYPE            MemoryType,
-  IN VOID                       *Buffer,
-  IN UINTN                      Size,
-  IN CHAR8                      *ActionString OPTIONAL
+  IN PHYSICAL_ADDRESS       CallerAddress,
+  IN MEMORY_PROFILE_ACTION  Action,
+  IN EFI_MEMORY_TYPE        MemoryType,
+  IN VOID                   *Buffer,
+  IN UINTN                  Size,
+  IN CHAR8                  *ActionString OPTIONAL
   )
 {
   if (BufferInSmram (Buffer)) {
@@ -103,6 +103,7 @@ MemoryProfileLibRecord (
     if (mLibProfileProtocol == NULL) {
       return EFI_UNSUPPORTED;
     }
+
     return mLibProfileProtocol->Record (
                                   mLibProfileProtocol,
                                   CallerAddress,
@@ -114,4 +115,3 @@ MemoryProfileLibRecord (
                                   );
   }
 }
-

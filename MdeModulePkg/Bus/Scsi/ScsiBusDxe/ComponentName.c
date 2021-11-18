@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "ScsiBus.h"
 
 //
@@ -21,16 +20,15 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gScsiBusComponentName
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gScsiBusComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ScsiBusComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ScsiBusComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gScsiBusComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)ScsiBusComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)ScsiBusComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mScsiBusDriverNameTable[] = {
-  { "eng;en", (CHAR16 *) L"SCSI Bus Driver" },
-  { NULL , NULL }
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mScsiBusDriverNameTable[] = {
+  { "eng;en", (CHAR16 *)L"SCSI Bus Driver" },
+  { NULL,     NULL                         }
 };
 
 /**
@@ -160,11 +158,11 @@ ScsiBusComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 ScsiBusComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   return EFI_UNSUPPORTED;

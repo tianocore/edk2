@@ -42,11 +42,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 SetVariableCheckHandlerMor (
-  IN CHAR16     *VariableName,
-  IN EFI_GUID   *VendorGuid,
-  IN UINT32     Attributes,
-  IN UINTN      DataSize,
-  IN VOID       *Data
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN UINT32    Attributes,
+  IN UINTN     DataSize,
+  IN VOID      *Data
   )
 {
   //
@@ -110,38 +110,43 @@ MorLockInitAtEndOfDxe (
   VOID
   )
 {
-  EFI_STATUS                        Status;
-  EDKII_VARIABLE_POLICY_PROTOCOL    *VariablePolicy;
+  EFI_STATUS                      Status;
+  EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy;
 
   // First, we obviously need to locate the VariablePolicy protocol.
-  Status = gBS->LocateProtocol( &gEdkiiVariablePolicyProtocolGuid, NULL, (VOID**)&VariablePolicy );
-  if (EFI_ERROR( Status )) {
-    DEBUG(( DEBUG_ERROR, "%a - Could not locate VariablePolicy protocol! %r\n", __FUNCTION__, Status ));
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Could not locate VariablePolicy protocol! %r\n", __FUNCTION__, Status));
     return;
   }
 
   // If we're successful, go ahead and set the policies to protect the target variables.
-  Status = RegisterBasicVariablePolicy( VariablePolicy,
-                                        &gEfiMemoryOverwriteRequestControlLockGuid,
-                                        MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,
-                                        VARIABLE_POLICY_NO_MIN_SIZE,
-                                        VARIABLE_POLICY_NO_MAX_SIZE,
-                                        VARIABLE_POLICY_NO_MUST_ATTR,
-                                        VARIABLE_POLICY_NO_CANT_ATTR,
-                                        VARIABLE_POLICY_TYPE_LOCK_NOW );
-  if (EFI_ERROR( Status )) {
-    DEBUG(( DEBUG_ERROR, "%a - Could not lock variable %s! %r\n", __FUNCTION__, MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME, Status ));
+  Status = RegisterBasicVariablePolicy (
+             VariablePolicy,
+             &gEfiMemoryOverwriteRequestControlLockGuid,
+             MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME,
+             VARIABLE_POLICY_NO_MIN_SIZE,
+             VARIABLE_POLICY_NO_MAX_SIZE,
+             VARIABLE_POLICY_NO_MUST_ATTR,
+             VARIABLE_POLICY_NO_CANT_ATTR,
+             VARIABLE_POLICY_TYPE_LOCK_NOW
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Could not lock variable %s! %r\n", __FUNCTION__, MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME, Status));
   }
-  Status = RegisterBasicVariablePolicy( VariablePolicy,
-                                        &gEfiMemoryOverwriteControlDataGuid,
-                                        MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
-                                        VARIABLE_POLICY_NO_MIN_SIZE,
-                                        VARIABLE_POLICY_NO_MAX_SIZE,
-                                        VARIABLE_POLICY_NO_MUST_ATTR,
-                                        VARIABLE_POLICY_NO_CANT_ATTR,
-                                        VARIABLE_POLICY_TYPE_LOCK_NOW );
-  if (EFI_ERROR( Status )) {
-    DEBUG(( DEBUG_ERROR, "%a - Could not lock variable %s! %r\n", __FUNCTION__, MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME, Status ));
+
+  Status = RegisterBasicVariablePolicy (
+             VariablePolicy,
+             &gEfiMemoryOverwriteControlDataGuid,
+             MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
+             VARIABLE_POLICY_NO_MIN_SIZE,
+             VARIABLE_POLICY_NO_MAX_SIZE,
+             VARIABLE_POLICY_NO_MUST_ATTR,
+             VARIABLE_POLICY_NO_CANT_ATTR,
+             VARIABLE_POLICY_TYPE_LOCK_NOW
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Could not lock variable %s! %r\n", __FUNCTION__, MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME, Status));
   }
 
   return;

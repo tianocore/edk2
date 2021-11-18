@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 DumpHiiPackage (
-  IN VOID       *HiiPackage
+  IN VOID  *HiiPackage
   );
 
 /**
@@ -31,8 +31,8 @@ DumpHiiPackage (
 **/
 VOID
 DumpHiiDatabase (
-  IN VOID       *HiiDatabase,
-  IN UINTN      HiiDatabaseSize
+  IN VOID   *HiiDatabase,
+  IN UINTN  HiiDatabaseSize
   );
 
 /**
@@ -50,7 +50,7 @@ DumpHiiDatabase (
 **/
 VOID *
 InternalVarCheckAllocateZeroPool (
-  IN UINTN            AllocationSize
+  IN UINTN  AllocationSize
   );
 
 /**
@@ -70,7 +70,7 @@ InternalVarCheckAllocateZeroPool (
 VOID
 EFIAPI
 InternalVarCheckFreePool (
-  IN VOID   *Buffer
+  IN VOID  *Buffer
   );
 
 /**
@@ -82,8 +82,8 @@ InternalVarCheckFreePool (
 **/
 VOID
 VarCheckParseHiiPackage (
-  IN VOID       *HiiPackage,
-  IN BOOLEAN    FromFv
+  IN VOID     *HiiPackage,
+  IN BOOLEAN  FromFv
   );
 
 /**
@@ -95,8 +95,8 @@ VarCheckParseHiiPackage (
 **/
 VOID
 VarCheckParseHiiDatabase (
-  IN VOID       *HiiDatabase,
-  IN UINTN      HiiDatabaseSize
+  IN VOID   *HiiDatabase,
+  IN UINTN  HiiDatabaseSize
   );
 
 /**
