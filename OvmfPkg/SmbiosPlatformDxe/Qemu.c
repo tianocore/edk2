@@ -24,17 +24,20 @@ GetQemuSmbiosTables (
   VOID
   )
 {
-  EFI_STATUS               Status;
-  FIRMWARE_CONFIG_ITEM     Tables;
-  UINTN                    TablesSize;
-  UINT8                    *QemuTables;
+  EFI_STATUS            Status;
+  FIRMWARE_CONFIG_ITEM  Tables;
+  UINTN                 TablesSize;
+  UINT8                 *QemuTables;
 
   if (!PcdGetBool (PcdQemuSmbiosValidated)) {
     return NULL;
   }
 
-  Status = QemuFwCfgFindFile ("etc/smbios/smbios-tables", &Tables,
-             &TablesSize);
+  Status = QemuFwCfgFindFile (
+             "etc/smbios/smbios-tables",
+             &Tables,
+             &TablesSize
+             );
   ASSERT_EFI_ERROR (Status);
   ASSERT (TablesSize > 0);
 
@@ -62,12 +65,12 @@ GetQemuSmbiosTables (
 EFI_STATUS
 EFIAPI
 SmbiosTablePublishEntry (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
-  UINT8                     *SmbiosTables;
+  EFI_STATUS  Status;
+  UINT8       *SmbiosTables;
 
   Status = EFI_NOT_FOUND;
   //

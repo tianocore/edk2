@@ -22,8 +22,8 @@
 #include <Protocol/PciIo.h>
 #include <Protocol/XenIo.h>
 
-#define PCI_VENDOR_ID_XEN                0x5853
-#define PCI_DEVICE_ID_XEN_PLATFORM       0x0001
+#define PCI_VENDOR_ID_XEN           0x5853
+#define PCI_DEVICE_ID_XEN_PLATFORM  0x0001
 
 /**
 
@@ -53,14 +53,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 XenIoPciDeviceBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS          Status;
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  PCI_TYPE00          Pci;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
 
   //
   // Attempt to open the device with the PciIo set of interfaces. On success,
@@ -96,7 +96,8 @@ XenIoPciDeviceBindingSupported (
 
   if (Status == EFI_SUCCESS) {
     if ((Pci.Hdr.VendorId == PCI_VENDOR_ID_XEN) &&
-        (Pci.Hdr.DeviceId == PCI_DEVICE_ID_XEN_PLATFORM)) {
+        (Pci.Hdr.DeviceId == PCI_DEVICE_ID_XEN_PLATFORM))
+    {
       Status = EFI_SUCCESS;
     } else {
       Status = EFI_UNSUPPORTED;
@@ -107,8 +108,12 @@ XenIoPciDeviceBindingSupported (
   // We needed PCI IO access only transitorily, to see whether we support the
   // device or not.
   //
-  gBS->CloseProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  gBS->CloseProtocol (
+         DeviceHandle,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         DeviceHandle
+         );
 
   return Status;
 }
@@ -143,24 +148,29 @@ STATIC
 EFI_STATUS
 EFIAPI
 XenIoPciDeviceBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS                        Status;
-  XENIO_PROTOCOL                    *XenIo;
-  EFI_PCI_IO_PROTOCOL               *PciIo;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *BarDesc;
+  EFI_STATUS                         Status;
+  XENIO_PROTOCOL                     *XenIo;
+  EFI_PCI_IO_PROTOCOL                *PciIo;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *BarDesc;
 
-  XenIo = (XENIO_PROTOCOL *) AllocateZeroPool (sizeof *XenIo);
+  XenIo = (XENIO_PROTOCOL *)AllocateZeroPool (sizeof *XenIo);
   if (XenIo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->OpenProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
-                  (VOID **)&PciIo, This->DriverBindingHandle,
-                  DeviceHandle, EFI_OPEN_PROTOCOL_BY_DRIVER);
+  Status = gBS->OpenProtocol (
+                  DeviceHandle,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID **)&PciIo,
+                  This->DriverBindingHandle,
+                  DeviceHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   if (EFI_ERROR (Status)) {
     goto FreeXenIo;
   }
@@ -170,7 +180,7 @@ XenIoPciDeviceBindingStart (
   // look like MMIO. The address space of the BAR1 will be used to map the
   // Grant Table.
   //
-  Status = PciIo->GetBarAttributes (PciIo, PCI_BAR_IDX1, NULL, (VOID**) &BarDesc);
+  Status = PciIo->GetBarAttributes (PciIo, PCI_BAR_IDX1, NULL, (VOID **)&BarDesc);
   ASSERT_EFI_ERROR (Status);
   ASSERT (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM);
 
@@ -179,15 +189,23 @@ XenIoPciDeviceBindingStart (
   XenIo->GrantTableAddress = BarDesc->AddrRangeMin;
   FreePool (BarDesc);
 
-  Status = gBS->InstallProtocolInterface (&DeviceHandle,
-             &gXenIoProtocolGuid, EFI_NATIVE_INTERFACE, XenIo);
+  Status = gBS->InstallProtocolInterface (
+                  &DeviceHandle,
+                  &gXenIoProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  XenIo
+                  );
 
   if (!EFI_ERROR (Status)) {
     return EFI_SUCCESS;
   }
 
-  gBS->CloseProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  gBS->CloseProtocol (
+         DeviceHandle,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         DeviceHandle
+         );
 
 FreeXenIo:
   FreePool (XenIo);
@@ -224,14 +242,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 XenIoPciDeviceBindingStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN UINTN                       NumberOfChildren,
-  IN EFI_HANDLE                  *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS               Status;
-  XENIO_PROTOCOL           *XenIo;
+  EFI_STATUS      Status;
+  XENIO_PROTOCOL  *XenIo;
 
   Status = gBS->OpenProtocol (
                   DeviceHandle,                  // candidate device
@@ -248,27 +266,33 @@ XenIoPciDeviceBindingStop (
   //
   // Handle Stop() requests for in-use driver instances gracefully.
   //
-  Status = gBS->UninstallProtocolInterface (DeviceHandle,
-                  &gXenIoProtocolGuid, XenIo);
+  Status = gBS->UninstallProtocolInterface (
+                  DeviceHandle,
+                  &gXenIoProtocolGuid,
+                  XenIo
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = gBS->CloseProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  Status = gBS->CloseProtocol (
+                  DeviceHandle,
+                  &gEfiPciIoProtocolGuid,
+                  This->DriverBindingHandle,
+                  DeviceHandle
+                  );
 
   FreePool (XenIo);
 
   return Status;
 }
 
-
 //
 // The static object that groups the Supported() (ie. probe), Start() and
 // Stop() functions of the driver together. Refer to UEFI Spec 2.3.1 + Errata
 // C, 10.1 EFI Driver Binding Protocol.
 //
-STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
+STATIC EFI_DRIVER_BINDING_PROTOCOL  gDriverBinding = {
   &XenIoPciDeviceBindingSupported,
   &XenIoPciDeviceBindingStart,
   &XenIoPciDeviceBindingStop,
@@ -278,7 +302,6 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
   NULL  // DriverBindingHandle, ditto
 };
 
-
 //
 // The purpose of the following scaffolding (EFI_COMPONENT_NAME_PROTOCOL and
 // EFI_COMPONENT_NAME2_PROTOCOL implementation) is to format the driver's name
@@ -287,20 +310,20 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
 // Guide for UEFI 2.3.1 v1.01, 11 UEFI Driver and Controller Names.
 //
 STATIC
-EFI_UNICODE_STRING_TABLE mDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE  mDriverNameTable[] = {
   { "eng;en", L"XenIo PCI Driver" },
   { NULL,     NULL                }
 };
 
 STATIC
-EFI_COMPONENT_NAME_PROTOCOL gComponentName;
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName;
 
 EFI_STATUS
 EFIAPI
 XenIoPciGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
-  IN  CHAR8                       *Language,
-  OUT CHAR16                      **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -315,30 +338,29 @@ XenIoPciGetDriverName (
 EFI_STATUS
 EFIAPI
 XenIoPciGetDeviceName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
-  IN  EFI_HANDLE                  DeviceHandle,
-  IN  EFI_HANDLE                  ChildHandle,
-  IN  CHAR8                       *Language,
-  OUT CHAR16                      **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   DeviceHandle,
+  IN  EFI_HANDLE                   ChildHandle,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   return EFI_UNSUPPORTED;
 }
 
 STATIC
-EFI_COMPONENT_NAME_PROTOCOL gComponentName = {
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName = {
   &XenIoPciGetDriverName,
   &XenIoPciGetDeviceName,
   "eng" // SupportedLanguages, ISO 639-2 language codes
 };
 
 STATIC
-EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     &XenIoPciGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) &XenIoPciGetDeviceName,
+EFI_COMPONENT_NAME2_PROTOCOL  gComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)&XenIoPciGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)&XenIoPciGetDeviceName,
   "en" // SupportedLanguages, RFC 4646 language codes
 };
-
 
 //
 // Entry point of this driver.
@@ -346,8 +368,8 @@ EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
 EFI_STATUS
 EFIAPI
 XenIoPciDeviceEntryPoint (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return EfiLibInstallDriverBindingComponentName2 (

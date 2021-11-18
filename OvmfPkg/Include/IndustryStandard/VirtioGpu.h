@@ -26,7 +26,7 @@
 //
 // Queue number for sending control commands.
 //
-#define VIRTIO_GPU_CONTROL_QUEUE 0
+#define VIRTIO_GPU_CONTROL_QUEUE  0
 
 //
 // Command and response types.
@@ -37,8 +37,8 @@ typedef enum {
   //
   // - create/release a host-side 2D resource,
   //
-  VirtioGpuCmdResourceCreate2d      = 0x0101,
-  VirtioGpuCmdResourceUnref         = 0x0102,
+  VirtioGpuCmdResourceCreate2d = 0x0101,
+  VirtioGpuCmdResourceUnref    = 0x0102,
   //
   // - attach/detach guest RAM to/from a host-side 2D resource,
   //
@@ -47,7 +47,7 @@ typedef enum {
   //
   // - assign/unassign a host-side 2D resource to/from a scanout ("head").
   //
-  VirtioGpuCmdSetScanout            = 0x0103,
+  VirtioGpuCmdSetScanout = 0x0103,
 
   //
   // Commands related to drawing:
@@ -55,22 +55,22 @@ typedef enum {
   // - transfer a guest RAM update to the host-side 2D resource (does not imply
   //   host display refresh),
   //
-  VirtioGpuCmdTransferToHost2d      = 0x0105,
+  VirtioGpuCmdTransferToHost2d = 0x0105,
   //
   // - trigger a host display refresh from the 2D resource.
   //
-  VirtioGpuCmdResourceFlush         = 0x0104,
+  VirtioGpuCmdResourceFlush = 0x0104,
 
   //
   // Success code for all of the above commands.
   //
-  VirtioGpuRespOkNodata             = 0x1100,
+  VirtioGpuRespOkNodata = 0x1100,
 } VIRTIO_GPU_CONTROL_TYPE;
 
 //
 // Common request/response header.
 //
-#define VIRTIO_GPU_FLAG_FENCE BIT0
+#define VIRTIO_GPU_FLAG_FENCE  BIT0
 
 #pragma pack (1)
 typedef struct {
@@ -78,20 +78,20 @@ typedef struct {
   // The guest sets Type to VirtioGpuCmd* in the requests. The host sets Type
   // to VirtioGpuResp* in the responses.
   //
-  UINT32 Type;
+  UINT32    Type;
 
   //
   // Fencing forces the host to complete the command before producing a
   // response.
   //
-  UINT32 Flags;
-  UINT64 FenceId;
+  UINT32    Flags;
+  UINT64    FenceId;
 
   //
   // Unused.
   //
-  UINT32 CtxId;
-  UINT32 Padding;
+  UINT32    CtxId;
+  UINT32    Padding;
 } VIRTIO_GPU_CONTROL_HEADER;
 #pragma pack ()
 
@@ -100,10 +100,10 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  UINT32 X;
-  UINT32 Y;
-  UINT32 Width;
-  UINT32 Height;
+  UINT32    X;
+  UINT32    Y;
+  UINT32    Width;
+  UINT32    Height;
 } VIRTIO_GPU_RECTANGLE;
 #pragma pack ()
 
@@ -119,11 +119,11 @@ typedef enum {
 
 #pragma pack (1)
 typedef struct {
-  VIRTIO_GPU_CONTROL_HEADER Header;
-  UINT32                    ResourceId; // note: 0 is invalid
-  UINT32                    Format;     // from VIRTIO_GPU_FORMATS
-  UINT32                    Width;
-  UINT32                    Height;
+  VIRTIO_GPU_CONTROL_HEADER    Header;
+  UINT32                       ResourceId; // note: 0 is invalid
+  UINT32                       Format;     // from VIRTIO_GPU_FORMATS
+  UINT32                       Width;
+  UINT32                       Height;
 } VIRTIO_GPU_RESOURCE_CREATE_2D;
 #pragma pack ()
 
@@ -132,9 +132,9 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  VIRTIO_GPU_CONTROL_HEADER Header;
-  UINT32                    ResourceId;
-  UINT32                    Padding;
+  VIRTIO_GPU_CONTROL_HEADER    Header;
+  UINT32                       ResourceId;
+  UINT32                       Padding;
 } VIRTIO_GPU_RESOURCE_UNREF;
 #pragma pack ()
 
@@ -146,16 +146,16 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  UINT64 Addr;
-  UINT32 Length;
-  UINT32 Padding;
+  UINT64    Addr;
+  UINT32    Length;
+  UINT32    Padding;
 } VIRTIO_GPU_MEM_ENTRY;
 
 typedef struct {
-  VIRTIO_GPU_CONTROL_HEADER Header;
-  UINT32                    ResourceId;
-  UINT32                    NrEntries;  // number of entries: constant 1
-  VIRTIO_GPU_MEM_ENTRY      Entry;
+  VIRTIO_GPU_CONTROL_HEADER    Header;
+  UINT32                       ResourceId;
+  UINT32                       NrEntries; // number of entries: constant 1
+  VIRTIO_GPU_MEM_ENTRY         Entry;
 } VIRTIO_GPU_RESOURCE_ATTACH_BACKING;
 #pragma pack ()
 
@@ -164,9 +164,9 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  VIRTIO_GPU_CONTROL_HEADER Header;
-  UINT32                    ResourceId;
-  UINT32                    Padding;
+  VIRTIO_GPU_CONTROL_HEADER    Header;
+  UINT32                       ResourceId;
+  UINT32                       Padding;
 } VIRTIO_GPU_RESOURCE_DETACH_BACKING;
 #pragma pack ()
 
@@ -175,10 +175,10 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  VIRTIO_GPU_CONTROL_HEADER Header;
-  VIRTIO_GPU_RECTANGLE      Rectangle;
-  UINT32                    ScanoutId;
-  UINT32                    ResourceId;
+  VIRTIO_GPU_CONTROL_HEADER    Header;
+  VIRTIO_GPU_RECTANGLE         Rectangle;
+  UINT32                       ScanoutId;
+  UINT32                       ResourceId;
 } VIRTIO_GPU_SET_SCANOUT;
 #pragma pack ()
 
@@ -187,11 +187,11 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  VIRTIO_GPU_CONTROL_HEADER Header;
-  VIRTIO_GPU_RECTANGLE      Rectangle;
-  UINT64                    Offset;
-  UINT32                    ResourceId;
-  UINT32                    Padding;
+  VIRTIO_GPU_CONTROL_HEADER    Header;
+  VIRTIO_GPU_RECTANGLE         Rectangle;
+  UINT64                       Offset;
+  UINT32                       ResourceId;
+  UINT32                       Padding;
 }  VIRTIO_GPU_CMD_TRANSFER_TO_HOST_2D;
 #pragma pack ()
 
@@ -200,10 +200,10 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  VIRTIO_GPU_CONTROL_HEADER Header;
-  VIRTIO_GPU_RECTANGLE      Rectangle;
-  UINT32                    ResourceId;
-  UINT32                    Padding;
+  VIRTIO_GPU_CONTROL_HEADER    Header;
+  VIRTIO_GPU_RECTANGLE         Rectangle;
+  UINT32                       ResourceId;
+  UINT32                       Padding;
 } VIRTIO_GPU_RESOURCE_FLUSH;
 #pragma pack ()
 

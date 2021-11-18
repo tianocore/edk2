@@ -12,7 +12,7 @@
 VOID
 EFIAPI
 Tcg2PhysicalPresenceLibProcessRequest (
-  IN      TPM2B_AUTH                     *PlatformAuth  OPTIONAL
+  IN      TPM2B_AUTH  *PlatformAuth  OPTIONAL
   )
 {
   //

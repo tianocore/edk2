@@ -29,4 +29,3 @@ CsmSupportLibConstructor (
 
   return EFI_SUCCESS;
 }
-

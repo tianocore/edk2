@@ -25,16 +25,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 // The default timer tick duration is set to 10 ms = 100000 100 ns units
 //
-#define DEFAULT_TIMER_TICK_DURATION 100000
+#define DEFAULT_TIMER_TICK_DURATION  100000
 
 //
 // The Timer Vector use for interrupt
 //
-#define LOCAL_APIC_TIMER_VECTOR 32
+#define LOCAL_APIC_TIMER_VECTOR  32
 
 //
 // Function Prototypes
 //
+
 /**
   Initialize the Timer Architectural Protocol driver
 
@@ -145,8 +146,8 @@ TimerDriverSetTimerPeriod (
 EFI_STATUS
 EFIAPI
 TimerDriverGetTimerPeriod (
-  IN EFI_TIMER_ARCH_PROTOCOL   *This,
-  OUT UINT64                   *TimerPeriod
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  OUT UINT64                  *TimerPeriod
   )
 ;
 

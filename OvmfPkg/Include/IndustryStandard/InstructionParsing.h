@@ -17,14 +17,14 @@
 //
 typedef union {
   struct {
-    UINT8  BitB:1;
-    UINT8  BitX:1;
-    UINT8  BitR:1;
-    UINT8  BitW:1;
-    UINT8  Rex:4;
+    UINT8    BitB : 1;
+    UINT8    BitX : 1;
+    UINT8    BitR : 1;
+    UINT8    BitW : 1;
+    UINT8    Rex  : 4;
   } Bits;
 
-  UINT8  Uint8;
+  UINT8    Uint8;
 } INSTRUCTION_REX_PREFIX;
 
 //
@@ -32,12 +32,12 @@ typedef union {
 //
 typedef union {
   struct {
-    UINT8  Rm:3;
-    UINT8  Reg:3;
-    UINT8  Mod:2;
+    UINT8    Rm  : 3;
+    UINT8    Reg : 3;
+    UINT8    Mod : 2;
   } Bits;
 
-  UINT8  Uint8;
+  UINT8    Uint8;
 } INSTRUCTION_MODRM;
 
 //
@@ -45,28 +45,28 @@ typedef union {
 //
 typedef union {
   struct {
-    UINT8  Base:3;
-    UINT8  Index:3;
-    UINT8  Scale:2;
+    UINT8    Base  : 3;
+    UINT8    Index : 3;
+    UINT8    Scale : 2;
   } Bits;
 
-  UINT8  Uint8;
+  UINT8    Uint8;
 } INSTRUCTION_SIB;
 
 //
 // Legacy Instruction Prefixes
 //
-#define OVERRIDE_SEGMENT_CS          0x2E
-#define OVERRIDE_SEGMENT_DS          0x3E
-#define OVERRIDE_SEGMENT_ES          0x26
-#define OVERRIDE_SEGMENT_SS          0x36
-#define OVERRIDE_SEGMENT_FS          0x64
-#define OVERRIDE_SEGMENT_GS          0x65
-#define OVERRIDE_OPERAND_SIZE        0x66
-#define OVERRIDE_ADDRESS_SIZE        0x67
-#define LOCK_PREFIX                  0xF0
-#define REPNZ_PREFIX                 0xF2
-#define REPZ_PREFIX                  0xF3
+#define OVERRIDE_SEGMENT_CS    0x2E
+#define OVERRIDE_SEGMENT_DS    0x3E
+#define OVERRIDE_SEGMENT_ES    0x26
+#define OVERRIDE_SEGMENT_SS    0x36
+#define OVERRIDE_SEGMENT_FS    0x64
+#define OVERRIDE_SEGMENT_GS    0x65
+#define OVERRIDE_OPERAND_SIZE  0x66
+#define OVERRIDE_ADDRESS_SIZE  0x67
+#define LOCK_PREFIX            0xF0
+#define REPNZ_PREFIX           0xF2
+#define REPZ_PREFIX            0xF3
 
 //
 // REX Prefixes
@@ -78,6 +78,6 @@ typedef union {
 //
 // Two-byte Opcode Flag
 //
-#define TWO_BYTE_OPCODE_ESCAPE       0x0F
+#define TWO_BYTE_OPCODE_ESCAPE  0x0F
 
 #endif

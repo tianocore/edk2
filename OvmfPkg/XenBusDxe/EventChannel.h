@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __XENBUS_EVENT_CHANNEL_H
 #define __XENBUS_EVENT_CHANNEL_H
 
@@ -23,8 +24,8 @@
 **/
 UINT32
 XenEventChannelNotify (
-  IN XENBUS_DEVICE *Dev,
-  IN evtchn_port_t Port
+  IN XENBUS_DEVICE  *Dev,
+  IN evtchn_port_t  Port
   );
 
 /*
@@ -44,9 +45,9 @@ XenEventChannelNotify (
 UINT32
 EFIAPI
 XenBusEventChannelAllocate (
-  IN  XENBUS_PROTOCOL *This,
-  IN  domid_t         DomainId,
-  OUT evtchn_port_t   *Port
+  IN  XENBUS_PROTOCOL  *This,
+  IN  domid_t          DomainId,
+  OUT evtchn_port_t    *Port
   );
 
 /**
@@ -60,8 +61,8 @@ XenBusEventChannelAllocate (
 UINT32
 EFIAPI
 XenBusEventChannelNotify (
-  IN XENBUS_PROTOCOL *This,
-  IN evtchn_port_t   Port
+  IN XENBUS_PROTOCOL  *This,
+  IN evtchn_port_t    Port
   );
 
 /**
@@ -75,8 +76,8 @@ XenBusEventChannelNotify (
 UINT32
 EFIAPI
 XenBusEventChannelClose (
-  IN XENBUS_PROTOCOL *This,
-  IN evtchn_port_t   Port
+  IN XENBUS_PROTOCOL  *This,
+  IN evtchn_port_t    Port
   );
 
 #endif

@@ -34,15 +34,15 @@
 **/
 EFI_STATUS
 VirtioFsFuseForget (
-  IN OUT VIRTIO_FS *VirtioFs,
-  IN     UINT64    NodeId
+  IN OUT VIRTIO_FS  *VirtioFs,
+  IN     UINT64     NodeId
   )
 {
-  VIRTIO_FS_FUSE_REQUEST        CommonReq;
-  VIRTIO_FS_FUSE_FORGET_REQUEST ForgetReq;
-  VIRTIO_FS_IO_VECTOR           ReqIoVec[2];
-  VIRTIO_FS_SCATTER_GATHER_LIST ReqSgList;
-  EFI_STATUS                    Status;
+  VIRTIO_FS_FUSE_REQUEST         CommonReq;
+  VIRTIO_FS_FUSE_FORGET_REQUEST  ForgetReq;
+  VIRTIO_FS_IO_VECTOR            ReqIoVec[2];
+  VIRTIO_FS_SCATTER_GATHER_LIST  ReqSgList;
+  EFI_STATUS                     Status;
 
   //
   // Set up the scatter-gather list (note: only request).
@@ -66,8 +66,13 @@ VirtioFsFuseForget (
   //
   // Populate the common request header.
   //
-  Status = VirtioFsFuseNewRequest (VirtioFs, &CommonReq, ReqSgList.TotalSize,
-             VirtioFsFuseOpForget, NodeId);
+  Status = VirtioFsFuseNewRequest (
+             VirtioFs,
+             &CommonReq,
+             ReqSgList.TotalSize,
+             VirtioFsFuseOpForget,
+             NodeId
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }

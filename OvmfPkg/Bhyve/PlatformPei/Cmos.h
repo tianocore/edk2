@@ -23,7 +23,7 @@
 UINT8
 EFIAPI
 CmosRead8 (
-  IN      UINTN                     Index
+  IN      UINTN  Index
   );
 
 /**
@@ -41,10 +41,8 @@ CmosRead8 (
 UINT8
 EFIAPI
 CmosWrite8 (
-  IN      UINTN                     Index,
-  IN      UINT8                     Value
+  IN      UINTN  Index,
+  IN      UINT8  Value
   );
 
-
 #endif /* _CMOS_H_ */
-

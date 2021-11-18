@@ -18,15 +18,15 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#define FW_PORT    0x510
-#define FW_IPORT   0x511
+#define FW_PORT   0x510
+#define FW_IPORT  0x511
 
 /* Transport protocol basic operations */
-#define OP_NULL      1
-#define OP_ECHO      2
-#define OP_GET       3
-#define OP_GET_LEN   4
-#define OP_SET       5
+#define OP_NULL     1
+#define OP_ECHO     2
+#define OP_GET      3
+#define OP_GET_LEN  4
+#define OP_SET      5
 
 /* Transport protocol error returns */
 #define T_ESUCCESS  0
@@ -34,17 +34,17 @@
 #define T_E2BIG     7
 #define T_EMSGSIZE  40
 
-#define ROUNDUP(x, y) ((((x)+((y)-1))/(y))*(y))
+#define ROUNDUP(x, y)  ((((x)+((y)-1))/(y))*(y))
 
-STATIC CONST CHAR8 mBhyveSig[4] = { 'B', 'H', 'Y', 'V' };
+STATIC CONST CHAR8  mBhyveSig[4] = { 'B', 'H', 'Y', 'V' };
 
-STATIC BOOLEAN mBhyveFwCtlSupported = FALSE;
+STATIC BOOLEAN  mBhyveFwCtlSupported = FALSE;
 
-STATIC INT32 mBhyveFwCtlTxid = 0xa5;
+STATIC INT32  mBhyveFwCtlTxid = 0xa5;
 
 /* XXX Maybe a better inbuilt version of this ? */
 typedef struct {
-  VOID     *Base;
+  VOID      *Base;
   UINT32    Len;
 } BIO_VEC;
 
@@ -59,27 +59,27 @@ STATIC
 RETURN_STATUS
 EFIAPI
 BhyveFwCtl_CvtErr (
-  IN UINT32    errno
+  IN UINT32  errno
   )
 {
-  RETURN_STATUS        Status;
+  RETURN_STATUS  Status;
 
   switch (errno) {
-  case T_ESUCCESS:
-    Status = RETURN_SUCCESS;
-    break;
-  case T_ENOENT:
-    Status = RETURN_NOT_FOUND;
-    break;
-  case T_E2BIG:
-    Status = RETURN_INVALID_PARAMETER;
-    break;
-  case T_EMSGSIZE:
-    Status = RETURN_BUFFER_TOO_SMALL;
-    break;
-  default:
-    Status = RETURN_PROTOCOL_ERROR;
-    break;
+    case T_ESUCCESS:
+      Status = RETURN_SUCCESS;
+      break;
+    case T_ENOENT:
+      Status = RETURN_NOT_FOUND;
+      break;
+    case T_E2BIG:
+      Status = RETURN_INVALID_PARAMETER;
+      break;
+    case T_EMSGSIZE:
+      Status = RETURN_BUFFER_TOO_SMALL;
+      break;
+    default:
+      Status = RETURN_PROTOCOL_ERROR;
+      break;
   }
 
   return Status;
@@ -89,17 +89,18 @@ STATIC
 UINT32
 EFIAPI
 BIov_WLen (
-  IN BIO_VEC b[]
+  IN BIO_VEC  b[]
   )
 {
-  UINT32        i;
-  UINT32        tLen;
+  UINT32  i;
+  UINT32  tLen;
 
   tLen = 0;
 
   if (b != NULL) {
-    for (i = 0; b[i].Base != NULL; i++)
-      tLen += ROUNDUP (b[i].Len, sizeof(UINT32));
+    for (i = 0; b[i].Base != NULL; i++) {
+      tLen += ROUNDUP (b[i].Len, sizeof (UINT32));
+    }
   }
 
   return tLen;
@@ -113,21 +114,22 @@ STATIC
 UINT32
 BIov_Send_Rem (
   IN UINT32  *Data,
-  IN UINT32   Len
+  IN UINT32  Len
   )
 {
   union {
-    UINT8    c[4];
+    UINT8     c[4];
     UINT32    w;
   } u;
-  UINT8        *cdata;
-  UINT32        i;
+  UINT8   *cdata;
+  UINT32  i;
 
   cdata = (UINT8 *)Data;
-  u.w = 0;
+  u.w   = 0;
 
-  for (i = 0; i < Len; i++)
+  for (i = 0; i < Len; i++) {
     u.c[i] = *cdata++;
+  }
 
   return u.w;
 }
@@ -140,16 +142,16 @@ STATIC
 VOID
 BIov_Send (
   IN char    *Data,
-  IN UINT32   Len
+  IN UINT32  Len
   )
 {
-  UINT32    *LData;
+  UINT32  *LData;
 
   LData = (UINT32 *)Data;
 
-  while (Len > sizeof(UINT32)) {
+  while (Len > sizeof (UINT32)) {
     IoWrite32 (FW_PORT, *LData++);
-    Len -= sizeof(UINT32);
+    Len -= sizeof (UINT32);
   }
 
   if (Len > 0) {
@@ -163,10 +165,10 @@ BIov_Send (
 STATIC
 VOID
 BIov_SendAll (
-   IN BIO_VEC b[]
-   )
+  IN BIO_VEC  b[]
+  )
 {
-  INT32        i;
+  INT32  i;
 
   if (b != NULL) {
     for (i = 0; b[i].Base; i++) {
@@ -181,22 +183,23 @@ BIov_SendAll (
 STATIC
 VOID
 EFIAPI
-BhyveFwCtl_MsgSend(
-  IN  UINT32  OpCode,
+BhyveFwCtl_MsgSend (
+  IN  UINT32   OpCode,
   IN  BIO_VEC  Data[]
   )
 {
   BIO_VEC  hIov[4];
-  UINT32  Hdr[3];
-  UINT32  i;
+  UINT32   Hdr[3];
+  UINT32   i;
 
   /* Set up header as an iovec */
   for (i = 0; i < 3; i++) {
     hIov[i].Base = &Hdr[i];
-    hIov[i].Len  = sizeof(Hdr[0]);
+    hIov[i].Len  = sizeof (Hdr[0]);
   }
+
   hIov[i].Base = NULL;
-  hIov[i].Len = 0;
+  hIov[i].Len  = 0;
 
   /* Initialize header */
   Hdr[0] = BIov_WLen (hIov) + BIov_WLen (Data);
@@ -214,13 +217,13 @@ BhyveFwCtl_MsgSend(
 STATIC
 RETURN_STATUS
 EFIAPI
-BhyveFwCtl_MsgRecv(
-  OUT  MSG_RX_HDR *Rhdr,
-  OUT  BIO_VEC    Data[]
+BhyveFwCtl_MsgRecv (
+  OUT  MSG_RX_HDR  *Rhdr,
+  OUT  BIO_VEC     Data[]
   )
 {
   RETURN_STATUS  Status;
-  UINT32        *Dp;
+  UINT32         *Dp;
   UINT32         Rd;
   UINT32         remLen;
   INT32          oLen;
@@ -228,7 +231,6 @@ BhyveFwCtl_MsgRecv(
 
   Rd = IoRead32 (FW_PORT);
   if (Rd < sizeof (MSG_RX_HDR)) {
-    ;
   }
 
   /* Read in header and setup initial error */
@@ -241,7 +243,7 @@ BhyveFwCtl_MsgRecv(
   Status = BhyveFwCtl_CvtErr (Rhdr->Err);
 
   remLen = Rd - sizeof (MSG_RX_HDR);
-  xLen = 0;
+  xLen   = 0;
 
   /*
    * A few cases to handle:
@@ -250,47 +252,48 @@ BhyveFwCtl_MsgRecv(
    *  - the response is zero-length
    */
   if (Data != NULL) {
-    Dp = (UINT32 *)Data[0].Base;
+    Dp   = (UINT32 *)Data[0].Base;
     oLen = remLen;
     if (remLen > Data[0].Len) {
       Status = RETURN_BUFFER_TOO_SMALL;
-      xLen = remLen - Data[0].Len;
-      oLen = remLen = Data[0].Len;
+      xLen   = remLen - Data[0].Len;
+      oLen   = remLen = Data[0].Len;
     }
+
     while (remLen > 0) {
-      *Dp++ = IoRead32 (FW_PORT);
+      *Dp++   = IoRead32 (FW_PORT);
       remLen -= sizeof (UINT32);
     }
+
     Data[0].Len = oLen;
   } else {
     /* No user data, but data returned - drop */
     if (remLen > 0) {
       Status = RETURN_BUFFER_TOO_SMALL;
-      xLen = remLen;
+      xLen   = remLen;
     }
   }
 
   /* Drop additional data */
   while (xLen > 0) {
-    (void) IoRead32 (FW_PORT);
+    (void)IoRead32 (FW_PORT);
     xLen -= sizeof (UINT32);
   }
 
   return Status;
 }
 
-
 STATIC
 RETURN_STATUS
 EFIAPI
-BhyveFwCtl_Msg(
-   IN   UINT32 OpCode,
-   IN   BIO_VEC Sdata[],
-   OUT  BIO_VEC Rdata[]
-   )
+BhyveFwCtl_Msg (
+  IN   UINT32   OpCode,
+  IN   BIO_VEC  Sdata[],
+  OUT  BIO_VEC  Rdata[]
+  )
 {
-  MSG_RX_HDR  Rh;
-  RETURN_STATUS    Status;
+  MSG_RX_HDR     Rh;
+  RETURN_STATUS  Status;
 
   Status = RETURN_SUCCESS;
 
@@ -306,11 +309,11 @@ STATIC
 RETURN_STATUS
 EFIAPI
 BhyveFwCtlGetLen (
-  IN CONST CHAR8  *Name,
-  IN OUT   UINT32 *Size
+  IN CONST CHAR8   *Name,
+  IN OUT   UINT32  *Size
   )
 {
-  BIO_VEC         Req[2], Resp[2];
+  BIO_VEC        Req[2], Resp[2];
   RETURN_STATUS  Status;
 
   Req[0].Base = (VOID *)Name;
@@ -326,7 +329,7 @@ BhyveFwCtlGetLen (
   return Status;
 }
 
-#define FMAXSZ    1024
+#define FMAXSZ  1024
 STATIC struct {
   UINT64    fSize;
   UINT32    fData[FMAXSZ];
@@ -336,18 +339,19 @@ STATIC
 RETURN_STATUS
 EFIAPI
 BhyveFwCtlGetVal (
-  IN CONST CHAR8 *Name,
-  OUT      VOID  *Item,
-  IN OUT   UINT32   *Size
+  IN CONST CHAR8   *Name,
+  OUT      VOID    *Item,
+  IN OUT   UINT32  *Size
   )
 {
-  BIO_VEC         Req[2];
-  BIO_VEC         Resp[2];
+  BIO_VEC        Req[2];
+  BIO_VEC        Resp[2];
   RETURN_STATUS  Status;
 
   /* Make sure temp buffer is larger than passed-in size */
-  if (*Size > sizeof (FwGetvalBuf.fData))
-      return RETURN_INVALID_PARAMETER;
+  if (*Size > sizeof (FwGetvalBuf.fData)) {
+    return RETURN_INVALID_PARAMETER;
+  }
 
   Req[0].Base = (VOID *)Name;
   Req[0].Len  = (UINT32)AsciiStrLen (Name) + 1;
@@ -378,25 +382,25 @@ BhyveFwCtlGetVal (
 RETURN_STATUS
 EFIAPI
 BhyveFwCtlGet (
-  IN   CONST CHAR8 *Name,
-  OUT  VOID        *Item,
-  IN OUT  UINTN    *Size
+  IN   CONST CHAR8  *Name,
+  OUT  VOID         *Item,
+  IN OUT  UINTN     *Size
   )
 {
-  RETURN_STATUS        Status;
+  RETURN_STATUS  Status;
 
-  if (mBhyveFwCtlSupported == FALSE)
+  if (mBhyveFwCtlSupported == FALSE) {
     return RETURN_UNSUPPORTED;
+  }
 
   if (Item == NULL) {
-    Status = BhyveFwCtlGetLen (Name, (UINT32*)Size);
+    Status = BhyveFwCtlGetLen (Name, (UINT32 *)Size);
   } else {
-    Status = BhyveFwCtlGetVal (Name, Item, (UINT32*)Size);
+    Status = BhyveFwCtlGetVal (Name, Item, (UINT32 *)Size);
   }
 
   return Status;
 }
-
 
 /**
    Library initialization. Probe the host to see if the f/w ctl

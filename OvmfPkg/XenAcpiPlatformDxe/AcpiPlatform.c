@@ -25,10 +25,10 @@
 EFI_STATUS
 EFIAPI
 InstallAcpiTables (
-  IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiTable
+  IN   EFI_ACPI_TABLE_PROTOCOL  *AcpiTable
   )
 {
-  EFI_STATUS                         Status;
+  EFI_STATUS  Status;
 
   if (XenDetected ()) {
     Status = InstallXenTables (AcpiTable);
@@ -38,4 +38,3 @@ InstallAcpiTables (
 
   return Status;
 }
-

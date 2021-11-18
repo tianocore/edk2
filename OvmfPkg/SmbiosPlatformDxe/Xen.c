@@ -25,8 +25,8 @@
 EFI_STATUS
 EFIAPI
 XenSmbiosTablePublishEntry (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                Status;
@@ -39,7 +39,7 @@ XenSmbiosTablePublishEntry (
   //
   EntryPointStructure = GetXenSmbiosTables ();
   if (EntryPointStructure != NULL) {
-    SmbiosTables = (UINT8*)(UINTN)EntryPointStructure->TableAddress;
+    SmbiosTables = (UINT8 *)(UINTN)EntryPointStructure->TableAddress;
     if (SmbiosTables != NULL) {
       Status = InstallAllStructures (SmbiosTables);
     }
