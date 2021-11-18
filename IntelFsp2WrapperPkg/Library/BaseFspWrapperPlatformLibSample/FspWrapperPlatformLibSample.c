@@ -93,5 +93,5 @@ CallFspWrapperResetSystem (
   // Perform reset according to the type.
   //
 
-  CpuDeadLoop();
+  CpuDeadLoop ();
 }
