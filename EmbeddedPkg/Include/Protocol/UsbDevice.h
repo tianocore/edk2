@@ -11,7 +11,7 @@
 
 #include <IndustryStandard/Usb.h>
 
-extern EFI_GUID gUsbDeviceProtocolGuid;
+extern EFI_GUID  gUsbDeviceProtocolGuid;
 
 /*
  * Note: This Protocol is just  the bare minimum for Android Fastboot. It
@@ -103,8 +103,8 @@ EFI_STATUS
   );
 
 struct _USB_DEVICE_PROTOCOL {
-  USB_DEVICE_START Start;
-  USB_DEVICE_SEND  Send;
+  USB_DEVICE_START    Start;
+  USB_DEVICE_SEND     Send;
 };
 
 typedef struct _USB_DEVICE_PROTOCOL USB_DEVICE_PROTOCOL;

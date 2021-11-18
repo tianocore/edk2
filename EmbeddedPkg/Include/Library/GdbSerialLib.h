@@ -10,8 +10,6 @@
 #ifndef __GDB_SERIAL_LIB_H__
 #define __GDB_SERIAL_LIB_H__
 
-
-
 /**
   Sets the baud rate, receive FIFO depth, transmit/receive time out, parity,
   data buts, and stop bits on a serial device. This call is optional as the serial
@@ -40,7 +38,6 @@ GdbSerialInit (
   IN UINT8      StopBits
   );
 
-
 /**
   Check to see if a character is available from GDB. Do not read the character as that is
   done via GdbGetChar().
@@ -67,7 +64,6 @@ GdbGetChar (
   VOID
   );
 
-
 /**
   Send a character to GDB. This function must be able to run in interrupt context.
 
@@ -82,7 +78,6 @@ GdbPutChar (
   IN  CHAR8   Char
   );
 
-
 /**
   Send an ASCII string to GDB. This function must be able to run in interrupt context.
 
@@ -96,6 +91,4 @@ GdbPutString (
   IN CHAR8  *String
   );
 
-
 #endif
-

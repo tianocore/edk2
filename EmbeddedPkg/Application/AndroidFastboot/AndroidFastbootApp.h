@@ -14,9 +14,9 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-#define BOOTIMG_KERNEL_ARGS_SIZE 512
+#define BOOTIMG_KERNEL_ARGS_SIZE  512
 
-#define ANDROID_FASTBOOT_VERSION "0.4"
+#define ANDROID_FASTBOOT_VERSION  "0.4"
 
 EFI_STATUS
 BootAndroidBootImg (

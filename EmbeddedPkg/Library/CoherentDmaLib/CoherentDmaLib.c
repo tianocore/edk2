@@ -12,7 +12,6 @@
 #include <Library/DmaLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-
 STATIC
 PHYSICAL_ADDRESS
 HostToDeviceAddress (
@@ -52,17 +51,18 @@ DmaMap (
   OUT    VOID                           **Mapping
   )
 {
-  if (HostAddress == NULL ||
-      NumberOfBytes == NULL ||
-      DeviceAddress == NULL ||
-      Mapping == NULL ) {
+  if ((HostAddress == NULL) ||
+      (NumberOfBytes == NULL) ||
+      (DeviceAddress == NULL) ||
+      (Mapping == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
+
   *DeviceAddress = HostToDeviceAddress (HostAddress);
   *Mapping = NULL;
   return EFI_SUCCESS;
 }
-
 
 /**
   Completes the DmaMapBusMasterRead(), DmaMapBusMasterWrite(), or DmaMapBusMasterCommonBuffer()
@@ -111,7 +111,6 @@ DmaAllocateBuffer (
   return DmaAllocateAlignedBuffer (MemoryType, Pages, 0, HostAddress);
 }
 
-
 /**
   Allocates pages that are suitable for an DmaMap() of type
   MapOperationBusMasterCommonBuffer mapping, at the requested alignment.
@@ -144,8 +143,9 @@ DmaAllocateAlignedBuffer (
     Alignment = EFI_PAGE_SIZE;
   }
 
-  if (HostAddress == NULL ||
-      (Alignment & (Alignment - 1)) != 0) {
+  if ((HostAddress == NULL) ||
+      ((Alignment & (Alignment - 1)) != 0))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -163,9 +163,9 @@ DmaAllocateAlignedBuffer (
   if (*HostAddress == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   return EFI_SUCCESS;
 }
-
 
 /**
   Frees memory that was allocated with DmaAllocateBuffer().
@@ -186,10 +186,9 @@ DmaFreeBuffer (
   )
 {
   if (HostAddress == NULL) {
-     return EFI_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
 
   FreePages (HostAddress, Pages);
   return EFI_SUCCESS;
 }
-

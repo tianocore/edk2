@@ -9,7 +9,7 @@
 #ifndef __ANDROID_FASTBOOT_PLATFORM_H__
 #define __ANDROID_FASTBOOT_PLATFORM_H__
 
-extern EFI_GUID gAndroidFastbootPlatformProtocolGuid;
+extern EFI_GUID  gAndroidFastbootPlatformProtocolGuid;
 
 /*
   Protocol for platform-specific operations initiated by Android Fastboot.
@@ -128,12 +128,12 @@ EFI_STATUS
   );
 
 typedef struct _FASTBOOT_PLATFORM_PROTOCOL {
-  FASTBOOT_PLATFORM_INIT          Init;
-  FASTBOOT_PLATFORM_UN_INIT       UnInit;
-  FASTBOOT_PLATFORM_FLASH         FlashPartition;
-  FASTBOOT_PLATFORM_ERASE         ErasePartition;
-  FASTBOOT_PLATFORM_GETVAR        GetVar;
-  FASTBOOT_PLATFORM_OEM_COMMAND   DoOemCommand;
+  FASTBOOT_PLATFORM_INIT           Init;
+  FASTBOOT_PLATFORM_UN_INIT        UnInit;
+  FASTBOOT_PLATFORM_FLASH          FlashPartition;
+  FASTBOOT_PLATFORM_ERASE          ErasePartition;
+  FASTBOOT_PLATFORM_GETVAR         GetVar;
+  FASTBOOT_PLATFORM_OEM_COMMAND    DoOemCommand;
 } FASTBOOT_PLATFORM_PROTOCOL;
 
 #endif
