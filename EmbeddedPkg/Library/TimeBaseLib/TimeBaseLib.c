@@ -27,22 +27,22 @@ EpochToEfiTime (
   OUT EFI_TIME  *Time
   )
 {
-  UINTN         a;
-  UINTN         b;
-  UINTN         c;
-  UINTN         d;
-  UINTN         g;
-  UINTN         j;
-  UINTN         m;
-  UINTN         y;
-  UINTN         da;
-  UINTN         db;
-  UINTN         dc;
-  UINTN         dg;
-  UINTN         hh;
-  UINTN         mm;
-  UINTN         ss;
-  UINTN         J;
+  UINTN  a;
+  UINTN  b;
+  UINTN  c;
+  UINTN  d;
+  UINTN  g;
+  UINTN  j;
+  UINTN  m;
+  UINTN  y;
+  UINTN  da;
+  UINTN  db;
+  UINTN  dc;
+  UINTN  dg;
+  UINTN  hh;
+  UINTN  mm;
+  UINTN  ss;
+  UINTN  J;
 
   J  = (EpochSeconds / 86400) + 2440588;
   j  = J + 32044;
@@ -65,14 +65,13 @@ EpochToEfiTime (
   ss = EpochSeconds % 60;
   a  = (EpochSeconds - ss) / 60;
   mm = a % 60;
-  b = (a - mm) / 60;
+  b  = (a - mm) / 60;
   hh = b % 24;
 
-  Time->Hour        = (UINT8)hh;
-  Time->Minute      = (UINT8)mm;
-  Time->Second      = (UINT8)ss;
-  Time->Nanosecond  = 0;
-
+  Time->Hour       = (UINT8)hh;
+  Time->Minute     = (UINT8)mm;
+  Time->Second     = (UINT8)ss;
+  Time->Nanosecond = 0;
 }
 
 /**
@@ -89,13 +88,13 @@ EfiGetEpochDays (
   IN  EFI_TIME  *Time
   )
 {
-  UINTN a;
-  UINTN y;
-  UINTN m;
-  UINTN JulianDate;  // Absolute Julian Date representation of the supplied Time
-  UINTN EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
+  UINTN  a;
+  UINTN  y;
+  UINTN  m;
+  UINTN  JulianDate; // Absolute Julian Date representation of the supplied Time
+  UINTN  EpochDays;  // Number of days elapsed since EPOCH_JULIAN_DAY
 
-  a = (14 - Time->Month) / 12 ;
+  a = (14 - Time->Month) / 12;
   y = Time->Year + 4800 - a;
   m = Time->Month + (12*a) - 3;
 
@@ -121,8 +120,8 @@ EfiTimeToEpoch (
   IN  EFI_TIME  *Time
   )
 {
-  UINTN EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
-  UINTN EpochSeconds;
+  UINTN  EpochDays;  // Number of days elapsed since EPOCH_JULIAN_DAY
+  UINTN  EpochSeconds;
 
   EpochDays = EfiGetEpochDays (Time);
 
@@ -144,7 +143,7 @@ EfiTimeToWday (
   IN  EFI_TIME  *Time
   )
 {
-  UINTN EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
+  UINTN  EpochDays;  // Number of days elapsed since EPOCH_JULIAN_DAY
 
   EpochDays = EfiGetEpochDays (Time);
 
@@ -165,7 +164,7 @@ EfiTimeToWday (
 BOOLEAN
 EFIAPI
 IsLeapYear (
-  IN EFI_TIME   *Time
+  IN EFI_TIME  *Time
   )
 {
   if (Time->Year % 4 == 0) {
@@ -198,12 +197,13 @@ IsDayValid (
   IN  EFI_TIME  *Time
   )
 {
-  STATIC CONST INTN DayOfMonth[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  STATIC CONST INTN  DayOfMonth[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-  if (Time->Day < 1 ||
-      Time->Day > DayOfMonth[Time->Month - 1] ||
-      (Time->Month == 2 && (!IsLeapYear (Time) && Time->Day > 28))
-     ) {
+  if ((Time->Day < 1) ||
+      (Time->Day > DayOfMonth[Time->Month - 1]) ||
+      ((Time->Month == 2) && (!IsLeapYear (Time) && (Time->Day > 28)))
+      )
+  {
     return FALSE;
   }
 
@@ -267,21 +267,22 @@ IsValidDaylight (
 BOOLEAN
 EFIAPI
 IsTimeValid (
-  IN EFI_TIME *Time
+  IN EFI_TIME  *Time
   )
 {
   // Check the input parameters are within the range specified by UEFI
   if ((Time->Year  < 2000)              ||
-     (Time->Year   > 2099)              ||
-     (Time->Month  < 1   )              ||
-     (Time->Month  > 12  )              ||
-     (!IsDayValid (Time) )              ||
-     (Time->Hour   > 23  )              ||
-     (Time->Minute > 59  )              ||
-     (Time->Second > 59  )              ||
-     (Time->Nanosecond > 999999999)     ||
-     (!IsValidTimeZone(Time->TimeZone)) ||
-     (!IsValidDaylight(Time->Daylight))) {
+      (Time->Year   > 2099)              ||
+      (Time->Month  < 1)              ||
+      (Time->Month  > 12)              ||
+      (!IsDayValid (Time))              ||
+      (Time->Hour   > 23)              ||
+      (Time->Minute > 59)              ||
+      (Time->Second > 59)              ||
+      (Time->Nanosecond > 999999999)     ||
+      (!IsValidTimeZone (Time->TimeZone)) ||
+      (!IsValidDaylight (Time->Daylight)))
+  {
     return FALSE;
   }
 
