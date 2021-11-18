@@ -12,18 +12,15 @@
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-
 UINTN                   gThunkPpiListSize = 0;
-EFI_PEI_PPI_DESCRIPTOR  *gThunkPpiList = NULL;
-
-
+EFI_PEI_PPI_DESCRIPTOR  *gThunkPpiList    = NULL;
 
 EFI_PEI_PPI_DESCRIPTOR *
 GetThunkPpiList (
   VOID
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   if (gThunkPpiList == NULL) {
     return NULL;
@@ -35,7 +32,6 @@ GetThunkPpiList (
   return gThunkPpiList;
 }
 
-
 EFI_STATUS
 EFIAPI
 AddThunkPpi (
@@ -44,7 +40,7 @@ AddThunkPpi (
   IN  VOID      *Ppi
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   gThunkPpiList = ReallocatePool (
                     gThunkPpiListSize,
@@ -63,8 +59,3 @@ AddThunkPpi (
 
   return EFI_SUCCESS;
 }
-
-
-
-
-
