@@ -13,7 +13,6 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
 
-
 /**
   This function will be called following a call to the
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL Read function.
@@ -30,15 +29,14 @@
 VOID
 EFIAPI
 PlatformFvbDataRead (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
-  IN        EFI_LBA                             Lba,
-  IN        UINTN                               Offset,
-  IN        UINTN                               NumBytes,
-  IN        UINT8                               *Buffer
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  IN        EFI_LBA                              Lba,
+  IN        UINTN                                Offset,
+  IN        UINTN                                NumBytes,
+  IN        UINT8                                *Buffer
   )
 {
 }
-
 
 /**
   This function will be called following a call to the
@@ -54,25 +52,25 @@ PlatformFvbDataRead (
 VOID
 EFIAPI
 PlatformFvbDataWritten (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
-  IN        EFI_LBA                             Lba,
-  IN        UINTN                               Offset,
-  IN        UINTN                               NumBytes,
-  IN        UINT8                               *Buffer
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  IN        EFI_LBA                              Lba,
+  IN        UINTN                                Offset,
+  IN        UINTN                                NumBytes,
+  IN        UINT8                                *Buffer
   )
 {
-  STATIC EFI_EVENT EventToSignal = NULL;
+  STATIC EFI_EVENT  EventToSignal = NULL;
 
   if (!EfiAtRuntime ()) {
     if (EventToSignal == NULL) {
-      EventToSignal = (EFI_EVENT)(UINTN) PcdGet64 (PcdEmuVariableEvent);
+      EventToSignal = (EFI_EVENT)(UINTN)PcdGet64 (PcdEmuVariableEvent);
     }
+
     if (EventToSignal != NULL) {
       gBS->SignalEvent (EventToSignal);
     }
   }
 }
-
 
 /**
   This function will be called following a call to the
@@ -88,10 +86,8 @@ PlatformFvbDataWritten (
 VOID
 EFIAPI
 PlatformFvbBlocksErased (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
-  IN  VA_LIST       List
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  IN  VA_LIST                                    List
   )
 {
 }
-
-

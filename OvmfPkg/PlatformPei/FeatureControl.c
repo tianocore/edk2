@@ -18,7 +18,7 @@
 //
 // The value to be written to the Feature Control MSR, retrieved from fw_cfg.
 //
-STATIC UINT64 mFeatureControlValue;
+STATIC UINT64  mFeatureControlValue;
 
 /**
   Write the Feature Control MSR on an Application Processor or the Boot
@@ -34,7 +34,7 @@ STATIC
 VOID
 EFIAPI
 WriteFeatureControl (
-  IN OUT VOID *WorkSpace
+  IN OUT VOID  *WorkSpace
   )
 {
   AsmWriteMsr64 (MSR_IA32_FEATURE_CONTROL, mFeatureControlValue);
@@ -60,8 +60,8 @@ OnMpServicesAvailable (
   IN VOID                       *Ppi
   )
 {
-  EFI_PEI_MP_SERVICES_PPI *MpServices;
-  EFI_STATUS              Status;
+  EFI_PEI_MP_SERVICES_PPI  *MpServices;
+  EFI_STATUS               Status;
 
   DEBUG ((DEBUG_VERBOSE, "%a: %a\n", gEfiCallerBaseName, __FUNCTION__));
 
@@ -69,15 +69,15 @@ OnMpServicesAvailable (
   // Write the MSR on all the APs in parallel.
   //
   MpServices = Ppi;
-  Status = MpServices->StartupAllAPs (
-                         (CONST EFI_PEI_SERVICES **)PeiServices,
-                         MpServices,
-                         WriteFeatureControl, // Procedure
-                         FALSE,               // SingleThread
-                         0,                   // TimeoutInMicroSeconds: inf.
-                         NULL                 // ProcedureArgument
-                         );
-  if (EFI_ERROR (Status) && Status != EFI_NOT_STARTED) {
+  Status     = MpServices->StartupAllAPs (
+                             (CONST EFI_PEI_SERVICES **)PeiServices,
+                             MpServices,
+                             WriteFeatureControl, // Procedure
+                             FALSE,               // SingleThread
+                             0,                   // TimeoutInMicroSeconds: inf.
+                             NULL                 // ProcedureArgument
+                             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_STARTED)) {
     DEBUG ((DEBUG_ERROR, "%a: StartupAllAps(): %r\n", __FUNCTION__, Status));
     return Status;
   }
@@ -93,7 +93,7 @@ OnMpServicesAvailable (
 // Notification object for registering the callback, for when
 // EFI_PEI_MP_SERVICES_PPI becomes available.
 //
-STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR mMpServicesNotify = {
+STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR  mMpServicesNotify = {
   EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | // Flags
   EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
   &gEfiPeiMpServicesPpiGuid,               // Guid
@@ -105,24 +105,32 @@ InstallFeatureControlCallback (
   VOID
   )
 {
-  EFI_STATUS           Status;
-  FIRMWARE_CONFIG_ITEM FwCfgItem;
-  UINTN                FwCfgSize;
+  EFI_STATUS            Status;
+  FIRMWARE_CONFIG_ITEM  FwCfgItem;
+  UINTN                 FwCfgSize;
 
-  Status = QemuFwCfgFindFile ("etc/msr_feature_control", &FwCfgItem,
-             &FwCfgSize);
-  if (EFI_ERROR (Status) || FwCfgSize != sizeof mFeatureControlValue) {
+  Status = QemuFwCfgFindFile (
+             "etc/msr_feature_control",
+             &FwCfgItem,
+             &FwCfgSize
+             );
+  if (EFI_ERROR (Status) || (FwCfgSize != sizeof mFeatureControlValue)) {
     //
     // Nothing to do.
     //
     return;
   }
+
   QemuFwCfgSelectItem (FwCfgItem);
   QemuFwCfgReadBytes (sizeof mFeatureControlValue, &mFeatureControlValue);
 
   Status = PeiServicesNotifyPpi (&mMpServicesNotify);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to set up MP Services callback: %r\n",
-      __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: failed to set up MP Services callback: %r\n",
+      __FUNCTION__,
+      Status
+      ));
   }
 }

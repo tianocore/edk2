@@ -28,9 +28,9 @@
  */
 
 #ifndef blkif_vdev_t
-#define blkif_vdev_t   UINT16
+#define blkif_vdev_t  UINT16
 #endif
-#define blkif_sector_t UINT64
+#define blkif_sector_t  UINT64
 
 /*
  * Feature and Parameter Negotiation
@@ -415,8 +415,9 @@
 /*
  * REQUEST CODES.
  */
-#define BLKIF_OP_READ              0
-#define BLKIF_OP_WRITE             1
+#define BLKIF_OP_READ   0
+#define BLKIF_OP_WRITE  1
+
 /*
  * All writes issued prior to a request with the BLKIF_OP_WRITE_BARRIER
  * operation code ("barrier request") must be completed prior to the
@@ -425,19 +426,22 @@
  *
  * Optional.  See "feature-barrier" XenBus node documentation above.
  */
-#define BLKIF_OP_WRITE_BARRIER     2
+#define BLKIF_OP_WRITE_BARRIER  2
+
 /*
  * Commit any uncommitted contents of the backing device's volatile cache
  * to stable storage.
  *
  * Optional.  See "feature-flush-cache" XenBus node documentation above.
  */
-#define BLKIF_OP_FLUSH_DISKCACHE   3
+#define BLKIF_OP_FLUSH_DISKCACHE  3
+
 /*
  * Used in SLES sources for device specific command packet
  * contained within the request. Reserved for that purpose.
  */
-#define BLKIF_OP_RESERVED_1        4
+#define BLKIF_OP_RESERVED_1  4
+
 /*
  * Indicate to the backend device that a region of storage is no longer in
  * use, and may be discarded at any time without impact to the client.  If
@@ -458,7 +462,7 @@
  * "discard-granularity", and "discard-secure" in the XenBus node
  * documentation above.
  */
-#define BLKIF_OP_DISCARD           5
+#define BLKIF_OP_DISCARD  5
 
 /*
  * Recognized if "feature-max-indirect-segments" in present in the backend
@@ -482,19 +486,19 @@
  * If a backend does not recognize BLKIF_OP_INDIRECT, it should *not*
  * create the "feature-max-indirect-segments" node!
  */
-#define BLKIF_OP_INDIRECT          6
+#define BLKIF_OP_INDIRECT  6
 
 /*
  * Maximum scatter/gather segments per request.
  * This is carefully chosen so that sizeof(blkif_ring_t) <= PAGE_SIZE.
  * NB. This could be 12 if the ring indexes weren't stored in the same page.
  */
-#define BLKIF_MAX_SEGMENTS_PER_REQUEST 11
+#define BLKIF_MAX_SEGMENTS_PER_REQUEST  11
 
 /*
  * Maximum number of indirect pages to use per request.
  */
-#define BLKIF_MAX_INDIRECT_PAGES_PER_REQUEST 8
+#define BLKIF_MAX_INDIRECT_PAGES_PER_REQUEST  8
 
 /*
  * NB. first_sect and last_sect in blkif_request_segment, as well as
@@ -505,31 +509,32 @@
  * 512-byte units.
  */
 struct blkif_request_segment {
-    grant_ref_t gref;        /* reference to I/O buffer frame        */
-    /* @first_sect: first sector in frame to transfer (inclusive).   */
-    /* @last_sect: last sector in frame to transfer (inclusive).     */
-    UINT8     first_sect, last_sect;
+  grant_ref_t    gref;       /* reference to I/O buffer frame        */
+  /* @first_sect: first sector in frame to transfer (inclusive).   */
+  /* @last_sect: last sector in frame to transfer (inclusive).     */
+  UINT8          first_sect, last_sect;
 };
 
 /*
  * Starting ring element for any I/O request.
  */
-#if defined(MDE_CPU_IA32)
+#if defined (MDE_CPU_IA32)
 //
 // pack(4) is necessary when these structs are compiled for Ia32.
 // Without it, the struct will have a different alignment than the one
 // a backend expect for a 32bit guest.
 //
-#pragma pack(4)
+  #pragma pack(4)
 #endif
 struct blkif_request {
-    UINT8        operation;    /* BLKIF_OP_???                         */
-    UINT8        nr_segments;  /* number of segments                   */
-    blkif_vdev_t   handle;       /* only for read/write requests         */
-    UINT64       id;           /* private guest value, echoed in resp  */
-    blkif_sector_t sector_number;/* start sector idx on disk (r/w only)  */
-    struct blkif_request_segment seg[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+  UINT8                           operation;     /* BLKIF_OP_???                         */
+  UINT8                           nr_segments;   /* number of segments                   */
+  blkif_vdev_t                    handle;        /* only for read/write requests         */
+  UINT64                          id;            /* private guest value, echoed in resp  */
+  blkif_sector_t                  sector_number; /* start sector idx on disk (r/w only)  */
+  struct blkif_request_segment    seg[BLKIF_MAX_SEGMENTS_PER_REQUEST];
 };
+
 typedef struct blkif_request blkif_request_t;
 
 /*
@@ -537,58 +542,61 @@ typedef struct blkif_request blkif_request_t;
  * sizeof(struct blkif_request_discard) <= sizeof(struct blkif_request)
  */
 struct blkif_request_discard {
-    UINT8        operation;    /* BLKIF_OP_DISCARD                     */
-    UINT8        flag;         /* BLKIF_DISCARD_SECURE or zero         */
-#define BLKIF_DISCARD_SECURE (1<<0)  /* ignored if discard-secure=0      */
-    blkif_vdev_t   handle;       /* same as for read/write requests      */
-    UINT64       id;           /* private guest value, echoed in resp  */
-    blkif_sector_t sector_number;/* start sector idx on disk             */
-    UINT64       nr_sectors;   /* number of contiguous sectors to discard*/
+  UINT8             operation;         /* BLKIF_OP_DISCARD                     */
+  UINT8             flag;              /* BLKIF_DISCARD_SECURE or zero         */
+  #define BLKIF_DISCARD_SECURE  (1<<0) /* ignored if discard-secure=0      */
+  blkif_vdev_t      handle;            /* same as for read/write requests      */
+  UINT64            id;                /* private guest value, echoed in resp  */
+  blkif_sector_t    sector_number;     /* start sector idx on disk             */
+  UINT64            nr_sectors;        /* number of contiguous sectors to discard*/
 };
+
 typedef struct blkif_request_discard blkif_request_discard_t;
 
 struct blkif_request_indirect {
-    UINT8        operation;    /* BLKIF_OP_INDIRECT                    */
-    UINT8        indirect_op;  /* BLKIF_OP_{READ/WRITE}                */
-    UINT16       nr_segments;  /* number of segments                   */
-    UINT64       id;           /* private guest value, echoed in resp  */
-    blkif_sector_t sector_number;/* start sector idx on disk (r/w only)  */
-    blkif_vdev_t   handle;       /* same as for read/write requests      */
-    grant_ref_t    indirect_grefs[BLKIF_MAX_INDIRECT_PAGES_PER_REQUEST];
-#ifdef MDE_CPU_IA32
-    UINT64       pad;          /* Make it 64 byte aligned on i386      */
-#endif
+  UINT8             operation;     /* BLKIF_OP_INDIRECT                    */
+  UINT8             indirect_op;   /* BLKIF_OP_{READ/WRITE}                */
+  UINT16            nr_segments;   /* number of segments                   */
+  UINT64            id;            /* private guest value, echoed in resp  */
+  blkif_sector_t    sector_number; /* start sector idx on disk (r/w only)  */
+  blkif_vdev_t      handle;        /* same as for read/write requests      */
+  grant_ref_t       indirect_grefs[BLKIF_MAX_INDIRECT_PAGES_PER_REQUEST];
+ #ifdef MDE_CPU_IA32
+  UINT64            pad;       /* Make it 64 byte aligned on i386      */
+ #endif
 };
+
 typedef struct blkif_request_indirect blkif_request_indirect_t;
 
 struct blkif_response {
-    UINT64        id;              /* copied from request */
-    UINT8         operation;       /* copied from request */
-    INT16         status;          /* BLKIF_RSP_???       */
+  UINT64    id;                    /* copied from request */
+  UINT8     operation;             /* copied from request */
+  INT16     status;                /* BLKIF_RSP_???       */
 };
+
 typedef struct blkif_response blkif_response_t;
-#if defined(MDE_CPU_IA32)
-#pragma pack()
+#if defined (MDE_CPU_IA32)
+  #pragma pack()
 #endif
 
 /*
  * STATUS RETURN CODES.
  */
- /* Operation not supported (only happens on barrier writes). */
+/* Operation not supported (only happens on barrier writes). */
 #define BLKIF_RSP_EOPNOTSUPP  -2
- /* Operation failed for some unspecified reason (-EIO). */
-#define BLKIF_RSP_ERROR       -1
- /* Operation completed successfully. */
-#define BLKIF_RSP_OKAY         0
+/* Operation failed for some unspecified reason (-EIO). */
+#define BLKIF_RSP_ERROR  -1
+/* Operation completed successfully. */
+#define BLKIF_RSP_OKAY  0
 
 /*
  * Generate blkif ring structures and types.
  */
-DEFINE_RING_TYPES(blkif, struct blkif_request, struct blkif_response);
+DEFINE_RING_TYPES (blkif, struct blkif_request, struct blkif_response);
 
-#define VDISK_CDROM        0x1
-#define VDISK_REMOVABLE    0x2
-#define VDISK_READONLY     0x4
+#define VDISK_CDROM      0x1
+#define VDISK_REMOVABLE  0x2
+#define VDISK_READONLY   0x4
 
 #endif /* __XEN_PUBLIC_IO_BLKIF_H__ */
 

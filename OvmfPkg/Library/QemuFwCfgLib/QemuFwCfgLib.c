@@ -19,7 +19,6 @@
 
 #include "QemuFwCfgLibInternal.h"
 
-
 /**
   Selects a firmware configuration item for reading.
 
@@ -32,11 +31,11 @@
 VOID
 EFIAPI
 QemuFwCfgSelectItem (
-  IN FIRMWARE_CONFIG_ITEM   QemuFwCfgItem
+  IN FIRMWARE_CONFIG_ITEM  QemuFwCfgItem
   )
 {
-  DEBUG ((DEBUG_INFO, "Select Item: 0x%x\n", (UINT16)(UINTN) QemuFwCfgItem));
-  IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)(UINTN) QemuFwCfgItem);
+  DEBUG ((DEBUG_INFO, "Select Item: 0x%x\n", (UINT16)(UINTN)QemuFwCfgItem));
+  IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)(UINTN)QemuFwCfgItem);
 }
 
 /**
@@ -49,17 +48,17 @@ QemuFwCfgSelectItem (
 VOID
 EFIAPI
 InternalQemuFwCfgReadBytes (
-  IN UINTN                  Size,
-  IN VOID                   *Buffer  OPTIONAL
+  IN UINTN  Size,
+  IN VOID   *Buffer  OPTIONAL
   )
 {
-  if (InternalQemuFwCfgDmaIsAvailable () && Size <= MAX_UINT32) {
+  if (InternalQemuFwCfgDmaIsAvailable () && (Size <= MAX_UINT32)) {
     InternalQemuFwCfgDmaBytes ((UINT32)Size, Buffer, FW_CFG_DMA_CTL_READ);
     return;
   }
+
   IoReadFifo8 (FW_CFG_IO_DATA, Size, Buffer);
 }
-
 
 /**
   Reads firmware configuration bytes into a buffer
@@ -75,8 +74,8 @@ InternalQemuFwCfgReadBytes (
 VOID
 EFIAPI
 QemuFwCfgReadBytes (
-  IN UINTN                  Size,
-  IN VOID                   *Buffer
+  IN UINTN  Size,
+  IN VOID   *Buffer
   )
 {
   if (InternalQemuFwCfgIsAvailable ()) {
@@ -100,19 +99,19 @@ QemuFwCfgReadBytes (
 VOID
 EFIAPI
 QemuFwCfgWriteBytes (
-  IN UINTN                  Size,
-  IN VOID                   *Buffer
+  IN UINTN  Size,
+  IN VOID   *Buffer
   )
 {
   if (InternalQemuFwCfgIsAvailable ()) {
-    if (InternalQemuFwCfgDmaIsAvailable () && Size <= MAX_UINT32) {
+    if (InternalQemuFwCfgDmaIsAvailable () && (Size <= MAX_UINT32)) {
       InternalQemuFwCfgDmaBytes ((UINT32)Size, Buffer, FW_CFG_DMA_CTL_WRITE);
       return;
     }
+
     IoWriteFifo8 (FW_CFG_IO_DATA, Size, Buffer);
   }
 }
-
 
 /**
   Skip bytes in the firmware configuration item.
@@ -126,17 +125,17 @@ QemuFwCfgWriteBytes (
 VOID
 EFIAPI
 QemuFwCfgSkipBytes (
-  IN UINTN                  Size
+  IN UINTN  Size
   )
 {
-  UINTN ChunkSize;
-  UINT8 SkipBuffer[256];
+  UINTN  ChunkSize;
+  UINT8  SkipBuffer[256];
 
   if (!InternalQemuFwCfgIsAvailable ()) {
     return;
   }
 
-  if (InternalQemuFwCfgDmaIsAvailable () && Size <= MAX_UINT32) {
+  if (InternalQemuFwCfgDmaIsAvailable () && (Size <= MAX_UINT32)) {
     InternalQemuFwCfgDmaBytes ((UINT32)Size, NULL, FW_CFG_DMA_CTL_SKIP);
     return;
   }
@@ -157,7 +156,6 @@ QemuFwCfgSkipBytes (
   }
 }
 
-
 /**
   Reads a UINT8 firmware configuration value
 
@@ -170,13 +168,12 @@ QemuFwCfgRead8 (
   VOID
   )
 {
-  UINT8 Result;
+  UINT8  Result;
 
   QemuFwCfgReadBytes (sizeof (Result), &Result);
 
   return Result;
 }
-
 
 /**
   Reads a UINT16 firmware configuration value
@@ -190,13 +187,12 @@ QemuFwCfgRead16 (
   VOID
   )
 {
-  UINT16 Result;
+  UINT16  Result;
 
   QemuFwCfgReadBytes (sizeof (Result), &Result);
 
   return Result;
 }
-
 
 /**
   Reads a UINT32 firmware configuration value
@@ -210,13 +206,12 @@ QemuFwCfgRead32 (
   VOID
   )
 {
-  UINT32 Result;
+  UINT32  Result;
 
   QemuFwCfgReadBytes (sizeof (Result), &Result);
 
   return Result;
 }
-
 
 /**
   Reads a UINT64 firmware configuration value
@@ -230,13 +225,12 @@ QemuFwCfgRead64 (
   VOID
   )
 {
-  UINT64 Result;
+  UINT64  Result;
 
   QemuFwCfgReadBytes (sizeof (Result), &Result);
 
   return Result;
 }
-
 
 /**
   Find the configuration item corresponding to the firmware configuration file.
@@ -259,8 +253,8 @@ QemuFwCfgFindFile (
   OUT  UINTN                 *Size
   )
 {
-  UINT32 Count;
-  UINT32 Idx;
+  UINT32  Count;
+  UINT32  Idx;
 
   if (!InternalQemuFwCfgIsAvailable ()) {
     return RETURN_UNSUPPORTED;
@@ -270,15 +264,15 @@ QemuFwCfgFindFile (
   Count = SwapBytes32 (QemuFwCfgRead32 ());
 
   for (Idx = 0; Idx < Count; ++Idx) {
-    UINT32 FileSize;
-    UINT16 FileSelect;
-    UINT16 FileReserved;
-    CHAR8  FName[QEMU_FW_CFG_FNAME_SIZE];
+    UINT32  FileSize;
+    UINT16  FileSelect;
+    UINT16  FileReserved;
+    CHAR8   FName[QEMU_FW_CFG_FNAME_SIZE];
 
     FileSize     = QemuFwCfgRead32 ();
     FileSelect   = QemuFwCfgRead16 ();
     FileReserved = QemuFwCfgRead16 ();
-    (VOID) FileReserved; /* Force a do-nothing reference. */
+    (VOID)FileReserved;  /* Force a do-nothing reference. */
     InternalQemuFwCfgReadBytes (sizeof (FName), FName);
 
     if (AsciiStrCmp (Name, FName) == 0) {

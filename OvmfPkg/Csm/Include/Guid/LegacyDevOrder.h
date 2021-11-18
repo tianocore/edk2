@@ -23,17 +23,17 @@ typedef UINT8 BBS_TYPE;
 
 #pragma pack(1)
 typedef struct {
-  BBS_TYPE  BbsType;
+  BBS_TYPE    BbsType;
   ///
   /// Length = sizeof (UINT16) + sizeof (Data)
   ///
-  UINT16    Length;
-  UINT16    Data[1];
+  UINT16      Length;
+  UINT16      Data[1];
 } LEGACY_DEV_ORDER_ENTRY;
 #pragma pack()
 
-#define VAR_LEGACY_DEV_ORDER L"LegacyDevOrder"
+#define VAR_LEGACY_DEV_ORDER  L"LegacyDevOrder"
 
-extern EFI_GUID gEfiLegacyDevOrderVariableGuid;
+extern EFI_GUID  gEfiLegacyDevOrderVariableGuid;
 
 #endif

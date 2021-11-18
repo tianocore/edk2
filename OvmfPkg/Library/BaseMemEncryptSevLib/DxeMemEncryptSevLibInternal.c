@@ -17,12 +17,12 @@
 #include <Register/Cpuid.h>
 #include <Uefi/UefiBaseType.h>
 
-STATIC BOOLEAN mSevStatus = FALSE;
-STATIC BOOLEAN mSevEsStatus = FALSE;
-STATIC BOOLEAN mSevStatusChecked = FALSE;
+STATIC BOOLEAN  mSevStatus   = FALSE;
+STATIC BOOLEAN  mSevEsStatus = FALSE;
+STATIC BOOLEAN  mSevStatusChecked = FALSE;
 
-STATIC UINT64  mSevEncryptionMask = 0;
-STATIC BOOLEAN mSevEncryptionMaskSaved = FALSE;
+STATIC UINT64   mSevEncryptionMask = 0;
+STATIC BOOLEAN  mSevEncryptionMaskSaved = FALSE;
 
 /**
   Reads and sets the status of SEV features.

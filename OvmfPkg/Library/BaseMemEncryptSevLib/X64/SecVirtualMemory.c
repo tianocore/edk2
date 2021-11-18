@@ -25,9 +25,9 @@ InternalGetMemEncryptionAddressMask (
   VOID
   )
 {
-  UINT64                            EncryptionMask;
+  UINT64  EncryptionMask;
 
-  EncryptionMask = MemEncryptSevGetEncryptionMask ();
+  EncryptionMask  = MemEncryptSevGetEncryptionMask ();
   EncryptionMask &= PAGING_1G_ADDRESS_MASK_64;
 
   return EncryptionMask;
@@ -52,9 +52,9 @@ InternalGetMemEncryptionAddressMask (
 RETURN_STATUS
 EFIAPI
 InternalMemEncryptSevSetMemoryDecrypted (
-  IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
-  IN  PHYSICAL_ADDRESS        PhysicalAddress,
-  IN  UINTN                   Length
+  IN  PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  UINTN             Length
   )
 {
   //
@@ -84,9 +84,9 @@ InternalMemEncryptSevSetMemoryDecrypted (
 RETURN_STATUS
 EFIAPI
 InternalMemEncryptSevSetMemoryEncrypted (
-  IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
-  IN  PHYSICAL_ADDRESS        PhysicalAddress,
-  IN  UINTN                   Length
+  IN  PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  UINTN             Length
   )
 {
   //
@@ -114,9 +114,9 @@ InternalMemEncryptSevSetMemoryEncrypted (
 RETURN_STATUS
 EFIAPI
 InternalMemEncryptSevClearMmioPageEncMask (
-  IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
-  IN  PHYSICAL_ADDRESS        PhysicalAddress,
-  IN  UINTN                   Length
+  IN  PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS  PhysicalAddress,
+  IN  UINTN             Length
   )
 {
   //

@@ -17,16 +17,16 @@
   {0xa3edc05d, 0xb618, 0x4ff6, {0x95, 0x52, 0x76, 0xd7, 0x88, 0x63, 0x43, 0xc8}}
 
 typedef struct {
-  VOID    *SetupBuf;
-  VOID    *KernelBuf;
-  CHAR8   *CommandLine;
-  VOID    *InitrdData;
-  UINTN   SetupSize;
-  UINTN   KernelInitialSize;
-  UINTN   InitrdSize;
-  UINTN   CommandLineSize;
+  VOID     *SetupBuf;
+  VOID     *KernelBuf;
+  CHAR8    *CommandLine;
+  VOID     *InitrdData;
+  UINTN    SetupSize;
+  UINTN    KernelInitialSize;
+  UINTN    InitrdSize;
+  UINTN    CommandLineSize;
 } OVMF_LOADED_X86_LINUX_KERNEL;
 
-extern EFI_GUID gOvmfLoadedX86LinuxKernelProtocolGuid;
+extern EFI_GUID  gOvmfLoadedX86LinuxKernelProtocolGuid;
 
 #endif
