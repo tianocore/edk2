@@ -30,7 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_PEI_PPI_DESCRIPTOR *
 EFIAPI
 SecPlatformMain (
-  IN OUT   EFI_SEC_PEI_HAND_OFF        *SecCoreData
+  IN OUT   EFI_SEC_PEI_HAND_OFF  *SecCoreData
   );
 
 /**
@@ -47,9 +47,9 @@ SecPlatformMain (
 EFI_STATUS
 EFIAPI
 SecPlatformInformation (
-  IN CONST EFI_PEI_SERVICES                     **PeiServices,
-  IN OUT   UINT64                               *StructureSize,
-     OUT   EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
+  IN CONST EFI_PEI_SERVICES                  **PeiServices,
+  IN OUT   UINT64                            *StructureSize,
+  OUT   EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
   );
 
 /**

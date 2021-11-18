@@ -77,5 +77,5 @@ GetCpuSteppingId (
 
   AsmCpuid (CPUID_VERSION_INFO, &Eax.Uint32, NULL, NULL, NULL);
 
-  return (UINT8) Eax.Bits.SteppingId;
+  return (UINT8)Eax.Bits.SteppingId;
 }
