@@ -21,13 +21,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 TpmCommHashAll (
-  IN  CONST UINT8                   *Data,
-  IN        UINTN                   DataLen,
-  OUT       TPM_DIGEST              *Digest
+  IN  CONST UINT8       *Data,
+  IN        UINTN       DataLen,
+  OUT       TPM_DIGEST  *Digest
   )
 {
-  VOID     *Sha1Ctx;
-  UINTN    CtxSize;
+  VOID   *Sha1Ctx;
+  UINTN  CtxSize;
 
   CtxSize = Sha1GetContextSize ();
   Sha1Ctx = AllocatePool (CtxSize);
@@ -41,4 +41,3 @@ TpmCommHashAll (
 
   return EFI_SUCCESS;
 }
-

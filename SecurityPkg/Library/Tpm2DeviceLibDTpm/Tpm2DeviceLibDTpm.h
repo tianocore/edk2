@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 TPM2_PTP_INTERFACE_TYPE
 Tpm2GetPtpInterface (
-  IN VOID *Register
+  IN VOID  *Register
   );
 
 /**
@@ -31,7 +31,7 @@ Tpm2GetPtpInterface (
 **/
 UINT8
 Tpm2GetIdleByPass (
-  IN VOID *Register
+  IN VOID  *Register
   );
 
 /**

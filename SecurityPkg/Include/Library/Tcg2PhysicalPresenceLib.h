@@ -18,13 +18,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // UEFI TCG2 library definition bit of the BIOS TPM Management Flags
 //
 // BIT0 is reserved
-#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CLEAR               BIT1
+#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CLEAR  BIT1
 // BIT2 is reserved
-#define TCG2_LIB_PP_FLAG_RESET_TRACK                                      BIT3
-#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_TURN_ON             BIT4
-#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_TURN_OFF            BIT5
-#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_EPS          BIT6
-#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_PCRS         BIT7
+#define TCG2_LIB_PP_FLAG_RESET_TRACK                               BIT3
+#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_TURN_ON      BIT4
+#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_TURN_OFF     BIT5
+#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_EPS   BIT6
+#define TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_PCRS  BIT7
 
 //
 // UEFI TCG2 library definition bit of the BIOS Information Flags
@@ -55,7 +55,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 VOID
 EFIAPI
 Tcg2PhysicalPresenceLibProcessRequest (
-  IN      TPM2B_AUTH                     *PlatformAuth  OPTIONAL
+  IN      TPM2B_AUTH  *PlatformAuth  OPTIONAL
   );
 
 /**
@@ -99,8 +99,8 @@ Tcg2PhysicalPresenceLibGetManagementFlags (
 UINT32
 EFIAPI
 Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
-  OUT UINT32                *MostRecentRequest,
-  OUT UINT32                *Response
+  OUT UINT32  *MostRecentRequest,
+  OUT UINT32  *Response
   );
 
 /**
@@ -120,8 +120,8 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   **/
 UINT32
 Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
-  IN OUT UINT32               *OperationRequest,
-  IN OUT UINT32               *RequestParameter
+  IN OUT UINT32  *OperationRequest,
+  IN OUT UINT32  *RequestParameter
   );
 
 /**
@@ -142,8 +142,8 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
 UINT32
 EFIAPI
 Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 RequestParameter
+  IN UINT32  OperationRequest,
+  IN UINT32  RequestParameter
   );
 
 /**
@@ -161,7 +161,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
 UINT32
 EFIAPI
 Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
-  IN UINT32                 OperationRequest
+  IN UINT32  OperationRequest
   );
 
 #endif

@@ -36,10 +36,10 @@ typedef enum {
 EFI_STATUS
 EFIAPI
 Tpm2SubmitCommand (
-  IN UINT32            InputParameterBlockSize,
-  IN UINT8             *InputParameterBlock,
-  IN OUT UINT32        *OutputParameterBlockSize,
-  IN UINT8             *OutputParameterBlock
+  IN UINT32      InputParameterBlockSize,
+  IN UINT8       *InputParameterBlock,
+  IN OUT UINT32  *OutputParameterBlockSize,
+  IN UINT8       *OutputParameterBlock
   );
 
 /**
@@ -69,7 +69,7 @@ Tpm2RequestUseTpm (
 **/
 typedef
 EFI_STATUS
-(EFIAPI *TPM2_SUBMIT_COMMAND) (
+(EFIAPI *TPM2_SUBMIT_COMMAND)(
   IN UINT32            InputParameterBlockSize,
   IN UINT8             *InputParameterBlock,
   IN OUT UINT32        *OutputParameterBlockSize,
@@ -85,14 +85,14 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *TPM2_REQUEST_USE_TPM) (
+(EFIAPI *TPM2_REQUEST_USE_TPM)(
   VOID
   );
 
 typedef struct {
-  EFI_GUID                           ProviderGuid;
-  TPM2_SUBMIT_COMMAND                Tpm2SubmitCommand;
-  TPM2_REQUEST_USE_TPM               Tpm2RequestUseTpm;
+  EFI_GUID                ProviderGuid;
+  TPM2_SUBMIT_COMMAND     Tpm2SubmitCommand;
+  TPM2_REQUEST_USE_TPM    Tpm2RequestUseTpm;
 } TPM2_DEVICE_INTERFACE;
 
 /**
@@ -107,7 +107,7 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 Tpm2RegisterTpm2DeviceLib (
-  IN TPM2_DEVICE_INTERFACE   *Tpm2Device
+  IN TPM2_DEVICE_INTERFACE  *Tpm2Device
   );
 
 #endif

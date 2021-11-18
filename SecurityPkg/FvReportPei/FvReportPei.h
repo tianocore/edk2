@@ -48,7 +48,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 typedef
 BOOLEAN
-(EFIAPI *HASH_ALL_METHOD) (
+(EFIAPI *HASH_ALL_METHOD)(
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
@@ -66,7 +66,7 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *HASH_INIT_METHOD) (
+(EFIAPI *HASH_INIT_METHOD)(
   OUT  VOID  *HashContext
   );
 
@@ -84,7 +84,7 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *HASH_UPDATE_METHOD) (
+(EFIAPI *HASH_UPDATE_METHOD)(
   IN OUT  VOID        *HashContext,
   IN      CONST VOID  *Data,
   IN      UINTN       DataSize
@@ -104,19 +104,18 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *HASH_FINAL_METHOD) (
+(EFIAPI *HASH_FINAL_METHOD)(
   IN OUT  VOID   *HashContext,
   OUT     UINT8  *HashValue
   );
 
 typedef struct {
-  UINT16              HashAlgId;
-  UINTN               HashSize;
-  HASH_INIT_METHOD    HashInit;
-  HASH_UPDATE_METHOD  HashUpdate;
-  HASH_FINAL_METHOD   HashFinal;
-  HASH_ALL_METHOD     HashAll;
+  UINT16                HashAlgId;
+  UINTN                 HashSize;
+  HASH_INIT_METHOD      HashInit;
+  HASH_UPDATE_METHOD    HashUpdate;
+  HASH_FINAL_METHOD     HashFinal;
+  HASH_ALL_METHOD       HashAll;
 } HASH_ALG_INFO;
 
 #endif //__FV_REPORT_PEI_H__
-

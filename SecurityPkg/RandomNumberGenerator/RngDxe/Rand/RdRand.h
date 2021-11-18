@@ -36,8 +36,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 RdRandGenerateEntropy (
-  IN UINTN         Length,
-  OUT UINT8        *Entropy
+  IN UINTN   Length,
+  OUT UINT8  *Entropy
   );
 
-#endif  // __RD_RAND_H__
+#endif // __RD_RAND_H__

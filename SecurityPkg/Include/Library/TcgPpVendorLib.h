@@ -18,40 +18,40 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // The definition of physical presence operation actions
 //
-#define TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION                         128
+#define TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION  128
 
 //
 // The definition bit of the BIOS TPM Management Flags
 //
-#define TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION                    BIT0
-#define TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR                        BIT1
-#define TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_MAINTENANCE                  BIT2
-#define TCG_VENDOR_LIB_FLAG_RESET_TRACK                                  BIT3
+#define TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_PROVISION    BIT0
+#define TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_CLEAR        BIT1
+#define TCG_BIOS_TPM_MANAGEMENT_FLAG_NO_PPI_MAINTENANCE  BIT2
+#define TCG_VENDOR_LIB_FLAG_RESET_TRACK                  BIT3
 
 //
 // The definition for TPM Operation Response to OS Environment
 //
-#define TCG_PP_OPERATION_RESPONSE_SUCCESS              0x0
-#define TCG_PP_OPERATION_RESPONSE_USER_ABORT           0xFFFFFFF0
-#define TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE         0xFFFFFFF1
+#define TCG_PP_OPERATION_RESPONSE_SUCCESS       0x0
+#define TCG_PP_OPERATION_RESPONSE_USER_ABORT    0xFFFFFFF0
+#define TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE  0xFFFFFFF1
 
 //
 // The return code for Submit TPM Request to Pre-OS Environment
 // and Submit TPM Request to Pre-OS Environment 2
 //
-#define TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS                                  0
-#define TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED                          1
-#define TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE                          2
-#define TCG_PP_SUBMIT_REQUEST_TO_PREOS_BLOCKED_BY_BIOS_SETTINGS                 3
+#define TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS                   0
+#define TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED           1
+#define TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE           2
+#define TCG_PP_SUBMIT_REQUEST_TO_PREOS_BLOCKED_BY_BIOS_SETTINGS  3
 
 //
 // The return code for Get User Confirmation Status for Operation
 //
-#define TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED                                 0
-#define TCG_PP_GET_USER_CONFIRMATION_BIOS_ONLY                                       1
-#define TCG_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION                   2
-#define TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_REQUIRED                     3
-#define TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_NOT_REQUIRED                 4
+#define TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED                  0
+#define TCG_PP_GET_USER_CONFIRMATION_BIOS_ONLY                        1
+#define TCG_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION    2
+#define TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_REQUIRED      3
+#define TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_NOT_REQUIRED  4
 
 /**
   Check and execute the requested physical presence command.
@@ -73,9 +73,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 UINT32
 EFIAPI
 TcgPpVendorLibExecutePendingRequest (
-  IN UINT32                 OperationRequest,
-  IN OUT UINT32             *ManagementFlags,
-  OUT BOOLEAN               *ResetRequired
+  IN UINT32      OperationRequest,
+  IN OUT UINT32  *ManagementFlags,
+  OUT BOOLEAN    *ResetRequired
   );
 
 /**
@@ -99,9 +99,9 @@ TcgPpVendorLibExecutePendingRequest (
 BOOLEAN
 EFIAPI
 TcgPpVendorLibHasValidRequest (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 ManagementFlags,
-  OUT BOOLEAN               *RequestConfirmed
+  IN UINT32    OperationRequest,
+  IN UINT32    ManagementFlags,
+  OUT BOOLEAN  *RequestConfirmed
   );
 
 /**
@@ -124,8 +124,8 @@ TcgPpVendorLibHasValidRequest (
 UINT32
 EFIAPI
 TcgPpVendorLibSubmitRequestToPreOSFunction (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 ManagementFlags
+  IN UINT32  OperationRequest,
+  IN UINT32  ManagementFlags
   );
 
 /**
@@ -146,8 +146,8 @@ TcgPpVendorLibSubmitRequestToPreOSFunction (
 UINT32
 EFIAPI
 TcgPpVendorLibGetUserConfirmationStatusFunction (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 ManagementFlags
+  IN UINT32  OperationRequest,
+  IN UINT32  ManagementFlags
   );
 
 #endif

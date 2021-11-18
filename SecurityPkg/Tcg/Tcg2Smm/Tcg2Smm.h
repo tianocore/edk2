@@ -37,14 +37,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // The definition for TCG MOR
 //
-#define ACPI_FUNCTION_DSM_MEMORY_CLEAR_INTERFACE                   1
-#define ACPI_FUNCTION_PTS_CLEAR_MOR_BIT                            2
+#define ACPI_FUNCTION_DSM_MEMORY_CLEAR_INTERFACE  1
+#define ACPI_FUNCTION_PTS_CLEAR_MOR_BIT           2
 
 //
 // The return code for Memory Clear Interface Functions
 //
-#define MOR_REQUEST_SUCCESS                                        0
-#define MOR_REQUEST_GENERAL_FAILURE                                1
+#define MOR_REQUEST_SUCCESS          0
+#define MOR_REQUEST_GENERAL_FAILURE  1
 
 /**
   Notify the system that the SMM variable driver is ready.
@@ -84,4 +84,4 @@ InitializeTcgCommon (
   VOID
   );
 
-#endif  // __TCG_SMM_H__
+#endif // __TCG_SMM_H__
