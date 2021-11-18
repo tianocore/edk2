@@ -28,4 +28,3 @@ StandaloneMmSmiHandlerProfileLibConstructor (
 {
   return MmSmiHandlerProfileLibInitialization ();
 }
-

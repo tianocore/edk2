@@ -89,7 +89,6 @@ DebuggerExtPciCFGB (
   return EFI_DEBUG_CONTINUE;
 }
 
-
 /**
 
   DebuggerCommand - CFGW.

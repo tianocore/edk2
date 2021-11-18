@@ -77,7 +77,7 @@ BOOLEAN
   IN  CHAR16                   *DriverName,
   OUT CHAR16                   **NewName,
   OUT BOOLEAN                  *EmptyLineAfter
-);
+  );
 
 /**
   Search the drivers in the system which need to show in the front page

@@ -8,13 +8,14 @@
 **/
 #include "InternalS3SaveState.h"
 
-EFI_HANDLE                    mHandle = NULL;
-EFI_S3_SAVE_STATE_PROTOCOL    mS3SaveState = {
+EFI_HANDLE                  mHandle = NULL;
+EFI_S3_SAVE_STATE_PROTOCOL  mS3SaveState = {
   BootScriptWrite,
   BootScriptInsert,
   BootScriptLabel,
   BootScriptCompare
-  };
+};
+
 /**
   Internal function to add IO write opcode to the table.
 
@@ -30,18 +31,19 @@ BootScriptWriteIoWrite (
   IN VA_LIST                       Marker
   )
 {
-  S3_BOOT_SCRIPT_LIB_WIDTH Width;
-  UINT64                Address;
-  UINTN                 Count;
-  UINT8                 *Buffer;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT64                    Address;
+  UINTN                     Count;
+  UINT8                     *Buffer;
 
-  Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-  Address     = VA_ARG (Marker, UINT64);
-  Count       = VA_ARG (Marker, UINTN);
-  Buffer      = VA_ARG (Marker, UINT8 *);
+  Width   = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Address = VA_ARG (Marker, UINT64);
+  Count   = VA_ARG (Marker, UINTN);
+  Buffer  = VA_ARG (Marker, UINT8 *);
 
   return S3BootScriptSaveIoWrite (Width, Address, Count, Buffer);
 }
+
 /**
   Internal function to add IO read/write opcode to the table.
 
@@ -57,15 +59,15 @@ BootScriptWriteIoReadWrite (
   IN VA_LIST                       Marker
   )
 {
-  S3_BOOT_SCRIPT_LIB_WIDTH Width;
-  UINT64                Address;
-  UINT8                 *Data;
-  UINT8                 *DataMask;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT64                    Address;
+  UINT8                     *Data;
+  UINT8                     *DataMask;
 
-  Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-  Address     = VA_ARG (Marker, UINT64);
-  Data        = VA_ARG (Marker, UINT8 *);
-  DataMask    = VA_ARG (Marker, UINT8 *);
+  Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Address  = VA_ARG (Marker, UINT64);
+  Data     = VA_ARG (Marker, UINT8 *);
+  DataMask = VA_ARG (Marker, UINT8 *);
 
   return S3BootScriptSaveIoReadWrite (Width, Address, Data, DataMask);
 }
@@ -85,15 +87,15 @@ BootScriptWriteMemWrite (
   IN VA_LIST                       Marker
   )
 {
-  S3_BOOT_SCRIPT_LIB_WIDTH Width;
-  UINT64                Address;
-  UINTN                 Count;
-  UINT8                 *Buffer;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT64                    Address;
+  UINTN                     Count;
+  UINT8                     *Buffer;
 
-  Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-  Address     = VA_ARG (Marker, UINT64);
-  Count       = VA_ARG (Marker, UINTN);
-  Buffer      = VA_ARG (Marker, UINT8 *);
+  Width   = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Address = VA_ARG (Marker, UINT64);
+  Count   = VA_ARG (Marker, UINTN);
+  Buffer  = VA_ARG (Marker, UINT8 *);
 
   return S3BootScriptSaveMemWrite (Width, Address, Count, Buffer);
 }
@@ -113,15 +115,15 @@ BootScriptWriteMemReadWrite (
   IN VA_LIST                       Marker
   )
 {
-  S3_BOOT_SCRIPT_LIB_WIDTH Width;
-  UINT64                Address;
-  UINT8                 *Data;
-  UINT8                 *DataMask;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT64                    Address;
+  UINT8                     *Data;
+  UINT8                     *DataMask;
 
-  Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-  Address     = VA_ARG (Marker, UINT64);
-  Data        = VA_ARG (Marker, UINT8 *);
-  DataMask    = VA_ARG (Marker, UINT8 *);
+  Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Address  = VA_ARG (Marker, UINT64);
+  Data     = VA_ARG (Marker, UINT8 *);
+  DataMask = VA_ARG (Marker, UINT8 *);
 
   return S3BootScriptSaveMemReadWrite (Width, Address, Data, DataMask);
 }
@@ -141,15 +143,15 @@ BootScriptWritePciCfgWrite (
   IN VA_LIST                       Marker
   )
 {
-  S3_BOOT_SCRIPT_LIB_WIDTH Width;
-  UINT64                Address;
-  UINTN                 Count;
-  UINT8                 *Buffer;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT64                    Address;
+  UINTN                     Count;
+  UINT8                     *Buffer;
 
-  Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-  Address     = VA_ARG (Marker, UINT64);
-  Count       = VA_ARG (Marker, UINTN);
-  Buffer      = VA_ARG (Marker, UINT8 *);
+  Width   = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Address = VA_ARG (Marker, UINT64);
+  Count   = VA_ARG (Marker, UINTN);
+  Buffer  = VA_ARG (Marker, UINT8 *);
 
   return S3BootScriptSavePciCfgWrite (Width, Address, Count, Buffer);
 }
@@ -169,18 +171,19 @@ BootScriptWritePciCfgReadWrite (
   IN VA_LIST                       Marker
   )
 {
-  S3_BOOT_SCRIPT_LIB_WIDTH Width;
-  UINT64                Address;
-  UINT8                 *Data;
-  UINT8                 *DataMask;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT64                    Address;
+  UINT8                     *Data;
+  UINT8                     *DataMask;
 
-  Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-  Address     = VA_ARG (Marker, UINT64);
-  Data        = VA_ARG (Marker, UINT8 *);
-  DataMask    = VA_ARG (Marker, UINT8 *);
+  Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Address  = VA_ARG (Marker, UINT64);
+  Data     = VA_ARG (Marker, UINT8 *);
+  DataMask = VA_ARG (Marker, UINT8 *);
 
   return S3BootScriptSavePciCfgReadWrite (Width, Address, Data, DataMask);
 }
+
 /**
   Internal function to add PciCfg2 write opcode to the table.
 
@@ -196,17 +199,17 @@ BootScriptWritePciCfg2Write (
   IN VA_LIST                       Marker
   )
 {
-  S3_BOOT_SCRIPT_LIB_WIDTH Width;
-  UINT64                Address;
-  UINTN                 Count;
-  UINT8                 *Buffer;
-  UINT16                Segment;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT64                    Address;
+  UINTN                     Count;
+  UINT8                     *Buffer;
+  UINT16                    Segment;
 
-  Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-  Segment     = VA_ARG (Marker, UINT16);
-  Address     = VA_ARG (Marker, UINT64);
-  Count       = VA_ARG (Marker, UINTN);
-  Buffer      = VA_ARG (Marker, UINT8 *);
+  Width   = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Segment = VA_ARG (Marker, UINT16);
+  Address = VA_ARG (Marker, UINT64);
+  Count   = VA_ARG (Marker, UINTN);
+  Buffer  = VA_ARG (Marker, UINT8 *);
 
   return S3BootScriptSavePciCfg2Write (Width, Segment, Address, Count, Buffer);
 }
@@ -226,20 +229,21 @@ BootScriptWritePciCfg2ReadWrite (
   IN VA_LIST                       Marker
   )
 {
-  S3_BOOT_SCRIPT_LIB_WIDTH Width;
-  UINT16                Segment;
-  UINT64                Address;
-  UINT8                 *Data;
-  UINT8                 *DataMask;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT16                    Segment;
+  UINT64                    Address;
+  UINT8                     *Data;
+  UINT8                     *DataMask;
 
-  Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-  Segment     = VA_ARG (Marker, UINT16);
-  Address     = VA_ARG (Marker, UINT64);
-  Data        = VA_ARG (Marker, UINT8 *);
-  DataMask    = VA_ARG (Marker, UINT8 *);
+  Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Segment  = VA_ARG (Marker, UINT16);
+  Address  = VA_ARG (Marker, UINT64);
+  Data     = VA_ARG (Marker, UINT8 *);
+  DataMask = VA_ARG (Marker, UINT8 *);
 
   return S3BootScriptSavePciCfg2ReadWrite (Width, Segment, Address, Data, DataMask);
 }
+
 /**
   Internal function to add smbus execute opcode to the table.
 
@@ -259,20 +263,21 @@ BootScriptWriteSmbusExecute (
   EFI_SMBUS_DEVICE_COMMAND  Command;
   EFI_SMBUS_OPERATION       Operation;
   BOOLEAN                   PecCheck;
-  VOID                     *Buffer;
-  UINTN                    *DataSize;
+  VOID                      *Buffer;
+  UINTN                     *DataSize;
   UINTN                     SmBusAddress;
 
   SlaveAddress.SmbusDeviceAddress = VA_ARG (Marker, UINTN);
-  Command                         = VA_ARG (Marker, EFI_SMBUS_DEVICE_COMMAND);
-  Operation                       = VA_ARG (Marker, EFI_SMBUS_OPERATION);
-  PecCheck                        = VA_ARG (Marker, BOOLEAN);
-  SmBusAddress                    = SMBUS_LIB_ADDRESS (SlaveAddress.SmbusDeviceAddress,Command,0,PecCheck);
-  DataSize                        = VA_ARG (Marker, UINTN *);
-  Buffer                          = VA_ARG (Marker, VOID *);
+  Command      = VA_ARG (Marker, EFI_SMBUS_DEVICE_COMMAND);
+  Operation    = VA_ARG (Marker, EFI_SMBUS_OPERATION);
+  PecCheck     = VA_ARG (Marker, BOOLEAN);
+  SmBusAddress = SMBUS_LIB_ADDRESS (SlaveAddress.SmbusDeviceAddress, Command, 0, PecCheck);
+  DataSize     = VA_ARG (Marker, UINTN *);
+  Buffer = VA_ARG (Marker, VOID *);
 
   return S3BootScriptSaveSmbusExecute (SmBusAddress, Operation, DataSize, Buffer);
 }
+
 /**
   Internal function to add stall opcode to the table.
 
@@ -288,9 +293,9 @@ BootScriptWriteStall (
   IN VA_LIST                       Marker
   )
 {
-  UINT32                Duration;
+  UINT32  Duration;
 
-  Duration    = VA_ARG (Marker, UINT32);
+  Duration = VA_ARG (Marker, UINT32);
 
   return S3BootScriptSaveStall (Duration);
 }
@@ -311,9 +316,9 @@ BootScriptWriteDispatch (
   IN VA_LIST                       Marker
   )
 {
-  VOID        *EntryPoint;
+  VOID  *EntryPoint;
 
-  EntryPoint = (VOID*)(UINTN)VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
+  EntryPoint = (VOID *)(UINTN)VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
   return S3BootScriptSaveDispatch (EntryPoint);
 }
 
@@ -332,8 +337,8 @@ BootScriptWriteMemPoll (
   IN VA_LIST                       Marker
   )
 {
-  S3_BOOT_SCRIPT_LIB_WIDTH   Width;
-  UINT64                     Address;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT64                    Address;
   VOID                      *Data;
   VOID                      *DataMask;
   UINT64                    Delay;
@@ -361,10 +366,10 @@ BootScriptWriteMemPoll (
     //
     // If Remainder is not zero, LoopTimes will be rounded up by 1.
     //
-    LoopTimes +=1;
+    LoopTimes += 1;
   }
-  return S3BootScriptSaveMemPoll (Width, Address, DataMask, Data, 1, LoopTimes);
 
+  return S3BootScriptSaveMemPoll (Width, Address, DataMask, Data, 1, LoopTimes);
 }
 
 /**
@@ -383,14 +388,15 @@ BootScriptWriteDispatch2 (
   IN VA_LIST                       Marker
   )
 {
-  VOID                  *EntryPoint;
-  VOID                  *Context;
+  VOID  *EntryPoint;
+  VOID  *Context;
 
-  EntryPoint = (VOID*)(UINTN)VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
-  Context    = (VOID*)(UINTN)VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
+  EntryPoint = (VOID *)(UINTN)VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
+  Context    = (VOID *)(UINTN)VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
 
   return S3BootScriptSaveDispatch2 (EntryPoint, Context);
 }
+
 /**
   Internal function to add INFORAMTION opcode node to the table
   list.
@@ -411,8 +417,9 @@ BootScriptWriteInformation (
 
   InformationLength = VA_ARG (Marker, UINT32);
   Information = VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
-  return S3BootScriptSaveInformation (InformationLength, (VOID*)(UINTN)Information);
+  return S3BootScriptSaveInformation (InformationLength, (VOID *)(UINTN)Information);
 }
+
 /**
   Internal function to add IO poll opcode node  to the table
   @param  Marker                The variable argument list to get the opcode
@@ -427,20 +434,21 @@ BootScriptWriteIoPoll (
   IN VA_LIST                       Marker
   )
 {
-   S3_BOOT_SCRIPT_LIB_WIDTH     Width;
-   UINT64                     Address;
-   VOID                      *Data;
-   VOID                      *DataMask;
-   UINT64                     Delay;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT64                    Address;
+  VOID                      *Data;
+  VOID                      *DataMask;
+  UINT64                    Delay;
 
-   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-   Address  = VA_ARG (Marker, UINT64);
-   Data     = VA_ARG (Marker, VOID *);
-   DataMask = VA_ARG (Marker, VOID *);
-   Delay    = (UINT64)VA_ARG (Marker, UINT64);
+  Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Address  = VA_ARG (Marker, UINT64);
+  Data     = VA_ARG (Marker, VOID *);
+  DataMask = VA_ARG (Marker, VOID *);
+  Delay    = (UINT64)VA_ARG (Marker, UINT64);
 
-   return S3BootScriptSaveIoPoll (Width, Address, Data, DataMask, Delay);
+  return S3BootScriptSaveIoPoll (Width, Address, Data, DataMask, Delay);
 }
+
 /**
   Internal function to add PCI config poll opcode node to the table
 
@@ -456,21 +464,21 @@ BootScriptWritePciConfigPoll (
   IN VA_LIST                       Marker
   )
 {
-   S3_BOOT_SCRIPT_LIB_WIDTH   Width;
-   UINT64                     Address;
-   VOID                      *Data;
-   VOID                      *DataMask;
-   UINT64                     Delay;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT64                    Address;
+  VOID                      *Data;
+  VOID                      *DataMask;
+  UINT64                    Delay;
 
+  Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Address  = VA_ARG (Marker, UINT64);
+  Data     = VA_ARG (Marker, VOID *);
+  DataMask = VA_ARG (Marker, VOID *);
+  Delay    = (UINT64)VA_ARG (Marker, UINT64);
 
-   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-   Address  = VA_ARG (Marker, UINT64);
-   Data     = VA_ARG (Marker, VOID *);
-   DataMask = VA_ARG (Marker, VOID *);
-   Delay    = (UINT64)VA_ARG (Marker, UINT64);
-
-   return S3BootScriptSavePciPoll (Width, Address, Data, DataMask, Delay);
+  return S3BootScriptSavePciPoll (Width, Address, Data, DataMask, Delay);
 }
+
 /**
   Internal function to add PCI config 2 poll opcode node to the table
 
@@ -486,23 +494,22 @@ BootScriptWritePciConfig2Poll (
   IN VA_LIST                       Marker
   )
 {
-   S3_BOOT_SCRIPT_LIB_WIDTH      Width;
-   UINT16                        Segment;
-   UINT64                        Address;
-   VOID                         *Data;
-   VOID                         *DataMask;
-   UINT64                        Delay;
+  S3_BOOT_SCRIPT_LIB_WIDTH  Width;
+  UINT16                    Segment;
+  UINT64                    Address;
+  VOID                      *Data;
+  VOID                      *DataMask;
+  UINT64                    Delay;
 
-   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
-   Segment  = VA_ARG (Marker, UINT16);
-   Address  = VA_ARG (Marker, UINT64);
-   Data     = VA_ARG (Marker, VOID *);
-   DataMask = VA_ARG (Marker, VOID *);
-   Delay    = (UINT64)VA_ARG (Marker, UINT64);
+  Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Segment  = VA_ARG (Marker, UINT16);
+  Address  = VA_ARG (Marker, UINT64);
+  Data     = VA_ARG (Marker, VOID *);
+  DataMask = VA_ARG (Marker, VOID *);
+  Delay    = (UINT64)VA_ARG (Marker, UINT64);
 
-   return S3BootScriptSavePci2Poll (Width, Segment, Address, Data, DataMask, Delay);
+  return S3BootScriptSavePci2Poll (Width, Segment, Address, Data, DataMask, Delay);
 }
-
 
 /**
   Adds a record into S3 boot script table.
@@ -539,123 +546,124 @@ BootScriptWrite (
   ...
   )
 {
-  EFI_STATUS                Status;
-  VA_LIST                   Marker;
+  EFI_STATUS  Status;
+  VA_LIST     Marker;
+
   //
   // Build script according to opcode
   //
   switch (OpCode) {
+    case EFI_BOOT_SCRIPT_IO_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteIoWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_IO_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteIoWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteIoReadWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteIoReadWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteMemWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteMemWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_MEM_READ_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteMemReadWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_MEM_READ_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteMemReadWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciCfgWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciCfgWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciCfgReadWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciCfgReadWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_SMBUS_EXECUTE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteSmbusExecute (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_SMBUS_EXECUTE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteSmbusExecute (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_STALL_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteStall (Marker);
+      VA_END (Marker);
 
-  case EFI_BOOT_SCRIPT_STALL_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteStall (Marker);
-    VA_END (Marker);
+      break;
 
-    break;
+    case EFI_BOOT_SCRIPT_DISPATCH_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteDispatch (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_DISPATCH_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteDispatch (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_DISPATCH_2_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteDispatch2 (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_DISPATCH_2_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteDispatch2 (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_INFORMATION_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteInformation (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_INFORMATION_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteInformation (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_MEM_POLL_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteMemPoll (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_MEM_POLL_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteMemPoll (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciCfg2Write (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciCfg2Write (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciCfg2ReadWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciCfg2ReadWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_IO_POLL_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteIoPoll (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_IO_POLL_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteIoPoll (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG_POLL_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciConfigPoll (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG_POLL_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciConfigPoll (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciConfig2Poll (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciConfig2Poll (Marker);
-    VA_END (Marker);
-    break;
-
-  default:
-    Status = EFI_INVALID_PARAMETER;
-    break;
+    default:
+      Status = EFI_INVALID_PARAMETER;
+      break;
   }
 
   return Status;
 }
+
 /**
   Insert a record into a specified Framework boot script table.
 
@@ -694,126 +702,128 @@ BootScriptInsert (
   ...
   )
 {
-  EFI_STATUS                Status;
-  VA_LIST                   Marker;
+  EFI_STATUS  Status;
+  VA_LIST     Marker;
+
   //
   // Build script according to opcode
   //
   switch (OpCode) {
+    case EFI_BOOT_SCRIPT_IO_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteIoWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_IO_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteIoWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteIoReadWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteIoReadWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteMemWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteMemWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_MEM_READ_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteMemReadWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_MEM_READ_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteMemReadWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciCfgWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciCfgWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciCfgReadWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciCfgReadWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_SMBUS_EXECUTE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteSmbusExecute (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_SMBUS_EXECUTE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteSmbusExecute (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_STALL_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteStall (Marker);
+      VA_END (Marker);
 
-  case EFI_BOOT_SCRIPT_STALL_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteStall (Marker);
-    VA_END (Marker);
+      break;
 
-    break;
+    case EFI_BOOT_SCRIPT_DISPATCH_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteDispatch (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_DISPATCH_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteDispatch (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_DISPATCH_2_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteDispatch2 (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_DISPATCH_2_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteDispatch2 (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_INFORMATION_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteInformation (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_INFORMATION_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteInformation (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_MEM_POLL_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteMemPoll (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_MEM_POLL_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteMemPoll (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciCfg2Write (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG2_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciCfg2Write (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciCfg2ReadWrite (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG2_READ_WRITE_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciCfg2ReadWrite (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_IO_POLL_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWriteIoPoll (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_IO_POLL_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWriteIoPoll (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG_POLL_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciConfigPoll (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG_POLL_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciConfigPoll (Marker);
-    VA_END (Marker);
-    break;
+    case EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL_OPCODE:
+      VA_START (Marker, OpCode);
+      Status = BootScriptWritePciConfig2Poll (Marker);
+      VA_END (Marker);
+      break;
 
-  case EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL_OPCODE:
-    VA_START (Marker, OpCode);
-    Status = BootScriptWritePciConfig2Poll (Marker);
-    VA_END (Marker);
-    break;
-
-  default:
-    Status = EFI_INVALID_PARAMETER;
-    break;
+    default:
+      Status = EFI_INVALID_PARAMETER;
+      break;
   }
 
   if (!EFI_ERROR (Status)) {
-   Status = S3BootScriptMoveLastOpcode (BeforeOrAfter, (VOID **)Position);
+    Status = S3BootScriptMoveLastOpcode (BeforeOrAfter, (VOID **)Position);
   }
+
   return Status;
 }
+
 /**
   Find a label within the boot script table and, if not present, optionally create it.
 
@@ -853,6 +863,7 @@ BootScriptLabel (
 {
   return S3BootScriptLabel (BeforeOrAfter, CreateIfNotFound, (VOID **)Position, Label);
 }
+
 /**
   Compare two positions in the boot script table and return their relative position.
 
@@ -881,6 +892,7 @@ BootScriptCompare (
 {
   return S3BootScriptCompare (Position1, Position2, RelativePosition);
 }
+
 /**
   This routine is entry point of ScriptSave driver.
 
@@ -899,8 +911,8 @@ InitializeS3SaveState (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  EFI_STATUS    Status;
-  EFI_EVENT     EndOfDxeEvent;
+  EFI_STATUS  Status;
+  EFI_EVENT   EndOfDxeEvent;
 
   if (!PcdGetBool (PcdAcpiS3Enable)) {
     return EFI_UNSUPPORTED;
@@ -916,13 +928,10 @@ InitializeS3SaveState (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  return  gBS->InstallProtocolInterface (
-                  &mHandle,
-                  &gEfiS3SaveStateProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &mS3SaveState
-                  );
-
+  return gBS->InstallProtocolInterface (
+                &mHandle,
+                &gEfiS3SaveStateProtocolGuid,
+                EFI_NATIVE_INTERFACE,
+                &mS3SaveState
+                );
 }
-
-

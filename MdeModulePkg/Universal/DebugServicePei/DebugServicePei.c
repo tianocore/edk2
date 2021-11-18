@@ -17,12 +17,12 @@
 
 #include "DebugService.h"
 
-EDKII_DEBUG_PPI mDebugPpi = {
+EDKII_DEBUG_PPI  mDebugPpi = {
   PeiDebugBPrint,
   PeiDebugAssert
 };
 
-EFI_PEI_PPI_DESCRIPTOR mDebugServicePpi = {
+EFI_PEI_PPI_DESCRIPTOR  mDebugServicePpi = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEdkiiDebugPpiGuid,
   (VOID *)&mDebugPpi
@@ -39,13 +39,13 @@ EFI_PEI_PPI_DESCRIPTOR mDebugServicePpi = {
 **/
 VOID
 EFIAPI
-PeiDebugBPrint(
+PeiDebugBPrint (
   IN UINTN                          ErrorLevel,
   IN CONST CHAR8                    *Format,
   IN BASE_LIST                      Marker
   )
 {
-  DebugBPrint(ErrorLevel, Format, Marker);
+  DebugBPrint (ErrorLevel, Format, Marker);
 }
 
 /**
@@ -61,13 +61,13 @@ PeiDebugBPrint(
 **/
 VOID
 EFIAPI
-PeiDebugAssert(
+PeiDebugAssert (
   IN CONST CHAR8                    *FileName,
   IN UINTN                          LineNumber,
   IN CONST CHAR8                    *Description
   )
 {
-  DebugAssert(FileName, LineNumber, Description);
+  DebugAssert (FileName, LineNumber, Description);
 }
 
 /**
@@ -91,4 +91,3 @@ DebugSerivceInitialize (
 {
   return PeiServicesInstallPpi (&mDebugServicePpi);
 }
-

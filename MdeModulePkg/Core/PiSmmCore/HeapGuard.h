@@ -53,15 +53,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Each entry occupies 8B/64b. 1-page can hold 512 entries, which spans 9
 // bits in address. (512 = 1 << 9)
 //
-#define BYTE_LENGTH_SHIFT                   3             // (8 = 1 << 3)
+#define BYTE_LENGTH_SHIFT  3                              // (8 = 1 << 3)
 
 #define GUARDED_HEAP_MAP_TABLE_ENTRY_SHIFT  \
         (EFI_PAGE_SHIFT - BYTE_LENGTH_SHIFT)
 
-#define GUARDED_HEAP_MAP_TABLE_DEPTH        5
+#define GUARDED_HEAP_MAP_TABLE_DEPTH  5
 
 // Use UINT64_index + bit_index_of_UINT64 to locate the bit in may
-#define GUARDED_HEAP_MAP_ENTRY_BIT_SHIFT    6             // (64 = 1 << 6)
+#define GUARDED_HEAP_MAP_ENTRY_BIT_SHIFT  6               // (64 = 1 << 6)
 
 #define GUARDED_HEAP_MAP_ENTRY_BITS         \
         (1 << GUARDED_HEAP_MAP_ENTRY_BIT_SHIFT)
@@ -154,8 +154,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Memory type to guard (matching the related PCD definition)
 //
-#define GUARD_HEAP_TYPE_PAGE        BIT2
-#define GUARD_HEAP_TYPE_POOL        BIT3
+#define GUARD_HEAP_TYPE_PAGE  BIT2
+#define GUARD_HEAP_TYPE_POOL  BIT3
 
 //
 // Debug message level
@@ -163,10 +163,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define HEAP_GUARD_DEBUG_LEVEL  (DEBUG_POOL|DEBUG_PAGE)
 
 typedef struct {
-  UINT32                TailMark;
-  UINT32                HeadMark;
-  EFI_PHYSICAL_ADDRESS  Address;
-  LIST_ENTRY            Link;
+  UINT32                  TailMark;
+  UINT32                  HeadMark;
+  EFI_PHYSICAL_ADDRESS    Address;
+  LIST_ENTRY              Link;
 } HEAP_GUARD_NODE;
 
 /**
@@ -387,6 +387,6 @@ VerifyMemoryGuard (
   IN  UINTN                     NumberOfPages
   );
 
-extern BOOLEAN mOnGuarding;
+extern BOOLEAN  mOnGuarding;
 
 #endif

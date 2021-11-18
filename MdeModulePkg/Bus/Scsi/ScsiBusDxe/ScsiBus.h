@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _SCSI_BUS_H_
 #define _SCSI_BUS_H_
 
-
 #include <Uefi.h>
 
 #include <Protocol/ScsiPassThru.h>
@@ -31,22 +30,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/Scsi.h>
 
-#define SCSI_IO_DEV_SIGNATURE SIGNATURE_32 ('s', 'c', 'i', 'o')
+#define SCSI_IO_DEV_SIGNATURE  SIGNATURE_32 ('s', 'c', 'i', 'o')
 
 typedef union {
-  UINT32  Scsi;
-  UINT8   ExtScsi[4];
+  UINT32    Scsi;
+  UINT8     ExtScsi[4];
 } SCSI_ID;
 
 typedef struct _SCSI_TARGET_ID {
-  SCSI_ID ScsiId;
-  UINT8   ExtScsiId[12];
-}SCSI_TARGET_ID;
-
+  SCSI_ID    ScsiId;
+  UINT8      ExtScsiId[12];
+} SCSI_TARGET_ID;
 
 typedef struct {
-   VOID   *Data1;
-   VOID   *Data2;
+  VOID    *Data1;
+  VOID    *Data2;
 } SCSI_EVENT_DATA;
 
 //
@@ -57,7 +55,7 @@ typedef struct {
 //
 // SCSI Bus Timeout Experience Value
 //
-#define SCSI_BUS_TIMEOUT           EFI_TIMER_PERIOD_SECONDS (3)
+#define SCSI_BUS_TIMEOUT  EFI_TIMER_PERIOD_SECONDS (3)
 
 //
 // The ScsiBusProtocol is just used to locate ScsiBusDev
@@ -67,16 +65,16 @@ typedef struct {
 // gEfiCallerIdGuid will be used as its protocol guid.
 //
 typedef struct _EFI_SCSI_BUS_PROTOCOL {
-  UINT64  Reserved;
+  UINT64    Reserved;
 } EFI_SCSI_BUS_PROTOCOL;
 
 typedef struct _SCSI_BUS_DEVICE {
-  UINTN                                 Signature;
-  EFI_SCSI_BUS_PROTOCOL                 BusIdentify;
-  BOOLEAN                               ExtScsiSupport;
-  EFI_SCSI_PASS_THRU_PROTOCOL           *ScsiInterface;
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL       *ExtScsiInterface;
-  EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
+  UINTN                              Signature;
+  EFI_SCSI_BUS_PROTOCOL              BusIdentify;
+  BOOLEAN                            ExtScsiSupport;
+  EFI_SCSI_PASS_THRU_PROTOCOL        *ScsiInterface;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL    *ExtScsiInterface;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
 } SCSI_BUS_DEVICE;
 
 #define SCSI_BUS_CONTROLLER_DEVICE_FROM_THIS(a)  CR (a, SCSI_BUS_DEVICE, BusIdentify, SCSI_BUS_DEVICE_SIGNATURE)
@@ -191,6 +189,7 @@ SCSIBusDriverBindingStop (
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 

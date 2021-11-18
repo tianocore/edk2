@@ -47,6 +47,7 @@ typedef struct {
 //
 // Functions
 //
+
 /**
   Provide the functionality of the variable services.
 

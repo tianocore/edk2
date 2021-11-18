@@ -14,13 +14,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef enum {
   VarCheckRequestReserved0 = 0,
   VarCheckRequestReserved1 = 1,
-  VarCheckFromTrusted = 2,
-  VarCheckFromUntrusted = 3,
+  VarCheckFromTrusted      = 2,
+  VarCheckFromUntrusted    = 3,
 } VAR_CHECK_REQUEST_SOURCE;
 
 typedef
 VOID
-(EFIAPI *VAR_CHECK_END_OF_DXE_CALLBACK) (
+(EFIAPI *VAR_CHECK_END_OF_DXE_CALLBACK)(
   VOID
   );
 

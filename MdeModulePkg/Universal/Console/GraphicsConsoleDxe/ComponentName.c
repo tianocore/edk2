@@ -20,14 +20,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gGraphicsConsoleCompo
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gGraphicsConsoleComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) GraphicsConsoleComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) GraphicsConsoleComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gGraphicsConsoleComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)GraphicsConsoleComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)GraphicsConsoleComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mGraphicsConsoleDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mGraphicsConsoleDriverNameTable[] = {
   {
     "eng;en",
     (CHAR16 *)L"Graphics Console Driver"

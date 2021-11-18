@@ -6,19 +6,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
 //
 // Private Data Types
 //
-#define IMAGE_FILE_HANDLE_SIGNATURE       SIGNATURE_32('i','m','g','f')
+#define IMAGE_FILE_HANDLE_SIGNATURE  SIGNATURE_32('i','m','g','f')
 typedef struct {
-  UINTN               Signature;
-  BOOLEAN             FreeBuffer;
-  VOID                *Source;
-  UINTN               SourceSize;
+  UINTN      Signature;
+  BOOLEAN    FreeBuffer;
+  VOID       *Source;
+  UINTN      SourceSize;
 } IMAGE_FILE_HANDLE;
 
 #endif

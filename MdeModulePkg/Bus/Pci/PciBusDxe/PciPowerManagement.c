@@ -31,11 +31,11 @@ ResetPowerManagementFeature (
   PowerManagementRegBlock = 0;
 
   Status = LocateCapabilityRegBlock (
-            PciIoDevice,
-            EFI_PCI_CAPABILITY_ID_PMI,
-            &PowerManagementRegBlock,
-            NULL
-            );
+             PciIoDevice,
+             EFI_PCI_CAPABILITY_ID_PMI,
+             &PowerManagementRegBlock,
+             NULL
+             );
 
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
@@ -77,6 +77,6 @@ ResetPowerManagementFeature (
                                       &PowerManagementCSR
                                       );
   }
+
   return Status;
 }
-

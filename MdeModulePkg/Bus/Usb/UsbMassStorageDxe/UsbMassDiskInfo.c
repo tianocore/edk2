@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "UsbMass.h"
 
-EFI_DISK_INFO_PROTOCOL gUsbDiskInfoProtocolTemplate = {
+EFI_DISK_INFO_PROTOCOL  gUsbDiskInfoProtocolTemplate = {
   EFI_DISK_INFO_USB_INTERFACE_GUID,
   UsbDiskInfoInquiry,
   UsbDiskInfoIdentify,
@@ -32,7 +32,6 @@ InitializeDiskInfo (
 {
   CopyMem (&UsbMass->DiskInfo, &gUsbDiskInfoProtocolTemplate, sizeof (gUsbDiskInfoProtocolTemplate));
 }
-
 
 /**
   Provides inquiry information for the controller type.
@@ -58,20 +57,20 @@ UsbDiskInfoInquiry (
   IN OUT UINT32                   *InquiryDataSize
   )
 {
-  EFI_STATUS        Status;
-  USB_MASS_DEVICE   *UsbMass;
+  EFI_STATUS       Status;
+  USB_MASS_DEVICE  *UsbMass;
 
-  UsbMass  = USB_MASS_DEVICE_FROM_DISK_INFO (This);
+  UsbMass = USB_MASS_DEVICE_FROM_DISK_INFO (This);
 
   Status = EFI_BUFFER_TOO_SMALL;
   if (*InquiryDataSize >= sizeof (UsbMass->InquiryData)) {
     Status = EFI_SUCCESS;
     CopyMem (InquiryData, &UsbMass->InquiryData, sizeof (UsbMass->InquiryData));
   }
+
   *InquiryDataSize = sizeof (UsbMass->InquiryData);
   return Status;
 }
-
 
 /**
   Provides identify information for the controller type.
@@ -131,7 +130,6 @@ UsbDiskInfoSenseData (
   return EFI_NOT_FOUND;
 }
 
-
 /**
   This function is used to get controller information.
 
@@ -153,4 +151,3 @@ UsbDiskInfoWhichIde (
 {
   return EFI_UNSUPPORTED;
 }
-

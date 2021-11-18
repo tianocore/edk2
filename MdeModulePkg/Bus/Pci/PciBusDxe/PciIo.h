@@ -569,7 +569,7 @@ SupportPaletteSnoopAttributes (
 EFI_STATUS
 EFIAPI
 PciIoAttributes (
-  IN EFI_PCI_IO_PROTOCOL                       * This,
+  IN EFI_PCI_IO_PROTOCOL                       *This,
   IN  EFI_PCI_IO_PROTOCOL_ATTRIBUTE_OPERATION  Operation,
   IN  UINT64                                   Attributes,
   OUT UINT64                                   *Result OPTIONAL
@@ -600,7 +600,7 @@ PciIoAttributes (
 EFI_STATUS
 EFIAPI
 PciIoGetBarAttributes (
-  IN EFI_PCI_IO_PROTOCOL             * This,
+  IN EFI_PCI_IO_PROTOCOL             *This,
   IN  UINT8                          BarIndex,
   OUT UINT64                         *Supports, OPTIONAL
   OUT VOID                           **Resources OPTIONAL
@@ -639,7 +639,6 @@ PciIoSetBarAttributes (
   IN OUT UINT64                       *Offset,
   IN OUT UINT64                       *Length
   );
-
 
 /**
   Test whether two Pci devices has same parent bridge.

@@ -46,24 +46,24 @@
 //
 // Default block size for RAM disk
 //
-#define RAM_DISK_DEFAULT_BLOCK_SIZE 512
+#define RAM_DISK_DEFAULT_BLOCK_SIZE  512
 
 //
 // RamDiskDxe driver maintains a list of registered RAM disks.
 //
-extern  LIST_ENTRY                RegisteredRamDisks;
+extern  LIST_ENTRY  RegisteredRamDisks;
 
 //
 // Pointers to the EFI_ACPI_TABLE_PROTOCOL and EFI_ACPI_SDT_PROTOCOL.
 //
-extern  EFI_ACPI_TABLE_PROTOCOL   *mAcpiTableProtocol;
-extern  EFI_ACPI_SDT_PROTOCOL     *mAcpiSdtProtocol;
+extern  EFI_ACPI_TABLE_PROTOCOL  *mAcpiTableProtocol;
+extern  EFI_ACPI_SDT_PROTOCOL    *mAcpiSdtProtocol;
 
 //
 // RAM Disk create method.
 //
 typedef enum _RAM_DISK_CREATE_METHOD {
-  RamDiskCreateOthers             = 0,
+  RamDiskCreateOthers = 0,
   RamDiskCreateHii
 } RAM_DISK_CREATE_METHOD;
 
@@ -73,31 +73,31 @@ typedef enum _RAM_DISK_CREATE_METHOD {
 // disk
 //
 typedef struct {
-  UINTN                           Signature;
+  UINTN                       Signature;
 
-  EFI_HANDLE                      Handle;
+  EFI_HANDLE                  Handle;
 
-  EFI_BLOCK_IO_PROTOCOL           BlockIo;
-  EFI_BLOCK_IO2_PROTOCOL          BlockIo2;
-  EFI_BLOCK_IO_MEDIA              Media;
-  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
+  EFI_BLOCK_IO_PROTOCOL       BlockIo;
+  EFI_BLOCK_IO2_PROTOCOL      BlockIo2;
+  EFI_BLOCK_IO_MEDIA          Media;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
 
-  UINT64                          StartingAddr;
-  UINT64                          Size;
-  EFI_GUID                        TypeGuid;
-  UINT16                          InstanceNumber;
-  RAM_DISK_CREATE_METHOD          CreateMethod;
-  BOOLEAN                         InNfit;
-  EFI_QUESTION_ID                 CheckBoxId;
-  BOOLEAN                         CheckBoxChecked;
+  UINT64                      StartingAddr;
+  UINT64                      Size;
+  EFI_GUID                    TypeGuid;
+  UINT16                      InstanceNumber;
+  RAM_DISK_CREATE_METHOD      CreateMethod;
+  BOOLEAN                     InNfit;
+  EFI_QUESTION_ID             CheckBoxId;
+  BOOLEAN                     CheckBoxChecked;
 
-  LIST_ENTRY                      ThisInstance;
+  LIST_ENTRY                  ThisInstance;
 } RAM_DISK_PRIVATE_DATA;
 
-#define RAM_DISK_PRIVATE_DATA_SIGNATURE     SIGNATURE_32 ('R', 'D', 'S', 'K')
-#define RAM_DISK_PRIVATE_FROM_BLKIO(a)      CR (a, RAM_DISK_PRIVATE_DATA, BlockIo, RAM_DISK_PRIVATE_DATA_SIGNATURE)
-#define RAM_DISK_PRIVATE_FROM_BLKIO2(a)     CR (a, RAM_DISK_PRIVATE_DATA, BlockIo2, RAM_DISK_PRIVATE_DATA_SIGNATURE)
-#define RAM_DISK_PRIVATE_FROM_THIS(a)       CR (a, RAM_DISK_PRIVATE_DATA, ThisInstance, RAM_DISK_PRIVATE_DATA_SIGNATURE)
+#define RAM_DISK_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('R', 'D', 'S', 'K')
+#define RAM_DISK_PRIVATE_FROM_BLKIO(a)   CR (a, RAM_DISK_PRIVATE_DATA, BlockIo, RAM_DISK_PRIVATE_DATA_SIGNATURE)
+#define RAM_DISK_PRIVATE_FROM_BLKIO2(a)  CR (a, RAM_DISK_PRIVATE_DATA, BlockIo2, RAM_DISK_PRIVATE_DATA_SIGNATURE)
+#define RAM_DISK_PRIVATE_FROM_THIS(a)    CR (a, RAM_DISK_PRIVATE_DATA, ThisInstance, RAM_DISK_PRIVATE_DATA_SIGNATURE)
 
 ///
 /// RAM disk HII-related definitions and declarations
@@ -106,28 +106,28 @@ typedef struct {
 //
 // Tool generated IFR binary data and String package data
 //
-extern  UINT8                     RamDiskHiiBin[];
-extern  UINT8                     RamDiskDxeStrings[];
+extern  UINT8  RamDiskHiiBin[];
+extern  UINT8  RamDiskDxeStrings[];
 
 typedef struct {
-  VENDOR_DEVICE_PATH              VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL        End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
 typedef struct {
-  UINTN                           Signature;
+  UINTN                             Signature;
 
-  RAM_DISK_CONFIGURATION          ConfigStore;
+  RAM_DISK_CONFIGURATION            ConfigStore;
 
-  EFI_HII_CONFIG_ACCESS_PROTOCOL  ConfigAccess;
-  EFI_HANDLE                      DriverHandle;
-  EFI_HII_HANDLE                  HiiHandle;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL    ConfigAccess;
+  EFI_HANDLE                        DriverHandle;
+  EFI_HII_HANDLE                    HiiHandle;
 } RAM_DISK_CONFIG_PRIVATE_DATA;
 
-extern RAM_DISK_CONFIG_PRIVATE_DATA    mRamDiskConfigPrivateDataTemplate;
+extern RAM_DISK_CONFIG_PRIVATE_DATA  mRamDiskConfigPrivateDataTemplate;
 
-#define RAM_DISK_CONFIG_PRIVATE_DATA_SIGNATURE   SIGNATURE_32 ('R', 'C', 'F', 'G')
-#define RAM_DISK_CONFIG_PRIVATE_FROM_THIS(a)     CR (a, RAM_DISK_CONFIG_PRIVATE_DATA, ConfigAccess, RAM_DISK_CONFIG_PRIVATE_DATA_SIGNATURE)
+#define RAM_DISK_CONFIG_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('R', 'C', 'F', 'G')
+#define RAM_DISK_CONFIG_PRIVATE_FROM_THIS(a)  CR (a, RAM_DISK_CONFIG_PRIVATE_DATA, ConfigAccess, RAM_DISK_CONFIG_PRIVATE_DATA_SIGNATURE)
 
 /**
   Register a RAM disk with specified address, size and type.
@@ -366,7 +366,7 @@ RamDiskBlkIo2ReadBlocksEx (
   IN     EFI_LBA                  Lba,
   IN OUT EFI_BLOCK_IO2_TOKEN      *Token,
   IN     UINTN                    BufferSize,
-     OUT VOID                     *Buffer
+  OUT VOID                     *Buffer
   );
 
 /**
@@ -507,8 +507,8 @@ EFIAPI
 RamDiskExtractConfig (
   IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
   IN CONST EFI_STRING                       Request,
-       OUT EFI_STRING                       *Progress,
-       OUT EFI_STRING                       *Results
+  OUT EFI_STRING                       *Progress,
+  OUT EFI_STRING                       *Results
   );
 
 /**
@@ -534,7 +534,7 @@ EFIAPI
 RamDiskRouteConfig (
   IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
   IN CONST EFI_STRING                       Configuration,
-       OUT EFI_STRING                       *Progress
+  OUT EFI_STRING                       *Progress
   );
 
 /**
@@ -567,9 +567,8 @@ RamDiskCallback (
   IN     EFI_QUESTION_ID                    QuestionId,
   IN     UINT8                              Type,
   IN     EFI_IFR_TYPE_VALUE                 *Value,
-     OUT EFI_BROWSER_ACTION_REQUEST         *ActionRequest
+  OUT EFI_BROWSER_ACTION_REQUEST         *ActionRequest
   );
-
 
 /**
   This function gets the file information from an open file descriptor,
@@ -584,7 +583,6 @@ EFI_FILE_INFO *
 FileInfo (
   IN EFI_FILE_HANDLE                        FHand
   );
-
 
 /**
   Publish the RAM disk NVDIMM Firmware Interface Table (NFIT) to the ACPI

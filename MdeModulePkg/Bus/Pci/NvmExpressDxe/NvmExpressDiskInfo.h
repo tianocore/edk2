@@ -23,7 +23,6 @@ InitializeDiskInfo (
   IN  NVME_DEVICE_PRIVATE_DATA    *Device
   );
 
-
 /**
   Provides inquiry information for the controller type.
 
@@ -99,7 +98,6 @@ NvmExpressDiskInfoSenseData (
   IN OUT UINT32                   *SenseDataSize,
   OUT    UINT8                    *SenseDataNumber
   );
-
 
 /**
   This function is used to get controller information.

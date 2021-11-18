@@ -6,7 +6,6 @@
 
 **/
 
-
 #ifndef _CAPSULE_APP_H_
 #define _CAPSULE_APP_H_
 
@@ -42,22 +41,22 @@
 #define CAPSULE_HEADER_SIZE  0x20
 
 #define NESTED_CAPSULE_HEADER_SIZE  SIZE_4KB
-#define SYSTEM_FIRMWARE_FLAG 0x50000
-#define DEVICE_FIRMWARE_FLAG 0x78010
+#define SYSTEM_FIRMWARE_FLAG        0x50000
+#define DEVICE_FIRMWARE_FLAG        0x78010
 
-#define MAJOR_VERSION   1
-#define MINOR_VERSION   0
+#define MAJOR_VERSION  1
+#define MINOR_VERSION  0
 
-#define MAX_CAPSULE_NUM 10
+#define MAX_CAPSULE_NUM  10
 
 //
 // (20 * (6+5+2))+1) unicode characters from EFI FAT spec (doubled for bytes)
 //
-#define MAX_FILE_NAME_SIZE   522
-#define MAX_FILE_NAME_LEN    (MAX_FILE_NAME_SIZE / sizeof(CHAR16))
+#define MAX_FILE_NAME_SIZE  522
+#define MAX_FILE_NAME_LEN   (MAX_FILE_NAME_SIZE / sizeof(CHAR16))
 
-extern UINTN  Argc;
-extern CHAR16 **Argv;
+extern UINTN   Argc;
+extern CHAR16  **Argv;
 
 /**
 
@@ -80,7 +79,6 @@ EFI_SHELL_PROTOCOL *
 GetShellProtocol (
   VOID
   );
-
 
 /**
   Read a file.
@@ -117,7 +115,6 @@ WriteFileFromBuffer (
   IN  UINTN                                BufferSize,
   IN  VOID                                 *Buffer
   );
-
 
 /**
   Dump capsule information
@@ -193,7 +190,6 @@ DumpAllEfiSysPartition (
   VOID
   );
 
-
 /**
   Get SimpleFileSystem from boot option file path.
 
@@ -212,7 +208,6 @@ GetEfiSysPartitionFromBootOptionFilePath (
   OUT EFI_DEVICE_PATH_PROTOCOL         **FullPath,
   OUT EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  **Fs
   );
-
 
 /**
   Process Capsule On Disk.
@@ -237,4 +232,3 @@ ProcessCapsuleOnDisk (
   );
 
 #endif
-

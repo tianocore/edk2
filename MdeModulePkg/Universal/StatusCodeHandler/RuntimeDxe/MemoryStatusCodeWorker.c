@@ -23,7 +23,7 @@ RtMemoryStatusCodeInitializeWorker (
   VOID
   )
 {
-  EFI_STATUS                        Status;
+  EFI_STATUS  Status;
 
   //
   // Allocate runtime memory status code pool.
@@ -42,7 +42,6 @@ RtMemoryStatusCodeInitializeWorker (
 
   return Status;
 }
-
 
 /**
   Report status code into runtime memory. If the runtime pool is full, roll back to the
@@ -72,12 +71,12 @@ RtMemoryStatusCodeReportWorker (
   IN EFI_STATUS_CODE_DATA               *Data OPTIONAL
   )
 {
-  MEMORY_STATUSCODE_RECORD              *Record;
+  MEMORY_STATUSCODE_RECORD  *Record;
 
   //
   // Locate current record buffer.
   //
-  Record = (MEMORY_STATUSCODE_RECORD *) (mRtMemoryStatusCodeTable + 1);
+  Record = (MEMORY_STATUSCODE_RECORD *)(mRtMemoryStatusCodeTable + 1);
   Record = &Record[mRtMemoryStatusCodeTable->RecordIndex++];
 
   //
@@ -105,6 +104,3 @@ RtMemoryStatusCodeReportWorker (
 
   return EFI_SUCCESS;
 }
-
-
-

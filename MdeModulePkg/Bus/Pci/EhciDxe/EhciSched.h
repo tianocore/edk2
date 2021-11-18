@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_EHCI_SCHED_H_
 #define _EFI_EHCI_SCHED_H_
 
-
 /**
   Initialize the schedule data structure such as frame list.
 
@@ -25,7 +24,6 @@ EhcInitSched (
   IN USB2_HC_DEV          *Ehc
   );
 
-
 /**
   Free the schedule data. It may be partially initialized.
 
@@ -36,7 +34,6 @@ VOID
 EhcFreeSched (
   IN USB2_HC_DEV          *Ehc
   );
-
 
 /**
   Link the queue head to the asynchronous schedule list.
@@ -55,7 +52,6 @@ EhcLinkQhToAsync (
   IN EHC_QH               *Qh
   );
 
-
 /**
   Unlink a queue head from the asynchronous schedule list.
   Need to synchronize with hardware.
@@ -69,7 +65,6 @@ EhcUnlinkQhFromAsync (
   IN USB2_HC_DEV          *Ehc,
   IN EHC_QH               *Qh
   );
-
 
 /**
   Link a queue head for interrupt transfer to the periodic
@@ -86,7 +81,6 @@ EhcLinkQhToPeriod (
   IN EHC_QH               *Qh
   );
 
-
 /**
   Unlink an interrupt queue head from the periodic
   schedule frame list.
@@ -100,8 +94,6 @@ EhcUnlinkQhFromPeriod (
   IN USB2_HC_DEV          *Ehc,
   IN EHC_QH               *Qh
   );
-
-
 
 /**
   Execute the transfer by polling the URB. This is a synchronous operation.
@@ -121,7 +113,6 @@ EhcExecTransfer (
   IN  URB                 *Urb,
   IN  UINTN               TimeOut
   );
-
 
 /**
   Delete a single asynchronous interrupt transfer for
@@ -143,7 +134,6 @@ EhciDelAsyncIntTransfer (
   IN  UINT8               EpNum,
   OUT UINT8               *DataToggle
   );
-
 
 /**
   Remove all the asynchronous interrutp transfers.

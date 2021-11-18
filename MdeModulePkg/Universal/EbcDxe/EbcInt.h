@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EBC_INT_H_
 #define _EBC_INT_H_
 
-
 #include <Uefi.h>
 
 #include <Protocol/DebugSupport.h>
@@ -28,7 +27,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-extern VM_CONTEXT                    *mVmPtr;
+extern VM_CONTEXT  *mVmPtr;
 
 //
 // Flags passed to the internal create-thunks function.
@@ -90,14 +89,15 @@ EbcAddImageThunk (
 // Define a constant of how often to call the debugger periodic callback
 // function.
 //
-#define EFI_TIMER_UNIT_1MS            (1000 * 10)
-#define EBC_VM_PERIODIC_CALLBACK_RATE (1000 * EFI_TIMER_UNIT_1MS)
-#define STACK_POOL_SIZE               (1024 * 1020)
-#define MAX_STACK_NUM                 4
+#define EFI_TIMER_UNIT_1MS             (1000 * 10)
+#define EBC_VM_PERIODIC_CALLBACK_RATE  (1000 * EFI_TIMER_UNIT_1MS)
+#define STACK_POOL_SIZE                (1024 * 1020)
+#define MAX_STACK_NUM                  4
 
 //
 // External low level functions that are native-processor dependent
 //
+
 /**
   The VM thunk code stuffs an EBC entry point into a processor
   register. Since we can't use inline assembly to get it from
@@ -174,7 +174,7 @@ EbcLLCALLEX (
 
 **/
 EFI_STATUS
-GetEBCStack(
+GetEBCStack (
   IN  EFI_HANDLE Handle,
   OUT VOID       **StackBuffer,
   OUT UINTN      *BufferIndex
@@ -189,7 +189,7 @@ GetEBCStack(
 
 **/
 EFI_STATUS
-ReturnEBCStack(
+ReturnEBCStack (
   IN UINTN Index
   );
 
@@ -212,7 +212,7 @@ InitEBCStack (
 
 **/
 EFI_STATUS
-FreeEBCStack(
+FreeEBCStack (
   VOID
   );
 
@@ -225,23 +225,21 @@ FreeEBCStack(
 
 **/
 EFI_STATUS
-ReturnEBCStackByHandle(
+ReturnEBCStackByHandle (
   IN EFI_HANDLE Handle
   );
 
 typedef struct {
-  EFI_EBC_PROTOCOL  *This;
-  VOID              *EntryPoint;
-  EFI_HANDLE        ImageHandle;
-  VM_CONTEXT        VmContext;
+  EFI_EBC_PROTOCOL    *This;
+  VOID                *EntryPoint;
+  EFI_HANDLE          ImageHandle;
+  VM_CONTEXT          VmContext;
 } EFI_EBC_THUNK_DATA;
 
-#define EBC_PROTOCOL_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('e', 'b', 'c', 'p')
-
+#define EBC_PROTOCOL_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('e', 'b', 'c', 'p')
 
 #define EBC_PROTOCOL_PRIVATE_DATA_FROM_THIS(a) \
       CR(a, EBC_PROTOCOL_PRIVATE_DATA, EbcProtocol, EBC_PROTOCOL_PRIVATE_DATA_SIGNATURE)
-
 
 /**
   Allocates a buffer of type EfiBootServicesCode.

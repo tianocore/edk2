@@ -22,8 +22,8 @@
 #include <Library/UnitTestLib.h>
 #include <Library/ResetSystemLib.h>
 
-#define UNIT_TEST_APP_NAME        "DxeResetSystemLib Unit Tests"
-#define UNIT_TEST_APP_VERSION     "1.0"
+#define UNIT_TEST_APP_NAME     "DxeResetSystemLib Unit Tests"
+#define UNIT_TEST_APP_VERSION  "1.0"
 
 /**
   Resets the entire platform.
@@ -256,15 +256,15 @@ UnitTestingEntry (
 
   Framework = NULL;
 
-  DEBUG(( DEBUG_INFO, "%a v%a\n", UNIT_TEST_APP_NAME, UNIT_TEST_APP_VERSION ));
+  DEBUG ((DEBUG_INFO, "%a v%a\n", UNIT_TEST_APP_NAME, UNIT_TEST_APP_VERSION));
 
   //
   // Start setting up the test framework for running the tests.
   //
   Status = InitUnitTestFramework (&Framework, UNIT_TEST_APP_NAME, gEfiCallerBaseName, UNIT_TEST_APP_VERSION);
   if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "Failed in InitUnitTestFramework. Status = %r\n", Status));
-      goto EXIT;
+    DEBUG ((DEBUG_ERROR, "Failed in InitUnitTestFramework. Status = %r\n", Status));
+    goto EXIT;
   }
 
   //

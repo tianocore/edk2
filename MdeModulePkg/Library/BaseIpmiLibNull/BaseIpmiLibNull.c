@@ -10,7 +10,6 @@
 #include <Library/DebugLib.h>
 #include <Library/IpmiLib.h>
 
-
 /**
   This service enables submitting commands via Ipmi.
 
@@ -36,7 +35,7 @@ IpmiSubmitCommand (
   IN     UINT8     Command,
   IN     UINT8     *RequestData,
   IN     UINT32    RequestDataSize,
-     OUT UINT8     *ResponseData,
+  OUT UINT8     *ResponseData,
   IN OUT UINT32    *ResponseDataSize
   )
 {

@@ -15,9 +15,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "VarCheckPcdStructure.h"
 
-//#define DUMP_VAR_CHECK_PCD
+// #define DUMP_VAR_CHECK_PCD
 
-GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 mVarCheckPcdHex[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  mVarCheckPcdHex[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 /**
   Dump some hexadecimal data.
@@ -36,15 +36,15 @@ VarCheckPcdInternalDumpHex (
   IN VOID         *UserData
   )
 {
-  UINT8 *Data;
+  UINT8  *Data;
 
-  CHAR8 Val[50];
+  CHAR8  Val[50];
 
-  CHAR8 Str[20];
+  CHAR8  Str[20];
 
-  UINT8 TempByte;
-  UINTN Size;
-  UINTN Index;
+  UINT8  TempByte;
+  UINTN  Size;
+  UINTN  Index;
 
   Data = UserData;
   while (DataSize != 0) {
@@ -54,19 +54,19 @@ VarCheckPcdInternalDumpHex (
     }
 
     for (Index = 0; Index < Size; Index += 1) {
-      TempByte            = Data[Index];
-      Val[Index * 3 + 0]  = mVarCheckPcdHex[TempByte >> 4];
-      Val[Index * 3 + 1]  = mVarCheckPcdHex[TempByte & 0xF];
-      Val[Index * 3 + 2]  = (CHAR8) ((Index == 7) ? '-' : ' ');
-      Str[Index]          = (CHAR8) ((TempByte < ' ' || TempByte > 'z') ? '.' : TempByte);
+      TempByte = Data[Index];
+      Val[Index * 3 + 0] = mVarCheckPcdHex[TempByte >> 4];
+      Val[Index * 3 + 1] = mVarCheckPcdHex[TempByte & 0xF];
+      Val[Index * 3 + 2] = (CHAR8)((Index == 7) ? '-' : ' ');
+      Str[Index] = (CHAR8)((TempByte < ' ' || TempByte > 'z') ? '.' : TempByte);
     }
 
-    Val[Index * 3]  = 0;
-    Str[Index]      = 0;
+    Val[Index * 3] = 0;
+    Str[Index]     = 0;
     DEBUG ((DEBUG_INFO, "%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str));
 
-    Data += Size;
-    Offset += Size;
+    Data     += Size;
+    Offset   += Size;
     DataSize -= Size;
   }
 }
@@ -89,19 +89,19 @@ VarCheckPcdValidData (
   IN UINTN                              DataSize
   )
 {
-  UINT64   OneData;
-  UINT64   Minimum;
-  UINT64   Maximum;
-  UINT64   OneValue;
-  UINT8    *Ptr;
+  UINT64  OneData;
+  UINT64  Minimum;
+  UINT64  Maximum;
+  UINT64  OneValue;
+  UINT8   *Ptr;
 
   OneData = 0;
-  CopyMem (&OneData, (UINT8 *) Data + PcdValidData->VarOffset, PcdValidData->StorageWidth);
+  CopyMem (&OneData, (UINT8 *)Data + PcdValidData->VarOffset, PcdValidData->StorageWidth);
 
   switch (PcdValidData->Type) {
     case VarCheckPcdValidList:
-      Ptr = (UINT8 *) ((VAR_CHECK_PCD_VALID_LIST *) PcdValidData + 1);
-      while ((UINTN) Ptr < (UINTN) PcdValidData + PcdValidData->Length) {
+      Ptr = (UINT8 *)((VAR_CHECK_PCD_VALID_LIST *)PcdValidData + 1);
+      while ((UINTN)Ptr < (UINTN)PcdValidData + PcdValidData->Length) {
         OneValue = 0;
         CopyMem (&OneValue, Ptr, PcdValidData->StorageWidth);
         if (OneData == OneValue) {
@@ -110,23 +110,28 @@ VarCheckPcdValidData (
           //
           break;
         }
+
         Ptr += PcdValidData->StorageWidth;
       }
-      if ((UINTN) Ptr >= ((UINTN) PcdValidData + PcdValidData->Length)) {
+
+      if ((UINTN)Ptr >= ((UINTN)PcdValidData + PcdValidData->Length)) {
         //
         // No match
         //
         DEBUG ((DEBUG_INFO, "VarCheckPcdValidData fail: ValidList mismatch (0x%lx)\n", OneData));
-        DEBUG_CODE (VarCheckPcdInternalDumpHex (2, 0, PcdValidData->Length, (UINT8 *) PcdValidData););
+        DEBUG_CODE (
+          VarCheckPcdInternalDumpHex (2, 0, PcdValidData->Length, (UINT8 *)PcdValidData);
+          );
         return FALSE;
       }
+
       break;
 
     case VarCheckPcdValidRange:
       Minimum = 0;
       Maximum = 0;
-      Ptr = (UINT8 *) ((VAR_CHECK_PCD_VALID_RANGE *) PcdValidData + 1);
-      while ((UINTN) Ptr < (UINTN) PcdValidData + PcdValidData->Length) {
+      Ptr     = (UINT8 *)((VAR_CHECK_PCD_VALID_RANGE *)PcdValidData + 1);
+      while ((UINTN)Ptr < (UINTN)PcdValidData + PcdValidData->Length) {
         CopyMem (&Minimum, Ptr, PcdValidData->StorageWidth);
         Ptr += PcdValidData->StorageWidth;
         CopyMem (&Maximum, Ptr, PcdValidData->StorageWidth);
@@ -136,8 +141,11 @@ VarCheckPcdValidData (
           return TRUE;
         }
       }
+
       DEBUG ((DEBUG_INFO, "VarCheckPcdValidData fail: ValidRange mismatch (0x%lx)\n", OneData));
-      DEBUG_CODE (VarCheckPcdInternalDumpHex (2, 0, PcdValidData->Length, (UINT8 *) PcdValidData););
+      DEBUG_CODE (
+        VarCheckPcdInternalDumpHex (2, 0, PcdValidData->Length, (UINT8 *)PcdValidData);
+        );
       return FALSE;
       break;
 
@@ -149,8 +157,8 @@ VarCheckPcdValidData (
   return TRUE;
 }
 
-VAR_CHECK_PCD_VARIABLE_HEADER   *mVarCheckPcdBin = NULL;
-UINTN                           mVarCheckPcdBinSize = 0;
+VAR_CHECK_PCD_VARIABLE_HEADER  *mVarCheckPcdBin    = NULL;
+UINTN                          mVarCheckPcdBinSize = 0;
 
 /**
   SetVariable check handler PCD.
@@ -175,8 +183,8 @@ SetVariableCheckHandlerPcd (
   IN VOID       *Data
   )
 {
-  VAR_CHECK_PCD_VARIABLE_HEADER     *PcdVariable;
-  VAR_CHECK_PCD_VALID_DATA_HEADER   *PcdValidData;
+  VAR_CHECK_PCD_VARIABLE_HEADER    *PcdVariable;
+  VAR_CHECK_PCD_VALID_DATA_HEADER  *PcdValidData;
 
   if (mVarCheckPcdBin == NULL) {
     return EFI_SUCCESS;
@@ -192,15 +200,16 @@ SetVariableCheckHandlerPcd (
   //
   // For Pcd Variable header align.
   //
-  PcdVariable = (VAR_CHECK_PCD_VARIABLE_HEADER *) HEADER_ALIGN (mVarCheckPcdBin);
-  while ((UINTN) PcdVariable < ((UINTN) mVarCheckPcdBin + mVarCheckPcdBinSize)) {
-    if ((StrCmp ((CHAR16 *) (PcdVariable + 1), VariableName) == 0) &&
-        (CompareGuid (&PcdVariable->Guid, VendorGuid))) {
+  PcdVariable = (VAR_CHECK_PCD_VARIABLE_HEADER *)HEADER_ALIGN (mVarCheckPcdBin);
+  while ((UINTN)PcdVariable < ((UINTN)mVarCheckPcdBin + mVarCheckPcdBinSize)) {
+    if ((StrCmp ((CHAR16 *)(PcdVariable + 1), VariableName) == 0) &&
+        (CompareGuid (&PcdVariable->Guid, VendorGuid)))
+    {
       //
       // Found the Pcd Variable that could be used to do check.
       //
       DEBUG ((DEBUG_INFO, "VarCheckPcdVariable - %s:%g with Attributes = 0x%08x Size = 0x%x\n", VariableName, VendorGuid, Attributes, DataSize));
-      if ((PcdVariable->Attributes != 0) && PcdVariable->Attributes != Attributes) {
+      if ((PcdVariable->Attributes != 0) && (PcdVariable->Attributes != Attributes)) {
         DEBUG ((DEBUG_INFO, "VarCheckPcdVariable fail for Attributes - 0x%08x\n", PcdVariable->Attributes));
         return EFI_SECURITY_VIOLATION;
       }
@@ -214,26 +223,28 @@ SetVariableCheckHandlerPcd (
       // Do the check.
       // For Pcd ValidData header align.
       //
-      PcdValidData = (VAR_CHECK_PCD_VALID_DATA_HEADER *) HEADER_ALIGN (((UINTN) PcdVariable + PcdVariable->HeaderLength));
-      while ((UINTN) PcdValidData < ((UINTN) PcdVariable + PcdVariable->Length)) {
-        if (((UINTN) PcdValidData->VarOffset + PcdValidData->StorageWidth) <= DataSize) {
+      PcdValidData = (VAR_CHECK_PCD_VALID_DATA_HEADER *)HEADER_ALIGN (((UINTN)PcdVariable + PcdVariable->HeaderLength));
+      while ((UINTN)PcdValidData < ((UINTN)PcdVariable + PcdVariable->Length)) {
+        if (((UINTN)PcdValidData->VarOffset + PcdValidData->StorageWidth) <= DataSize) {
           if (!VarCheckPcdValidData (PcdValidData, Data, DataSize)) {
             return EFI_SECURITY_VIOLATION;
           }
         }
+
         //
         // For Pcd ValidData header align.
         //
-        PcdValidData = (VAR_CHECK_PCD_VALID_DATA_HEADER *) HEADER_ALIGN (((UINTN) PcdValidData + PcdValidData->Length));
+        PcdValidData = (VAR_CHECK_PCD_VALID_DATA_HEADER *)HEADER_ALIGN (((UINTN)PcdValidData + PcdValidData->Length));
       }
 
       DEBUG ((DEBUG_INFO, "VarCheckPcdVariable - ALL CHECK PASS!\n"));
       return EFI_SUCCESS;
     }
+
     //
     // For Pcd Variable header align.
     //
-    PcdVariable = (VAR_CHECK_PCD_VARIABLE_HEADER *) HEADER_ALIGN (((UINTN) PcdVariable + PcdVariable->Length));
+    PcdVariable = (VAR_CHECK_PCD_VARIABLE_HEADER *)HEADER_ALIGN (((UINTN)PcdVariable + PcdVariable->Length));
   }
 
   // Not found, so pass.
@@ -241,6 +252,7 @@ SetVariableCheckHandlerPcd (
 }
 
 #ifdef DUMP_VAR_CHECK_PCD
+
 /**
   Dump Pcd ValidData.
 
@@ -252,10 +264,10 @@ DumpPcdValidData (
   IN VAR_CHECK_PCD_VALID_DATA_HEADER    *PcdValidData
   )
 {
-  UINT64    Minimum;
-  UINT64    Maximum;
-  UINT64    OneValue;
-  UINT8     *Ptr;
+  UINT64  Minimum;
+  UINT64  Maximum;
+  UINT64  OneValue;
+  UINT8   *Ptr;
 
   DEBUG ((DEBUG_INFO, "  VAR_CHECK_PCD_VALID_DATA_HEADER\n"));
   DEBUG ((DEBUG_INFO, "    Type          - 0x%02x\n", PcdValidData->Type));
@@ -265,8 +277,8 @@ DumpPcdValidData (
 
   switch (PcdValidData->Type) {
     case VarCheckPcdValidList:
-      Ptr = (UINT8 *) ((VAR_CHECK_PCD_VALID_LIST *) PcdValidData + 1);
-      while ((UINTN) Ptr < ((UINTN) PcdValidData + PcdValidData->Length)) {
+      Ptr = (UINT8 *)((VAR_CHECK_PCD_VALID_LIST *)PcdValidData + 1);
+      while ((UINTN)Ptr < ((UINTN)PcdValidData + PcdValidData->Length)) {
         OneValue = 0;
         CopyMem (&OneValue, Ptr, PcdValidData->StorageWidth);
         switch (PcdValidData->StorageWidth) {
@@ -286,15 +298,17 @@ DumpPcdValidData (
             ASSERT (FALSE);
             break;
         }
+
         Ptr += PcdValidData->StorageWidth;
       }
+
       break;
 
     case VarCheckPcdValidRange:
       Minimum = 0;
       Maximum = 0;
-      Ptr = (UINT8 *) ((VAR_CHECK_PCD_VALID_RANGE *) PcdValidData + 1);
-      while ((UINTN) Ptr < (UINTN) PcdValidData + PcdValidData->Length) {
+      Ptr     = (UINT8 *)((VAR_CHECK_PCD_VALID_RANGE *)PcdValidData + 1);
+      while ((UINTN)Ptr < (UINTN)PcdValidData + PcdValidData->Length) {
         CopyMem (&Minimum, Ptr, PcdValidData->StorageWidth);
         Ptr += PcdValidData->StorageWidth;
         CopyMem (&Maximum, Ptr, PcdValidData->StorageWidth);
@@ -322,6 +336,7 @@ DumpPcdValidData (
             break;
         }
       }
+
       break;
 
     default:
@@ -341,7 +356,7 @@ DumpPcdVariable (
   IN VAR_CHECK_PCD_VARIABLE_HEADER  *PcdVariable
   )
 {
-  VAR_CHECK_PCD_VALID_DATA_HEADER *PcdValidData;
+  VAR_CHECK_PCD_VALID_DATA_HEADER  *PcdValidData;
 
   DEBUG ((DEBUG_INFO, "VAR_CHECK_PCD_VARIABLE_HEADER\n"));
   DEBUG ((DEBUG_INFO, "  Revision        - 0x%04x\n", PcdVariable->Revision));
@@ -355,8 +370,8 @@ DumpPcdVariable (
   //
   // For Pcd ValidData header align.
   //
-  PcdValidData = (VAR_CHECK_PCD_VALID_DATA_HEADER *) HEADER_ALIGN (((UINTN) PcdVariable + PcdVariable->HeaderLength));
-  while ((UINTN) PcdValidData < ((UINTN) PcdVariable + PcdVariable->Length)) {
+  PcdValidData = (VAR_CHECK_PCD_VALID_DATA_HEADER *)HEADER_ALIGN (((UINTN)PcdVariable + PcdVariable->HeaderLength));
+  while ((UINTN)PcdValidData < ((UINTN)PcdVariable + PcdVariable->Length)) {
     //
     // Dump Pcd ValidData related to the Pcd Variable.
     //
@@ -364,7 +379,7 @@ DumpPcdVariable (
     //
     // For Pcd ValidData header align.
     //
-    PcdValidData = (VAR_CHECK_PCD_VALID_DATA_HEADER *) HEADER_ALIGN (((UINTN) PcdValidData + PcdValidData->Length));
+    PcdValidData = (VAR_CHECK_PCD_VALID_DATA_HEADER *)HEADER_ALIGN (((UINTN)PcdValidData + PcdValidData->Length));
   }
 }
 
@@ -381,22 +396,23 @@ DumpVarCheckPcd (
   IN UINTN  VarCheckPcdBinSize
   )
 {
-  VAR_CHECK_PCD_VARIABLE_HEADER     *PcdVariable;
+  VAR_CHECK_PCD_VARIABLE_HEADER  *PcdVariable;
 
   DEBUG ((DEBUG_INFO, "DumpVarCheckPcd\n"));
 
   //
   // For Pcd Variable header align.
   //
-  PcdVariable = (VAR_CHECK_PCD_VARIABLE_HEADER *) HEADER_ALIGN (VarCheckPcdBin);
-  while ((UINTN) PcdVariable < ((UINTN) VarCheckPcdBin + VarCheckPcdBinSize)) {
+  PcdVariable = (VAR_CHECK_PCD_VARIABLE_HEADER *)HEADER_ALIGN (VarCheckPcdBin);
+  while ((UINTN)PcdVariable < ((UINTN)VarCheckPcdBin + VarCheckPcdBinSize)) {
     DumpPcdVariable (PcdVariable);
     //
     // For Pcd Variable header align.
     //
-    PcdVariable = (VAR_CHECK_PCD_VARIABLE_HEADER *) HEADER_ALIGN (((UINTN) PcdVariable + PcdVariable->Length));
+    PcdVariable = (VAR_CHECK_PCD_VARIABLE_HEADER *)HEADER_ALIGN (((UINTN)PcdVariable + PcdVariable->Length));
   }
 }
+
 #endif
 
 /**
@@ -409,9 +425,9 @@ LocateVarCheckPcdBin (
   VOID
   )
 {
-  EFI_STATUS                        Status;
-  VAR_CHECK_PCD_VARIABLE_HEADER     *VarCheckPcdBin;
-  UINTN                             VarCheckPcdBinSize;
+  EFI_STATUS                     Status;
+  VAR_CHECK_PCD_VARIABLE_HEADER  *VarCheckPcdBin;
+  UINTN                          VarCheckPcdBinSize;
 
   //
   // Search the VarCheckPcdBin from the first RAW section of current FFS.
@@ -419,7 +435,7 @@ LocateVarCheckPcdBin (
   Status = GetSectionFromFfs (
              EFI_SECTION_RAW,
              0,
-             (VOID **) &VarCheckPcdBin,
+             (VOID **)&VarCheckPcdBin,
              &VarCheckPcdBinSize
              );
   if (!EFI_ERROR (Status)) {
@@ -432,17 +448,17 @@ LocateVarCheckPcdBin (
     //
     // Make sure the allocated buffer for VarCheckPcdBin at required alignment.
     //
-    ASSERT ((((UINTN) mVarCheckPcdBin) & (HEADER_ALIGNMENT - 1)) == 0);
+    ASSERT ((((UINTN)mVarCheckPcdBin) & (HEADER_ALIGNMENT - 1)) == 0);
     mVarCheckPcdBinSize = VarCheckPcdBinSize;
     FreePool (VarCheckPcdBin);
 
     DEBUG ((DEBUG_INFO, "VarCheckPcdBin - at 0x%x size = 0x%x\n", mVarCheckPcdBin, mVarCheckPcdBinSize));
 
-#ifdef DUMP_VAR_CHECK_PCD
+ #ifdef DUMP_VAR_CHECK_PCD
     DEBUG_CODE (
       DumpVarCheckPcd (mVarCheckPcdBin, mVarCheckPcdBinSize);
-    );
-#endif
+      );
+ #endif
   } else {
     DEBUG ((DEBUG_INFO, "[VarCheckPcd] No VarCheckPcdBin found at the first RAW section\n"));
   }
@@ -465,7 +481,7 @@ VarCheckPcdLibNullClassConstructor (
   )
 {
   LocateVarCheckPcdBin ();
-  VarCheckLibRegisterAddressPointer ((VOID **) &mVarCheckPcdBin);
+  VarCheckLibRegisterAddressPointer ((VOID **)&mVarCheckPcdBin);
   VarCheckLibRegisterSetVariableCheckHandler (SetVariableCheckHandlerPcd);
 
   return EFI_SUCCESS;

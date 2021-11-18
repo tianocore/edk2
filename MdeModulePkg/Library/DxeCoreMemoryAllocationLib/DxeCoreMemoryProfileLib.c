@@ -6,7 +6,6 @@
 
 **/
 
-
 #include <PiDxe.h>
 
 #include <Guid/MemoryProfile.h>
@@ -48,4 +47,3 @@ MemoryProfileLibRecord (
 {
   return CoreUpdateProfile (CallerAddress, Action, MemoryType, Size, Buffer, ActionString);
 }
-

@@ -50,7 +50,6 @@ CreateBasicVariablePolicy (
   OUT VARIABLE_POLICY_ENTRY   **NewEntry
   );
 
-
 /**
   This helper function will allocate and populate a new VariablePolicy
   structure for a policy with a lock type of VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE.
@@ -91,7 +90,6 @@ CreateVarStateVariablePolicy (
   OUT VARIABLE_POLICY_ENTRY   **NewEntry
   );
 
-
 /**
   This helper function does everything that CreateBasicVariablePolicy() does, but also
   uses the passed in protocol to register the policy with the infrastructure.
@@ -123,7 +121,6 @@ RegisterBasicVariablePolicy (
   IN        UINT32                          AttributesCantHave,
   IN        UINT8                           LockPolicyType
   );
-
 
 /**
   This helper function does everything that CreateBasicVariablePolicy() does, but also

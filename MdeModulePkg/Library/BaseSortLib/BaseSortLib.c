@@ -42,11 +42,11 @@ PerformQuickSort (
 {
   VOID  *Buffer;
 
-  ASSERT(BufferToSort     != NULL);
-  ASSERT(CompareFunction  != NULL);
+  ASSERT (BufferToSort     != NULL);
+  ASSERT (CompareFunction  != NULL);
 
-  Buffer = AllocateZeroPool(ElementSize);
-  ASSERT(Buffer != NULL);
+  Buffer = AllocateZeroPool (ElementSize);
+  ASSERT (Buffer != NULL);
 
   QuickSort (
     BufferToSort,
@@ -56,7 +56,7 @@ PerformQuickSort (
     Buffer
     );
 
-  FreePool(Buffer);
+  FreePool (Buffer);
   return;
 }
 
@@ -75,7 +75,7 @@ DevicePathCompare (
   IN  CONST VOID             *Buffer2
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -94,10 +94,9 @@ StringNoCaseCompare (
   IN  CONST VOID             *Buffer2
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
-
 
 /**
   Not supported in Base version.
@@ -114,8 +113,6 @@ StringCompare (
   IN  CONST VOID                *Buffer2
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
-
-

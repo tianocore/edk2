@@ -11,6 +11,7 @@
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
+
 #ifndef _PRIVILEGE_POLYMORPHIC_H_
 #define _PRIVILEGE_POLYMORPHIC_H_
 

@@ -14,8 +14,8 @@
 
 #include <Guid/MemoryProfile.h>
 
-EDKII_MEMORY_PROFILE_PROTOCOL     *mLibProfileProtocol;
-EDKII_SMM_MEMORY_PROFILE_PROTOCOL *mLibSmmProfileProtocol;
+EDKII_MEMORY_PROFILE_PROTOCOL      *mLibProfileProtocol;
+EDKII_SMM_MEMORY_PROFILE_PROTOCOL  *mLibSmmProfileProtocol;
 
 /**
   Check whether the start address of buffer is within any of the SMRAM ranges.
@@ -47,7 +47,7 @@ SmmMemoryProfileLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   //
   // Locate Profile Protocol
@@ -110,6 +110,7 @@ MemoryProfileLibRecord (
     if (mLibSmmProfileProtocol == NULL) {
       return EFI_UNSUPPORTED;
     }
+
     return mLibSmmProfileProtocol->Record (
                                      mLibSmmProfileProtocol,
                                      CallerAddress,
@@ -123,6 +124,7 @@ MemoryProfileLibRecord (
     if (mLibProfileProtocol == NULL) {
       return EFI_UNSUPPORTED;
     }
+
     return mLibProfileProtocol->Record (
                                   mLibProfileProtocol,
                                   CallerAddress,
@@ -134,4 +136,3 @@ MemoryProfileLibRecord (
                                   );
   }
 }
-

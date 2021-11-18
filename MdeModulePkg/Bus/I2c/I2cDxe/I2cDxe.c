@@ -20,21 +20,21 @@
 **/
 EFI_STATUS
 EFIAPI
-InitializeI2c(
+InitializeI2c (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   //
   // Install driver model protocol(s).
   //
-  Status = InitializeI2cHost ( ImageHandle, SystemTable );
-  if ( !EFI_ERROR ( Status ))
-  {
-    Status = InitializeI2cBus ( ImageHandle, SystemTable );
+  Status = InitializeI2cHost (ImageHandle, SystemTable);
+  if ( !EFI_ERROR (Status)) {
+    Status = InitializeI2cBus (ImageHandle, SystemTable);
   }
+
   return Status;
 }
 
@@ -56,14 +56,15 @@ I2cUnload (
   IN EFI_HANDLE             ImageHandle
   )
 {
-  EFI_STATUS                        Status;
+  EFI_STATUS  Status;
 
   //
   //  Disconnect the drivers
   //
-  Status = I2cBusUnload ( ImageHandle );
-  if ( !EFI_ERROR ( Status )) {
-    Status = I2cHostUnload ( ImageHandle );
+  Status = I2cBusUnload (ImageHandle);
+  if ( !EFI_ERROR (Status)) {
+    Status = I2cHostUnload (ImageHandle);
   }
+
   return Status;
 }

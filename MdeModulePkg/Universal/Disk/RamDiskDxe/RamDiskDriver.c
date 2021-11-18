@@ -34,7 +34,6 @@ LIST_ENTRY  RegisteredRamDisks;
 EFI_ACPI_TABLE_PROTOCOL  *mAcpiTableProtocol = NULL;
 EFI_ACPI_SDT_PROTOCOL    *mAcpiSdtProtocol   = NULL;
 
-
 /**
   Check whether EFI_ACPI_TABLE_PROTOCOL and EFI_ACPI_SDT_PROTOCOL are produced.
   If both protocols are produced, publish all the reserved memory type RAM
@@ -52,9 +51,9 @@ RamDiskAcpiCheck (
   IN VOID         *Context
   )
 {
-  EFI_STATUS                 Status;
-  LIST_ENTRY                 *Entry;
-  RAM_DISK_PRIVATE_DATA      *PrivateData;
+  EFI_STATUS             Status;
+  LIST_ENTRY             *Entry;
+  RAM_DISK_PRIVATE_DATA  *PrivateData;
 
   gBS->CloseEvent (Event);
 
@@ -99,7 +98,6 @@ RamDiskAcpiCheck (
   }
 }
 
-
 /**
   The entry point for RamDiskDxe driver.
 
@@ -120,10 +118,10 @@ RamDiskDxeEntryPoint (
   IN EFI_SYSTEM_TABLE             *SystemTable
   )
 {
-  EFI_STATUS                      Status;
-  RAM_DISK_CONFIG_PRIVATE_DATA    *ConfigPrivate;
-  VOID                            *DummyInterface;
-  EFI_EVENT                       Event;
+  EFI_STATUS                    Status;
+  RAM_DISK_CONFIG_PRIVATE_DATA  *ConfigPrivate;
+  VOID                          *DummyInterface;
+  EFI_EVENT                     Event;
 
   //
   // If already started, return.
@@ -194,7 +192,6 @@ ErrorExit:
   return Status;
 }
 
-
 /**
   Unload the RamDiskDxe driver and its configuration form.
 
@@ -211,13 +208,13 @@ RamDiskDxeUnload (
   IN EFI_HANDLE                   ImageHandle
   )
 {
-  EFI_STATUS                      Status;
-  RAM_DISK_CONFIG_PRIVATE_DATA    *ConfigPrivate;
+  EFI_STATUS                    Status;
+  RAM_DISK_CONFIG_PRIVATE_DATA  *ConfigPrivate;
 
   Status = gBS->HandleProtocol (
                   mRamDiskHandle,
                   &gEfiCallerIdGuid,
-                  (VOID **) &ConfigPrivate
+                  (VOID **)&ConfigPrivate
                   );
   if (EFI_ERROR (Status)) {
     return Status;

@@ -69,7 +69,6 @@ EbcDebuggerHookEbcUnloadImage (
   IN EFI_HANDLE                  Handle
   );
 
-
 /**
 
   Hooks in EbcSupport.c
@@ -93,7 +92,6 @@ VOID
 EbcDebuggerHookEbcInterpret (
   IN VM_CONTEXT *VmPtr
   );
-
 
 /**
   The hook in EbcExecute, before ExecuteFunction.
@@ -188,7 +186,6 @@ VOID
 EbcDebuggerHookRETEnd (
   IN VM_CONTEXT *VmPtr
   );
-
 
 /**
 

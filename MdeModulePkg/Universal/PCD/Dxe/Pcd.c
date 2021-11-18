@@ -13,13 +13,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// PCD database lock.
 ///
-EFI_LOCK mPcdDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE(TPL_NOTIFY);
+EFI_LOCK  mPcdDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 
 ///
 /// PCD_PROTOCOL the EDKII native implementation which support dynamic
 /// type and dynamicEx type PCDs.
 ///
-PCD_PROTOCOL mPcdInstance = {
+PCD_PROTOCOL  mPcdInstance = {
   DxePcdSetSku,
 
   DxePcdGet8,
@@ -62,7 +62,7 @@ PCD_PROTOCOL mPcdInstance = {
 /// EFI_PCD_PROTOCOL is defined in PI 1.2 Vol 3 which only support dynamicEx type
 /// PCD.
 ///
-EFI_PCD_PROTOCOL mEfiPcdInstance = {
+EFI_PCD_PROTOCOL  mEfiPcdInstance = {
   DxePcdSetSku,
   DxePcdGet8Ex,
   DxePcdGet16Ex,
@@ -77,8 +77,8 @@ EFI_PCD_PROTOCOL mEfiPcdInstance = {
   DxePcdSet64Ex,
   DxePcdSetPtrEx,
   DxePcdSetBoolEx,
-  (EFI_PCD_PROTOCOL_CALLBACK_ON_SET) DxeRegisterCallBackOnSet,
-  (EFI_PCD_PROTOCOL_CANCEL_CALLBACK) DxeUnRegisterCallBackOnSet,
+  (EFI_PCD_PROTOCOL_CALLBACK_ON_SET)DxeRegisterCallBackOnSet,
+  (EFI_PCD_PROTOCOL_CANCEL_CALLBACK)DxeUnRegisterCallBackOnSet,
   DxePcdGetNextToken,
   DxePcdGetNextTokenSpace
 };
@@ -87,7 +87,7 @@ EFI_PCD_PROTOCOL mEfiPcdInstance = {
 /// Instance of GET_PCD_INFO_PROTOCOL protocol is EDKII native implementation.
 /// This protocol instance support dynamic and dynamicEx type PCDs.
 ///
-GET_PCD_INFO_PROTOCOL mGetPcdInfoInstance = {
+GET_PCD_INFO_PROTOCOL  mGetPcdInfoInstance = {
   DxeGetPcdInfoGetInfo,
   DxeGetPcdInfoGetInfoEx,
   DxeGetPcdInfoGetSku
@@ -102,8 +102,8 @@ EFI_GET_PCD_INFO_PROTOCOL  mEfiGetPcdInfoInstance = {
   DxeGetPcdInfoGetSku
 };
 
-EFI_HANDLE mPcdHandle = NULL;
-UINTN      mVpdBaseAddress = 0;
+EFI_HANDLE  mPcdHandle = NULL;
+UINTN       mVpdBaseAddress = 0;
 
 /**
   Main entry for PCD DXE driver.
@@ -123,8 +123,8 @@ PcdDxeInit (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  EFI_STATUS Status;
-  VOID       *Registration;
+  EFI_STATUS  Status;
+  VOID        *Registration;
 
   //
   // Make sure the Pcd Protocol is not already installed in the system
@@ -140,8 +140,10 @@ PcdDxeInit (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mPcdHandle,
-                  &gPcdProtocolGuid,     &mPcdInstance,
-                  &gEfiPcdProtocolGuid,  &mEfiPcdInstance,
+                  &gPcdProtocolGuid,
+                  &mPcdInstance,
+                  &gEfiPcdProtocolGuid,
+                  &mEfiPcdInstance,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
@@ -152,8 +154,10 @@ PcdDxeInit (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mPcdHandle,
-                  &gGetPcdInfoProtocolGuid,     &mGetPcdInfoInstance,
-                  &gEfiGetPcdInfoProtocolGuid,  &mEfiGetPcdInfoInstance,
+                  &gGetPcdInfoProtocolGuid,
+                  &mGetPcdInfoInstance,
+                  &gEfiGetPcdInfoProtocolGuid,
+                  &mEfiGetPcdInfoInstance,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
@@ -177,12 +181,12 @@ PcdDxeInit (
   //
   // PcdVpdBaseAddress64 is DynamicEx PCD only. So, DxePcdGet64Ex() is used to get its value.
   //
-  mVpdBaseAddress = (UINTN) DxePcdGet64Ex (&gEfiMdeModulePkgTokenSpaceGuid, PcdToken (PcdVpdBaseAddress64));
+  mVpdBaseAddress = (UINTN)DxePcdGet64Ex (&gEfiMdeModulePkgTokenSpaceGuid, PcdToken (PcdVpdBaseAddress64));
   if (mVpdBaseAddress == 0) {
     //
     // PcdVpdBaseAddress64 is not set, get value from PcdVpdBaseAddress.
     //
-    mVpdBaseAddress = (UINTN) PcdGet32 (PcdVpdBaseAddress);
+    mVpdBaseAddress = (UINTN)PcdGet32 (PcdVpdBaseAddress);
   }
 
   return Status;
@@ -249,7 +253,7 @@ DxeGetPcdInfoGetSku (
   VOID
   )
 {
-  return (UINTN) mPcdDatabase.DxeDb->SystemSkuId;
+  return (UINTN)mPcdDatabase.DxeDb->SystemSkuId;
 }
 
 /**
@@ -279,11 +283,11 @@ DxePcdSetSku (
   IN  UINTN         SkuId
   )
 {
-  SKU_ID     *SkuIdTable;
-  UINTN      Index;
-  EFI_STATUS Status;
+  SKU_ID      *SkuIdTable;
+  UINTN       Index;
+  EFI_STATUS  Status;
 
-  DEBUG ((DEBUG_INFO, "PcdDxe - SkuId 0x%lx is to be set.\n", (SKU_ID) SkuId));
+  DEBUG ((DEBUG_INFO, "PcdDxe - SkuId 0x%lx is to be set.\n", (SKU_ID)SkuId));
 
   if (SkuId == mPcdDatabase.DxeDb->SystemSkuId) {
     //
@@ -293,26 +297,26 @@ DxePcdSetSku (
     return;
   }
 
-  if (mPcdDatabase.DxeDb->SystemSkuId != (SKU_ID) 0) {
+  if (mPcdDatabase.DxeDb->SystemSkuId != (SKU_ID)0) {
     DEBUG ((DEBUG_ERROR, "PcdDxe - The SKU Id could be changed only once."));
     DEBUG ((
       DEBUG_ERROR,
       "PcdDxe - The SKU Id was set to 0x%lx already, it could not be set to 0x%lx any more.",
       mPcdDatabase.DxeDb->SystemSkuId,
-      (SKU_ID) SkuId
+      (SKU_ID)SkuId
       ));
     ASSERT (FALSE);
     return;
   }
 
-  SkuIdTable = (SKU_ID *) ((UINT8 *) mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->SkuIdTableOffset);
+  SkuIdTable = (SKU_ID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->SkuIdTableOffset);
   for (Index = 0; Index < SkuIdTable[0]; Index++) {
     if (SkuId == SkuIdTable[Index + 1]) {
       DEBUG ((DEBUG_INFO, "PcdDxe - SkuId is found in SkuId table.\n"));
       Status = UpdatePcdDatabase (SkuId, TRUE);
       if (!EFI_ERROR (Status)) {
-        mPcdDatabase.DxeDb->SystemSkuId = (SKU_ID) SkuId;
-        DEBUG ((DEBUG_INFO, "PcdDxe - Set current SKU Id to 0x%lx.\n", (SKU_ID) SkuId));
+        mPcdDatabase.DxeDb->SystemSkuId = (SKU_ID)SkuId;
+        DEBUG ((DEBUG_INFO, "PcdDxe - Set current SKU Id to 0x%lx.\n", (SKU_ID)SkuId));
         return;
       }
     }
@@ -342,7 +346,7 @@ DxePcdGet8 (
   IN UINTN                    TokenNumber
   )
 {
-  return *((UINT8 *) GetWorker (TokenNumber, sizeof (UINT8)));
+  return *((UINT8 *)GetWorker (TokenNumber, sizeof (UINT8)));
 }
 
 /**
@@ -402,7 +406,7 @@ DxePcdGet64 (
   IN UINTN                     TokenNumber
   )
 {
-  return ReadUnaligned64(GetWorker (TokenNumber, sizeof (UINT64)));
+  return ReadUnaligned64 (GetWorker (TokenNumber, sizeof (UINT64)));
 }
 
 /**
@@ -446,7 +450,7 @@ DxePcdGetBool (
   IN UINTN                     TokenNumber
   )
 {
-  return *((BOOLEAN *) GetWorker (TokenNumber, sizeof (BOOLEAN)));
+  return *((BOOLEAN *)GetWorker (TokenNumber, sizeof (BOOLEAN)));
 }
 
 /**
@@ -466,11 +470,12 @@ DxePcdGetSize (
   IN UINTN                     TokenNumber
   )
 {
-  UINTN   Size;
-  UINT32  *LocalTokenNumberTable;
-  BOOLEAN IsPeiDb;
-  UINTN   MaxSize;
-  UINTN   TmpTokenNumber;
+  UINTN    Size;
+  UINT32   *LocalTokenNumberTable;
+  BOOLEAN  IsPeiDb;
+  UINTN    MaxSize;
+  UINTN    TmpTokenNumber;
+
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
   // We have to decrement TokenNumber by 1 to make it usable
@@ -491,10 +496,10 @@ DxePcdGetSize (
   // EBC compiler is very choosy. It may report warning about comparison
   // between UINTN and 0 . So we add 1 in each size of the
   // comparison.
-  IsPeiDb = (BOOLEAN) (TokenNumber + 1 < mPeiLocalTokenCount + 1);
+  IsPeiDb = (BOOLEAN)(TokenNumber + 1 < mPeiLocalTokenCount + 1);
 
   TokenNumber = IsPeiDb ? TokenNumber :
-                          (TokenNumber - mPeiLocalTokenCount);
+                (TokenNumber - mPeiLocalTokenCount);
 
   LocalTokenNumberTable = IsPeiDb ? (UINT32 *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->LocalTokenNumberTableOffset)
                                   : (UINT32 *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->LocalTokenNumberTableOffset);
@@ -509,7 +514,6 @@ DxePcdGetSize (
   } else {
     return Size;
   }
-
 }
 
 /**
@@ -533,7 +537,7 @@ DxePcdGet8Ex (
   IN UINTN                  ExTokenNumber
   )
 {
-  return *((UINT8 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT8)));
+  return *((UINT8 *)ExGetWorker (Guid, ExTokenNumber, sizeof (UINT8)));
 }
 
 /**
@@ -557,7 +561,7 @@ DxePcdGet16Ex (
   IN UINTN                ExTokenNumber
   )
 {
-  return ReadUnaligned16 (ExGetWorker (Guid, ExTokenNumber, sizeof(UINT16)));
+  return ReadUnaligned16 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT16)));
 }
 
 /**
@@ -581,7 +585,7 @@ DxePcdGet32Ex (
   IN UINTN                 ExTokenNumber
   )
 {
-  return ReadUnaligned32 (ExGetWorker (Guid, ExTokenNumber, sizeof(UINT32)));
+  return ReadUnaligned32 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT32)));
 }
 
 /**
@@ -605,7 +609,7 @@ DxePcdGet64Ex (
   IN UINTN                 ExTokenNumber
   )
 {
-  return ReadUnaligned64 (ExGetWorker (Guid, ExTokenNumber, sizeof(UINT64)));
+  return ReadUnaligned64 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT64)));
 }
 
 /**
@@ -629,7 +633,7 @@ DxePcdGetPtrEx (
   IN UINTN                 ExTokenNumber
   )
 {
-  return  ExGetWorker (Guid, ExTokenNumber, 0);
+  return ExGetWorker (Guid, ExTokenNumber, 0);
 }
 
 /**
@@ -653,7 +657,7 @@ DxePcdGetBoolEx (
   IN UINTN                 ExTokenNumber
   )
 {
-  return *((BOOLEAN *) ExGetWorker (Guid, ExTokenNumber, sizeof(BOOLEAN)));
+  return *((BOOLEAN *)ExGetWorker (Guid, ExTokenNumber, sizeof (BOOLEAN)));
 }
 
 /**
@@ -675,7 +679,7 @@ DxePcdGetSizeEx (
   IN UINTN                 ExTokenNumber
   )
 {
-  return DxePcdGetSize(GetExPcdTokenNumber (Guid, (UINT32) ExTokenNumber));
+  return DxePcdGetSize (GetExPcdTokenNumber (Guid, (UINT32)ExTokenNumber));
 }
 
 /**
@@ -871,7 +875,7 @@ DxePcdSet8Ex (
   IN UINT8                  Value
   )
 {
-  return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
+  return ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
 /**
@@ -903,9 +907,11 @@ DxePcdSet16Ex (
   //
   // PcdSetNvStoreDefaultId should be set in PEI phase to take effect.
   //
-  ASSERT (!(CompareGuid (Guid, &gEfiMdeModulePkgTokenSpaceGuid) &&
-            (ExTokenNumber == PcdToken(PcdSetNvStoreDefaultId))));
-  return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
+  ASSERT (
+    !(CompareGuid (Guid, &gEfiMdeModulePkgTokenSpaceGuid) &&
+      (ExTokenNumber == PcdToken (PcdSetNvStoreDefaultId)))
+    );
+  return ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
 /**
@@ -934,7 +940,7 @@ DxePcdSet32Ex (
   IN UINT32             Value
   )
 {
-  return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
+  return ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
 /**
@@ -963,7 +969,7 @@ DxePcdSet64Ex (
   IN UINT64            Value
   )
 {
-  return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
+  return ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
 /**
@@ -997,7 +1003,7 @@ DxePcdSetPtrEx (
   IN            VOID                   *Buffer
   )
 {
-  return  ExSetWorker(ExTokenNumber, Guid, Buffer, SizeOfBuffer, TRUE);
+  return ExSetWorker (ExTokenNumber, Guid, Buffer, SizeOfBuffer, TRUE);
 }
 
 /**
@@ -1026,7 +1032,7 @@ DxePcdSetBoolEx (
   IN BOOLEAN           Value
   )
 {
-  return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
+  return ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
 /**
@@ -1049,11 +1055,12 @@ DxeRegisterCallBackOnSet (
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   if (CallBackFunction == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Aquire lock to prevent reentrance from TPL_CALLBACK level
   //
@@ -1086,7 +1093,7 @@ DxeUnRegisterCallBackOnSet (
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   if (CallBackFunction == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1137,9 +1144,9 @@ DxePcdGetNextToken (
   IN OUT   UINTN            *TokenNumber
   )
 {
-  EFI_STATUS          Status;
-  BOOLEAN             PeiExMapTableEmpty;
-  BOOLEAN             DxeExMapTableEmpty;
+  EFI_STATUS  Status;
+  BOOLEAN     PeiExMapTableEmpty;
+  BOOLEAN     DxeExMapTableEmpty;
 
   Status = EFI_NOT_FOUND;
   PeiExMapTableEmpty = mPeiExMapTableEmpty;
@@ -1153,13 +1160,15 @@ DxePcdGetNextToken (
     // between UINTN and 0 . So we add 1 in each size of the
     // comparison.
     if (((*TokenNumber + 1 > mPeiNexTokenCount + 1) && (*TokenNumber + 1 <= mPeiLocalTokenCount + 1)) ||
-        ((*TokenNumber + 1 > (mPeiLocalTokenCount + mDxeNexTokenCount + 1)))) {
+        ((*TokenNumber + 1 > (mPeiLocalTokenCount + mDxeNexTokenCount + 1))))
+    {
       return EFI_NOT_FOUND;
     }
 
     (*TokenNumber)++;
     if ((*TokenNumber + 1 > mPeiNexTokenCount + 1) &&
-        (*TokenNumber + 1 <= mPeiLocalTokenCount + 1)) {
+        (*TokenNumber + 1 <= mPeiLocalTokenCount + 1))
+    {
       //
       // The first Non-Ex type Token Number for DXE PCD
       // database is mPeiLocalTokenCount + 1
@@ -1174,6 +1183,7 @@ DxePcdGetNextToken (
       *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
       return EFI_NOT_FOUND;
     }
+
     return EFI_SUCCESS;
   }
 
@@ -1183,13 +1193,13 @@ DxePcdGetNextToken (
 
   if (!PeiExMapTableEmpty) {
     Status = ExGetNextTokeNumber (
-                        Guid,
-                        TokenNumber,
-                        (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset),
-                        mPeiGuidTableSize,
-                        (DYNAMICEX_MAPPING *)((UINT8 *) mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->ExMapTableOffset),
-                        mPeiExMapppingTableSize
-                        );
+               Guid,
+               TokenNumber,
+               (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset),
+               mPeiGuidTableSize,
+               (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->ExMapTableOffset),
+               mPeiExMapppingTableSize
+               );
   }
 
   if (Status == EFI_SUCCESS) {
@@ -1198,13 +1208,13 @@ DxePcdGetNextToken (
 
   if (!DxeExMapTableEmpty) {
     Status = ExGetNextTokeNumber (
-                        Guid,
-                        TokenNumber,
-                        (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset),
-                        mDxeGuidTableSize,
-                        (DYNAMICEX_MAPPING *)((UINT8 *) mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->ExMapTableOffset),
-                        mDxeExMapppingTableSize
-                        );
+               Guid,
+               TokenNumber,
+               (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset),
+               mDxeGuidTableSize,
+               (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->ExMapTableOffset),
+               mDxeExMapppingTableSize
+               );
   }
 
   return Status;
@@ -1252,6 +1262,7 @@ GetDistinctTokenSpace (
         break;
       }
     }
+
     if (!Match) {
       DistinctTokenSpace[++TsIdx] = &GuidTable[OldGuidIndex];
     }
@@ -1264,7 +1275,6 @@ GetDistinctTokenSpace (
   //
   *ExMapTableSize = TsIdx + 1;
   return DistinctTokenSpace;
-
 }
 
 /**
@@ -1289,16 +1299,16 @@ DxePcdGetNextTokenSpace (
   IN OUT CONST EFI_GUID               **Guid
   )
 {
-  UINTN               Idx;
-  UINTN               Idx2;
-  UINTN               Idx3;
-  UINTN               PeiTokenSpaceTableSize;
-  UINTN               DxeTokenSpaceTableSize;
-  EFI_GUID            **PeiTokenSpaceTable;
-  EFI_GUID            **DxeTokenSpaceTable;
-  BOOLEAN             Match;
-  BOOLEAN             PeiExMapTableEmpty;
-  BOOLEAN             DxeExMapTableEmpty;
+  UINTN     Idx;
+  UINTN     Idx2;
+  UINTN     Idx3;
+  UINTN     PeiTokenSpaceTableSize;
+  UINTN     DxeTokenSpaceTableSize;
+  EFI_GUID  **PeiTokenSpaceTable;
+  EFI_GUID  **DxeTokenSpaceTable;
+  BOOLEAN   Match;
+  BOOLEAN   PeiExMapTableEmpty;
+  BOOLEAN   DxeExMapTableEmpty;
 
   ASSERT (Guid != NULL);
 
@@ -1313,22 +1323,24 @@ DxePcdGetNextTokenSpace (
     PeiTokenSpaceTableSize = 0;
 
     if (!PeiExMapTableEmpty) {
-      PeiTokenSpaceTableSize = mPeiExMapppingTableSize / sizeof(DYNAMICEX_MAPPING);
-      PeiTokenSpaceTable = GetDistinctTokenSpace (&PeiTokenSpaceTableSize,
-                            (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->ExMapTableOffset),
-                            (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset)
-                            );
-      CopyMem (TmpTokenSpaceBuffer, PeiTokenSpaceTable, sizeof (EFI_GUID*) * PeiTokenSpaceTableSize);
+      PeiTokenSpaceTableSize = mPeiExMapppingTableSize / sizeof (DYNAMICEX_MAPPING);
+      PeiTokenSpaceTable     = GetDistinctTokenSpace (
+                                 &PeiTokenSpaceTableSize,
+                                 (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->ExMapTableOffset),
+                                 (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset)
+                                 );
+      CopyMem (TmpTokenSpaceBuffer, PeiTokenSpaceTable, sizeof (EFI_GUID *) * PeiTokenSpaceTableSize);
       TmpTokenSpaceBufferCount = PeiTokenSpaceTableSize;
       FreePool (PeiTokenSpaceTable);
     }
 
     if (!DxeExMapTableEmpty) {
-      DxeTokenSpaceTableSize = mDxeExMapppingTableSize / sizeof(DYNAMICEX_MAPPING);
-      DxeTokenSpaceTable = GetDistinctTokenSpace (&DxeTokenSpaceTableSize,
-                            (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->ExMapTableOffset),
-                            (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset)
-                            );
+      DxeTokenSpaceTableSize = mDxeExMapppingTableSize / sizeof (DYNAMICEX_MAPPING);
+      DxeTokenSpaceTable     = GetDistinctTokenSpace (
+                                 &DxeTokenSpaceTableSize,
+                                 (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->ExMapTableOffset),
+                                 (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset)
+                                 );
 
       //
       // Make sure EFI_GUID in DxeTokenSpaceTable does not exist in PeiTokenSpaceTable
@@ -1341,6 +1353,7 @@ DxePcdGetNextTokenSpace (
             break;
           }
         }
+
         if (!Match) {
           TmpTokenSpaceBuffer[Idx3++] = DxeTokenSpaceTable[Idx2];
         }
@@ -1374,5 +1387,3 @@ DxePcdGetNextTokenSpace (
 
   return EFI_NOT_FOUND;
 }
-
-

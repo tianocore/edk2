@@ -46,11 +46,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define STACK_SIZE      0x20000
 #define BSP_STORE_SIZE  0x4000
 
-
 //
 // This PPI is installed to indicate the end of the PEI usage of memory
 //
-extern CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi;
+extern CONST EFI_PEI_PPI_DESCRIPTOR  gEndOfPeiSignalPpi;
 
 /**
    This function installs the PPIs that require permanent memory.
@@ -83,7 +82,6 @@ DxeIplFindDxeCore (
   VOID
   );
 
-
 /**
    Main entry point to last PEIM
 
@@ -103,8 +101,6 @@ DxeLoadCore (
   IN EFI_PEI_HOB_POINTERS  HobList
   );
 
-
-
 /**
    Transfers control to DxeCore.
 
@@ -121,8 +117,6 @@ HandOffToDxeCore (
   IN EFI_PHYSICAL_ADDRESS   DxeCoreEntryPoint,
   IN EFI_PEI_HOB_POINTERS   HobList
   );
-
-
 
 /**
    Updates the Stack HOB passed to DXE phase.
@@ -203,7 +197,6 @@ CustomGuidedSectionExtract (
   OUT       UINTN                                 *OutputSize,
   OUT       UINT32                                *AuthenticationStatus
   );
-
 
 /**
    Decompresses a section to the output buffer.

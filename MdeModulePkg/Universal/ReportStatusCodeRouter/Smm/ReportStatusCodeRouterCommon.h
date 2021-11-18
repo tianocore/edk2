@@ -22,9 +22,9 @@
 #define MM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE  SIGNATURE_32 ('s', 'h', 'c', 'e')
 
 typedef struct {
-  UINTN                         Signature;
-  EFI_MM_RSC_HANDLER_CALLBACK   RscHandlerCallback;
-  LIST_ENTRY                    Node;
+  UINTN                          Signature;
+  EFI_MM_RSC_HANDLER_CALLBACK    RscHandlerCallback;
+  LIST_ENTRY                     Node;
 } MM_RSC_HANDLER_CALLBACK_ENTRY;
 
 /**

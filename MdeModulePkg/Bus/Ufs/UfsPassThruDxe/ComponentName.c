@@ -18,14 +18,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUfsPassThruComponent
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUfsPassThruComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) UfsPassThruComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) UfsPassThruComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gUfsPassThruComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)UfsPassThruComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)UfsPassThruComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUfsPassThruDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mUfsPassThruDriverNameTable[] = {
   {
     "eng;en",
     L"Universal Flash Storage (UFS) Pass Thru Driver"
@@ -36,7 +35,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUfsPassThruDriverNameTab
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUfsPassThruControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mUfsPassThruControllerNameTable[] = {
   {
     "eng;en",
     L"Universal Flash Storage (UFS) Host Controller"
@@ -181,9 +180,9 @@ UfsPassThruComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  EFI_STATUS                    Status;
+  EFI_STATUS  Status;
 
-  if (Language == NULL || ControllerName == NULL) {
+  if ((Language == NULL) || (ControllerName == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 

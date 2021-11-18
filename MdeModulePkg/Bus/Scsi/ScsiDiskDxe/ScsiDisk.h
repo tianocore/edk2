@@ -9,9 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _SCSI_DISK_H_
 #define _SCSI_DISK_H_
 
-
 #include <Uefi.h>
-
 
 #include <Protocol/ScsiIo.h>
 #include <Protocol/ComponentName.h>
@@ -23,7 +21,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/ScsiPassThru.h>
 #include <Protocol/DiskInfo.h>
 #include <Protocol/StorageSecurityCommand.h>
-
 
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -37,74 +34,74 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/Scsi.h>
 #include <IndustryStandard/Atapi.h>
 
-#define IS_DEVICE_FIXED(a)        (a)->FixedDevice ? 1 : 0
+#define IS_DEVICE_FIXED(a)  (a)->FixedDevice ? 1 : 0
 
-#define IS_ALIGNED(addr, size)    (((UINTN) (addr) & (size - 1)) == 0)
+#define IS_ALIGNED(addr, size)  (((UINTN) (addr) & (size - 1)) == 0)
 
-#define UFS_WLUN_RPMB 0xC4
+#define UFS_WLUN_RPMB  0xC4
 
 typedef struct {
-  UINT32                    MaxLbaCnt;
-  UINT32                    MaxBlkDespCnt;
-  UINT32                    GranularityAlignment;
+  UINT32    MaxLbaCnt;
+  UINT32    MaxBlkDespCnt;
+  UINT32    GranularityAlignment;
 } SCSI_UNMAP_PARAM_INFO;
 
-#define SCSI_DISK_DEV_SIGNATURE SIGNATURE_32 ('s', 'c', 'd', 'k')
+#define SCSI_DISK_DEV_SIGNATURE  SIGNATURE_32 ('s', 'c', 'd', 'k')
 
 typedef struct {
-  UINT32                    Signature;
+  UINT32                                   Signature;
 
-  EFI_HANDLE                Handle;
+  EFI_HANDLE                               Handle;
 
-  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL   StorageSecurity;
+  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    StorageSecurity;
 
-  EFI_BLOCK_IO_PROTOCOL     BlkIo;
-  EFI_BLOCK_IO2_PROTOCOL    BlkIo2;
-  EFI_BLOCK_IO_MEDIA        BlkIoMedia;
-  EFI_ERASE_BLOCK_PROTOCOL  EraseBlock;
-  EFI_SCSI_IO_PROTOCOL      *ScsiIo;
-  UINT8                     DeviceType;
-  BOOLEAN                   FixedDevice;
-  UINT16                    Reserved;
+  EFI_BLOCK_IO_PROTOCOL                    BlkIo;
+  EFI_BLOCK_IO2_PROTOCOL                   BlkIo2;
+  EFI_BLOCK_IO_MEDIA                       BlkIoMedia;
+  EFI_ERASE_BLOCK_PROTOCOL                 EraseBlock;
+  EFI_SCSI_IO_PROTOCOL                     *ScsiIo;
+  UINT8                                    DeviceType;
+  BOOLEAN                                  FixedDevice;
+  UINT16                                   Reserved;
 
-  EFI_SCSI_SENSE_DATA       *SenseData;
-  UINTN                     SenseDataNumber;
-  EFI_SCSI_INQUIRY_DATA     InquiryData;
+  EFI_SCSI_SENSE_DATA                      *SenseData;
+  UINTN                                    SenseDataNumber;
+  EFI_SCSI_INQUIRY_DATA                    InquiryData;
 
-  EFI_UNICODE_STRING_TABLE  *ControllerNameTable;
+  EFI_UNICODE_STRING_TABLE                 *ControllerNameTable;
 
-  EFI_DISK_INFO_PROTOCOL    DiskInfo;
+  EFI_DISK_INFO_PROTOCOL                   DiskInfo;
 
   //
   // The following fields are only valid for ATAPI/SATA device
   //
-  UINT32                    Channel;
-  UINT32                    Device;
-  ATAPI_IDENTIFY_DATA       IdentifyData;
+  UINT32                                   Channel;
+  UINT32                                   Device;
+  ATAPI_IDENTIFY_DATA                      IdentifyData;
 
   //
   // Scsi UNMAP command parameters information
   //
-  SCSI_UNMAP_PARAM_INFO     UnmapInfo;
-  BOOLEAN                   BlockLimitsVpdSupported;
+  SCSI_UNMAP_PARAM_INFO                    UnmapInfo;
+  BOOLEAN                                  BlockLimitsVpdSupported;
 
   //
   // The flag indicates if 16-byte command can be used
   //
-  BOOLEAN                   Cdb16Byte;
+  BOOLEAN                                  Cdb16Byte;
 
   //
   // The queue for asynchronous task requests
   //
-  LIST_ENTRY                AsyncTaskQueue;
+  LIST_ENTRY                               AsyncTaskQueue;
 } SCSI_DISK_DEV;
 
-#define SCSI_DISK_DEV_FROM_BLKIO(a)  CR (a, SCSI_DISK_DEV, BlkIo, SCSI_DISK_DEV_SIGNATURE)
-#define SCSI_DISK_DEV_FROM_BLKIO2(a)  CR (a, SCSI_DISK_DEV, BlkIo2, SCSI_DISK_DEV_SIGNATURE)
+#define SCSI_DISK_DEV_FROM_BLKIO(a)     CR (a, SCSI_DISK_DEV, BlkIo, SCSI_DISK_DEV_SIGNATURE)
+#define SCSI_DISK_DEV_FROM_BLKIO2(a)    CR (a, SCSI_DISK_DEV, BlkIo2, SCSI_DISK_DEV_SIGNATURE)
 #define SCSI_DISK_DEV_FROM_ERASEBLK(a)  CR (a, SCSI_DISK_DEV, EraseBlock, SCSI_DISK_DEV_SIGNATURE)
-#define SCSI_DISK_DEV_FROM_STORSEC(a)  CR (a, SCSI_DISK_DEV, StorageSecurity, SCSI_DISK_DEV_SIGNATURE)
+#define SCSI_DISK_DEV_FROM_STORSEC(a)   CR (a, SCSI_DISK_DEV, StorageSecurity, SCSI_DISK_DEV_SIGNATURE)
 
-#define SCSI_DISK_DEV_FROM_DISKINFO(a) CR (a, SCSI_DISK_DEV, DiskInfo, SCSI_DISK_DEV_SIGNATURE)
+#define SCSI_DISK_DEV_FROM_DISKINFO(a)  CR (a, SCSI_DISK_DEV, DiskInfo, SCSI_DISK_DEV_SIGNATURE)
 
 //
 // Asynchronous I/O request
@@ -113,55 +110,55 @@ typedef struct {
 // Private data structure for a BlockIo2 request
 //
 typedef struct {
-  EFI_BLOCK_IO2_TOKEN                  *Token;
+  EFI_BLOCK_IO2_TOKEN    *Token;
   //
   // The flag indicates if the last Scsi Read/Write sub-task for a BlockIo2
   // request is sent to device
   //
-  BOOLEAN                              LastScsiRW;
+  BOOLEAN                LastScsiRW;
 
   //
   // The queue for Scsi Read/Write sub-tasks of a BlockIo2 request
   //
-  LIST_ENTRY                           ScsiRWQueue;
+  LIST_ENTRY             ScsiRWQueue;
 
-  LIST_ENTRY                           Link;
+  LIST_ENTRY             Link;
 } SCSI_BLKIO2_REQUEST;
 
 //
 // Private data structure for a SCSI Read/Write request
 //
 typedef struct {
-  SCSI_DISK_DEV                        *ScsiDiskDevice;
-  UINT64                               Timeout;
-  EFI_SCSI_SENSE_DATA                  *SenseData;
-  UINT8                                SenseDataLength;
-  UINT8                                HostAdapterStatus;
-  UINT8                                TargetStatus;
-  UINT8                                *InBuffer;
-  UINT8                                *OutBuffer;
-  UINT32                               DataLength;
-  UINT64                               StartLba;
-  UINT32                               SectorCount;
-  UINT8                                TimesRetry;
+  SCSI_DISK_DEV          *ScsiDiskDevice;
+  UINT64                 Timeout;
+  EFI_SCSI_SENSE_DATA    *SenseData;
+  UINT8                  SenseDataLength;
+  UINT8                  HostAdapterStatus;
+  UINT8                  TargetStatus;
+  UINT8                  *InBuffer;
+  UINT8                  *OutBuffer;
+  UINT32                 DataLength;
+  UINT64                 StartLba;
+  UINT32                 SectorCount;
+  UINT8                  TimesRetry;
 
   //
   // The BlockIo2 request this SCSI command belongs to
   //
-  SCSI_BLKIO2_REQUEST                  *BlkIo2Req;
+  SCSI_BLKIO2_REQUEST    *BlkIo2Req;
 
-  LIST_ENTRY                           Link;
+  LIST_ENTRY             Link;
 } SCSI_ASYNC_RW_REQUEST;
 
 //
 // Private data structure for an EraseBlock request
 //
 typedef struct {
-  EFI_ERASE_BLOCK_TOKEN                *Token;
+  EFI_ERASE_BLOCK_TOKEN              *Token;
 
-  EFI_SCSI_IO_SCSI_REQUEST_PACKET      CommandPacket;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET    CommandPacket;
 
-  LIST_ENTRY                           Link;
+  LIST_ENTRY                         Link;
 } SCSI_ERASEBLK_REQUEST;
 
 //
@@ -173,14 +170,14 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gScsiDiskComponentName2;
 //
 // action code used in detect media process
 //
-#define ACTION_NO_ACTION               0x00
-#define ACTION_READ_CAPACITY           0x01
-#define ACTION_RETRY_COMMAND_LATER     0x02
-#define ACTION_RETRY_WITH_BACKOFF_ALGO 0x03
+#define ACTION_NO_ACTION                0x00
+#define ACTION_READ_CAPACITY            0x01
+#define ACTION_RETRY_COMMAND_LATER      0x02
+#define ACTION_RETRY_WITH_BACKOFF_ALGO  0x03
 
-#define SCSI_COMMAND_VERSION_1      0x01
-#define SCSI_COMMAND_VERSION_2      0x02
-#define SCSI_COMMAND_VERSION_3      0x03
+#define SCSI_COMMAND_VERSION_1  0x01
+#define SCSI_COMMAND_VERSION_2  0x02
+#define SCSI_COMMAND_VERSION_3  0x03
 
 //
 // SCSI Disk Timeout Experience Value
@@ -189,7 +186,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gScsiDiskComponentName2;
 // value is updated to 30s to follow ATA/ATAPI spec in which the device may take up to 30s
 // to respond command.
 //
-#define SCSI_DISK_TIMEOUT           EFI_TIMER_PERIOD_SECONDS (30)
+#define SCSI_DISK_TIMEOUT  EFI_TIMER_PERIOD_SECONDS (30)
 
 /**
   Test to see if this driver supports ControllerHandle.
@@ -276,6 +273,7 @@ ScsiDiskDriverBindingStop (
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -322,7 +320,6 @@ ScsiDiskComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -422,7 +419,6 @@ ScsiDiskReset (
   IN  BOOLEAN                 ExtendedVerification
   );
 
-
 /**
   The function is to Read Block from SCSI Disk.
 
@@ -449,7 +445,6 @@ ScsiDiskReadBlocks (
   IN  UINTN                   BufferSize,
   OUT VOID                    *Buffer
   );
-
 
 /**
   The function is to Write Block to SCSI Disk.
@@ -479,7 +474,6 @@ ScsiDiskWriteBlocks (
   IN  VOID                    *Buffer
   );
 
-
 /**
   Flush Block to Disk.
 
@@ -495,7 +489,6 @@ EFIAPI
 ScsiDiskFlushBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL   *This
   );
-
 
 /**
   Reset SCSI Disk.
@@ -645,7 +638,6 @@ ScsiDiskEraseBlocks (
   IN     UINTN                         Size
   );
 
-
 /**
   Send a security protocol command to a device that receives data and/or the result
   of one or more commands sent by SendData.
@@ -790,7 +782,6 @@ ScsiDiskSendData (
   OUT VOID                                    *PayloadBuffer
   );
 
-
 /**
   Provides inquiry information for the controller type.
 
@@ -814,7 +805,6 @@ ScsiDiskInfoInquiry (
   IN OUT VOID                     *InquiryData,
   IN OUT UINT32                   *InquiryDataSize
   );
-
 
 /**
   Provides identify information for the controller type.
@@ -841,7 +831,6 @@ ScsiDiskInfoIdentify (
   IN OUT VOID                     *IdentifyData,
   IN OUT UINT32                   *IdentifyDataSize
   );
-
 
 /**
   Provides sense data information for the controller type.
@@ -888,7 +877,6 @@ ScsiDiskInfoWhichIde (
   OUT UINT32                   *IdeDevice
   );
 
-
 /**
   Detect Device and read out capacity ,if error occurs, parse the sense key.
 
@@ -931,7 +919,6 @@ ScsiDiskTestUnitReady (
   OUT UINTN                 *NumberOfSenseKeys
   );
 
-
 /**
   Parsing Sense Keys which got from request sense command.
 
@@ -952,7 +939,6 @@ DetectMediaParsingSenseKeys (
   OUT  UINTN                   *Action
   );
 
-
 /**
   Send read capacity command to device and get the device parameter.
 
@@ -968,9 +954,9 @@ DetectMediaParsingSenseKeys (
 EFI_STATUS
 ScsiDiskReadCapacity (
   IN  OUT  SCSI_DISK_DEV           *ScsiDiskDevice,
-      OUT  BOOLEAN                 *NeedRetry,
-      OUT  EFI_SCSI_SENSE_DATA     **SenseDataArray,
-      OUT  UINTN                   *NumberOfSenseKeys
+  OUT  BOOLEAN                 *NeedRetry,
+  OUT  EFI_SCSI_SENSE_DATA     **SenseDataArray,
+  OUT  UINTN                   *NumberOfSenseKeys
   );
 
 /**
@@ -988,7 +974,6 @@ EFI_STATUS
 CheckHostAdapterStatus (
   IN UINT8   HostAdapterStatus
   );
-
 
 /**
   Check the target status and re-interpret it in EFI_STATUS.
@@ -1025,9 +1010,9 @@ CheckTargetStatus (
 EFI_STATUS
 ScsiDiskRequestSenseKeys (
   IN  OUT  SCSI_DISK_DEV           *ScsiDiskDevice,
-      OUT  BOOLEAN                 *NeedRetry,
-      OUT  EFI_SCSI_SENSE_DATA     **SenseDataArray,
-      OUT  UINTN                   *NumberOfSenseKeys,
+  OUT  BOOLEAN                 *NeedRetry,
+  OUT  EFI_SCSI_SENSE_DATA     **SenseDataArray,
+  OUT  UINTN                   *NumberOfSenseKeys,
   IN       BOOLEAN                 AskResetIfError
   );
 
@@ -1044,7 +1029,7 @@ ScsiDiskRequestSenseKeys (
 EFI_STATUS
 ScsiDiskInquiryDevice (
   IN OUT  SCSI_DISK_DEV   *ScsiDiskDevice,
-     OUT  BOOLEAN         *NeedRetry
+  OUT  BOOLEAN         *NeedRetry
   );
 
 /**
@@ -1162,9 +1147,9 @@ ScsiDiskAsyncWriteSectors (
 EFI_STATUS
 ScsiDiskRead10 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
-     OUT BOOLEAN               *NeedRetry,
+  OUT BOOLEAN               *NeedRetry,
   IN     UINT64                Timeout,
-     OUT UINT8                 *DataBuffer,
+  OUT UINT8                 *DataBuffer,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
   IN     UINT32                SectorCount
@@ -1187,7 +1172,7 @@ ScsiDiskRead10 (
 EFI_STATUS
 ScsiDiskWrite10 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
-     OUT BOOLEAN               *NeedRetry,
+  OUT BOOLEAN               *NeedRetry,
   IN     UINT64                Timeout,
   IN     UINT8                 *DataBuffer,
   IN OUT UINT32                *DataLength,
@@ -1211,9 +1196,9 @@ ScsiDiskWrite10 (
 EFI_STATUS
 ScsiDiskRead16 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
-     OUT BOOLEAN               *NeedRetry,
+  OUT BOOLEAN               *NeedRetry,
   IN     UINT64                Timeout,
-     OUT UINT8                 *DataBuffer,
+  OUT UINT8                 *DataBuffer,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
   IN     UINT32                SectorCount
@@ -1236,7 +1221,7 @@ ScsiDiskRead16 (
 EFI_STATUS
 ScsiDiskWrite16 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
-     OUT BOOLEAN               *NeedRetry,
+  OUT BOOLEAN               *NeedRetry,
   IN     UINT64                Timeout,
   IN     UINT8                 *DataBuffer,
   IN OUT UINT32                *DataLength,
@@ -1269,7 +1254,7 @@ ScsiDiskAsyncRead10 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
   IN     UINT64                Timeout,
   IN     UINT8                 TimesRetry,
-     OUT UINT8                 *DataBuffer,
+  OUT UINT8                 *DataBuffer,
   IN     UINT32                DataLength,
   IN     UINT32                StartLba,
   IN     UINT32                SectorCount,
@@ -1335,7 +1320,7 @@ ScsiDiskAsyncRead16 (
   IN     SCSI_DISK_DEV         *ScsiDiskDevice,
   IN     UINT64                Timeout,
   IN     UINT8                 TimesRetry,
-     OUT UINT8                 *DataBuffer,
+  OUT UINT8                 *DataBuffer,
   IN     UINT32                DataLength,
   IN     UINT64                StartLba,
   IN     UINT32                SectorCount,

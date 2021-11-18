@@ -70,4 +70,3 @@ OemHookStatusCodeReport (
   );
 
 #endif // __OEM_HOOK_STATUSCODE_LIB__
-

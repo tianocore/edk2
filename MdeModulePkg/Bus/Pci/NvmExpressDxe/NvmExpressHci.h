@@ -11,12 +11,12 @@
 #ifndef _NVME_HCI_H_
 #define _NVME_HCI_H_
 
-#define NVME_BAR                 0
+#define NVME_BAR  0
 
 //
 // Offset from the beginning of private data queue buffer
 //
-#define NVME_ASQ_BUF_OFFSET                  EFI_PAGE_SIZE
+#define NVME_ASQ_BUF_OFFSET  EFI_PAGE_SIZE
 
 /**
   Initialize the Nvm Express controller.
@@ -67,4 +67,3 @@ NvmeIdentifyNamespace (
   );
 
 #endif
-

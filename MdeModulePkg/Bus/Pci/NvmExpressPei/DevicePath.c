@@ -17,8 +17,8 @@ NVME_NAMESPACE_DEVICE_PATH  mNvmeDevicePathNodeTemplate = {
     MESSAGING_DEVICE_PATH,
     MSG_NVME_NAMESPACE_DP,
     {
-      (UINT8) (sizeof (NVME_NAMESPACE_DEVICE_PATH)),
-      (UINT8) ((sizeof (NVME_NAMESPACE_DEVICE_PATH)) >> 8)
+      (UINT8)(sizeof (NVME_NAMESPACE_DEVICE_PATH)),
+      (UINT8)((sizeof (NVME_NAMESPACE_DEVICE_PATH)) >> 8)
     }
   },
   0x0,     // NamespaceId
@@ -32,8 +32,8 @@ EFI_DEVICE_PATH_PROTOCOL  mNvmeEndDevicePathNodeTemplate = {
   END_DEVICE_PATH_TYPE,
   END_ENTIRE_DEVICE_PATH_SUBTYPE,
   {
-    (UINT8) (sizeof (EFI_DEVICE_PATH_PROTOCOL)),
-    (UINT8) ((sizeof (EFI_DEVICE_PATH_PROTOCOL)) >> 8)
+    (UINT8)(sizeof (EFI_DEVICE_PATH_PROTOCOL)),
+    (UINT8)((sizeof (EFI_DEVICE_PATH_PROTOCOL)) >> 8)
   }
 };
 
@@ -78,7 +78,7 @@ NextDevicePathNode (
   )
 {
   ASSERT (Node != NULL);
-  return (EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)(Node) + DevicePathNodeLength(Node));
+  return (EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)(Node) + DevicePathNodeLength (Node));
 }
 
 /**
@@ -101,9 +101,9 @@ GetDevicePathInstanceSize (
   OUT BOOLEAN                     *EntireDevicePathEnd
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL    *Walker;
+  EFI_DEVICE_PATH_PROTOCOL  *Walker;
 
-  if (DevicePath == NULL || InstanceSize == NULL || EntireDevicePathEnd == NULL) {
+  if ((DevicePath == NULL) || (InstanceSize == NULL) || (EntireDevicePathEnd == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -129,7 +129,7 @@ GetDevicePathInstanceSize (
   //
   // Compute the size of the device path instance
   //
-  *InstanceSize = ((UINTN) Walker - (UINTN) (DevicePath)) + sizeof (EFI_DEVICE_PATH_PROTOCOL);
+  *InstanceSize = ((UINTN)Walker - (UINTN)(DevicePath)) + sizeof (EFI_DEVICE_PATH_PROTOCOL);
 
   return EFI_SUCCESS;
 }
@@ -151,8 +151,8 @@ NvmeIsHcDevicePathValid (
   IN UINTN                       DevicePathLength
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL    *Start;
-  UINTN                       Size;
+  EFI_DEVICE_PATH_PROTOCOL  *Start;
+  UINTN                     Size;
 
   if (DevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -167,22 +167,24 @@ NvmeIsHcDevicePathValid (
 
   Start = DevicePath;
   while (!(DevicePath->Type == END_DEVICE_PATH_TYPE &&
-           DevicePath->SubType == END_ENTIRE_DEVICE_PATH_SUBTYPE)) {
+           DevicePath->SubType == END_ENTIRE_DEVICE_PATH_SUBTYPE))
+  {
     DevicePath = NextDevicePathNode (DevicePath);
 
     //
     // Prevent overflow and invalid zero in the 'Length' field of a device path
     // node.
     //
-    if ((UINTN) DevicePath <= (UINTN) Start) {
+    if ((UINTN)DevicePath <= (UINTN)Start) {
       return EFI_INVALID_PARAMETER;
     }
 
     //
     // Prevent touching memory beyond given DevicePathLength.
     //
-    if ((UINTN) DevicePath - (UINTN) Start >
-        DevicePathLength - sizeof (EFI_DEVICE_PATH_PROTOCOL)) {
+    if ((UINTN)DevicePath - (UINTN)Start >
+        DevicePathLength - sizeof (EFI_DEVICE_PATH_PROTOCOL))
+    {
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -190,7 +192,7 @@ NvmeIsHcDevicePathValid (
   //
   // Check if the device path and its size match exactly with each other.
   //
-  Size = ((UINTN) DevicePath - (UINTN) Start) + sizeof (EFI_DEVICE_PATH_PROTOCOL);
+  Size = ((UINTN)DevicePath - (UINTN)Start) + sizeof (EFI_DEVICE_PATH_PROTOCOL);
   if (Size != DevicePathLength) {
     return EFI_INVALID_PARAMETER;
   }
@@ -224,15 +226,15 @@ NvmeBuildDevicePath (
   OUT EFI_DEVICE_PATH_PROTOCOL            **DevicePath
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL      *DevicePathWalker;
-  NVME_NAMESPACE_DEVICE_PATH    *NvmeDeviceNode;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePathWalker;
+  NVME_NAMESPACE_DEVICE_PATH  *NvmeDeviceNode;
 
-  if (DevicePathLength == NULL || DevicePath == NULL) {
+  if ((DevicePathLength == NULL) || (DevicePath == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   *DevicePathLength = Private->DevicePathLength + sizeof (NVME_NAMESPACE_DEVICE_PATH);
-  *DevicePath       = AllocatePool (*DevicePathLength);
+  *DevicePath = AllocatePool (*DevicePathLength);
   if (*DevicePath == NULL) {
     *DevicePathLength = 0;
     return EFI_OUT_OF_RESOURCES;
@@ -251,22 +253,22 @@ NvmeBuildDevicePath (
   //
   // Construct the Nvm Express device node
   //
-  DevicePathWalker = (EFI_DEVICE_PATH_PROTOCOL *) ((UINT8 *)DevicePathWalker +
-                     (Private->DevicePathLength - sizeof (EFI_DEVICE_PATH_PROTOCOL)));
+  DevicePathWalker = (EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)DevicePathWalker +
+                                                  (Private->DevicePathLength - sizeof (EFI_DEVICE_PATH_PROTOCOL)));
   CopyMem (
     DevicePathWalker,
     &mNvmeDevicePathNodeTemplate,
     sizeof (mNvmeDevicePathNodeTemplate)
     );
-  NvmeDeviceNode                = (NVME_NAMESPACE_DEVICE_PATH *)DevicePathWalker;
+  NvmeDeviceNode = (NVME_NAMESPACE_DEVICE_PATH *)DevicePathWalker;
   NvmeDeviceNode->NamespaceId   = NamespaceId;
   NvmeDeviceNode->NamespaceUuid = NamespaceUuid;
 
   //
   // Construct the end device node
   //
-  DevicePathWalker = (EFI_DEVICE_PATH_PROTOCOL *) ((UINT8 *)DevicePathWalker +
-                     sizeof (NVME_NAMESPACE_DEVICE_PATH));
+  DevicePathWalker = (EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)DevicePathWalker +
+                                                  sizeof (NVME_NAMESPACE_DEVICE_PATH));
   CopyMem (
     DevicePathWalker,
     &mNvmeEndDevicePathNodeTemplate,

@@ -9,7 +9,6 @@
 #ifndef __PEI_REPORT_STATUS_CODE_ROUTER_H__
 #define __PEI_REPORT_STATUS_CODE_ROUTER_H__
 
-
 #include <Ppi/ReportStatusCodeHandler.h>
 #include <Ppi/StatusCode.h>
 
@@ -99,5 +98,3 @@ ReportDispatcher (
   );
 
 #endif
-
-

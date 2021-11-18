@@ -52,7 +52,6 @@ BmConnectAllDriversToAllControllers (
     // the connect again.
     //
     Status = gDS->Dispatch ();
-
   } while (!EFI_ERROR (Status));
 }
 
@@ -133,7 +132,7 @@ EfiBootManagerConnectDevicePath (
     // RemainingDevicePath.
     //
     RemainingDevicePath = DevicePathToConnect;
-    Status              = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &Handle);
+    Status = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &RemainingDevicePath, &Handle);
     if (!EFI_ERROR (Status)) {
       if (Handle == PreviousHandle) {
         //
@@ -153,7 +152,6 @@ EfiBootManagerConnectDevicePath (
           Status = EFI_NOT_FOUND;
         }
       }
-
 
       if (!EFI_ERROR (Status)) {
         PreviousHandle = Handle;
@@ -175,11 +173,13 @@ EfiBootManagerConnectDevicePath (
         if (Status == EFI_NOT_FOUND) {
           Status = EFI_SUCCESS;
         }
+
         if (MatchingHandle != NULL) {
           *MatchingHandle = Handle;
         }
       }
     }
+
     //
     // Loop until RemainingDevicePath is an empty device path
     //
@@ -246,13 +246,13 @@ BmConnectUsbShortFormDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL   *DevicePath
   )
 {
-  EFI_STATUS                            Status;
-  EFI_HANDLE                            *Handles;
-  UINTN                                 HandleCount;
-  UINTN                                 Index;
-  EFI_PCI_IO_PROTOCOL                   *PciIo;
-  UINT8                                 Class[3];
-  BOOLEAN                               AtLeastOneConnected;
+  EFI_STATUS           Status;
+  EFI_HANDLE           *Handles;
+  UINTN                HandleCount;
+  UINTN                Index;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  UINT8                Class[3];
+  BOOLEAN              AtLeastOneConnected;
 
   //
   // Check the passed in parameters
@@ -263,7 +263,8 @@ BmConnectUsbShortFormDevicePath (
 
   if ((DevicePathType (DevicePath) != MESSAGING_DEVICE_PATH) ||
       ((DevicePathSubType (DevicePath) != MSG_USB_CLASS_DP) && (DevicePathSubType (DevicePath) != MSG_USB_WWID_DP))
-     ) {
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -283,7 +284,7 @@ BmConnectUsbShortFormDevicePath (
       Status = gBS->HandleProtocol (
                       Handles[Index],
                       &gEfiPciIoProtocolGuid,
-                      (VOID **) &PciIo
+                      (VOID **)&PciIo
                       );
       if (!EFI_ERROR (Status)) {
         //
@@ -292,14 +293,15 @@ BmConnectUsbShortFormDevicePath (
         Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x09, 3, &Class);
         if (!EFI_ERROR (Status) &&
             ((PCI_CLASS_SERIAL == Class[2]) && (PCI_CLASS_SERIAL_USB == Class[1]))
-           ) {
+            )
+        {
           Status = gBS->ConnectController (
                           Handles[Index],
                           NULL,
                           DevicePath,
                           FALSE
                           );
-          if (!EFI_ERROR(Status)) {
+          if (!EFI_ERROR (Status)) {
             AtLeastOneConnected = TRUE;
           }
         }

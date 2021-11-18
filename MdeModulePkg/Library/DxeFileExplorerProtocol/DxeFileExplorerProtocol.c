@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 
-EFI_FILE_EXPLORER_PROTOCOL *mProtocol = NULL;
+EFI_FILE_EXPLORER_PROTOCOL  *mProtocol = NULL;
 
 /**
   The constructor function caches the pointer to file explorer protocol.
@@ -41,12 +41,12 @@ FileExplorerConstructor (
   IN EFI_SYSTEM_TABLE          *SystemTable
   )
 {
-  EFI_STATUS                   Status;
+  EFI_STATUS  Status;
 
   Status = SystemTable->BootServices->LocateProtocol (
                                         &gEfiFileExplorerProtocolGuid,
                                         NULL,
-                                        (VOID**) &mProtocol
+                                        (VOID **)&mProtocol
                                         );
   ASSERT_EFI_ERROR (Status);
   ASSERT (mProtocol != NULL);
@@ -77,11 +77,10 @@ EFI_STATUS
 EFIAPI
 ChooseFile (
   IN  EFI_DEVICE_PATH_PROTOCOL  *RootDirectory,
-  IN  CHAR16                    *FileType,  OPTIONAL
-  IN  CHOOSE_HANDLER            ChooseHandler,  OPTIONAL
+  IN  CHAR16                    *FileType, OPTIONAL
+  IN  CHOOSE_HANDLER            ChooseHandler, OPTIONAL
   OUT EFI_DEVICE_PATH_PROTOCOL  **File  OPTIONAL
   )
 {
   return mProtocol->ChooseFile (RootDirectory, FileType, ChooseHandler, File);
 }
-

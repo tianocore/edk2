@@ -8,7 +8,7 @@
 
 #include "NvmExpress.h"
 
-EFI_DISK_INFO_PROTOCOL gNvmExpressDiskInfoProtocolTemplate = {
+EFI_DISK_INFO_PROTOCOL  gNvmExpressDiskInfoProtocolTemplate = {
   EFI_DISK_INFO_NVME_INTERFACE_GUID,
   NvmExpressDiskInfoInquiry,
   NvmExpressDiskInfoIdentify,
@@ -32,7 +32,6 @@ InitializeDiskInfo (
 {
   CopyMem (&Device->DiskInfo, &gNvmExpressDiskInfoProtocolTemplate, sizeof (EFI_DISK_INFO_PROTOCOL));
 }
-
 
 /**
   Provides inquiry information for the controller type.
@@ -61,7 +60,6 @@ NvmExpressDiskInfoInquiry (
   return EFI_NOT_FOUND;
 }
 
-
 /**
   Provides identify information for the controller type.
 
@@ -88,8 +86,8 @@ NvmExpressDiskInfoIdentify (
   IN OUT UINT32                   *IdentifyDataSize
   )
 {
-  EFI_STATUS                      Status;
-  NVME_DEVICE_PRIVATE_DATA        *Device;
+  EFI_STATUS                Status;
+  NVME_DEVICE_PRIVATE_DATA  *Device;
 
   Device = NVME_DEVICE_PRIVATE_DATA_FROM_DISK_INFO (This);
 
@@ -98,6 +96,7 @@ NvmExpressDiskInfoIdentify (
     Status = EFI_SUCCESS;
     CopyMem (IdentifyData, &Device->NamespaceData, sizeof (Device->NamespaceData));
   }
+
   *IdentifyDataSize = sizeof (Device->NamespaceData);
   return Status;
 }
@@ -131,7 +130,6 @@ NvmExpressDiskInfoSenseData (
   return EFI_NOT_FOUND;
 }
 
-
 /**
   This function is used to get controller information.
 
@@ -153,4 +151,3 @@ NvmExpressDiskInfoWhichIde (
 {
   return EFI_UNSUPPORTED;
 }
-

@@ -10,7 +10,7 @@
 //
 // Template for SD HC Slot Data.
 //
-SD_PEIM_HC_SLOT   gSdHcSlotTemplate = {
+SD_PEIM_HC_SLOT  gSdHcSlotTemplate = {
   SD_PEIM_SLOT_SIG,               // Signature
   {                               // Media
     MSG_SD_DP,
@@ -34,7 +34,7 @@ SD_PEIM_HC_SLOT   gSdHcSlotTemplate = {
 //
 // Template for SD HC Private Data.
 //
-SD_PEIM_HC_PRIVATE_DATA gSdHcPrivateTemplate = {
+SD_PEIM_HC_PRIVATE_DATA  gSdHcPrivateTemplate = {
   SD_PEIM_SIG,                    // Signature
   NULL,                           // Pool
   {                               // BlkIoPpi
@@ -86,6 +86,7 @@ SD_PEIM_HC_PRIVATE_DATA gSdHcPrivateTemplate = {
   0,                              // SlotNum
   0                               // TotalBlkIoDevices
 };
+
 /**
   Gets the count of block I/O devices that one specific block driver detects.
 
@@ -113,7 +114,7 @@ SdBlockIoPeimGetDeviceNo (
   OUT UINTN                          *NumberBlockDevices
   )
 {
-  SD_PEIM_HC_PRIVATE_DATA            *Private;
+  SD_PEIM_HC_PRIVATE_DATA  *Private;
 
   Private = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS (This);
   *NumberBlockDevices = Private->TotalBlkIoDevices;
@@ -170,9 +171,9 @@ SdBlockIoPeimGetMediaInfo (
   OUT EFI_PEI_BLOCK_IO_MEDIA         *MediaInfo
   )
 {
-  SD_PEIM_HC_PRIVATE_DATA            *Private;
+  SD_PEIM_HC_PRIVATE_DATA  *Private;
 
-  Private   = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS (This);
+  Private = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS (This);
 
   if ((DeviceIndex == 0) || (DeviceIndex > Private->TotalBlkIoDevices) || (DeviceIndex > SD_PEIM_MAX_SLOTS)) {
     return EFI_INVALID_PARAMETER;
@@ -231,12 +232,12 @@ SdBlockIoPeimReadBlocks (
   OUT VOID                           *Buffer
   )
 {
-  EFI_STATUS                         Status;
-  UINT32                             BlockSize;
-  UINTN                              NumberOfBlocks;
-  SD_PEIM_HC_PRIVATE_DATA            *Private;
-  UINTN                              Remaining;
-  UINT32                             MaxBlock;
+  EFI_STATUS               Status;
+  UINT32                   BlockSize;
+  UINTN                    NumberOfBlocks;
+  SD_PEIM_HC_PRIVATE_DATA  *Private;
+  UINTN                    Remaining;
+  UINT32                   MaxBlock;
 
   Status  = EFI_SUCCESS;
   Private = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS (This);
@@ -286,14 +287,16 @@ SdBlockIoPeimReadBlocks (
     } else {
       Status = SdPeimRwSingleBlock (&Private->Slot[DeviceIndex - 1], StartLBA, BlockSize, Buffer, BufferSize, TRUE);
     }
+
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
     StartLBA  += NumberOfBlocks;
-    Buffer     = (UINT8*)Buffer + BufferSize;
+    Buffer     = (UINT8 *)Buffer + BufferSize;
     Remaining -= NumberOfBlocks;
   }
+
   return Status;
 }
 
@@ -324,7 +327,7 @@ SdBlockIoPeimGetDeviceNo2 (
   OUT UINTN                          *NumberBlockDevices
   )
 {
-  SD_PEIM_HC_PRIVATE_DATA   *Private;
+  SD_PEIM_HC_PRIVATE_DATA  *Private;
 
   Private = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
   *NumberBlockDevices = Private->TotalBlkIoDevices;
@@ -382,18 +385,18 @@ SdBlockIoPeimGetMediaInfo2 (
   OUT EFI_PEI_BLOCK_IO2_MEDIA        *MediaInfo
   )
 {
-  EFI_STATUS                         Status;
-  SD_PEIM_HC_PRIVATE_DATA            *Private;
-  EFI_PEI_BLOCK_IO_MEDIA             Media;
+  EFI_STATUS               Status;
+  SD_PEIM_HC_PRIVATE_DATA  *Private;
+  EFI_PEI_BLOCK_IO_MEDIA   Media;
 
   Private = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
 
-  Status  = SdBlockIoPeimGetMediaInfo (
-              PeiServices,
-              &Private->BlkIoPpi,
-              DeviceIndex,
-              &Media
-              );
+  Status = SdBlockIoPeimGetMediaInfo (
+             PeiServices,
+             &Private->BlkIoPpi,
+             DeviceIndex,
+             &Media
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -447,20 +450,20 @@ SdBlockIoPeimReadBlocks2 (
   OUT VOID                           *Buffer
   )
 {
-  EFI_STATUS                         Status;
-  SD_PEIM_HC_PRIVATE_DATA            *Private;
+  EFI_STATUS               Status;
+  SD_PEIM_HC_PRIVATE_DATA  *Private;
 
-  Status    = EFI_SUCCESS;
-  Private   = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
+  Status  = EFI_SUCCESS;
+  Private = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS2 (This);
 
-  Status  = SdBlockIoPeimReadBlocks (
-              PeiServices,
-              &Private->BlkIoPpi,
-              DeviceIndex,
-              StartLBA,
-              BufferSize,
-              Buffer
-              );
+  Status = SdBlockIoPeimReadBlocks (
+             PeiServices,
+             &Private->BlkIoPpi,
+             DeviceIndex,
+             StartLBA,
+             BufferSize,
+             Buffer
+             );
   return Status;
 }
 
@@ -483,7 +486,7 @@ SdBlockIoPeimEndOfPei (
   IN VOID                       *Ppi
   )
 {
-  SD_PEIM_HC_PRIVATE_DATA       *Private;
+  SD_PEIM_HC_PRIVATE_DATA  *Private;
 
   Private = GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY (NotifyDescriptor);
 
@@ -511,22 +514,22 @@ InitializeSdBlockIoPeim (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS                       Status;
-  SD_PEIM_HC_PRIVATE_DATA          *Private;
-  EDKII_SD_MMC_HOST_CONTROLLER_PPI *SdMmcHcPpi;
-  UINT32                           Index;
-  UINTN                            *MmioBase;
-  UINT8                            BarNum;
-  UINT8                            SlotNum;
-  UINT8                            Controller;
-  UINT64                           Capacity;
-  SD_HC_SLOT_CAP                   Capability;
-  SD_PEIM_HC_SLOT                  *Slot;
-  SD_CSD                           *Csd;
-  SD_CSD2                          *Csd2;
-  UINT32                           CSize;
-  UINT32                           CSizeMul;
-  UINT32                           ReadBlLen;
+  EFI_STATUS                        Status;
+  SD_PEIM_HC_PRIVATE_DATA           *Private;
+  EDKII_SD_MMC_HOST_CONTROLLER_PPI  *SdMmcHcPpi;
+  UINT32                            Index;
+  UINTN                             *MmioBase;
+  UINT8                             BarNum;
+  UINT8                             SlotNum;
+  UINT8                             Controller;
+  UINT64                            Capacity;
+  SD_HC_SLOT_CAP                    Capability;
+  SD_PEIM_HC_SLOT                   *Slot;
+  SD_CSD                            *Csd;
+  SD_CSD2                           *Csd2;
+  UINT32                            CSize;
+  UINT32                            CSizeMul;
+  UINT32                            ReadBlLen;
 
   //
   // Shadow this PEIM to run from memory
@@ -542,7 +545,7 @@ InitializeSdBlockIoPeim (
              &gEdkiiPeiSdMmcHostControllerPpiGuid,
              0,
              NULL,
-             (VOID **) &SdMmcHcPpi
+             (VOID **)&SdMmcHcPpi
              );
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
@@ -571,8 +574,9 @@ InitializeSdBlockIoPeim (
       Status = EFI_OUT_OF_RESOURCES;
       break;
     }
-    Private->BlkIoPpiList.Ppi  = (VOID*)&Private->BlkIoPpi;
-    Private->BlkIo2PpiList.Ppi = (VOID*)&Private->BlkIo2Ppi;
+
+    Private->BlkIoPpiList.Ppi  = (VOID *)&Private->BlkIoPpi;
+    Private->BlkIo2PpiList.Ppi = (VOID *)&Private->BlkIo2Ppi;
     //
     // Initialize the memory pool which will be used in all transactions.
     //
@@ -587,6 +591,7 @@ InitializeSdBlockIoPeim (
       if (EFI_ERROR (Status)) {
         continue;
       }
+
       if (Capability.SlotType != 0x1) {
         DEBUG ((DEBUG_INFO, "The slot at 0x%x is not embedded slot type\n", MmioBase[Index]));
         Status = EFI_UNSUPPORTED;
@@ -597,10 +602,12 @@ InitializeSdBlockIoPeim (
       if (EFI_ERROR (Status)) {
         continue;
       }
+
       Status = SdPeimHcCardDetect (MmioBase[Index]);
       if (EFI_ERROR (Status)) {
         continue;
       }
+
       Status = SdPeimHcInitHost (MmioBase[Index]);
       if (EFI_ERROR (Status)) {
         continue;
@@ -627,7 +634,7 @@ InitializeSdBlockIoPeim (
         Capacity  = MultU64x32 (MultU64x32 ((UINT64)CSize, CSizeMul), ReadBlLen);
       } else {
         Slot->SectorAddressing = TRUE;
-        Csd2     = (SD_CSD2*)(VOID*)Csd;
+        Csd2     = (SD_CSD2 *)(VOID *)Csd;
         CSize    = (Csd2->CSizeHigh << 16 | Csd2->CSizeLow) + 1;
         Capacity = MultU64x32 ((UINT64)CSize, SIZE_512KB);
       }

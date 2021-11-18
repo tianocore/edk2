@@ -45,4 +45,3 @@ MemoryProfileLibRecord (
 {
   return EFI_UNSUPPORTED;
 }
-

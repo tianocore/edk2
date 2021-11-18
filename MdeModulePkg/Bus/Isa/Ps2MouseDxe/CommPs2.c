@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Ps2Mouse.h"
 #include "CommPs2.h"
 
-UINT8 SampleRateTbl[MaxSampleRate]  = { 0xa, 0x14, 0x28, 0x3c, 0x50, 0x64, 0xc8 };
+UINT8  SampleRateTbl[MaxSampleRate] = { 0xa, 0x14, 0x28, 0x3c, 0x50, 0x64, 0xc8 };
 
-UINT8 ResolutionTbl[MaxResolution]  = { 0, 1, 2, 3 };
+UINT8  ResolutionTbl[MaxResolution] = { 0, 1, 2, 3 };
 
 /**
   Issue self test command via IsaIo interface.
@@ -34,6 +34,7 @@ KbcSelfTest (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Read return code
   //
@@ -45,6 +46,7 @@ KbcSelfTest (
   if (Data != 0x55) {
     return EFI_DEVICE_ERROR;
   }
+
   //
   // Set system flag
   //
@@ -63,7 +65,7 @@ KbcSelfTest (
     return Status;
   }
 
-  Data |= CMD_SYS_FLAG;
+  Data  |= CMD_SYS_FLAG;
   Status = Out8042Data (Data);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -167,6 +169,7 @@ CheckKbStatus (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Check keyboard enable or not
   //
@@ -201,6 +204,7 @@ PS2MouseReset (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Check BAT Complete Code
   //
@@ -212,6 +216,7 @@ PS2MouseReset (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Check BAT Complete Code
   //
@@ -336,111 +341,112 @@ PS2MouseGetPacket (
   BOOLEAN     LButton;
   BOOLEAN     RButton;
 
-  KeyboardEnable  = FALSE;
-  State           = PS2_READ_BYTE_ONE;
+  KeyboardEnable = FALSE;
+  State = PS2_READ_BYTE_ONE;
 
   //
   // State machine to get mouse packet
   //
   while (1) {
-
     switch (State) {
-    case PS2_READ_BYTE_ONE:
-      //
-      // Read mouse first byte data, if failed, immediately return
-      //
-      KbcDisableAux ();
-      Count  = 1;
-      Status = PS2MouseRead (&Data, &Count, State);
-      if (EFI_ERROR (Status)) {
-        KbcEnableAux ();
-        return EFI_NOT_READY;
-      }
+      case PS2_READ_BYTE_ONE:
+        //
+        // Read mouse first byte data, if failed, immediately return
+        //
+        KbcDisableAux ();
+        Count  = 1;
+        Status = PS2MouseRead (&Data, &Count, State);
+        if (EFI_ERROR (Status)) {
+          KbcEnableAux ();
+          return EFI_NOT_READY;
+        }
 
-      if (Count != 1) {
-        KbcEnableAux ();
-        return EFI_NOT_READY;
-      }
+        if (Count != 1) {
+          KbcEnableAux ();
+          return EFI_NOT_READY;
+        }
 
-      if (IS_PS2_SYNC_BYTE (Data)) {
-        Packet[0] = Data;
-        State     = PS2_READ_DATA_BYTE;
+        if (IS_PS2_SYNC_BYTE (Data)) {
+          Packet[0] = Data;
+          State     = PS2_READ_DATA_BYTE;
 
-        CheckKbStatus (&KeyboardEnable);
-        KbcDisableKb ();
-        KbcEnableAux ();
-      }
-      break;
+          CheckKbStatus (&KeyboardEnable);
+          KbcDisableKb ();
+          KbcEnableAux ();
+        }
 
-    case PS2_READ_DATA_BYTE:
-      Count   = 2;
-      Status  = PS2MouseRead ((Packet + 1), &Count, State);
-      if (EFI_ERROR (Status)) {
+        break;
+
+      case PS2_READ_DATA_BYTE:
+        Count  = 2;
+        Status = PS2MouseRead ((Packet + 1), &Count, State);
+        if (EFI_ERROR (Status)) {
+          if (KeyboardEnable) {
+            KbcEnableKb ();
+          }
+
+          return EFI_NOT_READY;
+        }
+
+        if (Count != 2) {
+          if (KeyboardEnable) {
+            KbcEnableKb ();
+          }
+
+          return EFI_NOT_READY;
+        }
+
+        State = PS2_PROCESS_PACKET;
+        break;
+
+      case PS2_PROCESS_PACKET:
         if (KeyboardEnable) {
           KbcEnableKb ();
         }
 
-        return EFI_NOT_READY;
-      }
-
-      if (Count != 2) {
-        if (KeyboardEnable) {
-          KbcEnableKb ();
+        //
+        // Decode the packet
+        //
+        RelativeMovementX = Packet[1];
+        RelativeMovementY = Packet[2];
+        //
+        //               Bit 7   |    Bit 6   |    Bit 5   |   Bit 4    |   Bit 3  |   Bit 2    |   Bit 1   |   Bit 0
+        //  Byte 0  | Y overflow | X overflow | Y sign bit | X sign bit | Always 1 | Middle Btn | Right Btn | Left Btn
+        //  Byte 1  |                                           8 bit X Movement
+        //  Byte 2  |                                           8 bit Y Movement
+        //
+        // X sign bit + 8 bit X Movement : 9-bit signed twos complement integer that presents the relative displacement of the device in the X direction since the last data transmission.
+        // Y sign bit + 8 bit Y Movement : Same as X sign bit + 8 bit X Movement.
+        //
+        //
+        // First, Clear X and Y high 8 bits
+        //
+        RelativeMovementX = (INT16)(RelativeMovementX & 0xFF);
+        RelativeMovementY = (INT16)(RelativeMovementY & 0xFF);
+        //
+        // Second, if the 9-bit signed twos complement integer is negative, set the high 8 bit 0xff
+        //
+        if ((Packet[0] & 0x10) != 0) {
+          RelativeMovementX = (INT16)(RelativeMovementX | 0xFF00);
         }
 
-        return EFI_NOT_READY;
-      }
+        if ((Packet[0] & 0x20) != 0) {
+          RelativeMovementY = (INT16)(RelativeMovementY | 0xFF00);
+        }
 
-      State = PS2_PROCESS_PACKET;
-      break;
+        RButton = (UINT8)(Packet[0] & 0x2);
+        LButton = (UINT8)(Packet[0] & 0x1);
 
-    case PS2_PROCESS_PACKET:
-      if (KeyboardEnable) {
-        KbcEnableKb ();
-      }
-      //
-      // Decode the packet
-      //
-      RelativeMovementX = Packet[1];
-      RelativeMovementY = Packet[2];
-      //
-      //               Bit 7   |    Bit 6   |    Bit 5   |   Bit 4    |   Bit 3  |   Bit 2    |   Bit 1   |   Bit 0
-      //  Byte 0  | Y overflow | X overflow | Y sign bit | X sign bit | Always 1 | Middle Btn | Right Btn | Left Btn
-      //  Byte 1  |                                           8 bit X Movement
-      //  Byte 2  |                                           8 bit Y Movement
-      //
-      // X sign bit + 8 bit X Movement : 9-bit signed twos complement integer that presents the relative displacement of the device in the X direction since the last data transmission.
-      // Y sign bit + 8 bit Y Movement : Same as X sign bit + 8 bit X Movement.
-      //
-      //
-      // First, Clear X and Y high 8 bits
-      //
-      RelativeMovementX = (INT16) (RelativeMovementX & 0xFF);
-      RelativeMovementY = (INT16) (RelativeMovementY & 0xFF);
-      //
-      // Second, if the 9-bit signed twos complement integer is negative, set the high 8 bit 0xff
-      //
-      if ((Packet[0] & 0x10) != 0) {
-        RelativeMovementX = (INT16) (RelativeMovementX | 0xFF00);
-      }
-      if ((Packet[0] & 0x20) != 0) {
-        RelativeMovementY = (INT16) (RelativeMovementY | 0xFF00);
-      }
+        //
+        // Update mouse state
+        //
+        MouseDev->State.RelativeMovementX += RelativeMovementX;
+        MouseDev->State.RelativeMovementY -= RelativeMovementY;
+        MouseDev->State.RightButton = (UINT8)(RButton ? TRUE : FALSE);
+        MouseDev->State.LeftButton  = (UINT8)(LButton ? TRUE : FALSE);
+        MouseDev->StateChanged = TRUE;
 
-
-      RButton           = (UINT8) (Packet[0] & 0x2);
-      LButton           = (UINT8) (Packet[0] & 0x1);
-
-      //
-      // Update mouse state
-      //
-      MouseDev->State.RelativeMovementX += RelativeMovementX;
-      MouseDev->State.RelativeMovementY -= RelativeMovementY;
-      MouseDev->State.RightButton = (UINT8) (RButton ? TRUE : FALSE);
-      MouseDev->State.LeftButton  = (UINT8) (LButton ? TRUE : FALSE);
-      MouseDev->StateChanged      = TRUE;
-
-      return EFI_SUCCESS;
+        return EFI_SUCCESS;
     }
   }
 }
@@ -464,7 +470,7 @@ PS2MouseRead (
   EFI_STATUS  Status;
   UINTN       BytesRead;
 
-  Status    = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
 
   if (State == PS2_READ_BYTE_ONE) {
     //
@@ -478,17 +484,18 @@ PS2MouseRead (
   }
 
   for (BytesRead = 0; BytesRead < *BufSize; BytesRead++) {
-
     Status = WaitOutputFull (TIMEOUT);
     if (EFI_ERROR (Status)) {
       break;
     }
+
     Buffer[BytesRead] = IoRead8 (KBC_DATA_PORT);
   }
+
   //
   // Verify the correct number of bytes read
   //
-  if (BytesRead == 0 || BytesRead != *BufSize) {
+  if ((BytesRead == 0) || (BytesRead != *BufSize)) {
     Status = EFI_NOT_FOUND;
   }
 
@@ -499,6 +506,7 @@ PS2MouseRead (
 //
 // 8042 I/O function
 //
+
 /**
   I/O work flow of outing 8042 command.
 
@@ -521,6 +529,7 @@ Out8042Command (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Send command
   //
@@ -548,6 +557,7 @@ Out8042Data (
   )
 {
   EFI_STATUS  Status;
+
   //
   // Wait keyboard controller input buffer empty
   //
@@ -573,7 +583,7 @@ In8042Data (
   IN OUT UINT8                            *Data
   )
 {
-  UINTN Delay;
+  UINTN  Delay;
 
   Delay = TIMEOUT / 50;
 
@@ -623,6 +633,7 @@ Out8042AuxCommand (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Send write to auxiliary device command
   //
@@ -632,6 +643,7 @@ Out8042AuxCommand (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Send auxiliary device command
   //
@@ -650,13 +662,11 @@ Out8042AuxCommand (
     // Receive mouse acknowledge, command send success
     //
     return EFI_SUCCESS;
-
   } else if (Resend) {
     //
     // Resend fail
     //
     return EFI_DEVICE_ERROR;
-
   } else if (Data == PS2_RESEND) {
     //
     // Resend command
@@ -665,13 +675,11 @@ Out8042AuxCommand (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-
   } else {
     //
     // Invalid return code
     //
     return EFI_DEVICE_ERROR;
-
   }
 
   return EFI_SUCCESS;
@@ -691,6 +699,7 @@ Out8042AuxData (
   )
 {
   EFI_STATUS  Status;
+
   //
   // Wait keyboard controller input buffer empty
   //
@@ -698,6 +707,7 @@ Out8042AuxData (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Send write to auxiliary device command
   //
@@ -746,7 +756,6 @@ In8042AuxData (
   return EFI_SUCCESS;
 }
 
-
 /**
   Check keyboard controller status, if it is output buffer full and for auxiliary device.
 
@@ -758,7 +767,7 @@ CheckForInput (
   VOID
   )
 {
-  UINT8 Data;
+  UINT8  Data;
 
   Data = IoRead8 (KBC_CMD_STS_PORT);
 
@@ -785,8 +794,8 @@ WaitInputEmpty (
   IN UINTN                                Timeout
   )
 {
-  UINTN Delay;
-  UINT8 Data;
+  UINTN  Delay;
+  UINT8  Data;
 
   Delay = Timeout / 50;
 
@@ -824,8 +833,8 @@ WaitOutputFull (
   IN UINTN                                Timeout
   )
 {
-  UINTN Delay;
-  UINT8 Data;
+  UINTN  Delay;
+  UINT8  Data;
 
   Delay = Timeout / 50;
 

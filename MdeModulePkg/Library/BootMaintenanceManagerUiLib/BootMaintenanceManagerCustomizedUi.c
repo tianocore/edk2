@@ -27,19 +27,19 @@ UiCustomizeBMMPage (
   //
   // Create "Boot Option" menu.
   //
-  BmmCreateBootOptionMenu(HiiHandle, StartOpCodeHandle);
+  BmmCreateBootOptionMenu (HiiHandle, StartOpCodeHandle);
   //
   // Create "Driver Option" menu.
   //
-  BmmCreateDriverOptionMenu(HiiHandle, StartOpCodeHandle);
+  BmmCreateDriverOptionMenu (HiiHandle, StartOpCodeHandle);
   //
   // Create "Com Option" menu.
   //
-  BmmCreateComOptionMenu(HiiHandle, StartOpCodeHandle);
+  BmmCreateComOptionMenu (HiiHandle, StartOpCodeHandle);
   //
   // Create "Boot From File" menu.
   //
-  BmmCreateBootFromFileMenu(HiiHandle, StartOpCodeHandle);
+  BmmCreateBootFromFileMenu (HiiHandle, StartOpCodeHandle);
 
   //
   // Find third party drivers which need to be shown in the Bmm page.

@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "DxeMain.h"
 
-#define WATCHDOG_TIMER_CALIBRATE_PER_SECOND 10000000
+#define WATCHDOG_TIMER_CALIBRATE_PER_SECOND  10000000
 
 /**
   Sets the system's watchdog timer.

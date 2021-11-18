@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _PCI_HOST_BRIDGE_H_
 #define _PCI_HOST_BRIDGE_H_
 
-
 #include <PiDxe.h>
 #include <IndustryStandard/Acpi.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -21,27 +20,28 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PciRootBridge.h"
 
-#define PCI_HOST_BRIDGE_SIGNATURE SIGNATURE_32 ('p', 'h', 'b', 'g')
+#define PCI_HOST_BRIDGE_SIGNATURE  SIGNATURE_32 ('p', 'h', 'b', 'g')
 typedef struct {
-  UINTN                                             Signature;
-  EFI_HANDLE                                        Handle;
-  LIST_ENTRY                                        RootBridges;
-  BOOLEAN                                           CanRestarted;
-  EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  ResAlloc;
+  UINTN                                               Signature;
+  EFI_HANDLE                                          Handle;
+  LIST_ENTRY                                          RootBridges;
+  BOOLEAN                                             CanRestarted;
+  EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL    ResAlloc;
 } PCI_HOST_BRIDGE_INSTANCE;
 
-#define PCI_HOST_BRIDGE_FROM_THIS(a) CR (a, PCI_HOST_BRIDGE_INSTANCE, ResAlloc, PCI_HOST_BRIDGE_SIGNATURE)
+#define PCI_HOST_BRIDGE_FROM_THIS(a)  CR (a, PCI_HOST_BRIDGE_INSTANCE, ResAlloc, PCI_HOST_BRIDGE_SIGNATURE)
 
 //
 // Macros to translate device address to host address and vice versa. According
 // to UEFI 2.7, device address = host address + translation offset.
 //
-#define TO_HOST_ADDRESS(DeviceAddress,TranslationOffset) ((DeviceAddress) - (TranslationOffset))
-#define TO_DEVICE_ADDRESS(HostAddress,TranslationOffset) ((HostAddress) + (TranslationOffset))
+#define TO_HOST_ADDRESS(DeviceAddress, TranslationOffset)  ((DeviceAddress) - (TranslationOffset))
+#define TO_DEVICE_ADDRESS(HostAddress, TranslationOffset)  ((HostAddress) + (TranslationOffset))
 
 //
 // Driver Entry Point
 //
+
 /**
 
   Entry point of this driver.
@@ -63,6 +63,7 @@ InitializePciHostBridge (
 //
 //  HostBridge Resource Allocation interface
 //
+
 /**
 
   Enter a certain phase of the PCI enumeration process.
@@ -263,7 +264,7 @@ GetTranslationByResourceType (
   IN  PCI_RESOURCE_TYPE            ResourceType
   );
 
-extern EFI_CPU_IO2_PROTOCOL        *mCpuIo;
-extern EDKII_IOMMU_PROTOCOL        *mIoMmu;
+extern EFI_CPU_IO2_PROTOCOL  *mCpuIo;
+extern EDKII_IOMMU_PROTOCOL  *mIoMmu;
 
 #endif

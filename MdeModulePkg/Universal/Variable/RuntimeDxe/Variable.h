@@ -40,12 +40,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PrivilegePolymorphic.h"
 
-#define NV_STORAGE_VARIABLE_BASE (EFI_PHYSICAL_ADDRESS) \
+#define NV_STORAGE_VARIABLE_BASE  (EFI_PHYSICAL_ADDRESS)\
                                    (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0 ? \
                                     PcdGet64 (PcdFlashNvStorageVariableBase64) : \
                                     PcdGet32 (PcdFlashNvStorageVariableBase))
 
-#define EFI_VARIABLE_ATTRIBUTES_MASK (EFI_VARIABLE_NON_VOLATILE | \
+#define EFI_VARIABLE_ATTRIBUTES_MASK  (EFI_VARIABLE_NON_VOLATILE |\
                                       EFI_VARIABLE_BOOTSERVICE_ACCESS | \
                                       EFI_VARIABLE_RUNTIME_ACCESS | \
                                       EFI_VARIABLE_HARDWARE_ERROR_RECORD | \
@@ -55,7 +55,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// The size of a 3 character ISO639 language code.
 ///
-#define ISO_639_2_ENTRY_SIZE    3
+#define ISO_639_2_ENTRY_SIZE  3
 
 typedef enum {
   VariableStoreTypeVolatile,
@@ -65,65 +65,65 @@ typedef enum {
 } VARIABLE_STORE_TYPE;
 
 typedef struct {
-  UINT32                  PendingUpdateOffset;
-  UINT32                  PendingUpdateLength;
-  VARIABLE_STORE_HEADER   *Store;
+  UINT32                   PendingUpdateOffset;
+  UINT32                   PendingUpdateLength;
+  VARIABLE_STORE_HEADER    *Store;
 } VARIABLE_RUNTIME_CACHE;
 
 typedef struct {
-  BOOLEAN                 *ReadLock;
-  BOOLEAN                 *PendingUpdate;
-  BOOLEAN                 *HobFlushComplete;
-  VARIABLE_RUNTIME_CACHE  VariableRuntimeHobCache;
-  VARIABLE_RUNTIME_CACHE  VariableRuntimeNvCache;
-  VARIABLE_RUNTIME_CACHE  VariableRuntimeVolatileCache;
+  BOOLEAN                   *ReadLock;
+  BOOLEAN                   *PendingUpdate;
+  BOOLEAN                   *HobFlushComplete;
+  VARIABLE_RUNTIME_CACHE    VariableRuntimeHobCache;
+  VARIABLE_RUNTIME_CACHE    VariableRuntimeNvCache;
+  VARIABLE_RUNTIME_CACHE    VariableRuntimeVolatileCache;
 } VARIABLE_RUNTIME_CACHE_CONTEXT;
 
 typedef struct {
-  VARIABLE_HEADER *CurrPtr;
+  VARIABLE_HEADER    *CurrPtr;
   //
   // If both ADDED and IN_DELETED_TRANSITION variable are present,
   // InDeletedTransitionPtr will point to the IN_DELETED_TRANSITION one.
   // Otherwise, CurrPtr will point to the ADDED or IN_DELETED_TRANSITION one,
   // and InDeletedTransitionPtr will be NULL at the same time.
   //
-  VARIABLE_HEADER *InDeletedTransitionPtr;
-  VARIABLE_HEADER *EndPtr;
-  VARIABLE_HEADER *StartPtr;
-  BOOLEAN         Volatile;
+  VARIABLE_HEADER    *InDeletedTransitionPtr;
+  VARIABLE_HEADER    *EndPtr;
+  VARIABLE_HEADER    *StartPtr;
+  BOOLEAN            Volatile;
 } VARIABLE_POINTER_TRACK;
 
 typedef struct {
-  EFI_PHYSICAL_ADDRESS            HobVariableBase;
-  EFI_PHYSICAL_ADDRESS            VolatileVariableBase;
-  EFI_PHYSICAL_ADDRESS            NonVolatileVariableBase;
-  VARIABLE_RUNTIME_CACHE_CONTEXT  VariableRuntimeCacheContext;
-  EFI_LOCK                        VariableServicesLock;
-  UINT32                          ReentrantState;
-  BOOLEAN                         AuthFormat;
-  BOOLEAN                         AuthSupport;
-  BOOLEAN                         EmuNvMode;
+  EFI_PHYSICAL_ADDRESS              HobVariableBase;
+  EFI_PHYSICAL_ADDRESS              VolatileVariableBase;
+  EFI_PHYSICAL_ADDRESS              NonVolatileVariableBase;
+  VARIABLE_RUNTIME_CACHE_CONTEXT    VariableRuntimeCacheContext;
+  EFI_LOCK                          VariableServicesLock;
+  UINT32                            ReentrantState;
+  BOOLEAN                           AuthFormat;
+  BOOLEAN                           AuthSupport;
+  BOOLEAN                           EmuNvMode;
 } VARIABLE_GLOBAL;
 
 typedef struct {
-  VARIABLE_GLOBAL VariableGlobal;
-  UINTN           VolatileLastVariableOffset;
-  UINTN           NonVolatileLastVariableOffset;
-  UINTN           CommonVariableSpace;
-  UINTN           CommonMaxUserVariableSpace;
-  UINTN           CommonRuntimeVariableSpace;
-  UINTN           CommonVariableTotalSize;
-  UINTN           CommonUserVariableTotalSize;
-  UINTN           HwErrVariableTotalSize;
-  UINTN           MaxVariableSize;
-  UINTN           MaxAuthVariableSize;
-  UINTN           MaxVolatileVariableSize;
-  UINTN           ScratchBufferSize;
-  CHAR8           *PlatformLangCodes;
-  CHAR8           *LangCodes;
-  CHAR8           *PlatformLang;
-  CHAR8           Lang[ISO_639_2_ENTRY_SIZE + 1];
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *FvbInstance;
+  VARIABLE_GLOBAL                       VariableGlobal;
+  UINTN                                 VolatileLastVariableOffset;
+  UINTN                                 NonVolatileLastVariableOffset;
+  UINTN                                 CommonVariableSpace;
+  UINTN                                 CommonMaxUserVariableSpace;
+  UINTN                                 CommonRuntimeVariableSpace;
+  UINTN                                 CommonVariableTotalSize;
+  UINTN                                 CommonUserVariableTotalSize;
+  UINTN                                 HwErrVariableTotalSize;
+  UINTN                                 MaxVariableSize;
+  UINTN                                 MaxAuthVariableSize;
+  UINTN                                 MaxVolatileVariableSize;
+  UINTN                                 ScratchBufferSize;
+  CHAR8                                 *PlatformLangCodes;
+  CHAR8                                 *LangCodes;
+  CHAR8                                 *PlatformLang;
+  CHAR8                                 Lang[ISO_639_2_ENTRY_SIZE + 1];
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *FvbInstance;
 } VARIABLE_MODULE_GLOBAL;
 
 /**
@@ -254,7 +254,6 @@ UpdateVariable (
   IN      EFI_TIME        *TimeStamp  OPTIONAL
   );
 
-
 /**
   Return TRUE if ExitBootServices () has been called.
 
@@ -287,7 +286,6 @@ InitializeLock (
   IN EFI_TPL        Priority
   );
 
-
 /**
   Acquires lock only at boot time. Simply returns at runtime.
 
@@ -304,7 +302,6 @@ VOID
 AcquireLockOnlyAtBootTime (
   IN EFI_LOCK  *Lock
   );
-
 
 /**
   Releases lock only at boot time. Simply returns at runtime.
@@ -379,7 +376,7 @@ VariableCommonInitialize (
 
 **/
 VOID
-ReclaimForOS(
+ReclaimForOS (
   VOID
   );
 
@@ -689,14 +686,14 @@ InitializeVariableQuota (
   VOID
   );
 
-extern VARIABLE_MODULE_GLOBAL       *mVariableModuleGlobal;
-extern EFI_FIRMWARE_VOLUME_HEADER   *mNvFvHeaderCache;
-extern VARIABLE_STORE_HEADER        *mNvVariableCache;
-extern VARIABLE_INFO_ENTRY          *gVariableInfo;
-extern BOOLEAN                      mEndOfDxe;
-extern VAR_CHECK_REQUEST_SOURCE     mRequestSource;
+extern VARIABLE_MODULE_GLOBAL      *mVariableModuleGlobal;
+extern EFI_FIRMWARE_VOLUME_HEADER  *mNvFvHeaderCache;
+extern VARIABLE_STORE_HEADER       *mNvVariableCache;
+extern VARIABLE_INFO_ENTRY         *gVariableInfo;
+extern BOOLEAN                     mEndOfDxe;
+extern VAR_CHECK_REQUEST_SOURCE    mRequestSource;
 
-extern AUTH_VAR_LIB_CONTEXT_OUT     mAuthContextOut;
+extern AUTH_VAR_LIB_CONTEXT_OUT  mAuthContextOut;
 
 /**
   Finds variable in storage blocks of volatile and non-volatile storage areas.

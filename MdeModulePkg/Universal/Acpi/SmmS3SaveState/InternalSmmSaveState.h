@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef _INTERNAL_SMM_S3_SAVE_STATE_H_
 #define _INTERNAL_SMM_S3_SAVE_STATE_H_
 #include <PiDxe.h>
@@ -20,6 +21,7 @@
 #include <Library/PcdLib.h>
 #include <Library/SmbusLib.h>
 #include <IndustryStandard/SmBus.h>
+
 /**
   Adds a record into S3 boot script table.
 
@@ -54,6 +56,7 @@ BootScriptWrite (
   IN       UINTN                            OpCode,
   ...
   );
+
 /**
   Insert a record into a specified Framework boot script table.
 
@@ -91,6 +94,7 @@ BootScriptInsert (
   IN       UINTN                            OpCode,
   ...
   );
+
 /**
   Find a label within the boot script table and, if not present, optionally create it.
 
@@ -126,6 +130,7 @@ BootScriptLabel (
   IN OUT   EFI_S3_BOOT_SCRIPT_POSITION          *Position OPTIONAL,
   IN CONST CHAR8                                *Label
   );
+
 /**
   Compare two positions in the boot script table and return their relative position.
 

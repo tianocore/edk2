@@ -10,8 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __CUSTOMIZED_DISPLAY_LIB_INTERNAL_H__
 #define __CUSTOMIZED_DISPLAY_LIB_INTERNAL_H__
 
-
-
 #include <PiDxe.h>
 
 #include <Protocol/SimpleTextOut.h>
@@ -47,33 +45,30 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Colors.h"
 
+#define FORMSET_CLASS_PLATFORM_SETUP  0x0001
+#define FORMSET_CLASS_FRONT_PAGE      0x0002
 
-
-#define FORMSET_CLASS_PLATFORM_SETUP         0x0001
-#define FORMSET_CLASS_FRONT_PAGE             0x0002
-
-
-#define FRONT_PAGE_HEADER_HEIGHT      6
-#define NONE_FRONT_PAGE_HEADER_HEIGHT 3
-#define FOOTER_HEIGHT                 4
-#define STATUS_BAR_HEIGHT             1
+#define FRONT_PAGE_HEADER_HEIGHT       6
+#define NONE_FRONT_PAGE_HEADER_HEIGHT  3
+#define FOOTER_HEIGHT                  4
+#define STATUS_BAR_HEIGHT              1
 
 //
 // Screen definitions
 //
-#define BANNER_HEIGHT                 6
-#define BANNER_COLUMNS                3
-#define BANNER_LEFT_COLUMN_INDENT     1
+#define BANNER_HEIGHT              6
+#define BANNER_COLUMNS             3
+#define BANNER_LEFT_COLUMN_INDENT  1
 
 //
 // Character definitions
 //
-#define UPPER_LOWER_CASE_OFFSET 0x20
+#define UPPER_LOWER_CASE_OFFSET  0x20
 
 //
 // This is the Input Error Message
 //
-#define INPUT_ERROR 1
+#define INPUT_ERROR  1
 
 //
 // This is the NV RAM update required Message
@@ -81,35 +76,36 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define NV_UPDATE_REQUIRED  2
 
 typedef struct {
-  EFI_STRING_ID  Banner[BANNER_HEIGHT][BANNER_COLUMNS];
+  EFI_STRING_ID    Banner[BANNER_HEIGHT][BANNER_COLUMNS];
 } BANNER_DATA;
 
-extern  UINT16                        gClassOfVfr;                 // Formset class information
-extern  BANNER_DATA                   *gBannerData;
-extern  EFI_SCREEN_DESCRIPTOR         gScreenDimensions;
-extern  UINTN                         gFooterHeight;
+extern  UINT16                 gClassOfVfr;                        // Formset class information
+extern  BANNER_DATA            *gBannerData;
+extern  EFI_SCREEN_DESCRIPTOR  gScreenDimensions;
+extern  UINTN                  gFooterHeight;
 
 //
 // Browser Global Strings
 //
-extern CHAR16            *gEnterString;
-extern CHAR16            *gEnterCommitString;
-extern CHAR16            *gEnterEscapeString;
-extern CHAR16            *gEscapeString;
-extern CHAR16            *gMoveHighlight;
-extern CHAR16            *gDecNumericInput;
-extern CHAR16            *gHexNumericInput;
-extern CHAR16            *gToggleCheckBox;
-extern CHAR16            *gLibEmptyString;
-extern CHAR16            *gAreYouSure;
-extern CHAR16            *gYesResponse;
-extern CHAR16            *gNoResponse;
-extern CHAR16            *gPlusString;
-extern CHAR16            *gMinusString;
-extern CHAR16            *gAdjustNumber;
-extern CHAR16            *gSaveChanges;
-extern CHAR16            *gNvUpdateMessage;
-extern CHAR16            *gInputErrorMessage;
+extern CHAR16  *gEnterString;
+extern CHAR16  *gEnterCommitString;
+extern CHAR16  *gEnterEscapeString;
+extern CHAR16  *gEscapeString;
+extern CHAR16  *gMoveHighlight;
+extern CHAR16  *gDecNumericInput;
+extern CHAR16  *gHexNumericInput;
+extern CHAR16  *gToggleCheckBox;
+extern CHAR16  *gLibEmptyString;
+extern CHAR16  *gAreYouSure;
+extern CHAR16  *gYesResponse;
+extern CHAR16  *gNoResponse;
+extern CHAR16  *gPlusString;
+extern CHAR16  *gMinusString;
+extern CHAR16  *gAdjustNumber;
+extern CHAR16  *gSaveChanges;
+extern CHAR16  *gNvUpdateMessage;
+extern CHAR16  *gInputErrorMessage;
+
 /**
 
   Print banner info for front page.

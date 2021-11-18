@@ -29,12 +29,12 @@ typedef struct {
   ///
   /// A unique GUID identifying the firmware image type.
   ///
-  EFI_GUID                      ImageTypeGuid;
+  EFI_GUID    ImageTypeGuid;
   ///
   /// An optional number to identify the unique hardware instance within the
   /// system for devices that may have multiple instances whenever possible.
   ///
-  UINT64                        HardwareInstance;
+  UINT64      HardwareInstance;
 } GUID_HARDWAREINSTANCE_PAIR;
 
 /**
@@ -62,7 +62,7 @@ InstallEfiSystemResourceTableInUefiConfigurationTable (
   IN EFI_SYSTEM_RESOURCE_TABLE      *Table
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = EFI_SUCCESS;
   if (Table->FwResourceCount == 0) {
@@ -79,6 +79,7 @@ InstallEfiSystemResourceTableInUefiConfigurationTable (
       DEBUG ((DEBUG_INFO, "EsrtFmpDxe: Installed ESRT table. \n"));
     }
   }
+
   return Status;
 }
 
@@ -100,7 +101,7 @@ IsSystemFmp (
   UINTN  Index;
 
   Guid  = PcdGetPtr (PcdSystemFmpCapsuleImageTypeIdGuid);
-  Count = PcdGetSize (PcdSystemFmpCapsuleImageTypeIdGuid) / sizeof(GUID);
+  Count = PcdGetSize (PcdSystemFmpCapsuleImageTypeIdGuid) / sizeof (GUID);
 
   for (Index = 0; Index < Count; Index++, Guid++) {
     if (CompareGuid (&FmpImageInfo->ImageTypeId, Guid)) {
@@ -183,6 +184,7 @@ CreateEsrtEntry (
     if (!CompareGuid (&Entry->FwClass, &FmpImageInfoBuf->ImageTypeId)) {
       continue;
     }
+
     DEBUG ((DEBUG_INFO, "EsrtFmpDxe: ESRT Entry already exists for FMP Instance with GUID %g\n", &Entry->FwClass));
 
     //
@@ -216,7 +218,7 @@ CreateEsrtEntry (
       //
       if (Entry->LastAttemptStatus == LAST_ATTEMPT_STATUS_SUCCESS) {
         if (FmpImageInfoBuf->LastAttemptStatus != LAST_ATTEMPT_STATUS_SUCCESS) {
-          Entry->LastAttemptStatus = FmpImageInfoBuf->LastAttemptStatus;
+          Entry->LastAttemptStatus  = FmpImageInfoBuf->LastAttemptStatus;
           Entry->LastAttemptVersion = FmpImageInfoBuf->LastAttemptVersion;
         } else {
           Entry->LastAttemptVersion =
@@ -245,11 +247,11 @@ CreateEsrtEntry (
     Entry->FwType = (UINT32)(ESRT_FW_TYPE_DEVICEFIRMWARE);
   }
 
-  Entry->FwVersion                = FmpImageInfoBuf->Version;
+  Entry->FwVersion = FmpImageInfoBuf->Version;
   Entry->LowestSupportedFwVersion = 0;
-  Entry->CapsuleFlags             = 0;
-  Entry->LastAttemptVersion       = 0;
-  Entry->LastAttemptStatus        = 0;
+  Entry->CapsuleFlags = 0;
+  Entry->LastAttemptVersion = 0;
+  Entry->LastAttemptStatus  = 0;
 
   //
   // VERSION 2 has Lowest Supported
@@ -341,6 +343,7 @@ FmpGetFirmwareImageDescriptor (
   if (PackageVersionName != NULL) {
     FreePool (PackageVersionName);
   }
+
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "EsrtFmpDxe: Failure in GetImageInfo.  Status = %r\n", Status));
     FreePool (FmpImageInfoBuf);
@@ -376,20 +379,20 @@ CreateFmpBasedEsrt (
   EFI_SYSTEM_RESOURCE_TABLE      *Table;
   GUID_HARDWAREINSTANCE_PAIR     *HardwareInstances;
 
-  Status             = EFI_SUCCESS;
-  NoProtocols        = 0;
-  Buffer             = NULL;
+  Status = EFI_SUCCESS;
+  NoProtocols = 0;
+  Buffer = NULL;
   FmpImageInfoBuf    = NULL;
   OrgFmpImageInfoBuf = NULL;
-  Table              = NULL;
-  HardwareInstances  = NULL;
+  Table = NULL;
+  HardwareInstances = NULL;
 
   Status = EfiLocateProtocolBuffer (
              &gEfiFirmwareManagementProtocolGuid,
              &NoProtocols,
              &Buffer
              );
-  if (EFI_ERROR(Status) || (Buffer == NULL)) {
+  if (EFI_ERROR (Status) || (Buffer == NULL)) {
     return NULL;
   }
 
@@ -398,7 +401,7 @@ CreateFmpBasedEsrt (
   //
   for (Index = 0, NumberOfDescriptors = 0; Index < NoProtocols; Index++) {
     FmpImageInfoBuf = FmpGetFirmwareImageDescriptor (
-                        (EFI_FIRMWARE_MANAGEMENT_PROTOCOL *) Buffer[Index],
+                        (EFI_FIRMWARE_MANAGEMENT_PROTOCOL *)Buffer[Index],
                         &FmpImageInfoDescriptorVer,
                         &FmpImageInfoCount,
                         &DescriptorSize
@@ -413,8 +416,8 @@ CreateFmpBasedEsrt (
   // Allocate ESRT Table and GUID/HardwareInstance table
   //
   Table = AllocateZeroPool (
-             (NumberOfDescriptors * sizeof (EFI_SYSTEM_RESOURCE_ENTRY)) + sizeof (EFI_SYSTEM_RESOURCE_TABLE)
-             );
+            (NumberOfDescriptors * sizeof (EFI_SYSTEM_RESOURCE_ENTRY)) + sizeof (EFI_SYSTEM_RESOURCE_TABLE)
+            );
   if (Table == NULL) {
     DEBUG ((DEBUG_ERROR, "EsrtFmpDxe: Failed to allocate memory for ESRT.\n"));
     FreePool (Buffer);
@@ -439,7 +442,7 @@ CreateFmpBasedEsrt (
   NumberOfDescriptors = 0;
   for (Index = 0; Index < NoProtocols; Index++) {
     FmpImageInfoBuf = FmpGetFirmwareImageDescriptor (
-                        (EFI_FIRMWARE_MANAGEMENT_PROTOCOL *) Buffer[Index],
+                        (EFI_FIRMWARE_MANAGEMENT_PROTOCOL *)Buffer[Index],
                         &FmpImageInfoDescriptorVer,
                         &FmpImageInfoCount,
                         &DescriptorSize
@@ -462,6 +465,7 @@ CreateFmpBasedEsrt (
         //
         CreateEsrtEntry (Table, HardwareInstances, &NumberOfDescriptors, FmpImageInfoBuf, FmpImageInfoDescriptorVer);
       }
+
       FmpImageInfoCount--;
       //
       // Increment the buffer pointer ahead by the size of the descriptor

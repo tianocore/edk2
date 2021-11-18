@@ -17,14 +17,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack (1)
 
 typedef struct {
-  UNIVERSAL_PAYLOAD_GENERIC_HEADER   Header;
-  EFI_PHYSICAL_ADDRESS               SmBiosEntryPoint;
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER    Header;
+  EFI_PHYSICAL_ADDRESS                SmBiosEntryPoint;
 } UNIVERSAL_PAYLOAD_SMBIOS_TABLE;
 
 #pragma pack()
 
-#define UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION 1
+#define UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION  1
 
-extern GUID gUniversalPayloadSmbios3TableGuid;
-extern GUID gUniversalPayloadSmbiosTableGuid;
+extern GUID  gUniversalPayloadSmbios3TableGuid;
+extern GUID  gUniversalPayloadSmbiosTableGuid;
 #endif // UNIVERSAL_PAYLOAD_SMBIOS_TABLE_H_
