@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // EFI Component Name Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL   gMnpComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gMnpComponentName = {
   MnpComponentNameGetDriverName,
   MnpComponentNameGetControllerName,
   "eng"
@@ -21,12 +21,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL   gMnpComponentName = 
 // EFI Component Name 2 Protocol
 //
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gMnpComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) MnpComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) MnpComponentNameGetControllerName,
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)MnpComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)MnpComponentNameGetControllerName,
   "en"
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE      mMnpDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mMnpDriverNameTable[] = {
   {
     "eng;en",
     L"MNP Network Service Driver"
@@ -37,7 +37,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE      mMnpDriverNameTable[
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE    *gMnpControllerNameTable = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gMnpControllerNameTable = NULL;
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -81,9 +81,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE    *gMnpControllerNameTab
 EFI_STATUS
 EFIAPI
 MnpComponentNameGetDriverName (
-  IN     EFI_COMPONENT_NAME_PROTOCOL   *This,
-  IN     CHAR8                         *Language,
-     OUT CHAR16                        **DriverName
+  IN     EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN     CHAR8                        *Language,
+  OUT CHAR16                          **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -91,7 +91,7 @@ MnpComponentNameGetDriverName (
            This->SupportedLanguages,
            mMnpDriverNameTable,
            DriverName,
-           (BOOLEAN) (This == &gMnpComponentName)
+           (BOOLEAN)(This == &gMnpComponentName)
            );
 }
 
@@ -107,7 +107,7 @@ MnpComponentNameGetDriverName (
 **/
 EFI_STATUS
 UpdateName (
-  IN   EFI_MANAGED_NETWORK_PROTOCOL     *Mnp
+  IN   EFI_MANAGED_NETWORK_PROTOCOL  *Mnp
   )
 {
   EFI_STATUS                       Status;
@@ -146,6 +146,7 @@ UpdateName (
                   SnpModeData.CurrentAddress.Addr[Index]
                   );
     }
+
     ASSERT (OffSet > 0);
     //
     // Remove the last '-'
@@ -267,11 +268,11 @@ UpdateName (
 EFI_STATUS
 EFIAPI
 MnpComponentNameGetControllerName (
-  IN     EFI_COMPONENT_NAME_PROTOCOL   *This,
-  IN     EFI_HANDLE                    ControllerHandle,
-  IN     EFI_HANDLE                    ChildHandle        OPTIONAL,
-  IN     CHAR8                         *Language,
-     OUT CHAR16                        **ControllerName
+  IN     EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN     EFI_HANDLE                   ControllerHandle,
+  IN     EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN     CHAR8                        *Language,
+  OUT CHAR16                          **ControllerName
   )
 {
   EFI_STATUS                    Status;

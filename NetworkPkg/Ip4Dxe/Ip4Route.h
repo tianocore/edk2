@@ -11,10 +11,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Ip4Common.h"
 
-#define IP4_DIRECT_ROUTE       0x00000001
+#define IP4_DIRECT_ROUTE  0x00000001
 
-#define IP4_ROUTE_CACHE_HASH_VALUE 31
-#define IP4_ROUTE_CACHE_MAX        64  // Max NO. of cache entry per hash bucket
+#define IP4_ROUTE_CACHE_HASH_VALUE  31
+#define IP4_ROUTE_CACHE_MAX         64 // Max NO. of cache entry per hash bucket
 
 #define IP4_ROUTE_CACHE_HASH(Dst, Src)  (((Dst) ^ (Src)) % IP4_ROUTE_CACHE_HASH_VALUE)
 
@@ -26,12 +26,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// enties of the connected network have the flag on.
 ///
 typedef struct {
-  LIST_ENTRY                Link;
-  INTN                      RefCnt;
-  IP4_ADDR                  Dest;
-  IP4_ADDR                  Netmask;
-  IP4_ADDR                  NextHop;
-  UINT32                    Flag;
+  LIST_ENTRY    Link;
+  INTN          RefCnt;
+  IP4_ADDR      Dest;
+  IP4_ADDR      Netmask;
+  IP4_ADDR      NextHop;
+  UINT32        Flag;
 } IP4_ROUTE_ENTRY;
 
 ///
@@ -45,12 +45,12 @@ typedef struct {
 /// to-be-deleted route entry.
 ///
 typedef struct {
-  LIST_ENTRY                Link;
-  INTN                      RefCnt;
-  IP4_ADDR                  Dest;
-  IP4_ADDR                  Src;
-  IP4_ADDR                  NextHop;
-  UINTN                     Tag;
+  LIST_ENTRY    Link;
+  INTN          RefCnt;
+  IP4_ADDR      Dest;
+  IP4_ADDR      Src;
+  IP4_ADDR      NextHop;
+  UINTN         Tag;
 } IP4_ROUTE_CACHE_ENTRY;
 
 ///
@@ -61,7 +61,7 @@ typedef struct {
 /// detach them later.
 ///
 typedef struct {
-  LIST_ENTRY                CacheBucket[IP4_ROUTE_CACHE_HASH_VALUE];
+  LIST_ENTRY    CacheBucket[IP4_ROUTE_CACHE_HASH_VALUE];
 } IP4_ROUTE_CACHE;
 
 ///
@@ -75,11 +75,11 @@ typedef struct {
 typedef struct _IP4_ROUTE_TABLE IP4_ROUTE_TABLE;
 
 struct _IP4_ROUTE_TABLE {
-  INTN                      RefCnt;
-  UINT32                    TotalNum;
-  LIST_ENTRY                RouteArea[IP4_MASK_NUM];
-  IP4_ROUTE_TABLE           *Next;
-  IP4_ROUTE_CACHE           Cache;
+  INTN               RefCnt;
+  UINT32             TotalNum;
+  LIST_ENTRY         RouteArea[IP4_MASK_NUM];
+  IP4_ROUTE_TABLE    *Next;
+  IP4_ROUTE_CACHE    Cache;
 };
 
 /**
@@ -103,7 +103,7 @@ Ip4CreateRouteTable (
 **/
 VOID
 Ip4FreeRouteTable (
-  IN IP4_ROUTE_TABLE        *RtTable
+  IN IP4_ROUTE_TABLE  *RtTable
   );
 
 /**
@@ -122,10 +122,10 @@ Ip4FreeRouteTable (
 **/
 EFI_STATUS
 Ip4AddRoute (
-  IN OUT IP4_ROUTE_TABLE        *RtTable,
-  IN     IP4_ADDR               Dest,
-  IN     IP4_ADDR               Netmask,
-  IN     IP4_ADDR               Gateway
+  IN OUT IP4_ROUTE_TABLE  *RtTable,
+  IN     IP4_ADDR         Dest,
+  IN     IP4_ADDR         Netmask,
+  IN     IP4_ADDR         Gateway
   );
 
 /**
@@ -143,10 +143,10 @@ Ip4AddRoute (
 **/
 EFI_STATUS
 Ip4DelRoute (
-  IN OUT IP4_ROUTE_TABLE      *RtTable,
-  IN     IP4_ADDR             Dest,
-  IN     IP4_ADDR             Netmask,
-  IN     IP4_ADDR             Gateway
+  IN OUT IP4_ROUTE_TABLE  *RtTable,
+  IN     IP4_ADDR         Dest,
+  IN     IP4_ADDR         Netmask,
+  IN     IP4_ADDR         Gateway
   );
 
 /**
@@ -165,9 +165,9 @@ Ip4DelRoute (
 **/
 IP4_ROUTE_CACHE_ENTRY *
 Ip4FindRouteCache (
-  IN IP4_ROUTE_TABLE        *RtTable,
-  IN IP4_ADDR               Dest,
-  IN IP4_ADDR               Src
+  IN IP4_ROUTE_TABLE  *RtTable,
+  IN IP4_ADDR         Dest,
+  IN IP4_ADDR         Src
   );
 
 /**
@@ -200,11 +200,11 @@ Ip4FreeRouteCacheEntry (
 **/
 IP4_ROUTE_CACHE_ENTRY *
 Ip4Route (
-  IN IP4_ROUTE_TABLE        *RtTable,
-  IN IP4_ADDR               Dest,
-  IN IP4_ADDR               Src,
-  IN IP4_ADDR               SubnetMask,
-  IN BOOLEAN                AlwaysTryDestAddr
+  IN IP4_ROUTE_TABLE  *RtTable,
+  IN IP4_ADDR         Dest,
+  IN IP4_ADDR         Src,
+  IN IP4_ADDR         SubnetMask,
+  IN BOOLEAN          AlwaysTryDestAddr
   );
 
 /**
@@ -220,6 +220,7 @@ Ip4Route (
 **/
 EFI_STATUS
 Ip4BuildEfiRouteTable (
-  IN IP4_PROTOCOL           *IpInstance
+  IN IP4_PROTOCOL  *IpInstance
   );
+
 #endif

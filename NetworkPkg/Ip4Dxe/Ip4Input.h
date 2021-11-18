@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __EFI_IP4_INPUT_H__
 #define __EFI_IP4_INPUT_H__
 
-#define IP4_MIN_HEADLEN        20
-#define IP4_MAX_HEADLEN        60
+#define IP4_MIN_HEADLEN  20
+#define IP4_MAX_HEADLEN  60
 ///
 /// 8(ESP header) + 16(max IV) + 16(max padding) + 2(ESP tail) + 12(max ICV) = 54
 ///
@@ -30,37 +30,37 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// life. If it isn't consumed before Life reaches zero, the packet is released.
 ///
 typedef struct {
-  UINTN                     LinkFlag;
-  INTN                      CastType;
-  INTN                      Start;
-  INTN                      End;
-  INTN                      Length;
-  UINT32                    Life;
-  EFI_STATUS                Status;
+  UINTN         LinkFlag;
+  INTN          CastType;
+  INTN          Start;
+  INTN          End;
+  INTN          Length;
+  UINT32        Life;
+  EFI_STATUS    Status;
 } IP4_CLIP_INFO;
 
 ///
 /// Structure used to assemble IP packets.
 ///
 typedef struct {
-  LIST_ENTRY                Link;
+  LIST_ENTRY       Link;
 
   //
   // Identity of one IP4 packet. Each fragment of a packet has
   // the same (Dst, Src, Id, Protocol).
   //
-  IP4_ADDR                  Dst;
-  IP4_ADDR                  Src;
-  UINT16                    Id;
-  UINT8                     Protocol;
+  IP4_ADDR         Dst;
+  IP4_ADDR         Src;
+  UINT16           Id;
+  UINT8            Protocol;
 
-  INTN                      TotalLen;
-  INTN                      CurLen;
-  LIST_ENTRY                Fragments;  // List of all the fragments of this packet
+  INTN             TotalLen;
+  INTN             CurLen;
+  LIST_ENTRY       Fragments;           // List of all the fragments of this packet
 
-  IP4_HEAD                  *Head;      // IP head of the first fragment
-  IP4_CLIP_INFO             *Info;      // Per packet info of the first fragment
-  INTN                      Life;       // Count down life for the packet.
+  IP4_HEAD         *Head;               // IP head of the first fragment
+  IP4_CLIP_INFO    *Info;               // Per packet info of the first fragment
+  INTN             Life;                // Count down life for the packet.
 } IP4_ASSEMBLE_ENTRY;
 
 ///
@@ -69,10 +69,10 @@ typedef struct {
 /// as hash table.
 ///
 typedef struct {
-  LIST_ENTRY      Bucket[IP4_ASSEMLE_HASH_SIZE];
+  LIST_ENTRY    Bucket[IP4_ASSEMLE_HASH_SIZE];
 } IP4_ASSEMBLE_TABLE;
 
-#define IP4_GET_CLIP_INFO(Packet) ((IP4_CLIP_INFO *) ((Packet)->ProtoData))
+#define IP4_GET_CLIP_INFO(Packet)  ((IP4_CLIP_INFO *) ((Packet)->ProtoData))
 
 #define IP4_ASSEMBLE_HASH(Dst, Src, Id, Proto)  \
           (((Dst) + (Src) + ((Id) << 16) + (Proto)) % IP4_ASSEMLE_HASH_SIZE)
@@ -89,7 +89,7 @@ typedef struct {
 **/
 VOID
 Ip4InitAssembleTable (
-  IN OUT IP4_ASSEMBLE_TABLE     *Table
+  IN OUT IP4_ASSEMBLE_TABLE  *Table
   );
 
 /**
@@ -101,7 +101,7 @@ Ip4InitAssembleTable (
 **/
 VOID
 Ip4CleanAssembleTable (
-  IN IP4_ASSEMBLE_TABLE     *Table
+  IN IP4_ASSEMBLE_TABLE  *Table
   );
 
 /**
@@ -119,11 +119,11 @@ Ip4CleanAssembleTable (
 **/
 VOID
 Ip4AccpetFrame (
-  IN IP4_PROTOCOL           *Ip4Instance,
-  IN NET_BUF                *Packet,
-  IN EFI_STATUS             IoStatus,
-  IN UINT32                 Flag,
-  IN VOID                   *Context
+  IN IP4_PROTOCOL  *Ip4Instance,
+  IN NET_BUF       *Packet,
+  IN EFI_STATUS    IoStatus,
+  IN UINT32        Flag,
+  IN VOID          *Context
   );
 
 /**
@@ -148,11 +148,11 @@ Ip4AccpetFrame (
 **/
 EFI_STATUS
 Ip4Demultiplex (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet,
-  IN UINT8                  *Option,
-  IN UINT32                 OptionLen
+  IN IP4_SERVICE  *IpSb,
+  IN IP4_HEAD     *Head,
+  IN NET_BUF      *Packet,
+  IN UINT8        *Option,
+  IN UINT32       OptionLen
   );
 
 /**
@@ -171,12 +171,12 @@ Ip4Demultiplex (
 **/
 INTN
 Ip4InterfaceEnquePacket (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet,
-  IN UINT8                  *Option,
-  IN UINT32                 OptionLen,
-  IN IP4_INTERFACE          *IpIf
+  IN IP4_SERVICE    *IpSb,
+  IN IP4_HEAD       *Head,
+  IN NET_BUF        *Packet,
+  IN UINT8          *Option,
+  IN UINT32         OptionLen,
+  IN IP4_INTERFACE  *IpIf
   );
 
 /**
@@ -195,7 +195,7 @@ Ip4InterfaceEnquePacket (
 **/
 EFI_STATUS
 Ip4InstanceDeliverPacket (
-  IN IP4_PROTOCOL           *IpInstance
+  IN IP4_PROTOCOL  *IpInstance
   );
 
 /**
@@ -206,7 +206,7 @@ Ip4InstanceDeliverPacket (
 **/
 VOID
 Ip4PacketTimerTicking (
-  IN IP4_SERVICE            *IpSb
+  IN IP4_SERVICE  *IpSb
   );
 
 /**

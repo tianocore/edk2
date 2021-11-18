@@ -54,8 +54,8 @@
 #include "Ip6ConfigNv.h"
 #include "Ip6ConfigImpl.h"
 
-#define IP6_PROTOCOL_SIGNATURE SIGNATURE_32 ('I', 'P', '6', 'P')
-#define IP6_SERVICE_SIGNATURE  SIGNATURE_32 ('I', 'P', '6', 'S')
+#define IP6_PROTOCOL_SIGNATURE  SIGNATURE_32 ('I', 'P', '6', 'P')
+#define IP6_SERVICE_SIGNATURE   SIGNATURE_32 ('I', 'P', '6', 'S')
 
 //
 // The state of IP6 protocol. It starts from UNCONFIGED. if it is
@@ -63,8 +63,8 @@
 // is called, it becomes UNCONFIGED again. If (partly) destroyed, it
 // becomes DESTROY.
 //
-#define IP6_STATE_UNCONFIGED   0
-#define IP6_STATE_CONFIGED     1
+#define IP6_STATE_UNCONFIGED  0
+#define IP6_STATE_CONFIGED    1
 
 //
 // The state of IP6 service. It starts from UNSTARTED. It transits
@@ -83,10 +83,10 @@
 #define IP6_SERVICE_FROM_PROTOCOL(Sb)   \
           CR ((Sb), IP6_SERVICE, ServiceBinding, IP6_SERVICE_SIGNATURE)
 
-#define IP6_NO_MAPPING(IpInstance) (!(IpInstance)->Interface->Configured)
+#define IP6_NO_MAPPING(IpInstance)  (!(IpInstance)->Interface->Configured)
 
-extern EFI_IPSEC2_PROTOCOL *mIpSec;
-extern BOOLEAN             mIpSec2Installed;
+extern EFI_IPSEC2_PROTOCOL  *mIpSec;
+extern BOOLEAN              mIpSec2Installed;
 
 //
 // IP6_TXTOKEN_WRAP wraps the upper layer's transmit token.
@@ -98,17 +98,17 @@ extern BOOLEAN             mIpSec2Installed;
 // user's event signalled.
 //
 typedef struct {
-  IP6_PROTOCOL              *IpInstance;
-  EFI_IP6_COMPLETION_TOKEN  *Token;
-  EFI_EVENT                 IpSecRecycleSignal;
-  NET_BUF                   *Packet;
-  BOOLEAN                   Sent;
-  INTN                      Life;
+  IP6_PROTOCOL                *IpInstance;
+  EFI_IP6_COMPLETION_TOKEN    *Token;
+  EFI_EVENT                   IpSecRecycleSignal;
+  NET_BUF                     *Packet;
+  BOOLEAN                     Sent;
+  INTN                        Life;
 } IP6_TXTOKEN_WRAP;
 
 typedef struct {
-  EFI_EVENT                 IpSecRecycleSignal;
-  NET_BUF                   *Packet;
+  EFI_EVENT    IpSecRecycleSignal;
+  NET_BUF      *Packet;
 } IP6_IPSEC_WRAP;
 
 //
@@ -121,123 +121,123 @@ typedef struct {
 // fragments will be freed at last.
 //
 typedef struct {
-  LIST_ENTRY                Link;
-  IP6_PROTOCOL              *IpInstance;
-  NET_BUF                   *Packet;
-  EFI_IP6_RECEIVE_DATA      RxData;
+  LIST_ENTRY              Link;
+  IP6_PROTOCOL            *IpInstance;
+  NET_BUF                 *Packet;
+  EFI_IP6_RECEIVE_DATA    RxData;
 } IP6_RXDATA_WRAP;
 
 struct _IP6_PROTOCOL {
-  UINT32                    Signature;
+  UINT32                 Signature;
 
-  EFI_IP6_PROTOCOL          Ip6Proto;
-  EFI_HANDLE                Handle;
-  INTN                      State;
+  EFI_IP6_PROTOCOL       Ip6Proto;
+  EFI_HANDLE             Handle;
+  INTN                   State;
 
-  IP6_SERVICE               *Service;
-  LIST_ENTRY                Link; // Link to all the IP protocol from the service
+  IP6_SERVICE            *Service;
+  LIST_ENTRY             Link;    // Link to all the IP protocol from the service
 
-  UINT8                     PrefixLength; // PrefixLength of the configured station address.
+  UINT8                  PrefixLength;    // PrefixLength of the configured station address.
   //
   // User's transmit/receive tokens, and received/delivered packets
   //
-  NET_MAP                   RxTokens;
-  NET_MAP                   TxTokens;   // map between (User's Token, IP6_TXTOKE_WRAP)
-  LIST_ENTRY                Received;   // Received but not delivered packet
-  LIST_ENTRY                Delivered;  // Delivered and to be recycled packets
-  EFI_LOCK                  RecycleLock;
+  NET_MAP                RxTokens;
+  NET_MAP                TxTokens;      // map between (User's Token, IP6_TXTOKE_WRAP)
+  LIST_ENTRY             Received;      // Received but not delivered packet
+  LIST_ENTRY             Delivered;     // Delivered and to be recycled packets
+  EFI_LOCK               RecycleLock;
 
-  IP6_INTERFACE             *Interface;
-  LIST_ENTRY                AddrLink;   // Ip instances with the same IP address.
+  IP6_INTERFACE          *Interface;
+  LIST_ENTRY             AddrLink;      // Ip instances with the same IP address.
 
-  EFI_IPv6_ADDRESS          *GroupList; // stored in network order.
-  UINT32                    GroupCount;
+  EFI_IPv6_ADDRESS       *GroupList;    // stored in network order.
+  UINT32                 GroupCount;
 
-  EFI_IP6_CONFIG_DATA       ConfigData;
-  BOOLEAN                   InDestroy;
+  EFI_IP6_CONFIG_DATA    ConfigData;
+  BOOLEAN                InDestroy;
 };
 
 struct _IP6_SERVICE {
-  UINT32                          Signature;
-  EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
-  INTN                            State;
+  UINT32                             Signature;
+  EFI_SERVICE_BINDING_PROTOCOL       ServiceBinding;
+  INTN                               State;
 
   //
   // List of all the IP instances and interfaces, and default
   // interface and route table and caches.
   //
-  UINTN                           NumChildren;
-  LIST_ENTRY                      Children;
+  UINTN                              NumChildren;
+  LIST_ENTRY                         Children;
 
-  LIST_ENTRY                      Interfaces;
+  LIST_ENTRY                         Interfaces;
 
-  IP6_INTERFACE                   *DefaultInterface;
-  IP6_ROUTE_TABLE                 *RouteTable;
+  IP6_INTERFACE                      *DefaultInterface;
+  IP6_ROUTE_TABLE                    *RouteTable;
 
-  IP6_LINK_RX_TOKEN               RecvRequest;
+  IP6_LINK_RX_TOKEN                  RecvRequest;
 
   //
   // Ip reassemble utilities and MLD data
   //
-  IP6_ASSEMBLE_TABLE              Assemble;
-  IP6_MLD_SERVICE_DATA            MldCtrl;
+  IP6_ASSEMBLE_TABLE                 Assemble;
+  IP6_MLD_SERVICE_DATA               MldCtrl;
 
-  EFI_IPv6_ADDRESS                LinkLocalAddr;
-  BOOLEAN                         LinkLocalOk;
-  BOOLEAN                         LinkLocalDadFail;
-  BOOLEAN                         Dhcp6NeedStart;
-  BOOLEAN                         Dhcp6NeedInfoRequest;
+  EFI_IPv6_ADDRESS                   LinkLocalAddr;
+  BOOLEAN                            LinkLocalOk;
+  BOOLEAN                            LinkLocalDadFail;
+  BOOLEAN                            Dhcp6NeedStart;
+  BOOLEAN                            Dhcp6NeedInfoRequest;
 
   //
   // ND data
   //
-  UINT8                           CurHopLimit;
-  UINT32                          LinkMTU;
-  UINT32                          BaseReachableTime;
-  UINT32                          ReachableTime;
-  UINT32                          RetransTimer;
-  LIST_ENTRY                      NeighborTable;
+  UINT8                              CurHopLimit;
+  UINT32                             LinkMTU;
+  UINT32                             BaseReachableTime;
+  UINT32                             ReachableTime;
+  UINT32                             RetransTimer;
+  LIST_ENTRY                         NeighborTable;
 
-  LIST_ENTRY                      OnlinkPrefix;
-  LIST_ENTRY                      AutonomousPrefix;
+  LIST_ENTRY                         OnlinkPrefix;
+  LIST_ENTRY                         AutonomousPrefix;
 
-  LIST_ENTRY                      DefaultRouterList;
-  UINT32                          RoundRobin;
+  LIST_ENTRY                         DefaultRouterList;
+  UINT32                             RoundRobin;
 
-  UINT8                           InterfaceIdLen;
-  UINT8                           *InterfaceId;
+  UINT8                              InterfaceIdLen;
+  UINT8                              *InterfaceId;
 
-  BOOLEAN                         RouterAdvertiseReceived;
-  UINT8                           SolicitTimer;
-  UINT32                          Ticks;
+  BOOLEAN                            RouterAdvertiseReceived;
+  UINT8                              SolicitTimer;
+  UINT32                             Ticks;
 
   //
   // Low level protocol used by this service instance
   //
-  EFI_HANDLE                      Image;
-  EFI_HANDLE                      Controller;
+  EFI_HANDLE                         Image;
+  EFI_HANDLE                         Controller;
 
-  EFI_HANDLE                      MnpChildHandle;
-  EFI_MANAGED_NETWORK_PROTOCOL    *Mnp;
+  EFI_HANDLE                         MnpChildHandle;
+  EFI_MANAGED_NETWORK_PROTOCOL       *Mnp;
 
-  EFI_MANAGED_NETWORK_CONFIG_DATA MnpConfigData;
-  EFI_SIMPLE_NETWORK_MODE         SnpMode;
+  EFI_MANAGED_NETWORK_CONFIG_DATA    MnpConfigData;
+  EFI_SIMPLE_NETWORK_MODE            SnpMode;
 
-  EFI_EVENT                       Timer;
-  EFI_EVENT                       FasterTimer;
+  EFI_EVENT                          Timer;
+  EFI_EVENT                          FasterTimer;
 
   //
   // IPv6 Configuration Protocol instance
   //
-  IP6_CONFIG_INSTANCE             Ip6ConfigInstance;
+  IP6_CONFIG_INSTANCE                Ip6ConfigInstance;
 
   //
   // The string representation of the current mac address of the
   // NIC this IP6_SERVICE works on.
   //
-  CHAR16                          *MacString;
-  UINT32                          MaxPacketSize;
-  UINT32                          OldMaxPacketSize;
+  CHAR16                             *MacString;
+  UINT32                             MaxPacketSize;
+  UINT32                             OldMaxPacketSize;
 };
 
 /**
@@ -264,7 +264,7 @@ struct _IP6_SERVICE {
 VOID
 EFIAPI
 Ip6FreeTxToken (
-  IN VOID                   *Context
+  IN VOID  *Context
   );
 
 /**
@@ -287,8 +287,8 @@ Ip6FreeTxToken (
 **/
 EFI_STATUS
 Ip6ServiceConfigMnp (
-  IN IP6_SERVICE            *IpSb,
-  IN BOOLEAN                Force
+  IN IP6_SERVICE  *IpSb,
+  IN BOOLEAN      Force
   );
 
 /**
@@ -307,8 +307,8 @@ Ip6ServiceConfigMnp (
 **/
 EFI_STATUS
 Ip6Cancel (
-  IN IP6_PROTOCOL             *IpInstance,
-  IN EFI_IP6_COMPLETION_TOKEN *Token          OPTIONAL
+  IN IP6_PROTOCOL              *IpInstance,
+  IN EFI_IP6_COMPLETION_TOKEN  *Token          OPTIONAL
   );
 
 /**
@@ -320,8 +320,8 @@ Ip6Cancel (
 **/
 VOID
 Ip6InitProtocol (
-  IN IP6_SERVICE            *IpSb,
-  IN OUT IP6_PROTOCOL       *IpInstance
+  IN IP6_SERVICE       *IpSb,
+  IN OUT IP6_PROTOCOL  *IpInstance
   );
 
 /**
@@ -335,7 +335,7 @@ Ip6InitProtocol (
 **/
 EFI_STATUS
 Ip6CleanProtocol (
-  IN OUT IP6_PROTOCOL            *IpInstance
+  IN OUT IP6_PROTOCOL  *IpInstance
   );
 
 //
@@ -362,10 +362,10 @@ Ip6CleanProtocol (
 EFI_STATUS
 EFIAPI
 EfiIp6GetModeData (
-  IN EFI_IP6_PROTOCOL                 *This,
-  OUT EFI_IP6_MODE_DATA               *Ip6ModeData     OPTIONAL,
-  OUT EFI_MANAGED_NETWORK_CONFIG_DATA *MnpConfigData   OPTIONAL,
-  OUT EFI_SIMPLE_NETWORK_MODE         *SnpModeData     OPTIONAL
+  IN EFI_IP6_PROTOCOL                  *This,
+  OUT EFI_IP6_MODE_DATA                *Ip6ModeData     OPTIONAL,
+  OUT EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData   OPTIONAL,
+  OUT EFI_SIMPLE_NETWORK_MODE          *SnpModeData     OPTIONAL
   );
 
 /**
@@ -418,8 +418,8 @@ EfiIp6GetModeData (
 EFI_STATUS
 EFIAPI
 EfiIp6Configure (
-  IN EFI_IP6_PROTOCOL          *This,
-  IN EFI_IP6_CONFIG_DATA       *Ip6ConfigData OPTIONAL
+  IN EFI_IP6_PROTOCOL     *This,
+  IN EFI_IP6_CONFIG_DATA  *Ip6ConfigData OPTIONAL
   );
 
 /**
@@ -507,11 +507,11 @@ EfiIp6Groups (
 EFI_STATUS
 EFIAPI
 EfiIp6Routes (
-  IN EFI_IP6_PROTOCOL    *This,
-  IN BOOLEAN             DeleteRoute,
-  IN EFI_IPv6_ADDRESS    *Destination    OPTIONAL,
-  IN UINT8               PrefixLength,
-  IN EFI_IPv6_ADDRESS    *GatewayAddress OPTIONAL
+  IN EFI_IP6_PROTOCOL  *This,
+  IN BOOLEAN           DeleteRoute,
+  IN EFI_IPv6_ADDRESS  *Destination    OPTIONAL,
+  IN UINT8             PrefixLength,
+  IN EFI_IPv6_ADDRESS  *GatewayAddress OPTIONAL
   );
 
 /**
@@ -563,12 +563,12 @@ EfiIp6Routes (
 EFI_STATUS
 EFIAPI
 EfiIp6Neighbors (
-  IN EFI_IP6_PROTOCOL          *This,
-  IN BOOLEAN                   DeleteFlag,
-  IN EFI_IPv6_ADDRESS          *TargetIp6Address,
-  IN EFI_MAC_ADDRESS           *TargetLinkAddress OPTIONAL,
-  IN UINT32                    Timeout,
-  IN BOOLEAN                   Override
+  IN EFI_IP6_PROTOCOL  *This,
+  IN BOOLEAN           DeleteFlag,
+  IN EFI_IPv6_ADDRESS  *TargetIp6Address,
+  IN EFI_MAC_ADDRESS   *TargetLinkAddress OPTIONAL,
+  IN UINT32            Timeout,
+  IN BOOLEAN           Override
   );
 
 /**
@@ -742,7 +742,7 @@ EfiIp6Cancel (
 EFI_STATUS
 EFIAPI
 EfiIp6Poll (
-  IN EFI_IP6_PROTOCOL          *This
+  IN EFI_IP6_PROTOCOL  *This
   );
 
 #endif

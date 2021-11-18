@@ -29,22 +29,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Udp4Driver.h"
 
-
-extern EFI_COMPONENT_NAME_PROTOCOL     gUdp4ComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL    gUdp4ComponentName2;
-extern EFI_UNICODE_STRING_TABLE        *gUdpControllerNameTable;
-extern EFI_SERVICE_BINDING_PROTOCOL    mUdp4ServiceBinding;
-extern EFI_UDP4_PROTOCOL               mUdp4Protocol;
-extern UINT16                          mUdp4RandomPort;
+extern EFI_COMPONENT_NAME_PROTOCOL   gUdp4ComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gUdp4ComponentName2;
+extern EFI_UNICODE_STRING_TABLE      *gUdpControllerNameTable;
+extern EFI_SERVICE_BINDING_PROTOCOL  mUdp4ServiceBinding;
+extern EFI_UDP4_PROTOCOL             mUdp4Protocol;
+extern UINT16                        mUdp4RandomPort;
 
 #define ICMP_ERROR_PACKET_LENGTH  8
 
-#define UDP4_TIMEOUT_INTERVAL (50 * TICKS_PER_MS)  // 50 milliseconds
+#define UDP4_TIMEOUT_INTERVAL  (50 * TICKS_PER_MS) // 50 milliseconds
 
-#define UDP4_HEADER_SIZE      sizeof (EFI_UDP_HEADER)
-#define UDP4_MAX_DATA_SIZE    65507
+#define UDP4_HEADER_SIZE    sizeof (EFI_UDP_HEADER)
+#define UDP4_MAX_DATA_SIZE  65507
 
-#define UDP4_PORT_KNOWN       1024
+#define UDP4_PORT_KNOWN  1024
 
 #define UDP4_SERVICE_DATA_SIGNATURE  SIGNATURE_32('U', 'd', 'p', '4')
 
@@ -57,15 +56,15 @@ extern UINT16                          mUdp4RandomPort;
   )
 
 typedef struct _UDP4_SERVICE_DATA_ {
-  UINT32                        Signature;
-  EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
-  EFI_HANDLE                    ImageHandle;
-  EFI_HANDLE                    ControllerHandle;
-  LIST_ENTRY                    ChildrenList;
-  UINTN                         ChildrenNumber;
-  IP_IO                         *IpIo;
+  UINT32                          Signature;
+  EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
+  EFI_HANDLE                      ImageHandle;
+  EFI_HANDLE                      ControllerHandle;
+  LIST_ENTRY                      ChildrenList;
+  UINTN                           ChildrenNumber;
+  IP_IO                           *IpIo;
 
-  EFI_EVENT                     TimeoutEvent;
+  EFI_EVENT                       TimeoutEvent;
 } UDP4_SERVICE_DATA;
 
 #define UDP4_INSTANCE_DATA_SIGNATURE  SIGNATURE_32('U', 'd', 'p', 'I')
@@ -79,44 +78,44 @@ typedef struct _UDP4_SERVICE_DATA_ {
   )
 
 typedef struct _UDP4_INSTANCE_DATA_ {
-  UINT32                Signature;
-  LIST_ENTRY            Link;
+  UINT32                  Signature;
+  LIST_ENTRY              Link;
 
-  UDP4_SERVICE_DATA     *Udp4Service;
-  EFI_UDP4_PROTOCOL     Udp4Proto;
-  EFI_UDP4_CONFIG_DATA  ConfigData;
-  EFI_HANDLE            ChildHandle;
-  BOOLEAN               Configured;
-  BOOLEAN               IsNoMapping;
+  UDP4_SERVICE_DATA       *Udp4Service;
+  EFI_UDP4_PROTOCOL       Udp4Proto;
+  EFI_UDP4_CONFIG_DATA    ConfigData;
+  EFI_HANDLE              ChildHandle;
+  BOOLEAN                 Configured;
+  BOOLEAN                 IsNoMapping;
 
-  NET_MAP               TxTokens;
-  NET_MAP               RxTokens;
+  NET_MAP                 TxTokens;
+  NET_MAP                 RxTokens;
 
-  NET_MAP               McastIps;
+  NET_MAP                 McastIps;
 
-  LIST_ENTRY            RcvdDgramQue;
-  LIST_ENTRY            DeliveredDgramQue;
+  LIST_ENTRY              RcvdDgramQue;
+  LIST_ENTRY              DeliveredDgramQue;
 
-  UINT16                HeadSum;
+  UINT16                  HeadSum;
 
-  EFI_STATUS            IcmpError;
+  EFI_STATUS              IcmpError;
 
-  IP_IO_IP_INFO         *IpInfo;
+  IP_IO_IP_INFO           *IpInfo;
 
-  BOOLEAN               InDestroy;
+  BOOLEAN                 InDestroy;
 } UDP4_INSTANCE_DATA;
 
 typedef struct _UDP4_RXDATA_WRAP_ {
-  LIST_ENTRY             Link;
-  NET_BUF                *Packet;
-  UINT32                 TimeoutTick;
-  EFI_UDP4_RECEIVE_DATA  RxData;
+  LIST_ENTRY               Link;
+  NET_BUF                  *Packet;
+  UINT32                   TimeoutTick;
+  EFI_UDP4_RECEIVE_DATA    RxData;
 } UDP4_RXDATA_WRAP;
 
 typedef struct {
-  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
-  UINTN                         NumberOfChildren;
-  EFI_HANDLE                    *ChildHandleBuffer;
+  EFI_SERVICE_BINDING_PROTOCOL    *ServiceBinding;
+  UINTN                           NumberOfChildren;
+  EFI_HANDLE                      *ChildHandleBuffer;
 } UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 /**
@@ -582,8 +581,8 @@ Udp4TokenExist (
 **/
 UINT16
 Udp4Checksum (
-  IN NET_BUF *Packet,
-  IN UINT16  HeadSum
+  IN NET_BUF  *Packet,
+  IN UINT16   HeadSum
   );
 
 /**
