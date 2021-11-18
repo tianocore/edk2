@@ -14,6 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0xd3fb176, 0x9569, 0x4d51, { 0xa3, 0xef, 0x7d, 0x61, 0xc6, 0x4f, 0xea, 0xba } \
   }
 
-extern EFI_GUID gEfiSecurityPkgTokenSpaceGuid;
+extern EFI_GUID  gEfiSecurityPkgTokenSpaceGuid;
 
 #endif

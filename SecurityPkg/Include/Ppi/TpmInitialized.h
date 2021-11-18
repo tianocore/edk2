@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0xe9db0d58, 0xd48d, 0x47f6, 0x9c, 0x6e, 0x6f, 0x40, 0xe8, 0x6c, 0x7b, 0x41 \
   }
 
-extern EFI_GUID gPeiTpmInitializedPpiGuid;
+extern EFI_GUID  gPeiTpmInitializedPpiGuid;
 
 ///
 /// Global ID for the PEI_TPM_INITIALIZATION_DONE_PPI which always uses a NULL interface.
@@ -29,6 +29,6 @@ extern EFI_GUID gPeiTpmInitializedPpiGuid;
     0xa030d115, 0x54dd, 0x447b, { 0x90, 0x64, 0xf2, 0x6, 0x88, 0x3d, 0x7c, 0xcc \
   }
 
-extern EFI_GUID gPeiTpmInitializationDonePpiGuid;
+extern EFI_GUID  gPeiTpmInitializationDonePpiGuid;
 
 #endif

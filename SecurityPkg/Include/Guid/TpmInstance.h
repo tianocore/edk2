@@ -22,11 +22,9 @@ extern EFI_GUID  gEfiTpmDeviceInstanceNoneGuid;
 extern EFI_GUID  gEfiTpmDeviceInstanceTpm12Guid;
 extern EFI_GUID  gEfiTpmDeviceInstanceTpm20DtpmGuid;
 
-
 #define TPM_DEVICE_SELECTED_GUID  \
   { 0x7f4158d3, 0x74d, 0x456d, { 0x8c, 0xb2, 0x1, 0xf9, 0xc8, 0xf7, 0x9d, 0xaa } }
 
 extern EFI_GUID  gEfiTpmDeviceSelectedGuid;
 
 #endif
-

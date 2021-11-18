@@ -37,74 +37,74 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack(1)
 
 typedef struct {
-    //
-    // Opal SSC 1 support  (0 - not supported, 1 - supported)
-    //
-    UINT32 OpalSsc1 : 1;
+  //
+  // Opal SSC 1 support  (0 - not supported, 1 - supported)
+  //
+  UINT32    OpalSsc1          : 1;
 
-    //
-    // Opal SSC 2support  (0 - not supported, 1 - supported)
-    //
-    UINT32 OpalSsc2 : 1;
+  //
+  // Opal SSC 2support  (0 - not supported, 1 - supported)
+  //
+  UINT32    OpalSsc2          : 1;
 
-    //
-    // Opal SSC Lite support  (0 - not supported, 1 - supported)
-    //
-    UINT32 OpalSscLite : 1;
+  //
+  // Opal SSC Lite support  (0 - not supported, 1 - supported)
+  //
+  UINT32    OpalSscLite       : 1;
 
-    //
-    // Pyrite SSC support  (0 - not supported, 1 - supported)
-    //
-    UINT32 PyriteSsc : 1;
+  //
+  // Pyrite SSC support  (0 - not supported, 1 - supported)
+  //
+  UINT32    PyriteSsc         : 1;
 
-    //
-    // Security protocol 1 support  (0 - not supported, 1 - supported)
-    //
-    UINT32 Sp1 : 1;
+  //
+  // Security protocol 1 support  (0 - not supported, 1 - supported)
+  //
+  UINT32    Sp1               : 1;
 
-    //
-    // Security protocol 2 support  (0 - not supported, 1 - supported)
-    //
-    UINT32 Sp2 : 1;
+  //
+  // Security protocol 2 support  (0 - not supported, 1 - supported)
+  //
+  UINT32    Sp2               : 1;
 
-    //
-    // Security protocol IEEE1667 support  (0 - not supported, 1 - supported)
-    //
-    UINT32 SpIeee1667 : 1;
+  //
+  // Security protocol IEEE1667 support  (0 - not supported, 1 - supported)
+  //
+  UINT32    SpIeee1667        : 1;
 
-    //
-    // Media encryption supported (0 - not supported, 1 - supported)
-    //
-    UINT32 MediaEncryption : 1;
+  //
+  // Media encryption supported (0 - not supported, 1 - supported)
+  //
+  UINT32    MediaEncryption   : 1;
 
-    //
-    // Initial C_PIN_SID PIN Indicator
-    //  0 - The initial C_PIN_SID PIN value is NOT equal to the C_PIN_MSID PIN value
-    //  1 - The initial C_PIN_SID PIN value is equal to the C_PIN_MSID PIN value
-    //
-    UINT32 InitCpinIndicator : 1;
+  //
+  // Initial C_PIN_SID PIN Indicator
+  //  0 - The initial C_PIN_SID PIN value is NOT equal to the C_PIN_MSID PIN value
+  //  1 - The initial C_PIN_SID PIN value is equal to the C_PIN_MSID PIN value
+  //
+  UINT32    InitCpinIndicator : 1;
 
-    //
-    // Behavior of C_PIN_SID PIN upon TPer Revert
-    //  0 - The initial C_PIN_SID PIN value is NOT equal to the C_PIN_MSID PIN value
-    //  1 - The initial C_PIN_SID PIN value is equal to the C_PIN_MSID PIN value
-    //
-    UINT32 CpinUponRevert : 1;
+  //
+  // Behavior of C_PIN_SID PIN upon TPer Revert
+  //  0 - The initial C_PIN_SID PIN value is NOT equal to the C_PIN_MSID PIN value
+  //  1 - The initial C_PIN_SID PIN value is equal to the C_PIN_MSID PIN value
+  //
+  UINT32    CpinUponRevert    : 1;
 
-    //
-    // Media encryption supported (0 - not supported, 1 - supported)
-    //
-    UINT32 BlockSid : 1;
+  //
+  // Media encryption supported (0 - not supported, 1 - supported)
+  //
+  UINT32    BlockSid          : 1;
 
-    //
-    // Pyrite SSC V2 support  (0 - not supported, 1 - supported)
-    //
-    UINT32 PyriteSscV2 : 1;
+  //
+  // Pyrite SSC V2 support  (0 - not supported, 1 - supported)
+  //
+  UINT32    PyriteSscV2       : 1;
 
-    //
-    // Supported Data Removal Mechanism support  (0 - not supported, 1 - supported)
-    //
-    UINT32 DataRemoval : 1;
+  //
+  // Supported Data Removal Mechanism support  (0 - not supported, 1 - supported)
+  //
+  UINT32    DataRemoval       : 1;
 } OPAL_DISK_SUPPORT_ATTRIBUTE;
 
 //
@@ -112,16 +112,16 @@ typedef struct {
 // The type indicates who was the determined owner of the device.
 //
 typedef enum {
-    //
-    // Represents the device ownership is unknown because starting a session as the SID authority with the ADMIN SP
-    //was unsuccessful with the provided PIN
-    //
-    OpalOwnershipUnknown,
+  //
+  // Represents the device ownership is unknown because starting a session as the SID authority with the ADMIN SP
+  // was unsuccessful with the provided PIN
+  //
+  OpalOwnershipUnknown,
 
-    //
-    // Represents that the ADMIN SP SID authority contains the same PIN as the MSID PIN
-    //
-    OpalOwnershipNobody,
+  //
+  // Represents that the ADMIN SP SID authority contains the same PIN as the MSID PIN
+  //
+  OpalOwnershipNobody,
 } OPAL_OWNER_SHIP;
 
 //
@@ -132,14 +132,14 @@ typedef enum {
 //
 //
 typedef struct  {
-    UINT32                                 HostSessionId;
-    UINT32                                 TperSessionId;
-    UINT16                                 ComIdExtension;
+  UINT32                                   HostSessionId;
+  UINT32                                   TperSessionId;
+  UINT16                                   ComIdExtension;
 
-    UINT16                                 OpalBaseComId;
+  UINT16                                   OpalBaseComId;
 
-    EFI_STORAGE_SECURITY_COMMAND_PROTOCOL  *Sscp;
-    UINT32                                 MediaId;
+  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *Sscp;
+  UINT32                                   MediaId;
 } OPAL_SESSION;
 #pragma pack()
 
@@ -155,10 +155,10 @@ typedef struct  {
 **/
 TCG_RESULT
 EFIAPI
-OpalRetrieveSupportedProtocolList(
-  OPAL_SESSION     *Session,
-  UINTN            BufferSize,
-  VOID             *BuffAddress
+OpalRetrieveSupportedProtocolList (
+  OPAL_SESSION  *Session,
+  UINTN         BufferSize,
+  VOID          *BuffAddress
   );
 
 /**
@@ -173,10 +173,10 @@ OpalRetrieveSupportedProtocolList(
 **/
 TCG_RESULT
 EFIAPI
-OpalRetrieveLevel0DiscoveryHeader(
-  OPAL_SESSION     *Session,
-  UINTN            BufferSize,
-  VOID             *BuffAddress
+OpalRetrieveLevel0DiscoveryHeader (
+  OPAL_SESSION  *Session,
+  UINTN         BufferSize,
+  VOID          *BuffAddress
   );
 
 /**
@@ -199,14 +199,14 @@ OpalRetrieveLevel0DiscoveryHeader(
 **/
 TCG_RESULT
 EFIAPI
-OpalStartSession(
-  OPAL_SESSION     *Session,
-  TCG_UID          SpId,
-  BOOLEAN          Write,
-  UINT32           HostChallengeLength,
-  const VOID       *HostChallenge,
-  TCG_UID          HostSigningAuthority,
-  UINT8            *MethodStatus
+OpalStartSession (
+  OPAL_SESSION  *Session,
+  TCG_UID       SpId,
+  BOOLEAN       Write,
+  UINT32        HostChallengeLength,
+  const VOID    *HostChallenge,
+  TCG_UID       HostSigningAuthority,
+  UINT8         *MethodStatus
   );
 
 /**
@@ -217,8 +217,8 @@ OpalStartSession(
 **/
 TCG_RESULT
 EFIAPI
-OpalEndSession(
-  OPAL_SESSION     *Session
+OpalEndSession (
+  OPAL_SESSION  *Session
   );
 
 /**
@@ -230,10 +230,9 @@ OpalEndSession(
 **/
 TCG_RESULT
 EFIAPI
-OpalPsidRevert(
-  OPAL_SESSION              *AdminSpSession
+OpalPsidRevert (
+  OPAL_SESSION  *AdminSpSession
   );
-
 
 /**
 
@@ -247,11 +246,11 @@ OpalPsidRevert(
 **/
 TCG_RESULT
 EFIAPI
-OpalGetMsid(
-  OPAL_SESSION    *AdminSpSession,
-  UINT32          MsidBufferSize,
-  UINT8           *Msid,
-  UINT32          *MsidLength
+OpalGetMsid (
+  OPAL_SESSION  *AdminSpSession,
+  UINT32        MsidBufferSize,
+  UINT8         *Msid,
+  UINT32        *MsidLength
   );
 
 /**
@@ -266,11 +265,10 @@ OpalGetMsid(
 **/
 TCG_RESULT
 EFIAPI
-OpalActivateLockingSp(
-  OPAL_SESSION           *AdminSpSession,
-  UINT8                  *MethodStatus
+OpalActivateLockingSp (
+  OPAL_SESSION  *AdminSpSession,
+  UINT8         *MethodStatus
   );
-
 
 /**
 
@@ -285,12 +283,12 @@ OpalActivateLockingSp(
 **/
 TCG_RESULT
 EFIAPI
-OpalSetPassword(
-  OPAL_SESSION   *Session,
-  TCG_UID        CpinRowUid,
-  const VOID     *NewPin,
-  UINT32         NewPinLength,
-  UINT8          *MethodStatus
+OpalSetPassword (
+  OPAL_SESSION  *Session,
+  TCG_UID       CpinRowUid,
+  const VOID    *NewPin,
+  UINT32        NewPinLength,
+  UINT8         *MethodStatus
   );
 
 /**
@@ -304,11 +302,10 @@ OpalSetPassword(
 **/
 TCG_RESULT
 EFIAPI
-OpalGlobalLockingRangeGenKey(
-  OPAL_SESSION   *LockingSpSession,
-  UINT8          *MethodStatus
+OpalGlobalLockingRangeGenKey (
+  OPAL_SESSION  *LockingSpSession,
+  UINT8         *MethodStatus
   );
-
 
 /**
 
@@ -324,13 +321,12 @@ OpalGlobalLockingRangeGenKey(
 **/
 TCG_RESULT
 EFIAPI
-OpalUpdateGlobalLockingRange(
-  OPAL_SESSION             *LockingSpSession,
-  BOOLEAN                  ReadLocked,
-  BOOLEAN                  WriteLocked,
-  UINT8                    *MethodStatus
+OpalUpdateGlobalLockingRange (
+  OPAL_SESSION  *LockingSpSession,
+  BOOLEAN       ReadLocked,
+  BOOLEAN       WriteLocked,
+  UINT8         *MethodStatus
   );
-
 
 /**
 
@@ -350,16 +346,16 @@ OpalUpdateGlobalLockingRange(
 **/
 TCG_RESULT
 EFIAPI
-OpalSetLockingRange(
-  OPAL_SESSION     *LockingSpSession,
-  TCG_UID          LockingRangeUid,
-  UINT64           RangeStart,
-  UINT64           RangeLength,
-  BOOLEAN          ReadLockEnabled,
-  BOOLEAN          WriteLockEnabled,
-  BOOLEAN          ReadLocked,
-  BOOLEAN          WriteLocked,
-  UINT8            *MethodStatus
+OpalSetLockingRange (
+  OPAL_SESSION  *LockingSpSession,
+  TCG_UID       LockingRangeUid,
+  UINT64        RangeStart,
+  UINT64        RangeLength,
+  BOOLEAN       ReadLockEnabled,
+  BOOLEAN       WriteLockEnabled,
+  BOOLEAN       ReadLocked,
+  BOOLEAN       WriteLocked,
+  UINT8         *MethodStatus
   );
 
 /**
@@ -377,15 +373,14 @@ OpalSetLockingRange(
 **/
 TCG_RESULT
 EFIAPI
-OpalSetLockingSpAuthorityEnabledAndPin(
-  OPAL_SESSION    *LockingSpSession,
-  TCG_UID         CpinRowUid,
-  TCG_UID         AuthorityUid,
-  const VOID      *NewPin,
-  UINT32          NewPinLength,
-  UINT8           *MethodStatus
+OpalSetLockingSpAuthorityEnabledAndPin (
+  OPAL_SESSION  *LockingSpSession,
+  TCG_UID       CpinRowUid,
+  TCG_UID       AuthorityUid,
+  const VOID    *NewPin,
+  UINT32        NewPinLength,
+  UINT8         *MethodStatus
   );
-
 
 /**
 
@@ -397,11 +392,10 @@ OpalSetLockingSpAuthorityEnabledAndPin(
 **/
 TCG_RESULT
 EFIAPI
-OpalDisableUser(
-  OPAL_SESSION     *LockingSpSession,
-  UINT8            *MethodStatus
+OpalDisableUser (
+  OPAL_SESSION  *LockingSpSession,
+  UINT8         *MethodStatus
   );
-
 
 /**
 
@@ -415,12 +409,11 @@ OpalDisableUser(
 **/
 TCG_RESULT
 EFIAPI
-OpalAdminRevert(
-  OPAL_SESSION    *LockingSpSession,
-  BOOLEAN         KeepUserData,
-  UINT8           *MethodStatus
+OpalAdminRevert (
+  OPAL_SESSION  *LockingSpSession,
+  BOOLEAN       KeepUserData,
+  UINT8         *MethodStatus
   );
-
 
 /**
 
@@ -433,12 +426,11 @@ OpalAdminRevert(
 **/
 TCG_RESULT
 EFIAPI
-OpalGetTryLimit(
-  OPAL_SESSION   *LockingSpSession,
-  TCG_UID        RowUid,
-  UINT32         *TryLimit
+OpalGetTryLimit (
+  OPAL_SESSION  *LockingSpSession,
+  TCG_UID       RowUid,
+  UINT32        *TryLimit
   );
-
 
 /**
 
@@ -453,12 +445,11 @@ OpalGetTryLimit(
 **/
 TCG_RESULT
 EFIAPI
-OpalCreateRetrieveGlobalLockingRangeActiveKey(
-  const OPAL_SESSION    *Session,
-  TCG_CREATE_STRUCT     *CreateStruct,
-  UINT32                *Size
+OpalCreateRetrieveGlobalLockingRangeActiveKey (
+  const OPAL_SESSION  *Session,
+  TCG_CREATE_STRUCT   *CreateStruct,
+  UINT32              *Size
   );
-
 
 /**
 
@@ -470,7 +461,7 @@ OpalCreateRetrieveGlobalLockingRangeActiveKey(
 **/
 TCG_RESULT
 EFIAPI
-OpalParseRetrieveGlobalLockingRangeActiveKey(
+OpalParseRetrieveGlobalLockingRangeActiveKey (
   TCG_PARSE_STRUCT  *ParseStruct,
   TCG_UID           *ActiveKey
   );
@@ -485,9 +476,9 @@ OpalParseRetrieveGlobalLockingRangeActiveKey(
 **/
 TCG_RESULT
 EFIAPI
-OpalGetLockingInfo(
-  OPAL_SESSION                     *Session,
-  TCG_LOCKING_FEATURE_DESCRIPTOR   *LockingFeature
+OpalGetLockingInfo (
+  OPAL_SESSION                    *Session,
+  TCG_LOCKING_FEATURE_DESCRIPTOR  *LockingFeature
   );
 
 /**
@@ -500,8 +491,8 @@ OpalGetLockingInfo(
 **/
 BOOLEAN
 EFIAPI
-OpalFeatureSupported(
-  OPAL_DISK_SUPPORT_ATTRIBUTE      *SupportedAttributes
+OpalFeatureSupported (
+  OPAL_DISK_SUPPORT_ATTRIBUTE  *SupportedAttributes
   );
 
 /**
@@ -517,9 +508,9 @@ OpalFeatureSupported(
 **/
 BOOLEAN
 EFIAPI
-OpalFeatureEnabled(
-  OPAL_DISK_SUPPORT_ATTRIBUTE      *SupportedAttributes,
-  TCG_LOCKING_FEATURE_DESCRIPTOR   *LockingFeature
+OpalFeatureEnabled (
+  OPAL_DISK_SUPPORT_ATTRIBUTE     *SupportedAttributes,
+  TCG_LOCKING_FEATURE_DESCRIPTOR  *LockingFeature
   );
 
 /**
@@ -533,9 +524,9 @@ OpalFeatureEnabled(
 
 **/
 BOOLEAN
-OpalDeviceLocked(
-  OPAL_DISK_SUPPORT_ATTRIBUTE      *SupportedAttributes,
-  TCG_LOCKING_FEATURE_DESCRIPTOR   *LockingFeature
+OpalDeviceLocked (
+  OPAL_DISK_SUPPORT_ATTRIBUTE     *SupportedAttributes,
+  TCG_LOCKING_FEATURE_DESCRIPTOR  *LockingFeature
   );
 
 /**
@@ -547,9 +538,9 @@ OpalDeviceLocked(
 **/
 TCG_RESULT
 EFIAPI
-OpalBlockSid(
-  OPAL_SESSION                           *Session,
-  BOOLEAN                                HardwareReset
+OpalBlockSid (
+  OPAL_SESSION  *Session,
+  BOOLEAN       HardwareReset
   );
 
 /**
@@ -563,7 +554,7 @@ OpalBlockSid(
 **/
 TCG_RESULT
 EFIAPI
-OpalGetSupportedAttributesInfo(
+OpalGetSupportedAttributesInfo (
   OPAL_SESSION                 *Session,
   OPAL_DISK_SUPPORT_ATTRIBUTE  *SupportedAttributes,
   UINT16                       *OpalBaseComId
@@ -579,10 +570,10 @@ OpalGetSupportedAttributesInfo(
 **/
 TCG_RESULT
 EFIAPI
-OpalUtilPsidRevert(
-  OPAL_SESSION   *AdminSpSession,
-  const VOID     *Psid,
-  UINT32         PsidLength
+OpalUtilPsidRevert (
+  OPAL_SESSION  *AdminSpSession,
+  const VOID    *Psid,
+  UINT32        PsidLength
   );
 
 /**
@@ -599,12 +590,12 @@ OpalUtilPsidRevert(
 **/
 TCG_RESULT
 EFIAPI
-OpalUtilSetAdminPasswordAsSid(
-  OPAL_SESSION      *AdminSpSession,
-  const VOID        *GeneratedSid,
-  UINT32            SidLength,
-  const VOID        *Password,
-  UINT32            PassLength
+OpalUtilSetAdminPasswordAsSid (
+  OPAL_SESSION  *AdminSpSession,
+  const VOID    *GeneratedSid,
+  UINT32        SidLength,
+  const VOID    *Password,
+  UINT32        PassLength
   );
 
 /**
@@ -626,17 +617,17 @@ OpalUtilSetAdminPasswordAsSid(
 **/
 TCG_RESULT
 EFIAPI
-OpalUtilSetOpalLockingRange(
-  OPAL_SESSION   *LockingSpSession,
-  const VOID     *Password,
-  UINT32         PassLength,
-  TCG_UID        LockingRangeUid,
-  UINT64         RangeStart,
-  UINT64         RangeLength,
-  BOOLEAN        ReadLockEnabled,
-  BOOLEAN        WriteLockEnabled,
-  BOOLEAN        ReadLocked,
-  BOOLEAN        WriteLocked
+OpalUtilSetOpalLockingRange (
+  OPAL_SESSION  *LockingSpSession,
+  const VOID    *Password,
+  UINT32        PassLength,
+  TCG_UID       LockingRangeUid,
+  UINT64        RangeStart,
+  UINT64        RangeLength,
+  BOOLEAN       ReadLockEnabled,
+  BOOLEAN       WriteLockEnabled,
+  BOOLEAN       ReadLocked,
+  BOOLEAN       WriteLocked
   );
 
 /**
@@ -653,7 +644,7 @@ OpalUtilSetOpalLockingRange(
 **/
 TCG_RESULT
 EFIAPI
-OpalUtilSetAdminPassword(
+OpalUtilSetAdminPassword (
   OPAL_SESSION  *AdminSpSession,
   const VOID    *OldPassword,
   UINT32        OldPasswordLength,
@@ -674,12 +665,12 @@ OpalUtilSetAdminPassword(
 **/
 TCG_RESULT
 EFIAPI
-OpalUtilSetUserPassword(
-  OPAL_SESSION    *LockingSpSession,
-  const VOID      *OldPassword,
-  UINT32          OldPasswordLength,
-  const VOID      *NewPassword,
-  UINT32          NewPasswordLength
+OpalUtilSetUserPassword (
+  OPAL_SESSION  *LockingSpSession,
+  const VOID    *OldPassword,
+  UINT32        OldPasswordLength,
+  const VOID    *NewPassword,
+  UINT32        NewPasswordLength
   );
 
 /**
@@ -694,10 +685,10 @@ OpalUtilSetUserPassword(
 TCG_RESULT
 EFIAPI
 OpalUtilVerifyPassword (
-  OPAL_SESSION   *LockingSpSession,
-  const VOID     *Password,
-  UINT32         PasswordLength,
-  TCG_UID        HostSigningAuthority
+  OPAL_SESSION  *LockingSpSession,
+  const VOID    *Password,
+  UINT32        PasswordLength,
+  TCG_UID       HostSigningAuthority
   );
 
 /**
@@ -712,11 +703,11 @@ OpalUtilVerifyPassword (
 **/
 TCG_RESULT
 EFIAPI
-OpalUtilSecureErase(
-  OPAL_SESSION     *LockingSpSession,
-  const VOID       *Password,
-  UINT32           PasswordLength,
-  BOOLEAN          *PasswordFailed
+OpalUtilSecureErase (
+  OPAL_SESSION  *LockingSpSession,
+  const VOID    *Password,
+  UINT32        PasswordLength,
+  BOOLEAN       *PasswordFailed
   );
 
 /**
@@ -730,11 +721,11 @@ OpalUtilSecureErase(
 **/
 TCG_RESULT
 EFIAPI
-OpalUtilDisableUser(
-  OPAL_SESSION   *LockingSpSession,
-  const VOID     *Password,
-  UINT32         PasswordLength,
-  BOOLEAN        *PasswordFailed
+OpalUtilDisableUser (
+  OPAL_SESSION  *LockingSpSession,
+  const VOID    *Password,
+  UINT32        PasswordLength,
+  BOOLEAN       *PasswordFailed
   );
 
 /**
@@ -751,14 +742,14 @@ OpalUtilDisableUser(
 **/
 TCG_RESULT
 EFIAPI
-OpalUtilRevert(
-  OPAL_SESSION     *LockingSpSession,
-  BOOLEAN          KeepUserData,
-  const VOID       *Password,
-  UINT32           PasswordLength,
-  BOOLEAN          *PasswordFailed,
-  UINT8            *Msid,
-  UINT32           MsidLength
+OpalUtilRevert (
+  OPAL_SESSION  *LockingSpSession,
+  BOOLEAN       KeepUserData,
+  const VOID    *Password,
+  UINT32        PasswordLength,
+  BOOLEAN       *PasswordFailed,
+  UINT8         *Msid,
+  UINT32        MsidLength
   );
 
 /**
@@ -774,11 +765,11 @@ OpalUtilRevert(
 TCG_RESULT
 EFIAPI
 OpalUtilSetSIDtoMSID (
-  OPAL_SESSION     *AdminSpSession,
-  const VOID       *Password,
-  UINT32           PasswordLength,
-  UINT8            *Msid,
-  UINT32           MsidLength
+  OPAL_SESSION  *AdminSpSession,
+  const VOID    *Password,
+  UINT32        PasswordLength,
+  UINT8         *Msid,
+  UINT32        MsidLength
   );
 
 /**
@@ -793,12 +784,12 @@ OpalUtilSetSIDtoMSID (
 **/
 TCG_RESULT
 EFIAPI
-OpalUtilUpdateGlobalLockingRange(
-  OPAL_SESSION    *LockingSpSession,
-  const VOID      *Password,
-  UINT32          PasswordLength,
-  BOOLEAN         ReadLocked,
-  BOOLEAN         WriteLocked
+OpalUtilUpdateGlobalLockingRange (
+  OPAL_SESSION  *LockingSpSession,
+  const VOID    *Password,
+  UINT32        PasswordLength,
+  BOOLEAN       ReadLocked,
+  BOOLEAN       WriteLocked
   );
 
 /**
@@ -812,11 +803,11 @@ OpalUtilUpdateGlobalLockingRange(
 **/
 TCG_RESULT
 EFIAPI
-OpalUtilGetMsid(
-  OPAL_SESSION    *Session,
-  UINT8           *Msid,
-  UINT32          MsidBufferLength,
-  UINT32          *MsidLength
+OpalUtilGetMsid (
+  OPAL_SESSION  *Session,
+  UINT8         *Msid,
+  UINT32        MsidBufferLength,
+  UINT32        *MsidLength
   );
 
 /**
@@ -833,10 +824,10 @@ OpalUtilGetMsid(
 **/
 OPAL_OWNER_SHIP
 EFIAPI
-OpalUtilDetermineOwnership(
-  OPAL_SESSION       *Session,
-  UINT8              *Msid,
-  UINT32             MsidLength
+OpalUtilDetermineOwnership (
+  OPAL_SESSION  *Session,
+  UINT8         *Msid,
+  UINT32        MsidLength
   );
 
 /**
@@ -852,9 +843,9 @@ OpalUtilDetermineOwnership(
 **/
 BOOLEAN
 EFIAPI
-OpalUtilAdminPasswordExists(
-  IN  UINT16                           OwnerShip,
-  IN  TCG_LOCKING_FEATURE_DESCRIPTOR   *LockingFeature
+OpalUtilAdminPasswordExists (
+  IN  UINT16                          OwnerShip,
+  IN  TCG_LOCKING_FEATURE_DESCRIPTOR  *LockingFeature
   );
 
 /**
@@ -869,10 +860,10 @@ OpalUtilAdminPasswordExists(
 TCG_RESULT
 EFIAPI
 OpalUtilGetActiveDataRemovalMechanism (
-  OPAL_SESSION      *Session,
-  const VOID        *GeneratedSid,
-  UINT32            SidLength,
-  UINT8             *ActiveDataRemovalMechanism
+  OPAL_SESSION  *Session,
+  const VOID    *GeneratedSid,
+  UINT32        SidLength,
+  UINT8         *ActiveDataRemovalMechanism
   );
 
 /**
@@ -885,8 +876,8 @@ OpalUtilGetActiveDataRemovalMechanism (
 TCG_RESULT
 EFIAPI
 OpalUtilGetDataRemovalMechanismLists (
-  IN  OPAL_SESSION      *Session,
-  OUT UINT32            *RemovalMechanismLists
+  IN  OPAL_SESSION  *Session,
+  OUT UINT32        *RemovalMechanismLists
   );
 
 #endif // _OPAL_CORE_H_
