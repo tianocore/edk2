@@ -16,25 +16,23 @@
 
 #include <Protocol/EmuIoThunk.h>
 
-
-#define EMU_IO_THUNK_PROTOCOL_DATA_SIGNATURE SIGNATURE_32('E','m','u','T')
+#define EMU_IO_THUNK_PROTOCOL_DATA_SIGNATURE  SIGNATURE_32('E','m','u','T')
 
 typedef struct {
-  UINTN                 Signature;
-  EMU_IO_THUNK_PROTOCOL Data;
-  BOOLEAN               EmuBusDriver;
-  LIST_ENTRY            Link;
+  UINTN                    Signature;
+  EMU_IO_THUNK_PROTOCOL    Data;
+  BOOLEAN                  EmuBusDriver;
+  LIST_ENTRY               Link;
 } EMU_IO_THUNK_PROTOCOL_DATA;
 
 LIST_ENTRY  mThunkList = INITIALIZE_LIST_HEAD_VARIABLE (mThunkList);
 
-
 EFI_STATUS
 EFIAPI
 AddThunkProtocol (
-  IN  EMU_IO_THUNK_PROTOCOL   *ThunkIo,
-  IN  CHAR16                  *ConfigString,
-  IN  BOOLEAN                 EmuBusDriver
+  IN  EMU_IO_THUNK_PROTOCOL  *ThunkIo,
+  IN  CHAR16                 *ConfigString,
+  IN  BOOLEAN                EmuBusDriver
   )
 {
   UINTN                       Size;
@@ -47,15 +45,15 @@ AddThunkProtocol (
     return EFI_INVALID_PARAMETER;
   }
 
-  Instance = 0;
-  Size = StrSize (ConfigString);
+  Instance    = 0;
+  Size        = StrSize (ConfigString);
   StartString = AllocatePool (Size);
   if (StartString == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   StrCpyS (StartString, Size / sizeof (CHAR16), ConfigString);
   while (*StartString != '\0') {
-
     //
     // Find the end of the sub string
     //
@@ -77,12 +75,13 @@ AddThunkProtocol (
     if (Private == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    Private->Signature          = EMU_IO_THUNK_PROTOCOL_DATA_SIGNATURE;
-    Private->EmuBusDriver       = EmuBusDriver;
+
+    Private->Signature    = EMU_IO_THUNK_PROTOCOL_DATA_SIGNATURE;
+    Private->EmuBusDriver = EmuBusDriver;
 
     CopyMem (&Private->Data, ThunkIo, sizeof (EMU_IO_THUNK_PROTOCOL));
-    Private->Data.Instance      = (UINT16)Instance++;
-    Private->Data.ConfigString  = StartString;
+    Private->Data.Instance     = (UINT16)Instance++;
+    Private->Data.ConfigString = StartString;
 
     InsertTailList (&mThunkList, &Private->Link);
 
@@ -95,16 +94,15 @@ AddThunkProtocol (
   return EFI_SUCCESS;
 }
 
-
 EFI_STATUS
 EFIAPI
 GetNextThunkProtocol (
-  IN  BOOLEAN                 EmuBusDriver,
-  OUT EMU_IO_THUNK_PROTOCOL   **Instance  OPTIONAL
+  IN  BOOLEAN                EmuBusDriver,
+  OUT EMU_IO_THUNK_PROTOCOL  **Instance  OPTIONAL
   )
 {
-  LIST_ENTRY                   *Link;
-  EMU_IO_THUNK_PROTOCOL_DATA   *Private;
+  LIST_ENTRY                  *Link;
+  EMU_IO_THUNK_PROTOCOL_DATA  *Private;
 
   if (mThunkList.ForwardLink == &mThunkList) {
     // Skip parsing an empty list
@@ -125,13 +123,12 @@ GetNextThunkProtocol (
       if (Link == &mThunkList) {
         return EFI_NOT_FOUND;
       }
-      Private = CR (Link, EMU_IO_THUNK_PROTOCOL_DATA, Link, EMU_IO_THUNK_PROTOCOL_DATA_SIGNATURE);
+
+      Private   = CR (Link, EMU_IO_THUNK_PROTOCOL_DATA, Link, EMU_IO_THUNK_PROTOCOL_DATA_SIGNATURE);
       *Instance = &Private->Data;
       return EFI_SUCCESS;
     }
   }
 
-
   return EFI_NOT_FOUND;
 }
-
