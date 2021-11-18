@@ -30,12 +30,12 @@
 #include <Library/PrintLib.h>
 #include <Library/UefiHiiServicesLib.h>
 
-extern EFI_HII_HANDLE mTftpHiiHandle;
+extern EFI_HII_HANDLE  mTftpHiiHandle;
 
 typedef struct {
-  UINTN  FileSize;
-  UINTN  DownloadedNbOfBytes;
-  UINTN  LastReportedNbOfBytes;
+  UINTN    FileSize;
+  UINTN    DownloadedNbOfBytes;
+  UINTN    LastReportedNbOfBytes;
 } DOWNLOAD_CONTEXT;
 
 /**
@@ -64,6 +64,7 @@ RunTftp (
 **/
 EFI_HII_HANDLE
 InitializeHiiPackage (
-  EFI_HANDLE                  ImageHandle
+  EFI_HANDLE  ImageHandle
   );
+
 #endif // _TFTP_H_

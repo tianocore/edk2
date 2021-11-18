@@ -23,7 +23,7 @@
 /**
   SBBR specification version strings
 **/
-STATIC CONST CHAR8* ArmSbbrVersions[ArmSbbrVersionMax] = {
+STATIC CONST CHAR8  *ArmSbbrVersions[ArmSbbrVersionMax] = {
   "1.0",     // ArmSbbrVersion_1_0
   "1.1",     // ArmSbbrVersion_1_1
   "1.2"      // ArmSbbrVersion_1_2
@@ -32,7 +32,7 @@ STATIC CONST CHAR8* ArmSbbrVersions[ArmSbbrVersionMax] = {
 /**
   SBBR 1.0 mandatory ACPI tables
 **/
-STATIC CONST UINT32 ArmSbbr10Mandatory[] = {
+STATIC CONST UINT32  ArmSbbr10Mandatory[] = {
   EFI_ACPI_6_3_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
   EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
   EFI_ACPI_6_3_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
@@ -45,7 +45,7 @@ STATIC CONST UINT32 ArmSbbr10Mandatory[] = {
 /**
   SBBR 1.1 mandatory ACPI tables
 **/
-STATIC CONST UINT32 ArmSbbr11Mandatory[] = {
+STATIC CONST UINT32  ArmSbbr11Mandatory[] = {
   EFI_ACPI_6_3_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
   EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
   EFI_ACPI_6_3_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
@@ -59,7 +59,7 @@ STATIC CONST UINT32 ArmSbbr11Mandatory[] = {
 /**
   SBBR 1.2 mandatory ACPI tables
 **/
-STATIC CONST UINT32 ArmSbbr12Mandatory[] = {
+STATIC CONST UINT32  ArmSbbr12Mandatory[] = {
   EFI_ACPI_6_3_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
   EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
   EFI_ACPI_6_3_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
@@ -74,7 +74,7 @@ STATIC CONST UINT32 ArmSbbr12Mandatory[] = {
 /**
   Mandatory ACPI tables for every SBBR specification version.
 **/
-STATIC CONST ACPI_SBBR_REQ ArmSbbrReqs[ArmSbbrVersionMax] = {
+STATIC CONST ACPI_SBBR_REQ  ArmSbbrReqs[ArmSbbrVersionMax] = {
   { ArmSbbr10Mandatory, ARRAY_SIZE (ArmSbbr10Mandatory) },    // SBBR v1.0
   { ArmSbbr11Mandatory, ARRAY_SIZE (ArmSbbr11Mandatory) },    // SBBR v1.1
   { ArmSbbr12Mandatory, ARRAY_SIZE (ArmSbbr12Mandatory) }     // SBBR v1.2
@@ -84,16 +84,16 @@ STATIC CONST ACPI_SBBR_REQ ArmSbbrReqs[ArmSbbrVersionMax] = {
   Data structure to track instance counts for all ACPI tables which are
   defined as 'mandatory' in any SBBR version.
 **/
-STATIC ACPI_TABLE_COUNTER ArmSbbrTableCounts[] = {
-  {EFI_ACPI_6_3_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE, 0},
-  {EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE, 0},
-  {EFI_ACPI_6_3_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE, 0},
-  {EFI_ACPI_6_3_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE, 0},
-  {EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE, 0},
-  {EFI_ACPI_6_3_DEBUG_PORT_2_TABLE_SIGNATURE, 0},
-  {EFI_ACPI_6_3_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE, 0},
-  {EFI_ACPI_6_3_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE, 0},
-  {EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE, 0}
+STATIC ACPI_TABLE_COUNTER  ArmSbbrTableCounts[] = {
+  { EFI_ACPI_6_3_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,                                            0 },
+  { EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,                                                 0 },
+  { EFI_ACPI_6_3_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,                                      0 },
+  { EFI_ACPI_6_3_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,                                              0 },
+  { EFI_ACPI_6_3_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,                                              0 },
+  { EFI_ACPI_6_3_DEBUG_PORT_2_TABLE_SIGNATURE,                                                           0 },
+  { EFI_ACPI_6_3_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,                                        0 },
+  { EFI_ACPI_6_3_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE, 0 },
+  { EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE,                                0 }
 };
 
 /**
@@ -105,7 +105,7 @@ ArmSbbrResetTableCounts (
   VOID
   )
 {
-  UINT32 Table;
+  UINT32  Table;
 
   for (Table = 0; Table < ARRAY_SIZE (ArmSbbrTableCounts); Table++) {
     ArmSbbrTableCounts[Table].Count = 0;
@@ -124,10 +124,10 @@ ArmSbbrResetTableCounts (
 BOOLEAN
 EFIAPI
 ArmSbbrIncrementTableCount (
-  UINT32 Signature
+  UINT32  Signature
   )
 {
-  UINT32 Table;
+  UINT32  Table;
 
   for (Table = 0; Table < ARRAY_SIZE (ArmSbbrTableCounts); Table++) {
     if (Signature == ArmSbbrTableCounts[Table].Signature) {
@@ -154,14 +154,14 @@ ArmSbbrIncrementTableCount (
 EFI_STATUS
 EFIAPI
 ArmSbbrReqsValidate (
-  ARM_SBBR_VERSION Version
+  ARM_SBBR_VERSION  Version
   )
 {
-  UINT32        Table;
-  UINT32        Index;
-  UINT32        MandatoryTable;
-  CONST UINT8*  SignaturePtr;
-  BOOLEAN       IsArmSbbrViolated;
+  UINT32       Table;
+  UINT32       Index;
+  UINT32       MandatoryTable;
+  CONST UINT8  *SignaturePtr;
+  BOOLEAN      IsArmSbbrViolated;
 
   if (Version >= ArmSbbrVersionMax) {
     return EFI_INVALID_PARAMETER;
@@ -172,12 +172,13 @@ ArmSbbrReqsValidate (
   // Go through the list of mandatory tables for the input SBBR version
   for (Table = 0; Table < ArmSbbrReqs[Version].TableCount; Table++) {
     MandatoryTable = ArmSbbrReqs[Version].Tables[Table];
-    SignaturePtr = (CONST UINT8*)(UINTN)&MandatoryTable;
+    SignaturePtr   = (CONST UINT8 *)(UINTN)&MandatoryTable;
 
     // Locate the instance count for the table with the given signature
     Index = 0;
     while ((Index < ARRAY_SIZE (ArmSbbrTableCounts)) &&
-           (ArmSbbrTableCounts[Index].Signature != MandatoryTable)) {
+           (ArmSbbrTableCounts[Index].Signature != MandatoryTable))
+    {
       Index++;
     }
 
@@ -185,7 +186,7 @@ ArmSbbrReqsValidate (
       IncrementErrorCount ();
       Print (
         L"\nERROR: SBBR v%a: Mandatory %c%c%c%c table's instance count not " \
-          L"found\n",
+        L"found\n",
         ArmSbbrVersions[Version],
         SignaturePtr[0],
         SignaturePtr[1],

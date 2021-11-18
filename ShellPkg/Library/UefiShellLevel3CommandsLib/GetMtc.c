@@ -24,52 +24,52 @@ ShellCommandRunGetMtc (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS          Status;
-  LIST_ENTRY          *Package;
-  CHAR16              *ProblemParam;
-  SHELL_STATUS        ShellStatus;
-  UINT64              Mtc;
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+  UINT64        Mtc;
 
-  ProblemParam        = NULL;
-  ShellStatus         = SHELL_SUCCESS;
+  ProblemParam = NULL;
+  ShellStatus  = SHELL_SUCCESS;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
   //
-  Status = ShellInitialize();
-  ASSERT_EFI_ERROR(Status);
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
 
   //
   // parse the command line
   //
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR(Status)) {
-    if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"getmtc", ProblemParam);
-      FreePool(ProblemParam);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"getmtc", ProblemParam);
+      FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      ASSERT(FALSE);
+      ASSERT (FALSE);
     }
   } else {
     //
     // check for "-?"
     //
-    if (ShellCommandLineGetFlag(Package, L"-?")) {
-      ASSERT(FALSE);
-    } else if (ShellCommandLineGetRawValue(Package, 1) != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"getmtc");
+    if (ShellCommandLineGetFlag (Package, L"-?")) {
+      ASSERT (FALSE);
+    } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"getmtc");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
       // Get the monotonic counter count
       //
-      Status = gBS->GetNextMonotonicCount(&Mtc);
+      Status = gBS->GetNextMonotonicCount (&Mtc);
       if (Status == EFI_DEVICE_ERROR) {
         ShellStatus = SHELL_DEVICE_ERROR;
       } else if (Status == EFI_SECURITY_VIOLATION) {
         ShellStatus = SHELL_SECURITY_VIOLATION;
-      } else if (EFI_ERROR(Status)) {
+      } else if (EFI_ERROR (Status)) {
         ShellStatus = SHELL_DEVICE_ERROR;
       }
 
@@ -77,9 +77,10 @@ ShellCommandRunGetMtc (
       // print it...
       //
       if (ShellStatus == SHELL_SUCCESS) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GET_MTC_OUTPUT), gShellLevel3HiiHandle, Mtc);
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GET_MTC_OUTPUT), gShellLevel3HiiHandle, Mtc);
       }
     }
+
     //
     // free the command line package
     //
@@ -88,4 +89,3 @@ ShellCommandRunGetMtc (
 
   return (ShellStatus);
 }
-

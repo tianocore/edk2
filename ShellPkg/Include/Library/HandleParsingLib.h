@@ -26,10 +26,10 @@
 **/
 EFI_STATUS
 EFIAPI
-AddNewGuidNameMapping(
-  IN CONST EFI_GUID *Guid,
-  IN CONST CHAR16   *TheName,
-  IN CONST CHAR8    *Lang OPTIONAL
+AddNewGuidNameMapping (
+  IN CONST EFI_GUID  *Guid,
+  IN CONST CHAR16    *TheName,
+  IN CONST CHAR8     *Lang OPTIONAL
   );
 
 /**
@@ -43,11 +43,11 @@ AddNewGuidNameMapping(
   @return                       The pointer to a string of the name.  The caller
                                 is responsible to free this memory.
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
-GetStringNameFromGuid(
-  IN CONST EFI_GUID *Guid,
-  IN CONST CHAR8    *Lang OPTIONAL
+GetStringNameFromGuid (
+  IN CONST EFI_GUID  *Guid,
+  IN CONST CHAR8     *Lang OPTIONAL
   );
 
 /**
@@ -63,10 +63,10 @@ GetStringNameFromGuid(
 **/
 EFI_STATUS
 EFIAPI
-GetGuidFromStringName(
-  IN CONST CHAR16 *Name,
-  IN CONST CHAR8  *Lang OPTIONAL,
-  OUT EFI_GUID    **Guid
+GetGuidFromStringName (
+  IN CONST CHAR16  *Name,
+  IN CONST CHAR8   *Lang OPTIONAL,
+  OUT EFI_GUID     **Guid
   );
 
 /**
@@ -85,12 +85,12 @@ GetGuidFromStringName(
   @return                   The pointer to string.
   @retval NULL              An error was encountered.
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
-GetProtocolInformationDump(
-  IN CONST EFI_HANDLE TheHandle,
-  IN CONST EFI_GUID   *Guid,
-  IN CONST BOOLEAN    Verbose
+GetProtocolInformationDump (
+  IN CONST EFI_HANDLE  TheHandle,
+  IN CONST EFI_GUID    *Guid,
+  IN CONST BOOLEAN     Verbose
   );
 
 /**
@@ -105,11 +105,11 @@ GetProtocolInformationDump(
   @retval NULL              The name could not be found.
   @return                   A pointer to the string name.  Do not de-allocate the memory.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
-GetStringNameFromHandle(
-  IN CONST EFI_HANDLE TheHandle,
-  IN CONST CHAR8      *Language
+GetStringNameFromHandle (
+  IN CONST EFI_HANDLE  TheHandle,
+  IN CONST CHAR8       *Language
   );
 
 /**
@@ -133,19 +133,19 @@ GetBestLanguageForDriver (
   IN BOOLEAN      Iso639Language
   );
 
-#define HR_UNKNOWN                     0
-#define HR_IMAGE_HANDLE                BIT1
-#define HR_DRIVER_BINDING_HANDLE       BIT2 // has driver binding
-#define HR_DEVICE_DRIVER               BIT3 // device driver (hybrid?)
-#define HR_BUS_DRIVER                  BIT4 // a bus driver  (hybrid?)
-#define HR_DRIVER_CONFIGURATION_HANDLE BIT5
-#define HR_DRIVER_DIAGNOSTICS_HANDLE   BIT6
-#define HR_COMPONENT_NAME_HANDLE       BIT7
-#define HR_DEVICE_HANDLE               BIT8
-#define HR_PARENT_HANDLE               BIT9
-#define HR_CONTROLLER_HANDLE           BIT10
-#define HR_CHILD_HANDLE                BIT11
-#define HR_VALID_MASK                  (BIT1|BIT2|BIT3|BIT4|BIT5|BIT6|BIT7|BIT8|BIT9|BIT10|BIT11)
+#define HR_UNKNOWN                      0
+#define HR_IMAGE_HANDLE                 BIT1
+#define HR_DRIVER_BINDING_HANDLE        BIT2 // has driver binding
+#define HR_DEVICE_DRIVER                BIT3 // device driver (hybrid?)
+#define HR_BUS_DRIVER                   BIT4 // a bus driver  (hybrid?)
+#define HR_DRIVER_CONFIGURATION_HANDLE  BIT5
+#define HR_DRIVER_DIAGNOSTICS_HANDLE    BIT6
+#define HR_COMPONENT_NAME_HANDLE        BIT7
+#define HR_DEVICE_HANDLE                BIT8
+#define HR_PARENT_HANDLE                BIT9
+#define HR_CONTROLLER_HANDLE            BIT10
+#define HR_CHILD_HANDLE                 BIT11
+#define HR_VALID_MASK                   (BIT1|BIT2|BIT3|BIT4|BIT5|BIT6|BIT7|BIT8|BIT9|BIT10|BIT11)
 
 /**
   Gets all the related EFI_HANDLEs based on the mask supplied.
@@ -177,11 +177,11 @@ GetBestLanguageForDriver (
 EFI_STATUS
 EFIAPI
 ParseHandleDatabaseByRelationship (
-  IN CONST EFI_HANDLE       DriverBindingHandle OPTIONAL,
-  IN CONST EFI_HANDLE       ControllerHandle OPTIONAL,
-  IN CONST UINTN            Mask,
-  IN UINTN                  *MatchingHandleCount,
-  OUT EFI_HANDLE            **MatchingHandleBuffer OPTIONAL
+  IN CONST EFI_HANDLE  DriverBindingHandle OPTIONAL,
+  IN CONST EFI_HANDLE  ControllerHandle OPTIONAL,
+  IN CONST UINTN       Mask,
+  IN UINTN             *MatchingHandleCount,
+  OUT EFI_HANDLE       **MatchingHandleBuffer OPTIONAL
   );
 
 /**
@@ -213,11 +213,11 @@ ParseHandleDatabaseByRelationship (
 EFI_STATUS
 EFIAPI
 ParseHandleDatabaseByRelationshipWithType (
-  IN CONST EFI_HANDLE DriverBindingHandle OPTIONAL,
-  IN CONST EFI_HANDLE ControllerHandle OPTIONAL,
-  IN UINTN            *HandleCount,
-  OUT EFI_HANDLE      **HandleBuffer,
-  OUT UINTN           **HandleType
+  IN CONST EFI_HANDLE  DriverBindingHandle OPTIONAL,
+  IN CONST EFI_HANDLE  ControllerHandle OPTIONAL,
+  IN UINTN             *HandleCount,
+  OUT EFI_HANDLE       **HandleBuffer,
+  OUT UINTN            **HandleType
   );
 
 /**
@@ -290,10 +290,10 @@ ParseHandleDatabaseByRelationshipWithType (
 **/
 EFI_STATUS
 EFIAPI
-ParseHandleDatabaseForChildDevices(
-  IN CONST EFI_HANDLE       DriverHandle,
-  IN UINTN                  *MatchingHandleCount,
-  OUT EFI_HANDLE            **MatchingHandleBuffer OPTIONAL
+ParseHandleDatabaseForChildDevices (
+  IN CONST EFI_HANDLE  DriverHandle,
+  IN UINTN             *MatchingHandleCount,
+  OUT EFI_HANDLE       **MatchingHandleBuffer OPTIONAL
   );
 
 /**
@@ -309,12 +309,11 @@ ParseHandleDatabaseForChildDevices(
 **/
 EFI_STATUS
 EFIAPI
-ParseHandleDatabaseForChildControllers(
-  IN CONST EFI_HANDLE       ControllerHandle,
-  OUT UINTN                 *MatchingHandleCount,
-  OUT EFI_HANDLE            **MatchingHandleBuffer OPTIONAL
+ParseHandleDatabaseForChildControllers (
+  IN CONST EFI_HANDLE  ControllerHandle,
+  OUT UINTN            *MatchingHandleCount,
+  OUT EFI_HANDLE       **MatchingHandleBuffer OPTIONAL
   );
-
 
 /**
   Function to retrieve the human-friendly index of a given handle.  If the handle
@@ -329,8 +328,8 @@ ParseHandleDatabaseForChildControllers(
 **/
 UINTN
 EFIAPI
-ConvertHandleToHandleIndex(
-  IN CONST EFI_HANDLE TheHandle
+ConvertHandleToHandleIndex (
+  IN CONST EFI_HANDLE  TheHandle
   );
 
 /**
@@ -344,8 +343,8 @@ ConvertHandleToHandleIndex(
 **/
 EFI_HANDLE
 EFIAPI
-ConvertHandleIndexToHandle(
-  IN CONST UINTN TheIndex
+ConvertHandleIndexToHandle (
+  IN CONST UINTN  TheIndex
   );
 
 /**
@@ -359,10 +358,10 @@ ConvertHandleIndexToHandle(
   @retval NULL            A memory allocation failed.
   @return                 A NULL terminated list of handles.
 **/
-EFI_HANDLE*
+EFI_HANDLE *
 EFIAPI
 GetHandleListByProtocol (
-  IN CONST EFI_GUID *ProtocolGuid OPTIONAL
+  IN CONST EFI_GUID  *ProtocolGuid OPTIONAL
   );
 
 /**
@@ -376,12 +375,11 @@ GetHandleListByProtocol (
   @retval NULL              ProtocolGuids was NULL.
   @return                   A NULL terminated list of EFI_HANDLEs.
 **/
-EFI_HANDLE*
+EFI_HANDLE *
 EFIAPI
 GetHandleListByProtocolList (
-  IN CONST EFI_GUID **ProtocolGuids
+  IN CONST EFI_GUID  **ProtocolGuids
   );
-
 
 /**
   Return all supported GUIDs.
@@ -397,8 +395,8 @@ GetHandleListByProtocolList (
 EFI_STATUS
 EFIAPI
 GetAllMappingGuids (
-  OUT EFI_GUID *Guids,
-  IN OUT UINTN *Count
+  OUT EFI_GUID  *Guids,
+  IN OUT UINTN  *Count
   );
 
 #endif // __HANDLE_PARSING_LIB__
