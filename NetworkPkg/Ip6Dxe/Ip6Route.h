@@ -10,38 +10,38 @@
 #ifndef __EFI_IP6_ROUTE_H__
 #define __EFI_IP6_ROUTE_H__
 
-#define IP6_DIRECT_ROUTE          0x00000001
-#define IP6_PACKET_TOO_BIG        0x00000010
+#define IP6_DIRECT_ROUTE    0x00000001
+#define IP6_PACKET_TOO_BIG  0x00000010
 
-#define IP6_ROUTE_CACHE_HASH_SIZE 31
+#define IP6_ROUTE_CACHE_HASH_SIZE  31
 ///
 /// Max NO. of cache entry per hash bucket
 ///
-#define IP6_ROUTE_CACHE_MAX       32
+#define IP6_ROUTE_CACHE_MAX  32
 
-#define IP6_ROUTE_CACHE_HASH(Ip1, Ip2) Ip6RouteCacheHash ((Ip1), (Ip2))
+#define IP6_ROUTE_CACHE_HASH(Ip1, Ip2)  Ip6RouteCacheHash ((Ip1), (Ip2))
 
 typedef struct {
-  LIST_ENTRY                Link;
-  INTN                      RefCnt;
-  UINT32                    Flag;
-  UINT8                     PrefixLength;
-  EFI_IPv6_ADDRESS          Destination;
-  EFI_IPv6_ADDRESS          NextHop;
+  LIST_ENTRY          Link;
+  INTN                RefCnt;
+  UINT32              Flag;
+  UINT8               PrefixLength;
+  EFI_IPv6_ADDRESS    Destination;
+  EFI_IPv6_ADDRESS    NextHop;
 } IP6_ROUTE_ENTRY;
 
 typedef struct {
-  LIST_ENTRY                Link;
-  INTN                      RefCnt;
-  UINTN                     Tag;
-  EFI_IPv6_ADDRESS          Destination;
-  EFI_IPv6_ADDRESS          Source;
-  EFI_IPv6_ADDRESS          NextHop;
+  LIST_ENTRY          Link;
+  INTN                RefCnt;
+  UINTN               Tag;
+  EFI_IPv6_ADDRESS    Destination;
+  EFI_IPv6_ADDRESS    Source;
+  EFI_IPv6_ADDRESS    NextHop;
 } IP6_ROUTE_CACHE_ENTRY;
 
 typedef struct {
-  LIST_ENTRY                CacheBucket[IP6_ROUTE_CACHE_HASH_SIZE];
-  UINT8                     CacheNum[IP6_ROUTE_CACHE_HASH_SIZE];
+  LIST_ENTRY    CacheBucket[IP6_ROUTE_CACHE_HASH_SIZE];
+  UINT8         CacheNum[IP6_ROUTE_CACHE_HASH_SIZE];
 } IP6_ROUTE_CACHE;
 
 //
@@ -54,10 +54,10 @@ typedef struct {
 //
 
 typedef struct _IP6_ROUTE_TABLE {
-  INTN                      RefCnt;
-  UINT32                    TotalNum;
-  LIST_ENTRY                RouteArea[IP6_PREFIX_NUM];
-  IP6_ROUTE_CACHE           Cache;
+  INTN               RefCnt;
+  UINT32             TotalNum;
+  LIST_ENTRY         RouteArea[IP6_PREFIX_NUM];
+  IP6_ROUTE_CACHE    Cache;
 } IP6_ROUTE_TABLE;
 
 /**
@@ -72,8 +72,8 @@ typedef struct _IP6_ROUTE_TABLE {
 **/
 UINT32
 Ip6RouteCacheHash (
-  IN EFI_IPv6_ADDRESS       *Ip1,
-  IN EFI_IPv6_ADDRESS       *Ip2
+  IN EFI_IPv6_ADDRESS  *Ip1,
+  IN EFI_IPv6_ADDRESS  *Ip2
   );
 
 /**
@@ -91,10 +91,10 @@ Ip6RouteCacheHash (
 **/
 IP6_ROUTE_CACHE_ENTRY *
 Ip6CreateRouteCacheEntry (
-  IN EFI_IPv6_ADDRESS       *Dst,
-  IN EFI_IPv6_ADDRESS       *Src,
-  IN EFI_IPv6_ADDRESS       *GateWay,
-  IN UINTN                  Tag
+  IN EFI_IPv6_ADDRESS  *Dst,
+  IN EFI_IPv6_ADDRESS  *Src,
+  IN EFI_IPv6_ADDRESS  *GateWay,
+  IN UINTN             Tag
   );
 
 /**
@@ -122,9 +122,9 @@ Ip6FreeRouteCacheEntry (
 **/
 IP6_ROUTE_CACHE_ENTRY *
 Ip6FindRouteCache (
-  IN IP6_ROUTE_TABLE        *RtTable,
-  IN EFI_IPv6_ADDRESS       *Dest,
-  IN EFI_IPv6_ADDRESS       *Src
+  IN IP6_ROUTE_TABLE   *RtTable,
+  IN EFI_IPv6_ADDRESS  *Dest,
+  IN EFI_IPv6_ADDRESS  *Src
   );
 
 /**
@@ -142,9 +142,9 @@ Ip6FindRouteCache (
 **/
 EFI_STATUS
 Ip6BuildEfiRouteTable (
-  IN IP6_ROUTE_TABLE        *RouteTable,
-  OUT UINT32                *EfiRouteCount,
-  OUT EFI_IP6_ROUTE_TABLE   **EfiRouteTable OPTIONAL
+  IN IP6_ROUTE_TABLE       *RouteTable,
+  OUT UINT32               *EfiRouteCount,
+  OUT EFI_IP6_ROUTE_TABLE  **EfiRouteTable OPTIONAL
   );
 
 /**
@@ -168,7 +168,7 @@ Ip6CreateRouteTable (
 **/
 VOID
 Ip6CleanRouteTable (
-  IN OUT IP6_ROUTE_TABLE        *RtTable
+  IN OUT IP6_ROUTE_TABLE  *RtTable
   );
 
 /**
@@ -186,9 +186,9 @@ Ip6CleanRouteTable (
 **/
 IP6_ROUTE_ENTRY *
 Ip6CreateRouteEntry (
-  IN EFI_IPv6_ADDRESS       *Destination    OPTIONAL,
-  IN UINT8                  PrefixLength,
-  IN EFI_IPv6_ADDRESS       *GatewayAddress OPTIONAL
+  IN EFI_IPv6_ADDRESS  *Destination    OPTIONAL,
+  IN UINT8             PrefixLength,
+  IN EFI_IPv6_ADDRESS  *GatewayAddress OPTIONAL
   );
 
 /**
@@ -212,9 +212,9 @@ Ip6CreateRouteEntry (
 **/
 IP6_ROUTE_ENTRY *
 Ip6FindRouteEntry (
-  IN IP6_ROUTE_TABLE        *RtTable,
-  IN EFI_IPv6_ADDRESS       *Destination OPTIONAL,
-  IN EFI_IPv6_ADDRESS       *NextHop     OPTIONAL
+  IN IP6_ROUTE_TABLE   *RtTable,
+  IN EFI_IPv6_ADDRESS  *Destination OPTIONAL,
+  IN EFI_IPv6_ADDRESS  *NextHop     OPTIONAL
   );
 
 /**
@@ -225,7 +225,7 @@ Ip6FindRouteEntry (
 **/
 VOID
 Ip6FreeRouteEntry (
-  IN OUT IP6_ROUTE_ENTRY    *RtEntry
+  IN OUT IP6_ROUTE_ENTRY  *RtEntry
   );
 
 /**
@@ -243,10 +243,10 @@ Ip6FreeRouteEntry (
 **/
 EFI_STATUS
 Ip6AddRoute (
-  IN OUT IP6_ROUTE_TABLE    *RtTable,
-  IN EFI_IPv6_ADDRESS       *Destination,
-  IN UINT8                  PrefixLength,
-  IN EFI_IPv6_ADDRESS       *GatewayAddress
+  IN OUT IP6_ROUTE_TABLE  *RtTable,
+  IN EFI_IPv6_ADDRESS     *Destination,
+  IN UINT8                PrefixLength,
+  IN EFI_IPv6_ADDRESS     *GatewayAddress
   );
 
 /**
@@ -265,10 +265,10 @@ Ip6AddRoute (
 **/
 EFI_STATUS
 Ip6DelRoute (
-  IN OUT IP6_ROUTE_TABLE    *RtTable,
-  IN EFI_IPv6_ADDRESS       *Destination,
-  IN UINT8                  PrefixLength,
-  IN EFI_IPv6_ADDRESS       *GatewayAddress
+  IN OUT IP6_ROUTE_TABLE  *RtTable,
+  IN EFI_IPv6_ADDRESS     *Destination,
+  IN UINT8                PrefixLength,
+  IN EFI_IPv6_ADDRESS     *GatewayAddress
   );
 
 /**
@@ -285,9 +285,9 @@ Ip6DelRoute (
 **/
 IP6_ROUTE_CACHE_ENTRY *
 Ip6Route (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IPv6_ADDRESS       *Dest,
-  IN EFI_IPv6_ADDRESS       *Src
+  IN IP6_SERVICE       *IpSb,
+  IN EFI_IPv6_ADDRESS  *Dest,
+  IN EFI_IPv6_ADDRESS  *Src
   );
 
 #endif

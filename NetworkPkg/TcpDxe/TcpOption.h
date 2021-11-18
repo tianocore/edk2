@@ -28,12 +28,12 @@
 // recommend format of timestamp window scale
 // option for fast process.
 //
-#define TCP_OPTION_TS_FAST ((TCP_OPTION_NOP << 24) | \
+#define TCP_OPTION_TS_FAST  ((TCP_OPTION_NOP << 24) |\
                             (TCP_OPTION_NOP << 16) | \
                             (TCP_OPTION_TS << 8)   | \
                             (TCP_OPTION_TS_LEN))
 
-#define TCP_OPTION_WS_FAST   ((TCP_OPTION_NOP << 24) | \
+#define TCP_OPTION_WS_FAST  ((TCP_OPTION_NOP << 24) |  \
                               (TCP_OPTION_WS << 16)  | \
                               (TCP_OPTION_WS_LEN << 8))
 
@@ -42,22 +42,22 @@
 //
 // Other misc definitions
 //
-#define TCP_OPTION_RCVD_MSS        0x01
-#define TCP_OPTION_RCVD_WS         0x02
-#define TCP_OPTION_RCVD_TS         0x04
-#define TCP_OPTION_MAX_WS          14      ///< Maximum window scale value
-#define TCP_OPTION_MAX_WIN         0xffff  ///< Max window size in TCP header
+#define TCP_OPTION_RCVD_MSS  0x01
+#define TCP_OPTION_RCVD_WS   0x02
+#define TCP_OPTION_RCVD_TS   0x04
+#define TCP_OPTION_MAX_WS    14            ///< Maximum window scale value
+#define TCP_OPTION_MAX_WIN   0xffff        ///< Max window size in TCP header
 
 ///
 /// The structure to store the parse option value.
 /// ParseOption only parses the options, doesn't process them.
 ///
 typedef struct _TCP_OPTION {
-  UINT8   Flag;     ///< Flag such as TCP_OPTION_RCVD_MSS
-  UINT8   WndScale; ///< The WndScale received
-  UINT16  Mss;      ///< The Mss received
-  UINT32  TSVal;    ///< The TSVal field in a timestamp option
-  UINT32  TSEcr;    ///< The TSEcr field in a timestamp option
+  UINT8     Flag;     ///< Flag such as TCP_OPTION_RCVD_MSS
+  UINT8     WndScale; ///< The WndScale received
+  UINT16    Mss;      ///< The Mss received
+  UINT32    TSVal;    ///< The TSVal field in a timestamp option
+  UINT32    TSEcr;    ///< The TSEcr field in a timestamp option
 } TCP_OPTION;
 
 /**
@@ -70,7 +70,7 @@ typedef struct _TCP_OPTION {
 **/
 UINT8
 TcpComputeScale (
-  IN TCP_CB *Tcb
+  IN TCP_CB  *Tcb
   );
 
 /**
@@ -84,8 +84,8 @@ TcpComputeScale (
 **/
 UINT16
 TcpSynBuildOption (
-  IN TCP_CB  *Tcb,
-  IN NET_BUF *Nbuf
+  IN TCP_CB   *Tcb,
+  IN NET_BUF  *Nbuf
   );
 
 /**
@@ -99,8 +99,8 @@ TcpSynBuildOption (
 **/
 UINT16
 TcpBuildOption (
-  IN TCP_CB  *Tcb,
-  IN NET_BUF *Nbuf
+  IN TCP_CB   *Tcb,
+  IN NET_BUF  *Nbuf
   );
 
 /**
@@ -116,8 +116,8 @@ TcpBuildOption (
 **/
 INTN
 TcpParseOption (
-  IN     TCP_HEAD   *Tcp,
-  IN OUT TCP_OPTION *Option
+  IN     TCP_HEAD    *Tcp,
+  IN OUT TCP_OPTION  *Option
   );
 
 #endif

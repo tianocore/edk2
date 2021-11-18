@@ -58,9 +58,9 @@ extern EFI_TLS_CONFIGURATION_PROTOCOL  mTlsConfigurationProtocol;
 **/
 EFI_STATUS
 TlsEncryptPacket (
-  IN     TLS_INSTANCE                  *TlsInstance,
-  IN OUT EFI_TLS_FRAGMENT_DATA         **FragmentTable,
-  IN     UINT32                        *FragmentCount
+  IN     TLS_INSTANCE           *TlsInstance,
+  IN OUT EFI_TLS_FRAGMENT_DATA  **FragmentTable,
+  IN     UINT32                 *FragmentCount
   );
 
 /**
@@ -81,9 +81,9 @@ TlsEncryptPacket (
 **/
 EFI_STATUS
 TlsDecryptPacket (
-  IN     TLS_INSTANCE                  *TlsInstance,
-  IN OUT EFI_TLS_FRAGMENT_DATA         **FragmentTable,
-  IN     UINT32                        *FragmentCount
+  IN     TLS_INSTANCE           *TlsInstance,
+  IN OUT EFI_TLS_FRAGMENT_DATA  **FragmentTable,
+  IN     UINT32                 *FragmentCount
   );
 
 /**
@@ -114,10 +114,10 @@ TlsDecryptPacket (
 EFI_STATUS
 EFIAPI
 TlsSetSessionData (
-  IN     EFI_TLS_PROTOCOL              *This,
-  IN     EFI_TLS_SESSION_DATA_TYPE     DataType,
-  IN     VOID                          *Data,
-  IN     UINTN                         DataSize
+  IN     EFI_TLS_PROTOCOL           *This,
+  IN     EFI_TLS_SESSION_DATA_TYPE  DataType,
+  IN     VOID                       *Data,
+  IN     UINTN                      DataSize
   );
 
 /**
@@ -146,9 +146,9 @@ TlsSetSessionData (
 EFI_STATUS
 EFIAPI
 TlsGetSessionData (
-  IN     EFI_TLS_PROTOCOL              *This,
-  IN     EFI_TLS_SESSION_DATA_TYPE     DataType,
-  IN OUT VOID                          *Data,  OPTIONAL
+  IN     EFI_TLS_PROTOCOL *This,
+  IN     EFI_TLS_SESSION_DATA_TYPE DataType,
+  IN OUT VOID *Data, OPTIONAL
   IN OUT UINTN                         *DataSize
   );
 
@@ -193,10 +193,10 @@ TlsGetSessionData (
 EFI_STATUS
 EFIAPI
 TlsBuildResponsePacket (
-  IN     EFI_TLS_PROTOCOL              *This,
-  IN     UINT8                         *RequestBuffer, OPTIONAL
+  IN     EFI_TLS_PROTOCOL *This,
+  IN     UINT8 *RequestBuffer, OPTIONAL
   IN     UINTN                         RequestSize, OPTIONAL
-     OUT UINT8                         *Buffer, OPTIONAL
+  OUT UINT8                         *Buffer, OPTIONAL
   IN OUT UINTN                         *BufferSize
   );
 
@@ -237,10 +237,10 @@ TlsBuildResponsePacket (
 EFI_STATUS
 EFIAPI
 TlsProcessPacket (
-  IN     EFI_TLS_PROTOCOL              *This,
-  IN OUT EFI_TLS_FRAGMENT_DATA         **FragmentTable,
-  IN     UINT32                        *FragmentCount,
-  IN     EFI_TLS_CRYPT_MODE            CryptMode
+  IN     EFI_TLS_PROTOCOL       *This,
+  IN OUT EFI_TLS_FRAGMENT_DATA  **FragmentTable,
+  IN     UINT32                 *FragmentCount,
+  IN     EFI_TLS_CRYPT_MODE     CryptMode
   );
 
 /**
@@ -296,11 +296,10 @@ TlsConfigurationSetData (
 EFI_STATUS
 EFIAPI
 TlsConfigurationGetData (
-  IN     EFI_TLS_CONFIGURATION_PROTOCOL  *This,
-  IN     EFI_TLS_CONFIG_DATA_TYPE        DataType,
-  IN OUT VOID                            *Data, OPTIONAL
+  IN     EFI_TLS_CONFIGURATION_PROTOCOL *This,
+  IN     EFI_TLS_CONFIG_DATA_TYPE DataType,
+  IN OUT VOID *Data, OPTIONAL
   IN OUT UINTN                           *DataSize
   );
 
 #endif
-

@@ -28,9 +28,9 @@ Abstract:
 // list or on a DPC queue at a specific EFI_TPL.
 //
 typedef struct {
-  LIST_ENTRY             ListEntry;
-  EFI_DPC_PROCEDURE  DpcProcedure;
-  VOID               *DpcContext;
+  LIST_ENTRY           ListEntry;
+  EFI_DPC_PROCEDURE    DpcProcedure;
+  VOID                 *DpcContext;
 } DPC_ENTRY;
 
 /**
@@ -77,4 +77,3 @@ DpcDispatchDpc (
   );
 
 #endif
-

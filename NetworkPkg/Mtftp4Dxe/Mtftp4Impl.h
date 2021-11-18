@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __EFI_MTFTP4_IMPL_H__
 #define __EFI_MTFTP4_IMPL_H__
 
@@ -33,19 +32,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 extern EFI_MTFTP4_PROTOCOL  gMtftp4ProtocolTemplate;
 
-typedef struct _MTFTP4_SERVICE  MTFTP4_SERVICE;
-typedef struct _MTFTP4_PROTOCOL MTFTP4_PROTOCOL;
+typedef struct _MTFTP4_SERVICE   MTFTP4_SERVICE;
+typedef struct _MTFTP4_PROTOCOL  MTFTP4_PROTOCOL;
 
 #include "Mtftp4Driver.h"
 #include "Mtftp4Option.h"
 #include "Mtftp4Support.h"
 
-
 ///
 /// Some constant value of Mtftp service.
 ///
-#define MTFTP4_SERVICE_SIGNATURE    SIGNATURE_32 ('T', 'F', 'T', 'P')
-#define MTFTP4_PROTOCOL_SIGNATURE   SIGNATURE_32 ('t', 'f', 't', 'p')
+#define MTFTP4_SERVICE_SIGNATURE   SIGNATURE_32 ('T', 'F', 'T', 'P')
+#define MTFTP4_PROTOCOL_SIGNATURE  SIGNATURE_32 ('t', 'f', 't', 'p')
 
 #define MTFTP4_DEFAULT_SERVER_PORT  69
 #define MTFTP4_DEFAULT_TIMEOUT      3
@@ -54,114 +52,113 @@ typedef struct _MTFTP4_PROTOCOL MTFTP4_PROTOCOL;
 #define MTFTP4_DEFAULT_WINDOWSIZE   1
 #define MTFTP4_TIME_TO_GETMAP       5
 
-#define MTFTP4_STATE_UNCONFIGED     0
-#define MTFTP4_STATE_CONFIGED       1
-#define MTFTP4_STATE_DESTROY        2
+#define MTFTP4_STATE_UNCONFIGED  0
+#define MTFTP4_STATE_CONFIGED    1
+#define MTFTP4_STATE_DESTROY     2
 
 ///
 /// Mtftp service block
 ///
 struct _MTFTP4_SERVICE {
-  UINT32                        Signature;
-  EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
+  UINT32                          Signature;
+  EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
 
-  UINT16                        ChildrenNum;
-  LIST_ENTRY                    Children;
+  UINT16                          ChildrenNum;
+  LIST_ENTRY                      Children;
 
-  EFI_EVENT                     Timer;  ///< Ticking timer for all the MTFTP clients to handle the packet timeout case.
-  EFI_EVENT                     TimerNotifyLevel; ///< Ticking timer for all the MTFTP clients to calculate the packet live time.
-  EFI_EVENT                     TimerToGetMap;
+  EFI_EVENT                       Timer;            ///< Ticking timer for all the MTFTP clients to handle the packet timeout case.
+  EFI_EVENT                       TimerNotifyLevel; ///< Ticking timer for all the MTFTP clients to calculate the packet live time.
+  EFI_EVENT                       TimerToGetMap;
 
-  EFI_HANDLE                    Controller;
-  EFI_HANDLE                    Image;
+  EFI_HANDLE                      Controller;
+  EFI_HANDLE                      Image;
 
   //
   // This UDP child is used to keep the connection between the UDP
   // and MTFTP, so MTFTP will be notified when UDP is uninstalled.
   //
-  UDP_IO                        *ConnectUdp;
+  UDP_IO                          *ConnectUdp;
 };
 
-
 typedef struct {
-  EFI_MTFTP4_PACKET             **Packet;
-  UINT32                        *PacketLen;
-  EFI_STATUS                    Status;
+  EFI_MTFTP4_PACKET    **Packet;
+  UINT32               *PacketLen;
+  EFI_STATUS           Status;
 } MTFTP4_GETINFO_STATE;
 
 struct _MTFTP4_PROTOCOL {
-  UINT32                        Signature;
-  LIST_ENTRY                    Link;
-  EFI_MTFTP4_PROTOCOL           Mtftp4;
+  UINT32                    Signature;
+  LIST_ENTRY                Link;
+  EFI_MTFTP4_PROTOCOL       Mtftp4;
 
-  INTN                          State;
-  BOOLEAN                       InDestroy;
+  INTN                      State;
+  BOOLEAN                   InDestroy;
 
-  MTFTP4_SERVICE                *Service;
-  EFI_HANDLE                    Handle;
+  MTFTP4_SERVICE            *Service;
+  EFI_HANDLE                Handle;
 
-  EFI_MTFTP4_CONFIG_DATA        Config;
+  EFI_MTFTP4_CONFIG_DATA    Config;
 
   //
   // Operation parameters: token and requested options.
   //
-  EFI_MTFTP4_TOKEN              *Token;
-  MTFTP4_OPTION                 RequestOption;
-  UINT16                        Operation;
+  EFI_MTFTP4_TOKEN          *Token;
+  MTFTP4_OPTION             RequestOption;
+  UINT16                    Operation;
 
   //
   // Blocks is a list of MTFTP4_BLOCK_RANGE which contains
   // holes in the file
   //
-  UINT16                        BlkSize;
-  UINT16                        LastBlock;
-  LIST_ENTRY                    Blocks;
+  UINT16                    BlkSize;
+  UINT16                    LastBlock;
+  LIST_ENTRY                Blocks;
 
-  UINT16                        WindowSize;
+  UINT16                    WindowSize;
 
   //
   // Record the total received and saved block number.
   //
-  UINT64                        TotalBlock;
+  UINT64                    TotalBlock;
 
   //
   // Record the acked block number.
   //
-  UINT64                        AckedBlock;
+  UINT64                    AckedBlock;
 
   //
   // The server's communication end point: IP and two ports. one for
   // initial request, one for its selected port.
   //
-  IP4_ADDR                      ServerIp;
-  UINT16                        ListeningPort;
-  UINT16                        ConnectedPort;
-  IP4_ADDR                      Gateway;
-  UDP_IO                        *UnicastPort;
+  IP4_ADDR                  ServerIp;
+  UINT16                    ListeningPort;
+  UINT16                    ConnectedPort;
+  IP4_ADDR                  Gateway;
+  UDP_IO                    *UnicastPort;
 
   //
   // Timeout and retransmit status
   //
-  NET_BUF                       *LastPacket;
-  UINT32                        PacketToLive;
-  BOOLEAN                       HasTimeout;
-  UINT32                        CurRetry;
-  UINT32                        MaxRetry;
-  UINT32                        Timeout;
+  NET_BUF                   *LastPacket;
+  UINT32                    PacketToLive;
+  BOOLEAN                   HasTimeout;
+  UINT32                    CurRetry;
+  UINT32                    MaxRetry;
+  UINT32                    Timeout;
 
   //
   // Parameter used by RRQ's multicast download.
   //
-  IP4_ADDR                      McastIp;
-  UINT16                        McastPort;
-  BOOLEAN                       Master;
-  UDP_IO                        *McastUdpPort;
+  IP4_ADDR                  McastIp;
+  UINT16                    McastPort;
+  BOOLEAN                   Master;
+  UDP_IO                    *McastUdpPort;
 };
 
 typedef struct {
-  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
-  UINTN                         NumberOfChildren;
-  EFI_HANDLE                    *ChildHandleBuffer;
+  EFI_SERVICE_BINDING_PROTOCOL    *ServiceBinding;
+  UINTN                           NumberOfChildren;
+  EFI_HANDLE                      *ChildHandleBuffer;
 } MTFTP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT;
 
 /**
@@ -173,8 +170,8 @@ typedef struct {
 **/
 VOID
 Mtftp4CleanOperation (
-  IN OUT MTFTP4_PROTOCOL        *Instance,
-  IN     EFI_STATUS             Result
+  IN OUT MTFTP4_PROTOCOL  *Instance,
+  IN     EFI_STATUS       Result
   );
 
 /**
@@ -193,8 +190,8 @@ Mtftp4CleanOperation (
 **/
 EFI_STATUS
 Mtftp4WrqStart (
-  IN MTFTP4_PROTOCOL        *Instance,
-  IN UINT16                 Operation
+  IN MTFTP4_PROTOCOL  *Instance,
+  IN UINT16           Operation
   );
 
 /**
@@ -213,8 +210,8 @@ Mtftp4WrqStart (
 **/
 EFI_STATUS
 Mtftp4RrqStart (
-  IN MTFTP4_PROTOCOL        *Instance,
-  IN UINT16                 Operation
+  IN MTFTP4_PROTOCOL  *Instance,
+  IN UINT16           Operation
   );
 
 #define MTFTP4_SERVICE_FROM_THIS(a)   \

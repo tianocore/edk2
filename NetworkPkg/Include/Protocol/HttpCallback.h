@@ -13,7 +13,7 @@
     0x611114f1, 0xa37b, 0x4468, {0xa4, 0x36, 0x5b, 0xdd, 0xa1, 0x6a, 0xa2, 0x40} \
   }
 
-typedef struct _EDKII_HTTP_CALLBACK_PROTOCOL  EDKII_HTTP_CALLBACK_PROTOCOL;
+typedef struct _EDKII_HTTP_CALLBACK_PROTOCOL EDKII_HTTP_CALLBACK_PROTOCOL;
 
 ///
 /// EDKII_HTTP_CALLBACK_EVENT
@@ -67,19 +67,19 @@ typedef enum {
 **/
 typedef
 VOID
-(EFIAPI * EDKII_HTTP_CALLBACK) (
+(EFIAPI *EDKII_HTTP_CALLBACK)(
   IN EDKII_HTTP_CALLBACK_PROTOCOL     *This,
   IN EDKII_HTTP_CALLBACK_EVENT        Event,
   IN EFI_STATUS                       EventStatus
- );
+  );
 
 ///
 /// EFI HTTP Callback Protocol is invoked when HTTP event occurs.
 ///
 struct _EDKII_HTTP_CALLBACK_PROTOCOL {
-  EDKII_HTTP_CALLBACK Callback;
+  EDKII_HTTP_CALLBACK    Callback;
 };
 
-extern EFI_GUID gEdkiiHttpCallbackProtocolGuid;
+extern EFI_GUID  gEdkiiHttpCallbackProtocolGuid;
 
 #endif /* EDKII_HTTP_CALLBACK_H_ */
