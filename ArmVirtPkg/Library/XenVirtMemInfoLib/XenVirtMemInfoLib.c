@@ -29,10 +29,10 @@ STATIC ARM_MEMORY_REGION_DESCRIPTOR  mVirtualMemoryTable[2];
 VOID
 EFIAPI
 ArmVirtGetMemoryMap (
-  OUT ARM_MEMORY_REGION_DESCRIPTOR   **VirtualMemoryMap
+  OUT ARM_MEMORY_REGION_DESCRIPTOR  **VirtualMemoryMap
   )
 {
-  EFI_PHYSICAL_ADDRESS TopOfAddressSpace;
+  EFI_PHYSICAL_ADDRESS  TopOfAddressSpace;
 
   ASSERT (VirtualMemoryMap != NULL);
 
@@ -45,13 +45,13 @@ ArmVirtGetMemoryMap (
   //
   mVirtualMemoryTable[0].PhysicalBase = 0x0;
   mVirtualMemoryTable[0].VirtualBase  = 0x0;
-  mVirtualMemoryTable[0].Length       = TopOfAddressSpace;
-  mVirtualMemoryTable[0].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+  mVirtualMemoryTable[0].Length     = TopOfAddressSpace;
+  mVirtualMemoryTable[0].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 
   mVirtualMemoryTable[1].PhysicalBase = 0x0;
   mVirtualMemoryTable[1].VirtualBase  = 0x0;
-  mVirtualMemoryTable[1].Length       = 0x0;
-  mVirtualMemoryTable[1].Attributes   = 0x0;
+  mVirtualMemoryTable[1].Length     = 0x0;
+  mVirtualMemoryTable[1].Attributes = 0x0;
 
   *VirtualMemoryMap = mVirtualMemoryTable;
 }

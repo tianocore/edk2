@@ -33,7 +33,7 @@
 STATIC
 EFI_STATUS
 PlatformHasAcpiDt (
-  IN EFI_HANDLE           ImageHandle
+  IN EFI_HANDLE  ImageHandle
   )
 {
   if (!PcdGetBool (PcdForceNoAcpi)) {
@@ -69,11 +69,11 @@ PlatformHasAcpiDt (
 EFI_STATUS
 EFIAPI
 KvmtoolPlatformDxeEntryPoint (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                     Status;
+  EFI_STATUS  Status;
 
   Status = PlatformHasAcpiDt (ImageHandle);
   ASSERT_EFI_ERROR (Status);
