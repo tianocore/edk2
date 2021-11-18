@@ -34,16 +34,16 @@
 VOID
 EFIAPI
 QuickSort (
-  IN OUT VOID                           *BufferToSort,
-  IN CONST UINTN                        Count,
-  IN CONST UINTN                        ElementSize,
-  IN       BASE_SORT_COMPARE            CompareFunction,
-  OUT VOID                              *BufferOneElement
+  IN OUT VOID                 *BufferToSort,
+  IN CONST UINTN              Count,
+  IN CONST UINTN              ElementSize,
+  IN       BASE_SORT_COMPARE  CompareFunction,
+  OUT VOID                    *BufferOneElement
   )
 {
-  VOID        *Pivot;
-  UINTN       LoopCount;
-  UINTN       NextSwapLocation;
+  VOID   *Pivot;
+  UINTN  LoopCount;
+  UINTN  NextSwapLocation;
 
   ASSERT (BufferToSort     != NULL);
   ASSERT (CompareFunction  != NULL);
@@ -59,7 +59,7 @@ QuickSort (
   //
   // pick a pivot (we choose last element)
   //
-  Pivot = ((UINT8*) BufferToSort + ((Count - 1) * ElementSize));
+  Pivot = ((UINT8 *)BufferToSort + ((Count - 1) * ElementSize));
 
   //
   // Now get the pivot such that all on "left" are below it
@@ -69,13 +69,13 @@ QuickSort (
     //
     // if the element is less than or equal to the pivot
     //
-    if (CompareFunction ((VOID*) ((UINT8*) BufferToSort + ((LoopCount) * ElementSize)), Pivot) <= 0){
+    if (CompareFunction ((VOID *)((UINT8 *)BufferToSort + ((LoopCount) * ElementSize)), Pivot) <= 0) {
       //
       // swap
       //
-      CopyMem (BufferOneElement, (UINT8*) BufferToSort + (NextSwapLocation * ElementSize), ElementSize);
-      CopyMem ((UINT8*) BufferToSort + (NextSwapLocation * ElementSize), (UINT8*) BufferToSort + ((LoopCount) * ElementSize), ElementSize);
-      CopyMem ((UINT8*) BufferToSort + ((LoopCount)*ElementSize), BufferOneElement, ElementSize);
+      CopyMem (BufferOneElement, (UINT8 *)BufferToSort + (NextSwapLocation * ElementSize), ElementSize);
+      CopyMem ((UINT8 *)BufferToSort + (NextSwapLocation * ElementSize), (UINT8 *)BufferToSort + ((LoopCount) * ElementSize), ElementSize);
+      CopyMem ((UINT8 *)BufferToSort + ((LoopCount)*ElementSize), BufferOneElement, ElementSize);
 
       //
       // increment NextSwapLocation
@@ -83,12 +83,13 @@ QuickSort (
       NextSwapLocation++;
     }
   }
+
   //
   // swap pivot to it's final position (NextSwapLocation)
   //
   CopyMem (BufferOneElement, Pivot, ElementSize);
-  CopyMem (Pivot, (UINT8*) BufferToSort + (NextSwapLocation * ElementSize), ElementSize);
-  CopyMem ((UINT8*) BufferToSort + (NextSwapLocation * ElementSize), BufferOneElement, ElementSize);
+  CopyMem (Pivot, (UINT8 *)BufferToSort + (NextSwapLocation * ElementSize), ElementSize);
+  CopyMem ((UINT8 *)BufferToSort + (NextSwapLocation * ElementSize), BufferOneElement, ElementSize);
 
   //
   // Now recurse on 2 partial lists.  neither of these will have the 'pivot' element

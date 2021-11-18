@@ -11,7 +11,7 @@
 //
 // Net function definition for Firmware command
 //
-#define IPMI_NETFN_FIRMWARE 0x08
+#define IPMI_NETFN_FIRMWARE  0x08
 
 //
 // All Firmware commands and their structure definitions to follow here
@@ -26,8 +26,8 @@
 //  Constants and Structure definitions for "Get Device ID" command to follow here
 //
 typedef struct {
-  UINT8   CurrentExecutionContext;
-  UINT8   PartitionPointer;
+  UINT8    CurrentExecutionContext;
+  UINT8    PartitionPointer;
 } IPMI_MSG_GET_BMC_EXEC_RSP;
 
 //
