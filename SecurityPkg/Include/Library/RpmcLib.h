@@ -40,4 +40,3 @@ IncrementMonotonicCounter (
   );
 
 #endif
-

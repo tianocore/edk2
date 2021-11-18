@@ -30,10 +30,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 DTpm2SubmitCommand (
-  IN UINT32            InputParameterBlockSize,
-  IN UINT8             *InputParameterBlock,
-  IN OUT UINT32        *OutputParameterBlockSize,
-  IN UINT8             *OutputParameterBlock
+  IN UINT32      InputParameterBlockSize,
+  IN UINT8       *InputParameterBlock,
+  IN OUT UINT32  *OutputParameterBlockSize,
+  IN UINT8       *OutputParameterBlock
   );
 
 /**
@@ -64,10 +64,10 @@ DTpm2RequestUseTpm (
 EFI_STATUS
 EFIAPI
 Tpm2SubmitCommand (
-  IN UINT32            InputParameterBlockSize,
-  IN UINT8             *InputParameterBlock,
-  IN OUT UINT32        *OutputParameterBlockSize,
-  IN UINT8             *OutputParameterBlock
+  IN UINT32      InputParameterBlockSize,
+  IN UINT8       *InputParameterBlock,
+  IN OUT UINT32  *OutputParameterBlockSize,
+  IN UINT8       *OutputParameterBlock
   )
 {
   return DTpm2SubmitCommand (
@@ -106,7 +106,7 @@ Tpm2RequestUseTpm (
 EFI_STATUS
 EFIAPI
 Tpm2RegisterTpm2DeviceLib (
-  IN TPM2_DEVICE_INTERFACE   *Tpm2Device
+  IN TPM2_DEVICE_INTERFACE  *Tpm2Device
   )
 {
   return EFI_UNSUPPORTED;
