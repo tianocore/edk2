@@ -40,14 +40,14 @@
 VOID
 EFIAPI
 SwitchStack (
-  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      SWITCH_STACK_ENTRY_POINT EntryPoint,
+  IN      VOID *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack,
   ...
   )
 {
-  VA_LIST    Marker;
+  VA_LIST  Marker;
 
   ASSERT (EntryPoint != NULL);
   ASSERT (NewStack != NULL);
