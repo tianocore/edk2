@@ -22,27 +22,26 @@
 #include <Guid/ZeroGuid.h>
 #include <Guid/MmramMemoryReserve.h>
 
-
 #include "StandaloneMmCpu.h"
 
 // GUID to identify HOB with whereabouts of communication buffer with Normal
 // World
-extern EFI_GUID gEfiStandaloneMmNonSecureBufferGuid;
+extern EFI_GUID  gEfiStandaloneMmNonSecureBufferGuid;
 
 // GUID to identify HOB where the entry point of this CPU driver will be
 // populated to allow the entry point driver to invoke it upon receipt of an
 // event
-extern EFI_GUID gEfiArmTfCpuDriverEpDescriptorGuid;
+extern EFI_GUID  gEfiArmTfCpuDriverEpDescriptorGuid;
 
 //
 // Private copy of the MM system table for future use
 //
-EFI_MM_SYSTEM_TABLE *mMmst = NULL;
+EFI_MM_SYSTEM_TABLE  *mMmst = NULL;
 
 //
 // Globals used to initialize the protocol
 //
-STATIC EFI_HANDLE            mMmCpuHandle = NULL;
+STATIC EFI_HANDLE  mMmCpuHandle = NULL;
 
 /** Returns the HOB data for the matching HOB GUID.
 
@@ -56,12 +55,12 @@ STATIC EFI_HANDLE            mMmCpuHandle = NULL;
 **/
 EFI_STATUS
 GetGuidedHobData (
-  IN  VOID *HobList,
-  IN  CONST EFI_GUID *HobGuid,
-  OUT VOID **HobData
+  IN  VOID            *HobList,
+  IN  CONST EFI_GUID  *HobGuid,
+  OUT VOID            **HobData
   )
 {
-  EFI_HOB_GUID_TYPE *Hob;
+  EFI_HOB_GUID_TYPE  *Hob;
 
   if ((HobList == NULL) || (HobGuid == NULL) || (HobData == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -93,20 +92,20 @@ GetGuidedHobData (
 **/
 EFI_STATUS
 StandaloneMmCpuInitialize (
-  IN EFI_HANDLE            ImageHandle,  // not actual imagehandle
-  IN EFI_MM_SYSTEM_TABLE   *SystemTable  // not actual systemtable
+  IN EFI_HANDLE           ImageHandle,   // not actual imagehandle
+  IN EFI_MM_SYSTEM_TABLE  *SystemTable   // not actual systemtable
   )
 {
-  ARM_TF_CPU_DRIVER_EP_DESCRIPTOR *CpuDriverEntryPointDesc;
-  EFI_CONFIGURATION_TABLE         *ConfigurationTable;
-  MP_INFORMATION_HOB_DATA         *MpInformationHobData;
-  EFI_MMRAM_DESCRIPTOR            *NsCommBufMmramRange;
+  ARM_TF_CPU_DRIVER_EP_DESCRIPTOR  *CpuDriverEntryPointDesc;
+  EFI_CONFIGURATION_TABLE          *ConfigurationTable;
+  MP_INFORMATION_HOB_DATA          *MpInformationHobData;
+  EFI_MMRAM_DESCRIPTOR             *NsCommBufMmramRange;
   EFI_STATUS                       Status;
   EFI_HANDLE                       DispatchHandle;
   UINT32                           MpInfoSize;
   UINTN                            Index;
   UINTN                            ArraySize;
-  VOID                            *HobStart;
+  VOID                             *HobStart;
 
   ASSERT (SystemTable != NULL);
   mMmst = SystemTable;
@@ -155,7 +154,7 @@ StandaloneMmCpuInitialize (
   Status = GetGuidedHobData (
              HobStart,
              &gEfiArmTfCpuDriverEpDescriptorGuid,
-             (VOID **) &CpuDriverEntryPointDesc
+             (VOID **)&CpuDriverEntryPointDesc
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "ArmTfCpuDriverEpDesc HOB data extraction failed - 0x%x\n", Status));
@@ -163,9 +162,12 @@ StandaloneMmCpuInitialize (
   }
 
   // Share the entry point of the CPU driver
-  DEBUG ((DEBUG_INFO, "Sharing Cpu Driver EP *0x%lx = 0x%lx\n",
-          (UINTN) CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr,
-          (UINTN) PiMmStandaloneArmTfCpuDriverEntry));
+  DEBUG ((
+    DEBUG_INFO,
+    "Sharing Cpu Driver EP *0x%lx = 0x%lx\n",
+    (UINTN)CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr,
+    (UINTN)PiMmStandaloneArmTfCpuDriverEntry
+    ));
   *(CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr) = PiMmStandaloneArmTfCpuDriverEntry;
 
   // Find the descriptor that contains the whereabouts of the buffer for
@@ -173,17 +175,17 @@ StandaloneMmCpuInitialize (
   Status = GetGuidedHobData (
              HobStart,
              &gEfiStandaloneMmNonSecureBufferGuid,
-             (VOID **) &NsCommBufMmramRange
+             (VOID **)&NsCommBufMmramRange
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "NsCommBufMmramRange HOB data extraction failed - 0x%x\n", Status));
     return Status;
   }
 
-  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalStart - 0x%lx\n", (UINTN) NsCommBufMmramRange->PhysicalStart));
-  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalSize - 0x%lx\n", (UINTN) NsCommBufMmramRange->PhysicalSize));
+  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalStart - 0x%lx\n", (UINTN)NsCommBufMmramRange->PhysicalStart));
+  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalSize - 0x%lx\n", (UINTN)NsCommBufMmramRange->PhysicalSize));
 
-  CopyMem (&mNsCommBuffer, NsCommBufMmramRange, sizeof(EFI_MMRAM_DESCRIPTOR));
+  CopyMem (&mNsCommBuffer, NsCommBufMmramRange, sizeof (EFI_MMRAM_DESCRIPTOR));
   DEBUG ((DEBUG_INFO, "mNsCommBuffer: 0x%016lx - 0x%lx\n", mNsCommBuffer.CpuStart, mNsCommBuffer.PhysicalSize));
 
   //
@@ -192,7 +194,7 @@ StandaloneMmCpuInitialize (
   Status = GetGuidedHobData (
              HobStart,
              &gMpInformationHobGuid,
-             (VOID **) &MpInformationHobData
+             (VOID **)&MpInformationHobData
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "MpInformationHob extraction failed - 0x%x\n", Status));
@@ -206,11 +208,11 @@ StandaloneMmCpuInitialize (
   //
   MpInfoSize = sizeof (MP_INFORMATION_HOB_DATA) +
                (sizeof (EFI_PROCESSOR_INFORMATION) *
-               MpInformationHobData->NumberOfProcessors);
+                MpInformationHobData->NumberOfProcessors);
   Status = mMmst->MmAllocatePool (
                     EfiRuntimeServicesData,
                     MpInfoSize,
-                    (VOID **) &mMpInformationHobData
+                    (VOID **)&mMpInformationHobData
                     );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "mMpInformationHobData mem alloc failed - 0x%x\n", Status));
@@ -220,15 +222,21 @@ StandaloneMmCpuInitialize (
   CopyMem (mMpInformationHobData, MpInformationHobData, MpInfoSize);
 
   // Print MP information
-  DEBUG ((DEBUG_INFO, "mMpInformationHobData: 0x%016lx - 0x%lx\n",
-          mMpInformationHobData->NumberOfProcessors,
-          mMpInformationHobData->NumberOfEnabledProcessors));
+  DEBUG ((
+    DEBUG_INFO,
+    "mMpInformationHobData: 0x%016lx - 0x%lx\n",
+    mMpInformationHobData->NumberOfProcessors,
+    mMpInformationHobData->NumberOfEnabledProcessors
+    ));
   for (Index = 0; Index < mMpInformationHobData->NumberOfProcessors; Index++) {
-    DEBUG ((DEBUG_INFO, "mMpInformationHobData[0x%lx]: %d, %d, %d\n",
-            mMpInformationHobData->ProcessorInfoBuffer[Index].ProcessorId,
-            mMpInformationHobData->ProcessorInfoBuffer[Index].Location.Package,
-            mMpInformationHobData->ProcessorInfoBuffer[Index].Location.Core,
-            mMpInformationHobData->ProcessorInfoBuffer[Index].Location.Thread));
+    DEBUG ((
+      DEBUG_INFO,
+      "mMpInformationHobData[0x%lx]: %d, %d, %d\n",
+      mMpInformationHobData->ProcessorInfoBuffer[Index].ProcessorId,
+      mMpInformationHobData->ProcessorInfoBuffer[Index].Location.Package,
+      mMpInformationHobData->ProcessorInfoBuffer[Index].Location.Core,
+      mMpInformationHobData->ProcessorInfoBuffer[Index].Location.Thread
+      ));
   }
 
   //
@@ -240,11 +248,12 @@ StandaloneMmCpuInitialize (
   Status = mMmst->MmAllocatePool (
                     EfiRuntimeServicesData,
                     ArraySize,
-                    (VOID **) &PerCpuGuidedEventContext
+                    (VOID **)&PerCpuGuidedEventContext
                     );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "PerCpuGuidedEventContext mem alloc failed - 0x%x\n", Status));
     return Status;
   }
+
   return Status;
 }

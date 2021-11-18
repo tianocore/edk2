@@ -9,7 +9,7 @@
 
 #include "StandaloneMmCore.h"
 
-#define CONFIG_TABLE_SIZE_INCREASED 0x10
+#define CONFIG_TABLE_SIZE_INCREASED  0x10
 
 UINTN  mMmSystemTableAllocateSize = 0;
 
@@ -33,10 +33,10 @@ UINTN  mMmSystemTableAllocateSize = 0;
 EFI_STATUS
 EFIAPI
 MmInstallConfigurationTable (
-  IN  CONST EFI_MM_SYSTEM_TABLE    *SystemTable,
-  IN  CONST EFI_GUID               *Guid,
-  IN  VOID                         *Table,
-  IN  UINTN                        TableSize
+  IN  CONST EFI_MM_SYSTEM_TABLE  *SystemTable,
+  IN  CONST EFI_GUID             *Guid,
+  IN  VOID                       *Table,
+  IN  UINTN                      TableSize
   )
 {
   UINTN                    Index;
@@ -87,7 +87,6 @@ MmInstallConfigurationTable (
       &(ConfigurationTable[Index + 1]),
       (gMmCoreMmst.NumberOfTableEntries - Index) * sizeof (EFI_CONFIGURATION_TABLE)
       );
-
   } else {
     //
     // No matching GUIDs were found, so this is an add operation.
