@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/SmmVariable.h>
 #include "TcgMorLock.h"
 
-EFI_SMM_VARIABLE_PROTOCOL *mSmmVariable;
+EFI_SMM_VARIABLE_PROTOCOL  *mSmmVariable;
 
 /**
   This service is a wrapper for the UEFI Runtime Service GetVariable().
@@ -126,17 +126,17 @@ MorLockDriverEntryPointSmm (
   DEBUG ((DEBUG_INFO, "MorLockDriverEntryPointSmm\n"));
 
   Status = gSmst->SmmLocateProtocol (
-                  &gEfiSmmVariableProtocolGuid,
-                  NULL,
-                  (VOID **) &mSmmVariable
-                  );
+                    &gEfiSmmVariableProtocolGuid,
+                    NULL,
+                    (VOID **)&mSmmVariable
+                    );
   ASSERT_EFI_ERROR (Status);
 
   Status = gSmst->SmmLocateProtocol (
-                  &gEdkiiSmmVarCheckProtocolGuid,
-                  NULL,
-                  (VOID **) &SmmVarCheck
-                  );
+                    &gEdkiiSmmVarCheckProtocolGuid,
+                    NULL,
+                    (VOID **)&SmmVarCheck
+                    );
   ASSERT_EFI_ERROR (Status);
 
   Status = MorLockDriverInit ();

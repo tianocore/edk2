@@ -37,7 +37,7 @@ typedef
 BOOLEAN
 (EFIAPI *PEI_LOCK_PHYSICAL_PRESENCE)(
   IN CONST  EFI_PEI_SERVICES                    **PeiServices
-);
+  );
 
 ///
 /// This service abstracts TPM physical presence lock interface. It is necessary for
@@ -46,9 +46,9 @@ BOOLEAN
 /// PEIM and consumed by the TPM PEIM.
 ///
 struct _PEI_LOCK_PHYSICAL_PRESENCE_PPI {
-  PEI_LOCK_PHYSICAL_PRESENCE  LockPhysicalPresence;
+  PEI_LOCK_PHYSICAL_PRESENCE    LockPhysicalPresence;
 };
 
 extern EFI_GUID  gPeiLockPhysicalPresencePpiGuid;
 
-#endif  //  __PEI_LOCK_PHYSICAL_PRESENCE_H__
+#endif //  __PEI_LOCK_PHYSICAL_PRESENCE_H__

@@ -505,7 +505,7 @@ EFIAPI
 Tpm2PcrEvent (
   IN      TPMI_DH_PCR               PcrHandle,
   IN      TPM2B_EVENT               *EventData,
-     OUT  TPML_DIGEST_VALUES        *Digests
+  OUT  TPML_DIGEST_VALUES        *Digests
   );
 
 /**
@@ -523,9 +523,9 @@ EFI_STATUS
 EFIAPI
 Tpm2PcrRead (
   IN      TPML_PCR_SELECTION        *PcrSelectionIn,
-     OUT  UINT32                    *PcrUpdateCounter,
-     OUT  TPML_PCR_SELECTION        *PcrSelectionOut,
-     OUT  TPML_DIGEST               *PcrValues
+  OUT  UINT32                    *PcrUpdateCounter,
+  OUT  TPML_PCR_SELECTION        *PcrSelectionOut,
+  OUT  TPML_DIGEST               *PcrValues
   );
 
 /**
@@ -566,7 +566,7 @@ Tpm2PcrAllocate (
 EFI_STATUS
 EFIAPI
 Tpm2PcrAllocateBanks (
-  IN TPM2B_AUTH                *PlatformAuth,  OPTIONAL
+  IN TPM2B_AUTH                *PlatformAuth, OPTIONAL
   IN UINT32                    SupportedPCRBanks,
   IN UINT32                    PCRBanks
   );
@@ -769,7 +769,7 @@ Tpm2GetCapabilityPcrs (
 **/
 EFI_STATUS
 EFIAPI
-Tpm2GetCapabilitySupportedAndActivePcrs(
+Tpm2GetCapabilitySupportedAndActivePcrs (
   OUT UINT32                            *TpmHashAlgorithmBitmap,
   OUT UINT32                            *ActivePcrBanks
   );
@@ -867,8 +867,8 @@ Tpm2StartAuthSession (
   IN      TPM_SE                    SessionType,
   IN      TPMT_SYM_DEF              *Symmetric,
   IN      TPMI_ALG_HASH             AuthHash,
-     OUT  TPMI_SH_AUTH_SESSION      *SessionHandle,
-     OUT  TPM2B_NONCE               *NonceTPM
+  OUT  TPMI_SH_AUTH_SESSION      *SessionHandle,
+  OUT  TPM2B_NONCE               *NonceTPM
   );
 
 /**
@@ -966,7 +966,7 @@ EFI_STATUS
 EFIAPI
 Tpm2PolicyGetDigest (
   IN      TPMI_SH_POLICY            PolicySession,
-     OUT  TPM2B_DIGEST              *PolicyHash
+  OUT  TPM2B_DIGEST              *PolicyHash
   );
 
 /**
@@ -1060,7 +1060,7 @@ GetHashMaskFromAlgo (
 **/
 BOOLEAN
 EFIAPI
-IsHashAlgSupportedInHashAlgorithmMask(
+IsHashAlgSupportedInHashAlgorithmMask (
   IN TPMI_ALG_HASH  HashAlg,
   IN UINT32         HashAlgorithmMask
   );
@@ -1076,7 +1076,7 @@ IsHashAlgSupportedInHashAlgorithmMask(
 **/
 VOID *
 EFIAPI
-CopyDigestListToBuffer(
+CopyDigestListToBuffer (
   IN OUT VOID                       *Buffer,
   IN TPML_DIGEST_VALUES             *DigestList,
   IN UINT32                         HashAlgorithmMask
@@ -1091,7 +1091,7 @@ CopyDigestListToBuffer(
 **/
 UINT32
 EFIAPI
-GetDigestListSize(
+GetDigestListSize (
   IN TPML_DIGEST_VALUES             *DigestList
   );
 
@@ -1107,7 +1107,7 @@ GetDigestListSize(
 **/
 EFI_STATUS
 EFIAPI
-GetDigestFromDigestList(
+GetDigestFromDigestList (
   IN TPMI_ALG_HASH      HashAlg,
   IN TPML_DIGEST_VALUES *DigestList,
   OUT VOID              *Digest

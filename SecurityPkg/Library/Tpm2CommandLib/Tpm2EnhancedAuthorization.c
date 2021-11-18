@@ -16,53 +16,53 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack(1)
 
 typedef struct {
-  TPM2_COMMAND_HEADER       Header;
-  TPMI_DH_ENTITY            AuthHandle;
-  TPMI_SH_POLICY            PolicySession;
-  UINT32                    AuthSessionSize;
-  TPMS_AUTH_COMMAND         AuthSession;
-  TPM2B_NONCE               NonceTPM;
-  TPM2B_DIGEST              CpHashA;
-  TPM2B_NONCE               PolicyRef;
-  INT32                     Expiration;
+  TPM2_COMMAND_HEADER    Header;
+  TPMI_DH_ENTITY         AuthHandle;
+  TPMI_SH_POLICY         PolicySession;
+  UINT32                 AuthSessionSize;
+  TPMS_AUTH_COMMAND      AuthSession;
+  TPM2B_NONCE            NonceTPM;
+  TPM2B_DIGEST           CpHashA;
+  TPM2B_NONCE            PolicyRef;
+  INT32                  Expiration;
 } TPM2_POLICY_SECRET_COMMAND;
 
 typedef struct {
-  TPM2_RESPONSE_HEADER      Header;
-  UINT32                    AuthSessionSize;
-  TPM2B_TIMEOUT             Timeout;
-  TPMT_TK_AUTH              PolicyTicket;
-  TPMS_AUTH_RESPONSE        AuthSession;
+  TPM2_RESPONSE_HEADER    Header;
+  UINT32                  AuthSessionSize;
+  TPM2B_TIMEOUT           Timeout;
+  TPMT_TK_AUTH            PolicyTicket;
+  TPMS_AUTH_RESPONSE      AuthSession;
 } TPM2_POLICY_SECRET_RESPONSE;
 
 typedef struct {
-  TPM2_COMMAND_HEADER       Header;
-  TPMI_SH_POLICY            PolicySession;
-  TPML_DIGEST               HashList;
+  TPM2_COMMAND_HEADER    Header;
+  TPMI_SH_POLICY         PolicySession;
+  TPML_DIGEST            HashList;
 } TPM2_POLICY_OR_COMMAND;
 
 typedef struct {
-  TPM2_RESPONSE_HEADER      Header;
+  TPM2_RESPONSE_HEADER    Header;
 } TPM2_POLICY_OR_RESPONSE;
 
 typedef struct {
-  TPM2_COMMAND_HEADER       Header;
-  TPMI_SH_POLICY            PolicySession;
-  TPM_CC                    Code;
+  TPM2_COMMAND_HEADER    Header;
+  TPMI_SH_POLICY         PolicySession;
+  TPM_CC                 Code;
 } TPM2_POLICY_COMMAND_CODE_COMMAND;
 
 typedef struct {
-  TPM2_RESPONSE_HEADER      Header;
+  TPM2_RESPONSE_HEADER    Header;
 } TPM2_POLICY_COMMAND_CODE_RESPONSE;
 
 typedef struct {
-  TPM2_COMMAND_HEADER       Header;
-  TPMI_SH_POLICY            PolicySession;
+  TPM2_COMMAND_HEADER    Header;
+  TPMI_SH_POLICY         PolicySession;
 } TPM2_POLICY_GET_DIGEST_COMMAND;
 
 typedef struct {
-  TPM2_RESPONSE_HEADER      Header;
-  TPM2B_DIGEST              PolicyHash;
+  TPM2_RESPONSE_HEADER    Header;
+  TPM2B_DIGEST            PolicyHash;
 } TPM2_POLICY_GET_DIGEST_RESPONSE;
 
 #pragma pack()
@@ -99,20 +99,20 @@ Tpm2PolicySecret (
   OUT     TPMT_TK_AUTH              *PolicyTicket
   )
 {
-  EFI_STATUS                        Status;
-  TPM2_POLICY_SECRET_COMMAND        SendBuffer;
-  TPM2_POLICY_SECRET_RESPONSE       RecvBuffer;
-  UINT32                            SendBufferSize;
-  UINT32                            RecvBufferSize;
-  UINT8                             *Buffer;
-  UINT32                            SessionInfoSize;
+  EFI_STATUS                   Status;
+  TPM2_POLICY_SECRET_COMMAND   SendBuffer;
+  TPM2_POLICY_SECRET_RESPONSE  RecvBuffer;
+  UINT32                       SendBufferSize;
+  UINT32                       RecvBufferSize;
+  UINT8                        *Buffer;
+  UINT32                       SessionInfoSize;
 
   //
   // Construct command
   //
-  SendBuffer.Header.tag = SwapBytes16(TPM_ST_SESSIONS);
-  SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_PolicySecret);
-  SendBuffer.AuthHandle = SwapBytes32 (AuthHandle);
+  SendBuffer.Header.tag = SwapBytes16 (TPM_ST_SESSIONS);
+  SendBuffer.Header.commandCode = SwapBytes32 (TPM_CC_PolicySecret);
+  SendBuffer.AuthHandle    = SwapBytes32 (AuthHandle);
   SendBuffer.PolicySession = SwapBytes32 (PolicySession);
 
   //
@@ -123,28 +123,28 @@ Tpm2PolicySecret (
   // sessionInfoSize
   SessionInfoSize = CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer += SessionInfoSize;
-  SendBuffer.AuthSessionSize = SwapBytes32(SessionInfoSize);
+  SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 
   //
   // Real data
   //
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(NonceTPM->size));
-  Buffer += sizeof(UINT16);
+  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (NonceTPM->size));
+  Buffer += sizeof (UINT16);
   CopyMem (Buffer, NonceTPM->buffer, NonceTPM->size);
   Buffer += NonceTPM->size;
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(CpHashA->size));
-  Buffer += sizeof(UINT16);
+  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (CpHashA->size));
+  Buffer += sizeof (UINT16);
   CopyMem (Buffer, CpHashA->buffer, CpHashA->size);
   Buffer += CpHashA->size;
 
-  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(PolicyRef->size));
-  Buffer += sizeof(UINT16);
+  WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (PolicyRef->size));
+  Buffer += sizeof (UINT16);
   CopyMem (Buffer, PolicyRef->buffer, PolicyRef->size);
   Buffer += PolicyRef->size;
 
-  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32((UINT32)Expiration));
-  Buffer += sizeof(UINT32);
+  WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32 ((UINT32)Expiration));
+  Buffer += sizeof (UINT32);
 
   SendBufferSize = (UINT32)((UINTN)Buffer - (UINTN)&SendBuffer);
   SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
@@ -163,8 +163,9 @@ Tpm2PolicySecret (
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
-  if (SwapBytes32(RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((DEBUG_ERROR, "Tpm2PolicySecret - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+
+  if (SwapBytes32 (RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PolicySecret - responseCode - %x\n", SwapBytes32 (RecvBuffer.Header.responseCode)));
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
@@ -173,23 +174,23 @@ Tpm2PolicySecret (
   // Return the response
   //
   Buffer = (UINT8 *)&RecvBuffer.Timeout;
-  Timeout->size = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
-  if (Timeout->size > sizeof(UINT64)) {
+  Timeout->size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+  if (Timeout->size > sizeof (UINT64)) {
     DEBUG ((DEBUG_ERROR, "Tpm2PolicySecret - Timeout->size error %x\n", Timeout->size));
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
 
-  Buffer += sizeof(UINT16);
+  Buffer += sizeof (UINT16);
   CopyMem (Timeout->buffer, Buffer, Timeout->size);
 
-  PolicyTicket->tag = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
-  Buffer += sizeof(UINT16);
-  PolicyTicket->hierarchy = SwapBytes32(ReadUnaligned32 ((UINT32 *)Buffer));
-  Buffer += sizeof(UINT32);
-  PolicyTicket->digest.size = SwapBytes16(ReadUnaligned16 ((UINT16 *)Buffer));
-  Buffer += sizeof(UINT16);
-  if (PolicyTicket->digest.size > sizeof(TPMU_HA)) {
+  PolicyTicket->tag = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+  Buffer += sizeof (UINT16);
+  PolicyTicket->hierarchy = SwapBytes32 (ReadUnaligned32 ((UINT32 *)Buffer));
+  Buffer += sizeof (UINT32);
+  PolicyTicket->digest.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+  Buffer += sizeof (UINT16);
+  if (PolicyTicket->digest.size > sizeof (TPMU_HA)) {
     DEBUG ((DEBUG_ERROR, "Tpm2PolicySecret - digest.size error %x\n", PolicyTicket->digest.size));
     Status = EFI_DEVICE_ERROR;
     goto Done;
@@ -201,8 +202,8 @@ Done:
   //
   // Clear AuthSession Content
   //
-  ZeroMem (&SendBuffer, sizeof(SendBuffer));
-  ZeroMem (&RecvBuffer, sizeof(RecvBuffer));
+  ZeroMem (&SendBuffer, sizeof (SendBuffer));
+  ZeroMem (&RecvBuffer, sizeof (RecvBuffer));
   return Status;
 }
 
@@ -225,27 +226,27 @@ Tpm2PolicyOR (
   IN TPML_DIGEST              *HashList
   )
 {
-  EFI_STATUS                        Status;
-  TPM2_POLICY_OR_COMMAND            SendBuffer;
-  TPM2_POLICY_OR_RESPONSE           RecvBuffer;
-  UINT32                            SendBufferSize;
-  UINT32                            RecvBufferSize;
-  UINT8                             *Buffer;
-  UINTN                             Index;
+  EFI_STATUS               Status;
+  TPM2_POLICY_OR_COMMAND   SendBuffer;
+  TPM2_POLICY_OR_RESPONSE  RecvBuffer;
+  UINT32                   SendBufferSize;
+  UINT32                   RecvBufferSize;
+  UINT8                    *Buffer;
+  UINTN                    Index;
 
   //
   // Construct command
   //
-  SendBuffer.Header.tag = SwapBytes16(TPM_ST_NO_SESSIONS);
-  SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_PolicyOR);
+  SendBuffer.Header.tag = SwapBytes16 (TPM_ST_NO_SESSIONS);
+  SendBuffer.Header.commandCode = SwapBytes32 (TPM_CC_PolicyOR);
 
   SendBuffer.PolicySession = SwapBytes32 (PolicySession);
   Buffer = (UINT8 *)&SendBuffer.HashList;
   WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32 (HashList->count));
-  Buffer += sizeof(UINT32);
+  Buffer += sizeof (UINT32);
   for (Index = 0; Index < HashList->count; Index++) {
     WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (HashList->digests[Index].size));
-    Buffer += sizeof(UINT16);
+    Buffer += sizeof (UINT16);
     CopyMem (Buffer, HashList->digests[Index].buffer, HashList->digests[Index].size);
     Buffer += HashList->digests[Index].size;
   }
@@ -266,8 +267,9 @@ Tpm2PolicyOR (
     DEBUG ((DEBUG_ERROR, "Tpm2PolicyOR - RecvBufferSize Error - %x\n", RecvBufferSize));
     return EFI_DEVICE_ERROR;
   }
-  if (SwapBytes32(RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((DEBUG_ERROR, "Tpm2PolicyOR - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+
+  if (SwapBytes32 (RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PolicyOR - responseCode - %x\n", SwapBytes32 (RecvBuffer.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
@@ -290,22 +292,22 @@ Tpm2PolicyCommandCode (
   IN      TPM_CC                    Code
   )
 {
-  EFI_STATUS                        Status;
-  TPM2_POLICY_COMMAND_CODE_COMMAND  SendBuffer;
-  TPM2_POLICY_COMMAND_CODE_RESPONSE RecvBuffer;
-  UINT32                            SendBufferSize;
-  UINT32                            RecvBufferSize;
+  EFI_STATUS                         Status;
+  TPM2_POLICY_COMMAND_CODE_COMMAND   SendBuffer;
+  TPM2_POLICY_COMMAND_CODE_RESPONSE  RecvBuffer;
+  UINT32                             SendBufferSize;
+  UINT32                             RecvBufferSize;
 
   //
   // Construct command
   //
-  SendBuffer.Header.tag = SwapBytes16(TPM_ST_NO_SESSIONS);
-  SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_PolicyCommandCode);
+  SendBuffer.Header.tag = SwapBytes16 (TPM_ST_NO_SESSIONS);
+  SendBuffer.Header.commandCode = SwapBytes32 (TPM_CC_PolicyCommandCode);
 
   SendBuffer.PolicySession = SwapBytes32 (PolicySession);
   SendBuffer.Code = SwapBytes32 (Code);
 
-  SendBufferSize = (UINT32) sizeof (SendBuffer);
+  SendBufferSize = (UINT32)sizeof (SendBuffer);
   SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
 
   //
@@ -321,8 +323,9 @@ Tpm2PolicyCommandCode (
     DEBUG ((DEBUG_ERROR, "Tpm2PolicyCommandCode - RecvBufferSize Error - %x\n", RecvBufferSize));
     return EFI_DEVICE_ERROR;
   }
-  if (SwapBytes32(RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((DEBUG_ERROR, "Tpm2PolicyCommandCode - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+
+  if (SwapBytes32 (RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PolicyCommandCode - responseCode - %x\n", SwapBytes32 (RecvBuffer.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
@@ -343,24 +346,24 @@ EFI_STATUS
 EFIAPI
 Tpm2PolicyGetDigest (
   IN      TPMI_SH_POLICY            PolicySession,
-     OUT  TPM2B_DIGEST              *PolicyHash
+  OUT  TPM2B_DIGEST              *PolicyHash
   )
 {
-  EFI_STATUS                        Status;
-  TPM2_POLICY_GET_DIGEST_COMMAND    SendBuffer;
-  TPM2_POLICY_GET_DIGEST_RESPONSE   RecvBuffer;
-  UINT32                            SendBufferSize;
-  UINT32                            RecvBufferSize;
+  EFI_STATUS                       Status;
+  TPM2_POLICY_GET_DIGEST_COMMAND   SendBuffer;
+  TPM2_POLICY_GET_DIGEST_RESPONSE  RecvBuffer;
+  UINT32                           SendBufferSize;
+  UINT32                           RecvBufferSize;
 
   //
   // Construct command
   //
-  SendBuffer.Header.tag = SwapBytes16(TPM_ST_NO_SESSIONS);
-  SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_PolicyGetDigest);
+  SendBuffer.Header.tag = SwapBytes16 (TPM_ST_NO_SESSIONS);
+  SendBuffer.Header.commandCode = SwapBytes32 (TPM_CC_PolicyGetDigest);
 
   SendBuffer.PolicySession = SwapBytes32 (PolicySession);
 
-  SendBufferSize = (UINT32) sizeof (SendBuffer);
+  SendBufferSize = (UINT32)sizeof (SendBuffer);
   SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
 
   //
@@ -376,8 +379,9 @@ Tpm2PolicyGetDigest (
     DEBUG ((DEBUG_ERROR, "Tpm2PolicyGetDigest - RecvBufferSize Error - %x\n", RecvBufferSize));
     return EFI_DEVICE_ERROR;
   }
-  if (SwapBytes32(RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
-    DEBUG ((DEBUG_ERROR, "Tpm2PolicyGetDigest - responseCode - %x\n", SwapBytes32(RecvBuffer.Header.responseCode)));
+
+  if (SwapBytes32 (RecvBuffer.Header.responseCode) != TPM_RC_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PolicyGetDigest - responseCode - %x\n", SwapBytes32 (RecvBuffer.Header.responseCode)));
     return EFI_DEVICE_ERROR;
   }
 
@@ -385,7 +389,7 @@ Tpm2PolicyGetDigest (
   // Return the response
   //
   PolicyHash->size = SwapBytes16 (RecvBuffer.PolicyHash.size);
-  if (PolicyHash->size > sizeof(TPMU_HA)) {
+  if (PolicyHash->size > sizeof (TPMU_HA)) {
     DEBUG ((DEBUG_ERROR, "Tpm2PolicyGetDigest - PolicyHash->size error %x\n", PolicyHash->size));
     return EFI_DEVICE_ERROR;
   }

@@ -52,26 +52,26 @@ Tpm12ForceClear (
 #pragma pack(1)
 
 typedef struct {
-  UINT16                            sizeOfSelect;
-  UINT8                             pcrSelect[3];
+  UINT16    sizeOfSelect;
+  UINT8     pcrSelect[3];
 } TPM12_PCR_SELECTION;
 
 typedef struct {
-  TPM12_PCR_SELECTION               pcrSelection;
-  TPM_LOCALITY_SELECTION            localityAtRelease;
-  TPM_COMPOSITE_HASH                digestAtRelease;
+  TPM12_PCR_SELECTION       pcrSelection;
+  TPM_LOCALITY_SELECTION    localityAtRelease;
+  TPM_COMPOSITE_HASH        digestAtRelease;
 } TPM12_PCR_INFO_SHORT;
 
 typedef struct {
-  TPM_STRUCTURE_TAG               tag;
-  TPM_NV_INDEX                    nvIndex;
-  TPM12_PCR_INFO_SHORT            pcrInfoRead;
-  TPM12_PCR_INFO_SHORT            pcrInfoWrite;
-  TPM_NV_ATTRIBUTES               permission;
-  BOOLEAN                         bReadSTClear;
-  BOOLEAN                         bWriteSTClear;
-  BOOLEAN                         bWriteDefine;
-  UINT32                          dataSize;
+  TPM_STRUCTURE_TAG       tag;
+  TPM_NV_INDEX            nvIndex;
+  TPM12_PCR_INFO_SHORT    pcrInfoRead;
+  TPM12_PCR_INFO_SHORT    pcrInfoWrite;
+  TPM_NV_ATTRIBUTES       permission;
+  BOOLEAN                 bReadSTClear;
+  BOOLEAN                 bWriteSTClear;
+  BOOLEAN                 bWriteDefine;
+  UINT32                  dataSize;
 } TPM12_NV_DATA_PUBLIC;
 
 #pragma pack()
@@ -216,4 +216,5 @@ EFIAPI
 Tpm12GetCapabilityFlagVolatile (
   OUT TPM_STCLEAR_FLAGS                 *VolatileFlags
   );
+
 #endif

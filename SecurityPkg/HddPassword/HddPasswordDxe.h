@@ -58,7 +58,7 @@ extern UINT8  HddPasswordBin[];
 //
 extern UINT8  HddPasswordDxeStrings[];
 
-#define HDD_PASSWORD_DXE_PRIVATE_SIGNATURE SIGNATURE_32 ('H', 'D', 'D', 'P')
+#define HDD_PASSWORD_DXE_PRIVATE_SIGNATURE  SIGNATURE_32 ('H', 'D', 'D', 'P')
 
 typedef struct _HDD_PASSWORD_CONFIG_FORM_ENTRY {
   LIST_ENTRY                    Link;
@@ -79,46 +79,46 @@ typedef struct _HDD_PASSWORD_CONFIG_FORM_ENTRY {
 } HDD_PASSWORD_CONFIG_FORM_ENTRY;
 
 typedef struct _HDD_PASSWORD_DXE_PRIVATE_DATA {
-  UINTN                            Signature;
-  EFI_HANDLE                       DriverHandle;
-  EFI_HII_HANDLE                   HiiHandle;
-  EFI_HII_CONFIG_ACCESS_PROTOCOL   ConfigAccess;
-  HDD_PASSWORD_CONFIG_FORM_ENTRY   *Current;
+  UINTN                             Signature;
+  EFI_HANDLE                        DriverHandle;
+  EFI_HII_HANDLE                    HiiHandle;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL    ConfigAccess;
+  HDD_PASSWORD_CONFIG_FORM_ENTRY    *Current;
 } HDD_PASSWORD_DXE_PRIVATE_DATA;
 
 #define HDD_PASSWORD_DXE_PRIVATE_FROM_THIS(a)  CR (a, HDD_PASSWORD_DXE_PRIVATE_DATA, ConfigAccess, HDD_PASSWORD_DXE_PRIVATE_SIGNATURE)
 
-#define PASSWORD_SALT_SIZE                  32
+#define PASSWORD_SALT_SIZE  32
 
 #define HDD_PASSWORD_REQUEST_VARIABLE_NAME  L"HddPasswordRequest"
 
 //
 // It needs to be locked before EndOfDxe.
 //
-#define HDD_PASSWORD_VARIABLE_NAME          L"HddPassword"
+#define HDD_PASSWORD_VARIABLE_NAME  L"HddPassword"
 
 #pragma pack(1)
 
 typedef struct {
-  HDD_PASSWORD_DEVICE   Device;
-  HDD_PASSWORD_REQUEST  Request;
+  HDD_PASSWORD_DEVICE     Device;
+  HDD_PASSWORD_REQUEST    Request;
 } HDD_PASSWORD_REQUEST_VARIABLE;
 
 //
 // It will be used to validate HDD password when the device is at frozen state.
 //
 typedef struct {
-  HDD_PASSWORD_DEVICE   Device;
-  UINT8                 PasswordHash[SHA256_DIGEST_SIZE];
-  UINT8                 PasswordSalt[PASSWORD_SALT_SIZE];
+  HDD_PASSWORD_DEVICE    Device;
+  UINT8                  PasswordHash[SHA256_DIGEST_SIZE];
+  UINT8                  PasswordSalt[PASSWORD_SALT_SIZE];
 } HDD_PASSWORD_VARIABLE;
 
 ///
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH           VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL     End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
 #pragma pack()
@@ -126,11 +126,11 @@ typedef struct {
 //
 // Time out value for ATA pass through protocol
 //
-#define ATA_TIMEOUT        EFI_TIMER_PERIOD_SECONDS (3)
+#define ATA_TIMEOUT  EFI_TIMER_PERIOD_SECONDS (3)
 
 typedef struct {
-  UINT32                   Address;
-  S3_BOOT_SCRIPT_LIB_WIDTH Width;
+  UINT32                      Address;
+  S3_BOOT_SCRIPT_LIB_WIDTH    Width;
 } HDD_HC_PCI_REGISTER_SAVE;
 
 #endif

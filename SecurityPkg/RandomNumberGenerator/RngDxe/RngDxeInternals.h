@@ -114,4 +114,4 @@ RngGetBytes (
   OUT UINT8        *RandBuffer
   );
 
-#endif  // RNGDXE_INTERNALS_H_
+#endif // RNGDXE_INTERNALS_H_

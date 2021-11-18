@@ -31,7 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/AuthenticatedVariableFormat.h>
 #include <Guid/ImageAuthentication.h>
 
-#define TWO_BYTE_ENCODE       0x82
+#define TWO_BYTE_ENCODE  0x82
 
 ///
 /// Struct to record signature requirement defined by UEFI spec.
@@ -73,8 +73,8 @@ typedef enum {
 /// | AUTH_CERT_DB_DATA          | <-- Last CERT
 /// +----------------------------+
 ///
-#define EFI_CERT_DB_NAME                 L"certdb"
-#define EFI_CERT_DB_VOLATILE_NAME        L"certdbv"
+#define EFI_CERT_DB_NAME           L"certdb"
+#define EFI_CERT_DB_VOLATILE_NAME  L"certdbv"
 
 #pragma pack(1)
 typedef struct {
@@ -87,15 +87,14 @@ typedef struct {
 } AUTH_CERT_DB_DATA;
 #pragma pack()
 
-extern UINT8    *mCertDbStore;
-extern UINT32   mMaxCertDbSize;
-extern UINT32   mPlatformMode;
-extern UINT8    mVendorKeyState;
+extern UINT8   *mCertDbStore;
+extern UINT32  mMaxCertDbSize;
+extern UINT32  mPlatformMode;
+extern UINT8   mVendorKeyState;
 
-extern VOID     *mHashCtx;
+extern VOID  *mHashCtx;
 
-extern AUTH_VAR_LIB_CONTEXT_IN *mAuthVarLibContextIn;
-
+extern AUTH_VAR_LIB_CONTEXT_IN  *mAuthVarLibContextIn;
 
 /**
   Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set

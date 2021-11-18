@@ -40,6 +40,7 @@ Tpm2SubmitCommand (
   if (mInternalTpm2DeviceInterface.Tpm2SubmitCommand == NULL) {
     return EFI_UNSUPPORTED;
   }
+
   return mInternalTpm2DeviceInterface.Tpm2SubmitCommand (
                                         InputParameterBlockSize,
                                         InputParameterBlock,
@@ -64,6 +65,7 @@ Tpm2RequestUseTpm (
   if (mInternalTpm2DeviceInterface.Tpm2RequestUseTpm == NULL) {
     return EFI_UNSUPPORTED;
   }
+
   return mInternalTpm2DeviceInterface.Tpm2RequestUseTpm ();
 }
 
@@ -82,11 +84,11 @@ Tpm2RegisterTpm2DeviceLib (
   IN TPM2_DEVICE_INTERFACE   *Tpm2Device
   )
 {
-  if (!CompareGuid (PcdGetPtr(PcdTpmInstanceGuid), &Tpm2Device->ProviderGuid)){
+  if (!CompareGuid (PcdGetPtr (PcdTpmInstanceGuid), &Tpm2Device->ProviderGuid)) {
     DEBUG ((DEBUG_WARN, "WARNING: Tpm2RegisterTpm2DeviceLib - does not support %g registration\n", &Tpm2Device->ProviderGuid));
     return EFI_UNSUPPORTED;
   }
 
-  CopyMem (&mInternalTpm2DeviceInterface, Tpm2Device, sizeof(mInternalTpm2DeviceInterface));
+  CopyMem (&mInternalTpm2DeviceInterface, Tpm2Device, sizeof (mInternalTpm2DeviceInterface));
   return EFI_SUCCESS;
 }

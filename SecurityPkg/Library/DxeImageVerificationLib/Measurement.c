@@ -19,15 +19,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/TpmMeasurementLib.h>
 
 typedef struct {
-  CHAR16                                 *VariableName;
-  EFI_GUID                               *VendorGuid;
+  CHAR16      *VariableName;
+  EFI_GUID    *VendorGuid;
 } VARIABLE_TYPE;
 
 typedef struct {
-  CHAR16                                 *VariableName;
-  EFI_GUID                               *VendorGuid;
-  VOID                                   *Data;
-  UINTN                                  Size;
+  CHAR16      *VariableName;
+  EFI_GUID    *VendorGuid;
+  VOID        *Data;
+  UINTN       Size;
 } VARIABLE_RECORD;
 
 #define  MEASURED_AUTHORITY_COUNT_MAX  0x100
@@ -37,7 +37,7 @@ UINTN            mMeasuredAuthorityCountMax = 0;
 VARIABLE_RECORD  *mMeasuredAuthorityList    = NULL;
 
 VARIABLE_TYPE  mVariableType[] = {
-  {EFI_IMAGE_SECURITY_DATABASE,  &gEfiImageSecurityDatabaseGuid},
+  { EFI_IMAGE_SECURITY_DATABASE, &gEfiImageSecurityDatabaseGuid },
 };
 
 /**
@@ -54,7 +54,7 @@ AssignVarName (
 {
   UINTN  Index;
 
-  for (Index = 0; Index < sizeof(mVariableType)/sizeof(mVariableType[0]); Index++) {
+  for (Index = 0; Index < sizeof (mVariableType)/sizeof (mVariableType[0]); Index++) {
     if (StrCmp (VarName, mVariableType[Index].VariableName) == 0) {
       return mVariableType[Index].VariableName;
     }
@@ -77,7 +77,7 @@ AssignVendorGuid (
 {
   UINTN  Index;
 
-  for (Index = 0; Index < sizeof(mVariableType)/sizeof(mVariableType[0]); Index++) {
+  for (Index = 0; Index < sizeof (mVariableType)/sizeof (mVariableType[0]); Index++) {
     if (CompareGuid (VendorGuid, mVariableType[Index].VendorGuid)) {
       return mVariableType[Index].VendorGuid;
     }
@@ -112,15 +112,17 @@ AddDataMeasured (
     //
     // Need enlarge
     //
-    NewMeasuredAuthorityList = AllocateZeroPool (sizeof(VARIABLE_RECORD) * (mMeasuredAuthorityCountMax + MEASURED_AUTHORITY_COUNT_MAX));
+    NewMeasuredAuthorityList = AllocateZeroPool (sizeof (VARIABLE_RECORD) * (mMeasuredAuthorityCountMax + MEASURED_AUTHORITY_COUNT_MAX));
     if (NewMeasuredAuthorityList == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     if (mMeasuredAuthorityList != NULL) {
-      CopyMem (NewMeasuredAuthorityList, mMeasuredAuthorityList, sizeof(VARIABLE_RECORD) * mMeasuredAuthorityCount);
+      CopyMem (NewMeasuredAuthorityList, mMeasuredAuthorityList, sizeof (VARIABLE_RECORD) * mMeasuredAuthorityCount);
       FreePool (mMeasuredAuthorityList);
     }
-    mMeasuredAuthorityList     = NewMeasuredAuthorityList;
+
+    mMeasuredAuthorityList      = NewMeasuredAuthorityList;
     mMeasuredAuthorityCountMax += MEASURED_AUTHORITY_COUNT_MAX;
   }
 
@@ -129,11 +131,12 @@ AddDataMeasured (
   //
   mMeasuredAuthorityList[mMeasuredAuthorityCount].VariableName = AssignVarName (VarName);
   mMeasuredAuthorityList[mMeasuredAuthorityCount].VendorGuid   = AssignVendorGuid (VendorGuid);
-  mMeasuredAuthorityList[mMeasuredAuthorityCount].Size         = Size;
-  mMeasuredAuthorityList[mMeasuredAuthorityCount].Data         = AllocatePool (Size);
+  mMeasuredAuthorityList[mMeasuredAuthorityCount].Size = Size;
+  mMeasuredAuthorityList[mMeasuredAuthorityCount].Data = AllocatePool (Size);
   if (mMeasuredAuthorityList[mMeasuredAuthorityCount].Data == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   CopyMem (mMeasuredAuthorityList[mMeasuredAuthorityCount].Data, Data, Size);
   mMeasuredAuthorityCount++;
 
@@ -165,7 +168,8 @@ IsDataMeasured (
     if ((StrCmp (VarName, mMeasuredAuthorityList[Index].VariableName) == 0) &&
         (CompareGuid (VendorGuid, mMeasuredAuthorityList[Index].VendorGuid)) &&
         (CompareMem (Data, mMeasuredAuthorityList[Index].Data, Size) == 0) &&
-        (Size == mMeasuredAuthorityList[Index].Size)) {
+        (Size == mMeasuredAuthorityList[Index].Size))
+    {
       return TRUE;
     }
   }
@@ -188,14 +192,16 @@ IsSecureAuthorityVariable (
   IN EFI_GUID                               *VendorGuid
   )
 {
-  UINTN   Index;
+  UINTN  Index;
 
-  for (Index = 0; Index < sizeof(mVariableType)/sizeof(mVariableType[0]); Index++) {
+  for (Index = 0; Index < sizeof (mVariableType)/sizeof (mVariableType[0]); Index++) {
     if ((StrCmp (VariableName, mVariableType[Index].VariableName) == 0) &&
-        (CompareGuid (VendorGuid, mVariableType[Index].VendorGuid))) {
+        (CompareGuid (VendorGuid, mVariableType[Index].VendorGuid)))
+    {
       return TRUE;
     }
   }
+
   return FALSE;
 }
 
@@ -221,37 +227,37 @@ MeasureVariable (
   IN      UINTN                     VarSize
   )
 {
-  EFI_STATUS                        Status;
-  UINTN                             VarNameLength;
-  UEFI_VARIABLE_DATA                *VarLog;
-  UINT32                            VarLogSize;
+  EFI_STATUS          Status;
+  UINTN               VarNameLength;
+  UEFI_VARIABLE_DATA  *VarLog;
+  UINT32              VarLogSize;
 
   //
   // The UEFI_VARIABLE_DATA.VariableData value shall be the EFI_SIGNATURE_DATA value
   // from the EFI_SIGNATURE_LIST that contained the authority that was used to validate the image
   //
-  VarNameLength      = StrLen (VarName);
-  VarLogSize = (UINT32)(sizeof (*VarLog) + VarNameLength * sizeof (*VarName) + VarSize
-                        - sizeof (VarLog->UnicodeName) - sizeof (VarLog->VariableData));
+  VarNameLength = StrLen (VarName);
+  VarLogSize    = (UINT32)(sizeof (*VarLog) + VarNameLength * sizeof (*VarName) + VarSize
+                           - sizeof (VarLog->UnicodeName) - sizeof (VarLog->VariableData));
 
-  VarLog = (UEFI_VARIABLE_DATA *) AllocateZeroPool (VarLogSize);
+  VarLog = (UEFI_VARIABLE_DATA *)AllocateZeroPool (VarLogSize);
   if (VarLog == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  CopyMem (&VarLog->VariableName, VendorGuid, sizeof(VarLog->VariableName));
+  CopyMem (&VarLog->VariableName, VendorGuid, sizeof (VarLog->VariableName));
   VarLog->UnicodeNameLength  = VarNameLength;
   VarLog->VariableDataLength = VarSize;
   CopyMem (
-     VarLog->UnicodeName,
-     VarName,
-     VarNameLength * sizeof (*VarName)
-     );
+    VarLog->UnicodeName,
+    VarName,
+    VarNameLength * sizeof (*VarName)
+    );
   CopyMem (
-     (CHAR16 *)VarLog->UnicodeName + VarNameLength,
-     VarData,
-     VarSize
-     );
+    (CHAR16 *)VarLog->UnicodeName + VarNameLength,
+    VarData,
+    VarSize
+    );
 
   DEBUG ((DEBUG_INFO, "DxeImageVerification: MeasureVariable (Pcr - %x, EventType - %x, ", (UINTN)7, (UINTN)EV_EFI_VARIABLE_AUTHORITY));
   DEBUG ((DEBUG_INFO, "VariableName - %s, VendorGuid - %g)\n", VarName, VendorGuid));
@@ -288,15 +294,15 @@ SecureBootHook (
   IN VOID                                   *Data
   )
 {
-  EFI_STATUS                        Status;
+  EFI_STATUS  Status;
 
   if (!IsSecureAuthorityVariable (VariableName, VendorGuid)) {
-    return ;
+    return;
   }
 
   if (IsDataMeasured (VariableName, VendorGuid, Data, DataSize)) {
     DEBUG ((DEBUG_ERROR, "MeasureSecureAuthorityVariable - IsDataMeasured\n"));
-    return ;
+    return;
   }
 
   Status = MeasureVariable (
@@ -311,5 +317,5 @@ SecureBootHook (
     AddDataMeasured (VariableName, VendorGuid, Data, DataSize);
   }
 
-  return ;
+  return;
 }
