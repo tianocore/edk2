@@ -9,13 +9,13 @@
 #ifndef PAYLOAD_S3_COMMUNICATION_GUID_H_
 #define PAYLOAD_S3_COMMUNICATION_GUID_H_
 
-extern EFI_GUID gS3CommunicationGuid;
+extern EFI_GUID  gS3CommunicationGuid;
 
 #pragma pack(1)
 
 typedef struct {
-  EFI_SMRAM_DESCRIPTOR  CommBuffer;
-  BOOLEAN               PldAcpiS3Enable;
+  EFI_SMRAM_DESCRIPTOR    CommBuffer;
+  BOOLEAN                 PldAcpiS3Enable;
 } PLD_S3_COMMUNICATION;
 
 ///
@@ -27,16 +27,16 @@ typedef struct {
 ///
 
 typedef struct {
-  UINT32             ApicId;
-  UINT32             SmmBase;
+  UINT32    ApicId;
+  UINT32    SmmBase;
 } CPU_SMMBASE;
 
 typedef struct {
-  UINT8              SwSmiData;
-  UINT8              SwSmiTriggerValue;
-  UINT16             Reserved;
-  UINT32             CpuCount;
-  CPU_SMMBASE        SmmBase[0];
+  UINT8          SwSmiData;
+  UINT8          SwSmiTriggerValue;
+  UINT16         Reserved;
+  UINT32         CpuCount;
+  CPU_SMMBASE    SmmBase[0];
 } SMM_S3_INFO;
 
 //
@@ -45,8 +45,8 @@ typedef struct {
 // to trigger SMI to let payload to restore S3.
 //
 typedef struct {
-  EFI_HOB_GUID_TYPE  Header;
-  SMM_S3_INFO        S3Info;
+  EFI_HOB_GUID_TYPE    Header;
+  SMM_S3_INFO          S3Info;
 } PLD_TO_BL_SMM_INFO;
 
 #pragma pack()
