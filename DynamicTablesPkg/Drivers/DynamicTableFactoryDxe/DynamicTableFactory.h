@@ -22,33 +22,33 @@
 typedef struct DynamicTableFactoryInfo {
   /// An array for holding the list of Standard ACPI Table  Generators.
   CONST ACPI_TABLE_GENERATOR *
-          StdAcpiTableGeneratorList[EStdAcpiTableIdMax];
+        StdAcpiTableGeneratorList[EStdAcpiTableIdMax];
 
   /// An array for holding the list of Custom ACPI Table Generators.
   CONST ACPI_TABLE_GENERATOR *
-          CustomAcpiTableGeneratorList[FixedPcdGet16 (
-                                         PcdMaxCustomACPIGenerators
-                                         )];
+        CustomAcpiTableGeneratorList[FixedPcdGet16 (
+                                   PcdMaxCustomACPIGenerators
+                                   )];
 
   /// An array for holding the list of Standard SMBIOS Table Generators.
   CONST SMBIOS_TABLE_GENERATOR *
-          StdSmbiosTableGeneratorList[EStdSmbiosTableIdMax];
+        StdSmbiosTableGeneratorList[EStdSmbiosTableIdMax];
 
   /// An array for holding the list of Custom SMBIOS Table Generators.
   CONST SMBIOS_TABLE_GENERATOR *
-          CustomSmbiosTableGeneratorList[FixedPcdGet16 (
-                                           PcdMaxCustomSMBIOSGenerators
-                                           )];
+        CustomSmbiosTableGeneratorList[FixedPcdGet16 (
+                                     PcdMaxCustomSMBIOSGenerators
+                                     )];
 
   /// An array for holding the list of Standard DT Table Generators.
   CONST DT_TABLE_GENERATOR *
-          StdDtTableGeneratorList[EStdDtTableIdMax];
+        StdDtTableGeneratorList[EStdDtTableIdMax];
 
   /// An array for holding the list of Custom DT Table Generators.
   CONST DT_TABLE_GENERATOR *
-          CustomDtTableGeneratorList[FixedPcdGet16 (
-                                       PcdMaxCustomDTGenerators
-                                       )];
+        CustomDtTableGeneratorList[FixedPcdGet16 (
+                                 PcdMaxCustomDTGenerators
+                                 )];
 } EDKII_DYNAMIC_TABLE_FACTORY_INFO;
 
 /** Return a pointer to the ACPI table generator.
@@ -67,9 +67,9 @@ typedef struct DynamicTableFactoryInfo {
 EFI_STATUS
 EFIAPI
 GetAcpiTableGenerator (
-  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  * CONST This,
+  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST  This,
   IN  CONST ACPI_TABLE_GENERATOR_ID                       GeneratorId,
-  OUT CONST ACPI_TABLE_GENERATOR                 ** CONST Generator
+  OUT CONST ACPI_TABLE_GENERATOR                 **CONST  Generator
   );
 
 /** Return a pointer to the SMBIOS table generator.
@@ -88,9 +88,9 @@ GetAcpiTableGenerator (
 EFI_STATUS
 EFIAPI
 GetSmbiosTableGenerator (
-  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  * CONST This,
+  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST  This,
   IN  CONST SMBIOS_TABLE_GENERATOR_ID                     GeneratorId,
-  OUT CONST SMBIOS_TABLE_GENERATOR               ** CONST Generator
+  OUT CONST SMBIOS_TABLE_GENERATOR               **CONST  Generator
   );
 
 /** Return a pointer to the DT table generator.
@@ -109,9 +109,9 @@ GetSmbiosTableGenerator (
 EFI_STATUS
 EFIAPI
 GetDtTableGenerator (
-  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  * CONST This,
+  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST  This,
   IN  CONST DT_TABLE_GENERATOR_ID                         GeneratorId,
-  OUT CONST DT_TABLE_GENERATOR                   ** CONST Generator
+  OUT CONST DT_TABLE_GENERATOR                   **CONST  Generator
   );
 
 #pragma pack()

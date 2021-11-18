@@ -71,7 +71,7 @@ typedef struct CmArmBootArchInfo {
   /** This is the ARM_BOOT_ARCH flags field of the FADT Table
       described in the ACPI Table Specification.
   */
-  UINT16  BootArchFlags;
+  UINT16    BootArchFlags;
 } CM_ARM_BOOT_ARCH_INFO;
 
 /** A structure that describes the
@@ -83,7 +83,7 @@ typedef struct CmArmPowerManagementProfileInfo {
   /** This is the Preferred_PM_Profile field of the FADT Table
       described in the ACPI Specification
   */
-  UINT8  PowerManagementProfile;
+  UINT8    PowerManagementProfile;
 } CM_ARM_POWER_MANAGEMENT_PROFILE_INFO;
 
 /** A structure that describes the
@@ -93,99 +93,99 @@ typedef struct CmArmPowerManagementProfileInfo {
 */
 typedef struct CmArmGicCInfo {
   /// The GIC CPU Interface number.
-  UINT32  CPUInterfaceNumber;
+  UINT32    CPUInterfaceNumber;
 
   /** The ACPI Processor UID. This must match the
       _UID of the CPU Device object information described
       in the DSDT/SSDT for the CPU.
   */
-  UINT32  AcpiProcessorUid;
+  UINT32    AcpiProcessorUid;
 
   /** The flags field as described by the GICC structure
       in the ACPI Specification.
   */
-  UINT32  Flags;
+  UINT32    Flags;
 
   /** The parking protocol version field as described by
     the GICC structure in the ACPI Specification.
   */
-  UINT32  ParkingProtocolVersion;
+  UINT32    ParkingProtocolVersion;
 
   /** The Performance Interrupt field as described by
       the GICC structure in the ACPI Specification.
   */
-  UINT32  PerformanceInterruptGsiv;
+  UINT32    PerformanceInterruptGsiv;
 
   /** The CPU Parked address field as described by
       the GICC structure in the ACPI Specification.
   */
-  UINT64  ParkedAddress;
+  UINT64    ParkedAddress;
 
   /** The base address for the GIC CPU Interface
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64  PhysicalBaseAddress;
+  UINT64    PhysicalBaseAddress;
 
   /** The base address for GICV interface
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64  GICV;
+  UINT64    GICV;
 
   /** The base address for GICH interface
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64  GICH;
+  UINT64    GICH;
 
   /** The GICV maintenance interrupt
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT32  VGICMaintenanceInterrupt;
+  UINT32    VGICMaintenanceInterrupt;
 
   /** The base address for GICR interface
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64  GICRBaseAddress;
+  UINT64    GICRBaseAddress;
 
   /** The MPIDR for the CPU
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT64  MPIDR;
+  UINT64    MPIDR;
 
   /** The Processor Power Efficiency class
       as described by the GICC structure in the
       ACPI Specification.
   */
-  UINT8   ProcessorPowerEfficiencyClass;
+  UINT8     ProcessorPowerEfficiencyClass;
 
   /** Statistical Profiling Extension buffer overflow GSIV. Zero if
       unsupported by this processor. This field was introduced in
       ACPI 6.3 (MADT revision 5) and is therefore ignored when
       generating MADT revision 4 or lower.
   */
-  UINT16  SpeOverflowInterrupt;
+  UINT16    SpeOverflowInterrupt;
 
   /** The proximity domain to which the logical processor belongs.
       This field is used to populate the GICC affinity structure
       in the SRAT table.
   */
-  UINT32  ProximityDomain;
+  UINT32    ProximityDomain;
 
   /** The clock domain to which the logical processor belongs.
       This field is used to populate the GICC affinity structure
       in the SRAT table.
   */
-  UINT32  ClockDomain;
+  UINT32    ClockDomain;
 
   /** The GICC Affinity flags field as described by the GICC Affinity structure
       in the SRAT table.
   */
-  UINT32  AffinityFlags;
+  UINT32    AffinityFlags;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
@@ -195,19 +195,19 @@ typedef struct CmArmGicCInfo {
 */
 typedef struct CmArmGicDInfo {
   /// The Physical Base address for the GIC Distributor.
-  UINT64  PhysicalBaseAddress;
+  UINT64    PhysicalBaseAddress;
 
   /** The global system interrupt
       number where this GIC Distributor's
       interrupt inputs start.
   */
-  UINT32  SystemVectorBase;
+  UINT32    SystemVectorBase;
 
   /** The GIC version as described
       by the GICD structure in the
       ACPI Specification.
   */
-  UINT8   GicVersion;
+  UINT8     GicVersion;
 } CM_ARM_GICD_INFO;
 
 /** A structure that describes the
@@ -217,22 +217,22 @@ typedef struct CmArmGicDInfo {
 */
 typedef struct CmArmGicMsiFrameInfo {
   /// The GIC MSI Frame ID
-  UINT32  GicMsiFrameId;
+  UINT32    GicMsiFrameId;
 
   /// The Physical base address for the MSI Frame
-  UINT64  PhysicalBaseAddress;
+  UINT64    PhysicalBaseAddress;
 
   /** The GIC MSI Frame flags
       as described by the GIC MSI frame
       structure in the ACPI Specification.
   */
-  UINT32  Flags;
+  UINT32    Flags;
 
   /// SPI Count used by this frame
-  UINT16  SPICount;
+  UINT16    SPICount;
 
   /// SPI Base used by this frame
-  UINT16  SPIBase;
+  UINT16    SPIBase;
 } CM_ARM_GIC_MSI_FRAME_INFO;
 
 /** A structure that describes the
@@ -244,10 +244,10 @@ typedef struct CmArmGicRedistInfo {
   /** The physical address of a page range
       containing all GIC Redistributors.
   */
-  UINT64  DiscoveryRangeBaseAddress;
+  UINT64    DiscoveryRangeBaseAddress;
 
   /// Length of the GIC Redistributor Discovery page range
-  UINT32  DiscoveryRangeLength;
+  UINT32    DiscoveryRangeLength;
 } CM_ARM_GIC_REDIST_INFO;
 
 /** A structure that describes the
@@ -257,16 +257,16 @@ typedef struct CmArmGicRedistInfo {
 */
 typedef struct CmArmGicItsInfo {
   /// The GIC ITS ID
-  UINT32  GicItsId;
+  UINT32    GicItsId;
 
   /// The physical address for the Interrupt Translation Service
-  UINT64  PhysicalBaseAddress;
+  UINT64    PhysicalBaseAddress;
 
   /** The proximity domain to which the logical processor belongs.
       This field is used to populate the GIC ITS affinity structure
       in the SRAT table.
   */
-  UINT32  ProximityDomain;
+  UINT32    ProximityDomain;
 } CM_ARM_GIC_ITS_INFO;
 
 /** A structure that describes the
@@ -278,25 +278,25 @@ typedef struct CmArmGicItsInfo {
 */
 typedef struct CmArmSerialPortInfo {
   /// The physical base address for the serial port
-  UINT64  BaseAddress;
+  UINT64    BaseAddress;
 
   /// The serial port interrupt
-  UINT32  Interrupt;
+  UINT32    Interrupt;
 
   /// The serial port baud rate
-  UINT64  BaudRate;
+  UINT64    BaudRate;
 
   /// The serial port clock
-  UINT32  Clock;
+  UINT32    Clock;
 
   /// Serial Port subtype
-  UINT16  PortSubtype;
+  UINT16    PortSubtype;
 
   /// The Base address length
-  UINT64  BaseAddressLength;
+  UINT64    BaseAddressLength;
 
   /// The access size
-  UINT8   AccessSize;
+  UINT8     AccessSize;
 } CM_ARM_SERIAL_PORT_INFO;
 
 /** A structure that describes the
@@ -306,40 +306,40 @@ typedef struct CmArmSerialPortInfo {
 */
 typedef struct CmArmGenericTimerInfo {
   /// The physical base address for the counter control frame
-  UINT64  CounterControlBaseAddress;
+  UINT64    CounterControlBaseAddress;
 
   /// The physical base address for the counter read frame
-  UINT64  CounterReadBaseAddress;
+  UINT64    CounterReadBaseAddress;
 
   /// The secure PL1 timer interrupt
-  UINT32  SecurePL1TimerGSIV;
+  UINT32    SecurePL1TimerGSIV;
 
   /// The secure PL1 timer flags
-  UINT32  SecurePL1TimerFlags;
+  UINT32    SecurePL1TimerFlags;
 
   /// The non-secure PL1 timer interrupt
-  UINT32  NonSecurePL1TimerGSIV;
+  UINT32    NonSecurePL1TimerGSIV;
 
   /// The non-secure PL1 timer flags
-  UINT32  NonSecurePL1TimerFlags;
+  UINT32    NonSecurePL1TimerFlags;
 
   /// The virtual timer interrupt
-  UINT32  VirtualTimerGSIV;
+  UINT32    VirtualTimerGSIV;
 
   /// The virtual timer flags
-  UINT32  VirtualTimerFlags;
+  UINT32    VirtualTimerFlags;
 
   /// The non-secure PL2 timer interrupt
-  UINT32  NonSecurePL2TimerGSIV;
+  UINT32    NonSecurePL2TimerGSIV;
 
   /// The non-secure PL2 timer flags
-  UINT32  NonSecurePL2TimerFlags;
+  UINT32    NonSecurePL2TimerFlags;
 
   /// GSIV for the virtual EL2 timer
-  UINT32  VirtualPL2TimerGSIV;
+  UINT32    VirtualPL2TimerGSIV;
 
   /// Flags for the virtual EL2 timer
-  UINT32  VirtualPL2TimerFlags;
+  UINT32    VirtualPL2TimerFlags;
 } CM_ARM_GENERIC_TIMER_INFO;
 
 /** A structure that describes the
@@ -349,34 +349,34 @@ typedef struct CmArmGenericTimerInfo {
 */
 typedef struct CmArmGTBlockTimerFrameInfo {
   /// The Generic Timer frame number
-  UINT8   FrameNumber;
+  UINT8     FrameNumber;
 
   /// The physical base address for the CntBase block
-  UINT64  PhysicalAddressCntBase;
+  UINT64    PhysicalAddressCntBase;
 
   /// The physical base address for the CntEL0Base block
-  UINT64  PhysicalAddressCntEL0Base;
+  UINT64    PhysicalAddressCntEL0Base;
 
   /// The physical timer interrupt
-  UINT32  PhysicalTimerGSIV;
+  UINT32    PhysicalTimerGSIV;
 
   /** The physical timer flags as described by the GT Block
       Timer frame Structure in the ACPI Specification.
   */
-  UINT32  PhysicalTimerFlags;
+  UINT32    PhysicalTimerFlags;
 
   /// The virtual timer interrupt
-  UINT32  VirtualTimerGSIV;
+  UINT32    VirtualTimerGSIV;
 
   /** The virtual timer flags as described by the GT Block
       Timer frame Structure in the ACPI Specification.
   */
-  UINT32  VirtualTimerFlags;
+  UINT32    VirtualTimerFlags;
 
   /** The common timer flags as described by the GT Block
       Timer frame Structure in the ACPI Specification.
   */
-  UINT32  CommonFlags;
+  UINT32    CommonFlags;
 } CM_ARM_GTBLOCK_TIMER_FRAME_INFO;
 
 /** A structure that describes the
@@ -386,13 +386,13 @@ typedef struct CmArmGTBlockTimerFrameInfo {
 */
 typedef struct CmArmGTBlockInfo {
   /// The physical base address for the GT Block Timer structure
-  UINT64            GTBlockPhysicalAddress;
+  UINT64             GTBlockPhysicalAddress;
 
   /// The number of timer frames implemented in the GT Block
-  UINT32            GTBlockTimerFrameCount;
+  UINT32             GTBlockTimerFrameCount;
 
   /// Reference token for the GT Block timer frame list
-  CM_OBJECT_TOKEN   GTBlockTimerFrameToken;
+  CM_OBJECT_TOKEN    GTBlockTimerFrameToken;
 } CM_ARM_GTBLOCK_INFO;
 
 /** A structure that describes the
@@ -402,18 +402,18 @@ typedef struct CmArmGTBlockInfo {
 */
 typedef struct CmArmGenericWatchdogInfo {
   /// The physical base address of the Arm Watchdog control frame
-  UINT64  ControlFrameAddress;
+  UINT64    ControlFrameAddress;
 
   /// The physical base address of the Arm Watchdog refresh frame
-  UINT64  RefreshFrameAddress;
+  UINT64    RefreshFrameAddress;
 
   /// The watchdog interrupt
-  UINT32  TimerGSIV;
+  UINT32    TimerGSIV;
 
   /** The flags for the watchdog as described by the Arm watchdog
       structure in the ACPI specification.
   */
-  UINT32  Flags;
+  UINT32    Flags;
 } CM_ARM_GENERIC_WATCHDOG_INFO;
 
 /** A structure that describes the
@@ -423,16 +423,16 @@ typedef struct CmArmGenericWatchdogInfo {
 */
 typedef struct CmArmPciConfigSpaceInfo {
   /// The physical base address for the PCI segment
-  UINT64  BaseAddress;
+  UINT64    BaseAddress;
 
   /// The PCI segment group number
-  UINT16  PciSegmentGroupNumber;
+  UINT16    PciSegmentGroupNumber;
 
   /// The start bus number
-  UINT8   StartBusNumber;
+  UINT8     StartBusNumber;
 
   /// The end bus number
-  UINT8   EndBusNumber;
+  UINT8     EndBusNumber;
 } CM_ARM_PCI_CONFIG_SPACE_INFO;
 
 /** A structure that describes the
@@ -442,7 +442,7 @@ typedef struct CmArmPciConfigSpaceInfo {
 */
 typedef struct CmArmHypervisorVendorId {
   /// The hypervisor Vendor ID
-  UINT64  HypervisorVendorId;
+  UINT64    HypervisorVendorId;
 } CM_ARM_HYPERVISOR_VENDOR_ID;
 
 /** A structure that describes the
@@ -452,7 +452,7 @@ typedef struct CmArmHypervisorVendorId {
 */
 typedef struct CmArmFixedFeatureFlags {
   /// The Fixed feature flags
-  UINT32  Flags;
+  UINT32    Flags;
 } CM_ARM_FIXED_FEATURE_FLAGS;
 
 /** A structure that describes the
@@ -462,11 +462,11 @@ typedef struct CmArmFixedFeatureFlags {
 */
 typedef struct CmArmItsGroupNode {
   /// An unique token used to identify this object
-  CM_OBJECT_TOKEN   Token;
+  CM_OBJECT_TOKEN    Token;
   /// The number of ITS identifiers in the ITS node
-  UINT32            ItsIdCount;
+  UINT32             ItsIdCount;
   /// Reference token for the ITS identifier array
-  CM_OBJECT_TOKEN   ItsIdToken;
+  CM_OBJECT_TOKEN    ItsIdToken;
 } CM_ARM_ITS_GROUP_NODE;
 
 /** A structure that describes the
@@ -476,28 +476,29 @@ typedef struct CmArmItsGroupNode {
 */
 typedef struct CmArmNamedComponentNode {
   /// An unique token used to identify this object
-  CM_OBJECT_TOKEN   Token;
+  CM_OBJECT_TOKEN    Token;
   /// Number of ID mappings
-  UINT32            IdMappingCount;
+  UINT32             IdMappingCount;
   /// Reference token for the ID mapping array
-  CM_OBJECT_TOKEN   IdMappingToken;
+  CM_OBJECT_TOKEN    IdMappingToken;
 
   /// Flags for the named component
-  UINT32            Flags;
+  UINT32             Flags;
 
   /// Memory access properties : Cache coherent attributes
-  UINT32            CacheCoherent;
+  UINT32             CacheCoherent;
   /// Memory access properties : Allocation hints
-  UINT8             AllocationHints;
+  UINT8              AllocationHints;
   /// Memory access properties : Memory access flags
-  UINT8             MemoryAccessFlags;
+  UINT8              MemoryAccessFlags;
 
   /// Memory access properties : Address size limit
-  UINT8             AddressSizeLimit;
+  UINT8              AddressSizeLimit;
+
   /** ASCII Null terminated string with the full path to
       the entry in the namespace for this object.
   */
-  CHAR8*            ObjectName;
+  CHAR8              *ObjectName;
 } CM_ARM_NAMED_COMPONENT_NODE;
 
 /** A structure that describes the
@@ -507,25 +508,25 @@ typedef struct CmArmNamedComponentNode {
 */
 typedef struct CmArmRootComplexNode {
   /// An unique token used to identify this object
-  CM_OBJECT_TOKEN   Token;
+  CM_OBJECT_TOKEN    Token;
   /// Number of ID mappings
-  UINT32            IdMappingCount;
+  UINT32             IdMappingCount;
   /// Reference token for the ID mapping array
-  CM_OBJECT_TOKEN   IdMappingToken;
+  CM_OBJECT_TOKEN    IdMappingToken;
 
   /// Memory access properties : Cache coherent attributes
-  UINT32            CacheCoherent;
+  UINT32             CacheCoherent;
   /// Memory access properties : Allocation hints
-  UINT8             AllocationHints;
+  UINT8              AllocationHints;
   /// Memory access properties : Memory access flags
-  UINT8             MemoryAccessFlags;
+  UINT8              MemoryAccessFlags;
 
   /// ATS attributes
-  UINT32            AtsAttribute;
+  UINT32             AtsAttribute;
   /// PCI segment number
-  UINT32            PciSegmentNumber;
+  UINT32             PciSegmentNumber;
   /// Memory address size limit
-  UINT8             MemoryAddressSize;
+  UINT8              MemoryAddressSize;
 } CM_ARM_ROOT_COMPLEX_NODE;
 
 /** A structure that describes the
@@ -535,39 +536,39 @@ typedef struct CmArmRootComplexNode {
 */
 typedef struct CmArmSmmuV1SmmuV2Node {
   /// An unique token used to identify this object
-  CM_OBJECT_TOKEN   Token;
+  CM_OBJECT_TOKEN    Token;
   /// Number of ID mappings
-  UINT32            IdMappingCount;
+  UINT32             IdMappingCount;
   /// Reference token for the ID mapping array
-  CM_OBJECT_TOKEN   IdMappingToken;
+  CM_OBJECT_TOKEN    IdMappingToken;
 
   /// SMMU Base Address
-  UINT64            BaseAddress;
+  UINT64             BaseAddress;
   /// Length of the memory range covered by the SMMU
-  UINT64            Span;
+  UINT64             Span;
   /// SMMU Model
-  UINT32            Model;
+  UINT32             Model;
   /// SMMU flags
-  UINT32            Flags;
+  UINT32             Flags;
 
   /// Number of context interrupts
-  UINT32            ContextInterruptCount;
+  UINT32             ContextInterruptCount;
   /// Reference token for the context interrupt array
-  CM_OBJECT_TOKEN   ContextInterruptToken;
+  CM_OBJECT_TOKEN    ContextInterruptToken;
 
   /// Number of PMU interrupts
-  UINT32            PmuInterruptCount;
+  UINT32             PmuInterruptCount;
   /// Reference token for the PMU interrupt array
-  CM_OBJECT_TOKEN   PmuInterruptToken;
+  CM_OBJECT_TOKEN    PmuInterruptToken;
 
   /// GSIV of the SMMU_NSgIrpt interrupt
-  UINT32            SMMU_NSgIrpt;
+  UINT32             SMMU_NSgIrpt;
   /// SMMU_NSgIrpt interrupt flags
-  UINT32            SMMU_NSgIrptFlags;
+  UINT32             SMMU_NSgIrptFlags;
   /// GSIV of the SMMU_NSgCfgIrpt interrupt
-  UINT32            SMMU_NSgCfgIrpt;
+  UINT32             SMMU_NSgCfgIrpt;
   /// SMMU_NSgCfgIrpt interrupt flags
-  UINT32            SMMU_NSgCfgIrptFlags;
+  UINT32             SMMU_NSgCfgIrptFlags;
 } CM_ARM_SMMUV1_SMMUV2_NODE;
 
 /** A structure that describes the
@@ -577,33 +578,33 @@ typedef struct CmArmSmmuV1SmmuV2Node {
 */
 typedef struct CmArmSmmuV3Node {
   /// An unique token used to identify this object
-  CM_OBJECT_TOKEN   Token;
+  CM_OBJECT_TOKEN    Token;
   /// Number of ID mappings
-  UINT32            IdMappingCount;
+  UINT32             IdMappingCount;
   /// Reference token for the ID mapping array
-  CM_OBJECT_TOKEN   IdMappingToken;
+  CM_OBJECT_TOKEN    IdMappingToken;
 
   /// SMMU Base Address
-  UINT64    BaseAddress;
+  UINT64             BaseAddress;
   /// SMMU flags
-  UINT32            Flags;
+  UINT32             Flags;
   /// VATOS address
-  UINT64            VatosAddress;
+  UINT64             VatosAddress;
   /// Model
-  UINT32            Model;
+  UINT32             Model;
   /// GSIV of the Event interrupt if SPI based
-  UINT32            EventInterrupt;
+  UINT32             EventInterrupt;
   /// PRI Interrupt if SPI based
-  UINT32            PriInterrupt;
+  UINT32             PriInterrupt;
   /// GERR interrupt if GSIV based
-  UINT32            GerrInterrupt;
+  UINT32             GerrInterrupt;
   /// Sync interrupt if GSIV based
-  UINT32            SyncInterrupt;
+  UINT32             SyncInterrupt;
 
   /// Proximity domain flag
-  UINT32            ProximityDomain;
+  UINT32             ProximityDomain;
   /// Index into the array of ID mapping
-  UINT32            DeviceIdMappingIndex;
+  UINT32             DeviceIdMappingIndex;
 } CM_ARM_SMMUV3_NODE;
 
 /** A structure that describes the
@@ -613,21 +614,21 @@ typedef struct CmArmSmmuV3Node {
 */
 typedef struct CmArmPmcgNode {
   /// An unique token used to identify this object
-  CM_OBJECT_TOKEN   Token;
+  CM_OBJECT_TOKEN    Token;
   /// Number of ID mappings
-  UINT32            IdMappingCount;
+  UINT32             IdMappingCount;
   /// Reference token for the ID mapping array
-  CM_OBJECT_TOKEN   IdMappingToken;
+  CM_OBJECT_TOKEN    IdMappingToken;
 
   /// Base Address for performance monitor counter group
-  UINT64            BaseAddress;
+  UINT64             BaseAddress;
   /// GSIV for the Overflow interrupt
-  UINT32            OverflowInterrupt;
+  UINT32             OverflowInterrupt;
   /// Page 1 Base address
-  UINT64            Page1BaseAddress;
+  UINT64             Page1BaseAddress;
 
   /// Reference token for the IORT node associated with this node
-  CM_OBJECT_TOKEN   ReferenceToken;
+  CM_OBJECT_TOKEN    ReferenceToken;
 } CM_ARM_PMCG_NODE;
 
 /** A structure that describes the
@@ -637,7 +638,7 @@ typedef struct CmArmPmcgNode {
 */
 typedef struct CmArmGicItsIdentifier {
   /// The ITS Identifier
-  UINT32  ItsId;
+  UINT32    ItsId;
 } CM_ARM_ITS_IDENTIFIER;
 
 /** A structure that describes the
@@ -647,15 +648,15 @@ typedef struct CmArmGicItsIdentifier {
 */
 typedef struct CmArmIdMapping {
   /// Input base
-  UINT32           InputBase;
+  UINT32             InputBase;
   /// Number of input IDs
-  UINT32           NumIds;
+  UINT32             NumIds;
   /// Output Base
-  UINT32           OutputBase;
+  UINT32             OutputBase;
   /// Reference token for the output node
-  CM_OBJECT_TOKEN  OutputReferenceToken;
+  CM_OBJECT_TOKEN    OutputReferenceToken;
   /// Flags
-  UINT32    Flags;
+  UINT32             Flags;
 } CM_ARM_ID_MAPPING;
 
 /** A structure that describes the Arm
@@ -694,28 +695,28 @@ typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
 */
 typedef struct CmArmProcHierarchyInfo {
   /// A unique token used to identify this object
-  CM_OBJECT_TOKEN   Token;
+  CM_OBJECT_TOKEN    Token;
   /// Processor structure flags (ACPI 6.3 - January 2019, PPTT, Table 5-155)
-  UINT32            Flags;
+  UINT32             Flags;
   /// Token for the parent CM_ARM_PROC_HIERARCHY_INFO object in the processor
   /// topology. A value of CM_NULL_TOKEN means this node has no parent.
-  CM_OBJECT_TOKEN   ParentToken;
+  CM_OBJECT_TOKEN    ParentToken;
   /// Token of the associated CM_ARM_GICC_INFO object which has the
   /// corresponding ACPI Processor ID. A value of CM_NULL_TOKEN means this
   /// node represents a group of associated processors and it does not have an
   /// associated GIC CPU interface.
-  CM_OBJECT_TOKEN   GicCToken;
+  CM_OBJECT_TOKEN    GicCToken;
   /// Number of resources private to this Node
-  UINT32            NoOfPrivateResources;
+  UINT32             NoOfPrivateResources;
   /// Token of the array which contains references to the resources private to
   /// this CM_ARM_PROC_HIERARCHY_INFO instance. This field is ignored if
   /// the NoOfPrivateResources is 0, in which case it is recommended to set
   /// this field to CM_NULL_TOKEN.
-  CM_OBJECT_TOKEN   PrivateResourcesArrayToken;
+  CM_OBJECT_TOKEN    PrivateResourcesArrayToken;
   /// Optional field: Reference Token for the Lpi state of this processor.
   /// Token identifying a CM_ARM_OBJ_REF structure, itself referencing
   /// CM_ARM_LPI_INFO objects.
-  CM_OBJECT_TOKEN   LpiToken;
+  CM_OBJECT_TOKEN    LpiToken;
 } CM_ARM_PROC_HIERARCHY_INFO;
 
 /** A structure that describes the Cache Type Structure (Type 1) in PPTT
@@ -724,26 +725,26 @@ typedef struct CmArmProcHierarchyInfo {
 */
 typedef struct CmArmCacheInfo {
   /// A unique token used to identify this object
-  CM_OBJECT_TOKEN   Token;
+  CM_OBJECT_TOKEN    Token;
   /// Reference token for the next level of cache that is private to the same
   /// CM_ARM_PROC_HIERARCHY_INFO instance. A value of CM_NULL_TOKEN means this
   /// entry represents the last cache level appropriate to the processor
   /// hierarchy node structures using this entry.
-  CM_OBJECT_TOKEN   NextLevelOfCacheToken;
+  CM_OBJECT_TOKEN    NextLevelOfCacheToken;
   /// Size of the cache in bytes
-  UINT32            Size;
+  UINT32             Size;
   /// Number of sets in the cache
-  UINT32            NumberOfSets;
+  UINT32             NumberOfSets;
   /// Integer number of ways. The maximum associativity supported by
   /// ACPI Cache type structure is limited to MAX_UINT8. However,
   /// the maximum number of ways supported by the architecture is
   /// PPTT_ARM_CCIDX_CACHE_ASSOCIATIVITY_MAX. Therfore this field
   /// is 32-bit wide.
-  UINT32            Associativity;
+  UINT32             Associativity;
   /// Cache attributes (ACPI 6.3 - January 2019, PPTT, Table 5-156)
-  UINT8             Attributes;
+  UINT8              Attributes;
   /// Line size in bytes
-  UINT16            LineSize;
+  UINT16             LineSize;
 } CM_ARM_CACHE_INFO;
 
 /** A structure that describes the ID Structure (Type 2) in PPTT
@@ -752,19 +753,19 @@ typedef struct CmArmCacheInfo {
 */
 typedef struct CmArmProcNodeIdInfo {
   /// A unique token used to identify this object
-  CM_OBJECT_TOKEN   Token;
+  CM_OBJECT_TOKEN    Token;
   // Vendor ID (as described in ACPI ID registry)
-  UINT32            VendorId;
+  UINT32             VendorId;
   /// First level unique node ID
-  UINT64            Level1Id;
+  UINT64             Level1Id;
   /// Second level unique node ID
-  UINT64            Level2Id;
+  UINT64             Level2Id;
   /// Major revision of the node
-  UINT16            MajorRev;
+  UINT16             MajorRev;
   /// Minor revision of the node
-  UINT16            MinorRev;
+  UINT16             MinorRev;
   /// Spin revision of the node
-  UINT16            SpinRev;
+  UINT16             SpinRev;
 } CM_ARM_PROC_NODE_ID_INFO;
 
 /** A structure that describes a reference to another Configuration Manager
@@ -780,7 +781,7 @@ typedef struct CmArmProcNodeIdInfo {
 */
 typedef struct CmArmObjRef {
   /// Token of the CM object being referenced
-  CM_OBJECT_TOKEN   ReferenceToken;
+  CM_OBJECT_TOKEN    ReferenceToken;
 } CM_ARM_OBJ_REF;
 
 /** A structure that describes the Memory Affinity Structure (Type 1) in SRAT
@@ -789,16 +790,16 @@ typedef struct CmArmObjRef {
 */
 typedef struct CmArmMemoryAffinityInfo {
   /// The proximity domain to which the "range of memory" belongs.
-  UINT32            ProximityDomain;
+  UINT32    ProximityDomain;
 
   /// Base Address
-  UINT64            BaseAddress;
+  UINT64    BaseAddress;
 
   /// Length
-  UINT64            Length;
+  UINT64    Length;
 
   /// Flags
-  UINT32            Flags;
+  UINT32    Flags;
 } CM_ARM_MEMORY_AFFINITY_INFO;
 
 /** A structure that describes the ACPI Device Handle (Type 0) in the
@@ -808,10 +809,10 @@ typedef struct CmArmMemoryAffinityInfo {
 */
 typedef struct CmArmDeviceHandleAcpi {
   /// Hardware ID
-  UINT64  Hid;
+  UINT64    Hid;
 
   /// Unique Id
-  UINT32  Uid;
+  UINT32    Uid;
 } CM_ARM_DEVICE_HANDLE_ACPI;
 
 /** A structure that describes the PCI Device Handle (Type 1) in the
@@ -821,16 +822,16 @@ typedef struct CmArmDeviceHandleAcpi {
 */
 typedef struct CmArmDeviceHandlePci {
   /// PCI Segment Number
-  UINT16  SegmentNumber;
+  UINT16    SegmentNumber;
 
   /// PCI Bus Number - Max 256 busses (Bits 15:8 of BDF)
-  UINT8  BusNumber;
+  UINT8     BusNumber;
 
   /// PCI Device Number - Max 32 devices (Bits 7:3 of BDF)
-  UINT8   DeviceNumber;
+  UINT8     DeviceNumber;
 
   /// PCI Function Number - Max 8 functions (Bits 2:0 of BDF)
-  UINT8   FunctionNumber;
+  UINT8     FunctionNumber;
 } CM_ARM_DEVICE_HANDLE_PCI;
 
 /** A structure that describes the Generic Initiator Affinity structure in SRAT
@@ -839,16 +840,16 @@ typedef struct CmArmDeviceHandlePci {
 */
 typedef struct CmArmGenericInitiatorAffinityInfo {
   /// The proximity domain to which the generic initiator belongs.
-  UINT32            ProximityDomain;
+  UINT32             ProximityDomain;
 
   /// Flags
-  UINT32            Flags;
+  UINT32             Flags;
 
   /// Device Handle Type
-  UINT8             DeviceHandleType;
+  UINT8              DeviceHandleType;
 
   /// Reference Token for the Device Handle
-  CM_OBJECT_TOKEN   DeviceHandleToken;
+  CM_OBJECT_TOKEN    DeviceHandleToken;
 } CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO;
 
 /** A structure that describes the CMN-600 hardware.
@@ -858,19 +859,19 @@ typedef struct CmArmGenericInitiatorAffinityInfo {
 typedef struct CmArmCmn600Info {
   /// The PERIPHBASE address.
   /// Corresponds to the Configuration Node Region (CFGR) base address.
-  UINT64                     PeriphBaseAddress;
+  UINT64    PeriphBaseAddress;
 
   /// The PERIPHBASE address length.
   /// Corresponds to the CFGR base address length.
-  UINT64                     PeriphBaseAddressLength;
+  UINT64    PeriphBaseAddressLength;
 
   /// The ROOTNODEBASE address.
   /// Corresponds to the Root node (ROOT) base address.
-  UINT64                     RootNodeBaseAddress;
+  UINT64    RootNodeBaseAddress;
 
   /// The Debug and Trace Logic Controller (DTC) count.
   /// CMN-600 can have maximum 4 DTCs.
-  UINT8                      DtcCount;
+  UINT8     DtcCount;
 
   /// DTC Interrupt list.
   /// The first interrupt resource descriptor pertains to
@@ -880,7 +881,7 @@ typedef struct CmArmCmn600Info {
   /// and DtcInterrupt[3] are ignored.
   /// Note: The size of CM_ARM_CMN_600_INFO structure remains
   /// constant and does not vary with the DTC count.
-  CM_ARM_EXTENDED_INTERRUPT  DtcInterrupt[4];
+  CM_ARM_EXTENDED_INTERRUPT    DtcInterrupt[4];
 } CM_ARM_CMN_600_INFO;
 
 /** A structure that describes the Lpi information.
@@ -894,28 +895,28 @@ typedef struct CmArmLpiInfo {
   /** Minimum Residency. Time in microseconds after which a
       state becomes more energy efficient than any shallower state.
   */
-  UINT32                                  MinResidency;
+  UINT32                                    MinResidency;
 
   /** Worst case time in microseconds from a wake interrupt
       being asserted to the return to a running state
   */
-  UINT32                                  WorstCaseWakeLatency;
+  UINT32                                    WorstCaseWakeLatency;
 
   /** Flags.
   */
-  UINT32                                  Flags;
+  UINT32                                    Flags;
 
   /** Architecture specific context loss flags.
   */
-  UINT32                                  ArchFlags;
+  UINT32                                    ArchFlags;
 
   /** Residency counter frequency in cycles-per-second (Hz).
   */
-  UINT32                                  ResCntFreq;
+  UINT32                                    ResCntFreq;
 
   /** Every shallower power state in the parent is also enabled.
   */
-  UINT32                                  EnableParentState;
+  UINT32                                    EnableParentState;
 
   /** The EntryMethod _LPI field can be described as an integer
       or in a Register resource data descriptor.
@@ -923,27 +924,27 @@ typedef struct CmArmLpiInfo {
   If IsInteger is TRUE, the IntegerEntryMethod field is used.
   If IsInteger is FALSE, the RegisterEntryMethod field is used.
   */
-  BOOLEAN                                 IsInteger;
+  BOOLEAN                                   IsInteger;
 
   /** EntryMethod described as an Integer.
   */
-  UINT64                                  IntegerEntryMethod;
+  UINT64                                    IntegerEntryMethod;
 
   /** EntryMethod described as a EFI_ACPI_GENERIC_REGISTER_DESCRIPTOR.
   */
-  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  RegisterEntryMethod;
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    RegisterEntryMethod;
 
   /** Residency counter register.
   */
-  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  ResidencyCounterRegister;
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    ResidencyCounterRegister;
 
   /** Usage counter register.
   */
-  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  UsageCounterRegister;
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    UsageCounterRegister;
 
   /** String representing the Lpi state
   */
-  CHAR8                                   StateName[16];
+  CHAR8                                     StateName[16];
 } CM_ARM_LPI_INFO;
 
 #pragma pack()

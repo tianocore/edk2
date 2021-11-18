@@ -21,7 +21,7 @@
 
 #include "DynamicTableFactory.h"
 
-extern EDKII_DYNAMIC_TABLE_FACTORY_INFO TableFactoryInfo;
+extern EDKII_DYNAMIC_TABLE_FACTORY_INFO  TableFactoryInfo;
 
 /** Return a pointer to the DT table generator.
 
@@ -39,13 +39,13 @@ extern EDKII_DYNAMIC_TABLE_FACTORY_INFO TableFactoryInfo;
 EFI_STATUS
 EFIAPI
 GetDtTableGenerator (
-  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  * CONST This,
+  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST  This,
   IN  CONST DT_TABLE_GENERATOR_ID                         GeneratorId,
-  OUT CONST DT_TABLE_GENERATOR                   ** CONST Generator
+  OUT CONST DT_TABLE_GENERATOR                   **CONST  Generator
   )
 {
-  UINT16                             TableId;
-  EDKII_DYNAMIC_TABLE_FACTORY_INFO * FactoryInfo;
+  UINT16                            TableId;
+  EDKII_DYNAMIC_TABLE_FACTORY_INFO  *FactoryInfo;
 
   ASSERT (This != NULL);
 
@@ -62,12 +62,13 @@ GetDtTableGenerator (
   }
 
   *Generator = NULL;
-  TableId = GET_TABLE_ID (GeneratorId);
+  TableId    = GET_TABLE_ID (GeneratorId);
   if (IS_GENERATOR_NAMESPACE_STD (GeneratorId)) {
     if (TableId >= EStdDtTableIdMax) {
       ASSERT (TableId < EStdDtTableIdMax);
       return EFI_INVALID_PARAMETER;
     }
+
     if (FactoryInfo->StdDtTableGeneratorList[TableId] != NULL) {
       *Generator = FactoryInfo->StdDtTableGeneratorList[TableId];
     } else {
@@ -78,12 +79,14 @@ GetDtTableGenerator (
       ASSERT (TableId <= FixedPcdGet16 (PcdMaxCustomDTGenerators));
       return EFI_INVALID_PARAMETER;
     }
+
     if (FactoryInfo->CustomDtTableGeneratorList[TableId] != NULL) {
       *Generator = FactoryInfo->CustomDtTableGeneratorList[TableId];
     } else {
       return EFI_NOT_FOUND;
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -104,7 +107,7 @@ GetDtTableGenerator (
 EFI_STATUS
 EFIAPI
 RegisterDtTableGenerator (
-  IN  CONST DT_TABLE_GENERATOR                * CONST Generator
+  IN  CONST DT_TABLE_GENERATOR                *CONST  Generator
   )
 {
   UINT16  TableId;
@@ -131,6 +134,7 @@ RegisterDtTableGenerator (
       ASSERT (TableId < EStdDtTableIdMax);
       return EFI_INVALID_PARAMETER;
     }
+
     if (TableFactoryInfo.StdDtTableGeneratorList[TableId] == NULL) {
       TableFactoryInfo.StdDtTableGeneratorList[TableId] = Generator;
     } else {
@@ -141,12 +145,14 @@ RegisterDtTableGenerator (
       ASSERT (TableId <= FixedPcdGet16 (PcdMaxCustomDTGenerators));
       return EFI_INVALID_PARAMETER;
     }
+
     if (TableFactoryInfo.CustomDtTableGeneratorList[TableId] == NULL) {
       TableFactoryInfo.CustomDtTableGeneratorList[TableId] = Generator;
     } else {
       return EFI_ALREADY_STARTED;
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -165,7 +171,7 @@ RegisterDtTableGenerator (
 EFI_STATUS
 EFIAPI
 DeregisterDtTableGenerator (
-  IN  CONST DT_TABLE_GENERATOR                * CONST Generator
+  IN  CONST DT_TABLE_GENERATOR                *CONST  Generator
   )
 {
   UINT16  TableId;
@@ -190,10 +196,12 @@ DeregisterDtTableGenerator (
       ASSERT (TableId < EStdDtTableIdMax);
       return EFI_INVALID_PARAMETER;
     }
+
     if (TableFactoryInfo.StdDtTableGeneratorList[TableId] != NULL) {
       if (Generator != TableFactoryInfo.StdDtTableGeneratorList[TableId]) {
         return EFI_INVALID_PARAMETER;
       }
+
       TableFactoryInfo.StdDtTableGeneratorList[TableId] = NULL;
     } else {
       return EFI_NOT_FOUND;
@@ -203,11 +211,14 @@ DeregisterDtTableGenerator (
       ASSERT (TableId <= FixedPcdGet16 (PcdMaxCustomDTGenerators));
       return EFI_INVALID_PARAMETER;
     }
+
     if (TableFactoryInfo.CustomDtTableGeneratorList[TableId] != NULL) {
       if (Generator !=
-          TableFactoryInfo.CustomDtTableGeneratorList[TableId]) {
+          TableFactoryInfo.CustomDtTableGeneratorList[TableId])
+      {
         return EFI_INVALID_PARAMETER;
       }
+
       TableFactoryInfo.CustomDtTableGeneratorList[TableId] = NULL;
     } else {
       return EFI_NOT_FOUND;
