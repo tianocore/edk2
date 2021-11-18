@@ -10,89 +10,86 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _TCP_IO_H_
 #define _TCP_IO_H_
 
-
 #include <Protocol/Tcp4.h>
 #include <Protocol/Tcp6.h>
 
 #include <Library/NetLib.h>
 
-#define TCP_VERSION_4 IP_VERSION_4
-#define TCP_VERSION_6 IP_VERSION_6
+#define TCP_VERSION_4  IP_VERSION_4
+#define TCP_VERSION_6  IP_VERSION_6
 
 ///
 /// 10 seconds
 ///
-#define TCP_GET_MAPPING_TIMEOUT 100000000U
-
+#define TCP_GET_MAPPING_TIMEOUT  100000000U
 
 typedef struct {
-  EFI_IPv4_ADDRESS          LocalIp;
-  EFI_IPv4_ADDRESS          SubnetMask;
-  EFI_IPv4_ADDRESS          Gateway;
+  EFI_IPv4_ADDRESS    LocalIp;
+  EFI_IPv4_ADDRESS    SubnetMask;
+  EFI_IPv4_ADDRESS    Gateway;
 
-  UINT16                    StationPort;
-  EFI_IPv4_ADDRESS          RemoteIp;
-  UINT16                    RemotePort;
-  BOOLEAN                   ActiveFlag;
+  UINT16              StationPort;
+  EFI_IPv4_ADDRESS    RemoteIp;
+  UINT16              RemotePort;
+  BOOLEAN             ActiveFlag;
 } TCP4_IO_CONFIG_DATA;
 
 typedef struct {
-  UINT16                    StationPort;
-  EFI_IPv6_ADDRESS          RemoteIp;
-  UINT16                    RemotePort;
-  BOOLEAN                   ActiveFlag;
+  UINT16              StationPort;
+  EFI_IPv6_ADDRESS    RemoteIp;
+  UINT16              RemotePort;
+  BOOLEAN             ActiveFlag;
 } TCP6_IO_CONFIG_DATA;
 
 typedef union {
-  TCP4_IO_CONFIG_DATA       Tcp4IoConfigData;
-  TCP6_IO_CONFIG_DATA       Tcp6IoConfigData;
+  TCP4_IO_CONFIG_DATA    Tcp4IoConfigData;
+  TCP6_IO_CONFIG_DATA    Tcp6IoConfigData;
 } TCP_IO_CONFIG_DATA;
 
 typedef union {
-  EFI_TCP4_PROTOCOL         *Tcp4;
-  EFI_TCP6_PROTOCOL         *Tcp6;
+  EFI_TCP4_PROTOCOL    *Tcp4;
+  EFI_TCP6_PROTOCOL    *Tcp6;
 } TCP_IO_PROTOCOL;
 
 typedef union {
-  EFI_TCP4_CONNECTION_TOKEN Tcp4Token;
-  EFI_TCP6_CONNECTION_TOKEN Tcp6Token;
+  EFI_TCP4_CONNECTION_TOKEN    Tcp4Token;
+  EFI_TCP6_CONNECTION_TOKEN    Tcp6Token;
 } TCP_IO_CONNECTION_TOKEN;
 
 typedef union {
-  EFI_TCP4_IO_TOKEN         Tcp4Token;
-  EFI_TCP6_IO_TOKEN         Tcp6Token;
+  EFI_TCP4_IO_TOKEN    Tcp4Token;
+  EFI_TCP6_IO_TOKEN    Tcp6Token;
 } TCP_IO_IO_TOKEN;
 
 typedef union {
-  EFI_TCP4_CLOSE_TOKEN      Tcp4Token;
-  EFI_TCP6_CLOSE_TOKEN      Tcp6Token;
+  EFI_TCP4_CLOSE_TOKEN    Tcp4Token;
+  EFI_TCP6_CLOSE_TOKEN    Tcp6Token;
 } TCP_IO_CLOSE_TOKEN;
 
 typedef union {
-  EFI_TCP4_LISTEN_TOKEN     Tcp4Token;
-  EFI_TCP6_LISTEN_TOKEN     Tcp6Token;
+  EFI_TCP4_LISTEN_TOKEN    Tcp4Token;
+  EFI_TCP6_LISTEN_TOKEN    Tcp6Token;
 } TCP_IO_LISTEN_TOKEN;
 
-
 typedef struct {
-  UINT8                     TcpVersion;
-  EFI_HANDLE                Image;
-  EFI_HANDLE                Controller;
-  EFI_HANDLE                Handle;
+  UINT8                      TcpVersion;
+  EFI_HANDLE                 Image;
+  EFI_HANDLE                 Controller;
+  EFI_HANDLE                 Handle;
 
-  TCP_IO_PROTOCOL           Tcp;
-  TCP_IO_PROTOCOL           NewTcp;
-  TCP_IO_CONNECTION_TOKEN   ConnToken;
-  TCP_IO_IO_TOKEN           TxToken;
-  TCP_IO_IO_TOKEN           RxToken;
-  TCP_IO_CLOSE_TOKEN        CloseToken;
-  TCP_IO_LISTEN_TOKEN       ListenToken;
+  TCP_IO_PROTOCOL            Tcp;
+  TCP_IO_PROTOCOL            NewTcp;
+  TCP_IO_CONNECTION_TOKEN    ConnToken;
+  TCP_IO_IO_TOKEN            TxToken;
+  TCP_IO_IO_TOKEN            RxToken;
+  TCP_IO_CLOSE_TOKEN         CloseToken;
+  TCP_IO_LISTEN_TOKEN        ListenToken;
 
-  BOOLEAN                   IsConnDone;
-  BOOLEAN                   IsTxDone;
-  BOOLEAN                   IsRxDone;
-  BOOLEAN                   IsCloseDone;
-  BOOLEAN                   IsListenDone;
+  BOOLEAN                    IsConnDone;
+  BOOLEAN                    IsTxDone;
+  BOOLEAN                    IsRxDone;
+  BOOLEAN                    IsCloseDone;
+  BOOLEAN                    IsListenDone;
 } TCP_IO;
 
 /**
@@ -115,11 +112,11 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 TcpIoCreateSocket (
-  IN EFI_HANDLE             Image,
-  IN EFI_HANDLE             Controller,
-  IN UINT8                  TcpVersion,
-  IN TCP_IO_CONFIG_DATA     *ConfigData,
-  OUT TCP_IO                *TcpIo
+  IN EFI_HANDLE          Image,
+  IN EFI_HANDLE          Controller,
+  IN UINT8               TcpVersion,
+  IN TCP_IO_CONFIG_DATA  *ConfigData,
+  OUT TCP_IO             *TcpIo
   );
 
 /**
@@ -131,7 +128,7 @@ TcpIoCreateSocket (
 VOID
 EFIAPI
 TcpIoDestroySocket (
-  IN TCP_IO                 *TcpIo
+  IN TCP_IO  *TcpIo
   );
 
 /**
@@ -153,8 +150,8 @@ TcpIoDestroySocket (
 EFI_STATUS
 EFIAPI
 TcpIoConnect (
-  IN OUT TCP_IO             *TcpIo,
-  IN     EFI_EVENT          Timeout        OPTIONAL
+  IN OUT TCP_IO     *TcpIo,
+  IN     EFI_EVENT  Timeout        OPTIONAL
   );
 
 /**
@@ -178,8 +175,8 @@ TcpIoConnect (
 EFI_STATUS
 EFIAPI
 TcpIoAccept (
-  IN OUT TCP_IO             *TcpIo,
-  IN     EFI_EVENT          Timeout        OPTIONAL
+  IN OUT TCP_IO     *TcpIo,
+  IN     EFI_EVENT  Timeout        OPTIONAL
   );
 
 /**
@@ -191,7 +188,7 @@ TcpIoAccept (
 VOID
 EFIAPI
 TcpIoReset (
-  IN OUT TCP_IO             *TcpIo
+  IN OUT TCP_IO  *TcpIo
   );
 
 /**
@@ -212,8 +209,8 @@ TcpIoReset (
 EFI_STATUS
 EFIAPI
 TcpIoTransmit (
-  IN TCP_IO                 *TcpIo,
-  IN NET_BUF                *Packet
+  IN TCP_IO   *TcpIo,
+  IN NET_BUF  *Packet
   );
 
 /**
@@ -237,11 +234,10 @@ TcpIoTransmit (
 EFI_STATUS
 EFIAPI
 TcpIoReceive (
-  IN OUT TCP_IO             *TcpIo,
-  IN     NET_BUF            *Packet,
-  IN     BOOLEAN            AsyncMode,
-  IN     EFI_EVENT          Timeout       OPTIONAL
+  IN OUT TCP_IO     *TcpIo,
+  IN     NET_BUF    *Packet,
+  IN     BOOLEAN    AsyncMode,
+  IN     EFI_EVENT  Timeout       OPTIONAL
   );
 
 #endif
-

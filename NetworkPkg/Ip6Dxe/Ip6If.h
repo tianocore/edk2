@@ -10,10 +10,10 @@
 #ifndef __EFI_IP6_IF_H__
 #define __EFI_IP6_IF_H__
 
-#define IP6_LINK_RX_SIGNATURE   SIGNATURE_32 ('I', 'P', '6', 'R')
-#define IP6_LINK_TX_SIGNATURE   SIGNATURE_32 ('I', 'P', '6', 'T')
-#define IP6_INTERFACE_SIGNATURE SIGNATURE_32 ('I', 'P', '6', 'I')
-#define IP6_ADDR_INFO_SIGNATURE SIGNATURE_32 ('I', 'P', 'A', 'I')
+#define IP6_LINK_RX_SIGNATURE    SIGNATURE_32 ('I', 'P', '6', 'R')
+#define IP6_LINK_TX_SIGNATURE    SIGNATURE_32 ('I', 'P', '6', 'T')
+#define IP6_INTERFACE_SIGNATURE  SIGNATURE_32 ('I', 'P', '6', 'I')
+#define IP6_ADDR_INFO_SIGNATURE  SIGNATURE_32 ('I', 'P', 'A', 'I')
 
 //
 // This prototype is used by both receive and transmission.
@@ -33,10 +33,10 @@
 typedef
 VOID
 (*IP6_FRAME_CALLBACK) (
-  NET_BUF                   *Packet,
-  EFI_STATUS                IoStatus,
-  UINT32                    LinkFlag,
-  VOID                      *Context
+  NET_BUF     *Packet,
+  EFI_STATUS  IoStatus,
+  UINT32      LinkFlag,
+  VOID        *Context
   );
 
 //
@@ -46,10 +46,10 @@ VOID
 // Reference MNP's spec for information.
 //
 typedef struct {
-  UINT32                                Signature;
-  IP6_FRAME_CALLBACK                    CallBack;
-  VOID                                  *Context;
-  EFI_MANAGED_NETWORK_COMPLETION_TOKEN  MnpToken;
+  UINT32                                  Signature;
+  IP6_FRAME_CALLBACK                      CallBack;
+  VOID                                    *Context;
+  EFI_MANAGED_NETWORK_COMPLETION_TOKEN    MnpToken;
 } IP6_LINK_RX_TOKEN;
 
 //
@@ -57,29 +57,29 @@ typedef struct {
 // Upon completion, the Callback will be called.
 //
 typedef struct {
-  UINT32                                Signature;
-  LIST_ENTRY                            Link;
+  UINT32                                  Signature;
+  LIST_ENTRY                              Link;
 
-  IP6_PROTOCOL                          *IpInstance;
-  IP6_FRAME_CALLBACK                    CallBack;
-  NET_BUF                               *Packet;
-  VOID                                  *Context;
+  IP6_PROTOCOL                            *IpInstance;
+  IP6_FRAME_CALLBACK                      CallBack;
+  NET_BUF                                 *Packet;
+  VOID                                    *Context;
 
-  EFI_MAC_ADDRESS                       DstMac;
-  EFI_MAC_ADDRESS                       SrcMac;
+  EFI_MAC_ADDRESS                         DstMac;
+  EFI_MAC_ADDRESS                         SrcMac;
 
-  EFI_MANAGED_NETWORK_COMPLETION_TOKEN  MnpToken;
-  EFI_MANAGED_NETWORK_TRANSMIT_DATA     MnpTxData;
+  EFI_MANAGED_NETWORK_COMPLETION_TOKEN    MnpToken;
+  EFI_MANAGED_NETWORK_TRANSMIT_DATA       MnpTxData;
 } IP6_LINK_TX_TOKEN;
 
 struct _IP6_ADDRESS_INFO {
-  UINT32                  Signature;
-  LIST_ENTRY              Link;
-  EFI_IPv6_ADDRESS        Address;
-  BOOLEAN                 IsAnycast;
-  UINT8                   PrefixLength;
-  UINT32                  ValidLifetime;
-  UINT32                  PreferredLifetime;
+  UINT32              Signature;
+  LIST_ENTRY          Link;
+  EFI_IPv6_ADDRESS    Address;
+  BOOLEAN             IsAnycast;
+  UINT8               PrefixLength;
+  UINT32              ValidLifetime;
+  UINT32              PreferredLifetime;
 };
 
 //
@@ -89,50 +89,48 @@ struct _IP6_ADDRESS_INFO {
 typedef
 BOOLEAN
 (*IP6_FRAME_TO_CANCEL) (
-  IP6_LINK_TX_TOKEN       *Frame,
-  VOID                    *Context
+  IP6_LINK_TX_TOKEN  *Frame,
+  VOID               *Context
   );
 
 struct _IP6_INTERFACE {
-  UINT32                        Signature;
-  LIST_ENTRY                    Link;
-  INTN                          RefCnt;
+  UINT32         Signature;
+  LIST_ENTRY     Link;
+  INTN           RefCnt;
 
   //
   // IP address and prefix length of the interface.  The fileds
   // are invalid if (Configured == FALSE)
   //
-  LIST_ENTRY                    AddressList;
-  UINT32                        AddressCount;
-  BOOLEAN                       Configured;
+  LIST_ENTRY     AddressList;
+  UINT32         AddressCount;
+  BOOLEAN        Configured;
 
-  IP6_SERVICE                   *Service;
+  IP6_SERVICE    *Service;
 
-  EFI_HANDLE                    Controller;
-  EFI_HANDLE                    Image;
-
+  EFI_HANDLE     Controller;
+  EFI_HANDLE     Image;
 
   //
   // Queues to keep the frames sent and waiting ARP request.
   //
-  LIST_ENTRY                    ArpQues;
-  LIST_ENTRY                    SentFrames;
-
+  LIST_ENTRY     ArpQues;
+  LIST_ENTRY     SentFrames;
 
   //
   // The interface's configuration variables
   //
-  UINT32                        DupAddrDetect;
-  LIST_ENTRY                    DupAddrDetectList;
-  LIST_ENTRY                    DelayJoinList;
+  UINT32         DupAddrDetect;
+  LIST_ENTRY     DupAddrDetectList;
+  LIST_ENTRY     DelayJoinList;
 
   //
   // All the IP instances that have the same IP/SubnetMask are linked
   // together through IpInstances. If any of the instance enables
   // promiscuous receive, PromiscRecv is true.
   //
-  LIST_ENTRY                    IpInstances;
-  BOOLEAN                       PromiscRecv;
+  LIST_ENTRY     IpInstances;
+  BOOLEAN        PromiscRecv;
 };
 
 /**
@@ -147,8 +145,8 @@ struct _IP6_INTERFACE {
 **/
 IP6_INTERFACE *
 Ip6CreateInterface (
-  IN IP6_SERVICE            *IpSb,
-  IN BOOLEAN                LinkLocal
+  IN IP6_SERVICE  *IpSb,
+  IN BOOLEAN      LinkLocal
   );
 
 /**
@@ -165,8 +163,8 @@ Ip6CreateInterface (
 **/
 VOID
 Ip6CleanInterface (
-  IN  IP6_INTERFACE         *Interface,
-  IN  IP6_PROTOCOL          *IpInstance           OPTIONAL
+  IN  IP6_INTERFACE  *Interface,
+  IN  IP6_PROTOCOL   *IpInstance           OPTIONAL
   );
 
 /**
@@ -178,7 +176,7 @@ Ip6CleanInterface (
 **/
 VOID
 Ip6FreeLinkTxToken (
-  IN IP6_LINK_TX_TOKEN      *Token
+  IN IP6_LINK_TX_TOKEN  *Token
   );
 
 /**
@@ -191,8 +189,8 @@ Ip6FreeLinkTxToken (
 VOID
 EFIAPI
 Ip6OnFrameReceived (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -208,8 +206,8 @@ Ip6OnFrameReceived (
 **/
 EFI_STATUS
 Ip6ReceiveFrame (
-  IN  IP6_FRAME_CALLBACK    CallBack,
-  IN  IP6_SERVICE           *IpSb
+  IN  IP6_FRAME_CALLBACK  CallBack,
+  IN  IP6_SERVICE         *IpSb
   );
 
 /**
@@ -234,12 +232,12 @@ Ip6ReceiveFrame (
 **/
 EFI_STATUS
 Ip6SendFrame (
-  IN  IP6_INTERFACE         *Interface,
-  IN  IP6_PROTOCOL          *IpInstance      OPTIONAL,
-  IN  NET_BUF               *Packet,
-  IN  EFI_IPv6_ADDRESS      *NextHop,
-  IN  IP6_FRAME_CALLBACK    CallBack,
-  IN  VOID                  *Context
+  IN  IP6_INTERFACE       *Interface,
+  IN  IP6_PROTOCOL        *IpInstance      OPTIONAL,
+  IN  NET_BUF             *Packet,
+  IN  EFI_IPv6_ADDRESS    *NextHop,
+  IN  IP6_FRAME_CALLBACK  CallBack,
+  IN  VOID                *Context
   );
 
 /**
@@ -254,8 +252,8 @@ Ip6SendFrame (
 VOID
 EFIAPI
 Ip6TimerTicking (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 #endif

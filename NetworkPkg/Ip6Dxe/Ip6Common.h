@@ -10,59 +10,59 @@
 #ifndef __EFI_IP6_COMMON_H__
 #define __EFI_IP6_COMMON_H__
 
-#define IP6_LINK_EQUAL(Mac1, Mac2) (CompareMem ((Mac1), (Mac2), sizeof (EFI_MAC_ADDRESS)) == 0)
+#define IP6_LINK_EQUAL(Mac1, Mac2)  (CompareMem ((Mac1), (Mac2), sizeof (EFI_MAC_ADDRESS)) == 0)
 
 //
 // Convert the Microsecond to second. IP transmit/receive time is
 // in the unit of microsecond. IP ticks once per second.
 //
-#define IP6_US_TO_SEC(Us)              (((Us) + 999999) / 1000000)
+#define IP6_US_TO_SEC(Us)  (((Us) + 999999) / 1000000)
 
-#define IP6_ETHER_PROTO                0x86DD
+#define IP6_ETHER_PROTO  0x86DD
 
-#define IP6_MAC_LEN                    6
-#define IP6_IF_ID_LEN                  8
+#define IP6_MAC_LEN    6
+#define IP6_IF_ID_LEN  8
 
-#define IP6_INTERFACE_LOCAL_SCOPE      1
-#define IP6_LINK_LOCAL_SCOPE           2
-#define IP6_SITE_LOCAL_SCOPE           5
+#define IP6_INTERFACE_LOCAL_SCOPE  1
+#define IP6_LINK_LOCAL_SCOPE       2
+#define IP6_SITE_LOCAL_SCOPE       5
 
-#define IP6_INFINIT_LIFETIME           0xFFFFFFFF
+#define IP6_INFINIT_LIFETIME  0xFFFFFFFF
 
-#define IP6_HOP_LIMIT                  255
+#define IP6_HOP_LIMIT  255
 //
 // Make it to 64 since all 54 bits are zero.
 //
-#define IP6_LINK_LOCAL_PREFIX_LENGTH   64
+#define IP6_LINK_LOCAL_PREFIX_LENGTH  64
 
-#define IP6_TIMER_INTERVAL_IN_MS       100
-#define IP6_ONE_SECOND_IN_MS           1000
+#define IP6_TIMER_INTERVAL_IN_MS  100
+#define IP6_ONE_SECOND_IN_MS      1000
 
 //
 // The packet is received as link level broadcast/multicast/promiscuous.
 //
-#define IP6_LINK_BROADCAST             0x00000001
-#define IP6_LINK_MULTICAST             0x00000002
-#define IP6_LINK_PROMISC               0x00000004
+#define IP6_LINK_BROADCAST  0x00000001
+#define IP6_LINK_MULTICAST  0x00000002
+#define IP6_LINK_PROMISC    0x00000004
 
-#define IP6_U_BIT                      0x02
+#define IP6_U_BIT  0x02
 
 typedef enum {
-  Ip6Promiscuous                     = 1,
+  Ip6Promiscuous = 1,
   Ip6Unicast,
   Ip6Multicast,
   Ip6AnyCast
 } IP6_ADDRESS_TYPE;
 
 typedef struct {
-  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
-  EFI_IPv6_ADDRESS              *Address;
+  EFI_SERVICE_BINDING_PROTOCOL    *ServiceBinding;
+  EFI_IPv6_ADDRESS                *Address;
 } IP6_DESTROY_CHILD_BY_ADDR_CALLBACK_CONTEXT;
 
-typedef struct _IP6_INTERFACE    IP6_INTERFACE;
-typedef struct _IP6_PROTOCOL     IP6_PROTOCOL;
-typedef struct _IP6_SERVICE      IP6_SERVICE;
-typedef struct _IP6_ADDRESS_INFO IP6_ADDRESS_INFO;
+typedef struct _IP6_INTERFACE     IP6_INTERFACE;
+typedef struct _IP6_PROTOCOL      IP6_PROTOCOL;
+typedef struct _IP6_SERVICE       IP6_SERVICE;
+typedef struct _IP6_ADDRESS_INFO  IP6_ADDRESS_INFO;
 
 /**
   Build a array of EFI_IP6_ADDRESS_INFO to be returned to the caller. The number
@@ -105,9 +105,9 @@ Ip6BuildEfiAddressList (
 **/
 EFI_STATUS
 Ip6SetToAllNodeMulticast (
-  IN  BOOLEAN          Router,
-  IN  UINT8            Scope,
-  OUT EFI_IPv6_ADDRESS *Ip6Addr
+  IN  BOOLEAN           Router,
+  IN  UINT8             Scope,
+  OUT EFI_IPv6_ADDRESS  *Ip6Addr
   );
 
 /**
@@ -123,7 +123,7 @@ Ip6SetToAllNodeMulticast (
 **/
 UINT8 *
 Ip6CreateInterfaceID (
-  IN OUT IP6_SERVICE         *IpSb
+  IN OUT IP6_SERVICE  *IpSb
   );
 
 /**
@@ -140,7 +140,7 @@ Ip6CreateInterfaceID (
 **/
 EFI_IPv6_ADDRESS *
 Ip6CreateLinkLocalAddr (
-  IN OUT IP6_SERVICE         *IpSb
+  IN OUT IP6_SERVICE  *IpSb
   );
 
 /**
@@ -155,8 +155,8 @@ Ip6CreateLinkLocalAddr (
 **/
 VOID
 Ip6CreateSNMulticastAddr (
-  IN EFI_IPv6_ADDRESS  *Ip6Addr,
-  OUT EFI_IPv6_ADDRESS *MulticastAddr
+  IN EFI_IPv6_ADDRESS   *Ip6Addr,
+  OUT EFI_IPv6_ADDRESS  *MulticastAddr
   );
 
 /**
@@ -170,7 +170,7 @@ Ip6CreateSNMulticastAddr (
 **/
 BOOLEAN
 Ip6IsSNMulticastAddr (
-  IN EFI_IPv6_ADDRESS *Ip6
+  IN EFI_IPv6_ADDRESS  *Ip6
   );
 
 /**
@@ -190,10 +190,10 @@ Ip6IsSNMulticastAddr (
 **/
 BOOLEAN
 Ip6IsOneOfSetAddress (
-  IN  IP6_SERVICE           *IpSb,
-  IN  EFI_IPv6_ADDRESS      *Address,
-  OUT IP6_INTERFACE         **Interface   OPTIONAL,
-  OUT IP6_ADDRESS_INFO      **AddressInfo OPTIONAL
+  IN  IP6_SERVICE       *IpSb,
+  IN  EFI_IPv6_ADDRESS  *Address,
+  OUT IP6_INTERFACE     **Interface   OPTIONAL,
+  OUT IP6_ADDRESS_INFO  **AddressInfo OPTIONAL
   );
 
 /**
@@ -212,7 +212,6 @@ Ip6IsValidLinkAddress (
   IN  EFI_MAC_ADDRESS  *LinkAddress
   );
 
-
 /**
   Copy the PrefixLength bits from Src to Dest.
 
@@ -223,9 +222,9 @@ Ip6IsValidLinkAddress (
 **/
 VOID
 Ip6CopyAddressByPrefix (
-  OUT EFI_IPv6_ADDRESS *Dest,
-  IN  EFI_IPv6_ADDRESS *Src,
-  IN  UINT8            PrefixLength
+  OUT EFI_IPv6_ADDRESS  *Dest,
+  IN  EFI_IPv6_ADDRESS  *Src,
+  IN  UINT8             PrefixLength
   );
 
 /**
@@ -237,8 +236,8 @@ Ip6CopyAddressByPrefix (
 **/
 VOID
 Ip6AddAddr (
-  IN OUT IP6_INTERFACE *IpIf,
-  IN IP6_ADDRESS_INFO  *AddrInfo
+  IN OUT IP6_INTERFACE  *IpIf,
+  IN IP6_ADDRESS_INFO   *AddrInfo
   );
 
 /**
@@ -289,9 +288,9 @@ Ip6RemoveAddr (
 **/
 EFI_STATUS
 Ip6GetMulticastMac (
-  IN  EFI_MANAGED_NETWORK_PROTOCOL *Mnp,
-  IN  EFI_IPv6_ADDRESS             *Multicast,
-  OUT EFI_MAC_ADDRESS              *Mac
+  IN  EFI_MANAGED_NETWORK_PROTOCOL  *Mnp,
+  IN  EFI_IPv6_ADDRESS              *Multicast,
+  OUT EFI_MAC_ADDRESS               *Mac
   );
 
 /**
@@ -306,7 +305,7 @@ Ip6GetMulticastMac (
 **/
 EFI_IP6_HEADER *
 Ip6NtohHead (
-  IN OUT EFI_IP6_HEADER *Head
+  IN OUT EFI_IP6_HEADER  *Head
   );
 
 #endif

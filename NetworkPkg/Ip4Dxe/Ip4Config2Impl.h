@@ -14,14 +14,14 @@
 #define IP4_CONFIG2_INSTANCE_SIGNATURE    SIGNATURE_32 ('I', 'P', 'C', '2')
 #define IP4_FORM_CALLBACK_INFO_SIGNATURE  SIGNATURE_32 ('I', 'F', 'C', 'I')
 
-#define IP4_CONFIG2_VARIABLE_ATTRIBUTE    (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS)
+#define IP4_CONFIG2_VARIABLE_ATTRIBUTE  (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS)
 
-#define DATA_ATTRIB_SIZE_FIXED              0x1
-#define DATA_ATTRIB_VOLATILE                0x2
+#define DATA_ATTRIB_SIZE_FIXED  0x1
+#define DATA_ATTRIB_VOLATILE    0x2
 
-#define DATA_ATTRIB_SET(Attrib, Bits)       (BOOLEAN)((Attrib) & (Bits))
-#define SET_DATA_ATTRIB(Attrib, Bits)       ((Attrib) |= (Bits))
-#define REMOVE_DATA_ATTRIB(Attrib, Bits)    ((Attrib) &= (~Bits))
+#define DATA_ATTRIB_SET(Attrib, Bits)     (BOOLEAN)((Attrib) & (Bits))
+#define SET_DATA_ATTRIB(Attrib, Bits)     ((Attrib) |= (Bits))
+#define REMOVE_DATA_ATTRIB(Attrib, Bits)  ((Attrib) &= (~Bits))
 
 typedef struct _IP4_CONFIG2_INSTANCE IP4_CONFIG2_INSTANCE;
 
@@ -69,9 +69,9 @@ typedef struct _IP4_CONFIG2_INSTANCE IP4_CONFIG2_INSTANCE;
 typedef
 EFI_STATUS
 (*IP4_CONFIG2_SET_DATA) (
-  IN IP4_CONFIG2_INSTANCE *Instance,
-  IN UINTN                DataSize,
-  IN VOID                 *Data
+  IN IP4_CONFIG2_INSTANCE  *Instance,
+  IN UINTN                 DataSize,
+  IN VOID                  *Data
   );
 
 /**
@@ -93,34 +93,34 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (*IP4_CONFIG2_GET_DATA) (
-  IN IP4_CONFIG2_INSTANCE *Instance,
-  IN OUT UINTN            *DataSize,
-  IN VOID                 *Data      OPTIONAL
+  IN IP4_CONFIG2_INSTANCE  *Instance,
+  IN OUT UINTN             *DataSize,
+  IN VOID                  *Data      OPTIONAL
   );
 
 typedef union {
-  VOID                                      *Ptr;
-  EFI_IP4_CONFIG2_INTERFACE_INFO            *IfInfo;
-  EFI_IP4_CONFIG2_POLICY                    *Policy;
-  EFI_IP4_CONFIG2_MANUAL_ADDRESS            *ManualAddress;
-  EFI_IPv4_ADDRESS                          *Gateway;
-  EFI_IPv4_ADDRESS                          *DnsServers;
+  VOID                              *Ptr;
+  EFI_IP4_CONFIG2_INTERFACE_INFO    *IfInfo;
+  EFI_IP4_CONFIG2_POLICY            *Policy;
+  EFI_IP4_CONFIG2_MANUAL_ADDRESS    *ManualAddress;
+  EFI_IPv4_ADDRESS                  *Gateway;
+  EFI_IPv4_ADDRESS                  *DnsServers;
 } IP4_CONFIG2_DATA;
 
 typedef struct {
-  IP4_CONFIG2_SET_DATA SetData;
-  IP4_CONFIG2_GET_DATA GetData;
-  EFI_STATUS           Status;
-  UINT8                Attribute;
-  NET_MAP              EventMap;
-  IP4_CONFIG2_DATA     Data;
-  UINTN                DataSize;
+  IP4_CONFIG2_SET_DATA    SetData;
+  IP4_CONFIG2_GET_DATA    GetData;
+  EFI_STATUS              Status;
+  UINT8                   Attribute;
+  NET_MAP                 EventMap;
+  IP4_CONFIG2_DATA        Data;
+  UINTN                   DataSize;
 } IP4_CONFIG2_DATA_ITEM;
 
 typedef struct {
-  UINT16                    Offset;
-  UINT32                    DataSize;
-  EFI_IP4_CONFIG2_DATA_TYPE DataType;
+  UINT16                       Offset;
+  UINT32                       DataSize;
+  EFI_IP4_CONFIG2_DATA_TYPE    DataType;
 } IP4_CONFIG2_DATA_RECORD;
 
 #pragma pack(1)
@@ -137,57 +137,57 @@ typedef struct {
 //  EFI_IPv4_ADDRESS                          DnsServers[];
 //
 typedef struct {
-  UINT16                  Checksum;
-  UINT16                  DataRecordCount;
-  IP4_CONFIG2_DATA_RECORD DataRecord[1];
+  UINT16                     Checksum;
+  UINT16                     DataRecordCount;
+  IP4_CONFIG2_DATA_RECORD    DataRecord[1];
 } IP4_CONFIG2_VARIABLE;
 
 #pragma pack()
 
 typedef struct {
-  EFI_IP4_CONFIG2_POLICY                   Policy;               ///< manual or automatic
-  EFI_IP4_CONFIG2_MANUAL_ADDRESS           *ManualAddress;       ///< IP addresses
-  UINT32                                   ManualAddressCount;   ///< IP addresses count
-  EFI_IPv4_ADDRESS                         *GatewayAddress;      ///< Gateway address
-  UINT32                                   GatewayAddressCount;  ///< Gateway address count
-  EFI_IPv4_ADDRESS                         *DnsAddress;          ///< DNS server address
-  UINT32                                   DnsAddressCount;      ///< DNS server address count
+  EFI_IP4_CONFIG2_POLICY            Policy;                      ///< manual or automatic
+  EFI_IP4_CONFIG2_MANUAL_ADDRESS    *ManualAddress;              ///< IP addresses
+  UINT32                            ManualAddressCount;          ///< IP addresses count
+  EFI_IPv4_ADDRESS                  *GatewayAddress;             ///< Gateway address
+  UINT32                            GatewayAddressCount;         ///< Gateway address count
+  EFI_IPv4_ADDRESS                  *DnsAddress;                 ///< DNS server address
+  UINT32                            DnsAddressCount;             ///< DNS server address count
 } IP4_CONFIG2_NVDATA;
 
 typedef struct _IP4_FORM_CALLBACK_INFO {
-  UINT32                           Signature;
-  EFI_HANDLE                       ChildHandle;
-  EFI_HII_CONFIG_ACCESS_PROTOCOL   HiiConfigAccessProtocol;
-  EFI_DEVICE_PATH_PROTOCOL         *HiiVendorDevicePath;
-  EFI_HII_HANDLE                   RegisteredHandle;
+  UINT32                            Signature;
+  EFI_HANDLE                        ChildHandle;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL    HiiConfigAccessProtocol;
+  EFI_DEVICE_PATH_PROTOCOL          *HiiVendorDevicePath;
+  EFI_HII_HANDLE                    RegisteredHandle;
 } IP4_FORM_CALLBACK_INFO;
 
 struct _IP4_CONFIG2_INSTANCE {
-  UINT32                                    Signature;
-  BOOLEAN                                   Configured;
-  LIST_ENTRY                                Link;
-  UINT16                                    IfIndex;
+  UINT32                            Signature;
+  BOOLEAN                           Configured;
+  LIST_ENTRY                        Link;
+  UINT16                            IfIndex;
 
-  EFI_IP4_CONFIG2_PROTOCOL                  Ip4Config2;
+  EFI_IP4_CONFIG2_PROTOCOL          Ip4Config2;
 
-  EFI_IP4_CONFIG2_INTERFACE_INFO            InterfaceInfo;
-  EFI_IP4_CONFIG2_POLICY                    Policy;
-  IP4_CONFIG2_DATA_ITEM                     DataItem[Ip4Config2DataTypeMaximum];
+  EFI_IP4_CONFIG2_INTERFACE_INFO    InterfaceInfo;
+  EFI_IP4_CONFIG2_POLICY            Policy;
+  IP4_CONFIG2_DATA_ITEM             DataItem[Ip4Config2DataTypeMaximum];
 
-  EFI_EVENT                                 Dhcp4SbNotifyEvent;
-  VOID                                      *Registration;
-  EFI_HANDLE                                Dhcp4Handle;
-  EFI_DHCP4_PROTOCOL                        *Dhcp4;
-  BOOLEAN                                   DhcpSuccess;
-  BOOLEAN                                   OtherInfoOnly;
-  EFI_EVENT                                 Dhcp4Event;
-  UINT32                                    FailedIaAddressCount;
-  EFI_IPv4_ADDRESS                          *DeclineAddress;
-  UINT32                                    DeclineAddressCount;
+  EFI_EVENT                         Dhcp4SbNotifyEvent;
+  VOID                              *Registration;
+  EFI_HANDLE                        Dhcp4Handle;
+  EFI_DHCP4_PROTOCOL                *Dhcp4;
+  BOOLEAN                           DhcpSuccess;
+  BOOLEAN                           OtherInfoOnly;
+  EFI_EVENT                         Dhcp4Event;
+  UINT32                            FailedIaAddressCount;
+  EFI_IPv4_ADDRESS                  *DeclineAddress;
+  UINT32                            DeclineAddressCount;
 
-  IP4_FORM_CALLBACK_INFO                    CallbackInfo;
+  IP4_FORM_CALLBACK_INFO            CallbackInfo;
 
-  IP4_CONFIG2_NVDATA                        Ip4NvData;
+  IP4_CONFIG2_NVDATA                Ip4NvData;
 };
 
 //
@@ -196,9 +196,9 @@ struct _IP4_CONFIG2_INSTANCE {
 //
 #pragma pack(1)
 typedef struct {
-  EFI_DHCP4_PACKET_OPTION Head;
-  UINT8                   Route;
-  UINT8                   Dns;
+  EFI_DHCP4_PACKET_OPTION    Head;
+  UINT8                      Route;
+  UINT8                      Dns;
 } IP4_CONFIG2_DHCP4_OPTION;
 #pragma pack()
 
@@ -218,8 +218,8 @@ typedef struct {
 **/
 EFI_STATUS
 Ip4Config2ReadConfigData (
-  IN     CHAR16               *VarName,
-  IN OUT IP4_CONFIG2_INSTANCE *Instance
+  IN     CHAR16                *VarName,
+  IN OUT IP4_CONFIG2_INSTANCE  *Instance
   );
 
 /**
@@ -235,7 +235,7 @@ Ip4Config2ReadConfigData (
 **/
 EFI_STATUS
 Ip4StartAutoConfig (
-  IN IP4_CONFIG2_INSTANCE   *Instance
+  IN IP4_CONFIG2_INSTANCE  *Instance
   );
 
 /**
@@ -273,8 +273,8 @@ Ip4Config2CleanInstance (
 VOID
 EFIAPI
 Ip4AutoReconfigCallBack (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**

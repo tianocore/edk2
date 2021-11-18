@@ -10,14 +10,14 @@
 #ifndef __EFI_IP6_MLD_H__
 #define __EFI_IP6_MLD_H__
 
-#define IP6_UNSOLICITED_REPORT_INTERVAL 10
+#define IP6_UNSOLICITED_REPORT_INTERVAL  10
 
 #pragma pack(1)
 typedef struct {
-  IP6_ICMP_HEAD           Head;
-  UINT16                  MaxRespDelay;
-  UINT16                  Reserved;
-  EFI_IPv6_ADDRESS        Group;
+  IP6_ICMP_HEAD       Head;
+  UINT16              MaxRespDelay;
+  UINT16              Reserved;
+  EFI_IPv6_ADDRESS    Group;
 } IP6_MLD_HEAD;
 #pragma pack()
 
@@ -28,12 +28,12 @@ typedef struct {
 // "idle listener" state.
 //
 typedef struct {
-  LIST_ENTRY              Link;
-  INTN                    RefCnt;
-  EFI_IPv6_ADDRESS        Address;
-  UINT32                  DelayTimer;
-  BOOLEAN                 SendByUs;
-  EFI_MAC_ADDRESS         Mac;
+  LIST_ENTRY          Link;
+  INTN                RefCnt;
+  EFI_IPv6_ADDRESS    Address;
+  UINT32              DelayTimer;
+  BOOLEAN             SendByUs;
+  EFI_MAC_ADDRESS     Mac;
 } IP6_MLD_GROUP;
 
 //
@@ -42,8 +42,8 @@ typedef struct {
 // connected network is v1 or v2.
 //
 typedef struct {
-  INTN                    Mldv1QuerySeen;
-  LIST_ENTRY              Groups;
+  INTN          Mldv1QuerySeen;
+  LIST_ENTRY    Groups;
 } IP6_MLD_SERVICE_DATA;
 
 /**
@@ -57,8 +57,8 @@ typedef struct {
 **/
 IP6_MLD_GROUP *
 Ip6FindMldEntry (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IPv6_ADDRESS       *MulticastAddr
+  IN IP6_SERVICE       *IpSb,
+  IN EFI_IPv6_ADDRESS  *MulticastAddr
   );
 
 /**
@@ -74,7 +74,7 @@ Ip6FindMldEntry (
 **/
 EFI_STATUS
 Ip6InitMld (
-  IN IP6_SERVICE            *IpSb
+  IN IP6_SERVICE  *IpSb
   );
 
 /**
@@ -91,9 +91,9 @@ Ip6InitMld (
 **/
 EFI_STATUS
 Ip6JoinGroup (
-  IN IP6_SERVICE            *IpSb,
-  IN IP6_INTERFACE          *Interface,
-  IN EFI_IPv6_ADDRESS       *Address
+  IN IP6_SERVICE       *IpSb,
+  IN IP6_INTERFACE     *Interface,
+  IN EFI_IPv6_ADDRESS  *Address
   );
 
 /**
@@ -109,8 +109,8 @@ Ip6JoinGroup (
 **/
 EFI_STATUS
 Ip6LeaveGroup (
- IN IP6_SERVICE            *IpSb,
- IN EFI_IPv6_ADDRESS       *Address
+  IN IP6_SERVICE       *IpSb,
+  IN EFI_IPv6_ADDRESS  *Address
   );
 
 /**
@@ -131,9 +131,9 @@ Ip6LeaveGroup (
 **/
 EFI_STATUS
 Ip6Groups (
-  IN IP6_PROTOCOL           *IpInstance,
-  IN BOOLEAN                JoinFlag,
-  IN EFI_IPv6_ADDRESS       *GroupAddress       OPTIONAL
+  IN IP6_PROTOCOL      *IpInstance,
+  IN BOOLEAN           JoinFlag,
+  IN EFI_IPv6_ADDRESS  *GroupAddress       OPTIONAL
   );
 
 /**
@@ -151,9 +151,9 @@ Ip6Groups (
 **/
 EFI_STATUS
 Ip6ProcessMldQuery (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IP6_HEADER         *Head,
-  IN NET_BUF                *Packet
+  IN IP6_SERVICE     *IpSb,
+  IN EFI_IP6_HEADER  *Head,
+  IN NET_BUF         *Packet
   );
 
 /**
@@ -170,11 +170,10 @@ Ip6ProcessMldQuery (
 **/
 EFI_STATUS
 Ip6ProcessMldReport (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IP6_HEADER         *Head,
-  IN NET_BUF                *Packet
+  IN IP6_SERVICE     *IpSb,
+  IN EFI_IP6_HEADER  *Head,
+  IN NET_BUF         *Packet
   );
-
 
 /**
   The heartbeat timer of the MLD module. It sends out solicited MLD report when
@@ -185,8 +184,7 @@ Ip6ProcessMldReport (
 **/
 VOID
 Ip6MldTimerTicking (
-  IN IP6_SERVICE            *IpSb
+  IN IP6_SERVICE  *IpSb
   );
 
 #endif
-

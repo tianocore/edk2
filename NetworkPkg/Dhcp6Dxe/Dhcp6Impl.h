@@ -10,7 +10,6 @@
 #ifndef __EFI_DHCP6_IMPL_H__
 #define __EFI_DHCP6_IMPL_H__
 
-
 #include <Uefi.h>
 
 #include <IndustryStandard/Dhcp.h>
@@ -33,12 +32,11 @@
 #include <Library/PrintLib.h>
 #include <Guid/ZeroGuid.h>
 
-
-typedef struct _DHCP6_IA_CB    DHCP6_IA_CB;
-typedef struct _DHCP6_INF_CB   DHCP6_INF_CB;
-typedef struct _DHCP6_TX_CB    DHCP6_TX_CB;
-typedef struct _DHCP6_SERVICE  DHCP6_SERVICE;
-typedef struct _DHCP6_INSTANCE DHCP6_INSTANCE;
+typedef struct _DHCP6_IA_CB     DHCP6_IA_CB;
+typedef struct _DHCP6_INF_CB    DHCP6_INF_CB;
+typedef struct _DHCP6_TX_CB     DHCP6_TX_CB;
+typedef struct _DHCP6_SERVICE   DHCP6_SERVICE;
+typedef struct _DHCP6_INSTANCE  DHCP6_INSTANCE;
 
 #include "Dhcp6Utility.h"
 #include "Dhcp6Io.h"
@@ -47,104 +45,104 @@ typedef struct _DHCP6_INSTANCE DHCP6_INSTANCE;
 #define DHCP6_SERVICE_SIGNATURE   SIGNATURE_32 ('D', 'H', '6', 'S')
 #define DHCP6_INSTANCE_SIGNATURE  SIGNATURE_32 ('D', 'H', '6', 'I')
 
-#define DHCP6_PACKET_ALL          0
-#define DHCP6_PACKET_STATEFUL     1
-#define DHCP6_PACKET_STATELESS    2
+#define DHCP6_PACKET_ALL        0
+#define DHCP6_PACKET_STATEFUL   1
+#define DHCP6_PACKET_STATELESS  2
 
-#define DHCP6_BASE_PACKET_SIZE    1024
+#define DHCP6_BASE_PACKET_SIZE  1024
 
-#define DHCP6_PORT_CLIENT         546
-#define DHCP6_PORT_SERVER         547
+#define DHCP6_PORT_CLIENT  546
+#define DHCP6_PORT_SERVER  547
 
-#define DHCP_CHECK_MEDIA_WAITING_TIME    EFI_TIMER_PERIOD_SECONDS(20)
+#define DHCP_CHECK_MEDIA_WAITING_TIME  EFI_TIMER_PERIOD_SECONDS(20)
 
-#define DHCP6_INSTANCE_FROM_THIS(Instance) CR ((Instance), DHCP6_INSTANCE, Dhcp6, DHCP6_INSTANCE_SIGNATURE)
-#define DHCP6_SERVICE_FROM_THIS(Service)   CR ((Service), DHCP6_SERVICE, ServiceBinding, DHCP6_SERVICE_SIGNATURE)
+#define DHCP6_INSTANCE_FROM_THIS(Instance)  CR ((Instance), DHCP6_INSTANCE, Dhcp6, DHCP6_INSTANCE_SIGNATURE)
+#define DHCP6_SERVICE_FROM_THIS(Service)    CR ((Service), DHCP6_SERVICE, ServiceBinding, DHCP6_SERVICE_SIGNATURE)
 
-extern EFI_IPv6_ADDRESS           mAllDhcpRelayAndServersAddress;
-extern EFI_DHCP6_PROTOCOL         gDhcp6ProtocolTemplate;
+extern EFI_IPv6_ADDRESS    mAllDhcpRelayAndServersAddress;
+extern EFI_DHCP6_PROTOCOL  gDhcp6ProtocolTemplate;
 
 //
 // Control block for each IA.
 //
 struct _DHCP6_IA_CB {
-  EFI_DHCP6_IA                  *Ia;
-  UINT32                        T1;
-  UINT32                        T2;
-  UINT32                        AllExpireTime;
-  UINT32                        LeaseTime;
+  EFI_DHCP6_IA    *Ia;
+  UINT32          T1;
+  UINT32          T2;
+  UINT32          AllExpireTime;
+  UINT32          LeaseTime;
 };
 
 //
 // Control block for each transmitted message.
 //
 struct _DHCP6_TX_CB {
-  LIST_ENTRY                    Link;
-  UINT32                        Xid;
-  EFI_DHCP6_PACKET              *TxPacket;
-  EFI_DHCP6_RETRANSMISSION      RetryCtl;
-  UINT32                        RetryCnt;
-  UINT32                        RetryExp;
-  UINT32                        RetryLos;
-  UINT32                        TickTime;
-  UINT16                        *Elapsed;
-  BOOLEAN                       SolicitRetry;
+  LIST_ENTRY                  Link;
+  UINT32                      Xid;
+  EFI_DHCP6_PACKET            *TxPacket;
+  EFI_DHCP6_RETRANSMISSION    RetryCtl;
+  UINT32                      RetryCnt;
+  UINT32                      RetryExp;
+  UINT32                      RetryLos;
+  UINT32                      TickTime;
+  UINT16                      *Elapsed;
+  BOOLEAN                     SolicitRetry;
 };
 
 //
 // Control block for each info-request message.
 //
 struct _DHCP6_INF_CB {
-  LIST_ENTRY                    Link;
-  UINT32                        Xid;
-  EFI_DHCP6_INFO_CALLBACK       ReplyCallback;
-  VOID                          *CallbackContext;
-  EFI_EVENT                     TimeoutEvent;
+  LIST_ENTRY                 Link;
+  UINT32                     Xid;
+  EFI_DHCP6_INFO_CALLBACK    ReplyCallback;
+  VOID                       *CallbackContext;
+  EFI_EVENT                  TimeoutEvent;
 };
 
 //
 // Control block for Dhcp6 instance, it's per configuration data.
 //
 struct _DHCP6_INSTANCE {
-  UINT32                        Signature;
-  EFI_HANDLE                    Handle;
-  DHCP6_SERVICE                 *Service;
-  LIST_ENTRY                    Link;
-  EFI_DHCP6_PROTOCOL            Dhcp6;
-  EFI_EVENT                     Timer;
-  EFI_DHCP6_CONFIG_DATA         *Config;
-  EFI_DHCP6_IA                  *CacheIa;
-  DHCP6_IA_CB                   IaCb;
-  LIST_ENTRY                    TxList;
-  LIST_ENTRY                    InfList;
-  EFI_DHCP6_PACKET              *AdSelect;
-  UINT8                         AdPref;
-  EFI_IPv6_ADDRESS              *Unicast;
-  volatile EFI_STATUS           UdpSts;
-  BOOLEAN                       InDestroy;
-  BOOLEAN                       MediaPresent;
+  UINT32                   Signature;
+  EFI_HANDLE               Handle;
+  DHCP6_SERVICE            *Service;
+  LIST_ENTRY               Link;
+  EFI_DHCP6_PROTOCOL       Dhcp6;
+  EFI_EVENT                Timer;
+  EFI_DHCP6_CONFIG_DATA    *Config;
+  EFI_DHCP6_IA             *CacheIa;
+  DHCP6_IA_CB              IaCb;
+  LIST_ENTRY               TxList;
+  LIST_ENTRY               InfList;
+  EFI_DHCP6_PACKET         *AdSelect;
+  UINT8                    AdPref;
+  EFI_IPv6_ADDRESS         *Unicast;
+  volatile EFI_STATUS      UdpSts;
+  BOOLEAN                  InDestroy;
+  BOOLEAN                  MediaPresent;
   //
   // StartTime is used to calculate the 'elapsed-time' option. Refer to RFC3315,
   // the elapsed-time is amount of time since the client began its current DHCP transaction.
   //
-  UINT64                        StartTime;
+  UINT64                   StartTime;
 };
 
 //
 // Control block for Dhcp6 service, it's per Nic handle.
 //
 struct _DHCP6_SERVICE {
-  UINT32                        Signature;
-  EFI_HANDLE                    Controller;
-  EFI_HANDLE                    Image;
-  EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
-  EFI_SIMPLE_NETWORK_PROTOCOL   *Snp;
-  EFI_IP6_CONFIG_PROTOCOL       *Ip6Cfg;
-  EFI_DHCP6_DUID                *ClientId;
-  UDP_IO                        *UdpIo;
-  UINT32                        Xid;
-  LIST_ENTRY                    Child;
-  UINTN                         NumOfChild;
+  UINT32                          Signature;
+  EFI_HANDLE                      Controller;
+  EFI_HANDLE                      Image;
+  EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
+  EFI_SIMPLE_NETWORK_PROTOCOL     *Snp;
+  EFI_IP6_CONFIG_PROTOCOL         *Ip6Cfg;
+  EFI_DHCP6_DUID                  *ClientId;
+  UDP_IO                          *UdpIo;
+  UINT32                          Xid;
+  LIST_ENTRY                      Child;
+  UINTN                           NumOfChild;
 };
 
 /**
@@ -179,7 +177,7 @@ struct _DHCP6_SERVICE {
 EFI_STATUS
 EFIAPI
 EfiDhcp6Start (
-  IN EFI_DHCP6_PROTOCOL        *This
+  IN EFI_DHCP6_PROTOCOL  *This
   );
 
 /**
@@ -200,7 +198,7 @@ EfiDhcp6Start (
 EFI_STATUS
 EFIAPI
 EfiDhcp6Stop (
-  IN EFI_DHCP6_PROTOCOL        *This
+  IN EFI_DHCP6_PROTOCOL  *This
   );
 
 /**
@@ -222,9 +220,9 @@ EfiDhcp6Stop (
 EFI_STATUS
 EFIAPI
 EfiDhcp6GetModeData (
-  IN  EFI_DHCP6_PROTOCOL       *This,
-  OUT EFI_DHCP6_MODE_DATA      *Dhcp6ModeData      OPTIONAL,
-  OUT EFI_DHCP6_CONFIG_DATA    *Dhcp6ConfigData    OPTIONAL
+  IN  EFI_DHCP6_PROTOCOL     *This,
+  OUT EFI_DHCP6_MODE_DATA    *Dhcp6ModeData      OPTIONAL,
+  OUT EFI_DHCP6_CONFIG_DATA  *Dhcp6ConfigData    OPTIONAL
   );
 
 /**
@@ -259,8 +257,8 @@ EfiDhcp6GetModeData (
 EFI_STATUS
 EFIAPI
 EfiDhcp6Configure (
-  IN EFI_DHCP6_PROTOCOL        *This,
-  IN EFI_DHCP6_CONFIG_DATA     *Dhcp6CfgData    OPTIONAL
+  IN EFI_DHCP6_PROTOCOL     *This,
+  IN EFI_DHCP6_CONFIG_DATA  *Dhcp6CfgData    OPTIONAL
   );
 
 /**
@@ -366,8 +364,8 @@ EfiDhcp6InfoRequest (
 EFI_STATUS
 EFIAPI
 EfiDhcp6RenewRebind (
-  IN EFI_DHCP6_PROTOCOL        *This,
-  IN BOOLEAN                   RebindRequest
+  IN EFI_DHCP6_PROTOCOL  *This,
+  IN BOOLEAN             RebindRequest
   );
 
 /**
@@ -405,9 +403,9 @@ EfiDhcp6RenewRebind (
 EFI_STATUS
 EFIAPI
 EfiDhcp6Decline (
-  IN EFI_DHCP6_PROTOCOL        *This,
-  IN UINT32                    AddressCount,
-  IN EFI_IPv6_ADDRESS          *Addresses
+  IN EFI_DHCP6_PROTOCOL  *This,
+  IN UINT32              AddressCount,
+  IN EFI_IPv6_ADDRESS    *Addresses
   );
 
 /**
@@ -446,9 +444,9 @@ EfiDhcp6Decline (
 EFI_STATUS
 EFIAPI
 EfiDhcp6Release (
-  IN EFI_DHCP6_PROTOCOL        *This,
-  IN UINT32                    AddressCount,
-  IN EFI_IPv6_ADDRESS          *Addresses
+  IN EFI_DHCP6_PROTOCOL  *This,
+  IN UINT32              AddressCount,
+  IN EFI_IPv6_ADDRESS    *Addresses
   );
 
 /**

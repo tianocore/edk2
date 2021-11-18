@@ -14,6 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0xd79df6b0, 0xef44, 0x43bd, {0x97, 0x97, 0x43, 0xe9, 0x3b, 0xcf, 0x5f, 0xa8 } \
   }
 
-extern EFI_GUID gVlanConfigFormSetGuid;
+extern EFI_GUID  gVlanConfigFormSetGuid;
 
 #endif
