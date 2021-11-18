@@ -51,15 +51,13 @@
 **/
 EFI_STATUS
 GetSignerCertificate (
-  IN CONST VOID *CertChain,
+  IN CONST VOID  *CertChain,
   OUT VOID       **SignerCert
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_NOT_READY;
-
 }
-
 
 /**
   Determines if the specified EKU represented in ASN1 form is present
@@ -77,13 +75,12 @@ GetSignerCertificate (
 EFI_STATUS
 IsEkuInCertificate (
   IN CONST VOID  *Cert,
-  IN VOID *Asn1ToFind
+  IN VOID        *Asn1ToFind
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_NOT_READY;
 }
-
 
 /**
   Determines if the specified EKUs are present in a signing certificate.
@@ -99,14 +96,14 @@ IsEkuInCertificate (
   @retval EFI_NOT_FOUND             One or more EKU's were not found in the signature.
 **/
 EFI_STATUS
-CheckEKUs(
-  IN CONST VOID     *SignerCert,
-  IN CONST CHAR8    *RequiredEKUs[],
-  IN CONST UINT32   RequiredEKUsSize,
-  IN BOOLEAN        RequireAllPresent
+CheckEKUs (
+  IN CONST VOID    *SignerCert,
+  IN CONST CHAR8   *RequiredEKUs[],
+  IN CONST UINT32  RequiredEKUsSize,
+  IN BOOLEAN       RequireAllPresent
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_NOT_READY;
 }
 
@@ -143,14 +140,13 @@ CheckEKUs(
 EFI_STATUS
 EFIAPI
 VerifyEKUsInPkcs7Signature (
-  IN CONST UINT8    *Pkcs7Signature,
-  IN CONST UINT32   SignatureSize,
-  IN CONST CHAR8    *RequiredEKUs[],
-  IN CONST UINT32   RequiredEKUsSize,
-  IN BOOLEAN        RequireAllPresent
+  IN CONST UINT8   *Pkcs7Signature,
+  IN CONST UINT32  SignatureSize,
+  IN CONST CHAR8   *RequiredEKUs[],
+  IN CONST UINT32  RequiredEKUsSize,
+  IN BOOLEAN       RequireAllPresent
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_NOT_READY;
 }
-

@@ -26,7 +26,7 @@ DhNew (
   //
   // Allocates & Initializes DH Context by OpenSSL DH_new()
   //
-  return (VOID *) DH_new ();
+  return (VOID *)DH_new ();
 }
 
 /**
@@ -46,7 +46,7 @@ DhFree (
   //
   // Free OpenSSL DH Context
   //
-  DH_free ((DH *) DhContext);
+  DH_free ((DH *)DhContext);
 }
 
 /**
@@ -80,21 +80,21 @@ DhGenerateParameter (
   OUT     UINT8  *Prime
   )
 {
-  BOOLEAN RetVal;
-  BIGNUM  *BnP;
+  BOOLEAN  RetVal;
+  BIGNUM   *BnP;
 
   //
   // Check input parameters.
   //
-  if (DhContext == NULL || Prime == NULL || PrimeLength > INT_MAX) {
+  if ((DhContext == NULL) || (Prime == NULL) || (PrimeLength > INT_MAX)) {
     return FALSE;
   }
 
-  if (Generator != DH_GENERATOR_2 && Generator != DH_GENERATOR_5) {
+  if ((Generator != DH_GENERATOR_2) && (Generator != DH_GENERATOR_5)) {
     return FALSE;
   }
 
-  RetVal = (BOOLEAN) DH_generate_parameters_ex (DhContext, (UINT32) PrimeLength, (UINT32) Generator, NULL);
+  RetVal = (BOOLEAN)DH_generate_parameters_ex (DhContext, (UINT32)PrimeLength, (UINT32)Generator, NULL);
   if (!RetVal) {
     return FALSE;
   }
@@ -142,11 +142,11 @@ DhSetParameter (
   //
   // Check input parameters.
   //
-  if (DhContext == NULL || Prime == NULL || PrimeLength > INT_MAX) {
+  if ((DhContext == NULL) || (Prime == NULL) || (PrimeLength > INT_MAX)) {
     return FALSE;
   }
 
-  if (Generator != DH_GENERATOR_2 && Generator != DH_GENERATOR_5) {
+  if ((Generator != DH_GENERATOR_2) && (Generator != DH_GENERATOR_5)) {
     return FALSE;
   }
 
@@ -199,29 +199,29 @@ DhGenerateKey (
   IN OUT  UINTN  *PublicKeySize
   )
 {
-  BOOLEAN RetVal;
-  DH      *Dh;
-  BIGNUM  *DhPubKey;
-  INTN    Size;
+  BOOLEAN  RetVal;
+  DH       *Dh;
+  BIGNUM   *DhPubKey;
+  INTN     Size;
 
   //
   // Check input parameters.
   //
-  if (DhContext == NULL || PublicKeySize == NULL) {
+  if ((DhContext == NULL) || (PublicKeySize == NULL)) {
     return FALSE;
   }
 
-  if (PublicKey == NULL && *PublicKeySize != 0) {
+  if ((PublicKey == NULL) && (*PublicKeySize != 0)) {
     return FALSE;
   }
 
-  Dh = (DH *) DhContext;
+  Dh = (DH *)DhContext;
 
-  RetVal = (BOOLEAN) DH_generate_key (DhContext);
+  RetVal = (BOOLEAN)DH_generate_key (DhContext);
   if (RetVal) {
     DH_get0_key (Dh, (const BIGNUM **)&DhPubKey, NULL);
     Size = BN_num_bytes (DhPubKey);
-    if ((Size > 0) && (*PublicKeySize < (UINTN) Size)) {
+    if ((Size > 0) && (*PublicKeySize < (UINTN)Size)) {
       *PublicKeySize = Size;
       return FALSE;
     }
@@ -229,6 +229,7 @@ DhGenerateKey (
     if (PublicKey != NULL) {
       BN_bn2bin (DhPubKey, PublicKey);
     }
+
     *PublicKeySize = Size;
   }
 
@@ -275,7 +276,7 @@ DhComputeKey (
   //
   // Check input parameters.
   //
-  if (DhContext == NULL || PeerPublicKey == NULL || KeySize == NULL || Key == NULL) {
+  if ((DhContext == NULL) || (PeerPublicKey == NULL) || (KeySize == NULL) || (Key == NULL)) {
     return FALSE;
   }
 
@@ -283,7 +284,7 @@ DhComputeKey (
     return FALSE;
   }
 
-  Bn = BN_bin2bn (PeerPublicKey, (UINT32) PeerPublicKeySize, NULL);
+  Bn = BN_bin2bn (PeerPublicKey, (UINT32)PeerPublicKeySize, NULL);
   if (Bn == NULL) {
     return FALSE;
   }
@@ -294,7 +295,7 @@ DhComputeKey (
     return FALSE;
   }
 
-  if (*KeySize < (UINTN) Size) {
+  if (*KeySize < (UINTN)Size) {
     *KeySize = Size;
     BN_free (Bn);
     return FALSE;
