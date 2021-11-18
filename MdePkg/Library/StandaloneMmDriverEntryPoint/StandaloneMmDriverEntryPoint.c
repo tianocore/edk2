@@ -31,7 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 _DriverUnloadHandler (
-  EFI_HANDLE ImageHandle
+  EFI_HANDLE  ImageHandle
   )
 {
   EFI_STATUS  Status;
@@ -81,8 +81,8 @@ _DriverUnloadHandler (
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (
-  IN EFI_HANDLE               ImageHandle,
-  IN IN EFI_MM_SYSTEM_TABLE   *MmSystemTable
+  IN EFI_HANDLE              ImageHandle,
+  IN IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
   )
 {
   EFI_STATUS                 Status;

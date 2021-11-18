@@ -23,11 +23,11 @@
 /// a number of base address allocation structures.
 ///
 typedef struct {
-  UINT64  BaseAddress;
-  UINT16  PciSegmentGroupNumber;
-  UINT8   StartBusNumber;
-  UINT8   EndBusNumber;
-  UINT32  Reserved;
+  UINT64    BaseAddress;
+  UINT16    PciSegmentGroupNumber;
+  UINT8     StartBusNumber;
+  UINT8     EndBusNumber;
+  UINT32    Reserved;
 } EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE;
 
 ///
@@ -35,8 +35,8 @@ typedef struct {
 /// must be defined in a platform specific manner.
 ///
 typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER                       Header;
-  UINT64                                            Reserved;
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  UINT64                         Reserved;
 } EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER;
 
 ///

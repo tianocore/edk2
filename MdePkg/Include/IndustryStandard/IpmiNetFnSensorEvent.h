@@ -20,7 +20,7 @@
 //
 // Net function definition for Sensor command
 //
-#define IPMI_NETFN_SENSOR_EVENT 0x04
+#define IPMI_NETFN_SENSOR_EVENT  0x04
 
 //
 // All Sensor commands and their structure definitions to follow here
@@ -29,17 +29,17 @@
 //
 //  Definitions for Send Platform Event Message command
 //
-#define IPMI_SENSOR_PLATFORM_EVENT_MESSAGE   0x02
+#define IPMI_SENSOR_PLATFORM_EVENT_MESSAGE  0x02
 
 typedef struct {
-  UINT8   GeneratorId;
-  UINT8   EvMRevision;
-  UINT8   SensorType;
-  UINT8   SensorNumber;
-  UINT8   EventDirType;
-  UINT8   OEMEvData1;
-  UINT8   OEMEvData2;
-  UINT8   OEMEvData3;
+  UINT8    GeneratorId;
+  UINT8    EvMRevision;
+  UINT8    SensorType;
+  UINT8    SensorNumber;
+  UINT8    EventDirType;
+  UINT8    OEMEvData1;
+  UINT8    OEMEvData2;
+  UINT8    OEMEvData3;
 } IPMI_PLATFORM_EVENT_MESSAGE_DATA_REQUEST;
 
 #pragma pack()

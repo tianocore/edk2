@@ -16,7 +16,6 @@
 
 #include "UefiDevicePathLib.h"
 
-
 /**
   Retrieves the device path protocol from a handle.
 
@@ -33,7 +32,7 @@
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 DevicePathFromHandle (
-  IN EFI_HANDLE                      Handle
+  IN EFI_HANDLE  Handle
   )
 {
   return NULL;

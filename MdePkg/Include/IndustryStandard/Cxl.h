@@ -16,7 +16,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // CXL assigned new Vendor ID
 //
-#define CXL_DVSEC_VENDOR_ID                                             0x1E98
+#define CXL_DVSEC_VENDOR_ID  0x1E98
 
 #endif
-

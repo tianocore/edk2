@@ -41,10 +41,10 @@ typedef struct _EFI_RESET_NOTIFICATION_PROTOCOL EFI_RESET_NOTIFICATION_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_REGISTER_RESET_NOTIFY) (
+(EFIAPI *EFI_REGISTER_RESET_NOTIFY)(
   IN EFI_RESET_NOTIFICATION_PROTOCOL *This,
   IN EFI_RESET_SYSTEM                ResetFunction
-);
+  );
 
 /**
   Unregister a notification function.
@@ -63,18 +63,16 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_UNREGISTER_RESET_NOTIFY) (
+(EFIAPI *EFI_UNREGISTER_RESET_NOTIFY)(
   IN EFI_RESET_NOTIFICATION_PROTOCOL *This,
   IN EFI_RESET_SYSTEM                ResetFunction
-);
+  );
 
 struct _EFI_RESET_NOTIFICATION_PROTOCOL {
-  EFI_REGISTER_RESET_NOTIFY   RegisterResetNotify;
-  EFI_UNREGISTER_RESET_NOTIFY UnregisterResetNotify;
+  EFI_REGISTER_RESET_NOTIFY      RegisterResetNotify;
+  EFI_UNREGISTER_RESET_NOTIFY    UnregisterResetNotify;
 };
 
-
-extern EFI_GUID gEfiResetNotificationProtocolGuid;
+extern EFI_GUID  gEfiResetNotificationProtocolGuid;
 
 #endif
-
