@@ -28,21 +28,21 @@
 //   register,
 // - followed by distinguished bitmasks or values in the register.
 //
-#define QEMU_CPUHP_R_CMD_DATA2               0x0
+#define QEMU_CPUHP_R_CMD_DATA2  0x0
 
-#define QEMU_CPUHP_R_CPU_STAT                0x4
-#define QEMU_CPUHP_STAT_ENABLED                BIT0
-#define QEMU_CPUHP_STAT_INSERT                 BIT1
-#define QEMU_CPUHP_STAT_REMOVE                 BIT2
-#define QEMU_CPUHP_STAT_EJECT                  BIT3
-#define QEMU_CPUHP_STAT_FW_REMOVE              BIT4
+#define QEMU_CPUHP_R_CPU_STAT      0x4
+#define QEMU_CPUHP_STAT_ENABLED    BIT0
+#define QEMU_CPUHP_STAT_INSERT     BIT1
+#define QEMU_CPUHP_STAT_REMOVE     BIT2
+#define QEMU_CPUHP_STAT_EJECT      BIT3
+#define QEMU_CPUHP_STAT_FW_REMOVE  BIT4
 
-#define QEMU_CPUHP_RW_CMD_DATA               0x8
+#define QEMU_CPUHP_RW_CMD_DATA  0x8
 
-#define QEMU_CPUHP_W_CPU_SEL                 0x0
+#define QEMU_CPUHP_W_CPU_SEL  0x0
 
-#define QEMU_CPUHP_W_CMD                     0x5
-#define QEMU_CPUHP_CMD_GET_PENDING             0x0
-#define QEMU_CPUHP_CMD_GET_ARCH_ID             0x3
+#define QEMU_CPUHP_W_CMD            0x5
+#define QEMU_CPUHP_CMD_GET_PENDING  0x0
+#define QEMU_CPUHP_CMD_GET_ARCH_ID  0x3
 
 #endif // QEMU_CPU_HOTPLUG_H_

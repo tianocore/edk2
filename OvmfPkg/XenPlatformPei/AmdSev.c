@@ -28,8 +28,8 @@ AmdSevInitialize (
   VOID
   )
 {
-  UINT64                            EncryptionMask;
-  RETURN_STATUS                     PcdStatus;
+  UINT64         EncryptionMask;
+  RETURN_STATUS  PcdStatus;
 
   //
   // Check if SEV is enabled

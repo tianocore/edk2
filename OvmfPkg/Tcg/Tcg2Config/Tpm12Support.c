@@ -14,8 +14,8 @@
 
 #pragma pack (1)
 typedef struct {
-  TPM_RSP_COMMAND_HDR   Hdr;
-  TPM_CURRENT_TICKS     CurrentTicks;
+  TPM_RSP_COMMAND_HDR    Hdr;
+  TPM_CURRENT_TICKS      CurrentTicks;
 } TPM_RSP_GET_TICKS;
 #pragma pack ()
 
@@ -39,13 +39,17 @@ TestTpm12 (
   TPM_RSP_GET_TICKS    Response;
   UINT32               Length;
 
-  Command.tag       = SwapBytes16 (TPM_TAG_RQU_COMMAND);
+  Command.tag = SwapBytes16 (TPM_TAG_RQU_COMMAND);
   Command.paramSize = SwapBytes32 (sizeof (Command));
   Command.ordinal   = SwapBytes32 (TPM_ORD_GetTicks);
 
   Length = sizeof (Response);
-  Status = Tpm12SubmitCommand (sizeof (Command), (UINT8 *)&Command, &Length,
-             (UINT8 *)&Response);
+  Status = Tpm12SubmitCommand (
+             sizeof (Command),
+             (UINT8 *)&Command,
+             &Length,
+             (UINT8 *)&Response
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -68,7 +72,7 @@ InternalTpm12Detect (
   VOID
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = Tpm12RequestUseTpm ();
   if (EFI_ERROR (Status)) {

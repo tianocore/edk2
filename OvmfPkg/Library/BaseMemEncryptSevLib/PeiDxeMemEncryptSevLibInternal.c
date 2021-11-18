@@ -34,22 +34,22 @@
 RETURN_STATUS
 EFIAPI
 MemEncryptSevLocateInitialSmramSaveStateMapPages (
-  OUT UINTN *BaseAddress,
-  OUT UINTN *NumberOfPages
+  OUT UINTN  *BaseAddress,
+  OUT UINTN  *NumberOfPages
   )
 {
-  UINTN MapStart;
-  UINTN MapEnd;
-  UINTN MapPagesStart; // MapStart rounded down to page boundary
-  UINTN MapPagesEnd;   // MapEnd rounded up to page boundary
-  UINTN MapPagesSize;  // difference between MapPagesStart and MapPagesEnd
+  UINTN  MapStart;
+  UINTN  MapEnd;
+  UINTN  MapPagesStart; // MapStart rounded down to page boundary
+  UINTN  MapPagesEnd;   // MapEnd rounded up to page boundary
+  UINTN  MapPagesSize;  // difference between MapPagesStart and MapPagesEnd
 
   if (!FeaturePcdGet (PcdSmmSmramRequire)) {
     return RETURN_UNSUPPORTED;
   }
 
-  MapStart      = SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET;
-  MapEnd        = MapStart + sizeof (QEMU_SMRAM_SAVE_STATE_MAP);
+  MapStart = SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET;
+  MapEnd   = MapStart + sizeof (QEMU_SMRAM_SAVE_STATE_MAP);
   MapPagesStart = MapStart & ~(UINTN)EFI_PAGE_MASK;
   MapPagesEnd   = ALIGN_VALUE (MapEnd, EFI_PAGE_SIZE);
   MapPagesSize  = MapPagesEnd - MapPagesStart;

@@ -27,12 +27,12 @@ AcpiTimerLibConstructor (
   VOID
   )
 {
-  UINT16 HostBridgeDevId;
-  UINTN Pmba;
-  UINT32 PmbaAndVal;
-  UINT32 PmbaOrVal;
-  UINTN AcpiCtlReg;
-  UINT8 AcpiEnBit;
+  UINT16  HostBridgeDevId;
+  UINTN   Pmba;
+  UINT32  PmbaAndVal;
+  UINT32  PmbaOrVal;
+  UINTN   AcpiCtlReg;
+  UINT8   AcpiEnBit;
 
   //
   // Query Host Bridge DID to determine platform type
@@ -40,22 +40,26 @@ AcpiTimerLibConstructor (
   HostBridgeDevId = PciRead16 (OVMF_HOSTBRIDGE_DID);
   switch (HostBridgeDevId) {
     case INTEL_82441_DEVICE_ID:
-      Pmba       = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
+      Pmba = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMBA);
       PmbaAndVal = ~(UINT32)PIIX4_PMBA_MASK;
       PmbaOrVal  = PIIX4_PMBA_VALUE;
       AcpiCtlReg = POWER_MGMT_REGISTER_PIIX4 (PIIX4_PMREGMISC);
       AcpiEnBit  = PIIX4_PMREGMISC_PMIOSE;
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
-      Pmba       = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
+      Pmba = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
       PmbaAndVal = ~(UINT32)ICH9_PMBASE_MASK;
       PmbaOrVal  = ICH9_PMBASE_VALUE;
       AcpiCtlReg = POWER_MGMT_REGISTER_Q35 (ICH9_ACPI_CNTL);
       AcpiEnBit  = ICH9_ACPI_CNTL_ACPI_EN;
       break;
     default:
-      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-        __FUNCTION__, HostBridgeDevId));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+        __FUNCTION__,
+        HostBridgeDevId
+        ));
       ASSERT (FALSE);
       return RETURN_UNSUPPORTED;
   }
@@ -93,8 +97,8 @@ InternalAcpiGetTimerTick (
   VOID
   )
 {
-  UINT16 HostBridgeDevId;
-  UINTN Pmba;
+  UINT16  HostBridgeDevId;
+  UINTN   Pmba;
 
   //
   // Query Host Bridge DID to determine platform type
@@ -108,8 +112,12 @@ InternalAcpiGetTimerTick (
       Pmba = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
       break;
     default:
-      DEBUG ((DEBUG_ERROR, "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-        __FUNCTION__, HostBridgeDevId));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Unknown Host Bridge Device ID: 0x%04x\n",
+        __FUNCTION__,
+        HostBridgeDevId
+        ));
       ASSERT (FALSE);
       return 0;
   }
