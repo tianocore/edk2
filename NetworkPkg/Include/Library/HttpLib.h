@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/Http.h>
 
-
 /**
   Decode a percent-encoded URI component to the ASCII character.
 
@@ -33,10 +32,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 UriPercentDecode (
-  IN      CHAR8            *Buffer,
-  IN      UINT32            BufferLength,
-     OUT  CHAR8            *ResultBuffer,
-     OUT  UINT32           *ResultLength
+  IN      CHAR8   *Buffer,
+  IN      UINT32  BufferLength,
+  OUT  CHAR8      *ResultBuffer,
+  OUT  UINT32     *ResultLength
   );
 
 /**
@@ -60,10 +59,10 @@ UriPercentDecode (
 EFI_STATUS
 EFIAPI
 HttpParseUrl (
-  IN      CHAR8              *Url,
-  IN      UINT32             Length,
-  IN      BOOLEAN            IsConnectMethod,
-     OUT  VOID               **UrlParser
+  IN      CHAR8    *Url,
+  IN      UINT32   Length,
+  IN      BOOLEAN  IsConnectMethod,
+  OUT  VOID        **UrlParser
   );
 
 /**
@@ -85,9 +84,9 @@ HttpParseUrl (
 EFI_STATUS
 EFIAPI
 HttpUrlGetHostName (
-  IN      CHAR8              *Url,
-  IN      VOID               *UrlParser,
-     OUT  CHAR8              **HostName
+  IN      CHAR8  *Url,
+  IN      VOID   *UrlParser,
+  OUT  CHAR8     **HostName
   );
 
 /**
@@ -108,9 +107,9 @@ HttpUrlGetHostName (
 EFI_STATUS
 EFIAPI
 HttpUrlGetIp4 (
-  IN      CHAR8              *Url,
-  IN      VOID               *UrlParser,
-     OUT  EFI_IPv4_ADDRESS   *Ip4Address
+  IN      CHAR8          *Url,
+  IN      VOID           *UrlParser,
+  OUT  EFI_IPv4_ADDRESS  *Ip4Address
   );
 
 /**
@@ -131,9 +130,9 @@ HttpUrlGetIp4 (
 EFI_STATUS
 EFIAPI
 HttpUrlGetIp6 (
-  IN      CHAR8              *Url,
-  IN      VOID               *UrlParser,
-     OUT  EFI_IPv6_ADDRESS   *Ip6Address
+  IN      CHAR8          *Url,
+  IN      VOID           *UrlParser,
+  OUT  EFI_IPv6_ADDRESS  *Ip6Address
   );
 
 /**
@@ -154,9 +153,9 @@ HttpUrlGetIp6 (
 EFI_STATUS
 EFIAPI
 HttpUrlGetPort (
-  IN      CHAR8              *Url,
-  IN      VOID               *UrlParser,
-     OUT  UINT16             *Port
+  IN      CHAR8  *Url,
+  IN      VOID   *UrlParser,
+  OUT  UINT16    *Port
   );
 
 /**
@@ -178,9 +177,9 @@ HttpUrlGetPort (
 EFI_STATUS
 EFIAPI
 HttpUrlGetPath (
-  IN      CHAR8              *Url,
-  IN      VOID               *UrlParser,
-     OUT  CHAR8              **Path
+  IN      CHAR8  *Url,
+  IN      VOID   *UrlParser,
+  OUT  CHAR8     **Path
   );
 
 /**
@@ -192,7 +191,7 @@ HttpUrlGetPath (
 VOID
 EFIAPI
 HttpUrlFreeParser (
-  IN      VOID               *UrlParser
+  IN      VOID  *UrlParser
   );
 
 //
@@ -229,12 +228,12 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *HTTP_BODY_PARSER_CALLBACK) (
+(EFIAPI *HTTP_BODY_PARSER_CALLBACK)(
   IN HTTP_BODY_PARSE_EVENT      EventType,
   IN CHAR8                      *Data,
   IN UINTN                      Length,
   IN VOID                       *Context
-);
+  );
 
 /**
   Initialize a HTTP message-body parser.
@@ -260,13 +259,13 @@ EFI_STATUS
 EFI_STATUS
 EFIAPI
 HttpInitMsgParser (
-  IN     EFI_HTTP_METHOD               Method,
-  IN     EFI_HTTP_STATUS_CODE          StatusCode,
-  IN     UINTN                         HeaderCount,
-  IN     EFI_HTTP_HEADER               *Headers,
-  IN     HTTP_BODY_PARSER_CALLBACK     Callback,
-  IN     VOID                          *Context,
-    OUT  VOID                          **MsgParser
+  IN     EFI_HTTP_METHOD            Method,
+  IN     EFI_HTTP_STATUS_CODE       StatusCode,
+  IN     UINTN                      HeaderCount,
+  IN     EFI_HTTP_HEADER            *Headers,
+  IN     HTTP_BODY_PARSER_CALLBACK  Callback,
+  IN     VOID                       *Context,
+  OUT  VOID                         **MsgParser
   );
 
 /**
@@ -287,9 +286,9 @@ HttpInitMsgParser (
 EFI_STATUS
 EFIAPI
 HttpParseMessageBody (
-  IN OUT VOID              *MsgParser,
-  IN     UINTN             BodyLength,
-  IN     CHAR8             *Body
+  IN OUT VOID   *MsgParser,
+  IN     UINTN  BodyLength,
+  IN     CHAR8  *Body
   );
 
 /**
@@ -304,7 +303,7 @@ HttpParseMessageBody (
 BOOLEAN
 EFIAPI
 HttpIsMessageComplete (
-  IN VOID           *MsgParser
+  IN VOID  *MsgParser
   );
 
 /**
@@ -323,8 +322,8 @@ HttpIsMessageComplete (
 EFI_STATUS
 EFIAPI
 HttpGetEntityLength (
-  IN  VOID           *MsgParser,
-  OUT UINTN          *ContentLength
+  IN  VOID   *MsgParser,
+  OUT UINTN  *ContentLength
   );
 
 /**
@@ -336,9 +335,8 @@ HttpGetEntityLength (
 VOID
 EFIAPI
 HttpFreeMsgParser (
-  IN  VOID           *MsgParser
+  IN  VOID  *MsgParser
   );
-
 
 /**
   Find a specified header field according to the field name.
@@ -353,9 +351,9 @@ HttpFreeMsgParser (
 EFI_HTTP_HEADER *
 EFIAPI
 HttpFindHeader (
-  IN  UINTN                HeaderCount,
-  IN  EFI_HTTP_HEADER      *Headers,
-  IN  CHAR8                *FieldName
+  IN  UINTN            HeaderCount,
+  IN  EFI_HTTP_HEADER  *Headers,
+  IN  CHAR8            *FieldName
   );
 
 /**
@@ -374,9 +372,9 @@ HttpFindHeader (
 EFI_STATUS
 EFIAPI
 HttpSetFieldNameAndValue (
-   IN  OUT   EFI_HTTP_HEADER       *HttpHeader,
-   IN  CONST CHAR8                 *FieldName,
-   IN  CONST CHAR8                 *FieldValue
+  IN  OUT   EFI_HTTP_HEADER  *HttpHeader,
+  IN  CONST CHAR8            *FieldName,
+  IN  CONST CHAR8            *FieldValue
   );
 
 /**
@@ -393,9 +391,9 @@ HttpSetFieldNameAndValue (
 CHAR8 *
 EFIAPI
 HttpGetFieldNameAndValue (
-  IN     CHAR8   *String,
-     OUT CHAR8   **FieldName,
-     OUT CHAR8   **FieldValue
+  IN     CHAR8  *String,
+  OUT CHAR8     **FieldName,
+  OUT CHAR8     **FieldValue
   );
 
 /**
@@ -436,10 +434,10 @@ HttpFreeHeaderFields (
 EFI_STATUS
 EFIAPI
 HttpGenRequestMessage (
-  IN     CONST EFI_HTTP_MESSAGE        *Message,
-  IN     CONST CHAR8                   *Url,
-     OUT CHAR8                         **RequestMsg,
-     OUT UINTN                         *RequestMsgSize
+  IN     CONST EFI_HTTP_MESSAGE  *Message,
+  IN     CONST CHAR8             *Url,
+  OUT CHAR8                      **RequestMsg,
+  OUT UINTN                      *RequestMsgSize
   );
 
 /**
@@ -454,7 +452,7 @@ HttpGenRequestMessage (
 EFI_HTTP_STATUS_CODE
 EFIAPI
 HttpMappingToStatusCode (
-  IN UINTN                  StatusCode
+  IN UINTN  StatusCode
   );
 
 /**
@@ -471,20 +469,19 @@ HttpMappingToStatusCode (
 BOOLEAN
 EFIAPI
 HttpIsValidHttpHeader (
-  IN  CHAR8            *DeleteList[],
-  IN  UINTN            DeleteCount,
-  IN  CHAR8            *FieldName
+  IN  CHAR8  *DeleteList[],
+  IN  UINTN  DeleteCount,
+  IN  CHAR8  *FieldName
   );
 
 //
 // A wrapper structure to hold the HTTP headers.
 //
 typedef struct {
-  UINTN                       MaxHeaderCount;
-  UINTN                       HeaderCount;
-  EFI_HTTP_HEADER             *Headers;
+  UINTN              MaxHeaderCount;
+  UINTN              HeaderCount;
+  EFI_HTTP_HEADER    *Headers;
 } HTTP_IO_HEADER;
-
 
 /**
   Create a HTTP_IO_HEADER to hold the HTTP header items.
@@ -496,7 +493,7 @@ typedef struct {
 **/
 HTTP_IO_HEADER *
 HttpIoCreateHeader (
-  UINTN                     MaxHeaderCount
+  UINTN  MaxHeaderCount
   );
 
 /**
@@ -507,7 +504,7 @@ HttpIoCreateHeader (
 **/
 VOID
 HttpIoFreeHeader (
-  IN  HTTP_IO_HEADER       *HttpIoHeader
+  IN  HTTP_IO_HEADER  *HttpIoHeader
   );
 
 /**
@@ -525,10 +522,9 @@ HttpIoFreeHeader (
 **/
 EFI_STATUS
 HttpIoSetHeader (
-  IN  HTTP_IO_HEADER       *HttpIoHeader,
-  IN  CHAR8                *FieldName,
-  IN  CHAR8                *FieldValue
+  IN  HTTP_IO_HEADER  *HttpIoHeader,
+  IN  CHAR8           *FieldName,
+  IN  CHAR8           *FieldValue
   );
 
 #endif
-

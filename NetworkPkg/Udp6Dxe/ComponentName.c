@@ -12,6 +12,7 @@
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user-readable name of the driver.
 
@@ -58,7 +59,6 @@ Udp6ComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user-readable name of the controller
@@ -150,14 +150,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUdp6ComponentName = 
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUdp6ComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) Udp6ComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) Udp6ComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gUdp6ComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)Udp6ComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)Udp6ComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUdp6DriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mUdp6DriverNameTable[] = {
   {
     "eng;en",
     L"UDP6 Network Service Driver"
@@ -222,7 +221,7 @@ Udp6ComponentNameGetDriverName (
            This->SupportedLanguages,
            mUdp6DriverNameTable,
            DriverName,
-           (BOOLEAN) (This == &gUdp6ComponentName)
+           (BOOLEAN)(This == &gUdp6ComponentName)
            );
 }
 
@@ -238,12 +237,12 @@ Udp6ComponentNameGetDriverName (
 **/
 EFI_STATUS
 UpdateName (
-  IN    EFI_UDP6_PROTOCOL             *Udp6
+  IN    EFI_UDP6_PROTOCOL  *Udp6
   )
 {
-  EFI_STATUS                       Status;
-  CHAR16                           HandleName[64];
-  EFI_UDP6_CONFIG_DATA             Udp6ConfigData;
+  EFI_STATUS            Status;
+  CHAR16                HandleName[64];
+  EFI_UDP6_CONFIG_DATA  Udp6ConfigData;
 
   if (Udp6 == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -254,7 +253,9 @@ UpdateName (
   //
   Status = Udp6->GetModeData (Udp6, &Udp6ConfigData, NULL, NULL, NULL);
   if (!EFI_ERROR (Status)) {
-    UnicodeSPrint (HandleName, sizeof (HandleName),
+    UnicodeSPrint (
+      HandleName,
+      sizeof (HandleName),
       L"UDPv6 (SrcPort=%d, DestPort=%d)",
       Udp6ConfigData.StationPort,
       Udp6ConfigData.RemotePort
@@ -368,8 +369,8 @@ Udp6ComponentNameGetControllerName (
   OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                    Status;
-  EFI_UDP6_PROTOCOL             *Udp6;
+  EFI_STATUS         Status;
+  EFI_UDP6_PROTOCOL  *Udp6;
 
   //
   // Only provide names for child handles.

@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 extern UINT8  Ip4Config2Bin[];
 extern UINT8  Ip4DxeStrings[];
 
-#define NIC_ITEM_CONFIG_SIZE   (sizeof (IP4_CONFIG2_INSTANCE) + (sizeof (EFI_IPv4_ADDRESS) * MAX_IP4_CONFIG_DNS))
+#define NIC_ITEM_CONFIG_SIZE  (sizeof (IP4_CONFIG2_INSTANCE) + (sizeof (EFI_IPv4_ADDRESS) * MAX_IP4_CONFIG_DNS))
 
 /**
   Install HII Config Access protocol for network device and allocate resource.
@@ -28,7 +28,7 @@ extern UINT8  Ip4DxeStrings[];
 **/
 EFI_STATUS
 Ip4Config2FormInit (
-  IN OUT IP4_CONFIG2_INSTANCE     *Instance
+  IN OUT IP4_CONFIG2_INSTANCE  *Instance
   );
 
 /**
@@ -39,7 +39,7 @@ Ip4Config2FormInit (
 **/
 VOID
 Ip4Config2FormUnload (
-  IN OUT IP4_CONFIG2_INSTANCE     *Instance
+  IN OUT IP4_CONFIG2_INSTANCE  *Instance
   );
 
 #endif

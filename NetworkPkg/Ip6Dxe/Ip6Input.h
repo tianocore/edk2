@@ -10,23 +10,21 @@
 #ifndef __EFI_IP6_INPUT_H__
 #define __EFI_IP6_INPUT_H__
 
-#define IP6_MIN_HEADLEN       40
-#define IP6_MAX_HEADLEN       120
+#define IP6_MIN_HEADLEN  40
+#define IP6_MAX_HEADLEN  120
 ///
 /// 8(ESP header) + 16(max IV) + 16(max padding) + 2(ESP tail) + 12(max ICV) = 54
 ///
-#define IP6_MAX_IPSEC_HEADLEN 54
+#define IP6_MAX_IPSEC_HEADLEN  54
 
-
-#define IP6_ASSEMLE_HASH_SIZE 127
+#define IP6_ASSEMLE_HASH_SIZE  127
 ///
 /// Lift time in seconds.
 ///
-#define IP6_FRAGMENT_LIFE     60
-#define IP6_MAX_PACKET_SIZE   65535
+#define IP6_FRAGMENT_LIFE    60
+#define IP6_MAX_PACKET_SIZE  65535
 
-
-#define IP6_GET_CLIP_INFO(Packet) ((IP6_CLIP_INFO *) ((Packet)->ProtoData))
+#define IP6_GET_CLIP_INFO(Packet)  ((IP6_CLIP_INFO *) ((Packet)->ProtoData))
 
 #define IP6_ASSEMBLE_HASH(Dst, Src, Id)  \
           ((*((UINT32 *) (Dst)) + *((UINT32 *) (Src)) + (Id)) % IP6_ASSEMLE_HASH_SIZE)
@@ -45,42 +43,42 @@
 // life. If it isn't consumed before Life reaches zero, the packet is released.
 //
 typedef struct {
-  UINT32                    LinkFlag;
-  INT32                     CastType;
-  INT32                     Start;
-  INT32                     End;
-  INT32                     Length;
-  UINT32                    Life;
-  EFI_STATUS                Status;
-  UINT32                    Id;
-  UINT16                    HeadLen;
-  UINT8                     NextHeader;
-  UINT8                     LastFrag;
-  UINT32                    FormerNextHeader;
+  UINT32        LinkFlag;
+  INT32         CastType;
+  INT32         Start;
+  INT32         End;
+  INT32         Length;
+  UINT32        Life;
+  EFI_STATUS    Status;
+  UINT32        Id;
+  UINT16        HeadLen;
+  UINT8         NextHeader;
+  UINT8         LastFrag;
+  UINT32        FormerNextHeader;
 } IP6_CLIP_INFO;
 
 //
 // Structure used to assemble IP packets.
 //
 typedef struct {
-  LIST_ENTRY                Link;
-  LIST_ENTRY                Fragments;  // List of all the fragments of this packet
+  LIST_ENTRY          Link;
+  LIST_ENTRY          Fragments;        // List of all the fragments of this packet
 
   //
   // Identity of one IP6 packet. Each fragment of a packet has
   // the same (Dst, Src, Id).
   //
-  EFI_IPv6_ADDRESS          Dst;
-  EFI_IPv6_ADDRESS          Src;
-  UINT32                    Id;
+  EFI_IPv6_ADDRESS    Dst;
+  EFI_IPv6_ADDRESS    Src;
+  UINT32              Id;
 
-  UINT32                    TotalLen;
-  UINT32                    CurLen;
-  UINT32                    Life;       // Count down life for the packet.
+  UINT32              TotalLen;
+  UINT32              CurLen;
+  UINT32              Life;             // Count down life for the packet.
 
-  EFI_IP6_HEADER            *Head;      // IP head of the first fragment
-  IP6_CLIP_INFO             *Info;      // Per packet information of the first fragment
-  NET_BUF                   *Packet;    // The first fragment of the packet
+  EFI_IP6_HEADER      *Head;            // IP head of the first fragment
+  IP6_CLIP_INFO       *Info;            // Per packet information of the first fragment
+  NET_BUF             *Packet;          // The first fragment of the packet
 } IP6_ASSEMBLE_ENTRY;
 
 //
@@ -89,7 +87,7 @@ typedef struct {
 // as hash table.
 //
 typedef struct {
-  LIST_ENTRY  Bucket[IP6_ASSEMLE_HASH_SIZE];
+  LIST_ENTRY    Bucket[IP6_ASSEMLE_HASH_SIZE];
 } IP6_ASSEMBLE_TABLE;
 
 /**
@@ -105,10 +103,10 @@ typedef struct {
 **/
 VOID
 Ip6AcceptFrame (
-  IN NET_BUF                *Packet,
-  IN EFI_STATUS             IoStatus,
-  IN UINT32                 Flag,
-  IN VOID                   *Context
+  IN NET_BUF     *Packet,
+  IN EFI_STATUS  IoStatus,
+  IN UINT32      Flag,
+  IN VOID        *Context
   );
 
 /**
@@ -127,7 +125,7 @@ Ip6AcceptFrame (
 **/
 EFI_STATUS
 Ip6InstanceDeliverPacket (
-  IN IP6_PROTOCOL           *IpInstance
+  IN IP6_PROTOCOL  *IpInstance
   );
 
 /**
@@ -175,7 +173,7 @@ Ip6IpSecProcessPacket (
 **/
 VOID
 Ip6CreateAssembleTable (
-  IN OUT IP6_ASSEMBLE_TABLE *Table
+  IN OUT IP6_ASSEMBLE_TABLE  *Table
   );
 
 /**
@@ -187,7 +185,7 @@ Ip6CreateAssembleTable (
 **/
 VOID
 Ip6CleanAssembleTable (
-  IN OUT IP6_ASSEMBLE_TABLE *Table
+  IN OUT IP6_ASSEMBLE_TABLE  *Table
   );
 
 /**
@@ -210,9 +208,9 @@ Ip6CleanAssembleTable (
 **/
 EFI_STATUS
 Ip6Demultiplex (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IP6_HEADER         *Head,
-  IN NET_BUF                *Packet
+  IN IP6_SERVICE     *IpSb,
+  IN EFI_IP6_HEADER  *Head,
+  IN NET_BUF         *Packet
   );
 
 /**
@@ -223,7 +221,7 @@ Ip6Demultiplex (
 **/
 VOID
 Ip6PacketTimerTicking (
-  IN IP6_SERVICE            *IpSb
+  IN IP6_SERVICE  *IpSb
   );
 
 #endif

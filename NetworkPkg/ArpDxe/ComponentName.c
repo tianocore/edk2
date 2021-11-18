@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "ArpDriver.h"
 
-
 //
 // EFI Component Name Protocol
 //
@@ -21,21 +20,20 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gArpComponentName = {
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gArpComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ArpComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ArpComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gArpComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)ArpComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)ArpComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mArpDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mArpDriverNameTable[] = {
   { "eng;en", L"ARP Network Service Driver" },
-  { NULL, NULL }
+  { NULL,     NULL                          }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mArpControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mArpControllerNameTable[] = {
   { "eng;en", L"ARP Controller" },
-  { NULL, NULL }
+  { NULL,     NULL              }
 };
 
 /**
@@ -165,15 +163,15 @@ ArpComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 ArpComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                    Status;
-  EFI_ARP_PROTOCOL              *Arp;
+  EFI_STATUS        Status;
+  EFI_ARP_PROTOCOL  *Arp;
 
   //
   // Only provide names for child handles.
@@ -200,7 +198,7 @@ ArpComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   ChildHandle,
                   &gEfiArpProtocolGuid,
-                 (VOID **)&Arp,
+                  (VOID **)&Arp,
                   NULL,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
