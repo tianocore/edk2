@@ -21,7 +21,7 @@
 EFI_STATUS
 EFIAPI
 AcpiPlatformChecksum (
-  IN  EFI_ACPI_DESCRIPTION_HEADER  * AcpiTable
+  IN  EFI_ACPI_DESCRIPTION_HEADER  *AcpiTable
   );
 
 /** Compute the size of a tree/sub-tree.
@@ -35,8 +35,8 @@ AcpiPlatformChecksum (
 EFI_STATUS
 EFIAPI
 AmlComputeSize (
-  IN      CONST AML_NODE_HEADER   * Node,
-  IN  OUT       UINT32            * Size
+  IN      CONST AML_NODE_HEADER  *Node,
+  IN  OUT       UINT32           *Size
   );
 
 /** Get the value contained in an integer node.
@@ -51,8 +51,8 @@ AmlComputeSize (
 EFI_STATUS
 EFIAPI
 AmlNodeGetIntegerValue (
-  IN  AML_OBJECT_NODE   * Node,
-  OUT UINT64            * Value
+  IN  AML_OBJECT_NODE  *Node,
+  OUT UINT64           *Value
   );
 
 /** Set the value contained in an integer node.
@@ -76,9 +76,9 @@ AmlNodeGetIntegerValue (
 EFI_STATUS
 EFIAPI
 AmlNodeSetIntegerValue (
-  IN  AML_OBJECT_NODE   * Node,
-  IN  UINT64              NewValue,
-  OUT INT8              * ValueWidthDiff
+  IN  AML_OBJECT_NODE  *Node,
+  IN  UINT64           NewValue,
+  OUT INT8             *ValueWidthDiff
   );
 
 /** Propagate information up the tree.
@@ -101,10 +101,10 @@ AmlNodeSetIntegerValue (
 EFI_STATUS
 EFIAPI
 AmlPropagateInformation (
-  IN  AML_NODE_HEADER   * Node,
-  IN  BOOLEAN             IsIncrement,
-  IN  UINT32              Diff,
-  IN  UINT8               NodeCount
+  IN  AML_NODE_HEADER  *Node,
+  IN  BOOLEAN          IsIncrement,
+  IN  UINT32           Diff,
+  IN  UINT8            NodeCount
   );
 
 /** Find and set the EndTag's Checksum of a list of Resource Data elements.
@@ -135,9 +135,8 @@ AmlPropagateInformation (
 EFI_STATUS
 EFIAPI
 AmlSetRdListCheckSum (
-  IN  AML_OBJECT_NODE   * BufferOpNode,
-  IN  UINT8               CheckSum
+  IN  AML_OBJECT_NODE  *BufferOpNode,
+  IN  UINT8            CheckSum
   );
 
 #endif // AML_UTILITY_H_
-

@@ -28,8 +28,8 @@
 EFI_STATUS
 EFIAPI
 AmlCreateRootNode (
-  IN  CONST EFI_ACPI_DESCRIPTION_HEADER   * SdtHeader,
-  OUT       AML_ROOT_NODE                ** NewRootNodePtr
+  IN  CONST EFI_ACPI_DESCRIPTION_HEADER  *SdtHeader,
+  OUT       AML_ROOT_NODE                **NewRootNodePtr
   );
 
 /** Create an AML_OBJECT_NODE.
@@ -49,9 +49,9 @@ AmlCreateRootNode (
 EFI_STATUS
 EFIAPI
 AmlCreateObjectNode (
-  IN  CONST  AML_BYTE_ENCODING   * AmlByteEncoding,
-  IN         UINT32                PkgLength,
-  OUT        AML_OBJECT_NODE    ** NewObjectNodePtr
+  IN  CONST  AML_BYTE_ENCODING  *AmlByteEncoding,
+  IN         UINT32             PkgLength,
+  OUT        AML_OBJECT_NODE    **NewObjectNodePtr
   );
 
 /** Create an AML_DATA_NODE.
@@ -72,10 +72,10 @@ AmlCreateObjectNode (
 EFI_STATUS
 EFIAPI
 AmlCreateDataNode (
-  IN        EAML_NODE_DATA_TYPE     DataType,
-  IN  CONST UINT8                 * Data,
-  IN        UINT32                  DataSize,
-  OUT       AML_DATA_NODE        ** NewDataNodePtr
+  IN        EAML_NODE_DATA_TYPE  DataType,
+  IN  CONST UINT8                *Data,
+  IN        UINT32               DataSize,
+  OUT       AML_DATA_NODE        **NewDataNodePtr
   );
 
 /** Delete a Node.
@@ -88,7 +88,7 @@ AmlCreateDataNode (
 EFI_STATUS
 EFIAPI
 AmlDeleteNode (
-  IN  AML_NODE_HEADER   * Node
+  IN  AML_NODE_HEADER  *Node
   );
 
 /** Check whether ObjectNode has the input attribute.
@@ -104,8 +104,8 @@ AmlDeleteNode (
 BOOLEAN
 EFIAPI
 AmlNodeHasAttribute (
-  IN  CONST AML_OBJECT_NODE   * ObjectNode,
-  IN        AML_OP_ATTRIBUTE    Attribute
+  IN  CONST AML_OBJECT_NODE   *ObjectNode,
+  IN        AML_OP_ATTRIBUTE  Attribute
   );
 
 /** Check whether ObjectNode has the input OpCode/SubOpcode couple.
@@ -121,9 +121,9 @@ AmlNodeHasAttribute (
 BOOLEAN
 EFIAPI
 AmlNodeCompareOpCode (
-  IN  CONST  AML_OBJECT_NODE  * ObjectNode,
-  IN         UINT8              OpCode,
-  IN         UINT8              SubOpCode
+  IN  CONST  AML_OBJECT_NODE  *ObjectNode,
+  IN         UINT8            OpCode,
+  IN         UINT8            SubOpCode
   );
 
 /** Check whether a Node is an integer node.
@@ -142,7 +142,7 @@ AmlNodeCompareOpCode (
 BOOLEAN
 EFIAPI
 IsIntegerNode (
-  IN  AML_OBJECT_NODE   * Node
+  IN  AML_OBJECT_NODE  *Node
   );
 
 /** Check whether a Node is a ZeroOp, a OneOp or a OnesOp.
@@ -158,7 +158,7 @@ IsIntegerNode (
 BOOLEAN
 EFIAPI
 IsSpecialIntegerNode (
-  IN  AML_OBJECT_NODE   * Node
+  IN  AML_OBJECT_NODE  *Node
   );
 
 /** Check whether Node corresponds to a method definition.
@@ -180,7 +180,7 @@ IsSpecialIntegerNode (
 BOOLEAN
 EFIAPI
 AmlIsMethodDefinitionNode (
-  IN  CONST AML_OBJECT_NODE   * Node
+  IN  CONST AML_OBJECT_NODE  *Node
   );
 
 /** Get the index at which the name of the node is stored.
@@ -194,8 +194,8 @@ AmlIsMethodDefinitionNode (
 **/
 EFI_STATUS
 AmlNodeGetNameIndex (
-  IN  CONST AML_OBJECT_NODE     * ObjectNode,
-  OUT       EAML_PARSE_INDEX    * Index
+  IN  CONST AML_OBJECT_NODE   *ObjectNode,
+  OUT       EAML_PARSE_INDEX  *Index
   );
 
 /** Get the name of the Node.
@@ -212,7 +212,7 @@ AmlNodeGetNameIndex (
 CHAR8 *
 EFIAPI
 AmlNodeGetName (
-  IN  CONST AML_OBJECT_NODE   * ObjectNode
+  IN  CONST AML_OBJECT_NODE  *ObjectNode
   );
 
 #endif // AML_NODE_H_

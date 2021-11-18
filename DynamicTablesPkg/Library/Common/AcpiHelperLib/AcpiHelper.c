@@ -23,7 +23,7 @@
 UINT8
 EFIAPI
 AsciiFromHex (
-  IN  UINT8   Hex
+  IN  UINT8  Hex
   )
 {
   if (Hex < 10) {
@@ -50,7 +50,7 @@ AsciiFromHex (
 UINT8
 EFIAPI
 HexFromAscii (
-  IN  CHAR8   Char
+  IN  CHAR8  Char
   )
 {
   if ((Char >= '0') && (Char <= '9')) {
@@ -78,10 +78,10 @@ HexFromAscii (
 **/
 BOOLEAN
 IsValidPnpId (
-  IN  CONST CHAR8  * Hid
+  IN  CONST CHAR8  *Hid
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   if (AsciiStrLen (Hid) != 7) {
     return FALSE;
@@ -113,10 +113,10 @@ IsValidPnpId (
 **/
 BOOLEAN
 IsValidAcpiId (
-  IN  CONST CHAR8  * Hid
+  IN  CONST CHAR8  *Hid
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   if (AsciiStrLen (Hid) != 8) {
     return FALSE;
@@ -153,13 +153,14 @@ IsValidAcpiId (
 EFI_STATUS
 EFIAPI
 AmlGetEisaIdFromString (
-  IN  CONST CHAR8   * EisaIdStr,
-  OUT       UINT32  * EisaIdInt
+  IN  CONST CHAR8   *EisaIdStr,
+  OUT       UINT32  *EisaIdInt
   )
 {
   if ((EisaIdStr == NULL)         ||
       (!IsValidPnpId (EisaIdStr)) ||
-      (EisaIdInt == NULL)) {
+      (EisaIdInt == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -197,14 +198,14 @@ AmlGetEisaIdFromString (
         Bit 3-0: 4th hex digit of product number "3"
   */
   *EisaIdInt = SwapBytes32 (
-    ((EisaIdStr[0] - 0x40) << 26)       |
-    ((EisaIdStr[1] - 0x40) << 21)       |
-    ((EisaIdStr[2] - 0x40) << 16)       |
-    (HexFromAscii (EisaIdStr[3]) << 12) |
-    (HexFromAscii (EisaIdStr[4]) << 8)  |
-    (HexFromAscii (EisaIdStr[5]) << 4)  |
-    (HexFromAscii (EisaIdStr[6]))
-    );
+                 ((EisaIdStr[0] - 0x40) << 26)       |
+                 ((EisaIdStr[1] - 0x40) << 21)       |
+                 ((EisaIdStr[2] - 0x40) << 16)       |
+                 (HexFromAscii (EisaIdStr[3]) << 12) |
+                 (HexFromAscii (EisaIdStr[4]) << 8)  |
+                 (HexFromAscii (EisaIdStr[5]) << 4)  |
+                 (HexFromAscii (EisaIdStr[6]))
+                 );
 
   return EFI_SUCCESS;
 }

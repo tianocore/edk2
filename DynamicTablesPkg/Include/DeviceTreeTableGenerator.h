@@ -89,10 +89,10 @@ typedef struct DtTableGenerator             DT_TABLE_GENERATOR;
                         failure codes as returned by the generator.
 **/
 typedef EFI_STATUS (*DT_TABLE_GENERATOR_BUILD_TABLE) (
-  IN  CONST DT_TABLE_GENERATOR                    *       Generator,
-  IN  CONST CM_STD_OBJ_DT_TABLE_INFO              * CONST DtTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  OUT       VOID                                 **       Table
+  IN  CONST DT_TABLE_GENERATOR                            *Generator,
+  IN  CONST CM_STD_OBJ_DT_TABLE_INFO              *CONST  DtTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  OUT       VOID                                          **Table
   );
 
 /** This function pointer describes the interface to used by the
@@ -109,10 +109,10 @@ typedef EFI_STATUS (*DT_TABLE_GENERATOR_BUILD_TABLE) (
                         as returned by the generator.
 **/
 typedef EFI_STATUS (*DT_TABLE_GENERATOR_FREE_TABLE) (
-  IN  CONST DT_TABLE_GENERATOR                    *       Generator,
-  IN  CONST CM_STD_OBJ_DT_TABLE_INFO              * CONST DtTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN        VOID                                 **       Table
+  IN  CONST DT_TABLE_GENERATOR                            *Generator,
+  IN  CONST CM_STD_OBJ_DT_TABLE_INFO              *CONST  DtTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN        VOID                                          **Table
   );
 
 /** The DT_TABLE_GENERATOR structure provides an interface that the
@@ -120,16 +120,16 @@ typedef EFI_STATUS (*DT_TABLE_GENERATOR_FREE_TABLE) (
 */
 typedef struct DtTableGenerator {
   /// The DT table generator ID.
-  DT_TABLE_GENERATOR_ID                  GeneratorID;
+  DT_TABLE_GENERATOR_ID             GeneratorID;
 
   /// String describing the DT table generator.
-  CONST CHAR16                         * Description;
+  CONST CHAR16                      *Description;
 
   /// DT table build function pointer.
-  DT_TABLE_GENERATOR_BUILD_TABLE         BuildDtTable;
+  DT_TABLE_GENERATOR_BUILD_TABLE    BuildDtTable;
 
   /// The function to free any resources allocated for building the DT table.
-  DT_TABLE_GENERATOR_FREE_TABLE          FreeTableResources;
+  DT_TABLE_GENERATOR_FREE_TABLE     FreeTableResources;
 } DT_TABLE_GENERATOR;
 
 /** Register DT table factory generator.
@@ -149,7 +149,7 @@ typedef struct DtTableGenerator {
 EFI_STATUS
 EFIAPI
 RegisterDtTableGenerator (
-  IN CONST DT_TABLE_GENERATOR                   * CONST Generator
+  IN CONST DT_TABLE_GENERATOR                   *CONST  Generator
   );
 
 /** Deregister DT generator.
@@ -167,10 +167,9 @@ RegisterDtTableGenerator (
 EFI_STATUS
 EFIAPI
 DeregisterDtTableGenerator (
-  IN CONST DT_TABLE_GENERATOR                   * CONST Generator
+  IN CONST DT_TABLE_GENERATOR                   *CONST  Generator
   );
 
 #pragma pack()
 
 #endif // DEVICETREE_TABLE_GENERATOR_H_
-
