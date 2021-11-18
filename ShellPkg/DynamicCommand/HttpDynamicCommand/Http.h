@@ -32,7 +32,7 @@
 #include <Protocol/HttpUtilities.h>
 #include <Protocol/ServiceBinding.h>
 
-#define HTTP_APP_NAME L"http"
+#define HTTP_APP_NAME  L"http"
 
 #define REQ_OK           0
 #define REQ_NEED_REPEAT  1
@@ -40,25 +40,25 @@
 //
 // Download Flags.
 //
-#define DL_FLAG_TIME     BIT0 // Show elapsed time.
-#define DL_FLAG_KEEP_BAD BIT1 // Keep files even if download failed.
+#define DL_FLAG_TIME      BIT0 // Show elapsed time.
+#define DL_FLAG_KEEP_BAD  BIT1 // Keep files even if download failed.
 
-extern EFI_HII_HANDLE mHttpHiiHandle;
+extern EFI_HII_HANDLE  mHttpHiiHandle;
 
 typedef struct {
-  UINTN                 ContentDownloaded;
-  UINTN                 ContentLength;
-  UINTN                 LastReportedNbOfBytes;
-  UINTN                 BufferSize;
-  UINTN                 Status;
-  UINTN                 Flags;
-  UINT8                 *Buffer;
-  CHAR16                *ServerAddrAndProto;
-  CHAR16                *Uri;
-  EFI_HTTP_TOKEN        ResponseToken;
-  EFI_HTTP_TOKEN        RequestToken;
-  EFI_HTTP_PROTOCOL     *Http;
-  EFI_HTTP_CONFIG_DATA  HttpConfigData;
+  UINTN                   ContentDownloaded;
+  UINTN                   ContentLength;
+  UINTN                   LastReportedNbOfBytes;
+  UINTN                   BufferSize;
+  UINTN                   Status;
+  UINTN                   Flags;
+  UINT8                   *Buffer;
+  CHAR16                  *ServerAddrAndProto;
+  CHAR16                  *Uri;
+  EFI_HTTP_TOKEN          ResponseToken;
+  EFI_HTTP_TOKEN          RequestToken;
+  EFI_HTTP_PROTOCOL       *Http;
+  EFI_HTTP_CONFIG_DATA    HttpConfigData;
 } HTTP_DOWNLOAD_CONTEXT;
 
 /**
@@ -87,6 +87,7 @@ RunHttp (
 **/
 EFI_HII_HANDLE
 InitializeHiiPackage (
-  IN EFI_HANDLE                  ImageHandle
+  IN EFI_HANDLE  ImageHandle
   );
+
 #endif // _HTTP_H_

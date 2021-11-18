@@ -60,7 +60,7 @@ FileBufferRefresh (
 **/
 EFI_STATUS
 FileBufferHandleInput (
-  IN CONST EFI_INPUT_KEY * Key
+  IN CONST EFI_INPUT_KEY  *Key
   );
 
 /**
@@ -99,7 +99,7 @@ FileBufferRestorePosition (
 **/
 EFI_STATUS
 FileBufferSetFileName (
-  IN CONST CHAR16 *Str
+  IN CONST CHAR16  *Str
   );
 
 /**
@@ -115,8 +115,8 @@ FileBufferSetFileName (
 **/
 EFI_STATUS
 FileBufferRead (
-  IN CONST CHAR16  *FileName,
-  IN CONST BOOLEAN Recover
+  IN CONST CHAR16   *FileName,
+  IN CONST BOOLEAN  Recover
   );
 
 /**
@@ -130,7 +130,7 @@ FileBufferRead (
 **/
 EFI_STATUS
 FileBufferSave (
-  CONST CHAR16 *FileName
+  CONST CHAR16  *FileName
   );
 
 /**
@@ -141,8 +141,8 @@ FileBufferSave (
 **/
 VOID
 FileBufferMovePosition (
-  IN CONST UINTN NewFilePosRow,
-  IN CONST UINTN NewFilePosCol
+  IN CONST UINTN  NewFilePosRow,
+  IN CONST UINTN  NewFilePosCol
   );
 
 /**
@@ -157,7 +157,7 @@ FileBufferMovePosition (
 **/
 EFI_STATUS
 FileBufferCutLine (
-  OUT EFI_EDITOR_LINE **CutLine
+  OUT EFI_EDITOR_LINE  **CutLine
   );
 
 /**
@@ -183,7 +183,7 @@ FileBufferPasteLine (
 EFI_STATUS
 FileBufferSearch (
   IN CONST CHAR16  *Str,
-  IN CONST UINTN Offset
+  IN CONST UINTN   Offset
   );
 
 /**
@@ -199,8 +199,8 @@ FileBufferSearch (
 **/
 EFI_STATUS
 FileBufferReplace (
-  IN CONST CHAR16   *Replace,
-  IN CONST UINTN    SearchLen
+  IN CONST CHAR16  *Replace,
+  IN CONST UINTN   SearchLen
   );
 
 /**
@@ -212,9 +212,9 @@ FileBufferReplace (
 **/
 EFI_STATUS
 FileBufferReplaceAll (
-  IN CHAR16 *SearchStr,
-  IN CHAR16 *ReplaceStr,
-  IN UINTN  Offset
+  IN CHAR16  *SearchStr,
+  IN CHAR16  *ReplaceStr,
+  IN UINTN   Offset
   );
 
 /**
@@ -225,8 +225,8 @@ FileBufferReplaceAll (
 **/
 VOID
 FileBufferAdjustMousePosition (
-  IN CONST INT32 TextX,
-  IN CONST INT32 TextY
+  IN CONST INT32  TextX,
+  IN CONST INT32  TextY
   );
 
 /**

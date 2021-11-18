@@ -42,8 +42,8 @@
 #include <Library/SortLib.h>
 #include <Library/FileHandleLib.h>
 
-extern CONST  CHAR16                            mFileName[];
-extern        EFI_HII_HANDLE                    gShellLevel2HiiHandle;
+extern CONST  CHAR16          mFileName[];
+extern        EFI_HII_HANDLE  gShellLevel2HiiHandle;
 
 /**
   Function for 'attrib' command.
@@ -256,9 +256,9 @@ ShellCommandRunMv (
   @retval NULL            a fully qualified path could not be discovered.
   @retval other           pointer to a fuly qualified path.
 **/
-CHAR16*
-GetFullyQualifiedPath(
-  IN CONST CHAR16* Path
+CHAR16 *
+GetFullyQualifiedPath (
+  IN CONST CHAR16  *Path
   );
 
 /**
@@ -270,7 +270,7 @@ GetFullyQualifiedPath(
 **/
 EFI_STATUS
 VerifyIntermediateDirectories (
-  IN CONST CHAR16 *Path
+  IN CONST CHAR16  *Path
   );
 
 /**
@@ -285,10 +285,10 @@ VerifyIntermediateDirectories (
 
 **/
 INTN
-StrniCmp(
-  IN CONST CHAR16 *Source,
-  IN CONST CHAR16 *Target,
-  IN CONST UINTN  Count
+StrniCmp (
+  IN CONST CHAR16  *Source,
+  IN CONST CHAR16  *Target,
+  IN CONST UINTN   Count
   );
 
 /**
@@ -303,8 +303,8 @@ StrniCmp(
 **/
 EFI_STATUS
 ShellLevel2StripQuotes (
-  IN  CONST CHAR16     *OriginalString,
-  OUT CHAR16           **CleanString
+  IN  CONST CHAR16  *OriginalString,
+  OUT CHAR16        **CleanString
   );
 
 /**
@@ -334,12 +334,12 @@ ShellCommandRunVol (
   @retval SHELL_SUCCESS   The source file was copied to the destination
 **/
 SHELL_STATUS
-CopySingleFile(
-  IN CONST CHAR16 *Source,
-  IN CONST CHAR16 *Dest,
-  OUT VOID        **Resp,
-  IN BOOLEAN      SilentMode,
-  IN CONST CHAR16 *CmdName
+CopySingleFile (
+  IN CONST CHAR16  *Source,
+  IN CONST CHAR16  *Dest,
+  OUT VOID         **Resp,
+  IN BOOLEAN       SilentMode,
+  IN CONST CHAR16  *CmdName
   );
 
 /**
@@ -354,10 +354,9 @@ CopySingleFile(
   @retval SHELL_DEVICE_ERROR  A device error occurred reading this Node.
 **/
 SHELL_STATUS
-CascadeDelete(
+CascadeDelete (
   IN EFI_SHELL_FILE_INFO  *Node,
   IN CONST BOOLEAN        Quiet
   );
 
 #endif
-
