@@ -31,51 +31,51 @@
 ///
 /// The minimum value of the FMP reserved range.
 ///
-#define LAST_ATTEMPT_STATUS_FMP_RESERVED_MIN_ERROR_CODE_VALUE               0x1000
+#define LAST_ATTEMPT_STATUS_FMP_RESERVED_MIN_ERROR_CODE_VALUE  0x1000
 
 ///
 /// The maximum value of the FMP reserved range.
 ///
-#define LAST_ATTEMPT_STATUS_FMP_RESERVED_MAX_ERROR_CODE_VALUE               0x1FFF
+#define LAST_ATTEMPT_STATUS_FMP_RESERVED_MAX_ERROR_CODE_VALUE  0x1FFF
 
 ///
 /// The minimum value allowed for FmpDxe driver-specific errors.
 ///
-#define LAST_ATTEMPT_STATUS_DRIVER_MIN_ERROR_CODE_VALUE                     0x1000
+#define LAST_ATTEMPT_STATUS_DRIVER_MIN_ERROR_CODE_VALUE  0x1000
 
 ///
 /// The maximum value allowed for FmpDxe driver-specific errors.
 ///
-#define LAST_ATTEMPT_STATUS_DRIVER_MAX_ERROR_CODE_VALUE                     0x107F
+#define LAST_ATTEMPT_STATUS_DRIVER_MAX_ERROR_CODE_VALUE  0x107F
 
 ///
 /// The minimum value allowed for FmpDependencyLib related errors.
 ///
-#define LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_LIB_MIN_ERROR_CODE_VALUE         0x1080
+#define LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_LIB_MIN_ERROR_CODE_VALUE  0x1080
 
 ///
 /// The maximum value allowed for FmpDependencyLib related errors.
 ///
-#define LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_LIB_MAX_ERROR_CODE_VALUE         0x109F
+#define LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_LIB_MAX_ERROR_CODE_VALUE  0x109F
 
 ///
 /// The minimum value allowed for FmpDependencyCheckLib related errors.
 ///
-#define LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_CHECK_LIB_MIN_ERROR_CODE_VALUE   0x10A0
+#define LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_CHECK_LIB_MIN_ERROR_CODE_VALUE  0x10A0
 
 ///
 /// The maximum value allowed for FmpDependencyCheckLib related errors.
 ///
-#define LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_CHECK_LIB_MAX_ERROR_CODE_VALUE   0x10BF
+#define LAST_ATTEMPT_STATUS_FMP_DEPENDENCY_CHECK_LIB_MAX_ERROR_CODE_VALUE  0x10BF
 
 ///
 /// The minimum value allowed for FMP device library errors.
 ///
-#define LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE             0x1800
+#define LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MIN_ERROR_CODE_VALUE  0x1800
 
 ///
 /// The maximum value allowed for FMP device library errors.
 ///
-#define LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MAX_ERROR_CODE_VALUE             0x1FFF
+#define LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MAX_ERROR_CODE_VALUE  0x1FFF
 
 #endif
