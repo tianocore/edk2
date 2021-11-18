@@ -39,7 +39,7 @@ SetCommunicationContext (
                     gSmst,
                     &gEfiPeiSmmCommunicationPpiGuid,
                     &mSmmCommunicationContext,
-                    sizeof(mSmmCommunicationContext)
+                    sizeof (mSmmCommunicationContext)
                     );
   ASSERT_EFI_ERROR (Status);
 }
@@ -66,14 +66,14 @@ PiSmmCommunicationHandler (
   IN OUT UINTN   *CommBufferSize  OPTIONAL
   )
 {
-  UINTN                            CommSize;
-  EFI_STATUS                       Status;
-  EFI_SMM_COMMUNICATE_HEADER       *CommunicateHeader;
-  EFI_PHYSICAL_ADDRESS             *BufferPtrAddress;
+  UINTN                       CommSize;
+  EFI_STATUS                  Status;
+  EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
+  EFI_PHYSICAL_ADDRESS        *BufferPtrAddress;
 
   DEBUG ((DEBUG_INFO, "PiSmmCommunicationHandler Enter\n"));
 
-  BufferPtrAddress = (EFI_PHYSICAL_ADDRESS *)(UINTN)mSmmCommunicationContext.BufferPtrAddress;
+  BufferPtrAddress  = (EFI_PHYSICAL_ADDRESS *)(UINTN)mSmmCommunicationContext.BufferPtrAddress;
   CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)(UINTN)*BufferPtrAddress;
   DEBUG ((DEBUG_INFO, "PiSmmCommunicationHandler CommunicateHeader - %x\n", CommunicateHeader));
   if (CommunicateHeader == NULL) {
@@ -122,28 +122,28 @@ Done:
   @return Allocated address for output.
 
 **/
-VOID*
+VOID *
 AllocateAcpiNvsMemoryBelow4G (
-  IN   UINTN   Size
+  IN   UINTN  Size
   )
 {
   UINTN                 Pages;
   EFI_PHYSICAL_ADDRESS  Address;
   EFI_STATUS            Status;
-  VOID*                 Buffer;
+  VOID                  *Buffer;
 
-  Pages = EFI_SIZE_TO_PAGES (Size);
+  Pages   = EFI_SIZE_TO_PAGES (Size);
   Address = 0xffffffff;
 
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   EfiACPIMemoryNVS,
-                   Pages,
-                   &Address
-                   );
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiACPIMemoryNVS,
+                  Pages,
+                  &Address
+                  );
   ASSERT_EFI_ERROR (Status);
 
-  Buffer = (VOID *) (UINTN) Address;
+  Buffer = (VOID *)(UINTN)Address;
   ZeroMem (Buffer, Size);
 
   return Buffer;
@@ -165,11 +165,11 @@ PiSmmCommunicationSmmEntryPoint (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                    Status;
-  EFI_SMM_SW_DISPATCH2_PROTOCOL *SmmSwDispatch2;
-  EFI_SMM_SW_REGISTER_CONTEXT   SmmSwDispatchContext;
-  EFI_HANDLE                    DispatchHandle;
-  EFI_PHYSICAL_ADDRESS          *BufferPtrAddress;
+  EFI_STATUS                     Status;
+  EFI_SMM_SW_DISPATCH2_PROTOCOL  *SmmSwDispatch2;
+  EFI_SMM_SW_REGISTER_CONTEXT    SmmSwDispatchContext;
+  EFI_HANDLE                     DispatchHandle;
+  EFI_PHYSICAL_ADDRESS           *BufferPtrAddress;
 
   //
   // Register software SMI handler
@@ -192,7 +192,7 @@ PiSmmCommunicationSmmEntryPoint (
 
   DEBUG ((DEBUG_INFO, "SmmCommunication SwSmi: %x\n", (UINTN)SmmSwDispatchContext.SwSmiInputValue));
 
-  BufferPtrAddress = AllocateAcpiNvsMemoryBelow4G (sizeof(EFI_PHYSICAL_ADDRESS));
+  BufferPtrAddress = AllocateAcpiNvsMemoryBelow4G (sizeof (EFI_PHYSICAL_ADDRESS));
   ASSERT (BufferPtrAddress != NULL);
   DEBUG ((DEBUG_INFO, "SmmCommunication BufferPtrAddress: 0x%016lx, BufferPtr: 0x%016lx\n", (EFI_PHYSICAL_ADDRESS)(UINTN)BufferPtrAddress, *BufferPtrAddress));
 

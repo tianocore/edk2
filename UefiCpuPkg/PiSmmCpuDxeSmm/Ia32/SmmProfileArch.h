@@ -12,42 +12,42 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack (1)
 
 typedef struct _MSR_DS_AREA_STRUCT {
-  UINT32  BTSBufferBase;
-  UINT32  BTSIndex;
-  UINT32  BTSAbsoluteMaximum;
-  UINT32  BTSInterruptThreshold;
-  UINT32  PEBSBufferBase;
-  UINT32  PEBSIndex;
-  UINT32  PEBSAbsoluteMaximum;
-  UINT32  PEBSInterruptThreshold;
-  UINT32  PEBSCounterReset[4];
-  UINT32  Reserved;
+  UINT32    BTSBufferBase;
+  UINT32    BTSIndex;
+  UINT32    BTSAbsoluteMaximum;
+  UINT32    BTSInterruptThreshold;
+  UINT32    PEBSBufferBase;
+  UINT32    PEBSIndex;
+  UINT32    PEBSAbsoluteMaximum;
+  UINT32    PEBSInterruptThreshold;
+  UINT32    PEBSCounterReset[4];
+  UINT32    Reserved;
 } MSR_DS_AREA_STRUCT;
 
 typedef struct _BRANCH_TRACE_RECORD {
-  UINT32  LastBranchFrom;
-  UINT32  LastBranchTo;
-  UINT32  Rsvd0 : 4;
-  UINT32  BranchPredicted : 1;
-  UINT32  Rsvd1 : 27;
+  UINT32    LastBranchFrom;
+  UINT32    LastBranchTo;
+  UINT32    Rsvd0           : 4;
+  UINT32    BranchPredicted : 1;
+  UINT32    Rsvd1           : 27;
 } BRANCH_TRACE_RECORD;
 
 typedef struct _PEBS_RECORD {
-  UINT32  Eflags;
-  UINT32  LinearIP;
-  UINT32  Eax;
-  UINT32  Ebx;
-  UINT32  Ecx;
-  UINT32  Edx;
-  UINT32  Esi;
-  UINT32  Edi;
-  UINT32  Ebp;
-  UINT32  Esp;
+  UINT32    Eflags;
+  UINT32    LinearIP;
+  UINT32    Eax;
+  UINT32    Ebx;
+  UINT32    Ecx;
+  UINT32    Edx;
+  UINT32    Esi;
+  UINT32    Edi;
+  UINT32    Ebp;
+  UINT32    Esp;
 } PEBS_RECORD;
 
 #pragma pack ()
 
-#define PHYSICAL_ADDRESS_MASK       ((1ull << 32) - SIZE_4KB)
+#define PHYSICAL_ADDRESS_MASK  ((1ull << 32) - SIZE_4KB)
 
 /**
   Update page table to map the memory correctly in order to make the instruction
@@ -63,11 +63,11 @@ typedef struct _PEBS_RECORD {
 **/
 VOID
 RestorePageTableAbove4G (
-  UINT64        *PageTable,
-  UINT64        PFAddress,
-  UINTN         CpuIndex,
-  UINTN         ErrorCode,
-  BOOLEAN       *IsValidPFAddress
+  UINT64   *PageTable,
+  UINT64   PFAddress,
+  UINTN    CpuIndex,
+  UINTN    ErrorCode,
+  BOOLEAN  *IsValidPFAddress
   );
 
 /**

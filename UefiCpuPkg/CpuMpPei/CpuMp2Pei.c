@@ -43,9 +43,9 @@
 EFI_STATUS
 EFIAPI
 EdkiiPeiGetNumberOfProcessors (
-  IN  EDKII_PEI_MP_SERVICES2_PPI   *This,
-  OUT UINTN                     *NumberOfProcessors,
-  OUT UINTN                     *NumberOfEnabledProcessors
+  IN  EDKII_PEI_MP_SERVICES2_PPI  *This,
+  OUT UINTN                       *NumberOfProcessors,
+  OUT UINTN                       *NumberOfEnabledProcessors
   )
 {
   if ((NumberOfProcessors == NULL) || (NumberOfEnabledProcessors == NULL)) {
@@ -85,9 +85,9 @@ EdkiiPeiGetNumberOfProcessors (
 EFI_STATUS
 EFIAPI
 EdkiiPeiGetProcessorInfo (
-  IN  EDKII_PEI_MP_SERVICES2_PPI    *This,
-  IN  UINTN                         ProcessorNumber,
-  OUT EFI_PROCESSOR_INFORMATION     *ProcessorInfoBuffer
+  IN  EDKII_PEI_MP_SERVICES2_PPI  *This,
+  IN  UINTN                       ProcessorNumber,
+  OUT EFI_PROCESSOR_INFORMATION   *ProcessorInfoBuffer
   )
 {
   return MpInitLibGetProcessorInfo (ProcessorNumber, ProcessorInfoBuffer, NULL);
@@ -157,11 +157,11 @@ EdkiiPeiGetProcessorInfo (
 EFI_STATUS
 EFIAPI
 EdkiiPeiStartupAllAPs (
-  IN  EDKII_PEI_MP_SERVICES2_PPI   *This,
-  IN  EFI_AP_PROCEDURE             Procedure,
-  IN  BOOLEAN                      SingleThread,
-  IN  UINTN                        TimeoutInMicroSeconds,
-  IN  VOID                         *ProcedureArgument      OPTIONAL
+  IN  EDKII_PEI_MP_SERVICES2_PPI  *This,
+  IN  EFI_AP_PROCEDURE            Procedure,
+  IN  BOOLEAN                     SingleThread,
+  IN  UINTN                       TimeoutInMicroSeconds,
+  IN  VOID                        *ProcedureArgument      OPTIONAL
   )
 {
   return MpInitLibStartupAllAPs (
@@ -221,11 +221,11 @@ EdkiiPeiStartupAllAPs (
 EFI_STATUS
 EFIAPI
 EdkiiPeiStartupThisAP (
-  IN  EDKII_PEI_MP_SERVICES2_PPI   *This,
-  IN  EFI_AP_PROCEDURE             Procedure,
-  IN  UINTN                        ProcessorNumber,
-  IN  UINTN                        TimeoutInMicroseconds,
-  IN  VOID                         *ProcedureArgument      OPTIONAL
+  IN  EDKII_PEI_MP_SERVICES2_PPI  *This,
+  IN  EFI_AP_PROCEDURE            Procedure,
+  IN  UINTN                       ProcessorNumber,
+  IN  UINTN                       TimeoutInMicroseconds,
+  IN  VOID                        *ProcedureArgument      OPTIONAL
   )
 {
   return MpInitLibStartupThisAP (
@@ -321,10 +321,10 @@ EdkiiPeiSwitchBSP (
 EFI_STATUS
 EFIAPI
 EdkiiPeiEnableDisableAP (
-  IN  EDKII_PEI_MP_SERVICES2_PPI   *This,
-  IN  UINTN                        ProcessorNumber,
-  IN  BOOLEAN                      EnableAP,
-  IN  UINT32                       *HealthFlag OPTIONAL
+  IN  EDKII_PEI_MP_SERVICES2_PPI  *This,
+  IN  UINTN                       ProcessorNumber,
+  IN  BOOLEAN                     EnableAP,
+  IN  UINT32                      *HealthFlag OPTIONAL
   )
 {
   return MpInitLibEnableDisableAP (ProcessorNumber, EnableAP, HealthFlag);
@@ -388,10 +388,10 @@ EdkiiPeiWhoAmI (
 EFI_STATUS
 EFIAPI
 EdkiiPeiStartupAllCPUs (
-  IN  EDKII_PEI_MP_SERVICES2_PPI   *This,
-  IN  EFI_AP_PROCEDURE             Procedure,
-  IN  UINTN                        TimeoutInMicroSeconds,
-  IN  VOID                         *ProcedureArgument      OPTIONAL
+  IN  EDKII_PEI_MP_SERVICES2_PPI  *This,
+  IN  EFI_AP_PROCEDURE            Procedure,
+  IN  UINTN                       TimeoutInMicroSeconds,
+  IN  VOID                        *ProcedureArgument      OPTIONAL
   )
 {
   return MpInitLibStartupAllCPUs (
@@ -404,7 +404,7 @@ EdkiiPeiStartupAllCPUs (
 //
 // CPU MP2 PPI to be installed
 //
-EDKII_PEI_MP_SERVICES2_PPI            mMpServices2Ppi = {
+EDKII_PEI_MP_SERVICES2_PPI  mMpServices2Ppi = {
   EdkiiPeiGetNumberOfProcessors,
   EdkiiPeiGetProcessorInfo,
   EdkiiPeiStartupAllAPs,
@@ -414,4 +414,3 @@ EDKII_PEI_MP_SERVICES2_PPI            mMpServices2Ppi = {
   EdkiiPeiWhoAmI,
   EdkiiPeiStartupAllCPUs
 };
-

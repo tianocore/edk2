@@ -36,7 +36,7 @@
 
 #include <Guid/MicrocodePatchHob.h>
 
-#define WAKEUP_AP_SIGNAL SIGNATURE_32 ('S', 'T', 'A', 'P')
+#define WAKEUP_AP_SIGNAL  SIGNATURE_32 ('S', 'T', 'A', 'P')
 
 #define CPU_INIT_MP_LIB_HOB_GUID \
   { \
@@ -46,14 +46,14 @@
 //
 //  The MP data for switch BSP
 //
-#define CPU_SWITCH_STATE_IDLE   0
-#define CPU_SWITCH_STATE_STORED 1
-#define CPU_SWITCH_STATE_LOADED 2
+#define CPU_SWITCH_STATE_IDLE    0
+#define CPU_SWITCH_STATE_STORED  1
+#define CPU_SWITCH_STATE_LOADED  2
 
 //
 // Default maximum number of entries to store the microcode patches information
 //
-#define DEFAULT_MAX_MICROCODE_PATCH_NUM 8
+#define DEFAULT_MAX_MICROCODE_PATCH_NUM  8
 
 //
 // Data structure for microcode patch information
@@ -67,10 +67,10 @@ typedef struct {
 // CPU exchange information for switch BSP
 //
 typedef struct {
-  UINT8             State;        // offset 0
-  UINTN             StackPointer; // offset 4 / 8
-  IA32_DESCRIPTOR   Gdtr;         // offset 8 / 16
-  IA32_DESCRIPTOR   Idtr;         // offset 14 / 26
+  UINT8              State;        // offset 0
+  UINTN              StackPointer; // offset 4 / 8
+  IA32_DESCRIPTOR    Gdtr;         // offset 8 / 16
+  IA32_DESCRIPTOR    Idtr;         // offset 14 / 26
 } CPU_EXCHANGE_ROLE_INFO;
 
 //
@@ -111,41 +111,41 @@ typedef enum {
 // CPU volatile registers around INIT-SIPI-SIPI
 //
 typedef struct {
-  UINTN                          Cr0;
-  UINTN                          Cr3;
-  UINTN                          Cr4;
-  UINTN                          Dr0;
-  UINTN                          Dr1;
-  UINTN                          Dr2;
-  UINTN                          Dr3;
-  UINTN                          Dr6;
-  UINTN                          Dr7;
-  IA32_DESCRIPTOR                Gdtr;
-  IA32_DESCRIPTOR                Idtr;
-  UINT16                         Tr;
+  UINTN              Cr0;
+  UINTN              Cr3;
+  UINTN              Cr4;
+  UINTN              Dr0;
+  UINTN              Dr1;
+  UINTN              Dr2;
+  UINTN              Dr3;
+  UINTN              Dr6;
+  UINTN              Dr7;
+  IA32_DESCRIPTOR    Gdtr;
+  IA32_DESCRIPTOR    Idtr;
+  UINT16             Tr;
 } CPU_VOLATILE_REGISTERS;
 
 //
 // AP related data
 //
 typedef struct {
-  SPIN_LOCK                      ApLock;
-  volatile UINT32                *StartupApSignal;
-  volatile UINTN                 ApFunction;
-  volatile UINTN                 ApFunctionArgument;
-  BOOLEAN                        CpuHealthy;
-  volatile CPU_STATE             State;
-  CPU_VOLATILE_REGISTERS         VolatileRegisters;
-  BOOLEAN                        Waiting;
-  BOOLEAN                        *Finished;
-  UINT64                         ExpectedTime;
-  UINT64                         CurrentTime;
-  UINT64                         TotalTime;
-  EFI_EVENT                      WaitEvent;
-  UINT32                         ProcessorSignature;
-  UINT8                          PlatformId;
-  UINT64                         MicrocodeEntryAddr;
-  UINT32                         MicrocodeRevision;
+  SPIN_LOCK                 ApLock;
+  volatile UINT32           *StartupApSignal;
+  volatile UINTN            ApFunction;
+  volatile UINTN            ApFunctionArgument;
+  BOOLEAN                   CpuHealthy;
+  volatile CPU_STATE        State;
+  CPU_VOLATILE_REGISTERS    VolatileRegisters;
+  BOOLEAN                   Waiting;
+  BOOLEAN                   *Finished;
+  UINT64                    ExpectedTime;
+  UINT64                    CurrentTime;
+  UINT64                    TotalTime;
+  EFI_EVENT                 WaitEvent;
+  UINT32                    ProcessorSignature;
+  UINT8                     PlatformId;
+  UINT64                    MicrocodeEntryAddr;
+  UINT32                    MicrocodeRevision;
 } CPU_AP_DATA;
 
 //
@@ -156,10 +156,10 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  UINT32                         InitialApicId;
-  UINT32                         ApicId;
-  UINT32                         Health;
-  UINT64                         ApTopOfStack;
+  UINT32    InitialApicId;
+  UINT32    ApicId;
+  UINT32    Health;
+  UINT64    ApTopOfStack;
 } CPU_INFO_IN_HOB;
 #pragma pack ()
 
@@ -169,20 +169,20 @@ typedef struct {
 // It is natural aligned by design.
 //
 typedef struct {
-  UINT8             *RendezvousFunnelAddress;
-  UINTN             ModeEntryOffset;
-  UINTN             RendezvousFunnelSize;
-  UINT8             *RelocateApLoopFuncAddress;
-  UINTN             RelocateApLoopFuncSize;
-  UINTN             ModeTransitionOffset;
-  UINTN             SwitchToRealSize;
-  UINTN             SwitchToRealOffset;
-  UINTN             SwitchToRealNoNxOffset;
-  UINTN             SwitchToRealPM16ModeOffset;
-  UINTN             SwitchToRealPM16ModeSize;
+  UINT8    *RendezvousFunnelAddress;
+  UINTN    ModeEntryOffset;
+  UINTN    RendezvousFunnelSize;
+  UINT8    *RelocateApLoopFuncAddress;
+  UINTN    RelocateApLoopFuncSize;
+  UINTN    ModeTransitionOffset;
+  UINTN    SwitchToRealSize;
+  UINTN    SwitchToRealOffset;
+  UINTN    SwitchToRealNoNxOffset;
+  UINTN    SwitchToRealPM16ModeOffset;
+  UINTN    SwitchToRealPM16ModeSize;
 } MP_ASSEMBLY_ADDRESS_MAP;
 
-typedef struct _CPU_MP_DATA  CPU_MP_DATA;
+typedef struct _CPU_MP_DATA CPU_MP_DATA;
 
 #pragma pack(1)
 
@@ -192,33 +192,33 @@ typedef struct _CPU_MP_DATA  CPU_MP_DATA;
 // into this structure are used in assembly code in this module
 //
 typedef struct {
-  UINTN                 StackStart;
-  UINTN                 StackSize;
-  UINTN                 CFunction;
-  IA32_DESCRIPTOR       GdtrProfile;
-  IA32_DESCRIPTOR       IdtrProfile;
-  UINTN                 BufferStart;
-  UINTN                 ModeOffset;
-  UINTN                 ApIndex;
-  UINTN                 CodeSegment;
-  UINTN                 DataSegment;
-  UINTN                 EnableExecuteDisable;
-  UINTN                 Cr3;
-  UINTN                 InitFlag;
-  CPU_INFO_IN_HOB       *CpuInfo;
-  UINTN                 NumApsExecuting;
-  CPU_MP_DATA           *CpuMpData;
-  UINTN                 InitializeFloatingPointUnitsAddress;
-  UINT32                ModeTransitionMemory;
-  UINT16                ModeTransitionSegment;
-  UINT32                ModeHighMemory;
-  UINT16                ModeHighSegment;
+  UINTN              StackStart;
+  UINTN              StackSize;
+  UINTN              CFunction;
+  IA32_DESCRIPTOR    GdtrProfile;
+  IA32_DESCRIPTOR    IdtrProfile;
+  UINTN              BufferStart;
+  UINTN              ModeOffset;
+  UINTN              ApIndex;
+  UINTN              CodeSegment;
+  UINTN              DataSegment;
+  UINTN              EnableExecuteDisable;
+  UINTN              Cr3;
+  UINTN              InitFlag;
+  CPU_INFO_IN_HOB    *CpuInfo;
+  UINTN              NumApsExecuting;
+  CPU_MP_DATA        *CpuMpData;
+  UINTN              InitializeFloatingPointUnitsAddress;
+  UINT32             ModeTransitionMemory;
+  UINT16             ModeTransitionSegment;
+  UINT32             ModeHighMemory;
+  UINT16             ModeHighSegment;
   //
   // Enable5LevelPaging indicates whether 5-level paging is enabled in long mode.
   //
-  BOOLEAN               Enable5LevelPaging;
-  BOOLEAN               SevEsIsEnabled;
-  UINTN                 GhcbBase;
+  BOOLEAN            Enable5LevelPaging;
+  BOOLEAN            SevEsIsEnabled;
+  UINTN              GhcbBase;
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
@@ -227,55 +227,55 @@ typedef struct {
 // CPU MP Data save in memory
 //
 struct _CPU_MP_DATA {
-  UINT64                         CpuInfoInHob;
-  UINT32                         CpuCount;
-  UINT32                         BspNumber;
+  UINT64                           CpuInfoInHob;
+  UINT32                           CpuCount;
+  UINT32                           BspNumber;
   //
   // The above fields data will be passed from PEI to DXE
   // Please make sure the fields offset same in the different
   // architecture.
   //
-  SPIN_LOCK                      MpLock;
-  UINTN                          Buffer;
-  UINTN                          CpuApStackSize;
-  MP_ASSEMBLY_ADDRESS_MAP        AddressMap;
-  UINTN                          WakeupBuffer;
-  UINTN                          WakeupBufferHigh;
-  UINTN                          BackupBuffer;
-  UINTN                          BackupBufferSize;
+  SPIN_LOCK                        MpLock;
+  UINTN                            Buffer;
+  UINTN                            CpuApStackSize;
+  MP_ASSEMBLY_ADDRESS_MAP          AddressMap;
+  UINTN                            WakeupBuffer;
+  UINTN                            WakeupBufferHigh;
+  UINTN                            BackupBuffer;
+  UINTN                            BackupBufferSize;
 
-  volatile UINT32                FinishedCount;
-  UINT32                         RunningCount;
-  BOOLEAN                        SingleThread;
-  EFI_AP_PROCEDURE               Procedure;
-  VOID                           *ProcArguments;
-  BOOLEAN                        *Finished;
-  UINT64                         ExpectedTime;
-  UINT64                         CurrentTime;
-  UINT64                         TotalTime;
-  EFI_EVENT                      WaitEvent;
-  UINTN                          **FailedCpuList;
+  volatile UINT32                  FinishedCount;
+  UINT32                           RunningCount;
+  BOOLEAN                          SingleThread;
+  EFI_AP_PROCEDURE                 Procedure;
+  VOID                             *ProcArguments;
+  BOOLEAN                          *Finished;
+  UINT64                           ExpectedTime;
+  UINT64                           CurrentTime;
+  UINT64                           TotalTime;
+  EFI_EVENT                        WaitEvent;
+  UINTN                            **FailedCpuList;
 
-  AP_INIT_STATE                  InitFlag;
-  BOOLEAN                        SwitchBspFlag;
-  UINTN                          NewBspNumber;
-  CPU_EXCHANGE_ROLE_INFO         BSPInfo;
-  CPU_EXCHANGE_ROLE_INFO         APInfo;
-  MTRR_SETTINGS                  MtrrTable;
-  UINT8                          ApLoopMode;
-  UINT8                          ApTargetCState;
-  UINT16                         PmCodeSegment;
-  UINT16                         Pm16CodeSegment;
-  CPU_AP_DATA                    *CpuData;
-  volatile MP_CPU_EXCHANGE_INFO  *MpCpuExchangeInfo;
+  AP_INIT_STATE                    InitFlag;
+  BOOLEAN                          SwitchBspFlag;
+  UINTN                            NewBspNumber;
+  CPU_EXCHANGE_ROLE_INFO           BSPInfo;
+  CPU_EXCHANGE_ROLE_INFO           APInfo;
+  MTRR_SETTINGS                    MtrrTable;
+  UINT8                            ApLoopMode;
+  UINT8                            ApTargetCState;
+  UINT16                           PmCodeSegment;
+  UINT16                           Pm16CodeSegment;
+  CPU_AP_DATA                      *CpuData;
+  volatile MP_CPU_EXCHANGE_INFO    *MpCpuExchangeInfo;
 
-  UINT32                         CurrentTimerCount;
-  UINTN                          DivideValue;
-  UINT8                          Vector;
-  BOOLEAN                        PeriodicMode;
-  BOOLEAN                        TimerInterruptState;
-  UINT64                         MicrocodePatchAddress;
-  UINT64                         MicrocodePatchRegionSize;
+  UINT32                           CurrentTimerCount;
+  UINTN                            DivideValue;
+  UINT8                            Vector;
+  BOOLEAN                          PeriodicMode;
+  BOOLEAN                          TimerInterruptState;
+  UINT64                           MicrocodePatchAddress;
+  UINT64                           MicrocodePatchRegionSize;
 
   //
   // Whether need to use Init-Sipi-Sipi to wake up the APs.
@@ -284,25 +284,25 @@ struct _CPU_MP_DATA {
   // will be hardcode change to HLT mode by PiSmmCpuDxeSmm
   // driver.
   //
-  BOOLEAN                        WakeUpByInitSipiSipi;
+  BOOLEAN        WakeUpByInitSipiSipi;
 
-  BOOLEAN                        SevEsIsEnabled;
-  UINTN                          SevEsAPBuffer;
-  UINTN                          SevEsAPResetStackStart;
-  CPU_MP_DATA                    *NewCpuMpData;
+  BOOLEAN        SevEsIsEnabled;
+  UINTN          SevEsAPBuffer;
+  UINTN          SevEsAPResetStackStart;
+  CPU_MP_DATA    *NewCpuMpData;
 
-  UINT64                         GhcbBase;
+  UINT64         GhcbBase;
 };
 
-#define AP_SAFE_STACK_SIZE  128
-#define AP_RESET_STACK_SIZE AP_SAFE_STACK_SIZE
+#define AP_SAFE_STACK_SIZE   128
+#define AP_RESET_STACK_SIZE  AP_SAFE_STACK_SIZE
 
 #pragma pack(1)
 
 typedef struct {
-  UINT8   InsnBuffer[8];
-  UINT16  Rip;
-  UINT16  Segment;
+  UINT8     InsnBuffer[8];
+  UINT16    Rip;
+  UINT16    Segment;
 } SEV_ES_AP_JMP_FAR;
 
 #pragma pack()
@@ -322,14 +322,14 @@ typedef struct {
 **/
 typedef
 VOID
-(EFIAPI AP_RESET) (
+(EFIAPI AP_RESET)(
   IN UINTN    BufferStart,
   IN UINT16   Code16,
   IN UINT16   Code32,
   IN UINTN    StackStart
   );
 
-extern EFI_GUID mCpuInitMpLibHobGuid;
+extern EFI_GUID  mCpuInitMpLibHobGuid;
 
 /**
   Assembly code to place AP into safe loop mode.
@@ -347,7 +347,7 @@ extern EFI_GUID mCpuInitMpLibHobGuid;
 **/
 typedef
 VOID
-(EFIAPI * ASM_RELOCATE_AP_LOOP) (
+(EFIAPI *ASM_RELOCATE_AP_LOOP)(
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
   IN UINTN                   PmCodeSegment,
@@ -367,7 +367,7 @@ VOID
 VOID
 EFIAPI
 AsmGetAddressMap (
-  OUT MP_ASSEMBLY_ADDRESS_MAP    *AddressMap
+  OUT MP_ASSEMBLY_ADDRESS_MAP  *AddressMap
   );
 
 /**
@@ -382,8 +382,8 @@ AsmGetAddressMap (
 VOID
 EFIAPI
 AsmExchangeRole (
-  IN CPU_EXCHANGE_ROLE_INFO    *MyInfo,
-  IN CPU_EXCHANGE_ROLE_INFO    *OthersInfo
+  IN CPU_EXCHANGE_ROLE_INFO  *MyInfo,
+  IN CPU_EXCHANGE_ROLE_INFO  *OthersInfo
   );
 
 /**
@@ -403,9 +403,8 @@ GetCpuMpData (
 **/
 VOID
 SaveCpuMpData (
-  IN CPU_MP_DATA   *CpuMpData
+  IN CPU_MP_DATA  *CpuMpData
   );
-
 
 /**
   Get available system memory below 1MB by specified size.
@@ -417,7 +416,7 @@ SaveCpuMpData (
 **/
 UINTN
 GetWakeupBuffer (
-  IN UINTN                WakeupBufferSize
+  IN UINTN  WakeupBufferSize
   );
 
 /**
@@ -434,7 +433,7 @@ GetWakeupBuffer (
 **/
 UINTN
 GetModeTransitionBuffer (
-  IN UINTN                BufferSize
+  IN UINTN  BufferSize
   );
 
 /**
@@ -463,11 +462,11 @@ GetSevEsAPMemory (
 **/
 VOID
 WakeUpAP (
-  IN CPU_MP_DATA               *CpuMpData,
-  IN BOOLEAN                   Broadcast,
-  IN UINTN                     ProcessorNumber,
-  IN EFI_AP_PROCEDURE          Procedure,              OPTIONAL
-  IN VOID                      *ProcedureArgument,     OPTIONAL
+  IN CPU_MP_DATA *CpuMpData,
+  IN BOOLEAN Broadcast,
+  IN UINTN ProcessorNumber,
+  IN EFI_AP_PROCEDURE Procedure, OPTIONAL
+  IN VOID                      *ProcedureArgument, OPTIONAL
   IN BOOLEAN                   WakeUpDisabledAps       OPTIONAL
   );
 
@@ -478,7 +477,7 @@ WakeUpAP (
 **/
 VOID
 InitMpGlobalData (
-  IN CPU_MP_DATA               *CpuMpData
+  IN CPU_MP_DATA  *CpuMpData
   );
 
 /**
@@ -515,13 +514,13 @@ InitMpGlobalData (
 **/
 EFI_STATUS
 StartupAllCPUsWorker (
-  IN  EFI_AP_PROCEDURE          Procedure,
-  IN  BOOLEAN                   SingleThread,
-  IN  BOOLEAN                   ExcludeBsp,
-  IN  EFI_EVENT                 WaitEvent               OPTIONAL,
-  IN  UINTN                     TimeoutInMicroseconds,
-  IN  VOID                      *ProcedureArgument      OPTIONAL,
-  OUT UINTN                     **FailedCpuList         OPTIONAL
+  IN  EFI_AP_PROCEDURE  Procedure,
+  IN  BOOLEAN           SingleThread,
+  IN  BOOLEAN           ExcludeBsp,
+  IN  EFI_EVENT         WaitEvent               OPTIONAL,
+  IN  UINTN             TimeoutInMicroseconds,
+  IN  VOID              *ProcedureArgument      OPTIONAL,
+  OUT UINTN             **FailedCpuList         OPTIONAL
   );
 
 /**
@@ -549,12 +548,12 @@ StartupAllCPUsWorker (
 **/
 EFI_STATUS
 StartupThisAPWorker (
-  IN  EFI_AP_PROCEDURE          Procedure,
-  IN  UINTN                     ProcessorNumber,
-  IN  EFI_EVENT                 WaitEvent               OPTIONAL,
-  IN  UINTN                     TimeoutInMicroseconds,
-  IN  VOID                      *ProcedureArgument      OPTIONAL,
-  OUT BOOLEAN                   *Finished               OPTIONAL
+  IN  EFI_AP_PROCEDURE  Procedure,
+  IN  UINTN             ProcessorNumber,
+  IN  EFI_EVENT         WaitEvent               OPTIONAL,
+  IN  UINTN             TimeoutInMicroseconds,
+  IN  VOID              *ProcedureArgument      OPTIONAL,
+  OUT BOOLEAN           *Finished               OPTIONAL
   );
 
 /**
@@ -570,8 +569,8 @@ StartupThisAPWorker (
 **/
 EFI_STATUS
 SwitchBSPWorker (
-  IN UINTN                     ProcessorNumber,
-  IN BOOLEAN                   EnableOldBSP
+  IN UINTN    ProcessorNumber,
+  IN BOOLEAN  EnableOldBSP
   );
 
 /**
@@ -590,9 +589,9 @@ SwitchBSPWorker (
 **/
 EFI_STATUS
 EnableDisableApWorker (
-  IN  UINTN                     ProcessorNumber,
-  IN  BOOLEAN                   EnableAP,
-  IN  UINT32                    *HealthFlag OPTIONAL
+  IN  UINTN    ProcessorNumber,
+  IN  BOOLEAN  EnableAP,
+  IN  UINT32   *HealthFlag OPTIONAL
   );
 
 /**
@@ -618,7 +617,7 @@ GetCpuMpDataFromGuidedHob (
 **/
 EFI_STATUS
 CheckThisAP (
-  IN UINTN        ProcessorNumber
+  IN UINTN  ProcessorNumber
   );
 
 /**
@@ -655,8 +654,8 @@ CheckAndUpdateApsStatus (
 **/
 VOID
 MicrocodeDetect (
-  IN CPU_MP_DATA             *CpuMpData,
-  IN UINTN                   ProcessorNumber
+  IN CPU_MP_DATA  *CpuMpData,
+  IN UINTN        ProcessorNumber
   );
 
 /**
@@ -666,7 +665,7 @@ MicrocodeDetect (
 **/
 VOID
 ShadowMicrocodeUpdatePatch (
-  IN OUT CPU_MP_DATA             *CpuMpData
+  IN OUT CPU_MP_DATA  *CpuMpData
   );
 
 /**
@@ -686,8 +685,8 @@ ShadowMicrocodeUpdatePatch (
 **/
 BOOLEAN
 GetMicrocodePatchInfoFromHob (
-  UINT64                         *Address,
-  UINT64                         *RegionSize
+  UINT64  *Address,
+  UINT64  *RegionSize
   );
 
 /**
@@ -721,8 +720,8 @@ EnableDebugAgent (
 **/
 EFI_STATUS
 GetProcessorNumber (
-  IN CPU_MP_DATA               *CpuMpData,
-  OUT UINTN                    *ProcessorNumber
+  IN CPU_MP_DATA  *CpuMpData,
+  OUT UINTN       *ProcessorNumber
   );
 
 /**
@@ -738,8 +737,7 @@ GetProcessorNumber (
 **/
 EFI_STATUS
 PlatformShadowMicrocode (
-  IN OUT CPU_MP_DATA             *CpuMpData
+  IN OUT CPU_MP_DATA  *CpuMpData
   );
 
 #endif
-
