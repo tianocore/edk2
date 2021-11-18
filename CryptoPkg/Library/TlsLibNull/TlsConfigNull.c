@@ -31,7 +31,7 @@ TlsSetVersion (
   IN     UINT8                    MinorVer
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -55,7 +55,7 @@ TlsSetConnectionEnd (
   IN     BOOLEAN                  IsServer
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -85,7 +85,7 @@ TlsSetCipherList (
   IN     UINTN                    CipherNum
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -107,7 +107,7 @@ TlsSetCompressionMethod (
   IN     UINT8                    CompMethod
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -127,10 +127,11 @@ TlsSetVerify (
   IN     UINT32                   VerifyMode
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 // MU_CHANGE - Proposed fixes for TCBZ960, invalid domain name (CN) accepted. [BEGIN]
+
 /**
   Set the specified host name to be verified.
 
@@ -151,7 +152,7 @@ TlsSetVerifyHost (
   IN     CHAR8                    *HostName
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -180,7 +181,7 @@ TlsSetSessionId (
   IN     UINT16                   SessionIdLen
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -209,7 +210,7 @@ TlsSetCaCertificate (
   IN     UINTN                    DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -238,7 +239,7 @@ TlsSetHostPublicCert (
   IN     UINTN                    DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -266,7 +267,7 @@ TlsSetHostPrivateKey (
   IN     UINTN                    DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -291,7 +292,7 @@ TlsSetCertRevocationList (
   IN     UINTN                    DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -314,7 +315,7 @@ TlsGetVersion (
   IN     VOID                     *Tls
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -337,7 +338,7 @@ TlsGetConnectionEnd (
   IN     VOID                     *Tls
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -362,7 +363,7 @@ TlsGetCurrentCipher (
   IN OUT UINT16                   *CipherId
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -389,7 +390,7 @@ TlsGetCurrentCompressionId (
   IN OUT UINT8                    *CompressionId
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -412,7 +413,7 @@ TlsGetVerify (
   IN     VOID                     *Tls
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -439,7 +440,7 @@ TlsGetSessionId (
   IN OUT UINT16                   *SessionIdLen
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -461,7 +462,7 @@ TlsGetClientRandom (
   IN OUT UINT8                    *ClientRandom
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 /**
@@ -482,7 +483,7 @@ TlsGetServerRandom (
   IN OUT UINT8                    *ServerRandom
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 /**
@@ -506,7 +507,7 @@ TlsGetKeyMaterial (
   IN OUT UINT8                    *KeyMaterial
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -534,7 +535,7 @@ TlsGetCaCertificate (
   IN OUT UINTN                    *DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -563,7 +564,7 @@ TlsGetHostPublicCert (
   IN OUT UINTN                    *DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -591,7 +592,7 @@ TlsGetHostPrivateKey (
   IN OUT UINTN                    *DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -617,6 +618,6 @@ TlsGetCertRevocationList (
   IN OUT UINTN                    *DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }

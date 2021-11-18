@@ -25,7 +25,7 @@ HmacSha256New (
   //
   // Allocates & Initializes HMAC_CTX Context by OpenSSL HMAC_CTX_new()
   //
-  return (VOID *) HMAC_CTX_new ();
+  return (VOID *)HMAC_CTX_new ();
 }
 
 /**
@@ -71,11 +71,11 @@ HmacSha256SetKey (
   //
   // Check input parameters.
   //
-  if (HmacSha256Context == NULL || KeySize > INT_MAX) {
+  if ((HmacSha256Context == NULL) || (KeySize > INT_MAX)) {
     return FALSE;
   }
 
-  if (HMAC_Init_ex ((HMAC_CTX *)HmacSha256Context, Key, (UINT32) KeySize, EVP_sha256(), NULL) != 1) {
+  if (HMAC_Init_ex ((HMAC_CTX *)HmacSha256Context, Key, (UINT32)KeySize, EVP_sha256 (), NULL) != 1) {
     return FALSE;
   }
 
@@ -105,7 +105,7 @@ HmacSha256Duplicate (
   //
   // Check input parameters.
   //
-  if (HmacSha256Context == NULL || NewHmacSha256Context == NULL) {
+  if ((HmacSha256Context == NULL) || (NewHmacSha256Context == NULL)) {
     return FALSE;
   }
 
@@ -152,7 +152,7 @@ HmacSha256Update (
   //
   // Check invalid parameters, in case that only DataLength was checked in OpenSSL
   //
-  if (Data == NULL && DataSize != 0) {
+  if ((Data == NULL) && (DataSize != 0)) {
     return FALSE;
   }
 
@@ -198,7 +198,7 @@ HmacSha256Final (
   //
   // Check input parameters.
   //
-  if (HmacSha256Context == NULL || HmacValue == NULL) {
+  if ((HmacSha256Context == NULL) || (HmacValue == NULL)) {
     return FALSE;
   }
 
@@ -208,6 +208,7 @@ HmacSha256Final (
   if (HMAC_Final ((HMAC_CTX *)HmacSha256Context, HmacValue, &Length) != 1) {
     return FALSE;
   }
+
   if (HMAC_CTX_reset ((HMAC_CTX *)HmacSha256Context) != 1) {
     return FALSE;
   }

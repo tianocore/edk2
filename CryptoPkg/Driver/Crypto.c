@@ -18,7 +18,7 @@
   A macro used to retrieve the FixedAtBuild PcdCryptoServiceFamilyEnable with a
   typecast to its associcted structure type PCD_CRYPTO_SERVICE_FAMILY_ENABLE.
 **/
-#define EDKII_CRYPTO_PCD ((const PCD_CRYPTO_SERVICE_FAMILY_ENABLE *) \
+#define EDKII_CRYPTO_PCD  ((const PCD_CRYPTO_SERVICE_FAMILY_ENABLE *)\
   (FixedPcdGetPtr (PcdCryptoServiceFamilyEnable)))
 
 /**
@@ -119,9 +119,9 @@ CryptoServiceGetCryptoVersion (
   return EDKII_CRYPTO_VERSION;
 }
 
-//=====================================================================================
+// =====================================================================================
 //    One-Way Cryptographic Hash Primitives
-//=====================================================================================
+// =====================================================================================
 
 /**
   MD4 is deprecated and unsupported any longer.
@@ -244,6 +244,7 @@ DeprecatedCryptoServiceMd4HashAll (
 }
 
 #ifndef ENABLE_MD5_DEPRECATED_INTERFACES
+
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
@@ -390,7 +391,9 @@ DeprecatedCryptoServiceMd5HashAll (
 {
   return BaseCryptLibServiceDeprecated ("Md5HashAll"), FALSE;
 }
+
 #else
+
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
@@ -548,9 +551,11 @@ CryptoServiceMd5HashAll (
 {
   return CALL_BASECRYPTLIB (Md5.Services.HashAll, Md5HashAll, (Data, DataSize, HashValue), FALSE);
 }
+
 #endif
 
 #ifdef DISABLE_SHA1_DEPRECATED_INTERFACES
+
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
 
@@ -699,7 +704,9 @@ DeprecatedCryptoServiceSha1HashAll (
 {
   return BaseCryptLibServiceDeprecated ("Sha1HashAll"), FALSE;
 }
+
 #else
+
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
 
@@ -857,6 +864,7 @@ CryptoServiceSha1HashAll (
 {
   return CALL_BASECRYPTLIB (Sha1.Services.HashAll, Sha1HashAll, (Data, DataSize, HashValue), FALSE);
 }
+
 #endif
 
 /**
@@ -1455,9 +1463,9 @@ CryptoServiceSm3HashAll (
   return CALL_BASECRYPTLIB (Sm3.Services.HashAll, Sm3HashAll, (Data, DataSize, HashValue), FALSE);
 }
 
-//=====================================================================================
+// =====================================================================================
 //    MAC (Message Authentication Code) Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   HMAC MD5 is deprecated and unsupported any longer.
@@ -1839,9 +1847,9 @@ CryptoServiceHmacSha256Final (
   return CALL_BASECRYPTLIB (HmacSha256.Services.Final, HmacSha256Final, (HmacSha256Context, HmacValue), FALSE);
 }
 
-//=====================================================================================
+// =====================================================================================
 //    Symmetric Cryptography Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   TDES is deprecated and unsupported any longer.
@@ -2268,9 +2276,9 @@ DeprecatedCryptoServiceArc4Reset (
   return BaseCryptLibServiceDeprecated ("Arc4Reset"), FALSE;
 }
 
-//=====================================================================================
+// =====================================================================================
 //    Asymmetric Cryptography Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   Allocates and initializes one RSA context for subsequent use.
@@ -2638,7 +2646,7 @@ EFIAPI
 CryptoServiceX509GetCommonName (
   IN      CONST UINT8  *Cert,
   IN      UINTN        CertSize,
-  OUT     CHAR8        *CommonName,  OPTIONAL
+  OUT     CHAR8        *CommonName, OPTIONAL
   IN OUT  UINTN        *CommonNameSize
   )
 {
@@ -2676,7 +2684,7 @@ EFIAPI
 CryptoServiceX509GetOrganizationName (
   IN      CONST UINT8   *Cert,
   IN      UINTN         CertSize,
-  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  OUT     CHAR8         *NameBuffer, OPTIONAL
   IN OUT  UINTN         *NameBufferSize
   )
 {
@@ -2945,8 +2953,8 @@ CryptoServicePkcs1v2Encrypt (
   IN   UINTN        PublicKeySize,
   IN   UINT8        *InData,
   IN   UINTN        InDataSize,
-  IN   CONST UINT8  *PrngSeed,  OPTIONAL
-  IN   UINTN        PrngSeedSize,  OPTIONAL
+  IN   CONST UINT8  *PrngSeed, OPTIONAL
+  IN   UINTN        PrngSeedSize, OPTIONAL
   OUT  UINT8        **EncryptedData,
   OUT  UINTN        *EncryptedDataSize
   )
@@ -3172,7 +3180,6 @@ CryptoServiceVerifyEKUsInPkcs7Signature (
   return CALL_BASECRYPTLIB (Pkcs.Services.VerifyEKUsInPkcs7Signature, VerifyEKUsInPkcs7Signature, (Pkcs7Signature, SignatureSize, RequiredEKUs, RequiredEKUsSize, RequireAllPresent), FALSE);
 }
 
-
 /**
   Extracts the attached content from a PKCS#7 signed data if existed. The input signed
   data could be wrapped in a ContentInfo structure.
@@ -3276,9 +3283,9 @@ CryptoServiceImageTimestampVerify (
   return CALL_BASECRYPTLIB (Pkcs.Services.ImageTimestampVerify, ImageTimestampVerify, (AuthData, DataSize, TsaCert, CertSize, SigningTime), FALSE);
 }
 
-//=====================================================================================
+// =====================================================================================
 //    DH Key Exchange Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   Allocates and Initializes one Diffie-Hellman Context for subsequent use.
@@ -3459,9 +3466,9 @@ CryptoServiceDhComputeKey (
   return CALL_BASECRYPTLIB (Dh.Services.ComputeKey, DhComputeKey, (DhContext, PeerPublicKey, PeerPublicKeySize, Key, KeySize), FALSE);
 }
 
-//=====================================================================================
+// =====================================================================================
 //    Pseudo-Random Generation Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   Sets up the seed value for the pseudorandom number generator.
@@ -3515,9 +3522,9 @@ CryptoServiceRandomBytes (
   return CALL_BASECRYPTLIB (Random.Services.Bytes, RandomBytes, (Output, Size), FALSE);
 }
 
-//=====================================================================================
+// =====================================================================================
 //    Key Derivation Function Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   Derive key data using HMAC-SHA256 based KDF.
@@ -3699,7 +3706,7 @@ CryptoServiceTlsDoHandshake (
   IN     VOID                     *Tls,
   IN     UINT8                    *BufferIn, OPTIONAL
   IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
+  OUT UINT8                    *BufferOut, OPTIONAL
   IN OUT UINTN                    *BufferOutSize
   )
 {
@@ -3737,7 +3744,7 @@ CryptoServiceTlsHandleAlert (
   IN     VOID                     *Tls,
   IN     UINT8                    *BufferIn, OPTIONAL
   IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
+  OUT UINT8                    *BufferOut, OPTIONAL
   IN OUT UINTN                    *BufferOutSize
   )
 {
@@ -4463,7 +4470,7 @@ CryptoServiceTlsGetCertRevocationList (
   return CALL_BASECRYPTLIB (TlsGet.Services.CertRevocationList, TlsGetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
 }
 
-const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
+const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   /// Version
   CryptoServiceGetCryptoVersion,
   /// HMAC MD5 - deprecated and unsupported
@@ -4494,7 +4501,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   DeprecatedCryptoServiceMd4Update,
   DeprecatedCryptoServiceMd4Final,
   DeprecatedCryptoServiceMd4HashAll,
-#ifndef ENABLE_MD5_DEPRECATED_INTERFACES
+ #ifndef ENABLE_MD5_DEPRECATED_INTERFACES
   /// Md5 - deprecated and unsupported
   DeprecatedCryptoServiceMd5GetContextSize,
   DeprecatedCryptoServiceMd5Init,
@@ -4502,7 +4509,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   DeprecatedCryptoServiceMd5Update,
   DeprecatedCryptoServiceMd5Final,
   DeprecatedCryptoServiceMd5HashAll,
-#else
+ #else
   /// Md5
   CryptoServiceMd5GetContextSize,
   CryptoServiceMd5Init,
@@ -4510,7 +4517,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceMd5Update,
   CryptoServiceMd5Final,
   CryptoServiceMd5HashAll,
-#endif
+ #endif
   /// Pkcs
   CryptoServicePkcs1v2Encrypt,
   CryptoServicePkcs5HashPassword,
@@ -4545,7 +4552,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceRsaPkcs1Verify,
   CryptoServiceRsaGetPrivateKeyFromPem,
   CryptoServiceRsaGetPublicKeyFromX509,
-#ifdef DISABLE_SHA1_DEPRECATED_INTERFACES
+ #ifdef DISABLE_SHA1_DEPRECATED_INTERFACES
   /// Sha1 - deprecated and unsupported
   DeprecatedCryptoServiceSha1GetContextSize,
   DeprecatedCryptoServiceSha1Init,
@@ -4553,7 +4560,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   DeprecatedCryptoServiceSha1Update,
   DeprecatedCryptoServiceSha1Final,
   DeprecatedCryptoServiceSha1HashAll,
-#else
+ #else
   /// Sha1
   CryptoServiceSha1GetContextSize,
   CryptoServiceSha1Init,
@@ -4561,7 +4568,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceSha1Update,
   CryptoServiceSha1Final,
   CryptoServiceSha1HashAll,
-#endif
+ #endif
   /// Sha256
   CryptoServiceSha256GetContextSize,
   CryptoServiceSha256Init,

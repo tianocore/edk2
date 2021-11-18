@@ -8,16 +8,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 /*
  * Shifts a 64-bit signed value left by a particular number of bits.
  */
-__declspec(naked) void __cdecl _allshl (void)
+__declspec(naked) void __cdecl
+_allshl (
+  void
+  )
 {
   _asm {
     ;
     ; Handle shifting of 64 or more bits (return 0)
     ;
+
     cmp     cl, 64
     jae     short ReturnZero
 

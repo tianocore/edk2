@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalCryptLib.h"
 
-
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
 
