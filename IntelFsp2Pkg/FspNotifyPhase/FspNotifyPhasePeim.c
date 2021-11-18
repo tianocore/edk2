@@ -21,28 +21,28 @@
 EFI_STATUS
 EFIAPI
 WaitForNotify (
-  IN CONST EFI_DXE_IPL_PPI *This,
-  IN EFI_PEI_SERVICES      **PeiServices,
-  IN EFI_PEI_HOB_POINTERS  HobList
+  IN CONST EFI_DXE_IPL_PPI  *This,
+  IN EFI_PEI_SERVICES       **PeiServices,
+  IN EFI_PEI_HOB_POINTERS   HobList
   );
 
-CONST EFI_DXE_IPL_PPI mDxeIplPpi = {
+CONST EFI_DXE_IPL_PPI  mDxeIplPpi = {
   WaitForNotify
 };
 
-CONST EFI_PEI_PPI_DESCRIPTOR mInstallDxeIplPpi = {
+CONST EFI_PEI_PPI_DESCRIPTOR  mInstallDxeIplPpi = {
   EFI_PEI_PPI_DESCRIPTOR_PPI,
   &gEfiDxeIplPpiGuid,
-  (VOID *) &mDxeIplPpi
+  (VOID *)&mDxeIplPpi
 };
 
-CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi = {
+CONST EFI_PEI_PPI_DESCRIPTOR  gEndOfPeiSignalPpi = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiEndOfPeiSignalPpiGuid,
   NULL
 };
 
-CONST EFI_PEI_PPI_DESCRIPTOR gFspReadyForNotifyPhasePpi = {
+CONST EFI_PEI_PPI_DESCRIPTOR  gFspReadyForNotifyPhasePpi = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gFspReadyForNotifyPhasePpiGuid,
   NULL
@@ -62,12 +62,12 @@ CONST EFI_PEI_PPI_DESCRIPTOR gFspReadyForNotifyPhasePpi = {
 EFI_STATUS
 EFIAPI
 WaitForNotify (
-  IN CONST EFI_DXE_IPL_PPI *This,
-  IN EFI_PEI_SERVICES      **PeiServices,
-  IN EFI_PEI_HOB_POINTERS  HobList
+  IN CONST EFI_DXE_IPL_PPI  *This,
+  IN EFI_PEI_SERVICES       **PeiServices,
+  IN EFI_PEI_HOB_POINTERS   HobList
   )
 {
-  EFI_STATUS   Status;
+  EFI_STATUS  Status;
 
   DEBUG ((DEBUG_INFO | DEBUG_INIT, "FSP HOB is located at 0x%08X\n", HobList));
 
@@ -113,13 +113,13 @@ WaitForNotify (
 **/
 EFI_STATUS
 FspNotifyPhasePeimEntryPoint (
-  IN       EFI_PEI_FILE_HANDLE    FileHandle,
-  IN CONST EFI_PEI_SERVICES       **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS                      Status;
-  VOID                            *OldDxeIplPpi;
-  EFI_PEI_PPI_DESCRIPTOR          *OldDescriptor;
+  EFI_STATUS              Status;
+  VOID                    *OldDxeIplPpi;
+  EFI_PEI_PPI_DESCRIPTOR  *OldDescriptor;
 
   DEBUG ((DEBUG_INFO | DEBUG_INIT, "The entry of FspNotificationPeim\n"));
 
@@ -128,11 +128,11 @@ FspNotifyPhasePeimEntryPoint (
     // Locate old DXE IPL PPI
     //
     Status = PeiServicesLocatePpi (
-              &gEfiDxeIplPpiGuid,
-              0,
-              &OldDescriptor,
-              &OldDxeIplPpi
-              );
+               &gEfiDxeIplPpiGuid,
+               0,
+               &OldDescriptor,
+               &OldDxeIplPpi
+               );
     ASSERT_EFI_ERROR (Status);
 
     //
