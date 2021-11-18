@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef REDFISH_CONTENT_CODING_LIB_H_
 #define REDFISH_CONTENT_CODING_LIB_H_
 
@@ -36,11 +37,11 @@
 
 EFI_STATUS
 RedfishContentEncode  (
-  IN CHAR8  *ContentEncodedValue,
-  IN CHAR8  *OriginalContent,
-  IN UINTN  OriginalContentLength,
-  OUT VOID  **EncodedContentPointer,
-  OUT UINTN *EncodedLength
+  IN CHAR8   *ContentEncodedValue,
+  IN CHAR8   *OriginalContent,
+  IN UINTN   OriginalContentLength,
+  OUT VOID   **EncodedContentPointer,
+  OUT UINTN  *EncodedLength
   );
 
 /**
@@ -69,10 +70,11 @@ RedfishContentEncode  (
 **/
 EFI_STATUS
 RedfishContentDecode (
-  IN CHAR8  *ContentEncodedValue,
-  IN VOID   *ContentPointer,
-  IN UINTN  ContentLength,
-  OUT VOID  **DecodedContentPointer,
-  OUT UINTN *DecodedLength
+  IN CHAR8   *ContentEncodedValue,
+  IN VOID    *ContentPointer,
+  IN UINTN   ContentLength,
+  OUT VOID   **DecodedContentPointer,
+  OUT UINTN  *DecodedLength
   );
+
 #endif
