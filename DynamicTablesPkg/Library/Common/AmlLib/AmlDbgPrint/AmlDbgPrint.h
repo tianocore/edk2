@@ -24,7 +24,7 @@
 
 #if !defined (MDEPKG_NDEBUG)
 
-#include <AmlInclude.h>
+  #include <AmlInclude.h>
 
 /**
   @defgroup DbgPrintApis Print APIs for debugging.
@@ -46,7 +46,7 @@
 VOID
 EFIAPI
 AmlDbgDumpRaw (
-  IN  CONST UINT8   * Ptr,
+  IN  CONST UINT8   *Ptr,
   IN        UINT32    Length
   );
 
@@ -62,7 +62,7 @@ VOID
 EFIAPI
 AmlDbgPrintChars (
   IN        UINT32      ErrorLevel,
-  IN  CONST CHAR8     * Buffer,
+  IN  CONST CHAR8     *Buffer,
   IN        UINT32      Size
   );
 
@@ -74,7 +74,7 @@ AmlDbgPrintChars (
 VOID
 EFIAPI
 AmlDbgPrintNameSeg (
-  IN  CONST CHAR8   * Buffer
+  IN  CONST CHAR8   *Buffer
   );
 
 /** Print an AML NameString.
@@ -85,7 +85,7 @@ AmlDbgPrintNameSeg (
 VOID
 EFIAPI
 AmlDbgPrintNameString (
-  IN  CONST CHAR8   * Buffer,
+  IN  CONST CHAR8   *Buffer,
   IN        BOOLEAN   NewLine
   );
 
@@ -145,7 +145,7 @@ AmlDbgPrintNameSpace (
 #define AMLDBG_PRINT_NAMESEG(Buffer)                  \
           AmlDbgPrintNameSeg (Buffer)
 
-#define AMLDBG_PRINT_NAMESTR(Buffer,NewLine)          \
+#define AMLDBG_PRINT_NAMESTR(Buffer, NewLine)          \
           AmlDbgPrintNameString (Buffer,NewLine)
 
 #define AMLDBG_PRINT_NODE(Node)                       \
@@ -165,7 +165,7 @@ AmlDbgPrintNameSpace (
 
 #define AMLDBG_PRINT_NAMESEG(Buffer)
 
-#define AMLDBG_PRINT_NAMESTR(Buffer,NewLine)
+#define AMLDBG_PRINT_NAMESTR(Buffer, NewLine)
 
 #define AMLDBG_PRINT_NODE(Node)
 

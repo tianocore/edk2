@@ -35,12 +35,12 @@ STATIC
 EFI_STATUS
 EFIAPI
 LinkNode (
-  IN  AML_OBJECT_NODE    * Node,
-  IN  AML_NODE_HEADER    * ParentNode,
-  OUT AML_OBJECT_NODE   ** NewObjectNode
+  IN  AML_OBJECT_NODE    *Node,
+  IN  AML_NODE_HEADER    *ParentNode,
+  OUT AML_OBJECT_NODE   **NewObjectNode
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if (NewObjectNode != NULL) {
     *NewObjectNode = NULL;
@@ -48,7 +48,7 @@ LinkNode (
 
   // Add RdNode as the last element.
   if (ParentNode != NULL) {
-    Status = AmlVarListAddTail (ParentNode, (AML_NODE_HEADER*)Node);
+    Status = AmlVarListAddTail (ParentNode, (AML_NODE_HEADER *)Node);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
@@ -89,31 +89,32 @@ LinkNode (
 EFI_STATUS
 EFIAPI
 AmlCodeGenDefinitionBlock (
-  IN  CONST CHAR8             * TableSignature,
-  IN  CONST CHAR8             * OemId,
-  IN  CONST CHAR8             * OemTableId,
+  IN  CONST CHAR8             *TableSignature,
+  IN  CONST CHAR8             *OemId,
+  IN  CONST CHAR8             *OemTableId,
   IN        UINT32              OemRevision,
-  OUT       AML_ROOT_NODE    ** NewRootNode
+  OUT       AML_ROOT_NODE    **NewRootNode
   )
 {
-  EFI_STATUS                      Status;
-  EFI_ACPI_DESCRIPTION_HEADER     AcpiHeader;
+  EFI_STATUS                   Status;
+  EFI_ACPI_DESCRIPTION_HEADER  AcpiHeader;
 
   if ((TableSignature == NULL)  ||
       (OemId == NULL)           ||
       (OemTableId == NULL)      ||
-      (NewRootNode == NULL)) {
+      (NewRootNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   CopyMem (&AcpiHeader.Signature, TableSignature, 4);
-  AcpiHeader.Length = sizeof (EFI_ACPI_DESCRIPTION_HEADER);
+  AcpiHeader.Length   = sizeof (EFI_ACPI_DESCRIPTION_HEADER);
   AcpiHeader.Revision = 2;
   CopyMem (&AcpiHeader.OemId, OemId, 6);
   CopyMem (&AcpiHeader.OemTableId, OemTableId, 8);
-  AcpiHeader.OemRevision = OemRevision;
-  AcpiHeader.CreatorId = TABLE_GENERATOR_CREATOR_ID_ARM;
+  AcpiHeader.OemRevision     = OemRevision;
+  AcpiHeader.CreatorId       = TABLE_GENERATOR_CREATOR_ID_ARM;
   AcpiHeader.CreatorRevision = CREATE_REVISION (1, 0);
 
   Status = AmlCreateRootNode (&AcpiHeader, NewRootNode);
@@ -136,16 +137,17 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenString (
-  IN  CHAR8               * String,
-  OUT AML_OBJECT_NODE    ** NewObjectNode
+  IN  CHAR8               *String,
+  OUT AML_OBJECT_NODE    **NewObjectNode
   )
 {
-  EFI_STATUS          Status;
-  AML_OBJECT_NODE   * ObjectNode;
-  AML_DATA_NODE     * DataNode;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
+  AML_DATA_NODE    *DataNode;
 
   if ((String == NULL)  ||
-      (NewObjectNode == NULL)) {
+      (NewObjectNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -164,7 +166,7 @@ AmlCodeGenString (
 
   Status = AmlCreateDataNode (
              EAmlNodeDataTypeString,
-             (UINT8*)String,
+             (UINT8 *)String,
              (UINT32)AsciiStrLen (String) + 1,
              &DataNode
              );
@@ -176,11 +178,11 @@ AmlCodeGenString (
   Status = AmlSetFixedArgument (
              ObjectNode,
              EAmlParseIndexTerm0,
-             (AML_NODE_HEADER*)DataNode
+             (AML_NODE_HEADER *)DataNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
-    AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)DataNode);
     goto error_handler;
   }
 
@@ -188,7 +190,7 @@ AmlCodeGenString (
   return Status;
 
 error_handler:
-  AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
+  AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
   return Status;
 }
 
@@ -207,19 +209,19 @@ EFI_STATUS
 EFIAPI
 AmlCodeGenInteger (
   IN  UINT64                Integer,
-  OUT AML_OBJECT_NODE    ** NewObjectNode
+  OUT AML_OBJECT_NODE    **NewObjectNode
   )
 {
-  EFI_STATUS          Status;
-  INT8                ValueWidthDiff;
+  EFI_STATUS  Status;
+  INT8        ValueWidthDiff;
 
   if (NewObjectNode == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-   // Create an object node containing Zero.
-   Status = AmlCreateObjectNode (
+  // Create an object node containing Zero.
+  Status = AmlCreateObjectNode (
              AmlGetByteEncodingByOpCode (AML_ZERO_OP, 0),
              0,
              NewObjectNode
@@ -233,7 +235,7 @@ AmlCodeGenInteger (
   Status = AmlNodeSetIntegerValue (*NewObjectNode, Integer, &ValueWidthDiff);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
-    AmlDeleteTree ((AML_NODE_HEADER*)*NewObjectNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)*NewObjectNode);
   }
 
   return Status;
@@ -255,12 +257,12 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenPackage (
-  OUT AML_OBJECT_NODE    ** NewObjectNode
+  OUT AML_OBJECT_NODE    **NewObjectNode
   )
 {
-  EFI_STATUS        Status;
-  AML_DATA_NODE   * DataNode;
-  UINT8             NodeCount;
+  EFI_STATUS     Status;
+  AML_DATA_NODE  *DataNode;
+  UINT8          NodeCount;
 
   if (NewObjectNode == NULL) {
     ASSERT (0);
@@ -301,7 +303,7 @@ AmlCodeGenPackage (
   Status = AmlSetFixedArgument (
              *NewObjectNode,
              EAmlParseIndexTerm0,
-             (AML_NODE_HEADER*)DataNode
+             (AML_NODE_HEADER *)DataNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -311,10 +313,11 @@ AmlCodeGenPackage (
   return Status;
 
 error_handler:
-  AmlDeleteTree ((AML_NODE_HEADER*)*NewObjectNode);
+  AmlDeleteTree ((AML_NODE_HEADER *)*NewObjectNode);
   if (DataNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)DataNode);
   }
+
   return Status;
 }
 
@@ -341,27 +344,28 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenBuffer (
-  IN  CONST UINT8             * Buffer,       OPTIONAL
-  IN        UINT32              BufferSize,   OPTIONAL
-  OUT       AML_OBJECT_NODE  ** NewObjectNode
+  IN  CONST UINT8             *Buffer, OPTIONAL
+  IN        UINT32              BufferSize, OPTIONAL
+  OUT       AML_OBJECT_NODE  **NewObjectNode
   )
 {
-  EFI_STATUS        Status;
-  AML_OBJECT_NODE * BufferNode;
-  AML_OBJECT_NODE * BufferSizeNode;
-  UINT32            BufferSizeNodeSize;
-  AML_DATA_NODE   * DataNode;
-  UINT32            PkgLen;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *BufferNode;
+  AML_OBJECT_NODE  *BufferSizeNode;
+  UINT32           BufferSizeNodeSize;
+  AML_DATA_NODE    *DataNode;
+  UINT32           PkgLen;
 
   // Buffer and BufferSize must be either both set, or both clear.
   if ((NewObjectNode == NULL)                 ||
-      ((Buffer == NULL) != (BufferSize == 0))) {
+      ((Buffer == NULL) != (BufferSize == 0)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   BufferNode = NULL;
-  DataNode = NULL;
+  DataNode   = NULL;
 
   // Cf ACPI 6.3 specification, s20.2.5.4 "Type 2 Opcodes Encoding"
   // DefBuffer := BufferOp PkgLength BufferSize ByteList
@@ -376,7 +380,7 @@ AmlCodeGenBuffer (
 
   // Get the number of bytes required to encode the BufferSizeNode.
   Status = AmlComputeSize (
-             (AML_NODE_HEADER*)BufferSizeNode,
+             (AML_NODE_HEADER *)BufferSizeNode,
              &BufferSizeNodeSize
              );
   if (EFI_ERROR (Status)) {
@@ -406,7 +410,7 @@ AmlCodeGenBuffer (
   Status = AmlSetFixedArgument (
              BufferNode,
              EAmlParseIndexTerm0,
-             (AML_NODE_HEADER*)BufferSizeNode
+             (AML_NODE_HEADER *)BufferSizeNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -430,8 +434,8 @@ AmlCodeGenBuffer (
     }
 
     Status = AmlVarListAddTail (
-               (AML_NODE_HEADER*)BufferNode,
-               (AML_NODE_HEADER*)DataNode
+               (AML_NODE_HEADER *)BufferNode,
+               (AML_NODE_HEADER *)DataNode
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
@@ -444,14 +448,17 @@ AmlCodeGenBuffer (
 
 error_handler:
   if (BufferSizeNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)BufferSizeNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)BufferSizeNode);
   }
+
   if (BufferNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)BufferNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)BufferNode);
   }
+
   if (DataNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)DataNode);
   }
+
   return Status;
 }
 
@@ -477,11 +484,11 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenResourceTemplate (
-  OUT AML_OBJECT_NODE    ** NewObjectNode
+  OUT AML_OBJECT_NODE    **NewObjectNode
   )
 {
-  EFI_STATUS          Status;
-  AML_OBJECT_NODE   * BufferNode;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *BufferNode;
 
   if (NewObjectNode == NULL) {
     ASSERT (0);
@@ -499,7 +506,7 @@ AmlCodeGenResourceTemplate (
   Status = AmlCodeGenEndTag (0, BufferNode, NULL);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
-    AmlDeleteTree ((AML_NODE_HEADER*)BufferNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)BufferNode);
     return Status;
   }
 
@@ -526,27 +533,28 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenName (
-  IN  CONST CHAR8              * NameString,
-  IN        AML_OBJECT_NODE    * Object,
-  IN        AML_NODE_HEADER    * ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE   ** NewObjectNode   OPTIONAL
+  IN  CONST CHAR8              *NameString,
+  IN        AML_OBJECT_NODE    *Object,
+  IN        AML_NODE_HEADER    *ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE   **NewObjectNode   OPTIONAL
   )
 {
-  EFI_STATUS          Status;
-  AML_OBJECT_NODE   * ObjectNode;
-  AML_DATA_NODE     * DataNode;
-  CHAR8             * AmlNameString;
-  UINT32              AmlNameStringSize;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
+  AML_DATA_NODE    *DataNode;
+  CHAR8            *AmlNameString;
+  UINT32           AmlNameStringSize;
 
   if ((NameString == NULL)    ||
       (Object == NULL)        ||
-      ((ParentNode == NULL) && (NewObjectNode == NULL))) {
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  ObjectNode = NULL;
-  DataNode = NULL;
+  ObjectNode    = NULL;
+  DataNode      = NULL;
   AmlNameString = NULL;
 
   Status = ConvertAslNameToAmlName (NameString, &AmlNameString);
@@ -573,7 +581,7 @@ AmlCodeGenName (
 
   Status = AmlCreateDataNode (
              EAmlNodeDataTypeNameString,
-             (UINT8*)AmlNameString,
+             (UINT8 *)AmlNameString,
              AmlNameStringSize,
              &DataNode
              );
@@ -585,18 +593,18 @@ AmlCodeGenName (
   Status = AmlSetFixedArgument (
              ObjectNode,
              EAmlParseIndexTerm0,
-             (AML_NODE_HEADER*)DataNode
+             (AML_NODE_HEADER *)DataNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
-    AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)DataNode);
     goto error_handler2;
   }
 
   Status = AmlSetFixedArgument (
              ObjectNode,
              EAmlParseIndexTerm1,
-             (AML_NODE_HEADER*)Object
+             (AML_NODE_HEADER *)Object
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -619,7 +627,7 @@ AmlCodeGenName (
 
 error_handler2:
   if (ObjectNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
   }
 
 error_handler1:
@@ -653,18 +661,19 @@ error_handler1:
 EFI_STATUS
 EFIAPI
 AmlCodeGenNameString (
-  IN  CONST CHAR8              * NameString,
-  IN        CHAR8              * String,
-  IN        AML_NODE_HEADER    * ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE   ** NewObjectNode   OPTIONAL
+  IN  CONST CHAR8              *NameString,
+  IN        CHAR8              *String,
+  IN        AML_NODE_HEADER    *ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE   **NewObjectNode   OPTIONAL
   )
 {
-  EFI_STATUS          Status;
-  AML_OBJECT_NODE   * ObjectNode;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
 
   if ((NameString == NULL)  ||
       (String == NULL)      ||
-      ((ParentNode == NULL) && (NewObjectNode == NULL))) {
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -683,7 +692,7 @@ AmlCodeGenNameString (
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
-    AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
   }
 
   return Status;
@@ -711,17 +720,18 @@ AmlCodeGenNameString (
 EFI_STATUS
 EFIAPI
 AmlCodeGenNameInteger (
-  IN  CONST CHAR8              * NameString,
+  IN  CONST CHAR8              *NameString,
   IN        UINT64               Integer,
-  IN        AML_NODE_HEADER    * ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE   ** NewObjectNode   OPTIONAL
+  IN        AML_NODE_HEADER    *ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE   **NewObjectNode   OPTIONAL
   )
 {
-  EFI_STATUS          Status;
-  AML_OBJECT_NODE   * ObjectNode;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
 
   if ((NameString == NULL)  ||
-      ((ParentNode == NULL) && (NewObjectNode == NULL))) {
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -740,7 +750,7 @@ AmlCodeGenNameInteger (
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
-    AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
   }
 
   return Status;
@@ -767,25 +777,26 @@ AmlCodeGenNameInteger (
 EFI_STATUS
 EFIAPI
 AmlCodeGenDevice (
-  IN  CONST CHAR8              * NameString,
-  IN        AML_NODE_HEADER    * ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE   ** NewObjectNode   OPTIONAL
+  IN  CONST CHAR8              *NameString,
+  IN        AML_NODE_HEADER    *ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE   **NewObjectNode   OPTIONAL
   )
 {
-  EFI_STATUS          Status;
-  AML_OBJECT_NODE   * ObjectNode;
-  AML_DATA_NODE     * DataNode;
-  CHAR8             * AmlNameString;
-  UINT32              AmlNameStringSize;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
+  AML_DATA_NODE    *DataNode;
+  CHAR8            *AmlNameString;
+  UINT32           AmlNameStringSize;
 
   if ((NameString == NULL)  ||
-      ((ParentNode == NULL) && (NewObjectNode == NULL))) {
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  ObjectNode = NULL;
-  DataNode = NULL;
+  ObjectNode    = NULL;
+  DataNode      = NULL;
   AmlNameString = NULL;
 
   Status = ConvertAslNameToAmlName (NameString, &AmlNameString);
@@ -812,7 +823,7 @@ AmlCodeGenDevice (
 
   Status = AmlCreateDataNode (
              EAmlNodeDataTypeNameString,
-             (UINT8*)AmlNameString,
+             (UINT8 *)AmlNameString,
              AmlNameStringSize,
              &DataNode
              );
@@ -824,11 +835,11 @@ AmlCodeGenDevice (
   Status = AmlSetFixedArgument (
              ObjectNode,
              EAmlParseIndexTerm0,
-             (AML_NODE_HEADER*)DataNode
+             (AML_NODE_HEADER *)DataNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
-    AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)DataNode);
     goto error_handler2;
   }
 
@@ -848,7 +859,7 @@ AmlCodeGenDevice (
 
 error_handler2:
   if (ObjectNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
   }
 
 error_handler1:
@@ -880,25 +891,26 @@ error_handler1:
 EFI_STATUS
 EFIAPI
 AmlCodeGenScope (
-  IN  CONST CHAR8              * NameString,
-  IN        AML_NODE_HEADER    * ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE   ** NewObjectNode   OPTIONAL
+  IN  CONST CHAR8              *NameString,
+  IN        AML_NODE_HEADER    *ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE   **NewObjectNode   OPTIONAL
   )
 {
-  EFI_STATUS          Status;
-  AML_OBJECT_NODE   * ObjectNode;
-  AML_DATA_NODE     * DataNode;
-  CHAR8             * AmlNameString;
-  UINT32              AmlNameStringSize;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
+  AML_DATA_NODE    *DataNode;
+  CHAR8            *AmlNameString;
+  UINT32           AmlNameStringSize;
 
   if ((NameString == NULL)  ||
-      ((ParentNode == NULL) && (NewObjectNode == NULL))) {
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  ObjectNode = NULL;
-  DataNode = NULL;
+  ObjectNode    = NULL;
+  DataNode      = NULL;
   AmlNameString = NULL;
 
   Status = ConvertAslNameToAmlName (NameString, &AmlNameString);
@@ -925,7 +937,7 @@ AmlCodeGenScope (
 
   Status = AmlCreateDataNode (
              EAmlNodeDataTypeNameString,
-             (UINT8*)AmlNameString,
+             (UINT8 *)AmlNameString,
              AmlNameStringSize,
              &DataNode
              );
@@ -937,11 +949,11 @@ AmlCodeGenScope (
   Status = AmlSetFixedArgument (
              ObjectNode,
              EAmlParseIndexTerm0,
-             (AML_NODE_HEADER*)DataNode
+             (AML_NODE_HEADER *)DataNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
-    AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)DataNode);
     goto error_handler2;
   }
 
@@ -961,7 +973,7 @@ AmlCodeGenScope (
 
 error_handler2:
   if (ObjectNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
   }
 
 error_handler1:
@@ -1009,32 +1021,33 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenMethod (
-  IN  CONST CHAR8              * NameString,
+  IN  CONST CHAR8              *NameString,
   IN        UINT8                NumArgs,
   IN        BOOLEAN              IsSerialized,
   IN        UINT8                SyncLevel,
-  IN        AML_NODE_HEADER    * ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE   ** NewObjectNode   OPTIONAL
+  IN        AML_NODE_HEADER    *ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE   **NewObjectNode   OPTIONAL
   )
 {
-  EFI_STATUS        Status;
-  UINT32            PkgLen;
-  UINT8             Flags;
-  AML_OBJECT_NODE * ObjectNode;
-  AML_DATA_NODE   * DataNode;
-  CHAR8           * AmlNameString;
-  UINT32            AmlNameStringSize;
+  EFI_STATUS       Status;
+  UINT32           PkgLen;
+  UINT8            Flags;
+  AML_OBJECT_NODE  *ObjectNode;
+  AML_DATA_NODE    *DataNode;
+  CHAR8            *AmlNameString;
+  UINT32           AmlNameStringSize;
 
   if ((NameString == NULL)    ||
       (NumArgs > 6)           ||
       (SyncLevel > 15)        ||
-      ((ParentNode == NULL) && (NewObjectNode == NULL))) {
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   ObjectNode = NULL;
-  DataNode = NULL;
+  DataNode   = NULL;
 
   // ACPI 6.4, s20.2.5.2 "Named Objects Encoding":
   //   DefMethod := MethodOp PkgLength NameString MethodFlags TermList
@@ -1080,7 +1093,7 @@ AmlCodeGenMethod (
 
   Status = AmlCreateDataNode (
              EAmlNodeDataTypeNameString,
-             (UINT8*)AmlNameString,
+             (UINT8 *)AmlNameString,
              AmlNameStringSize,
              &DataNode
              );
@@ -1093,7 +1106,7 @@ AmlCodeGenMethod (
   Status = AmlSetFixedArgument (
              ObjectNode,
              EAmlParseIndexTerm0,
-             (AML_NODE_HEADER*)DataNode
+             (AML_NODE_HEADER *)DataNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -1116,7 +1129,7 @@ AmlCodeGenMethod (
   Status = AmlSetFixedArgument (
              ObjectNode,
              EAmlParseIndexTerm1,
-             (AML_NODE_HEADER*)DataNode
+             (AML_NODE_HEADER *)DataNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -1143,16 +1156,18 @@ AmlCodeGenMethod (
 
 error_handler2:
   if (ObjectNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
   }
+
   if (DataNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)DataNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)DataNode);
   }
 
 error_handler1:
   if (AmlNameString != NULL) {
     FreePool (AmlNameString);
   }
+
   return Status;
 }
 
@@ -1189,19 +1204,23 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenReturn (
-  IN  AML_NODE_HEADER     * ReturnNode,
-  IN  AML_NODE_HEADER     * ParentNode,     OPTIONAL
-  OUT AML_OBJECT_NODE    ** NewObjectNode   OPTIONAL
+  IN  AML_NODE_HEADER     *ReturnNode,
+  IN  AML_NODE_HEADER     *ParentNode, OPTIONAL
+  OUT AML_OBJECT_NODE    **NewObjectNode   OPTIONAL
   )
 {
-  EFI_STATUS        Status;
-  AML_OBJECT_NODE * ObjectNode;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
 
   if ((ReturnNode == NULL)                              ||
       ((ParentNode == NULL) && (NewObjectNode == NULL)) ||
       ((ParentNode != NULL) &&
-        !AmlNodeCompareOpCode (
-            (AML_OBJECT_NODE*)ParentNode, AML_METHOD_OP, 0))) {
+       !AmlNodeCompareOpCode (
+          (AML_OBJECT_NODE *)ParentNode,
+          AML_METHOD_OP,
+          0
+          )))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -1219,7 +1238,7 @@ AmlCodeGenReturn (
   Status = AmlSetFixedArgument (
              ObjectNode,
              EAmlParseIndexTerm0,
-             (AML_NODE_HEADER*)ReturnNode
+             (AML_NODE_HEADER *)ReturnNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -1244,9 +1263,11 @@ error_handler:
   if (ReturnNode != NULL) {
     AmlDeleteTree (ReturnNode);
   }
+
   if (ObjectNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)ObjectNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
   }
+
   return Status;
 }
 
@@ -1287,15 +1308,15 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenReturnNameString (
-  IN  CONST CHAR8               * NameString,
-  IN        AML_NODE_HEADER     * ParentNode,     OPTIONAL
-  OUT       AML_OBJECT_NODE    ** NewObjectNode   OPTIONAL
+  IN  CONST CHAR8               *NameString,
+  IN        AML_NODE_HEADER     *ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE    **NewObjectNode   OPTIONAL
   )
 {
-  EFI_STATUS          Status;
-  AML_DATA_NODE     * DataNode;
-  CHAR8             * AmlNameString;
-  UINT32              AmlNameStringSize;
+  EFI_STATUS     Status;
+  AML_DATA_NODE  *DataNode;
+  CHAR8          *AmlNameString;
+  UINT32         AmlNameStringSize;
 
   DataNode = NULL;
 
@@ -1313,7 +1334,7 @@ AmlCodeGenReturnNameString (
 
   Status = AmlCreateDataNode (
              EAmlNodeDataTypeNameString,
-             (UINT8*)AmlNameString,
+             (UINT8 *)AmlNameString,
              AmlNameStringSize,
              &DataNode
              );
@@ -1324,7 +1345,7 @@ AmlCodeGenReturnNameString (
 
   // AmlCodeGenReturn() deletes DataNode if error.
   Status = AmlCodeGenReturn (
-             (AML_NODE_HEADER*)DataNode,
+             (AML_NODE_HEADER *)DataNode,
              ParentNode,
              NewObjectNode
              );
@@ -1334,6 +1355,7 @@ exit_handler:
   if (AmlNameString != NULL) {
     FreePool (AmlNameString);
   }
+
   return Status;
 }
 
@@ -1379,20 +1401,21 @@ exit_handler:
 EFI_STATUS
 EFIAPI
 AmlCodeGenMethodRetNameString (
-  IN  CONST CHAR8                   * MethodNameString,
-  IN  CONST CHAR8                   * ReturnedNameString,  OPTIONAL
+  IN  CONST CHAR8                   *MethodNameString,
+  IN  CONST CHAR8                   *ReturnedNameString, OPTIONAL
   IN        UINT8                     NumArgs,
   IN        BOOLEAN                   IsSerialized,
   IN        UINT8                     SyncLevel,
-  IN        AML_NODE_HANDLE           ParentNode,          OPTIONAL
-  OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode        OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode        OPTIONAL
   )
 {
-  EFI_STATUS                Status;
-  AML_OBJECT_NODE_HANDLE    MethodNode;
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  MethodNode;
 
   if ((MethodNameString == NULL)  ||
-      ((ParentNode == NULL) && (NewObjectNode == NULL))) {
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -1440,6 +1463,7 @@ error_handler:
   if (MethodNode != NULL) {
     AmlDeleteTree ((AML_NODE_HANDLE)MethodNode);
   }
+
   return Status;
 }
 
@@ -1478,19 +1502,20 @@ error_handler:
 EFI_STATUS
 EFIAPI
 AmlCreateLpiNode (
-  IN  CONST CHAR8                   * LpiNameString,
+  IN  CONST CHAR8                   *LpiNameString,
   IN        UINT16                    Revision,
   IN        UINT64                    LevelId,
-  IN        AML_NODE_HANDLE           ParentNode,  OPTIONAL
-  OUT       AML_OBJECT_NODE_HANDLE  * NewLpiNode   OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode, OPTIONAL
+  OUT       AML_OBJECT_NODE_HANDLE  *NewLpiNode   OPTIONAL
   )
 {
-  EFI_STATUS                Status;
-  AML_OBJECT_NODE_HANDLE    PackageNode;
-  AML_OBJECT_NODE_HANDLE    IntegerNode;
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  PackageNode;
+  AML_OBJECT_NODE_HANDLE  IntegerNode;
 
   if ((LpiNameString == NULL)                           ||
-      ((ParentNode == NULL) && (NewLpiNode == NULL))) {
+      ((ParentNode == NULL) && (NewLpiNode == NULL)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -1573,6 +1598,7 @@ error_handler:
   if (IntegerNode != NULL) {
     AmlDeleteTree ((AML_NODE_HANDLE)IntegerNode);
   }
+
   return Status;
 }
 
@@ -1637,35 +1663,36 @@ AmlAddLpiState (
   IN  UINT32                                    ArchFlags,
   IN  UINT32                                    ResCntFreq,
   IN  UINT32                                    EnableParentState,
-  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * GenericRegisterDescriptor,  OPTIONAL
-  IN  UINT64                                    Integer,                    OPTIONAL
-  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * ResidencyCounterRegister,   OPTIONAL
-  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * UsageCounterRegister,       OPTIONAL
-  IN  CHAR8                                   * StateName,                  OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *GenericRegisterDescriptor, OPTIONAL
+  IN  UINT64                                    Integer, OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *ResidencyCounterRegister, OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *UsageCounterRegister, OPTIONAL
+  IN  CHAR8                                   *StateName, OPTIONAL
   IN  AML_OBJECT_NODE_HANDLE                    LpiNode
   )
 {
-  EFI_STATUS                Status;
-  AML_DATA_NODE_HANDLE      RdNode;
-  AML_OBJECT_NODE_HANDLE    PackageNode;
-  AML_OBJECT_NODE_HANDLE    IntegerNode;
-  AML_OBJECT_NODE_HANDLE    StringNode;
-  AML_OBJECT_NODE_HANDLE    NewLpiPackageNode;
-  AML_OBJECT_NODE_HANDLE    ResourceTemplateNode;
+  EFI_STATUS              Status;
+  AML_DATA_NODE_HANDLE    RdNode;
+  AML_OBJECT_NODE_HANDLE  PackageNode;
+  AML_OBJECT_NODE_HANDLE  IntegerNode;
+  AML_OBJECT_NODE_HANDLE  StringNode;
+  AML_OBJECT_NODE_HANDLE  NewLpiPackageNode;
+  AML_OBJECT_NODE_HANDLE  ResourceTemplateNode;
 
-  UINT32                    Index;
-  AML_OBJECT_NODE_HANDLE    CountNode;
-  UINT64                    Count;
+  UINT32                  Index;
+  AML_OBJECT_NODE_HANDLE  CountNode;
+  UINT64                  Count;
 
   if ((LpiNode == NULL)                                              ||
       (AmlGetNodeType ((AML_NODE_HANDLE)LpiNode) != EAmlNodeObject)  ||
-      (!AmlNodeHasOpCode (LpiNode, AML_NAME_OP, 0))) {
+      (!AmlNodeHasOpCode (LpiNode, AML_NAME_OP, 0)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  RdNode = 0;
-  StringNode = NULL;
+  RdNode      = 0;
+  StringNode  = NULL;
   IntegerNode = NULL;
   ResourceTemplateNode = NULL;
 
@@ -1683,7 +1710,8 @@ AmlAddLpiState (
                                           );
   if ((PackageNode == NULL)                                             ||
       (AmlGetNodeType ((AML_NODE_HANDLE)PackageNode) != EAmlNodeObject) ||
-      (!AmlNodeHasOpCode (PackageNode, AML_PACKAGE_OP, 0))) {
+      (!AmlNodeHasOpCode (PackageNode, AML_PACKAGE_OP, 0)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -1706,6 +1734,7 @@ AmlAddLpiState (
     ASSERT (0);
     return Status;
   }
+
   Status = AmlUpdateInteger (CountNode, Count + 1);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -1725,6 +1754,7 @@ AmlAddLpiState (
     IntegerNode = NULL;
     goto error_handler;
   }
+
   Status = AmlVarListAddTail (
              (AML_NODE_HANDLE)NewLpiPackageNode,
              (AML_NODE_HANDLE)IntegerNode
@@ -1733,6 +1763,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   IntegerNode = NULL;
 
   // WorstCaseWakeLatency
@@ -1742,6 +1773,7 @@ AmlAddLpiState (
     IntegerNode = NULL;
     goto error_handler;
   }
+
   Status = AmlVarListAddTail (
              (AML_NODE_HANDLE)NewLpiPackageNode,
              (AML_NODE_HANDLE)IntegerNode
@@ -1750,6 +1782,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   IntegerNode = NULL;
 
   // Flags
@@ -1759,6 +1792,7 @@ AmlAddLpiState (
     IntegerNode = NULL;
     goto error_handler;
   }
+
   Status = AmlVarListAddTail (
              (AML_NODE_HANDLE)NewLpiPackageNode,
              (AML_NODE_HANDLE)IntegerNode
@@ -1767,6 +1801,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   IntegerNode = NULL;
 
   // ArchFlags
@@ -1776,6 +1811,7 @@ AmlAddLpiState (
     IntegerNode = NULL;
     goto error_handler;
   }
+
   Status = AmlVarListAddTail (
              (AML_NODE_HANDLE)NewLpiPackageNode,
              (AML_NODE_HANDLE)IntegerNode
@@ -1784,6 +1820,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   IntegerNode = NULL;
 
   // ResCntFreq
@@ -1793,6 +1830,7 @@ AmlAddLpiState (
     IntegerNode = NULL;
     goto error_handler;
   }
+
   Status = AmlVarListAddTail (
              (AML_NODE_HANDLE)NewLpiPackageNode,
              (AML_NODE_HANDLE)IntegerNode
@@ -1801,6 +1839,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   IntegerNode = NULL;
 
   // EnableParentState
@@ -1810,6 +1849,7 @@ AmlAddLpiState (
     IntegerNode = NULL;
     goto error_handler;
   }
+
   Status = AmlVarListAddTail (
              (AML_NODE_HANDLE)NewLpiPackageNode,
              (AML_NODE_HANDLE)IntegerNode
@@ -1818,6 +1858,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   IntegerNode = NULL;
 
   // Entry Method
@@ -1829,6 +1870,7 @@ AmlAddLpiState (
       ResourceTemplateNode = NULL;
       goto error_handler;
     }
+
     Status = AmlCodeGenRdRegister (
                GenericRegisterDescriptor->AddressSpaceId,
                GenericRegisterDescriptor->RegisterBitWidth,
@@ -1849,6 +1891,7 @@ AmlAddLpiState (
       ASSERT (0);
       goto error_handler;
     }
+
     RdNode = NULL;
 
     Status = AmlVarListAddTail (
@@ -1859,6 +1902,7 @@ AmlAddLpiState (
       ASSERT (0);
       goto error_handler;
     }
+
     ResourceTemplateNode = NULL;
   } else {
     // Entry Method: As an integer
@@ -1868,6 +1912,7 @@ AmlAddLpiState (
       IntegerNode = NULL;
       goto error_handler;
     }
+
     Status = AmlVarListAddTail (
                (AML_NODE_HANDLE)NewLpiPackageNode,
                (AML_NODE_HANDLE)IntegerNode
@@ -1876,6 +1921,7 @@ AmlAddLpiState (
       ASSERT (0);
       goto error_handler;
     }
+
     IntegerNode = NULL;
   }
 
@@ -1886,6 +1932,7 @@ AmlAddLpiState (
     ResourceTemplateNode = NULL;
     goto error_handler;
   }
+
   if (ResidencyCounterRegister != NULL) {
     Status = AmlCodeGenRdRegister (
                ResidencyCounterRegister->AddressSpaceId,
@@ -1907,6 +1954,7 @@ AmlAddLpiState (
                &RdNode
                );
   }
+
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     RdNode = NULL;
@@ -1918,6 +1966,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   RdNode = NULL;
 
   Status = AmlVarListAddTail (
@@ -1928,6 +1977,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   ResourceTemplateNode = NULL;
 
   // Usage Counter Register.
@@ -1937,6 +1987,7 @@ AmlAddLpiState (
     ResourceTemplateNode = NULL;
     goto error_handler;
   }
+
   if (UsageCounterRegister != NULL) {
     Status = AmlCodeGenRdRegister (
                UsageCounterRegister->AddressSpaceId,
@@ -1958,6 +2009,7 @@ AmlAddLpiState (
                &RdNode
                );
   }
+
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     RdNode = NULL;
@@ -1969,6 +2021,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   RdNode = NULL;
 
   Status = AmlVarListAddTail (
@@ -1979,6 +2032,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   ResourceTemplateNode = NULL;
 
   // State name.
@@ -1987,11 +2041,13 @@ AmlAddLpiState (
   } else {
     Status = AmlCodeGenString ("", &StringNode);
   }
+
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     StringNode = NULL;
     goto error_handler;
   }
+
   Status = AmlVarListAddTail (
              (AML_NODE_HANDLE)NewLpiPackageNode,
              (AML_NODE_HANDLE)StringNode
@@ -2000,6 +2056,7 @@ AmlAddLpiState (
     ASSERT (0);
     goto error_handler;
   }
+
   StringNode = NULL;
 
   // Add the new LPI state to the LpiNode.
@@ -2018,15 +2075,19 @@ error_handler:
   if (RdNode != NULL) {
     AmlDeleteTree ((AML_NODE_HANDLE)RdNode);
   }
+
   if (NewLpiPackageNode != NULL) {
     AmlDeleteTree ((AML_NODE_HANDLE)NewLpiPackageNode);
   }
+
   if (StringNode != NULL) {
     AmlDeleteTree ((AML_NODE_HANDLE)StringNode);
   }
+
   if (IntegerNode != NULL) {
     AmlDeleteTree ((AML_NODE_HANDLE)IntegerNode);
   }
+
   if (ResourceTemplateNode != NULL) {
     AmlDeleteTree ((AML_NODE_HANDLE)ResourceTemplateNode);
   }

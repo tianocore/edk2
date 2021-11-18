@@ -20,24 +20,24 @@
 /** PeriphBase maximum address length is 256MB (0x10000000)
     for a (X >= 4) || (Y >= 4) dimensions mesh.
 */
-#define PERIPHBASE_MAX_ADDRESS_LENGTH   SIZE_256MB
+#define PERIPHBASE_MAX_ADDRESS_LENGTH  SIZE_256MB
 
 /** PeriphBase minimum address length is 64MB (0x04000000)
     for a (X < 4) && (Y < 4) dimensions mesh.
 */
-#define PERIPHBASE_MIN_ADDRESS_LENGTH   SIZE_64MB
+#define PERIPHBASE_MIN_ADDRESS_LENGTH  SIZE_64MB
 
 /** RootNodeBase address length is 16KB (0x00004000).
 */
-#define ROOTNODEBASE_ADDRESS_LENGTH     SIZE_16KB
+#define ROOTNODEBASE_ADDRESS_LENGTH  SIZE_16KB
 
 /** Maximum number of CMN-600 Debug and Trace Logic Controllers (DTC).
 */
-#define MAX_DTC_COUNT                   4
+#define MAX_DTC_COUNT  4
 
 /** Starting value for the UID to represent the CMN600 devices.
 */
-#define CMN600_DEVICE_START_UID         0
+#define CMN600_DEVICE_START_UID  0
 
 /** Maximum CMN-600 devices supported by this generator.
     This generator supports a maximum of 16 CMN-600 devices.
@@ -46,6 +46,6 @@
           UID fields describing the serial port.
 
 */
-#define MAX_CMN600_DEVICES_SUPPORTED    16
+#define MAX_CMN600_DEVICES_SUPPORTED  16
 
 #endif // SSDT_CMN600_GENERATOR_H_
