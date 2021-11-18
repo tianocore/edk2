@@ -18,7 +18,7 @@
 VOID
 EFIAPI
 DisableCacheAsRam (
-  IN BOOLEAN                   DisableCar
+  IN BOOLEAN  DisableCar
   )
 {
   //
@@ -28,8 +28,8 @@ DisableCacheAsRam (
   if (DisableCar) {
     AsmInvd ();
   } else {
-    AsmWbinvd();
+    AsmWbinvd ();
   }
 
-  return ;
+  return;
 }

@@ -13,11 +13,11 @@
 //
 typedef INT32 EFI_MEMORY_CACHE_TYPE;
 
-#define EFI_CACHE_UNCACHEABLE                 0
-#define EFI_CACHE_WRITECOMBINING              1
-#define EFI_CACHE_WRITETHROUGH                4
-#define EFI_CACHE_WRITEPROTECTED              5
-#define EFI_CACHE_WRITEBACK                   6
+#define EFI_CACHE_UNCACHEABLE     0
+#define EFI_CACHE_WRITECOMBINING  1
+#define EFI_CACHE_WRITETHROUGH    4
+#define EFI_CACHE_WRITEPROTECTED  5
+#define EFI_CACHE_WRITEBACK       6
 
 /**
  Reset all the MTRRs to a known state.
@@ -47,10 +47,9 @@ ResetCacheAttributes (
 EFI_STATUS
 EFIAPI
 SetCacheAttributes (
-  IN  EFI_PHYSICAL_ADDRESS      MemoryAddress,
-  IN  UINT64                    MemoryLength,
-  IN  EFI_MEMORY_CACHE_TYPE     MemoryCacheType
+  IN  EFI_PHYSICAL_ADDRESS   MemoryAddress,
+  IN  UINT64                 MemoryLength,
+  IN  EFI_MEMORY_CACHE_TYPE  MemoryCacheType
   );
 
 #endif
-
