@@ -45,8 +45,8 @@
 STATIC
 EFI_STATUS
 SendMemoryPermissionRequest (
-  IN OUT  ARM_SVC_ARGS *SvcArgs,
-     OUT  INT32        *RetVal
+  IN OUT  ARM_SVC_ARGS  *SvcArgs,
+  OUT  INT32            *RetVal
   )
 {
   if ((SvcArgs == NULL) || (RetVal == NULL)) {
@@ -148,8 +148,8 @@ SendMemoryPermissionRequest (
 STATIC
 EFI_STATUS
 GetMemoryPermissions (
-  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
-  OUT UINT32                    *MemoryAttributes
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  OUT UINT32                *MemoryAttributes
   )
 {
   EFI_STATUS    Status;
@@ -207,9 +207,9 @@ GetMemoryPermissions (
 STATIC
 EFI_STATUS
 RequestMemoryPermissionChange (
-  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN  UINT64                    Length,
-  IN  UINT32                    Permissions
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length,
+  IN  UINT32                Permissions
   )
 {
   INT32         Ret;
@@ -239,13 +239,13 @@ RequestMemoryPermissionChange (
 
 EFI_STATUS
 ArmSetMemoryRegionNoExec (
-  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN  UINT64                    Length
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
   )
 {
-  EFI_STATUS    Status;
-  UINT32 MemoryAttributes;
-  UINT32 CodePermission;
+  EFI_STATUS  Status;
+  UINT32      MemoryAttributes;
+  UINT32      CodePermission;
 
   Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
@@ -256,18 +256,19 @@ ArmSetMemoryRegionNoExec (
              MemoryAttributes | CodePermission
              );
   }
+
   return Status;
 }
 
 EFI_STATUS
 ArmClearMemoryRegionNoExec (
-  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN  UINT64                    Length
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
   )
 {
-  EFI_STATUS    Status;
-  UINT32 MemoryAttributes;
-  UINT32 CodePermission;
+  EFI_STATUS  Status;
+  UINT32      MemoryAttributes;
+  UINT32      CodePermission;
 
   Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
@@ -278,18 +279,19 @@ ArmClearMemoryRegionNoExec (
              MemoryAttributes & ~CodePermission
              );
   }
+
   return Status;
 }
 
 EFI_STATUS
 ArmSetMemoryRegionReadOnly (
-  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN  UINT64                    Length
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
   )
 {
-  EFI_STATUS    Status;
-  UINT32 MemoryAttributes;
-  UINT32 DataPermission;
+  EFI_STATUS  Status;
+  UINT32      MemoryAttributes;
+  UINT32      DataPermission;
 
   Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
@@ -300,28 +302,32 @@ ArmSetMemoryRegionReadOnly (
              MemoryAttributes | DataPermission
              );
   }
+
   return Status;
 }
 
 EFI_STATUS
 ArmClearMemoryRegionReadOnly (
-  IN  EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN  UINT64                    Length
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
   )
 {
-  EFI_STATUS    Status;
-  UINT32 MemoryAttributes;
-  UINT32 PermissionRequest;
+  EFI_STATUS  Status;
+  UINT32      MemoryAttributes;
+  UINT32      PermissionRequest;
 
   Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
-    PermissionRequest = SET_MEM_ATTR_MAKE_PERM_REQUEST (SET_MEM_ATTR_DATA_PERM_RW,
-                                                        MemoryAttributes);
+    PermissionRequest = SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          SET_MEM_ATTR_DATA_PERM_RW,
+                          MemoryAttributes
+                          );
     return RequestMemoryPermissionChange (
              BaseAddress,
              Length,
              PermissionRequest
              );
   }
+
   return Status;
 }

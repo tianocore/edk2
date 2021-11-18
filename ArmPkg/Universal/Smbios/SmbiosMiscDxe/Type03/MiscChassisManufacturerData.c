@@ -13,11 +13,10 @@
 
 #include "SmbiosMisc.h"
 
-
 //
 // Static (possibly build generated) Chassis Manufacturer data.
 //
-SMBIOS_MISC_TABLE_DATA(SMBIOS_TABLE_TYPE3, MiscChassisManufacturer) = {
+SMBIOS_MISC_TABLE_DATA (SMBIOS_TABLE_TYPE3, MiscChassisManufacturer) = {
   {                                                       // Hdr
     EFI_SMBIOS_TYPE_SYSTEM_ENCLOSURE,                     // Type,
     0,                                                    // Length,
