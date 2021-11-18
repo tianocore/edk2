@@ -14,11 +14,11 @@
 /// The Non-Volatile Storage (NVS) HOB version 2 provides > 64KB buffer support.
 ///
 typedef struct {
-  EFI_HOB_GUID_TYPE    GuidHob;
-  EFI_PHYSICAL_ADDRESS NvsDataPtr;
-  UINT64               NvsDataLength;
+  EFI_HOB_GUID_TYPE       GuidHob;
+  EFI_PHYSICAL_ADDRESS    NvsDataPtr;
+  UINT64                  NvsDataLength;
 } FSP_NON_VOLATILE_STORAGE_HOB2;
 
-extern EFI_GUID gFspNonVolatileStorageHob2Guid;
+extern EFI_GUID  gFspNonVolatileStorageHob2Guid;
 
 #endif
