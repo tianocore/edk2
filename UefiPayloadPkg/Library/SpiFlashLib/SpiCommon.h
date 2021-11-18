@@ -28,8 +28,8 @@
 ///  Wait Time = 6 seconds = 6000000 microseconds
 ///  Wait Period = 10 microseconds
 ///
-#define WAIT_TIME   6000000     ///< Wait Time = 6 seconds = 6000000 microseconds
-#define WAIT_PERIOD 10          ///< Wait Period = 10 microseconds
+#define WAIT_TIME    6000000    ///< Wait Time = 6 seconds = 6000000 microseconds
+#define WAIT_PERIOD  10         ///< Wait Period = 10 microseconds
 
 ///
 /// Flash cycle Type
@@ -60,19 +60,18 @@ typedef enum {
 #define SC_SPI_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('P', 'S', 'P', 'I')
 
 typedef struct {
-  UINTN                 Signature;
-  EFI_HANDLE            Handle;
-  UINT32                AcpiTmrReg;
-  UINTN                 PchSpiBase;
-  UINT16                RegionPermission;
-  UINT32                SfdpVscc0Value;
-  UINT32                SfdpVscc1Value;
-  UINT32                StrapBaseAddress;
-  UINT8                 NumberOfComponents;
-  UINT16                Flags;
-  UINT32                Component1StartAddr;
+  UINTN         Signature;
+  EFI_HANDLE    Handle;
+  UINT32        AcpiTmrReg;
+  UINTN         PchSpiBase;
+  UINT16        RegionPermission;
+  UINT32        SfdpVscc0Value;
+  UINT32        SfdpVscc1Value;
+  UINT32        StrapBaseAddress;
+  UINT8         NumberOfComponents;
+  UINT16        Flags;
+  UINT32        Component1StartAddr;
 } SPI_INSTANCE;
-
 
 /**
   Acquire SPI MMIO BAR
@@ -87,7 +86,6 @@ AcquireSpiBar0 (
   IN  UINTN         PchSpiBase
   );
 
-
 /**
   Release SPI MMIO BAR. Do nothing.
 
@@ -100,7 +98,6 @@ VOID
 ReleaseSpiBar0 (
   IN  UINTN         PchSpiBase
   );
-
 
 /**
   This function is a hook for Spi to disable BIOS Write Protect
@@ -135,7 +132,6 @@ EnableBiosWriteProtect (
   IN  UINT8         CpuSmmBwp
   );
 
-
 /**
   This function disables SPI Prefetching and caching,
   and returns previous BIOS Control Register value before disabling.
@@ -164,7 +160,6 @@ SetSpiBiosControlRegister (
   IN  UINTN         PchSpiBase,
   IN  UINT8         BiosCtlValue
   );
-
 
 /**
   This function sends the programmed SPI command to the slave device.

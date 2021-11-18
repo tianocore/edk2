@@ -33,18 +33,18 @@ GetParameterBase (
   VOID
   )
 {
-  EFI_HOB_HANDOFF_INFO_TABLE          *HandoffTable;
+  EFI_HOB_HANDOFF_INFO_TABLE  *HandoffTable;
 
-  HandoffTable = (EFI_HOB_HANDOFF_INFO_TABLE *)(UINTN) GET_BOOTLOADER_PARAMETER ();
+  HandoffTable = (EFI_HOB_HANDOFF_INFO_TABLE *)(UINTN)GET_BOOTLOADER_PARAMETER ();
   if ((HandoffTable->Header.HobType == EFI_HOB_TYPE_HANDOFF) &&
-    (HandoffTable->Header.HobLength == sizeof (EFI_HOB_HANDOFF_INFO_TABLE)) &&
-    (HandoffTable->Header.Reserved == 0)) {
+      (HandoffTable->Header.HobLength == sizeof (EFI_HOB_HANDOFF_INFO_TABLE)) &&
+      (HandoffTable->Header.Reserved == 0))
+  {
     return (VOID *)HandoffTable;
   }
 
   return NULL;
 }
-
 
 /**
   This function retrieves a GUIDed HOB data from Slim Bootloader.
@@ -63,8 +63,8 @@ GetGuidHobDataFromSbl (
   IN       EFI_GUID      *Guid
   )
 {
-  UINT8                  *GuidHob;
-  CONST VOID             *HobList;
+  UINT8       *GuidHob;
+  CONST VOID  *HobList;
 
   HobList = GetParameterBase ();
   ASSERT (HobList != NULL);
@@ -93,10 +93,10 @@ ParseMemoryInfo (
   IN  VOID                       *Params
   )
 {
-  MEMORY_MAP_INFO               *MemoryMapInfo;
-  UINTN                          Idx;
+  MEMORY_MAP_INFO  *MemoryMapInfo;
+  UINTN            Idx;
 
-  MemoryMapInfo = (MEMORY_MAP_INFO *) GetGuidHobDataFromSbl (&gLoaderMemoryMapInfoGuid);
+  MemoryMapInfo = (MEMORY_MAP_INFO *)GetGuidHobDataFromSbl (&gLoaderMemoryMapInfoGuid);
   if (MemoryMapInfo == NULL) {
     ASSERT (FALSE);
     return RETURN_NOT_FOUND;
@@ -121,10 +121,10 @@ ParseMemoryInfo (
 RETURN_STATUS
 EFIAPI
 ParseSmbiosTable (
-    OUT UNIVERSAL_PAYLOAD_SMBIOS_TABLE     *SmbiosTable
+  OUT UNIVERSAL_PAYLOAD_SMBIOS_TABLE     *SmbiosTable
   )
 {
-  UNIVERSAL_PAYLOAD_SMBIOS_TABLE         *TableInfo;
+  UNIVERSAL_PAYLOAD_SMBIOS_TABLE  *TableInfo;
 
   TableInfo = (UNIVERSAL_PAYLOAD_SMBIOS_TABLE *)GetGuidHobDataFromSbl (&gUniversalPayloadSmbiosTableGuid);
   if (TableInfo == NULL) {
@@ -136,7 +136,6 @@ ParseSmbiosTable (
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   Acquire ACPI table from slim bootloader.
@@ -153,7 +152,7 @@ ParseAcpiTableInfo (
   OUT UNIVERSAL_PAYLOAD_ACPI_TABLE        *AcpiTableHob
   )
 {
-  UNIVERSAL_PAYLOAD_ACPI_TABLE         *TableInfo;
+  UNIVERSAL_PAYLOAD_ACPI_TABLE  *TableInfo;
 
   TableInfo = (UNIVERSAL_PAYLOAD_ACPI_TABLE *)GetGuidHobDataFromSbl (&gUniversalPayloadAcpiTableGuid);
   if (TableInfo == NULL) {
@@ -181,9 +180,9 @@ ParseSerialInfo (
   OUT SERIAL_PORT_INFO     *SerialPortInfo
   )
 {
-  SERIAL_PORT_INFO              *BlSerialInfo;
+  SERIAL_PORT_INFO  *BlSerialInfo;
 
-  BlSerialInfo = (SERIAL_PORT_INFO *) GetGuidHobDataFromSbl (&gUefiSerialPortInfoGuid);
+  BlSerialInfo = (SERIAL_PORT_INFO *)GetGuidHobDataFromSbl (&gUefiSerialPortInfoGuid);
   if (BlSerialInfo == NULL) {
     ASSERT (FALSE);
     return RETURN_NOT_FOUND;
@@ -193,7 +192,6 @@ ParseSerialInfo (
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   Find the video frame buffer information
@@ -210,9 +208,9 @@ ParseGfxInfo (
   OUT EFI_PEI_GRAPHICS_INFO_HOB       *GfxInfo
   )
 {
-  EFI_PEI_GRAPHICS_INFO_HOB           *BlGfxInfo;
+  EFI_PEI_GRAPHICS_INFO_HOB  *BlGfxInfo;
 
-  BlGfxInfo = (EFI_PEI_GRAPHICS_INFO_HOB *) GetGuidHobDataFromSbl (&gEfiGraphicsInfoHobGuid);
+  BlGfxInfo = (EFI_PEI_GRAPHICS_INFO_HOB *)GetGuidHobDataFromSbl (&gEfiGraphicsInfoHobGuid);
   if (BlGfxInfo == NULL) {
     return RETURN_NOT_FOUND;
   }
@@ -237,9 +235,9 @@ ParseGfxDeviceInfo (
   OUT EFI_PEI_GRAPHICS_DEVICE_INFO_HOB       *GfxDeviceInfo
   )
 {
-  EFI_PEI_GRAPHICS_DEVICE_INFO_HOB           *BlGfxDeviceInfo;
+  EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  *BlGfxDeviceInfo;
 
-  BlGfxDeviceInfo = (EFI_PEI_GRAPHICS_DEVICE_INFO_HOB *) GetGuidHobDataFromSbl (&gEfiGraphicsDeviceInfoHobGuid);
+  BlGfxDeviceInfo = (EFI_PEI_GRAPHICS_DEVICE_INFO_HOB *)GetGuidHobDataFromSbl (&gEfiGraphicsDeviceInfoHobGuid);
   if (BlGfxDeviceInfo == NULL) {
     return RETURN_NOT_FOUND;
   }
@@ -263,22 +261,22 @@ ParseMiscInfo (
   VOID
   )
 {
-  RETURN_STATUS                          Status;
-  UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES     *BlRootBridgesHob;
-  UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES     *PldRootBridgesHob;
+  RETURN_STATUS                       Status;
+  UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *BlRootBridgesHob;
+  UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *PldRootBridgesHob;
 
   Status = RETURN_NOT_FOUND;
-  BlRootBridgesHob = (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES *) GetGuidHobDataFromSbl (
-                       &gUniversalPayloadPciRootBridgeInfoGuid
-                     );
+  BlRootBridgesHob = (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES *)GetGuidHobDataFromSbl (
+                                                             &gUniversalPayloadPciRootBridgeInfoGuid
+                                                             );
   if (BlRootBridgesHob != NULL) {
     //
     // Migrate bootloader root bridge info hob from bootloader to payload.
     //
     PldRootBridgesHob = BuildGuidHob (
-                                      &gUniversalPayloadPciRootBridgeInfoGuid,
-                                      BlRootBridgesHob->Header.Length
-                                     );
+                          &gUniversalPayloadPciRootBridgeInfoGuid,
+                          BlRootBridgesHob->Header.Length
+                          );
     ASSERT (PldRootBridgesHob != NULL);
     if (PldRootBridgesHob != NULL) {
       CopyMem (PldRootBridgesHob, BlRootBridgesHob, BlRootBridgesHob->Header.Length);
@@ -291,4 +289,3 @@ ParseMiscInfo (
 
   return Status;
 }
-

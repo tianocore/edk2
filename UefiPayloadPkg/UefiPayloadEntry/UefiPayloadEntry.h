@@ -42,15 +42,14 @@
 #define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
   ((ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1)))
 
-
-#define E820_RAM       1
-#define E820_RESERVED  2
-#define E820_ACPI      3
-#define E820_NVS       4
-#define E820_UNUSABLE  5
-#define E820_DISABLED  6
-#define E820_PMEM      7
-#define E820_UNDEFINED 8
+#define E820_RAM        1
+#define E820_RESERVED   2
+#define E820_ACPI       3
+#define E820_NVS        4
+#define E820_UNUSABLE   5
+#define E820_DISABLED   6
+#define E820_PMEM       7
+#define E820_UNDEFINED  8
 
 /**
   Auto-generated function that calls the library constructors for all of the module's
@@ -108,7 +107,7 @@ UpdateStackHob (
   @return   The pointer to the handoff HOB table.
 
 **/
-EFI_HOB_HANDOFF_INFO_TABLE*
+EFI_HOB_HANDOFF_INFO_TABLE *
 EFIAPI
 HobConstructor (
   IN VOID   *EfiMemoryBottom,

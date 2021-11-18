@@ -27,7 +27,6 @@ LibFvbFlashDeviceInit (
   return SpiConstructor ();
 }
 
-
 /**
   Read NumBytes bytes of data from the address specified by
   PAddress into Buffer.
@@ -46,13 +45,13 @@ EFIAPI
 LibFvbFlashDeviceRead (
   IN      UINTN                           PAddress,
   IN  OUT UINTN                           *NumBytes,
-      OUT UINT8                           *Buffer
+  OUT UINT8                           *Buffer
   )
 {
-  EFI_STATUS                              Status;
-  UINT32                                  ByteCount;
-  UINT32                                  RgnSize;
-  UINT32                                  AddrOffset;
+  EFI_STATUS  Status;
+  UINT32      ByteCount;
+  UINT32      RgnSize;
+  UINT32      AddrOffset;
 
   Status = SpiGetRegionAddress (FlashRegionBios, NULL, &RgnSize);
   if (EFI_ERROR (Status)) {
@@ -65,7 +64,6 @@ LibFvbFlashDeviceRead (
   ByteCount  = (UINT32)*NumBytes;
   return SpiFlashRead (FlashRegionBios, AddrOffset, ByteCount, Buffer);
 }
-
 
 /**
   Write NumBytes bytes of data from Buffer to the address specified by
@@ -88,10 +86,10 @@ LibFvbFlashDeviceWrite (
   IN        UINT8                           *Buffer
   )
 {
-  EFI_STATUS                                Status;
-  UINT32                                    ByteCount;
-  UINT32                                    RgnSize;
-  UINT32                                    AddrOffset;
+  EFI_STATUS  Status;
+  UINT32      ByteCount;
+  UINT32      RgnSize;
+  UINT32      AddrOffset;
 
   Status = SpiGetRegionAddress (FlashRegionBios, NULL, &RgnSize);
   if (EFI_ERROR (Status)) {
@@ -104,7 +102,6 @@ LibFvbFlashDeviceWrite (
   ByteCount  = (UINT32)*NumBytes;
   return SpiFlashWrite (FlashRegionBios, AddrOffset, ByteCount, Buffer);
 }
-
 
 /**
   Erase the block starting at PAddress.
@@ -125,9 +122,9 @@ LibFvbFlashDeviceBlockErase (
   IN    UINTN                     LbaLength
   )
 {
-  EFI_STATUS                      Status;
-  UINT32                          RgnSize;
-  UINT32                          AddrOffset;
+  EFI_STATUS  Status;
+  UINT32      RgnSize;
+  UINT32      AddrOffset;
 
   Status = SpiGetRegionAddress (FlashRegionBios, NULL, &RgnSize);
   if (EFI_ERROR (Status)) {
@@ -139,7 +136,6 @@ LibFvbFlashDeviceBlockErase (
   AddrOffset = (UINT32)((UINT32)PAddress + RgnSize);
   return SpiFlashErase (FlashRegionBios, AddrOffset, (UINT32)LbaLength);
 }
-
 
 /**
   Lock or unlock the block starting at PAddress.
@@ -162,4 +158,3 @@ LibFvbFlashDeviceBlockLock (
 {
   return EFI_SUCCESS;
 }
-
