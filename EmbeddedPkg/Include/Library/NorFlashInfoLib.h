@@ -11,45 +11,45 @@
 
 #include <Uefi/UefiBaseType.h>
 
-#define NOR_FLASH_MAX_ID_LEN    6
+#define NOR_FLASH_MAX_ID_LEN  6
 
 typedef struct {
   /* Device name */
-  UINT16 *Name;
+  UINT16    *Name;
 
   /*
    * JEDEC ID
    */
-  UINT8  Id[NOR_FLASH_MAX_ID_LEN];
-  UINT8  IdLen;
+  UINT8     Id[NOR_FLASH_MAX_ID_LEN];
+  UINT8     IdLen;
 
-  UINT16 PageSize;
+  UINT16    PageSize;
 
   /*
    * Below parameters can be referred as BlockSize
    * and BlockCount, when treating the NorFlash as
    * block device.
    */
-  UINT32 SectorSize;
-  UINT32 SectorCount;
+  UINT32    SectorSize;
+  UINT32    SectorCount;
 
-  UINT16 Flags;
-#define NOR_FLASH_ERASE_4K     (1 << 0)  /* Use 4 KB erase blocks and CMD_ERASE_4K */
-#define NOR_FLASH_ERASE_32K    (1 << 1)  /* Use 32 KB erase blocks and CMD_ERASE_32K */
-#define NOR_FLASH_WRITE_FSR    (1 << 2)  /* Use flag status register for write */
-#define NOR_FLASH_4B_ADDR      (1 << 3)  /* Use 4B addressing */
+  UINT16    Flags;
+  #define NOR_FLASH_ERASE_4K   (1 << 0)  /* Use 4 KB erase blocks and CMD_ERASE_4K */
+  #define NOR_FLASH_ERASE_32K  (1 << 1)  /* Use 32 KB erase blocks and CMD_ERASE_32K */
+  #define NOR_FLASH_WRITE_FSR  (1 << 2)  /* Use flag status register for write */
+  #define NOR_FLASH_4B_ADDR    (1 << 3)  /* Use 4B addressing */
 } NOR_FLASH_INFO;
 
 /* Vendor IDs */
-#define NOR_FLASH_ID_ATMEL      0x1f
-#define NOR_FLASH_ID_EON        0x1c
-#define NOR_FLASH_ID_GIGADEVICE 0xc8
-#define NOR_FLASH_ID_ISSI       0x9d
-#define NOR_FLASH_ID_MACRONIX   0xc2
-#define NOR_FLASH_ID_SPANSION   0x01
-#define NOR_FLASH_ID_STMICRO    0x20
-#define NOR_FLASH_ID_SST        0xbf
-#define NOR_FLASH_ID_WINDBOND   0xef
+#define NOR_FLASH_ID_ATMEL       0x1f
+#define NOR_FLASH_ID_EON         0x1c
+#define NOR_FLASH_ID_GIGADEVICE  0xc8
+#define NOR_FLASH_ID_ISSI        0x9d
+#define NOR_FLASH_ID_MACRONIX    0xc2
+#define NOR_FLASH_ID_SPANSION    0x01
+#define NOR_FLASH_ID_STMICRO     0x20
+#define NOR_FLASH_ID_SST         0xbf
+#define NOR_FLASH_ID_WINDBOND    0xef
 
 /**
   Return an allocated copy pool of the NOR flash information structure.
@@ -70,9 +70,9 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 NorFlashGetInfo (
-  IN UINT8                *Id,
+  IN UINT8               *Id,
   IN OUT NOR_FLASH_INFO  **FlashInfo,
-  IN BOOLEAN               AllocateForRuntime
+  IN BOOLEAN             AllocateForRuntime
   );
 
 /**
@@ -87,4 +87,5 @@ EFIAPI
 NorFlashPrintInfo (
   IN     NOR_FLASH_INFO  *Info
   );
+
 #endif

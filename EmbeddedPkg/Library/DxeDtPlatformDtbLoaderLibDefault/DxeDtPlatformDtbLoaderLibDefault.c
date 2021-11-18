@@ -27,17 +27,22 @@
 EFI_STATUS
 EFIAPI
 DtPlatformLoadDtb (
-  OUT   VOID        **Dtb,
-  OUT   UINTN       *DtbSize
+  OUT   VOID   **Dtb,
+  OUT   UINTN  *DtbSize
   )
 {
-  EFI_STATUS      Status;
-  VOID            *OrigDtb;
-  VOID            *CopyDtb;
-  UINTN           OrigDtbSize;
+  EFI_STATUS  Status;
+  VOID        *OrigDtb;
+  VOID        *CopyDtb;
+  UINTN       OrigDtbSize;
 
-  Status = GetSectionFromAnyFv (&gDtPlatformDefaultDtbFileGuid,
-             EFI_SECTION_RAW, 0, &OrigDtb, &OrigDtbSize);
+  Status = GetSectionFromAnyFv (
+             &gDtPlatformDefaultDtbFileGuid,
+             EFI_SECTION_RAW,
+             0,
+             &OrigDtb,
+             &OrigDtbSize
+             );
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
@@ -47,7 +52,7 @@ DtPlatformLoadDtb (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  *Dtb = CopyDtb;
+  *Dtb     = CopyDtb;
   *DtbSize = OrigDtbSize;
 
   return EFI_SUCCESS;
