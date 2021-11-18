@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Uefi.h>
 #include <Protocol/SimpleTextInEx.h>
 
-
 /**
   KeyMapMake gets called on key presses.
 
@@ -20,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 KeyMapMake (
-  IN EFI_KEY_DATA   *KeyData
+  IN EFI_KEY_DATA  *KeyData
   )
 {
   return EFI_SUCCESS;
@@ -37,7 +36,7 @@ KeyMapMake (
 EFI_STATUS
 EFIAPI
 KeyMapBreak (
-  IN EFI_KEY_DATA   *KeyData
+  IN EFI_KEY_DATA  *KeyData
   )
 {
   return EFI_SUCCESS;
