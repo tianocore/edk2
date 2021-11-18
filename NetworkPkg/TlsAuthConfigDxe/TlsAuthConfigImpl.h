@@ -36,34 +36,33 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/ImageAuthentication.h>
 #include <Guid/TlsAuthentication.h>
 
-
 //
 // Include files with function prototypes
 //
 #include "TlsAuthConfigNvData.h"
 
-extern   UINT8       TlsAuthConfigDxeStrings[];
-extern   UINT8       TlsAuthConfigVfrBin[];
+extern   UINT8  TlsAuthConfigDxeStrings[];
+extern   UINT8  TlsAuthConfigVfrBin[];
 
-#define TLS_AUTH_CONFIG_PRIVATE_DATA_SIGNATURE    SIGNATURE_32 ('T', 'A', 'C', 'D')
-#define TLS_AUTH_CONFIG_PRIVATE_FROM_THIS(a)      CR (a, TLS_AUTH_CONFIG_PRIVATE_DATA, ConfigAccess, TLS_AUTH_CONFIG_PRIVATE_DATA_SIGNATURE)
+#define TLS_AUTH_CONFIG_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('T', 'A', 'C', 'D')
+#define TLS_AUTH_CONFIG_PRIVATE_FROM_THIS(a)  CR (a, TLS_AUTH_CONFIG_PRIVATE_DATA, ConfigAccess, TLS_AUTH_CONFIG_PRIVATE_DATA_SIGNATURE)
 
 #define TLS_AUTH_CONFIG_VAR_BASE_ATTR  (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS)
 
-typedef struct _TLS_AUTH_CONFIG_PRIVATE_DATA      TLS_AUTH_CONFIG_PRIVATE_DATA;
-typedef struct _TLS_AUTH_CONFIG_FILE_CONTEXT      TLS_AUTH_CONFIG_FILE_CONTEXT;
+typedef struct _TLS_AUTH_CONFIG_PRIVATE_DATA  TLS_AUTH_CONFIG_PRIVATE_DATA;
+typedef struct _TLS_AUTH_CONFIG_FILE_CONTEXT  TLS_AUTH_CONFIG_FILE_CONTEXT;
 
 ///
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH                VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL          End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
 struct _TLS_AUTH_CONFIG_FILE_CONTEXT {
-  EFI_FILE_HANDLE                   FHandle;
-  UINT16                            *FileName;
+  EFI_FILE_HANDLE    FHandle;
+  UINT16             *FileName;
 };
 
 struct _TLS_AUTH_CONFIG_PRIVATE_DATA {
@@ -274,4 +273,3 @@ TlsAuthConfigAccessCallback (
   );
 
 #endif
-

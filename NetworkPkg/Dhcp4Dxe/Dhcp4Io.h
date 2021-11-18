@@ -18,37 +18,35 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-
-
-#define DHCP_WAIT_OFFER                    3  // Time to wait the offers
+#define DHCP_WAIT_OFFER     3                 // Time to wait the offers
 #define DHCP_DEFAULT_LEASE  7 * 24 * 60 * 60  // Seven days as default.
-#define DHCP_SERVER_PORT                  67
-#define DHCP_CLIENT_PORT                  68
+#define DHCP_SERVER_PORT    67
+#define DHCP_CLIENT_PORT    68
 
 //
 // BOOTP header "op" field
 //
-#define BOOTP_REQUEST           1
-#define BOOTP_REPLY             2
+#define BOOTP_REQUEST  1
+#define BOOTP_REPLY    2
 
 //
 // DHCP message types
 //
-#define DHCP_MSG_DISCOVER       1
-#define DHCP_MSG_OFFER          2
-#define DHCP_MSG_REQUEST        3
-#define DHCP_MSG_DECLINE        4
-#define DHCP_MSG_ACK            5
-#define DHCP_MSG_NAK            6
-#define DHCP_MSG_RELEASE        7
-#define DHCP_MSG_INFORM         8
+#define DHCP_MSG_DISCOVER  1
+#define DHCP_MSG_OFFER     2
+#define DHCP_MSG_REQUEST   3
+#define DHCP_MSG_DECLINE   4
+#define DHCP_MSG_ACK       5
+#define DHCP_MSG_NAK       6
+#define DHCP_MSG_RELEASE   7
+#define DHCP_MSG_INFORM    8
 
 //
 // DHCP notify user type
 //
-#define DHCP_NOTIFY_COMPLETION  1
-#define DHCP_NOTIFY_RENEWREBIND 2
-#define DHCP_NOTIFY_ALL         3
+#define DHCP_NOTIFY_COMPLETION   1
+#define DHCP_NOTIFY_RENEWREBIND  2
+#define DHCP_NOTIFY_ALL          3
 
 #define DHCP_IS_BOOTP(Parameter)  (((Parameter) == NULL) || ((Parameter)->DhcpType == 0))
 

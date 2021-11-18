@@ -21,10 +21,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0x28be27e5, 0x66cc, 0x4a31, { 0xa3, 0x15, 0xdb, 0x14, 0xc3, 0x74, 0x4d, 0x85 } \
   }
 
-#define ISCSI_INITIATOR_NAME_VAR_NAME L"I_NAME"
+#define ISCSI_INITIATOR_NAME_VAR_NAME  L"I_NAME"
 
-#define IP_MODE_AUTOCONFIG_IP4     3
-#define IP_MODE_AUTOCONFIG_IP6     4
+#define IP_MODE_AUTOCONFIG_IP4                      3
+#define IP_MODE_AUTOCONFIG_IP6                      4
 #define ALWAYS_USE_UEFI_ISCSI_AND_IGNORE_ISCSI_HBA  0x00
 #define STOP_UEFI_ISCSI_IF_HBA_INSTALL_AIP          0x01
 #define STOP_UEFI_ISCSI_IF_AIP_SUPPORT_IP4          0x02
@@ -45,41 +45,41 @@ extern EFI_GUID                           gIScsiV4PrivateGuid;
 extern EFI_GUID                           gIScsiV6PrivateGuid;
 
 typedef struct {
-  CHAR16          PortString[ISCSI_NAME_IFR_MAX_SIZE];
-  LIST_ENTRY      NicInfoList;
-  UINT8           NicCount;
-  UINT8           CurrentNic;
-  UINT8           MaxNic;
-  BOOLEAN         Ipv6Flag;
-  BOOLEAN         OneSessionEstablished;
-  BOOLEAN         EnableMpio;
-  UINT8           MpioCount;            // The number of attempts in MPIO.
-  UINT8           Krb5MpioCount;        // The number of attempts login with KRB5 in MPIO.
-  UINT8           SinglePathCount;      // The number of single path attempts.
-  UINT8           ValidSinglePathCount; // The number of valid single path attempts.
-  UINT8           BootSelectedIndex;
-  UINT8           AttemptCount;
-  LIST_ENTRY      AttemptConfigs;       // User configured Attempt list.
-  CHAR8           InitiatorName[ISCSI_NAME_MAX_SIZE];
-  UINTN           InitiatorNameLength;
+  CHAR16        PortString[ISCSI_NAME_IFR_MAX_SIZE];
+  LIST_ENTRY    NicInfoList;
+  UINT8         NicCount;
+  UINT8         CurrentNic;
+  UINT8         MaxNic;
+  BOOLEAN       Ipv6Flag;
+  BOOLEAN       OneSessionEstablished;
+  BOOLEAN       EnableMpio;
+  UINT8         MpioCount;              // The number of attempts in MPIO.
+  UINT8         Krb5MpioCount;          // The number of attempts login with KRB5 in MPIO.
+  UINT8         SinglePathCount;        // The number of single path attempts.
+  UINT8         ValidSinglePathCount;   // The number of valid single path attempts.
+  UINT8         BootSelectedIndex;
+  UINT8         AttemptCount;
+  LIST_ENTRY    AttemptConfigs;         // User configured Attempt list.
+  CHAR8         InitiatorName[ISCSI_NAME_MAX_SIZE];
+  UINTN         InitiatorNameLength;
 } ISCSI_PRIVATE_DATA;
 
-extern ISCSI_PRIVATE_DATA                 *mPrivate;
+extern ISCSI_PRIVATE_DATA  *mPrivate;
 
 typedef struct {
-  LIST_ENTRY      Link;
-  UINT32          HwAddressSize;
-  EFI_MAC_ADDRESS PermanentAddress;
-  UINT8           NicIndex;
-  UINT16          VlanId;
-  UINTN           BusNumber;
-  UINTN           DeviceNumber;
-  UINTN           FunctionNumber;
-  BOOLEAN         Ipv6Available;
+  LIST_ENTRY         Link;
+  UINT32             HwAddressSize;
+  EFI_MAC_ADDRESS    PermanentAddress;
+  UINT8              NicIndex;
+  UINT16             VlanId;
+  UINTN              BusNumber;
+  UINTN              DeviceNumber;
+  UINTN              FunctionNumber;
+  BOOLEAN            Ipv6Available;
 } ISCSI_NIC_INFO;
 
 typedef struct _ISCSI_PRIVATE_PROTOCOL {
-  UINT32  Reserved;
+  UINT32    Reserved;
 } ISCSI_PRIVATE_PROTOCOL;
 
 //

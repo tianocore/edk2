@@ -32,7 +32,7 @@ EFI_STATUS
 ReadFileContent (
   IN      EFI_FILE_HANDLE           FileHandle,
   IN OUT  VOID                      **BufferPtr,
-     OUT  UINTN                     *FileSize,
+  OUT  UINTN                     *FileSize,
   IN      UINTN                     AddtionAllocateSize
   );
 

@@ -14,6 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0x9f94d327, 0x0b18, 0x4245, { 0x8f, 0xf2, 0x83, 0x2e, 0x30, 0xd, 0x2c, 0xef } \
   }
 
-extern EFI_GUID gWifiConfigGuid;
+extern EFI_GUID  gWifiConfigGuid;
 
 #endif

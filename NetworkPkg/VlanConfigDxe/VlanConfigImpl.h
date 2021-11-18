@@ -32,40 +32,39 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "VlanConfigNvData.h"
 
-extern EFI_COMPONENT_NAME2_PROTOCOL gVlanConfigComponentName2;
-extern EFI_COMPONENT_NAME_PROTOCOL  gVlanConfigComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gVlanConfigComponentName2;
+extern EFI_COMPONENT_NAME_PROTOCOL   gVlanConfigComponentName;
 
 //
 // Tool generated IFR binary data and String package data
 //
-extern UINT8                        VlanConfigBin[];
-extern UINT8                        VlanConfigDxeStrings[];
+extern UINT8  VlanConfigBin[];
+extern UINT8  VlanConfigDxeStrings[];
 
-#define VLAN_LIST_VAR_OFFSET ((UINT16) OFFSET_OF (VLAN_CONFIGURATION, VlanList))
+#define VLAN_LIST_VAR_OFFSET  ((UINT16) OFFSET_OF (VLAN_CONFIGURATION, VlanList))
 
 typedef struct {
-  UINTN                           Signature;
+  UINTN                             Signature;
 
-  EFI_HII_CONFIG_ACCESS_PROTOCOL  ConfigAccess;
-  EFI_HII_HANDLE                  HiiHandle;
-  EFI_HANDLE                      DriverHandle;
-  EFI_DEVICE_PATH_PROTOCOL        *ChildDevicePath;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL    ConfigAccess;
+  EFI_HII_HANDLE                    HiiHandle;
+  EFI_HANDLE                        DriverHandle;
+  EFI_DEVICE_PATH_PROTOCOL          *ChildDevicePath;
 
-  EFI_HANDLE                      ControllerHandle;
-  EFI_HANDLE                      ImageHandle;
-  EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
-  EFI_VLAN_CONFIG_PROTOCOL        *VlanConfig;
-  CHAR16                          *MacString;
+  EFI_HANDLE                        ControllerHandle;
+  EFI_HANDLE                        ImageHandle;
+  EFI_DEVICE_PATH_PROTOCOL          *ParentDevicePath;
+  EFI_VLAN_CONFIG_PROTOCOL          *VlanConfig;
+  CHAR16                            *MacString;
 
-  UINT16                          NumberOfVlan;
-  UINT16                          VlanId[MAX_VLAN_NUMBER];
+  UINT16                            NumberOfVlan;
+  UINT16                            VlanId[MAX_VLAN_NUMBER];
 } VLAN_CONFIG_PRIVATE_DATA;
 
-#define VLAN_CONFIG_PRIVATE_DATA_SIGNATURE     SIGNATURE_32 ('V', 'C', 'P', 'D')
+#define VLAN_CONFIG_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('V', 'C', 'P', 'D')
 #define VLAN_CONFIG_PRIVATE_DATA_FROM_THIS(a)  CR (a, VLAN_CONFIG_PRIVATE_DATA, ConfigAccess, VLAN_CONFIG_PRIVATE_DATA_SIGNATURE)
 
-extern VLAN_CONFIG_PRIVATE_DATA mVlanConfigPrivateDateTemplate;
-
+extern VLAN_CONFIG_PRIVATE_DATA  mVlanConfigPrivateDateTemplate;
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -106,7 +105,7 @@ EFIAPI
 VlanConfigComponentNameGetDriverName (
   IN     EFI_COMPONENT_NAME_PROTOCOL   *This,
   IN     CHAR8                         *Language,
-     OUT CHAR16                        **DriverName
+  OUT CHAR16                        **DriverName
   );
 
 /**
@@ -174,7 +173,7 @@ VlanConfigComponentNameGetControllerName (
   IN     EFI_HANDLE                    ControllerHandle,
   IN     EFI_HANDLE                    ChildHandle OPTIONAL,
   IN     CHAR8                         *Language,
-     OUT CHAR16                        **ControllerName
+  OUT CHAR16                        **ControllerName
   );
 
 /**
@@ -315,8 +314,8 @@ EFIAPI
 VlanExtractConfig (
   IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL        *This,
   IN CONST EFI_STRING                            Request,
-       OUT EFI_STRING                            *Progress,
-       OUT EFI_STRING                            *Results
+  OUT EFI_STRING                            *Progress,
+  OUT EFI_STRING                            *Results
   );
 
 /**
@@ -342,7 +341,7 @@ EFIAPI
 VlanRouteConfig (
   IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
   IN CONST EFI_STRING                          Configuration,
-       OUT EFI_STRING                          *Progress
+  OUT EFI_STRING                          *Progress
   );
 
 /**
@@ -375,7 +374,7 @@ VlanCallback (
   IN     EFI_QUESTION_ID                       QuestionId,
   IN     UINT8                                 Type,
   IN     EFI_IFR_TYPE_VALUE                    *Value,
-     OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
+  OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   );
 
 #endif

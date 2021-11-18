@@ -10,25 +10,24 @@
 #ifndef __EFI_PXEBC_DHCP6_H__
 #define __EFI_PXEBC_DHCP6_H__
 
-#define PXEBC_DHCP6_OPTION_MAX_NUM        16
-#define PXEBC_DHCP6_OPTION_MAX_SIZE       312
-#define PXEBC_DHCP6_PACKET_MAX_SIZE       (sizeof (EFI_PXE_BASE_CODE_PACKET))
-#define PXEBC_IP6_POLICY_MAX              0xff
-#define PXEBC_IP6_ROUTE_TABLE_TIMEOUT     10
+#define PXEBC_DHCP6_OPTION_MAX_NUM     16
+#define PXEBC_DHCP6_OPTION_MAX_SIZE    312
+#define PXEBC_DHCP6_PACKET_MAX_SIZE    (sizeof (EFI_PXE_BASE_CODE_PACKET))
+#define PXEBC_IP6_POLICY_MAX           0xff
+#define PXEBC_IP6_ROUTE_TABLE_TIMEOUT  10
 
-#define PXEBC_DHCP6_S_PORT                547
-#define PXEBC_DHCP6_C_PORT                546
+#define PXEBC_DHCP6_S_PORT  547
+#define PXEBC_DHCP6_C_PORT  546
 
-#define PXEBC_DHCP6_ENTERPRISE_NUM        343   // TODO: IANA TBD: temporarily using Intel's
-#define PXEBC_DHCP6_MAX_BOOT_FILE_SIZE    65535 //   It's a limitation of bit length, 65535*512 bytes.
+#define PXEBC_DHCP6_ENTERPRISE_NUM      343     // TODO: IANA TBD: temporarily using Intel's
+#define PXEBC_DHCP6_MAX_BOOT_FILE_SIZE  65535   //   It's a limitation of bit length, 65535*512 bytes.
 
-
-#define PXEBC_DHCP6_IDX_IA_NA             0
-#define PXEBC_DHCP6_IDX_BOOT_FILE_URL     1
-#define PXEBC_DHCP6_IDX_BOOT_FILE_PARAM   2
-#define PXEBC_DHCP6_IDX_VENDOR_CLASS      3
-#define PXEBC_DHCP6_IDX_DNS_SERVER        4
-#define PXEBC_DHCP6_IDX_MAX               5
+#define PXEBC_DHCP6_IDX_IA_NA            0
+#define PXEBC_DHCP6_IDX_BOOT_FILE_URL    1
+#define PXEBC_DHCP6_IDX_BOOT_FILE_PARAM  2
+#define PXEBC_DHCP6_IDX_VENDOR_CLASS     3
+#define PXEBC_DHCP6_IDX_DNS_SERVER       4
+#define PXEBC_DHCP6_IDX_MAX              5
 
 #define PXEBC_DHCP6_BOOT_FILE_URL_PREFIX  "tftp://"
 #define PXEBC_TFTP_URL_SEPARATOR          '/'
@@ -47,70 +46,66 @@
    (Type) == PxeOfferTypeProxyPxe10 || \
    (Type) == PxeOfferTypeProxyWfm11a)
 
-
 #pragma pack(1)
 typedef struct {
-  UINT16 OpCode[256];
+  UINT16    OpCode[256];
 } PXEBC_DHCP6_OPTION_ORO;
 
 typedef struct {
-  UINT8 Type;
-  UINT8 MajorVer;
-  UINT8 MinorVer;
+  UINT8    Type;
+  UINT8    MajorVer;
+  UINT8    MinorVer;
 } PXEBC_DHCP6_OPTION_UNDI;
 
 typedef struct {
-  UINT16 Type;
+  UINT16    Type;
 } PXEBC_DHCP6_OPTION_ARCH;
 
 typedef struct {
-  UINT8 ClassIdentifier[10];
-  UINT8 ArchitecturePrefix[5];
-  UINT8 ArchitectureType[5];
-  UINT8 Lit3[1];
-  UINT8 InterfaceName[4];
-  UINT8 Lit4[1];
-  UINT8 UndiMajor[3];
-  UINT8 UndiMinor[3];
+  UINT8    ClassIdentifier[10];
+  UINT8    ArchitecturePrefix[5];
+  UINT8    ArchitectureType[5];
+  UINT8    Lit3[1];
+  UINT8    InterfaceName[4];
+  UINT8    Lit4[1];
+  UINT8    UndiMajor[3];
+  UINT8    UndiMinor[3];
 } PXEBC_CLASS_ID;
 
 typedef struct {
-  UINT32         Vendor;
-  UINT16         ClassLen;
-  PXEBC_CLASS_ID ClassId;
+  UINT32            Vendor;
+  UINT16            ClassLen;
+  PXEBC_CLASS_ID    ClassId;
 } PXEBC_DHCP6_OPTION_VENDOR_CLASS;
 
 #pragma pack()
 
 typedef union {
-  PXEBC_DHCP6_OPTION_ORO            *Oro;
-  PXEBC_DHCP6_OPTION_UNDI           *Undi;
-  PXEBC_DHCP6_OPTION_ARCH           *Arch;
-  PXEBC_DHCP6_OPTION_VENDOR_CLASS   *VendorClass;
+  PXEBC_DHCP6_OPTION_ORO             *Oro;
+  PXEBC_DHCP6_OPTION_UNDI            *Undi;
+  PXEBC_DHCP6_OPTION_ARCH            *Arch;
+  PXEBC_DHCP6_OPTION_VENDOR_CLASS    *VendorClass;
 } PXEBC_DHCP6_OPTION_ENTRY;
 
 typedef struct {
-  LIST_ENTRY              Link;
-  EFI_DHCP6_PACKET_OPTION *Option;
-  UINT8                   Precedence;
+  LIST_ENTRY                 Link;
+  EFI_DHCP6_PACKET_OPTION    *Option;
+  UINT8                      Precedence;
 } PXEBC_DHCP6_OPTION_NODE;
 
 #define PXEBC_CACHED_DHCP6_PACKET_MAX_SIZE  (OFFSET_OF (EFI_DHCP6_PACKET, Dhcp6) + PXEBC_DHCP6_PACKET_MAX_SIZE)
 
 typedef union {
-  EFI_DHCP6_PACKET        Offer;
-  EFI_DHCP6_PACKET        Ack;
-  UINT8                   Buffer[PXEBC_CACHED_DHCP6_PACKET_MAX_SIZE];
+  EFI_DHCP6_PACKET    Offer;
+  EFI_DHCP6_PACKET    Ack;
+  UINT8               Buffer[PXEBC_CACHED_DHCP6_PACKET_MAX_SIZE];
 } PXEBC_DHCP6_PACKET;
 
 typedef struct {
-  PXEBC_DHCP6_PACKET      Packet;
-  PXEBC_OFFER_TYPE        OfferType;
-  EFI_DHCP6_PACKET_OPTION *OptList[PXEBC_DHCP6_IDX_MAX];
+  PXEBC_DHCP6_PACKET         Packet;
+  PXEBC_OFFER_TYPE           OfferType;
+  EFI_DHCP6_PACKET_OPTION    *OptList[PXEBC_DHCP6_IDX_MAX];
 } PXEBC_DHCP6_PACKET_CACHE;
-
-
-
 
 /**
   Parse the Boot File URL option.
@@ -129,12 +124,11 @@ typedef struct {
 EFI_STATUS
 PxeBcExtractBootFileUrl (
   IN PXEBC_PRIVATE_DATA      *Private,
-     OUT UINT8               **FileName,
+  OUT UINT8               **FileName,
   IN OUT EFI_IPv6_ADDRESS    *SrvAddr,
   IN     CHAR8               *BootFile,
   IN     UINT16              Length
   );
-
 
 /**
   Parse the Boot File Parameter option.
@@ -152,7 +146,6 @@ PxeBcExtractBootFileParam (
   OUT UINT16                 *BootFileSize
   );
 
-
 /**
   Parse the cached DHCPv6 packet, including all the options.
 
@@ -166,7 +159,6 @@ EFI_STATUS
 PxeBcParseDhcp6Packet (
   IN PXEBC_DHCP6_PACKET_CACHE  *Cache6
   );
-
 
 /**
   Register the ready address by Ip6Config protocol.
@@ -184,7 +176,6 @@ PxeBcRegisterIp6Address (
   IN EFI_IPv6_ADDRESS              *Address
   );
 
-
 /**
   Unregister the address by Ip6Config protocol.
 
@@ -195,7 +186,6 @@ VOID
 PxeBcUnregisterIp6Address (
   IN PXEBC_PRIVATE_DATA            *Private
   );
-
 
 /**
   Build and send out the request packet for the bootfile, and parse the reply.
@@ -266,4 +256,3 @@ PxeBcDhcp6Sarr (
   );
 
 #endif
-

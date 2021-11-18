@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __EFI_HTTPS_SUPPORT_H__
 #define __EFI_HTTPS_SUPPORT_H__
 
-#define HTTPS_DEFAULT_PORT       443
+#define HTTPS_DEFAULT_PORT  443
 
-#define HTTPS_FLAG               "https://"
+#define HTTPS_FLAG  "https://"
 
 /**
   Check whether the Url is from Https.
@@ -167,7 +167,7 @@ EFI_STATUS
 EFIAPI
 TlsReceiveOnePdu (
   IN OUT HTTP_PROTOCOL      *HttpInstance,
-     OUT NET_BUF            **Pdu,
+  OUT NET_BUF            **Pdu,
   IN     EFI_EVENT          Timeout
   );
 
@@ -262,4 +262,3 @@ HttpsReceive (
   );
 
 #endif
-

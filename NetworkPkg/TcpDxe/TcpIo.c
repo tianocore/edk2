@@ -67,15 +67,14 @@ TcpSendIpPacket (
   IN UINT8           Version
   )
 {
-  EFI_STATUS       Status;
-  IP_IO            *IpIo;
-  IP_IO_OVERRIDE   Override;
-  SOCKET           *Sock;
-  VOID             *IpSender;
+  EFI_STATUS      Status;
+  IP_IO           *IpIo;
+  IP_IO_OVERRIDE  Override;
+  SOCKET          *Sock;
+  VOID            *IpSender;
   TCP_PROTO_DATA  *TcpProto;
 
   if (NULL == Tcb) {
-
     IpIo     = NULL;
     IpSender = IpIoFindSender (&IpIo, Version, Src);
 
@@ -95,9 +94,8 @@ TcpSendIpPacket (
       IpSender = NULL;
     }
   } else {
-
     Sock     = Tcb->Sk;
-    TcpProto = (TCP_PROTO_DATA *) Sock->ProtoReserved;
+    TcpProto = (TCP_PROTO_DATA *)Sock->ProtoReserved;
     IpIo     = TcpProto->TcpService->IpIo;
     IpSender = Tcb->IpInfo;
 
@@ -118,7 +116,7 @@ TcpSendIpPacket (
     Override.Ip4OverrideData.TypeOfService = 0;
     Override.Ip4OverrideData.TimeToLive    = 255;
     Override.Ip4OverrideData.DoNotFragment = FALSE;
-    Override.Ip4OverrideData.Protocol      = EFI_IP_PROTO_TCP;
+    Override.Ip4OverrideData.Protocol = EFI_IP_PROTO_TCP;
     ZeroMem (&Override.Ip4OverrideData.GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
     CopyMem (&Override.Ip4OverrideData.SourceAddress, Src, sizeof (EFI_IPv4_ADDRESS));
   } else {
@@ -162,8 +160,8 @@ Tcp6RefreshNeighbor (
   IN UINT32          Timeout
   )
 {
-  IP_IO            *IpIo;
-  SOCKET           *Sock;
+  IP_IO           *IpIo;
+  SOCKET          *Sock;
   TCP_PROTO_DATA  *TcpProto;
 
   if (NULL == Tcb) {
@@ -174,10 +172,9 @@ Tcp6RefreshNeighbor (
       DEBUG ((DEBUG_WARN, "Tcp6AddNeighbor: No appropriate IpIo.\n"));
       return EFI_NOT_STARTED;
     }
-
   } else {
     Sock     = Tcb->Sk;
-    TcpProto = (TCP_PROTO_DATA *) Sock->ProtoReserved;
+    TcpProto = (TCP_PROTO_DATA *)Sock->ProtoReserved;
     IpIo     = TcpProto->TcpService->IpIo;
   }
 

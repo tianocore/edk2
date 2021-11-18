@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "MnpDriver.h"
 
-extern EFI_VLAN_CONFIG_PROTOCOL mVlanConfigProtocolTemplate;
-
+extern EFI_VLAN_CONFIG_PROTOCOL  mVlanConfigProtocolTemplate;
 
 /**
   Create a child handle for the VLAN ID.
@@ -30,7 +29,7 @@ MnpCreateVlanChild (
   IN     EFI_HANDLE                  ImageHandle,
   IN     EFI_HANDLE                  ControllerHandle,
   IN     UINT16                      VlanId,
-     OUT EFI_DEVICE_PATH_PROTOCOL    **Devicepath OPTIONAL
+  OUT EFI_DEVICE_PATH_PROTOCOL    **Devicepath OPTIONAL
   );
 
 /**
@@ -48,7 +47,7 @@ BOOLEAN
 MnpRemoveVlanTag (
   IN OUT MNP_DEVICE_DATA   *MnpDeviceData,
   IN OUT NET_BUF           *Nbuf,
-     OUT UINT16            *VlanId
+  OUT UINT16            *VlanId
   );
 
 /**
@@ -67,7 +66,7 @@ VOID
 MnpInsertVlanTag (
   IN     MNP_SERVICE_DATA                    *MnpServiceData,
   IN     EFI_MANAGED_NETWORK_TRANSMIT_DATA   *TxData,
-     OUT UINT16                              *ProtocolType,
+  OUT UINT16                              *ProtocolType,
   IN OUT UINT8                               **Packet,
   IN OUT UINT32                              *Length
   );
@@ -89,8 +88,8 @@ MnpInsertVlanTag (
 EFI_STATUS
 MnpGetVlanVariable (
   IN     MNP_DEVICE_DATA   *MnpDeviceData,
-     OUT UINTN             *NumberOfVlan,
-     OUT VLAN_TCI          **VlanVariable
+  OUT UINTN             *NumberOfVlan,
+  OUT VLAN_TCI          **VlanVariable
   );
 
 /**
@@ -174,8 +173,8 @@ EFIAPI
 VlanConfigFind (
   IN     EFI_VLAN_CONFIG_PROTOCOL    *This,
   IN     UINT16                      *VlanId OPTIONAL,
-     OUT UINT16                      *NumberOfVlan,
-     OUT EFI_VLAN_FIND_DATA          **Entries
+  OUT UINT16                      *NumberOfVlan,
+  OUT EFI_VLAN_FIND_DATA          **Entries
   );
 
 /**

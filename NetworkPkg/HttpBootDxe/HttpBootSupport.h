@@ -53,7 +53,6 @@ HttpBootUintnToAscDecWithFormat (
   IN INTN                        Length
   );
 
-
 /**
   This function is to display the IPv4 address.
 
@@ -102,7 +101,7 @@ EFI_STATUS
 HttpBootDns (
   IN     HTTP_BOOT_PRIVATE_DATA   *Private,
   IN     CHAR16                   *HostName,
-     OUT EFI_IPv6_ADDRESS         *IpAddress
+  OUT EFI_IPv6_ADDRESS         *IpAddress
   );
 
 /**
@@ -149,7 +148,7 @@ HttpBootCheckUriScheme (
 EFI_STATUS
 HttpBootParseFilePath (
   IN     EFI_DEVICE_PATH_PROTOCOL     *FilePath,
-     OUT CHAR8                        **UriAddress
+  OUT CHAR8                        **UriAddress
   );
 
 /**
@@ -175,7 +174,7 @@ HttpBootCheckImageType (
   IN      VOID                   *UriParser,
   IN      UINTN                  HeaderCount,
   IN      EFI_HTTP_HEADER        *Headers,
-     OUT  HTTP_BOOT_IMAGE_TYPE   *ImageType
+  OUT  HTTP_BOOT_IMAGE_TYPE   *ImageType
   );
 
 /**
@@ -212,4 +211,5 @@ BOOLEAN
 HttpBootIsHttpRedirectStatusCode (
   IN   EFI_HTTP_STATUS_CODE        StatusCode
   );
+
 #endif

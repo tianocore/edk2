@@ -5,9 +5,9 @@ Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef _SNP_H_
 #define _SNP_H_
-
 
 #include <Uefi.h>
 
@@ -33,35 +33,34 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define FOUR_GIGABYTES  (UINT64) 0x100000000ULL
 
-
 #define SNP_DRIVER_SIGNATURE  SIGNATURE_32 ('s', 'n', 'd', 's')
 #define MAX_MAP_LENGTH        100
 
-#define PCI_BAR_IO_MASK       0x00000003
-#define PCI_BAR_IO_MODE       0x00000001
+#define PCI_BAR_IO_MASK  0x00000003
+#define PCI_BAR_IO_MODE  0x00000001
 
-#define PCI_BAR_MEM_MASK      0x0000000F
-#define PCI_BAR_MEM_MODE      0x00000000
-#define PCI_BAR_MEM_64BIT     0x00000004
+#define PCI_BAR_MEM_MASK   0x0000000F
+#define PCI_BAR_MEM_MODE   0x00000000
+#define PCI_BAR_MEM_64BIT  0x00000004
 
-#define SNP_TX_BUFFER_INCREASEMENT    MAX_XMIT_BUFFERS
-#define SNP_MAX_TX_BUFFER_NUM         65536
+#define SNP_TX_BUFFER_INCREASEMENT  MAX_XMIT_BUFFERS
+#define SNP_MAX_TX_BUFFER_NUM       65536
 
 typedef
 EFI_STATUS
-(EFIAPI *ISSUE_UNDI32_COMMAND) (
+(EFIAPI *ISSUE_UNDI32_COMMAND)(
   UINT64         Cdb
   );
 
 typedef struct {
-  UINT32                      Signature;
-  EFI_LOCK                    Lock;
+  UINT32                         Signature;
+  EFI_LOCK                       Lock;
 
-  EFI_SIMPLE_NETWORK_PROTOCOL Snp;
-  EFI_SIMPLE_NETWORK_MODE     Mode;
+  EFI_SIMPLE_NETWORK_PROTOCOL    Snp;
+  EFI_SIMPLE_NETWORK_MODE        Mode;
 
-  EFI_HANDLE                  DeviceHandle;
-  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  EFI_HANDLE                     DeviceHandle;
+  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
 
   //
   //  Local instance data needed by SNP driver
@@ -69,96 +68,96 @@ typedef struct {
   //  Pointer to S/W UNDI API entry point
   //  This will be NULL for H/W UNDI
   //
-  ISSUE_UNDI32_COMMAND  IssueUndi32Command;
+  ISSUE_UNDI32_COMMAND           IssueUndi32Command;
 
-  BOOLEAN               IsSwUndi;
+  BOOLEAN                        IsSwUndi;
 
   //
   // undi interface number, if one undi manages more nics
   //
-  PXE_IFNUM             IfNum;
+  PXE_IFNUM                      IfNum;
 
   //
   //  Allocated tx/rx buffer that was passed to UNDI Initialize.
   //
-  UINT32                TxRxBufferSize;
-  VOID                  *TxRxBuffer;
+  UINT32                         TxRxBufferSize;
+  VOID                           *TxRxBuffer;
   //
   // mappable buffers for receive and fill header for undi3.0
   // these will be used if the user buffers are above 4GB limit (instead of
   // mapping the user buffers)
   //
-  UINT8                 *ReceiveBufffer;
-  VOID                  *ReceiveBufferUnmap;
-  UINT8                 *FillHeaderBuffer;
-  VOID                  *FillHeaderBufferUnmap;
+  UINT8                          *ReceiveBufffer;
+  VOID                           *ReceiveBufferUnmap;
+  UINT8                          *FillHeaderBuffer;
+  VOID                           *FillHeaderBufferUnmap;
 
-  EFI_PCI_IO_PROTOCOL   *PciIo;
-  UINT8                 IoBarIndex;
-  UINT8                 MemoryBarIndex;
+  EFI_PCI_IO_PROTOCOL            *PciIo;
+  UINT8                          IoBarIndex;
+  UINT8                          MemoryBarIndex;
 
   //
   // Buffers for command descriptor block, command parameter block
   // and data block.
   //
-  PXE_CDB               Cdb;
-  VOID                  *Cpb;
-  VOID                  *CpbUnmap;
-  VOID                  *Db;
+  PXE_CDB                        Cdb;
+  VOID                           *Cpb;
+  VOID                           *CpbUnmap;
+  VOID                           *Db;
 
   //
   // UNDI structure, we need to remember the init info for a long time!
   //
-  PXE_DB_GET_INIT_INFO  InitInfo;
+  PXE_DB_GET_INIT_INFO           InitInfo;
 
-  VOID                  *SnpDriverUnmap;
+  VOID                           *SnpDriverUnmap;
   //
   // when ever we map an address, we must remember it's address and the un-map
   // cookie so that we can unmap later
   //
   struct MAP_LIST {
-    EFI_PHYSICAL_ADDRESS  VirtualAddress;
-    VOID                  *MapCookie;
+    EFI_PHYSICAL_ADDRESS    VirtualAddress;
+    VOID                    *MapCookie;
   } MapList[MAX_MAP_LENGTH];
 
-  EFI_EVENT              ExitBootServicesEvent;
+  EFI_EVENT    ExitBootServicesEvent;
 
   //
   // Whether UNDI support reporting media status from GET_STATUS command,
   // i.e. PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED or
   //      PXE_STATFLAGS_GET_STATUS_NO_MEDIA_NOT_SUPPORTED
   //
-  BOOLEAN                MediaStatusSupported;
+  BOOLEAN      MediaStatusSupported;
 
   //
   // Whether UNDI support cable detect for INITIALIZE command,
   // i.e. PXE_STATFLAGS_CABLE_DETECT_SUPPORTED or
   //      PXE_STATFLAGS_CABLE_DETECT_NOT_SUPPORTED
   //
-  BOOLEAN                CableDetectSupported;
+  BOOLEAN      CableDetectSupported;
 
   //
   // Array of the recycled transmit buffer address from UNDI.
   //
-  UINT64                 *RecycledTxBuf;
+  UINT64       *RecycledTxBuf;
   //
   // The maximum number of recycled buffer pointers in RecycledTxBuf.
   //
-  UINT32                 MaxRecycledTxBuf;
+  UINT32       MaxRecycledTxBuf;
   //
   // Current number of recycled buffer pointers in RecycledTxBuf.
   //
-  UINT32                 RecycledTxBufCount;
+  UINT32       RecycledTxBufCount;
 } SNP_DRIVER;
 
-#define EFI_SIMPLE_NETWORK_DEV_FROM_THIS(a) CR (a, SNP_DRIVER, Snp, SNP_DRIVER_SIGNATURE)
+#define EFI_SIMPLE_NETWORK_DEV_FROM_THIS(a)  CR (a, SNP_DRIVER, Snp, SNP_DRIVER_SIGNATURE)
 
 //
 // Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL    gSimpleNetworkDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL    gSimpleNetworkComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL   gSimpleNetworkComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gSimpleNetworkDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gSimpleNetworkComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gSimpleNetworkComponentName2;
 
 /**
   this routine calls undi to start the interface and changes the snp state.
@@ -256,7 +255,7 @@ PxeGetStnAddr (
 EFI_STATUS
 PxeGetStatus (
   IN     SNP_DRIVER *Snp,
-     OUT UINT32     *InterruptStatusPtr,
+  OUT UINT32     *InterruptStatusPtr,
   IN     BOOLEAN    GetTransmittedBuf
   );
 
@@ -644,7 +643,7 @@ SnpUndi32ReceiveFilters (
   IN UINT32                      Enable,
   IN UINT32                      Disable,
   IN BOOLEAN                     ResetMCastFilter,
-  IN UINTN                       MCastFilterCnt,  OPTIONAL
+  IN UINTN                       MCastFilterCnt, OPTIONAL
   IN EFI_MAC_ADDRESS             *MCastFilter     OPTIONAL
   );
 
@@ -740,7 +739,7 @@ EFIAPI
 SnpUndi32Statistics (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   IN BOOLEAN                     Reset,
-  IN OUT UINTN                   *StatisticsSize,  OPTIONAL
+  IN OUT UINTN                   *StatisticsSize, OPTIONAL
   IN OUT EFI_NETWORK_STATISTICS  *StatisticsTable  OPTIONAL
   );
 
@@ -949,7 +948,7 @@ SnpUndi32Transmit (
   IN UINTN                       HeaderSize,
   IN UINTN                       BufferSize,
   IN VOID                        *Buffer,
-  IN EFI_MAC_ADDRESS             *SrcAddr,  OPTIONAL
+  IN EFI_MAC_ADDRESS             *SrcAddr, OPTIONAL
   IN EFI_MAC_ADDRESS             *DestAddr, OPTIONAL
   IN UINT16                      *Protocol  OPTIONAL
   );
@@ -1029,6 +1028,5 @@ SnpWaitForPacketNotify (
   );
 
 #define SNP_MEM_PAGES(x)  (((x) - 1) / 4096 + 1)
-
 
 #endif /*  _SNP_H_  */

@@ -15,13 +15,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // the holes are filled in, then the download or upload has completed.
 //
 typedef struct {
-  LIST_ENTRY                Link;
-  INTN                      Start;
-  INTN                      End;
-  INTN                      Round;
-  INTN                      Bound;
+  LIST_ENTRY    Link;
+  INTN          Start;
+  INTN          End;
+  INTN          Round;
+  INTN          Bound;
 } MTFTP4_BLOCK_RANGE;
-
 
 /**
   Initialize the block range for either RRQ or WRQ.
@@ -167,7 +166,6 @@ Mtftp4SendError (
   IN UINT8                  *ErrInfo
   );
 
-
 /**
   The timer ticking function in TPL_NOTIFY level for the Mtftp service instance.
 
@@ -195,4 +193,5 @@ Mtftp4OnTimerTick (
   IN EFI_EVENT              Event,
   IN VOID                   *Context
   );
+
 #endif

@@ -23,9 +23,9 @@ SnpNotifyExitBootServices (
   VOID      *Context
   )
 {
-  SNP_DRIVER             *Snp;
+  SNP_DRIVER  *Snp;
 
-  Snp  = (SNP_DRIVER *)Context;
+  Snp = (SNP_DRIVER *)Context;
 
   //
   // Shutdown and stop UNDI driver
@@ -54,14 +54,13 @@ IssueHwUndiCommand (
 
   if (Cdb == 0) {
     return EFI_INVALID_PARAMETER;
-
   }
+
   //
   //  %%TBD - For now, nothing is done.
   //
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Compute 8-bit checksum of a buffer.
@@ -79,18 +78,18 @@ Calc8BitCksum (
   UINTN Length
   )
 {
-  UINT8 *Ptr;
-  UINT8 Cksum;
+  UINT8  *Ptr;
+  UINT8  Cksum;
 
   Ptr   = Buffer;
   Cksum = 0;
 
-  if (Ptr == NULL || Length == 0) {
+  if ((Ptr == NULL) || (Length == 0)) {
     return 0;
   }
 
   while (Length-- != 0) {
-    Cksum = (UINT8) (Cksum + *Ptr++);
+    Cksum = (UINT8)(Cksum + *Ptr++);
   }
 
   return Cksum;
@@ -122,9 +121,9 @@ SimpleNetworkDriverSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 {
-  EFI_STATUS                                Status;
-  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *NiiProtocol;
-  PXE_UNDI                                  *Pxe;
+  EFI_STATUS                                 Status;
+  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL  *NiiProtocol;
+  PXE_UNDI                                   *Pxe;
 
   Status = gBS->OpenProtocol (
                   Controller,
@@ -141,7 +140,7 @@ SimpleNetworkDriverSupported (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-                  (VOID **) &NiiProtocol,
+                  (VOID **)&NiiProtocol,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -151,6 +150,7 @@ SimpleNetworkDriverSupported (
     if (Status == EFI_ALREADY_STARTED) {
       DEBUG ((DEBUG_INFO, "Support(): Already Started. on handle %p\n", Controller));
     }
+
     return Status;
   }
 
@@ -163,6 +163,7 @@ SimpleNetworkDriverSupported (
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
+
   //
   // Check to see if !PXE structure is valid. Paragraph alignment of !PXE structure is required.
   //
@@ -172,7 +173,7 @@ SimpleNetworkDriverSupported (
     goto Done;
   }
 
-  Pxe = (PXE_UNDI *) (UINTN) (NiiProtocol->Id);
+  Pxe = (PXE_UNDI *)(UINTN)(NiiProtocol->Id);
 
   //
   //  Verify !PXE revisions.
@@ -190,16 +191,15 @@ SimpleNetworkDriverSupported (
   }
 
   if (Pxe->hw.MajorVer < PXE_ROMID_MAJORVER) {
-
     DEBUG ((DEBUG_NET, "\n!PXE.MajorVer is not supported.\n"));
     Status = EFI_UNSUPPORTED;
     goto Done;
-
-  } else if (Pxe->hw.MajorVer == PXE_ROMID_MAJORVER && Pxe->hw.MinorVer < PXE_ROMID_MINORVER) {
+  } else if ((Pxe->hw.MajorVer == PXE_ROMID_MAJORVER) && (Pxe->hw.MinorVer < PXE_ROMID_MINORVER)) {
     DEBUG ((DEBUG_NET, "\n!PXE.MinorVer is not supported."));
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
+
   //
   // Do S/W UNDI specific checks.
   //
@@ -222,11 +222,11 @@ SimpleNetworkDriverSupported (
 
 Done:
   gBS->CloseProtocol (
-        Controller,
-        &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-        This->DriverBindingHandle,
-        Controller
-        );
+         Controller,
+         &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
+         This->DriverBindingHandle,
+         Controller
+         );
 
   return Status;
 }
@@ -257,26 +257,26 @@ SimpleNetworkDriverStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 {
-  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL *Nii;
-  EFI_DEVICE_PATH_PROTOCOL                  *NiiDevicePath;
-  EFI_STATUS                                Status;
-  PXE_UNDI                                  *Pxe;
-  SNP_DRIVER                                *Snp;
-  VOID                                      *Address;
-  EFI_HANDLE                                Handle;
-  UINT8                                     BarIndex;
-  PXE_STATFLAGS                             InitStatFlags;
-  EFI_PCI_IO_PROTOCOL                       *PciIo;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR         *BarDesc;
-  BOOLEAN                                   FoundIoBar;
-  BOOLEAN                                   FoundMemoryBar;
+  EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL  *Nii;
+  EFI_DEVICE_PATH_PROTOCOL                   *NiiDevicePath;
+  EFI_STATUS                                 Status;
+  PXE_UNDI                                   *Pxe;
+  SNP_DRIVER                                 *Snp;
+  VOID                                       *Address;
+  EFI_HANDLE                                 Handle;
+  UINT8                                      BarIndex;
+  PXE_STATFLAGS                              InitStatFlags;
+  EFI_PCI_IO_PROTOCOL                        *PciIo;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR          *BarDesc;
+  BOOLEAN                                    FoundIoBar;
+  BOOLEAN                                    FoundMemoryBar;
 
   DEBUG ((DEBUG_NET, "\nSnpNotifyNetworkInterfaceIdentifier()  "));
 
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
-                  (VOID **) &NiiDevicePath,
+                  (VOID **)&NiiDevicePath,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -299,7 +299,7 @@ SimpleNetworkDriverStart (
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIo,
+                  (VOID **)&PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -307,30 +307,31 @@ SimpleNetworkDriverStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Get the NII interface.
   //
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-                  (VOID **) &Nii,
+                  (VOID **)&Nii,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
     gBS->CloseProtocol (
-          Controller,
-          &gEfiDevicePathProtocolGuid,
-          This->DriverBindingHandle,
-          Controller
-          );
+           Controller,
+           &gEfiDevicePathProtocolGuid,
+           This->DriverBindingHandle,
+           Controller
+           );
     return Status;
   }
 
   DEBUG ((DEBUG_INFO, "Start(): UNDI3.1 found\n"));
 
-  Pxe = (PXE_UNDI *) (UINTN) (Nii->Id);
+  Pxe = (PXE_UNDI *)(UINTN)(Nii->Id);
 
   if (Calc8BitCksum (Pxe, Pxe->hw.Len) != 0) {
     DEBUG ((DEBUG_NET, "\n!PXE checksum is not correct.\n"));
@@ -351,6 +352,7 @@ SimpleNetworkDriverStart (
     DEBUG ((DEBUG_NET, "\nUNDI does not have promiscuous or broadcast support."));
     goto NiiError;
   }
+
   //
   // OK, we like this UNDI, and we know snp is not already there on this handle
   // Allocate and initialize a new simple network protocol structure.
@@ -369,12 +371,12 @@ SimpleNetworkDriverStart (
     goto NiiError;
   }
 
-  Snp = (SNP_DRIVER *) (UINTN) Address;
+  Snp = (SNP_DRIVER *)(UINTN)Address;
 
   ZeroMem (Snp, sizeof (SNP_DRIVER));
 
-  Snp->PciIo      = PciIo;
-  Snp->Signature  = SNP_DRIVER_SIGNATURE;
+  Snp->PciIo     = PciIo;
+  Snp->Signature = SNP_DRIVER_SIGNATURE;
 
   EfiInitializeLock (&Snp->Lock, TPL_NOTIFY);
 
@@ -394,38 +396,39 @@ SimpleNetworkDriverStart (
   Snp->Snp.Receive        = SnpUndi32Receive;
   Snp->Snp.WaitForPacket  = NULL;
 
-  Snp->Snp.Mode           = &Snp->Mode;
+  Snp->Snp.Mode = &Snp->Mode;
 
-  Snp->TxRxBufferSize     = 0;
-  Snp->TxRxBuffer         = NULL;
+  Snp->TxRxBufferSize = 0;
+  Snp->TxRxBuffer     = NULL;
 
   Snp->RecycledTxBuf = AllocatePool (sizeof (UINT64) * SNP_TX_BUFFER_INCREASEMENT);
   if (Snp->RecycledTxBuf == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Error_DeleteSNP;
   }
-  Snp->MaxRecycledTxBuf    = SNP_TX_BUFFER_INCREASEMENT;
-  Snp->RecycledTxBufCount  = 0;
+
+  Snp->MaxRecycledTxBuf   = SNP_TX_BUFFER_INCREASEMENT;
+  Snp->RecycledTxBufCount = 0;
 
   if (Nii->Revision >= EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION) {
     Snp->IfNum = Nii->IfNum;
-
   } else {
-    Snp->IfNum = (UINT8) (Nii->IfNum & 0xFF);
+    Snp->IfNum = (UINT8)(Nii->IfNum & 0xFF);
   }
 
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_HW_UNDI) != 0) {
-    Snp->IsSwUndi             = FALSE;
-    Snp->IssueUndi32Command   = &IssueHwUndiCommand;
+    Snp->IsSwUndi = FALSE;
+    Snp->IssueUndi32Command = &IssueHwUndiCommand;
   } else {
     Snp->IsSwUndi = TRUE;
 
     if ((Pxe->sw.Implementation & PXE_ROMID_IMP_SW_VIRT_ADDR) != 0) {
-      Snp->IssueUndi32Command = (ISSUE_UNDI32_COMMAND) (UINTN) Pxe->sw.EntryPoint;
+      Snp->IssueUndi32Command = (ISSUE_UNDI32_COMMAND)(UINTN)Pxe->sw.EntryPoint;
     } else {
-      Snp->IssueUndi32Command = (ISSUE_UNDI32_COMMAND) (UINTN) ((UINT8) (UINTN) Pxe + Pxe->sw.EntryPoint);
+      Snp->IssueUndi32Command = (ISSUE_UNDI32_COMMAND)(UINTN)((UINT8)(UINTN)Pxe + Pxe->sw.EntryPoint);
     }
   }
+
   //
   // Allocate a global CPB and DB buffer for this UNDI interface.
   // we do this because:
@@ -456,8 +459,8 @@ SimpleNetworkDriverStart (
     goto Error_DeleteSNP;
   }
 
-  Snp->Cpb  = (VOID *) (UINTN) Address;
-  Snp->Db   = (VOID *) ((UINTN) Address + 2048);
+  Snp->Cpb = (VOID *)(UINTN)Address;
+  Snp->Db  = (VOID *)((UINTN)Address + 2048);
 
   //
   // Find the correct BAR to do IO.
@@ -468,14 +471,14 @@ SimpleNetworkDriverStart (
   //
   Snp->MemoryBarIndex = PCI_MAX_BAR;
   Snp->IoBarIndex     = PCI_MAX_BAR;
-  FoundMemoryBar      = FALSE;
-  FoundIoBar          = FALSE;
+  FoundMemoryBar = FALSE;
+  FoundIoBar     = FALSE;
   for (BarIndex = 0; BarIndex < PCI_MAX_BAR; BarIndex++) {
     Status = PciIo->GetBarAttributes (
                       PciIo,
                       BarIndex,
                       NULL,
-                      (VOID**) &BarDesc
+                      (VOID **)&BarDesc
                       );
     if (Status == EFI_UNSUPPORTED) {
       continue;
@@ -485,10 +488,10 @@ SimpleNetworkDriverStart (
 
     if ((!FoundMemoryBar) && (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM)) {
       Snp->MemoryBarIndex = BarIndex;
-      FoundMemoryBar      = TRUE;
+      FoundMemoryBar = TRUE;
     } else if ((!FoundIoBar) && (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_IO)) {
       Snp->IoBarIndex = BarIndex;
-      FoundIoBar      = TRUE;
+      FoundIoBar = TRUE;
     }
 
     FreePool (BarDesc);
@@ -504,24 +507,24 @@ SimpleNetworkDriverStart (
     goto Error_DeleteSNP;
   }
 
-  Snp->Cdb.OpCode     = PXE_OPCODE_GET_INIT_INFO;
-  Snp->Cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb.OpCode  = PXE_OPCODE_GET_INIT_INFO;
+  Snp->Cdb.OpFlags = PXE_OPFLAGS_NOT_USED;
 
-  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr    = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.CPBsize = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr = PXE_DBADDR_NOT_USED;
 
-  Snp->Cdb.DBsize     = (UINT16) sizeof (Snp->InitInfo);
-  Snp->Cdb.DBaddr     = (UINT64)(UINTN) (&Snp->InitInfo);
+  Snp->Cdb.DBsize = (UINT16)sizeof (Snp->InitInfo);
+  Snp->Cdb.DBaddr = (UINT64)(UINTN)(&Snp->InitInfo);
 
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
 
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.IFnum   = Snp->IfNum;
+  Snp->Cdb.Control = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   DEBUG ((DEBUG_NET, "\nSnp->undi.get_init_info()  "));
 
-  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
 
   //
   // Save the INIT Stat Code...
@@ -537,34 +540,34 @@ SimpleNetworkDriverStart (
   //
   //  Initialize simple network protocol mode structure
   //
-  Snp->Mode.State               = EfiSimpleNetworkStopped;
-  Snp->Mode.HwAddressSize       = Snp->InitInfo.HWaddrLen;
-  Snp->Mode.MediaHeaderSize     = Snp->InitInfo.MediaHeaderLen;
-  Snp->Mode.MaxPacketSize       = Snp->InitInfo.FrameDataLen;
-  Snp->Mode.NvRamAccessSize     = Snp->InitInfo.NvWidth;
-  Snp->Mode.NvRamSize           = Snp->InitInfo.NvCount * Snp->Mode.NvRamAccessSize;
-  Snp->Mode.IfType              = Snp->InitInfo.IFtype;
+  Snp->Mode.State = EfiSimpleNetworkStopped;
+  Snp->Mode.HwAddressSize   = Snp->InitInfo.HWaddrLen;
+  Snp->Mode.MediaHeaderSize = Snp->InitInfo.MediaHeaderLen;
+  Snp->Mode.MaxPacketSize   = Snp->InitInfo.FrameDataLen;
+  Snp->Mode.NvRamAccessSize = Snp->InitInfo.NvWidth;
+  Snp->Mode.NvRamSize = Snp->InitInfo.NvCount * Snp->Mode.NvRamAccessSize;
+  Snp->Mode.IfType    = Snp->InitInfo.IFtype;
   Snp->Mode.MaxMCastFilterCount = Snp->InitInfo.MCastFilterCnt;
   Snp->Mode.MCastFilterCount    = 0;
 
   switch (InitStatFlags & PXE_STATFLAGS_CABLE_DETECT_MASK) {
-  case PXE_STATFLAGS_CABLE_DETECT_SUPPORTED:
-    Snp->CableDetectSupported = TRUE;
-    break;
+    case PXE_STATFLAGS_CABLE_DETECT_SUPPORTED:
+      Snp->CableDetectSupported = TRUE;
+      break;
 
-  case PXE_STATFLAGS_CABLE_DETECT_NOT_SUPPORTED:
-  default:
-    Snp->CableDetectSupported = FALSE;
+    case PXE_STATFLAGS_CABLE_DETECT_NOT_SUPPORTED:
+    default:
+      Snp->CableDetectSupported = FALSE;
   }
 
   switch (InitStatFlags & PXE_STATFLAGS_GET_STATUS_NO_MEDIA_MASK) {
-  case PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED:
-    Snp->MediaStatusSupported = TRUE;
-    break;
+    case PXE_STATFLAGS_GET_STATUS_NO_MEDIA_SUPPORTED:
+      Snp->MediaStatusSupported = TRUE;
+      break;
 
-  case PXE_STATFLAGS_GET_STATUS_NO_MEDIA_NOT_SUPPORTED:
-  default:
-    Snp->MediaStatusSupported = FALSE;
+    case PXE_STATFLAGS_GET_STATUS_NO_MEDIA_NOT_SUPPORTED:
+    default:
+      Snp->MediaStatusSupported = FALSE;
   }
 
   if (Snp->CableDetectSupported || Snp->MediaStatusSupported) {
@@ -587,27 +590,22 @@ SimpleNetworkDriverStart (
 
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_PROMISCUOUS_MULTICAST_RX_SUPPORTED) != 0) {
     Snp->Mode.ReceiveFilterMask |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
-
   }
 
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_PROMISCUOUS_RX_SUPPORTED) != 0) {
     Snp->Mode.ReceiveFilterMask |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS;
-
   }
 
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_BROADCAST_RX_SUPPORTED) != 0) {
     Snp->Mode.ReceiveFilterMask |= EFI_SIMPLE_NETWORK_RECEIVE_BROADCAST;
-
   }
 
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_FILTERED_MULTICAST_RX_SUPPORTED) != 0) {
     Snp->Mode.ReceiveFilterMask |= EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST;
-
   }
 
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_PROMISCUOUS_MULTICAST_RX_SUPPORTED) != 0) {
     Snp->Mode.ReceiveFilterMask |= EFI_SIMPLE_NETWORK_RECEIVE_PROMISCUOUS_MULTICAST;
-
   }
 
   Snp->Mode.ReceiveFilterSetting = 0;
@@ -617,7 +615,7 @@ SimpleNetworkDriverStart (
   // initialize the UNDI first for this.
   //
   Snp->TxRxBufferSize = Snp->InitInfo.MemoryRequired;
-  Status              = PxeInit (Snp, PXE_OPFLAGS_INITIALIZE_DO_NOT_DETECT_CABLE);
+  Status = PxeInit (Snp, PXE_OPFLAGS_INITIALIZE_DO_NOT_DETECT_CABLE);
 
   if (EFI_ERROR (Status)) {
     PxeStop (Snp);
@@ -698,18 +696,18 @@ Error_DeleteSNP:
            );
 NiiError:
   gBS->CloseProtocol (
-        Controller,
-        &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-        This->DriverBindingHandle,
-        Controller
-        );
+         Controller,
+         &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
+         This->DriverBindingHandle,
+         Controller
+         );
 
   gBS->CloseProtocol (
-        Controller,
-        &gEfiDevicePathProtocolGuid,
-        This->DriverBindingHandle,
-        Controller
-        );
+         Controller,
+         &gEfiDevicePathProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
 
   //
   // If we got here that means we are in error state.
@@ -748,10 +746,10 @@ SimpleNetworkDriverStop (
   IN  EFI_HANDLE                     *ChildHandleBuffer
   )
 {
-  EFI_STATUS                  Status;
-  EFI_SIMPLE_NETWORK_PROTOCOL *SnpProtocol;
-  SNP_DRIVER                  *Snp;
-  EFI_PCI_IO_PROTOCOL         *PciIo;
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *SnpProtocol;
+  SNP_DRIVER                   *Snp;
+  EFI_PCI_IO_PROTOCOL          *PciIo;
 
   //
   // Get our context back.
@@ -759,7 +757,7 @@ SimpleNetworkDriverStop (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiSimpleNetworkProtocolGuid,
-                  (VOID **) &SnpProtocol,
+                  (VOID **)&SnpProtocol,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -826,7 +824,7 @@ SimpleNetworkDriverStop (
 //
 // Simple Network Protocol Driver Global Variables
 //
-EFI_DRIVER_BINDING_PROTOCOL gSimpleNetworkDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gSimpleNetworkDriverBinding = {
   SimpleNetworkDriverSupported,
   SimpleNetworkDriverStart,
   SimpleNetworkDriverStop,
