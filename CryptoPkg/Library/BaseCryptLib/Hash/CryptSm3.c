@@ -24,7 +24,7 @@ Sm3GetContextSize (
   //
   // Retrieves Openssl SM3 Context Size
   //
-  return (UINTN) (sizeof (SM3_CTX));
+  return (UINTN)(sizeof (SM3_CTX));
 }
 
 /**
@@ -55,7 +55,7 @@ Sm3Init (
   //
   // Openssl SM3 Context Initialization
   //
-  sm3_init ((SM3_CTX *) Sm3Context);
+  sm3_init ((SM3_CTX *)Sm3Context);
   return TRUE;
 }
 
@@ -84,7 +84,7 @@ Sm3Duplicate (
   //
   // Check input parameters.
   //
-  if (Sm3Context == NULL || NewSm3Context == NULL) {
+  if ((Sm3Context == NULL) || (NewSm3Context == NULL)) {
     return FALSE;
   }
 
@@ -129,14 +129,14 @@ Sm3Update (
   //
   // Check invalid parameters, in case that only DataLength was checked in Openssl
   //
-  if (Data == NULL && DataSize != 0) {
+  if ((Data == NULL) && (DataSize != 0)) {
     return FALSE;
   }
 
   //
   // Openssl SM3 Hash Update
   //
-  sm3_update ((SM3_CTX *) Sm3Context, Data, DataSize);
+  sm3_update ((SM3_CTX *)Sm3Context, Data, DataSize);
 
   return TRUE;
 }
@@ -171,14 +171,14 @@ Sm3Final (
   //
   // Check input parameters.
   //
-  if (Sm3Context == NULL || HashValue == NULL) {
+  if ((Sm3Context == NULL) || (HashValue == NULL)) {
     return FALSE;
   }
 
   //
   // Openssl SM3 Hash Finalization
   //
-  sm3_final (HashValue, (SM3_CTX *) Sm3Context);
+  sm3_final (HashValue, (SM3_CTX *)Sm3Context);
 
   return TRUE;
 }
@@ -209,7 +209,7 @@ Sm3HashAll (
   OUT  UINT8       *HashValue
   )
 {
-  SM3_CTX Ctx;
+  SM3_CTX  Ctx;
 
   //
   // Check input parameters.
@@ -217,18 +217,19 @@ Sm3HashAll (
   if (HashValue == NULL) {
     return FALSE;
   }
-  if (Data == NULL && DataSize != 0) {
+
+  if ((Data == NULL) && (DataSize != 0)) {
     return FALSE;
   }
 
   //
   // SM3 Hash Computation.
   //
-  sm3_init(&Ctx);
+  sm3_init (&Ctx);
 
-  sm3_update(&Ctx, Data, DataSize);
+  sm3_update (&Ctx, Data, DataSize);
 
-  sm3_final(HashValue, &Ctx);
+  sm3_final (HashValue, &Ctx);
 
   return TRUE;
 }
