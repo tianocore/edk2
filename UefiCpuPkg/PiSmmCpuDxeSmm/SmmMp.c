@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// SMM MP Protocol instance
 ///
-EFI_MM_MP_PROTOCOL  mSmmMp  = {
+EFI_MM_MP_PROTOCOL  mSmmMp = {
   EFI_MM_MP_PROTOCOL_REVISION,
   0,
   SmmMpGetNumberOfProcessors,
@@ -37,8 +37,8 @@ EFI_MM_MP_PROTOCOL  mSmmMp  = {
 EFI_STATUS
 EFIAPI
 SmmMpGetNumberOfProcessors (
-  IN CONST EFI_MM_MP_PROTOCOL   *This,
-  OUT      UINTN                *NumberOfProcessors
+  IN CONST EFI_MM_MP_PROTOCOL  *This,
+  OUT      UINTN               *NumberOfProcessors
   )
 {
   if (NumberOfProcessors == NULL) {
@@ -114,23 +114,23 @@ SmmMpGetNumberOfProcessors (
 EFI_STATUS
 EFIAPI
 SmmMpDispatchProcedure (
-  IN CONST EFI_MM_MP_PROTOCOL            *This,
-  IN       EFI_AP_PROCEDURE2             Procedure,
-  IN       UINTN                         CpuNumber,
-  IN       UINTN                         TimeoutInMicroseconds,
-  IN OUT   VOID                          *ProcedureArguments OPTIONAL,
-  IN OUT   MM_COMPLETION                 *Token,
-  IN OUT   EFI_STATUS                    *CPUStatus
+  IN CONST EFI_MM_MP_PROTOCOL  *This,
+  IN       EFI_AP_PROCEDURE2   Procedure,
+  IN       UINTN               CpuNumber,
+  IN       UINTN               TimeoutInMicroseconds,
+  IN OUT   VOID                *ProcedureArguments OPTIONAL,
+  IN OUT   MM_COMPLETION       *Token,
+  IN OUT   EFI_STATUS          *CPUStatus
   )
 {
   return InternalSmmStartupThisAp (
-    Procedure,
-    CpuNumber,
-    ProcedureArguments,
-    Token,
-    TimeoutInMicroseconds,
-    CPUStatus
-    );
+           Procedure,
+           CpuNumber,
+           ProcedureArguments,
+           Token,
+           TimeoutInMicroseconds,
+           CPUStatus
+           );
 }
 
 /**
@@ -202,21 +202,21 @@ SmmMpDispatchProcedure (
 EFI_STATUS
 EFIAPI
 SmmMpBroadcastProcedure (
-  IN CONST EFI_MM_MP_PROTOCOL            *This,
-  IN       EFI_AP_PROCEDURE2             Procedure,
-  IN       UINTN                         TimeoutInMicroseconds,
-  IN OUT   VOID                          *ProcedureArguments OPTIONAL,
-  IN OUT   MM_COMPLETION                 *Token,
-  IN OUT   EFI_STATUS                    *CPUStatus
+  IN CONST EFI_MM_MP_PROTOCOL  *This,
+  IN       EFI_AP_PROCEDURE2   Procedure,
+  IN       UINTN               TimeoutInMicroseconds,
+  IN OUT   VOID                *ProcedureArguments OPTIONAL,
+  IN OUT   MM_COMPLETION       *Token,
+  IN OUT   EFI_STATUS          *CPUStatus
   )
 {
-  return InternalSmmStartupAllAPs(
-    Procedure,
-    TimeoutInMicroseconds,
-    ProcedureArguments,
-    Token,
-    CPUStatus
-    );
+  return InternalSmmStartupAllAPs (
+           Procedure,
+           TimeoutInMicroseconds,
+           ProcedureArguments,
+           Token,
+           CPUStatus
+           );
 }
 
 /**
@@ -286,8 +286,8 @@ SmmMpSetStartupProcedure (
 EFI_STATUS
 EFIAPI
 SmmMpCheckForProcedure (
-  IN CONST EFI_MM_MP_PROTOCOL            *This,
-  IN       MM_COMPLETION                 Token
+  IN CONST EFI_MM_MP_PROTOCOL  *This,
+  IN       MM_COMPLETION       Token
   )
 {
   if (Token == NULL) {
@@ -329,11 +329,11 @@ SmmMpCheckForProcedure (
 EFI_STATUS
 EFIAPI
 SmmMpWaitForProcedure (
-  IN CONST EFI_MM_MP_PROTOCOL            *This,
-  IN       MM_COMPLETION                 Token
+  IN CONST EFI_MM_MP_PROTOCOL  *This,
+  IN       MM_COMPLETION       Token
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   do {
     Status = SmmMpCheckForProcedure (This, Token);
@@ -341,4 +341,3 @@ SmmMpWaitForProcedure (
 
   return Status;
 }
-
