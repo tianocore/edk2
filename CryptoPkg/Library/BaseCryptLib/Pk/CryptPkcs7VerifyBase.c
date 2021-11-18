@@ -26,11 +26,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 STATIC
 BOOLEAN
 Pkcs7TypeIsOther (
-  IN PKCS7 *P7
+  IN PKCS7  *P7
   )
 {
-  BOOLEAN Others;
-  INTN    Nid = OBJ_obj2nid (P7->type);
+  BOOLEAN  Others;
+  INTN     Nid = OBJ_obj2nid (P7->type);
 
   switch (Nid) {
     case NID_pkcs7_data:
@@ -57,17 +57,18 @@ Pkcs7TypeIsOther (
   @return ASN1_OCTET_STRING ASN.1 string.
 **/
 STATIC
-ASN1_OCTET_STRING*
+ASN1_OCTET_STRING *
 Pkcs7GetOctetString (
-  IN PKCS7 *P7
+  IN PKCS7  *P7
   )
 {
   if (PKCS7_type_is_data (P7)) {
     return P7->d.data;
   }
 
-  if (Pkcs7TypeIsOther(P7) && (P7->d.other != NULL) &&
-      (P7->d.other->type == V_ASN1_OCTET_STRING)) {
+  if (Pkcs7TypeIsOther (P7) && (P7->d.other != NULL) &&
+      (P7->d.other->type == V_ASN1_OCTET_STRING))
+  {
     return P7->d.other->value.octet_string;
   }
 
@@ -171,9 +172,11 @@ Pkcs7GetAttachedContent (
         *ContentSize = 0;
         goto _Exit;
       }
+
       CopyMem (*Content, OctStr->data, *ContentSize);
     }
   }
+
   Status = TRUE;
 
 _Exit:
