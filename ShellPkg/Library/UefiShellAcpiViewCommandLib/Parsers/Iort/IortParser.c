@@ -16,22 +16,22 @@
 #include "AcpiViewConfig.h"
 
 // Local variables
-STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
+STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
 
-STATIC CONST UINT32* IortNodeCount;
-STATIC CONST UINT32* IortNodeOffset;
+STATIC CONST UINT32  *IortNodeCount;
+STATIC CONST UINT32  *IortNodeOffset;
 
-STATIC CONST UINT8*  IortNodeType;
-STATIC CONST UINT16* IortNodeLength;
-STATIC CONST UINT32* IortIdMappingCount;
-STATIC CONST UINT32* IortIdMappingOffset;
+STATIC CONST UINT8   *IortNodeType;
+STATIC CONST UINT16  *IortNodeLength;
+STATIC CONST UINT32  *IortIdMappingCount;
+STATIC CONST UINT32  *IortIdMappingOffset;
 
-STATIC CONST UINT32* InterruptContextCount;
-STATIC CONST UINT32* InterruptContextOffset;
-STATIC CONST UINT32* PmuInterruptCount;
-STATIC CONST UINT32* PmuInterruptOffset;
+STATIC CONST UINT32  *InterruptContextCount;
+STATIC CONST UINT32  *InterruptContextOffset;
+STATIC CONST UINT32  *PmuInterruptCount;
+STATIC CONST UINT32  *PmuInterruptOffset;
 
-STATIC CONST UINT32* ItsCount;
+STATIC CONST UINT32  *ItsCount;
 
 /**
   This function validates the ID Mapping array count for the ITS node.
@@ -44,11 +44,11 @@ STATIC
 VOID
 EFIAPI
 ValidateItsIdMappingCount (
-  IN UINT8* Ptr,
-  IN VOID*  Context
+  IN UINT8  *Ptr,
+  IN VOID   *Context
   )
 {
-  if (*(UINT32*)Ptr != 0) {
+  if (*(UINT32 *)Ptr != 0) {
     IncrementErrorCount ();
     Print (L"\nERROR: IORT ID Mapping count must be zero.");
   }
@@ -66,11 +66,11 @@ STATIC
 VOID
 EFIAPI
 ValidatePmcgIdMappingCount (
-  IN UINT8* Ptr,
-  IN VOID*  Context
+  IN UINT8  *Ptr,
+  IN VOID   *Context
   )
 {
-  if (*(UINT32*)Ptr > 1) {
+  if (*(UINT32 *)Ptr > 1) {
     IncrementErrorCount ();
     Print (L"\nERROR: IORT ID Mapping count must not be greater than 1.");
   }
@@ -87,11 +87,11 @@ STATIC
 VOID
 EFIAPI
 ValidateItsIdArrayReference (
-  IN UINT8* Ptr,
-  IN VOID*  Context
+  IN UINT8  *Ptr,
+  IN VOID   *Context
   )
 {
-  if (*(UINT32*)Ptr != 0) {
+  if (*(UINT32 *)Ptr != 0) {
     IncrementErrorCount ();
     Print (L"\nERROR: IORT ID Mapping offset must be zero.");
   }
@@ -119,135 +119,135 @@ ValidateItsIdArrayReference (
 /**
   An ACPI_PARSER array describing the ACPI IORT Table
 **/
-STATIC CONST ACPI_PARSER IortParser[] = {
+STATIC CONST ACPI_PARSER  IortParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
-  {L"Number of IORT Nodes", 4, 36, L"%d", NULL,
-   (VOID**)&IortNodeCount, NULL, NULL},
-  {L"Offset to Array of IORT Nodes", 4, 40, L"0x%x", NULL,
-   (VOID**)&IortNodeOffset, NULL, NULL},
-  {L"Reserved", 4, 44, L"0x%x", NULL, NULL, NULL, NULL}
+  { L"Number of IORT Nodes",       4,     36, L"%d",   NULL,
+    (VOID **)&IortNodeCount,       NULL,  NULL },
+  { L"Offset to Array of IORT Nodes",4,     40, L"0x%x", NULL,
+    (VOID **)&IortNodeOffset,      NULL,  NULL },
+  { L"Reserved",                   4,     44, L"0x%x", NULL,NULL,NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the IORT node header structure.
 **/
-STATIC CONST ACPI_PARSER IortNodeHeaderParser[] = {
+STATIC CONST ACPI_PARSER  IortNodeHeaderParser[] = {
   PARSE_IORT_NODE_HEADER (NULL, NULL)
 };
 
 /**
   An ACPI_PARSER array describing the IORT SMMUv1/2 node.
 **/
-STATIC CONST ACPI_PARSER IortNodeSmmuV1V2Parser[] = {
-  PARSE_IORT_NODE_HEADER (NULL, NULL),
-  {L"Base Address", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Span", 8, 24, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Model", 4, 32, L"%d", NULL, NULL, NULL, NULL},
-  {L"Flags", 4, 36, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Reference to Global Interrupt Array", 4, 40, L"0x%x", NULL, NULL, NULL,
-   NULL},
-  {L"Number of context interrupts", 4, 44, L"%d", NULL,
-   (VOID**)&InterruptContextCount, NULL, NULL},
-  {L"Reference to Context Interrupt Array", 4, 48, L"0x%x", NULL,
-   (VOID**)&InterruptContextOffset, NULL, NULL},
-  {L"Number of PMU Interrupts", 4, 52, L"%d", NULL,
-   (VOID**)&PmuInterruptCount, NULL, NULL},
-  {L"Reference to PMU Interrupt Array", 4, 56, L"0x%x", NULL,
-   (VOID**)&PmuInterruptOffset, NULL, NULL},
+STATIC CONST ACPI_PARSER  IortNodeSmmuV1V2Parser[] = {
+  PARSE_IORT_NODE_HEADER (NULL,       NULL),
+  { L"Base Address",                  8,    16,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Span",                          8,    24,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Model",                         4,    32,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Flags",                         4,    36,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Reference to Global Interrupt Array",4,    40,  L"0x%x",  NULL, NULL, NULL,
+    NULL },
+  { L"Number of context interrupts",  4,    44,  L"%d",    NULL,
+    (VOID **)&InterruptContextCount,  NULL, NULL },
+  { L"Reference to Context Interrupt Array",4,    48,  L"0x%x",  NULL,
+    (VOID **)&InterruptContextOffset, NULL, NULL },
+  { L"Number of PMU Interrupts",      4,    52,  L"%d",    NULL,
+    (VOID **)&PmuInterruptCount,      NULL, NULL },
+  { L"Reference to PMU Interrupt Array",4,    56,  L"0x%x",  NULL,
+    (VOID **)&PmuInterruptOffset,     NULL, NULL },
 
   // Interrupt Array
-  {L"SMMU_NSgIrpt", 4, 60, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"SMMU_NSgIrpt interrupt flags", 4, 64, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"SMMU_NSgCfgIrpt", 4, 68, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"SMMU_NSgCfgIrpt interrupt flags", 4, 72, L"0x%x", NULL, NULL, NULL, NULL}
+  { L"SMMU_NSgIrpt",                  4,    60,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"SMMU_NSgIrpt interrupt flags",  4,    64,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"SMMU_NSgCfgIrpt",               4,    68,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"SMMU_NSgCfgIrpt interrupt flags",4,    72,  L"0x%x",  NULL, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the SMMUv1/2 Node Interrupt Array.
 **/
-STATIC CONST ACPI_PARSER InterruptArrayParser[] = {
-  {L"Interrupt GSIV", 4, 0, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Flags", 4, 4, L"0x%x", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  InterruptArrayParser[] = {
+  { L"Interrupt GSIV", 4, 0, L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Flags",          4, 4, L"0x%x", NULL, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the IORT ID Mapping.
 **/
-STATIC CONST ACPI_PARSER IortNodeIdMappingParser[] = {
-  {L"Input base", 4, 0, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Number of IDs", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Output base", 4, 8, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Output reference", 4, 12, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Flags", 4, 16, L"0x%x", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  IortNodeIdMappingParser[] = {
+  { L"Input base",       4, 0,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Number of IDs",    4, 4,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Output base",      4, 8,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Output reference", 4, 12, L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Flags",            4, 16, L"0x%x", NULL, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the IORT SMMUv3 node.
 **/
-STATIC CONST ACPI_PARSER IortNodeSmmuV3Parser[] = {
+STATIC CONST ACPI_PARSER  IortNodeSmmuV3Parser[] = {
   PARSE_IORT_NODE_HEADER (NULL, NULL),
-  {L"Base Address", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Flags", 4, 24, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Reserved", 4, 28, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"VATOS Address", 8, 32, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Model", 4, 40, L"%d", NULL, NULL, NULL, NULL},
-  {L"Event", 4, 44, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"PRI", 4, 48, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"GERR", 4, 52, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Sync", 4, 56, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Proximity domain", 4, 60, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Device ID mapping index", 4, 64, L"%d", NULL, NULL, NULL, NULL}
+  { L"Base Address",            8,    16,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Flags",                   4,    24,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Reserved",                4,    28,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"VATOS Address",           8,    32,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Model",                   4,    40,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Event",                   4,    44,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"PRI",                     4,    48,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"GERR",                    4,    52,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Sync",                    4,    56,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Proximity domain",        4,    60,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Device ID mapping index", 4,    64,  L"%d",    NULL, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the IORT ITS node.
 **/
-STATIC CONST ACPI_PARSER IortNodeItsParser[] = {
+STATIC CONST ACPI_PARSER  IortNodeItsParser[] = {
   PARSE_IORT_NODE_HEADER (
     ValidateItsIdMappingCount,
     ValidateItsIdArrayReference
     ),
-  {L"Number of ITSs", 4, 16, L"%d", NULL, (VOID**)&ItsCount, NULL}
+  { L"Number of ITSs",        4,16, L"%d", NULL, (VOID **)&ItsCount, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the ITS ID.
 **/
-STATIC CONST ACPI_PARSER ItsIdParser[] = {
+STATIC CONST ACPI_PARSER  ItsIdParser[] = {
   { L"GIC ITS Identifier", 4, 0, L"%d", NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the IORT Names Component node.
 **/
-STATIC CONST ACPI_PARSER IortNodeNamedComponentParser[] = {
+STATIC CONST ACPI_PARSER  IortNodeNamedComponentParser[] = {
   PARSE_IORT_NODE_HEADER (NULL, NULL),
-  {L"Node Flags", 4, 16, L"%d", NULL, NULL, NULL, NULL},
-  {L"Memory access properties", 8, 20, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Device memory address size limit", 1, 28, L"%d", NULL, NULL, NULL, NULL}
+  { L"Node Flags",              4,    16,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Memory access properties",8,    20,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Device memory address size limit",1,    28,  L"%d",    NULL, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the IORT Root Complex node.
 **/
-STATIC CONST ACPI_PARSER IortNodeRootComplexParser[] = {
+STATIC CONST ACPI_PARSER  IortNodeRootComplexParser[] = {
   PARSE_IORT_NODE_HEADER (NULL, NULL),
-  {L"Memory access properties", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"ATS Attribute", 4, 24, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"PCI Segment number", 4, 28, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Memory access size limit", 1, 32, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Reserved", 3, 33, L"%x %x %x", Dump3Chars, NULL, NULL, NULL}
+  { L"Memory access properties",8,    16,  L"0x%lx",    NULL,       NULL, NULL, NULL },
+  { L"ATS Attribute",           4,    24,  L"0x%x",     NULL,       NULL, NULL, NULL },
+  { L"PCI Segment number",      4,    28,  L"0x%x",     NULL,       NULL, NULL, NULL },
+  { L"Memory access size limit",1,    32,  L"0x%x",     NULL,       NULL, NULL, NULL },
+  { L"Reserved",                3,    33,  L"%x %x %x", Dump3Chars, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the IORT PMCG node.
 **/
-STATIC CONST ACPI_PARSER IortNodePmcgParser[] = {
+STATIC CONST ACPI_PARSER  IortNodePmcgParser[] = {
   PARSE_IORT_NODE_HEADER (ValidatePmcgIdMappingCount, NULL),
-  {L"Page 0 Base Address", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Overflow interrupt GSIV", 4, 24, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Node reference", 4, 28, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Page 1 Base Address", 8, 32, L"0x%lx", NULL, NULL, NULL, NULL}
+  { L"Page 0 Base Address",                           8,    16,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Overflow interrupt GSIV",                       4,    24,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Node reference",                                4,    28,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Page 1 Base Address",                           8,    32,  L"0x%lx", NULL, NULL, NULL, NULL }
 };
 
 /**
@@ -260,20 +260,21 @@ STATIC CONST ACPI_PARSER IortNodePmcgParser[] = {
 STATIC
 VOID
 DumpIortNodeIdMappings (
-  IN UINT8* Ptr,
-  IN UINT32 Length,
-  IN UINT32 MappingCount
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN UINT32  MappingCount
   )
 {
-  UINT32 Index;
-  UINT32 Offset;
-  CHAR8  Buffer[40];  // Used for AsciiName param of ParseAcpi
+  UINT32  Index;
+  UINT32  Offset;
+  CHAR8   Buffer[40]; // Used for AsciiName param of ParseAcpi
 
-  Index = 0;
+  Index  = 0;
   Offset = 0;
 
   while ((Index < MappingCount) &&
-         (Offset < Length)) {
+         (Offset < Length))
+  {
     AsciiSPrint (
       Buffer,
       sizeof (Buffer),
@@ -304,15 +305,15 @@ DumpIortNodeIdMappings (
 STATIC
 VOID
 DumpIortNodeSmmuV1V2 (
-  IN UINT8* Ptr,
-  IN UINT16 Length,
-  IN UINT32 MappingCount,
-  IN UINT32 MappingOffset
+  IN UINT8   *Ptr,
+  IN UINT16  Length,
+  IN UINT32  MappingCount,
+  IN UINT32  MappingOffset
   )
 {
-  UINT32 Index;
-  UINT32 Offset;
-  CHAR8  Buffer[50];  // Used for AsciiName param of ParseAcpi
+  UINT32  Index;
+  UINT32  Offset;
+  CHAR8   Buffer[50]; // Used for AsciiName param of ParseAcpi
 
   ParseAcpi (
     TRUE,
@@ -328,7 +329,8 @@ DumpIortNodeSmmuV1V2 (
   if ((InterruptContextCount == NULL)   ||
       (InterruptContextOffset == NULL)  ||
       (PmuInterruptCount == NULL)       ||
-      (PmuInterruptOffset == NULL)) {
+      (PmuInterruptOffset == NULL))
+  {
     IncrementErrorCount ();
     Print (
       L"ERROR: Insufficient SMMUv1/2 node length. Length = %d\n",
@@ -338,10 +340,11 @@ DumpIortNodeSmmuV1V2 (
   }
 
   Offset = *InterruptContextOffset;
-  Index = 0;
+  Index  = 0;
 
   while ((Index < *InterruptContextCount) &&
-         (Offset < Length)) {
+         (Offset < Length))
+  {
     AsciiSPrint (
       Buffer,
       sizeof (Buffer),
@@ -360,10 +363,11 @@ DumpIortNodeSmmuV1V2 (
   }
 
   Offset = *PmuInterruptOffset;
-  Index = 0;
+  Index  = 0;
 
   while ((Index < *PmuInterruptCount) &&
-         (Offset < Length)) {
+         (Offset < Length))
+  {
     AsciiSPrint (
       Buffer,
       sizeof (Buffer),
@@ -400,10 +404,10 @@ DumpIortNodeSmmuV1V2 (
 STATIC
 VOID
 DumpIortNodeSmmuV3 (
-  IN UINT8* Ptr,
-  IN UINT16 Length,
-  IN UINT32 MappingCount,
-  IN UINT32 MappingOffset
+  IN UINT8   *Ptr,
+  IN UINT16  Length,
+  IN UINT32  MappingCount,
+  IN UINT32  MappingOffset
   )
 {
   ParseAcpi (
@@ -431,22 +435,22 @@ DumpIortNodeSmmuV3 (
 STATIC
 VOID
 DumpIortNodeIts (
-  IN UINT8* Ptr,
-  IN UINT16 Length
+  IN UINT8   *Ptr,
+  IN UINT16  Length
   )
 {
-  UINT32 Offset;
-  UINT32 Index;
-  CHAR8  Buffer[80];  // Used for AsciiName param of ParseAcpi
+  UINT32  Offset;
+  UINT32  Index;
+  CHAR8   Buffer[80]; // Used for AsciiName param of ParseAcpi
 
   Offset = ParseAcpi (
-            TRUE,
-            2,
-            "ITS Node",
-            Ptr,
-            Length,
-            PARSER_PARAMS (IortNodeItsParser)
-            );
+             TRUE,
+             2,
+             "ITS Node",
+             Ptr,
+             Length,
+             PARSER_PARAMS (IortNodeItsParser)
+             );
 
   // Check if the values used to control the parsing logic have been
   // successfully read.
@@ -462,7 +466,8 @@ DumpIortNodeIts (
   Index = 0;
 
   while ((Index < *ItsCount) &&
-         (Offset < Length)) {
+         (Offset < Length))
+  {
     AsciiSPrint (
       Buffer,
       sizeof (Buffer),
@@ -481,7 +486,6 @@ DumpIortNodeIts (
   }
 
   // Note: ITS does not have the ID Mappings Array
-
 }
 
 /**
@@ -496,13 +500,13 @@ DumpIortNodeIts (
 STATIC
 VOID
 DumpIortNodeNamedComponent (
-  IN UINT8* Ptr,
-  IN UINT16 Length,
-  IN UINT32 MappingCount,
-  IN UINT32 MappingOffset
+  IN UINT8   *Ptr,
+  IN UINT16  Length,
+  IN UINT32  MappingCount,
+  IN UINT32  MappingOffset
   )
 {
-  UINT32 Offset;
+  UINT32  Offset;
 
   Offset = ParseAcpi (
              TRUE,
@@ -517,10 +521,12 @@ DumpIortNodeNamedComponent (
   PrintFieldName (2, L"Device Object Name");
 
   while ((*(Ptr + Offset) != 0) &&
-         (Offset < Length)) {
+         (Offset < Length))
+  {
     Print (L"%c", *(Ptr + Offset));
     Offset++;
   }
+
   Print (L"\n");
 
   DumpIortNodeIdMappings (
@@ -542,10 +548,10 @@ DumpIortNodeNamedComponent (
 STATIC
 VOID
 DumpIortNodeRootComplex (
-  IN UINT8* Ptr,
-  IN UINT16 Length,
-  IN UINT32 MappingCount,
-  IN UINT32 MappingOffset
+  IN UINT8   *Ptr,
+  IN UINT16  Length,
+  IN UINT32  MappingCount,
+  IN UINT32  MappingOffset
   )
 {
   ParseAcpi (
@@ -576,11 +582,11 @@ DumpIortNodeRootComplex (
 STATIC
 VOID
 DumpIortNodePmcg (
-  IN UINT8* Ptr,
-  IN UINT16 Length,
-  IN UINT32 MappingCount,
-  IN UINT32 MappingOffset
-)
+  IN UINT8   *Ptr,
+  IN UINT16  Length,
+  IN UINT32  MappingCount,
+  IN UINT32  MappingOffset
+  )
 {
   ParseAcpi (
     TRUE,
@@ -620,15 +626,15 @@ DumpIortNodePmcg (
 VOID
 EFIAPI
 ParseAcpiIort (
-  IN BOOLEAN Trace,
-  IN UINT8*  Ptr,
-  IN UINT32  AcpiTableLength,
-  IN UINT8   AcpiTableRevision
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
   )
 {
-  UINT32 Offset;
-  UINT32 Index;
-  UINT8* NodePtr;
+  UINT32  Offset;
+  UINT32  Index;
+  UINT8   *NodePtr;
 
   if (!Trace) {
     return;
@@ -646,7 +652,8 @@ ParseAcpiIort (
   // Check if the values used to control the parsing logic have been
   // successfully read.
   if ((IortNodeCount == NULL) ||
-      (IortNodeOffset == NULL)) {
+      (IortNodeOffset == NULL))
+  {
     IncrementErrorCount ();
     Print (
       L"ERROR: Insufficient table length. AcpiTableLength = %d.\n",
@@ -655,14 +662,15 @@ ParseAcpiIort (
     return;
   }
 
-  Offset = *IortNodeOffset;
+  Offset  = *IortNodeOffset;
   NodePtr = Ptr + Offset;
-  Index = 0;
+  Index   = 0;
 
   // Parse the specified number of IORT nodes or the IORT table buffer length.
   // Whichever is minimum.
   while ((Index++ < *IortNodeCount) &&
-         (Offset < AcpiTableLength)) {
+         (Offset < AcpiTableLength))
+  {
     // Parse the IORT Node Header
     ParseAcpi (
       FALSE,
@@ -678,11 +686,12 @@ ParseAcpiIort (
     if ((IortNodeType == NULL)        ||
         (IortNodeLength == NULL)      ||
         (IortIdMappingCount == NULL)  ||
-        (IortIdMappingOffset == NULL)) {
+        (IortIdMappingOffset == NULL))
+    {
       IncrementErrorCount ();
       Print (
         L"ERROR: Insufficient remaining table buffer length to read the " \
-          L"IORT node header. Length = %d.\n",
+        L"IORT node header. Length = %d.\n",
         AcpiTableLength - Offset
         );
       return;
@@ -690,11 +699,12 @@ ParseAcpiIort (
 
     // Validate IORT Node length
     if ((*IortNodeLength == 0) ||
-        ((Offset + (*IortNodeLength)) > AcpiTableLength)) {
+        ((Offset + (*IortNodeLength)) > AcpiTableLength))
+    {
       IncrementErrorCount ();
       Print (
         L"ERROR: Invalid IORT Node length. " \
-          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
+        L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
         *IortNodeLength,
         Offset,
         AcpiTableLength
@@ -750,7 +760,7 @@ ParseAcpiIort (
           *IortNodeLength,
           *IortIdMappingCount,
           *IortIdMappingOffset
-        );
+          );
         break;
 
       default:
@@ -759,6 +769,6 @@ ParseAcpiIort (
     } // switch
 
     NodePtr += (*IortNodeLength);
-    Offset += (*IortNodeLength);
+    Offset  += (*IortNodeLength);
   } // while
 }
