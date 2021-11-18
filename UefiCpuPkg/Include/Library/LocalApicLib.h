@@ -38,7 +38,7 @@ GetLocalApicBaseAddress (
 VOID
 EFIAPI
 SetLocalApicBaseAddress (
-  IN UINTN                BaseAddress
+  IN UINTN  BaseAddress
   );
 
 /**
@@ -120,8 +120,8 @@ GetApicVersion (
 VOID
 EFIAPI
 SendFixedIpi (
-  IN UINT32          ApicId,
-  IN UINT8           Vector
+  IN UINT32  ApicId,
+  IN UINT8   Vector
   );
 
 /**
@@ -134,7 +134,7 @@ SendFixedIpi (
 VOID
 EFIAPI
 SendFixedIpiAllExcludingSelf (
-  IN UINT8           Vector
+  IN UINT8  Vector
   );
 
 /**
@@ -147,7 +147,7 @@ SendFixedIpiAllExcludingSelf (
 VOID
 EFIAPI
 SendSmiIpi (
-  IN UINT32          ApicId
+  IN UINT32  ApicId
   );
 
 /**
@@ -171,7 +171,7 @@ SendSmiIpiAllExcludingSelf (
 VOID
 EFIAPI
 SendInitIpi (
-  IN UINT32          ApicId
+  IN UINT32  ApicId
   );
 
 /**
@@ -200,8 +200,8 @@ SendInitIpiAllExcludingSelf (
 VOID
 EFIAPI
 SendInitSipiSipi (
-  IN UINT32          ApicId,
-  IN UINT32          StartupRoutine
+  IN UINT32  ApicId,
+  IN UINT32  StartupRoutine
   );
 
 /**
@@ -218,7 +218,7 @@ SendInitSipiSipi (
 VOID
 EFIAPI
 SendInitSipiSipiAllExcludingSelf (
-  IN UINT32          StartupRoutine
+  IN UINT32  StartupRoutine
   );
 
 /**
@@ -296,10 +296,10 @@ GetApicTimerCurrentCount (
 VOID
 EFIAPI
 InitializeApicTimer (
-  IN UINTN   DivideValue,
-  IN UINT32  InitCount,
-  IN BOOLEAN PeriodicMode,
-  IN UINT8   Vector
+  IN UINTN    DivideValue,
+  IN UINT32   InitCount,
+  IN BOOLEAN  PeriodicMode,
+  IN UINT8    Vector
   );
 
 /**
@@ -453,5 +453,5 @@ GetProcessorLocation2ByApicId (
   OUT UINT32  *Core     OPTIONAL,
   OUT UINT32  *Thread   OPTIONAL
   );
-#endif
 
+#endif

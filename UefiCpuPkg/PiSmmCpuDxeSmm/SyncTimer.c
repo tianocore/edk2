@@ -8,11 +8,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PiSmmCpuDxeSmm.h"
 
-UINT64   mTimeoutTicker = 0;
+UINT64  mTimeoutTicker = 0;
 //
 //  Number of counts in a roll-over cycle of the performance counter.
 //
-UINT64   mCycle = 0;
+UINT64  mCycle = 0;
 //
 // Flag to indicate the performance counter is count-up or count-down.
 //
@@ -33,15 +33,15 @@ InitializeSmmTimer (
 
   TimerFrequency = GetPerformanceCounterProperties (&Start, &End);
   mTimeoutTicker = DivU64x32 (
-                     MultU64x64(TimerFrequency, PcdGet64 (PcdCpuSmmApSyncTimeout)),
+                     MultU64x64 (TimerFrequency, PcdGet64 (PcdCpuSmmApSyncTimeout)),
                      1000 * 1000
                      );
   if (End < Start) {
     mCountDown = TRUE;
-    mCycle = Start - End;
+    mCycle     = Start - End;
   } else {
     mCountDown = FALSE;
-    mCycle = End - Start;
+    mCycle     = End - Start;
   }
 }
 
@@ -58,7 +58,6 @@ StartSyncTimer (
   return GetPerformanceCounter ();
 }
 
-
 /**
   Check if the SMM AP Sync timer is timeout.
 
@@ -68,7 +67,7 @@ StartSyncTimer (
 BOOLEAN
 EFIAPI
 IsSyncTimerTimeout (
-  IN      UINT64                    Timer
+  IN      UINT64  Timer
   )
 {
   UINT64  CurrentTimer;
@@ -106,5 +105,5 @@ IsSyncTimerTimeout (
     }
   }
 
-  return (BOOLEAN) (Delta >= mTimeoutTicker);
+  return (BOOLEAN)(Delta >= mTimeoutTicker);
 }
