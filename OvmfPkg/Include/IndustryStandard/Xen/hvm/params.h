@@ -22,26 +22,26 @@
  *                  method is available.
  * If val == 0 then CPU0 event-channel notifications are not delivered.
  */
-#define HVM_PARAM_CALLBACK_IRQ 0
+#define HVM_PARAM_CALLBACK_IRQ  0
 
 /*
  * These are not used by Xen. They are here for convenience of HVM-guest
  * xenbus implementations.
  */
-#define HVM_PARAM_STORE_PFN    1
-#define HVM_PARAM_STORE_EVTCHN 2
+#define HVM_PARAM_STORE_PFN     1
+#define HVM_PARAM_STORE_EVTCHN  2
 
 #define HVM_PARAM_PAE_ENABLED  4
 
-#define HVM_PARAM_IOREQ_PFN    5
+#define HVM_PARAM_IOREQ_PFN  5
 
-#define HVM_PARAM_BUFIOREQ_PFN 6
-#define HVM_PARAM_BUFIOREQ_EVTCHN 26
+#define HVM_PARAM_BUFIOREQ_PFN     6
+#define HVM_PARAM_BUFIOREQ_EVTCHN  26
 
-#if defined(MDE_CPU_IA32) || defined(MDE_CPU_X64)
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
 /* Expose Viridian interfaces to this HVM guest? */
-#define HVM_PARAM_VIRIDIAN     9
+#define HVM_PARAM_VIRIDIAN  9
 
 #endif
 
@@ -64,33 +64,33 @@
  *   Missed interrupts are collapsed together and delivered as one 'late tick'.
  *   Guest time always tracks wallclock (i.e., real) time.
  */
-#define HVM_PARAM_TIMER_MODE   10
-#define HVMPTM_delay_for_missed_ticks    0
-#define HVMPTM_no_delay_for_missed_ticks 1
-#define HVMPTM_no_missed_ticks_pending   2
-#define HVMPTM_one_missed_tick_pending   3
+#define HVM_PARAM_TIMER_MODE              10
+#define HVMPTM_delay_for_missed_ticks     0
+#define HVMPTM_no_delay_for_missed_ticks  1
+#define HVMPTM_no_missed_ticks_pending    2
+#define HVMPTM_one_missed_tick_pending    3
 
 /* Boolean: Enable virtual HPET (high-precision event timer)? (x86-only) */
-#define HVM_PARAM_HPET_ENABLED 11
+#define HVM_PARAM_HPET_ENABLED  11
 
 /* Identity-map page directory used by Intel EPT when CR0.PG=0. */
-#define HVM_PARAM_IDENT_PT     12
+#define HVM_PARAM_IDENT_PT  12
 
 /* Device Model domain, defaults to 0. */
-#define HVM_PARAM_DM_DOMAIN    13
+#define HVM_PARAM_DM_DOMAIN  13
 
 /* ACPI S state: currently support S0 and S3 on x86. */
-#define HVM_PARAM_ACPI_S_STATE 14
+#define HVM_PARAM_ACPI_S_STATE  14
 
 /* TSS used on Intel when CR0.PE=0. */
-#define HVM_PARAM_VM86_TSS     15
+#define HVM_PARAM_VM86_TSS  15
 
 /* Boolean: Enable aligning all periodic vpts to reduce interrupts */
-#define HVM_PARAM_VPT_ALIGN    16
+#define HVM_PARAM_VPT_ALIGN  16
 
 /* Console debug shared memory ring and event channel */
-#define HVM_PARAM_CONSOLE_PFN    17
-#define HVM_PARAM_CONSOLE_EVTCHN 18
+#define HVM_PARAM_CONSOLE_PFN     17
+#define HVM_PARAM_CONSOLE_EVTCHN  18
 
 /*
  * Select location of ACPI PM1a and TMR control blocks. Currently two locations
@@ -101,7 +101,7 @@
  *        PM1A_EVT == 0xb000; PM1A_CNT == 0xb004; PM_TMR == 0xb008
  * You can find these address definitions in <hvm/ioreq.h>
  */
-#define HVM_PARAM_ACPI_IOPORTS_LOCATION 19
+#define HVM_PARAM_ACPI_IOPORTS_LOCATION  19
 
 /* Enable blocking memory events, async or sync (pause vcpu until response)
  * onchangeonly indicates messages only on a change of value */
@@ -112,14 +112,14 @@
 #define HVM_PARAM_MEMORY_EVENT_SINGLE_STEP  25
 #define HVM_PARAM_MEMORY_EVENT_MSR          30
 
-#define HVMPME_MODE_MASK       (3 << 0)
-#define HVMPME_mode_disabled   0
-#define HVMPME_mode_async      1
-#define HVMPME_mode_sync       2
-#define HVMPME_onchangeonly    (1 << 2)
+#define HVMPME_MODE_MASK      (3 << 0)
+#define HVMPME_mode_disabled  0
+#define HVMPME_mode_async     1
+#define HVMPME_mode_sync      2
+#define HVMPME_onchangeonly   (1 << 2)
 
 /* Boolean: Enable nestedhvm (hvm only) */
-#define HVM_PARAM_NESTEDHVM    24
+#define HVM_PARAM_NESTEDHVM  24
 
 /* Params for the mem event rings */
 #define HVM_PARAM_PAGING_RING_PFN   27
@@ -127,8 +127,8 @@
 #define HVM_PARAM_SHARING_RING_PFN  29
 
 /* SHUTDOWN_* action in case of a triple fault */
-#define HVM_PARAM_TRIPLE_FAULT_REASON 31
+#define HVM_PARAM_TRIPLE_FAULT_REASON  31
 
-#define HVM_NR_PARAMS          32
+#define HVM_NR_PARAMS  32
 
 #endif /* __XEN_PUBLIC_HVM_PARAMS_H__ */

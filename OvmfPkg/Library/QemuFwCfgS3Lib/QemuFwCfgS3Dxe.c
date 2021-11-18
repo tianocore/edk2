@@ -14,34 +14,32 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/S3SaveState.h>
 
-
 //
 // Event to signal when the S3SaveState protocol interface is installed.
 //
-STATIC EFI_EVENT mS3SaveStateInstalledEvent;
+STATIC EFI_EVENT  mS3SaveStateInstalledEvent;
 
 //
 // Reference to the S3SaveState protocol interface, after it is installed.
 //
-STATIC EFI_S3_SAVE_STATE_PROTOCOL *mS3SaveState;
+STATIC EFI_S3_SAVE_STATE_PROTOCOL  *mS3SaveState;
 
 //
 // The control structure is allocated in reserved memory, aligned at 8 bytes.
 // The client-requested ScratchBuffer will be allocated adjacently, also
 // aligned at 8 bytes.
 //
-#define RESERVED_MEM_ALIGNMENT 8
+#define RESERVED_MEM_ALIGNMENT  8
 
-STATIC FW_CFG_DMA_ACCESS *mDmaAccess;
-STATIC VOID              *mScratchBuffer;
-STATIC UINTN             mScratchBufferSize;
+STATIC FW_CFG_DMA_ACCESS  *mDmaAccess;
+STATIC VOID               *mScratchBuffer;
+STATIC UINTN              mScratchBufferSize;
 
 //
 // Callback provided by the client, for appending ACPI S3 Boot Script opcodes.
 // To be called from S3SaveStateInstalledNotify().
 //
-STATIC FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION *mCallback;
-
+STATIC FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION  *mCallback;
 
 /**
   Event notification function for mS3SaveStateInstalledEvent.
@@ -50,31 +48,39 @@ STATIC
 VOID
 EFIAPI
 S3SaveStateInstalledNotify (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   ASSERT (Event == mS3SaveStateInstalledEvent);
 
-  Status = gBS->LocateProtocol (&gEfiS3SaveStateProtocolGuid,
-                  NULL /* Registration */, (VOID **)&mS3SaveState);
+  Status = gBS->LocateProtocol (
+                  &gEfiS3SaveStateProtocolGuid,
+                  NULL /* Registration */,
+                  (VOID **)&mS3SaveState
+                  );
   if (EFI_ERROR (Status)) {
     return;
   }
 
   ASSERT (mCallback != NULL);
 
-  DEBUG ((DEBUG_INFO, "%a: %a: DmaAccess@0x%Lx ScratchBuffer@[0x%Lx+0x%Lx]\n",
-    gEfiCallerBaseName, __FUNCTION__, (UINT64)(UINTN)mDmaAccess,
-    (UINT64)(UINTN)mScratchBuffer, (UINT64)mScratchBufferSize));
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: %a: DmaAccess@0x%Lx ScratchBuffer@[0x%Lx+0x%Lx]\n",
+    gEfiCallerBaseName,
+    __FUNCTION__,
+    (UINT64)(UINTN)mDmaAccess,
+    (UINT64)(UINTN)mScratchBuffer,
+    (UINT64)mScratchBufferSize
+    ));
   mCallback (Context, mScratchBuffer);
 
   gBS->CloseEvent (mS3SaveStateInstalledEvent);
   mS3SaveStateInstalledEvent = NULL;
 }
-
 
 /**
   Install the client module's FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION callback for
@@ -137,12 +143,12 @@ RETURN_STATUS
 EFIAPI
 QemuFwCfgS3CallWhenBootScriptReady (
   IN     FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION *Callback,
-  IN OUT VOID                                 *Context,          OPTIONAL
+  IN OUT VOID *Context, OPTIONAL
   IN     UINTN                                ScratchBufferSize
   )
 {
-  EFI_STATUS Status;
-  VOID       *Registration;
+  EFI_STATUS  Status;
+  VOID        *Registration;
 
   //
   // Basic fw_cfg is certainly available, as we can only be here after a
@@ -151,8 +157,12 @@ QemuFwCfgS3CallWhenBootScriptReady (
   ASSERT (QemuFwCfgIsAvailable ());
   QemuFwCfgSelectItem (QemuFwCfgItemInterfaceVersion);
   if ((QemuFwCfgRead32 () & FW_CFG_F_DMA) == 0) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: fw_cfg DMA unavailable\n",
-      gEfiCallerBaseName, __FUNCTION__));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: fw_cfg DMA unavailable\n",
+      gEfiCallerBaseName,
+      __FUNCTION__
+      ));
     return RETURN_NOT_FOUND;
   }
 
@@ -161,37 +171,69 @@ QemuFwCfgS3CallWhenBootScriptReady (
   // client data together.
   //
   if (ScratchBufferSize >
-      MAX_UINT32 - (RESERVED_MEM_ALIGNMENT - 1) - sizeof *mDmaAccess) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: ScratchBufferSize too big: %Lu\n",
-      gEfiCallerBaseName, __FUNCTION__, (UINT64)ScratchBufferSize));
+      MAX_UINT32 - (RESERVED_MEM_ALIGNMENT - 1) - sizeof *mDmaAccess)
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: ScratchBufferSize too big: %Lu\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      (UINT64)ScratchBufferSize
+      ));
     return RETURN_BAD_BUFFER_SIZE;
   }
-  mDmaAccess = AllocateReservedPool ((RESERVED_MEM_ALIGNMENT - 1) +
-                 sizeof *mDmaAccess + ScratchBufferSize);
+
+  mDmaAccess = AllocateReservedPool (
+                 (RESERVED_MEM_ALIGNMENT - 1) +
+                 sizeof *mDmaAccess + ScratchBufferSize
+                 );
   if (mDmaAccess == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: AllocateReservedPool(): out of resources\n",
-      gEfiCallerBaseName, __FUNCTION__));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: AllocateReservedPool(): out of resources\n",
+      gEfiCallerBaseName,
+      __FUNCTION__
+      ));
     return RETURN_OUT_OF_RESOURCES;
   }
+
   mDmaAccess = ALIGN_POINTER (mDmaAccess, RESERVED_MEM_ALIGNMENT);
 
   //
   // Set up a protocol notify for EFI_S3_SAVE_STATE_PROTOCOL. Forward the
   // client's Context to the callback.
   //
-  Status = gBS->CreateEvent (EVT_NOTIFY_SIGNAL, TPL_CALLBACK,
-                  S3SaveStateInstalledNotify, Context,
-                  &mS3SaveStateInstalledEvent);
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  S3SaveStateInstalledNotify,
+                  Context,
+                  &mS3SaveStateInstalledEvent
+                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: CreateEvent(): %r\n", gEfiCallerBaseName,
-      __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: CreateEvent(): %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     goto FreeDmaAccess;
   }
-  Status = gBS->RegisterProtocolNotify (&gEfiS3SaveStateProtocolGuid,
-                  mS3SaveStateInstalledEvent, &Registration);
+
+  Status = gBS->RegisterProtocolNotify (
+                  &gEfiS3SaveStateProtocolGuid,
+                  mS3SaveStateInstalledEvent,
+                  &Registration
+                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: RegisterProtocolNotify(): %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: RegisterProtocolNotify(): %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     goto CloseEvent;
   }
 
@@ -201,7 +243,7 @@ QemuFwCfgS3CallWhenBootScriptReady (
   // integral multiple of RESERVED_MEM_ALIGNMENT.
   //
   ASSERT (sizeof *mDmaAccess % RESERVED_MEM_ALIGNMENT == 0);
-  mScratchBuffer = mDmaAccess + 1;
+  mScratchBuffer     = mDmaAccess + 1;
   mScratchBufferSize = ScratchBufferSize;
   mCallback = Callback;
 
@@ -210,15 +252,20 @@ QemuFwCfgS3CallWhenBootScriptReady (
   //
   Status = gBS->SignalEvent (mS3SaveStateInstalledEvent);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: SignalEvent(): %r\n", gEfiCallerBaseName,
-      __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: SignalEvent(): %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     goto NullGlobals;
   }
 
   return RETURN_SUCCESS;
 
 NullGlobals:
-  mScratchBuffer = NULL;
+  mScratchBuffer     = NULL;
   mScratchBufferSize = 0;
   mCallback = NULL;
 
@@ -232,7 +279,6 @@ FreeDmaAccess:
 
   return (RETURN_STATUS)Status;
 }
-
 
 /**
   Produce ACPI S3 Boot Script opcodes that (optionally) select an fw_cfg item,
@@ -277,22 +323,23 @@ FreeDmaAccess:
 RETURN_STATUS
 EFIAPI
 QemuFwCfgS3ScriptWriteBytes (
-  IN INT32 FirmwareConfigItem,
-  IN UINTN NumberOfBytes
+  IN INT32  FirmwareConfigItem,
+  IN UINTN  NumberOfBytes
   )
 {
-  UINTN      Count;
-  EFI_STATUS Status;
-  UINT64     AccessAddress;
-  UINT32     ControlPollData;
-  UINT32     ControlPollMask;
+  UINTN       Count;
+  EFI_STATUS  Status;
+  UINT64      AccessAddress;
+  UINT32      ControlPollData;
+  UINT32      ControlPollMask;
 
   ASSERT (mDmaAccess != NULL);
   ASSERT (mS3SaveState != NULL);
 
-  if (FirmwareConfigItem < -1 || FirmwareConfigItem > MAX_UINT16) {
+  if ((FirmwareConfigItem < -1) || (FirmwareConfigItem > MAX_UINT16)) {
     return RETURN_INVALID_PARAMETER;
   }
+
   if (NumberOfBytes > mScratchBufferSize) {
     return RETURN_BAD_BUFFER_SIZE;
   }
@@ -305,6 +352,7 @@ QemuFwCfgS3ScriptWriteBytes (
     mDmaAccess->Control |= FW_CFG_DMA_CTL_SELECT;
     mDmaAccess->Control |= (UINT32)FirmwareConfigItem << 16;
   }
+
   mDmaAccess->Control = SwapBytes32 (mDmaAccess->Control);
 
   //
@@ -321,7 +369,7 @@ QemuFwCfgS3ScriptWriteBytes (
   // script. When executed at S3 resume, this opcode will restore all of them
   // in-place.
   //
-  Count = (UINTN)mScratchBuffer + NumberOfBytes - (UINTN)mDmaAccess;
+  Count  = (UINTN)mScratchBuffer + NumberOfBytes - (UINTN)mDmaAccess;
   Status = mS3SaveState->Write (
                            mS3SaveState,                     // This
                            EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE, // OpCode
@@ -331,8 +379,13 @@ QemuFwCfgS3ScriptWriteBytes (
                            (VOID *)mDmaAccess                // Buffer
                            );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE: %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE: %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return (RETURN_STATUS)Status;
   }
 
@@ -352,8 +405,13 @@ QemuFwCfgS3ScriptWriteBytes (
                            (VOID *)&AccessAddress           // Buffer
                            );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return (RETURN_STATUS)Status;
   }
 
@@ -374,14 +432,18 @@ QemuFwCfgS3ScriptWriteBytes (
                            MAX_UINT64                           // Delay
                            );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return (RETURN_STATUS)Status;
   }
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   Produce ACPI S3 Boot Script opcodes that (optionally) select an fw_cfg item,
@@ -425,21 +487,22 @@ QemuFwCfgS3ScriptWriteBytes (
 RETURN_STATUS
 EFIAPI
 QemuFwCfgS3ScriptReadBytes (
-  IN INT32 FirmwareConfigItem,
-  IN UINTN NumberOfBytes
+  IN INT32  FirmwareConfigItem,
+  IN UINTN  NumberOfBytes
   )
 {
-  EFI_STATUS Status;
-  UINT64     AccessAddress;
-  UINT32     ControlPollData;
-  UINT32     ControlPollMask;
+  EFI_STATUS  Status;
+  UINT64      AccessAddress;
+  UINT32      ControlPollData;
+  UINT32      ControlPollMask;
 
   ASSERT (mDmaAccess != NULL);
   ASSERT (mS3SaveState != NULL);
 
-  if (FirmwareConfigItem < -1 || FirmwareConfigItem > MAX_UINT16) {
+  if ((FirmwareConfigItem < -1) || (FirmwareConfigItem > MAX_UINT16)) {
     return RETURN_INVALID_PARAMETER;
   }
+
   if (NumberOfBytes > mScratchBufferSize) {
     return RETURN_BAD_BUFFER_SIZE;
   }
@@ -452,6 +515,7 @@ QemuFwCfgS3ScriptReadBytes (
     mDmaAccess->Control |= FW_CFG_DMA_CTL_SELECT;
     mDmaAccess->Control |= (UINT32)FirmwareConfigItem << 16;
   }
+
   mDmaAccess->Control = SwapBytes32 (mDmaAccess->Control);
 
   //
@@ -476,8 +540,13 @@ QemuFwCfgS3ScriptReadBytes (
                            (VOID *)mDmaAccess                // Buffer
                            );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE: %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE: %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return (RETURN_STATUS)Status;
   }
 
@@ -497,8 +566,13 @@ QemuFwCfgS3ScriptReadBytes (
                            (VOID *)&AccessAddress           // Buffer
                            );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return (RETURN_STATUS)Status;
   }
 
@@ -519,14 +593,18 @@ QemuFwCfgS3ScriptReadBytes (
                            MAX_UINT64                           // Delay
                            );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return (RETURN_STATUS)Status;
   }
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   Produce ACPI S3 Boot Script opcodes that (optionally) select an fw_cfg item,
@@ -563,21 +641,22 @@ QemuFwCfgS3ScriptReadBytes (
 RETURN_STATUS
 EFIAPI
 QemuFwCfgS3ScriptSkipBytes (
-  IN INT32 FirmwareConfigItem,
-  IN UINTN NumberOfBytes
+  IN INT32  FirmwareConfigItem,
+  IN UINTN  NumberOfBytes
   )
 {
-  EFI_STATUS Status;
-  UINT64     AccessAddress;
-  UINT32     ControlPollData;
-  UINT32     ControlPollMask;
+  EFI_STATUS  Status;
+  UINT64      AccessAddress;
+  UINT32      ControlPollData;
+  UINT32      ControlPollMask;
 
   ASSERT (mDmaAccess != NULL);
   ASSERT (mS3SaveState != NULL);
 
-  if (FirmwareConfigItem < -1 || FirmwareConfigItem > MAX_UINT16) {
+  if ((FirmwareConfigItem < -1) || (FirmwareConfigItem > MAX_UINT16)) {
     return RETURN_INVALID_PARAMETER;
   }
+
   if (NumberOfBytes > MAX_UINT32) {
     return RETURN_BAD_BUFFER_SIZE;
   }
@@ -590,9 +669,10 @@ QemuFwCfgS3ScriptSkipBytes (
     mDmaAccess->Control |= FW_CFG_DMA_CTL_SELECT;
     mDmaAccess->Control |= (UINT32)FirmwareConfigItem << 16;
   }
+
   mDmaAccess->Control = SwapBytes32 (mDmaAccess->Control);
 
-  mDmaAccess->Length = SwapBytes32 ((UINT32)NumberOfBytes);
+  mDmaAccess->Length  = SwapBytes32 ((UINT32)NumberOfBytes);
   mDmaAccess->Address = 0;
 
   //
@@ -608,8 +688,13 @@ QemuFwCfgS3ScriptSkipBytes (
                            (VOID *)mDmaAccess                // Buffer
                            );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE: %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE: %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return (RETURN_STATUS)Status;
   }
 
@@ -629,8 +714,13 @@ QemuFwCfgS3ScriptSkipBytes (
                            (VOID *)&AccessAddress           // Buffer
                            );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return (RETURN_STATUS)Status;
   }
 
@@ -651,14 +741,18 @@ QemuFwCfgS3ScriptSkipBytes (
                            MAX_UINT64                           // Delay
                            );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return (RETURN_STATUS)Status;
   }
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   Produce ACPI S3 Boot Script opcodes that check a value in ScratchBuffer.
@@ -713,41 +807,42 @@ QemuFwCfgS3ScriptSkipBytes (
 RETURN_STATUS
 EFIAPI
 QemuFwCfgS3ScriptCheckValue (
-  IN VOID   *ScratchData,
-  IN UINT8  ValueSize,
-  IN UINT64 ValueMask,
-  IN UINT64 Value
+  IN VOID    *ScratchData,
+  IN UINT8   ValueSize,
+  IN UINT64  ValueMask,
+  IN UINT64  Value
   )
 {
-  EFI_BOOT_SCRIPT_WIDTH Width;
-  EFI_STATUS            Status;
+  EFI_BOOT_SCRIPT_WIDTH  Width;
+  EFI_STATUS             Status;
 
   ASSERT (mS3SaveState != NULL);
 
   switch (ValueSize) {
-  case 1:
-    Width = EfiBootScriptWidthUint8;
-    break;
+    case 1:
+      Width = EfiBootScriptWidthUint8;
+      break;
 
-  case 2:
-    Width = EfiBootScriptWidthUint16;
-    break;
+    case 2:
+      Width = EfiBootScriptWidthUint16;
+      break;
 
-  case 4:
-    Width = EfiBootScriptWidthUint32;
-    break;
+    case 4:
+      Width = EfiBootScriptWidthUint32;
+      break;
 
-  case 8:
-    Width = EfiBootScriptWidthUint64;
-    break;
+    case 8:
+      Width = EfiBootScriptWidthUint64;
+      break;
 
-  default:
-    return RETURN_INVALID_PARAMETER;
+    default:
+      return RETURN_INVALID_PARAMETER;
   }
 
-  if (ValueSize < 8 &&
-      (RShiftU64 (ValueMask, ValueSize * 8) > 0 ||
-       RShiftU64 (Value, ValueSize * 8) > 0)) {
+  if ((ValueSize < 8) &&
+      ((RShiftU64 (ValueMask, ValueSize * 8) > 0) ||
+       (RShiftU64 (Value, ValueSize * 8) > 0)))
+  {
     return RETURN_INVALID_PARAMETER;
   }
 
@@ -758,7 +853,8 @@ QemuFwCfgS3ScriptCheckValue (
   if (((UINTN)ScratchData < (UINTN)mScratchBuffer) ||
       ((UINTN)ScratchData > MAX_UINTN - ValueSize) ||
       ((UINTN)ScratchData + ValueSize >
-       (UINTN)mScratchBuffer + mScratchBufferSize)) {
+       (UINTN)mScratchBuffer + mScratchBufferSize))
+  {
     return RETURN_BAD_BUFFER_SIZE;
   }
 
@@ -777,8 +873,13 @@ QemuFwCfgS3ScriptCheckValue (
                            MAX_UINT64                       // Delay
                            );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
-      gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      Status
+      ));
     return (RETURN_STATUS)Status;
   }
 

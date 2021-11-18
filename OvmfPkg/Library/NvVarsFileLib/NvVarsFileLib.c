@@ -10,8 +10,7 @@
 #include <Library/DebugLib.h>
 #include <Library/NvVarsFileLib.h>
 
-EFI_HANDLE    mNvVarsFileLibFsHandle = NULL;
-
+EFI_HANDLE  mNvVarsFileLibFsHandle = NULL;
 
 /**
   Attempts to connect the NvVarsFileLib to the specified file system.
@@ -26,10 +25,10 @@ EFI_HANDLE    mNvVarsFileLibFsHandle = NULL;
 EFI_STATUS
 EFIAPI
 ConnectNvVarsToFileSystem (
-  IN EFI_HANDLE    FsHandle
+  IN EFI_HANDLE  FsHandle
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   //
   // We might fail to load the variable, since the file system initially
@@ -48,7 +47,6 @@ ConnectNvVarsToFileSystem (
 
   return Status;
 }
-
 
 /**
   Update non-volatile variables stored on the file system.
@@ -73,5 +71,3 @@ UpdateNvVarsOnFileSystem (
     return SaveNvVarsToFs (mNvVarsFileLibFsHandle);
   }
 }
-
-

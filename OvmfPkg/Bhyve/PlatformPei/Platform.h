@@ -14,33 +14,33 @@
 
 VOID
 AddIoMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
   );
 
 VOID
 AddIoMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit
   );
 
 VOID
 AddMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
   );
 
 VOID
 AddMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit
   );
 
 VOID
 AddReservedMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize,
-  BOOLEAN                     Cacheable
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize,
+  BOOLEAN               Cacheable
   );
 
 VOID
@@ -113,25 +113,25 @@ AmdSevInitialize (
   VOID
   );
 
-extern BOOLEAN mXen;
+extern BOOLEAN  mXen;
 
 VOID
 XenPublishRamRegions (
   VOID
   );
 
-extern EFI_BOOT_MODE mBootMode;
+extern EFI_BOOT_MODE  mBootMode;
 
-extern BOOLEAN mS3Supported;
+extern BOOLEAN  mS3Supported;
 
-extern UINT8 mPhysMemAddressWidth;
+extern UINT8  mPhysMemAddressWidth;
 
-extern UINT32 mMaxCpuCount;
+extern UINT32  mMaxCpuCount;
 
-extern UINT16 mHostBridgeDevId;
+extern UINT16  mHostBridgeDevId;
 
-extern BOOLEAN mQ35SmramAtDefaultSmbase;
+extern BOOLEAN  mQ35SmramAtDefaultSmbase;
 
-extern UINT32 mQemuUc32Base;
+extern UINT32  mQemuUc32Base;
 
 #endif // _PLATFORM_PEI_H_INCLUDED_

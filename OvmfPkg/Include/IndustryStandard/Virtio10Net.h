@@ -18,8 +18,8 @@
 //
 #pragma pack (1)
 typedef struct {
-  VIRTIO_NET_REQ V0_9_5;
-  UINT16         NumBuffers;
+  VIRTIO_NET_REQ    V0_9_5;
+  UINT16            NumBuffers;
 } VIRTIO_1_0_NET_REQ;
 #pragma pack ()
 

@@ -16,12 +16,12 @@
 
 VOID
 QemuFlashBeforeProbe (
-  IN  EFI_PHYSICAL_ADDRESS    BaseAddress,
-  IN  UINTN                   FdBlockSize,
-  IN  UINTN                   FdBlockCount
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINTN                 FdBlockSize,
+  IN  UINTN                 FdBlockCount
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   ASSERT (FeaturePcdGet (PcdSmmSmramRequire));
 
@@ -55,8 +55,8 @@ QemuFlashBeforeProbe (
 **/
 VOID
 QemuFlashPtrWrite (
-  IN        volatile UINT8    *Ptr,
-  IN        UINT8             Value
+  IN        volatile UINT8  *Ptr,
+  IN        UINT8           Value
   )
 {
   *Ptr = Value;

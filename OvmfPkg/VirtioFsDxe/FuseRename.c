@@ -49,21 +49,21 @@
 **/
 EFI_STATUS
 VirtioFsFuseRename (
-  IN OUT VIRTIO_FS *VirtioFs,
-  IN     UINT64    OldParentNodeId,
-  IN     CHAR8     *OldName,
-  IN     UINT64    NewParentNodeId,
-  IN     CHAR8     *NewName
+  IN OUT VIRTIO_FS  *VirtioFs,
+  IN     UINT64     OldParentNodeId,
+  IN     CHAR8      *OldName,
+  IN     UINT64     NewParentNodeId,
+  IN     CHAR8      *NewName
   )
 {
-  VIRTIO_FS_FUSE_REQUEST         CommonReq;
-  VIRTIO_FS_FUSE_RENAME2_REQUEST Rename2Req;
-  VIRTIO_FS_IO_VECTOR            ReqIoVec[4];
-  VIRTIO_FS_SCATTER_GATHER_LIST  ReqSgList;
-  VIRTIO_FS_FUSE_RESPONSE        CommonResp;
-  VIRTIO_FS_IO_VECTOR            RespIoVec[1];
-  VIRTIO_FS_SCATTER_GATHER_LIST  RespSgList;
-  EFI_STATUS                     Status;
+  VIRTIO_FS_FUSE_REQUEST          CommonReq;
+  VIRTIO_FS_FUSE_RENAME2_REQUEST  Rename2Req;
+  VIRTIO_FS_IO_VECTOR             ReqIoVec[4];
+  VIRTIO_FS_SCATTER_GATHER_LIST   ReqSgList;
+  VIRTIO_FS_FUSE_RESPONSE         CommonResp;
+  VIRTIO_FS_IO_VECTOR             RespIoVec[1];
+  VIRTIO_FS_SCATTER_GATHER_LIST   RespSgList;
+  EFI_STATUS                      Status;
 
   //
   // Set up the scatter-gather lists.
@@ -95,8 +95,13 @@ VirtioFsFuseRename (
   //
   // Populate the common request header.
   //
-  Status = VirtioFsFuseNewRequest (VirtioFs, &CommonReq, ReqSgList.TotalSize,
-             VirtioFsFuseOpRename2, OldParentNodeId);
+  Status = VirtioFsFuseNewRequest (
+             VirtioFs,
+             &CommonReq,
+             ReqSgList.TotalSize,
+             VirtioFsFuseOpRename2,
+             OldParentNodeId
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -121,11 +126,20 @@ VirtioFsFuseRename (
   //
   Status = VirtioFsFuseCheckResponse (&RespSgList, CommonReq.Unique, NULL);
   if (Status == EFI_DEVICE_ERROR) {
-    DEBUG ((DEBUG_ERROR, "%a: Label=\"%s\" OldParentNodeId=%Lu OldName=\"%a\" "
-      "NewParentNodeId=%Lu NewName=\"%a\" Errno=%d\n", __FUNCTION__,
-      VirtioFs->Label, OldParentNodeId, OldName, NewParentNodeId, NewName,
-      CommonResp.Error));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Label=\"%s\" OldParentNodeId=%Lu OldName=\"%a\" "
+      "NewParentNodeId=%Lu NewName=\"%a\" Errno=%d\n",
+      __FUNCTION__,
+      VirtioFs->Label,
+      OldParentNodeId,
+      OldName,
+      NewParentNodeId,
+      NewName,
+      CommonResp.Error
+      ));
     Status = VirtioFsErrnoToEfiStatus (CommonResp.Error);
   }
+
   return Status;
 }

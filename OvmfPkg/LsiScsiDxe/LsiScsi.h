@@ -17,11 +17,11 @@ typedef struct {
   // Allocate 32 UINT32 entries for the script and it's sufficient for
   // 16 instructions.
   //
-  UINT32                          Script[32];
+  UINT32    Script[32];
   //
   // The max size of CDB is 32.
   //
-  UINT8                           Cdb[32];
+  UINT8     Cdb[32];
   //
   // Allocate 64KB for read/write buffer. It seems sufficient for the common
   // boot scenarios.
@@ -29,44 +29,43 @@ typedef struct {
   // NOTE: The number of bytes for data transmission is bounded by DMA Byte
   //       Count (DBC), a 24-bit register, so the maximum is 0xFFFFFF (16MB-1).
   //
-  UINT8                           Data[SIZE_64KB];
+  UINT8     Data[SIZE_64KB];
   //
   // For SCSI Message In phase
   //
-  UINT8                           MsgIn[2];
+  UINT8     MsgIn[2];
   //
   // For SCSI Message Out phase
   //
-  UINT8                           MsgOut;
+  UINT8     MsgOut;
   //
   // For SCSI Status phase
   //
-  UINT8                           Status;
+  UINT8     Status;
 } LSI_SCSI_DMA_BUFFER;
 
 typedef struct {
-  UINT32                          Signature;
-  UINT64                          OrigPciAttrs;
-  EFI_EVENT                       ExitBoot;
-  EFI_PCI_IO_PROTOCOL             *PciIo;
-  UINT8                           MaxTarget;
-  UINT8                           MaxLun;
-  UINT32                          StallPerPollUsec;
-  LSI_SCSI_DMA_BUFFER             *Dma;
-  EFI_PHYSICAL_ADDRESS            DmaPhysical;
-  VOID                            *DmaMapping;
-  EFI_EXT_SCSI_PASS_THRU_MODE     PassThruMode;
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL PassThru;
+  UINT32                             Signature;
+  UINT64                             OrigPciAttrs;
+  EFI_EVENT                          ExitBoot;
+  EFI_PCI_IO_PROTOCOL                *PciIo;
+  UINT8                              MaxTarget;
+  UINT8                              MaxLun;
+  UINT32                             StallPerPollUsec;
+  LSI_SCSI_DMA_BUFFER                *Dma;
+  EFI_PHYSICAL_ADDRESS               DmaPhysical;
+  VOID                               *DmaMapping;
+  EFI_EXT_SCSI_PASS_THRU_MODE        PassThruMode;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL    PassThru;
 } LSI_SCSI_DEV;
 
-#define LSI_SCSI_DEV_SIGNATURE SIGNATURE_32 ('L','S','I','S')
+#define LSI_SCSI_DEV_SIGNATURE  SIGNATURE_32 ('L','S','I','S')
 
 #define LSI_SCSI_FROM_PASS_THRU(PassThruPtr) \
   CR (PassThruPtr, LSI_SCSI_DEV, PassThru, LSI_SCSI_DEV_SIGNATURE)
 
 #define LSI_SCSI_DMA_ADDR(Dev, MemberName) \
   ((UINT32)(Dev->DmaPhysical + OFFSET_OF (LSI_SCSI_DMA_BUFFER, MemberName)))
-
 
 //
 // Probe, start and stop functions of this driver, called by the DXE core for
@@ -80,28 +79,27 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 LsiScsiControllerSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 EFI_STATUS
 EFIAPI
 LsiScsiControllerStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 EFI_STATUS
 EFIAPI
 LsiScsiControllerStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  ControllerHandle,
-  IN UINTN                       NumberOfChildren,
-  IN EFI_HANDLE                  *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   );
-
 
 //
 // The next seven functions implement EFI_EXT_SCSI_PASS_THRU_PROTOCOL
@@ -114,60 +112,59 @@ LsiScsiControllerStop (
 EFI_STATUS
 EFIAPI
 LsiScsiPassThru (
-  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                *This,
-  IN UINT8                                          *Target,
-  IN UINT64                                         Lun,
-  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET *Packet,
-  IN EFI_EVENT                                      Event     OPTIONAL
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL                 *This,
+  IN UINT8                                           *Target,
+  IN UINT64                                          Lun,
+  IN OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet,
+  IN EFI_EVENT                                       Event     OPTIONAL
   );
 
 EFI_STATUS
 EFIAPI
 LsiScsiGetNextTargetLun (
-  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
-  IN OUT UINT8                       **TargetPointer,
-  IN OUT UINT64                      *Lun
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *This,
+  IN OUT UINT8                        **TargetPointer,
+  IN OUT UINT64                       *Lun
   );
 
 EFI_STATUS
 EFIAPI
 LsiScsiBuildDevicePath (
-  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
-  IN UINT8                           *Target,
-  IN UINT64                          Lun,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL    **DevicePath
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *This,
+  IN UINT8                            *Target,
+  IN UINT64                           Lun,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL     **DevicePath
   );
 
 EFI_STATUS
 EFIAPI
 LsiScsiGetTargetLun (
-  IN  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
-  IN  EFI_DEVICE_PATH_PROTOCOL        *DevicePath,
-  OUT UINT8                           **TargetPointer,
-  OUT UINT64                          *Lun
+  IN  EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *This,
+  IN  EFI_DEVICE_PATH_PROTOCOL         *DevicePath,
+  OUT UINT8                            **TargetPointer,
+  OUT UINT64                           *Lun
   );
 
 EFI_STATUS
 EFIAPI
 LsiScsiResetChannel (
-  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *This
   );
 
 EFI_STATUS
 EFIAPI
 LsiScsiResetTargetLun (
-  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
-  IN UINT8                           *Target,
-  IN UINT64                          Lun
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *This,
+  IN UINT8                            *Target,
+  IN UINT64                           Lun
   );
 
 EFI_STATUS
 EFIAPI
 LsiScsiGetNextTarget (
-  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL *This,
-  IN OUT UINT8                       **TargetPointer
+  IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *This,
+  IN OUT UINT8                        **TargetPointer
   );
-
 
 //
 // The purpose of the following scaffolding (EFI_COMPONENT_NAME_PROTOCOL and
@@ -184,19 +181,19 @@ LsiScsiGetNextTarget (
 EFI_STATUS
 EFIAPI
 LsiScsiGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
-  IN  CHAR8                       *Language,
-  OUT CHAR16                      **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   );
 
 EFI_STATUS
 EFIAPI
 LsiScsiGetDeviceName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
-  IN  EFI_HANDLE                  DeviceHandle,
-  IN  EFI_HANDLE                  ChildHandle,
-  IN  CHAR8                       *Language,
-  OUT CHAR16                      **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   DeviceHandle,
+  IN  EFI_HANDLE                   ChildHandle,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
 
 #endif // _LSI_SCSI_DXE_H_

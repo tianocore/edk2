@@ -46,51 +46,51 @@
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetGetStatus (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  OUT UINT32                     *InterruptStatus OPTIONAL,
-  OUT VOID                       **TxBuf OPTIONAL
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  OUT UINT32                      *InterruptStatus OPTIONAL,
+  OUT VOID                        **TxBuf OPTIONAL
   )
 {
-  VNET_DEV             *Dev;
-  EFI_TPL              OldTpl;
-  EFI_STATUS           Status;
-  UINT16               RxCurUsed;
-  UINT16               TxCurUsed;
-  EFI_PHYSICAL_ADDRESS DeviceAddress;
+  VNET_DEV              *Dev;
+  EFI_TPL               OldTpl;
+  EFI_STATUS            Status;
+  UINT16                RxCurUsed;
+  UINT16                TxCurUsed;
+  EFI_PHYSICAL_ADDRESS  DeviceAddress;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Dev = VIRTIO_NET_FROM_SNP (This);
+  Dev    = VIRTIO_NET_FROM_SNP (This);
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   switch (Dev->Snm.State) {
-  case EfiSimpleNetworkStopped:
-    Status = EFI_NOT_STARTED;
-    goto Exit;
-  case EfiSimpleNetworkStarted:
-    Status = EFI_DEVICE_ERROR;
-    goto Exit;
-  default:
-    break;
+    case EfiSimpleNetworkStopped:
+      Status = EFI_NOT_STARTED;
+      goto Exit;
+    case EfiSimpleNetworkStarted:
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    default:
+      break;
   }
 
   //
   // update link status
   //
   if (Dev->Snm.MediaPresentSupported) {
-    UINT16 LinkStatus;
+    UINT16  LinkStatus;
 
     Status = VIRTIO_CFG_READ (Dev, LinkStatus, &LinkStatus);
     if (EFI_ERROR (Status)) {
       goto Exit;
     }
+
     Dev->Snm.MediaPresent =
-      (BOOLEAN) ((LinkStatus & VIRTIO_NET_S_LINK_UP) != 0);
+      (BOOLEAN)((LinkStatus & VIRTIO_NET_S_LINK_UP) != 0);
   }
 
   //
@@ -110,6 +110,7 @@ VirtioNetGetStatus (
     if (Dev->RxLastUsed != RxCurUsed) {
       *InterruptStatus |= EFI_SIMPLE_NETWORK_RECEIVE_INTERRUPT;
     }
+
     if (Dev->TxLastUsed != TxCurUsed) {
       ASSERT (Dev->TxCurPending > 0);
       *InterruptStatus |= EFI_SIMPLE_NETWORK_TRANSMIT_INTERRUPT;
@@ -119,10 +120,9 @@ VirtioNetGetStatus (
   if (TxBuf != NULL) {
     if (Dev->TxLastUsed == TxCurUsed) {
       *TxBuf = NULL;
-    }
-    else {
-      UINT16 UsedElemIdx;
-      UINT32 DescIdx;
+    } else {
+      UINT16  UsedElemIdx;
+      UINT32  DescIdx;
 
       //
       // fetch the first descriptor among those that the hypervisor reports
@@ -132,8 +132,8 @@ VirtioNetGetStatus (
       ASSERT (Dev->TxCurPending <= Dev->TxMaxPending);
 
       UsedElemIdx = Dev->TxLastUsed++ % Dev->TxRing.QueueSize;
-      DescIdx = Dev->TxRing.Used.UsedElem[UsedElemIdx].Id;
-      ASSERT (DescIdx < (UINT32) (2 * Dev->TxMaxPending - 1));
+      DescIdx     = Dev->TxRing.Used.UsedElem[UsedElemIdx].Id;
+      ASSERT (DescIdx < (UINT32)(2 * Dev->TxMaxPending - 1));
 
       //
       // get the device address that has been enqueued for the caller's
@@ -144,7 +144,7 @@ VirtioNetGetStatus (
       //
       // now this descriptor can be used again to enqueue a transmit buffer
       //
-      Dev->TxFreeStack[--Dev->TxCurPending] = (UINT16) DescIdx;
+      Dev->TxFreeStack[--Dev->TxCurPending] = (UINT16)DescIdx;
 
       //
       // Unmap the device address and perform the reverse mapping to find the

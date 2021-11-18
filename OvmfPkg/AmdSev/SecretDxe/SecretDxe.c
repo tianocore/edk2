@@ -8,16 +8,16 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Guid/ConfidentialComputingSecret.h>
 
-STATIC CONFIDENTIAL_COMPUTING_SECRET_LOCATION mSecretDxeTable = {
+STATIC CONFIDENTIAL_COMPUTING_SECRET_LOCATION  mSecretDxeTable = {
   FixedPcdGet32 (PcdSevLaunchSecretBase),
   FixedPcdGet32 (PcdSevLaunchSecretSize),
 };
 
 EFI_STATUS
 EFIAPI
-InitializeSecretDxe(
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+InitializeSecretDxe (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return gBS->InstallConfigurationTable (
