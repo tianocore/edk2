@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef BOOTLOADER_PARSE_LIB_
 #define BOOTLOADER_PARSE_LIB_
 
@@ -17,10 +18,13 @@
 #include <UniversalPayload/AcpiTable.h>
 #include <UniversalPayload/SmbiosTable.h>
 
-#define GET_BOOTLOADER_PARAMETER()      PcdGet64 (PcdBootloaderParameter)
+#define GET_BOOTLOADER_PARAMETER()  PcdGet64 (PcdBootloaderParameter)
 
 typedef RETURN_STATUS \
-        (*BL_MEM_INFO_CALLBACK) (MEMORY_MAP_ENTRY *MemoryMapEntry, VOID *Param);
+(*BL_MEM_INFO_CALLBACK) (
+  MEMORY_MAP_ENTRY  *MemoryMapEntry,
+  VOID              *Param
+  );
 
 /**
   This function retrieves the parameter base address from boot loader.
@@ -51,8 +55,8 @@ GetParameterBase (
 RETURN_STATUS
 EFIAPI
 ParseMemoryInfo (
-  IN  BL_MEM_INFO_CALLBACK       MemInfoCallback,
-  IN  VOID                       *Params
+  IN  BL_MEM_INFO_CALLBACK  MemInfoCallback,
+  IN  VOID                  *Params
   );
 
 /**
@@ -67,7 +71,7 @@ ParseMemoryInfo (
 RETURN_STATUS
 EFIAPI
 ParseSmbiosTable (
-  OUT UNIVERSAL_PAYLOAD_SMBIOS_TABLE     *SmbiosTable
+  OUT UNIVERSAL_PAYLOAD_SMBIOS_TABLE  *SmbiosTable
   );
 
 /**
@@ -82,7 +86,7 @@ ParseSmbiosTable (
 RETURN_STATUS
 EFIAPI
 ParseAcpiTableInfo (
-  OUT UNIVERSAL_PAYLOAD_ACPI_TABLE        *AcpiTableHob
+  OUT UNIVERSAL_PAYLOAD_ACPI_TABLE  *AcpiTableHob
   );
 
 /**
@@ -97,9 +101,8 @@ ParseAcpiTableInfo (
 RETURN_STATUS
 EFIAPI
 ParseSerialInfo (
-  OUT SERIAL_PORT_INFO     *SerialPortInfo
+  OUT SERIAL_PORT_INFO  *SerialPortInfo
   );
-
 
 /**
   Find the video frame buffer information
@@ -113,7 +116,7 @@ ParseSerialInfo (
 RETURN_STATUS
 EFIAPI
 ParseGfxInfo (
-  OUT EFI_PEI_GRAPHICS_INFO_HOB       *GfxInfo
+  OUT EFI_PEI_GRAPHICS_INFO_HOB  *GfxInfo
   );
 
 /**
@@ -128,7 +131,7 @@ ParseGfxInfo (
 RETURN_STATUS
 EFIAPI
 ParseGfxDeviceInfo (
-  OUT EFI_PEI_GRAPHICS_DEVICE_INFO_HOB       *GfxDeviceInfo
+  OUT EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  *GfxDeviceInfo
   );
 
 /**

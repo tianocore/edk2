@@ -5,6 +5,7 @@
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef BL_SUPPORT_SMM_H_
 #define BL_SUPPORT_SMM_H_
 
@@ -28,14 +29,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/SmmS3CommunicationInfoGuid.h>
 #include <Guid/SmramMemoryReserve.h>
 
-#define  EFI_MSR_SMRR_MASK              0xFFFFF000
-#define  MSR_SMM_FEATURE_CONTROL        0x4E0
-#define  SMRAM_SAVE_STATE_MAP_OFFSET    0xFC00  /// Save state offset from SMBASE
+#define  EFI_MSR_SMRR_MASK            0xFFFFF000
+#define  MSR_SMM_FEATURE_CONTROL      0x4E0
+#define  SMRAM_SAVE_STATE_MAP_OFFSET  0xFC00    /// Save state offset from SMBASE
 
 typedef struct {
-  UINT32  Base;
-  UINT32  Mask;
+  UINT32    Base;
+  UINT32    Mask;
 } SMRR_BASE_MASK;
 
 #endif
-

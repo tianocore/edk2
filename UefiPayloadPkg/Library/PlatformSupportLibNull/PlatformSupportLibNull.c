@@ -26,4 +26,3 @@ ParsePlatformInfo (
 {
   return EFI_SUCCESS;
 }
-
