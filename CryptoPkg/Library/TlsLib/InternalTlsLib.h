@@ -26,16 +26,15 @@ typedef struct {
   // Main SSL Connection which is created by a server or a client
   // per established connection.
   //
-  SSL                             *Ssl;
+  SSL    *Ssl;
   //
   // Memory BIO for the TLS/SSL Reading operations.
   //
-  BIO                             *InBio;
+  BIO    *InBio;
   //
   // Memory BIO for the TLS/SSL Writing operations.
   //
-  BIO                             *OutBio;
+  BIO    *OutBio;
 } TLS_CONNECTION;
 
 #endif
-

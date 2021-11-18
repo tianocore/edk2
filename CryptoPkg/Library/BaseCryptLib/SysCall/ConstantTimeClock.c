@@ -23,15 +23,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // -- Time Management Routines --
 //
 
-time_t time (time_t *timer)
+time_t
+time (
+  time_t  *timer
+  )
 {
   if (timer != NULL) {
     *timer = 0;
   }
+
   return 0;
 }
 
-struct tm * gmtime (const time_t *timer)
+struct tm *
+gmtime (
+  const time_t  *timer
+  )
 {
   return NULL;
 }

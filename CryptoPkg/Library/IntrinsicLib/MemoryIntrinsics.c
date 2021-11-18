@@ -11,20 +11,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
 
-typedef UINTN  size_t;
+typedef UINTN size_t;
 
-#if defined(__GNUC__) || defined(__clang__)
-  #define GLOBAL_USED __attribute__((used))
+#if defined (__GNUC__) || defined (__clang__)
+#define GLOBAL_USED  __attribute__((used))
 #else
-  #define GLOBAL_USED
+#define GLOBAL_USED
 #endif
 
 /* OpenSSL will use floating point support, and C compiler produces the _fltused
    symbol by default. Simply define this symbol here to satisfy the linker. */
-int  GLOBAL_USED _fltused = 1;
+int  GLOBAL_USED  _fltused = 1;
 
 /* Sets buffers to a specified character */
-void * memset (void *dest, int ch, size_t count)
+void *
+memset (
+  void    *dest,
+  int     ch,
+  size_t  count
+  )
 {
   //
   // NOTE: Here we use one base implementation for memset, instead of the direct
@@ -49,12 +54,21 @@ void * memset (void *dest, int ch, size_t count)
 }
 
 /* Compare bytes in two buffers. */
-int memcmp (const void *buf1, const void *buf2, size_t count)
+int
+memcmp (
+  const void  *buf1,
+  const void  *buf2,
+  size_t      count
+  )
 {
-  return (int)CompareMem(buf1, buf2, count);
+  return (int)CompareMem (buf1, buf2, count);
 }
 
-int strcmp (const char *s1, const char *s2)
+int
+strcmp (
+  const char  *s1,
+  const char  *s2
+  )
 {
-  return (int)AsciiStrCmp(s1, s2);
+  return (int)AsciiStrCmp (s1, s2);
 }

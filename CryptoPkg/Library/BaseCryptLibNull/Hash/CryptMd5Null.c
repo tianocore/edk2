@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalCryptLib.h"
 
-
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
@@ -25,7 +24,6 @@ Md5GetContextSize (
   ASSERT (FALSE);
   return 0;
 }
-
 
 /**
   Initializes user-supplied memory pointed by Md5Context as MD5 hash context for
@@ -154,12 +152,12 @@ value (16 bytes).
 **/
 BOOLEAN
 EFIAPI
-Md5HashAll(
+Md5HashAll (
   IN   CONST VOID  *Data,
   IN   UINTN       DataSize,
   OUT  UINT8       *HashValue
-)
+  )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return FALSE;
 }
