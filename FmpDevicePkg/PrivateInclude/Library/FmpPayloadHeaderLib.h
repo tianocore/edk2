@@ -75,9 +75,9 @@ GetFmpPayloadHeaderVersion (
 EFI_STATUS
 EFIAPI
 GetFmpPayloadHeaderLowestSupportedVersion (
-  IN  CONST VOID    *Header,
-  IN  CONST UINTN   FmpPayloadSize,
-  OUT UINT32        *LowestSupportedVersion
+  IN  CONST VOID   *Header,
+  IN  CONST UINTN  FmpPayloadSize,
+  OUT UINT32       *LowestSupportedVersion
   );
 
 #endif
