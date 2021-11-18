@@ -19,9 +19,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Cache copy of HobList pointer.
 //
-extern VOID *gHobList;
+extern VOID  *gHobList;
 
-EFI_HOB_HANDOFF_INFO_TABLE*
+EFI_HOB_HANDOFF_INFO_TABLE *
 HobConstructor (
   IN VOID   *EfiMemoryBegin,
   IN UINTN  EfiMemoryLength,
@@ -35,16 +35,16 @@ HobConstructor (
   Hob    = EfiFreeMemoryBottom;
   HobEnd = (EFI_HOB_GENERIC_HEADER *)(Hob+1);
 
-  Hob->Header.HobType     = EFI_HOB_TYPE_HANDOFF;
-  Hob->Header.HobLength   = sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
-  Hob->Header.Reserved    = 0;
+  Hob->Header.HobType   = EFI_HOB_TYPE_HANDOFF;
+  Hob->Header.HobLength = sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
+  Hob->Header.Reserved  = 0;
 
-  HobEnd->HobType     = EFI_HOB_TYPE_END_OF_HOB_LIST;
-  HobEnd->HobLength   = sizeof (EFI_HOB_GENERIC_HEADER);
-  HobEnd->Reserved    = 0;
+  HobEnd->HobType   = EFI_HOB_TYPE_END_OF_HOB_LIST;
+  HobEnd->HobLength = sizeof (EFI_HOB_GENERIC_HEADER);
+  HobEnd->Reserved  = 0;
 
-  Hob->Version             = EFI_HOB_HANDOFF_TABLE_VERSION;
-  Hob->BootMode            = BOOT_WITH_FULL_CONFIGURATION;
+  Hob->Version  = EFI_HOB_HANDOFF_TABLE_VERSION;
+  Hob->BootMode = BOOT_WITH_FULL_CONFIGURATION;
 
   Hob->EfiMemoryTop        = (UINTN)EfiMemoryBegin + EfiMemoryLength;
   Hob->EfiMemoryBottom     = (UINTN)EfiMemoryBegin;

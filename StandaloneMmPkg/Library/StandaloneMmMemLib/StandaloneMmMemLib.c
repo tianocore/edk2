@@ -13,15 +13,14 @@
 
 **/
 
-
 #include <PiMm.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 
-EFI_MMRAM_DESCRIPTOR *mMmMemLibInternalMmramRanges;
-UINTN                mMmMemLibInternalMmramCount;
+EFI_MMRAM_DESCRIPTOR  *mMmMemLibInternalMmramRanges;
+UINTN                 mMmMemLibInternalMmramCount;
 
 //
 // Maximum support address used to check input buffer
@@ -82,7 +81,8 @@ MmIsBufferOutsideMmValid (
   //
   if ((Length > mMmMemLibInternalMaximumSupportAddress) ||
       (Buffer > mMmMemLibInternalMaximumSupportAddress) ||
-      ((Length != 0) && (Buffer > (mMmMemLibInternalMaximumSupportAddress - (Length - 1)))) ) {
+      ((Length != 0) && (Buffer > (mMmMemLibInternalMaximumSupportAddress - (Length - 1)))))
+  {
     //
     // Overflow happen
     //
@@ -96,11 +96,12 @@ MmIsBufferOutsideMmValid (
     return FALSE;
   }
 
-  for (Index = 0; Index < mMmMemLibInternalMmramCount; Index ++) {
+  for (Index = 0; Index < mMmMemLibInternalMmramCount; Index++) {
     if (((Buffer >= mMmMemLibInternalMmramRanges[Index].CpuStart) &&
          (Buffer < mMmMemLibInternalMmramRanges[Index].CpuStart + mMmMemLibInternalMmramRanges[Index].PhysicalSize)) ||
         ((mMmMemLibInternalMmramRanges[Index].CpuStart >= Buffer) &&
-         (mMmMemLibInternalMmramRanges[Index].CpuStart < Buffer + Length))) {
+         (mMmMemLibInternalMmramRanges[Index].CpuStart < Buffer + Length)))
+    {
       DEBUG ((
         DEBUG_ERROR,
         "MmIsBufferOutsideMmValid: Overlap: Buffer (0x%lx) - Length (0x%lx), ",
@@ -149,6 +150,7 @@ MmCopyMemToMmram (
     DEBUG ((DEBUG_ERROR, "MmCopyMemToMmram: Security Violation: Source (0x%x), Length (0x%x)\n", SourceBuffer, Length));
     return EFI_SECURITY_VIOLATION;
   }
+
   CopyMem (DestinationBuffer, SourceBuffer, Length);
   return EFI_SUCCESS;
 }
@@ -179,10 +181,15 @@ MmCopyMemFromMmram (
   )
 {
   if (!MmIsBufferOutsideMmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)DestinationBuffer, Length)) {
-    DEBUG ((DEBUG_ERROR, "MmCopyMemFromMmram: Security Violation: Destination (0x%x), Length (0x%x)\n",
-            DestinationBuffer, Length));
+    DEBUG ((
+      DEBUG_ERROR,
+      "MmCopyMemFromMmram: Security Violation: Destination (0x%x), Length (0x%x)\n",
+      DestinationBuffer,
+      Length
+      ));
     return EFI_SECURITY_VIOLATION;
   }
+
   CopyMem (DestinationBuffer, SourceBuffer, Length);
   return EFI_SUCCESS;
 }
@@ -214,14 +221,20 @@ MmCopyMem (
   )
 {
   if (!MmIsBufferOutsideMmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)DestinationBuffer, Length)) {
-    DEBUG ((DEBUG_ERROR, "MmCopyMem: Security Violation: Destination (0x%x), Length (0x%x)\n",
-            DestinationBuffer, Length));
+    DEBUG ((
+      DEBUG_ERROR,
+      "MmCopyMem: Security Violation: Destination (0x%x), Length (0x%x)\n",
+      DestinationBuffer,
+      Length
+      ));
     return EFI_SECURITY_VIOLATION;
   }
+
   if (!MmIsBufferOutsideMmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)SourceBuffer, Length)) {
     DEBUG ((DEBUG_ERROR, "MmCopyMem: Security Violation: Source (0x%x), Length (0x%x)\n", SourceBuffer, Length));
     return EFI_SECURITY_VIOLATION;
   }
+
   CopyMem (DestinationBuffer, SourceBuffer, Length);
   return EFI_SUCCESS;
 }
@@ -254,6 +267,7 @@ MmSetMem (
     DEBUG ((DEBUG_ERROR, "MmSetMem: Security Violation: Source (0x%x), Length (0x%x)\n", Buffer, Length));
     return EFI_SECURITY_VIOLATION;
   }
+
   SetMem (Buffer, Length, Value);
   return EFI_SUCCESS;
 }
@@ -270,11 +284,11 @@ MmSetMem (
 EFI_STATUS
 EFIAPI
 MemLibConstructor (
-  IN EFI_HANDLE             ImageHandle,
-  IN EFI_MM_SYSTEM_TABLE    *MmSystemTable
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   //
   // Calculate and save maximum support address
@@ -301,11 +315,10 @@ MemLibConstructor (
 EFI_STATUS
 EFIAPI
 MemLibDestructor (
-  IN EFI_HANDLE             ImageHandle,
-  IN EFI_MM_SYSTEM_TABLE    *MmSystemTable
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
   )
 {
-
   //
   // Deinitialize cached Mmram Ranges.
   //
