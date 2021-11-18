@@ -21,10 +21,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 typedef
 UINTN
-(* EDB_DISASM_INSTRUCTION) (
-  IN     EFI_PHYSICAL_ADDRESS      InstructionAddress,
-  IN     EFI_SYSTEM_CONTEXT        SystemContext,
-  OUT    CHAR16                    **DisAsmString
+(*EDB_DISASM_INSTRUCTION) (
+  IN     EFI_PHYSICAL_ADDRESS  InstructionAddress,
+  IN     EFI_SYSTEM_CONTEXT    SystemContext,
+  OUT    CHAR16                **DisAsmString
   );
 
 #endif

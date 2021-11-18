@@ -51,15 +51,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Each entry occupies 8B/64b. 1-page can hold 512 entries, which spans 9
 // bits in address. (512 = 1 << 9)
 //
-#define BYTE_LENGTH_SHIFT                   3             // (8 = 1 << 3)
+#define BYTE_LENGTH_SHIFT  3                              // (8 = 1 << 3)
 
 #define GUARDED_HEAP_MAP_TABLE_ENTRY_SHIFT  \
         (EFI_PAGE_SHIFT - BYTE_LENGTH_SHIFT)
 
-#define GUARDED_HEAP_MAP_TABLE_DEPTH        5
+#define GUARDED_HEAP_MAP_TABLE_DEPTH  5
 
 // Use UINT64_index + bit_index_of_UINT64 to locate the bit in may
-#define GUARDED_HEAP_MAP_ENTRY_BIT_SHIFT    6             // (64 = 1 << 6)
+#define GUARDED_HEAP_MAP_ENTRY_BIT_SHIFT  6               // (64 = 1 << 6)
 
 #define GUARDED_HEAP_MAP_ENTRY_BITS         \
         (1 << GUARDED_HEAP_MAP_ENTRY_BIT_SHIFT)
@@ -152,9 +152,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Memory type to guard (matching the related PCD definition)
 //
-#define GUARD_HEAP_TYPE_PAGE        BIT0
-#define GUARD_HEAP_TYPE_POOL        BIT1
-#define GUARD_HEAP_TYPE_FREED       BIT4
+#define GUARD_HEAP_TYPE_PAGE   BIT0
+#define GUARD_HEAP_TYPE_POOL   BIT1
+#define GUARD_HEAP_TYPE_FREED  BIT4
 #define GUARD_HEAP_TYPE_ALL         \
         (GUARD_HEAP_TYPE_PAGE|GUARD_HEAP_TYPE_POOL|GUARD_HEAP_TYPE_FREED)
 
@@ -164,10 +164,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define HEAP_GUARD_DEBUG_LEVEL  (DEBUG_POOL|DEBUG_PAGE)
 
 typedef struct {
-  UINT32                TailMark;
-  UINT32                HeadMark;
-  EFI_PHYSICAL_ADDRESS  Address;
-  LIST_ENTRY            Link;
+  UINT32                  TailMark;
+  UINT32                  HeadMark;
+  EFI_PHYSICAL_ADDRESS    Address;
+  LIST_ENTRY              Link;
 } HEAP_GUARD_NODE;
 
 /**
@@ -219,8 +219,8 @@ CoreConvertPagesWithGuard (
 **/
 VOID
 SetGuardForMemory (
-  IN EFI_PHYSICAL_ADDRESS   Memory,
-  IN UINTN                  NumberOfPages
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages
   );
 
 /**
@@ -233,8 +233,8 @@ SetGuardForMemory (
 **/
 VOID
 UnsetGuardForMemory (
-  IN EFI_PHYSICAL_ADDRESS   Memory,
-  IN UINTN                  NumberOfPages
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages
   );
 
 /**
@@ -247,8 +247,8 @@ UnsetGuardForMemory (
 **/
 VOID
 AdjustMemoryA (
-  IN OUT EFI_PHYSICAL_ADDRESS    *Memory,
-  IN OUT UINTN                   *NumberOfPages
+  IN OUT EFI_PHYSICAL_ADDRESS  *Memory,
+  IN OUT UINTN                 *NumberOfPages
   );
 
 /**
@@ -265,8 +265,8 @@ AdjustMemoryA (
 **/
 VOID
 AdjustMemoryF (
-  IN OUT EFI_PHYSICAL_ADDRESS    *Memory,
-  IN OUT UINTN                   *NumberOfPages
+  IN OUT EFI_PHYSICAL_ADDRESS  *Memory,
+  IN OUT UINTN                 *NumberOfPages
   );
 
 /**
@@ -285,9 +285,9 @@ AdjustMemoryF (
 **/
 UINT64
 AdjustMemoryS (
-  IN UINT64                  Start,
-  IN UINT64                  Size,
-  IN UINT64                  SizeRequested
+  IN UINT64  Start,
+  IN UINT64  Size,
+  IN UINT64  SizeRequested
   );
 
 /**
@@ -301,7 +301,7 @@ AdjustMemoryS (
 **/
 BOOLEAN
 IsPoolTypeToGuard (
-  IN EFI_MEMORY_TYPE        MemoryType
+  IN EFI_MEMORY_TYPE  MemoryType
   );
 
 /**
@@ -315,8 +315,8 @@ IsPoolTypeToGuard (
 **/
 BOOLEAN
 IsPageTypeToGuard (
-  IN EFI_MEMORY_TYPE        MemoryType,
-  IN EFI_ALLOCATE_TYPE      AllocateType
+  IN EFI_MEMORY_TYPE    MemoryType,
+  IN EFI_ALLOCATE_TYPE  AllocateType
   );
 
 /**
@@ -330,7 +330,7 @@ IsPageTypeToGuard (
 BOOLEAN
 EFIAPI
 IsMemoryGuarded (
-  IN EFI_PHYSICAL_ADDRESS    Address
+  IN EFI_PHYSICAL_ADDRESS  Address
   );
 
 /**
@@ -344,7 +344,7 @@ IsMemoryGuarded (
 BOOLEAN
 EFIAPI
 IsGuardPage (
-  IN EFI_PHYSICAL_ADDRESS    Address
+  IN EFI_PHYSICAL_ADDRESS  Address
   );
 
 /**
@@ -369,9 +369,9 @@ DumpGuardedMemoryBitmap (
 **/
 VOID *
 AdjustPoolHeadA (
-  IN EFI_PHYSICAL_ADDRESS    Memory,
-  IN UINTN                   NoPages,
-  IN UINTN                   Size
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NoPages,
+  IN UINTN                 Size
   );
 
 /**
@@ -383,7 +383,7 @@ AdjustPoolHeadA (
 **/
 VOID *
 AdjustPoolHeadF (
-  IN EFI_PHYSICAL_ADDRESS    Memory
+  IN EFI_PHYSICAL_ADDRESS  Memory
   );
 
 /**
@@ -395,7 +395,7 @@ AdjustPoolHeadF (
 **/
 BOOLEAN
 IsHeapGuardEnabled (
-  UINT8           GuardType
+  UINT8  GuardType
   );
 
 /**
@@ -418,8 +418,8 @@ HeapGuardCpuArchProtocolNotify (
 **/
 VOID
 MergeGuardPages (
-  IN EFI_MEMORY_DESCRIPTOR      *MemoryMapEntry,
-  IN EFI_PHYSICAL_ADDRESS       MaxAddress
+  IN EFI_MEMORY_DESCRIPTOR  *MemoryMapEntry,
+  IN EFI_PHYSICAL_ADDRESS   MaxAddress
   );
 
 /**
@@ -433,8 +433,8 @@ MergeGuardPages (
 VOID
 EFIAPI
 GuardFreedPagesChecked (
-  IN  EFI_PHYSICAL_ADDRESS    BaseAddress,
-  IN  UINTN                   Pages
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINTN                 Pages
   );
 
 /**
@@ -458,10 +458,10 @@ GuardFreedPagesChecked (
 **/
 BOOLEAN
 PromoteGuardedFreePages (
-  OUT EFI_PHYSICAL_ADDRESS      *StartAddress,
-  OUT EFI_PHYSICAL_ADDRESS      *EndAddress
+  OUT EFI_PHYSICAL_ADDRESS  *StartAddress,
+  OUT EFI_PHYSICAL_ADDRESS  *EndAddress
   );
 
-extern BOOLEAN mOnGuarding;
+extern BOOLEAN  mOnGuarding;
 
 #endif

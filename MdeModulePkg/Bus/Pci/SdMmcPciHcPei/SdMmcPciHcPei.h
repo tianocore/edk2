@@ -22,10 +22,10 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-#define SD_MMC_HC_PEI_SIGNATURE    SIGNATURE_32 ('S', 'D', 'M', 'C')
+#define SD_MMC_HC_PEI_SIGNATURE  SIGNATURE_32 ('S', 'D', 'M', 'C')
 
-#define MAX_SD_MMC_HCS             8
-#define MAX_SD_MMC_SLOTS           6
+#define MAX_SD_MMC_HCS    8
+#define MAX_SD_MMC_SLOTS  6
 
 //
 // SD Host Controller SlotInfo Register Offset
@@ -33,23 +33,23 @@
 #define SD_MMC_HC_PEI_SLOT_OFFSET  0x40
 
 typedef struct {
-  UINT8    FirstBar:3;        // bit 0:2
-  UINT8    Reserved:1;        // bit 3
-  UINT8    SlotNum:3;         // bit 4:6
-  UINT8    Reserved1:1;       // bit 7
+  UINT8    FirstBar  : 3;     // bit 0:2
+  UINT8    Reserved  : 1;     // bit 3
+  UINT8    SlotNum   : 3;     // bit 4:6
+  UINT8    Reserved1 : 1;     // bit 7
 } SD_MMC_HC_PEI_SLOT_INFO;
 
 typedef struct {
-  UINTN                            SlotNum;
-  UINTN                            MmioBarAddr[MAX_SD_MMC_SLOTS];
+  UINTN    SlotNum;
+  UINTN    MmioBarAddr[MAX_SD_MMC_SLOTS];
 } SD_MMC_HC_PEI_BAR;
 
 typedef struct {
-  UINTN                            Signature;
-  EDKII_SD_MMC_HOST_CONTROLLER_PPI SdMmcHostControllerPpi;
-  EFI_PEI_PPI_DESCRIPTOR           PpiList;
-  UINTN                            TotalSdMmcHcs;
-  SD_MMC_HC_PEI_BAR                MmioBar[MAX_SD_MMC_HCS];
+  UINTN                               Signature;
+  EDKII_SD_MMC_HOST_CONTROLLER_PPI    SdMmcHostControllerPpi;
+  EFI_PEI_PPI_DESCRIPTOR              PpiList;
+  UINTN                               TotalSdMmcHcs;
+  SD_MMC_HC_PEI_BAR                   MmioBar[MAX_SD_MMC_HCS];
 } SD_MMC_HC_PEI_PRIVATE_DATA;
 
 #define SD_MMC_HC_PEI_PRIVATE_DATA_FROM_THIS(a)  CR (a, SD_MMC_HC_PEI_PRIVATE_DATA, SdMmcHostControllerPpi, SD_MMC_HC_PEI_SIGNATURE)
@@ -71,10 +71,10 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 GetSdMmcHcMmioBar (
-  IN     EDKII_SD_MMC_HOST_CONTROLLER_PPI *This,
-  IN     UINT8                            ControllerId,
-  IN OUT UINTN                            **MmioBar,
-     OUT UINT8                            *BarNum
+  IN     EDKII_SD_MMC_HOST_CONTROLLER_PPI  *This,
+  IN     UINT8                             ControllerId,
+  IN OUT UINTN                             **MmioBar,
+  OUT UINT8                                *BarNum
   );
 
 #endif

@@ -59,11 +59,11 @@ AuthVariableLibInitialize (
 EFI_STATUS
 EFIAPI
 AuthVariableLibProcessVariable (
-  IN CHAR16         *VariableName,
-  IN EFI_GUID       *VendorGuid,
-  IN VOID           *Data,
-  IN UINTN          DataSize,
-  IN UINT32         Attributes
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN VOID      *Data,
+  IN UINTN     DataSize,
+  IN UINT32    Attributes
   )
 {
   ASSERT (FALSE);

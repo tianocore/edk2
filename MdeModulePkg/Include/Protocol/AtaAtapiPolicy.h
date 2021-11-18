@@ -6,6 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __ATA_ATAPI_POLICY_H__
 #define __ATA_ATAPI_POLICY_H__
 
@@ -18,36 +19,34 @@ typedef struct {
   ///
   /// Protocol version.
   ///
-  UINT32  Version;
+  UINT32    Version;
 
   ///
   /// 0: Disable Power-up in Standby;
   /// 1: Enable Power-up in Standby;
   /// others: Since PUIS setting is non-volatile, platform can use other value than 0/1 to keep hardware PUIS setting.
   ///
-  UINT8   PuisEnable;
+  UINT8     PuisEnable;
 
   ///
   /// 0: Disable Device Sleep;
   /// 1: Enable Device Sleep;
   /// others: Ignored.
   ///
-  UINT8   DeviceSleepEnable;
+  UINT8     DeviceSleepEnable;
 
   ///
   /// 0: Disable Aggressive Device Sleep;
   /// 1: Enable Aggressive Device Sleep;
   /// others: Ignored.
   ///
-  UINT8   AggressiveDeviceSleepEnable;
+  UINT8     AggressiveDeviceSleepEnable;
 
-  UINT8   Reserved;
+  UINT8     Reserved;
 } EDKII_ATA_ATAPI_POLICY_PROTOCOL;
 
-#define EDKII_ATA_ATAPI_POLICY_VERSION 0x00010000
+#define EDKII_ATA_ATAPI_POLICY_VERSION  0x00010000
 
-
-extern EFI_GUID gEdkiiAtaAtapiPolicyProtocolGuid;
+extern EFI_GUID  gEdkiiAtaAtapiPolicyProtocolGuid;
 
 #endif
-

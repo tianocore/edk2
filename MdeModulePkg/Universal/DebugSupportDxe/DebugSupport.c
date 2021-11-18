@@ -16,7 +16,6 @@ EFI_DEBUG_SUPPORT_PROTOCOL  mDebugSupportProtocolInterface = {
   InvalidateInstructionCache
 };
 
-
 /**
   Debug Support Driver entry point.
 
@@ -34,8 +33,8 @@ EFI_DEBUG_SUPPORT_PROTOCOL  mDebugSupportProtocolInterface = {
 EFI_STATUS
 EFIAPI
 InitializeDebugSupportDriver (
-  IN EFI_HANDLE               ImageHandle,
-  IN EFI_SYSTEM_TABLE         *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_LOADED_IMAGE_PROTOCOL   *LoadedImageProtocolPtr;
@@ -63,7 +62,7 @@ InitializeDebugSupportDriver (
       Status = gBS->OpenProtocol (
                       HandlePtr[NumHandles],
                       &gEfiDebugSupportProtocolGuid,
-                      (VOID **) &DebugSupportProtocolPtr,
+                      (VOID **)&DebugSupportProtocolPtr,
                       ImageHandle,
                       NULL,
                       EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -77,6 +76,7 @@ InitializeDebugSupportDriver (
         goto ErrExit;
       }
     } while (NumHandles > 0);
+
     FreePool (HandlePtr);
   }
 
@@ -86,7 +86,7 @@ InitializeDebugSupportDriver (
   Status = gBS->OpenProtocol (
                   ImageHandle,
                   &gEfiLoadedImageProtocolGuid,
-                  (VOID **) &LoadedImageProtocolPtr,
+                  (VOID **)&LoadedImageProtocolPtr,
                   ImageHandle,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

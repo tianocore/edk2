@@ -27,12 +27,12 @@ EFI_HANDLE  mMonotonicCounterHandle = NULL;
 //
 // The current monotonic counter value
 //
-UINT64      mEfiMtc;
+UINT64  mEfiMtc;
 
 //
 // Event to update the monotonic Counter's high part when low part overflows.
 //
-EFI_EVENT   mEfiMtcEvent;
+EFI_EVENT  mEfiMtcEvent;
 
 /**
   Returns a monotonically increasing count for the platform.
@@ -59,7 +59,7 @@ MonotonicCounterDriverGetNextMonotonicCount (
   OUT UINT64  *Count
   )
 {
-  EFI_TPL OldTpl;
+  EFI_TPL  OldTpl;
 
   //
   // Cannot be called after ExitBootServices()
@@ -67,17 +67,19 @@ MonotonicCounterDriverGetNextMonotonicCount (
   if (EfiAtRuntime ()) {
     return EFI_UNSUPPORTED;
   }
+
   //
   // Check input parameters
   //
   if (Count == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Update the monotonic counter with a lock
   //
-  OldTpl  = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  *Count  = mEfiMtc;
+  OldTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  *Count = mEfiMtc;
   mEfiMtc++;
   gBS->RestoreTPL (OldTpl);
 
@@ -85,13 +87,12 @@ MonotonicCounterDriverGetNextMonotonicCount (
   // If the low 32-bit counter overflows (MSB bit toggled),
   // then signal that the high part needs update now.
   //
-  if ((((UINT32) mEfiMtc) ^ ((UINT32) *Count)) & BIT31) {
+  if ((((UINT32)mEfiMtc) ^ ((UINT32)*Count)) & BIT31) {
     gBS->SignalEvent (mEfiMtcEvent);
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Returns the next high 32 bits of the platform's monotonic counter.
@@ -132,7 +133,7 @@ MonotonicCounterDriverGetNextHighMonotonicCount (
   OUT UINT32  *HighCount
   )
 {
-  EFI_TPL     OldTpl;
+  EFI_TPL  OldTpl;
 
   //
   // Check input parameters
@@ -145,14 +146,15 @@ MonotonicCounterDriverGetNextHighMonotonicCount (
     //
     // Use a lock if called before ExitBootServices()
     //
-    OldTpl      = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-    *HighCount  = (UINT32) RShiftU64 (mEfiMtc, 32) + 1;
-    mEfiMtc     = LShiftU64 (*HighCount, 32);
+    OldTpl     = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    *HighCount = (UINT32)RShiftU64 (mEfiMtc, 32) + 1;
+    mEfiMtc    = LShiftU64 (*HighCount, 32);
     gBS->RestoreTPL (OldTpl);
   } else {
-    *HighCount  = (UINT32) RShiftU64 (mEfiMtc, 32) + 1;
-    mEfiMtc     = LShiftU64 (*HighCount, 32);
+    *HighCount = (UINT32)RShiftU64 (mEfiMtc, 32) + 1;
+    mEfiMtc    = LShiftU64 (*HighCount, 32);
   }
+
   //
   // Update the NV variable to match the new high part
   //
@@ -163,7 +165,6 @@ MonotonicCounterDriverGetNextHighMonotonicCount (
            sizeof (UINT32),
            HighCount
            );
-
 }
 
 /**
@@ -176,8 +177,8 @@ MonotonicCounterDriverGetNextHighMonotonicCount (
 VOID
 EFIAPI
 EfiMtcEventHandler (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   UINT32  HighCount;
@@ -226,16 +227,17 @@ MonotonicCounterDriverInitialize (
   // Read the last high part
   //
   BufferSize = sizeof (UINT32);
-  Status = EfiGetVariable (
-             MTC_VARIABLE_NAME,
-             &gMtcVendorGuid,
-             NULL,
-             &BufferSize,
-             &HighCount
-             );
+  Status     = EfiGetVariable (
+                 MTC_VARIABLE_NAME,
+                 &gMtcVendorGuid,
+                 NULL,
+                 &BufferSize,
+                 &HighCount
+                 );
   if (EFI_ERROR (Status)) {
     HighCount = 0;
   }
+
   //
   // Set the current value
   //
@@ -251,8 +253,8 @@ MonotonicCounterDriverInitialize (
   //
   // Fill in the EFI Boot Services and EFI Runtime Services Monotonic Counter Fields
   //
-  gBS->GetNextMonotonicCount      = MonotonicCounterDriverGetNextMonotonicCount;
-  gRT->GetNextHighMonotonicCount  = MonotonicCounterDriverGetNextHighMonotonicCount;
+  gBS->GetNextMonotonicCount     = MonotonicCounterDriverGetNextMonotonicCount;
+  gRT->GetNextHighMonotonicCount = MonotonicCounterDriverGetNextHighMonotonicCount;
 
   //
   // Install the Monotonic Counter Architctural Protocol onto a new handle

@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL_GUID  \
   { 0xa770c357, 0xb693, 0x4e6d, { 0xa6, 0xcf, 0xd2, 0x1c, 0x72, 0x8e, 0x55, 0xb }}
 
-typedef struct _EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL   EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL;
+typedef struct _EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL;
 
 #define BROWSER_EXTENSION2_VERSION_1    0x10000
 #define BROWSER_EXTENSION2_VERSION_1_1  0x10001
@@ -29,7 +29,7 @@ typedef struct _EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL   EDKII_FORM_BROWSER_EXTE
 **/
 typedef
 BOOLEAN
-(EFIAPI *IS_BROWSER_DATA_MODIFIED) (
+(EFIAPI *IS_BROWSER_DATA_MODIFIED)(
   VOID
   );
 
@@ -44,7 +44,7 @@ BOOLEAN
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EXECUTE_ACTION) (
+(EFIAPI *EXECUTE_ACTION)(
   IN UINT32        Action,
   IN UINT16        DefaultId
   );
@@ -58,35 +58,35 @@ EFI_STATUS
 **/
 typedef
 BOOLEAN
-(EFIAPI *IS_RESET_REQUIRED) (
+(EFIAPI *IS_RESET_REQUIRED)(
   VOID
   );
 
-#define FORM_ENTRY_INFO_SIGNATURE    SIGNATURE_32 ('f', 'e', 'i', 's')
+#define FORM_ENTRY_INFO_SIGNATURE  SIGNATURE_32 ('f', 'e', 'i', 's')
 
 typedef struct {
-  UINTN           Signature;
-  LIST_ENTRY      Link;
+  UINTN              Signature;
+  LIST_ENTRY         Link;
 
-  EFI_HII_HANDLE  HiiHandle;
-  EFI_GUID        FormSetGuid;
-  EFI_FORM_ID     FormId;
-  EFI_QUESTION_ID QuestionId;
+  EFI_HII_HANDLE     HiiHandle;
+  EFI_GUID           FormSetGuid;
+  EFI_FORM_ID        FormId;
+  EFI_QUESTION_ID    QuestionId;
 } FORM_ENTRY_INFO;
 
 #define FORM_ENTRY_INFO_FROM_LINK(a)  CR (a, FORM_ENTRY_INFO, Link, FORM_ENTRY_INFO_SIGNATURE)
 
-#define FORM_QUESTION_ATTRIBUTE_OVERRIDE_SIGNATURE    SIGNATURE_32 ('f', 'q', 'o', 's')
+#define FORM_QUESTION_ATTRIBUTE_OVERRIDE_SIGNATURE  SIGNATURE_32 ('f', 'q', 'o', 's')
 
 typedef struct {
-  UINTN            Signature;
-  LIST_ENTRY       Link;
+  UINTN              Signature;
+  LIST_ENTRY         Link;
 
-  EFI_QUESTION_ID  QuestionId;           // Find the question
-  EFI_FORM_ID      FormId;               // Find the form
-  EFI_GUID         FormSetGuid;          // Find the formset.
-  EFI_HII_HANDLE   HiiHandle;            // Find the HII handle
-  UINT32           Attribute;            // Hide or grayout ...
+  EFI_QUESTION_ID    QuestionId;         // Find the question
+  EFI_FORM_ID        FormId;             // Find the form
+  EFI_GUID           FormSetGuid;        // Find the formset.
+  EFI_HII_HANDLE     HiiHandle;          // Find the HII handle
+  UINT32             Attribute;          // Hide or grayout ...
 } QUESTION_ATTRIBUTE_OVERRIDE;
 
 #define FORM_QUESTION_ATTRIBUTE_OVERRIDE_FROM_LINK(a)  CR (a, QUESTION_ATTRIBUTE_OVERRIDE, Link, FORM_QUESTION_ATTRIBUTE_OVERRIDE_SIGNATURE)
@@ -95,25 +95,24 @@ struct _EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL {
   ///
   /// Version for protocol future extension.
   ///
-  UINT32                    Version;
-  SET_SCOPE                 SetScope;
-  REGISTER_HOT_KEY          RegisterHotKey;
-  REGISTER_EXIT_HANDLER     RegiserExitHandler;
-  IS_BROWSER_DATA_MODIFIED  IsBrowserDataModified;
-  EXECUTE_ACTION            ExecuteAction;
+  UINT32                      Version;
+  SET_SCOPE                   SetScope;
+  REGISTER_HOT_KEY            RegisterHotKey;
+  REGISTER_EXIT_HANDLER       RegiserExitHandler;
+  IS_BROWSER_DATA_MODIFIED    IsBrowserDataModified;
+  EXECUTE_ACTION              ExecuteAction;
   ///
   /// A list of type FORMID_INFO is Browser View Form History List.
   ///
-  LIST_ENTRY                FormViewHistoryHead;
+  LIST_ENTRY                  FormViewHistoryHead;
   ///
   /// A list of type QUESTION_ATTRIBUTE_OVERRIDE.
   ///
-  LIST_ENTRY                OverrideQestListHead;
+  LIST_ENTRY                  OverrideQestListHead;
 
-  IS_RESET_REQUIRED         IsResetRequired;
+  IS_RESET_REQUIRED           IsResetRequired;
 };
 
-extern EFI_GUID gEdkiiFormBrowserEx2ProtocolGuid;
+extern EFI_GUID  gEdkiiFormBrowserEx2ProtocolGuid;
 
 #endif
-

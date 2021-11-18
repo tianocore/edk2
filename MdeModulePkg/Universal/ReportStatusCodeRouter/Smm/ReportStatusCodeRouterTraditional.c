@@ -25,8 +25,8 @@
 EFI_STATUS
 EFIAPI
 GenericStatusCodeTraditionalEntry (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return GenericStatusCodeCommonEntry ();

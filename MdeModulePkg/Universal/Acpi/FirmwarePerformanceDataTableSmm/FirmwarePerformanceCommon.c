@@ -31,10 +31,9 @@
 #include <Library/BaseMemoryLib.h>
 #include "FirmwarePerformanceCommon.h"
 
-
-EFI_MM_RSC_HANDLER_PROTOCOL   *mRscHandlerProtocol    = NULL;
-UINT64                        mSuspendStartTime       = 0;
-BOOLEAN                       mS3SuspendLockBoxSaved  = FALSE;
+EFI_MM_RSC_HANDLER_PROTOCOL  *mRscHandlerProtocol   = NULL;
+UINT64                       mSuspendStartTime      = 0;
+BOOLEAN                      mS3SuspendLockBoxSaved = FALSE;
 
 /**
   Report status code listener for MM. This is used to record the performance
@@ -58,11 +57,11 @@ BOOLEAN                       mS3SuspendLockBoxSaved  = FALSE;
 EFI_STATUS
 EFIAPI
 FpdtStatusCodeListenerMm (
-  IN EFI_STATUS_CODE_TYPE     CodeType,
-  IN EFI_STATUS_CODE_VALUE    Value,
-  IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId,
-  IN EFI_STATUS_CODE_DATA     *Data
+  IN EFI_STATUS_CODE_TYPE   CodeType,
+  IN EFI_STATUS_CODE_VALUE  Value,
+  IN UINT32                 Instance,
+  IN EFI_GUID               *CallerId,
+  IN EFI_STATUS_CODE_DATA   *Data
   )
 {
   EFI_STATUS                           Status;
@@ -76,13 +75,14 @@ FpdtStatusCodeListenerMm (
     return EFI_UNSUPPORTED;
   }
 
-  if (Data != NULL && CompareGuid (&Data->Type, &gEfiFirmwarePerformanceGuid)) {
+  if ((Data != NULL) && CompareGuid (&Data->Type, &gEfiFirmwarePerformanceGuid)) {
     DEBUG ((DEBUG_ERROR, "FpdtStatusCodeListenerMm: Performance data reported through gEfiFirmwarePerformanceGuid will not be collected by FirmwarePerformanceDataTableMm\n"));
     return EFI_UNSUPPORTED;
   }
 
   if ((Value != PcdGet32 (PcdProgressCodeS3SuspendStart)) &&
-      (Value != PcdGet32 (PcdProgressCodeS3SuspendEnd))) {
+      (Value != PcdGet32 (PcdProgressCodeS3SuspendEnd)))
+  {
     return EFI_UNSUPPORTED;
   }
 
@@ -142,7 +142,7 @@ FirmwarePerformanceCommonEntryPoint (
   VOID
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   //
   // Get MM Report Status Code Handler Protocol.
@@ -150,7 +150,7 @@ FirmwarePerformanceCommonEntryPoint (
   Status = gMmst->MmLocateProtocol (
                     &gEfiMmRscHandlerProtocolGuid,
                     NULL,
-                    (VOID **) &mRscHandlerProtocol
+                    (VOID **)&mRscHandlerProtocol
                     );
   ASSERT_EFI_ERROR (Status);
 

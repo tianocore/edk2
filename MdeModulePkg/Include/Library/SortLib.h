@@ -5,6 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __SORT_LIB_H__
 #define __SORT_LIB_H__
 
@@ -46,12 +47,11 @@ INTN
 VOID
 EFIAPI
 PerformQuickSort (
-  IN OUT VOID                   *BufferToSort,
-  IN CONST UINTN                Count,
-  IN CONST UINTN                ElementSize,
-  IN       SORT_COMPARE         CompareFunction
+  IN OUT VOID            *BufferToSort,
+  IN CONST UINTN         Count,
+  IN CONST UINTN         ElementSize,
+  IN       SORT_COMPARE  CompareFunction
   );
-
 
 /**
   Function to compare 2 device paths for use as CompareFunction.
@@ -66,8 +66,8 @@ PerformQuickSort (
 INTN
 EFIAPI
 DevicePathCompare (
-  IN  CONST VOID                *Buffer1,
-  IN  CONST VOID                *Buffer2
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
   );
 
 /**
@@ -83,8 +83,8 @@ DevicePathCompare (
 INTN
 EFIAPI
 StringNoCaseCompare (
-  IN  CONST VOID                *Buffer1,
-  IN  CONST VOID                *Buffer2
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
   );
 
 /**
@@ -100,8 +100,8 @@ StringNoCaseCompare (
 INTN
 EFIAPI
 StringCompare (
-  IN  CONST VOID                *Buffer1,
-  IN  CONST VOID                *Buffer2
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
   );
 
 #endif //__SORT_LIB_H__

@@ -14,25 +14,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// Size of AuthInfo prior to the data payload.
 ///
-#define AUTHINFO_SIZE ((OFFSET_OF (EFI_VARIABLE_AUTHENTICATION, AuthInfo)) + \
+#define AUTHINFO_SIZE  ((OFFSET_OF (EFI_VARIABLE_AUTHENTICATION, AuthInfo)) +\
                        (OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData)) + \
                        sizeof (EFI_CERT_BLOCK_RSA_2048_SHA256))
 
-#define AUTHINFO2_SIZE(VarAuth2) ((OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo)) + \
+#define AUTHINFO2_SIZE(VarAuth2)  ((OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo)) +\
                                   (UINTN) ((EFI_VARIABLE_AUTHENTICATION_2 *) (VarAuth2))->AuthInfo.Hdr.dwLength)
 
-#define OFFSET_OF_AUTHINFO2_CERT_DATA ((OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo)) + \
+#define OFFSET_OF_AUTHINFO2_CERT_DATA  ((OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo)) +\
                                        (OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData)))
 
 typedef struct {
-  CHAR16        *VariableName;
-  EFI_GUID      *VendorGuid;
-  UINT32        Attributes;
-  UINTN         DataSize;
-  VOID          *Data;
-  UINT32        PubKeyIndex;
-  UINT64        MonotonicCount;
-  EFI_TIME      *TimeStamp;
+  CHAR16      *VariableName;
+  EFI_GUID    *VendorGuid;
+  UINT32      Attributes;
+  UINTN       DataSize;
+  VOID        *Data;
+  UINT32      PubKeyIndex;
+  UINT64      MonotonicCount;
+  EFI_TIME    *TimeStamp;
 } AUTH_VARIABLE_INFO;
 
 /**
@@ -55,7 +55,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *AUTH_VAR_LIB_FIND_VARIABLE) (
+(EFIAPI *AUTH_VAR_LIB_FIND_VARIABLE)(
   IN  CHAR16                *VariableName,
   IN  EFI_GUID              *VendorGuid,
   OUT AUTH_VARIABLE_INFO    *AuthVariableInfo
@@ -81,7 +81,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *AUTH_VAR_LIB_FIND_NEXT_VARIABLE) (
+(EFIAPI *AUTH_VAR_LIB_FIND_NEXT_VARIABLE)(
   IN  CHAR16                *VariableName,
   IN  EFI_GUID              *VendorGuid,
   OUT AUTH_VARIABLE_INFO    *AuthVariableInfo
@@ -101,7 +101,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *AUTH_VAR_LIB_UPDATE_VARIABLE) (
+(EFIAPI *AUTH_VAR_LIB_UPDATE_VARIABLE)(
   IN AUTH_VARIABLE_INFO     *AuthVariableInfo
   );
 
@@ -119,7 +119,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *AUTH_VAR_LIB_GET_SCRATCH_BUFFER) (
+(EFIAPI *AUTH_VAR_LIB_GET_SCRATCH_BUFFER)(
   IN OUT UINTN      *ScratchBufferSize,
   OUT    VOID       **ScratchBuffer
   );
@@ -145,7 +145,7 @@ EFI_STATUS
 **/
 typedef
 BOOLEAN
-(EFIAPI *AUTH_VAR_LIB_CHECK_REMAINING_SPACE) (
+(EFIAPI *AUTH_VAR_LIB_CHECK_REMAINING_SPACE)(
   IN UINT32                     Attributes,
   ...
   );
@@ -159,7 +159,7 @@ BOOLEAN
 **/
 typedef
 BOOLEAN
-(EFIAPI *AUTH_VAR_LIB_AT_RUNTIME) (
+(EFIAPI *AUTH_VAR_LIB_AT_RUNTIME)(
   VOID
   );
 
@@ -183,21 +183,21 @@ typedef struct {
   AUTH_VAR_LIB_AT_RUNTIME               AtRuntime;
 } AUTH_VAR_LIB_CONTEXT_IN;
 
-#define AUTH_VAR_LIB_CONTEXT_OUT_STRUCT_VERSION 0x01
+#define AUTH_VAR_LIB_CONTEXT_OUT_STRUCT_VERSION  0x01
 
 typedef struct {
-  UINTN                                 StructVersion;
-  UINTN                                 StructSize;
+  UINTN                      StructVersion;
+  UINTN                      StructSize;
   //
   // Caller needs to set variable property for the variables.
   //
-  VARIABLE_ENTRY_PROPERTY               *AuthVarEntry;
-  UINTN                                 AuthVarEntryCount;
+  VARIABLE_ENTRY_PROPERTY    *AuthVarEntry;
+  UINTN                      AuthVarEntryCount;
   //
   // Caller needs to ConvertPointer() for the pointers.
   //
-  VOID                                  ***AddressPointer;
-  UINTN                                 AddressPointerCount;
+  VOID                       ***AddressPointer;
+  UINTN                      AddressPointerCount;
 } AUTH_VAR_LIB_CONTEXT_OUT;
 
 /**
@@ -244,11 +244,11 @@ AuthVariableLibInitialize (
 EFI_STATUS
 EFIAPI
 AuthVariableLibProcessVariable (
-  IN CHAR16         *VariableName,
-  IN EFI_GUID       *VendorGuid,
-  IN VOID           *Data,
-  IN UINTN          DataSize,
-  IN UINT32         Attributes
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN VOID      *Data,
+  IN UINTN     DataSize,
+  IN UINT32    Attributes
   );
 
 #endif

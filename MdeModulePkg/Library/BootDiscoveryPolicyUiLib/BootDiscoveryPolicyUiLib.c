@@ -24,16 +24,16 @@
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH             VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL       End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
-extern UINT8 BootDiscoveryPolicyUiLibVfrBin[];
+extern UINT8  BootDiscoveryPolicyUiLibVfrBin[];
 
-EFI_HII_HANDLE  mBPHiiHandle = NULL;
+EFI_HII_HANDLE  mBPHiiHandle    = NULL;
 EFI_HANDLE      mBPDriverHandle = NULL;
 
-STATIC HII_VENDOR_DEVICE_PATH mVendorDevicePath = {
+STATIC HII_VENDOR_DEVICE_PATH  mVendorDevicePath = {
   {
     {
       HARDWARE_DEVICE_PATH,
@@ -69,15 +69,15 @@ STATIC HII_VENDOR_DEVICE_PATH mVendorDevicePath = {
 EFI_STATUS
 EFIAPI
 BootDiscoveryPolicyUiLibConstructor (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
-  UINTN                     Size;
-  UINT32                    BootDiscoveryPolicy;
+  EFI_STATUS  Status;
+  UINTN       Size;
+  UINT32      BootDiscoveryPolicy;
 
-  Size = sizeof (UINT32);
+  Size   = sizeof (UINT32);
   Status = gRT->GetVariable (
                   BOOT_DISCOVERY_POLICY_VAR,
                   &gBootDiscoveryPolicyMgrFormsetGuid,
@@ -141,7 +141,6 @@ BootDiscoveryPolicyUiLibDestructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-
   if (mBPDriverHandle != NULL) {
     gBS->UninstallProtocolInterface (
            mBPDriverHandle,

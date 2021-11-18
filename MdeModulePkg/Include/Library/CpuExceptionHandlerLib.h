@@ -13,70 +13,70 @@
 #include <Ppi/VectorHandoffInfo.h>
 #include <Protocol/Cpu.h>
 
-#define CPU_EXCEPTION_INIT_DATA_REV     1
+#define CPU_EXCEPTION_INIT_DATA_REV  1
 
 typedef union {
   struct {
     //
     // Revision number of this structure.
     //
-    UINT32                    Revision;
+    UINT32     Revision;
     //
     // The address of top of known good stack reserved for *ALL* exceptions
     // listed in field StackSwitchExceptions.
     //
-    UINTN                     KnownGoodStackTop;
+    UINTN      KnownGoodStackTop;
     //
     // The size of known good stack for *ONE* exception only.
     //
-    UINTN                     KnownGoodStackSize;
+    UINTN      KnownGoodStackSize;
     //
     // Buffer of exception vector list for stack switch.
     //
-    UINT8                     *StackSwitchExceptions;
+    UINT8      *StackSwitchExceptions;
     //
     // Number of exception vectors in StackSwitchExceptions.
     //
-    UINTN                     StackSwitchExceptionNumber;
+    UINTN      StackSwitchExceptionNumber;
     //
     // Buffer of IDT table. It must be type of IA32_IDT_GATE_DESCRIPTOR.
     // Normally there's no need to change IDT table size.
     //
-    VOID                      *IdtTable;
+    VOID       *IdtTable;
     //
     // Size of buffer for IdtTable.
     //
-    UINTN                     IdtTableSize;
+    UINTN      IdtTableSize;
     //
     // Buffer of GDT table. It must be type of IA32_SEGMENT_DESCRIPTOR.
     //
-    VOID                      *GdtTable;
+    VOID       *GdtTable;
     //
     // Size of buffer for GdtTable.
     //
-    UINTN                     GdtTableSize;
+    UINTN      GdtTableSize;
     //
     // Pointer to start address of descriptor of exception task gate in the
     // GDT table. It must be type of IA32_TSS_DESCRIPTOR.
     //
-    VOID                      *ExceptionTssDesc;
+    VOID       *ExceptionTssDesc;
     //
     // Size of buffer for ExceptionTssDesc.
     //
-    UINTN                     ExceptionTssDescSize;
+    UINTN      ExceptionTssDescSize;
     //
     // Buffer of task-state segment for exceptions. It must be type of
     // IA32_TASK_STATE_SEGMENT.
     //
-    VOID                      *ExceptionTss;
+    VOID       *ExceptionTss;
     //
     // Size of buffer for ExceptionTss.
     //
-    UINTN                     ExceptionTssSize;
+    UINTN      ExceptionTssSize;
     //
     // Flag to indicate if default handlers should be initialized or not.
     //
-    BOOLEAN                   InitDefaultHandlers;
+    BOOLEAN    InitDefaultHandlers;
   } Ia32, X64;
 } CPU_EXCEPTION_INIT_DATA;
 
@@ -99,7 +99,7 @@ typedef union {
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   );
 
 /**
@@ -128,8 +128,8 @@ InitializeCpuExceptionHandlers (
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlersEx (
-  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
-  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA  *InitData OPTIONAL
   );
 
 /**
@@ -151,7 +151,7 @@ InitializeCpuExceptionHandlersEx (
 EFI_STATUS
 EFIAPI
 InitializeCpuInterruptHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   );
 
 /**
@@ -180,8 +180,8 @@ InitializeCpuInterruptHandlers (
 EFI_STATUS
 EFIAPI
 RegisterCpuInterruptHandler (
-  IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   );
 
 /**
@@ -193,8 +193,8 @@ RegisterCpuInterruptHandler (
 VOID
 EFIAPI
 DumpCpuContext (
-  IN EFI_EXCEPTION_TYPE   ExceptionType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext
+  IN EFI_EXCEPTION_TYPE  ExceptionType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   );
 
 #endif

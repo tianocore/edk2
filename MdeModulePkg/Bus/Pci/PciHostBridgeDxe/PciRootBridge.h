@@ -31,7 +31,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/TimerLib.h>
 #include "PciHostResource.h"
 
-
 typedef enum {
   IoOperation,
   MemOperation,
@@ -40,46 +39,46 @@ typedef enum {
 
 #define MAP_INFO_SIGNATURE  SIGNATURE_32 ('_', 'm', 'a', 'p')
 typedef struct {
-  UINT32                                    Signature;
-  LIST_ENTRY                                Link;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION Operation;
-  UINTN                                     NumberOfBytes;
-  UINTN                                     NumberOfPages;
-  EFI_PHYSICAL_ADDRESS                      HostAddress;
-  EFI_PHYSICAL_ADDRESS                      MappedHostAddress;
+  UINT32                                       Signature;
+  LIST_ENTRY                                   Link;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION    Operation;
+  UINTN                                        NumberOfBytes;
+  UINTN                                        NumberOfPages;
+  EFI_PHYSICAL_ADDRESS                         HostAddress;
+  EFI_PHYSICAL_ADDRESS                         MappedHostAddress;
 } MAP_INFO;
-#define MAP_INFO_FROM_LINK(a) CR (a, MAP_INFO, Link, MAP_INFO_SIGNATURE)
+#define MAP_INFO_FROM_LINK(a)  CR (a, MAP_INFO, Link, MAP_INFO_SIGNATURE)
 
-#define PCI_ROOT_BRIDGE_SIGNATURE SIGNATURE_32 ('_', 'p', 'r', 'b')
+#define PCI_ROOT_BRIDGE_SIGNATURE  SIGNATURE_32 ('_', 'p', 'r', 'b')
 
 typedef struct {
-  UINT32                            Signature;
-  LIST_ENTRY                        Link;
-  EFI_HANDLE                        Handle;
-  UINT64                            AllocationAttributes;
-  UINT64                            Attributes;
-  UINT64                            Supports;
-  PCI_RES_NODE                      ResAllocNode[TypeMax];
-  PCI_ROOT_BRIDGE_APERTURE          Bus;
-  PCI_ROOT_BRIDGE_APERTURE          Io;
-  PCI_ROOT_BRIDGE_APERTURE          Mem;
-  PCI_ROOT_BRIDGE_APERTURE          PMem;
-  PCI_ROOT_BRIDGE_APERTURE          MemAbove4G;
-  PCI_ROOT_BRIDGE_APERTURE          PMemAbove4G;
-  BOOLEAN                           DmaAbove4G;
-  BOOLEAN                           NoExtendedConfigSpace;
-  VOID                              *ConfigBuffer;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
-  CHAR16                            *DevicePathStr;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL   RootBridgeIo;
+  UINT32                             Signature;
+  LIST_ENTRY                         Link;
+  EFI_HANDLE                         Handle;
+  UINT64                             AllocationAttributes;
+  UINT64                             Attributes;
+  UINT64                             Supports;
+  PCI_RES_NODE                       ResAllocNode[TypeMax];
+  PCI_ROOT_BRIDGE_APERTURE           Bus;
+  PCI_ROOT_BRIDGE_APERTURE           Io;
+  PCI_ROOT_BRIDGE_APERTURE           Mem;
+  PCI_ROOT_BRIDGE_APERTURE           PMem;
+  PCI_ROOT_BRIDGE_APERTURE           MemAbove4G;
+  PCI_ROOT_BRIDGE_APERTURE           PMemAbove4G;
+  BOOLEAN                            DmaAbove4G;
+  BOOLEAN                            NoExtendedConfigSpace;
+  VOID                               *ConfigBuffer;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
+  CHAR16                             *DevicePathStr;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL    RootBridgeIo;
 
-  BOOLEAN                           ResourceSubmitted;
-  LIST_ENTRY                        Maps;
+  BOOLEAN                            ResourceSubmitted;
+  LIST_ENTRY                         Maps;
 } PCI_ROOT_BRIDGE_INSTANCE;
 
-#define ROOT_BRIDGE_FROM_THIS(a) CR (a, PCI_ROOT_BRIDGE_INSTANCE, RootBridgeIo, PCI_ROOT_BRIDGE_SIGNATURE)
+#define ROOT_BRIDGE_FROM_THIS(a)  CR (a, PCI_ROOT_BRIDGE_INSTANCE, RootBridgeIo, PCI_ROOT_BRIDGE_SIGNATURE)
 
-#define ROOT_BRIDGE_FROM_LINK(a) CR (a, PCI_ROOT_BRIDGE_INSTANCE, Link, PCI_ROOT_BRIDGE_SIGNATURE)
+#define ROOT_BRIDGE_FROM_LINK(a)  CR (a, PCI_ROOT_BRIDGE_INSTANCE, Link, PCI_ROOT_BRIDGE_SIGNATURE)
 
 /**
   Construct the Pci Root Bridge instance.
@@ -91,12 +90,13 @@ typedef struct {
 **/
 PCI_ROOT_BRIDGE_INSTANCE *
 CreateRootBridge (
-  IN PCI_ROOT_BRIDGE       *Bridge
+  IN PCI_ROOT_BRIDGE  *Bridge
   );
 
 //
 // Protocol Member Function Prototypes
 //
+
 /**
 
   Poll an address in memory mapped space until an exit condition is met
@@ -286,11 +286,11 @@ RootBridgeIoIoWrite (
 EFI_STATUS
 EFIAPI
 RootBridgeIoCopyMem (
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL          *This,
-  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH    Width,
-  IN UINT64                                   DestAddress,
-  IN UINT64                                   SrcAddress,
-  IN UINTN                                    Count
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL        *This,
+  IN EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH  Width,
+  IN UINT64                                 DestAddress,
+  IN UINT64                                 SrcAddress,
+  IN UINTN                                  Count
   )
 ;
 
@@ -567,5 +567,5 @@ RootBridgeIoConfiguration (
   )
 ;
 
-extern EFI_CPU_IO2_PROTOCOL         *mCpuIo;
+extern EFI_CPU_IO2_PROTOCOL  *mCpuIo;
 #endif

@@ -28,9 +28,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 GetLbaAndOffsetByAddress (
-  IN  EFI_PHYSICAL_ADDRESS   Address,
-  OUT EFI_LBA                *Lba,
-  OUT UINTN                  *Offset
+  IN  EFI_PHYSICAL_ADDRESS  Address,
+  OUT EFI_LBA               *Lba,
+  OUT UINTN                 *Offset
   )
 {
   EFI_STATUS                          Status;
@@ -41,7 +41,7 @@ GetLbaAndOffsetByAddress (
   UINT32                              LbaIndex;
 
   Fvb     = NULL;
-  *Lba    = (EFI_LBA) (-1);
+  *Lba    = (EFI_LBA)(-1);
   *Offset = 0;
 
   //
@@ -60,7 +60,7 @@ GetLbaAndOffsetByAddress (
     return Status;
   }
 
-  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) ((UINTN) FvbBaseAddress);
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)FvbBaseAddress);
 
   //
   // Get the (LBA, Offset) of Address.
@@ -76,9 +76,9 @@ GetLbaAndOffsetByAddress (
         // Found the (Lba, Offset).
         //
         *Lba    = LbaIndex - 1;
-        *Offset = (UINTN) (Address - (FvbBaseAddress + FvbMapEntry->Length * (LbaIndex - 1)));
+        *Offset = (UINTN)(Address - (FvbBaseAddress + FvbMapEntry->Length * (LbaIndex - 1)));
         return EFI_SUCCESS;
-     }
+      }
     }
   }
 
@@ -116,10 +116,11 @@ FtwVariableSpace (
   //
   // Locate fault tolerant write protocol.
   //
-  Status = GetFtwProtocol((VOID **) &FtwProtocol);
+  Status = GetFtwProtocol ((VOID **)&FtwProtocol);
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
+
   //
   // Locate Fvb handle by address.
   //
@@ -127,6 +128,7 @@ FtwVariableSpace (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Get LBA and Offset by address.
   //
@@ -135,7 +137,7 @@ FtwVariableSpace (
     return EFI_ABORTED;
   }
 
-  FtwBufferSize = ((VARIABLE_STORE_HEADER *) ((UINTN) VariableBase))->Size;
+  FtwBufferSize = ((VARIABLE_STORE_HEADER *)((UINTN)VariableBase))->Size;
   ASSERT (FtwBufferSize == VariableBuffer->Size);
 
   //
@@ -143,12 +145,12 @@ FtwVariableSpace (
   //
   Status = FtwProtocol->Write (
                           FtwProtocol,
-                          VarLba,         // LBA
-                          VarOffset,      // Offset
-                          FtwBufferSize,  // NumBytes
-                          NULL,           // PrivateData NULL
-                          FvbHandle,      // Fvb Handle
-                          (VOID *) VariableBuffer // write buffer
+                          VarLba,                // LBA
+                          VarOffset,             // Offset
+                          FtwBufferSize,         // NumBytes
+                          NULL,                  // PrivateData NULL
+                          FvbHandle,             // Fvb Handle
+                          (VOID *)VariableBuffer // write buffer
                           );
 
   return Status;

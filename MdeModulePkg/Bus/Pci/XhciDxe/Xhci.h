@@ -29,8 +29,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/Pci.h>
 
-typedef struct _USB_XHCI_INSTANCE    USB_XHCI_INSTANCE;
-typedef struct _USB_DEV_CONTEXT      USB_DEV_CONTEXT;
+typedef struct _USB_XHCI_INSTANCE  USB_XHCI_INSTANCE;
+typedef struct _USB_DEV_CONTEXT    USB_DEV_CONTEXT;
 
 #include "XhciReg.h"
 #include "XhciSched.h"
@@ -40,62 +40,62 @@ typedef struct _USB_DEV_CONTEXT      USB_DEV_CONTEXT;
 //
 // The unit is microsecond, setting it as 1us.
 //
-#define XHC_1_MICROSECOND            (1)
+#define XHC_1_MICROSECOND  (1)
 //
 // The unit is microsecond, setting it as 1ms.
 //
-#define XHC_1_MILLISECOND            (1000)
+#define XHC_1_MILLISECOND  (1000)
 //
 // XHC generic timeout experience values.
 // The unit is millisecond, setting it as 10s.
 //
-#define XHC_GENERIC_TIMEOUT          (10 * 1000)
+#define XHC_GENERIC_TIMEOUT  (10 * 1000)
 //
 // XHC reset timeout experience values.
 // The unit is millisecond, setting it as 1s.
 //
-#define XHC_RESET_TIMEOUT            (1000)
+#define XHC_RESET_TIMEOUT  (1000)
 //
 // TRSTRCY delay requirement in usb 2.0 spec chapter 7.1.7.5.
 // The unit is microsecond, setting it as 10ms.
 //
-#define XHC_RESET_RECOVERY_DELAY     (10 * 1000)
+#define XHC_RESET_RECOVERY_DELAY  (10 * 1000)
 //
 // XHC async transfer timer interval, set by experience.
 // The unit is 100us, takes 1ms as interval.
 //
-#define XHC_ASYNC_TIMER_INTERVAL     EFI_TIMER_PERIOD_MILLISECONDS(1)
+#define XHC_ASYNC_TIMER_INTERVAL  EFI_TIMER_PERIOD_MILLISECONDS(1)
 
 //
 // XHC raises TPL to TPL_NOTIFY to serialize all its operations
 // to protect shared data structures.
 //
-#define XHC_TPL                      TPL_NOTIFY
+#define XHC_TPL  TPL_NOTIFY
 
-#define CMD_RING_TRB_NUMBER          0x100
-#define TR_RING_TRB_NUMBER           0x100
-#define ERST_NUMBER                  0x01
-#define EVENT_RING_TRB_NUMBER        0x200
+#define CMD_RING_TRB_NUMBER    0x100
+#define TR_RING_TRB_NUMBER     0x100
+#define ERST_NUMBER            0x01
+#define EVENT_RING_TRB_NUMBER  0x200
 
-#define CMD_INTER                    0
-#define CTRL_INTER                   1
-#define BULK_INTER                   2
-#define INT_INTER                    3
-#define INT_INTER_ASYNC              4
+#define CMD_INTER        0
+#define CTRL_INTER       1
+#define BULK_INTER       2
+#define INT_INTER        3
+#define INT_INTER_ASYNC  4
 
-#define EFI_LIST_CONTAINER(Entry, Type, Field) BASE_CR(Entry, Type, Field)
+#define EFI_LIST_CONTAINER(Entry, Type, Field)  BASE_CR(Entry, Type, Field)
 
-#define XHC_LOW_32BIT(Addr64)          ((UINT32)(((UINTN)(Addr64)) & 0xFFFFFFFF))
-#define XHC_HIGH_32BIT(Addr64)         ((UINT32)(RShiftU64((UINT64)(UINTN)(Addr64), 32) & 0xFFFFFFFF))
-#define XHC_BIT_IS_SET(Data, Bit)      ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
+#define XHC_LOW_32BIT(Addr64)      ((UINT32)(((UINTN)(Addr64)) & 0xFFFFFFFF))
+#define XHC_HIGH_32BIT(Addr64)     ((UINT32)(RShiftU64((UINT64)(UINTN)(Addr64), 32) & 0xFFFFFFFF))
+#define XHC_BIT_IS_SET(Data, Bit)  ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
 
 #define XHC_REG_BIT_IS_SET(Xhc, Offset, Bit) \
           (XHC_BIT_IS_SET(XhcReadOpReg ((Xhc), (Offset)), (Bit)))
 
-#define XHCI_IS_DATAIN(EndpointAddr)   XHC_BIT_IS_SET((EndpointAddr), 0x80)
+#define XHCI_IS_DATAIN(EndpointAddr)  XHC_BIT_IS_SET((EndpointAddr), 0x80)
 
-#define XHCI_INSTANCE_SIG              SIGNATURE_32 ('x', 'h', 'c', 'i')
-#define XHC_FROM_THIS(a)               CR(a, USB_XHCI_INSTANCE, Usb2Hc, XHCI_INSTANCE_SIG)
+#define XHCI_INSTANCE_SIG  SIGNATURE_32 ('x', 'h', 'c', 'i')
+#define XHC_FROM_THIS(a)  CR(a, USB_XHCI_INSTANCE, Usb2Hc, XHCI_INSTANCE_SIG)
 
 #define USB_DESC_TYPE_HUB              0x29
 #define USB_DESC_TYPE_HUB_SUPER_SPEED  0x2a
@@ -113,19 +113,19 @@ typedef struct _USB_DEV_CONTEXT      USB_DEV_CONTEXT;
 //
 #pragma pack(1)
 typedef struct {
-  UINT8                     ProgInterface;
-  UINT8                     SubClassCode;
-  UINT8                     BaseCode;
+  UINT8    ProgInterface;
+  UINT8    SubClassCode;
+  UINT8    BaseCode;
 } USB_CLASSC;
 
 typedef struct {
-  UINT8                     Length;
-  UINT8                     DescType;
-  UINT8                     NumPorts;
-  UINT16                    HubCharacter;
-  UINT8                     PwrOn2PwrGood;
-  UINT8                     HubContrCurrent;
-  UINT8                     Filler[16];
+  UINT8     Length;
+  UINT8     DescType;
+  UINT8     NumPorts;
+  UINT16    HubCharacter;
+  UINT8     PwrOn2PwrGood;
+  UINT8     HubContrCurrent;
+  UINT8     Filler[16];
 } EFI_USB_HUB_DESCRIPTOR;
 #pragma pack()
 
@@ -133,23 +133,23 @@ struct _USB_DEV_CONTEXT {
   //
   // Whether this entry in UsbDevContext array is used or not.
   //
-  BOOLEAN                   Enabled;
+  BOOLEAN          Enabled;
   //
   // The slot id assigned to the new device through XHCI's Enable_Slot cmd.
   //
-  UINT8                     SlotId;
+  UINT8            SlotId;
   //
   // The route string presented an attached usb device.
   //
-  USB_DEV_ROUTE             RouteString;
+  USB_DEV_ROUTE    RouteString;
   //
   // The route string of parent device if it exists. Otherwise it's zero.
   //
-  USB_DEV_ROUTE             ParentRouteString;
+  USB_DEV_ROUTE    ParentRouteString;
   //
   // The actual device address assigned by XHCI through Address_Device command.
   //
-  UINT8                     XhciDevAddr;
+  UINT8            XhciDevAddr;
   //
   // The requested device address from UsbBus driver through Set_Address standard usb request.
   // As XHCI spec replaces this request with Address_Device command, we have to record the
@@ -158,23 +158,23 @@ struct _USB_DEV_CONTEXT {
   // through EFI_USB2_HC_PROTOCOL. Xhci driver would be responsible for translating it to actual
   // device address and access the actual device.
   //
-  UINT8                     BusDevAddr;
+  UINT8                        BusDevAddr;
   //
   // The pointer to the input device context.
   //
-  VOID                      *InputContext;
+  VOID                         *InputContext;
   //
   // The pointer to the output device context.
   //
-  VOID                      *OutputContext;
+  VOID                         *OutputContext;
   //
   // The transfer queue for every endpoint.
   //
-  VOID                      *EndpointTransferRing[31];
+  VOID                         *EndpointTransferRing[31];
   //
   // The device descriptor which is stored to support XHCI's Evaluate_Context cmd.
   //
-  EFI_USB_DEVICE_DESCRIPTOR DevDesc;
+  EFI_USB_DEVICE_DESCRIPTOR    DevDesc;
   //
   // As a usb device may include multiple configuration descriptors, we dynamically allocate an array
   // to store them.
@@ -182,81 +182,80 @@ struct _USB_DEV_CONTEXT {
   // such as Interface descriptor, Endpoint descriptor, and so on.
   // These information is used to support XHCI's Config_Endpoint cmd.
   //
-  EFI_USB_CONFIG_DESCRIPTOR **ConfDesc;
+  EFI_USB_CONFIG_DESCRIPTOR    **ConfDesc;
   //
   // A device has an active Configuration.
   //
-  UINT8                     ActiveConfiguration;
+  UINT8                        ActiveConfiguration;
   //
   // Every interface has an active AlternateSetting.
   //
-  UINT8                     *ActiveAlternateSetting;
+  UINT8                        *ActiveAlternateSetting;
 };
 
 struct _USB_XHCI_INSTANCE {
-  UINT32                    Signature;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
-  UINT64                    OriginalPciAttributes;
-  USBHC_MEM_POOL            *MemPool;
+  UINT32                      Signature;
+  EFI_PCI_IO_PROTOCOL         *PciIo;
+  UINT64                      OriginalPciAttributes;
+  USBHC_MEM_POOL              *MemPool;
 
-  EFI_USB2_HC_PROTOCOL      Usb2Hc;
+  EFI_USB2_HC_PROTOCOL        Usb2Hc;
 
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
 
   //
   // ExitBootServicesEvent is used to set OS semaphore and
   // stop the XHC DMA operation after exit boot service.
   //
-  EFI_EVENT                 ExitBootServiceEvent;
-  EFI_EVENT                 PollTimer;
-  LIST_ENTRY                AsyncIntTransfers;
+  EFI_EVENT                   ExitBootServiceEvent;
+  EFI_EVENT                   PollTimer;
+  LIST_ENTRY                  AsyncIntTransfers;
 
-  UINT8                     CapLength;    ///< Capability Register Length
-  XHC_HCSPARAMS1            HcSParams1;   ///< Structural Parameters 1
-  XHC_HCSPARAMS2            HcSParams2;   ///< Structural Parameters 2
-  XHC_HCCPARAMS             HcCParams;    ///< Capability Parameters
-  UINT32                    DBOff;        ///< Doorbell Offset
-  UINT32                    RTSOff;       ///< Runtime Register Space Offset
-  UINT16                    MaxInterrupt;
-  UINT32                    PageSize;
-  UINT64                    *ScratchBuf;
-  VOID                      *ScratchMap;
-  UINT32                    MaxScratchpadBufs;
-  UINT64                    *ScratchEntry;
-  UINTN                     *ScratchEntryMap;
-  UINT32                    ExtCapRegBase;
-  UINT32                    UsbLegSupOffset;
-  UINT32                    DebugCapSupOffset;
-  UINT64                    *DCBAA;
-  VOID                      *DCBAAMap;
-  UINT32                    MaxSlotsEn;
-  URB                       *PendingUrb;
+  UINT8                       CapLength;  ///< Capability Register Length
+  XHC_HCSPARAMS1              HcSParams1; ///< Structural Parameters 1
+  XHC_HCSPARAMS2              HcSParams2; ///< Structural Parameters 2
+  XHC_HCCPARAMS               HcCParams;  ///< Capability Parameters
+  UINT32                      DBOff;      ///< Doorbell Offset
+  UINT32                      RTSOff;     ///< Runtime Register Space Offset
+  UINT16                      MaxInterrupt;
+  UINT32                      PageSize;
+  UINT64                      *ScratchBuf;
+  VOID                        *ScratchMap;
+  UINT32                      MaxScratchpadBufs;
+  UINT64                      *ScratchEntry;
+  UINTN                       *ScratchEntryMap;
+  UINT32                      ExtCapRegBase;
+  UINT32                      UsbLegSupOffset;
+  UINT32                      DebugCapSupOffset;
+  UINT64                      *DCBAA;
+  VOID                        *DCBAAMap;
+  UINT32                      MaxSlotsEn;
+  URB                         *PendingUrb;
   //
   // Cmd Transfer Ring
   //
-  TRANSFER_RING             CmdRing;
+  TRANSFER_RING               CmdRing;
   //
   // EventRing
   //
-  EVENT_RING                EventRing;
+  EVENT_RING                  EventRing;
   //
   // Misc
   //
-  EFI_UNICODE_STRING_TABLE  *ControllerNameTable;
+  EFI_UNICODE_STRING_TABLE    *ControllerNameTable;
 
   //
   // Store device contexts managed by XHCI instance
   // The array supports up to 255 devices, entry 0 is reserved and should not be used.
   //
-  USB_DEV_CONTEXT           UsbDevContext[256];
+  USB_DEV_CONTEXT             UsbDevContext[256];
 
-  BOOLEAN                   Support64BitDma; // Whether 64 bit DMA may be used with this device
+  BOOLEAN                     Support64BitDma; // Whether 64 bit DMA may be used with this device
 };
 
-
-extern EFI_DRIVER_BINDING_PROTOCOL      gXhciDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL      gXhciComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL     gXhciComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gXhciDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gXhciComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gXhciComponentName2;
 
 /**
   Test to see if this driver supports ControllerHandle. Any
@@ -274,9 +273,9 @@ extern EFI_COMPONENT_NAME2_PROTOCOL     gXhciComponentName2;
 EFI_STATUS
 EFIAPI
 XhcDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -295,9 +294,9 @@ XhcDriverBindingSupported (
 EFI_STATUS
 EFIAPI
 XhcDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -316,10 +315,10 @@ XhcDriverBindingStart (
 EFI_STATUS
 EFIAPI
 XhcDriverBindingStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  Controller,
-  IN UINTN                       NumberOfChildren,
-  IN EFI_HANDLE                  *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   );
 
 /**

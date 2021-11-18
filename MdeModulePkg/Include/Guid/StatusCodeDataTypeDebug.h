@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// The maximum size of an EFI_DEBUG_INFO structure.
 ///
-#define EFI_STATUS_CODE_DATA_MAX_SIZE 200
+#define EFI_STATUS_CODE_DATA_MAX_SIZE  200
 
 ///
 /// This structure contains the ErrorLevel passed into the DEBUG() macro, followed
@@ -35,9 +35,9 @@ typedef struct {
   ///
   /// The debug error level passed into a DEBUG() macro.
   ///
-  UINT32  ErrorLevel;
+  UINT32    ErrorLevel;
 } EFI_DEBUG_INFO;
 
-extern EFI_GUID gEfiStatusCodeDataTypeDebugGuid;
+extern EFI_GUID  gEfiStatusCodeDataTypeDebugGuid;
 
 #endif // _STATUS_CODE_DATA_TYPE_DEBUG_H_

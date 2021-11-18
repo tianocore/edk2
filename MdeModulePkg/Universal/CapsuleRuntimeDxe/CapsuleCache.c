@@ -24,10 +24,10 @@
 **/
 VOID
 CapsuleCacheWriteBack (
-  IN  EFI_PHYSICAL_ADDRESS    ScatterGatherList
+  IN  EFI_PHYSICAL_ADDRESS  ScatterGatherList
   )
 {
-  EFI_CAPSULE_BLOCK_DESCRIPTOR    *Desc;
+  EFI_CAPSULE_BLOCK_DESCRIPTOR  *Desc;
 
   if (!EfiAtRuntime ()) {
     Desc = (EFI_CAPSULE_BLOCK_DESCRIPTOR *)(UINTN)ScatterGatherList;
@@ -54,4 +54,3 @@ CapsuleCacheWriteBack (
       );
   }
 }
-

@@ -13,38 +13,37 @@ Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef _VIRTUAL_MEMORY_H_
 #define _VIRTUAL_MEMORY_H_
 
-
-#define SYS_CODE64_SEL 0x38
-
+#define SYS_CODE64_SEL  0x38
 
 #pragma pack(1)
 
 typedef union {
   struct {
-    UINT32  LimitLow    : 16;
-    UINT32  BaseLow     : 16;
-    UINT32  BaseMid     : 8;
-    UINT32  Type        : 4;
-    UINT32  System      : 1;
-    UINT32  Dpl         : 2;
-    UINT32  Present     : 1;
-    UINT32  LimitHigh   : 4;
-    UINT32  Software    : 1;
-    UINT32  Reserved    : 1;
-    UINT32  DefaultSize : 1;
-    UINT32  Granularity : 1;
-    UINT32  BaseHigh    : 8;
+    UINT32    LimitLow    : 16;
+    UINT32    BaseLow     : 16;
+    UINT32    BaseMid     : 8;
+    UINT32    Type        : 4;
+    UINT32    System      : 1;
+    UINT32    Dpl         : 2;
+    UINT32    Present     : 1;
+    UINT32    LimitHigh   : 4;
+    UINT32    Software    : 1;
+    UINT32    Reserved    : 1;
+    UINT32    DefaultSize : 1;
+    UINT32    Granularity : 1;
+    UINT32    BaseHigh    : 8;
   } Bits;
-  UINT64  Uint64;
+  UINT64    Uint64;
 } IA32_GDT;
 
 typedef struct {
-  IA32_IDT_GATE_DESCRIPTOR  Ia32IdtEntry;
-  UINT32                    Offset32To63;
-  UINT32                    Reserved;
+  IA32_IDT_GATE_DESCRIPTOR    Ia32IdtEntry;
+  UINT32                      Offset32To63;
+  UINT32                      Reserved;
 } X64_IDT_GATE_DESCRIPTOR;
 
 //
@@ -54,18 +53,18 @@ typedef struct {
 
 typedef union {
   struct {
-    UINT64  Present:1;                // 0 = Not present in memory, 1 = Present in memory
-    UINT64  ReadWrite:1;              // 0 = Read-Only, 1= Read/Write
-    UINT64  UserSupervisor:1;         // 0 = Supervisor, 1=User
-    UINT64  WriteThrough:1;           // 0 = Write-Back caching, 1=Write-Through caching
-    UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
-    UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
-    UINT64  Reserved:1;               // Reserved
-    UINT64  MustBeZero:2;             // Must Be Zero
-    UINT64  Available:3;              // Available for use by system software
-    UINT64  PageTableBaseAddress:40;  // Page Table Base Address
-    UINT64  AvabilableHigh:11;        // Available for use by system software
-    UINT64  Nx:1;                     // No Execute bit
+    UINT64    Present              : 1;  // 0 = Not present in memory, 1 = Present in memory
+    UINT64    ReadWrite            : 1;  // 0 = Read-Only, 1= Read/Write
+    UINT64    UserSupervisor       : 1;  // 0 = Supervisor, 1=User
+    UINT64    WriteThrough         : 1;  // 0 = Write-Back caching, 1=Write-Through caching
+    UINT64    CacheDisabled        : 1;  // 0 = Cached, 1=Non-Cached
+    UINT64    Accessed             : 1;  // 0 = Not accessed, 1 = Accessed (set by CPU)
+    UINT64    Reserved             : 1;  // Reserved
+    UINT64    MustBeZero           : 2;  // Must Be Zero
+    UINT64    Available            : 3;  // Available for use by system software
+    UINT64    PageTableBaseAddress : 40; // Page Table Base Address
+    UINT64    AvabilableHigh       : 11; // Available for use by system software
+    UINT64    Nx                   : 1;  // No Execute bit
   } Bits;
   UINT64    Uint64;
 } PAGE_MAP_AND_DIRECTORY_POINTER;
@@ -75,19 +74,19 @@ typedef union {
 //
 typedef union {
   struct {
-    UINT64  Present:1;                // 0 = Not present in memory, 1 = Present in memory
-    UINT64  ReadWrite:1;              // 0 = Read-Only, 1= Read/Write
-    UINT64  UserSupervisor:1;         // 0 = Supervisor, 1=User
-    UINT64  WriteThrough:1;           // 0 = Write-Back caching, 1=Write-Through caching
-    UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
-    UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
-    UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  PAT:1;                    //
-    UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
-    UINT64  Available:3;              // Available for use by system software
-    UINT64  PageTableBaseAddress:40;  // Page Table Base Address
-    UINT64  AvabilableHigh:11;        // Available for use by system software
-    UINT64  Nx:1;                     // 0 = Execute Code, 1 = No Code Execution
+    UINT64    Present              : 1;  // 0 = Not present in memory, 1 = Present in memory
+    UINT64    ReadWrite            : 1;  // 0 = Read-Only, 1= Read/Write
+    UINT64    UserSupervisor       : 1;  // 0 = Supervisor, 1=User
+    UINT64    WriteThrough         : 1;  // 0 = Write-Back caching, 1=Write-Through caching
+    UINT64    CacheDisabled        : 1;  // 0 = Cached, 1=Non-Cached
+    UINT64    Accessed             : 1;  // 0 = Not accessed, 1 = Accessed (set by CPU)
+    UINT64    Dirty                : 1;  // 0 = Not Dirty, 1 = written by processor on access to page
+    UINT64    PAT                  : 1;  //
+    UINT64    Global               : 1;  // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
+    UINT64    Available            : 3;  // Available for use by system software
+    UINT64    PageTableBaseAddress : 40; // Page Table Base Address
+    UINT64    AvabilableHigh       : 11; // Available for use by system software
+    UINT64    Nx                   : 1;  // 0 = Execute Code, 1 = No Code Execution
   } Bits;
   UINT64    Uint64;
 } PAGE_TABLE_4K_ENTRY;
@@ -97,21 +96,21 @@ typedef union {
 //
 typedef union {
   struct {
-    UINT64  Present:1;                // 0 = Not present in memory, 1 = Present in memory
-    UINT64  ReadWrite:1;              // 0 = Read-Only, 1= Read/Write
-    UINT64  UserSupervisor:1;         // 0 = Supervisor, 1=User
-    UINT64  WriteThrough:1;           // 0 = Write-Back caching, 1=Write-Through caching
-    UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
-    UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
-    UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  MustBe1:1;                // Must be 1
-    UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
-    UINT64  Available:3;              // Available for use by system software
-    UINT64  PAT:1;                    //
-    UINT64  MustBeZero:8;             // Must be zero;
-    UINT64  PageTableBaseAddress:31;  // Page Table Base Address
-    UINT64  AvabilableHigh:11;        // Available for use by system software
-    UINT64  Nx:1;                     // 0 = Execute Code, 1 = No Code Execution
+    UINT64    Present              : 1;  // 0 = Not present in memory, 1 = Present in memory
+    UINT64    ReadWrite            : 1;  // 0 = Read-Only, 1= Read/Write
+    UINT64    UserSupervisor       : 1;  // 0 = Supervisor, 1=User
+    UINT64    WriteThrough         : 1;  // 0 = Write-Back caching, 1=Write-Through caching
+    UINT64    CacheDisabled        : 1;  // 0 = Cached, 1=Non-Cached
+    UINT64    Accessed             : 1;  // 0 = Not accessed, 1 = Accessed (set by CPU)
+    UINT64    Dirty                : 1;  // 0 = Not Dirty, 1 = written by processor on access to page
+    UINT64    MustBe1              : 1;  // Must be 1
+    UINT64    Global               : 1;  // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
+    UINT64    Available            : 3;  // Available for use by system software
+    UINT64    PAT                  : 1;  //
+    UINT64    MustBeZero           : 8;  // Must be zero;
+    UINT64    PageTableBaseAddress : 31; // Page Table Base Address
+    UINT64    AvabilableHigh       : 11; // Available for use by system software
+    UINT64    Nx                   : 1;  // 0 = Execute Code, 1 = No Code Execution
   } Bits;
   UINT64    Uint64;
 } PAGE_TABLE_ENTRY;
@@ -121,45 +120,45 @@ typedef union {
 //
 typedef union {
   struct {
-    UINT64  Present:1;                // 0 = Not present in memory, 1 = Present in memory
-    UINT64  ReadWrite:1;              // 0 = Read-Only, 1= Read/Write
-    UINT64  UserSupervisor:1;         // 0 = Supervisor, 1=User
-    UINT64  WriteThrough:1;           // 0 = Write-Back caching, 1=Write-Through caching
-    UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
-    UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
-    UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  MustBe1:1;                // Must be 1
-    UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
-    UINT64  Available:3;              // Available for use by system software
-    UINT64  PAT:1;                    //
-    UINT64  MustBeZero:17;            // Must be zero;
-    UINT64  PageTableBaseAddress:22;  // Page Table Base Address
-    UINT64  AvabilableHigh:11;        // Available for use by system software
-    UINT64  Nx:1;                     // 0 = Execute Code, 1 = No Code Execution
+    UINT64    Present              : 1;  // 0 = Not present in memory, 1 = Present in memory
+    UINT64    ReadWrite            : 1;  // 0 = Read-Only, 1= Read/Write
+    UINT64    UserSupervisor       : 1;  // 0 = Supervisor, 1=User
+    UINT64    WriteThrough         : 1;  // 0 = Write-Back caching, 1=Write-Through caching
+    UINT64    CacheDisabled        : 1;  // 0 = Cached, 1=Non-Cached
+    UINT64    Accessed             : 1;  // 0 = Not accessed, 1 = Accessed (set by CPU)
+    UINT64    Dirty                : 1;  // 0 = Not Dirty, 1 = written by processor on access to page
+    UINT64    MustBe1              : 1;  // Must be 1
+    UINT64    Global               : 1;  // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
+    UINT64    Available            : 3;  // Available for use by system software
+    UINT64    PAT                  : 1;  //
+    UINT64    MustBeZero           : 17; // Must be zero;
+    UINT64    PageTableBaseAddress : 22; // Page Table Base Address
+    UINT64    AvabilableHigh       : 11; // Available for use by system software
+    UINT64    Nx                   : 1;  // 0 = Execute Code, 1 = No Code Execution
   } Bits;
   UINT64    Uint64;
 } PAGE_TABLE_1G_ENTRY;
 
 #pragma pack()
 
-#define CR0_WP                      BIT16
+#define CR0_WP  BIT16
 
-#define IA32_PG_P                   BIT0
-#define IA32_PG_RW                  BIT1
-#define IA32_PG_PS                  BIT7
+#define IA32_PG_P   BIT0
+#define IA32_PG_RW  BIT1
+#define IA32_PG_PS  BIT7
 
-#define PAGING_PAE_INDEX_MASK       0x1FF
+#define PAGING_PAE_INDEX_MASK  0x1FF
 
-#define PAGING_4K_ADDRESS_MASK_64   0x000FFFFFFFFFF000ull
-#define PAGING_2M_ADDRESS_MASK_64   0x000FFFFFFFE00000ull
-#define PAGING_1G_ADDRESS_MASK_64   0x000FFFFFC0000000ull
+#define PAGING_4K_ADDRESS_MASK_64  0x000FFFFFFFFFF000ull
+#define PAGING_2M_ADDRESS_MASK_64  0x000FFFFFFFE00000ull
+#define PAGING_1G_ADDRESS_MASK_64  0x000FFFFFC0000000ull
 
-#define PAGING_L1_ADDRESS_SHIFT     12
-#define PAGING_L2_ADDRESS_SHIFT     21
-#define PAGING_L3_ADDRESS_SHIFT     30
-#define PAGING_L4_ADDRESS_SHIFT     39
+#define PAGING_L1_ADDRESS_SHIFT  12
+#define PAGING_L2_ADDRESS_SHIFT  21
+#define PAGING_L3_ADDRESS_SHIFT  30
+#define PAGING_L4_ADDRESS_SHIFT  39
 
-#define PAGING_PML4E_NUMBER         4
+#define PAGING_PML4E_NUMBER  4
 
 #define PAGE_TABLE_POOL_ALIGNMENT   BASE_2MB
 #define PAGE_TABLE_POOL_UNIT_SIZE   SIZE_2MB
@@ -168,9 +167,9 @@ typedef union {
   (~(EFI_PHYSICAL_ADDRESS)(PAGE_TABLE_POOL_ALIGNMENT - 1))
 
 typedef struct {
-  VOID            *NextPool;
-  UINTN           Offset;
-  UINTN           FreePages;
+  VOID     *NextPool;
+  UINTN    Offset;
+  UINTN    FreePages;
 } PAGE_TABLE_POOL;
 
 /**
@@ -207,12 +206,12 @@ EnableExecuteDisableBit (
 **/
 VOID
 Split2MPageTo4K (
-  IN EFI_PHYSICAL_ADDRESS               PhysicalAddress,
-  IN OUT UINT64                         *PageEntry2M,
-  IN EFI_PHYSICAL_ADDRESS               StackBase,
-  IN UINTN                              StackSize,
-  IN EFI_PHYSICAL_ADDRESS               GhcbBase,
-  IN UINTN                              GhcbSize
+  IN EFI_PHYSICAL_ADDRESS  PhysicalAddress,
+  IN OUT UINT64            *PageEntry2M,
+  IN EFI_PHYSICAL_ADDRESS  StackBase,
+  IN UINTN                 StackSize,
+  IN EFI_PHYSICAL_ADDRESS  GhcbBase,
+  IN UINTN                 GhcbSize
   );
 
 /**
@@ -229,12 +228,11 @@ Split2MPageTo4K (
 **/
 UINTN
 CreateIdentityMappingPageTables (
-  IN EFI_PHYSICAL_ADDRESS   StackBase,
-  IN UINTN                  StackSize,
-  IN EFI_PHYSICAL_ADDRESS   GhcbBase,
-  IN UINTN                  GhcbkSize
+  IN EFI_PHYSICAL_ADDRESS  StackBase,
+  IN UINTN                 StackSize,
+  IN EFI_PHYSICAL_ADDRESS  GhcbBase,
+  IN UINTN                 GhcbkSize
   );
-
 
 /**
 
@@ -247,10 +245,9 @@ CreateIdentityMappingPageTables (
 VOID
 EFIAPI
 AsmVectorFixup (
-  VOID    *VectorBase,
-  UINT8   VectorNum
+  VOID   *VectorBase,
+  UINT8  VectorNum
   );
-
 
 /**
 
@@ -278,7 +275,7 @@ AsmGetVectorTemplatInfo (
 **/
 VOID
 ClearFirst4KPage (
-  IN  VOID *HobStart
+  IN  VOID  *HobStart
   );
 
 /**
@@ -301,8 +298,8 @@ IsNullDetectionEnabled (
 **/
 VOID
 EnablePageTableProtection (
-  IN  UINTN     PageTableBase,
-  IN  BOOLEAN   Level4Paging
+  IN  UINTN    PageTableBase,
+  IN  BOOLEAN  Level4Paging
   );
 
 /**
@@ -324,7 +321,7 @@ EnablePageTableProtection (
 **/
 VOID *
 AllocatePageTableMemory (
-  IN UINTN           Pages
+  IN UINTN  Pages
   );
 
 #endif
