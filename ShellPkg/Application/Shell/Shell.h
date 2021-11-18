@@ -51,75 +51,75 @@
 #include "ConsoleWrappers.h"
 #include "FileHandleWrappers.h"
 
-extern CONST CHAR16 mNoNestingEnvVarName[];
-extern CONST CHAR16 mNoNestingTrue[];
-extern CONST CHAR16 mNoNestingFalse[];
+extern CONST CHAR16  mNoNestingEnvVarName[];
+extern CONST CHAR16  mNoNestingTrue[];
+extern CONST CHAR16  mNoNestingFalse[];
 
 typedef struct {
-  LIST_ENTRY        Link;           ///< Standard linked list handler.
-  SHELL_FILE_HANDLE SplitStdOut;    ///< ConsoleOut for use in the split.
-  SHELL_FILE_HANDLE SplitStdIn;     ///< ConsoleIn for use in the split.
+  LIST_ENTRY           Link;        ///< Standard linked list handler.
+  SHELL_FILE_HANDLE    SplitStdOut; ///< ConsoleOut for use in the split.
+  SHELL_FILE_HANDLE    SplitStdIn;  ///< ConsoleIn for use in the split.
 } SPLIT_LIST;
 
 typedef struct {
-  UINT32  Startup:1;      ///< Was "-startup"       found on command line.
-  UINT32  NoStartup:1;    ///< Was "-nostartup"     found on command line.
-  UINT32  NoConsoleOut:1; ///< Was "-noconsoleout"  found on command line.
-  UINT32  NoConsoleIn:1;  ///< Was "-noconsolein"   found on command line.
-  UINT32  NoInterrupt:1;  ///< Was "-nointerrupt"   found on command line.
-  UINT32  NoMap:1;        ///< Was "-nomap"         found on command line.
-  UINT32  NoVersion:1;    ///< Was "-noversion"     found on command line.
-  UINT32  Delay:1;        ///< Was "-delay[:n]      found on command line
-  UINT32  Exit:1;         ///< Was "-_exit"         found on command line
-  UINT32  NoNest:1;       ///< Was "-nonest"        found on command line
-  UINT32  Reserved:7;     ///< Extra bits
+  UINT32    Startup      : 1; ///< Was "-startup"       found on command line.
+  UINT32    NoStartup    : 1; ///< Was "-nostartup"     found on command line.
+  UINT32    NoConsoleOut : 1; ///< Was "-noconsoleout"  found on command line.
+  UINT32    NoConsoleIn  : 1; ///< Was "-noconsolein"   found on command line.
+  UINT32    NoInterrupt  : 1; ///< Was "-nointerrupt"   found on command line.
+  UINT32    NoMap        : 1; ///< Was "-nomap"         found on command line.
+  UINT32    NoVersion    : 1; ///< Was "-noversion"     found on command line.
+  UINT32    Delay        : 1; ///< Was "-delay[:n]      found on command line
+  UINT32    Exit         : 1; ///< Was "-_exit"         found on command line
+  UINT32    NoNest       : 1; ///< Was "-nonest"        found on command line
+  UINT32    Reserved     : 7; ///< Extra bits
 } SHELL_BITS;
 
 typedef union {
-  SHELL_BITS  Bits;
-  UINT16      AllBits;
+  SHELL_BITS    Bits;
+  UINT16        AllBits;
 } SHELL_BIT_UNION;
 
 typedef struct {
-  SHELL_BIT_UNION BitUnion;
-  UINTN           Delay;          ///< Seconds of delay default:5.
-  CHAR16          *FileName;      ///< Filename to run upon successful initialization.
-  CHAR16          *FileOptions;   ///< Options to pass to FileName.
+  SHELL_BIT_UNION    BitUnion;
+  UINTN              Delay;        ///< Seconds of delay default:5.
+  CHAR16             *FileName;    ///< Filename to run upon successful initialization.
+  CHAR16             *FileOptions; ///< Options to pass to FileName.
 } SHELL_INIT_SETTINGS;
 
 typedef struct {
-  BUFFER_LIST                 CommandHistory;
-  UINTN                       VisibleRowNumber;
-  UINTN                       OriginalVisibleRowNumber;
-  BOOLEAN                     InsertMode;           ///< Is the current typing mode insert (FALSE = overwrite).
+  BUFFER_LIST    CommandHistory;
+  UINTN          VisibleRowNumber;
+  UINTN          OriginalVisibleRowNumber;
+  BOOLEAN        InsertMode;                        ///< Is the current typing mode insert (FALSE = overwrite).
 } SHELL_VIEWING_SETTINGS;
 
 typedef struct {
-  EFI_SHELL_PARAMETERS_PROTOCOL *NewShellParametersProtocol;
-  EFI_SHELL_PROTOCOL            *NewEfiShellProtocol;
-  BOOLEAN                       PageBreakEnabled;
-  BOOLEAN                       RootShellInstance;
-  SHELL_INIT_SETTINGS           ShellInitSettings;
-  BUFFER_LIST                   BufferToFreeList;     ///< List of buffers that were returned to the user to free.
-  SHELL_VIEWING_SETTINGS        ViewingSettings;
-  EFI_HII_HANDLE                HiiHandle;            ///< Handle from HiiLib.
-  UINTN                         LogScreenCount;       ///< How many screens of log information to save.
-  EFI_EVENT                     UserBreakTimer;       ///< Timer event for polling for CTRL-C.
-  EFI_DEVICE_PATH_PROTOCOL      *ImageDevPath;        ///< DevicePath for ourselves.
-  EFI_DEVICE_PATH_PROTOCOL      *FileDevPath;         ///< DevicePath for ourselves.
-  CONSOLE_LOGGER_PRIVATE_DATA   *ConsoleInfo;         ///< Pointer for ConsoleInformation.
-  EFI_SHELL_PARAMETERS_PROTOCOL *OldShellParameters;  ///< old shell parameters to reinstall upon exiting.
-  SHELL_PROTOCOL_HANDLE_LIST    OldShellList;         ///< List of other instances to reinstall when closing.
-  SPLIT_LIST                    SplitList;            ///< List of Splits in FILO stack.
-  VOID                          *CtrlCNotifyHandle1;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  VOID                          *CtrlCNotifyHandle2;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  VOID                          *CtrlCNotifyHandle3;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  VOID                          *CtrlCNotifyHandle4;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  VOID                          *CtrlSNotifyHandle1;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  VOID                          *CtrlSNotifyHandle2;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  VOID                          *CtrlSNotifyHandle3;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  VOID                          *CtrlSNotifyHandle4;  ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
-  BOOLEAN                       HaltOutput;           ///< TRUE to start a CTRL-S halt.
+  EFI_SHELL_PARAMETERS_PROTOCOL    *NewShellParametersProtocol;
+  EFI_SHELL_PROTOCOL               *NewEfiShellProtocol;
+  BOOLEAN                          PageBreakEnabled;
+  BOOLEAN                          RootShellInstance;
+  SHELL_INIT_SETTINGS              ShellInitSettings;
+  BUFFER_LIST                      BufferToFreeList;  ///< List of buffers that were returned to the user to free.
+  SHELL_VIEWING_SETTINGS           ViewingSettings;
+  EFI_HII_HANDLE                   HiiHandle;           ///< Handle from HiiLib.
+  UINTN                            LogScreenCount;      ///< How many screens of log information to save.
+  EFI_EVENT                        UserBreakTimer;      ///< Timer event for polling for CTRL-C.
+  EFI_DEVICE_PATH_PROTOCOL         *ImageDevPath;       ///< DevicePath for ourselves.
+  EFI_DEVICE_PATH_PROTOCOL         *FileDevPath;        ///< DevicePath for ourselves.
+  CONSOLE_LOGGER_PRIVATE_DATA      *ConsoleInfo;        ///< Pointer for ConsoleInformation.
+  EFI_SHELL_PARAMETERS_PROTOCOL    *OldShellParameters; ///< old shell parameters to reinstall upon exiting.
+  SHELL_PROTOCOL_HANDLE_LIST       OldShellList;        ///< List of other instances to reinstall when closing.
+  SPLIT_LIST                       SplitList;           ///< List of Splits in FILO stack.
+  VOID                             *CtrlCNotifyHandle1; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                             *CtrlCNotifyHandle2; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                             *CtrlCNotifyHandle3; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                             *CtrlCNotifyHandle4; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                             *CtrlSNotifyHandle1; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                             *CtrlSNotifyHandle2; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                             *CtrlSNotifyHandle3; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                             *CtrlSNotifyHandle4; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  BOOLEAN                          HaltOutput;          ///< TRUE to start a CTRL-S halt.
 } SHELL_INFO;
 
 #pragma pack(1)
@@ -127,12 +127,12 @@ typedef struct {
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH             VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL       End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } SHELL_MAN_HII_VENDOR_DEVICE_PATH;
 #pragma pack()
 
-extern SHELL_INFO ShellInfoObject;
+extern SHELL_INFO  ShellInfoObject;
 
 /**
   Converts the command line to its post-processed form.  this replaces variables and alias' per UEFI Shell spec.
@@ -144,8 +144,8 @@ extern SHELL_INFO ShellInfoObject;
   @return                       some other error occurred
 **/
 EFI_STATUS
-ProcessCommandLineToFinal(
-  IN OUT CHAR16 **CmdLine
+ProcessCommandLineToFinal (
+  IN OUT CHAR16  **CmdLine
   );
 
 /**
@@ -154,8 +154,8 @@ ProcessCommandLineToFinal(
   @param[in] ErrorCode      the error code to put into lasterror
 **/
 EFI_STATUS
-SetLastError(
-  IN CONST SHELL_STATUS   ErrorCode
+SetLastError (
+  IN CONST SHELL_STATUS  ErrorCode
   );
 
 /**
@@ -164,7 +164,7 @@ SetLastError(
   @retval EFI_SUCCESS           all init commands were run successfully.
 **/
 EFI_STATUS
-SetBuiltInAlias(
+SetBuiltInAlias (
   VOID
   );
 
@@ -184,8 +184,8 @@ SetBuiltInAlias(
 **/
 EFI_STATUS
 GetDevicePathsForImageAndFile (
-  IN OUT EFI_DEVICE_PATH_PROTOCOL **DevPath,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL **FilePath
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  **DevPath,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  **FilePath
   );
 
 /**
@@ -216,7 +216,7 @@ GetDevicePathsForImageAndFile (
   @retval EFI_SUCCESS           the variable is initialized.
 **/
 EFI_STATUS
-ProcessCommandLine(
+ProcessCommandLine (
   VOID
   );
 
@@ -231,9 +231,9 @@ ProcessCommandLine(
   @retval EFI_SUCCESS           The variable is initialized.
 **/
 EFI_STATUS
-DoStartupScript(
-  IN EFI_DEVICE_PATH_PROTOCOL *ImagePath,
-  IN EFI_DEVICE_PATH_PROTOCOL *FilePath
+DoStartupScript (
+  IN EFI_DEVICE_PATH_PROTOCOL  *ImagePath,
+  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
 
 /**
@@ -255,9 +255,9 @@ DoShellPrompt (
 
   @param Buffer   Something to pass to FreePool when the shell is exiting.
 **/
-VOID*
-AddBufferToFreeList(
-  VOID *Buffer
+VOID *
+AddBufferToFreeList (
+  VOID  *Buffer
   );
 
 /**
@@ -266,8 +266,8 @@ AddBufferToFreeList(
   @param Buffer[in]     The line buffer to add.
 **/
 VOID
-AddLineToCommandHistory(
-  IN CONST CHAR16 *Buffer
+AddLineToCommandHistory (
+  IN CONST CHAR16  *Buffer
   );
 
 /**
@@ -281,8 +281,8 @@ AddLineToCommandHistory(
   @retval EFI_ABORTED     the command's operation was aborted
 **/
 EFI_STATUS
-RunCommand(
-  IN CONST CHAR16   *CmdLine
+RunCommand (
+  IN CONST CHAR16  *CmdLine
   );
 
 /**
@@ -298,11 +298,10 @@ RunCommand(
   @retval EFI_ABORTED     The command's operation was aborted.
 **/
 EFI_STATUS
-RunShellCommand(
-  IN CONST CHAR16   *CmdLine,
-  OUT EFI_STATUS    *CommandStatus
+RunShellCommand (
+  IN CONST CHAR16  *CmdLine,
+  OUT EFI_STATUS   *CommandStatus
   );
-
 
 /**
   Function to process a NSH script file via SHELL_FILE_HANDLE.
@@ -346,11 +345,11 @@ RunScriptFile (
   @return the location of the first character in the string
   @retval CHAR_NULL no instance of any character in CharacterList was found in String
 **/
-CONST CHAR16*
-FindFirstCharacter(
-  IN CONST CHAR16 *String,
-  IN CONST CHAR16 *CharacterList,
-  IN CONST CHAR16 EscapeCharacter
+CONST CHAR16 *
+FindFirstCharacter (
+  IN CONST CHAR16  *String,
+  IN CONST CHAR16  *CharacterList,
+  IN CONST CHAR16  EscapeCharacter
   );
 
 /**
@@ -359,8 +358,8 @@ FindFirstCharacter(
   @param[in] String pointer to the string to trim them off.
 **/
 EFI_STATUS
-TrimSpaces(
-  IN CHAR16 **String
+TrimSpaces (
+  IN CHAR16  **String
   );
 
 /**
@@ -371,7 +370,7 @@ TrimSpaces(
 **/
 VOID
 SaveBufferList (
-  OUT LIST_ENTRY     *OldBufferList
+  OUT LIST_ENTRY  *OldBufferList
   );
 
 /**
@@ -381,10 +380,7 @@ SaveBufferList (
 **/
 VOID
 RestoreBufferList (
-  IN OUT LIST_ENTRY     *OldBufferList
+  IN OUT LIST_ENTRY  *OldBufferList
   );
 
-
-
 #endif //_SHELL_INTERNAL_HEADER_
-

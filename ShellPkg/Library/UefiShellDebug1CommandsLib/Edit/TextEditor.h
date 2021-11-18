@@ -19,8 +19,8 @@
 #include "EditMenuBar.h"
 #include "Misc.h"
 
-extern EFI_EDITOR_GLOBAL_EDITOR MainEditor;
-extern BOOLEAN                  EditorFirst;
-extern BOOLEAN                  EditorExit;
+extern EFI_EDITOR_GLOBAL_EDITOR  MainEditor;
+extern BOOLEAN                   EditorFirst;
+extern BOOLEAN                   EditorExit;
 
 #endif // _EFI_EDIT_H_

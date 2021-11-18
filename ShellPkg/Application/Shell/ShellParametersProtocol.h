@@ -75,7 +75,7 @@ CleanUpShellParametersProtocol (
   @retval   EFI_OUT_OF_RESOURCES        a memory allocation failed.
 **/
 EFI_STATUS
-UpdateArgcArgv(
+UpdateArgcArgv (
   IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
   IN CONST CHAR16                       *NewCommandLine,
   IN SHELL_OPERATION_TYPES              Type,
@@ -93,19 +93,19 @@ UpdateArgcArgv(
   @param[in] OldArgc                    pointer to old number of items in Argv list
 **/
 VOID
-RestoreArgcArgv(
+RestoreArgcArgv (
   IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
   IN CHAR16                             ***OldArgv,
   IN UINTN                              *OldArgc
   );
 
 typedef struct {
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL        *ConIn;
-  EFI_HANDLE                            ConInHandle;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *ConOut;
-  EFI_HANDLE                            ConOutHandle;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *ErrOut;
-  EFI_HANDLE                            ErrOutHandle;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *ConIn;
+  EFI_HANDLE                         ConInHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *ConOut;
+  EFI_HANDLE                         ConOutHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *ErrOut;
+  EFI_HANDLE                         ErrOutHandle;
 } SYSTEM_TABLE_INFO;
 
 /**
@@ -126,7 +126,7 @@ typedef struct {
   @retval   EFI_OUT_OF_RESOURCES        A memory allocation failed.
 **/
 EFI_STATUS
-UpdateStdInStdOutStdErr(
+UpdateStdInStdOutStdErr (
   IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
   IN CHAR16                             *NewCommandLine,
   OUT SHELL_FILE_HANDLE                 *OldStdIn,
@@ -172,11 +172,11 @@ RestoreStdInStdOutStdErr (
   @return EFI_OUT_OF_RESOURCES  a memory allocation failed.
 **/
 EFI_STATUS
-ParseCommandLineToArgs(
-  IN CONST CHAR16 *CommandLine,
-  IN BOOLEAN      StripQuotation,
-  IN OUT CHAR16   ***Argv,
-  IN OUT UINTN    *Argc
+ParseCommandLineToArgs (
+  IN CONST CHAR16  *CommandLine,
+  IN BOOLEAN       StripQuotation,
+  IN OUT CHAR16    ***Argv,
+  IN OUT UINTN     *Argc
   );
 
 /**
@@ -200,7 +200,7 @@ ParseCommandLineToArgs(
   @return   EFI_NOT_FOUND         A closing " could not be found on the specified string
 **/
 EFI_STATUS
-GetNextParameter(
+GetNextParameter (
   IN OUT CHAR16   **Walker,
   IN OUT CHAR16   **TempParameter,
   IN CONST UINTN  Length,
@@ -208,4 +208,3 @@ GetNextParameter(
   );
 
 #endif //_SHELL_PARAMETERS_PROTOCOL_PROVIDER_HEADER_
-

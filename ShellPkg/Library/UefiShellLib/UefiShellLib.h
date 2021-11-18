@@ -36,16 +36,16 @@
 #include <Library/ShellLib.h>
 
 typedef struct  {
-  EFI_SHELL_GET_FILE_INFO                   GetFileInfo;
-  EFI_SHELL_SET_FILE_INFO                   SetFileInfo;
-  EFI_SHELL_READ_FILE                       ReadFile;
-  EFI_SHELL_WRITE_FILE                      WriteFile;
-  EFI_SHELL_CLOSE_FILE                      CloseFile;
-  EFI_SHELL_DELETE_FILE                     DeleteFile;
-  EFI_SHELL_GET_FILE_POSITION               GetFilePosition;
-  EFI_SHELL_SET_FILE_POSITION               SetFilePosition;
-  EFI_SHELL_FLUSH_FILE                      FlushFile;
-  EFI_SHELL_GET_FILE_SIZE                   GetFileSize;
+  EFI_SHELL_GET_FILE_INFO        GetFileInfo;
+  EFI_SHELL_SET_FILE_INFO        SetFileInfo;
+  EFI_SHELL_READ_FILE            ReadFile;
+  EFI_SHELL_WRITE_FILE           WriteFile;
+  EFI_SHELL_CLOSE_FILE           CloseFile;
+  EFI_SHELL_DELETE_FILE          DeleteFile;
+  EFI_SHELL_GET_FILE_POSITION    GetFilePosition;
+  EFI_SHELL_SET_FILE_POSITION    SetFilePosition;
+  EFI_SHELL_FLUSH_FILE           FlushFile;
+  EFI_SHELL_GET_FILE_SIZE        GetFileSize;
 } FILE_HANDLE_FUNCTION_MAP;
 
 /**
@@ -81,10 +81,8 @@ InternalShellIsHexOrDecimalNumber (
 **/
 EFI_STATUS
 InternalShellStripQuotes (
-  IN  CONST CHAR16     *OriginalString,
-  OUT CHAR16           **CleanString
+  IN  CONST CHAR16  *OriginalString,
+  OUT CHAR16        **CleanString
   );
 
-
 #endif
-
