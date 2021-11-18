@@ -7,7 +7,6 @@
 
 #include "SecFsp.h"
 
-
 /**
   This function check the FSP API calling condition.
 
@@ -18,14 +17,14 @@
 EFI_STATUS
 EFIAPI
 FspApiCallingCheck (
-  IN UINT8     ApiIdx,
-  IN VOID     *ApiParam
+  IN UINT8  ApiIdx,
+  IN VOID   *ApiParam
   )
 {
-  EFI_STATUS                Status;
-  FSP_GLOBAL_DATA           *FspData;
+  EFI_STATUS       Status;
+  FSP_GLOBAL_DATA  *FspData;
 
-  Status = EFI_SUCCESS;
+  Status  = EFI_SUCCESS;
   FspData = GetFspGlobalDataPointer ();
 
   if (ApiIdx == NotifyPhaseApiIndex) {
