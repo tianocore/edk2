@@ -13,22 +13,21 @@
 
 #include "SmbiosMisc.h"
 
-
 //
 // Static (possibly build generated) System Manufacturer data.
 //
-SMBIOS_MISC_TABLE_DATA(SMBIOS_TABLE_TYPE1, MiscSystemManufacturer) = {
+SMBIOS_MISC_TABLE_DATA (SMBIOS_TABLE_TYPE1, MiscSystemManufacturer) = {
   {                                               // Hdr
-    EFI_SMBIOS_TYPE_SYSTEM_INFORMATION,             // Type,
-    0,                                              // Length,
-    0                                               // Handle
+    EFI_SMBIOS_TYPE_SYSTEM_INFORMATION,           // Type,
+    0,                                            // Length,
+    0                                             // Handle
   },
   1,                                              // Manufacturer
   2,                                              // ProductName
   3,                                              // Version
   4,                                              // SerialNumber
   {                                               // Uuid
-    0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+    0x00000000, 0x0000, 0x0000, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   },
   SystemWakeupTypePowerSwitch,                    // SystemWakeupType
   5,                                              // SKUNumber,
