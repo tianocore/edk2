@@ -546,8 +546,10 @@
       NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   }
-  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
-
+  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf {
+    <LibraryClasses>
+      NULL|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  }
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
   MdeModulePkg/Universal/Metronome/Metronome.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
