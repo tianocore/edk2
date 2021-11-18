@@ -9,7 +9,7 @@
 #ifndef _FSP_SILICON_INIT_DONE_H_
 #define _FSP_SILICON_INIT_DONE_H_
 
-typedef struct _FSP_SILICON_INIT_DONE_PPI  FSP_SILICON_INIT_DONE_PPI;
+typedef struct _FSP_SILICON_INIT_DONE_PPI FSP_SILICON_INIT_DONE_PPI;
 
 /**
   Return Hob list produced by FSP.
@@ -29,9 +29,9 @@ EFI_STATUS
   );
 
 struct _FSP_SILICON_INIT_DONE_PPI {
-  FSP_SILICON_INIT_DONE_GET_FSP_HOB_LIST      GetFspHobList;
+  FSP_SILICON_INIT_DONE_GET_FSP_HOB_LIST    GetFspHobList;
 };
 
-extern EFI_GUID gFspSiliconInitDonePpiGuid;
+extern EFI_GUID  gFspSiliconInitDonePpiGuid;
 
 #endif
