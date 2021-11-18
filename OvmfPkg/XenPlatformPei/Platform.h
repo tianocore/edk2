@@ -132,10 +132,10 @@ CalibrateLapicTimer (
   VOID
   );
 
-extern EFI_BOOT_MODE mBootMode;
+extern EFI_BOOT_MODE  mBootMode;
 
-extern UINT8 mPhysMemAddressWidth;
+extern UINT8  mPhysMemAddressWidth;
 
-extern UINT16 mHostBridgeDevId;
+extern UINT16  mHostBridgeDevId;
 
 #endif // _PLATFORM_PEI_H_INCLUDED_

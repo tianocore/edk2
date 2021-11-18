@@ -9,6 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __GNTTAB_H__
 #define __GNTTAB_H__
 

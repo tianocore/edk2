@@ -20,20 +20,20 @@
 // Size of the longest valid BOOL string (see the "mTrueString" and
 // "mFalseString" arrays below), including the terminating NUL.
 //
-#define BOOL_STRING_MAX_SIZE (sizeof "disabled")
+#define BOOL_STRING_MAX_SIZE  (sizeof "disabled")
 
 //
 // Length of "\r\n", not including the terminating NUL.
 //
-#define CRLF_LENGTH (sizeof "\r\n" - 1)
+#define CRLF_LENGTH  (sizeof "\r\n" - 1)
 
 //
 // Words recognized as representing TRUE or FALSE.
 //
-STATIC CONST CHAR8 * CONST mTrueString[] = {
+STATIC CONST CHAR8 *CONST  mTrueString[] = {
   "true", "yes", "y", "enable", "enabled", "1"
 };
-STATIC CONST CHAR8 * CONST mFalseString[] = {
+STATIC CONST CHAR8 *CONST  mFalseString[] = {
   "false", "no", "n", "disable", "disabled", "0"
 };
 
@@ -90,9 +90,9 @@ QemuFwCfgGetAsString (
   OUT    CHAR8       *Buffer
   )
 {
-  RETURN_STATUS        Status;
-  FIRMWARE_CONFIG_ITEM FwCfgItem;
-  UINTN                FwCfgSize;
+  RETURN_STATUS         Status;
+  FIRMWARE_CONFIG_ITEM  FwCfgItem;
+  UINTN                 FwCfgSize;
 
   if (!QemuFwCfgIsAvailable ()) {
     return RETURN_UNSUPPORTED;
@@ -102,6 +102,7 @@ QemuFwCfgGetAsString (
   if (RETURN_ERROR (Status)) {
     return Status;
   }
+
   if (FwCfgSize > *BufferSize) {
     return RETURN_PROTOCOL_ERROR;
   }
@@ -112,16 +113,18 @@ QemuFwCfgGetAsString (
   //
   // If Buffer is already NUL-terminated due to fw_cfg contents, we're done.
   //
-  if (FwCfgSize > 0 && Buffer[FwCfgSize - 1] == '\0') {
+  if ((FwCfgSize > 0) && (Buffer[FwCfgSize - 1] == '\0')) {
     *BufferSize = FwCfgSize;
     return RETURN_SUCCESS;
   }
+
   //
   // Otherwise, append a NUL byte to Buffer (if we have room for it).
   //
   if (FwCfgSize == *BufferSize) {
     return RETURN_PROTOCOL_ERROR;
   }
+
   Buffer[FwCfgSize] = '\0';
   *BufferSize = FwCfgSize + 1;
   return RETURN_SUCCESS;
@@ -146,15 +149,16 @@ StripNewline (
   IN OUT CHAR8 *Buffer
   )
 {
-  UINTN InSize, OutSize;
+  UINTN  InSize, OutSize;
 
-  InSize = *BufferSize;
+  InSize  = *BufferSize;
   OutSize = InSize;
 
-  if (InSize >= 3 &&
-      Buffer[InSize - 3] == '\r' && Buffer[InSize - 2] == '\n') {
+  if ((InSize >= 3) &&
+      (Buffer[InSize - 3] == '\r') && (Buffer[InSize - 2] == '\n'))
+  {
     OutSize = InSize - 2;
-  } else if (InSize >= 2 && Buffer[InSize - 2] == '\n') {
+  } else if ((InSize >= 2) && (Buffer[InSize - 2] == '\n')) {
     OutSize = InSize - 1;
   }
 
@@ -209,11 +213,11 @@ QemuFwCfgParseUint64WithLimit (
   OUT UINT64      *Value
   )
 {
-  UINTN         Uint64StringSize;
-  CHAR8         Uint64String[UINT64_STRING_MAX_SIZE + CRLF_LENGTH];
-  RETURN_STATUS Status;
-  CHAR8         *EndPointer;
-  UINT64        Uint64;
+  UINTN          Uint64StringSize;
+  CHAR8          Uint64String[UINT64_STRING_MAX_SIZE + CRLF_LENGTH];
+  RETURN_STATUS  Status;
+  CHAR8          *EndPointer;
+  UINT64         Uint64;
 
   Uint64StringSize = sizeof Uint64String;
   Status = QemuFwCfgGetAsString (FileName, &Uint64StringSize, Uint64String);
@@ -228,6 +232,7 @@ QemuFwCfgParseUint64WithLimit (
   } else {
     Status = AsciiStrDecimalToUint64S (Uint64String, &EndPointer, &Uint64);
   }
+
   if (RETURN_ERROR (Status)) {
     return Status;
   }
@@ -236,7 +241,7 @@ QemuFwCfgParseUint64WithLimit (
   // Report a wire protocol error if the subject sequence is empty, or trailing
   // garbage is present, or Limit is not honored.
   //
-  if (EndPointer == Uint64String || *EndPointer != '\0' || Uint64 > Limit) {
+  if ((EndPointer == Uint64String) || (*EndPointer != '\0') || (Uint64 > Limit)) {
     return RETURN_PROTOCOL_ERROR;
   }
 
@@ -267,10 +272,10 @@ QemuFwCfgParseBool (
   OUT BOOLEAN     *Value
   )
 {
-  UINTN         BoolStringSize;
-  CHAR8         BoolString[BOOL_STRING_MAX_SIZE + CRLF_LENGTH];
-  RETURN_STATUS Status;
-  UINTN         Idx;
+  UINTN          BoolStringSize;
+  CHAR8          BoolString[BOOL_STRING_MAX_SIZE + CRLF_LENGTH];
+  RETURN_STATUS  Status;
+  UINTN          Idx;
 
   BoolStringSize = sizeof BoolString;
   Status = QemuFwCfgGetAsString (FileName, &BoolStringSize, BoolString);
@@ -305,14 +310,19 @@ QemuFwCfgParseUint8 (
   OUT UINT8       *Value
   )
 {
-  RETURN_STATUS Status;
-  UINT64        Uint64;
+  RETURN_STATUS  Status;
+  UINT64         Uint64;
 
-  Status = QemuFwCfgParseUint64WithLimit (FileName, ParseAsHex, MAX_UINT8,
-             &Uint64);
+  Status = QemuFwCfgParseUint64WithLimit (
+             FileName,
+             ParseAsHex,
+             MAX_UINT8,
+             &Uint64
+             );
   if (RETURN_ERROR (Status)) {
     return Status;
   }
+
   *Value = (UINT8)Uint64;
   return RETURN_SUCCESS;
 }
@@ -325,14 +335,19 @@ QemuFwCfgParseUint16 (
   OUT UINT16      *Value
   )
 {
-  RETURN_STATUS Status;
-  UINT64        Uint64;
+  RETURN_STATUS  Status;
+  UINT64         Uint64;
 
-  Status = QemuFwCfgParseUint64WithLimit (FileName, ParseAsHex, MAX_UINT16,
-             &Uint64);
+  Status = QemuFwCfgParseUint64WithLimit (
+             FileName,
+             ParseAsHex,
+             MAX_UINT16,
+             &Uint64
+             );
   if (RETURN_ERROR (Status)) {
     return Status;
   }
+
   *Value = (UINT16)Uint64;
   return RETURN_SUCCESS;
 }
@@ -345,14 +360,19 @@ QemuFwCfgParseUint32 (
   OUT UINT32      *Value
   )
 {
-  RETURN_STATUS Status;
-  UINT64        Uint64;
+  RETURN_STATUS  Status;
+  UINT64         Uint64;
 
-  Status = QemuFwCfgParseUint64WithLimit (FileName, ParseAsHex, MAX_UINT32,
-             &Uint64);
+  Status = QemuFwCfgParseUint64WithLimit (
+             FileName,
+             ParseAsHex,
+             MAX_UINT32,
+             &Uint64
+             );
   if (RETURN_ERROR (Status)) {
     return Status;
   }
+
   *Value = (UINT32)Uint64;
   return RETURN_SUCCESS;
 }
@@ -365,14 +385,19 @@ QemuFwCfgParseUint64 (
   OUT UINT64      *Value
   )
 {
-  RETURN_STATUS Status;
-  UINT64        Uint64;
+  RETURN_STATUS  Status;
+  UINT64         Uint64;
 
-  Status = QemuFwCfgParseUint64WithLimit (FileName, ParseAsHex, MAX_UINT64,
-             &Uint64);
+  Status = QemuFwCfgParseUint64WithLimit (
+             FileName,
+             ParseAsHex,
+             MAX_UINT64,
+             &Uint64
+             );
   if (RETURN_ERROR (Status)) {
     return Status;
   }
+
   *Value = Uint64;
   return RETURN_SUCCESS;
 }
@@ -385,14 +410,19 @@ QemuFwCfgParseUintn (
   OUT UINTN       *Value
   )
 {
-  RETURN_STATUS Status;
-  UINT64        Uint64;
+  RETURN_STATUS  Status;
+  UINT64         Uint64;
 
-  Status = QemuFwCfgParseUint64WithLimit (FileName, ParseAsHex, MAX_UINTN,
-             &Uint64);
+  Status = QemuFwCfgParseUint64WithLimit (
+             FileName,
+             ParseAsHex,
+             MAX_UINTN,
+             &Uint64
+             );
   if (RETURN_ERROR (Status)) {
     return Status;
   }
+
   *Value = (UINTN)Uint64;
   return RETURN_SUCCESS;
 }

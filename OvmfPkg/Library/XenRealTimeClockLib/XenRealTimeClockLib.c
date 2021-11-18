@@ -22,22 +22,22 @@ EpochToEfiTime (
   OUT EFI_TIME  *Time
   )
 {
-  UINTN         a;
-  UINTN         b;
-  UINTN         c;
-  UINTN         d;
-  UINTN         g;
-  UINTN         j;
-  UINTN         m;
-  UINTN         y;
-  UINTN         da;
-  UINTN         db;
-  UINTN         dc;
-  UINTN         dg;
-  UINTN         hh;
-  UINTN         mm;
-  UINTN         ss;
-  UINTN         J;
+  UINTN  a;
+  UINTN  b;
+  UINTN  c;
+  UINTN  d;
+  UINTN  g;
+  UINTN  j;
+  UINTN  m;
+  UINTN  y;
+  UINTN  da;
+  UINTN  db;
+  UINTN  dc;
+  UINTN  dg;
+  UINTN  hh;
+  UINTN  mm;
+  UINTN  ss;
+  UINTN  J;
 
   J  = (EpochSeconds / 86400) + 2440588;
   j  = J + 32044;
@@ -60,14 +60,13 @@ EpochToEfiTime (
   ss = EpochSeconds % 60;
   a  = (EpochSeconds - ss) / 60;
   mm = a % 60;
-  b = (a - mm) / 60;
+  b  = (a - mm) / 60;
   hh = b % 24;
 
-  Time->Hour        = (UINT8)hh;
-  Time->Minute      = (UINT8)mm;
-  Time->Second      = (UINT8)ss;
-  Time->Nanosecond  = 0;
-
+  Time->Hour       = (UINT8)hh;
+  Time->Minute     = (UINT8)mm;
+  Time->Second     = (UINT8)ss;
+  Time->Nanosecond = 0;
 }
 
 /**
@@ -97,7 +96,7 @@ LibGetTime (
   // as Xen's timekeeping uses a shared info page which cannot be shared
   // between UEFI and the OS
   //
-  EpochToEfiTime(1421770011, Time);
+  EpochToEfiTime (1421770011, Time);
 
   return EFI_SUCCESS;
 }
@@ -120,7 +119,6 @@ LibSetTime (
 {
   return EFI_DEVICE_ERROR;
 }
-
 
 /**
   Returns the current wakeup alarm clock setting.

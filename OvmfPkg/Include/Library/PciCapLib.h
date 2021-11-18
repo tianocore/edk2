@@ -50,7 +50,7 @@ typedef struct PCI_CAP_DEV PCI_CAP_DEV;
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *PCI_CAP_DEV_READ_CONFIG) (
+(EFIAPI *PCI_CAP_DEV_READ_CONFIG)(
   IN  PCI_CAP_DEV *PciDevice,
   IN  UINT16      SourceOffset,
   OUT VOID        *DestinationBuffer,
@@ -85,7 +85,7 @@ RETURN_STATUS
 **/
 typedef
 RETURN_STATUS
-(EFIAPI *PCI_CAP_DEV_WRITE_CONFIG) (
+(EFIAPI *PCI_CAP_DEV_WRITE_CONFIG)(
   IN PCI_CAP_DEV *PciDevice,
   IN UINT16      DestinationOffset,
   IN VOID        *SourceBuffer,
@@ -97,8 +97,8 @@ RETURN_STATUS
 // config space accessors.
 //
 struct PCI_CAP_DEV {
-  PCI_CAP_DEV_READ_CONFIG  ReadConfig;
-  PCI_CAP_DEV_WRITE_CONFIG WriteConfig;
+  PCI_CAP_DEV_READ_CONFIG     ReadConfig;
+  PCI_CAP_DEV_WRITE_CONFIG    WriteConfig;
 };
 
 //
@@ -126,26 +126,26 @@ typedef enum {
 // Public data structure that PciCapGetInfo() fills in about a PCI_CAP object.
 //
 typedef struct {
-  PCI_CAP_DOMAIN Domain;
-  UINT16         CapId;
+  PCI_CAP_DOMAIN    Domain;
+  UINT16            CapId;
   //
   // The capability identified by Domain and CapId may have multiple instances
   // in config space. NumInstances provides the total count of occurrences of
   // the capability. It is always positive.
   //
-  UINT16 NumInstances;
+  UINT16            NumInstances;
   //
   // Instance is the serial number, in capabilities list traversal order (not
   // necessarily config space offset order), of the one capability instance
   // that PciCapGetInfo() is reporting about. Instance is always smaller than
   // NumInstances.
   //
-  UINT16 Instance;
+  UINT16            Instance;
   //
   // The offset in config space at which the capability header of the
   // capability instance starts.
   //
-  UINT16 Offset;
+  UINT16            Offset;
   //
   // The deduced maximum size of the capability instance, including the
   // capability header. This hint is an upper bound, calculated -- without
@@ -154,14 +154,13 @@ typedef struct {
   // capability, and (b) from the end of the config space identified by Domain,
   // whichever is lower.
   //
-  UINT16 MaxSizeHint;
+  UINT16    MaxSizeHint;
   //
   // The version number of the capability instance. Always zero when Domain is
   // PciCapNormal.
   //
-  UINT8 Version;
+  UINT8     Version;
 } PCI_CAP_INFO;
-
 
 /**
   Parse the capabilities lists (both normal and extended, as applicable) of a
@@ -202,7 +201,6 @@ PciCapListInit (
   OUT PCI_CAP_LIST **CapList
   );
 
-
 /**
   Free the resources used by CapList.
 
@@ -214,7 +212,6 @@ EFIAPI
 PciCapListUninit (
   IN PCI_CAP_LIST *CapList
   );
-
 
 /**
   Locate a capability instance in the parsed capabilities lists.
@@ -259,7 +256,6 @@ PciCapListFindCap (
   OUT PCI_CAP        **Cap    OPTIONAL
   );
 
-
 /**
   Locate the first instance of the capability given by (Domain, CapId) such
   that the instance's Version is greater than or equal to MinVersion.
@@ -303,7 +299,6 @@ PciCapListFindCapVersion (
   OUT PCI_CAP        **Cap      OPTIONAL
   );
 
-
 /**
   Get information about a PCI Capability instance.
 
@@ -324,7 +319,6 @@ PciCapGetInfo (
   IN  PCI_CAP      *Cap,
   OUT PCI_CAP_INFO *Info
   );
-
 
 /**
   Read a slice of a capability instance.
@@ -371,7 +365,6 @@ PciCapRead (
   OUT VOID        *DestinationBuffer,
   IN  UINT16      Size
   );
-
 
 /**
   Write a slice of a capability instance.

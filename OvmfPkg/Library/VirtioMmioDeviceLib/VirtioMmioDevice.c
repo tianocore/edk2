@@ -14,26 +14,26 @@
 
 #include "VirtioMmioDevice.h"
 
-STATIC CONST VIRTIO_DEVICE_PROTOCOL mMmioDeviceProtocolTemplate = {
-    0,                                     // Revision
-    0,                                     // SubSystemDeviceId
-    VirtioMmioGetDeviceFeatures,           // GetDeviceFeatures
-    VirtioMmioSetGuestFeatures,            // SetGuestFeatures
-    VirtioMmioSetQueueAddress,             // SetQueueAddress
-    VirtioMmioSetQueueSel,                 // SetQueueSel
-    VirtioMmioSetQueueNotify,              // SetQueueNotify
-    VirtioMmioSetQueueAlignment,           // SetQueueAlign
-    VirtioMmioSetPageSize,                 // SetPageSize
-    VirtioMmioGetQueueSize,                // GetQueueNumMax
-    VirtioMmioSetQueueSize,                // SetQueueNum
-    VirtioMmioGetDeviceStatus,             // GetDeviceStatus
-    VirtioMmioSetDeviceStatus,             // SetDeviceStatus
-    VirtioMmioDeviceWrite,                 // WriteDevice
-    VirtioMmioDeviceRead,                  // ReadDevice
-    VirtioMmioAllocateSharedPages,         // AllocateSharedPages
-    VirtioMmioFreeSharedPages,             // FreeSharedPages
-    VirtioMmioMapSharedBuffer,             // MapSharedBuffer
-    VirtioMmioUnmapSharedBuffer            // UnmapSharedBuffer
+STATIC CONST VIRTIO_DEVICE_PROTOCOL  mMmioDeviceProtocolTemplate = {
+  0,                                       // Revision
+  0,                                       // SubSystemDeviceId
+  VirtioMmioGetDeviceFeatures,             // GetDeviceFeatures
+  VirtioMmioSetGuestFeatures,              // SetGuestFeatures
+  VirtioMmioSetQueueAddress,               // SetQueueAddress
+  VirtioMmioSetQueueSel,                   // SetQueueSel
+  VirtioMmioSetQueueNotify,                // SetQueueNotify
+  VirtioMmioSetQueueAlignment,             // SetQueueAlign
+  VirtioMmioSetPageSize,                   // SetPageSize
+  VirtioMmioGetQueueSize,                  // GetQueueNumMax
+  VirtioMmioSetQueueSize,                  // SetQueueNum
+  VirtioMmioGetDeviceStatus,               // GetDeviceStatus
+  VirtioMmioSetDeviceStatus,               // SetDeviceStatus
+  VirtioMmioDeviceWrite,                   // WriteDevice
+  VirtioMmioDeviceRead,                    // ReadDevice
+  VirtioMmioAllocateSharedPages,           // AllocateSharedPages
+  VirtioMmioFreeSharedPages,               // FreeSharedPages
+  VirtioMmioMapSharedBuffer,               // MapSharedBuffer
+  VirtioMmioUnmapSharedBuffer              // UnmapSharedBuffer
 };
 
 /**
@@ -57,16 +57,19 @@ VirtioMmioInit (
   IN OUT VIRTIO_MMIO_DEVICE *Device
   )
 {
-  UINT32     MagicValue;
+  UINT32  MagicValue;
 
   //
   // Initialize VirtIo Mmio Device
   //
-  CopyMem (&Device->VirtioDevice, &mMmioDeviceProtocolTemplate,
-        sizeof (VIRTIO_DEVICE_PROTOCOL));
+  CopyMem (
+    &Device->VirtioDevice,
+    &mMmioDeviceProtocolTemplate,
+    sizeof (VIRTIO_DEVICE_PROTOCOL)
+    );
   Device->BaseAddress = BaseAddress;
   Device->VirtioDevice.SubSystemDeviceId =
-          MmioRead32 (BaseAddress + VIRTIO_MMIO_OFFSET_DEVICE_ID);
+    MmioRead32 (BaseAddress + VIRTIO_MMIO_OFFSET_DEVICE_ID);
 
   //
   // Double-check MMIO-specific values
@@ -78,23 +81,30 @@ VirtioMmioInit (
 
   Device->Version = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_VERSION);
   switch (Device->Version) {
-  case VIRTIO_MMIO_DEVICE_VERSION_0_95:
-    DEBUG ((DEBUG_INFO, "%a virtio 0.9.5, id %d\n", __FUNCTION__,
-            Device->VirtioDevice.SubSystemDeviceId));
-    Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (0, 9, 5);
-    break;
-  case VIRTIO_MMIO_DEVICE_VERSION_1_00:
-    DEBUG ((DEBUG_INFO, "%a virtio 1.0, id %d\n", __FUNCTION__,
-            Device->VirtioDevice.SubSystemDeviceId));
-    Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (1, 0, 0);
-    break;
-  default:
-    return EFI_UNSUPPORTED;
+    case VIRTIO_MMIO_DEVICE_VERSION_0_95:
+      DEBUG ((
+        DEBUG_INFO,
+        "%a virtio 0.9.5, id %d\n",
+        __FUNCTION__,
+        Device->VirtioDevice.SubSystemDeviceId
+        ));
+      Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (0, 9, 5);
+      break;
+    case VIRTIO_MMIO_DEVICE_VERSION_1_00:
+      DEBUG ((
+        DEBUG_INFO,
+        "%a virtio 1.0, id %d\n",
+        __FUNCTION__,
+        Device->VirtioDevice.SubSystemDeviceId
+        ));
+      Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (1, 0, 0);
+      break;
+    default:
+      return EFI_UNSUPPORTED;
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
 
@@ -104,7 +114,6 @@ VirtioMmioInit (
   @param[in, out]  Device  The device to clean up.
 
 **/
-
 STATIC
 VOID
 EFIAPI
@@ -125,11 +134,12 @@ VirtioMmioInstallDevice (
   )
 {
   EFI_STATUS          Status;
-  VIRTIO_MMIO_DEVICE *VirtIo;
+  VIRTIO_MMIO_DEVICE  *VirtIo;
 
   if (!BaseAddress) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (Handle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -152,9 +162,12 @@ VirtioMmioInstallDevice (
   //
   // Install VIRTIO_DEVICE_PROTOCOL to Handle
   //
-  Status = gBS->InstallProtocolInterface (&Handle,
-                  &gVirtioDeviceProtocolGuid, EFI_NATIVE_INTERFACE,
-                  &VirtIo->VirtioDevice);
+  Status = gBS->InstallProtocolInterface (
+                  &Handle,
+                  &gVirtioDeviceProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &VirtIo->VirtioDevice
+                  );
   if (EFI_ERROR (Status)) {
     goto UninitVirtio;
   }
@@ -198,9 +211,11 @@ VirtioMmioUninstallDevice (
   //
   // Uninstall the protocol interface
   //
-  Status = gBS->UninstallProtocolInterface (DeviceHandle,
-      &gVirtioDeviceProtocolGuid, &MmioDevice->VirtioDevice
-      );
+  Status = gBS->UninstallProtocolInterface (
+                  DeviceHandle,
+                  &gVirtioDeviceProtocolGuid,
+                  &MmioDevice->VirtioDevice
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }

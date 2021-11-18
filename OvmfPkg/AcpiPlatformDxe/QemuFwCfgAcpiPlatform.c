@@ -26,7 +26,7 @@ InstallAcpiTables (
   IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiTable
   )
 {
-  EFI_STATUS                         Status;
+  EFI_STATUS  Status;
 
   Status = InstallQemuFwCfgTables (AcpiTable);
   return Status;

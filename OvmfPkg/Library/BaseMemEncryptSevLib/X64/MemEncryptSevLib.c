@@ -141,5 +141,4 @@ MemEncryptSevClearMmioPageEncMask (
            BaseAddress,
            EFI_PAGES_TO_SIZE (NumPages)
            );
-
 }

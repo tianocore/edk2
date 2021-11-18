@@ -30,7 +30,6 @@ PciHostBridgeGetRootBridges (
   return ScanForRootBridges (Count);
 }
 
-
 /**
   Free the root bridge instances array returned from
   PciHostBridgeGetRootBridges().
@@ -47,7 +46,6 @@ PciHostBridgeFreeRootBridges (
 {
   PciHostBridgeUtilityFreeRootBridges (Bridges, Count);
 }
-
 
 /**
   Inform the platform that the resource conflict happens.

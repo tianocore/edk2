@@ -28,10 +28,9 @@
 // BusNumbers is NULL.
 //
 struct EXTRA_ROOT_BUS_MAP_STRUCT {
-  UINT32 *BusNumbers;
-  UINTN  Count;
+  UINT32    *BusNumbers;
+  UINTN     Count;
 };
-
 
 /**
   An ORDERED_COLLECTION_USER_COMPARE function that compares root bridge
@@ -55,8 +54,8 @@ RootBridgePathCompare (
   IN CONST VOID *UserStruct2
   )
 {
-  CONST ACPI_HID_DEVICE_PATH *Acpi1;
-  CONST ACPI_HID_DEVICE_PATH *Acpi2;
+  CONST ACPI_HID_DEVICE_PATH  *Acpi1;
+  CONST ACPI_HID_DEVICE_PATH  *Acpi2;
 
   Acpi1 = UserStruct1;
   Acpi2 = UserStruct2;
@@ -65,7 +64,6 @@ RootBridgePathCompare (
          Acpi1->UID > Acpi2->UID ?  1 :
          0;
 }
-
 
 /**
   An ORDERED_COLLECTION_KEY_COMPARE function that compares a root bridge
@@ -90,8 +88,8 @@ RootBridgePathKeyCompare (
   IN CONST VOID *UserStruct
   )
 {
-  CONST UINT32               *Uid;
-  CONST ACPI_HID_DEVICE_PATH *Acpi;
+  CONST UINT32                *Uid;
+  CONST ACPI_HID_DEVICE_PATH  *Acpi;
 
   Uid  = StandaloneKey;
   Acpi = UserStruct;
@@ -100,7 +98,6 @@ RootBridgePathKeyCompare (
          *Uid > Acpi->UID ?  1 :
          0;
 }
-
 
 /**
   Create a structure that maps the relative positions of PCI root buses to bus
@@ -132,28 +129,34 @@ CreateExtraRootBusMap (
   OUT EXTRA_ROOT_BUS_MAP **ExtraRootBusMap
   )
 {
-  EFI_STATUS               Status;
-  UINTN                    NumHandles;
-  EFI_HANDLE               *Handles;
-  ORDERED_COLLECTION       *Collection;
-  EXTRA_ROOT_BUS_MAP       *Map;
-  UINTN                    Idx;
-  ORDERED_COLLECTION_ENTRY *Entry, *Entry2;
+  EFI_STATUS                Status;
+  UINTN                     NumHandles;
+  EFI_HANDLE                *Handles;
+  ORDERED_COLLECTION        *Collection;
+  EXTRA_ROOT_BUS_MAP        *Map;
+  UINTN                     Idx;
+  ORDERED_COLLECTION_ENTRY  *Entry, *Entry2;
 
   //
   // Handles and Collection are temporary / helper variables, while in Map we
   // build the return value.
   //
 
-  Status = gBS->LocateHandleBuffer (ByProtocol,
-                  &gEfiPciRootBridgeIoProtocolGuid, NULL /* SearchKey */,
-                  &NumHandles, &Handles);
-  if (EFI_ERROR (Status))  {
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiPciRootBridgeIoProtocolGuid,
+                  NULL /* SearchKey */,
+                  &NumHandles,
+                  &Handles
+                  );
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Collection = OrderedCollectionInit (RootBridgePathCompare,
-                 RootBridgePathKeyCompare);
+  Collection = OrderedCollectionInit (
+                 RootBridgePathCompare,
+                 RootBridgePathKeyCompare
+                 );
   if (Collection == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto FreeHandles;
@@ -169,10 +172,13 @@ CreateExtraRootBusMap (
   // Collect the ACPI device path protocols of the root bridges.
   //
   for (Idx = 0; Idx < NumHandles; ++Idx) {
-    EFI_DEVICE_PATH_PROTOCOL *DevicePath;
+    EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
 
-    Status = gBS->HandleProtocol (Handles[Idx], &gEfiDevicePathProtocolGuid,
-                    (VOID**)&DevicePath);
+    Status = gBS->HandleProtocol (
+                    Handles[Idx],
+                    &gEfiDevicePathProtocolGuid,
+                    (VOID **)&DevicePath
+                    );
     if (EFI_ERROR (Status)) {
       goto FreeMap;
     }
@@ -182,14 +188,16 @@ CreateExtraRootBusMap (
     // nonzero (ie. the root bridge that the bus number belongs to is "extra",
     // not the main one). In that case, link the device path into Collection.
     //
-    if (DevicePathType (DevicePath) == ACPI_DEVICE_PATH &&
-        DevicePathSubType (DevicePath) == ACPI_DP &&
-        ((ACPI_HID_DEVICE_PATH *)DevicePath)->HID == EISA_PNP_ID(0x0A03) &&
-        ((ACPI_HID_DEVICE_PATH *)DevicePath)->UID > 0) {
+    if ((DevicePathType (DevicePath) == ACPI_DEVICE_PATH) &&
+        (DevicePathSubType (DevicePath) == ACPI_DP) &&
+        (((ACPI_HID_DEVICE_PATH *)DevicePath)->HID == EISA_PNP_ID (0x0A03)) &&
+        (((ACPI_HID_DEVICE_PATH *)DevicePath)->UID > 0))
+    {
       Status = OrderedCollectionInsert (Collection, NULL, DevicePath);
       if (EFI_ERROR (Status)) {
         goto FreeMap;
       }
+
       ++Map->Count;
     }
   }
@@ -208,20 +216,25 @@ CreateExtraRootBusMap (
   //
   // Now collect the bus numbers of the extra PCI root buses into Map.
   //
-  Idx = 0;
+  Idx   = 0;
   Entry = OrderedCollectionMin (Collection);
   while (Idx < Map->Count) {
-    ACPI_HID_DEVICE_PATH *Acpi;
+    ACPI_HID_DEVICE_PATH  *Acpi;
 
     ASSERT (Entry != NULL);
     Acpi = OrderedCollectionUserStruct (Entry);
     Map->BusNumbers[Idx] = Acpi->UID;
-    DEBUG ((DEBUG_VERBOSE,
+    DEBUG ((
+      DEBUG_VERBOSE,
       "%a: extra bus position 0x%Lx maps to bus number (UID) 0x%x\n",
-      __FUNCTION__, (UINT64)(Idx + 1), Acpi->UID));
+      __FUNCTION__,
+      (UINT64)(Idx + 1),
+      Acpi->UID
+      ));
     ++Idx;
     Entry = OrderedCollectionNext (Entry);
   }
+
   ASSERT (Entry == NULL);
 
   *ExtraRootBusMap = Map;
@@ -236,15 +249,18 @@ FreeMap:
     if (Map->BusNumbers != NULL) {
       FreePool (Map->BusNumbers);
     }
+
     FreePool (Map);
   }
 
 FreeCollection:
   for (Entry = OrderedCollectionMin (Collection); Entry != NULL;
-       Entry = Entry2) {
+       Entry = Entry2)
+  {
     Entry2 = OrderedCollectionNext (Entry);
     OrderedCollectionDelete (Collection, Entry, NULL);
   }
+
   OrderedCollectionUninit (Collection);
 
 FreeHandles:
@@ -252,7 +268,6 @@ FreeHandles:
 
   return Status;
 }
-
 
 /**
   Release a map created with CreateExtraRootBusMap().
@@ -267,6 +282,7 @@ DestroyExtraRootBusMap (
   if (ExtraRootBusMap->BusNumbers != NULL) {
     FreePool (ExtraRootBusMap->BusNumbers);
   }
+
   FreePool (ExtraRootBusMap);
 }
 
@@ -299,9 +315,11 @@ MapRootBusPosToBusNr (
   if (RootBusPos == 0) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (RootBusPos > ExtraRootBusMap->Count) {
     return EFI_NOT_FOUND;
   }
+
   *RootBusNr = ExtraRootBusMap->BusNumbers[(UINTN)RootBusPos - 1];
   return EFI_SUCCESS;
 }

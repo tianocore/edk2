@@ -36,8 +36,8 @@
 // in general, it is actually fine for the Xen domU (guest) environment that
 // this module is intended for, as UEFI always executes from DRAM in that case.
 //
-STATIC evtchn_send_t              mXenConsoleEventChain;
-STATIC struct xencons_interface   *mXenConsoleInterface;
+STATIC evtchn_send_t             mXenConsoleEventChain;
+STATIC struct xencons_interface  *mXenConsoleInterface;
 
 /**
   Initialize the serial device hardware.
@@ -56,19 +56,20 @@ SerialPortInitialize (
   VOID
   )
 {
-  if (! XenHypercallIsAvailable ()) {
+  if (!XenHypercallIsAvailable ()) {
     return RETURN_DEVICE_ERROR;
   }
 
   if (!mXenConsoleInterface) {
     mXenConsoleEventChain.port = (UINT32)XenHypercallHvmGetParam (HVM_PARAM_CONSOLE_EVTCHN);
     mXenConsoleInterface = (struct xencons_interface *)(UINTN)
-      (XenHypercallHvmGetParam (HVM_PARAM_CONSOLE_PFN) << EFI_PAGE_SHIFT);
+                           (XenHypercallHvmGetParam (HVM_PARAM_CONSOLE_PFN) << EFI_PAGE_SHIFT);
 
     //
     // No point in ASSERT'ing here as we won't be seeing the output
     //
   }
+
   return RETURN_SUCCESS;
 }
 
@@ -116,15 +117,15 @@ SerialPortWrite (
 
     MemoryFence ();
 
-    while (Sent < NumberOfBytes && ((Producer - Consumer) < sizeof (mXenConsoleInterface->out)))
-      mXenConsoleInterface->out[MASK_XENCONS_IDX(Producer++, mXenConsoleInterface->out)] = Buffer[Sent++];
+    while (Sent < NumberOfBytes && ((Producer - Consumer) < sizeof (mXenConsoleInterface->out))) {
+      mXenConsoleInterface->out[MASK_XENCONS_IDX (Producer++, mXenConsoleInterface->out)] = Buffer[Sent++];
+    }
 
     MemoryFence ();
 
     mXenConsoleInterface->out_prod = Producer;
 
     XenHypercallEventChannelOp (EVTCHNOP_send, &mXenConsoleEventChain);
-
   } while (Sent < NumberOfBytes);
 
   return Sent;
@@ -150,7 +151,7 @@ EFIAPI
 SerialPortRead (
   OUT UINT8     *Buffer,
   IN  UINTN     NumberOfBytes
-)
+  )
 {
   XENCONS_RING_IDX  Consumer, Producer;
   UINTN             Received;
@@ -171,8 +172,9 @@ SerialPortRead (
   MemoryFence ();
 
   Received = 0;
-  while (Received < NumberOfBytes && Consumer < Producer)
-     Buffer[Received++] = mXenConsoleInterface->in[MASK_XENCONS_IDX(Consumer++, mXenConsoleInterface->in)];
+  while (Received < NumberOfBytes && Consumer < Producer) {
+    Buffer[Received++] = mXenConsoleInterface->in[MASK_XENCONS_IDX (Consumer++, mXenConsoleInterface->in)];
+  }
 
   MemoryFence ();
 
@@ -197,7 +199,7 @@ SerialPortPoll (
   )
 {
   return mXenConsoleInterface &&
-    mXenConsoleInterface->in_cons != mXenConsoleInterface->in_prod;
+         mXenConsoleInterface->in_cons != mXenConsoleInterface->in_prod;
 }
 
 /**
@@ -243,6 +245,7 @@ SerialPortGetControl (
   if (!SerialPortPoll ()) {
     *Control = EFI_SERIAL_INPUT_BUFFER_EMPTY;
   }
+
   return RETURN_SUCCESS;
 }
 
@@ -292,4 +295,3 @@ SerialPortSetAttributes (
 {
   return RETURN_UNSUPPORTED;
 }
-

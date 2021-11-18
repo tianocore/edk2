@@ -14,7 +14,6 @@
 
 #include "BasePciCapPciSegmentLib.h"
 
-
 /**
   Read the config space of a given PCI device (both normal and extended).
 
@@ -50,9 +49,9 @@ SegmentDevReadConfig (
   IN  UINT16      Size
   )
 {
-  SEGMENT_DEV *SegmentDev;
-  UINT16      ConfigSpaceSize;
-  UINT64      SourceAddress;
+  SEGMENT_DEV  *SegmentDev;
+  UINT16       ConfigSpaceSize;
+  UINT64       SourceAddress;
 
   SegmentDev = SEGMENT_DEV_FROM_PCI_CAP_DEV (PciDevice);
   ConfigSpaceSize = (SegmentDev->MaxDomain == PciCapNormal ?
@@ -64,13 +63,17 @@ SegmentDevReadConfig (
   if (SourceOffset + Size > ConfigSpaceSize) {
     return RETURN_UNSUPPORTED;
   }
-  SourceAddress = PCI_SEGMENT_LIB_ADDRESS (SegmentDev->SegmentNr,
-                    SegmentDev->BusNr, SegmentDev->DeviceNr,
-                    SegmentDev->FunctionNr, SourceOffset);
+
+  SourceAddress = PCI_SEGMENT_LIB_ADDRESS (
+                    SegmentDev->SegmentNr,
+                    SegmentDev->BusNr,
+                    SegmentDev->DeviceNr,
+                    SegmentDev->FunctionNr,
+                    SourceOffset
+                    );
   PciSegmentReadBuffer (SourceAddress, Size, DestinationBuffer);
   return RETURN_SUCCESS;
 }
-
 
 /**
   Write the config space of a given PCI device (both normal and extended).
@@ -107,9 +110,9 @@ SegmentDevWriteConfig (
   IN UINT16      Size
   )
 {
-  SEGMENT_DEV *SegmentDev;
-  UINT16      ConfigSpaceSize;
-  UINT64      DestinationAddress;
+  SEGMENT_DEV  *SegmentDev;
+  UINT16       ConfigSpaceSize;
+  UINT64       DestinationAddress;
 
   SegmentDev = SEGMENT_DEV_FROM_PCI_CAP_DEV (PciDevice);
   ConfigSpaceSize = (SegmentDev->MaxDomain == PciCapNormal ?
@@ -121,13 +124,17 @@ SegmentDevWriteConfig (
   if (DestinationOffset + Size > ConfigSpaceSize) {
     return RETURN_UNSUPPORTED;
   }
-  DestinationAddress = PCI_SEGMENT_LIB_ADDRESS (SegmentDev->SegmentNr,
-                         SegmentDev->BusNr, SegmentDev->DeviceNr,
-                         SegmentDev->FunctionNr, DestinationOffset);
+
+  DestinationAddress = PCI_SEGMENT_LIB_ADDRESS (
+                         SegmentDev->SegmentNr,
+                         SegmentDev->BusNr,
+                         SegmentDev->DeviceNr,
+                         SegmentDev->FunctionNr,
+                         DestinationOffset
+                         );
   PciSegmentWriteBuffer (DestinationAddress, Size, SourceBuffer);
   return RETURN_SUCCESS;
 }
-
 
 /**
   Create a PCI_CAP_DEV object from the PCI Segment:Bus:Device.Function
@@ -176,9 +183,9 @@ PciCapPciSegmentDeviceInit (
   OUT PCI_CAP_DEV    **PciDevice
   )
 {
-  SEGMENT_DEV *SegmentDev;
+  SEGMENT_DEV  *SegmentDev;
 
-  if (Device > PCI_MAX_DEVICE || Function > PCI_MAX_FUNC) {
+  if ((Device > PCI_MAX_DEVICE) || (Function > PCI_MAX_FUNC)) {
     return RETURN_INVALID_PARAMETER;
   }
 
@@ -187,19 +194,18 @@ PciCapPciSegmentDeviceInit (
     return RETURN_OUT_OF_RESOURCES;
   }
 
-  SegmentDev->Signature              = SEGMENT_DEV_SIG;
-  SegmentDev->MaxDomain              = MaxDomain;
-  SegmentDev->SegmentNr              = Segment;
-  SegmentDev->BusNr                  = Bus;
-  SegmentDev->DeviceNr               = Device;
-  SegmentDev->FunctionNr             = Function;
+  SegmentDev->Signature  = SEGMENT_DEV_SIG;
+  SegmentDev->MaxDomain  = MaxDomain;
+  SegmentDev->SegmentNr  = Segment;
+  SegmentDev->BusNr      = Bus;
+  SegmentDev->DeviceNr   = Device;
+  SegmentDev->FunctionNr = Function;
   SegmentDev->BaseDevice.ReadConfig  = SegmentDevReadConfig;
   SegmentDev->BaseDevice.WriteConfig = SegmentDevWriteConfig;
 
   *PciDevice = &SegmentDev->BaseDevice;
   return RETURN_SUCCESS;
 }
-
 
 /**
   Free the resources used by PciDevice.
@@ -213,7 +219,7 @@ PciCapPciSegmentDeviceUninit (
   IN PCI_CAP_DEV *PciDevice
   )
 {
-  SEGMENT_DEV *SegmentDev;
+  SEGMENT_DEV  *SegmentDev;
 
   SegmentDev = SEGMENT_DEV_FROM_PCI_CAP_DEV (PciDevice);
   FreePool (SegmentDev);

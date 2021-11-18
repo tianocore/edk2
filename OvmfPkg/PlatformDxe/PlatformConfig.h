@@ -23,8 +23,8 @@ typedef struct {
   //
   // preferred graphics console resolution when booting
   //
-  UINT32 HorizontalResolution;
-  UINT32 VerticalResolution;
+  UINT32    HorizontalResolution;
+  UINT32    VerticalResolution;
 } PLATFORM_CONFIG;
 #pragma pack()
 
@@ -47,7 +47,7 @@ PlatformConfigLoad (
 //
 // Feature flags for OptionalElements.
 //
-#define PLATFORM_CONFIG_F_GRAPHICS_RESOLUTION BIT0
-#define PLATFORM_CONFIG_F_DOWNGRADE           BIT63
+#define PLATFORM_CONFIG_F_GRAPHICS_RESOLUTION  BIT0
+#define PLATFORM_CONFIG_F_DOWNGRADE            BIT63
 
 #endif // _PLATFORM_CONFIG_H_

@@ -12,9 +12,9 @@
 //
 // Driver name table
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mSioBusDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mSioBusDriverNameTable[] = {
   { "eng;en", L"OVMF Sio Bus Driver" },
-  { NULL , NULL }
+  { NULL,     NULL                   }
 };
 
 //
@@ -29,12 +29,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gSioBusComponentName 
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gSioBusComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) SioBusComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) SioBusComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gSioBusComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)SioBusComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)SioBusComponentNameGetControllerName,
   "en"
 };
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.

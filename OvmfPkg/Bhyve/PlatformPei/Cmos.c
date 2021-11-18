@@ -6,7 +6,6 @@
 
 **/
 
-
 #include "Cmos.h"
 #include "Library/IoLib.h"
 
@@ -27,10 +26,9 @@ CmosRead8 (
   IN      UINTN                     Index
   )
 {
-  IoWrite8 (0x70, (UINT8) Index);
+  IoWrite8 (0x70, (UINT8)Index);
   return IoRead8 (0x71);
 }
-
 
 /**
   Writes 8-bits of CMOS data.
@@ -51,8 +49,7 @@ CmosWrite8 (
   IN      UINT8                     Value
   )
 {
-  IoWrite8 (0x70, (UINT8) Index);
+  IoWrite8 (0x70, (UINT8)Index);
   IoWrite8 (0x71, Value);
   return Value;
 }
-

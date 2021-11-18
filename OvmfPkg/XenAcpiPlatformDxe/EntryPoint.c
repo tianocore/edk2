@@ -19,18 +19,17 @@ FindAcpiTableProtocol (
   VOID
   )
 {
-  EFI_STATUS              Status;
-  EFI_ACPI_TABLE_PROTOCOL *AcpiTable;
+  EFI_STATUS               Status;
+  EFI_ACPI_TABLE_PROTOCOL  *AcpiTable;
 
   Status = gBS->LocateProtocol (
                   &gEfiAcpiTableProtocolGuid,
                   NULL,
-                  (VOID**)&AcpiTable
+                  (VOID **)&AcpiTable
                   );
   ASSERT_EFI_ERROR (Status);
   return AcpiTable;
 }
-
 
 EFI_STATUS
 EFIAPI

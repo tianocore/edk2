@@ -45,6 +45,4 @@ CmosWrite8 (
   IN      UINT8                     Value
   );
 
-
 #endif
-

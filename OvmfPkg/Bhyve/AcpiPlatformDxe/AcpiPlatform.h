@@ -22,8 +22,8 @@
 #include <IndustryStandard/Acpi.h>
 
 typedef struct {
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  UINT64              PciAttributes;
+  EFI_PCI_IO_PROTOCOL    *PciIo;
+  UINT64                 PciAttributes;
 } ORIGINAL_ATTRIBUTES;
 
 typedef struct S3_CONTEXT S3_CONTEXT;
@@ -39,7 +39,7 @@ InstallAcpiTable (
 
 EFI_STATUS
 EFIAPI
-BhyveInstallAcpiTable(
+BhyveInstallAcpiTable (
   IN   EFI_ACPI_TABLE_PROTOCOL       *AcpiProtocol,
   IN   VOID                          *AcpiTableBuffer,
   IN   UINTN                         AcpiTableBufferSize,

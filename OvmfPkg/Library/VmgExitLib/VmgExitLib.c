@@ -36,8 +36,10 @@ VmgExitErrorCheck (
   UINT64                Status;
 
   ExitInfo.Uint64 = Ghcb->SaveArea.SwExitInfo1;
-  ASSERT ((ExitInfo.Elements.Lower32Bits == 0) ||
-          (ExitInfo.Elements.Lower32Bits == 1));
+  ASSERT (
+    (ExitInfo.Elements.Lower32Bits == 0) ||
+    (ExitInfo.Elements.Lower32Bits == 1)
+    );
 
   Status = 0;
   if (ExitInfo.Elements.Lower32Bits == 0) {
@@ -52,14 +54,15 @@ VmgExitErrorCheck (
     //
     Event.Uint64 = Ghcb->SaveArea.SwExitInfo2;
     if (Event.Elements.Valid &&
-        Event.Elements.Type == GHCB_EVENT_INJECTION_TYPE_EXCEPTION) {
+        (Event.Elements.Type == GHCB_EVENT_INJECTION_TYPE_EXCEPTION))
+    {
       switch (Event.Elements.Vector) {
-      case GP_EXCEPTION:
-      case UD_EXCEPTION:
-        //
-        // Use returned event as return code
-        //
-        Status = Event.Uint64;
+        case GP_EXCEPTION:
+        case UD_EXCEPTION:
+          //
+          // Use returned event as return code
+          //
+          Status = Event.Uint64;
       }
     }
   }
@@ -106,7 +109,7 @@ VmgExit (
   IN     UINT64              ExitInfo2
   )
 {
-  Ghcb->SaveArea.SwExitCode = ExitCode;
+  Ghcb->SaveArea.SwExitCode  = ExitCode;
   Ghcb->SaveArea.SwExitInfo1 = ExitInfo1;
   Ghcb->SaveArea.SwExitInfo2 = ExitInfo2;
 

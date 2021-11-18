@@ -40,6 +40,6 @@
     { 0x81, 0xd3, 0x5b, 0xb9, 0x71, 0x5f, 0x97, 0x27 }, \
   }
 
-extern EFI_GUID gOvmfPkKek1AppPrefixGuid;
+extern EFI_GUID  gOvmfPkKek1AppPrefixGuid;
 
 #endif /* OVMF_PK_KEK1_APP_PREFIX_H_ */

@@ -57,7 +57,7 @@ VmgExitHandleVc (
   Ghcb = Msr.Ghcb;
   GhcbBackup = NULL;
 
-  SevEsData = (SEV_ES_PER_CPU_DATA *) (Ghcb + 1);
+  SevEsData = (SEV_ES_PER_CPU_DATA *)(Ghcb + 1);
   SevEsData->VcCount++;
 
   //
@@ -84,7 +84,7 @@ VmgExitHandleVc (
     //   To access the correct backup page, increment the backup page pointer
     //   based on the current VcCount.
     //
-    GhcbBackup = (GHCB *) FixedPcdGet32 (PcdOvmfSecGhcbBackupBase);
+    GhcbBackup  = (GHCB *)FixedPcdGet32 (PcdOvmfSecGhcbBackupBase);
     GhcbBackup += (SevEsData->VcCount - 2);
 
     CopyMem (GhcbBackup, Ghcb, sizeof (*Ghcb));

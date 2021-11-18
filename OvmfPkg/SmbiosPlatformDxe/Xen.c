@@ -39,7 +39,7 @@ XenSmbiosTablePublishEntry (
   //
   EntryPointStructure = GetXenSmbiosTables ();
   if (EntryPointStructure != NULL) {
-    SmbiosTables = (UINT8*)(UINTN)EntryPointStructure->TableAddress;
+    SmbiosTables = (UINT8 *)(UINTN)EntryPointStructure->TableAddress;
     if (SmbiosTables != NULL) {
       Status = InstallAllStructures (SmbiosTables);
     }

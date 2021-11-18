@@ -21,7 +21,7 @@
 //   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
 // in any FDF file using this PCD.
 //
-#define VMGEXIT_MAXIMUM_VC_COUNT   2
+#define VMGEXIT_MAXIMUM_VC_COUNT  2
 
 //
 // Per-CPU data mapping structure
@@ -30,11 +30,11 @@
 //   writing random data to that area.
 //
 typedef struct {
-  UINT32  Dr7Cached;
-  UINT64  Dr7;
+  UINT32    Dr7Cached;
+  UINT64    Dr7;
 
-  UINTN   VcCount;
-  VOID    *GhcbBackupPages;
+  UINTN     VcCount;
+  VOID      *GhcbBackupPages;
 } SEV_ES_PER_CPU_DATA;
 
 //
@@ -120,7 +120,6 @@ MemEncryptSevSetPageEncMask (
   IN PHYSICAL_ADDRESS         BaseAddress,
   IN UINTN                    NumPages
   );
-
 
 /**
   Locate the page range that covers the initial (pre-SMBASE-relocation) SMRAM

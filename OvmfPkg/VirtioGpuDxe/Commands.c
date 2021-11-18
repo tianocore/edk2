@@ -34,11 +34,11 @@ VirtioGpuInit (
   IN OUT VGPU_DEV *VgpuDev
   )
 {
-  UINT8      NextDevStat;
-  EFI_STATUS Status;
-  UINT64     Features;
-  UINT16     QueueSize;
-  UINT64     RingBaseShift;
+  UINT8       NextDevStat;
+  EFI_STATUS  Status;
+  UINT64      Features;
+  UINT16      QueueSize;
+  UINT64      RingBaseShift;
 
   //
   // Execute virtio-v1.0-cs04, 3.1.1 Driver Requirements: Device
@@ -77,10 +77,12 @@ VirtioGpuInit (
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
+
   if ((Features & VIRTIO_F_VERSION_1) == 0) {
     Status = EFI_UNSUPPORTED;
     goto Failed;
   }
+
   //
   // We only want the most basic 2D features.
   //
@@ -101,11 +103,14 @@ VirtioGpuInit (
   // 7. Perform device-specific setup, including discovery of virtqueues for
   // the device [...]
   //
-  Status = VgpuDev->VirtIo->SetQueueSel (VgpuDev->VirtIo,
-                              VIRTIO_GPU_CONTROL_QUEUE);
+  Status = VgpuDev->VirtIo->SetQueueSel (
+                              VgpuDev->VirtIo,
+                              VIRTIO_GPU_CONTROL_QUEUE
+                              );
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
+
   Status = VgpuDev->VirtIo->GetQueueNumMax (VgpuDev->VirtIo, &QueueSize);
   if (EFI_ERROR (Status)) {
     goto Failed;
@@ -127,6 +132,7 @@ VirtioGpuInit (
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
+
   //
   // If anything fails from here on, we have to release the ring.
   //
@@ -139,6 +145,7 @@ VirtioGpuInit (
   if (EFI_ERROR (Status)) {
     goto ReleaseQueue;
   }
+
   //
   // If anything fails from here on, we have to unmap the ring.
   //
@@ -242,8 +249,8 @@ VirtioGpuAllocateZeroAndMapBackingStore (
   OUT VOID                 **Mapping
   )
 {
-  EFI_STATUS Status;
-  VOID       *NewHostAddress;
+  EFI_STATUS  Status;
+  VOID        *NewHostAddress;
 
   Status = VgpuDev->VirtIo->AllocateSharedPages (
                               VgpuDev->VirtIo,
@@ -345,7 +352,7 @@ VirtioGpuExitBoot (
   IN VOID      *Context
   )
 {
-  VGPU_DEV *VgpuDev;
+  VGPU_DEV  *VgpuDev;
 
   DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
   VgpuDev = Context;
@@ -405,19 +412,19 @@ VirtioGpuSendCommand (
   IN     UINTN                              RequestSize
   )
 {
-  DESC_INDICES                       Indices;
-  volatile VIRTIO_GPU_CONTROL_HEADER Response;
-  EFI_STATUS                         Status;
-  UINT32                             ResponseSize;
-  EFI_PHYSICAL_ADDRESS               RequestDeviceAddress;
-  VOID                               *RequestMap;
-  EFI_PHYSICAL_ADDRESS               ResponseDeviceAddress;
-  VOID                               *ResponseMap;
+  DESC_INDICES                        Indices;
+  volatile VIRTIO_GPU_CONTROL_HEADER  Response;
+  EFI_STATUS                          Status;
+  UINT32                              ResponseSize;
+  EFI_PHYSICAL_ADDRESS                RequestDeviceAddress;
+  VOID                                *RequestMap;
+  EFI_PHYSICAL_ADDRESS                ResponseDeviceAddress;
+  VOID                                *ResponseMap;
 
   //
   // Initialize Header.
   //
-  Header->Type      = RequestType;
+  Header->Type = RequestType;
   if (Fence) {
     Header->Flags   = VIRTIO_GPU_FLAG_FENCE;
     Header->FenceId = VgpuDev->FenceId++;
@@ -425,8 +432,9 @@ VirtioGpuSendCommand (
     Header->Flags   = 0;
     Header->FenceId = 0;
   }
-  Header->CtxId     = 0;
-  Header->Padding   = 0;
+
+  Header->CtxId   = 0;
+  Header->Padding = 0;
 
   ASSERT (RequestSize >= sizeof *Header);
   ASSERT (RequestSize <= MAX_UINT32);
@@ -445,6 +453,7 @@ VirtioGpuSendCommand (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   Status = VirtioMapAllBytesInSharedBuffer (
              VgpuDev->VirtIo,
              VirtioOperationBusMasterWrite,
@@ -479,8 +488,13 @@ VirtioGpuSendCommand (
   //
   // Send the command.
   //
-  Status = VirtioFlush (VgpuDev->VirtIo, VIRTIO_GPU_CONTROL_QUEUE,
-             &VgpuDev->Ring, &Indices, &ResponseSize);
+  Status = VirtioFlush (
+             VgpuDev->VirtIo,
+             VIRTIO_GPU_CONTROL_QUEUE,
+             &VgpuDev->Ring,
+             &Indices,
+             &ResponseSize
+             );
   if (EFI_ERROR (Status)) {
     goto UnmapResponse;
   }
@@ -489,8 +503,12 @@ VirtioGpuSendCommand (
   // Verify response size.
   //
   if (ResponseSize != sizeof Response) {
-    DEBUG ((DEBUG_ERROR, "%a: malformed response to Request=0x%x\n",
-      __FUNCTION__, (UINT32)RequestType));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: malformed response to Request=0x%x\n",
+      __FUNCTION__,
+      (UINT32)RequestType
+      ));
     Status = EFI_PROTOCOL_ERROR;
     goto UnmapResponse;
   }
@@ -504,6 +522,7 @@ VirtioGpuSendCommand (
   if (EFI_ERROR (Status)) {
     goto UnmapRequest;
   }
+
   Status = VgpuDev->VirtIo->UnmapSharedBuffer (VgpuDev->VirtIo, RequestMap);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -516,8 +535,13 @@ VirtioGpuSendCommand (
     return EFI_SUCCESS;
   }
 
-  DEBUG ((DEBUG_ERROR, "%a: Request=0x%x Response=0x%x\n", __FUNCTION__,
-    (UINT32)RequestType, Response.Type));
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a: Request=0x%x Response=0x%x\n",
+    __FUNCTION__,
+    (UINT32)RequestType,
+    Response.Type
+    ));
   return EFI_DEVICE_ERROR;
 
 UnmapResponse:
@@ -564,7 +588,7 @@ VirtioGpuResourceCreate2d (
   IN     UINT32             Height
   )
 {
-  volatile VIRTIO_GPU_RESOURCE_CREATE_2D Request;
+  volatile VIRTIO_GPU_RESOURCE_CREATE_2D  Request;
 
   if (ResourceId == 0) {
     return EFI_INVALID_PARAMETER;
@@ -572,8 +596,8 @@ VirtioGpuResourceCreate2d (
 
   Request.ResourceId = ResourceId;
   Request.Format     = (UINT32)Format;
-  Request.Width      = Width;
-  Request.Height     = Height;
+  Request.Width  = Width;
+  Request.Height = Height;
 
   return VirtioGpuSendCommand (
            VgpuDev,
@@ -590,7 +614,7 @@ VirtioGpuResourceUnref (
   IN     UINT32   ResourceId
   )
 {
-  volatile VIRTIO_GPU_RESOURCE_UNREF Request;
+  volatile VIRTIO_GPU_RESOURCE_UNREF  Request;
 
   if (ResourceId == 0) {
     return EFI_INVALID_PARAMETER;
@@ -616,7 +640,7 @@ VirtioGpuResourceAttachBacking (
   IN     UINTN                NumberOfPages
   )
 {
-  volatile VIRTIO_GPU_RESOURCE_ATTACH_BACKING Request;
+  volatile VIRTIO_GPU_RESOURCE_ATTACH_BACKING  Request;
 
   if (ResourceId == 0) {
     return EFI_INVALID_PARAMETER;
@@ -643,7 +667,7 @@ VirtioGpuResourceDetachBacking (
   IN     UINT32   ResourceId
   )
 {
-  volatile VIRTIO_GPU_RESOURCE_DETACH_BACKING Request;
+  volatile VIRTIO_GPU_RESOURCE_DETACH_BACKING  Request;
 
   if (ResourceId == 0) {
     return EFI_INVALID_PARAMETER;
@@ -678,7 +702,7 @@ VirtioGpuSetScanout (
   IN     UINT32   ResourceId
   )
 {
-  volatile VIRTIO_GPU_SET_SCANOUT Request;
+  volatile VIRTIO_GPU_SET_SCANOUT  Request;
 
   //
   // Unlike for most other commands, ResourceId=0 is valid; it
@@ -688,8 +712,8 @@ VirtioGpuSetScanout (
   Request.Rectangle.Y      = Y;
   Request.Rectangle.Width  = Width;
   Request.Rectangle.Height = Height;
-  Request.ScanoutId        = ScanoutId;
-  Request.ResourceId       = ResourceId;
+  Request.ScanoutId  = ScanoutId;
+  Request.ResourceId = ResourceId;
 
   return VirtioGpuSendCommand (
            VgpuDev,
@@ -711,7 +735,7 @@ VirtioGpuTransferToHost2d (
   IN     UINT32   ResourceId
   )
 {
-  volatile VIRTIO_GPU_CMD_TRANSFER_TO_HOST_2D Request;
+  volatile VIRTIO_GPU_CMD_TRANSFER_TO_HOST_2D  Request;
 
   if (ResourceId == 0) {
     return EFI_INVALID_PARAMETER;
@@ -721,9 +745,9 @@ VirtioGpuTransferToHost2d (
   Request.Rectangle.Y      = Y;
   Request.Rectangle.Width  = Width;
   Request.Rectangle.Height = Height;
-  Request.Offset           = Offset;
-  Request.ResourceId       = ResourceId;
-  Request.Padding          = 0;
+  Request.Offset     = Offset;
+  Request.ResourceId = ResourceId;
+  Request.Padding    = 0;
 
   return VirtioGpuSendCommand (
            VgpuDev,
@@ -744,7 +768,7 @@ VirtioGpuResourceFlush (
   IN     UINT32   ResourceId
   )
 {
-  volatile VIRTIO_GPU_RESOURCE_FLUSH Request;
+  volatile VIRTIO_GPU_RESOURCE_FLUSH  Request;
 
   if (ResourceId == 0) {
     return EFI_INVALID_PARAMETER;
@@ -754,8 +778,8 @@ VirtioGpuResourceFlush (
   Request.Rectangle.Y      = Y;
   Request.Rectangle.Width  = Width;
   Request.Rectangle.Height = Height;
-  Request.ResourceId       = ResourceId;
-  Request.Padding          = 0;
+  Request.ResourceId = ResourceId;
+  Request.Padding    = 0;
 
   return VirtioGpuSendCommand (
            VgpuDev,

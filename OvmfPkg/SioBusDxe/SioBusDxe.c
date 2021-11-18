@@ -13,7 +13,7 @@
 //
 // SioBus Driver Binding Protocol
 //
-EFI_DRIVER_BINDING_PROTOCOL gSioBusDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gSioBusDriverBinding = {
   SioBusDriverBindingSupported,
   SioBusDriverBindingStart,
   SioBusDriverBindingStop,
@@ -21,7 +21,6 @@ EFI_DRIVER_BINDING_PROTOCOL gSioBusDriverBinding = {
   NULL,
   NULL
 };
-
 
 /**
   Tests to see if this driver supports a given controller. If a child device is
@@ -84,13 +83,13 @@ SioBusDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 {
-  EFI_STATUS             Status;
-  EFI_PCI_IO_PROTOCOL    *PciIo;
-  PCI_TYPE00             Pci;
-  UINTN                  SegmentNumber;
-  UINTN                  BusNumber;
-  UINTN                  DeviceNumber;
-  UINTN                  FunctionNumber;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
+  UINTN                SegmentNumber;
+  UINTN                BusNumber;
+  UINTN                DeviceNumber;
+  UINTN                FunctionNumber;
 
   //
   // Get PciIo protocol instance
@@ -98,21 +97,22 @@ SioBusDriverBindingSupported (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  (VOID**)&PciIo,
+                  (VOID **)&PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
   Status = PciIo->Pci.Read (
-                    PciIo,
-                    EfiPciIoWidthUint32,
-                    0,
-                    sizeof(Pci) / sizeof(UINT32),
-                    &Pci);
+                        PciIo,
+                        EfiPciIoWidthUint32,
+                        0,
+                        sizeof (Pci) / sizeof (UINT32),
+                        &Pci
+                        );
 
   if (!EFI_ERROR (Status)) {
     Status = EFI_UNSUPPORTED;
@@ -129,8 +129,9 @@ SioBusDriverBindingSupported (
         //
         // See if this is an Intel PCI to ISA bridge in Positive Decode Mode
         //
-        if (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA_PDECODE &&
-            Pci.Hdr.VendorId     == 0x8086) {
+        if ((Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA_PDECODE) &&
+            (Pci.Hdr.VendorId     == 0x8086))
+        {
           //
           // See if this is on Function #0 to avoid false positives on
           // PCI_CLASS_BRIDGE_OTHER that has the same value as
@@ -143,7 +144,7 @@ SioBusDriverBindingSupported (
                             &DeviceNumber,
                             &FunctionNumber
                             );
-          if (!EFI_ERROR (Status) && FunctionNumber == 0) {
+          if (!EFI_ERROR (Status) && (FunctionNumber == 0)) {
             Status = EFI_SUCCESS;
           } else {
             Status = EFI_UNSUPPORTED;
@@ -217,29 +218,29 @@ SioBusDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
 {
-  EFI_STATUS                     Status;
-  EFI_PCI_IO_PROTOCOL            *PciIo;
-  EFI_DEVICE_PATH_PROTOCOL       *ParentDevicePath;
-  UINT64                         Supports;
-  UINT64                         OriginalAttributes;
-  UINT64                         Attributes;
-  BOOLEAN                        Enabled;
-  SIO_BUS_DRIVER_PRIVATE_DATA    *Private;
-  UINT32                         ChildDeviceNumber;
+  EFI_STATUS                   Status;
+  EFI_PCI_IO_PROTOCOL          *PciIo;
+  EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath;
+  UINT64                       Supports;
+  UINT64                       OriginalAttributes;
+  UINT64                       Attributes;
+  BOOLEAN                      Enabled;
+  SIO_BUS_DRIVER_PRIVATE_DATA  *Private;
+  UINT32                       ChildDeviceNumber;
 
-  Enabled            = FALSE;
-  Supports           = 0;
+  Enabled  = FALSE;
+  Supports = 0;
   OriginalAttributes = 0;
-  Private            = NULL;
+  Private = NULL;
 
   //
   // Open the PCI I/O Protocol Interface
   //
-  PciIo = NULL;
+  PciIo  = NULL;
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  (VOID**) &PciIo,
+                  (VOID **)&PciIo,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -254,7 +255,7 @@ SioBusDriverBindingStart (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath,
+                  (VOID **)&ParentDevicePath,
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -282,11 +283,12 @@ SioBusDriverBindingStart (
     goto Done;
   }
 
-  Supports &= (UINT64) (EFI_PCI_IO_ATTRIBUTE_ISA_IO |
-                        EFI_PCI_IO_ATTRIBUTE_ISA_IO_16);
-  if (Supports == 0 ||
-      Supports == (EFI_PCI_IO_ATTRIBUTE_ISA_IO |
-                   EFI_PCI_IO_ATTRIBUTE_ISA_IO_16)) {
+  Supports &= (UINT64)(EFI_PCI_IO_ATTRIBUTE_ISA_IO |
+                       EFI_PCI_IO_ATTRIBUTE_ISA_IO_16);
+  if ((Supports == 0) ||
+      (Supports == (EFI_PCI_IO_ATTRIBUTE_ISA_IO |
+                    EFI_PCI_IO_ATTRIBUTE_ISA_IO_16)))
+  {
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
@@ -324,7 +326,8 @@ SioBusDriverBindingStart (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-  Private->PciIo              = PciIo;
+
+  Private->PciIo = PciIo;
   Private->OriginalAttributes = OriginalAttributes;
 
   Status = gBS->InstallProtocolInterface (
@@ -370,7 +373,7 @@ SioBusDriverBindingStart (
 
 Done:
   if (EFI_ERROR (Status)) {
-    if (PciIo != NULL && Enabled) {
+    if ((PciIo != NULL) && Enabled) {
       PciIo->Attributes (
                PciIo,
                EfiPciIoAttributeOperationSet,
@@ -451,13 +454,13 @@ SioBusDriverBindingStop (
   IN  EFI_HANDLE                     *ChildHandleBuffer
   )
 {
-  EFI_STATUS                     Status;
-  SIO_BUS_DRIVER_PRIVATE_DATA    *Private;
-  UINTN                          Index;
-  BOOLEAN                        AllChildrenStopped;
-  EFI_SIO_PROTOCOL               *Sio;
-  SIO_DEV                        *SioDevice;
-  EFI_PCI_IO_PROTOCOL            *PciIo;
+  EFI_STATUS                   Status;
+  SIO_BUS_DRIVER_PRIVATE_DATA  *Private;
+  UINTN                        Index;
+  BOOLEAN                      AllChildrenStopped;
+  EFI_SIO_PROTOCOL             *Sio;
+  SIO_DEV                      *SioDevice;
+  EFI_PCI_IO_PROTOCOL          *PciIo;
 
   if (NumberOfChildren == 0) {
     //
@@ -466,7 +469,7 @@ SioBusDriverBindingStop (
     Status = gBS->OpenProtocol (
                     Controller,
                     &gEfiCallerIdGuid,
-                    (VOID **) &Private,
+                    (VOID **)&Private,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -486,10 +489,10 @@ SioBusDriverBindingStop (
     }
 
     gBS->UninstallProtocolInterface (
-          Controller,
-          &gEfiCallerIdGuid,
-          Private
-          );
+           Controller,
+           &gEfiCallerIdGuid,
+           Private
+           );
     FreePool (Private);
 
     //
@@ -527,7 +530,7 @@ SioBusDriverBindingStop (
     Status = gBS->OpenProtocol (
                     ChildHandleBuffer[Index],
                     &gEfiSioProtocolGuid,
-                    (VOID **) &Sio,
+                    (VOID **)&Sio,
                     This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -564,7 +567,7 @@ SioBusDriverBindingStop (
         gBS->OpenProtocol (
                Controller,
                &gEfiPciIoProtocolGuid,
-               (VOID **) &PciIo,
+               (VOID **)&PciIo,
                This->DriverBindingHandle,
                ChildHandleBuffer[Index],
                EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
