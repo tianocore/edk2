@@ -6,7 +6,6 @@
 
 **/
 
-
 #include <PiPei.h>
 #include <Library/DebugLib.h>
 #include <Library/SerialPortLib.h>
@@ -21,9 +20,9 @@
 VOID
 EFIAPI
 PlatformInit (
-  IN VOID                 *FspHobList,
-  IN VOID                 *StartOfRange,
-  IN VOID                 *EndOfRange
+  IN VOID  *FspHobList,
+  IN VOID  *StartOfRange,
+  IN VOID  *EndOfRange
   )
 {
   //

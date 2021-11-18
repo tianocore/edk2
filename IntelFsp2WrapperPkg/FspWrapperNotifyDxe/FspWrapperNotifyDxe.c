@@ -21,25 +21,25 @@
 #include <Library/HobLib.h>
 #include <FspStatusCode.h>
 
-#define   FSP_API_NOTIFY_PHASE_AFTER_PCI_ENUMERATION     BIT16
+#define   FSP_API_NOTIFY_PHASE_AFTER_PCI_ENUMERATION  BIT16
 
 typedef
 EFI_STATUS
-(EFIAPI * ADD_PERFORMANCE_RECORDS)(
+(EFIAPI *ADD_PERFORMANCE_RECORDS)(
   IN CONST VOID *HobStart
   );
 
 struct _ADD_PERFORMANCE_RECORD_PROTOCOL {
-  ADD_PERFORMANCE_RECORDS          AddPerformanceRecords;
+  ADD_PERFORMANCE_RECORDS    AddPerformanceRecords;
 };
 
 typedef struct _ADD_PERFORMANCE_RECORD_PROTOCOL ADD_PERFORMANCE_RECORD_PROTOCOL;
 
-extern EFI_GUID gAddPerfRecordProtocolGuid;
-extern EFI_GUID gFspHobGuid;
-extern EFI_GUID gFspApiPerformanceGuid;
+extern EFI_GUID  gAddPerfRecordProtocolGuid;
+extern EFI_GUID  gFspHobGuid;
+extern EFI_GUID  gFspApiPerformanceGuid;
 
-static EFI_EVENT mExitBootServicesEvent     = NULL;
+static EFI_EVENT  mExitBootServicesEvent = NULL;
 
 /**
   Relocate this image under 4G memory.
@@ -53,8 +53,8 @@ static EFI_EVENT mExitBootServicesEvent     = NULL;
 **/
 EFI_STATUS
 RelocateImageUnder4GIfNeeded (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
 /**
@@ -70,9 +70,9 @@ OnPciEnumerationComplete (
   IN VOID       *Context
   )
 {
-  NOTIFY_PHASE_PARAMS NotifyPhaseParams;
-  EFI_STATUS          Status;
-  VOID                *Interface;
+  NOTIFY_PHASE_PARAMS  NotifyPhaseParams;
+  EFI_STATUS           Status;
+  VOID                 *Interface;
 
   //
   // Try to locate it because gEfiPciEnumerationCompleteProtocolGuid will trigger it once when registration.
@@ -84,26 +84,26 @@ OnPciEnumerationComplete (
                   &Interface
                   );
   if (EFI_ERROR (Status)) {
-    return ;
+    return;
   }
 
   NotifyPhaseParams.Phase = EnumInitPhaseAfterPciEnumeration;
-  PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_POST_PCIE_ENUM_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
+  PERF_START_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_POST_PCIE_ENUM_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
   Status = CallFspNotifyPhase (&NotifyPhaseParams);
-  PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_POST_PCIE_ENUM_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
+  PERF_END_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_POST_PCIE_ENUM_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
 
   //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
-    DEBUG((DEBUG_INFO, "FSP NotifyPhase AfterPciEnumeration requested reset 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "FSP NotifyPhase AfterPciEnumeration requested reset 0x%x\n", Status));
     CallFspWrapperResetSystem ((UINT32)Status);
   }
 
   if (Status != EFI_SUCCESS) {
-    DEBUG((DEBUG_ERROR, "FSP NotifyPhase AfterPciEnumeration failed, status: 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "FSP NotifyPhase AfterPciEnumeration failed, status: 0x%x\n", Status));
   } else {
-    DEBUG((DEBUG_INFO, "FSP NotifyPhase AfterPciEnumeration Success.\n"));
+    DEBUG ((DEBUG_INFO, "FSP NotifyPhase AfterPciEnumeration Success.\n"));
   }
 }
 
@@ -125,28 +125,28 @@ OnReadyToBoot (
   IN VOID       *Context
   )
 {
-  NOTIFY_PHASE_PARAMS               NotifyPhaseParams;
-  EFI_STATUS                        Status;
+  NOTIFY_PHASE_PARAMS  NotifyPhaseParams;
+  EFI_STATUS           Status;
 
   gBS->CloseEvent (Event);
 
   NotifyPhaseParams.Phase = EnumInitPhaseReadyToBoot;
-  PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_READY_TO_BOOT_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
+  PERF_START_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_READY_TO_BOOT_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
   Status = CallFspNotifyPhase (&NotifyPhaseParams);
-  PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_READY_TO_BOOT_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
+  PERF_END_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_READY_TO_BOOT_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
 
   //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
-    DEBUG((DEBUG_INFO, "FSP NotifyPhase ReadyToBoot requested reset 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "FSP NotifyPhase ReadyToBoot requested reset 0x%x\n", Status));
     CallFspWrapperResetSystem ((UINT32)Status);
   }
 
   if (Status != EFI_SUCCESS) {
-    DEBUG((DEBUG_ERROR, "FSP NotifyPhase ReadyToBoot failed, status: 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "FSP NotifyPhase ReadyToBoot failed, status: 0x%x\n", Status));
   } else {
-    DEBUG((DEBUG_INFO, "FSP NotifyPhase ReadyToBoot Success.\n"));
+    DEBUG ((DEBUG_INFO, "FSP NotifyPhase ReadyToBoot Success.\n"));
   }
 }
 
@@ -166,39 +166,40 @@ OnEndOfFirmware (
   IN VOID       *Context
   )
 {
-  NOTIFY_PHASE_PARAMS               NotifyPhaseParams;
-  EFI_STATUS                        Status;
-  ADD_PERFORMANCE_RECORD_PROTOCOL   *AddPerfRecordInterface;
-  EFI_PEI_HOB_POINTERS              Hob;
-  VOID                              **FspHobListPtr;
+  NOTIFY_PHASE_PARAMS              NotifyPhaseParams;
+  EFI_STATUS                       Status;
+  ADD_PERFORMANCE_RECORD_PROTOCOL  *AddPerfRecordInterface;
+  EFI_PEI_HOB_POINTERS             Hob;
+  VOID                             **FspHobListPtr;
 
   gBS->CloseEvent (Event);
 
   NotifyPhaseParams.Phase = EnumInitPhaseEndOfFirmware;
-  PERF_START_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_END_OF_FIRMWARE_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
+  PERF_START_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_END_OF_FIRMWARE_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_ENTRY);
   Status = CallFspNotifyPhase (&NotifyPhaseParams);
-  PERF_END_EX(&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_END_OF_FIRMWARE_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
+  PERF_END_EX (&gFspApiPerformanceGuid, "EventRec", NULL, 0, FSP_STATUS_CODE_END_OF_FIRMWARE_NOTIFICATION | FSP_STATUS_CODE_COMMON_CODE | FSP_STATUS_CODE_API_EXIT);
 
   //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
-    DEBUG((DEBUG_INFO, "FSP NotifyPhase EndOfFirmware requested reset 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "FSP NotifyPhase EndOfFirmware requested reset 0x%x\n", Status));
     CallFspWrapperResetSystem ((UINT32)Status);
   }
 
   if (Status != EFI_SUCCESS) {
-    DEBUG((DEBUG_ERROR, "FSP NotifyPhase EndOfFirmware failed, status: 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "FSP NotifyPhase EndOfFirmware failed, status: 0x%x\n", Status));
   } else {
-    DEBUG((DEBUG_INFO, "FSP NotifyPhase EndOfFirmware Success.\n"));
+    DEBUG ((DEBUG_INFO, "FSP NotifyPhase EndOfFirmware Success.\n"));
   }
+
   Status = gBS->LocateProtocol (
                   &gAddPerfRecordProtocolGuid,
                   NULL,
-                  (VOID**) &AddPerfRecordInterface
+                  (VOID **)&AddPerfRecordInterface
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG((DEBUG_INFO, "gAddPerfRecordProtocolGuid - Locate protocol failed\n"));
+    DEBUG ((DEBUG_INFO, "gAddPerfRecordProtocolGuid - Locate protocol failed\n"));
     return;
   } else {
     Hob.Raw = GetFirstGuidHob (&gFspHobGuid);
@@ -224,15 +225,15 @@ OnEndOfFirmware (
 EFI_STATUS
 EFIAPI
 FspWrapperNotifyDxeEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS Status;
-  EFI_EVENT  ReadyToBootEvent;
-  VOID       *Registration;
-  EFI_EVENT  ProtocolNotifyEvent;
-  UINT32     FspApiMask;
+  EFI_STATUS  Status;
+  EFI_EVENT   ReadyToBootEvent;
+  VOID        *Registration;
+  EFI_EVENT   ProtocolNotifyEvent;
+  UINT32      FspApiMask;
 
   //
   // Load this driver's image to memory
@@ -274,4 +275,3 @@ FspWrapperNotifyDxeEntryPoint (
 
   return EFI_SUCCESS;
 }
-

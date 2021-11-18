@@ -19,7 +19,7 @@
 **/
 typedef
 EFI_STATUS
-(EFIAPI *FSP_FUNCTION) (
+(EFIAPI *FSP_FUNCTION)(
   IN VOID *Param1,
   IN VOID *Param2
   );
@@ -36,17 +36,16 @@ EFI_STATUS
 **/
 EFI_STATUS
 Execute32BitCode (
-  IN UINT64      Function,
-  IN UINT64      Param1,
-  IN UINT64      Param2
+  IN UINT64  Function,
+  IN UINT64  Param1,
+  IN UINT64  Param2
   )
 {
-  FSP_FUNCTION               EntryFunc;
-  EFI_STATUS                 Status;
+  FSP_FUNCTION  EntryFunc;
+  EFI_STATUS    Status;
 
-  EntryFunc = (FSP_FUNCTION) (UINTN) (Function);
+  EntryFunc = (FSP_FUNCTION)(UINTN)(Function);
   Status    = EntryFunc ((VOID *)(UINTN)Param1, (VOID *)(UINTN)Param2);
 
   return Status;
 }
-
