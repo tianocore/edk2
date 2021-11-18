@@ -73,7 +73,7 @@ InputBarSetStringSize (
   @retval NULL                  No input has been received.
   @return The string that was input.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 InputBarGetString (
   VOID
   );

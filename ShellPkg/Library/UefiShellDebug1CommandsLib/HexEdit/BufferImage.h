@@ -140,7 +140,6 @@ HBufferImageMovePosition (
   IN BOOLEAN  HighBits
   );
 
-
 /**
   Create a new line and append it to the line list.
     Fields affected:

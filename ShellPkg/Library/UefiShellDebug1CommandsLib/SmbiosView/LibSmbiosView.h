@@ -11,22 +11,22 @@
 
 #include <IndustryStandard/SmBios.h>
 
-#define DMI_SUCCESS                     0x00
-#define DMI_UNKNOWN_FUNCTION            0x81
-#define DMI_FUNCTION_NOT_SUPPORTED      0x82
-#define DMI_INVALID_HANDLE              0x83
-#define DMI_BAD_PARAMETER               0x84
-#define DMI_INVALID_SUBFUNCTION         0x85
-#define DMI_NO_CHANGE                   0x86
-#define DMI_ADD_STRUCTURE_FAILED        0x87
-#define DMI_READ_ONLY                   0x8D
-#define DMI_LOCK_NOT_SUPPORTED          0x90
-#define DMI_CURRENTLY_LOCKED            0x91
-#define DMI_INVALID_LOCK                0x92
+#define DMI_SUCCESS                 0x00
+#define DMI_UNKNOWN_FUNCTION        0x81
+#define DMI_FUNCTION_NOT_SUPPORTED  0x82
+#define DMI_INVALID_HANDLE          0x83
+#define DMI_BAD_PARAMETER           0x84
+#define DMI_INVALID_SUBFUNCTION     0x85
+#define DMI_NO_CHANGE               0x86
+#define DMI_ADD_STRUCTURE_FAILED    0x87
+#define DMI_READ_ONLY               0x8D
+#define DMI_LOCK_NOT_SUPPORTED      0x90
+#define DMI_CURRENTLY_LOCKED        0x91
+#define DMI_INVALID_LOCK            0x92
 
-#define INVALID_HANDLE                  (UINT16) (-1)
+#define INVALID_HANDLE  (UINT16) (-1)
 
-#define EFI_SMBIOSERR(val)              EFIERR (0x30000 | val)
+#define EFI_SMBIOSERR(val)  EFIERR (0x30000 | val)
 
 #define EFI_SMBIOSERR_FAILURE           EFI_SMBIOSERR (1)
 #define EFI_SMBIOSERR_STRUCT_NOT_FOUND  EFI_SMBIOSERR (2)
@@ -98,7 +98,7 @@ LibSmbios64BitGetEPS (
 
   @return Pointer to string, or pointer to next SMBIOS strcuture if StringNumber == -1
 **/
-CHAR8*
+CHAR8 *
 LibGetSmbiosString (
   IN  SMBIOS_STRUCTURE_POINTER    *Smbios,
   IN  UINT16                      StringNumber

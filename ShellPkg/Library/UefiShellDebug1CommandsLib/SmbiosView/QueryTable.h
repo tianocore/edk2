@@ -12,11 +12,11 @@
 
 #include <IndustryStandard/SmBios.h>
 
-#define QUERY_TABLE_UNFOUND 0xFF
+#define QUERY_TABLE_UNFOUND  0xFF
 
 typedef struct TABLE_ITEM {
-  UINT16  Key;
-  CHAR16  *Info;
+  UINT16    Key;
+  CHAR16    *Info;
 } TABLE_ITEM;
 
 //
@@ -109,7 +109,7 @@ DisplayBaseBoardFeatureFlags (
   @param[in] Option         The optional information.
 **/
 VOID
-DisplayBaseBoardBoardType(
+DisplayBaseBoardBoardType (
   IN UINT8 Type,
   IN UINT8 Option
   );

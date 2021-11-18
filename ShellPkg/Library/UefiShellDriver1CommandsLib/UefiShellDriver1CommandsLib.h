@@ -57,9 +57,8 @@
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/HandleParsingLib.h>
 
-
-extern        EFI_HII_HANDLE                    gShellDriver1HiiHandle;
-extern        BOOLEAN                           gInReconnect;
+extern        EFI_HII_HANDLE  gShellDriver1HiiHandle;
+extern        BOOLEAN         gInReconnect;
 
 /**
   Function for 'connect' command.
@@ -216,7 +215,4 @@ ShellConnectFromDevPaths (
   IN CONST CHAR16 *Key
   );
 
-
-
 #endif
-

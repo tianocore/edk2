@@ -9,15 +9,15 @@
 #ifndef _SMBIOS_VIEW_H_
 #define _SMBIOS_VIEW_H_
 
-#define STRUCTURE_TYPE_RANDOM     (UINT8) 0xFE
-#define STRUCTURE_TYPE_INVALID    (UINT8) 0xFF
+#define STRUCTURE_TYPE_RANDOM   (UINT8) 0xFE
+#define STRUCTURE_TYPE_INVALID  (UINT8) 0xFF
 
 typedef struct {
-  UINT16  Index;
-  UINT8   Type;
-  UINT16  Handle;
-  UINT16  Addr;   // offset from table head
-  UINT16  Length; // total structure length
+  UINT16    Index;
+  UINT8     Type;
+  UINT16    Handle;
+  UINT16    Addr;   // offset from table head
+  UINT16    Length; // total structure length
 } STRUCTURE_STATISTICS;
 
 /**
@@ -111,7 +111,7 @@ DisplaySmbios64BitStatisticsTable (
 
   @return   A pointer to a string representing the ShowType (or 'undefined type' if not known).
 **/
-CHAR16*
+CHAR16 *
 GetShowTypeString (
   UINT8 ShowType
   );

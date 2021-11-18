@@ -56,4 +56,3 @@ PrintCommandHistory (
   );
 
 #endif //_FILE_HANDLE_INTERNAL_HEADER_
-

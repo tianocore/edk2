@@ -31,4 +31,3 @@ ShellAppMain (
   );
 
 #endif
-

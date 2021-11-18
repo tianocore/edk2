@@ -10,31 +10,32 @@
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
+
 #ifndef _DP_INTELNAL_H_
 #define _DP_INTELNAL_H_
 
-#define DP_GAUGE_STRING_LENGTH   36
+#define DP_GAUGE_STRING_LENGTH  36
 
 //
 /// Module-Global Variables
 ///@{
-extern EFI_HII_HANDLE     mDpHiiHandle;
-extern CHAR16             mGaugeString[DP_GAUGE_STRING_LENGTH + 1];
-extern CHAR16             mUnicodeToken[DXE_PERFORMANCE_STRING_SIZE];
-extern UINT64             mInterestThreshold;
-extern BOOLEAN            mShowId;
-extern UINT8              *mBootPerformanceTable;
-extern UINTN              mBootPerformanceTableLength;
-extern MEASUREMENT_RECORD *mMeasurementList;
-extern UINTN              mMeasurementNum;
+extern EFI_HII_HANDLE      mDpHiiHandle;
+extern CHAR16              mGaugeString[DP_GAUGE_STRING_LENGTH + 1];
+extern CHAR16              mUnicodeToken[DXE_PERFORMANCE_STRING_SIZE];
+extern UINT64              mInterestThreshold;
+extern BOOLEAN             mShowId;
+extern UINT8               *mBootPerformanceTable;
+extern UINTN               mBootPerformanceTableLength;
+extern MEASUREMENT_RECORD  *mMeasurementList;
+extern UINTN               mMeasurementNum;
 
 extern PERF_SUMMARY_DATA  SummaryData;    ///< Create the SummaryData structure and init. to ZERO.
 
 /// Items for which to gather cumulative statistics.
-extern PERF_CUM_DATA      CumData[];
+extern PERF_CUM_DATA  CumData[];
 
 /// Number of items for which we are gathering cumulative statistics.
-extern UINT32 const       NumCum;
+extern UINT32 const  NumCum;
 
 ///@}
 
@@ -75,7 +76,7 @@ GetDuration (
   @retval     FALSE       The measurement record is NOT for an EFI Phase.
 **/
 BOOLEAN
-IsPhase(
+IsPhase (
   IN MEASUREMENT_RECORD *Measurement
   );
 
@@ -89,7 +90,7 @@ IsPhase(
 
 **/
 BOOLEAN
-IsCorePerf(
+IsCorePerf (
   IN MEASUREMENT_RECORD        *Measurement
   );
 
@@ -164,7 +165,7 @@ DurationInMicroSeconds (
   @retval     >=0   Return value is the index into CumData where Token is found.
 **/
 INTN
-GetCumulativeItem(
+GetCumulativeItem (
   IN MEASUREMENT_RECORD *Measurement
   );
 
@@ -186,7 +187,7 @@ GetCumulativeItem(
 
 **/
 VOID
-GatherStatistics(
+GatherStatistics (
   IN OUT PERF_CUM_DATA              *CustomCumulativeData OPTIONAL
   );
 
@@ -212,7 +213,7 @@ GatherStatistics(
   @return Others                from a call to gBS->LocateHandleBuffer().
 **/
 EFI_STATUS
-DumpAllTrace(
+DumpAllTrace (
   IN UINTN             Limit,
   IN BOOLEAN           ExcludeFlag
   );
@@ -237,7 +238,7 @@ DumpAllTrace(
   @retval EFI_ABORTED           The user aborts the operation.
 **/
 EFI_STATUS
-DumpRawTrace(
+DumpRawTrace (
   IN UINTN          Limit,
   IN BOOLEAN        ExcludeFlag
   );
@@ -247,10 +248,9 @@ DumpRawTrace(
 
 **/
 VOID
-ProcessPhases(
+ProcessPhases (
   VOID
   );
-
 
 /**
   Gather and print Handle data.
@@ -262,10 +262,9 @@ ProcessPhases(
   @return Others                  from a call to gBS->LocateHandleBuffer().
 **/
 EFI_STATUS
-ProcessHandles(
+ProcessHandles (
   IN BOOLEAN ExcludeFlag
   );
-
 
 /**
   Gather and print PEIM data.
@@ -276,7 +275,7 @@ ProcessHandles(
   @retval EFI_ABORTED           The user aborts the operation.
 **/
 EFI_STATUS
-ProcessPeims(
+ProcessPeims (
   VOID
   );
 
@@ -292,7 +291,7 @@ ProcessPeims(
   @retval EFI_ABORTED           The user aborts the operation.
 **/
 EFI_STATUS
-ProcessGlobal(
+ProcessGlobal (
   VOID
   );
 
@@ -308,7 +307,7 @@ ProcessGlobal(
 
 **/
 VOID
-ProcessCumulative(
+ProcessCumulative (
   IN PERF_CUM_DATA                  *CustomCumulativeData OPTIONAL
   );
 

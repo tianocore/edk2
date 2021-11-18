@@ -33,7 +33,7 @@
 #include <Library/HiiLib.h>
 #include <Library/FileHandleLib.h>
 
-extern        EFI_HII_HANDLE                    gShellLevel1HiiHandle;
+extern        EFI_HII_HANDLE  gShellLevel1HiiHandle;
 
 /**
   Function for 'stall' command.
@@ -139,7 +139,6 @@ ShellCommandRunShift (
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
-
 /**
   Function for 'else' command.
 
@@ -200,4 +199,3 @@ MoveToTag (
   );
 
 #endif
-
