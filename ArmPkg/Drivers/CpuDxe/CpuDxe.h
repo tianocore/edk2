@@ -31,7 +31,7 @@
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
 
-extern BOOLEAN mIsFlushingGCD;
+extern BOOLEAN  mIsFlushingGCD;
 
 /**
   This function registers and enables the handler specified by InterruptHandler for a processor
@@ -59,7 +59,6 @@ RegisterInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER      InterruptHandler
   );
 
-
 /**
   This function registers and enables the handler specified by InterruptHandler for a processor
   interrupt or exception type specified by InterruptType. If InterruptHandler is NULL, then the
@@ -85,7 +84,6 @@ RegisterDebuggerInterruptHandler (
   IN EFI_EXCEPTION_TYPE             InterruptType,
   IN EFI_CPU_INTERRUPT_HANDLER      InterruptHandler
   );
-
 
 EFI_STATUS
 EFIAPI
@@ -117,7 +115,7 @@ SyncCacheConfig (
 **/
 VOID
 EFIAPI
-PublishArmProcessorTable(
+PublishArmProcessorTable (
   VOID
   );
 

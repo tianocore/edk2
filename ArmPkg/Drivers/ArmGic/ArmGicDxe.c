@@ -36,8 +36,8 @@ InterruptDxeInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS            Status;
-  ARM_GIC_ARCH_REVISION Revision;
+  EFI_STATUS             Status;
+  ARM_GIC_ARCH_REVISION  Revision;
 
   Revision = ArmGicGetSupportedArchRevision ();
 

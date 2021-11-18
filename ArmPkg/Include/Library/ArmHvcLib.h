@@ -14,14 +14,14 @@
  * The native size is used for the arguments.
  */
 typedef struct {
-  UINTN  Arg0;
-  UINTN  Arg1;
-  UINTN  Arg2;
-  UINTN  Arg3;
-  UINTN  Arg4;
-  UINTN  Arg5;
-  UINTN  Arg6;
-  UINTN  Arg7;
+  UINTN    Arg0;
+  UINTN    Arg1;
+  UINTN    Arg2;
+  UINTN    Arg3;
+  UINTN    Arg4;
+  UINTN    Arg5;
+  UINTN    Arg6;
+  UINTN    Arg7;
 } ARM_HVC_ARGS;
 
 /**

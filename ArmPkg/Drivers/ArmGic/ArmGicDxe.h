@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/HardwareInterrupt.h>
 #include <Protocol/HardwareInterrupt2.h>
 
-extern UINTN                        mGicNumInterrupts;
+extern UINTN                       mGicNumInterrupts;
 extern HARDWARE_INTERRUPT_HANDLER  *gRegisteredInterruptHandlers;
 
 // Common API
@@ -54,7 +54,6 @@ GicV3DxeInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   );
-
 
 // Shared code
 

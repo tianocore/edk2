@@ -17,12 +17,12 @@
  *
  */
 
-#define SEMIHOST_FILE_MODE_READ     (0 << 2)
-#define SEMIHOST_FILE_MODE_WRITE    (1 << 2)
-#define SEMIHOST_FILE_MODE_APPEND   (2 << 2)
-#define SEMIHOST_FILE_MODE_UPDATE   (1 << 1)
-#define SEMIHOST_FILE_MODE_BINARY   (1 << 0)
-#define SEMIHOST_FILE_MODE_ASCII    (0 << 0)
+#define SEMIHOST_FILE_MODE_READ    (0 << 2)
+#define SEMIHOST_FILE_MODE_WRITE   (1 << 2)
+#define SEMIHOST_FILE_MODE_APPEND  (2 << 2)
+#define SEMIHOST_FILE_MODE_UPDATE  (1 << 1)
+#define SEMIHOST_FILE_MODE_BINARY  (1 << 0)
+#define SEMIHOST_FILE_MODE_ASCII   (0 << 0)
 
 BOOLEAN
 SemihostConnectionSupported (
@@ -81,7 +81,7 @@ SemihostFileLength (
 
 **/
 RETURN_STATUS
-SemihostFileTmpName(
+SemihostFileTmpName (
   OUT  VOID   *Buffer,
   IN   UINT8  Identifier,
   IN   UINTN  Length
@@ -104,7 +104,7 @@ SemihostFileRemove (
 
 **/
 RETURN_STATUS
-SemihostFileRename(
+SemihostFileRename (
   IN  CHAR8  *FileName,
   IN  CHAR8  *NewFileName
   );

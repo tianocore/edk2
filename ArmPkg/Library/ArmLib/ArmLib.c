@@ -19,7 +19,7 @@ ArmSetAuxCrBit (
   IN  UINT32    Bits
   )
 {
-  ArmWriteAuxCr(ArmReadAuxCr() | Bits);
+  ArmWriteAuxCr (ArmReadAuxCr () | Bits);
 }
 
 VOID
@@ -28,7 +28,7 @@ ArmUnsetAuxCrBit (
   IN  UINT32    Bits
   )
 {
-  ArmWriteAuxCr(ArmReadAuxCr() & ~Bits);
+  ArmWriteAuxCr (ArmReadAuxCr () & ~Bits);
 }
 
 //
@@ -77,7 +77,7 @@ ArmCacheWritebackGranule (
   VOID
   )
 {
-  UINTN   CWG;
+  UINTN  CWG;
 
   CWG = (ArmCacheInfo () >> 24) & 0xf; // CTR_EL0.CWG
 

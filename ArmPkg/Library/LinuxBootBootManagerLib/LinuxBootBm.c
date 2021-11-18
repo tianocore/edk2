@@ -43,14 +43,14 @@ PlatformRegisterFvBootOption (
   UINT32         Attributes
   )
 {
-  EFI_STATUS                        Status;
-  INTN                              OptionIndex;
-  EFI_BOOT_MANAGER_LOAD_OPTION      NewOption;
-  EFI_BOOT_MANAGER_LOAD_OPTION      *BootOptions;
-  UINTN                             BootOptionCount;
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH FileNode;
-  EFI_LOADED_IMAGE_PROTOCOL         *LoadedImage;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+  EFI_STATUS                         Status;
+  INTN                               OptionIndex;
+  EFI_BOOT_MANAGER_LOAD_OPTION       NewOption;
+  EFI_BOOT_MANAGER_LOAD_OPTION       *BootOptions;
+  UINTN                              BootOptionCount;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
+  EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
 
   Status = gBS->HandleProtocol (
                   gImageHandle,
@@ -96,6 +96,7 @@ PlatformRegisterFvBootOption (
     Status = EfiBootManagerAddLoadOptionVariable (&NewOption, MAX_UINTN);
     ASSERT_EFI_ERROR (Status);
   }
+
   EfiBootManagerFreeLoadOption (&NewOption);
   EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
 }
@@ -136,7 +137,7 @@ PlatformBootManagerAfterConsole (
   VOID
   )
 {
-  EFI_GUID LinuxBootFileGuid;
+  EFI_GUID  LinuxBootFileGuid;
 
   CopyGuid (&LinuxBootFileGuid, PcdGetPtr (PcdLinuxBootFileGuid));
 

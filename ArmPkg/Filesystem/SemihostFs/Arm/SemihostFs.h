@@ -243,4 +243,3 @@ FileFlush (
   );
 
 #endif // SEMIHOST_FS_H_
-

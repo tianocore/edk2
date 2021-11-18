@@ -15,7 +15,6 @@
 #include <Library/HiiLib.h>
 #include <Library/OemMiscLib.h>
 
-
 /** Gets the CPU frequency of the specified processor.
 
   @param ProcessorIndex Index of the processor to get the frequency for.

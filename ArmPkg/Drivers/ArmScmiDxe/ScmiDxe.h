@@ -8,12 +8,13 @@
     http://infocenter.arm.com/help/topic/com.arm.doc.den0056a/
     DEN0056A_System_Control_and_Management_Interface.pdf
 **/
+
 #ifndef SCMI_DXE_H_
 #define SCMI_DXE_H_
 
 #include "ScmiPrivate.h"
 
-#define MAX_VENDOR_LEN       SCMI_MAX_STR_LEN
+#define MAX_VENDOR_LEN  SCMI_MAX_STR_LEN
 
 /** Pointer to protocol initialization function.
 
@@ -29,8 +30,8 @@ EFI_STATUS
   );
 
 typedef struct {
-  SCMI_PROTOCOL_ID Id;            // Protocol Id.
-  SCMI_PROTOCOL_INIT_FXN InitFn;  // Protocol init function.
+  SCMI_PROTOCOL_ID          Id;     // Protocol Id.
+  SCMI_PROTOCOL_INIT_FXN    InitFn; // Protocol init function.
 } SCMI_PROTOCOL_ENTRY;
 
 #endif /* SCMI_DXE_H_ */

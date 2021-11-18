@@ -15,13 +15,13 @@
 
 #ifdef MDE_CPU_ARM
   #include <Chipset/ArmV7.h>
-#elif defined(MDE_CPU_AARCH64)
+#elif defined (MDE_CPU_AARCH64)
   #include <Chipset/AArch64.h>
 #else
- #error "Unknown chipset."
+  #error "Unknown chipset."
 #endif
 
-#define EFI_MEMORY_CACHETYPE_MASK   (EFI_MEMORY_UC | EFI_MEMORY_WC | \
+#define EFI_MEMORY_CACHETYPE_MASK  (EFI_MEMORY_UC | EFI_MEMORY_WC |  \
                                      EFI_MEMORY_WT | EFI_MEMORY_WB | \
                                      EFI_MEMORY_UCE)
 
@@ -50,17 +50,21 @@ typedef enum {
   ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE
 } ARM_MEMORY_REGION_ATTRIBUTES;
 
-#define IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE(attr) ((UINT32)(attr) & 1)
+#define IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE(attr)  ((UINT32)(attr) & 1)
 
 typedef struct {
-  EFI_PHYSICAL_ADDRESS          PhysicalBase;
-  EFI_VIRTUAL_ADDRESS           VirtualBase;
-  UINT64                        Length;
-  ARM_MEMORY_REGION_ATTRIBUTES  Attributes;
+  EFI_PHYSICAL_ADDRESS            PhysicalBase;
+  EFI_VIRTUAL_ADDRESS             VirtualBase;
+  UINT64                          Length;
+  ARM_MEMORY_REGION_ATTRIBUTES    Attributes;
 } ARM_MEMORY_REGION_DESCRIPTOR;
 
-typedef VOID (*CACHE_OPERATION)(VOID);
-typedef VOID (*LINE_OPERATION)(UINTN);
+typedef VOID (*CACHE_OPERATION)(
+  VOID
+  );
+typedef VOID (*LINE_OPERATION)(
+  UINTN
+  );
 
 //
 // ARM Processor Mode
@@ -80,34 +84,34 @@ typedef enum {
 //
 // ARM Cpu IDs
 //
-#define ARM_CPU_IMPLEMENTER_MASK          (0xFFU << 24)
-#define ARM_CPU_IMPLEMENTER_ARMLTD        (0x41U << 24)
-#define ARM_CPU_IMPLEMENTER_DEC           (0x44U << 24)
-#define ARM_CPU_IMPLEMENTER_MOT           (0x4DU << 24)
-#define ARM_CPU_IMPLEMENTER_QUALCOMM      (0x51U << 24)
-#define ARM_CPU_IMPLEMENTER_MARVELL       (0x56U << 24)
+#define ARM_CPU_IMPLEMENTER_MASK      (0xFFU << 24)
+#define ARM_CPU_IMPLEMENTER_ARMLTD    (0x41U << 24)
+#define ARM_CPU_IMPLEMENTER_DEC       (0x44U << 24)
+#define ARM_CPU_IMPLEMENTER_MOT       (0x4DU << 24)
+#define ARM_CPU_IMPLEMENTER_QUALCOMM  (0x51U << 24)
+#define ARM_CPU_IMPLEMENTER_MARVELL   (0x56U << 24)
 
-#define ARM_CPU_PRIMARY_PART_MASK         (0xFFF << 4)
-#define ARM_CPU_PRIMARY_PART_CORTEXA5     (0xC05 << 4)
-#define ARM_CPU_PRIMARY_PART_CORTEXA7     (0xC07 << 4)
-#define ARM_CPU_PRIMARY_PART_CORTEXA8     (0xC08 << 4)
-#define ARM_CPU_PRIMARY_PART_CORTEXA9     (0xC09 << 4)
-#define ARM_CPU_PRIMARY_PART_CORTEXA15    (0xC0F << 4)
+#define ARM_CPU_PRIMARY_PART_MASK       (0xFFF << 4)
+#define ARM_CPU_PRIMARY_PART_CORTEXA5   (0xC05 << 4)
+#define ARM_CPU_PRIMARY_PART_CORTEXA7   (0xC07 << 4)
+#define ARM_CPU_PRIMARY_PART_CORTEXA8   (0xC08 << 4)
+#define ARM_CPU_PRIMARY_PART_CORTEXA9   (0xC09 << 4)
+#define ARM_CPU_PRIMARY_PART_CORTEXA15  (0xC0F << 4)
 
 //
 // ARM MP Core IDs
 //
-#define ARM_CORE_AFF0         0xFF
-#define ARM_CORE_AFF1         (0xFF << 8)
-#define ARM_CORE_AFF2         (0xFF << 16)
-#define ARM_CORE_AFF3         (0xFFULL << 32)
+#define ARM_CORE_AFF0  0xFF
+#define ARM_CORE_AFF1  (0xFF << 8)
+#define ARM_CORE_AFF2  (0xFF << 16)
+#define ARM_CORE_AFF3  (0xFFULL << 32)
 
-#define ARM_CORE_MASK         ARM_CORE_AFF0
-#define ARM_CLUSTER_MASK      ARM_CORE_AFF1
-#define GET_CORE_ID(MpId)     ((MpId) & ARM_CORE_MASK)
-#define GET_CLUSTER_ID(MpId)  (((MpId) & ARM_CLUSTER_MASK) >> 8)
-#define GET_MPID(ClusterId, CoreId)   (((ClusterId) << 8) | (CoreId))
-#define PRIMARY_CORE_ID       (PcdGet32(PcdArmPrimaryCore) & ARM_CORE_MASK)
+#define ARM_CORE_MASK     ARM_CORE_AFF0
+#define ARM_CLUSTER_MASK  ARM_CORE_AFF1
+#define GET_CORE_ID(MpId)            ((MpId) & ARM_CORE_MASK)
+#define GET_CLUSTER_ID(MpId)         (((MpId) & ARM_CLUSTER_MASK) >> 8)
+#define GET_MPID(ClusterId, CoreId)  (((ClusterId) << 8) | (CoreId))
+#define PRIMARY_CORE_ID  (PcdGet32(PcdArmPrimaryCore) & ARM_CORE_MASK)
 
 /** Reads the CCSIDR register for the specified cache.
 
@@ -183,7 +187,6 @@ ArmInvalidateDataCache (
   VOID
   );
 
-
 VOID
 EFIAPI
 ArmCleanInvalidateDataCache (
@@ -223,8 +226,8 @@ ArmInvalidateInstructionCacheEntryToPoUByMVA (
 VOID
 EFIAPI
 ArmCleanDataCacheEntryByMVA (
-IN  UINTN   Address
-);
+  IN  UINTN   Address
+  );
 
 VOID
 EFIAPI
@@ -573,7 +576,6 @@ ArmWriteHVBar (
   IN  UINTN   HypModeVectorBase
   );
 
-
 //
 // Helper functions for accessing CPU ACTLR
 //
@@ -606,9 +608,9 @@ ArmUnsetCpuActlrBit (
 // Accessors for the architected generic timer registers
 //
 
-#define ARM_ARCH_TIMER_ENABLE           (1 << 0)
-#define ARM_ARCH_TIMER_IMASK            (1 << 1)
-#define ARM_ARCH_TIMER_ISTATUS          (1 << 2)
+#define ARM_ARCH_TIMER_ENABLE   (1 << 0)
+#define ARM_ARCH_TIMER_IMASK    (1 << 1)
+#define ARM_ARCH_TIMER_ISTATUS  (1 << 2)
 
 UINTN
 EFIAPI
@@ -736,7 +738,6 @@ ArmGetPhysicalAddressBits (
   VOID
   );
 
-
 ///
 ///  ID Register Helper functions
 ///
@@ -768,6 +769,7 @@ ArmHasCcidx (
 ///
 /// AArch32-only ID Register Helper functions
 ///
+
 /**
   Check whether the CPU supports the Security extensions
 
@@ -779,6 +781,7 @@ EFIAPI
 ArmHasSecurityExtensions (
   VOID
   );
+
 #endif // MDE_CPU_ARM
 
 #endif // ARM_LIB_H_
