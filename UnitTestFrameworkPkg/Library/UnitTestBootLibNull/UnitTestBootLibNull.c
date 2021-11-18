@@ -18,7 +18,7 @@
 **/
 EFI_STATUS
 EFIAPI
-SetBootNextDevice(
+SetBootNextDevice (
   VOID
   )
 {
