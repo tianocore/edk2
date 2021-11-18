@@ -15,23 +15,23 @@
 #include <Protocol/ArmScmiPerformanceProtocol.h>
 
 // Number of performance levels returned by a call to the SCP, Lvls Bits[11:0]
-#define NUM_PERF_LEVELS_MASK          0x0FFF
-#define NUM_PERF_LEVELS(Lvls) (Lvls & NUM_PERF_LEVELS_MASK)
+#define NUM_PERF_LEVELS_MASK  0x0FFF
+#define NUM_PERF_LEVELS(Lvls)  (Lvls & NUM_PERF_LEVELS_MASK)
 
 // Number of performance levels remaining after a call to the SCP, Lvls Bits[31:16]
 #define NUM_REMAIN_PERF_LEVELS_SHIFT  16
-#define NUM_REMAIN_PERF_LEVELS(Lvls) (Lvls >> NUM_REMAIN_PERF_LEVELS_SHIFT)
+#define NUM_REMAIN_PERF_LEVELS(Lvls)  (Lvls >> NUM_REMAIN_PERF_LEVELS_SHIFT)
 
 /** Return values for ScmiMessageIdPerformanceDescribeLevels command.
   SCMI Spec section 4.5.2.5
 **/
 typedef struct {
-  UINT32 NumLevels;
+  UINT32                    NumLevels;
 
   // NOTE: Since EDK2 does not allow flexible array member [] we declare
   // here array of 1 element length. However below is used as a variable
   // length array.
-  SCMI_PERFORMANCE_LEVEL PerfLevel[1]; // Offset to array of performance levels
+  SCMI_PERFORMANCE_LEVEL    PerfLevel[1]; // Offset to array of performance levels
 } PERF_DESCRIBE_LEVELS;
 
 /** Initialize performance management protocol and install on a given Handle.
@@ -43,7 +43,7 @@ typedef struct {
 **/
 EFI_STATUS
 ScmiPerformanceProtocolInit (
-  IN EFI_HANDLE* Handle
+  IN EFI_HANDLE  *Handle
   );
 
 #endif /* ARM_SCMI_PERFORMANCE_PROTOCOL_PRIVATE_H_ */

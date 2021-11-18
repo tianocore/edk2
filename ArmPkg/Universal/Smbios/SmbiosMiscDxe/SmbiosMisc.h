@@ -20,11 +20,10 @@
 //
 // Data table entry update function.
 //
-typedef EFI_STATUS (EFIAPI SMBIOS_MISC_DATA_FUNCTION) (
+typedef EFI_STATUS (EFIAPI SMBIOS_MISC_DATA_FUNCTION)(
   IN  VOID                 *RecordData,
   IN  EFI_SMBIOS_PROTOCOL  *Smbios
   );
-
 
 //
 // Data table entry definition.
@@ -33,10 +32,9 @@ typedef struct {
   //
   // intermediate input data for SMBIOS record
   //
-  VOID                          *RecordData;
-  SMBIOS_MISC_DATA_FUNCTION     *Function;
+  VOID                         *RecordData;
+  SMBIOS_MISC_DATA_FUNCTION    *Function;
 } SMBIOS_MISC_DATA_TABLE;
-
 
 //
 // SMBIOS table extern definitions
@@ -44,7 +42,6 @@ typedef struct {
 #define SMBIOS_MISC_TABLE_EXTERNS(NAME1, NAME2, NAME3) \
 extern NAME1 NAME2 ## Data; \
 extern SMBIOS_MISC_DATA_FUNCTION NAME3 ## Function;
-
 
 //
 // SMBIOS data table entries
@@ -73,14 +70,13 @@ extern SMBIOS_MISC_DATA_FUNCTION NAME3 ## Function;
 //
 // Data Table Array Entries
 //
-extern EFI_HII_HANDLE               mSmbiosMiscHiiHandle;
+extern EFI_HII_HANDLE  mSmbiosMiscHiiHandle;
 
-typedef struct _SMBIOS_TYPE13_BIOS_LANGUAGE_INFORMATION_STRING{
-  UINT8                               *LanguageSignature;
-  EFI_STRING_ID                       InstallableLanguageLongString;
-  EFI_STRING_ID                       InstallableLanguageAbbreviateString;
+typedef struct _SMBIOS_TYPE13_BIOS_LANGUAGE_INFORMATION_STRING {
+  UINT8            *LanguageSignature;
+  EFI_STRING_ID    InstallableLanguageLongString;
+  EFI_STRING_ID    InstallableLanguageAbbreviateString;
 } SMBIOS_TYPE13_BIOS_LANGUAGE_INFORMATION_STRING;
-
 
 /**
   Adds an SMBIOS record.
@@ -101,8 +97,8 @@ typedef struct _SMBIOS_TYPE13_BIOS_LANGUAGE_INFORMATION_STRING{
 **/
 EFI_STATUS
 SmbiosMiscAddRecord (
-  IN       UINT8                      *Buffer,
-  IN  OUT  EFI_SMBIOS_HANDLE          *SmbiosHandle OPTIONAL
+  IN       UINT8              *Buffer,
+  IN  OUT  EFI_SMBIOS_HANDLE  *SmbiosHandle OPTIONAL
   );
 
 /**
@@ -114,21 +110,21 @@ SmbiosMiscAddRecord (
 
 **/
 VOID
-SmbiosMiscGetLinkTypeHandle(
-  IN  UINT8                 SmbiosType,
-  OUT UINT16                **HandleArray,
-  OUT UINTN                 *HandleCount
+SmbiosMiscGetLinkTypeHandle (
+  IN  UINT8   SmbiosType,
+  OUT UINT16  **HandleArray,
+  OUT UINTN   *HandleCount
   );
 
 //
 // Data Table Array
 //
-extern SMBIOS_MISC_DATA_TABLE   mSmbiosMiscDataTable[];
+extern SMBIOS_MISC_DATA_TABLE  mSmbiosMiscDataTable[];
 
 //
 // Data Table Array Entries
 //
-extern UINTN   mSmbiosMiscDataTableEntries;
-extern UINT8   mSmbiosMiscDxeStrings[];
+extern UINTN  mSmbiosMiscDataTableEntries;
+extern UINT8  mSmbiosMiscDxeStrings[];
 
 #endif // SMBIOS_MISC_H_

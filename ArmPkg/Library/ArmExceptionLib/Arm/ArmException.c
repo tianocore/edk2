@@ -24,21 +24,20 @@ PHYSICAL_ADDRESS        gExceptionVectorAlignmentMask = ARM_VECTOR_TABLE_ALIGNME
 
 // Exception handler contains branch to vector location (jmp $) so no handler
 // NOTE: This code assumes vectors are ARM and not Thumb code
-UINTN                   gDebuggerNoHandlerValue = 0xEAFFFFFE;
+UINTN  gDebuggerNoHandlerValue = 0xEAFFFFFE;
 
 RETURN_STATUS
 ArchVectorConfig (
-  IN  UINTN       VectorBaseAddress
+  IN  UINTN  VectorBaseAddress
   )
 {
   // if the vector address corresponds to high vectors
   if (VectorBaseAddress == 0xFFFF0000) {
     // set SCTLR.V to enable high vectors
-    ArmSetHighVectors();
-  }
-  else {
+    ArmSetHighVectors ();
+  } else {
     // Set SCTLR.V to 0 to enable VBAR to be used
-    ArmSetLowVectors();
+    ArmSetLowVectors ();
   }
 
   return RETURN_SUCCESS;

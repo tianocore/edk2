@@ -10,7 +10,7 @@
 
 VOID
 ArmCallSmc (
-  IN OUT ARM_SMC_ARGS *Args
+  IN OUT ARM_SMC_ARGS  *Args
   )
 {
 }

@@ -26,12 +26,12 @@
 **/
 VOID
 DisassembleInstruction (
-  IN  UINT8     **OpCodePtr,
-  IN  BOOLEAN   Thumb,
-  IN  BOOLEAN   Extended,
-  IN OUT UINT32 *ItBlock,
-  OUT CHAR8     *Buf,
-  OUT UINTN     Size
+  IN  UINT8      **OpCodePtr,
+  IN  BOOLEAN    Thumb,
+  IN  BOOLEAN    Extended,
+  IN OUT UINT32  *ItBlock,
+  OUT CHAR8      *Buf,
+  OUT UINTN      Size
   )
 {
   // Not yet supported for AArch64.
