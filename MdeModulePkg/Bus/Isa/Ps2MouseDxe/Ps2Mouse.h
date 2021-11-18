@@ -69,29 +69,29 @@ typedef enum {
 //
 // Driver Private Data
 //
-#define PS2_MOUSE_DEV_SIGNATURE SIGNATURE_32 ('p', 's', '2', 'm')
+#define PS2_MOUSE_DEV_SIGNATURE  SIGNATURE_32 ('p', 's', '2', 'm')
 
 typedef struct {
-  UINTN                               Signature;
+  UINTN                          Signature;
 
-  EFI_HANDLE                          Handle;
-  EFI_SIMPLE_POINTER_PROTOCOL         SimplePointerProtocol;
-  EFI_SIMPLE_POINTER_STATE            State;
-  EFI_SIMPLE_POINTER_MODE             Mode;
-  BOOLEAN                             StateChanged;
+  EFI_HANDLE                     Handle;
+  EFI_SIMPLE_POINTER_PROTOCOL    SimplePointerProtocol;
+  EFI_SIMPLE_POINTER_STATE       State;
+  EFI_SIMPLE_POINTER_MODE        Mode;
+  BOOLEAN                        StateChanged;
 
   //
   // PS2 Mouse device specific information
   //
-  MOUSE_SR                            SampleRate;
-  MOUSE_RE                            Resolution;
-  MOUSE_SF                            Scaling;
-  UINT8                               DataPackageSize;
+  MOUSE_SR                       SampleRate;
+  MOUSE_RE                       Resolution;
+  MOUSE_SF                       Scaling;
+  UINT8                          DataPackageSize;
 
-  EFI_EVENT                           TimerEvent;
+  EFI_EVENT                      TimerEvent;
 
-  EFI_UNICODE_STRING_TABLE            *ControllerNameTable;
-  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  EFI_UNICODE_STRING_TABLE       *ControllerNameTable;
+  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
 } PS2_MOUSE_DEV;
 
 #define PS2_MOUSE_DEV_FROM_THIS(a)  CR (a, PS2_MOUSE_DEV, SimplePointerProtocol, PS2_MOUSE_DEV_SIGNATURE)
@@ -99,6 +99,7 @@ typedef struct {
 //
 // Function prototypes
 //
+
 /**
   Test to see if this driver supports ControllerHandle. Any ControllerHandle
   than contains a IsaIo protocol can be supported.
@@ -116,9 +117,9 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 PS2MouseDriverSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -139,9 +140,9 @@ PS2MouseDriverSupported (
 EFI_STATUS
 EFIAPI
 PS2MouseDriverStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -161,15 +162,16 @@ PS2MouseDriverStart (
 EFI_STATUS
 EFIAPI
 PS2MouseDriverStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL   *This,
-  IN EFI_HANDLE                    Controller,
-  IN UINTN                         NumberOfChildren,
-  IN EFI_HANDLE                    *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   );
 
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -216,7 +218,6 @@ Ps2MouseComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -289,11 +290,11 @@ Ps2MouseComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 Ps2MouseComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
 
 /**
@@ -311,8 +312,8 @@ Ps2MouseComponentNameGetControllerName (
 EFI_STATUS
 EFIAPI
 MouseReset (
-  IN EFI_SIMPLE_POINTER_PROTOCOL    *This,
-  IN BOOLEAN                        ExtendedVerification
+  IN EFI_SIMPLE_POINTER_PROTOCOL  *This,
+  IN BOOLEAN                      ExtendedVerification
   );
 
 /**
@@ -328,8 +329,8 @@ MouseReset (
 EFI_STATUS
 EFIAPI
 MouseGetState (
-  IN EFI_SIMPLE_POINTER_PROTOCOL    *This,
-  IN OUT EFI_SIMPLE_POINTER_STATE   *State
+  IN EFI_SIMPLE_POINTER_PROTOCOL   *This,
+  IN OUT EFI_SIMPLE_POINTER_STATE  *State
   );
 
 /**
@@ -344,8 +345,8 @@ MouseGetState (
 VOID
 EFIAPI
 MouseWaitForInput (
-  IN  EFI_EVENT               Event,
-  IN  VOID                    *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   );
 
 /**
@@ -373,7 +374,7 @@ PollMouse (
 **/
 EFI_STATUS
 In8042Data (
-  IN OUT UINT8                            *Data
+  IN OUT UINT8  *Data
   );
 
 /**
@@ -387,7 +388,7 @@ In8042Data (
 **/
 BOOLEAN
 CheckMouseConnect (
-  IN  PS2_MOUSE_DEV     *MouseDev
+  IN  PS2_MOUSE_DEV  *MouseDev
   );
 
 #endif

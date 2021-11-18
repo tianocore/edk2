@@ -71,7 +71,7 @@ HiiAddPackages (
 VOID
 EFIAPI
 HiiRemovePackages (
-  IN      EFI_HII_HANDLE      HiiHandle
+  IN      EFI_HII_HANDLE  HiiHandle
   )
 ;
 
@@ -116,8 +116,8 @@ HiiRemovePackages (
 EFI_STRING_ID
 EFIAPI
 HiiSetString (
-  IN EFI_HII_HANDLE    HiiHandle,
-  IN EFI_STRING_ID     StringId,            OPTIONAL
+  IN EFI_HII_HANDLE HiiHandle,
+  IN EFI_STRING_ID StringId, OPTIONAL
   IN CONST EFI_STRING  String,
   IN CONST CHAR8       *SupportedLanguages  OPTIONAL
   )
@@ -269,10 +269,10 @@ HiiGetHiiHandles (
 **/
 EFI_STATUS
 EFIAPI
-HiiGetFormSetFromHiiHandle(
-  IN  EFI_HII_HANDLE     Handle,
-  OUT EFI_IFR_FORM_SET   **Buffer,
-  OUT UINTN              *BufferSize
+HiiGetFormSetFromHiiHandle (
+  IN  EFI_HII_HANDLE    Handle,
+  OUT EFI_IFR_FORM_SET  **Buffer,
+  OUT UINTN             *BufferSize
   );
 
 /**
@@ -296,7 +296,7 @@ HiiGetFormSetFromHiiHandle(
 CHAR8 *
 EFIAPI
 HiiGetSupportedLanguages (
-  IN EFI_HII_HANDLE           HiiHandle
+  IN EFI_HII_HANDLE  HiiHandle
   )
 ;
 
@@ -332,8 +332,8 @@ HiiGetSupportedLanguages (
 EFI_STRING
 EFIAPI
 HiiConstructConfigHdr (
-  IN CONST EFI_GUID  *Guid,  OPTIONAL
-  IN CONST CHAR16    *Name,  OPTIONAL
+  IN CONST EFI_GUID *Guid, OPTIONAL
+  IN CONST CHAR16    *Name, OPTIONAL
   IN EFI_HANDLE      DriverHandle
   );
 
@@ -356,7 +356,7 @@ HiiConstructConfigHdr (
 BOOLEAN
 EFIAPI
 HiiSetToDefaults (
-  IN CONST EFI_STRING  Request,  OPTIONAL
+  IN CONST EFI_STRING Request, OPTIONAL
   IN UINT16            DefaultId
   );
 
@@ -396,8 +396,8 @@ HiiValidateSettings (
 BOOLEAN
 EFIAPI
 HiiIsConfigHdrMatch (
-  IN CONST EFI_STRING  ConfigHdr,
-  IN CONST EFI_GUID    *Guid,     OPTIONAL
+  IN CONST EFI_STRING ConfigHdr,
+  IN CONST EFI_GUID *Guid, OPTIONAL
   IN CONST CHAR16      *Name      OPTIONAL
   );
 
@@ -419,8 +419,8 @@ HiiIsConfigHdrMatch (
 BOOLEAN
 EFIAPI
 HiiGetBrowserData (
-  IN CONST EFI_GUID  *VariableGuid,  OPTIONAL
-  IN CONST CHAR16    *VariableName,  OPTIONAL
+  IN CONST EFI_GUID *VariableGuid, OPTIONAL
+  IN CONST CHAR16    *VariableName, OPTIONAL
   IN UINTN           BufferSize,
   OUT UINT8          *Buffer
   );
@@ -449,7 +449,7 @@ HiiGetBrowserData (
 BOOLEAN
 EFIAPI
 HiiSetBrowserData (
-  IN CONST EFI_GUID  *VariableGuid, OPTIONAL
+  IN CONST EFI_GUID *VariableGuid, OPTIONAL
   IN CONST CHAR16    *VariableName, OPTIONAL
   IN UINTN           BufferSize,
   IN CONST UINT8     *Buffer,
@@ -640,9 +640,9 @@ HiiCreateDefaultOpCode (
 UINT8 *
 EFIAPI
 HiiCreateGuidOpCode (
-  IN VOID            *OpCodeHandle,
-  IN CONST EFI_GUID  *Guid,
-  IN CONST VOID      *GuidOpCode,    OPTIONAL
+  IN VOID *OpCodeHandle,
+  IN CONST EFI_GUID *Guid,
+  IN CONST VOID *GuidOpCode, OPTIONAL
   IN UINTN           OpCodeSize
   );
 
@@ -762,14 +762,14 @@ HiiCreateGotoOpCode (
 UINT8 *
 EFIAPI
 HiiCreateGotoExOpCode (
-  IN VOID             *OpCodeHandle,
-  IN EFI_FORM_ID      RefFormId,
-  IN EFI_STRING_ID    Prompt,
-  IN EFI_STRING_ID    Help,
-  IN UINT8            QuestionFlags,
-  IN EFI_QUESTION_ID  QuestionId,
-  IN EFI_QUESTION_ID  RefQuestionId,
-  IN EFI_GUID         *RefFormSetId,    OPTIONAL
+  IN VOID *OpCodeHandle,
+  IN EFI_FORM_ID RefFormId,
+  IN EFI_STRING_ID Prompt,
+  IN EFI_STRING_ID Help,
+  IN UINT8 QuestionFlags,
+  IN EFI_QUESTION_ID QuestionId,
+  IN EFI_QUESTION_ID RefQuestionId,
+  IN EFI_GUID *RefFormSetId, OPTIONAL
   IN EFI_STRING_ID    RefDevicePath
   );
 
@@ -1027,10 +1027,10 @@ HiiCreateTextOpCode (
 UINT8 *
 EFIAPI
 HiiCreateDateOpCode (
-  IN VOID             *OpCodeHandle,
-  IN EFI_QUESTION_ID  QuestionId,
-  IN EFI_VARSTORE_ID  VarStoreId,   OPTIONAL
-  IN UINT16           VarOffset,    OPTIONAL
+  IN VOID *OpCodeHandle,
+  IN EFI_QUESTION_ID QuestionId,
+  IN EFI_VARSTORE_ID VarStoreId, OPTIONAL
+  IN UINT16           VarOffset, OPTIONAL
   IN EFI_STRING_ID    Prompt,
   IN EFI_STRING_ID    Help,
   IN UINT8            QuestionFlags,
@@ -1066,10 +1066,10 @@ HiiCreateDateOpCode (
 UINT8 *
 EFIAPI
 HiiCreateTimeOpCode (
-  IN VOID             *OpCodeHandle,
-  IN EFI_QUESTION_ID  QuestionId,
-  IN EFI_VARSTORE_ID  VarStoreId,   OPTIONAL
-  IN UINT16           VarOffset,    OPTIONAL
+  IN VOID *OpCodeHandle,
+  IN EFI_QUESTION_ID QuestionId,
+  IN EFI_VARSTORE_ID VarStoreId, OPTIONAL
+  IN UINT16           VarOffset, OPTIONAL
   IN EFI_STRING_ID    Prompt,
   IN EFI_STRING_ID    Help,
   IN UINT8            QuestionFlags,
@@ -1137,8 +1137,8 @@ HiiCreateTimeOpCode (
 EFI_STATUS
 EFIAPI
 HiiUpdateForm (
-  IN EFI_HII_HANDLE  HiiHandle,
-  IN EFI_GUID        *FormSetGuid,        OPTIONAL
+  IN EFI_HII_HANDLE HiiHandle,
+  IN EFI_GUID *FormSetGuid, OPTIONAL
   IN EFI_FORM_ID     FormId,
   IN VOID            *StartOpCodeHandle,
   IN VOID            *EndOpCodeHandle     OPTIONAL

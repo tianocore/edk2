@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _PI_SMM_MEMORY_ATTRIBUTES_TABLE_H_
 #define _PI_SMM_MEMORY_ATTRIBUTES_TABLE_H_
 
-#define EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE_GUID {\
+#define EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE_GUID  {\
   0x6b9fd3f7, 0x16df, 0x45e8, {0xbd, 0x39, 0xb9, 0x4a, 0x66, 0x54, 0x1a, 0x5d} \
 }
 
@@ -31,15 +31,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // and it is EFI_MEMORY_XP.
 //
 typedef struct {
-  UINT32                Version;
-  UINT32                NumberOfEntries;
-  UINT32                DescriptorSize;
-  UINT32                Reserved;
-//EFI_MEMORY_DESCRIPTOR Entry[1];
+  UINT32    Version;
+  UINT32    NumberOfEntries;
+  UINT32    DescriptorSize;
+  UINT32    Reserved;
+  // EFI_MEMORY_DESCRIPTOR Entry[1];
 } EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE;
 
 #define EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE_VERSION  0x00000001
 
-extern EFI_GUID gEdkiiPiSmmMemoryAttributesTableGuid;
+extern EFI_GUID  gEdkiiPiSmmMemoryAttributesTableGuid;
 
 #endif

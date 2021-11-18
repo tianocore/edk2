@@ -14,42 +14,42 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // UHCI register offset
 //
 
-#define UHCI_FRAME_NUM        1024
+#define UHCI_FRAME_NUM  1024
 
 //
 // Register offset and PCI related staff
 //
-#define USB_BAR_INDEX         4
+#define USB_BAR_INDEX  4
 
-#define USBCMD_OFFSET         0
-#define USBSTS_OFFSET         2
-#define USBINTR_OFFSET        4
-#define USBPORTSC_OFFSET      0x10
-#define USB_FRAME_NO_OFFSET   6
-#define USB_FRAME_BASE_OFFSET 8
-#define USB_EMULATION_OFFSET  0xC0
+#define USBCMD_OFFSET          0
+#define USBSTS_OFFSET          2
+#define USBINTR_OFFSET         4
+#define USBPORTSC_OFFSET       0x10
+#define USB_FRAME_NO_OFFSET    6
+#define USB_FRAME_BASE_OFFSET  8
+#define USB_EMULATION_OFFSET   0xC0
 
 //
 // Packet IDs
 //
-#define SETUP_PACKET_ID       0x2D
-#define INPUT_PACKET_ID       0x69
-#define OUTPUT_PACKET_ID      0xE1
-#define ERROR_PACKET_ID       0x55
+#define SETUP_PACKET_ID   0x2D
+#define INPUT_PACKET_ID   0x69
+#define OUTPUT_PACKET_ID  0xE1
+#define ERROR_PACKET_ID   0x55
 
 //
 // USB port status and control bit definition.
 //
-#define USBPORTSC_CCS         BIT0  // Current Connect Status
-#define USBPORTSC_CSC         BIT1  // Connect Status Change
-#define USBPORTSC_PED         BIT2  // Port Enable / Disable
-#define USBPORTSC_PEDC        BIT3  // Port Enable / Disable Change
-#define USBPORTSC_LSL         BIT4  // Line Status Low BIT
-#define USBPORTSC_LSH         BIT5  // Line Status High BIT
-#define USBPORTSC_RD          BIT6  // Resume Detect
-#define USBPORTSC_LSDA        BIT8  // Low Speed Device Attached
-#define USBPORTSC_PR          BIT9  // Port Reset
-#define USBPORTSC_SUSP        BIT12 // Suspend
+#define USBPORTSC_CCS   BIT0        // Current Connect Status
+#define USBPORTSC_CSC   BIT1        // Connect Status Change
+#define USBPORTSC_PED   BIT2        // Port Enable / Disable
+#define USBPORTSC_PEDC  BIT3        // Port Enable / Disable Change
+#define USBPORTSC_LSL   BIT4        // Line Status Low BIT
+#define USBPORTSC_LSH   BIT5        // Line Status High BIT
+#define USBPORTSC_RD    BIT6        // Resume Detect
+#define USBPORTSC_LSDA  BIT8        // Low Speed Device Attached
+#define USBPORTSC_PR    BIT9        // Port Reset
+#define USBPORTSC_SUSP  BIT12       // Suspend
 
 //
 // UHCI Spec said it must implement 2 ports each host at least,
@@ -61,33 +61,32 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Command register bit definitions
 //
-#define USBCMD_RS             BIT0  // Run/Stop
-#define USBCMD_HCRESET        BIT1  // Host reset
-#define USBCMD_GRESET         BIT2  // Global reset
-#define USBCMD_EGSM           BIT3  // Global Suspend Mode
-#define USBCMD_FGR            BIT4  // Force Global Resume
-#define USBCMD_SWDBG          BIT5  // SW Debug mode
-#define USBCMD_CF             BIT6  // Config Flag (sw only)
-#define USBCMD_MAXP           BIT7  // Max Packet (0 = 32, 1 = 64)
+#define USBCMD_RS       BIT0        // Run/Stop
+#define USBCMD_HCRESET  BIT1        // Host reset
+#define USBCMD_GRESET   BIT2        // Global reset
+#define USBCMD_EGSM     BIT3        // Global Suspend Mode
+#define USBCMD_FGR      BIT4        // Force Global Resume
+#define USBCMD_SWDBG    BIT5        // SW Debug mode
+#define USBCMD_CF       BIT6        // Config Flag (sw only)
+#define USBCMD_MAXP     BIT7        // Max Packet (0 = 32, 1 = 64)
 
 //
 // USB Status register bit definitions
 //
-#define USBSTS_USBINT         BIT0  // Interrupt due to IOC
-#define USBSTS_ERROR          BIT1  // Interrupt due to error
-#define USBSTS_RD             BIT2  // Resume Detect
-#define USBSTS_HSE            BIT3  // Host System Error
-#define USBSTS_HCPE           BIT4  // Host Controller Process Error
-#define USBSTS_HCH            BIT5  // HC Halted
+#define USBSTS_USBINT  BIT0         // Interrupt due to IOC
+#define USBSTS_ERROR   BIT1         // Interrupt due to error
+#define USBSTS_RD      BIT2         // Resume Detect
+#define USBSTS_HSE     BIT3         // Host System Error
+#define USBSTS_HCPE    BIT4         // Host Controller Process Error
+#define USBSTS_HCH     BIT5         // HC Halted
 
-#define USBTD_ACTIVE          BIT7  // TD is still active
-#define USBTD_STALLED         BIT6  // TD is stalled
-#define USBTD_BUFFERR         BIT5  // Buffer underflow or overflow
-#define USBTD_BABBLE          BIT4  // Babble condition
-#define USBTD_NAK             BIT3  // NAK is received
-#define USBTD_CRC             BIT2  // CRC/Time out error
-#define USBTD_BITSTUFF        BIT1  // Bit stuff error
-
+#define USBTD_ACTIVE    BIT7        // TD is still active
+#define USBTD_STALLED   BIT6        // TD is stalled
+#define USBTD_BUFFERR   BIT5        // Buffer underflow or overflow
+#define USBTD_BABBLE    BIT4        // Babble condition
+#define USBTD_NAK       BIT3        // NAK is received
+#define USBTD_CRC       BIT2        // CRC/Time out error
+#define USBTD_BITSTUFF  BIT1        // Bit stuff error
 
 /**
   Read a UHCI register.
@@ -100,11 +99,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 UINT16
 UhciReadReg (
-  IN EFI_PCI_IO_PROTOCOL     *PciIo,
-  IN UINT32                  Offset
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT32               Offset
   );
-
-
 
 /**
   Write data to UHCI register.
@@ -118,12 +115,10 @@ UhciReadReg (
 **/
 VOID
 UhciWriteReg (
-  IN EFI_PCI_IO_PROTOCOL     *PciIo,
-  IN UINT32                  Offset,
-  IN UINT16                  Data
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT32               Offset,
+  IN UINT16               Data
   );
-
-
 
 /**
   Set a bit of the UHCI Register.
@@ -137,12 +132,10 @@ UhciWriteReg (
 **/
 VOID
 UhciSetRegBit (
-  IN EFI_PCI_IO_PROTOCOL     *PciIo,
-  IN UINT32                  Offset,
-  IN UINT16                  Bit
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT32               Offset,
+  IN UINT16               Bit
   );
-
-
 
 /**
   Clear a bit of the UHCI Register.
@@ -156,11 +149,10 @@ UhciSetRegBit (
 **/
 VOID
 UhciClearRegBit (
-  IN EFI_PCI_IO_PROTOCOL     *PciIo,
-  IN UINT32                  Offset,
-  IN UINT16                  Bit
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT32               Offset,
+  IN UINT16               Bit
   );
-
 
 /**
   Clear all the interrutp status bits, these bits
@@ -173,9 +165,8 @@ UhciClearRegBit (
 **/
 VOID
 UhciAckAllInterrupt (
-  IN  USB_HC_DEV          *Uhc
+  IN  USB_HC_DEV  *Uhc
   );
-
 
 /**
   Stop the host controller.
@@ -189,11 +180,9 @@ UhciAckAllInterrupt (
 **/
 EFI_STATUS
 UhciStopHc (
-  IN USB_HC_DEV         *Uhc,
-  IN UINTN              Timeout
+  IN USB_HC_DEV  *Uhc,
+  IN UINTN       Timeout
   );
-
-
 
 /**
   Check whether the host controller operates well.
@@ -206,9 +195,8 @@ UhciStopHc (
 **/
 BOOLEAN
 UhciIsHcWorking (
-  IN EFI_PCI_IO_PROTOCOL     *PciIo
+  IN EFI_PCI_IO_PROTOCOL  *PciIo
   );
-
 
 /**
   Set the UHCI frame list base address. It can't use
@@ -222,10 +210,9 @@ UhciIsHcWorking (
 **/
 VOID
 UhciSetFrameListBaseAddr (
-  IN EFI_PCI_IO_PROTOCOL     *PciIo,
-  IN VOID                    *Addr
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN VOID                 *Addr
   );
-
 
 /**
   Disable USB Emulation.
@@ -237,6 +224,7 @@ UhciSetFrameListBaseAddr (
 **/
 VOID
 UhciTurnOffUsbEmulation (
-  IN EFI_PCI_IO_PROTOCOL     *PciIo
+  IN EFI_PCI_IO_PROTOCOL  *PciIo
   );
+
 #endif

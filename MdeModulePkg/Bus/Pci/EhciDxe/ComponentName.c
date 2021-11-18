@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Ehci.h"
 
-
 //
 // EFI Component Name Protocol
 //
@@ -22,18 +21,16 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gEhciComponentName = 
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gEhciComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) EhciComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) EhciComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gEhciComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)EhciComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)EhciComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mEhciDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mEhciDriverNameTable[] = {
   { "eng;en", L"Usb Ehci Driver" },
-  { NULL , NULL }
+  { NULL,     NULL               }
 };
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -162,16 +159,16 @@ EhciComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 EhciComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS           Status;
-  USB2_HC_DEV          *EhciDev;
-  EFI_USB2_HC_PROTOCOL *Usb2Hc;
+  EFI_STATUS            Status;
+  USB2_HC_DEV           *EhciDev;
+  EFI_USB2_HC_PROTOCOL  *Usb2Hc;
 
   //
   // This is a device driver, so ChildHandle must be NULL.
@@ -179,6 +176,7 @@ EhciComponentNameGetControllerName (
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
   }
+
   //
   // Make sure this driver is currently managing ControllerHandle
   //
@@ -190,13 +188,14 @@ EhciComponentNameGetControllerName (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Get the device context
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiUsb2HcProtocolGuid,
-                  (VOID **) &Usb2Hc,
+                  (VOID **)&Usb2Hc,
                   gEhciDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -214,5 +213,4 @@ EhciComponentNameGetControllerName (
            ControllerName,
            (BOOLEAN)(This == &gEhciComponentName)
            );
-
 }

@@ -10,73 +10,73 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_XHCI_SCHED_H_
 #define _EFI_XHCI_SCHED_H_
 
-#define XHC_URB_SIG      SIGNATURE_32 ('U', 'S', 'B', 'R')
-#define XHC_INIT_DEVICE_SLOT_RETRIES 1
+#define XHC_URB_SIG                   SIGNATURE_32 ('U', 'S', 'B', 'R')
+#define XHC_INIT_DEVICE_SLOT_RETRIES  1
 
 //
 // Transfer types, used in URB to identify the transfer type
 //
-#define XHC_CTRL_TRANSFER                     0x01
-#define XHC_BULK_TRANSFER                     0x02
-#define XHC_INT_TRANSFER_SYNC                 0x04
-#define XHC_INT_TRANSFER_ASYNC                0x08
-#define XHC_INT_ONLY_TRANSFER_ASYNC           0x10
+#define XHC_CTRL_TRANSFER            0x01
+#define XHC_BULK_TRANSFER            0x02
+#define XHC_INT_TRANSFER_SYNC        0x04
+#define XHC_INT_TRANSFER_ASYNC       0x08
+#define XHC_INT_ONLY_TRANSFER_ASYNC  0x10
 
 //
 // 6.4.6 TRB Types
 //
-#define TRB_TYPE_NORMAL                       1
-#define TRB_TYPE_SETUP_STAGE                  2
-#define TRB_TYPE_DATA_STAGE                   3
-#define TRB_TYPE_STATUS_STAGE                 4
-#define TRB_TYPE_ISOCH                        5
-#define TRB_TYPE_LINK                         6
-#define TRB_TYPE_EVENT_DATA                   7
-#define TRB_TYPE_NO_OP                        8
-#define TRB_TYPE_EN_SLOT                      9
-#define TRB_TYPE_DIS_SLOT                     10
-#define TRB_TYPE_ADDRESS_DEV                  11
-#define TRB_TYPE_CON_ENDPOINT                 12
-#define TRB_TYPE_EVALU_CONTXT                 13
-#define TRB_TYPE_RESET_ENDPOINT               14
-#define TRB_TYPE_STOP_ENDPOINT                15
-#define TRB_TYPE_SET_TR_DEQUE                 16
-#define TRB_TYPE_RESET_DEV                    17
-#define TRB_TYPE_GET_PORT_BANW                21
-#define TRB_TYPE_FORCE_HEADER                 22
-#define TRB_TYPE_NO_OP_COMMAND                23
-#define TRB_TYPE_TRANS_EVENT                  32
-#define TRB_TYPE_COMMAND_COMPLT_EVENT         33
-#define TRB_TYPE_PORT_STATUS_CHANGE_EVENT     34
-#define TRB_TYPE_HOST_CONTROLLER_EVENT        37
-#define TRB_TYPE_DEVICE_NOTIFI_EVENT          38
-#define TRB_TYPE_MFINDEX_WRAP_EVENT           39
+#define TRB_TYPE_NORMAL                    1
+#define TRB_TYPE_SETUP_STAGE               2
+#define TRB_TYPE_DATA_STAGE                3
+#define TRB_TYPE_STATUS_STAGE              4
+#define TRB_TYPE_ISOCH                     5
+#define TRB_TYPE_LINK                      6
+#define TRB_TYPE_EVENT_DATA                7
+#define TRB_TYPE_NO_OP                     8
+#define TRB_TYPE_EN_SLOT                   9
+#define TRB_TYPE_DIS_SLOT                  10
+#define TRB_TYPE_ADDRESS_DEV               11
+#define TRB_TYPE_CON_ENDPOINT              12
+#define TRB_TYPE_EVALU_CONTXT              13
+#define TRB_TYPE_RESET_ENDPOINT            14
+#define TRB_TYPE_STOP_ENDPOINT             15
+#define TRB_TYPE_SET_TR_DEQUE              16
+#define TRB_TYPE_RESET_DEV                 17
+#define TRB_TYPE_GET_PORT_BANW             21
+#define TRB_TYPE_FORCE_HEADER              22
+#define TRB_TYPE_NO_OP_COMMAND             23
+#define TRB_TYPE_TRANS_EVENT               32
+#define TRB_TYPE_COMMAND_COMPLT_EVENT      33
+#define TRB_TYPE_PORT_STATUS_CHANGE_EVENT  34
+#define TRB_TYPE_HOST_CONTROLLER_EVENT     37
+#define TRB_TYPE_DEVICE_NOTIFI_EVENT       38
+#define TRB_TYPE_MFINDEX_WRAP_EVENT        39
 
 //
 // Endpoint Type (EP Type).
 //
-#define ED_NOT_VALID                          0
-#define ED_ISOCH_OUT                          1
-#define ED_BULK_OUT                           2
-#define ED_INTERRUPT_OUT                      3
-#define ED_CONTROL_BIDIR                      4
-#define ED_ISOCH_IN                           5
-#define ED_BULK_IN                            6
-#define ED_INTERRUPT_IN                       7
+#define ED_NOT_VALID      0
+#define ED_ISOCH_OUT      1
+#define ED_BULK_OUT       2
+#define ED_INTERRUPT_OUT  3
+#define ED_CONTROL_BIDIR  4
+#define ED_ISOCH_IN       5
+#define ED_BULK_IN        6
+#define ED_INTERRUPT_IN   7
 
 //
 // 6.4.5 TRB Completion Codes
 //
-#define TRB_COMPLETION_INVALID                0
-#define TRB_COMPLETION_SUCCESS                1
-#define TRB_COMPLETION_DATA_BUFFER_ERROR      2
-#define TRB_COMPLETION_BABBLE_ERROR           3
-#define TRB_COMPLETION_USB_TRANSACTION_ERROR  4
-#define TRB_COMPLETION_TRB_ERROR              5
-#define TRB_COMPLETION_STALL_ERROR            6
-#define TRB_COMPLETION_SHORT_PACKET           13
-#define TRB_COMPLETION_STOPPED                26
-#define TRB_COMPLETION_STOPPED_LENGTH_INVALID 27
+#define TRB_COMPLETION_INVALID                 0
+#define TRB_COMPLETION_SUCCESS                 1
+#define TRB_COMPLETION_DATA_BUFFER_ERROR       2
+#define TRB_COMPLETION_BABBLE_ERROR            3
+#define TRB_COMPLETION_USB_TRANSACTION_ERROR   4
+#define TRB_COMPLETION_TRB_ERROR               5
+#define TRB_COMPLETION_STALL_ERROR             6
+#define TRB_COMPLETION_SHORT_PACKET            13
+#define TRB_COMPLETION_STOPPED                 26
+#define TRB_COMPLETION_STOPPED_LENGTH_INVALID  27
 
 //
 // The topology string used to present usb device location
@@ -85,15 +85,15 @@ typedef struct _USB_DEV_TOPOLOGY {
   //
   // The tier concatenation of down stream port.
   //
-  UINT32 RouteString:20;
+  UINT32    RouteString : 20;
   //
   // The root port number of the chain.
   //
-  UINT32 RootPortNum:8;
+  UINT32    RootPortNum : 8;
   //
   // The Tier the device reside.
   //
-  UINT32 TierNum:4;
+  UINT32    TierNum     : 4;
 } USB_DEV_TOPOLOGY;
 
 //
@@ -126,33 +126,33 @@ typedef struct _USB_ENDPOINT {
 // TRB Template
 //
 typedef struct _TRB_TEMPLATE {
-  UINT32                    Parameter1;
+  UINT32    Parameter1;
 
-  UINT32                    Parameter2;
+  UINT32    Parameter2;
 
-  UINT32                    Status;
+  UINT32    Status;
 
-  UINT32                    CycleBit:1;
-  UINT32                    RsvdZ1:9;
-  UINT32                    Type:6;
-  UINT32                    Control:16;
+  UINT32    CycleBit : 1;
+  UINT32    RsvdZ1   : 9;
+  UINT32    Type     : 6;
+  UINT32    Control  : 16;
 } TRB_TEMPLATE;
 
 typedef struct _TRANSFER_RING {
-  VOID                      *RingSeg0;
-  UINTN                     TrbNumber;
-  TRB_TEMPLATE              *RingEnqueue;
-  TRB_TEMPLATE              *RingDequeue;
-  UINT32                    RingPCS;
+  VOID            *RingSeg0;
+  UINTN           TrbNumber;
+  TRB_TEMPLATE    *RingEnqueue;
+  TRB_TEMPLATE    *RingDequeue;
+  UINT32          RingPCS;
 } TRANSFER_RING;
 
 typedef struct _EVENT_RING {
-  VOID                      *ERSTBase;
-  VOID                      *EventRingSeg0;
-  UINTN                     TrbNumber;
-  TRB_TEMPLATE              *EventRingEnqueue;
-  TRB_TEMPLATE              *EventRingDequeue;
-  UINT32                    EventRingCCS;
+  VOID            *ERSTBase;
+  VOID            *EventRingSeg0;
+  UINTN           TrbNumber;
+  TRB_TEMPLATE    *EventRingEnqueue;
+  TRB_TEMPLATE    *EventRingDequeue;
+  UINT32          EventRingCCS;
 } EVENT_RING;
 
 //
@@ -160,39 +160,39 @@ typedef struct _EVENT_RING {
 // usb requests.
 //
 typedef struct _URB {
-  UINT32                          Signature;
-  LIST_ENTRY                      UrbList;
+  UINT32                             Signature;
+  LIST_ENTRY                         UrbList;
   //
   // Usb Device URB related information
   //
-  USB_ENDPOINT                    Ep;
-  EFI_USB_DEVICE_REQUEST          *Request;
-  VOID                            *Data;
-  UINTN                           DataLen;
-  VOID                            *DataPhy;
-  VOID                            *DataMap;
-  EFI_ASYNC_USB_TRANSFER_CALLBACK Callback;
-  VOID                            *Context;
+  USB_ENDPOINT                       Ep;
+  EFI_USB_DEVICE_REQUEST             *Request;
+  VOID                               *Data;
+  UINTN                              DataLen;
+  VOID                               *DataPhy;
+  VOID                               *DataMap;
+  EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback;
+  VOID                               *Context;
   //
   // Execute result
   //
-  UINT32                          Result;
+  UINT32                             Result;
   //
   // completed data length
   //
-  UINTN                           Completed;
+  UINTN                              Completed;
   //
   // Command/Tranfer Ring info
   //
-  TRANSFER_RING                   *Ring;
-  TRB_TEMPLATE                    *TrbStart;
-  TRB_TEMPLATE                    *TrbEnd;
-  UINTN                           TrbNum;
-  BOOLEAN                         StartDone;
-  BOOLEAN                         EndDone;
-  BOOLEAN                         Finished;
+  TRANSFER_RING                      *Ring;
+  TRB_TEMPLATE                       *TrbStart;
+  TRB_TEMPLATE                       *TrbEnd;
+  UINTN                              TrbNum;
+  BOOLEAN                            StartDone;
+  BOOLEAN                            EndDone;
+  BOOLEAN                            Finished;
 
-  TRB_TEMPLATE                    *EvtTrb;
+  TRB_TEMPLATE                       *EvtTrb;
 } URB;
 
 //
@@ -203,11 +203,11 @@ typedef struct _URB {
 // is defined by the Event Ring Segment Table Base Size Register (5.5.2.3.1).
 //
 typedef struct _EVENT_RING_SEG_TABLE_ENTRY {
-  UINT32                  PtrLo;
-  UINT32                  PtrHi;
-  UINT32                  RingTrbSize:16;
-  UINT32                  RsvdZ1:16;
-  UINT32                  RsvdZ2;
+  UINT32    PtrLo;
+  UINT32    PtrHi;
+  UINT32    RingTrbSize : 16;
+  UINT32    RsvdZ1      : 16;
+  UINT32    RsvdZ2;
 } EVENT_RING_SEG_TABLE_ENTRY;
 
 //
@@ -217,25 +217,25 @@ typedef struct _EVENT_RING_SEG_TABLE_ENTRY {
 // Rings, and to define the Data stage information for Control Transfer Rings.
 //
 typedef struct _TRANSFER_TRB_NORMAL {
-  UINT32                  TRBPtrLo;
+  UINT32    TRBPtrLo;
 
-  UINT32                  TRBPtrHi;
+  UINT32    TRBPtrHi;
 
-  UINT32                  Length:17;
-  UINT32                  TDSize:5;
-  UINT32                  IntTarget:10;
+  UINT32    Length    : 17;
+  UINT32    TDSize    : 5;
+  UINT32    IntTarget : 10;
 
-  UINT32                  CycleBit:1;
-  UINT32                  ENT:1;
-  UINT32                  ISP:1;
-  UINT32                  NS:1;
-  UINT32                  CH:1;
-  UINT32                  IOC:1;
-  UINT32                  IDT:1;
-  UINT32                  RsvdZ1:2;
-  UINT32                  BEI:1;
-  UINT32                  Type:6;
-  UINT32                  RsvdZ2:16;
+  UINT32    CycleBit  : 1;
+  UINT32    ENT       : 1;
+  UINT32    ISP       : 1;
+  UINT32    NS        : 1;
+  UINT32    CH        : 1;
+  UINT32    IOC       : 1;
+  UINT32    IDT       : 1;
+  UINT32    RsvdZ1    : 2;
+  UINT32    BEI       : 1;
+  UINT32    Type      : 6;
+  UINT32    RsvdZ2    : 16;
 } TRANSFER_TRB_NORMAL;
 
 //
@@ -243,25 +243,25 @@ typedef struct _TRANSFER_TRB_NORMAL {
 // A Setup Stage TRB is created by system software to initiate a USB Setup packet on a control endpoint.
 //
 typedef struct _TRANSFER_TRB_CONTROL_SETUP {
-  UINT32                  bmRequestType:8;
-  UINT32                  bRequest:8;
-  UINT32                  wValue:16;
+  UINT32    bmRequestType : 8;
+  UINT32    bRequest      : 8;
+  UINT32    wValue        : 16;
 
-  UINT32                  wIndex:16;
-  UINT32                  wLength:16;
+  UINT32    wIndex        : 16;
+  UINT32    wLength       : 16;
 
-  UINT32                  Length:17;
-  UINT32                  RsvdZ1:5;
-  UINT32                  IntTarget:10;
+  UINT32    Length        : 17;
+  UINT32    RsvdZ1        : 5;
+  UINT32    IntTarget     : 10;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ2:4;
-  UINT32                  IOC:1;
-  UINT32                  IDT:1;
-  UINT32                  RsvdZ3:3;
-  UINT32                  Type:6;
-  UINT32                  TRT:2;
-  UINT32                  RsvdZ4:14;
+  UINT32    CycleBit      : 1;
+  UINT32    RsvdZ2        : 4;
+  UINT32    IOC           : 1;
+  UINT32    IDT           : 1;
+  UINT32    RsvdZ3        : 3;
+  UINT32    Type          : 6;
+  UINT32    TRT           : 2;
+  UINT32    RsvdZ4        : 14;
 } TRANSFER_TRB_CONTROL_SETUP;
 
 //
@@ -269,25 +269,25 @@ typedef struct _TRANSFER_TRB_CONTROL_SETUP {
 // A Data Stage TRB is used generate the Data stage transaction of a USB Control transfer.
 //
 typedef struct _TRANSFER_TRB_CONTROL_DATA {
-  UINT32                  TRBPtrLo;
+  UINT32    TRBPtrLo;
 
-  UINT32                  TRBPtrHi;
+  UINT32    TRBPtrHi;
 
-  UINT32                  Length:17;
-  UINT32                  TDSize:5;
-  UINT32                  IntTarget:10;
+  UINT32    Length    : 17;
+  UINT32    TDSize    : 5;
+  UINT32    IntTarget : 10;
 
-  UINT32                  CycleBit:1;
-  UINT32                  ENT:1;
-  UINT32                  ISP:1;
-  UINT32                  NS:1;
-  UINT32                  CH:1;
-  UINT32                  IOC:1;
-  UINT32                  IDT:1;
-  UINT32                  RsvdZ1:3;
-  UINT32                  Type:6;
-  UINT32                  DIR:1;
-  UINT32                  RsvdZ2:15;
+  UINT32    CycleBit  : 1;
+  UINT32    ENT       : 1;
+  UINT32    ISP       : 1;
+  UINT32    NS        : 1;
+  UINT32    CH        : 1;
+  UINT32    IOC       : 1;
+  UINT32    IDT       : 1;
+  UINT32    RsvdZ1    : 3;
+  UINT32    Type      : 6;
+  UINT32    DIR       : 1;
+  UINT32    RsvdZ2    : 15;
 } TRANSFER_TRB_CONTROL_DATA;
 
 //
@@ -295,21 +295,21 @@ typedef struct _TRANSFER_TRB_CONTROL_DATA {
 // A Data Stage TRB is used generate the Data stage transaction of a USB Control transfer.
 //
 typedef struct _TRANSFER_TRB_CONTROL_STATUS {
-  UINT32                  RsvdZ1;
-  UINT32                  RsvdZ2;
+  UINT32    RsvdZ1;
+  UINT32    RsvdZ2;
 
-  UINT32                  RsvdZ3:22;
-  UINT32                  IntTarget:10;
+  UINT32    RsvdZ3    : 22;
+  UINT32    IntTarget : 10;
 
-  UINT32                  CycleBit:1;
-  UINT32                  ENT:1;
-  UINT32                  RsvdZ4:2;
-  UINT32                  CH:1;
-  UINT32                  IOC:1;
-  UINT32                  RsvdZ5:4;
-  UINT32                  Type:6;
-  UINT32                  DIR:1;
-  UINT32                  RsvdZ6:15;
+  UINT32    CycleBit  : 1;
+  UINT32    ENT       : 1;
+  UINT32    RsvdZ4    : 2;
+  UINT32    CH        : 1;
+  UINT32    IOC       : 1;
+  UINT32    RsvdZ5    : 4;
+  UINT32    Type      : 6;
+  UINT32    DIR       : 1;
+  UINT32    RsvdZ6    : 15;
 } TRANSFER_TRB_CONTROL_STATUS;
 
 //
@@ -318,21 +318,21 @@ typedef struct _TRANSFER_TRB_CONTROL_STATUS {
 // for more information on the use and operation of Transfer Events.
 //
 typedef struct _EVT_TRB_TRANSFER {
-  UINT32                  TRBPtrLo;
+  UINT32    TRBPtrLo;
 
-  UINT32                  TRBPtrHi;
+  UINT32    TRBPtrHi;
 
-  UINT32                  Length:24;
-  UINT32                  Completecode:8;
+  UINT32    Length       : 24;
+  UINT32    Completecode : 8;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ1:1;
-  UINT32                  ED:1;
-  UINT32                  RsvdZ2:7;
-  UINT32                  Type:6;
-  UINT32                  EndpointId:5;
-  UINT32                  RsvdZ3:3;
-  UINT32                  SlotId:8;
+  UINT32    CycleBit     : 1;
+  UINT32    RsvdZ1       : 1;
+  UINT32    ED           : 1;
+  UINT32    RsvdZ2       : 7;
+  UINT32    Type         : 6;
+  UINT32    EndpointId   : 5;
+  UINT32    RsvdZ3       : 3;
+  UINT32    SlotId       : 8;
 } EVT_TRB_TRANSFER;
 
 //
@@ -341,26 +341,26 @@ typedef struct _EVT_TRB_TRANSFER {
 // Command Ring. Refer to section 4.11.4 for more information on the use of Command Completion Events.
 //
 typedef struct _EVT_TRB_COMMAND_COMPLETION {
-  UINT32                  TRBPtrLo;
+  UINT32    TRBPtrLo;
 
-  UINT32                  TRBPtrHi;
+  UINT32    TRBPtrHi;
 
-  UINT32                  RsvdZ2:24;
-  UINT32                  Completecode:8;
+  UINT32    RsvdZ2       : 24;
+  UINT32    Completecode : 8;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ3:9;
-  UINT32                  Type:6;
-  UINT32                  VFID:8;
-  UINT32                  SlotId:8;
+  UINT32    CycleBit     : 1;
+  UINT32    RsvdZ3       : 9;
+  UINT32    Type         : 6;
+  UINT32    VFID         : 8;
+  UINT32    SlotId       : 8;
 } EVT_TRB_COMMAND_COMPLETION;
 
 typedef union _TRB {
-  TRB_TEMPLATE                TrbTemplate;
-  TRANSFER_TRB_NORMAL         TrbNormal;
-  TRANSFER_TRB_CONTROL_SETUP  TrbCtrSetup;
-  TRANSFER_TRB_CONTROL_DATA   TrbCtrData;
-  TRANSFER_TRB_CONTROL_STATUS TrbCtrStatus;
+  TRB_TEMPLATE                   TrbTemplate;
+  TRANSFER_TRB_NORMAL            TrbNormal;
+  TRANSFER_TRB_CONTROL_SETUP     TrbCtrSetup;
+  TRANSFER_TRB_CONTROL_DATA      TrbCtrData;
+  TRANSFER_TRB_CONTROL_STATUS    TrbCtrStatus;
 } TRB;
 
 //
@@ -369,14 +369,14 @@ typedef union _TRB {
 // mechanisms offered by the xHCI.
 //
 typedef struct _CMD_TRB_NO_OP {
-  UINT32                  RsvdZ0;
-  UINT32                  RsvdZ1;
-  UINT32                  RsvdZ2;
+  UINT32    RsvdZ0;
+  UINT32    RsvdZ1;
+  UINT32    RsvdZ2;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ3:9;
-  UINT32                  Type:6;
-  UINT32                  RsvdZ4:16;
+  UINT32    CycleBit : 1;
+  UINT32    RsvdZ3   : 9;
+  UINT32    Type     : 6;
+  UINT32    RsvdZ4   : 16;
 } CMD_TRB_NO_OP;
 
 //
@@ -385,14 +385,14 @@ typedef struct _CMD_TRB_NO_OP {
 // selected slot to the host in a Command Completion Event.
 //
 typedef struct _CMD_TRB_ENABLE_SLOT {
-  UINT32                  RsvdZ0;
-  UINT32                  RsvdZ1;
-  UINT32                  RsvdZ2;
+  UINT32    RsvdZ0;
+  UINT32    RsvdZ1;
+  UINT32    RsvdZ2;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ3:9;
-  UINT32                  Type:6;
-  UINT32                  RsvdZ4:16;
+  UINT32    CycleBit : 1;
+  UINT32    RsvdZ3   : 9;
+  UINT32    Type     : 6;
+  UINT32    RsvdZ4   : 16;
 } CMD_TRB_ENABLE_SLOT;
 
 //
@@ -401,15 +401,15 @@ typedef struct _CMD_TRB_ENABLE_SLOT {
 // internal xHC resources assigned to the slot.
 //
 typedef struct _CMD_TRB_DISABLE_SLOT {
-  UINT32                  RsvdZ0;
-  UINT32                  RsvdZ1;
-  UINT32                  RsvdZ2;
+  UINT32    RsvdZ0;
+  UINT32    RsvdZ1;
+  UINT32    RsvdZ2;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ3:9;
-  UINT32                  Type:6;
-  UINT32                  RsvdZ4:8;
-  UINT32                  SlotId:8;
+  UINT32    CycleBit : 1;
+  UINT32    RsvdZ3   : 9;
+  UINT32    Type     : 6;
+  UINT32    RsvdZ4   : 8;
+  UINT32    SlotId   : 8;
 } CMD_TRB_DISABLE_SLOT;
 
 //
@@ -419,18 +419,18 @@ typedef struct _CMD_TRB_DISABLE_SLOT {
 // issue a SET_ADDRESS request to the USB device.
 //
 typedef struct _CMD_TRB_ADDRESS_DEVICE {
-  UINT32                  PtrLo;
+  UINT32    PtrLo;
 
-  UINT32                  PtrHi;
+  UINT32    PtrHi;
 
-  UINT32                  RsvdZ1;
+  UINT32    RsvdZ1;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ2:8;
-  UINT32                  BSR:1;
-  UINT32                  Type:6;
-  UINT32                  RsvdZ3:8;
-  UINT32                  SlotId:8;
+  UINT32    CycleBit : 1;
+  UINT32    RsvdZ2   : 8;
+  UINT32    BSR      : 1;
+  UINT32    Type     : 6;
+  UINT32    RsvdZ3   : 8;
+  UINT32    SlotId   : 8;
 } CMD_TRB_ADDRESS_DEVICE;
 
 //
@@ -439,18 +439,18 @@ typedef struct _CMD_TRB_ADDRESS_DEVICE {
 // endpoints selected by the command.
 //
 typedef struct _CMD_TRB_CONFIG_ENDPOINT {
-  UINT32                  PtrLo;
+  UINT32    PtrLo;
 
-  UINT32                  PtrHi;
+  UINT32    PtrHi;
 
-  UINT32                  RsvdZ1;
+  UINT32    RsvdZ1;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ2:8;
-  UINT32                  DC:1;
-  UINT32                  Type:6;
-  UINT32                  RsvdZ3:8;
-  UINT32                  SlotId:8;
+  UINT32    CycleBit : 1;
+  UINT32    RsvdZ2   : 8;
+  UINT32    DC       : 1;
+  UINT32    Type     : 6;
+  UINT32    RsvdZ3   : 8;
+  UINT32    SlotId   : 8;
 } CMD_TRB_CONFIG_ENDPOINT;
 
 //
@@ -460,17 +460,17 @@ typedef struct _CMD_TRB_CONFIG_ENDPOINT {
 // shall evaluate any changes
 //
 typedef struct _CMD_TRB_EVALUATE_CONTEXT {
-  UINT32                  PtrLo;
+  UINT32    PtrLo;
 
-  UINT32                  PtrHi;
+  UINT32    PtrHi;
 
-  UINT32                  RsvdZ1;
+  UINT32    RsvdZ1;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ2:9;
-  UINT32                  Type:6;
-  UINT32                  RsvdZ3:8;
-  UINT32                  SlotId:8;
+  UINT32    CycleBit : 1;
+  UINT32    RsvdZ2   : 9;
+  UINT32    Type     : 6;
+  UINT32    RsvdZ3   : 8;
+  UINT32    SlotId   : 8;
 } CMD_TRB_EVALUATE_CONTEXT;
 
 //
@@ -478,17 +478,17 @@ typedef struct _CMD_TRB_EVALUATE_CONTEXT {
 // The Reset Endpoint Command TRB is used by system software to reset a specified Transfer Ring
 //
 typedef struct _CMD_TRB_RESET_ENDPOINT {
-  UINT32                  RsvdZ0;
-  UINT32                  RsvdZ1;
-  UINT32                  RsvdZ2;
+  UINT32    RsvdZ0;
+  UINT32    RsvdZ1;
+  UINT32    RsvdZ2;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ3:8;
-  UINT32                  TSP:1;
-  UINT32                  Type:6;
-  UINT32                  EDID:5;
-  UINT32                  RsvdZ4:3;
-  UINT32                  SlotId:8;
+  UINT32    CycleBit : 1;
+  UINT32    RsvdZ3   : 8;
+  UINT32    TSP      : 1;
+  UINT32    Type     : 6;
+  UINT32    EDID     : 5;
+  UINT32    RsvdZ4   : 3;
+  UINT32    SlotId   : 8;
 } CMD_TRB_RESET_ENDPOINT;
 
 //
@@ -497,17 +497,17 @@ typedef struct _CMD_TRB_RESET_ENDPOINT {
 // Transfer Ring and temporarily take ownership of TDs that had previously been passed to the xHC.
 //
 typedef struct _CMD_TRB_STOP_ENDPOINT {
-  UINT32                  RsvdZ0;
-  UINT32                  RsvdZ1;
-  UINT32                  RsvdZ2;
+  UINT32    RsvdZ0;
+  UINT32    RsvdZ1;
+  UINT32    RsvdZ2;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ3:9;
-  UINT32                  Type:6;
-  UINT32                  EDID:5;
-  UINT32                  RsvdZ4:2;
-  UINT32                  SP:1;
-  UINT32                  SlotId:8;
+  UINT32    CycleBit : 1;
+  UINT32    RsvdZ3   : 9;
+  UINT32    Type     : 6;
+  UINT32    EDID     : 5;
+  UINT32    RsvdZ4   : 2;
+  UINT32    SP       : 1;
+  UINT32    SlotId   : 8;
 } CMD_TRB_STOP_ENDPOINT;
 
 //
@@ -516,19 +516,19 @@ typedef struct _CMD_TRB_STOP_ENDPOINT {
 // Pointer and DCS fields of an Endpoint or Stream Context.
 //
 typedef struct _CMD_SET_TR_DEQ_POINTER {
-  UINT32                  PtrLo;
+  UINT32    PtrLo;
 
-  UINT32                  PtrHi;
+  UINT32    PtrHi;
 
-  UINT32                  RsvdZ1:16;
-  UINT32                  StreamID:16;
+  UINT32    RsvdZ1   : 16;
+  UINT32    StreamID : 16;
 
-  UINT32                  CycleBit:1;
-  UINT32                  RsvdZ2:9;
-  UINT32                  Type:6;
-  UINT32                  Endpoint:5;
-  UINT32                  RsvdZ3:3;
-  UINT32                  SlotId:8;
+  UINT32    CycleBit : 1;
+  UINT32    RsvdZ2   : 9;
+  UINT32    Type     : 6;
+  UINT32    Endpoint : 5;
+  UINT32    RsvdZ3   : 3;
+  UINT32    SlotId   : 8;
 } CMD_SET_TR_DEQ_POINTER;
 
 //
@@ -536,211 +536,207 @@ typedef struct _CMD_SET_TR_DEQ_POINTER {
 // A Link TRB provides support for non-contiguous TRB Rings.
 //
 typedef struct _LINK_TRB {
-  UINT32                  PtrLo;
+  UINT32    PtrLo;
 
-  UINT32                  PtrHi;
+  UINT32    PtrHi;
 
-  UINT32                  RsvdZ1:22;
-  UINT32                  InterTarget:10;
+  UINT32    RsvdZ1      : 22;
+  UINT32    InterTarget : 10;
 
-  UINT32                  CycleBit:1;
-  UINT32                  TC:1;
-  UINT32                  RsvdZ2:2;
-  UINT32                  CH:1;
-  UINT32                  IOC:1;
-  UINT32                  RsvdZ3:4;
-  UINT32                  Type:6;
-  UINT32                  RsvdZ4:16;
+  UINT32    CycleBit    : 1;
+  UINT32    TC          : 1;
+  UINT32    RsvdZ2      : 2;
+  UINT32    CH          : 1;
+  UINT32    IOC         : 1;
+  UINT32    RsvdZ3      : 4;
+  UINT32    Type        : 6;
+  UINT32    RsvdZ4      : 16;
 } LINK_TRB;
 
 //
 // 6.2.2 Slot Context
 //
 typedef struct _SLOT_CONTEXT {
-  UINT32                  RouteString:20;
-  UINT32                  Speed:4;
-  UINT32                  RsvdZ1:1;
-  UINT32                  MTT:1;
-  UINT32                  Hub:1;
-  UINT32                  ContextEntries:5;
+  UINT32    RouteString    : 20;
+  UINT32    Speed          : 4;
+  UINT32    RsvdZ1         : 1;
+  UINT32    MTT            : 1;
+  UINT32    Hub            : 1;
+  UINT32    ContextEntries : 5;
 
-  UINT32                  MaxExitLatency:16;
-  UINT32                  RootHubPortNum:8;
-  UINT32                  PortNum:8;
+  UINT32    MaxExitLatency : 16;
+  UINT32    RootHubPortNum : 8;
+  UINT32    PortNum        : 8;
 
-  UINT32                  TTHubSlotId:8;
-  UINT32                  TTPortNum:8;
-  UINT32                  TTT:2;
-  UINT32                  RsvdZ2:4;
-  UINT32                  InterTarget:10;
+  UINT32    TTHubSlotId    : 8;
+  UINT32    TTPortNum      : 8;
+  UINT32    TTT            : 2;
+  UINT32    RsvdZ2         : 4;
+  UINT32    InterTarget    : 10;
 
-  UINT32                  DeviceAddress:8;
-  UINT32                  RsvdZ3:19;
-  UINT32                  SlotState:5;
+  UINT32    DeviceAddress  : 8;
+  UINT32    RsvdZ3         : 19;
+  UINT32    SlotState      : 5;
 
-  UINT32                  RsvdZ4;
-  UINT32                  RsvdZ5;
-  UINT32                  RsvdZ6;
-  UINT32                  RsvdZ7;
+  UINT32    RsvdZ4;
+  UINT32    RsvdZ5;
+  UINT32    RsvdZ6;
+  UINT32    RsvdZ7;
 } SLOT_CONTEXT;
 
 typedef struct _SLOT_CONTEXT_64 {
-  UINT32                  RouteString:20;
-  UINT32                  Speed:4;
-  UINT32                  RsvdZ1:1;
-  UINT32                  MTT:1;
-  UINT32                  Hub:1;
-  UINT32                  ContextEntries:5;
+  UINT32    RouteString    : 20;
+  UINT32    Speed          : 4;
+  UINT32    RsvdZ1         : 1;
+  UINT32    MTT            : 1;
+  UINT32    Hub            : 1;
+  UINT32    ContextEntries : 5;
 
-  UINT32                  MaxExitLatency:16;
-  UINT32                  RootHubPortNum:8;
-  UINT32                  PortNum:8;
+  UINT32    MaxExitLatency : 16;
+  UINT32    RootHubPortNum : 8;
+  UINT32    PortNum        : 8;
 
-  UINT32                  TTHubSlotId:8;
-  UINT32                  TTPortNum:8;
-  UINT32                  TTT:2;
-  UINT32                  RsvdZ2:4;
-  UINT32                  InterTarget:10;
+  UINT32    TTHubSlotId    : 8;
+  UINT32    TTPortNum      : 8;
+  UINT32    TTT            : 2;
+  UINT32    RsvdZ2         : 4;
+  UINT32    InterTarget    : 10;
 
-  UINT32                  DeviceAddress:8;
-  UINT32                  RsvdZ3:19;
-  UINT32                  SlotState:5;
+  UINT32    DeviceAddress  : 8;
+  UINT32    RsvdZ3         : 19;
+  UINT32    SlotState      : 5;
 
-  UINT32                  RsvdZ4;
-  UINT32                  RsvdZ5;
-  UINT32                  RsvdZ6;
-  UINT32                  RsvdZ7;
+  UINT32    RsvdZ4;
+  UINT32    RsvdZ5;
+  UINT32    RsvdZ6;
+  UINT32    RsvdZ7;
 
-  UINT32                  RsvdZ8;
-  UINT32                  RsvdZ9;
-  UINT32                  RsvdZ10;
-  UINT32                  RsvdZ11;
+  UINT32    RsvdZ8;
+  UINT32    RsvdZ9;
+  UINT32    RsvdZ10;
+  UINT32    RsvdZ11;
 
-  UINT32                  RsvdZ12;
-  UINT32                  RsvdZ13;
-  UINT32                  RsvdZ14;
-  UINT32                  RsvdZ15;
-
+  UINT32    RsvdZ12;
+  UINT32    RsvdZ13;
+  UINT32    RsvdZ14;
+  UINT32    RsvdZ15;
 } SLOT_CONTEXT_64;
-
 
 //
 // 6.2.3 Endpoint Context
 //
 typedef struct _ENDPOINT_CONTEXT {
-  UINT32                  EPState:3;
-  UINT32                  RsvdZ1:5;
-  UINT32                  Mult:2;
-  UINT32                  MaxPStreams:5;
-  UINT32                  LSA:1;
-  UINT32                  Interval:8;
-  UINT32                  RsvdZ2:8;
+  UINT32    EPState          : 3;
+  UINT32    RsvdZ1           : 5;
+  UINT32    Mult             : 2;
+  UINT32    MaxPStreams      : 5;
+  UINT32    LSA              : 1;
+  UINT32    Interval         : 8;
+  UINT32    RsvdZ2           : 8;
 
-  UINT32                  RsvdZ3:1;
-  UINT32                  CErr:2;
-  UINT32                  EPType:3;
-  UINT32                  RsvdZ4:1;
-  UINT32                  HID:1;
-  UINT32                  MaxBurstSize:8;
-  UINT32                  MaxPacketSize:16;
+  UINT32    RsvdZ3           : 1;
+  UINT32    CErr             : 2;
+  UINT32    EPType           : 3;
+  UINT32    RsvdZ4           : 1;
+  UINT32    HID              : 1;
+  UINT32    MaxBurstSize     : 8;
+  UINT32    MaxPacketSize    : 16;
 
-  UINT32                  PtrLo;
+  UINT32    PtrLo;
 
-  UINT32                  PtrHi;
+  UINT32    PtrHi;
 
-  UINT32                  AverageTRBLength:16;
-  UINT32                  MaxESITPayload:16;
+  UINT32    AverageTRBLength : 16;
+  UINT32    MaxESITPayload   : 16;
 
-  UINT32                  RsvdZ5;
-  UINT32                  RsvdZ6;
-  UINT32                  RsvdZ7;
+  UINT32    RsvdZ5;
+  UINT32    RsvdZ6;
+  UINT32    RsvdZ7;
 } ENDPOINT_CONTEXT;
 
 typedef struct _ENDPOINT_CONTEXT_64 {
-  UINT32                  EPState:3;
-  UINT32                  RsvdZ1:5;
-  UINT32                  Mult:2;
-  UINT32                  MaxPStreams:5;
-  UINT32                  LSA:1;
-  UINT32                  Interval:8;
-  UINT32                  RsvdZ2:8;
+  UINT32    EPState          : 3;
+  UINT32    RsvdZ1           : 5;
+  UINT32    Mult             : 2;
+  UINT32    MaxPStreams      : 5;
+  UINT32    LSA              : 1;
+  UINT32    Interval         : 8;
+  UINT32    RsvdZ2           : 8;
 
-  UINT32                  RsvdZ3:1;
-  UINT32                  CErr:2;
-  UINT32                  EPType:3;
-  UINT32                  RsvdZ4:1;
-  UINT32                  HID:1;
-  UINT32                  MaxBurstSize:8;
-  UINT32                  MaxPacketSize:16;
+  UINT32    RsvdZ3           : 1;
+  UINT32    CErr             : 2;
+  UINT32    EPType           : 3;
+  UINT32    RsvdZ4           : 1;
+  UINT32    HID              : 1;
+  UINT32    MaxBurstSize     : 8;
+  UINT32    MaxPacketSize    : 16;
 
-  UINT32                  PtrLo;
+  UINT32    PtrLo;
 
-  UINT32                  PtrHi;
+  UINT32    PtrHi;
 
-  UINT32                  AverageTRBLength:16;
-  UINT32                  MaxESITPayload:16;
+  UINT32    AverageTRBLength : 16;
+  UINT32    MaxESITPayload   : 16;
 
-  UINT32                  RsvdZ5;
-  UINT32                  RsvdZ6;
-  UINT32                  RsvdZ7;
+  UINT32    RsvdZ5;
+  UINT32    RsvdZ6;
+  UINT32    RsvdZ7;
 
-  UINT32                  RsvdZ8;
-  UINT32                  RsvdZ9;
-  UINT32                  RsvdZ10;
-  UINT32                  RsvdZ11;
+  UINT32    RsvdZ8;
+  UINT32    RsvdZ9;
+  UINT32    RsvdZ10;
+  UINT32    RsvdZ11;
 
-  UINT32                  RsvdZ12;
-  UINT32                  RsvdZ13;
-  UINT32                  RsvdZ14;
-  UINT32                  RsvdZ15;
-
+  UINT32    RsvdZ12;
+  UINT32    RsvdZ13;
+  UINT32    RsvdZ14;
+  UINT32    RsvdZ15;
 } ENDPOINT_CONTEXT_64;
-
 
 //
 // 6.2.5.1 Input Control Context
 //
 typedef struct _INPUT_CONTRL_CONTEXT {
-  UINT32                  Dword1;
-  UINT32                  Dword2;
-  UINT32                  RsvdZ1;
-  UINT32                  RsvdZ2;
-  UINT32                  RsvdZ3;
-  UINT32                  RsvdZ4;
-  UINT32                  RsvdZ5;
-  UINT32                  RsvdZ6;
+  UINT32    Dword1;
+  UINT32    Dword2;
+  UINT32    RsvdZ1;
+  UINT32    RsvdZ2;
+  UINT32    RsvdZ3;
+  UINT32    RsvdZ4;
+  UINT32    RsvdZ5;
+  UINT32    RsvdZ6;
 } INPUT_CONTRL_CONTEXT;
 
 typedef struct _INPUT_CONTRL_CONTEXT_64 {
-  UINT32                  Dword1;
-  UINT32                  Dword2;
-  UINT32                  RsvdZ1;
-  UINT32                  RsvdZ2;
-  UINT32                  RsvdZ3;
-  UINT32                  RsvdZ4;
-  UINT32                  RsvdZ5;
-  UINT32                  RsvdZ6;
-  UINT32                  RsvdZ7;
-  UINT32                  RsvdZ8;
-  UINT32                  RsvdZ9;
-  UINT32                  RsvdZ10;
-  UINT32                  RsvdZ11;
-  UINT32                  RsvdZ12;
-  UINT32                  RsvdZ13;
-  UINT32                  RsvdZ14;
+  UINT32    Dword1;
+  UINT32    Dword2;
+  UINT32    RsvdZ1;
+  UINT32    RsvdZ2;
+  UINT32    RsvdZ3;
+  UINT32    RsvdZ4;
+  UINT32    RsvdZ5;
+  UINT32    RsvdZ6;
+  UINT32    RsvdZ7;
+  UINT32    RsvdZ8;
+  UINT32    RsvdZ9;
+  UINT32    RsvdZ10;
+  UINT32    RsvdZ11;
+  UINT32    RsvdZ12;
+  UINT32    RsvdZ13;
+  UINT32    RsvdZ14;
 } INPUT_CONTRL_CONTEXT_64;
 
 //
 // 6.2.1 Device Context
 //
 typedef struct _DEVICE_CONTEXT {
-  SLOT_CONTEXT            Slot;
-  ENDPOINT_CONTEXT        EP[31];
+  SLOT_CONTEXT        Slot;
+  ENDPOINT_CONTEXT    EP[31];
 } DEVICE_CONTEXT;
 
 typedef struct _DEVICE_CONTEXT_64 {
-  SLOT_CONTEXT_64         Slot;
-  ENDPOINT_CONTEXT_64     EP[31];
+  SLOT_CONTEXT_64        Slot;
+  ENDPOINT_CONTEXT_64    EP[31];
 } DEVICE_CONTEXT_64;
 
 //
@@ -753,11 +749,10 @@ typedef struct _INPUT_CONTEXT {
 } INPUT_CONTEXT;
 
 typedef struct _INPUT_CONTEXT_64 {
-  INPUT_CONTRL_CONTEXT_64 InputControlContext;
-  SLOT_CONTEXT_64         Slot;
-  ENDPOINT_CONTEXT_64     EP[31];
+  INPUT_CONTRL_CONTEXT_64    InputControlContext;
+  SLOT_CONTEXT_64            Slot;
+  ENDPOINT_CONTEXT_64        EP[31];
 } INPUT_CONTEXT_64;
-
 
 /**
   Initialize the XHCI host controller for schedule.
@@ -767,7 +762,7 @@ typedef struct _INPUT_CONTEXT_64 {
 **/
 VOID
 XhcInitSched (
-  IN USB_XHCI_INSTANCE    *Xhc
+  IN USB_XHCI_INSTANCE  *Xhc
   );
 
 /**
@@ -778,7 +773,7 @@ XhcInitSched (
 **/
 VOID
 XhcFreeSched (
-  IN USB_XHCI_INSTANCE    *Xhc
+  IN USB_XHCI_INSTANCE  *Xhc
   );
 
 /**
@@ -792,8 +787,8 @@ XhcFreeSched (
 **/
 EFI_STATUS
 RingIntTransferDoorBell (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  URB                 *Urb
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  URB                *Urb
   );
 
 /**
@@ -811,10 +806,10 @@ RingIntTransferDoorBell (
 **/
 EFI_STATUS
 XhcExecTransfer (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  BOOLEAN             CmdTransfer,
-  IN  URB                 *Urb,
-  IN  UINTN               Timeout
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  BOOLEAN            CmdTransfer,
+  IN  URB                *Urb,
+  IN  UINTN              Timeout
   );
 
 /**
@@ -831,9 +826,9 @@ XhcExecTransfer (
 **/
 EFI_STATUS
 XhciDelAsyncIntTransfer (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  UINT8               BusAddr,
-  IN  UINT8               EpNum
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  UINT8              BusAddr,
+  IN  UINT8              EpNum
   );
 
 /**
@@ -844,7 +839,7 @@ XhciDelAsyncIntTransfer (
 **/
 VOID
 XhciDelAllAsyncIntTransfers (
-  IN USB_XHCI_INSTANCE    *Xhc
+  IN USB_XHCI_INSTANCE  *Xhc
   );
 
 /**
@@ -865,14 +860,14 @@ XhciDelAllAsyncIntTransfers (
 **/
 URB *
 XhciInsertAsyncIntTransfer (
-  IN USB_XHCI_INSTANCE                  *Xhc,
-  IN UINT8                              BusAddr,
-  IN UINT8                              EpAddr,
-  IN UINT8                              DevSpeed,
-  IN UINTN                              MaxPacket,
-  IN UINTN                              DataLen,
-  IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
-  IN VOID                               *Context
+  IN USB_XHCI_INSTANCE                *Xhc,
+  IN UINT8                            BusAddr,
+  IN UINT8                            EpAddr,
+  IN UINT8                            DevSpeed,
+  IN UINTN                            MaxPacket,
+  IN UINTN                            DataLen,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK  Callback,
+  IN VOID                             *Context
   );
 
 /**
@@ -883,7 +878,7 @@ XhciInsertAsyncIntTransfer (
 **/
 VOID
 XhcSetBiosOwnership (
-  IN USB_XHCI_INSTANCE    *Xhc
+  IN USB_XHCI_INSTANCE  *Xhc
   );
 
 /**
@@ -894,7 +889,7 @@ XhcSetBiosOwnership (
 **/
 VOID
 XhcClearBiosOwnership (
-  IN USB_XHCI_INSTANCE    *Xhc
+  IN USB_XHCI_INSTANCE  *Xhc
   );
 
 /**
@@ -924,8 +919,8 @@ XhcRouteStringToSlotId (
 **/
 UINT8
 XhcEndpointToDci (
-  IN  UINT8                   EpAddr,
-  IN  UINT8                   Direction
+  IN  UINT8  EpAddr,
+  IN  UINT8  Direction
   );
 
 /**
@@ -941,9 +936,9 @@ XhcEndpointToDci (
 EFI_STATUS
 EFIAPI
 XhcRingDoorBell (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  IN UINT8                SlotId,
-  IN UINT8                Dci
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci
   );
 
 /**
@@ -956,8 +951,8 @@ XhcRingDoorBell (
 VOID
 EFIAPI
 XhcMonitorAsyncRequests (
-  IN EFI_EVENT            Event,
-  IN VOID                 *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -975,10 +970,10 @@ XhcMonitorAsyncRequests (
 EFI_STATUS
 EFIAPI
 XhcPollPortStatusChange (
-  IN  USB_XHCI_INSTANCE     *Xhc,
-  IN  USB_DEV_ROUTE         ParentRouteChart,
-  IN  UINT8                 Port,
-  IN  EFI_USB_PORT_STATUS   *PortState
+  IN  USB_XHCI_INSTANCE    *Xhc,
+  IN  USB_DEV_ROUTE        ParentRouteChart,
+  IN  UINT8                Port,
+  IN  EFI_USB_PORT_STATUS  *PortState
   );
 
 /**
@@ -995,13 +990,12 @@ XhcPollPortStatusChange (
 **/
 EFI_STATUS
 XhcConfigHubContext (
-  IN USB_XHCI_INSTANCE        *Xhc,
-  IN UINT8                    SlotId,
-  IN UINT8                    PortNum,
-  IN UINT8                    TTT,
-  IN UINT8                    MTT
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              PortNum,
+  IN UINT8              TTT,
+  IN UINT8              MTT
   );
-
 
 /**
   Evaluate the slot context for hub device through XHCI's Configure_Endpoint cmd.
@@ -1017,13 +1011,12 @@ XhcConfigHubContext (
 **/
 EFI_STATUS
 XhcConfigHubContext64 (
-  IN USB_XHCI_INSTANCE        *Xhc,
-  IN UINT8                    SlotId,
-  IN UINT8                    PortNum,
-  IN UINT8                    TTT,
-  IN UINT8                    MTT
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              PortNum,
+  IN UINT8              TTT,
+  IN UINT8              MTT
   );
-
 
 /**
   Configure all the device endpoints through XHCI's Configure_Endpoint cmd.
@@ -1039,12 +1032,11 @@ XhcConfigHubContext64 (
 EFI_STATUS
 EFIAPI
 XhcSetConfigCmd (
-  IN USB_XHCI_INSTANCE        *Xhc,
-  IN UINT8                    SlotId,
-  IN UINT8                    DeviceSpeed,
-  IN USB_CONFIG_DESCRIPTOR    *ConfigDesc
+  IN USB_XHCI_INSTANCE      *Xhc,
+  IN UINT8                  SlotId,
+  IN UINT8                  DeviceSpeed,
+  IN USB_CONFIG_DESCRIPTOR  *ConfigDesc
   );
-
 
 /**
   Configure all the device endpoints through XHCI's Configure_Endpoint cmd.
@@ -1060,10 +1052,10 @@ XhcSetConfigCmd (
 EFI_STATUS
 EFIAPI
 XhcSetConfigCmd64 (
-  IN USB_XHCI_INSTANCE        *Xhc,
-  IN UINT8                    SlotId,
-  IN UINT8                    DeviceSpeed,
-  IN USB_CONFIG_DESCRIPTOR    *ConfigDesc
+  IN USB_XHCI_INSTANCE      *Xhc,
+  IN UINT8                  SlotId,
+  IN UINT8                  DeviceSpeed,
+  IN USB_CONFIG_DESCRIPTOR  *ConfigDesc
   );
 
 /**
@@ -1081,11 +1073,11 @@ XhcSetConfigCmd64 (
 EFI_STATUS
 EFIAPI
 XhcSetInterface (
-  IN USB_XHCI_INSTANCE        *Xhc,
-  IN UINT8                    SlotId,
-  IN UINT8                    DeviceSpeed,
-  IN USB_CONFIG_DESCRIPTOR    *ConfigDesc,
-  IN EFI_USB_DEVICE_REQUEST   *Request
+  IN USB_XHCI_INSTANCE       *Xhc,
+  IN UINT8                   SlotId,
+  IN UINT8                   DeviceSpeed,
+  IN USB_CONFIG_DESCRIPTOR   *ConfigDesc,
+  IN EFI_USB_DEVICE_REQUEST  *Request
   );
 
 /**
@@ -1103,11 +1095,11 @@ XhcSetInterface (
 EFI_STATUS
 EFIAPI
 XhcSetInterface64 (
-  IN USB_XHCI_INSTANCE        *Xhc,
-  IN UINT8                    SlotId,
-  IN UINT8                    DeviceSpeed,
-  IN USB_CONFIG_DESCRIPTOR    *ConfigDesc,
-  IN EFI_USB_DEVICE_REQUEST   *Request
+  IN USB_XHCI_INSTANCE       *Xhc,
+  IN UINT8                   SlotId,
+  IN UINT8                   DeviceSpeed,
+  IN USB_CONFIG_DESCRIPTOR   *ConfigDesc,
+  IN EFI_USB_DEVICE_REQUEST  *Request
   );
 
 /**
@@ -1141,11 +1133,11 @@ XhcBusDevAddrToSlotId (
 EFI_STATUS
 EFIAPI
 XhcInitializeDeviceSlot (
-  IN  USB_XHCI_INSTANCE         *Xhc,
-  IN  USB_DEV_ROUTE             ParentRouteChart,
-  IN  UINT16                    ParentPort,
-  IN  USB_DEV_ROUTE             RouteChart,
-  IN  UINT8                     DeviceSpeed
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  USB_DEV_ROUTE      ParentRouteChart,
+  IN  UINT16             ParentPort,
+  IN  USB_DEV_ROUTE      RouteChart,
+  IN  UINT8              DeviceSpeed
   );
 
 /**
@@ -1163,11 +1155,11 @@ XhcInitializeDeviceSlot (
 EFI_STATUS
 EFIAPI
 XhcInitializeDeviceSlot64 (
-  IN  USB_XHCI_INSTANCE         *Xhc,
-  IN  USB_DEV_ROUTE             ParentRouteChart,
-  IN  UINT16                    ParentPort,
-  IN  USB_DEV_ROUTE             RouteChart,
-  IN  UINT8                     DeviceSpeed
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  USB_DEV_ROUTE      ParentRouteChart,
+  IN  UINT16             ParentPort,
+  IN  USB_DEV_ROUTE      RouteChart,
+  IN  UINT8              DeviceSpeed
   );
 
 /**
@@ -1183,11 +1175,10 @@ XhcInitializeDeviceSlot64 (
 EFI_STATUS
 EFIAPI
 XhcEvaluateContext (
-  IN USB_XHCI_INSTANCE        *Xhc,
-  IN UINT8                    SlotId,
-  IN UINT32                   MaxPacketSize
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT32             MaxPacketSize
   );
-
 
 /**
   Evaluate the endpoint 0 context through XHCI's Evaluate_Context cmd.
@@ -1202,11 +1193,10 @@ XhcEvaluateContext (
 EFI_STATUS
 EFIAPI
 XhcEvaluateContext64 (
-  IN USB_XHCI_INSTANCE        *Xhc,
-  IN UINT8                    SlotId,
-  IN UINT32                   MaxPacketSize
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT32             MaxPacketSize
   );
-
 
 /**
   Disable the specified device slot.
@@ -1220,10 +1210,9 @@ XhcEvaluateContext64 (
 EFI_STATUS
 EFIAPI
 XhcDisableSlotCmd (
-  IN USB_XHCI_INSTANCE        *Xhc,
-  IN UINT8                    SlotId
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId
   );
-
 
 /**
   Disable the specified device slot.
@@ -1237,10 +1226,9 @@ XhcDisableSlotCmd (
 EFI_STATUS
 EFIAPI
 XhcDisableSlotCmd64 (
-  IN USB_XHCI_INSTANCE        *Xhc,
-  IN UINT8                    SlotId
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId
   );
-
 
 /**
   Synchronize the specified transfer ring to update the enqueue and dequeue pointer.
@@ -1254,8 +1242,8 @@ XhcDisableSlotCmd64 (
 EFI_STATUS
 EFIAPI
 XhcSyncTrsRing (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  TRANSFER_RING           *TrsRing
+  IN USB_XHCI_INSTANCE  *Xhc,
+  TRANSFER_RING         *TrsRing
   );
 
 /**
@@ -1270,8 +1258,8 @@ XhcSyncTrsRing (
 EFI_STATUS
 EFIAPI
 XhcSyncEventRing (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  EVENT_RING              *EvtRing
+  IN USB_XHCI_INSTANCE  *Xhc,
+  EVENT_RING            *EvtRing
   );
 
 /**
@@ -1288,9 +1276,9 @@ XhcSyncEventRing (
 EFI_STATUS
 EFIAPI
 XhcCheckNewEvent (
-  IN  USB_XHCI_INSTANCE       *Xhc,
-  IN  EVENT_RING              *EvtRing,
-  OUT TRB_TEMPLATE            **NewEvtTrb
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  EVENT_RING         *EvtRing,
+  OUT TRB_TEMPLATE       **NewEvtTrb
   );
 
 /**
@@ -1303,9 +1291,9 @@ XhcCheckNewEvent (
 **/
 VOID
 CreateTransferRing (
-  IN  USB_XHCI_INSTANCE     *Xhc,
-  IN  UINTN                 TrbNum,
-  OUT TRANSFER_RING         *TransferRing
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  UINTN              TrbNum,
+  OUT TRANSFER_RING      *TransferRing
   );
 
 /**
@@ -1317,8 +1305,8 @@ CreateTransferRing (
 **/
 VOID
 CreateEventRing (
-  IN  USB_XHCI_INSTANCE     *Xhc,
-  OUT EVENT_RING            *EventRing
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  OUT EVENT_RING         *EventRing
   );
 
 /**
@@ -1338,8 +1326,8 @@ CreateEventRing (
 EFI_STATUS
 EFIAPI
 XhcRecoverHaltedEndpoint (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  URB                 *Urb
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  URB                *Urb
   );
 
 /**
@@ -1358,8 +1346,8 @@ XhcRecoverHaltedEndpoint (
 EFI_STATUS
 EFIAPI
 XhcDequeueTrbFromEndpoint (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  URB                 *Urb
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  URB                *Urb
   );
 
 /**
@@ -1377,10 +1365,10 @@ XhcDequeueTrbFromEndpoint (
 EFI_STATUS
 EFIAPI
 XhcStopEndpoint (
-  IN USB_XHCI_INSTANCE      *Xhc,
-  IN UINT8                  SlotId,
-  IN UINT8                  Dci,
-  IN URB                    *PendingUrb  OPTIONAL
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci,
+  IN URB                *PendingUrb  OPTIONAL
   );
 
 /**
@@ -1397,9 +1385,9 @@ XhcStopEndpoint (
 EFI_STATUS
 EFIAPI
 XhcResetEndpoint (
-  IN USB_XHCI_INSTANCE      *Xhc,
-  IN UINT8                  SlotId,
-  IN UINT8                  Dci
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci
   );
 
 /**
@@ -1418,10 +1406,10 @@ XhcResetEndpoint (
 EFI_STATUS
 EFIAPI
 XhcSetTrDequeuePointer (
-  IN USB_XHCI_INSTANCE      *Xhc,
-  IN UINT8                  SlotId,
-  IN UINT8                  Dci,
-  IN URB                    *Urb
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci,
+  IN URB                *Urb
   );
 
 /**
@@ -1442,19 +1430,19 @@ XhcSetTrDequeuePointer (
   @return Created URB or NULL
 
 **/
-URB*
+URB *
 XhcCreateUrb (
-  IN USB_XHCI_INSTANCE                  *Xhc,
-  IN UINT8                              DevAddr,
-  IN UINT8                              EpAddr,
-  IN UINT8                              DevSpeed,
-  IN UINTN                              MaxPacket,
-  IN UINTN                              Type,
-  IN EFI_USB_DEVICE_REQUEST             *Request,
-  IN VOID                               *Data,
-  IN UINTN                              DataLen,
-  IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
-  IN VOID                               *Context
+  IN USB_XHCI_INSTANCE                *Xhc,
+  IN UINT8                            DevAddr,
+  IN UINT8                            EpAddr,
+  IN UINT8                            DevSpeed,
+  IN UINTN                            MaxPacket,
+  IN UINTN                            Type,
+  IN EFI_USB_DEVICE_REQUEST           *Request,
+  IN VOID                             *Data,
+  IN UINTN                            DataLen,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK  Callback,
+  IN VOID                             *Context
   );
 
 /**
@@ -1466,8 +1454,8 @@ XhcCreateUrb (
 **/
 VOID
 XhcFreeUrb (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  IN URB                  *Urb
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN URB                *Urb
   );
 
 /**
@@ -1481,8 +1469,8 @@ XhcFreeUrb (
 **/
 EFI_STATUS
 XhcCreateTransferTrb (
-  IN USB_XHCI_INSTANCE            *Xhc,
-  IN URB                          *Urb
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN URB                *Urb
   );
 
 #endif

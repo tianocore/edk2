@@ -11,18 +11,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Ps2Mouse.h"
 
-#define PS2_PACKET_LENGTH       3
-#define PS2_SYNC_MASK           0xc
-#define PS2_SYNC_BYTE           0x8
+#define PS2_PACKET_LENGTH  3
+#define PS2_SYNC_MASK      0xc
+#define PS2_SYNC_BYTE      0x8
 
 #define IS_PS2_SYNC_BYTE(byte)  ((byte & PS2_SYNC_MASK) == PS2_SYNC_BYTE)
 
-#define PS2_READ_BYTE_ONE       0
-#define PS2_READ_DATA_BYTE      1
-#define PS2_PROCESS_PACKET      2
+#define PS2_READ_BYTE_ONE   0
+#define PS2_READ_DATA_BYTE  1
+#define PS2_PROCESS_PACKET  2
 
-#define TIMEOUT                 50000
-#define BAT_TIMEOUT             500000
+#define TIMEOUT      50000
+#define BAT_TIMEOUT  500000
 
 //
 // 8042 I/O Port
@@ -42,31 +42,31 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ENABLE_KB       0xae
 #define WRITE_AUX_DEV   0xd4
 
-#define CMD_SYS_FLAG    0x04
-#define CMD_KB_STS      0x10
-#define CMD_KB_DIS      0x10
-#define CMD_KB_EN       0x0
+#define CMD_SYS_FLAG  0x04
+#define CMD_KB_STS    0x10
+#define CMD_KB_DIS    0x10
+#define CMD_KB_EN     0x0
 
 //
 // 8042 Auxiliary Device Command
 //
-#define SETSF1_CMD  0xe6
-#define SETSF2_CMD  0xe7
-#define SETRE_CMD   0xe8
-#define READ_CMD    0xeb
-#define SETRM_CMD   0xf0
-#define SETSR_CMD   0xf3
-#define ENABLE_CMD  0xf4
-#define DISABLE_CMD 0xf5
-#define RESET_CMD   0xff
+#define SETSF1_CMD   0xe6
+#define SETSF2_CMD   0xe7
+#define SETRE_CMD    0xe8
+#define READ_CMD     0xeb
+#define SETRM_CMD    0xf0
+#define SETSR_CMD    0xf3
+#define ENABLE_CMD   0xf4
+#define DISABLE_CMD  0xf5
+#define RESET_CMD    0xff
 
 //
 // return code
 //
-#define PS2_ACK       0xfa
-#define PS2_RESEND    0xfe
-#define PS2MOUSE_BAT1 0xaa
-#define PS2MOUSE_BAT2 0x0
+#define PS2_ACK        0xfa
+#define PS2_RESEND     0xfe
+#define PS2MOUSE_BAT1  0xaa
+#define PS2MOUSE_BAT2  0x0
 
 //
 // Keyboard Controller Status
@@ -78,7 +78,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// General Time Out
 ///
-#define KBC_TIM   0x40
+#define KBC_TIM  0x40
 ///
 /// Output buffer for auxiliary device (PS/2):
 ///    0 - Holds keyboard data
@@ -176,7 +176,7 @@ KbcDisableKb (
 **/
 EFI_STATUS
 CheckKbStatus (
-  OUT BOOLEAN                             *KeyboardEnable
+  OUT BOOLEAN  *KeyboardEnable
   );
 
 /**
@@ -198,7 +198,7 @@ PS2MouseReset (
 **/
 EFI_STATUS
 PS2MouseSetSampleRate (
-  IN MOUSE_SR                             SampleRate
+  IN MOUSE_SR  SampleRate
   );
 
 /**
@@ -210,7 +210,7 @@ PS2MouseSetSampleRate (
 **/
 EFI_STATUS
 PS2MouseSetResolution (
-  IN MOUSE_RE                             Resolution
+  IN MOUSE_RE  Resolution
   );
 
 /**
@@ -222,7 +222,7 @@ PS2MouseSetResolution (
 **/
 EFI_STATUS
 PS2MouseSetScaling (
-  IN MOUSE_SF                             Scaling
+  IN MOUSE_SF  Scaling
   );
 
 /**
@@ -246,7 +246,7 @@ PS2MouseEnable (
 **/
 EFI_STATUS
 PS2MouseGetPacket (
-  PS2_MOUSE_DEV     *MouseDev
+  PS2_MOUSE_DEV  *MouseDev
   );
 
 /**
@@ -260,14 +260,15 @@ PS2MouseGetPacket (
 **/
 EFI_STATUS
 PS2MouseRead (
-  OUT UINT8                               *Buffer,
-  IN OUT UINTN                            *BufSize,
-  IN  UINTN                               State
+  OUT UINT8     *Buffer,
+  IN OUT UINTN  *BufSize,
+  IN  UINTN     State
   );
 
 //
 // 8042 I/O function
 //
+
 /**
   I/O work flow of outing 8042 command.
 
@@ -278,7 +279,7 @@ PS2MouseRead (
 **/
 EFI_STATUS
 Out8042Command (
-  IN UINT8                                Command
+  IN UINT8  Command
   );
 
 /**
@@ -291,7 +292,7 @@ Out8042Command (
 **/
 EFI_STATUS
 In8042Data (
-  IN OUT UINT8                            *Data
+  IN OUT UINT8  *Data
   );
 
 /**
@@ -304,7 +305,7 @@ In8042Data (
 **/
 EFI_STATUS
 Out8042Data (
-  IN UINT8                                Data
+  IN UINT8  Data
   );
 
 /**
@@ -318,8 +319,8 @@ Out8042Data (
 **/
 EFI_STATUS
 Out8042AuxCommand (
-  IN UINT8                                Command,
-  IN BOOLEAN                              Resend
+  IN UINT8    Command,
+  IN BOOLEAN  Resend
   );
 
 /**
@@ -332,7 +333,7 @@ Out8042AuxCommand (
 **/
 EFI_STATUS
 In8042AuxData (
-  IN OUT UINT8                            *Data
+  IN OUT UINT8  *Data
   );
 
 /**
@@ -345,7 +346,7 @@ In8042AuxData (
 **/
 EFI_STATUS
 Out8042AuxData (
-  IN UINT8                                Data
+  IN UINT8  Data
   );
 
 /**
@@ -369,7 +370,7 @@ CheckForInput (
 **/
 EFI_STATUS
 WaitInputEmpty (
-  IN UINTN                                Timeout
+  IN UINTN  Timeout
   );
 
 /**
@@ -382,8 +383,7 @@ WaitInputEmpty (
 **/
 EFI_STATUS
 WaitOutputFull (
-  IN UINTN                                Timeout
+  IN UINTN  Timeout
   );
 
 #endif
-

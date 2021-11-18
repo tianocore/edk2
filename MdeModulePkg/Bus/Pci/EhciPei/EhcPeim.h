@@ -28,46 +28,44 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 typedef struct _PEI_USB2_HC_DEV PEI_USB2_HC_DEV;
 
-#define EFI_LIST_ENTRY LIST_ENTRY
+#define EFI_LIST_ENTRY  LIST_ENTRY
 
 #include "UsbHcMem.h"
 #include "EhciReg.h"
 #include "EhciUrb.h"
 #include "EhciSched.h"
 
-#define EFI_USB_SPEED_FULL 0x0000
-#define EFI_USB_SPEED_LOW  0x0001
-#define EFI_USB_SPEED_HIGH 0x0002
+#define EFI_USB_SPEED_FULL  0x0000
+#define EFI_USB_SPEED_LOW   0x0001
+#define EFI_USB_SPEED_HIGH  0x0002
 
-#define PAGESIZE           4096
+#define PAGESIZE  4096
 
-#define EHC_1_MICROSECOND            1
-#define EHC_1_MILLISECOND            (1000 * EHC_1_MICROSECOND)
-#define EHC_1_SECOND                 (1000 * EHC_1_MILLISECOND)
+#define EHC_1_MICROSECOND  1
+#define EHC_1_MILLISECOND  (1000 * EHC_1_MICROSECOND)
+#define EHC_1_SECOND       (1000 * EHC_1_MILLISECOND)
 
 //
 // EHCI register operation timeout, set by experience
 //
-#define EHC_RESET_TIMEOUT            (1 * EHC_1_SECOND)
-#define EHC_GENERIC_TIMEOUT          (10 * EHC_1_MILLISECOND)
-
+#define EHC_RESET_TIMEOUT    (1 * EHC_1_SECOND)
+#define EHC_GENERIC_TIMEOUT  (10 * EHC_1_MILLISECOND)
 
 //
 // Wait for roothub port power stable, refers to Spec[EHCI1.0-2.3.9]
 //
-#define EHC_ROOT_PORT_RECOVERY_STALL (20 * EHC_1_MILLISECOND)
+#define EHC_ROOT_PORT_RECOVERY_STALL  (20 * EHC_1_MILLISECOND)
 
 //
 // Sync transfer polling interval, set by experience.
 //
-#define EHC_SYNC_POLL_INTERVAL       (6 * EHC_1_MILLISECOND)
+#define EHC_SYNC_POLL_INTERVAL  (6 * EHC_1_MILLISECOND)
 
-#define EFI_LIST_CONTAINER(Entry, Type, Field) BASE_CR(Entry, Type, Field)
+#define EFI_LIST_CONTAINER(Entry, Type, Field)  BASE_CR(Entry, Type, Field)
 
-
-#define EHC_LOW_32BIT(Addr64)     ((UINT32)(((UINTN)(Addr64)) & 0XFFFFFFFF))
-#define EHC_HIGH_32BIT(Addr64)    ((UINT32)(RShiftU64((UINTN)(Addr64), 32) & 0XFFFFFFFF))
-#define EHC_BIT_IS_SET(Data, Bit) ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
+#define EHC_LOW_32BIT(Addr64)      ((UINT32)(((UINTN)(Addr64)) & 0XFFFFFFFF))
+#define EHC_HIGH_32BIT(Addr64)     ((UINT32)(RShiftU64((UINTN)(Addr64), 32) & 0XFFFFFFFF))
+#define EHC_BIT_IS_SET(Data, Bit)  ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
 
 #define EHC_REG_BIT_IS_SET(Ehc, Offset, Bit) \
           (EHC_BIT_IS_SET(EhcReadOpReg ((Ehc), (Offset)), (Bit)))
@@ -75,18 +73,18 @@ typedef struct _PEI_USB2_HC_DEV PEI_USB2_HC_DEV;
 #define USB2_HC_DEV_SIGNATURE  SIGNATURE_32 ('e', 'h', 'c', 'i')
 
 struct _PEI_USB2_HC_DEV {
-  UINTN                               Signature;
-  PEI_USB2_HOST_CONTROLLER_PPI        Usb2HostControllerPpi;
-  EDKII_IOMMU_PPI                     *IoMmu;
-  EFI_PEI_PPI_DESCRIPTOR              PpiDescriptor;
+  UINTN                           Signature;
+  PEI_USB2_HOST_CONTROLLER_PPI    Usb2HostControllerPpi;
+  EDKII_IOMMU_PPI                 *IoMmu;
+  EFI_PEI_PPI_DESCRIPTOR          PpiDescriptor;
   //
   // EndOfPei callback is used to stop the EHC DMA operation
   // after exit PEI phase.
   //
-  EFI_PEI_NOTIFY_DESCRIPTOR           EndOfPeiNotifyList;
-  UINT32                              UsbHostControllerBaseAddress;
-  PEI_URB                             *Urb;
-  USBHC_MEM_POOL                      *MemPool;
+  EFI_PEI_NOTIFY_DESCRIPTOR       EndOfPeiNotifyList;
+  UINT32                          UsbHostControllerBaseAddress;
+  PEI_URB                         *Urb;
+  USBHC_MEM_POOL                  *MemPool;
 
   //
   // Schedule data shared between asynchronous and periodic
@@ -97,36 +95,36 @@ struct _PEI_USB2_HC_DEV {
   // For control transfer, even the short read happens, try the
   // status stage.
   //
-  PEI_EHC_QTD                         *ShortReadStop;
-  EFI_EVENT                           PollTimer;
+  PEI_EHC_QTD       *ShortReadStop;
+  EFI_EVENT         PollTimer;
 
   //
   // Asynchronous(bulk and control) transfer schedule data:
   // ReclaimHead is used as the head of the asynchronous transfer
   // list. It acts as the reclamation header.
   //
-  PEI_EHC_QH                          *ReclaimHead;
+  PEI_EHC_QH        *ReclaimHead;
 
   //
   // Periodic (interrupt) transfer schedule data:
   //
-  VOID                                *PeriodFrame;     // Mapped as common buffer
-  VOID                                *PeriodFrameMap;
+  VOID              *PeriodFrame;                       // Mapped as common buffer
+  VOID              *PeriodFrameMap;
 
-  PEI_EHC_QH                          *PeriodOne;
-  EFI_LIST_ENTRY                      AsyncIntTransfers;
+  PEI_EHC_QH        *PeriodOne;
+  EFI_LIST_ENTRY    AsyncIntTransfers;
 
   //
   // EHCI configuration data
   //
-  UINT32                              HcStructParams; // Cache of HC structure parameter, EHC_HCSPARAMS_OFFSET
-  UINT32                              HcCapParams;    // Cache of HC capability parameter, HCCPARAMS
-  UINT32                              CapLen;         // Capability length
-  UINT32                              High32bitAddr;
+  UINT32            HcStructParams;                   // Cache of HC structure parameter, EHC_HCSPARAMS_OFFSET
+  UINT32            HcCapParams;                      // Cache of HC capability parameter, HCCPARAMS
+  UINT32            CapLen;                           // Capability length
+  UINT32            High32bitAddr;
 };
 
-#define PEI_RECOVERY_USB_EHC_DEV_FROM_EHCI_THIS(a)  CR (a, PEI_USB2_HC_DEV, Usb2HostControllerPpi, USB2_HC_DEV_SIGNATURE)
-#define PEI_RECOVERY_USB_EHC_DEV_FROM_THIS_NOTIFY(a) CR (a, PEI_USB2_HC_DEV, EndOfPeiNotifyList, USB2_HC_DEV_SIGNATURE)
+#define PEI_RECOVERY_USB_EHC_DEV_FROM_EHCI_THIS(a)    CR (a, PEI_USB2_HC_DEV, Usb2HostControllerPpi, USB2_HC_DEV_SIGNATURE)
+#define PEI_RECOVERY_USB_EHC_DEV_FROM_THIS_NOTIFY(a)  CR (a, PEI_USB2_HC_DEV, EndOfPeiNotifyList, USB2_HC_DEV_SIGNATURE)
 
 /**
   @param  EhcDev                 EHCI Device.
@@ -137,7 +135,7 @@ struct _PEI_USB2_HC_DEV {
 **/
 EFI_STATUS
 InitializeUsbHC (
-  IN PEI_USB2_HC_DEV      *EhcDev
+  IN PEI_USB2_HC_DEV  *EhcDev
   );
 
 /**
@@ -154,9 +152,9 @@ InitializeUsbHC (
 **/
 USBHC_MEM_POOL *
 UsbHcInitMemPool (
-  IN PEI_USB2_HC_DEV      *Ehc,
-  IN BOOLEAN              Check4G,
-  IN UINT32               Which4G
+  IN PEI_USB2_HC_DEV  *Ehc,
+  IN BOOLEAN          Check4G,
+  IN UINT32           Which4G
   )
 ;
 
@@ -172,8 +170,8 @@ UsbHcInitMemPool (
 **/
 EFI_STATUS
 UsbHcFreeMemPool (
-  IN PEI_USB2_HC_DEV      *Ehc,
-  IN USBHC_MEM_POOL       *Pool
+  IN PEI_USB2_HC_DEV  *Ehc,
+  IN USBHC_MEM_POOL   *Pool
   )
 ;
 
@@ -190,9 +188,9 @@ UsbHcFreeMemPool (
 **/
 VOID *
 UsbHcAllocateMem (
-  IN PEI_USB2_HC_DEV      *Ehc,
-  IN  USBHC_MEM_POOL      *Pool,
-  IN  UINTN               Size
+  IN PEI_USB2_HC_DEV  *Ehc,
+  IN  USBHC_MEM_POOL  *Pool,
+  IN  UINTN           Size
   )
 ;
 
@@ -207,10 +205,10 @@ UsbHcAllocateMem (
 **/
 VOID
 UsbHcFreeMem (
-  IN PEI_USB2_HC_DEV      *Ehc,
-  IN USBHC_MEM_POOL       *Pool,
-  IN VOID                 *Mem,
-  IN UINTN                Size
+  IN PEI_USB2_HC_DEV  *Ehc,
+  IN USBHC_MEM_POOL   *Pool,
+  IN VOID             *Mem,
+  IN UINTN            Size
   )
 ;
 
@@ -253,8 +251,8 @@ IoMmuMap (
 **/
 VOID
 IoMmuUnmap (
-  IN EDKII_IOMMU_PPI        *IoMmu,
-  IN VOID                  *Mapping
+  IN EDKII_IOMMU_PPI  *IoMmu,
+  IN VOID             *Mapping
   );
 
 /**
@@ -296,10 +294,10 @@ IoMmuAllocateBuffer (
 **/
 VOID
 IoMmuFreeBuffer (
-  IN EDKII_IOMMU_PPI        *IoMmu,
-  IN UINTN                  Pages,
-  IN VOID                   *HostAddress,
-  IN VOID                   *Mapping
+  IN EDKII_IOMMU_PPI  *IoMmu,
+  IN UINTN            Pages,
+  IN VOID             *HostAddress,
+  IN VOID             *Mapping
   );
 
 /**
@@ -310,7 +308,7 @@ IoMmuFreeBuffer (
 **/
 VOID
 IoMmuInit (
-  OUT EDKII_IOMMU_PPI       **IoMmu
+  OUT EDKII_IOMMU_PPI  **IoMmu
   );
 
 #endif

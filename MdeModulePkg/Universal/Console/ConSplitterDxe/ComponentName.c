@@ -20,12 +20,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gConSplitterConInComp
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConSplitterConInComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ConSplitterComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ConSplitterConInComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gConSplitterConInComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)ConSplitterComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)ConSplitterConInComponentNameGetControllerName,
   "en"
 };
-
 
 //
 // EFI Component Name Protocol
@@ -39,16 +38,16 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gConSplitterSimplePoi
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConSplitterSimplePointerComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ConSplitterComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ConSplitterSimplePointerComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gConSplitterSimplePointerComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)ConSplitterComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)ConSplitterSimplePointerComponentNameGetControllerName,
   "en"
 };
 
 //
 // EFI Component Name Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gConSplitterAbsolutePointerComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gConSplitterAbsolutePointerComponentName = {
   ConSplitterComponentNameGetDriverName,
   ConSplitterAbsolutePointerComponentNameGetControllerName,
   "eng"
@@ -57,9 +56,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gConSplitterAbsolutePo
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConSplitterAbsolutePointerComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ConSplitterComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ConSplitterAbsolutePointerComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gConSplitterAbsolutePointerComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)ConSplitterComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)ConSplitterAbsolutePointerComponentNameGetControllerName,
   "en"
 };
 
@@ -75,12 +74,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gConSplitterConOutCom
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConSplitterConOutComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ConSplitterComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ConSplitterConOutComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gConSplitterConOutComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)ConSplitterComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)ConSplitterConOutComponentNameGetControllerName,
   "en"
 };
-
 
 //
 // EFI Component Name Protocol
@@ -94,17 +92,16 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gConSplitterStdErrCom
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gConSplitterStdErrComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) ConSplitterComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) ConSplitterStdErrComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gConSplitterStdErrComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)ConSplitterComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)ConSplitterStdErrComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mConSplitterDriverNameTable[] = {
   {
     "eng;en",
-    (CHAR16 *) L"Console Splitter Driver"
+    (CHAR16 *)L"Console Splitter Driver"
   },
   {
     NULL,
@@ -112,10 +109,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterDriverNameTab
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterConInControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mConSplitterConInControllerNameTable[] = {
   {
     "eng;en",
-    (CHAR16 *) L"Primary Console Input Device"
+    (CHAR16 *)L"Primary Console Input Device"
   },
   {
     NULL,
@@ -123,10 +120,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterConInControll
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterSimplePointerControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mConSplitterSimplePointerControllerNameTable[] = {
   {
     "eng;en",
-    (CHAR16 *) L"Primary Simple Pointer Device"
+    (CHAR16 *)L"Primary Simple Pointer Device"
   },
   {
     NULL,
@@ -134,7 +131,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterSimplePointer
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterAbsolutePointerControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mConSplitterAbsolutePointerControllerNameTable[] = {
   {
     "eng;en",
     (CHAR16 *)L"Primary Absolute Pointer Device"
@@ -145,10 +142,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterAbsolutePoint
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterConOutControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mConSplitterConOutControllerNameTable[] = {
   {
     "eng;en",
-    (CHAR16 *) L"Primary Console Output Device"
+    (CHAR16 *)L"Primary Console Output Device"
   },
   {
     NULL,
@@ -156,10 +153,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterConOutControl
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mConSplitterStdErrControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mConSplitterStdErrControllerNameTable[] = {
   {
     "eng;en",
-    (CHAR16 *) L"Primary Standard Error Device"
+    (CHAR16 *)L"Primary Standard Error Device"
   },
   {
     NULL,
@@ -252,14 +249,14 @@ ConSplitterComponentNameGetDriverName (
 **/
 EFI_STATUS
 ConSplitterTestControllerHandles (
-  IN  CONST EFI_HANDLE       ControllerHandle,
-  IN  CONST EFI_HANDLE       DriverBindingHandle,
-  IN  CONST EFI_GUID         *ProtocolGuid,
-  IN  EFI_HANDLE             ChildHandle,
-  IN  CONST EFI_GUID         *ConsumsedGuid
+  IN  CONST EFI_HANDLE  ControllerHandle,
+  IN  CONST EFI_HANDLE  DriverBindingHandle,
+  IN  CONST EFI_GUID    *ProtocolGuid,
+  IN  EFI_HANDLE        ChildHandle,
+  IN  CONST EFI_GUID    *ConsumsedGuid
   )
 {
-  EFI_STATUS                 Status;
+  EFI_STATUS  Status;
 
   //
   // here ChildHandle is not an Optional parameter.
@@ -363,14 +360,14 @@ ConSplitterTestControllerHandles (
 EFI_STATUS
 EFIAPI
 ConSplitterConInComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                     Status;
+  EFI_STATUS  Status;
 
   Status = ConSplitterTestControllerHandles (
              ControllerHandle,
@@ -463,14 +460,14 @@ ConSplitterConInComponentNameGetControllerName (
 EFI_STATUS
 EFIAPI
 ConSplitterSimplePointerComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
   Status = ConSplitterTestControllerHandles (
              ControllerHandle,
@@ -491,7 +488,6 @@ ConSplitterSimplePointerComponentNameGetControllerName (
            (BOOLEAN)(This == &gConSplitterSimplePointerComponentName)
            );
 }
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -540,14 +536,14 @@ ConSplitterSimplePointerComponentNameGetControllerName (
 EFI_STATUS
 EFIAPI
 ConSplitterAbsolutePointerComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                    *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                    Status;
+  EFI_STATUS  Status;
 
   Status = ConSplitterTestControllerHandles (
              ControllerHandle,
@@ -640,14 +636,14 @@ ConSplitterAbsolutePointerComponentNameGetControllerName (
 EFI_STATUS
 EFIAPI
 ConSplitterConOutComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                       Status;
+  EFI_STATUS  Status;
 
   Status = ConSplitterTestControllerHandles (
              ControllerHandle,
@@ -740,14 +736,14 @@ ConSplitterConOutComponentNameGetControllerName (
 EFI_STATUS
 EFIAPI
 ConSplitterStdErrComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                       Status;
+  EFI_STATUS  Status;
 
   Status = ConSplitterTestControllerHandles (
              ControllerHandle,

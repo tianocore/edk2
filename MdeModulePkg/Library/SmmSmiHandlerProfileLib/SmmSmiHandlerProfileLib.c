@@ -22,8 +22,8 @@
 EFI_STATUS
 EFIAPI
 SmmSmiHandlerProfileLibConstructor (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return MmSmiHandlerProfileLibInitialization ();

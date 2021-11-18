@@ -49,10 +49,10 @@
 EFI_STATUS
 EFIAPI
 AhciAtaPassThruPassThru (
-  IN     EDKII_PEI_ATA_PASS_THRU_PPI         *This,
-  IN     UINT16                              Port,
-  IN     UINT16                              PortMultiplierPort,
-  IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET    *Packet
+  IN     EDKII_PEI_ATA_PASS_THRU_PPI       *This,
+  IN     UINT16                            Port,
+  IN     UINT16                            PortMultiplierPort,
+  IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET  *Packet
   );
 
 /**
@@ -90,8 +90,8 @@ AhciAtaPassThruPassThru (
 EFI_STATUS
 EFIAPI
 AhciAtaPassThruGetNextPort (
-  IN     EDKII_PEI_ATA_PASS_THRU_PPI    *This,
-  IN OUT UINT16                         *Port
+  IN     EDKII_PEI_ATA_PASS_THRU_PPI  *This,
+  IN OUT UINT16                       *Port
   );
 
 /**
@@ -144,9 +144,9 @@ AhciAtaPassThruGetNextPort (
 EFI_STATUS
 EFIAPI
 AhciAtaPassThruGetNextDevice (
-  IN     EDKII_PEI_ATA_PASS_THRU_PPI    *This,
-  IN     UINT16                         Port,
-  IN OUT UINT16                         *PortMultiplierPort
+  IN     EDKII_PEI_ATA_PASS_THRU_PPI  *This,
+  IN     UINT16                       Port,
+  IN OUT UINT16                       *PortMultiplierPort
   );
 
 /**
@@ -169,9 +169,9 @@ AhciAtaPassThruGetNextDevice (
 EFI_STATUS
 EFIAPI
 AhciAtaPassThruGetDevicePath (
-  IN  EDKII_PEI_ATA_PASS_THRU_PPI    *This,
-  OUT UINTN                          *DevicePathLength,
-  OUT EFI_DEVICE_PATH_PROTOCOL       **DevicePath
+  IN  EDKII_PEI_ATA_PASS_THRU_PPI  *This,
+  OUT UINTN                        *DevicePathLength,
+  OUT EFI_DEVICE_PATH_PROTOCOL     **DevicePath
   );
 
 #endif

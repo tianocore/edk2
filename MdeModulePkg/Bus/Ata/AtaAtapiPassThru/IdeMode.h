@@ -5,6 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __ATA_HC_IDE_MODE_H__
 #define __ATA_HC_IDE_MODE_H__
 
@@ -59,50 +60,50 @@ typedef enum {
 #define BMIS_INTERRUPT  BIT2
 #define BMIS_ERROR      BIT1
 
-#define BMIC_OFFSET    0x00
-#define BMIS_OFFSET    0x02
-#define BMID_OFFSET    0x04
+#define BMIC_OFFSET  0x00
+#define BMIS_OFFSET  0x02
+#define BMID_OFFSET  0x04
 
 //
 // IDE transfer mode
 //
-#define EFI_ATA_MODE_DEFAULT_PIO 0x00
-#define EFI_ATA_MODE_FLOW_PIO    0x01
-#define EFI_ATA_MODE_MDMA        0x04
-#define EFI_ATA_MODE_UDMA        0x08
+#define EFI_ATA_MODE_DEFAULT_PIO  0x00
+#define EFI_ATA_MODE_FLOW_PIO     0x01
+#define EFI_ATA_MODE_MDMA         0x04
+#define EFI_ATA_MODE_UDMA         0x08
 
 typedef struct {
-  UINT32  RegionBaseAddr;
-  UINT16  ByteCount;
-  UINT16  EndOfTable;
+  UINT32    RegionBaseAddr;
+  UINT16    ByteCount;
+  UINT16    EndOfTable;
 } EFI_ATA_DMA_PRD;
 
 typedef struct {
-  UINT8 ModeNumber   : 3;
-  UINT8 ModeCategory : 5;
+  UINT8    ModeNumber   : 3;
+  UINT8    ModeCategory : 5;
 } EFI_ATA_TRANSFER_MODE;
 
 typedef struct {
-  UINT8 Sector;
-  UINT8 Heads;
-  UINT8 MultipleSector;
+  UINT8    Sector;
+  UINT8    Heads;
+  UINT8    MultipleSector;
 } EFI_ATA_DRIVE_PARMS;
 
 //
 // IDE registers set
 //
 typedef struct {
-  UINT16                          Data;
-  UINT16                          ErrOrFeature;
-  UINT16                          SectorCount;
-  UINT16                          SectorNumber;
-  UINT16                          CylinderLsb;
-  UINT16                          CylinderMsb;
-  UINT16                          Head;
-  UINT16                          CmdOrStatus;
-  UINT16                          AltOrDev;
+  UINT16    Data;
+  UINT16    ErrOrFeature;
+  UINT16    SectorCount;
+  UINT16    SectorNumber;
+  UINT16    CylinderLsb;
+  UINT16    CylinderMsb;
+  UINT16    Head;
+  UINT16    CmdOrStatus;
+  UINT16    AltOrDev;
 
-  UINT16                          BusMasterBaseAddr;
+  UINT16    BusMasterBaseAddr;
 } EFI_IDE_REGISTERS;
 
 //
@@ -164,8 +165,8 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 GetIdeRegisterIoAddr (
-  IN     EFI_PCI_IO_PROTOCOL         *PciIo,
-  IN OUT EFI_IDE_REGISTERS           *IdeRegisters
+  IN     EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN OUT EFI_IDE_REGISTERS    *IdeRegisters
   );
 
 /**
@@ -187,12 +188,11 @@ GetIdeRegisterIoAddr (
 EFI_STATUS
 EFIAPI
 AtaPacketCommandExecute (
-  IN  EFI_PCI_IO_PROTOCOL                           *PciIo,
-  IN  EFI_IDE_REGISTERS                             *IdeRegisters,
-  IN  UINT8                                         Channel,
-  IN  UINT8                                         Device,
-  IN  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET    *Packet
+  IN  EFI_PCI_IO_PROTOCOL                         *PciIo,
+  IN  EFI_IDE_REGISTERS                           *IdeRegisters,
+  IN  UINT8                                       Channel,
+  IN  UINT8                                       Device,
+  IN  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   );
 
 #endif
-

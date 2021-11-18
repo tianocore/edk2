@@ -50,13 +50,13 @@
 #define EFI_NONTESTED_MEMORY_RANGE_SIGNATURE  SIGNATURE_32 ('N', 'T', 'M', 'E')
 
 typedef struct {
-  UINTN                 Signature;
-  LIST_ENTRY        Link;
-  EFI_PHYSICAL_ADDRESS  StartAddress;
-  UINT64                Length;
-  UINT64                Capabilities;
-  BOOLEAN               Above4G;
-  BOOLEAN               AlreadyMapped;
+  UINTN                   Signature;
+  LIST_ENTRY              Link;
+  EFI_PHYSICAL_ADDRESS    StartAddress;
+  UINT64                  Length;
+  UINT64                  Capabilities;
+  BOOLEAN                 Above4G;
+  BOOLEAN                 AlreadyMapped;
 } NONTESTED_MEMORY_RANGE;
 
 #define NONTESTED_MEMORY_RANGE_FROM_LINK(link) \
@@ -70,46 +70,44 @@ typedef struct {
 //
 // This is the memory test driver's structure definition
 //
-#define EFI_GENERIC_MEMORY_TEST_PRIVATE_SIGNATURE SIGNATURE_32 ('G', 'E', 'M', 'T')
+#define EFI_GENERIC_MEMORY_TEST_PRIVATE_SIGNATURE  SIGNATURE_32 ('G', 'E', 'M', 'T')
 
 typedef struct {
-
-  UINTN                             Signature;
-  EFI_HANDLE                        Handle;
+  UINTN                               Signature;
+  EFI_HANDLE                          Handle;
 
   //
   // Cpu arch protocol's pointer
   //
-  EFI_CPU_ARCH_PROTOCOL             *Cpu;
+  EFI_CPU_ARCH_PROTOCOL               *Cpu;
 
   //
   // generic memory test driver's protocol
   //
-  EFI_GENERIC_MEMORY_TEST_PROTOCOL  GenericMemoryTest;
+  EFI_GENERIC_MEMORY_TEST_PROTOCOL    GenericMemoryTest;
 
   //
   // memory test covered spans
   //
-  EXTENDMEM_COVERAGE_LEVEL          CoverLevel;
-  UINTN                             CoverageSpan;
-  UINT64                            BdsBlockSize;
+  EXTENDMEM_COVERAGE_LEVEL            CoverLevel;
+  UINTN                               CoverageSpan;
+  UINT64                              BdsBlockSize;
 
   //
   // the memory test pattern and size every time R/W/V memory
   //
-  VOID                              *MonoPattern;
-  UINTN                             MonoTestSize;
+  VOID                                *MonoPattern;
+  UINTN                               MonoTestSize;
 
   //
   // base memory's size which tested in PEI phase
   //
-  UINT64                            BaseMemorySize;
+  UINT64                              BaseMemorySize;
 
   //
   // memory range list
   //
-  LIST_ENTRY                    NonTestedMemRanList;
-
+  LIST_ENTRY                          NonTestedMemRanList;
 } GENERIC_MEMORY_TEST_PRIVATE;
 
 #define GENERIC_MEMORY_TEST_PRIVATE_FROM_THIS(a) \
@@ -167,7 +165,7 @@ ConstructNonTestedMemoryRange (
 **/
 EFI_STATUS
 PerformAddressDataLineTest (
-  IN  GENERIC_MEMORY_TEST_PRIVATE      *Private
+  IN  GENERIC_MEMORY_TEST_PRIVATE  *Private
   );
 
 /**
@@ -268,9 +266,9 @@ DirectRangeTest (
 EFI_STATUS
 EFIAPI
 InitializeMemoryTest (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
-  IN  EXTENDMEM_COVERAGE_LEVEL                 Level,
-  OUT BOOLEAN                                  *RequireSoftECCInit
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This,
+  IN  EXTENDMEM_COVERAGE_LEVEL         Level,
+  OUT BOOLEAN                          *RequireSoftECCInit
   );
 
 /**
@@ -291,11 +289,11 @@ InitializeMemoryTest (
 EFI_STATUS
 EFIAPI
 GenPerformMemoryTest (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
-  OUT UINT64                                   *TestedMemorySize,
-  OUT UINT64                                   *TotalMemorySize,
-  OUT BOOLEAN                                  *ErrorOut,
-  IN BOOLEAN                                   TestAbort
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This,
+  OUT UINT64                           *TestedMemorySize,
+  OUT UINT64                           *TotalMemorySize,
+  OUT BOOLEAN                          *ErrorOut,
+  IN BOOLEAN                           TestAbort
   );
 
 /**
@@ -309,7 +307,7 @@ GenPerformMemoryTest (
 EFI_STATUS
 EFIAPI
 GenMemoryTestFinished (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This
   );
 
 /**
@@ -327,9 +325,9 @@ GenMemoryTestFinished (
 EFI_STATUS
 EFIAPI
 GenCompatibleRangeTest (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
-  IN  EFI_PHYSICAL_ADDRESS                     StartAddress,
-  IN  UINT64                                   Length
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This,
+  IN  EFI_PHYSICAL_ADDRESS             StartAddress,
+  IN  UINT64                           Length
   );
 
 #endif

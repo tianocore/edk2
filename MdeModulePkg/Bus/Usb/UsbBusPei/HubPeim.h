@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _PEI_HUB_PEIM_H_
 #define _PEI_HUB_PEIM_H_
 
-
 //
 // Hub feature numbers
 //
@@ -35,45 +34,45 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Hub Characteristics
 //
-#define HUB_CHAR_LPSM     0x0003
-#define HUB_CHAR_COMPOUND 0x0004
-#define HUB_CHAR_OCPM     0x0018
+#define HUB_CHAR_LPSM      0x0003
+#define HUB_CHAR_COMPOUND  0x0004
+#define HUB_CHAR_OCPM      0x0018
 
 //
 // Standard hub request and request type
 // By [Spec-USB20/Chapter-11.24]
 //
-#define USB_HUB_CLEAR_FEATURE               0x01
-#define USB_HUB_CLEAR_FEATURE_REQ_TYPE      0x20
+#define USB_HUB_CLEAR_FEATURE           0x01
+#define USB_HUB_CLEAR_FEATURE_REQ_TYPE  0x20
 
-#define USB_HUB_CLEAR_FEATURE_PORT          0x01
-#define USB_HUB_CLEAR_FEATURE_PORT_REQ_TYPE 0x23
+#define USB_HUB_CLEAR_FEATURE_PORT           0x01
+#define USB_HUB_CLEAR_FEATURE_PORT_REQ_TYPE  0x23
 
-#define USB_HUB_GET_BUS_STATE               0x02
-#define USB_HUB_GET_BUS_STATE_REQ_TYPE      0xA3
+#define USB_HUB_GET_BUS_STATE           0x02
+#define USB_HUB_GET_BUS_STATE_REQ_TYPE  0xA3
 
-#define USB_HUB_GET_DESCRIPTOR              0x06
-#define USB_HUB_GET_DESCRIPTOR_REQ_TYPE     0xA0
+#define USB_HUB_GET_DESCRIPTOR           0x06
+#define USB_HUB_GET_DESCRIPTOR_REQ_TYPE  0xA0
 
-#define USB_HUB_GET_HUB_STATUS              0x00
-#define USB_HUB_GET_HUB_STATUS_REQ_TYPE     0xA0
+#define USB_HUB_GET_HUB_STATUS           0x00
+#define USB_HUB_GET_HUB_STATUS_REQ_TYPE  0xA0
 
-#define USB_HUB_GET_PORT_STATUS             0x00
-#define USB_HUB_GET_PORT_STATUS_REQ_TYPE    0xA3
+#define USB_HUB_GET_PORT_STATUS           0x00
+#define USB_HUB_GET_PORT_STATUS_REQ_TYPE  0xA3
 
-#define USB_HUB_SET_DESCRIPTOR              0x07
-#define USB_HUB_SET_DESCRIPTOR_REQ_TYPE     0x20
+#define USB_HUB_SET_DESCRIPTOR           0x07
+#define USB_HUB_SET_DESCRIPTOR_REQ_TYPE  0x20
 
-#define USB_HUB_SET_HUB_FEATURE             0x03
-#define USB_HUB_SET_HUB_FEATURE_REQ_TYPE    0x20
+#define USB_HUB_SET_HUB_FEATURE           0x03
+#define USB_HUB_SET_HUB_FEATURE_REQ_TYPE  0x20
 
-#define USB_HUB_SET_PORT_FEATURE            0x03
-#define USB_HUB_SET_PORT_FEATURE_REQ_TYPE   0x23
+#define USB_HUB_SET_PORT_FEATURE           0x03
+#define USB_HUB_SET_PORT_FEATURE_REQ_TYPE  0x23
 
-#define USB_RT_HUB        (USB_TYPE_CLASS | USB_RECIP_DEVICE)
-#define USB_RT_PORT       (USB_TYPE_CLASS | USB_RECIP_OTHER)
+#define USB_RT_HUB   (USB_TYPE_CLASS | USB_RECIP_DEVICE)
+#define USB_RT_PORT  (USB_TYPE_CLASS | USB_RECIP_OTHER)
 
-#define USB_HUB_REQ_SET_DEPTH               12
+#define USB_HUB_REQ_SET_DEPTH  12
 
 #define MAXBYTES  8
 #pragma pack(1)
@@ -81,21 +80,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Hub descriptor, the last two fields are of variable length.
 //
 typedef struct {
-  UINT8 Length;
-  UINT8 DescriptorType;
-  UINT8 NbrPorts;
-  UINT8 HubCharacteristics[2];
-  UINT8 PwrOn2PwrGood;
-  UINT8 HubContrCurrent;
-  UINT8 Filler[MAXBYTES];
+  UINT8    Length;
+  UINT8    DescriptorType;
+  UINT8    NbrPorts;
+  UINT8    HubCharacteristics[2];
+  UINT8    PwrOn2PwrGood;
+  UINT8    HubContrCurrent;
+  UINT8    Filler[MAXBYTES];
 } EFI_USB_HUB_DESCRIPTOR;
 
 typedef struct {
-  UINT16  HubStatus;
-  UINT16  HubChangeStatus;
+  UINT16    HubStatus;
+  UINT16    HubChangeStatus;
 } EFI_USB_HUB_STATUS;
 
 #pragma pack()
+
 /**
   Get a given hub port status.
 
@@ -111,10 +111,10 @@ typedef struct {
 **/
 EFI_STATUS
 PeiHubGetPortStatus (
-  IN EFI_PEI_SERVICES       **PeiServices,
-  IN PEI_USB_IO_PPI         *UsbIoPpi,
-  IN  UINT8                 Port,
-  OUT UINT32                *PortStatus
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_USB_IO_PPI    *UsbIoPpi,
+  IN  UINT8            Port,
+  OUT UINT32           *PortStatus
   );
 
 /**
@@ -132,12 +132,11 @@ PeiHubGetPortStatus (
 **/
 EFI_STATUS
 PeiHubSetPortFeature (
-  IN EFI_PEI_SERVICES       **PeiServices,
-  IN PEI_USB_IO_PPI         *UsbIoPpi,
-  IN  UINT8                 Port,
-  IN  UINT8                 Value
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_USB_IO_PPI    *UsbIoPpi,
+  IN  UINT8            Port,
+  IN  UINT8            Value
   );
-
 
 /**
   Get a given hub status.
@@ -153,9 +152,9 @@ PeiHubSetPortFeature (
 **/
 EFI_STATUS
 PeiHubGetHubStatus (
-  IN EFI_PEI_SERVICES       **PeiServices,
-  IN PEI_USB_IO_PPI         *UsbIoPpi,
-  OUT UINT32                *HubStatus
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_USB_IO_PPI    *UsbIoPpi,
+  OUT UINT32           *HubStatus
   );
 
 /**
@@ -173,10 +172,10 @@ PeiHubGetHubStatus (
 **/
 EFI_STATUS
 PeiHubClearPortFeature (
-  IN EFI_PEI_SERVICES       **PeiServices,
-  IN PEI_USB_IO_PPI         *UsbIoPpi,
-  IN  UINT8                 Port,
-  IN  UINT8                 Value
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_USB_IO_PPI    *UsbIoPpi,
+  IN  UINT8            Port,
+  IN  UINT8            Value
   );
 
 /**
@@ -193,9 +192,9 @@ PeiHubClearPortFeature (
 **/
 EFI_STATUS
 PeiHubClearHubFeature (
-  IN EFI_PEI_SERVICES       **PeiServices,
-  IN PEI_USB_IO_PPI         *UsbIoPpi,
-  IN  UINT8                 Value
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_USB_IO_PPI    *UsbIoPpi,
+  IN  UINT8            Value
   );
 
 /**
@@ -234,8 +233,8 @@ PeiGetHubDescriptor (
 **/
 EFI_STATUS
 PeiDoHubConfig (
-  IN EFI_PEI_SERVICES         **PeiServices,
-  IN PEI_USB_DEVICE           *PeiUsbDevice
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_USB_DEVICE    *PeiUsbDevice
   );
 
 /**
@@ -248,11 +247,9 @@ PeiDoHubConfig (
 **/
 VOID
 PeiResetHubPort (
-  IN EFI_PEI_SERVICES    **PeiServices,
-  IN PEI_USB_IO_PPI      *UsbIoPpi,
-  IN UINT8               PortNum
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_USB_IO_PPI    *UsbIoPpi,
+  IN UINT8             PortNum
   );
 
 #endif
-
-

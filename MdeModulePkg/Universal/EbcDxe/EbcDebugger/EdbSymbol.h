@@ -47,10 +47,10 @@ typedef enum {
 **/
 UINTN
 EbdFindSymbolAddress (
-  IN UINTN                       Address,
-  IN EDB_MATCH_SYMBOL_TYPE       Type,
-  OUT EFI_DEBUGGER_SYMBOL_OBJECT **Object,
-  OUT EFI_DEBUGGER_SYMBOL_ENTRY  **Entry
+  IN UINTN                        Address,
+  IN EDB_MATCH_SYMBOL_TYPE        Type,
+  OUT EFI_DEBUGGER_SYMBOL_OBJECT  **Object,
+  OUT EFI_DEBUGGER_SYMBOL_ENTRY   **Entry
   );
 
 /**
@@ -67,10 +67,10 @@ EbdFindSymbolAddress (
 **/
 EFI_STATUS
 EdbLoadSymbol (
-  IN EFI_DEBUGGER_PRIVATE_DATA   *DebuggerPrivate,
-  IN CHAR16                      *FileName,
-  IN UINTN                       BufferSize,
-  IN VOID                        *Buffer
+  IN EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN CHAR16                     *FileName,
+  IN UINTN                      BufferSize,
+  IN VOID                       *Buffer
   );
 
 /**
@@ -85,8 +85,8 @@ EdbLoadSymbol (
 **/
 EFI_STATUS
 EdbUnloadSymbol (
-  IN EFI_DEBUGGER_PRIVATE_DATA   *DebuggerPrivate,
-  IN CHAR16                      *FileName
+  IN EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN CHAR16                     *FileName
   );
 
 /**
@@ -103,9 +103,9 @@ EdbUnloadSymbol (
 **/
 EFI_STATUS
 EdbPatchSymbolRVA (
-  IN EFI_DEBUGGER_PRIVATE_DATA     *DebuggerPrivate,
-  IN CHAR16                        *FileName,
-  IN EDB_EBC_IMAGE_RVA_SEARCH_TYPE SearchType
+  IN EFI_DEBUGGER_PRIVATE_DATA      *DebuggerPrivate,
+  IN CHAR16                         *FileName,
+  IN EDB_EBC_IMAGE_RVA_SEARCH_TYPE  SearchType
   );
 
 /**
@@ -123,11 +123,11 @@ EdbPatchSymbolRVA (
 **/
 EFI_STATUS
 EdbLoadCode (
-  IN EFI_DEBUGGER_PRIVATE_DATA   *DebuggerPrivate,
-  IN CHAR16                      *MapFileName,
-  IN CHAR16                      *FileName,
-  IN UINTN                       BufferSize,
-  IN VOID                        *Buffer
+  IN EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN CHAR16                     *MapFileName,
+  IN CHAR16                     *FileName,
+  IN UINTN                      BufferSize,
+  IN VOID                       *Buffer
   );
 
 /**
@@ -144,10 +144,10 @@ EdbLoadCode (
 **/
 EFI_STATUS
 EdbUnloadCode (
-  IN EFI_DEBUGGER_PRIVATE_DATA   *DebuggerPrivate,
-  IN CHAR16                      *MapFileName,
-  IN CHAR16                      *FileName,
-  OUT VOID                       **Buffer
+  IN EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN CHAR16                     *MapFileName,
+  IN CHAR16                     *FileName,
+  OUT VOID                      **Buffer
   );
 
 /**
@@ -165,11 +165,11 @@ EdbUnloadCode (
 **/
 EFI_STATUS
 EdbAddCodeBuffer (
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     CHAR16                    *MapFileName,
-  IN     CHAR16                    *CodeFileName,
-  IN     UINTN                     SourceBufferSize,
-  IN     VOID                      *SourceBuffer
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     CHAR16                     *MapFileName,
+  IN     CHAR16                     *CodeFileName,
+  IN     UINTN                      SourceBufferSize,
+  IN     VOID                       *SourceBuffer
   );
 
 /**
@@ -186,10 +186,10 @@ EdbAddCodeBuffer (
 **/
 EFI_STATUS
 EdbDeleteCodeBuffer (
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     CHAR16                    *MapFileName,
-  IN     CHAR16                    *CodeFileName,
-  IN     VOID                      *SourceBuffer
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     CHAR16                     *MapFileName,
+  IN     CHAR16                     *CodeFileName,
+  IN     VOID                       *SourceBuffer
   );
 
 /**
@@ -203,7 +203,7 @@ EdbDeleteCodeBuffer (
 **/
 CHAR8 *
 FindSymbolStr (
-  IN UINTN Address
+  IN UINTN  Address
   );
 
 /**
@@ -219,8 +219,8 @@ FindSymbolStr (
 **/
 UINTN
 EdbPrintSource (
-  IN UINTN     Address,
-  IN BOOLEAN   IsPrint
+  IN UINTN    Address,
+  IN BOOLEAN  IsPrint
   );
 
 /**
@@ -237,8 +237,8 @@ EdbPrintSource (
 **/
 EFI_STATUS
 Symboltoi (
-  IN CHAR16   *Symbol,
-  OUT UINTN   *Address
+  IN CHAR16  *Symbol,
+  OUT UINTN  *Address
   );
 
 #endif

@@ -21,7 +21,7 @@
 //
 // Forward declaration for the EDKII_ATA_AHCI_HOST_CONTROLLER_PPI.
 //
-typedef struct _EDKII_ATA_AHCI_HOST_CONTROLLER_PPI  EDKII_ATA_AHCI_HOST_CONTROLLER_PPI;
+typedef struct _EDKII_ATA_AHCI_HOST_CONTROLLER_PPI EDKII_ATA_AHCI_HOST_CONTROLLER_PPI;
 
 /**
   Get the MMIO base address of ATA AHCI host controller.
@@ -37,7 +37,7 @@ typedef struct _EDKII_ATA_AHCI_HOST_CONTROLLER_PPI  EDKII_ATA_AHCI_HOST_CONTROLL
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_ATA_AHCI_HC_GET_MMIO_BAR) (
+(EFIAPI *EDKII_ATA_AHCI_HC_GET_MMIO_BAR)(
   IN  EDKII_ATA_AHCI_HOST_CONTROLLER_PPI    *This,
   IN  UINT8                                 ControllerId,
   OUT UINTN                                 *MmioBar
@@ -63,7 +63,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_ATA_AHCI_HC_GET_DEVICE_PATH) (
+(EFIAPI *EDKII_ATA_AHCI_HC_GET_DEVICE_PATH)(
   IN  EDKII_ATA_AHCI_HOST_CONTROLLER_PPI    *This,
   IN  UINT8                                 ControllerId,
   OUT UINTN                                 *DevicePathLength,
@@ -78,6 +78,6 @@ struct _EDKII_ATA_AHCI_HOST_CONTROLLER_PPI {
   EDKII_ATA_AHCI_HC_GET_DEVICE_PATH    GetAhciHcDevicePath;
 };
 
-extern EFI_GUID gEdkiiPeiAtaAhciHostControllerPpiGuid;
+extern EFI_GUID  gEdkiiPeiAtaAhciHostControllerPpiGuid;
 
 #endif

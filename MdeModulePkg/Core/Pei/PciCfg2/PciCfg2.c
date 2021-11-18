@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// This default instance of EFI_PEI_PCI_CFG2_PPI install assigned to EFI_PEI_SERVICE.PciCfg
 /// when PeiCore's initialization.
 ///
-EFI_PEI_PCI_CFG2_PPI gPeiDefaultPciCfg2Ppi = {
+EFI_PEI_PCI_CFG2_PPI  gPeiDefaultPciCfg2Ppi = {
   PeiDefaultPciCfg2Read,
   PeiDefaultPciCfg2Write,
   PeiDefaultPciCfg2Modify
@@ -45,11 +45,11 @@ EFI_PEI_PCI_CFG2_PPI gPeiDefaultPciCfg2Ppi = {
 EFI_STATUS
 EFIAPI
 PeiDefaultPciCfg2Read (
-  IN CONST  EFI_PEI_SERVICES          **PeiServices,
-  IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
-  IN        EFI_PEI_PCI_CFG_PPI_WIDTH Width,
-  IN        UINT64                    Address,
-  IN OUT    VOID                      *Buffer
+  IN CONST  EFI_PEI_SERVICES           **PeiServices,
+  IN CONST  EFI_PEI_PCI_CFG2_PPI       *This,
+  IN        EFI_PEI_PCI_CFG_PPI_WIDTH  Width,
+  IN        UINT64                     Address,
+  IN OUT    VOID                       *Buffer
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -76,11 +76,11 @@ PeiDefaultPciCfg2Read (
 EFI_STATUS
 EFIAPI
 PeiDefaultPciCfg2Write (
-  IN CONST  EFI_PEI_SERVICES          **PeiServices,
-  IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
-  IN        EFI_PEI_PCI_CFG_PPI_WIDTH Width,
-  IN        UINT64                    Address,
-  IN OUT    VOID                      *Buffer
+  IN CONST  EFI_PEI_SERVICES           **PeiServices,
+  IN CONST  EFI_PEI_PCI_CFG2_PPI       *This,
+  IN        EFI_PEI_PCI_CFG_PPI_WIDTH  Width,
+  IN        UINT64                     Address,
+  IN OUT    VOID                       *Buffer
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -110,12 +110,12 @@ PeiDefaultPciCfg2Write (
 EFI_STATUS
 EFIAPI
 PeiDefaultPciCfg2Modify (
-  IN CONST  EFI_PEI_SERVICES          **PeiServices,
-  IN CONST  EFI_PEI_PCI_CFG2_PPI      *This,
-  IN        EFI_PEI_PCI_CFG_PPI_WIDTH Width,
-  IN        UINT64                    Address,
-  IN        VOID                      *SetBits,
-  IN        VOID                      *ClearBits
+  IN CONST  EFI_PEI_SERVICES           **PeiServices,
+  IN CONST  EFI_PEI_PCI_CFG2_PPI       *This,
+  IN        EFI_PEI_PCI_CFG_PPI_WIDTH  Width,
+  IN        UINT64                     Address,
+  IN        VOID                       *SetBits,
+  IN        VOID                       *ClearBits
   )
 {
   return EFI_NOT_AVAILABLE_YET;

@@ -20,17 +20,16 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gTerminalComponentNam
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gTerminalComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) TerminalComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) TerminalComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gTerminalComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)TerminalComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)TerminalComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mTerminalDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mTerminalDriverNameTable[] = {
   {
     "eng;en",
-   (CHAR16 *) L"Serial Terminal Driver"
+    (CHAR16 *)L"Serial Terminal Driver"
   },
   {
     NULL,
@@ -165,11 +164,11 @@ TerminalComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 TerminalComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   EFI_STATUS                       Status;
@@ -210,7 +209,7 @@ TerminalComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   ChildHandle,
                   &gEfiSimpleTextOutProtocolGuid,
-                  (VOID **) &SimpleTextOutput,
+                  (VOID **)&SimpleTextOutput,
                   gTerminalDriverBinding.DriverBindingHandle,
                   ChildHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL

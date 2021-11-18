@@ -86,15 +86,19 @@ DisplayUpdateProgress (
       if (Color->Pixel.Blue >= 0x40) {
         mProgressBarForegroundColor |= EFI_BLUE;
       }
+
       if (Color->Pixel.Green >= 0x40) {
         mProgressBarForegroundColor |= EFI_GREEN;
       }
+
       if (Color->Pixel.Red >= 0x40) {
         mProgressBarForegroundColor |= EFI_RED;
       }
-      if (Color->Pixel.Blue >= 0xC0 || Color->Pixel.Green >= 0xC0 || Color->Pixel.Red >= 0xC0) {
+
+      if ((Color->Pixel.Blue >= 0xC0) || (Color->Pixel.Green >= 0xC0) || (Color->Pixel.Red >= 0xC0)) {
         mProgressBarForegroundColor |= EFI_BRIGHT;
       }
+
       if (mProgressBarForegroundColor == EFI_BLACK) {
         mProgressBarForegroundColor = EFI_WHITE;
       }
@@ -147,7 +151,7 @@ DisplayUpdateProgress (
   //
   // Print remaining portion of progress bar
   //
-  for (; Index < 50; Index++) {
+  for ( ; Index < 50; Index++) {
     Print (L"%c", BLOCKELEMENT_LIGHT_SHADE);
   }
 

@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "DxeMain.h"
 
-#define WATCHDOG_TIMER_CALIBRATE_PER_SECOND 10000000
+#define WATCHDOG_TIMER_CALIBRATE_PER_SECOND  10000000
 
 /**
   Sets the system's watchdog timer.
@@ -35,10 +35,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 CoreSetWatchdogTimer (
-  IN UINTN    Timeout,
-  IN UINT64   WatchdogCode,
-  IN UINTN    DataSize,
-  IN CHAR16   *WatchdogData OPTIONAL
+  IN UINTN   Timeout,
+  IN UINT64  WatchdogCode,
+  IN UINTN   DataSize,
+  IN CHAR16  *WatchdogData OPTIONAL
   )
 {
   EFI_STATUS  Status;

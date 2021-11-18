@@ -11,7 +11,7 @@
 //
 // UDF filesystem driver's Global Variables.
 //
-EFI_DRIVER_BINDING_PROTOCOL gUdfDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gUdfDriverBinding = {
   UdfDriverBindingSupported,
   UdfDriverBindingStart,
   UdfDriverBindingStop,
@@ -20,7 +20,7 @@ EFI_DRIVER_BINDING_PROTOCOL gUdfDriverBinding = {
   NULL
 };
 
-EFI_SIMPLE_FILE_SYSTEM_PROTOCOL gUdfSimpleFsTemplate = {
+EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  gUdfSimpleFsTemplate = {
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION,
   UdfOpenVolume
 };
@@ -55,13 +55,13 @@ UdfDriverBindingSupported (
   // Open DiskIo protocol on ControllerHandle
   //
   Status = gBS->OpenProtocol (
-    ControllerHandle,
-    &gEfiDiskIoProtocolGuid,
-    (VOID **)&DiskIo,
-    This->DriverBindingHandle,
-    ControllerHandle,
-    EFI_OPEN_PROTOCOL_BY_DRIVER
-    );
+                  ControllerHandle,
+                  &gEfiDiskIoProtocolGuid,
+                  (VOID **)&DiskIo,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -70,23 +70,23 @@ UdfDriverBindingSupported (
   // Close DiskIo protocol on ControllerHandle
   //
   gBS->CloseProtocol (
-    ControllerHandle,
-    &gEfiDiskIoProtocolGuid,
-    This->DriverBindingHandle,
-    ControllerHandle
-    );
+         ControllerHandle,
+         &gEfiDiskIoProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 
   //
   // Test whether ControllerHandle supports BlockIo protocol
   //
   Status = gBS->OpenProtocol (
-    ControllerHandle,
-    &gEfiBlockIoProtocolGuid,
-    NULL,
-    This->DriverBindingHandle,
-    ControllerHandle,
-    EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-    );
+                  ControllerHandle,
+                  &gEfiBlockIoProtocolGuid,
+                  NULL,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
 
   return Status;
 }
@@ -127,26 +127,26 @@ UdfDriverBindingStart (
   // Open BlockIo protocol on ControllerHandle
   //
   Status = gBS->OpenProtocol (
-    ControllerHandle,
-    &gEfiBlockIoProtocolGuid,
-    (VOID **)&BlockIo,
-    This->DriverBindingHandle,
-    ControllerHandle,
-    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-    );
+                  ControllerHandle,
+                  &gEfiBlockIoProtocolGuid,
+                  (VOID **)&BlockIo,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
   ASSERT_EFI_ERROR (Status);
 
   //
   // Open DiskIo protocol on ControllerHandle
   //
   Status = gBS->OpenProtocol (
-    ControllerHandle,
-    &gEfiDiskIoProtocolGuid,
-    (VOID **)&DiskIo,
-    This->DriverBindingHandle,
-    ControllerHandle,
-    EFI_OPEN_PROTOCOL_BY_DRIVER
-    );
+                  ControllerHandle,
+                  &gEfiDiskIoProtocolGuid,
+                  (VOID **)&DiskIo,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -179,18 +179,21 @@ UdfDriverBindingStart (
   //
   // Set up SimpleFs protocol
   //
-  CopyMem ((VOID *)&PrivFsData->SimpleFs, (VOID *)&gUdfSimpleFsTemplate,
-           sizeof (EFI_SIMPLE_FILE_SYSTEM_PROTOCOL));
+  CopyMem (
+    (VOID *)&PrivFsData->SimpleFs,
+    (VOID *)&gUdfSimpleFsTemplate,
+    sizeof (EFI_SIMPLE_FILE_SYSTEM_PROTOCOL)
+    );
 
   //
   // Install child handle
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
-    &PrivFsData->Handle,
-    &gEfiSimpleFileSystemProtocolGuid,
-    &PrivFsData->SimpleFs,
-    NULL
-    );
+                  &PrivFsData->Handle,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  &PrivFsData->SimpleFs,
+                  NULL
+                  );
 
 Exit:
   if (EFI_ERROR (Status)) {
@@ -198,20 +201,20 @@ Exit:
     // Close DiskIo protocol on ControllerHandle
     //
     gBS->CloseProtocol (
-      ControllerHandle,
-      &gEfiDiskIoProtocolGuid,
-      This->DriverBindingHandle,
-      ControllerHandle
-      );
+           ControllerHandle,
+           &gEfiDiskIoProtocolGuid,
+           This->DriverBindingHandle,
+           ControllerHandle
+           );
     //
     // Close BlockIo protocol on ControllerHandle
     //
     gBS->CloseProtocol (
-      ControllerHandle,
-      &gEfiBlockIoProtocolGuid,
-      This->DriverBindingHandle,
-      ControllerHandle
-      );
+           ControllerHandle,
+           &gEfiBlockIoProtocolGuid,
+           This->DriverBindingHandle,
+           ControllerHandle
+           );
   }
 
   gBS->RestoreTPL (OldTpl);
@@ -236,27 +239,27 @@ Exit:
 EFI_STATUS
 EFIAPI
 UdfDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL   *This,
-  IN  EFI_HANDLE                    ControllerHandle,
-  IN  UINTN                         NumberOfChildren,
-  IN  EFI_HANDLE                    *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  PRIVATE_UDF_SIMPLE_FS_DATA        *PrivFsData;
-  EFI_STATUS                        Status;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL   *SimpleFs;
+  PRIVATE_UDF_SIMPLE_FS_DATA       *PrivFsData;
+  EFI_STATUS                       Status;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *SimpleFs;
 
   //
   // Open SimpleFs protocol on ControllerHandle
   //
   Status = gBS->OpenProtocol (
-    ControllerHandle,
-    &gEfiSimpleFileSystemProtocolGuid,
-    (VOID **)&SimpleFs,
-    This->DriverBindingHandle,
-    ControllerHandle,
-    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-    );
+                  ControllerHandle,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  (VOID **)&SimpleFs,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
   if (!EFI_ERROR (Status)) {
     PrivFsData = PRIVATE_UDF_SIMPLE_FS_DATA_FROM_THIS (SimpleFs);
 
@@ -264,11 +267,11 @@ UdfDriverBindingStop (
     // Uninstall child handle
     //
     Status = gBS->UninstallMultipleProtocolInterfaces (
-      PrivFsData->Handle,
-      &gEfiSimpleFileSystemProtocolGuid,
-      &PrivFsData->SimpleFs,
-      NULL
-      );
+                    PrivFsData->Handle,
+                    &gEfiSimpleFileSystemProtocolGuid,
+                    &PrivFsData->SimpleFs,
+                    NULL
+                    );
 
     FreePool ((VOID *)PrivFsData);
   }
@@ -278,20 +281,20 @@ UdfDriverBindingStop (
     // Close DiskIo protocol on ControllerHandle
     //
     gBS->CloseProtocol (
-      ControllerHandle,
-      &gEfiDiskIoProtocolGuid,
-      This->DriverBindingHandle,
-      ControllerHandle
-      );
+           ControllerHandle,
+           &gEfiDiskIoProtocolGuid,
+           This->DriverBindingHandle,
+           ControllerHandle
+           );
     //
     // Close BlockIo protocol on ControllerHandle
     //
     gBS->CloseProtocol (
-      ControllerHandle,
-      &gEfiBlockIoProtocolGuid,
-      This->DriverBindingHandle,
-      ControllerHandle
-      );
+           ControllerHandle,
+           &gEfiBlockIoProtocolGuid,
+           This->DriverBindingHandle,
+           ControllerHandle
+           );
   }
 
   return Status;
@@ -311,20 +314,20 @@ UdfDriverBindingStop (
 EFI_STATUS
 EFIAPI
 InitializeUdf (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   Status = EfiLibInstallDriverBindingComponentName2 (
-    ImageHandle,
-    SystemTable,
-    &gUdfDriverBinding,
-    ImageHandle,
-    &gUdfComponentName,
-    &gUdfComponentName2
-    );
+             ImageHandle,
+             SystemTable,
+             &gUdfDriverBinding,
+             ImageHandle,
+             &gUdfComponentName,
+             &gUdfComponentName2
+             );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
