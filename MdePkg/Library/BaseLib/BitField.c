@@ -74,7 +74,7 @@ InternalBaseLibBitFieldOrUint (
   // ~((UINTN)-2 << EndBit) is a mask in which bit[0] thru bit[EndBit]
   // are 1's while bit[EndBit + 1] thru the most significant bit are 0's.
   //
-  return Operand | ((OrData << StartBit) & ~((UINTN) -2 << EndBit));
+  return Operand | ((OrData << StartBit) & ~((UINTN)-2 << EndBit));
 }
 
 /**
@@ -811,7 +811,7 @@ BitFieldOr64 (
   ASSERT (RShiftU64 (OrData, EndBit - StartBit) == (RShiftU64 (OrData, EndBit - StartBit) & 1));
 
   Value1 = LShiftU64 (OrData, StartBit);
-  Value2 = LShiftU64 ((UINT64) - 2, EndBit);
+  Value2 = LShiftU64 ((UINT64)-2, EndBit);
 
   return Operand | (Value1 & ~Value2);
 }
@@ -943,20 +943,20 @@ BitFieldCountOnes32 (
   IN       UINTN                    EndBit
   )
 {
-  UINT32 Count;
+  UINT32  Count;
 
   ASSERT (EndBit < 32);
   ASSERT (StartBit <= EndBit);
 
-  Count = BitFieldRead32 (Operand, StartBit, EndBit);
+  Count  = BitFieldRead32 (Operand, StartBit, EndBit);
   Count -= ((Count >> 1) & 0x55555555);
-  Count = (Count & 0x33333333) + ((Count >> 2) & 0x33333333);
+  Count  = (Count & 0x33333333) + ((Count >> 2) & 0x33333333);
   Count += Count >> 4;
   Count &= 0x0F0F0F0F;
   Count += Count >> 8;
   Count += Count >> 16;
 
-  return (UINT8) Count & 0x3F;
+  return (UINT8)Count & 0x3F;
 }
 
 /**
@@ -987,16 +987,15 @@ BitFieldCountOnes64 (
   IN       UINTN                    EndBit
   )
 {
-  UINT64 BitField;
-  UINT8 Count;
+  UINT64  BitField;
+  UINT8   Count;
 
   ASSERT (EndBit < 64);
   ASSERT (StartBit <= EndBit);
 
   BitField = BitFieldRead64 (Operand, StartBit, EndBit);
-  Count = BitFieldCountOnes32 ((UINT32) BitField, 0, 31);
-  Count += BitFieldCountOnes32 ((UINT32) RShiftU64(BitField, 32), 0, 31);
+  Count    = BitFieldCountOnes32 ((UINT32)BitField, 0, 31);
+  Count   += BitFieldCountOnes32 ((UINT32)RShiftU64 (BitField, 32), 0, 31);
 
   return Count;
 }
-

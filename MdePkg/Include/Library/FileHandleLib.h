@@ -14,7 +14,7 @@
 
 /// The tag for use in identifying UNICODE files.
 /// If the file is UNICODE, the first 16 bits of the file will equal this value.
-extern CONST UINT16 gUnicodeFileTag;
+extern CONST UINT16  gUnicodeFileTag;
 
 /**
   This function retrieves information about the file for the handle
@@ -29,7 +29,7 @@ extern CONST UINT16 gUnicodeFileTag;
   @retval NULL                  Information could not be retrieved.
   @retval !NULL                 The information about the file.
 **/
-EFI_FILE_INFO*
+EFI_FILE_INFO *
 EFIAPI
 FileHandleGetInfo (
   IN EFI_FILE_HANDLE            FileHandle
@@ -92,7 +92,7 @@ FileHandleSetInfo (
 **/
 EFI_STATUS
 EFIAPI
-FileHandleRead(
+FileHandleRead (
   IN EFI_FILE_HANDLE            FileHandle,
   IN OUT UINTN                  *BufferSize,
   OUT VOID                      *Buffer
@@ -124,7 +124,7 @@ FileHandleRead(
 **/
 EFI_STATUS
 EFIAPI
-FileHandleWrite(
+FileHandleWrite (
   IN EFI_FILE_HANDLE            FileHandle,
   IN OUT UINTN                  *BufferSize,
   IN VOID                       *Buffer
@@ -214,6 +214,7 @@ FileHandleGetPosition (
   IN EFI_FILE_HANDLE            FileHandle,
   OUT UINT64                    *Position
   );
+
 /**
   Flushes data on a file.
 
@@ -302,7 +303,7 @@ FileHandleFindFirstFile (
 **/
 EFI_STATUS
 EFIAPI
-FileHandleFindNextFile(
+FileHandleFindNextFile (
   IN EFI_FILE_HANDLE             DirHandle,
   OUT EFI_FILE_INFO              *Buffer,
   OUT BOOLEAN                    *NoFile
@@ -401,7 +402,7 @@ FileHandleGetFileName (
 **/
 EFI_STATUS
 EFIAPI
-FileHandleReadLine(
+FileHandleReadLine (
   IN EFI_FILE_HANDLE            Handle,
   IN OUT CHAR16                 *Buffer,
   IN OUT UINTN                  *Size,
@@ -424,9 +425,9 @@ FileHandleReadLine(
 
   @sa FileHandleReadLine
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
-FileHandleReturnLine(
+FileHandleReturnLine (
   IN EFI_FILE_HANDLE            Handle,
   IN OUT BOOLEAN                *Ascii
   );
@@ -454,7 +455,7 @@ FileHandleReturnLine(
 **/
 EFI_STATUS
 EFIAPI
-FileHandleWriteLine(
+FileHandleWriteLine (
   IN EFI_FILE_HANDLE Handle,
   IN CHAR16          *Buffer
   );
@@ -473,7 +474,7 @@ FileHandleWriteLine(
 **/
 EFI_STATUS
 EFIAPI
-FileHandlePrintLine(
+FileHandlePrintLine (
   IN EFI_FILE_HANDLE  Handle,
   IN CONST CHAR16     *Format,
   ...
@@ -493,9 +494,8 @@ FileHandlePrintLine(
 **/
 BOOLEAN
 EFIAPI
-FileHandleEof(
+FileHandleEof (
   IN EFI_FILE_HANDLE Handle
   );
 
 #endif //_FILE_HANDLE_LIBRARY_HEADER_
-

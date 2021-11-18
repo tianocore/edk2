@@ -8,8 +8,8 @@
 
 #include "BaseSynchronizationLibInternals.h"
 
-#define SPIN_LOCK_RELEASED          ((UINTN) 1)
-#define SPIN_LOCK_ACQUIRED          ((UINTN) 2)
+#define SPIN_LOCK_RELEASED  ((UINTN) 1)
+#define SPIN_LOCK_ACQUIRED  ((UINTN) 2)
 
 /**
   Retrieves the architecture specific spin lock alignment requirements for
@@ -106,7 +106,7 @@ AcquireSpinLock (
     //
     // Get the current timer value
     //
-    Current = GetPerformanceCounter();
+    Current = GetPerformanceCounter ();
 
     //
     // Initialize local variables
@@ -130,23 +130,27 @@ AcquireSpinLock (
     if (Cycle < 0) {
       Cycle = -Cycle;
     }
+
     Cycle++;
 
     while (!AcquireSpinLockOrFail (SpinLock)) {
       CpuPause ();
       Previous = Current;
-      Current  = GetPerformanceCounter();
-      Delta = (INT64) (Current - Previous);
+      Current  = GetPerformanceCounter ();
+      Delta    = (INT64)(Current - Previous);
       if (Start > End) {
         Delta = -Delta;
       }
+
       if (Delta < 0) {
         Delta += Cycle;
       }
+
       Total += Delta;
       ASSERT (Total < Timeout);
     }
   }
+
   return SpinLock;
 }
 
@@ -173,7 +177,7 @@ AcquireSpinLockOrFail (
   IN OUT  SPIN_LOCK                 *SpinLock
   )
 {
-  SPIN_LOCK    LockValue;
+  SPIN_LOCK  LockValue;
 
   ASSERT (SpinLock != NULL);
 
@@ -181,12 +185,12 @@ AcquireSpinLockOrFail (
   ASSERT (SPIN_LOCK_ACQUIRED == LockValue || SPIN_LOCK_RELEASED == LockValue);
 
   return (BOOLEAN)(
-           InterlockedCompareExchangePointer (
-             (VOID**)SpinLock,
-             (VOID*)SPIN_LOCK_RELEASED,
-             (VOID*)SPIN_LOCK_ACQUIRED
-             ) == (VOID*)SPIN_LOCK_RELEASED
-           );
+                   InterlockedCompareExchangePointer (
+                     (VOID **)SpinLock,
+                     (VOID *)SPIN_LOCK_RELEASED,
+                     (VOID *)SPIN_LOCK_ACQUIRED
+                     ) == (VOID *)SPIN_LOCK_RELEASED
+                   );
 }
 
 /**
@@ -209,7 +213,7 @@ ReleaseSpinLock (
   IN OUT  SPIN_LOCK                 *SpinLock
   )
 {
-  SPIN_LOCK    LockValue;
+  SPIN_LOCK  LockValue;
 
   ASSERT (SpinLock != NULL);
 
@@ -381,7 +385,7 @@ InterlockedCompareExchange64 (
 VOID *
 EFIAPI
 InterlockedCompareExchangePointer (
-  IN OUT  VOID                      * volatile *Value,
+  IN OUT  VOID                      *volatile *Value,
   IN      VOID                      *CompareValue,
   IN      VOID                      *ExchangeValue
   )
@@ -392,17 +396,17 @@ InterlockedCompareExchangePointer (
 
   switch (SizeOfValue) {
     case sizeof (UINT32):
-      return (VOID*)(UINTN)InterlockedCompareExchange32 (
-                             (volatile UINT32 *)Value,
-                             (UINT32)(UINTN)CompareValue,
-                             (UINT32)(UINTN)ExchangeValue
-                             );
+      return (VOID *)(UINTN)InterlockedCompareExchange32 (
+                              (volatile UINT32 *)Value,
+                              (UINT32)(UINTN)CompareValue,
+                              (UINT32)(UINTN)ExchangeValue
+                              );
     case sizeof (UINT64):
-      return (VOID*)(UINTN)InterlockedCompareExchange64 (
-                             (volatile UINT64 *)Value,
-                             (UINT64)(UINTN)CompareValue,
-                             (UINT64)(UINTN)ExchangeValue
-                             );
+      return (VOID *)(UINTN)InterlockedCompareExchange64 (
+                              (volatile UINT64 *)Value,
+                              (UINT64)(UINTN)CompareValue,
+                              (UINT64)(UINTN)ExchangeValue
+                              );
     default:
       ASSERT (FALSE);
       return NULL;

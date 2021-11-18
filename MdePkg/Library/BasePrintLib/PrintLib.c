@@ -15,9 +15,9 @@
 // A NULL VA_LIST can not be passed into  BasePrintLibSPrintMarker() because some
 // compilers define VA_LIST to be a structure.
 //
-VA_LIST gNullVaList;
+VA_LIST  gNullVaList;
 
-#define ASSERT_UNICODE_BUFFER(Buffer) ASSERT ((((UINTN) (Buffer)) & 0x01) == 0)
+#define ASSERT_UNICODE_BUFFER(Buffer)  ASSERT ((((UINTN) (Buffer)) & 0x01) == 0)
 
 /**
   Produces a Null-terminated Unicode string in an output buffer based on
@@ -174,8 +174,8 @@ UnicodeSPrint (
   ...
   )
 {
-  VA_LIST Marker;
-  UINTN   NumberOfPrinted;
+  VA_LIST  Marker;
+  UINTN    NumberOfPrinted;
 
   VA_START (Marker, FormatString);
   NumberOfPrinted = UnicodeVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
@@ -334,15 +334,14 @@ UnicodeSPrintAsciiFormat (
   ...
   )
 {
-  VA_LIST Marker;
-  UINTN   NumberOfPrinted;
+  VA_LIST  Marker;
+  UINTN    NumberOfPrinted;
 
   VA_START (Marker, FormatString);
   NumberOfPrinted = UnicodeVSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
   VA_END (Marker);
   return NumberOfPrinted;
 }
-
 
 /**
   Converts a decimal value to a Null-terminated Unicode string.
@@ -405,7 +404,7 @@ UnicodeValueToStringS (
   IN UINTN       Width
   )
 {
-  ASSERT_UNICODE_BUFFER(Buffer);
+  ASSERT_UNICODE_BUFFER (Buffer);
   return BasePrintLibConvertValueToStringS ((CHAR8 *)Buffer, BufferSize, Flags, Value, Width, 2);
 }
 
@@ -552,8 +551,8 @@ AsciiSPrint (
   ...
   )
 {
-  VA_LIST Marker;
-  UINTN   NumberOfPrinted;
+  VA_LIST  Marker;
+  UINTN    NumberOfPrinted;
 
   VA_START (Marker, FormatString);
   NumberOfPrinted = AsciiVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
@@ -712,8 +711,8 @@ AsciiSPrintUnicodeFormat (
   ...
   )
 {
-  VA_LIST Marker;
-  UINTN   NumberOfPrinted;
+  VA_LIST  Marker;
+  UINTN    NumberOfPrinted;
 
   VA_START (Marker, FormatString);
   NumberOfPrinted = AsciiVSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);

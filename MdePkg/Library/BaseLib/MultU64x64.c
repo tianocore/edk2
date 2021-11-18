@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 #include "BaseLibInternals.h"
 
 /**
@@ -32,7 +29,7 @@ MultU64x64 (
   IN      UINT64                    Multiplier
   )
 {
-  UINT64                            Result;
+  UINT64  Result;
 
   Result = InternalMathMultU64x64 (Multiplicand, Multiplier);
 

@@ -16,7 +16,6 @@
 #include <Library/S3BootScriptLib.h>
 #include <Library/S3StallLib.h>
 
-
 /**
   Stalls the CPU for at least the given number of microseconds and and saves
   the value in the S3 script to be replayed on S3 resume.
@@ -34,12 +33,10 @@ S3Stall (
   IN UINTN                     MicroSeconds
   )
 {
-  RETURN_STATUS    Status;
+  RETURN_STATUS  Status;
 
   Status = S3BootScriptSaveStall (MicroSecondDelay (MicroSeconds));
   ASSERT (Status == RETURN_SUCCESS);
 
   return MicroSeconds;
 }
-
-

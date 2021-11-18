@@ -424,7 +424,6 @@ EfiSetVirtualAddressMap (
   IN CONST EFI_MEMORY_DESCRIPTOR    *VirtualMap
   );
 
-
 /**
   Convert the standard Lib double linked list to a virtual mapping.
 
@@ -489,7 +488,6 @@ EfiUpdateCapsule (
   IN EFI_PHYSICAL_ADDRESS     ScatterGatherList OPTIONAL
   );
 
-
 /**
   This service is a wrapper for the UEFI Runtime Service QueryCapsuleCapabilities().
 
@@ -532,7 +530,6 @@ EfiQueryCapsuleCapabilities (
   OUT UINT64                   *MaximumCapsuleSize,
   OUT EFI_RESET_TYPE           *ResetType
   );
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service QueryVariableInfo().
@@ -578,4 +575,3 @@ EfiQueryVariableInfo (
   );
 
 #endif
-

@@ -8,7 +8,6 @@
 
 #include "BaseLibInternals.h"
 
-
 /**
   Disables CPU interrupts and returns the interrupt state prior to the disable
   operation.
@@ -23,7 +22,7 @@ SaveAndDisableInterrupts (
   VOID
   )
 {
-  BOOLEAN                           InterruptState;
+  BOOLEAN  InterruptState;
 
   InterruptState = GetInterruptState ();
   DisableInterrupts ();
@@ -55,5 +54,6 @@ SetInterruptState (
   } else {
     DisableInterrupts ();
   }
+
   return InterruptState;
 }

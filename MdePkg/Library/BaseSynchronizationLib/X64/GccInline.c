@@ -7,8 +7,6 @@
 
 **/
 
-
-
 /**
   Performs an atomic increment of an 32-bit unsigned integer.
 
@@ -39,11 +37,10 @@ InternalSyncIncrement (
     :                         // no inputs that aren't also outputs
     : "memory",
       "cc"
-    );
+  );
 
   return Result;
 }
-
 
 /**
   Performs an atomic decrement of an 32-bit unsigned integer.
@@ -63,7 +60,7 @@ InternalSyncDecrement (
   IN      volatile UINT32       *Value
   )
 {
-   UINT32  Result;
+  UINT32  Result;
 
   __asm__ __volatile__ (
     "movl    $-1, %%eax  \n\t"
@@ -75,11 +72,10 @@ InternalSyncDecrement (
     :                          // no inputs that aren't also outputs
     : "memory",
       "cc"
-    );
+  );
 
   return Result;
 }
-
 
 /**
   Performs an atomic compare exchange operation on a 16-bit unsigned integer.
@@ -115,11 +111,10 @@ InternalSyncCompareExchange16 (
     : "r"  (ExchangeValue)      // %2
     : "memory",
       "cc"
-    );
+  );
 
   return CompareValue;
 }
-
 
 /**
   Performs an atomic compare exchange operation on a 32-bit unsigned integer.
@@ -155,11 +150,10 @@ InternalSyncCompareExchange32 (
     : "r"  (ExchangeValue)      // %2
     : "memory",
       "cc"
-    );
+  );
 
   return CompareValue;
 }
-
 
 /**
   Performs an atomic compare exchange operation on a 64-bit unsigned integer.
@@ -194,7 +188,7 @@ InternalSyncCompareExchange64 (
     : "r"  (ExchangeValue)      // %2
     : "memory",
       "cc"
-    );
+  );
 
   return CompareValue;
 }

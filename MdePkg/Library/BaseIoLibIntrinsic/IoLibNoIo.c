@@ -11,7 +11,6 @@
 
 **/
 
-
 //
 // Include common header file for this module.
 //
@@ -407,13 +406,14 @@ MmioRead8 (
   IN      UINTN                     Address
   )
 {
-  UINT8                             Value;
-  BOOLEAN                           Flag;
+  UINT8    Value;
+  BOOLEAN  Flag;
 
   Flag = FilterBeforeMmIoRead (FilterWidth8, Address, &Value);
   if (Flag) {
-    Value = *(volatile UINT8*)Address;
+    Value = *(volatile UINT8 *)Address;
   }
+
   FilterAfterMmIoRead (FilterWidth8, Address, &Value);
 
   return Value;
@@ -439,12 +439,13 @@ MmioWrite8 (
   IN      UINT8                     Value
   )
 {
-  BOOLEAN                           Flag;
+  BOOLEAN  Flag;
 
   Flag = FilterBeforeMmIoWrite (FilterWidth8, Address, &Value);
   if (Flag) {
-    *(volatile UINT8*)Address = Value;
+    *(volatile UINT8 *)Address = Value;
   }
+
   FilterAfterMmIoWrite (FilterWidth8, Address, &Value);
 
   return Value;
@@ -470,15 +471,16 @@ MmioRead16 (
   IN      UINTN                     Address
   )
 {
-  UINT16                            Value;
-  BOOLEAN                           Flag;
+  UINT16   Value;
+  BOOLEAN  Flag;
 
   ASSERT ((Address & 1) == 0);
 
   Flag = FilterBeforeMmIoRead (FilterWidth16, Address, &Value);
   if (Flag) {
-    Value = *(volatile UINT16*)Address;
+    Value = *(volatile UINT16 *)Address;
   }
+
   FilterAfterMmIoRead (FilterWidth16, Address, &Value);
 
   return Value;
@@ -504,14 +506,15 @@ MmioWrite16 (
   IN      UINT16                    Value
   )
 {
-  BOOLEAN                           Flag;
+  BOOLEAN  Flag;
 
   ASSERT ((Address & 1) == 0);
 
   Flag = FilterBeforeMmIoWrite (FilterWidth16, Address, &Value);
   if (Flag) {
-    *(volatile UINT16*)Address = Value;
+    *(volatile UINT16 *)Address = Value;
   }
+
   FilterAfterMmIoWrite (FilterWidth16, Address, &Value);
 
   return Value;
@@ -537,15 +540,16 @@ MmioRead32 (
   IN      UINTN                     Address
   )
 {
-  UINT32                            Value;
-  BOOLEAN                           Flag;
+  UINT32   Value;
+  BOOLEAN  Flag;
 
   ASSERT ((Address & 3) == 0);
 
   Flag = FilterBeforeMmIoRead (FilterWidth32, Address, &Value);
   if (Flag) {
-    Value = *(volatile UINT32*)Address;
+    Value = *(volatile UINT32 *)Address;
   }
+
   FilterAfterMmIoRead (FilterWidth32, Address, &Value);
 
   return Value;
@@ -571,14 +575,15 @@ MmioWrite32 (
   IN      UINT32                    Value
   )
 {
-  BOOLEAN                           Flag;
+  BOOLEAN  Flag;
 
   ASSERT ((Address & 3) == 0);
 
   Flag = FilterBeforeMmIoWrite (FilterWidth32, Address, &Value);
   if (Flag) {
-  *(volatile UINT32*)Address = Value;
+    *(volatile UINT32 *)Address = Value;
   }
+
   FilterAfterMmIoWrite (FilterWidth32, Address, &Value);
 
   return Value;
@@ -604,15 +609,16 @@ MmioRead64 (
   IN      UINTN                     Address
   )
 {
-  UINT64                            Value;
-  BOOLEAN                           Flag;
+  UINT64   Value;
+  BOOLEAN  Flag;
 
   ASSERT ((Address & 7) == 0);
 
   Flag = FilterBeforeMmIoRead (FilterWidth64, Address, &Value);
   if (Flag) {
-    Value = *(volatile UINT64*)Address;
+    Value = *(volatile UINT64 *)Address;
   }
+
   FilterAfterMmIoRead (FilterWidth64, Address, &Value);
 
   return Value;
@@ -638,16 +644,16 @@ MmioWrite64 (
   IN      UINT64                    Value
   )
 {
-  BOOLEAN                           Flag;
+  BOOLEAN  Flag;
 
   ASSERT ((Address & 7) == 0);
 
   Flag = FilterBeforeMmIoWrite (FilterWidth64, Address, &Value);
   if (Flag) {
-    *(volatile UINT64*)Address = Value;
+    *(volatile UINT64 *)Address = Value;
   }
+
   FilterAfterMmIoWrite (FilterWidth64, Address, &Value);
 
   return Value;
 }
-

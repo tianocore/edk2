@@ -169,7 +169,6 @@ GetSectionFromFv (
   OUT UINTN                         *Size
   );
 
-
 /**
   Searches the FFS file the currently executing module was loaded from and returns the first matching FFS section.
 
@@ -220,7 +219,6 @@ GetSectionFromFfs (
   OUT VOID                          **Buffer,
   OUT UINTN                         *Size
   );
-
 
 /**
   Get the image file buffer data and buffer size by its device path.

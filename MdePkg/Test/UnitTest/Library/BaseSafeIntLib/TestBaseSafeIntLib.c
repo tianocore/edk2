@@ -9,8 +9,8 @@
 
 #include "TestBaseSafeIntLib.h"
 
-#define UNIT_TEST_NAME        "Int Safe Lib Unit Test Application"
-#define UNIT_TEST_VERSION     "0.1"
+#define UNIT_TEST_NAME     "Int Safe Lib Unit Test Application"
+#define UNIT_TEST_VERSION  "0.1"
 
 //
 // Conversion function tests:
@@ -29,17 +29,17 @@ TestSafeInt8ToUint8 (
   // Positive UINT8 should result in just a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt8ToUint8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt8ToUint8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Negative number should result in an error status
   //
   Operand = (-56);
-  Status = SafeInt8ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt8ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -58,17 +58,17 @@ TestSafeInt8ToUint16 (
   // Positive UINT8 should result in just a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt8ToUint16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt8ToUint16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Negative number should result in an error status
   //
   Operand = (-56);
-  Status = SafeInt8ToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt8ToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -87,17 +87,17 @@ TestSafeInt8ToUint32 (
   // Positive UINT8 should result in just a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt8ToUint32(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt8ToUint32 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Negative number should result in an error status
   //
   Operand = (-56);
-  Status = SafeInt8ToUint32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt8ToUint32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -116,17 +116,17 @@ TestSafeInt8ToUintn (
   // Positive UINT8 should result in just a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt8ToUintn(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt8ToUintn (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Negative number should result in an error status
   //
   Operand = (-56);
-  Status = SafeInt8ToUintn(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt8ToUintn (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -145,17 +145,17 @@ TestSafeInt8ToUint64 (
   // Positive UINT8 should result in just a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt8ToUint64(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt8ToUint64 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Negative number should result in an error status
   //
   Operand = (-56);
-  Status = SafeInt8ToUint64(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt8ToUint64 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -174,17 +174,17 @@ TestSafeUint8ToInt8 (
   // Operand <= 0x7F (MAX_INT8) should result in a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeUint8ToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeUint8ToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Operand larger than 0x7f should result in an error status
   //
   Operand = 0xaf;
-  Status = SafeUint8ToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint8ToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -208,17 +208,17 @@ TestSafeUint8ToChar8 (
   // Operand <= 0x7F (MAX_INT8) should result in a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeUint8ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeUint8ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Operand larger than 0x7f should result in an error status
   //
   Operand = 0xaf;
-  Status = SafeUint8ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint8ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -237,26 +237,26 @@ TestSafeInt16ToInt8 (
   // If Operand is between MIN_INT8 and MAX_INT8 inclusive, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt16ToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt16ToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   Operand = (-35);
-  Status = SafeInt16ToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-35), Result);
+  Status  = SafeInt16ToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-35), Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = 0x1234;
-  Status = SafeInt16ToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-17835);
-  Status = SafeInt16ToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -280,37 +280,37 @@ TestSafeInt16ToChar8 (
   // If Operand is between 0 and MAX_INT8 inclusive, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt16ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt16ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   Operand = 0;
-  Result = 0;
-  Status = SafeInt16ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0, Result);
+  Result  = 0;
+  Status  = SafeInt16ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0, Result);
 
   Operand = MAX_INT8;
-  Result = 0;
-  Status = SafeInt16ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(MAX_INT8, Result);
+  Result  = 0;
+  Status  = SafeInt16ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (MAX_INT8, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-35);
-  Status = SafeInt16ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = 0x1234;
-  Status = SafeInt16ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-17835);
-  Status = SafeInt16ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -329,21 +329,21 @@ TestSafeInt16ToUint8 (
   // If Operand is between 0 and MAX_INT8 inclusive, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt16ToUint8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt16ToUint8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = 0x1234;
-  Status = SafeInt16ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-17835);
-  Status = SafeInt16ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -355,22 +355,22 @@ TestSafeInt16ToUint16 (
   )
 {
   EFI_STATUS  Status;
-  INT16 Operand = 0x5b5b;
-  UINT16 Result = 0;
+  INT16       Operand = 0x5b5b;
+  UINT16      Result  = 0;
 
   //
   // If Operand is non-negative, then it's a cast
   //
-  Status = SafeInt16ToUint16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b5b, Result);
+  Status = SafeInt16ToUint16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-17835);
-  Status = SafeInt16ToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -389,17 +389,17 @@ TestSafeInt16ToUint32 (
   // If Operand is non-negative, then it's a cast
   //
   Operand = 0x5b5b;
-  Result = 0;
-  Status = SafeInt16ToUint32(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b5b, Result);
+  Result  = 0;
+  Status  = SafeInt16ToUint32 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-17835);
-  Status = SafeInt16ToUint32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToUint32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -418,17 +418,17 @@ TestSafeInt16ToUintn (
   // If Operand is non-negative, then it's a cast
   //
   Operand = 0x5b5b;
-  Result = 0;
-  Status = SafeInt16ToUintn(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b5b, Result);
+  Result  = 0;
+  Status  = SafeInt16ToUintn (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-17835);
-  Status = SafeInt16ToUintn(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToUintn (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -447,17 +447,17 @@ TestSafeInt16ToUint64 (
   // If Operand is non-negative, then it's a cast
   //
   Operand = 0x5b5b;
-  Result = 0;
-  Status = SafeInt16ToUint64(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b5b, Result);
+  Result  = 0;
+  Status  = SafeInt16ToUint64 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-17835);
-  Status = SafeInt16ToUint64(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt16ToUint64 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -476,17 +476,17 @@ TestSafeUint16ToInt8 (
   // If Operand is <= MAX_INT8, it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeUint16ToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeUint16ToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5b5b);
-  Status = SafeUint16ToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint16ToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -508,17 +508,17 @@ TestSafeUint16ToChar8 (
   // If Operand is <= MAX_INT8, it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeUint16ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeUint16ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5b5b);
-  Status = SafeUint16ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint16ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -537,17 +537,17 @@ TestSafeUint16ToUint8 (
   // If Operand is <= MAX_UINT8 (0xff), it's a cast
   //
   Operand = 0xab;
-  Result = 0;
-  Status = SafeUint16ToUint8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xab, Result);
+  Result  = 0;
+  Status  = SafeUint16ToUint8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5b5b);
-  Status = SafeUint16ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint16ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -566,17 +566,17 @@ TestSafeUint16ToInt16 (
   // If Operand is <= MAX_INT16 (0x7fff), it's a cast
   //
   Operand = 0x5b5b;
-  Result = 0;
-  Status = SafeUint16ToInt16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b5b, Result);
+  Result  = 0;
+  Status  = SafeUint16ToInt16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabab);
-  Status = SafeUint16ToInt16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint16ToInt16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -595,26 +595,26 @@ TestSafeInt32ToInt8 (
   // If Operand is between MIN_INT8 and MAX_INT8 inclusive, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt32ToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt32ToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   Operand = (-57);
-  Status = SafeInt32ToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-57), Result);
+  Status  = SafeInt32ToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-57), Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5bababab);
-  Status = SafeInt32ToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-1537977259);
-  Status = SafeInt32ToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -638,37 +638,37 @@ TestSafeInt32ToChar8 (
   // If Operand is between 0 and MAX_INT8 inclusive, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt32ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt32ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   Operand = 0;
-  Result = 0;
-  Status = SafeInt32ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0, Result);
+  Result  = 0;
+  Status  = SafeInt32ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0, Result);
 
   Operand = MAX_INT8;
-  Result = 0;
-  Status = SafeInt32ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(MAX_INT8, Result);
+  Result  = 0;
+  Status  = SafeInt32ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (MAX_INT8, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-57);
-  Status = SafeInt32ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (0x5bababab);
-  Status = SafeInt32ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-1537977259);
-  Status = SafeInt32ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -687,25 +687,25 @@ TestSafeInt32ToUint8 (
   // If Operand is between 0 and MAX_INT8 inclusive, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt32ToUint8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt32ToUint8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-57);
-  Status = SafeInt32ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (0x5bababab);
-  Status = SafeInt32ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-1537977259);
-  Status = SafeInt32ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -724,26 +724,26 @@ TestSafeInt32ToInt16 (
   // If Operand is between MIN_INT16 and MAX_INT16 inclusive, then it's a cast
   //
   Operand = 0x5b5b;
-  Result = 0;
-  Status = SafeInt32ToInt16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b5b, Result);
+  Result  = 0;
+  Status  = SafeInt32ToInt16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b5b, Result);
 
   Operand = (-17857);
-  Status = SafeInt32ToInt16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-17857), Result);
+  Status  = SafeInt32ToInt16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-17857), Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5bababab);
-  Status = SafeInt32ToInt16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToInt16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-1537977259);
-  Status = SafeInt32ToInt16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToInt16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -762,25 +762,25 @@ TestSafeInt32ToUint16 (
   // If Operand is between 0 and MAX_UINT16 inclusive, then it's a cast
   //
   Operand = 0xabab;
-  Result = 0;
-  Status = SafeInt32ToUint16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xabab, Result);
+  Result  = 0;
+  Status  = SafeInt32ToUint16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xabab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-17857);
-  Status = SafeInt32ToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (0x5bababab);
-  Status = SafeInt32ToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-1537977259);
-  Status = SafeInt32ToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -799,17 +799,17 @@ TestSafeInt32ToUint32 (
   // If Operand is non-negative, then it's a cast
   //
   Operand = 0x5bababab;
-  Result = 0;
-  Status = SafeInt32ToUint32(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bababab, Result);
+  Result  = 0;
+  Status  = SafeInt32ToUint32 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bababab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-1537977259);
-  Status = SafeInt32ToUint32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToUint32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -828,17 +828,17 @@ TestSafeInt32ToUint64 (
   // If Operand is non-negative, then it's a cast
   //
   Operand = 0x5bababab;
-  Result = 0;
-  Status = SafeInt32ToUint64(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bababab, Result);
+  Result  = 0;
+  Status  = SafeInt32ToUint64 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bababab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-1537977259);
-  Status = SafeInt32ToUint64(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt32ToUint64 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -857,17 +857,17 @@ TestSafeUint32ToInt8 (
   // If Operand is <= MAX_INT8, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeUint32ToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeUint32ToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5bababab);
-  Status = SafeUint32ToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint32ToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -889,17 +889,17 @@ TestSafeUint32ToChar8 (
   // If Operand is <= MAX_INT8, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeUint32ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeUint32ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5bababab);
-  Status = SafeUint32ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint32ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -918,17 +918,17 @@ TestSafeUint32ToUint8 (
   // If Operand is <= MAX_UINT8, then it's a cast
   //
   Operand = 0xab;
-  Result = 0;
-  Status = SafeUint32ToUint8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xab, Result);
+  Result  = 0;
+  Status  = SafeUint32ToUint8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabababab);
-  Status = SafeUint32ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint32ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -947,17 +947,17 @@ TestSafeUint32ToInt16 (
   // If Operand is <= MAX_INT16, then it's a cast
   //
   Operand = 0x5bab;
-  Result = 0;
-  Status = SafeUint32ToInt16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bab, Result);
+  Result  = 0;
+  Status  = SafeUint32ToInt16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabababab);
-  Status = SafeUint32ToInt16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint32ToInt16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -976,17 +976,17 @@ TestSafeUint32ToUint16 (
   // If Operand is <= MAX_UINT16, then it's a cast
   //
   Operand = 0xabab;
-  Result = 0;
-  Status = SafeUint32ToUint16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xabab, Result);
+  Result  = 0;
+  Status  = SafeUint32ToUint16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xabab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabababab);
-  Status = SafeUint32ToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint32ToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1005,17 +1005,17 @@ TestSafeUint32ToInt32 (
   // If Operand is <= MAX_INT32, then it's a cast
   //
   Operand = 0x5bababab;
-  Result = 0;
-  Status = SafeUint32ToInt32(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bababab, Result);
+  Result  = 0;
+  Status  = SafeUint32ToInt32 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bababab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabababab);
-  Status = SafeUint32ToInt32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint32ToInt32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1034,26 +1034,26 @@ TestSafeIntnToInt8 (
   // If Operand is between MIN_INT8 and MAX_INT8 inclusive, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeIntnToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeIntnToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   Operand = (-53);
-  Status = SafeIntnToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-53), Result);
+  Status  = SafeIntnToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-53), Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5bababab);
-  Status = SafeIntnToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-1537977259);
-  Status = SafeIntnToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1077,37 +1077,37 @@ TestSafeIntnToChar8 (
   // If Operand is between MIN_INT8 and MAX_INT8 inclusive, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeIntnToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeIntnToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   Operand = 0;
-  Result = 0;
-  Status = SafeIntnToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0, Result);
+  Result  = 0;
+  Status  = SafeIntnToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0, Result);
 
   Operand = MAX_INT8;
-  Result = 0;
-  Status = SafeIntnToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(MAX_INT8, Result);
+  Result  = 0;
+  Status  = SafeIntnToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (MAX_INT8, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-53);
-  Status = SafeIntnToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (0x5bababab);
-  Status = SafeIntnToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-1537977259);
-  Status = SafeIntnToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1126,21 +1126,21 @@ TestSafeIntnToUint8 (
   // If Operand is between 0 and MAX_UINT8 inclusive, then it's a cast
   //
   Operand = 0xab;
-  Result = 0;
-  Status = SafeIntnToUint8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xab, Result);
+  Result  = 0;
+  Status  = SafeIntnToUint8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5bababab);
-  Status = SafeIntnToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-1537977259);
-  Status = SafeIntnToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1159,26 +1159,26 @@ TestSafeIntnToInt16 (
   // If Operand is between MIN_INT16 and MAX_INT16 inclusive, then it's a cast
   //
   Operand = 0x5bab;
-  Result = 0;
-  Status = SafeIntnToInt16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bab, Result);
+  Result  = 0;
+  Status  = SafeIntnToInt16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bab, Result);
 
   Operand = (-23467);
-  Status = SafeIntnToInt16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-23467), Result);
+  Status  = SafeIntnToInt16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-23467), Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5bababab);
-  Status = SafeIntnToInt16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToInt16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-1537977259);
-  Status = SafeIntnToInt16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToInt16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1197,21 +1197,21 @@ TestSafeIntnToUint16 (
   // If Operand is between 0 and MAX_UINT16 inclusive, then it's a cast
   //
   Operand = 0xabab;
-  Result = 0;
-  Status = SafeIntnToUint16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xabab, Result);
+  Result  = 0;
+  Status  = SafeIntnToUint16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xabab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5bababab);
-  Status = SafeIntnToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (-1537977259);
-  Status = SafeIntnToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1230,17 +1230,17 @@ TestSafeIntnToUintn (
   // If Operand is non-negative, then it's a cast
   //
   Operand = 0x5bababab;
-  Result = 0;
-  Status = SafeIntnToUintn(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bababab, Result);
+  Result  = 0;
+  Status  = SafeIntnToUintn (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bababab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-1537977259);
-  Status = SafeIntnToUintn(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToUintn (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1259,17 +1259,17 @@ TestSafeIntnToUint64 (
   // If Operand is non-negative, then it's a cast
   //
   Operand = 0x5bababab;
-  Result = 0;
-  Status = SafeIntnToUint64(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bababab, Result);
+  Result  = 0;
+  Status  = SafeIntnToUint64 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bababab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-1537977259);
-  Status = SafeIntnToUint64(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeIntnToUint64 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1288,17 +1288,17 @@ TestSafeUintnToInt8 (
   // If Operand is <= MAX_INT8, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeUintnToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeUintnToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabab);
-  Status = SafeUintnToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUintnToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1320,17 +1320,17 @@ TestSafeUintnToChar8 (
   // If Operand is <= MAX_INT8, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeUintnToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeUintnToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabab);
-  Status = SafeUintnToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUintnToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1349,17 +1349,17 @@ TestSafeUintnToUint8 (
   // If Operand is <= MAX_UINT8, then it's a cast
   //
   Operand = 0xab;
-  Result = 0;
-  Status = SafeUintnToUint8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xab, Result);
+  Result  = 0;
+  Status  = SafeUintnToUint8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabab);
-  Status = SafeUintnToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUintnToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1378,17 +1378,17 @@ TestSafeUintnToInt16 (
   // If Operand is <= MAX_INT16, then it's a cast
   //
   Operand = 0x5bab;
-  Result = 0;
-  Status = SafeUintnToInt16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bab, Result);
+  Result  = 0;
+  Status  = SafeUintnToInt16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabab);
-  Status = SafeUintnToInt16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUintnToInt16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1407,17 +1407,17 @@ TestSafeUintnToUint16 (
   // If Operand is <= MAX_UINT16, then it's a cast
   //
   Operand = 0xabab;
-  Result = 0;
-  Status = SafeUintnToUint16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xabab, Result);
+  Result  = 0;
+  Status  = SafeUintnToUint16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xabab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabababab);
-  Status = SafeUintnToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUintnToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1436,17 +1436,17 @@ TestSafeUintnToInt32 (
   // If Operand is <= MAX_INT32, then it's a cast
   //
   Operand = 0x5bababab;
-  Result = 0;
-  Status = SafeUintnToInt32(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bababab, Result);
+  Result  = 0;
+  Status  = SafeUintnToInt32 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bababab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xabababab);
-  Status = SafeUintnToInt32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUintnToInt32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1465,26 +1465,26 @@ TestSafeInt64ToInt8 (
   // If Operand is between MIN_INT8 and  MAX_INT8 inclusive, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt64ToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt64ToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   Operand = (-37);
-  Status = SafeInt64ToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-37), Result);
+  Status  = SafeInt64ToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-37), Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5babababefefefef);
-  Status = SafeInt64ToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand =  (-6605562033422200815);
-  Status = SafeInt64ToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1508,37 +1508,37 @@ TestSafeInt64ToChar8 (
   // If Operand is between MIN_INT8 and  MAX_INT8 inclusive, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeInt64ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeInt64ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   Operand = 0;
-  Result = 0;
-  Status = SafeInt64ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0, Result);
+  Result  = 0;
+  Status  = SafeInt64ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0, Result);
 
   Operand = MAX_INT8;
-  Result = 0;
-  Status = SafeInt64ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(MAX_INT8, Result);
+  Result  = 0;
+  Status  = SafeInt64ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (MAX_INT8, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (-37);
-  Status = SafeInt64ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand = (0x5babababefefefef);
-  Status = SafeInt64ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand =  (-6605562033422200815);
-  Status = SafeInt64ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1557,21 +1557,21 @@ TestSafeInt64ToUint8 (
   // If Operand is between 0 and  MAX_UINT8 inclusive, then it's a cast
   //
   Operand = 0xab;
-  Result = 0;
-  Status = SafeInt64ToUint8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xab, Result);
+  Result  = 0;
+  Status  = SafeInt64ToUint8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5babababefefefef);
-  Status = SafeInt64ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand =  (-6605562033422200815);
-  Status = SafeInt64ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1590,26 +1590,26 @@ TestSafeInt64ToInt16 (
   // If Operand is between MIN_INT16 and  MAX_INT16 inclusive, then it's a cast
   //
   Operand = 0x5bab;
-  Result = 0;
-  Status = SafeInt64ToInt16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bab, Result);
+  Result  = 0;
+  Status  = SafeInt64ToInt16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bab, Result);
 
   Operand = (-23467);
-  Status = SafeInt64ToInt16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-23467), Result);
+  Status  = SafeInt64ToInt16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-23467), Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5babababefefefef);
-  Status = SafeInt64ToInt16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToInt16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand =  (-6605562033422200815);
-  Status = SafeInt64ToInt16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToInt16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1628,21 +1628,21 @@ TestSafeInt64ToUint16 (
   // If Operand is between 0 and  MAX_UINT16 inclusive, then it's a cast
   //
   Operand = 0xabab;
-  Result = 0;
-  Status = SafeInt64ToUint16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xabab, Result);
+  Result  = 0;
+  Status  = SafeInt64ToUint16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xabab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5babababefefefef);
-  Status = SafeInt64ToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand =  (-6605562033422200815);
-  Status = SafeInt64ToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1661,26 +1661,26 @@ TestSafeInt64ToInt32 (
   // If Operand is between MIN_INT32 and  MAX_INT32 inclusive, then it's a cast
   //
   Operand = 0x5bababab;
-  Result = 0;
-  Status = SafeInt64ToInt32(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bababab, Result);
+  Result  = 0;
+  Status  = SafeInt64ToInt32 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bababab, Result);
 
   Operand = (-1537977259);
-  Status = SafeInt64ToInt32(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-1537977259), Result);
+  Status  = SafeInt64ToInt32 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-1537977259), Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5babababefefefef);
-  Status = SafeInt64ToInt32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToInt32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand =  (-6605562033422200815);
-  Status = SafeInt64ToInt32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToInt32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1699,21 +1699,21 @@ TestSafeInt64ToUint32 (
   // If Operand is between 0 and  MAX_UINT32 inclusive, then it's a cast
   //
   Operand = 0xabababab;
-  Result = 0;
-  Status = SafeInt64ToUint32(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xabababab, Result);
+  Result  = 0;
+  Status  = SafeInt64ToUint32 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xabababab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0x5babababefefefef);
-  Status = SafeInt64ToUint32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToUint32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Operand =  (-6605562033422200815);
-  Status = SafeInt64ToUint32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToUint32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1732,17 +1732,17 @@ TestSafeInt64ToUint64 (
   // If Operand is non-negative, then it's a cast
   //
   Operand = 0x5babababefefefef;
-  Result = 0;
-  Status = SafeInt64ToUint64(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5babababefefefef, Result);
+  Result  = 0;
+  Status  = SafeInt64ToUint64 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5babababefefefef, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand =  (-6605562033422200815);
-  Status = SafeInt64ToUint64(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeInt64ToUint64 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1761,17 +1761,17 @@ TestSafeUint64ToInt8 (
   // If Operand is <= MAX_INT8, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeUint64ToInt8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeUint64ToInt8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xababababefefefef);
-  Status = SafeUint64ToInt8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint64ToInt8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1793,17 +1793,17 @@ TestSafeUint64ToChar8 (
   // If Operand is <= MAX_INT8, then it's a cast
   //
   Operand = 0x5b;
-  Result = 0;
-  Status = SafeUint64ToChar8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5b, Result);
+  Result  = 0;
+  Status  = SafeUint64ToChar8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5b, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xababababefefefef);
-  Status = SafeUint64ToChar8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint64ToChar8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1822,17 +1822,17 @@ TestSafeUint64ToUint8 (
   // If Operand is <= MAX_UINT8, then it's a cast
   //
   Operand = 0xab;
-  Result = 0;
-  Status = SafeUint64ToUint8(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xab, Result);
+  Result  = 0;
+  Status  = SafeUint64ToUint8 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xababababefefefef);
-  Status = SafeUint64ToUint8(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint64ToUint8 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1851,17 +1851,17 @@ TestSafeUint64ToInt16 (
   // If Operand is <= MAX_INT16, then it's a cast
   //
   Operand = 0x5bab;
-  Result = 0;
-  Status = SafeUint64ToInt16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bab, Result);
+  Result  = 0;
+  Status  = SafeUint64ToInt16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xababababefefefef);
-  Status = SafeUint64ToInt16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint64ToInt16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1880,17 +1880,17 @@ TestSafeUint64ToUint16 (
   // If Operand is <= MAX_UINT16, then it's a cast
   //
   Operand = 0xabab;
-  Result = 0;
-  Status = SafeUint64ToUint16(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xabab, Result);
+  Result  = 0;
+  Status  = SafeUint64ToUint16 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xabab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xababababefefefef);
-  Status = SafeUint64ToUint16(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint64ToUint16 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1909,17 +1909,17 @@ TestSafeUint64ToInt32 (
   // If Operand is <= MAX_INT32, then it's a cast
   //
   Operand = 0x5bababab;
-  Result = 0;
-  Status = SafeUint64ToInt32(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5bababab, Result);
+  Result  = 0;
+  Status  = SafeUint64ToInt32 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5bababab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xababababefefefef);
-  Status = SafeUint64ToInt32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint64ToInt32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1938,17 +1938,17 @@ TestSafeUint64ToUint32 (
   // If Operand is <= MAX_UINT32, then it's a cast
   //
   Operand = 0xabababab;
-  Result = 0;
-  Status = SafeUint64ToUint32(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xabababab, Result);
+  Result  = 0;
+  Status  = SafeUint64ToUint32 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xabababab, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xababababefefefef);
-  Status = SafeUint64ToUint32(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint64ToUint32 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -1967,17 +1967,17 @@ TestSafeUint64ToInt64 (
   // If Operand is <= MAX_INT64, then it's a cast
   //
   Operand = 0x5babababefefefef;
-  Result = 0;
-  Status = SafeUint64ToInt64(Operand, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x5babababefefefef, Result);
+  Result  = 0;
+  Status  = SafeUint64ToInt64 (Operand, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x5babababefefefef, Result);
 
   //
   // Otherwise should result in an error status
   //
   Operand = (0xababababefefefef);
-  Status = SafeUint64ToInt64(Operand, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status  = SafeUint64ToInt64 (Operand, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2002,17 +2002,17 @@ TestSafeUint8Add (
   Augend = 0x3a;
   Addend = 0x3a;
   Result = 0;
-  Status = SafeUint8Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x74, Result);
+  Status = SafeUint8Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x74, Result);
 
   //
   // Otherwise should result in an error status
   //
   Augend = 0xab;
   Addend = 0xbc;
-  Status = SafeUint8Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeUint8Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2024,24 +2024,24 @@ TestSafeUint16Add (
   )
 {
   EFI_STATUS  Status;
-  UINT16 Augend = 0x3a3a;
-  UINT16 Addend = 0x3a3a;
-  UINT16 Result = 0;
+  UINT16      Augend = 0x3a3a;
+  UINT16      Addend = 0x3a3a;
+  UINT16      Result = 0;
 
   //
   // If the result of addition doesn't overflow MAX_UINT16, then it's addition
   //
-  Status = SafeUint16Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x7474, Result);
+  Status = SafeUint16Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x7474, Result);
 
   //
   // Otherwise should result in an error status
   //
   Augend = 0xabab;
   Addend = 0xbcbc;
-  Status = SafeUint16Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeUint16Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2063,17 +2063,17 @@ TestSafeUint32Add (
   Augend = 0x3a3a3a3a;
   Addend = 0x3a3a3a3a;
   Result = 0;
-  Status = SafeUint32Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x74747474, Result);
+  Status = SafeUint32Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x74747474, Result);
 
   //
   // Otherwise should result in an error status
   //
   Augend = 0xabababab;
   Addend = 0xbcbcbcbc;
-  Status = SafeUint32Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeUint32Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2095,17 +2095,17 @@ TestSafeUint64Add (
   Augend = 0x3a3a3a3a12121212;
   Addend = 0x3a3a3a3a12121212;
   Result = 0;
-  Status = SafeUint64Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x7474747424242424, Result);
+  Status = SafeUint64Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x7474747424242424, Result);
 
   //
   // Otherwise should result in an error status
   //
   Augend = 0xababababefefefef;
   Addend = 0xbcbcbcbcdededede;
-  Status = SafeUint64Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeUint64Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2128,31 +2128,30 @@ TestSafeInt8Add (
   Augend = 0x3a;
   Addend = 0x3a;
   Result = 0;
-  Status = SafeInt8Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x74, Result);
+  Status = SafeInt8Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x74, Result);
 
   Augend = (-58);
   Addend = (-58);
-  Status = SafeInt8Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-116), Result);
+  Status = SafeInt8Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-116), Result);
 
   //
   // Otherwise should result in an error status
   //
   Augend = 0x5a;
   Addend = 0x5a;
-  Status = SafeInt8Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeInt8Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Augend = (-90);
   Addend = (-90);
-  Status = SafeInt8Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeInt8Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
-
 }
 
 UNIT_TEST_STATUS
@@ -2173,28 +2172,28 @@ TestSafeInt16Add (
   Augend = 0x3a3a;
   Addend = 0x3a3a;
   Result = 0;
-  Status = SafeInt16Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x7474, Result);
+  Status = SafeInt16Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x7474, Result);
 
   Augend = (-14906);
   Addend = (-14906);
-  Status = SafeInt16Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-29812), Result);
+  Status = SafeInt16Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-29812), Result);
 
   //
   // Otherwise should result in an error status
   //
   Augend = 0x5a5a;
   Addend = 0x5a5a;
-  Status = SafeInt16Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeInt16Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Augend = (-23130);
   Addend = (-23130);
-  Status = SafeInt16Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeInt16Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2217,28 +2216,28 @@ TestSafeInt32Add (
   Augend = 0x3a3a3a3a;
   Addend = 0x3a3a3a3a;
   Result = 0;
-  Status = SafeInt32Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x74747474, Result);
+  Status = SafeInt32Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x74747474, Result);
 
   Augend = (-976894522);
   Addend = (-976894522);
-  Status = SafeInt32Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-1953789044), Result);
+  Status = SafeInt32Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-1953789044), Result);
 
   //
   // Otherwise should result in an error status
   //
   Augend = 0x5a5a5a5a;
   Addend = 0x5a5a5a5a;
-  Status = SafeInt32Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeInt32Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Augend = (-1515870810);
   Addend = (-1515870810);
-  Status = SafeInt32Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeInt32Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2261,28 +2260,28 @@ TestSafeInt64Add (
   Augend = 0x3a3a3a3a3a3a3a3a;
   Addend = 0x3a3a3a3a3a3a3a3a;
   Result = 0;
-  Status = SafeInt64Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x7474747474747474, Result);
+  Status = SafeInt64Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x7474747474747474, Result);
 
   Augend = (-4195730024608447034);
   Addend = (-4195730024608447034);
-  Status = SafeInt64Add(Augend, Addend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-8391460049216894068), Result);
+  Status = SafeInt64Add (Augend, Addend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-8391460049216894068), Result);
 
   //
   // Otherwise should result in an error status
   //
   Augend = 0x5a5a5a5a5a5a5a5a;
   Addend = 0x5a5a5a5a5a5a5a5a;
-  Status = SafeInt64Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeInt64Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   Augend = (-6510615555426900570);
   Addend = (-6510615555426900570);
-  Status = SafeInt64Add(Augend, Addend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status = SafeInt64Add (Augend, Addend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2304,20 +2303,20 @@ TestSafeUint8Sub (
   //
   // If Minuend >= Subtrahend, then it's subtraction
   //
-  Minuend = 0x5a;
+  Minuend    = 0x5a;
   Subtrahend = 0x3b;
-  Result = 0;
-  Status = SafeUint8Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x1f, Result);
+  Result     = 0;
+  Status     = SafeUint8Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x1f, Result);
 
   //
   // Otherwise should result in an error status
   //
-  Minuend = 0x5a;
+  Minuend    = 0x5a;
   Subtrahend = 0x6d;
-  Status = SafeUint8Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeUint8Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2336,20 +2335,20 @@ TestSafeUint16Sub (
   //
   // If Minuend >= Subtrahend, then it's subtraction
   //
-  Minuend = 0x5a5a;
+  Minuend    = 0x5a5a;
   Subtrahend = 0x3b3b;
-  Result = 0;
-  Status = SafeUint16Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x1f1f, Result);
+  Result     = 0;
+  Status     = SafeUint16Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x1f1f, Result);
 
   //
   // Otherwise should result in an error status
   //
-  Minuend = 0x5a5a;
+  Minuend    = 0x5a5a;
   Subtrahend = 0x6d6d;
-  Status = SafeUint16Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeUint16Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2368,20 +2367,20 @@ TestSafeUint32Sub (
   //
   // If Minuend >= Subtrahend, then it's subtraction
   //
-  Minuend = 0x5a5a5a5a;
+  Minuend    = 0x5a5a5a5a;
   Subtrahend = 0x3b3b3b3b;
-  Result = 0;
-  Status = SafeUint32Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x1f1f1f1f, Result);
+  Result     = 0;
+  Status     = SafeUint32Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x1f1f1f1f, Result);
 
   //
   // Otherwise should result in an error status
   //
-  Minuend = 0x5a5a5a5a;
+  Minuend    = 0x5a5a5a5a;
   Subtrahend = 0x6d6d6d6d;
-  Status = SafeUint32Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeUint32Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2400,20 +2399,20 @@ TestSafeUint64Sub (
   //
   // If Minuend >= Subtrahend, then it's subtraction
   //
-  Minuend = 0x5a5a5a5a5a5a5a5a;
+  Minuend    = 0x5a5a5a5a5a5a5a5a;
   Subtrahend = 0x3b3b3b3b3b3b3b3b;
-  Result = 0;
-  Status = SafeUint64Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x1f1f1f1f1f1f1f1f, Result);
+  Result     = 0;
+  Status     = SafeUint64Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x1f1f1f1f1f1f1f1f, Result);
 
   //
   // Otherwise should result in an error status
   //
-  Minuend = 0x5a5a5a5a5a5a5a5a;
+  Minuend    = 0x5a5a5a5a5a5a5a5a;
   Subtrahend = 0x6d6d6d6d6d6d6d6d;
-  Status = SafeUint64Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeUint64Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2433,31 +2432,31 @@ TestSafeInt8Sub (
   // If the result of subtractions doesn't overflow MAX_INT8 or
   // underflow MIN_INT8, then it's subtraction
   //
-  Minuend = 0x5a;
+  Minuend    = 0x5a;
   Subtrahend = 0x3a;
-  Result = 0;
-  Status = SafeInt8Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x20, Result);
+  Result     = 0;
+  Status     = SafeInt8Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x20, Result);
 
-  Minuend = 58;
+  Minuend    = 58;
   Subtrahend = 78;
-  Status = SafeInt8Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-20), Result);
+  Status     = SafeInt8Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-20), Result);
 
   //
   // Otherwise should result in an error status
   //
-  Minuend = (-80);
+  Minuend    = (-80);
   Subtrahend = 80;
-  Status = SafeInt8Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeInt8Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
-  Minuend = (80);
+  Minuend    = (80);
   Subtrahend = (-80);
-  Status = SafeInt8Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeInt8Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2477,31 +2476,31 @@ TestSafeInt16Sub (
   // If the result of subtractions doesn't overflow MAX_INT16 or
   // underflow MIN_INT16, then it's subtraction
   //
-  Minuend = 0x5a5a;
+  Minuend    = 0x5a5a;
   Subtrahend = 0x3a3a;
-  Result = 0;
-  Status = SafeInt16Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x2020, Result);
+  Result     = 0;
+  Status     = SafeInt16Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x2020, Result);
 
-  Minuend = 0x3a3a;
+  Minuend    = 0x3a3a;
   Subtrahend = 0x5a5a;
-  Status = SafeInt16Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-8224), Result);
+  Status     = SafeInt16Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-8224), Result);
 
   //
   // Otherwise should result in an error status
   //
-  Minuend = (-31354);
+  Minuend    = (-31354);
   Subtrahend = 31354;
-  Status = SafeInt16Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeInt16Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
-  Minuend = (31354);
+  Minuend    = (31354);
   Subtrahend = (-31354);
-  Status = SafeInt16Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeInt16Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2521,31 +2520,31 @@ TestSafeInt32Sub (
   // If the result of subtractions doesn't overflow MAX_INT32 or
   // underflow MIN_INT32, then it's subtraction
   //
-  Minuend = 0x5a5a5a5a;
+  Minuend    = 0x5a5a5a5a;
   Subtrahend = 0x3a3a3a3a;
-  Result = 0;
-  Status = SafeInt32Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x20202020, Result);
+  Result     = 0;
+  Status     = SafeInt32Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x20202020, Result);
 
-  Minuend = 0x3a3a3a3a;
+  Minuend    = 0x3a3a3a3a;
   Subtrahend = 0x5a5a5a5a;
-  Status = SafeInt32Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-538976288), Result);
+  Status     = SafeInt32Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-538976288), Result);
 
   //
   // Otherwise should result in an error status
   //
-  Minuend = (-2054847098);
+  Minuend    = (-2054847098);
   Subtrahend = 2054847098;
-  Status = SafeInt32Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeInt32Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
-  Minuend = (2054847098);
+  Minuend    = (2054847098);
   Subtrahend = (-2054847098);
-  Status = SafeInt32Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeInt32Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2565,31 +2564,31 @@ TestSafeInt64Sub (
   // If the result of subtractions doesn't overflow MAX_INT64 or
   // underflow MIN_INT64, then it's subtraction
   //
-  Minuend = 0x5a5a5a5a5a5a5a5a;
+  Minuend    = 0x5a5a5a5a5a5a5a5a;
   Subtrahend = 0x3a3a3a3a3a3a3a3a;
-  Result = 0;
-  Status = SafeInt64Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x2020202020202020, Result);
+  Result     = 0;
+  Status     = SafeInt64Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x2020202020202020, Result);
 
-  Minuend = 0x3a3a3a3a3a3a3a3a;
+  Minuend    = 0x3a3a3a3a3a3a3a3a;
   Subtrahend = 0x5a5a5a5a5a5a5a5a;
-  Status = SafeInt64Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL((-2314885530818453536), Result);
+  Status     = SafeInt64Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL ((-2314885530818453536), Result);
 
   //
   // Otherwise should result in an error status
   //
-  Minuend = (-8825501086245354106);
+  Minuend    = (-8825501086245354106);
   Subtrahend = 8825501086245354106;
-  Status = SafeInt64Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeInt64Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
-  Minuend = (8825501086245354106);
+  Minuend    = (8825501086245354106);
   Subtrahend = (-8825501086245354106);
-  Status = SafeInt64Sub(Minuend, Subtrahend, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Status     = SafeInt64Sub (Minuend, Subtrahend, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2612,19 +2611,19 @@ TestSafeUint8Mult (
   // If the result of multiplication doesn't overflow MAX_UINT8, it will succeed
   //
   Multiplicand = 0x12;
-  Multiplier = 0xa;
+  Multiplier   = 0xa;
   Result = 0;
-  Status = SafeUint8Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xb4, Result);
+  Status = SafeUint8Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xb4, Result);
 
   //
   // Otherwise should result in an error status
   //
   Multiplicand = 0x12;
-  Multiplier = 0x23;
-  Status = SafeUint8Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Multiplier   = 0x23;
+  Status = SafeUint8Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2644,19 +2643,19 @@ TestSafeUint16Mult (
   // If the result of multiplication doesn't overflow MAX_UINT16, it will succeed
   //
   Multiplicand = 0x212;
-  Multiplier = 0x7a;
+  Multiplier   = 0x7a;
   Result = 0;
-  Status = SafeUint16Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0xfc94, Result);
+  Status = SafeUint16Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0xfc94, Result);
 
   //
   // Otherwise should result in an error status
   //
   Multiplicand = 0x1234;
-  Multiplier = 0x213;
-  Status = SafeUint16Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Multiplier   = 0x213;
+  Status = SafeUint16Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2676,19 +2675,19 @@ TestSafeUint32Mult (
   // If the result of multiplication doesn't overflow MAX_UINT32, it will succeed
   //
   Multiplicand = 0xa122a;
-  Multiplier = 0xd23;
+  Multiplier   = 0xd23;
   Result = 0;
-  Status = SafeUint32Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x844c9dbe, Result);
+  Status = SafeUint32Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x844c9dbe, Result);
 
   //
   // Otherwise should result in an error status
   //
   Multiplicand = 0xa122a;
-  Multiplier = 0xed23;
-  Status = SafeUint32Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Multiplier   = 0xed23;
+  Status = SafeUint32Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2708,19 +2707,19 @@ TestSafeUint64Mult (
   // If the result of multiplication doesn't overflow MAX_UINT64, it will succeed
   //
   Multiplicand = 0x123456789a;
-  Multiplier = 0x1234567;
+  Multiplier   = 0x1234567;
   Result = 0;
-  Status = SafeUint64Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x14b66db9745a07f6, Result);
+  Status = SafeUint64Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x14b66db9745a07f6, Result);
 
   //
   // Otherwise should result in an error status
   //
   Multiplicand = 0x123456789a;
-  Multiplier = 0x12345678;
-  Status = SafeUint64Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Multiplier   = 0x12345678;
+  Status = SafeUint64Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2741,19 +2740,19 @@ TestSafeInt8Mult (
   // underflow MIN_UINT8, it will succeed
   //
   Multiplicand = 0x12;
-  Multiplier = 0x7;
+  Multiplier   = 0x7;
   Result = 0;
-  Status = SafeInt8Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x7e, Result);
+  Status = SafeInt8Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x7e, Result);
 
   //
   // Otherwise should result in an error status
   //
   Multiplicand = 0x12;
-  Multiplier = 0xa;
-  Status = SafeInt8Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Multiplier   = 0xa;
+  Status = SafeInt8Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2774,19 +2773,19 @@ TestSafeInt16Mult (
   // underflow MIN_UINT16, it will succeed
   //
   Multiplicand = 0x123;
-  Multiplier = 0x67;
+  Multiplier   = 0x67;
   Result = 0;
-  Status = SafeInt16Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x7515, Result);
+  Status = SafeInt16Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x7515, Result);
 
   //
   // Otherwise should result in an error status
   //
   Multiplicand = 0x123;
-  Multiplier = 0xab;
-  Status = SafeInt16Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Multiplier   = 0xab;
+  Status = SafeInt16Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2807,19 +2806,19 @@ TestSafeInt32Mult (
   // underflow MIN_UINT32, it will succeed
   //
   Multiplicand = 0x123456;
-  Multiplier = 0x678;
+  Multiplier   = 0x678;
   Result = 0;
-  Status = SafeInt32Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x75c28c50, Result);
+  Status = SafeInt32Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x75c28c50, Result);
 
   //
   // Otherwise should result in an error status
   //
   Multiplicand = 0x123456;
-  Multiplier = 0xabc;
-  Status = SafeInt32Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Multiplier   = 0xabc;
+  Status = SafeInt32Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2840,19 +2839,19 @@ TestSafeInt64Mult (
   // underflow MIN_UINT64, it will succeed
   //
   Multiplicand = 0x123456789;
-  Multiplier = 0x6789abcd;
+  Multiplier   = 0x6789abcd;
   Result = 0;
-  Status = SafeInt64Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_NOT_EFI_ERROR(Status);
-  UT_ASSERT_EQUAL(0x75cd9045220d6bb5, Result);
+  Status = SafeInt64Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+  UT_ASSERT_EQUAL (0x75cd9045220d6bb5, Result);
 
   //
   // Otherwise should result in an error status
   //
   Multiplicand = 0x123456789;
-  Multiplier = 0xa789abcd;
-  Status = SafeInt64Mult(Multiplicand, Multiplier, &Result);
-  UT_ASSERT_EQUAL(RETURN_BUFFER_TOO_SMALL, Status);
+  Multiplier   = 0xa789abcd;
+  Status = SafeInt64Mult (Multiplicand, Multiplier, &Result);
+  UT_ASSERT_EQUAL (RETURN_BUFFER_TOO_SMALL, Status);
 
   return UNIT_TEST_PASSED;
 }
@@ -2879,14 +2878,14 @@ UefiTestMain (
   AdditionSubtractionTestSuite = NULL;
   MultiplicationTestSuite = NULL;
 
-  DEBUG((DEBUG_INFO, "%a v%a\n", UNIT_TEST_NAME, UNIT_TEST_VERSION));
+  DEBUG ((DEBUG_INFO, "%a v%a\n", UNIT_TEST_NAME, UNIT_TEST_VERSION));
 
   //
   // Start setting up the test framework for running the tests.
   //
   Status = InitUnitTestFramework (&Framework, UNIT_TEST_NAME, gEfiCallerBaseName, UNIT_TEST_VERSION);
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_ERROR, "Failed in InitUnitTestFramework. Status = %r\n", Status));
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed in InitUnitTestFramework. Status = %r\n", Status));
     goto EXIT;
   }
 
@@ -2894,141 +2893,144 @@ UefiTestMain (
   // Test the conversion functions
   //
   Status = CreateUnitTestSuite (&ConversionTestSuite, Framework, "Int Safe Conversions Test Suite", "Common.SafeInt.Convert", NULL, NULL);
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_ERROR, "Failed in CreateUnitTestSuite for Conversions Test Suite\n"));
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestSuite for Conversions Test Suite\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
-  AddTestCase(ConversionTestSuite, "Test SafeInt8ToUint8",    "TestSafeInt8ToUint8",    TestSafeInt8ToUint8,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt8ToUint16",   "TestSafeInt8ToUint16",   TestSafeInt8ToUint16,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt8ToUint32",   "TestSafeInt8ToUint32",   TestSafeInt8ToUint32,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt8ToUintn",    "TestSafeInt8ToUintn",    TestSafeInt8ToUintn,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt8ToUint64",   "TestSafeInt8ToUint64",   TestSafeInt8ToUint64,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint8ToInt8",    "TestSafeUint8ToInt8",    TestSafeUint8ToInt8,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint8ToChar8",   "TestSafeUint8ToChar8",   TestSafeUint8ToChar8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt16ToInt8",    "TestSafeInt16ToInt8",    TestSafeInt16ToInt8,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt16ToChar8",   "TestSafeInt16ToChar8",   TestSafeInt16ToChar8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt16ToUint8",   "TestSafeInt16ToUint8",   TestSafeInt16ToUint8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt16ToUint16",  "TestSafeInt16ToUint16",  TestSafeInt16ToUint16,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt16ToUint32",  "TestSafeInt16ToUint32",  TestSafeInt16ToUint32,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt16ToUintn",   "TestSafeInt16ToUintn",   TestSafeInt16ToUintn,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt16ToUint64",  "TestSafeInt16ToUint64",  TestSafeInt16ToUint64,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint16ToInt8",   "TestSafeUint16ToInt8",   TestSafeUint16ToInt8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint16ToChar8",  "TestSafeUint16ToChar8",  TestSafeUint16ToChar8,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint16ToUint8",  "TestSafeUint16ToUint8",  TestSafeUint16ToUint8,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint16ToInt16",  "TestSafeUint16ToInt16",  TestSafeUint16ToInt16,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt32ToInt8",    "TestSafeInt32ToInt8",    TestSafeInt32ToInt8,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt32ToChar8",   "TestSafeInt32ToChar8",   TestSafeInt32ToChar8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt32ToUint8",   "TestSafeInt32ToUint8",   TestSafeInt32ToUint8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt32ToInt16",   "TestSafeInt32ToInt16",   TestSafeInt32ToInt16,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt32ToUint16",  "TestSafeInt32ToUint16",  TestSafeInt32ToUint16,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt32ToUint32",  "TestSafeInt32ToUint32",  TestSafeInt32ToUint32,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt32ToUintn",   "TestSafeInt32ToUintn",   TestSafeInt32ToUintn,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt32ToUint64",  "TestSafeInt32ToUint64",  TestSafeInt32ToUint64,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint32ToInt8",   "TestSafeUint32ToInt8",   TestSafeUint32ToInt8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint32ToChar8",  "TestSafeUint32ToChar8",  TestSafeUint32ToChar8,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint32ToUint8",  "TestSafeUint32ToUint8",  TestSafeUint32ToUint8,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint32ToInt16",  "TestSafeUint32ToInt16",  TestSafeUint32ToInt16,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint32ToUint16", "TestSafeUint32ToUint16", TestSafeUint32ToUint16, NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint32ToInt32",  "TestSafeUint32ToInt32",  TestSafeUint32ToInt32,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint32ToIntn",   "TestSafeUint32ToIntn",   TestSafeUint32ToIntn,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeIntnToInt8",     "TestSafeIntnToInt8",     TestSafeIntnToInt8,     NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeIntnToChar8",    "TestSafeIntnToChar8",    TestSafeIntnToChar8,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeIntnToUint8",    "TestSafeIntnToUint8",    TestSafeIntnToUint8,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeIntnToInt16",    "TestSafeIntnToInt16",    TestSafeIntnToInt16,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeIntnToUint16",   "TestSafeIntnToUint16",   TestSafeIntnToUint16,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeIntnToInt32",    "TestSafeIntnToInt32",    TestSafeIntnToInt32,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeIntnToUint32",   "TestSafeIntnToUint32",   TestSafeIntnToUint32,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeIntnToUintn",    "TestSafeIntnToUintn",    TestSafeIntnToUintn,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeIntnToUint64",   "TestSafeIntnToUint64",   TestSafeIntnToUint64,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUintnToInt8",    "TestSafeUintnToInt8",    TestSafeUintnToInt8,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUintnToChar8",   "TestSafeUintnToChar8",   TestSafeUintnToChar8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUintnToUint8",   "TestSafeUintnToUint8",   TestSafeUintnToUint8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUintnToInt16",   "TestSafeUintnToInt16",   TestSafeUintnToInt16,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUintnToUint16",  "TestSafeUintnToUint16",  TestSafeUintnToUint16,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUintnToInt32",   "TestSafeUintnToInt32",   TestSafeUintnToInt32,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUintnToUint32",  "TestSafeUintnToUint32",  TestSafeUintnToUint32,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUintnToIntn",    "TestSafeUintnToIntn",    TestSafeUintnToIntn,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUintnToInt64",   "TestSafeUintnToInt64",   TestSafeUintnToInt64,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt64ToInt8",    "TestSafeInt64ToInt8",    TestSafeInt64ToInt8,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt64ToChar8",   "TestSafeInt64ToChar8",   TestSafeInt64ToChar8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt64ToUint8",   "TestSafeInt64ToUint8",   TestSafeInt64ToUint8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt64ToInt16",   "TestSafeInt64ToInt16",   TestSafeInt64ToInt16,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt64ToUint16",  "TestSafeInt64ToUint16",  TestSafeInt64ToUint16,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt64ToInt32",   "TestSafeInt64ToInt32",   TestSafeInt64ToInt32,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt64ToUint32",  "TestSafeInt64ToUint32",  TestSafeInt64ToUint32,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt64ToIntn",    "TestSafeInt64ToIntn",    TestSafeInt64ToIntn,    NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt64ToUintn",   "TestSafeInt64ToUintn",   TestSafeInt64ToUintn,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeInt64ToUint64",  "TestSafeInt64ToUint64",  TestSafeInt64ToUint64,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint64ToInt8",   "TestSafeUint64ToInt8",   TestSafeUint64ToInt8,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint64ToChar8",  "TestSafeUint64ToChar8",  TestSafeUint64ToChar8,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint64ToUint8",  "TestSafeUint64ToUint8",  TestSafeUint64ToUint8,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint64ToInt16",  "TestSafeUint64ToInt16",  TestSafeUint64ToInt16,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint64ToUint16", "TestSafeUint64ToUint16", TestSafeUint64ToUint16, NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint64ToInt32",  "TestSafeUint64ToInt32",  TestSafeUint64ToInt32,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint64ToUint32", "TestSafeUint64ToUint32", TestSafeUint64ToUint32, NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint64ToIntn",   "TestSafeUint64ToIntn",   TestSafeUint64ToIntn,   NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint64ToUintn",  "TestSafeUint64ToUintn",  TestSafeUint64ToUintn,  NULL, NULL, NULL);
-  AddTestCase(ConversionTestSuite, "Test SafeUint64ToInt64",  "TestSafeUint64ToInt64",  TestSafeUint64ToInt64,  NULL, NULL, NULL);
+
+  AddTestCase (ConversionTestSuite, "Test SafeInt8ToUint8", "TestSafeInt8ToUint8", TestSafeInt8ToUint8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt8ToUint16", "TestSafeInt8ToUint16", TestSafeInt8ToUint16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt8ToUint32", "TestSafeInt8ToUint32", TestSafeInt8ToUint32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt8ToUintn", "TestSafeInt8ToUintn", TestSafeInt8ToUintn, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt8ToUint64", "TestSafeInt8ToUint64", TestSafeInt8ToUint64, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint8ToInt8", "TestSafeUint8ToInt8", TestSafeUint8ToInt8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint8ToChar8", "TestSafeUint8ToChar8", TestSafeUint8ToChar8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt16ToInt8", "TestSafeInt16ToInt8", TestSafeInt16ToInt8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt16ToChar8", "TestSafeInt16ToChar8", TestSafeInt16ToChar8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt16ToUint8", "TestSafeInt16ToUint8", TestSafeInt16ToUint8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt16ToUint16", "TestSafeInt16ToUint16", TestSafeInt16ToUint16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt16ToUint32", "TestSafeInt16ToUint32", TestSafeInt16ToUint32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt16ToUintn", "TestSafeInt16ToUintn", TestSafeInt16ToUintn, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt16ToUint64", "TestSafeInt16ToUint64", TestSafeInt16ToUint64, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint16ToInt8", "TestSafeUint16ToInt8", TestSafeUint16ToInt8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint16ToChar8", "TestSafeUint16ToChar8", TestSafeUint16ToChar8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint16ToUint8", "TestSafeUint16ToUint8", TestSafeUint16ToUint8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint16ToInt16", "TestSafeUint16ToInt16", TestSafeUint16ToInt16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt32ToInt8", "TestSafeInt32ToInt8", TestSafeInt32ToInt8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt32ToChar8", "TestSafeInt32ToChar8", TestSafeInt32ToChar8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt32ToUint8", "TestSafeInt32ToUint8", TestSafeInt32ToUint8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt32ToInt16", "TestSafeInt32ToInt16", TestSafeInt32ToInt16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt32ToUint16", "TestSafeInt32ToUint16", TestSafeInt32ToUint16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt32ToUint32", "TestSafeInt32ToUint32", TestSafeInt32ToUint32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt32ToUintn", "TestSafeInt32ToUintn", TestSafeInt32ToUintn, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt32ToUint64", "TestSafeInt32ToUint64", TestSafeInt32ToUint64, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint32ToInt8", "TestSafeUint32ToInt8", TestSafeUint32ToInt8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint32ToChar8", "TestSafeUint32ToChar8", TestSafeUint32ToChar8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint32ToUint8", "TestSafeUint32ToUint8", TestSafeUint32ToUint8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint32ToInt16", "TestSafeUint32ToInt16", TestSafeUint32ToInt16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint32ToUint16", "TestSafeUint32ToUint16", TestSafeUint32ToUint16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint32ToInt32", "TestSafeUint32ToInt32", TestSafeUint32ToInt32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint32ToIntn", "TestSafeUint32ToIntn", TestSafeUint32ToIntn, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeIntnToInt8", "TestSafeIntnToInt8", TestSafeIntnToInt8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeIntnToChar8", "TestSafeIntnToChar8", TestSafeIntnToChar8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeIntnToUint8", "TestSafeIntnToUint8", TestSafeIntnToUint8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeIntnToInt16", "TestSafeIntnToInt16", TestSafeIntnToInt16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeIntnToUint16", "TestSafeIntnToUint16", TestSafeIntnToUint16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeIntnToInt32", "TestSafeIntnToInt32", TestSafeIntnToInt32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeIntnToUint32", "TestSafeIntnToUint32", TestSafeIntnToUint32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeIntnToUintn", "TestSafeIntnToUintn", TestSafeIntnToUintn, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeIntnToUint64", "TestSafeIntnToUint64", TestSafeIntnToUint64, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUintnToInt8", "TestSafeUintnToInt8", TestSafeUintnToInt8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUintnToChar8", "TestSafeUintnToChar8", TestSafeUintnToChar8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUintnToUint8", "TestSafeUintnToUint8", TestSafeUintnToUint8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUintnToInt16", "TestSafeUintnToInt16", TestSafeUintnToInt16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUintnToUint16", "TestSafeUintnToUint16", TestSafeUintnToUint16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUintnToInt32", "TestSafeUintnToInt32", TestSafeUintnToInt32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUintnToUint32", "TestSafeUintnToUint32", TestSafeUintnToUint32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUintnToIntn", "TestSafeUintnToIntn", TestSafeUintnToIntn, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUintnToInt64", "TestSafeUintnToInt64", TestSafeUintnToInt64, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt64ToInt8", "TestSafeInt64ToInt8", TestSafeInt64ToInt8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt64ToChar8", "TestSafeInt64ToChar8", TestSafeInt64ToChar8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt64ToUint8", "TestSafeInt64ToUint8", TestSafeInt64ToUint8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt64ToInt16", "TestSafeInt64ToInt16", TestSafeInt64ToInt16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt64ToUint16", "TestSafeInt64ToUint16", TestSafeInt64ToUint16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt64ToInt32", "TestSafeInt64ToInt32", TestSafeInt64ToInt32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt64ToUint32", "TestSafeInt64ToUint32", TestSafeInt64ToUint32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt64ToIntn", "TestSafeInt64ToIntn", TestSafeInt64ToIntn, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt64ToUintn", "TestSafeInt64ToUintn", TestSafeInt64ToUintn, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeInt64ToUint64", "TestSafeInt64ToUint64", TestSafeInt64ToUint64, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint64ToInt8", "TestSafeUint64ToInt8", TestSafeUint64ToInt8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint64ToChar8", "TestSafeUint64ToChar8", TestSafeUint64ToChar8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint64ToUint8", "TestSafeUint64ToUint8", TestSafeUint64ToUint8, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint64ToInt16", "TestSafeUint64ToInt16", TestSafeUint64ToInt16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint64ToUint16", "TestSafeUint64ToUint16", TestSafeUint64ToUint16, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint64ToInt32", "TestSafeUint64ToInt32", TestSafeUint64ToInt32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint64ToUint32", "TestSafeUint64ToUint32", TestSafeUint64ToUint32, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint64ToIntn", "TestSafeUint64ToIntn", TestSafeUint64ToIntn, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint64ToUintn", "TestSafeUint64ToUintn", TestSafeUint64ToUintn, NULL, NULL, NULL);
+  AddTestCase (ConversionTestSuite, "Test SafeUint64ToInt64", "TestSafeUint64ToInt64", TestSafeUint64ToInt64, NULL, NULL, NULL);
 
   //
   // Test the addition and subtraction functions
   //
-  Status = CreateUnitTestSuite(&AdditionSubtractionTestSuite, Framework, "Int Safe Add/Subtract Test Suite", "Common.SafeInt.AddSubtract", NULL, NULL);
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_ERROR, "Failed in CreateUnitTestSuite for Int Safe Add/Subtract Test Suite\n"));
+  Status = CreateUnitTestSuite (&AdditionSubtractionTestSuite, Framework, "Int Safe Add/Subtract Test Suite", "Common.SafeInt.AddSubtract", NULL, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestSuite for Int Safe Add/Subtract Test Suite\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeUint8Add",  "TestSafeUint8Add",  TestSafeUint8Add,  NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeUint16Add", "TestSafeUint16Add", TestSafeUint16Add, NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeUint32Add", "TestSafeUint32Add", TestSafeUint32Add, NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeUintnAdd",  "TestSafeUintnAdd",  TestSafeUintnAdd,  NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeUint64Add", "TestSafeUint64Add", TestSafeUint64Add, NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeInt8Add",   "TestSafeInt8Add",   TestSafeInt8Add,   NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeInt16Add",  "TestSafeInt16Add",  TestSafeInt16Add,  NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeInt32Add",  "TestSafeInt32Add",  TestSafeInt32Add,  NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeIntnAdd",   "TestSafeIntnAdd",   TestSafeIntnAdd,   NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeInt64Add",  "TestSafeInt64Add",  TestSafeInt64Add,  NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeUint8Sub",  "TestSafeUint8Sub",  TestSafeUint8Sub,  NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeUint16Sub", "TestSafeUint16Sub", TestSafeUint16Sub, NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeUint32Sub", "TestSafeUint32Sub", TestSafeUint32Sub, NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeUintnSub",  "TestSafeUintnSub",  TestSafeUintnSub,  NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeUint64Sub", "TestSafeUint64Sub", TestSafeUint64Sub, NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeInt8Sub",   "TestSafeInt8Sub",   TestSafeInt8Sub,   NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeInt16Sub",  "TestSafeInt16Sub",  TestSafeInt16Sub,  NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeInt32Sub",  "TestSafeInt32Sub",  TestSafeInt32Sub,  NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeIntnSub",   "TestSafeIntnSub",   TestSafeIntnSub,   NULL, NULL, NULL);
-  AddTestCase(AdditionSubtractionTestSuite, "Test SafeInt64Sub",  "TestSafeInt64Sub",  TestSafeInt64Sub,  NULL, NULL, NULL);
+
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeUint8Add", "TestSafeUint8Add", TestSafeUint8Add, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeUint16Add", "TestSafeUint16Add", TestSafeUint16Add, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeUint32Add", "TestSafeUint32Add", TestSafeUint32Add, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeUintnAdd", "TestSafeUintnAdd", TestSafeUintnAdd, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeUint64Add", "TestSafeUint64Add", TestSafeUint64Add, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeInt8Add", "TestSafeInt8Add", TestSafeInt8Add, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeInt16Add", "TestSafeInt16Add", TestSafeInt16Add, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeInt32Add", "TestSafeInt32Add", TestSafeInt32Add, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeIntnAdd", "TestSafeIntnAdd", TestSafeIntnAdd, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeInt64Add", "TestSafeInt64Add", TestSafeInt64Add, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeUint8Sub", "TestSafeUint8Sub", TestSafeUint8Sub, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeUint16Sub", "TestSafeUint16Sub", TestSafeUint16Sub, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeUint32Sub", "TestSafeUint32Sub", TestSafeUint32Sub, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeUintnSub", "TestSafeUintnSub", TestSafeUintnSub, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeUint64Sub", "TestSafeUint64Sub", TestSafeUint64Sub, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeInt8Sub", "TestSafeInt8Sub", TestSafeInt8Sub, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeInt16Sub", "TestSafeInt16Sub", TestSafeInt16Sub, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeInt32Sub", "TestSafeInt32Sub", TestSafeInt32Sub, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeIntnSub", "TestSafeIntnSub", TestSafeIntnSub, NULL, NULL, NULL);
+  AddTestCase (AdditionSubtractionTestSuite, "Test SafeInt64Sub", "TestSafeInt64Sub", TestSafeInt64Sub, NULL, NULL, NULL);
 
   //
   // Test the multiplication functions
   //
-  Status = CreateUnitTestSuite(&MultiplicationTestSuite, Framework, "Int Safe Multiply Test Suite", "Common.SafeInt.Multiply", NULL, NULL);
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_ERROR, "Failed in CreateUnitTestSuite for Int Safe Multiply Test Suite\n"));
+  Status = CreateUnitTestSuite (&MultiplicationTestSuite, Framework, "Int Safe Multiply Test Suite", "Common.SafeInt.Multiply", NULL, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestSuite for Int Safe Multiply Test Suite\n"));
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
-  AddTestCase(MultiplicationTestSuite, "Test SafeUint8Mult",  "TestSafeUint8Mult",  TestSafeUint8Mult,  NULL, NULL, NULL);
-  AddTestCase(MultiplicationTestSuite, "Test SafeUint16Mult", "TestSafeUint16Mult", TestSafeUint16Mult, NULL, NULL, NULL);
-  AddTestCase(MultiplicationTestSuite, "Test SafeUint32Mult", "TestSafeUint32Mult", TestSafeUint32Mult, NULL, NULL, NULL);
-  AddTestCase(MultiplicationTestSuite, "Test SafeUintnMult",  "TestSafeUintnMult",  TestSafeUintnMult,  NULL, NULL, NULL);
-  AddTestCase(MultiplicationTestSuite, "Test SafeUint64Mult", "TestSafeUint64Mult", TestSafeUint64Mult, NULL, NULL, NULL);
-  AddTestCase(MultiplicationTestSuite, "Test SafeInt8Mult",   "TestSafeInt8Mult",   TestSafeInt8Mult,   NULL, NULL, NULL);
-  AddTestCase(MultiplicationTestSuite, "Test SafeInt16Mult",  "TestSafeInt16Mult",  TestSafeInt16Mult,  NULL, NULL, NULL);
-  AddTestCase(MultiplicationTestSuite, "Test SafeInt32Mult",  "TestSafeInt32Mult",  TestSafeInt32Mult,  NULL, NULL, NULL);
-  AddTestCase(MultiplicationTestSuite, "Test SafeIntnMult",   "TestSafeIntnMult",   TestSafeIntnMult,   NULL, NULL, NULL);
-  AddTestCase(MultiplicationTestSuite, "Test SafeInt64Mult",  "TestSafeInt64Mult",  TestSafeInt64Mult,  NULL, NULL, NULL);
+
+  AddTestCase (MultiplicationTestSuite, "Test SafeUint8Mult", "TestSafeUint8Mult", TestSafeUint8Mult, NULL, NULL, NULL);
+  AddTestCase (MultiplicationTestSuite, "Test SafeUint16Mult", "TestSafeUint16Mult", TestSafeUint16Mult, NULL, NULL, NULL);
+  AddTestCase (MultiplicationTestSuite, "Test SafeUint32Mult", "TestSafeUint32Mult", TestSafeUint32Mult, NULL, NULL, NULL);
+  AddTestCase (MultiplicationTestSuite, "Test SafeUintnMult", "TestSafeUintnMult", TestSafeUintnMult, NULL, NULL, NULL);
+  AddTestCase (MultiplicationTestSuite, "Test SafeUint64Mult", "TestSafeUint64Mult", TestSafeUint64Mult, NULL, NULL, NULL);
+  AddTestCase (MultiplicationTestSuite, "Test SafeInt8Mult", "TestSafeInt8Mult", TestSafeInt8Mult, NULL, NULL, NULL);
+  AddTestCase (MultiplicationTestSuite, "Test SafeInt16Mult", "TestSafeInt16Mult", TestSafeInt16Mult, NULL, NULL, NULL);
+  AddTestCase (MultiplicationTestSuite, "Test SafeInt32Mult", "TestSafeInt32Mult", TestSafeInt32Mult, NULL, NULL, NULL);
+  AddTestCase (MultiplicationTestSuite, "Test SafeIntnMult", "TestSafeIntnMult", TestSafeIntnMult, NULL, NULL, NULL);
+  AddTestCase (MultiplicationTestSuite, "Test SafeInt64Mult", "TestSafeInt64Mult", TestSafeInt64Mult, NULL, NULL, NULL);
 
   //
   // Execute the tests.
   //
-  Status = RunAllTestSuites(Framework);
+  Status = RunAllTestSuites (Framework);
 
 EXIT:
   if (Framework != NULL) {
-    FreeUnitTestFramework(Framework);
+    FreeUnitTestFramework (Framework);
   }
 
   return Status;

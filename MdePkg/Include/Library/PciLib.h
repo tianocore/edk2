@@ -31,7 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @return The encoded PCI address.
 
 **/
-#define PCI_LIB_ADDRESS(Bus,Device,Function,Register)   \
+#define PCI_LIB_ADDRESS(Bus, Device, Function, Register)   \
   (((Register) & 0xfff) | (((Function) & 0x07) << 12) | (((Device) & 0x1f) << 15) | (((Bus) & 0xff) << 20))
 
 /**

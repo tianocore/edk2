@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Divides a 64-bit unsigned integer by a 32-bit unsigned integer and
   generates a 64-bit unsigned result.
@@ -41,4 +38,3 @@ InternalMathDivU64x32 (
     pop     edx                     ; restore high-order dword of the quotient
   }
 }
-

@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 #include "BaseLibInternals.h"
 
 /**
@@ -32,8 +29,8 @@ SwapBytes32 (
   UINT32  LowerBytes;
   UINT32  HigherBytes;
 
-  LowerBytes  = (UINT32) SwapBytes16 ((UINT16) Value);
-  HigherBytes = (UINT32) SwapBytes16 ((UINT16) (Value >> 16));
+  LowerBytes  = (UINT32)SwapBytes16 ((UINT16)Value);
+  HigherBytes = (UINT32)SwapBytes16 ((UINT16)(Value >> 16));
 
   return (LowerBytes << 16 | HigherBytes);
 }

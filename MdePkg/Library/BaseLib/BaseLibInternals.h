@@ -326,12 +326,11 @@ VOID
 EFIAPI
 InternalSwitchStack (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,   OPTIONAL
-  IN      VOID                      *Context2,   OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack,
   IN      VA_LIST                   Marker
   );
-
 
 /**
   Worker function that returns a bit field from Operand.
@@ -352,7 +351,6 @@ BitFieldReadUint (
   IN      UINTN                     StartBit,
   IN      UINTN                     EndBit
   );
-
 
 /**
   Worker function that reads a bit field from Operand, performs a bitwise OR,
@@ -379,7 +377,6 @@ BitFieldOrUint (
   IN      UINTN                     OrData
   );
 
-
 /**
   Worker function that reads a bit field from Operand, performs a bitwise AND,
   and returns the result.
@@ -405,7 +402,6 @@ BitFieldAndUint (
   IN      UINTN                     AndData
   );
 
-
 /**
   Worker function that checks ASSERT condition for JumpBuffer
 
@@ -422,7 +418,6 @@ EFIAPI
 InternalAssertJumpBuffer (
   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
   );
-
 
 /**
   Restores the CPU context that was saved with SetJump().
@@ -441,7 +436,6 @@ InternalLongJump (
   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
   IN      UINTN                     Value
   );
-
 
 /**
   Check if a Unicode character is a decimal character.
@@ -462,7 +456,6 @@ InternalIsDecimalDigitCharacter (
   IN      CHAR16                    Char
   );
 
-
 /**
   Convert a Unicode character to numerical value.
 
@@ -481,7 +474,6 @@ EFIAPI
 InternalHexCharToUintn (
   IN      CHAR16                    Char
   );
-
 
 /**
   Check if a Unicode character is a hexadecimal character.
@@ -503,7 +495,6 @@ InternalIsHexaDecimalDigitCharacter (
   IN      CHAR16                    Char
   );
 
-
 /**
   Check if a ASCII character is a decimal character.
 
@@ -522,7 +513,6 @@ EFIAPI
 InternalAsciiIsDecimalDigitCharacter (
   IN      CHAR8                     Char
   );
-
 
 /**
   Check if a ASCII character is a hexadecimal character.
@@ -544,7 +534,6 @@ InternalAsciiIsHexaDecimalDigitCharacter (
   IN      CHAR8                    Char
   );
 
-
 /**
   Convert a ASCII character to numerical value.
 
@@ -563,7 +552,6 @@ EFIAPI
 InternalAsciiHexCharToUintn (
   IN      CHAR8                    Char
   );
-
 
 //
 // Ia32 and x64 specific functions
@@ -699,8 +687,8 @@ VOID
 EFIAPI
 InternalX86EnablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack
   );
 
@@ -738,8 +726,8 @@ VOID
 EFIAPI
 InternalX86DisablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack
   );
 
@@ -775,8 +763,8 @@ EFIAPI
 InternalX86EnablePaging64 (
   IN      UINT16                    Cs,
   IN      UINT64                    EntryPoint,
-  IN      UINT64                    Context1,  OPTIONAL
-  IN      UINT64                    Context2,  OPTIONAL
+  IN      UINT64                    Context1, OPTIONAL
+  IN      UINT64                    Context2, OPTIONAL
   IN      UINT64                    NewStack
   );
 
@@ -811,8 +799,8 @@ EFIAPI
 InternalX86DisablePaging64 (
   IN      UINT16                    Cs,
   IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
+  IN      UINT32                    Context1, OPTIONAL
+  IN      UINT32                    Context2, OPTIONAL
   IN      UINT32                    NewStack
   );
 

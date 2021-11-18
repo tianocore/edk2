@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Writes the current value of 64-bit MMX Register #6 (MM6).
 
@@ -29,4 +26,3 @@ AsmWriteMm6 (
     emms
   }
 }
-

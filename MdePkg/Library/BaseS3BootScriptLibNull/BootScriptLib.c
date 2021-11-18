@@ -7,7 +7,6 @@
 
 **/
 
-
 #include <Base.h>
 #include <Library/S3BootScriptLib.h>
 
@@ -79,6 +78,7 @@ S3BootScriptSaveMemWrite (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Adds a record for a memory modify operation into a specified boot script table.
 
@@ -101,6 +101,7 @@ S3BootScriptSaveMemReadWrite (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Adds a record for a PCI configuration space write operation into a specified boot script table.
 
@@ -146,6 +147,7 @@ S3BootScriptSavePciCfgReadWrite (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Adds a record for a PCI configuration space modify operation into a specified boot script table.
 
@@ -170,6 +172,7 @@ S3BootScriptSavePciCfg2Write (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Adds a record for a PCI configuration space modify operation into a specified boot script table.
 
@@ -194,6 +197,7 @@ S3BootScriptSavePciCfg2ReadWrite (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Adds a record for an SMBus command execution into a specified boot script table.
 
@@ -217,6 +221,7 @@ S3BootScriptSaveSmbusExecute (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Adds a record for an execution stall on the processor into a specified boot script table.
 
@@ -233,6 +238,7 @@ S3BootScriptSaveStall (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Adds a record for dispatching specified arbitrary code into a specified boot script table.
 
@@ -249,6 +255,7 @@ S3BootScriptSaveDispatch (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Adds a record for dispatching specified arbitrary code into a specified boot script table.
 
@@ -323,6 +330,7 @@ S3BootScriptSaveInformation (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Adds a record for I/O reads the I/O location and continues when the exit criteria is satisfied or after a
   defined duration.
@@ -371,15 +379,16 @@ S3BootScriptSaveIoPoll (
 RETURN_STATUS
 EFIAPI
 S3BootScriptSavePciPoll (
-   IN S3_BOOT_SCRIPT_LIB_WIDTH   Width,
-   IN UINT64                     Address,
-   IN VOID                      *Data,
-   IN VOID                      *DataMask,
-   IN UINT64                     Delay
- )
+  IN S3_BOOT_SCRIPT_LIB_WIDTH   Width,
+  IN UINT64                     Address,
+  IN VOID                      *Data,
+  IN VOID                      *DataMask,
+  IN UINT64                     Delay
+  )
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Adds a record for PCI configuration space reads and continues when the exit criteria is satisfied or
   after a defined duration.
@@ -403,16 +412,17 @@ S3BootScriptSavePciPoll (
 RETURN_STATUS
 EFIAPI
 S3BootScriptSavePci2Poll (
-   IN S3_BOOT_SCRIPT_LIB_WIDTH      Width,
-   IN UINT16                        Segment,
-   IN UINT64                        Address,
-   IN VOID                         *Data,
-   IN VOID                         *DataMask,
-   IN UINT64                        Delay
+  IN S3_BOOT_SCRIPT_LIB_WIDTH      Width,
+  IN UINT16                        Segment,
+  IN UINT64                        Address,
+  IN VOID                         *Data,
+  IN VOID                         *DataMask,
+  IN UINT64                        Delay
   )
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Save ASCII string information specified by Buffer to
   boot script with opcode EFI_BOOT_SCRIPT_INFORMATION_OPCODE
@@ -431,6 +441,7 @@ S3BootScriptSaveInformationAsciiString (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   This is an function to close the S3 boot script table. The function could only be called in
   BOOT time phase. To comply with the Framework spec definition on
@@ -456,7 +467,7 @@ S3BootScriptSaveInformationAsciiString (
   @return the base address of the new copy of the boot script table.
 
 **/
-UINT8*
+UINT8 *
 EFIAPI
 S3BootScriptCloseTable (
   VOID
@@ -464,6 +475,7 @@ S3BootScriptCloseTable (
 {
   return 0;
 }
+
 /**
   Executes the S3 boot script table.
 
@@ -473,11 +485,12 @@ S3BootScriptCloseTable (
 RETURN_STATUS
 EFIAPI
 S3BootScriptExecute (
-   VOID
+  VOID
   )
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Move the last boot script entry to the position
 
@@ -498,10 +511,11 @@ EFIAPI
 S3BootScriptMoveLastOpcode (
   IN     BOOLEAN                        BeforeOrAfter,
   IN OUT VOID                         **Position OPTIONAL
-)
+  )
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Find a label within the boot script table and, if not present, optionally create it.
 
@@ -535,6 +549,7 @@ S3BootScriptLabel (
 {
   return RETURN_SUCCESS;
 }
+
 /**
   Compare two positions in the boot script table and return their relative position.
   @param  Position1             The positions in the boot script table to compare

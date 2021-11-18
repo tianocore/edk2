@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Writes the current Local Descriptor Table Register (GDTR) selector.
 
@@ -30,4 +27,3 @@ AsmWriteLdtr (
     lldt    ax
   }
 }
-

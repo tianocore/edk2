@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Performs an atomic compare exchange operation on a 64-bit unsigned integer.
 

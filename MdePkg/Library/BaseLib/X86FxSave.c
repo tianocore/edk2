@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 #include "BaseLibInternals.h"
 
 /**
@@ -38,5 +35,5 @@ AsmFxSave (
   //
   // Mark one flag at end of Buffer, it will be check by AsmFxRestor()
   //
-  *(UINT32 *) (&Buffer->Buffer[sizeof (Buffer->Buffer) - 4]) = 0xAA5555AA;
+  *(UINT32 *)(&Buffer->Buffer[sizeof (Buffer->Buffer) - 4]) = 0xAA5555AA;
 }

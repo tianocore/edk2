@@ -20,7 +20,6 @@
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 
-
 /**
   Reads registers in the EFI CPU I/O space.
 

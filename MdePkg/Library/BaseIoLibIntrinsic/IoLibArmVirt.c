@@ -546,13 +546,14 @@ MmioRead8 (
   IN      UINTN                     Address
   )
 {
-  UINT8      Value;
-  BOOLEAN    Flag;
+  UINT8    Value;
+  BOOLEAN  Flag;
 
   Flag = FilterBeforeMmIoRead (FilterWidth8, Address, &Value);
   if (Flag) {
     Value = MmioRead8Internal (Address);
   }
+
   FilterAfterMmIoRead (FilterWidth8, Address, &Value);
 
   return Value;
@@ -578,12 +579,13 @@ MmioWrite8 (
   IN      UINT8                     Value
   )
 {
-  BOOLEAN               Flag;
+  BOOLEAN  Flag;
 
   Flag = FilterBeforeMmIoWrite (FilterWidth8, Address, &Value);
   if (Flag) {
     MmioWrite8Internal (Address, Value);
   }
+
   FilterAfterMmIoWrite (FilterWidth8, Address, &Value);
 
   return Value;
@@ -609,8 +611,8 @@ MmioRead16 (
   IN      UINTN                     Address
   )
 {
-  BOOLEAN    Flag;
-  UINT16     Value;
+  BOOLEAN  Flag;
+  UINT16   Value;
 
   ASSERT ((Address & 1) == 0);
 
@@ -618,6 +620,7 @@ MmioRead16 (
   if (Flag) {
     Value = MmioRead16Internal (Address);
   }
+
   FilterAfterMmIoRead (FilterWidth16, Address, &Value);
 
   return Value;
@@ -643,7 +646,7 @@ MmioWrite16 (
   IN      UINT16                    Value
   )
 {
-  BOOLEAN    Flag;
+  BOOLEAN  Flag;
 
   ASSERT ((Address & 1) == 0);
 
@@ -651,6 +654,7 @@ MmioWrite16 (
   if (Flag) {
     MmioWrite16Internal (Address, Value);
   }
+
   FilterAfterMmIoWrite (FilterWidth16, Address, &Value);
 
   return Value;
@@ -676,8 +680,8 @@ MmioRead32 (
   IN      UINTN                     Address
   )
 {
-  BOOLEAN   Flag;
-  UINT32    Value;
+  BOOLEAN  Flag;
+  UINT32   Value;
 
   ASSERT ((Address & 3) == 0);
 
@@ -685,6 +689,7 @@ MmioRead32 (
   if (Flag) {
     Value = MmioRead32Internal (Address);
   }
+
   FilterAfterMmIoRead (FilterWidth32, Address, &Value);
 
   return Value;
@@ -710,7 +715,7 @@ MmioWrite32 (
   IN      UINT32                    Value
   )
 {
-  BOOLEAN   Flag;
+  BOOLEAN  Flag;
 
   ASSERT ((Address & 3) == 0);
 
@@ -718,6 +723,7 @@ MmioWrite32 (
   if (Flag) {
     MmioWrite32Internal (Address, Value);
   }
+
   FilterAfterMmIoWrite (FilterWidth32, Address, &Value);
 
   return Value;
@@ -743,8 +749,8 @@ MmioRead64 (
   IN      UINTN                     Address
   )
 {
-  BOOLEAN   Flag;
-  UINT64    Value;
+  BOOLEAN  Flag;
+  UINT64   Value;
 
   ASSERT ((Address & 7) == 0);
 
@@ -752,6 +758,7 @@ MmioRead64 (
   if (Flag) {
     Value = MmioRead64Internal (Address);
   }
+
   FilterAfterMmIoRead (FilterWidth64, Address, &Value);
 
   return Value;
@@ -777,7 +784,7 @@ MmioWrite64 (
   IN      UINT64                    Value
   )
 {
-  BOOLEAN   Flag;
+  BOOLEAN  Flag;
 
   ASSERT ((Address & 7) == 0);
 
@@ -785,6 +792,7 @@ MmioWrite64 (
   if (Flag) {
     MmioWrite64Internal (Address, Value);
   }
+
   FilterAfterMmIoWrite (FilterWidth64, Address, &Value);
 
   return Value;

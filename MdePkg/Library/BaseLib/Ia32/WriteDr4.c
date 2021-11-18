@@ -30,4 +30,3 @@ AsmWriteDr4 (
     _emit   0xe0
   }
 }
-

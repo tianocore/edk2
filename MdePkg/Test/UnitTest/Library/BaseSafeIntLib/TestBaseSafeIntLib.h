@@ -20,103 +20,103 @@
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeInt32ToUintn(
+TestSafeInt32ToUintn (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeUint32ToIntn(
+TestSafeUint32ToIntn (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeIntnToInt32(
+TestSafeIntnToInt32 (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeIntnToUint32(
+TestSafeIntnToUint32 (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeUintnToUint32(
+TestSafeUintnToUint32 (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeUintnToIntn(
+TestSafeUintnToIntn (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeUintnToInt64(
+TestSafeUintnToInt64 (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeInt64ToIntn(
+TestSafeInt64ToIntn (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeInt64ToUintn(
+TestSafeInt64ToUintn (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeUint64ToIntn(
+TestSafeUint64ToIntn (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeUint64ToUintn(
+TestSafeUint64ToUintn (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeUintnAdd(
+TestSafeUintnAdd (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeIntnAdd(
+TestSafeIntnAdd (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeUintnSub(
+TestSafeUintnSub (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeIntnSub(
+TestSafeIntnSub (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeUintnMult(
+TestSafeUintnMult (
   IN UNIT_TEST_CONTEXT           Context
   );
 
 UNIT_TEST_STATUS
 EFIAPI
-TestSafeIntnMult(
+TestSafeIntnMult (
   IN UNIT_TEST_CONTEXT           Context
   );
 

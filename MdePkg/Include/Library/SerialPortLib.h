@@ -54,7 +54,6 @@ SerialPortWrite (
   IN UINTN     NumberOfBytes
   );
 
-
 /**
   Read data from serial device and save the datas in buffer.
 

@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Shifts a 64-bit integer left between 0 and 63 bits. The low bits
   are filled with zeros. The shifted value is returned.
@@ -42,4 +39,3 @@ L0:
     shl     eax, cl
   }
 }
-

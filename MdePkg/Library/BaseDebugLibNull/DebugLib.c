@@ -34,7 +34,6 @@ DebugPrint (
 {
 }
 
-
 /**
   Prints a debug message to the debug output device if the specified
   error level is enabled.
@@ -59,7 +58,6 @@ DebugVPrint (
   )
 {
 }
-
 
 /**
   Prints a debug message to the debug output device if the specified
@@ -87,7 +85,6 @@ DebugBPrint (
   )
 {
 }
-
 
 /**
   Prints an assert message containing a filename, line number, and description.
@@ -120,7 +117,6 @@ DebugAssert (
 {
 }
 
-
 /**
   Fills a target buffer with PcdDebugClearMemoryValue, and returns the target buffer.
 
@@ -146,7 +142,6 @@ DebugClearMemory (
   return Buffer;
 }
 
-
 /**
   Returns TRUE if ASSERT() macros are enabled.
 
@@ -165,7 +160,6 @@ DebugAssertEnabled (
 {
   return FALSE;
 }
-
 
 /**
   Returns TRUE if DEBUG() macros are enabled.
@@ -186,7 +180,6 @@ DebugPrintEnabled (
   return FALSE;
 }
 
-
 /**
   Returns TRUE if DEBUG_CODE() macros are enabled.
 
@@ -205,7 +198,6 @@ DebugCodeEnabled (
 {
   return FALSE;
 }
-
 
 /**
   Returns TRUE if DEBUG_CLEAR_MEMORY() macro is enabled.
@@ -243,4 +235,3 @@ DebugPrintLevelEnabled (
 {
   return FALSE;
 }
-

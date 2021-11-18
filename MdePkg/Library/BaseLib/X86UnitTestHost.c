@@ -60,24 +60,28 @@ UINT32
 EFIAPI
 UnitTestHostBaseLibAsmCpuid (
   IN      UINT32                    Index,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax, OPTIONAL
+  OUT     UINT32                    *Ebx, OPTIONAL
+  OUT     UINT32                    *Ecx, OPTIONAL
   OUT     UINT32                    *Edx   OPTIONAL
   )
 {
   if (Eax != NULL) {
     *Eax = 0;
   }
+
   if (Ebx != NULL) {
     *Ebx = 0;
   }
+
   if (Ecx != NULL) {
     *Ecx = 0;
   }
+
   if (Edx != NULL) {
     *Edx = 0;
   }
+
   return Index;
 }
 
@@ -118,24 +122,28 @@ EFIAPI
 UnitTestHostBaseLibAsmCpuidEx (
   IN      UINT32                    Index,
   IN      UINT32                    SubIndex,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax, OPTIONAL
+  OUT     UINT32                    *Ebx, OPTIONAL
+  OUT     UINT32                    *Ecx, OPTIONAL
   OUT     UINT32                    *Edx   OPTIONAL
   )
 {
   if (Eax != NULL) {
     *Eax = 0;
   }
+
   if (Ebx != NULL) {
     *Ebx = 0;
   }
+
   if (Ecx != NULL) {
     *Ecx = 0;
   }
+
   if (Edx != NULL) {
     *Edx = 0;
   }
+
   return Index;
 }
 
@@ -192,9 +200,11 @@ UnitTestHostBaseLibAsmReadMsr64 (
   if (Index < 0x1000) {
     return mUnitTestHostBaseLibMsr[0][Index];
   }
-  if (Index >= 0xC0000000 && Index < 0xC0001000) {
+
+  if ((Index >= 0xC0000000) && (Index < 0xC0001000)) {
     return mUnitTestHostBaseLibMsr[1][Index];
   }
+
   return 0;
 }
 
@@ -225,9 +235,11 @@ UnitTestHostBaseLibAsmWriteMsr64 (
   if (Index < 0x1000) {
     mUnitTestHostBaseLibMsr[0][Index] = Value;
   }
-  if (Index >= 0xC0000000 && Index < 0xC0001000) {
+
+  if ((Index >= 0xC0000000) && (Index < 0xC0001000)) {
     mUnitTestHostBaseLibMsr[1][Index - 0xC00000000] = Value;
   }
+
   return Value;
 }
 
@@ -1119,8 +1131,8 @@ VOID
 EFIAPI
 UnitTestHostBaseLibAsmEnablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack
   )
 {
@@ -1165,8 +1177,8 @@ VOID
 EFIAPI
 UnitTestHostBaseLibAsmDisablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack
   )
 {
@@ -1210,8 +1222,8 @@ EFIAPI
 UnitTestHostBaseLibAsmEnablePaging64 (
   IN      UINT16                    Cs,
   IN      UINT64                    EntryPoint,
-  IN      UINT64                    Context1,  OPTIONAL
-  IN      UINT64                    Context2,  OPTIONAL
+  IN      UINT64                    Context1, OPTIONAL
+  IN      UINT64                    Context2, OPTIONAL
   IN      UINT64                    NewStack
   )
 {
@@ -1256,8 +1268,8 @@ EFIAPI
 UnitTestHostBaseLibAsmDisablePaging64 (
   IN      UINT16                    Cs,
   IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
+  IN      UINT32                    Context1, OPTIONAL
+  IN      UINT32                    Context2, OPTIONAL
   IN      UINT32                    NewStack
   )
 {
@@ -1512,9 +1524,9 @@ UINT32
 EFIAPI
 AsmCpuid (
   IN      UINT32                    Index,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax, OPTIONAL
+  OUT     UINT32                    *Ebx, OPTIONAL
+  OUT     UINT32                    *Ecx, OPTIONAL
   OUT     UINT32                    *Edx   OPTIONAL
   )
 {
@@ -1558,9 +1570,9 @@ EFIAPI
 AsmCpuidEx (
   IN      UINT32                    Index,
   IN      UINT32                    SubIndex,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax, OPTIONAL
+  OUT     UINT32                    *Ebx, OPTIONAL
+  OUT     UINT32                    *Ecx, OPTIONAL
   OUT     UINT32                    *Edx   OPTIONAL
   )
 {
@@ -2527,8 +2539,8 @@ VOID
 EFIAPI
 AsmEnablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack
   )
 {
@@ -2573,8 +2585,8 @@ VOID
 EFIAPI
 AsmDisablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1, OPTIONAL
+  IN      VOID                      *Context2, OPTIONAL
   IN      VOID                      *NewStack
   )
 {
@@ -2618,8 +2630,8 @@ EFIAPI
 AsmEnablePaging64 (
   IN      UINT16                    Cs,
   IN      UINT64                    EntryPoint,
-  IN      UINT64                    Context1,  OPTIONAL
-  IN      UINT64                    Context2,  OPTIONAL
+  IN      UINT64                    Context1, OPTIONAL
+  IN      UINT64                    Context2, OPTIONAL
   IN      UINT64                    NewStack
   )
 {
@@ -2661,8 +2673,8 @@ EFIAPI
 AsmDisablePaging64 (
   IN      UINT16                    Cs,
   IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
+  IN      UINT32                    Context1, OPTIONAL
+  IN      UINT32                    Context2, OPTIONAL
   IN      UINT32                    NewStack
   )
 {

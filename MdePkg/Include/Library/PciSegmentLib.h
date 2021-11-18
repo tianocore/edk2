@@ -31,7 +31,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __PCI_SEGMENT_LIB__
 #define __PCI_SEGMENT_LIB__
 
-
 /**
   Macro that converts PCI Segment, PCI Bus, PCI Device, PCI Function,
   and PCI Register to an address that can be passed to the PCI Segment Library functions.
@@ -49,7 +48,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @return The address that is compatible with the PCI Segment Library functions.
 
 **/
-#define PCI_SEGMENT_LIB_ADDRESS(Segment,Bus,Device,Function,Register) \
+#define PCI_SEGMENT_LIB_ADDRESS(Segment, Bus, Device, Function, Register) \
   ((Segment != 0) ? \
     ( ((Register) & 0xfff)                 | \
       (((Function) & 0x07) << 12)          | \

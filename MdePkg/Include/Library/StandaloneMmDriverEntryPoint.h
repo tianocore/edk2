@@ -16,12 +16,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// Declare the PI Specification Revision that this driver requires to execute
 /// correctly.
 ///
-extern CONST UINT32                   _gMmRevision;
+extern CONST UINT32  _gMmRevision;
 
 ///
 /// Declare the number of unload handler in the image.
 ///
-extern CONST UINT8                    _gDriverUnloadImageCount;
+extern CONST UINT8  _gDriverUnloadImageCount;
 
 /**
   The entry point of PE/COFF Image for a Standalone MM Driver.
@@ -52,7 +52,6 @@ _ModuleEntryPoint (
   IN EFI_MM_SYSTEM_TABLE    *MmSystemTable
   );
 
-
 /**
   Auto generated function that calls the library constructors for all of the
   module's dependent libraries.
@@ -78,7 +77,6 @@ ProcessLibraryConstructorList (
   IN EFI_MM_SYSTEM_TABLE    *MmSystemTable
   );
 
-
 /**
   Auto generated function that calls the library descructors for all of the
   module's dependent libraries.
@@ -103,7 +101,6 @@ ProcessLibraryDestructorList (
   IN EFI_HANDLE             ImageHandle,
   IN EFI_MM_SYSTEM_TABLE    *MmSystemTable
   );
-
 
 /**
   Auto generated function that calls a set of module entry points.

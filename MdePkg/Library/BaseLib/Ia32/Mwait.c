@@ -35,4 +35,3 @@ AsmMwait (
     _emit   0xC9
   }
 }
-

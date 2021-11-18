@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Writes the current value of 64-bit MMX Register #7 (MM7).
 
@@ -29,4 +26,3 @@ AsmWriteMm7 (
     emms
   }
 }
-

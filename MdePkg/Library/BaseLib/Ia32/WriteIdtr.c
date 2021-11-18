@@ -6,7 +6,6 @@
 
 **/
 
-
 #include "BaseLibInternals.h"
 
 /**
@@ -32,4 +31,3 @@ InternalX86WriteIdtr (
     popfd
   }
 }
-

@@ -6,15 +6,14 @@
 
 **/
 
-
 #include "BaseLibInternals.h"
 
-extern CONST UINT8                  m16Start;
-extern CONST UINT16                 m16Size;
-extern CONST UINT16                 mThunk16Attr;
-extern CONST UINT16                 m16Gdt;
-extern CONST UINT16                 m16GdtrBase;
-extern CONST UINT16                 mTransition;
+extern CONST UINT8   m16Start;
+extern CONST UINT16  m16Size;
+extern CONST UINT16  mThunk16Attr;
+extern CONST UINT16  m16Gdt;
+extern CONST UINT16  m16GdtrBase;
+extern CONST UINT16  mTransition;
 
 /**
   Invokes 16-bit code in big real mode and returns the updated register set.
@@ -96,7 +95,7 @@ AsmPrepareThunk16 (
   IN OUT  THUNK_CONTEXT             *ThunkContext
   )
 {
-  IA32_SEGMENT_DESCRIPTOR           *RealModeGdt;
+  IA32_SEGMENT_DESCRIPTOR  *RealModeGdt;
 
   ASSERT (ThunkContext != NULL);
   ASSERT ((UINTN)ThunkContext->RealModeBuffer < 0x100000);
@@ -113,8 +112,8 @@ AsmPrepareThunk16 (
   // RealModeGdt[2]: Data Segment
   // RealModeGdt[3]: Call Gate
   //
-  RealModeGdt = (IA32_SEGMENT_DESCRIPTOR*)(
-                  (UINTN)ThunkContext->RealModeBuffer + m16Gdt);
+  RealModeGdt = (IA32_SEGMENT_DESCRIPTOR *)(
+                                            (UINTN)ThunkContext->RealModeBuffer + m16Gdt);
 
   //
   // Update Code & Data Segment Descriptor
@@ -127,7 +126,7 @@ AsmPrepareThunk16 (
   //
   // Update transition code entry point offset
   //
-  *(UINT32*)((UINTN)ThunkContext->RealModeBuffer + mTransition) +=
+  *(UINT32 *)((UINTN)ThunkContext->RealModeBuffer + mTransition) +=
     (UINT32)(UINTN)ThunkContext->RealModeBuffer & 0xf;
 
   //
@@ -146,12 +145,12 @@ AsmPrepareThunk16 (
   //
   // Update GDTBASE for this thunk context
   //
-  *(VOID**)((UINTN)ThunkContext->RealModeBuffer + m16GdtrBase) = RealModeGdt;
+  *(VOID **)((UINTN)ThunkContext->RealModeBuffer + m16GdtrBase) = RealModeGdt;
 
   //
   // Update Thunk Attributes
   //
-  *(UINT32*)((UINTN)ThunkContext->RealModeBuffer + mThunk16Attr) =
+  *(UINT32 *)((UINTN)ThunkContext->RealModeBuffer + mThunk16Attr) =
     ThunkContext->ThunkAttributes;
 }
 
@@ -214,14 +213,16 @@ AsmThunk16 (
   IN OUT  THUNK_CONTEXT             *ThunkContext
   )
 {
-  IA32_REGISTER_SET                 *UpdatedRegs;
+  IA32_REGISTER_SET  *UpdatedRegs;
 
   ASSERT (ThunkContext != NULL);
   ASSERT ((UINTN)ThunkContext->RealModeBuffer < 0x100000);
   ASSERT (ThunkContext->RealModeBufferSize >= m16Size);
   ASSERT ((UINTN)ThunkContext->RealModeBuffer + m16Size <= 0x100000);
-  ASSERT (((ThunkContext->ThunkAttributes & (THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 | THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL)) != \
-           (THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 | THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL)));
+  ASSERT (
+    ((ThunkContext->ThunkAttributes & (THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 | THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL)) != \
+     (THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15 | THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL))
+    );
 
   UpdatedRegs = InternalAsmThunk16 (
                   ThunkContext->RealModeState,

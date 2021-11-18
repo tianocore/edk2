@@ -33,8 +33,8 @@ IoReadWorker (
   IN      EFI_SMM_IO_WIDTH          Width
   )
 {
-  EFI_STATUS                        Status;
-  UINT64                            Data;
+  EFI_STATUS  Status;
+  UINT64      Data;
 
   Status = gSmst->SmmIo.Io.Read (&gSmst->SmmIo, Width, Port, 1, &Data);
   ASSERT_EFI_ERROR (Status);
@@ -65,7 +65,7 @@ IoWriteWorker (
   IN      UINT64                    Data
   )
 {
-  EFI_STATUS                        Status;
+  EFI_STATUS  Status;
 
   Status = gSmst->SmmIo.Io.Write (&gSmst->SmmIo, Width, Port, 1, &Data);
   ASSERT_EFI_ERROR (Status);
@@ -94,8 +94,8 @@ MmioReadWorker (
   IN      EFI_SMM_IO_WIDTH          Width
   )
 {
-  EFI_STATUS                        Status;
-  UINT64                            Data;
+  EFI_STATUS  Status;
+  UINT64      Data;
 
   Status = gSmst->SmmIo.Mem.Read (&gSmst->SmmIo, Width, Address, 1, &Data);
   ASSERT_EFI_ERROR (Status);
@@ -126,7 +126,7 @@ MmioWriteWorker (
   IN      UINT64                    Data
   )
 {
-  EFI_STATUS                        Status;
+  EFI_STATUS  Status;
 
   Status = gSmst->SmmIo.Mem.Write (&gSmst->SmmIo, Width, Address, 1, &Data);
   ASSERT_EFI_ERROR (Status);
@@ -387,7 +387,7 @@ IoReadFifo8 (
   OUT     VOID                      *Buffer
   )
 {
-  UINT8 *Buffer8;
+  UINT8  *Buffer8;
 
   Buffer8 = (UINT8 *)Buffer;
   while (Count-- > 0) {
@@ -420,7 +420,7 @@ IoWriteFifo8 (
   IN      VOID                      *Buffer
   )
 {
-  UINT8 *Buffer8;
+  UINT8  *Buffer8;
 
   Buffer8 = (UINT8 *)Buffer;
   while (Count-- > 0) {
@@ -453,7 +453,7 @@ IoReadFifo16 (
   OUT     VOID                      *Buffer
   )
 {
-  UINT16 *Buffer16;
+  UINT16  *Buffer16;
 
   //
   // Make sure Port is aligned on a 16-bit boundary.
@@ -490,7 +490,7 @@ IoWriteFifo16 (
   IN      VOID                      *Buffer
   )
 {
-  UINT16 *Buffer16;
+  UINT16  *Buffer16;
 
   //
   // Make sure Port is aligned on a 16-bit boundary.
@@ -527,7 +527,7 @@ IoReadFifo32 (
   OUT     VOID                      *Buffer
   )
 {
-  UINT32 *Buffer32;
+  UINT32  *Buffer32;
 
   //
   // Make sure Port is aligned on a 32-bit boundary.
@@ -564,7 +564,7 @@ IoWriteFifo32 (
   IN      VOID                      *Buffer
   )
 {
-  UINT32 *Buffer32;
+  UINT32  *Buffer32;
 
   //
   // Make sure Port is aligned on a 32-bit boundary.

@@ -6,9 +6,6 @@
 
 **/
 
-
-
-
 /**
   Writes the current value of 64-bit MMX Register #1 (MM1).
 
@@ -29,4 +26,3 @@ AsmWriteMm1 (
     emms
   }
 }
-

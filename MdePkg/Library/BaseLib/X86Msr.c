@@ -6,9 +6,7 @@
 
 **/
 
-
 #include "BaseLibInternals.h"
-
 
 /**
   Returns the lower 32-bits of a Machine Specific Register(MSR).
