@@ -17,7 +17,7 @@ parameters:
 jobs:
 
 - job: Build_${{ parameters.tool_chain_tag }}
-
+  timeoutInMinutes: 120
   #Use matrix to speed up the build process
   strategy:
     matrix:
