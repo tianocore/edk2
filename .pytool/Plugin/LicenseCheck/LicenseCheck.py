@@ -5,6 +5,7 @@
 ##
 
 import os
+import shutil
 import logging
 import re
 from io import StringIO
@@ -61,12 +62,19 @@ class LicenseCheck(ICiBuildPlugin):
     #   - Junit Logger
     #   - output_stream the StringIO output stream from this plugin via logging
     def RunBuildPlugin(self, packagename, Edk2pathObj, pkgconfig, environment, PLM, PLMHelper, tc, output_stream=None):
-        return_buffer = StringIO()
-        params = "diff --unified=0 origin/master HEAD"
-        RunCmd("git", params, outstream=return_buffer)
-        p = return_buffer.getvalue().strip()
-        patch = p.split("\n")
-        return_buffer.close()
+        # Create temp directory
+        temp_path = os.path.join(Edk2pathObj.WorkspacePath, 'Build', '.pytool', 'Plugin', 'LicenseCheck')
+        if not os.path.exists(temp_path):
+            os.makedirs(temp_path)
+        # Output file to use for git diff operations
+        temp_diff_output = os.path.join (temp_path, 'diff.txt')
+        params = "diff --output={} --unified=0 origin/master HEAD".format(temp_diff_output)
+        RunCmd("git", params)
+        with open(temp_diff_output) as file:
+            patch = file.read().strip().split("\n")
+        # Delete temp directory
+        if os.path.exists(temp_path):
+            shutil.rmtree(temp_path)
 
         ignore_files = []
         if "IgnoreFiles" in pkgconfig:
