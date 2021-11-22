@@ -248,7 +248,12 @@ my @asmfilelist = ();
 my @asmbuild = ();
 foreach my $product ((@{$unified_info{libraries}},
                       @{$unified_info{engines}})) {
-    foreach my $o (@{$unified_info{sources}->{$product}}) {
+    my @objs = @{$unified_info{sources}->{$product}};
+    while (my $o = pop @objs) {
+        if ($o =~ m/\.a$/) {
+            push @objs, @{$unified_info{sources}->{$o}};
+            next;
+        }
         foreach my $s (@{$unified_info{sources}->{$o}}) {
             # No need to add unused files in UEFI.
             # So it can reduce porting time, compile time, library size.
