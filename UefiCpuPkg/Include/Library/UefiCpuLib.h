@@ -4,7 +4,7 @@
   This library class defines some routines that are generic for IA32 family CPU
   to be UEFI specification compliant.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -40,6 +40,27 @@ InitializeFloatingPointUnits (
 BOOLEAN
 EFIAPI
 StandardSignatureIsAuthenticAMD (
+  VOID
+  );
+
+/**
+  Return the 32bit CPU family and model value.
+
+  @return CPUID[01h].EAX with Processor Type and Stepping ID cleared.
+**/
+UINT32
+EFIAPI
+GetCpuFamilyModel (
+  VOID
+  );
+
+/**
+  Return the CPU stepping ID.
+  @return CPU stepping ID value in CPUID[01h].EAX.
+**/
+UINT8
+EFIAPI
+GetCpuSteppingId (
   VOID
   );
 

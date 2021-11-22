@@ -3,7 +3,7 @@
 #
 #  Capsule library instance for DXE_DRIVER module types.
 #
-#  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -51,6 +51,7 @@
   DisplayUpdateProgressLib
   FileHandleLib
   UefiBootManagerLib
+  VariablePolicyHelperLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax                               ## CONSUMES
@@ -68,14 +69,17 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCodRelocationDevPath                     ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCoDRelocationFileName                    ## CONSUMES
 
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset ## CONSUMES
+
 [Protocols]
   gEsrtManagementProtocolGuid                   ## CONSUMES
   gEfiFirmwareManagementProtocolGuid            ## CONSUMES
-  gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
   gEdkiiFirmwareManagementProgressProtocolGuid  ## SOMETIMES_CONSUMES
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
   gEfiBlockIoProtocolGuid                       ## CONSUMES
   gEfiDiskIoProtocolGuid                        ## CONSUMES
+  gEdkiiVariablePolicyProtocolGuid              ## CONSUMES
 
 [Guids]
   gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID

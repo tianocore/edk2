@@ -24,24 +24,24 @@ UINT32 mCetInterruptSspTable;
 UINTN  mSmmInterruptSspTables;
 
 /**
-  Initialize IDT for SMM Stack Guard.
+  Initialize IDT IST Field.
+
+  @param[in]  ExceptionType       Exception type.
+  @param[in]  Ist                 IST value.
 
 **/
 VOID
 EFIAPI
-InitializeIDTSmmStackGuard (
-  VOID
+InitializeIdtIst (
+  IN EFI_EXCEPTION_TYPE            ExceptionType,
+  IN UINT8                         Ist
   )
 {
   IA32_IDT_GATE_DESCRIPTOR  *IdtGate;
 
-  //
-  // If SMM Stack Guard feature is enabled, set the IST field of
-  // the interrupt gate for Page Fault Exception to be 1
-  //
   IdtGate = (IA32_IDT_GATE_DESCRIPTOR *)gcSmiIdtr.Base;
-  IdtGate += EXCEPT_IA32_PAGE_FAULT;
-  IdtGate->Bits.Reserved_0 = 1;
+  IdtGate += ExceptionType;
+  IdtGate->Bits.Reserved_0 = Ist;
 }
 
 /**
@@ -89,7 +89,7 @@ InitGdt (
     GdtDescriptor->Bits.BaseMid = (UINT8)((UINTN)TssBase >> 16);
     GdtDescriptor->Bits.BaseHigh = (UINT8)((UINTN)TssBase >> 24);
 
-    if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
+    if ((FeaturePcdGet (PcdCpuSmmStackGuard)) || ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported)) {
       //
       // Setup top of known good stack as IST1 for each processor.
       //
@@ -177,8 +177,16 @@ InitShadowStack (
 
   if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
     SmmShadowStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmShadowStackSize)));
+    //
+    // Add 1 page as known good shadow stack
+    //
+    SmmShadowStackSize += EFI_PAGES_TO_SIZE (1);
+
     if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-      SmmShadowStackSize += EFI_PAGES_TO_SIZE (2);
+      //
+      // Add one guard page between Known Good Shadow Stack and SMM Shadow Stack.
+      //
+      SmmShadowStackSize += EFI_PAGES_TO_SIZE (1);
     }
     mCetPl0Ssp = (UINT32)((UINTN)ShadowStack + SmmShadowStackSize - sizeof(UINT64));
     PatchInstructionX86 (mPatchCetPl0Ssp, mCetPl0Ssp, 4);
@@ -186,33 +194,32 @@ InitShadowStack (
     DEBUG ((DEBUG_INFO, "ShadowStack - 0x%x\n", ShadowStack));
     DEBUG ((DEBUG_INFO, "  SmmShadowStackSize - 0x%x\n", SmmShadowStackSize));
 
-    if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-      if (mSmmInterruptSspTables == 0) {
-        mSmmInterruptSspTables = (UINTN)AllocateZeroPool(sizeof(UINT64) * 8 * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus);
-        ASSERT (mSmmInterruptSspTables != 0);
-        DEBUG ((DEBUG_INFO, "mSmmInterruptSspTables - 0x%x\n", mSmmInterruptSspTables));
-      }
-
-      //
-      // The highest address on the stack (0xFF8) is a save-previous-ssp token pointing to a location that is 40 bytes away - 0xFD0.
-      // The supervisor shadow stack token is just above it at address 0xFF0. This is where the interrupt SSP table points.
-      // So when an interrupt of exception occurs, we can use SAVESSP/RESTORESSP/CLEARSSBUSY for the supervisor shadow stack,
-      // due to the reason the RETF in SMM exception handler cannot clear the BUSY flag with same CPL.
-      // (only IRET or RETF with different CPL can clear BUSY flag)
-      // Please refer to UefiCpuPkg/Library/CpuExceptionHandlerLib/X64 for the full stack frame at runtime.
-      //
-      InterruptSsp = (UINT32)((UINTN)ShadowStack + EFI_PAGES_TO_SIZE(1) - sizeof(UINT64));
-      *(UINT64 *)(UINTN)InterruptSsp = (InterruptSsp - sizeof(UINT64) * 4) | 0x2;
-      mCetInterruptSsp = InterruptSsp - sizeof(UINT64);
-
-      mCetInterruptSspTable = (UINT32)(UINTN)(mSmmInterruptSspTables + sizeof(UINT64) * 8 * CpuIndex);
-      InterruptSspTable = (UINT64 *)(UINTN)mCetInterruptSspTable;
-      InterruptSspTable[1] = mCetInterruptSsp;
-      PatchInstructionX86 (mPatchCetInterruptSsp, mCetInterruptSsp, 4);
-      PatchInstructionX86 (mPatchCetInterruptSspTable, mCetInterruptSspTable, 4);
-      DEBUG ((DEBUG_INFO, "mCetInterruptSsp - 0x%x\n", mCetInterruptSsp));
-      DEBUG ((DEBUG_INFO, "mCetInterruptSspTable - 0x%x\n", mCetInterruptSspTable));
+    if (mSmmInterruptSspTables == 0) {
+      mSmmInterruptSspTables = (UINTN)AllocateZeroPool(sizeof(UINT64) * 8 * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus);
+      ASSERT (mSmmInterruptSspTables != 0);
+      DEBUG ((DEBUG_INFO, "mSmmInterruptSspTables - 0x%x\n", mSmmInterruptSspTables));
     }
+
+    //
+    // The highest address on the stack (0xFE0) is a save-previous-ssp token pointing to a location that is 40 bytes away - 0xFB8.
+    // The supervisor shadow stack token is just above it at address 0xFD8. This is where the interrupt SSP table points.
+    // So when an interrupt of exception occurs, we can use SAVESSP/RESTORESSP/CLEARSSBUSY for the supervisor shadow stack,
+    // due to the reason the RETF in SMM exception handler cannot clear the BUSY flag with same CPL.
+    // (only IRET or RETF with different CPL can clear BUSY flag)
+    // Please refer to UefiCpuPkg/Library/CpuExceptionHandlerLib/X64 for the full stack frame at runtime.
+    // According to SDM (ver. 075 June 2021), shadow stack should be 32 bytes aligned.
+    //
+    InterruptSsp = (UINT32)(((UINTN)ShadowStack + EFI_PAGES_TO_SIZE(1) - (sizeof(UINT64) * 4)) & ~0x1f);
+    *(UINT64 *)(UINTN)InterruptSsp = (InterruptSsp - sizeof(UINT64) * 4) | 0x2;
+    mCetInterruptSsp = InterruptSsp - sizeof(UINT64);
+
+    mCetInterruptSspTable = (UINT32)(UINTN)(mSmmInterruptSspTables + sizeof(UINT64) * 8 * CpuIndex);
+    InterruptSspTable = (UINT64 *)(UINTN)mCetInterruptSspTable;
+    InterruptSspTable[1] = mCetInterruptSsp;
+    PatchInstructionX86 (mPatchCetInterruptSsp, mCetInterruptSsp, 4);
+    PatchInstructionX86 (mPatchCetInterruptSspTable, mCetInterruptSspTable, 4);
+    DEBUG ((DEBUG_INFO, "mCetInterruptSsp - 0x%x\n", mCetInterruptSsp));
+    DEBUG ((DEBUG_INFO, "mCetInterruptSspTable - 0x%x\n", mCetInterruptSspTable));
   }
 }
 

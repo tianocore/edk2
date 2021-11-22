@@ -16,13 +16,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/TcgStorageCore.h>
 
-#define ERROR_CHECK(arg)                                                         \
-  {                                                                              \
-    TCG_RESULT ret = (arg);                                                      \
-    if (ret != TcgResultSuccess) {                                               \
-      DEBUG ((DEBUG_INFO, "ERROR_CHECK failed at %a:%u\n", __FILE__, __LINE__)); \
-      return ret;                                                                \
-    }                                                                            \
+#define ERROR_CHECK(arg)                                                                  \
+  {                                                                                       \
+    TCG_RESULT ret = (arg);                                                               \
+    if (ret != TcgResultSuccess) {                                                        \
+      DEBUG ((DEBUG_INFO, "ERROR_CHECK failed at %a:%u\n", __FILE__, DEBUG_LINE_NUMBER)); \
+      return ret;                                                                         \
+    }                                                                                     \
   }
 
 #define METHOD_STATUS_ERROR_CHECK(arg, failRet)                                                  \
@@ -31,12 +31,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     return (failRet);                                                                            \
   }
 
-#define NULL_CHECK(arg)                                                                   \
-  do {                                                                                    \
-    if ((arg) == NULL) {                                                                  \
-      DEBUG ((DEBUG_INFO, "NULL_CHECK(%a) failed at %a:%u\n", #arg, __FILE__, __LINE__)); \
-      return TcgResultFailureNullPointer;                                                 \
-    }                                                                                     \
+#define NULL_CHECK(arg)                                                                            \
+  do {                                                                                             \
+    if ((arg) == NULL) {                                                                           \
+      DEBUG ((DEBUG_INFO, "NULL_CHECK(%a) failed at %a:%u\n", #arg, __FILE__, DEBUG_LINE_NUMBER)); \
+      return TcgResultFailureNullPointer;                                                          \
+    }                                                                                              \
   } while (0)
 
 #pragma pack(1)

@@ -347,9 +347,9 @@ SaveFrameworkState (
 
   @param[in]  Expression  Expression to be evaluated for TRUE.
 **/
-#define UT_ASSERT_TRUE(Expression)                                                        \
-  if(!UnitTestAssertTrue ((Expression), __FUNCTION__, __LINE__, __FILE__, #Expression)) { \
-    return UNIT_TEST_ERROR_TEST_FAILED;                                                   \
+#define UT_ASSERT_TRUE(Expression)                                                                 \
+  if(!UnitTestAssertTrue ((Expression), __FUNCTION__, DEBUG_LINE_NUMBER, __FILE__, #Expression)) { \
+    return UNIT_TEST_ERROR_TEST_FAILED;                                                            \
   }
 
 /**
@@ -359,9 +359,9 @@ SaveFrameworkState (
 
   @param[in]  Expression  Expression to be evaluated for FALSE.
 **/
-#define UT_ASSERT_FALSE(Expression)                                                        \
-  if(!UnitTestAssertFalse ((Expression), __FUNCTION__, __LINE__, __FILE__, #Expression)) { \
-    return UNIT_TEST_ERROR_TEST_FAILED;                                                    \
+#define UT_ASSERT_FALSE(Expression)                                                                 \
+  if(!UnitTestAssertFalse ((Expression), __FUNCTION__, DEBUG_LINE_NUMBER, __FILE__, #Expression)) { \
+    return UNIT_TEST_ERROR_TEST_FAILED;                                                             \
   }
 
 /**
@@ -373,7 +373,7 @@ SaveFrameworkState (
   @param[in]  ValueB  Value to be compared for equality (64-bit comparison).
 **/
 #define UT_ASSERT_EQUAL(ValueA, ValueB)                                                                           \
-  if(!UnitTestAssertEqual ((UINT64)(ValueA), (UINT64)(ValueB), __FUNCTION__, __LINE__, __FILE__, #ValueA, #ValueB)) { \
+  if(!UnitTestAssertEqual ((UINT64)(ValueA), (UINT64)(ValueB), __FUNCTION__, DEBUG_LINE_NUMBER, __FILE__, #ValueA, #ValueB)) { \
     return UNIT_TEST_ERROR_TEST_FAILED;                                                                           \
   }
 
@@ -386,9 +386,9 @@ SaveFrameworkState (
   @param[in]  BufferB  Pointer to a buffer for comparison.
   @param[in]  Length   Number of bytes to compare in BufferA and BufferB.
 **/
-#define UT_ASSERT_MEM_EQUAL(BufferA, BufferB, Length)                                                                               \
-  if(!UnitTestAssertMemEqual ((VOID *)(UINTN)(BufferA), (VOID *)(UINTN)(BufferB), (UINTN)Length, __FUNCTION__, __LINE__, __FILE__, #BufferA, #BufferB)) { \
-    return UNIT_TEST_ERROR_TEST_FAILED;                                                                                           \
+#define UT_ASSERT_MEM_EQUAL(BufferA, BufferB, Length)                                                                                                              \
+  if(!UnitTestAssertMemEqual ((VOID *)(UINTN)(BufferA), (VOID *)(UINTN)(BufferB), (UINTN)Length, __FUNCTION__, DEBUG_LINE_NUMBER, __FILE__, #BufferA, #BufferB)) { \
+    return UNIT_TEST_ERROR_TEST_FAILED;                                                                                                                            \
   }
 
 /**
@@ -399,9 +399,9 @@ SaveFrameworkState (
   @param[in]  ValueA  Value to be compared for inequality (64-bit comparison).
   @param[in]  ValueB  Value to be compared for inequality (64-bit comparison).
 **/
-#define UT_ASSERT_NOT_EQUAL(ValueA, ValueB)                                                                          \
-  if(!UnitTestAssertNotEqual ((UINT64)(ValueA), (UINT64)(ValueB), __FUNCTION__, __LINE__, __FILE__, #ValueA, #ValueB)) { \
-    return UNIT_TEST_ERROR_TEST_FAILED;                                                                              \
+#define UT_ASSERT_NOT_EQUAL(ValueA, ValueB)                                                                                       \
+  if(!UnitTestAssertNotEqual ((UINT64)(ValueA), (UINT64)(ValueB), __FUNCTION__, DEBUG_LINE_NUMBER, __FILE__, #ValueA, #ValueB)) { \
+    return UNIT_TEST_ERROR_TEST_FAILED;                                                                                           \
   }
 
 /**
@@ -411,9 +411,9 @@ SaveFrameworkState (
 
   @param[in]  Status  EFI_STATUS value to check.
 **/
-#define UT_ASSERT_NOT_EFI_ERROR(Status)                                                \
-  if(!UnitTestAssertNotEfiError ((Status), __FUNCTION__, __LINE__, __FILE__, #Status)) { \
-    return UNIT_TEST_ERROR_TEST_FAILED;                                                \
+#define UT_ASSERT_NOT_EFI_ERROR(Status)                                                           \
+  if(!UnitTestAssertNotEfiError ((Status), __FUNCTION__, DEBUG_LINE_NUMBER, __FILE__, #Status)) { \
+    return UNIT_TEST_ERROR_TEST_FAILED;                                                           \
   }
 
 /**
@@ -424,9 +424,9 @@ SaveFrameworkState (
   @param[in]  Status    EFI_STATUS values to compare for equality.
   @param[in]  Expected  EFI_STATUS values to compare for equality.
 **/
-#define UT_ASSERT_STATUS_EQUAL(Status, Expected)                                                 \
-  if(!UnitTestAssertStatusEqual ((Status), (Expected), __FUNCTION__, __LINE__, __FILE__, #Status)) { \
-    return UNIT_TEST_ERROR_TEST_FAILED;                                                          \
+#define UT_ASSERT_STATUS_EQUAL(Status, Expected)                                                              \
+  if(!UnitTestAssertStatusEqual ((Status), (Expected), __FUNCTION__, DEBUG_LINE_NUMBER, __FILE__, #Status)) { \
+    return UNIT_TEST_ERROR_TEST_FAILED;                                                                       \
   }
 
 /**
@@ -436,9 +436,9 @@ SaveFrameworkState (
 
   @param[in]  Pointer  Pointer to be checked against NULL.
 **/
-#define UT_ASSERT_NOT_NULL(Pointer)                                                  \
-  if(!UnitTestAssertNotNull ((Pointer), __FUNCTION__, __LINE__, __FILE__, #Pointer)) { \
-    return UNIT_TEST_ERROR_TEST_FAILED;                                              \
+#define UT_ASSERT_NOT_NULL(Pointer)                                                             \
+  if(!UnitTestAssertNotNull ((Pointer), __FUNCTION__, DEBUG_LINE_NUMBER, __FILE__, #Pointer)) { \
+    return UNIT_TEST_ERROR_TEST_FAILED;                                                         \
   }
 
 /**
@@ -482,7 +482,7 @@ SaveFrameworkState (
       }                                                                \
       if (!UnitTestExpectAssertFailure (                               \
              UnitTestJumpStatus,                                       \
-             __FUNCTION__, __LINE__, __FILE__,                         \
+             __FUNCTION__, DEBUG_LINE_NUMBER, __FILE__,                \
              #FunctionCall, Status)) {                                 \
         return UNIT_TEST_ERROR_TEST_FAILED;                            \
       }                                                                \

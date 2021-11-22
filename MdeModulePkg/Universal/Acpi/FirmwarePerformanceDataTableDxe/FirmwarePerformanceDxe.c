@@ -5,7 +5,7 @@
   for Firmware Basic Boot Performance Record and other boot performance records,
   and install FPDT to ACPI table.
 
-  Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -16,6 +16,7 @@
 #include <Protocol/AcpiTable.h>
 #include <Protocol/LockBox.h>
 #include <Protocol/Variable.h>
+#include <Protocol/VariablePolicy.h>
 
 #include <Guid/Acpi.h>
 #include <Guid/FirmwarePerformance.h>
@@ -32,6 +33,8 @@
 #include <Library/HobLib.h>
 #include <Library/LockBoxLib.h>
 #include <Library/UefiLib.h>
+#include <Library/VariablePolicyHelperLib.h>
+#include <Library/PerformanceLib.h>
 
 #define SMM_BOOT_RECORD_COMM_SIZE (OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + sizeof(SMM_BOOT_RECORD_COMMUNICATE))
 
@@ -278,16 +281,25 @@ InstallFirmwarePerformanceDataTable (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  EFI_ACPI_TABLE_PROTOCOL       *AcpiTableProtocol;
-  UINTN                         BootPerformanceDataSize;
-  FIRMWARE_PERFORMANCE_VARIABLE PerformanceVariable;
-  UINTN                         Size;
+  EFI_STATUS                      Status;
+  EFI_ACPI_TABLE_PROTOCOL         *AcpiTableProtocol;
+  UINTN                           BootPerformanceDataSize;
+  FIRMWARE_PERFORMANCE_VARIABLE   PerformanceVariable;
+  UINTN                           Size;
+  EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicyProtocol;
 
   //
   // Get AcpiTable Protocol.
   //
   Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **) &AcpiTableProtocol);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Get VariablePolicy Protocol.
+  //
+  Status = gBS->LocateProtocol(&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicyProtocol);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -368,6 +380,24 @@ InstallFirmwarePerformanceDataTable (
         sizeof (PerformanceVariable),
         &PerformanceVariable
         );
+
+  //
+  // Lock the variable which stores the Performance Table pointers.
+  //
+  Status = RegisterBasicVariablePolicy (
+             VariablePolicyProtocol,
+             &gEfiFirmwarePerformanceGuid,
+             EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME,
+             VARIABLE_POLICY_NO_MIN_SIZE,
+             VARIABLE_POLICY_NO_MAX_SIZE,
+             VARIABLE_POLICY_NO_MUST_ATTR,
+             VARIABLE_POLICY_NO_CANT_ATTR,
+             VARIABLE_POLICY_TYPE_LOCK_NOW
+             );
+  if (EFI_ERROR(Status)) {
+    DEBUG((DEBUG_ERROR, "[FirmwarePerformanceDxe] Error when lock variable %s, Status = %r\n", EFI_FIRMWARE_PERFORMANCE_VARIABLE_NAME, Status));
+    ASSERT_EFI_ERROR(Status);
+  }
 
   //
   // Publish Firmware Performance Data Table.
@@ -501,18 +531,12 @@ FpdtStatusCodeListenerDxe (
     DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - OsLoaderStartImageStart = %ld\n", mAcpiBootPerformanceTable->BasicBoot.OsLoaderStartImageStart));
     DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ExitBootServicesEntry   = 0\n"));
     DEBUG ((EFI_D_INFO, "FPDT: Boot Performance - ExitBootServicesExit    = 0\n"));
-  } else if (Value == (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_READY_TO_BOOT_EVENT)) {
-    if (mAcpiBootPerformanceTable == NULL) {
-      //
-      // ACPI Firmware Performance Data Table not installed yet, install it now.
-      //
-      InstallFirmwarePerformanceDataTable ();
-    }
   } else if (Data != NULL && CompareGuid (&Data->Type, &gEdkiiFpdtExtendedFirmwarePerformanceGuid)) {
     //
     // Get the Boot performance table and then install it to ACPI table.
     //
     CopyMem (&mReceivedAcpiBootPerformanceTable, Data + 1, Data->Size);
+    InstallFirmwarePerformanceDataTable ();
   } else if (Data != NULL && CompareGuid (&Data->Type, &gEfiFirmwarePerformanceGuid)) {
     DEBUG ((DEBUG_ERROR, "FpdtStatusCodeListenerDxe: Performance data reported through gEfiFirmwarePerformanceGuid will not be collected by FirmwarePerformanceDataTableDxe\n"));
     Status = EFI_UNSUPPORTED;
@@ -526,6 +550,32 @@ FpdtStatusCodeListenerDxe (
   return Status;
 }
 
+/**
+  Notify function for event EndOfDxe.
+
+  This is used to install ACPI Firmware Performance Data Table for basic boot records.
+
+  @param[in]  Event   The Event that is being processed.
+  @param[in]  Context The Event Context.
+
+**/
+VOID
+EFIAPI
+FpdtEndOfDxeEventNotify (
+  IN EFI_EVENT        Event,
+  IN VOID             *Context
+  )
+{
+  //
+  // When performance is enabled, the FPDT will be installed when DxeCorePerformanceLib report the data to FimwarePerformanceDxe.
+  // This is used to install the FPDT for the basic boot recods when performance infrastructure is not enabled.
+  //
+  if ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0) {
+    return;
+  }
+  ASSERT (mReceivedAcpiBootPerformanceTable == NULL);
+  InstallFirmwarePerformanceDataTable ();
+}
 
 /**
   Notify function for event EVT_SIGNAL_EXIT_BOOT_SERVICES. This is used to record
@@ -596,6 +646,7 @@ FirmwarePerformanceDxeEntryPoint (
   FIRMWARE_SEC_PERFORMANCE *Performance;
   VOID                     *Registration;
   UINT64                   OemTableId;
+  EFI_EVENT                EndOfDxeEvent;
 
   CopyMem (
     mFirmwarePerformanceTableTemplate.Header.OemId,
@@ -618,6 +669,19 @@ FirmwarePerformanceDxeEntryPoint (
   // Register report status code listener for OS Loader load and start.
   //
   Status = mRscHandlerProtocol->Register (FpdtStatusCodeListenerDxe, TPL_HIGH_LEVEL);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Register the notify function to install FPDT at EndOfDxe.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  FpdtEndOfDxeEventNotify,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &EndOfDxeEvent
+                  );
   ASSERT_EFI_ERROR (Status);
 
   //
