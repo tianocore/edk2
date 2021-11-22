@@ -198,7 +198,8 @@ BEGIN {
                 "no-whirlpool",
                 # OpenSSL1_1_1b doesn't support default rand-seed-os for UEFI
                 # UEFI only support --with-rand-seed=none
-                "--with-rand-seed=none"
+                "--with-rand-seed=none",
+                "--api=1.1.1"
                 ) == 0 ||
                     die "OpenSSL Configure failed!\n";
 
