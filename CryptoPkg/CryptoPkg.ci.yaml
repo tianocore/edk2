@@ -19,6 +19,9 @@
         ##     "<ErrorID>", "<KeyWord>"
         ## ]
         "ExceptionList": [
+            "8001", "IsLeap",
+            "8001", "OBJ_get0_data",
+            "8001", "OBJ_length"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
@@ -26,14 +29,15 @@
             # The unit testing folder is not to be checked
             "Test/UnitTest",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
-            "Library/BaseCryptLib/SysCall/UnitTestHostCrtWrapper.c",
+            "Library/BaseCryptLib/SysCall",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
             "Library/OpensslLib/rand_pool.c",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
             "Library/Include/CrtLibSupport.h",
             # These directories contain auto-generated OpenSSL content
-            "Library/OpensslLib/X64",
-            "Library/OpensslLib/X64Gcc"
+            "Library/OpensslLib",
+            "Library/IntrinsicLib",
+            "Library/BaseCryptLib/Pk/CryptPkcs7VerifyBase.c"
         ]
     },
     "CompilerPlugin": {
