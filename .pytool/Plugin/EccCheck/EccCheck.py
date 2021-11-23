@@ -69,31 +69,49 @@ class EccCheck(ICiBuildPlugin):
         env.set_shell_var('WORKSPACE', workspace_path)
         env.set_shell_var('PACKAGES_PATH', os.pathsep.join(Edk2pathObj.PackagePathList))
         self.ECC_PASS = True
-        self.ApplyConfig(pkgconfig, workspace_path, basetools_path, packagename)
+
+        # Create temp directory
+        temp_path = os.path.join(workspace_path, 'Build', '.pytool', 'Plugin', 'EccCheck')
+        # Delete temp directory
+        if os.path.exists(temp_path):
+            shutil.rmtree(temp_path)
+        # Copy package being scanned to temp_path
+        shutil.copytree (
+          os.path.join(workspace_path, packagename),
+          os.path.join(temp_path, packagename),
+          symlinks=True
+          )
+        # Copy exception.xml to temp_path
+        shutil.copyfile (
+          os.path.join(basetools_path, "Source", "Python", "Ecc", "exception.xml"),
+          os.path.join(temp_path, "exception.xml")
+          )
+
+        self.ApplyConfig(pkgconfig, temp_path, packagename)
         modify_dir_list = self.GetModifyDir(packagename)
         patch = self.GetDiff(packagename)
-        ecc_diff_range = self.GetDiffRange(patch, packagename, workspace_path)
-        self.GenerateEccReport(modify_dir_list, ecc_diff_range, workspace_path, basetools_path)
-        ecc_log = os.path.join(workspace_path, "Ecc.log")
-        self.RevertCode()
+        ecc_diff_range = self.GetDiffRange(patch, packagename, temp_path)
+        #
+        # Use temp_path as working directory when running ECC tool
+        #
+        self.GenerateEccReport(modify_dir_list, ecc_diff_range, temp_path, basetools_path)
+        ecc_log = os.path.join(temp_path, "Ecc.log")
         if self.ECC_PASS:
+            # Delete temp directory
+            if os.path.exists(temp_path):
+                shutil.rmtree(temp_path)
             tc.SetSuccess()
-            self.RemoveFile(ecc_log)
             return 0
         else:
             with open(ecc_log, encoding='utf8') as output:
                 ecc_output = output.readlines()
                 for line in ecc_output:
                     logging.error(line.strip())
-            self.RemoveFile(ecc_log)
-            tc.SetFailed("EccCheck failed for {0}".format(packagename), "Ecc detected issues")
+            # Delete temp directory
+            if os.path.exists(temp_path):
+                shutil.rmtree(temp_path)
+            tc.SetFailed("EccCheck failed for {0}".format(packagename), "CHECK FAILED")
             return 1
-
-    def RevertCode(self) -> None:
-        submoudle_params = "submodule update --init"
-        RunCmd("git", submoudle_params)
-        reset_params = "reset HEAD --hard"
-        RunCmd("git", reset_params)
 
     def GetDiff(self, pkg: str) -> List[str]:
         return_buffer = StringIO()
@@ -104,11 +122,6 @@ class EccCheck(ICiBuildPlugin):
         return_buffer.close()
 
         return patch
-
-    def RemoveFile(self, file: str) -> None:
-        if os.path.exists(file):
-            os.remove(file)
-        return
 
     def GetModifyDir(self, pkg: str) -> List[str]:
         return_buffer = StringIO()
@@ -132,14 +145,14 @@ class EccCheck(ICiBuildPlugin):
         modify_dir_list = list(set(modify_dir_list))
         return modify_dir_list
 
-    def GetDiffRange(self, patch_diff: List[str], pkg: str, workingdir: str) -> Dict[str, List[Tuple[int, int]]]:
+    def GetDiffRange(self, patch_diff: List[str], pkg: str, temp_path: str) -> Dict[str, List[Tuple[int, int]]]:
         IsDelete = True
         StartCheck = False
         range_directory: Dict[str, List[Tuple[int, int]]] = {}
         for line in patch_diff:
             modify_file = self.FindModifyFile.findall(line)
             if modify_file and pkg in modify_file[0] and not StartCheck and os.path.isfile(modify_file[0]):
-                modify_file_comment_dic = self.GetCommentRange(modify_file[0], workingdir)
+                modify_file_comment_dic = self.GetCommentRange(modify_file[0], temp_path)
                 IsDelete = False
                 StartCheck = True
                 modify_file_dic = modify_file[0]
@@ -158,11 +171,13 @@ class EccCheck(ICiBuildPlugin):
                         range_directory[modify_file_dic].append(i)
         return range_directory
 
-    def GetCommentRange(self, modify_file: str, workingdir: str) -> List[Tuple[int, int]]:
-        modify_file_path = os.path.join(workingdir, modify_file)
+    def GetCommentRange(self, modify_file: str, temp_path: str) -> List[Tuple[int, int]]:
+        comment_range: List[Tuple[int, int]] = []
+        modify_file_path = os.path.join(temp_path, modify_file)
+        if not os.path.exists (modify_file_path):
+            return comment_range
         with open(modify_file_path) as f:
             line_no = 1
-            comment_range: List[Tuple[int, int]] = []
             Start = False
             for line in f:
                 if line.startswith('/**'):
@@ -179,35 +194,33 @@ class EccCheck(ICiBuildPlugin):
         return comment_range
 
     def GenerateEccReport(self, modify_dir_list: List[str], ecc_diff_range: Dict[str, List[Tuple[int, int]]],
-                           workspace_path: str, basetools_path: str) -> None:
+                           temp_path: str, basetools_path: str) -> None:
         ecc_need = False
         ecc_run = True
-        config = os.path.join(basetools_path, "Source", "Python", "Ecc", "config.ini")
-        exception = os.path.join(basetools_path, "Source", "Python", "Ecc", "exception.xml")
-        report = os.path.join(workspace_path, "Ecc.csv")
+        config    = os.path.normpath(os.path.join(basetools_path, "Source", "Python", "Ecc", "config.ini"))
+        exception = os.path.normpath(os.path.join(temp_path, "exception.xml"))
+        report    = os.path.normpath(os.path.join(temp_path, "Ecc.csv"))
         for modify_dir in modify_dir_list:
-            target = os.path.join(workspace_path, modify_dir)
+            target = os.path.normpath(os.path.join(temp_path, modify_dir))
             logging.info('Run ECC tool for the commit in %s' % modify_dir)
             ecc_need = True
             ecc_params = "-c {0} -e {1} -t {2} -r {3}".format(config, exception, target, report)
-            return_code = RunCmd("Ecc", ecc_params, workingdir=workspace_path)
+            return_code = RunCmd("Ecc", ecc_params, workingdir=temp_path)
             if return_code != 0:
                 ecc_run = False
                 break
             if not ecc_run:
                 logging.error('Fail to run ECC tool')
-            self.ParseEccReport(ecc_diff_range, workspace_path)
+            self.ParseEccReport(ecc_diff_range, temp_path)
 
         if not ecc_need:
             logging.info("Doesn't need run ECC check")
 
-        revert_params = "checkout -- {}".format(exception)
-        RunCmd("git", revert_params)
         return
 
-    def ParseEccReport(self, ecc_diff_range: Dict[str, List[Tuple[int, int]]], workspace_path: str) -> None:
-        ecc_log = os.path.join(workspace_path, "Ecc.log")
-        ecc_csv = os.path.join(workspace_path, "Ecc.csv")
+    def ParseEccReport(self, ecc_diff_range: Dict[str, List[Tuple[int, int]]], temp_path: str) -> None:
+        ecc_log = os.path.join(temp_path, "Ecc.log")
+        ecc_csv = os.path.join(temp_path, "Ecc.csv")
         row_lines = []
         ignore_error_code = self.GetIgnoreErrorCode()
         if os.path.exists(ecc_csv):
@@ -236,16 +249,16 @@ class EccCheck(ICiBuildPlugin):
             log.writelines(all_line)
         return
 
-    def ApplyConfig(self, pkgconfig: Dict[str, List[str]], workspace_path: str, basetools_path: str, pkg: str) -> None:
+    def ApplyConfig(self, pkgconfig: Dict[str, List[str]], temp_path: str, pkg: str) -> None:
         if "IgnoreFiles" in pkgconfig:
             for a in pkgconfig["IgnoreFiles"]:
-                a = os.path.join(workspace_path, pkg, a)
+                a = os.path.join(temp_path, pkg, a)
                 a = a.replace(os.sep, "/")
 
                 logging.info("Ignoring Files {0}".format(a))
                 if os.path.exists(a):
                     if os.path.isfile(a):
-                        self.RemoveFile(a)
+                        os.remove(a)
                     elif os.path.isdir(a):
                         shutil.rmtree(a)
                 else:
@@ -253,7 +266,7 @@ class EccCheck(ICiBuildPlugin):
 
         if "ExceptionList" in pkgconfig:
             exception_list = pkgconfig["ExceptionList"]
-            exception_xml = os.path.join(basetools_path, "Source", "Python", "Ecc", "exception.xml")
+            exception_xml = os.path.join(temp_path, "exception.xml")
             try:
                 logging.info("Appending exceptions")
                 self.AppendException(exception_list, exception_xml)
