@@ -5,6 +5,18 @@
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+            "4002", "HobConstructor"
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+        ]
+    },
     ## options defined .pytool/Plugin/CompilerPlugin
     "CompilerPlugin": {
         "DscPath": "StandaloneMmPkg.dsc"
