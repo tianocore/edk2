@@ -1,0 +1,16 @@
+## @file
+# Downloads the Uncrustify application from a Project Mu NuGet package.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "id": "uncrustify-ci-1",
+  "scope": "cibuild",
+  "type": "nuget",
+  "name": "mu-uncrustify-release",
+  "source": "https://pkgs.dev.azure.com/projectmu/Uncrustify/_packaging/mu_uncrustify/nuget/v3/index.json",
+  "version": "73.0.3",
+  "flags": ["set_shell_var", "host_specific"],
+  "var_name": "UNCRUSTIFY_CI_PATH"
+}
