@@ -72,45 +72,61 @@ class EccCheck(ICiBuildPlugin):
 
         # Create temp directory
         temp_path = os.path.join(workspace_path, 'Build', '.pytool', 'Plugin', 'EccCheck')
-        # Delete temp directory
-        if os.path.exists(temp_path):
-            shutil.rmtree(temp_path)
-        # Copy package being scanned to temp_path
-        shutil.copytree (
-          os.path.join(workspace_path, packagename),
-          os.path.join(temp_path, packagename),
-          symlinks=True
-          )
-        # Copy exception.xml to temp_path
-        shutil.copyfile (
-          os.path.join(basetools_path, "Source", "Python", "Ecc", "exception.xml"),
-          os.path.join(temp_path, "exception.xml")
-          )
+        try:
+            # Delete temp directory
+            if os.path.exists(temp_path):
+                shutil.rmtree(temp_path)
+            # Copy package being scanned to temp_path
+            shutil.copytree (
+              os.path.join(workspace_path, packagename),
+              os.path.join(temp_path, packagename),
+              symlinks=True
+              )
+            # Copy exception.xml to temp_path
+            shutil.copyfile (
+              os.path.join(basetools_path, "Source", "Python", "Ecc", "exception.xml"),
+              os.path.join(temp_path, "exception.xml")
+              )
 
-        self.ApplyConfig(pkgconfig, temp_path, packagename)
-        modify_dir_list = self.GetModifyDir(packagename)
-        patch = self.GetDiff(packagename)
-        ecc_diff_range = self.GetDiffRange(patch, packagename, temp_path)
-        #
-        # Use temp_path as working directory when running ECC tool
-        #
-        self.GenerateEccReport(modify_dir_list, ecc_diff_range, temp_path, basetools_path)
-        ecc_log = os.path.join(temp_path, "Ecc.log")
-        if self.ECC_PASS:
+            self.ApplyConfig(pkgconfig, temp_path, packagename)
+            modify_dir_list = self.GetModifyDir(packagename)
+            patch = self.GetDiff(packagename)
+            ecc_diff_range = self.GetDiffRange(patch, packagename, temp_path)
+            #
+            # Use temp_path as working directory when running ECC tool
+            #
+            self.GenerateEccReport(modify_dir_list, ecc_diff_range, temp_path, basetools_path)
+            ecc_log = os.path.join(temp_path, "Ecc.log")
+            if self.ECC_PASS:
+                # Delete temp directory
+                if os.path.exists(temp_path):
+                    shutil.rmtree(temp_path)
+                tc.SetSuccess()
+                return 0
+            else:
+                with open(ecc_log, encoding='utf8') as output:
+                    ecc_output = output.readlines()
+                    for line in ecc_output:
+                        logging.error(line.strip())
+                # Delete temp directory
+                if os.path.exists(temp_path):
+                    shutil.rmtree(temp_path)
+                tc.SetFailed("EccCheck failed for {0}".format(packagename), "CHECK FAILED")
+                return 1
+        except KeyboardInterrupt:
+            # If EccCheck is interrupted by keybard interrupt, then return failure
             # Delete temp directory
             if os.path.exists(temp_path):
                 shutil.rmtree(temp_path)
-            tc.SetSuccess()
-            return 0
+            tc.SetFailed("EccCheck interrupted for {0}".format(packagename), "CHECK FAILED")
+            return 1
         else:
-            with open(ecc_log, encoding='utf8') as output:
-                ecc_output = output.readlines()
-                for line in ecc_output:
-                    logging.error(line.strip())
+            # If EccCheck fails for any other exception type, raise the exception
             # Delete temp directory
             if os.path.exists(temp_path):
                 shutil.rmtree(temp_path)
-            tc.SetFailed("EccCheck failed for {0}".format(packagename), "CHECK FAILED")
+            tc.SetFailed("EccCheck exception for {0}".format(packagename), "CHECK FAILED")
+            raise
             return 1
 
     def GetDiff(self, pkg: str) -> List[str]:
