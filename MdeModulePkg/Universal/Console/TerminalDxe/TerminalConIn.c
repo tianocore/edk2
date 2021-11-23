@@ -751,7 +751,7 @@ RawFiFoInsertOneKey (
   UINT8         Input
   )
 {
-  UINT8  Tail;
+  UINT16  Tail;
 
   Tail = TerminalDevice->RawFiFo->Tail;
 
@@ -764,7 +764,7 @@ RawFiFoInsertOneKey (
 
   TerminalDevice->RawFiFo->Data[Tail] = Input;
 
-  TerminalDevice->RawFiFo->Tail = (UINT8)((Tail + 1) % (RAW_FIFO_MAX_NUMBER + 1));
+  TerminalDevice->RawFiFo->Tail = (UINT16)((Tail + 1) % (RAW_FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -785,7 +785,7 @@ RawFiFoRemoveOneKey (
   UINT8         *Output
   )
 {
-  UINT8  Head;
+  UINT16  Head;
 
   Head = TerminalDevice->RawFiFo->Head;
 
@@ -800,7 +800,7 @@ RawFiFoRemoveOneKey (
   *Output                             = TerminalDevice->RawFiFo->Data[Head];
   TerminalDevice->RawFiFo->Data[Head] = 0;
 
-  TerminalDevice->RawFiFo->Head = (UINT8)((Head + 1) % (RAW_FIFO_MAX_NUMBER + 1));
+  TerminalDevice->RawFiFo->Head = (UINT16)((Head + 1) % (RAW_FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -840,8 +840,8 @@ IsRawFiFoFull (
   TERMINAL_DEV  *TerminalDevice
   )
 {
-  UINT8  Tail;
-  UINT8  Head;
+  UINT16  Tail;
+  UINT16  Head;
 
   Tail = TerminalDevice->RawFiFo->Tail;
   Head = TerminalDevice->RawFiFo->Head;
@@ -870,7 +870,7 @@ EfiKeyFiFoForNotifyInsertOneKey (
   EFI_INPUT_KEY  *Input
   )
 {
-  UINT8  Tail;
+  UINT16  Tail;
 
   Tail = EfiKeyFiFo->Tail;
 
@@ -883,7 +883,7 @@ EfiKeyFiFoForNotifyInsertOneKey (
 
   CopyMem (&EfiKeyFiFo->Data[Tail], Input, sizeof (EFI_INPUT_KEY));
 
-  EfiKeyFiFo->Tail = (UINT8)((Tail + 1) % (FIFO_MAX_NUMBER + 1));
+  EfiKeyFiFo->Tail = (UINT16)((Tail + 1) % (FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -904,7 +904,7 @@ EfiKeyFiFoForNotifyRemoveOneKey (
   EFI_INPUT_KEY  *Output
   )
 {
-  UINT8  Head;
+  UINT16  Head;
 
   Head = EfiKeyFiFo->Head;
   ASSERT (Head < FIFO_MAX_NUMBER + 1);
@@ -921,7 +921,7 @@ EfiKeyFiFoForNotifyRemoveOneKey (
   CopyMem (Output, &EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
   ZeroMem (&EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
 
-  EfiKeyFiFo->Head = (UINT8)((Head + 1) % (FIFO_MAX_NUMBER + 1));
+  EfiKeyFiFo->Head = (UINT16)((Head + 1) % (FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -961,8 +961,8 @@ IsEfiKeyFiFoForNotifyFull (
   EFI_KEY_FIFO  *EfiKeyFiFo
   )
 {
-  UINT8  Tail;
-  UINT8  Head;
+  UINT16  Tail;
+  UINT16  Head;
 
   Tail = EfiKeyFiFo->Tail;
   Head = EfiKeyFiFo->Head;
@@ -991,7 +991,7 @@ EfiKeyFiFoInsertOneKey (
   EFI_INPUT_KEY  *Key
   )
 {
-  UINT8                          Tail;
+  UINT16                         Tail;
   LIST_ENTRY                     *Link;
   LIST_ENTRY                     *NotifyList;
   TERMINAL_CONSOLE_IN_EX_NOTIFY  *CurrentNotify;
@@ -1035,7 +1035,7 @@ EfiKeyFiFoInsertOneKey (
 
   CopyMem (&TerminalDevice->EfiKeyFiFo->Data[Tail], Key, sizeof (EFI_INPUT_KEY));
 
-  TerminalDevice->EfiKeyFiFo->Tail = (UINT8)((Tail + 1) % (FIFO_MAX_NUMBER + 1));
+  TerminalDevice->EfiKeyFiFo->Tail = (UINT16)((Tail + 1) % (FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -1056,7 +1056,7 @@ EfiKeyFiFoRemoveOneKey (
   EFI_INPUT_KEY  *Output
   )
 {
-  UINT8  Head;
+  UINT16  Head;
 
   Head = TerminalDevice->EfiKeyFiFo->Head;
   ASSERT (Head < FIFO_MAX_NUMBER + 1);
@@ -1073,7 +1073,7 @@ EfiKeyFiFoRemoveOneKey (
   CopyMem (Output, &TerminalDevice->EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
   ZeroMem (&TerminalDevice->EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
 
-  TerminalDevice->EfiKeyFiFo->Head = (UINT8)((Head + 1) % (FIFO_MAX_NUMBER + 1));
+  TerminalDevice->EfiKeyFiFo->Head = (UINT16)((Head + 1) % (FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -1113,8 +1113,8 @@ IsEfiKeyFiFoFull (
   TERMINAL_DEV  *TerminalDevice
   )
 {
-  UINT8  Tail;
-  UINT8  Head;
+  UINT16  Tail;
+  UINT16  Head;
 
   Tail = TerminalDevice->EfiKeyFiFo->Tail;
   Head = TerminalDevice->EfiKeyFiFo->Head;
@@ -1143,7 +1143,7 @@ UnicodeFiFoInsertOneKey (
   UINT16        Input
   )
 {
-  UINT8  Tail;
+  UINT16  Tail;
 
   Tail = TerminalDevice->UnicodeFiFo->Tail;
   ASSERT (Tail < FIFO_MAX_NUMBER + 1);
@@ -1157,7 +1157,7 @@ UnicodeFiFoInsertOneKey (
 
   TerminalDevice->UnicodeFiFo->Data[Tail] = Input;
 
-  TerminalDevice->UnicodeFiFo->Tail = (UINT8)((Tail + 1) % (FIFO_MAX_NUMBER + 1));
+  TerminalDevice->UnicodeFiFo->Tail = (UINT16)((Tail + 1) % (FIFO_MAX_NUMBER + 1));
 
   return TRUE;
 }
@@ -1177,7 +1177,7 @@ UnicodeFiFoRemoveOneKey (
   UINT16        *Output
   )
 {
-  UINT8  Head;
+  UINT16  Head;
 
   Head = TerminalDevice->UnicodeFiFo->Head;
   ASSERT (Head < FIFO_MAX_NUMBER + 1);
@@ -1185,7 +1185,7 @@ UnicodeFiFoRemoveOneKey (
   *Output                                 = TerminalDevice->UnicodeFiFo->Data[Head];
   TerminalDevice->UnicodeFiFo->Data[Head] = 0;
 
-  TerminalDevice->UnicodeFiFo->Head = (UINT8)((Head + 1) % (FIFO_MAX_NUMBER + 1));
+  TerminalDevice->UnicodeFiFo->Head = (UINT16)((Head + 1) % (FIFO_MAX_NUMBER + 1));
 }
 
 /**
@@ -1223,8 +1223,8 @@ IsUnicodeFiFoFull (
   TERMINAL_DEV  *TerminalDevice
   )
 {
-  UINT8  Tail;
-  UINT8  Head;
+  UINT16  Tail;
+  UINT16  Head;
 
   Tail = TerminalDevice->UnicodeFiFo->Tail;
   Head = TerminalDevice->UnicodeFiFo->Head;
