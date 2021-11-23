@@ -30,7 +30,6 @@ class EccCheck(ICiBuildPlugin):
     },
     """
 
-    ReModifyFile = re.compile(r'[B-Q,S-Z]+[\d]*\t(.*)')
     FindModifyFile = re.compile(r'\+\+\+ b\/(.*)')
     LineScopePattern = (r'@@ -\d*\,*\d* \+\d*\,*\d* @@.*')
     LineNumRange = re.compile(r'@@ -\d*\,*\d* \+(\d*)\,*(\d*) @@.*')
@@ -87,10 +86,12 @@ class EccCheck(ICiBuildPlugin):
               os.path.join(basetools_path, "Source", "Python", "Ecc", "exception.xml"),
               os.path.join(temp_path, "exception.xml")
               )
+            # Output file to use for git diff operations
+            temp_diff_output = os.path.join (temp_path, 'diff.txt')
 
             self.ApplyConfig(pkgconfig, temp_path, packagename)
-            modify_dir_list = self.GetModifyDir(packagename)
-            patch = self.GetDiff(packagename)
+            modify_dir_list = self.GetModifyDir(packagename, temp_diff_output)
+            patch = self.GetDiff(packagename, temp_diff_output)
             ecc_diff_range = self.GetDiffRange(patch, packagename, temp_path)
             #
             # Use temp_path as working directory when running ECC tool
@@ -129,37 +130,103 @@ class EccCheck(ICiBuildPlugin):
             raise
             return 1
 
-    def GetDiff(self, pkg: str) -> List[str]:
-        return_buffer = StringIO()
-        params = "diff --unified=0 origin/master HEAD"
-        RunCmd("git", params, outstream=return_buffer)
-        p = return_buffer.getvalue().strip()
-        patch = p.split("\n")
-        return_buffer.close()
-
+    def GetDiff(self, pkg: str, temp_diff_output: str) -> List[str]:
+        patch = []
+        #
+        # Generate unified diff between origin/master and HEAD.
+        #
+        params = "diff --output={} --unified=0 origin/master HEAD".format(temp_diff_output)
+        RunCmd("git", params)
+        with open(temp_diff_output) as file:
+            patch = file.read().strip().split('\n')
         return patch
 
-    def GetModifyDir(self, pkg: str) -> List[str]:
-        return_buffer = StringIO()
-        params = "diff --name-status" + ' HEAD' + ' origin/master'
-        RunCmd("git", params, outstream=return_buffer)
-        p1 = return_buffer.getvalue().strip()
-        dir_list = p1.split("\n")
-        return_buffer.close()
+    def GetModifyDir(self, pkg: str, temp_diff_output: str) -> List[str]:
+        #
+        # Generate diff between origin/master and HEAD using --diff-filter to
+        # exclude deleted and renamed files that do not need to be scanned by
+        # ECC.  Also use --name-status to only generate the names of the files
+        # with differences.  The output format of this git diff command is a
+        # list of files with the change status and the filename.  The filename
+        # is always at the end of the line.  Examples:
+        #
+        #   M       MdeModulePkg/Application/CapsuleApp/CapsuleApp.h
+        #   M       MdeModulePkg/Application/UiApp/FrontPage.h
+        #
+        params = "diff --output={} --diff-filter=dr --name-status origin/master HEAD".format(temp_diff_output)
+        RunCmd("git", params)
+        dir_list = []
+        with open(temp_diff_output) as file:
+            dir_list = file.read().strip().split('\n')
+
         modify_dir_list = []
         for modify_dir in dir_list:
-            file_path = self.ReModifyFile.findall(modify_dir)
-            if file_path:
-                file_dir = os.path.dirname(file_path[0])
-            else:
+            #
+            # Parse file name from the end of the line
+            #
+            file_path = modify_dir.strip().split()
+            #
+            # Skip lines that do not have at least 2 elements (status and file name)
+            #
+            if len(file_path) < 2:
                 continue
-            if pkg in file_dir and file_dir != pkg:
-                modify_dir_list.append('%s' % file_dir)
-            else:
+            #
+            # Parse the directory name from the file name
+            #
+            file_dir = os.path.dirname(file_path[-1])
+            #
+            # Skip directory names that do not start with the package being scanned.
+            #
+            if file_dir.split('/')[0] != pkg:
                 continue
+            #
+            # Skip directory names that are identical to the package being scanned.
+            # The assumption here is that there are no source files at the package
+            # root.  Instead, the only expected files in the package root are
+            # EDK II meta data files (DEC, DSC, FDF).
+            #
+            if file_dir == pkg:
+                continue
+            #
+            # Skip directory names that are already in the modified dir list
+            #
+            if file_dir in modify_dir_list:
+                continue
+            #
+            # Add the candidate directory to scan to the modified dir list
+            #
+            modify_dir_list.append(file_dir)
 
-        modify_dir_list = list(set(modify_dir_list))
-        return modify_dir_list
+        #
+        # Remove duplicates from modify_dir_list
+        # Given a folder path, ECC performs a recursive scan of that folder.
+        # If a parent and child folder are both present in modify_dir_list,
+        # then ECC will perform redudanct scans of source files.  In order
+        # to prevent redundant scans, if a parent and child folder are both
+        # present, then remove all the child folders.
+        #
+        # For example, if modified_dir_list contains the following elements:
+        #   MdeModulePkg/Core/Dxe
+        #   MdeModulePkg/Core/Dxe/Hand
+        #   MdeModulePkg/Core/Dxe/Mem
+        #
+        # Then MdeModulePkg/Core/Dxe/Hand and MdeModulePkg/Core/Dxe/Mem should
+        # be removed because the files in those folders are covered by a scan
+        # of MdeModulePkg/Core/Dxe.
+        #
+        filtered_list = []
+        for dir1 in modify_dir_list:
+            Append = True
+            for dir2 in modify_dir_list:
+                if dir1 == dir2:
+                    continue
+                common = os.path.commonpath([dir1, dir2])
+                if os.path.normpath(common) == os.path.normpath(dir2):
+                    Append = False
+                    break
+            if Append and dir1 not in filtered_list:
+                filtered_list.append(dir1)
+        return filtered_list
 
     def GetDiffRange(self, patch_diff: List[str], pkg: str, temp_path: str) -> Dict[str, List[Tuple[int, int]]]:
         IsDelete = True
