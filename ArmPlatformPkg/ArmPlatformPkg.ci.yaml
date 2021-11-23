@@ -19,7 +19,8 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Scripts/Ds5/"
+            "Scripts/Ds5/",
+            "Drivers/PL061GpioDxe/PL061Gpio.c"
         ]
     },
 
