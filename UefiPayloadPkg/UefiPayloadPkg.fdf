@@ -117,6 +117,9 @@ INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe
 INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 !endif
 INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+!if $(PERFORMANCE_MEASUREMENT_ENABLE)
+  INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
+!endif
 
 #
 # SMM Support
@@ -130,6 +133,9 @@ INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   INF UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
   INF UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
   INF UefiPayloadPkg/PchSmiDispatchSmm/PchSmiDispatchSmm.inf
+!if $(PERFORMANCE_MEASUREMENT_ENABLE)
+  INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableSmm/FirmwarePerformanceSmm.inf
+!endif
 !endif
 
 !if $(VARIABLE_SUPPORT) == "EMU"
