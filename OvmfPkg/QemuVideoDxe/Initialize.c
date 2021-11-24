@@ -284,6 +284,88 @@ QemuVideoBochsAddMode (
   Private->MaxMode++;
 }
 
+STATIC
+VOID
+QemuVideoBochsEdid (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  UINT32                   *XRes,
+  UINT32                   *YRes
+  )
+{
+  EFI_STATUS  Status;
+
+  if (Private->Variant != QEMU_VIDEO_BOCHS_MMIO) {
+    return;
+  }
+
+  Status = Private->PciIo->Mem.Read (
+                                 Private->PciIo,
+                                 EfiPciIoWidthUint8,
+                                 PCI_BAR_IDX2,
+                                 0,
+                                 sizeof (Private->Edid),
+                                 Private->Edid
+                                 );
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: mmio read failed\n",
+      __FUNCTION__
+      ));
+    return;
+  }
+
+  if ((Private->Edid[0] != 0x00) ||
+      (Private->Edid[1] != 0xff))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: magic check failed\n",
+      __FUNCTION__
+      ));
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: blob found (extensions: %d)\n",
+    __FUNCTION__,
+    Private->Edid[126]
+    ));
+
+  if ((Private->Edid[54] == 0x00) &&
+      (Private->Edid[55] == 0x00))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: no detailed timing descriptor\n",
+      __FUNCTION__
+      ));
+    return;
+  }
+
+  *XRes = Private->Edid[56] | ((Private->Edid[58] & 0xf0) << 4);
+  *YRes = Private->Edid[59] | ((Private->Edid[61] & 0xf0) << 4);
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: default resolution: %dx%d\n",
+    __FUNCTION__,
+    *XRes,
+    *YRes
+    ));
+
+  if (PcdGet8 (PcdVideoResolutionSource) == 0) {
+    Status = PcdSet32S (PcdVideoHorizontalResolution, *XRes);
+    ASSERT_RETURN_ERROR (Status);
+    Status = PcdSet32S (PcdVideoVerticalResolution, *YRes);
+    ASSERT_RETURN_ERROR (Status);
+    Status = PcdSet8S (PcdVideoResolutionSource, 2);
+    ASSERT_RETURN_ERROR (Status);
+  }
+
+  // TODO: register edid as gEfiEdidDiscoveredProtocolGuid ?
+}
+
 EFI_STATUS
 QemuVideoBochsModeSetup (
   QEMU_VIDEO_PRIVATE_DATA  *Private,
@@ -291,7 +373,7 @@ QemuVideoBochsModeSetup (
   )
 {
   UINT32  AvailableFbSize;
-  UINT32  Index;
+  UINT32  Index, XRes = 0, YRes = 0;
 
   //
   // Fetch the available framebuffer size.
@@ -374,13 +456,29 @@ QemuVideoBochsModeSetup (
   // Setup Video Modes
   //
   Private->ModeData = AllocatePool (
-                        sizeof (Private->ModeData[0]) * QEMU_VIDEO_BOCHS_MODE_COUNT
+                        sizeof (Private->ModeData[0]) * (QEMU_VIDEO_BOCHS_MODE_COUNT+1)
                         );
   if (Private->ModeData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
+  QemuVideoBochsEdid (Private, &XRes, &YRes);
+  if (XRes && YRes) {
+    QemuVideoBochsAddMode (
+      Private,
+      AvailableFbSize,
+      XRes,
+      YRes
+      );
+  }
+
   for (Index = 0; Index < QEMU_VIDEO_BOCHS_MODE_COUNT; Index++) {
+    if ((QemuVideoBochsModes[Index].Width == XRes) &&
+        (QemuVideoBochsModes[Index].Height == YRes))
+    {
+      continue; // duplicate with edid resolution
+    }
+
     QemuVideoBochsAddMode (
       Private,
       AvailableFbSize,
