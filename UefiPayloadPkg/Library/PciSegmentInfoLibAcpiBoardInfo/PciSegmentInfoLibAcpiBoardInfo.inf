@@ -34,3 +34,6 @@
   PcdLib
   HobLib
   DebugLib
+
+[Guids]
+  gUefiAcpiBoardInfoGuid
