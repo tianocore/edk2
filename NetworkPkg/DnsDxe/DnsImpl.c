@@ -1700,6 +1700,7 @@ ON_EXIT:
           }
 
           FreePool (Dns4TokenEntry->Token->RspData.H2AData);
+          Dns4TokenEntry->Token->RspData.H2AData = NULL;
         }
       }
     }
@@ -1731,6 +1732,7 @@ ON_EXIT:
           }
 
           FreePool (Dns6TokenEntry->Token->RspData.H2AData);
+          Dns6TokenEntry->Token->RspData.H2AData = NULL;
         }
       }
     }
