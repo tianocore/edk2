@@ -405,6 +405,7 @@ inet_pton   (
 #define strcat(strDest, strSource)          AsciiStrCatS(strDest,MAX_STRING_SIZE,strSource)
 #define strncmp(string1, string2, count)    (int)(AsciiStrnCmp(string1,string2,(UINTN)(count)))
 #define strcasecmp(str1, str2)              (int)AsciiStriCmp(str1,str2)
+#define strstr(s1, s2)                      AsciiStrStr(s1,s2)
 #define sprintf(buf, ...)                   AsciiSPrint(buf,MAX_STRING_SIZE,__VA_ARGS__)
 #define localtime(timer)                    NULL
 #define assert(expression)
