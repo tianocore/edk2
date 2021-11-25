@@ -207,7 +207,7 @@ UsbHcAllocMemFromBlock (
     NEXT_BIT (Byte, Bit);
   }
 
-  return Block->Buf + (StartByte * 8 + StartBit) * USBHC_MEM_UNIT;
+  return Block->BufHost + (StartByte * 8 + StartBit) * USBHC_MEM_UNIT;
 }
 
 /**
@@ -508,12 +508,12 @@ UsbHcFreeMem (
     // scan the memory block list for the memory block that
     // completely contains the memory to free.
     //
-    if ((Block->Buf <= ToFree) && ((ToFree + AllocSize) <= (Block->Buf + Block->BufLen))) {
+    if ((Block->BufHost <= ToFree) && ((ToFree + AllocSize) <= (Block->BufHost + Block->BufLen))) {
       //
       // compute the start byte and bit in the bit array
       //
-      Byte = ((ToFree - Block->Buf) / USBHC_MEM_UNIT) / 8;
-      Bit  = ((ToFree - Block->Buf) / USBHC_MEM_UNIT) % 8;
+      Byte = ((ToFree - Block->BufHost) / USBHC_MEM_UNIT) / 8;
+      Bit  = ((ToFree - Block->BufHost) / USBHC_MEM_UNIT) % 8;
 
       //
       // reset associated bits in bit array
