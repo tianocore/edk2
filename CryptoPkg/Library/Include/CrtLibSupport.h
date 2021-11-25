@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define OPENSSLDIR  ""
 #define ENGINESDIR  ""
+#define MODULESDIR  ""
 
 #define MAX_STRING_SIZE  0x1000
 
