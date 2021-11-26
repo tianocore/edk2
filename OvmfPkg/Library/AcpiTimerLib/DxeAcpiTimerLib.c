@@ -50,6 +50,9 @@ AcpiTimerLibConstructor (
     case INTEL_Q35_MCH_DEVICE_ID:
       Pmba = POWER_MGMT_REGISTER_Q35 (ICH9_PMBASE);
       break;
+    case CLOUDHV_DEVICE_ID:
+      mAcpiTimerIoAddr = CLOUDHV_ACPI_TIMER_IO_ADDRESS;
+      return RETURN_SUCCESS;
     default:
       DEBUG ((
         DEBUG_ERROR,
