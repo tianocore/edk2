@@ -1,7 +1,7 @@
 /** @file
 SMM MP service implementation
 
-Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -261,7 +261,7 @@ IsLmceSignaled (
 **/
 VOID
 SmmWaitForApArrival (
-  VOID
+  IN  BOOLEAN  BlockingMode
   )
 {
   UINT64   Timer;
@@ -270,6 +270,13 @@ SmmWaitForApArrival (
   BOOLEAN  LmceSignal;
 
   ASSERT (*mSmmMpSyncData->Counter <= mNumberOfCpus);
+  
+  //
+  // if block is False, do not wait and return immediately.
+  //
+  if (!BlockingMode){
+    return;
+  }
 
   LmceEn     = FALSE;
   LmceSignal = FALSE;
@@ -511,7 +518,7 @@ BSPHandler (
     //
     // Wait for APs to arrive
     //
-    SmmWaitForApArrival ();
+    SmmWaitForApArrival (TRUE);
 
     //
     // Lock the counter down and retrieve the number of APs
@@ -1886,6 +1893,7 @@ InitializeMpSyncData (
     *mSmmMpSyncData->Counter       = 0;
     *mSmmMpSyncData->InsideSmm     = FALSE;
     *mSmmMpSyncData->AllCpusInSync = FALSE;
+    mSmmMpSyncData->AllApArrivedWithException = FALSE;
 
     for (CpuIndex = 0; CpuIndex < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; CpuIndex++) {
       mSmmMpSyncData->CpuData[CpuIndex].Busy =
