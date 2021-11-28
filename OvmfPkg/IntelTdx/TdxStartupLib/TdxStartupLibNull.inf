@@ -1,0 +1,40 @@
+#/** @file
+# Component description file for TDX Pre PI Library
+#
+# LIbrary helps you build a platform that skips PEI and loads DXE Core
+# directly. Helps building HOBs, reading data from the FV, and doing
+# decompression.
+#
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TdxStartupLibNull
+  FILE_GUID                      = 79DD2160-D5E0-48CD-AA87-479EACEE8393
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TdxStartupLib|SEC
+
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  TdxStartupNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+
+[Pcd]
