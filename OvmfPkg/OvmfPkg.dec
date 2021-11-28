@@ -121,6 +121,10 @@
   #
   TdxPlatformLib|Include/Library/TdxPlatformLib.h
 
+  ##  @libraryclass  TdxStartupLib
+  #
+  TdxStartupLib|Include/Library/TdxStartupLib.h
+
 [Guids]
   gUefiOvmfPkgTokenSpaceGuid            = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
   gEfiXenInfoGuid                       = {0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d}}
@@ -388,6 +392,9 @@
 
   ## The Tdx accept page size. 0x1000(4k),0x200000(2M)
   gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize|0x1000|UINT32|0x66
+
+  ## Noexec settings for Tdx guest.
+  gUefiOvmfPkgTokenSpaceGuid.PcdTdxSetNxForStack|TRUE|BOOLEAN|0x67
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
