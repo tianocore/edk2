@@ -9,6 +9,7 @@
 **/
 
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 
 #include "VirtioGpu.h"
 
@@ -195,11 +196,54 @@ STATIC CONST GOP_RESOLUTION  mGopResolutions[] = {
 STATIC
 VOID
 EFIAPI
+GopNativeResolution (
+  IN  VGPU_GOP  *VgpuGop,
+  OUT UINT32    *XRes,
+  OUT UINT32    *YRes
+  )
+{
+  volatile VIRTIO_GPU_RESP_DISPLAY_INFO  DisplayInfo;
+  EFI_STATUS                             Status;
+  UINTN                                  Index;
+
+  Status = VirtioGpuGetDisplayInfo (VgpuGop->ParentBus, &DisplayInfo);
+  if (Status != EFI_SUCCESS) {
+    return;
+  }
+
+  for (Index = 0; Index < VIRTIO_GPU_MAX_SCANOUTS; Index++) {
+    if (!DisplayInfo.Pmodes[Index].Enabled ||
+        !DisplayInfo.Pmodes[Index].Rectangle.Width ||
+        !DisplayInfo.Pmodes[Index].Rectangle.Height)
+    {
+      continue;
+    }
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: #%d: %dx%d\n",
+      __FUNCTION__,
+      Index,
+      DisplayInfo.Pmodes[Index].Rectangle.Width,
+      DisplayInfo.Pmodes[Index].Rectangle.Height
+      ));
+    if ((*XRes == 0) || (*YRes == 0)) {
+      *XRes = DisplayInfo.Pmodes[Index].Rectangle.Width;
+      *YRes = DisplayInfo.Pmodes[Index].Rectangle.Height;
+    }
+  }
+}
+
+STATIC
+VOID
+EFIAPI
 GopInitialize (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL  *This
   )
 {
-  VGPU_GOP  *VgpuGop;
+  VGPU_GOP    *VgpuGop;
+  EFI_STATUS  Status;
+  UINT32      XRes = 0, YRes = 0, Index;
 
   VgpuGop = VGPU_GOP_FROM_GOP (This);
 
@@ -216,6 +260,37 @@ GopInitialize (
   VgpuGop->GopMode.SizeOfInfo = sizeof VgpuGop->GopModeInfo;
 
   VgpuGop->GopModeInfo.PixelFormat = PixelBltOnly;
+
+  //
+  // query host for display resolution
+  //
+  GopNativeResolution (VgpuGop, &XRes, &YRes);
+  if ((XRes == 0) || (YRes == 0)) {
+    return;
+  }
+
+  if (PcdGet8 (PcdVideoResolutionSource) == 0) {
+    Status = PcdSet32S (PcdVideoHorizontalResolution, XRes);
+    ASSERT_RETURN_ERROR (Status);
+    Status = PcdSet32S (PcdVideoVerticalResolution, YRes);
+    ASSERT_RETURN_ERROR (Status);
+    Status = PcdSet8S (PcdVideoResolutionSource, 2);
+    ASSERT_RETURN_ERROR (Status);
+  }
+
+  VgpuGop->NativeXRes = XRes;
+  VgpuGop->NativeYRes = YRes;
+  for (Index = 0; Index < ARRAY_SIZE (mGopResolutions); Index++) {
+    if ((mGopResolutions[Index].Width == XRes) &&
+        (mGopResolutions[Index].Height == YRes))
+    {
+      // native resolution already is in mode list
+      return;
+    }
+  }
+
+  // add to mode list
+  VgpuGop->GopMode.MaxMode++;
 }
 
 //
@@ -242,10 +317,17 @@ GopQueryMode (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  GopModeInfo->HorizontalResolution = mGopResolutions[ModeNumber].Width;
-  GopModeInfo->VerticalResolution   = mGopResolutions[ModeNumber].Height;
-  GopModeInfo->PixelFormat          = PixelBltOnly;
-  GopModeInfo->PixelsPerScanLine    = mGopResolutions[ModeNumber].Width;
+  if (ModeNumber < ARRAY_SIZE (mGopResolutions)) {
+    GopModeInfo->HorizontalResolution = mGopResolutions[ModeNumber].Width;
+    GopModeInfo->VerticalResolution   = mGopResolutions[ModeNumber].Height;
+  } else {
+    VGPU_GOP  *VgpuGop = VGPU_GOP_FROM_GOP (This);
+    GopModeInfo->HorizontalResolution = VgpuGop->NativeXRes;
+    GopModeInfo->VerticalResolution   = VgpuGop->NativeYRes;
+  }
+
+  GopModeInfo->PixelFormat       = PixelBltOnly;
+  GopModeInfo->PixelsPerScanLine = GopModeInfo->HorizontalResolution;
 
   *SizeOfInfo = sizeof *GopModeInfo;
   *Info       = GopModeInfo;
