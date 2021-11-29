@@ -83,7 +83,7 @@ MmCommunication2Communicate (
   //
   // Check parameters
   //
-  if (CommBufferVirtual == NULL) {
+  if ((CommBufferVirtual == NULL) || (CommBufferPhysical == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
