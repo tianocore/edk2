@@ -20,15 +20,16 @@ SECTION .text
 
 BITS 64
 
+%define TDVMCALL_EXPOSE_REGS_MASK       0xffec
+%define TDVMCALL                        0x0
+%define EXIT_REASON_CPUID               0xa
+
 %macro  tdcall  0
   db  0x66, 0x0f, 0x01, 0xcc
 %endmacro
 
 ;
 ; Relocated Ap Mailbox loop
-;
-; @param[in]  RBX:  Relocated mailbox address
-; @param[in]  RBP:  vCpuId
 ;
 ; @return     None  This routine does not return
 ;
@@ -37,17 +38,19 @@ ASM_PFX(AsmRelocateApMailBoxLoop):
 AsmRelocateApMailBoxLoopStart:
 
     ;
-    ; TdCall[TDINFO] to get the vCpuId
+    ; AP doesn't know its ApicId. So TdVmcall[CPUID(0xb)] is invoked to get
+    ; the X2ApicId from host Vmm.
+    ; After the call, the X2ApicId is stored in R8.
     ;
-    ;mov     rax, 1
-    ;tdcall
-    ;
-    ; R8  [31:0]  NUM_VCPUS
-    ;     [63:32] MAX_VCPUS
-    ; R9  [31:0]  VCPU_INDEX
-    ;
+    mov        rax, TDVMCALL
+    mov        rcx, TDVMCALL_EXPOSE_REGS_MASK
+    mov        r11, EXIT_REASON_CPUID
+    mov        r12, 0xb
+    tdcall
+    test       rax, rax
+    jnz        Panic
+    mov        r8, r15
 
-    mov       r8, rbp
 MailBoxLoop:
     ; Spin until command set
     cmp        dword [rbx + CommandOffset], MpProtectedModeWakeupCommandNoop
@@ -69,6 +72,8 @@ MailBoxWakeUp:
     jmp       rax
 MailBoxSleep:
     jmp       $
+Panic:
+    ud2
 BITS 64
 AsmRelocateApMailBoxLoopEnd:
 
