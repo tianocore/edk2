@@ -2930,6 +2930,7 @@ vfrNumericFlags [CIfrNumeric & NObj, UINT32 LineNum] :
                                                             }
                                                             _PCATCH(NObj.SetFlags (HFlags, LFlags, IsDisplaySpecified), LineNum);
                                                           } else if ((_GET_CURRQEST_VARTINFO().mVarStoreId != EFI_VARSTORE_ID_INVALID) && (_GET_CURRQEST_VARTINFO().mIsBitVar)) {
+                                                            LFlags &= EDKII_IFR_DISPLAY_BIT;
                                                             LFlags |= (EDKII_IFR_NUMERIC_SIZE_BIT & (_GET_CURRQEST_VARSIZE()));
                                                             _PCATCH(NObj.SetFlagsForBitField (HFlags, LFlags, IsDisplaySpecified), LineNum);
                                                           }
@@ -3105,6 +3106,8 @@ vfrOneofFlagsField [CIfrOneOf & OObj, UINT32 LineNum] :
                                                             }
                                                             _PCATCH(OObj.SetFlags (HFlags, LFlags), LineNum);
                                                           } else if (_GET_CURRQEST_VARTINFO().mVarStoreId != EFI_VARSTORE_ID_INVALID) {
+                                                            LFlags &= EDKII_IFR_DISPLAY_BIT;
+                                                            LFlags |= (EDKII_IFR_NUMERIC_SIZE_BIT & (_GET_CURRQEST_VARSIZE()));
                                                             _PCATCH(OObj.SetFlagsForBitField (HFlags, LFlags), LineNum);
                                                           }
                                                        >>

@@ -1455,7 +1455,7 @@ public:
       return Ret;
     }
 
-    if (LFlags & EFI_IFR_DISPLAY) {
+    if (LFlags & EDKII_IFR_DISPLAY_BIT) {
       mOneOf->Flags = LFlags;
     } else {
       mOneOf->Flags = LFlags | EDKII_IFR_DISPLAY_UINT_DEC_BIT;
