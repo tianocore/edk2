@@ -1373,6 +1373,8 @@ UpdateBootPerformanceTable (
   UINTN                            AppendSize;
   UINT8                            *FirmwarePerformanceTablePtr;
 
+  SmmBootRecordDataSize = 0;
+
   //
   // Get SMM performance data.
   //
