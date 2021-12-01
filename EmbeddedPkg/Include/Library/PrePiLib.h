@@ -180,6 +180,9 @@ FfsAnyFvFindFirstFile (
 
 /**
   Get Fv image from the FV type file, then add FV & FV2 Hob.
+  This function can handle the situation that a compressed
+  section contains multi-FvImages and create FV/FV2 Hob for
+  all the FvImages.
 
   @param FileHandle  File handle of a Fv type file.
 
@@ -190,7 +193,7 @@ FfsAnyFvFindFirstFile (
 **/
 EFI_STATUS
 EFIAPI
-FfsProcessFvFile (
+FfsProcessFvFileEx (
   IN  EFI_PEI_FILE_HANDLE  FvFileHandle
   );
 
@@ -733,6 +736,22 @@ EFI_STATUS
 EFIAPI
 DecompressFirstFv (
   VOID
+  );
+
+/**
+ * This function find the file by GUID name from a FvImage.
+ *
+ * @param Name          GUID name of the file
+ * @param VolumeHandle  The handle of the Fv
+ * @param FileHandle    The handle of the File
+ * @return EFI_STATUS   Successfully find the file.
+ */
+EFI_STATUS
+EFIAPI
+FfsAnyFvFindFileByName (
+  IN  CONST EFI_GUID       *Name,
+  OUT EFI_PEI_FV_HANDLE    *VolumeHandle,
+  OUT EFI_PEI_FILE_HANDLE  *FileHandle
   );
 
 #endif

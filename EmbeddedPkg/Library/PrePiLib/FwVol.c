@@ -335,7 +335,7 @@ FfsProcessSection (
 
         Status = UefiDecompressGetInfo (
                    CompressedData,
-                   CompressedDataLength,
+                   (UINT32)CompressedDataLength,
                    &DstBufferSize,
                    &ScratchBufferSize
                    );
@@ -850,6 +850,403 @@ FfsProcessFvFile (
     &FvImageInfo.FvName,
     &(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name)
     );
+  return EFI_SUCCESS;
+}
+
+/**
+ * This function find the file by GUID name from a FvImage.
+ *
+ * @param Name          GUID name of the file
+ * @param VolumeHandle  The handle of the Fv
+ * @param FileHandle    The handle of the File
+ * @return EFI_STATUS   Successfully find the file.
+ */
+EFI_STATUS
+EFIAPI
+FfsAnyFvFindFileByName (
+  IN  CONST EFI_GUID       *Name,
+  OUT EFI_PEI_FV_HANDLE    *VolumeHandle,
+  OUT EFI_PEI_FILE_HANDLE  *FileHandle
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Instance;
+
+  //
+  // Search every FV for the file by name
+  //
+  Instance    = 0;
+  *FileHandle = NULL;
+
+  while (1) {
+    Status = FfsFindNextVolume (Instance++, VolumeHandle);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    Status = FfsFindFileByName (Name, *VolumeHandle, FileHandle);
+    if (!EFI_ERROR (Status)) {
+      break;
+    }
+  }
+
+  DEBUG ((DEBUG_INFO, "FfsAnyFvFindFileByName with name = %g, %r\n", Name, Status));
+
+  return Status;
+}
+
+/**
+ * This function decompress the compressed section.
+ *
+ * @param FileHandle        File handle
+ * @param OutputBuffer      Pointer to the decompressed data
+ * @param OutputBufferSize  Pointer to the size of the decompressed data
+ * @return EFI_STATUS
+ */
+EFI_STATUS
+FfsDecompressSection (
+  IN VOID     *FileHandle,
+  OUT VOID    **OutputBuffer,
+  OUT UINT32  *OutputBufferSize
+  )
+{
+  EFI_STATUS                 Status;
+  UINT32                     SectionLength;
+  UINT32                     ParsedLength;
+  EFI_COMPRESSION_SECTION    *CompressionSection;
+  EFI_COMPRESSION_SECTION2   *CompressionSection2;
+  UINT32                     DstBufferSize;
+  VOID                       *ScratchBuffer;
+  UINT32                     ScratchBufferSize;
+  VOID                       *DstBuffer;
+  UINT16                     SectionAttribute;
+  UINT32                     AuthenticationStatus;
+  CHAR8                      *CompressedData;
+  UINTN                      CompressedDataLength;
+  EFI_COMMON_SECTION_HEADER  *Section;
+  UINT32                     SectionSize;
+  EFI_FFS_FILE_HEADER        *FfsFileHeader;
+
+  *OutputBuffer     = NULL;
+  *OutputBufferSize = 0;
+  ParsedLength      = 0;
+  Status            = EFI_NOT_FOUND;
+
+  FfsFileHeader = (EFI_FFS_FILE_HEADER *)(FileHandle);
+  //
+  // Size is 24 bits wide so mask upper 8 bits.
+  // Does not include FfsFileHeader header size
+  // FileSize is adjusted to FileOccupiedSize as it is 8 byte aligned.
+  //
+  Section      = (EFI_COMMON_SECTION_HEADER *)(FfsFileHeader + 1);
+  SectionSize  = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+  SectionSize -= sizeof (EFI_FFS_FILE_HEADER);
+
+  while (ParsedLength < SectionSize) {
+    if (IS_SECTION2 (Section)) {
+      ASSERT (SECTION2_SIZE (Section) > 0x00FFFFFF);
+    }
+
+    DEBUG ((DEBUG_INFO, "Check section type=%x\n", Section->Type));
+
+    if ((Section->Type == EFI_SECTION_COMPRESSION) || (Section->Type == EFI_SECTION_GUID_DEFINED)) {
+      DEBUG ((DEBUG_INFO, "It is a compressed section.\n"));
+
+      if (Section->Type == EFI_SECTION_COMPRESSION) {
+        if (IS_SECTION2 (Section)) {
+          CompressionSection2 = (EFI_COMPRESSION_SECTION2 *)Section;
+          SectionLength       = SECTION2_SIZE (Section);
+
+          if (CompressionSection2->CompressionType != EFI_STANDARD_COMPRESSION) {
+            return EFI_UNSUPPORTED;
+          }
+
+          CompressedData       = (CHAR8 *)((EFI_COMPRESSION_SECTION2 *)Section + 1);
+          CompressedDataLength = (UINT32)SectionLength - sizeof (EFI_COMPRESSION_SECTION2);
+        } else {
+          CompressionSection = (EFI_COMPRESSION_SECTION *)Section;
+          SectionLength      = SECTION_SIZE (Section);
+
+          if (CompressionSection->CompressionType != EFI_STANDARD_COMPRESSION) {
+            return EFI_UNSUPPORTED;
+          }
+
+          CompressedData       = (CHAR8 *)((EFI_COMPRESSION_SECTION *)Section + 1);
+          CompressedDataLength = (UINT32)SectionLength - sizeof (EFI_COMPRESSION_SECTION);
+        }
+
+        Status = UefiDecompressGetInfo (
+                   CompressedData,
+                   (UINT32)CompressedDataLength,
+                   &DstBufferSize,
+                   &ScratchBufferSize
+                   );
+      } else if (Section->Type == EFI_SECTION_GUID_DEFINED) {
+        Status = ExtractGuidedSectionGetInfo (
+                   Section,
+                   &DstBufferSize,
+                   &ScratchBufferSize,
+                   &SectionAttribute
+                   );
+      }
+
+      if (EFI_ERROR (Status)) {
+        //
+        // GetInfo failed
+        //
+        DEBUG ((DEBUG_ERROR, "Decompress GetInfo Failed - %r\n", Status));
+        return EFI_NOT_FOUND;
+      }
+
+      //
+      // Allocate scratch buffer
+      //
+      ScratchBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (ScratchBufferSize));
+      if (ScratchBuffer == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      //
+      // Allocate destination buffer, extra one page for adjustment
+      //
+      DstBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize) + 1);
+      if (DstBuffer == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      //
+      // DstBuffer still is one section. Adjust DstBuffer offset, skip EFI section header
+      // to make section data at page alignment.
+      //
+      if (IS_SECTION2 (Section)) {
+        DstBuffer = (UINT8 *)DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER2);
+      } else {
+        DstBuffer = (UINT8 *)DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER);
+      }
+
+      //
+      // Call decompress function
+      //
+      if (Section->Type == EFI_SECTION_COMPRESSION) {
+        if (IS_SECTION2 (Section)) {
+          CompressedData = (CHAR8 *)((EFI_COMPRESSION_SECTION2 *)Section + 1);
+        } else {
+          CompressedData = (CHAR8 *)((EFI_COMPRESSION_SECTION *)Section + 1);
+        }
+
+        Status = UefiDecompress (
+                   CompressedData,
+                   DstBuffer,
+                   ScratchBuffer
+                   );
+      } else if (Section->Type == EFI_SECTION_GUID_DEFINED) {
+        Status = ExtractGuidedSectionDecode (
+                   Section,
+                   &DstBuffer,
+                   ScratchBuffer,
+                   &AuthenticationStatus
+                   );
+      }
+
+      if (EFI_ERROR (Status)) {
+        //
+        // Decompress failed
+        //
+        DEBUG ((DEBUG_ERROR, "Decompress Failed - %r\n", Status));
+        return EFI_NOT_FOUND;
+      } else {
+        *OutputBuffer     = DstBuffer;
+        *OutputBufferSize = DstBufferSize;
+        DEBUG ((
+          DEBUG_INFO,
+          "Decompressed data is at %x, %x\n",
+          DstBuffer,
+          DstBufferSize
+          ));
+        return EFI_SUCCESS;
+      }
+    }
+
+    if (IS_SECTION2 (Section)) {
+      SectionLength = SECTION2_SIZE (Section);
+    } else {
+      SectionLength = SECTION_SIZE (Section);
+    }
+
+    //
+    // SectionLength is adjusted it is 4 byte aligned.
+    // Go to the next section
+    //
+    SectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
+    ASSERT (SectionLength != 0);
+    ParsedLength += SectionLength;
+    Section       = (EFI_COMMON_SECTION_HEADER *)((UINT8 *)Section + SectionLength);
+    DEBUG ((DEBUG_INFO, "Go to next section.\n"));
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+#define MAX_FV_IMAGES  8
+/**
+  Get Fv image from the FV type file, then add FV & FV2 Hob.
+  This function can handle the situation that a compressed
+  section contains multi-FvImages and create FV/FV2 Hob for
+  all the FvImages.
+
+  We assume there are at most MAX_FV_IMAGES (8) FvImages in
+  a compressed section. If it is not the case, it can be
+  expanded to a larger one.
+
+  @param FileHandle  File handle of a Fv type file.
+
+
+  @retval EFI_NOT_FOUND  FV image can't be found.
+  @retval EFI_SUCCESS    Successfully to process it.
+
+**/
+EFI_STATUS
+EFIAPI
+FfsProcessFvFileEx (
+  IN  EFI_PEI_FILE_HANDLE  FvFileHandle
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_FV_INFO                   FvImageInfo;
+  UINT32                        FvAlignment;
+  VOID                          *FvBuffer;
+  EFI_PEI_HOB_POINTERS          HobFv2;
+  UINT32                        ParsedLength;
+  VOID                          *DecompressBuffer;
+  UINT32                        DecompressBufferSize;
+  UINT32                        FvImagesCnt;
+  UINT32                        SectionLength;
+  UINTN                         FvImageHandles[MAX_FV_IMAGES];
+  UINT32                        Index;
+  IN EFI_COMMON_SECTION_HEADER  *Section;
+
+  FvBuffer             = NULL;
+  DecompressBuffer     = NULL;
+  DecompressBufferSize = 0;
+
+  //
+  // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
+  // been extracted.
+  //
+  HobFv2.Raw = GetHobList ();
+  while ((HobFv2.Raw = GetNextHob (EFI_HOB_TYPE_FV2, HobFv2.Raw)) != NULL) {
+    if (CompareGuid (&(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name), &HobFv2.FirmwareVolume2->FileName)) {
+      //
+      // this FILE has been dispatched, it will not be dispatched again.
+      //
+      return EFI_SUCCESS;
+    }
+
+    HobFv2.Raw = GET_NEXT_HOB (HobFv2);
+  }
+
+  //
+  // Decompress section
+  //
+  Status = FfsDecompressSection (FvFileHandle, (VOID **)&DecompressBuffer, &DecompressBufferSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to decompress section. %r\n", Status));
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  //
+  // Find all the FvImages in the decompressed buffer
+  //
+  ParsedLength = 0;
+  FvImagesCnt  = 0;
+  Section      = (EFI_COMMON_SECTION_HEADER *)(DecompressBuffer);
+
+  while (ParsedLength < DecompressBufferSize && FvImagesCnt < MAX_FV_IMAGES) {
+    if (IS_SECTION2 (Section)) {
+      ASSERT (SECTION2_SIZE (Section) > 0x00FFFFFF);
+    }
+
+    if (Section->Type == EFI_SECTION_FIRMWARE_VOLUME_IMAGE) {
+      if (IS_SECTION2 (Section)) {
+        FvImageHandles[FvImagesCnt++] = (UINTN)(VOID *)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER2));
+      } else {
+        FvImageHandles[FvImagesCnt++] = (UINTN)(VOID *)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER));
+      }
+    }
+
+    if (IS_SECTION2 (Section)) {
+      SectionLength = SECTION2_SIZE (Section);
+    } else {
+      SectionLength = SECTION_SIZE (Section);
+    }
+
+    //
+    // SectionLength is adjusted it is 4 byte aligned.
+    // Go to the next section
+    //
+    SectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
+    ASSERT (SectionLength != 0);
+    ParsedLength += SectionLength;
+    Section       = (EFI_COMMON_SECTION_HEADER *)((UINT8 *)Section + SectionLength);
+  }
+
+  if (FvImagesCnt == 0) {
+    ASSERT (FALSE);
+    DEBUG ((DEBUG_ERROR, "Cannot find FvImages.\n"));
+    return EFI_NOT_FOUND;
+  }
+
+  DEBUG ((DEBUG_INFO, "Collect FvImageInfo\n"));
+  for (Index = 0; Index < FvImagesCnt; Index++) {
+    //
+    // Collect FvImage Info.
+    //
+    ZeroMem (&FvImageInfo, sizeof (FvImageInfo));
+    Status = FfsGetVolumeInfo ((VOID *)FvImageHandles[Index], &FvImageInfo);
+    ASSERT_EFI_ERROR (Status);
+    DEBUG ((DEBUG_INFO, "  Fv Name=%g, Format=%g, Size=0x%x\n", FvImageInfo.FvName, FvImageInfo.FvFormat, FvImageInfo.FvSize));
+
+    //
+    // FvAlignment must be more than 8 bytes required by FvHeader structure.
+    //
+    FvAlignment = 1 << ((FvImageInfo.FvAttributes & EFI_FVB2_ALIGNMENT) >> 16);
+    if (FvAlignment < 8) {
+      FvAlignment = 8;
+    }
+
+    //
+    // Check FvImage
+    //
+    if ((UINTN)FvImageInfo.FvStart % FvAlignment != 0) {
+      FvBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINT32)FvImageInfo.FvSize), FvAlignment);
+      if (FvBuffer == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      CopyMem (FvBuffer, FvImageInfo.FvStart, (UINTN)FvImageInfo.FvSize);
+      //
+      // Update FvImageInfo after reload FvImage to new aligned memory
+      //
+      FfsGetVolumeInfo ((EFI_PEI_FV_HANDLE)FvBuffer, &FvImageInfo);
+    }
+
+    //
+    // Inform HOB consumer phase, i.e. DXE core, the existence of this FV
+    //
+    BuildFvHob ((EFI_PHYSICAL_ADDRESS)(UINTN)FvImageInfo.FvStart, FvImageInfo.FvSize);
+
+    //
+    // Makes the encapsulated volume show up in DXE phase to skip processing of
+    // encapsulated file again.
+    //
+    BuildFv2Hob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN)FvImageInfo.FvStart,
+      FvImageInfo.FvSize,
+      &FvImageInfo.FvName,
+      &(((EFI_FFS_FILE_HEADER *)FvFileHandle)->Name)
+      );
+  }
 
   return EFI_SUCCESS;
 }
