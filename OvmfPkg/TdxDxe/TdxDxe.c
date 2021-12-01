@@ -24,6 +24,7 @@
 #include <Library/HobLib.h>
 #include <Protocol/Cpu.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 #include <IndustryStandard/Tdx.h>
 #include <IndustryStandard/IntelTdx.h>
 #include <Library/TdxLib.h>
@@ -180,6 +181,17 @@ TdxDxeEntryPoint (
   }
 
   SetMmioSharedBit ();
+
+ #ifdef INTEL_TDX_FULL_FEATURE
+  PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrIntelTdx);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
+  PcdStatus = PcdSetBoolS (PcdIa32EferChangeAllowed, FALSE);
+  ASSERT_RETURN_ERROR (PcdStatus);
+
+  PcdStatus = PcdSet64S (PcdTdxSharedBitMask, TdSharedPageMask ());
+  ASSERT_RETURN_ERROR (PcdStatus);
+ #endif
 
   PlatformInfo = (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
 

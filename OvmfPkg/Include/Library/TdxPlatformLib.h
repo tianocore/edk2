@@ -16,8 +16,8 @@
 #include <Library/HobLib.h>
 #include <IndustryStandard/IntelTdx.h>
 
-#define FW_CFG_NX_STACK_ITEM        "opt/ovmf/PcdSetNxForStack"
-#define FW_CFG_SYSTEM_STATE_ITEM    "etc/system-states"
+#define FW_CFG_NX_STACK_ITEM      "opt/ovmf/PcdSetNxForStack"
+#define FW_CFG_SYSTEM_STATE_ITEM  "etc/system-states"
 
 /**
  * Perform Platform initialization.
