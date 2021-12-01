@@ -13,7 +13,6 @@
 
 #string STR_MISC_SYSTEM_MANUFACTURER   #language en-US  "Not Specified"
 #string STR_MISC_SYSTEM_PRODUCT_NAME   #language en-US  "Not Specified"
-#string STR_MISC_SYSTEM_PRODUCT_NAME   #language en-US  "Not Specified"
 #string STR_MISC_SYSTEM_VERSION        #language en-US  "Not Specified"
 #string STR_MISC_SYSTEM_SERIAL_NUMBER  #language en-US  "Not Specified"
 #string STR_MISC_SYSTEM_SKU_NUMBER     #language en-US  "Not Specified"
