@@ -221,6 +221,34 @@ AllocateZeroPool (
 }
 
 /**
+  Copies a buffer to an allocated buffer of type EfiBootServicesData.
+
+  Allocates the number bytes specified by AllocationSize of type EfiBootServicesData, copies
+  AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the
+  allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
+  is not enough memory remaining to satisfy the request, then NULL is returned.
+
+  If Buffer is NULL, then ASSERT().
+  If AllocationSize is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
+
+  @param  AllocationSize        The number of bytes to allocate and zero.
+  @param  Buffer                The buffer to copy to the allocated buffer.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+EFIAPI
+AllocateCopyPool (
+  IN UINTN       AllocationSize,
+  IN CONST VOID  *Buffer
+  )
+{
+  ASSERT (FALSE);
+  return NULL;
+}
+
+/**
   Frees a buffer that was previously allocated with one of the pool allocation functions in the
   Memory Allocation Library.
 
