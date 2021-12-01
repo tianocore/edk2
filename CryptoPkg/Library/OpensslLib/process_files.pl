@@ -203,21 +203,8 @@ BEGIN {
                 ) == 0 ||
                     die "OpenSSL Configure failed!\n";
 
-            # Generate opensslconf.h per config data
-            system(
-                "perl -I. -Mconfigdata util/dofile.pl " .
-                "include/openssl/opensslconf.h.in " .
-                "> include/openssl/opensslconf.h"
-                ) == 0 ||
-                    die "Failed to generate opensslconf.h!\n";
-
-            # Generate dso_conf.h per config data
-            system(
-                "perl -I. -Mconfigdata util/dofile.pl " .
-                "include/crypto/dso_conf.h.in " .
-                "> include/crypto/dso_conf.h"
-                ) == 0 ||
-                    die "Failed to generate dso_conf.h!\n";
+            # Generate files per config data
+            system("make build_all_generated");
 
             chdir($basedir) ||
                 die "Cannot change to base directory \"" . $basedir . "\"";
@@ -416,25 +403,15 @@ if (!defined $arch) {
 }
 
 #
-# Copy opensslconf.h and dso_conf.h generated from OpenSSL Configuration
+# Copy generated files
 #
-print "\n--> Duplicating opensslconf.h into Include/openssl ... ";
-system(
-    "perl -pe 's/\\n/\\r\\n/' " .
-    "< " . $OPENSSL_PATH . "/include/openssl/opensslconf.h " .
-    "> " . $OPENSSL_PATH . "/../../Include/openssl/opensslconf.h"
-    ) == 0 ||
-    die "Cannot copy opensslconf.h!";
-print "Done!";
-
-print "\n--> Duplicating dso_conf.h into Include/crypto ... ";
-system(
-    "perl -pe 's/\\n/\\r\\n/' " .
-    "< " . $OPENSSL_PATH . "/include/crypto/dso_conf.h" .
-    "> " . $OPENSSL_PATH . "/../../Include/crypto/dso_conf.h"
-    ) == 0 ||
-    die "Cannot copy dso_conf.h!";
-print "Done!\n";
+for my $file (map { s/\.in//; $_ } glob($OPENSSL_PATH . "/include/*/*.h.in")) {
+    my $dest = $file;
+    $dest =~ s|.*/include/|../Include/|;
+    print "\n--> Duplicating $file into $dest ... ";
+    system("perl -pe 's/\\n/\\r\\n/' < $file > $dest") == 0
+        or die "Cannot copy $file !";
+}
 
 print "\nProcessing Files Done!\n";
 
