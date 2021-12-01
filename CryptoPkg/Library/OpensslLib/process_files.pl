@@ -428,6 +428,15 @@ for my $file (@hdrs) {
         or die "Cannot copy $file !";
 }
 
+for my $file (map { s/\.in//; $_ } glob($OPENSSL_PATH . "/providers/common/der/*.c.in")) {
+    next unless -f $file;
+    my $dest = $file;
+    $dest =~ s|.*/||;
+    print "\n--> Duplicating $file into $dest ... ";
+    system("perl -pe 's/\\n/\\r\\n/' < $file > $dest") == 0
+        or die "Cannot copy $file !";
+}
+
 print "\nProcessing Files Done!\n";
 
 # cleanup
