@@ -18,6 +18,52 @@
 #include <Uefi/UefiBaseType.h>
 
 /**
+ Determine if the SEV is active.
+
+ During the early booting, GuestType is set in the work area. Verify that it
+ is an SEV guest.
+
+ @retval TRUE   SEV is enabled
+ @retval FALSE  SEV is not enabled
+
+ **/
+STATIC
+BOOLEAN
+IsSevGuest (
+  VOID
+  )
+{
+  OVMF_WORK_AREA  *WorkArea;
+
+  //
+  // Ensure that the size of the Confidential Computing work area header
+  // is same as what is provided through a fixed PCD.
+  //
+  ASSERT ((UINTN) FixedPcdGet32 (PcdOvmfConfidentialComputingWorkAreaHeader) ==
+          sizeof(CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER));
+
+  WorkArea = (OVMF_WORK_AREA *) FixedPcdGet32 (PcdOvmfWorkAreaBase);
+
+  return ((WorkArea != NULL) && (WorkArea->Header.GuestType == GUEST_TYPE_AMD_SEV));
+}
+
+STATIC
+SEC_SEV_ES_WORK_AREA *
+GetSevEsWorkArea (
+  VOID
+  )
+{
+  //
+  // Before accessing the Es workarea lets verify that its SEV guest
+  //
+  if (!IsSevGuest()) {
+    return NULL;
+  }
+
+  return (SEC_SEV_ES_WORK_AREA *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
+}
+
+/**
   Reads and sets the status of SEV features.
 
   **/
@@ -35,7 +81,8 @@ InternalMemEncryptSevStatus (
 
   ReadSevMsr = FALSE;
 
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
+
+  SevEsWorkArea = GetSevEsWorkArea ();
   if (SevEsWorkArea != NULL && SevEsWorkArea->EncryptionMask != 0) {
     //
     // The MSR has been read before, so it is safe to read it again and avoid
@@ -115,7 +162,14 @@ MemEncryptSevGetEncryptionMask (
   SEC_SEV_ES_WORK_AREA              *SevEsWorkArea;
   UINT64                            EncryptionMask;
 
-  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *) FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  //
+  // Before accessing the Es workarea lets verify that its SEV guest
+  //
+  if (!IsSevGuest()) {
+    return 0;
+  }
+
+  SevEsWorkArea = GetSevEsWorkArea ();
   if (SevEsWorkArea != NULL) {
     EncryptionMask = SevEsWorkArea->EncryptionMask;
   } else {

@@ -48,4 +48,6 @@
   PcdLib
 
 [FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader

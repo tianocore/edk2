@@ -54,4 +54,6 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
