@@ -523,6 +523,9 @@
   buildinf.c
   ossl_store.c
   rand_pool.c
+  der_digests_gen.c
+  der_rsa_gen.c
+  der_wrap_gen.c
 
 [Packages]
   MdePkg/MdePkg.dec
