@@ -413,6 +413,17 @@ for my $file (map { s/\.in//; $_ } glob($OPENSSL_PATH . "/include/*/*.h.in")) {
         or die "Cannot copy $file !";
 }
 
+my @hdrs = ();
+push @hdrs, glob($OPENSSL_PATH . "/providers/common/include/prov/[a-z]*.h");
+push @hdrs, glob($OPENSSL_PATH . "/providers/implementations/include/prov/[a-z]*.h");
+for my $file (@hdrs) {
+    my $dest = $file;
+    $dest =~ s|.*/include/|../Include/|;
+    print "\n--> Duplicating $file into $dest ... ";
+    system("perl -pe 's/\\n/\\r\\n/' < $file > $dest") == 0
+        or die "Cannot copy $file !";
+}
+
 print "\nProcessing Files Done!\n";
 
 exit(0);
