@@ -12,7 +12,7 @@
 #include <Uefi/UefiBaseType.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/HobLib.h>
+#include <Library/PrePiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <Library/MemoryAllocationLib.h>
@@ -24,6 +24,11 @@
 #include "IntelTdx.h"
 
 #define ALIGNED_2MB_MASK  0x1fffff
+
+#define GET_HOB_TYPE(Hob)     ((Hob).Header->HobType)
+#define GET_HOB_LENGTH(Hob)   ((Hob).Header->HobLength)
+#define GET_NEXT_HOB(Hob)     ((Hob).Raw + GET_HOB_LENGTH (Hob))
+#define END_OF_HOB_LIST(Hob)  (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_END_OF_HOB_LIST)
 
 /**
   Check TDX is enabled.

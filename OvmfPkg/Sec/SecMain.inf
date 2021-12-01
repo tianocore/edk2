@@ -38,6 +38,7 @@
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
   OvmfPkg/OvmfPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -58,6 +59,7 @@
 
 [LibraryClasses.X64]
   TdxLib
+  TdxStartupLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED

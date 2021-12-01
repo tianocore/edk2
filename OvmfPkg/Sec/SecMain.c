@@ -33,6 +33,10 @@
 #include "IntelTdx.h"
 #include "AmdSev.h"
 
+#ifdef INTEL_TDX_FULL_FEATURE
+  #include <Library/TdxStartupLib.h>
+#endif
+
 #define SEC_IDT_ENTRY_COUNT  34
 
 typedef struct _SEC_IDT_TABLE {
@@ -912,6 +916,19 @@ SecCoreStartupWithStack (
   //
   InitializeApicTimer (0, MAX_UINT32, TRUE, 5);
   DisableApicTimerInterrupt ();
+
+ #ifdef INTEL_TDX_FULL_FEATURE
+  if (SecTdxIsEnabled ()) {
+    TdxStartup (&SecCoreData);
+
+    //
+    // Never arrived here
+    //
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+ #endif
 
   //
   // Initialize Debug Agent to support source level debug in SEC/PEI phases before memory ready.
