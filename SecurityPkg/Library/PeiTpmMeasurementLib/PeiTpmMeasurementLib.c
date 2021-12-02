@@ -36,25 +36,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 TpmMeasureAndLogData (
-  IN UINT32             PcrIndex,
-  IN UINT32             EventType,
-  IN VOID               *EventLog,
-  IN UINT32             LogLen,
-  IN VOID               *HashData,
-  IN UINT64             HashDataLen
+  IN UINT32  PcrIndex,
+  IN UINT32  EventType,
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
   )
 {
-  EFI_STATUS                Status;
-  EDKII_TCG_PPI             *TcgPpi;
-  TCG_PCR_EVENT_HDR         TcgEventHdr;
+  EFI_STATUS         Status;
+  EDKII_TCG_PPI      *TcgPpi;
+  TCG_PCR_EVENT_HDR  TcgEventHdr;
 
   Status = PeiServicesLocatePpi (
              &gEdkiiTcgPpiGuid,
              0,
              NULL,
-             (VOID**)&TcgPpi
+             (VOID **)&TcgPpi
              );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 

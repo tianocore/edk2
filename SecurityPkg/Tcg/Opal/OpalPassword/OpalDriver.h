@@ -44,37 +44,37 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "OpalPasswordCommon.h"
 #include "OpalHiiFormValues.h"
 
-#define EFI_DRIVER_NAME_UNICODE L"1.0 UEFI Opal Driver"
+#define EFI_DRIVER_NAME_UNICODE  L"1.0 UEFI Opal Driver"
 
 // UEFI 2.1
-#define LANGUAGE_RFC_3066_ENGLISH ((CHAR8*)"en")
+#define LANGUAGE_RFC_3066_ENGLISH  ((CHAR8*)"en")
 
 // UEFI/EFI < 2.1
-#define LANGUAGE_ISO_639_2_ENGLISH ((CHAR8*)"eng")
+#define LANGUAGE_ISO_639_2_ENGLISH  ((CHAR8*)"eng")
 
-#define CONCAT_(x, y) x ## y
-#define CONCAT(x, y) CONCAT_(x, y)
+#define CONCAT_(x, y)  x ## y
+#define CONCAT(x, y)   CONCAT_(x, y)
 
-#define UNICODE_STR(x) CONCAT( L, x )
+#define UNICODE_STR(x)  CONCAT( L, x )
 
 extern EFI_DRIVER_BINDING_PROTOCOL   gOpalDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gOpalComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gOpalComponentName2;
 
-#define OPAL_MSID_LENGTH        128
+#define OPAL_MSID_LENGTH  128
 
 #define MAX_PASSWORD_TRY_COUNT  5
 
 // PSID Length
-#define PSID_CHARACTER_LENGTH   0x20
-#define MAX_PSID_TRY_COUNT      5
+#define PSID_CHARACTER_LENGTH  0x20
+#define MAX_PSID_TRY_COUNT     5
 
 //
 // The max timeout value assume the user can wait for the revert action. The unit of this macro is second.
 // If the revert time value bigger than this one, driver needs to popup a dialog to let user confirm the
 // revert action.
 //
-#define MAX_ACCEPTABLE_REVERTING_TIME    10
+#define MAX_ACCEPTABLE_REVERTING_TIME  10
 
 #pragma pack(1)
 
@@ -84,66 +84,66 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gOpalComponentName2;
 // by the consumer of this library.
 //
 typedef struct {
-    //
-    // Indicates if the disk can support PSID Revert action.  should verify disk supports PSID authority
-    //
-    UINT16 PsidRevert : 1;
+  //
+  // Indicates if the disk can support PSID Revert action.  should verify disk supports PSID authority
+  //
+  UINT16    PsidRevert           : 1;
 
-    //
-    // Indicates if the disk can support Revert action
-    //
-    UINT16 Revert : 1;
+  //
+  // Indicates if the disk can support Revert action
+  //
+  UINT16    Revert               : 1;
 
-    //
-    // Indicates if the user must keep data for revert action.  It is true if no media encryption is supported.
-    //
-    UINT16 RevertKeepDataForced : 1;
+  //
+  // Indicates if the user must keep data for revert action.  It is true if no media encryption is supported.
+  //
+  UINT16    RevertKeepDataForced : 1;
 
-    //
-    // Indicates if the disk can support set Admin password
-    //
-    UINT16 AdminPass : 1;
+  //
+  // Indicates if the disk can support set Admin password
+  //
+  UINT16    AdminPass            : 1;
 
-    //
-    // Indicates if the disk can support set User password.  This action requires that a user
-    // password is first enabled.
-    //
-    UINT16 UserPass : 1;
+  //
+  // Indicates if the disk can support set User password.  This action requires that a user
+  // password is first enabled.
+  //
+  UINT16    UserPass             : 1;
 
-    //
-    // Indicates if unlock action is available.  Requires disk to be currently locked.
-    //
-    UINT16 Unlock : 1;
+  //
+  // Indicates if unlock action is available.  Requires disk to be currently locked.
+  //
+  UINT16    Unlock               : 1;
 
-    //
-    // Indicates if Secure Erase action is available.  Action requires admin credentials and media encryption support.
-    //
-    UINT16 SecureErase : 1;
+  //
+  // Indicates if Secure Erase action is available.  Action requires admin credentials and media encryption support.
+  //
+  UINT16    SecureErase          : 1;
 
-    //
-    // Indicates if Disable User action is available.  Action requires admin credentials.
-    //
-    UINT16 DisableUser : 1;
+  //
+  // Indicates if Disable User action is available.  Action requires admin credentials.
+  //
+  UINT16    DisableUser          : 1;
 } OPAL_DISK_ACTIONS;
 
 //
 // Structure that is used to represent an OPAL_DISK.
 //
 typedef struct {
-  UINT32                                          MsidLength;             // Byte length of MSID Pin for device
-  UINT8                                           Msid[OPAL_MSID_LENGTH]; // MSID Pin for device
-  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL           *Sscp;
-  UINT32                                          MediaId;                // MediaId is used by Ssc Protocol.
-  EFI_DEVICE_PATH_PROTOCOL                        *OpalDevicePath;
-  UINT16                                          OpalBaseComId;          // Opal SSC 1 base com id.
-  OPAL_OWNER_SHIP                                 Owner;
-  OPAL_DISK_SUPPORT_ATTRIBUTE                     SupportedAttributes;
-  TCG_LOCKING_FEATURE_DESCRIPTOR                  LockingFeature;         // Locking Feature Descriptor retrieved from performing a Level 0 Discovery
-  UINT8                                           PasswordLength;
-  UINT8                                           Password[OPAL_MAX_PASSWORD_SIZE];
+  UINT32                                   MsidLength;                    // Byte length of MSID Pin for device
+  UINT8                                    Msid[OPAL_MSID_LENGTH];        // MSID Pin for device
+  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *Sscp;
+  UINT32                                   MediaId;                       // MediaId is used by Ssc Protocol.
+  EFI_DEVICE_PATH_PROTOCOL                 *OpalDevicePath;
+  UINT16                                   OpalBaseComId;                 // Opal SSC 1 base com id.
+  OPAL_OWNER_SHIP                          Owner;
+  OPAL_DISK_SUPPORT_ATTRIBUTE              SupportedAttributes;
+  TCG_LOCKING_FEATURE_DESCRIPTOR           LockingFeature;                // Locking Feature Descriptor retrieved from performing a Level 0 Discovery
+  UINT8                                    PasswordLength;
+  UINT8                                    Password[OPAL_MAX_PASSWORD_SIZE];
 
-  UINT32                                          EstimateTimeCost;
-  BOOLEAN                                         SentBlockSID;           // Check whether BlockSid command has been sent.
+  UINT32                                   EstimateTimeCost;
+  BOOLEAN                                  SentBlockSID;                  // Check whether BlockSid command has been sent.
 } OPAL_DISK;
 
 //
@@ -152,23 +152,23 @@ typedef struct {
 typedef struct _OPAL_DRIVER_DEVICE OPAL_DRIVER_DEVICE;
 
 struct _OPAL_DRIVER_DEVICE {
-  OPAL_DRIVER_DEVICE                              *Next;              ///< Linked list pointer
-  EFI_HANDLE                                      Handle;             ///< Device handle
-  OPAL_DISK                                       OpalDisk;           ///< User context
-  CHAR16                                          *Name16;            ///< Allocated/freed by UEFI Filter Driver at device creation/removal
-  CHAR8                                           *NameZ;             ///< Allocated/freed by UEFI Filter Driver at device creation/removal
-  UINT32                                          MediaId;            ///< Required parameter for EFI_STORAGE_SECURITY_COMMAND_PROTOCOL, from BLOCK_IO_MEDIA
+  OPAL_DRIVER_DEVICE                       *Next;                     ///< Linked list pointer
+  EFI_HANDLE                               Handle;                    ///< Device handle
+  OPAL_DISK                                OpalDisk;                  ///< User context
+  CHAR16                                   *Name16;                   ///< Allocated/freed by UEFI Filter Driver at device creation/removal
+  CHAR8                                    *NameZ;                    ///< Allocated/freed by UEFI Filter Driver at device creation/removal
+  UINT32                                   MediaId;                   ///< Required parameter for EFI_STORAGE_SECURITY_COMMAND_PROTOCOL, from BLOCK_IO_MEDIA
 
-  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL           *Sscp;              /// Device protocols consumed
-  EFI_DEVICE_PATH_PROTOCOL                        *OpalDevicePath;
+  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *Sscp;                     /// Device protocols consumed
+  EFI_DEVICE_PATH_PROTOCOL                 *OpalDevicePath;
 };
 
 //
 // Opal Driver UEFI Driver Model
 //
 typedef struct {
-  EFI_HANDLE           Handle;              ///< Driver image handle
-  OPAL_DRIVER_DEVICE   *DeviceList;         ///< Linked list of controllers owned by this Driver
+  EFI_HANDLE            Handle;             ///< Driver image handle
+  OPAL_DRIVER_DEVICE    *DeviceList;        ///< Linked list of controllers owned by this Driver
 } OPAL_DRIVER;
 
 #pragma pack()
@@ -176,15 +176,15 @@ typedef struct {
 //
 // Retrieves a OPAL_DRIVER_DEVICE based on the pointer to its StorageSecurity protocol.
 //
-#define DRIVER_DEVICE_FROM_OPALDISK(OpalDiskPointer) (OPAL_DRIVER_DEVICE*)(BASE_CR(OpalDiskPointer, OPAL_DRIVER_DEVICE, OpalDisk))
+#define DRIVER_DEVICE_FROM_OPALDISK(OpalDiskPointer)  (OPAL_DRIVER_DEVICE*)(BASE_CR(OpalDiskPointer, OPAL_DRIVER_DEVICE, OpalDisk))
 
 /**
   Get devcie list info.
 
   @retval     return the device list pointer.
 **/
-OPAL_DRIVER_DEVICE*
-OpalDriverGetDeviceList(
+OPAL_DRIVER_DEVICE *
+OpalDriverGetDeviceList (
   VOID
   );
 
@@ -197,8 +197,8 @@ OpalDriverGetDeviceList(
   @retval     FALSE       Not found the name for this device.
 **/
 BOOLEAN
-OpalDriverGetDriverDeviceName(
-  OPAL_DRIVER_DEVICE          *Dev
+OpalDriverGetDriverDeviceName (
+  OPAL_DRIVER_DEVICE  *Dev
   );
 
 /**
@@ -222,9 +222,9 @@ GetDeviceCount (
 **/
 VOID
 OpalSupportUpdatePassword (
-  IN OUT OPAL_DISK      *OpalDisk,
-  IN VOID               *Password,
-  IN UINT32             PasswordLength
+  IN OUT OPAL_DISK  *OpalDisk,
+  IN VOID           *Password,
+  IN UINT32         PasswordLength
   );
 
 /**
@@ -239,11 +239,11 @@ OpalSupportUpdatePassword (
 **/
 TCG_RESULT
 EFIAPI
-OpalSupportGetAvailableActions(
-  IN  OPAL_DISK_SUPPORT_ATTRIBUTE      *SupportedAttributes,
-  IN  TCG_LOCKING_FEATURE_DESCRIPTOR   *LockingFeature,
-  IN  UINT16                           OwnerShip,
-  OUT OPAL_DISK_ACTIONS                *AvalDiskActions
+OpalSupportGetAvailableActions (
+  IN  OPAL_DISK_SUPPORT_ATTRIBUTE     *SupportedAttributes,
+  IN  TCG_LOCKING_FEATURE_DESCRIPTOR  *LockingFeature,
+  IN  UINT16                          OwnerShip,
+  OUT OPAL_DISK_ACTIONS               *AvalDiskActions
   );
 
 /**
@@ -259,11 +259,11 @@ OpalSupportGetAvailableActions(
 TCG_RESULT
 EFIAPI
 OpalSupportEnableOpalFeature (
-  IN OPAL_SESSION              *Session,
-  IN VOID                      *Msid,
-  IN UINT32                    MsidLength,
-  IN VOID                      *Password,
-  IN UINT32                    PassLength
+  IN OPAL_SESSION  *Session,
+  IN VOID          *Msid,
+  IN UINT32        MsidLength,
+  IN VOID          *Password,
+  IN UINT32        PassLength
   );
 
 /**
@@ -276,10 +276,9 @@ OpalSupportEnableOpalFeature (
 **/
 EFI_STATUS
 EFIAPI
-EfiDriverUnload(
-  EFI_HANDLE ImageHandle
+EfiDriverUnload (
+  EFI_HANDLE  ImageHandle
   );
-
 
 /**
   Test to see if this driver supports Controller.
@@ -296,10 +295,10 @@ EfiDriverUnload(
 **/
 EFI_STATUS
 EFIAPI
-OpalEfiDriverBindingSupported(
-  EFI_DRIVER_BINDING_PROTOCOL*    This,
-  EFI_HANDLE                      Controller,
-  EFI_DEVICE_PATH_PROTOCOL*       RemainingDevicePath
+OpalEfiDriverBindingSupported (
+  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  EFI_HANDLE                   Controller,
+  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -335,10 +334,10 @@ OpalEfiDriverBindingSupported(
 **/
 EFI_STATUS
 EFIAPI
-OpalEfiDriverBindingStart(
-  EFI_DRIVER_BINDING_PROTOCOL*    This,
-  EFI_HANDLE                      Controller,
-  EFI_DEVICE_PATH_PROTOCOL*       RemainingDevicePath
+OpalEfiDriverBindingStart (
+  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  EFI_HANDLE                   Controller,
+  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -356,11 +355,11 @@ OpalEfiDriverBindingStart(
 **/
 EFI_STATUS
 EFIAPI
-OpalEfiDriverBindingStop(
-  EFI_DRIVER_BINDING_PROTOCOL*    This,
-  EFI_HANDLE                      Controller,
-  UINTN                           NumberOfChildren,
-  EFI_HANDLE*                     ChildHandleBuffer
+OpalEfiDriverBindingStop (
+  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  EFI_HANDLE                   Controller,
+  UINTN                        NumberOfChildren,
+  EFI_HANDLE                   *ChildHandleBuffer
   );
 
 /**
@@ -404,10 +403,10 @@ OpalEfiDriverBindingStop(
 **/
 EFI_STATUS
 EFIAPI
-OpalEfiDriverComponentNameGetDriverName(
-  EFI_COMPONENT_NAME_PROTOCOL*    This,
-  CHAR8*                          Language,
-  CHAR16**                        DriverName
+OpalEfiDriverComponentNameGetDriverName (
+  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  CHAR8                        *Language,
+  CHAR16                       **DriverName
   );
 
 /**
@@ -480,12 +479,12 @@ OpalEfiDriverComponentNameGetDriverName(
 **/
 EFI_STATUS
 EFIAPI
-OpalEfiDriverComponentNameGetControllerName(
-  EFI_COMPONENT_NAME_PROTOCOL*    This,
-  EFI_HANDLE                      ControllerHandle,
-  EFI_HANDLE                      ChildHandle,
-  CHAR8*                          Language,
-  CHAR16**                        ControllerName
+OpalEfiDriverComponentNameGetControllerName (
+  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  EFI_HANDLE                   ControllerHandle,
+  EFI_HANDLE                   ChildHandle,
+  CHAR8                        *Language,
+  CHAR16                       **ControllerName
   );
 
 /**
@@ -529,10 +528,10 @@ OpalEfiDriverComponentNameGetControllerName(
 **/
 EFI_STATUS
 EFIAPI
-OpalEfiDriverComponentName2GetDriverName(
-  EFI_COMPONENT_NAME2_PROTOCOL*   This,
-  CHAR8*                          Language,
-  CHAR16**                        DriverName
+OpalEfiDriverComponentName2GetDriverName (
+  EFI_COMPONENT_NAME2_PROTOCOL  *This,
+  CHAR8                         *Language,
+  CHAR16                        **DriverName
   );
 
 /**
@@ -605,12 +604,12 @@ OpalEfiDriverComponentName2GetDriverName(
 **/
 EFI_STATUS
 EFIAPI
-OpalEfiDriverComponentName2GetControllerName(
-  EFI_COMPONENT_NAME2_PROTOCOL*   This,
-  EFI_HANDLE                      ControllerHandle,
-  EFI_HANDLE                      ChildHandle,
-  CHAR8*                          Language,
-  CHAR16**                        ControllerName
+OpalEfiDriverComponentName2GetControllerName (
+  EFI_COMPONENT_NAME2_PROTOCOL  *This,
+  EFI_HANDLE                    ControllerHandle,
+  EFI_HANDLE                    ChildHandle,
+  CHAR8                         *Language,
+  CHAR16                        **ControllerName
   );
 
 #endif //_OPAL_DRIVER_H_

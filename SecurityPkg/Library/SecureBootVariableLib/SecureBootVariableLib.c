@@ -33,20 +33,20 @@
 STATIC
 EFI_STATUS
 CreateSigList (
-  IN VOID                *Data,
-  IN UINTN               Size,
-  OUT EFI_SIGNATURE_LIST **SigList
+  IN VOID                 *Data,
+  IN UINTN                Size,
+  OUT EFI_SIGNATURE_LIST  **SigList
   )
 {
-  UINTN                  SigListSize;
-  EFI_SIGNATURE_LIST     *TmpSigList;
-  EFI_SIGNATURE_DATA     *SigData;
+  UINTN               SigListSize;
+  EFI_SIGNATURE_LIST  *TmpSigList;
+  EFI_SIGNATURE_DATA  *SigData;
 
   //
   // Allocate data for Signature Database
   //
   SigListSize = sizeof (EFI_SIGNATURE_LIST) + sizeof (EFI_SIGNATURE_DATA) - 1 + Size;
-  TmpSigList = (EFI_SIGNATURE_LIST *) AllocateZeroPool (SigListSize);
+  TmpSigList  = (EFI_SIGNATURE_LIST *)AllocateZeroPool (SigListSize);
   if (TmpSigList == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -54,15 +54,15 @@ CreateSigList (
   //
   // Only gEfiCertX509Guid type is supported
   //
-  TmpSigList->SignatureListSize = (UINT32)SigListSize;
-  TmpSigList->SignatureSize = (UINT32) (sizeof (EFI_SIGNATURE_DATA) - 1 + Size);
+  TmpSigList->SignatureListSize   = (UINT32)SigListSize;
+  TmpSigList->SignatureSize       = (UINT32)(sizeof (EFI_SIGNATURE_DATA) - 1 + Size);
   TmpSigList->SignatureHeaderSize = 0;
   CopyGuid (&TmpSigList->SignatureType, &gEfiCertX509Guid);
 
   //
   // Copy key data
   //
-  SigData = (EFI_SIGNATURE_DATA *) (TmpSigList + 1);
+  SigData = (EFI_SIGNATURE_DATA *)(TmpSigList + 1);
   CopyGuid (&SigData->SignatureOwner, &gEfiGlobalVariableGuid);
   CopyMem (&SigData->SignatureData[0], Data, Size);
 
@@ -84,31 +84,31 @@ CreateSigList (
 STATIC
 EFI_STATUS
 ConcatenateSigList (
-  IN  EFI_SIGNATURE_LIST *SigLists,
-  IN  EFI_SIGNATURE_LIST *SigListAppend,
-  OUT EFI_SIGNATURE_LIST **SigListOut,
-  IN OUT UINTN           *SigListsSize
-)
+  IN  EFI_SIGNATURE_LIST  *SigLists,
+  IN  EFI_SIGNATURE_LIST  *SigListAppend,
+  OUT EFI_SIGNATURE_LIST  **SigListOut,
+  IN OUT UINTN            *SigListsSize
+  )
 {
-  EFI_SIGNATURE_LIST *TmpSigList;
-  UINT8              *Offset;
-  UINTN              NewSigListsSize;
+  EFI_SIGNATURE_LIST  *TmpSigList;
+  UINT8               *Offset;
+  UINTN               NewSigListsSize;
 
   NewSigListsSize = *SigListsSize + SigListAppend->SignatureListSize;
 
-  TmpSigList = (EFI_SIGNATURE_LIST *) AllocateZeroPool (NewSigListsSize);
+  TmpSigList = (EFI_SIGNATURE_LIST *)AllocateZeroPool (NewSigListsSize);
   if (TmpSigList == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   CopyMem (TmpSigList, SigLists, *SigListsSize);
 
-  Offset = (UINT8 *)TmpSigList;
+  Offset  = (UINT8 *)TmpSigList;
   Offset += *SigListsSize;
   CopyMem ((VOID *)Offset, SigListAppend, SigListAppend->SignatureListSize);
 
   *SigListsSize = NewSigListsSize;
-  *SigListOut = TmpSigList;
+  *SigListOut   = TmpSigList;
   return EFI_SUCCESS;
 }
 
@@ -128,23 +128,22 @@ ConcatenateSigList (
 **/
 EFI_STATUS
 SecureBootFetchData (
-    IN  EFI_GUID           *KeyFileGuid,
-    OUT UINTN              *SigListsSize,
-    OUT EFI_SIGNATURE_LIST **SigListOut
-)
+  IN  EFI_GUID            *KeyFileGuid,
+  OUT UINTN               *SigListsSize,
+  OUT EFI_SIGNATURE_LIST  **SigListOut
+  )
 {
-  EFI_SIGNATURE_LIST *EfiSig;
-  EFI_SIGNATURE_LIST *TmpEfiSig;
-  EFI_SIGNATURE_LIST *TmpEfiSig2;
-  EFI_STATUS         Status;
-  VOID               *Buffer;
-  VOID               *RsaPubKey;
+  EFI_SIGNATURE_LIST  *EfiSig;
+  EFI_SIGNATURE_LIST  *TmpEfiSig;
+  EFI_SIGNATURE_LIST  *TmpEfiSig2;
+  EFI_STATUS          Status;
+  VOID                *Buffer;
+  VOID                *RsaPubKey;
   UINTN               Size;
   UINTN               KeyIndex;
 
-
-  KeyIndex = 0;
-  EfiSig = NULL;
+  KeyIndex      = 0;
+  EfiSig        = NULL;
   *SigListsSize = 0;
   while (1) {
     Status = GetSectionFromAnyFv (
@@ -160,9 +159,10 @@ SecureBootFetchData (
       if (RsaGetPublicKeyFromX509 (Buffer, Size, &RsaPubKey) == FALSE) {
         DEBUG ((DEBUG_ERROR, "%a: Invalid key format: %d\n", __FUNCTION__, KeyIndex));
         if (EfiSig != NULL) {
-          FreePool(EfiSig);
+          FreePool (EfiSig);
         }
-        FreePool(Buffer);
+
+        FreePool (Buffer);
         return EFI_INVALID_PARAMETER;
       }
 
@@ -172,7 +172,7 @@ SecureBootFetchData (
       // Concatenate lists if more than one section found
       //
       if (KeyIndex == 0) {
-        EfiSig = TmpEfiSig;
+        EfiSig        = TmpEfiSig;
         *SigListsSize = TmpEfiSig->SignatureListSize;
       } else {
         ConcatenateSigList (EfiSig, TmpEfiSig, &TmpEfiSig2, SigListsSize);
@@ -183,10 +183,12 @@ SecureBootFetchData (
 
       KeyIndex++;
       FreePool (Buffer);
-    } if (Status == EFI_NOT_FOUND) {
+    }
+
+    if (Status == EFI_NOT_FOUND) {
       break;
     }
-  };
+  }
 
   if (KeyIndex == 0) {
     return EFI_NOT_FOUND;
@@ -217,19 +219,19 @@ SecureBootFetchData (
 **/
 EFI_STATUS
 CreateTimeBasedPayload (
-  IN OUT UINTN            *DataSize,
-  IN OUT UINT8            **Data
+  IN OUT UINTN  *DataSize,
+  IN OUT UINT8  **Data
   )
 {
-  EFI_STATUS                       Status;
-  UINT8                            *NewData;
-  UINT8                            *Payload;
-  UINTN                            PayloadSize;
-  EFI_VARIABLE_AUTHENTICATION_2    *DescriptorData;
-  UINTN                            DescriptorSize;
-  EFI_TIME                         Time;
+  EFI_STATUS                     Status;
+  UINT8                          *NewData;
+  UINT8                          *Payload;
+  UINTN                          PayloadSize;
+  EFI_VARIABLE_AUTHENTICATION_2  *DescriptorData;
+  UINTN                          DescriptorSize;
+  EFI_TIME                       Time;
 
-  if (Data == NULL || DataSize == NULL) {
+  if ((Data == NULL) || (DataSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -242,8 +244,8 @@ CreateTimeBasedPayload (
   Payload     = *Data;
   PayloadSize = *DataSize;
 
-  DescriptorSize    = OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo) + OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
-  NewData = (UINT8*) AllocateZeroPool (DescriptorSize + PayloadSize);
+  DescriptorSize = OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo) + OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
+  NewData        = (UINT8 *)AllocateZeroPool (DescriptorSize + PayloadSize);
   if (NewData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -252,14 +254,15 @@ CreateTimeBasedPayload (
     CopyMem (NewData + DescriptorSize, Payload, PayloadSize);
   }
 
-  DescriptorData = (EFI_VARIABLE_AUTHENTICATION_2 *) (NewData);
+  DescriptorData = (EFI_VARIABLE_AUTHENTICATION_2 *)(NewData);
 
   ZeroMem (&Time, sizeof (EFI_TIME));
   Status = gRT->GetTime (&Time, NULL);
   if (EFI_ERROR (Status)) {
-    FreePool(NewData);
+    FreePool (NewData);
     return Status;
   }
+
   Time.Pad1       = 0;
   Time.Nanosecond = 0;
   Time.TimeZone   = 0;
@@ -273,7 +276,7 @@ CreateTimeBasedPayload (
   CopyGuid (&DescriptorData->AuthInfo.CertType, &gEfiCertPkcs7Guid);
 
   if (Payload != NULL) {
-    FreePool(Payload);
+    FreePool (Payload);
   }
 
   *DataSize = DescriptorSize + PayloadSize;
@@ -294,20 +297,21 @@ CreateTimeBasedPayload (
 **/
 EFI_STATUS
 DeleteVariable (
-  IN  CHAR16                    *VariableName,
-  IN  EFI_GUID                  *VendorGuid
+  IN  CHAR16    *VariableName,
+  IN  EFI_GUID  *VendorGuid
   )
 {
-  EFI_STATUS              Status;
-  VOID*                   Variable;
-  UINT8                   *Data;
-  UINTN                   DataSize;
-  UINT32                  Attr;
+  EFI_STATUS  Status;
+  VOID        *Variable;
+  UINT8       *Data;
+  UINTN       DataSize;
+  UINT32      Attr;
 
   GetVariable2 (VariableName, VendorGuid, &Variable, NULL);
   if (Variable == NULL) {
     return EFI_SUCCESS;
   }
+
   FreePool (Variable);
 
   Data     = NULL;
@@ -331,6 +335,7 @@ DeleteVariable (
   if (Data != NULL) {
     FreePool (Data);
   }
+
   return Status;
 }
 
@@ -369,13 +374,13 @@ SetSecureBootMode (
 EFI_STATUS
 EFIAPI
 GetSetupMode (
-    OUT UINT8 *SetupMode
-)
+  OUT UINT8  *SetupMode
+  )
 {
-  UINTN      Size;
-  EFI_STATUS Status;
+  UINTN       Size;
+  EFI_STATUS  Status;
 
-  Size = sizeof (*SetupMode);
+  Size   = sizeof (*SetupMode);
   Status = gRT->GetVariable (
                   EFI_SETUP_MODE_NAME,
                   &gEfiGlobalVariableGuid,
@@ -401,9 +406,9 @@ EFI_STATUS
 EFIAPI
 DeleteDb (
   VOID
-)
+  )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = DeleteVariable (
              EFI_IMAGE_SECURITY_DATABASE,
@@ -424,9 +429,9 @@ EFI_STATUS
 EFIAPI
 DeleteDbx (
   VOID
-)
+  )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = DeleteVariable (
              EFI_IMAGE_SECURITY_DATABASE1,
@@ -447,9 +452,9 @@ EFI_STATUS
 EFIAPI
 DeleteDbt (
   VOID
-)
+  )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = DeleteVariable (
              EFI_IMAGE_SECURITY_DATABASE2,
@@ -470,9 +475,9 @@ EFI_STATUS
 EFIAPI
 DeleteKEK (
   VOID
-)
+  )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = DeleteVariable (
              EFI_KEY_EXCHANGE_KEY_NAME,
@@ -493,11 +498,11 @@ EFI_STATUS
 EFIAPI
 DeletePlatformKey (
   VOID
-)
+  )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
-  Status = SetSecureBootMode(CUSTOM_SECURE_BOOT_MODE);
+  Status = SetSecureBootMode (CUSTOM_SECURE_BOOT_MODE);
   if (EFI_ERROR (Status)) {
     return Status;
   }

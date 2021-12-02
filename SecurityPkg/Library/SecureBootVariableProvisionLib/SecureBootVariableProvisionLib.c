@@ -34,22 +34,22 @@
 STATIC
 EFI_STATUS
 EnrollFromDefault (
-  IN CHAR16   *VariableName,
-  IN CHAR16   *DefaultName,
-  IN EFI_GUID *VendorGuid
+  IN CHAR16    *VariableName,
+  IN CHAR16    *DefaultName,
+  IN EFI_GUID  *VendorGuid
   )
 {
-  VOID       *Data;
+  VOID        *Data;
   UINTN       DataSize;
   EFI_STATUS  Status;
 
   Status = EFI_SUCCESS;
 
   DataSize = 0;
-  Status = GetVariable2 (DefaultName, &gEfiGlobalVariableGuid, &Data, &DataSize);
+  Status   = GetVariable2 (DefaultName, &gEfiGlobalVariableGuid, &Data, &DataSize);
   if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "error: GetVariable (\"%s): %r\n", DefaultName, Status));
-      return Status;
+    DEBUG ((DEBUG_ERROR, "error: GetVariable (\"%s): %r\n", DefaultName, Status));
+    return Status;
   }
 
   CreateTimeBasedPayload (&DataSize, (UINT8 **)&Data);
@@ -73,8 +73,14 @@ EnrollFromDefault (
                   );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "error: %a (\"%s\", %g): %r\n", __FUNCTION__, VariableName,
-      VendorGuid, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "error: %a (\"%s\", %g): %r\n",
+      __FUNCTION__,
+      VariableName,
+      VendorGuid,
+      Status
+      ));
   }
 
   if (Data != NULL) {
@@ -94,7 +100,7 @@ SecureBootInitPKDefault (
   IN VOID
   )
 {
-  EFI_SIGNATURE_LIST *EfiSig;
+  EFI_SIGNATURE_LIST  *EfiSig;
   UINTN               SigListsSize;
   EFI_STATUS          Status;
   UINT8               *Data;
@@ -103,7 +109,7 @@ SecureBootInitPKDefault (
   //
   // Check if variable exists, if so do not change it
   //
-  Status = GetVariable2 (EFI_PK_DEFAULT_VARIABLE_NAME, &gEfiGlobalVariableGuid, (VOID **) &Data, &DataSize);
+  Status = GetVariable2 (EFI_PK_DEFAULT_VARIABLE_NAME, &gEfiGlobalVariableGuid, (VOID **)&Data, &DataSize);
   if (Status == EFI_SUCCESS) {
     DEBUG ((DEBUG_INFO, "Variable %s exists. Old value is preserved\n", EFI_PK_DEFAULT_VARIABLE_NAME));
     FreePool (Data);
@@ -151,16 +157,16 @@ SecureBootInitKEKDefault (
   IN VOID
   )
 {
-  EFI_SIGNATURE_LIST *EfiSig;
+  EFI_SIGNATURE_LIST  *EfiSig;
   UINTN               SigListsSize;
   EFI_STATUS          Status;
-  UINT8              *Data;
+  UINT8               *Data;
   UINTN               DataSize;
 
   //
   // Check if variable exists, if so do not change it
   //
-  Status = GetVariable2 (EFI_KEK_DEFAULT_VARIABLE_NAME, &gEfiGlobalVariableGuid, (VOID **) &Data, &DataSize);
+  Status = GetVariable2 (EFI_KEK_DEFAULT_VARIABLE_NAME, &gEfiGlobalVariableGuid, (VOID **)&Data, &DataSize);
   if (Status == EFI_SUCCESS) {
     DEBUG ((DEBUG_INFO, "Variable %s exists. Old value is preserved\n", EFI_KEK_DEFAULT_VARIABLE_NAME));
     FreePool (Data);
@@ -181,7 +187,6 @@ SecureBootInitKEKDefault (
     DEBUG ((DEBUG_INFO, "Content for %s not found\n", EFI_KEK_DEFAULT_VARIABLE_NAME));
     return Status;
   }
-
 
   Status = gRT->SetVariable (
                   EFI_KEK_DEFAULT_VARIABLE_NAME,
@@ -209,13 +214,13 @@ SecureBootInitDbDefault (
   IN VOID
   )
 {
-  EFI_SIGNATURE_LIST *EfiSig;
+  EFI_SIGNATURE_LIST  *EfiSig;
   UINTN               SigListsSize;
   EFI_STATUS          Status;
-  UINT8              *Data;
+  UINT8               *Data;
   UINTN               DataSize;
 
-  Status = GetVariable2 (EFI_DB_DEFAULT_VARIABLE_NAME, &gEfiGlobalVariableGuid, (VOID **) &Data, &DataSize);
+  Status = GetVariable2 (EFI_DB_DEFAULT_VARIABLE_NAME, &gEfiGlobalVariableGuid, (VOID **)&Data, &DataSize);
   if (Status == EFI_SUCCESS) {
     DEBUG ((DEBUG_INFO, "Variable %s exists. Old value is preserved\n", EFI_DB_DEFAULT_VARIABLE_NAME));
     FreePool (Data);
@@ -230,7 +235,7 @@ SecureBootInitDbDefault (
 
   Status = SecureBootFetchData (&gDefaultdbFileGuid, &SigListsSize, &EfiSig);
   if (EFI_ERROR (Status)) {
-      return Status;
+    return Status;
   }
 
   Status = gRT->SetVariable (
@@ -241,7 +246,7 @@ SecureBootInitDbDefault (
                   (VOID *)EfiSig
                   );
   if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "Failed to set %s\n", EFI_DB_DEFAULT_VARIABLE_NAME));
+    DEBUG ((DEBUG_INFO, "Failed to set %s\n", EFI_DB_DEFAULT_VARIABLE_NAME));
   }
 
   FreePool (EfiSig);
@@ -259,16 +264,16 @@ SecureBootInitDbxDefault (
   IN VOID
   )
 {
-  EFI_SIGNATURE_LIST *EfiSig;
+  EFI_SIGNATURE_LIST  *EfiSig;
   UINTN               SigListsSize;
   EFI_STATUS          Status;
-  UINT8              *Data;
+  UINT8               *Data;
   UINTN               DataSize;
 
   //
   // Check if variable exists, if so do not change it
   //
-  Status = GetVariable2 (EFI_DBX_DEFAULT_VARIABLE_NAME, &gEfiGlobalVariableGuid, (VOID **) &Data, &DataSize);
+  Status = GetVariable2 (EFI_DBX_DEFAULT_VARIABLE_NAME, &gEfiGlobalVariableGuid, (VOID **)&Data, &DataSize);
   if (Status == EFI_SUCCESS) {
     DEBUG ((DEBUG_INFO, "Variable %s exists. Old value is preserved\n", EFI_DBX_DEFAULT_VARIABLE_NAME));
     FreePool (Data);
@@ -316,16 +321,16 @@ SecureBootInitDbtDefault (
   IN VOID
   )
 {
-  EFI_SIGNATURE_LIST *EfiSig;
+  EFI_SIGNATURE_LIST  *EfiSig;
   UINTN               SigListsSize;
   EFI_STATUS          Status;
-  UINT8              *Data;
+  UINT8               *Data;
   UINTN               DataSize;
 
   //
   // Check if variable exists, if so do not change it
   //
-  Status = GetVariable2 (EFI_DBT_DEFAULT_VARIABLE_NAME, &gEfiGlobalVariableGuid, (VOID **) &Data, &DataSize);
+  Status = GetVariable2 (EFI_DBT_DEFAULT_VARIABLE_NAME, &gEfiGlobalVariableGuid, (VOID **)&Data, &DataSize);
   if (Status == EFI_SUCCESS) {
     DEBUG ((DEBUG_INFO, "Variable %s exists. Old value is preserved\n", EFI_DBT_DEFAULT_VARIABLE_NAME));
     FreePool (Data);
@@ -343,7 +348,7 @@ SecureBootInitDbtDefault (
 
   Status = SecureBootFetchData (&gDefaultdbtFileGuid, &SigListsSize, &EfiSig);
   if (EFI_ERROR (Status)) {
-      return Status;
+    return Status;
   }
 
   Status = gRT->SetVariable (
@@ -373,9 +378,9 @@ EFI_STATUS
 EFIAPI
 EnrollDbFromDefault (
   VOID
-)
+  )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = EnrollFromDefault (
              EFI_IMAGE_SECURITY_DATABASE,
@@ -397,9 +402,9 @@ EFI_STATUS
 EFIAPI
 EnrollDbxFromDefault (
   VOID
-)
+  )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = EnrollFromDefault (
              EFI_IMAGE_SECURITY_DATABASE1,
@@ -421,14 +426,15 @@ EFI_STATUS
 EFIAPI
 EnrollDbtFromDefault (
   VOID
-)
+  )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = EnrollFromDefault (
              EFI_IMAGE_SECURITY_DATABASE2,
              EFI_DBT_DEFAULT_VARIABLE_NAME,
-             &gEfiImageSecurityDatabaseGuid);
+             &gEfiImageSecurityDatabaseGuid
+             );
 
   return Status;
 }
@@ -444,9 +450,9 @@ EFI_STATUS
 EFIAPI
 EnrollKEKFromDefault (
   VOID
-)
+  )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = EnrollFromDefault (
              EFI_KEY_EXCHANGE_KEY_NAME,
@@ -468,9 +474,9 @@ EFI_STATUS
 EFIAPI
 EnrollPKFromDefault (
   VOID
-)
+  )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = EnrollFromDefault (
              EFI_PLATFORM_KEY_NAME,
