@@ -17,25 +17,24 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// S3 Boot Script Table identifier.
 ///
-#define FRAMEWORK_EFI_ACPI_S3_RESUME_SCRIPT_TABLE               0x00
+#define FRAMEWORK_EFI_ACPI_S3_RESUME_SCRIPT_TABLE  0x00
 ///
 /// The opcode is used to add a record for memory reads of the memory location and continues when the
 /// exit criteria is satisfied, or after a defined duration.
 ///
-#define FRAMEWORK_EFI_BOOT_SCRIPT_MEM_POLL_OPCODE               0x09
+#define FRAMEWORK_EFI_BOOT_SCRIPT_MEM_POLL_OPCODE  0x09
 ///
 /// The opcode is used to add a record for dispatching specified arbitrary code into a specified
 /// boot script table.
 ///
-#define FRAMEWORK_EFI_BOOT_SCRIPT_DISPATCH_2_OPCODE             0x0D
+#define FRAMEWORK_EFI_BOOT_SCRIPT_DISPATCH_2_OPCODE  0x0D
 ///
 /// The opcode indicates the start of the boot script table.
 ///
-#define FRAMEWORK_EFI_BOOT_SCRIPT_TABLE_OPCODE                  0xAA
+#define FRAMEWORK_EFI_BOOT_SCRIPT_TABLE_OPCODE  0xAA
 ///
 /// The opcode indicates the end of the boot script table.
 ///
-#define FRAMEWORK_EFI_BOOT_SCRIPT_TERMINATE_OPCODE              0xFF
-
+#define FRAMEWORK_EFI_BOOT_SCRIPT_TERMINATE_OPCODE  0xFF
 
 #endif

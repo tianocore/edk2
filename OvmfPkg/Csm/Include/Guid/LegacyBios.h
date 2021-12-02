@@ -24,6 +24,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0x2e3044ac, 0x879f, 0x490f, {0x97, 0x60, 0xbb, 0xdf, 0xaf, 0x69, 0x5f, 0x50 } \
   }
 
-extern EFI_GUID gEfiLegacyBiosGuid;
+extern EFI_GUID  gEfiLegacyBiosGuid;
 
 #endif

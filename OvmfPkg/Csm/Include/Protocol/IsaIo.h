@@ -128,11 +128,11 @@ typedef struct {
   ///
   /// Read from ISA I/O or MMIO space.
   ///
-  EFI_ISA_IO_PROTOCOL_IO_MEM  Read;
+  EFI_ISA_IO_PROTOCOL_IO_MEM    Read;
   ///
   /// Write to ISA I/O or MMIO space.
   ///
-  EFI_ISA_IO_PROTOCOL_IO_MEM  Write;
+  EFI_ISA_IO_PROTOCOL_IO_MEM    Write;
 } EFI_ISA_IO_PROTOCOL_ACCESS;
 
 /**
@@ -326,31 +326,31 @@ EFI_STATUS
 /// ISA_PCI_IO_PROTOCOL instance associated with the ISA controller.
 ///
 struct _EFI_ISA_IO_PROTOCOL {
-  EFI_ISA_IO_PROTOCOL_ACCESS           Mem;
-  EFI_ISA_IO_PROTOCOL_ACCESS           Io;
-  EFI_ISA_IO_PROTOCOL_COPY_MEM         CopyMem;
-  EFI_ISA_IO_PROTOCOL_MAP              Map;
-  EFI_ISA_IO_PROTOCOL_UNMAP            Unmap;
-  EFI_ISA_IO_PROTOCOL_ALLOCATE_BUFFER  AllocateBuffer;
-  EFI_ISA_IO_PROTOCOL_FREE_BUFFER      FreeBuffer;
-  EFI_ISA_IO_PROTOCOL_FLUSH            Flush;
+  EFI_ISA_IO_PROTOCOL_ACCESS             Mem;
+  EFI_ISA_IO_PROTOCOL_ACCESS             Io;
+  EFI_ISA_IO_PROTOCOL_COPY_MEM           CopyMem;
+  EFI_ISA_IO_PROTOCOL_MAP                Map;
+  EFI_ISA_IO_PROTOCOL_UNMAP              Unmap;
+  EFI_ISA_IO_PROTOCOL_ALLOCATE_BUFFER    AllocateBuffer;
+  EFI_ISA_IO_PROTOCOL_FREE_BUFFER        FreeBuffer;
+  EFI_ISA_IO_PROTOCOL_FLUSH              Flush;
   ///
   /// The list of I/O , MMIO, DMA, and Interrupt resources associated with the
   /// ISA controller abstracted by this instance of the EFI_ISA_IO_PROTOCOL.
   ///
-  EFI_ISA_ACPI_RESOURCE_LIST           *ResourceList;
+  EFI_ISA_ACPI_RESOURCE_LIST             *ResourceList;
   ///
   /// The size, in bytes, of the ROM image.
   ///
-  UINT32                               RomSize;
+  UINT32                                 RomSize;
   ///
   /// A pointer to the in memory copy of the ROM image. The ISA Bus Driver is responsible
   /// for allocating memory for the ROM image, and copying the contents of the ROM to memory
   /// during ISA Bus initialization.
   ///
-  VOID                                 *RomImage;
+  VOID                                   *RomImage;
 };
 
-extern EFI_GUID gEfiIsaIoProtocolGuid;
+extern EFI_GUID  gEfiIsaIoProtocolGuid;
 
 #endif

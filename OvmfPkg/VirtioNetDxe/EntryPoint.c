@@ -25,12 +25,11 @@
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval Others                An unexpected error occurred.
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetEntryPoint (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return EfiLibInstallDriverBindingComponentName2 (

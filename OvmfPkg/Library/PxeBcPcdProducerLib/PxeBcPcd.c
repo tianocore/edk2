@@ -16,19 +16,29 @@ SetPxeBcPcds (
   VOID
   )
 {
-  BOOLEAN       FwCfgBool;
-  RETURN_STATUS PcdStatus;
+  BOOLEAN        FwCfgBool;
+  RETURN_STATUS  PcdStatus;
 
-  if (!RETURN_ERROR (QemuFwCfgParseBool ("opt/org.tianocore/IPv4PXESupport",
-                       &FwCfgBool))) {
+  if (!RETURN_ERROR (
+         QemuFwCfgParseBool (
+           "opt/org.tianocore/IPv4PXESupport",
+           &FwCfgBool
+           )
+         ))
+  {
     PcdStatus = PcdSet8S (PcdIPv4PXESupport, FwCfgBool);
     if (RETURN_ERROR (PcdStatus)) {
       return PcdStatus;
     }
   }
 
-  if (!RETURN_ERROR (QemuFwCfgParseBool ("opt/org.tianocore/IPv6PXESupport",
-                       &FwCfgBool))) {
+  if (!RETURN_ERROR (
+         QemuFwCfgParseBool (
+           "opt/org.tianocore/IPv6PXESupport",
+           &FwCfgBool
+           )
+         ))
+  {
     PcdStatus = PcdSet8S (PcdIPv6PXESupport, FwCfgBool);
     if (RETURN_ERROR (PcdStatus)) {
       return PcdStatus;
