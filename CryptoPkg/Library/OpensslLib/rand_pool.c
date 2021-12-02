@@ -74,7 +74,7 @@ RandGetBytes (
  * This is OpenSSL required interface.
  */
 size_t
-rand_pool_acquire_entropy (
+ossl_pool_acquire_entropy (
   RAND_POOL  *pool
   )
 {
@@ -82,21 +82,21 @@ rand_pool_acquire_entropy (
   size_t         Bytes_needed;
   unsigned char  *Buffer;
 
-  Bytes_needed = rand_pool_bytes_needed (pool, 1 /*entropy_factor*/);
+  Bytes_needed = ossl_rand_pool_bytes_needed (pool, 1 /*entropy_factor*/);
   if (Bytes_needed > 0) {
-    Buffer = rand_pool_add_begin (pool, Bytes_needed);
+    Buffer = ossl_rand_pool_add_begin (pool, Bytes_needed);
 
     if (Buffer != NULL) {
       Ret = RandGetBytes (Bytes_needed, Buffer);
       if (FALSE == Ret) {
-        rand_pool_add_end (pool, 0, 0);
+        ossl_rand_pool_add_end (pool, 0, 0);
       } else {
-        rand_pool_add_end (pool, Bytes_needed, 8 * Bytes_needed);
+        ossl_rand_pool_add_end (pool, Bytes_needed, 8 * Bytes_needed);
       }
     }
   }
 
-  return rand_pool_entropy_available (pool);
+  return ossl_rand_pool_entropy_available (pool);
 }
 
 /*
@@ -105,7 +105,7 @@ rand_pool_acquire_entropy (
  * This is OpenSSL required interface.
  */
 int
-rand_pool_add_nonce_data (
+ossl_pool_add_nonce_data (
   RAND_POOL  *pool
   )
 {
@@ -113,7 +113,7 @@ rand_pool_add_nonce_data (
 
   RandGetBytes (sizeof (data), data);
 
-  return rand_pool_add (pool, (unsigned char *)&data, sizeof (data), 0);
+  return ossl_rand_pool_add (pool, (unsigned char *)&data, sizeof (data), 0);
 }
 
 /*
@@ -130,7 +130,7 @@ rand_pool_add_additional_data (
 
   RandGetBytes (sizeof (data), data);
 
-  return rand_pool_add (pool, (unsigned char *)&data, sizeof (data), 0);
+  return ossl_rand_pool_add (pool, (unsigned char *)&data, sizeof (data), 0);
 }
 
 /*
@@ -139,7 +139,7 @@ rand_pool_add_additional_data (
  * This is OpenSSL required interface.
  */
 int
-rand_pool_init (
+ossl_rand_pool_init (
   VOID
   )
 {
@@ -152,7 +152,7 @@ rand_pool_init (
  * This is OpenSSL required interface.
  */
 VOID
-rand_pool_cleanup (
+ossl_rand_pool_cleanup (
   VOID
   )
 {
@@ -164,7 +164,7 @@ rand_pool_cleanup (
  * This is OpenSSL required interface.
  */
 VOID
-rand_pool_keep_random_devices_open (
+ossl_rand_pool_keep_random_devices_open (
   int  keep
   )
 {
