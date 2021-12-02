@@ -206,8 +206,8 @@ FmpDeviceGetImageTypeIdGuidPtr (
 EFI_STATUS
 EFIAPI
 FmpDeviceGetAttributes (
-  OUT UINT64    *Supported,
-  OUT UINT64    *Setting
+  OUT UINT64  *Supported,
+  OUT UINT64  *Setting
   );
 
 /**
