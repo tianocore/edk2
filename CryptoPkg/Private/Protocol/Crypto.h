@@ -1991,7 +1991,7 @@ EFI_STATUS
 (EFIAPI *EDKII_CRYPTO_X509_GET_COMMON_NAME) (
   IN      CONST UINT8  *Cert,
   IN      UINTN        CertSize,
-  OUT     CHAR8        *CommonName,  OPTIONAL
+  OUT     CHAR8        *CommonName   OPTIONAL,
   IN OUT  UINTN        *CommonNameSize
   );
 
@@ -2026,7 +2026,7 @@ EFI_STATUS
 (EFIAPI *EDKII_CRYPTO_X509_GET_ORGANIZATION_NAME) (
   IN      CONST UINT8  *Cert,
   IN      UINTN        CertSize,
-  OUT     CHAR8        *NameBuffer,  OPTIONAL
+  OUT     CHAR8        *NameBuffer   OPTIONAL,
   IN OUT  UINTN        *NameBufferSize
   );
 
@@ -2735,9 +2735,9 @@ typedef
 EFI_STATUS
 (EFIAPI* EDKII_CRYPTO_TLS_DO_HANDSHAKE)(
   IN     VOID                     *Tls,
-  IN     UINT8                    *BufferIn, OPTIONAL
-  IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
+  IN     UINT8                    *BufferIn  OPTIONAL,
+  IN     UINTN                    BufferInSize  OPTIONAL,
+     OUT UINT8                    *BufferOut  OPTIONAL,
   IN OUT UINTN                    *BufferOutSize
   );
 
@@ -2770,9 +2770,9 @@ typedef
 EFI_STATUS
 (EFIAPI* EDKII_CRYPTO_TLS_HANDLE_ALERT)(
   IN     VOID                     *Tls,
-  IN     UINT8                    *BufferIn, OPTIONAL
-  IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
+  IN     UINT8                    *BufferIn  OPTIONAL,
+  IN     UINTN                    BufferInSize  OPTIONAL,
+     OUT UINT8                    *BufferOut  OPTIONAL,
   IN OUT UINTN                    *BufferOutSize
   );
 
