@@ -27,12 +27,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Pointer to the CPU Architectural Protocol instance
 //
-EFI_CPU_ARCH_PROTOCOL   *mCpu;
+EFI_CPU_ARCH_PROTOCOL  *mCpu;
 
 //
 // The Timer Architectural Protocol that this driver produces
 //
-EFI_TIMER_ARCH_PROTOCOL mTimer = {
+EFI_TIMER_ARCH_PROTOCOL  mTimer = {
   EmuTimerDriverRegisterHandler,
   EmuTimerDriverSetTimerPeriod,
   EmuTimerDriverGetTimerPeriod,
@@ -42,21 +42,21 @@ EFI_TIMER_ARCH_PROTOCOL mTimer = {
 //
 // The notification function to call on every timer interrupt
 //
-EFI_TIMER_NOTIFY        mTimerNotifyFunction = NULL;
+EFI_TIMER_NOTIFY  mTimerNotifyFunction = NULL;
 
 //
 // The current period of the timer interrupt
 //
-UINT64                  mTimerPeriodMs;
-
+UINT64  mTimerPeriodMs;
 
 VOID
 EFIAPI
-TimerCallback (UINT64 DeltaMs)
+TimerCallback (
+  UINT64  DeltaMs
+  )
 {
   EFI_TPL           OriginalTPL;
   EFI_TIMER_NOTIFY  CallbackFunction;
-
 
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
@@ -73,15 +73,15 @@ TimerCallback (UINT64 DeltaMs)
   }
 
   gBS->RestoreTPL (OriginalTPL);
-
 }
 
 EFI_STATUS
 EFIAPI
 EmuTimerDriverRegisterHandler (
-  IN EFI_TIMER_ARCH_PROTOCOL           *This,
-  IN EFI_TIMER_NOTIFY                  NotifyFunction
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  IN EFI_TIMER_NOTIFY         NotifyFunction
   )
+
 /*++
 
 Routine Description:
@@ -127,11 +127,11 @@ Returns:
   //
   // Check for invalid parameters
   //
-  if (NotifyFunction == NULL && mTimerNotifyFunction == NULL) {
+  if ((NotifyFunction == NULL) && (mTimerNotifyFunction == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (NotifyFunction != NULL && mTimerNotifyFunction != NULL) {
+  if ((NotifyFunction != NULL) && (mTimerNotifyFunction != NULL)) {
     return EFI_ALREADY_STARTED;
   }
 
@@ -142,6 +142,7 @@ Returns:
     /* Enable Timer.  */
     gEmuThunk->SetTimer (mTimerPeriodMs, TimerCallback);
   }
+
   mTimerNotifyFunction = NotifyFunction;
 
   return EFI_SUCCESS;
@@ -153,6 +154,7 @@ EmuTimerDriverSetTimerPeriod (
   IN EFI_TIMER_ARCH_PROTOCOL  *This,
   IN UINT64                   TimerPeriod
   )
+
 /*++
 
 Routine Description:
@@ -190,14 +192,14 @@ Returns:
 
 **/
 {
-
   //
   // If TimerPeriod is 0, then the timer thread should be canceled
   // If the TimerPeriod is valid, then create and/or adjust the period of the timer thread
   //
-  if (TimerPeriod == 0
-      || ((TimerPeriod > TIMER_MINIMUM_VALUE)
-    && (TimerPeriod < TIMER_MAXIMUM_VALUE))) {
+  if (  (TimerPeriod == 0)
+     || (  (TimerPeriod > TIMER_MINIMUM_VALUE)
+        && (TimerPeriod < TIMER_MAXIMUM_VALUE)))
+  {
     mTimerPeriodMs = DivU64x32 (TimerPeriod + 5000, 10000);
 
     gEmuThunk->SetTimer (mTimerPeriodMs, TimerCallback);
@@ -209,9 +211,10 @@ Returns:
 EFI_STATUS
 EFIAPI
 EmuTimerDriverGetTimerPeriod (
-  IN EFI_TIMER_ARCH_PROTOCOL            *This,
-  OUT UINT64                            *TimerPeriod
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  OUT UINT64                  *TimerPeriod
   )
+
 /*++
 
 Routine Description:
@@ -250,6 +253,7 @@ EFIAPI
 EmuTimerDriverGenerateSoftInterrupt (
   IN EFI_TIMER_ARCH_PROTOCOL  *This
   )
+
 /*++
 
 Routine Description:
@@ -283,6 +287,7 @@ EmuTimerDriverInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
+
 /*++
 
 Routine Description:
@@ -340,7 +345,6 @@ Returns:
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
 
   return EFI_SUCCESS;
 }
