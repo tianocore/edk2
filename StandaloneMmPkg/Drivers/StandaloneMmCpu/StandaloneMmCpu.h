@@ -73,8 +73,8 @@ EFI_STATUS
 EFIAPI
 PiMmCpuTpFwRootMmiHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context         OPTIONAL,
+  IN OUT VOID                     *CommBuffer      OPTIONAL,
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
