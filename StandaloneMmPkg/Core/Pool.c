@@ -14,7 +14,7 @@ LIST_ENTRY  mMmPoolLists[MAX_POOL_INDEX];
 // To cache the MMRAM base since when Loading modules At fixed address feature is enabled,
 // all module is assigned an offset relative the MMRAM base in build time.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED  EFI_PHYSICAL_ADDRESS       gLoadModuleAtFixAddressMmramBase = 0;
+GLOBAL_REMOVE_IF_UNREFERENCED  EFI_PHYSICAL_ADDRESS  gLoadModuleAtFixAddressMmramBase = 0;
 
 /**
   Called to initialize the memory service.
@@ -29,7 +29,7 @@ MmInitializeMemoryServices (
   IN EFI_MMRAM_DESCRIPTOR  *MmramRanges
   )
 {
-  UINTN                  Index;
+  UINTN  Index;
 
   //
   // Initialize Pool list
@@ -37,7 +37,6 @@ MmInitializeMemoryServices (
   for (Index = sizeof (mMmPoolLists) / sizeof (*mMmPoolLists); Index > 0;) {
     InitializeListHead (&mMmPoolLists[--Index]);
   }
-
 
   //
   // Initialize free MMRAM regions
@@ -49,8 +48,14 @@ MmInitializeMemoryServices (
     if (MmramRanges[Index].CpuStart < BASE_1MB) {
       continue;
     }
-    DEBUG ((DEBUG_INFO, "MmAddMemoryRegion %d : 0x%016lx - 0x%016lx\n",
-      Index, MmramRanges[Index].CpuStart, MmramRanges[Index].PhysicalSize));
+
+    DEBUG ((
+      DEBUG_INFO,
+      "MmAddMemoryRegion %d : 0x%016lx - 0x%016lx\n",
+      Index,
+      MmramRanges[Index].CpuStart,
+      MmramRanges[Index].PhysicalSize
+      ));
     MmAddMemoryRegion (
       MmramRanges[Index].CpuStart,
       MmramRanges[Index].PhysicalSize,
@@ -58,7 +63,6 @@ MmInitializeMemoryServices (
       MmramRanges[Index].RegionState
       );
   }
-
 }
 
 /**
@@ -83,7 +87,7 @@ InternalAllocPoolByIndex (
 
   ASSERT (PoolIndex <= MAX_POOL_INDEX);
   Status = EFI_SUCCESS;
-  Hdr = NULL;
+  Hdr    = NULL;
   if (PoolIndex == MAX_POOL_INDEX) {
     Status = MmInternalAllocatePages (
                AllocateAnyPages,
@@ -94,22 +98,23 @@ InternalAllocPoolByIndex (
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
-    Hdr = (FREE_POOL_HEADER *) (UINTN) Address;
+
+    Hdr = (FREE_POOL_HEADER *)(UINTN)Address;
   } else if (!IsListEmpty (&mMmPoolLists[PoolIndex])) {
     Hdr = BASE_CR (GetFirstNode (&mMmPoolLists[PoolIndex]), FREE_POOL_HEADER, Link);
     RemoveEntryList (&Hdr->Link);
   } else {
     Status = InternalAllocPoolByIndex (PoolIndex + 1, &Hdr);
     if (!EFI_ERROR (Status)) {
-      Hdr->Header.Size >>= 1;
+      Hdr->Header.Size    >>= 1;
       Hdr->Header.Available = TRUE;
       InsertHeadList (&mMmPoolLists[PoolIndex], &Hdr->Link);
-      Hdr = (FREE_POOL_HEADER*)((UINT8*)Hdr + Hdr->Header.Size);
+      Hdr = (FREE_POOL_HEADER *)((UINT8 *)Hdr + Hdr->Header.Size);
     }
   }
 
   if (!EFI_ERROR (Status)) {
-    Hdr->Header.Size = MIN_POOL_SIZE << PoolIndex;
+    Hdr->Header.Size      = MIN_POOL_SIZE << PoolIndex;
     Hdr->Header.Available = FALSE;
   }
 
@@ -136,7 +141,7 @@ InternalFreePoolByIndex (
   ASSERT (((UINTN)FreePoolHdr & (FreePoolHdr->Header.Size - 1)) == 0);
   ASSERT (FreePoolHdr->Header.Size >= MIN_POOL_SIZE);
 
-  PoolIndex = (UINTN) (HighBitSet32 ((UINT32)FreePoolHdr->Header.Size) - MIN_POOL_SHIFT);
+  PoolIndex                     = (UINTN)(HighBitSet32 ((UINT32)FreePoolHdr->Header.Size) - MIN_POOL_SHIFT);
   FreePoolHdr->Header.Available = TRUE;
   ASSERT (PoolIndex < MAX_POOL_INDEX);
   InsertHeadList (&mMmPoolLists[PoolIndex], &FreePoolHdr->Link);
@@ -170,28 +175,29 @@ MmInternalAllocatePool (
   EFI_PHYSICAL_ADDRESS  Address;
   UINTN                 PoolIndex;
 
-  if (PoolType != EfiRuntimeServicesCode &&
-      PoolType != EfiRuntimeServicesData) {
+  if ((PoolType != EfiRuntimeServicesCode) &&
+      (PoolType != EfiRuntimeServicesData))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   Size += sizeof (*PoolHdr);
   if (Size > MAX_POOL_SIZE) {
-    Size = EFI_SIZE_TO_PAGES (Size);
+    Size   = EFI_SIZE_TO_PAGES (Size);
     Status = MmInternalAllocatePages (AllocateAnyPages, PoolType, Size, &Address);
     if (EFI_ERROR (Status)) {
       return Status;
     }
 
-    PoolHdr = (POOL_HEADER*)(UINTN)Address;
-    PoolHdr->Size = EFI_PAGES_TO_SIZE (Size);
+    PoolHdr            = (POOL_HEADER *)(UINTN)Address;
+    PoolHdr->Size      = EFI_PAGES_TO_SIZE (Size);
     PoolHdr->Available = FALSE;
-    *Buffer = PoolHdr + 1;
+    *Buffer            = PoolHdr + 1;
     return Status;
   }
 
-  Size = (Size + MIN_POOL_SIZE - 1) >> MIN_POOL_SHIFT;
-  PoolIndex = (UINTN) HighBitSet32 ((UINT32)Size);
+  Size      = (Size + MIN_POOL_SIZE - 1) >> MIN_POOL_SHIFT;
+  PoolIndex = (UINTN)HighBitSet32 ((UINT32)Size);
   if ((Size & (Size - 1)) != 0) {
     PoolIndex++;
   }
@@ -200,6 +206,7 @@ MmInternalAllocatePool (
   if (!EFI_ERROR (Status)) {
     *Buffer = &FreePoolHdr->Header + 1;
   }
+
   return Status;
 }
 
@@ -251,7 +258,7 @@ MmInternalFreePool (
     return EFI_INVALID_PARAMETER;
   }
 
-  FreePoolHdr = (FREE_POOL_HEADER*)((POOL_HEADER*)Buffer - 1);
+  FreePoolHdr = (FREE_POOL_HEADER *)((POOL_HEADER *)Buffer - 1);
   ASSERT (!FreePoolHdr->Header.Available);
 
   if (FreePoolHdr->Header.Size > MAX_POOL_SIZE) {
@@ -262,6 +269,7 @@ MmInternalFreePool (
              EFI_SIZE_TO_PAGES (FreePoolHdr->Header.Size)
              );
   }
+
   return InternalFreePoolByIndex (FreePoolHdr);
 }
 
