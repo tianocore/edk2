@@ -644,7 +644,7 @@ SnpUndi32ReceiveFilters (
   IN UINT32                      Enable,
   IN UINT32                      Disable,
   IN BOOLEAN                     ResetMCastFilter,
-  IN UINTN                       MCastFilterCnt,  OPTIONAL
+  IN UINTN                       MCastFilterCnt   OPTIONAL,
   IN EFI_MAC_ADDRESS             *MCastFilter     OPTIONAL
   );
 
@@ -740,7 +740,7 @@ EFIAPI
 SnpUndi32Statistics (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   IN BOOLEAN                     Reset,
-  IN OUT UINTN                   *StatisticsSize,  OPTIONAL
+  IN OUT UINTN                   *StatisticsSize   OPTIONAL,
   IN OUT EFI_NETWORK_STATISTICS  *StatisticsTable  OPTIONAL
   );
 
@@ -884,7 +884,7 @@ EFI_STATUS
 EFIAPI
 SnpUndi32GetStatus (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  OUT UINT32                     *InterruptStatus, OPTIONAL
+  OUT UINT32                     *InterruptStatus  OPTIONAL,
   OUT VOID                       **TxBuf           OPTIONAL
   );
 
@@ -949,8 +949,8 @@ SnpUndi32Transmit (
   IN UINTN                       HeaderSize,
   IN UINTN                       BufferSize,
   IN VOID                        *Buffer,
-  IN EFI_MAC_ADDRESS             *SrcAddr,  OPTIONAL
-  IN EFI_MAC_ADDRESS             *DestAddr, OPTIONAL
+  IN EFI_MAC_ADDRESS             *SrcAddr   OPTIONAL,
+  IN EFI_MAC_ADDRESS             *DestAddr  OPTIONAL,
   IN UINT16                      *Protocol  OPTIONAL
   );
 

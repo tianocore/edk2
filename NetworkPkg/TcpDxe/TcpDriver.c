@@ -411,7 +411,7 @@ TcpDestroyService (
   IN EFI_HANDLE  Controller,
   IN EFI_HANDLE  ImageHandle,
   IN UINTN       NumberOfChildren,
-  IN EFI_HANDLE  *ChildHandleBuffer, OPTIONAL
+  IN EFI_HANDLE  *ChildHandleBuffer  OPTIONAL,
   IN UINT8       IpVersion
   )
 {
