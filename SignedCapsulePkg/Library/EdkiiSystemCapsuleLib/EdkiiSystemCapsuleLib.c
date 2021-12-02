@@ -661,7 +661,7 @@ CapsuleAuthenticateSystemFirmware (
 VOID
 EFIAPI
 EdkiiSystemCapsuleLibPcdCallBack (
-  IN        CONST GUID        *CallBackGuid, OPTIONAL
+  IN        CONST GUID        *CallBackGuid  OPTIONAL,
   IN        UINTN             CallBackToken,
   IN  OUT   VOID              *TokenData,
   IN        UINTN             TokenDataSize
