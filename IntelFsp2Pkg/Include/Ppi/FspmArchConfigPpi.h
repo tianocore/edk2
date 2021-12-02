@@ -10,7 +10,7 @@
 #ifndef _FSPM_ARCH_CONFIG_PPI_H_
 #define _FSPM_ARCH_CONFIG_PPI_H_
 
-#define FSPM_ARCH_CONFIG_PPI_REVISION 0x1
+#define FSPM_ARCH_CONFIG_PPI_REVISION  0x1
 
 ///
 /// Global ID for the FSPM_ARCH_CONFIG_PPI.
@@ -27,21 +27,21 @@ typedef struct {
   ///
   /// Revision of the structure
   ///
-  UINT8         Revision;
-  UINT8         Reserved[3];
+  UINT8     Revision;
+  UINT8     Reserved[3];
   ///
   /// Pointer to the non-volatile storage (NVS) data buffer.
   /// If it is NULL it indicates the NVS data is not available.
   ///
-  VOID          *NvsBufferPtr;
+  VOID      *NvsBufferPtr;
   ///
   /// Size of memory to be reserved by FSP below "top
   /// of low usable memory" for bootloader usage.
   ///
-  UINT32        BootLoaderTolumSize;
-  UINT8         Reserved1[4];
+  UINT32    BootLoaderTolumSize;
+  UINT8     Reserved1[4];
 } FSPM_ARCH_CONFIG_PPI;
 
-extern EFI_GUID gFspmArchConfigPpiGuid;
+extern EFI_GUID  gFspmArchConfigPpiGuid;
 
 #endif // _FSPM_ARCH_CONFIG_PPI_H_

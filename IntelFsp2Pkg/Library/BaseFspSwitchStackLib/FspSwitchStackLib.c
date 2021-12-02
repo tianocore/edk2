@@ -22,15 +22,14 @@
 **/
 UINT32
 SwapStack (
-  IN  UINT32 NewStack
+  IN  UINT32  NewStack
   )
 {
   FSP_GLOBAL_DATA  *FspData;
-  UINT32         OldStack;
+  UINT32           OldStack;
 
-  FspData  = GetFspGlobalDataPointer ();
-  OldStack = FspData->CoreStack;
+  FspData            = GetFspGlobalDataPointer ();
+  OldStack           = FspData->CoreStack;
   FspData->CoreStack = NewStack;
   return OldStack;
 }
-

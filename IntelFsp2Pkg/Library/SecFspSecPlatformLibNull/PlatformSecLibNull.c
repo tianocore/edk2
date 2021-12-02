@@ -19,8 +19,8 @@
 EFI_STATUS
 EFIAPI
 FspUpdSignatureCheck (
-  IN UINT32   ApiIdx,
-  IN VOID     *ApiParam
+  IN UINT32  ApiIdx,
+  IN VOID    *ApiParam
   )
 {
   return EFI_SUCCESS;
@@ -36,8 +36,8 @@ FspUpdSignatureCheck (
 EFI_STATUS
 EFIAPI
 FspMultiPhaseSiInitApiHandler (
-  IN UINT32   ApiIdx,
-  IN VOID     *ApiParam
+  IN UINT32  ApiIdx,
+  IN VOID    *ApiParam
   )
 {
   return EFI_SUCCESS;

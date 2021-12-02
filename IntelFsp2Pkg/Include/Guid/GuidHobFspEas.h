@@ -10,8 +10,8 @@
 #ifndef __GUID_HOB_FSP_EAS_GUID__
 #define __GUID_HOB_FSP_EAS_GUID__
 
-extern EFI_GUID gFspBootLoaderTolumHobGuid;
-extern EFI_GUID gFspReservedMemoryResourceHobGuid;
-extern EFI_GUID gFspNonVolatileStorageHobGuid;
+extern EFI_GUID  gFspBootLoaderTolumHobGuid;
+extern EFI_GUID  gFspReservedMemoryResourceHobGuid;
+extern EFI_GUID  gFspNonVolatileStorageHobGuid;
 
 #endif
