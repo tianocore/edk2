@@ -448,8 +448,8 @@ BOOLEAN
 IsFontInfoExisted (
   IN  HII_DATABASE_PRIVATE_DATA *Private,
   IN  EFI_FONT_INFO             *FontInfo,
-  IN  EFI_FONT_INFO_MASK        *FontInfoMask,   OPTIONAL
-  IN  EFI_FONT_HANDLE           FontHandle,      OPTIONAL
+  IN  EFI_FONT_INFO_MASK        *FontInfoMask    OPTIONAL,
+  IN  EFI_FONT_HANDLE           FontHandle       OPTIONAL,
   OUT HII_GLOBAL_FONT_INFO      **GlobalFontInfo OPTIONAL
   );
 
@@ -532,10 +532,10 @@ FindStringBlock (
   IN HII_DATABASE_PRIVATE_DATA        *Private,
   IN  HII_STRING_PACKAGE_INSTANCE     *StringPackage,
   IN  EFI_STRING_ID                   StringId,
-  OUT UINT8                           *BlockType, OPTIONAL
-  OUT UINT8                           **StringBlockAddr, OPTIONAL
-  OUT UINTN                           *StringTextOffset, OPTIONAL
-  OUT EFI_STRING_ID                   *LastStringId, OPTIONAL
+  OUT UINT8                           *BlockType  OPTIONAL,
+  OUT UINT8                           **StringBlockAddr  OPTIONAL,
+  OUT UINTN                           *StringTextOffset  OPTIONAL,
+  OUT EFI_STRING_ID                   *LastStringId  OPTIONAL,
   OUT EFI_STRING_ID                   *StartStringId OPTIONAL
   );
 
@@ -565,8 +565,8 @@ EFI_STATUS
 FindGlyphBlock (
   IN  HII_FONT_PACKAGE_INSTANCE      *FontPackage,
   IN  CHAR16                         CharValue,
-  OUT UINT8                          **GlyphBuffer, OPTIONAL
-  OUT EFI_HII_GLYPH_INFO             *Cell, OPTIONAL
+  OUT UINT8                          **GlyphBuffer  OPTIONAL,
+  OUT EFI_HII_GLYPH_INFO             *Cell  OPTIONAL,
   OUT UINTN                          *GlyphBufferLen OPTIONAL
   );
 
@@ -821,7 +821,7 @@ EFIAPI
 HiiGetFontInfo (
   IN  CONST EFI_HII_FONT_PROTOCOL    *This,
   IN  OUT   EFI_FONT_HANDLE          *FontHandle,
-  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfoIn, OPTIONAL
+  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfoIn  OPTIONAL,
   OUT       EFI_FONT_DISPLAY_INFO    **StringInfoOut,
   IN  CONST EFI_STRING               String OPTIONAL
   );
@@ -1327,7 +1327,7 @@ HiiNewString (
   IN  EFI_HII_HANDLE                  PackageList,
   OUT EFI_STRING_ID                   *StringId,
   IN  CONST CHAR8                     *Language,
-  IN  CONST CHAR16                    *LanguageName, OPTIONAL
+  IN  CONST CHAR16                    *LanguageName  OPTIONAL,
   IN  CONST EFI_STRING                String,
   IN  CONST EFI_FONT_INFO             *StringFontInfo OPTIONAL
   );
@@ -1524,7 +1524,7 @@ EFIAPI
 HiiNewPackageList (
   IN CONST EFI_HII_DATABASE_PROTOCOL    *This,
   IN CONST EFI_HII_PACKAGE_LIST_HEADER  *PackageList,
-  IN CONST EFI_HANDLE                   DriverHandle, OPTIONAL
+  IN CONST EFI_HANDLE                   DriverHandle  OPTIONAL,
   OUT EFI_HII_HANDLE                    *Handle
   );
 
@@ -2268,8 +2268,8 @@ EFI_STATUS
 EFIAPI
 EfiConfigKeywordHandlerGetData (
   IN EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL  *This,
-  IN CONST EFI_STRING                     NameSpaceId, OPTIONAL
-  IN CONST EFI_STRING                     KeywordString, OPTIONAL
+  IN CONST EFI_STRING                     NameSpaceId  OPTIONAL,
+  IN CONST EFI_STRING                     KeywordString  OPTIONAL,
   OUT EFI_STRING                          *Progress,
   OUT UINT32                              *ProgressErr,
   OUT EFI_STRING                          *Results

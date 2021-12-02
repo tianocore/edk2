@@ -356,7 +356,7 @@ EFI_STATUS
 EFIAPI
 SmbiosAdd (
   IN CONST EFI_SMBIOS_PROTOCOL  *This,
-  IN EFI_HANDLE                 ProducerHandle, OPTIONAL
+  IN EFI_HANDLE                 ProducerHandle  OPTIONAL,
   IN OUT EFI_SMBIOS_HANDLE      *SmbiosHandle,
   IN EFI_SMBIOS_TABLE_HEADER    *Record
   )
@@ -898,7 +898,7 @@ EFIAPI
 SmbiosGetNext (
   IN CONST EFI_SMBIOS_PROTOCOL      *This,
   IN OUT EFI_SMBIOS_HANDLE          *SmbiosHandle,
-  IN EFI_SMBIOS_TYPE                *Type,          OPTIONAL
+  IN EFI_SMBIOS_TYPE                *Type           OPTIONAL,
   OUT EFI_SMBIOS_TABLE_HEADER       **Record,
   OUT EFI_HANDLE                    *ProducerHandle OPTIONAL
   )

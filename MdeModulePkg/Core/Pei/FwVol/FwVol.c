@@ -264,7 +264,7 @@ FileHandleToVolume (
 EFI_STATUS
 FindFileEx (
   IN  CONST EFI_PEI_FV_HANDLE        FvHandle,
-  IN  CONST EFI_GUID                 *FileName,   OPTIONAL
+  IN  CONST EFI_GUID                 *FileName    OPTIONAL,
   IN        EFI_FV_FILETYPE          SearchType,
   IN OUT    EFI_PEI_FILE_HANDLE      *FileHandle,
   IN OUT    EFI_PEI_FILE_HANDLE      *AprioriFile  OPTIONAL

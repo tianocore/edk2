@@ -458,7 +458,7 @@ DiskIoCreateSubtask (
   IN UINT64           Lba,
   IN UINT32           Offset,
   IN UINTN            Length,
-  IN VOID             *WorkingBuffer,  OPTIONAL
+  IN VOID             *WorkingBuffer   OPTIONAL,
   IN VOID             *Buffer,
   IN BOOLEAN          Blocking
   )

@@ -421,7 +421,7 @@ CreateSerialDevice (
   IN BOOLEAN                        CreateControllerNode,
   IN UINT32                         Instance,
   IN PARENT_IO_PROTOCOL_PTR         ParentIo,
-  IN PCI_SERIAL_PARAMETER           *PciSerialParameter, OPTIONAL
+  IN PCI_SERIAL_PARAMETER           *PciSerialParameter  OPTIONAL,
   IN PCI_DEVICE_INFO                *PciDeviceInfo       OPTIONAL
   )
 {

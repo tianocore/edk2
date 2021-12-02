@@ -47,10 +47,9 @@ OemHookStatusCodeReport (
   IN EFI_STATUS_CODE_TYPE     CodeType,
   IN EFI_STATUS_CODE_VALUE    Value,
   IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId, OPTIONAL
+  IN EFI_GUID                 *CallerId  OPTIONAL,
   IN EFI_STATUS_CODE_DATA     *Data      OPTIONAL
   )
 {
   return EFI_SUCCESS;
 }
-
