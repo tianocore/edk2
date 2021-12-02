@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#include <openssl/store.h>       /* The OSSL_STORE_INFO type numbers */
+
 /*
  * This function is cleanup ossl store.
  *
@@ -17,3 +19,17 @@ ossl_store_cleanup_int (
   )
 {
 }
+
+static void *
+file_open (
+  void        *provctx,
+  const char  *uri
+  )
+{
+  return NULL;
+}
+
+const OSSL_DISPATCH  ossl_file_store_functions[] = {
+  { OSSL_FUNC_STORE_OPEN, (void (*)(void)) file_open },
+  { 0,                    NULL                       },
+};
