@@ -13,8 +13,6 @@
 #ifndef __UEFI_CPU_LIB_H__
 #define __UEFI_CPU_LIB_H__
 
-
-
 /**
   Initializes floating point units for requirement of UEFI specification.
 

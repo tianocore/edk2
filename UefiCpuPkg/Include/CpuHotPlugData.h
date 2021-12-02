@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _CPU_HOT_PLUG_DATA_H_
 #define _CPU_HOT_PLUG_DATA_H_
 
-#define  CPU_HOT_PLUG_DATA_REVISION_1      0x00000001
+#define  CPU_HOT_PLUG_DATA_REVISION_1  0x00000001
 
 typedef struct {
   UINT32    Revision;          // Used for version identification for this structure

@@ -12,17 +12,17 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-CONST UINTN    mDoFarReturnFlag  = 0;
+CONST UINTN  mDoFarReturnFlag = 0;
 
-RESERVED_VECTORS_DATA       mReservedVectorsData[CPU_EXCEPTION_NUM];
-EFI_CPU_INTERRUPT_HANDLER   mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
-UINTN                       mEnabledInterruptNum = 0;
+RESERVED_VECTORS_DATA      mReservedVectorsData[CPU_EXCEPTION_NUM];
+EFI_CPU_INTERRUPT_HANDLER  mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
+UINTN                      mEnabledInterruptNum = 0;
 
-EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
+EXCEPTION_HANDLER_DATA  mExceptionHandlerData;
 
-UINT8                       mNewStack[CPU_STACK_SWITCH_EXCEPTION_NUMBER *
-                                      CPU_KNOWN_GOOD_STACK_SIZE];
-UINT8                       mNewGdt[CPU_TSS_GDT_SIZE];
+UINT8  mNewStack[CPU_STACK_SWITCH_EXCEPTION_NUMBER *
+                 CPU_KNOWN_GOOD_STACK_SIZE];
+UINT8  mNewGdt[CPU_TSS_GDT_SIZE];
 
 /**
   Common exception handler.
@@ -33,8 +33,8 @@ UINT8                       mNewGdt[CPU_TSS_GDT_SIZE];
 VOID
 EFIAPI
 CommonExceptionHandler (
-  IN EFI_EXCEPTION_TYPE          ExceptionType,
-  IN EFI_SYSTEM_CONTEXT          SystemContext
+  IN EFI_EXCEPTION_TYPE  ExceptionType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
   CommonExceptionHandlerWorker (ExceptionType, SystemContext, &mExceptionHandlerData);
@@ -59,7 +59,7 @@ CommonExceptionHandler (
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
   mExceptionHandlerData.ReservedVectors          = mReservedVectorsData;
@@ -87,19 +87,19 @@ InitializeCpuExceptionHandlers (
 EFI_STATUS
 EFIAPI
 InitializeCpuInterruptHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
-  EFI_STATUS                         Status;
-  IA32_IDT_GATE_DESCRIPTOR           *IdtTable;
-  IA32_DESCRIPTOR                    IdtDescriptor;
-  UINTN                              IdtEntryCount;
-  EXCEPTION_HANDLER_TEMPLATE_MAP     TemplateMap;
-  UINTN                              Index;
-  UINTN                              InterruptEntry;
-  UINT8                              *InterruptEntryCode;
-  RESERVED_VECTORS_DATA              *ReservedVectors;
-  EFI_CPU_INTERRUPT_HANDLER          *ExternalInterruptHandler;
+  EFI_STATUS                      Status;
+  IA32_IDT_GATE_DESCRIPTOR        *IdtTable;
+  IA32_DESCRIPTOR                 IdtDescriptor;
+  UINTN                           IdtEntryCount;
+  EXCEPTION_HANDLER_TEMPLATE_MAP  TemplateMap;
+  UINTN                           Index;
+  UINTN                           InterruptEntry;
+  UINT8                           *InterruptEntryCode;
+  RESERVED_VECTORS_DATA           *ReservedVectors;
+  EFI_CPU_INTERRUPT_HANDLER       *ExternalInterruptHandler;
 
   Status = gBS->AllocatePool (
                   EfiBootServicesCode,
@@ -107,7 +107,7 @@ InitializeCpuInterruptHandlers (
                   (VOID **)&ReservedVectors
                   );
   ASSERT (!EFI_ERROR (Status) && ReservedVectors != NULL);
-  SetMem ((VOID *) ReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM, 0xff);
+  SetMem ((VOID *)ReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM, 0xff);
   if (VectorInfo != NULL) {
     Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectors, CPU_INTERRUPT_NUM);
     if (EFI_ERROR (Status)) {
@@ -127,6 +127,7 @@ InitializeCpuInterruptHandlers (
   if (IdtEntryCount > CPU_INTERRUPT_NUM) {
     IdtEntryCount = CPU_INTERRUPT_NUM;
   }
+
   //
   // Create Interrupt Descriptor Table and Copy the old IDT table in
   //
@@ -144,18 +145,18 @@ InitializeCpuInterruptHandlers (
                   );
   ASSERT (!EFI_ERROR (Status) && InterruptEntryCode != NULL);
 
-  InterruptEntry = (UINTN) InterruptEntryCode;
-  for (Index = 0; Index < CPU_INTERRUPT_NUM; Index ++) {
+  InterruptEntry = (UINTN)InterruptEntryCode;
+  for (Index = 0; Index < CPU_INTERRUPT_NUM; Index++) {
     CopyMem (
-      (VOID *) InterruptEntry,
-      (VOID *) TemplateMap.ExceptionStart,
+      (VOID *)InterruptEntry,
+      (VOID *)TemplateMap.ExceptionStart,
       TemplateMap.ExceptionStubHeaderSize
       );
-    AsmVectorNumFixup ((VOID *) InterruptEntry,  (UINT8) Index, (VOID *) TemplateMap.ExceptionStart);
+    AsmVectorNumFixup ((VOID *)InterruptEntry, (UINT8)Index, (VOID *)TemplateMap.ExceptionStart);
     InterruptEntry += TemplateMap.ExceptionStubHeaderSize;
   }
 
-  TemplateMap.ExceptionStart = (UINTN) InterruptEntryCode;
+  TemplateMap.ExceptionStart                     = (UINTN)InterruptEntryCode;
   mExceptionHandlerData.IdtEntryCount            = CPU_INTERRUPT_NUM;
   mExceptionHandlerData.ReservedVectors          = ReservedVectors;
   mExceptionHandlerData.ExternalInterruptHandler = ExternalInterruptHandler;
@@ -166,9 +167,9 @@ InitializeCpuInterruptHandlers (
   //
   // Load Interrupt Descriptor Table
   //
-  IdtDescriptor.Base  = (UINTN) IdtTable;
-  IdtDescriptor.Limit = (UINT16) (sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM - 1);
-  AsmWriteIdtr ((IA32_DESCRIPTOR *) &IdtDescriptor);
+  IdtDescriptor.Base  = (UINTN)IdtTable;
+  IdtDescriptor.Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM - 1);
+  AsmWriteIdtr ((IA32_DESCRIPTOR *)&IdtDescriptor);
 
   return EFI_SUCCESS;
 }
@@ -199,8 +200,8 @@ InitializeCpuInterruptHandlers (
 EFI_STATUS
 EFIAPI
 RegisterCpuInterruptHandler (
-  IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   )
 {
   return RegisterCpuInterruptHandlerWorker (InterruptType, InterruptHandler, &mExceptionHandlerData);
@@ -230,14 +231,14 @@ RegisterCpuInterruptHandler (
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlersEx (
-  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
-  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA  *InitData OPTIONAL
   )
 {
-  EFI_STATUS                        Status;
-  CPU_EXCEPTION_INIT_DATA           EssData;
-  IA32_DESCRIPTOR                   Idtr;
-  IA32_DESCRIPTOR                   Gdtr;
+  EFI_STATUS               Status;
+  CPU_EXCEPTION_INIT_DATA  EssData;
+  IA32_DESCRIPTOR          Idtr;
+  IA32_DESCRIPTOR          Gdtr;
 
   //
   // To avoid repeat initialization of default handlers, the caller should pass
@@ -246,7 +247,7 @@ InitializeCpuExceptionHandlersEx (
   // version instead; or this method must be implemented as a simple wrapper of
   // non-ex version of it, if this version has to be called.
   //
-  if (InitData == NULL || InitData->X64.InitDefaultHandlers) {
+  if ((InitData == NULL) || InitData->X64.InitDefaultHandlers) {
     Status = InitializeCpuExceptionHandlers (VectorInfo);
   } else {
     Status = EFI_SUCCESS;
@@ -263,25 +264,26 @@ InitializeCpuExceptionHandlersEx (
         AsmReadIdtr (&Idtr);
         AsmReadGdtr (&Gdtr);
 
-        EssData.X64.Revision = CPU_EXCEPTION_INIT_DATA_REV;
-        EssData.X64.KnownGoodStackTop = (UINTN)mNewStack + sizeof (mNewStack);
-        EssData.X64.KnownGoodStackSize = CPU_KNOWN_GOOD_STACK_SIZE;
-        EssData.X64.StackSwitchExceptions = CPU_STACK_SWITCH_EXCEPTION_LIST;
+        EssData.X64.Revision                   = CPU_EXCEPTION_INIT_DATA_REV;
+        EssData.X64.KnownGoodStackTop          = (UINTN)mNewStack + sizeof (mNewStack);
+        EssData.X64.KnownGoodStackSize         = CPU_KNOWN_GOOD_STACK_SIZE;
+        EssData.X64.StackSwitchExceptions      = CPU_STACK_SWITCH_EXCEPTION_LIST;
         EssData.X64.StackSwitchExceptionNumber = CPU_STACK_SWITCH_EXCEPTION_NUMBER;
-        EssData.X64.IdtTable = (VOID *)Idtr.Base;
-        EssData.X64.IdtTableSize = Idtr.Limit + 1;
-        EssData.X64.GdtTable = mNewGdt;
-        EssData.X64.GdtTableSize = sizeof (mNewGdt);
-        EssData.X64.ExceptionTssDesc = mNewGdt + Gdtr.Limit + 1;
-        EssData.X64.ExceptionTssDescSize = CPU_TSS_DESC_SIZE;
-        EssData.X64.ExceptionTss = mNewGdt + Gdtr.Limit + 1 + CPU_TSS_DESC_SIZE;
-        EssData.X64.ExceptionTssSize = CPU_TSS_SIZE;
+        EssData.X64.IdtTable                   = (VOID *)Idtr.Base;
+        EssData.X64.IdtTableSize               = Idtr.Limit + 1;
+        EssData.X64.GdtTable                   = mNewGdt;
+        EssData.X64.GdtTableSize               = sizeof (mNewGdt);
+        EssData.X64.ExceptionTssDesc           = mNewGdt + Gdtr.Limit + 1;
+        EssData.X64.ExceptionTssDescSize       = CPU_TSS_DESC_SIZE;
+        EssData.X64.ExceptionTss               = mNewGdt + Gdtr.Limit + 1 + CPU_TSS_DESC_SIZE;
+        EssData.X64.ExceptionTssSize           = CPU_TSS_SIZE;
 
         InitData = &EssData;
       }
+
       Status = ArchSetupExceptionStack (InitData);
     }
   }
 
-  return  Status;
+  return Status;
 }
