@@ -1183,9 +1183,9 @@ FindCertsFromDb (
   IN     EFI_GUID         *VendorGuid,
   IN     UINT8            *Data,
   IN     UINTN            DataSize,
-  OUT    UINT32           *CertOffset,    OPTIONAL
-  OUT    UINT32           *CertDataSize,  OPTIONAL
-  OUT    UINT32           *CertNodeOffset,OPTIONAL
+  OUT    UINT32           *CertOffset     OPTIONAL,
+  OUT    UINT32           *CertDataSize   OPTIONAL,
+  OUT    UINT32           *CertNodeOffset OPTIONAL,
   OUT    UINT32           *CertNodeSize   OPTIONAL
   )
 {
