@@ -9,16 +9,16 @@
 #include "HexEditor.h"
 
 typedef struct {
-  UINT8 *Buffer;
-  UINTN Size;
+  UINT8    *Buffer;
+  UINTN    Size;
 } HEFI_EDITOR_CLIPBOARD;
 
-HEFI_EDITOR_CLIPBOARD HClipBoard;
+HEFI_EDITOR_CLIPBOARD  HClipBoard;
 
 //
 // for basic initialization of HClipBoard
 //
-HEFI_EDITOR_CLIPBOARD HClipBoardConst = {
+HEFI_EDITOR_CLIPBOARD  HClipBoardConst = {
   NULL,
   0
 };
@@ -53,7 +53,6 @@ HClipBoardCleanup (
   VOID
   )
 {
-
   SHELL_FREE_NON_NULL (HClipBoard.Buffer);
 
   return EFI_SUCCESS;
@@ -69,8 +68,8 @@ HClipBoardCleanup (
 **/
 EFI_STATUS
 HClipBoardSet (
-  IN UINT8 *Buffer,
-  IN UINTN Size
+  IN UINT8  *Buffer,
+  IN UINTN  Size
   )
 {
   //
@@ -80,7 +79,7 @@ HClipBoardSet (
   SHELL_FREE_NON_NULL (HClipBoard.Buffer);
   HClipBoard.Buffer = Buffer;
 
-  HClipBoard.Size   = Size;
+  HClipBoard.Size = Size;
 
   return EFI_SUCCESS;
 }
