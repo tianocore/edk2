@@ -16,19 +16,19 @@
 VOID
 EFIAPI
 ArmSetAuxCrBit (
-  IN  UINT32    Bits
+  IN  UINT32  Bits
   )
 {
-  ArmWriteAuxCr(ArmReadAuxCr() | Bits);
+  ArmWriteAuxCr (ArmReadAuxCr () | Bits);
 }
 
 VOID
 EFIAPI
 ArmUnsetAuxCrBit (
-  IN  UINT32    Bits
+  IN  UINT32  Bits
   )
 {
-  ArmWriteAuxCr(ArmReadAuxCr() & ~Bits);
+  ArmWriteAuxCr (ArmReadAuxCr () & ~Bits);
 }
 
 //
@@ -38,7 +38,7 @@ ArmUnsetAuxCrBit (
 VOID
 EFIAPI
 ArmSetCpuActlrBit (
-  IN  UINTN    Bits
+  IN  UINTN  Bits
   )
 {
   ArmWriteCpuActlr (ArmReadCpuActlr () | Bits);
@@ -47,7 +47,7 @@ ArmSetCpuActlrBit (
 VOID
 EFIAPI
 ArmUnsetCpuActlrBit (
-  IN  UINTN    Bits
+  IN  UINTN  Bits
   )
 {
   ArmWriteCpuActlr (ArmReadCpuActlr () & ~Bits);
@@ -77,7 +77,7 @@ ArmCacheWritebackGranule (
   VOID
   )
 {
-  UINTN   CWG;
+  UINTN  CWG;
 
   CWG = (ArmCacheInfo () >> 24) & 0xf; // CTR_EL0.CWG
 

@@ -13,10 +13,10 @@
 VOID
 EFIAPI
 ArmGicEnableDistributor (
-  IN  INTN          GicDistributorBase
+  IN  INTN  GicDistributorBase
   )
 {
-  ARM_GIC_ARCH_REVISION Revision;
+  ARM_GIC_ARCH_REVISION  Revision;
 
   /*
    * Enable GIC distributor in Non-Secure world.
