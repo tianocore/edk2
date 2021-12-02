@@ -22,19 +22,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 PciOperateRegister (
-  IN  PCI_IO_DEVICE *PciIoDevice,
-  IN  UINT16        Command,
-  IN  UINT8         Offset,
-  IN  UINT8         Operation,
-  OUT UINT16        *PtrCommand
+  IN  PCI_IO_DEVICE  *PciIoDevice,
+  IN  UINT16         Command,
+  IN  UINT8          Offset,
+  IN  UINT8          Operation,
+  OUT UINT16         *PtrCommand
   )
 {
-  UINT16              OldCommand;
-  EFI_STATUS          Status;
-  EFI_PCI_IO_PROTOCOL *PciIo;
+  UINT16               OldCommand;
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
 
-  OldCommand  = 0;
-  PciIo       = &PciIoDevice->PciIo;
+  OldCommand = 0;
+  PciIo      = &PciIoDevice->PciIo;
 
   if (Operation != EFI_SET_REGISTER) {
     Status = PciIo->Pci.Read (
@@ -52,9 +52,9 @@ PciOperateRegister (
   }
 
   if (Operation == EFI_ENABLE_REGISTER) {
-    OldCommand = (UINT16) (OldCommand | Command);
+    OldCommand = (UINT16)(OldCommand | Command);
   } else if (Operation == EFI_DISABLE_REGISTER) {
-    OldCommand = (UINT16) (OldCommand & ~(Command));
+    OldCommand = (UINT16)(OldCommand & ~(Command));
   } else {
     OldCommand = Command;
   }
@@ -124,10 +124,8 @@ LocateCapabilityRegBlock (
   if (*Offset != 0) {
     CapabilityPtr = *Offset;
   } else {
-
     CapabilityPtr = 0;
     if (IS_CARDBUS_BRIDGE (&PciIoDevice->Pci)) {
-
       PciIoDevice->PciIo.Pci.Read (
                                &PciIoDevice->PciIo,
                                EfiPciIoWidthUint8,
@@ -136,7 +134,6 @@ LocateCapabilityRegBlock (
                                &CapabilityPtr
                                );
     } else {
-
       PciIoDevice->PciIo.Pci.Read (
                                &PciIoDevice->PciIo,
                                EfiPciIoWidthUint8,
@@ -156,12 +153,12 @@ LocateCapabilityRegBlock (
                              &CapabilityEntry
                              );
 
-    CapabilityID = (UINT8) CapabilityEntry;
+    CapabilityID = (UINT8)CapabilityEntry;
 
     if (CapabilityID == CapId) {
       *Offset = CapabilityPtr;
       if (NextRegBlock != NULL) {
-        *NextRegBlock = (UINT8) (CapabilityEntry >> 8);
+        *NextRegBlock = (UINT8)(CapabilityEntry >> 8);
       }
 
       return EFI_SUCCESS;
@@ -171,11 +168,11 @@ LocateCapabilityRegBlock (
     // Certain PCI device may incorrectly have capability pointing to itself,
     // break to avoid dead loop.
     //
-    if (CapabilityPtr == (UINT8) (CapabilityEntry >> 8)) {
+    if (CapabilityPtr == (UINT8)(CapabilityEntry >> 8)) {
       break;
     }
 
-    CapabilityPtr = (UINT8) (CapabilityEntry >> 8);
+    CapabilityPtr = (UINT8)(CapabilityEntry >> 8);
   }
 
   return EFI_NOT_FOUND;
@@ -196,16 +193,16 @@ LocateCapabilityRegBlock (
 **/
 EFI_STATUS
 LocatePciExpressCapabilityRegBlock (
-  IN     PCI_IO_DEVICE *PciIoDevice,
-  IN     UINT16        CapId,
-  IN OUT UINT32        *Offset,
-     OUT UINT32        *NextRegBlock OPTIONAL
+  IN     PCI_IO_DEVICE  *PciIoDevice,
+  IN     UINT16         CapId,
+  IN OUT UINT32         *Offset,
+  OUT UINT32            *NextRegBlock OPTIONAL
   )
 {
-  EFI_STATUS           Status;
-  UINT32               CapabilityPtr;
-  UINT32               CapabilityEntry;
-  UINT16               CapabilityID;
+  EFI_STATUS  Status;
+  UINT32      CapabilityPtr;
+  UINT32      CapabilityEntry;
+  UINT16      CapabilityID;
 
   //
   // To check the capability of this device supports
@@ -225,13 +222,13 @@ LocatePciExpressCapabilityRegBlock (
     // Mask it to DWORD alignment per PCI spec
     //
     CapabilityPtr &= 0xFFC;
-    Status = PciIoDevice->PciIo.Pci.Read (
-                                      &PciIoDevice->PciIo,
-                                      EfiPciIoWidthUint32,
-                                      CapabilityPtr,
-                                      1,
-                                      &CapabilityEntry
-                                      );
+    Status         = PciIoDevice->PciIo.Pci.Read (
+                                              &PciIoDevice->PciIo,
+                                              EfiPciIoWidthUint32,
+                                              CapabilityPtr,
+                                              1,
+                                              &CapabilityEntry
+                                              );
     if (EFI_ERROR (Status)) {
       break;
     }
@@ -249,7 +246,7 @@ LocatePciExpressCapabilityRegBlock (
       break;
     }
 
-    CapabilityID = (UINT16) CapabilityEntry;
+    CapabilityID = (UINT16)CapabilityEntry;
 
     if (CapabilityID == CapId) {
       *Offset = CapabilityPtr;

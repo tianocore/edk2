@@ -25,7 +25,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Address>     - The hexical address user want to break at.\n"
     L"  <Symbol>      - The symbol name for target address user want to break at. It has following format [MapFileName:]SymbolName\n",
     L"Execution:\n",
-    {SCAN_F5, CHAR_NULL},
+    { SCAN_F5,   CHAR_NULL },
     DebuggerGo
   },
   {
@@ -35,7 +35,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"T\n"
     L"  (No Argument)\n",
     L"",
-    {SCAN_F8, CHAR_NULL},
+    { SCAN_F8,   CHAR_NULL },
     DebuggerStepInto
   },
   {
@@ -45,7 +45,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"P\n"
     L"  (No Argument)\n",
     L"",
-    {SCAN_F10, CHAR_NULL},
+    { SCAN_F10,  CHAR_NULL },
     DebuggerStepOver
   },
   {
@@ -55,7 +55,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"O\n"
     L"  (No Argument)\n",
     L"",
-    {SCAN_F11, CHAR_NULL},
+    { SCAN_F11,  CHAR_NULL },
     DebuggerStepOut
   },
   {
@@ -65,7 +65,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"Q\n"
     L"  (No Argument)\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerQuit
   },
   //
@@ -80,7 +80,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  on            - enable break-on-call\n"
     L"  off           - disable break-on-call\n",
     L"Break:\n",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakOnCALL
   },
   {
@@ -92,7 +92,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  on            - enable break-on-callex\n"
     L"  off           - disable break-on-callex\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakOnCALLEX
   },
   {
@@ -104,7 +104,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  on            - enable break-on-return\n"
     L"  off           - disable break-on-return\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakOnRET
   },
   {
@@ -116,7 +116,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  on            - enable break-on-entrypoint\n"
     L"  off           - disable break-on-entrypoint\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakOnEntrypoint
   },
   {
@@ -128,7 +128,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  on            - enable break-on-thunk\n"
     L"  off           - disable break-on-thunk\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakOnThunk
   },
   {
@@ -140,7 +140,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  on            - enable break-on-key\n"
     L"  off           - disable break-on-key\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakOnKey
   },
   {
@@ -150,7 +150,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"BL\n"
     L"  (No Argument) - show the state for current breakpoint\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakpointList
   },
   {
@@ -161,7 +161,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Address> - Hexical breakpoint address\n"
     L"  <Symbol>  - Symbol name for breakpoint address. It has following format [MapFileName:]SymbolName.\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakpointSet
   },
   {
@@ -172,7 +172,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Index>   - Decimal breakpoint index, which can be got from BL command\n"
     L"  *         - For all the breakpoint\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakpointClear
   },
   {
@@ -183,7 +183,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Index>   - Decimal breakpoint index, which can be got from BL command\n"
     L"  *         - For all the breakpoint\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakpointDisable
   },
   {
@@ -194,7 +194,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Index>   - Decimal breakpoint index, which can be got from BL command\n"
     L"  *         - For all the breakpoint\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerBreakpointEnable
   },
   //
@@ -210,7 +210,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  ParameterNum  - Decimal call-stack parameters number, 8 by default, 16 as max\n"
     L"  c             - Clear current call-stack\n",
     L"Information:\n",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerCallStack
   },
   {
@@ -221,7 +221,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  (No Argument) - Show current instruction branch\n"
     L"  c             - Clear current instruction branch\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerInstructionBranch
   },
   {
@@ -233,7 +233,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Register>    - EBC VM register name (R0~R7, Flags, ControlFlags, and IP\n"
     L"  <Value>       - The Hexical value of register\n",
     L"",
-    {SCAN_F2, CHAR_NULL},
+    { SCAN_F2,   CHAR_NULL },
     DebuggerRegister
   },
   {
@@ -244,7 +244,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  (No Argument) - List current assembly code\n"
     L"  Count         - The decimal instruction assembly count\n",
     L"",
-    {SCAN_F4, CHAR_NULL},
+    { SCAN_F4,   CHAR_NULL },
     DebuggerList
   },
   {
@@ -255,7 +255,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Address> - The Hexical address where user wants to see the assembly code\n"
     L"  <Symbol>  - Symbol name for scope address. It has following format [MapFileName:]SymbolName.\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerScope
   },
   {
@@ -267,7 +267,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Symbol>  - Symbol name for memory address. It has following format [MapFileName:]SymbolName.\n"
     L"  <Count>   - The hexical memory count (not set means 1)\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerMemoryDB
   },
   {
@@ -279,7 +279,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Symbol>  - Symbol name for memory address. It has following format [MapFileName:]SymbolName.\n"
     L"  <Count>   - The hexical memory count (not set means 1)\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerMemoryDW
   },
   {
@@ -291,7 +291,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Symbol>  - Symbol name for memory address. It has following format [MapFileName:]SymbolName.\n"
     L"  <Count>   - The hexical memory count (not set means 1)\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerMemoryDD
   },
   {
@@ -303,7 +303,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Symbol>  - Symbol name for memory address. It has following format [MapFileName:]SymbolName.\n"
     L"  <Count>   - The hexical memory count (not set means 1)\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerMemoryDQ
   },
   {
@@ -315,7 +315,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Symbol>  - Symbol name for memory address. It has following format [MapFileName:]SymbolName.\n"
     L"  <Value>   - The hexical memory value\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerMemoryEB
   },
   {
@@ -327,7 +327,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Symbol>  - Symbol name for memory address. It has following format [MapFileName:]SymbolName.\n"
     L"  <Value>   - The hexical memory value\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerMemoryEW
   },
   {
@@ -339,7 +339,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Symbol>  - Symbol name for memory address. It has following format [MapFileName:]SymbolName.\n"
     L"  <Value>   - The hexical memory value\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerMemoryED
   },
   {
@@ -351,7 +351,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  <Symbol>  - Symbol name for memory address. It has following format [MapFileName:]SymbolName.\n"
     L"  <Value>   - The hexical memory value\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerMemoryEQ
   },
   //
@@ -367,7 +367,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  S <Symbol>     - List this symbol only\n"
     L"  <Address>      - The hexical memory address, which user want to find the symbol for.\n",
     L"Symbol:\n",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerListSymbol
   },
   {
@@ -378,7 +378,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  SymbolFile - The EBC symbol file (Its name should be XXX.MAP)\n"
     L"  a          - Automatically load code files in the same dir\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerLoadSymbol
   },
   {
@@ -388,7 +388,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"UNLOADSYMBOL <SymbolFile>\n"
     L"  SymbolFile - The EBC symbol file (Its name should be XXX.MAP)\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerUnloadSymbol
   },
   {
@@ -399,7 +399,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  CodeFile   - The EBC code file (Its name should be XXX.COD)\n"
     L"  SymbolFile - The EBC symbol file (Its name should be XXX.MAP)\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerLoadCode
   },
   {
@@ -410,7 +410,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  CodeFile   - The EBC code file (Its name should be XXX.COD)\n"
     L"  SymbolFile - The EBC symbol file (Its name should be XXX.MAP)\n",
     L"",
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     DebuggerUnloadCode
   },
   {
@@ -423,7 +423,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  on            - enable symbol output\n"
     L"  off           - disable symbol output\n",
     L"",
-    {SCAN_F3, CHAR_NULL},
+    { SCAN_F3,   CHAR_NULL },
     DebuggerDisplaySymbol
   },
   {
@@ -436,7 +436,7 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"  on            - enable source only output\n"
     L"  off           - disable source only output\n",
     L"",
-    {SCAN_F6, CHAR_NULL},
+    { SCAN_F6,   CHAR_NULL },
     DebuggerDisplayCode
   },
   //
@@ -448,120 +448,121 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
     L"The help command will print help information for each command\n\n",
     L"H [<Command>]\n",
     L"",
-    {SCAN_F1, CHAR_NULL},
+    { SCAN_F1,   CHAR_NULL },
     DebuggerHelp
   },
-/*
-  //
-  // Extended
-  //
-  {
-    L"!IB",
-    L"![I|O][B|W|D]      - display/modify IO\n",
-    L"",
-    L"!IB <Address>\n",
-    L"Extended:\n",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtIoIB
-  },
-  {
-    L"!IW",
-    L"",
-    L"",
-    L"!IW <Address>\n",
-    L"",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtIoIW
-  },
-  {
-    L"!ID",
-    L"",
-    L"",
-    L"!ID <Address>\n",
-    L"",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtIoID
-  },
-  {
-    L"!OB",
-    L"",
-    L"",
-    L"!OB <Address> <Value>\n",
-    L"",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtIoOB
-  },
-  {
-    L"!OW",
-    L"",
-    L"",
-    L"!OW <Address> <Value>\n",
-    L"",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtIoOW
-  },
-  {
-    L"!OD",
-    L"",
-    L"",
-    L"!OD <Address> <Value>\n",
-    L"",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtIoOD
-  },
-  {
-    L"!PCIL",
-    L"!PCIL              - list PCI device, with BAR\n",
-    L"",
-    L"!PCIL [B]\n",
-    L"",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtPciPCIL
-  },
-  {
-    L"!PCID",
-    L"!PCID              - show PCI space\n",
-    L"",
-    L"!PCID Bus Device Function [H|B|E]\n",
-    L"",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtPciPCID
-  },
-  {
-    L"!CFGB",
-    L"!CFG[B|W|D]        - show/modify PCI space",
-    L"",
-    L"!CFGB <Address> [<Value>]\n",
-    L"",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtPciCFGB
-  },
-  {
-    L"!CFGW",
-    L"",
-    L"",
-    L"!CFGW <Address> [<Value>]\n",
-    L"",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtPciCFGW
-  },
-  {
-    L"!CFGD",
-    L"",
-    L"",
-    L"!CFGD <Address> [<Value>]\n",
-    L"",
-    {SCAN_NULL, CHAR_NULL},
-    DebuggerExtPciCFGD
-  },
-*/
+
+  /*
+    //
+    // Extended
+    //
+    {
+      L"!IB",
+      L"![I|O][B|W|D]      - display/modify IO\n",
+      L"",
+      L"!IB <Address>\n",
+      L"Extended:\n",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtIoIB
+    },
+    {
+      L"!IW",
+      L"",
+      L"",
+      L"!IW <Address>\n",
+      L"",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtIoIW
+    },
+    {
+      L"!ID",
+      L"",
+      L"",
+      L"!ID <Address>\n",
+      L"",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtIoID
+    },
+    {
+      L"!OB",
+      L"",
+      L"",
+      L"!OB <Address> <Value>\n",
+      L"",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtIoOB
+    },
+    {
+      L"!OW",
+      L"",
+      L"",
+      L"!OW <Address> <Value>\n",
+      L"",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtIoOW
+    },
+    {
+      L"!OD",
+      L"",
+      L"",
+      L"!OD <Address> <Value>\n",
+      L"",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtIoOD
+    },
+    {
+      L"!PCIL",
+      L"!PCIL              - list PCI device, with BAR\n",
+      L"",
+      L"!PCIL [B]\n",
+      L"",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtPciPCIL
+    },
+    {
+      L"!PCID",
+      L"!PCID              - show PCI space\n",
+      L"",
+      L"!PCID Bus Device Function [H|B|E]\n",
+      L"",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtPciPCID
+    },
+    {
+      L"!CFGB",
+      L"!CFG[B|W|D]        - show/modify PCI space",
+      L"",
+      L"!CFGB <Address> [<Value>]\n",
+      L"",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtPciCFGB
+    },
+    {
+      L"!CFGW",
+      L"",
+      L"",
+      L"!CFGW <Address> [<Value>]\n",
+      L"",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtPciCFGW
+    },
+    {
+      L"!CFGD",
+      L"",
+      L"",
+      L"!CFGD <Address> [<Value>]\n",
+      L"",
+      {SCAN_NULL, CHAR_NULL},
+      DebuggerExtPciCFGD
+    },
+  */
   {
     NULL,
     NULL,
     NULL,
     NULL,
     NULL,
-    {SCAN_NULL, CHAR_NULL},
+    { SCAN_NULL, CHAR_NULL },
     NULL
   },
 };
@@ -579,22 +580,22 @@ EFI_DEBUGGER_COMMAND_SET  mDebuggerCommandSet[] = {
 **/
 EFI_DEBUGGER_COMMAND
 MatchDebuggerCommand (
-  IN CHAR16    *CommandName,
-  IN CHAR16    **CommandArg
+  IN CHAR16  *CommandName,
+  IN CHAR16  **CommandArg
   )
 {
-  UINTN  Index;
-  CHAR16 *Temp;
+  UINTN   Index;
+  CHAR16  *Temp;
 
   //
   // Get Command Name
   //
-  Temp = StrGetNewTokenLine (CommandName, L" ");
+  Temp        = StrGetNewTokenLine (CommandName, L" ");
   CommandName = Temp;
   //
   // Get Command Argument
   //
-  Temp = StrGetNextTokenLine (L" ");
+  Temp        = StrGetNextTokenLine (L" ");
   *CommandArg = Temp;
 
   if (CommandName == NULL) {
@@ -631,7 +632,7 @@ MatchDebuggerCommand (
 **/
 CHAR16 *
 GetCommandNameByKey (
-  IN EFI_INPUT_KEY CommandKey
+  IN EFI_INPUT_KEY  CommandKey
   )
 {
   UINTN  Index;
@@ -641,7 +642,8 @@ GetCommandNameByKey (
   //
   for (Index = 0; mDebuggerCommandSet[Index].CommandName != NULL; Index++) {
     if ((mDebuggerCommandSet[Index].CommandKey.UnicodeChar == CommandKey.UnicodeChar) &&
-        (mDebuggerCommandSet[Index].CommandKey.ScanCode    == CommandKey.ScanCode)) {
+        (mDebuggerCommandSet[Index].CommandKey.ScanCode    == CommandKey.ScanCode))
+    {
       //
       // Found
       //

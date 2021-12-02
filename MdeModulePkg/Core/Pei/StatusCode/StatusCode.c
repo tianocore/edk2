@@ -27,16 +27,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 PeiReportStatusCode (
-  IN CONST EFI_PEI_SERVICES         **PeiServices,
-  IN EFI_STATUS_CODE_TYPE           CodeType,
-  IN EFI_STATUS_CODE_VALUE          Value,
-  IN UINT32                         Instance,
-  IN CONST EFI_GUID                 *CallerId,
-  IN CONST EFI_STATUS_CODE_DATA     *Data OPTIONAL
+  IN CONST EFI_PEI_SERVICES      **PeiServices,
+  IN EFI_STATUS_CODE_TYPE        CodeType,
+  IN EFI_STATUS_CODE_VALUE       Value,
+  IN UINT32                      Instance,
+  IN CONST EFI_GUID              *CallerId,
+  IN CONST EFI_STATUS_CODE_DATA  *Data OPTIONAL
   )
 {
-  EFI_STATUS                Status;
-  EFI_PEI_PROGRESS_CODE_PPI *StatusCodePpi;
+  EFI_STATUS                 Status;
+  EFI_PEI_PROGRESS_CODE_PPI  *StatusCodePpi;
 
   //
   // Locate StatusCode Ppi.
@@ -50,19 +50,16 @@ PeiReportStatusCode (
 
   if (!EFI_ERROR (Status)) {
     Status = StatusCodePpi->ReportStatusCode (
-                            PeiServices,
-                            CodeType,
-                            Value,
-                            Instance,
-                            CallerId,
-                            Data
-                            );
+                              PeiServices,
+                              CodeType,
+                              Value,
+                              Instance,
+                              CallerId,
+                              Data
+                              );
 
-   return Status;
+    return Status;
   }
 
-  return  EFI_NOT_AVAILABLE_YET;
+  return EFI_NOT_AVAILABLE_YET;
 }
-
-
-

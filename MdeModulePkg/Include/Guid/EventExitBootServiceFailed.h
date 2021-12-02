@@ -13,6 +13,6 @@
 #define EVENT_GROUP_EXIT_BOOT_SERVICES_FAILED \
   { 0x4f6c5507, 0x232f, 0x4787, { 0xb9, 0x5e, 0x72, 0xf8, 0x62, 0x49, 0xc, 0xb1 } }
 
-extern EFI_GUID gEventExitBootServicesFailedGuid;
+extern EFI_GUID  gEventExitBootServicesFailedGuid;
 
 #endif

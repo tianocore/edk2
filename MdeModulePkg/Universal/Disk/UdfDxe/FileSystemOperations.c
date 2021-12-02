@@ -12,7 +12,7 @@
 //
 // Vendor-Defined Device Path GUID for UDF file system
 //
-EFI_GUID gUdfDevPathGuid = EFI_UDF_DEVICE_PATH_GUID;
+EFI_GUID  gUdfDevPathGuid = EFI_UDF_DEVICE_PATH_GUID;
 
 /**
   Find the anchor volume descriptor pointer.
@@ -40,8 +40,8 @@ FindAnchorVolumeDescriptorPointer (
   UINTN               Index;
   UDF_DESCRIPTOR_TAG  *DescriptorTag;
 
-  BlockSize = BlockIo->Media->BlockSize;
-  EndLBA = BlockIo->Media->LastBlock;
+  BlockSize         = BlockIo->Media->BlockSize;
+  EndLBA            = BlockIo->Media->LastBlock;
   DescriptorLBAs[0] = 256;
   DescriptorLBAs[1] = EndLBA - 256;
   DescriptorLBAs[2] = EndLBA;
@@ -49,12 +49,12 @@ FindAnchorVolumeDescriptorPointer (
 
   for (Index = 0; Index < ARRAY_SIZE (DescriptorLBAs); Index++) {
     Status = DiskIo->ReadDisk (
-      DiskIo,
-      BlockIo->Media->MediaId,
-      MultU64x32 (DescriptorLBAs[Index], BlockSize),
-      sizeof (UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER),
-      (VOID *)AnchorPoint
-      );
+                       DiskIo,
+                       BlockIo->Media->MediaId,
+                       MultU64x32 (DescriptorLBAs[Index], BlockSize),
+                       sizeof (UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER),
+                       (VOID *)AnchorPoint
+                       );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -68,6 +68,7 @@ FindAnchorVolumeDescriptorPointer (
       return EFI_SUCCESS;
     }
   }
+
   //
   // No AVDP found.
   //
@@ -98,18 +99,18 @@ StartMainVolumeDescriptorSequence (
   OUT  UDF_VOLUME_INFO                       *Volume
   )
 {
-  EFI_STATUS            Status;
-  UINT32                BlockSize;
-  UDF_EXTENT_AD         *ExtentAd;
-  EFI_LBA               SeqStartBlock;
-  EFI_LBA               SeqEndBlock;
-  BOOLEAN               StopSequence;
-  VOID                  *Buffer;
-  UDF_DESCRIPTOR_TAG    *DescriptorTag;
-  UINT32                LogicalBlockSize;
+  EFI_STATUS          Status;
+  UINT32              BlockSize;
+  UDF_EXTENT_AD       *ExtentAd;
+  EFI_LBA             SeqStartBlock;
+  EFI_LBA             SeqEndBlock;
+  BOOLEAN             StopSequence;
+  VOID                *Buffer;
+  UDF_DESCRIPTOR_TAG  *DescriptorTag;
+  UINT32              LogicalBlockSize;
 
   BlockSize = BlockIo->Media->BlockSize;
-  ExtentAd = &AnchorPoint->MainVolumeDescriptorSequenceExtent;
+  ExtentAd  = &AnchorPoint->MainVolumeDescriptorSequenceExtent;
 
   //
   // Allocate buffer for reading disk blocks
@@ -128,20 +129,22 @@ StartMainVolumeDescriptorSequence (
   // Partition driver already did.
   //
   SeqStartBlock = 0;
-  SeqEndBlock = SeqStartBlock + DivU64x32 ((UINT64)ExtentAd->ExtentLength,
-                                           BlockSize);
+  SeqEndBlock   = SeqStartBlock + DivU64x32 (
+                                    (UINT64)ExtentAd->ExtentLength,
+                                    BlockSize
+                                    );
   StopSequence = FALSE;
-  for (; SeqStartBlock < SeqEndBlock && !StopSequence; SeqStartBlock++) {
+  for ( ; SeqStartBlock < SeqEndBlock && !StopSequence; SeqStartBlock++) {
     //
     // Read disk block
     //
     Status = BlockIo->ReadBlocks (
-      BlockIo,
-      BlockIo->Media->MediaId,
-      SeqStartBlock,
-      BlockSize,
-      Buffer
-      );
+                        BlockIo,
+                        BlockIo->Media->MediaId,
+                        SeqStartBlock,
+                        BlockSize,
+                        Buffer
+                        );
     if (EFI_ERROR (Status)) {
       goto Out_Free;
     }
@@ -149,26 +152,26 @@ StartMainVolumeDescriptorSequence (
     DescriptorTag = Buffer;
 
     switch (DescriptorTag->TagIdentifier) {
-    case UdfPartitionDescriptor:
-      //
-      // Save Partition Descriptor
-      //
-      CopyMem (&Volume->PartitionDesc, Buffer, sizeof (Volume->PartitionDesc));
-      break;
+      case UdfPartitionDescriptor:
+        //
+        // Save Partition Descriptor
+        //
+        CopyMem (&Volume->PartitionDesc, Buffer, sizeof (Volume->PartitionDesc));
+        break;
 
-    case UdfLogicalVolumeDescriptor:
-      //
-      // Save Logical Volume Descriptor
-      //
-      CopyMem (&Volume->LogicalVolDesc, Buffer, sizeof (Volume->LogicalVolDesc));
-      break;
+      case UdfLogicalVolumeDescriptor:
+        //
+        // Save Logical Volume Descriptor
+        //
+        CopyMem (&Volume->LogicalVolDesc, Buffer, sizeof (Volume->LogicalVolDesc));
+        break;
 
-    case UdfTerminatingDescriptor:
-      StopSequence = TRUE;
-      break;
+      case UdfTerminatingDescriptor:
+        StopSequence = TRUE;
+        break;
 
-    default:
-      ;
+      default:
+        ;
     }
   }
 
@@ -216,45 +219,46 @@ GetPdFromLongAd (
   LogicalVolDesc = &Volume->LogicalVolDesc;
 
   switch (LogicalVolDesc->DomainIdentifier.Suffix.Domain.UdfRevision) {
-  case 0x0102:
-  case 0x0150:
-  case 0x0200:
-  case 0x0201:
-  case 0x0250:
-  case 0x0260:
-    //
-    // UDF 1.02 specification:
-    //
-    // There shall be exactly one prevailing Logical Volume Descriptor recorded
-    // per Volume Set. The Partition Maps field shall contain only Type 1
-    // Partition Maps.
-    //
-    // UDF 1.50 through 2.60 specs say:
-    //
-    // For the purpose of interchange partition maps shall be limited to
-    // Partition Map type 1, except type 2 maps as described in the document.
-    //
-    // NOTE: Only one Type 1 (Physical) Partition is supported. It has been
-    // checked already in Partition driver for existence of a single Type 1
-    // Partition map. Hence, the 'PartitionReferenceNumber' field (the index
-    // used to access Partition Maps data within the Logical Volume Descriptor)
-    // in the Long Allocation Descriptor should be 0 to indicate there is only
-    // one partition.
-    //
-    if (LongAd->ExtentLocation.PartitionReferenceNumber != 0) {
-      return NULL;
-    }
-    //
-    // Since only one partition, get the first one directly.
-    //
-    PartitionNum = *(UINT16 *)((UINTN)&LogicalVolDesc->PartitionMaps[4]);
-    break;
+    case 0x0102:
+    case 0x0150:
+    case 0x0200:
+    case 0x0201:
+    case 0x0250:
+    case 0x0260:
+      //
+      // UDF 1.02 specification:
+      //
+      // There shall be exactly one prevailing Logical Volume Descriptor recorded
+      // per Volume Set. The Partition Maps field shall contain only Type 1
+      // Partition Maps.
+      //
+      // UDF 1.50 through 2.60 specs say:
+      //
+      // For the purpose of interchange partition maps shall be limited to
+      // Partition Map type 1, except type 2 maps as described in the document.
+      //
+      // NOTE: Only one Type 1 (Physical) Partition is supported. It has been
+      // checked already in Partition driver for existence of a single Type 1
+      // Partition map. Hence, the 'PartitionReferenceNumber' field (the index
+      // used to access Partition Maps data within the Logical Volume Descriptor)
+      // in the Long Allocation Descriptor should be 0 to indicate there is only
+      // one partition.
+      //
+      if (LongAd->ExtentLocation.PartitionReferenceNumber != 0) {
+        return NULL;
+      }
 
-  default:
-    //
-    // Unsupported UDF revision
-    //
-    return NULL;
+      //
+      // Since only one partition, get the first one directly.
+      //
+      PartitionNum = *(UINT16 *)((UINTN)&LogicalVolDesc->PartitionMaps[4]);
+      break;
+
+    default:
+      //
+      // Unsupported UDF revision
+      //
+      return NULL;
   }
 
   //
@@ -287,7 +291,7 @@ GetLongAdLsn (
   OUT UINT64                          *Lsn
   )
 {
-  UDF_PARTITION_DESCRIPTOR *PartitionDesc;
+  UDF_PARTITION_DESCRIPTOR  *PartitionDesc;
 
   PartitionDesc = GetPdFromLongAd (Volume, LongAd);
   if (PartitionDesc == NULL) {
@@ -324,7 +328,7 @@ GetShortAdLsn (
   )
 {
   return (UINT64)PartitionDesc->PartitionStartingLocation -
-    Volume->MainVdsStartLocation + ShortAd->ExtentPosition;
+         Volume->MainVdsStartLocation + ShortAd->ExtentPosition;
 }
 
 /**
@@ -344,9 +348,9 @@ GetShortAdLsn (
 **/
 EFI_STATUS
 FindFileSetDescriptor (
-  IN   EFI_BLOCK_IO_PROTOCOL    *BlockIo,
-  IN   EFI_DISK_IO_PROTOCOL     *DiskIo,
-  IN   UDF_VOLUME_INFO          *Volume
+  IN   EFI_BLOCK_IO_PROTOCOL  *BlockIo,
+  IN   EFI_DISK_IO_PROTOCOL   *DiskIo,
+  IN   UDF_VOLUME_INFO        *Volume
   )
 {
   EFI_STATUS                     Status;
@@ -355,7 +359,7 @@ FindFileSetDescriptor (
   UDF_DESCRIPTOR_TAG             *DescriptorTag;
 
   LogicalVolDesc = &Volume->LogicalVolDesc;
-  Status = GetLongAdLsn (Volume, &LogicalVolDesc->LogicalVolumeContentsUse, &Lsn);
+  Status         = GetLongAdLsn (Volume, &LogicalVolDesc->LogicalVolumeContentsUse, &Lsn);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -369,12 +373,12 @@ FindFileSetDescriptor (
   // Read disk block
   //
   Status = DiskIo->ReadDisk (
-    DiskIo,
-    BlockIo->Media->MediaId,
-    MultU64x32 (Lsn, LogicalVolDesc->LogicalBlockSize),
-    sizeof (Volume->FileSetDesc),
-    &Volume->FileSetDesc
-    );
+                     DiskIo,
+                     BlockIo->Media->MediaId,
+                     MultU64x32 (Lsn, LogicalVolDesc->LogicalBlockSize),
+                     sizeof (Volume->FileSetDesc),
+                     &Volume->FileSetDesc
+                     );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -417,10 +421,10 @@ ReadVolumeFileStructure (
   // Find Anchor Volume Descriptor Pointer
   //
   Status = FindAnchorVolumeDescriptorPointer (
-    BlockIo,
-    DiskIo,
-    &AnchorPoint
-    );
+             BlockIo,
+             DiskIo,
+             &AnchorPoint
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -436,11 +440,11 @@ ReadVolumeFileStructure (
   // Start Main Volume Descriptor Sequence.
   //
   Status = StartMainVolumeDescriptorSequence (
-    BlockIo,
-    DiskIo,
-    &AnchorPoint,
-    Volume
-    );
+             BlockIo,
+             DiskIo,
+             &AnchorPoint,
+             Volume
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -462,10 +466,10 @@ GetFidDescriptorLength (
   )
 {
   return (UINT64)(
-             (INTN)((OFFSET_OF (UDF_FILE_IDENTIFIER_DESCRIPTOR, Data[0]) + 3 +
-             FileIdentifierDesc->LengthOfFileIdentifier +
-             FileIdentifierDesc->LengthOfImplementationUse) >> 2) << 2
-             );
+                  (INTN)((OFFSET_OF (UDF_FILE_IDENTIFIER_DESCRIPTOR, Data[0]) + 3 +
+                          FileIdentifierDesc->LengthOfFileIdentifier +
+                          FileIdentifierDesc->LengthOfImplementationUse) >> 2) << 2
+                  );
 }
 
 /**
@@ -483,7 +487,9 @@ DuplicateFid (
 {
   *NewFileIdentifierDesc =
     (UDF_FILE_IDENTIFIER_DESCRIPTOR *)AllocateCopyPool (
-      (UINTN) GetFidDescriptorLength (FileIdentifierDesc), FileIdentifierDesc);
+                                        (UINTN)GetFidDescriptorLength (FileIdentifierDesc),
+                                        FileIdentifierDesc
+                                        );
 }
 
 /**
@@ -549,22 +555,24 @@ GetFileEntryData (
   if (DescriptorTag->TagIdentifier == UdfExtendedFileEntry) {
     ExtendedFileEntry = (UDF_EXTENDED_FILE_ENTRY *)FileEntryData;
 
-    *Length  = ExtendedFileEntry->InformationLength;
-    *Data    = (VOID *)((UINT8 *)ExtendedFileEntry->Data +
-                        ExtendedFileEntry->LengthOfExtendedAttributes);
+    *Length = ExtendedFileEntry->InformationLength;
+    *Data   = (VOID *)((UINT8 *)ExtendedFileEntry->Data +
+                       ExtendedFileEntry->LengthOfExtendedAttributes);
   } else if (DescriptorTag->TagIdentifier == UdfFileEntry) {
     FileEntry = (UDF_FILE_ENTRY *)FileEntryData;
 
-    *Length  = FileEntry->InformationLength;
-    *Data    = (VOID *)((UINT8 *)FileEntry->Data +
-                        FileEntry->LengthOfExtendedAttributes);
+    *Length = FileEntry->InformationLength;
+    *Data   = (VOID *)((UINT8 *)FileEntry->Data +
+                       FileEntry->LengthOfExtendedAttributes);
   }
 
   if ((*Length > FileEntrySize) ||
       ((UINTN)FileEntryData > (UINTN)(*Data)) ||
-      ((UINTN)(*Data) - (UINTN)FileEntryData > FileEntrySize - *Length)) {
+      ((UINTN)(*Data) - (UINTN)FileEntryData > FileEntrySize - *Length))
+  {
     return EFI_VOLUME_CORRUPTED;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -606,22 +614,24 @@ GetAdsInformation (
   if (DescriptorTag->TagIdentifier == UdfExtendedFileEntry) {
     ExtendedFileEntry = (UDF_EXTENDED_FILE_ENTRY *)FileEntryData;
 
-    *Length = ExtendedFileEntry->LengthOfAllocationDescriptors;
+    *Length  = ExtendedFileEntry->LengthOfAllocationDescriptors;
     *AdsData = (VOID *)((UINT8 *)ExtendedFileEntry->Data +
                         ExtendedFileEntry->LengthOfExtendedAttributes);
   } else if (DescriptorTag->TagIdentifier == UdfFileEntry) {
     FileEntry = (UDF_FILE_ENTRY *)FileEntryData;
 
-    *Length = FileEntry->LengthOfAllocationDescriptors;
+    *Length  = FileEntry->LengthOfAllocationDescriptors;
     *AdsData = (VOID *)((UINT8 *)FileEntry->Data +
                         FileEntry->LengthOfExtendedAttributes);
   }
 
   if ((*Length > FileEntrySize) ||
       ((UINTN)FileEntryData > (UINTN)(*AdsData)) ||
-      ((UINTN)(*AdsData) - (UINTN)FileEntryData > FileEntrySize - *Length)) {
+      ((UINTN)(*AdsData) - (UINTN)FileEntryData > FileEntrySize - *Length))
+  {
     return EFI_VOLUME_CORRUPTED;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -648,7 +658,7 @@ GetLongAdFromAds (
   UDF_LONG_ALLOCATION_DESCRIPTOR  *LongAd;
   UDF_EXTENT_FLAGS                ExtentFlags;
 
-  for (;;) {
+  for ( ; ;) {
     if (*Offset >= Length) {
       //
       // No more Long Allocation Descriptors.
@@ -664,8 +674,9 @@ GetLongAdFromAds (
     // allocated AD, then return it.
     //
     ExtentFlags = GET_EXTENT_FLAGS (LongAdsSequence, LongAd);
-    if (ExtentFlags == ExtentIsNextExtent ||
-        ExtentFlags == ExtentRecordedAndAllocated) {
+    if ((ExtentFlags == ExtentIsNextExtent) ||
+        (ExtentFlags == ExtentRecordedAndAllocated))
+    {
       break;
     }
 
@@ -701,10 +712,10 @@ GetShortAdFromAds (
   OUT     UDF_SHORT_ALLOCATION_DESCRIPTOR  **FoundShortAd
   )
 {
-  UDF_SHORT_ALLOCATION_DESCRIPTOR *ShortAd;
-  UDF_EXTENT_FLAGS                ExtentFlags;
+  UDF_SHORT_ALLOCATION_DESCRIPTOR  *ShortAd;
+  UDF_EXTENT_FLAGS                 ExtentFlags;
 
-  for (;;) {
+  for ( ; ;) {
     if (*Offset >= Length) {
       //
       // No more Short Allocation Descriptors.
@@ -720,8 +731,9 @@ GetShortAdFromAds (
     // allocated AD, then return it.
     //
     ExtentFlags = GET_EXTENT_FLAGS (ShortAdsSequence, ShortAd);
-    if (ExtentFlags == ExtentIsNextExtent ||
-        ExtentFlags == ExtentRecordedAndAllocated) {
+    if ((ExtentFlags == ExtentIsNextExtent) ||
+        (ExtentFlags == ExtentRecordedAndAllocated))
+    {
       break;
     }
 
@@ -763,18 +775,18 @@ GetAllocationDescriptor (
 {
   if (RecordingFlags == LongAdsSequence) {
     return GetLongAdFromAds (
-      Data,
-      Offset,
-      Length,
-      (UDF_LONG_ALLOCATION_DESCRIPTOR **)FoundAd
-      );
+             Data,
+             Offset,
+             Length,
+             (UDF_LONG_ALLOCATION_DESCRIPTOR **)FoundAd
+             );
   } else if (RecordingFlags == ShortAdsSequence) {
     return GetShortAdFromAds (
-      Data,
-      Offset,
-      Length,
-      (UDF_SHORT_ALLOCATION_DESCRIPTOR **)FoundAd
-      );
+             Data,
+             Offset,
+             Length,
+             (UDF_SHORT_ALLOCATION_DESCRIPTOR **)FoundAd
+             );
   }
 
   //
@@ -809,7 +821,7 @@ GetAllocationDescriptorLsn (
   OUT UINT64                          *Lsn
   )
 {
-  UDF_PARTITION_DESCRIPTOR *PartitionDesc;
+  UDF_PARTITION_DESCRIPTOR  *PartitionDesc;
 
   if (RecordingFlags == LongAdsSequence) {
     return GetLongAdLsn (Volume, (UDF_LONG_ALLOCATION_DESCRIPTOR *)Ad, Lsn);
@@ -875,12 +887,14 @@ GetAedAdsOffset (
   UDF_ALLOCATION_EXTENT_DESCRIPTOR  *AllocExtDesc;
   UDF_DESCRIPTOR_TAG                *DescriptorTag;
 
-  ExtentLength  = GET_EXTENT_LENGTH (RecordingFlags, Ad);
-  Status        = GetAllocationDescriptorLsn (RecordingFlags,
-                                              Volume,
-                                              ParentIcb,
-                                              Ad,
-                                              &Lsn);
+  ExtentLength = GET_EXTENT_LENGTH (RecordingFlags, Ad);
+  Status       = GetAllocationDescriptorLsn (
+                   RecordingFlags,
+                   Volume,
+                   ParentIcb,
+                   Ad,
+                   &Lsn
+                   );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -896,12 +910,12 @@ GetAedAdsOffset (
   // Read extent.
   //
   Status = DiskIo->ReadDisk (
-    DiskIo,
-    BlockIo->Media->MediaId,
-    MultU64x32 (Lsn, LogicalBlockSize),
-    ExtentLength,
-    Data
-    );
+                     DiskIo,
+                     BlockIo->Media->MediaId,
+                     MultU64x32 (Lsn, LogicalBlockSize),
+                     ExtentLength,
+                     Data
+                     );
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -922,7 +936,7 @@ GetAedAdsOffset (
   // Get AED's block offset and its length.
   //
   *Offset = MultU64x32 (Lsn, LogicalBlockSize) +
-    sizeof (UDF_ALLOCATION_EXTENT_DESCRIPTOR);
+            sizeof (UDF_ALLOCATION_EXTENT_DESCRIPTOR);
   *Length = AllocExtDesc->LengthOfAllocationDescriptors;
 
 Exit:
@@ -969,15 +983,15 @@ GetAedAdsData (
   // Get AED's offset + length.
   //
   Status = GetAedAdsOffset (
-    BlockIo,
-    DiskIo,
-    Volume,
-    ParentIcb,
-    RecordingFlags,
-    Ad,
-    &Offset,
-    Length
-    );
+             BlockIo,
+             DiskIo,
+             Volume,
+             ParentIcb,
+             RecordingFlags,
+             Ad,
+             &Offset,
+             Length
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -985,18 +999,18 @@ GetAedAdsData (
   //
   // Allocate buffer to read in AED's data.
   //
-  *Data = AllocatePool ((UINTN) (*Length));
+  *Data = AllocatePool ((UINTN)(*Length));
   if (*Data == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   return DiskIo->ReadDisk (
-    DiskIo,
-    BlockIo->Media->MediaId,
-    Offset,
-    (UINTN) (*Length),
-    *Data
-    );
+                   DiskIo,
+                   BlockIo->Media->MediaId,
+                   Offset,
+                   (UINTN)(*Length),
+                   *Data
+                   );
 }
 
 /**
@@ -1020,7 +1034,7 @@ GrowUpBufferToNextAd (
   IN      UINT64                  Length
   )
 {
-  UINT32 ExtentLength;
+  UINT32  ExtentLength;
 
   ExtentLength = GET_EXTENT_LENGTH (RecordingFlags, Ad);
 
@@ -1030,7 +1044,7 @@ GrowUpBufferToNextAd (
       return EFI_OUT_OF_RESOURCES;
     }
   } else {
-    *Buffer = ReallocatePool ((UINTN) Length, (UINTN) (Length + ExtentLength), *Buffer);
+    *Buffer = ReallocatePool ((UINTN)Length, (UINTN)(Length + ExtentLength), *Buffer);
     if (*Buffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -1087,294 +1101,297 @@ ReadFile (
   UINT32                  ExtentLength;
   UDF_FE_RECORDING_FLAGS  RecordingFlags;
 
-  LogicalBlockSize  = Volume->LogicalVolDesc.LogicalBlockSize;
-  DoFreeAed         = FALSE;
+  LogicalBlockSize = Volume->LogicalVolDesc.LogicalBlockSize;
+  DoFreeAed        = FALSE;
 
   //
   // set BytesLeft to suppress incorrect compiler/analyzer warnings
   //
-  BytesLeft = 0;
-  DataOffset = 0;
-  FilePosition = 0;
+  BytesLeft       = 0;
+  DataOffset      = 0;
+  FilePosition    = 0;
   FinishedSeeking = FALSE;
-  Data = NULL;
+  Data            = NULL;
 
   switch (ReadFileInfo->Flags) {
-  case ReadFileGetFileSize:
-  case ReadFileAllocateAndRead:
-    //
-    // Initialise ReadFileInfo structure for either getting file size, or
-    // reading file's recorded data.
-    //
-    ReadFileInfo->ReadLength = 0;
-    ReadFileInfo->FileData = NULL;
-    break;
-  case ReadFileSeekAndRead:
-    //
-    // About to seek a file and/or read its data.
-    //
-    Length = ReadFileInfo->FileSize - ReadFileInfo->FilePosition;
-    if (ReadFileInfo->FileDataSize > Length) {
+    case ReadFileGetFileSize:
+    case ReadFileAllocateAndRead:
       //
-      // About to read beyond the EOF -- truncate it.
+      // Initialise ReadFileInfo structure for either getting file size, or
+      // reading file's recorded data.
       //
-      ReadFileInfo->FileDataSize = Length;
-    }
+      ReadFileInfo->ReadLength = 0;
+      ReadFileInfo->FileData   = NULL;
+      break;
+    case ReadFileSeekAndRead:
+      //
+      // About to seek a file and/or read its data.
+      //
+      Length = ReadFileInfo->FileSize - ReadFileInfo->FilePosition;
+      if (ReadFileInfo->FileDataSize > Length) {
+        //
+        // About to read beyond the EOF -- truncate it.
+        //
+        ReadFileInfo->FileDataSize = Length;
+      }
 
-    //
-    // Initialise data to start seeking and/or reading a file.
-    //
-    BytesLeft = ReadFileInfo->FileDataSize;
-    DataOffset = 0;
-    FilePosition = 0;
-    FinishedSeeking = FALSE;
+      //
+      // Initialise data to start seeking and/or reading a file.
+      //
+      BytesLeft       = ReadFileInfo->FileDataSize;
+      DataOffset      = 0;
+      FilePosition    = 0;
+      FinishedSeeking = FALSE;
 
-    break;
+      break;
   }
 
   RecordingFlags = GET_FE_RECORDING_FLAGS (FileEntryData);
   switch (RecordingFlags) {
-  case InlineData:
-    //
-    // There are no extents for this FE/EFE. All data is inline.
-    //
-    Status = GetFileEntryData (FileEntryData, Volume->FileEntrySize, &Data, &Length);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    if (ReadFileInfo->Flags == ReadFileGetFileSize) {
-      ReadFileInfo->ReadLength = Length;
-    } else if (ReadFileInfo->Flags == ReadFileAllocateAndRead) {
+    case InlineData:
       //
-      // Allocate buffer for starting read data.
+      // There are no extents for this FE/EFE. All data is inline.
       //
-      ReadFileInfo->FileData = AllocatePool ((UINTN) Length);
-      if (ReadFileInfo->FileData == NULL) {
-        return EFI_OUT_OF_RESOURCES;
-      }
-
-      //
-      // Read all inline data into ReadFileInfo->FileData
-      //
-      CopyMem (ReadFileInfo->FileData, Data, (UINTN) Length);
-      ReadFileInfo->ReadLength = Length;
-    } else if (ReadFileInfo->Flags == ReadFileSeekAndRead) {
-      //
-      // If FilePosition is non-zero, seek file to FilePosition, read
-      // FileDataSize bytes and then updates FilePosition.
-      //
-      CopyMem (
-        ReadFileInfo->FileData,
-        (VOID *)((UINT8 *)Data + ReadFileInfo->FilePosition),
-        (UINTN) ReadFileInfo->FileDataSize
-        );
-
-      ReadFileInfo->FilePosition += ReadFileInfo->FileDataSize;
-    } else {
-      ASSERT (FALSE);
-      return EFI_INVALID_PARAMETER;
-    }
-
-    Status = EFI_SUCCESS;
-    break;
-
-  case LongAdsSequence:
-  case ShortAdsSequence:
-    //
-    // This FE/EFE contains a run of Allocation Descriptors. Get data + size
-    // for start reading them out.
-    //
-    Status = GetAdsInformation (FileEntryData, Volume->FileEntrySize, &Data, &Length);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    AdOffset = 0;
-
-    for (;;) {
-      //
-      // Read AD.
-      //
-      Status = GetAllocationDescriptor (
-        RecordingFlags,
-        Data,
-        &AdOffset,
-        Length,
-        &Ad
-        );
-      if (Status == EFI_DEVICE_ERROR) {
-        Status = EFI_SUCCESS;
-        goto Done;
-      }
-
-      //
-      // Check if AD is an indirect AD. If so, read Allocation Extent
-      // Descriptor and its extents (ADs).
-      //
-      if (GET_EXTENT_FLAGS (RecordingFlags, Ad) == ExtentIsNextExtent) {
-        DataBak = Data;
-        Status = GetAedAdsData (
-          BlockIo,
-          DiskIo,
-          Volume,
-          ParentIcb,
-          RecordingFlags,
-          Ad,
-          &Data,
-          &Length
-          );
-
-        if (!DoFreeAed) {
-          DoFreeAed = TRUE;
-        } else {
-          FreePool (DataBak);
-        }
-
-        if (EFI_ERROR (Status)) {
-          goto Error_Get_Aed;
-        }
-        ASSERT (Data != NULL);
-
-        AdOffset = 0;
-        continue;
-      }
-
-      ExtentLength = GET_EXTENT_LENGTH (RecordingFlags, Ad);
-
-      Status = GetAllocationDescriptorLsn (RecordingFlags,
-                                           Volume,
-                                           ParentIcb,
-                                           Ad,
-                                           &Lsn);
+      Status = GetFileEntryData (FileEntryData, Volume->FileEntrySize, &Data, &Length);
       if (EFI_ERROR (Status)) {
-        goto Done;
+        return Status;
       }
 
-      switch (ReadFileInfo->Flags) {
-      case ReadFileGetFileSize:
-        ReadFileInfo->ReadLength += ExtentLength;
-        break;
-      case ReadFileAllocateAndRead:
+      if (ReadFileInfo->Flags == ReadFileGetFileSize) {
+        ReadFileInfo->ReadLength = Length;
+      } else if (ReadFileInfo->Flags == ReadFileAllocateAndRead) {
         //
-        // Increase FileData (if necessary) to read next extent.
+        // Allocate buffer for starting read data.
         //
-        Status = GrowUpBufferToNextAd (
-          RecordingFlags,
-          Ad,
-          &ReadFileInfo->FileData,
-          ReadFileInfo->ReadLength
+        ReadFileInfo->FileData = AllocatePool ((UINTN)Length);
+        if (ReadFileInfo->FileData == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+
+        //
+        // Read all inline data into ReadFileInfo->FileData
+        //
+        CopyMem (ReadFileInfo->FileData, Data, (UINTN)Length);
+        ReadFileInfo->ReadLength = Length;
+      } else if (ReadFileInfo->Flags == ReadFileSeekAndRead) {
+        //
+        // If FilePosition is non-zero, seek file to FilePosition, read
+        // FileDataSize bytes and then updates FilePosition.
+        //
+        CopyMem (
+          ReadFileInfo->FileData,
+          (VOID *)((UINT8 *)Data + ReadFileInfo->FilePosition),
+          (UINTN)ReadFileInfo->FileDataSize
           );
-        if (EFI_ERROR (Status)) {
-          goto Error_Alloc_Buffer_To_Next_Ad;
-        }
 
-        //
-        // Read extent's data into FileData.
-        //
-        Status = DiskIo->ReadDisk (
-          DiskIo,
-          BlockIo->Media->MediaId,
-          MultU64x32 (Lsn, LogicalBlockSize),
-          ExtentLength,
-          (VOID *)((UINT8 *)ReadFileInfo->FileData +
-                   ReadFileInfo->ReadLength)
-          );
-        if (EFI_ERROR (Status)) {
-          goto Error_Read_Disk_Blk;
-        }
+        ReadFileInfo->FilePosition += ReadFileInfo->FileDataSize;
+      } else {
+        ASSERT (FALSE);
+        return EFI_INVALID_PARAMETER;
+      }
 
-        ReadFileInfo->ReadLength += ExtentLength;
-        break;
-      case ReadFileSeekAndRead:
-        //
-        // Seek file first before reading in its data.
-        //
-        if (FinishedSeeking) {
-          Offset = 0;
-          goto Skip_File_Seek;
-        }
+      Status = EFI_SUCCESS;
+      break;
 
-        if (FilePosition + ExtentLength < ReadFileInfo->FilePosition) {
-          FilePosition += ExtentLength;
-          goto Skip_Ad;
-        }
+    case LongAdsSequence:
+    case ShortAdsSequence:
+      //
+      // This FE/EFE contains a run of Allocation Descriptors. Get data + size
+      // for start reading them out.
+      //
+      Status = GetAdsInformation (FileEntryData, Volume->FileEntrySize, &Data, &Length);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
 
-        if (FilePosition + ExtentLength > ReadFileInfo->FilePosition) {
-          Offset = ReadFileInfo->FilePosition - FilePosition;
-        } else {
-          Offset = 0;
-        }
+      AdOffset = 0;
 
+      for ( ; ;) {
         //
-        // Done with seeking file. Start reading its data.
+        // Read AD.
         //
-        FinishedSeeking = TRUE;
-
-      Skip_File_Seek:
-        //
-        // Make sure we don't read more data than really wanted.
-        //
-        if (ExtentLength - Offset > BytesLeft) {
-          DataLength = BytesLeft;
-        } else {
-          DataLength = ExtentLength - Offset;
-        }
-
-        //
-        // Read extent's data into FileData.
-        //
-        Status = DiskIo->ReadDisk (
-          DiskIo,
-          BlockIo->Media->MediaId,
-          Offset + MultU64x32 (Lsn, LogicalBlockSize),
-          (UINTN) DataLength,
-          (VOID *)((UINT8 *)ReadFileInfo->FileData +
-                   DataOffset)
-          );
-        if (EFI_ERROR (Status)) {
-          goto Error_Read_Disk_Blk;
-        }
-
-        //
-        // Update current file's position.
-        //
-        DataOffset += DataLength;
-        ReadFileInfo->FilePosition += DataLength;
-
-        BytesLeft -= DataLength;
-        if (BytesLeft == 0) {
-          //
-          // There is no more file data to read.
-          //
+        Status = GetAllocationDescriptor (
+                   RecordingFlags,
+                   Data,
+                   &AdOffset,
+                   Length,
+                   &Ad
+                   );
+        if (Status == EFI_DEVICE_ERROR) {
           Status = EFI_SUCCESS;
           goto Done;
         }
 
-        break;
+        //
+        // Check if AD is an indirect AD. If so, read Allocation Extent
+        // Descriptor and its extents (ADs).
+        //
+        if (GET_EXTENT_FLAGS (RecordingFlags, Ad) == ExtentIsNextExtent) {
+          DataBak = Data;
+          Status  = GetAedAdsData (
+                      BlockIo,
+                      DiskIo,
+                      Volume,
+                      ParentIcb,
+                      RecordingFlags,
+                      Ad,
+                      &Data,
+                      &Length
+                      );
+
+          if (!DoFreeAed) {
+            DoFreeAed = TRUE;
+          } else {
+            FreePool (DataBak);
+          }
+
+          if (EFI_ERROR (Status)) {
+            goto Error_Get_Aed;
+          }
+
+          ASSERT (Data != NULL);
+
+          AdOffset = 0;
+          continue;
+        }
+
+        ExtentLength = GET_EXTENT_LENGTH (RecordingFlags, Ad);
+
+        Status = GetAllocationDescriptorLsn (
+                   RecordingFlags,
+                   Volume,
+                   ParentIcb,
+                   Ad,
+                   &Lsn
+                   );
+        if (EFI_ERROR (Status)) {
+          goto Done;
+        }
+
+        switch (ReadFileInfo->Flags) {
+          case ReadFileGetFileSize:
+            ReadFileInfo->ReadLength += ExtentLength;
+            break;
+          case ReadFileAllocateAndRead:
+            //
+            // Increase FileData (if necessary) to read next extent.
+            //
+            Status = GrowUpBufferToNextAd (
+                       RecordingFlags,
+                       Ad,
+                       &ReadFileInfo->FileData,
+                       ReadFileInfo->ReadLength
+                       );
+            if (EFI_ERROR (Status)) {
+              goto Error_Alloc_Buffer_To_Next_Ad;
+            }
+
+            //
+            // Read extent's data into FileData.
+            //
+            Status = DiskIo->ReadDisk (
+                               DiskIo,
+                               BlockIo->Media->MediaId,
+                               MultU64x32 (Lsn, LogicalBlockSize),
+                               ExtentLength,
+                               (VOID *)((UINT8 *)ReadFileInfo->FileData +
+                                        ReadFileInfo->ReadLength)
+                               );
+            if (EFI_ERROR (Status)) {
+              goto Error_Read_Disk_Blk;
+            }
+
+            ReadFileInfo->ReadLength += ExtentLength;
+            break;
+          case ReadFileSeekAndRead:
+            //
+            // Seek file first before reading in its data.
+            //
+            if (FinishedSeeking) {
+              Offset = 0;
+              goto Skip_File_Seek;
+            }
+
+            if (FilePosition + ExtentLength < ReadFileInfo->FilePosition) {
+              FilePosition += ExtentLength;
+              goto Skip_Ad;
+            }
+
+            if (FilePosition + ExtentLength > ReadFileInfo->FilePosition) {
+              Offset = ReadFileInfo->FilePosition - FilePosition;
+            } else {
+              Offset = 0;
+            }
+
+            //
+            // Done with seeking file. Start reading its data.
+            //
+            FinishedSeeking = TRUE;
+
+Skip_File_Seek:
+            //
+            // Make sure we don't read more data than really wanted.
+            //
+            if (ExtentLength - Offset > BytesLeft) {
+              DataLength = BytesLeft;
+            } else {
+              DataLength = ExtentLength - Offset;
+            }
+
+            //
+            // Read extent's data into FileData.
+            //
+            Status = DiskIo->ReadDisk (
+                               DiskIo,
+                               BlockIo->Media->MediaId,
+                               Offset + MultU64x32 (Lsn, LogicalBlockSize),
+                               (UINTN)DataLength,
+                               (VOID *)((UINT8 *)ReadFileInfo->FileData +
+                                        DataOffset)
+                               );
+            if (EFI_ERROR (Status)) {
+              goto Error_Read_Disk_Blk;
+            }
+
+            //
+            // Update current file's position.
+            //
+            DataOffset                 += DataLength;
+            ReadFileInfo->FilePosition += DataLength;
+
+            BytesLeft -= DataLength;
+            if (BytesLeft == 0) {
+              //
+              // There is no more file data to read.
+              //
+              Status = EFI_SUCCESS;
+              goto Done;
+            }
+
+            break;
+        }
+
+Skip_Ad:
+        //
+        // Point to the next AD (extent).
+        //
+        AdOffset += AD_LENGTH (RecordingFlags);
       }
 
-    Skip_Ad:
-      //
-      // Point to the next AD (extent).
-      //
-      AdOffset += AD_LENGTH (RecordingFlags);
-    }
+      break;
+    case ExtendedAdsSequence:
+      // FIXME: Not supported. Got no volume with it, yet.
+      ASSERT (FALSE);
+      Status = EFI_UNSUPPORTED;
+      break;
 
-    break;
-  case ExtendedAdsSequence:
-     // FIXME: Not supported. Got no volume with it, yet.
-    ASSERT (FALSE);
-    Status = EFI_UNSUPPORTED;
-    break;
-
-  default:
-    //
-    // A flag value reserved by the ECMA-167 standard (3rd Edition - June
-    // 1997); 14.6 ICB Tag; 14.6.8 Flags (RBP 18); was found.
-    //
-    Status = EFI_UNSUPPORTED;
-    break;
+    default:
+      //
+      // A flag value reserved by the ECMA-167 standard (3rd Edition - June
+      // 1997); 14.6 ICB Tag; 14.6.8 Flags (RBP 18); was found.
+      //
+      Status = EFI_UNSUPPORTED;
+      break;
   }
 
 Done:
@@ -1475,18 +1492,18 @@ InternalFindFile (
   ZeroMem ((VOID *)&ReadDirInfo, sizeof (UDF_READ_DIRECTORY_INFO));
   Found = FALSE;
 
-  for (;;) {
+  for ( ; ;) {
     Status = ReadDirectoryEntry (
-      BlockIo,
-      DiskIo,
-      Volume,
-      (Parent->FileIdentifierDesc != NULL) ?
-      &Parent->FileIdentifierDesc->Icb :
-      Icb,
-      Parent->FileEntry,
-      &ReadDirInfo,
-      &FileIdentifierDesc
-      );
+               BlockIo,
+               DiskIo,
+               Volume,
+               (Parent->FileIdentifierDesc != NULL) ?
+               &Parent->FileIdentifierDesc->Icb :
+               Icb,
+               Parent->FileEntry,
+               &ReadDirInfo,
+               &FileIdentifierDesc
+               );
     if (EFI_ERROR (Status)) {
       if (Status == EFI_DEVICE_ERROR) {
         Status = EFI_NOT_FOUND;
@@ -1494,6 +1511,7 @@ InternalFindFile (
 
       break;
     }
+
     //
     // After calling function ReadDirectoryEntry(), if 'FileIdentifierDesc' is
     // NULL, then the 'Status' must be EFI_OUT_OF_RESOURCES. Hence, if the code
@@ -1510,7 +1528,7 @@ InternalFindFile (
       // directory (Parent), and if FileName is either ".." or "\\", then it's
       // the expected FID.
       //
-      if (StrCmp (FileName, L"..") == 0 || StrCmp (FileName, L"\\") == 0) {
+      if ((StrCmp (FileName, L"..") == 0) || (StrCmp (FileName, L"\\") == 0)) {
         Found = TRUE;
         break;
       }
@@ -1552,12 +1570,12 @@ InternalFindFile (
     //
     if (StrCmp (FileName, L"\\") != 0) {
       Status = FindFileEntry (
-        BlockIo,
-        DiskIo,
-        Volume,
-        &FileIdentifierDesc->Icb,
-        &CompareFileEntry
-        );
+                 BlockIo,
+                 DiskIo,
+                 Volume,
+                 &FileIdentifierDesc->Icb,
+                 &CompareFileEntry
+                 );
       if (EFI_ERROR (Status)) {
         goto Error_Find_Fe;
       }
@@ -1565,8 +1583,12 @@ InternalFindFile (
       //
       // Make sure that both Parent's FE/EFE and found FE/EFE are not equal.
       //
-      if (CompareMem ((VOID *)Parent->FileEntry, (VOID *)CompareFileEntry,
-                      Volume->FileEntrySize) != 0) {
+      if (CompareMem (
+            (VOID *)Parent->FileEntry,
+            (VOID *)CompareFileEntry,
+            Volume->FileEntrySize
+            ) != 0)
+      {
         File->FileEntry = CompareFileEntry;
       } else {
         FreePool ((VOID *)FileIdentifierDesc);
@@ -1605,16 +1627,16 @@ ReadUdfVolumeInformation (
   OUT  UDF_VOLUME_INFO        *Volume
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   //
   // Read all necessary UDF volume information and keep it private to the driver
   //
   Status = ReadVolumeFileStructure (
-    BlockIo,
-    DiskIo,
-    Volume
-    );
+             BlockIo,
+             DiskIo,
+             Volume
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1658,29 +1680,29 @@ FindRootDirectory (
   UDF_FILE_INFO  Parent;
 
   Status = FindFileEntry (
-    BlockIo,
-    DiskIo,
-    Volume,
-    &Volume->FileSetDesc.RootDirectoryIcb,
-    &File->FileEntry
-    );
+             BlockIo,
+             DiskIo,
+             Volume,
+             &Volume->FileSetDesc.RootDirectoryIcb,
+             &File->FileEntry
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Parent.FileEntry = File->FileEntry;
+  Parent.FileEntry          = File->FileEntry;
   Parent.FileIdentifierDesc = NULL;
 
   Status = FindFile (
-    BlockIo,
-    DiskIo,
-    Volume,
-    L"\\",
-    NULL,
-    &Parent,
-    &Volume->FileSetDesc.RootDirectoryIcb,
-    File
-    );
+             BlockIo,
+             DiskIo,
+             Volume,
+             L"\\",
+             NULL,
+             &Parent,
+             &Volume->FileSetDesc.RootDirectoryIcb,
+             File
+             );
   if (EFI_ERROR (Status)) {
     FreePool (File->FileEntry);
   }
@@ -1725,7 +1747,7 @@ FindFileEntry (
     return Status;
   }
 
-  LogicalBlockSize  = Volume->LogicalVolDesc.LogicalBlockSize;
+  LogicalBlockSize = Volume->LogicalVolDesc.LogicalBlockSize;
 
   ReadBuffer = AllocateZeroPool (Volume->FileEntrySize);
   if (ReadBuffer == NULL) {
@@ -1736,12 +1758,12 @@ FindFileEntry (
   // Read extent.
   //
   Status = DiskIo->ReadDisk (
-    DiskIo,
-    BlockIo->Media->MediaId,
-    MultU64x32 (Lsn, LogicalBlockSize),
-    Volume->FileEntrySize,
-    ReadBuffer
-    );
+                     DiskIo,
+                     BlockIo->Media->MediaId,
+                     MultU64x32 (Lsn, LogicalBlockSize),
+                     Volume->FileEntrySize,
+                     ReadBuffer
+                     );
   if (EFI_ERROR (Status)) {
     goto Error_Read_Disk_Blk;
   }
@@ -1752,8 +1774,9 @@ FindFileEntry (
   // Check if the read extent contains a valid Tag Identifier for the expected
   // FE/EFE.
   //
-  if (DescriptorTag->TagIdentifier != UdfFileEntry &&
-      DescriptorTag->TagIdentifier != UdfExtendedFileEntry) {
+  if ((DescriptorTag->TagIdentifier != UdfFileEntry) &&
+      (DescriptorTag->TagIdentifier != UdfExtendedFileEntry))
+  {
     Status = EFI_VOLUME_CORRUPTED;
     goto Error_Invalid_Fe;
   }
@@ -1813,7 +1836,8 @@ FindFile (
     FileNamePointer = FileName;
     while (*FilePath != L'\0' && *FilePath != L'\\') {
       if ((((UINTN)FileNamePointer - (UINTN)FileName) / sizeof (CHAR16)) >=
-          (ARRAY_SIZE (FileName) - 1)) {
+          (ARRAY_SIZE (FileName) - 1))
+      {
         return EFI_NOT_FOUND;
       }
 
@@ -1832,13 +1856,15 @@ FindFile (
         //
         // See UdfOpenVolume() function.
         //
-        Status = InternalFindFile (BlockIo,
-                                   DiskIo,
-                                   Volume,
-                                   L"\\",
-                                   &PreviousFile,
-                                   Icb,
-                                   File);
+        Status = InternalFindFile (
+                   BlockIo,
+                   DiskIo,
+                   Volume,
+                   L"\\",
+                   &PreviousFile,
+                   Icb,
+                   File
+                   );
       } else {
         //
         // We've already a file pointer (Root) for the root directory. Duplicate
@@ -1863,13 +1889,15 @@ FindFile (
       //
       // No root directory. Find filename from the current directory.
       //
-      Status = InternalFindFile (BlockIo,
-                                 DiskIo,
-                                 Volume,
-                                 FileName,
-                                 &PreviousFile,
-                                 Icb,
-                                 File);
+      Status = InternalFindFile (
+                 BlockIo,
+                 DiskIo,
+                 Volume,
+                 FileName,
+                 &PreviousFile,
+                 Icb,
+                 File
+                 );
     }
 
     if (EFI_ERROR (Status)) {
@@ -1885,12 +1913,14 @@ FindFile (
 
       FileEntry = File->FileEntry;
 
-      Status = ResolveSymlink (BlockIo,
-                               DiskIo,
-                               Volume,
-                               &PreviousFile,
-                               FileEntry,
-                               File);
+      Status = ResolveSymlink (
+                 BlockIo,
+                 DiskIo,
+                 Volume,
+                 &PreviousFile,
+                 FileEntry,
+                 File
+                 );
 
       FreePool (FileEntry);
 
@@ -1899,13 +1929,17 @@ FindFile (
       }
     }
 
-    if (CompareMem ((VOID *)&PreviousFile, (VOID *)Parent,
-                    sizeof (UDF_FILE_INFO)) != 0) {
+    if (CompareMem (
+          (VOID *)&PreviousFile,
+          (VOID *)Parent,
+          sizeof (UDF_FILE_INFO)
+          ) != 0)
+    {
       CleanupFileInformation (&PreviousFile);
     }
 
     CopyMem ((VOID *)&PreviousFile, (VOID *)File, sizeof (UDF_FILE_INFO));
-    if (*FilePath != L'\0' && *FilePath == L'\\') {
+    if ((*FilePath != L'\0') && (*FilePath == L'\\')) {
       FilePath++;
     }
   }
@@ -1957,13 +1991,13 @@ ReadDirectoryEntry (
     ReadFileInfo.Flags = ReadFileAllocateAndRead;
 
     Status = ReadFile (
-      BlockIo,
-      DiskIo,
-      Volume,
-      ParentIcb,
-      FileEntryData,
-      &ReadFileInfo
-      );
+               BlockIo,
+               DiskIo,
+               Volume,
+               ParentIcb,
+               FileEntryData,
+               &ReadFileInfo
+               );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1971,7 +2005,7 @@ ReadDirectoryEntry (
     //
     // Fill in ReadDirInfo structure with the read directory's data information.
     //
-    ReadDirInfo->DirectoryData = ReadFileInfo.FileData;
+    ReadDirInfo->DirectoryData   = ReadFileInfo.FileData;
     ReadDirInfo->DirectoryLength = ReadFileInfo.ReadLength;
   }
 
@@ -1988,8 +2022,10 @@ ReadDirectoryEntry (
     //
     // Get FID for this entry.
     //
-    FileIdentifierDesc = GET_FID_FROM_ADS (ReadDirInfo->DirectoryData,
-                                           ReadDirInfo->FidOffset);
+    FileIdentifierDesc = GET_FID_FROM_ADS (
+                           ReadDirInfo->DirectoryData,
+                           ReadDirInfo->FidOffset
+                           );
     //
     // Update FidOffset to point to next FID.
     //
@@ -2031,11 +2067,11 @@ GetFileNameFromFid (
   OUT  CHAR16                          *FileName
   )
 {
-  UINT8  *OstaCompressed;
-  UINT8  CompressionId;
-  UINT8  Length;
-  UINTN  Index;
-  CHAR16 *FileNameBak;
+  UINT8   *OstaCompressed;
+  UINT8   CompressionId;
+  UINT8   Length;
+  UINTN   Index;
+  CHAR16  *FileNameBak;
 
   if (CharMax == 0) {
     return EFI_BUFFER_TOO_SMALL;
@@ -2043,9 +2079,9 @@ GetFileNameFromFid (
 
   OstaCompressed =
     (UINT8 *)(
-      (UINT8 *)FileIdentifierDesc->Data +
-      FileIdentifierDesc->LengthOfImplementationUse
-      );
+              (UINT8 *)FileIdentifierDesc->Data +
+              FileIdentifierDesc->LengthOfImplementationUse
+              );
 
   CompressionId = OstaCompressed[0];
   if (!IS_VALID_COMPRESSION_ID (CompressionId)) {
@@ -2086,6 +2122,7 @@ GetFileNameFromFid (
   if (Index > CharMax - 1) {
     Index = CharMax - 1;
   }
+
   FileNameBak[Index] = L'\0';
 
   return EFI_SUCCESS;
@@ -2152,135 +2189,140 @@ ResolveSymlink (
   ReadFileInfo.Flags = ReadFileAllocateAndRead;
 
   Status = ReadFile (
-    BlockIo,
-    DiskIo,
-    Volume,
-    &Parent->FileIdentifierDesc->Icb,
-    FileEntryData,
-    &ReadFileInfo
-    );
+             BlockIo,
+             DiskIo,
+             Volume,
+             &Parent->FileIdentifierDesc->Icb,
+             FileEntryData,
+             &ReadFileInfo
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   Length = ReadFileInfo.ReadLength;
 
-  Data = (UINT8 *)ReadFileInfo.FileData;
+  Data    = (UINT8 *)ReadFileInfo.FileData;
   EndData = Data + Length;
 
   CopyMem ((VOID *)&PreviousFile, (VOID *)Parent, sizeof (UDF_FILE_INFO));
 
-  for (;;) {
+  for ( ; ;) {
     PathComp = (UDF_PATH_COMPONENT *)Data;
 
     PathCompLength = PathComp->LengthOfComponentIdentifier;
 
     switch (PathComp->ComponentType) {
-    case 1:
+      case 1:
       //
       // This Path Component specifies the root directory hierarchy subject to
       // agreement between the originator and recipient of the medium. Skip it.
       //
       // Fall through.
       //
-    case 2:
-      //
-      // "\\." of the current directory. Read next Path Component.
-      //
-      goto Next_Path_Component;
-    case 3:
-      //
-      // ".." (parent directory). Go to it.
-      //
-      CopyMem ((VOID *)FileName, L"..", 6);
-      break;
-    case 4:
-      //
-      // "." (current file). Duplicate both FE/EFE and FID of this file.
-      //
-      DuplicateFe (BlockIo, Volume, PreviousFile.FileEntry, &File->FileEntry);
-      if (File->FileEntry == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Error_Find_File;
-      }
+      case 2:
+        //
+        // "\\." of the current directory. Read next Path Component.
+        //
+        goto Next_Path_Component;
+      case 3:
+        //
+        // ".." (parent directory). Go to it.
+        //
+        CopyMem ((VOID *)FileName, L"..", 6);
+        break;
+      case 4:
+        //
+        // "." (current file). Duplicate both FE/EFE and FID of this file.
+        //
+        DuplicateFe (BlockIo, Volume, PreviousFile.FileEntry, &File->FileEntry);
+        if (File->FileEntry == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Error_Find_File;
+        }
 
-      DuplicateFid (PreviousFile.FileIdentifierDesc,
-                    &File->FileIdentifierDesc);
-      if (File->FileIdentifierDesc == NULL) {
-        FreePool (File->FileEntry);
-        Status = EFI_OUT_OF_RESOURCES;
-        goto Error_Find_File;
-      }
-      goto Next_Path_Component;
-    case 5:
-      //
-      // This Path Component identifies an object, either a file or a
-      // directory or an alias.
-      //
-      // Decode it from the compressed data in ComponentIdentifier and find
-      // respective path.
-      //
-      CompressionId = PathComp->ComponentIdentifier[0];
-      if (!IS_VALID_COMPRESSION_ID (CompressionId)) {
-        return EFI_VOLUME_CORRUPTED;
-      }
+        DuplicateFid (
+          PreviousFile.FileIdentifierDesc,
+          &File->FileIdentifierDesc
+          );
+        if (File->FileIdentifierDesc == NULL) {
+          FreePool (File->FileEntry);
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Error_Find_File;
+        }
 
-      if ((UINTN)PathComp->ComponentIdentifier + PathCompLength > (UINTN)EndData) {
-        return EFI_VOLUME_CORRUPTED;
-      }
+        goto Next_Path_Component;
+      case 5:
+        //
+        // This Path Component identifies an object, either a file or a
+        // directory or an alias.
+        //
+        // Decode it from the compressed data in ComponentIdentifier and find
+        // respective path.
+        //
+        CompressionId = PathComp->ComponentIdentifier[0];
+        if (!IS_VALID_COMPRESSION_ID (CompressionId)) {
+          return EFI_VOLUME_CORRUPTED;
+        }
 
-      Char = FileName;
-      for (Index = 1; Index < PathCompLength; Index++) {
-        if (CompressionId == 16) {
-          *Char = *(UINT8 *)((UINT8 *)PathComp->ComponentIdentifier +
-                          Index) << 8;
-          Index++;
-        } else {
-          if (Index > ARRAY_SIZE (FileName)) {
-            return EFI_UNSUPPORTED;
+        if ((UINTN)PathComp->ComponentIdentifier + PathCompLength > (UINTN)EndData) {
+          return EFI_VOLUME_CORRUPTED;
+        }
+
+        Char = FileName;
+        for (Index = 1; Index < PathCompLength; Index++) {
+          if (CompressionId == 16) {
+            *Char = *(UINT8 *)((UINT8 *)PathComp->ComponentIdentifier +
+                               Index) << 8;
+            Index++;
+          } else {
+            if (Index > ARRAY_SIZE (FileName)) {
+              return EFI_UNSUPPORTED;
+            }
+
+            *Char = 0;
           }
-          *Char = 0;
+
+          if (Index < Length) {
+            *Char |= (CHAR16)(*(UINT8 *)((UINT8 *)PathComp->ComponentIdentifier + Index));
+          }
+
+          Char++;
         }
 
-        if (Index < Length) {
-          *Char |= (CHAR16)(*(UINT8 *)((UINT8 *)PathComp->ComponentIdentifier + Index));
+        Index = ((UINTN)Char - (UINTN)FileName) / sizeof (CHAR16);
+        if (Index > ARRAY_SIZE (FileName) - 1) {
+          Index = ARRAY_SIZE (FileName) - 1;
         }
 
-        Char++;
-      }
-
-      Index = ((UINTN)Char - (UINTN)FileName) / sizeof (CHAR16);
-      if (Index > ARRAY_SIZE (FileName) - 1) {
-        Index = ARRAY_SIZE (FileName) - 1;
-      }
-      FileName[Index] = L'\0';
-      break;
-    default:
-      //
-      // According to the ECMA-167 standard (3rd Edition - June 1997), Section
-      // 14.16.1.1, all other values are reserved.
-      //
-      Status = EFI_VOLUME_CORRUPTED;
-      goto Error_Find_File;
+        FileName[Index] = L'\0';
+        break;
+      default:
+        //
+        // According to the ECMA-167 standard (3rd Edition - June 1997), Section
+        // 14.16.1.1, all other values are reserved.
+        //
+        Status = EFI_VOLUME_CORRUPTED;
+        goto Error_Find_File;
     }
 
     //
     // Find file from the read filename in symlink's file data.
     //
     Status = InternalFindFile (
-      BlockIo,
-      DiskIo,
-      Volume,
-      FileName,
-      &PreviousFile,
-      NULL,
-      File
-      );
+               BlockIo,
+               DiskIo,
+               Volume,
+               FileName,
+               &PreviousFile,
+               NULL,
+               File
+               );
     if (EFI_ERROR (Status)) {
       goto Error_Find_File;
     }
 
-  Next_Path_Component:
+Next_Path_Component:
     Data += sizeof (UDF_PATH_COMPONENT) + PathCompLength;
     if (Data >= EndData) {
       break;
@@ -2294,10 +2336,16 @@ ResolveSymlink (
       goto Error_Find_File;
     }
 
-    NotParent = (CompareMem ((VOID *)&PreviousFile, (VOID *)Parent,
-                 sizeof (UDF_FILE_INFO)) != 0);
-    NotFile   = (CompareMem ((VOID *)&PreviousFile, (VOID *)File,
-                 sizeof (UDF_FILE_INFO)) != 0);
+    NotParent = (CompareMem (
+                   (VOID *)&PreviousFile,
+                   (VOID *)Parent,
+                   sizeof (UDF_FILE_INFO)
+                   ) != 0);
+    NotFile = (CompareMem (
+                 (VOID *)&PreviousFile,
+                 (VOID *)File,
+                 sizeof (UDF_FILE_INFO)
+                 ) != 0);
 
     if (NotParent && NotFile) {
       CleanupFileInformation (&PreviousFile);
@@ -2323,8 +2371,12 @@ ResolveSymlink (
   return EFI_SUCCESS;
 
 Error_Find_File:
-  if (CompareMem ((VOID *)&PreviousFile, (VOID *)Parent,
-                  sizeof (UDF_FILE_INFO)) != 0) {
+  if (CompareMem (
+        (VOID *)&PreviousFile,
+        (VOID *)Parent,
+        sizeof (UDF_FILE_INFO)
+        ) != 0)
+  {
     CleanupFileInformation (&PreviousFile);
   }
 
@@ -2341,12 +2393,13 @@ Error_Find_File:
 **/
 VOID
 CleanupFileInformation (
-  IN UDF_FILE_INFO *File
+  IN UDF_FILE_INFO  *File
   )
 {
   if (File->FileEntry != NULL) {
     FreePool (File->FileEntry);
   }
+
   if (File->FileIdentifierDesc != NULL) {
     FreePool ((VOID *)File->FileIdentifierDesc);
   }
@@ -2387,13 +2440,13 @@ GetFileSize (
   ReadFileInfo.Flags = ReadFileGetFileSize;
 
   Status = ReadFile (
-    BlockIo,
-    DiskIo,
-    Volume,
-    &File->FileIdentifierDesc->Icb,
-    File->FileEntry,
-    &ReadFileInfo
-    );
+             BlockIo,
+             DiskIo,
+             Volume,
+             &File->FileIdentifierDesc->Icb,
+             File->FileEntry,
+             &ReadFileInfo
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -2453,10 +2506,10 @@ SetFileInfo (
   // Buffer now contains room enough to store EFI_FILE_INFO structure.
   // Now, fill it in with all necessary information about the file.
   //
-  FileInfo = (EFI_FILE_INFO *)Buffer;
-  FileInfo->Size         = FileInfoLength;
-  FileInfo->Attribute    &= ~EFI_FILE_VALID_ATTR;
-  FileInfo->Attribute    |= EFI_FILE_READ_ONLY;
+  FileInfo             = (EFI_FILE_INFO *)Buffer;
+  FileInfo->Size       = FileInfoLength;
+  FileInfo->Attribute &= ~EFI_FILE_VALID_ATTR;
+  FileInfo->Attribute |= EFI_FILE_READ_ONLY;
 
   if (IS_FID_DIRECTORY_FILE (File->FileIdentifierDesc)) {
     FileInfo->Attribute |= EFI_FILE_DIRECTORY;
@@ -2480,32 +2533,32 @@ SetFileInfo (
       FileInfo->Attribute |= EFI_FILE_SYSTEM;
     }
 
-    FileInfo->FileSize      = FileSize;
-    FileInfo->PhysicalSize  = FileSize;
+    FileInfo->FileSize     = FileSize;
+    FileInfo->PhysicalSize = FileSize;
 
-    FileInfo->CreateTime.Year        = FileEntry->AccessTime.Year;
-    FileInfo->CreateTime.Month       = FileEntry->AccessTime.Month;
-    FileInfo->CreateTime.Day         = FileEntry->AccessTime.Day;
-    FileInfo->CreateTime.Hour        = FileEntry->AccessTime.Hour;
-    FileInfo->CreateTime.Minute      = FileEntry->AccessTime.Minute;
-    FileInfo->CreateTime.Second      = FileEntry->AccessTime.Second;
-    FileInfo->CreateTime.Nanosecond  =
-                                   FileEntry->AccessTime.HundredsOfMicroseconds;
+    FileInfo->CreateTime.Year       = FileEntry->AccessTime.Year;
+    FileInfo->CreateTime.Month      = FileEntry->AccessTime.Month;
+    FileInfo->CreateTime.Day        = FileEntry->AccessTime.Day;
+    FileInfo->CreateTime.Hour       = FileEntry->AccessTime.Hour;
+    FileInfo->CreateTime.Minute     = FileEntry->AccessTime.Minute;
+    FileInfo->CreateTime.Second     = FileEntry->AccessTime.Second;
+    FileInfo->CreateTime.Nanosecond =
+      FileEntry->AccessTime.HundredsOfMicroseconds;
 
-    FileInfo->LastAccessTime.Year        =
-                                   FileEntry->AccessTime.Year;
-    FileInfo->LastAccessTime.Month       =
-                                   FileEntry->AccessTime.Month;
-    FileInfo->LastAccessTime.Day         =
-                                   FileEntry->AccessTime.Day;
-    FileInfo->LastAccessTime.Hour        =
-                                   FileEntry->AccessTime.Hour;
-    FileInfo->LastAccessTime.Minute      =
-                                   FileEntry->AccessTime.Minute;
-    FileInfo->LastAccessTime.Second      =
-                                   FileEntry->AccessTime.Second;
-    FileInfo->LastAccessTime.Nanosecond  =
-                                   FileEntry->AccessTime.HundredsOfMicroseconds;
+    FileInfo->LastAccessTime.Year =
+      FileEntry->AccessTime.Year;
+    FileInfo->LastAccessTime.Month =
+      FileEntry->AccessTime.Month;
+    FileInfo->LastAccessTime.Day =
+      FileEntry->AccessTime.Day;
+    FileInfo->LastAccessTime.Hour =
+      FileEntry->AccessTime.Hour;
+    FileInfo->LastAccessTime.Minute =
+      FileEntry->AccessTime.Minute;
+    FileInfo->LastAccessTime.Second =
+      FileEntry->AccessTime.Second;
+    FileInfo->LastAccessTime.Nanosecond =
+      FileEntry->AccessTime.HundredsOfMicroseconds;
   } else if (DescriptorTag->TagIdentifier == UdfExtendedFileEntry) {
     ExtendedFileEntry = (UDF_EXTENDED_FILE_ENTRY *)File->FileEntry;
 
@@ -2516,42 +2569,44 @@ SetFileInfo (
       FileInfo->Attribute |= EFI_FILE_SYSTEM;
     }
 
-    FileInfo->FileSize      = FileSize;
-    FileInfo->PhysicalSize  = FileSize;
+    FileInfo->FileSize     = FileSize;
+    FileInfo->PhysicalSize = FileSize;
 
-    FileInfo->CreateTime.Year        = ExtendedFileEntry->CreationTime.Year;
-    FileInfo->CreateTime.Month       = ExtendedFileEntry->CreationTime.Month;
-    FileInfo->CreateTime.Day         = ExtendedFileEntry->CreationTime.Day;
-    FileInfo->CreateTime.Hour        = ExtendedFileEntry->CreationTime.Hour;
-    FileInfo->CreateTime.Minute      = ExtendedFileEntry->CreationTime.Second;
-    FileInfo->CreateTime.Second      = ExtendedFileEntry->CreationTime.Second;
-    FileInfo->CreateTime.Nanosecond  =
-                           ExtendedFileEntry->AccessTime.HundredsOfMicroseconds;
+    FileInfo->CreateTime.Year       = ExtendedFileEntry->CreationTime.Year;
+    FileInfo->CreateTime.Month      = ExtendedFileEntry->CreationTime.Month;
+    FileInfo->CreateTime.Day        = ExtendedFileEntry->CreationTime.Day;
+    FileInfo->CreateTime.Hour       = ExtendedFileEntry->CreationTime.Hour;
+    FileInfo->CreateTime.Minute     = ExtendedFileEntry->CreationTime.Second;
+    FileInfo->CreateTime.Second     = ExtendedFileEntry->CreationTime.Second;
+    FileInfo->CreateTime.Nanosecond =
+      ExtendedFileEntry->AccessTime.HundredsOfMicroseconds;
 
-    FileInfo->LastAccessTime.Year        =
-                           ExtendedFileEntry->AccessTime.Year;
-    FileInfo->LastAccessTime.Month       =
-                           ExtendedFileEntry->AccessTime.Month;
-    FileInfo->LastAccessTime.Day         =
-                           ExtendedFileEntry->AccessTime.Day;
-    FileInfo->LastAccessTime.Hour        =
-                           ExtendedFileEntry->AccessTime.Hour;
-    FileInfo->LastAccessTime.Minute      =
-                           ExtendedFileEntry->AccessTime.Minute;
-    FileInfo->LastAccessTime.Second      =
-                           ExtendedFileEntry->AccessTime.Second;
-    FileInfo->LastAccessTime.Nanosecond  =
-                           ExtendedFileEntry->AccessTime.HundredsOfMicroseconds;
+    FileInfo->LastAccessTime.Year =
+      ExtendedFileEntry->AccessTime.Year;
+    FileInfo->LastAccessTime.Month =
+      ExtendedFileEntry->AccessTime.Month;
+    FileInfo->LastAccessTime.Day =
+      ExtendedFileEntry->AccessTime.Day;
+    FileInfo->LastAccessTime.Hour =
+      ExtendedFileEntry->AccessTime.Hour;
+    FileInfo->LastAccessTime.Minute =
+      ExtendedFileEntry->AccessTime.Minute;
+    FileInfo->LastAccessTime.Second =
+      ExtendedFileEntry->AccessTime.Second;
+    FileInfo->LastAccessTime.Nanosecond =
+      ExtendedFileEntry->AccessTime.HundredsOfMicroseconds;
   }
 
-  FileInfo->CreateTime.TimeZone      = EFI_UNSPECIFIED_TIMEZONE;
-  FileInfo->CreateTime.Daylight      = EFI_TIME_ADJUST_DAYLIGHT;
-  FileInfo->LastAccessTime.TimeZone  = EFI_UNSPECIFIED_TIMEZONE;
-  FileInfo->LastAccessTime.Daylight  = EFI_TIME_ADJUST_DAYLIGHT;
+  FileInfo->CreateTime.TimeZone     = EFI_UNSPECIFIED_TIMEZONE;
+  FileInfo->CreateTime.Daylight     = EFI_TIME_ADJUST_DAYLIGHT;
+  FileInfo->LastAccessTime.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
+  FileInfo->LastAccessTime.Daylight = EFI_TIME_ADJUST_DAYLIGHT;
 
-  CopyMem ((VOID *)&FileInfo->ModificationTime,
-           (VOID *)&FileInfo->LastAccessTime,
-           sizeof (EFI_TIME));
+  CopyMem (
+    (VOID *)&FileInfo->ModificationTime,
+    (VOID *)&FileInfo->LastAccessTime,
+    sizeof (EFI_TIME)
+    );
 
   if (FileName != NULL) {
     StrCpyS (FileInfo->FileName, StrLen (FileName) + 1, FileName);
@@ -2643,6 +2698,7 @@ GetVolumeLabel (
   if (Index > CharMax - 1) {
     Index = CharMax - 1;
   }
+
   StringBak[Index] = L'\0';
 
   return EFI_SUCCESS;
@@ -2697,7 +2753,8 @@ GetVolumeSize (
   ExtentAd = &LogicalVolDesc->IntegritySequenceExtent;
 
   if ((ExtentAd->ExtentLength == 0) ||
-      (ExtentAd->ExtentLength < sizeof (UDF_LOGICAL_VOLUME_INTEGRITY))) {
+      (ExtentAd->ExtentLength < sizeof (UDF_LOGICAL_VOLUME_INTEGRITY)))
+  {
     return EFI_VOLUME_CORRUPTED;
   }
 
@@ -2717,12 +2774,12 @@ GetVolumeSize (
   // Read disk block
   //
   Status = DiskIo->ReadDisk (
-    DiskIo,
-    BlockIo->Media->MediaId,
-    MultU64x32 (Lsn, LogicalBlockSize),
-    ExtentAd->ExtentLength,
-    LogicalVolInt
-    );
+                     DiskIo,
+                     BlockIo->Media->MediaId,
+                     MultU64x32 (Lsn, LogicalBlockSize),
+                     ExtentAd->ExtentLength,
+                     LogicalVolInt
+                     );
   if (EFI_ERROR (Status)) {
     goto Out_Free;
   }
@@ -2739,12 +2796,13 @@ GetVolumeSize (
 
   if ((LogicalVolInt->NumberOfPartitions > MAX_UINT32 / sizeof (UINT32) / 2) ||
       (LogicalVolInt->NumberOfPartitions * sizeof (UINT32) * 2 >
-       ExtentAd->ExtentLength - sizeof (UDF_LOGICAL_VOLUME_INTEGRITY))) {
+       ExtentAd->ExtentLength - sizeof (UDF_LOGICAL_VOLUME_INTEGRITY)))
+  {
     Status = EFI_VOLUME_CORRUPTED;
     goto Out_Free;
   }
 
-  *VolumeSize = 0;
+  *VolumeSize    = 0;
   *FreeSpaceSize = 0;
 
   Length = LogicalVolInt->NumberOfPartitions;
@@ -2756,6 +2814,7 @@ GetVolumeSize (
     if (LsnsNo == 0xFFFFFFFFUL) {
       continue;
     }
+
     //
     // Accumulate free space size
     //
@@ -2763,7 +2822,7 @@ GetVolumeSize (
   }
 
   Length = LogicalVolInt->NumberOfPartitions * sizeof (UINT32) * 2;
-  for (; Index < Length; Index += sizeof (UINT32)) {
+  for ( ; Index < Length; Index += sizeof (UINT32)) {
     LsnsNo = *(UINT32 *)((UINT8 *)LogicalVolInt->Data + Index);
     //
     // Check if size is not specified
@@ -2771,6 +2830,7 @@ GetVolumeSize (
     if (LsnsNo == 0xFFFFFFFFUL) {
       continue;
     }
+
     //
     // Accumulate used volume space
     //
@@ -2824,26 +2884,26 @@ ReadFileData (
   EFI_STATUS          Status;
   UDF_READ_FILE_INFO  ReadFileInfo;
 
-  ReadFileInfo.Flags         = ReadFileSeekAndRead;
-  ReadFileInfo.FilePosition  = *FilePosition;
-  ReadFileInfo.FileData      = Buffer;
-  ReadFileInfo.FileDataSize  = *BufferSize;
-  ReadFileInfo.FileSize      = FileSize;
+  ReadFileInfo.Flags        = ReadFileSeekAndRead;
+  ReadFileInfo.FilePosition = *FilePosition;
+  ReadFileInfo.FileData     = Buffer;
+  ReadFileInfo.FileDataSize = *BufferSize;
+  ReadFileInfo.FileSize     = FileSize;
 
   Status = ReadFile (
-                 BlockIo,
-                 DiskIo,
-                 Volume,
-                 &File->FileIdentifierDesc->Icb,
-                 File->FileEntry,
-                 &ReadFileInfo
-                 );
+             BlockIo,
+             DiskIo,
+             Volume,
+             &File->FileIdentifierDesc->Icb,
+             File->FileEntry,
+             &ReadFileInfo
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  *BufferSize    = ReadFileInfo.FileDataSize;
-  *FilePosition  = ReadFileInfo.FilePosition;
+  *BufferSize   = ReadFileInfo.FileDataSize;
+  *FilePosition = ReadFileInfo.FilePosition;
 
   return EFI_SUCCESS;
 }
@@ -2874,13 +2934,13 @@ SupportUdfFileSystem (
   // Open Device Path protocol on ControllerHandle
   //
   Status = gBS->OpenProtocol (
-    ControllerHandle,
-    &gEfiDevicePathProtocolGuid,
-    (VOID **)&DevicePath,
-    This->DriverBindingHandle,
-    ControllerHandle,
-    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-    );
+                  ControllerHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **)&DevicePath,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
@@ -2891,18 +2951,20 @@ SupportUdfFileSystem (
   // Get last Device Path node
   //
   LastDevicePathNode = NULL;
-  DevicePathNode = DevicePath;
+  DevicePathNode     = DevicePath;
   while (!IsDevicePathEnd (DevicePathNode)) {
     LastDevicePathNode = DevicePathNode;
-    DevicePathNode = NextDevicePathNode (DevicePathNode);
+    DevicePathNode     = NextDevicePathNode (DevicePathNode);
   }
+
   //
   // Check if last Device Path node contains a Vendor-Defined Media Device Path
   // of an UDF file system.
   //
-  if (LastDevicePathNode != NULL &&
-      DevicePathType (LastDevicePathNode) == MEDIA_DEVICE_PATH &&
-      DevicePathSubType (LastDevicePathNode) == MEDIA_VENDOR_DP) {
+  if ((LastDevicePathNode != NULL) &&
+      (DevicePathType (LastDevicePathNode) == MEDIA_DEVICE_PATH) &&
+      (DevicePathSubType (LastDevicePathNode) == MEDIA_VENDOR_DP))
+  {
     VendorDefinedGuid = (EFI_GUID *)((UINTN)LastDevicePathNode +
                                      OFFSET_OF (VENDOR_DEVICE_PATH, Guid));
     if (CompareGuid (VendorDefinedGuid, &gUdfDevPathGuid)) {
@@ -2914,11 +2976,11 @@ SupportUdfFileSystem (
   // Close Device Path protocol on ControllerHandle
   //
   gBS->CloseProtocol (
-    ControllerHandle,
-    &gEfiDevicePathProtocolGuid,
-    This->DriverBindingHandle,
-    ControllerHandle
-    );
+         ControllerHandle,
+         &gEfiDevicePathProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 
   return Status;
 }

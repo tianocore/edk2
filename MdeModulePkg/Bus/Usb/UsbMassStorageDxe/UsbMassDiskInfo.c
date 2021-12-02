@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "UsbMass.h"
 
-EFI_DISK_INFO_PROTOCOL gUsbDiskInfoProtocolTemplate = {
+EFI_DISK_INFO_PROTOCOL  gUsbDiskInfoProtocolTemplate = {
   EFI_DISK_INFO_USB_INTERFACE_GUID,
   UsbDiskInfoInquiry,
   UsbDiskInfoIdentify,
@@ -27,12 +27,11 @@ EFI_DISK_INFO_PROTOCOL gUsbDiskInfoProtocolTemplate = {
 **/
 VOID
 InitializeDiskInfo (
-  IN  USB_MASS_DEVICE   *UsbMass
+  IN  USB_MASS_DEVICE  *UsbMass
   )
 {
   CopyMem (&UsbMass->DiskInfo, &gUsbDiskInfoProtocolTemplate, sizeof (gUsbDiskInfoProtocolTemplate));
 }
-
 
 /**
   Provides inquiry information for the controller type.
@@ -53,25 +52,25 @@ InitializeDiskInfo (
 EFI_STATUS
 EFIAPI
 UsbDiskInfoInquiry (
-  IN     EFI_DISK_INFO_PROTOCOL   *This,
-  IN OUT VOID                     *InquiryData,
-  IN OUT UINT32                   *InquiryDataSize
+  IN     EFI_DISK_INFO_PROTOCOL  *This,
+  IN OUT VOID                    *InquiryData,
+  IN OUT UINT32                  *InquiryDataSize
   )
 {
-  EFI_STATUS        Status;
-  USB_MASS_DEVICE   *UsbMass;
+  EFI_STATUS       Status;
+  USB_MASS_DEVICE  *UsbMass;
 
-  UsbMass  = USB_MASS_DEVICE_FROM_DISK_INFO (This);
+  UsbMass = USB_MASS_DEVICE_FROM_DISK_INFO (This);
 
   Status = EFI_BUFFER_TOO_SMALL;
   if (*InquiryDataSize >= sizeof (UsbMass->InquiryData)) {
     Status = EFI_SUCCESS;
     CopyMem (InquiryData, &UsbMass->InquiryData, sizeof (UsbMass->InquiryData));
   }
+
   *InquiryDataSize = sizeof (UsbMass->InquiryData);
   return Status;
 }
-
 
 /**
   Provides identify information for the controller type.
@@ -94,9 +93,9 @@ UsbDiskInfoInquiry (
 EFI_STATUS
 EFIAPI
 UsbDiskInfoIdentify (
-  IN     EFI_DISK_INFO_PROTOCOL   *This,
-  IN OUT VOID                     *IdentifyData,
-  IN OUT UINT32                   *IdentifyDataSize
+  IN     EFI_DISK_INFO_PROTOCOL  *This,
+  IN OUT VOID                    *IdentifyData,
+  IN OUT UINT32                  *IdentifyDataSize
   )
 {
   return EFI_NOT_FOUND;
@@ -122,15 +121,14 @@ UsbDiskInfoIdentify (
 EFI_STATUS
 EFIAPI
 UsbDiskInfoSenseData (
-  IN     EFI_DISK_INFO_PROTOCOL   *This,
-  IN OUT VOID                     *SenseData,
-  IN OUT UINT32                   *SenseDataSize,
-  OUT    UINT8                    *SenseDataNumber
+  IN     EFI_DISK_INFO_PROTOCOL  *This,
+  IN OUT VOID                    *SenseData,
+  IN OUT UINT32                  *SenseDataSize,
+  OUT    UINT8                   *SenseDataNumber
   )
 {
   return EFI_NOT_FOUND;
 }
-
 
 /**
   This function is used to get controller information.
@@ -146,11 +144,10 @@ UsbDiskInfoSenseData (
 EFI_STATUS
 EFIAPI
 UsbDiskInfoWhichIde (
-  IN  EFI_DISK_INFO_PROTOCOL   *This,
-  OUT UINT32                   *IdeChannel,
-  OUT UINT32                   *IdeDevice
+  IN  EFI_DISK_INFO_PROTOCOL  *This,
+  OUT UINT32                  *IdeChannel,
+  OUT UINT32                  *IdeDevice
   )
 {
   return EFI_UNSUPPORTED;
 }
-

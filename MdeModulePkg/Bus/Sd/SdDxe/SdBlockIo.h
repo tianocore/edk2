@@ -26,8 +26,8 @@
 EFI_STATUS
 EFIAPI
 SdReset (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  BOOLEAN                 ExtendedVerification
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  BOOLEAN                ExtendedVerification
   );
 
 /**
@@ -56,7 +56,7 @@ SdReadBlocks (
   IN     UINT32                 MediaId,
   IN     EFI_LBA                Lba,
   IN     UINTN                  BufferSize,
-     OUT VOID                   *Buffer
+  OUT VOID                      *Buffer
   );
 
 /**
@@ -82,11 +82,11 @@ SdReadBlocks (
 EFI_STATUS
 EFIAPI
 SdWriteBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  UINT32                  MediaId,
-  IN  EFI_LBA                 Lba,
-  IN  UINTN                   BufferSize,
-  IN  VOID                    *Buffer
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  UINT32                 MediaId,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  BufferSize,
+  IN  VOID                   *Buffer
   );
 
 /**
@@ -102,7 +102,7 @@ SdWriteBlocks (
 EFI_STATUS
 EFIAPI
 SdFlushBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This
+  IN  EFI_BLOCK_IO_PROTOCOL  *This
   );
 
 /**
@@ -152,12 +152,12 @@ SdResetEx (
 EFI_STATUS
 EFIAPI
 SdReadBlocksEx (
-  IN     EFI_BLOCK_IO2_PROTOCOL *This,
-  IN     UINT32                 MediaId,
-  IN     EFI_LBA                Lba,
-  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
-  IN     UINTN                  BufferSize,
-     OUT VOID                   *Buffer
+  IN     EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN     UINT32                  MediaId,
+  IN     EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token,
+  IN     UINTN                   BufferSize,
+  OUT VOID                       *Buffer
   );
 
 /**
@@ -185,12 +185,12 @@ SdReadBlocksEx (
 EFI_STATUS
 EFIAPI
 SdWriteBlocksEx (
-  IN     EFI_BLOCK_IO2_PROTOCOL *This,
-  IN     UINT32                 MediaId,
-  IN     EFI_LBA                Lba,
-  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
-  IN     UINTN                  BufferSize,
-  IN     VOID                   *Buffer
+  IN     EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN     UINT32                  MediaId,
+  IN     EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token,
+  IN     UINTN                   BufferSize,
+  IN     VOID                    *Buffer
   );
 
 /**
@@ -241,12 +241,11 @@ SdFlushBlocksEx (
 EFI_STATUS
 EFIAPI
 SdEraseBlocks (
-  IN     EFI_ERASE_BLOCK_PROTOCOL      *This,
-  IN     UINT32                        MediaId,
-  IN     EFI_LBA                       Lba,
-  IN OUT EFI_ERASE_BLOCK_TOKEN         *Token,
-  IN     UINTN                         Size
+  IN     EFI_ERASE_BLOCK_PROTOCOL  *This,
+  IN     UINT32                    MediaId,
+  IN     EFI_LBA                   Lba,
+  IN OUT EFI_ERASE_BLOCK_TOKEN     *Token,
+  IN     UINTN                     Size
   );
 
 #endif
-

@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <LegacyRegion2.h>
 
-EFI_HANDLE   mLegacyRegion2Handle = NULL;
+EFI_HANDLE  mLegacyRegion2Handle = NULL;
 
 EFI_LEGACY_REGION2_PROTOCOL  mLegacyRegion2 = {
   LegacyRegion2Decode,
@@ -90,10 +90,10 @@ LegacyRegion2Decode (
 EFI_STATUS
 EFIAPI
 LegacyRegion2Lock (
-  IN  EFI_LEGACY_REGION2_PROTOCOL *This,
-  IN  UINT32                      Start,
-  IN  UINT32                      Length,
-  OUT UINT32                      *Granularity
+  IN  EFI_LEGACY_REGION2_PROTOCOL  *This,
+  IN  UINT32                       Start,
+  IN  UINT32                       Length,
+  OUT UINT32                       *Granularity
   )
 {
   if ((Start < 0xC0000) || ((Start + Length - 1) > 0xFFFFF)) {
@@ -133,10 +133,10 @@ LegacyRegion2Lock (
 EFI_STATUS
 EFIAPI
 LegacyRegion2BootLock (
-  IN  EFI_LEGACY_REGION2_PROTOCOL         *This,
-  IN  UINT32                              Start,
-  IN  UINT32                              Length,
-  OUT UINT32                              *Granularity
+  IN  EFI_LEGACY_REGION2_PROTOCOL  *This,
+  IN  UINT32                       Start,
+  IN  UINT32                       Length,
+  OUT UINT32                       *Granularity
   )
 {
   if ((Start < 0xC0000) || ((Start + Length - 1) > 0xFFFFF)) {
@@ -242,7 +242,8 @@ LegacyRegion2Install (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mLegacyRegion2Handle,
-                  &gEfiLegacyRegion2ProtocolGuid, &mLegacyRegion2,
+                  &gEfiLegacyRegion2ProtocolGuid,
+                  &mLegacyRegion2,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

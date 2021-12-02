@@ -26,31 +26,31 @@
 
 #include <IndustryStandard/Emmc.h>
 
-typedef struct _EMMC_PEIM_HC_PRIVATE_DATA EMMC_PEIM_HC_PRIVATE_DATA;
-typedef struct _EMMC_PEIM_HC_SLOT         EMMC_PEIM_HC_SLOT;
-typedef struct _EMMC_TRB                  EMMC_TRB;
+typedef struct _EMMC_PEIM_HC_PRIVATE_DATA  EMMC_PEIM_HC_PRIVATE_DATA;
+typedef struct _EMMC_PEIM_HC_SLOT          EMMC_PEIM_HC_SLOT;
+typedef struct _EMMC_TRB                   EMMC_TRB;
 
 #include "EmmcHci.h"
 #include "EmmcHcMem.h"
 
-#define EMMC_PEIM_SIG               SIGNATURE_32 ('E', 'M', 'C', 'P')
-#define EMMC_PEIM_SLOT_SIG          SIGNATURE_32 ('E', 'M', 'C', 'S')
+#define EMMC_PEIM_SIG       SIGNATURE_32 ('E', 'M', 'C', 'P')
+#define EMMC_PEIM_SLOT_SIG  SIGNATURE_32 ('E', 'M', 'C', 'S')
 
-#define EMMC_PEIM_MAX_SLOTS         6
-#define EMMC_PEIM_MAX_PARTITIONS    8
+#define EMMC_PEIM_MAX_SLOTS       6
+#define EMMC_PEIM_MAX_PARTITIONS  8
 
 struct _EMMC_PEIM_HC_SLOT {
-  UINT32                            Signature;
-  EFI_PEI_BLOCK_IO2_MEDIA           Media[EMMC_PEIM_MAX_PARTITIONS];
-  UINT8                             MediaNum;
-  EMMC_PARTITION_TYPE               PartitionType[EMMC_PEIM_MAX_PARTITIONS];
+  UINT32                       Signature;
+  EFI_PEI_BLOCK_IO2_MEDIA      Media[EMMC_PEIM_MAX_PARTITIONS];
+  UINT8                        MediaNum;
+  EMMC_PARTITION_TYPE          PartitionType[EMMC_PEIM_MAX_PARTITIONS];
 
-  UINTN                             EmmcHcBase;
-  EMMC_HC_SLOT_CAP                  Capability;
-  EMMC_CSD                          Csd;
-  EMMC_EXT_CSD                      ExtCsd;
-  BOOLEAN                           SectorAddressing;
-  EMMC_PEIM_HC_PRIVATE_DATA         *Private;
+  UINTN                        EmmcHcBase;
+  EMMC_HC_SLOT_CAP             Capability;
+  EMMC_CSD                     Csd;
+  EMMC_EXT_CSD                 ExtCsd;
+  BOOLEAN                      SectorAddressing;
+  EMMC_PEIM_HC_PRIVATE_DATA    *Private;
 };
 
 struct _EMMC_PEIM_HC_PRIVATE_DATA {
@@ -71,27 +71,27 @@ struct _EMMC_PEIM_HC_PRIVATE_DATA {
   UINT8                             TotalBlkIoDevices;
 };
 
-#define EMMC_TIMEOUT                MultU64x32((UINT64)(3), 1000000)
-#define GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS(a) CR (a, EMMC_PEIM_HC_PRIVATE_DATA, BlkIoPpi, EMMC_PEIM_SIG)
-#define GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS2(a) CR (a, EMMC_PEIM_HC_PRIVATE_DATA, BlkIo2Ppi, EMMC_PEIM_SIG)
-#define GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY(a) CR (a, EMMC_PEIM_HC_PRIVATE_DATA, EndOfPeiNotifyList, EMMC_PEIM_SIG)
+#define EMMC_TIMEOUT  MultU64x32((UINT64)(3), 1000000)
+#define GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS(a)         CR (a, EMMC_PEIM_HC_PRIVATE_DATA, BlkIoPpi, EMMC_PEIM_SIG)
+#define GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS2(a)        CR (a, EMMC_PEIM_HC_PRIVATE_DATA, BlkIo2Ppi, EMMC_PEIM_SIG)
+#define GET_EMMC_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY(a)  CR (a, EMMC_PEIM_HC_PRIVATE_DATA, EndOfPeiNotifyList, EMMC_PEIM_SIG)
 
 struct _EMMC_TRB {
-  EMMC_PEIM_HC_SLOT                   *Slot;
-  UINT16                              BlockSize;
+  EMMC_PEIM_HC_SLOT         *Slot;
+  UINT16                    BlockSize;
 
-  EMMC_COMMAND_PACKET                 *Packet;
-  VOID                                *Data;
-  UINT32                              DataLen;
-  BOOLEAN                             Read;
-  EFI_PHYSICAL_ADDRESS                DataPhy;
-  VOID                                *DataMap;
-  EMMC_HC_TRANSFER_MODE               Mode;
+  EMMC_COMMAND_PACKET       *Packet;
+  VOID                      *Data;
+  UINT32                    DataLen;
+  BOOLEAN                   Read;
+  EFI_PHYSICAL_ADDRESS      DataPhy;
+  VOID                      *DataMap;
+  EMMC_HC_TRANSFER_MODE     Mode;
 
-  UINT64                              Timeout;
+  UINT64                    Timeout;
 
-  EMMC_HC_ADMA_DESC_LINE              *AdmaDesc;
-  UINTN                               AdmaDescSize;
+  EMMC_HC_ADMA_DESC_LINE    *AdmaDesc;
+  UINTN                     AdmaDescSize;
 };
 
 /**
@@ -238,9 +238,9 @@ EmmcBlockIoPeimReadBlocks (
 EFI_STATUS
 EFIAPI
 EmmcBlockIoPeimGetDeviceNo2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  OUT UINTN                          *NumberBlockDevices
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  OUT UINTN                           *NumberBlockDevices
   );
 
 /**
@@ -287,10 +287,10 @@ EmmcBlockIoPeimGetDeviceNo2 (
 EFI_STATUS
 EFIAPI
 EmmcBlockIoPeimGetMediaInfo2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  IN  UINTN                          DeviceIndex,
-  OUT EFI_PEI_BLOCK_IO2_MEDIA        *MediaInfo
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  IN  UINTN                           DeviceIndex,
+  OUT EFI_PEI_BLOCK_IO2_MEDIA         *MediaInfo
   );
 
 /**
@@ -330,12 +330,12 @@ EmmcBlockIoPeimGetMediaInfo2 (
 EFI_STATUS
 EFIAPI
 EmmcBlockIoPeimReadBlocks2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  IN  UINTN                          DeviceIndex,
-  IN  EFI_PEI_LBA                    StartLBA,
-  IN  UINTN                          BufferSize,
-  OUT VOID                           *Buffer
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  IN  UINTN                           DeviceIndex,
+  IN  EFI_PEI_LBA                     StartLBA,
+  IN  UINTN                           BufferSize,
+  OUT VOID                            *Buffer
   );
 
 /**
@@ -349,7 +349,7 @@ EmmcBlockIoPeimReadBlocks2 (
 **/
 EFI_STATUS
 EmmcPeimInitMemPool (
-  IN  EMMC_PEIM_HC_PRIVATE_DATA      *Private
+  IN  EMMC_PEIM_HC_PRIVATE_DATA  *Private
   );
 
 /**
@@ -363,7 +363,7 @@ EmmcPeimInitMemPool (
 **/
 EFI_STATUS
 EmmcPeimFreeMemPool (
-  IN EMMC_PEIM_MEM_POOL       *Pool
+  IN EMMC_PEIM_MEM_POOL  *Pool
   );
 
 /**
@@ -378,8 +378,8 @@ EmmcPeimFreeMemPool (
 **/
 VOID *
 EmmcPeimAllocateMem (
-  IN  EMMC_PEIM_MEM_POOL        *Pool,
-  IN  UINTN                    Size
+  IN  EMMC_PEIM_MEM_POOL  *Pool,
+  IN  UINTN               Size
   );
 
 /**
@@ -392,9 +392,9 @@ EmmcPeimAllocateMem (
 **/
 VOID
 EmmcPeimFreeMem (
-  IN EMMC_PEIM_MEM_POOL    *Pool,
-  IN VOID                 *Mem,
-  IN UINTN                Size
+  IN EMMC_PEIM_MEM_POOL  *Pool,
+  IN VOID                *Mem,
+  IN UINTN               Size
   );
 
 /**
@@ -426,11 +426,11 @@ IoMmuInit (
 **/
 EFI_STATUS
 IoMmuMap (
-  IN  EDKII_IOMMU_OPERATION Operation,
-  IN  VOID                  *HostAddress,
-  IN  OUT UINTN             *NumberOfBytes,
-  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
-  OUT VOID                  **Mapping
+  IN  EDKII_IOMMU_OPERATION  Operation,
+  IN  VOID                   *HostAddress,
+  IN  OUT UINTN              *NumberOfBytes,
+  OUT EFI_PHYSICAL_ADDRESS   *DeviceAddress,
+  OUT VOID                   **Mapping
   );
 
 /**
@@ -444,7 +444,7 @@ IoMmuMap (
 **/
 EFI_STATUS
 IoMmuUnmap (
-  IN VOID                  *Mapping
+  IN VOID  *Mapping
   );
 
 /**
@@ -487,9 +487,9 @@ IoMmuAllocateBuffer (
 **/
 EFI_STATUS
 IoMmuFreeBuffer (
-  IN UINTN                  Pages,
-  IN VOID                   *HostAddress,
-  IN VOID                   *Mapping
+  IN UINTN  Pages,
+  IN VOID   *HostAddress,
+  IN VOID   *Mapping
   );
 
 /**

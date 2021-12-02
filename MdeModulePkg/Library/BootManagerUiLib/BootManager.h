@@ -33,8 +33,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH             VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL       End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 #pragma pack()
 
@@ -46,11 +46,11 @@ typedef struct {
   0x847bc3fe, 0xb974, 0x446d, {0x94, 0x49, 0x5a, 0xd5, 0x41, 0x2e, 0x99, 0x3b} \
   }
 
-#define BOOT_MANAGER_FORM_ID     0x1000
+#define BOOT_MANAGER_FORM_ID  0x1000
 
-#define LABEL_BOOT_OPTION        0x00
-#define LABEL_BOOT_OPTION_END    0x01
-#define MAX_STRING_LEN           200
+#define LABEL_BOOT_OPTION      0x00
+#define LABEL_BOOT_OPTION_END  0x01
+#define MAX_STRING_LEN         200
 
 //
 // Variable created with this flag will be "Efi:...."
@@ -60,23 +60,23 @@ typedef struct {
 //
 // These are the VFR compiler generated data representing our VFR data.
 //
-extern UINT8 BootManagerVfrBin[];
+extern UINT8  BootManagerVfrBin[];
 
 #define BOOT_MANAGER_CALLBACK_DATA_SIGNATURE  SIGNATURE_32 ('B', 'M', 'C', 'B')
 
 typedef struct {
-  UINTN                           Signature;
+  UINTN                             Signature;
 
   //
   // HII relative handles
   //
-  EFI_HII_HANDLE                  HiiHandle;
-  EFI_HANDLE                      DriverHandle;
+  EFI_HII_HANDLE                    HiiHandle;
+  EFI_HANDLE                        DriverHandle;
 
   //
   // Produced protocols
   //
-  EFI_HII_CONFIG_ACCESS_PROTOCOL   ConfigAccess;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL    ConfigAccess;
 } BOOT_MANAGER_CALLBACK_DATA;
 
 /**
@@ -100,12 +100,12 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 BootManagerCallback (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  EFI_BROWSER_ACTION                    Action,
+  IN  EFI_QUESTION_ID                       QuestionId,
+  IN  UINT8                                 Type,
+  IN  EFI_IFR_TYPE_VALUE                    *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   );
 
 /**
@@ -133,10 +133,10 @@ BootManagerCallback (
 EFI_STATUS
 EFIAPI
 BootManagerExtractConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Request,
-  OUT EFI_STRING                             *Progress,
-  OUT EFI_STRING                             *Results
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Request,
+  OUT EFI_STRING                            *Progress,
+  OUT EFI_STRING                            *Results
   );
 
 /**
@@ -158,9 +158,9 @@ BootManagerExtractConfig (
 EFI_STATUS
 EFIAPI
 BootManagerRouteConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Configuration,
-  OUT EFI_STRING                             *Progress
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                            *Progress
   );
 
 #endif

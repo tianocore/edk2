@@ -10,16 +10,16 @@
 
 #include <Protocol/DriverBinding.h>
 
-#define MAX_NON_DISCOVERABLE_PCI_DEVICE_ID   (32 * 256)
+#define MAX_NON_DISCOVERABLE_PCI_DEVICE_ID  (32 * 256)
 
-STATIC UINTN               mUniqueIdCounter = 0;
-EFI_CPU_ARCH_PROTOCOL      *mCpu;
+STATIC UINTN           mUniqueIdCounter = 0;
+EFI_CPU_ARCH_PROTOCOL  *mCpu;
 
 //
 // We only support the following device types
 //
 STATIC
-CONST EFI_GUID * CONST
+CONST EFI_GUID *CONST
 SupportedNonDiscoverableDevices[] = {
   &gEdkiiNonDiscoverableAhciDeviceGuid,
   &gEdkiiNonDiscoverableEhciDeviceGuid,
@@ -63,27 +63,31 @@ STATIC
 EFI_STATUS
 EFIAPI
 NonDiscoverablePciDeviceSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  NON_DISCOVERABLE_DEVICE             *Device;
-  EFI_STATUS                          Status;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR   *Desc;
-  INTN                                Idx;
+  NON_DISCOVERABLE_DEVICE            *Device;
+  EFI_STATUS                         Status;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Desc;
+  INTN                               Idx;
 
-  Status = gBS->OpenProtocol (DeviceHandle,
-                  &gEdkiiNonDiscoverableDeviceProtocolGuid, (VOID **)&Device,
-                  This->DriverBindingHandle, DeviceHandle,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER);
+  Status = gBS->OpenProtocol (
+                  DeviceHandle,
+                  &gEdkiiNonDiscoverableDeviceProtocolGuid,
+                  (VOID **)&Device,
+                  This->DriverBindingHandle,
+                  DeviceHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   Status = EFI_UNSUPPORTED;
   for (Idx = 0; Idx < ARRAY_SIZE (SupportedNonDiscoverableDevices); Idx++) {
-    if (CompareGuid (Device->Type, SupportedNonDiscoverableDevices [Idx])) {
+    if (CompareGuid (Device->Type, SupportedNonDiscoverableDevices[Idx])) {
       Status = EFI_SUCCESS;
       break;
     }
@@ -98,17 +102,23 @@ NonDiscoverablePciDeviceSupported (
   // that they only describe things that we can handle
   //
   for (Desc = Device->Resources; Desc->Desc != ACPI_END_TAG_DESCRIPTOR;
-       Desc = (VOID *)((UINT8 *)Desc + Desc->Len + 3)) {
-    if (Desc->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR ||
-        Desc->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) {
+       Desc = (VOID *)((UINT8 *)Desc + Desc->Len + 3))
+  {
+    if ((Desc->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR) ||
+        (Desc->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM))
+    {
       Status = EFI_UNSUPPORTED;
       break;
     }
   }
 
 CloseProtocol:
-  gBS->CloseProtocol (DeviceHandle, &gEdkiiNonDiscoverableDeviceProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  gBS->CloseProtocol (
+         DeviceHandle,
+         &gEdkiiNonDiscoverableDeviceProtocolGuid,
+         This->DriverBindingHandle,
+         DeviceHandle
+         );
 
   return Status;
 }
@@ -130,13 +140,13 @@ STATIC
 EFI_STATUS
 EFIAPI
 NonDiscoverablePciDeviceStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  NON_DISCOVERABLE_PCI_DEVICE   *Dev;
-  EFI_STATUS                    Status;
+  NON_DISCOVERABLE_PCI_DEVICE  *Dev;
+  EFI_STATUS                   Status;
 
   ASSERT (mUniqueIdCounter < MAX_NON_DISCOVERABLE_PCI_DEVICE_ID);
   if (mUniqueIdCounter >= MAX_NON_DISCOVERABLE_PCI_DEVICE_ID) {
@@ -148,10 +158,14 @@ NonDiscoverablePciDeviceStart (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->OpenProtocol (DeviceHandle,
+  Status = gBS->OpenProtocol (
+                  DeviceHandle,
                   &gEdkiiNonDiscoverableDeviceProtocolGuid,
-                  (VOID **)&Dev->Device, This->DriverBindingHandle,
-                  DeviceHandle, EFI_OPEN_PROTOCOL_BY_DRIVER);
+                  (VOID **)&Dev->Device,
+                  This->DriverBindingHandle,
+                  DeviceHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   if (EFI_ERROR (Status)) {
     goto FreeDev;
   }
@@ -163,8 +177,12 @@ NonDiscoverablePciDeviceStart (
   // EFI_PCI_IO_PROTOCOL interface.
   //
   Dev->Signature = NON_DISCOVERABLE_PCI_DEVICE_SIG;
-  Status = gBS->InstallProtocolInterface (&DeviceHandle, &gEfiPciIoProtocolGuid,
-                  EFI_NATIVE_INTERFACE, &Dev->PciIo);
+  Status         = gBS->InstallProtocolInterface (
+                          &DeviceHandle,
+                          &gEfiPciIoProtocolGuid,
+                          EFI_NATIVE_INTERFACE,
+                          &Dev->PciIo
+                          );
   if (EFI_ERROR (Status)) {
     goto CloseProtocol;
   }
@@ -174,8 +192,12 @@ NonDiscoverablePciDeviceStart (
   return EFI_SUCCESS;
 
 CloseProtocol:
-  gBS->CloseProtocol (DeviceHandle, &gEdkiiNonDiscoverableDeviceProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  gBS->CloseProtocol (
+         DeviceHandle,
+         &gEdkiiNonDiscoverableDeviceProtocolGuid,
+         This->DriverBindingHandle,
+         DeviceHandle
+         );
 
 FreeDev:
   FreePool (Dev);
@@ -199,19 +221,24 @@ STATIC
 EFI_STATUS
 EFIAPI
 NonDiscoverablePciDeviceStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN UINTN                       NumberOfChildren,
-  IN EFI_HANDLE                  *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS                      Status;
-  EFI_PCI_IO_PROTOCOL             *PciIo;
-  NON_DISCOVERABLE_PCI_DEVICE     *Dev;
+  EFI_STATUS                   Status;
+  EFI_PCI_IO_PROTOCOL          *PciIo;
+  NON_DISCOVERABLE_PCI_DEVICE  *Dev;
 
-  Status = gBS->OpenProtocol (DeviceHandle, &gEfiPciIoProtocolGuid,
-                  (VOID **)&PciIo, This->DriverBindingHandle, DeviceHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  Status = gBS->OpenProtocol (
+                  DeviceHandle,
+                  &gEfiPciIoProtocolGuid,
+                  (VOID **)&PciIo,
+                  This->DriverBindingHandle,
+                  DeviceHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -221,27 +248,33 @@ NonDiscoverablePciDeviceStop (
   //
   // Handle Stop() requests for in-use driver instances gracefully.
   //
-  Status = gBS->UninstallProtocolInterface (DeviceHandle,
-                  &gEfiPciIoProtocolGuid, &Dev->PciIo);
+  Status = gBS->UninstallProtocolInterface (
+                  DeviceHandle,
+                  &gEfiPciIoProtocolGuid,
+                  &Dev->PciIo
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  gBS->CloseProtocol (DeviceHandle, &gEdkiiNonDiscoverableDeviceProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  gBS->CloseProtocol (
+         DeviceHandle,
+         &gEdkiiNonDiscoverableDeviceProtocolGuid,
+         This->DriverBindingHandle,
+         DeviceHandle
+         );
 
   FreePool (Dev);
 
   return EFI_SUCCESS;
 }
 
-
 //
 // The static object that groups the Supported() (ie. probe), Start() and
 // Stop() functions of the driver together. Refer to UEFI Spec 2.3.1 + Errata
 // C, 10.1 EFI Driver Binding Protocol.
 //
-STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
+STATIC EFI_DRIVER_BINDING_PROTOCOL  gDriverBinding = {
   &NonDiscoverablePciDeviceSupported,
   &NonDiscoverablePciDeviceStart,
   &NonDiscoverablePciDeviceStop,
@@ -263,14 +296,14 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
 EFI_STATUS
 EFIAPI
 NonDiscoverablePciDeviceDxeEntryPoint (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS  Status;
 
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
-  ASSERT_EFI_ERROR(Status);
+  ASSERT_EFI_ERROR (Status);
 
   return EfiLibInstallDriverBindingComponentName2 (
            ImageHandle,
