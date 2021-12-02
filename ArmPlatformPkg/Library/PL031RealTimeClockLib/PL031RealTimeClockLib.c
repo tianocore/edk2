@@ -31,38 +31,40 @@
 
 #include "PL031RealTimeClock.h"
 
-STATIC BOOLEAN                mPL031Initialized = FALSE;
-STATIC EFI_EVENT              mRtcVirtualAddrChangeEvent;
-STATIC UINTN                  mPL031RtcBase;
+STATIC BOOLEAN    mPL031Initialized = FALSE;
+STATIC EFI_EVENT  mRtcVirtualAddrChangeEvent;
+STATIC UINTN      mPL031RtcBase;
 
 EFI_STATUS
 IdentifyPL031 (
   VOID
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   // Check if this is a PrimeCell Peripheral
   if (  (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID0) != 0x0D)
-      || (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID1) != 0xF0)
-      || (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID2) != 0x05)
-      || (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID3) != 0xB1)) {
+     || (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID1) != 0xF0)
+     || (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID2) != 0x05)
+     || (MmioRead8 (mPL031RtcBase + PL031_RTC_PCELL_ID3) != 0xB1))
+  {
     Status = EFI_NOT_FOUND;
     goto EXIT;
   }
 
   // Check if this PrimeCell Peripheral is the PL031 Real Time Clock
   if (  (MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID0) != 0x31)
-      || (MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID1) != 0x10)
-      || ((MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID2) & 0xF) != 0x04)
-      || (MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID3) != 0x00)) {
+     || (MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID1) != 0x10)
+     || ((MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID2) & 0xF) != 0x04)
+     || (MmioRead8 (mPL031RtcBase + PL031_RTC_PERIPH_ID3) != 0x00))
+  {
     Status = EFI_NOT_FOUND;
     goto EXIT;
   }
 
   Status = EFI_SUCCESS;
 
-  EXIT:
+EXIT:
   return Status;
 }
 
@@ -71,10 +73,10 @@ InitializePL031 (
   VOID
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   // Prepare the hardware
-  Status = IdentifyPL031();
+  Status = IdentifyPL031 ();
   if (EFI_ERROR (Status)) {
     goto EXIT;
   }
@@ -96,7 +98,7 @@ InitializePL031 (
 
   mPL031Initialized = TRUE;
 
-  EXIT:
+EXIT:
   return Status;
 }
 
@@ -117,8 +119,8 @@ InitializePL031 (
 EFI_STATUS
 EFIAPI
 LibGetTime (
-  OUT EFI_TIME                *Time,
-  OUT EFI_TIME_CAPABILITIES   *Capabilities
+  OUT EFI_TIME               *Time,
+  OUT EFI_TIME_CAPABILITIES  *Capabilities
   )
 {
   EFI_STATUS  Status;
@@ -154,16 +156,15 @@ LibGetTime (
   // Update the Capabilities info
   if (Capabilities != NULL) {
     // PL031 runs at frequency 1Hz
-    Capabilities->Resolution  = PL031_COUNTS_PER_SECOND;
+    Capabilities->Resolution = PL031_COUNTS_PER_SECOND;
     // Accuracy in ppm multiplied by 1,000,000, e.g. for 50ppm set 50,000,000
-    Capabilities->Accuracy    = (UINT32)PcdGet32 (PcdPL031RtcPpmAccuracy);
+    Capabilities->Accuracy = (UINT32)PcdGet32 (PcdPL031RtcPpmAccuracy);
     // FALSE: Setting the time does not clear the values below the resolution level
-    Capabilities->SetsToZero  = FALSE;
+    Capabilities->SetsToZero = FALSE;
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Sets the current local time and date information.
@@ -178,7 +179,7 @@ LibGetTime (
 EFI_STATUS
 EFIAPI
 LibSetTime (
-  IN  EFI_TIME                *Time
+  IN  EFI_TIME  *Time
   )
 {
   EFI_STATUS  Status;
@@ -217,7 +218,6 @@ LibSetTime (
   return EFI_SUCCESS;
 }
 
-
 /**
   Returns the current wakeup alarm clock setting.
 
@@ -233,15 +233,14 @@ LibSetTime (
 EFI_STATUS
 EFIAPI
 LibGetWakeupTime (
-  OUT BOOLEAN     *Enabled,
-  OUT BOOLEAN     *Pending,
-  OUT EFI_TIME    *Time
+  OUT BOOLEAN   *Enabled,
+  OUT BOOLEAN   *Pending,
+  OUT EFI_TIME  *Time
   )
 {
   // Not a required feature
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Sets the system wakeup alarm clock time.
@@ -259,8 +258,8 @@ LibGetWakeupTime (
 EFI_STATUS
 EFIAPI
 LibSetWakeupTime (
-  IN BOOLEAN      Enabled,
-  OUT EFI_TIME    *Time
+  IN BOOLEAN    Enabled,
+  OUT EFI_TIME  *Time
   )
 {
   // Not a required feature
@@ -278,8 +277,8 @@ LibSetWakeupTime (
 VOID
 EFIAPI
 LibRtcVirtualNotifyEvent (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -288,7 +287,7 @@ LibRtcVirtualNotifyEvent (
   // to virtual address. After the OS transitions to calling in virtual mode, all future
   // runtime calls will be made in virtual mode.
   //
-  EfiConvertPointer (0x0, (VOID**)&mPL031RtcBase);
+  EfiConvertPointer (0x0, (VOID **)&mPL031RtcBase);
   return;
 }
 
@@ -305,12 +304,12 @@ LibRtcVirtualNotifyEvent (
 EFI_STATUS
 EFIAPI
 LibRtcInitialize (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS    Status;
-  EFI_HANDLE    Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   // Initialize RTC Base Address
   mPL031RtcBase = PcdGet32 (PcdPL031RtcBase);
@@ -318,7 +317,8 @@ LibRtcInitialize (
   // Declare the controller as EFI_MEMORY_RUNTIME
   Status = gDS->AddMemorySpace (
                   EfiGcdMemoryTypeMemoryMappedIo,
-                  mPL031RtcBase, SIZE_4KB,
+                  mPL031RtcBase,
+                  SIZE_4KB,
                   EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
                   );
   if (EFI_ERROR (Status)) {
@@ -334,9 +334,10 @@ LibRtcInitialize (
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEfiRealTimeClockArchProtocolGuid,  NULL,
+                  &gEfiRealTimeClockArchProtocolGuid,
+                  NULL,
                   NULL
-                 );
+                  );
   ASSERT_EFI_ERROR (Status);
 
   //
