@@ -48,31 +48,30 @@ EFI_DNS6_PROTOCOL  mDns6Protocol = {
 EFI_STATUS
 EFIAPI
 Dns4GetModeData (
-  IN  EFI_DNS4_PROTOCOL          *This,
-  OUT EFI_DNS4_MODE_DATA         *DnsModeData
+  IN  EFI_DNS4_PROTOCOL   *This,
+  OUT EFI_DNS4_MODE_DATA  *DnsModeData
   )
 {
-  DNS_INSTANCE         *Instance;
+  DNS_INSTANCE  *Instance;
 
-  EFI_TPL              OldTpl;
+  EFI_TPL  OldTpl;
 
-  UINTN                Index;
+  UINTN  Index;
 
-  LIST_ENTRY           *Entry;
-  LIST_ENTRY           *Next;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
 
-  DNS4_SERVER_IP       *ServerItem;
-  EFI_IPv4_ADDRESS     *ServerList;
-  DNS4_CACHE           *CacheItem;
-  EFI_DNS4_CACHE_ENTRY *CacheList;
-  EFI_STATUS           Status;
+  DNS4_SERVER_IP        *ServerItem;
+  EFI_IPv4_ADDRESS      *ServerList;
+  DNS4_CACHE            *CacheItem;
+  EFI_DNS4_CACHE_ENTRY  *CacheList;
+  EFI_STATUS            Status;
 
   ServerItem = NULL;
   ServerList = NULL;
   CacheItem  = NULL;
   CacheList  = NULL;
   Status     = EFI_SUCCESS;
-
 
   if ((This == NULL) || (DnsModeData == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -103,8 +102,8 @@ Dns4GetModeData (
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &mDriverData->Dns4ServerList) {
     Index++;
   }
-  DnsModeData->DnsServerCount = (UINT32) Index;
-  ServerList = AllocatePool (sizeof (EFI_IPv4_ADDRESS) * DnsModeData->DnsServerCount);
+  DnsModeData->DnsServerCount = (UINT32)Index;
+  ServerList                  = AllocatePool (sizeof (EFI_IPv4_ADDRESS) * DnsModeData->DnsServerCount);
   if (ServerList == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     Dns4CleanConfigure (&DnsModeData->DnsConfigData);
@@ -122,12 +121,12 @@ Dns4GetModeData (
   //
   // Get the DnsCacheCount and DnsCacheList
   //
-  Index =0;
+  Index = 0;
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &mDriverData->Dns4CacheList) {
     Index++;
   }
-  DnsModeData->DnsCacheCount = (UINT32) Index;
-  CacheList = AllocatePool (sizeof (EFI_DNS4_CACHE_ENTRY) * DnsModeData->DnsCacheCount);
+  DnsModeData->DnsCacheCount = (UINT32)Index;
+  CacheList                  = AllocatePool (sizeof (EFI_DNS4_CACHE_ENTRY) * DnsModeData->DnsCacheCount);
   if (CacheList == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     Dns4CleanConfigure (&DnsModeData->DnsConfigData);
@@ -135,7 +134,7 @@ Dns4GetModeData (
     goto ON_EXIT;
   }
 
-  Index =0;
+  Index = 0;
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &mDriverData->Dns4CacheList) {
     CacheItem = NET_LIST_USER_STRUCT (Entry, DNS4_CACHE, AllCacheLink);
     CopyMem (CacheList + Index, &CacheItem->DnsCache, sizeof (EFI_DNS4_CACHE_ENTRY));
@@ -176,30 +175,31 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 Dns4Configure (
-  IN EFI_DNS4_PROTOCOL           *This,
-  IN EFI_DNS4_CONFIG_DATA        *DnsConfigData
+  IN EFI_DNS4_PROTOCOL     *This,
+  IN EFI_DNS4_CONFIG_DATA  *DnsConfigData
   )
 {
-  EFI_STATUS                Status;
-  DNS_INSTANCE              *Instance;
+  EFI_STATUS    Status;
+  DNS_INSTANCE  *Instance;
 
-  EFI_TPL                   OldTpl;
-  IP4_ADDR                  Ip;
-  IP4_ADDR                  Netmask;
+  EFI_TPL   OldTpl;
+  IP4_ADDR  Ip;
+  IP4_ADDR  Netmask;
 
-  UINT32                    ServerListCount;
-  EFI_IPv4_ADDRESS          *ServerList;
+  UINT32            ServerListCount;
+  EFI_IPv4_ADDRESS  *ServerList;
 
   Status     = EFI_SUCCESS;
   ServerList = NULL;
 
-  if (This == NULL ||
-     (DnsConfigData != NULL && ((DnsConfigData->DnsServerListCount != 0 && DnsConfigData->DnsServerList == NULL) ||
-                                (DnsConfigData->DnsServerListCount == 0 && DnsConfigData->DnsServerList != NULL)))) {
+  if ((This == NULL) ||
+      ((DnsConfigData != NULL) && (((DnsConfigData->DnsServerListCount != 0) && (DnsConfigData->DnsServerList == NULL)) ||
+                                   ((DnsConfigData->DnsServerListCount == 0) && (DnsConfigData->DnsServerList != NULL)))))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (DnsConfigData != NULL && DnsConfigData->Protocol != DNS_PROTOCOL_UDP) {
+  if ((DnsConfigData != NULL) && (DnsConfigData->Protocol != DNS_PROTOCOL_UDP)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -213,8 +213,8 @@ Dns4Configure (
     //
     // Reset the Instance if ConfigData is NULL
     //
-    if (!NetMapIsEmpty(&Instance->Dns4TxTokens)) {
-      Dns4InstanceCancelToken(Instance, NULL);
+    if (!NetMapIsEmpty (&Instance->Dns4TxTokens)) {
+      Dns4InstanceCancelToken (Instance, NULL);
     }
 
     if (Instance->UdpIo != NULL) {
@@ -224,6 +224,7 @@ Dns4Configure (
     if (Instance->Dns4CfgData.DnsServerList != NULL) {
       FreePool (Instance->Dns4CfgData.DnsServerList);
     }
+
     ZeroMem (&Instance->Dns4CfgData, sizeof (EFI_DNS4_CONFIG_DATA));
 
     Instance->State = DNS_STATE_UNCONFIGED;
@@ -234,11 +235,12 @@ Dns4Configure (
     CopyMem (&Ip, &DnsConfigData->StationIp, sizeof (IP4_ADDR));
     CopyMem (&Netmask, &DnsConfigData->SubnetMask, sizeof (IP4_ADDR));
 
-    Ip       = NTOHL (Ip);
-    Netmask  = NTOHL (Netmask);
+    Ip      = NTOHL (Ip);
+    Netmask = NTOHL (Netmask);
 
     if (!DnsConfigData->UseDefaultSetting &&
-        ((!IP4_IS_VALID_NETMASK (Netmask) || (Netmask != 0 && !NetIp4IsUnicast (Ip, Netmask))))) {
+        ((!IP4_IS_VALID_NETMASK (Netmask) || ((Netmask != 0) && !NetIp4IsUnicast (Ip, Netmask)))))
+    {
       Status = EFI_INVALID_PARAMETER;
       goto ON_EXIT;
     }
@@ -263,7 +265,7 @@ Dns4Configure (
         return Status;
       }
 
-      ASSERT(ServerList != NULL);
+      ASSERT (ServerList != NULL);
 
       OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -281,6 +283,7 @@ Dns4Configure (
         FreePool (Instance->Dns4CfgData.DnsServerList);
         Instance->Dns4CfgData.DnsServerList = NULL;
       }
+
       goto ON_EXIT;
     }
 
@@ -293,6 +296,7 @@ Dns4Configure (
         FreePool (Instance->Dns4CfgData.DnsServerList);
         Instance->Dns4CfgData.DnsServerList = NULL;
       }
+
       goto ON_EXIT;
     }
 
@@ -332,23 +336,23 @@ Dns4HostNameToIp (
   IN  EFI_DNS4_COMPLETION_TOKEN  *Token
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
-  DNS_INSTANCE          *Instance;
+  DNS_INSTANCE  *Instance;
 
   EFI_DNS4_CONFIG_DATA  *ConfigData;
 
-  UINTN                 Index;
-  DNS4_CACHE            *Item;
-  LIST_ENTRY            *Entry;
-  LIST_ENTRY            *Next;
+  UINTN       Index;
+  DNS4_CACHE  *Item;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
 
-  CHAR8                 *QueryName;
+  CHAR8  *QueryName;
 
-  DNS4_TOKEN_ENTRY      *TokenEntry;
-  NET_BUF               *Packet;
+  DNS4_TOKEN_ENTRY  *TokenEntry;
+  NET_BUF           *Packet;
 
-  EFI_TPL               OldTpl;
+  EFI_TPL  OldTpl;
 
   Status     = EFI_SUCCESS;
   Item       = NULL;
@@ -359,11 +363,11 @@ Dns4HostNameToIp (
   //
   // Validate the parameters
   //
-  if ((This == NULL) || (HostName == NULL) || Token == NULL) {
+  if ((This == NULL) || (HostName == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl   = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Instance = DNS_INSTANCE_FROM_THIS_PROTOCOL4 (This);
 
@@ -417,7 +421,7 @@ Dns4HostNameToIp (
       }
 
       Token->RspData.H2AData->IpCount = (UINT32)Index;
-      Token->RspData.H2AData->IpList = AllocatePool (sizeof (EFI_IPv4_ADDRESS) * Index);
+      Token->RspData.H2AData->IpList  = AllocatePool (sizeof (EFI_IPv4_ADDRESS) * Index);
       if (Token->RspData.H2AData->IpList == NULL) {
         if (Token->RspData.H2AData != NULL) {
           FreePool (Token->RspData.H2AData);
@@ -430,7 +434,7 @@ Dns4HostNameToIp (
       Index = 0;
       NET_LIST_FOR_EACH_SAFE (Entry, Next, &mDriverData->Dns4CacheList) {
         Item = NET_LIST_USER_STRUCT (Entry, DNS4_CACHE, AllCacheLink);
-        if ((UINT32)Index < Token->RspData.H2AData->IpCount && StrCmp (HostName, Item->DnsCache.HostName) == 0) {
+        if (((UINT32)Index < Token->RspData.H2AData->IpCount) && (StrCmp (HostName, Item->DnsCache.HostName) == 0)) {
           CopyMem ((Token->RspData.H2AData->IpList) + Index, Item->DnsCache.IpAddress, sizeof (EFI_IPv4_ADDRESS));
           Index++;
         }
@@ -451,14 +455,14 @@ Dns4HostNameToIp (
   //
   // Construct DNS TokenEntry.
   //
-  TokenEntry = AllocateZeroPool (sizeof(DNS4_TOKEN_ENTRY));
+  TokenEntry = AllocateZeroPool (sizeof (DNS4_TOKEN_ENTRY));
   if (TokenEntry == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
 
-  TokenEntry->PacketToLive = Token->RetryInterval;
-  TokenEntry->Token = Token;
+  TokenEntry->PacketToLive  = Token->RetryInterval;
+  TokenEntry->Token         = Token;
   TokenEntry->QueryHostName = AllocateZeroPool (StrSize (HostName));
   if (TokenEntry->QueryHostName == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -551,9 +555,9 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 Dns4IpToHostName (
-  IN  EFI_DNS4_PROTOCOL              *This,
-  IN  EFI_IPv4_ADDRESS               IpAddress,
-  IN  EFI_DNS4_COMPLETION_TOKEN      *Token
+  IN  EFI_DNS4_PROTOCOL          *This,
+  IN  EFI_IPv4_ADDRESS           IpAddress,
+  IN  EFI_DNS4_COMPLETION_TOKEN  *Token
   )
 {
   return EFI_UNSUPPORTED;
@@ -589,23 +593,23 @@ Dns4IpToHostName (
 EFI_STATUS
 EFIAPI
 Dns4GeneralLookUp (
-  IN  EFI_DNS4_PROTOCOL                *This,
-  IN  CHAR8                            *QName,
-  IN  UINT16                           QType,
-  IN  UINT16                           QClass,
-  IN  EFI_DNS4_COMPLETION_TOKEN        *Token
+  IN  EFI_DNS4_PROTOCOL          *This,
+  IN  CHAR8                      *QName,
+  IN  UINT16                     QType,
+  IN  UINT16                     QClass,
+  IN  EFI_DNS4_COMPLETION_TOKEN  *Token
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
-  DNS_INSTANCE          *Instance;
+  DNS_INSTANCE  *Instance;
 
   EFI_DNS4_CONFIG_DATA  *ConfigData;
 
-  DNS4_TOKEN_ENTRY      *TokenEntry;
-  NET_BUF               *Packet;
+  DNS4_TOKEN_ENTRY  *TokenEntry;
+  NET_BUF           *Packet;
 
-  EFI_TPL               OldTpl;
+  EFI_TPL  OldTpl;
 
   Status     = EFI_SUCCESS;
   TokenEntry = NULL;
@@ -614,11 +618,11 @@ Dns4GeneralLookUp (
   //
   // Validate the parameters
   //
-  if ((This == NULL) || (QName == NULL) || Token == NULL) {
+  if ((This == NULL) || (QName == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl   = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Instance = DNS_INSTANCE_FROM_THIS_PROTOCOL4 (This);
 
@@ -655,15 +659,15 @@ Dns4GeneralLookUp (
   //
   // Construct DNS TokenEntry.
   //
-  TokenEntry = AllocateZeroPool (sizeof(DNS4_TOKEN_ENTRY));
+  TokenEntry = AllocateZeroPool (sizeof (DNS4_TOKEN_ENTRY));
   if (TokenEntry == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
 
-  TokenEntry->PacketToLive = Token->RetryInterval;
+  TokenEntry->PacketToLive  = Token->RetryInterval;
   TokenEntry->GeneralLookUp = TRUE;
-  TokenEntry->Token = Token;
+  TokenEntry->Token         = Token;
 
   //
   // Construct DNS Query Packet.
@@ -741,18 +745,18 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 Dns4UpdateDnsCache (
-  IN EFI_DNS4_PROTOCOL      *This,
-  IN BOOLEAN                DeleteFlag,
-  IN BOOLEAN                Override,
-  IN EFI_DNS4_CACHE_ENTRY   DnsCacheEntry
+  IN EFI_DNS4_PROTOCOL     *This,
+  IN BOOLEAN               DeleteFlag,
+  IN BOOLEAN               Override,
+  IN EFI_DNS4_CACHE_ENTRY  DnsCacheEntry
   )
 {
-  EFI_STATUS    Status;
-  EFI_TPL       OldTpl;
+  EFI_STATUS  Status;
+  EFI_TPL     OldTpl;
 
   Status = EFI_SUCCESS;
 
-  if (DnsCacheEntry.HostName == NULL || DnsCacheEntry.IpAddress == NULL || DnsCacheEntry.Timeout == 0) {
+  if ((DnsCacheEntry.HostName == NULL) || (DnsCacheEntry.IpAddress == NULL) || (DnsCacheEntry.Timeout == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -792,11 +796,11 @@ Dns4UpdateDnsCache (
 EFI_STATUS
 EFIAPI
 Dns4Poll (
-  IN EFI_DNS4_PROTOCOL    *This
+  IN EFI_DNS4_PROTOCOL  *This
   )
 {
-  DNS_INSTANCE           *Instance;
-  EFI_UDP4_PROTOCOL      *Udp;
+  DNS_INSTANCE       *Instance;
+  EFI_UDP4_PROTOCOL  *Udp;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -847,9 +851,9 @@ Dns4Cancel (
   IN  EFI_DNS4_COMPLETION_TOKEN  *Token
   )
 {
-  EFI_STATUS          Status;
-  DNS_INSTANCE        *Instance;
-  EFI_TPL             OldTpl;
+  EFI_STATUS    Status;
+  DNS_INSTANCE  *Instance;
+  EFI_TPL       OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -897,24 +901,24 @@ Dns4Cancel (
 EFI_STATUS
 EFIAPI
 Dns6GetModeData (
-  IN  EFI_DNS6_PROTOCOL          *This,
-  OUT EFI_DNS6_MODE_DATA         *DnsModeData
+  IN  EFI_DNS6_PROTOCOL   *This,
+  OUT EFI_DNS6_MODE_DATA  *DnsModeData
   )
 {
-  DNS_INSTANCE         *Instance;
+  DNS_INSTANCE  *Instance;
 
-  EFI_TPL              OldTpl;
+  EFI_TPL  OldTpl;
 
-  UINTN                Index;
+  UINTN  Index;
 
-  LIST_ENTRY           *Entry;
-  LIST_ENTRY           *Next;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
 
-  DNS6_SERVER_IP       *ServerItem;
-  EFI_IPv6_ADDRESS     *ServerList;
-  DNS6_CACHE           *CacheItem;
-  EFI_DNS6_CACHE_ENTRY *CacheList;
-  EFI_STATUS           Status;
+  DNS6_SERVER_IP        *ServerItem;
+  EFI_IPv6_ADDRESS      *ServerList;
+  DNS6_CACHE            *CacheItem;
+  EFI_DNS6_CACHE_ENTRY  *CacheList;
+  EFI_STATUS            Status;
 
   ServerItem = NULL;
   ServerList = NULL;
@@ -928,7 +932,7 @@ Dns6GetModeData (
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  Instance  = DNS_INSTANCE_FROM_THIS_PROTOCOL6 (This);
+  Instance = DNS_INSTANCE_FROM_THIS_PROTOCOL6 (This);
   if (Instance->State == DNS_STATE_UNCONFIGED) {
     Status =  EFI_NOT_STARTED;
     goto ON_EXIT;
@@ -951,8 +955,8 @@ Dns6GetModeData (
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &mDriverData->Dns6ServerList) {
     Index++;
   }
-  DnsModeData->DnsServerCount = (UINT32) Index;
-  ServerList = AllocatePool (sizeof(EFI_IPv6_ADDRESS) * DnsModeData->DnsServerCount);
+  DnsModeData->DnsServerCount = (UINT32)Index;
+  ServerList                  = AllocatePool (sizeof (EFI_IPv6_ADDRESS) * DnsModeData->DnsServerCount);
   if (ServerList == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     Dns6CleanConfigure (&DnsModeData->DnsConfigData);
@@ -970,12 +974,12 @@ Dns6GetModeData (
   //
   // Get the DnsCacheCount and DnsCacheList
   //
-  Index =0;
+  Index = 0;
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &mDriverData->Dns6CacheList) {
     Index++;
   }
-  DnsModeData->DnsCacheCount = (UINT32) Index;
-  CacheList = AllocatePool (sizeof(EFI_DNS6_CACHE_ENTRY) * DnsModeData->DnsCacheCount);
+  DnsModeData->DnsCacheCount = (UINT32)Index;
+  CacheList                  = AllocatePool (sizeof (EFI_DNS6_CACHE_ENTRY) * DnsModeData->DnsCacheCount);
   if (CacheList == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     Dns6CleanConfigure (&DnsModeData->DnsConfigData);
@@ -983,7 +987,7 @@ Dns6GetModeData (
     goto ON_EXIT;
   }
 
-  Index =0;
+  Index = 0;
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &mDriverData->Dns6CacheList) {
     CacheItem = NET_LIST_USER_STRUCT (Entry, DNS6_CACHE, AllCacheLink);
     CopyMem (CacheList + Index, &CacheItem->DnsCache, sizeof (EFI_DNS6_CACHE_ENTRY));
@@ -1022,28 +1026,29 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 Dns6Configure (
-  IN EFI_DNS6_PROTOCOL           *This,
-  IN EFI_DNS6_CONFIG_DATA        *DnsConfigData
+  IN EFI_DNS6_PROTOCOL     *This,
+  IN EFI_DNS6_CONFIG_DATA  *DnsConfigData
   )
 {
-  EFI_STATUS                Status;
-  DNS_INSTANCE              *Instance;
+  EFI_STATUS    Status;
+  DNS_INSTANCE  *Instance;
 
-  EFI_TPL                   OldTpl;
+  EFI_TPL  OldTpl;
 
-  UINT32                    ServerListCount;
-  EFI_IPv6_ADDRESS          *ServerList;
+  UINT32            ServerListCount;
+  EFI_IPv6_ADDRESS  *ServerList;
 
   Status     = EFI_SUCCESS;
   ServerList = NULL;
 
-  if (This == NULL ||
-     (DnsConfigData != NULL && ((DnsConfigData->DnsServerCount != 0 && DnsConfigData->DnsServerList == NULL) ||
-                                (DnsConfigData->DnsServerCount == 0 && DnsConfigData->DnsServerList != NULL)))) {
+  if ((This == NULL) ||
+      ((DnsConfigData != NULL) && (((DnsConfigData->DnsServerCount != 0) && (DnsConfigData->DnsServerList == NULL)) ||
+                                   ((DnsConfigData->DnsServerCount == 0) && (DnsConfigData->DnsServerList != NULL)))))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (DnsConfigData != NULL && DnsConfigData->Protocol != DNS_PROTOCOL_UDP) {
+  if ((DnsConfigData != NULL) && (DnsConfigData->Protocol != DNS_PROTOCOL_UDP)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1057,8 +1062,8 @@ Dns6Configure (
     //
     // Reset the Instance if ConfigData is NULL
     //
-    if (!NetMapIsEmpty(&Instance->Dns6TxTokens)) {
-      Dns6InstanceCancelToken(Instance, NULL);
+    if (!NetMapIsEmpty (&Instance->Dns6TxTokens)) {
+      Dns6InstanceCancelToken (Instance, NULL);
     }
 
     if (Instance->UdpIo != NULL) {
@@ -1068,6 +1073,7 @@ Dns6Configure (
     if (Instance->Dns6CfgData.DnsServerList != NULL) {
       FreePool (Instance->Dns6CfgData.DnsServerList);
     }
+
     ZeroMem (&Instance->Dns6CfgData, sizeof (EFI_DNS6_CONFIG_DATA));
 
     Instance->State = DNS_STATE_UNCONFIGED;
@@ -1089,7 +1095,7 @@ Dns6Configure (
       gBS->RestoreTPL (OldTpl);
 
       //
-      //The DNS instance will retrieve DNS server from DHCP Server.
+      // The DNS instance will retrieve DNS server from DHCP Server.
       //
       Status = GetDns6ServerFromDhcp6 (
                  Instance->Service->ImageHandle,
@@ -1101,7 +1107,7 @@ Dns6Configure (
         goto ON_EXIT;
       }
 
-      ASSERT(ServerList != NULL);
+      ASSERT (ServerList != NULL);
 
       OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -1121,6 +1127,7 @@ Dns6Configure (
         FreePool (Instance->Dns6CfgData.DnsServerList);
         Instance->Dns6CfgData.DnsServerList = NULL;
       }
+
       goto ON_EXIT;
     }
 
@@ -1133,6 +1140,7 @@ Dns6Configure (
         FreePool (Instance->Dns6CfgData.DnsServerList);
         Instance->Dns6CfgData.DnsServerList = NULL;
       }
+
       goto ON_EXIT;
     }
 
@@ -1174,23 +1182,23 @@ Dns6HostNameToIp (
   IN  EFI_DNS6_COMPLETION_TOKEN  *Token
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
-  DNS_INSTANCE          *Instance;
+  DNS_INSTANCE  *Instance;
 
   EFI_DNS6_CONFIG_DATA  *ConfigData;
 
-  UINTN                 Index;
-  DNS6_CACHE            *Item;
-  LIST_ENTRY            *Entry;
-  LIST_ENTRY            *Next;
+  UINTN       Index;
+  DNS6_CACHE  *Item;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
 
-  CHAR8                 *QueryName;
+  CHAR8  *QueryName;
 
-  DNS6_TOKEN_ENTRY      *TokenEntry;
-  NET_BUF               *Packet;
+  DNS6_TOKEN_ENTRY  *TokenEntry;
+  NET_BUF           *Packet;
 
-  EFI_TPL               OldTpl;
+  EFI_TPL  OldTpl;
 
   Status     = EFI_SUCCESS;
   Item       = NULL;
@@ -1201,11 +1209,11 @@ Dns6HostNameToIp (
   //
   // Validate the parameters
   //
-  if ((This == NULL) || (HostName == NULL) || Token == NULL) {
+  if ((This == NULL) || (HostName == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl   = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Instance = DNS_INSTANCE_FROM_THIS_PROTOCOL6 (This);
 
@@ -1259,7 +1267,7 @@ Dns6HostNameToIp (
       }
 
       Token->RspData.H2AData->IpCount = (UINT32)Index;
-      Token->RspData.H2AData->IpList = AllocatePool (sizeof (EFI_IPv6_ADDRESS) * Index);
+      Token->RspData.H2AData->IpList  = AllocatePool (sizeof (EFI_IPv6_ADDRESS) * Index);
       if (Token->RspData.H2AData->IpList == NULL) {
         if (Token->RspData.H2AData != NULL) {
           FreePool (Token->RspData.H2AData);
@@ -1272,7 +1280,7 @@ Dns6HostNameToIp (
       Index = 0;
       NET_LIST_FOR_EACH_SAFE (Entry, Next, &mDriverData->Dns6CacheList) {
         Item = NET_LIST_USER_STRUCT (Entry, DNS6_CACHE, AllCacheLink);
-        if ((UINT32)Index < Token->RspData.H2AData->IpCount && StrCmp (HostName, Item->DnsCache.HostName) == 0) {
+        if (((UINT32)Index < Token->RspData.H2AData->IpCount) && (StrCmp (HostName, Item->DnsCache.HostName) == 0)) {
           CopyMem ((Token->RspData.H2AData->IpList) + Index, Item->DnsCache.IpAddress, sizeof (EFI_IPv6_ADDRESS));
           Index++;
         }
@@ -1299,8 +1307,8 @@ Dns6HostNameToIp (
     goto ON_EXIT;
   }
 
-  TokenEntry->PacketToLive = Token->RetryInterval;
-  TokenEntry->Token = Token;
+  TokenEntry->PacketToLive  = Token->RetryInterval;
+  TokenEntry->Token         = Token;
   TokenEntry->QueryHostName = AllocateZeroPool (StrSize (HostName));
   if (TokenEntry->QueryHostName == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -1394,9 +1402,9 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 Dns6IpToHostName (
-  IN  EFI_DNS6_PROTOCOL              *This,
-  IN  EFI_IPv6_ADDRESS               IpAddress,
-  IN  EFI_DNS6_COMPLETION_TOKEN      *Token
+  IN  EFI_DNS6_PROTOCOL          *This,
+  IN  EFI_IPv6_ADDRESS           IpAddress,
+  IN  EFI_DNS6_COMPLETION_TOKEN  *Token
   )
 {
   return EFI_UNSUPPORTED;
@@ -1434,23 +1442,23 @@ Dns6IpToHostName (
 EFI_STATUS
 EFIAPI
 Dns6GeneralLookUp (
-  IN  EFI_DNS6_PROTOCOL                 *This,
-  IN  CHAR8                             *QName,
-  IN  UINT16                            QType,
-  IN  UINT16                            QClass,
-  IN  EFI_DNS6_COMPLETION_TOKEN         *Token
+  IN  EFI_DNS6_PROTOCOL          *This,
+  IN  CHAR8                      *QName,
+  IN  UINT16                     QType,
+  IN  UINT16                     QClass,
+  IN  EFI_DNS6_COMPLETION_TOKEN  *Token
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
-  DNS_INSTANCE          *Instance;
+  DNS_INSTANCE  *Instance;
 
   EFI_DNS6_CONFIG_DATA  *ConfigData;
 
-  DNS6_TOKEN_ENTRY      *TokenEntry;
-  NET_BUF               *Packet;
+  DNS6_TOKEN_ENTRY  *TokenEntry;
+  NET_BUF           *Packet;
 
-  EFI_TPL               OldTpl;
+  EFI_TPL  OldTpl;
 
   Status     = EFI_SUCCESS;
   TokenEntry = NULL;
@@ -1459,11 +1467,11 @@ Dns6GeneralLookUp (
   //
   // Validate the parameters
   //
-  if ((This == NULL) || (QName == NULL) || Token == NULL) {
+  if ((This == NULL) || (QName == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl   = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Instance = DNS_INSTANCE_FROM_THIS_PROTOCOL6 (This);
 
@@ -1500,15 +1508,15 @@ Dns6GeneralLookUp (
   //
   // Construct DNS TokenEntry.
   //
-  TokenEntry = AllocateZeroPool (sizeof(DNS6_TOKEN_ENTRY));
+  TokenEntry = AllocateZeroPool (sizeof (DNS6_TOKEN_ENTRY));
   if (TokenEntry == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
 
-  TokenEntry->PacketToLive = Token->RetryInterval;
+  TokenEntry->PacketToLive  = Token->RetryInterval;
   TokenEntry->GeneralLookUp = TRUE;
-  TokenEntry->Token = Token;
+  TokenEntry->Token         = Token;
 
   //
   // Construct DNS Query Packet.
@@ -1587,18 +1595,18 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 Dns6UpdateDnsCache (
-  IN EFI_DNS6_PROTOCOL      *This,
-  IN BOOLEAN                DeleteFlag,
-  IN BOOLEAN                Override,
-  IN EFI_DNS6_CACHE_ENTRY   DnsCacheEntry
+  IN EFI_DNS6_PROTOCOL     *This,
+  IN BOOLEAN               DeleteFlag,
+  IN BOOLEAN               Override,
+  IN EFI_DNS6_CACHE_ENTRY  DnsCacheEntry
   )
 {
-  EFI_STATUS    Status;
-  EFI_TPL       OldTpl;
+  EFI_STATUS  Status;
+  EFI_TPL     OldTpl;
 
   Status = EFI_SUCCESS;
 
-  if (DnsCacheEntry.HostName == NULL || DnsCacheEntry.IpAddress == NULL || DnsCacheEntry.Timeout == 0) {
+  if ((DnsCacheEntry.HostName == NULL) || (DnsCacheEntry.IpAddress == NULL) || (DnsCacheEntry.Timeout == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1640,11 +1648,11 @@ Dns6UpdateDnsCache (
 EFI_STATUS
 EFIAPI
 Dns6Poll (
-  IN EFI_DNS6_PROTOCOL    *This
+  IN EFI_DNS6_PROTOCOL  *This
   )
 {
-  DNS_INSTANCE           *Instance;
-  EFI_UDP6_PROTOCOL      *Udp;
+  DNS_INSTANCE       *Instance;
+  EFI_UDP6_PROTOCOL  *Udp;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1696,9 +1704,9 @@ Dns6Cancel (
   IN  EFI_DNS6_COMPLETION_TOKEN  *Token
   )
 {
-  EFI_STATUS          Status;
-  DNS_INSTANCE        *Instance;
-  EFI_TPL             OldTpl;
+  EFI_STATUS    Status;
+  DNS_INSTANCE  *Instance;
+  EFI_TPL       OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1726,4 +1734,3 @@ Dns6Cancel (
 
   return Status;
 }
-
