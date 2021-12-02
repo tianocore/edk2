@@ -62,8 +62,9 @@ Pkcs7Sign (
   //
   // Check input parameters.
   //
-  if (PrivateKey == NULL || KeyPassword == NULL || InData == NULL ||
-    SignCert == NULL || SignedData == NULL || SignedDataSize == NULL || InDataSize > INT_MAX) {
+  if ((PrivateKey == NULL) || (KeyPassword == NULL) || (InData == NULL) ||
+      (SignCert == NULL) || (SignedData == NULL) || (SignedDataSize == NULL) || (InDataSize > INT_MAX))
+  {
     return FALSE;
   }
 
@@ -79,8 +80,8 @@ Pkcs7Sign (
   Status = RsaGetPrivateKeyFromPem (
              PrivateKey,
              PrivateKeySize,
-             (CONST CHAR8 *) KeyPassword,
-             (VOID **) &RsaContext
+             (CONST CHAR8 *)KeyPassword,
+             (VOID **)&RsaContext
              );
   if (!Status) {
     return Status;
@@ -94,9 +95,11 @@ Pkcs7Sign (
   if (EVP_add_digest (EVP_md5 ()) == 0) {
     goto _Exit;
   }
+
   if (EVP_add_digest (EVP_sha1 ()) == 0) {
     goto _Exit;
   }
+
   if (EVP_add_digest (EVP_sha256 ()) == 0) {
     goto _Exit;
   }
@@ -110,7 +113,8 @@ Pkcs7Sign (
   if (Key == NULL) {
     goto _Exit;
   }
-  if (EVP_PKEY_assign_RSA (Key, (RSA *) RsaContext) == 0) {
+
+  if (EVP_PKEY_assign_RSA (Key, (RSA *)RsaContext) == 0) {
     goto _Exit;
   }
 
@@ -122,7 +126,7 @@ Pkcs7Sign (
     goto _Exit;
   }
 
-  if (BIO_write (DataBio, InData, (int) InDataSize) <= 0) {
+  if (BIO_write (DataBio, InData, (int)InDataSize) <= 0) {
     goto _Exit;
   }
 
@@ -130,9 +134,9 @@ Pkcs7Sign (
   // Create the PKCS#7 signedData structure.
   //
   Pkcs7 = PKCS7_sign (
-            (X509 *) SignCert,
+            (X509 *)SignCert,
             Key,
-            (STACK_OF(X509) *) OtherCerts,
+            (STACK_OF (X509) *) OtherCerts,
             DataBio,
             PKCS7_BINARY | PKCS7_NOATTR | PKCS7_DETACHED
             );
@@ -148,13 +152,13 @@ Pkcs7Sign (
     goto _Exit;
   }
 
-  P7Data     = malloc (P7DataSize);
+  P7Data = malloc (P7DataSize);
   if (P7Data == NULL) {
     goto _Exit;
   }
 
   Tmp        = P7Data;
-  P7DataSize = i2d_PKCS7 (Pkcs7, (unsigned char **) &Tmp);
+  P7DataSize = i2d_PKCS7 (Pkcs7, (unsigned char **)&Tmp);
   ASSERT (P7DataSize > 19);
 
   //
