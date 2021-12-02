@@ -14,17 +14,20 @@
 #include <Library/SortLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-int  errno = 0;
-char errnum_message [] = "We don't support to map errnum to the error message on edk2 Redfish\n";
+int   errno            = 0;
+char  errnum_message[] = "We don't support to map errnum to the error message on edk2 Redfish\n";
 
 // This is required to keep VC++ happy if you use floating-point
-int _fltused  = 1;
+int  _fltused = 1;
 
 /**
   Determine if a particular character is an alphanumeric character
   @return  Returns 1 if c is an alphanumeric character, otherwise returns 0.
 **/
-int isalnum (int c)
+int
+isalnum (
+  int  c
+  )
 {
   //
   // <alnum> ::= [0-9] | [a-z] | [A-Z]
@@ -39,7 +42,10 @@ int isalnum (int c)
 
   @return  Returns 1 if c is an digital character, otherwise returns 0.
 **/
-int isdchar (int c)
+int
+isdchar (
+  int  c
+  )
 {
   //
   // [0-9] | [e +-.]
@@ -55,7 +61,10 @@ int isdchar (int c)
 
   @return  Returns 1 if c is a space character
 **/
-int isspace (int c)
+int
+isspace (
+  int  c
+  )
 {
   //
   // <space> ::= [ ]
@@ -66,15 +75,21 @@ int isspace (int c)
 /**
   Allocates memory blocks
 */
-void *malloc (size_t size)
+void *
+malloc (
+  size_t  size
+  )
 {
-  return AllocatePool ((UINTN) size);
+  return AllocatePool ((UINTN)size);
 }
 
 /**
   De-allocates or frees a memory block
 */
-void free (void *ptr)
+void
+free (
+  void  *ptr
+  )
 {
   //
   // In Standard C, free() handles a null pointer argument transparently. This
@@ -90,15 +105,20 @@ void free (void *ptr)
 
   @return  Returns the pointer to duplicated string.
 **/
-char * strdup(const char *str)
+char *
+strdup (
+  const char  *str
+  )
 {
-  size_t len;
-  char *copy;
+  size_t  len;
+  char    *copy;
 
-  len = strlen(str) + 1;
-  if ((copy = malloc(len)) == NULL)
+  len = strlen (str) + 1;
+  if ((copy = malloc (len)) == NULL) {
     return (NULL);
-  memcpy(copy, str, len);
+  }
+
+  memcpy (copy, str, len);
   return (copy);
 }
 
@@ -115,13 +135,14 @@ char * strdup(const char *str)
               returned unchanged.
 **/
 int
-toupper(
-  IN  int c
+toupper (
+  IN  int  c
   )
 {
-  if ( (c >= 'a') && (c <= 'z') ) {
+  if ((c >= 'a') && (c <= 'z')) {
     c = c - ('a' - 'A');
   }
+
   return c;
 }
 
@@ -131,14 +152,17 @@ toupper(
   @return  Returns the value of digit.
 **/
 int
-Digit2Val( int c)
+Digit2Val (
+  int  c
+  )
 {
-  if (((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'))) {  /* If c is one of [A-Za-z]... */
-    c = toupper(c) - 7;   // Adjust so 'A' is ('9' + 1)
+  if (((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'))) {
+    /* If c is one of [A-Za-z]... */
+    c = toupper (c) - 7;   // Adjust so 'A' is ('9' + 1)
   }
+
   return c - '0';   // Value returned is between 0 and 35, inclusive.
 }
-
 
 /** The strtoll function converts the initial portion of the string pointed to
     by nptr to long long int representation.
@@ -152,9 +176,13 @@ Digit2Val( int c)
             and the value of the macro ERANGE is stored in errno.
 **/
 long long
-strtoll(const char * nptr, char ** endptr, int base)
+strtoll (
+  const char  *nptr,
+  char        **endptr,
+  int         base
+  )
 {
-  const char *pEnd;
+  const char  *pEnd;
   long long   Result = 0;
   long long   Previous;
   int         temp;
@@ -162,71 +190,86 @@ strtoll(const char * nptr, char ** endptr, int base)
 
   pEnd = nptr;
 
-  if((base < 0) || (base == 1) || (base > 36)) {
-    if(endptr != NULL) {
-    *endptr = NULL;
+  if ((base < 0) || (base == 1) || (base > 36)) {
+    if (endptr != NULL) {
+      *endptr = NULL;
     }
+
     return 0;
   }
-  // Skip leading spaces.
-  while(isspace(*nptr))   ++nptr;
 
-  // Process Subject sequence: optional sign followed by digits.
-  if(*nptr == '+') {
-    Negative = FALSE;
+  // Skip leading spaces.
+  while (isspace (*nptr)) {
     ++nptr;
   }
-  else if(*nptr == '-') {
+
+  // Process Subject sequence: optional sign followed by digits.
+  if (*nptr == '+') {
+    Negative = FALSE;
+    ++nptr;
+  } else if (*nptr == '-') {
     Negative = TRUE;
     ++nptr;
   }
 
-  if(*nptr == '0') {  /* Might be Octal or Hex */
-    if(toupper(nptr[1]) == 'X') {   /* Looks like Hex */
-      if((base == 0) || (base == 16)) {
+  if (*nptr == '0') {
+    /* Might be Octal or Hex */
+    if (toupper (nptr[1]) == 'X') {
+      /* Looks like Hex */
+      if ((base == 0) || (base == 16)) {
         nptr += 2;  /* Skip the "0X"      */
-        base = 16;  /* In case base was 0 */
+        base  = 16; /* In case base was 0 */
       }
-    }
-    else {    /* Looks like Octal */
-      if((base == 0) || (base == 8)) {
+    } else {
+      /* Looks like Octal */
+      if ((base == 0) || (base == 8)) {
         ++nptr;     /* Skip the leading "0" */
         base = 8;   /* In case base was 0   */
       }
     }
   }
-  if(base == 0) {   /* If still zero then must be decimal */
+
+  if (base == 0) {
+    /* If still zero then must be decimal */
     base = 10;
   }
-  if(*nptr  == '0') {
-    for( ; *nptr == '0'; ++nptr);  /* Skip any remaining leading zeros */
+
+  if (*nptr  == '0') {
+    for ( ; *nptr == '0'; ++nptr) {
+      /* Skip any remaining leading zeros */
+    }
+
     pEnd = nptr;
   }
 
-  while( isalnum(*nptr) && ((temp = Digit2Val(*nptr)) < base)) {
+  while ( isalnum (*nptr) && ((temp = Digit2Val (*nptr)) < base)) {
     Previous = Result;
-    Result = MultS64x64 (Result, base) + (long long int)temp;
-    if( Result <= Previous) {   // Detect Overflow
-      if(Negative) {
+    Result   = MultS64x64 (Result, base) + (long long int)temp;
+    if ( Result <= Previous) {
+      // Detect Overflow
+      if (Negative) {
         Result = LLONG_MIN;
-      }
-      else {
+      } else {
         Result = LLONG_MAX;
       }
+
       Negative = FALSE;
-      errno = ERANGE;
+      errno    = ERANGE;
       break;
     }
+
     pEnd = ++nptr;
   }
-  if(Negative) {
+
+  if (Negative) {
     Result = -Result;
   }
 
   // Save pointer to final sequence
-  if(endptr != NULL) {
+  if (endptr != NULL) {
     *endptr = (char *)pEnd;
   }
+
   return Result;
 }
 
@@ -285,9 +328,13 @@ strtoll(const char * nptr, char ** endptr, int base)
             is stored in errno.
 **/
 long
-strtol(const char * nptr, char ** endptr, int base)
+strtol (
+  const char  *nptr,
+  char        **endptr,
+  int         base
+  )
 {
-  const char *pEnd;
+  const char  *pEnd;
   long        Result = 0;
   long        Previous;
   int         temp;
@@ -295,71 +342,86 @@ strtol(const char * nptr, char ** endptr, int base)
 
   pEnd = nptr;
 
-  if((base < 0) || (base == 1) || (base > 36)) {
-    if(endptr != NULL) {
-    *endptr = NULL;
+  if ((base < 0) || (base == 1) || (base > 36)) {
+    if (endptr != NULL) {
+      *endptr = NULL;
     }
+
     return 0;
   }
-  // Skip leading spaces.
-  while(isspace(*nptr))   ++nptr;
 
-  // Process Subject sequence: optional sign followed by digits.
-  if(*nptr == '+') {
-    Negative = FALSE;
+  // Skip leading spaces.
+  while (isspace (*nptr)) {
     ++nptr;
   }
-  else if(*nptr == '-') {
+
+  // Process Subject sequence: optional sign followed by digits.
+  if (*nptr == '+') {
+    Negative = FALSE;
+    ++nptr;
+  } else if (*nptr == '-') {
     Negative = TRUE;
     ++nptr;
   }
 
-  if(*nptr == '0') {  /* Might be Octal or Hex */
-    if(toupper(nptr[1]) == 'X') {   /* Looks like Hex */
-      if((base == 0) || (base == 16)) {
+  if (*nptr == '0') {
+    /* Might be Octal or Hex */
+    if (toupper (nptr[1]) == 'X') {
+      /* Looks like Hex */
+      if ((base == 0) || (base == 16)) {
         nptr += 2;  /* Skip the "0X"      */
-        base = 16;  /* In case base was 0 */
+        base  = 16; /* In case base was 0 */
       }
-    }
-    else {    /* Looks like Octal */
-      if((base == 0) || (base == 8)) {
+    } else {
+      /* Looks like Octal */
+      if ((base == 0) || (base == 8)) {
         ++nptr;     /* Skip the leading "0" */
         base = 8;   /* In case base was 0   */
       }
     }
   }
-  if(base == 0) {   /* If still zero then must be decimal */
+
+  if (base == 0) {
+    /* If still zero then must be decimal */
     base = 10;
   }
-  if(*nptr  == '0') {
-    for( ; *nptr == '0'; ++nptr);  /* Skip any remaining leading zeros */
+
+  if (*nptr  == '0') {
+    for ( ; *nptr == '0'; ++nptr) {
+      /* Skip any remaining leading zeros */
+    }
+
     pEnd = nptr;
   }
 
-  while( isalnum(*nptr) && ((temp = Digit2Val(*nptr)) < base)) {
+  while ( isalnum (*nptr) && ((temp = Digit2Val (*nptr)) < base)) {
     Previous = Result;
-    Result = (Result * base) + (long int)temp;
-    if( Result <= Previous) {   // Detect Overflow
-      if(Negative) {
+    Result   = (Result * base) + (long int)temp;
+    if ( Result <= Previous) {
+      // Detect Overflow
+      if (Negative) {
         Result = LONG_MIN;
-      }
-      else {
+      } else {
         Result = LONG_MAX;
       }
+
       Negative = FALSE;
-      errno = ERANGE;
+      errno    = ERANGE;
       break;
     }
+
     pEnd = ++nptr;
   }
-  if(Negative) {
+
+  if (Negative) {
     Result = -Result;
   }
 
   // Save pointer to final sequence
-  if(endptr != NULL) {
+  if (endptr != NULL) {
     *endptr = (char *)pEnd;
   }
+
   return Result;
 }
 
@@ -374,66 +436,85 @@ strtol(const char * nptr, char ** endptr, int base)
             returned and the value of the macro ERANGE is stored in errno.
 **/
 unsigned long long
-strtoull(const char * nptr, char ** endptr, int base)
+strtoull (
+  const char  *nptr,
+  char        **endptr,
+  int         base
+  )
 {
-  const char           *pEnd;
-  unsigned long long    Result = 0;
-  unsigned long long    Previous;
-  int                   temp;
+  const char          *pEnd;
+  unsigned long long  Result = 0;
+  unsigned long long  Previous;
+  int                 temp;
 
   pEnd = nptr;
 
-  if((base < 0) || (base == 1) || (base > 36)) {
-    if(endptr != NULL) {
-    *endptr = NULL;
+  if ((base < 0) || (base == 1) || (base > 36)) {
+    if (endptr != NULL) {
+      *endptr = NULL;
     }
+
     return 0;
   }
-  // Skip leading spaces.
-  while(isspace(*nptr))   ++nptr;
 
-  // Process Subject sequence: optional + sign followed by digits.
-  if(*nptr == '+') {
+  // Skip leading spaces.
+  while (isspace (*nptr)) {
     ++nptr;
   }
 
-  if(*nptr == '0') {  /* Might be Octal or Hex */
-    if(toupper(nptr[1]) == 'X') {   /* Looks like Hex */
-      if((base == 0) || (base == 16)) {
+  // Process Subject sequence: optional + sign followed by digits.
+  if (*nptr == '+') {
+    ++nptr;
+  }
+
+  if (*nptr == '0') {
+    /* Might be Octal or Hex */
+    if (toupper (nptr[1]) == 'X') {
+      /* Looks like Hex */
+      if ((base == 0) || (base == 16)) {
         nptr += 2;  /* Skip the "0X"      */
-        base = 16;  /* In case base was 0 */
+        base  = 16; /* In case base was 0 */
       }
-    }
-    else {    /* Looks like Octal */
-      if((base == 0) || (base == 8)) {
+    } else {
+      /* Looks like Octal */
+      if ((base == 0) || (base == 8)) {
         ++nptr;     /* Skip the leading "0" */
         base = 8;   /* In case base was 0   */
       }
     }
   }
-  if(base == 0) {   /* If still zero then must be decimal */
+
+  if (base == 0) {
+    /* If still zero then must be decimal */
     base = 10;
   }
-  if(*nptr  == '0') {
-    for( ; *nptr == '0'; ++nptr);  /* Skip any remaining leading zeros */
+
+  if (*nptr  == '0') {
+    for ( ; *nptr == '0'; ++nptr) {
+      /* Skip any remaining leading zeros */
+    }
+
     pEnd = nptr;
   }
 
-  while( isalnum(*nptr) && ((temp = Digit2Val(*nptr)) < base)) {
+  while ( isalnum (*nptr) && ((temp = Digit2Val (*nptr)) < base)) {
     Previous = Result;
-    Result = DivU64x32 (Result, base) + (unsigned long long)temp;
-    if( Result < Previous)  {   // If we overflowed
+    Result   = DivU64x32 (Result, base) + (unsigned long long)temp;
+    if ( Result < Previous) {
+      // If we overflowed
       Result = ULLONG_MAX;
-      errno = ERANGE;
+      errno  = ERANGE;
       break;
     }
+
     pEnd = ++nptr;
   }
 
   // Save pointer to final sequence
-  if(endptr != NULL) {
+  if (endptr != NULL) {
     *endptr = (char *)pEnd;
   }
+
   return Result;
 }
 
@@ -462,27 +543,34 @@ strtoull(const char * nptr, char ** endptr, int base)
   @return  Return 0.
 **/
 double
-strtod (const char * __restrict nptr, char ** __restrict endptr) {
-
-    DEBUG((DEBUG_INFO, "We don't supprot double type on edk2 yet!"));
-    ASSERT(FALSE);
-    return (double)0;
+strtod (
+  const char *__restrict  nptr,
+  char **__restrict       endptr
+  )
+{
+  DEBUG ((DEBUG_INFO, "We don't supprot double type on edk2 yet!"));
+  ASSERT (FALSE);
+  return (double)0;
 }
 
 static UINT8  BitMask[] = {
   0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
-  };
+};
 
 #define WHICH8(c)     ((unsigned char)(c) >> 3)
 #define WHICH_BIT(c)  (BitMask[((c) & 0x7)])
-#define BITMAP64      ((UINT64 *)bitmap)
+#define BITMAP64  ((UINT64 *)bitmap)
 
 static
 void
-BuildBitmap(unsigned char * bitmap, const char *s2, int n)
+BuildBitmap (
+  unsigned char  *bitmap,
+  const char     *s2,
+  int            n
+  )
 {
-  unsigned char bit;
-  int           index;
+  unsigned char  bit;
+  int            index;
 
   // Initialize bitmap.  Bit 0 is always 1 which corresponds to '\0'
   for (BITMAP64[0] = index = 1; index < n; index++) {
@@ -490,9 +578,9 @@ BuildBitmap(unsigned char * bitmap, const char *s2, int n)
   }
 
   // Set bits in bitmap corresponding to the characters in s2
-  for (; *s2 != '\0'; s2++) {
-    index = WHICH8(*s2);
-    bit = WHICH_BIT(*s2);
+  for ( ; *s2 != '\0'; s2++) {
+    index         = WHICH8 (*s2);
+    bit           = WHICH_BIT (*s2);
     bitmap[index] = bitmap[index] | bit;
   }
 }
@@ -504,21 +592,25 @@ BuildBitmap(unsigned char * bitmap, const char *s2, int n)
               null pointer if no character from s2 occurs in s1.
 **/
 char *
-strpbrk(const char *s1, const char *s2)
+strpbrk (
+  const char  *s1,
+  const char  *s2
+  )
 {
-  UINT8 bitmap[ (((UCHAR_MAX + 1) / CHAR_BIT) + (CHAR_BIT - 1)) & ~7U];
-  UINT8 bit;
-  int index;
+  UINT8  bitmap[(((UCHAR_MAX + 1) / CHAR_BIT) + (CHAR_BIT - 1)) & ~7U];
+  UINT8  bit;
+  int    index;
 
-  BuildBitmap( bitmap, s2, sizeof(bitmap) / sizeof(UINT64));
+  BuildBitmap (bitmap, s2, sizeof (bitmap) / sizeof (UINT64));
 
-  for( ; *s1 != '\0'; ++s1) {
-    index = WHICH8(*s1);
-    bit = WHICH_BIT(*s1);
-    if( (bitmap[index] & bit) != 0) {
+  for ( ; *s1 != '\0'; ++s1) {
+    index = WHICH8 (*s1);
+    bit   = WHICH_BIT (*s1);
+    if ((bitmap[index] & bit) != 0) {
       return (char *)s1;
     }
   }
+
   return NULL;
 }
 
@@ -535,7 +627,9 @@ strpbrk(const char *s1, const char *s2)
               a subsequent call to the strerror function.
 **/
 char *
-strerror(int errnum)
+strerror (
+  int  errnum
+  )
 {
   return errnum_message;
 }
@@ -544,20 +638,24 @@ strerror(int errnum)
   Allocate and zero-initialize array.
 **/
 void *
-calloc(size_t Num, size_t Size)
+calloc (
+  size_t  Num,
+  size_t  Size
+  )
 {
-  void       *RetVal;
-  size_t      NumSize;
+  void    *RetVal;
+  size_t  NumSize;
 
   NumSize = Num * Size;
   RetVal  = NULL;
   if (NumSize != 0) {
-  RetVal = malloc(NumSize);
-  if( RetVal != NULL) {
-    (VOID)ZeroMem( RetVal, NumSize);
+    RetVal = malloc (NumSize);
+    if ( RetVal != NULL) {
+      (VOID)ZeroMem (RetVal, NumSize);
+    }
   }
-  }
-  DEBUG((DEBUG_POOL, "0x%p = calloc(%d, %d)\n", RetVal, Num, Size));
+
+  DEBUG ((DEBUG_POOL, "0x%p = calloc(%d, %d)\n", RetVal, Num, Size));
 
   return RetVal;
 }
@@ -567,7 +665,7 @@ calloc(size_t Num, size_t Size)
 //  month number used as the index (1 -> 12) for regular and leap years.
 //  The value at index 13 is for the whole year.
 //
-UINTN CumulativeDays[2][14] = {
+UINTN  CumulativeDays[2][14] = {
   {
     0,
     0,
@@ -602,15 +700,18 @@ UINTN CumulativeDays[2][14] = {
   }
 };
 
-#define IsLeap(y)   (((y) % 4) == 0 && (((y) % 100) != 0 || ((y) % 400) == 0))
-#define SECSPERMIN  (60)
-#define SECSPERHOUR (60 * 60)
-#define SECSPERDAY  (24 * SECSPERHOUR)
+#define IsLeap(y)  (((y) % 4) == 0 && (((y) % 100) != 0 || ((y) % 400) == 0))
+#define SECSPERMIN   (60)
+#define SECSPERHOUR  (60 * 60)
+#define SECSPERDAY   (24 * SECSPERHOUR)
 
 /**
   Get the system time as seconds elapsed since midnight, January 1, 1970.
 **/
-time_t time (time_t *timer)
+time_t
+time (
+  time_t  *timer
+  )
 {
   EFI_TIME  Time;
   time_t    CalTime;
@@ -626,7 +727,7 @@ time_t time (time_t *timer)
   // UTime should now be set to 00:00:00 on Jan 1 of the current year.
   //
   for (Year = 1970, CalTime = 0; Year != Time.Year; Year++) {
-    CalTime = CalTime + (time_t)(CumulativeDays[IsLeap(Year)][13] * SECSPERDAY);
+    CalTime = CalTime + (time_t)(CumulativeDays[IsLeap (Year)][13] * SECSPERDAY);
   }
 
   //
@@ -634,7 +735,7 @@ time_t time (time_t *timer)
   //
   CalTime = CalTime +
             (time_t)((Time.TimeZone != EFI_UNSPECIFIED_TIMEZONE) ? (Time.TimeZone * 60) : 0) +
-            (time_t)(CumulativeDays[IsLeap(Time.Year)][Time.Month] * SECSPERDAY) +
+            (time_t)(CumulativeDays[IsLeap (Time.Year)][Time.Month] * SECSPERDAY) +
             (time_t)(((Time.Day > 0) ? Time.Day - 1 : 0) * SECSPERDAY) +
             (time_t)(Time.Hour * SECSPERHOUR) +
             (time_t)(Time.Minute * 60) +
@@ -650,9 +751,14 @@ time_t time (time_t *timer)
 /**
   Performs a quick sort
 **/
-void qsort (void *base, size_t num, size_t width, int (*compare)(const void *, const void *))
+void
+qsort (
+  void *base,
+  size_t num,
+  size_t width,
+  int ( *compare )(const void *, const void *)
+  )
 {
-
   ASSERT (base    != NULL);
   ASSERT (compare != NULL);
 
@@ -666,54 +772,93 @@ void qsort (void *base, size_t num, size_t width, int (*compare)(const void *, c
   @return Returns the character currently pointed by the internal file position indicator of the specified stream
 
 **/
-int fgetc(FILE * _File){
-   return EOF;
+int
+fgetc (
+  FILE  *_File
+  )
+{
+  return EOF;
 }
+
 /**
   Open stream file, we don't support file operastion on edk2 JSON library.
 
   @return 0 Unsupported
 
 **/
-FILE *fopen (const char *filename, const char *mode) {
+FILE *
+fopen (
+  const char  *filename,
+  const char  *mode
+  )
+{
   return NULL;
 }
+
 /**
   Read stream from file, we don't support file operastion on edk2 JSON library.
 
   @return 0 Unsupported
 
 **/
-size_t fread (void * ptr, size_t size, size_t count, FILE * stream) {
+size_t
+fread (
+  void    *ptr,
+  size_t  size,
+  size_t  count,
+  FILE    *stream
+  )
+{
   return 0;
 }
+
 /**
   Write stream from file, we don't support file operastion on edk2 JSON library.
 
   @return 0 Unsupported
 
 **/
-size_t fwrite (const void * ptr, size_t size, size_t count, FILE * stream) {
+size_t
+fwrite (
+  const void  *ptr,
+  size_t      size,
+  size_t      count,
+  FILE        *stream
+  )
+{
   return 0;
 }
+
 /**
   Close file, we don't support file operastion on edk2 JSON library.
 
   @return 0 Unsupported
 
 **/
-int fclose (FILE * stream) {
+int
+fclose (
+  FILE  *stream
+  )
+{
   return EOF;
 }
+
 /**
   Write the formatted string to file, we don't support file operastion on edk2 JSON library.
 
   @return 0 Unsupported
 
 **/
-int fprintf (FILE * stream, const char * format, ...) {
+int
+fprintf (
+  FILE        *stream,
+  const char  *format,
+  ...
+  )
+{
   return -1;
 }
+
 /**
   This function check if this is the formating string specifier.
 
@@ -730,12 +875,12 @@ int fprintf (FILE * stream, const char * format, ...) {
 **/
 BOOLEAN
 CheckFormatingString (
-  IN     CONST CHAR8 *FormatString,
-  IN OUT UINTN       *CurrentPosition,
-  IN     UINTN       StrLength
+  IN     CONST CHAR8  *FormatString,
+  IN OUT UINTN        *CurrentPosition,
+  IN     UINTN        StrLength
   )
 {
-  CHAR8 FormatStringParamater;
+  CHAR8  FormatStringParamater;
 
   while (*(FormatString + *CurrentPosition) != 's') {
     //
@@ -749,14 +894,17 @@ CheckFormatingString (
         (FormatStringParamater != '*') &&
         (FormatStringParamater != '.') &&
         !(((UINTN)FormatStringParamater >= (UINTN)'0') && ((UINTN)FormatStringParamater <= (UINTN)'9'))
-        ) {
+        )
+    {
       return FALSE;
     }
+
     (*CurrentPosition)++;
     if (*CurrentPosition >= StrLength) {
       return FALSE;
     }
-  };
+  }
+
   return TRUE;
 }
 
@@ -772,15 +920,15 @@ CheckFormatingString (
 **/
 CHAR8 *
 ReplaceUnicodeToAsciiStrFormat (
-  IN CONST CHAR8 *FormatString
-)
+  IN CONST CHAR8  *FormatString
+  )
 {
-  UINTN FormatStrSize;
-  UINTN FormatStrIndex;
-  UINTN FormatStrSpecifier;
-  BOOLEAN PercentageMark;
-  CHAR8 *TempFormatBuffer;
-  BOOLEAN IsFormatString;
+  UINTN    FormatStrSize;
+  UINTN    FormatStrIndex;
+  UINTN    FormatStrSpecifier;
+  BOOLEAN  PercentageMark;
+  CHAR8    *TempFormatBuffer;
+  BOOLEAN  IsFormatString;
 
   //
   // Error checking.
@@ -788,15 +936,18 @@ ReplaceUnicodeToAsciiStrFormat (
   if (FormatString == NULL) {
     return NULL;
   }
-  FormatStrSize = AsciiStrSize(FormatString);
+
+  FormatStrSize = AsciiStrSize (FormatString);
   if (FormatStrSize == 0) {
     return NULL;
   }
-  TempFormatBuffer = AllocatePool(FormatStrSize); // Allocate memory for the
-                                                  // new string.
-  if (TempFormatBuffer== NULL) {
+
+  TempFormatBuffer = AllocatePool (FormatStrSize); // Allocate memory for the
+                                                   // new string.
+  if (TempFormatBuffer == NULL) {
     return NULL;
   }
+
   //
   // Clone *FormatString but replace "%s" wih "%a".
   // "%%" is not considered as the format tag.
@@ -809,18 +960,21 @@ ReplaceUnicodeToAsciiStrFormat (
       // Previous character is "%".
       //
       PercentageMark = FALSE;
-      if (*(FormatString + FormatStrIndex) != '%') { // Check if this is double "%".
+      if (*(FormatString + FormatStrIndex) != '%') {
+        // Check if this is double "%".
         FormatStrSpecifier = FormatStrIndex;
         //
         // Check if this is the formating string specifier.
         //
         IsFormatString = CheckFormatingString (FormatString, &FormatStrSpecifier, FormatStrSize);
         if ((FormatStrSpecifier - FormatStrIndex) != 0) {
-          CopyMem((VOID *)(TempFormatBuffer + FormatStrIndex),
-                  (VOID *)(FormatString + FormatStrIndex),
-                  FormatStrSpecifier - FormatStrIndex
-                  );
+          CopyMem (
+            (VOID *)(TempFormatBuffer + FormatStrIndex),
+            (VOID *)(FormatString + FormatStrIndex),
+            FormatStrSpecifier - FormatStrIndex
+            );
         }
+
         FormatStrIndex = FormatStrSpecifier;
         if (IsFormatString == TRUE) {
           //
@@ -828,18 +982,22 @@ ReplaceUnicodeToAsciiStrFormat (
           // format on edk2 environment.
           //
           *(TempFormatBuffer + FormatStrSpecifier) = 'a';
-          FormatStrIndex ++;
+          FormatStrIndex++;
         }
+
         continue;
       }
+
       goto ContinueCheck;
     }
+
     if (*(FormatString + FormatStrIndex) == '%') {
       //
       // This character is "%", set the flag.
       //
       PercentageMark = TRUE;
     }
+
 ContinueCheck:
     //
     // Clone character to the new string and advance FormatStrIndex
@@ -847,7 +1005,8 @@ ContinueCheck:
     //
     *(TempFormatBuffer + FormatStrIndex) = *(FormatString + FormatStrIndex);
     FormatStrIndex++;
-  };
+  }
+
   return TempFormatBuffer;
 }
 
@@ -870,14 +1029,14 @@ ContinueCheck:
 UINTN
 EFIAPI
 RedfishAsciiVSPrint (
-  OUT CHAR8         *StartOfBuffer,
-  IN  UINTN         BufferSize,
-  IN  CONST CHAR8   *FormatString,
-  IN  VA_LIST       Marker
+  OUT CHAR8        *StartOfBuffer,
+  IN  UINTN        BufferSize,
+  IN  CONST CHAR8  *FormatString,
+  IN  VA_LIST      Marker
   )
 {
-  CHAR8 *TempFormatBuffer;
-  UINTN LenStrProduced;
+  CHAR8  *TempFormatBuffer;
+  UINTN  LenStrProduced;
 
   //
   // Looking for "%s" in the format string and replace it
@@ -888,6 +1047,7 @@ RedfishAsciiVSPrint (
   if (TempFormatBuffer == NULL) {
     return 0;
   }
+
   LenStrProduced = AsciiVSPrint (StartOfBuffer, BufferSize, (CONST CHAR8 *)TempFormatBuffer, Marker);
   FreePool (TempFormatBuffer);
   return LenStrProduced;
@@ -919,11 +1079,10 @@ RedfishAsciiSPrint (
   ...
   )
 {
-  VA_LIST Marker;
-  UINTN LenStrProduced;
+  VA_LIST  Marker;
+  UINTN    LenStrProduced;
 
-  VA_START(Marker, FormatString);
+  VA_START (Marker, FormatString);
   LenStrProduced = RedfishAsciiVSPrint (StartOfBuffer, BufferSize, FormatString, Marker);
   return LenStrProduced;
 }
-

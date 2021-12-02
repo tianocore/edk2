@@ -45,37 +45,37 @@ EFI_REST_EX_PROTOCOL  mRedfishRestExProtocol = {
 EFI_STATUS
 EFIAPI
 RedfishRestExSendReceive (
-  IN      EFI_REST_EX_PROTOCOL   *This,
-  IN      EFI_HTTP_MESSAGE       *RequestMessage,
-  OUT     EFI_HTTP_MESSAGE       *ResponseMessage
+  IN      EFI_REST_EX_PROTOCOL  *This,
+  IN      EFI_HTTP_MESSAGE      *RequestMessage,
+  OUT     EFI_HTTP_MESSAGE      *ResponseMessage
   )
 {
-  EFI_STATUS             Status;
-  RESTEX_INSTANCE        *Instance;
-  HTTP_IO_RESPONSE_DATA  *ResponseData;
-  UINTN                  TotalReceivedSize;
-  UINTN                  Index;
-  LIST_ENTRY             *ChunkListLink;
-  HTTP_IO_CHUNKS        *ThisChunk;
-  BOOLEAN                CopyChunkData;
-  BOOLEAN                MediaPresent;
-  EFI_HTTP_HEADER        *PreservedRequestHeaders;
-  BOOLEAN                ItsWrite;
-  BOOLEAN                IsGetChunkedTransfer;
-  HTTP_IO_SEND_CHUNK_PROCESS     SendChunkProcess;
-  HTTP_IO_SEND_NON_CHUNK_PROCESS SendNonChunkProcess;
-  EFI_HTTP_MESSAGE       ChunkTransferRequestMessage;
+  EFI_STATUS                      Status;
+  RESTEX_INSTANCE                 *Instance;
+  HTTP_IO_RESPONSE_DATA           *ResponseData;
+  UINTN                           TotalReceivedSize;
+  UINTN                           Index;
+  LIST_ENTRY                      *ChunkListLink;
+  HTTP_IO_CHUNKS                  *ThisChunk;
+  BOOLEAN                         CopyChunkData;
+  BOOLEAN                         MediaPresent;
+  EFI_HTTP_HEADER                 *PreservedRequestHeaders;
+  BOOLEAN                         ItsWrite;
+  BOOLEAN                         IsGetChunkedTransfer;
+  HTTP_IO_SEND_CHUNK_PROCESS      SendChunkProcess;
+  HTTP_IO_SEND_NON_CHUNK_PROCESS  SendNonChunkProcess;
+  EFI_HTTP_MESSAGE                ChunkTransferRequestMessage;
 
-  Status            = EFI_SUCCESS;
-  ResponseData      = NULL;
+  Status               = EFI_SUCCESS;
+  ResponseData         = NULL;
   IsGetChunkedTransfer = FALSE;
-  SendChunkProcess = HttpIoSendChunkNone;
-  SendNonChunkProcess = HttpIoSendNonChunkNone;
+  SendChunkProcess     = HttpIoSendChunkNone;
+  SendNonChunkProcess  = HttpIoSendNonChunkNone;
 
   //
   // Validate the parameters
   //
-  if ((This == NULL) || (RequestMessage == NULL) || ResponseMessage == NULL) {
+  if ((This == NULL) || (RequestMessage == NULL) || (ResponseMessage == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -101,17 +101,19 @@ RedfishRestExSendReceive (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   if (ItsWrite == TRUE) {
     if (RequestMessage->BodyLength > HTTP_IO_MAX_SEND_PAYLOAD) {
       //
       // Send chunked transfer.
       //
-      SendChunkProcess ++;
+      SendChunkProcess++;
       CopyMem ((VOID *)&ChunkTransferRequestMessage, (VOID *)RequestMessage, sizeof (EFI_HTTP_MESSAGE));
     } else {
-      SendNonChunkProcess ++;
+      SendNonChunkProcess++;
     }
   }
+
 ReSendRequest:;
   //
   // Send out the request to REST service.
@@ -127,7 +129,7 @@ ReSendRequest:;
       // following request message body using chunk transfer.
       //
       do {
-        Status = HttpIoSendChunkedTransfer(
+        Status = HttpIoSendChunkedTransfer (
                    &(Instance->HttpIo),
                    &SendChunkProcess,
                    &ChunkTransferRequestMessage
@@ -141,20 +143,20 @@ ReSendRequest:;
       // This is the non-chunk transfer, send request header first and then
       // handle the following request message body using chunk transfer.
       //
-      Status = HttpIoSendRequest(
+      Status = HttpIoSendRequest (
                  &(Instance->HttpIo),
-                 (SendNonChunkProcess == HttpIoSendNonChunkContent)? NULL: RequestMessage->Data.Request,
-                 (SendNonChunkProcess == HttpIoSendNonChunkContent)? 0: RequestMessage->HeaderCount,
-                 (SendNonChunkProcess == HttpIoSendNonChunkContent)? NULL: RequestMessage->Headers,
-                 (SendNonChunkProcess == HttpIoSendNonChunkHeaderZeroContent)? 0: RequestMessage->BodyLength,
-                 (SendNonChunkProcess == HttpIoSendNonChunkHeaderZeroContent)? NULL: RequestMessage->Body
+                 (SendNonChunkProcess == HttpIoSendNonChunkContent) ? NULL : RequestMessage->Data.Request,
+                 (SendNonChunkProcess == HttpIoSendNonChunkContent) ? 0 : RequestMessage->HeaderCount,
+                 (SendNonChunkProcess == HttpIoSendNonChunkContent) ? NULL : RequestMessage->Headers,
+                 (SendNonChunkProcess == HttpIoSendNonChunkHeaderZeroContent) ? 0 : RequestMessage->BodyLength,
+                 (SendNonChunkProcess == HttpIoSendNonChunkHeaderZeroContent) ? NULL : RequestMessage->Body
                  );
     }
   } else {
     //
     // This is read from URI.
     //
-    Status = HttpIoSendRequest(
+    Status = HttpIoSendRequest (
                &(Instance->HttpIo),
                RequestMessage->Data.Request,
                RequestMessage->HeaderCount,
@@ -163,6 +165,7 @@ ReSendRequest:;
                RequestMessage->Body
                );
   }
+
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
@@ -173,20 +176,20 @@ ReSendRequest:;
   // Clean the previous buffers and all of them will be allocated later according to the actual situation.
   //
   if (ResponseMessage->Data.Response != NULL) {
-    FreePool(ResponseMessage->Data.Response);
+    FreePool (ResponseMessage->Data.Response);
     ResponseMessage->Data.Response = NULL;
   }
 
   ResponseMessage->BodyLength = 0;
   if (ResponseMessage->Body != NULL) {
-    FreePool(ResponseMessage->Body);
+    FreePool (ResponseMessage->Body);
     ResponseMessage->Body = NULL;
   }
 
   //
   // Use zero BodyLength to only receive the response headers.
   //
-  ResponseData = AllocateZeroPool (sizeof(HTTP_IO_RESPONSE_DATA));
+  ResponseData = AllocateZeroPool (sizeof (HTTP_IO_RESPONSE_DATA));
   if (ResponseData == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
@@ -194,25 +197,26 @@ ReSendRequest:;
 
   DEBUG ((DEBUG_INFO, "Receiving HTTP response and headers...\n"));
   Status = RedfishCheckHttpReceiveStatus (
-                Instance,
-                HttpIoRecvResponse (
-                  &(Instance->HttpIo),
-                  TRUE,
-                  ResponseData
-                  )
+             Instance,
+             HttpIoRecvResponse (
+               &(Instance->HttpIo),
+               TRUE,
+               ResponseData
+               )
              );
   if (Status == EFI_NOT_READY) {
-     goto ReSendRequest;
+    goto ReSendRequest;
   } else if (Status == EFI_DEVICE_ERROR) {
     goto ON_EXIT;
   }
+
   //
   // Restore the headers if it ever changed in RedfishHttpAddExpectation().
   //
   if (RequestMessage->Headers != PreservedRequestHeaders) {
     FreePool (RequestMessage->Headers);
     RequestMessage->Headers = PreservedRequestHeaders; // Restore headers before we adding "Expect".
-    RequestMessage->HeaderCount --;                    // Minus one header count for "Expect".
+    RequestMessage->HeaderCount--;                     // Minus one header count for "Expect".
   }
 
   DEBUG ((DEBUG_INFO, "HTTP Response StatusCode - %d:", ResponseData->Response.StatusCode));
@@ -221,7 +225,7 @@ ReSendRequest:;
 
     if (SendChunkProcess == HttpIoSendChunkHeaderZeroContent) {
       DEBUG ((DEBUG_INFO, "This is chunk transfer, start to send all chunks.", ResponseData->Response.StatusCode));
-      SendChunkProcess ++;
+      SendChunkProcess++;
       goto ReSendRequest;
     }
   } else if (ResponseData->Response.StatusCode == HTTP_STATUS_413_REQUEST_ENTITY_TOO_LARGE) {
@@ -229,7 +233,7 @@ ReSendRequest:;
 
     Status = EFI_BAD_BUFFER_SIZE;
     goto ON_EXIT;
-  } else if (ResponseData->Response.StatusCode == HTTP_STATUS_405_METHOD_NOT_ALLOWED){
+  } else if (ResponseData->Response.StatusCode == HTTP_STATUS_405_METHOD_NOT_ALLOWED) {
     DEBUG ((DEBUG_ERROR, "HTTP_STATUS_405_METHOD_NOT_ALLOWED\n"));
 
     Status = EFI_ACCESS_DENIED;
@@ -238,7 +242,7 @@ ReSendRequest:;
     DEBUG ((DEBUG_INFO, "HTTP_STATUS_400_BAD_REQUEST\n"));
     if (SendChunkProcess == HttpIoSendChunkHeaderZeroContent) {
       DEBUG ((DEBUG_INFO, "Bad request may caused by zero length chunk. Try to send all chunks...\n"));
-      SendChunkProcess ++;
+      SendChunkProcess++;
       goto ReSendRequest;
     }
   } else if (ResponseData->Response.StatusCode == HTTP_STATUS_100_CONTINUE) {
@@ -248,22 +252,25 @@ ReSendRequest:;
       // We get HTTP_STATUS_100_CONTINUE to send the body using chunk transfer.
       //
       DEBUG ((DEBUG_INFO, "HTTP_STATUS_100_CONTINUE for chunk transfer...\n"));
-      SendChunkProcess ++;
+      SendChunkProcess++;
       goto ReSendRequest;
     }
+
     if (SendNonChunkProcess == HttpIoSendNonChunkHeaderZeroContent) {
       DEBUG ((DEBUG_INFO, "HTTP_STATUS_100_CONTINUE for non chunk transfer...\n"));
-      SendNonChunkProcess ++;
+      SendNonChunkProcess++;
       goto ReSendRequest;
     }
+
     //
     // It's the REST protocol's responsibility to handle the interim HTTP response (e.g. 100 Continue Informational),
     // and return the final response content to the caller.
     //
-    if (ResponseData->Headers != NULL && ResponseData->HeaderCount != 0) {
+    if ((ResponseData->Headers != NULL) && (ResponseData->HeaderCount != 0)) {
       FreePool (ResponseData->Headers);
     }
-    ZeroMem (ResponseData, sizeof(HTTP_IO_RESPONSE_DATA));
+
+    ZeroMem (ResponseData, sizeof (HTTP_IO_RESPONSE_DATA));
     Status = HttpIoRecvResponse (
                &(Instance->HttpIo),
                TRUE,
@@ -288,15 +295,15 @@ ReSendRequest:;
   }
 
   ResponseMessage->Data.Response->StatusCode = ResponseData->Response.StatusCode;
-  ResponseMessage->HeaderCount = ResponseData->HeaderCount;
-  ResponseMessage->Headers = ResponseData->Headers;
+  ResponseMessage->HeaderCount               = ResponseData->HeaderCount;
+  ResponseMessage->Headers                   = ResponseData->Headers;
 
   //
   // Get response message body.
   //
   if (ResponseMessage->HeaderCount > 0) {
     Status = HttpIoGetContentLength (ResponseMessage->HeaderCount, ResponseMessage->Headers, &ResponseMessage->BodyLength);
-    if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
+    if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
       goto ON_EXIT;
     }
 
@@ -315,46 +322,52 @@ ReSendRequest:;
                  &ChunkListLink,
                  &ResponseMessage->BodyLength
                  );
-      if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
+      if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
         goto ON_EXIT;
       }
-      if (Status == EFI_SUCCESS &&
-          ChunkListLink != NULL &&
-          !IsListEmpty(ChunkListLink) &&
-          ResponseMessage->BodyLength != 0) {
+
+      if ((Status == EFI_SUCCESS) &&
+          (ChunkListLink != NULL) &&
+          !IsListEmpty (ChunkListLink) &&
+          (ResponseMessage->BodyLength != 0))
+      {
         IsGetChunkedTransfer = TRUE;
         //
         // Copy data to Message body.
         //
-        CopyChunkData = TRUE;
+        CopyChunkData         = TRUE;
         ResponseMessage->Body = AllocateZeroPool (ResponseMessage->BodyLength);
         if (ResponseMessage->Body == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
+          Status        = EFI_OUT_OF_RESOURCES;
           CopyChunkData = FALSE;
         }
+
         Index = 0;
-        while (!IsListEmpty(ChunkListLink)) {
+        while (!IsListEmpty (ChunkListLink)) {
           ThisChunk = (HTTP_IO_CHUNKS *)GetFirstNode (ChunkListLink);
           if (CopyChunkData) {
-            CopyMem(((UINT8 *)ResponseMessage->Body + Index), (UINT8 *)ThisChunk->Data, ThisChunk->Length);
+            CopyMem (((UINT8 *)ResponseMessage->Body + Index), (UINT8 *)ThisChunk->Data, ThisChunk->Length);
             Index += ThisChunk->Length;
           }
+
           RemoveEntryList (&ThisChunk->NextChunk);
           FreePool ((VOID *)ThisChunk->Data);
           FreePool ((VOID *)ThisChunk);
-        };
+        }
+
         FreePool ((VOID *)ChunkListLink);
       }
     }
+
     Status = EFI_SUCCESS;
   }
 
   //
   // Ready to return the Body from REST service if have any.
   //
-  if (ResponseMessage->BodyLength > 0 && !IsGetChunkedTransfer) {
+  if ((ResponseMessage->BodyLength > 0) && !IsGetChunkedTransfer) {
     ResponseData->HeaderCount = 0;
-    ResponseData->Headers = NULL;
+    ResponseData->Headers     = NULL;
 
     ResponseMessage->Body = AllocateZeroPool (ResponseMessage->BodyLength);
     if (ResponseMessage->Body == NULL) {
@@ -368,20 +381,22 @@ ReSendRequest:;
     TotalReceivedSize = 0;
     while (TotalReceivedSize < ResponseMessage->BodyLength) {
       ResponseData->BodyLength = ResponseMessage->BodyLength - TotalReceivedSize;
-      ResponseData->Body = (CHAR8 *) ResponseMessage->Body + TotalReceivedSize;
-      Status = HttpIoRecvResponse (
-                 &(Instance->HttpIo),
-                 FALSE,
-                 ResponseData
-                 );
+      ResponseData->Body       = (CHAR8 *)ResponseMessage->Body + TotalReceivedSize;
+      Status                   = HttpIoRecvResponse (
+                                   &(Instance->HttpIo),
+                                   FALSE,
+                                   ResponseData
+                                   );
       if (EFI_ERROR (Status)) {
         goto ON_EXIT;
       }
 
       TotalReceivedSize += ResponseData->BodyLength;
     }
+
     DEBUG ((DEBUG_INFO, "Total of lengh of Response :%d\n", TotalReceivedSize));
   }
+
   DEBUG ((DEBUG_INFO, "RedfishRestExSendReceive()- EFI_STATUS: %r\n", Status));
 
 ON_EXIT:
@@ -401,6 +416,7 @@ ON_EXIT:
       ResponseMessage->Body = NULL;
     }
   }
+
   return Status;
 }
 
@@ -429,8 +445,8 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 RedfishRestExGetServiceTime (
-  IN      EFI_REST_EX_PROTOCOL   *This,
-  OUT     EFI_TIME               *Time
+  IN      EFI_REST_EX_PROTOCOL  *This,
+  OUT     EFI_TIME              *Time
   )
 {
   return EFI_UNSUPPORTED;
@@ -474,17 +490,17 @@ RedfishRestExGetService (
   OUT  EFI_REST_EX_SERVICE_INFO  **RestExServiceInfo
   )
 {
-  EFI_TPL                  OldTpl;
-  RESTEX_INSTANCE          *Instance;
-  EFI_REST_EX_SERVICE_INFO *ServiceInfo;
+  EFI_TPL                   OldTpl;
+  RESTEX_INSTANCE           *Instance;
+  EFI_REST_EX_SERVICE_INFO  *ServiceInfo;
 
   ServiceInfo = NULL;
 
-  if (This == NULL || RestExServiceInfo == NULL) {
+  if ((This == NULL) || (RestExServiceInfo == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl   = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Instance = RESTEX_INSTANCE_FROM_THIS (This);
 
@@ -531,8 +547,8 @@ RedfishRestExGetService (
 EFI_STATUS
 EFIAPI
 RedfishRestExGetModeData (
-  IN  EFI_REST_EX_PROTOCOL      *This,
-  OUT EFI_REST_EX_CONFIG_DATA   *RestExConfigData
+  IN  EFI_REST_EX_PROTOCOL     *This,
+  OUT EFI_REST_EX_CONFIG_DATA  *RestExConfigData
   )
 {
   return EFI_UNSUPPORTED;
@@ -572,15 +588,15 @@ RedfishRestExGetModeData (
 EFI_STATUS
 EFIAPI
 RedfishRestExConfigure (
-  IN  EFI_REST_EX_PROTOCOL    *This,
-  IN  EFI_REST_EX_CONFIG_DATA RestExConfigData
+  IN  EFI_REST_EX_PROTOCOL     *This,
+  IN  EFI_REST_EX_CONFIG_DATA  RestExConfigData
   )
 {
-  EFI_STATUS               Status;
-  EFI_TPL                  OldTpl;
-  RESTEX_INSTANCE          *Instance;
+  EFI_STATUS       Status;
+  EFI_TPL          OldTpl;
+  RESTEX_INSTANCE  *Instance;
 
-  EFI_HTTP_CONFIG_DATA     *HttpConfigData;
+  EFI_HTTP_CONFIG_DATA  *HttpConfigData;
 
   Status         = EFI_SUCCESS;
   HttpConfigData = NULL;
@@ -589,7 +605,7 @@ RedfishRestExConfigure (
     return EFI_INVALID_PARAMETER;
   }
 
-  OldTpl   = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   Instance = RESTEX_INSTANCE_FROM_THIS (This);
 
@@ -601,19 +617,21 @@ RedfishRestExConfigure (
 
     if (Instance->ConfigData != NULL) {
       if (((EFI_REST_EX_HTTP_CONFIG_DATA *)Instance->ConfigData)->HttpConfigData.AccessPoint.IPv4Node != NULL) {
-        FreePool(((EFI_REST_EX_HTTP_CONFIG_DATA *)Instance->ConfigData)->HttpConfigData.AccessPoint.IPv4Node);
+        FreePool (((EFI_REST_EX_HTTP_CONFIG_DATA *)Instance->ConfigData)->HttpConfigData.AccessPoint.IPv4Node);
       }
-      FreePool(Instance->ConfigData);
+
+      FreePool (Instance->ConfigData);
       Instance->ConfigData = NULL;
     }
 
     Instance->State = RESTEX_STATE_UNCONFIGED;
   } else {
     HttpConfigData = &((EFI_REST_EX_HTTP_CONFIG_DATA *)RestExConfigData)->HttpConfigData;
-    Status = Instance->HttpIo.Http->Configure (Instance->HttpIo.Http, HttpConfigData);
+    Status         = Instance->HttpIo.Http->Configure (Instance->HttpIo.Http, HttpConfigData);
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
+
     Instance->HttpIo.Timeout = ((EFI_REST_EX_HTTP_CONFIG_DATA *)RestExConfigData)->SendReceiveTimeout;
 
     Instance->ConfigData = AllocateZeroPool (sizeof (EFI_REST_EX_HTTP_CONFIG_DATA));
@@ -621,6 +639,7 @@ RedfishRestExConfigure (
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
+
     CopyMem (Instance->ConfigData, RestExConfigData, sizeof (EFI_REST_EX_HTTP_CONFIG_DATA));
     if (HttpConfigData->LocalAddressIsIPv6 == TRUE) {
       ((EFI_REST_EX_HTTP_CONFIG_DATA *)Instance->ConfigData)->HttpConfigData.AccessPoint.IPv6Node = AllocateZeroPool (sizeof (EFI_HTTPv6_ACCESS_POINT));
@@ -628,6 +647,7 @@ RedfishRestExConfigure (
         Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       CopyMem (
         ((EFI_REST_EX_HTTP_CONFIG_DATA *)Instance->ConfigData)->HttpConfigData.AccessPoint.IPv6Node,
         HttpConfigData->AccessPoint.IPv6Node,
@@ -639,12 +659,14 @@ RedfishRestExConfigure (
         Status = EFI_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       CopyMem (
         ((EFI_REST_EX_HTTP_CONFIG_DATA *)Instance->ConfigData)->HttpConfigData.AccessPoint.IPv4Node,
         HttpConfigData->AccessPoint.IPv4Node,
         sizeof (EFI_HTTPv4_ACCESS_POINT)
         );
     }
+
     Instance->State = RESTEX_STATE_CONFIGED;
   }
 
@@ -687,10 +709,10 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 RedfishRestExAyncSendReceive (
-  IN      EFI_REST_EX_PROTOCOL   *This,
-  IN      EFI_HTTP_MESSAGE       *RequestMessage OPTIONAL,
-  IN      EFI_REST_EX_TOKEN      *RestExToken,
-  IN      UINTN                  *TimeOutInMilliSeconds OPTIONAL
+  IN      EFI_REST_EX_PROTOCOL  *This,
+  IN      EFI_HTTP_MESSAGE      *RequestMessage OPTIONAL,
+  IN      EFI_REST_EX_TOKEN     *RestExToken,
+  IN      UINTN                 *TimeOutInMilliSeconds OPTIONAL
   )
 {
   return EFI_UNSUPPORTED;
@@ -725,11 +747,10 @@ RedfishRestExAyncSendReceive (
 EFI_STATUS
 EFIAPI
 RedfishRestExEventService (
-  IN      EFI_REST_EX_PROTOCOL   *This,
-  IN      EFI_HTTP_MESSAGE       *RequestMessage OPTIONAL,
-  IN      EFI_REST_EX_TOKEN      *RestExToken
+  IN      EFI_REST_EX_PROTOCOL  *This,
+  IN      EFI_HTTP_MESSAGE      *RequestMessage OPTIONAL,
+  IN      EFI_REST_EX_TOKEN     *RestExToken
   )
 {
   return EFI_UNSUPPORTED;
 }
-

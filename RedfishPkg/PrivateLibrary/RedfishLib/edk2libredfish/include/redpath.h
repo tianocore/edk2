@@ -14,6 +14,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef LIBREDFISH_REDPATH_H_
 #define LIBREDFISH_REDPATH_H_
 
@@ -21,22 +22,28 @@
 
 #include <jansson.h>
 
-typedef struct _redPathNode
-{
-    bool isRoot;
-    bool isIndex;
+typedef struct _redPathNode {
+  bool                   isRoot;
+  bool                   isIndex;
 
-    char* version;
-    char* nodeName;
-    size_t index;
-    char* op;
-    char* propName;
-    char* value;
+  char                   *version;
+  char                   *nodeName;
+  size_t                 index;
+  char                   *op;
+  char                   *propName;
+  char                   *value;
 
-    struct _redPathNode* next;
+  struct _redPathNode    *next;
 } redPathNode;
 
-redPathNode* parseRedPath(const char* path);
-void cleanupRedPath(redPathNode* node);
+redPathNode *
+parseRedPath (
+  const char  *path
+  );
+
+void
+cleanupRedPath (
+  redPathNode  *node
+  );
 
 #endif
