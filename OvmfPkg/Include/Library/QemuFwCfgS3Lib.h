@@ -87,7 +87,7 @@ QemuFwCfgS3Enabled (
 **/
 typedef
 VOID (EFIAPI FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION) (
-  IN OUT VOID *Context,      OPTIONAL
+  IN OUT VOID *Context       OPTIONAL,
   IN OUT VOID *ScratchBuffer
   );
 
@@ -153,7 +153,7 @@ RETURN_STATUS
 EFIAPI
 QemuFwCfgS3CallWhenBootScriptReady (
   IN     FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION *Callback,
-  IN OUT VOID                                 *Context,          OPTIONAL
+  IN OUT VOID                                 *Context           OPTIONAL,
   IN     UINTN                                ScratchBufferSize
   );
 
