@@ -466,11 +466,22 @@ fwrite (
 //  -- Dummy OpenSSL Support Routines --
 //
 
+#if 0
 int
 BIO_printf (
   void        *bio,
   const char  *format,
   ...
+  )
+{
+  return 0;
+}
+
+int
+BIO_vprintf (
+  void        *bio,
+  const char  *format,
+  va_list     args
   )
 {
   return 0;
@@ -484,8 +495,36 @@ BIO_snprintf (
   ...
   )
 {
-  return 0;
+  VA_LIST  Marker;
+  UINTN    Length;
+
+  VA_START (Marker, format);
+  Length = AsciiVSPrint (buf, n, format, Marker);
+  VA_END (Marker);
+  DEBUG ((
+    DEBUG_INFO,
+    "%a:%d: \"%a\" -> \"%a\" (%d)\n",
+    __FUNCTION__,
+    __LINE__,
+    format,
+    buf,
+    Length
+    ));
+  return Length;
 }
+
+int
+BIO_vsnprintf (
+  char        *buf,
+  size_t      n,
+  const char  *format,
+  va_list     args
+  )
+{
+  return AsciiVSPrint (buf, n, format, args);
+}
+
+#endif
 
 #ifdef __GNUC__
 
