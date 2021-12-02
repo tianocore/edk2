@@ -1094,7 +1094,7 @@ RETURN_STATUS
 ReceivePacket (
   OUT UINT8             *InputPacket,
   OUT BOOLEAN           *BreakReceived,
-  OUT BOOLEAN           *IncompatibilityFlag, OPTIONAL
+  OUT BOOLEAN           *IncompatibilityFlag  OPTIONAL,
   IN  UINTN             Timeout,
   IN  BOOLEAN           SkipStartSymbol
   )
@@ -1208,7 +1208,7 @@ RETURN_STATUS
 SendCommandAndWaitForAckOK (
   IN  UINT8               Command,
   IN  UINTN               Timeout,
-  OUT BOOLEAN             *BreakReceived, OPTIONAL
+  OUT BOOLEAN             *BreakReceived  OPTIONAL,
   OUT BOOLEAN             *IncompatibilityFlag OPTIONAL
   )
 {
@@ -1441,7 +1441,7 @@ CompressData (
   IN  UINT8             *Data,
   IN  UINT8             Length,
   IN  BOOLEAN           Send,
-  OUT UINTN             *CompressedLength,  OPTIONAL
+  OUT UINTN             *CompressedLength   OPTIONAL,
   OUT UINT16            *CompressedCrc      OPTIONAL
   )
 {
