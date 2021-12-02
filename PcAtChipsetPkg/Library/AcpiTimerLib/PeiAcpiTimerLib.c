@@ -12,7 +12,7 @@
 #include <Library/HobLib.h>
 #include <Library/DebugLib.h>
 
-extern GUID mFrequencyHobGuid;
+extern GUID  mFrequencyHobGuid;
 
 /**
   Calculate TSC frequency.
@@ -47,18 +47,18 @@ InternalGetPerformanceCounterFrequency (
   VOID
   )
 {
-  UINT64              *PerformanceCounterFrequency;
-  EFI_HOB_GUID_TYPE   *GuidHob;
+  UINT64             *PerformanceCounterFrequency;
+  EFI_HOB_GUID_TYPE  *GuidHob;
 
   PerformanceCounterFrequency = NULL;
-  GuidHob = GetFirstGuidHob (&mFrequencyHobGuid);
+  GuidHob                     = GetFirstGuidHob (&mFrequencyHobGuid);
   if (GuidHob == NULL) {
-    PerformanceCounterFrequency  = (UINT64*)BuildGuidHob(&mFrequencyHobGuid, sizeof (*PerformanceCounterFrequency));
+    PerformanceCounterFrequency = (UINT64 *)BuildGuidHob (&mFrequencyHobGuid, sizeof (*PerformanceCounterFrequency));
     ASSERT (PerformanceCounterFrequency != NULL);
     *PerformanceCounterFrequency = InternalCalculateTscFrequency ();
   } else {
-    PerformanceCounterFrequency = (UINT64*)GET_GUID_HOB_DATA (GuidHob);
+    PerformanceCounterFrequency = (UINT64 *)GET_GUID_HOB_DATA (GuidHob);
   }
 
-  return  *PerformanceCounterFrequency;
+  return *PerformanceCounterFrequency;
 }
