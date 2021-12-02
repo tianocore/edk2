@@ -128,7 +128,7 @@ EFI_STATUS
   IN EFI_BLUETOOTH_LE_CONFIG_PROTOCOL                *This,
   IN BOOLEAN                                         ReScan,
   IN UINT32                                          Timeout,
-  IN EFI_BLUETOOTH_LE_CONFIG_SCAN_PARAMETER          *ScanParameter, OPTIONAL
+  IN EFI_BLUETOOTH_LE_CONFIG_SCAN_PARAMETER          *ScanParameter  OPTIONAL,
   IN EFI_BLUETOOTH_LE_CONFIG_SCAN_CALLBACK_FUNCTION  Callback,
   IN VOID                                            *Context
   );
@@ -197,7 +197,7 @@ EFI_STATUS
   IN  EFI_BLUETOOTH_LE_CONFIG_PROTOCOL            *This,
   IN  BOOLEAN                                     AutoReconnect,
   IN  BOOLEAN                                     DoBonding,
-  IN  EFI_BLUETOOTH_LE_CONFIG_CONNECT_PARAMETER   *ConnectParameter, OPTIONAL
+  IN  EFI_BLUETOOTH_LE_CONFIG_CONNECT_PARAMETER   *ConnectParameter  OPTIONAL,
   IN  BLUETOOTH_LE_ADDRESS                        *BD_ADDR
   );
 
@@ -627,4 +627,3 @@ struct _EFI_BLUETOOTH_LE_CONFIG_PROTOCOL {
 extern EFI_GUID gEfiBluetoothLeConfigProtocolGuid;
 
 #endif
-

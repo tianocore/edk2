@@ -105,7 +105,7 @@ EFI_STATUS
 (EFIAPI *EFI_PEI_SMBUS2_PPI_ARP_DEVICE)(
   IN CONST  EFI_PEI_SMBUS2_PPI        *This,
   IN        BOOLEAN                   ArpAll,
-  IN        EFI_SMBUS_UDID            *SmbusUdid,   OPTIONAL
+  IN        EFI_SMBUS_UDID            *SmbusUdid    OPTIONAL,
   IN OUT    EFI_SMBUS_DEVICE_ADDRESS  *SlaveAddress OPTIONAL
 );
 

@@ -405,7 +405,7 @@ RETURN_STATUS
 EFIAPI
 StrDecimalToUintnS (
   IN  CONST CHAR16             *String,
-  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       CHAR16             **EndPointer   OPTIONAL,
   OUT       UINTN              *Data
   );
 
@@ -456,7 +456,7 @@ RETURN_STATUS
 EFIAPI
 StrDecimalToUint64S (
   IN  CONST CHAR16             *String,
-  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       CHAR16             **EndPointer   OPTIONAL,
   OUT       UINT64             *Data
   );
 
@@ -512,7 +512,7 @@ RETURN_STATUS
 EFIAPI
 StrHexToUintnS (
   IN  CONST CHAR16             *String,
-  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       CHAR16             **EndPointer   OPTIONAL,
   OUT       UINTN              *Data
   );
 
@@ -568,7 +568,7 @@ RETURN_STATUS
 EFIAPI
 StrHexToUint64S (
   IN  CONST CHAR16             *String,
-  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       CHAR16             **EndPointer   OPTIONAL,
   OUT       UINT64             *Data
   );
 
@@ -802,7 +802,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrDecimalToUintnS (
   IN  CONST CHAR8              *String,
-  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       CHAR8              **EndPointer   OPTIONAL,
   OUT       UINTN              *Data
   );
 
@@ -851,7 +851,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrDecimalToUint64S (
   IN  CONST CHAR8              *String,
-  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       CHAR8              **EndPointer   OPTIONAL,
   OUT       UINT64             *Data
   );
 
@@ -904,7 +904,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrHexToUintnS (
   IN  CONST CHAR8              *String,
-  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       CHAR8              **EndPointer   OPTIONAL,
   OUT       UINTN              *Data
   );
 
@@ -957,7 +957,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrHexToUint64S (
   IN  CONST CHAR8              *String,
-  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       CHAR8              **EndPointer   OPTIONAL,
   OUT       UINT64             *Data
   );
 
@@ -1338,7 +1338,7 @@ RETURN_STATUS
 EFIAPI
 StrToIpv6Address (
   IN  CONST CHAR16       *String,
-  OUT CHAR16             **EndPointer, OPTIONAL
+  OUT CHAR16             **EndPointer  OPTIONAL,
   OUT IPv6_ADDRESS       *Address,
   OUT UINT8              *PrefixLength OPTIONAL
   );
@@ -1388,7 +1388,7 @@ RETURN_STATUS
 EFIAPI
 StrToIpv4Address (
   IN  CONST CHAR16       *String,
-  OUT CHAR16             **EndPointer, OPTIONAL
+  OUT CHAR16             **EndPointer  OPTIONAL,
   OUT IPv4_ADDRESS       *Address,
   OUT UINT8              *PrefixLength OPTIONAL
   );
@@ -1986,7 +1986,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrToIpv6Address (
   IN  CONST CHAR8        *String,
-  OUT CHAR8              **EndPointer, OPTIONAL
+  OUT CHAR8              **EndPointer  OPTIONAL,
   OUT IPv6_ADDRESS       *Address,
   OUT UINT8              *PrefixLength OPTIONAL
   );
@@ -2034,7 +2034,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrToIpv4Address (
   IN  CONST CHAR8        *String,
-  OUT CHAR8              **EndPointer, OPTIONAL
+  OUT CHAR8              **EndPointer  OPTIONAL,
   OUT IPv4_ADDRESS       *Address,
   OUT UINT8              *PrefixLength OPTIONAL
   );
@@ -4606,7 +4606,7 @@ CalculateCrc32(
 typedef
 VOID
 (EFIAPI *SWITCH_STACK_ENTRY_POINT)(
-  IN      VOID                      *Context1,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
   IN      VOID                      *Context2   OPTIONAL
   );
 
@@ -4812,8 +4812,8 @@ VOID
 EFIAPI
 SwitchStack (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
+  IN      VOID                      *Context2   OPTIONAL,
   IN      VOID                      *NewStack,
   ...
   );
@@ -5385,9 +5385,9 @@ UINT32
 EFIAPI
 AsmCpuid (
   IN      UINT32                    Index,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax   OPTIONAL,
+  OUT     UINT32                    *Ebx   OPTIONAL,
+  OUT     UINT32                    *Ecx   OPTIONAL,
   OUT     UINT32                    *Edx   OPTIONAL
   );
 
@@ -5429,9 +5429,9 @@ EFIAPI
 AsmCpuidEx (
   IN      UINT32                    Index,
   IN      UINT32                    SubIndex,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax   OPTIONAL,
+  OUT     UINT32                    *Ebx   OPTIONAL,
+  OUT     UINT32                    *Ecx   OPTIONAL,
   OUT     UINT32                    *Edx   OPTIONAL
   );
 
@@ -7207,8 +7207,8 @@ VOID
 EFIAPI
 AsmEnablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
+  IN      VOID                      *Context2   OPTIONAL,
   IN      VOID                      *NewStack
   );
 
@@ -7251,8 +7251,8 @@ VOID
 EFIAPI
 AsmDisablePaging32 (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
+  IN      VOID                      *Context2   OPTIONAL,
   IN      VOID                      *NewStack
   );
 
@@ -7294,8 +7294,8 @@ EFIAPI
 AsmEnablePaging64 (
   IN      UINT16                    Cs,
   IN      UINT64                    EntryPoint,
-  IN      UINT64                    Context1,  OPTIONAL
-  IN      UINT64                    Context2,  OPTIONAL
+  IN      UINT64                    Context1   OPTIONAL,
+  IN      UINT64                    Context2   OPTIONAL,
   IN      UINT64                    NewStack
   );
 
@@ -7335,8 +7335,8 @@ EFIAPI
 AsmDisablePaging64 (
   IN      UINT16                    Cs,
   IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
+  IN      UINT32                    Context1   OPTIONAL,
+  IN      UINT32                    Context2   OPTIONAL,
   IN      UINT32                    NewStack
   );
 
