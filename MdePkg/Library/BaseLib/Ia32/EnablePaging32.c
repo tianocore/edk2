@@ -41,7 +41,7 @@
                       function after paging is enabled.
 
 **/
-__declspec (naked)
+__declspec(naked)
 VOID
 EFIAPI
 InternalX86EnablePaging32 (

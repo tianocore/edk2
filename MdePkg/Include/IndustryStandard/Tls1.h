@@ -15,42 +15,42 @@
 ///
 /// TLS Cipher Suite, refers to A.5 of rfc-2246, rfc-4346 and rfc-5246.
 ///
-#define TLS_RSA_WITH_NULL_MD5                    {0x00, 0x01}
-#define TLS_RSA_WITH_NULL_SHA                    {0x00, 0x02}
-#define TLS_RSA_WITH_RC4_128_MD5                 {0x00, 0x04}
-#define TLS_RSA_WITH_RC4_128_SHA                 {0x00, 0x05}
-#define TLS_RSA_WITH_IDEA_CBC_SHA                {0x00, 0x07}
-#define TLS_RSA_WITH_DES_CBC_SHA                 {0x00, 0x09}
-#define TLS_RSA_WITH_3DES_EDE_CBC_SHA            {0x00, 0x0A}
-#define TLS_DH_DSS_WITH_DES_CBC_SHA              {0x00, 0x0C}
-#define TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA         {0x00, 0x0D}
-#define TLS_DH_RSA_WITH_DES_CBC_SHA              {0x00, 0x0F}
-#define TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA         {0x00, 0x10}
-#define TLS_DHE_DSS_WITH_DES_CBC_SHA             {0x00, 0x12}
-#define TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA        {0x00, 0x13}
-#define TLS_DHE_RSA_WITH_DES_CBC_SHA             {0x00, 0x15}
-#define TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA        {0x00, 0x16}
-#define TLS_RSA_WITH_AES_128_CBC_SHA             {0x00, 0x2F}
-#define TLS_DH_DSS_WITH_AES_128_CBC_SHA          {0x00, 0x30}
-#define TLS_DH_RSA_WITH_AES_128_CBC_SHA          {0x00, 0x31}
-#define TLS_DHE_DSS_WITH_AES_128_CBC_SHA         {0x00, 0x32}
-#define TLS_DHE_RSA_WITH_AES_128_CBC_SHA         {0x00, 0x33}
-#define TLS_RSA_WITH_AES_256_CBC_SHA             {0x00, 0x35}
-#define TLS_DH_DSS_WITH_AES_256_CBC_SHA          {0x00, 0x36}
-#define TLS_DH_RSA_WITH_AES_256_CBC_SHA          {0x00, 0x37}
-#define TLS_DHE_DSS_WITH_AES_256_CBC_SHA         {0x00, 0x38}
-#define TLS_DHE_RSA_WITH_AES_256_CBC_SHA         {0x00, 0x39}
-#define TLS_RSA_WITH_NULL_SHA256                 {0x00, 0x3B}
-#define TLS_RSA_WITH_AES_128_CBC_SHA256          {0x00, 0x3C}
-#define TLS_RSA_WITH_AES_256_CBC_SHA256          {0x00, 0x3D}
-#define TLS_DH_DSS_WITH_AES_128_CBC_SHA256       {0x00, 0x3E}
-#define TLS_DH_RSA_WITH_AES_128_CBC_SHA256       {0x00, 0x3F}
-#define TLS_DHE_DSS_WITH_AES_128_CBC_SHA256      {0x00, 0x40}
-#define TLS_DHE_RSA_WITH_AES_128_CBC_SHA256      {0x00, 0x67}
-#define TLS_DH_DSS_WITH_AES_256_CBC_SHA256       {0x00, 0x68}
-#define TLS_DH_RSA_WITH_AES_256_CBC_SHA256       {0x00, 0x69}
-#define TLS_DHE_DSS_WITH_AES_256_CBC_SHA256      {0x00, 0x6A}
-#define TLS_DHE_RSA_WITH_AES_256_CBC_SHA256      {0x00, 0x6B}
+#define TLS_RSA_WITH_NULL_MD5                {0x00, 0x01}
+#define TLS_RSA_WITH_NULL_SHA                {0x00, 0x02}
+#define TLS_RSA_WITH_RC4_128_MD5             {0x00, 0x04}
+#define TLS_RSA_WITH_RC4_128_SHA             {0x00, 0x05}
+#define TLS_RSA_WITH_IDEA_CBC_SHA            {0x00, 0x07}
+#define TLS_RSA_WITH_DES_CBC_SHA             {0x00, 0x09}
+#define TLS_RSA_WITH_3DES_EDE_CBC_SHA        {0x00, 0x0A}
+#define TLS_DH_DSS_WITH_DES_CBC_SHA          {0x00, 0x0C}
+#define TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA     {0x00, 0x0D}
+#define TLS_DH_RSA_WITH_DES_CBC_SHA          {0x00, 0x0F}
+#define TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA     {0x00, 0x10}
+#define TLS_DHE_DSS_WITH_DES_CBC_SHA         {0x00, 0x12}
+#define TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA    {0x00, 0x13}
+#define TLS_DHE_RSA_WITH_DES_CBC_SHA         {0x00, 0x15}
+#define TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA    {0x00, 0x16}
+#define TLS_RSA_WITH_AES_128_CBC_SHA         {0x00, 0x2F}
+#define TLS_DH_DSS_WITH_AES_128_CBC_SHA      {0x00, 0x30}
+#define TLS_DH_RSA_WITH_AES_128_CBC_SHA      {0x00, 0x31}
+#define TLS_DHE_DSS_WITH_AES_128_CBC_SHA     {0x00, 0x32}
+#define TLS_DHE_RSA_WITH_AES_128_CBC_SHA     {0x00, 0x33}
+#define TLS_RSA_WITH_AES_256_CBC_SHA         {0x00, 0x35}
+#define TLS_DH_DSS_WITH_AES_256_CBC_SHA      {0x00, 0x36}
+#define TLS_DH_RSA_WITH_AES_256_CBC_SHA      {0x00, 0x37}
+#define TLS_DHE_DSS_WITH_AES_256_CBC_SHA     {0x00, 0x38}
+#define TLS_DHE_RSA_WITH_AES_256_CBC_SHA     {0x00, 0x39}
+#define TLS_RSA_WITH_NULL_SHA256             {0x00, 0x3B}
+#define TLS_RSA_WITH_AES_128_CBC_SHA256      {0x00, 0x3C}
+#define TLS_RSA_WITH_AES_256_CBC_SHA256      {0x00, 0x3D}
+#define TLS_DH_DSS_WITH_AES_128_CBC_SHA256   {0x00, 0x3E}
+#define TLS_DH_RSA_WITH_AES_128_CBC_SHA256   {0x00, 0x3F}
+#define TLS_DHE_DSS_WITH_AES_128_CBC_SHA256  {0x00, 0x40}
+#define TLS_DHE_RSA_WITH_AES_128_CBC_SHA256  {0x00, 0x67}
+#define TLS_DH_DSS_WITH_AES_256_CBC_SHA256   {0x00, 0x68}
+#define TLS_DH_RSA_WITH_AES_256_CBC_SHA256   {0x00, 0x69}
+#define TLS_DHE_DSS_WITH_AES_256_CBC_SHA256  {0x00, 0x6A}
+#define TLS_DHE_RSA_WITH_AES_256_CBC_SHA256  {0x00, 0x6B}
 
 ///
 /// TLS Version, refers to A.1 of rfc-2246, rfc-4346 and rfc-5246.
@@ -76,26 +76,25 @@ typedef enum {
 /// TLS Record Header, refers to A.1 of rfc-2246, rfc-4346 and rfc-5246.
 ///
 typedef struct {
-  UINT8                   ContentType;
-  EFI_TLS_VERSION         Version;
-  UINT16                  Length;
+  UINT8              ContentType;
+  EFI_TLS_VERSION    Version;
+  UINT16             Length;
 } TLS_RECORD_HEADER;
 
-#define TLS_RECORD_HEADER_LENGTH   5
+#define TLS_RECORD_HEADER_LENGTH  5
 
 //
 // The length (in bytes) of the TLSPlaintext records payload MUST NOT exceed 2^14.
 // Refers to section 6.2 of RFC5246.
 //
-#define TLS_PLAINTEXT_RECORD_MAX_PAYLOAD_LENGTH   16384
+#define TLS_PLAINTEXT_RECORD_MAX_PAYLOAD_LENGTH  16384
 
 //
 // The length (in bytes) of the TLSCiphertext records payload MUST NOT exceed 2^14 + 2048.
 // Refers to section 6.2 of RFC5246.
 //
-#define TLS_CIPHERTEXT_RECORD_MAX_PAYLOAD_LENGTH   18432
+#define TLS_CIPHERTEXT_RECORD_MAX_PAYLOAD_LENGTH  18432
 
 #pragma pack()
 
 #endif
-
