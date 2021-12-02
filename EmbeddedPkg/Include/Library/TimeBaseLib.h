@@ -20,13 +20,13 @@
 // in which case __DATE__ is defined as a "Mmm dd yyyy" 11 chars string,
 // but add an explicit filter for compilers that have been validated.
 //
-#if (defined(__GNUC__) || defined(_MSC_VER) || defined(__clang__))
-#define TIME_BUILD_YEAR  (__DATE__[7] == '?' ? 1900 \
+#if (defined (__GNUC__) || defined (_MSC_VER) || defined (__clang__))
+#define TIME_BUILD_YEAR   (__DATE__[7] == '?' ? 1900\
           : (((__DATE__[7] - '0') * 1000 )          \
           + (__DATE__[8] - '0') * 100               \
           + (__DATE__[9] - '0') * 10                \
           + __DATE__[10] - '0'))
-#define TIME_BUILD_MONTH ( __DATE__ [2] == '?' ? 1  \
+#define TIME_BUILD_MONTH  ( __DATE__ [2] == '?' ? 1 \
           : __DATE__ [2] == 'n' ? (                 \
             __DATE__ [1] == 'a' ? 1 : 6)            \
           : __DATE__ [2] == 'b' ? 2                 \
@@ -39,19 +39,19 @@
           : __DATE__ [2] == 't' ? 10                \
           : __DATE__ [2] == 'v' ? 11                \
           : 12)
-#define TIME_BUILD_DAY ( __DATE__[4] == '?' ? 1     \
+#define TIME_BUILD_DAY    ( __DATE__[4] == '?' ? 1  \
           : ((__DATE__[4] == ' ' ? 0 :              \
             ((__DATE__[4] - '0') * 10))             \
           + __DATE__[5] - '0'))
 #endif
 
 // Define EPOCH (1970-JANUARY-01) in the Julian Date representation
-#define EPOCH_JULIAN_DATE                               2440588
+#define EPOCH_JULIAN_DATE  2440588
 
 // Seconds per unit
-#define SEC_PER_MIN                                     ((UINTN)    60)
-#define SEC_PER_HOUR                                    ((UINTN)  3600)
-#define SEC_PER_DAY                                     ((UINTN) 86400)
+#define SEC_PER_MIN   ((UINTN)    60)
+#define SEC_PER_HOUR  ((UINTN)  3600)
+#define SEC_PER_DAY   ((UINTN) 86400)
 
 /**
   Check if it is a leap year.
