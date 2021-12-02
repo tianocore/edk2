@@ -30,7 +30,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlDeleteNameSpaceRefNode (
-  IN  AML_NAMESPACE_REF_NODE    * NameSpaceRefNode
+  IN  AML_NAMESPACE_REF_NODE  *NameSpaceRefNode
   )
 {
   if (NameSpaceRefNode == NULL) {
@@ -39,7 +39,7 @@ AmlDeleteNameSpaceRefNode (
   }
 
   if (NameSpaceRefNode->RawAbsolutePath != NULL) {
-    FreePool ((CHAR8*)NameSpaceRefNode->RawAbsolutePath);
+    FreePool ((CHAR8 *)NameSpaceRefNode->RawAbsolutePath);
   } else {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -59,11 +59,11 @@ AmlDeleteNameSpaceRefNode (
 EFI_STATUS
 EFIAPI
 AmlDeleteNameSpaceRefList (
-  IN  LIST_ENTRY      * NameSpaceRefList
+  IN  LIST_ENTRY  *NameSpaceRefList
   )
 {
-  EFI_STATUS        Status;
-  LIST_ENTRY      * CurrentLink;
+  EFI_STATUS  Status;
+  LIST_ENTRY  *CurrentLink;
 
   if (NameSpaceRefList == NULL) {
     ASSERT (0);
@@ -74,7 +74,7 @@ AmlDeleteNameSpaceRefList (
     CurrentLink = NameSpaceRefList->ForwardLink;
     RemoveEntryList (CurrentLink);
     Status = AmlDeleteNameSpaceRefNode (
-               (AML_NAMESPACE_REF_NODE*)CurrentLink
+               (AML_NAMESPACE_REF_NODE *)CurrentLink
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
@@ -106,18 +106,19 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCreateMethodRefNode (
-  IN  CONST AML_OBJECT_NODE         * ObjectNode,
-  IN  CONST CHAR8                   * RawAbsolutePath,
-  IN        UINT32                    RawAbsolutePathSize,
-  OUT       AML_NAMESPACE_REF_NODE ** NameSpaceRefNodePtr
+  IN  CONST AML_OBJECT_NODE         *ObjectNode,
+  IN  CONST CHAR8                   *RawAbsolutePath,
+  IN        UINT32                  RawAbsolutePathSize,
+  OUT       AML_NAMESPACE_REF_NODE  **NameSpaceRefNodePtr
   )
 {
-  AML_NAMESPACE_REF_NODE     * NameSpaceRefNode;
+  AML_NAMESPACE_REF_NODE  *NameSpaceRefNode;
 
   if (!AmlNodeHasAttribute (ObjectNode, AML_IN_NAMESPACE) ||
       (RawAbsolutePath == NULL)                           ||
       (RawAbsolutePathSize == 0)                          ||
-      (NameSpaceRefNodePtr == NULL)) {
+      (NameSpaceRefNodePtr == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -129,10 +130,10 @@ AmlCreateMethodRefNode (
   }
 
   NameSpaceRefNode->RawAbsolutePathSize = RawAbsolutePathSize;
-  NameSpaceRefNode->RawAbsolutePath = AllocateCopyPool (
-                                        RawAbsolutePathSize,
-                                        RawAbsolutePath
-                                        );
+  NameSpaceRefNode->RawAbsolutePath     = AllocateCopyPool (
+                                            RawAbsolutePathSize,
+                                            RawAbsolutePath
+                                            );
   if (NameSpaceRefNode->RawAbsolutePath == NULL) {
     FreePool (NameSpaceRefNode);
     ASSERT (0);
@@ -142,7 +143,7 @@ AmlCreateMethodRefNode (
   InitializeListHead (&NameSpaceRefNode->Link);
 
   NameSpaceRefNode->NodeRef = ObjectNode;
-  *NameSpaceRefNodePtr = NameSpaceRefNode;
+  *NameSpaceRefNodePtr      = NameSpaceRefNode;
 
   return EFI_SUCCESS;
 }
@@ -156,11 +157,11 @@ AmlCreateMethodRefNode (
 VOID
 EFIAPI
 AmlDbgPrintNameSpaceRefList (
-  IN  CONST LIST_ENTRY    * NameSpaceRefList
+  IN  CONST LIST_ENTRY  *NameSpaceRefList
   )
 {
-  LIST_ENTRY              * CurrLink;
-  AML_NAMESPACE_REF_NODE  * CurrNameSpaceNode;
+  LIST_ENTRY              *CurrLink;
+  AML_NAMESPACE_REF_NODE  *CurrNameSpaceNode;
 
   if (NameSpaceRefList == NULL) {
     ASSERT (0);
@@ -171,7 +172,7 @@ AmlDbgPrintNameSpaceRefList (
 
   CurrLink = NameSpaceRefList->ForwardLink;
   while (CurrLink != NameSpaceRefList) {
-    CurrNameSpaceNode = (AML_NAMESPACE_REF_NODE*)CurrLink;
+    CurrNameSpaceNode = (AML_NAMESPACE_REF_NODE *)CurrLink;
 
     AMLDBG_PRINT_CHARS (
       DEBUG_INFO,
@@ -215,28 +216,29 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlInitRawPathBStream (
-  IN  CONST AML_STREAM    * FStream,
-  OUT       AML_STREAM    * RawPathNameBStream
+  IN  CONST AML_STREAM  *FStream,
+  OUT       AML_STREAM  *RawPathNameBStream
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
-  UINT8       * RawPathBuffer;
-  CONST CHAR8 * Buffer;
+  UINT8        *RawPathBuffer;
+  CONST CHAR8  *Buffer;
 
-  UINT32        Root;
-  UINT32        ParentPrefix;
-  UINT32        SegCount;
+  UINT32  Root;
+  UINT32  ParentPrefix;
+  UINT32  SegCount;
 
   if (!IS_STREAM (FStream)          ||
       IS_END_OF_STREAM (FStream)    ||
-      !IS_STREAM_FORWARD  (FStream) ||
-      (RawPathNameBStream == NULL)) {
+      !IS_STREAM_FORWARD (FStream) ||
+      (RawPathNameBStream == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  Buffer = (CONST CHAR8*)AmlStreamGetCurrPos (FStream);
+  Buffer = (CONST CHAR8 *)AmlStreamGetCurrPos (FStream);
   if (Buffer == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -255,11 +257,11 @@ AmlInitRawPathBStream (
   }
 
   // Get the beginning of the raw NameString.
-  RawPathBuffer = (UINT8*)AmlGetFirstNameSeg (
-                            Buffer,
-                            Root,
-                            ParentPrefix
-                            );
+  RawPathBuffer = (UINT8 *)AmlGetFirstNameSeg (
+                             Buffer,
+                             Root,
+                             ParentPrefix
+                             );
   if (RawPathBuffer == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -313,16 +315,17 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlGetFirstNamedAncestorNode (
-  IN  CONST AML_NODE_HEADER   * Node,
-  OUT       AML_NODE_HEADER  ** OutNamedNode
+  IN  CONST AML_NODE_HEADER  *Node,
+  OUT       AML_NODE_HEADER  **OutNamedNode
   )
 {
-  EFI_STATUS                Status;
-  CONST AML_NODE_HEADER   * NameSpaceNode;
+  EFI_STATUS             Status;
+  CONST AML_NODE_HEADER  *NameSpaceNode;
 
   if ((!IS_AML_OBJECT_NODE (Node)   &&
        !IS_AML_ROOT_NODE (Node))    ||
-      (OutNamedNode == NULL)) {
+      (OutNamedNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -331,23 +334,26 @@ AmlGetFirstNamedAncestorNode (
   // get the ancestor NameSpace node.
   while (!IS_AML_ROOT_NODE (Node)             &&
          !(AmlNodeHasAttribute (
-             (CONST AML_OBJECT_NODE*)Node,
-              AML_IN_NAMESPACE)               &&
-           AmlNodeGetName ((CONST AML_OBJECT_NODE*)Node) != NULL)) {
+             (CONST AML_OBJECT_NODE *)Node,
+             AML_IN_NAMESPACE
+             )               &&
+           AmlNodeGetName ((CONST AML_OBJECT_NODE *)Node) != NULL))
+  {
     Status = AmlGetFirstAncestorNameSpaceNode (
-                Node,
-                (AML_NODE_HEADER**)&NameSpaceNode
-                );
+               Node,
+               (AML_NODE_HEADER **)&NameSpaceNode
+               );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
     }
+
     // The NameSpaceNode may not have its name defined as yet. In this
     // case get the next ancestor node.
     Node = NameSpaceNode;
   }
 
-  *OutNamedNode = (AML_NODE_HEADER*)Node;
+  *OutNamedNode = (AML_NODE_HEADER *)Node;
 
   return EFI_SUCCESS;
 }
@@ -380,20 +386,20 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlBuildRawMethodAbsolutePath (
-  IN      CONST AML_NODE_HEADER   * ParentNode,
-  IN      CONST AML_STREAM        * PathnameFStream,
-  IN  OUT       AML_STREAM        * AbsolutePathBStream
+  IN      CONST AML_NODE_HEADER  *ParentNode,
+  IN      CONST AML_STREAM       *PathnameFStream,
+  IN  OUT       AML_STREAM       *AbsolutePathBStream
   )
 {
-  EFI_STATUS          Status;
+  EFI_STATUS  Status;
 
-  AML_NODE_HEADER   * NamedParentNode;
-  UINT8             * RawPathBuffer;
-  CONST CHAR8       * CurrPos;
+  AML_NODE_HEADER  *NamedParentNode;
+  UINT8            *RawPathBuffer;
+  CONST CHAR8      *CurrPos;
 
-  UINT32              Root;
-  UINT32              ParentPrefix;
-  UINT32              SegCount;
+  UINT32  Root;
+  UINT32  ParentPrefix;
+  UINT32  SegCount;
 
   if ((!IS_AML_OBJECT_NODE (ParentNode)         &&
        !IS_AML_ROOT_NODE (ParentNode))          ||
@@ -402,12 +408,13 @@ AmlBuildRawMethodAbsolutePath (
       !IS_STREAM_FORWARD (PathnameFStream)      ||
       !IS_STREAM (AbsolutePathBStream)          ||
       IS_END_OF_STREAM (AbsolutePathBStream)    ||
-      !IS_STREAM_BACKWARD (AbsolutePathBStream)) {
+      !IS_STREAM_BACKWARD (AbsolutePathBStream))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  CurrPos = (CONST CHAR8*)AmlStreamGetCurrPos (PathnameFStream);
+  CurrPos = (CONST CHAR8 *)AmlStreamGetCurrPos (PathnameFStream);
   if (CurrPos == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -428,11 +435,11 @@ AmlBuildRawMethodAbsolutePath (
   // Copy the method invocation raw relative path at the end of the Stream.
   if (SegCount != 0) {
     // Get the beginning of the raw NameString.
-    RawPathBuffer = (UINT8*)AmlGetFirstNameSeg (
-                              CurrPos,
-                              Root,
-                              ParentPrefix
-                              );
+    RawPathBuffer = (UINT8 *)AmlGetFirstNameSeg (
+                               CurrPos,
+                               Root,
+                               ParentPrefix
+                               );
 
     Status = AmlStreamWrite (
                AbsolutePathBStream,
@@ -487,19 +494,19 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCompareRawNameString (
-  IN  CONST AML_STREAM    * RawFStream1,
-  IN  CONST AML_STREAM    * RawFStream2,
-  OUT       UINT32        * CompareCount
+  IN  CONST AML_STREAM  *RawFStream1,
+  IN  CONST AML_STREAM  *RawFStream2,
+  OUT       UINT32      *CompareCount
   )
 {
-  EFI_STATUS    Status;
-  UINT32        Index;
+  EFI_STATUS  Status;
+  UINT32      Index;
 
-  AML_STREAM    RawFStream1Clone;
-  AML_STREAM    RawFStream2Clone;
-  UINT32        Stream1Size;
-  UINT32        Stream2Size;
-  UINT32        CompareLen;
+  AML_STREAM  RawFStream1Clone;
+  AML_STREAM  RawFStream2Clone;
+  UINT32      Stream1Size;
+  UINT32      Stream2Size;
+  UINT32      CompareLen;
 
   // Raw NameStrings have a size that is a multiple of the size of NameSegs.
   if (!IS_STREAM (RawFStream1)          ||
@@ -507,7 +514,8 @@ AmlCompareRawNameString (
       !IS_STREAM_FORWARD (RawFStream1)  ||
       !IS_STREAM (RawFStream2)          ||
       IS_END_OF_STREAM (RawFStream2)    ||
-      (CompareCount == NULL)) {
+      (CompareCount == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -537,14 +545,16 @@ AmlCompareRawNameString (
   }
 
   CompareLen = MIN (Stream1Size, Stream2Size);
-  Index = 0;
+  Index      = 0;
   // Check there is enough space for a NameSeg in both Stream1 and Stream2.
   while (Index < CompareLen) {
     if (!AmlStreamCmp (
            &RawFStream1Clone,
            &RawFStream2Clone,
-           AML_NAME_SEG_SIZE)
-           ) {
+           AML_NAME_SEG_SIZE
+           )
+        )
+    {
       // NameSegs are different. Break.
       break;
     }
@@ -554,6 +564,7 @@ AmlCompareRawNameString (
       ASSERT (0);
       return Status;
     }
+
     Status = AmlStreamProgress (&RawFStream2Clone, AML_NAME_SEG_SIZE);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
@@ -599,28 +610,29 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlResolveAliasMethod (
-  IN  CONST AML_OBJECT_NODE           * AliasNode,
-  IN  CONST LIST_ENTRY                * NameSpaceRefList,
-  OUT       AML_NAMESPACE_REF_NODE   ** OutNameSpaceRefNode
+  IN  CONST AML_OBJECT_NODE         *AliasNode,
+  IN  CONST LIST_ENTRY              *NameSpaceRefList,
+  OUT       AML_NAMESPACE_REF_NODE  **OutNameSpaceRefNode
   )
 {
-  EFI_STATUS              Status;
-  AML_STREAM              SourceAliasFStream;
-  CONST AML_DATA_NODE   * DataNode;
+  EFI_STATUS           Status;
+  AML_STREAM           SourceAliasFStream;
+  CONST AML_DATA_NODE  *DataNode;
 
   if (!AmlNodeCompareOpCode (AliasNode, AML_ALIAS_OP, 0)  ||
       (NameSpaceRefList == NULL)                          ||
-      (OutNameSpaceRefNode == NULL)) {
+      (OutNameSpaceRefNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   // The aliased NameString (the source name) is the first fixed argument,
   // cf. ACPI6.3 spec, s19.6.4: Alias (SourceObject, AliasObject)
-  DataNode = (CONST AML_DATA_NODE*)AmlGetFixedArgument (
-                                     (AML_OBJECT_NODE*)AliasNode,
-                                     EAmlParseIndexTerm0
-                                     );
+  DataNode = (CONST AML_DATA_NODE *)AmlGetFixedArgument (
+                                      (AML_OBJECT_NODE *)AliasNode,
+                                      EAmlParseIndexTerm0
+                                      );
   if (DataNode == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -641,7 +653,7 @@ AmlResolveAliasMethod (
   // Recursively check whether the source alias NameString
   // is a method invocation.
   Status = AmlIsMethodInvocation (
-             AmlGetParent ((AML_NODE_HEADER*)AliasNode),
+             AmlGetParent ((AML_NODE_HEADER *)AliasNode),
              &SourceAliasFStream,
              NameSpaceRefList,
              OutNameSpaceRefNode
@@ -710,27 +722,27 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlFindMethodDefinition (
-  IN  CONST AML_STREAM                * RawAbsolutePathFStream,
-  IN  CONST AML_STREAM                * RawPathNameBStream,
-  IN  CONST LIST_ENTRY                * NameSpaceRefList,
-  OUT       AML_NAMESPACE_REF_NODE   ** OutNameSpaceRefNode
+  IN  CONST AML_STREAM              *RawAbsolutePathFStream,
+  IN  CONST AML_STREAM              *RawPathNameBStream,
+  IN  CONST LIST_ENTRY              *NameSpaceRefList,
+  OUT       AML_NAMESPACE_REF_NODE  **OutNameSpaceRefNode
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
-  LIST_ENTRY              * NextLink;
+  LIST_ENTRY  *NextLink;
 
   // To resolve a pathname, scope levels need to be compared.
-  UINT32                    NameSegScopeCount;
-  UINT32                    PathNameSegScopeCount;
-  UINT32                    ProbedScopeCount;
-  UINT32                    BestScopeCount;
+  UINT32  NameSegScopeCount;
+  UINT32  PathNameSegScopeCount;
+  UINT32  ProbedScopeCount;
+  UINT32  BestScopeCount;
 
-  AML_STREAM                ProbedRawAbsoluteFStream;
-  AML_STREAM                ProbedRawAbsoluteBStream;
+  AML_STREAM  ProbedRawAbsoluteFStream;
+  AML_STREAM  ProbedRawAbsoluteBStream;
 
-  AML_NAMESPACE_REF_NODE  * ProbedNameSpaceRefNode;
-  AML_NAMESPACE_REF_NODE  * BestNameSpaceRefNode;
+  AML_NAMESPACE_REF_NODE  *ProbedNameSpaceRefNode;
+  AML_NAMESPACE_REF_NODE  *BestNameSpaceRefNode;
 
   if (!IS_STREAM (RawAbsolutePathFStream)                               ||
       IS_END_OF_STREAM (RawAbsolutePathFStream)                         ||
@@ -743,7 +755,8 @@ AmlFindMethodDefinition (
       ((AmlStreamGetIndex (RawPathNameBStream) &
         (AML_NAME_SEG_SIZE - 1)) != 0)                                  ||
       (NameSpaceRefList == NULL)                                        ||
-      (OutNameSpaceRefNode == NULL)) {
+      (OutNameSpaceRefNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -751,21 +764,21 @@ AmlFindMethodDefinition (
   DEBUG ((DEBUG_VERBOSE, "AmlMethodParser: Checking absolute name: "));
   AMLDBG_PRINT_CHARS (
     DEBUG_VERBOSE,
-    (CONST CHAR8*)AmlStreamGetCurrPos (RawAbsolutePathFStream),
+    (CONST CHAR8 *)AmlStreamGetCurrPos (RawAbsolutePathFStream),
     AmlStreamGetMaxBufferSize (RawAbsolutePathFStream)
     );
   DEBUG ((DEBUG_VERBOSE, ".\n"));
 
-  BestNameSpaceRefNode = NULL;
-  BestScopeCount = 0;
-  NameSegScopeCount = AmlStreamGetMaxBufferSize (RawAbsolutePathFStream);
+  BestNameSpaceRefNode  = NULL;
+  BestScopeCount        = 0;
+  NameSegScopeCount     = AmlStreamGetMaxBufferSize (RawAbsolutePathFStream);
   PathNameSegScopeCount = AmlStreamGetMaxBufferSize (RawPathNameBStream);
 
   // Iterate through the raw AML absolute path to find the best match.
   DEBUG ((DEBUG_VERBOSE, "AmlMethodParser: Comparing with: "));
   NextLink = NameSpaceRefList->ForwardLink;
   while (NextLink != NameSpaceRefList) {
-    ProbedNameSpaceRefNode = (AML_NAMESPACE_REF_NODE*)NextLink;
+    ProbedNameSpaceRefNode = (AML_NAMESPACE_REF_NODE *)NextLink;
 
     // Print the raw absolute path of the probed node.
     AMLDBG_PRINT_CHARS (
@@ -790,7 +803,7 @@ AmlFindMethodDefinition (
     //      "MET0" should be skipped.
     Status = AmlStreamInit (
                &ProbedRawAbsoluteBStream,
-               (UINT8*)ProbedNameSpaceRefNode->RawAbsolutePath,
+               (UINT8 *)ProbedNameSpaceRefNode->RawAbsolutePath,
                ProbedNameSpaceRefNode->RawAbsolutePathSize,
                EAmlStreamDirectionBackward
                );
@@ -803,7 +816,9 @@ AmlFindMethodDefinition (
     if (!AmlStreamCmp (
            RawPathNameBStream,
            &ProbedRawAbsoluteBStream,
-           AmlStreamGetMaxBufferSize (RawPathNameBStream))) {
+           AmlStreamGetMaxBufferSize (RawPathNameBStream)
+           ))
+    {
       NextLink = NextLink->ForwardLink;
       continue;
     }
@@ -820,7 +835,7 @@ AmlFindMethodDefinition (
     //       Thus, the best match is \AAAA.MET0.
     Status = AmlStreamInit (
                &ProbedRawAbsoluteFStream,
-               (UINT8*)ProbedNameSpaceRefNode->RawAbsolutePath,
+               (UINT8 *)ProbedNameSpaceRefNode->RawAbsolutePath,
                ProbedNameSpaceRefNode->RawAbsolutePathSize,
                EAmlStreamDirectionForward
                );
@@ -847,7 +862,7 @@ AmlFindMethodDefinition (
     } else if (ProbedScopeCount > BestScopeCount) {
       // The probed node has more scope levels in common than the
       // last best match. Update the best match.
-      BestScopeCount = ProbedScopeCount;
+      BestScopeCount       = ProbedScopeCount;
       BestNameSpaceRefNode = ProbedNameSpaceRefNode;
     } else if (ProbedScopeCount == BestScopeCount) {
       // The probed node has the same number of scope levels in
@@ -871,11 +886,13 @@ AmlFindMethodDefinition (
         //       didn't because it is out of scope.
         //       Thus, the best match is \AAAA.MET0.
         if (AmlStreamGetIndex (&ProbedRawAbsoluteFStream) <
-              BestNameSpaceRefNode->RawAbsolutePathSize) {
-          BestScopeCount = ProbedScopeCount;
+            BestNameSpaceRefNode->RawAbsolutePathSize)
+        {
+          BestScopeCount       = ProbedScopeCount;
           BestNameSpaceRefNode = ProbedNameSpaceRefNode;
         } else if (AmlStreamGetIndex (&ProbedRawAbsoluteFStream) ==
-                     BestNameSpaceRefNode->RawAbsolutePathSize) {
+                   BestNameSpaceRefNode->RawAbsolutePathSize)
+        {
           ASSERT (0);
           return EFI_INVALID_PARAMETER;
         }
@@ -893,7 +910,10 @@ AmlFindMethodDefinition (
       *OutNameSpaceRefNode = BestNameSpaceRefNode;
     } else if (AmlNodeCompareOpCode (
                  BestNameSpaceRefNode->NodeRef,
-                 AML_ALIAS_OP, 0)) {
+                 AML_ALIAS_OP,
+                 0
+                 ))
+    {
       // The path matches an alias. Resolve the alias and check whether
       // this is a method defintion.
       Status = AmlResolveAliasMethod (
@@ -943,22 +963,22 @@ AmlFindMethodDefinition (
 EFI_STATUS
 EFIAPI
 AmlIsMethodInvocation (
-  IN  CONST AML_NODE_HEADER     * ParentNode,
-  IN  CONST AML_STREAM          * FStream,
-  IN  CONST LIST_ENTRY          * NameSpaceRefList,
-  OUT AML_NAMESPACE_REF_NODE   ** OutNameSpaceRefNode
+  IN  CONST AML_NODE_HEADER   *ParentNode,
+  IN  CONST AML_STREAM        *FStream,
+  IN  CONST LIST_ENTRY        *NameSpaceRefList,
+  OUT AML_NAMESPACE_REF_NODE  **OutNameSpaceRefNode
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
-  AML_STREAM                RawPathNameBStream;
-  AML_STREAM                RawAbsolutePathFStream;
+  AML_STREAM  RawPathNameBStream;
+  AML_STREAM  RawAbsolutePathFStream;
 
-  AML_STREAM                RawAbsolutePathBStream;
-  UINT8                   * RawAbsolutePathBuffer;
-  UINT32                    RawAbsolutePathBufferSize;
+  AML_STREAM  RawAbsolutePathBStream;
+  UINT8       *RawAbsolutePathBuffer;
+  UINT32      RawAbsolutePathBufferSize;
 
-  AML_NAMESPACE_REF_NODE  * NameSpaceRefNode;
+  AML_NAMESPACE_REF_NODE  *NameSpaceRefNode;
 
   if ((!IS_AML_OBJECT_NODE (ParentNode) &&
        !IS_AML_ROOT_NODE (ParentNode))  ||
@@ -966,22 +986,25 @@ AmlIsMethodInvocation (
       IS_END_OF_STREAM (FStream)        ||
       !IS_STREAM_FORWARD (FStream)      ||
       (NameSpaceRefList == NULL)        ||
-      (OutNameSpaceRefNode == NULL)) {
+      (OutNameSpaceRefNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   // There cannot be a method invocation in a field list. Return.
   if (AmlNodeHasAttribute (
-        (CONST AML_OBJECT_NODE*)ParentNode,
-        AML_HAS_FIELD_LIST)) {
+        (CONST AML_OBJECT_NODE *)ParentNode,
+        AML_HAS_FIELD_LIST
+        ))
+  {
     *OutNameSpaceRefNode = NULL;
     return EFI_SUCCESS;
   }
 
   // Allocate memory for the raw absolute path.
   RawAbsolutePathBufferSize = MAX_AML_NAMESTRING_SIZE;
-  RawAbsolutePathBuffer = AllocateZeroPool (RawAbsolutePathBufferSize);
+  RawAbsolutePathBuffer     = AllocateZeroPool (RawAbsolutePathBufferSize);
   if (RawAbsolutePathBuffer == NULL) {
     ASSERT (0);
     return EFI_OUT_OF_RESOURCES;
@@ -1018,7 +1041,7 @@ AmlIsMethodInvocation (
       "Root node cannot be a method invocation\n"
       ));
     *OutNameSpaceRefNode = NULL;
-    Status = EFI_SUCCESS;
+    Status               = EFI_SUCCESS;
     goto exit_handler;
   }
 
@@ -1049,18 +1072,18 @@ AmlIsMethodInvocation (
   // Go through the NameSpaceRefList elements to check for
   // a corresponding method definition.
   NameSpaceRefNode = NULL;
-  Status = AmlFindMethodDefinition (
-             &RawAbsolutePathFStream,
-             &RawPathNameBStream,
-             NameSpaceRefList,
-             &NameSpaceRefNode
-             );
+  Status           = AmlFindMethodDefinition (
+                       &RawAbsolutePathFStream,
+                       &RawPathNameBStream,
+                       NameSpaceRefList,
+                       &NameSpaceRefNode
+                       );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto exit_handler;
   }
 
-#if !defined(MDEPKG_NDEBUG)
+ #if !defined (MDEPKG_NDEBUG)
   // Print whether a method definition has been found.
   if (NameSpaceRefNode != NULL) {
     DEBUG ((
@@ -1073,11 +1096,11 @@ AmlIsMethodInvocation (
       NameSpaceRefNode->RawAbsolutePathSize
       );
     DEBUG ((DEBUG_VERBOSE, ".\n"));
-
   } else {
     DEBUG ((DEBUG_VERBOSE, "AmlMethodParser: No method definition found.\n"));
   }
-#endif // MDEPKG_NDEBUG
+
+ #endif // MDEPKG_NDEBUG
 
   *OutNameSpaceRefNode = NameSpaceRefNode;
 
@@ -1105,27 +1128,28 @@ exit_handler:
 EFI_STATUS
 EFIAPI
 AmlAddNameSpaceReference (
-  IN      CONST AML_OBJECT_NODE   * Node,
-  IN  OUT       LIST_ENTRY        * NameSpaceRefList
+  IN      CONST AML_OBJECT_NODE  *Node,
+  IN  OUT       LIST_ENTRY       *NameSpaceRefList
   )
 {
-  EFI_STATUS                Status;
-  AML_NAMESPACE_REF_NODE  * NameSpaceRefNode;
+  EFI_STATUS              Status;
+  AML_NAMESPACE_REF_NODE  *NameSpaceRefNode;
 
-  AML_STREAM                NodeNameFStream;
-  EAML_PARSE_INDEX          NameIndex;
-  CONST AML_DATA_NODE     * NameNode;
+  AML_STREAM           NodeNameFStream;
+  EAML_PARSE_INDEX     NameIndex;
+  CONST AML_DATA_NODE  *NameNode;
 
-  AML_STREAM                RawAbsolutePathBStream;
-  UINT32                    RawAbsolutePathBStreamSize;
+  AML_STREAM  RawAbsolutePathBStream;
+  UINT32      RawAbsolutePathBStreamSize;
 
-  CHAR8                   * AbsolutePathBuffer;
-  UINT32                    AbsolutePathBufferSize;
+  CHAR8   *AbsolutePathBuffer;
+  UINT32  AbsolutePathBufferSize;
 
-  CONST AML_NODE_HEADER   * ParentNode;
+  CONST AML_NODE_HEADER  *ParentNode;
 
   if (!AmlNodeHasAttribute (Node, AML_IN_NAMESPACE)   ||
-      (NameSpaceRefList == NULL)) {
+      (NameSpaceRefList == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -1133,7 +1157,7 @@ AmlAddNameSpaceReference (
   // Allocate a buffer to get the raw AML absolute pathname of the
   // namespace node.
   AbsolutePathBufferSize = MAX_AML_NAMESTRING_SIZE;
-  AbsolutePathBuffer = AllocateZeroPool (AbsolutePathBufferSize);
+  AbsolutePathBuffer     = AllocateZeroPool (AbsolutePathBufferSize);
   if (AbsolutePathBuffer == NULL) {
     ASSERT (0);
     return EFI_OUT_OF_RESOURCES;
@@ -1141,7 +1165,7 @@ AmlAddNameSpaceReference (
 
   Status = AmlStreamInit (
              &RawAbsolutePathBStream,
-             (UINT8*)AbsolutePathBuffer,
+             (UINT8 *)AbsolutePathBuffer,
              AbsolutePathBufferSize,
              EAmlStreamDirectionBackward
              );
@@ -1161,12 +1185,13 @@ AmlAddNameSpaceReference (
   }
 
   // Get the Node name.
-  NameNode = (CONST AML_DATA_NODE*)AmlGetFixedArgument (
-                                     (AML_OBJECT_NODE*)Node,
-                                     NameIndex
-                                     );
+  NameNode = (CONST AML_DATA_NODE *)AmlGetFixedArgument (
+                                      (AML_OBJECT_NODE *)Node,
+                                      NameIndex
+                                      );
   if (!IS_AML_DATA_NODE (NameNode)    ||
-      (NameNode->DataType != EAmlNodeDataTypeNameString)) {
+      (NameNode->DataType != EAmlNodeDataTypeNameString))
+  {
     ASSERT (0);
     Status = EFI_INVALID_PARAMETER;
     goto exit_handler;
@@ -1186,7 +1211,7 @@ AmlAddNameSpaceReference (
     goto exit_handler;
   }
 
-  ParentNode = AmlGetParent ((AML_NODE_HEADER*)Node);
+  ParentNode = AmlGetParent ((AML_NODE_HEADER *)Node);
   if (ParentNode == NULL) {
     ASSERT (0);
     Status = EFI_INVALID_PARAMETER;
@@ -1214,7 +1239,7 @@ AmlAddNameSpaceReference (
   // Create a NameSpace reference node.
   Status = AmlCreateMethodRefNode (
              Node,
-             (CONST CHAR8*)AmlStreamGetCurrPos (&RawAbsolutePathBStream),
+             (CONST CHAR8 *)AmlStreamGetCurrPos (&RawAbsolutePathBStream),
              RawAbsolutePathBStreamSize,
              &NameSpaceRefNode
              );
@@ -1232,7 +1257,7 @@ AmlAddNameSpaceReference (
     ));
   AMLDBG_PRINT_CHARS (
     DEBUG_VERBOSE,
-    (CONST CHAR8*)AmlStreamGetCurrPos (&RawAbsolutePathBStream),
+    (CONST CHAR8 *)AmlStreamGetCurrPos (&RawAbsolutePathBStream),
     AmlStreamGetIndex (&RawAbsolutePathBStream)
     );
   DEBUG ((DEBUG_VERBOSE, "\n"));
@@ -1275,31 +1300,32 @@ exit_handler:
 EFI_STATUS
 EFIAPI
 AmlCreateMethodInvocationNode (
-  IN  CONST AML_NAMESPACE_REF_NODE   * NameSpaceRefNode,
-  IN        AML_DATA_NODE            * MethodInvocationName,
-  OUT       AML_OBJECT_NODE         ** MethodInvocationNodePtr
+  IN  CONST AML_NAMESPACE_REF_NODE  *NameSpaceRefNode,
+  IN        AML_DATA_NODE           *MethodInvocationName,
+  OUT       AML_OBJECT_NODE         **MethodInvocationNodePtr
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
-  UINT8                 ArgCount;
-  AML_DATA_NODE       * ArgCountNode;
-  AML_NODE_HEADER    ** FixedArgs;
-  AML_OBJECT_NODE     * MethodDefinitionNode;
-  AML_OBJECT_NODE     * MethodInvocationNode;
+  UINT8            ArgCount;
+  AML_DATA_NODE    *ArgCountNode;
+  AML_NODE_HEADER  **FixedArgs;
+  AML_OBJECT_NODE  *MethodDefinitionNode;
+  AML_OBJECT_NODE  *MethodInvocationNode;
 
   if ((NameSpaceRefNode == NULL)                                      ||
       !AmlIsMethodDefinitionNode (NameSpaceRefNode->NodeRef)          ||
       !IS_AML_DATA_NODE (MethodInvocationName)                        ||
       (MethodInvocationName->DataType != EAmlNodeDataTypeNameString)  ||
-      (MethodInvocationNodePtr == NULL)) {
+      (MethodInvocationNodePtr == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   // Get the number of arguments of the method.
-  MethodDefinitionNode = (AML_OBJECT_NODE*)NameSpaceRefNode->NodeRef;
-  FixedArgs = MethodDefinitionNode->FixedArgs;
+  MethodDefinitionNode = (AML_OBJECT_NODE *)NameSpaceRefNode->NodeRef;
+  FixedArgs            = MethodDefinitionNode->FixedArgs;
   // The method definition is an actual method definition.
   if (AmlNodeCompareOpCode (MethodDefinitionNode, AML_METHOD_OP, 0)) {
     // Cf ACPI 6.3 specification:
@@ -1312,8 +1338,8 @@ AmlCreateMethodInvocationNode (
     //                           bit 4-7: SyncLevel (0x00-0x0f)
 
     // Read the MethodFlags to decode the ArgCount.
-    ArgCountNode = (AML_DATA_NODE*)FixedArgs[EAmlParseIndexTerm1];
-    ArgCount = *((UINT8*)ArgCountNode->Buffer) & 0x7;
+    ArgCountNode = (AML_DATA_NODE *)FixedArgs[EAmlParseIndexTerm1];
+    ArgCount     = *((UINT8 *)ArgCountNode->Buffer) & 0x7;
   } else if (AmlNodeCompareOpCode (MethodDefinitionNode, AML_EXTERNAL_OP, 0)) {
     // The method definition is an external statement.
     // Cf ACPI 6.3 specification:
@@ -1323,8 +1349,8 @@ AmlCreateMethodInvocationNode (
     //  ArgumentCount := ByteData (0 - 7)
 
     // Read the ArgumentCount.
-    ArgCountNode = (AML_DATA_NODE*)FixedArgs[EAmlParseIndexTerm2];
-    ArgCount = *((UINT8*)ArgCountNode->Buffer);
+    ArgCountNode = (AML_DATA_NODE *)FixedArgs[EAmlParseIndexTerm2];
+    ArgCount     = *((UINT8 *)ArgCountNode->Buffer);
   } else {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -1349,7 +1375,7 @@ AmlCreateMethodInvocationNode (
   Status = AmlSetFixedArgument (
              MethodInvocationNode,
              EAmlParseIndexTerm0,
-             (AML_NODE_HEADER*)MethodInvocationName
+             (AML_NODE_HEADER *)MethodInvocationName
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -1359,12 +1385,12 @@ AmlCreateMethodInvocationNode (
   // Create a data node holding the number of arguments
   // of the method invocation.
   ArgCountNode = NULL;
-  Status = AmlCreateDataNode (
-             EAmlNodeDataTypeUInt,
-             &ArgCount,
-             sizeof (UINT8),
-             &ArgCountNode
-             );
+  Status       = AmlCreateDataNode (
+                   EAmlNodeDataTypeUInt,
+                   &ArgCount,
+                   sizeof (UINT8),
+                   &ArgCountNode
+                   );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto error_handler;
@@ -1372,10 +1398,10 @@ AmlCreateMethodInvocationNode (
 
   // The second fixed argument is the number of arguments.
   Status = AmlSetFixedArgument (
-              MethodInvocationNode,
-              EAmlParseIndexTerm1,
-              (AML_NODE_HEADER*)ArgCountNode
-              );
+             MethodInvocationNode,
+             EAmlParseIndexTerm1,
+             (AML_NODE_HEADER *)ArgCountNode
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto error_handler;
@@ -1386,9 +1412,9 @@ AmlCreateMethodInvocationNode (
 
 error_handler:
   // Delete the sub-tree: the method invocation name is already attached.
-  AmlDeleteTree ((AML_NODE_HEADER*)MethodInvocationNode);
+  AmlDeleteTree ((AML_NODE_HEADER *)MethodInvocationNode);
   if (ArgCountNode != NULL) {
-    AmlDeleteNode ((AML_NODE_HEADER*)ArgCountNode);
+    AmlDeleteNode ((AML_NODE_HEADER *)ArgCountNode);
   }
 
   return Status;
@@ -1415,16 +1441,17 @@ error_handler:
 EFI_STATUS
 EFIAPI
 AmlGetMethodInvocationArgCount (
-  IN  CONST AML_OBJECT_NODE   * MethodInvocationNode,
-  OUT       BOOLEAN           * IsMethodInvocation,
-  OUT       UINT8             * ArgCount
+  IN  CONST AML_OBJECT_NODE  *MethodInvocationNode,
+  OUT       BOOLEAN          *IsMethodInvocation,
+  OUT       UINT8            *ArgCount
   )
 {
-  AML_DATA_NODE   * NumArgsNode;
+  AML_DATA_NODE  *NumArgsNode;
 
   if (!IS_AML_NODE_VALID (MethodInvocationNode) ||
       (IsMethodInvocation == NULL)              ||
-      (ArgCount == NULL)) {
+      (ArgCount == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -1432,7 +1459,7 @@ AmlGetMethodInvocationArgCount (
   // Check whether MethodInvocationNode is a method invocation.
   if (!AmlNodeCompareOpCode (MethodInvocationNode, AML_METHOD_INVOC_OP, 0)) {
     *IsMethodInvocation = FALSE;
-    *ArgCount = 0;
+    *ArgCount           = 0;
     return EFI_SUCCESS;
   }
 
@@ -1440,17 +1467,19 @@ AmlGetMethodInvocationArgCount (
   // MethodInvocationOp := Pseudo Opcode for Method Invocation
   // NameString := Method Name
   // ArgumentCount := ByteData (0 - 7)
-  NumArgsNode = (AML_DATA_NODE*)AmlGetFixedArgument (
-                                  (AML_OBJECT_NODE*)MethodInvocationNode,
-                                  EAmlParseIndexTerm1
-                                  );
+  NumArgsNode = (AML_DATA_NODE *)AmlGetFixedArgument (
+                                   (AML_OBJECT_NODE *)MethodInvocationNode,
+                                   EAmlParseIndexTerm1
+                                   );
   if (!IS_AML_NODE_VALID (NumArgsNode)                ||
       (NumArgsNode->Buffer == NULL)                   ||
       (NumArgsNode->DataType != EAmlNodeDataTypeUInt) ||
-      (NumArgsNode->Size != 1)) {
+      (NumArgsNode->Size != 1))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
   *ArgCount = *NumArgsNode->Buffer;
 
   *IsMethodInvocation = TRUE;

@@ -69,9 +69,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseStream (
-  IN      AML_NODE_HEADER   * Node,
-  IN  OUT AML_STREAM        * FStream,
-  IN  OUT LIST_ENTRY        * NameSpaceRefList
+  IN      AML_NODE_HEADER  *Node,
+  IN  OUT AML_STREAM       *FStream,
+  IN  OUT LIST_ENTRY       *NameSpaceRefList
   );
 
 /** Function pointer to parse an AML construct.
@@ -102,10 +102,10 @@ typedef
 EFI_STATUS
 EFIAPI
 (*AML_PARSE_FUNCTION) (
-  IN      CONST AML_NODE_HEADER     * Node,
-  IN            AML_PARSE_FORMAT      ExpectedFormat,
-  IN  OUT       AML_STREAM          * FStream,
-      OUT       AML_NODE_HEADER    ** OutNode
+  IN      CONST AML_NODE_HEADER   *Node,
+  IN            AML_PARSE_FORMAT  ExpectedFormat,
+  IN  OUT       AML_STREAM        *FStream,
+  OUT       AML_NODE_HEADER       **OutNode
   );
 
 /** Parse a UInt<X> (where X=8, 16, 32 or 64).
@@ -130,14 +130,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseUIntX (
-  IN      CONST AML_NODE_HEADER     * ParentNode,
-  IN            AML_PARSE_FORMAT      ExpectedFormat,
-  IN  OUT       AML_STREAM          * FStream,
-      OUT       AML_NODE_HEADER    ** OutNode
+  IN      CONST AML_NODE_HEADER   *ParentNode,
+  IN            AML_PARSE_FORMAT  ExpectedFormat,
+  IN  OUT       AML_STREAM        *FStream,
+  OUT       AML_NODE_HEADER       **OutNode
   )
 {
-  EFI_STATUS    Status;
-  UINT32        UIntXSize;
+  EFI_STATUS  Status;
+  UINT32      UIntXSize;
 
   if ((!IS_AML_ROOT_NODE (ParentNode)       &&
        !IS_AML_OBJECT_NODE (ParentNode))    ||
@@ -148,34 +148,35 @@ AmlParseUIntX (
       !IS_STREAM (FStream)                  ||
       IS_END_OF_STREAM (FStream)            ||
       !IS_STREAM_FORWARD (FStream)          ||
-      (OutNode == NULL)) {
+      (OutNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   switch (ExpectedFormat) {
-  case EAmlUInt8:
-    UIntXSize = 1;
-    break;
-  case EAmlUInt16:
-    UIntXSize = 2;
-    break;
-  case EAmlUInt32:
-    UIntXSize = 4;
-    break;
-  case EAmlUInt64:
-    UIntXSize = 8;
-    break;
-  default:
-    ASSERT (0);
-    return EFI_INVALID_PARAMETER;
+    case EAmlUInt8:
+      UIntXSize = 1;
+      break;
+    case EAmlUInt16:
+      UIntXSize = 2;
+      break;
+    case EAmlUInt32:
+      UIntXSize = 4;
+      break;
+    case EAmlUInt64:
+      UIntXSize = 8;
+      break;
+    default:
+      ASSERT (0);
+      return EFI_INVALID_PARAMETER;
   }
 
   Status = AmlCreateDataNode (
              AmlTypeToNodeDataType (ExpectedFormat),
              AmlStreamGetCurrPos (FStream),
              UIntXSize,
-             (AML_DATA_NODE**)OutNode
+             (AML_DATA_NODE **)OutNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -216,17 +217,17 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseNameString (
-  IN      CONST AML_NODE_HEADER     * ParentNode,
-  IN            AML_PARSE_FORMAT      ExpectedFormat,
-  IN  OUT       AML_STREAM          * FStream,
-      OUT       AML_NODE_HEADER    ** OutNode
+  IN      CONST AML_NODE_HEADER   *ParentNode,
+  IN            AML_PARSE_FORMAT  ExpectedFormat,
+  IN  OUT       AML_STREAM        *FStream,
+  OUT       AML_NODE_HEADER       **OutNode
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
-  CONST UINT8               * Buffer;
-  CONST AML_BYTE_ENCODING   * ByteEncoding;
-  UINT32                      StrSize;
+  CONST UINT8              *Buffer;
+  CONST AML_BYTE_ENCODING  *ByteEncoding;
+  UINT32                   StrSize;
 
   if ((!IS_AML_ROOT_NODE (ParentNode)     &&
        !IS_AML_OBJECT_NODE (ParentNode))  ||
@@ -234,23 +235,26 @@ AmlParseNameString (
       !IS_STREAM (FStream)                ||
       IS_END_OF_STREAM (FStream)          ||
       !IS_STREAM_FORWARD (FStream)        ||
-      (OutNode == NULL)) {
+      (OutNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  Buffer = (CONST UINT8*)AmlStreamGetCurrPos (FStream);
+  Buffer       = (CONST UINT8 *)AmlStreamGetCurrPos (FStream);
   ByteEncoding = AmlGetByteEncoding (Buffer);
   if ((ByteEncoding == NULL)    ||
-      ((ByteEncoding->Attribute & AML_IS_NAME_CHAR) == 0)) {
+      ((ByteEncoding->Attribute & AML_IS_NAME_CHAR) == 0))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   // Parse the NameString.
-  Status = AmlGetNameStringSize ((CONST CHAR8*)Buffer, &StrSize);
+  Status = AmlGetNameStringSize ((CONST CHAR8 *)Buffer, &StrSize);
   if ((EFI_ERROR (Status))  ||
-      (StrSize > AmlStreamGetFreeSpace (FStream))) {
+      (StrSize > AmlStreamGetFreeSpace (FStream)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -259,7 +263,7 @@ AmlParseNameString (
              EAmlNodeDataTypeNameString,
              Buffer,
              StrSize,
-             (AML_DATA_NODE**)OutNode
+             (AML_DATA_NODE **)OutNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -300,16 +304,16 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseString (
-  IN      CONST AML_NODE_HEADER     * ParentNode,
-  IN            AML_PARSE_FORMAT      ExpectedFormat,
-  IN  OUT       AML_STREAM          * FStream,
-      OUT       AML_NODE_HEADER    ** OutNode
+  IN      CONST AML_NODE_HEADER   *ParentNode,
+  IN            AML_PARSE_FORMAT  ExpectedFormat,
+  IN  OUT       AML_STREAM        *FStream,
+  OUT       AML_NODE_HEADER       **OutNode
   )
 {
-  EFI_STATUS      Status;
-  UINT32          StrSize;
-  UINT8           Byte;
-  CONST UINT8   * Buffer;
+  EFI_STATUS   Status;
+  UINT32       StrSize;
+  UINT8        Byte;
+  CONST UINT8  *Buffer;
 
   if ((!IS_AML_ROOT_NODE (ParentNode)     &&
        !IS_AML_OBJECT_NODE (ParentNode))  ||
@@ -317,12 +321,13 @@ AmlParseString (
       !IS_STREAM (FStream)                ||
       IS_END_OF_STREAM (FStream)          ||
       !IS_STREAM_FORWARD (FStream)        ||
-      (OutNode == NULL)) {
+      (OutNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  Buffer = (CONST UINT8*)AmlStreamGetCurrPos (FStream);
+  Buffer  = (CONST UINT8 *)AmlStreamGetCurrPos (FStream);
   StrSize = 0;
   // AML String is NULL terminated.
   do {
@@ -332,6 +337,7 @@ AmlParseString (
       ASSERT (0);
       return Status;
     }
+
     StrSize++;
   } while (Byte != '\0');
 
@@ -341,7 +347,7 @@ AmlParseString (
              AmlTypeToNodeDataType (ExpectedFormat),
              Buffer,
              StrSize,
-             (AML_DATA_NODE**)OutNode
+             (AML_DATA_NODE **)OutNode
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -372,21 +378,21 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseObject (
-  IN      CONST AML_NODE_HEADER     * ParentNode,
-  IN            AML_PARSE_FORMAT      ExpectedFormat,
-  IN  OUT       AML_STREAM          * FStream,
-      OUT       AML_NODE_HEADER    ** OutNode
+  IN      CONST AML_NODE_HEADER   *ParentNode,
+  IN            AML_PARSE_FORMAT  ExpectedFormat,
+  IN  OUT       AML_STREAM        *FStream,
+  OUT       AML_NODE_HEADER       **OutNode
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
-  UINT8                       OpCodeSize;
-  UINT32                      PkgLength;
-  UINT32                      PkgOffset;
-  UINT32                      FreeSpace;
+  UINT8   OpCodeSize;
+  UINT32  PkgLength;
+  UINT32  PkgOffset;
+  UINT32  FreeSpace;
 
-  CONST AML_BYTE_ENCODING   * AmlByteEncoding;
-  CONST UINT8               * Buffer;
+  CONST AML_BYTE_ENCODING  *AmlByteEncoding;
+  CONST UINT8              *Buffer;
 
   if ((!IS_AML_ROOT_NODE (ParentNode)     &&
        !IS_AML_OBJECT_NODE (ParentNode))  ||
@@ -394,7 +400,8 @@ AmlParseObject (
       !IS_STREAM (FStream)                ||
       IS_END_OF_STREAM (FStream)          ||
       !IS_STREAM_FORWARD (FStream)        ||
-      (OutNode == NULL)) {
+      (OutNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -424,16 +431,18 @@ AmlParseObject (
     if (EFI_ERROR (Status)) {
       ASSERT (0);
     }
+
     return Status;
   }
 
   // 2. Determine the OpCode size to move the stream forward.
-  Buffer = (CONST UINT8*)AmlStreamGetCurrPos (FStream);
+  Buffer = (CONST UINT8 *)AmlStreamGetCurrPos (FStream);
   if (*Buffer == AML_EXT_OP) {
     OpCodeSize = 2;
   } else {
     OpCodeSize = 1;
   }
+
   Status = AmlStreamProgress (FStream, OpCodeSize);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -446,7 +455,7 @@ AmlParseObject (
   if (!IS_END_OF_STREAM (FStream)) {
     // 3. Parse the PkgLength field, if present.
     if ((AmlByteEncoding->Attribute & AML_HAS_PKG_LENGTH) != 0) {
-      Buffer = (CONST UINT8*)AmlStreamGetCurrPos (FStream);
+      Buffer    = (CONST UINT8 *)AmlStreamGetCurrPos (FStream);
       PkgOffset = AmlGetPkgLength (Buffer, &PkgLength);
       if (PkgOffset == 0) {
         ASSERT (0);
@@ -482,7 +491,7 @@ AmlParseObject (
   Status = AmlCreateObjectNode (
              AmlByteEncoding,
              PkgLength,
-             (AML_OBJECT_NODE**)OutNode
+             (AML_OBJECT_NODE **)OutNode
              );
   ASSERT_EFI_ERROR (Status);
 
@@ -513,32 +522,33 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseFieldPkgLen (
-  IN      CONST AML_NODE_HEADER     * ParentNode,
-  IN            AML_PARSE_FORMAT      ExpectedFormat,
-  IN  OUT       AML_STREAM          * FStream,
-      OUT       AML_NODE_HEADER    ** OutNode
+  IN      CONST AML_NODE_HEADER   *ParentNode,
+  IN            AML_PARSE_FORMAT  ExpectedFormat,
+  IN  OUT       AML_STREAM        *FStream,
+  OUT       AML_NODE_HEADER       **OutNode
   )
 {
-  EFI_STATUS      Status;
-  EFI_STATUS      Status1;
-  CONST UINT8   * Buffer;
-  UINT32          PkgOffset;
-  UINT32          PkgLength;
+  EFI_STATUS   Status;
+  EFI_STATUS   Status1;
+  CONST UINT8  *Buffer;
+  UINT32       PkgOffset;
+  UINT32       PkgLength;
 
   if (!AmlNodeHasAttribute (
-         (CONST AML_OBJECT_NODE*)ParentNode,
+         (CONST AML_OBJECT_NODE *)ParentNode,
          AML_IS_FIELD_ELEMENT
          )                                ||
       (ExpectedFormat != EAmlFieldPkgLen) ||
       !IS_STREAM (FStream)                ||
       IS_END_OF_STREAM (FStream)          ||
       !IS_STREAM_FORWARD (FStream)        ||
-      (OutNode == NULL)) {
+      (OutNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  Buffer = (CONST UINT8*)AmlStreamGetCurrPos (FStream);
+  Buffer = (CONST UINT8 *)AmlStreamGetCurrPos (FStream);
 
   PkgOffset = AmlGetPkgLength (Buffer, &PkgLength);
   if (PkgOffset == 0) {
@@ -552,7 +562,7 @@ AmlParseFieldPkgLen (
              AmlTypeToNodeDataType (ExpectedFormat),
              Buffer,
              PkgOffset,
-             (AML_DATA_NODE**)OutNode
+             (AML_DATA_NODE **)OutNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -577,7 +587,7 @@ AmlParseFieldPkgLen (
   statements. The AML_PARSE_FORMAT enum definition lists these constructs
   and the corresponding parsing functions.
 */
-AML_PARSE_FUNCTION mParseType[EAmlParseFormatMax] = {
+AML_PARSE_FUNCTION  mParseType[EAmlParseFormatMax] = {
   NULL,                    // EAmlNone
   AmlParseUIntX,           // EAmlUInt8
   AmlParseUIntX,           // EAmlUInt16
@@ -611,23 +621,24 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCheckAndParseMethodInvoc (
-  IN  CONST AML_NODE_HEADER     * ParentNode,
-  IN        AML_DATA_NODE       * DataNode,
-  IN  OUT   LIST_ENTRY          * NameSpaceRefList,
-      OUT   AML_OBJECT_NODE    ** OutNode
+  IN  CONST AML_NODE_HEADER  *ParentNode,
+  IN        AML_DATA_NODE    *DataNode,
+  IN  OUT   LIST_ENTRY       *NameSpaceRefList,
+  OUT   AML_OBJECT_NODE      **OutNode
   )
 {
-  EFI_STATUS                Status;
-  AML_NAMESPACE_REF_NODE  * NameSpaceRefNode;
-  AML_OBJECT_NODE         * MethodInvocationNode;
-  AML_STREAM                FStream;
+  EFI_STATUS              Status;
+  AML_NAMESPACE_REF_NODE  *NameSpaceRefNode;
+  AML_OBJECT_NODE         *MethodInvocationNode;
+  AML_STREAM              FStream;
 
   if ((!IS_AML_ROOT_NODE (ParentNode)                     &&
        !IS_AML_OBJECT_NODE (ParentNode))                  ||
       !IS_AML_DATA_NODE (DataNode)                        ||
       (DataNode->DataType != EAmlNodeDataTypeNameString)  ||
       (NameSpaceRefList == NULL)                          ||
-      (OutNode == NULL)) {
+      (OutNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -646,12 +657,12 @@ AmlCheckAndParseMethodInvoc (
 
   // Check whether the NameString is a method invocation.
   NameSpaceRefNode = NULL;
-  Status = AmlIsMethodInvocation (
-              ParentNode,
-              &FStream,
-              NameSpaceRefList,
-              &NameSpaceRefNode
-              );
+  Status           = AmlIsMethodInvocation (
+                       ParentNode,
+                       &FStream,
+                       NameSpaceRefList,
+                       &NameSpaceRefNode
+                       );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -663,7 +674,7 @@ AmlCheckAndParseMethodInvoc (
     // Create a method invocation node.
     Status = AmlCreateMethodInvocationNode (
                NameSpaceRefNode,
-               (AML_DATA_NODE*)DataNode,
+               (AML_DATA_NODE *)DataNode,
                &MethodInvocationNode
                );
     if (EFI_ERROR (Status)) {
@@ -701,17 +712,17 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseArgument (
-  IN      CONST AML_NODE_HEADER     * ParentNode,
-  IN            AML_PARSE_FORMAT      ExpectedFormat,
-  IN  OUT       AML_STREAM          * FStream,
-  IN  OUT       LIST_ENTRY          * NameSpaceRefList,
-      OUT       AML_NODE_HEADER    ** OutNode
+  IN      CONST AML_NODE_HEADER   *ParentNode,
+  IN            AML_PARSE_FORMAT  ExpectedFormat,
+  IN  OUT       AML_STREAM        *FStream,
+  IN  OUT       LIST_ENTRY        *NameSpaceRefList,
+  OUT       AML_NODE_HEADER       **OutNode
   )
 {
-  EFI_STATUS                Status;
-  AML_PARSE_FUNCTION        ParsingFunction;
-  AML_DATA_NODE           * DataNode;
-  AML_OBJECT_NODE         * MethodInvocationNode;
+  EFI_STATUS          Status;
+  AML_PARSE_FUNCTION  ParsingFunction;
+  AML_DATA_NODE       *DataNode;
+  AML_OBJECT_NODE     *MethodInvocationNode;
 
   if ((!IS_AML_ROOT_NODE (ParentNode)         &&
        !IS_AML_OBJECT_NODE (ParentNode))      ||
@@ -720,7 +731,8 @@ AmlParseArgument (
       IS_END_OF_STREAM (FStream)              ||
       !IS_STREAM_FORWARD (FStream)            ||
       (NameSpaceRefList == NULL)              ||
-      (OutNode == NULL)) {
+      (OutNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -746,15 +758,17 @@ AmlParseArgument (
 
   // Check whether the parsed argument is a NameString when an object
   // is expected. In such case, it could be a method invocation.
-  DataNode = (AML_DATA_NODE*)*OutNode;
+  DataNode = (AML_DATA_NODE *)*OutNode;
   if (IS_AML_DATA_NODE (DataNode)                         &&
       (DataNode->DataType == EAmlNodeDataTypeNameString)  &&
-      (ExpectedFormat == EAmlObject)) {
+      (ExpectedFormat == EAmlObject))
+  {
     Status = AmlCheckAndParseMethodInvoc (
                ParentNode,
-               (AML_DATA_NODE*)*OutNode,
+               (AML_DATA_NODE *)*OutNode,
                NameSpaceRefList,
-               &MethodInvocationNode);
+               &MethodInvocationNode
+               );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
@@ -764,7 +778,7 @@ AmlParseArgument (
     // the NameString has been attached to the MethodInvocationNode.
     // Replace the OutNode with the MethodInvocationNode.
     if (MethodInvocationNode != NULL) {
-      *OutNode = (AML_NODE_HEADER*)MethodInvocationNode;
+      *OutNode = (AML_NODE_HEADER *)MethodInvocationNode;
     }
   }
 
@@ -789,20 +803,21 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseByteList (
-  IN      AML_OBJECT_NODE   * BufferNode,
-  IN  OUT AML_STREAM        * FStream
+  IN      AML_OBJECT_NODE  *BufferNode,
+  IN  OUT AML_STREAM       *FStream
   )
 {
-  EFI_STATUS          Status;
-  AML_NODE_HEADER   * NewNode;
-  CONST UINT8       * Buffer;
-  UINT32              BufferSize;
+  EFI_STATUS       Status;
+  AML_NODE_HEADER  *NewNode;
+  CONST UINT8      *Buffer;
+  UINT32           BufferSize;
 
   // Check whether the node is an Object Node and has byte list.
   if (!AmlNodeHasAttribute (BufferNode, AML_HAS_BYTE_LIST)  ||
       !IS_STREAM (FStream)                                  ||
       IS_END_OF_STREAM (FStream)                            ||
-      !IS_STREAM_FORWARD (FStream)) {
+      !IS_STREAM_FORWARD (FStream))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -820,14 +835,14 @@ AmlParseByteList (
     // Create a single node holding the whole buffer data.
 
     // CreateDataNode checks the Buffer and BufferSize values.
-    Buffer = (CONST UINT8*)AmlStreamGetCurrPos (FStream);
+    Buffer     = (CONST UINT8 *)AmlStreamGetCurrPos (FStream);
     BufferSize = AmlStreamGetFreeSpace (FStream);
 
     Status = AmlCreateDataNode (
                EAmlNodeDataTypeRaw,
                Buffer,
                BufferSize,
-               (AML_DATA_NODE**)&NewNode
+               (AML_DATA_NODE **)&NewNode
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
@@ -835,9 +850,9 @@ AmlParseByteList (
     }
 
     Status = AmlVarListAddTailInternal (
-                (AML_NODE_HEADER*)BufferNode,
-                NewNode
-                );
+               (AML_NODE_HEADER *)BufferNode,
+               NewNode
+               );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       AmlDeleteTree (NewNode);
@@ -877,19 +892,19 @@ AmlParseByteList (
 EFI_STATUS
 EFIAPI
 AmlParseFixedArguments (
-  IN  AML_OBJECT_NODE   * ObjectNode,
-  IN  AML_STREAM        * FStream,
-  IN  LIST_ENTRY        * NameSpaceRefList
+  IN  AML_OBJECT_NODE  *ObjectNode,
+  IN  AML_STREAM       *FStream,
+  IN  LIST_ENTRY       *NameSpaceRefList
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
-  AML_NODE_HEADER         * FixedArgNode;
-  AML_STREAM                FixedArgFStream;
+  AML_NODE_HEADER  *FixedArgNode;
+  AML_STREAM       FixedArgFStream;
 
-  EAML_PARSE_INDEX          TermIndex;
-  EAML_PARSE_INDEX          MaxIndex;
-  CONST AML_PARSE_FORMAT  * Format;
+  EAML_PARSE_INDEX        TermIndex;
+  EAML_PARSE_INDEX        MaxIndex;
+  CONST AML_PARSE_FORMAT  *Format;
 
   // Fixed arguments of method invocations node are handled differently.
   if (!IS_AML_OBJECT_NODE (ObjectNode)                              ||
@@ -897,17 +912,19 @@ AmlParseFixedArguments (
       !IS_STREAM (FStream)                                          ||
       IS_END_OF_STREAM (FStream)                                    ||
       !IS_STREAM_FORWARD (FStream)                                  ||
-      (NameSpaceRefList == NULL)) {
+      (NameSpaceRefList == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   TermIndex = EAmlParseIndexTerm0;
-  MaxIndex = (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (
-                                 (AML_OBJECT_NODE*)ObjectNode
-                                 );
+  MaxIndex  = (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (
+                                  (AML_OBJECT_NODE *)ObjectNode
+                                  );
   if ((ObjectNode->AmlByteEncoding != NULL)   &&
-      (ObjectNode->AmlByteEncoding->Format != NULL)) {
+      (ObjectNode->AmlByteEncoding->Format != NULL))
+  {
     Format = ObjectNode->AmlByteEncoding->Format;
   } else {
     ASSERT (0);
@@ -917,7 +934,8 @@ AmlParseFixedArguments (
   // Parse all the FixedArgs.
   while ((TermIndex < MaxIndex)       &&
          !IS_END_OF_STREAM (FStream)  &&
-         (Format[TermIndex] != EAmlNone)) {
+         (Format[TermIndex] != EAmlNone))
+  {
     // Initialize a FixedArgStream to parse the current fixed argument.
     Status = AmlStreamInitSubStream (FStream, &FixedArgFStream);
     if (EFI_ERROR (Status)) {
@@ -927,7 +945,7 @@ AmlParseFixedArguments (
 
     // Parse the current fixed argument.
     Status = AmlParseArgument (
-               (CONST AML_NODE_HEADER*)ObjectNode,
+               (CONST AML_NODE_HEADER *)ObjectNode,
                Format[TermIndex],
                &FixedArgFStream,
                NameSpaceRefList,
@@ -941,7 +959,7 @@ AmlParseFixedArguments (
     // Add the fixed argument to the parent node's fixed argument list.
     // FixedArgNode can be an object or data node.
     Status = AmlSetFixedArgument (
-               (AML_OBJECT_NODE*)ObjectNode,
+               (AML_OBJECT_NODE *)ObjectNode,
                TermIndex,
                FixedArgNode
                );
@@ -957,7 +975,8 @@ AmlParseFixedArguments (
 
     // Parse the AML bytecode of the FixedArgNode if this is an object node.
     if (IS_AML_OBJECT_NODE (FixedArgNode) &&
-        !IS_END_OF_STREAM (&FixedArgFStream)) {
+        !IS_END_OF_STREAM (&FixedArgFStream))
+    {
       Status = AmlParseStream (
                  FixedArgNode,
                  &FixedArgFStream,
@@ -1011,34 +1030,35 @@ AmlParseFixedArguments (
 EFI_STATUS
 EFIAPI
 AmlParseVariableArguments (
-  IN  AML_NODE_HEADER   * Node,
-  IN  AML_STREAM        * FStream,
-  IN  LIST_ENTRY        * NameSpaceRefList
+  IN  AML_NODE_HEADER  *Node,
+  IN  AML_STREAM       *FStream,
+  IN  LIST_ENTRY       *NameSpaceRefList
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
-  BOOLEAN                   IsMethodInvocation;
-  UINT8                     MethodInvocationArgCount;
+  BOOLEAN  IsMethodInvocation;
+  UINT8    MethodInvocationArgCount;
 
-  AML_NODE_HEADER         * VarArgNode;
-  AML_STREAM                VarArgFStream;
+  AML_NODE_HEADER  *VarArgNode;
+  AML_STREAM       VarArgFStream;
 
   if ((!AmlNodeHasAttribute (
-          (CONST AML_OBJECT_NODE*)Node,
+          (CONST AML_OBJECT_NODE *)Node,
           AML_HAS_CHILD_OBJ
           ) &&
        !IS_AML_ROOT_NODE (Node))        ||
       !IS_STREAM (FStream)              ||
       IS_END_OF_STREAM (FStream)        ||
       !IS_STREAM_FORWARD (FStream)      ||
-      (NameSpaceRefList == NULL)) {
+      (NameSpaceRefList == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   Status = AmlGetMethodInvocationArgCount (
-             (CONST AML_OBJECT_NODE*)Node,
+             (CONST AML_OBJECT_NODE *)Node,
              &IsMethodInvocation,
              &MethodInvocationArgCount
              );
@@ -1077,7 +1097,7 @@ AmlParseVariableArguments (
     // Add the variable argument to its parent variable list of arguments.
     // VarArgNode can be an object or data node.
     Status = AmlVarListAddTailInternal (
-               (AML_NODE_HEADER*)Node,
+               (AML_NODE_HEADER *)Node,
                VarArgNode
                );
     if (EFI_ERROR (Status)) {
@@ -1092,7 +1112,8 @@ AmlParseVariableArguments (
 
     // Parse the AML bytecode of the VarArgNode if this is an object node.
     if (IS_AML_OBJECT_NODE (VarArgNode)       &&
-        (!IS_END_OF_STREAM (&VarArgFStream))) {
+        (!IS_END_OF_STREAM (&VarArgFStream)))
+    {
       Status = AmlParseStream (VarArgNode, &VarArgFStream, NameSpaceRefList);
       if (EFI_ERROR (Status)) {
         ASSERT (0);
@@ -1139,25 +1160,26 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlPopulateRootNode (
-  IN      AML_ROOT_NODE     * RootNode,
-  IN  OUT AML_STREAM        * FStream,
-  IN  OUT LIST_ENTRY        * NameSpaceRefList
+  IN      AML_ROOT_NODE  *RootNode,
+  IN  OUT AML_STREAM     *FStream,
+  IN  OUT LIST_ENTRY     *NameSpaceRefList
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS  Status;
 
   if (!IS_AML_ROOT_NODE (RootNode)  ||
       !IS_STREAM (FStream)          ||
       IS_END_OF_STREAM (FStream)    ||
       !IS_STREAM_FORWARD (FStream)  ||
-      (NameSpaceRefList == NULL)) {
+      (NameSpaceRefList == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   // A Root Node only has variable arguments.
   Status = AmlParseVariableArguments (
-             (AML_NODE_HEADER*)RootNode,
+             (AML_NODE_HEADER *)RootNode,
              FStream,
              NameSpaceRefList
              );
@@ -1184,18 +1206,19 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlPopulateObjectNode (
-  IN      AML_OBJECT_NODE   * ObjectNode,
-  IN  OUT AML_STREAM        * FStream,
-  IN  OUT LIST_ENTRY        * NameSpaceRefList
+  IN      AML_OBJECT_NODE  *ObjectNode,
+  IN  OUT AML_STREAM       *FStream,
+  IN  OUT LIST_ENTRY       *NameSpaceRefList
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS  Status;
 
   if (!IS_AML_OBJECT_NODE (ObjectNode)  ||
       !IS_STREAM (FStream)              ||
       IS_END_OF_STREAM (FStream)        ||
       !IS_STREAM_FORWARD (FStream)      ||
-      (NameSpaceRefList == NULL)) {
+      (NameSpaceRefList == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -1230,10 +1253,12 @@ AmlPopulateObjectNode (
   // This allows to identify method invocations from other namespace
   // paths. Method invocation need to be parsed differently.
   if (AmlNodeHasAttribute (
-         (CONST AML_OBJECT_NODE*)ObjectNode,
-         AML_IN_NAMESPACE)) {
+        (CONST AML_OBJECT_NODE *)ObjectNode,
+        AML_IN_NAMESPACE
+        ))
+  {
     Status = AmlAddNameSpaceReference (
-               (CONST AML_OBJECT_NODE*)ObjectNode,
+               (CONST AML_OBJECT_NODE *)ObjectNode,
                NameSpaceRefList
                );
     if (EFI_ERROR (Status)) {
@@ -1246,23 +1271,23 @@ AmlPopulateObjectNode (
     // Parse the variable list of arguments if present.
     if (AmlNodeHasAttribute (ObjectNode, AML_HAS_CHILD_OBJ)) {
       Status = AmlParseVariableArguments (
-                (AML_NODE_HEADER*)ObjectNode,
-                FStream,
-                NameSpaceRefList
-                );
+                 (AML_NODE_HEADER *)ObjectNode,
+                 FStream,
+                 NameSpaceRefList
+                 );
     } else if (AmlNodeHasAttribute (ObjectNode, AML_HAS_BYTE_LIST)) {
       // Parse the byte list if present.
       Status = AmlParseByteList (
-                ObjectNode,
-                FStream
-                );
+                 ObjectNode,
+                 FStream
+                 );
     } else if (AmlNodeHasAttribute (ObjectNode, AML_HAS_FIELD_LIST)) {
       // Parse the field list if present.
       Status = AmlParseFieldList (
-                ObjectNode,
-                FStream,
-                NameSpaceRefList
-                );
+                 ObjectNode,
+                 FStream,
+                 NameSpaceRefList
+                 );
     }
 
     // Check status and assert
@@ -1292,33 +1317,31 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseStream (
-  IN  AML_NODE_HEADER   * Node,
-  IN  AML_STREAM        * FStream,
-  IN  LIST_ENTRY        * NameSpaceRefList
+  IN  AML_NODE_HEADER  *Node,
+  IN  AML_STREAM       *FStream,
+  IN  LIST_ENTRY       *NameSpaceRefList
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if (IS_AML_ROOT_NODE (Node)) {
     Status = AmlPopulateRootNode (
-               (AML_ROOT_NODE*)Node,
+               (AML_ROOT_NODE *)Node,
                FStream,
                NameSpaceRefList
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
     }
-
   } else if (IS_AML_OBJECT_NODE (Node)) {
     Status = AmlPopulateObjectNode (
-               (AML_OBJECT_NODE*)Node,
+               (AML_OBJECT_NODE *)Node,
                FStream,
                NameSpaceRefList
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
     }
-
   } else {
     // Data node or other.
     ASSERT (0);
@@ -1346,37 +1369,39 @@ AmlParseStream (
 EFI_STATUS
 EFIAPI
 AmlParseDefinitionBlock (
-  IN  CONST EFI_ACPI_DESCRIPTION_HEADER   * DefinitionBlock,
-  OUT       AML_ROOT_NODE                ** RootPtr
+  IN  CONST EFI_ACPI_DESCRIPTION_HEADER  *DefinitionBlock,
+  OUT       AML_ROOT_NODE                **RootPtr
   )
 {
-  EFI_STATUS              Status;
-  EFI_STATUS              Status1;
-  AML_STREAM              Stream;
-  AML_ROOT_NODE         * Root;
+  EFI_STATUS     Status;
+  EFI_STATUS     Status1;
+  AML_STREAM     Stream;
+  AML_ROOT_NODE  *Root;
 
-  LIST_ENTRY              NameSpaceRefList;
+  LIST_ENTRY  NameSpaceRefList;
 
-  UINT8                 * Buffer;
-  UINT32                  MaxBufferSize;
+  UINT8   *Buffer;
+  UINT32  MaxBufferSize;
 
   if ((DefinitionBlock == NULL)   ||
-      (RootPtr == NULL)) {
+      (RootPtr == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  Buffer = (UINT8*)DefinitionBlock + sizeof (EFI_ACPI_DESCRIPTION_HEADER);
+  Buffer = (UINT8 *)DefinitionBlock + sizeof (EFI_ACPI_DESCRIPTION_HEADER);
   if (DefinitionBlock->Length < sizeof (EFI_ACPI_DESCRIPTION_HEADER)) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
+
   MaxBufferSize = DefinitionBlock->Length -
-                    (UINT32)sizeof (EFI_ACPI_DESCRIPTION_HEADER);
+                  (UINT32)sizeof (EFI_ACPI_DESCRIPTION_HEADER);
 
   // Create a root node.
   Status = AmlCreateRootNode (
-             (EFI_ACPI_DESCRIPTION_HEADER*)DefinitionBlock,
+             (EFI_ACPI_DESCRIPTION_HEADER *)DefinitionBlock,
              &Root
              );
   if (EFI_ERROR (Status)) {
@@ -1408,7 +1433,7 @@ AmlParseDefinitionBlock (
 
   // Parse the whole AML blob.
   Status = AmlParseStream (
-             (AML_NODE_HEADER*)Root,
+             (AML_NODE_HEADER *)Root,
              &Stream,
              &NameSpaceRefList
              );
@@ -1432,7 +1457,7 @@ AmlParseDefinitionBlock (
 
 error_handler:
   if (Root != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER*)Root);
+    AmlDeleteTree ((AML_NODE_HEADER *)Root);
   }
 
 exit_handler:

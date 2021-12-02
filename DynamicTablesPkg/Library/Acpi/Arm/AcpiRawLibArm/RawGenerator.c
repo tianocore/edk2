@@ -38,10 +38,10 @@ STATIC
 EFI_STATUS
 EFIAPI
 BuildRawTable (
-  IN  CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
   ASSERT (This != NULL);
@@ -63,13 +63,13 @@ BuildRawTable (
 
 /** This macro defines the Raw Generator revision.
 */
-#define RAW_GENERATOR_REVISION CREATE_REVISION (1, 0)
+#define RAW_GENERATOR_REVISION  CREATE_REVISION (1, 0)
 
 /** The interface for the Raw Table Generator.
 */
 STATIC
 CONST
-ACPI_TABLE_GENERATOR RawGenerator = {
+ACPI_TABLE_GENERATOR  RawGenerator = {
   // Generator ID
   CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdRaw),
   // Generator Description
@@ -109,11 +109,12 @@ ACPI_TABLE_GENERATOR RawGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiRawLibConstructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = RegisterAcpiTableGenerator (&RawGenerator);
   DEBUG ((DEBUG_INFO, "RAW: Register Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);
@@ -132,11 +133,12 @@ AcpiRawLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiRawLibDestructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = DeregisterAcpiTableGenerator (&RawGenerator);
   DEBUG ((DEBUG_INFO, "RAW: Deregister Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);
