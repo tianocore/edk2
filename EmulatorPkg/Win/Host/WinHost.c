@@ -247,7 +247,7 @@ EfiSystemMemoryRange (
 
 EFI_STATUS
 WinNtOpenFile (
-  IN  CHAR16                    *FileName,            OPTIONAL
+  IN  CHAR16                    *FileName             OPTIONAL,
   IN  UINT32                    MapSize,
   IN  DWORD                     CreationDisposition,
   IN OUT  VOID                  **BaseAddress,
