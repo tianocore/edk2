@@ -241,7 +241,7 @@ IsValidCapsuleHeader (
 EFI_STATUS
 ValidateFmpCapsule (
   IN EFI_CAPSULE_HEADER *CapsuleHeader,
-  OUT BOOLEAN           *IsSystemFmp, OPTIONAL
+  OUT BOOLEAN           *IsSystemFmp  OPTIONAL,
   OUT UINT16            *EmbeddedDriverCount OPTIONAL
   )
 {
