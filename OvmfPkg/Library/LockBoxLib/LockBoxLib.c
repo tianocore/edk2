@@ -291,7 +291,7 @@ RETURN_STATUS
 EFIAPI
 RestoreLockBox (
   IN  GUID                        *Guid,
-  IN  VOID                        *Buffer, OPTIONAL
+  IN  VOID                        *Buffer  OPTIONAL,
   IN  OUT UINTN                   *Length  OPTIONAL
   )
 {

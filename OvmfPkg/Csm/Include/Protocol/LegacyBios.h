@@ -1200,8 +1200,8 @@ EFI_STATUS
 (EFIAPI *EFI_LEGACY_BIOS_CHECK_ROM)(
   IN  EFI_LEGACY_BIOS_PROTOCOL  *This,
   IN  EFI_HANDLE                PciHandle,
-  OUT VOID                      **RomImage, OPTIONAL
-  OUT UINTN                     *RomSize, OPTIONAL
+  OUT VOID                      **RomImage  OPTIONAL,
+  OUT UINTN                     *RomSize  OPTIONAL,
   OUT UINTN                     *Flags
   );
 
@@ -1239,9 +1239,9 @@ EFI_STATUS
   IN  EFI_HANDLE                PciHandle,
   IN  VOID                      **RomImage,
   OUT UINTN                     *Flags,
-  OUT UINT8                     *DiskStart, OPTIONAL
-  OUT UINT8                     *DiskEnd, OPTIONAL
-  OUT VOID                      **RomShadowAddress, OPTIONAL
+  OUT UINT8                     *DiskStart  OPTIONAL,
+  OUT UINT8                     *DiskEnd  OPTIONAL,
+  OUT VOID                      **RomShadowAddress  OPTIONAL,
   OUT UINT32                    *ShadowedRomSize OPTIONAL
   );
 

@@ -52,9 +52,9 @@ EDKII_IOMMU_PROTOCOL                *mIoMmu;
 EFI_STATUS
 GetShadowedRomParameters (
   IN EFI_HANDLE                         PciHandle,
-  OUT UINT8                             *DiskStart,         OPTIONAL
-  OUT UINT8                             *DiskEnd,           OPTIONAL
-  OUT VOID                              **RomShadowAddress, OPTIONAL
+  OUT UINT8                             *DiskStart          OPTIONAL,
+  OUT UINT8                             *DiskEnd            OPTIONAL,
+  OUT VOID                              **RomShadowAddress  OPTIONAL,
   OUT UINTN                             *ShadowedSize       OPTIONAL
   )
 {
@@ -276,8 +276,8 @@ GetPciLegacyRom (
   IN     UINT16 DeviceId,
   IN OUT VOID   **Rom,
   IN OUT UINTN  *ImageSize,
-  OUT    UINTN  *MaxRuntimeImageLength,   OPTIONAL
-  OUT    UINT8  *OpRomRevision,           OPTIONAL
+  OUT    UINTN  *MaxRuntimeImageLength    OPTIONAL,
+  OUT    UINT8  *OpRomRevision            OPTIONAL,
   OUT    VOID   **ConfigUtilityCodeHeader OPTIONAL
   )
 {
@@ -1814,8 +1814,8 @@ EFIAPI
 LegacyBiosCheckPciRom (
   IN EFI_LEGACY_BIOS_PROTOCOL           *This,
   IN  EFI_HANDLE                        PciHandle,
-  OUT VOID                              **RomImage, OPTIONAL
-  OUT UINTN                             *RomSize, OPTIONAL
+  OUT VOID                              **RomImage  OPTIONAL,
+  OUT UINTN                             *RomSize  OPTIONAL,
   OUT UINTN                             *Flags
   )
 {
@@ -1856,11 +1856,11 @@ EFI_STATUS
 LegacyBiosCheckPciRomEx (
   IN EFI_LEGACY_BIOS_PROTOCOL           *This,
   IN  EFI_HANDLE                        PciHandle,
-  OUT VOID                              **RomImage, OPTIONAL
-  OUT UINTN                             *RomSize, OPTIONAL
-  OUT UINTN                             *RuntimeImageLength, OPTIONAL
-  OUT UINTN                             *Flags, OPTIONAL
-  OUT UINT8                             *OpromRevision, OPTIONAL
+  OUT VOID                              **RomImage  OPTIONAL,
+  OUT UINTN                             *RomSize  OPTIONAL,
+  OUT UINTN                             *RuntimeImageLength  OPTIONAL,
+  OUT UINTN                             *Flags  OPTIONAL,
+  OUT UINT8                             *OpromRevision  OPTIONAL,
   OUT VOID                              **ConfigUtilityCodeHeader OPTIONAL
   )
 {
@@ -2256,8 +2256,8 @@ LegacyBiosInstallRom (
   IN VOID                               *RomImage,
   IN UINTN                              ImageSize,
   IN OUT UINTN                          *RuntimeImageLength,
-  OUT UINT8                             *DiskStart, OPTIONAL
-  OUT UINT8                             *DiskEnd, OPTIONAL
+  OUT UINT8                             *DiskStart  OPTIONAL,
+  OUT UINT8                             *DiskEnd  OPTIONAL,
   OUT VOID                              **RomShadowAddress OPTIONAL
   )
 {
@@ -2791,9 +2791,9 @@ LegacyBiosInstallPciRom (
   IN  EFI_HANDLE                        PciHandle,
   IN  VOID                              **RomImage,
   OUT UINTN                             *Flags,
-  OUT UINT8                             *DiskStart, OPTIONAL
-  OUT UINT8                             *DiskEnd, OPTIONAL
-  OUT VOID                              **RomShadowAddress, OPTIONAL
+  OUT UINT8                             *DiskStart  OPTIONAL,
+  OUT UINT8                             *DiskEnd  OPTIONAL,
+  OUT VOID                              **RomShadowAddress  OPTIONAL,
   OUT UINT32                            *RomShadowedSize OPTIONAL
   )
 {
@@ -3080,4 +3080,3 @@ LegacyBiosInstallPciRom (
   mVgaInstallationInProgress = FALSE;
   return Status;
 }
-

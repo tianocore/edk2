@@ -2249,7 +2249,7 @@ CopyVideoBuffer (
 EFI_STATUS
 BiosVideoVbeBltWorker (
   IN  BIOS_VIDEO_DEV                     *BiosVideoPrivate,
-  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer  OPTIONAL,
   IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
   IN  UINTN                              SourceX,
   IN  UINTN                              SourceY,
@@ -2518,7 +2518,7 @@ EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputVbeBlt (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
-  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer  OPTIONAL,
   IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
   IN  UINTN                              SourceX,
   IN  UINTN                              SourceY,
@@ -2740,7 +2740,7 @@ EFI_STATUS
 EFIAPI
 BiosVideoGraphicsOutputVgaBlt (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
-  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer  OPTIONAL,
   IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
   IN  UINTN                              SourceX,
   IN  UINTN                              SourceY,
@@ -3286,4 +3286,3 @@ BiosVideoEntryPoint(
                 NULL
                 );
 }
-
