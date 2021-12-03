@@ -63,7 +63,7 @@ MpInitLibInitialize (
 EFI_STATUS
 EFIAPI
 MpInitLibGetNumberOfProcessors (
-  OUT UINTN                     *NumberOfProcessors,       OPTIONAL
+  OUT UINTN                     *NumberOfProcessors        OPTIONAL,
   OUT UINTN                     *NumberOfEnabledProcessors OPTIONAL
   )
 {

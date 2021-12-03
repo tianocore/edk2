@@ -803,10 +803,10 @@ SetCpuFeaturesBitMask (
 RETURN_STATUS
 EFIAPI
 RegisterCpuFeature (
-  IN CHAR8                             *FeatureName,       OPTIONAL
-  IN CPU_FEATURE_GET_CONFIG_DATA       GetConfigDataFunc,  OPTIONAL
-  IN CPU_FEATURE_SUPPORT               SupportFunc,        OPTIONAL
-  IN CPU_FEATURE_INITIALIZE            InitializeFunc,     OPTIONAL
+  IN CHAR8                             *FeatureName        OPTIONAL,
+  IN CPU_FEATURE_GET_CONFIG_DATA       GetConfigDataFunc   OPTIONAL,
+  IN CPU_FEATURE_SUPPORT               SupportFunc         OPTIONAL,
+  IN CPU_FEATURE_INITIALIZE            InitializeFunc      OPTIONAL,
   ...
   )
 {
@@ -1288,4 +1288,3 @@ SwitchBspAfterFeaturesInitialize (
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuFeaturesData->BspNumber = ProcessorNumber;
 }
-
