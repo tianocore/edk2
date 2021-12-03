@@ -84,7 +84,7 @@ GetHashMaskFromAlgo (
 UINT32
 EFIAPI
 CopyAuthSessionCommand (
-  IN      TPMS_AUTH_COMMAND         *AuthSessionIn, OPTIONAL
+  IN      TPMS_AUTH_COMMAND         *AuthSessionIn  OPTIONAL,
   OUT     UINT8                     *AuthSessionOut
   )
 {
