@@ -135,7 +135,7 @@ DuplicateDevicePath (
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 AppendDevicePath (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *FirstDevicePath,  OPTIONAL
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *FirstDevicePath   OPTIONAL,
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *SecondDevicePath  OPTIONAL
   )
 {
@@ -177,7 +177,7 @@ AppendDevicePath (
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 AppendDevicePathNode (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath,     OPTIONAL
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath      OPTIONAL,
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode  OPTIONAL
   )
 {
@@ -214,7 +214,7 @@ AppendDevicePathNode (
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 AppendDevicePathInstance (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath,        OPTIONAL
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath         OPTIONAL,
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePathInstance OPTIONAL
   )
 {
@@ -475,4 +475,3 @@ ConvertTextToDevicePath (
 
   return UefiDevicePathLibConvertTextToDevicePath (TextDevicePath);
 }
-

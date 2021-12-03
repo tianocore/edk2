@@ -169,7 +169,7 @@ EfiCreateProtocolNotifyEvent(
   IN  EFI_GUID          *ProtocolGuid,
   IN  EFI_TPL           NotifyTpl,
   IN  EFI_EVENT_NOTIFY  NotifyFunction,
-  IN  VOID              *NotifyContext,  OPTIONAL
+  IN  VOID              *NotifyContext   OPTIONAL,
   OUT VOID              **Registration
   );
 
@@ -199,7 +199,7 @@ EfiNamedEventListen (
   IN CONST EFI_GUID    *Name,
   IN EFI_TPL           NotifyTpl,
   IN EFI_EVENT_NOTIFY  NotifyFunction,
-  IN CONST VOID        *NotifyContext,  OPTIONAL
+  IN CONST VOID        *NotifyContext   OPTIONAL,
   OUT VOID             *Registration OPTIONAL
   );
 
@@ -841,7 +841,7 @@ VOID
 EFIAPI
 CreatePopUp (
   IN  UINTN          Attribute,
-  OUT EFI_INPUT_KEY  *Key,      OPTIONAL
+  OUT EFI_INPUT_KEY  *Key       OPTIONAL,
   ...
   );
 
@@ -965,8 +965,8 @@ EFI_STATUS
 EFIAPI
 EfiCreateEventLegacyBootEx (
   IN  EFI_TPL           NotifyTpl,
-  IN  EFI_EVENT_NOTIFY  NotifyFunction,  OPTIONAL
-  IN  VOID              *NotifyContext,  OPTIONAL
+  IN  EFI_EVENT_NOTIFY  NotifyFunction   OPTIONAL,
+  IN  VOID              *NotifyContext   OPTIONAL,
   OUT EFI_EVENT         *LegacyBootEvent
   );
 
@@ -1016,8 +1016,8 @@ EFI_STATUS
 EFIAPI
 EfiCreateEventReadyToBootEx (
   IN  EFI_TPL           NotifyTpl,
-  IN  EFI_EVENT_NOTIFY  NotifyFunction,  OPTIONAL
-  IN  VOID              *NotifyContext,  OPTIONAL
+  IN  EFI_EVENT_NOTIFY  NotifyFunction   OPTIONAL,
+  IN  VOID              *NotifyContext   OPTIONAL,
   OUT EFI_EVENT         *ReadyToBootEvent
   );
 
@@ -1220,8 +1220,8 @@ EFIAPI
 PrintXY (
   IN UINTN                            PointX,
   IN UINTN                            PointY,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround  OPTIONAL,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround  OPTIONAL,
   IN CONST CHAR16                     *Format,
   ...
   );
@@ -1270,8 +1270,8 @@ EFIAPI
 AsciiPrintXY (
   IN UINTN                            PointX,
   IN UINTN                            PointY,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround  OPTIONAL,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround  OPTIONAL,
   IN CONST CHAR8                      *Format,
   ...
   );
@@ -1361,8 +1361,8 @@ EfiLibInstallAllDriverProtocols (
   IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
   IN EFI_HANDLE                               DriverBindingHandle,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName        OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration  OPTIONAL,
   IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics    OPTIONAL
   );
 
@@ -1387,8 +1387,8 @@ EFI_STATUS
 EFIAPI
 EfiLibUninstallAllDriverProtocols (
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName        OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration  OPTIONAL,
   IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics    OPTIONAL
   );
 
@@ -1423,7 +1423,7 @@ EfiLibInstallDriverBindingComponentName2 (
   IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
   IN EFI_HANDLE                               DriverBindingHandle,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName        OPTIONAL,
   IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2       OPTIONAL
   );
 
@@ -1446,7 +1446,7 @@ EFI_STATUS
 EFIAPI
 EfiLibUninstallDriverBindingComponentName2 (
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName        OPTIONAL,
   IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2       OPTIONAL
   );
 
@@ -1487,11 +1487,11 @@ EfiLibInstallAllDriverProtocols2 (
   IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
   IN EFI_HANDLE                               DriverBindingHandle,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,        OPTIONAL
-  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2,       OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration,  OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2, OPTIONAL
-  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,    OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName         OPTIONAL,
+  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2        OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration   OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2  OPTIONAL,
+  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics     OPTIONAL,
   IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2    OPTIONAL
   );
 
@@ -1520,11 +1520,11 @@ EFI_STATUS
 EFIAPI
 EfiLibUninstallAllDriverProtocols2 (
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,        OPTIONAL
-  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2,       OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration,  OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2, OPTIONAL
-  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,    OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName         OPTIONAL,
+  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2        OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration   OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2  OPTIONAL,
+  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics     OPTIONAL,
   IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2    OPTIONAL
   );
 
@@ -1553,7 +1553,7 @@ EfiLibUninstallAllDriverProtocols2 (
 CHAR16*
 EFIAPI
 CatVSPrint (
-  IN  CHAR16  *String, OPTIONAL
+  IN  CHAR16  *String  OPTIONAL,
   IN  CONST CHAR16  *FormatString,
   IN  VA_LIST       Marker
   );
@@ -1584,7 +1584,7 @@ CatVSPrint (
 CHAR16 *
 EFIAPI
 CatSPrint (
-  IN  CHAR16  *String, OPTIONAL
+  IN  CHAR16  *String  OPTIONAL,
   IN  CONST CHAR16  *FormatString,
   ...
   );

@@ -398,7 +398,7 @@ EFI_STATUS
 (EFIAPI *EFI_TLS_GET_SESSION_DATA) (
   IN EFI_TLS_PROTOCOL                *This,
   IN EFI_TLS_SESSION_DATA_TYPE       DataType,
-  IN OUT VOID                        *Data,  OPTIONAL
+  IN OUT VOID                        *Data   OPTIONAL,
   IN OUT UINTN                       *DataSize
   );
 
@@ -444,9 +444,9 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_TLS_BUILD_RESPONSE_PACKET) (
   IN EFI_TLS_PROTOCOL                *This,
-  IN UINT8                           *RequestBuffer, OPTIONAL
-  IN UINTN                           RequestSize, OPTIONAL
-  OUT UINT8                          *Buffer, OPTIONAL
+  IN UINT8                           *RequestBuffer  OPTIONAL,
+  IN UINTN                           RequestSize  OPTIONAL,
+  OUT UINT8                          *Buffer  OPTIONAL,
   IN OUT UINTN                       *BufferSize
   );
 
@@ -508,4 +508,3 @@ extern EFI_GUID gEfiTlsServiceBindingProtocolGuid;
 extern EFI_GUID gEfiTlsProtocolGuid;
 
 #endif  // __EFI_TLS_PROTOCOL_H__
-

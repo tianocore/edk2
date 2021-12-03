@@ -103,7 +103,7 @@ EFI_STATUS
 (EFIAPI *EFI_HII_DATABASE_NEW_PACK)(
   IN CONST  EFI_HII_DATABASE_PROTOCOL   *This,
   IN CONST  EFI_HII_PACKAGE_LIST_HEADER *PackageList,
-  IN        EFI_HANDLE                  DriverHandle, OPTIONAL
+  IN        EFI_HANDLE                  DriverHandle  OPTIONAL,
   OUT       EFI_HII_HANDLE               *Handle
 );
 
@@ -524,5 +524,3 @@ struct _EFI_HII_DATABASE_PROTOCOL {
 extern EFI_GUID gEfiHiiDatabaseProtocolGuid;
 
 #endif
-
-

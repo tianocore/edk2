@@ -76,7 +76,7 @@ EFI_STATUS
 EFIAPI
 HstiLibSetFeaturesVerified (
   IN UINT32                   Role,
-  IN CHAR16                   *ImplementationID, OPTIONAL
+  IN CHAR16                   *ImplementationID  OPTIONAL,
   IN UINT32                   ByteIndex,
   IN UINT8                    BitMask
   );
@@ -100,7 +100,7 @@ EFI_STATUS
 EFIAPI
 HstiLibClearFeaturesVerified (
   IN UINT32                   Role,
-  IN CHAR16                   *ImplementationID, OPTIONAL
+  IN CHAR16                   *ImplementationID  OPTIONAL,
   IN UINT32                   ByteIndex,
   IN UINT8                    BitMask
   );
@@ -123,7 +123,7 @@ EFI_STATUS
 EFIAPI
 HstiLibAppendErrorString (
   IN UINT32                   Role,
-  IN CHAR16                   *ImplementationID, OPTIONAL
+  IN CHAR16                   *ImplementationID  OPTIONAL,
   IN CHAR16                   *ErrorString
   );
 
@@ -145,7 +145,7 @@ EFI_STATUS
 EFIAPI
 HstiLibSetErrorString (
   IN UINT32                   Role,
-  IN CHAR16                   *ImplementationID, OPTIONAL
+  IN CHAR16                   *ImplementationID  OPTIONAL,
   IN CHAR16                   *ErrorString
   );
 

@@ -390,7 +390,7 @@ VOID
 EFIAPI
 CreatePopUp (
   IN  UINTN          Attribute,
-  OUT EFI_INPUT_KEY  *Key,      OPTIONAL
+  OUT EFI_INPUT_KEY  *Key       OPTIONAL,
   ...
   )
 {

@@ -707,7 +707,7 @@ EFI_STATUS
 typedef
 VOID
 (EFIAPI *PCD_PROTOCOL_CALLBACK)(
-  IN CONST EFI_GUID         *CallBackGuid, OPTIONAL
+  IN CONST EFI_GUID         *CallBackGuid  OPTIONAL,
   IN       UINTN            CallBackToken,
   IN OUT   VOID             *TokenData,
   IN       UINTN            TokenDataSize
@@ -730,7 +730,7 @@ VOID
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PROTOCOL_CALLBACK_ONSET)(
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid  OPTIONAL,
   IN  UINTN                   TokenNumber,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   );
@@ -752,7 +752,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PROTOCOL_CANCEL_CALLBACK)(
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid  OPTIONAL,
   IN  UINTN                   TokenNumber,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   );
@@ -788,7 +788,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PROTOCOL_GET_NEXT_TOKEN)(
-  IN      CONST EFI_GUID      *Guid, OPTIONAL
+  IN      CONST EFI_GUID      *Guid  OPTIONAL,
   IN OUT  UINTN               *TokenNumber
   );
 
