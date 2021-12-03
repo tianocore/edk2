@@ -72,9 +72,9 @@ EFI_STATUS
 EFIAPI
 TlsDoHandshake (
   IN     VOID                     *Tls,
-  IN     UINT8                    *BufferIn, OPTIONAL
-  IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
+  IN     UINT8                    *BufferIn  OPTIONAL,
+  IN     UINTN                    BufferInSize  OPTIONAL,
+     OUT UINT8                    *BufferOut  OPTIONAL,
   IN OUT UINTN                    *BufferOutSize
   )
 {
@@ -193,9 +193,9 @@ EFI_STATUS
 EFIAPI
 TlsHandleAlert (
   IN     VOID                     *Tls,
-  IN     UINT8                    *BufferIn, OPTIONAL
-  IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
+  IN     UINT8                    *BufferIn  OPTIONAL,
+  IN     UINTN                    BufferInSize  OPTIONAL,
+     OUT UINT8                    *BufferOut  OPTIONAL,
   IN OUT UINTN                    *BufferOutSize
   )
 {
@@ -454,4 +454,3 @@ TlsWrite (
   //
   return SSL_write (TlsConn->Ssl, Buffer, (UINT32) BufferSize);
 }
-

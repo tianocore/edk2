@@ -2638,7 +2638,7 @@ EFIAPI
 CryptoServiceX509GetCommonName (
   IN      CONST UINT8  *Cert,
   IN      UINTN        CertSize,
-  OUT     CHAR8        *CommonName,  OPTIONAL
+  OUT     CHAR8        *CommonName   OPTIONAL,
   IN OUT  UINTN        *CommonNameSize
   )
 {
@@ -2676,7 +2676,7 @@ EFIAPI
 CryptoServiceX509GetOrganizationName (
   IN      CONST UINT8   *Cert,
   IN      UINTN         CertSize,
-  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  OUT     CHAR8         *NameBuffer   OPTIONAL,
   IN OUT  UINTN         *NameBufferSize
   )
 {
@@ -2945,8 +2945,8 @@ CryptoServicePkcs1v2Encrypt (
   IN   UINTN        PublicKeySize,
   IN   UINT8        *InData,
   IN   UINTN        InDataSize,
-  IN   CONST UINT8  *PrngSeed,  OPTIONAL
-  IN   UINTN        PrngSeedSize,  OPTIONAL
+  IN   CONST UINT8  *PrngSeed   OPTIONAL,
+  IN   UINTN        PrngSeedSize   OPTIONAL,
   OUT  UINT8        **EncryptedData,
   OUT  UINTN        *EncryptedDataSize
   )
@@ -3697,9 +3697,9 @@ EFI_STATUS
 EFIAPI
 CryptoServiceTlsDoHandshake (
   IN     VOID                     *Tls,
-  IN     UINT8                    *BufferIn, OPTIONAL
-  IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
+  IN     UINT8                    *BufferIn  OPTIONAL,
+  IN     UINTN                    BufferInSize  OPTIONAL,
+     OUT UINT8                    *BufferOut  OPTIONAL,
   IN OUT UINTN                    *BufferOutSize
   )
 {
@@ -3735,9 +3735,9 @@ EFI_STATUS
 EFIAPI
 CryptoServiceTlsHandleAlert (
   IN     VOID                     *Tls,
-  IN     UINT8                    *BufferIn, OPTIONAL
-  IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
+  IN     UINT8                    *BufferIn  OPTIONAL,
+  IN     UINTN                    BufferInSize  OPTIONAL,
+     OUT UINT8                    *BufferOut  OPTIONAL,
   IN OUT UINTN                    *BufferOutSize
   )
 {
