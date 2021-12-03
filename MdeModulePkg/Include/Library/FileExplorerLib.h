@@ -33,8 +33,8 @@ EFI_STATUS
 EFIAPI
 ChooseFile (
   IN  EFI_DEVICE_PATH_PROTOCOL  *RootDirectory,
-  IN  CHAR16                    *FileType,  OPTIONAL
-  IN  CHOOSE_HANDLER            ChooseHandler,  OPTIONAL
+  IN  CHAR16                    *FileType   OPTIONAL,
+  IN  CHOOSE_HANDLER            ChooseHandler   OPTIONAL,
   OUT EFI_DEVICE_PATH_PROTOCOL  **File  OPTIONAL
   );
 

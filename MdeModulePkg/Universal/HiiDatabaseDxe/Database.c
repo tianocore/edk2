@@ -3479,7 +3479,7 @@ EFIAPI
 HiiNewPackageList (
   IN CONST EFI_HII_DATABASE_PROTOCOL    *This,
   IN CONST EFI_HII_PACKAGE_LIST_HEADER  *PackageList,
-  IN CONST EFI_HANDLE                   DriverHandle, OPTIONAL
+  IN CONST EFI_HANDLE                   DriverHandle  OPTIONAL,
   OUT EFI_HII_HANDLE                    *Handle
   )
 {
@@ -4629,4 +4629,3 @@ HiiGetPackageListHandle (
 
   return EFI_NOT_FOUND;
 }
-

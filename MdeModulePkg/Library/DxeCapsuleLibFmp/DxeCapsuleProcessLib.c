@@ -148,7 +148,7 @@ EFI_STATUS
 EFIAPI
 ProcessThisCapsuleImage (
   IN EFI_CAPSULE_HEADER  *CapsuleHeader,
-  IN CHAR16              *CapFileName,  OPTIONAL
+  IN CHAR16              *CapFileName   OPTIONAL,
   OUT BOOLEAN            *ResetRequired OPTIONAL
   );
 

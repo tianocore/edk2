@@ -1161,7 +1161,7 @@ InternalPrintLibSPrintMarker (
   IN  UINTN        BufferSize,
   IN  UINTN        Flags,
   IN  CONST CHAR8  *Format,
-  IN  VA_LIST      VaListMarker,   OPTIONAL
+  IN  VA_LIST      VaListMarker    OPTIONAL,
   IN  BASE_LIST    BaseListMarker  OPTIONAL
   );
 
@@ -1321,7 +1321,7 @@ InternalPrintLibSPrintMarker (
   IN  UINTN        BufferSize,
   IN  UINTN        Flags,
   IN  CONST CHAR8  *Format,
-  IN  VA_LIST      VaListMarker,   OPTIONAL
+  IN  VA_LIST      VaListMarker    OPTIONAL,
   IN  BASE_LIST    BaseListMarker  OPTIONAL
   )
 {

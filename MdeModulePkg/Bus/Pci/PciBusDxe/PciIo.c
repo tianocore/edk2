@@ -1854,7 +1854,7 @@ EFIAPI
 PciIoGetBarAttributes (
   IN EFI_PCI_IO_PROTOCOL             * This,
   IN  UINT8                          BarIndex,
-  OUT UINT64                         *Supports, OPTIONAL
+  OUT UINT64                         *Supports  OPTIONAL,
   OUT VOID                           **Resources OPTIONAL
   )
 {
@@ -2084,4 +2084,3 @@ PciDevicesOnTheSamePath (
 
   return (BOOLEAN) (Existed1 || Existed2);
 }
-
