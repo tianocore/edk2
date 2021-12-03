@@ -131,7 +131,7 @@ HttpIoCreateIo (
   IN EFI_HANDLE             Image,
   IN EFI_HANDLE             Controller,
   IN UINT8                  IpVersion,
-  IN HTTP_IO_CONFIG_DATA    *ConfigData, OPTIONAL
+  IN HTTP_IO_CONFIG_DATA    *ConfigData  OPTIONAL,
   IN HTTP_IO_CALLBACK       Callback,
   IN VOID                   *Context,
   OUT HTTP_IO               *HttpIo
