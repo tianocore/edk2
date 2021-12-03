@@ -152,7 +152,7 @@ ConvertToUnicodeText (
 **/
 EFI_STATUS
 GetUnicodeStringTextOrSize (
-  OUT EFI_STRING       StringDest, OPTIONAL
+  OUT EFI_STRING       StringDest  OPTIONAL,
   IN  UINT8            *StringSrc,
   IN  OUT UINTN        *BufferSize
   )
@@ -258,10 +258,10 @@ FindStringBlock (
   IN HII_DATABASE_PRIVATE_DATA        *Private,
   IN  HII_STRING_PACKAGE_INSTANCE     *StringPackage,
   IN  EFI_STRING_ID                   StringId,
-  OUT UINT8                           *BlockType, OPTIONAL
-  OUT UINT8                           **StringBlockAddr, OPTIONAL
-  OUT UINTN                           *StringTextOffset, OPTIONAL
-  OUT EFI_STRING_ID                   *LastStringId, OPTIONAL
+  OUT UINT8                           *BlockType  OPTIONAL,
+  OUT UINT8                           **StringBlockAddr  OPTIONAL,
+  OUT UINTN                           *StringTextOffset  OPTIONAL,
+  OUT EFI_STRING_ID                   *LastStringId  OPTIONAL,
   OUT EFI_STRING_ID                   *StartStringId OPTIONAL
   )
 {
@@ -612,7 +612,7 @@ GetStringWorker (
   IN  HII_STRING_PACKAGE_INSTANCE     *StringPackage,
   IN  EFI_STRING_ID                   StringId,
   OUT EFI_STRING                      String,
-  IN  OUT UINTN                       *StringSize, OPTIONAL
+  IN  OUT UINTN                       *StringSize  OPTIONAL,
   OUT EFI_FONT_INFO                   **StringFontInfo OPTIONAL
   )
 {
@@ -1143,7 +1143,7 @@ HiiNewString (
   IN  EFI_HII_HANDLE                  PackageList,
   OUT EFI_STRING_ID                   *StringId,
   IN  CONST CHAR8                     *Language,
-  IN  CONST CHAR16                    *LanguageName, OPTIONAL
+  IN  CONST CHAR16                    *LanguageName  OPTIONAL,
   IN  CONST EFI_STRING                String,
   IN  CONST EFI_FONT_INFO             *StringFontInfo OPTIONAL
   )

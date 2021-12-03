@@ -112,7 +112,7 @@ EFIAPI
 Crc32GuidedSectionHandler (
   IN CONST  VOID    *InputSection,
   OUT       VOID    **OutputBuffer,
-  IN        VOID    *ScratchBuffer,        OPTIONAL
+  IN        VOID    *ScratchBuffer         OPTIONAL,
   OUT       UINT32  *AuthenticationStatus
   )
 {
@@ -227,4 +227,3 @@ DxeCrc32GuidedSectionExtractLibConstructor (
           Crc32GuidedSectionHandler
           );
 }
-

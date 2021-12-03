@@ -404,7 +404,7 @@ UpdateStatusBar (
 VOID
 EFIAPI
 CreateDialog (
-  OUT EFI_INPUT_KEY  *Key,        OPTIONAL
+  OUT EFI_INPUT_KEY  *Key         OPTIONAL,
   ...
   )
 {
@@ -949,4 +949,3 @@ CustomizedDisplayLibDestructor (
 
   return EFI_SUCCESS;
 }
-

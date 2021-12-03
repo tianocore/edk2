@@ -113,7 +113,7 @@ UINTN mMaxTransferBlockNumber[] = {
 EFI_STATUS
 AtaDevicePassThru (
   IN OUT ATA_DEVICE                       *AtaDevice,
-  IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET *TaskPacket, OPTIONAL
+  IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET *TaskPacket  OPTIONAL,
   IN OUT EFI_EVENT                        Event OPTIONAL
   )
 {
@@ -464,7 +464,7 @@ DiscoverAtaDevice (
 EFI_STATUS
 TransferAtaDevice (
   IN OUT ATA_DEVICE                       *AtaDevice,
-  IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET *TaskPacket, OPTIONAL
+  IN OUT EFI_ATA_PASS_THRU_COMMAND_PACKET *TaskPacket  OPTIONAL,
   IN OUT VOID                             *Buffer,
   IN EFI_LBA                              StartLba,
   IN UINT32                               TransferLength,

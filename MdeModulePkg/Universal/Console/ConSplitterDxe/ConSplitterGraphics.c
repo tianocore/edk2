@@ -246,7 +246,7 @@ EFI_STATUS
 EFIAPI
 ConSplitterGraphicsOutputBlt (
   IN  EFI_GRAPHICS_OUTPUT_PROTOCOL                  *This,
-  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL                 *BltBuffer, OPTIONAL
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL                 *BltBuffer  OPTIONAL,
   IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION             BltOperation,
   IN  UINTN                                         SourceX,
   IN  UINTN                                         SourceY,
@@ -520,7 +520,7 @@ EFI_STATUS
 EFIAPI
 ConSplitterUgaDrawBlt (
   IN  EFI_UGA_DRAW_PROTOCOL                         *This,
-  IN  EFI_UGA_PIXEL                                 *BltBuffer, OPTIONAL
+  IN  EFI_UGA_PIXEL                                 *BltBuffer  OPTIONAL,
   IN  EFI_UGA_BLT_OPERATION                         BltOperation,
   IN  UINTN                                         SourceX,
   IN  UINTN                                         SourceY,
