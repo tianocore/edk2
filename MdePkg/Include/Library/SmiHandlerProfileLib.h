@@ -48,7 +48,7 @@ SmiHandlerProfileRegisterHandler (
   IN EFI_GUID                       *HandlerGuid,
   IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler,
   IN PHYSICAL_ADDRESS               CallerAddress,
-  IN VOID                           *Context, OPTIONAL
+  IN VOID                           *Context  OPTIONAL,
   IN UINTN                          ContextSize OPTIONAL
   );
 
@@ -74,7 +74,7 @@ EFIAPI
 SmiHandlerProfileUnregisterHandler (
   IN EFI_GUID                       *HandlerGuid,
   IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler,
-  IN VOID                           *Context, OPTIONAL
+  IN VOID                           *Context  OPTIONAL,
   IN UINTN                          ContextSize OPTIONAL
   );
 

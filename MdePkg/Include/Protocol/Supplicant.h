@@ -335,8 +335,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_SUPPLICANT_BUILD_RESPONSE_PACKET) (
   IN     EFI_SUPPLICANT_PROTOCOL          *This,
-  IN     UINT8                            *RequestBuffer,     OPTIONAL
-  IN     UINTN                            RequestBufferSize,  OPTIONAL
+  IN     UINT8                            *RequestBuffer      OPTIONAL,
+  IN     UINTN                            RequestBufferSize   OPTIONAL,
      OUT UINT8                            *Buffer,
   IN OUT UINTN                            *BufferSize
   );
@@ -435,7 +435,7 @@ EFI_STATUS
 (EFIAPI *EFI_SUPPLICANT_GET_DATA) (
   IN     EFI_SUPPLICANT_PROTOCOL          *This,
   IN     EFI_SUPPLICANT_DATA_TYPE         DataType,
-     OUT UINT8                            *Data,     OPTIONAL
+     OUT UINT8                            *Data      OPTIONAL,
   IN OUT UINTN                            *DataSize
   );
 

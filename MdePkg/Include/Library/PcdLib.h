@@ -1412,7 +1412,7 @@ LibPcdSetExBoolS (
 typedef
 VOID
 (EFIAPI *PCD_CALLBACK)(
-  IN        CONST GUID        *CallBackGuid, OPTIONAL
+  IN        CONST GUID        *CallBackGuid  OPTIONAL,
   IN        UINTN             CallBackToken,
   IN  OUT   VOID              *TokenData,
   IN        UINTN             TokenDataSize
@@ -1438,7 +1438,7 @@ VOID
 VOID
 EFIAPI
 LibPcdCallbackOnSet (
-  IN CONST GUID               *Guid,       OPTIONAL
+  IN CONST GUID               *Guid        OPTIONAL,
   IN UINTN                    TokenNumber,
   IN PCD_CALLBACK             NotificationFunction
   );
@@ -1460,7 +1460,7 @@ LibPcdCallbackOnSet (
 VOID
 EFIAPI
 LibPcdCancelCallback (
-  IN CONST GUID               *Guid,       OPTIONAL
+  IN CONST GUID               *Guid        OPTIONAL,
   IN UINTN                    TokenNumber,
   IN PCD_CALLBACK             NotificationFunction
   );
@@ -1488,7 +1488,7 @@ LibPcdCancelCallback (
 UINTN
 EFIAPI
 LibPcdGetNextToken (
-  IN CONST GUID               *Guid,       OPTIONAL
+  IN CONST GUID               *Guid        OPTIONAL,
   IN UINTN                    TokenNumber
   );
 

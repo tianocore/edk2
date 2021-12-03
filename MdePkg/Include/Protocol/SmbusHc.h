@@ -184,7 +184,7 @@ EFI_STATUS
 (EFIAPI *EFI_SMBUS_HC_PROTOCOL_ARP_DEVICE)(
   IN CONST  EFI_SMBUS_HC_PROTOCOL     *This,
   IN        BOOLEAN                   ArpAll,
-  IN        EFI_SMBUS_UDID            *SmbusUdid,   OPTIONAL
+  IN        EFI_SMBUS_UDID            *SmbusUdid    OPTIONAL,
   IN OUT    EFI_SMBUS_DEVICE_ADDRESS  *SlaveAddress OPTIONAL
 );
 
@@ -286,4 +286,3 @@ struct _EFI_SMBUS_HC_PROTOCOL {
 extern EFI_GUID gEfiSmbusHcProtocolGuid;
 
 #endif
-
