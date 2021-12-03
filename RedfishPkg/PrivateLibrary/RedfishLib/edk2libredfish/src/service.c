@@ -227,7 +227,7 @@ DecodeResponseContent (
 EFI_STATUS
 RedfishBuildUrl (
   IN  REDFISH_CONFIG_SERVICE_INFORMATION *RedfishConfigServiceInfo,
-  IN  CHAR16                        *RelativePath,   OPTIONAL
+  IN  CHAR16                        *RelativePath    OPTIONAL,
   OUT CHAR16                        **HttpUrl
   )
 {
