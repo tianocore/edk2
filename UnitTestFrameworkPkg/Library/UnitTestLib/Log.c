@@ -109,7 +109,7 @@ VOID
 EFIAPI
 UnitTestLogInit (
   IN OUT UNIT_TEST  *Test,
-  IN     UINT8      *Buffer,     OPTIONAL
+  IN     UINT8      *Buffer      OPTIONAL,
   IN     UINTN      BufferSize   OPTIONAL
   )
 {

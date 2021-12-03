@@ -604,7 +604,7 @@ STATIC
 UNIT_TEST_SAVE_HEADER*
 SerializeState (
   IN UNIT_TEST_FRAMEWORK_HANDLE  FrameworkHandle,
-  IN UNIT_TEST_CONTEXT           ContextToSave,      OPTIONAL
+  IN UNIT_TEST_CONTEXT           ContextToSave       OPTIONAL,
   IN UINTN                       ContextToSaveSize
   )
 {
