@@ -344,8 +344,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_CONNECT_CONTROLLER)(
   IN  EFI_HANDLE                    ControllerHandle,
-  IN  EFI_HANDLE                    *DriverImageHandle,   OPTIONAL
-  IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath, OPTIONAL
+  IN  EFI_HANDLE                    *DriverImageHandle    OPTIONAL,
+  IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath  OPTIONAL,
   IN  BOOLEAN                       Recursive
   );
 
@@ -377,7 +377,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_DISCONNECT_CONTROLLER)(
   IN  EFI_HANDLE                     ControllerHandle,
-  IN  EFI_HANDLE                     DriverImageHandle, OPTIONAL
+  IN  EFI_HANDLE                     DriverImageHandle  OPTIONAL,
   IN  EFI_HANDLE                     ChildHandle        OPTIONAL
   );
 
@@ -676,7 +676,7 @@ EFI_STATUS
 (EFIAPI *EFI_GET_VARIABLE)(
   IN     CHAR16                      *VariableName,
   IN     EFI_GUID                    *VendorGuid,
-  OUT    UINT32                      *Attributes,    OPTIONAL
+  OUT    UINT32                      *Attributes     OPTIONAL,
   IN OUT UINTN                       *DataSize,
   OUT    VOID                        *Data           OPTIONAL
   );
@@ -1338,7 +1338,7 @@ EFI_STATUS
 (EFIAPI *EFI_OPEN_PROTOCOL)(
   IN  EFI_HANDLE                Handle,
   IN  EFI_GUID                  *Protocol,
-  OUT VOID                      **Interface, OPTIONAL
+  OUT VOID                      **Interface  OPTIONAL,
   IN  EFI_HANDLE                AgentHandle,
   IN  EFI_HANDLE                ControllerHandle,
   IN  UINT32                    Attributes
@@ -1506,8 +1506,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_LOCATE_HANDLE)(
   IN     EFI_LOCATE_SEARCH_TYPE   SearchType,
-  IN     EFI_GUID                 *Protocol,    OPTIONAL
-  IN     VOID                     *SearchKey,   OPTIONAL
+  IN     EFI_GUID                 *Protocol     OPTIONAL,
+  IN     VOID                     *SearchKey    OPTIONAL,
   IN OUT UINTN                    *BufferSize,
   OUT    EFI_HANDLE               *Buffer
   );
@@ -1579,8 +1579,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_LOCATE_HANDLE_BUFFER)(
   IN     EFI_LOCATE_SEARCH_TYPE       SearchType,
-  IN     EFI_GUID                     *Protocol,      OPTIONAL
-  IN     VOID                         *SearchKey,     OPTIONAL
+  IN     EFI_GUID                     *Protocol       OPTIONAL,
+  IN     VOID                         *SearchKey      OPTIONAL,
   OUT    UINTN                        *NoHandles,
   OUT    EFI_HANDLE                   **Buffer
   );
@@ -1606,7 +1606,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_LOCATE_PROTOCOL)(
   IN  EFI_GUID  *Protocol,
-  IN  VOID      *Registration, OPTIONAL
+  IN  VOID      *Registration  OPTIONAL,
   OUT VOID      **Interface
   );
 

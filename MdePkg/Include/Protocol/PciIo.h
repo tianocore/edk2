@@ -468,7 +468,7 @@ EFI_STATUS
 (EFIAPI *EFI_PCI_IO_PROTOCOL_GET_BAR_ATTRIBUTES)(
   IN EFI_PCI_IO_PROTOCOL             *This,
   IN  UINT8                          BarIndex,
-  OUT UINT64                         *Supports, OPTIONAL
+  OUT UINT64                         *Supports  OPTIONAL,
   OUT VOID                           **Resources OPTIONAL
   );
 

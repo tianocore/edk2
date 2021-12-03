@@ -134,7 +134,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_UGA_DRAW_PROTOCOL_BLT)(
   IN  EFI_UGA_DRAW_PROTOCOL                   * This,
-  IN  EFI_UGA_PIXEL                           * BltBuffer, OPTIONAL
+  IN  EFI_UGA_PIXEL                           * BltBuffer  OPTIONAL,
   IN  EFI_UGA_BLT_OPERATION                   BltOperation,
   IN  UINTN                                   SourceX,
   IN  UINTN                                   SourceY,

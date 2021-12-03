@@ -606,7 +606,7 @@ PeriodicSmiYield (
 VOID
 EFIAPI
 PeriodicSmiDispatchFunctionSwitchStack (
-  IN VOID  *Context1,  OPTIONAL
+  IN VOID  *Context1   OPTIONAL,
   IN VOID  *Context2   OPTIONAL
   )
 {
@@ -898,9 +898,9 @@ PeriodicSmiDispatchFunction (
 EFI_STATUS
 EFIAPI
 PeriodicSmiEnable (
-  IN OUT EFI_HANDLE                    *DispatchHandle,    OPTIONAL
+  IN OUT EFI_HANDLE                    *DispatchHandle     OPTIONAL,
   IN     PERIODIC_SMI_LIBRARY_HANDLER  DispatchFunction,
-  IN     CONST VOID                    *Context,           OPTIONAL
+  IN     CONST VOID                    *Context            OPTIONAL,
   IN     UINT64                        TickPeriod,
   IN     UINTN                         Cpu,
   IN     UINTN                         StackSize

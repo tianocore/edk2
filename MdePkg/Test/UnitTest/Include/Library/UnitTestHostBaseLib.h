@@ -128,9 +128,9 @@ typedef
 UINT32
 (EFIAPI *UNIT_TEST_HOST_BASE_LIB_ASM_CPUID)(
   IN      UINT32                    Index,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax   OPTIONAL,
+  OUT     UINT32                    *Ebx   OPTIONAL,
+  OUT     UINT32                    *Ecx   OPTIONAL,
   OUT     UINT32                    *Edx   OPTIONAL
   );
 
@@ -171,9 +171,9 @@ UINT32
 (EFIAPI *UNIT_TEST_HOST_BASE_LIB_ASM_CPUID_EX)(
   IN      UINT32                    Index,
   IN      UINT32                    SubIndex,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax   OPTIONAL,
+  OUT     UINT32                    *Ebx   OPTIONAL,
+  OUT     UINT32                    *Ecx   OPTIONAL,
   OUT     UINT32                    *Edx   OPTIONAL
   );
 
@@ -321,8 +321,8 @@ typedef
 VOID
 (EFIAPI *UNIT_TEST_HOST_BASE_LIB_ASM_PAGING_32)(
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *Context1   OPTIONAL,
+  IN      VOID                      *Context2   OPTIONAL,
   IN      VOID                      *NewStack
   );
 
@@ -363,8 +363,8 @@ VOID
 (EFIAPI *UNIT_TEST_HOST_BASE_LIB_ASM_ENABLE_PAGING_64)(
   IN      UINT16                    Cs,
   IN      UINT64                    EntryPoint,
-  IN      UINT64                    Context1,  OPTIONAL
-  IN      UINT64                    Context2,  OPTIONAL
+  IN      UINT64                    Context1   OPTIONAL,
+  IN      UINT64                    Context2   OPTIONAL,
   IN      UINT64                    NewStack
   );
 
@@ -403,8 +403,8 @@ VOID
 (EFIAPI *UNIT_TEST_HOST_BASE_LIB_ASM_DISABLE_PAGING_64)(
   IN      UINT16                    Cs,
   IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
+  IN      UINT32                    Context1   OPTIONAL,
+  IN      UINT32                    Context2   OPTIONAL,
   IN      UINT32                    NewStack
   );
 

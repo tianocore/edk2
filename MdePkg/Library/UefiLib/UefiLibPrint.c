@@ -600,8 +600,8 @@ EFIAPI
 PrintXY (
   IN UINTN                            PointX,
   IN UINTN                            PointY,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround  OPTIONAL,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround  OPTIONAL,
   IN CONST CHAR16                     *Format,
   ...
   )
@@ -679,8 +679,8 @@ EFIAPI
 AsciiPrintXY (
   IN UINTN                            PointX,
   IN UINTN                            PointY,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround, OPTIONAL
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *ForeGround  OPTIONAL,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL    *BackGround  OPTIONAL,
   IN CONST CHAR8                      *Format,
   ...
   )
@@ -735,7 +735,7 @@ AsciiPrintXY (
 CHAR16*
 EFIAPI
 CatVSPrint (
-  IN  CHAR16  *String, OPTIONAL
+  IN  CHAR16  *String  OPTIONAL,
   IN  CONST CHAR16  *FormatString,
   IN  VA_LIST       Marker
   )
@@ -800,7 +800,7 @@ CatVSPrint (
 CHAR16 *
 EFIAPI
 CatSPrint (
-  IN  CHAR16  *String, OPTIONAL
+  IN  CHAR16  *String  OPTIONAL,
   IN  CONST CHAR16  *FormatString,
   ...
   )
@@ -813,4 +813,3 @@ CatSPrint (
   VA_END (Marker);
   return NewString;
 }
-

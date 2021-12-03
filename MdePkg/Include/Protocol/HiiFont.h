@@ -447,7 +447,7 @@ EFI_STATUS
 (EFIAPI *EFI_HII_GET_FONT_INFO)(
   IN CONST  EFI_HII_FONT_PROTOCOL *This,
   IN OUT    EFI_FONT_HANDLE       *FontHandle,
-  IN CONST  EFI_FONT_DISPLAY_INFO *StringInfoIn, OPTIONAL
+  IN CONST  EFI_FONT_DISPLAY_INFO *StringInfoIn  OPTIONAL,
   OUT       EFI_FONT_DISPLAY_INFO **StringInfoOut,
   IN CONST  EFI_STRING            String OPTIONAL
 );
@@ -466,4 +466,3 @@ extern EFI_GUID gEfiHiiFontProtocolGuid;
 
 
 #endif
-

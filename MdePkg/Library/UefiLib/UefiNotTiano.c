@@ -69,8 +69,8 @@ EFI_STATUS
 EFIAPI
 EfiCreateEventLegacyBootEx (
   IN  EFI_TPL           NotifyTpl,
-  IN  EFI_EVENT_NOTIFY  NotifyFunction,  OPTIONAL
-  IN  VOID              *NotifyContext,  OPTIONAL
+  IN  EFI_EVENT_NOTIFY  NotifyFunction   OPTIONAL,
+  IN  VOID              *NotifyContext   OPTIONAL,
   OUT EFI_EVENT         *LegacyBootEvent
   )
 {
@@ -164,8 +164,8 @@ EFI_STATUS
 EFIAPI
 EfiCreateEventReadyToBootEx (
   IN  EFI_TPL           NotifyTpl,
-  IN  EFI_EVENT_NOTIFY  NotifyFunction,  OPTIONAL
-  IN  VOID              *NotifyContext,  OPTIONAL
+  IN  EFI_EVENT_NOTIFY  NotifyFunction   OPTIONAL,
+  IN  VOID              *NotifyContext   OPTIONAL,
   OUT EFI_EVENT         *ReadyToBootEvent
   )
 {

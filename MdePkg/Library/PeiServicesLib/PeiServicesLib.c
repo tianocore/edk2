@@ -89,7 +89,7 @@ EFIAPI
 PeiServicesLocatePpi (
   IN CONST EFI_GUID                   *Guid,
   IN UINTN                      Instance,
-  IN OUT EFI_PEI_PPI_DESCRIPTOR **PpiDescriptor, OPTIONAL
+  IN OUT EFI_PEI_PPI_DESCRIPTOR **PpiDescriptor  OPTIONAL,
   IN OUT VOID                   **Ppi
   )
 {
@@ -622,11 +622,11 @@ VOID
 EFIAPI
 InternalPeiServicesInstallFvInfoPpi (
   IN       BOOLEAN                 InstallFvInfoPpi,
-  IN CONST EFI_GUID                *FvFormat, OPTIONAL
+  IN CONST EFI_GUID                *FvFormat  OPTIONAL,
   IN CONST VOID                    *FvInfo,
   IN       UINT32                  FvInfoSize,
-  IN CONST EFI_GUID                *ParentFvName, OPTIONAL
-  IN CONST EFI_GUID                *ParentFileName, OPTIONAL
+  IN CONST EFI_GUID                *ParentFvName  OPTIONAL,
+  IN CONST EFI_GUID                *ParentFileName  OPTIONAL,
   IN       UINT32                  AuthenticationStatus
   )
 {
@@ -728,10 +728,10 @@ InternalPeiServicesInstallFvInfoPpi (
 VOID
 EFIAPI
 PeiServicesInstallFvInfoPpi (
-  IN CONST EFI_GUID                *FvFormat, OPTIONAL
+  IN CONST EFI_GUID                *FvFormat  OPTIONAL,
   IN CONST VOID                    *FvInfo,
   IN       UINT32                  FvInfoSize,
-  IN CONST EFI_GUID                *ParentFvName, OPTIONAL
+  IN CONST EFI_GUID                *ParentFvName  OPTIONAL,
   IN CONST EFI_GUID                *ParentFileName OPTIONAL
   )
 {
@@ -772,11 +772,11 @@ PeiServicesInstallFvInfoPpi (
 VOID
 EFIAPI
 PeiServicesInstallFvInfo2Ppi (
-  IN CONST EFI_GUID                *FvFormat, OPTIONAL
+  IN CONST EFI_GUID                *FvFormat  OPTIONAL,
   IN CONST VOID                    *FvInfo,
   IN       UINT32                  FvInfoSize,
-  IN CONST EFI_GUID                *ParentFvName, OPTIONAL
-  IN CONST EFI_GUID                *ParentFileName, OPTIONAL
+  IN CONST EFI_GUID                *ParentFvName  OPTIONAL,
+  IN CONST EFI_GUID                *ParentFileName  OPTIONAL,
   IN       UINT32                  AuthenticationStatus
   )
 {

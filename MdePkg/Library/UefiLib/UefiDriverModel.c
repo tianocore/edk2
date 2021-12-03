@@ -137,8 +137,8 @@ EfiLibInstallAllDriverProtocols (
   IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
   IN EFI_HANDLE                               DriverBindingHandle,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName        OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration  OPTIONAL,
   IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics    OPTIONAL
   )
 {
@@ -256,8 +256,8 @@ EFI_STATUS
 EFIAPI
 EfiLibUninstallAllDriverProtocols (
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName        OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration  OPTIONAL,
   IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics    OPTIONAL
   )
 {
@@ -379,7 +379,7 @@ EfiLibInstallDriverBindingComponentName2 (
   IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
   IN EFI_HANDLE                               DriverBindingHandle,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName        OPTIONAL,
   IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2       OPTIONAL
   )
 {
@@ -455,7 +455,7 @@ EFI_STATUS
 EFIAPI
 EfiLibUninstallDriverBindingComponentName2 (
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName        OPTIONAL,
   IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2       OPTIONAL
   )
 {
@@ -543,11 +543,11 @@ EfiLibInstallAllDriverProtocols2 (
   IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
   IN EFI_HANDLE                               DriverBindingHandle,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,        OPTIONAL
-  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2,       OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration,  OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2, OPTIONAL
-  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,    OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName         OPTIONAL,
+  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2        OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration   OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2  OPTIONAL,
+  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics     OPTIONAL,
   IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2    OPTIONAL
   )
 {
@@ -1297,11 +1297,11 @@ EFI_STATUS
 EFIAPI
 EfiLibUninstallAllDriverProtocols2 (
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
-  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,        OPTIONAL
-  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2,       OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration,  OPTIONAL
-  IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2, OPTIONAL
-  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,    OPTIONAL
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName         OPTIONAL,
+  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2        OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration   OPTIONAL,
+  IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2  OPTIONAL,
+  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics     OPTIONAL,
   IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2    OPTIONAL
   )
 {

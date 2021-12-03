@@ -125,7 +125,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_RNG_GET_RNG) (
   IN EFI_RNG_PROTOCOL            *This,
-  IN EFI_RNG_ALGORITHM           *RNGAlgorithm, OPTIONAL
+  IN EFI_RNG_ALGORITHM           *RNGAlgorithm  OPTIONAL,
   IN UINTN                       RNGValueLength,
   OUT UINT8                      *RNGValue
   );

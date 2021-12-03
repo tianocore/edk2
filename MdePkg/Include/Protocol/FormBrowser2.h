@@ -102,9 +102,9 @@ EFI_STATUS
   IN CONST  EFI_FORM_BROWSER2_PROTOCOL  *This,
   IN        EFI_HII_HANDLE              *Handle,
   IN        UINTN                      HandleCount,
-  IN        EFI_GUID                   *FormSetGuid, OPTIONAL
-  IN        EFI_FORM_ID                FormId, OPTIONAL
-  IN CONST  EFI_SCREEN_DESCRIPTOR      *ScreenDimensions, OPTIONAL
+  IN        EFI_GUID                   *FormSetGuid  OPTIONAL,
+  IN        EFI_FORM_ID                FormId  OPTIONAL,
+  IN CONST  EFI_SCREEN_DESCRIPTOR      *ScreenDimensions  OPTIONAL,
   OUT       EFI_BROWSER_ACTION_REQUEST *ActionRequest  OPTIONAL
 );
 
@@ -155,7 +155,7 @@ EFI_STATUS
   IN OUT    UINTN                     *ResultsDataSize,
   IN OUT    EFI_STRING                ResultsData,
   IN CONST  BOOLEAN                   RetrieveData,
-  IN CONST  EFI_GUID                  *VariableGuid, OPTIONAL
+  IN CONST  EFI_GUID                  *VariableGuid  OPTIONAL,
   IN CONST  CHAR16                    *VariableName OPTIONAL
 );
 
@@ -171,4 +171,3 @@ struct _EFI_FORM_BROWSER2_PROTOCOL {
 extern EFI_GUID gEfiFormBrowser2ProtocolGuid;
 
 #endif
-

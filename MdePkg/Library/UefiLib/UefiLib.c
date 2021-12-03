@@ -136,7 +136,7 @@ EfiCreateProtocolNotifyEvent(
   IN  EFI_GUID          *ProtocolGuid,
   IN  EFI_TPL           NotifyTpl,
   IN  EFI_EVENT_NOTIFY  NotifyFunction,
-  IN  VOID              *NotifyContext,  OPTIONAL
+  IN  VOID              *NotifyContext   OPTIONAL,
   OUT VOID              **Registration
   )
 {
@@ -207,7 +207,7 @@ EfiNamedEventListen (
   IN CONST EFI_GUID    *Name,
   IN EFI_TPL           NotifyTpl,
   IN EFI_EVENT_NOTIFY  NotifyFunction,
-  IN CONST VOID        *NotifyContext,  OPTIONAL
+  IN CONST VOID        *NotifyContext   OPTIONAL,
   OUT VOID             *Registration OPTIONAL
   )
 {

@@ -58,7 +58,7 @@ EFI_STATUS
   IN        EFI_HII_HANDLE            PackageList,
   OUT       EFI_STRING_ID             *StringId,
   IN CONST  CHAR8                     *Language,
-  IN  CONST CHAR16                    *LanguageName, OPTIONAL
+  IN  CONST CHAR16                    *LanguageName  OPTIONAL,
   IN CONST  EFI_STRING                String,
   IN CONST  EFI_FONT_INFO             *StringFontInfo OPTIONAL
 );
@@ -235,4 +235,3 @@ struct _EFI_HII_STRING_PROTOCOL {
 extern EFI_GUID gEfiHiiStringProtocolGuid;
 
 #endif
-

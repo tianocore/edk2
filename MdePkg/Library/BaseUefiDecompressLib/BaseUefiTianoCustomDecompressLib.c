@@ -141,7 +141,7 @@ EFIAPI
 TianoDecompress (
   IN CONST  VOID    *InputSection,
   OUT       VOID    **OutputBuffer,
-  IN        VOID    *ScratchBuffer,        OPTIONAL
+  IN        VOID    *ScratchBuffer         OPTIONAL,
   OUT       UINT32  *AuthenticationStatus
   )
 {

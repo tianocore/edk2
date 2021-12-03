@@ -620,7 +620,7 @@ RETURN_STATUS
 EFIAPI
 StrDecimalToUintnS (
   IN  CONST CHAR16             *String,
-  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       CHAR16             **EndPointer   OPTIONAL,
   OUT       UINTN              *Data
   )
 {
@@ -730,7 +730,7 @@ RETURN_STATUS
 EFIAPI
 StrDecimalToUint64S (
   IN  CONST CHAR16             *String,
-  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       CHAR16             **EndPointer   OPTIONAL,
   OUT       UINT64             *Data
   )
 {
@@ -845,7 +845,7 @@ RETURN_STATUS
 EFIAPI
 StrHexToUintnS (
   IN  CONST CHAR16             *String,
-  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       CHAR16             **EndPointer   OPTIONAL,
   OUT       UINTN              *Data
   )
 {
@@ -971,7 +971,7 @@ RETURN_STATUS
 EFIAPI
 StrHexToUint64S (
   IN  CONST CHAR16             *String,
-  OUT       CHAR16             **EndPointer,  OPTIONAL
+  OUT       CHAR16             **EndPointer   OPTIONAL,
   OUT       UINT64             *Data
   )
 {
@@ -1099,7 +1099,7 @@ RETURN_STATUS
 EFIAPI
 StrToIpv6Address (
   IN  CONST CHAR16       *String,
-  OUT CHAR16             **EndPointer, OPTIONAL
+  OUT CHAR16             **EndPointer  OPTIONAL,
   OUT IPv6_ADDRESS       *Address,
   OUT UINT8              *PrefixLength OPTIONAL
   )
@@ -1314,7 +1314,7 @@ RETURN_STATUS
 EFIAPI
 StrToIpv4Address (
   IN  CONST CHAR16       *String,
-  OUT CHAR16             **EndPointer, OPTIONAL
+  OUT CHAR16             **EndPointer  OPTIONAL,
   OUT IPv4_ADDRESS       *Address,
   OUT UINT8              *PrefixLength OPTIONAL
   )
@@ -2125,7 +2125,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrDecimalToUintnS (
   IN  CONST CHAR8              *String,
-  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       CHAR8              **EndPointer   OPTIONAL,
   OUT       UINTN              *Data
   )
 {
@@ -2231,7 +2231,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrDecimalToUint64S (
   IN  CONST CHAR8              *String,
-  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       CHAR8              **EndPointer   OPTIONAL,
   OUT       UINT64             *Data
   )
 {
@@ -2341,7 +2341,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrHexToUintnS (
   IN  CONST CHAR8              *String,
-  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       CHAR8              **EndPointer   OPTIONAL,
   OUT       UINTN              *Data
   )
 {
@@ -2462,7 +2462,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrHexToUint64S (
   IN  CONST CHAR8              *String,
-  OUT       CHAR8              **EndPointer,  OPTIONAL
+  OUT       CHAR8              **EndPointer   OPTIONAL,
   OUT       UINT64             *Data
   )
 {
@@ -3013,7 +3013,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrToIpv6Address (
   IN  CONST CHAR8        *String,
-  OUT CHAR8              **EndPointer, OPTIONAL
+  OUT CHAR8              **EndPointer  OPTIONAL,
   OUT IPv6_ADDRESS       *Address,
   OUT UINT8              *PrefixLength OPTIONAL
   )
@@ -3225,7 +3225,7 @@ RETURN_STATUS
 EFIAPI
 AsciiStrToIpv4Address (
   IN  CONST CHAR8        *String,
-  OUT CHAR8              **EndPointer, OPTIONAL
+  OUT CHAR8              **EndPointer  OPTIONAL,
   OUT IPv4_ADDRESS       *Address,
   OUT UINT8              *PrefixLength OPTIONAL
   )
@@ -3532,4 +3532,3 @@ AsciiStrHexToBytes (
   }
   return RETURN_SUCCESS;
 }
-

@@ -175,8 +175,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_CONFIG_KEYWORD_HANDLER_GET_DATA) (
   IN EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL  *This,
-  IN CONST EFI_STRING                     NameSpaceId, OPTIONAL
-  IN CONST EFI_STRING                     KeywordString, OPTIONAL
+  IN CONST EFI_STRING                     NameSpaceId  OPTIONAL,
+  IN CONST EFI_STRING                     KeywordString  OPTIONAL,
   OUT EFI_STRING                          *Progress,
   OUT UINT32                              *ProgressErr,
   OUT EFI_STRING                          *Results
@@ -196,4 +196,3 @@ struct _EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL {
 extern EFI_GUID gEfiConfigKeywordHandlerProtocolGuid;
 
 #endif
-

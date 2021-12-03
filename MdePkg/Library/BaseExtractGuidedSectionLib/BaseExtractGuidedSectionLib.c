@@ -349,7 +349,7 @@ EFIAPI
 ExtractGuidedSectionDecode (
   IN  CONST VOID    *InputSection,
   OUT       VOID    **OutputBuffer,
-  IN        VOID    *ScratchBuffer,        OPTIONAL
+  IN        VOID    *ScratchBuffer         OPTIONAL,
   OUT       UINT32  *AuthenticationStatus
   )
 {
@@ -434,7 +434,7 @@ RETURN_STATUS
 EFIAPI
 ExtractGuidedSectionGetHandlers (
   IN CONST   GUID                                     *SectionGuid,
-  OUT        EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER  *GetInfoHandler,  OPTIONAL
+  OUT        EXTRACT_GUIDED_SECTION_GET_INFO_HANDLER  *GetInfoHandler   OPTIONAL,
   OUT        EXTRACT_GUIDED_SECTION_DECODE_HANDLER    *DecodeHandler    OPTIONAL
   )
 {

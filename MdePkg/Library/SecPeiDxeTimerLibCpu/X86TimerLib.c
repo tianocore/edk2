@@ -305,7 +305,7 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  OUT      UINT64                    *StartValue,  OPTIONAL
+  OUT      UINT64                    *StartValue   OPTIONAL,
   OUT      UINT64                    *EndValue     OPTIONAL
   )
 {

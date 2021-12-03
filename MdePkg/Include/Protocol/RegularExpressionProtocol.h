@@ -143,9 +143,9 @@ EFI_STATUS
   IN  EFI_REGULAR_EXPRESSION_PROTOCOL *This,
   IN  CHAR16                          *String,
   IN  CHAR16                          *Pattern,
-  IN  EFI_REGEX_SYNTAX_TYPE           *SyntaxType, OPTIONAL
+  IN  EFI_REGEX_SYNTAX_TYPE           *SyntaxType  OPTIONAL,
   OUT BOOLEAN                         *Result,
-  OUT EFI_REGEX_CAPTURE               **Captures, OPTIONAL
+  OUT EFI_REGEX_CAPTURE               **Captures  OPTIONAL,
   OUT UINTN                           *CapturesCount
   );
 
