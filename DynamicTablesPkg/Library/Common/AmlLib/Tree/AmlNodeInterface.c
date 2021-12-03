@@ -95,9 +95,9 @@ EFI_STATUS
 EFIAPI
 AmlGetObjectNodeInfo (
   IN  AML_OBJECT_NODE   * ObjectNode,
-  OUT UINT8             * OpCode,           OPTIONAL
-  OUT UINT8             * SubOpCode,        OPTIONAL
-  OUT UINT32            * PkgLen,           OPTIONAL
+  OUT UINT8             * OpCode            OPTIONAL,
+  OUT UINT8             * SubOpCode         OPTIONAL,
+  OUT UINT32            * PkgLen            OPTIONAL,
   OUT BOOLEAN           * IsNameSpaceNode   OPTIONAL
   )
 {
@@ -228,7 +228,7 @@ EFI_STATUS
 EFIAPI
 AmlGetDataNodeBuffer (
   IN      AML_DATA_NODE   * DataNode,
-      OUT UINT8           * Buffer,       OPTIONAL
+      OUT UINT8           * Buffer        OPTIONAL,
   IN  OUT UINT32          * BufferSize
   )
 {
