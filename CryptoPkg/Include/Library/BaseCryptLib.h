@@ -1550,7 +1550,7 @@ EFIAPI
 X509GetCommonName (
   IN      CONST UINT8  *Cert,
   IN      UINTN        CertSize,
-  OUT     CHAR8        *CommonName,  OPTIONAL
+  OUT     CHAR8        *CommonName   OPTIONAL,
   IN OUT  UINTN        *CommonNameSize
   );
 
@@ -1585,7 +1585,7 @@ EFIAPI
 X509GetOrganizationName (
   IN      CONST UINT8   *Cert,
   IN      UINTN         CertSize,
-  OUT     CHAR8         *NameBuffer,  OPTIONAL
+  OUT     CHAR8         *NameBuffer   OPTIONAL,
   IN OUT  UINTN         *NameBufferSize
   );
 
@@ -1821,8 +1821,8 @@ Pkcs1v2Encrypt (
   IN   UINTN        PublicKeySize,
   IN   UINT8        *InData,
   IN   UINTN        InDataSize,
-  IN   CONST UINT8  *PrngSeed,  OPTIONAL
-  IN   UINTN        PrngSeedSize,  OPTIONAL
+  IN   CONST UINT8  *PrngSeed   OPTIONAL,
+  IN   UINTN        PrngSeedSize   OPTIONAL,
   OUT  UINT8        **EncryptedData,
   OUT  UINTN        *EncryptedDataSize
   );
