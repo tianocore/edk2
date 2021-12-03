@@ -35,7 +35,7 @@ EFIAPI
 AmlEnumTree (
   IN      AML_NODE_HEADER               * Node,
   IN      EDKII_AML_TREE_ENUM_CALLBACK    CallBack,
-  IN  OUT VOID                          * Context,  OPTIONAL
+  IN  OUT VOID                          * Context   OPTIONAL,
       OUT EFI_STATUS                    * Status    OPTIONAL
   )
 {

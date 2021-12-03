@@ -68,7 +68,7 @@ EFI_STATUS
 EFIAPI
 AmlSerializeTree (
   IN      AML_ROOT_NODE_HANDLE    RootNode,
-  IN      UINT8                 * Buffer,     OPTIONAL
+  IN      UINT8                 * Buffer      OPTIONAL,
   IN  OUT UINT32                * BufferSize
   );
 
@@ -334,9 +334,9 @@ EFI_STATUS
 EFIAPI
 AmlGetObjectNodeInfo (
   IN  AML_OBJECT_NODE_HANDLE    ObjectNode,
-  OUT UINT8                   * OpCode,           OPTIONAL
-  OUT UINT8                   * SubOpCode,        OPTIONAL
-  OUT UINT32                  * PkgLen,           OPTIONAL
+  OUT UINT8                   * OpCode            OPTIONAL,
+  OUT UINT8                   * SubOpCode         OPTIONAL,
+  OUT UINT32                  * PkgLen            OPTIONAL,
   OUT BOOLEAN                 * IsNameSpaceNode   OPTIONAL
   );
 
@@ -423,7 +423,7 @@ EFI_STATUS
 EFIAPI
 AmlGetDataNodeBuffer (
   IN      AML_DATA_NODE_HANDLE    DataNode,
-      OUT UINT8                 * Buffer,     OPTIONAL
+      OUT UINT8                 * Buffer      OPTIONAL,
   IN  OUT UINT32                * BufferSize
   );
 
@@ -684,7 +684,7 @@ typedef
 BOOLEAN
 (EFIAPI * EDKII_AML_TREE_ENUM_CALLBACK) (
   IN       AML_NODE_HANDLE     Node,
-  IN  OUT  VOID              * Context,    OPTIONAL
+  IN  OUT  VOID              * Context     OPTIONAL,
   IN  OUT  EFI_STATUS        * Status      OPTIONAL
   );
 
@@ -714,7 +714,7 @@ EFIAPI
 AmlEnumTree (
   IN      AML_NODE_HANDLE                 Node,
   IN      EDKII_AML_TREE_ENUM_CALLBACK    CallBack,
-  IN  OUT VOID                          * Context,  OPTIONAL
+  IN  OUT VOID                          * Context   OPTIONAL,
       OUT EFI_STATUS                    * Status    OPTIONAL
   );
 

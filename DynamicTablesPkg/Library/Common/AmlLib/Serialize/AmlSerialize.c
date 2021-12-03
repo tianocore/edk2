@@ -39,7 +39,7 @@ BOOLEAN
 EFIAPI
 AmlSerializeNodeCallback (
   IN       AML_NODE_HEADER   * Node,
-  IN  OUT  VOID              * Context,    OPTIONAL
+  IN  OUT  VOID              * Context     OPTIONAL,
   IN  OUT  EFI_STATUS        * Status      OPTIONAL
   )
 {
@@ -170,7 +170,7 @@ EFI_STATUS
 EFIAPI
 AmlSerializeTree (
   IN      AML_ROOT_NODE   * RootNode,
-  IN      UINT8           * Buffer,     OPTIONAL
+  IN      UINT8           * Buffer      OPTIONAL,
   IN  OUT UINT32          * BufferSize
   )
 {
