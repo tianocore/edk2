@@ -364,7 +364,7 @@ BuildFv3Hob (
   IN          UINT64                      Length,
   IN          UINT32                      AuthenticationStatus,
   IN          BOOLEAN                     ExtractedFv,
-  IN CONST    EFI_GUID                    *FvName, OPTIONAL
+  IN CONST    EFI_GUID                    *FvName  OPTIONAL,
   IN CONST    EFI_GUID                    *FileName OPTIONAL
   );
 
