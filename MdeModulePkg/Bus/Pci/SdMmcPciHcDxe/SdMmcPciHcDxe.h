@@ -2,7 +2,7 @@
 
   Provides some data structure definitions used by the SD/MMC host controller driver.
 
-Copyright (c) 2018-2019, NVIDIA CORPORATION. All rights reserved.
+Copyright (c) 2018-2020, NVIDIA CORPORATION. All rights reserved.
 Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -83,7 +83,6 @@ typedef struct {
   BOOLEAN                            MediaPresent;
   BOOLEAN                            Initialized;
   SD_MMC_CARD_TYPE                   CardType;
-  UINT64                             CurrentFreq;
   EDKII_SD_MMC_OPERATING_PARAMETERS  OperatingParameters;
 } SD_MMC_HC_SLOT;
 
@@ -131,8 +130,6 @@ typedef struct {
 
 #define SD_MMC_HC_TRB_SIG             SIGNATURE_32 ('T', 'R', 'B', 'T')
 
-#define SD_MMC_TRB_RETRIES            5
-
 //
 // TRB (Transfer Request Block) contains information for the cmd request.
 //
@@ -154,12 +151,7 @@ typedef struct {
 
   EFI_EVENT                           Event;
   BOOLEAN                             Started;
-  BOOLEAN                             CommandComplete;
   UINT64                              Timeout;
-  UINT32                              Retries;
-
-  BOOLEAN                             PioModeTransferCompleted;
-  UINT32                              PioBlockIndex;
 
   SD_MMC_HC_ADMA_32_DESC_LINE         *Adma32Desc;
   SD_MMC_HC_ADMA_64_V3_DESC_LINE      *Adma64V3Desc;
@@ -802,30 +794,6 @@ EFI_STATUS
 SdCardIdentification (
   IN SD_MMC_HC_PRIVATE_DATA             *Private,
   IN UINT8                              Slot
-  );
-
-/**
-  SD/MMC card clock supply.
-
-  Refer to SD Host Controller Simplified spec 3.0 Section 3.2.1 for details.
-
-  @param[in] Private         A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
-  @param[in] Slot            The slot number of the SD card to send the command to.
-  @param[in] BusTiming       BusTiming at which the frequency change is done.
-  @param[in] FirstTimeSetup  Flag to indicate whether the clock is being setup for the first time.
-  @param[in] ClockFreq       The max clock frequency to be set. The unit is KHz.
-
-  @retval EFI_SUCCESS       The clock is supplied successfully.
-  @retval Others            The clock isn't supplied successfully.
-
-**/
-EFI_STATUS
-SdMmcHcClockSupply (
-  IN SD_MMC_HC_PRIVATE_DATA  *Private,
-  IN UINT8                   Slot,
-  IN SD_MMC_BUS_MODE         BusTiming,
-  IN BOOLEAN                 FirstTimeSetup,
-  IN UINT64                  ClockFreq
   );
 
 /**

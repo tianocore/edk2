@@ -2,8 +2,8 @@
 
   Provides some data structure definitions used by the SD/MMC host controller driver.
 
-Copyright (c) 2018-2019, NVIDIA CORPORATION. All rights reserved.
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2018-2020, NVIDIA CORPORATION. All rights reserved.
+Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -479,18 +479,27 @@ SdMmcHcStopClock (
   );
 
 /**
-  Start the SD clock.
+  SD/MMC card clock supply.
 
-  @param[in] PciIo  The PCI IO protocol instance.
-  @param[in] Slot   The slot number.
+  Refer to SD Host Controller Simplified spec 3.0 Section 3.2.1 for details.
 
-  @retval EFI_SUCCESS  Succeeded to start the SD clock.
-  @retval Others       Failed to start the SD clock.
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] ClockFreq      The max clock frequency to be set. The unit is KHz.
+  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
+  @param[in] ControllerVer  The version of host controller.
+
+  @retval EFI_SUCCESS       The clock is supplied successfully.
+  @retval Others            The clock isn't supplied successfully.
+
 **/
 EFI_STATUS
-SdMmcHcStartSdClock (
-  IN EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN UINT8                Slot
+SdMmcHcClockSupply (
+  IN EFI_PCI_IO_PROTOCOL    *PciIo,
+  IN UINT8                  Slot,
+  IN UINT64                 ClockFreq,
+  IN UINT32                 BaseClkFreq,
+  IN UINT16                 ControllerVer
   );
 
 /**
@@ -531,6 +540,26 @@ SdMmcHcSetBusWidth (
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot,
   IN UINT16                 BusWidth
+  );
+
+/**
+  Supply SD/MMC card with lowest clock frequency at initialization.
+
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
+  @param[in] ControllerVer  The version of host controller.
+
+  @retval EFI_SUCCESS       The clock is supplied successfully.
+  @retval Others            The clock isn't supplied successfully.
+
+**/
+EFI_STATUS
+SdMmcHcInitClockFreq (
+  IN EFI_PCI_IO_PROTOCOL    *PciIo,
+  IN UINT8                  Slot,
+  IN UINT32                 BaseClkFreq,
+  IN UINT16                 ControllerVer
   );
 
 /**
