@@ -476,7 +476,7 @@ EfiBootManagerInitializeLoadOption (
   IN  UINT32                            Attributes,
   IN  CHAR16                            *Description,
   IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
-  IN  UINT8                             *OptionalData,   OPTIONAL
+  IN  UINT8                             *OptionalData    OPTIONAL,
   IN  UINT32                            OptionalDataSize
   )
 {

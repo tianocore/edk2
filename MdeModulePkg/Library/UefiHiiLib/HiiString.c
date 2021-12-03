@@ -52,7 +52,7 @@ EFI_STRING_ID
 EFIAPI
 HiiSetString (
   IN EFI_HII_HANDLE    HiiHandle,
-  IN EFI_STRING_ID     StringId,            OPTIONAL
+  IN EFI_STRING_ID     StringId             OPTIONAL,
   IN CONST EFI_STRING  String,
   IN CONST CHAR8       *SupportedLanguages  OPTIONAL
   )
@@ -392,4 +392,3 @@ Error:
   //
   return String;
 }
-

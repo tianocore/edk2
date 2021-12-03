@@ -603,8 +603,8 @@ InternalHiiBlockToConfig (
 EFI_STRING
 EFIAPI
 InternalHiiBrowserCallback (
-  IN CONST EFI_GUID    *VariableGuid,  OPTIONAL
-  IN CONST CHAR16      *VariableName,  OPTIONAL
+  IN CONST EFI_GUID    *VariableGuid   OPTIONAL,
+  IN CONST CHAR16      *VariableName   OPTIONAL,
   IN CONST EFI_STRING  SetResultsData  OPTIONAL
   )
 {
@@ -713,8 +713,8 @@ InternalHiiBrowserCallback (
 EFI_STRING
 EFIAPI
 HiiConstructConfigHdr (
-  IN CONST EFI_GUID  *Guid,  OPTIONAL
-  IN CONST CHAR16    *Name,  OPTIONAL
+  IN CONST EFI_GUID  *Guid   OPTIONAL,
+  IN CONST CHAR16    *Name   OPTIONAL,
   IN EFI_HANDLE      DriverHandle
   )
 {
@@ -2241,7 +2241,7 @@ GetElementsFromRequest (
 BOOLEAN
 EFIAPI
 InternalHiiIfrValueAction (
-  IN CONST EFI_STRING Request,  OPTIONAL
+  IN CONST EFI_STRING Request   OPTIONAL,
   IN UINT16           DefaultId,
   IN UINT8            ActionType
   )
@@ -2636,7 +2636,7 @@ HiiValidateSettings (
 BOOLEAN
 EFIAPI
 HiiSetToDefaults (
-  IN CONST EFI_STRING Request,  OPTIONAL
+  IN CONST EFI_STRING Request   OPTIONAL,
   IN UINT16        DefaultId
   )
 {
@@ -2736,7 +2736,7 @@ BOOLEAN
 EFIAPI
 HiiIsConfigHdrMatch (
   IN CONST EFI_STRING  ConfigHdr,
-  IN CONST EFI_GUID    *Guid,     OPTIONAL
+  IN CONST EFI_GUID    *Guid      OPTIONAL,
   IN CONST CHAR16      *Name      OPTIONAL
   )
 {
@@ -2794,8 +2794,8 @@ HiiIsConfigHdrMatch (
 BOOLEAN
 EFIAPI
 HiiGetBrowserData (
-  IN CONST EFI_GUID  *VariableGuid,  OPTIONAL
-  IN CONST CHAR16    *VariableName,  OPTIONAL
+  IN CONST EFI_GUID  *VariableGuid   OPTIONAL,
+  IN CONST CHAR16    *VariableName   OPTIONAL,
   IN UINTN           BufferSize,
   OUT UINT8          *Buffer
   )
@@ -2876,8 +2876,8 @@ HiiGetBrowserData (
 BOOLEAN
 EFIAPI
 HiiSetBrowserData (
-  IN CONST EFI_GUID  *VariableGuid, OPTIONAL
-  IN CONST CHAR16    *VariableName, OPTIONAL
+  IN CONST EFI_GUID  *VariableGuid  OPTIONAL,
+  IN CONST CHAR16    *VariableName  OPTIONAL,
   IN UINTN           BufferSize,
   IN CONST UINT8     *Buffer,
   IN CONST CHAR16    *RequestElement  OPTIONAL
@@ -3330,7 +3330,7 @@ EFIAPI
 HiiCreateGuidOpCode (
   IN VOID            *OpCodeHandle,
   IN CONST EFI_GUID  *Guid,
-  IN CONST VOID      *GuidOpCode,    OPTIONAL
+  IN CONST VOID      *GuidOpCode     OPTIONAL,
   IN UINTN           OpCodeSize
   )
 {
@@ -3528,7 +3528,7 @@ HiiCreateGotoExOpCode (
   IN UINT8            QuestionFlags,
   IN EFI_QUESTION_ID  QuestionId,
   IN EFI_QUESTION_ID  RefQuestionId,
-  IN EFI_GUID         *RefFormSetId,    OPTIONAL
+  IN EFI_GUID         *RefFormSetId     OPTIONAL,
   IN EFI_STRING_ID    RefDevicePath
   )
 {
@@ -3997,8 +3997,8 @@ EFIAPI
 HiiCreateDateOpCode (
   IN VOID             *OpCodeHandle,
   IN EFI_QUESTION_ID  QuestionId,
-  IN EFI_VARSTORE_ID  VarStoreId,   OPTIONAL
-  IN UINT16           VarOffset,    OPTIONAL
+  IN EFI_VARSTORE_ID  VarStoreId    OPTIONAL,
+  IN UINT16           VarOffset     OPTIONAL,
   IN EFI_STRING_ID    Prompt,
   IN EFI_STRING_ID    Help,
   IN UINT8            QuestionFlags,
@@ -4062,8 +4062,8 @@ EFIAPI
 HiiCreateTimeOpCode (
   IN VOID             *OpCodeHandle,
   IN EFI_QUESTION_ID  QuestionId,
-  IN EFI_VARSTORE_ID  VarStoreId,   OPTIONAL
-  IN UINT16           VarOffset,    OPTIONAL
+  IN EFI_VARSTORE_ID  VarStoreId    OPTIONAL,
+  IN UINT16           VarOffset     OPTIONAL,
   IN EFI_STRING_ID    Prompt,
   IN EFI_STRING_ID    Help,
   IN UINT8            QuestionFlags,
@@ -4117,11 +4117,11 @@ HiiCreateTimeOpCode (
 EFI_STATUS
 EFIAPI
 InternalHiiUpdateFormPackageData (
-  IN  EFI_GUID               *FormSetGuid, OPTIONAL
+  IN  EFI_GUID               *FormSetGuid  OPTIONAL,
   IN  EFI_FORM_ID            FormId,
   IN  EFI_HII_PACKAGE_HEADER *Package,
   IN  HII_LIB_OPCODE_BUFFER  *OpCodeBufferStart,
-  IN  HII_LIB_OPCODE_BUFFER  *OpCodeBufferEnd,    OPTIONAL
+  IN  HII_LIB_OPCODE_BUFFER  *OpCodeBufferEnd     OPTIONAL,
   OUT EFI_HII_PACKAGE_HEADER *TempPackage
   )
 {
@@ -4321,7 +4321,7 @@ EFI_STATUS
 EFIAPI
 HiiUpdateForm (
   IN EFI_HII_HANDLE  HiiHandle,
-  IN EFI_GUID        *FormSetGuid,        OPTIONAL
+  IN EFI_GUID        *FormSetGuid         OPTIONAL,
   IN EFI_FORM_ID     FormId,
   IN VOID            *StartOpCodeHandle,
   IN VOID            *EndOpCodeHandle     OPTIONAL

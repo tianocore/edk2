@@ -150,7 +150,7 @@ EFI_STATUS
 UfsPeimTestUnitReady (
   IN     UFS_PEIM_HC_PRIVATE_DATA        *Private,
   IN     UINTN                           Lun,
-     OUT VOID                            *SenseData,  OPTIONAL
+     OUT VOID                            *SenseData   OPTIONAL,
      OUT UINT8                           *SenseDataLength
   )
 {
@@ -202,7 +202,7 @@ UfsPeimReadCapacity (
   IN     UINTN                        Lun,
      OUT VOID                         *DataBuffer,
      OUT UINT32                       *DataLength,
-     OUT VOID                         *SenseData,  OPTIONAL
+     OUT VOID                         *SenseData   OPTIONAL,
      OUT UINT8                        *SenseDataLength
   )
 {
@@ -258,7 +258,7 @@ UfsPeimReadCapacity16 (
   IN     UINTN                        Lun,
      OUT VOID                         *DataBuffer,
      OUT UINT32                       *DataLength,
-     OUT VOID                         *SenseData,  OPTIONAL
+     OUT VOID                         *SenseData   OPTIONAL,
      OUT UINT8                        *SenseDataLength
   )
 {
@@ -320,7 +320,7 @@ UfsPeimRead10 (
   IN     UINT32                       SectorNum,
      OUT VOID                         *DataBuffer,
      OUT UINT32                       *DataLength,
-     OUT VOID                         *SenseData,  OPTIONAL
+     OUT VOID                         *SenseData   OPTIONAL,
      OUT UINT8                        *SenseDataLength
   )
 {
@@ -382,7 +382,7 @@ UfsPeimRead16 (
   IN     UINT32                       SectorNum,
      OUT VOID                         *DataBuffer,
      OUT UINT32                       *DataLength,
-     OUT VOID                         *SenseData,  OPTIONAL
+     OUT VOID                         *SenseData   OPTIONAL,
      OUT UINT8                        *SenseDataLength
   )
 {
