@@ -803,7 +803,7 @@ EFI_STATUS
 EFIAPI
 SpiGetRegionAddress (
   IN     FLASH_REGION_TYPE  FlashRegionType,
-  OUT    UINT32             *BaseAddress, OPTIONAL
+  OUT    UINT32             *BaseAddress  OPTIONAL,
   OUT    UINT32             *RegionSize OPTIONAL
   )
 {
@@ -854,4 +854,3 @@ SpiGetRegionAddress (
 
   return EFI_SUCCESS;
 }
-
