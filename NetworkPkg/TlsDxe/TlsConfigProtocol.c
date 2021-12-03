@@ -105,7 +105,7 @@ EFIAPI
 TlsConfigurationGetData (
   IN     EFI_TLS_CONFIGURATION_PROTOCOL  *This,
   IN     EFI_TLS_CONFIG_DATA_TYPE        DataType,
-  IN OUT VOID                            *Data, OPTIONAL
+  IN OUT VOID                            *Data  OPTIONAL,
   IN OUT UINTN                           *DataSize
   )
 {
@@ -144,4 +144,3 @@ TlsConfigurationGetData (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-

@@ -62,7 +62,7 @@ EFIAPI
 SnpUndi32Statistics (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
   IN BOOLEAN                     Reset,
-  IN OUT UINTN                   *StatisticsSize, OPTIONAL
+  IN OUT UINTN                   *StatisticsSize  OPTIONAL,
   IN OUT EFI_NETWORK_STATISTICS  *StatisticsTable OPTIONAL
   )
 {

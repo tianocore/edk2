@@ -384,7 +384,7 @@ SnpUndi32ReceiveFilters (
   IN UINT32                      Enable,
   IN UINT32                      Disable,
   IN BOOLEAN                     ResetMCastFilter,
-  IN UINTN                       MCastFilterCnt,  OPTIONAL
+  IN UINTN                       MCastFilterCnt   OPTIONAL,
   IN EFI_MAC_ADDRESS             *MCastFilter     OPTIONAL
   )
 {

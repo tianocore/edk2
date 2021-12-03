@@ -216,7 +216,7 @@ IScsiDhcpSelectOffer (
   IN  VOID                *Context,
   IN  EFI_DHCP4_STATE     CurrentState,
   IN  EFI_DHCP4_EVENT     Dhcp4Event,
-  IN  EFI_DHCP4_PACKET    *Packet, OPTIONAL
+  IN  EFI_DHCP4_PACKET    *Packet  OPTIONAL,
   OUT EFI_DHCP4_PACKET    **NewPacket OPTIONAL
   )
 {

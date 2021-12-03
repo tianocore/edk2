@@ -60,7 +60,7 @@ Ip4CopyOption (
   IN     UINT8              *Option,
   IN     UINT32             OptionLen,
   IN     BOOLEAN            FirstFragment,
-  IN OUT UINT8              *Buf,           OPTIONAL
+  IN OUT UINT8              *Buf            OPTIONAL,
   IN OUT UINT32             *BufLen
   );
 #endif
