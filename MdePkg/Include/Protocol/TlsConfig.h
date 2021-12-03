@@ -108,7 +108,7 @@ EFI_STATUS
 (EFIAPI *EFI_TLS_CONFIGURATION_GET_DATA)(
   IN EFI_TLS_CONFIGURATION_PROTOCOL  *This,
   IN EFI_TLS_CONFIG_DATA_TYPE        DataType,
-  IN OUT VOID                        *Data,  OPTIONAL
+  IN OUT VOID                        *Data   OPTIONAL,
   IN OUT UINTN                       *DataSize
   );
 
@@ -124,4 +124,3 @@ struct _EFI_TLS_CONFIGURATION_PROTOCOL {
 extern EFI_GUID gEfiTlsConfigurationProtocolGuid;
 
 #endif  //__EFI_TLS_CONFIGURATION_PROTOCOL_H__
-

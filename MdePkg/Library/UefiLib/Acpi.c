@@ -33,7 +33,7 @@ ScanTableInSDT (
   IN  EFI_ACPI_DESCRIPTION_HEADER   *Sdt,
   IN  UINTN                         TablePointerSize,
   IN  UINT32                        Signature,
-  IN  EFI_ACPI_COMMON_HEADER        *PreviousTable, OPTIONAL
+  IN  EFI_ACPI_COMMON_HEADER        *PreviousTable  OPTIONAL,
   OUT BOOLEAN                       *PreviousTableLocated OPTIONAL
   )
 {
@@ -172,7 +172,7 @@ EFI_ACPI_COMMON_HEADER *
 LocateAcpiTableInAcpiConfigurationTable (
   IN  EFI_GUID                  *AcpiGuid,
   IN  UINT32                    Signature,
-  IN  EFI_ACPI_COMMON_HEADER    *PreviousTable, OPTIONAL
+  IN  EFI_ACPI_COMMON_HEADER    *PreviousTable  OPTIONAL,
   OUT BOOLEAN                   *PreviousTableLocated OPTIONAL
   )
 {

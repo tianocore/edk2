@@ -87,7 +87,7 @@ EFIAPI
 ScsiTestUnitReadyCommand (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,  OPTIONAL
+  IN OUT VOID                  *SenseData   OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus
@@ -186,11 +186,11 @@ EFIAPI
 ScsiInquiryCommand (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,  OPTIONAL
+  IN OUT VOID                  *SenseData   OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *InquiryDataBuffer,    OPTIONAL
+  IN OUT VOID                  *InquiryDataBuffer     OPTIONAL,
   IN OUT UINT32                *InquiryDataLength,
   IN     BOOLEAN               EnableVitalProductData
   );
@@ -290,11 +290,11 @@ EFIAPI
 ScsiInquiryCommandEx (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,  OPTIONAL
+  IN OUT VOID                  *SenseData   OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *InquiryDataBuffer,    OPTIONAL
+  IN OUT VOID                  *InquiryDataBuffer     OPTIONAL,
   IN OUT UINT32                *InquiryDataLength,
   IN     BOOLEAN               EnableVitalProductData,
   IN     UINT8                 PageCode
@@ -395,13 +395,13 @@ EFIAPI
 ScsiModeSense10Command (
   IN     EFI_SCSI_IO_PROTOCOL    *ScsiIo,
   IN     UINT64                  Timeout,
-  IN OUT VOID                    *SenseData,  OPTIONAL
+  IN OUT VOID                    *SenseData   OPTIONAL,
   IN OUT UINT8                   *SenseDataLength,
      OUT UINT8                   *HostAdapterStatus,
      OUT UINT8                   *TargetStatus,
-  IN OUT VOID                    *DataBuffer, OPTIONAL
+  IN OUT VOID                    *DataBuffer  OPTIONAL,
   IN OUT UINT32                  *DataLength,
-  IN     UINT8                   DBDField,    OPTIONAL
+  IN     UINT8                   DBDField     OPTIONAL,
   IN     UINT8                   PageControl,
   IN     UINT8                   PageCode
   );
@@ -445,7 +445,7 @@ EFIAPI
 ScsiRequestSenseCommand (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,  OPTIONAL
+  IN OUT VOID                  *SenseData   OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus
@@ -501,11 +501,11 @@ EFIAPI
 ScsiReadCapacityCommand (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,    OPTIONAL
+  IN OUT VOID                  *SenseData     OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *DataBuffer,   OPTIONAL
+  IN OUT VOID                  *DataBuffer    OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     BOOLEAN               Pmi
   );
@@ -560,11 +560,11 @@ EFIAPI
 ScsiReadCapacity16Command (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,  OPTIONAL
+  IN OUT VOID                  *SenseData   OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *DataBuffer, OPTIONAL
+  IN OUT VOID                  *DataBuffer  OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     BOOLEAN               Pmi
   );
@@ -620,11 +620,11 @@ EFIAPI
 ScsiRead10Command (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
   IN     UINT32                SectorSize
@@ -681,11 +681,11 @@ EFIAPI
 ScsiWrite10Command (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
   IN     UINT32                SectorSize
@@ -741,11 +741,11 @@ EFIAPI
 ScsiRead16Command (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
   IN     UINT32                SectorSize
@@ -802,11 +802,11 @@ EFIAPI
 ScsiWrite16Command (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
   IN     UINT32                SectorSize
@@ -866,7 +866,7 @@ EFIAPI
 ScsiSecurityProtocolInCommand (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
@@ -874,7 +874,7 @@ ScsiSecurityProtocolInCommand (
   IN     UINT16                SecurityProtocolSpecific,
   IN     BOOLEAN               Inc512,
   IN     UINTN                 DataLength,
-  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT VOID                  *DataBuffer   OPTIONAL,
      OUT UINTN                 *TransferLength
   );
 
@@ -929,7 +929,7 @@ EFIAPI
 ScsiSecurityProtocolOutCommand (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
@@ -1019,11 +1019,11 @@ EFIAPI
 ScsiRead10CommandEx (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
   IN     UINT32                SectorSize,
@@ -1109,11 +1109,11 @@ EFIAPI
 ScsiWrite10CommandEx (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
   IN     UINT32                SectorSize,
@@ -1199,11 +1199,11 @@ EFIAPI
 ScsiRead16CommandEx (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
   IN     UINT32                SectorSize,
@@ -1289,11 +1289,11 @@ EFIAPI
 ScsiWrite16CommandEx (
   IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
   IN     UINT64                Timeout,
-  IN OUT VOID                  *SenseData,   OPTIONAL
+  IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
      OUT UINT8                 *HostAdapterStatus,
      OUT UINT8                 *TargetStatus,
-  IN OUT VOID                  *DataBuffer,  OPTIONAL
+  IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
   IN     UINT32                SectorSize,

@@ -621,11 +621,11 @@ EFI_STATUS
   IN UINT16                                    OpFlags,
   IN EFI_IP_ADDRESS                            *DestIp,
   IN EFI_PXE_BASE_CODE_UDP_PORT                *DestPort,
-  IN EFI_IP_ADDRESS                            *GatewayIp,  OPTIONAL
-  IN EFI_IP_ADDRESS                            *SrcIp,      OPTIONAL
-  IN OUT EFI_PXE_BASE_CODE_UDP_PORT            *SrcPort,    OPTIONAL
-  IN UINTN                                     *HeaderSize, OPTIONAL
-  IN VOID                                      *HeaderPtr,  OPTIONAL
+  IN EFI_IP_ADDRESS                            *GatewayIp   OPTIONAL,
+  IN EFI_IP_ADDRESS                            *SrcIp       OPTIONAL,
+  IN OUT EFI_PXE_BASE_CODE_UDP_PORT            *SrcPort     OPTIONAL,
+  IN UINTN                                     *HeaderSize  OPTIONAL,
+  IN VOID                                      *HeaderPtr   OPTIONAL,
   IN UINTN                                     *BufferSize,
   IN VOID                                      *BufferPtr
   );
@@ -673,12 +673,12 @@ EFI_STATUS
 (EFIAPI *EFI_PXE_BASE_CODE_UDP_READ)(
   IN EFI_PXE_BASE_CODE_PROTOCOL                *This,
   IN UINT16                                    OpFlags,
-  IN OUT EFI_IP_ADDRESS                        *DestIp,     OPTIONAL
-  IN OUT EFI_PXE_BASE_CODE_UDP_PORT            *DestPort,   OPTIONAL
-  IN OUT EFI_IP_ADDRESS                        *SrcIp,      OPTIONAL
-  IN OUT EFI_PXE_BASE_CODE_UDP_PORT            *SrcPort,    OPTIONAL
-  IN UINTN                                     *HeaderSize, OPTIONAL
-  IN VOID                                      *HeaderPtr,  OPTIONAL
+  IN OUT EFI_IP_ADDRESS                        *DestIp      OPTIONAL,
+  IN OUT EFI_PXE_BASE_CODE_UDP_PORT            *DestPort    OPTIONAL,
+  IN OUT EFI_IP_ADDRESS                        *SrcIp       OPTIONAL,
+  IN OUT EFI_PXE_BASE_CODE_UDP_PORT            *SrcPort     OPTIONAL,
+  IN UINTN                                     *HeaderSize  OPTIONAL,
+  IN VOID                                      *HeaderPtr   OPTIONAL,
   IN OUT UINTN                                 *BufferSize,
   IN VOID                                      *BufferPtr
   );
@@ -795,10 +795,10 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_PXE_BASE_CODE_SET_PARAMETERS)(
   IN EFI_PXE_BASE_CODE_PROTOCOL            *This,
-  IN BOOLEAN                               *NewAutoArp,     OPTIONAL
-  IN BOOLEAN                               *NewSendGUID,    OPTIONAL
-  IN UINT8                                 *NewTTL,         OPTIONAL
-  IN UINT8                                 *NewToS,         OPTIONAL
+  IN BOOLEAN                               *NewAutoArp      OPTIONAL,
+  IN BOOLEAN                               *NewSendGUID     OPTIONAL,
+  IN UINT8                                 *NewTTL          OPTIONAL,
+  IN UINT8                                 *NewToS          OPTIONAL,
   IN BOOLEAN                               *NewMakeCallback OPTIONAL
   );
 
@@ -829,7 +829,7 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_PXE_BASE_CODE_SET_STATION_IP)(
   IN EFI_PXE_BASE_CODE_PROTOCOL            *This,
-  IN EFI_IP_ADDRESS                        *NewStationIp,   OPTIONAL
+  IN EFI_IP_ADDRESS                        *NewStationIp    OPTIONAL,
   IN EFI_IP_ADDRESS                        *NewSubnetMask   OPTIONAL
   );
 
@@ -868,17 +868,17 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_PXE_BASE_CODE_SET_PACKETS)(
   IN EFI_PXE_BASE_CODE_PROTOCOL            *This,
-  BOOLEAN                                  *NewDhcpDiscoverValid,   OPTIONAL
-  BOOLEAN                                  *NewDhcpAckReceived,     OPTIONAL
-  BOOLEAN                                  *NewProxyOfferReceived,  OPTIONAL
-  BOOLEAN                                  *NewPxeDiscoverValid,    OPTIONAL
-  BOOLEAN                                  *NewPxeReplyReceived,    OPTIONAL
-  BOOLEAN                                  *NewPxeBisReplyReceived, OPTIONAL
-  IN EFI_PXE_BASE_CODE_PACKET              *NewDhcpDiscover,        OPTIONAL
-  IN EFI_PXE_BASE_CODE_PACKET              *NewDhcpAck,             OPTIONAL
-  IN EFI_PXE_BASE_CODE_PACKET              *NewProxyOffer,          OPTIONAL
-  IN EFI_PXE_BASE_CODE_PACKET              *NewPxeDiscover,         OPTIONAL
-  IN EFI_PXE_BASE_CODE_PACKET              *NewPxeReply,            OPTIONAL
+  BOOLEAN                                  *NewDhcpDiscoverValid    OPTIONAL,
+  BOOLEAN                                  *NewDhcpAckReceived      OPTIONAL,
+  BOOLEAN                                  *NewProxyOfferReceived   OPTIONAL,
+  BOOLEAN                                  *NewPxeDiscoverValid     OPTIONAL,
+  BOOLEAN                                  *NewPxeReplyReceived     OPTIONAL,
+  BOOLEAN                                  *NewPxeBisReplyReceived  OPTIONAL,
+  IN EFI_PXE_BASE_CODE_PACKET              *NewDhcpDiscover         OPTIONAL,
+  IN EFI_PXE_BASE_CODE_PACKET              *NewDhcpAck              OPTIONAL,
+  IN EFI_PXE_BASE_CODE_PACKET              *NewProxyOffer           OPTIONAL,
+  IN EFI_PXE_BASE_CODE_PACKET              *NewPxeDiscover          OPTIONAL,
+  IN EFI_PXE_BASE_CODE_PACKET              *NewPxeReply             OPTIONAL,
   IN EFI_PXE_BASE_CODE_PACKET              *NewPxeBisReply          OPTIONAL
   );
 
