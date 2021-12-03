@@ -88,7 +88,7 @@ PerformFlashWriteWithProgress (
   IN FLASH_ADDRESS_TYPE                             FlashAddressType,
   IN VOID                                           *Buffer,
   IN UINTN                                          Length,
-  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress,        OPTIONAL
+  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress         OPTIONAL,
   IN UINTN                                          StartPercentage,
   IN UINTN                                          EndPercentage
   );
