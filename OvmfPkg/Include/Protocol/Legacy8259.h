@@ -88,9 +88,9 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_8259_GET_MASK)(
   IN EFI_LEGACY_8259_PROTOCOL           *This,
-  OUT UINT16                            *LegacyMask, OPTIONAL
-  OUT UINT16                            *LegacyEdgeLevel, OPTIONAL
-  OUT UINT16                            *ProtectedMask, OPTIONAL
+  OUT UINT16                            *LegacyMask  OPTIONAL,
+  OUT UINT16                            *LegacyEdgeLevel  OPTIONAL,
+  OUT UINT16                            *ProtectedMask  OPTIONAL,
   OUT UINT16                            *ProtectedEdgeLevel OPTIONAL
   );
 
@@ -114,9 +114,9 @@ typedef
 EFI_STATUS
 (EFIAPI *EFI_LEGACY_8259_SET_MASK)(
   IN EFI_LEGACY_8259_PROTOCOL           *This,
-  IN  UINT16                            *LegacyMask, OPTIONAL
-  IN  UINT16                            *LegacyEdgeLevel, OPTIONAL
-  IN  UINT16                            *ProtectedMask, OPTIONAL
+  IN  UINT16                            *LegacyMask  OPTIONAL,
+  IN  UINT16                            *LegacyEdgeLevel  OPTIONAL,
+  IN  UINT16                            *ProtectedMask  OPTIONAL,
   IN  UINT16                            *ProtectedEdgeLevel OPTIONAL
   );
 
@@ -143,7 +143,7 @@ EFI_STATUS
 (EFIAPI *EFI_LEGACY_8259_SET_MODE)(
   IN EFI_LEGACY_8259_PROTOCOL         *This,
   IN  EFI_8259_MODE                   Mode,
-  IN  UINT16                          *Mask, OPTIONAL
+  IN  UINT16                          *Mask  OPTIONAL,
   IN  UINT16                          *EdgeLevel OPTIONAL
   );
 

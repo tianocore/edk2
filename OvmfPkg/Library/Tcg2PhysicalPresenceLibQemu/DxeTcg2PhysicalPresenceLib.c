@@ -278,7 +278,7 @@ Tpm2CommandChangeEps (
 STATIC
 UINT32
 Tcg2ExecutePhysicalPresence (
-  IN      TPM2B_AUTH                       *PlatformAuth,  OPTIONAL
+  IN      TPM2B_AUTH                       *PlatformAuth   OPTIONAL,
   IN      UINT32                           CommandCode,
   IN      UINT32                           CommandParameter
   )

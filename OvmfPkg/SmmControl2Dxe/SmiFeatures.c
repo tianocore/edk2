@@ -203,7 +203,7 @@ STATIC
 VOID
 EFIAPI
 AppendFwCfgBootScript (
-  IN OUT VOID *Context,              OPTIONAL
+  IN OUT VOID *Context               OPTIONAL,
   IN OUT VOID *ExternalScratchBuffer
   )
 {

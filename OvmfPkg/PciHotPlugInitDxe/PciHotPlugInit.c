@@ -489,7 +489,7 @@ InitializeRootHpc (
   IN  EFI_PCI_HOT_PLUG_INIT_PROTOCOL *This,
   IN  EFI_DEVICE_PATH_PROTOCOL       *HpcDevicePath,
   IN  UINT64                         HpcPciAddress,
-  IN  EFI_EVENT                      Event, OPTIONAL
+  IN  EFI_EVENT                      Event  OPTIONAL,
   OUT EFI_HPC_STATE                  *HpcState
   )
 {
