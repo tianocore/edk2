@@ -252,6 +252,36 @@ FindAnotherHighestBelow4GResourceDescriptor (
 }
 
 /**
+  Check the HOB and decide if it is need inside Payload
+
+  Payload maintainer may make decision which HOB is need or needn't
+  Then add the check logic in the function.
+
+  @param[in] Hob The HOB to check
+
+  @retval TRUE  If HOB is need inside Payload
+  @retval FALSE If HOB is needn't inside Payload
+**/
+BOOLEAN
+IsHobNeed (
+  EFI_PEI_HOB_POINTERS  Hob
+  )
+{
+  if (Hob.Header->HobType == EFI_HOB_TYPE_HANDOFF) {
+    return FALSE;
+  }
+
+  if (Hob.Header->HobType == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
+    if (CompareGuid (&Hob.MemoryAllocationModule->MemoryAllocationHeader.Name, &gEfiHobMemoryAllocModuleGuid)) {
+      return FALSE;
+    }
+  }
+
+  // Arrive here mean the HOB is need
+  return TRUE;
+}
+
+/**
   It will build HOBs based on information from bootloaders.
 
   @param[in]  BootloaderParameter   The starting memory address of bootloader parameter block.
@@ -351,7 +381,7 @@ BuildHobs (
   // Since payload created new Hob, move all hobs except PHIT from boot loader hob list.
   //
   while (!END_OF_HOB_LIST (Hob)) {
-    if (Hob.Header->HobType != EFI_HOB_TYPE_HANDOFF) {
+    if (IsHobNeed (Hob)) {
       // Add this hob to payload HOB
       AddNewHob (&Hob);
     }
