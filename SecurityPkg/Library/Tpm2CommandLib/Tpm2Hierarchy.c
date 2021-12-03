@@ -305,7 +305,7 @@ EFI_STATUS
 EFIAPI
 Tpm2ClearControl (
   IN TPMI_RH_CLEAR             AuthHandle,
-  IN TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN TPMS_AUTH_COMMAND         *AuthSession  OPTIONAL,
   IN TPMI_YES_NO               Disable
   )
 {

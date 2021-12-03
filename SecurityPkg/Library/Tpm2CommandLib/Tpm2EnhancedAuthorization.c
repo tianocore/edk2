@@ -90,7 +90,7 @@ EFIAPI
 Tpm2PolicySecret (
   IN      TPMI_DH_ENTITY            AuthHandle,
   IN      TPMI_SH_POLICY            PolicySession,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN      TPMS_AUTH_COMMAND         *AuthSession  OPTIONAL,
   IN      TPM2B_NONCE               *NonceTPM,
   IN      TPM2B_DIGEST              *CpHashA,
   IN      TPM2B_NONCE               *PolicyRef,

@@ -281,7 +281,7 @@ EFI_STATUS
 EFIAPI
 Tpm2NvDefineSpace (
   IN      TPMI_RH_PROVISION         AuthHandle,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN      TPMS_AUTH_COMMAND         *AuthSession  OPTIONAL,
   IN      TPM2B_AUTH                *Auth,
   IN      TPM2B_NV_PUBLIC           *NvPublic
   )
@@ -525,7 +525,7 @@ EFIAPI
 Tpm2NvRead (
   IN      TPMI_RH_NV_AUTH           AuthHandle,
   IN      TPMI_RH_NV_INDEX          NvIndex,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN      TPMS_AUTH_COMMAND         *AuthSession  OPTIONAL,
   IN      UINT16                    Size,
   IN      UINT16                    Offset,
   IN OUT  TPM2B_MAX_BUFFER          *OutData
@@ -670,7 +670,7 @@ EFIAPI
 Tpm2NvWrite (
   IN      TPMI_RH_NV_AUTH           AuthHandle,
   IN      TPMI_RH_NV_INDEX          NvIndex,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN      TPMS_AUTH_COMMAND         *AuthSession  OPTIONAL,
   IN      TPM2B_MAX_BUFFER          *InData,
   IN      UINT16                    Offset
   )
