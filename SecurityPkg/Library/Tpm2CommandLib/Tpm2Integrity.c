@@ -566,7 +566,7 @@ Done:
 EFI_STATUS
 EFIAPI
 Tpm2PcrAllocateBanks (
-  IN TPM2B_AUTH                *PlatformAuth,  OPTIONAL
+  IN TPM2B_AUTH                *PlatformAuth   OPTIONAL,
   IN UINT32                    SupportedPCRBanks,
   IN UINT32                    PCRBanks
   )
