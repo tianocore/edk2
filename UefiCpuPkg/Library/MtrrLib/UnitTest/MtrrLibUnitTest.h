@@ -129,7 +129,7 @@ VOID
 GenerateRandomMtrrPair (
   IN  UINT32                 PhysicalAddressBits,
   IN  MTRR_MEMORY_CACHE_TYPE CacheType,
-  OUT MTRR_VARIABLE_SETTING  *MtrrPair,       OPTIONAL
+  OUT MTRR_VARIABLE_SETTING  *MtrrPair        OPTIONAL,
   OUT MTRR_MEMORY_RANGE      *MtrrMemoryRange OPTIONAL
   );
 

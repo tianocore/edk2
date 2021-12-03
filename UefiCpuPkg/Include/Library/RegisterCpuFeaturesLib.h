@@ -252,7 +252,7 @@ RETURN_STATUS
 (EFIAPI *CPU_FEATURE_INITIALIZE)(
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   );
 
@@ -303,10 +303,10 @@ RETURN_STATUS
 RETURN_STATUS
 EFIAPI
 RegisterCpuFeature (
-  IN CHAR8                             *FeatureName,       OPTIONAL
-  IN CPU_FEATURE_GET_CONFIG_DATA       GetConfigDataFunc,  OPTIONAL
-  IN CPU_FEATURE_SUPPORT               SupportFunc,        OPTIONAL
-  IN CPU_FEATURE_INITIALIZE            InitializeFunc,     OPTIONAL
+  IN CHAR8                             *FeatureName        OPTIONAL,
+  IN CPU_FEATURE_GET_CONFIG_DATA       GetConfigDataFunc   OPTIONAL,
+  IN CPU_FEATURE_SUPPORT               SupportFunc         OPTIONAL,
+  IN CPU_FEATURE_INITIALIZE            InitializeFunc      OPTIONAL,
   ...
   );
 

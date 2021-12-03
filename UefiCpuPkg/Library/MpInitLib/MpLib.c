@@ -1333,8 +1333,8 @@ WakeUpAP (
   IN CPU_MP_DATA               *CpuMpData,
   IN BOOLEAN                   Broadcast,
   IN UINTN                     ProcessorNumber,
-  IN EFI_AP_PROCEDURE          Procedure,              OPTIONAL
-  IN VOID                      *ProcedureArgument,     OPTIONAL
+  IN EFI_AP_PROCEDURE          Procedure               OPTIONAL,
+  IN VOID                      *ProcedureArgument      OPTIONAL,
   IN BOOLEAN                   WakeUpDisabledAps
   )
 {
@@ -2534,7 +2534,7 @@ MpInitLibWhoAmI (
 EFI_STATUS
 EFIAPI
 MpInitLibGetNumberOfProcessors (
-  OUT UINTN                     *NumberOfProcessors,       OPTIONAL
+  OUT UINTN                     *NumberOfProcessors        OPTIONAL,
   OUT UINTN                     *NumberOfEnabledProcessors OPTIONAL
   )
 {

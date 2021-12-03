@@ -113,9 +113,9 @@ UINT32
 EFIAPI
 UnitTestMtrrLibAsmCpuid (
   IN      UINT32                    Index,
-  OUT     UINT32                    *Eax,  OPTIONAL
-  OUT     UINT32                    *Ebx,  OPTIONAL
-  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Eax   OPTIONAL,
+  OUT     UINT32                    *Ebx   OPTIONAL,
+  OUT     UINT32                    *Ecx   OPTIONAL,
   OUT     UINT32                    *Edx   OPTIONAL
   )
 {
@@ -423,7 +423,7 @@ VOID
 GenerateRandomMtrrPair (
   IN  UINT32                 PhysicalAddressBits,
   IN  MTRR_MEMORY_CACHE_TYPE CacheType,
-  OUT MTRR_VARIABLE_SETTING  *MtrrPair,       OPTIONAL
+  OUT MTRR_VARIABLE_SETTING  *MtrrPair        OPTIONAL,
   OUT MTRR_MEMORY_RANGE      *MtrrMemoryRange OPTIONAL
   )
 {

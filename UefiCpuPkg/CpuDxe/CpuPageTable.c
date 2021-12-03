@@ -691,7 +691,7 @@ ConvertMemoryPageAttributes (
   IN  UINT64                            Attributes,
   IN  PAGE_ACTION                       PageAction,
   IN  PAGE_TABLE_LIB_ALLOCATE_PAGES     AllocatePagesFunc OPTIONAL,
-  OUT BOOLEAN                           *IsSplitted,  OPTIONAL
+  OUT BOOLEAN                           *IsSplitted   OPTIONAL,
   OUT BOOLEAN                           *IsModified   OPTIONAL
   )
 {
@@ -1379,4 +1379,3 @@ InitializePageTableLib (
 
   return ;
 }
-

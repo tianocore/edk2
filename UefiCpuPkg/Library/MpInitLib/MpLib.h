@@ -466,8 +466,8 @@ WakeUpAP (
   IN CPU_MP_DATA               *CpuMpData,
   IN BOOLEAN                   Broadcast,
   IN UINTN                     ProcessorNumber,
-  IN EFI_AP_PROCEDURE          Procedure,              OPTIONAL
-  IN VOID                      *ProcedureArgument,     OPTIONAL
+  IN EFI_AP_PROCEDURE          Procedure               OPTIONAL,
+  IN VOID                      *ProcedureArgument      OPTIONAL,
   IN BOOLEAN                   WakeUpDisabledAps       OPTIONAL
   );
 
@@ -742,4 +742,3 @@ PlatformShadowMicrocode (
   );
 
 #endif
-

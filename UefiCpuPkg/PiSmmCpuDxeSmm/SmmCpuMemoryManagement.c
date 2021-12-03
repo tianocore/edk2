@@ -405,7 +405,7 @@ ConvertMemoryPageAttributes (
   IN  UINT64                            Length,
   IN  UINT64                            Attributes,
   IN  BOOLEAN                           IsSet,
-  OUT BOOLEAN                           *IsSplitted,  OPTIONAL
+  OUT BOOLEAN                           *IsSplitted   OPTIONAL,
   OUT BOOLEAN                           *IsModified   OPTIONAL
   )
 {
@@ -1568,4 +1568,3 @@ EdkiiSmmGetMemoryAttributes (
 
   return EFI_SUCCESS;
 }
-
