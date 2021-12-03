@@ -70,7 +70,7 @@ EFI_STATUS
 EFIAPI
 LcdGraphicsBlt (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
-  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer,     OPTIONAL
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer      OPTIONAL,
   IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
   IN UINTN                              SourceX,
   IN UINTN                              SourceY,
