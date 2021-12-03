@@ -202,7 +202,7 @@ LoadDxeCoreFromFfsFile (
 EFI_STATUS
 EFIAPI
 LoadDxeCoreFromFv (
-  IN UINTN  *FvInstance,   OPTIONAL
+  IN UINTN  *FvInstance    OPTIONAL,
   IN UINTN  StackSize
   )
 {
