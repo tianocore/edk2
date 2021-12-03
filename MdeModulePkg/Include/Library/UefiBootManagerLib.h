@@ -322,7 +322,7 @@ EfiBootManagerStartHotkeyService (
 EFI_STATUS
 EFIAPI
 EfiBootManagerAddKeyOptionVariable (
-  OUT EFI_BOOT_MANAGER_KEY_OPTION *AddedOption,   OPTIONAL
+  OUT EFI_BOOT_MANAGER_KEY_OPTION *AddedOption    OPTIONAL,
   IN UINT16                       BootOptionNumber,
   IN UINT32                       Modifier,
   ...
@@ -341,7 +341,7 @@ EfiBootManagerAddKeyOptionVariable (
 EFI_STATUS
 EFIAPI
 EfiBootManagerDeleteKeyOptionVariable (
-  IN EFI_BOOT_MANAGER_KEY_OPTION *DeletedOption, OPTIONAL
+  IN EFI_BOOT_MANAGER_KEY_OPTION *DeletedOption  OPTIONAL,
   IN UINT32                      Modifier,
   ...
   );

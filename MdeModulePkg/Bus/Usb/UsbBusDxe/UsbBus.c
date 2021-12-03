@@ -60,8 +60,8 @@ UsbIoControlTransfer (
   IN  EFI_USB_DEVICE_REQUEST  *Request,
   IN  EFI_USB_DATA_DIRECTION  Direction,
   IN  UINT32                  Timeout,
-  IN  OUT VOID                *Data,      OPTIONAL
-  IN  UINTN                   DataLength, OPTIONAL
+  IN  OUT VOID                *Data       OPTIONAL,
+  IN  UINTN                   DataLength  OPTIONAL,
   OUT UINT32                  *UsbStatus
   )
 {
@@ -405,9 +405,9 @@ UsbIoAsyncInterruptTransfer (
   IN EFI_USB_IO_PROTOCOL              *This,
   IN UINT8                            Endpoint,
   IN BOOLEAN                          IsNewTransfer,
-  IN UINTN                            PollInterval,       OPTIONAL
-  IN UINTN                            DataLength,         OPTIONAL
-  IN EFI_ASYNC_USB_TRANSFER_CALLBACK  Callback,           OPTIONAL
+  IN UINTN                            PollInterval        OPTIONAL,
+  IN UINTN                            DataLength          OPTIONAL,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK  Callback            OPTIONAL,
   IN VOID                             *Context            OPTIONAL
   )
 {

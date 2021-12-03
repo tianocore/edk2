@@ -138,7 +138,7 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiList2[] = {
 VOID
 EFIAPI
 PcdSetNvStoreDefaultIdCallBack (
-  IN CONST EFI_GUID         *CallBackGuid, OPTIONAL
+  IN CONST EFI_GUID         *CallBackGuid  OPTIONAL,
   IN       UINTN            CallBackToken,
   IN OUT   VOID             *TokenData,
   IN       UINTN            TokenDataSize
@@ -1342,7 +1342,7 @@ PeiPcdSetBoolEx (
 EFI_STATUS
 EFIAPI
 PeiRegisterCallBackOnSet (
-  IN  CONST EFI_GUID              *Guid, OPTIONAL
+  IN  CONST EFI_GUID              *Guid  OPTIONAL,
   IN  UINTN                       ExTokenNumber,
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
@@ -1373,7 +1373,7 @@ PeiRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 PcdUnRegisterCallBackOnSet (
-  IN  CONST EFI_GUID              *Guid, OPTIONAL
+  IN  CONST EFI_GUID              *Guid  OPTIONAL,
   IN  UINTN                       ExTokenNumber,
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
@@ -1417,7 +1417,7 @@ PcdUnRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 PeiPcdGetNextToken (
-  IN CONST EFI_GUID               *Guid, OPTIONAL
+  IN CONST EFI_GUID               *Guid  OPTIONAL,
   IN OUT  UINTN                   *TokenNumber
   )
 {

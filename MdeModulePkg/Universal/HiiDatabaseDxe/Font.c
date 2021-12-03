@@ -603,8 +603,8 @@ WriteOutputParam (
   IN  UINT8                          *BufferIn,
   IN  UINTN                          BufferLen,
   IN  EFI_HII_GLYPH_INFO             *InputCell,
-  OUT UINT8                          **GlyphBuffer, OPTIONAL
-  OUT EFI_HII_GLYPH_INFO             *Cell, OPTIONAL
+  OUT UINT8                          **GlyphBuffer  OPTIONAL,
+  OUT EFI_HII_GLYPH_INFO             *Cell  OPTIONAL,
   OUT UINTN                          *GlyphBufferLen OPTIONAL
   )
 {
@@ -657,8 +657,8 @@ EFI_STATUS
 FindGlyphBlock (
   IN  HII_FONT_PACKAGE_INSTANCE      *FontPackage,
   IN  CHAR16                         CharValue,
-  OUT UINT8                          **GlyphBuffer, OPTIONAL
-  OUT EFI_HII_GLYPH_INFO             *Cell, OPTIONAL
+  OUT UINT8                          **GlyphBuffer  OPTIONAL,
+  OUT EFI_HII_GLYPH_INFO             *Cell  OPTIONAL,
   OUT UINTN                          *GlyphBufferLen OPTIONAL
   )
 {
@@ -1036,7 +1036,7 @@ BOOLEAN
 IsSystemFontInfo (
   IN  HII_DATABASE_PRIVATE_DATA      *Private,
   IN  EFI_FONT_DISPLAY_INFO          *StringInfo,
-  OUT EFI_FONT_DISPLAY_INFO          **SystemInfo, OPTIONAL
+  OUT EFI_FONT_DISPLAY_INFO          **SystemInfo  OPTIONAL,
   OUT UINTN                          *SystemInfoLen OPTIONAL
   )
 {
@@ -1149,8 +1149,8 @@ BOOLEAN
 IsFontInfoExisted (
   IN  HII_DATABASE_PRIVATE_DATA *Private,
   IN  EFI_FONT_INFO             *FontInfo,
-  IN  EFI_FONT_INFO_MASK        *FontInfoMask,   OPTIONAL
-  IN  EFI_FONT_HANDLE           FontHandle,      OPTIONAL
+  IN  EFI_FONT_INFO_MASK        *FontInfoMask    OPTIONAL,
+  IN  EFI_FONT_HANDLE           FontHandle       OPTIONAL,
   OUT HII_GLOBAL_FONT_INFO      **GlobalFontInfo OPTIONAL
   )
 {
@@ -2729,7 +2729,7 @@ EFIAPI
 HiiGetFontInfo (
   IN  CONST EFI_HII_FONT_PROTOCOL    *This,
   IN  OUT   EFI_FONT_HANDLE          *FontHandle,
-  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfoIn, OPTIONAL
+  IN  CONST EFI_FONT_DISPLAY_INFO    *StringInfoIn  OPTIONAL,
   OUT       EFI_FONT_DISPLAY_INFO    **StringInfoOut,
   IN  CONST EFI_STRING               String OPTIONAL
   )
@@ -2900,5 +2900,3 @@ Exit:
   }
   return Status;
 }
-
-
