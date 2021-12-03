@@ -750,8 +750,8 @@ EFIAPI
 LegacyBiosCheckPciRom (
   IN  EFI_LEGACY_BIOS_PROTOCOL          *This,
   IN  EFI_HANDLE                        PciHandle,
-  OUT VOID                              **RomImage, OPTIONAL
-  OUT UINTN                             *RomSize, OPTIONAL
+  OUT VOID                              **RomImage  OPTIONAL,
+  OUT UINTN                             *RomSize  OPTIONAL,
   OUT UINTN                             *Flags
   );
 
@@ -838,9 +838,9 @@ LegacyBiosInstallPciRom (
   IN  EFI_HANDLE                        PciHandle,
   IN  VOID                              **RomImage,
   OUT UINTN                             *Flags,
-  OUT UINT8                             *DiskStart, OPTIONAL
-  OUT UINT8                             *DiskEnd, OPTIONAL
-  OUT VOID                              **RomShadowAddress, OPTIONAL
+  OUT UINT8                             *DiskStart  OPTIONAL,
+  OUT UINT8                             *DiskEnd  OPTIONAL,
+  OUT VOID                              **RomShadowAddress  OPTIONAL,
   OUT UINT32                            *RomShadowedSize OPTIONAL
   );
 
@@ -1388,11 +1388,11 @@ EFI_STATUS
 LegacyBiosCheckPciRomEx (
   IN EFI_LEGACY_BIOS_PROTOCOL           *This,
   IN  EFI_HANDLE                        PciHandle,
-  OUT VOID                              **RomImage, OPTIONAL
-  OUT UINTN                             *RomSize, OPTIONAL
-  OUT UINTN                             *RuntimeImageLength, OPTIONAL
-  OUT UINTN                             *Flags, OPTIONAL
-  OUT UINT8                             *OpromRevision, OPTIONAL
+  OUT VOID                              **RomImage  OPTIONAL,
+  OUT UINTN                             *RomSize  OPTIONAL,
+  OUT UINTN                             *RuntimeImageLength  OPTIONAL,
+  OUT UINTN                             *Flags  OPTIONAL,
+  OUT UINT8                             *OpromRevision  OPTIONAL,
   OUT VOID                              **ConfigUtilityCodeHeader OPTIONAL
   );
 

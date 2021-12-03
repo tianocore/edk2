@@ -616,9 +616,9 @@ PlatformHooks (
   IN       EFI_LEGACY_BIOS_PLATFORM_PROTOCOL     *This,
   IN       EFI_GET_PLATFORM_HOOK_MODE            Mode,
   IN       UINT16                                Type,
-     OUT   EFI_HANDLE                            DeviceHandle, OPTIONAL
-  IN OUT   UINTN                                 *Shadowaddress, OPTIONAL
-  IN       EFI_COMPATIBILITY16_TABLE             *Compatibility16Table, OPTIONAL
+     OUT   EFI_HANDLE                            DeviceHandle  OPTIONAL,
+  IN OUT   UINTN                                 *Shadowaddress  OPTIONAL,
+  IN       EFI_COMPATIBILITY16_TABLE             *Compatibility16Table  OPTIONAL,
      OUT   VOID                                  **AdditionalData OPTIONAL
   )
 {
@@ -674,9 +674,9 @@ GetRoutingTable (
   IN  EFI_LEGACY_BIOS_PLATFORM_PROTOCOL           *This,
   OUT VOID                                        **RoutingTable,
   OUT UINTN                                       *RoutingTableEntries,
-  OUT VOID                                        **LocalPirqTable, OPTIONAL
-  OUT UINTN                                       *PirqTableSize, OPTIONAL
-  OUT VOID                                        **LocalIrqPriorityTable, OPTIONAL
+  OUT VOID                                        **LocalPirqTable  OPTIONAL,
+  OUT UINTN                                       *PirqTableSize  OPTIONAL,
+  OUT VOID                                        **LocalIrqPriorityTable  OPTIONAL,
   OUT UINTN                                       *IrqPriorityTableEntries OPTIONAL
   )
 {
@@ -1057,4 +1057,3 @@ LegacyBiosPlatformInstall (
                   );
   return Status;
 }
-

@@ -629,9 +629,9 @@ EFI_STATUS
   IN EFI_LEGACY_BIOS_PLATFORM_PROTOCOL   *This,
   IN EFI_GET_PLATFORM_HOOK_MODE          Mode,
   IN UINT16                              Type,
-  IN  EFI_HANDLE                         DeviceHandle, OPTIONAL
-  IN  OUT UINTN                          *ShadowAddress, OPTIONAL
-  IN  EFI_COMPATIBILITY16_TABLE          *Compatibility16Table, OPTIONAL
+  IN  EFI_HANDLE                         DeviceHandle  OPTIONAL,
+  IN  OUT UINTN                          *ShadowAddress  OPTIONAL,
+  IN  EFI_COMPATIBILITY16_TABLE          *Compatibility16Table  OPTIONAL,
   OUT  VOID                               **AdditionalData OPTIONAL
   );
 
@@ -660,9 +660,9 @@ EFI_STATUS
   IN EFI_LEGACY_BIOS_PLATFORM_PROTOCOL   *This,
   OUT VOID                               **RoutingTable,
   OUT UINTN                              *RoutingTableEntries,
-  OUT VOID                               **LocalPirqTable, OPTIONAL
-  OUT UINTN                              *PirqTableSize, OPTIONAL
-  OUT VOID                               **LocalIrqPriorityTable, OPTIONAL
+  OUT VOID                               **LocalPirqTable  OPTIONAL,
+  OUT UINTN                              *PirqTableSize  OPTIONAL,
+  OUT VOID                               **LocalIrqPriorityTable  OPTIONAL,
   OUT UINTN                              *IrqPriorityTableEntries OPTIONAL
   );
 
