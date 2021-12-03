@@ -147,7 +147,7 @@ Tpm2CommandChangeEps (
 **/
 UINT32
 Tcg2ExecutePhysicalPresence (
-  IN      TPM2B_AUTH                       *PlatformAuth,  OPTIONAL
+  IN      TPM2B_AUTH                       *PlatformAuth   OPTIONAL,
   IN      UINT32                           CommandCode,
   IN      UINT32                           CommandParameter,
   IN OUT  EFI_TCG2_PHYSICAL_PRESENCE_FLAGS *PpiFlags
@@ -720,7 +720,7 @@ Tcg2HaveValidTpmRequest  (
 **/
 VOID
 Tcg2ExecutePendingTpmRequest (
-  IN      TPM2B_AUTH                       *PlatformAuth,  OPTIONAL
+  IN      TPM2B_AUTH                       *PlatformAuth   OPTIONAL,
   IN OUT  EFI_TCG2_PHYSICAL_PRESENCE       *TcgPpData,
   IN OUT  EFI_TCG2_PHYSICAL_PRESENCE_FLAGS *Flags
   )

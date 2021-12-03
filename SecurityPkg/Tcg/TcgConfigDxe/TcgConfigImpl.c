@@ -56,7 +56,7 @@ HII_VENDOR_DEVICE_PATH          mTcgHiiVendorDevicePath = {
 EFI_STATUS
 GetTpmState (
   IN  EFI_TCG_PROTOCOL          *TcgProtocol,
-  OUT BOOLEAN                   *TpmEnable,  OPTIONAL
+  OUT BOOLEAN                   *TpmEnable   OPTIONAL,
   OUT BOOLEAN                   *TpmActivate OPTIONAL
   )
 {

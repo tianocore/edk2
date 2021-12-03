@@ -186,7 +186,7 @@ EFI_STATUS
 EFIAPI
 Tpm2ClearControl (
   IN TPMI_RH_CLEAR             AuthHandle,
-  IN TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN TPMS_AUTH_COMMAND         *AuthSession  OPTIONAL,
   IN TPMI_YES_NO               Disable
   );
 
@@ -340,7 +340,7 @@ EFI_STATUS
 EFIAPI
 Tpm2NvDefineSpace (
   IN      TPMI_RH_PROVISION         AuthHandle,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN      TPMS_AUTH_COMMAND         *AuthSession  OPTIONAL,
   IN      TPM2B_AUTH                *Auth,
   IN      TPM2B_NV_PUBLIC           *NvPublic
   );
@@ -383,7 +383,7 @@ EFIAPI
 Tpm2NvRead (
   IN      TPMI_RH_NV_AUTH           AuthHandle,
   IN      TPMI_RH_NV_INDEX          NvIndex,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN      TPMS_AUTH_COMMAND         *AuthSession  OPTIONAL,
   IN      UINT16                    Size,
   IN      UINT16                    Offset,
   IN OUT  TPM2B_MAX_BUFFER          *OutData
@@ -407,7 +407,7 @@ EFIAPI
 Tpm2NvWrite (
   IN      TPMI_RH_NV_AUTH           AuthHandle,
   IN      TPMI_RH_NV_INDEX          NvIndex,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN      TPMS_AUTH_COMMAND         *AuthSession  OPTIONAL,
   IN      TPM2B_MAX_BUFFER          *InData,
   IN      UINT16                    Offset
   );
@@ -566,7 +566,7 @@ Tpm2PcrAllocate (
 EFI_STATUS
 EFIAPI
 Tpm2PcrAllocateBanks (
-  IN TPM2B_AUTH                *PlatformAuth,  OPTIONAL
+  IN TPM2B_AUTH                *PlatformAuth   OPTIONAL,
   IN UINT32                    SupportedPCRBanks,
   IN UINT32                    PCRBanks
   );
@@ -908,7 +908,7 @@ EFIAPI
 Tpm2PolicySecret (
   IN      TPMI_DH_ENTITY            AuthHandle,
   IN      TPMI_SH_POLICY            PolicySession,
-  IN      TPMS_AUTH_COMMAND         *AuthSession, OPTIONAL
+  IN      TPMS_AUTH_COMMAND         *AuthSession  OPTIONAL,
   IN      TPM2B_NONCE               *NonceTPM,
   IN      TPM2B_DIGEST              *CpHashA,
   IN      TPM2B_NONCE               *PolicyRef,
@@ -1004,7 +1004,7 @@ Tpm2ReadPublic (
 UINT32
 EFIAPI
 CopyAuthSessionCommand (
-  IN      TPMS_AUTH_COMMAND         *AuthSessionIn, OPTIONAL
+  IN      TPMS_AUTH_COMMAND         *AuthSessionIn  OPTIONAL,
   OUT     UINT8                     *AuthSessionOut
   );
 
