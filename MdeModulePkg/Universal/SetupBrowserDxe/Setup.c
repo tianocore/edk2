@@ -399,7 +399,7 @@ UINT32
 PopupErrorMessage (
   IN UINT32                BrowserStatus,
   IN EFI_HII_HANDLE        HiiHandle,
-  IN EFI_IFR_OP_HEADER     *OpCode, OPTIONAL
+  IN EFI_IFR_OP_HEADER     *OpCode  OPTIONAL,
   IN CHAR16                *ErrorString
   )
 {
@@ -469,9 +469,9 @@ SendForm (
   IN  CONST EFI_FORM_BROWSER2_PROTOCOL *This,
   IN  EFI_HII_HANDLE                   *Handles,
   IN  UINTN                            HandleCount,
-  IN  EFI_GUID                         *FormSetGuid, OPTIONAL
-  IN  UINT16                           FormId, OPTIONAL
-  IN  CONST EFI_SCREEN_DESCRIPTOR      *ScreenDimensions, OPTIONAL
+  IN  EFI_GUID                         *FormSetGuid  OPTIONAL,
+  IN  UINT16                           FormId  OPTIONAL,
+  IN  CONST EFI_SCREEN_DESCRIPTOR      *ScreenDimensions  OPTIONAL,
   OUT EFI_BROWSER_ACTION_REQUEST       *ActionRequest  OPTIONAL
   )
 {
@@ -730,7 +730,7 @@ BrowserCallback (
   IN OUT UINTN                         *ResultsDataSize,
   IN OUT EFI_STRING                    ResultsData,
   IN BOOLEAN                           RetrieveData,
-  IN CONST EFI_GUID                    *VariableGuid, OPTIONAL
+  IN CONST EFI_GUID                    *VariableGuid  OPTIONAL,
   IN CONST CHAR16                      *VariableName  OPTIONAL
   )
 {
@@ -6672,4 +6672,3 @@ IsResetRequired (
 {
   return gResetRequiredSystemLevel;
 }
-

@@ -689,8 +689,8 @@ EFI_STATUS
 EFIAPI
 SmmDriverDispatchHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context         OPTIONAL,
+  IN OUT VOID                     *CommBuffer      OPTIONAL,
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -711,8 +711,8 @@ EFI_STATUS
 EFIAPI
 SmmLegacyBootHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context         OPTIONAL,
+  IN OUT VOID                     *CommBuffer      OPTIONAL,
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -733,8 +733,8 @@ EFI_STATUS
 EFIAPI
 SmmReadyToLockHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context         OPTIONAL,
+  IN OUT VOID                     *CommBuffer      OPTIONAL,
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -755,8 +755,8 @@ EFI_STATUS
 EFIAPI
 SmmEndOfDxeHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context         OPTIONAL,
+  IN OUT VOID                     *CommBuffer      OPTIONAL,
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -777,8 +777,8 @@ EFI_STATUS
 EFIAPI
 SmmExitBootServicesHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context         OPTIONAL,
+  IN OUT VOID                     *CommBuffer      OPTIONAL,
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -799,8 +799,8 @@ EFI_STATUS
 EFIAPI
 SmmReadyToBootHandler (
   IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *Context,        OPTIONAL
-  IN OUT VOID                     *CommBuffer,     OPTIONAL
+  IN     CONST VOID               *Context         OPTIONAL,
+  IN OUT VOID                     *CommBuffer      OPTIONAL,
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
   );
 
@@ -822,8 +822,8 @@ EFI_STATUS
 EFIAPI
 SmmS3SmmInitDoneHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
@@ -845,8 +845,8 @@ EFI_STATUS
 EFIAPI
 SmmEndOfS3ResumeHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
@@ -1175,7 +1175,7 @@ SmiHandlerProfileRegisterHandler (
   IN EFI_GUID                       *HandlerGuid,
   IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler,
   IN PHYSICAL_ADDRESS               CallerAddress,
-  IN VOID                           *Context, OPTIONAL
+  IN VOID                           *Context  OPTIONAL,
   IN UINTN                          ContextSize OPTIONAL
   );
 
@@ -1202,7 +1202,7 @@ SmiHandlerProfileUnregisterHandler (
   IN SMI_HANDLER_PROFILE_PROTOCOL   *This,
   IN EFI_GUID                       *HandlerGuid,
   IN EFI_SMM_HANDLER_ENTRY_POINT2   Handler,
-  IN VOID                           *Context, OPTIONAL
+  IN VOID                           *Context  OPTIONAL,
   IN UINTN                          ContextSize OPTIONAL
   );
 

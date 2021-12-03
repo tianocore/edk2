@@ -192,7 +192,7 @@ BmGetSingleControllerHealthStatus (
   IN OUT EFI_BOOT_MANAGER_DRIVER_HEALTH_INFO **DriverHealthInfo,
   IN OUT UINTN                               *Count,
   IN  EFI_HANDLE                             DriverHealthHandle,
-  IN  EFI_HANDLE                             ControllerHandle,  OPTIONAL
+  IN  EFI_HANDLE                             ControllerHandle   OPTIONAL,
   IN  EFI_HANDLE                             ChildHandle        OPTIONAL
   )
 {

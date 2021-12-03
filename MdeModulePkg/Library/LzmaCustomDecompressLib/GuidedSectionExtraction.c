@@ -128,7 +128,7 @@ EFIAPI
 LzmaGuidedSectionExtraction (
   IN CONST  VOID    *InputSection,
   OUT       VOID    **OutputBuffer,
-  OUT       VOID    *ScratchBuffer,        OPTIONAL
+  OUT       VOID    *ScratchBuffer         OPTIONAL,
   OUT       UINT32  *AuthenticationStatus
   )
 {
@@ -193,4 +193,3 @@ LzmaDecompressLibConstructor (
           LzmaGuidedSectionExtraction
           );
 }
-

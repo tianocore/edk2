@@ -724,7 +724,7 @@ DxePcdSetBoolEx (
 EFI_STATUS
 EFIAPI
 DxeRegisterCallBackOnSet (
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid  OPTIONAL,
   IN  UINTN                   TokenNumber,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   );
@@ -744,7 +744,7 @@ DxeRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 DxeUnRegisterCallBackOnSet (
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid  OPTIONAL,
   IN  UINTN                   TokenNumber,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   );
@@ -780,7 +780,7 @@ DxeUnRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 DxePcdGetNextToken (
-  IN CONST EFI_GUID               *Guid, OPTIONAL
+  IN CONST EFI_GUID               *Guid  OPTIONAL,
   IN OUT   UINTN                  *TokenNumber
   );
 
@@ -1018,7 +1018,7 @@ SetHiiVariable (
 EFI_STATUS
 DxeRegisterCallBackWorker (
   IN  UINTN                   TokenNumber,
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid  OPTIONAL,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   );
 
@@ -1039,7 +1039,7 @@ DxeRegisterCallBackWorker (
 EFI_STATUS
 DxeUnRegisterCallBackWorker (
   IN  UINTN                   TokenNumber,
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid  OPTIONAL,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   );
 
@@ -1192,4 +1192,3 @@ extern  UINTN          TmpTokenSpaceBufferCount;
 extern EFI_LOCK mPcdDatabaseLock;
 
 #endif
-

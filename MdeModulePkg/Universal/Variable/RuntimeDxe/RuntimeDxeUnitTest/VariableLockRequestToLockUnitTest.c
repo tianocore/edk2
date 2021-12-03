@@ -86,7 +86,7 @@ EFIAPI
 StubGetVariableNull (
   IN     CHAR16    *VariableName,
   IN     EFI_GUID  *VendorGuid,
-  OUT    UINT32    *Attributes,  OPTIONAL
+  OUT    UINT32    *Attributes   OPTIONAL,
   IN OUT UINTN     *DataSize,
   OUT    VOID      *Data         OPTIONAL
   )

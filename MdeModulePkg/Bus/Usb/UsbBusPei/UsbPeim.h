@@ -142,7 +142,7 @@ PeiUsbControlTransfer (
   IN     EFI_USB_DEVICE_REQUEST    *Request,
   IN     EFI_USB_DATA_DIRECTION    Direction,
   IN     UINT32                    Timeout,
-  IN OUT VOID                      *Data,      OPTIONAL
+  IN OUT VOID                      *Data       OPTIONAL,
   IN     UINTN                     DataLength  OPTIONAL
   );
 

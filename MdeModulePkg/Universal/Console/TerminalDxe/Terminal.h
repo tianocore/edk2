@@ -1379,7 +1379,7 @@ Utf8ToUnicode (
 BOOLEAN
 TerminalIsValidTextGraphics (
   IN  CHAR16  Graphic,
-  OUT CHAR8   *PcAnsi, OPTIONAL
+  OUT CHAR8   *PcAnsi  OPTIONAL,
   OUT CHAR8   *Ascii OPTIONAL
   );
 

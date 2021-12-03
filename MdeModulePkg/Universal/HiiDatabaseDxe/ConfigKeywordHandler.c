@@ -3114,8 +3114,8 @@ EFI_STATUS
 EFIAPI
 EfiConfigKeywordHandlerGetData (
   IN EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL  *This,
-  IN CONST EFI_STRING                     NameSpaceId, OPTIONAL
-  IN CONST EFI_STRING                     KeywordString, OPTIONAL
+  IN CONST EFI_STRING                     NameSpaceId  OPTIONAL,
+  IN CONST EFI_STRING                     KeywordString  OPTIONAL,
   OUT EFI_STRING                          *Progress,
   OUT UINT32                              *ProgressErr,
   OUT EFI_STRING                          *Results

@@ -719,7 +719,7 @@ PeiPcdSetBoolEx (
 EFI_STATUS
 EFIAPI
 PeiRegisterCallBackOnSet (
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid  OPTIONAL,
   IN  UINTN                   TokenNumber,
   IN  PCD_PPI_CALLBACK        CallBackFunction
   );
@@ -739,7 +739,7 @@ PeiRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 PcdUnRegisterCallBackOnSet (
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid  OPTIONAL,
   IN  UINTN                   TokenNumber,
   IN  PCD_PPI_CALLBACK        CallBackFunction
   );
@@ -774,7 +774,7 @@ PcdUnRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 PeiPcdGetNextToken (
-  IN CONST EFI_GUID           *Guid, OPTIONAL
+  IN CONST EFI_GUID           *Guid  OPTIONAL,
   IN OUT  UINTN               *TokenNumber
   );
 
@@ -1004,7 +1004,7 @@ GetExPcdTokenNumber (
 EFI_STATUS
 PeiRegisterCallBackWorker (
   IN  UINTN              TokenNumber,
-  IN  CONST EFI_GUID         *Guid, OPTIONAL
+  IN  CONST EFI_GUID         *Guid  OPTIONAL,
   IN  PCD_PPI_CALLBACK   CallBackFunction,
   IN  BOOLEAN            Register
   );
@@ -1079,4 +1079,3 @@ SetPtrTypeSize (
   );
 
 #endif
-

@@ -522,7 +522,7 @@ GetWorker (
 EFI_STATUS
 DxeRegisterCallBackWorker (
   IN  UINTN                   TokenNumber,
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid  OPTIONAL,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
 )
 {
@@ -581,7 +581,7 @@ DxeRegisterCallBackWorker (
 EFI_STATUS
 DxeUnRegisterCallBackWorker (
   IN  UINTN                   TokenNumber,
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid  OPTIONAL,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
 )
 {
@@ -1018,7 +1018,7 @@ GetHiiVariable (
 VOID
 InvokeCallbackOnSet (
   UINT32            ExTokenNumber,
-  CONST EFI_GUID    *Guid, OPTIONAL
+  CONST EFI_GUID    *Guid  OPTIONAL,
   UINTN             TokenNumber,
   VOID              *Data,
   UINTN             Size
@@ -1899,4 +1899,3 @@ VariableLockCallBack (
     VariableLockDynamicHiiPcd (FALSE, VariableLock);
   }
 }
-

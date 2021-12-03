@@ -590,8 +590,8 @@ EFI_STATUS
 PeiLoadImageLoadImage (
   IN     CONST EFI_PEI_SERVICES       **PeiServices,
   IN     EFI_PEI_FILE_HANDLE          FileHandle,
-  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg,  OPTIONAL
-  OUT    UINT64                       *ImageSizeArg,     OPTIONAL
+  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg   OPTIONAL,
+  OUT    UINT64                       *ImageSizeArg      OPTIONAL,
   OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
   OUT    UINT32                       *AuthenticationState
   )
@@ -771,8 +771,8 @@ EFIAPI
 PeiLoadImageLoadImageWrapper (
   IN     CONST EFI_PEI_LOAD_FILE_PPI  *This,
   IN     EFI_PEI_FILE_HANDLE          FileHandle,
-  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg,  OPTIONAL
-  OUT    UINT64                       *ImageSizeArg,     OPTIONAL
+  OUT    EFI_PHYSICAL_ADDRESS         *ImageAddressArg   OPTIONAL,
+  OUT    UINT64                       *ImageSizeArg      OPTIONAL,
   OUT    EFI_PHYSICAL_ADDRESS         *EntryPoint,
   OUT    UINT32                       *AuthenticationState
   )

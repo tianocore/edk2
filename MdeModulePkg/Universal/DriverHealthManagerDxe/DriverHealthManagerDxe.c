@@ -630,10 +630,10 @@ DriverHealthManagerGetFormsetId (
 VOID
 DriverHealthManagerProcessSingleControllerHealth (
   IN  EFI_DRIVER_HEALTH_PROTOCOL         *DriverHealth,
-  IN  EFI_HANDLE                         ControllerHandle, OPTIONAL
-  IN  EFI_HANDLE                         ChildHandle,      OPTIONAL
+  IN  EFI_HANDLE                         ControllerHandle  OPTIONAL,
+  IN  EFI_HANDLE                         ChildHandle       OPTIONAL,
   IN  EFI_DRIVER_HEALTH_STATUS           HealthStatus,
-  IN  EFI_DRIVER_HEALTH_HII_MESSAGE      **MessageList,    OPTIONAL
+  IN  EFI_DRIVER_HEALTH_HII_MESSAGE      **MessageList     OPTIONAL,
   IN  EFI_HII_HANDLE                     FormHiiHandle
   )
 {

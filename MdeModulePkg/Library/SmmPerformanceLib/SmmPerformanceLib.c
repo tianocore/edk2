@@ -105,9 +105,9 @@ GetPerformanceMeasurementProtocol (
 RETURN_STATUS
 EFIAPI
 StartPerformanceMeasurementEx (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
+  IN CONST VOID   *Handle   OPTIONAL,
+  IN CONST CHAR8  *Token    OPTIONAL,
+  IN CONST CHAR8  *Module   OPTIONAL,
   IN UINT64       TimeStamp,
   IN UINT32       Identifier
   )
@@ -164,9 +164,9 @@ StartPerformanceMeasurementEx (
 RETURN_STATUS
 EFIAPI
 EndPerformanceMeasurementEx (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
+  IN CONST VOID   *Handle   OPTIONAL,
+  IN CONST CHAR8  *Token    OPTIONAL,
+  IN CONST CHAR8  *Module   OPTIONAL,
   IN UINT64       TimeStamp,
   IN UINT32       Identifier
   )
@@ -275,9 +275,9 @@ GetPerformanceMeasurementEx (
 RETURN_STATUS
 EFIAPI
 StartPerformanceMeasurement (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
+  IN CONST VOID   *Handle   OPTIONAL,
+  IN CONST CHAR8  *Token    OPTIONAL,
+  IN CONST CHAR8  *Module   OPTIONAL,
   IN UINT64       TimeStamp
   )
 {
@@ -309,9 +309,9 @@ StartPerformanceMeasurement (
 RETURN_STATUS
 EFIAPI
 EndPerformanceMeasurement (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
+  IN CONST VOID   *Handle   OPTIONAL,
+  IN CONST CHAR8  *Token    OPTIONAL,
+  IN CONST CHAR8  *Module   OPTIONAL,
   IN UINT64       TimeStamp
   )
 {
@@ -411,9 +411,9 @@ RETURN_STATUS
 EFIAPI
 LogPerformanceMeasurement (
   IN CONST VOID   *CallerIdentifier,
-  IN CONST VOID   *Guid,    OPTIONAL
-  IN CONST CHAR8  *String,  OPTIONAL
-  IN UINT64       Address, OPTIONAL
+  IN CONST VOID   *Guid     OPTIONAL,
+  IN CONST CHAR8  *String   OPTIONAL,
+  IN UINT64       Address  OPTIONAL,
   IN UINT32       Identifier
   )
 {

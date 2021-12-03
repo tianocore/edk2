@@ -53,11 +53,11 @@ typedef enum {
 typedef
 EFI_STATUS
 (EFIAPI *CREATE_PERFORMANCE_MEASUREMENT)(
-  IN CONST VOID                        *CallerIdentifier, OPTIONAL
-  IN CONST VOID                        *Guid,     OPTIONAL
-  IN CONST CHAR8                       *String,   OPTIONAL
-  IN       UINT64                      TimeStamp, OPTIONAL
-  IN       UINT64                      Address,   OPTIONAL
+  IN CONST VOID                        *CallerIdentifier  OPTIONAL,
+  IN CONST VOID                        *Guid      OPTIONAL,
+  IN CONST CHAR8                       *String    OPTIONAL,
+  IN       UINT64                      TimeStamp  OPTIONAL,
+  IN       UINT64                      Address    OPTIONAL,
   IN       UINT32                      Identifier,
   IN       PERF_MEASUREMENT_ATTRIBUTE  Attribute
   );

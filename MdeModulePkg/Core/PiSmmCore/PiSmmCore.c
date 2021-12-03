@@ -158,8 +158,8 @@ EFI_STATUS
 EFIAPI
 SmmLegacyBootHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
@@ -213,8 +213,8 @@ EFI_STATUS
 EFIAPI
 SmmExitBootServicesHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
@@ -297,8 +297,8 @@ EFI_STATUS
 EFIAPI
 SmmReadyToBootHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
@@ -342,8 +342,8 @@ EFI_STATUS
 EFIAPI
 SmmReadyToLockHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
@@ -428,8 +428,8 @@ EFI_STATUS
 EFIAPI
 SmmEndOfDxeHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
@@ -499,8 +499,8 @@ EFI_STATUS
 EFIAPI
 SmmS3SmmInitDoneHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
@@ -558,8 +558,8 @@ EFI_STATUS
 EFIAPI
 SmmEndOfS3ResumeHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {

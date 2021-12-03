@@ -238,7 +238,7 @@ InternalGetSmmLockBoxContext (
 EFI_STATUS
 InternalRestoreLockBoxFromSmram (
   IN  GUID                        *Guid,
-  IN  VOID                        *Buffer, OPTIONAL
+  IN  VOID                        *Buffer  OPTIONAL,
   IN  OUT UINTN                   *Length  OPTIONAL
   )
 {
@@ -517,7 +517,7 @@ RETURN_STATUS
 EFIAPI
 RestoreLockBox (
   IN  GUID                        *Guid,
-  IN  VOID                        *Buffer, OPTIONAL
+  IN  VOID                        *Buffer  OPTIONAL,
   IN  OUT UINTN                   *Length  OPTIONAL
   )
 {
@@ -739,4 +739,3 @@ RestoreAllLockBoxInPlace (
   //
   return Status;
 }
-

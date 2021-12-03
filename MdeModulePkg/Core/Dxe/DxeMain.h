@@ -1545,8 +1545,8 @@ EFIAPI
 CoreCreateEvent (
   IN UINT32                   Type,
   IN EFI_TPL                  NotifyTpl,
-  IN EFI_EVENT_NOTIFY         NotifyFunction, OPTIONAL
-  IN VOID                     *NotifyContext, OPTIONAL
+  IN EFI_EVENT_NOTIFY         NotifyFunction  OPTIONAL,
+  IN VOID                     *NotifyContext  OPTIONAL,
   OUT EFI_EVENT               *Event
   );
 
@@ -1577,9 +1577,9 @@ EFIAPI
 CoreCreateEventEx (
   IN UINT32                   Type,
   IN EFI_TPL                  NotifyTpl,
-  IN EFI_EVENT_NOTIFY         NotifyFunction, OPTIONAL
-  IN CONST VOID               *NotifyContext, OPTIONAL
-  IN CONST EFI_GUID           *EventGroup,    OPTIONAL
+  IN EFI_EVENT_NOTIFY         NotifyFunction  OPTIONAL,
+  IN CONST VOID               *NotifyContext  OPTIONAL,
+  IN CONST EFI_GUID           *EventGroup     OPTIONAL,
   OUT EFI_EVENT               *Event
   );
 
@@ -1608,9 +1608,9 @@ EFIAPI
 CoreCreateEventInternal (
   IN UINT32                   Type,
   IN EFI_TPL                  NotifyTpl,
-  IN EFI_EVENT_NOTIFY         NotifyFunction, OPTIONAL
-  IN CONST VOID               *NotifyContext, OPTIONAL
-  IN CONST EFI_GUID           *EventGroup,    OPTIONAL
+  IN EFI_EVENT_NOTIFY         NotifyFunction  OPTIONAL,
+  IN CONST VOID               *NotifyContext  OPTIONAL,
+  IN CONST EFI_GUID           *EventGroup     OPTIONAL,
   OUT EFI_EVENT               *Event
   );
 

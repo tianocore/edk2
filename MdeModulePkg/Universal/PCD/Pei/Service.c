@@ -298,7 +298,7 @@ PeiGetPcdInfo (
 EFI_STATUS
 PeiRegisterCallBackWorker (
   IN  UINTN                       ExTokenNumber,
-  IN  CONST EFI_GUID              *Guid, OPTIONAL
+  IN  CONST EFI_GUID              *Guid  OPTIONAL,
   IN  PCD_PPI_CALLBACK            CallBackFunction,
   IN  BOOLEAN                     Register
 )
@@ -529,7 +529,7 @@ GetHiiVariable (
 VOID
 InvokeCallbackOnSet (
   UINTN             ExTokenNumber,
-  CONST EFI_GUID    *Guid, OPTIONAL
+  CONST EFI_GUID    *Guid  OPTIONAL,
   UINTN             TokenNumber,
   VOID              *Data,
   UINTN             Size

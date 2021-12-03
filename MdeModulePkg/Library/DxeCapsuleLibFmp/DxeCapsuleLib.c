@@ -91,7 +91,7 @@ RecordFmpCapsuleStatusVariable (
   IN EFI_STATUS                                    CapsuleStatus,
   IN UINTN                                         PayloadIndex,
   IN EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER  *ImageHeader,
-  IN EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath, OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL                      *FmpDevicePath  OPTIONAL,
   IN CHAR16                                        *CapFileName    OPTIONAL
   );
 
@@ -651,8 +651,8 @@ EFI_STATUS
 GetFmpHandleBufferByType (
   IN     EFI_GUID                     *UpdateImageTypeId,
   IN     UINT64                       UpdateHardwareInstance,
-  OUT    UINTN                        *NoHandles, OPTIONAL
-  OUT    EFI_HANDLE                   **HandleBuf, OPTIONAL
+  OUT    UINTN                        *NoHandles  OPTIONAL,
+  OUT    EFI_HANDLE                   **HandleBuf  OPTIONAL,
   OUT    BOOLEAN                      **ResetRequiredBuf OPTIONAL
   )
 {
@@ -1083,7 +1083,7 @@ StartFmpImage (
 **/
 VOID
 RecordFmpCapsuleStatus (
-  IN EFI_HANDLE                                    Handle,  OPTIONAL
+  IN EFI_HANDLE                                    Handle   OPTIONAL,
   IN EFI_CAPSULE_HEADER                            *CapsuleHeader,
   IN EFI_STATUS                                    CapsuleStatus,
   IN UINTN                                         PayloadIndex,
@@ -1170,7 +1170,7 @@ RecordFmpCapsuleStatus (
 EFI_STATUS
 ProcessFmpCapsuleImage (
   IN EFI_CAPSULE_HEADER  *CapsuleHeader,
-  IN CHAR16              *CapFileName,  OPTIONAL
+  IN CHAR16              *CapFileName   OPTIONAL,
   OUT BOOLEAN            *ResetRequired OPTIONAL
   )
 {
@@ -1506,7 +1506,7 @@ EFI_STATUS
 EFIAPI
 ProcessThisCapsuleImage (
   IN EFI_CAPSULE_HEADER  *CapsuleHeader,
-  IN CHAR16              *CapFileName,  OPTIONAL
+  IN CHAR16              *CapFileName   OPTIONAL,
   OUT BOOLEAN            *ResetRequired OPTIONAL
   )
 {
