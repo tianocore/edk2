@@ -303,6 +303,7 @@ foreach(@dir_list){
 chdir ($dir);
 
 foreach (@headers){
+  next if $_ =~ "crypto/buildinf.h";
   if(/ssl/){
     push @sslfilelist, '  $(OPENSSL_PATH)/' . $_ . "\r\n";
     next;
