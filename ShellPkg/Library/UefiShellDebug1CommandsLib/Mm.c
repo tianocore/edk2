@@ -68,8 +68,8 @@ ShellMmDecodePciAddress (
   IN UINT64                 Address,
   OUT UINT32                *Segment,
   OUT UINT8                 *Bus,
-  OUT UINT8                 *Device,   OPTIONAL
-  OUT UINT8                 *Function, OPTIONAL
+  OUT UINT8                 *Device    OPTIONAL,
+  OUT UINT8                 *Function  OPTIONAL,
   OUT UINT32                *Register  OPTIONAL
   )
 {
