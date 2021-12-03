@@ -1287,8 +1287,8 @@ MtrrLibCalculateSubtractivePath (
   IN UINT16                      Stop,
   IN UINT8                       Types,
   IN UINT8                       TypeCount,
-  IN OUT MTRR_MEMORY_RANGE       *Mtrrs,       OPTIONAL
-  IN UINT32                      MtrrCapacity, OPTIONAL
+  IN OUT MTRR_MEMORY_RANGE       *Mtrrs        OPTIONAL,
+  IN UINT32                      MtrrCapacity  OPTIONAL,
   IN OUT UINT32                  *MtrrCount    OPTIONAL
   )
 {

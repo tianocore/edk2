@@ -57,7 +57,7 @@ EFIAPI
 VmxInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   )
 {
@@ -135,7 +135,7 @@ EFIAPI
 LockFeatureControlRegisterInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   )
 {
@@ -214,7 +214,7 @@ EFIAPI
 SmxInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   )
 {
