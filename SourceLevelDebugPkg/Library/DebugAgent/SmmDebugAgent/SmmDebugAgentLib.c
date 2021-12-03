@@ -175,7 +175,7 @@ VOID
 EFIAPI
 InitializeDebugAgent (
   IN UINT32                InitFlag,
-  IN VOID                  *Context, OPTIONAL
+  IN VOID                  *Context  OPTIONAL,
   IN DEBUG_AGENT_CONTINUE  Function  OPTIONAL
   )
 {
