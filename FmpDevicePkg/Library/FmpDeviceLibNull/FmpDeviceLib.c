@@ -519,8 +519,8 @@ EFIAPI
 FmpDeviceSetImage (
   IN  CONST VOID                                     *Image,
   IN  UINTN                                          ImageSize,
-  IN  CONST VOID                                     *VendorCode,       OPTIONAL
-  IN  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress,          OPTIONAL
+  IN  CONST VOID                                     *VendorCode        OPTIONAL,
+  IN  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress           OPTIONAL,
   IN  UINT32                                         CapsuleFwVersion,
   OUT CHAR16                                         **AbortReason
   )
@@ -606,8 +606,8 @@ EFIAPI
 FmpDeviceSetImageWithStatus (
   IN  CONST VOID                                     *Image,
   IN  UINTN                                          ImageSize,
-  IN  CONST VOID                                     *VendorCode,       OPTIONAL
-  IN  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress,          OPTIONAL
+  IN  CONST VOID                                     *VendorCode        OPTIONAL,
+  IN  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress           OPTIONAL,
   IN  UINT32                                         CapsuleFwVersion,
   OUT CHAR16                                         **AbortReason,
   OUT UINT32                                         *LastAttemptStatus
