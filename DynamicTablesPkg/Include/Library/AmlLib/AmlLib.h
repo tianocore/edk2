@@ -462,7 +462,7 @@ AmlCodeGenRdInterrupt (
   IN  BOOLEAN                 Shared,
   IN  UINT32                  *IrqList,
   IN  UINT8                   IrqCount,
-  IN  AML_OBJECT_NODE_HANDLE  NameOpNode, OPTIONAL
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode  OPTIONAL,
   OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
   );
 
@@ -529,7 +529,7 @@ EFIAPI
 AmlCodeGenNameString (
   IN  CONST CHAR8                   * NameString,
   IN        CHAR8                   * String,
-  IN        AML_NODE_HANDLE           ParentNode,     OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode      OPTIONAL,
   OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
   );
 
@@ -559,7 +559,7 @@ EFIAPI
 AmlCodeGenNameInteger (
   IN  CONST CHAR8                   * NameString,
   IN        UINT64                    Integer,
-  IN        AML_NODE_HANDLE           ParentNode,     OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode      OPTIONAL,
   OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
   );
 
@@ -587,7 +587,7 @@ EFI_STATUS
 EFIAPI
 AmlCodeGenDevice (
   IN  CONST CHAR8                   * NameString,
-  IN        AML_NODE_HANDLE           ParentNode,     OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode      OPTIONAL,
   OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
   );
 
@@ -615,7 +615,7 @@ EFI_STATUS
 EFIAPI
 AmlCodeGenScope (
   IN  CONST CHAR8                   * NameString,
-  IN        AML_NODE_HANDLE           ParentNode,     OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode      OPTIONAL,
   OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode   OPTIONAL
   );
 
@@ -664,11 +664,11 @@ EFI_STATUS
 EFIAPI
 AmlCodeGenMethodRetNameString (
   IN  CONST CHAR8                   * MethodNameString,
-  IN  CONST CHAR8                   * ReturnedNameString,  OPTIONAL
+  IN  CONST CHAR8                   * ReturnedNameString   OPTIONAL,
   IN        UINT8                     NumArgs,
   IN        BOOLEAN                   IsSerialized,
   IN        UINT8                     SyncLevel,
-  IN        AML_NODE_HANDLE           ParentNode,          OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode           OPTIONAL,
   OUT       AML_OBJECT_NODE_HANDLE  * NewObjectNode        OPTIONAL
   );
 
@@ -712,7 +712,7 @@ AmlCreateLpiNode (
   IN  CONST CHAR8                   * LpiNameString,
   IN        UINT16                    Revision,
   IN        UINT64                    LevelId,
-  IN        AML_NODE_HANDLE           ParentNode,  OPTIONAL
+  IN        AML_NODE_HANDLE           ParentNode   OPTIONAL,
   OUT       AML_OBJECT_NODE_HANDLE  * NewLpiNode   OPTIONAL
   );
 
@@ -779,11 +779,11 @@ AmlAddLpiState (
   IN  UINT32                                    ArchFlags,
   IN  UINT32                                    ResCntFreq,
   IN  UINT32                                    EnableParentState,
-  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * GenericRegisterDescriptor,  OPTIONAL
-  IN  UINT64                                    Integer,                    OPTIONAL
-  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * ResidencyCounterRegister,   OPTIONAL
-  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * UsageCounterRegister,       OPTIONAL
-  IN  CHAR8                                   * StateName,                  OPTIONAL
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * GenericRegisterDescriptor   OPTIONAL,
+  IN  UINT64                                    Integer                     OPTIONAL,
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * ResidencyCounterRegister    OPTIONAL,
+  IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  * UsageCounterRegister        OPTIONAL,
+  IN  CHAR8                                   * StateName                   OPTIONAL,
   IN  AML_OBJECT_NODE_HANDLE                    LpiNode
   );
 
