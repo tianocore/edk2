@@ -96,7 +96,7 @@ EFIAPI
 EvaluateDependency (
   IN  EFI_FIRMWARE_IMAGE_DEP        *Dependencies,
   IN  UINTN                         DependenciesSize,
-  IN  FMP_DEPEX_CHECK_VERSION_DATA  *FmpVersions,      OPTIONAL
+  IN  FMP_DEPEX_CHECK_VERSION_DATA  *FmpVersions       OPTIONAL,
   IN  UINTN                         FmpVersionsCount,
   OUT UINT32                        *LastAttemptStatus OPTIONAL
   );
