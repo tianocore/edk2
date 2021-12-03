@@ -257,7 +257,7 @@ STATIC
 EFI_STATUS
 BltVideoFill (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL        *This,
-  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *EfiSourcePixel,     OPTIONAL
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *EfiSourcePixel      OPTIONAL,
   IN UINTN                               SourceX,
   IN UINTN                               SourceY,
   IN UINTN                               DestinationX,
@@ -400,7 +400,7 @@ STATIC
 EFI_STATUS
 BltVideoToBltBuffer (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL        *This,
-  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer,     OPTIONAL
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer      OPTIONAL,
   IN UINTN                               SourceX,
   IN UINTN                               SourceY,
   IN UINTN                               DestinationX,
@@ -559,7 +559,7 @@ STATIC
 EFI_STATUS
 BltBufferToVideo (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL        *This,
-  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer,     OPTIONAL
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer      OPTIONAL,
   IN UINTN                               SourceX,
   IN UINTN                               SourceY,
   IN UINTN                               DestinationX,
@@ -716,7 +716,7 @@ STATIC
 EFI_STATUS
 BltVideoToVideo (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL        *This,
-  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer,     OPTIONAL
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer      OPTIONAL,
   IN UINTN                               SourceX,
   IN UINTN                               SourceY,
   IN UINTN                               DestinationX,
@@ -776,7 +776,7 @@ EFI_STATUS
 EFIAPI
 LcdGraphicsBlt (
   IN EFI_GRAPHICS_OUTPUT_PROTOCOL        *This,
-  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer,     OPTIONAL
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL   *BltBuffer      OPTIONAL,
   IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION   BltOperation,
   IN UINTN                               SourceX,
   IN UINTN                               SourceY,
