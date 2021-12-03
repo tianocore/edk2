@@ -1147,7 +1147,7 @@ EFIAPI
 NetDestroyLinkList (
   IN   LIST_ENTRY                       *List,
   IN   NET_DESTROY_LINK_LIST_CALLBACK   CallBack,
-  IN   VOID                             *Context,    OPTIONAL
+  IN   VOID                             *Context     OPTIONAL,
   OUT  UINTN                            *ListLength  OPTIONAL
   )
 {
@@ -2283,7 +2283,7 @@ EFI_STATUS
 EFIAPI
 NetLibGetMacString (
   IN  EFI_HANDLE            ServiceHandle,
-  IN  EFI_HANDLE            ImageHandle, OPTIONAL
+  IN  EFI_HANDLE            ImageHandle  OPTIONAL,
   OUT CHAR16                **MacString
   )
 {

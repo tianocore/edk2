@@ -195,7 +195,7 @@ EFI_STATUS
 EFIAPI
 SnpUndi32GetStatus (
   IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  OUT UINT32                     *InterruptStatus, OPTIONAL
+  OUT UINT32                     *InterruptStatus  OPTIONAL,
   OUT VOID                       **TxBuf           OPTIONAL
   )
 {

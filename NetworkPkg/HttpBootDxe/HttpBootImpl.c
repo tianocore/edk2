@@ -296,7 +296,7 @@ EFI_STATUS
 HttpBootLoadFile (
   IN     HTTP_BOOT_PRIVATE_DATA       *Private,
   IN OUT UINTN                        *BufferSize,
-  IN     VOID                         *Buffer,       OPTIONAL
+  IN     VOID                         *Buffer        OPTIONAL,
      OUT HTTP_BOOT_IMAGE_TYPE         *ImageType
   )
 {

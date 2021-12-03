@@ -234,9 +234,9 @@ HttpIoCreateIo (
 EFI_STATUS
 HttpIoSendRequest (
   IN  HTTP_IO                *HttpIo,
-  IN  EFI_HTTP_REQUEST_DATA  *Request,      OPTIONAL
+  IN  EFI_HTTP_REQUEST_DATA  *Request       OPTIONAL,
   IN  UINTN                  HeaderCount,
-  IN  EFI_HTTP_HEADER        *Headers,      OPTIONAL
+  IN  EFI_HTTP_HEADER        *Headers       OPTIONAL,
   IN  UINTN                  BodyLength,
   IN  VOID                   *Body          OPTIONAL
   );
