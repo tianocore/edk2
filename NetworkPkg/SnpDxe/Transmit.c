@@ -274,8 +274,8 @@ SnpUndi32Transmit (
   IN UINTN                       HeaderSize,
   IN UINTN                       BufferSize,
   IN VOID                        *Buffer,
-  IN EFI_MAC_ADDRESS             *SrcAddr,  OPTIONAL
-  IN EFI_MAC_ADDRESS             *DestAddr, OPTIONAL
+  IN EFI_MAC_ADDRESS             *SrcAddr   OPTIONAL,
+  IN EFI_MAC_ADDRESS             *DestAddr  OPTIONAL,
   IN UINT16                      *Protocol  OPTIONAL
   )
 {

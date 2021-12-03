@@ -52,11 +52,11 @@ EFIAPI
 HttpUtilitiesBuild (
   IN     EFI_HTTP_UTILITIES_PROTOCOL *This,
   IN     UINTN                       SeedMessageSize,
-  IN     VOID                        *SeedMessage, OPTIONAL
+  IN     VOID                        *SeedMessage  OPTIONAL,
   IN     UINTN                       DeleteCount,
-  IN     CHAR8                       *DeleteList[], OPTIONAL
+  IN     CHAR8                       *DeleteList[]  OPTIONAL,
   IN     UINTN                       AppendCount,
-  IN     EFI_HTTP_HEADER             *AppendList[], OPTIONAL
+  IN     EFI_HTTP_HEADER             *AppendList[]  OPTIONAL,
      OUT UINTN                       *NewMessageSize,
      OUT VOID                        **NewMessage
   )

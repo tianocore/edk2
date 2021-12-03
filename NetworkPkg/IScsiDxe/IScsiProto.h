@@ -859,7 +859,7 @@ EFI_STATUS
 IScsiReceivePdu (
   IN ISCSI_CONNECTION                      *Conn,
   OUT NET_BUF                              **Pdu,
-  IN ISCSI_IN_BUFFER_CONTEXT               *Context, OPTIONAL
+  IN ISCSI_IN_BUFFER_CONTEXT               *Context  OPTIONAL,
   IN BOOLEAN                               HeaderDigest,
   IN BOOLEAN                               DataDigest,
   IN EFI_EVENT                             TimeoutEvent OPTIONAL

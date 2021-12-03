@@ -24,7 +24,7 @@
 EFI_STATUS
 PxeBcFlushStationIp (
   PXEBC_PRIVATE_DATA       *Private,
-  EFI_IP_ADDRESS           *StationIp,     OPTIONAL
+  EFI_IP_ADDRESS           *StationIp      OPTIONAL,
   EFI_IP_ADDRESS           *SubnetMask     OPTIONAL
   )
 {
@@ -1535,4 +1535,3 @@ CalcElapsedTime (
     Private->ElapsedTime = ElapsedTimeValue;
   }
 }
-

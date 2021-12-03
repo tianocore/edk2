@@ -78,7 +78,7 @@ EFI_STATUS
 DhcpCallUser (
   IN  DHCP_SERVICE          *DhcpSb,
   IN  EFI_DHCP4_EVENT       Event,
-  IN  EFI_DHCP4_PACKET      *Packet,      OPTIONAL
+  IN  EFI_DHCP4_PACKET      *Packet       OPTIONAL,
   OUT EFI_DHCP4_PACKET      **NewPacket   OPTIONAL
   )
 {
