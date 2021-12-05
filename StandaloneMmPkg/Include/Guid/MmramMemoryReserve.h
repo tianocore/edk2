@@ -42,15 +42,14 @@ typedef struct {
   /// In Framework MM CIS 0.91 specification, it defines the field type as UINTN.
   /// However, HOBs are supposed to be CPU neutral, so UINT32 should be used instead.
   ///
-  UINT32                NumberOfMmReservedRegions;
+  UINT32                  NumberOfMmReservedRegions;
   ///
   /// Used throughout this protocol to describe the candidate
   /// regions for MMRAM that are supported by this platform.
   ///
-  EFI_MMRAM_DESCRIPTOR  Descriptor[1];
+  EFI_MMRAM_DESCRIPTOR    Descriptor[1];
 } EFI_MMRAM_HOB_DESCRIPTOR_BLOCK;
 
-extern EFI_GUID gEfiMmPeiSmramMemoryReserveGuid;
+extern EFI_GUID  gEfiMmPeiSmramMemoryReserveGuid;
 
 #endif
-

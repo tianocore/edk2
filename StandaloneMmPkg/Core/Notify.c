@@ -25,7 +25,7 @@ MmNotifyProtocol (
   LIST_ENTRY       *Link;
 
   ProtEntry = Prot->Protocol;
-  for (Link=ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link=Link->ForwardLink) {
+  for (Link = ProtEntry->Notify.ForwardLink; Link != &ProtEntry->Notify; Link = Link->ForwardLink) {
     ProtNotify = CR (Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
     ProtNotify->Function (&ProtEntry->ProtocolID, Prot->Interface, Prot->Handle);
   }
@@ -55,7 +55,6 @@ MmRemoveInterfaceFromProtocol (
 
   Prot = MmFindProtocolInterface (Handle, Protocol, Interface);
   if (Prot != NULL) {
-
     ProtEntry = Prot->Protocol;
 
     //
@@ -96,9 +95,9 @@ MmRemoveInterfaceFromProtocol (
 EFI_STATUS
 EFIAPI
 MmRegisterProtocolNotify (
-  IN  CONST EFI_GUID     *Protocol,
+  IN  CONST EFI_GUID    *Protocol,
   IN  EFI_MM_NOTIFY_FN  Function,
-  OUT VOID               **Registration
+  OUT VOID              **Registration
   )
 {
   PROTOCOL_ENTRY   *ProtEntry;
@@ -106,7 +105,7 @@ MmRegisterProtocolNotify (
   LIST_ENTRY       *Link;
   EFI_STATUS       Status;
 
-  if (Protocol == NULL || Registration == NULL) {
+  if ((Protocol == NULL) || (Registration == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -114,12 +113,13 @@ MmRegisterProtocolNotify (
     //
     // Get the protocol entry per Protocol
     //
-    ProtEntry = MmFindProtocolEntry ((EFI_GUID *) Protocol, FALSE);
+    ProtEntry = MmFindProtocolEntry ((EFI_GUID *)Protocol, FALSE);
     if (ProtEntry != NULL) {
-      ProtNotify = (PROTOCOL_NOTIFY * )*Registration;
+      ProtNotify = (PROTOCOL_NOTIFY *)*Registration;
       for (Link = ProtEntry->Notify.ForwardLink;
            Link != &ProtEntry->Notify;
-           Link = Link->ForwardLink) {
+           Link = Link->ForwardLink)
+      {
         //
         // Compare the notification record
         //
@@ -134,6 +134,7 @@ MmRegisterProtocolNotify (
         }
       }
     }
+
     //
     // If the registration is not found
     //
@@ -145,19 +146,19 @@ MmRegisterProtocolNotify (
   //
   // Get the protocol entry to add the notification too
   //
-  ProtEntry = MmFindProtocolEntry ((EFI_GUID *) Protocol, TRUE);
+  ProtEntry = MmFindProtocolEntry ((EFI_GUID *)Protocol, TRUE);
   if (ProtEntry != NULL) {
     //
     // Find whether notification already exist
     //
     for (Link = ProtEntry->Notify.ForwardLink;
          Link != &ProtEntry->Notify;
-         Link = Link->ForwardLink) {
-
+         Link = Link->ForwardLink)
+    {
       ProtNotify = CR (Link, PROTOCOL_NOTIFY, Link, PROTOCOL_NOTIFY_SIGNATURE);
       if (CompareGuid (&ProtNotify->Protocol->ProtocolID, Protocol) &&
-          (ProtNotify->Function == Function)) {
-
+          (ProtNotify->Function == Function))
+      {
         //
         // Notification already exist
         //
@@ -173,8 +174,8 @@ MmRegisterProtocolNotify (
     ProtNotify = AllocatePool (sizeof (PROTOCOL_NOTIFY));
     if (ProtNotify != NULL) {
       ProtNotify->Signature = PROTOCOL_NOTIFY_SIGNATURE;
-      ProtNotify->Protocol = ProtEntry;
-      ProtNotify->Function = Function;
+      ProtNotify->Protocol  = ProtEntry;
+      ProtNotify->Function  = Function;
       //
       // Start at the ending
       //
@@ -191,7 +192,8 @@ MmRegisterProtocolNotify (
   Status = EFI_OUT_OF_RESOURCES;
   if (ProtNotify != NULL) {
     *Registration = ProtNotify;
-    Status = EFI_SUCCESS;
+    Status        = EFI_SUCCESS;
   }
+
   return Status;
 }

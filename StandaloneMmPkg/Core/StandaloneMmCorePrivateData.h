@@ -18,8 +18,8 @@
 //
 
 typedef struct {
-  LIST_ENTRY  Link;
-  UINTN       NumberOfPages;
+  LIST_ENTRY    Link;
+  UINTN         NumberOfPages;
 } FREE_PAGE_LIST;
 
 extern LIST_ENTRY  mMmMemoryMap;
@@ -46,13 +46,13 @@ extern LIST_ENTRY  mMmMemoryMap;
 #define MAX_POOL_INDEX  (MAX_POOL_SHIFT - MIN_POOL_SHIFT + 1)
 
 typedef struct {
-  UINTN        Size;
-  BOOLEAN      Available;
+  UINTN      Size;
+  BOOLEAN    Available;
 } POOL_HEADER;
 
 typedef struct {
-  POOL_HEADER  Header;
-  LIST_ENTRY   Link;
+  POOL_HEADER    Header;
+  LIST_ENTRY     Link;
 } FREE_POOL_HEADER;
 
 extern LIST_ENTRY  mMmPoolLists[MAX_POOL_INDEX];

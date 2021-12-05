@@ -13,15 +13,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MM_CORE_DATA_HOB_GUID \
   { 0xa160bf99, 0x2aa4, 0x4d7d, { 0x99, 0x93, 0x89, 0x9c, 0xb1, 0x2d, 0xf3, 0x76 }}
 
-extern EFI_GUID gMmCoreDataHobGuid;
+extern EFI_GUID  gMmCoreDataHobGuid;
 
 typedef struct {
   //
   // Address pointer to MM_CORE_PRIVATE_DATA
   //
-  EFI_PHYSICAL_ADDRESS   Address;
+  EFI_PHYSICAL_ADDRESS    Address;
 } MM_CORE_DATA_HOB_DATA;
-
 
 ///
 /// Define values for the communications buffer used when gEfiEventDxeDispatchGuid is
@@ -55,19 +54,19 @@ typedef struct {
 /// thos structure.
 ///
 typedef struct {
-  UINT64                          Signature;
+  UINT64                  Signature;
 
   ///
   /// The number of MMRAM ranges passed from the MM IPL to the MM Core.  The MM
   /// Core uses these ranges of MMRAM to initialize the MM Core memory manager.
   ///
-  UINT64                          MmramRangeCount;
+  UINT64                  MmramRangeCount;
 
   ///
   /// A table of MMRAM ranges passed from the MM IPL to the MM Core.  The MM
   /// Core uses these ranges of MMRAM to initialize the MM Core memory manager.
   ///
-  EFI_PHYSICAL_ADDRESS            MmramRanges;
+  EFI_PHYSICAL_ADDRESS    MmramRanges;
 
   ///
   /// The MM Foundation Entry Point.  The MM Core fills in this field when the
@@ -78,50 +77,50 @@ typedef struct {
   /// the MM Foundation Entry Point as soon as the MM Configuration Protocol is
   /// available.
   ///
-  EFI_PHYSICAL_ADDRESS            MmEntryPoint;
+  EFI_PHYSICAL_ADDRESS    MmEntryPoint;
 
   ///
   /// Boolean flag set to TRUE while an MMI is being processed by the MM Core.
   ///
-  BOOLEAN                         MmEntryPointRegistered;
+  BOOLEAN                 MmEntryPointRegistered;
 
   ///
   /// Boolean flag set to TRUE while an MMI is being processed by the MM Core.
   ///
-  BOOLEAN                         InMm;
+  BOOLEAN                 InMm;
 
   ///
   /// This field is set by the MM Core then the MM Core is initialized.  This field is
   /// used by the MM Base 2 Protocol and MM Communication Protocol implementations in
   /// the MM IPL.
   ///
-  EFI_PHYSICAL_ADDRESS            Mmst;
+  EFI_PHYSICAL_ADDRESS    Mmst;
 
   ///
   /// This field is used by the MM Communication Protocol to pass a buffer into
   /// a software MMI handler and for the software MMI handler to pass a buffer back to
   /// the caller of the MM Communication Protocol.
   ///
-  EFI_PHYSICAL_ADDRESS            CommunicationBuffer;
+  EFI_PHYSICAL_ADDRESS    CommunicationBuffer;
 
   ///
   /// This field is used by the MM Communication Protocol to pass the size of a buffer,
   /// in bytes, into a software MMI handler and for the software MMI handler to pass the
   /// size, in bytes, of a buffer back to the caller of the MM Communication Protocol.
   ///
-  UINT64                          BufferSize;
+  UINT64                  BufferSize;
 
   ///
   /// This field is used by the MM Communication Protocol to pass the return status from
   /// a software MMI handler back to the caller of the MM Communication Protocol.
   ///
-  UINT64                          ReturnStatus;
+  UINT64                  ReturnStatus;
 
-  EFI_PHYSICAL_ADDRESS            MmCoreImageBase;
-  UINT64                          MmCoreImageSize;
-  EFI_PHYSICAL_ADDRESS            MmCoreEntryPoint;
+  EFI_PHYSICAL_ADDRESS    MmCoreImageBase;
+  UINT64                  MmCoreImageSize;
+  EFI_PHYSICAL_ADDRESS    MmCoreEntryPoint;
 
-  EFI_PHYSICAL_ADDRESS            StandaloneBfvAddress;
+  EFI_PHYSICAL_ADDRESS    StandaloneBfvAddress;
 } MM_CORE_PRIVATE_DATA;
 
 #endif
