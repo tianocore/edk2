@@ -12,9 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "EmuSimpleFileSystem.h"
 
-
-
-
 /**
   Opens a new file relative to the source file's location.
 
@@ -38,44 +35,44 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 EmuSimpleFileSystemOpen (
-  IN  EFI_FILE_PROTOCOL   *This,
-  OUT EFI_FILE_PROTOCOL   **NewHandle,
-  IN  CHAR16              *FileName,
-  IN  UINT64              OpenMode,
-  IN  UINT64              Attributes
+  IN  EFI_FILE_PROTOCOL  *This,
+  OUT EFI_FILE_PROTOCOL  **NewHandle,
+  IN  CHAR16             *FileName,
+  IN  UINT64             OpenMode,
+  IN  UINT64             Attributes
   )
 {
-  EFI_STATUS                        Status;
-  EFI_TPL                           OldTpl;
-  EMU_EFI_FILE_PRIVATE              *PrivateFile;
-  EMU_EFI_FILE_PRIVATE              *NewPrivateFile;
+  EFI_STATUS            Status;
+  EFI_TPL               OldTpl;
+  EMU_EFI_FILE_PRIVATE  *PrivateFile;
+  EMU_EFI_FILE_PRIVATE  *NewPrivateFile;
 
   //
   // Check for obvious invalid parameters.
   //
-  if (This == NULL || NewHandle == NULL || FileName == NULL) {
+  if ((This == NULL) || (NewHandle == NULL) || (FileName == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   switch (OpenMode) {
-  case EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE:
-    if (Attributes &~EFI_FILE_VALID_ATTR) {
+    case EFI_FILE_MODE_CREATE | EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE:
+      if (Attributes &~EFI_FILE_VALID_ATTR) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      if (Attributes & EFI_FILE_READ_ONLY) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+    //
+    // fall through
+    //
+    case EFI_FILE_MODE_READ:
+    case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE:
+      break;
+
+    default:
       return EFI_INVALID_PARAMETER;
-    }
-
-    if (Attributes & EFI_FILE_READ_ONLY) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-  //
-  // fall through
-  //
-  case EFI_FILE_MODE_READ:
-  case EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE:
-    break;
-
-  default:
-    return EFI_INVALID_PARAMETER;
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
@@ -87,7 +84,6 @@ EmuSimpleFileSystemOpen (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-
 
   Status = PrivateFile->Io->Open (PrivateFile->Io, &NewPrivateFile->Io, FileName, OpenMode, Attributes);
   if (!EFI_ERROR (Status)) {
@@ -103,8 +99,6 @@ Done:
   return Status;
 }
 
-
-
 /**
   Close the file handle
 
@@ -119,9 +113,9 @@ EmuSimpleFileSystemClose (
   IN EFI_FILE_PROTOCOL  *This
   )
 {
-  EFI_STATUS              Status;
-  EMU_EFI_FILE_PRIVATE    *PrivateFile;
-  EFI_TPL                 OldTpl;
+  EFI_STATUS            Status;
+  EMU_EFI_FILE_PRIVATE  *PrivateFile;
+  EFI_TPL               OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -141,7 +135,6 @@ EmuSimpleFileSystemClose (
   return Status;
 }
 
-
 /**
   Close and delete the file handle.
 
@@ -157,9 +150,9 @@ EmuSimpleFileSystemDelete (
   IN EFI_FILE_PROTOCOL  *This
   )
 {
-  EFI_STATUS              Status;
-  EMU_EFI_FILE_PRIVATE    *PrivateFile;
-  EFI_TPL                 OldTpl;
+  EFI_STATUS            Status;
+  EMU_EFI_FILE_PRIVATE  *PrivateFile;
+  EFI_TPL               OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -178,7 +171,6 @@ EmuSimpleFileSystemDelete (
 
   return Status;
 }
-
 
 /**
   Read data from the file.
@@ -202,11 +194,11 @@ EmuSimpleFileSystemRead (
   OUT    VOID               *Buffer
   )
 {
-  EFI_STATUS              Status;
-  EMU_EFI_FILE_PRIVATE    *PrivateFile;
-  EFI_TPL                 OldTpl;
+  EFI_STATUS            Status;
+  EMU_EFI_FILE_PRIVATE  *PrivateFile;
+  EFI_TPL               OldTpl;
 
-  if (This == NULL || BufferSize == NULL) {
+  if ((This == NULL) || (BufferSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -224,7 +216,6 @@ EmuSimpleFileSystemRead (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
 
 /**
   Write data to a file.
@@ -253,10 +244,10 @@ EmuSimpleFileSystemWrite (
   )
 {
   EFI_STATUS            Status;
-  EMU_EFI_FILE_PRIVATE *PrivateFile;
+  EMU_EFI_FILE_PRIVATE  *PrivateFile;
   EFI_TPL               OldTpl;
 
-  if (This == NULL || BufferSize == NULL || Buffer == NULL) {
+  if ((This == NULL) || (BufferSize == NULL) || (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -269,7 +260,6 @@ EmuSimpleFileSystemWrite (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
 
 /**
   Get a file's current position
@@ -284,29 +274,27 @@ EmuSimpleFileSystemWrite (
 EFI_STATUS
 EFIAPI
 EmuSimpleFileSystemGetPosition (
-  IN  EFI_FILE_PROTOCOL   *This,
-  OUT UINT64              *Position
+  IN  EFI_FILE_PROTOCOL  *This,
+  OUT UINT64             *Position
   )
 {
   EFI_STATUS            Status;
-  EMU_EFI_FILE_PRIVATE *PrivateFile;
+  EMU_EFI_FILE_PRIVATE  *PrivateFile;
   EFI_TPL               OldTpl;
 
-  if (This == NULL || Position == NULL) {
+  if ((This == NULL) || (Position == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  PrivateFile   = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
+  PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status = PrivateFile->Io->GetPosition (PrivateFile->Io, Position);
 
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
-
 
 /**
   Set file's current position
@@ -325,9 +313,9 @@ EmuSimpleFileSystemSetPosition (
   IN UINT64             Position
   )
 {
-  EFI_STATUS              Status;
-  EMU_EFI_FILE_PRIVATE    *PrivateFile;
-  EFI_TPL                 OldTpl;
+  EFI_STATUS            Status;
+  EMU_EFI_FILE_PRIVATE  *PrivateFile;
+  EFI_TPL               OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -342,7 +330,6 @@ EmuSimpleFileSystemSetPosition (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
 
 /**
   Get information about a file.
@@ -371,11 +358,11 @@ EmuSimpleFileSystemGetInfo (
   OUT    VOID               *Buffer
   )
 {
-  EFI_STATUS                        Status;
-  EMU_EFI_FILE_PRIVATE              *PrivateFile;
-  EFI_TPL                           OldTpl;
+  EFI_STATUS            Status;
+  EMU_EFI_FILE_PRIVATE  *PrivateFile;
+  EFI_TPL               OldTpl;
 
-  if (This == NULL || InformationType == NULL || BufferSize == NULL) {
+  if ((This == NULL) || (InformationType == NULL) || (BufferSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -388,7 +375,6 @@ EmuSimpleFileSystemGetInfo (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
 
 /**
   Set information about a file
@@ -410,33 +396,32 @@ EmuSimpleFileSystemGetInfo (
 EFI_STATUS
 EFIAPI
 EmuSimpleFileSystemSetInfo (
-  IN EFI_FILE_PROTOCOL*This,
-  IN EFI_GUID         *InformationType,
-  IN UINTN            BufferSize,
-  IN VOID             *Buffer
+  IN EFI_FILE_PROTOCOL  *This,
+  IN EFI_GUID           *InformationType,
+  IN UINTN              BufferSize,
+  IN VOID               *Buffer
   )
 {
-  EFI_STATUS                        Status;
-  EMU_EFI_FILE_PRIVATE              *PrivateFile;
-  EFI_TPL                           OldTpl;
+  EFI_STATUS            Status;
+  EMU_EFI_FILE_PRIVATE  *PrivateFile;
+  EFI_TPL               OldTpl;
 
   //
   // Check for invalid parameters.
   //
-  if (This == NULL || InformationType == NULL || BufferSize == 0 || Buffer == NULL) {
+  if ((This == NULL) || (InformationType == NULL) || (BufferSize == 0) || (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  PrivateFile               = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
+  PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
 
   Status = PrivateFile->Io->SetInfo (PrivateFile->Io, InformationType, BufferSize, Buffer);
 
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
 
 /**
   Flush data back for the file handle.
@@ -459,9 +444,9 @@ EmuSimpleFileSystemFlush (
   IN EFI_FILE_PROTOCOL  *This
   )
 {
-  EFI_STATUS                Status;
-  EMU_EFI_FILE_PRIVATE      *PrivateFile;
-  EFI_TPL                   OldTpl;
+  EFI_STATUS            Status;
+  EMU_EFI_FILE_PRIVATE  *PrivateFile;
+  EFI_TPL               OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -476,8 +461,6 @@ EmuSimpleFileSystemFlush (
   gBS->RestoreTPL (OldTpl);
   return Status;
 }
-
-
 
 /**
   Open the root directory on a volume.
@@ -501,14 +484,14 @@ EmuSimpleFileSystemOpenVolume (
   OUT EFI_FILE_PROTOCOL               **Root
   )
 {
-  EFI_STATUS                        Status;
-  EMU_SIMPLE_FILE_SYSTEM_PRIVATE    *Private;
-  EMU_EFI_FILE_PRIVATE              *PrivateFile;
-  EFI_TPL                           OldTpl;
+  EFI_STATUS                      Status;
+  EMU_SIMPLE_FILE_SYSTEM_PRIVATE  *Private;
+  EMU_EFI_FILE_PRIVATE            *PrivateFile;
+  EFI_TPL                         OldTpl;
 
   Status = EFI_UNSUPPORTED;
 
-  if (This == NULL || Root == NULL) {
+  if ((This == NULL) || (Root == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -522,22 +505,22 @@ EmuSimpleFileSystemOpenVolume (
     goto Done;
   }
 
-  PrivateFile->Signature            = EMU_EFI_FILE_PRIVATE_SIGNATURE;
-  PrivateFile->IoThunk              = Private->IoThunk;
-  PrivateFile->SimpleFileSystem     = This;
+  PrivateFile->Signature        = EMU_EFI_FILE_PRIVATE_SIGNATURE;
+  PrivateFile->IoThunk          = Private->IoThunk;
+  PrivateFile->SimpleFileSystem = This;
 
   ZeroMem (&PrivateFile->EfiFile, sizeof (PrivateFile->EfiFile));
-  PrivateFile->EfiFile.Revision     = EFI_FILE_PROTOCOL_REVISION;
-  PrivateFile->EfiFile.Open         = EmuSimpleFileSystemOpen;
-  PrivateFile->EfiFile.Close        = EmuSimpleFileSystemClose;
-  PrivateFile->EfiFile.Delete       = EmuSimpleFileSystemDelete;
-  PrivateFile->EfiFile.Read         = EmuSimpleFileSystemRead;
-  PrivateFile->EfiFile.Write        = EmuSimpleFileSystemWrite;
-  PrivateFile->EfiFile.GetPosition  = EmuSimpleFileSystemGetPosition;
-  PrivateFile->EfiFile.SetPosition  = EmuSimpleFileSystemSetPosition;
-  PrivateFile->EfiFile.GetInfo      = EmuSimpleFileSystemGetInfo;
-  PrivateFile->EfiFile.SetInfo      = EmuSimpleFileSystemSetInfo;
-  PrivateFile->EfiFile.Flush        = EmuSimpleFileSystemFlush;
+  PrivateFile->EfiFile.Revision    = EFI_FILE_PROTOCOL_REVISION;
+  PrivateFile->EfiFile.Open        = EmuSimpleFileSystemOpen;
+  PrivateFile->EfiFile.Close       = EmuSimpleFileSystemClose;
+  PrivateFile->EfiFile.Delete      = EmuSimpleFileSystemDelete;
+  PrivateFile->EfiFile.Read        = EmuSimpleFileSystemRead;
+  PrivateFile->EfiFile.Write       = EmuSimpleFileSystemWrite;
+  PrivateFile->EfiFile.GetPosition = EmuSimpleFileSystemGetPosition;
+  PrivateFile->EfiFile.SetPosition = EmuSimpleFileSystemSetPosition;
+  PrivateFile->EfiFile.GetInfo     = EmuSimpleFileSystemGetInfo;
+  PrivateFile->EfiFile.SetInfo     = EmuSimpleFileSystemSetInfo;
+  PrivateFile->EfiFile.Flush       = EmuSimpleFileSystemFlush;
 
   *Root = &PrivateFile->EfiFile;
 
@@ -561,7 +544,6 @@ EmuSimpleFileSystemOpenVolume (
     Private->IoThunk->ConfigString,
     FALSE
     );
-
 
 Done:
   if (EFI_ERROR (Status)) {
@@ -627,7 +609,7 @@ EmuSimpleFileSystemDriverBindingSupported (
   IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS             Status;
   EMU_IO_THUNK_PROTOCOL  *EmuIoThunk;
 
   //
@@ -657,16 +639,14 @@ EmuSimpleFileSystemDriverBindingSupported (
   // Close the I/O Abstraction(s) used to perform the supported test
   //
   gBS->CloseProtocol (
-        ControllerHandle,
-        &gEmuIoThunkProtocolGuid,
-        This->DriverBindingHandle,
-        ControllerHandle
-        );
+         ControllerHandle,
+         &gEmuIoThunkProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 
   return Status;
 }
-
-
 
 /**
   Starts a device controller or a bus controller.
@@ -706,14 +686,14 @@ EmuSimpleFileSystemDriverBindingSupported (
 EFI_STATUS
 EFIAPI
 EmuSimpleFileSystemDriverBindingStart (
-  IN  EFI_DRIVER_BINDING_PROTOCOL   *This,
-  IN  EFI_HANDLE                    ControllerHandle,
-  IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS                        Status;
-  EMU_IO_THUNK_PROTOCOL             *EmuIoThunk;
-  EMU_SIMPLE_FILE_SYSTEM_PRIVATE    *Private;
+  EFI_STATUS                      Status;
+  EMU_IO_THUNK_PROTOCOL           *EmuIoThunk;
+  EMU_SIMPLE_FILE_SYSTEM_PRIVATE  *Private;
 
   Private = NULL;
 
@@ -755,8 +735,8 @@ EmuSimpleFileSystemDriverBindingStart (
   Private->IoThunk   = EmuIoThunk;
   Private->Io        = EmuIoThunk->Interface;
 
-  Private->SimpleFileSystem.Revision    = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION;
-  Private->SimpleFileSystem.OpenVolume  = EmuSimpleFileSystemOpenVolume;
+  Private->SimpleFileSystem.Revision   = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION;
+  Private->SimpleFileSystem.OpenVolume = EmuSimpleFileSystemOpenVolume;
 
   Private->ControllerNameTable = NULL;
 
@@ -778,7 +758,8 @@ EmuSimpleFileSystemDriverBindingStart (
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ControllerHandle,
-                  &gEfiSimpleFileSystemProtocolGuid,  &Private->SimpleFileSystem,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  &Private->SimpleFileSystem,
                   NULL
                   );
 
@@ -790,20 +771,18 @@ Done:
       }
 
       gBS->FreePool (Private);
-
     }
 
     gBS->CloseProtocol (
-          ControllerHandle,
-          &gEmuIoThunkProtocolGuid,
-          This->DriverBindingHandle,
-          ControllerHandle
-          );
+           ControllerHandle,
+           &gEmuIoThunkProtocolGuid,
+           This->DriverBindingHandle,
+           ControllerHandle
+           );
   }
 
   return Status;
 }
-
 
 /**
   Stops a device controller or a bus controller.
@@ -840,9 +819,9 @@ EmuSimpleFileSystemDriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS                        Status;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL   *SimpleFileSystem;
-  EMU_SIMPLE_FILE_SYSTEM_PRIVATE    *Private;
+  EFI_STATUS                       Status;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *SimpleFileSystem;
+  EMU_SIMPLE_FILE_SYSTEM_PRIVATE   *Private;
 
   //
   // Get our context back
@@ -866,7 +845,8 @@ EmuSimpleFileSystemDriverBindingStop (
   //
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   ControllerHandle,
-                  &gEfiSimpleFileSystemProtocolGuid,  &Private->SimpleFileSystem,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  &Private->SimpleFileSystem,
                   NULL
                   );
   if (!EFI_ERROR (Status)) {
@@ -892,8 +872,7 @@ EmuSimpleFileSystemDriverBindingStop (
   return Status;
 }
 
-
-EFI_DRIVER_BINDING_PROTOCOL gEmuSimpleFileSystemDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gEmuSimpleFileSystemDriverBinding = {
   EmuSimpleFileSystemDriverBindingSupported,
   EmuSimpleFileSystemDriverBindingStart,
   EmuSimpleFileSystemDriverBindingStop,
@@ -901,9 +880,6 @@ EFI_DRIVER_BINDING_PROTOCOL gEmuSimpleFileSystemDriverBinding = {
   NULL,
   NULL
 };
-
-
-
 
 /**
   The user Entry Point for module EmuSimpleFileSystem. The user code starts with this function.
@@ -917,12 +893,12 @@ EFI_DRIVER_BINDING_PROTOCOL gEmuSimpleFileSystemDriverBinding = {
 **/
 EFI_STATUS
 EFIAPI
-InitializeEmuSimpleFileSystem(
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+InitializeEmuSimpleFileSystem (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
