@@ -21,8 +21,8 @@
 UINTN
 EFIAPI
 ShellDumpBufferToFile (
-  IN CONST CHAR16* FileNameBuffer,
-  IN CONST VOID*   Buffer,
+  IN CONST CHAR16  *FileNameBuffer,
+  IN CONST VOID    *Buffer,
   IN CONST UINTN   BufferSize
   );
 

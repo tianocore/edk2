@@ -11,14 +11,14 @@
 #include "UefiShellNetwork1CommandsLib.h"
 
 typedef enum {
-  IfConfigOpList     = 1,
-  IfConfigOpSet      = 2,
-  IfConfigOpClear    = 3
+  IfConfigOpList  = 1,
+  IfConfigOpSet   = 2,
+  IfConfigOpClear = 3
 } IFCONFIG_OPCODE;
 
 typedef enum {
-  VarCheckReserved      = -1,
-  VarCheckOk            = 0,
+  VarCheckReserved = -1,
+  VarCheckOk       = 0,
   VarCheckDuplicate,
   VarCheckConflict,
   VarCheckUnknown,
@@ -27,22 +27,22 @@ typedef enum {
 } VAR_CHECK_CODE;
 
 typedef enum {
-  FlagTypeSingle         = 0,
+  FlagTypeSingle = 0,
   FlagTypeNeedVar,
   FlagTypeNeedSet,
   FlagTypeSkipUnknown
 } VAR_CHECK_FLAG_TYPE;
 
-#define MACADDRMAXSIZE    32
+#define MACADDRMAXSIZE  32
 
 typedef struct _IFCONFIG_INTERFACE_CB {
-  EFI_HANDLE                                  NicHandle;
-  LIST_ENTRY                                  Link;
-  EFI_IP4_CONFIG2_PROTOCOL                    *IfCfg;
-  EFI_IP4_CONFIG2_INTERFACE_INFO              *IfInfo;
-  EFI_IP4_CONFIG2_POLICY                      Policy;
-  UINT32                                      DnsCnt;
-  EFI_IPv4_ADDRESS                            DnsAddr[1];
+  EFI_HANDLE                        NicHandle;
+  LIST_ENTRY                        Link;
+  EFI_IP4_CONFIG2_PROTOCOL          *IfCfg;
+  EFI_IP4_CONFIG2_INTERFACE_INFO    *IfInfo;
+  EFI_IP4_CONFIG2_POLICY            Policy;
+  UINT32                            DnsCnt;
+  EFI_IPv4_ADDRESS                  DnsAddr[1];
 } IFCONFIG_INTERFACE_CB;
 
 typedef struct _ARG_LIST ARG_LIST;
@@ -53,21 +53,21 @@ struct _ARG_LIST {
 };
 
 typedef struct _IFCONFIG4_PRIVATE_DATA {
-  LIST_ENTRY  IfList;
+  LIST_ENTRY    IfList;
 
-  UINT32      OpCode;
-  CHAR16      *IfName;
-  ARG_LIST    *VarArg;
+  UINT32        OpCode;
+  CHAR16        *IfName;
+  ARG_LIST      *VarArg;
 } IFCONFIG_PRIVATE_DATA;
 
-typedef struct _VAR_CHECK_ITEM{
+typedef struct _VAR_CHECK_ITEM {
   CHAR16                 *FlagStr;
   UINT32                 FlagID;
   UINT32                 ConflictMask;
   VAR_CHECK_FLAG_TYPE    FlagType;
 } VAR_CHECK_ITEM;
 
-SHELL_PARAM_ITEM    mIfConfigCheckList[] = {
+SHELL_PARAM_ITEM  mIfConfigCheckList[] = {
   {
     L"-b",
     TypeFlag
@@ -96,7 +96,7 @@ SHELL_PARAM_ITEM    mIfConfigCheckList[] = {
 
 VAR_CHECK_ITEM  mSetCheckList[] = {
   {
-   L"static",
+    L"static",
     0x00000001,
     0x00000001,
     FlagTypeSingle
@@ -121,7 +121,7 @@ VAR_CHECK_ITEM  mSetCheckList[] = {
   },
 };
 
-STATIC CONST CHAR16 PermanentString[10] = L"PERMANENT";
+STATIC CONST CHAR16  PermanentString[10] = L"PERMANENT";
 
 /**
   Free the ARG_LIST.
@@ -130,10 +130,11 @@ STATIC CONST CHAR16 PermanentString[10] = L"PERMANENT";
 **/
 VOID
 FreeArgList (
-  ARG_LIST       *List
-)
+  ARG_LIST  *List
+  )
 {
-  ARG_LIST       *Next;
+  ARG_LIST  *Next;
+
   while (List->Next != NULL) {
     Next = List->Next;
     FreePool (List);
@@ -154,14 +155,14 @@ FreeArgList (
 **/
 ARG_LIST *
 SplitStrToList (
-  IN CONST CHAR16    *String,
-  IN CHAR16          Separator
+  IN CONST CHAR16  *String,
+  IN CHAR16        Separator
   )
 {
-  CHAR16      *Str;
-  CHAR16      *ArgStr;
-  ARG_LIST    *ArgList;
-  ARG_LIST    *ArgNode;
+  CHAR16    *Str;
+  CHAR16    *ArgStr;
+  ARG_LIST  *ArgList;
+  ARG_LIST  *ArgNode;
 
   if (*String == L'\0') {
     return NULL;
@@ -174,15 +175,17 @@ SplitStrToList (
   if (Str == NULL) {
     return NULL;
   }
-  ArgStr  = Str;
+
+  ArgStr = Str;
 
   //
   // init a node for the list head.
   //
-  ArgNode = (ARG_LIST *) AllocateZeroPool (sizeof (ARG_LIST));
+  ArgNode = (ARG_LIST *)AllocateZeroPool (sizeof (ARG_LIST));
   if (ArgNode == NULL) {
     return NULL;
   }
+
   ArgList = ArgNode;
 
   //
@@ -193,7 +196,7 @@ SplitStrToList (
       *Str          = L'\0';
       ArgNode->Arg  = ArgStr;
       ArgStr        = Str + 1;
-      ArgNode->Next = (ARG_LIST *) AllocateZeroPool (sizeof (ARG_LIST));
+      ArgNode->Next = (ARG_LIST *)AllocateZeroPool (sizeof (ARG_LIST));
       if (ArgNode->Next == NULL) {
         //
         // Free the local copy of string stored in the first node
@@ -202,6 +205,7 @@ SplitStrToList (
         FreeArgList (ArgList);
         return NULL;
       }
+
       ArgNode = ArgNode->Next;
     }
 
@@ -228,17 +232,17 @@ SplitStrToList (
 
 **/
 VAR_CHECK_CODE
-IfConfigRetriveCheckListByName(
-  IN VAR_CHECK_ITEM    *CheckList,
-  IN CHAR16            *Name,
-  IN BOOLEAN           Init
-)
+IfConfigRetriveCheckListByName (
+  IN VAR_CHECK_ITEM  *CheckList,
+  IN CHAR16          *Name,
+  IN BOOLEAN         Init
+  )
 {
-  STATIC UINT32     CheckDuplicate;
-  STATIC UINT32     CheckConflict;
-  VAR_CHECK_CODE    RtCode;
-  UINT32            Index;
-  VAR_CHECK_ITEM    Arg;
+  STATIC UINT32   CheckDuplicate;
+  STATIC UINT32   CheckConflict;
+  VAR_CHECK_CODE  RtCode;
+  UINT32          Index;
+  VAR_CHECK_ITEM  Arg;
 
   if (Init) {
     CheckDuplicate = 0;
@@ -246,16 +250,15 @@ IfConfigRetriveCheckListByName(
     return VarCheckOk;
   }
 
-  RtCode  = VarCheckOk;
-  Index   = 0;
-  Arg     = CheckList[Index];
+  RtCode = VarCheckOk;
+  Index  = 0;
+  Arg    = CheckList[Index];
 
   //
   // Check the Duplicated/Conflicted/Unknown input Args.
   //
   while (Arg.FlagStr != NULL) {
     if (StrCmp (Arg.FlagStr, Name) == 0) {
-
       if (CheckDuplicate & Arg.FlagID) {
         RtCode = VarCheckDuplicate;
         break;
@@ -291,11 +294,11 @@ IfConfigRetriveCheckListByName(
 VOID
 EFIAPI
 IfConfigManualAddressNotify (
-  IN EFI_EVENT    Event,
-  IN VOID         *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  *((BOOLEAN *) Context) = TRUE;
+  *((BOOLEAN *)Context) = TRUE;
 }
 
 /**
@@ -307,11 +310,11 @@ IfConfigManualAddressNotify (
 **/
 VOID
 IfConfigPrintMacAddr (
-  IN UINT8     *Node,
-  IN UINT32    Size
+  IN UINT8   *Node,
+  IN UINT32  Size
   )
 {
-  UINTN    Index;
+  UINTN  Index;
 
   ASSERT (Size <= MACADDRMAXSIZE);
 
@@ -325,7 +328,6 @@ IfConfigPrintMacAddr (
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_NEWLINE), gShellNetwork1HiiHandle);
 }
 
-
 /**
   The get current status of all handles.
 
@@ -338,24 +340,24 @@ IfConfigPrintMacAddr (
 **/
 EFI_STATUS
 IfConfigGetInterfaceInfo (
-  IN CHAR16        *IfName,
-  IN LIST_ENTRY    *IfList
+  IN CHAR16      *IfName,
+  IN LIST_ENTRY  *IfList
   )
 {
-  EFI_STATUS                       Status;
-  UINTN                            HandleIndex;
-  UINTN                            HandleNum;
-  EFI_HANDLE                       *HandleBuffer;
-  EFI_IP4_CONFIG2_PROTOCOL         *Ip4Cfg2;
-  EFI_IP4_CONFIG2_INTERFACE_INFO   *IfInfo;
-  IFCONFIG_INTERFACE_CB            *IfCb;
-  UINTN                            DataSize;
+  EFI_STATUS                      Status;
+  UINTN                           HandleIndex;
+  UINTN                           HandleNum;
+  EFI_HANDLE                      *HandleBuffer;
+  EFI_IP4_CONFIG2_PROTOCOL        *Ip4Cfg2;
+  EFI_IP4_CONFIG2_INTERFACE_INFO  *IfInfo;
+  IFCONFIG_INTERFACE_CB           *IfCb;
+  UINTN                           DataSize;
 
   HandleBuffer = NULL;
   HandleNum    = 0;
 
-  IfInfo       = NULL;
-  IfCb         = NULL;
+  IfInfo = NULL;
+  IfCb   = NULL;
 
   //
   // Locate all the handles with ip4 service binding protocol.
@@ -366,7 +368,7 @@ IfConfigGetInterfaceInfo (
                   NULL,
                   &HandleNum,
                   &HandleBuffer
-                 );
+                  );
   if (EFI_ERROR (Status) || (HandleNum == 0)) {
     return Status;
   }
@@ -375,9 +377,9 @@ IfConfigGetInterfaceInfo (
   // Enumerate all handles that installed with ip4 service binding protocol.
   //
   for (HandleIndex = 0; HandleIndex < HandleNum; HandleIndex++) {
-    IfCb      = NULL;
-    IfInfo    = NULL;
-    DataSize  = 0;
+    IfCb     = NULL;
+    IfInfo   = NULL;
+    DataSize = 0;
 
     //
     // Ip4config protocol and ip4 service binding protocol are installed
@@ -387,7 +389,7 @@ IfConfigGetInterfaceInfo (
     Status = gBS->HandleProtocol (
                     HandleBuffer[HandleIndex],
                     &gEfiIp4Config2ProtocolGuid,
-                    (VOID **) &Ip4Cfg2
+                    (VOID **)&Ip4Cfg2
                     );
 
     if (EFI_ERROR (Status)) {
@@ -398,11 +400,11 @@ IfConfigGetInterfaceInfo (
     // Get the interface information size.
     //
     Status = Ip4Cfg2->GetData (
-                       Ip4Cfg2,
-                       Ip4Config2DataTypeInterfaceInfo,
-                       &DataSize,
-                       NULL
-                       );
+                        Ip4Cfg2,
+                        Ip4Config2DataTypeInterfaceInfo,
+                        &DataSize,
+                        NULL
+                        );
 
     if (Status != EFI_BUFFER_TOO_SMALL) {
       goto ON_ERROR;
@@ -419,11 +421,11 @@ IfConfigGetInterfaceInfo (
     // Get the interface info.
     //
     Status = Ip4Cfg2->GetData (
-                       Ip4Cfg2,
-                       Ip4Config2DataTypeInterfaceInfo,
-                       &DataSize,
-                       IfInfo
-                       );
+                        Ip4Cfg2,
+                        Ip4Config2DataTypeInterfaceInfo,
+                        &DataSize,
+                        IfInfo
+                        );
 
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
@@ -443,11 +445,11 @@ IfConfigGetInterfaceInfo (
     // Get the size of dns server list.
     //
     Status = Ip4Cfg2->GetData (
-                       Ip4Cfg2,
-                       Ip4Config2DataTypeDnsServer,
-                       &DataSize,
-                       NULL
-                       );
+                        Ip4Cfg2,
+                        Ip4Config2DataTypeDnsServer,
+                        &DataSize,
+                        NULL
+                        );
 
     if ((Status != EFI_BUFFER_TOO_SMALL) && (Status != EFI_NOT_FOUND)) {
       goto ON_ERROR;
@@ -463,18 +465,18 @@ IfConfigGetInterfaceInfo (
     IfCb->NicHandle = HandleBuffer[HandleIndex];
     IfCb->IfInfo    = IfInfo;
     IfCb->IfCfg     = Ip4Cfg2;
-    IfCb->DnsCnt    = (UINT32) (DataSize / sizeof (EFI_IPv4_ADDRESS));
+    IfCb->DnsCnt    = (UINT32)(DataSize / sizeof (EFI_IPv4_ADDRESS));
 
     //
     // Get the dns server list if has.
     //
     if (DataSize > 0) {
       Status = Ip4Cfg2->GetData (
-                         Ip4Cfg2,
-                         Ip4Config2DataTypeDnsServer,
-                         &DataSize,
-                         IfCb->DnsAddr
-                         );
+                          Ip4Cfg2,
+                          Ip4Config2DataTypeDnsServer,
+                          &DataSize,
+                          IfCb->DnsAddr
+                          );
 
       if (EFI_ERROR (Status)) {
         goto ON_ERROR;
@@ -486,11 +488,11 @@ IfConfigGetInterfaceInfo (
     //
     DataSize = sizeof (EFI_IP4_CONFIG2_POLICY);
     Status   = Ip4Cfg2->GetData (
-                         Ip4Cfg2,
-                         Ip4Config2DataTypePolicy,
-                         &DataSize,
-                         &IfCb->Policy
-                         );
+                          Ip4Cfg2,
+                          Ip4Config2DataTypePolicy,
+                          &DataSize,
+                          &IfCb->Policy
+                          );
 
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
@@ -538,15 +540,15 @@ ON_ERROR:
 **/
 SHELL_STATUS
 IfConfigShowInterfaceInfo (
-  IN LIST_ENTRY    *IfList
+  IN LIST_ENTRY  *IfList
   )
 {
-  LIST_ENTRY                   *Entry;
-  LIST_ENTRY                   *Next;
-  IFCONFIG_INTERFACE_CB        *IfCb;
-  EFI_STATUS                    MediaStatus;
-  EFI_IPv4_ADDRESS              Gateway;
-  UINT32                        Index;
+  LIST_ENTRY             *Entry;
+  LIST_ENTRY             *Next;
+  IFCONFIG_INTERFACE_CB  *IfCb;
+  EFI_STATUS             MediaStatus;
+  EFI_IPv4_ADDRESS       Gateway;
+  UINT32                 Index;
 
   MediaStatus = EFI_SUCCESS;
 
@@ -604,7 +606,7 @@ IfConfigShowInterfaceInfo (
     //
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_IP_ADDR_HEAD), gShellNetwork1HiiHandle);
 
-    ShellPrintHiiEx(
+    ShellPrintHiiEx (
       -1,
       -1,
       NULL,
@@ -621,7 +623,7 @@ IfConfigShowInterfaceInfo (
     //
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_SUBNET_MASK_HEAD), gShellNetwork1HiiHandle);
 
-    ShellPrintHiiEx(
+    ShellPrintHiiEx (
       -1,
       -1,
       NULL,
@@ -642,12 +644,13 @@ IfConfigShowInterfaceInfo (
 
     for (Index = 0; Index < IfCb->IfInfo->RouteTableSize; Index++) {
       if ((CompareMem (&IfCb->IfInfo->RouteTable[Index].SubnetAddress, &mZeroIp4Addr, sizeof (EFI_IPv4_ADDRESS)) == 0) &&
-          (CompareMem (&IfCb->IfInfo->RouteTable[Index].SubnetMask   , &mZeroIp4Addr, sizeof (EFI_IPv4_ADDRESS)) == 0) ){
+          (CompareMem (&IfCb->IfInfo->RouteTable[Index].SubnetMask, &mZeroIp4Addr, sizeof (EFI_IPv4_ADDRESS)) == 0))
+      {
         CopyMem (&Gateway, &IfCb->IfInfo->RouteTable[Index].GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
       }
     }
 
-    ShellPrintHiiEx(
+    ShellPrintHiiEx (
       -1,
       -1,
       NULL,
@@ -662,12 +665,12 @@ IfConfigShowInterfaceInfo (
     //
     // Print route table entry.
     //
-    ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_ROUTES_SIZE), gShellNetwork1HiiHandle, IfCb->IfInfo->RouteTableSize);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_ROUTES_SIZE), gShellNetwork1HiiHandle, IfCb->IfInfo->RouteTableSize);
 
     for (Index = 0; Index < IfCb->IfInfo->RouteTableSize; Index++) {
-      ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_ROUTES_ENTRY_INDEX), gShellNetwork1HiiHandle, Index);
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_ROUTES_ENTRY_INDEX), gShellNetwork1HiiHandle, Index);
 
-      ShellPrintHiiEx(
+      ShellPrintHiiEx (
         -1,
         -1,
         NULL,
@@ -680,7 +683,7 @@ IfConfigShowInterfaceInfo (
         (UINTN)IfCb->IfInfo->RouteTable[Index].SubnetAddress.Addr[3]
         );
 
-      ShellPrintHiiEx(
+      ShellPrintHiiEx (
         -1,
         -1,
         NULL,
@@ -693,7 +696,7 @@ IfConfigShowInterfaceInfo (
         (UINTN)IfCb->IfInfo->RouteTable[Index].SubnetMask.Addr[3]
         );
 
-      ShellPrintHiiEx(
+      ShellPrintHiiEx (
         -1,
         -1,
         NULL,
@@ -713,16 +716,16 @@ IfConfigShowInterfaceInfo (
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_DNS_ADDR_HEAD), gShellNetwork1HiiHandle);
 
     for (Index = 0; Index < IfCb->DnsCnt; Index++) {
-      ShellPrintHiiEx(
+      ShellPrintHiiEx (
         -1,
         -1,
         NULL,
         STRING_TOKEN (STR_IFCONFIG_INFO_DNS_ADDR_BODY),
         gShellNetwork1HiiHandle,
-        (UINTN) IfCb->DnsAddr[Index].Addr[0],
-        (UINTN) IfCb->DnsAddr[Index].Addr[1],
-        (UINTN) IfCb->DnsAddr[Index].Addr[2],
-        (UINTN) IfCb->DnsAddr[Index].Addr[3]
+        (UINTN)IfCb->DnsAddr[Index].Addr[0],
+        (UINTN)IfCb->DnsAddr[Index].Addr[1],
+        (UINTN)IfCb->DnsAddr[Index].Addr[2],
+        (UINTN)IfCb->DnsAddr[Index].Addr[3]
         );
 
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_NEWLINE), gShellNetwork1HiiHandle);
@@ -746,18 +749,18 @@ IfConfigShowInterfaceInfo (
 **/
 SHELL_STATUS
 IfConfigClearInterfaceInfo (
-  IN LIST_ENTRY    *IfList,
-  IN CHAR16        *IfName
+  IN LIST_ENTRY  *IfList,
+  IN CHAR16      *IfName
   )
 {
-  EFI_STATUS                Status;
-  SHELL_STATUS              ShellStatus;
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IFCONFIG_INTERFACE_CB     *IfCb;
-  EFI_IP4_CONFIG2_POLICY    Policy;
+  EFI_STATUS              Status;
+  SHELL_STATUS            ShellStatus;
+  LIST_ENTRY              *Entry;
+  LIST_ENTRY              *Next;
+  IFCONFIG_INTERFACE_CB   *IfCb;
+  EFI_IP4_CONFIG2_POLICY  Policy;
 
-  Status = EFI_SUCCESS;
+  Status      = EFI_SUCCESS;
   ShellStatus = SHELL_SUCCESS;
 
   if (IsListEmpty (IfList)) {
@@ -818,29 +821,29 @@ IfConfigClearInterfaceInfo (
 **/
 SHELL_STATUS
 IfConfigSetInterfaceInfo (
-  IN LIST_ENTRY    *IfList,
-  IN ARG_LIST      *VarArg
+  IN LIST_ENTRY  *IfList,
+  IN ARG_LIST    *VarArg
   )
 {
-  EFI_STATUS                       Status;
-  SHELL_STATUS                     ShellStatus;
-  IFCONFIG_INTERFACE_CB            *IfCb;
-  VAR_CHECK_CODE                   CheckCode;
-  EFI_EVENT                        TimeOutEvt;
-  EFI_EVENT                        MappedEvt;
-  BOOLEAN                          IsAddressOk;
+  EFI_STATUS             Status;
+  SHELL_STATUS           ShellStatus;
+  IFCONFIG_INTERFACE_CB  *IfCb;
+  VAR_CHECK_CODE         CheckCode;
+  EFI_EVENT              TimeOutEvt;
+  EFI_EVENT              MappedEvt;
+  BOOLEAN                IsAddressOk;
 
-  EFI_IP4_CONFIG2_POLICY           Policy;
-  EFI_IP4_CONFIG2_MANUAL_ADDRESS   ManualAddress;
-  UINTN                            DataSize;
-  EFI_IPv4_ADDRESS                 Gateway;
-  IP4_ADDR                         SubnetMask;
-  IP4_ADDR                         TempGateway;
-  EFI_IPv4_ADDRESS                 *Dns;
-  ARG_LIST                         *Tmp;
-  UINTN                            Index;
+  EFI_IP4_CONFIG2_POLICY          Policy;
+  EFI_IP4_CONFIG2_MANUAL_ADDRESS  ManualAddress;
+  UINTN                           DataSize;
+  EFI_IPv4_ADDRESS                Gateway;
+  IP4_ADDR                        SubnetMask;
+  IP4_ADDR                        TempGateway;
+  EFI_IPv4_ADDRESS                *Dns;
+  ARG_LIST                        *Tmp;
+  UINTN                           Index;
 
-  CONST CHAR16* TempString;
+  CONST CHAR16  *TempString;
 
   Dns = NULL;
 
@@ -852,14 +855,14 @@ IfConfigSetInterfaceInfo (
   //
   // Make sure to set only one interface each time.
   //
-  IfCb   = NET_LIST_USER_STRUCT (IfList->ForwardLink, IFCONFIG_INTERFACE_CB, Link);
-  Status = EFI_SUCCESS;
+  IfCb        = NET_LIST_USER_STRUCT (IfList->ForwardLink, IFCONFIG_INTERFACE_CB, Link);
+  Status      = EFI_SUCCESS;
   ShellStatus = SHELL_SUCCESS;
 
   //
   // Initialize check list mechanism.
   //
-  CheckCode = IfConfigRetriveCheckListByName(
+  CheckCode = IfConfigRetriveCheckListByName (
                 NULL,
                 NULL,
                 TRUE
@@ -901,7 +904,7 @@ IfConfigSetInterfaceInfo (
     //
     // Check invalid parameters (duplication & unknown & conflict).
     //
-    CheckCode = IfConfigRetriveCheckListByName(
+    CheckCode = IfConfigRetriveCheckListByName (
                   mSetCheckList,
                   VarArg->Arg,
                   FALSE
@@ -922,8 +925,8 @@ IfConfigSetInterfaceInfo (
           // To handle unsupported option.
           //
           TempString = PermanentString;
-          if (StringNoCaseCompare(&VarArg->Arg, &TempString) == 0) {
-            ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_UNSUPPORTED_OPTION), gShellNetwork1HiiHandle, PermanentString);
+          if (StringNoCaseCompare (&VarArg->Arg, &TempString) == 0) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_UNSUPPORTED_OPTION), gShellNetwork1HiiHandle, PermanentString);
             goto ON_EXIT;
           }
 
@@ -944,7 +947,7 @@ IfConfigSetInterfaceInfo (
     //
     // Process valid variables.
     //
-    if (StrCmp(VarArg->Arg, L"dhcp") == 0) {
+    if (StrCmp (VarArg->Arg, L"dhcp") == 0) {
       //
       // Set dhcp config policy
       //
@@ -955,16 +958,15 @@ IfConfigSetInterfaceInfo (
                               sizeof (EFI_IP4_CONFIG2_POLICY),
                               &Policy
                               );
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
 
-      VarArg= VarArg->Next;
-
+      VarArg = VarArg->Next;
     } else if (StrCmp (VarArg->Arg, L"static") == 0) {
-      VarArg= VarArg->Next;
+      VarArg = VarArg->Next;
       if (VarArg == NULL) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_LACK_COMMAND), gShellNetwork1HiiHandle);
         ShellStatus = SHELL_INVALID_PARAMETER;
@@ -977,8 +979,8 @@ IfConfigSetInterfaceInfo (
       // Get manual IP address.
       //
       Status = NetLibStrToIp4 (VarArg->Arg, &ManualAddress.Address);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto ON_EXIT;
       }
@@ -994,8 +996,8 @@ IfConfigSetInterfaceInfo (
       }
 
       Status = NetLibStrToIp4 (VarArg->Arg, &ManualAddress.SubnetMask);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto ON_EXIT;
       }
@@ -1011,8 +1013,8 @@ IfConfigSetInterfaceInfo (
       }
 
       Status = NetLibStrToIp4 (VarArg->Arg, &Gateway);
-      if (EFI_ERROR(Status)) {
-        ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto ON_EXIT;
       }
@@ -1027,7 +1029,8 @@ IfConfigSetInterfaceInfo (
       TempGateway = NTOHL (TempGateway);
       if ((SubnetMask != 0) &&
           (SubnetMask != 0xFFFFFFFFu) &&
-          !NetIp4IsUnicast (TempGateway, SubnetMask)) {
+          !NetIp4IsUnicast (TempGateway, SubnetMask))
+      {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INVALID_GATEWAY), gShellNetwork1HiiHandle, VarArg->Arg);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto ON_EXIT;
@@ -1043,7 +1046,7 @@ IfConfigSetInterfaceInfo (
                               sizeof (EFI_IP4_CONFIG2_POLICY),
                               &Policy
                               );
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
@@ -1115,7 +1118,6 @@ IfConfigSetInterfaceInfo (
       }
 
       VarArg = VarArg->Next;
-
     } else if (StrCmp (VarArg->Arg, L"dns") == 0) {
       //
       // Get DNS addresses.
@@ -1124,26 +1126,28 @@ IfConfigSetInterfaceInfo (
       Tmp    = VarArg;
       Index  = 0;
       while (Tmp != NULL) {
-        Index ++;
+        Index++;
         Tmp = Tmp->Next;
       }
 
-      Dns   = AllocatePool (Index * sizeof (EFI_IPv4_ADDRESS));
+      Dns = AllocatePool (Index * sizeof (EFI_IPv4_ADDRESS));
       if (Dns == NULL) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork1HiiHandle, L"ifconfig");
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       Tmp   = VarArg;
       Index = 0;
       while (Tmp != NULL) {
         Status = NetLibStrToIp4 (Tmp->Arg, Dns + Index);
-        if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, Tmp->Arg);
+        if (EFI_ERROR (Status)) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, Tmp->Arg);
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto ON_EXIT;
         }
-        Index ++;
+
+        Index++;
         Tmp = Tmp->Next;
       }
 
@@ -1174,7 +1178,6 @@ ON_EXIT:
   }
 
   return ShellStatus;
-
 }
 
 /**
@@ -1188,7 +1191,7 @@ ON_EXIT:
 **/
 SHELL_STATUS
 IfConfig (
-  IN IFCONFIG_PRIVATE_DATA    *Private
+  IN IFCONFIG_PRIVATE_DATA  *Private
   )
 {
   EFI_STATUS    Status;
@@ -1209,20 +1212,20 @@ IfConfig (
   }
 
   switch (Private->OpCode) {
-  case IfConfigOpList:
-    ShellStatus = IfConfigShowInterfaceInfo (&Private->IfList);
-    break;
+    case IfConfigOpList:
+      ShellStatus = IfConfigShowInterfaceInfo (&Private->IfList);
+      break;
 
-  case IfConfigOpClear:
-    ShellStatus = IfConfigClearInterfaceInfo (&Private->IfList, Private->IfName);
-    break;
+    case IfConfigOpClear:
+      ShellStatus = IfConfigClearInterfaceInfo (&Private->IfList, Private->IfName);
+      break;
 
-  case IfConfigOpSet:
-    ShellStatus = IfConfigSetInterfaceInfo (&Private->IfList, Private->VarArg);
-    break;
+    case IfConfigOpSet:
+      ShellStatus = IfConfigSetInterfaceInfo (&Private->IfList, Private->VarArg);
+      break;
 
-  default:
-    ShellStatus = SHELL_UNSUPPORTED;
+    default:
+      ShellStatus = SHELL_UNSUPPORTED;
   }
 
 ON_EXIT:
@@ -1240,9 +1243,9 @@ IfConfigCleanup (
   IN IFCONFIG_PRIVATE_DATA  *Private
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *NextEntry;
-  IFCONFIG_INTERFACE_CB     *IfCb;
+  LIST_ENTRY             *Entry;
+  LIST_ENTRY             *NextEntry;
+  IFCONFIG_INTERFACE_CB  *IfCb;
 
   ASSERT (Private != NULL);
 
@@ -1266,7 +1269,6 @@ IfConfigCleanup (
     RemoveEntryList (&IfCb->Link);
 
     if (IfCb->IfInfo != NULL) {
-
       FreePool (IfCb->IfInfo);
     }
 
@@ -1293,27 +1295,27 @@ ShellCommandRunIfconfig (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
-  IFCONFIG_PRIVATE_DATA     *Private;
-  LIST_ENTRY                *ParamPackage;
-  SHELL_STATUS              ShellStatus;
-  CONST CHAR16              *ValueStr;
-  ARG_LIST                  *ArgList;
-  CHAR16                    *ProblemParam;
-  CHAR16                    *Str;
+  EFI_STATUS             Status;
+  IFCONFIG_PRIVATE_DATA  *Private;
+  LIST_ENTRY             *ParamPackage;
+  SHELL_STATUS           ShellStatus;
+  CONST CHAR16           *ValueStr;
+  ARG_LIST               *ArgList;
+  CHAR16                 *ProblemParam;
+  CHAR16                 *Str;
 
-  Status = EFI_INVALID_PARAMETER;
-  Private = NULL;
+  Status      = EFI_INVALID_PARAMETER;
+  Private     = NULL;
   ShellStatus = SHELL_SUCCESS;
 
   Status = ShellCommandLineParseEx (mIfConfigCheckList, &ParamPackage, &ProblemParam, TRUE, FALSE);
   if (EFI_ERROR (Status)) {
-    if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellNetwork1HiiHandle, L"ifconfig", ProblemParam);
-      FreePool(ProblemParam);
+      FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      ASSERT(FALSE);
+      ASSERT (FALSE);
     }
 
     goto ON_EXIT;
@@ -1323,7 +1325,7 @@ ShellCommandRunIfconfig (
   // To handle unsupported option.
   //
   if (ShellCommandLineGetFlag (ParamPackage, L"-c")) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_UNSUPPORTED_OPTION), gShellNetwork1HiiHandle,L"-c");
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_UNSUPPORTED_OPTION), gShellNetwork1HiiHandle, L"-c");
     ShellStatus = SHELL_INVALID_PARAMETER;
     goto ON_EXIT;
   }
@@ -1332,7 +1334,8 @@ ShellCommandRunIfconfig (
   // To handle no option.
   //
   if (!ShellCommandLineGetFlag (ParamPackage, L"-r") && !ShellCommandLineGetFlag (ParamPackage, L"-s") &&
-      !ShellCommandLineGetFlag (ParamPackage, L"-l")) {
+      !ShellCommandLineGetFlag (ParamPackage, L"-l"))
+  {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_LACK_OPTION), gShellNetwork1HiiHandle);
     ShellStatus = SHELL_INVALID_PARAMETER;
     goto ON_EXIT;
@@ -1343,7 +1346,8 @@ ShellCommandRunIfconfig (
   //
   if (((ShellCommandLineGetFlag (ParamPackage, L"-r")) && (ShellCommandLineGetFlag (ParamPackage, L"-s"))) ||
       ((ShellCommandLineGetFlag (ParamPackage, L"-r")) && (ShellCommandLineGetFlag (ParamPackage, L"-l"))) ||
-      ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-l")))) {
+      ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-l"))))
+  {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellNetwork1HiiHandle, L"ifconfig");
     ShellStatus = SHELL_INVALID_PARAMETER;
     goto ON_EXIT;
@@ -1362,7 +1366,7 @@ ShellCommandRunIfconfig (
   //
   if (ShellCommandLineGetFlag (ParamPackage, L"-l")) {
     Private->OpCode = IfConfigOpList;
-    ValueStr = ShellCommandLineGetValue (ParamPackage, L"-l");
+    ValueStr        = ShellCommandLineGetValue (ParamPackage, L"-l");
     if (ValueStr != NULL) {
       Str = AllocateCopyPool (StrSize (ValueStr), ValueStr);
       if (Str == NULL) {
@@ -1370,6 +1374,7 @@ ShellCommandRunIfconfig (
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       Private->IfName = Str;
     }
   }
@@ -1379,7 +1384,7 @@ ShellCommandRunIfconfig (
   //
   if (ShellCommandLineGetFlag (ParamPackage, L"-r")) {
     Private->OpCode = IfConfigOpClear;
-    ValueStr = ShellCommandLineGetValue (ParamPackage, L"-r");
+    ValueStr        = ShellCommandLineGetValue (ParamPackage, L"-r");
     if (ValueStr != NULL) {
       Str = AllocateCopyPool (StrSize (ValueStr), ValueStr);
       if (Str == NULL) {
@@ -1387,6 +1392,7 @@ ShellCommandRunIfconfig (
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       Private->IfName = Str;
     }
   }
@@ -1417,7 +1423,7 @@ ShellCommandRunIfconfig (
 
     Private->VarArg = ArgList->Next;
 
-    if (Private->IfName == NULL || Private->VarArg == NULL) {
+    if ((Private->IfName == NULL) || (Private->VarArg == NULL)) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_LACK_COMMAND), gShellNetwork1HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto ON_EXIT;

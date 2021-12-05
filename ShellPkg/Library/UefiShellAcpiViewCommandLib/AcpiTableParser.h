@@ -11,11 +11,11 @@
 /**
   The maximum number of ACPI table parsers.
 */
-#define MAX_ACPI_TABLE_PARSERS          32
+#define MAX_ACPI_TABLE_PARSERS  32
 
 /** An invalid/NULL signature value.
 */
-#define ACPI_PARSER_SIGNATURE_NULL      0
+#define ACPI_PARSER_SIGNATURE_NULL  0
 
 /**
   A function that parses the ACPI table.
@@ -27,9 +27,9 @@
 **/
 typedef
 VOID
-(EFIAPI * PARSE_ACPI_TABLE_PROC) (
+(EFIAPI *PARSE_ACPI_TABLE_PROC)(
   IN BOOLEAN Trace,
-  IN UINT8*  Ptr,
+  IN UINT8 *Ptr,
   IN UINT32  AcpiTableLength,
   IN UINT8   AcpiTableRevision
   );
@@ -39,10 +39,10 @@ VOID
 **/
 typedef struct AcpiTableParser {
   /// ACPI table signature
-  UINT32                  Signature;
+  UINT32                   Signature;
 
   /// The ACPI table parser function.
-  PARSE_ACPI_TABLE_PROC   Parser;
+  PARSE_ACPI_TABLE_PROC    Parser;
 } ACPI_TABLE_PARSER;
 
 /**
@@ -63,8 +63,8 @@ typedef struct AcpiTableParser {
 EFI_STATUS
 EFIAPI
 RegisterParser (
-  IN  UINT32                  Signature,
-  IN  PARSE_ACPI_TABLE_PROC   ParserProc
+  IN  UINT32                 Signature,
+  IN  PARSE_ACPI_TABLE_PROC  ParserProc
   );
 
 /**
@@ -81,7 +81,7 @@ RegisterParser (
 EFI_STATUS
 EFIAPI
 DeregisterParser (
-  IN  UINT32                  Signature
+  IN  UINT32  Signature
   );
 
 /**
@@ -101,7 +101,7 @@ DeregisterParser (
 VOID
 EFIAPI
 ProcessAcpiTable (
-  IN UINT8* Ptr
+  IN UINT8  *Ptr
   );
 
 /**
@@ -120,8 +120,8 @@ ProcessAcpiTable (
 EFI_STATUS
 EFIAPI
 GetParser (
-  IN  UINT32                   Signature,
-  OUT PARSE_ACPI_TABLE_PROC *  ParserProc
+  IN  UINT32                 Signature,
+  OUT PARSE_ACPI_TABLE_PROC  *ParserProc
   );
 
 #endif // ACPITABLEPARSER_H_
