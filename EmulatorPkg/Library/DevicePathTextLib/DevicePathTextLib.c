@@ -19,7 +19,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DevicePathLib.h>
 
-
 /**
   Converts a Vendor device path structure to its string representative.
 
@@ -52,18 +51,22 @@ DevPathToTextVendorLib (
     CatPrint (Str, L"EmuThunk()");
     return EFI_SUCCESS;
   }
+
   if (CompareGuid (&Vendor->VendorDevicePath.Guid, &gEmuGraphicsWindowProtocolGuid)) {
     CatPrint (Str, L"EmuGraphics(%d)", Vendor->Instance);
     return EFI_SUCCESS;
   }
+
   if (CompareGuid (&Vendor->VendorDevicePath.Guid, &gEfiSimpleFileSystemProtocolGuid)) {
     CatPrint (Str, L"EmuFs(%d)", Vendor->Instance);
     return EFI_SUCCESS;
   }
+
   if (CompareGuid (&Vendor->VendorDevicePath.Guid, &gEmuBlockIoProtocolGuid)) {
     CatPrint (Str, L"EmuBlk(%d)", Vendor->Instance);
     return EFI_SUCCESS;
   }
+
   if (CompareGuid (&Vendor->VendorDevicePath.Guid, &gEmuThreadThunkProtocolGuid)) {
     CatPrint (Str, L"EmuThread()");
     return EFI_SUCCESS;
@@ -82,20 +85,20 @@ DevPathToTextVendorLib (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextEmuThunk (
-  IN CHAR16 *TextDeviceNode
+  IN CHAR16  *TextDeviceNode
   )
 {
   CHAR16              *Str;
   VENDOR_DEVICE_PATH  *Vendor;
 
   Str    = GetNextParamStr (&TextDeviceNode);
-  Vendor = (VENDOR_DEVICE_PATH *) CreateDeviceNode (
-                                     HARDWARE_DEVICE_PATH,
-                                     HW_VENDOR_DP,
-                                     (UINT16) sizeof (VENDOR_DEVICE_PATH)
-                                     );
+  Vendor = (VENDOR_DEVICE_PATH *)CreateDeviceNode (
+                                   HARDWARE_DEVICE_PATH,
+                                   HW_VENDOR_DP,
+                                   (UINT16)sizeof (VENDOR_DEVICE_PATH)
+                                   );
   CopyGuid (&Vendor->Guid, &gEmuThunkProtocolGuid);
-  return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
+  return (EFI_DEVICE_PATH_PROTOCOL *)Vendor;
 }
 
 /**
@@ -108,20 +111,20 @@ DevPathFromTextEmuThunk (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextEmuThread (
-  IN CHAR16 *TextDeviceNode
+  IN CHAR16  *TextDeviceNode
   )
 {
   CHAR16              *Str;
   VENDOR_DEVICE_PATH  *Vendor;
 
   Str    = GetNextParamStr (&TextDeviceNode);
-  Vendor = (VENDOR_DEVICE_PATH *) CreateDeviceNode (
-                                     HARDWARE_DEVICE_PATH,
-                                     HW_VENDOR_DP,
-                                     (UINT16) sizeof (VENDOR_DEVICE_PATH)
-                                     );
+  Vendor = (VENDOR_DEVICE_PATH *)CreateDeviceNode (
+                                   HARDWARE_DEVICE_PATH,
+                                   HW_VENDOR_DP,
+                                   (UINT16)sizeof (VENDOR_DEVICE_PATH)
+                                   );
   CopyGuid (&Vendor->Guid, &gEmuThreadThunkProtocolGuid);
-  return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
+  return (EFI_DEVICE_PATH_PROTOCOL *)Vendor;
 }
 
 /**
@@ -134,22 +137,22 @@ DevPathFromTextEmuThread (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 DevPathFromTextEmuFs (
-  IN CHAR16 *TextDeviceNode
+  IN CHAR16  *TextDeviceNode
   )
 {
   CHAR16                       *Str;
   EMU_VENDOR_DEVICE_PATH_NODE  *Vendor;
 
-  Str = GetNextParamStr (&TextDeviceNode);
-  Vendor    = (EMU_VENDOR_DEVICE_PATH_NODE *) CreateDeviceNode (
-                                                   HARDWARE_DEVICE_PATH,
-                                                   HW_VENDOR_DP,
-                                                   (UINT16) sizeof (EMU_VENDOR_DEVICE_PATH_NODE)
-                                                   );
+  Str    = GetNextParamStr (&TextDeviceNode);
+  Vendor = (EMU_VENDOR_DEVICE_PATH_NODE *)CreateDeviceNode (
+                                            HARDWARE_DEVICE_PATH,
+                                            HW_VENDOR_DP,
+                                            (UINT16)sizeof (EMU_VENDOR_DEVICE_PATH_NODE)
+                                            );
   CopyGuid (&Vendor->VendorDevicePath.Guid, &gEfiSimpleFileSystemProtocolGuid);
-  Vendor->Instance = (UINT32) StrDecimalToUintn (Str);
+  Vendor->Instance = (UINT32)StrDecimalToUintn (Str);
 
-  return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
+  return (EFI_DEVICE_PATH_PROTOCOL *)Vendor;
 }
 
 /**

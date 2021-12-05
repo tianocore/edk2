@@ -13,19 +13,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-
-
-
 //
 // Legal timer value range in 100 ns units
 //
-#define TIMER_MINIMUM_VALUE 0
-#define TIMER_MAXIMUM_VALUE (0x100000000ULL - 1)
+#define TIMER_MINIMUM_VALUE  0
+#define TIMER_MAXIMUM_VALUE  (0x100000000ULL - 1)
 
 //
 // Default timer value in 100 ns units (50 ms)
 //
-#define DEFAULT_TIMER_TICK_DURATION 500000
+#define DEFAULT_TIMER_TICK_DURATION  500000
 
 //
 // Function Prototypes
@@ -54,8 +51,8 @@ EmuTimerDriverSetTimerPeriod (
 EFI_STATUS
 EFIAPI
 EmuTimerDriverGetTimerPeriod (
-  IN EFI_TIMER_ARCH_PROTOCOL   *This,
-  OUT UINT64                   *TimerPeriod
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  OUT UINT64                  *TimerPeriod
   );
 
 EFI_STATUS
