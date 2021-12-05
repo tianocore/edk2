@@ -26,7 +26,7 @@ CONST CHAR8  *mHexTable = "0123456789ABCDEF";
 // VA_LIST can not initialize to NULL for all compiler, so we use this to
 // indicate a null VA_LIST
 //
-VA_LIST     mVaListNull;
+VA_LIST  mVaListNull;
 
 /**
   Get stack frame pointer of function call.
@@ -38,7 +38,6 @@ EFIAPI
 GetStackFramePointer (
   VOID
   );
-
 
 /**
   Prints a debug message to the debug output device if the specified error level is enabled.
@@ -63,7 +62,7 @@ DebugPrint (
   ...
   )
 {
-  VA_LIST         Marker;
+  VA_LIST  Marker;
 
   VA_START (Marker, Format);
   DebugVPrint (ErrorLevel, Format, Marker);
@@ -89,13 +88,13 @@ DebugPrint (
 **/
 VOID
 DebugPrintMarker (
-  IN  UINTN         ErrorLevel,
-  IN  CONST CHAR8   *Format,
-  IN  VA_LIST       VaListMarker,
-  IN  BASE_LIST     BaseListMarker
+  IN  UINTN        ErrorLevel,
+  IN  CONST CHAR8  *Format,
+  IN  VA_LIST      VaListMarker,
+  IN  BASE_LIST    BaseListMarker
   )
 {
-  CHAR8    Buffer[MAX_DEBUG_MESSAGE_LENGTH];
+  CHAR8  Buffer[MAX_DEBUG_MESSAGE_LENGTH];
 
   //
   // If Format is NULL, then ASSERT().
@@ -149,9 +148,9 @@ DebugPrintMarker (
 VOID
 EFIAPI
 DebugVPrint (
-  IN  UINTN         ErrorLevel,
-  IN  CONST CHAR8   *Format,
-  IN  VA_LIST       VaListMarker
+  IN  UINTN        ErrorLevel,
+  IN  CONST CHAR8  *Format,
+  IN  VA_LIST      VaListMarker
   )
 {
   DebugPrintMarker (ErrorLevel, Format, VaListMarker, NULL);
@@ -177,9 +176,9 @@ DebugVPrint (
 VOID
 EFIAPI
 DebugBPrint (
-  IN  UINTN         ErrorLevel,
-  IN  CONST CHAR8   *Format,
-  IN  BASE_LIST     BaseListMarker
+  IN  UINTN        ErrorLevel,
+  IN  CONST CHAR8  *Format,
+  IN  BASE_LIST    BaseListMarker
   )
 {
   DebugPrintMarker (ErrorLevel, Format, mVaListNull, BaseListMarker);
@@ -194,14 +193,15 @@ DebugBPrint (
 **/
 VOID
 FillHex (
-  UINT32   Value,
+  UINT32  Value,
   CHAR8   *Buffer
   )
 {
   INTN  Idx;
+
   for (Idx = 7; Idx >= 0; Idx--) {
     Buffer[Idx] = mHexTable[Value & 0x0F];
-    Value >>= 4;
+    Value     >>= 4;
   }
 }
 
@@ -227,8 +227,8 @@ DebugAssertInternal (
   VOID
   )
 {
-  CHAR8     Buffer[MAX_DEBUG_MESSAGE_LENGTH];
-  UINT32   *Frame;
+  CHAR8   Buffer[MAX_DEBUG_MESSAGE_LENGTH];
+  UINT32  *Frame;
 
   Frame = (UINT32 *)GetStackFramePointer ();
 
@@ -237,9 +237,9 @@ DebugAssertInternal (
   //
   AsciiStrnCpyS (
     Buffer,
-    sizeof(Buffer) / sizeof(CHAR8),
+    sizeof (Buffer) / sizeof (CHAR8),
     "-> EBP:0x00000000  EIP:0x00000000\n",
-    sizeof(Buffer) / sizeof(CHAR8) - 1
+    sizeof (Buffer) / sizeof (CHAR8) - 1
     );
   SerialPortWrite ((UINT8 *)"ASSERT DUMP:\n", 13);
   while (Frame != NULL) {
@@ -291,7 +291,6 @@ DebugAssert (
   DebugAssertInternal ();
 }
 
-
 /**
   Fills a target buffer with PcdDebugClearMemoryValue, and returns the target buffer.
 
@@ -317,7 +316,6 @@ DebugClearMemory (
   return Buffer;
 }
 
-
 /**
   Returns TRUE if ASSERT() macros are enabled.
 
@@ -334,9 +332,8 @@ DebugAssertEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
 }
-
 
 /**
   Returns TRUE if DEBUG() macros are enabled.
@@ -354,7 +351,7 @@ DebugPrintEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
 }
 
 /**
@@ -373,9 +370,8 @@ DebugCodeEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
 }
-
 
 /**
   Returns TRUE if DEBUG_CLEAR_MEMORY() macro is enabled.
@@ -393,7 +389,7 @@ DebugClearMemoryEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
 }
 
 /**
@@ -408,8 +404,8 @@ DebugClearMemoryEnabled (
 BOOLEAN
 EFIAPI
 DebugPrintLevelEnabled (
-  IN  CONST UINTN        ErrorLevel
+  IN  CONST UINTN  ErrorLevel
   )
 {
-  return (BOOLEAN) ((ErrorLevel & PcdGet32(PcdFixedDebugPrintErrorLevel)) != 0);
+  return (BOOLEAN)((ErrorLevel & PcdGet32 (PcdFixedDebugPrintErrorLevel)) != 0);
 }
