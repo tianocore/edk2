@@ -14,12 +14,12 @@
 INT32
 EFIAPI
 TestAndClearBit (
-  IN INT32            Bit,
-  IN VOID             *Address
+  IN INT32  Bit,
+  IN VOID   *Address
   )
 {
-  UINT16    Word, Read;
-  UINT16    Mask;
+  UINT16  Word, Read;
+  UINT16  Mask;
 
   //
   // Calculate the effective address relative to 'Address' based on the
@@ -27,14 +27,15 @@ TestAndClearBit (
   // ensure we round towards -Inf, and end up with a positive shift in
   // 'Bit', even if 'Bit' itself is negative.
   //
-  Address = (VOID*)((UINT8*) Address + ((Bit >> 4) * sizeof(UINT16)));
-  Mask = 1U << (Bit & 15);
+  Address = (VOID *)((UINT8 *)Address + ((Bit >> 4) * sizeof (UINT16)));
+  Mask    = 1U << (Bit & 15);
 
-  for (Word = *(UINT16 *) Address; Word & Mask; Word = Read) {
+  for (Word = *(UINT16 *)Address; Word &Mask; Word = Read) {
     Read = InterlockedCompareExchange16 (Address, Word, Word & ~Mask);
     if (Read == Word) {
       return 1;
     }
   }
+
   return 0;
 }

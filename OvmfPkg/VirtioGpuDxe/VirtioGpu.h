@@ -36,35 +36,35 @@ typedef struct {
   //
   // VirtIo represents access to the Virtio GPU device. Never NULL.
   //
-  VIRTIO_DEVICE_PROTOCOL   *VirtIo;
+  VIRTIO_DEVICE_PROTOCOL      *VirtIo;
 
   //
   // BusName carries a customized name for
   // EFI_COMPONENT_NAME2_PROTOCOL.GetControllerName(). It is expressed in table
   // form because it can theoretically support several languages. Never NULL.
   //
-  EFI_UNICODE_STRING_TABLE *BusName;
+  EFI_UNICODE_STRING_TABLE    *BusName;
 
   //
   // VirtIo ring used for VirtIo communication.
   //
-  VRING                    Ring;
+  VRING                       Ring;
 
   //
   // Token associated with Ring's mapping for bus master common buffer
   // operation, from VirtioRingMap().
   //
-  VOID                     *RingMap;
+  VOID                        *RingMap;
 
   //
   // Event to be signaled at ExitBootServices().
   //
-  EFI_EVENT                ExitBoot;
+  EFI_EVENT                   ExitBoot;
 
   //
   // Common running counter for all VirtIo GPU requests that ask for fencing.
   //
-  UINT64                   FenceId;
+  UINT64                      FenceId;
 
   //
   // The Child field references the GOP wrapper structure. If this pointer is
@@ -77,85 +77,86 @@ typedef struct {
   // In practice, this field represents the single head (scanout) that we
   // support.
   //
-  VGPU_GOP                 *Child;
+  VGPU_GOP    *Child;
 } VGPU_DEV;
 
 //
 // The Graphics Output Protocol wrapper structure.
 //
-#define VGPU_GOP_SIG SIGNATURE_64 ('V', 'G', 'P', 'U', '_', 'G', 'O', 'P')
+#define VGPU_GOP_SIG  SIGNATURE_64 ('V', 'G', 'P', 'U', '_', 'G', 'O', 'P')
 
 struct VGPU_GOP_STRUCT {
-  UINT64                               Signature;
+  UINT64                                  Signature;
 
   //
   // ParentBus points to the parent VGPU_DEV object. Never NULL.
   //
-  VGPU_DEV                             *ParentBus;
+  VGPU_DEV                                *ParentBus;
 
   //
   // GopName carries a customized name for
   // EFI_COMPONENT_NAME2_PROTOCOL.GetControllerName(). It is expressed in table
   // form because it can theoretically support several languages. Never NULL.
   //
-  EFI_UNICODE_STRING_TABLE             *GopName;
+  EFI_UNICODE_STRING_TABLE                *GopName;
 
   //
   // GopHandle is the UEFI child handle that carries the device path ending
   // with the ACPI ADR node, and the Graphics Output Protocol. Never NULL.
   //
-  EFI_HANDLE                           GopHandle;
+  EFI_HANDLE                              GopHandle;
 
   //
   // The GopDevicePath field is the device path installed on GopHandle,
   // ending with an ACPI ADR node. Never NULL.
   //
-  EFI_DEVICE_PATH_PROTOCOL             *GopDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL                *GopDevicePath;
 
   //
   // The Gop field is installed on the child handle as Graphics Output Protocol
   // interface.
   //
-  EFI_GRAPHICS_OUTPUT_PROTOCOL         Gop;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL            Gop;
 
   //
   // Referenced by Gop.Mode, GopMode provides a summary about the supported
   // graphics modes, and the current mode.
   //
-  EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE    GopMode;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE       GopMode;
 
   //
   // Referenced by GopMode.Info, GopModeInfo provides detailed information
   // about the current mode.
   //
-  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION GopModeInfo;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION    GopModeInfo;
 
   //
   // Identifier of the 2D host resource that is in use by this head (scanout)
   // of the VirtIo GPU device. Zero until the first successful -- internal --
   // Gop.SetMode() call, never zero afterwards.
   //
-  UINT32                               ResourceId;
+  UINT32                                  ResourceId;
 
   //
   // A number of whole pages providing the backing store for the 2D host
   // resource identified by ResourceId above. NULL until the first successful
   // -- internal -- Gop.SetMode() call, never NULL afterwards.
   //
-  UINT32                               *BackingStore;
-  UINTN                                NumberOfPages;
+  UINT32                                  *BackingStore;
+  UINTN                                   NumberOfPages;
 
   //
   // Token associated with BackingStore's mapping for bus master common
   // buffer operation. BackingStoreMap is valid if, and only if,
   // BackingStore is non-NULL.
   //
-  VOID                                 *BackingStoreMap;
+  VOID                                    *BackingStoreMap;
 };
 
 //
 // VirtIo GPU initialization, and commands (primitives) for the GPU device.
 //
+
 /**
   Configure the VirtIo GPU device that underlies VgpuDev.
 
@@ -174,7 +175,7 @@ struct VGPU_GOP_STRUCT {
 **/
 EFI_STATUS
 VirtioGpuInit (
-  IN OUT VGPU_DEV *VgpuDev
+  IN OUT VGPU_DEV  *VgpuDev
   );
 
 /**
@@ -188,7 +189,7 @@ VirtioGpuInit (
 **/
 VOID
 VirtioGpuUninit (
-  IN OUT VGPU_DEV *VgpuDev
+  IN OUT VGPU_DEV  *VgpuDev
   );
 
 /**
@@ -221,11 +222,11 @@ VirtioGpuUninit (
 **/
 EFI_STATUS
 VirtioGpuAllocateZeroAndMapBackingStore (
-  IN  VGPU_DEV             *VgpuDev,
-  IN  UINTN                NumberOfPages,
-  OUT VOID                 **HostAddress,
-  OUT EFI_PHYSICAL_ADDRESS *DeviceAddress,
-  OUT VOID                 **Mapping
+  IN  VGPU_DEV              *VgpuDev,
+  IN  UINTN                 NumberOfPages,
+  OUT VOID                  **HostAddress,
+  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
+  OUT VOID                  **Mapping
   );
 
 /**
@@ -252,10 +253,10 @@ VirtioGpuAllocateZeroAndMapBackingStore (
 **/
 VOID
 VirtioGpuUnmapAndFreeBackingStore (
-  IN VGPU_DEV *VgpuDev,
-  IN UINTN    NumberOfPages,
-  IN VOID     *HostAddress,
-  IN VOID     *Mapping
+  IN VGPU_DEV  *VgpuDev,
+  IN UINTN     NumberOfPages,
+  IN VOID      *HostAddress,
+  IN VOID      *Mapping
   );
 
 /**
@@ -274,8 +275,8 @@ VirtioGpuUnmapAndFreeBackingStore (
 VOID
 EFIAPI
 VirtioGpuExitBoot (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -306,63 +307,63 @@ VirtioGpuExitBoot (
 **/
 EFI_STATUS
 VirtioGpuResourceCreate2d (
-  IN OUT VGPU_DEV           *VgpuDev,
-  IN     UINT32             ResourceId,
-  IN     VIRTIO_GPU_FORMATS Format,
-  IN     UINT32             Width,
-  IN     UINT32             Height
+  IN OUT VGPU_DEV            *VgpuDev,
+  IN     UINT32              ResourceId,
+  IN     VIRTIO_GPU_FORMATS  Format,
+  IN     UINT32              Width,
+  IN     UINT32              Height
   );
 
 EFI_STATUS
 VirtioGpuResourceUnref (
-  IN OUT VGPU_DEV *VgpuDev,
-  IN     UINT32   ResourceId
+  IN OUT VGPU_DEV  *VgpuDev,
+  IN     UINT32    ResourceId
   );
 
 EFI_STATUS
 VirtioGpuResourceAttachBacking (
-  IN OUT VGPU_DEV             *VgpuDev,
-  IN     UINT32               ResourceId,
-  IN     EFI_PHYSICAL_ADDRESS BackingStoreDeviceAddress,
-  IN     UINTN                NumberOfPages
+  IN OUT VGPU_DEV              *VgpuDev,
+  IN     UINT32                ResourceId,
+  IN     EFI_PHYSICAL_ADDRESS  BackingStoreDeviceAddress,
+  IN     UINTN                 NumberOfPages
   );
 
 EFI_STATUS
 VirtioGpuResourceDetachBacking (
-  IN OUT VGPU_DEV *VgpuDev,
-  IN     UINT32   ResourceId
+  IN OUT VGPU_DEV  *VgpuDev,
+  IN     UINT32    ResourceId
   );
 
 EFI_STATUS
 VirtioGpuSetScanout (
-  IN OUT VGPU_DEV *VgpuDev,
-  IN     UINT32   X,
-  IN     UINT32   Y,
-  IN     UINT32   Width,
-  IN     UINT32   Height,
-  IN     UINT32   ScanoutId,
-  IN     UINT32   ResourceId
+  IN OUT VGPU_DEV  *VgpuDev,
+  IN     UINT32    X,
+  IN     UINT32    Y,
+  IN     UINT32    Width,
+  IN     UINT32    Height,
+  IN     UINT32    ScanoutId,
+  IN     UINT32    ResourceId
   );
 
 EFI_STATUS
 VirtioGpuTransferToHost2d (
-  IN OUT VGPU_DEV *VgpuDev,
-  IN     UINT32   X,
-  IN     UINT32   Y,
-  IN     UINT32   Width,
-  IN     UINT32   Height,
-  IN     UINT64   Offset,
-  IN     UINT32   ResourceId
+  IN OUT VGPU_DEV  *VgpuDev,
+  IN     UINT32    X,
+  IN     UINT32    Y,
+  IN     UINT32    Width,
+  IN     UINT32    Height,
+  IN     UINT64    Offset,
+  IN     UINT32    ResourceId
   );
 
 EFI_STATUS
 VirtioGpuResourceFlush (
-  IN OUT VGPU_DEV *VgpuDev,
-  IN     UINT32   X,
-  IN     UINT32   Y,
-  IN     UINT32   Width,
-  IN     UINT32   Height,
-  IN     UINT32   ResourceId
+  IN OUT VGPU_DEV  *VgpuDev,
+  IN     UINT32    X,
+  IN     UINT32    Y,
+  IN     UINT32    Width,
+  IN     UINT32    Height,
+  IN     UINT32    ResourceId
   );
 
 /**
@@ -390,13 +391,13 @@ VirtioGpuResourceFlush (
 **/
 VOID
 ReleaseGopResources (
-  IN OUT VGPU_GOP *VgpuGop,
-  IN     BOOLEAN  DisableHead
+  IN OUT VGPU_GOP  *VgpuGop,
+  IN     BOOLEAN   DisableHead
   );
 
 //
 // Template for initializing VGPU_GOP.Gop.
 //
-extern CONST EFI_GRAPHICS_OUTPUT_PROTOCOL mGopTemplate;
+extern CONST EFI_GRAPHICS_OUTPUT_PROTOCOL  mGopTemplate;
 
 #endif // _VIRTIO_GPU_DXE_H_

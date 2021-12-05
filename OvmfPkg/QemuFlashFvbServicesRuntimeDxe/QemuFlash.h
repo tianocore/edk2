@@ -12,7 +12,7 @@
 
 #include <Protocol/FirmwareVolumeBlock.h>
 
-extern UINT8 *mFlashBase;
+extern UINT8  *mFlashBase;
 
 /**
   Read from QEMU Flash
@@ -26,12 +26,11 @@ extern UINT8 *mFlashBase;
 **/
 EFI_STATUS
 QemuFlashRead (
-  IN        EFI_LBA                              Lba,
-  IN        UINTN                                Offset,
-  IN        UINTN                                *NumBytes,
-  IN        UINT8                                *Buffer
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset,
+  IN        UINTN    *NumBytes,
+  IN        UINT8    *Buffer
   );
-
 
 /**
   Write to QEMU Flash
@@ -45,12 +44,11 @@ QemuFlashRead (
 **/
 EFI_STATUS
 QemuFlashWrite (
-  IN        EFI_LBA                              Lba,
-  IN        UINTN                                Offset,
-  IN        UINTN                                *NumBytes,
-  IN        UINT8                                *Buffer
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset,
+  IN        UINTN    *NumBytes,
+  IN        UINT8    *Buffer
   );
-
 
 /**
   Erase a QEMU Flash block
@@ -60,9 +58,8 @@ QemuFlashWrite (
 **/
 EFI_STATUS
 QemuFlashEraseBlock (
-  IN   EFI_LBA      Lba
+  IN   EFI_LBA  Lba
   );
-
 
 /**
   Initializes QEMU flash memory support
@@ -76,7 +73,6 @@ QemuFlashInitialize (
   VOID
   );
 
-
 VOID
 QemuFlashConvertPointers (
   VOID
@@ -84,9 +80,9 @@ QemuFlashConvertPointers (
 
 VOID
 QemuFlashBeforeProbe (
-  IN  EFI_PHYSICAL_ADDRESS    BaseAddress,
-  IN  UINTN                   FdBlockSize,
-  IN  UINTN                   FdBlockCount
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINTN                 FdBlockSize,
+  IN  UINTN                 FdBlockCount
   );
 
 /**
@@ -98,9 +94,8 @@ QemuFlashBeforeProbe (
 **/
 VOID
 QemuFlashPtrWrite (
-  IN        volatile UINT8    *Ptr,
-  IN        UINT8             Value
+  IN        volatile UINT8  *Ptr,
+  IN        UINT8           Value
   );
 
 #endif
-

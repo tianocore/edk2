@@ -18,6 +18,6 @@ typedef UINT32 APIC_ID;
 //
 // The PrintLib conversion specification for formatting an APIC_ID.
 //
-#define FMT_APIC_ID "0x%08x"
+#define FMT_APIC_ID  "0x%08x"
 
 #endif // APIC_ID_H_

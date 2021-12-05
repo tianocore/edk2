@@ -44,13 +44,13 @@
  */
 
 /* ` enum event_channel_op { // EVTCHNOP_* => struct evtchn_* */
-#define EVTCHNOP_close            3
-#define EVTCHNOP_send             4
-#define EVTCHNOP_alloc_unbound    6
+#define EVTCHNOP_close          3
+#define EVTCHNOP_send           4
+#define EVTCHNOP_alloc_unbound  6
 /* ` } */
 
 typedef UINT32 evtchn_port_t;
-DEFINE_XEN_GUEST_HANDLE(evtchn_port_t);
+DEFINE_XEN_GUEST_HANDLE (evtchn_port_t);
 
 /*
  * EVTCHNOP_alloc_unbound: Allocate a port in domain <dom> and mark as
@@ -61,11 +61,12 @@ DEFINE_XEN_GUEST_HANDLE(evtchn_port_t);
  *  2. <rdom> may be DOMID_SELF, allowing loopback connections.
  */
 struct evtchn_alloc_unbound {
-    /* IN parameters */
-    domid_t dom, remote_dom;
-    /* OUT parameters */
-    evtchn_port_t port;
+  /* IN parameters */
+  domid_t          dom, remote_dom;
+  /* OUT parameters */
+  evtchn_port_t    port;
 };
+
 typedef struct evtchn_alloc_unbound evtchn_alloc_unbound_t;
 
 /*
@@ -74,9 +75,10 @@ typedef struct evtchn_alloc_unbound evtchn_alloc_unbound_t;
  * (EVTCHNSTAT_unbound), awaiting a new connection.
  */
 struct evtchn_close {
-    /* IN parameters. */
-    evtchn_port_t port;
+  /* IN parameters. */
+  evtchn_port_t    port;
 };
+
 typedef struct evtchn_close evtchn_close_t;
 
 /*
@@ -84,9 +86,10 @@ typedef struct evtchn_close evtchn_close_t;
  * endpoint is <port>.
  */
 struct evtchn_send {
-    /* IN parameters. */
-    evtchn_port_t port;
+  /* IN parameters. */
+  evtchn_port_t    port;
 };
+
 typedef struct evtchn_send evtchn_send_t;
 
 #endif /* __XEN_PUBLIC_EVENT_CHANNEL_H__ */

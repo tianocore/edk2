@@ -20,13 +20,13 @@
 #define MEMORY_TYPE_INFO_DEFAULT(Type) \
   { Type, FixedPcdGet32 (PcdMemoryType ## Type) }
 
-STATIC EFI_MEMORY_TYPE_INFORMATION mMemoryTypeInformation[] = {
+STATIC EFI_MEMORY_TYPE_INFORMATION  mMemoryTypeInformation[] = {
   MEMORY_TYPE_INFO_DEFAULT (EfiACPIMemoryNVS),
   MEMORY_TYPE_INFO_DEFAULT (EfiACPIReclaimMemory),
   MEMORY_TYPE_INFO_DEFAULT (EfiReservedMemoryType),
   MEMORY_TYPE_INFO_DEFAULT (EfiRuntimeServicesCode),
   MEMORY_TYPE_INFO_DEFAULT (EfiRuntimeServicesData),
-  { EfiMaxMemoryType, 0 }
+  { EfiMaxMemoryType,                               0}
 };
 
 STATIC
@@ -64,28 +64,28 @@ BuildMemTypeInfoHob (
 STATIC
 VOID
 RefreshMemTypeInfo (
-  IN EFI_PEI_READ_ONLY_VARIABLE2_PPI *ReadOnlyVariable2
+  IN EFI_PEI_READ_ONLY_VARIABLE2_PPI  *ReadOnlyVariable2
   )
 {
-  UINTN                       DataSize;
-  EFI_MEMORY_TYPE_INFORMATION Entries[EfiMaxMemoryType + 1];
-  EFI_STATUS                  Status;
-  UINTN                       NumEntries;
-  UINTN                       HobRecordIdx;
+  UINTN                        DataSize;
+  EFI_MEMORY_TYPE_INFORMATION  Entries[EfiMaxMemoryType + 1];
+  EFI_STATUS                   Status;
+  UINTN                        NumEntries;
+  UINTN                        HobRecordIdx;
 
   //
   // Read the MemoryTypeInformation UEFI variable from the
   // gEfiMemoryTypeInformationGuid namespace.
   //
   DataSize = sizeof Entries;
-  Status = ReadOnlyVariable2->GetVariable (
-                                ReadOnlyVariable2,
-                                EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
-                                &gEfiMemoryTypeInformationGuid,
-                                NULL,
-                                &DataSize,
-                                Entries
-                                );
+  Status   = ReadOnlyVariable2->GetVariable (
+                                  ReadOnlyVariable2,
+                                  EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+                                  &gEfiMemoryTypeInformationGuid,
+                                  NULL,
+                                  &DataSize,
+                                  Entries
+                                  );
   if (EFI_ERROR (Status)) {
     //
     // If the UEFI variable does not exist (EFI_NOT_FOUND), we can't use it for
@@ -108,10 +108,15 @@ RefreshMemTypeInfo (
   // Sanity-check the UEFI variable size against the record size.
   //
   if (DataSize % sizeof Entries[0] != 0) {
-    DEBUG ((DEBUG_ERROR, "%a: invalid UEFI variable size %Lu\n", __FUNCTION__,
-      (UINT64)DataSize));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: invalid UEFI variable size %Lu\n",
+      __FUNCTION__,
+      (UINT64)DataSize
+      ));
     return;
   }
+
   NumEntries = DataSize / sizeof Entries[0];
 
   //
@@ -121,10 +126,11 @@ RefreshMemTypeInfo (
   //
   for (HobRecordIdx = 0;
        HobRecordIdx < ARRAY_SIZE (mMemoryTypeInformation) - 1;
-       HobRecordIdx++) {
-    EFI_MEMORY_TYPE_INFORMATION *HobRecord;
-    UINTN                       Idx;
-    EFI_MEMORY_TYPE_INFORMATION *VariableRecord;
+       HobRecordIdx++)
+  {
+    EFI_MEMORY_TYPE_INFORMATION  *HobRecord;
+    UINTN                        Idx;
+    EFI_MEMORY_TYPE_INFORMATION  *VariableRecord;
 
     HobRecord = &mMemoryTypeInformation[HobRecordIdx];
 
@@ -139,11 +145,17 @@ RefreshMemTypeInfo (
     //
     // If there is a match, allow the UEFI variable to increase NumberOfPages.
     //
-    if (Idx < NumEntries &&
-        HobRecord->NumberOfPages < VariableRecord->NumberOfPages) {
-      DEBUG ((DEBUG_VERBOSE, "%a: Type 0x%x: NumberOfPages 0x%x -> 0x%x\n",
-        __FUNCTION__, HobRecord->Type, HobRecord->NumberOfPages,
-        VariableRecord->NumberOfPages));
+    if ((Idx < NumEntries) &&
+        (HobRecord->NumberOfPages < VariableRecord->NumberOfPages))
+    {
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: Type 0x%x: NumberOfPages 0x%x -> 0x%x\n",
+        __FUNCTION__,
+        HobRecord->Type,
+        HobRecord->NumberOfPages,
+        VariableRecord->NumberOfPages
+        ));
 
       HobRecord->NumberOfPages = VariableRecord->NumberOfPages;
     }
@@ -182,7 +194,7 @@ OnReadOnlyVariable2Available (
 // Notification object for registering the callback, for when
 // EFI_PEI_READ_ONLY_VARIABLE2_PPI becomes available.
 //
-STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR mReadOnlyVariable2Notify = {
+STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR  mReadOnlyVariable2Notify = {
   (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH |
    EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),  // Flags
   &gEfiPeiReadOnlyVariable2PpiGuid,         // Guid
@@ -194,7 +206,7 @@ MemTypeInfoInitialization (
   VOID
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   if (!FeaturePcdGet (PcdSmmSmramRequire)) {
     //
@@ -207,8 +219,12 @@ MemTypeInfoInitialization (
 
   Status = PeiServicesNotifyPpi (&mReadOnlyVariable2Notify);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to set up R/O Variable 2 callback: %r\n",
-      __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: failed to set up R/O Variable 2 callback: %r\n",
+      __FUNCTION__,
+      Status
+      ));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }

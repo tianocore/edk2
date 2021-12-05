@@ -12,7 +12,6 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-
 /**
   Open the NvVars file for reading or writing
 
@@ -26,14 +25,14 @@
 **/
 EFI_STATUS
 GetNvVarsFile (
-  IN  EFI_HANDLE            FsHandle,
-  IN  BOOLEAN               ReadingFile,
-  OUT EFI_FILE_HANDLE       *NvVarsFile
+  IN  EFI_HANDLE       FsHandle,
+  IN  BOOLEAN          ReadingFile,
+  OUT EFI_FILE_HANDLE  *NvVarsFile
   )
 {
-  EFI_STATUS                            Status;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL       *Fs;
-  EFI_FILE_HANDLE                       Root;
+  EFI_STATUS                       Status;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *Fs;
+  EFI_FILE_HANDLE                  Root;
 
   //
   // Get the FileSystem protocol on that handle
@@ -63,18 +62,17 @@ GetNvVarsFile (
                    NvVarsFile,
                    L"NvVars",
                    ReadingFile ?
-                     EFI_FILE_MODE_READ :
-                     (
-                       EFI_FILE_MODE_CREATE |
-                       EFI_FILE_MODE_READ |
-                       EFI_FILE_MODE_WRITE
-                     ),
+                   EFI_FILE_MODE_READ :
+                   (
+                    EFI_FILE_MODE_CREATE |
+                    EFI_FILE_MODE_READ |
+                    EFI_FILE_MODE_WRITE
+                   ),
                    0
                    );
 
   return Status;
 }
-
 
 /**
   Open the NvVars file for reading or writing
@@ -87,15 +85,15 @@ GetNvVarsFile (
 **/
 VOID
 NvVarsFileReadCheckup (
-  IN  EFI_FILE_HANDLE        File,
-  OUT BOOLEAN                *Exists,
-  OUT UINTN                  *Size
+  IN  EFI_FILE_HANDLE  File,
+  OUT BOOLEAN          *Exists,
+  OUT UINTN            *Size
   )
 {
-  EFI_FILE_INFO               *FileInfo;
+  EFI_FILE_INFO  *FileInfo;
 
   *Exists = FALSE;
-  *Size = 0;
+  *Size   = 0;
 
   FileInfo = FileHandleGetInfo (File);
   if (FileInfo == NULL) {
@@ -108,11 +106,10 @@ NvVarsFileReadCheckup (
   }
 
   *Exists = TRUE;
-  *Size = (UINTN) FileInfo->FileSize;
+  *Size   = (UINTN)FileInfo->FileSize;
 
   FreePool (FileInfo);
 }
-
 
 /**
   Open the NvVars file for reading or writing
@@ -125,11 +122,11 @@ NvVarsFileReadCheckup (
 **/
 EFI_STATUS
 FileHandleEmpty (
-  IN  EFI_FILE_HANDLE        File
+  IN  EFI_FILE_HANDLE  File
   )
 {
-  EFI_STATUS                  Status;
-  EFI_FILE_INFO               *FileInfo;
+  EFI_STATUS     Status;
+  EFI_FILE_INFO  *FileInfo;
 
   //
   // Retrieve the FileInfo structure
@@ -160,13 +157,12 @@ FileHandleEmpty (
   // Set the file size to 0.
   //
   FileInfo->FileSize = 0;
-  Status = FileHandleSetInfo (File, FileInfo);
+  Status             = FileHandleSetInfo (File, FileInfo);
 
   FreePool (FileInfo);
 
   return Status;
 }
-
 
 /**
   Reads a file to a newly allocated buffer
@@ -178,18 +174,18 @@ FileHandleEmpty (
               contents.  NULL if an error occurred.
 
 **/
-VOID*
+VOID *
 FileHandleReadToNewBuffer (
-  IN EFI_FILE_HANDLE            FileHandle,
-  IN UINTN                      ReadSize
+  IN EFI_FILE_HANDLE  FileHandle,
+  IN UINTN            ReadSize
   )
 {
-  EFI_STATUS                  Status;
-  UINTN                       ActualReadSize;
-  VOID                        *FileContents;
+  EFI_STATUS  Status;
+  UINTN       ActualReadSize;
+  VOID        *FileContents;
 
   ActualReadSize = ReadSize;
-  FileContents = AllocatePool (ReadSize);
+  FileContents   = AllocatePool (ReadSize);
   if (FileContents != NULL) {
     Status = FileHandleRead (
                FileHandle,
@@ -205,7 +201,6 @@ FileHandleReadToNewBuffer (
   return FileContents;
 }
 
-
 /**
   Reads the contents of the NvVars file on the file system
 
@@ -216,15 +211,15 @@ FileHandleReadToNewBuffer (
 **/
 EFI_STATUS
 ReadNvVarsFile (
-  IN  EFI_HANDLE            FsHandle
+  IN  EFI_HANDLE  FsHandle
   )
 {
-  EFI_STATUS                  Status;
-  EFI_FILE_HANDLE             File;
-  UINTN                       FileSize;
-  BOOLEAN                     FileExists;
-  VOID                        *FileContents;
-  EFI_HANDLE                  SerializedVariables;
+  EFI_STATUS       Status;
+  EFI_FILE_HANDLE  File;
+  UINTN            FileSize;
+  BOOLEAN          FileExists;
+  VOID             *FileContents;
+  EFI_HANDLE       SerializedVariables;
 
   Status = GetNvVarsFile (FsHandle, TRUE, &File);
   if (EFI_ERROR (Status)) {
@@ -265,7 +260,6 @@ ReadNvVarsFile (
   return Status;
 }
 
-
 /**
   Writes a variable to indicate that the NV variables
   have been loaded from the file system.
@@ -277,27 +271,26 @@ SetNvVarsVariable (
   VOID
   )
 {
-  BOOLEAN                        VarData;
-  UINTN                          Size;
+  BOOLEAN  VarData;
+  UINTN    Size;
 
   //
   // Write a variable to indicate we've already loaded the
   // variable data.  If it is found, we skip the loading on
   // subsequent attempts.
   //
-  Size = sizeof (VarData);
+  Size    = sizeof (VarData);
   VarData = TRUE;
   gRT->SetVariable (
          L"NvVars",
          &gEfiSimpleFileSystemProtocolGuid,
          EFI_VARIABLE_NON_VOLATILE |
-           EFI_VARIABLE_BOOTSERVICE_ACCESS |
-           EFI_VARIABLE_RUNTIME_ACCESS,
+         EFI_VARIABLE_BOOTSERVICE_ACCESS |
+         EFI_VARIABLE_RUNTIME_ACCESS,
          Size,
-         (VOID*) &VarData
+         (VOID *)&VarData
          );
 }
-
 
 /**
   Loads the non-volatile variables from the NvVars file on the
@@ -310,12 +303,12 @@ SetNvVarsVariable (
 **/
 EFI_STATUS
 LoadNvVarsFromFs (
-  EFI_HANDLE                            FsHandle
+  EFI_HANDLE  FsHandle
   )
 {
-  EFI_STATUS                     Status;
-  BOOLEAN                        VarData;
-  UINTN                          Size;
+  EFI_STATUS  Status;
+  BOOLEAN     VarData;
+  UINTN       Size;
 
   DEBUG ((DEBUG_INFO, "FsAccess.c: LoadNvVarsFromFs\n"));
 
@@ -328,15 +321,15 @@ LoadNvVarsFromFs (
   // want to re-load the file as it would overwrite newer changes
   // made to the variables.
   //
-  Size = sizeof (VarData);
+  Size    = sizeof (VarData);
   VarData = TRUE;
-  Status = gRT->GetVariable (
-                  L"NvVars",
-                  &gEfiSimpleFileSystemProtocolGuid,
-                  NULL,
-                  &Size,
-                  (VOID*) &VarData
-                  );
+  Status  = gRT->GetVariable (
+                   L"NvVars",
+                   &gEfiSimpleFileSystemProtocolGuid,
+                   NULL,
+                   &Size,
+                   (VOID *)&VarData
+                   );
   if (Status == EFI_SUCCESS) {
     DEBUG ((DEBUG_INFO, "NV Variables were already loaded\n"));
     return EFI_ALREADY_STARTED;
@@ -356,7 +349,7 @@ LoadNvVarsFromFs (
   // variable data.  If it is found, we skip the loading on
   // subsequent attempts.
   //
-  SetNvVarsVariable();
+  SetNvVarsVariable ();
 
   DEBUG ((
     DEBUG_INFO,
@@ -367,22 +360,21 @@ LoadNvVarsFromFs (
   return Status;
 }
 
-
 STATIC
 RETURN_STATUS
 EFIAPI
 IterateVariablesCallbackAddAllNvVariables (
-  IN  VOID                         *Context,
-  IN  CHAR16                       *VariableName,
-  IN  EFI_GUID                     *VendorGuid,
-  IN  UINT32                       Attributes,
-  IN  UINTN                        DataSize,
-  IN  VOID                         *Data
+  IN  VOID      *Context,
+  IN  CHAR16    *VariableName,
+  IN  EFI_GUID  *VendorGuid,
+  IN  UINT32    Attributes,
+  IN  UINTN     DataSize,
+  IN  VOID      *Data
   )
 {
   EFI_HANDLE  Instance;
 
-  Instance = (EFI_HANDLE) Context;
+  Instance = (EFI_HANDLE)Context;
 
   //
   // Only save non-volatile variables
@@ -401,7 +393,6 @@ IterateVariablesCallbackAddAllNvVariables (
            );
 }
 
-
 /**
   Saves the non-volatile variables into the NvVars file on the
   given file system.
@@ -413,15 +404,15 @@ IterateVariablesCallbackAddAllNvVariables (
 **/
 EFI_STATUS
 SaveNvVarsToFs (
-  EFI_HANDLE                            FsHandle
+  EFI_HANDLE  FsHandle
   )
 {
-  EFI_STATUS                  Status;
-  EFI_FILE_HANDLE             File;
-  UINTN                       WriteSize;
-  UINTN                       VariableDataSize;
-  VOID                        *VariableData;
-  EFI_HANDLE                  SerializedVariables;
+  EFI_STATUS       Status;
+  EFI_FILE_HANDLE  File;
+  UINTN            WriteSize;
+  UINTN            VariableDataSize;
+  VOID             *VariableData;
+  EFI_HANDLE       SerializedVariables;
 
   SerializedVariables = NULL;
 
@@ -432,19 +423,19 @@ SaveNvVarsToFs (
 
   Status = SerializeVariablesIterateSystemVariables (
              IterateVariablesCallbackAddAllNvVariables,
-             (VOID*) SerializedVariables
+             (VOID *)SerializedVariables
              );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  VariableData = NULL;
+  VariableData     = NULL;
   VariableDataSize = 0;
-  Status = SerializeVariablesToBuffer (
-             SerializedVariables,
-             NULL,
-             &VariableDataSize
-             );
+  Status           = SerializeVariablesToBuffer (
+                       SerializedVariables,
+                       NULL,
+                       &VariableDataSize
+                       );
   if (Status == RETURN_BUFFER_TOO_SMALL) {
     VariableData = AllocatePool (VariableDataSize);
     if (VariableData == NULL) {
@@ -483,7 +474,7 @@ SaveNvVarsToFs (
   }
 
   WriteSize = VariableDataSize;
-  Status = FileHandleWrite (File, &WriteSize, VariableData);
+  Status    = FileHandleWrite (File, &WriteSize, VariableData);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -496,13 +487,10 @@ SaveNvVarsToFs (
     // variable data.  If it is found, we skip the loading on
     // subsequent attempts.
     //
-    SetNvVarsVariable();
+    SetNvVarsVariable ();
 
     DEBUG ((DEBUG_INFO, "Saved NV Variables to NvVars file\n"));
   }
 
   return Status;
-
 }
-
-
