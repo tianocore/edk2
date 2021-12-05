@@ -62,7 +62,7 @@ typedef enum EAmlNodeDataType {
   @ingroup TreeStructures
 */
 typedef enum EAmlParseIndex {
-  EAmlParseIndexTerm0  = 0,     ///< First fixed argument index.
+  EAmlParseIndexTerm0 = 0,      ///< First fixed argument index.
   EAmlParseIndexTerm1,          ///< Second fixed argument index.
   EAmlParseIndexTerm2,          ///< Third fixed argument index.
   EAmlParseIndexTerm3,          ///< Fourth fixed argument index.
@@ -84,7 +84,7 @@ typedef enum EAmlParseIndex {
 
   @ingroup TreeStructures
 */
-#define MAX_AML_NAMESTRING_SIZE       1277U
+#define MAX_AML_NAMESTRING_SIZE  1277U
 
 /** Maximum size of an ASL NameString.
 
@@ -98,7 +98,7 @@ typedef enum EAmlParseIndex {
 
   @ingroup TreeStructures
 */
-#define MAX_ASL_NAMESTRING_SIZE       1529U
+#define MAX_ASL_NAMESTRING_SIZE  1529U
 
 /** Pseudo OpCode for method invocations.
 
@@ -117,7 +117,7 @@ typedef enum EAmlParseIndex {
 
   @ingroup TreeStructures
 */
-#define AML_METHOD_INVOC_OP           0xD0
+#define AML_METHOD_INVOC_OP  0xD0
 
 /** Pseudo OpCode for NamedField field elements.
 
@@ -136,7 +136,7 @@ typedef enum EAmlParseIndex {
 
   @ingroup TreeStructures
 */
-#define AML_FIELD_NAMED_OP            0x04
+#define AML_FIELD_NAMED_OP  0x04
 
 /** AML object types.
 
@@ -146,7 +146,7 @@ typedef enum EAmlParseIndex {
   @ingroup TreeStructures
 */
 typedef enum EAmlObjType {
-  EAmlObjTypeUnknown        = 0x0,
+  EAmlObjTypeUnknown = 0x0,
   EAmlObjTypeInt,
   EAmlObjTypeStrObj,
   EAmlObjTypeBuffObj,

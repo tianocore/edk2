@@ -96,15 +96,16 @@ STATIC
 EFI_STATUS
 EFIAPI
 TokenTableInitialize (
-  IN  ACPI_CPU_TOPOLOGY_GENERATOR   * Generator,
-  IN  UINT32                          Count
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
+  IN  UINT32                       Count
   )
 {
-  CM_OBJECT_TOKEN   * Table;
+  CM_OBJECT_TOKEN  *Table;
 
   if ((Generator == NULL) ||
       (Count == 0)        ||
-      (Count >= MAX_NODE_COUNT)) {
+      (Count >= MAX_NODE_COUNT))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -128,7 +129,7 @@ STATIC
 VOID
 EFIAPI
 TokenTableFree (
-  IN  ACPI_CPU_TOPOLOGY_GENERATOR   * Generator
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR  *Generator
   )
 {
   ASSERT (Generator != NULL);
@@ -153,18 +154,18 @@ STATIC
 UINT32
 EFIAPI
 TokenTableAdd (
-  IN  ACPI_CPU_TOPOLOGY_GENERATOR   * Generator,
-  IN  CM_OBJECT_TOKEN                 Token
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
+  IN  CM_OBJECT_TOKEN              Token
   )
 {
-  CM_OBJECT_TOKEN   * Table;
-  UINT32              Index;
-  UINT32              LastIndex;
+  CM_OBJECT_TOKEN  *Table;
+  UINT32           Index;
+  UINT32           LastIndex;
 
   ASSERT (Generator != NULL);
   ASSERT (Generator->TokenTable.Table != NULL);
 
-  Table = Generator->TokenTable.Table;
+  Table     = Generator->TokenTable.Table;
   LastIndex = Generator->TokenTable.LastIndex;
 
   // Search if there is already an entry with this Token.
@@ -203,20 +204,21 @@ STATIC
 EFI_STATUS
 EFIAPI
 WriteAslName (
-  IN      CHAR8     LeadChar,
-  IN      UINT32    Value,
-  IN OUT  CHAR8   * AslName
+  IN      CHAR8   LeadChar,
+  IN      UINT32  Value,
+  IN OUT  CHAR8   *AslName
   )
 {
-  UINT8   Index;
+  UINT8  Index;
 
   if ((Value >= MAX_NODE_COUNT)  ||
-      (AslName == NULL)) {
+      (AslName == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  AslName[0] = LeadChar;
+  AslName[0]                 = LeadChar;
   AslName[AML_NAME_SEG_SIZE] = '\0';
 
   for (Index = 0; Index < AML_NAME_SEG_SIZE - 1; Index++) {
@@ -262,14 +264,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 CreateAmlLpiMethod (
-  IN  ACPI_CPU_TOPOLOGY_GENERATOR   * Generator,
-  IN  CM_ARM_PROC_HIERARCHY_INFO    * ProcHierarchyNodeInfo,
-  IN  AML_OBJECT_NODE_HANDLE        * Node
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
+  IN  CM_ARM_PROC_HIERARCHY_INFO   *ProcHierarchyNodeInfo,
+  IN  AML_OBJECT_NODE_HANDLE       *Node
   )
 {
-  EFI_STATUS    Status;
-  UINT32        TokenIndex;
-  CHAR8         AslName[SB_SCOPE_PREFIX_SIZE + AML_NAME_SEG_SIZE];
+  EFI_STATUS  Status;
+  UINT32      TokenIndex;
+  CHAR8       AslName[SB_SCOPE_PREFIX_SIZE + AML_NAME_SEG_SIZE];
 
   ASSERT (Generator != NULL);
   ASSERT (ProcHierarchyNodeInfo != NULL);
@@ -349,22 +351,22 @@ STATIC
 EFI_STATUS
 EFIAPI
 GenerateLpiStates (
-  IN        ACPI_CPU_TOPOLOGY_GENERATOR           *       Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
+  IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        AML_OBJECT_NODE_HANDLE                        ScopeNode
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
-  UINT32                    Index;
-  UINT32                    LastIndex;
+  UINT32  Index;
+  UINT32  LastIndex;
 
-  AML_OBJECT_NODE_HANDLE    LpiNode;
-  CM_ARM_OBJ_REF          * LpiRefInfo;
-  UINT32                    LpiRefInfoCount;
-  UINT32                    LpiRefIndex;
-  CM_ARM_LPI_INFO         * LpiInfo;
-  CHAR8                     AslName[AML_NAME_SEG_SIZE + 1];
+  AML_OBJECT_NODE_HANDLE  LpiNode;
+  CM_ARM_OBJ_REF          *LpiRefInfo;
+  UINT32                  LpiRefInfoCount;
+  UINT32                  LpiRefIndex;
+  CM_ARM_LPI_INFO         *LpiInfo;
+  CHAR8                   AslName[AML_NAME_SEG_SIZE + 1];
 
   ASSERT (Generator != NULL);
   ASSERT (Generator->TokenTable.Table != NULL);
@@ -422,11 +424,11 @@ GenerateLpiStates (
                  LpiInfo->ResCntFreq,
                  LpiInfo->EnableParentState,
                  LpiInfo->IsInteger ?
-                   NULL :
-                   &LpiInfo->RegisterEntryMethod,
+                 NULL :
+                 &LpiInfo->RegisterEntryMethod,
                  LpiInfo->IsInteger ?
-                   LpiInfo->IntegerEntryMethod :
-                   0,
+                 LpiInfo->IntegerEntryMethod :
+                 0,
                  &LpiInfo->ResidencyCounterRegister,
                  &LpiInfo->UsageCounterRegister,
                  LpiInfo->StateName,
@@ -465,16 +467,16 @@ STATIC
 EFI_STATUS
 EFIAPI
 CreateAmlCpu (
-  IN   ACPI_CPU_TOPOLOGY_GENERATOR   * Generator,
-  IN   AML_NODE_HANDLE                 ParentNode,
-  IN   CM_ARM_GICC_INFO              * GicCInfo,
-  IN   UINT32                          CpuIndex,
-  OUT  AML_OBJECT_NODE_HANDLE        * CpuNodePtr OPTIONAL
+  IN   ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
+  IN   AML_NODE_HANDLE              ParentNode,
+  IN   CM_ARM_GICC_INFO             *GicCInfo,
+  IN   UINT32                       CpuIndex,
+  OUT  AML_OBJECT_NODE_HANDLE       *CpuNodePtr OPTIONAL
   )
 {
-  EFI_STATUS                Status;
-  AML_OBJECT_NODE_HANDLE    CpuNode;
-  CHAR8                     AslName[AML_NAME_SEG_SIZE + 1];
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  CpuNode;
+  CHAR8                   AslName[AML_NAME_SEG_SIZE + 1];
 
   ASSERT (Generator != NULL);
   ASSERT (ParentNode != NULL);
@@ -541,16 +543,16 @@ STATIC
 EFI_STATUS
 EFIAPI
 CreateAmlCpuFromProcHierarchy (
-  IN        ACPI_CPU_TOPOLOGY_GENERATOR           *       Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
+  IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        AML_NODE_HANDLE                               ParentNode,
   IN        UINT32                                        CpuIndex,
-  IN        CM_ARM_PROC_HIERARCHY_INFO            *       ProcHierarchyNodeInfo
+  IN        CM_ARM_PROC_HIERARCHY_INFO                    *ProcHierarchyNodeInfo
   )
 {
-  EFI_STATUS                Status;
-  CM_ARM_GICC_INFO        * GicCInfo;
-  AML_OBJECT_NODE_HANDLE    CpuNode;
+  EFI_STATUS              Status;
+  CM_ARM_GICC_INFO        *GicCInfo;
+  AML_OBJECT_NODE_HANDLE  CpuNode;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -619,17 +621,17 @@ STATIC
 EFI_STATUS
 EFIAPI
 CreateAmlCluster (
-  IN        ACPI_CPU_TOPOLOGY_GENERATOR           *       Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
+  IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        AML_NODE_HANDLE                               ParentNode,
-  IN        CM_ARM_PROC_HIERARCHY_INFO            *       ProcHierarchyNodeInfo,
+  IN        CM_ARM_PROC_HIERARCHY_INFO                    *ProcHierarchyNodeInfo,
   IN        UINT32                                        ClusterIndex,
-  OUT       AML_OBJECT_NODE_HANDLE                *       ClusterNodePtr
+  OUT       AML_OBJECT_NODE_HANDLE                        *ClusterNodePtr
   )
 {
-  EFI_STATUS                Status;
-  AML_OBJECT_NODE_HANDLE    ClusterNode;
-  CHAR8                     AslNameCluster[AML_NAME_SEG_SIZE + 1];
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  ClusterNode;
+  CHAR8                   AslNameCluster[AML_NAME_SEG_SIZE + 1];
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -713,8 +715,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 CreateAmlCpuTopologyTree (
-  IN        ACPI_CPU_TOPOLOGY_GENERATOR           *       Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
+  IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        CM_OBJECT_TOKEN                               NodeToken,
   IN        AML_NODE_HANDLE                               ParentNode
   )
@@ -732,19 +734,19 @@ CreateAmlCpuTopologyTree (
   ASSERT (NodeToken != CM_NULL_TOKEN);
   ASSERT (ParentNode != NULL);
 
-  CpuIndex = 0;
+  CpuIndex     = 0;
   ClusterIndex = 0;
 
   for (Index = 0; Index < Generator->ProcNodeCount; Index++) {
     // Find the children of the CM_ARM_PROC_HIERARCHY_INFO
     // currently being handled (i.e. ParentToken == NodeToken).
     if (Generator->ProcNodeList[Index].ParentToken == NodeToken) {
-
       // Only Cpus (leaf nodes in this tree) have a GicCToken.
       // Create a Cpu node.
       if (Generator->ProcNodeList[Index].GicCToken != CM_NULL_TOKEN) {
         if ((Generator->ProcNodeList[Index].Flags & PPTT_PROCESSOR_MASK) !=
-             PPTT_CPU_PROCESSOR_MASK) {
+            PPTT_CPU_PROCESSOR_MASK)
+        {
           DEBUG ((
             DEBUG_ERROR,
             "ERROR: SSDT-CPU-TOPOLOGY: Invalid flags for cpu: 0x%x.\n",
@@ -767,13 +769,13 @@ CreateAmlCpuTopologyTree (
         }
 
         CpuIndex++;
-
       } else {
         // If this is not a Cpu, then this is a cluster.
 
         // Acpi processor Id for clusters is not handled.
         if ((Generator->ProcNodeList[Index].Flags & PPTT_PROCESSOR_MASK) !=
-             PPTT_CLUSTER_PROCESSOR_MASK) {
+            PPTT_CLUSTER_PROCESSOR_MASK)
+        {
           DEBUG ((
             DEBUG_ERROR,
             "ERROR: SSDT-CPU-TOPOLOGY: Invalid flags for cluster: 0x%x.\n",
@@ -835,8 +837,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 CreateTopologyFromProcHierarchy (
-  IN        ACPI_CPU_TOPOLOGY_GENERATOR           *       Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
+  IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        AML_OBJECT_NODE_HANDLE                        ScopeNode
   )
 {
@@ -865,7 +867,8 @@ CreateTopologyFromProcHierarchy (
   for (Index = 0; Index < Generator->ProcNodeCount; Index++) {
     if ((Generator->ProcNodeList[Index].ParentToken == CM_NULL_TOKEN) &&
         (Generator->ProcNodeList[Index].Flags &
-          EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL)) {
+         EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL))
+    {
       if (TopLevelProcNodeIndex != MAX_UINT32) {
         DEBUG ((
           DEBUG_ERROR,
@@ -875,6 +878,7 @@ CreateTopologyFromProcHierarchy (
         ASSERT (0);
         goto exit_handler;
       }
+
       TopLevelProcNodeIndex = Index;
     }
   } // for
@@ -919,15 +923,15 @@ STATIC
 EFI_STATUS
 EFIAPI
 CreateTopologyFromGicC (
-  IN        ACPI_CPU_TOPOLOGY_GENERATOR           *       Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
+  IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        AML_OBJECT_NODE_HANDLE                        ScopeNode
   )
 {
-  EFI_STATUS            Status;
-  CM_ARM_GICC_INFO    * GicCInfo;
-  UINT32                GicCInfoCount;
-  UINT32                Index;
+  EFI_STATUS        Status;
+  CM_ARM_GICC_INFO  *GicCInfo;
+  UINT32            GicCInfoCount;
+  UINT32            Index;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -988,18 +992,18 @@ STATIC
 EFI_STATUS
 EFIAPI
 BuildSsdtCpuTopologyTable (
-  IN  CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
-  EFI_STATUS                      Status;
-  AML_ROOT_NODE_HANDLE            RootNode;
-  AML_OBJECT_NODE_HANDLE          ScopeNode;
-  CM_ARM_PROC_HIERARCHY_INFO    * ProcHierarchyNodeList;
-  UINT32                          ProcHierarchyNodeCount;
-  ACPI_CPU_TOPOLOGY_GENERATOR   * Generator;
+  EFI_STATUS                   Status;
+  AML_ROOT_NODE_HANDLE         RootNode;
+  AML_OBJECT_NODE_HANDLE       ScopeNode;
+  CM_ARM_PROC_HIERARCHY_INFO   *ProcHierarchyNodeList;
+  UINT32                       ProcHierarchyNodeCount;
+  ACPI_CPU_TOPOLOGY_GENERATOR  *Generator;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -1008,7 +1012,7 @@ BuildSsdtCpuTopologyTable (
   ASSERT (AcpiTableInfo->TableGeneratorId == This->GeneratorID);
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
 
-  Generator = (ACPI_CPU_TOPOLOGY_GENERATOR*)This;
+  Generator = (ACPI_CPU_TOPOLOGY_GENERATOR *)This;
 
   Status = AddSsdtAcpiHeader (
              CfgMgrProtocol,
@@ -1034,7 +1038,8 @@ BuildSsdtCpuTopologyTable (
              &ProcHierarchyNodeCount
              );
   if (EFI_ERROR (Status) &&
-      (Status != EFI_NOT_FOUND)) {
+      (Status != EFI_NOT_FOUND))
+  {
     goto exit_handler;
   }
 
@@ -1051,7 +1056,7 @@ BuildSsdtCpuTopologyTable (
     }
   } else {
     // Generate the topology from CM_ARM_PROC_HIERARCHY_INFO objects.
-    Generator->ProcNodeList = ProcHierarchyNodeList;
+    Generator->ProcNodeList  = ProcHierarchyNodeList;
     Generator->ProcNodeCount = ProcHierarchyNodeCount;
 
     Status = CreateTopologyFromProcHierarchy (
@@ -1098,10 +1103,10 @@ exit_handler:
 STATIC
 EFI_STATUS
 FreeSsdtCpuTopologyTableResources (
-  IN      CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+  IN      CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
   ASSERT (This != NULL);
@@ -1123,12 +1128,12 @@ FreeSsdtCpuTopologyTableResources (
 
 /** This macro defines the SSDT Cpu Topology Table Generator revision.
 */
-#define SSDT_CPU_TOPOLOGY_GENERATOR_REVISION CREATE_REVISION (1, 0)
+#define SSDT_CPU_TOPOLOGY_GENERATOR_REVISION  CREATE_REVISION (1, 0)
 
 /** The interface for the SSDT Cpu Topology Table Generator.
 */
 STATIC
-ACPI_CPU_TOPOLOGY_GENERATOR SsdtCpuTopologyGenerator = {
+ACPI_CPU_TOPOLOGY_GENERATOR  SsdtCpuTopologyGenerator = {
   // ACPI table generator header
   {
     // Generator ID
@@ -1160,10 +1165,10 @@ ACPI_CPU_TOPOLOGY_GENERATOR SsdtCpuTopologyGenerator = {
 
   // TokenTable
   {
-      // Table
-      NULL,
-      // LastIndex
-      0
+    // Table
+    NULL,
+    // LastIndex
+    0
   },
   // ProcNodeList
   NULL,
@@ -1184,11 +1189,12 @@ ACPI_CPU_TOPOLOGY_GENERATOR SsdtCpuTopologyGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiSsdtCpuTopologyLibConstructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = RegisterAcpiTableGenerator (&SsdtCpuTopologyGenerator.Header);
   DEBUG ((
     DEBUG_INFO,
@@ -1212,11 +1218,12 @@ AcpiSsdtCpuTopologyLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiSsdtCpuTopologyLibDestructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = DeregisterAcpiTableGenerator (&SsdtCpuTopologyGenerator.Header);
   DEBUG ((
     DEBUG_INFO,
