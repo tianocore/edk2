@@ -1387,7 +1387,7 @@ BmExpandLoadFile (
   //
   FileBuffer = AllocateReservedPages (EFI_SIZE_TO_PAGES (BufferSize));
   if (FileBuffer == NULL) {
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       EFI_DEVICE_PATH *LoadFilePath;
       CHAR16          *LoadFileText;
       CHAR16          *FileText;
@@ -1417,7 +1417,7 @@ BmExpandLoadFile (
       if (LoadFileText != NULL) {
         FreePool (LoadFileText);
       }
-      );
+    DEBUG_CODE_END ();
     return NULL;
   }
 

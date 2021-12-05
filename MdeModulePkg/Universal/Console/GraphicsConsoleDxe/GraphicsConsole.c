@@ -335,12 +335,12 @@ InitializeGraphicsConsoleTextMode (
     }
   }
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     for (Index = 0; Index < ValidCount; Index++) {
       DEBUG ((DEBUG_INFO, "Graphics - Mode %d, Column = %d, Row = %d\n",
                            Index, NewModeBuffer[Index].Columns, NewModeBuffer[Index].Rows));
     }
-  );
+  DEBUG_CODE_END ();
 
   //
   // Return valid mode count and mode information buffer.
