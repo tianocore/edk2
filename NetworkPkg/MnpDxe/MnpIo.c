@@ -898,11 +898,11 @@ MnpReceivePacket (
   //
   Status = Snp->Receive (Snp, &HeaderSize, &BufLen, BufPtr, NULL, NULL, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       if (Status != EFI_NOT_READY) {
         DEBUG ((DEBUG_WARN, "MnpReceivePacket: Snp->Receive() = %r.\n", Status));
       }
-    );
+    DEBUG_CODE_END ();
 
     return Status;
   }

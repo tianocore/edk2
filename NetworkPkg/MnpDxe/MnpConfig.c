@@ -1669,7 +1669,7 @@ MnpConfigReceiveFilters (
                   MCastFilterCnt,
                   MCastFilter
                   );
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     if (EFI_ERROR (Status)) {
       DEBUG (
         (DEBUG_ERROR,
@@ -1677,7 +1677,7 @@ MnpConfigReceiveFilters (
         Status)
         );
     }
-  );
+  DEBUG_CODE_END ();
 
   if (MCastFilter != NULL) {
     //
