@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Gop.h"
 
-
 EFI_STATUS
 FreeNotifyList (
-  IN OUT LIST_ENTRY           *ListHead
+  IN OUT LIST_ENTRY  *ListHead
   )
+
 /*++
 
 Routine Description:
@@ -29,11 +29,12 @@ Returns:
 
 **/
 {
-  EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *NotifyNode;
+  EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY  *NotifyNode;
 
   if (ListHead == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   while (!IsListEmpty (ListHead)) {
     NotifyNode = CR (
                    ListHead->ForwardLink,
@@ -47,7 +48,6 @@ Returns:
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
@@ -94,13 +94,13 @@ Returns:
 EFI_STATUS
 EFIAPI
 EmuGopDriverBindingSupported (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Handle,
-  IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Handle,
+  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS              Status;
-  EMU_IO_THUNK_PROTOCOL   *EmuIoThunk;
+  EFI_STATUS             Status;
+  EMU_IO_THUNK_PROTOCOL  *EmuIoThunk;
 
   //
   // Open the IO Abstraction(s) needed to perform the supported test
@@ -123,15 +123,14 @@ EmuGopDriverBindingSupported (
   // Close the I/O Abstraction(s) used to perform the supported test
   //
   gBS->CloseProtocol (
-        Handle,
-        &gEmuIoThunkProtocolGuid,
-        This->DriverBindingHandle,
-        Handle
-        );
+         Handle,
+         &gEmuIoThunkProtocolGuid,
+         This->DriverBindingHandle,
+         Handle
+         );
 
   return Status;
 }
-
 
 /**
   Starts a device controller or a bus controller.
@@ -171,14 +170,14 @@ EmuGopDriverBindingSupported (
 EFI_STATUS
 EFIAPI
 EmuGopDriverBindingStart (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Handle,
-  IN  EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Handle,
+  IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EMU_IO_THUNK_PROTOCOL   *EmuIoThunk;
-  EFI_STATUS              Status;
-  GOP_PRIVATE_DATA        *Private;
+  EMU_IO_THUNK_PROTOCOL  *EmuIoThunk;
+  EFI_STATUS             Status;
+  GOP_PRIVATE_DATA       *Private;
 
   //
   // Grab the protocols we need
@@ -199,14 +198,15 @@ EmuGopDriverBindingStart (
   // Allocate Private context data for SGO inteface.
   //
   Private = NULL;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  sizeof (GOP_PRIVATE_DATA),
-                  (VOID **)&Private
-                  );
+  Status  = gBS->AllocatePool (
+                   EfiBootServicesData,
+                   sizeof (GOP_PRIVATE_DATA),
+                   (VOID **)&Private
+                   );
   if (EFI_ERROR (Status)) {
     goto Done;
   }
+
   //
   // Set up context record
   //
@@ -234,27 +234,31 @@ EmuGopDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
+
   //
   // Publish the Gop interface to the world
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Private->Handle,
-                  &gEfiGraphicsOutputProtocolGuid,    &Private->GraphicsOutput,
-                  &gEfiSimpleTextInProtocolGuid,      &Private->SimpleTextIn,
-                  &gEfiSimplePointerProtocolGuid,     &Private->SimplePointer,
-                  &gEfiSimpleTextInputExProtocolGuid, &Private->SimpleTextInEx,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  &Private->GraphicsOutput,
+                  &gEfiSimpleTextInProtocolGuid,
+                  &Private->SimpleTextIn,
+                  &gEfiSimplePointerProtocolGuid,
+                  &Private->SimplePointer,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  &Private->SimpleTextInEx,
                   NULL
                   );
 
 Done:
   if (EFI_ERROR (Status)) {
-
     gBS->CloseProtocol (
-          Handle,
-          &gEmuIoThunkProtocolGuid,
-          This->DriverBindingHandle,
-          Handle
-          );
+           Handle,
+           &gEmuIoThunkProtocolGuid,
+           This->DriverBindingHandle,
+           Handle
+           );
 
     if (Private != NULL) {
       //
@@ -263,12 +267,15 @@ Done:
       if (Private->ControllerNameTable != NULL) {
         FreeUnicodeStringTable (Private->ControllerNameTable);
       }
+
       if (Private->SimpleTextIn.WaitForKey != NULL) {
         gBS->CloseEvent (Private->SimpleTextIn.WaitForKey);
       }
+
       if (Private->SimpleTextInEx.WaitForKeyEx != NULL) {
         gBS->CloseEvent (Private->SimpleTextInEx.WaitForKeyEx);
       }
+
       FreeNotifyList (&Private->NotifyList);
 
       gBS->FreePool (Private);
@@ -277,8 +284,6 @@ Done:
 
   return Status;
 }
-
-
 
 /**
   Stops a device controller or a bus controller.
@@ -315,9 +320,9 @@ EmuGopDriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_GRAPHICS_OUTPUT_PROTOCOL *GraphicsOutput;
-  EFI_STATUS                   Status;
-  GOP_PRIVATE_DATA             *Private;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
+  EFI_STATUS                    Status;
+  GOP_PRIVATE_DATA              *Private;
 
   Status = gBS->OpenProtocol (
                   Handle,
@@ -344,10 +349,14 @@ EmuGopDriverBindingStop (
   //
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   Private->Handle,
-                  &gEfiGraphicsOutputProtocolGuid,    &Private->GraphicsOutput,
-                  &gEfiSimpleTextInProtocolGuid,      &Private->SimpleTextIn,
-                  &gEfiSimplePointerProtocolGuid,     &Private->SimplePointer,
-                  &gEfiSimpleTextInputExProtocolGuid, &Private->SimpleTextInEx,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  &Private->GraphicsOutput,
+                  &gEfiSimpleTextInProtocolGuid,
+                  &Private->SimpleTextIn,
+                  &gEfiSimplePointerProtocolGuid,
+                  &Private->SimplePointer,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  &Private->SimpleTextInEx,
                   NULL
                   );
   if (!EFI_ERROR (Status)) {
@@ -360,11 +369,11 @@ EmuGopDriverBindingStop (
     }
 
     gBS->CloseProtocol (
-          Handle,
-          &gEmuIoThunkProtocolGuid,
-          This->DriverBindingHandle,
-          Handle
-          );
+           Handle,
+           &gEmuIoThunkProtocolGuid,
+           This->DriverBindingHandle,
+           Handle
+           );
 
     //
     // Free our instance data
@@ -380,18 +389,16 @@ EmuGopDriverBindingStop (
     FreeNotifyList (&Private->NotifyList);
 
     gBS->FreePool (Private);
-
   }
 
   return Status;
 }
 
-
 ///
 /// This protocol provides the services required to determine if a driver supports a given controller.
 /// If a controller is supported, then it also provides routines to start and stop the controller.
 ///
-EFI_DRIVER_BINDING_PROTOCOL gEmuGopDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gEmuGopDriverBinding = {
   EmuGopDriverBindingSupported,
   EmuGopDriverBindingStart,
   EmuGopDriverBindingStop,
@@ -399,8 +406,6 @@ EFI_DRIVER_BINDING_PROTOCOL gEmuGopDriverBinding = {
   NULL,
   NULL
 };
-
-
 
 /**
   The user Entry Point for module EmuGop. The user code starts with this function.
@@ -415,11 +420,11 @@ EFI_DRIVER_BINDING_PROTOCOL gEmuGopDriverBinding = {
 EFI_STATUS
 EFIAPI
 InitializeEmuGop (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
@@ -431,7 +436,5 @@ InitializeEmuGop (
              );
   ASSERT_EFI_ERROR (Status);
 
-
   return Status;
 }
-

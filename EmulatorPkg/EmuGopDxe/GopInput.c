@@ -9,12 +9,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Gop.h"
 
-
 BOOLEAN
 GopPrivateIsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
   )
+
 /*++
 
 Routine Description:
@@ -35,37 +35,39 @@ Returns:
   ASSERT (RegsiteredData != NULL && InputData != NULL);
 
   if ((RegsiteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
-      (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar)) {
+      (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar))
+  {
     return FALSE;
   }
 
   //
   // Assume KeyShiftState/KeyToggleState = 0 in Registered key data means these state could be ignored.
   //
-  if (RegsiteredData->KeyState.KeyShiftState != 0 &&
-      RegsiteredData->KeyState.KeyShiftState != InputData->KeyState.KeyShiftState) {
+  if ((RegsiteredData->KeyState.KeyShiftState != 0) &&
+      (RegsiteredData->KeyState.KeyShiftState != InputData->KeyState.KeyShiftState))
+  {
     return FALSE;
   }
-  if (RegsiteredData->KeyState.KeyToggleState != 0 &&
-      RegsiteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState) {
+
+  if ((RegsiteredData->KeyState.KeyToggleState != 0) &&
+      (RegsiteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState))
+  {
     return FALSE;
   }
 
   return TRUE;
-
 }
-
 
 VOID
 EFIAPI
 GopPrivateMakeCallbackFunction (
-  IN VOID           *Context,
-  IN EFI_KEY_DATA   *KeyData
+  IN VOID          *Context,
+  IN EFI_KEY_DATA  *KeyData
   )
 {
-  LIST_ENTRY                        *Link;
+  LIST_ENTRY                       *Link;
   EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY  *CurrentNotify;
-  GOP_PRIVATE_DATA                  *Private = (GOP_PRIVATE_DATA *)Context;
+  GOP_PRIVATE_DATA                 *Private = (GOP_PRIVATE_DATA *)Context;
 
   KeyMapMake (KeyData);
 
@@ -84,18 +86,15 @@ GopPrivateMakeCallbackFunction (
   }
 }
 
-
 VOID
 EFIAPI
 GopPrivateBreakCallbackFunction (
-  IN VOID           *Context,
-  IN EFI_KEY_DATA   *KeyData
+  IN VOID          *Context,
+  IN EFI_KEY_DATA  *KeyData
   )
 {
   KeyMapBreak (KeyData);
 }
-
-
 
 //
 // Simple Text In implementation.
@@ -114,8 +113,8 @@ GopPrivateBreakCallbackFunction (
 EFI_STATUS
 EFIAPI
 EmuGopSimpleTextInReset (
-  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL       *This,
-  IN BOOLEAN                              ExtendedVerification
+  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
+  IN BOOLEAN                         ExtendedVerification
   )
 {
   GOP_PRIVATE_DATA  *Private;
@@ -135,8 +134,8 @@ EmuGopSimpleTextInReset (
   //
   // A reset is draining the Queue
   //
-  while (Private->EmuGraphicsWindow->GetKey (Private->EmuGraphicsWindow, &KeyData) == EFI_SUCCESS)
-    ;
+  while (Private->EmuGraphicsWindow->GetKey (Private->EmuGraphicsWindow, &KeyData) == EFI_SUCCESS) {
+  }
 
   //
   // Leave critical section and return
@@ -144,7 +143,6 @@ EmuGopSimpleTextInReset (
   gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 }
-
 
 /**
   Reads the next keystroke from the input device. The WaitForKey Event can
@@ -163,8 +161,8 @@ EmuGopSimpleTextInReset (
 EFI_STATUS
 EFIAPI
 EmuGopSimpleTextInReadKeyStroke (
-  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL       *This,
-  OUT EFI_INPUT_KEY                       *Key
+  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
+  OUT EFI_INPUT_KEY                  *Key
   )
 {
   GOP_PRIVATE_DATA  *Private;
@@ -180,9 +178,9 @@ EmuGopSimpleTextInReadKeyStroke (
   //
   // Enter critical section
   //
-  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Status  = Private->EmuGraphicsWindow->GetKey (Private->EmuGraphicsWindow, &KeyData);
+  Status = Private->EmuGraphicsWindow->GetKey (Private->EmuGraphicsWindow, &KeyData);
   if (!EFI_ERROR (Status)) {
     if ((KeyData.Key.ScanCode == 0) && (KeyData.Key.UnicodeChar == 0)) {
       // Modifier key was pressed
@@ -200,8 +198,6 @@ EmuGopSimpleTextInReadKeyStroke (
   return Status;
 }
 
-
-
 /**
   SimpleTextIn and SimpleTextInEx Notify Wait Event
 
@@ -212,15 +208,15 @@ EmuGopSimpleTextInReadKeyStroke (
 VOID
 EFIAPI
 EmuGopSimpleTextInWaitForKey (
-  IN EFI_EVENT          Event,
-  IN VOID               *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   GOP_PRIVATE_DATA  *Private;
   EFI_STATUS        Status;
   EFI_TPL           OldTpl;
 
-  Private = (GOP_PRIVATE_DATA *) Context;
+  Private = (GOP_PRIVATE_DATA *)Context;
   if (Private->EmuGraphicsWindow == NULL) {
     return;
   }
@@ -228,26 +224,25 @@ EmuGopSimpleTextInWaitForKey (
   //
   // Enter critical section
   //
-  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Status  = Private->EmuGraphicsWindow->CheckKey (Private->EmuGraphicsWindow);
+  Status = Private->EmuGraphicsWindow->CheckKey (Private->EmuGraphicsWindow);
   if (!EFI_ERROR (Status)) {
     //
     // If a there is a key in the queue signal our event.
     //
     gBS->SignalEvent (Event);
   }
+
   //
   // Leave critical section and return
   //
   gBS->RestoreTPL (OldTpl);
 }
 
-
 //
 // Simple Text Input Ex protocol functions
 //
-
 
 /**
   The Reset() function resets the input device hardware. As part
@@ -280,6 +275,7 @@ EmuGopSimpleTextInExResetEx (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN BOOLEAN                            ExtendedVerification
   )
+
 /*++
 
   Routine Description:
@@ -296,8 +292,6 @@ EmuGopSimpleTextInExResetEx (
 {
   return EFI_SUCCESS;
 }
-
-
 
 /**
   The function reads the next keystroke from the input device. If
@@ -351,9 +345,10 @@ EmuGopSimpleTextInExResetEx (
 EFI_STATUS
 EFIAPI
 EmuGopSimpleTextInExReadKeyStrokeEx (
-  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
-  OUT EFI_KEY_DATA                      *KeyData
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  OUT EFI_KEY_DATA                       *KeyData
   )
+
 /*++
 
   Routine Description:
@@ -378,7 +373,6 @@ EmuGopSimpleTextInExReadKeyStrokeEx (
   GOP_PRIVATE_DATA  *Private;
   EFI_TPL           OldTpl;
 
-
   if (KeyData == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -391,9 +385,9 @@ EmuGopSimpleTextInExReadKeyStrokeEx (
   //
   // Enter critical section
   //
-  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Status  = Private->EmuGraphicsWindow->GetKey(Private->EmuGraphicsWindow, KeyData);
+  Status = Private->EmuGraphicsWindow->GetKey (Private->EmuGraphicsWindow, KeyData);
 
   //
   // Leave critical section and return
@@ -402,8 +396,6 @@ EmuGopSimpleTextInExReadKeyStrokeEx (
 
   return Status;
 }
-
-
 
 /**
   The SetState() function allows the input device hardware to
@@ -446,16 +438,17 @@ EmuGopSimpleTextInExSetState (
   }
 
   if (((Private->KeyState.KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID) ||
-      ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID)) {
+      ((*KeyToggleState & EFI_TOGGLE_STATE_VALID) != EFI_TOGGLE_STATE_VALID))
+  {
     return EFI_UNSUPPORTED;
   }
 
   //
   // Enter critical section
   //
-  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Status  = Private->EmuGraphicsWindow->KeySetState (Private->EmuGraphicsWindow, KeyToggleState);
+  Status = Private->EmuGraphicsWindow->KeySetState (Private->EmuGraphicsWindow, KeyToggleState);
   //
   // Leave critical section and return
   //
@@ -463,7 +456,6 @@ EmuGopSimpleTextInExSetState (
 
   return Status;
 }
-
 
 /**
   SimpleTextIn and SimpleTextInEx Notify Wait Event
@@ -475,16 +467,14 @@ EmuGopSimpleTextInExSetState (
 VOID
 EFIAPI
 EmuGopRegisterKeyCallback (
-  IN EFI_EVENT          Event,
-  IN VOID               *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *ExNotify = (EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *)Context;
+  EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY  *ExNotify = (EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *)Context;
 
   ExNotify->KeyNotificationFn (&ExNotify->KeyData);
 }
-
-
 
 /**
   The RegisterKeystrokeNotify() function registers a function
@@ -520,13 +510,13 @@ EmuGopSimpleTextInExRegisterKeyNotify (
   OUT VOID                              **NotifyHandle
   )
 {
-  EFI_STATUS                          Status;
-  GOP_PRIVATE_DATA                    *Private;
-  EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY     *CurrentNotify;
-  LIST_ENTRY                          *Link;
-  EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY     *NewNotify;
+  EFI_STATUS                       Status;
+  GOP_PRIVATE_DATA                 *Private;
+  EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY  *CurrentNotify;
+  LIST_ENTRY                       *Link;
+  EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY  *NewNotify;
 
-  if (KeyData == NULL || KeyNotificationFunction == NULL || NotifyHandle == NULL) {
+  if ((KeyData == NULL) || (KeyNotificationFunction == NULL) || (NotifyHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -553,14 +543,14 @@ EmuGopSimpleTextInExRegisterKeyNotify (
   //
   // Allocate resource to save the notification function
   //
-  NewNotify = (EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *) AllocateZeroPool (sizeof (EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY));
+  NewNotify = (EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *)AllocateZeroPool (sizeof (EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY));
   if (NewNotify == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   NewNotify->Signature         = EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE;
   NewNotify->KeyNotificationFn = KeyNotificationFunction;
-  NewNotify->NotifyHandle      = (EFI_HANDLE) NewNotify;
+  NewNotify->NotifyHandle      = (EFI_HANDLE)NewNotify;
   CopyMem (&NewNotify->KeyData, KeyData, sizeof (KeyData));
   InsertTailList (&Private->NotifyList, &NewNotify->NotifyEntry);
 
@@ -573,13 +563,10 @@ EmuGopSimpleTextInExRegisterKeyNotify (
                   );
   ASSERT_EFI_ERROR (Status);
 
-
   *NotifyHandle = NewNotify->NotifyHandle;
 
   return EFI_SUCCESS;
-
 }
-
 
 /**
   The UnregisterKeystrokeNotify() function removes the
@@ -602,6 +589,7 @@ EmuGopSimpleTextInExUnregisterKeyNotify (
   IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
   IN VOID                               *NotificationHandle
   )
+
 /*++
 
   Routine Description:
@@ -617,15 +605,15 @@ EmuGopSimpleTextInExUnregisterKeyNotify (
 
 **/
 {
-  GOP_PRIVATE_DATA                   *Private;
-  LIST_ENTRY                         *Link;
-  EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *CurrentNotify;
+  GOP_PRIVATE_DATA                 *Private;
+  LIST_ENTRY                       *Link;
+  EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY  *CurrentNotify;
 
   if (NotificationHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *) NotificationHandle)->Signature != EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE) {
+  if (((EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY *)NotificationHandle)->Signature != EMU_GOP_SIMPLE_TEXTIN_EX_NOTIFY_SIGNATURE) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -657,8 +645,6 @@ EmuGopSimpleTextInExUnregisterKeyNotify (
   return EFI_INVALID_PARAMETER;
 }
 
-
-
 /**
   Initialize SimplelTextIn and SimpleTextInEx protocols in the Private
   context structure.
@@ -670,7 +656,7 @@ EmuGopSimpleTextInExUnregisterKeyNotify (
 **/
 EFI_STATUS
 EmuGopInitializeSimpleTextInForWindow (
-  IN  GOP_PRIVATE_DATA    *Private
+  IN  GOP_PRIVATE_DATA  *Private
   )
 {
   EFI_STATUS  Status;
@@ -689,7 +675,6 @@ EmuGopInitializeSimpleTextInForWindow (
                   &Private->SimpleTextIn.WaitForKey
                   );
   ASSERT_EFI_ERROR (Status);
-
 
   //
   // Initialize Simple Text In Ex
@@ -714,20 +699,12 @@ EmuGopInitializeSimpleTextInForWindow (
                   );
   ASSERT_EFI_ERROR (Status);
 
-
   return Status;
 }
-
-
-
-
-
-
 
 //
 // Simple Pointer implementation.
 //
-
 
 /**
   Resets the pointer device hardware.
@@ -744,13 +721,13 @@ EmuGopInitializeSimpleTextInForWindow (
 EFI_STATUS
 EFIAPI
 EmuGopSimplePointerReset (
-  IN EFI_SIMPLE_POINTER_PROTOCOL          *This,
-  IN BOOLEAN                              ExtendedVerification
+  IN EFI_SIMPLE_POINTER_PROTOCOL  *This,
+  IN BOOLEAN                      ExtendedVerification
   )
 {
-  GOP_PRIVATE_DATA             *Private;
-  EFI_SIMPLE_POINTER_STATE     State;
-  EFI_TPL                      OldTpl;
+  GOP_PRIVATE_DATA          *Private;
+  EFI_SIMPLE_POINTER_STATE  State;
+  EFI_TPL                   OldTpl;
 
   Private = GOP_PRIVATE_DATA_FROM_POINTER_MODE_THIS (This);
   if (Private->EmuGraphicsWindow == NULL) {
@@ -765,8 +742,8 @@ EmuGopSimplePointerReset (
   //
   // A reset is draining the Queue
   //
-  while (Private->EmuGraphicsWindow->GetPointerState (Private->EmuGraphicsWindow, &State) == EFI_SUCCESS)
-    ;
+  while (Private->EmuGraphicsWindow->GetPointerState (Private->EmuGraphicsWindow, &State) == EFI_SUCCESS) {
+  }
 
   //
   // Leave critical section and return
@@ -774,7 +751,6 @@ EmuGopSimplePointerReset (
   gBS->RestoreTPL (OldTpl);
   return EFI_SUCCESS;
 }
-
 
 /**
   Retrieves the current state of a pointer device.
@@ -793,8 +769,8 @@ EmuGopSimplePointerReset (
 EFI_STATUS
 EFIAPI
 EmuGopSimplePointerGetState (
-  IN EFI_SIMPLE_POINTER_PROTOCOL          *This,
-  IN OUT EFI_SIMPLE_POINTER_STATE         *State
+  IN EFI_SIMPLE_POINTER_PROTOCOL   *This,
+  IN OUT EFI_SIMPLE_POINTER_STATE  *State
   )
 {
   GOP_PRIVATE_DATA  *Private;
@@ -809,9 +785,9 @@ EmuGopSimplePointerGetState (
   //
   // Enter critical section
   //
-  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Status  = Private->EmuGraphicsWindow->GetPointerState (Private->EmuGraphicsWindow, State);
+  Status = Private->EmuGraphicsWindow->GetPointerState (Private->EmuGraphicsWindow, State);
   //
   // Leave critical section and return
   //
@@ -819,7 +795,6 @@ EmuGopSimplePointerGetState (
 
   return Status;
 }
-
 
 /**
   SimplePointer Notify Wait Event
@@ -831,15 +806,15 @@ EmuGopSimplePointerGetState (
 VOID
 EFIAPI
 EmuGopSimplePointerWaitForInput (
-  IN EFI_EVENT          Event,
-  IN VOID               *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   GOP_PRIVATE_DATA  *Private;
   EFI_STATUS        Status;
   EFI_TPL           OldTpl;
 
-  Private = (GOP_PRIVATE_DATA *) Context;
+  Private = (GOP_PRIVATE_DATA *)Context;
   if (Private->EmuGraphicsWindow == NULL) {
     return;
   }
@@ -847,21 +822,21 @@ EmuGopSimplePointerWaitForInput (
   //
   // Enter critical section
   //
-  OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Status  = Private->EmuGraphicsWindow->CheckPointer (Private->EmuGraphicsWindow);
+  Status = Private->EmuGraphicsWindow->CheckPointer (Private->EmuGraphicsWindow);
   if (!EFI_ERROR (Status)) {
     //
     // If the pointer state has changed, signal our event.
     //
     gBS->SignalEvent (Event);
   }
+
   //
   // Leave critical section and return
   //
   gBS->RestoreTPL (OldTpl);
 }
-
 
 /**
   SimplePointer constructor
@@ -873,7 +848,7 @@ EmuGopSimplePointerWaitForInput (
 **/
 EFI_STATUS
 EmuGopInitializeSimplePointerForWindow (
-  IN  GOP_PRIVATE_DATA    *Private
+  IN  GOP_PRIVATE_DATA  *Private
   )
 {
   EFI_STATUS  Status;
@@ -887,9 +862,9 @@ EmuGopInitializeSimplePointerForWindow (
   Private->PointerMode.LeftButton  = TRUE;
   Private->PointerMode.RightButton = TRUE;
 
-  Private->SimplePointer.Reset     = EmuGopSimplePointerReset;
-  Private->SimplePointer.GetState  = EmuGopSimplePointerGetState;
-  Private->SimplePointer.Mode      = &Private->PointerMode;
+  Private->SimplePointer.Reset    = EmuGopSimplePointerReset;
+  Private->SimplePointer.GetState = EmuGopSimplePointerGetState;
+  Private->SimplePointer.Mode     = &Private->PointerMode;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,

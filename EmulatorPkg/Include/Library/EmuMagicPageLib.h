@@ -18,15 +18,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef struct {
   // Used by PEI Core and PEIMs to store the PEI Services pointer.
   // Privilege issues prevent using the PI mechanism in the emulator.
-  CONST EFI_PEI_SERVICES **PeiServicesTablePointer;
+  CONST EFI_PEI_SERVICES    **PeiServicesTablePointer;
 
   // Used by SecPeiServicesLib
-  EFI_PEI_PPI_DESCRIPTOR  *PpiList;
+  EFI_PEI_PPI_DESCRIPTOR    *PpiList;
 
   // Needed by PEI PEI PeCoffLoaderExtraActionLib
-  EMU_THUNK_PROTOCOL   *Thunk;
+  EMU_THUNK_PROTOCOL        *Thunk;
 } EMU_MAGIC_PAGE_LAYOUT;
 
-#define EMU_MAGIC_PAGE() ((EMU_MAGIC_PAGE_LAYOUT *)((UINTN)PcdGet64 (PcdPeiServicesTablePage)))
+#define EMU_MAGIC_PAGE()  ((EMU_MAGIC_PAGE_LAYOUT *)((UINTN)PcdGet64 (PcdPeiServicesTablePage)))
 
 #endif

@@ -9,23 +9,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Host.h"
 
 #ifdef __APPLE__
-#define MAP_ANONYMOUS MAP_ANON
+#define MAP_ANONYMOUS  MAP_ANON
 #endif
-
 
 //
 // Globals
 //
 
-EMU_THUNK_PPI mSecEmuThunkPpi = {
+EMU_THUNK_PPI  mSecEmuThunkPpi = {
   GasketSecUnixPeiAutoScan,
   GasketSecUnixFdAddress,
   GasketSecEmuThunkAddress
 };
 
-char *gGdbWorkingFileName = NULL;
-unsigned int mScriptSymbolChangesCount = 0;
-
+char          *gGdbWorkingFileName      = NULL;
+unsigned int  mScriptSymbolChangesCount = 0;
 
 //
 // Default information about where the FD is located.
@@ -34,8 +32,8 @@ unsigned int mScriptSymbolChangesCount = 0;
 //  The number of array elements is allocated base on parsing
 //  EFI_FIRMWARE_VOLUMES and the memory is never freed.
 //
-UINTN       gFdInfoCount = 0;
-EMU_FD_INFO *gFdInfo;
+UINTN        gFdInfoCount = 0;
+EMU_FD_INFO  *gFdInfo;
 
 //
 // Array that supports separate memory ranges.
@@ -46,16 +44,12 @@ EMU_FD_INFO *gFdInfo;
 UINTN              gSystemMemoryCount = 0;
 EMU_SYSTEM_MEMORY  *gSystemMemory;
 
-
-
 UINTN                        mImageContextModHandleArraySize = 0;
-IMAGE_CONTEXT_TO_MOD_HANDLE  *mImageContextModHandleArray = NULL;
+IMAGE_CONTEXT_TO_MOD_HANDLE  *mImageContextModHandleArray    = NULL;
 
 EFI_PEI_PPI_DESCRIPTOR  *gPpiList;
 
-
-int gInXcode = 0;
-
+int  gInXcode = 0;
 
 /*++
   Breakpoint target for Xcode project. Set in the Xcode XML
@@ -70,8 +64,6 @@ SecGdbConfigBreak (
   )
 {
 }
-
-
 
 /*++
 
@@ -121,8 +113,8 @@ main (
   // If dlopen doesn't work, then we build a gdb script to allow the
   // symbols to be loaded.
   //
-  Index = strlen (*Argv);
-  gGdbWorkingFileName = AllocatePool (Index + strlen(".gdb") + 1);
+  Index               = strlen (*Argv);
+  gGdbWorkingFileName = AllocatePool (Index + strlen (".gdb") + 1);
   strcpy (gGdbWorkingFileName, *Argv);
   strcat (gGdbWorkingFileName, ".gdb");
 
@@ -139,8 +131,8 @@ main (
   setbuf (stdout, 0);
   setbuf (stderr, 0);
 
-  MemorySizeStr      = (CHAR16 *) PcdGetPtr (PcdEmuMemorySize);
-  FirmwareVolumesStr = (CHAR16 *) PcdGetPtr (PcdEmuFirmwareVolume);
+  MemorySizeStr      = (CHAR16 *)PcdGetPtr (PcdEmuMemorySize);
+  FirmwareVolumesStr = (CHAR16 *)PcdGetPtr (PcdEmuFirmwareVolume);
 
   //
   // PPIs pased into PEI_CORE
@@ -169,17 +161,18 @@ main (
   //
   // Allocate space for gSystemMemory Array
   //
-  gSystemMemoryCount  = CountSeparatorsInString (MemorySizeStr, '!') + 1;
-  gSystemMemory       = AllocateZeroPool (gSystemMemoryCount * sizeof (EMU_SYSTEM_MEMORY));
+  gSystemMemoryCount = CountSeparatorsInString (MemorySizeStr, '!') + 1;
+  gSystemMemory      = AllocateZeroPool (gSystemMemoryCount * sizeof (EMU_SYSTEM_MEMORY));
   if (gSystemMemory == NULL) {
     printf ("ERROR : Can not allocate memory for system.  Exiting.\n");
     exit (1);
   }
+
   //
   // Allocate space for gSystemMemory Array
   //
-  gFdInfoCount  = CountSeparatorsInString (FirmwareVolumesStr, '!') + 1;
-  gFdInfo       = AllocateZeroPool (gFdInfoCount * sizeof (EMU_FD_INFO));
+  gFdInfoCount = CountSeparatorsInString (FirmwareVolumesStr, '!') + 1;
+  gFdInfo      = AllocateZeroPool (gFdInfoCount * sizeof (EMU_FD_INFO));
   if (gFdInfo == NULL) {
     printf ("ERROR : Can not allocate memory for fd info.  Exiting.\n");
     exit (1);
@@ -192,31 +185,35 @@ main (
   //  on a real platform this would be SRAM, or using the cache as RAM.
   //  Set InitialStackMemory to zero so UnixOpenFile will allocate a new mapping
   //
-  InitialStackMemorySize  = STACK_SIZE;
-  InitialStackMemory = (UINTN)MapMemory (
-                                0, (UINT32) InitialStackMemorySize,
-                                PROT_READ | PROT_WRITE | PROT_EXEC, MAP_ANONYMOUS | MAP_PRIVATE
-                                );
+  InitialStackMemorySize = STACK_SIZE;
+  InitialStackMemory     = (UINTN)MapMemory (
+                                    0,
+                                    (UINT32)InitialStackMemorySize,
+                                    PROT_READ | PROT_WRITE | PROT_EXEC,
+                                    MAP_ANONYMOUS | MAP_PRIVATE
+                                    );
   if (InitialStackMemory == 0) {
     printf ("ERROR : Can not open SecStack Exiting\n");
     exit (1);
   }
 
-  printf ("  OS Emulator passing in %u KB of temp RAM at 0x%08lx to SEC\n",
+  printf (
+    "  OS Emulator passing in %u KB of temp RAM at 0x%08lx to SEC\n",
     (unsigned int)(InitialStackMemorySize / 1024),
     (unsigned long)InitialStackMemory
     );
 
-  for (StackPointer = (UINTN*) (UINTN) InitialStackMemory;
-     StackPointer < (UINTN*)(UINTN)((UINTN) InitialStackMemory + (UINT64) InitialStackMemorySize);
-     StackPointer ++) {
+  for (StackPointer = (UINTN *)(UINTN)InitialStackMemory;
+       StackPointer < (UINTN *)(UINTN)((UINTN)InitialStackMemory + (UINT64)InitialStackMemorySize);
+       StackPointer++)
+  {
     *StackPointer = 0x5AA55AA5;
   }
 
   //
   // Open All the firmware volumes and remember the info in the gFdInfo global
   //
-  FileName = (CHAR8 *) AllocatePool (StrLen (FirmwareVolumesStr) + 1);
+  FileName = (CHAR8 *)AllocatePool (StrLen (FirmwareVolumesStr) + 1);
   if (FileName == NULL) {
     printf ("ERROR : Can not allocate memory for firmware volume string\n");
     exit (1);
@@ -225,39 +222,43 @@ main (
   Index2 = 0;
   for (Done = FALSE, Index = 0, PeiIndex = 0, SecFile = NULL;
        FirmwareVolumesStr[Index2] != 0;
-       Index++) {
+       Index++)
+  {
     for (Index1 = 0; (FirmwareVolumesStr[Index2] != '!') && (FirmwareVolumesStr[Index2] != 0); Index2++) {
       FileName[Index1++] = FirmwareVolumesStr[Index2];
     }
+
     if (FirmwareVolumesStr[Index2] == '!') {
       Index2++;
     }
-    FileName[Index1]  = '\0';
+
+    FileName[Index1] = '\0';
 
     if (Index == 0) {
       // Map FV Recovery Read Only and other areas Read/Write
       Status = MapFd0 (
-                FileName,
-                &gFdInfo[0].Address,
-                &gFdInfo[0].Size
-                );
+                 FileName,
+                 &gFdInfo[0].Address,
+                 &gFdInfo[0].Size
+                 );
     } else {
       //
       // Open the FD and remember where it got mapped into our processes address space
       // Maps Read Only
       //
       Status = MapFile (
-                FileName,
-                &gFdInfo[Index].Address,
-                &gFdInfo[Index].Size
-                );
+                 FileName,
+                 &gFdInfo[Index].Address,
+                 &gFdInfo[Index].Size
+                 );
     }
+
     if (EFI_ERROR (Status)) {
       printf ("ERROR : Can not open Firmware Device File %s (%x).  Exiting.\n", FileName, (unsigned int)Status);
       exit (1);
     }
 
-    printf ("  FD loaded from %s at 0x%08lx",FileName, (unsigned long)gFdInfo[Index].Address);
+    printf ("  FD loaded from %s at 0x%08lx", FileName, (unsigned long)gFdInfo[Index].Address);
 
     if (SecFile == NULL) {
       //
@@ -265,11 +266,11 @@ main (
       // Load the first one we find.
       //
       FileHandle = NULL;
-      Status = PeiServicesFfsFindNextFile (
-                  EFI_FV_FILETYPE_SECURITY_CORE,
-                  (EFI_PEI_FV_HANDLE)(UINTN)gFdInfo[Index].Address,
-                  &FileHandle
-                  );
+      Status     = PeiServicesFfsFindNextFile (
+                     EFI_FV_FILETYPE_SECURITY_CORE,
+                     (EFI_PEI_FV_HANDLE)(UINTN)gFdInfo[Index].Address,
+                     &FileHandle
+                     );
       if (!EFI_ERROR (Status)) {
         Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &SecFile);
         if (!EFI_ERROR (Status)) {
@@ -293,9 +294,9 @@ main (
   //  map this memory into the SEC process memory space.
   //
   Index1 = 0;
-  Index = 0;
+  Index  = 0;
   while (1) {
-    UINTN val = 0;
+    UINTN  val = 0;
     //
     // Save the size of the memory.
     //
@@ -303,10 +304,12 @@ main (
       val = val * 10 + MemorySizeStr[Index1] - '0';
       Index1++;
     }
+
     gSystemMemory[Index++].Size = val * 0x100000;
     if (MemorySizeStr[Index1] == 0) {
       break;
     }
+
     Index1++;
   }
 
@@ -315,7 +318,7 @@ main (
   //
   // Hand off to SEC
   //
-  SecLoadFromCore ((UINTN) InitialStackMemory, (UINTN) InitialStackMemorySize, (UINTN) gFdInfo[0].Address, SecFile);
+  SecLoadFromCore ((UINTN)InitialStackMemory, (UINTN)InitialStackMemorySize, (UINTN)gFdInfo[0].Address, SecFile);
 
   //
   // If we get here, then the SEC Core returned. This is an error as SEC should
@@ -325,39 +328,39 @@ main (
   exit (1);
 }
 
-
 EFI_PHYSICAL_ADDRESS *
 MapMemory (
-  IN INTN   fd,
-  IN UINT64 length,
-  IN INTN   prot,
-  IN INTN   flags
+  IN INTN    fd,
+  IN UINT64  length,
+  IN INTN    prot,
+  IN INTN    flags
   )
 {
-  STATIC UINTN base  = 0x40000000;
-  CONST UINTN  align = (1 << 24);
-  VOID         *res  = NULL;
-  BOOLEAN      isAligned = 0;
+  STATIC UINTN  base      = 0x40000000;
+  CONST UINTN   align     = (1 << 24);
+  VOID          *res      = NULL;
+  BOOLEAN       isAligned = 0;
 
   //
   // Try to get an aligned block somewhere in the address space of this
   // process.
   //
-  while((!isAligned) && (base != 0)) {
+  while ((!isAligned) && (base != 0)) {
     res = mmap ((void *)base, length, prot, flags, fd, 0);
     if (res == MAP_FAILED) {
       return NULL;
     }
+
     if ((((UINTN)res) & ~(align-1)) == (UINTN)res) {
-      isAligned=1;
+      isAligned = 1;
     } else {
-      munmap(res, length);
+      munmap (res, length);
       base += align;
     }
   }
+
   return res;
 }
-
 
 /*++
 
@@ -389,16 +392,16 @@ MapFile (
   OUT UINT64                    *Length
   )
 {
-  int     fd;
-  VOID    *res;
-  UINTN   FileSize;
+  int    fd;
+  VOID   *res;
+  UINTN  FileSize;
 
   fd = open (FileName, O_RDWR);
   if (fd < 0) {
     return EFI_NOT_FOUND;
   }
-  FileSize = lseek (fd, 0, SEEK_END);
 
+  FileSize = lseek (fd, 0, SEEK_END);
 
   res = MapMemory (fd, FileSize, PROT_READ | PROT_EXEC, MAP_PRIVATE);
 
@@ -409,8 +412,8 @@ MapFile (
     return EFI_DEVICE_ERROR;
   }
 
-  *Length = (UINT64) FileSize;
-  *BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) res;
+  *Length      = (UINT64)FileSize;
+  *BaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)res;
 
   return EFI_SUCCESS;
 }
@@ -422,16 +425,17 @@ MapFd0 (
   OUT UINT64                    *Length
   )
 {
-  int     fd;
-  void    *res, *res2, *res3;
-  UINTN   FileSize;
-  UINTN   FvSize;
-  void    *EmuMagicPage;
+  int    fd;
+  void   *res, *res2, *res3;
+  UINTN  FileSize;
+  UINTN  FvSize;
+  void   *EmuMagicPage;
 
   fd = open (FileName, O_RDWR);
   if (fd < 0) {
     return EFI_NOT_FOUND;
   }
+
   FileSize = lseek (fd, 0, SEEK_END);
 
   FvSize = FixedPcdGet64 (PcdEmuFlashFvRecoverySize);
@@ -469,13 +473,13 @@ MapFd0 (
 
   // Map the rest of the FD as read/write
   res2 = mmap (
-          (void *)(UINTN)(FixedPcdGet64 (PcdEmuFlashFvRecoveryBase) + FvSize),
-          FileSize - FvSize,
-          PROT_READ | PROT_WRITE | PROT_EXEC,
-          MAP_SHARED,
-          fd,
-          FvSize
-          );
+           (void *)(UINTN)(FixedPcdGet64 (PcdEmuFlashFvRecoveryBase) + FvSize),
+           FileSize - FvSize,
+           PROT_READ | PROT_WRITE | PROT_EXEC,
+           MAP_SHARED,
+           fd,
+           FvSize
+           );
   close (fd);
   if (res2 == MAP_FAILED) {
     perror ("MapFd0() Failed res2 =");
@@ -504,12 +508,11 @@ MapFd0 (
     }
   }
 
-  *Length = (UINT64) FileSize;
-  *BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) res;
+  *Length      = (UINT64)FileSize;
+  *BaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)res;
 
   return EFI_SUCCESS;
 }
-
 
 /*++
 
@@ -528,24 +531,24 @@ Returns:
 **/
 VOID
 SecLoadFromCore (
-  IN  UINTN   LargestRegion,
-  IN  UINTN   LargestRegionSize,
-  IN  UINTN   BootFirmwareVolumeBase,
-  IN  VOID    *PeiCorePe32File
+  IN  UINTN  LargestRegion,
+  IN  UINTN  LargestRegionSize,
+  IN  UINTN  BootFirmwareVolumeBase,
+  IN  VOID   *PeiCorePe32File
   )
 {
-  EFI_STATUS                  Status;
-  EFI_PHYSICAL_ADDRESS        TopOfMemory;
-  VOID                        *TopOfStack;
-  EFI_PHYSICAL_ADDRESS        PeiCoreEntryPoint;
-  EFI_SEC_PEI_HAND_OFF        *SecCoreData;
-  UINTN                       PeiStackSize;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  TopOfMemory;
+  VOID                  *TopOfStack;
+  EFI_PHYSICAL_ADDRESS  PeiCoreEntryPoint;
+  EFI_SEC_PEI_HAND_OFF  *SecCoreData;
+  UINTN                 PeiStackSize;
 
   //
   // Compute Top Of Memory for Stack and PEI Core Allocations
   //
   TopOfMemory  = LargestRegion + LargestRegionSize;
-  PeiStackSize = (UINTN)RShiftU64((UINT64)STACK_SIZE,1);
+  PeiStackSize = (UINTN)RShiftU64 ((UINT64)STACK_SIZE, 1);
 
   //
   // |-----------| <---- TemporaryRamBase + TemporaryRamSize
@@ -562,22 +565,21 @@ SecLoadFromCore (
   //
   // Reservet space for storing PeiCore's parament in stack.
   //
-  TopOfStack  = (VOID *)((UINTN)TopOfStack - sizeof (EFI_SEC_PEI_HAND_OFF) - CPU_STACK_ALIGNMENT);
-  TopOfStack  = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
-
+  TopOfStack = (VOID *)((UINTN)TopOfStack - sizeof (EFI_SEC_PEI_HAND_OFF) - CPU_STACK_ALIGNMENT);
+  TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
 
   //
   // Bind this information into the SEC hand-off state
   //
-  SecCoreData                         = (EFI_SEC_PEI_HAND_OFF*)(UINTN) TopOfStack;
-  SecCoreData->DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
-  SecCoreData->BootFirmwareVolumeBase = (VOID*)BootFirmwareVolumeBase;
+  SecCoreData                         = (EFI_SEC_PEI_HAND_OFF *)(UINTN)TopOfStack;
+  SecCoreData->DataSize               = sizeof (EFI_SEC_PEI_HAND_OFF);
+  SecCoreData->BootFirmwareVolumeBase = (VOID *)BootFirmwareVolumeBase;
   SecCoreData->BootFirmwareVolumeSize = PcdGet32 (PcdEmuFirmwareFdSize);
-  SecCoreData->TemporaryRamBase       = (VOID*)(UINTN)LargestRegion;
+  SecCoreData->TemporaryRamBase       = (VOID *)(UINTN)LargestRegion;
   SecCoreData->TemporaryRamSize       = STACK_SIZE;
   SecCoreData->StackBase              = SecCoreData->TemporaryRamBase;
   SecCoreData->StackSize              = PeiStackSize;
-  SecCoreData->PeiTemporaryRamBase    = (VOID*) ((UINTN) SecCoreData->TemporaryRamBase + PeiStackSize);
+  SecCoreData->PeiTemporaryRamBase    = (VOID *)((UINTN)SecCoreData->TemporaryRamBase + PeiStackSize);
   SecCoreData->PeiTemporaryRamSize    = STACK_SIZE - PeiStackSize;
 
   //
@@ -585,14 +587,14 @@ SecLoadFromCore (
   //
   Status = SecPeCoffGetEntryPoint (PeiCorePe32File, (VOID **)&PeiCoreEntryPoint);
   if (EFI_ERROR (Status)) {
-    return ;
+    return;
   }
 
   //
   // Transfer control to the SEC Core
   //
   PeiSwitchStacks (
-    (SWITCH_STACK_ENTRY_POINT) (UINTN) PeiCoreEntryPoint,
+    (SWITCH_STACK_ENTRY_POINT)(UINTN)PeiCoreEntryPoint,
     SecCoreData,
     (VOID *)gPpiList,
     TopOfStack
@@ -600,9 +602,8 @@ SecLoadFromCore (
   //
   // If we get here, then the SEC Core returned.  This is an error
   //
-  return ;
+  return;
 }
-
 
 /*++
 
@@ -631,28 +632,29 @@ SecUnixPeiAutoScan (
   OUT UINT64                *MemorySize
   )
 {
-  void *res;
+  void  *res;
 
   if (Index >= gSystemMemoryCount) {
     return EFI_UNSUPPORTED;
   }
 
   *MemoryBase = 0;
-  res = MapMemory (
-          0, gSystemMemory[Index].Size,
-          PROT_READ | PROT_WRITE | PROT_EXEC,
-          MAP_PRIVATE | MAP_ANONYMOUS
-          );
+  res         = MapMemory (
+                  0,
+                  gSystemMemory[Index].Size,
+                  PROT_READ | PROT_WRITE | PROT_EXEC,
+                  MAP_PRIVATE | MAP_ANONYMOUS
+                  );
   if (res == MAP_FAILED) {
     return EFI_DEVICE_ERROR;
   }
-  *MemorySize = gSystemMemory[Index].Size;
-  *MemoryBase = (UINTN)res;
+
+  *MemorySize                 = gSystemMemory[Index].Size;
+  *MemoryBase                 = (UINTN)res;
   gSystemMemory[Index].Memory = *MemoryBase;
 
   return EFI_SUCCESS;
 }
-
 
 /*++
 
@@ -675,7 +677,7 @@ Returns:
 **/
 BOOLEAN
 EfiSystemMemoryRange (
-  IN  VOID *MemoryAddress
+  IN  VOID  *MemoryAddress
   )
 {
   UINTN                 Index;
@@ -684,14 +686,14 @@ EfiSystemMemoryRange (
   MemoryBase = (EFI_PHYSICAL_ADDRESS)(UINTN)MemoryAddress;
   for (Index = 0; Index < gSystemMemoryCount; Index++) {
     if ((MemoryBase >= gSystemMemory[Index].Memory) &&
-        (MemoryBase < (gSystemMemory[Index].Memory + gSystemMemory[Index].Size)) ) {
+        (MemoryBase < (gSystemMemory[Index].Memory + gSystemMemory[Index].Size)))
+    {
       return TRUE;
     }
   }
 
   return FALSE;
 }
-
 
 /*++
 
@@ -715,8 +717,6 @@ SecEmuThunkAddress (
   return &gEmuThunkProtocol;
 }
 
-
-
 RETURN_STATUS
 EFIAPI
 SecPeCoffGetEntryPoint (
@@ -728,10 +728,10 @@ SecPeCoffGetEntryPoint (
   PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
 
   ZeroMem (&ImageContext, sizeof (ImageContext));
-  ImageContext.Handle     = Pe32Data;
-  ImageContext.ImageRead  = (PE_COFF_LOADER_READ_FILE) SecImageRead;
+  ImageContext.Handle    = Pe32Data;
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE)SecImageRead;
 
-  Status                  = PeCoffLoaderGetImageInfo (&ImageContext);
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -741,7 +741,7 @@ SecPeCoffGetEntryPoint (
     // Relocate image to match the address where it resides
     //
     ImageContext.ImageAddress = (UINTN)Pe32Data;
-    Status = PeCoffLoaderLoadImage (&ImageContext);
+    Status                    = PeCoffLoaderLoadImage (&ImageContext);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -755,10 +755,11 @@ SecPeCoffGetEntryPoint (
     // Or just return image entry point
     //
     ImageContext.PdbPointer = PeCoffLoaderGetPdbPointer (Pe32Data);
-    Status = PeCoffLoaderGetEntryPoint (Pe32Data, EntryPoint);
+    Status                  = PeCoffLoaderGetEntryPoint (Pe32Data, EntryPoint);
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     ImageContext.EntryPoint = (UINTN)*EntryPoint;
   }
 
@@ -768,8 +769,6 @@ SecPeCoffGetEntryPoint (
 
   return Status;
 }
-
-
 
 /*++
 
@@ -804,7 +803,7 @@ SecUnixFdAddress (
   *FdSize = gFdInfo[Index].Size;
   *FixUp  = 0;
 
-  if (*FdBase == 0 && *FdSize == 0) {
+  if ((*FdBase == 0) && (*FdSize == 0)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -819,7 +818,6 @@ SecUnixFdAddress (
 
   return EFI_SUCCESS;
 }
-
 
 /*++
 
@@ -836,11 +834,11 @@ Returns:
 **/
 UINTN
 CountSeparatorsInString (
-  IN  const CHAR16   *String,
-  IN  CHAR16         Separator
+  IN  const CHAR16  *String,
+  IN  CHAR16        Separator
   )
 {
-  UINTN Count;
+  UINTN  Count;
 
   for (Count = 0; *String != '\0'; String++) {
     if (*String == Separator) {
@@ -851,15 +849,15 @@ CountSeparatorsInString (
   return Count;
 }
 
-
 EFI_STATUS
 EFIAPI
 SecImageRead (
-  IN     VOID    *FileHandle,
-  IN     UINTN   FileOffset,
-  IN OUT UINTN   *ReadSize,
-  OUT    VOID    *Buffer
+  IN     VOID   *FileHandle,
+  IN     UINTN  FileOffset,
+  IN OUT UINTN  *ReadSize,
+  OUT    VOID   *Buffer
   )
+
 /*++
 
 Routine Description:
@@ -876,20 +874,19 @@ Returns:
 
 **/
 {
-  CHAR8 *Destination8;
-  CHAR8 *Source8;
-  UINTN Length;
+  CHAR8  *Destination8;
+  CHAR8  *Source8;
+  UINTN  Length;
 
-  Destination8  = Buffer;
-  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
-  Length        = *ReadSize;
+  Destination8 = Buffer;
+  Source8      = (CHAR8 *)((UINTN)FileHandle + FileOffset);
+  Length       = *ReadSize;
   while (Length--) {
     *(Destination8++) = *(Source8++);
   }
 
   return EFI_SUCCESS;
 }
-
 
 /*++
 
@@ -909,14 +906,13 @@ Returns:
 **/
 EFI_STATUS
 AddHandle (
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext,
-  IN  VOID                                 *ModHandle
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext,
+  IN  VOID                          *ModHandle
   )
 {
-  UINTN                       Index;
-  IMAGE_CONTEXT_TO_MOD_HANDLE *Array;
-  UINTN                       PreviousSize;
-
+  UINTN                        Index;
+  IMAGE_CONTEXT_TO_MOD_HANDLE  *Array;
+  UINTN                        PreviousSize;
 
   Array = mImageContextModHandleArray;
   for (Index = 0; Index < mImageContextModHandleArraySize; Index++, Array++) {
@@ -936,7 +932,7 @@ AddHandle (
   // copy the old values to the new location. But it does
   // not zero the new memory area.
   //
-  PreviousSize = mImageContextModHandleArraySize * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE);
+  PreviousSize                     = mImageContextModHandleArraySize * sizeof (IMAGE_CONTEXT_TO_MOD_HANDLE);
   mImageContextModHandleArraySize += MAX_IMAGE_CONTEXT_TO_MOD_HANDLE_ARRAY_SIZE;
 
   mImageContextModHandleArray = ReallocatePool (
@@ -954,7 +950,6 @@ AddHandle (
   return AddHandle (ImageContext, ModHandle);
 }
 
-
 /*++
 
 Routine Description:
@@ -971,7 +966,7 @@ Returns:
 **/
 VOID *
 RemoveHandle (
-  IN  PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  IN  PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
   UINTN                        Index;
@@ -998,59 +993,59 @@ RemoveHandle (
   return NULL;
 }
 
-
-
 BOOLEAN
 IsPdbFile (
-  IN  CHAR8   *PdbFileName
+  IN  CHAR8  *PdbFileName
   )
 {
-  UINTN Len;
+  UINTN  Len;
 
   if (PdbFileName == NULL) {
     return FALSE;
   }
 
   Len = strlen (PdbFileName);
-  if ((Len < 5)|| (PdbFileName[Len - 4] != '.')) {
+  if ((Len < 5) || (PdbFileName[Len - 4] != '.')) {
     return FALSE;
   }
 
-  if ((PdbFileName[Len - 3] == 'P' || PdbFileName[Len - 3] == 'p') &&
-      (PdbFileName[Len - 2] == 'D' || PdbFileName[Len - 2] == 'd') &&
-      (PdbFileName[Len - 1] == 'B' || PdbFileName[Len - 1] == 'b')) {
+  if (((PdbFileName[Len - 3] == 'P') || (PdbFileName[Len - 3] == 'p')) &&
+      ((PdbFileName[Len - 2] == 'D') || (PdbFileName[Len - 2] == 'd')) &&
+      ((PdbFileName[Len - 1] == 'B') || (PdbFileName[Len - 1] == 'b')))
+  {
     return TRUE;
   }
 
   return FALSE;
 }
 
-
-#define MAX_SPRINT_BUFFER_SIZE 0x200
+#define MAX_SPRINT_BUFFER_SIZE  0x200
 
 void
 PrintLoadAddress (
-  IN PE_COFF_LOADER_IMAGE_CONTEXT          *ImageContext
+  IN PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
   if (ImageContext->PdbPointer == NULL) {
-    fprintf (stderr,
+    fprintf (
+      stderr,
       "0x%08lx Loading NO DEBUG with entry point 0x%08lx\n",
       (unsigned long)(ImageContext->ImageAddress),
       (unsigned long)ImageContext->EntryPoint
       );
   } else {
-    fprintf (stderr,
+    fprintf (
+      stderr,
       "0x%08lx Loading %s with entry point 0x%08lx\n",
       (unsigned long)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders),
       ImageContext->PdbPointer,
       (unsigned long)ImageContext->EntryPoint
       );
   }
+
   // Keep output synced up
   fflush (stderr);
 }
-
 
 /**
   Loads the image using dlopen so symbols will be automatically
@@ -1064,18 +1059,17 @@ PrintLoadAddress (
 **/
 BOOLEAN
 DlLoadImage (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-
-#ifdef __APPLE__
+ #ifdef __APPLE__
 
   return FALSE;
 
-#else
+ #else
 
-  void        *Handle = NULL;
-  void        *Entry = NULL;
+  void  *Handle = NULL;
+  void  *Entry  = NULL;
 
   if (ImageContext->PdbPointer == NULL) {
     return FALSE;
@@ -1086,19 +1080,19 @@ DlLoadImage (
   }
 
   fprintf (
-     stderr,
-     "Loading %s 0x%08lx - entry point 0x%08lx\n",
-     ImageContext->PdbPointer,
-     (unsigned long)ImageContext->ImageAddress,
-     (unsigned long)ImageContext->EntryPoint
-     );
+    stderr,
+    "Loading %s 0x%08lx - entry point 0x%08lx\n",
+    ImageContext->PdbPointer,
+    (unsigned long)ImageContext->ImageAddress,
+    (unsigned long)ImageContext->EntryPoint
+    );
 
   Handle = dlopen (ImageContext->PdbPointer, RTLD_NOW);
   if (Handle != NULL) {
     Entry = dlsym (Handle, "_ModuleEntryPoint");
     AddHandle (ImageContext, Handle);
   } else {
-    printf("%s\n", dlerror());
+    printf ("%s\n", dlerror ());
   }
 
   if (Entry != NULL) {
@@ -1109,24 +1103,22 @@ DlLoadImage (
     return FALSE;
   }
 
-#endif
+ #endif
 }
 
-
 #ifdef __APPLE__
-__attribute__((noinline))
+__attribute__ ((noinline))
 #endif
 VOID
 SecGdbScriptBreak (
-  char                *FileName,
-  int                 FileNameLength,
-  long unsigned int   LoadAddress,
-  int                 AddSymbolFlag
+  char               *FileName,
+  int                FileNameLength,
+  long unsigned int  LoadAddress,
+  int                AddSymbolFlag
   )
 {
   return;
 }
-
 
 /**
   Adds the image to a gdb script so its symbols can be loaded.
@@ -1137,18 +1129,17 @@ SecGdbScriptBreak (
 **/
 VOID
 GdbScriptAddImage (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-
   PrintLoadAddress (ImageContext);
 
-  if (ImageContext->PdbPointer != NULL && !IsPdbFile (ImageContext->PdbPointer)) {
+  if ((ImageContext->PdbPointer != NULL) && !IsPdbFile (ImageContext->PdbPointer)) {
     FILE  *GdbTempFile;
     if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {
       GdbTempFile = fopen (gGdbWorkingFileName, "a");
       if (GdbTempFile != NULL) {
-        long unsigned int SymbolsAddr = (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders);
+        long unsigned int  SymbolsAddr = (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders);
         mScriptSymbolChangesCount++;
         fprintf (
           GdbTempFile,
@@ -1188,18 +1179,16 @@ GdbScriptAddImage (
   }
 }
 
-
 VOID
 EFIAPI
 SecPeCoffRelocateImageExtraAction (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
   if (!DlLoadImage (ImageContext)) {
     GdbScriptAddImage (ImageContext);
   }
 }
-
 
 /**
   Adds the image to a gdb script so its symbols can be unloaded.
@@ -1210,7 +1199,7 @@ SecPeCoffRelocateImageExtraAction (
 **/
 VOID
 GdbScriptRemoveImage (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
   FILE  *GdbTempFile;
@@ -1257,27 +1246,24 @@ GdbScriptRemoveImage (
   }
 }
 
-
 VOID
 EFIAPI
 SecPeCoffUnloadImageExtraAction (
-  IN PE_COFF_LOADER_IMAGE_CONTEXT         *ImageContext
+  IN PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-  VOID *Handle;
+  VOID  *Handle;
 
   //
   // Check to see if the image symbols were loaded with gdb script, or dlopen
   //
   Handle = RemoveHandle (ImageContext);
   if (Handle != NULL) {
-#ifndef __APPLE__
+ #ifndef __APPLE__
     dlclose (Handle);
-#endif
+ #endif
     return;
   }
 
   GdbScriptRemoveImage (ImageContext);
 }
-
-

@@ -20,16 +20,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #pragma pack(1)
 typedef struct _NT_NET_INTERFACE_INFO {
-  UINT32          InterfaceIndex;
-  EFI_MAC_ADDRESS MacAddr;
+  UINT32             InterfaceIndex;
+  EFI_MAC_ADDRESS    MacAddr;
 } NT_NET_INTERFACE_INFO;
 #pragma pack()
 
-#define NET_ETHER_HEADER_SIZE         14
-#define MAX_INTERFACE_INFO_NUMBER     16
-#define SNP_MAX_TX_BUFFER_NUM         65536
-#define SNP_TX_BUFFER_INCREASEMENT    32
-#define DEFAULT_SELECTED_NIC_INDEX    0
+#define NET_ETHER_HEADER_SIZE       14
+#define MAX_INTERFACE_INFO_NUMBER   16
+#define SNP_MAX_TX_BUFFER_NUM       65536
+#define SNP_TX_BUFFER_INCREASEMENT  32
+#define DEFAULT_SELECTED_NIC_INDEX  0
 
 //
 //  Functions in Net Library
@@ -37,8 +37,8 @@ typedef struct _NT_NET_INTERFACE_INFO {
 typedef
 INT32
 (*NT_NET_INITIALIZE) (
-  IN OUT  UINT32                *InterfaceCount,
-  IN OUT  NT_NET_INTERFACE_INFO * InterfaceInfoBuffer
+  IN OUT  UINT32                 *InterfaceCount,
+  IN OUT  NT_NET_INTERFACE_INFO  *InterfaceInfoBuffer
   );
 
 typedef
@@ -50,84 +50,83 @@ INT32
 typedef
 INT32
 (*NT_NET_SET_RECEIVE_FILTER) (
-  IN  UINT32                        Index,
-  IN  UINT32                        EnableFilter,
-  IN  UINT32                        MCastFilterCnt,
-  IN  EFI_MAC_ADDRESS               * MCastFilter
+  IN  UINT32           Index,
+  IN  UINT32           EnableFilter,
+  IN  UINT32           MCastFilterCnt,
+  IN  EFI_MAC_ADDRESS  *MCastFilter
   );
 
 typedef
 INT32
 (*NT_NET_RECEIVE) (
-  IN      UINT32                        Index,
-  IN OUT  UINT32                        *BufferSize,
-  OUT     VOID                          *Buffer
+  IN      UINT32  Index,
+  IN OUT  UINT32  *BufferSize,
+  OUT     VOID    *Buffer
   );
 
 typedef
 INT32
 (*NT_NET_TRANSMIT) (
-  IN  UINT32                        Index,
-  IN  UINT32                        HeaderSize,
-  IN  UINT32                        BufferSize,
-  IN  VOID                          *Buffer,
-  IN  EFI_MAC_ADDRESS               * SrcAddr,
-  IN  EFI_MAC_ADDRESS               * DestAddr,
-  IN  UINT16                        *Protocol
+  IN  UINT32           Index,
+  IN  UINT32           HeaderSize,
+  IN  UINT32           BufferSize,
+  IN  VOID             *Buffer,
+  IN  EFI_MAC_ADDRESS  *SrcAddr,
+  IN  EFI_MAC_ADDRESS  *DestAddr,
+  IN  UINT16           *Protocol
   );
 
 typedef struct _NT_NET_UTILITY_TABLE {
-  NT_NET_INITIALIZE         Initialize;
-  NT_NET_FINALIZE           Finalize;
-  NT_NET_SET_RECEIVE_FILTER SetReceiveFilter;
-  NT_NET_RECEIVE            Receive;
-  NT_NET_TRANSMIT           Transmit;
+  NT_NET_INITIALIZE            Initialize;
+  NT_NET_FINALIZE              Finalize;
+  NT_NET_SET_RECEIVE_FILTER    SetReceiveFilter;
+  NT_NET_RECEIVE               Receive;
+  NT_NET_TRANSMIT              Transmit;
 } NT_NET_UTILITY_TABLE;
 
 //
 //  Instance data for each fake SNP instance
 //
-#define WIN_NT_INSTANCE_SIGNATURE SIGNATURE_32 ('N', 'T', 'I', 'S')
+#define WIN_NT_INSTANCE_SIGNATURE  SIGNATURE_32 ('N', 'T', 'I', 'S')
 
 typedef struct  {
-  UINT32                      Signature;
+  UINT32                     Signature;
 
   //
   // Array of the recycled transmit buffer address.
   //
-  UINT64                      *RecycledTxBuf;
+  UINT64                     *RecycledTxBuf;
 
   //
   // Current number of recycled buffer pointers in RecycledTxBuf.
   //
-  UINT32                      RecycledTxBufCount;
+  UINT32                     RecycledTxBufCount;
 
   //
   // The maximum number of recycled buffer pointers in RecycledTxBuf.
   //
-  UINT32                      MaxRecycledTxBuf;
-  EFI_SIMPLE_NETWORK_MODE     Mode;
-  NT_NET_INTERFACE_INFO       InterfaceInfo;
+  UINT32                     MaxRecycledTxBuf;
+  EFI_SIMPLE_NETWORK_MODE    Mode;
+  NT_NET_INTERFACE_INFO      InterfaceInfo;
 } WIN_NT_INSTANCE_DATA;
 
 //
 //  Instance data for each SNP private instance
 //
-#define WIN_NT_SIMPLE_NETWORK_PRIVATE_SIGNATURE SIGNATURE_32 ('N', 'T', 's', 'n')
+#define WIN_NT_SIMPLE_NETWORK_PRIVATE_SIGNATURE  SIGNATURE_32 ('N', 'T', 's', 'n')
 
 typedef struct {
-  UINTN                       Signature;
-  EMU_IO_THUNK_PROTOCOL       *Thunk;
-  EMU_SNP_PROTOCOL            EmuSnp;
-  EFI_SIMPLE_NETWORK_MODE     *Mode;
-  HMODULE                     NetworkLibraryHandle;
-  NT_NET_UTILITY_TABLE        NtNetUtilityTable;
-  WIN_NT_INSTANCE_DATA        Instance;
+  UINTN                      Signature;
+  EMU_IO_THUNK_PROTOCOL      *Thunk;
+  EMU_SNP_PROTOCOL           EmuSnp;
+  EFI_SIMPLE_NETWORK_MODE    *Mode;
+  HMODULE                    NetworkLibraryHandle;
+  NT_NET_UTILITY_TABLE       NtNetUtilityTable;
+  WIN_NT_INSTANCE_DATA       Instance;
 } WIN_NT_SNP_PRIVATE;
 
 #define WIN_NT_SNP_PRIVATE_DATA_FROM_THIS(a) \
          CR(a, WIN_NT_SNP_PRIVATE, EmuSnp, WIN_NT_SIMPLE_NETWORK_PRIVATE_SIGNATURE)
-
 
 /**
   Register storage for SNP Mode.
@@ -145,7 +144,7 @@ WinNtSnpCreateMapping (
   IN     EFI_SIMPLE_NETWORK_MODE  *Mode
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -181,7 +180,7 @@ WinNtSnpStart (
   IN EMU_SNP_PROTOCOL  *This
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -221,7 +220,7 @@ WinNtSnpStop (
   IN EMU_SNP_PROTOCOL  *This
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -271,12 +270,12 @@ WinNtSnpStop (
 **/
 EFI_STATUS
 WinNtSnpInitialize (
-  IN EMU_SNP_PROTOCOL                    *This,
-  IN UINTN                               ExtraRxBufferSize  OPTIONAL,
-  IN UINTN                               ExtraTxBufferSize  OPTIONAL
+  IN EMU_SNP_PROTOCOL  *This,
+  IN UINTN             ExtraRxBufferSize  OPTIONAL,
+  IN UINTN             ExtraTxBufferSize  OPTIONAL
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -293,7 +292,7 @@ WinNtSnpInitialize (
       break;
   }
 
-  Private->Mode->MCastFilterCount = 0;
+  Private->Mode->MCastFilterCount     = 0;
   Private->Mode->ReceiveFilterSetting = 0;
   ZeroMem (Private->Mode->MCastFilter, sizeof (Private->Mode->MCastFilter));
 
@@ -320,11 +319,11 @@ WinNtSnpInitialize (
 **/
 EFI_STATUS
 WinNtSnpReset (
-  IN EMU_SNP_PROTOCOL   *This,
-  IN BOOLEAN            ExtendedVerification
+  IN EMU_SNP_PROTOCOL  *This,
+  IN BOOLEAN           ExtendedVerification
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -362,7 +361,7 @@ WinNtSnpShutdown (
   IN EMU_SNP_PROTOCOL  *This
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -382,7 +381,7 @@ WinNtSnpShutdown (
   Private->Mode->State = EfiSimpleNetworkStarted;
 
   Private->Mode->ReceiveFilterSetting = 0;
-  Private->Mode->MCastFilterCount = 0;
+  Private->Mode->MCastFilterCount     = 0;
   ZeroMem (Private->Mode->MCastFilter, sizeof (Private->Mode->MCastFilter));
 
   return EFI_SUCCESS;
@@ -414,25 +413,25 @@ WinNtSnpShutdown (
 **/
 EFI_STATUS
 WinNtSnpReceiveFilters (
-  IN EMU_SNP_PROTOCOL                             *This,
-  IN UINT32                                       Enable,
-  IN UINT32                                       Disable,
-  IN BOOLEAN                                      ResetMCastFilter,
-  IN UINTN                                        MCastFilterCnt     OPTIONAL,
-  IN EFI_MAC_ADDRESS                              *MCastFilter OPTIONAL
+  IN EMU_SNP_PROTOCOL  *This,
+  IN UINT32            Enable,
+  IN UINT32            Disable,
+  IN BOOLEAN           ResetMCastFilter,
+  IN UINTN             MCastFilterCnt     OPTIONAL,
+  IN EFI_MAC_ADDRESS   *MCastFilter OPTIONAL
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
-  INT32                 ReturnValue;
+  WIN_NT_SNP_PRIVATE  *Private;
+  INT32               ReturnValue;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
   ReturnValue = Private->NtNetUtilityTable.SetReceiveFilter (
-                                                Private->Instance.InterfaceInfo.InterfaceIndex,
-                                                Enable,
-                                                (UINT32)MCastFilterCnt,
-                                                MCastFilter
-                                                );
+                                             Private->Instance.InterfaceInfo.InterfaceIndex,
+                                             Enable,
+                                             (UINT32)MCastFilterCnt,
+                                             MCastFilter
+                                             );
 
   if (ReturnValue <= 0) {
     return EFI_DEVICE_ERROR;
@@ -458,12 +457,12 @@ WinNtSnpReceiveFilters (
 **/
 EFI_STATUS
 WinNtSnpStationAddress (
-  IN EMU_SNP_PROTOCOL            *This,
-  IN BOOLEAN                     Reset,
-  IN EFI_MAC_ADDRESS             *New OPTIONAL
+  IN EMU_SNP_PROTOCOL  *This,
+  IN BOOLEAN           Reset,
+  IN EFI_MAC_ADDRESS   *New OPTIONAL
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -493,13 +492,13 @@ WinNtSnpStationAddress (
 **/
 EFI_STATUS
 WinNtSnpStatistics (
-  IN EMU_SNP_PROTOCOL                     *This,
-  IN BOOLEAN                              Reset,
-  IN OUT UINTN                            *StatisticsSize   OPTIONAL,
-  OUT EFI_NETWORK_STATISTICS              *StatisticsTable  OPTIONAL
+  IN EMU_SNP_PROTOCOL         *This,
+  IN BOOLEAN                  Reset,
+  IN OUT UINTN                *StatisticsSize   OPTIONAL,
+  OUT EFI_NETWORK_STATISTICS  *StatisticsTable  OPTIONAL
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -529,13 +528,13 @@ WinNtSnpStatistics (
 **/
 EFI_STATUS
 WinNtSnpMCastIpToMac (
-  IN EMU_SNP_PROTOCOL                     *This,
-  IN BOOLEAN                              IPv6,
-  IN EFI_IP_ADDRESS                       *IP,
-  OUT EFI_MAC_ADDRESS                     *MAC
+  IN EMU_SNP_PROTOCOL  *This,
+  IN BOOLEAN           IPv6,
+  IN EFI_IP_ADDRESS    *IP,
+  OUT EFI_MAC_ADDRESS  *MAC
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -564,14 +563,14 @@ WinNtSnpMCastIpToMac (
 **/
 EFI_STATUS
 WinNtSnpNvData (
-  IN EMU_SNP_PROTOCOL                     *This,
-  IN BOOLEAN                              ReadWrite,
-  IN UINTN                                Offset,
-  IN UINTN                                BufferSize,
-  IN OUT VOID                             *Buffer
+  IN EMU_SNP_PROTOCOL  *This,
+  IN BOOLEAN           ReadWrite,
+  IN UINTN             Offset,
+  IN UINTN             BufferSize,
+  IN OUT VOID          *Buffer
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -605,21 +604,21 @@ WinNtSnpNvData (
 **/
 EFI_STATUS
 WinNtSnpGetStatus (
-  IN EMU_SNP_PROTOCOL                     *This,
-  OUT UINT32                              *InterruptStatus OPTIONAL,
-  OUT VOID                                **TxBuf OPTIONAL
+  IN EMU_SNP_PROTOCOL  *This,
+  OUT UINT32           *InterruptStatus OPTIONAL,
+  OUT VOID             **TxBuf OPTIONAL
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
+  WIN_NT_SNP_PRIVATE  *Private;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
   if (TxBuf != NULL) {
     if (Private->Instance.RecycledTxBufCount != 0) {
-      Private->Instance.RecycledTxBufCount --;
-      *((UINT8 **) TxBuf)    = (UINT8 *) (UINTN)Private->Instance.RecycledTxBuf[Private->Instance.RecycledTxBufCount];
+      Private->Instance.RecycledTxBufCount--;
+      *((UINT8 **)TxBuf) = (UINT8 *)(UINTN)Private->Instance.RecycledTxBuf[Private->Instance.RecycledTxBufCount];
     } else {
-      *((UINT8 **) TxBuf)    = NULL;
+      *((UINT8 **)TxBuf) = NULL;
     }
   }
 
@@ -665,18 +664,18 @@ WinNtSnpGetStatus (
 **/
 EFI_STATUS
 WinNtSnpTransmit (
-  IN EMU_SNP_PROTOCOL                     *This,
-  IN UINTN                                HeaderSize,
-  IN UINTN                                BufferSize,
-  IN VOID                                 *Buffer,
-  IN EFI_MAC_ADDRESS                      *SrcAddr  OPTIONAL,
-  IN EFI_MAC_ADDRESS                      *DestAddr OPTIONAL,
-  IN UINT16                               *Protocol OPTIONAL
+  IN EMU_SNP_PROTOCOL  *This,
+  IN UINTN             HeaderSize,
+  IN UINTN             BufferSize,
+  IN VOID              *Buffer,
+  IN EFI_MAC_ADDRESS   *SrcAddr  OPTIONAL,
+  IN EFI_MAC_ADDRESS   *DestAddr OPTIONAL,
+  IN UINT16            *Protocol OPTIONAL
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
-  INT32                 ReturnValue;
-  UINT64                *Tmp;
+  WIN_NT_SNP_PRIVATE  *Private;
+  INT32               ReturnValue;
+  UINT64              *Tmp;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -685,14 +684,14 @@ WinNtSnpTransmit (
   }
 
   ReturnValue = Private->NtNetUtilityTable.Transmit (
-                                                Private->Instance.InterfaceInfo.InterfaceIndex,
-                                                (UINT32)HeaderSize,
-                                                (UINT32)BufferSize,
-                                                Buffer,
-                                                SrcAddr,
-                                                DestAddr,
-                                                Protocol
-                                                );
+                                             Private->Instance.InterfaceInfo.InterfaceIndex,
+                                             (UINT32)HeaderSize,
+                                             (UINT32)BufferSize,
+                                             Buffer,
+                                             SrcAddr,
+                                             DestAddr,
+                                             Protocol
+                                             );
 
   if (ReturnValue < 0) {
     return EFI_DEVICE_ERROR;
@@ -702,16 +701,17 @@ WinNtSnpTransmit (
     }
 
     if (Private->Instance.RecycledTxBufCount < Private->Instance.MaxRecycledTxBuf) {
-      Private->Instance.RecycledTxBuf[Private->Instance.RecycledTxBufCount] = (UINT64) Buffer;
-      Private->Instance.RecycledTxBufCount ++;
+      Private->Instance.RecycledTxBuf[Private->Instance.RecycledTxBufCount] = (UINT64)Buffer;
+      Private->Instance.RecycledTxBufCount++;
     } else {
       Tmp = malloc (sizeof (UINT64) * (Private->Instance.MaxRecycledTxBuf + SNP_TX_BUFFER_INCREASEMENT));
       if (Tmp == NULL) {
         return EFI_DEVICE_ERROR;
       }
+
       CopyMem (Tmp, Private->Instance.RecycledTxBuf, sizeof (UINT64) * Private->Instance.RecycledTxBufCount);
       free (Private->Instance.RecycledTxBuf);
-      Private->Instance.RecycledTxBuf    =  Tmp;
+      Private->Instance.RecycledTxBuf     =  Tmp;
       Private->Instance.MaxRecycledTxBuf += SNP_TX_BUFFER_INCREASEMENT;
     }
   }
@@ -753,30 +753,30 @@ WinNtSnpTransmit (
 **/
 EFI_STATUS
 WinNtSnpReceive (
-  IN EMU_SNP_PROTOCOL                     *This,
-  OUT UINTN                               *HeaderSize OPTIONAL,
-  IN OUT UINTN                            *BufferSize,
-  OUT VOID                                *Buffer,
-  OUT EFI_MAC_ADDRESS                     *SrcAddr    OPTIONAL,
-  OUT EFI_MAC_ADDRESS                     *DestAddr   OPTIONAL,
-  OUT UINT16                              *Protocol   OPTIONAL
+  IN EMU_SNP_PROTOCOL  *This,
+  OUT UINTN            *HeaderSize OPTIONAL,
+  IN OUT UINTN         *BufferSize,
+  OUT VOID             *Buffer,
+  OUT EFI_MAC_ADDRESS  *SrcAddr    OPTIONAL,
+  OUT EFI_MAC_ADDRESS  *DestAddr   OPTIONAL,
+  OUT UINT16           *Protocol   OPTIONAL
   )
 {
-  WIN_NT_SNP_PRIVATE    *Private;
-  INT32                 ReturnValue;
-  UINTN                 BufSize;
+  WIN_NT_SNP_PRIVATE  *Private;
+  INT32               ReturnValue;
+  UINTN               BufSize;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
-  BufSize     = *BufferSize;
+  BufSize = *BufferSize;
 
   ASSERT (Private->NtNetUtilityTable.Receive != NULL);
 
   ReturnValue = Private->NtNetUtilityTable.Receive (
-                                                Private->Instance.InterfaceInfo.InterfaceIndex,
-                                                BufferSize,
-                                                Buffer
-                                                );
+                                             Private->Instance.InterfaceInfo.InterfaceIndex,
+                                             BufferSize,
+                                             Buffer
+                                             );
 
   if (ReturnValue < 0) {
     if (ReturnValue == -100) {
@@ -794,16 +794,16 @@ WinNtSnpReceive (
 
   if (SrcAddr != NULL) {
     ZeroMem (SrcAddr, sizeof (EFI_MAC_ADDRESS));
-    CopyMem (SrcAddr, ((UINT8 *) Buffer) + 6, 6);
+    CopyMem (SrcAddr, ((UINT8 *)Buffer) + 6, 6);
   }
 
   if (DestAddr != NULL) {
     ZeroMem (DestAddr, sizeof (EFI_MAC_ADDRESS));
-    CopyMem (DestAddr, ((UINT8 *) Buffer), 6);
+    CopyMem (DestAddr, ((UINT8 *)Buffer), 6);
   }
 
   if (Protocol != NULL) {
-    *Protocol = NTOHS (*((UINT16 *) (((UINT8 *) Buffer) + 12)));
+    *Protocol = NTOHS (*((UINT16 *)(((UINT8 *)Buffer) + 12)));
   }
 
   return (*BufferSize <= BufSize) ? EFI_SUCCESS : EFI_BUFFER_TOO_SMALL;
@@ -821,27 +821,27 @@ WinNtSnpReceive (
 **/
 EFI_STATUS
 WinNtInitializeInstanceData (
-  IN OUT WIN_NT_INSTANCE_DATA  *Instance,
-  IN     NT_NET_INTERFACE_INFO *NetInfo
+  IN OUT WIN_NT_INSTANCE_DATA   *Instance,
+  IN     NT_NET_INTERFACE_INFO  *NetInfo
   )
 {
-  if (Instance == NULL || NetInfo == NULL) {
+  if ((Instance == NULL) || (NetInfo == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   ZeroMem (Instance, sizeof (WIN_NT_INSTANCE_DATA));
 
-  Instance->Signature = WIN_NT_INSTANCE_SIGNATURE;
-  Instance->RecycledTxBufCount = 0;
-  Instance->MaxRecycledTxBuf = 32;
-  Instance->Mode.State = EfiSimpleNetworkInitialized;
-  Instance->Mode.HwAddressSize = NET_ETHER_ADDR_LEN;
-  Instance->Mode.MediaHeaderSize = NET_ETHER_HEADER_SIZE;
-  Instance->Mode.MaxPacketSize = 1500;
-  Instance->Mode.MaxMCastFilterCount = MAX_MCAST_FILTER_CNT;
-  Instance->Mode.IfType = NET_IFTYPE_ETHERNET;
+  Instance->Signature                  = WIN_NT_INSTANCE_SIGNATURE;
+  Instance->RecycledTxBufCount         = 0;
+  Instance->MaxRecycledTxBuf           = 32;
+  Instance->Mode.State                 = EfiSimpleNetworkInitialized;
+  Instance->Mode.HwAddressSize         = NET_ETHER_ADDR_LEN;
+  Instance->Mode.MediaHeaderSize       = NET_ETHER_HEADER_SIZE;
+  Instance->Mode.MaxPacketSize         = 1500;
+  Instance->Mode.MaxMCastFilterCount   = MAX_MCAST_FILTER_CNT;
+  Instance->Mode.IfType                = NET_IFTYPE_ETHERNET;
   Instance->Mode.MediaPresentSupported = TRUE;
-  Instance->Mode.MediaPresent = TRUE;
+  Instance->Mode.MediaPresent          = TRUE;
 
   //
   // Allocate the RecycledTxBuf.
@@ -856,7 +856,6 @@ WinNtInitializeInstanceData (
   //
   CopyMem (&Instance->InterfaceInfo, NetInfo, sizeof (Instance->InterfaceInfo));
 
-
   //
   //  Set broadcast address
   //
@@ -865,8 +864,8 @@ WinNtInitializeInstanceData (
   //
   //  Copy Current/PermanentAddress MAC address
   //
-  CopyMem (&Instance->Mode.CurrentAddress, &Instance->InterfaceInfo.MacAddr, sizeof(Instance->Mode.CurrentAddress));
-  CopyMem (&Instance->Mode.PermanentAddress, &Instance->InterfaceInfo.MacAddr, sizeof(Instance->Mode.PermanentAddress));
+  CopyMem (&Instance->Mode.CurrentAddress, &Instance->InterfaceInfo.MacAddr, sizeof (Instance->Mode.CurrentAddress));
+  CopyMem (&Instance->Mode.PermanentAddress, &Instance->InterfaceInfo.MacAddr, sizeof (Instance->Mode.PermanentAddress));
 
   //
   //  Since the fake SNP is based on a real NIC, to avoid conflict with the host
@@ -892,20 +891,20 @@ WinNtInitializeInstanceData (
 **/
 EFI_STATUS
 WintNtInitializeNetUtilityData (
-  IN OUT WIN_NT_SNP_PRIVATE *Private,
+  IN OUT WIN_NT_SNP_PRIVATE  *Private,
   IN UINT8                   ActiveInstance
   )
 {
-  EFI_STATUS            Status;
-  CHAR16                *DllFileNameU;
-  INT32                 ReturnValue;
-  BOOLEAN               NetUtilityLibInitDone;
-  NT_NET_INTERFACE_INFO NetInterfaceInfoBuffer[MAX_INTERFACE_INFO_NUMBER];
-  UINT32                InterfaceCount;
-  UINT8                 ActiveInterfaceIndex;
+  EFI_STATUS             Status;
+  CHAR16                 *DllFileNameU;
+  INT32                  ReturnValue;
+  BOOLEAN                NetUtilityLibInitDone;
+  NT_NET_INTERFACE_INFO  NetInterfaceInfoBuffer[MAX_INTERFACE_INFO_NUMBER];
+  UINT32                 InterfaceCount;
+  UINT8                  ActiveInterfaceIndex;
 
   if (Private == NULL) {
-      return EFI_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
 
   NetUtilityLibInitDone = FALSE;
@@ -920,31 +919,31 @@ WintNtInitializeNetUtilityData (
     return EFI_NOT_FOUND;
   }
 
-  Private->NtNetUtilityTable.Initialize = (NT_NET_INITIALIZE) GetProcAddress (Private->NetworkLibraryHandle, NETWORK_LIBRARY_INITIALIZE);
+  Private->NtNetUtilityTable.Initialize = (NT_NET_INITIALIZE)GetProcAddress (Private->NetworkLibraryHandle, NETWORK_LIBRARY_INITIALIZE);
   if (NULL == Private->NtNetUtilityTable.Initialize) {
     Status = EFI_NOT_FOUND;
     goto ErrorReturn;
   }
 
-  Private->NtNetUtilityTable.Finalize = (NT_NET_FINALIZE) GetProcAddress (Private->NetworkLibraryHandle, NETWORK_LIBRARY_FINALIZE);
+  Private->NtNetUtilityTable.Finalize = (NT_NET_FINALIZE)GetProcAddress (Private->NetworkLibraryHandle, NETWORK_LIBRARY_FINALIZE);
   if (NULL == Private->NtNetUtilityTable.Finalize) {
     Status = EFI_NOT_FOUND;
     goto ErrorReturn;
   }
 
-  Private->NtNetUtilityTable.SetReceiveFilter = (NT_NET_SET_RECEIVE_FILTER) GetProcAddress (Private->NetworkLibraryHandle, NETWORK_LIBRARY_SET_RCV_FILTER);
+  Private->NtNetUtilityTable.SetReceiveFilter = (NT_NET_SET_RECEIVE_FILTER)GetProcAddress (Private->NetworkLibraryHandle, NETWORK_LIBRARY_SET_RCV_FILTER);
   if (NULL == Private->NtNetUtilityTable.SetReceiveFilter) {
     Status = EFI_NOT_FOUND;
     goto ErrorReturn;
   }
 
-  Private->NtNetUtilityTable.Receive = (NT_NET_RECEIVE) GetProcAddress (Private->NetworkLibraryHandle, NETWORK_LIBRARY_RECEIVE);
+  Private->NtNetUtilityTable.Receive = (NT_NET_RECEIVE)GetProcAddress (Private->NetworkLibraryHandle, NETWORK_LIBRARY_RECEIVE);
   if (NULL == Private->NtNetUtilityTable.Receive) {
     Status = EFI_NOT_FOUND;
     goto ErrorReturn;
   }
 
-  Private->NtNetUtilityTable.Transmit = (NT_NET_TRANSMIT) GetProcAddress (Private->NetworkLibraryHandle, NETWORK_LIBRARY_TRANSMIT);
+  Private->NtNetUtilityTable.Transmit = (NT_NET_TRANSMIT)GetProcAddress (Private->NetworkLibraryHandle, NETWORK_LIBRARY_TRANSMIT);
   if (NULL == Private->NtNetUtilityTable.Transmit) {
     Status = EFI_NOT_FOUND;
     goto ErrorReturn;
@@ -979,7 +978,7 @@ WintNtInitializeNetUtilityData (
   //
   Status = WinNtInitializeInstanceData (&Private->Instance, &NetInterfaceInfoBuffer[ActiveInterfaceIndex]);
   if (EFI_ERROR (Status)) {
-      goto ErrorReturn;
+    goto ErrorReturn;
   }
 
   return EFI_SUCCESS;
@@ -987,7 +986,7 @@ WintNtInitializeNetUtilityData (
 ErrorReturn:
 
   if (Private->Instance.RecycledTxBuf != NULL) {
-      free (Private->Instance.RecycledTxBuf);
+    free (Private->Instance.RecycledTxBuf);
   }
 
   if (NetUtilityLibInitDone) {
@@ -1011,7 +1010,7 @@ ErrorReturn:
 **/
 EFI_STATUS
 WintNtReleaseNetUtilityData (
-  IN OUT WIN_NT_SNP_PRIVATE *Private
+  IN OUT WIN_NT_SNP_PRIVATE  *Private
   )
 {
   if (Private == NULL) {
@@ -1019,7 +1018,7 @@ WintNtReleaseNetUtilityData (
   }
 
   if (Private->Instance.RecycledTxBuf != NULL) {
-      free (Private->Instance.RecycledTxBuf);
+    free (Private->Instance.RecycledTxBuf);
   }
 
   if (Private->NtNetUtilityTable.Finalize != NULL) {
@@ -1031,7 +1030,7 @@ WintNtReleaseNetUtilityData (
   return EFI_SUCCESS;
 }
 
-EMU_SNP_PROTOCOL mWinNtSnpProtocol = {
+EMU_SNP_PROTOCOL  mWinNtSnpProtocol = {
   WinNtSnpCreateMapping,
   WinNtSnpStart,
   WinNtSnpStop,
@@ -1061,7 +1060,7 @@ EMU_SNP_PROTOCOL mWinNtSnpProtocol = {
 **/
 EFI_STATUS
 WinNtSnpThunkOpen (
-  IN  EMU_IO_THUNK_PROTOCOL   *This
+  IN  EMU_IO_THUNK_PROTOCOL  *This
   )
 {
   WIN_NT_SNP_PRIVATE  *Private;
@@ -1089,7 +1088,7 @@ WinNtSnpThunkOpen (
   This->Interface = &Private->EmuSnp;
   This->Private   = Private;
 
-  if (This->ConfigString != NULL && This->ConfigString[0] != '\0') {
+  if ((This->ConfigString != NULL) && (This->ConfigString[0] != '\0')) {
     HostInterfaceIndex = (UINT8)StrDecimalToUintn (This->ConfigString);
   }
 
@@ -1108,7 +1107,7 @@ WinNtSnpThunkOpen (
 **/
 EFI_STATUS
 WinNtSnpThunkClose (
-  IN  EMU_IO_THUNK_PROTOCOL   *This
+  IN  EMU_IO_THUNK_PROTOCOL  *This
   )
 {
   WIN_NT_SNP_PRIVATE  *Private;
@@ -1124,7 +1123,7 @@ WinNtSnpThunkClose (
   return EFI_SUCCESS;
 }
 
-EMU_IO_THUNK_PROTOCOL mWinNtSnpThunkIo = {
+EMU_IO_THUNK_PROTOCOL  mWinNtSnpThunkIo = {
   &gEmuSnpProtocolGuid,
   NULL,
   NULL,
