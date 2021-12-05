@@ -32,7 +32,7 @@ PrePeiGetHobList (
 EFI_STATUS
 EFIAPI
 PrePeiSetHobList (
-  IN  VOID      *HobList
+  IN  VOID  *HobList
   );
 
 #endif

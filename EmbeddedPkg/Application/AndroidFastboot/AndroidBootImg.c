@@ -16,24 +16,28 @@
 // present, but RamdiskSize will be set to 0.
 EFI_STATUS
 ParseAndroidBootImg (
-  IN  VOID    *BootImg,
+  IN  VOID   *BootImg,
   OUT VOID   **Kernel,
-  OUT UINTN   *KernelSize,
+  OUT UINTN  *KernelSize,
   OUT VOID   **Ramdisk,
-  OUT UINTN   *RamdiskSize,
-  OUT CHAR8   *KernelArgs
+  OUT UINTN  *RamdiskSize,
+  OUT CHAR8  *KernelArgs
   )
 {
-  ANDROID_BOOTIMG_HEADER   *Header;
-  UINT8                    *BootImgBytePtr;
+  ANDROID_BOOTIMG_HEADER  *Header;
+  UINT8                   *BootImgBytePtr;
 
   // Cast to UINT8 so we can do pointer arithmetic
-  BootImgBytePtr = (UINT8 *) BootImg;
+  BootImgBytePtr = (UINT8 *)BootImg;
 
-  Header = (ANDROID_BOOTIMG_HEADER *) BootImg;
+  Header = (ANDROID_BOOTIMG_HEADER *)BootImg;
 
-  if (AsciiStrnCmp ((CONST CHAR8 *)Header->BootMagic, ANDROID_BOOT_MAGIC,
-                    ANDROID_BOOT_MAGIC_LENGTH) != 0) {
+  if (AsciiStrnCmp (
+        (CONST CHAR8 *)Header->BootMagic,
+        ANDROID_BOOT_MAGIC,
+        ANDROID_BOOT_MAGIC_LENGTH
+        ) != 0)
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -43,18 +47,22 @@ ParseAndroidBootImg (
 
   ASSERT (IS_VALID_ANDROID_PAGE_SIZE (Header->PageSize));
 
-  *KernelSize = Header->KernelSize;
-  *Kernel = BootImgBytePtr + Header->PageSize;
+  *KernelSize  = Header->KernelSize;
+  *Kernel      = BootImgBytePtr + Header->PageSize;
   *RamdiskSize = Header->RamdiskSize;
 
   if (Header->RamdiskSize != 0) {
-    *Ramdisk = (VOID *) (BootImgBytePtr
-                 + Header->PageSize
-                 + ALIGN_VALUE (Header->KernelSize, Header->PageSize));
+    *Ramdisk = (VOID *)(BootImgBytePtr
+                        + Header->PageSize
+                        + ALIGN_VALUE (Header->KernelSize, Header->PageSize));
   }
 
-  AsciiStrnCpyS (KernelArgs, ANDROID_BOOTIMG_KERNEL_ARGS_SIZE, Header->KernelArgs,
-    ANDROID_BOOTIMG_KERNEL_ARGS_SIZE);
+  AsciiStrnCpyS (
+    KernelArgs,
+    ANDROID_BOOTIMG_KERNEL_ARGS_SIZE,
+    Header->KernelArgs,
+    ANDROID_BOOTIMG_KERNEL_ARGS_SIZE
+    );
 
   return EFI_SUCCESS;
 }

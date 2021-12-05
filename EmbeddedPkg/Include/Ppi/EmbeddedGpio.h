@@ -13,27 +13,27 @@
 //
 // Protocol interface structure
 //
-typedef struct _EMBEDDED_GPIO_PPI   EMBEDDED_GPIO_PPI;
+typedef struct _EMBEDDED_GPIO_PPI EMBEDDED_GPIO_PPI;
 
 //
 // Data Types
 //
 typedef UINTN EMBEDDED_GPIO_PIN;
 
-#define GPIO(Port, Pin) ((EMBEDDED_GPIO_PIN)(((Port) << (16)) | (Pin)))
-#define GPIO_PIN(x)     ((EMBEDDED_GPIO_PIN)(x) & (0xFFFF))
-#define GPIO_PORT(x)    ((EMBEDDED_GPIO_PIN)(x) >> (16))
+#define GPIO(Port, Pin)  ((EMBEDDED_GPIO_PIN)(((Port) << (16)) | (Pin)))
+#define GPIO_PIN(x)      ((EMBEDDED_GPIO_PIN)(x) & (0xFFFF))
+#define GPIO_PORT(x)     ((EMBEDDED_GPIO_PIN)(x) >> (16))
 
 typedef enum {
-  GPIO_MODE_INPUT                 = 0x00,
-  GPIO_MODE_OUTPUT_0              = 0x0E,
-  GPIO_MODE_OUTPUT_1              = 0x0F,
-  GPIO_MODE_SPECIAL_FUNCTION_2    = 0x02,
-  GPIO_MODE_SPECIAL_FUNCTION_3    = 0x03,
-  GPIO_MODE_SPECIAL_FUNCTION_4    = 0x04,
-  GPIO_MODE_SPECIAL_FUNCTION_5    = 0x05,
-  GPIO_MODE_SPECIAL_FUNCTION_6    = 0x06,
-  GPIO_MODE_SPECIAL_FUNCTION_7    = 0x07
+  GPIO_MODE_INPUT              = 0x00,
+  GPIO_MODE_OUTPUT_0           = 0x0E,
+  GPIO_MODE_OUTPUT_1           = 0x0F,
+  GPIO_MODE_SPECIAL_FUNCTION_2 = 0x02,
+  GPIO_MODE_SPECIAL_FUNCTION_3 = 0x03,
+  GPIO_MODE_SPECIAL_FUNCTION_4 = 0x04,
+  GPIO_MODE_SPECIAL_FUNCTION_5 = 0x05,
+  GPIO_MODE_SPECIAL_FUNCTION_6 = 0x06,
+  GPIO_MODE_SPECIAL_FUNCTION_7 = 0x07
 } EMBEDDED_GPIO_MODE;
 
 typedef enum {
@@ -61,7 +61,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EMBEDDED_GPIO_GET) (
+(EFIAPI *EMBEDDED_GPIO_GET)(
   IN  EMBEDDED_GPIO_PPI     *This,
   IN  EMBEDDED_GPIO_PIN     Gpio,
   OUT UINTN                 *Value
@@ -82,12 +82,11 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EMBEDDED_GPIO_SET) (
+(EFIAPI *EMBEDDED_GPIO_SET)(
   IN EMBEDDED_GPIO_PPI      *This,
   IN EMBEDDED_GPIO_PIN      Gpio,
   IN EMBEDDED_GPIO_MODE     Mode
   );
-
 
 /**
 
@@ -104,12 +103,11 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EMBEDDED_GPIO_GET_MODE) (
+(EFIAPI *EMBEDDED_GPIO_GET_MODE)(
   IN  EMBEDDED_GPIO_PPI     *This,
   IN  EMBEDDED_GPIO_PIN     Gpio,
   OUT EMBEDDED_GPIO_MODE    *Mode
   );
-
 
 /**
 
@@ -126,12 +124,11 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EMBEDDED_GPIO_SET_PULL) (
+(EFIAPI *EMBEDDED_GPIO_SET_PULL)(
   IN  EMBEDDED_GPIO_PPI     *This,
   IN  EMBEDDED_GPIO_PIN     Gpio,
   IN  EMBEDDED_GPIO_PULL    Direction
   );
-
 
 struct _EMBEDDED_GPIO_PPI {
   EMBEDDED_GPIO_GET         Get;
@@ -140,6 +137,6 @@ struct _EMBEDDED_GPIO_PPI {
   EMBEDDED_GPIO_SET_PULL    SetPull;
 };
 
-extern EFI_GUID gEmbeddedGpioPpiGuid;
+extern EFI_GUID  gEmbeddedGpioPpiGuid;
 
 #endif
