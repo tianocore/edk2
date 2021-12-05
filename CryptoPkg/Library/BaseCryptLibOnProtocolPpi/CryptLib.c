@@ -3580,3 +3580,261 @@ TlsGetCertRevocationList (
 {
   CALL_CRYPTO_SERVICE (TlsGetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
 }
+
+//=====================================================================================
+//    Big number primitive
+//=====================================================================================
+
+VOID *
+EFIAPI
+BigNumInit (
+  VOID
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumInit, (), NULL);
+}
+
+VOID *
+EFIAPI
+BigNumFromBin(
+  IN CONST UINT8 *Buf,
+  IN UINTN Len
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumFromBin, (Buf, Len), NULL);
+}
+
+INTN
+EFIAPI
+BigNumToBin(
+  IN VOID *Bn,
+  OUT UINT8 *Buf)
+{
+  CALL_CRYPTO_SERVICE (BigNumToBin, (Bn, Buf), -1);
+}
+
+VOID
+EFIAPI
+BigNumFree(
+  IN VOID *Bn,
+  IN BOOLEAN Clear
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (BigNumFree, (Bn, Clear));
+}
+
+EFI_STATUS
+EFIAPI
+BigNumAdd(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumAdd, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+BigNumSub(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumSub, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+BigNumMod(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumMod, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+BigNumExpMod(
+  IN VOID *BnA,
+  IN VOID *BnP,
+  IN VOID *BnM,
+  OUT VOID *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumExpMod, (BnA, BnP, BnM, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+BigNumInverseMod(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumInverseMod, (BnA, BnM, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+BigNumDiv(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumDiv, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+BigNumMulMod(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumMulMod, (BnA, BnB, BnM, BnRes), EFI_UNSUPPORTED);
+}
+
+INTN
+EFIAPI
+BigNumCmp(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumCmp, (BnA, BnB), 0);
+}
+
+UINTN
+EFIAPI
+BigNumBits(
+  IN CONST VOID *Bn
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumBits, (Bn), 0);
+}
+
+UINTN
+EFIAPI
+BigNumBytes(
+  IN CONST VOID *Bn
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumBytes, (Bn), 0);
+}
+
+BOOLEAN
+EFIAPI
+BigNumIsWord(
+  IN CONST VOID *Bn,
+  IN UINTN Num)
+{
+  CALL_CRYPTO_SERVICE (BigNumIsWord, (Bn, Num), FALSE);
+}
+
+BOOLEAN
+EFIAPI
+BigNumIsOdd(
+  IN CONST VOID *Bn
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumIsOdd, (Bn), FALSE);
+}
+
+
+VOID *
+EFIAPI
+BigNumCopy(
+  OUT VOID *BnDst,
+  IN CONST VOID *BnSrc
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumCopy, (BnDst, BnSrc), NULL);
+}
+
+CONST VOID *
+EFIAPI
+BigNumValueOne(
+  VOID
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumValueOne, (), NULL);
+}
+
+EFI_STATUS
+EFIAPI
+BigNumRShift(
+  IN CONST VOID *Bn,
+  IN UINTN n,
+  OUT VOID *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumRShift, (Bn, n, BnRes), EFI_UNSUPPORTED);
+}
+
+VOID
+EFIAPI
+BigNumConsttime(
+  IN VOID *Bn
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (BigNumConsttime, (Bn));
+}
+
+EFI_STATUS
+EFIAPI
+BigNumSqrMod(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumSqrMod, (BnA, BnM, BnRes), EFI_UNSUPPORTED);
+}
+
+VOID *
+EFIAPI
+BigNumNewContext(
+  VOID
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumNewContext, (), NULL);
+}
+
+VOID
+EFIAPI
+BigNumContextFree(
+  IN VOID *BnCtx
+)
+{
+  CALL_VOID_CRYPTO_SERVICE (BigNumContextFree, (BnCtx));
+}
+
+EFI_STATUS
+EFIAPI
+BigNumSetUint(
+  IN VOID *Bn,
+  IN UINTN Val
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumSetUint, (Bn, Val), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+BigNumAddMod(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumAddMod, (BnA, BnB, BnM, BnRes), EFI_UNSUPPORTED);
+}

@@ -4470,7 +4470,262 @@ CryptoServiceTlsGetCertRevocationList (
   return CALL_BASECRYPTLIB (TlsGet.Services.CertRevocationList, TlsGetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
 }
 
-const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
+VOID *
+EFIAPI
+CryptoServiceBigNumInit (
+  VOID
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Init, BigNumInit, (), NULL);
+}
+
+VOID *
+EFIAPI
+CryptoServiceBigNumFromBin(
+  IN CONST UINT8 *Buf,
+  IN UINTN Len
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.FromBin, BigNumFromBin, (Buf, Len), NULL);
+}
+
+INTN
+EFIAPI
+CryptoServiceBigNumToBin(
+  IN VOID *Bn,
+  OUT UINT8 *Buf
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.ToBin, BigNumToBin, (Bn, Buf), -1);
+}
+
+VOID
+EFIAPI
+CryptoServiceBigNumFree(
+  IN VOID *Bn,
+  IN BOOLEAN Clear
+  )
+{
+  CALL_VOID_BASECRYPTLIB (Bn.Services.Free, BigNumFree, (Bn, Clear));
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumAdd(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Add, BigNumAdd, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumSub(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Sub, BigNumSub, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumMod(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Mod, BigNumMod, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumExpMod(
+  IN VOID *BnA,
+  IN VOID *BnP,
+  IN VOID *BnM,
+  OUT VOID *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.ExpMod, BigNumExpMod, (BnA, BnP, BnM, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumInverseMod(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.InverseMod, BigNumInverseMod, (BnA, BnM, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumDiv(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Div, BigNumDiv, (BnA, BnB, BnRes), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumMulMod(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.MulMod, BigNumMulMod, (BnA, BnB, BnM, BnRes), EFI_UNSUPPORTED);
+}
+
+INTN
+EFIAPI
+CryptoServiceBigNumCmp(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Cmp, BigNumCmp, (BnA, BnB), 0);
+}
+
+UINTN
+EFIAPI
+CryptoServiceBigNumBits(
+  IN CONST VOID *Bn
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Bits, BigNumBits, (Bn), 0);
+}
+
+UINTN
+EFIAPI
+CryptoServiceBigNumBytes(
+  IN CONST VOID *Bn
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Bytes, BigNumBytes, (Bn), 0);
+}
+
+BOOLEAN
+EFIAPI
+CryptoServiceBigNumIsWord(
+  IN CONST VOID *Bn,
+  IN UINTN Num)
+{
+  return CALL_BASECRYPTLIB (Bn.Services.IsWord, BigNumIsWord, (Bn, Num), FALSE);
+}
+
+BOOLEAN
+EFIAPI
+CryptoServiceBigNumIsOdd(
+  IN CONST VOID *Bn
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.IsOdd, BigNumIsOdd, (Bn), FALSE);
+}
+
+
+VOID *
+EFIAPI
+CryptoServiceBigNumCopy(
+  OUT VOID *BnDst,
+  IN CONST VOID *BnSrc
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Copy, BigNumCopy, (BnDst, BnSrc), NULL);
+}
+
+CONST VOID *
+EFIAPI
+CryptoServiceBigNumValueOne(
+  VOID
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.ValueOne, BigNumValueOne, (), NULL);
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumRShift(
+  IN CONST VOID *Bn,
+  IN UINTN n,
+  OUT VOID *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.RShift, BigNumRShift, (Bn, n, BnRes), EFI_UNSUPPORTED);
+}
+
+VOID
+EFIAPI
+CryptoServiceBigNumConsttime(
+  IN VOID *Bn
+  )
+{
+  CALL_VOID_BASECRYPTLIB (Bn.Services.Consttime, BigNumConsttime, (Bn));
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumSqrMod(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.SqrMod, BigNumSqrMod, (BnA, BnM, BnRes), EFI_UNSUPPORTED);
+}
+
+VOID *
+EFIAPI
+CryptoServiceBigNumNewContext(
+  VOID
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.NewContext, BigNumNewContext, (), NULL);
+}
+
+VOID
+EFIAPI
+CryptoServiceBigNumContextFree(
+  IN VOID *BnCtx
+)
+{
+  CALL_VOID_BASECRYPTLIB (Bn.Services.ContextFree, BigNumContextFree, (BnCtx));
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumSetUint(
+  IN VOID *BnA,
+  IN UINTN Val
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.SetUint, BigNumSetUint, (BnA, Val), EFI_UNSUPPORTED);
+}
+
+EFI_STATUS
+EFIAPI
+CryptoServiceBigNumAddMod(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.AddMod, BigNumAddMod, (BnA, BnB, BnM, BnRes), EFI_UNSUPPORTED);
+}
+
+const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   /// Version
   CryptoServiceGetCryptoVersion,
   /// HMAC MD5 - deprecated and unsupported
@@ -4670,5 +4925,32 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceTlsGetCaCertificate,
   CryptoServiceTlsGetHostPublicCert,
   CryptoServiceTlsGetHostPrivateKey,
-  CryptoServiceTlsGetCertRevocationList
+  CryptoServiceTlsGetCertRevocationList,
+
+  //Big Numbers
+  CryptoServiceBigNumInit,
+  CryptoServiceBigNumFromBin,
+  CryptoServiceBigNumToBin,
+  CryptoServiceBigNumFree,
+  CryptoServiceBigNumAdd,
+  CryptoServiceBigNumSub,
+  CryptoServiceBigNumMod,
+  CryptoServiceBigNumExpMod,
+  CryptoServiceBigNumInverseMod,
+  CryptoServiceBigNumDiv,
+  CryptoServiceBigNumMulMod,
+  CryptoServiceBigNumCmp,
+  CryptoServiceBigNumBits,
+  CryptoServiceBigNumBytes,
+  CryptoServiceBigNumIsWord,
+  CryptoServiceBigNumIsOdd,
+  CryptoServiceBigNumCopy,
+  CryptoServiceBigNumValueOne,
+  CryptoServiceBigNumRShift,
+  CryptoServiceBigNumConsttime,
+  CryptoServiceBigNumSqrMod,
+  CryptoServiceBigNumNewContext,
+  CryptoServiceBigNumContextFree,
+  CryptoServiceBigNumSetUint,
+  CryptoServiceBigNumAddMod,
 };

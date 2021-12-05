@@ -288,6 +288,36 @@ typedef struct {
     } Services;
     UINT32    Family;
   } TlsGet;
+  union {
+    struct {
+      UINT8 Init:1;
+      UINT8 FromBin:1;
+      UINT8 ToBin:1;
+      UINT8 Free:1;
+      UINT8 Add:1;
+      UINT8 Sub:1;
+      UINT8 Mod:1;
+      UINT8 ExpMod:1;
+      UINT8 InverseMod:1;
+      UINT8 Div:1;
+      UINT8 MulMod:1;
+      UINT8 Cmp:1;
+      UINT8 Bits:1;
+      UINT8 Bytes:1;
+      UINT8 IsWord:1;
+      UINT8 IsOdd:1;
+      UINT8 Copy:1;
+      UINT8 ValueOne:1;
+      UINT8 RShift:1;
+      UINT8 Consttime:1;
+      UINT8 SqrMod:1;
+      UINT8 NewContext:1;
+      UINT8 ContextFree:1;
+      UINT8 SetUint:1;
+      UINT8 AddMod:1;
+    } Services;
+    UINT32 Family;
+  } Bn;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
 
 #endif

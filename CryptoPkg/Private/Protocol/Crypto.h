@@ -3457,6 +3457,410 @@ BOOLEAN
   IN  UINT16       SaltLen
   );
 
+//=====================================================================================
+//   Big Number Primitive
+//=====================================================================================
+
+/**
+  Allocate new Big Number
+
+  @retval New BigNum opaque structure or NULL on failure
+**/
+typedef
+VOID *
+(EFIAPI* EDKII_CRYPTO_BIGNUM_INIT)(
+  VOID
+  );
+
+/**
+  Allocate new Big Number and assign the provided value to it
+
+  @param[in]   Buf    Big endian encoded buffer
+  @param[in]   Len    Buffer length
+
+  @retval New EDKII_CRYPTO_BIGNUM_ opaque structure or NULL on failure
+**/
+typedef
+VOID *
+(EFIAPI* EDKII_CRYPTO_BIGNUM_FROM_BIN)(
+  IN CONST UINT8 *Buf,
+  IN UINTN Len
+  );
+
+/**
+  Convert the absolute value of Bn into big-endian form and store it at Buf.
+  The Buf array should have at least EDKII_CRYPTO_BIGNUM_Bytes() in it.
+
+  @param[in]   Bn     Big number to convert
+  @param[out]  Buf    Output buffer
+
+  @retval The length of the big-endian number placed at Buf or -1 on error
+**/
+typedef
+INTN
+(EFIAPI* EDKII_CRYPTO_BIGNUM_TO_BIN)(
+  IN VOID *Bn,
+  OUT UINT8 *Buf);
+
+/**
+  Free the Big Number
+
+  @param[in]   Bn      Big number to free
+  @param[in]   Clear   TRUE if the buffer should be cleared
+**/
+typedef
+VOID
+(EFIAPI* EDKII_CRYPTO_BIGNUM_FREE)(
+  IN VOID *Bn,
+  IN BOOLEAN Clear
+  );
+
+/**
+  Calculate the sum of two Big Numbers.
+
+  @param[in]   BnA     Big number
+  @param[in]   BnB     Big number
+  @param[out]  BnRes    The result of BnA + BnB
+
+  @retval EFI_SUCCESS          On success
+  @retval EFI_PROTOCOL_ERROR   Otherwise
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_ADD)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  );
+
+/**
+  Subtract two Big Numbers.
+
+  @param[in]   BnA     Big number
+  @param[in]   BnB     Big number
+  @param[out]  BnRes    The result of BnA - BnB
+
+  @retval EFI_SUCCESS          On success
+  @retval EFI_PROTOCOL_ERROR   Otherwise
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_SUB)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  );
+
+/**
+  Calculate remainder: BnRes = BnA % BnB
+
+  @param[in]   BnA     Big number
+  @param[in]   BnB     Big number
+  @param[out]  BnRes    The result of BnA % BnB
+
+  @retval EFI_SUCCESS          On success
+  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
+  @retval EFI_PROTOCOL_ERROR   Otherwise
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_MOD)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  );
+
+/**
+  Compute BnA to the BnP-th power modulo BnM
+
+  @param[in]   BnA     Big number
+  @param[in]   BnP     Big number (power)
+  @param[in]   BnM     Big number (modulo)
+  @param[out]  BnRes    The result of BnA ^ BnP % BnM
+
+  @retval EFI_SUCCESS          On success
+  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
+  @retval EFI_PROTOCOL_ERROR   Otherwise
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_EXP_MOD)(
+  IN VOID *BnA,
+  IN VOID *BnP,
+  IN VOID *BnM,
+  OUT VOID *BnRes
+  );
+
+/**
+  Compute BnA inverse modulo BnM
+
+  @param[in]   BnA     Big number
+  @param[in]   BnM     Big number (modulo)
+  @param[out]  BnRes   The result, such that (BnA * BnRes) % BnM == 1
+
+  @retval EFI_SUCCESS          On success
+  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
+  @retval EFI_PROTOCOL_ERROR   Otherwise
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_INVERSE_MOD)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  );
+
+/**
+  Divide two Big Numbers
+
+  @param[in]   BnA     Big number
+  @param[in]   BnM     Big number (modulo)
+  @param[out]  BnRes   The result, such that BnA / BnB
+
+  @retval EFI_SUCCESS          On success
+  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
+  @retval EFI_PROTOCOL_ERROR   Otherwise
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_DIV)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  );
+
+/**
+  Multiply two Big Numbers modulo BnM
+
+  @param[in]   BnA     Big number
+  @param[in]   BnB     Big number
+  @param[in]   BnM     Big number (modulo)
+  @param[out]  BnRes   The result, such that (BnA * BnB) % BnM
+
+  @retval EFI_SUCCESS          On success
+  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
+  @retval EFI_PROTOCOL_ERROR   Otherwise
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_MUL_MOD)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  );
+
+/**
+  Compare two Big Numbers
+
+  @param[in]   BnA     Big number
+  @param[in]   BnB     Big number
+
+  @retval 0          BnA == BnB
+  @retval 1          BnA > BnB
+  @retval -1         BnA < BnB
+**/
+typedef
+INTN
+(EFIAPI* EDKII_CRYPTO_BIGNUM_CMP)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB
+  );
+
+/**
+  Get number of bits in Bn
+
+  @param[in]   Bn     Big number
+
+  @retval Number of bits
+**/
+typedef
+
+UINTN
+(EFIAPI* EDKII_CRYPTO_BIGNUM_BITS)(
+  IN CONST VOID *Bn
+  );
+
+/**
+  Get number of bytes in Bn
+
+  @param[in]   Bn     Big number
+
+  @retval Number of bytes
+**/
+typedef
+UINTN
+(EFIAPI* EDKII_CRYPTO_BIGNUM_BYTES)(
+  IN CONST VOID *Bn
+  );
+
+/**
+  Checks if Big Number equals to the given Num
+
+  @param[in]   Bn     Big number
+  @param[in]   Num    Number
+
+  @retval TRUE   iff Bn == Num
+  @retval FALSE  otherwise
+**/
+typedef
+BOOLEAN
+(EFIAPI* EDKII_CRYPTO_BIGNUM_IS_WORD)(
+  IN CONST VOID *Bn,
+  IN UINTN Num);
+
+/**
+  Checks if Big Number is odd
+
+  @param[in]   Bn     Big number
+
+  @retval TRUE   Bn is odd (Bn % 2 == 1)
+  @retval FALSE  otherwise
+**/
+typedef
+BOOLEAN
+(EFIAPI* EDKII_CRYPTO_BIGNUM_IS_ODD)(
+  IN CONST VOID *Bn
+  );
+
+/**
+  Copy Big number
+
+  @param[out]  BnDst     Destination
+  @param[in]   BnSrc     Source
+
+  @retval BnDst on success
+  @retval NULL otherwise
+**/
+typedef
+VOID *
+(EFIAPI* EDKII_CRYPTO_BIGNUM_COPY)(
+  OUT VOID *BnDst,
+  IN CONST VOID *BnSrc
+  );
+
+/**
+  Get constant Big number with value of "1".
+  This may be used to save expensive allocations.
+
+  @retval Big Number with value of 1
+**/
+typedef
+CONST VOID *
+(EFIAPI* EDKII_CRYPTO_BIGNUM_VALUE_ONE)(
+  VOID
+  );
+
+/**
+  Shift right Big Number
+
+  @param[in]   BnA     Big number
+  @param[in]   BnB     Big number
+  @param[in]   BnM     Big number (modulo)
+  @param[out]  BnRes   The result, such that (BnA * BnB) % BnM
+
+  @retval EFI_SUCCESS          On success
+  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
+  @retval EFI_PROTOCOL_ERROR   Otherwise
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_R_SHIFT)(
+  IN CONST VOID *Bn,
+  IN UINTN n,
+  OUT VOID *BnRes
+  );
+
+/**
+  Mark Big Number for constant time computations.
+  This function should be called before any constant time computations are
+  performed on the given Big number.
+
+  @param[in]   Bn     Big number
+**/
+typedef
+VOID
+(EFIAPI* EDKII_CRYPTO_BIGNUM_CONSTTIME)(
+  IN VOID *Bn
+  );
+
+/**
+  Calculate square modulo
+
+  @param[in]   BnA     Big number
+  @param[in]   BnM     Big number (modulo)
+  @param[out]  BnRes   The result, such that (BnA ^ 2) % BnM
+
+  @retval EFI_SUCCESS          On success
+  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
+  @retval EFI_PROTOCOL_ERROR   Otherwise
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_SQR_MOD)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  );
+
+/**
+  Create new Big Number computation context. This is an opaque structure
+  which should be passed to any function that requires it. The BN context is
+  needed to optimize calculations and expensive allocations.
+
+  @retval Big Number context struct or NULL on failure
+**/
+typedef
+VOID *
+(EFIAPI* EDKII_CRYPTO_BIGNUM_NEW_CONTEXT)(
+  VOID
+  );
+
+/**
+  Free Big Number context that was allocated with EDKII_CRYPTO_BIGNUM_NewContext()
+
+  @param[in]   BnCtx     Big number context to free
+**/
+typedef
+VOID
+(EFIAPI* EDKII_CRYPTO_BIGNUM_CONTEXT_FREE)(
+  IN VOID *BnCtx
+);
+
+/**
+  Set Big Number to a given value
+
+  @param[in]   Bn     Big number to set
+  @param[in]   Val    Value to set
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_SET_UINT)(
+  IN VOID *Bn,
+  IN UINTN Val
+  );
+
+/**
+  Add two Big Numbers modulo BnM
+
+  @param[in]   BnA     Big number
+  @param[in]   BnB     Big number
+  @param[in]   BnM     Big number (modulo)
+  @param[out]  BnRes   The result, such that (BnA + BnB) % BnM
+
+  @retval EFI_SUCCESS          On success
+  @retval EFI_OUT_OF_RESOURCES In case of internal allocation failures
+  @retval EFI_PROTOCOL_ERROR   Otherwise
+**/
+typedef
+EFI_STATUS
+(EFIAPI* EDKII_CRYPTO_BIGNUM_ADD_MOD)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  );
+
 ///
 /// EDK II Crypto Protocol
 ///
@@ -3641,6 +4045,34 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_TLS_GET_HOST_PUBLIC_CERT              TlsGetHostPublicCert;
   EDKII_CRYPTO_TLS_GET_HOST_PRIVATE_KEY              TlsGetHostPrivateKey;
   EDKII_CRYPTO_TLS_GET_CERT_REVOCATION_LIST          TlsGetCertRevocationList;
+
+  /// Big Number
+  EDKII_CRYPTO_BIGNUM_INIT                           BigNumInit;
+  EDKII_CRYPTO_BIGNUM_FROM_BIN                       BigNumFromBin;
+  EDKII_CRYPTO_BIGNUM_TO_BIN                         BigNumToBin;
+  EDKII_CRYPTO_BIGNUM_FREE                           BigNumFree;
+  EDKII_CRYPTO_BIGNUM_ADD                            BigNumAdd;
+  EDKII_CRYPTO_BIGNUM_SUB                            BigNumSub;
+  EDKII_CRYPTO_BIGNUM_MOD                            BigNumMod;
+  EDKII_CRYPTO_BIGNUM_EXP_MOD                        BigNumExpMod;
+  EDKII_CRYPTO_BIGNUM_INVERSE_MOD                    BigNumInverseMod;
+  EDKII_CRYPTO_BIGNUM_DIV                            BigNumDiv;
+  EDKII_CRYPTO_BIGNUM_MUL_MOD                        BigNumMulMod;
+  EDKII_CRYPTO_BIGNUM_CMP                            BigNumCmp;
+  EDKII_CRYPTO_BIGNUM_BITS                           BigNumBits;
+  EDKII_CRYPTO_BIGNUM_BYTES                          BigNumBytes;
+  EDKII_CRYPTO_BIGNUM_IS_WORD                        BigNumIsWord;
+  EDKII_CRYPTO_BIGNUM_IS_ODD                         BigNumIsOdd;
+  EDKII_CRYPTO_BIGNUM_COPY                           BigNumCopy;
+  EDKII_CRYPTO_BIGNUM_VALUE_ONE                      BigNumValueOne;
+  EDKII_CRYPTO_BIGNUM_R_SHIFT                        BigNumRShift;
+  EDKII_CRYPTO_BIGNUM_CONSTTIME                      BigNumConsttime;
+  EDKII_CRYPTO_BIGNUM_SQR_MOD                        BigNumSqrMod;
+  EDKII_CRYPTO_BIGNUM_NEW_CONTEXT                    BigNumNewContext;
+  EDKII_CRYPTO_BIGNUM_CONTEXT_FREE                   BigNumContextFree;
+  EDKII_CRYPTO_BIGNUM_SET_UINT                       BigNumSetUint;
+  EDKII_CRYPTO_BIGNUM_ADD_MOD                        BigNumAddMod;
+
   /// RSA PSS
   EDKII_CRYPTO_RSA_PSS_SIGN                          RsaPssSign;
   EDKII_CRYPTO_RSA_PSS_VERIFY                        RsaPssVerify;
