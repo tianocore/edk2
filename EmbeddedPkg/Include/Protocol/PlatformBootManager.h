@@ -12,7 +12,7 @@
 //
 // Protocol interface structure
 //
-typedef struct _PLATFORM_BOOT_MANAGER_PROTOCOL    PLATFORM_BOOT_MANAGER_PROTOCOL;
+typedef struct _PLATFORM_BOOT_MANAGER_PROTOCOL PLATFORM_BOOT_MANAGER_PROTOCOL;
 
 //
 // Function Prototypes
@@ -65,16 +65,16 @@ typedef struct _PLATFORM_BOOT_MANAGER_PROTOCOL    PLATFORM_BOOT_MANAGER_PROTOCOL
 */
 typedef
 EFI_STATUS
-(EFIAPI *GET_PLATFORM_BOOT_OPTIONS_AND_KEYS) (
+(EFIAPI *GET_PLATFORM_BOOT_OPTIONS_AND_KEYS)(
   OUT UINTN                              *Count,
   OUT EFI_BOOT_MANAGER_LOAD_OPTION       **BootOptions,
   OUT EFI_INPUT_KEY                      **BootKeys
   );
 
 struct _PLATFORM_BOOT_MANAGER_PROTOCOL {
-  GET_PLATFORM_BOOT_OPTIONS_AND_KEYS     GetPlatformBootOptionsAndKeys;
+  GET_PLATFORM_BOOT_OPTIONS_AND_KEYS    GetPlatformBootOptionsAndKeys;
 };
 
-extern EFI_GUID gPlatformBootManagerProtocolGuid;
+extern EFI_GUID  gPlatformBootManagerProtocolGuid;
 
 #endif /* __PLATFORM_BOOT_MANAGER_PROTOCOL_H__ */

@@ -6,10 +6,8 @@
 
 **/
 
-
 #ifndef __EFI_RESET_SYSTEM_LIB_H___
 #define __EFI_RESET_SYSTEM_LIB_H___
-
 
 /**
   Resets the entire platform.
@@ -25,13 +23,11 @@
 EFI_STATUS
 EFIAPI
 LibResetSystem (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN CHAR16           *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN CHAR16          *ResetData OPTIONAL
   );
-
-
 
 /**
   Initialize any infrastructure required for LibResetSystem () to function.

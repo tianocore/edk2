@@ -21,45 +21,44 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 
-STATIC USB_DEVICE_PROTOCOL *mUsbDevice;
+STATIC USB_DEVICE_PROTOCOL  *mUsbDevice;
 
 // Configuration attributes:
 // bit 7 reserved and must be 1, bit 6 means self-powered.
-#define CONFIG_DESC_ATTRIBUTES      (BIT7 | BIT6)
+#define CONFIG_DESC_ATTRIBUTES  (BIT7 | BIT6)
 
-#define MAX_PACKET_SIZE_BULK        512
+#define MAX_PACKET_SIZE_BULK  512
 
 STATIC USB_DEVICE_PROTOCOL  *mUsbDevice;
-STATIC EFI_EVENT             mReceiveEvent = NULL;
-STATIC LIST_ENTRY            mPacketList;
+STATIC EFI_EVENT            mReceiveEvent = NULL;
+STATIC LIST_ENTRY           mPacketList;
 
 // List type for queued received packets
 typedef struct _FASTBOOT_USB_PACKET_LIST {
-  LIST_ENTRY  Link;
-  VOID       *Buffer;
-  UINTN       BufferSize;
+  LIST_ENTRY    Link;
+  VOID          *Buffer;
+  UINTN         BufferSize;
 } FASTBOOT_USB_PACKET_LIST;
-
 
 /*
   No string descriptors - all string descriptor members are set to 0
 */
 
-STATIC USB_DEVICE_DESCRIPTOR mDeviceDescriptor = {
-  sizeof (USB_DEVICE_DESCRIPTOR),                  //Length
-  USB_DESC_TYPE_DEVICE,                            //DescriptorType
-  0x0200,                                          //BcdUSB
-  0xFF,                                            //DeviceClass
-  0,                                               //DeviceSubClass
-  0,                                               //DeviceProtocol
-  64,                                              //MaxPacketSize0
-  FixedPcdGet32 (PcdAndroidFastbootUsbVendorId),   //IdVendor
-  FixedPcdGet32 (PcdAndroidFastbootUsbProductId),  //IdProduct
-  0,                                               //BcdDevice
-  0,                                               //StrManufacturer
-  0,                                               //StrProduct
-  0,                                               //StrSerialNumber
-  1                                                //NumConfigurations
+STATIC USB_DEVICE_DESCRIPTOR  mDeviceDescriptor = {
+  sizeof (USB_DEVICE_DESCRIPTOR),                  // Length
+  USB_DESC_TYPE_DEVICE,                            // DescriptorType
+  0x0200,                                          // BcdUSB
+  0xFF,                                            // DeviceClass
+  0,                                               // DeviceSubClass
+  0,                                               // DeviceProtocol
+  64,                                              // MaxPacketSize0
+  FixedPcdGet32 (PcdAndroidFastbootUsbVendorId),   // IdVendor
+  FixedPcdGet32 (PcdAndroidFastbootUsbProductId),  // IdProduct
+  0,                                               // BcdDevice
+  0,                                               // StrManufacturer
+  0,                                               // StrProduct
+  0,                                               // StrSerialNumber
+  1                                                // NumConfigurations
 };
 
 /*
@@ -71,69 +70,69 @@ STATIC USB_DEVICE_DESCRIPTOR mDeviceDescriptor = {
 
 #pragma pack(1)
 typedef struct {
-  USB_CONFIG_DESCRIPTOR     ConfigDescriptor;
-  USB_INTERFACE_DESCRIPTOR  InterfaceDescriptor;
-  USB_ENDPOINT_DESCRIPTOR   EndpointDescriptor1;
-  USB_ENDPOINT_DESCRIPTOR   EndpointDescriptor2;
+  USB_CONFIG_DESCRIPTOR       ConfigDescriptor;
+  USB_INTERFACE_DESCRIPTOR    InterfaceDescriptor;
+  USB_ENDPOINT_DESCRIPTOR     EndpointDescriptor1;
+  USB_ENDPOINT_DESCRIPTOR     EndpointDescriptor2;
 } GET_CONFIG_DESCRIPTOR_RESPONSE;
 #pragma pack()
 
-STATIC GET_CONFIG_DESCRIPTOR_RESPONSE mGetConfigDescriptorResponse = {
-  { // USB_CONFIG_DESCRIPTOR
-    sizeof (USB_CONFIG_DESCRIPTOR),                   //Length;
-    USB_DESC_TYPE_CONFIG,                             //DescriptorType;
-    sizeof (GET_CONFIG_DESCRIPTOR_RESPONSE),          //TotalLength;
-    1,                                                //NumInterfaces;
-    1,                                                //ConfigurationValue;
-    0,                                                //Configuration;
-    CONFIG_DESC_ATTRIBUTES,                           //Attributes;
-    0                                                 //MaxPower;
+STATIC GET_CONFIG_DESCRIPTOR_RESPONSE  mGetConfigDescriptorResponse = {
+  {                                          // USB_CONFIG_DESCRIPTOR
+    sizeof (USB_CONFIG_DESCRIPTOR),          // Length;
+    USB_DESC_TYPE_CONFIG,                    // DescriptorType;
+    sizeof (GET_CONFIG_DESCRIPTOR_RESPONSE), // TotalLength;
+    1,                                       // NumInterfaces;
+    1,                                       // ConfigurationValue;
+    0,                                       // Configuration;
+    CONFIG_DESC_ATTRIBUTES,                  // Attributes;
+    0                                        // MaxPower;
   },
-  { // USB_INTERFACE_DESCRIPTOR
-    sizeof (USB_INTERFACE_DESCRIPTOR), //Length;
-    USB_DESC_TYPE_INTERFACE, //DescriptorType;
-    0,                                                //InterfaceNumber;
-    0,                                                //AlternateSetting;
-    2,                                                //NumEndpoints;
-    0xFF,                                             //InterfaceClass;
+  {                                    // USB_INTERFACE_DESCRIPTOR
+    sizeof (USB_INTERFACE_DESCRIPTOR), // Length;
+    USB_DESC_TYPE_INTERFACE,           // DescriptorType;
+    0,                                 // InterfaceNumber;
+    0,                                 // AlternateSetting;
+    2,                                 // NumEndpoints;
+    0xFF,                              // InterfaceClass;
     // Vendor specific interface subclass and protocol codes.
     // I found these values in the Fastboot code
     // (in match_fastboot_with_serial in fastboot.c).
-    0x42,                                             //InterfaceSubClass;
-    0x03,                                             //InterfaceProtocol;
-    0                                                 //Interface;
+    0x42,                                             // InterfaceSubClass;
+    0x03,                                             // InterfaceProtocol;
+    0                                                 // Interface;
   },
-  { // USB_ENDPOINT_DESCRIPTOR (In Endpoint)
-    sizeof (USB_ENDPOINT_DESCRIPTOR),                 //Length;
-    USB_DESC_TYPE_ENDPOINT,                           //DescriptorType;
-    1 | BIT7,                                         //EndpointAddress;
-    0x2,                                              //Attributes;
-    MAX_PACKET_SIZE_BULK,                             //MaxPacketSize;
-    16                                                //Interval;
+  {                                   // USB_ENDPOINT_DESCRIPTOR (In Endpoint)
+    sizeof (USB_ENDPOINT_DESCRIPTOR), // Length;
+    USB_DESC_TYPE_ENDPOINT,           // DescriptorType;
+    1 | BIT7,                         // EndpointAddress;
+    0x2,                              // Attributes;
+    MAX_PACKET_SIZE_BULK,             // MaxPacketSize;
+    16                                // Interval;
   },
-  { // STATIC USB_ENDPOINT_DESCRIPTOR (Out Endpoint)
-    sizeof (USB_ENDPOINT_DESCRIPTOR),                 //Length;
-    USB_DESC_TYPE_ENDPOINT,                           //DescriptorType;
-    1,                                                //EndpointAddress;
-    0x2,                                              //Attributes;
-    MAX_PACKET_SIZE_BULK,                             //MaxPacketSize;
-    16                                                //Interval;
+  {                                   // STATIC USB_ENDPOINT_DESCRIPTOR (Out Endpoint)
+    sizeof (USB_ENDPOINT_DESCRIPTOR), // Length;
+    USB_DESC_TYPE_ENDPOINT,           // DescriptorType;
+    1,                                // EndpointAddress;
+    0x2,                              // Attributes;
+    MAX_PACKET_SIZE_BULK,             // MaxPacketSize;
+    16                                // Interval;
   }
 };
 
 STATIC
 VOID
 DataReceived (
-  IN UINTN    Size,
-  IN VOID    *Buffer
+  IN UINTN  Size,
+  IN VOID   *Buffer
   )
 {
-  FASTBOOT_USB_PACKET_LIST *NewEntry;
+  FASTBOOT_USB_PACKET_LIST  *NewEntry;
 
   NewEntry = AllocatePool (sizeof (*NewEntry));
   ASSERT (NewEntry != NULL);
 
-  NewEntry->Buffer = Buffer;
+  NewEntry->Buffer     = Buffer;
   NewEntry->BufferSize = Size;
 
   InsertTailList (&mPacketList, &NewEntry->Link);
@@ -146,7 +145,7 @@ DataReceived (
 STATIC
 VOID
 DataSent (
-  IN UINT8 EndpointIndex
+  IN UINT8  EndpointIndex
   )
 {
   // Don't care.
@@ -158,7 +157,7 @@ DataSent (
 */
 EFI_STATUS
 FastbootTransportUsbStart (
-  EFI_EVENT ReceiveEvent
+  EFI_EVENT  ReceiveEvent
   )
 {
   GET_CONFIG_DESCRIPTOR_RESPONSE  *Responses;
@@ -166,11 +165,11 @@ FastbootTransportUsbStart (
   mReceiveEvent = ReceiveEvent;
 
   mGetConfigDescriptorResponse.ConfigDescriptor.TotalLength = sizeof (GET_CONFIG_DESCRIPTOR_RESPONSE);
-  Responses = &mGetConfigDescriptorResponse;
+  Responses                                                 = &mGetConfigDescriptorResponse;
 
   InitializeListHead (&mPacketList);
 
-  return mUsbDevice->Start (&mDeviceDescriptor, (VOID **) &Responses, DataReceived, DataSent);
+  return mUsbDevice->Start (&mDeviceDescriptor, (VOID **)&Responses, DataReceived, DataSent);
 }
 
 /*
@@ -196,12 +195,12 @@ FastbootTransportUsbStop (
 EFI_STATUS
 FastbootTransportUsbSend (
   IN        UINTN      BufferSize,
-  IN  CONST VOID      *Buffer,
-  IN        EFI_EVENT *FatalErrorEvent
+  IN  CONST VOID       *Buffer,
+  IN        EFI_EVENT  *FatalErrorEvent
   )
 {
   // Current USB protocol is blocking, so ignore FatalErrorEvent
-  return mUsbDevice->Send(1, BufferSize, Buffer);
+  return mUsbDevice->Send (1, BufferSize, Buffer);
 }
 
 /*
@@ -221,19 +220,19 @@ FastbootTransportUsbSend (
 EFI_STATUS
 FastbootTransportUsbReceive (
   OUT UINTN  *BufferSize,
-  OUT VOID  **Buffer
+  OUT VOID   **Buffer
   )
 {
-  FASTBOOT_USB_PACKET_LIST *Entry;
+  FASTBOOT_USB_PACKET_LIST  *Entry;
 
   if (IsListEmpty (&mPacketList)) {
     return EFI_NOT_READY;
   }
 
-  Entry = (FASTBOOT_USB_PACKET_LIST *) GetFirstNode (&mPacketList);
+  Entry = (FASTBOOT_USB_PACKET_LIST *)GetFirstNode (&mPacketList);
 
   *BufferSize = Entry->BufferSize;
-  *Buffer = Entry->Buffer;
+  *Buffer     = Entry->Buffer;
 
   RemoveEntryList (&Entry->Link);
   FreePool (Entry);
@@ -241,7 +240,7 @@ FastbootTransportUsbReceive (
   return EFI_SUCCESS;
 }
 
-STATIC FASTBOOT_TRANSPORT_PROTOCOL mTransportProtocol = {
+STATIC FASTBOOT_TRANSPORT_PROTOCOL  mTransportProtocol = {
   FastbootTransportUsbStart,
   FastbootTransportUsbStop,
   FastbootTransportUsbSend,
@@ -251,13 +250,13 @@ STATIC FASTBOOT_TRANSPORT_PROTOCOL mTransportProtocol = {
 EFI_STATUS
 FastbootTransportUsbEntryPoint (
   IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   // Assume there's only one USB peripheral controller.
-  Status = gBS->LocateProtocol (&gUsbDeviceProtocolGuid, NULL, (VOID **) &mUsbDevice);
+  Status = gBS->LocateProtocol (&gUsbDeviceProtocolGuid, NULL, (VOID **)&mUsbDevice);
   if (EFI_ERROR (Status)) {
     return Status;
   }

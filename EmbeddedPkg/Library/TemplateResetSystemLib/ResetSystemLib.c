@@ -10,13 +10,11 @@
 
 **/
 
-
 #include <PiDxe.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
 #include <Library/EfiResetSystemLib.h>
-
 
 /**
   Resets the entire platform.
@@ -32,40 +30,39 @@
 EFI_STATUS
 EFIAPI
 LibResetSystem (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN CHAR16           *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN CHAR16          *ResetData OPTIONAL
   )
 {
-  UINTN   Address;
-  UINT8   Data;
-
+  UINTN  Address;
+  UINT8  Data;
 
   switch (ResetType) {
-  case EfiResetCold:
-    // system power cycle
+    case EfiResetCold:
+      // system power cycle
 
-    // Example using IoLib functions to do IO.
-    Address = 0x12345678;
-    Data = MmioRead8 (Address);
-    MmioWrite8 (Address, Data | 0x01);
+      // Example using IoLib functions to do IO.
+      Address = 0x12345678;
+      Data    = MmioRead8 (Address);
+      MmioWrite8 (Address, Data | 0x01);
 
-    // Note this is a bad example asa MmioOr8 (Address, 0x01) does the same thing
-    break;
+      // Note this is a bad example asa MmioOr8 (Address, 0x01) does the same thing
+      break;
 
-  case EfiResetWarm:
-    // not a full power cycle, maybe memory stays around.
-    // if not support do the same thing as EfiResetCold.
-    break;
+    case EfiResetWarm:
+      // not a full power cycle, maybe memory stays around.
+      // if not support do the same thing as EfiResetCold.
+      break;
 
-  case EfiResetShutdown:
-    // turn off the system.
-    // if not support do the same thing as EfiResetCold.
-    break;
+    case EfiResetShutdown:
+      // turn off the system.
+      // if not support do the same thing as EfiResetCold.
+      break;
 
-  default:
-    return EFI_INVALID_PARAMETER;
+    default:
+      return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -73,8 +70,6 @@ LibResetSystem (
   //
   return EFI_DEVICE_ERROR;
 }
-
-
 
 /**
   Initialize any infrastructure required for LibResetSystem () to function.
@@ -94,4 +89,3 @@ LibInitializeResetSystem (
 {
   return EFI_SUCCESS;
 }
-

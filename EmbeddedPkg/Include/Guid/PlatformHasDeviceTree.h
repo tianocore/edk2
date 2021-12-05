@@ -14,7 +14,6 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-
 #ifndef __EDKII_PLATFORM_HAS_DEVICE_TREE_H__
 #define __EDKII_PLATFORM_HAS_DEVICE_TREE_H__
 
@@ -24,6 +23,6 @@
     { 0xb2, 0xaf, 0x54, 0x1e, 0x1d, 0xce, 0x14, 0x8b } \
   }
 
-extern EFI_GUID gEdkiiPlatformHasDeviceTreeGuid;
+extern EFI_GUID  gEdkiiPlatformHasDeviceTreeGuid;
 
 #endif

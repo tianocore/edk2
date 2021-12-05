@@ -65,30 +65,26 @@
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/DevicePath.h>
 
-
-#define MODE0_COLUMN_COUNT        80
-#define MODE0_ROW_COUNT           25
-
+#define MODE0_COLUMN_COUNT  80
+#define MODE0_ROW_COUNT     25
 
 EFI_STATUS
 EFIAPI
-TextInReset(
-  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This,
-  IN BOOLEAN                        ExtendedVerification
+TextInReset (
+  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
+  IN BOOLEAN                         ExtendedVerification
   );
 
-
 EFI_STATUS
 EFIAPI
-ReadKeyStroke(
-  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This,
-  OUT EFI_INPUT_KEY                 *Key
+ReadKeyStroke (
+  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
+  OUT EFI_INPUT_KEY                  *Key
   );
 
-
 EFI_STATUS
 EFIAPI
-TextOutReset(
+TextOutReset (
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN BOOLEAN                          ExtendedVerification
   );
@@ -96,8 +92,8 @@ TextOutReset(
 CHAR8 *
 EFIAPI
 SafeUnicodeStrToAsciiStr (
-  IN      CONST CHAR16                *Source,
-  OUT     CHAR8                       *Destination
+  IN      CONST CHAR16  *Source,
+  OUT     CHAR8         *Destination
   );
 
 EFI_STATUS
@@ -107,14 +103,12 @@ OutputString (
   IN CHAR16                           *String
   );
 
-
 EFI_STATUS
 EFIAPI
 TestString (
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN CHAR16                           *String
   );
-
 
 EFI_STATUS
 EFIAPI
@@ -125,29 +119,25 @@ QueryMode (
   OUT UINTN                           *Rows
   );
 
-
 EFI_STATUS
 EFIAPI
-SetMode(
+SetMode (
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN UINTN                            ModeNumber
   );
 
-
 EFI_STATUS
 EFIAPI
-SetAttribute(
+SetAttribute (
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN UINTN                            Attribute
   );
-
 
 EFI_STATUS
 EFIAPI
 ClearScreen (
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
   );
-
 
 EFI_STATUS
 EFIAPI
@@ -157,7 +147,6 @@ SetCursorPosition (
   IN UINTN                            Row
   );
 
-
 EFI_STATUS
 EFIAPI
 EnableCursor (
@@ -165,23 +154,22 @@ EnableCursor (
   IN BOOLEAN                          Enable
   );
 
-
- EFI_SIMPLE_TEXT_INPUT_PROTOCOL mSimpleTextIn = {
+EFI_SIMPLE_TEXT_INPUT_PROTOCOL  mSimpleTextIn = {
   TextInReset,
   ReadKeyStroke,
   NULL
 };
 
- EFI_SIMPLE_TEXT_OUTPUT_MODE mSimpleTextOutMode = {
+EFI_SIMPLE_TEXT_OUTPUT_MODE  mSimpleTextOutMode = {
   1,
   0,
-  EFI_TEXT_ATTR( EFI_LIGHTGRAY, EFI_BLACK ),
+  EFI_TEXT_ATTR (EFI_LIGHTGRAY,EFI_BLACK),
   0,
   0,
   TRUE
 };
 
-EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL mSimpleTextOut = {
+EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  mSimpleTextOut = {
   TextOutReset,
   OutputString,
   TestString,
@@ -194,36 +182,36 @@ EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL mSimpleTextOut = {
   &mSimpleTextOutMode
 };
 
-EFI_HANDLE           mInstallHandle = NULL;
+EFI_HANDLE  mInstallHandle = NULL;
 
 typedef struct {
-  VENDOR_DEVICE_PATH        Guid;
-  UART_DEVICE_PATH          Uart;
-  EFI_DEVICE_PATH_PROTOCOL  End;
+  VENDOR_DEVICE_PATH          Guid;
+  UART_DEVICE_PATH            Uart;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } SIMPLE_TEXT_OUT_DEVICE_PATH;
 
-SIMPLE_TEXT_OUT_DEVICE_PATH mDevicePath = {
+SIMPLE_TEXT_OUT_DEVICE_PATH  mDevicePath = {
   {
-    { HARDWARE_DEVICE_PATH, HW_VENDOR_DP, { sizeof (VENDOR_DEVICE_PATH), 0} },
+    { HARDWARE_DEVICE_PATH,  HW_VENDOR_DP,                   { sizeof (VENDOR_DEVICE_PATH),       0 }
+    },
     EFI_CALLER_ID_GUID
   },
   {
-    { MESSAGING_DEVICE_PATH, MSG_UART_DP, { sizeof (UART_DEVICE_PATH), 0} },
-    0,        // Reserved
-    FixedPcdGet64 (PcdUartDefaultBaudRate),   // BaudRate
-    FixedPcdGet8 (PcdUartDefaultDataBits),    // DataBits
-    FixedPcdGet8 (PcdUartDefaultParity),      // Parity (N)
-    FixedPcdGet8 (PcdUartDefaultStopBits)     // StopBits
+    { MESSAGING_DEVICE_PATH, MSG_UART_DP,                    { sizeof (UART_DEVICE_PATH),         0 }
+    },
+    0,                                      // Reserved
+    FixedPcdGet64 (PcdUartDefaultBaudRate), // BaudRate
+    FixedPcdGet8 (PcdUartDefaultDataBits),  // DataBits
+    FixedPcdGet8 (PcdUartDefaultParity),    // Parity (N)
+    FixedPcdGet8 (PcdUartDefaultStopBits)   // StopBits
   },
-  { END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE, { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0} }
+  { END_DEVICE_PATH_TYPE,  END_ENTIRE_DEVICE_PATH_SUBTYPE, { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0 }
+  }
 };
-
-
-
 
 BOOLEAN
 TextOutIsValidAscii (
-  IN CHAR16       Ascii
+  IN CHAR16  Ascii
   )
 {
   //
@@ -236,59 +224,56 @@ TextOutIsValidAscii (
   return FALSE;
 }
 
-
 BOOLEAN
 TextOutIsValidEfiCntlChar (
-  IN CHAR16       Char
+  IN CHAR16  Char
   )
 {
   //
   // only support four control characters.
   //
-  if (Char == CHAR_NULL ||
-      Char == CHAR_BACKSPACE ||
-      Char == CHAR_LINEFEED ||
-      Char == CHAR_CARRIAGE_RETURN ||
-      Char == CHAR_TAB ) {
+  if ((Char == CHAR_NULL) ||
+      (Char == CHAR_BACKSPACE) ||
+      (Char == CHAR_LINEFEED) ||
+      (Char == CHAR_CARRIAGE_RETURN) ||
+      (Char == CHAR_TAB))
+  {
     return TRUE;
   }
 
   return FALSE;
 }
 
-
 VOID
 EFIAPI
 WaitForKeyEvent (
-  IN EFI_EVENT          Event,
-  IN VOID               *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  if (SerialPortPoll ())  {
+  if (SerialPortPoll ()) {
     gBS->SignalEvent (Event);
   }
 }
 
-
 EFI_STATUS
 EFIAPI
 TextInReset (
-  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This,
-  IN BOOLEAN                        ExtendedVerification
+  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
+  IN BOOLEAN                         ExtendedVerification
   )
 {
   return EFI_SUCCESS;
 }
 
-
 EFI_STATUS
 EFIAPI
 ReadKeyStroke (
-  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL *This,
-  OUT EFI_INPUT_KEY                 *Key
+  IN EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *This,
+  OUT EFI_INPUT_KEY                  *Key
   )
 {
-  CHAR8             Char;
+  CHAR8  Char;
 
   if (!SerialPortPoll ()) {
     return EFI_NOT_READY;
@@ -310,113 +295,114 @@ ReadKeyStroke (
     if (Char == '[') {
       SerialPortRead ((UINT8 *)&Char, 1);
       switch (Char) {
-      case 'A':
-        Key->ScanCode = SCAN_UP;
-        break;
-      case 'B':
-        Key->ScanCode = SCAN_DOWN;
-        break;
-      case 'C':
-        Key->ScanCode = SCAN_RIGHT;
-        break;
-      case 'D':
-        Key->ScanCode = SCAN_LEFT;
-        break;
-      case 'H':
-        Key->ScanCode = SCAN_HOME;
-        break;
-      case 'K':
-      case 'F': // PC ANSI
-        Key->ScanCode = SCAN_END;
-        break;
-      case '@':
-      case 'L':
-        Key->ScanCode = SCAN_INSERT;
-        break;
-      case 'P':
-      case 'X': // PC ANSI
-        Key->ScanCode = SCAN_DELETE;
-        break;
-      case 'U':
-      case '/':
-      case 'G': // PC ANSI
-        Key->ScanCode = SCAN_PAGE_DOWN;
-        break;
-      case 'V':
-      case '?':
-      case 'I': // PC ANSI
-        Key->ScanCode = SCAN_PAGE_UP;
-        break;
+        case 'A':
+          Key->ScanCode = SCAN_UP;
+          break;
+        case 'B':
+          Key->ScanCode = SCAN_DOWN;
+          break;
+        case 'C':
+          Key->ScanCode = SCAN_RIGHT;
+          break;
+        case 'D':
+          Key->ScanCode = SCAN_LEFT;
+          break;
+        case 'H':
+          Key->ScanCode = SCAN_HOME;
+          break;
+        case 'K':
+        case 'F': // PC ANSI
+          Key->ScanCode = SCAN_END;
+          break;
+        case '@':
+        case 'L':
+          Key->ScanCode = SCAN_INSERT;
+          break;
+        case 'P':
+        case 'X': // PC ANSI
+          Key->ScanCode = SCAN_DELETE;
+          break;
+        case 'U':
+        case '/':
+        case 'G': // PC ANSI
+          Key->ScanCode = SCAN_PAGE_DOWN;
+          break;
+        case 'V':
+        case '?':
+        case 'I': // PC ANSI
+          Key->ScanCode = SCAN_PAGE_UP;
+          break;
 
-      // PCANSI that does not conflict with VT100
-      case 'M':
-        Key->ScanCode = SCAN_F1;
-        break;
-      case 'N':
-        Key->ScanCode = SCAN_F2;
-        break;
-      case 'O':
-        Key->ScanCode = SCAN_F3;
-        break;
-      case 'Q':
-        Key->ScanCode = SCAN_F5;
-        break;
-      case 'R':
-        Key->ScanCode = SCAN_F6;
-        break;
-      case 'S':
-        Key->ScanCode = SCAN_F7;
-        break;
-      case 'T':
-        Key->ScanCode = SCAN_F8;
-        break;
+        // PCANSI that does not conflict with VT100
+        case 'M':
+          Key->ScanCode = SCAN_F1;
+          break;
+        case 'N':
+          Key->ScanCode = SCAN_F2;
+          break;
+        case 'O':
+          Key->ScanCode = SCAN_F3;
+          break;
+        case 'Q':
+          Key->ScanCode = SCAN_F5;
+          break;
+        case 'R':
+          Key->ScanCode = SCAN_F6;
+          break;
+        case 'S':
+          Key->ScanCode = SCAN_F7;
+          break;
+        case 'T':
+          Key->ScanCode = SCAN_F8;
+          break;
 
-      default:
-        Key->UnicodeChar = Char;
-        break;
+        default:
+          Key->UnicodeChar = Char;
+          break;
       }
     } else if (Char == '0') {
       SerialPortRead ((UINT8 *)&Char, 1);
       switch (Char) {
-      case 'P':
-        Key->ScanCode = SCAN_F1;
-        break;
-      case 'Q':
-        Key->ScanCode = SCAN_F2;
-        break;
-      case 'w':
-        Key->ScanCode = SCAN_F3;
-        break;
-      case 'x':
-        Key->ScanCode = SCAN_F4;
-        break;
-      case 't':
-        Key->ScanCode = SCAN_F5;
-        break;
-      case 'u':
-        Key->ScanCode = SCAN_F6;
-        break;
-      case 'q':
-        Key->ScanCode = SCAN_F7;
-        break;
-      case 'r':
-        Key->ScanCode = SCAN_F8;
-        break;
-      case 'p':
-        Key->ScanCode = SCAN_F9;
-        break;
-      case 'm':
-        Key->ScanCode = SCAN_F10;
-        break;
-      default :
-        break;
+        case 'P':
+          Key->ScanCode = SCAN_F1;
+          break;
+        case 'Q':
+          Key->ScanCode = SCAN_F2;
+          break;
+        case 'w':
+          Key->ScanCode = SCAN_F3;
+          break;
+        case 'x':
+          Key->ScanCode = SCAN_F4;
+          break;
+        case 't':
+          Key->ScanCode = SCAN_F5;
+          break;
+        case 'u':
+          Key->ScanCode = SCAN_F6;
+          break;
+        case 'q':
+          Key->ScanCode = SCAN_F7;
+          break;
+        case 'r':
+          Key->ScanCode = SCAN_F8;
+          break;
+        case 'p':
+          Key->ScanCode = SCAN_F9;
+          break;
+        case 'm':
+          Key->ScanCode = SCAN_F10;
+          break;
+        default:
+          break;
       }
     }
   } else if (Char < ' ') {
     if ((Char == CHAR_BACKSPACE) ||
         (Char == CHAR_TAB)       ||
         (Char == CHAR_LINEFEED)  ||
-        (Char == CHAR_CARRIAGE_RETURN)) {
+        (Char == CHAR_CARRIAGE_RETURN))
+    {
       // Only let through EFI required control characters
       Key->UnicodeChar = (CHAR16)Char;
     }
@@ -429,7 +415,6 @@ ReadKeyStroke (
   return EFI_SUCCESS;
 }
 
-
 EFI_STATUS
 EFIAPI
 TextOutReset (
@@ -437,12 +422,12 @@ TextOutReset (
   IN BOOLEAN                          ExtendedVerification
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
-  This->SetAttribute(
-        This,
-        EFI_TEXT_ATTR(This->Mode->Attribute & 0x0F, EFI_BACKGROUND_BLACK)
-        );
+  This->SetAttribute (
+          This,
+          EFI_TEXT_ATTR (This->Mode->Attribute & 0x0F, EFI_BACKGROUND_BLACK)
+          );
 
   Status = This->SetMode (This, 0);
 
@@ -452,11 +437,11 @@ TextOutReset (
 CHAR8 *
 EFIAPI
 SafeUnicodeStrToAsciiStr (
-  IN      CONST CHAR16                *Source,
-  OUT     CHAR8                       *Destination
+  IN      CONST CHAR16  *Source,
+  OUT     CHAR8         *Destination
   )
 {
-  CHAR8                               *ReturnValue;
+  CHAR8  *ReturnValue;
 
   ASSERT (Destination != NULL);
 
@@ -469,9 +454,8 @@ SafeUnicodeStrToAsciiStr (
   //
   // Source and Destination should not overlap
   //
-  ASSERT ((UINTN) ((CHAR16 *) Destination -  Source) > StrLen (Source));
-  ASSERT ((UINTN) ((CHAR8 *) Source - Destination) > StrLen (Source));
-
+  ASSERT ((UINTN)((CHAR16 *)Destination -  Source) > StrLen (Source));
+  ASSERT ((UINTN)((CHAR8 *)Source - Destination) > StrLen (Source));
 
   ReturnValue = Destination;
   while (*Source != '\0') {
@@ -479,11 +463,11 @@ SafeUnicodeStrToAsciiStr (
     // If any non-ascii characters in Source then replace it with '?'.
     //
     if (*Source < 0x80) {
-      *Destination = (CHAR8) *Source;
+      *Destination = (CHAR8)*Source;
     } else {
       *Destination = '?';
 
-      //Surrogate pair check.
+      // Surrogate pair check.
       if ((*Source >= 0xD800) && (*Source <= 0xDFFF)) {
         Source++;
       }
@@ -511,19 +495,19 @@ OutputString (
   IN CHAR16                           *String
   )
 {
-  UINTN                       Size;
-  CHAR8*                      OutputString;
-  EFI_STATUS                  Status;
-  EFI_SIMPLE_TEXT_OUTPUT_MODE *Mode;
-  UINTN                       MaxColumn;
-  UINTN                       MaxRow;
+  UINTN                        Size;
+  CHAR8                        *OutputString;
+  EFI_STATUS                   Status;
+  EFI_SIMPLE_TEXT_OUTPUT_MODE  *Mode;
+  UINTN                        MaxColumn;
+  UINTN                        MaxRow;
 
-  Size = StrLen(String) + 1;
-  OutputString = AllocatePool(Size);
+  Size         = StrLen (String) + 1;
+  OutputString = AllocatePool (Size);
 
-  //If there is any non-ascii characters in String buffer then replace it with '?'
-  //Eventually, UnicodeStrToAsciiStr API should be fixed.
-  SafeUnicodeStrToAsciiStr(String, OutputString);
+  // If there is any non-ascii characters in String buffer then replace it with '?'
+  // Eventually, UnicodeStrToAsciiStr API should be fixed.
+  SafeUnicodeStrToAsciiStr (String, OutputString);
   SerialPortWrite ((UINT8 *)OutputString, Size - 1);
 
   //
@@ -542,46 +526,48 @@ OutputString (
     return Status;
   }
 
-  for (; *String != CHAR_NULL; String++) {
-
+  for ( ; *String != CHAR_NULL; String++) {
     switch (*String) {
-    case CHAR_BACKSPACE:
-      if (Mode->CursorColumn > 0) {
-        Mode->CursorColumn--;
-      }
-      break;
+      case CHAR_BACKSPACE:
+        if (Mode->CursorColumn > 0) {
+          Mode->CursorColumn--;
+        }
 
-    case CHAR_LINEFEED:
-      if (Mode->CursorRow < (INT32) (MaxRow - 1)) {
-        Mode->CursorRow++;
-      }
-      break;
+        break;
 
-    case CHAR_CARRIAGE_RETURN:
-      Mode->CursorColumn = 0;
-      break;
-
-    default:
-      if (Mode->CursorColumn >= (INT32) (MaxColumn - 1)) {
-        // Move the cursor as if we print CHAR_CARRIAGE_RETURN & CHAR_LINE_FEED
-        // CHAR_LINEFEED
-        if (Mode->CursorRow < (INT32) (MaxRow - 1)) {
+      case CHAR_LINEFEED:
+        if (Mode->CursorRow < (INT32)(MaxRow - 1)) {
           Mode->CursorRow++;
         }
-        // CHAR_CARIAGE_RETURN
+
+        break;
+
+      case CHAR_CARRIAGE_RETURN:
         Mode->CursorColumn = 0;
-      } else {
-        Mode->CursorColumn++;
-      }
-      break;
+        break;
+
+      default:
+        if (Mode->CursorColumn >= (INT32)(MaxColumn - 1)) {
+          // Move the cursor as if we print CHAR_CARRIAGE_RETURN & CHAR_LINE_FEED
+          // CHAR_LINEFEED
+          if (Mode->CursorRow < (INT32)(MaxRow - 1)) {
+            Mode->CursorRow++;
+          }
+
+          // CHAR_CARIAGE_RETURN
+          Mode->CursorColumn = 0;
+        } else {
+          Mode->CursorColumn++;
+        }
+
+        break;
     }
   }
 
-  FreePool(OutputString);
+  FreePool (OutputString);
 
   return EFI_SUCCESS;
 }
-
 
 EFI_STATUS
 EFIAPI
@@ -590,7 +576,7 @@ TestString (
   IN CHAR16                           *String
   )
 {
-  CHAR8           Character;
+  CHAR8  Character;
 
   for ( ; *String != CHAR_NULL; String++) {
     Character = (CHAR8)*String;
@@ -602,14 +588,13 @@ TestString (
   return EFI_SUCCESS;
 }
 
-
 EFI_STATUS
 EFIAPI
 QueryMode (
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
   IN UINTN                            ModeNumber,
-  OUT UINTN                          *Columns,
-  OUT UINTN                          *Rows
+  OUT UINTN                           *Columns,
+  OUT UINTN                           *Rows
   )
 {
   if (This->Mode->MaxMode > 1) {
@@ -617,20 +602,19 @@ QueryMode (
   }
 
   if (ModeNumber == 0) {
-    *Columns  = MODE0_COLUMN_COUNT;
-    *Rows     = MODE0_ROW_COUNT;
+    *Columns = MODE0_COLUMN_COUNT;
+    *Rows    = MODE0_ROW_COUNT;
     return EFI_SUCCESS;
   }
 
   return EFI_UNSUPPORTED;
 }
 
-
 EFI_STATUS
 EFIAPI
 SetMode (
-  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
-  IN UINTN                              ModeNumber
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
+  IN UINTN                            ModeNumber
   )
 {
   if (ModeNumber != 0) {
@@ -642,54 +626,51 @@ SetMode (
   return EFI_SUCCESS;
 }
 
-
 EFI_STATUS
 EFIAPI
-SetAttribute(
-  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
-  IN UINTN                              Attribute
+SetAttribute (
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
+  IN UINTN                            Attribute
   )
 {
   This->Mode->Attribute = (INT32)Attribute;
   return EFI_SUCCESS;
 }
 
-
 EFI_STATUS
 EFIAPI
 ClearScreen (
-  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   Status = This->SetCursorPosition (This, 0, 0);
   return Status;
 }
 
-
 EFI_STATUS
 EFIAPI
 SetCursorPosition (
-  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *This,
-  IN UINTN                              Column,
-  IN UINTN                              Row
+  IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *This,
+  IN UINTN                            Column,
+  IN UINTN                            Row
   )
 {
-  EFI_SIMPLE_TEXT_OUTPUT_MODE       *Mode;
-  EFI_STATUS                        Status;
-  UINTN                             MaxColumn;
-  UINTN                             MaxRow;
+  EFI_SIMPLE_TEXT_OUTPUT_MODE  *Mode;
+  EFI_STATUS                   Status;
+  UINTN                        MaxColumn;
+  UINTN                        MaxRow;
 
   Mode = This->Mode;
 
-  Status = This->QueryMode(
-                  This,
-                  Mode->Mode,
-                  &MaxColumn,
-                  &MaxRow
-                  );
-  if (EFI_ERROR(Status)) {
+  Status = This->QueryMode (
+                   This,
+                   Mode->Mode,
+                   &MaxColumn,
+                   &MaxRow
+                   );
+  if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -698,11 +679,10 @@ SetCursorPosition (
   }
 
   Mode->CursorColumn = (INT32)Column;
-  Mode->CursorRow = (INT32)Row;
+  Mode->CursorRow    = (INT32)Row;
 
   return EFI_SUCCESS;
 }
-
 
 EFI_STATUS
 EFIAPI
@@ -718,15 +698,14 @@ EnableCursor (
   return EFI_SUCCESS;
 }
 
-
 EFI_STATUS
 EFIAPI
 SimpleTextInOutEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
@@ -737,16 +716,19 @@ SimpleTextInOutEntryPoint (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  Status = gBS->InstallMultipleProtocolInterfaces(
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &mInstallHandle,
-                  &gEfiSimpleTextInProtocolGuid,   &mSimpleTextIn,
-                  &gEfiSimpleTextOutProtocolGuid,  &mSimpleTextOut,
-                  &gEfiDevicePathProtocolGuid,     &mDevicePath,
+                  &gEfiSimpleTextInProtocolGuid,
+                  &mSimpleTextIn,
+                  &gEfiSimpleTextOutProtocolGuid,
+                  &mSimpleTextOut,
+                  &gEfiDevicePathProtocolGuid,
+                  &mDevicePath,
                   NULL
                   );
   if (!EFI_ERROR (Status)) {
     gST->ConOut = &mSimpleTextOut;
-    gST->ConIn = &mSimpleTextIn;
+    gST->ConIn  = &mSimpleTextIn;
   }
 
   return Status;

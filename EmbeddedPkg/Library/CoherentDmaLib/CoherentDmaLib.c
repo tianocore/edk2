@@ -12,11 +12,10 @@
 #include <Library/DmaLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-
 STATIC
 PHYSICAL_ADDRESS
 HostToDeviceAddress (
-  IN  VOID      *Address
+  IN  VOID  *Address
   )
 {
   return (PHYSICAL_ADDRESS)(UINTN)Address + PcdGet64 (PcdDmaDeviceOffset);
@@ -45,24 +44,25 @@ HostToDeviceAddress (
 EFI_STATUS
 EFIAPI
 DmaMap (
-  IN     DMA_MAP_OPERATION              Operation,
-  IN     VOID                           *HostAddress,
-  IN OUT UINTN                          *NumberOfBytes,
-  OUT    PHYSICAL_ADDRESS               *DeviceAddress,
-  OUT    VOID                           **Mapping
+  IN     DMA_MAP_OPERATION  Operation,
+  IN     VOID               *HostAddress,
+  IN OUT UINTN              *NumberOfBytes,
+  OUT    PHYSICAL_ADDRESS   *DeviceAddress,
+  OUT    VOID               **Mapping
   )
 {
-  if (HostAddress == NULL ||
-      NumberOfBytes == NULL ||
-      DeviceAddress == NULL ||
-      Mapping == NULL ) {
+  if ((HostAddress == NULL) ||
+      (NumberOfBytes == NULL) ||
+      (DeviceAddress == NULL) ||
+      (Mapping == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
+
   *DeviceAddress = HostToDeviceAddress (HostAddress);
-  *Mapping = NULL;
+  *Mapping       = NULL;
   return EFI_SUCCESS;
 }
-
 
 /**
   Completes the DmaMapBusMasterRead(), DmaMapBusMasterWrite(), or DmaMapBusMasterCommonBuffer()
@@ -77,7 +77,7 @@ DmaMap (
 EFI_STATUS
 EFIAPI
 DmaUnmap (
-  IN  VOID                         *Mapping
+  IN  VOID  *Mapping
   )
 {
   return EFI_SUCCESS;
@@ -103,14 +103,13 @@ DmaUnmap (
 EFI_STATUS
 EFIAPI
 DmaAllocateBuffer (
-  IN  EFI_MEMORY_TYPE              MemoryType,
-  IN  UINTN                        Pages,
-  OUT VOID                         **HostAddress
+  IN  EFI_MEMORY_TYPE  MemoryType,
+  IN  UINTN            Pages,
+  OUT VOID             **HostAddress
   )
 {
   return DmaAllocateAlignedBuffer (MemoryType, Pages, 0, HostAddress);
 }
-
 
 /**
   Allocates pages that are suitable for an DmaMap() of type
@@ -134,18 +133,19 @@ DmaAllocateBuffer (
 EFI_STATUS
 EFIAPI
 DmaAllocateAlignedBuffer (
-  IN  EFI_MEMORY_TYPE              MemoryType,
-  IN  UINTN                        Pages,
-  IN  UINTN                        Alignment,
-  OUT VOID                         **HostAddress
+  IN  EFI_MEMORY_TYPE  MemoryType,
+  IN  UINTN            Pages,
+  IN  UINTN            Alignment,
+  OUT VOID             **HostAddress
   )
 {
   if (Alignment == 0) {
     Alignment = EFI_PAGE_SIZE;
   }
 
-  if (HostAddress == NULL ||
-      (Alignment & (Alignment - 1)) != 0) {
+  if ((HostAddress == NULL) ||
+      ((Alignment & (Alignment - 1)) != 0))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -163,9 +163,9 @@ DmaAllocateAlignedBuffer (
   if (*HostAddress == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   return EFI_SUCCESS;
 }
-
 
 /**
   Frees memory that was allocated with DmaAllocateBuffer().
@@ -181,15 +181,14 @@ DmaAllocateAlignedBuffer (
 EFI_STATUS
 EFIAPI
 DmaFreeBuffer (
-  IN  UINTN                        Pages,
-  IN  VOID                         *HostAddress
+  IN  UINTN  Pages,
+  IN  VOID   *HostAddress
   )
 {
   if (HostAddress == NULL) {
-     return EFI_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
 
   FreePages (HostAddress, Pages);
   return EFI_SUCCESS;
 }
-

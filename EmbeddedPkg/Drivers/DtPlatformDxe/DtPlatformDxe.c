@@ -18,22 +18,22 @@
 
 #include "DtPlatformDxe.h"
 
-extern  UINT8                     DtPlatformHiiBin[];
-extern  UINT8                     DtPlatformDxeStrings[];
+extern  UINT8  DtPlatformHiiBin[];
+extern  UINT8  DtPlatformDxeStrings[];
 
 typedef struct {
-  VENDOR_DEVICE_PATH              VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL        End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
-STATIC HII_VENDOR_DEVICE_PATH     mDtPlatformDxeVendorDevicePath = {
+STATIC HII_VENDOR_DEVICE_PATH  mDtPlatformDxeVendorDevicePath = {
   {
     {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
       {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
     DT_PLATFORM_FORMSET_GUID
@@ -42,8 +42,8 @@ STATIC HII_VENDOR_DEVICE_PATH     mDtPlatformDxeVendorDevicePath = {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
     {
-      (UINT8) (END_DEVICE_PATH_LENGTH),
-      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+      (UINT8)(END_DEVICE_PATH_LENGTH),
+      (UINT8)((END_DEVICE_PATH_LENGTH) >> 8)
     }
   }
 };
@@ -54,32 +54,39 @@ InstallHiiPages (
   VOID
   )
 {
-  EFI_STATUS                      Status;
-  EFI_HII_HANDLE                  HiiHandle;
-  EFI_HANDLE                      DriverHandle;
+  EFI_STATUS      Status;
+  EFI_HII_HANDLE  HiiHandle;
+  EFI_HANDLE      DriverHandle;
 
   DriverHandle = NULL;
-  Status = gBS->InstallMultipleProtocolInterfaces (&DriverHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  &mDtPlatformDxeVendorDevicePath,
-                  NULL);
+  Status       = gBS->InstallMultipleProtocolInterfaces (
+                        &DriverHandle,
+                        &gEfiDevicePathProtocolGuid,
+                        &mDtPlatformDxeVendorDevicePath,
+                        NULL
+                        );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  HiiHandle = HiiAddPackages (&gDtPlatformFormSetGuid,
-                              DriverHandle,
-                              DtPlatformDxeStrings,
-                              DtPlatformHiiBin,
-                              NULL);
+  HiiHandle = HiiAddPackages (
+                &gDtPlatformFormSetGuid,
+                DriverHandle,
+                DtPlatformDxeStrings,
+                DtPlatformHiiBin,
+                NULL
+                );
 
   if (HiiHandle == NULL) {
-    gBS->UninstallMultipleProtocolInterfaces (DriverHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  &mDtPlatformDxeVendorDevicePath,
-                  NULL);
+    gBS->UninstallMultipleProtocolInterfaces (
+           DriverHandle,
+           &gEfiDevicePathProtocolGuid,
+           &mDtPlatformDxeVendorDevicePath,
+           NULL
+           );
     return EFI_OUT_OF_RESOURCES;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -99,44 +106,61 @@ InstallHiiPages (
 EFI_STATUS
 EFIAPI
 DtPlatformDxeEntryPoint (
-  IN EFI_HANDLE                   ImageHandle,
-  IN EFI_SYSTEM_TABLE             *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                      Status;
-  DT_ACPI_VARSTORE_DATA           DtAcpiPref;
-  UINTN                           BufferSize;
-  VOID                            *Dtb;
-  UINTN                           DtbSize;
+  EFI_STATUS             Status;
+  DT_ACPI_VARSTORE_DATA  DtAcpiPref;
+  UINTN                  BufferSize;
+  VOID                   *Dtb;
+  UINTN                  DtbSize;
 
-  Dtb = NULL;
+  Dtb    = NULL;
   Status = DtPlatformLoadDtb (&Dtb, &DtbSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN,
+    DEBUG ((
+      DEBUG_WARN,
       "%a: no DTB blob could be loaded, defaulting to ACPI (Status == %r)\n",
-      __FUNCTION__, Status));
+      __FUNCTION__,
+      Status
+      ));
     DtAcpiPref.Pref = DT_ACPI_SELECT_ACPI;
   } else {
     //
     // Get the current DT/ACPI preference from the DtAcpiPref variable.
     //
     BufferSize = sizeof (DtAcpiPref);
-    Status = gRT->GetVariable(DT_ACPI_VARIABLE_NAME, &gDtPlatformFormSetGuid,
-                    NULL, &BufferSize, &DtAcpiPref);
+    Status     = gRT->GetVariable (
+                        DT_ACPI_VARIABLE_NAME,
+                        &gDtPlatformFormSetGuid,
+                        NULL,
+                        &BufferSize,
+                        &DtAcpiPref
+                        );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "%a: no DT/ACPI preference found, defaulting to %a\n",
-        __FUNCTION__, PcdGetBool (PcdDefaultDtPref) ? "DT" : "ACPI"));
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: no DT/ACPI preference found, defaulting to %a\n",
+        __FUNCTION__,
+        PcdGetBool (PcdDefaultDtPref) ? "DT" : "ACPI"
+        ));
       DtAcpiPref.Pref = PcdGetBool (PcdDefaultDtPref) ? DT_ACPI_SELECT_DT
                                                       : DT_ACPI_SELECT_ACPI;
     }
   }
 
   if (!EFI_ERROR (Status) &&
-      DtAcpiPref.Pref != DT_ACPI_SELECT_ACPI &&
-      DtAcpiPref.Pref != DT_ACPI_SELECT_DT) {
-    DEBUG ((DEBUG_WARN, "%a: invalid value for %s, defaulting to %a\n",
-      __FUNCTION__, DT_ACPI_VARIABLE_NAME,
-      PcdGetBool (PcdDefaultDtPref) ? "DT" : "ACPI"));
+      (DtAcpiPref.Pref != DT_ACPI_SELECT_ACPI) &&
+      (DtAcpiPref.Pref != DT_ACPI_SELECT_DT))
+  {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: invalid value for %s, defaulting to %a\n",
+      __FUNCTION__,
+      DT_ACPI_VARIABLE_NAME,
+      PcdGetBool (PcdDefaultDtPref) ? "DT" : "ACPI"
+      ));
     DtAcpiPref.Pref = PcdGetBool (PcdDefaultDtPref) ? DT_ACPI_SELECT_DT
                                                     : DT_ACPI_SELECT_ACPI;
     Status = EFI_INVALID_PARAMETER; // trigger setvar below
@@ -146,9 +170,13 @@ DtPlatformDxeEntryPoint (
   // Write the newly selected default value back to the variable store.
   //
   if (EFI_ERROR (Status)) {
-    Status = gRT->SetVariable(DT_ACPI_VARIABLE_NAME, &gDtPlatformFormSetGuid,
+    Status = gRT->SetVariable (
+                    DT_ACPI_VARIABLE_NAME,
+                    &gDtPlatformFormSetGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                    sizeof (DtAcpiPref), &DtAcpiPref);
+                    sizeof (DtAcpiPref),
+                    &DtAcpiPref
+                    );
     if (EFI_ERROR (Status)) {
       goto FreeDtb;
     }
@@ -159,12 +187,18 @@ DtPlatformDxeEntryPoint (
     // ACPI was selected: install the gEdkiiPlatformHasAcpiGuid GUID as a
     // NULL protocol to unlock dispatch of ACPI related drivers.
     //
-    Status = gBS->InstallMultipleProtocolInterfaces (&ImageHandle,
-                    &gEdkiiPlatformHasAcpiGuid, NULL, NULL);
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &ImageHandle,
+                    &gEdkiiPlatformHasAcpiGuid,
+                    NULL,
+                    NULL
+                    );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR,
+      DEBUG ((
+        DEBUG_ERROR,
         "%a: failed to install gEdkiiPlatformHasAcpiGuid as a protocol\n",
-        __FUNCTION__));
+        __FUNCTION__
+        ));
       goto FreeDtb;
     }
   } else if (DtAcpiPref.Pref == DT_ACPI_SELECT_DT) {
@@ -174,8 +208,11 @@ DtPlatformDxeEntryPoint (
     //
     Status = gBS->InstallConfigurationTable (&gFdtTableGuid, Dtb);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: failed to install FDT configuration table\n",
-        __FUNCTION__));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: failed to install FDT configuration table\n",
+        __FUNCTION__
+        ));
       goto FreeDtb;
     }
   } else {
