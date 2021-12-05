@@ -9,9 +9,9 @@
 #include "EditStatusBar.h"
 #include "UefiShellDebug1CommandsLib.h"
 
-CHAR16  *StatusString;
-BOOLEAN StatusBarNeedRefresh;
-BOOLEAN StatusStringChanged;
+CHAR16   *StatusString;
+BOOLEAN  StatusBarNeedRefresh;
+BOOLEAN  StatusStringChanged;
 
 /**
   Initialization function for Status Bar.
@@ -53,13 +53,13 @@ StatusBarCleanup (
 }
 
 typedef struct {
-  UINT32  Foreground : 4;
-  UINT32  Background : 3;
+  UINT32    Foreground : 4;
+  UINT32    Background : 3;
 } STATUS_BAR_COLOR_ATTRIBUTES;
 
 typedef union {
-  STATUS_BAR_COLOR_ATTRIBUTES  Colors;
-  UINTN                       Data;
+  STATUS_BAR_COLOR_ATTRIBUTES    Colors;
+  UINTN                          Data;
 } STATUS_BAR_COLOR_UNION;
 
 /**
@@ -91,6 +91,7 @@ StatusBarRefresh (
   if (!StatusStringChanged && StatusBarNeedRefresh) {
     StatusBarSetStatusString (L"\0");
   }
+
   //
   // when it's called first time after editor launch, so refresh is mandatory
   //
@@ -117,7 +118,7 @@ StatusBarRefresh (
   //
   // print row, column fields
   //
-  if (FileRow != (UINTN)(-1) && FileCol != (UINTN)(-1)) {
+  if ((FileRow != (UINTN)(-1)) && (FileCol != (UINTN)(-1))) {
     ShellPrintEx (
       0,
       (INT32)(LastRow) - 1,
@@ -143,6 +144,7 @@ StatusBarRefresh (
   } else {
     ShellPrintEx ((INT32)(LastCol) - 21, (INT32)(LastRow) - 1, L"|%s|   Help: Ctrl-E", L"OVR");
   }
+
   //
   // restore the old screen attributes
   //
@@ -153,8 +155,8 @@ StatusBarRefresh (
   //
   gST->ConOut->EnableCursor (gST->ConOut, TRUE);
 
-  StatusBarNeedRefresh  = FALSE;
-  StatusStringChanged   = FALSE;
+  StatusBarNeedRefresh = FALSE;
+  StatusStringChanged  = FALSE;
 
   return EFI_SUCCESS;
 }
@@ -169,7 +171,7 @@ StatusBarRefresh (
 **/
 EFI_STATUS
 StatusBarSetStatusString (
-  IN CHAR16 *Str
+  IN CHAR16  *Str
   )
 {
   StatusStringChanged = TRUE;
@@ -191,7 +193,7 @@ StatusBarSetStatusString (
 
   @return The string that is used.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 StatusBarGetString (
   VOID
   )
@@ -203,7 +205,7 @@ StatusBarGetString (
   Function to set the need refresh boolean to TRUE.
 **/
 VOID
-StatusBarSetRefresh(
+StatusBarSetRefresh (
   VOID
   )
 {
@@ -216,7 +218,7 @@ StatusBarSetRefresh(
   @retval TRUE    The status bar needs to be refreshed.
 **/
 BOOLEAN
-StatusBarGetRefresh(
+StatusBarGetRefresh (
   VOID
   )
 {

@@ -23,12 +23,12 @@
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
 
-#if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-#include "Arm/SbbrValidator.h"
+#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+  #include "Arm/SbbrValidator.h"
 #endif
 
-STATIC UINT32             mTableCount;
-STATIC UINT32             mBinTableCount;
+STATIC UINT32  mTableCount;
+STATIC UINT32  mBinTableCount;
 
 /**
   This function dumps the ACPI table to a file.
@@ -42,13 +42,13 @@ STATIC UINT32             mBinTableCount;
 STATIC
 BOOLEAN
 DumpAcpiTableToFile (
-  IN CONST UINT8*  Ptr,
-  IN CONST UINTN   Length
+  IN CONST UINT8  *Ptr,
+  IN CONST UINTN  Length
   )
 {
-  CHAR16              FileNameBuffer[MAX_FILE_NAME_LEN];
-  UINTN               TransferBytes;
-  SELECTED_ACPI_TABLE *SelectedTable;
+  CHAR16               FileNameBuffer[MAX_FILE_NAME_LEN];
+  UINTN                TransferBytes;
+  SELECTED_ACPI_TABLE  *SelectedTable;
 
   GetSelectedAcpiTable (&SelectedTable);
 
@@ -78,7 +78,7 @@ DumpAcpiTableToFile (
 BOOLEAN
 ProcessTableReportOptions (
   IN CONST UINT32  Signature,
-  IN CONST UINT8*  TablePtr,
+  IN CONST UINT8   *TablePtr,
   IN CONST UINT32  Length
   )
 {
@@ -92,9 +92,9 @@ ProcessTableReportOptions (
   // set local variables to suppress incorrect compiler/analyzer warnings
   //
   OriginalAttribute = 0;
-  SignaturePtr = (UINT8*)(UINTN)&Signature;
-  Log = FALSE;
-  HighLight = GetColourHighlighting ();
+  SignaturePtr      = (UINT8 *)(UINTN)&Signature;
+  Log               = FALSE;
+  HighLight         = GetColourHighlighting ();
   GetSelectedAcpiTable (&SelectedTable);
 
   switch (GetReportOption ()) {
@@ -103,9 +103,10 @@ ProcessTableReportOptions (
       break;
     case ReportSelected:
       if (Signature == SelectedTable->Type) {
-        Log = TRUE;
+        Log                  = TRUE;
         SelectedTable->Found = TRUE;
       }
+
       break;
     case ReportTableList:
       if (mTableCount == 0) {
@@ -113,15 +114,19 @@ ProcessTableReportOptions (
           OriginalAttribute = gST->ConOut->Mode->Attribute;
           gST->ConOut->SetAttribute (
                          gST->ConOut,
-                         EFI_TEXT_ATTR(EFI_CYAN,
-                           ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4))
+                         EFI_TEXT_ATTR (
+                           EFI_CYAN,
+                           ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
+                           )
                          );
         }
+
         Print (L"\nInstalled Table(s):\n");
         if (HighLight) {
           gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
         }
       }
+
       Print (
         L"\t%4d. %c%c%c%c\n",
         ++mTableCount,
@@ -136,6 +141,7 @@ ProcessTableReportOptions (
         SelectedTable->Found = TRUE;
         DumpAcpiTableToFile (TablePtr, Length);
       }
+
       break;
     case ReportMax:
       // We should never be here.
@@ -148,10 +154,13 @@ ProcessTableReportOptions (
       OriginalAttribute = gST->ConOut->Mode->Attribute;
       gST->ConOut->SetAttribute (
                      gST->ConOut,
-                     EFI_TEXT_ATTR(EFI_LIGHTBLUE,
-                       ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4))
+                     EFI_TEXT_ATTR (
+                       EFI_LIGHTBLUE,
+                       ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
+                       )
                      );
     }
+
     Print (
       L"\n\n --------------- %c%c%c%c Table --------------- \n\n",
       SignaturePtr[0],
@@ -167,8 +176,6 @@ ProcessTableReportOptions (
   return Log;
 }
 
-
-
 /**
   This function iterates the configuration table entries in the
   system table, retrieves the RSDP pointer and starts parsing the ACPI tables.
@@ -182,17 +189,17 @@ ProcessTableReportOptions (
 EFI_STATUS
 EFIAPI
 AcpiView (
-  IN EFI_SYSTEM_TABLE* SystemTable
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS               Status;
   UINTN                    Index;
-  EFI_CONFIGURATION_TABLE* EfiConfigurationTable;
+  EFI_CONFIGURATION_TABLE  *EfiConfigurationTable;
   BOOLEAN                  FoundAcpiTable;
   UINTN                    OriginalAttribute;
   UINTN                    PrintAttribute;
   EREPORT_OPTION           ReportOption;
-  UINT8*                   RsdpPtr;
+  UINT8                    *RsdpPtr;
   UINT32                   RsdpLength;
   UINT8                    RsdpRevision;
   PARSE_ACPI_TABLE_PROC    RsdpParserProc;
@@ -203,10 +210,10 @@ AcpiView (
   // set local variables to suppress incorrect compiler/analyzer warnings
   //
   EfiConfigurationTable = NULL;
-  OriginalAttribute = 0;
+  OriginalAttribute     = 0;
 
   // Reset Table counts
-  mTableCount = 0;
+  mTableCount    = 0;
   mBinTableCount = 0;
 
   // Reset The error/warning counters
@@ -219,16 +226,19 @@ AcpiView (
   // Search the table for an entry that matches the ACPI Table Guid
   FoundAcpiTable = FALSE;
   for (Index = 0; Index < SystemTable->NumberOfTableEntries; Index++) {
-    if (CompareGuid (&gEfiAcpiTableGuid,
-          &(SystemTable->ConfigurationTable[Index].VendorGuid))) {
+    if (CompareGuid (
+          &gEfiAcpiTableGuid,
+          &(SystemTable->ConfigurationTable[Index].VendorGuid)
+          ))
+    {
       EfiConfigurationTable = &SystemTable->ConfigurationTable[Index];
-      FoundAcpiTable = TRUE;
+      FoundAcpiTable        = TRUE;
       break;
     }
   }
 
   if (FoundAcpiTable) {
-    RsdpPtr = (UINT8*)EfiConfigurationTable->VendorTable;
+    RsdpPtr = (UINT8 *)EfiConfigurationTable->VendorTable;
 
     // The RSDP revision is 1 byte starting at offset 15
     RsdpRevision = *(RsdpPtr + RSDP_REVISION_OFFSET);
@@ -240,14 +250,15 @@ AcpiView (
       return EFI_UNSUPPORTED;
     }
 
-#if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
     if (GetMandatoryTableValidate ()) {
       ArmSbbrResetTableCounts ();
     }
-#endif
+
+ #endif
 
     // The RSDP length is 4 bytes starting at offset 20
-    RsdpLength = *(UINT32*)(RsdpPtr + RSDP_LENGTH_OFFSET);
+    RsdpLength = *(UINT32 *)(RsdpPtr + RSDP_LENGTH_OFFSET);
 
     Trace = ProcessTableReportOptions (RSDP_TABLE_INFO, RsdpPtr, RsdpLength);
 
@@ -265,7 +276,6 @@ AcpiView (
       RsdpLength,
       RsdpRevision
       );
-
   } else {
     IncrementErrorCount ();
     Print (
@@ -274,45 +284,50 @@ AcpiView (
     return EFI_NOT_FOUND;
   }
 
-#if defined(MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
   if (GetMandatoryTableValidate ()) {
     ArmSbbrReqsValidate ((ARM_SBBR_VERSION)GetMandatoryTableSpec ());
   }
-#endif
+
+ #endif
 
   ReportOption = GetReportOption ();
   if (ReportTableList != ReportOption) {
     if (((ReportSelected == ReportOption)  ||
          (ReportDumpBinFile == ReportOption)) &&
-        (!SelectedTable->Found)) {
+        (!SelectedTable->Found))
+    {
       Print (L"\nRequested ACPI Table not found.\n");
     } else if (GetConsistencyChecking () &&
-               (ReportDumpBinFile != ReportOption)) {
+               (ReportDumpBinFile != ReportOption))
+    {
       OriginalAttribute = gST->ConOut->Mode->Attribute;
 
       Print (L"\nTable Statistics:\n");
 
       if (GetColourHighlighting ()) {
         PrintAttribute = (GetErrorCount () > 0) ?
-                            EFI_TEXT_ATTR (
-                              EFI_RED,
-                              ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
-                              ) :
-                            OriginalAttribute;
+                         EFI_TEXT_ATTR (
+                           EFI_RED,
+                           ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
+                           ) :
+                         OriginalAttribute;
         gST->ConOut->SetAttribute (gST->ConOut, PrintAttribute);
       }
+
       Print (L"\t%d Error(s)\n", GetErrorCount ());
 
       if (GetColourHighlighting ()) {
         PrintAttribute = (GetWarningCount () > 0) ?
-                            EFI_TEXT_ATTR (
-                              EFI_RED,
-                              ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
-                              ) :
-                            OriginalAttribute;
+                         EFI_TEXT_ATTR (
+                           EFI_RED,
+                           ((OriginalAttribute&(BIT4|BIT5|BIT6))>>4)
+                           ) :
+                         OriginalAttribute;
 
         gST->ConOut->SetAttribute (gST->ConOut, PrintAttribute);
       }
+
       Print (L"\t%d Warning(s)\n", GetWarningCount ());
 
       if (GetColourHighlighting ()) {
@@ -320,5 +335,6 @@ AcpiView (
       }
     }
   }
+
   return EFI_SUCCESS;
 }

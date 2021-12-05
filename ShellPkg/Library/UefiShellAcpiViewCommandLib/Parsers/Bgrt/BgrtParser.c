@@ -14,19 +14,19 @@
 #include "AcpiTableParser.h"
 
 // Local variables
-STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
+STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
 
 /**
   An ACPI_PARSER array describing the ACPI BDRT Table.
 **/
-STATIC CONST ACPI_PARSER BgrtParser[] = {
+STATIC CONST ACPI_PARSER  BgrtParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
-  {L"Version", 2, 36, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Status", 1, 38, L"0x%x", NULL,  NULL, NULL, NULL},
-  {L"Image Type", 1, 39, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Image Address", 8, 40, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Image Offset X", 4, 48, L"%d", NULL, NULL, NULL, NULL},
-  {L"Image Offset Y", 4, 52, L"%d", NULL, NULL, NULL, NULL}
+  { L"Version",                    2,  36, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Status",                     1,  38, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Image Type",                 1,  39, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Image Address",              8,  40, L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Image Offset X",             4,  48, L"%d",    NULL, NULL, NULL, NULL },
+  { L"Image Offset Y",             4,  52, L"%d",    NULL, NULL, NULL, NULL }
 };
 
 /**
@@ -44,10 +44,10 @@ STATIC CONST ACPI_PARSER BgrtParser[] = {
 VOID
 EFIAPI
 ParseAcpiBgrt (
-  IN BOOLEAN Trace,
-  IN UINT8*  Ptr,
-  IN UINT32  AcpiTableLength,
-  IN UINT8   AcpiTableRevision
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
   )
 {
   if (!Trace) {
