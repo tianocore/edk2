@@ -14,11 +14,11 @@
 //
 // Static (possibly build generated) Bios Vendor data.
 //
-SMBIOS_MISC_TABLE_DATA(SMBIOS_TABLE_TYPE32, MiscBootInformation) = {
+SMBIOS_MISC_TABLE_DATA (SMBIOS_TABLE_TYPE32, MiscBootInformation) = {
   {                                                     // Hdr
-    EFI_SMBIOS_TYPE_SYSTEM_BOOT_INFORMATION,              // Type,
-    0,                                                    // Length,
-    0                                                     // Handle
+    EFI_SMBIOS_TYPE_SYSTEM_BOOT_INFORMATION,            // Type,
+    0,                                                  // Length,
+    0                                                   // Handle
   },
   {                                                     // Reserved[6]
     0,

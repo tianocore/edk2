@@ -9,7 +9,6 @@
 
 **/
 
-
 #ifndef ASM_MACRO_IO_LIBV8_H_
 #define ASM_MACRO_IO_LIBV8_H_
 
@@ -23,7 +22,6 @@
         b.eq   2f                   ;\
         cbnz   SAFE_XREG, 1f        ;\
         b      .                    ;// We should never get here
-
 
 // CurrentEL : 0xC = EL3; 8 = EL2; 4 = EL1
 // This only selects between EL1 and EL2 and EL3, else we die.
@@ -42,7 +40,7 @@
   .type     Name, %function       ; \
   Name:
 
-#define ASM_FUNC(Name)            _ASM_FUNC(ASM_PFX(Name), .text. ## Name)
+#define ASM_FUNC(Name)  _ASM_FUNC(ASM_PFX(Name), .text. ## Name)
 
 #define MOV32(Reg, Val)                   \
   movz      Reg, (Val) >> 16, lsl #16   ; \

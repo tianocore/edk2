@@ -30,7 +30,7 @@ SmbiosProcessorGetMaxCacheLevel (
 **/
 BOOLEAN
 SmbiosProcessorHasSeparateCaches (
-  UINT8 CacheLevel
+  UINT8  CacheLevel
   );
 
 /** Gets the size of the specified cache.
@@ -43,9 +43,9 @@ SmbiosProcessorHasSeparateCaches (
 **/
 UINT64
 SmbiosProcessorGetCacheSize (
-  IN UINT8   CacheLevel,
-  IN BOOLEAN DataCache,
-  IN BOOLEAN UnifiedCache
+  IN UINT8    CacheLevel,
+  IN BOOLEAN  DataCache,
+  IN BOOLEAN  UnifiedCache
   );
 
 /** Gets the associativity of the specified cache.
@@ -58,9 +58,9 @@ SmbiosProcessorGetCacheSize (
 **/
 UINT32
 SmbiosProcessorGetCacheAssociativity (
-  IN UINT8   CacheLevel,
-  IN BOOLEAN DataCache,
-  IN BOOLEAN UnifiedCache
+  IN UINT8    CacheLevel,
+  IN BOOLEAN  DataCache,
+  IN BOOLEAN  UnifiedCache
   );
 
 /** Returns a value for the Processor ID field that conforms to SMBIOS
@@ -69,34 +69,44 @@ SmbiosProcessorGetCacheAssociativity (
     @return Processor ID.
 **/
 UINT64
-SmbiosGetProcessorId (VOID);
+SmbiosGetProcessorId (
+  VOID
+  );
 
 /** Returns the external clock frequency.
 
     @return The external CPU clock frequency.
 **/
 UINTN
-SmbiosGetExternalClockFrequency (VOID);
+SmbiosGetExternalClockFrequency (
+  VOID
+  );
 
 /** Returns the SMBIOS ProcessorFamily field value.
 
     @return The value for the ProcessorFamily field.
 **/
 UINT8
-SmbiosGetProcessorFamily (VOID);
+SmbiosGetProcessorFamily (
+  VOID
+  );
 
 /** Returns the ProcessorFamily2 field value.
 
     @return The value for the ProcessorFamily2 field.
 **/
 UINT16
-SmbiosGetProcessorFamily2 (VOID);
+SmbiosGetProcessorFamily2 (
+  VOID
+  );
 
 /** Returns the SMBIOS Processor Characteristics.
 
     @return Processor Characteristics bitfield.
 **/
 PROCESSOR_CHARACTERISTIC_FLAGS
-SmbiosGetProcessorCharacteristics (VOID);
+SmbiosGetProcessorCharacteristics (
+  VOID
+  );
 
 #endif // SMBIOS_PROCESSOR_H_

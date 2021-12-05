@@ -31,7 +31,7 @@
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
 
-extern BOOLEAN mIsFlushingGCD;
+extern BOOLEAN  mIsFlushingGCD;
 
 /**
   This function registers and enables the handler specified by InterruptHandler for a processor
@@ -55,10 +55,9 @@ extern BOOLEAN mIsFlushingGCD;
 **/
 EFI_STATUS
 RegisterInterruptHandler (
-  IN EFI_EXCEPTION_TYPE             InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER      InterruptHandler
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   );
-
 
 /**
   This function registers and enables the handler specified by InterruptHandler for a processor
@@ -82,28 +81,27 @@ RegisterInterruptHandler (
 **/
 EFI_STATUS
 RegisterDebuggerInterruptHandler (
-  IN EFI_EXCEPTION_TYPE             InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER      InterruptHandler
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   );
-
 
 EFI_STATUS
 EFIAPI
 CpuSetMemoryAttributes (
-  IN EFI_CPU_ARCH_PROTOCOL     *This,
-  IN EFI_PHYSICAL_ADDRESS      BaseAddress,
-  IN UINT64                    Length,
-  IN UINT64                    Attributes
+  IN EFI_CPU_ARCH_PROTOCOL  *This,
+  IN EFI_PHYSICAL_ADDRESS   BaseAddress,
+  IN UINT64                 Length,
+  IN UINT64                 Attributes
   );
 
 EFI_STATUS
 InitializeExceptions (
-  IN EFI_CPU_ARCH_PROTOCOL    *Cpu
+  IN EFI_CPU_ARCH_PROTOCOL  *Cpu
   );
 
 EFI_STATUS
 SyncCacheConfig (
-  IN  EFI_CPU_ARCH_PROTOCOL *CpuProtocol
+  IN  EFI_CPU_ARCH_PROTOCOL  *CpuProtocol
   );
 
 /**
@@ -117,30 +115,30 @@ SyncCacheConfig (
 **/
 VOID
 EFIAPI
-PublishArmProcessorTable(
+PublishArmProcessorTable (
   VOID
   );
 
 // The ARM Attributes might be defined on 64-bit (case of the long format description table)
 UINT64
 EfiAttributeToArmAttribute (
-  IN UINT64                    EfiAttributes
+  IN UINT64  EfiAttributes
   );
 
 EFI_STATUS
 GetMemoryRegion (
-  IN OUT UINTN                   *BaseAddress,
-  OUT    UINTN                   *RegionLength,
-  OUT    UINTN                   *RegionAttributes
+  IN OUT UINTN  *BaseAddress,
+  OUT    UINTN  *RegionLength,
+  OUT    UINTN  *RegionAttributes
   );
 
 EFI_STATUS
 SetGcdMemorySpaceAttributes (
-  IN EFI_GCD_MEMORY_SPACE_DESCRIPTOR    *MemorySpaceMap,
-  IN UINTN                               NumberOfDescriptors,
-  IN EFI_PHYSICAL_ADDRESS                BaseAddress,
-  IN UINT64                              Length,
-  IN UINT64                              Attributes
+  IN EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap,
+  IN UINTN                            NumberOfDescriptors,
+  IN EFI_PHYSICAL_ADDRESS             BaseAddress,
+  IN UINT64                           Length,
+  IN UINT64                           Attributes
   );
 
 #endif // CPU_DXE_H_

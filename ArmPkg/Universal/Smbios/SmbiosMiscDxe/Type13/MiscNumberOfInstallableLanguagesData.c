@@ -17,12 +17,12 @@
 // Static (possibly build generated) Bios Vendor data.
 //
 
-SMBIOS_MISC_TABLE_DATA(SMBIOS_TABLE_TYPE13, MiscNumberOfInstallableLanguages) =
+SMBIOS_MISC_TABLE_DATA (SMBIOS_TABLE_TYPE13, MiscNumberOfInstallableLanguages) =
 {
   {                                                     // Hdr
-    EFI_SMBIOS_TYPE_BIOS_LANGUAGE_INFORMATION,            // Type,
-    0,                                                    // Length,
-    0                                                     // Handle
+    EFI_SMBIOS_TYPE_BIOS_LANGUAGE_INFORMATION,          // Type,
+    0,                                                  // Length,
+    0                                                   // Handle
   },
   0,                                                    // InstallableLanguages
   0,                                                    // Flags

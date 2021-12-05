@@ -8,9 +8,9 @@
 #ifndef ARM_SOFT_FLOAT_LIB_H_
 #define ARM_SOFT_FLOAT_LIB_H_
 
-#define LITTLEENDIAN 1
-#define INLINE static inline
-#define SOFTFLOAT_BUILTIN_CLZ 1
+#define LITTLEENDIAN           1
+#define INLINE                 static inline
+#define SOFTFLOAT_BUILTIN_CLZ  1
 #define SOFTFLOAT_FAST_INT64
 #include "opts-GCC.h"
 

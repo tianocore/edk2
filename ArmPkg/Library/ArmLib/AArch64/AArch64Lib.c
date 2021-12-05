@@ -23,10 +23,10 @@ AArch64DataCacheOperation (
   IN  AARCH64_CACHE_OPERATION  DataCacheOperation
   )
 {
-  UINTN     SavedInterruptState;
+  UINTN  SavedInterruptState;
 
   SavedInterruptState = ArmGetInterruptState ();
-  ArmDisableInterrupts();
+  ArmDisableInterrupts ();
 
   AArch64AllDataCachesOperation (DataCacheOperation);
 
@@ -99,7 +99,7 @@ ArmHasCcidx (
   VOID
   )
 {
-  UINTN Mmfr2;
+  UINTN  Mmfr2;
 
   Mmfr2 = ArmReadIdAA64Mmfr2 ();
   return (((Mmfr2 >> 20) & 0xF) == 1) ? TRUE : FALSE;

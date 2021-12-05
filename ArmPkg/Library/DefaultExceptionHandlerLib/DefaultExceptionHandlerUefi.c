@@ -33,11 +33,11 @@ GetImageName (
   OUT UINTN  *PeCoffSizeOfHeaders
   )
 {
-  EFI_STATUS                          Status;
-  EFI_DEBUG_IMAGE_INFO_TABLE_HEADER   *DebugTableHeader;
-  EFI_DEBUG_IMAGE_INFO                *DebugTable;
-  UINTN                               Entry;
-  CHAR8                               *Address;
+  EFI_STATUS                         Status;
+  EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  *DebugTableHeader;
+  EFI_DEBUG_IMAGE_INFO               *DebugTable;
+  UINTN                              Entry;
+  CHAR8                              *Address;
 
   Status = EfiGetSystemConfigurationTable (&gEfiDebugImageInfoTableGuid, (VOID **)&DebugTableHeader);
   if (EFI_ERROR (Status)) {
@@ -53,10 +53,12 @@ GetImageName (
   for (Entry = 0; Entry < DebugTableHeader->TableSize; Entry++, DebugTable++) {
     if (DebugTable->NormalImage != NULL) {
       if ((DebugTable->NormalImage->ImageInfoType == EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL) &&
-          (DebugTable->NormalImage->LoadedImageProtocolInstance != NULL)) {
+          (DebugTable->NormalImage->LoadedImageProtocolInstance != NULL))
+      {
         if ((Address >= (CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase) &&
-            (Address <= ((CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase + DebugTable->NormalImage->LoadedImageProtocolInstance->ImageSize))) {
-          *ImageBase = (UINTN)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase;
+            (Address <= ((CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase + DebugTable->NormalImage->LoadedImageProtocolInstance->ImageSize)))
+        {
+          *ImageBase           = (UINTN)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase;
           *PeCoffSizeOfHeaders = PeCoffGetSizeOfHeaders ((VOID *)(UINTN)*ImageBase);
           return PeCoffLoaderGetPdbPointer (DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase);
         }
@@ -66,4 +68,3 @@ GetImageName (
 
   return NULL;
 }
-

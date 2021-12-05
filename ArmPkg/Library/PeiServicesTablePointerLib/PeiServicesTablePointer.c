@@ -28,10 +28,10 @@
 VOID
 EFIAPI
 SetPeiServicesTablePointer (
-  IN CONST EFI_PEI_SERVICES ** PeiServicesTablePointer
+  IN CONST EFI_PEI_SERVICES  **PeiServicesTablePointer
   )
 {
-  ArmWriteTpidrurw((UINTN)PeiServicesTablePointer);
+  ArmWriteTpidrurw ((UINTN)PeiServicesTablePointer);
 }
 
 /**
@@ -52,7 +52,7 @@ GetPeiServicesTablePointer (
   VOID
   )
 {
-  return (CONST EFI_PEI_SERVICES **)ArmReadTpidrurw();
+  return (CONST EFI_PEI_SERVICES **)ArmReadTpidrurw ();
 }
 
 /**
@@ -71,9 +71,9 @@ migration actions are required for Itanium or ARM CPUs.
 **/
 VOID
 EFIAPI
-MigratePeiServicesTablePointer(
-VOID
-)
+MigratePeiServicesTablePointer (
+  VOID
+  )
 {
   return;
 }

@@ -12,36 +12,36 @@
 #include <Library/ArmGicArchLib.h>
 
 // GIC Distributor
-#define ARM_GIC_ICDDCR          0x000 // Distributor Control Register
-#define ARM_GIC_ICDICTR         0x004 // Interrupt Controller Type Register
-#define ARM_GIC_ICDIIDR         0x008 // Implementer Identification Register
+#define ARM_GIC_ICDDCR   0x000        // Distributor Control Register
+#define ARM_GIC_ICDICTR  0x004        // Interrupt Controller Type Register
+#define ARM_GIC_ICDIIDR  0x008        // Implementer Identification Register
 
 // Each reg base below repeats for Number of interrupts / 4 (see GIC spec)
-#define ARM_GIC_ICDISR          0x080 // Interrupt Security Registers
-#define ARM_GIC_ICDISER         0x100 // Interrupt Set-Enable Registers
-#define ARM_GIC_ICDICER         0x180 // Interrupt Clear-Enable Registers
-#define ARM_GIC_ICDSPR          0x200 // Interrupt Set-Pending Registers
-#define ARM_GIC_ICDICPR         0x280 // Interrupt Clear-Pending Registers
-#define ARM_GIC_ICDABR          0x300 // Active Bit Registers
+#define ARM_GIC_ICDISR   0x080        // Interrupt Security Registers
+#define ARM_GIC_ICDISER  0x100        // Interrupt Set-Enable Registers
+#define ARM_GIC_ICDICER  0x180        // Interrupt Clear-Enable Registers
+#define ARM_GIC_ICDSPR   0x200        // Interrupt Set-Pending Registers
+#define ARM_GIC_ICDICPR  0x280        // Interrupt Clear-Pending Registers
+#define ARM_GIC_ICDABR   0x300        // Active Bit Registers
 
 // Each reg base below repeats for Number of interrupts / 4
-#define ARM_GIC_ICDIPR          0x400 // Interrupt Priority Registers
+#define ARM_GIC_ICDIPR  0x400         // Interrupt Priority Registers
 
 // Each reg base below repeats for Number of interrupts
-#define ARM_GIC_ICDIPTR         0x800 // Interrupt Processor Target Registers
-#define ARM_GIC_ICDICFR         0xC00 // Interrupt Configuration Registers
+#define ARM_GIC_ICDIPTR  0x800        // Interrupt Processor Target Registers
+#define ARM_GIC_ICDICFR  0xC00        // Interrupt Configuration Registers
 
-#define ARM_GIC_ICDPPISR        0xD00 // PPI Status register
+#define ARM_GIC_ICDPPISR  0xD00       // PPI Status register
 
 // just one of these
-#define ARM_GIC_ICDSGIR         0xF00 // Software Generated Interrupt Register
+#define ARM_GIC_ICDSGIR  0xF00        // Software Generated Interrupt Register
 
 // GICv3 specific registers
-#define ARM_GICD_IROUTER        0x6100 // Interrupt Routing Registers
+#define ARM_GICD_IROUTER  0x6100       // Interrupt Routing Registers
 
 // GICD_CTLR bits
-#define ARM_GIC_ICDDCR_ARE      (1 << 4) // Affinity Routing Enable (ARE)
-#define ARM_GIC_ICDDCR_DS       (1 << 6) // Disable Security (DS)
+#define ARM_GIC_ICDDCR_ARE  (1 << 4)     // Affinity Routing Enable (ARE)
+#define ARM_GIC_ICDDCR_DS   (1 << 6)     // Disable Security (DS)
 
 // GICD_ICDICFR bits
 #define ARM_GIC_ICDICFR_WIDTH            32   // ICDICFR is a 32 bit register
@@ -52,125 +52,124 @@
 #define ARM_GIC_ICDICFR_LEVEL_TRIGGERED  0x0  // Level triggered interrupt
 #define ARM_GIC_ICDICFR_EDGE_TRIGGERED   0x1  // Edge triggered interrupt
 
-
 // GIC Redistributor
-#define ARM_GICR_CTLR_FRAME_SIZE         SIZE_64KB
-#define ARM_GICR_SGI_PPI_FRAME_SIZE      SIZE_64KB
-#define ARM_GICR_SGI_VLPI_FRAME_SIZE     SIZE_64KB
-#define ARM_GICR_SGI_RESERVED_FRAME_SIZE SIZE_64KB
+#define ARM_GICR_CTLR_FRAME_SIZE          SIZE_64KB
+#define ARM_GICR_SGI_PPI_FRAME_SIZE       SIZE_64KB
+#define ARM_GICR_SGI_VLPI_FRAME_SIZE      SIZE_64KB
+#define ARM_GICR_SGI_RESERVED_FRAME_SIZE  SIZE_64KB
 
 // GIC Redistributor Control frame
-#define ARM_GICR_TYPER          0x0008  // Redistributor Type Register
+#define ARM_GICR_TYPER  0x0008          // Redistributor Type Register
 
 // GIC Redistributor TYPER bit assignments
-#define ARM_GICR_TYPER_PLPIS        (1 << 0)              // Physical LPIs
-#define ARM_GICR_TYPER_VLPIS        (1 << 1)              // Virtual LPIs
-#define ARM_GICR_TYPER_DIRECTLPI    (1 << 3)              // Direct LPIs
-#define ARM_GICR_TYPER_LAST         (1 << 4)              // Last Redistributor in series
-#define ARM_GICR_TYPER_DPGS         (1 << 5)              // Disable Processor Group
+#define ARM_GICR_TYPER_PLPIS      (1 << 0)                // Physical LPIs
+#define ARM_GICR_TYPER_VLPIS      (1 << 1)                // Virtual LPIs
+#define ARM_GICR_TYPER_DIRECTLPI  (1 << 3)                // Direct LPIs
+#define ARM_GICR_TYPER_LAST       (1 << 4)                // Last Redistributor in series
+#define ARM_GICR_TYPER_DPGS       (1 << 5)                // Disable Processor Group
                                                           // Selection Support
-#define ARM_GICR_TYPER_PROCNO       (0xFFFF << 8)         // Processor Number
-#define ARM_GICR_TYPER_COMMONLPIAFF (0x3 << 24)           // Common LPI Affinity
-#define ARM_GICR_TYPER_AFFINITY     (0xFFFFFFFFULL << 32) // Redistributor Affinity
+#define ARM_GICR_TYPER_PROCNO        (0xFFFF << 8)         // Processor Number
+#define ARM_GICR_TYPER_COMMONLPIAFF  (0x3 << 24)           // Common LPI Affinity
+#define ARM_GICR_TYPER_AFFINITY      (0xFFFFFFFFULL << 32) // Redistributor Affinity
 
 #define ARM_GICR_TYPER_GET_AFFINITY(TypeReg)  (((TypeReg) & \
                                                 ARM_GICR_TYPER_AFFINITY) >> 32)
 
 // GIC SGI & PPI Redistributor frame
-#define ARM_GICR_ISENABLER      0x0100  // Interrupt Set-Enable Registers
-#define ARM_GICR_ICENABLER      0x0180  // Interrupt Clear-Enable Registers
+#define ARM_GICR_ISENABLER  0x0100      // Interrupt Set-Enable Registers
+#define ARM_GICR_ICENABLER  0x0180      // Interrupt Clear-Enable Registers
 
 // GIC Cpu interface
-#define ARM_GIC_ICCICR          0x00  // CPU Interface Control Register
-#define ARM_GIC_ICCPMR          0x04  // Interrupt Priority Mask Register
-#define ARM_GIC_ICCBPR          0x08  // Binary Point Register
-#define ARM_GIC_ICCIAR          0x0C  // Interrupt Acknowledge Register
-#define ARM_GIC_ICCEIOR         0x10  // End Of Interrupt Register
-#define ARM_GIC_ICCRPR          0x14  // Running Priority Register
-#define ARM_GIC_ICCPIR          0x18  // Highest Pending Interrupt Register
-#define ARM_GIC_ICCABPR         0x1C  // Aliased Binary Point Register
-#define ARM_GIC_ICCIIDR         0xFC  // Identification Register
+#define ARM_GIC_ICCICR   0x00         // CPU Interface Control Register
+#define ARM_GIC_ICCPMR   0x04         // Interrupt Priority Mask Register
+#define ARM_GIC_ICCBPR   0x08         // Binary Point Register
+#define ARM_GIC_ICCIAR   0x0C         // Interrupt Acknowledge Register
+#define ARM_GIC_ICCEIOR  0x10         // End Of Interrupt Register
+#define ARM_GIC_ICCRPR   0x14         // Running Priority Register
+#define ARM_GIC_ICCPIR   0x18         // Highest Pending Interrupt Register
+#define ARM_GIC_ICCABPR  0x1C         // Aliased Binary Point Register
+#define ARM_GIC_ICCIIDR  0xFC         // Identification Register
 
-#define ARM_GIC_ICDSGIR_FILTER_TARGETLIST       0x0
-#define ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE     0x1
-#define ARM_GIC_ICDSGIR_FILTER_ITSELF           0x2
+#define ARM_GIC_ICDSGIR_FILTER_TARGETLIST    0x0
+#define ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE  0x1
+#define ARM_GIC_ICDSGIR_FILTER_ITSELF        0x2
 
 // Bit-masks to configure the CPU Interface Control register
-#define ARM_GIC_ICCICR_ENABLE_SECURE            0x01
-#define ARM_GIC_ICCICR_ENABLE_NS                0x02
-#define ARM_GIC_ICCICR_ACK_CTL                  0x04
-#define ARM_GIC_ICCICR_SIGNAL_SECURE_TO_FIQ     0x08
-#define ARM_GIC_ICCICR_USE_SBPR                 0x10
+#define ARM_GIC_ICCICR_ENABLE_SECURE         0x01
+#define ARM_GIC_ICCICR_ENABLE_NS             0x02
+#define ARM_GIC_ICCICR_ACK_CTL               0x04
+#define ARM_GIC_ICCICR_SIGNAL_SECURE_TO_FIQ  0x08
+#define ARM_GIC_ICCICR_USE_SBPR              0x10
 
 // Bit Mask for GICC_IIDR
-#define ARM_GIC_ICCIIDR_GET_PRODUCT_ID(IccIidr)   (((IccIidr) >> 20) & 0xFFF)
-#define ARM_GIC_ICCIIDR_GET_ARCH_VERSION(IccIidr) (((IccIidr) >> 16) & 0xF)
-#define ARM_GIC_ICCIIDR_GET_REVISION(IccIidr)     (((IccIidr) >> 12) & 0xF)
-#define ARM_GIC_ICCIIDR_GET_IMPLEMENTER(IccIidr)  ((IccIidr) & 0xFFF)
+#define ARM_GIC_ICCIIDR_GET_PRODUCT_ID(IccIidr)    (((IccIidr) >> 20) & 0xFFF)
+#define ARM_GIC_ICCIIDR_GET_ARCH_VERSION(IccIidr)  (((IccIidr) >> 16) & 0xF)
+#define ARM_GIC_ICCIIDR_GET_REVISION(IccIidr)      (((IccIidr) >> 12) & 0xF)
+#define ARM_GIC_ICCIIDR_GET_IMPLEMENTER(IccIidr)   ((IccIidr) & 0xFFF)
 
 // Bit Mask for
-#define ARM_GIC_ICCIAR_ACKINTID                 0x3FF
+#define ARM_GIC_ICCIAR_ACKINTID  0x3FF
 
 UINTN
 EFIAPI
 ArmGicGetInterfaceIdentification (
-  IN  INTN          GicInterruptInterfaceBase
+  IN  INTN  GicInterruptInterfaceBase
   );
 
 // GIC Secure interfaces
 VOID
 EFIAPI
 ArmGicSetupNonSecure (
-  IN  UINTN         MpId,
-  IN  INTN          GicDistributorBase,
-  IN  INTN          GicInterruptInterfaceBase
+  IN  UINTN  MpId,
+  IN  INTN   GicDistributorBase,
+  IN  INTN   GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicSetSecureInterrupts (
-  IN  UINTN         GicDistributorBase,
-  IN  UINTN*        GicSecureInterruptMask,
-  IN  UINTN         GicSecureInterruptMaskSize
+  IN  UINTN  GicDistributorBase,
+  IN  UINTN  *GicSecureInterruptMask,
+  IN  UINTN  GicSecureInterruptMaskSize
   );
 
 VOID
 EFIAPI
 ArmGicEnableInterruptInterface (
-  IN  INTN          GicInterruptInterfaceBase
+  IN  INTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicDisableInterruptInterface (
-  IN  INTN          GicInterruptInterfaceBase
+  IN  INTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicEnableDistributor (
-  IN  INTN          GicDistributorBase
+  IN  INTN  GicDistributorBase
   );
 
 VOID
 EFIAPI
 ArmGicDisableDistributor (
-  IN  INTN          GicDistributorBase
+  IN  INTN  GicDistributorBase
   );
 
 UINTN
 EFIAPI
 ArmGicGetMaxNumInterrupts (
-  IN  INTN          GicDistributorBase
+  IN  INTN  GicDistributorBase
   );
 
 VOID
 EFIAPI
 ArmGicSendSgiTo (
-  IN  INTN          GicDistributorBase,
-  IN  INTN          TargetListFilter,
-  IN  INTN          CPUTargetList,
-  IN  INTN          SgiId
+  IN  INTN  GicDistributorBase,
+  IN  INTN  TargetListFilter,
+  IN  INTN  CPUTargetList,
+  IN  INTN  SgiId
   );
 
 /*
@@ -190,55 +189,55 @@ ArmGicSendSgiTo (
 UINTN
 EFIAPI
 ArmGicAcknowledgeInterrupt (
-  IN  UINTN          GicInterruptInterfaceBase,
-  OUT UINTN          *InterruptId
+  IN  UINTN  GicInterruptInterfaceBase,
+  OUT UINTN  *InterruptId
   );
 
 VOID
 EFIAPI
 ArmGicEndOfInterrupt (
-  IN  UINTN                 GicInterruptInterfaceBase,
-  IN UINTN                  Source
+  IN  UINTN  GicInterruptInterfaceBase,
+  IN UINTN   Source
   );
 
 UINTN
 EFIAPI
 ArmGicSetPriorityMask (
-  IN  INTN          GicInterruptInterfaceBase,
-  IN  INTN          PriorityMask
+  IN  INTN  GicInterruptInterfaceBase,
+  IN  INTN  PriorityMask
   );
 
 VOID
 EFIAPI
 ArmGicSetInterruptPriority (
-  IN UINTN                  GicDistributorBase,
-  IN UINTN                  GicRedistributorBase,
-  IN UINTN                  Source,
-  IN UINTN                  Priority
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source,
+  IN UINTN  Priority
   );
 
 VOID
 EFIAPI
 ArmGicEnableInterrupt (
-  IN UINTN                  GicDistributorBase,
-  IN UINTN                  GicRedistributorBase,
-  IN UINTN                  Source
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
   );
 
 VOID
 EFIAPI
 ArmGicDisableInterrupt (
-  IN UINTN                  GicDistributorBase,
-  IN UINTN                  GicRedistributorBase,
-  IN UINTN                  Source
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
   );
 
 BOOLEAN
 EFIAPI
 ArmGicIsInterruptEnabled (
-  IN UINTN                  GicDistributorBase,
-  IN UINTN                  GicRedistributorBase,
-  IN UINTN                  Source
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
   );
 
 // GIC revision 2 specific declarations
@@ -251,41 +250,41 @@ ArmGicIsInterruptEnabled (
 VOID
 EFIAPI
 ArmGicV2SetupNonSecure (
-  IN  UINTN         MpId,
-  IN  INTN          GicDistributorBase,
-  IN  INTN          GicInterruptInterfaceBase
+  IN  UINTN  MpId,
+  IN  INTN   GicDistributorBase,
+  IN  INTN   GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicV2EnableInterruptInterface (
-  IN  INTN          GicInterruptInterfaceBase
+  IN  INTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicV2DisableInterruptInterface (
-  IN  INTN          GicInterruptInterfaceBase
+  IN  INTN  GicInterruptInterfaceBase
   );
 
 UINTN
 EFIAPI
 ArmGicV2AcknowledgeInterrupt (
-  IN  UINTN          GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicV2EndOfInterrupt (
-  IN UINTN                  GicInterruptInterfaceBase,
-  IN UINTN                  Source
+  IN UINTN  GicInterruptInterfaceBase,
+  IN UINTN  Source
   );
 
 // GIC revision 3 specific declarations
 
-#define ICC_SRE_EL2_SRE         (1 << 0)
+#define ICC_SRE_EL2_SRE  (1 << 0)
 
-#define ARM_GICD_IROUTER_IRM BIT31
+#define ARM_GICD_IROUTER_IRM  BIT31
 
 UINT32
 EFIAPI
@@ -296,7 +295,7 @@ ArmGicV3GetControlSystemRegisterEnable (
 VOID
 EFIAPI
 ArmGicV3SetControlSystemRegisterEnable (
-  IN UINT32         ControlSystemRegisterEnable
+  IN UINT32  ControlSystemRegisterEnable
   );
 
 VOID
@@ -320,17 +319,17 @@ ArmGicV3AcknowledgeInterrupt (
 VOID
 EFIAPI
 ArmGicV3EndOfInterrupt (
-  IN UINTN                  Source
+  IN UINTN  Source
   );
 
 VOID
 ArmGicV3SetBinaryPointer (
-  IN UINTN                  BinaryPoint
+  IN UINTN  BinaryPoint
   );
 
 VOID
 ArmGicV3SetPriorityMask (
-  IN UINTN                  Priority
+  IN UINTN  Priority
   );
 
 #endif // ARMGIC_H_

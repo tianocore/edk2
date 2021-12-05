@@ -14,7 +14,7 @@
 
 #include <Guid/ArmMpCoreInfo.h>
 
-ARM_PROCESSOR_TABLE mArmProcessorTableTemplate = {
+ARM_PROCESSOR_TABLE  mArmProcessorTableTemplate = {
   {
     EFI_ARM_PROCESSOR_TABLE_SIGNATURE,
     0,
@@ -26,7 +26,7 @@ ARM_PROCESSOR_TABLE mArmProcessorTableTemplate = {
     EFI_ARM_PROCESSOR_TABLE_CREATOR_REVISION,
     { 0 },
     0
-  },   //ARM Processor table header
+  },   // ARM Processor table header
   0,   // Number of entries in ARM processor Table
   NULL // ARM Processor Table
 };
@@ -45,47 +45,48 @@ PublishArmProcessorTable (
   VOID
   )
 {
-  EFI_PEI_HOB_POINTERS    Hob;
+  EFI_PEI_HOB_POINTERS  Hob;
 
   Hob.Raw = GetHobList ();
 
   // Iterate through the HOBs and find if there is ARM PROCESSOR ENTRY HOB
-  for (; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
+  for ( ; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
     // Check for Correct HOB type
     if ((GET_HOB_TYPE (Hob)) == EFI_HOB_TYPE_GUID_EXTENSION) {
       // Check for correct GUID type
-      if (CompareGuid(&(Hob.Guid->Name), &gArmMpCoreInfoGuid)) {
-        ARM_PROCESSOR_TABLE     *ArmProcessorTable;
-        EFI_STATUS              Status;
+      if (CompareGuid (&(Hob.Guid->Name), &gArmMpCoreInfoGuid)) {
+        ARM_PROCESSOR_TABLE  *ArmProcessorTable;
+        EFI_STATUS           Status;
 
         // Allocate Runtime memory for ARM processor table
-        ArmProcessorTable = (ARM_PROCESSOR_TABLE*)AllocateRuntimePool(sizeof(ARM_PROCESSOR_TABLE));
+        ArmProcessorTable = (ARM_PROCESSOR_TABLE *)AllocateRuntimePool (sizeof (ARM_PROCESSOR_TABLE));
 
         // Check if the memory allocation is successful or not
-        ASSERT(NULL != ArmProcessorTable);
+        ASSERT (NULL != ArmProcessorTable);
 
         // Set ARM processor table to default values
-        CopyMem(ArmProcessorTable,&mArmProcessorTableTemplate,sizeof(ARM_PROCESSOR_TABLE));
+        CopyMem (ArmProcessorTable, &mArmProcessorTableTemplate, sizeof (ARM_PROCESSOR_TABLE));
 
         // Fill in Length fields of ARM processor table
-        ArmProcessorTable->Header.Length = sizeof(ARM_PROCESSOR_TABLE);
-        ArmProcessorTable->Header.DataLen = GET_GUID_HOB_DATA_SIZE(Hob);
+        ArmProcessorTable->Header.Length  = sizeof (ARM_PROCESSOR_TABLE);
+        ArmProcessorTable->Header.DataLen = GET_GUID_HOB_DATA_SIZE (Hob);
 
         // Fill in Identifier(ARM processor table GUID)
         ArmProcessorTable->Header.Identifier = gArmMpCoreInfoGuid;
 
         // Set Number of ARM core entries in the Table
-        ArmProcessorTable->NumberOfEntries = GET_GUID_HOB_DATA_SIZE(Hob)/sizeof(ARM_CORE_INFO);
+        ArmProcessorTable->NumberOfEntries = GET_GUID_HOB_DATA_SIZE (Hob)/sizeof (ARM_CORE_INFO);
 
         // Allocate runtime memory for ARM processor Table entries
-        ArmProcessorTable->ArmCpus = (ARM_CORE_INFO*)AllocateRuntimePool (
-           ArmProcessorTable->NumberOfEntries * sizeof(ARM_CORE_INFO));
+        ArmProcessorTable->ArmCpus = (ARM_CORE_INFO *)AllocateRuntimePool (
+                                                        ArmProcessorTable->NumberOfEntries * sizeof (ARM_CORE_INFO)
+                                                        );
 
         // Check if the memory allocation is successful or not
-        ASSERT(NULL != ArmProcessorTable->ArmCpus);
+        ASSERT (NULL != ArmProcessorTable->ArmCpus);
 
         // Copy ARM Processor Table data from HOB list to newly allocated memory
-        CopyMem(ArmProcessorTable->ArmCpus,GET_GUID_HOB_DATA(Hob), ArmProcessorTable->Header.DataLen);
+        CopyMem (ArmProcessorTable->ArmCpus, GET_GUID_HOB_DATA (Hob), ArmProcessorTable->Header.DataLen);
 
         // Install the ARM Processor table into EFI system configuration table
         Status = gBS->InstallConfigurationTable (&gArmMpCoreInfoGuid, ArmProcessorTable);

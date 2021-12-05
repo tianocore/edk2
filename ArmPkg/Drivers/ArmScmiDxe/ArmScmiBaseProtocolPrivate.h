@@ -14,7 +14,7 @@
 
 // Return values of BASE_DISCOVER_LIST_PROTOCOLS command.
 typedef struct {
-  UINT32 NumProtocols;
+  UINT32    NumProtocols;
 
   // Array of four protocols in each element
   // Total elements = 1 + (NumProtocols-1)/4
@@ -22,7 +22,7 @@ typedef struct {
   // NOTE: Since EDK2 does not allow flexible array member [] we declare
   // here array of 1 element length. However below is used as a variable
   // length array.
-  UINT8 Protocols[1];
+  UINT8     Protocols[1];
 } BASE_DISCOVER_LIST;
 
 /** Initialize Base protocol and install protocol on a given handle.
@@ -34,7 +34,7 @@ typedef struct {
 **/
 EFI_STATUS
 ScmiBaseProtocolInit (
-  IN OUT EFI_HANDLE* Handle
+  IN OUT EFI_HANDLE  *Handle
   );
 
 #endif /* ARM_SCMI_BASE_PROTOCOL_PRIVATE_H_ */

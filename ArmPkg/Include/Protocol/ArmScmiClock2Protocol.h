@@ -15,13 +15,13 @@
 #include <Protocol/ArmScmi.h>
 #include <Protocol/ArmScmiClockProtocol.h>
 
-#define ARM_SCMI_CLOCK2_PROTOCOL_GUID { \
+#define ARM_SCMI_CLOCK2_PROTOCOL_GUID  {\
   0xb8d8caf2, 0x9e94, 0x462c, { 0xa8, 0x34, 0x6c, 0x99, 0xfc, 0x05, 0xef, 0xcf } \
   }
 
-extern EFI_GUID gArmScmiClock2ProtocolGuid;
+extern EFI_GUID  gArmScmiClock2ProtocolGuid;
 
-#define SCMI_CLOCK2_PROTOCOL_VERSION 1
+#define SCMI_CLOCK2_PROTOCOL_VERSION  1
 
 typedef struct _SCMI_CLOCK2_PROTOCOL SCMI_CLOCK2_PROTOCOL;
 
@@ -39,7 +39,7 @@ typedef struct _SCMI_CLOCK2_PROTOCOL SCMI_CLOCK2_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK2_GET_VERSION) (
+(EFIAPI *SCMI_CLOCK2_GET_VERSION)(
   IN  SCMI_CLOCK2_PROTOCOL  *This,
   OUT UINT32                *Version
   );
@@ -57,7 +57,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK2_GET_TOTAL_CLOCKS) (
+(EFIAPI *SCMI_CLOCK2_GET_TOTAL_CLOCKS)(
   IN  SCMI_CLOCK2_PROTOCOL  *This,
   OUT UINT32                *TotalClocks
   );
@@ -77,7 +77,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK2_GET_CLOCK_ATTRIBUTES) (
+(EFIAPI *SCMI_CLOCK2_GET_CLOCK_ATTRIBUTES)(
   IN  SCMI_CLOCK2_PROTOCOL  *This,
   IN  UINT32                ClockId,
   OUT BOOLEAN               *Enabled,
@@ -109,7 +109,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK2_DESCRIBE_RATES) (
+(EFIAPI *SCMI_CLOCK2_DESCRIBE_RATES)(
   IN     SCMI_CLOCK2_PROTOCOL     *This,
   IN     UINT32                   ClockId,
   OUT    SCMI_CLOCK_RATE_FORMAT   *Format,
@@ -131,7 +131,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK2_RATE_GET) (
+(EFIAPI *SCMI_CLOCK2_RATE_GET)(
   IN  SCMI_CLOCK2_PROTOCOL  *This,
   IN  UINT32                ClockId,
   OUT UINT64                *Rate
@@ -149,7 +149,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK2_RATE_SET) (
+(EFIAPI *SCMI_CLOCK2_RATE_SET)(
   IN SCMI_CLOCK2_PROTOCOL   *This,
   IN UINT32                 ClockId,
   IN UINT64                 Rate
@@ -168,24 +168,24 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_CLOCK2_ENABLE) (
+(EFIAPI *SCMI_CLOCK2_ENABLE)(
   IN SCMI_CLOCK2_PROTOCOL   *This,
   IN UINT32                 ClockId,
   IN BOOLEAN                Enable
   );
 
 typedef struct _SCMI_CLOCK2_PROTOCOL {
-  SCMI_CLOCK2_GET_VERSION           GetVersion;
-  SCMI_CLOCK2_GET_TOTAL_CLOCKS      GetTotalClocks;
-  SCMI_CLOCK2_GET_CLOCK_ATTRIBUTES  GetClockAttributes;
-  SCMI_CLOCK2_DESCRIBE_RATES        DescribeRates;
-  SCMI_CLOCK2_RATE_GET              RateGet;
-  SCMI_CLOCK2_RATE_SET              RateSet;
+  SCMI_CLOCK2_GET_VERSION             GetVersion;
+  SCMI_CLOCK2_GET_TOTAL_CLOCKS        GetTotalClocks;
+  SCMI_CLOCK2_GET_CLOCK_ATTRIBUTES    GetClockAttributes;
+  SCMI_CLOCK2_DESCRIBE_RATES          DescribeRates;
+  SCMI_CLOCK2_RATE_GET                RateGet;
+  SCMI_CLOCK2_RATE_SET                RateSet;
 
   // Extension to original ClockProtocol, added here so SCMI_CLOCK2_PROTOCOL
   // can be cast to SCMI_CLOCK_PROTOCOL
-  UINTN                             Version; // For future expandability
-  SCMI_CLOCK2_ENABLE                Enable;
+  UINTN                               Version; // For future expandability
+  SCMI_CLOCK2_ENABLE                  Enable;
 } SCMI_CLOCK2_PROTOCOL;
 
 #endif /* ARM_SCMI_CLOCK2_PROTOCOL_H_ */

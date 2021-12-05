@@ -7,7 +7,6 @@
 
 **/
 
-
 #include <PiDxe.h>
 
 #include <Library/ArmLib.h>
@@ -24,18 +23,18 @@
 #include <Protocol/HardwareInterrupt.h>
 
 // The notification function to call on every timer interrupt.
-EFI_TIMER_NOTIFY      mTimerNotifyFunction     = (EFI_TIMER_NOTIFY)NULL;
-EFI_EVENT             EfiExitBootServicesEvent = (EFI_EVENT)NULL;
+EFI_TIMER_NOTIFY  mTimerNotifyFunction     = (EFI_TIMER_NOTIFY)NULL;
+EFI_EVENT         EfiExitBootServicesEvent = (EFI_EVENT)NULL;
 
 // The current period of the timer interrupt
-UINT64 mTimerPeriod = 0;
+UINT64  mTimerPeriod = 0;
 // The latest Timer Tick calculated for mTimerPeriod
-UINT64 mTimerTicks = 0;
+UINT64  mTimerTicks = 0;
 // Number of elapsed period since the last Timer interrupt
-UINT64 mElapsedPeriod = 1;
+UINT64  mElapsedPeriod = 1;
 
 // Cached copy of the Hardware Interrupt protocol instance
-EFI_HARDWARE_INTERRUPT_PROTOCOL *gInterrupt = NULL;
+EFI_HARDWARE_INTERRUPT_PROTOCOL  *gInterrupt = NULL;
 
 /**
   This function registers the handler NotifyFunction so it is called every time
@@ -133,9 +132,9 @@ TimerDriverSetTimerPeriod (
   IN UINT64                   TimerPeriod
   )
 {
-  UINT64      CounterValue;
-  UINT64      TimerTicks;
-  EFI_TPL     OriginalTPL;
+  UINT64   CounterValue;
+  UINT64   TimerTicks;
+  EFI_TPL  OriginalTPL;
 
   // Always disable the timer
   ArmGenericTimerDisableTimer ();
@@ -166,7 +165,7 @@ TimerDriverSetTimerPeriod (
     ArmGenericTimerEnableTimer ();
   } else {
     // Save the new timer period
-    mTimerPeriod   = TimerPeriod;
+    mTimerPeriod = TimerPeriod;
     // Reset the elapsed period
     mElapsedPeriod = 1;
   }
@@ -192,8 +191,8 @@ TimerDriverSetTimerPeriod (
 EFI_STATUS
 EFIAPI
 TimerDriverGetTimerPeriod (
-  IN EFI_TIMER_ARCH_PROTOCOL   *This,
-  OUT UINT64                   *TimerPeriod
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  OUT UINT64                  *TimerPeriod
   )
 {
   if (TimerPeriod == NULL) {
@@ -262,7 +261,7 @@ TimerDriverGenerateSoftInterrupt (
   a period of time.
 
 **/
-EFI_TIMER_ARCH_PROTOCOL   gTimer = {
+EFI_TIMER_ARCH_PROTOCOL  gTimer = {
   TimerDriverRegisterHandler,
   TimerDriverSetTimerPeriod,
   TimerDriverGetTimerPeriod,
@@ -285,13 +284,13 @@ EFI_TIMER_ARCH_PROTOCOL   gTimer = {
 VOID
 EFIAPI
 TimerInterruptHandler (
-  IN  HARDWARE_INTERRUPT_SOURCE   Source,
-  IN  EFI_SYSTEM_CONTEXT          SystemContext
+  IN  HARDWARE_INTERRUPT_SOURCE  Source,
+  IN  EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
-  EFI_TPL      OriginalTPL;
-  UINT64       CurrentValue;
-  UINT64       CompareValue;
+  EFI_TPL  OriginalTPL;
+  UINT64   CurrentValue;
+  UINT64   CompareValue;
 
   //
   // DXE core uses this callback for the EFI timer tick. The DXE core uses locks
@@ -305,8 +304,7 @@ TimerInterruptHandler (
   gInterrupt->EndOfInterrupt (gInterrupt, Source);
 
   // Check if the timer interrupt is active
-  if ((ArmGenericTimerGetTimerCtrlReg () ) & ARM_ARCH_TIMER_ISTATUS) {
-
+  if ((ArmGenericTimerGetTimerCtrlReg ()) & ARM_ARCH_TIMER_ISTATUS) {
     if (mTimerNotifyFunction != 0) {
       mTimerNotifyFunction (mTimerPeriod * mElapsedPeriod);
     }
@@ -338,7 +336,6 @@ TimerInterruptHandler (
   gBS->RestoreTPL (OriginalTPL);
 }
 
-
 /**
   Initialize the state information for the Timer Architectural Protocol and
   the Timer Debug support protocol that allows the debugger to break into a
@@ -355,8 +352,8 @@ TimerInterruptHandler (
 EFI_STATUS
 EFIAPI
 TimerInitialize (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_HANDLE  Handle;
@@ -374,7 +371,7 @@ TimerInitialize (
   ASSERT_EFI_ERROR (Status);
 
   // Disable the timer
-  TimerCtrlReg = ArmGenericTimerGetTimerCtrlReg ();
+  TimerCtrlReg  = ArmGenericTimerGetTimerCtrlReg ();
   TimerCtrlReg |= ARM_ARCH_TIMER_IMASK;
   TimerCtrlReg &= ~ARM_ARCH_TIMER_ENABLE;
   ArmGenericTimerSetTimerCtrlReg (TimerCtrlReg);
@@ -405,17 +402,18 @@ TimerInitialize (
   ASSERT_EFI_ERROR (Status);
 
   // Set up default timer
-  Status = TimerDriverSetTimerPeriod (&gTimer, FixedPcdGet32(PcdTimerPeriod)); // TIMER_DEFAULT_PERIOD
+  Status = TimerDriverSetTimerPeriod (&gTimer, FixedPcdGet32 (PcdTimerPeriod)); // TIMER_DEFAULT_PERIOD
   ASSERT_EFI_ERROR (Status);
 
   Handle = NULL;
   // Install the Timer Architectural Protocol onto a new handle
-  Status = gBS->InstallMultipleProtocolInterfaces(
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEfiTimerArchProtocolGuid,      &gTimer,
+                  &gEfiTimerArchProtocolGuid,
+                  &gTimer,
                   NULL
                   );
-  ASSERT_EFI_ERROR(Status);
+  ASSERT_EFI_ERROR (Status);
 
   // Everything is ready, unmask and enable timer interrupts
   TimerCtrlReg = ARM_ARCH_TIMER_ENABLE;

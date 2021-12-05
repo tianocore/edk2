@@ -8,6 +8,7 @@
     http://infocenter.arm.com/help/topic/com.arm.doc.den0056a/
     DEN0056A_System_Control_and_Management_Interface.pdf
 **/
+
 #ifndef SCMI_PRIVATE_H_
 #define SCMI_PRIVATE_H_
 
@@ -52,21 +53,21 @@ typedef enum {
 
 // Not defined in SCMI specification but will help to identify a message.
 typedef struct {
-  SCMI_PROTOCOL_ID ProtocolId;
-  UINT32 MessageId;
+  SCMI_PROTOCOL_ID    ProtocolId;
+  UINT32              MessageId;
 } SCMI_COMMAND;
 
 #pragma pack(1)
 
 // Response to a SCMI command.
 typedef struct {
-  INT32 Status;
-  UINT32 ReturnValues[];
+  INT32     Status;
+  UINT32    ReturnValues[];
 } SCMI_MESSAGE_RESPONSE;
 
 // Message header. MsgId[7:0], MsgType[9:8], ProtocolId[17:10]
-#define MESSAGE_TYPE_SHIFT       8
-#define PROTOCOL_ID_SHIFT       10
+#define MESSAGE_TYPE_SHIFT  8
+#define PROTOCOL_ID_SHIFT   10
 #define SCMI_MESSAGE_HEADER(MsgId, MsgType, ProtocolId)  (           \
                             MsgType << MESSAGE_TYPE_SHIFT   |        \
                             ProtocolId << PROTOCOL_ID_SHIFT |        \
@@ -74,7 +75,7 @@ typedef struct {
                             )
 // SCMI message header.
 typedef struct {
-  UINT32 MessageHeader;
+  UINT32    MessageHeader;
 } SCMI_MESSAGE_HEADER;
 
 #pragma pack()
@@ -89,7 +90,7 @@ typedef struct {
 **/
 EFI_STATUS
 ScmiCommandGetPayload (
-  OUT UINT32** Payload
+  OUT UINT32  **Payload
   );
 
 /** Execute a SCMI command and receive a response.
@@ -115,7 +116,7 @@ EFI_STATUS
 ScmiCommandExecute (
   IN     SCMI_COMMAND  *Command,
   IN OUT UINT32        *PayloadLength,
-  OUT    UINT32       **ReturnValues OPTIONAL
+  OUT    UINT32        **ReturnValues OPTIONAL
   );
 
 /** Return protocol version from SCP for a given protocol ID.

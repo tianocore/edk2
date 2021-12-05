@@ -13,7 +13,6 @@
 #include <Library/SemihostLib.h>
 #include <Library/SerialPortLib.h>
 
-
 /*
 
   Programmed hardware of Serial port.
@@ -51,54 +50,49 @@ SerialPortInitialize (
 UINTN
 EFIAPI
 SerialPortWrite (
-  IN UINT8     *Buffer,
-  IN UINTN     NumberOfBytes
-)
+  IN UINT8  *Buffer,
+  IN UINTN  NumberOfBytes
+  )
 {
-  UINT8 PrintBuffer[PRINT_BUFFER_SIZE];
-  UINTN SourceIndex;
-  UINTN DestinationIndex;
-  UINT8 CurrentCharacter;
+  UINT8  PrintBuffer[PRINT_BUFFER_SIZE];
+  UINTN  SourceIndex;
+  UINTN  DestinationIndex;
+  UINT8  CurrentCharacter;
 
   SourceIndex      = 0;
   DestinationIndex = 0;
 
-  while (SourceIndex < NumberOfBytes)
-  {
-      CurrentCharacter = Buffer[SourceIndex++];
+  while (SourceIndex < NumberOfBytes) {
+    CurrentCharacter = Buffer[SourceIndex++];
 
-      switch (CurrentCharacter)
-      {
+    switch (CurrentCharacter) {
       case '\r':
-          continue;
+        continue;
 
       case '\n':
-          PrintBuffer[DestinationIndex++] = ' ';
-          // fall through
+        PrintBuffer[DestinationIndex++] = ' ';
+      // fall through
 
       default:
-          PrintBuffer[DestinationIndex++] = CurrentCharacter;
-          break;
-      }
+        PrintBuffer[DestinationIndex++] = CurrentCharacter;
+        break;
+    }
 
-      if (DestinationIndex > PRINT_BUFFER_THRESHOLD)
-      {
-          PrintBuffer[DestinationIndex] = '\0';
-          SemihostWriteString ((CHAR8 *) PrintBuffer);
+    if (DestinationIndex > PRINT_BUFFER_THRESHOLD) {
+      PrintBuffer[DestinationIndex] = '\0';
+      SemihostWriteString ((CHAR8 *)PrintBuffer);
 
-          DestinationIndex = 0;
-      }
+      DestinationIndex = 0;
+    }
   }
 
-  if (DestinationIndex > 0)
-  {
-      PrintBuffer[DestinationIndex] = '\0';
-      SemihostWriteString ((CHAR8 *) PrintBuffer);
+  if (DestinationIndex > 0) {
+    PrintBuffer[DestinationIndex] = '\0';
+    SemihostWriteString ((CHAR8 *)PrintBuffer);
   }
 
   return NumberOfBytes;
 }
-
 
 /**
   Read data from serial device and save the datas in buffer.
@@ -113,15 +107,13 @@ SerialPortWrite (
 UINTN
 EFIAPI
 SerialPortRead (
-  OUT UINT8     *Buffer,
-  IN  UINTN     NumberOfBytes
-)
+  OUT UINT8  *Buffer,
+  IN  UINTN  NumberOfBytes
+  )
 {
   *Buffer = SemihostReadCharacter ();
   return 1;
 }
-
-
 
 /**
   Check to see if any data is available to be read from the debug device.
@@ -139,4 +131,3 @@ SerialPortPoll (
   // Since SemiHosting read character is blocking always say we have a char ready?
   return SemihostConnectionSupported ();
 }
-

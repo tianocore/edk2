@@ -9,7 +9,6 @@
 
 **/
 
-
 #ifndef ASM_MACRO_IO_LIB_H_
 #define ASM_MACRO_IO_LIB_H_
 
@@ -20,7 +19,7 @@
   .p2align  2                     ; \
   Name:
 
-#define ASM_FUNC(Name)            _ASM_FUNC(ASM_PFX(Name), .text. ## Name)
+#define ASM_FUNC(Name)  _ASM_FUNC(ASM_PFX(Name), .text. ## Name)
 
 #define MOV32(Reg, Val)                       \
   movw      Reg, #(Val) & 0xffff            ; \

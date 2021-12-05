@@ -18,8 +18,8 @@
 **/
 VOID
 DefaultExceptionHandler (
-  IN     EFI_EXCEPTION_TYPE           ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT           SystemContext
+  IN     EFI_EXCEPTION_TYPE  ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
 
 #endif // DEFAULT_EXCEPTION_HANDLER_LIB_H_

@@ -15,7 +15,6 @@
 #include <Library/HiiLib.h>
 #include <Library/OemMiscLib.h>
 
-
 /** Gets the CPU frequency of the specified processor.
 
   @param ProcessorIndex Index of the processor to get the frequency for.
@@ -25,7 +24,7 @@
 UINTN
 EFIAPI
 OemGetCpuFreq (
-  IN UINT8 ProcessorIndex
+  IN UINT8  ProcessorIndex
   )
 {
   ASSERT (FALSE);
@@ -45,10 +44,10 @@ OemGetCpuFreq (
 BOOLEAN
 EFIAPI
 OemGetProcessorInformation (
-  IN UINTN ProcessorIndex,
-  IN OUT PROCESSOR_STATUS_DATA *ProcessorStatus,
-  IN OUT PROCESSOR_CHARACTERISTIC_FLAGS *ProcessorCharacteristics,
-  IN OUT OEM_MISC_PROCESSOR_DATA *MiscProcessorData
+  IN UINTN                               ProcessorIndex,
+  IN OUT PROCESSOR_STATUS_DATA           *ProcessorStatus,
+  IN OUT PROCESSOR_CHARACTERISTIC_FLAGS  *ProcessorCharacteristics,
+  IN OUT OEM_MISC_PROCESSOR_DATA         *MiscProcessorData
   )
 {
   ASSERT (FALSE);
@@ -68,11 +67,11 @@ OemGetProcessorInformation (
 BOOLEAN
 EFIAPI
 OemGetCacheInformation (
-  IN UINT8   ProcessorIndex,
-  IN UINT8   CacheLevel,
-  IN BOOLEAN DataCache,
-  IN BOOLEAN UnifiedCache,
-  IN OUT SMBIOS_TABLE_TYPE7 *SmbiosCacheTable
+  IN UINT8                   ProcessorIndex,
+  IN UINT8                   CacheLevel,
+  IN BOOLEAN                 DataCache,
+  IN BOOLEAN                 UnifiedCache,
+  IN OUT SMBIOS_TABLE_TYPE7  *SmbiosCacheTable
   )
 {
   ASSERT (FALSE);
@@ -116,7 +115,7 @@ OemGetChassisType (
 BOOLEAN
 EFIAPI
 OemIsProcessorPresent (
-  IN UINTN ProcessorIndex
+  IN UINTN  ProcessorIndex
   )
 {
   ASSERT (FALSE);
@@ -132,9 +131,9 @@ OemIsProcessorPresent (
 VOID
 EFIAPI
 OemUpdateSmbiosInfo (
-  IN EFI_HII_HANDLE HiiHandle,
-  IN EFI_STRING_ID TokenToUpdate,
-  IN OEM_MISC_SMBIOS_HII_STRING_FIELD Field
+  IN EFI_HII_HANDLE                    HiiHandle,
+  IN EFI_STRING_ID                     TokenToUpdate,
+  IN OEM_MISC_SMBIOS_HII_STRING_FIELD  Field
   )
 {
   ASSERT (FALSE);
