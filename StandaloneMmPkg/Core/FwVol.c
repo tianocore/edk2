@@ -14,9 +14,9 @@
 //
 // List of file types supported by dispatcher
 //
-EFI_FV_FILETYPE mMmFileTypes[] = {
+EFI_FV_FILETYPE  mMmFileTypes[] = {
   EFI_FV_FILETYPE_MM,
-  0xE, //EFI_FV_FILETYPE_MM_STANDALONE,
+  0xE, // EFI_FV_FILETYPE_MM_STANDALONE,
        //
        // Note: DXE core will process the FV image file, so skip it in MM core
        // EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE
@@ -25,22 +25,22 @@ EFI_FV_FILETYPE mMmFileTypes[] = {
 
 EFI_STATUS
 MmAddToDriverList (
-  IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader,
-  IN VOID                       *Pe32Data,
-  IN UINTN                      Pe32DataSize,
-  IN VOID                       *Depex,
-  IN UINTN                      DepexSize,
-  IN EFI_GUID                   *DriverName
+  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
+  IN VOID                        *Pe32Data,
+  IN UINTN                       Pe32DataSize,
+  IN VOID                        *Depex,
+  IN UINTN                       DepexSize,
+  IN EFI_GUID                    *DriverName
   );
 
 BOOLEAN
 FvHasBeenProcessed (
-  IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader
+  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
   );
 
 VOID
 FvIsBeingProcessed (
-  IN EFI_FIRMWARE_VOLUME_HEADER *FwVolHeader
+  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
   );
 
 /**
@@ -62,25 +62,25 @@ MmCoreFfsFindMmDriver (
   IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
   )
 {
-  EFI_STATUS                              Status;
-  EFI_STATUS                              DepexStatus;
-  EFI_FFS_FILE_HEADER                     *FileHeader;
-  EFI_FV_FILETYPE                         FileType;
-  VOID                                    *Pe32Data;
-  UINTN                                   Pe32DataSize;
-  VOID                                    *Depex;
-  UINTN                                   DepexSize;
-  UINTN                                   Index;
-  EFI_COMMON_SECTION_HEADER               *Section;
-  VOID                                    *SectionData;
-  UINTN                                   SectionDataSize;
-  UINT32                                  DstBufferSize;
-  VOID                                    *ScratchBuffer;
-  UINT32                                  ScratchBufferSize;
-  VOID                                    *DstBuffer;
-  UINT16                                  SectionAttribute;
-  UINT32                                  AuthenticationStatus;
-  EFI_FIRMWARE_VOLUME_HEADER              *InnerFvHeader;
+  EFI_STATUS                  Status;
+  EFI_STATUS                  DepexStatus;
+  EFI_FFS_FILE_HEADER         *FileHeader;
+  EFI_FV_FILETYPE             FileType;
+  VOID                        *Pe32Data;
+  UINTN                       Pe32DataSize;
+  VOID                        *Depex;
+  UINTN                       DepexSize;
+  UINTN                       Index;
+  EFI_COMMON_SECTION_HEADER   *Section;
+  VOID                        *SectionData;
+  UINTN                       SectionDataSize;
+  UINT32                      DstBufferSize;
+  VOID                        *ScratchBuffer;
+  UINT32                      ScratchBufferSize;
+  VOID                        *DstBuffer;
+  UINT16                      SectionAttribute;
+  UINT32                      AuthenticationStatus;
+  EFI_FIRMWARE_VOLUME_HEADER  *InnerFvHeader;
 
   DEBUG ((DEBUG_INFO, "MmCoreFfsFindMmDriver - 0x%x\n", FwVolHeader));
 
@@ -95,19 +95,32 @@ MmCoreFfsFindMmDriver (
   //
   FileHeader = NULL;
   do {
-    Status = FfsFindNextFile (EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE,
-               FwVolHeader, &FileHeader);
+    Status = FfsFindNextFile (
+               EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE,
+               FwVolHeader,
+               &FileHeader
+               );
     if (EFI_ERROR (Status)) {
       break;
     }
-    Status = FfsFindSectionData (EFI_SECTION_GUID_DEFINED, FileHeader,
-               &SectionData, &SectionDataSize);
+
+    Status = FfsFindSectionData (
+               EFI_SECTION_GUID_DEFINED,
+               FileHeader,
+               &SectionData,
+               &SectionDataSize
+               );
     if (EFI_ERROR (Status)) {
       break;
     }
+
     Section = (EFI_COMMON_SECTION_HEADER *)(FileHeader + 1);
-    Status = ExtractGuidedSectionGetInfo (Section, &DstBufferSize,
-               &ScratchBufferSize, &SectionAttribute);
+    Status  = ExtractGuidedSectionGetInfo (
+                Section,
+                &DstBufferSize,
+                &ScratchBufferSize,
+                &SectionAttribute
+                );
     if (EFI_ERROR (Status)) {
       break;
     }
@@ -131,25 +144,35 @@ MmCoreFfsFindMmDriver (
     //
     // Call decompress function
     //
-    Status = ExtractGuidedSectionDecode (Section, &DstBuffer, ScratchBuffer,
-                &AuthenticationStatus);
+    Status = ExtractGuidedSectionDecode (
+               Section,
+               &DstBuffer,
+               ScratchBuffer,
+               &AuthenticationStatus
+               );
     FreePages (ScratchBuffer, EFI_SIZE_TO_PAGES (ScratchBufferSize));
     if (EFI_ERROR (Status)) {
       goto FreeDstBuffer;
     }
 
-    DEBUG ((DEBUG_INFO,
+    DEBUG ((
+      DEBUG_INFO,
       "Processing compressed firmware volume (AuthenticationStatus == %x)\n",
-      AuthenticationStatus));
+      AuthenticationStatus
+      ));
 
-    Status = FindFfsSectionInSections (DstBuffer, DstBufferSize,
-               EFI_SECTION_FIRMWARE_VOLUME_IMAGE, &Section);
+    Status = FindFfsSectionInSections (
+               DstBuffer,
+               DstBufferSize,
+               EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
+               &Section
+               );
     if (EFI_ERROR (Status)) {
       goto FreeDstBuffer;
     }
 
     InnerFvHeader = (VOID *)(Section + 1);
-    Status = MmCoreFfsFindMmDriver (InnerFvHeader);
+    Status        = MmCoreFfsFindMmDriver (InnerFvHeader);
     if (EFI_ERROR (Status)) {
       goto FreeDstBuffer;
     }
@@ -157,7 +180,7 @@ MmCoreFfsFindMmDriver (
 
   for (Index = 0; Index < sizeof (mMmFileTypes) / sizeof (mMmFileTypes[0]); Index++) {
     DEBUG ((DEBUG_INFO, "Check MmFileTypes - 0x%x\n", mMmFileTypes[Index]));
-    FileType = mMmFileTypes[Index];
+    FileType   = mMmFileTypes[Index];
     FileHeader = NULL;
     do {
       Status = FfsFindNextFile (FileType, FwVolHeader, &FileHeader);
