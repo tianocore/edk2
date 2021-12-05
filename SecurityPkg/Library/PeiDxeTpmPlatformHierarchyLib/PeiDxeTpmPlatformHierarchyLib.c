@@ -27,7 +27,7 @@
 //   algorithm used for context integrity.
 //
 
-UINT16       mAuthSize;
+UINT16  mAuthSize;
 
 /**
   Generate high-quality entropy source through RDRAND.
@@ -42,8 +42,8 @@ UINT16       mAuthSize;
 EFI_STATUS
 EFIAPI
 RdRandGenerateEntropy (
-  IN UINTN         Length,
-  OUT UINT8        *Entropy
+  IN UINTN   Length,
+  OUT UINT8  *Entropy
   )
 {
   EFI_STATUS  Status;
@@ -51,9 +51,9 @@ RdRandGenerateEntropy (
   UINT64      Seed[2];
   UINT8       *Ptr;
 
-  Status = EFI_NOT_READY;
-  BlockCount = Length / sizeof(Seed);
-  Ptr = (UINT8 *)Entropy;
+  Status     = EFI_NOT_READY;
+  BlockCount = Length / sizeof (Seed);
+  Ptr        = (UINT8 *)Entropy;
 
   //
   // Generate high-quality seed for DRBG Entropy
@@ -63,10 +63,11 @@ RdRandGenerateEntropy (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    CopyMem (Ptr, Seed, sizeof(Seed));
+
+    CopyMem (Ptr, Seed, sizeof (Seed));
 
     BlockCount--;
-    Ptr = Ptr + sizeof(Seed);
+    Ptr = Ptr + sizeof (Seed);
   }
 
   //
@@ -76,7 +77,8 @@ RdRandGenerateEntropy (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  CopyMem (Ptr, Seed, (Length % sizeof(Seed)));
+
+  CopyMem (Ptr, Seed, (Length % sizeof (Seed)));
 
   return Status;
 }
@@ -94,18 +96,17 @@ RdRandGenerateEntropy (
 EFI_STATUS
 EFIAPI
 GetAuthSize (
-  OUT UINT16            *AuthSize
+  OUT UINT16  *AuthSize
   )
 {
-  EFI_STATUS            Status;
-  TPML_PCR_SELECTION    Pcrs;
-  UINTN                 Index;
-  UINT16                DigestSize;
+  EFI_STATUS          Status;
+  TPML_PCR_SELECTION  Pcrs;
+  UINTN               Index;
+  UINT16              DigestSize;
 
   Status = EFI_SUCCESS;
 
   while (mAuthSize == 0) {
-
     mAuthSize = SHA1_DIGEST_SIZE;
     ZeroMem (&Pcrs, sizeof (TPML_PCR_SELECTION));
     Status = Tpm2GetCapabilityPcrs (&Pcrs);
@@ -121,30 +122,31 @@ GetAuthSize (
       DEBUG ((DEBUG_ERROR, "alg - %x\n", Pcrs.pcrSelections[Index].hash));
 
       switch (Pcrs.pcrSelections[Index].hash) {
-      case TPM_ALG_SHA1:
-        DigestSize = SHA1_DIGEST_SIZE;
-        break;
-      case TPM_ALG_SHA256:
-        DigestSize = SHA256_DIGEST_SIZE;
-        break;
-      case TPM_ALG_SHA384:
-        DigestSize = SHA384_DIGEST_SIZE;
-        break;
-      case TPM_ALG_SHA512:
-        DigestSize = SHA512_DIGEST_SIZE;
-        break;
-      case TPM_ALG_SM3_256:
-        DigestSize = SM3_256_DIGEST_SIZE;
-        break;
-      default:
-        DigestSize = SHA1_DIGEST_SIZE;
-        break;
+        case TPM_ALG_SHA1:
+          DigestSize = SHA1_DIGEST_SIZE;
+          break;
+        case TPM_ALG_SHA256:
+          DigestSize = SHA256_DIGEST_SIZE;
+          break;
+        case TPM_ALG_SHA384:
+          DigestSize = SHA384_DIGEST_SIZE;
+          break;
+        case TPM_ALG_SHA512:
+          DigestSize = SHA512_DIGEST_SIZE;
+          break;
+        case TPM_ALG_SM3_256:
+          DigestSize = SM3_256_DIGEST_SIZE;
+          break;
+        default:
+          DigestSize = SHA1_DIGEST_SIZE;
+          break;
       }
 
       if (DigestSize > mAuthSize) {
         mAuthSize = DigestSize;
       }
     }
+
     break;
   }
 
@@ -160,9 +162,9 @@ RandomizePlatformAuth (
   VOID
   )
 {
-  EFI_STATUS                        Status;
-  UINT16                            AuthSize;
-  TPM2B_AUTH                        NewPlatformAuth;
+  EFI_STATUS  Status;
+  UINT16      AuthSize;
+  TPM2B_AUTH  NewPlatformAuth;
 
   //
   // Send Tpm2HierarchyChange Auth with random value to avoid PlatformAuth being null

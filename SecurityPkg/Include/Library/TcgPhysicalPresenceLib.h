@@ -41,7 +41,7 @@ TcgPhysicalPresenceLibProcessRequest (
 **/
 BOOLEAN
 EFIAPI
-TcgPhysicalPresenceLibNeedUserConfirm(
+TcgPhysicalPresenceLibNeedUserConfirm (
   VOID
   );
 

@@ -44,4 +44,3 @@ IncrementMonotonicCounter (
   ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
-

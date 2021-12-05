@@ -26,7 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 SetSecureBootMode (
   IN  UINT8  SecureBootMode
-);
+  );
 
 /**
   Fetches the value of SetupMode variable.
@@ -38,8 +38,8 @@ SetSecureBootMode (
 EFI_STATUS
 EFIAPI
 GetSetupMode (
-  OUT UINT8 *SetupMode
-);
+  OUT UINT8  *SetupMode
+  );
 
 /**
   Create a EFI Signature List with data fetched from section specified as a argument.
@@ -57,10 +57,10 @@ GetSetupMode (
 --*/
 EFI_STATUS
 SecureBootFetchData (
-    IN  EFI_GUID           *KeyFileGuid,
-    OUT UINTN              *SigListsSize,
-    OUT EFI_SIGNATURE_LIST **SigListOut
-);
+  IN  EFI_GUID            *KeyFileGuid,
+  OUT UINTN               *SigListsSize,
+  OUT EFI_SIGNATURE_LIST  **SigListOut
+  );
 
 /**
   Create a time based data payload by concatenating the EFI_VARIABLE_AUTHENTICATION_2
@@ -82,9 +82,9 @@ SecureBootFetchData (
 --*/
 EFI_STATUS
 CreateTimeBasedPayload (
-  IN OUT UINTN            *DataSize,
-  IN OUT UINT8            **Data
-);
+  IN OUT UINTN  *DataSize,
+  IN OUT UINT8  **Data
+  );
 
 /**
   Clears the content of the 'db' variable.
@@ -97,7 +97,7 @@ EFI_STATUS
 EFIAPI
 DeleteDb (
   VOID
-);
+  );
 
 /**
   Clears the content of the 'dbx' variable.
@@ -110,7 +110,7 @@ EFI_STATUS
 EFIAPI
 DeleteDbx (
   VOID
-);
+  );
 
 /**
   Clears the content of the 'dbt' variable.
@@ -123,7 +123,7 @@ EFI_STATUS
 EFIAPI
 DeleteDbt (
   VOID
-);
+  );
 
 /**
   Clears the content of the 'KEK' variable.
@@ -136,7 +136,7 @@ EFI_STATUS
 EFIAPI
 DeleteKEK (
   VOID
-);
+  );
 
 /**
   Clears the content of the 'PK' variable.
@@ -149,5 +149,6 @@ EFI_STATUS
 EFIAPI
 DeletePlatformKey (
   VOID
-);
+  );
+
 #endif

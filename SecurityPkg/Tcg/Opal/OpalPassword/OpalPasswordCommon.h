@@ -9,18 +9,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _OPAL_PASSWORD_COMMON_H_
 #define _OPAL_PASSWORD_COMMON_H_
 
-#define OPAL_MAX_PASSWORD_SIZE      32
+#define OPAL_MAX_PASSWORD_SIZE  32
 
-#define OPAL_DEVICE_TYPE_UNKNOWN    0x0
-#define OPAL_DEVICE_TYPE_ATA        0x1
-#define OPAL_DEVICE_TYPE_NVME       0x2
+#define OPAL_DEVICE_TYPE_UNKNOWN  0x0
+#define OPAL_DEVICE_TYPE_ATA      0x1
+#define OPAL_DEVICE_TYPE_NVME     0x2
 
 typedef struct {
-  UINT16            Segment;
-  UINT8             Bus;
-  UINT8             Device;
-  UINT8             Function;
-  UINT8             Reserved;
+  UINT16    Segment;
+  UINT8     Bus;
+  UINT8     Device;
+  UINT8     Function;
+  UINT8     Reserved;
 } OPAL_PCI_DEVICE;
 
 typedef struct {

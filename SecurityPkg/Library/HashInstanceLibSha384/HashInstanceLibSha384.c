@@ -24,11 +24,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 Tpm2SetSha384ToDigestList (
-  IN TPML_DIGEST_VALUES *DigestList,
-  IN UINT8              *Sha384Digest
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN UINT8               *Sha384Digest
   )
 {
-  DigestList->count = 1;
+  DigestList->count              = 1;
   DigestList->digests[0].hashAlg = TPM_ALG_SHA384;
   CopyMem (
     DigestList->digests[0].digest.sha384,
@@ -48,13 +48,13 @@ Tpm2SetSha384ToDigestList (
 EFI_STATUS
 EFIAPI
 Sha384HashInit (
-  OUT HASH_HANDLE    *HashHandle
+  OUT HASH_HANDLE  *HashHandle
   )
 {
-  VOID     *Sha384Ctx;
-  UINTN    CtxSize;
+  VOID   *Sha384Ctx;
+  UINTN  CtxSize;
 
-  CtxSize = Sha384GetContextSize ();
+  CtxSize   = Sha384GetContextSize ();
   Sha384Ctx = AllocatePool (CtxSize);
   ASSERT (Sha384Ctx != NULL);
 
@@ -77,12 +77,12 @@ Sha384HashInit (
 EFI_STATUS
 EFIAPI
 Sha384HashUpdate (
-  IN HASH_HANDLE    HashHandle,
-  IN VOID           *DataToHash,
-  IN UINTN          DataToHashLen
+  IN HASH_HANDLE  HashHandle,
+  IN VOID         *DataToHash,
+  IN UINTN        DataToHashLen
   )
 {
-  VOID     *Sha384Ctx;
+  VOID  *Sha384Ctx;
 
   Sha384Ctx = (VOID *)HashHandle;
   Sha384Update (Sha384Ctx, DataToHash, DataToHashLen);
@@ -101,12 +101,12 @@ Sha384HashUpdate (
 EFI_STATUS
 EFIAPI
 Sha384HashFinal (
-  IN HASH_HANDLE         HashHandle,
-  OUT TPML_DIGEST_VALUES *DigestList
+  IN HASH_HANDLE          HashHandle,
+  OUT TPML_DIGEST_VALUES  *DigestList
   )
 {
-  UINT8         Digest[SHA384_DIGEST_SIZE];
-  VOID          *Sha384Ctx;
+  UINT8  Digest[SHA384_DIGEST_SIZE];
+  VOID   *Sha384Ctx;
 
   Sha384Ctx = (VOID *)HashHandle;
   Sha384Final (Sha384Ctx, Digest);
@@ -145,5 +145,6 @@ HashInstanceLibSha384Constructor (
     //
     return EFI_SUCCESS;
   }
+
   return Status;
 }

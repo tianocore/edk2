@@ -23,11 +23,11 @@
 **/
 VOID
 Tpm2SetSm3ToDigestList (
-  IN TPML_DIGEST_VALUES *DigestList,
-  IN UINT8              *Sm3Digest
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN UINT8               *Sm3Digest
   )
 {
-  DigestList->count = 1;
+  DigestList->count              = 1;
   DigestList->digests[0].hashAlg = TPM_ALG_SM3_256;
   CopyMem (
     DigestList->digests[0].digest.sm3_256,
@@ -47,14 +47,14 @@ Tpm2SetSm3ToDigestList (
 EFI_STATUS
 EFIAPI
 Sm3HashInit (
-  OUT HASH_HANDLE    *HashHandle
+  OUT HASH_HANDLE  *HashHandle
   )
 {
-  VOID     *Sm3Ctx;
-  UINTN    CtxSize;
+  VOID   *Sm3Ctx;
+  UINTN  CtxSize;
 
   CtxSize = Sm3GetContextSize ();
-  Sm3Ctx = AllocatePool (CtxSize);
+  Sm3Ctx  = AllocatePool (CtxSize);
   if (Sm3Ctx == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -78,12 +78,12 @@ Sm3HashInit (
 EFI_STATUS
 EFIAPI
 Sm3HashUpdate (
-  IN HASH_HANDLE    HashHandle,
-  IN VOID           *DataToHash,
-  IN UINTN          DataToHashLen
+  IN HASH_HANDLE  HashHandle,
+  IN VOID         *DataToHash,
+  IN UINTN        DataToHashLen
   )
 {
-  VOID     *Sm3Ctx;
+  VOID  *Sm3Ctx;
 
   Sm3Ctx = (VOID *)HashHandle;
   Sm3Update (Sm3Ctx, DataToHash, DataToHashLen);
@@ -102,12 +102,12 @@ Sm3HashUpdate (
 EFI_STATUS
 EFIAPI
 Sm3HashFinal (
-  IN HASH_HANDLE         HashHandle,
-  OUT TPML_DIGEST_VALUES *DigestList
+  IN HASH_HANDLE          HashHandle,
+  OUT TPML_DIGEST_VALUES  *DigestList
   )
 {
-  UINT8         Digest[SM3_256_DIGEST_SIZE];
-  VOID          *Sm3Ctx;
+  UINT8  Digest[SM3_256_DIGEST_SIZE];
+  VOID   *Sm3Ctx;
 
   Sm3Ctx = (VOID *)HashHandle;
   Sm3Final (Sm3Ctx, Digest);
@@ -146,5 +146,6 @@ HashInstanceLibSm3Constructor (
     //
     return EFI_SUCCESS;
   }
+
   return Status;
 }

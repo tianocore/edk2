@@ -48,20 +48,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Tool generated IFR binary data and String package data
 //
-extern  UINT8                      SecureBootConfigBin[];
-extern  UINT8                      SecureBootConfigDxeStrings[];
+extern  UINT8  SecureBootConfigBin[];
+extern  UINT8  SecureBootConfigDxeStrings[];
 
 //
 // Shared IFR form update data
 //
-extern  VOID                       *mStartOpCodeHandle;
-extern  VOID                       *mEndOpCodeHandle;
-extern  EFI_IFR_GUID_LABEL         *mStartLabel;
-extern  EFI_IFR_GUID_LABEL         *mEndLabel;
+extern  VOID                *mStartOpCodeHandle;
+extern  VOID                *mEndOpCodeHandle;
+extern  EFI_IFR_GUID_LABEL  *mStartLabel;
+extern  EFI_IFR_GUID_LABEL  *mEndLabel;
 
-#define MAX_CHAR              480
-#define TWO_BYTE_ENCODE       0x82
-#define BUFFER_MAX_SIZE       100
+#define MAX_CHAR         480
+#define TWO_BYTE_ENCODE  0x82
+#define BUFFER_MAX_SIZE  100
 
 //
 // SHA-256 digest size in bytes
@@ -79,24 +79,24 @@ extern  EFI_IFR_GUID_LABEL         *mEndLabel;
 //
 // Set max digest size as SHA512 Output (64 bytes) by far
 //
-#define MAX_DIGEST_SIZE    SHA512_DIGEST_SIZE
+#define MAX_DIGEST_SIZE  SHA512_DIGEST_SIZE
 
-#define WIN_CERT_UEFI_RSA2048_SIZE               256
+#define WIN_CERT_UEFI_RSA2048_SIZE  256
 
 //
 // Support hash types
 //
-#define HASHALG_SHA224                         0x00000000
-#define HASHALG_SHA256                         0x00000001
-#define HASHALG_SHA384                         0x00000002
-#define HASHALG_SHA512                         0x00000003
-#define HASHALG_RAW                            0x00000004
-#define HASHALG_MAX                            0x00000004
+#define HASHALG_SHA224  0x00000000
+#define HASHALG_SHA256  0x00000001
+#define HASHALG_SHA384  0x00000002
+#define HASHALG_SHA512  0x00000003
+#define HASHALG_RAW     0x00000004
+#define HASHALG_MAX     0x00000004
 
 //
 // Certificate public key minimum size (bytes)
 //
-#define CER_PUBKEY_MIN_SIZE     256
+#define CER_PUBKEY_MIN_SIZE  256
 
 //
 // Types of errors may occur during certificate enrollment.
@@ -113,18 +113,18 @@ typedef enum {
   //
   Unqualified_Key,
   Enroll_Error_Max
-}ENROLL_KEY_ERROR;
+} ENROLL_KEY_ERROR;
 
 typedef struct {
-  UINTN             Signature;
-  LIST_ENTRY        Head;
-  UINTN             MenuNumber;
+  UINTN         Signature;
+  LIST_ENTRY    Head;
+  UINTN         MenuNumber;
 } SECUREBOOT_MENU_OPTION;
 
 typedef struct {
-  EFI_FILE_HANDLE                   FHandle;
-  UINT16                            *FileName;
-  UINT8                             FileType;
+  EFI_FILE_HANDLE    FHandle;
+  UINT16             *FileName;
+  UINT8              FileType;
 } SECUREBOOT_FILE_CONTEXT;
 
 #define SECUREBOOT_FREE_NON_NULL(Pointer)   \
@@ -149,11 +149,11 @@ typedef struct {
 // We define another format of 5th directory entry: security directory
 //
 typedef struct {
-  UINT32               Offset;      // Offset of certificate
-  UINT32               SizeOfCert;  // size of certificate appended
+  UINT32    Offset;                 // Offset of certificate
+  UINT32    SizeOfCert;             // size of certificate appended
 } EFI_IMAGE_SECURITY_DATA_DIRECTORY;
 
-typedef enum{
+typedef enum {
   ImageType_IA32,
   ImageType_X64
 } IMAGE_TYPE;
@@ -162,8 +162,8 @@ typedef enum{
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH                VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL          End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
 typedef enum {
@@ -177,7 +177,7 @@ typedef enum {
   Delete_Signature_List_All,
   Delete_Signature_List_One,
   Delete_Signature_Data
-}SIGNATURE_DELETE_TYPE;
+} SIGNATURE_DELETE_TYPE;
 
 typedef struct {
   UINTN                             Signature;
@@ -196,10 +196,10 @@ typedef struct {
   BOOLEAN                           *CheckArray;      // Record which signature data checked.
 } SECUREBOOT_CONFIG_PRIVATE_DATA;
 
-extern SECUREBOOT_CONFIG_PRIVATE_DATA      mSecureBootConfigPrivateDateTemplate;
-extern SECUREBOOT_CONFIG_PRIVATE_DATA      *gSecureBootPrivateData;
+extern SECUREBOOT_CONFIG_PRIVATE_DATA  mSecureBootConfigPrivateDateTemplate;
+extern SECUREBOOT_CONFIG_PRIVATE_DATA  *gSecureBootPrivateData;
 
-#define SECUREBOOT_CONFIG_PRIVATE_DATA_SIGNATURE     SIGNATURE_32 ('S', 'E', 'C', 'B')
+#define SECUREBOOT_CONFIG_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('S', 'E', 'C', 'B')
 #define SECUREBOOT_CONFIG_PRIVATE_FROM_THIS(a)  CR (a, SECUREBOOT_CONFIG_PRIVATE_DATA, ConfigAccess, SECUREBOOT_CONFIG_PRIVATE_DATA_SIGNATURE)
 
 //
@@ -207,15 +207,14 @@ extern SECUREBOOT_CONFIG_PRIVATE_DATA      *gSecureBootPrivateData;
 //
 #pragma pack(1)
 typedef struct _CPL_KEY_INFO {
-  UINT32        KeyLengthInBits;    // Key Length In Bits
-  UINT32        BlockSize;          // Operation Block Size in Bytes
-  UINT32        CipherBlockSize;    // Output Cipher Block Size in Bytes
-  UINT32        KeyType;            // Key Type
-  UINT32        CipherMode;         // Cipher Mode for Symmetric Algorithm
-  UINT32        Flags;              // Additional Key Property Flags
+  UINT32    KeyLengthInBits;        // Key Length In Bits
+  UINT32    BlockSize;              // Operation Block Size in Bytes
+  UINT32    CipherBlockSize;        // Output Cipher Block Size in Bytes
+  UINT32    KeyType;                // Key Type
+  UINT32    CipherMode;             // Cipher Mode for Symmetric Algorithm
+  UINT32    Flags;                  // Additional Key Property Flags
 } CPL_KEY_INFO;
 #pragma pack()
-
 
 /**
   Retrieves the size, in bytes, of the context buffer required for hash operations.
@@ -246,7 +245,6 @@ BOOLEAN
 (EFIAPI *HASH_INIT)(
   IN OUT  VOID  *HashContext
   );
-
 
 /**
   Performs digest on a data buffer of the specified length. This function can
@@ -308,10 +306,9 @@ typedef struct {
 } HASH_TABLE;
 
 typedef struct {
-  WIN_CERTIFICATE Hdr;
-  UINT8           CertData[1];
+  WIN_CERTIFICATE    Hdr;
+  UINT8              CertData[1];
 } WIN_CERTIFICATE_EFI_PKCS;
-
 
 /**
   This function publish the SecureBoot configuration Form.
@@ -328,7 +325,6 @@ InstallSecureBootConfigForm (
   IN OUT SECUREBOOT_CONFIG_PRIVATE_DATA  *PrivateData
   );
 
-
 /**
   This function removes SecureBoot configuration Form.
 
@@ -337,9 +333,8 @@ InstallSecureBootConfigForm (
 **/
 VOID
 UninstallSecureBootConfigForm (
-  IN OUT SECUREBOOT_CONFIG_PRIVATE_DATA    *PrivateData
+  IN OUT SECUREBOOT_CONFIG_PRIVATE_DATA  *PrivateData
   );
-
 
 /**
   This function allows a caller to extract the current configuration for one
@@ -370,12 +365,11 @@ UninstallSecureBootConfigForm (
 EFI_STATUS
 EFIAPI
 SecureBootExtractConfig (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL        *This,
-  IN CONST EFI_STRING                            Request,
-       OUT EFI_STRING                            *Progress,
-       OUT EFI_STRING                            *Results
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN CONST EFI_STRING                      Request,
+  OUT EFI_STRING                           *Progress,
+  OUT EFI_STRING                           *Results
   );
-
 
 /**
   This function processes the results of changes in configuration.
@@ -398,11 +392,10 @@ SecureBootExtractConfig (
 EFI_STATUS
 EFIAPI
 SecureBootRouteConfig (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
-  IN CONST EFI_STRING                          Configuration,
-       OUT EFI_STRING                          *Progress
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                           *Progress
   );
-
 
 /**
   This function processes the results of changes in configuration.
@@ -429,14 +422,13 @@ SecureBootRouteConfig (
 EFI_STATUS
 EFIAPI
 SecureBootCallback (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
-  IN     EFI_BROWSER_ACTION                    Action,
-  IN     EFI_QUESTION_ID                       QuestionId,
-  IN     UINT8                                 Type,
-  IN     EFI_IFR_TYPE_VALUE                    *Value,
-     OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN     EFI_BROWSER_ACTION                Action,
+  IN     EFI_QUESTION_ID                   QuestionId,
+  IN     UINT8                             Type,
+  IN     EFI_IFR_TYPE_VALUE                *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST           *ActionRequest
   );
-
 
 /**
   This function converts an input device structure to a Unicode string.
@@ -449,9 +441,8 @@ SecureBootCallback (
 CHAR16 *
 EFIAPI
 DevicePathToStr (
-  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
   );
-
 
 /**
   Clean up the dynamic opcode at label and form specified by both LabelId.
@@ -462,10 +453,9 @@ DevicePathToStr (
 **/
 VOID
 CleanUpPage (
-  IN UINT16                           LabelId,
-  IN SECUREBOOT_CONFIG_PRIVATE_DATA   *PrivateData
+  IN UINT16                          LabelId,
+  IN SECUREBOOT_CONFIG_PRIVATE_DATA  *PrivateData
   );
-
 
 /**
   Read file content into BufferPtr, the size of the allocate buffer
@@ -485,12 +475,11 @@ CleanUpPage (
 **/
 EFI_STATUS
 ReadFileContent (
-  IN      EFI_FILE_HANDLE           FileHandle,
-  IN OUT  VOID                      **BufferPtr,
-     OUT  UINTN                     *FileSize,
-  IN      UINTN                     AdditionAllocateSize
+  IN      EFI_FILE_HANDLE  FileHandle,
+  IN OUT  VOID             **BufferPtr,
+  OUT  UINTN               *FileSize,
+  IN      UINTN            AdditionAllocateSize
   );
-
 
 /**
   Close an open file handle.
@@ -500,9 +489,8 @@ ReadFileContent (
 **/
 VOID
 CloseFile (
-  IN EFI_FILE_HANDLE   FileHandle
+  IN EFI_FILE_HANDLE  FileHandle
   );
-
 
 /**
   Converts a nonnegative integer to an octet string of a specified length.
@@ -521,10 +509,10 @@ Returns:
 EFI_STATUS
 EFIAPI
 Int2OctStr (
-  IN     CONST UINTN       *Integer,
-  IN     UINTN             IntSizeInWords,
-     OUT UINT8             *OctetString,
-  IN     UINTN             OSSizeInBytes
+  IN     CONST UINTN  *Integer,
+  IN     UINTN        IntSizeInWords,
+  OUT UINT8           *OctetString,
+  IN     UINTN        OSSizeInBytes
   );
 
 /**
@@ -555,7 +543,7 @@ GuidToString (
 BOOLEAN
 EFIAPI
 UpdatePKFromFile (
-  IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
 
 /**
@@ -569,7 +557,7 @@ UpdatePKFromFile (
 BOOLEAN
 EFIAPI
 UpdateKEKFromFile (
-  IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
 
 /**
@@ -583,7 +571,7 @@ UpdateKEKFromFile (
 BOOLEAN
 EFIAPI
 UpdateDBFromFile (
-  IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
 
 /**
@@ -597,7 +585,7 @@ UpdateDBFromFile (
 BOOLEAN
 EFIAPI
 UpdateDBXFromFile (
-  IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
 
 /**
@@ -611,7 +599,7 @@ UpdateDBXFromFile (
 BOOLEAN
 EFIAPI
 UpdateDBTFromFile (
-  IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
 
 #endif

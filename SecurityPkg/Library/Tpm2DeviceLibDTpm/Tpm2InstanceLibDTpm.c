@@ -25,7 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 DumpPtpInfo (
-  IN VOID *Register
+  IN VOID  *Register
   );
 
 /**
@@ -43,10 +43,10 @@ DumpPtpInfo (
 EFI_STATUS
 EFIAPI
 DTpm2SubmitCommand (
-  IN UINT32            InputParameterBlockSize,
-  IN UINT8             *InputParameterBlock,
-  IN OUT UINT32        *OutputParameterBlockSize,
-  IN UINT8             *OutputParameterBlock
+  IN UINT32      InputParameterBlockSize,
+  IN UINT8       *InputParameterBlock,
+  IN OUT UINT32  *OutputParameterBlockSize,
+  IN UINT8       *OutputParameterBlock
   );
 
 /**
@@ -79,7 +79,7 @@ Tpm2InstanceLibDTpmConstructor (
   VOID
   )
 {
-  EFI_STATUS               Status;
+  EFI_STATUS  Status;
 
   Status = Tpm2RegisterTpm2DeviceLib (&mDTpm2InternalTpm2Device);
   if ((Status == EFI_SUCCESS) || (Status == EFI_UNSUPPORTED)) {
@@ -88,9 +88,11 @@ Tpm2InstanceLibDTpmConstructor (
     //
     if (Status == EFI_SUCCESS) {
       Status = InternalTpm2DeviceLibDTpmCommonConstructor ();
-      DumpPtpInfo ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+      DumpPtpInfo ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
     }
+
     return EFI_SUCCESS;
   }
+
   return Status;
 }

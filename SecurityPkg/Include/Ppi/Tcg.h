@@ -57,9 +57,9 @@ EFI_STATUS
 /// The EFI_TCG Protocol abstracts TCG activity.
 ///
 struct _EDKII_TCG_PPI {
-  EDKII_TCG_HASH_LOG_EXTEND_EVENT     HashLogExtendEvent;
+  EDKII_TCG_HASH_LOG_EXTEND_EVENT    HashLogExtendEvent;
 };
 
-extern EFI_GUID gEdkiiTcgPpiGuid;
+extern EFI_GUID  gEdkiiTcgPpiGuid;
 
 #endif

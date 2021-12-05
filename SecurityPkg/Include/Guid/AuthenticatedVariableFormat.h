@@ -18,10 +18,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_SECURE_BOOT_ENABLE_DISABLE \
   { 0xf0a30bc7, 0xaf08, 0x4556, { 0x99, 0xc4, 0x0, 0x10, 0x9, 0xc9, 0x3a, 0x44 } }
 
-extern EFI_GUID gEfiSecureBootEnableDisableGuid;
-extern EFI_GUID gEfiCertDbGuid;
-extern EFI_GUID gEfiCustomModeEnableGuid;
-extern EFI_GUID gEfiVendorKeysNvGuid;
+extern EFI_GUID  gEfiSecureBootEnableDisableGuid;
+extern EFI_GUID  gEfiCertDbGuid;
+extern EFI_GUID  gEfiCustomModeEnableGuid;
+extern EFI_GUID  gEfiVendorKeysNvGuid;
 
 ///
 /// "SecureBootEnable" variable for the Secure Boot feature enable/disable.
@@ -32,9 +32,9 @@ extern EFI_GUID gEfiVendorKeysNvGuid;
 ///
 /// Format: UINT8
 ///
-#define EFI_SECURE_BOOT_ENABLE_NAME      L"SecureBootEnable"
-#define SECURE_BOOT_ENABLE               1
-#define SECURE_BOOT_DISABLE              0
+#define EFI_SECURE_BOOT_ENABLE_NAME  L"SecureBootEnable"
+#define SECURE_BOOT_ENABLE           1
+#define SECURE_BOOT_DISABLE          0
 
 ///
 ///  "CustomMode" variable for two Secure Boot modes feature: "Custom" and "Standard".
@@ -48,9 +48,9 @@ extern EFI_GUID gEfiVendorKeysNvGuid;
 ///
 /// Format: UINT8
 ///
-#define EFI_CUSTOM_MODE_NAME          L"CustomMode"
-#define CUSTOM_SECURE_BOOT_MODE       1
-#define STANDARD_SECURE_BOOT_MODE     0
+#define EFI_CUSTOM_MODE_NAME       L"CustomMode"
+#define CUSTOM_SECURE_BOOT_MODE    1
+#define STANDARD_SECURE_BOOT_MODE  0
 
 ///
 ///  "VendorKeysNv" variable to record the out of band secure boot keys modification.
@@ -62,8 +62,8 @@ extern EFI_GUID gEfiVendorKeysNvGuid;
 ///
 /// Format: UINT8
 ///
-#define EFI_VENDOR_KEYS_NV_VARIABLE_NAME       L"VendorKeysNv"
-#define VENDOR_KEYS_VALID             1
-#define VENDOR_KEYS_MODIFIED          0
+#define EFI_VENDOR_KEYS_NV_VARIABLE_NAME  L"VendorKeysNv"
+#define VENDOR_KEYS_VALID                 1
+#define VENDOR_KEYS_MODIFIED              0
 
 #endif // __AUTHENTICATED_VARIABLE_FORMAT_H__

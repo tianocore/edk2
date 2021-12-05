@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define TCG_CONFIGURATION_VARSTORE_ID  0x0001
 #define TCG_CONFIGURATION_FORM_ID      0x0001
 
-#define KEY_TPM_ACTION                         0x3000
+#define KEY_TPM_ACTION  0x3000
 
 #define LABEL_TCG_CONFIGURATION_TPM_OPERATION  0x0001
 #define LABEL_END                              0xffff
@@ -25,9 +25,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Nv Data structure referenced by IFR
 //
 typedef struct {
-  UINT8   TpmOperation;
-  BOOLEAN TpmEnable;
-  BOOLEAN TpmActivate;
+  UINT8      TpmOperation;
+  BOOLEAN    TpmEnable;
+  BOOLEAN    TpmActivate;
 } TCG_CONFIGURATION;
 
 #endif

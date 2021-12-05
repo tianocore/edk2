@@ -23,11 +23,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 Tpm2SetSha512ToDigestList (
-  IN TPML_DIGEST_VALUES *DigestList,
-  IN UINT8              *Sha512Digest
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN UINT8               *Sha512Digest
   )
 {
-  DigestList->count = 1;
+  DigestList->count              = 1;
   DigestList->digests[0].hashAlg = TPM_ALG_SHA512;
   CopyMem (
     DigestList->digests[0].digest.sha512,
@@ -47,13 +47,13 @@ Tpm2SetSha512ToDigestList (
 EFI_STATUS
 EFIAPI
 Sha512HashInit (
-  OUT HASH_HANDLE    *HashHandle
+  OUT HASH_HANDLE  *HashHandle
   )
 {
-  VOID     *Sha512Ctx;
-  UINTN    CtxSize;
+  VOID   *Sha512Ctx;
+  UINTN  CtxSize;
 
-  CtxSize = Sha512GetContextSize ();
+  CtxSize   = Sha512GetContextSize ();
   Sha512Ctx = AllocatePool (CtxSize);
   ASSERT (Sha512Ctx != NULL);
 
@@ -76,12 +76,12 @@ Sha512HashInit (
 EFI_STATUS
 EFIAPI
 Sha512HashUpdate (
-  IN HASH_HANDLE    HashHandle,
-  IN VOID           *DataToHash,
-  IN UINTN          DataToHashLen
+  IN HASH_HANDLE  HashHandle,
+  IN VOID         *DataToHash,
+  IN UINTN        DataToHashLen
   )
 {
-  VOID     *Sha512Ctx;
+  VOID  *Sha512Ctx;
 
   Sha512Ctx = (VOID *)HashHandle;
   Sha512Update (Sha512Ctx, DataToHash, DataToHashLen);
@@ -100,12 +100,12 @@ Sha512HashUpdate (
 EFI_STATUS
 EFIAPI
 Sha512HashFinal (
-  IN HASH_HANDLE         HashHandle,
-  OUT TPML_DIGEST_VALUES *DigestList
+  IN HASH_HANDLE          HashHandle,
+  OUT TPML_DIGEST_VALUES  *DigestList
   )
 {
-  UINT8         Digest[SHA512_DIGEST_SIZE];
-  VOID          *Sha512Ctx;
+  UINT8  Digest[SHA512_DIGEST_SIZE];
+  VOID   *Sha512Ctx;
 
   Sha512Ctx = (VOID *)HashHandle;
   Sha512Final (Sha512Ctx, Digest);
@@ -144,5 +144,6 @@ HashInstanceLibSha512Constructor (
     //
     return EFI_SUCCESS;
   }
+
   return Status;
 }

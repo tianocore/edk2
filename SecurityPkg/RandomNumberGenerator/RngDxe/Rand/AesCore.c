@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Number of columns (32-bit words) comprising the State.
 // AES_NB is a constant (value = 4) for NIST FIPS-197.
 //
-#define AES_NB                     4
+#define AES_NB  4
 
 //
 // Pre-computed AES Forward Table: AesForwardTable[t] = AES_SBOX[t].[02, 01, 01, 03]
@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // This is to speed up execution of the cipher by combining SubBytes and
 // ShiftRows with MixColumns steps and transforming them into table lookups.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT32 AesForwardTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT32  AesForwardTable[] = {
   0xc66363a5, 0xf87c7c84, 0xee777799, 0xf67b7b8d, 0xfff2f20d, 0xd66b6bbd,
   0xde6f6fb1, 0x91c5c554, 0x60303050, 0x02010103, 0xce6767a9, 0x562b2b7d,
   0xe7fefe19, 0xb5d7d762, 0x4dababe6, 0xec76769a, 0x8fcaca45, 0x1f82829d,
@@ -71,7 +71,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT32 AesForwardTable[] = {
 //
 // Round constant word array used in AES key expansion.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT32 Rcon[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT32  Rcon[] = {
   0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000,
   0x20000000, 0x40000000, 0x80000000, 0x1B000000, 0x36000000
 };
@@ -79,14 +79,14 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT32 Rcon[] = {
 //
 // Rotates x right n bits (circular right shift operation)
 //
-#define ROTATE_RIGHT32(x, n)    (((x) >> (n)) | ((x) << (32-(n))))
+#define ROTATE_RIGHT32(x, n)  (((x) >> (n)) | ((x) << (32-(n))))
 
 //
 // Loading & Storing 32-bit words in big-endian format: y[3..0] --> x; x --> y[3..0];
 //
-#define LOAD32H(x, y)    { x = ((UINT32)((y)[0] & 0xFF) << 24) | ((UINT32)((y)[1] & 0xFF) << 16) |  \
+#define LOAD32H(x, y)   { x = ((UINT32)((y)[0] & 0xFF) << 24) | ((UINT32)((y)[1] & 0xFF) << 16) |   \
                                ((UINT32)((y)[2] & 0xFF) <<  8) | ((UINT32)((y)[3] & 0xFF)); }
-#define STORE32H(x, y)   { (y)[0] = (UINT8)(((x) >> 24) & 0xFF); (y)[1] = (UINT8)(((x) >> 16) & 0xFF); \
+#define STORE32H(x, y)  { (y)[0] = (UINT8)(((x) >> 24) & 0xFF); (y)[1] = (UINT8)(((x) >> 16) & 0xFF);  \
                            (y)[2] = (UINT8)(((x) >>  8) & 0xFF); (y)[3] = (UINT8)((x)         & 0xFF); }
 
 //
@@ -121,30 +121,31 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 AesExpandKey (
-  IN UINT8         *Key,
-  IN UINTN         KeyLenInBits,
-  OUT AES_KEY      *AesKey
+  IN UINT8     *Key,
+  IN UINTN     KeyLenInBits,
+  OUT AES_KEY  *AesKey
   )
 {
-  UINTN       Nk;
-  UINTN       Nr;
-  UINTN       Nw;
-  UINTN       Index1;
-  UINTN       Index2;
-  UINTN       Index3;
-  UINT32      *Ek;
-  UINT32      Temp;
+  UINTN   Nk;
+  UINTN   Nr;
+  UINTN   Nw;
+  UINTN   Index1;
+  UINTN   Index2;
+  UINTN   Index3;
+  UINT32  *Ek;
+  UINT32  Temp;
 
   //
   // Nk - Number of 32-bit words comprising the cipher key. (Nk = 4, 6 or 8)
   // Nr - Number of rounds. (Nr = 10, 12, or 14), which is dependent on the key size.
   //
   Nk = KeyLenInBits >> 5;
-  if (Nk != 4 && Nk != 6 && Nk != 8) {
+  if ((Nk != 4) && (Nk != 6) && (Nk != 8)) {
     return EFI_INVALID_PARAMETER;
   }
-  Nr = Nk + 6;
-  Nw = AES_NB * (Nr + 1);    // Key Expansion generates a total of Nb * (Nr + 1) words
+
+  Nr         = Nk + 6;
+  Nw         = AES_NB * (Nr + 1); // Key Expansion generates a total of Nb * (Nr + 1) words
   AesKey->Nk = Nk;
 
   //
@@ -161,31 +162,32 @@ AesExpandKey (
   //
   for (Index2 = Nk, Index3 = 0; Index2 < Nw; Index2 += Nk, Index3++) {
     Temp       = Ek[Index2 - 1];
-    Ek[Index2] = Ek[Index2 - Nk] ^ (AES_FT2((Temp >> 16) & 0xFF) & 0xFF000000) ^
-                                   (AES_FT3((Temp >>  8) & 0xFF) & 0x00FF0000) ^
-                                   (AES_FT0((Temp)       & 0xFF) & 0x0000FF00) ^
-                                   (AES_FT1((Temp >> 24) & 0xFF) & 0x000000FF) ^
-                                   Rcon[Index3];
+    Ek[Index2] = Ek[Index2 - Nk] ^ (AES_FT2 ((Temp >> 16) & 0xFF) & 0xFF000000) ^
+                 (AES_FT3 ((Temp >>  8) & 0xFF) & 0x00FF0000) ^
+                 (AES_FT0 ((Temp)       & 0xFF) & 0x0000FF00) ^
+                 (AES_FT1 ((Temp >> 24) & 0xFF) & 0x000000FF) ^
+                 Rcon[Index3];
     if (Nk <= 6) {
       //
       // If AES Cipher Key is 128 or 192 bits
       //
       for (Index1 = 1; Index1 < Nk && (Index1 + Index2) < Nw; Index1++) {
-        Ek [Index1 + Index2] = Ek [Index1 + Index2 - Nk] ^ Ek[Index1 + Index2 - 1];
+        Ek[Index1 + Index2] = Ek[Index1 + Index2 - Nk] ^ Ek[Index1 + Index2 - 1];
       }
     } else {
       //
       // Different routine for key expansion If Cipher Key is 256 bits,
       //
       for (Index1 = 1; Index1 < 4 && (Index1 + Index2) < Nw; Index1++) {
-        Ek [Index1 + Index2] = Ek[Index1 + Index2 - Nk] ^ Ek[Index1 + Index2 - 1];
+        Ek[Index1 + Index2] = Ek[Index1 + Index2 - Nk] ^ Ek[Index1 + Index2 - 1];
       }
+
       if (Index2 + 4 < Nw) {
         Temp           = Ek[Index2 + 3];
-        Ek[Index2 + 4] = Ek[Index2 + 4 - Nk] ^ (AES_FT2((Temp >> 24) & 0xFF) & 0xFF000000) ^
-                                               (AES_FT3((Temp >> 16) & 0xFF) & 0x00FF0000) ^
-                                               (AES_FT0((Temp >>  8) & 0xFF) & 0x0000FF00) ^
-                                               (AES_FT1((Temp)       & 0xFF) & 0x000000FF);
+        Ek[Index2 + 4] = Ek[Index2 + 4 - Nk] ^ (AES_FT2 ((Temp >> 24) & 0xFF) & 0xFF000000) ^
+                         (AES_FT3 ((Temp >> 16) & 0xFF) & 0x00FF0000) ^
+                         (AES_FT0 ((Temp >>  8) & 0xFF) & 0x0000FF00) ^
+                         (AES_FT1 ((Temp)       & 0xFF) & 0x000000FF);
       }
 
       for (Index1 = 5; Index1 < Nk && (Index1 + Index2) < Nw; Index1++) {
@@ -211,9 +213,9 @@ AesExpandKey (
 EFI_STATUS
 EFIAPI
 AesEncrypt (
-  IN  UINT8        *Key,
-  IN  UINT8        *InData,
-  OUT UINT8        *OutData
+  IN  UINT8  *Key,
+  IN  UINT8  *InData,
+  OUT UINT8  *OutData
   )
 {
   AES_KEY  AesKey;
@@ -258,33 +260,35 @@ AesEncrypt (
   // table lookups to speed up the execution.
   //
   for (Round = 1; Round < Nr; Round++) {
-    StateY[0] = AES_FT0 ((StateX[0] >> 24)       ) ^ AES_FT1 ((StateX[1] >> 16) & 0xFF) ^
-                AES_FT2 ((StateX[2] >>  8) & 0xFF) ^ AES_FT3 ((StateX[3]      ) & 0xFF) ^ Ek[NbIndex];
-    StateY[1] = AES_FT0 ((StateX[1] >> 24)       ) ^ AES_FT1 ((StateX[2] >> 16) & 0xFF) ^
-                AES_FT2 ((StateX[3] >>  8) & 0xFF) ^ AES_FT3 ((StateX[0]      ) & 0xFF) ^ Ek[NbIndex + 1];
-    StateY[2] = AES_FT0 ((StateX[2] >> 24)       ) ^ AES_FT1 ((StateX[3] >> 16) & 0xFF) ^
-                AES_FT2 ((StateX[0] >>  8) & 0xFF) ^ AES_FT3 ((StateX[1]      ) & 0xFF) ^ Ek[NbIndex + 2];
-    StateY[3] = AES_FT0 ((StateX[3] >> 24)       ) ^ AES_FT1 ((StateX[0] >> 16) & 0xFF) ^
-                AES_FT2 ((StateX[1] >>  8) & 0xFF) ^ AES_FT3 ((StateX[2]      ) & 0xFF) ^ Ek[NbIndex + 3];
+    StateY[0] = AES_FT0 ((StateX[0] >> 24)) ^ AES_FT1 ((StateX[1] >> 16) & 0xFF) ^
+                AES_FT2 ((StateX[2] >>  8) & 0xFF) ^ AES_FT3 ((StateX[3]) & 0xFF) ^ Ek[NbIndex];
+    StateY[1] = AES_FT0 ((StateX[1] >> 24)) ^ AES_FT1 ((StateX[2] >> 16) & 0xFF) ^
+                AES_FT2 ((StateX[3] >>  8) & 0xFF) ^ AES_FT3 ((StateX[0]) & 0xFF) ^ Ek[NbIndex + 1];
+    StateY[2] = AES_FT0 ((StateX[2] >> 24)) ^ AES_FT1 ((StateX[3] >> 16) & 0xFF) ^
+                AES_FT2 ((StateX[0] >>  8) & 0xFF) ^ AES_FT3 ((StateX[1]) & 0xFF) ^ Ek[NbIndex + 2];
+    StateY[3] = AES_FT0 ((StateX[3] >> 24)) ^ AES_FT1 ((StateX[0] >> 16) & 0xFF) ^
+                AES_FT2 ((StateX[1] >>  8) & 0xFF) ^ AES_FT3 ((StateX[2]) & 0xFF) ^ Ek[NbIndex + 3];
 
     NbIndex += 4;
-    Temp = StateX; StateX = StateY; StateY = Temp;
+    Temp     = StateX;
+    StateX   = StateY;
+    StateY   = Temp;
   }
 
   //
   // Apply the final round, which does not include MixColumns() transformation
   //
-  StateY[0] = (AES_FT2 ((StateX[0] >> 24)       ) & 0xFF000000) ^ (AES_FT3 ((StateX[1] >> 16) & 0xFF) & 0x00FF0000) ^
-              (AES_FT0 ((StateX[2] >>  8) & 0xFF) & 0x0000FF00) ^ (AES_FT1 ((StateX[3]      ) & 0xFF) & 0x000000FF) ^
+  StateY[0] = (AES_FT2 ((StateX[0] >> 24)) & 0xFF000000) ^ (AES_FT3 ((StateX[1] >> 16) & 0xFF) & 0x00FF0000) ^
+              (AES_FT0 ((StateX[2] >>  8) & 0xFF) & 0x0000FF00) ^ (AES_FT1 ((StateX[3]) & 0xFF) & 0x000000FF) ^
               Ek[NbIndex];
-  StateY[1] = (AES_FT2 ((StateX[1] >> 24)       ) & 0xFF000000) ^ (AES_FT3 ((StateX[2] >> 16) & 0xFF) & 0x00FF0000) ^
-              (AES_FT0 ((StateX[3] >>  8) & 0xFF) & 0x0000FF00) ^ (AES_FT1 ((StateX[0]      ) & 0xFF) & 0x000000FF) ^
+  StateY[1] = (AES_FT2 ((StateX[1] >> 24)) & 0xFF000000) ^ (AES_FT3 ((StateX[2] >> 16) & 0xFF) & 0x00FF0000) ^
+              (AES_FT0 ((StateX[3] >>  8) & 0xFF) & 0x0000FF00) ^ (AES_FT1 ((StateX[0]) & 0xFF) & 0x000000FF) ^
               Ek[NbIndex + 1];
-  StateY[2] = (AES_FT2 ((StateX[2] >> 24)       ) & 0xFF000000) ^ (AES_FT3 ((StateX[3] >> 16) & 0xFF) & 0x00FF0000) ^
-              (AES_FT0 ((StateX[0] >>  8) & 0xFF) & 0x0000FF00) ^ (AES_FT1 ((StateX[1]      ) & 0xFF) & 0x000000FF) ^
+  StateY[2] = (AES_FT2 ((StateX[2] >> 24)) & 0xFF000000) ^ (AES_FT3 ((StateX[3] >> 16) & 0xFF) & 0x00FF0000) ^
+              (AES_FT0 ((StateX[0] >>  8) & 0xFF) & 0x0000FF00) ^ (AES_FT1 ((StateX[1]) & 0xFF) & 0x000000FF) ^
               Ek[NbIndex + 2];
-  StateY[3] = (AES_FT2 ((StateX[3] >> 24)       ) & 0xFF000000) ^ (AES_FT3 ((StateX[0] >> 16) & 0xFF) & 0x00FF0000) ^
-              (AES_FT0 ((StateX[1] >>  8) & 0xFF) & 0x0000FF00) ^ (AES_FT1 ((StateX[2]      ) & 0xFF) & 0x000000FF) ^
+  StateY[3] = (AES_FT2 ((StateX[3] >> 24)) & 0xFF000000) ^ (AES_FT3 ((StateX[0] >> 16) & 0xFF) & 0x00FF0000) ^
+              (AES_FT0 ((StateX[1] >>  8) & 0xFF) & 0x0000FF00) ^ (AES_FT1 ((StateX[2]) & 0xFF) & 0x000000FF) ^
               Ek[NbIndex + 3];
 
   //

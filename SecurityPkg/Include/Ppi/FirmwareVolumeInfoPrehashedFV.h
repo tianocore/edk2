@@ -18,9 +18,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // HashAlgoId is TPM_ALG_ID in Tpm20.h
 //
 typedef struct _HASH_INFO {
-  UINT16                                     HashAlgoId;
-  UINT16                                     HashSize;
-  //UINT8                                    Hash[];
+  UINT16    HashAlgoId;
+  UINT16    HashSize;
+  // UINT8                                    Hash[];
 } HASH_INFO;
 
 //
@@ -32,13 +32,12 @@ typedef struct _HASH_INFO {
 //     else, drops PPI data and calculate all hash again
 //
 typedef struct {
-  UINT32                                     FvBase;
-  UINT32                                     FvLength;
-  UINT32                                     Count;
-  //HASH_INFO                                HashInfo[];
+  UINT32    FvBase;
+  UINT32    FvLength;
+  UINT32    Count;
+  // HASH_INFO                                HashInfo[];
 } EDKII_PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_PPI;
 
-extern EFI_GUID gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid;
+extern EFI_GUID  gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid;
 
 #endif
-

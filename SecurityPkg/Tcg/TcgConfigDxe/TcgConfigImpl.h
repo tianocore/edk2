@@ -37,15 +37,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Tool generated IFR binary data and String package data
 //
-extern UINT8                        TcgConfigBin[];
-extern UINT8                        TcgConfigDxeStrings[];
+extern UINT8  TcgConfigBin[];
+extern UINT8  TcgConfigDxeStrings[];
 
 ///
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH                VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL          End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
 typedef struct {
@@ -59,11 +59,10 @@ typedef struct {
   EFI_TCG_PROTOCOL                  *TcgProtocol;
 } TCG_CONFIG_PRIVATE_DATA;
 
-extern TCG_CONFIG_PRIVATE_DATA      mTcgConfigPrivateDateTemplate;
+extern TCG_CONFIG_PRIVATE_DATA  mTcgConfigPrivateDateTemplate;
 
-#define TCG_CONFIG_PRIVATE_DATA_SIGNATURE     SIGNATURE_32 ('T', 'C', 'G', 'D')
+#define TCG_CONFIG_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('T', 'C', 'G', 'D')
 #define TCG_CONFIG_PRIVATE_DATA_FROM_THIS(a)  CR (a, TCG_CONFIG_PRIVATE_DATA, ConfigAccess, TCG_CONFIG_PRIVATE_DATA_SIGNATURE)
-
 
 /**
   This function publish the TCG configuration Form for TPM device.
@@ -88,7 +87,7 @@ InstallTcgConfigForm (
 **/
 VOID
 UninstallTcgConfigForm (
-  IN OUT TCG_CONFIG_PRIVATE_DATA    *PrivateData
+  IN OUT TCG_CONFIG_PRIVATE_DATA  *PrivateData
   );
 
 /**
@@ -120,10 +119,10 @@ UninstallTcgConfigForm (
 EFI_STATUS
 EFIAPI
 TcgExtractConfig (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL        *This,
-  IN CONST EFI_STRING                            Request,
-       OUT EFI_STRING                            *Progress,
-       OUT EFI_STRING                            *Results
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN CONST EFI_STRING                      Request,
+  OUT EFI_STRING                           *Progress,
+  OUT EFI_STRING                           *Results
   );
 
 /**
@@ -147,9 +146,9 @@ TcgExtractConfig (
 EFI_STATUS
 EFIAPI
 TcgRouteConfig (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
-  IN CONST EFI_STRING                          Configuration,
-       OUT EFI_STRING                          *Progress
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                           *Progress
   );
 
 /**
@@ -177,12 +176,12 @@ TcgRouteConfig (
 EFI_STATUS
 EFIAPI
 TcgCallback (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
-  IN     EFI_BROWSER_ACTION                    Action,
-  IN     EFI_QUESTION_ID                       QuestionId,
-  IN     UINT8                                 Type,
-  IN     EFI_IFR_TYPE_VALUE                    *Value,
-     OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN     EFI_BROWSER_ACTION                Action,
+  IN     EFI_QUESTION_ID                   QuestionId,
+  IN     UINT8                             Type,
+  IN     EFI_IFR_TYPE_VALUE                *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST           *ActionRequest
   );
 
 #endif

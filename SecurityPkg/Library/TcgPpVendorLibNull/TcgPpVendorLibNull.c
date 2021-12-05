@@ -29,9 +29,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 UINT32
 EFIAPI
 TcgPpVendorLibExecutePendingRequest (
-  IN UINT32                 OperationRequest,
-  IN OUT UINT32             *ManagementFlags,
-  OUT BOOLEAN               *ResetRequired
+  IN UINT32      OperationRequest,
+  IN OUT UINT32  *ManagementFlags,
+  OUT BOOLEAN    *ResetRequired
   )
 {
   ASSERT (OperationRequest >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION);
@@ -59,9 +59,9 @@ TcgPpVendorLibExecutePendingRequest (
 BOOLEAN
 EFIAPI
 TcgPpVendorLibHasValidRequest (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 ManagementFlags,
-  OUT BOOLEAN               *RequestConfirmed
+  IN UINT32    OperationRequest,
+  IN UINT32    ManagementFlags,
+  OUT BOOLEAN  *RequestConfirmed
   )
 {
   ASSERT (OperationRequest >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION);
@@ -88,8 +88,8 @@ TcgPpVendorLibHasValidRequest (
 UINT32
 EFIAPI
 TcgPpVendorLibSubmitRequestToPreOSFunction (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 ManagementFlags
+  IN UINT32  OperationRequest,
+  IN UINT32  ManagementFlags
   )
 {
   ASSERT (OperationRequest >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION);
@@ -114,8 +114,8 @@ TcgPpVendorLibSubmitRequestToPreOSFunction (
 UINT32
 EFIAPI
 TcgPpVendorLibGetUserConfirmationStatusFunction (
-  IN UINT32                 OperationRequest,
-  IN UINT32                 ManagementFlags
+  IN UINT32  OperationRequest,
+  IN UINT32  ManagementFlags
   )
 {
   ASSERT (OperationRequest >= TCG_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION);

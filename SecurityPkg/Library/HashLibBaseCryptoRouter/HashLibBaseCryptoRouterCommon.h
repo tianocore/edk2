@@ -31,8 +31,8 @@ Tpm2GetHashMaskFromAlgo (
 VOID
 EFIAPI
 Tpm2SetHashToDigestList (
-  IN OUT TPML_DIGEST_VALUES *DigestList,
-  IN TPML_DIGEST_VALUES     *Digest
+  IN OUT TPML_DIGEST_VALUES  *DigestList,
+  IN TPML_DIGEST_VALUES      *Digest
   );
 
 #endif

@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 EFI_HANDLE
-HiiGetDriverImageHandleCB(
+HiiGetDriverImageHandleCB (
   VOID
   )
 {
@@ -32,17 +32,17 @@ HiiGetDriverImageHandleCB(
 
 **/
 VOID *
-HiiGetDiskContextCB(
-  UINT8 DiskIndex
+HiiGetDiskContextCB (
+  UINT8  DiskIndex
   )
 {
-  OPAL_DRIVER_DEVICE*                Dev;
-  UINT8                              CurrentDisk;
+  OPAL_DRIVER_DEVICE  *Dev;
+  UINT8               CurrentDisk;
 
-  Dev = OpalDriverGetDeviceList();
+  Dev         = OpalDriverGetDeviceList ();
   CurrentDisk = 0;
 
-  if (DiskIndex >= GetDeviceCount()) {
+  if (DiskIndex >= GetDeviceCount ()) {
     return NULL;
   }
 
@@ -66,13 +66,13 @@ HiiGetDiskContextCB(
   @retval The device pointer.
 
 **/
-OPAL_DISK*
-HiiGetOpalDiskCB(
-  UINT8 DiskIndex
+OPAL_DISK *
+HiiGetOpalDiskCB (
+  UINT8  DiskIndex
   )
 {
-  VOID                           *Ctx;
-  OPAL_DRIVER_DEVICE             *Tmp;
+  VOID                *Ctx;
+  OPAL_DRIVER_DEVICE  *Tmp;
 
   Ctx = HiiGetDiskContextCB (DiskIndex);
 
@@ -80,7 +80,7 @@ HiiGetOpalDiskCB(
     return NULL;
   }
 
-  Tmp = (OPAL_DRIVER_DEVICE*) Ctx;
+  Tmp = (OPAL_DRIVER_DEVICE *)Ctx;
 
   return &Tmp->OpalDisk;
 }
@@ -93,20 +93,22 @@ HiiGetOpalDiskCB(
   @retval Returns the disk name.
 
 **/
-CHAR8*
-HiiDiskGetNameCB(
-  UINT8 DiskIndex
+CHAR8 *
+HiiDiskGetNameCB (
+  UINT8  DiskIndex
   )
 {
-  OPAL_DRIVER_DEVICE*                Ctx;
+  OPAL_DRIVER_DEVICE  *Ctx;
 
-  Ctx = (OPAL_DRIVER_DEVICE*) HiiGetDiskContextCB (DiskIndex);
+  Ctx = (OPAL_DRIVER_DEVICE *)HiiGetDiskContextCB (DiskIndex);
 
   if (Ctx != NULL) {
     if (Ctx->NameZ == NULL) {
       OpalDriverGetDriverDeviceName (Ctx);
     }
+
     return Ctx->NameZ;
   }
+
   return NULL;
 }

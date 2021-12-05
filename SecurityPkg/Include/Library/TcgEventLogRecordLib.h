@@ -13,20 +13,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #pragma pack (1)
 
-#define PLATFORM_FIRMWARE_BLOB_DESC "Fv(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)"
+#define PLATFORM_FIRMWARE_BLOB_DESC  "Fv(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)"
 typedef struct {
-  UINT8                             BlobDescriptionSize;
-  UINT8                             BlobDescription[sizeof(PLATFORM_FIRMWARE_BLOB_DESC)];
-  EFI_PHYSICAL_ADDRESS              BlobBase;
-  UINT64                            BlobLength;
+  UINT8                   BlobDescriptionSize;
+  UINT8                   BlobDescription[sizeof (PLATFORM_FIRMWARE_BLOB_DESC)];
+  EFI_PHYSICAL_ADDRESS    BlobBase;
+  UINT64                  BlobLength;
 } PLATFORM_FIRMWARE_BLOB2_STRUCT;
 
 #define HANDOFF_TABLE_POINTER_DESC  "1234567890ABCDEF"
 typedef struct {
-  UINT8                             TableDescriptionSize;
-  UINT8                             TableDescription[sizeof(HANDOFF_TABLE_POINTER_DESC)];
-  UINT64                            NumberOfTables;
-  EFI_CONFIGURATION_TABLE           TableEntry[1];
+  UINT8                      TableDescriptionSize;
+  UINT8                      TableDescription[sizeof (HANDOFF_TABLE_POINTER_DESC)];
+  UINT64                     NumberOfTables;
+  EFI_CONFIGURATION_TABLE    TableEntry[1];
 } HANDOFF_TABLE_POINTERS2_STRUCT;
 
 #pragma pack ()
@@ -44,8 +44,8 @@ typedef struct {
 **/
 VOID *
 TpmMeasurementGetFvName (
-  IN EFI_PHYSICAL_ADDRESS           FvBase,
-  IN UINT64                         FvLength
+  IN EFI_PHYSICAL_ADDRESS  FvBase,
+  IN UINT64                FvLength
   );
 
 /**
@@ -64,10 +64,10 @@ TpmMeasurementGetFvName (
 EFI_STATUS
 EFIAPI
 MeasureFirmwareBlob (
-  IN UINT32                         PcrIndex,
-  IN CHAR8                          *Description OPTIONAL,
-  IN EFI_PHYSICAL_ADDRESS           FirmwareBlobBase,
-  IN UINT64                         FirmwareBlobLength
+  IN UINT32                PcrIndex,
+  IN CHAR8                 *Description OPTIONAL,
+  IN EFI_PHYSICAL_ADDRESS  FirmwareBlobBase,
+  IN UINT64                FirmwareBlobLength
   );
 
 /**
@@ -87,11 +87,11 @@ MeasureFirmwareBlob (
 EFI_STATUS
 EFIAPI
 MeasureHandoffTable (
-  IN UINT32                         PcrIndex,
-  IN CHAR8                          *Description OPTIONAL,
-  IN EFI_GUID                       *TableGuid,
-  IN VOID                           *TableAddress,
-  IN UINTN                          TableLength
+  IN UINT32    PcrIndex,
+  IN CHAR8     *Description OPTIONAL,
+  IN EFI_GUID  *TableGuid,
+  IN VOID      *TableAddress,
+  IN UINTN     TableLength
   );
 
 #endif
