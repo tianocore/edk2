@@ -149,7 +149,7 @@ SetIdtEntry (
   Status = InitializeCpuExceptionHandlers (NULL);
   ASSERT_EFI_ERROR (Status);
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     //
     // Update IDT entry INT3 if the instruction is valid in it
     //
@@ -164,7 +164,7 @@ SetIdtEntry (
       IdtEntry->Bits.OffsetUpper    = (UINT32)(S3DebugBuffer >> 32);
       IdtEntry->Bits.Reserved_1     = 0;
     }
-  );
+  DEBUG_CODE_END ();
 
   //
   // If both BIOS and OS wants long mode waking vector,

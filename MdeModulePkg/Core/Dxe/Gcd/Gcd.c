@@ -141,7 +141,7 @@ CoreDumpGcdMemorySpaceMap (
   BOOLEAN  InitialMap
   )
 {
-  DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
     EFI_STATUS                       Status;
     UINTN                            NumberOfDescriptors;
     EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
@@ -167,7 +167,7 @@ CoreDumpGcdMemorySpaceMap (
     }
     DEBUG ((DEBUG_GCD, "\n"));
     FreePool (MemorySpaceMap);
-  );
+    DEBUG_CODE_END ();
 }
 
 /**
@@ -183,7 +183,7 @@ CoreDumpGcdIoSpaceMap (
   BOOLEAN  InitialMap
   )
 {
-  DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
     EFI_STATUS                   Status;
     UINTN                        NumberOfDescriptors;
     EFI_GCD_IO_SPACE_DESCRIPTOR  *IoSpaceMap;
@@ -208,7 +208,7 @@ CoreDumpGcdIoSpaceMap (
     }
     DEBUG ((DEBUG_GCD, "\n"));
     FreePool (IoSpaceMap);
-  );
+    DEBUG_CODE_END ();
 }
 
 /**

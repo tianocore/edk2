@@ -286,7 +286,7 @@ ParseFv (
                     );
     ASSERT_EFI_ERROR (Status);
 
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL   *Fvb2;
       EFI_PHYSICAL_ADDRESS                  FvAddress;
       UINT64                                FvSize;
@@ -303,7 +303,7 @@ ParseFv (
         FvSize = ((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) FvAddress)->FvLength;
         DEBUG ((DEBUG_INFO , "FvSize    - 0x%08x\n", FvSize));
       }
-    );
+    DEBUG_CODE_END ();
 
     if (ScanAll) {
       //

@@ -330,7 +330,7 @@ Defer3rdPartyImageLoad (
 
   ImageInfo = LookupImage (File, BootPolicy);
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     CHAR16 *DevicePathStr;
     DevicePathStr = ConvertDevicePathToText (File, FALSE, FALSE);
     DEBUG ((
@@ -342,7 +342,7 @@ Defer3rdPartyImageLoad (
     if (DevicePathStr != NULL) {
       FreePool (DevicePathStr);
     }
-    );
+  DEBUG_CODE_END ();
 
   if (mEndOfDxe) {
     mImageLoadedAfterEndOfDxe = TRUE;

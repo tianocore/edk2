@@ -489,7 +489,7 @@ GetEfiSysPartitionFromActiveBootOption(
       continue;
     }
 
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       CHAR16 *DevicePathStr;
 
       DevicePathStr = ConvertDevicePathToText(DevicePath, TRUE, TRUE);
@@ -499,7 +499,7 @@ GetEfiSysPartitionFromActiveBootOption(
       } else {
         DEBUG((DEBUG_INFO, "DevicePathToStr failed\n"));
       }
-    );
+    DEBUG_CODE_END ();
 
     CurFullPath = NULL;
     //
@@ -521,7 +521,7 @@ GetEfiSysPartitionFromActiveBootOption(
         break;
       }
 
-      DEBUG_CODE (
+      DEBUG_CODE_BEGIN ();
         CHAR16 *DevicePathStr1;
 
         DevicePathStr1 = ConvertDevicePathToText(CurFullPath, TRUE, TRUE);
@@ -529,7 +529,7 @@ GetEfiSysPartitionFromActiveBootOption(
           DEBUG((DEBUG_INFO, "Full device path %s\n", DevicePathStr1));
           FreePool(DevicePathStr1);
         }
-      );
+      DEBUG_CODE_END ();
 
       //
       // Make sure the boot option device path connected.
@@ -587,7 +587,7 @@ GetEfiSysPartitionFromActiveBootOption(
     Status = EFI_NOT_FOUND;
   }
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     CHAR16 *DevicePathStr2;
     if (*FsHandle != NULL) {
       DevicePathStr2 = ConvertDevicePathToText(CurFullPath, TRUE, TRUE);
@@ -598,7 +598,7 @@ GetEfiSysPartitionFromActiveBootOption(
     } else {
       DEBUG((DEBUG_INFO, "Failed to found Active EFI System Partion\n"));
     }
-  );
+  DEBUG_CODE_END ();
 
   if (CurFullPath != NULL) {
     FreePool(CurFullPath);
@@ -990,13 +990,13 @@ GetFileImageInAlphabetFromDir(
     FileCount++;
   }
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     for (Link = FileInfoList.ForwardLink; Link != &FileInfoList; Link = Link->ForwardLink) {
       FileInfoEntry = CR (Link, FILE_INFO_ENTRY, Link, FILE_INFO_SIGNATURE);
       FileInfo      = FileInfoEntry->FileInfo;
       DEBUG((DEBUG_INFO, "Successfully read capsule file %s from disk.\n", FileInfo->FileName));
     }
-  );
+  DEBUG_CODE_END ();
 
 EXIT:
 
