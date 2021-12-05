@@ -28,19 +28,20 @@
 EFI_STATUS
 EFIAPI
 PlatformHasAcpiDt (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS           Status;
+  EFI_STATUS  Status;
 
   //
   // If we fail to install any of the necessary protocols below, the OS will be
   // unbootable anyway (due to lacking hardware description), so tolerate no
   // errors here.
   //
-  if (MAX_UINTN == MAX_UINT64 &&
-      !PcdGetBool (PcdForceNoAcpi)) {
+  if ((MAX_UINTN == MAX_UINT64) &&
+      !PcdGetBool (PcdForceNoAcpi))
+  {
     Status = gBS->InstallProtocolInterface (
                     &ImageHandle,
                     &gEdkiiPlatformHasAcpiGuid,

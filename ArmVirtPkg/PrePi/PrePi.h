@@ -30,16 +30,16 @@ TimerConstructor (
 
 VOID
 PrePiMain (
-  IN  UINTN                     UefiMemoryBase,
-  IN  UINTN                     StacksBase,
-  IN  UINT64                    StartTimeStamp
+  IN  UINTN   UefiMemoryBase,
+  IN  UINTN   StacksBase,
+  IN  UINT64  StartTimeStamp
   );
 
 EFI_STATUS
 EFIAPI
 MemoryPeim (
-  IN EFI_PHYSICAL_ADDRESS       UefiMemoryBase,
-  IN UINT64                     UefiMemorySize
+  IN EFI_PHYSICAL_ADDRESS  UefiMemoryBase,
+  IN UINT64                UefiMemorySize
   );
 
 EFI_STATUS
