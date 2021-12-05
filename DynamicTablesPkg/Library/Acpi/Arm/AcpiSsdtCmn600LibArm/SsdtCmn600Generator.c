@@ -174,7 +174,7 @@ error_handler:
     Cmn600Info->DtcCount
     ));
 
-  DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
     for (DtcIndex = 0; DtcIndex < Cmn600Info->DtcCount; DtcIndex++) {
       DtcInterrupt = &Cmn600Info->DtcInterrupt[DtcIndex];
       DEBUG ((
@@ -193,7 +193,7 @@ error_handler:
         DtcInterrupt->Flags
         ));
     } // for
-  );
+    DEBUG_CODE_END ();
 
   return EFI_INVALID_PARAMETER;
 }
