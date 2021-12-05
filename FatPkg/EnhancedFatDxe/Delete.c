@@ -48,6 +48,7 @@ FatDelete (
     Status = EFI_WRITE_PROTECTED;
     goto Done;
   }
+
   //
   // If the file is the root dir, then don't delete it
   //
@@ -55,6 +56,7 @@ FatDelete (
     Status = EFI_ACCESS_DENIED;
     goto Done;
   }
+
   //
   // If the file has a permanent error, skip the delete
   //
@@ -72,14 +74,16 @@ FatDelete (
       for (Round = 0; Round < 3; Round++) {
         Status = FatGetNextDirEnt (OFile, &DirEnt);
         if ((EFI_ERROR (Status)) ||
-            ((Round < 2) && (DirEnt == NULL || !FatIsDotDirEnt (DirEnt))) ||
+            ((Round < 2) && ((DirEnt == NULL) || !FatIsDotDirEnt (DirEnt))) ||
             ((Round == 2) && (DirEnt != NULL))
-            ) {
+            )
+        {
           Status = EFI_ACCESS_DENIED;
           goto Done;
         }
       }
     }
+
     //
     // Return the file's space by setting its size to 0
     //
@@ -91,6 +95,7 @@ FatDelete (
     if (EFI_ERROR (Status)) {
       goto Done;
     }
+
     //
     // Set a permanent error for this OFile in case there
     // are still opened IFiles attached

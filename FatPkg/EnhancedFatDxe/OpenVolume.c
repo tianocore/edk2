@@ -41,6 +41,7 @@ FatOpenVolume (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
+
   //
   // Open a new instance to the root
   //
