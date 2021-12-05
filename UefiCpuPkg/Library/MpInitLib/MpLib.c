@@ -2155,7 +2155,7 @@ MpInitLibInitialize (
   //
   // Dump the microcode revision for each core.
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     UINT32 ThreadId;
     UINT32 ExpectedMicrocodeRevision;
     CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
@@ -2176,7 +2176,7 @@ MpInitLibInitialize (
           ));
       }
     }
-  );
+  DEBUG_CODE_END ();
   //
   // Initialize global data for MP support
   //

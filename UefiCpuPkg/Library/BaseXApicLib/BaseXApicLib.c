@@ -243,7 +243,7 @@ GetApicMode (
   VOID
   )
 {
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     {
       MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
@@ -259,7 +259,7 @@ GetApicMode (
         ASSERT (ApicBaseMsr.Bits.EXTD == 0);
       }
     }
-  );
+  DEBUG_CODE_END ();
   return LOCAL_APIC_MODE_XAPIC;
 }
 

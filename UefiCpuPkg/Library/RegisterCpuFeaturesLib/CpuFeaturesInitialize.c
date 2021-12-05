@@ -636,7 +636,7 @@ AnalysisProcessorFeatures (
   //
   // Dump the last CPU feature list
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     DEBUG ((DEBUG_INFO, "Last CPU features list...\n"));
     Entry = GetFirstNode (&CpuFeaturesData->FeatureList);
     while (!IsNull (&CpuFeaturesData->FeatureList, Entry)) {
@@ -659,7 +659,7 @@ AnalysisProcessorFeatures (
     DumpCpuFeatureMask (PcdGetPtr (PcdCpuFeaturesSetting), CpuFeaturesData->BitMaskSize);
     DEBUG ((DEBUG_INFO, "Final PcdCpuFeaturesSetting:\n"));
     DumpCpuFeatureMask (CpuFeaturesData->SettingPcd, CpuFeaturesData->BitMaskSize);
-  );
+  DEBUG_CODE_END ();
 
   //
   // Save PCDs and display CPU PCDs
@@ -1190,4 +1190,3 @@ CpuFeaturesDetect (
 
   AnalysisProcessorFeatures (CpuFeaturesData->NumberOfCpus);
 }
-
