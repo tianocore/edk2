@@ -24,10 +24,10 @@
 /// Base UEFI Variable names for FMP Controller State information stored in
 /// separate variables.
 ///
-#define VARNAME_VERSION                 L"FmpVersion"
-#define VARNAME_LSV                     L"FmpLsv"
-#define VARNAME_LASTATTEMPTSTATUS       L"LastAttemptStatus"
-#define VARNAME_LASTATTEMPTVERSION      L"LastAttemptVersion"
+#define VARNAME_VERSION             L"FmpVersion"
+#define VARNAME_LSV                 L"FmpLsv"
+#define VARNAME_LASTATTEMPTSTATUS   L"LastAttemptStatus"
+#define VARNAME_LASTATTEMPTVERSION  L"LastAttemptVersion"
 
 ///
 /// Base UEFI Variable name for FMP Controller State information stored in a
@@ -35,21 +35,21 @@
 /// then they are merged into a single variable and the separate variables are
 /// deleted.
 ///
-#define VARNAME_FMPSTATE                L"FmpState"
+#define VARNAME_FMPSTATE  L"FmpState"
 
 ///
 /// FMP Controller State structure that is used to store the state of
 /// a controller in one combined UEFI Variable.
 ///
 typedef struct {
-  BOOLEAN  VersionValid;
-  BOOLEAN  LsvValid;
-  BOOLEAN  LastAttemptStatusValid;
-  BOOLEAN  LastAttemptVersionValid;
-  UINT32   Version;
-  UINT32   Lsv;
-  UINT32   LastAttemptStatus;
-  UINT32   LastAttemptVersion;
+  BOOLEAN    VersionValid;
+  BOOLEAN    LsvValid;
+  BOOLEAN    LastAttemptStatusValid;
+  BOOLEAN    LastAttemptVersionValid;
+  UINT32     Version;
+  UINT32     Lsv;
+  UINT32     LastAttemptStatus;
+  UINT32     LastAttemptVersion;
 } FMP_CONTROLLER_STATE;
 
 /**

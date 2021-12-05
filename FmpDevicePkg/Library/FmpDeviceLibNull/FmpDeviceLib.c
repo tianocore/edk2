@@ -131,6 +131,7 @@ FmpDeviceGetSize (
   if (Size == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   *Size = 0;
   return EFI_SUCCESS;
 }
@@ -184,13 +185,14 @@ FmpDeviceGetImageTypeIdGuidPtr (
 EFI_STATUS
 EFIAPI
 FmpDeviceGetAttributes (
-  OUT UINT64    *Supported,
-  OUT UINT64    *Setting
+  OUT UINT64  *Supported,
+  OUT UINT64  *Setting
   )
 {
-  if (Supported == NULL || Setting == NULL) {
+  if ((Supported == NULL) || (Setting == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   *Supported = 0;
   *Setting   = 0;
   return EFI_SUCCESS;
@@ -268,6 +270,7 @@ FmpDeviceGetVersionString (
   if (VersionString == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   *VersionString = NULL;
   return EFI_UNSUPPORTED;
 }
@@ -527,15 +530,15 @@ FmpDeviceSetImage (
 {
   UINT32  LastAttemptStatus;
 
-  return  FmpDeviceSetImageWithStatus (
-            Image,
-            ImageSize,
-            VendorCode,
-            Progress,
-            CapsuleFwVersion,
-            AbortReason,
-            &LastAttemptStatus
-            );
+  return FmpDeviceSetImageWithStatus (
+           Image,
+           ImageSize,
+           VendorCode,
+           Progress,
+           CapsuleFwVersion,
+           AbortReason,
+           &LastAttemptStatus
+           );
 }
 
 /**

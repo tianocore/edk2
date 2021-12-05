@@ -40,7 +40,7 @@ SaveFmpDependency (
   @retval  NULL
 
 **/
-EFI_FIRMWARE_IMAGE_DEP*
+EFI_FIRMWARE_IMAGE_DEP *
 EFIAPI
 GetFmpDependency (
   OUT UINT32  *DepexSize

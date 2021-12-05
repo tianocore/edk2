@@ -50,7 +50,7 @@ CheckSystemPower (
 EFI_STATUS
 EFIAPI
 CheckSystemThermal (
-  OUT BOOLEAN   *Good
+  OUT BOOLEAN  *Good
   )
 {
   *Good = TRUE;
@@ -73,7 +73,7 @@ CheckSystemThermal (
 EFI_STATUS
 EFIAPI
 CheckSystemEnvironment (
-  OUT BOOLEAN   *Good
+  OUT BOOLEAN  *Good
   )
 {
   *Good = TRUE;
