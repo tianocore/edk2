@@ -1071,7 +1071,7 @@ AddMemoryMappedIoSpace (
     }
   }
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     //
     // Make sure there are adjacent descriptors covering [Base, Base + Length).
     // It is possible that they have not been merged; merging can be prevented
@@ -1089,7 +1089,7 @@ AddMemoryMappedIoSpace (
       ASSERT (Descriptor.GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo);
       ASSERT ((Descriptor.Capabilities & Capabilities) == Capabilities);
     }
-    );
+  DEBUG_CODE_END ();
 
 FreeMemorySpaceMap:
   FreePool (MemorySpaceMap);
@@ -1212,4 +1212,3 @@ InitializeCpu (
 
   return Status;
 }
-

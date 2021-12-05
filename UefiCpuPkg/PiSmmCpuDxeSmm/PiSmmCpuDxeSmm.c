@@ -597,12 +597,12 @@ PiCpuSmmEntry (
   // If support CPU hot plug, PcdCpuSmmEnableBspElection should be set to TRUE.
   // A constant BSP index makes no sense because it may be hot removed.
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
 
       ASSERT (FeaturePcdGet (PcdCpuSmmEnableBspElection));
     }
-  );
+  DEBUG_CODE_END ();
 
   //
   // Save the PcdCpuSmmCodeAccessCheckEnable value into a global variable.
