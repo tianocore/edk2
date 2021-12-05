@@ -250,7 +250,7 @@ RemoveStaleFvFileOptions (
     //
     Status = EfiBootManagerDeleteLoadOptionVariable (
                BootOptions[Index].OptionNumber, LoadOptionTypeBoot);
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       CHAR16 *DevicePathString;
 
       DevicePathString = ConvertDevicePathToText(BootOptions[Index].FilePath,
@@ -266,7 +266,7 @@ RemoveStaleFvFileOptions (
       if (DevicePathString != NULL) {
         FreePool (DevicePathString);
       }
-      );
+    DEBUG_CODE_END ();
   }
 
   EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);

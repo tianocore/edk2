@@ -228,7 +228,7 @@ InternalLegacyBiosFarCall (
   // interupts other than the Timer interrupt that was disabled above can not be
   // handled properly from real mode.
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     UINTN  Vector;
     UINTN  Count;
 
@@ -245,7 +245,7 @@ InternalLegacyBiosFarCall (
       DEBUG ((DEBUG_ERROR, "ERROR: More than one HW interrupt active with CSM enabled\n"));
     }
     ASSERT (Count < 2);
-  );
+  DEBUG_CODE_END ();
 
   //
   // If the Timer AP has enabled the 8254 timer IRQ and the current 8254 timer
@@ -310,7 +310,7 @@ InternalLegacyBiosFarCall (
   // EBDA base address, if the current EBDA base address is smaller, it indicates
   // PcdEbdaReservedMemorySize should be adjusted to larger for more OPROMs.
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     {
       UINTN                 EbdaBaseAddress;
       UINTN                 ReservedEbdaBaseAddress;
@@ -322,7 +322,7 @@ InternalLegacyBiosFarCall (
         ASSERT (ReservedEbdaBaseAddress <= EbdaBaseAddress);
       );
     }
-  );
+  DEBUG_CODE_END ();
 
   //
   // Restore interrupt of debug timer

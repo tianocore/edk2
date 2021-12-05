@@ -564,7 +564,7 @@ GetResourcePadding (
 
   Address = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS *)&HpcPciAddress;
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     CHAR16                                      *DevicePathString;
 
     DevicePathString = ConvertDevicePathToText (HpcDevicePath, FALSE, FALSE);
@@ -576,7 +576,7 @@ GetResourcePadding (
     if (DevicePathString != NULL) {
       FreePool (DevicePathString);
     }
-    );
+  DEBUG_CODE_END ();
 
   if (HpcState == NULL || Padding == NULL || Attributes == NULL) {
     return EFI_INVALID_PARAMETER;
