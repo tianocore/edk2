@@ -43,7 +43,7 @@ SecPlatformInit (
 UINT32
 EFIAPI
 LoadMicrocode (
-  IN  VOID    *FsptUpdDataPtr
+  IN  VOID  *FsptUpdDataPtr
   );
 
 /**
@@ -62,7 +62,7 @@ LoadMicrocode (
 UINT32
 EFIAPI
 SecCarInit (
-  IN  VOID    *FsptUpdDataPtr
+  IN  VOID  *FsptUpdDataPtr
   );
 
 /**
@@ -75,8 +75,8 @@ SecCarInit (
 EFI_STATUS
 EFIAPI
 FspUpdSignatureCheck (
-  IN UINT32   ApiIdx,
-  IN VOID     *ApiParam
+  IN UINT32  ApiIdx,
+  IN VOID    *ApiParam
   );
 
 /**
@@ -89,8 +89,8 @@ FspUpdSignatureCheck (
 EFI_STATUS
 EFIAPI
 FspMultiPhaseSiInitApiHandler (
-  IN UINT32   ApiIdx,
-  IN VOID     *ApiParam
+  IN UINT32  ApiIdx,
+  IN VOID    *ApiParam
   );
 
 #endif
