@@ -334,7 +334,7 @@ PeCoffSearchImageBase (
 
   Pe32Data = 0;
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     EFI_IMAGE_DOS_HEADER                 *DosHdr;
     EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
 
@@ -376,7 +376,7 @@ PeCoffSearchImageBase (
       //
       Pe32Data -= PE_COFF_IMAGE_ALIGN_SIZE;
     }
-  );
+  DEBUG_CODE_END ();
 
   return Pe32Data;
 }
