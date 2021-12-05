@@ -304,12 +304,12 @@ RESTART_RECEIVE:
   //
   Status = ArpService->Mnp->Receive (ArpService->Mnp, RxToken);
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "ArpOnFrameRcvd: ArpService->Mnp->Receive "
         "failed, %r\n.", Status));
     }
-  );
+  DEBUG_CODE_END ();
 }
 
 /**
@@ -358,11 +358,11 @@ ArpOnFrameSentDpc (
   TxToken = (EFI_MANAGED_NETWORK_COMPLETION_TOKEN *)Context;
   TxData  = TxToken->Packet.TxData;
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     if (EFI_ERROR (TxToken->Status)) {
       DEBUG ((DEBUG_ERROR, "ArpOnFrameSent: TxToken->Status, %r.\n", TxToken->Status));
     }
-  );
+  DEBUG_CODE_END ();
 
   //
   // Free the allocated memory and close the event.
