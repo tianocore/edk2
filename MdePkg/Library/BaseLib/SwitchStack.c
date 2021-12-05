@@ -47,7 +47,7 @@ SwitchStack (
   ...
   )
 {
-  VA_LIST    Marker;
+  VA_LIST  Marker;
 
   ASSERT (EntryPoint != NULL);
   ASSERT (NewStack != NULL);

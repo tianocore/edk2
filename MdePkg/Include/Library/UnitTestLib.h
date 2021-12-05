@@ -13,7 +13,7 @@
 ///
 /// Unit Test Status
 ///
-typedef UINT32  UNIT_TEST_STATUS;
+typedef UINT32 UNIT_TEST_STATUS;
 #define UNIT_TEST_PASSED                      (0)
 #define UNIT_TEST_ERROR_PREREQUISITE_NOT_MET  (1)
 #define UNIT_TEST_ERROR_TEST_FAILED           (2)
@@ -34,24 +34,24 @@ typedef UINT32  UNIT_TEST_STATUS;
 /// Unit Test Framework Handle
 ///
 struct UNIT_TEST_FRAMEWORK_OBJECT;
-typedef struct UNIT_TEST_FRAMEWORK_OBJECT  *UNIT_TEST_FRAMEWORK_HANDLE;
+typedef struct UNIT_TEST_FRAMEWORK_OBJECT *UNIT_TEST_FRAMEWORK_HANDLE;
 
 ///
 /// Unit Test Suite Handle
 ///
 struct UNIT_TEST_SUITE_OBJECT;
-typedef struct UNIT_TEST_SUITE_OBJECT  *UNIT_TEST_SUITE_HANDLE;
+typedef struct UNIT_TEST_SUITE_OBJECT *UNIT_TEST_SUITE_HANDLE;
 
 ///
 /// Unit Test Handle
 ///
 struct UNIT_TEST_OBJECT;
-typedef struct UNIT_TEST_OBJECT  *UNIT_TEST_HANDLE;
+typedef struct UNIT_TEST_OBJECT *UNIT_TEST_HANDLE;
 
 ///
 /// Unit Test Context
 ///
-typedef VOID*  UNIT_TEST_CONTEXT;
+typedef VOID *UNIT_TEST_CONTEXT;
 
 /**
   The prototype for a single UnitTest case function.
@@ -336,8 +336,8 @@ FreeUnitTestFramework (
 EFI_STATUS
 EFIAPI
 SaveFrameworkState (
-  IN UNIT_TEST_CONTEXT           ContextToSave     OPTIONAL,
-  IN UINTN                       ContextToSaveSize
+  IN UNIT_TEST_CONTEXT  ContextToSave     OPTIONAL,
+  IN UINTN              ContextToSaveSize
   );
 
 /**
@@ -459,13 +459,13 @@ SaveFrameworkState (
 #if defined (EDKII_UNIT_TEST_FRAMEWORK_ENABLED)
   #include <Library/BaseLib.h>
 
-  ///
-  /// Pointer to jump buffer used with SetJump()/LongJump() to test if a
-  /// function under test generates an expected ASSERT() condition.
-  ///
-  extern BASE_LIBRARY_JUMP_BUFFER  *gUnitTestExpectAssertFailureJumpBuffer;
+///
+/// Pointer to jump buffer used with SetJump()/LongJump() to test if a
+/// function under test generates an expected ASSERT() condition.
+///
+extern BASE_LIBRARY_JUMP_BUFFER  *gUnitTestExpectAssertFailureJumpBuffer;
 
-  #define UT_EXPECT_ASSERT_FAILURE(FunctionCall, Status)               \
+#define UT_EXPECT_ASSERT_FAILURE(FunctionCall, Status)               \
     do {                                                               \
       UNIT_TEST_STATUS          UnitTestJumpStatus;                    \
       BASE_LIBRARY_JUMP_BUFFER  UnitTestJumpBuffer;                    \
@@ -488,7 +488,7 @@ SaveFrameworkState (
       }                                                                \
     } while (FALSE)
 #else
-  #define UT_EXPECT_ASSERT_FAILURE(FunctionCall, Status)  FunctionCall;
+#define UT_EXPECT_ASSERT_FAILURE(FunctionCall, Status)  FunctionCall;
 #endif
 
 /**
