@@ -14,6 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0x4d20583a, 0x7765, 0x4e7a, { 0x8a, 0x67, 0xdc, 0xde, 0x74, 0xee, 0x3e, 0xc5 } \
   }
 
-extern EFI_GUID gHttpBootConfigGuid;
+extern EFI_GUID  gHttpBootConfigGuid;
 
 #endif

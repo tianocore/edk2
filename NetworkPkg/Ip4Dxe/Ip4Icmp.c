@@ -8,60 +8,58 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Ip4Impl.h"
 
 IP4_ICMP_CLASS
-mIcmpClass[] = {
-  {ICMP_ECHO_REPLY,         ICMP_QUERY_MESSAGE  },
-  {1,                       ICMP_INVALID_MESSAGE},
-  {2,                       ICMP_INVALID_MESSAGE},
-  {ICMP_DEST_UNREACHABLE,   ICMP_ERROR_MESSAGE  },
-  {ICMP_SOURCE_QUENCH,      ICMP_ERROR_MESSAGE  },
-  {ICMP_REDIRECT,           ICMP_ERROR_MESSAGE  },
-  {6,                       ICMP_INVALID_MESSAGE},
-  {7,                       ICMP_INVALID_MESSAGE},
-  {ICMP_ECHO_REQUEST,       ICMP_QUERY_MESSAGE  },
-  {9,                       ICMP_INVALID_MESSAGE},
-  {10,                      ICMP_INVALID_MESSAGE},
-  {ICMP_TIME_EXCEEDED,      ICMP_ERROR_MESSAGE  },
-  {ICMP_PARAMETER_PROBLEM,  ICMP_ERROR_MESSAGE  },
-  {ICMP_TIMESTAMP ,         ICMP_QUERY_MESSAGE  },
-  {14,                      ICMP_INVALID_MESSAGE},
-  {ICMP_INFO_REQUEST ,      ICMP_QUERY_MESSAGE  },
-  {ICMP_INFO_REPLY ,        ICMP_QUERY_MESSAGE  },
+  mIcmpClass[] = {
+  { ICMP_ECHO_REPLY,        ICMP_QUERY_MESSAGE   },
+  { 1,                      ICMP_INVALID_MESSAGE },
+  { 2,                      ICMP_INVALID_MESSAGE },
+  { ICMP_DEST_UNREACHABLE,  ICMP_ERROR_MESSAGE   },
+  { ICMP_SOURCE_QUENCH,     ICMP_ERROR_MESSAGE   },
+  { ICMP_REDIRECT,          ICMP_ERROR_MESSAGE   },
+  { 6,                      ICMP_INVALID_MESSAGE },
+  { 7,                      ICMP_INVALID_MESSAGE },
+  { ICMP_ECHO_REQUEST,      ICMP_QUERY_MESSAGE   },
+  { 9,                      ICMP_INVALID_MESSAGE },
+  { 10,                     ICMP_INVALID_MESSAGE },
+  { ICMP_TIME_EXCEEDED,     ICMP_ERROR_MESSAGE   },
+  { ICMP_PARAMETER_PROBLEM, ICMP_ERROR_MESSAGE   },
+  { ICMP_TIMESTAMP,         ICMP_QUERY_MESSAGE   },
+  { 14,                     ICMP_INVALID_MESSAGE },
+  { ICMP_INFO_REQUEST,      ICMP_QUERY_MESSAGE   },
+  { ICMP_INFO_REPLY,        ICMP_QUERY_MESSAGE   },
 };
 
 EFI_IP4_ICMP_TYPE
-mIp4SupportedIcmp[23] = {
-  {ICMP_ECHO_REPLY,        ICMP_DEFAULT_CODE        },
+  mIp4SupportedIcmp[23] = {
+  { ICMP_ECHO_REPLY,        ICMP_DEFAULT_CODE         },
 
-  {ICMP_DEST_UNREACHABLE,  ICMP_NET_UNREACHABLE     },
-  {ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNREACHABLE    },
-  {ICMP_DEST_UNREACHABLE,  ICMP_PROTO_UNREACHABLE   },
-  {ICMP_DEST_UNREACHABLE,  ICMP_PORT_UNREACHABLE    },
-  {ICMP_DEST_UNREACHABLE,  ICMP_FRAGMENT_FAILED     },
-  {ICMP_DEST_UNREACHABLE,  ICMP_SOURCEROUTE_FAILED  },
-  {ICMP_DEST_UNREACHABLE,  ICMP_NET_UNKNOWN         },
-  {ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNKNOWN        },
-  {ICMP_DEST_UNREACHABLE,  ICMP_SOURCE_ISOLATED     },
-  {ICMP_DEST_UNREACHABLE,  ICMP_NET_PROHIBITED      },
-  {ICMP_DEST_UNREACHABLE,  ICMP_HOST_PROHIBITED     },
-  {ICMP_DEST_UNREACHABLE,  ICMP_NET_UNREACHABLE_TOS },
-  {ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNREACHABLE_TOS},
+  { ICMP_DEST_UNREACHABLE,  ICMP_NET_UNREACHABLE      },
+  { ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNREACHABLE     },
+  { ICMP_DEST_UNREACHABLE,  ICMP_PROTO_UNREACHABLE    },
+  { ICMP_DEST_UNREACHABLE,  ICMP_PORT_UNREACHABLE     },
+  { ICMP_DEST_UNREACHABLE,  ICMP_FRAGMENT_FAILED      },
+  { ICMP_DEST_UNREACHABLE,  ICMP_SOURCEROUTE_FAILED   },
+  { ICMP_DEST_UNREACHABLE,  ICMP_NET_UNKNOWN          },
+  { ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNKNOWN         },
+  { ICMP_DEST_UNREACHABLE,  ICMP_SOURCE_ISOLATED      },
+  { ICMP_DEST_UNREACHABLE,  ICMP_NET_PROHIBITED       },
+  { ICMP_DEST_UNREACHABLE,  ICMP_HOST_PROHIBITED      },
+  { ICMP_DEST_UNREACHABLE,  ICMP_NET_UNREACHABLE_TOS  },
+  { ICMP_DEST_UNREACHABLE,  ICMP_HOST_UNREACHABLE_TOS },
 
-  {ICMP_SOURCE_QUENCH,     ICMP_DEFAULT_CODE        },
+  { ICMP_SOURCE_QUENCH,     ICMP_DEFAULT_CODE         },
 
-  {ICMP_REDIRECT,          ICMP_NET_REDIRECT        },
-  {ICMP_REDIRECT,          ICMP_HOST_REDIRECT       },
-  {ICMP_REDIRECT,          ICMP_NET_TOS_REDIRECT    },
-  {ICMP_REDIRECT,          ICMP_HOST_TOS_REDIRECT   },
+  { ICMP_REDIRECT,          ICMP_NET_REDIRECT         },
+  { ICMP_REDIRECT,          ICMP_HOST_REDIRECT        },
+  { ICMP_REDIRECT,          ICMP_NET_TOS_REDIRECT     },
+  { ICMP_REDIRECT,          ICMP_HOST_TOS_REDIRECT    },
 
-  {ICMP_ECHO_REQUEST,      ICMP_DEFAULT_CODE        },
+  { ICMP_ECHO_REQUEST,      ICMP_DEFAULT_CODE         },
 
-  {ICMP_TIME_EXCEEDED,     ICMP_TIMEOUT_IN_TRANSIT  },
-  {ICMP_TIME_EXCEEDED,     ICMP_TIMEOUT_REASSEMBLE  },
+  { ICMP_TIME_EXCEEDED,     ICMP_TIMEOUT_IN_TRANSIT   },
+  { ICMP_TIME_EXCEEDED,     ICMP_TIMEOUT_REASSEMBLE   },
 
-  {ICMP_PARAMETER_PROBLEM, ICMP_DEFAULT_CODE        },
+  { ICMP_PARAMETER_PROBLEM, ICMP_DEFAULT_CODE         },
 };
-
-
 
 /**
   Process the ICMP redirect. Find the instance then update
@@ -88,19 +86,19 @@ mIp4SupportedIcmp[23] = {
 **/
 EFI_STATUS
 Ip4ProcessIcmpRedirect (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet,
-  IN IP4_ICMP_ERROR_HEAD    *Icmp
+  IN IP4_SERVICE          *IpSb,
+  IN IP4_HEAD             *Head,
+  IN NET_BUF              *Packet,
+  IN IP4_ICMP_ERROR_HEAD  *Icmp
   )
 {
-  LIST_ENTRY                *Entry;
-  IP4_PROTOCOL              *Ip4Instance;
-  IP4_ROUTE_CACHE_ENTRY     *CacheEntry;
-  IP4_INTERFACE             *IpIf;
-  IP4_ADDR                  Gateway;
-  IP4_ADDR                  Src;
-  IP4_ADDR                  Dst;
+  LIST_ENTRY             *Entry;
+  IP4_PROTOCOL           *Ip4Instance;
+  IP4_ROUTE_CACHE_ENTRY  *CacheEntry;
+  IP4_INTERFACE          *IpIf;
+  IP4_ADDR               Gateway;
+  IP4_ADDR               Src;
+  IP4_ADDR               Dst;
 
   //
   // Find the interface whose IP address is the source of the
@@ -129,8 +127,8 @@ Ip4ProcessIcmpRedirect (
       continue;
     }
 
-    Dst = NTOHL (Icmp->IpHead.Dst);
-    Src = NTOHL (Icmp->IpHead.Src);
+    Dst        = NTOHL (Icmp->IpHead.Dst);
+    Src        = NTOHL (Icmp->IpHead.Src);
     CacheEntry = Ip4FindRouteCache (Ip4Instance->RouteTable, Dst, Src);
 
     //
@@ -145,7 +143,6 @@ Ip4ProcessIcmpRedirect (
   NetbufFree (Packet);
   return EFI_SUCCESS;
 }
-
 
 /**
   Process the ICMP error packet. If it is an ICMP redirect packet,
@@ -164,19 +161,19 @@ Ip4ProcessIcmpRedirect (
 **/
 EFI_STATUS
 Ip4ProcessIcmpError (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet
+  IN IP4_SERVICE  *IpSb,
+  IN IP4_HEAD     *Head,
+  IN NET_BUF      *Packet
   )
 {
-  IP4_ICMP_ERROR_HEAD       Icmp;
+  IP4_ICMP_ERROR_HEAD  Icmp;
 
   if (Packet->TotalSize < sizeof (Icmp)) {
     NetbufFree (Packet);
     return EFI_INVALID_PARAMETER;
   }
 
-  NetbufCopy (Packet, 0, sizeof (Icmp), (UINT8 *) &Icmp);
+  NetbufCopy (Packet, 0, sizeof (Icmp), (UINT8 *)&Icmp);
 
   //
   // If it is an ICMP redirect error, update the route cache
@@ -189,7 +186,6 @@ Ip4ProcessIcmpError (
   IP4_GET_CLIP_INFO (Packet)->Status = EFI_ICMP_ERROR;
   return Ip4Demultiplex (IpSb, Head, Packet, NULL, 0);
 }
-
 
 /**
   Replay an ICMP echo request.
@@ -206,15 +202,15 @@ Ip4ProcessIcmpError (
 **/
 EFI_STATUS
 Ip4IcmpReplyEcho (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet
+  IN IP4_SERVICE  *IpSb,
+  IN IP4_HEAD     *Head,
+  IN NET_BUF      *Packet
   )
 {
-  IP4_ICMP_QUERY_HEAD       *Icmp;
-  NET_BUF                   *Data;
-  EFI_STATUS                Status;
-  IP4_HEAD                  ReplyHead;
+  IP4_ICMP_QUERY_HEAD  *Icmp;
+  NET_BUF              *Data;
+  EFI_STATUS           Status;
+  IP4_HEAD             ReplyHead;
 
   //
   // make a copy the packet, it is really a bad idea to
@@ -233,17 +229,17 @@ Ip4IcmpReplyEcho (
   // use specific destination. See RFC1122. SRR/RR option
   // update is omitted.
   //
-  Icmp                = (IP4_ICMP_QUERY_HEAD *) NetbufGetByte (Data, 0, NULL);
+  Icmp = (IP4_ICMP_QUERY_HEAD *)NetbufGetByte (Data, 0, NULL);
   ASSERT (Icmp != NULL);
   Icmp->Head.Type     = ICMP_ECHO_REPLY;
   Icmp->Head.Checksum = 0;
-  Icmp->Head.Checksum = (UINT16) (~NetblockChecksum ((UINT8 *) Icmp, Data->TotalSize));
+  Icmp->Head.Checksum = (UINT16)(~NetblockChecksum ((UINT8 *)Icmp, Data->TotalSize));
 
-  ReplyHead.Tos       = 0;
-  ReplyHead.Fragment  = 0;
-  ReplyHead.Ttl       = 64;
-  ReplyHead.Protocol  = EFI_IP_PROTO_ICMP;
-  ReplyHead.Src       = 0;
+  ReplyHead.Tos      = 0;
+  ReplyHead.Fragment = 0;
+  ReplyHead.Ttl      = 64;
+  ReplyHead.Protocol = EFI_IP_PROTO_ICMP;
+  ReplyHead.Src      = 0;
 
   //
   // Ip4Output will select a source for us
@@ -270,7 +266,6 @@ ON_EXIT:
   return Status;
 }
 
-
 /**
   Process the ICMP query message. If it is an ICMP echo
   request, answer it. Otherwise deliver it to upper layer.
@@ -287,19 +282,19 @@ ON_EXIT:
 **/
 EFI_STATUS
 Ip4ProcessIcmpQuery (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet
+  IN IP4_SERVICE  *IpSb,
+  IN IP4_HEAD     *Head,
+  IN NET_BUF      *Packet
   )
 {
-  IP4_ICMP_QUERY_HEAD       Icmp;
+  IP4_ICMP_QUERY_HEAD  Icmp;
 
   if (Packet->TotalSize < sizeof (Icmp)) {
     NetbufFree (Packet);
     return EFI_INVALID_PARAMETER;
   }
 
-  NetbufCopy (Packet, 0, sizeof (Icmp), (UINT8 *) &Icmp);
+  NetbufCopy (Packet, 0, sizeof (Icmp), (UINT8 *)&Icmp);
 
   if (Icmp.Head.Type == ICMP_ECHO_REQUEST) {
     return Ip4IcmpReplyEcho (IpSb, Head, Packet);
@@ -307,7 +302,6 @@ Ip4ProcessIcmpQuery (
 
   return Ip4Demultiplex (IpSb, Head, Packet, NULL, 0);
 }
-
 
 /**
   Handle the ICMP packet. First validate the message format,
@@ -326,35 +320,33 @@ Ip4ProcessIcmpQuery (
 **/
 EFI_STATUS
 Ip4IcmpHandle (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet
+  IN IP4_SERVICE  *IpSb,
+  IN IP4_HEAD     *Head,
+  IN NET_BUF      *Packet
   )
 {
-  IP4_ICMP_HEAD             Icmp;
-  UINT16                    Checksum;
+  IP4_ICMP_HEAD  Icmp;
+  UINT16         Checksum;
 
   if (Packet->TotalSize < sizeof (Icmp)) {
     goto DROP;
   }
 
-  NetbufCopy (Packet, 0, sizeof (Icmp), (UINT8 *) &Icmp);
+  NetbufCopy (Packet, 0, sizeof (Icmp), (UINT8 *)&Icmp);
 
   if (Icmp.Type > ICMP_TYPE_MAX) {
     goto DROP;
   }
 
-  Checksum = (UINT16) (~NetbufChecksum (Packet));
+  Checksum = (UINT16)(~NetbufChecksum (Packet));
   if ((Icmp.Checksum != 0) && (Checksum != 0)) {
     goto DROP;
   }
 
   if (mIcmpClass[Icmp.Type].IcmpClass == ICMP_ERROR_MESSAGE) {
     return Ip4ProcessIcmpError (IpSb, Head, Packet);
-
   } else if (mIcmpClass[Icmp.Type].IcmpClass == ICMP_QUERY_MESSAGE) {
     return Ip4ProcessIcmpQuery (IpSb, Head, Packet);
-
   }
 
 DROP:

@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -56,7 +57,6 @@ Ip4ComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -129,13 +129,12 @@ Ip4ComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 Ip4ComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
-
 
 //
 // EFI Component Name Protocol
@@ -149,14 +148,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gIp4ComponentName = {
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gIp4ComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) Ip4ComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) Ip4ComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gIp4ComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)Ip4ComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)Ip4ComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mIp4DriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mIp4DriverNameTable[] = {
   {
     "eng;en",
     L"IP4 Network Service Driver"
@@ -223,7 +221,6 @@ Ip4ComponentNameGetDriverName (
            DriverName,
            (BOOLEAN)(This == &gIp4ComponentName)
            );
-
 }
 
 /**
@@ -238,12 +235,12 @@ Ip4ComponentNameGetDriverName (
 **/
 EFI_STATUS
 UpdateName (
-  IN     EFI_IP4_PROTOCOL         *Ip4
+  IN     EFI_IP4_PROTOCOL  *Ip4
   )
 {
-  EFI_STATUS                       Status;
-  CHAR16                           HandleName[80];
-  EFI_IP4_MODE_DATA                Ip4ModeData;
+  EFI_STATUS         Status;
+  CHAR16             HandleName[80];
+  EFI_IP4_MODE_DATA  Ip4ModeData;
 
   if (Ip4 == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -261,7 +258,9 @@ UpdateName (
   if (!Ip4ModeData.IsStarted || !Ip4ModeData.IsConfigured) {
     UnicodeSPrint (HandleName, sizeof (HandleName), L"IPv4 (Not started)");
   } else {
-    UnicodeSPrint (HandleName, sizeof (HandleName),
+    UnicodeSPrint (
+      HandleName,
+      sizeof (HandleName),
       L"IPv4 (SrcIP=%d.%d.%d.%d)",
       Ip4ModeData.ConfigData.StationAddress.Addr[0],
       Ip4ModeData.ConfigData.StationAddress.Addr[1],
@@ -274,6 +273,7 @@ UpdateName (
     FreeUnicodeStringTable (gIp4ControllerNameTable);
     gIp4ControllerNameTable = NULL;
   }
+
   Status = AddUnicodeString2 (
              "eng",
              gIp4ComponentName.SupportedLanguages,
@@ -365,15 +365,15 @@ UpdateName (
 EFI_STATUS
 EFIAPI
 Ip4ComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                    Status;
-  EFI_IP4_PROTOCOL              *Ip4;
+  EFI_STATUS        Status;
+  EFI_IP4_PROTOCOL  *Ip4;
 
   //
   // Only provide names for child handles.
@@ -425,4 +425,3 @@ Ip4ComponentNameGetControllerName (
            (BOOLEAN)(This == &gIp4ComponentName)
            );
 }
-

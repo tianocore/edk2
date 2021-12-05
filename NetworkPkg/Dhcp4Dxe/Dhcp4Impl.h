@@ -14,8 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __EFI_DHCP4_IMPL_H__
 #define __EFI_DHCP4_IMPL_H__
 
-
-
 #include <Uefi.h>
 
 #include <Protocol/Dhcp4.h>
@@ -28,8 +26,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/NetLib.h>
 
-typedef struct _DHCP_SERVICE  DHCP_SERVICE;
-typedef struct _DHCP_PROTOCOL DHCP_PROTOCOL;
+typedef struct _DHCP_SERVICE   DHCP_SERVICE;
+typedef struct _DHCP_PROTOCOL  DHCP_PROTOCOL;
 
 #include "Dhcp4Option.h"
 #include "Dhcp4Io.h"
@@ -37,7 +35,7 @@ typedef struct _DHCP_PROTOCOL DHCP_PROTOCOL;
 #define DHCP_SERVICE_SIGNATURE   SIGNATURE_32 ('D', 'H', 'C', 'P')
 #define DHCP_PROTOCOL_SIGNATURE  SIGNATURE_32 ('d', 'h', 'c', 'p')
 
-#define DHCP_CHECK_MEDIA_WAITING_TIME    EFI_TIMER_PERIOD_SECONDS(20)
+#define DHCP_CHECK_MEDIA_WAITING_TIME  EFI_TIMER_PERIOD_SECONDS(20)
 
 //
 // The state of the DHCP service. It starts as UNCONFIGED. If
@@ -46,28 +44,27 @@ typedef struct _DHCP_PROTOCOL DHCP_PROTOCOL;
 // goes back to UNCONFIGED. It becomes DESTROY if it is (partly)
 // destroyed.
 //
-#define DHCP_UNCONFIGED          0
-#define DHCP_CONFIGED            1
-#define DHCP_DESTROY             2
-
+#define DHCP_UNCONFIGED  0
+#define DHCP_CONFIGED    1
+#define DHCP_DESTROY     2
 
 struct _DHCP_PROTOCOL {
-  UINT32                            Signature;
-  EFI_DHCP4_PROTOCOL                Dhcp4Protocol;
-  LIST_ENTRY                        Link;
-  EFI_HANDLE                        Handle;
-  DHCP_SERVICE                      *Service;
+  UINT32                              Signature;
+  EFI_DHCP4_PROTOCOL                  Dhcp4Protocol;
+  LIST_ENTRY                          Link;
+  EFI_HANDLE                          Handle;
+  DHCP_SERVICE                        *Service;
 
-  BOOLEAN                           InDestroy;
+  BOOLEAN                             InDestroy;
 
-  EFI_EVENT                         CompletionEvent;
-  EFI_EVENT                         RenewRebindEvent;
+  EFI_EVENT                           CompletionEvent;
+  EFI_EVENT                           RenewRebindEvent;
 
-  EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
-  UDP_IO                            *UdpIo; // The UDP IO used for TransmitReceive.
-  UINT32                            Timeout;
-  UINT16                            ElaspedTime;
-  NET_BUF_QUEUE                     ResponseQueue;
+  EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN    *Token;
+  UDP_IO                              *UdpIo; // The UDP IO used for TransmitReceive.
+  UINT32                              Timeout;
+  UINT16                              ElaspedTime;
+  NET_BUF_QUEUE                       ResponseQueue;
 };
 
 //
@@ -75,62 +72,62 @@ struct _DHCP_PROTOCOL {
 // has a service binding, there can be only one active child.
 //
 struct _DHCP_SERVICE {
-  UINT32                        Signature;
-  EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
+  UINT32                          Signature;
+  EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
 
-  INTN                          ServiceState; // CONFIGED, UNCONFIGED, and DESTROY
+  INTN                            ServiceState; // CONFIGED, UNCONFIGED, and DESTROY
 
-  EFI_HANDLE                    Controller;
-  EFI_HANDLE                    Image;
+  EFI_HANDLE                      Controller;
+  EFI_HANDLE                      Image;
 
-  LIST_ENTRY                    Children;
-  UINTN                         NumChildren;
+  LIST_ENTRY                      Children;
+  UINTN                           NumChildren;
 
-  INTN                          DhcpState;
-  EFI_STATUS                    IoStatus;     // the result of last user operation
-  UINT32                        Xid;
+  INTN                            DhcpState;
+  EFI_STATUS                      IoStatus;   // the result of last user operation
+  UINT32                          Xid;
 
-  IP4_ADDR                      ClientAddr;   // lease IP or configured client address
-  IP4_ADDR                      Netmask;
-  IP4_ADDR                      ServerAddr;
+  IP4_ADDR                        ClientAddr; // lease IP or configured client address
+  IP4_ADDR                        Netmask;
+  IP4_ADDR                        ServerAddr;
 
-  EFI_DHCP4_PACKET              *LastOffer;   // The last received offer
-  EFI_DHCP4_PACKET              *Selected;
-  DHCP_PARAMETER                *Para;
+  EFI_DHCP4_PACKET                *LastOffer; // The last received offer
+  EFI_DHCP4_PACKET                *Selected;
+  DHCP_PARAMETER                  *Para;
 
-  UINT32                        Lease;
-  UINT32                        T1;
-  UINT32                        T2;
-  INTN                          ExtraRefresh; // This refresh is reqested by user
+  UINT32                          Lease;
+  UINT32                          T1;
+  UINT32                          T2;
+  INTN                            ExtraRefresh; // This refresh is reqested by user
 
-  UDP_IO                        *UdpIo;       // Udp child receiving all DHCP message
-  UDP_IO                        *LeaseIoPort; // Udp child with lease IP
-  EFI_DHCP4_PACKET              *LastPacket;  // The last sent packet for retransmission
-  EFI_MAC_ADDRESS               Mac;
-  UINT8                         HwType;
-  UINT8                         HwLen;
-  UINT8                         ClientAddressSendOut[16];
+  UDP_IO                          *UdpIo;       // Udp child receiving all DHCP message
+  UDP_IO                          *LeaseIoPort; // Udp child with lease IP
+  EFI_DHCP4_PACKET                *LastPacket;  // The last sent packet for retransmission
+  EFI_MAC_ADDRESS                 Mac;
+  UINT8                           HwType;
+  UINT8                           HwLen;
+  UINT8                           ClientAddressSendOut[16];
 
-  DHCP_PROTOCOL                 *ActiveChild;
-  EFI_DHCP4_CONFIG_DATA         ActiveConfig;
-  UINT32                        UserOptionLen;
+  DHCP_PROTOCOL                   *ActiveChild;
+  EFI_DHCP4_CONFIG_DATA           ActiveConfig;
+  UINT32                          UserOptionLen;
 
   //
   // Timer event and various timer
   //
-  EFI_EVENT                     Timer;
+  EFI_EVENT                       Timer;
 
-  UINT32                        PacketToLive; // Retransmission timer for our packets
-  UINT32                        LastTimeout;  // Record the init value of PacketToLive every time
-  INTN                          CurRetry;
-  INTN                          MaxRetries;
-  UINT32                        LeaseLife;
+  UINT32                          PacketToLive; // Retransmission timer for our packets
+  UINT32                          LastTimeout;  // Record the init value of PacketToLive every time
+  INTN                            CurRetry;
+  INTN                            MaxRetries;
+  UINT32                          LeaseLife;
 };
 
 typedef struct {
-  EFI_DHCP4_PACKET_OPTION       **Option;
-  UINT32                        OptionCount;
-  UINT32                        Index;
+  EFI_DHCP4_PACKET_OPTION    **Option;
+  UINT32                     OptionCount;
+  UINT32                     Index;
 } DHCP_PARSE_CONTEXT;
 
 #define DHCP_INSTANCE_FROM_THIS(Proto)  \
@@ -139,7 +136,7 @@ typedef struct {
 #define DHCP_SERVICE_FROM_THIS(Sb)      \
   CR ((Sb), DHCP_SERVICE, ServiceBinding, DHCP_SERVICE_SIGNATURE)
 
-extern EFI_DHCP4_PROTOCOL mDhcp4ProtocolTemplate;
+extern EFI_DHCP4_PROTOCOL  mDhcp4ProtocolTemplate;
 
 /**
   Give up the control of the DHCP service to let other child
@@ -151,7 +148,7 @@ extern EFI_DHCP4_PROTOCOL mDhcp4ProtocolTemplate;
 **/
 VOID
 DhcpYieldControl (
-  IN DHCP_SERVICE           *DhcpSb
+  IN DHCP_SERVICE  *DhcpSb
   );
 
 /**
@@ -187,7 +184,7 @@ DhcpCleanConfigure (
 VOID
 EFIAPI
 DhcpDummyExtFree (
-  IN VOID                   *Arg
+  IN VOID  *Arg
   );
 
 /**
@@ -199,8 +196,8 @@ DhcpDummyExtFree (
 **/
 VOID
 SetElapsedTime (
-  IN     UINT16                 *Elapsed,
-  IN     DHCP_PROTOCOL          *Instance
+  IN     UINT16         *Elapsed,
+  IN     DHCP_PROTOCOL  *Instance
   );
 
 #endif

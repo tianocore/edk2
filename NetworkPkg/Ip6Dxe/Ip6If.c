@@ -19,8 +19,8 @@
 VOID
 EFIAPI
 Ip6OnFrameSent (
-  IN EFI_EVENT               Event,
-  IN VOID                    *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -37,11 +37,11 @@ Ip6OnFrameSent (
 **/
 BOOLEAN
 Ip6CancelInstanceFrame (
-  IN IP6_LINK_TX_TOKEN *Frame,
-  IN VOID              *Context
+  IN IP6_LINK_TX_TOKEN  *Frame,
+  IN VOID               *Context
   )
 {
-  if (Frame->IpInstance == (IP6_PROTOCOL *) Context) {
+  if (Frame->IpInstance == (IP6_PROTOCOL *)Context) {
     return TRUE;
   }
 
@@ -73,14 +73,14 @@ Ip6CancelInstanceFrame (
 **/
 EFI_STATUS
 Ip6SetAddress (
-  IN IP6_INTERFACE          *Interface,
-  IN EFI_IPv6_ADDRESS       *Ip6Addr,
-  IN BOOLEAN                IsAnycast,
-  IN UINT8                  PrefixLength,
-  IN UINT32                 ValidLifetime,
-  IN UINT32                 PreferredLifetime,
-  IN IP6_DAD_CALLBACK       DadCallback  OPTIONAL,
-  IN VOID                   *Context     OPTIONAL
+  IN IP6_INTERFACE     *Interface,
+  IN EFI_IPv6_ADDRESS  *Ip6Addr,
+  IN BOOLEAN           IsAnycast,
+  IN UINT8             PrefixLength,
+  IN UINT32            ValidLifetime,
+  IN UINT32            PreferredLifetime,
+  IN IP6_DAD_CALLBACK  DadCallback  OPTIONAL,
+  IN VOID              *Context     OPTIONAL
   )
 {
   IP6_SERVICE            *IpSb;
@@ -109,12 +109,12 @@ Ip6SetAddress (
     return EFI_SUCCESS;
   }
 
-  AddressInfo = (IP6_ADDRESS_INFO *) AllocatePool (sizeof (IP6_ADDRESS_INFO));
+  AddressInfo = (IP6_ADDRESS_INFO *)AllocatePool (sizeof (IP6_ADDRESS_INFO));
   if (AddressInfo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  AddressInfo->Signature         = IP6_ADDR_INFO_SIGNATURE;
+  AddressInfo->Signature = IP6_ADDR_INFO_SIGNATURE;
   IP6_COPY_ADDRESS (&AddressInfo->Address, Ip6Addr);
   AddressInfo->IsAnycast         = IsAnycast;
   AddressInfo->PrefixLength      = PrefixLength;
@@ -158,24 +158,23 @@ Ip6SetAddress (
     AddressInfo->PrefixLength = IP6_LINK_LOCAL_PREFIX_LENGTH;
   }
 
-
   //
   // Node should delay joining the solicited-node multicast address by a random delay
   // between 0 and MAX_RTR_SOLICITATION_DELAY (1 second).
   // Thus queue the address to be processed in Duplicate Address Detection module
   // after the delay time (in milliseconds).
   //
-  Delay = (UINT64) NET_RANDOM (NetRandomInitSeed ());
+  Delay = (UINT64)NET_RANDOM (NetRandomInitSeed ());
   Delay = MultU64x32 (Delay, IP6_ONE_SECOND_IN_MS);
   Delay = RShiftU64 (Delay, 32);
 
-  DelayNode = (IP6_DELAY_JOIN_LIST *) AllocatePool (sizeof (IP6_DELAY_JOIN_LIST));
+  DelayNode = (IP6_DELAY_JOIN_LIST *)AllocatePool (sizeof (IP6_DELAY_JOIN_LIST));
   if (DelayNode == NULL) {
     FreePool (AddressInfo);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  DelayNode->DelayTime   = (UINT32) (DivU64x32 (Delay, IP6_TIMER_INTERVAL_IN_MS));
+  DelayNode->DelayTime   = (UINT32)(DivU64x32 (Delay, IP6_TIMER_INTERVAL_IN_MS));
   DelayNode->Interface   = Interface;
   DelayNode->AddressInfo = AddressInfo;
   DelayNode->DadCallback = DadCallback;
@@ -197,13 +196,13 @@ Ip6SetAddress (
 **/
 IP6_INTERFACE *
 Ip6CreateInterface (
-  IN IP6_SERVICE            *IpSb,
-  IN BOOLEAN                LinkLocal
+  IN IP6_SERVICE  *IpSb,
+  IN BOOLEAN      LinkLocal
   )
 {
-  EFI_STATUS                Status;
-  IP6_INTERFACE             *Interface;
-  EFI_IPv6_ADDRESS          *Ip6Addr;
+  EFI_STATUS        Status;
+  IP6_INTERFACE     *Interface;
+  EFI_IPv6_ADDRESS  *Ip6Addr;
 
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
 
@@ -212,27 +211,27 @@ Ip6CreateInterface (
     return NULL;
   }
 
-  Interface->Signature        = IP6_INTERFACE_SIGNATURE;
-  Interface->RefCnt           = 1;
+  Interface->Signature = IP6_INTERFACE_SIGNATURE;
+  Interface->RefCnt    = 1;
 
   InitializeListHead (&Interface->AddressList);
-  Interface->AddressCount     = 0;
-  Interface->Configured       = FALSE;
+  Interface->AddressCount = 0;
+  Interface->Configured   = FALSE;
 
-  Interface->Service          = IpSb;
-  Interface->Controller       = IpSb->Controller;
-  Interface->Image            = IpSb->Image;
+  Interface->Service    = IpSb;
+  Interface->Controller = IpSb->Controller;
+  Interface->Image      = IpSb->Image;
 
   InitializeListHead (&Interface->ArpQues);
   InitializeListHead (&Interface->SentFrames);
 
-  Interface->DupAddrDetect    = IpSb->Ip6ConfigInstance.DadXmits.DupAddrDetectTransmits;
+  Interface->DupAddrDetect = IpSb->Ip6ConfigInstance.DadXmits.DupAddrDetectTransmits;
   InitializeListHead (&Interface->DupAddrDetectList);
 
   InitializeListHead (&Interface->DelayJoinList);
 
   InitializeListHead (&Interface->IpInstances);
-  Interface->PromiscRecv      = FALSE;
+  Interface->PromiscRecv = FALSE;
 
   if (!LinkLocal) {
     return Interface;
@@ -254,8 +253,8 @@ Ip6CreateInterface (
              Ip6Addr,
              FALSE,
              IP6_LINK_LOCAL_PREFIX_LENGTH,
-             (UINT32) IP6_INFINIT_LIFETIME,
-             (UINT32) IP6_INFINIT_LIFETIME,
+             (UINT32)IP6_INFINIT_LIFETIME,
+             (UINT32)IP6_INFINIT_LIFETIME,
              NULL,
              NULL
              );
@@ -288,12 +287,12 @@ ON_ERROR:
 **/
 VOID
 Ip6CleanInterface (
-  IN  IP6_INTERFACE         *Interface,
-  IN  IP6_PROTOCOL          *IpInstance           OPTIONAL
+  IN  IP6_INTERFACE  *Interface,
+  IN  IP6_PROTOCOL   *IpInstance           OPTIONAL
   )
 {
-  IP6_DAD_ENTRY             *Duplicate;
-  IP6_DELAY_JOIN_LIST       *Delay;
+  IP6_DAD_ENTRY        *Duplicate;
+  IP6_DELAY_JOIN_LIST  *Delay;
 
   NET_CHECK_SIGNATURE (Interface, IP6_INTERFACE_SIGNATURE);
   ASSERT (Interface->RefCnt > 0);
@@ -352,11 +351,11 @@ Ip6CleanInterface (
 **/
 IP6_LINK_TX_TOKEN *
 Ip6CreateLinkTxToken (
-  IN IP6_INTERFACE          *Interface,
-  IN IP6_PROTOCOL           *IpInstance    OPTIONAL,
-  IN NET_BUF                *Packet,
-  IN IP6_FRAME_CALLBACK     CallBack,
-  IN VOID                   *Context
+  IN IP6_INTERFACE       *Interface,
+  IN IP6_PROTOCOL        *IpInstance    OPTIONAL,
+  IN NET_BUF             *Packet,
+  IN IP6_FRAME_CALLBACK  CallBack,
+  IN VOID                *Context
   )
 {
   EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *MnpToken;
@@ -381,8 +380,8 @@ Ip6CreateLinkTxToken (
   ZeroMem (&Token->DstMac, sizeof (EFI_MAC_ADDRESS));
   IP6_COPY_LINK_ADDRESS (&Token->SrcMac, &Interface->Service->SnpMode.CurrentAddress);
 
-  MnpToken          = &(Token->MnpToken);
-  MnpToken->Status  = EFI_NOT_READY;
+  MnpToken         = &(Token->MnpToken);
+  MnpToken->Status = EFI_NOT_READY;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_SIGNAL,
@@ -397,8 +396,8 @@ Ip6CreateLinkTxToken (
     return NULL;
   }
 
-  MnpTxData                     = &Token->MnpTxData;
-  MnpToken->Packet.TxData       = MnpTxData;
+  MnpTxData               = &Token->MnpTxData;
+  MnpToken->Packet.TxData = MnpTxData;
 
   MnpTxData->DestinationAddress = &Token->DstMac;
   MnpTxData->SourceAddress      = &Token->SrcMac;
@@ -406,10 +405,10 @@ Ip6CreateLinkTxToken (
   MnpTxData->DataLength         = Packet->TotalSize;
   MnpTxData->HeaderLength       = 0;
 
-  Count                         = Packet->BlockOpNum;
+  Count = Packet->BlockOpNum;
 
-  NetbufBuildExt (Packet, (NET_FRAGMENT *) MnpTxData->FragmentTable, &Count);
-  MnpTxData->FragmentCount      = (UINT16)Count;
+  NetbufBuildExt (Packet, (NET_FRAGMENT *)MnpTxData->FragmentTable, &Count);
+  MnpTxData->FragmentCount = (UINT16)Count;
 
   return Token;
 }
@@ -423,7 +422,7 @@ Ip6CreateLinkTxToken (
 **/
 VOID
 Ip6FreeLinkTxToken (
-  IN IP6_LINK_TX_TOKEN      *Token
+  IN IP6_LINK_TX_TOKEN  *Token
   )
 {
   NET_CHECK_SIGNATURE (Token, IP6_LINK_TX_SIGNATURE);
@@ -442,12 +441,12 @@ Ip6FreeLinkTxToken (
 VOID
 EFIAPI
 Ip6RecycleFrame (
-  IN VOID                   *Context
+  IN VOID  *Context
   )
 {
   EFI_MANAGED_NETWORK_RECEIVE_DATA  *RxData;
 
-  RxData = (EFI_MANAGED_NETWORK_RECEIVE_DATA *) Context;
+  RxData = (EFI_MANAGED_NETWORK_RECEIVE_DATA *)Context;
 
   gBS->SignalEvent (RxData->RecycleEvent);
 }
@@ -466,7 +465,7 @@ Ip6RecycleFrame (
 VOID
 EFIAPI
 Ip6OnFrameReceivedDpc (
-  IN VOID                     *Context
+  IN VOID  *Context
   )
 {
   EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *MnpToken;
@@ -477,23 +476,22 @@ Ip6OnFrameReceivedDpc (
   UINT32                                Flag;
   IP6_SERVICE                           *IpSb;
 
-  Token = (IP6_LINK_RX_TOKEN *) Context;
+  Token = (IP6_LINK_RX_TOKEN *)Context;
   NET_CHECK_SIGNATURE (Token, IP6_LINK_RX_SIGNATURE);
 
   //
   // First clear the interface's receive request in case the
   // caller wants to call Ip6ReceiveFrame in the callback.
   //
-  IpSb = (IP6_SERVICE *) Token->Context;
+  IpSb = (IP6_SERVICE *)Token->Context;
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
-
 
   MnpToken  = &Token->MnpToken;
   MnpRxData = MnpToken->Packet.RxData;
 
   if (EFI_ERROR (MnpToken->Status) || (MnpRxData == NULL)) {
     Token->CallBack (NULL, MnpToken->Status, 0, Token->Context);
-    return ;
+    return;
   }
 
   //
@@ -510,7 +508,7 @@ Ip6OnFrameReceivedDpc (
 
     Token->CallBack (NULL, EFI_OUT_OF_RESOURCES, 0, Token->Context);
 
-    return ;
+    return;
   }
 
   Flag  = (MnpRxData->BroadcastFlag ? IP6_LINK_BROADCAST : 0);
@@ -530,8 +528,8 @@ Ip6OnFrameReceivedDpc (
 VOID
 EFIAPI
 Ip6OnFrameReceived (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -553,18 +551,18 @@ Ip6OnFrameReceived (
 **/
 EFI_STATUS
 Ip6ReceiveFrame (
-  IN  IP6_FRAME_CALLBACK    CallBack,
-  IN  IP6_SERVICE           *IpSb
+  IN  IP6_FRAME_CALLBACK  CallBack,
+  IN  IP6_SERVICE         *IpSb
   )
 {
-  EFI_STATUS                Status;
-  IP6_LINK_RX_TOKEN         *Token;
+  EFI_STATUS         Status;
+  IP6_LINK_RX_TOKEN  *Token;
 
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
 
   Token           = &IpSb->RecvRequest;
   Token->CallBack = CallBack;
-  Token->Context  = (VOID *) IpSb;
+  Token->Context  = (VOID *)IpSb;
 
   Status = IpSb->Mnp->Receive (IpSb->Mnp, &Token->MnpToken);
   if (EFI_ERROR (Status)) {
@@ -584,22 +582,22 @@ Ip6ReceiveFrame (
 VOID
 EFIAPI
 Ip6OnFrameSentDpc (
-  IN VOID                    *Context
+  IN VOID  *Context
   )
 {
-  IP6_LINK_TX_TOKEN         *Token;
+  IP6_LINK_TX_TOKEN  *Token;
 
-  Token = (IP6_LINK_TX_TOKEN *) Context;
+  Token = (IP6_LINK_TX_TOKEN *)Context;
   NET_CHECK_SIGNATURE (Token, IP6_LINK_TX_SIGNATURE);
 
   RemoveEntryList (&Token->Link);
 
   Token->CallBack (
-          Token->Packet,
-          Token->MnpToken.Status,
-          0,
-          Token->Context
-          );
+           Token->Packet,
+           Token->MnpToken.Status,
+           0,
+           Token->Context
+           );
 
   Ip6FreeLinkTxToken (Token);
 }
@@ -614,8 +612,8 @@ Ip6OnFrameSentDpc (
 VOID
 EFIAPI
 Ip6OnFrameSent (
-  IN EFI_EVENT               Event,
-  IN VOID                    *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -646,20 +644,20 @@ Ip6OnFrameSent (
 **/
 EFI_STATUS
 Ip6SendFrame (
-  IN  IP6_INTERFACE         *Interface,
-  IN  IP6_PROTOCOL          *IpInstance      OPTIONAL,
-  IN  NET_BUF               *Packet,
-  IN  EFI_IPv6_ADDRESS      *NextHop,
-  IN  IP6_FRAME_CALLBACK    CallBack,
-  IN  VOID                  *Context
+  IN  IP6_INTERFACE       *Interface,
+  IN  IP6_PROTOCOL        *IpInstance      OPTIONAL,
+  IN  NET_BUF             *Packet,
+  IN  EFI_IPv6_ADDRESS    *NextHop,
+  IN  IP6_FRAME_CALLBACK  CallBack,
+  IN  VOID                *Context
   )
 {
-  IP6_SERVICE               *IpSb;
-  IP6_LINK_TX_TOKEN         *Token;
-  EFI_STATUS                Status;
-  IP6_NEIGHBOR_ENTRY        *NeighborCache;
-  LIST_ENTRY                *Entry;
-  IP6_NEIGHBOR_ENTRY        *ArpQue;
+  IP6_SERVICE         *IpSb;
+  IP6_LINK_TX_TOKEN   *Token;
+  EFI_STATUS          Status;
+  IP6_NEIGHBOR_ENTRY  *NeighborCache;
+  LIST_ENTRY          *Entry;
+  IP6_NEIGHBOR_ENTRY  *ArpQue;
 
   IpSb = Interface->Service;
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
@@ -706,21 +704,21 @@ Ip6SendFrame (
   }
 
   switch (NeighborCache->State) {
-  case EfiNeighborStale:
-    NeighborCache->State = EfiNeighborDelay;
-    NeighborCache->Ticks = (UINT32) IP6_GET_TICKS (IP6_DELAY_FIRST_PROBE_TIME);
+    case EfiNeighborStale:
+      NeighborCache->State = EfiNeighborDelay;
+      NeighborCache->Ticks = (UINT32)IP6_GET_TICKS (IP6_DELAY_FIRST_PROBE_TIME);
     //
     // Fall through
     //
-  case EfiNeighborReachable:
-  case EfiNeighborDelay:
-  case EfiNeighborProbe:
-    IP6_COPY_LINK_ADDRESS (&Token->DstMac, &NeighborCache->LinkAddress);
-    goto SendNow;
-    break;
+    case EfiNeighborReachable:
+    case EfiNeighborDelay:
+    case EfiNeighborProbe:
+      IP6_COPY_LINK_ADDRESS (&Token->DstMac, &NeighborCache->LinkAddress);
+      goto SendNow;
+      break;
 
-  default:
-    break;
+    default:
+      break;
   }
 
   //
@@ -747,7 +745,7 @@ Ip6SendFrame (
   return EFI_SUCCESS;
 
 SendNow:
- //
+  //
   // Insert the tx token into the SentFrames list before calling Mnp->Transmit.
   // Remove it if the returned status is not EFI_SUCCESS.
   //
@@ -777,13 +775,13 @@ Error:
 VOID
 EFIAPI
 Ip6TimerTicking (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  IP6_SERVICE               *IpSb;
+  IP6_SERVICE  *IpSb;
 
-  IpSb = (IP6_SERVICE *) Context;
+  IpSb = (IP6_SERVICE *)Context;
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
 
   Ip6PacketTimerTicking (IpSb);
