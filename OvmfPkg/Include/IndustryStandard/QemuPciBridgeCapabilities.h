@@ -18,22 +18,22 @@
 // The hints apply to PCI Bridges whose PCI_DEVICE_INDEPENDENT_REGION.VendorId
 // equals the following value.
 //
-#define QEMU_PCI_BRIDGE_VENDOR_ID_REDHAT 0x1B36
+#define QEMU_PCI_BRIDGE_VENDOR_ID_REDHAT  0x1B36
 
 //
 // Common capability header for all hints.
 //
 #pragma pack (1)
 typedef struct {
-  EFI_PCI_CAPABILITY_VENDOR_HDR VendorHdr;
-  UINT8                         Type;
+  EFI_PCI_CAPABILITY_VENDOR_HDR    VendorHdr;
+  UINT8                            Type;
 } QEMU_PCI_BRIDGE_CAPABILITY_HDR;
 #pragma pack ()
 
 //
 // Values defined for QEMU_PCI_BRIDGE_CAPABILITY_HDR.Type.
 //
-#define QEMU_PCI_BRIDGE_CAPABILITY_TYPE_RESOURCE_RESERVATION 0x01
+#define QEMU_PCI_BRIDGE_CAPABILITY_TYPE_RESOURCE_RESERVATION  0x01
 
 //
 // PCI Resource Reservation structure for when
@@ -42,12 +42,12 @@ typedef struct {
 //
 #pragma pack (1)
 typedef struct {
-  QEMU_PCI_BRIDGE_CAPABILITY_HDR BridgeHdr;
-  UINT32                         BusNumbers;
-  UINT64                         Io;
-  UINT32                         NonPrefetchable32BitMmio;
-  UINT32                         Prefetchable32BitMmio;
-  UINT64                         Prefetchable64BitMmio;
+  QEMU_PCI_BRIDGE_CAPABILITY_HDR    BridgeHdr;
+  UINT32                            BusNumbers;
+  UINT64                            Io;
+  UINT32                            NonPrefetchable32BitMmio;
+  UINT32                            Prefetchable32BitMmio;
+  UINT64                            Prefetchable64BitMmio;
 } QEMU_PCI_BRIDGE_CAPABILITY_RESOURCE_RESERVATION;
 #pragma pack ()
 

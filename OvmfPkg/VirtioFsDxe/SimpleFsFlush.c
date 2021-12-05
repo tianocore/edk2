@@ -11,12 +11,12 @@
 EFI_STATUS
 EFIAPI
 VirtioFsSimpleFileFlush (
-  IN EFI_FILE_PROTOCOL *This
+  IN EFI_FILE_PROTOCOL  *This
   )
 {
-  VIRTIO_FS_FILE *VirtioFsFile;
-  VIRTIO_FS      *VirtioFs;
-  EFI_STATUS     Status;
+  VIRTIO_FS_FILE  *VirtioFsFile;
+  VIRTIO_FS       *VirtioFs;
+  EFI_STATUS      Status;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
   VirtioFs     = VirtioFsFile->OwnerFs;
@@ -29,14 +29,21 @@ VirtioFsSimpleFileFlush (
   // FUSE_FLUSH is for regular files only.
   //
   if (!VirtioFsFile->IsDirectory) {
-    Status = VirtioFsFuseFlush (VirtioFs, VirtioFsFile->NodeId,
-               VirtioFsFile->FuseHandle);
+    Status = VirtioFsFuseFlush (
+               VirtioFs,
+               VirtioFsFile->NodeId,
+               VirtioFsFile->FuseHandle
+               );
     if (EFI_ERROR (Status)) {
       return Status;
     }
   }
 
-  Status = VirtioFsFuseFsyncFileOrDir (VirtioFs, VirtioFsFile->NodeId,
-             VirtioFsFile->FuseHandle, VirtioFsFile->IsDirectory);
+  Status = VirtioFsFuseFsyncFileOrDir (
+             VirtioFs,
+             VirtioFsFile->NodeId,
+             VirtioFsFile->FuseHandle,
+             VirtioFsFile->IsDirectory
+             );
   return Status;
 }

@@ -16,19 +16,19 @@
 
 EFI_STATUS
 SmbaseAllocatePostSmmPen (
-  OUT UINT32                  *PenAddress,
-  IN  CONST EFI_BOOT_SERVICES *BootServices
+  OUT UINT32                   *PenAddress,
+  IN  CONST EFI_BOOT_SERVICES  *BootServices
   );
 
 VOID
 SmbaseReinstallPostSmmPen (
-  IN UINT32 PenAddress
+  IN UINT32  PenAddress
   );
 
 VOID
 SmbaseReleasePostSmmPen (
-  IN UINT32                  PenAddress,
-  IN CONST EFI_BOOT_SERVICES *BootServices
+  IN UINT32                   PenAddress,
+  IN CONST EFI_BOOT_SERVICES  *BootServices
   );
 
 VOID
@@ -38,9 +38,9 @@ SmbaseInstallFirstSmiHandler (
 
 EFI_STATUS
 SmbaseRelocate (
-  IN APIC_ID ApicId,
-  IN UINTN   Smbase,
-  IN UINT32  PenAddress
+  IN APIC_ID  ApicId,
+  IN UINTN    Smbase,
+  IN UINT32   PenAddress
   );
 
 #endif // SMBASE_H_

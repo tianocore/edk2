@@ -37,9 +37,9 @@
 RETURN_STATUS
 EFIAPI
 MemEncryptSevClearPageEncMask (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    NumPages
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
   )
 {
   return InternalMemEncryptSevSetMemoryDecrypted (
@@ -69,9 +69,9 @@ MemEncryptSevClearPageEncMask (
 RETURN_STATUS
 EFIAPI
 MemEncryptSevSetPageEncMask (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    NumPages
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
   )
 {
   return InternalMemEncryptSevSetMemoryEncrypted (
@@ -99,9 +99,9 @@ MemEncryptSevSetPageEncMask (
 MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE
 EFIAPI
 MemEncryptSevGetAddressRangeState (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    Length
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             Length
   )
 {
   return InternalMemEncryptSevGetAddressRangeState (
@@ -131,9 +131,9 @@ MemEncryptSevGetAddressRangeState (
 RETURN_STATUS
 EFIAPI
 MemEncryptSevClearMmioPageEncMask (
-  IN PHYSICAL_ADDRESS         Cr3BaseAddress,
-  IN PHYSICAL_ADDRESS         BaseAddress,
-  IN UINTN                    NumPages
+  IN PHYSICAL_ADDRESS  Cr3BaseAddress,
+  IN PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN             NumPages
   )
 {
   return InternalMemEncryptSevClearMmioPageEncMask (
@@ -141,5 +141,4 @@ MemEncryptSevClearMmioPageEncMask (
            BaseAddress,
            EFI_PAGES_TO_SIZE (NumPages)
            );
-
 }

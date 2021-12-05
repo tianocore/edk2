@@ -41,8 +41,8 @@
 RETURN_STATUS
 EFIAPI
 QemuFwCfgParseBool (
-  IN  CONST CHAR8 *FileName,
-  OUT BOOLEAN     *Value
+  IN  CONST CHAR8  *FileName,
+  OUT BOOLEAN      *Value
   );
 
 /**
@@ -82,9 +82,9 @@ QemuFwCfgParseBool (
 RETURN_STATUS
 EFIAPI
 QemuFwCfgParseUint8 (
-  IN  CONST CHAR8 *FileName,
-  IN  BOOLEAN     ParseAsHex,
-  OUT UINT8       *Value
+  IN  CONST CHAR8  *FileName,
+  IN  BOOLEAN      ParseAsHex,
+  OUT UINT8        *Value
   );
 
 //
@@ -96,33 +96,33 @@ QemuFwCfgParseUint8 (
 RETURN_STATUS
 EFIAPI
 QemuFwCfgParseUint16 (
-  IN  CONST CHAR8 *FileName,
-  IN  BOOLEAN     ParseAsHex,
-  OUT UINT16      *Value
+  IN  CONST CHAR8  *FileName,
+  IN  BOOLEAN      ParseAsHex,
+  OUT UINT16       *Value
   );
 
 RETURN_STATUS
 EFIAPI
 QemuFwCfgParseUint32 (
-  IN  CONST CHAR8 *FileName,
-  IN  BOOLEAN     ParseAsHex,
-  OUT UINT32      *Value
+  IN  CONST CHAR8  *FileName,
+  IN  BOOLEAN      ParseAsHex,
+  OUT UINT32       *Value
   );
 
 RETURN_STATUS
 EFIAPI
 QemuFwCfgParseUint64 (
-  IN  CONST CHAR8 *FileName,
-  IN  BOOLEAN     ParseAsHex,
-  OUT UINT64      *Value
+  IN  CONST CHAR8  *FileName,
+  IN  BOOLEAN      ParseAsHex,
+  OUT UINT64       *Value
   );
 
 RETURN_STATUS
 EFIAPI
 QemuFwCfgParseUintn (
-  IN  CONST CHAR8 *FileName,
-  IN  BOOLEAN     ParseAsHex,
-  OUT UINTN       *Value
+  IN  CONST CHAR8  *FileName,
+  IN  BOOLEAN      ParseAsHex,
+  OUT UINTN        *Value
   );
 
 #endif // QEMU_FW_CFG_SIMPLE_PARSER_LIB_H_

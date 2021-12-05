@@ -24,7 +24,6 @@
 
 #include "EnrollDefaultKeys.h"
 
-
 /**
   Fetch the X509 certificate (to be used as Platform Key and first Key Exchange
   Key) from SMBIOS.
@@ -54,47 +53,55 @@
 STATIC
 EFI_STATUS
 GetPkKek1 (
-  OUT UINT8 **PkKek1,
-  OUT UINTN *SizeOfPkKek1
+  OUT UINT8  **PkKek1,
+  OUT UINTN  *SizeOfPkKek1
   )
 {
-  CONST CHAR8             *Base64Cert;
-  CHAR8                   OvmfPkKek1AppPrefix[GUID_STRING_LENGTH + 1 + 1];
-  EFI_STATUS              Status;
-  EFI_SMBIOS_PROTOCOL     *Smbios;
-  EFI_SMBIOS_HANDLE       Handle;
-  EFI_SMBIOS_TYPE         Type;
-  EFI_SMBIOS_TABLE_HEADER *Header;
-  SMBIOS_TABLE_TYPE11     *OemStringsTable;
-  UINTN                   Base64CertLen;
-  UINTN                   DecodedCertSize;
-  UINT8                   *DecodedCert;
+  CONST CHAR8              *Base64Cert;
+  CHAR8                    OvmfPkKek1AppPrefix[GUID_STRING_LENGTH + 1 + 1];
+  EFI_STATUS               Status;
+  EFI_SMBIOS_PROTOCOL      *Smbios;
+  EFI_SMBIOS_HANDLE        Handle;
+  EFI_SMBIOS_TYPE          Type;
+  EFI_SMBIOS_TABLE_HEADER  *Header;
+  SMBIOS_TABLE_TYPE11      *OemStringsTable;
+  UINTN                    Base64CertLen;
+  UINTN                    DecodedCertSize;
+  UINT8                    *DecodedCert;
 
   Base64Cert = NULL;
 
   //
   // Format the application prefix, for OEM String matching.
   //
-  AsciiSPrint (OvmfPkKek1AppPrefix, sizeof OvmfPkKek1AppPrefix, "%g:",
-    &gOvmfPkKek1AppPrefixGuid);
+  AsciiSPrint (
+    OvmfPkKek1AppPrefix,
+    sizeof OvmfPkKek1AppPrefix,
+    "%g:",
+    &gOvmfPkKek1AppPrefixGuid
+    );
 
   //
   // Scan all "OEM Strings" tables.
   //
-  Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL,
-                  (VOID **)&Smbios);
+  Status = gBS->LocateProtocol (
+                  &gEfiSmbiosProtocolGuid,
+                  NULL,
+                  (VOID **)&Smbios
+                  );
   if (EFI_ERROR (Status)) {
     AsciiPrint ("error: failed to locate EFI_SMBIOS_PROTOCOL: %r\n", Status);
     return Status;
   }
 
   Handle = SMBIOS_HANDLE_PI_RESERVED;
-  Type = SMBIOS_TYPE_OEM_STRINGS;
+  Type   = SMBIOS_TYPE_OEM_STRINGS;
   for (Status = Smbios->GetNext (Smbios, &Handle, &Type, &Header, NULL);
        !EFI_ERROR (Status);
-       Status = Smbios->GetNext (Smbios, &Handle, &Type, &Header, NULL)) {
-    CONST CHAR8 *OemString;
-    UINTN       Idx;
+       Status = Smbios->GetNext (Smbios, &Handle, &Type, &Header, NULL))
+  {
+    CONST CHAR8  *OemString;
+    UINTN        Idx;
 
     if (Header->Length < sizeof *OemStringsTable) {
       //
@@ -102,6 +109,7 @@ GetPkKek1 (
       //
       continue;
     }
+
     OemStringsTable = (SMBIOS_TABLE_TYPE11 *)Header;
 
     //
@@ -110,13 +118,17 @@ GetPkKek1 (
     //
     OemString = (CONST CHAR8 *)(OemStringsTable + 1);
     for (Idx = 0; Idx < OemStringsTable->StringCount; ++Idx) {
-      CHAR8 CandidatePrefix[sizeof OvmfPkKek1AppPrefix];
+      CHAR8  CandidatePrefix[sizeof OvmfPkKek1AppPrefix];
 
       //
       // NUL-terminate the candidate prefix for case-insensitive comparison.
       //
-      AsciiStrnCpyS (CandidatePrefix, sizeof CandidatePrefix, OemString,
-        GUID_STRING_LENGTH + 1);
+      AsciiStrnCpyS (
+        CandidatePrefix,
+        sizeof CandidatePrefix,
+        OemString,
+        GUID_STRING_LENGTH + 1
+        );
       if (AsciiStriCmp (OvmfPkKek1AppPrefix, CandidatePrefix) == 0) {
         //
         // The current string matches the prefix.
@@ -124,6 +136,7 @@ GetPkKek1 (
         Base64Cert = OemString + GUID_STRING_LENGTH + 1;
         break;
       }
+
       OemString += AsciiStrSize (OemString);
     }
 
@@ -139,8 +152,11 @@ GetPkKek1 (
     //
     // No table with a matching string has been found.
     //
-    AsciiPrint ("error: OEM String with app prefix %g not found: %r\n",
-      &gOvmfPkKek1AppPrefixGuid, Status);
+    AsciiPrint (
+      "error: OEM String with app prefix %g not found: %r\n",
+      &gOvmfPkKek1AppPrefixGuid,
+      Status
+      );
     return EFI_NOT_FOUND;
   }
 
@@ -151,19 +167,23 @@ GetPkKek1 (
   // Verify the base64 encoding, and determine the decoded size.
   //
   DecodedCertSize = 0;
-  Status = Base64Decode (Base64Cert, Base64CertLen, NULL, &DecodedCertSize);
+  Status          = Base64Decode (Base64Cert, Base64CertLen, NULL, &DecodedCertSize);
   switch (Status) {
-  case EFI_BUFFER_TOO_SMALL:
-    ASSERT (DecodedCertSize > 0);
-    break;
-  case EFI_SUCCESS:
-    AsciiPrint ("error: empty certificate after app prefix %g\n",
-      &gOvmfPkKek1AppPrefixGuid);
-    return EFI_PROTOCOL_ERROR;
-  default:
-    AsciiPrint ("error: invalid base64 string after app prefix %g\n",
-      &gOvmfPkKek1AppPrefixGuid);
-    return EFI_PROTOCOL_ERROR;
+    case EFI_BUFFER_TOO_SMALL:
+      ASSERT (DecodedCertSize > 0);
+      break;
+    case EFI_SUCCESS:
+      AsciiPrint (
+        "error: empty certificate after app prefix %g\n",
+        &gOvmfPkKek1AppPrefixGuid
+        );
+      return EFI_PROTOCOL_ERROR;
+    default:
+      AsciiPrint (
+        "error: invalid base64 string after app prefix %g\n",
+        &gOvmfPkKek1AppPrefixGuid
+        );
+      return EFI_PROTOCOL_ERROR;
   }
 
   //
@@ -178,15 +198,18 @@ GetPkKek1 (
   //
   // Decoding will succeed at this point.
   //
-  Status = Base64Decode (Base64Cert, Base64CertLen, DecodedCert,
-             &DecodedCertSize);
+  Status = Base64Decode (
+             Base64Cert,
+             Base64CertLen,
+             DecodedCert,
+             &DecodedCertSize
+             );
   ASSERT_EFI_ERROR (Status);
 
-  *PkKek1 = DecodedCert;
+  *PkKek1       = DecodedCert;
   *SizeOfPkKek1 = DecodedCertSize;
   return EFI_SUCCESS;
 }
-
 
 /**
   Enroll a set of certificates in a global variable, overwriting it.
@@ -235,20 +258,20 @@ STATIC
 EFI_STATUS
 EFIAPI
 EnrollListOfCerts (
-  IN CHAR16   *VariableName,
-  IN EFI_GUID *VendorGuid,
-  IN EFI_GUID *CertType,
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN EFI_GUID  *CertType,
   ...
   )
 {
-  UINTN            DataSize;
-  SINGLE_HEADER    *SingleHeader;
-  REPEATING_HEADER *RepeatingHeader;
-  VA_LIST          Marker;
-  CONST UINT8      *Cert;
-  EFI_STATUS       Status;
-  UINT8            *Data;
-  UINT8            *Position;
+  UINTN             DataSize;
+  SINGLE_HEADER     *SingleHeader;
+  REPEATING_HEADER  *RepeatingHeader;
+  VA_LIST           Marker;
+  CONST UINT8       *Cert;
+  EFI_STATUS        Status;
+  UINT8             *Data;
+  UINT8             *Position;
 
   Status = EFI_SUCCESS;
 
@@ -259,25 +282,30 @@ EnrollListOfCerts (
   VA_START (Marker, CertType);
   for (Cert = VA_ARG (Marker, CONST UINT8 *);
        Cert != NULL;
-       Cert = VA_ARG (Marker, CONST UINT8 *)) {
-    UINTN          CertSize;
+       Cert = VA_ARG (Marker, CONST UINT8 *))
+  {
+    UINTN  CertSize;
 
     CertSize = VA_ARG (Marker, UINTN);
     (VOID)VA_ARG (Marker, CONST EFI_GUID *);
 
-    if (CertSize == 0 ||
-        CertSize > MAX_UINT32 - sizeof *RepeatingHeader ||
-        DataSize > MAX_UINT32 - sizeof *RepeatingHeader - CertSize) {
+    if ((CertSize == 0) ||
+        (CertSize > MAX_UINT32 - sizeof *RepeatingHeader) ||
+        (DataSize > MAX_UINT32 - sizeof *RepeatingHeader - CertSize))
+    {
       Status = EFI_INVALID_PARAMETER;
       break;
     }
+
     DataSize += sizeof *RepeatingHeader + CertSize;
   }
+
   VA_END (Marker);
 
   if (DataSize == sizeof *SingleHeader) {
     Status = EFI_INVALID_PARAMETER;
   }
+
   if (EFI_ERROR (Status)) {
     goto Out;
   }
@@ -291,27 +319,28 @@ EnrollListOfCerts (
   Position = Data;
 
   SingleHeader = (SINGLE_HEADER *)Position;
-  Status = gRT->GetTime (&SingleHeader->TimeStamp, NULL);
+  Status       = gRT->GetTime (&SingleHeader->TimeStamp, NULL);
   if (EFI_ERROR (Status)) {
     goto FreeData;
   }
+
   SingleHeader->TimeStamp.Pad1       = 0;
   SingleHeader->TimeStamp.Nanosecond = 0;
   SingleHeader->TimeStamp.TimeZone   = 0;
   SingleHeader->TimeStamp.Daylight   = 0;
   SingleHeader->TimeStamp.Pad2       = 0;
-#if 0
-  SingleHeader->dwLength         = DataSize - sizeof SingleHeader->TimeStamp;
-#else
+ #if 0
+  SingleHeader->dwLength = DataSize - sizeof SingleHeader->TimeStamp;
+ #else
   //
   // This looks like a bug in edk2. According to the UEFI specification,
   // dwLength is "The length of the entire certificate, including the length of
   // the header, in bytes". That shouldn't stop right after CertType -- it
   // should include everything below it.
   //
-  SingleHeader->dwLength         = sizeof *SingleHeader
-                                     - sizeof SingleHeader->TimeStamp;
-#endif
+  SingleHeader->dwLength = sizeof *SingleHeader
+                           - sizeof SingleHeader->TimeStamp;
+ #endif
   SingleHeader->wRevision        = 0x0200;
   SingleHeader->wCertificateType = WIN_CERT_TYPE_EFI_GUID;
   CopyGuid (&SingleHeader->CertType, &gEfiCertPkcs7Guid);
@@ -320,16 +349,17 @@ EnrollListOfCerts (
   VA_START (Marker, CertType);
   for (Cert = VA_ARG (Marker, CONST UINT8 *);
        Cert != NULL;
-       Cert = VA_ARG (Marker, CONST UINT8 *)) {
-    UINTN            CertSize;
-    CONST EFI_GUID   *OwnerGuid;
+       Cert = VA_ARG (Marker, CONST UINT8 *))
+  {
+    UINTN           CertSize;
+    CONST EFI_GUID  *OwnerGuid;
 
     CertSize  = VA_ARG (Marker, UINTN);
     OwnerGuid = VA_ARG (Marker, CONST EFI_GUID *);
 
     RepeatingHeader = (REPEATING_HEADER *)Position;
     CopyGuid (&RepeatingHeader->SignatureType, CertType);
-    RepeatingHeader->SignatureListSize   =
+    RepeatingHeader->SignatureListSize =
       (UINT32)(sizeof *RepeatingHeader + CertSize);
     RepeatingHeader->SignatureHeaderSize = 0;
     RepeatingHeader->SignatureSize       =
@@ -340,28 +370,38 @@ EnrollListOfCerts (
     CopyMem (Position, Cert, CertSize);
     Position += CertSize;
   }
+
   VA_END (Marker);
 
   ASSERT (Data + DataSize == Position);
 
-  Status = gRT->SetVariable (VariableName, VendorGuid,
+  Status = gRT->SetVariable (
+                  VariableName,
+                  VendorGuid,
                   (EFI_VARIABLE_NON_VOLATILE |
                    EFI_VARIABLE_BOOTSERVICE_ACCESS |
                    EFI_VARIABLE_RUNTIME_ACCESS |
                    EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS),
-                  DataSize, Data);
+                  DataSize,
+                  Data
+                  );
 
 FreeData:
   FreePool (Data);
 
 Out:
   if (EFI_ERROR (Status)) {
-    AsciiPrint ("error: %a(\"%s\", %g): %r\n", __FUNCTION__, VariableName,
-      VendorGuid, Status);
+    AsciiPrint (
+      "error: %a(\"%s\", %g): %r\n",
+      __FUNCTION__,
+      VariableName,
+      VendorGuid,
+      Status
+      );
   }
+
   return Status;
 }
-
 
 /**
   Read a UEFI variable into a caller-allocated buffer, enforcing an exact size.
@@ -404,38 +444,47 @@ Out:
 STATIC
 EFI_STATUS
 GetExact (
-  IN CHAR16   *VariableName,
-  IN EFI_GUID *VendorGuid,
-  OUT VOID    *Data,
-  IN UINTN    DataSize,
-  IN BOOLEAN  AllowMissing
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  OUT VOID     *Data,
+  IN UINTN     DataSize,
+  IN BOOLEAN   AllowMissing
   )
 {
-  UINTN      Size;
-  EFI_STATUS Status;
+  UINTN       Size;
+  EFI_STATUS  Status;
 
-  Size = DataSize;
+  Size   = DataSize;
   Status = gRT->GetVariable (VariableName, VendorGuid, NULL, &Size, Data);
   if (EFI_ERROR (Status)) {
-    if (Status == EFI_NOT_FOUND && AllowMissing) {
+    if ((Status == EFI_NOT_FOUND) && AllowMissing) {
       ZeroMem (Data, DataSize);
       return EFI_SUCCESS;
     }
 
-    AsciiPrint ("error: GetVariable(\"%s\", %g): %r\n", VariableName,
-      VendorGuid, Status);
+    AsciiPrint (
+      "error: GetVariable(\"%s\", %g): %r\n",
+      VariableName,
+      VendorGuid,
+      Status
+      );
     return Status;
   }
 
   if (Size != DataSize) {
-    AsciiPrint ("error: GetVariable(\"%s\", %g): expected size 0x%Lx, "
-      "got 0x%Lx\n", VariableName, VendorGuid, (UINT64)DataSize, (UINT64)Size);
+    AsciiPrint (
+      "error: GetVariable(\"%s\", %g): expected size 0x%Lx, "
+      "got 0x%Lx\n",
+      VariableName,
+      VendorGuid,
+      (UINT64)DataSize,
+      (UINT64)Size
+      );
     return EFI_PROTOCOL_ERROR;
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Populate a SETTINGS structure from the underlying UEFI variables.
@@ -464,41 +513,64 @@ GetExact (
 STATIC
 EFI_STATUS
 GetSettings (
-  OUT SETTINGS *Settings
+  OUT SETTINGS  *Settings
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
-  Status = GetExact (EFI_SETUP_MODE_NAME, &gEfiGlobalVariableGuid,
-             &Settings->SetupMode, sizeof Settings->SetupMode, FALSE);
+  Status = GetExact (
+             EFI_SETUP_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &Settings->SetupMode,
+             sizeof Settings->SetupMode,
+             FALSE
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = GetExact (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid,
-             &Settings->SecureBoot, sizeof Settings->SecureBoot, FALSE);
+  Status = GetExact (
+             EFI_SECURE_BOOT_MODE_NAME,
+             &gEfiGlobalVariableGuid,
+             &Settings->SecureBoot,
+             sizeof Settings->SecureBoot,
+             FALSE
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = GetExact (EFI_SECURE_BOOT_ENABLE_NAME,
-             &gEfiSecureBootEnableDisableGuid, &Settings->SecureBootEnable,
-             sizeof Settings->SecureBootEnable, TRUE);
+  Status = GetExact (
+             EFI_SECURE_BOOT_ENABLE_NAME,
+             &gEfiSecureBootEnableDisableGuid,
+             &Settings->SecureBootEnable,
+             sizeof Settings->SecureBootEnable,
+             TRUE
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = GetExact (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid,
-             &Settings->CustomMode, sizeof Settings->CustomMode, FALSE);
+  Status = GetExact (
+             EFI_CUSTOM_MODE_NAME,
+             &gEfiCustomModeEnableGuid,
+             &Settings->CustomMode,
+             sizeof Settings->CustomMode,
+             FALSE
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = GetExact (EFI_VENDOR_KEYS_VARIABLE_NAME, &gEfiGlobalVariableGuid,
-             &Settings->VendorKeys, sizeof Settings->VendorKeys, FALSE);
+  Status = GetExact (
+             EFI_VENDOR_KEYS_VARIABLE_NAME,
+             &gEfiGlobalVariableGuid,
+             &Settings->VendorKeys,
+             sizeof Settings->VendorKeys,
+             FALSE
+             );
   return Status;
 }
-
 
 /**
   Print the contents of a SETTINGS structure to the UEFI console.
@@ -508,14 +580,19 @@ GetSettings (
 STATIC
 VOID
 PrintSettings (
-  IN CONST SETTINGS *Settings
+  IN CONST SETTINGS  *Settings
   )
 {
-  AsciiPrint ("info: SetupMode=%d SecureBoot=%d SecureBootEnable=%d "
-    "CustomMode=%d VendorKeys=%d\n", Settings->SetupMode, Settings->SecureBoot,
-    Settings->SecureBootEnable, Settings->CustomMode, Settings->VendorKeys);
+  AsciiPrint (
+    "info: SetupMode=%d SecureBoot=%d SecureBootEnable=%d "
+    "CustomMode=%d VendorKeys=%d\n",
+    Settings->SetupMode,
+    Settings->SecureBoot,
+    Settings->SecureBootEnable,
+    Settings->CustomMode,
+    Settings->VendorKeys
+    );
 }
-
 
 /**
   Entry point function of this shell application.
@@ -523,18 +600,18 @@ PrintSettings (
 INTN
 EFIAPI
 ShellAppMain (
-  IN UINTN  Argc,
-  IN CHAR16 **Argv
+  IN UINTN   Argc,
+  IN CHAR16  **Argv
   )
 {
-  INTN       RetVal;
-  EFI_STATUS Status;
-  SETTINGS   Settings;
-  UINT8      *PkKek1;
-  UINTN      SizeOfPkKek1;
-  BOOLEAN    NoDefault;
+  INTN        RetVal;
+  EFI_STATUS  Status;
+  SETTINGS    Settings;
+  UINT8       *PkKek1;
+  UINTN       SizeOfPkKek1;
+  BOOLEAN     NoDefault;
 
-  if (Argc == 2 && StrCmp (Argv[1], L"--no-default") == 0) {
+  if ((Argc == 2) && (StrCmp (Argv[1], L"--no-default") == 0)) {
     NoDefault = TRUE;
   } else {
     NoDefault = FALSE;
@@ -552,6 +629,7 @@ ShellAppMain (
   if (EFI_ERROR (Status)) {
     return RetVal;
   }
+
   PrintSettings (&Settings);
 
   if (Settings.SetupMode != 1) {
@@ -563,7 +641,7 @@ ShellAppMain (
   // Set PkKek1 and SizeOfPkKek1 to suppress incorrect compiler/analyzer
   // warnings.
   //
-  PkKek1 = NULL;
+  PkKek1       = NULL;
   SizeOfPkKek1 = 0;
 
   //
@@ -581,13 +659,21 @@ ShellAppMain (
   //
   if (Settings.CustomMode != CUSTOM_SECURE_BOOT_MODE) {
     Settings.CustomMode = CUSTOM_SECURE_BOOT_MODE;
-    Status = gRT->SetVariable (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid,
-                    (EFI_VARIABLE_NON_VOLATILE |
-                     EFI_VARIABLE_BOOTSERVICE_ACCESS),
-                    sizeof Settings.CustomMode, &Settings.CustomMode);
+    Status              = gRT->SetVariable (
+                                 EFI_CUSTOM_MODE_NAME,
+                                 &gEfiCustomModeEnableGuid,
+                                 (EFI_VARIABLE_NON_VOLATILE |
+                                  EFI_VARIABLE_BOOTSERVICE_ACCESS),
+                                 sizeof Settings.CustomMode,
+                                 &Settings.CustomMode
+                                 );
     if (EFI_ERROR (Status)) {
-      AsciiPrint ("error: SetVariable(\"%s\", %g): %r\n", EFI_CUSTOM_MODE_NAME,
-        &gEfiCustomModeEnableGuid, Status);
+      AsciiPrint (
+        "error: SetVariable(\"%s\", %g): %r\n",
+        EFI_CUSTOM_MODE_NAME,
+        &gEfiCustomModeEnableGuid,
+        Status
+        );
       goto FreePkKek1;
     }
   }
@@ -600,17 +686,26 @@ ShellAppMain (
                EFI_IMAGE_SECURITY_DATABASE,
                &gEfiImageSecurityDatabaseGuid,
                &gEfiCertX509Guid,
-               PkKek1, SizeOfPkKek1, &gEfiCallerIdGuid,
-               NULL);
+               PkKek1,
+               SizeOfPkKek1,
+               &gEfiCallerIdGuid,
+               NULL
+               );
   } else {
     Status = EnrollListOfCerts (
                EFI_IMAGE_SECURITY_DATABASE,
                &gEfiImageSecurityDatabaseGuid,
                &gEfiCertX509Guid,
-               mMicrosoftPca,    mSizeOfMicrosoftPca,    &gMicrosoftVendorGuid,
-               mMicrosoftUefiCa, mSizeOfMicrosoftUefiCa, &gMicrosoftVendorGuid,
-               NULL);
+               mMicrosoftPca,
+               mSizeOfMicrosoftPca,
+               &gMicrosoftVendorGuid,
+               mMicrosoftUefiCa,
+               mSizeOfMicrosoftUefiCa,
+               &gMicrosoftVendorGuid,
+               NULL
+               );
   }
+
   if (EFI_ERROR (Status)) {
     goto FreePkKek1;
   }
@@ -622,8 +717,11 @@ ShellAppMain (
              EFI_IMAGE_SECURITY_DATABASE1,
              &gEfiImageSecurityDatabaseGuid,
              &gEfiCertSha256Guid,
-             mSha256OfDevNull, mSizeOfSha256OfDevNull, &gEfiCallerIdGuid,
-             NULL);
+             mSha256OfDevNull,
+             mSizeOfSha256OfDevNull,
+             &gEfiCallerIdGuid,
+             NULL
+             );
   if (EFI_ERROR (Status)) {
     goto FreePkKek1;
   }
@@ -636,17 +734,26 @@ ShellAppMain (
                EFI_KEY_EXCHANGE_KEY_NAME,
                &gEfiGlobalVariableGuid,
                &gEfiCertX509Guid,
-               PkKek1, SizeOfPkKek1, &gEfiCallerIdGuid,
-               NULL);
+               PkKek1,
+               SizeOfPkKek1,
+               &gEfiCallerIdGuid,
+               NULL
+               );
   } else {
     Status = EnrollListOfCerts (
                EFI_KEY_EXCHANGE_KEY_NAME,
                &gEfiGlobalVariableGuid,
                &gEfiCertX509Guid,
-               PkKek1,        SizeOfPkKek1,        &gEfiCallerIdGuid,
-               mMicrosoftKek, mSizeOfMicrosoftKek, &gMicrosoftVendorGuid,
-               NULL);
+               PkKek1,
+               SizeOfPkKek1,
+               &gEfiCallerIdGuid,
+               mMicrosoftKek,
+               mSizeOfMicrosoftKek,
+               &gMicrosoftVendorGuid,
+               NULL
+               );
   }
+
   if (EFI_ERROR (Status)) {
     goto FreePkKek1;
   }
@@ -658,8 +765,11 @@ ShellAppMain (
              EFI_PLATFORM_KEY_NAME,
              &gEfiGlobalVariableGuid,
              &gEfiCertX509Guid,
-             PkKek1, SizeOfPkKek1, &gEfiGlobalVariableGuid,
-             NULL);
+             PkKek1,
+             SizeOfPkKek1,
+             &gEfiGlobalVariableGuid,
+             NULL
+             );
   if (EFI_ERROR (Status)) {
     goto FreePkKek1;
   }
@@ -669,12 +779,20 @@ ShellAppMain (
   // signatures.
   //
   Settings.CustomMode = STANDARD_SECURE_BOOT_MODE;
-  Status = gRT->SetVariable (EFI_CUSTOM_MODE_NAME, &gEfiCustomModeEnableGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                  sizeof Settings.CustomMode, &Settings.CustomMode);
+  Status              = gRT->SetVariable (
+                               EFI_CUSTOM_MODE_NAME,
+                               &gEfiCustomModeEnableGuid,
+                               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                               sizeof Settings.CustomMode,
+                               &Settings.CustomMode
+                               );
   if (EFI_ERROR (Status)) {
-    AsciiPrint ("error: SetVariable(\"%s\", %g): %r\n", EFI_CUSTOM_MODE_NAME,
-      &gEfiCustomModeEnableGuid, Status);
+    AsciiPrint (
+      "error: SetVariable(\"%s\", %g): %r\n",
+      EFI_CUSTOM_MODE_NAME,
+      &gEfiCustomModeEnableGuid,
+      Status
+      );
     goto FreePkKek1;
   }
 
@@ -713,11 +831,13 @@ ShellAppMain (
   if (EFI_ERROR (Status)) {
     goto FreePkKek1;
   }
+
   PrintSettings (&Settings);
 
-  if (Settings.SetupMode != 0 || Settings.SecureBoot != 1 ||
-      Settings.SecureBootEnable != 1 || Settings.CustomMode != 0 ||
-      Settings.VendorKeys != 0) {
+  if ((Settings.SetupMode != 0) || (Settings.SecureBoot != 1) ||
+      (Settings.SecureBootEnable != 1) || (Settings.CustomMode != 0) ||
+      (Settings.VendorKeys != 0))
+  {
     AsciiPrint ("error: unexpected\n");
     goto FreePkKek1;
   }

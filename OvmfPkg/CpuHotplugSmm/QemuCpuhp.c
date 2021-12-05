@@ -21,83 +21,86 @@
 
 UINT32
 QemuCpuhpReadCommandData2 (
-  IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo
+  IN CONST EFI_MM_CPU_IO_PROTOCOL  *MmCpuIo
   )
 {
-  UINT32     CommandData2;
-  EFI_STATUS Status;
+  UINT32      CommandData2;
+  EFI_STATUS  Status;
 
   CommandData2 = 0;
-  Status = MmCpuIo->Io.Read (
-                         MmCpuIo,
-                         MM_IO_UINT32,
-                         ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_R_CMD_DATA2,
-                         1,
-                         &CommandData2
-                         );
+  Status       = MmCpuIo->Io.Read (
+                               MmCpuIo,
+                               MM_IO_UINT32,
+                               ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_R_CMD_DATA2,
+                               1,
+                               &CommandData2
+                               );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
+
   return CommandData2;
 }
 
 UINT8
 QemuCpuhpReadCpuStatus (
-  IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo
+  IN CONST EFI_MM_CPU_IO_PROTOCOL  *MmCpuIo
   )
 {
-  UINT8      CpuStatus;
-  EFI_STATUS Status;
+  UINT8       CpuStatus;
+  EFI_STATUS  Status;
 
   CpuStatus = 0;
-  Status = MmCpuIo->Io.Read (
-                         MmCpuIo,
-                         MM_IO_UINT8,
-                         ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_R_CPU_STAT,
-                         1,
-                         &CpuStatus
-                         );
+  Status    = MmCpuIo->Io.Read (
+                            MmCpuIo,
+                            MM_IO_UINT8,
+                            ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_R_CPU_STAT,
+                            1,
+                            &CpuStatus
+                            );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
+
   return CpuStatus;
 }
 
 UINT32
 QemuCpuhpReadCommandData (
-  IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo
+  IN CONST EFI_MM_CPU_IO_PROTOCOL  *MmCpuIo
   )
 {
-  UINT32     CommandData;
-  EFI_STATUS Status;
+  UINT32      CommandData;
+  EFI_STATUS  Status;
 
   CommandData = 0;
-  Status = MmCpuIo->Io.Read (
-                         MmCpuIo,
-                         MM_IO_UINT32,
-                         ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_RW_CMD_DATA,
-                         1,
-                         &CommandData
-                         );
+  Status      = MmCpuIo->Io.Read (
+                              MmCpuIo,
+                              MM_IO_UINT32,
+                              ICH9_CPU_HOTPLUG_BASE + QEMU_CPUHP_RW_CMD_DATA,
+                              1,
+                              &CommandData
+                              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
+
   return CommandData;
 }
 
 VOID
 QemuCpuhpWriteCpuSelector (
-  IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
-  IN UINT32                       Selector
+  IN CONST EFI_MM_CPU_IO_PROTOCOL  *MmCpuIo,
+  IN UINT32                        Selector
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = MmCpuIo->Io.Write (
                          MmCpuIo,
@@ -115,11 +118,11 @@ QemuCpuhpWriteCpuSelector (
 
 VOID
 QemuCpuhpWriteCpuStatus (
-  IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
-  IN UINT8                        CpuStatus
+  IN CONST EFI_MM_CPU_IO_PROTOCOL  *MmCpuIo,
+  IN UINT8                         CpuStatus
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = MmCpuIo->Io.Write (
                          MmCpuIo,
@@ -137,11 +140,11 @@ QemuCpuhpWriteCpuStatus (
 
 VOID
 QemuCpuhpWriteCommand (
-  IN CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
-  IN UINT8                        Command
+  IN CONST EFI_MM_CPU_IO_PROTOCOL  *MmCpuIo,
+  IN UINT8                         Command
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = MmCpuIo->Io.Write (
                          MmCpuIo,
@@ -206,33 +209,33 @@ QemuCpuhpWriteCommand (
 **/
 EFI_STATUS
 QemuCpuhpCollectApicIds (
-  IN  CONST EFI_MM_CPU_IO_PROTOCOL *MmCpuIo,
-  IN  UINT32                       PossibleCpuCount,
-  IN  UINT32                       ApicIdCount,
-  OUT APIC_ID                      *PluggedApicIds,
-  OUT UINT32                       *PluggedCount,
-  OUT APIC_ID                      *ToUnplugApicIds,
-  OUT UINT32                       *ToUnplugSelectors,
-  OUT UINT32                       *ToUnplugCount
+  IN  CONST EFI_MM_CPU_IO_PROTOCOL  *MmCpuIo,
+  IN  UINT32                        PossibleCpuCount,
+  IN  UINT32                        ApicIdCount,
+  OUT APIC_ID                       *PluggedApicIds,
+  OUT UINT32                        *PluggedCount,
+  OUT APIC_ID                       *ToUnplugApicIds,
+  OUT UINT32                        *ToUnplugSelectors,
+  OUT UINT32                        *ToUnplugCount
   )
 {
-  UINT32 CurrentSelector;
+  UINT32  CurrentSelector;
 
-  if (PossibleCpuCount == 0 || ApicIdCount == 0) {
+  if ((PossibleCpuCount == 0) || (ApicIdCount == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  *PluggedCount = 0;
+  *PluggedCount  = 0;
   *ToUnplugCount = 0;
 
   CurrentSelector = 0;
   do {
-    UINT32  PendingSelector;
-    UINT8   CpuStatus;
-    APIC_ID *ExtendIds;
-    UINT32  *ExtendSels;
-    UINT32  *ExtendCount;
-    APIC_ID NewApicId;
+    UINT32   PendingSelector;
+    UINT8    CpuStatus;
+    APIC_ID  *ExtendIds;
+    UINT32   *ExtendSels;
+    UINT32   *ExtendCount;
+    APIC_ID  NewApicId;
 
     //
     // Write CurrentSelector (which is valid) to the CPU selector register.
@@ -259,10 +262,17 @@ QemuCpuhpCollectApicIds (
     QemuCpuhpWriteCommand (MmCpuIo, QEMU_CPUHP_CMD_GET_PENDING);
     PendingSelector = QemuCpuhpReadCommandData (MmCpuIo);
     if (PendingSelector < CurrentSelector) {
-      DEBUG ((DEBUG_VERBOSE, "%a: CurrentSelector=%u PendingSelector=%u: "
-        "wrap-around\n", __FUNCTION__, CurrentSelector, PendingSelector));
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: CurrentSelector=%u PendingSelector=%u: "
+        "wrap-around\n",
+        __FUNCTION__,
+        CurrentSelector,
+        PendingSelector
+        ));
       break;
     }
+
     CurrentSelector = PendingSelector;
 
     //
@@ -274,16 +284,26 @@ QemuCpuhpCollectApicIds (
       // The "insert" event guarantees the "enabled" status; plus it excludes
       // the "fw_remove" event.
       //
-      if ((CpuStatus & QEMU_CPUHP_STAT_ENABLED) == 0 ||
-          (CpuStatus & QEMU_CPUHP_STAT_FW_REMOVE) != 0) {
-        DEBUG ((DEBUG_ERROR, "%a: CurrentSelector=%u CpuStatus=0x%x: "
-          "inconsistent CPU status\n", __FUNCTION__, CurrentSelector,
-          CpuStatus));
+      if (((CpuStatus & QEMU_CPUHP_STAT_ENABLED) == 0) ||
+          ((CpuStatus & QEMU_CPUHP_STAT_FW_REMOVE) != 0))
+      {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: CurrentSelector=%u CpuStatus=0x%x: "
+          "inconsistent CPU status\n",
+          __FUNCTION__,
+          CurrentSelector,
+          CpuStatus
+          ));
         return EFI_PROTOCOL_ERROR;
       }
 
-      DEBUG ((DEBUG_VERBOSE, "%a: CurrentSelector=%u: insert\n", __FUNCTION__,
-        CurrentSelector));
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: CurrentSelector=%u: insert\n",
+        __FUNCTION__,
+        CurrentSelector
+        ));
 
       ExtendIds   = PluggedApicIds;
       ExtendSels  = NULL;
@@ -293,14 +313,23 @@ QemuCpuhpCollectApicIds (
       // "fw_remove" event guarantees "enabled".
       //
       if ((CpuStatus & QEMU_CPUHP_STAT_ENABLED) == 0) {
-        DEBUG ((DEBUG_ERROR, "%a: CurrentSelector=%u CpuStatus=0x%x: "
-          "inconsistent CPU status\n", __FUNCTION__, CurrentSelector,
-          CpuStatus));
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: CurrentSelector=%u CpuStatus=0x%x: "
+          "inconsistent CPU status\n",
+          __FUNCTION__,
+          CurrentSelector,
+          CpuStatus
+          ));
         return EFI_PROTOCOL_ERROR;
       }
 
-      DEBUG ((DEBUG_VERBOSE, "%a: CurrentSelector=%u: fw_remove\n",
-        __FUNCTION__, CurrentSelector));
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: CurrentSelector=%u: fw_remove\n",
+        __FUNCTION__,
+        CurrentSelector
+        ));
 
       ExtendIds   = ToUnplugApicIds;
       ExtendSels  = ToUnplugSelectors;
@@ -309,15 +338,23 @@ QemuCpuhpCollectApicIds (
       //
       // Let the OSPM deal with the "remove" event.
       //
-      DEBUG ((DEBUG_VERBOSE, "%a: CurrentSelector=%u: remove (ignored)\n",
-        __FUNCTION__, CurrentSelector));
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: CurrentSelector=%u: remove (ignored)\n",
+        __FUNCTION__,
+        CurrentSelector
+        ));
 
       ExtendIds   = NULL;
       ExtendSels  = NULL;
       ExtendCount = NULL;
     } else {
-      DEBUG ((DEBUG_VERBOSE, "%a: CurrentSelector=%u: no event\n",
-        __FUNCTION__, CurrentSelector));
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: CurrentSelector=%u: no event\n",
+        __FUNCTION__,
+        CurrentSelector
+        ));
       break;
     }
 
@@ -334,15 +371,22 @@ QemuCpuhpCollectApicIds (
         DEBUG ((DEBUG_ERROR, "%a: APIC ID array too small\n", __FUNCTION__));
         return EFI_BUFFER_TOO_SMALL;
       }
+
       QemuCpuhpWriteCommand (MmCpuIo, QEMU_CPUHP_CMD_GET_ARCH_ID);
       NewApicId = QemuCpuhpReadCommandData (MmCpuIo);
-      DEBUG ((DEBUG_VERBOSE, "%a: ApicId=" FMT_APIC_ID "\n", __FUNCTION__,
-        NewApicId));
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: ApicId=" FMT_APIC_ID "\n",
+        __FUNCTION__,
+        NewApicId
+        ));
       if (ExtendSels != NULL) {
         ExtendSels[(*ExtendCount)] = CurrentSelector;
       }
+
       ExtendIds[(*ExtendCount)++] = NewApicId;
     }
+
     //
     // We've processed the CPU with (known) pending events, but we must never
     // clear events. Therefore we need to advance past this CPU manually;
@@ -352,7 +396,12 @@ QemuCpuhpCollectApicIds (
     CurrentSelector++;
   } while (CurrentSelector < PossibleCpuCount);
 
-  DEBUG ((DEBUG_VERBOSE, "%a: PluggedCount=%u ToUnplugCount=%u\n",
-    __FUNCTION__, *PluggedCount, *ToUnplugCount));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: PluggedCount=%u ToUnplugCount=%u\n",
+    __FUNCTION__,
+    *PluggedCount,
+    *ToUnplugCount
+    ));
   return EFI_SUCCESS;
 }

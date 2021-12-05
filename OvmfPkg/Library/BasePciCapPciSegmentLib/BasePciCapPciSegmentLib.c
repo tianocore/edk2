@@ -14,7 +14,6 @@
 
 #include "BasePciCapPciSegmentLib.h"
 
-
 /**
   Read the config space of a given PCI device (both normal and extended).
 
@@ -44,17 +43,17 @@ STATIC
 RETURN_STATUS
 EFIAPI
 SegmentDevReadConfig (
-  IN  PCI_CAP_DEV *PciDevice,
-  IN  UINT16      SourceOffset,
-  OUT VOID        *DestinationBuffer,
-  IN  UINT16      Size
+  IN  PCI_CAP_DEV  *PciDevice,
+  IN  UINT16       SourceOffset,
+  OUT VOID         *DestinationBuffer,
+  IN  UINT16       Size
   )
 {
-  SEGMENT_DEV *SegmentDev;
-  UINT16      ConfigSpaceSize;
-  UINT64      SourceAddress;
+  SEGMENT_DEV  *SegmentDev;
+  UINT16       ConfigSpaceSize;
+  UINT64       SourceAddress;
 
-  SegmentDev = SEGMENT_DEV_FROM_PCI_CAP_DEV (PciDevice);
+  SegmentDev      = SEGMENT_DEV_FROM_PCI_CAP_DEV (PciDevice);
   ConfigSpaceSize = (SegmentDev->MaxDomain == PciCapNormal ?
                      PCI_MAX_CONFIG_OFFSET : PCI_EXP_MAX_CONFIG_OFFSET);
   //
@@ -64,13 +63,17 @@ SegmentDevReadConfig (
   if (SourceOffset + Size > ConfigSpaceSize) {
     return RETURN_UNSUPPORTED;
   }
-  SourceAddress = PCI_SEGMENT_LIB_ADDRESS (SegmentDev->SegmentNr,
-                    SegmentDev->BusNr, SegmentDev->DeviceNr,
-                    SegmentDev->FunctionNr, SourceOffset);
+
+  SourceAddress = PCI_SEGMENT_LIB_ADDRESS (
+                    SegmentDev->SegmentNr,
+                    SegmentDev->BusNr,
+                    SegmentDev->DeviceNr,
+                    SegmentDev->FunctionNr,
+                    SourceOffset
+                    );
   PciSegmentReadBuffer (SourceAddress, Size, DestinationBuffer);
   return RETURN_SUCCESS;
 }
-
 
 /**
   Write the config space of a given PCI device (both normal and extended).
@@ -101,17 +104,17 @@ STATIC
 RETURN_STATUS
 EFIAPI
 SegmentDevWriteConfig (
-  IN PCI_CAP_DEV *PciDevice,
-  IN UINT16      DestinationOffset,
-  IN VOID        *SourceBuffer,
-  IN UINT16      Size
+  IN PCI_CAP_DEV  *PciDevice,
+  IN UINT16       DestinationOffset,
+  IN VOID         *SourceBuffer,
+  IN UINT16       Size
   )
 {
-  SEGMENT_DEV *SegmentDev;
-  UINT16      ConfigSpaceSize;
-  UINT64      DestinationAddress;
+  SEGMENT_DEV  *SegmentDev;
+  UINT16       ConfigSpaceSize;
+  UINT64       DestinationAddress;
 
-  SegmentDev = SEGMENT_DEV_FROM_PCI_CAP_DEV (PciDevice);
+  SegmentDev      = SEGMENT_DEV_FROM_PCI_CAP_DEV (PciDevice);
   ConfigSpaceSize = (SegmentDev->MaxDomain == PciCapNormal ?
                      PCI_MAX_CONFIG_OFFSET : PCI_EXP_MAX_CONFIG_OFFSET);
   //
@@ -121,13 +124,17 @@ SegmentDevWriteConfig (
   if (DestinationOffset + Size > ConfigSpaceSize) {
     return RETURN_UNSUPPORTED;
   }
-  DestinationAddress = PCI_SEGMENT_LIB_ADDRESS (SegmentDev->SegmentNr,
-                         SegmentDev->BusNr, SegmentDev->DeviceNr,
-                         SegmentDev->FunctionNr, DestinationOffset);
+
+  DestinationAddress = PCI_SEGMENT_LIB_ADDRESS (
+                         SegmentDev->SegmentNr,
+                         SegmentDev->BusNr,
+                         SegmentDev->DeviceNr,
+                         SegmentDev->FunctionNr,
+                         DestinationOffset
+                         );
   PciSegmentWriteBuffer (DestinationAddress, Size, SourceBuffer);
   return RETURN_SUCCESS;
 }
-
 
 /**
   Create a PCI_CAP_DEV object from the PCI Segment:Bus:Device.Function
@@ -168,17 +175,17 @@ SegmentDevWriteConfig (
 RETURN_STATUS
 EFIAPI
 PciCapPciSegmentDeviceInit (
-  IN  PCI_CAP_DOMAIN MaxDomain,
-  IN  UINT16         Segment,
-  IN  UINT8          Bus,
-  IN  UINT8          Device,
-  IN  UINT8          Function,
-  OUT PCI_CAP_DEV    **PciDevice
+  IN  PCI_CAP_DOMAIN  MaxDomain,
+  IN  UINT16          Segment,
+  IN  UINT8           Bus,
+  IN  UINT8           Device,
+  IN  UINT8           Function,
+  OUT PCI_CAP_DEV     **PciDevice
   )
 {
-  SEGMENT_DEV *SegmentDev;
+  SEGMENT_DEV  *SegmentDev;
 
-  if (Device > PCI_MAX_DEVICE || Function > PCI_MAX_FUNC) {
+  if ((Device > PCI_MAX_DEVICE) || (Function > PCI_MAX_FUNC)) {
     return RETURN_INVALID_PARAMETER;
   }
 
@@ -200,7 +207,6 @@ PciCapPciSegmentDeviceInit (
   return RETURN_SUCCESS;
 }
 
-
 /**
   Free the resources used by PciDevice.
 
@@ -210,10 +216,10 @@ PciCapPciSegmentDeviceInit (
 VOID
 EFIAPI
 PciCapPciSegmentDeviceUninit (
-  IN PCI_CAP_DEV *PciDevice
+  IN PCI_CAP_DEV  *PciDevice
   )
 {
-  SEGMENT_DEV *SegmentDev;
+  SEGMENT_DEV  *SegmentDev;
 
   SegmentDev = SEGMENT_DEV_FROM_PCI_CAP_DEV (PciDevice);
   FreePool (SegmentDev);

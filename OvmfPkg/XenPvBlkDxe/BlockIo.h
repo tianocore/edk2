@@ -29,11 +29,11 @@
 EFI_STATUS
 EFIAPI
 XenPvBlkDxeBlockIoReadBlocks (
-  IN EFI_BLOCK_IO_PROTOCOL          *This,
-  IN UINT32                         MediaId,
-  IN EFI_LBA                        Lba,
-  IN UINTN                          BufferSize,
-  OUT VOID                          *Buffer
+  IN EFI_BLOCK_IO_PROTOCOL  *This,
+  IN UINT32                 MediaId,
+  IN EFI_LBA                Lba,
+  IN UINTN                  BufferSize,
+  OUT VOID                  *Buffer
   );
 
 /**
@@ -59,11 +59,11 @@ XenPvBlkDxeBlockIoReadBlocks (
 EFI_STATUS
 EFIAPI
 XenPvBlkDxeBlockIoWriteBlocks (
-  IN EFI_BLOCK_IO_PROTOCOL          *This,
-  IN UINT32                         MediaId,
-  IN EFI_LBA                        Lba,
-  IN UINTN                          BufferSize,
-  IN VOID                           *Buffer
+  IN EFI_BLOCK_IO_PROTOCOL  *This,
+  IN UINT32                 MediaId,
+  IN EFI_LBA                Lba,
+  IN UINTN                  BufferSize,
+  IN VOID                   *Buffer
   );
 
 /**
@@ -94,9 +94,9 @@ XenPvBlkDxeBlockIoFlushBlocks (
 EFI_STATUS
 EFIAPI
 XenPvBlkDxeBlockIoReset (
-  IN EFI_BLOCK_IO_PROTOCOL   *This,
-  IN BOOLEAN                 ExtendedVerification
+  IN EFI_BLOCK_IO_PROTOCOL  *This,
+  IN BOOLEAN                ExtendedVerification
   );
 
-extern EFI_BLOCK_IO_MEDIA  gXenPvBlkDxeBlockIoMedia;
+extern EFI_BLOCK_IO_MEDIA     gXenPvBlkDxeBlockIoMedia;
 extern EFI_BLOCK_IO_PROTOCOL  gXenPvBlkDxeBlockIo;

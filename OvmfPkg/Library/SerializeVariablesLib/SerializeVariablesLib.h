@@ -19,15 +19,14 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-#define SV_FROM_HANDLE(a)       CR (a, SV_INSTANCE, Signature, SV_SIGNATURE)
-#define SV_SIGNATURE            SIGNATURE_32 ('S', 'V', 'A', 'R')
+#define SV_FROM_HANDLE(a)  CR (a, SV_INSTANCE, Signature, SV_SIGNATURE)
+#define SV_SIGNATURE  SIGNATURE_32 ('S', 'V', 'A', 'R')
 
 typedef struct {
-  UINT32                              Signature;
-  VOID                                *BufferPtr;
-  UINTN                               BufferSize;
-  UINTN                               DataSize;
+  UINT32    Signature;
+  VOID      *BufferPtr;
+  UINTN     BufferSize;
+  UINTN     DataSize;
 } SV_INSTANCE;
 
 #endif
-
