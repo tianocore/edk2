@@ -70,17 +70,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 CustomGuidedSectionExtract (
-  IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI *This,
-  IN CONST  VOID                                  *InputSection,
-  OUT       VOID                                  **OutputBuffer,
-  OUT       UINTN                                 *OutputSize,
-  OUT       UINT32                                *AuthenticationStatus
+  IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI  *This,
+  IN CONST  VOID                                   *InputSection,
+  OUT       VOID                                   **OutputBuffer,
+  OUT       UINTN                                  *OutputSize,
+  OUT       UINT32                                 *AuthenticationStatus
   );
 
 //
 // Module global for the Section Extraction PPI instance
 //
-CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = {
+CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI  mCustomGuidedSectionExtractionPpi = {
   CustomGuidedSectionExtract
 };
 
@@ -141,18 +141,18 @@ CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = 
 EFI_STATUS
 EFIAPI
 CustomGuidedSectionExtract (
-  IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI *This,
-  IN CONST  VOID                                  *InputSection,
-  OUT       VOID                                  **OutputBuffer,
-  OUT       UINTN                                 *OutputSize,
-  OUT       UINT32                                *AuthenticationStatus
+  IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI  *This,
+  IN CONST  VOID                                   *InputSection,
+  OUT       VOID                                   **OutputBuffer,
+  OUT       UINTN                                  *OutputSize,
+  OUT       UINT32                                 *AuthenticationStatus
   )
 {
-  EFI_STATUS      Status;
-  UINT8           *ScratchBuffer;
-  UINT32          ScratchBufferSize;
-  UINT32          OutputBufferSize;
-  UINT16          SectionAttribute;
+  EFI_STATUS  Status;
+  UINT8       *ScratchBuffer;
+  UINT32      ScratchBufferSize;
+  UINT32      OutputBufferSize;
+  UINT16      SectionAttribute;
 
   //
   // Init local variable
@@ -184,7 +184,7 @@ CustomGuidedSectionExtract (
     }
   }
 
-  if (((SectionAttribute & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) && OutputBufferSize > 0) {
+  if (((SectionAttribute & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) && (OutputBufferSize > 0)) {
     //
     // Allocate output buffer
     //
@@ -192,6 +192,7 @@ CustomGuidedSectionExtract (
     if (*OutputBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     DEBUG ((DEBUG_INFO, "Customized Guided section Memory Size required is 0x%x and address is 0x%p\n", OutputBufferSize, *OutputBuffer));
   }
 
@@ -209,7 +210,7 @@ CustomGuidedSectionExtract (
     return Status;
   }
 
-  *OutputSize = (UINTN) OutputBufferSize;
+  *OutputSize = (UINTN)OutputBufferSize;
 
   return EFI_SUCCESS;
 }
@@ -248,13 +249,13 @@ SectionExtractionPeiEntry (
   // Install custom extraction guid PPI
   //
   if (ExtractHandlerNumber > 0) {
-    GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *) AllocatePool (ExtractHandlerNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR));
+    GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *)AllocatePool (ExtractHandlerNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR));
     ASSERT (GuidPpi != NULL);
     while (ExtractHandlerNumber-- > 0) {
       GuidPpi->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
-      GuidPpi->Ppi   = (VOID *) &mCustomGuidedSectionExtractionPpi;
+      GuidPpi->Ppi   = (VOID *)&mCustomGuidedSectionExtractionPpi;
       GuidPpi->Guid  = &ExtractHandlerGuidTable[ExtractHandlerNumber];
-      Status = PeiServicesInstallPpi (GuidPpi++);
+      Status         = PeiServicesInstallPpi (GuidPpi++);
       ASSERT_EFI_ERROR (Status);
     }
   }

@@ -17,16 +17,16 @@ VarCheckHiiGenFromHiiDatabase (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  UINTN                         BufferSize;
-  VOID                          *Buffer;
-  EFI_PHYSICAL_ADDRESS          BufferAddress;
-  EFI_HII_DATABASE_PROTOCOL     *HiiDatabase;
+  EFI_STATUS                 Status;
+  UINTN                      BufferSize;
+  VOID                       *Buffer;
+  EFI_PHYSICAL_ADDRESS       BufferAddress;
+  EFI_HII_DATABASE_PROTOCOL  *HiiDatabase;
 
   //
   // Locate HII Database protocol
   //
-  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **) &HiiDatabase);
+  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **)&HiiDatabase);
   if (EFI_ERROR (Status)) {
     return;
   }
@@ -36,15 +36,15 @@ VarCheckHiiGenFromHiiDatabase (
   // Should fail with EFI_BUFFER_TOO_SMALL.
   //
   BufferSize = 0;
-  Buffer = NULL;
-  Status = HiiDatabase->ExportPackageLists (HiiDatabase, 0, &BufferSize, Buffer);
+  Buffer     = NULL;
+  Status     = HiiDatabase->ExportPackageLists (HiiDatabase, 0, &BufferSize, Buffer);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     //
     // Allocate buffer to hold the HII Database.
     //
     Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData, EFI_SIZE_TO_PAGES (BufferSize), &BufferAddress);
     ASSERT_EFI_ERROR (Status);
-    Buffer = (VOID *) (UINTN) BufferAddress;
+    Buffer = (VOID *)(UINTN)BufferAddress;
 
     //
     // Export HII Database into the buffer.
@@ -52,13 +52,13 @@ VarCheckHiiGenFromHiiDatabase (
     Status = HiiDatabase->ExportPackageLists (HiiDatabase, 0, &BufferSize, Buffer);
     ASSERT_EFI_ERROR (Status);
 
-    DEBUG ((DEBUG_INFO , "VarCheckHiiGenDxeFromHii - HII Database exported at 0x%x, size = 0x%x\n", Buffer, BufferSize));
+    DEBUG ((DEBUG_INFO, "VarCheckHiiGenDxeFromHii - HII Database exported at 0x%x, size = 0x%x\n", Buffer, BufferSize));
 
-#ifdef DUMP_HII_DATA
+ #ifdef DUMP_HII_DATA
     DEBUG_CODE (
       DumpHiiDatabase (Buffer, BufferSize);
       );
-#endif
+ #endif
 
     VarCheckParseHiiDatabase (Buffer, BufferSize);
 

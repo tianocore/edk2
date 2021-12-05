@@ -21,7 +21,7 @@
 //
 // Forward declaration for the EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI.
 //
-typedef struct _EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI  EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI;
+typedef struct _EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI;
 
 /**
   Get the MMIO base address of NVM Express host controller.
@@ -38,7 +38,7 @@ typedef struct _EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI  EDKII_NVM_EXPRESS_HOST_CO
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_NVM_EXPRESS_HC_GET_MMIO_BAR) (
+(EFIAPI *EDKII_NVM_EXPRESS_HC_GET_MMIO_BAR)(
   IN  EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI    *This,
   IN  UINT8                                    ControllerId,
   OUT UINTN                                    *MmioBar
@@ -65,7 +65,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_NVM_EXPRESS_HC_GET_DEVICE_PATH) (
+(EFIAPI *EDKII_NVM_EXPRESS_HC_GET_DEVICE_PATH)(
   IN  EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI    *This,
   IN  UINT8                                    ControllerId,
   OUT UINTN                                    *DevicePathLength,
@@ -81,6 +81,6 @@ struct _EDKII_NVM_EXPRESS_HOST_CONTROLLER_PPI {
   EDKII_NVM_EXPRESS_HC_GET_DEVICE_PATH    GetNvmeHcDevicePath;
 };
 
-extern EFI_GUID gEdkiiPeiNvmExpressHostControllerPpiGuid;
+extern EFI_GUID  gEdkiiPeiNvmExpressHostControllerPpiGuid;
 
 #endif

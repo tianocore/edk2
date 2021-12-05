@@ -16,7 +16,7 @@
     0xcd3d0a05, 0x9e24, 0x437c, { 0xa8, 0x91, 0x1e, 0xe0, 0x53, 0xdb, 0x76, 0x38 } \
   }
 
-typedef struct _EDKII_VARIABLE_LOCK_PROTOCOL  EDKII_VARIABLE_LOCK_PROTOCOL;
+typedef struct _EDKII_VARIABLE_LOCK_PROTOCOL EDKII_VARIABLE_LOCK_PROTOCOL;
 
 /**
   Mark a variable that will become read-only after leaving the DXE phase of execution.
@@ -36,7 +36,7 @@ typedef struct _EDKII_VARIABLE_LOCK_PROTOCOL  EDKII_VARIABLE_LOCK_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_VARIABLE_LOCK_PROTOCOL_REQUEST_TO_LOCK) (
+(EFIAPI *EDKII_VARIABLE_LOCK_PROTOCOL_REQUEST_TO_LOCK)(
   IN CONST EDKII_VARIABLE_LOCK_PROTOCOL *This,
   IN       CHAR16                       *VariableName,
   IN       EFI_GUID                     *VendorGuid
@@ -48,10 +48,9 @@ EFI_STATUS
 /// EFI_END_OF_DXE_EVENT_GUID is signaled.
 ///
 struct _EDKII_VARIABLE_LOCK_PROTOCOL {
-  EDKII_VARIABLE_LOCK_PROTOCOL_REQUEST_TO_LOCK RequestToLock;
+  EDKII_VARIABLE_LOCK_PROTOCOL_REQUEST_TO_LOCK    RequestToLock;
 };
 
-extern EFI_GUID gEdkiiVariableLockProtocolGuid;
+extern EFI_GUID  gEdkiiVariableLockProtocolGuid;
 
 #endif
-

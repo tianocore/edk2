@@ -28,7 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 ///
 /// Forward declaration for the PEI_USB_IO_PPI.
 ///
-typedef struct _PEI_USB_IO_PPI  PEI_USB_IO_PPI;
+typedef struct _PEI_USB_IO_PPI PEI_USB_IO_PPI;
 
 /**
   Submits control transfer to a target USB device.
@@ -177,13 +177,13 @@ EFI_STATUS
 /// these interfaces.
 ///
 struct _PEI_USB_IO_PPI {
-  PEI_USB_CONTROL_TRANSFER          UsbControlTransfer;
-  PEI_USB_BULK_TRANSFER             UsbBulkTransfer;
-  PEI_USB_GET_INTERFACE_DESCRIPTOR  UsbGetInterfaceDescriptor;
-  PEI_USB_GET_ENDPOINT_DESCRIPTOR   UsbGetEndpointDescriptor;
-  PEI_USB_PORT_RESET                UsbPortReset;
+  PEI_USB_CONTROL_TRANSFER            UsbControlTransfer;
+  PEI_USB_BULK_TRANSFER               UsbBulkTransfer;
+  PEI_USB_GET_INTERFACE_DESCRIPTOR    UsbGetInterfaceDescriptor;
+  PEI_USB_GET_ENDPOINT_DESCRIPTOR     UsbGetEndpointDescriptor;
+  PEI_USB_PORT_RESET                  UsbPortReset;
 };
 
-extern EFI_GUID gPeiUsbIoPpiGuid;
+extern EFI_GUID  gPeiUsbIoPpiGuid;
 
 #endif

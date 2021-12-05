@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 UiCreateContinueMenu (
-  IN EFI_HII_HANDLE              HiiHandle,
-  IN VOID                        *StartOpCodeHandle
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN VOID            *StartOpCodeHandle
   );
 
 /**
@@ -31,8 +31,8 @@ UiCreateContinueMenu (
 **/
 VOID
 UiCreateEmptyLine (
-  IN EFI_HII_HANDLE              HiiHandle,
-  IN VOID                        *StartOpCodeHandle
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN VOID            *StartOpCodeHandle
   );
 
 /**
@@ -44,8 +44,8 @@ UiCreateEmptyLine (
 **/
 VOID
 UiCreateLanguageMenu (
-  IN EFI_HII_HANDLE              HiiHandle,
-  IN VOID                        *StartOpCodeHandle
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN VOID            *StartOpCodeHandle
   );
 
 /**
@@ -57,8 +57,8 @@ UiCreateLanguageMenu (
 **/
 VOID
 UiCreateResetMenu (
-  IN EFI_HII_HANDLE              HiiHandle,
-  IN VOID                        *StartOpCodeHandle
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN VOID            *StartOpCodeHandle
   );
 
 /**
@@ -77,7 +77,7 @@ BOOLEAN
   IN  CHAR16                   *DriverName,
   OUT CHAR16                   **NewName,
   OUT BOOLEAN                  *EmptyLineAfter
-);
+  );
 
 /**
   Search the drivers in the system which need to show in the front page
@@ -93,10 +93,10 @@ BOOLEAN
 **/
 EFI_STATUS
 UiListThirdPartyDrivers (
-  IN EFI_HII_HANDLE              HiiHandle,
-  IN EFI_GUID                    *ClassGuid,
-  IN DRIVER_SPECIAL_HANDLER      SpecialHandlerFn,
-  IN VOID                        *StartOpCodeHandle
+  IN EFI_HII_HANDLE          HiiHandle,
+  IN EFI_GUID                *ClassGuid,
+  IN DRIVER_SPECIAL_HANDLER  SpecialHandlerFn,
+  IN VOID                    *StartOpCodeHandle
   );
 
 /**
@@ -118,13 +118,13 @@ UiListThirdPartyDrivers (
 **/
 BOOLEAN
 UiSupportLibCallbackHandler (
-  IN  EFI_HII_HANDLE                         HiiHandle,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest,
-  OUT EFI_STATUS                             *Status
+  IN  EFI_HII_HANDLE              HiiHandle,
+  IN  EFI_BROWSER_ACTION          Action,
+  IN  EFI_QUESTION_ID             QuestionId,
+  IN  UINT8                       Type,
+  IN  EFI_IFR_TYPE_VALUE          *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest,
+  OUT EFI_STATUS                  *Status
   );
 
 #endif

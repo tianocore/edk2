@@ -29,7 +29,7 @@ typedef struct _EDKII_PLATFORM_BOOT_MANAGER_PROTOCOL EDKII_PLATFORM_BOOT_MANAGER
 //          All future revisions must be backwards compatible.
 //          If a future version is not back wards compatible it is not the same GUID.
 //
-#define EDKII_PLATFORM_BOOT_MANAGER_PROTOCOL_REVISION 0x00000001
+#define EDKII_PLATFORM_BOOT_MANAGER_PROTOCOL_REVISION  0x00000001
 
 //
 // Function Prototypes
@@ -65,7 +65,7 @@ typedef struct _EDKII_PLATFORM_BOOT_MANAGER_PROTOCOL EDKII_PLATFORM_BOOT_MANAGER
 */
 typedef
 EFI_STATUS
-(EFIAPI *PLATFORM_BOOT_MANAGER_REFRESH_ALL_BOOT_OPTIONS) (
+(EFIAPI *PLATFORM_BOOT_MANAGER_REFRESH_ALL_BOOT_OPTIONS)(
   IN  CONST EFI_BOOT_MANAGER_LOAD_OPTION *BootOptions,
   IN  CONST UINTN                        BootOptionsCount,
   OUT       EFI_BOOT_MANAGER_LOAD_OPTION **UpdatedBootOptions,
@@ -73,10 +73,10 @@ EFI_STATUS
   );
 
 struct _EDKII_PLATFORM_BOOT_MANAGER_PROTOCOL {
-  UINT64                                         Revision;
-  PLATFORM_BOOT_MANAGER_REFRESH_ALL_BOOT_OPTIONS RefreshAllBootOptions;
+  UINT64                                            Revision;
+  PLATFORM_BOOT_MANAGER_REFRESH_ALL_BOOT_OPTIONS    RefreshAllBootOptions;
 };
 
-extern EFI_GUID gEdkiiPlatformBootManagerProtocolGuid;
+extern EFI_GUID  gEdkiiPlatformBootManagerProtocolGuid;
 
 #endif /* __PLATFORM_BOOT_MANAGER_PROTOCOL_H__ */

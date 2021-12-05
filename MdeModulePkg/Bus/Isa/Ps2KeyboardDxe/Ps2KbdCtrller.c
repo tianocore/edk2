@@ -9,13 +9,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Ps2Keyboard.h"
 
 struct {
-  UINT8   ScanCode;             ///< follows value defined in Scan Code Set1
-  UINT16  EfiScanCode;
-  CHAR16  UnicodeChar;
-  CHAR16  ShiftUnicodeChar;
-}
-ConvertKeyboardScanCodeToEfiKey[] = {
-
+  UINT8     ScanCode;           ///< follows value defined in Scan Code Set1
+  UINT16    EfiScanCode;
+  CHAR16    UnicodeChar;
+  CHAR16    ShiftUnicodeChar;
+} ConvertKeyboardScanCodeToEfiKey[] = {
   {
     0x01,  //   Escape
     SCAN_ESC,
@@ -335,7 +333,7 @@ ConvertKeyboardScanCodeToEfiKey[] = {
     L'?'
   },
   {
-    0x36, //Right Shift
+    0x36, // Right Shift
     SCAN_NULL,
     0x0000,
     0x0000
@@ -347,7 +345,7 @@ ConvertKeyboardScanCodeToEfiKey[] = {
     L'*'
   },
   {
-    0x38,  //Left Alt/Extended Right Alt
+    0x38,  // Left Alt/Extended Right Alt
     SCAN_NULL,
     0x0000,
     0x0000
@@ -359,7 +357,7 @@ ConvertKeyboardScanCodeToEfiKey[] = {
     L' '
   },
   {
-    0x3A, //CapsLock
+    0x3A, // CapsLock
     SCAN_NULL,
     0x0000,
     0x0000
@@ -527,19 +525,19 @@ ConvertKeyboardScanCodeToEfiKey[] = {
     0x0000
   },
   {
-    0x5B,  //Left LOGO
+    0x5B,  // Left LOGO
     SCAN_NULL,
     0x0000,
     0x0000
   },
   {
-    0x5C,  //Right LOGO
+    0x5C,  // Right LOGO
     SCAN_NULL,
     0x0000,
     0x0000
   },
   {
-    0x5D,  //Menu key
+    0x5D,  // Menu key
     SCAN_NULL,
     0x0000,
     0x0000
@@ -557,9 +555,7 @@ ConvertKeyboardScanCodeToEfiKey[] = {
 //
 UINTN  mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
 
-BOOLEAN          mEnableMouseInterface;
-
-
+BOOLEAN  mEnableMouseInterface;
 
 /**
   Return the count of scancode in the queue.
@@ -570,7 +566,7 @@ BOOLEAN          mEnableMouseInterface;
 **/
 UINTN
 GetScancodeBufCount (
-  IN SCAN_CODE_QUEUE       *Queue
+  IN SCAN_CODE_QUEUE  *Queue
   )
 {
   if (Queue->Head <= Queue->Tail) {
@@ -594,13 +590,13 @@ GetScancodeBufCount (
 **/
 EFI_STATUS
 GetScancodeBufHead (
-  IN  SCAN_CODE_QUEUE        *Queue,
-  IN  UINTN                  Count,
-  OUT UINT8                  *Buf
+  IN  SCAN_CODE_QUEUE  *Queue,
+  IN  UINTN            Count,
+  OUT UINT8            *Buf
   )
 {
-  UINTN                      Index;
-  UINTN                      Pos;
+  UINTN  Index;
+  UINTN  Pos;
 
   //
   // check the valid range of parameter 'Count'
@@ -608,6 +604,7 @@ GetScancodeBufHead (
   if (GetScancodeBufCount (Queue) < Count) {
     return EFI_NOT_READY;
   }
+
   //
   // retrieve the values
   //
@@ -632,12 +629,12 @@ GetScancodeBufHead (
 **/
 EFI_STATUS
 PopScancodeBufHead (
-  IN  SCAN_CODE_QUEUE       *Queue,
-  IN  UINTN                 Count,
-  OUT UINT8                 *Buf OPTIONAL
+  IN  SCAN_CODE_QUEUE  *Queue,
+  IN  UINTN            Count,
+  OUT UINT8            *Buf OPTIONAL
   )
 {
-  UINTN                     Index;
+  UINTN  Index;
 
   //
   // Check the valid range of parameter 'Count'
@@ -645,6 +642,7 @@ PopScancodeBufHead (
   if (GetScancodeBufCount (Queue) < Count) {
     return EFI_NOT_READY;
   }
+
   //
   // Retrieve and remove the values
   //
@@ -665,8 +663,8 @@ PopScancodeBufHead (
 **/
 VOID
 PushScancodeBufTail (
-  IN  SCAN_CODE_QUEUE       *Queue,
-  IN  UINT8                 Scancode
+  IN  SCAN_CODE_QUEUE  *Queue,
+  IN  UINT8            Scancode
   )
 {
   if (GetScancodeBufCount (Queue) == KEYBOARD_SCAN_CODE_MAX_COUNT - 1) {
@@ -674,7 +672,7 @@ PushScancodeBufTail (
   }
 
   Queue->Buffer[Queue->Tail] = Scancode;
-  Queue->Tail = (Queue->Tail + 1) % KEYBOARD_SCAN_CODE_MAX_COUNT;
+  Queue->Tail                = (Queue->Tail + 1) % KEYBOARD_SCAN_CODE_MAX_COUNT;
 }
 
 /**
@@ -687,7 +685,7 @@ PushScancodeBufTail (
 **/
 UINT8
 KeyReadDataRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn
   )
 
 {
@@ -703,8 +701,8 @@ KeyReadDataRegister (
 **/
 VOID
 KeyWriteDataRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  IN UINT8                    Data
   )
 {
   IoWrite8 (ConsoleIn->DataRegisterAddress, Data);
@@ -720,7 +718,7 @@ KeyWriteDataRegister (
 **/
 UINT8
 KeyReadStatusRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn
   )
 {
   return IoRead8 (ConsoleIn->StatusRegisterAddress);
@@ -735,8 +733,8 @@ KeyReadStatusRegister (
 **/
 VOID
 KeyWriteCommandRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  IN UINT8                    Data
   )
 {
   IoWrite8 (ConsoleIn->CommandRegisterAddress, Data);
@@ -751,8 +749,8 @@ KeyWriteCommandRegister (
 **/
 VOID
 KeyboardError (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN CHAR16                  *ErrMsg
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  IN CHAR16                   *ErrMsg
   )
 {
   ConsoleIn->KeyboardErr = TRUE;
@@ -772,28 +770,28 @@ KeyboardError (
 VOID
 EFIAPI
 KeyboardTimerHandler (
-  IN EFI_EVENT    Event,
-  IN VOID         *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 
 {
-  UINT8                   Data;
-  EFI_TPL                 OldTpl;
-  KEYBOARD_CONSOLE_IN_DEV *ConsoleIn;
+  UINT8                    Data;
+  EFI_TPL                  OldTpl;
+  KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn;
 
-  ConsoleIn = (KEYBOARD_CONSOLE_IN_DEV *) Context;
+  ConsoleIn = (KEYBOARD_CONSOLE_IN_DEV *)Context;
 
   //
   // Enter critical section
   //
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
-  if (((KEYBOARD_CONSOLE_IN_DEV *) Context)->KeyboardErr) {
+  if (((KEYBOARD_CONSOLE_IN_DEV *)Context)->KeyboardErr) {
     //
     // Leave critical section and return
     //
     gBS->RestoreTPL (OldTpl);
-    return ;
+    return;
   }
 
   //
@@ -805,14 +803,16 @@ KeyboardTimerHandler (
   //
 
   while ((KeyReadStatusRegister (ConsoleIn) & (KEYBOARD_STATUS_REGISTER_TRANSMIT_TIMEOUT|KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA)) ==
-      KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA
-     ) {
+         KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA
+         )
+  {
     //
     // Read one byte of the scan code and store it into the memory buffer
     //
     Data = KeyReadDataRegister (ConsoleIn);
     PushScancodeBufTail (&ConsoleIn->ScancodeQueue, Data);
   }
+
   KeyGetchar (ConsoleIn);
 
   //
@@ -876,15 +876,15 @@ KeyboardRead (
 **/
 EFI_STATUS
 KeyboardWrite (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  IN UINT8                    Data
   )
 {
   UINT32  TimeOut;
   UINT32  RegEmptied;
 
-  TimeOut     = 0;
-  RegEmptied  = 0;
+  TimeOut    = 0;
+  RegEmptied = 0;
 
   //
   // wait for input buffer empty
@@ -901,6 +901,7 @@ KeyboardWrite (
   if (RegEmptied == 0) {
     return EFI_TIMEOUT;
   }
+
   //
   // Write it
   //
@@ -921,15 +922,15 @@ KeyboardWrite (
 **/
 EFI_STATUS
 KeyboardCommand (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Data
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  IN UINT8                    Data
   )
 {
   UINT32  TimeOut;
   UINT32  RegEmptied;
 
-  TimeOut     = 0;
-  RegEmptied  = 0;
+  TimeOut    = 0;
+  RegEmptied = 0;
 
   //
   // Wait For Input Buffer Empty
@@ -946,6 +947,7 @@ KeyboardCommand (
   if (RegEmptied == 0) {
     return EFI_TIMEOUT;
   }
+
   //
   // issue the command
   //
@@ -985,8 +987,8 @@ KeyboardCommand (
 **/
 EFI_STATUS
 KeyboardWaitForValue (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN UINT8                   Value
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  IN UINT8                    Value
   )
 {
   UINT8   Data;
@@ -994,9 +996,9 @@ KeyboardWaitForValue (
   UINT32  SumTimeOut;
   UINT32  GotIt;
 
-  GotIt       = 0;
-  TimeOut     = 0;
-  SumTimeOut  = 0;
+  GotIt      = 0;
+  TimeOut    = 0;
+  SumTimeOut = 0;
 
   //
   // Make sure the initial value of 'Data' is different from 'Value'
@@ -1005,6 +1007,7 @@ KeyboardWaitForValue (
   if (Data == Value) {
     Data = 1;
   }
+
   //
   // Read from 8042 (multiple times if needed)
   // until the expected value appears
@@ -1034,6 +1037,7 @@ KeyboardWaitForValue (
       break;
     }
   }
+
   //
   // Check results
   //
@@ -1042,7 +1046,6 @@ KeyboardWaitForValue (
   } else {
     return EFI_TIMEOUT;
   }
-
 }
 
 /**
@@ -1056,7 +1059,7 @@ KeyboardWaitForValue (
 **/
 EFI_STATUS
 UpdateStatusLights (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn
   )
 {
   EFI_STATUS  Status;
@@ -1106,28 +1109,28 @@ UpdateStatusLights (
 **/
 VOID
 InitializeKeyState (
-  IN  KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  OUT EFI_KEY_STATE           *KeyState
+  IN  KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  OUT EFI_KEY_STATE            *KeyState
   )
 {
-  KeyState->KeyShiftState  = EFI_SHIFT_STATE_VALID
-                           | (ConsoleIn->LeftCtrl   ? EFI_LEFT_CONTROL_PRESSED  : 0)
-                           | (ConsoleIn->RightCtrl  ? EFI_RIGHT_CONTROL_PRESSED : 0)
-                           | (ConsoleIn->LeftAlt    ? EFI_LEFT_ALT_PRESSED      : 0)
-                           | (ConsoleIn->RightAlt   ? EFI_RIGHT_ALT_PRESSED     : 0)
-                           | (ConsoleIn->LeftShift  ? EFI_LEFT_SHIFT_PRESSED    : 0)
-                           | (ConsoleIn->RightShift ? EFI_RIGHT_SHIFT_PRESSED   : 0)
-                           | (ConsoleIn->LeftLogo   ? EFI_LEFT_LOGO_PRESSED     : 0)
-                           | (ConsoleIn->RightLogo  ? EFI_RIGHT_LOGO_PRESSED    : 0)
-                           | (ConsoleIn->Menu       ? EFI_MENU_KEY_PRESSED      : 0)
-                           | (ConsoleIn->SysReq     ? EFI_SYS_REQ_PRESSED       : 0)
-                           ;
+  KeyState->KeyShiftState = EFI_SHIFT_STATE_VALID
+                            | (ConsoleIn->LeftCtrl   ? EFI_LEFT_CONTROL_PRESSED  : 0)
+                            | (ConsoleIn->RightCtrl  ? EFI_RIGHT_CONTROL_PRESSED : 0)
+                            | (ConsoleIn->LeftAlt    ? EFI_LEFT_ALT_PRESSED      : 0)
+                            | (ConsoleIn->RightAlt   ? EFI_RIGHT_ALT_PRESSED     : 0)
+                            | (ConsoleIn->LeftShift  ? EFI_LEFT_SHIFT_PRESSED    : 0)
+                            | (ConsoleIn->RightShift ? EFI_RIGHT_SHIFT_PRESSED   : 0)
+                            | (ConsoleIn->LeftLogo   ? EFI_LEFT_LOGO_PRESSED     : 0)
+                            | (ConsoleIn->RightLogo  ? EFI_RIGHT_LOGO_PRESSED    : 0)
+                            | (ConsoleIn->Menu       ? EFI_MENU_KEY_PRESSED      : 0)
+                            | (ConsoleIn->SysReq     ? EFI_SYS_REQ_PRESSED       : 0)
+  ;
   KeyState->KeyToggleState = EFI_TOGGLE_STATE_VALID
-                           | (ConsoleIn->CapsLock   ? EFI_CAPS_LOCK_ACTIVE :   0)
-                           | (ConsoleIn->NumLock    ? EFI_NUM_LOCK_ACTIVE :    0)
-                           | (ConsoleIn->ScrollLock ? EFI_SCROLL_LOCK_ACTIVE : 0)
-                           | (ConsoleIn->IsSupportPartialKey ? EFI_KEY_STATE_EXPOSED : 0)
-                           ;
+                             | (ConsoleIn->CapsLock   ? EFI_CAPS_LOCK_ACTIVE :   0)
+                             | (ConsoleIn->NumLock    ? EFI_NUM_LOCK_ACTIVE :    0)
+                             | (ConsoleIn->ScrollLock ? EFI_SCROLL_LOCK_ACTIVE : 0)
+                             | (ConsoleIn->IsSupportPartialKey ? EFI_KEY_STATE_EXPOSED : 0)
+  ;
 }
 
 /**
@@ -1140,7 +1143,7 @@ InitializeKeyState (
 **/
 VOID
 KeyGetchar (
-  IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  IN OUT KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn
   )
 {
   EFI_STATUS                     Status;
@@ -1154,8 +1157,8 @@ KeyGetchar (
   //
   // 3 bytes most
   //
-  UINT8                          ScancodeArr[3];
-  UINT32                         ScancodeArrPos;
+  UINT8   ScancodeArr[3];
+  UINT32  ScancodeArrPos;
 
   //
   // Check if there are enough bytes of scancode representing a single key
@@ -1165,32 +1168,33 @@ KeyGetchar (
     Extend0        = FALSE;
     Extend1        = FALSE;
     ScancodeArrPos = 0;
-    Status  = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, ScancodeArrPos + 1, ScancodeArr);
+    Status         = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, ScancodeArrPos + 1, ScancodeArr);
     if (EFI_ERROR (Status)) {
-      return ;
+      return;
     }
 
     if (ScancodeArr[ScancodeArrPos] == SCANCODE_EXTENDED0) {
       //
       // E0 to look ahead 2 bytes
       //
-      Extend0 = TRUE;
+      Extend0        = TRUE;
       ScancodeArrPos = 1;
       Status         = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, ScancodeArrPos + 1, ScancodeArr);
       if (EFI_ERROR (Status)) {
-        return ;
+        return;
       }
     } else if (ScancodeArr[ScancodeArrPos] == SCANCODE_EXTENDED1) {
       //
       // E1 to look ahead 3 bytes
       //
-      Extend1 = TRUE;
+      Extend1        = TRUE;
       ScancodeArrPos = 2;
       Status         = GetScancodeBufHead (&ConsoleIn->ScancodeQueue, ScancodeArrPos + 1, ScancodeArr);
       if (EFI_ERROR (Status)) {
-        return ;
+        return;
       }
     }
+
     //
     // if we reach this position, scancodes for a key is in buffer now,pop them
     //
@@ -1207,115 +1211,123 @@ KeyGetchar (
       // Check for special keys and update the driver state.
       //
       switch (ScanCode) {
+        case SCANCODE_CTRL_MAKE:
+          if (Extend0) {
+            ConsoleIn->RightCtrl = TRUE;
+          } else {
+            ConsoleIn->LeftCtrl = TRUE;
+          }
 
-      case SCANCODE_CTRL_MAKE:
-        if (Extend0) {
-          ConsoleIn->RightCtrl = TRUE;
-        } else {
-          ConsoleIn->LeftCtrl  = TRUE;
-        }
-        break;
-      case SCANCODE_CTRL_BREAK:
-        if (Extend0) {
-          ConsoleIn->RightCtrl = FALSE;
-        } else {
-          ConsoleIn->LeftCtrl  = FALSE;
-        }
-        break;
+          break;
+        case SCANCODE_CTRL_BREAK:
+          if (Extend0) {
+            ConsoleIn->RightCtrl = FALSE;
+          } else {
+            ConsoleIn->LeftCtrl = FALSE;
+          }
 
-      case SCANCODE_ALT_MAKE:
+          break;
+
+        case SCANCODE_ALT_MAKE:
           if (Extend0) {
             ConsoleIn->RightAlt = TRUE;
           } else {
-            ConsoleIn->LeftAlt  = TRUE;
+            ConsoleIn->LeftAlt = TRUE;
           }
-        break;
-      case SCANCODE_ALT_BREAK:
+
+          break;
+        case SCANCODE_ALT_BREAK:
           if (Extend0) {
             ConsoleIn->RightAlt = FALSE;
           } else {
-            ConsoleIn->LeftAlt  = FALSE;
+            ConsoleIn->LeftAlt = FALSE;
           }
-        break;
 
-      case SCANCODE_LEFT_SHIFT_MAKE:
-        //
-        // To avoid recognize PRNT_SCRN key as a L_SHIFT key
-        // because PRNT_SCRN key generates E0 followed by L_SHIFT scan code.
-        // If it the second byte of the PRNT_ScRN skip it.
-        //
-        if (!Extend0) {
-          ConsoleIn->LeftShift  = TRUE;
           break;
-        }
-        continue;
 
-      case SCANCODE_LEFT_SHIFT_BREAK:
-        if (!Extend0) {
-          ConsoleIn->LeftShift = FALSE;
-        }
-        break;
+        case SCANCODE_LEFT_SHIFT_MAKE:
+          //
+          // To avoid recognize PRNT_SCRN key as a L_SHIFT key
+          // because PRNT_SCRN key generates E0 followed by L_SHIFT scan code.
+          // If it the second byte of the PRNT_ScRN skip it.
+          //
+          if (!Extend0) {
+            ConsoleIn->LeftShift = TRUE;
+            break;
+          }
 
-      case SCANCODE_RIGHT_SHIFT_MAKE:
-        ConsoleIn->RightShift = TRUE;
-        break;
-      case SCANCODE_RIGHT_SHIFT_BREAK:
-        ConsoleIn->RightShift = FALSE;
-        break;
+          continue;
 
-      case SCANCODE_LEFT_LOGO_MAKE:
-        ConsoleIn->LeftLogo = TRUE;
-        break;
-      case SCANCODE_LEFT_LOGO_BREAK:
-        ConsoleIn->LeftLogo = FALSE;
-        break;
+        case SCANCODE_LEFT_SHIFT_BREAK:
+          if (!Extend0) {
+            ConsoleIn->LeftShift = FALSE;
+          }
 
-      case SCANCODE_RIGHT_LOGO_MAKE:
-        ConsoleIn->RightLogo = TRUE;
-        break;
-      case SCANCODE_RIGHT_LOGO_BREAK:
-        ConsoleIn->RightLogo = FALSE;
-        break;
+          break;
 
-      case SCANCODE_MENU_MAKE:
-        ConsoleIn->Menu = TRUE;
-        break;
-      case SCANCODE_MENU_BREAK:
-        ConsoleIn->Menu = FALSE;
-        break;
+        case SCANCODE_RIGHT_SHIFT_MAKE:
+          ConsoleIn->RightShift = TRUE;
+          break;
+        case SCANCODE_RIGHT_SHIFT_BREAK:
+          ConsoleIn->RightShift = FALSE;
+          break;
 
-      case SCANCODE_SYS_REQ_MAKE:
-        if (Extend0) {
+        case SCANCODE_LEFT_LOGO_MAKE:
+          ConsoleIn->LeftLogo = TRUE;
+          break;
+        case SCANCODE_LEFT_LOGO_BREAK:
+          ConsoleIn->LeftLogo = FALSE;
+          break;
+
+        case SCANCODE_RIGHT_LOGO_MAKE:
+          ConsoleIn->RightLogo = TRUE;
+          break;
+        case SCANCODE_RIGHT_LOGO_BREAK:
+          ConsoleIn->RightLogo = FALSE;
+          break;
+
+        case SCANCODE_MENU_MAKE:
+          ConsoleIn->Menu = TRUE;
+          break;
+        case SCANCODE_MENU_BREAK:
+          ConsoleIn->Menu = FALSE;
+          break;
+
+        case SCANCODE_SYS_REQ_MAKE:
+          if (Extend0) {
+            ConsoleIn->SysReq = TRUE;
+          }
+
+          break;
+        case SCANCODE_SYS_REQ_BREAK:
+          if (Extend0) {
+            ConsoleIn->SysReq = FALSE;
+          }
+
+          break;
+
+        case SCANCODE_SYS_REQ_MAKE_WITH_ALT:
           ConsoleIn->SysReq = TRUE;
-        }
-        break;
-      case SCANCODE_SYS_REQ_BREAK:
-        if (Extend0) {
+          break;
+        case SCANCODE_SYS_REQ_BREAK_WITH_ALT:
           ConsoleIn->SysReq = FALSE;
-        }
-        break;
+          break;
 
-      case SCANCODE_SYS_REQ_MAKE_WITH_ALT:
-        ConsoleIn->SysReq = TRUE;
-        break;
-      case SCANCODE_SYS_REQ_BREAK_WITH_ALT:
-        ConsoleIn->SysReq = FALSE;
-        break;
-
-      case SCANCODE_CAPS_LOCK_MAKE:
-        ConsoleIn->CapsLock = (BOOLEAN)!ConsoleIn->CapsLock;
-        UpdateStatusLights (ConsoleIn);
-        break;
-      case SCANCODE_NUM_LOCK_MAKE:
-        ConsoleIn->NumLock = (BOOLEAN)!ConsoleIn->NumLock;
-        UpdateStatusLights (ConsoleIn);
-        break;
-      case SCANCODE_SCROLL_LOCK_MAKE:
-        if (!Extend0) {
-          ConsoleIn->ScrollLock = (BOOLEAN)!ConsoleIn->ScrollLock;
+        case SCANCODE_CAPS_LOCK_MAKE:
+          ConsoleIn->CapsLock = (BOOLEAN) !ConsoleIn->CapsLock;
           UpdateStatusLights (ConsoleIn);
-        }
-        break;
+          break;
+        case SCANCODE_NUM_LOCK_MAKE:
+          ConsoleIn->NumLock = (BOOLEAN) !ConsoleIn->NumLock;
+          UpdateStatusLights (ConsoleIn);
+          break;
+        case SCANCODE_SCROLL_LOCK_MAKE:
+          if (!Extend0) {
+            ConsoleIn->ScrollLock = (BOOLEAN) !ConsoleIn->ScrollLock;
+            UpdateStatusLights (ConsoleIn);
+          }
+
+          break;
       }
     }
 
@@ -1333,9 +1345,10 @@ KeyGetchar (
   // Handle Ctrl+Alt+Del hotkey
   //
   if ((ConsoleIn->LeftCtrl || ConsoleIn->RightCtrl) &&
-      (ConsoleIn->LeftAlt  || ConsoleIn->RightAlt ) &&
-      ScanCode == SCANCODE_DELETE_MAKE
-     ) {
+      (ConsoleIn->LeftAlt  || ConsoleIn->RightAlt) &&
+      (ScanCode == SCANCODE_DELETE_MAKE)
+      )
+  {
     gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
   }
 
@@ -1349,34 +1362,34 @@ KeyGetchar (
   //
   // Key Pad "/" shares the same scancode as that of "/" except Key Pad "/" has E0 prefix
   //
-  if (Extend0 && ScanCode == 0x35) {
+  if (Extend0 && (ScanCode == 0x35)) {
     KeyData.Key.UnicodeChar = L'/';
     KeyData.Key.ScanCode    = SCAN_NULL;
 
-  //
-  // PAUSE shares the same scancode as that of NUM except PAUSE has E1 prefix
-  //
-  } else if (Extend1 && ScanCode == SCANCODE_NUM_LOCK_MAKE) {
+    //
+    // PAUSE shares the same scancode as that of NUM except PAUSE has E1 prefix
+    //
+  } else if (Extend1 && (ScanCode == SCANCODE_NUM_LOCK_MAKE)) {
     KeyData.Key.UnicodeChar = CHAR_NULL;
     KeyData.Key.ScanCode    = SCAN_PAUSE;
 
-  //
-  // PAUSE shares the same scancode as that of SCROLL except PAUSE (CTRL pressed) has E0 prefix
-  //
-  } else if (Extend0 && ScanCode == SCANCODE_SCROLL_LOCK_MAKE) {
+    //
+    // PAUSE shares the same scancode as that of SCROLL except PAUSE (CTRL pressed) has E0 prefix
+    //
+  } else if (Extend0 && (ScanCode == SCANCODE_SCROLL_LOCK_MAKE)) {
     KeyData.Key.UnicodeChar = CHAR_NULL;
     KeyData.Key.ScanCode    = SCAN_PAUSE;
 
-  //
-  // PRNT_SCRN shares the same scancode as that of Key Pad "*" except PRNT_SCRN has E0 prefix
-  //
-  } else if (Extend0 && ScanCode == SCANCODE_SYS_REQ_MAKE) {
+    //
+    // PRNT_SCRN shares the same scancode as that of Key Pad "*" except PRNT_SCRN has E0 prefix
+    //
+  } else if (Extend0 && (ScanCode == SCANCODE_SYS_REQ_MAKE)) {
     KeyData.Key.UnicodeChar = CHAR_NULL;
     KeyData.Key.ScanCode    = SCAN_NULL;
 
-  //
-  // Except the above special case, all others can be handled by convert table
-  //
+    //
+    // Except the above special case, all others can be handled by convert table
+    //
   } else {
     for (Index = 0; ConvertKeyboardScanCodeToEfiKey[Index].ScanCode != TABLE_END; Index++) {
       if (ScanCode == ConvertKeyboardScanCodeToEfiKey[Index].ScanCode) {
@@ -1384,7 +1397,8 @@ KeyGetchar (
         KeyData.Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].UnicodeChar;
 
         if ((ConsoleIn->LeftShift || ConsoleIn->RightShift) &&
-            (ConvertKeyboardScanCodeToEfiKey[Index].UnicodeChar != ConvertKeyboardScanCodeToEfiKey[Index].ShiftUnicodeChar)) {
+            (ConvertKeyboardScanCodeToEfiKey[Index].UnicodeChar != ConvertKeyboardScanCodeToEfiKey[Index].ShiftUnicodeChar))
+        {
           KeyData.Key.UnicodeChar = ConvertKeyboardScanCodeToEfiKey[Index].ShiftUnicodeChar;
           //
           // Need not return associated shift state if a class of printable characters that
@@ -1392,16 +1406,18 @@ KeyGetchar (
           //
           KeyData.KeyState.KeyShiftState &= ~(EFI_LEFT_SHIFT_PRESSED | EFI_RIGHT_SHIFT_PRESSED);
         }
+
         //
         // alphabetic key is affected by CapsLock State
         //
         if (ConsoleIn->CapsLock) {
-          if (KeyData.Key.UnicodeChar >= L'a' && KeyData.Key.UnicodeChar <= L'z') {
-            KeyData.Key.UnicodeChar = (UINT16) (KeyData.Key.UnicodeChar - L'a' + L'A');
-          } else if (KeyData.Key.UnicodeChar >= L'A' && KeyData.Key.UnicodeChar <= L'Z') {
-            KeyData.Key.UnicodeChar = (UINT16) (KeyData.Key.UnicodeChar - L'A' + L'a');
+          if ((KeyData.Key.UnicodeChar >= L'a') && (KeyData.Key.UnicodeChar <= L'z')) {
+            KeyData.Key.UnicodeChar = (UINT16)(KeyData.Key.UnicodeChar - L'a' + L'A');
+          } else if ((KeyData.Key.UnicodeChar >= L'A') && (KeyData.Key.UnicodeChar <= L'Z')) {
+            KeyData.Key.UnicodeChar = (UINT16)(KeyData.Key.UnicodeChar - L'A' + L'a');
           }
         }
+
         break;
       }
     }
@@ -1410,10 +1426,10 @@ KeyGetchar (
   //
   // distinguish numeric key pad keys' 'up symbol' and 'down symbol'
   //
-  if (ScanCode >= 0x47 && ScanCode <= 0x53) {
+  if ((ScanCode >= 0x47) && (ScanCode <= 0x53)) {
     if (ConsoleIn->NumLock && !(ConsoleIn->LeftShift || ConsoleIn->RightShift) && !Extend0) {
       KeyData.Key.ScanCode = SCAN_NULL;
-    } else if (ScanCode != 0x4a && ScanCode != 0x4e) {
+    } else if ((ScanCode != 0x4a) && (ScanCode != 0x4e)) {
       KeyData.Key.UnicodeChar = CHAR_NULL;
     }
   }
@@ -1421,9 +1437,9 @@ KeyGetchar (
   //
   // If the key can not be converted then just return.
   //
-  if (KeyData.Key.ScanCode == SCAN_NULL && KeyData.Key.UnicodeChar == CHAR_NULL) {
+  if ((KeyData.Key.ScanCode == SCAN_NULL) && (KeyData.Key.UnicodeChar == CHAR_NULL)) {
     if (!ConsoleIn->IsSupportPartialKey) {
-      return ;
+      return;
     }
   }
 
@@ -1465,28 +1481,28 @@ KeyGetchar (
 **/
 EFI_STATUS
 InitKeyboard (
-  IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN BOOLEAN                     ExtendedVerification
+  IN OUT KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  IN BOOLEAN                      ExtendedVerification
   )
 {
-  EFI_STATUS              Status;
-  EFI_STATUS              Status1;
-  UINT8                   CommandByte;
-  EFI_PS2_POLICY_PROTOCOL *Ps2Policy;
-  UINT32                  TryTime;
+  EFI_STATUS               Status;
+  EFI_STATUS               Status1;
+  UINT8                    CommandByte;
+  EFI_PS2_POLICY_PROTOCOL  *Ps2Policy;
+  UINT32                   TryTime;
 
-  Status                 = EFI_SUCCESS;
-  mEnableMouseInterface  = TRUE;
-  TryTime                = 0;
+  Status                = EFI_SUCCESS;
+  mEnableMouseInterface = TRUE;
+  TryTime               = 0;
 
   //
   // Get Ps2 policy to set this
   //
   gBS->LocateProtocol (
-        &gEfiPs2PolicyProtocolGuid,
-        NULL,
-        (VOID **) &Ps2Policy
-        );
+         &gEfiPs2PolicyProtocolGuid,
+         NULL,
+         (VOID **)&Ps2Policy
+         );
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
@@ -1501,8 +1517,9 @@ InitKeyboard (
   if ((KeyReadStatusRegister (ConsoleIn) & KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA) != 0) {
     while (!EFI_ERROR (Status) && TryTime < KEYBOARD_MAX_TRY) {
       Status = KeyboardRead (ConsoleIn, &CommandByte);
-      TryTime ++;
+      TryTime++;
     }
+
     //
     // Exceed the max try times. The device may be error.
     //
@@ -1511,6 +1528,7 @@ InitKeyboard (
       goto Done;
     }
   }
+
   //
   // We should disable mouse interface during the initialization process
   // since mouse device output could block keyboard device output in the
@@ -1544,6 +1562,7 @@ InitKeyboard (
         KeyboardError (ConsoleIn, L"\n\r");
         goto Done;
       }
+
       //
       // Test the mouse enabling bit
       //
@@ -1597,16 +1616,17 @@ InitKeyboard (
         goto Done;
       }
     }
+
     //
     // Don't enable mouse interface later
     //
     mEnableMouseInterface = FALSE;
-
   }
 
   if (Ps2Policy != NULL) {
     Ps2Policy->Ps2InitHardware (ConsoleIn->Handle);
   }
+
   //
   // Write 8042 Command Byte, set System Flag
   // While at the same time:
@@ -1640,10 +1660,10 @@ InitKeyboard (
   //
   // Clear Memory Scancode Buffer
   //
-  ConsoleIn->ScancodeQueue.Head = 0;
-  ConsoleIn->ScancodeQueue.Tail = 0;
-  ConsoleIn->EfiKeyQueue.Head   = 0;
-  ConsoleIn->EfiKeyQueue.Tail   = 0;
+  ConsoleIn->ScancodeQueue.Head        = 0;
+  ConsoleIn->ScancodeQueue.Tail        = 0;
+  ConsoleIn->EfiKeyQueue.Head          = 0;
+  ConsoleIn->EfiKeyQueue.Tail          = 0;
   ConsoleIn->EfiKeyQueueForNotify.Head = 0;
   ConsoleIn->EfiKeyQueueForNotify.Tail = 0;
 
@@ -1692,6 +1712,7 @@ InitKeyboard (
         );
       goto Done;
     }
+
     //
     // Keyboard reset with a BAT(Basic Assurance Test)
     //
@@ -1706,12 +1727,13 @@ InitKeyboard (
       KeyboardError (ConsoleIn, L"Some specific value not acquired from 8042 controller!\n\r");
       goto Done;
     }
+
     //
     // wait for BAT completion code
     //
-    mWaitForValueTimeOut  = KEYBOARD_BAT_TIMEOUT;
+    mWaitForValueTimeOut = KEYBOARD_BAT_TIMEOUT;
 
-    Status                = KeyboardWaitForValue (ConsoleIn, KEYBOARD_8048_RETURN_8042_BAT_SUCCESS);
+    Status = KeyboardWaitForValue (ConsoleIn, KEYBOARD_8048_RETURN_8042_BAT_SUCCESS);
     if (EFI_ERROR (Status)) {
       KeyboardError (ConsoleIn, L"Keyboard self test failed!\n\r");
       goto Done;
@@ -1746,43 +1768,46 @@ InitKeyboard (
       goto Done;
     }
 
-  //
-  // Clear Keyboard Scancode Buffer
-  //
-  Status = KeyboardWrite (ConsoleIn, KEYBOARD_8048_COMMAND_CLEAR_OUTPUT_DATA);
-  if (EFI_ERROR (Status)) {
-    KeyboardError (ConsoleIn, L"8042 controller data write error!\n\r");
-    goto Done;
-  }
-
-  Status = KeyboardWaitForValue (ConsoleIn, KEYBOARD_8048_RETURN_8042_ACK);
-  if (EFI_ERROR (Status)) {
-    KeyboardError (ConsoleIn, L"Some specific value not acquired from 8042 controller!\n\r");
-    goto Done;
-  }
-  //
-  if (Ps2Policy != NULL) {
-    if ((Ps2Policy->KeyboardLight & EFI_KEYBOARD_CAPSLOCK) == EFI_KEYBOARD_CAPSLOCK) {
-      ConsoleIn->CapsLock = TRUE;
+    //
+    // Clear Keyboard Scancode Buffer
+    //
+    Status = KeyboardWrite (ConsoleIn, KEYBOARD_8048_COMMAND_CLEAR_OUTPUT_DATA);
+    if (EFI_ERROR (Status)) {
+      KeyboardError (ConsoleIn, L"8042 controller data write error!\n\r");
+      goto Done;
     }
 
-    if ((Ps2Policy->KeyboardLight & EFI_KEYBOARD_NUMLOCK) == EFI_KEYBOARD_NUMLOCK) {
-      ConsoleIn->NumLock = TRUE;
+    Status = KeyboardWaitForValue (ConsoleIn, KEYBOARD_8048_RETURN_8042_ACK);
+    if (EFI_ERROR (Status)) {
+      KeyboardError (ConsoleIn, L"Some specific value not acquired from 8042 controller!\n\r");
+      goto Done;
     }
 
-    if ((Ps2Policy->KeyboardLight & EFI_KEYBOARD_SCROLLLOCK) == EFI_KEYBOARD_SCROLLLOCK) {
-      ConsoleIn->ScrollLock = TRUE;
+    //
+    if (Ps2Policy != NULL) {
+      if ((Ps2Policy->KeyboardLight & EFI_KEYBOARD_CAPSLOCK) == EFI_KEYBOARD_CAPSLOCK) {
+        ConsoleIn->CapsLock = TRUE;
+      }
+
+      if ((Ps2Policy->KeyboardLight & EFI_KEYBOARD_NUMLOCK) == EFI_KEYBOARD_NUMLOCK) {
+        ConsoleIn->NumLock = TRUE;
+      }
+
+      if ((Ps2Policy->KeyboardLight & EFI_KEYBOARD_SCROLLLOCK) == EFI_KEYBOARD_SCROLLLOCK) {
+        ConsoleIn->ScrollLock = TRUE;
+      }
+    }
+
+    //
+    // Update Keyboard Lights
+    //
+    Status = UpdateStatusLights (ConsoleIn);
+    if (EFI_ERROR (Status)) {
+      KeyboardError (ConsoleIn, L"Update keyboard status lights error!\n\r");
+      goto Done;
     }
   }
-  //
-  // Update Keyboard Lights
-  //
-  Status = UpdateStatusLights (ConsoleIn);
-  if (EFI_ERROR (Status)) {
-    KeyboardError (ConsoleIn, L"Update keyboard status lights error!\n\r");
-    goto Done;
-    }
-  }
+
   //
   // At last, we can now enable the mouse interface if appropriate
   //
@@ -1804,9 +1829,7 @@ Done:
   } else {
     return EFI_DEVICE_ERROR;
   }
-
 }
-
 
 /**
   Check whether there is Ps/2 Keyboard device in system by 0xF4 Keyboard Command
@@ -1821,11 +1844,11 @@ Done:
 BOOLEAN
 EFIAPI
 CheckKeyboardConnect (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn
   )
 {
-  EFI_STATUS     Status;
-  UINTN          WaitForValueTimeOutBcakup;
+  EFI_STATUS  Status;
+  UINTN       WaitForValueTimeOutBcakup;
 
   //
   // enable keyboard itself and wait for its ack
@@ -1840,15 +1863,16 @@ CheckKeyboardConnect (
     if (EFI_ERROR (Status)) {
       return FALSE;
     }
+
     //
     // wait for 1s
     //
     WaitForValueTimeOutBcakup = mWaitForValueTimeOut;
-    mWaitForValueTimeOut = KEYBOARD_WAITFORVALUE_TIMEOUT;
-    Status = KeyboardWaitForValue (
-               ConsoleIn,
-               KEYBOARD_CMDECHO_ACK
-               );
+    mWaitForValueTimeOut      = KEYBOARD_WAITFORVALUE_TIMEOUT;
+    Status                    = KeyboardWaitForValue (
+                                  ConsoleIn,
+                                  KEYBOARD_CMDECHO_ACK
+                                  );
     mWaitForValueTimeOut = WaitForValueTimeOutBcakup;
 
     if (EFI_ERROR (Status)) {
@@ -1860,4 +1884,3 @@ CheckKeyboardConnect (
     return TRUE;
   }
 }
-

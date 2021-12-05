@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _PI_SMM_COMMUNICATION_REGION_TABLE_H_
 #define _PI_SMM_COMMUNICATION_REGION_TABLE_H_
 
-#define EDKII_PI_SMM_COMMUNICATION_REGION_TABLE_GUID {\
+#define EDKII_PI_SMM_COMMUNICATION_REGION_TABLE_GUID  {\
   0x4e28ca50, 0xd582, 0x44ac, {0xa1, 0x1f, 0xe3, 0xd5, 0x65, 0x26, 0xdb, 0x34} \
 }
 
@@ -43,15 +43,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // to get SMM profile data in SMM.
 //
 typedef struct {
-  UINT32                Version;
-  UINT32                NumberOfEntries;
-  UINT32                DescriptorSize;
-  UINT32                Reserved;
-//EFI_MEMORY_DESCRIPTOR Entry[1];
+  UINT32    Version;
+  UINT32    NumberOfEntries;
+  UINT32    DescriptorSize;
+  UINT32    Reserved;
+  // EFI_MEMORY_DESCRIPTOR Entry[1];
 } EDKII_PI_SMM_COMMUNICATION_REGION_TABLE;
 
 #define EDKII_PI_SMM_COMMUNICATION_REGION_TABLE_VERSION  0x00000001
 
-extern EFI_GUID gEdkiiPiSmmCommunicationRegionTableGuid;
+extern EFI_GUID  gEdkiiPiSmmCommunicationRegionTableGuid;
 
 #endif

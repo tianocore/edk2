@@ -52,7 +52,7 @@ EbcDebuggerHookUnload (
 **/
 VOID
 EbcDebuggerHookEbcUnloadImage (
-  IN EFI_HANDLE                  Handle
+  IN EFI_HANDLE  Handle
   )
 {
   return;
@@ -67,7 +67,7 @@ EbcDebuggerHookEbcUnloadImage (
 **/
 VOID
 EbcDebuggerHookExecuteEbcImageEntryPoint (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -82,7 +82,7 @@ EbcDebuggerHookExecuteEbcImageEntryPoint (
 **/
 VOID
 EbcDebuggerHookEbcInterpret (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -96,7 +96,7 @@ EbcDebuggerHookEbcInterpret (
 **/
 VOID
 EbcDebuggerHookExecuteStart (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -110,7 +110,7 @@ EbcDebuggerHookExecuteStart (
 **/
 VOID
 EbcDebuggerHookExecuteEnd (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -125,7 +125,7 @@ EbcDebuggerHookExecuteEnd (
 **/
 VOID
 EbcDebuggerHookCALLStart (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -140,7 +140,7 @@ EbcDebuggerHookCALLStart (
 **/
 VOID
 EbcDebuggerHookCALLEnd (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -155,7 +155,7 @@ EbcDebuggerHookCALLEnd (
 **/
 VOID
 EbcDebuggerHookCALLEXStart (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -170,7 +170,7 @@ EbcDebuggerHookCALLEXStart (
 **/
 VOID
 EbcDebuggerHookCALLEXEnd (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -185,7 +185,7 @@ EbcDebuggerHookCALLEXEnd (
 **/
 VOID
 EbcDebuggerHookRETStart (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -200,7 +200,7 @@ EbcDebuggerHookRETStart (
 **/
 VOID
 EbcDebuggerHookRETEnd (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -215,7 +215,7 @@ EbcDebuggerHookRETEnd (
 **/
 VOID
 EbcDebuggerHookJMPStart (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -230,7 +230,7 @@ EbcDebuggerHookJMPStart (
 **/
 VOID
 EbcDebuggerHookJMPEnd (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -245,7 +245,7 @@ EbcDebuggerHookJMPEnd (
 **/
 VOID
 EbcDebuggerHookJMP8Start (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;
@@ -260,7 +260,7 @@ EbcDebuggerHookJMP8Start (
 **/
 VOID
 EbcDebuggerHookJMP8End (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   return;

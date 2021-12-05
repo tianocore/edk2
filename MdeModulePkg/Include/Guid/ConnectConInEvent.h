@@ -13,6 +13,6 @@
 #define CONNECT_CONIN_EVENT_GUID \
     { 0xdb4e8151, 0x57ed, 0x4bed, { 0x88, 0x33, 0x67, 0x51, 0xb5, 0xd1, 0xa8, 0xd7 }}
 
-extern EFI_GUID gConnectConInEventGuid;
+extern EFI_GUID  gConnectConInEventGuid;
 
 #endif

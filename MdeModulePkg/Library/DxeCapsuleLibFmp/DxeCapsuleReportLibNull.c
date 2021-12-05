@@ -24,8 +24,8 @@
 **/
 EFI_STATUS
 RecordCapsuleStatusVariable (
-  IN EFI_CAPSULE_HEADER                           *CapsuleHeader,
-  IN EFI_STATUS                                   CapsuleStatus
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  IN EFI_STATUS          CapsuleStatus
   )
 {
   return EFI_UNSUPPORTED;

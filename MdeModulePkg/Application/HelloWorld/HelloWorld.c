@@ -20,7 +20,7 @@
 // the resource section. Thus the application can use '-?' option to show help message in
 // Shell.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringHelpTokenId = STRING_TOKEN (STR_HELLO_WORLD_HELP_INFORMATION);
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID  mStringHelpTokenId = STRING_TOKEN (STR_HELLO_WORLD_HELP_INFORMATION);
 
 /**
   The user Entry Point for Application. The user code starts with this function
@@ -40,7 +40,7 @@ UefiMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINT32 Index;
+  UINT32  Index;
 
   Index = 0;
 
@@ -48,11 +48,11 @@ UefiMain (
   // Three PCD type (FeatureFlag, UINT32 and String) are used as the sample.
   //
   if (FeaturePcdGet (PcdHelloWorldPrintEnable)) {
-    for (Index = 0; Index < PcdGet32 (PcdHelloWorldPrintTimes); Index ++) {
+    for (Index = 0; Index < PcdGet32 (PcdHelloWorldPrintTimes); Index++) {
       //
       // Use UefiLib Print API to print string to UEFI console
       //
-      Print ((CHAR16*)PcdGetPtr (PcdHelloWorldPrintString));
+      Print ((CHAR16 *)PcdGetPtr (PcdHelloWorldPrintString));
     }
   }
 
