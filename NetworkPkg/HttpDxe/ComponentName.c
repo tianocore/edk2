@@ -15,8 +15,8 @@
 ///
 GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_COMPONENT_NAME_PROTOCOL  gHttpDxeComponentName = {
-  (EFI_COMPONENT_NAME_GET_DRIVER_NAME)     HttpDxeComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME_GET_CONTROLLER_NAME) HttpDxeComponentNameGetControllerName,
+  (EFI_COMPONENT_NAME_GET_DRIVER_NAME)HttpDxeComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME_GET_CONTROLLER_NAME)HttpDxeComponentNameGetControllerName,
   "eng"
 };
 
@@ -34,9 +34,9 @@ EFI_COMPONENT_NAME2_PROTOCOL  gHttpDxeComponentName2 = {
 /// Table of driver names
 ///
 GLOBAL_REMOVE_IF_UNREFERENCED
-EFI_UNICODE_STRING_TABLE mHttpDxeDriverNameTable[] = {
-  { "eng;en", (CHAR16 *) L"HttpDxe" },
-  { NULL, NULL }
+EFI_UNICODE_STRING_TABLE  mHttpDxeDriverNameTable[] = {
+  { "eng;en", (CHAR16 *)L"HttpDxe" },
+  { NULL,     NULL                 }
 };
 
 /**

@@ -18,9 +18,8 @@
 #define PXE_MTFTP_OPTION_MAXIMUM_INDEX     5
 #define PXE_MTFTP_OPTBUF_MAXNUM_INDEX      128
 
-#define PXE_MTFTP_ERROR_STRING_LENGTH      127   // refer to definition of struct EFI_PXE_BASE_CODE_TFTP_ERROR.
-#define PXE_MTFTP_DEFAULT_BLOCK_SIZE       512   // refer to rfc-1350.
-
+#define PXE_MTFTP_ERROR_STRING_LENGTH  127       // refer to definition of struct EFI_PXE_BASE_CODE_TFTP_ERROR.
+#define PXE_MTFTP_DEFAULT_BLOCK_SIZE   512       // refer to rfc-1350.
 
 /**
   This function is wrapper to get the file size using TFTP.
@@ -40,14 +39,13 @@
 **/
 EFI_STATUS
 PxeBcTftpGetFileSize (
-  IN     PXEBC_PRIVATE_DATA         *Private,
-  IN     VOID                       *Config,
-  IN     UINT8                      *Filename,
-  IN     UINTN                      *BlockSize,
-  IN     UINTN                      *WindowSize,
-  IN OUT UINT64                     *BufferSize
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN     VOID                *Config,
+  IN     UINT8               *Filename,
+  IN     UINTN               *BlockSize,
+  IN     UINTN               *WindowSize,
+  IN OUT UINT64              *BufferSize
   );
-
 
 /**
   This function is a wrapper to get a file using TFTP.
@@ -68,16 +66,15 @@ PxeBcTftpGetFileSize (
 **/
 EFI_STATUS
 PxeBcTftpReadFile (
-  IN     PXEBC_PRIVATE_DATA         *Private,
-  IN     VOID                       *Config,
-  IN     UINT8                      *Filename,
-  IN     UINTN                      *BlockSize,
-  IN     UINTN                      *WindowSize,
-  IN     UINT8                      *BufferPtr,
-  IN OUT UINT64                     *BufferSize,
-  IN     BOOLEAN                    DontUseBuffer
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN     VOID                *Config,
+  IN     UINT8               *Filename,
+  IN     UINTN               *BlockSize,
+  IN     UINTN               *WindowSize,
+  IN     UINT8               *BufferPtr,
+  IN OUT UINT64              *BufferSize,
+  IN     BOOLEAN             DontUseBuffer
   );
-
 
 /**
   This function is a wrapper to put file with TFTP.
@@ -97,15 +94,14 @@ PxeBcTftpReadFile (
 **/
 EFI_STATUS
 PxeBcTftpWriteFile (
-  IN     PXEBC_PRIVATE_DATA         *Private,
-  IN     VOID                       *Config,
-  IN     UINT8                      *Filename,
-  IN     BOOLEAN                    Overwrite,
-  IN     UINTN                      *BlockSize,
-  IN     UINT8                      *BufferPtr,
-  IN OUT UINT64                     *BufferSize
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN     VOID                *Config,
+  IN     UINT8               *Filename,
+  IN     BOOLEAN             Overwrite,
+  IN     UINTN               *BlockSize,
+  IN     UINT8               *BufferPtr,
+  IN OUT UINT64              *BufferSize
   );
-
 
 /**
   This function is a wrapper to get the data (file) from a directory using TFTP.
@@ -126,13 +122,14 @@ PxeBcTftpWriteFile (
 **/
 EFI_STATUS
 PxeBcTftpReadDirectory (
-  IN     PXEBC_PRIVATE_DATA            *Private,
-  IN     VOID                          *Config,
-  IN     UINT8                         *Filename,
-  IN     UINTN                         *BlockSize,
-  IN     UINTN                         *WindowSize,
-  IN     UINT8                         *BufferPtr,
-  IN OUT UINT64                        *BufferSize,
-  IN     BOOLEAN                       DontUseBuffer
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN     VOID                *Config,
+  IN     UINT8               *Filename,
+  IN     UINTN               *BlockSize,
+  IN     UINTN               *WindowSize,
+  IN     UINT8               *BufferPtr,
+  IN OUT UINT64              *BufferSize,
+  IN     BOOLEAN             DontUseBuffer
   );
+
 #endif

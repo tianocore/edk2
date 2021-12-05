@@ -24,9 +24,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0x46ddb415, 0x5244, 0x49c7, { 0x93, 0x74, 0xf0, 0xe2, 0x98, 0xe7, 0xd3, 0x86 } \
   }
 
-#define EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE       L"HttpTlsCipherList"
+#define EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE  L"HttpTlsCipherList"
 
-extern EFI_GUID gEdkiiHttpTlsCipherListGuid;
+extern EFI_GUID  gEdkiiHttpTlsCipherListGuid;
 
 #endif
-

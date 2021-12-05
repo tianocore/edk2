@@ -24,17 +24,17 @@
 #include <Library/UefiLib.h>
 #include <Library/DpcLib.h>
 
-#define SOCK_SND_BUF        0
-#define SOCK_RCV_BUF        1
+#define SOCK_SND_BUF  0
+#define SOCK_RCV_BUF  1
 
-#define SOCK_BUFF_LOW_WATER (2 * 1024)
-#define SOCK_RCV_BUFF_SIZE  (8 * 1024)
-#define SOCK_SND_BUFF_SIZE  (8 * 1024)
-#define SOCK_BACKLOG        5
+#define SOCK_BUFF_LOW_WATER  (2 * 1024)
+#define SOCK_RCV_BUFF_SIZE   (8 * 1024)
+#define SOCK_SND_BUFF_SIZE   (8 * 1024)
+#define SOCK_BACKLOG         5
 
 #define PROTO_RESERVED_LEN  20
 
-#define SO_NO_MORE_DATA     0x0001
+#define SO_NO_MORE_DATA  0x0001
 
 //
 //
@@ -61,11 +61,11 @@
 ///
 /// Socket state
 ///
-#define SO_CLOSED        0
-#define SO_LISTENING     1
-#define SO_CONNECTING    2
-#define SO_CONNECTED     3
-#define SO_DISCONNECTING 4
+#define SO_CLOSED         0
+#define SO_LISTENING      1
+#define SO_CONNECTING     2
+#define SO_CONNECTED      3
+#define SO_DISCONNECTING  4
 
 ///
 /// Socket configure state
@@ -100,7 +100,7 @@
   @param[in] Sock            Pointer to the socket
 
 **/
-#define SOCK_NO_MORE_DATA(Sock)     ((Sock)->Flag |= SO_NO_MORE_DATA)
+#define SOCK_NO_MORE_DATA(Sock)  ((Sock)->Flag |= SO_NO_MORE_DATA)
 
 /**
   Check whether the socket is unconfigured.
@@ -135,7 +135,7 @@
   @retval FALSE              The socket is not configured to active mode.
 
 **/
-#define SOCK_IS_CONFIGURED_ACTIVE(Sock) ((Sock)->ConfigureState == SO_CONFIGURED_ACTIVE)
+#define SOCK_IS_CONFIGURED_ACTIVE(Sock)  ((Sock)->ConfigureState == SO_CONFIGURED_ACTIVE)
 
 /**
   Check whether the socket is configured to passive mode.
@@ -146,7 +146,7 @@
   @retval FALSE              The socket is not configured to passive mode.
 
 **/
-#define SOCK_IS_CONNECTED_PASSIVE(Sock) ((Sock)->ConfigureState == SO_CONFIGURED_PASSIVE)
+#define SOCK_IS_CONNECTED_PASSIVE(Sock)  ((Sock)->ConfigureState == SO_CONFIGURED_PASSIVE)
 
 /**
   Check whether the socket is mapped.
@@ -168,7 +168,7 @@
   @retval FALSE              The socket is not closed.
 
 **/
-#define SOCK_IS_CLOSED(Sock)          ((Sock)->State == SO_CLOSED)
+#define SOCK_IS_CLOSED(Sock)  ((Sock)->State == SO_CLOSED)
 
 /**
   Check whether the socket is listening.
@@ -179,7 +179,7 @@
   @retval FALSE              The socket is not listening.
 
 **/
-#define SOCK_IS_LISTENING(Sock)       ((Sock)->State == SO_LISTENING)
+#define SOCK_IS_LISTENING(Sock)  ((Sock)->State == SO_LISTENING)
 
 /**
   Check whether the socket is connecting.
@@ -190,7 +190,7 @@
   @retval FALSE              The socket is not connecting.
 
 **/
-#define SOCK_IS_CONNECTING(Sock)      ((Sock)->State == SO_CONNECTING)
+#define SOCK_IS_CONNECTING(Sock)  ((Sock)->State == SO_CONNECTING)
 
 /**
   Check whether the socket has connected.
@@ -201,7 +201,7 @@
   @retval FALSE              The socket has not connected.
 
 **/
-#define SOCK_IS_CONNECTED(Sock)       ((Sock)->State == SO_CONNECTED)
+#define SOCK_IS_CONNECTED(Sock)  ((Sock)->State == SO_CONNECTED)
 
 /**
   Check whether the socket is disconnecting.
@@ -212,7 +212,7 @@
   @retval FALSE              The socket is not disconnecting.
 
 **/
-#define SOCK_IS_DISCONNECTING(Sock)   ((Sock)->State == SO_DISCONNECTING)
+#define SOCK_IS_DISCONNECTING(Sock)  ((Sock)->State == SO_DISCONNECTING)
 
 /**
   Check whether the socket is no more data.
@@ -223,7 +223,7 @@
   @retval FALSE              The socket still has data.
 
 **/
-#define SOCK_IS_NO_MORE_DATA(Sock)    (0 != ((Sock)->Flag & SO_NO_MORE_DATA))
+#define SOCK_IS_NO_MORE_DATA(Sock)  (0 != ((Sock)->Flag & SO_NO_MORE_DATA))
 
 /**
   Set the size of the receive buffer.
@@ -242,7 +242,7 @@
   @return The receive buffer size.
 
 **/
-#define GET_RCV_BUFFSIZE(Sock)        ((Sock)->RcvBuffer.HighWater)
+#define GET_RCV_BUFFSIZE(Sock)  ((Sock)->RcvBuffer.HighWater)
 
 /**
   Get the size of the receive data.
@@ -252,7 +252,7 @@
   @return The received data size.
 
 **/
-#define GET_RCV_DATASIZE(Sock)        (((Sock)->RcvBuffer.DataQueue)->BufSize)
+#define GET_RCV_DATASIZE(Sock)  (((Sock)->RcvBuffer.DataQueue)->BufSize)
 
 /**
   Set the size of the send buffer.
@@ -271,7 +271,7 @@
   @return The send buffer size.
 
 **/
-#define GET_SND_BUFFSIZE(Sock)        ((Sock)->SndBuffer.HighWater)
+#define GET_SND_BUFFSIZE(Sock)  ((Sock)->SndBuffer.HighWater)
 
 /**
   Get the size of the send data.
@@ -281,7 +281,7 @@
   @return The send data size.
 
 **/
-#define GET_SND_DATASIZE(Sock)        (((Sock)->SndBuffer.DataQueue)->BufSize)
+#define GET_SND_DATASIZE(Sock)  (((Sock)->SndBuffer.DataQueue)->BufSize)
 
 /**
   Set the backlog value of the socket.
@@ -290,7 +290,7 @@
   @param[in] Value           The value to set.
 
 **/
-#define SET_BACKLOG(Sock, Value)      ((Sock)->BackLog = (Value))
+#define SET_BACKLOG(Sock, Value)  ((Sock)->BackLog = (Value))
 
 /**
   Get the backlog value of the socket.
@@ -300,7 +300,7 @@
   @return The backlog value.
 
 **/
-#define GET_BACKLOG(Sock)             ((Sock)->BackLog)
+#define GET_BACKLOG(Sock)  ((Sock)->BackLog)
 
 /**
   Set the socket with error state.
@@ -309,13 +309,13 @@
   @param[in] Error           The error state.
 
 **/
-#define SOCK_ERROR(Sock, Error)       ((Sock)->SockError = (Error))
+#define SOCK_ERROR(Sock, Error)  ((Sock)->SockError = (Error))
 
-#define SOCK_SIGNATURE                SIGNATURE_32 ('S', 'O', 'C', 'K')
+#define SOCK_SIGNATURE  SIGNATURE_32 ('S', 'O', 'C', 'K')
 
-#define SOCK_FROM_THIS(a)             CR ((a), SOCKET, NetProtocol, SOCK_SIGNATURE)
+#define SOCK_FROM_THIS(a)  CR ((a), SOCKET, NetProtocol, SOCK_SIGNATURE)
 
-#define SOCK_FROM_TOKEN(Token)        (((SOCK_TOKEN *) (Token))->Sock)
+#define SOCK_FROM_TOKEN(Token)  (((SOCK_TOKEN *) (Token))->Sock)
 
 #define PROTO_TOKEN_FORM_SOCK(SockToken, Type)  ((Type *) (((SOCK_TOKEN *) (SockToken))->Token))
 
@@ -325,21 +325,21 @@ typedef struct _TCP_SOCKET SOCKET;
 /// Socket completion token
 ///
 typedef struct _SOCK_COMPLETION_TOKEN {
-  EFI_EVENT   Event;            ///< The event to be issued
-  EFI_STATUS  Status;           ///< The status to be issued
+  EFI_EVENT     Event;          ///< The event to be issued
+  EFI_STATUS    Status;         ///< The status to be issued
 } SOCK_COMPLETION_TOKEN;
 
 typedef union {
-  VOID  *RxData;
-  VOID  *TxData;
+  VOID    *RxData;
+  VOID    *TxData;
 } SOCK_IO_DATA;
 
 ///
 /// The application token with data packet
 ///
 typedef struct _SOCK_IO_TOKEN {
-  SOCK_COMPLETION_TOKEN Token;
-  SOCK_IO_DATA          Packet;
+  SOCK_COMPLETION_TOKEN    Token;
+  SOCK_IO_DATA             Packet;
 } SOCK_IO_TOKEN;
 
 ///
@@ -354,9 +354,9 @@ typedef enum {
 ///  The buffer structure of rcvd data and send data used by socket.
 ///
 typedef struct _SOCK_BUFFER {
-  UINT32        HighWater;  ///< The buffersize upper limit of sock_buffer
-  UINT32        LowWater;   ///< The low water mark of sock_buffer
-  NET_BUF_QUEUE *DataQueue; ///< The queue to buffer data
+  UINT32           HighWater;  ///< The buffersize upper limit of sock_buffer
+  UINT32           LowWater;   ///< The low water mark of sock_buffer
+  NET_BUF_QUEUE    *DataQueue; ///< The queue to buffer data
 } SOCK_BUFFER;
 
 /**
@@ -374,9 +374,9 @@ typedef struct _SOCK_BUFFER {
 typedef
 EFI_STATUS
 (*SOCK_PROTO_HANDLER) (
-  IN SOCKET       *Socket,
-  IN UINT8        Request,
-  IN VOID         *RequestData
+  IN SOCKET  *Socket,
+  IN UINT8   Request,
+  IN VOID    *RequestData
   );
 
 /**
@@ -414,41 +414,41 @@ VOID
 ///  The initialize data for create a new socket.
 ///
 typedef struct _SOCK_INIT_DATA {
-  SOCK_TYPE              Type;
-  UINT8                  State;
+  SOCK_TYPE                Type;
+  UINT8                    State;
 
-  SOCKET                 *Parent;        ///< The parent of this socket
-  UINT32                 BackLog;        ///< The connection limit for listening socket
-  UINT32                 SndBufferSize;  ///< The high water mark of send buffer
-  UINT32                 RcvBufferSize;  ///< The high water mark of receive buffer
-  UINT8                  IpVersion;
-  VOID                   *Protocol;      ///< The pointer to protocol function template
+  SOCKET                   *Parent;       ///< The parent of this socket
+  UINT32                   BackLog;       ///< The connection limit for listening socket
+  UINT32                   SndBufferSize; ///< The high water mark of send buffer
+  UINT32                   RcvBufferSize; ///< The high water mark of receive buffer
+  UINT8                    IpVersion;
+  VOID                     *Protocol;    ///< The pointer to protocol function template
                                          ///< wanted to install on socket
 
   //
   // Callbacks after socket is created and before socket is to be destroyed.
   //
-  SOCK_CREATE_CALLBACK   CreateCallback;  ///< Callback after created
-  SOCK_DESTROY_CALLBACK  DestroyCallback; ///< Callback before destroyed
-  VOID                   *Context;        ///< The context of the callback
+  SOCK_CREATE_CALLBACK     CreateCallback;  ///< Callback after created
+  SOCK_DESTROY_CALLBACK    DestroyCallback; ///< Callback before destroyed
+  VOID                     *Context;        ///< The context of the callback
 
   //
   // Opaque protocol data.
   //
-  VOID                   *ProtoData;
-  UINT32                 DataSize;
+  VOID                     *ProtoData;
+  UINT32                   DataSize;
 
-  SOCK_PROTO_HANDLER     ProtoHandler;    ///< The handler of protocol for socket request
+  SOCK_PROTO_HANDLER       ProtoHandler;  ///< The handler of protocol for socket request
 
-  EFI_HANDLE             DriverBinding;   ///< The driver binding handle
+  EFI_HANDLE               DriverBinding; ///< The driver binding handle
 } SOCK_INIT_DATA;
 
 ///
 ///  The union type of TCP4 and TCP6 protocol.
 ///
 typedef union _NET_PROTOCOL {
-  EFI_TCP4_PROTOCOL      Tcp4Protocol;    ///< Tcp4 protocol
-  EFI_TCP6_PROTOCOL      Tcp6Protocol;    ///< Tcp6 protocol
+  EFI_TCP4_PROTOCOL    Tcp4Protocol;      ///< Tcp4 protocol
+  EFI_TCP6_PROTOCOL    Tcp6Protocol;      ///< Tcp6 protocol
 } NET_PROTOCOL;
 ///
 /// The socket structure representing a network service access point.
@@ -457,70 +457,70 @@ struct _TCP_SOCKET {
   //
   // Socket description information
   //
-  UINT32                    Signature;      ///< Signature of the socket
-  EFI_HANDLE                SockHandle;     ///< The virtual handle of the socket
-  EFI_HANDLE                DriverBinding;  ///< Socket's driver binding protocol
-  EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  LIST_ENTRY                Link;
-  UINT8                     ConfigureState;
-  SOCK_TYPE                 Type;
-  UINT8                     State;
-  UINT16                    Flag;
-  EFI_LOCK                  Lock;           ///< The lock of socket
-  SOCK_BUFFER               SndBuffer;      ///< Send buffer of application's data
-  SOCK_BUFFER               RcvBuffer;      ///< Receive buffer of received data
-  EFI_STATUS                SockError;      ///< The error returned by low layer protocol
-  BOOLEAN                   InDestroy;
+  UINT32                      Signature;     ///< Signature of the socket
+  EFI_HANDLE                  SockHandle;    ///< The virtual handle of the socket
+  EFI_HANDLE                  DriverBinding; ///< Socket's driver binding protocol
+  EFI_DEVICE_PATH_PROTOCOL    *ParentDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  LIST_ENTRY                  Link;
+  UINT8                       ConfigureState;
+  SOCK_TYPE                   Type;
+  UINT8                       State;
+  UINT16                      Flag;
+  EFI_LOCK                    Lock;         ///< The lock of socket
+  SOCK_BUFFER                 SndBuffer;    ///< Send buffer of application's data
+  SOCK_BUFFER                 RcvBuffer;    ///< Receive buffer of received data
+  EFI_STATUS                  SockError;    ///< The error returned by low layer protocol
+  BOOLEAN                     InDestroy;
 
   //
   // Fields used to manage the connection request
   //
-  UINT32                    BackLog;        ///< the limit of connection to this socket
-  UINT32                    ConnCnt;        ///< the current count of connections to it
-  SOCKET                    *Parent;        ///< listening parent that accept the connection
-  LIST_ENTRY                ConnectionList; ///< the connections maintained by this socket
+  UINT32                      BackLog;        ///< the limit of connection to this socket
+  UINT32                      ConnCnt;        ///< the current count of connections to it
+  SOCKET                      *Parent;        ///< listening parent that accept the connection
+  LIST_ENTRY                  ConnectionList; ///< the connections maintained by this socket
   //
   // The queue to buffer application's asynchronous token
   //
-  LIST_ENTRY                ListenTokenList;
-  LIST_ENTRY                RcvTokenList;
-  LIST_ENTRY                SndTokenList;
-  LIST_ENTRY                ProcessingSndTokenList;
+  LIST_ENTRY                  ListenTokenList;
+  LIST_ENTRY                  RcvTokenList;
+  LIST_ENTRY                  SndTokenList;
+  LIST_ENTRY                  ProcessingSndTokenList;
 
-  SOCK_COMPLETION_TOKEN     *ConnectionToken; ///< app's token to signal if connected
-  SOCK_COMPLETION_TOKEN     *CloseToken;      ///< app's token to signal if closed
+  SOCK_COMPLETION_TOKEN       *ConnectionToken; ///< app's token to signal if connected
+  SOCK_COMPLETION_TOKEN       *CloseToken;      ///< app's token to signal if closed
   //
   // Interface for low level protocol
   //
-  SOCK_PROTO_HANDLER        ProtoHandler;     ///< The request handler of protocol
-  UINT8                     ProtoReserved[PROTO_RESERVED_LEN];  ///< Data fields reserved for protocol
-  UINT8                     IpVersion;
-  NET_PROTOCOL              NetProtocol;                        ///< TCP4 or TCP6 protocol socket used
+  SOCK_PROTO_HANDLER          ProtoHandler;                      ///< The request handler of protocol
+  UINT8                       ProtoReserved[PROTO_RESERVED_LEN]; ///< Data fields reserved for protocol
+  UINT8                       IpVersion;
+  NET_PROTOCOL                NetProtocol;                      ///< TCP4 or TCP6 protocol socket used
   //
   // Callbacks after socket is created and before socket is to be destroyed.
   //
-  SOCK_CREATE_CALLBACK      CreateCallback;   ///< Callback after created
-  SOCK_DESTROY_CALLBACK     DestroyCallback;  ///< Callback before destroyed
-  VOID                      *Context;         ///< The context of the callback
+  SOCK_CREATE_CALLBACK        CreateCallback;  ///< Callback after created
+  SOCK_DESTROY_CALLBACK       DestroyCallback; ///< Callback before destroyed
+  VOID                        *Context;        ///< The context of the callback
 };
 
 ///
 ///  The token structure buffered in socket layer.
 ///
 typedef struct _SOCK_TOKEN {
-  LIST_ENTRY            TokenList;      ///< The entry to add in the token list
-  SOCK_COMPLETION_TOKEN *Token;         ///< The application's token
-  UINT32                RemainDataLen;  ///< Unprocessed data length
-  SOCKET                *Sock;          ///< The pointer to the socket this token
-                                        ///< belongs to
+  LIST_ENTRY               TokenList;     ///< The entry to add in the token list
+  SOCK_COMPLETION_TOKEN    *Token;        ///< The application's token
+  UINT32                   RemainDataLen; ///< Unprocessed data length
+  SOCKET                   *Sock;         ///< The pointer to the socket this token
+                                          ///< belongs to
 } SOCK_TOKEN;
 
 ///
 /// Reserved data to access the NET_BUF delivered by TCP driver.
 ///
 typedef struct _TCP_RSV_DATA {
-  UINT32 UrgLen;
+  UINT32    UrgLen;
 } TCP_RSV_DATA;
 
 //
@@ -536,8 +536,8 @@ typedef struct _TCP_RSV_DATA {
 **/
 VOID
 SockSetState (
-  IN OUT SOCKET     *Sock,
-  IN     UINT8      State
+  IN OUT SOCKET  *Sock,
+  IN     UINT8   State
   );
 
 /**
@@ -550,7 +550,7 @@ SockSetState (
 **/
 SOCKET *
 SockClone (
-  IN SOCKET *Sock
+  IN SOCKET  *Sock
   );
 
 /**
@@ -566,7 +566,7 @@ SockClone (
 **/
 VOID
 SockConnEstablished (
-  IN OUT SOCKET *Sock
+  IN OUT SOCKET  *Sock
   );
 
 /**
@@ -581,7 +581,7 @@ SockConnEstablished (
 **/
 VOID
 SockConnClosed (
-  IN OUT SOCKET *Sock
+  IN OUT SOCKET  *Sock
   );
 
 /**
@@ -596,8 +596,8 @@ SockConnClosed (
 **/
 VOID
 SockDataSent (
-  IN OUT SOCKET     *Sock,
-  IN     UINT32     Count
+  IN OUT SOCKET  *Sock,
+  IN     UINT32  Count
   );
 
 /**
@@ -615,10 +615,10 @@ SockDataSent (
 **/
 UINT32
 SockGetDataToSend (
-  IN  SOCKET      *Sock,
-  IN  UINT32      Offset,
-  IN  UINT32      Len,
-  OUT UINT8       *Dest
+  IN  SOCKET  *Sock,
+  IN  UINT32  Offset,
+  IN  UINT32  Len,
+  OUT UINT8   *Dest
   );
 
 /**
@@ -634,9 +634,9 @@ SockGetDataToSend (
 **/
 VOID
 SockDataRcvd (
-  IN OUT SOCKET    *Sock,
-  IN OUT NET_BUF   *NetBuffer,
-  IN     UINT32    UrgLen
+  IN OUT SOCKET   *Sock,
+  IN OUT NET_BUF  *NetBuffer,
+  IN     UINT32   UrgLen
   );
 
 /**
@@ -667,7 +667,7 @@ SockGetFreeSpace (
 **/
 VOID
 SockNoMoreData (
-  IN OUT SOCKET *Sock
+  IN OUT SOCKET  *Sock
   );
 
 //
@@ -686,7 +686,7 @@ SockNoMoreData (
 **/
 SOCKET *
 SockCreateChild (
-  IN SOCK_INIT_DATA *SockInitData
+  IN SOCK_INIT_DATA  *SockInitData
   );
 
 /**
@@ -700,7 +700,7 @@ SockCreateChild (
 **/
 EFI_STATUS
 SockDestroyChild (
-  IN OUT SOCKET *Sock
+  IN OUT SOCKET  *Sock
   );
 
 /**
@@ -716,8 +716,8 @@ SockDestroyChild (
 **/
 EFI_STATUS
 SockConfigure (
-  IN SOCKET *Sock,
-  IN VOID   *ConfigData
+  IN SOCKET  *Sock,
+  IN VOID    *ConfigData
   );
 
 /**
@@ -740,8 +740,8 @@ SockConfigure (
 **/
 EFI_STATUS
 SockConnect (
-  IN SOCKET *Sock,
-  IN VOID   *Token
+  IN SOCKET  *Sock,
+  IN VOID    *Token
   );
 
 /**
@@ -765,8 +765,8 @@ SockConnect (
 **/
 EFI_STATUS
 SockAccept (
-  IN SOCKET *Sock,
-  IN VOID   *Token
+  IN SOCKET  *Sock,
+  IN VOID    *Token
   );
 
 /**
@@ -789,8 +789,8 @@ SockAccept (
 **/
 EFI_STATUS
 SockSend (
-  IN SOCKET *Sock,
-  IN VOID   *Token
+  IN SOCKET  *Sock,
+  IN VOID    *Token
   );
 
 /**
@@ -814,8 +814,8 @@ SockSend (
 **/
 EFI_STATUS
 SockRcv (
-  IN SOCKET *Sock,
-  IN VOID   *Token
+  IN SOCKET  *Sock,
+  IN VOID    *Token
   );
 
 /**
@@ -829,7 +829,7 @@ SockRcv (
 **/
 EFI_STATUS
 SockFlush (
-  IN OUT SOCKET *Sock
+  IN OUT SOCKET  *Sock
   );
 
 /**
@@ -853,9 +853,9 @@ SockFlush (
 **/
 EFI_STATUS
 SockClose (
-  IN OUT SOCKET  *Sock,
-  IN     VOID    *Token,
-  IN     BOOLEAN OnAbort
+  IN OUT SOCKET   *Sock,
+  IN     VOID     *Token,
+  IN     BOOLEAN  OnAbort
   );
 
 /**
@@ -889,8 +889,8 @@ SockCancel (
 **/
 EFI_STATUS
 SockGetMode (
-  IN     SOCKET *Sock,
-  IN OUT VOID   *Mode
+  IN     SOCKET  *Sock,
+  IN OUT VOID    *Mode
   );
 
 /**
@@ -910,8 +910,8 @@ SockGetMode (
 **/
 EFI_STATUS
 SockRoute (
-  IN SOCKET    *Sock,
-  IN VOID      *RouteInfo
+  IN SOCKET  *Sock,
+  IN VOID    *RouteInfo
   );
 
 #endif

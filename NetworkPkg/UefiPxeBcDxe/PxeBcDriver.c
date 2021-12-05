@@ -10,8 +10,7 @@
 
 #include "PxeBcImpl.h"
 
-
-EFI_DRIVER_BINDING_PROTOCOL gPxeBcIp4DriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gPxeBcIp4DriverBinding = {
   PxeBcIp4DriverBindingSupported,
   PxeBcIp4DriverBindingStart,
   PxeBcIp4DriverBindingStop,
@@ -20,7 +19,7 @@ EFI_DRIVER_BINDING_PROTOCOL gPxeBcIp4DriverBinding = {
   NULL
 };
 
-EFI_DRIVER_BINDING_PROTOCOL gPxeBcIp6DriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gPxeBcIp6DriverBinding = {
   PxeBcIp6DriverBindingSupported,
   PxeBcIp6DriverBindingStart,
   PxeBcIp6DriverBindingStop,
@@ -39,10 +38,10 @@ EFI_DRIVER_BINDING_PROTOCOL gPxeBcIp6DriverBinding = {
 **/
 EFI_HANDLE
 PxeBcGetNicByIp4Children (
-  IN EFI_HANDLE                 ControllerHandle
+  IN EFI_HANDLE  ControllerHandle
   )
 {
-  EFI_HANDLE                    NicHandle;
+  EFI_HANDLE  NicHandle;
 
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiArpProtocolGuid);
   if (NicHandle == NULL) {
@@ -64,7 +63,6 @@ PxeBcGetNicByIp4Children (
   return NicHandle;
 }
 
-
 /**
   Get the Nic handle using any child handle in the IPv6 stack.
 
@@ -75,10 +73,10 @@ PxeBcGetNicByIp4Children (
 **/
 EFI_HANDLE
 PxeBcGetNicByIp6Children (
-  IN EFI_HANDLE                  ControllerHandle
+  IN EFI_HANDLE  ControllerHandle
   )
 {
-  EFI_HANDLE                     NicHandle;
+  EFI_HANDLE  NicHandle;
 
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiIp6ProtocolGuid);
   if (NicHandle == NULL) {
@@ -97,7 +95,6 @@ PxeBcGetNicByIp6Children (
   return NicHandle;
 }
 
-
 /**
   Destroy the opened instances based on IPv4.
 
@@ -111,7 +108,7 @@ PxeBcDestroyIp4Children (
   IN PXEBC_PRIVATE_DATA           *Private
   )
 {
-  ASSERT(Private != NULL);
+  ASSERT (Private != NULL);
 
   if (Private->ArpChild != NULL) {
     //
@@ -175,11 +172,11 @@ PxeBcDestroyIp4Children (
     // Close Udp4 for PxeBc->UdpRead and destroy the instance.
     //
     gBS->CloseProtocol (
-          Private->Udp4ReadChild,
-          &gEfiUdp4ProtocolGuid,
-          This->DriverBindingHandle,
-          Private->Controller
-          );
+           Private->Udp4ReadChild,
+           &gEfiUdp4ProtocolGuid,
+           This->DriverBindingHandle,
+           Private->Controller
+           );
 
     NetLibDestroyServiceChild (
       Private->Controller,
@@ -194,11 +191,11 @@ PxeBcDestroyIp4Children (
     // Close Mtftp4 for PxeBc->Mtftp4 and destroy the instance.
     //
     gBS->CloseProtocol (
-          Private->Mtftp4Child,
-          &gEfiMtftp4ProtocolGuid,
-          This->DriverBindingHandle,
-          Private->Controller
-          );
+           Private->Mtftp4Child,
+           &gEfiMtftp4ProtocolGuid,
+           This->DriverBindingHandle,
+           Private->Controller
+           );
 
     NetLibDestroyServiceChild (
       Private->Controller,
@@ -213,11 +210,11 @@ PxeBcDestroyIp4Children (
     // Close Dhcp4 for PxeBc->Dhcp4 and destroy the instance.
     //
     gBS->CloseProtocol (
-          Private->Dhcp4Child,
-          &gEfiDhcp4ProtocolGuid,
-          This->DriverBindingHandle,
-          Private->Controller
-          );
+           Private->Dhcp4Child,
+           &gEfiDhcp4ProtocolGuid,
+           This->DriverBindingHandle,
+           Private->Controller
+           );
 
     NetLibDestroyServiceChild (
       Private->Controller,
@@ -267,18 +264,18 @@ PxeBcDestroyIp4Children (
              Private->Snp
              );
     }
+
     FreePool (Private->Ip4Nic);
   }
 
-  Private->ArpChild         = NULL;
-  Private->Ip4Child         = NULL;
-  Private->Udp4WriteChild   = NULL;
-  Private->Udp4ReadChild    = NULL;
-  Private->Mtftp4Child      = NULL;
-  Private->Dhcp4Child       = NULL;
-  Private->Ip4Nic           = NULL;
+  Private->ArpChild       = NULL;
+  Private->Ip4Child       = NULL;
+  Private->Udp4WriteChild = NULL;
+  Private->Udp4ReadChild  = NULL;
+  Private->Mtftp4Child    = NULL;
+  Private->Dhcp4Child     = NULL;
+  Private->Ip4Nic         = NULL;
 }
-
 
 /**
   Destroy the opened instances based on IPv6.
@@ -293,18 +290,18 @@ PxeBcDestroyIp6Children (
   IN PXEBC_PRIVATE_DATA           *Private
   )
 {
-  ASSERT(Private != NULL);
+  ASSERT (Private != NULL);
 
   if (Private->Ip6Child != NULL) {
     //
     // Close Ip6 for Ip6->Ip6Config and destroy the instance.
     //
     gBS->CloseProtocol (
-          Private->Ip6Child,
-          &gEfiIp6ProtocolGuid,
-          This->DriverBindingHandle,
-          Private->Controller
-          );
+           Private->Ip6Child,
+           &gEfiIp6ProtocolGuid,
+           This->DriverBindingHandle,
+           Private->Controller
+           );
 
     NetLibDestroyServiceChild (
       Private->Controller,
@@ -337,11 +334,11 @@ PxeBcDestroyIp6Children (
     // Close Udp6 for PxeBc->UdpRead and destroy the instance.
     //
     gBS->CloseProtocol (
-          Private->Udp6ReadChild,
-          &gEfiUdp6ProtocolGuid,
-          This->DriverBindingHandle,
-          Private->Controller
-          );
+           Private->Udp6ReadChild,
+           &gEfiUdp6ProtocolGuid,
+           This->DriverBindingHandle,
+           Private->Controller
+           );
     NetLibDestroyServiceChild (
       Private->Controller,
       This->DriverBindingHandle,
@@ -355,11 +352,11 @@ PxeBcDestroyIp6Children (
     // Close Mtftp6 for PxeBc->Mtftp and destroy the instance.
     //
     gBS->CloseProtocol (
-          Private->Mtftp6Child,
-          &gEfiMtftp6ProtocolGuid,
-          This->DriverBindingHandle,
-          Private->Controller
-          );
+           Private->Mtftp6Child,
+           &gEfiMtftp6ProtocolGuid,
+           This->DriverBindingHandle,
+           Private->Controller
+           );
 
     NetLibDestroyServiceChild (
       Private->Controller,
@@ -374,11 +371,11 @@ PxeBcDestroyIp6Children (
     // Close Dhcp6 for PxeBc->Dhcp and destroy the instance.
     //
     gBS->CloseProtocol (
-          Private->Dhcp6Child,
-          &gEfiDhcp6ProtocolGuid,
-          This->DriverBindingHandle,
-          Private->Controller
-          );
+           Private->Dhcp6Child,
+           &gEfiDhcp6ProtocolGuid,
+           This->DriverBindingHandle,
+           Private->Controller
+           );
 
     NetLibDestroyServiceChild (
       Private->Controller,
@@ -427,6 +424,7 @@ PxeBcDestroyIp6Children (
              Private->Snp
              );
     }
+
     FreePool (Private->Ip6Nic);
   }
 
@@ -452,20 +450,20 @@ PxeBcDestroyIp6Children (
 **/
 EFI_STATUS
 PxeBcCheckIpv6Support (
-  IN  EFI_HANDLE                   ControllerHandle,
-  IN  PXEBC_PRIVATE_DATA           *Private,
-  OUT BOOLEAN                      *Ipv6Support
+  IN  EFI_HANDLE          ControllerHandle,
+  IN  PXEBC_PRIVATE_DATA  *Private,
+  OUT BOOLEAN             *Ipv6Support
   )
 {
-  EFI_HANDLE                       Handle;
-  EFI_ADAPTER_INFORMATION_PROTOCOL *Aip;
-  EFI_STATUS                       Status;
-  EFI_GUID                         *InfoTypesBuffer;
-  UINTN                            InfoTypeBufferCount;
-  UINTN                            TypeIndex;
-  BOOLEAN                          Supported;
-  VOID                             *InfoBlock;
-  UINTN                            InfoBlockSize;
+  EFI_HANDLE                        Handle;
+  EFI_ADAPTER_INFORMATION_PROTOCOL  *Aip;
+  EFI_STATUS                        Status;
+  EFI_GUID                          *InfoTypesBuffer;
+  UINTN                             InfoTypeBufferCount;
+  UINTN                             TypeIndex;
+  BOOLEAN                           Supported;
+  VOID                              *InfoBlock;
+  UINTN                             InfoBlockSize;
 
   ASSERT (Private != NULL && Ipv6Support != NULL);
 
@@ -493,16 +491,16 @@ PxeBcCheckIpv6Support (
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiAdapterInformationProtocolGuid,
-                  (VOID *) &Aip
+                  (VOID *)&Aip
                   );
-  if (EFI_ERROR (Status) || Aip == NULL) {
+  if (EFI_ERROR (Status) || (Aip == NULL)) {
     return EFI_NOT_FOUND;
   }
 
   InfoTypesBuffer     = NULL;
   InfoTypeBufferCount = 0;
-  Status = Aip->GetSupportedTypes (Aip, &InfoTypesBuffer, &InfoTypeBufferCount);
-  if (EFI_ERROR (Status) || InfoTypesBuffer == NULL) {
+  Status              = Aip->GetSupportedTypes (Aip, &InfoTypesBuffer, &InfoTypeBufferCount);
+  if (EFI_ERROR (Status) || (InfoTypesBuffer == NULL)) {
     FreePool (InfoTypesBuffer);
     return EFI_NOT_FOUND;
   }
@@ -525,16 +523,15 @@ PxeBcCheckIpv6Support (
   //
   InfoBlock     = NULL;
   InfoBlockSize = 0;
-  Status = Aip->GetInformation (Aip, &gEfiAdapterInfoUndiIpv6SupportGuid, &InfoBlock, &InfoBlockSize);
-  if (EFI_ERROR (Status) || InfoBlock == NULL) {
+  Status        = Aip->GetInformation (Aip, &gEfiAdapterInfoUndiIpv6SupportGuid, &InfoBlock, &InfoBlockSize);
+  if (EFI_ERROR (Status) || (InfoBlock == NULL)) {
     FreePool (InfoBlock);
     return EFI_NOT_FOUND;
   }
 
-  *Ipv6Support = ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *) InfoBlock)->Ipv6Support;
+  *Ipv6Support = ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *)InfoBlock)->Ipv6Support;
   FreePool (InfoBlock);
   return EFI_SUCCESS;
-
 }
 
 /**
@@ -555,14 +552,14 @@ PxeBcCreateIp4Children (
   IN PXEBC_PRIVATE_DATA           *Private
   )
 {
-  EFI_STATUS                      Status;
-  IPv4_DEVICE_PATH                Ip4Node;
-  EFI_PXE_BASE_CODE_MODE          *Mode;
-  EFI_UDP4_CONFIG_DATA            *Udp4CfgData;
-  EFI_IP4_CONFIG_DATA             *Ip4CfgData;
-  EFI_IP4_MODE_DATA               Ip4ModeData;
-  PXEBC_PRIVATE_PROTOCOL          *Id;
-  EFI_SIMPLE_NETWORK_PROTOCOL     *Snp;
+  EFI_STATUS                   Status;
+  IPv4_DEVICE_PATH             Ip4Node;
+  EFI_PXE_BASE_CODE_MODE       *Mode;
+  EFI_UDP4_CONFIG_DATA         *Udp4CfgData;
+  EFI_IP4_CONFIG_DATA          *Ip4CfgData;
+  EFI_IP4_MODE_DATA            Ip4ModeData;
+  PXEBC_PRIVATE_PROTOCOL       *Id;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
 
   if (Private->Ip4Nic != NULL) {
     //
@@ -587,7 +584,7 @@ PxeBcCreateIp4Children (
   Status = gBS->OpenProtocol (
                   Private->Dhcp4Child,
                   &gEfiDhcp4ProtocolGuid,
-                  (VOID **) &Private->Dhcp4,
+                  (VOID **)&Private->Dhcp4,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -612,7 +609,7 @@ PxeBcCreateIp4Children (
   Status = gBS->OpenProtocol (
                   Private->Mtftp4Child,
                   &gEfiMtftp4ProtocolGuid,
-                  (VOID **) &Private->Mtftp4,
+                  (VOID **)&Private->Mtftp4,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -637,7 +634,7 @@ PxeBcCreateIp4Children (
   Status = gBS->OpenProtocol (
                   Private->Udp4ReadChild,
                   &gEfiUdp4ProtocolGuid,
-                  (VOID **) &Private->Udp4Read,
+                  (VOID **)&Private->Udp4Read,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -662,7 +659,7 @@ PxeBcCreateIp4Children (
   Status = gBS->OpenProtocol (
                   Private->Udp4WriteChild,
                   &gEfiUdp4ProtocolGuid,
-                  (VOID **) &Private->Udp4Write,
+                  (VOID **)&Private->Udp4Write,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -687,7 +684,7 @@ PxeBcCreateIp4Children (
   Status = gBS->OpenProtocol (
                   Private->ArpChild,
                   &gEfiArpProtocolGuid,
-                  (VOID **) &Private->Arp,
+                  (VOID **)&Private->Arp,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -712,7 +709,7 @@ PxeBcCreateIp4Children (
   Status = gBS->OpenProtocol (
                   Private->Ip4Child,
                   &gEfiIp4ProtocolGuid,
-                  (VOID **) &Private->Ip4,
+                  (VOID **)&Private->Ip4,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -739,13 +736,13 @@ PxeBcCreateIp4Children (
   Private->Ip4Nic->Private   = Private;
   Private->Ip4Nic->Signature = PXEBC_VIRTUAL_NIC_SIGNATURE;
 
-   //
+  //
   // Locate Ip4->Ip4Config2 and store it for set IPv4 Policy.
   //
   Status = gBS->HandleProtocol (
                   ControllerHandle,
                   &gEfiIp4Config2ProtocolGuid,
-                  (VOID **) &Private->Ip4Config2
+                  (VOID **)&Private->Ip4Config2
                   );
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
@@ -814,7 +811,7 @@ PxeBcCreateIp4Children (
     Status = gBS->OpenProtocol (
                     Private->Ip4Nic->Controller,
                     &gEfiSimpleNetworkProtocolGuid,
-                    (VOID **) &Snp,
+                    (VOID **)&Snp,
                     This->DriverBindingHandle,
                     Private->Ip4Nic->Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER|EFI_OPEN_PROTOCOL_EXCLUSIVE
@@ -831,7 +828,7 @@ PxeBcCreateIp4Children (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiCallerIdGuid,
-                  (VOID **) &Id,
+                  (VOID **)&Id,
                   This->DriverBindingHandle,
                   Private->Ip4Nic->Controller,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -843,9 +840,9 @@ PxeBcCreateIp4Children (
   //
   // Set default configure data for Udp4Read and Ip4 instance.
   //
-  Mode                            = Private->PxeBc.Mode;
-  Udp4CfgData                     = &Private->Udp4CfgData;
-  Ip4CfgData                      = &Private->Ip4CfgData;
+  Mode        = Private->PxeBc.Mode;
+  Udp4CfgData = &Private->Udp4CfgData;
+  Ip4CfgData  = &Private->Ip4CfgData;
 
   Udp4CfgData->AcceptBroadcast    = FALSE;
   Udp4CfgData->AcceptAnyPort      = TRUE;
@@ -855,12 +852,12 @@ PxeBcCreateIp4Children (
   Udp4CfgData->ReceiveTimeout     = PXEBC_DEFAULT_LIFETIME;
   Udp4CfgData->TransmitTimeout    = PXEBC_DEFAULT_LIFETIME;
 
-  Ip4CfgData->AcceptIcmpErrors    = TRUE;
-  Ip4CfgData->DefaultProtocol     = EFI_IP_PROTO_ICMP;
-  Ip4CfgData->TypeOfService       = Mode->ToS;
-  Ip4CfgData->TimeToLive          = Mode->TTL;
-  Ip4CfgData->ReceiveTimeout      = PXEBC_DEFAULT_LIFETIME;
-  Ip4CfgData->TransmitTimeout     = PXEBC_DEFAULT_LIFETIME;
+  Ip4CfgData->AcceptIcmpErrors = TRUE;
+  Ip4CfgData->DefaultProtocol  = EFI_IP_PROTO_ICMP;
+  Ip4CfgData->TypeOfService    = Mode->ToS;
+  Ip4CfgData->TimeToLive       = Mode->TTL;
+  Ip4CfgData->ReceiveTimeout   = PXEBC_DEFAULT_LIFETIME;
+  Ip4CfgData->TransmitTimeout  = PXEBC_DEFAULT_LIFETIME;
 
   return EFI_SUCCESS;
 
@@ -868,7 +865,6 @@ ON_ERROR:
   PxeBcDestroyIp4Children (This, Private);
   return Status;
 }
-
 
 /**
   Create the opened instances based on IPv6.
@@ -888,14 +884,14 @@ PxeBcCreateIp6Children (
   IN PXEBC_PRIVATE_DATA           *Private
   )
 {
-  EFI_STATUS                      Status;
-  IPv6_DEVICE_PATH                Ip6Node;
-  EFI_UDP6_CONFIG_DATA            *Udp6CfgData;
-  EFI_IP6_CONFIG_DATA             *Ip6CfgData;
-  EFI_IP6_MODE_DATA               Ip6ModeData;
-  PXEBC_PRIVATE_PROTOCOL          *Id;
-  EFI_SIMPLE_NETWORK_PROTOCOL     *Snp;
-  UINTN                           Index;
+  EFI_STATUS                   Status;
+  IPv6_DEVICE_PATH             Ip6Node;
+  EFI_UDP6_CONFIG_DATA         *Udp6CfgData;
+  EFI_IP6_CONFIG_DATA          *Ip6CfgData;
+  EFI_IP6_MODE_DATA            Ip6ModeData;
+  PXEBC_PRIVATE_PROTOCOL       *Id;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
+  UINTN                        Index;
 
   if (Private->Ip6Nic != NULL) {
     //
@@ -929,7 +925,7 @@ PxeBcCreateIp6Children (
   Status = gBS->OpenProtocol (
                   Private->Dhcp6Child,
                   &gEfiDhcp6ProtocolGuid,
-                  (VOID **) &Private->Dhcp6,
+                  (VOID **)&Private->Dhcp6,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -964,7 +960,7 @@ PxeBcCreateIp6Children (
   Status = gBS->OpenProtocol (
                   Private->Mtftp6Child,
                   &gEfiMtftp6ProtocolGuid,
-                  (VOID **) &Private->Mtftp6,
+                  (VOID **)&Private->Mtftp6,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -989,7 +985,7 @@ PxeBcCreateIp6Children (
   Status = gBS->OpenProtocol (
                   Private->Udp6ReadChild,
                   &gEfiUdp6ProtocolGuid,
-                  (VOID **) &Private->Udp6Read,
+                  (VOID **)&Private->Udp6Read,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -1014,7 +1010,7 @@ PxeBcCreateIp6Children (
   Status = gBS->OpenProtocol (
                   Private->Udp6WriteChild,
                   &gEfiUdp6ProtocolGuid,
-                  (VOID **) &Private->Udp6Write,
+                  (VOID **)&Private->Udp6Write,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -1039,7 +1035,7 @@ PxeBcCreateIp6Children (
   Status = gBS->OpenProtocol (
                   Private->Ip6Child,
                   &gEfiIp6ProtocolGuid,
-                  (VOID **) &Private->Ip6,
+                  (VOID **)&Private->Ip6,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -1088,7 +1084,7 @@ PxeBcCreateIp6Children (
   Status = gBS->HandleProtocol (
                   ControllerHandle,
                   &gEfiIp6ConfigProtocolGuid,
-                  (VOID **) &Private->Ip6Cfg
+                  (VOID **)&Private->Ip6Cfg
                   );
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
@@ -1098,9 +1094,9 @@ PxeBcCreateIp6Children (
   // Create a device path node for Ipv6 virtual nic, and append it.
   //
   ZeroMem (&Ip6Node, sizeof (IPv6_DEVICE_PATH));
-  Ip6Node.Header.Type     = MESSAGING_DEVICE_PATH;
-  Ip6Node.Header.SubType  = MSG_IPv6_DP;
-  Ip6Node.PrefixLength    = IP6_PREFIX_LENGTH;
+  Ip6Node.Header.Type    = MESSAGING_DEVICE_PATH;
+  Ip6Node.Header.SubType = MSG_IPv6_DP;
+  Ip6Node.PrefixLength   = IP6_PREFIX_LENGTH;
 
   SetDevicePathNodeLength (&Ip6Node.Header, sizeof (Ip6Node));
 
@@ -1157,7 +1153,7 @@ PxeBcCreateIp6Children (
     Status = gBS->OpenProtocol (
                     Private->Ip6Nic->Controller,
                     &gEfiSimpleNetworkProtocolGuid,
-                    (VOID **) &Snp,
+                    (VOID **)&Snp,
                     This->DriverBindingHandle,
                     Private->Ip6Nic->Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER|EFI_OPEN_PROTOCOL_EXCLUSIVE
@@ -1174,7 +1170,7 @@ PxeBcCreateIp6Children (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiCallerIdGuid,
-                  (VOID **) &Id,
+                  (VOID **)&Id,
                   This->DriverBindingHandle,
                   Private->Ip6Nic->Controller,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -1192,15 +1188,15 @@ PxeBcCreateIp6Children (
     //
     // Fail to get the data whether UNDI supports IPv6. Set default value.
     //
-    Private->Mode.Ipv6Available   = TRUE;
+    Private->Mode.Ipv6Available = TRUE;
   }
 
   if (!Private->Mode.Ipv6Available) {
     goto ON_ERROR;
   }
 
-  Udp6CfgData                     = &Private->Udp6CfgData;
-  Ip6CfgData                      = &Private->Ip6CfgData;
+  Udp6CfgData = &Private->Udp6CfgData;
+  Ip6CfgData  = &Private->Ip6CfgData;
 
   Udp6CfgData->AcceptAnyPort      = TRUE;
   Udp6CfgData->AllowDuplicatePort = TRUE;
@@ -1208,11 +1204,11 @@ PxeBcCreateIp6Children (
   Udp6CfgData->ReceiveTimeout     = PXEBC_DEFAULT_LIFETIME;
   Udp6CfgData->TransmitTimeout    = PXEBC_DEFAULT_LIFETIME;
 
-  Ip6CfgData->AcceptIcmpErrors    = TRUE;
-  Ip6CfgData->DefaultProtocol     = IP6_ICMP;
-  Ip6CfgData->HopLimit            = PXEBC_DEFAULT_HOPLIMIT;
-  Ip6CfgData->ReceiveTimeout      = PXEBC_DEFAULT_LIFETIME;
-  Ip6CfgData->TransmitTimeout     = PXEBC_DEFAULT_LIFETIME;
+  Ip6CfgData->AcceptIcmpErrors = TRUE;
+  Ip6CfgData->DefaultProtocol  = IP6_ICMP;
+  Ip6CfgData->HopLimit         = PXEBC_DEFAULT_HOPLIMIT;
+  Ip6CfgData->ReceiveTimeout   = PXEBC_DEFAULT_LIFETIME;
+  Ip6CfgData->TransmitTimeout  = PXEBC_DEFAULT_LIFETIME;
 
   return EFI_SUCCESS;
 
@@ -1220,7 +1216,6 @@ ON_ERROR:
   PxeBcDestroyIp6Children (This, Private);
   return Status;
 }
-
 
 /**
   The entry point for UefiPxeBc driver that installs the driver
@@ -1236,13 +1231,13 @@ ON_ERROR:
 EFI_STATUS
 EFIAPI
 PxeBcDriverEntryPoint (
-  IN EFI_HANDLE             ImageHandle,
-  IN EFI_SYSTEM_TABLE       *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
 
-  if ((PcdGet8(PcdIPv4PXESupport) == PXE_DISABLED) && (PcdGet8(PcdIPv6PXESupport) == PXE_DISABLED)) {
+  if ((PcdGet8 (PcdIPv4PXESupport) == PXE_DISABLED) && (PcdGet8 (PcdIPv6PXESupport) == PXE_DISABLED)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1300,20 +1295,22 @@ PxeBcSupported (
   IN UINT8                        IpVersion
   )
 {
-  EFI_STATUS                      Status;
-  EFI_GUID                        *DhcpServiceBindingGuid;
-  EFI_GUID                        *MtftpServiceBindingGuid;
+  EFI_STATUS  Status;
+  EFI_GUID    *DhcpServiceBindingGuid;
+  EFI_GUID    *MtftpServiceBindingGuid;
 
   if (IpVersion == IP_VERSION_4) {
-    if (PcdGet8(PcdIPv4PXESupport) == PXE_DISABLED) {
+    if (PcdGet8 (PcdIPv4PXESupport) == PXE_DISABLED) {
       return EFI_UNSUPPORTED;
     }
+
     DhcpServiceBindingGuid  = &gEfiDhcp4ServiceBindingProtocolGuid;
     MtftpServiceBindingGuid = &gEfiMtftp4ServiceBindingProtocolGuid;
   } else {
-    if (PcdGet8(PcdIPv6PXESupport) == PXE_DISABLED) {
+    if (PcdGet8 (PcdIPv6PXESupport) == PXE_DISABLED) {
       return EFI_UNSUPPORTED;
     }
+
     DhcpServiceBindingGuid  = &gEfiDhcp6ServiceBindingProtocolGuid;
     MtftpServiceBindingGuid = &gEfiMtftp6ServiceBindingProtocolGuid;
   }
@@ -1322,22 +1319,22 @@ PxeBcSupported (
   // Try to open the Mtftp and Dhcp protocol to test whether IP stack is ready.
   //
   Status = gBS->OpenProtocol (
-                     ControllerHandle,
-                     DhcpServiceBindingGuid,
-                     NULL,
-                     This->DriverBindingHandle,
-                     ControllerHandle,
-                     EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                     );
+                  ControllerHandle,
+                  DhcpServiceBindingGuid,
+                  NULL,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                  );
   if (!EFI_ERROR (Status)) {
     Status = gBS->OpenProtocol (
-                       ControllerHandle,
-                       MtftpServiceBindingGuid,
-                       NULL,
-                       This->DriverBindingHandle,
-                       ControllerHandle,
-                       EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                       );
+                    ControllerHandle,
+                    MtftpServiceBindingGuid,
+                    NULL,
+                    This->DriverBindingHandle,
+                    ControllerHandle,
+                    EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                    );
   }
 
   //
@@ -1375,20 +1372,20 @@ PxeBcStart (
   IN UINT8                        IpVersion
   )
 {
-  PXEBC_PRIVATE_DATA              *Private;
-  EFI_STATUS                      Status;
-  PXEBC_PRIVATE_PROTOCOL          *Id;
-  BOOLEAN                         FirstStart;
+  PXEBC_PRIVATE_DATA      *Private;
+  EFI_STATUS              Status;
+  PXEBC_PRIVATE_PROTOCOL  *Id;
+  BOOLEAN                 FirstStart;
 
   FirstStart = FALSE;
-  Status = gBS->OpenProtocol (
-                  ControllerHandle,
-                  &gEfiCallerIdGuid,
-                  (VOID **) &Id,
-                  This->DriverBindingHandle,
-                  ControllerHandle,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
+  Status     = gBS->OpenProtocol (
+                      ControllerHandle,
+                      &gEfiCallerIdGuid,
+                      (VOID **)&Id,
+                      This->DriverBindingHandle,
+                      ControllerHandle,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
   if (!EFI_ERROR (Status)) {
     //
     // Skip the initialization if the driver has been started already.
@@ -1425,7 +1422,7 @@ PxeBcStart (
     Status = gBS->OpenProtocol (
                     ControllerHandle,
                     &gEfiDevicePathProtocolGuid,
-                    (VOID **) &Private->DevicePath,
+                    (VOID **)&Private->DevicePath,
                     This->DriverBindingHandle,
                     ControllerHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -1441,7 +1438,7 @@ PxeBcStart (
     Status = gBS->OpenProtocol (
                     ControllerHandle,
                     &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-                    (VOID **) &Private->Nii,
+                    (VOID **)&Private->Nii,
                     This->DriverBindingHandle,
                     ControllerHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -1469,7 +1466,7 @@ PxeBcStart (
     //
     // Try to locate SNP protocol.
     //
-    NetLibGetSnpHandle(ControllerHandle, &Private->Snp);
+    NetLibGetSnpHandle (ControllerHandle, &Private->Snp);
   }
 
   if (IpVersion == IP_VERSION_4) {
@@ -1483,6 +1480,7 @@ PxeBcStart (
     //
     Status = PxeBcCreateIp6Children (This, ControllerHandle, Private);
   }
+
   if (EFI_ERROR (Status)) {
     //
     // Failed to start PXE driver if IPv4 and IPv6 stack are both not available.
@@ -1508,13 +1506,12 @@ ON_ERROR:
     PxeBcDestroyIp6Children (This, Private);
   }
 
-  if (FirstStart && Private != NULL) {
+  if (FirstStart && (Private != NULL)) {
     FreePool (Private);
   }
 
   return Status;
 }
-
 
 /**
   Stop this driver on ControllerHandle. This is the worker function for
@@ -1542,12 +1539,12 @@ PxeBcStop (
   IN UINT8                        IpVersion
   )
 {
-  PXEBC_PRIVATE_DATA              *Private;
-  PXEBC_VIRTUAL_NIC               *VirtualNic;
-  EFI_LOAD_FILE_PROTOCOL          *LoadFile;
-  EFI_STATUS                      Status;
-  EFI_HANDLE                      NicHandle;
-  PXEBC_PRIVATE_PROTOCOL          *Id;
+  PXEBC_PRIVATE_DATA      *Private;
+  PXEBC_VIRTUAL_NIC       *VirtualNic;
+  EFI_LOAD_FILE_PROTOCOL  *LoadFile;
+  EFI_STATUS              Status;
+  EFI_HANDLE              NicHandle;
+  PXEBC_PRIVATE_PROTOCOL  *Id;
 
   Private    = NULL;
   NicHandle  = NULL;
@@ -1558,7 +1555,7 @@ PxeBcStop (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiLoadFileProtocolGuid,
-                  (VOID **) &LoadFile,
+                  (VOID **)&LoadFile,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -1572,6 +1569,7 @@ PxeBcStop (
     } else {
       NicHandle = PxeBcGetNicByIp6Children (ControllerHandle);
     }
+
     if (NicHandle == NULL) {
       return EFI_SUCCESS;
     }
@@ -1582,7 +1580,7 @@ PxeBcStop (
     Status = gBS->OpenProtocol (
                     NicHandle,
                     &gEfiCallerIdGuid,
-                    (VOID **) &Id,
+                    (VOID **)&Id,
                     This->DriverBindingHandle,
                     ControllerHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -1590,8 +1588,8 @@ PxeBcStop (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    Private = PXEBC_PRIVATE_DATA_FROM_ID (Id);
 
+    Private = PXEBC_PRIVATE_DATA_FROM_ID (Id);
   } else {
     //
     // It's a virtual handle with LoadFileProtocol.
@@ -1599,7 +1597,7 @@ PxeBcStop (
     Status = gBS->OpenProtocol (
                     ControllerHandle,
                     &gEfiLoadFileProtocolGuid,
-                    (VOID **) &LoadFile,
+                    (VOID **)&LoadFile,
                     This->DriverBindingHandle,
                     ControllerHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -1617,20 +1615,19 @@ PxeBcStop (
   // Stop functionality of PXE Base Code protocol
   //
   Status = Private->PxeBc.Stop (&Private->PxeBc);
-  if (Status != EFI_SUCCESS && Status != EFI_NOT_STARTED) {
+  if ((Status != EFI_SUCCESS) && (Status != EFI_NOT_STARTED)) {
     return Status;
   }
 
-
-  if (Private->Ip4Nic != NULL && IpVersion == IP_VERSION_4) {
+  if ((Private->Ip4Nic != NULL) && (IpVersion == IP_VERSION_4)) {
     PxeBcDestroyIp4Children (This, Private);
   }
 
-  if (Private->Ip6Nic != NULL && IpVersion == IP_VERSION_6) {
+  if ((Private->Ip6Nic != NULL) && (IpVersion == IP_VERSION_6)) {
     PxeBcDestroyIp6Children (This, Private);
   }
 
-  if (Private->Ip4Nic == NULL && Private->Ip6Nic == NULL) {
+  if ((Private->Ip4Nic == NULL) && (Private->Ip6Nic == NULL)) {
     gBS->UninstallProtocolInterface (
            NicHandle,
            &gEfiCallerIdGuid,

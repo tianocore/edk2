@@ -10,8 +10,7 @@
 
 #include "Mtftp6Impl.h"
 
-
-EFI_DRIVER_BINDING_PROTOCOL   gMtftp6DriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gMtftp6DriverBinding = {
   Mtftp6DriverBindingSupported,
   Mtftp6DriverBindingStart,
   Mtftp6DriverBindingStop,
@@ -25,7 +24,6 @@ EFI_SERVICE_BINDING_PROTOCOL  gMtftp6ServiceBindingTemplate = {
   Mtftp6ServiceBindingDestroyChild
 };
 
-
 /**
   Destroy the MTFTP6 service. The MTFTP6 service may be partly initialized,
   or partly destroyed. If a resource is destroyed, it is marked as such in
@@ -36,7 +34,7 @@ EFI_SERVICE_BINDING_PROTOCOL  gMtftp6ServiceBindingTemplate = {
 **/
 VOID
 Mtftp6DestroyService (
-  IN MTFTP6_SERVICE     *Service
+  IN MTFTP6_SERVICE  *Service
   )
 {
   //
@@ -55,7 +53,6 @@ Mtftp6DestroyService (
   FreePool (Service);
 }
 
-
 /**
   Create then initialize a MTFTP6 service binding instance.
 
@@ -72,13 +69,13 @@ Mtftp6DestroyService (
 **/
 EFI_STATUS
 Mtftp6CreateService (
-  IN  EFI_HANDLE            Controller,
-  IN  EFI_HANDLE            Image,
-  OUT MTFTP6_SERVICE        **Service
+  IN  EFI_HANDLE      Controller,
+  IN  EFI_HANDLE      Image,
+  OUT MTFTP6_SERVICE  **Service
   )
 {
-  MTFTP6_SERVICE            *Mtftp6Srv;
-  EFI_STATUS                Status;
+  MTFTP6_SERVICE  *Mtftp6Srv;
+  EFI_STATUS      Status;
 
   ASSERT (Service != NULL);
 
@@ -89,10 +86,10 @@ Mtftp6CreateService (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Mtftp6Srv->Signature      = MTFTP6_SERVICE_SIGNATURE;
-  Mtftp6Srv->Controller     = Controller;
-  Mtftp6Srv->Image          = Image;
-  Mtftp6Srv->ChildrenNum    = 0;
+  Mtftp6Srv->Signature   = MTFTP6_SERVICE_SIGNATURE;
+  Mtftp6Srv->Controller  = Controller;
+  Mtftp6Srv->Image       = Image;
+  Mtftp6Srv->ChildrenNum = 0;
 
   CopyMem (
     &Mtftp6Srv->ServiceBinding,
@@ -140,7 +137,6 @@ Mtftp6CreateService (
   return EFI_SUCCESS;
 }
 
-
 /**
   Destroy the MTFTP6 instance and recycle the resources.
 
@@ -149,18 +145,18 @@ Mtftp6CreateService (
 **/
 VOID
 Mtftp6DestroyInstance (
-  IN MTFTP6_INSTANCE         *Instance
+  IN MTFTP6_INSTANCE  *Instance
   )
 {
-  LIST_ENTRY                 *Entry;
-  LIST_ENTRY                 *Next;
-  MTFTP6_BLOCK_RANGE         *Block;
+  LIST_ENTRY          *Entry;
+  LIST_ENTRY          *Next;
+  MTFTP6_BLOCK_RANGE  *Block;
 
   if (Instance->Config != NULL) {
     FreePool (Instance->Config);
   }
 
-  if (Instance->Token != NULL && Instance->Token->Event != NULL) {
+  if ((Instance->Token != NULL) && (Instance->Token->Event != NULL)) {
     gBS->SignalEvent (Instance->Token->Event);
   }
 
@@ -168,7 +164,7 @@ Mtftp6DestroyInstance (
     NetbufFree (Instance->LastPacket);
   }
 
-  if (Instance->UdpIo!= NULL) {
+  if (Instance->UdpIo != NULL) {
     UdpIoFreeIo (Instance->UdpIo);
   }
 
@@ -185,7 +181,6 @@ Mtftp6DestroyInstance (
   FreePool (Instance);
 }
 
-
 /**
   Create the MTFTP6 instance and initialize it.
 
@@ -198,11 +193,11 @@ Mtftp6DestroyInstance (
 **/
 EFI_STATUS
 Mtftp6CreateInstance (
-  IN  MTFTP6_SERVICE         *Service,
-  OUT MTFTP6_INSTANCE        **Instance
+  IN  MTFTP6_SERVICE   *Service,
+  OUT MTFTP6_INSTANCE  **Instance
   )
 {
-  MTFTP6_INSTANCE            *Mtftp6Ins;
+  MTFTP6_INSTANCE  *Mtftp6Ins;
 
   *Instance = NULL;
   Mtftp6Ins = AllocateZeroPool (sizeof (MTFTP6_INSTANCE));
@@ -229,7 +224,6 @@ Mtftp6CreateInstance (
   return EFI_SUCCESS;
 }
 
-
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
 
@@ -243,8 +237,8 @@ Mtftp6CreateInstance (
 EFI_STATUS
 EFIAPI
 Mtftp6DestroyChildEntryInHandleBuffer (
-  IN LIST_ENTRY         *Entry,
-  IN VOID               *Context
+  IN LIST_ENTRY  *Entry,
+  IN VOID        *Context
   )
 {
   MTFTP6_INSTANCE               *Instance;
@@ -252,14 +246,14 @@ Mtftp6DestroyChildEntryInHandleBuffer (
   UINTN                         NumberOfChildren;
   EFI_HANDLE                    *ChildHandleBuffer;
 
-  if (Entry == NULL || Context == NULL) {
+  if ((Entry == NULL) || (Context == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Instance = NET_LIST_USER_STRUCT_S (Entry, MTFTP6_INSTANCE, Link, MTFTP6_INSTANCE_SIGNATURE);
-  ServiceBinding    = ((MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ServiceBinding;
-  NumberOfChildren  = ((MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->NumberOfChildren;
-  ChildHandleBuffer = ((MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ChildHandleBuffer;
+  Instance          = NET_LIST_USER_STRUCT_S (Entry, MTFTP6_INSTANCE, Link, MTFTP6_INSTANCE_SIGNATURE);
+  ServiceBinding    = ((MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *)Context)->ServiceBinding;
+  NumberOfChildren  = ((MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *)Context)->NumberOfChildren;
+  ChildHandleBuffer = ((MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *)Context)->ChildHandleBuffer;
 
   if (!NetIsInHandleBuffer (Instance->Handle, NumberOfChildren, ChildHandleBuffer)) {
     return EFI_SUCCESS;
@@ -267,7 +261,6 @@ Mtftp6DestroyChildEntryInHandleBuffer (
 
   return ServiceBinding->DestroyChild (ServiceBinding, Instance->Handle);
 }
-
 
 /**
   This is the declaration of an EFI image entry point. This entry point is
@@ -286,8 +279,8 @@ Mtftp6DestroyChildEntryInHandleBuffer (
 EFI_STATUS
 EFIAPI
 Mtftp6DriverEntryPoint (
-  IN EFI_HANDLE             ImageHandle,
-  IN EFI_SYSTEM_TABLE       *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return EfiLibInstallDriverBindingComponentName2 (
@@ -299,7 +292,6 @@ Mtftp6DriverEntryPoint (
            &gMtftp6ComponentName2
            );
 }
-
 
 /**
   Test to see if this driver supports Controller. This service
@@ -321,9 +313,9 @@ Mtftp6DriverEntryPoint (
 EFI_STATUS
 EFIAPI
 Mtftp6DriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
   return gBS->OpenProtocol (
@@ -335,7 +327,6 @@ Mtftp6DriverBindingSupported (
                 EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                 );
 }
-
 
 /**
   Start this driver on Controller. This service is called by the
@@ -363,8 +354,8 @@ Mtftp6DriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  MTFTP6_SERVICE            *Service;
-  EFI_STATUS                Status;
+  MTFTP6_SERVICE  *Service;
+  EFI_STATUS      Status;
 
   //
   // Directly return if driver is already running on this Nic handle.
@@ -432,7 +423,6 @@ ON_ERROR:
   return Status;
 }
 
-
 /**
   Stop this driver on Controller. This service is called by the
   EFI boot service DisconnectController(). In order to
@@ -455,18 +445,18 @@ ON_ERROR:
 EFI_STATUS
 EFIAPI
 Mtftp6DriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN  EFI_HANDLE                  Controller,
-  IN  UINTN                       NumberOfChildren,
-  IN  EFI_HANDLE                  *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Controller,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_SERVICE_BINDING_PROTOCOL               *ServiceBinding;
-  MTFTP6_SERVICE                             *Service;
-  EFI_HANDLE                                 NicHandle;
-  EFI_STATUS                                 Status;
-  LIST_ENTRY                                 *List;
-  MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT Context;
+  EFI_SERVICE_BINDING_PROTOCOL                *ServiceBinding;
+  MTFTP6_SERVICE                              *Service;
+  EFI_HANDLE                                  NicHandle;
+  EFI_STATUS                                  Status;
+  LIST_ENTRY                                  *List;
+  MTFTP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT  Context;
 
   //
   // Locate the Nic handle to retrieve the Mtftp6 private data.
@@ -480,7 +470,7 @@ Mtftp6DriverBindingStop (
   Status = gBS->OpenProtocol (
                   NicHandle,
                   &gEfiMtftp6ServiceBindingProtocolGuid,
-                  (VOID **) &ServiceBinding,
+                  (VOID **)&ServiceBinding,
                   This->DriverBindingHandle,
                   NicHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -496,19 +486,19 @@ Mtftp6DriverBindingStop (
     //
     // Destroy the Mtftp6 child instance in ChildHandleBuffer.
     //
-    List = &Service->Children;
+    List                      = &Service->Children;
     Context.ServiceBinding    = ServiceBinding;
     Context.NumberOfChildren  = NumberOfChildren;
     Context.ChildHandleBuffer = ChildHandleBuffer;
-    Status = NetDestroyLinkList (
-               List,
-               Mtftp6DestroyChildEntryInHandleBuffer,
-               &Context,
-               NULL
-               );
+    Status                    = NetDestroyLinkList (
+                                  List,
+                                  Mtftp6DestroyChildEntryInHandleBuffer,
+                                  &Context,
+                                  NULL
+                                  );
   }
 
-  if (NumberOfChildren == 0 && IsListEmpty (&Service->Children)) {
+  if ((NumberOfChildren == 0) && IsListEmpty (&Service->Children)) {
     //
     // Destroy the Mtftp6 service if there is no Mtftp6 child instance left.
     //
@@ -524,7 +514,6 @@ Mtftp6DriverBindingStop (
 
   return Status;
 }
-
 
 /**
   Creates a child handle and installs a protocol.
@@ -550,13 +539,13 @@ Mtftp6ServiceBindingCreateChild (
   IN OUT EFI_HANDLE                    *ChildHandle
   )
 {
-  MTFTP6_SERVICE            *Service;
-  MTFTP6_INSTANCE           *Instance;
-  EFI_STATUS                Status;
-  EFI_TPL                   OldTpl;
-  VOID                      *Udp6;
+  MTFTP6_SERVICE   *Service;
+  MTFTP6_INSTANCE  *Instance;
+  EFI_STATUS       Status;
+  EFI_TPL          OldTpl;
+  VOID             *Udp6;
 
-  if (This == NULL || ChildHandle == NULL) {
+  if ((This == NULL) || (ChildHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -592,7 +581,7 @@ Mtftp6ServiceBindingCreateChild (
   Status = gBS->OpenProtocol (
                   Service->DummyUdpIo->UdpHandle,
                   &gEfiUdp6ProtocolGuid,
-                  (VOID **) &Udp6,
+                  (VOID **)&Udp6,
                   gMtftp6DriverBinding.DriverBindingHandle,
                   Instance->Handle,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -626,7 +615,6 @@ ON_ERROR:
   return Status;
 }
 
-
 /**
   Destroys a child handle with a protocol installed on it.
 
@@ -646,17 +634,17 @@ ON_ERROR:
 EFI_STATUS
 EFIAPI
 Mtftp6ServiceBindingDestroyChild (
-  IN EFI_SERVICE_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                   ChildHandle
+  IN EFI_SERVICE_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                    ChildHandle
   )
 {
-  MTFTP6_SERVICE            *Service;
-  MTFTP6_INSTANCE           *Instance;
-  EFI_MTFTP6_PROTOCOL       *Mtftp6;
-  EFI_STATUS                Status;
-  EFI_TPL                   OldTpl;
+  MTFTP6_SERVICE       *Service;
+  MTFTP6_INSTANCE      *Instance;
+  EFI_MTFTP6_PROTOCOL  *Mtftp6;
+  EFI_STATUS           Status;
+  EFI_TPL              OldTpl;
 
-  if (This == NULL || ChildHandle == NULL) {
+  if ((This == NULL) || (ChildHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -666,7 +654,7 @@ Mtftp6ServiceBindingDestroyChild (
   Status = gBS->OpenProtocol (
                   ChildHandle,
                   &gEfiMtftp6ProtocolGuid,
-                  (VOID **) &Mtftp6,
+                  (VOID **)&Mtftp6,
                   gMtftp6DriverBinding.DriverBindingHandle,
                   ChildHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -703,11 +691,11 @@ Mtftp6ServiceBindingDestroyChild (
 
   if (Instance->UdpIo != NULL) {
     gBS->CloseProtocol (
-         Instance->UdpIo->UdpHandle,
-         &gEfiUdp6ProtocolGuid,
-         gMtftp6DriverBinding.DriverBindingHandle,
-         Instance->Handle
-         );
+           Instance->UdpIo->UdpHandle,
+           &gEfiUdp6ProtocolGuid,
+           gMtftp6DriverBinding.DriverBindingHandle,
+           Instance->Handle
+           );
   }
 
   if (Instance->McastUdpIo != NULL) {
@@ -739,7 +727,7 @@ Mtftp6ServiceBindingDestroyChild (
   // Remove the Mtftp6 instance from the children list of Mtftp6 service.
   //
   RemoveEntryList (&Instance->Link);
-  Service->ChildrenNum --;
+  Service->ChildrenNum--;
 
   gBS->RestoreTPL (OldTpl);
 

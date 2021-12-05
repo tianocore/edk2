@@ -19,10 +19,11 @@
 **/
 UINT16
 TcpGetUint16 (
-  IN UINT8 *Buf
+  IN UINT8  *Buf
   )
 {
   UINT16  Value;
+
   CopyMem (&Value, Buf, sizeof (UINT16));
   return NTOHS (Value);
 }
@@ -37,10 +38,11 @@ TcpGetUint16 (
 **/
 UINT32
 TcpGetUint32 (
-  IN UINT8 *Buf
+  IN UINT8  *Buf
   )
 {
   UINT32  Value;
+
   CopyMem (&Value, Buf, sizeof (UINT32));
   return NTOHL (Value);
 }
@@ -54,8 +56,8 @@ TcpGetUint32 (
 **/
 VOID
 TcpPutUint32 (
-     OUT UINT8  *Buf,
-  IN     UINT32 Data
+  OUT UINT8      *Buf,
+  IN     UINT32  Data
   )
 {
   Data = HTONL (Data);
@@ -72,7 +74,7 @@ TcpPutUint32 (
 **/
 UINT8
 TcpComputeScale (
-  IN TCP_CB *Tcb
+  IN TCP_CB  *Tcb
   )
 {
   UINT8   Scale;
@@ -82,9 +84,8 @@ TcpComputeScale (
 
   BufSize = GET_RCV_BUFFSIZE (Tcb->Sk);
 
-  Scale   = 0;
-  while ((Scale < TCP_OPTION_MAX_WS) && ((UINT32) (TCP_OPTION_MAX_WIN << Scale) < BufSize)) {
-
+  Scale = 0;
+  while ((Scale < TCP_OPTION_MAX_WS) && ((UINT32)(TCP_OPTION_MAX_WIN << Scale) < BufSize)) {
     Scale++;
   }
 
@@ -102,8 +103,8 @@ TcpComputeScale (
 **/
 UINT16
 TcpSynBuildOption (
-  IN TCP_CB  *Tcb,
-  IN NET_BUF *Nbuf
+  IN TCP_CB   *Tcb,
+  IN NET_BUF  *Nbuf
   )
 {
   UINT8   *Data;
@@ -120,9 +121,9 @@ TcpSynBuildOption (
   //
   if (!TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_TS) &&
       (!TCP_FLG_ON (TCPSEG_NETBUF (Nbuf)->Flag, TCP_FLG_ACK) ||
-        TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RCVD_TS))
-      ) {
-
+       TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RCVD_TS))
+      )
+  {
     Data = NetbufAllocSpace (
              Nbuf,
              TCP_OPTION_TS_ALIGNED_LEN,
@@ -144,9 +145,9 @@ TcpSynBuildOption (
   //
   if (!TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_NO_WS) &&
       (!TCP_FLG_ON (TCPSEG_NETBUF (Nbuf)->Flag, TCP_FLG_ACK) ||
-        TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RCVD_WS))
-      ) {
-
+       TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_RCVD_WS))
+      )
+  {
     Data = NetbufAllocSpace (
              Nbuf,
              TCP_OPTION_WS_ALIGNED_LEN,
@@ -182,8 +183,8 @@ TcpSynBuildOption (
 **/
 UINT16
 TcpBuildOption (
-  IN TCP_CB  *Tcb,
-  IN NET_BUF *Nbuf
+  IN TCP_CB   *Tcb,
+  IN NET_BUF  *Nbuf
   )
 {
   UINT8   *Data;
@@ -197,13 +198,13 @@ TcpBuildOption (
   //
   if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_SND_TS) &&
       !TCP_FLG_ON (TCPSEG_NETBUF (Nbuf)->Flag, TCP_FLG_RST)
-      ) {
-
+      )
+  {
     Data = NetbufAllocSpace (
-            Nbuf,
-            TCP_OPTION_TS_ALIGNED_LEN,
-            NET_BUF_HEAD
-            );
+             Nbuf,
+             TCP_OPTION_TS_ALIGNED_LEN,
+             NET_BUF_HEAD
+             );
 
     ASSERT (Data != NULL);
     Len += TCP_OPTION_TS_ALIGNED_LEN;
@@ -229,38 +230,38 @@ TcpBuildOption (
 **/
 INTN
 TcpParseOption (
-  IN     TCP_HEAD   *Tcp,
-  IN OUT TCP_OPTION *Option
+  IN     TCP_HEAD    *Tcp,
+  IN OUT TCP_OPTION  *Option
   )
 {
-  UINT8 *Head;
-  UINT8 TotalLen;
-  UINT8 Cur;
-  UINT8 Type;
-  UINT8 Len;
+  UINT8  *Head;
+  UINT8  TotalLen;
+  UINT8  Cur;
+  UINT8  Type;
+  UINT8  Len;
 
   ASSERT ((Tcp != NULL) && (Option != NULL));
 
-  Option->Flag  = 0;
+  Option->Flag = 0;
 
-  TotalLen      = (UINT8) ((Tcp->HeadLen << 2) - sizeof (TCP_HEAD));
+  TotalLen = (UINT8)((Tcp->HeadLen << 2) - sizeof (TCP_HEAD));
   if (TotalLen <= 0) {
     return 0;
   }
 
-  Head = (UINT8 *) (Tcp + 1);
+  Head = (UINT8 *)(Tcp + 1);
 
   //
   // Fast process of the timestamp option.
   //
   if ((TotalLen == TCP_OPTION_TS_ALIGNED_LEN) && (TcpGetUint32 (Head) == TCP_OPTION_TS_FAST)) {
-
     Option->TSVal = TcpGetUint32 (Head + 4);
     Option->TSEcr = TcpGetUint32 (Head + 8);
     Option->Flag  = TCP_OPTION_RCVD_TS;
 
     return 0;
   }
+
   //
   // Slow path to process the options.
   //
@@ -270,68 +271,64 @@ TcpParseOption (
     Type = Head[Cur];
 
     switch (Type) {
-    case TCP_OPTION_MSS:
-      Len = Head[Cur + 1];
+      case TCP_OPTION_MSS:
+        Len = Head[Cur + 1];
 
-      if ((Len != TCP_OPTION_MSS_LEN) || (TotalLen - Cur < TCP_OPTION_MSS_LEN)) {
+        if ((Len != TCP_OPTION_MSS_LEN) || (TotalLen - Cur < TCP_OPTION_MSS_LEN)) {
+          return -1;
+        }
 
-        return -1;
-      }
+        Option->Mss = TcpGetUint16 (&Head[Cur + 2]);
+        TCP_SET_FLG (Option->Flag, TCP_OPTION_RCVD_MSS);
 
-      Option->Mss = TcpGetUint16 (&Head[Cur + 2]);
-      TCP_SET_FLG (Option->Flag, TCP_OPTION_RCVD_MSS);
+        Cur += TCP_OPTION_MSS_LEN;
+        break;
 
-      Cur += TCP_OPTION_MSS_LEN;
-      break;
+      case TCP_OPTION_WS:
+        Len = Head[Cur + 1];
 
-    case TCP_OPTION_WS:
-      Len = Head[Cur + 1];
+        if ((Len != TCP_OPTION_WS_LEN) || (TotalLen - Cur < TCP_OPTION_WS_LEN)) {
+          return -1;
+        }
 
-      if ((Len != TCP_OPTION_WS_LEN) || (TotalLen - Cur < TCP_OPTION_WS_LEN)) {
+        Option->WndScale = (UINT8)MIN (14, Head[Cur + 2]);
+        TCP_SET_FLG (Option->Flag, TCP_OPTION_RCVD_WS);
 
-        return -1;
-      }
+        Cur += TCP_OPTION_WS_LEN;
+        break;
 
-      Option->WndScale = (UINT8) MIN (14, Head[Cur + 2]);
-      TCP_SET_FLG (Option->Flag, TCP_OPTION_RCVD_WS);
+      case TCP_OPTION_TS:
+        Len = Head[Cur + 1];
 
-      Cur += TCP_OPTION_WS_LEN;
-      break;
+        if ((Len != TCP_OPTION_TS_LEN) || (TotalLen - Cur < TCP_OPTION_TS_LEN)) {
+          return -1;
+        }
 
-    case TCP_OPTION_TS:
-      Len = Head[Cur + 1];
+        Option->TSVal = TcpGetUint32 (&Head[Cur + 2]);
+        Option->TSEcr = TcpGetUint32 (&Head[Cur + 6]);
+        TCP_SET_FLG (Option->Flag, TCP_OPTION_RCVD_TS);
 
-      if ((Len != TCP_OPTION_TS_LEN) || (TotalLen - Cur < TCP_OPTION_TS_LEN)) {
+        Cur += TCP_OPTION_TS_LEN;
+        break;
 
-        return -1;
-      }
+      case TCP_OPTION_NOP:
+        Cur++;
+        break;
 
-      Option->TSVal = TcpGetUint32 (&Head[Cur + 2]);
-      Option->TSEcr = TcpGetUint32 (&Head[Cur + 6]);
-      TCP_SET_FLG (Option->Flag, TCP_OPTION_RCVD_TS);
+      case TCP_OPTION_EOP:
+        Cur = TotalLen;
+        break;
 
-      Cur += TCP_OPTION_TS_LEN;
-      break;
+      default:
+        Len = Head[Cur + 1];
 
-    case TCP_OPTION_NOP:
-      Cur++;
-      break;
+        if (((TotalLen - Cur) < Len) || (Len < 2)) {
+          return -1;
+        }
 
-    case TCP_OPTION_EOP:
-      Cur = TotalLen;
-      break;
-
-    default:
-      Len = Head[Cur + 1];
-
-      if ((TotalLen - Cur) < Len || Len < 2) {
-        return -1;
-      }
-
-      Cur = (UINT8) (Cur + Len);
-      break;
+        Cur = (UINT8)(Cur + Len);
+        break;
     }
-
   }
 
   return 0;

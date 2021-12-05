@@ -173,4 +173,3 @@ Udp6ServiceBindingDestroyChild (
   );
 
 #endif
-

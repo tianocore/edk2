@@ -22,7 +22,7 @@ EFI_HANDLE  mDpcHandle = NULL;
 //
 // The EFI_DPC_PROTOCOL instances that is installed onto mDpcHandle
 //
-EFI_DPC_PROTOCOL mDpc = {
+EFI_DPC_PROTOCOL  mDpc = {
   DpcQueueDpc,
   DpcDispatchDpc
 };
@@ -30,7 +30,7 @@ EFI_DPC_PROTOCOL mDpc = {
 //
 // Global variables used to measure the DPC Queue Depths
 //
-UINTN  mDpcQueueDepth = 0;
+UINTN  mDpcQueueDepth    = 0;
 UINTN  mMaxDpcQueueDepth = 0;
 
 //
@@ -39,14 +39,14 @@ UINTN  mMaxDpcQueueDepth = 0;
 // If the free list is empty and a DPC is queued, the free list is grown by allocating
 // an additional set of DPC entries.
 //
-LIST_ENTRY      mDpcEntryFreeList = INITIALIZE_LIST_HEAD_VARIABLE(mDpcEntryFreeList);
+LIST_ENTRY  mDpcEntryFreeList = INITIALIZE_LIST_HEAD_VARIABLE (mDpcEntryFreeList);
 
 //
 // An array of DPC queues.  A DPC queue is allocated for every level EFI_TPL value.
 // As DPCs are queued, they are added to the end of the linked list.
 // As DPCs are dispatched, they are removed from the beginning of the linked list.
 //
-LIST_ENTRY      mDpcQueue[TPL_HIGH_LEVEL + 1];
+LIST_ENTRY  mDpcQueue[TPL_HIGH_LEVEL + 1];
 
 /**
   Add a Deferred Procedure Call to the end of the DPC queue.
@@ -81,7 +81,7 @@ DpcQueueDpc (
   //
   // Make sure DpcTpl is valid
   //
-  if (DpcTpl < TPL_APPLICATION || DpcTpl > TPL_HIGH_LEVEL) {
+  if ((DpcTpl < TPL_APPLICATION) || (DpcTpl > TPL_HIGH_LEVEL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -265,7 +265,7 @@ DpcDispatchDpc (
         //
         // Invoke the DPC passing in its context
         //
-        (DpcEntry->DpcProcedure) (DpcEntry->DpcContext);
+        (DpcEntry->DpcProcedure)(DpcEntry->DpcContext);
 
         //
         // At least one DPC has been invoked, so set the return status to EFI_SUCCESS

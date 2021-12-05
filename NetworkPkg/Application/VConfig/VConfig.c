@@ -23,20 +23,20 @@
 //
 // String token ID of VConfig command help message text.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringVConfigHelpTokenId = STRING_TOKEN (STR_VCONFIG_HELP);
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID  mStringVConfigHelpTokenId = STRING_TOKEN (STR_VCONFIG_HELP);
 
-#define INVALID_NIC_INDEX   0xffff
-#define INVALID_VLAN_ID     0xffff
+#define INVALID_NIC_INDEX  0xffff
+#define INVALID_VLAN_ID    0xffff
 
 //
 // This is the generated String package data for all .UNI files.
 // This data array is ready to be used as input of HiiAddPackages() to
 // create a packagelist (which contains Form packages, String packages, etc).
 //
-extern UINT8      VConfigStrings[];
+extern UINT8  VConfigStrings[];
 
-EFI_HANDLE        mImageHandle  = NULL;
-EFI_HII_HANDLE    mHiiHandle    = NULL;
+EFI_HANDLE      mImageHandle = NULL;
+EFI_HII_HANDLE  mHiiHandle   = NULL;
 
 SHELL_PARAM_ITEM  mParamList[] = {
   {
@@ -66,14 +66,14 @@ SHELL_PARAM_ITEM  mParamList[] = {
 **/
 VOID
 LocateNicHandleBuffer (
-  OUT UINTN                       *NumberOfHandles,
-  OUT EFI_HANDLE                  **HandleBuffer
+  OUT UINTN       *NumberOfHandles,
+  OUT EFI_HANDLE  **HandleBuffer
   )
 {
   EFI_STATUS  Status;
 
-  *NumberOfHandles  = 0;
-  *HandleBuffer     = NULL;
+  *NumberOfHandles = 0;
+  *HandleBuffer    = NULL;
 
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
@@ -98,7 +98,7 @@ LocateNicHandleBuffer (
 **/
 UINTN
 NicNameToIndex (
-  IN CHAR16                   *Name
+  IN CHAR16  *Name
   )
 {
   CHAR16  *Str;
@@ -116,7 +116,7 @@ NicNameToIndex (
     Str++;
   }
 
-  return (UINT16) StrDecimalToUintn (Name + 3);
+  return (UINT16)StrDecimalToUintn (Name + 3);
 }
 
 /**
@@ -130,7 +130,7 @@ NicNameToIndex (
 **/
 EFI_HANDLE
 NicNameToHandle (
-  IN CHAR16                   *Name
+  IN CHAR16  *Name
   )
 {
   UINTN       NumberOfHandles;
@@ -168,7 +168,7 @@ NicNameToHandle (
 **/
 EFI_VLAN_CONFIG_PROTOCOL *
 OpenVlanConfigProtocol (
-  IN EFI_HANDLE                 Handle
+  IN EFI_HANDLE  Handle
   )
 {
   EFI_VLAN_CONFIG_PROTOCOL  *VlanConfig;
@@ -177,7 +177,7 @@ OpenVlanConfigProtocol (
   gBS->OpenProtocol (
          Handle,
          &gEfiVlanConfigProtocolGuid,
-         (VOID **) &VlanConfig,
+         (VOID **)&VlanConfig,
          mImageHandle,
          Handle,
          EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -194,7 +194,7 @@ OpenVlanConfigProtocol (
 **/
 VOID
 CloseVlanConfigProtocol (
-  IN EFI_HANDLE                 Handle
+  IN EFI_HANDLE  Handle
   )
 {
   gBS->CloseProtocol (
@@ -214,8 +214,8 @@ CloseVlanConfigProtocol (
 **/
 VOID
 ShowNicVlanInfo (
-  IN EFI_HANDLE              Handle,
-  IN UINTN                   NicIndex
+  IN EFI_HANDLE  Handle,
+  IN UINTN       NicIndex
   )
 {
   CHAR16                    *MacStr;
@@ -227,11 +227,11 @@ ShowNicVlanInfo (
 
   VlanConfig = OpenVlanConfigProtocol (Handle);
   if (VlanConfig == NULL) {
-    return ;
+    return;
   }
 
-  MacStr  = NULL;
-  Status  = NetLibGetMacString (Handle, mImageHandle, &MacStr);
+  MacStr = NULL;
+  Status = NetLibGetMacString (Handle, mImageHandle, &MacStr);
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_MAC_FAIL), mHiiHandle, Status);
     goto Exit;
@@ -281,7 +281,7 @@ Exit:
 **/
 VOID
 DisplayVlan (
-  IN CHAR16              *Name OPTIONAL
+  IN CHAR16  *Name OPTIONAL
   )
 {
   UINTN       NumberOfHandles;
@@ -295,11 +295,11 @@ DisplayVlan (
     //
     NicHandle = NicNameToHandle (Name);
     if (NicHandle == NULL) {
-      return ;
+      return;
     }
 
     ShowNicVlanInfo (NicHandle, 0);
-    return ;
+    return;
   }
 
   //
@@ -307,7 +307,7 @@ DisplayVlan (
   //
   LocateNicHandleBuffer (&NumberOfHandles, &HandleBuffer);
   if (NumberOfHandles == 0) {
-    return ;
+    return;
   }
 
   for (Index = 0; Index < NumberOfHandles; Index++) {
@@ -327,7 +327,7 @@ DisplayVlan (
 **/
 UINT16
 StrToVlanId (
-  IN CHAR16             *String
+  IN CHAR16  *String
   )
 {
   CHAR16  *Str;
@@ -345,7 +345,7 @@ StrToVlanId (
     return INVALID_VLAN_ID;
   }
 
-  return (UINT16) StrDecimalToUintn (String);
+  return (UINT16)StrDecimalToUintn (String);
 }
 
 /**
@@ -356,7 +356,7 @@ StrToVlanId (
 **/
 VOID
 AddVlan (
-  IN CHAR16             *ParamStr
+  IN CHAR16  *ParamStr
   )
 {
   CHAR16                    *Name;
@@ -371,17 +371,17 @@ AddVlan (
   EFI_VLAN_CONFIG_PROTOCOL  *VlanConfig;
   EFI_STATUS                Status;
 
-  VlanConfig  = NULL;
-  Priority    = 0;
+  VlanConfig = NULL;
+  Priority   = 0;
 
   if (ParamStr == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_NO_IF), mHiiHandle);
-    return ;
+    return;
   }
 
   StrPtr = AllocateCopyPool (StrSize (ParamStr), ParamStr);
   if (StrPtr == NULL) {
-    return ;
+    return;
   }
 
   Name        = StrPtr;
@@ -459,7 +459,7 @@ AddVlan (
   //
   // Set VLAN
   //
-  Status = VlanConfig->Set (VlanConfig, (UINT16) VlanId, (UINT8) Priority);
+  Status = VlanConfig->Set (VlanConfig, (UINT16)VlanId, (UINT8)Priority);
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_SET_FAIL), mHiiHandle, Status);
     goto Exit;
@@ -468,7 +468,7 @@ AddVlan (
   //
   // Connect the VLAN device.
   //
-  VlanHandle = NetLibGetVlanHandle (Handle, (UINT16) VlanId);
+  VlanHandle = NetLibGetVlanHandle (Handle, (UINT16)VlanId);
   if (VlanHandle != NULL) {
     gBS->ConnectController (VlanHandle, NULL, NULL, TRUE);
   }
@@ -491,7 +491,7 @@ Exit:
 **/
 VOID
 DeleteVlan (
-  IN CHAR16 *ParamStr
+  IN CHAR16  *ParamStr
   )
 {
   CHAR16                    *Name;
@@ -508,12 +508,12 @@ DeleteVlan (
 
   if (ParamStr == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_NO_IF), mHiiHandle);
-    return ;
+    return;
   }
 
   StrPtr = AllocateCopyPool (StrSize (ParamStr), ParamStr);
   if (StrPtr == NULL) {
-    return ;
+    return;
   }
 
   Name      = StrPtr;
@@ -541,7 +541,7 @@ DeleteVlan (
   //
   // Check VLAN ID
   //
-  if (VlanIdStr == NULL || *VlanIdStr == 0) {
+  if ((VlanIdStr == NULL) || (*VlanIdStr == 0)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_NO_VID), mHiiHandle);
     goto Exit;
   }
@@ -555,7 +555,7 @@ DeleteVlan (
   //
   // Delete VLAN.
   //
-  Status = VlanConfig->Remove (VlanConfig, (UINT16) VlanId);
+  Status = VlanConfig->Remove (VlanConfig, (UINT16)VlanId);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_NOT_FOUND) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_NOT_FOUND), mHiiHandle);
@@ -606,10 +606,10 @@ VlanConfigMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  LIST_ENTRY    *List;
-  CONST CHAR16  *Str;
-  EFI_HII_PACKAGE_LIST_HEADER     *PackageList;
-  EFI_STATUS    Status;
+  LIST_ENTRY                   *List;
+  CONST CHAR16                 *Str;
+  EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
+  EFI_STATUS                   Status;
 
   mImageHandle = ImageHandle;
 
@@ -619,7 +619,7 @@ VlanConfigMain (
   Status = gBS->OpenProtocol (
                   ImageHandle,
                   &gEfiHiiPackageListProtocolGuid,
-                  (VOID **) &PackageList,
+                  (VOID **)&PackageList,
                   ImageHandle,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -632,11 +632,11 @@ VlanConfigMain (
   // Publish HII package list to HII Database.
   //
   Status = gHiiDatabase->NewPackageList (
-                          gHiiDatabase,
-                          PackageList,
-                          NULL,
-                          &mHiiHandle
-                          );
+                           gHiiDatabase,
+                           PackageList,
+                           NULL,
+                           &mHiiHandle
+                           );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -654,19 +654,19 @@ VlanConfigMain (
 
   if (ShellCommandLineGetFlag (List, L"-l")) {
     Str = ShellCommandLineGetValue (List, L"-l");
-    DisplayVlan ((CHAR16 *) Str);
+    DisplayVlan ((CHAR16 *)Str);
     goto Exit;
   }
 
   if (ShellCommandLineGetFlag (List, L"-a")) {
     Str = ShellCommandLineGetValue (List, L"-a");
-    AddVlan ((CHAR16 *) Str);
+    AddVlan ((CHAR16 *)Str);
     goto Exit;
   }
 
   if (ShellCommandLineGetFlag (List, L"-d")) {
     Str = ShellCommandLineGetValue (List, L"-d");
-    DeleteVlan ((CHAR16 *) Str);
+    DeleteVlan ((CHAR16 *)Str);
     goto Exit;
   }
 

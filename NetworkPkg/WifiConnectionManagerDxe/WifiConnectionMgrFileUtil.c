@@ -9,7 +9,7 @@
 
 #include "WifiConnectionMgrFileUtil.h"
 
-CHAR16*  mDerPemEncodedSuffix[] = {
+CHAR16  *mDerPemEncodedSuffix[] = {
   L".cer",
   L".der",
   L".crt",
@@ -28,15 +28,17 @@ CHAR16*  mDerPemEncodedSuffix[] = {
 **/
 BOOLEAN
 IsDerPemEncodeCertificate (
-  IN CONST CHAR16         *FileSuffix
-)
+  IN CONST CHAR16  *FileSuffix
+  )
 {
-  UINTN     Index;
+  UINTN  Index;
+
   for (Index = 0; mDerPemEncodedSuffix[Index] != NULL; Index++) {
     if (StrCmp (FileSuffix, mDerPemEncodedSuffix[Index]) == 0) {
       return TRUE;
     }
   }
+
   return FALSE;
 }
 
@@ -58,16 +60,16 @@ IsDerPemEncodeCertificate (
 **/
 EFI_STATUS
 ReadFileContent (
-  IN      EFI_FILE_HANDLE           FileHandle,
-  IN OUT  VOID                      **BufferPtr,
-     OUT  UINTN                     *FileSize,
-  IN      UINTN                     AddtionAllocateSize
+  IN      EFI_FILE_HANDLE  FileHandle,
+  IN OUT  VOID             **BufferPtr,
+  OUT  UINTN               *FileSize,
+  IN      UINTN            AddtionAllocateSize
   )
 {
-  UINTN      BufferSize;
-  UINT64     SourceFileSize;
-  VOID       *Buffer;
-  EFI_STATUS Status;
+  UINTN       BufferSize;
+  UINT64      SourceFileSize;
+  VOID        *Buffer;
+  EFI_STATUS  Status;
 
   if ((FileHandle == NULL) || (FileSize == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -78,7 +80,7 @@ ReadFileContent (
   //
   // Get the file size
   //
-  Status = FileHandle->SetPosition (FileHandle, (UINT64) -1);
+  Status = FileHandle->SetPosition (FileHandle, (UINT64)-1);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
@@ -93,20 +95,20 @@ ReadFileContent (
     goto ON_EXIT;
   }
 
-  BufferSize = (UINTN) SourceFileSize + AddtionAllocateSize;
-  Buffer =  AllocateZeroPool(BufferSize);
+  BufferSize = (UINTN)SourceFileSize + AddtionAllocateSize;
+  Buffer     =  AllocateZeroPool (BufferSize);
   if (Buffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  BufferSize = (UINTN) SourceFileSize;
+  BufferSize = (UINTN)SourceFileSize;
   *FileSize  = BufferSize;
 
   Status = FileHandle->Read (FileHandle, &BufferSize, Buffer);
-  if (EFI_ERROR (Status) || BufferSize != *FileSize) {
+  if (EFI_ERROR (Status) || (BufferSize != *FileSize)) {
     FreePool (Buffer);
     Buffer = NULL;
-    Status  = EFI_BAD_BUFFER_SIZE;
+    Status = EFI_BAD_BUFFER_SIZE;
     goto ON_EXIT;
   }
 
@@ -127,7 +129,7 @@ ON_EXIT:
 CHAR16 *
 EFIAPI
 DevicePathToStr (
-  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
   )
 {
   return ConvertDevicePathToText (
@@ -150,37 +152,38 @@ DevicePathToStr (
 **/
 CHAR16 *
 ExtractFileNameFromDevicePath (
-  IN   EFI_DEVICE_PATH_PROTOCOL    *DevicePath
+  IN   EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
-  CHAR16          *String;
-  CHAR16          *MatchString;
-  CHAR16          *LastMatch;
-  CHAR16          *FileName;
-  UINTN           Length;
+  CHAR16  *String;
+  CHAR16  *MatchString;
+  CHAR16  *LastMatch;
+  CHAR16  *FileName;
+  UINTN   Length;
 
-  ASSERT(DevicePath != NULL);
+  ASSERT (DevicePath != NULL);
 
-  String = DevicePathToStr(DevicePath);
+  String = DevicePathToStr (DevicePath);
   if (String == NULL) {
     return NULL;
   }
+
   MatchString = String;
   LastMatch   = String;
   FileName    = NULL;
 
-  while(MatchString != NULL){
+  while (MatchString != NULL) {
     LastMatch   = MatchString + 1;
-    MatchString = StrStr(LastMatch,L"\\");
+    MatchString = StrStr (LastMatch, L"\\");
   }
 
-  Length = StrLen(LastMatch);
-  FileName = AllocateCopyPool ((Length + 1) * sizeof(CHAR16), LastMatch);
+  Length   = StrLen (LastMatch);
+  FileName = AllocateCopyPool ((Length + 1) * sizeof (CHAR16), LastMatch);
   if (FileName != NULL) {
     *(FileName + Length) = 0;
   }
 
-  FreePool(String);
+  FreePool (String);
 
   return FileName;
 }
@@ -197,20 +200,21 @@ ExtractFileNameFromDevicePath (
 
 **/
 BOOLEAN
-UpdatePage(
-  IN  WIFI_MGR_PRIVATE_DATA       *Private,
-  IN  EFI_DEVICE_PATH_PROTOCOL    *FilePath,
-  IN  EFI_FORM_ID                 FormId
+UpdatePage (
+  IN  WIFI_MGR_PRIVATE_DATA     *Private,
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath,
+  IN  EFI_FORM_ID               FormId
   )
 {
-  CHAR16           *FileName;
-  EFI_STATUS       Status;
+  CHAR16      *FileName;
+  EFI_STATUS  Status;
 
   FileName = NULL;
 
   if (FilePath != NULL) {
-    FileName = ExtractFileNameFromDevicePath(FilePath);
+    FileName = ExtractFileNameFromDevicePath (FilePath);
   }
+
   if (FileName == NULL) {
     //
     // FileName = NULL has two cases:
@@ -227,6 +231,7 @@ UpdatePage(
   if (Private->FileContext->FHandle != NULL) {
     Private->FileContext->FHandle->Close (Private->FileContext->FHandle);
   }
+
   Private->FileContext->FHandle = NULL;
 
   Status = EfiOpenFileByDevicePath (
@@ -237,26 +242,42 @@ UpdatePage(
              );
   if (EFI_ERROR (Status)) {
     if (FormId == FORMID_ENROLL_CERT) {
-      HiiSetString (Private->RegisteredHandle,
-        STRING_TOKEN (STR_EAP_ENROLLED_CERT_NAME), L"", NULL);
-    } else if (FormId == FORMID_ENROLL_PRIVATE_KEY){
-      HiiSetString (Private->RegisteredHandle,
-        STRING_TOKEN (STR_EAP_ENROLLED_PRIVATE_KEY_NAME), L"", NULL);
+      HiiSetString (
+        Private->RegisteredHandle,
+        STRING_TOKEN (STR_EAP_ENROLLED_CERT_NAME),
+        L"",
+        NULL
+        );
+    } else if (FormId == FORMID_ENROLL_PRIVATE_KEY) {
+      HiiSetString (
+        Private->RegisteredHandle,
+        STRING_TOKEN (STR_EAP_ENROLLED_PRIVATE_KEY_NAME),
+        L"",
+        NULL
+        );
     }
   } else {
-
     if (Private->FileContext->FileName != NULL) {
       FreePool (Private->FileContext->FileName);
       Private->FileContext->FileName = NULL;
     }
+
     Private->FileContext->FileName = FileName;
 
     if (FormId == FORMID_ENROLL_CERT) {
-      HiiSetString (Private->RegisteredHandle,
-        STRING_TOKEN (STR_EAP_ENROLLED_CERT_NAME), FileName, NULL);
-    } else if (FormId == FORMID_ENROLL_PRIVATE_KEY){
-      HiiSetString (Private->RegisteredHandle,
-        STRING_TOKEN (STR_EAP_ENROLLED_PRIVATE_KEY_NAME), FileName, NULL);
+      HiiSetString (
+        Private->RegisteredHandle,
+        STRING_TOKEN (STR_EAP_ENROLLED_CERT_NAME),
+        FileName,
+        NULL
+        );
+    } else if (FormId == FORMID_ENROLL_PRIVATE_KEY) {
+      HiiSetString (
+        Private->RegisteredHandle,
+        STRING_TOKEN (STR_EAP_ENROLLED_PRIVATE_KEY_NAME),
+        FileName,
+        NULL
+        );
     }
   }
 
@@ -275,11 +296,11 @@ UpdatePage(
 **/
 BOOLEAN
 UpdateCAFromFile (
-  IN  WIFI_MGR_PRIVATE_DATA       *Private,
-  IN  EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  IN  WIFI_MGR_PRIVATE_DATA     *Private,
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath
   )
 {
-  return UpdatePage(Private, FilePath, FORMID_ENROLL_CERT);
+  return UpdatePage (Private, FilePath, FORMID_ENROLL_CERT);
 }
 
 /**
@@ -294,10 +315,9 @@ UpdateCAFromFile (
 **/
 BOOLEAN
 UpdatePrivateKeyFromFile (
-  IN  WIFI_MGR_PRIVATE_DATA       *Private,
-  IN  EFI_DEVICE_PATH_PROTOCOL    *FilePath
+  IN  WIFI_MGR_PRIVATE_DATA     *Private,
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath
   )
 {
-  return UpdatePage(Private, FilePath, FORMID_ENROLL_PRIVATE_KEY);
+  return UpdatePage (Private, FilePath, FORMID_ENROLL_PRIVATE_KEY);
 }
-

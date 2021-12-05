@@ -13,94 +13,93 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// to validate a dhcp message. Refere the comments of the
 /// DHCP_OPTION_FORMAT structure.
 ///
-DHCP_OPTION_FORMAT DhcpOptionFormats[] = {
-  {DHCP4_TAG_NETMASK,        DHCP_OPTION_IP,     1, 1  , TRUE},
-  {DHCP4_TAG_TIME_OFFSET,    DHCP_OPTION_INT32,  1, 1  , FALSE},
-  {DHCP4_TAG_ROUTER,         DHCP_OPTION_IP,     1, -1 , TRUE},
-  {DHCP4_TAG_TIME_SERVER,    DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_NAME_SERVER,    DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_DNS_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_LOG_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_COOKIE_SERVER,  DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_LPR_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_IMPRESS_SERVER, DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_RL_SERVER,      DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_HOSTNAME,       DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_BOOTFILE_LEN,   DHCP_OPTION_INT16,  1, 1  , FALSE},
-  {DHCP4_TAG_DUMP,           DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_DOMAINNAME,     DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_SWAP_SERVER,    DHCP_OPTION_IP,     1, 1  , FALSE},
-  {DHCP4_TAG_ROOTPATH,       DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_EXTEND_PATH,    DHCP_OPTION_INT8,   1, -1 , FALSE},
+DHCP_OPTION_FORMAT  DhcpOptionFormats[] = {
+  { DHCP4_TAG_NETMASK,         DHCP_OPTION_IP,     1, 1,  TRUE  },
+  { DHCP4_TAG_TIME_OFFSET,     DHCP_OPTION_INT32,  1, 1,  FALSE },
+  { DHCP4_TAG_ROUTER,          DHCP_OPTION_IP,     1, -1, TRUE  },
+  { DHCP4_TAG_TIME_SERVER,     DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_NAME_SERVER,     DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_DNS_SERVER,      DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_LOG_SERVER,      DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_COOKIE_SERVER,   DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_LPR_SERVER,      DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_IMPRESS_SERVER,  DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_RL_SERVER,       DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_HOSTNAME,        DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_BOOTFILE_LEN,    DHCP_OPTION_INT16,  1, 1,  FALSE },
+  { DHCP4_TAG_DUMP,            DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_DOMAINNAME,      DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_SWAP_SERVER,     DHCP_OPTION_IP,     1, 1,  FALSE },
+  { DHCP4_TAG_ROOTPATH,        DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_EXTEND_PATH,     DHCP_OPTION_INT8,   1, -1, FALSE },
 
-  {DHCP4_TAG_IPFORWARD,      DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP4_TAG_NONLOCAL_SRR,   DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP4_TAG_POLICY_SRR,     DHCP_OPTION_IPPAIR, 1, -1 , FALSE},
-  {DHCP4_TAG_EMTU,           DHCP_OPTION_INT16,  1, 1  , FALSE},
-  {DHCP4_TAG_TTL,            DHCP_OPTION_INT8,   1, 1  , FALSE},
-  {DHCP4_TAG_PATHMTU_AGE,    DHCP_OPTION_INT32,  1, 1  , FALSE},
-  {DHCP4_TAG_PATHMTU_PLATEAU,DHCP_OPTION_INT16,  1, -1 , FALSE},
+  { DHCP4_TAG_IPFORWARD,       DHCP_OPTION_SWITCH, 1, 1,  FALSE },
+  { DHCP4_TAG_NONLOCAL_SRR,    DHCP_OPTION_SWITCH, 1, 1,  FALSE },
+  { DHCP4_TAG_POLICY_SRR,      DHCP_OPTION_IPPAIR, 1, -1, FALSE },
+  { DHCP4_TAG_EMTU,            DHCP_OPTION_INT16,  1, 1,  FALSE },
+  { DHCP4_TAG_TTL,             DHCP_OPTION_INT8,   1, 1,  FALSE },
+  { DHCP4_TAG_PATHMTU_AGE,     DHCP_OPTION_INT32,  1, 1,  FALSE },
+  { DHCP4_TAG_PATHMTU_PLATEAU, DHCP_OPTION_INT16,  1, -1, FALSE },
 
-  {DHCP4_TAG_IFMTU,          DHCP_OPTION_INT16,  1, 1  , FALSE},
-  {DHCP4_TAG_SUBNET_LOCAL,   DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP4_TAG_BROADCAST,      DHCP_OPTION_IP,     1, 1  , FALSE},
-  {DHCP4_TAG_DISCOVER_MASK,  DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP4_TAG_SUPPLY_MASK,    DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP4_TAG_DISCOVER_ROUTE, DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP4_TAG_ROUTER_SOLICIT, DHCP_OPTION_IP,     1, 1  , FALSE},
-  {DHCP4_TAG_STATIC_ROUTE,   DHCP_OPTION_IPPAIR, 1, -1 , FALSE},
+  { DHCP4_TAG_IFMTU,           DHCP_OPTION_INT16,  1, 1,  FALSE },
+  { DHCP4_TAG_SUBNET_LOCAL,    DHCP_OPTION_SWITCH, 1, 1,  FALSE },
+  { DHCP4_TAG_BROADCAST,       DHCP_OPTION_IP,     1, 1,  FALSE },
+  { DHCP4_TAG_DISCOVER_MASK,   DHCP_OPTION_SWITCH, 1, 1,  FALSE },
+  { DHCP4_TAG_SUPPLY_MASK,     DHCP_OPTION_SWITCH, 1, 1,  FALSE },
+  { DHCP4_TAG_DISCOVER_ROUTE,  DHCP_OPTION_SWITCH, 1, 1,  FALSE },
+  { DHCP4_TAG_ROUTER_SOLICIT,  DHCP_OPTION_IP,     1, 1,  FALSE },
+  { DHCP4_TAG_STATIC_ROUTE,    DHCP_OPTION_IPPAIR, 1, -1, FALSE },
 
-  {DHCP4_TAG_TRAILER,        DHCP_OPTION_SWITCH, 1, 1  , FALSE},
-  {DHCP4_TAG_ARPAGE,         DHCP_OPTION_INT32,  1, 1  , FALSE},
-  {DHCP4_TAG_ETHER_ENCAP,    DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  { DHCP4_TAG_TRAILER,         DHCP_OPTION_SWITCH, 1, 1,  FALSE },
+  { DHCP4_TAG_ARPAGE,          DHCP_OPTION_INT32,  1, 1,  FALSE },
+  { DHCP4_TAG_ETHER_ENCAP,     DHCP_OPTION_SWITCH, 1, 1,  FALSE },
 
-  {DHCP4_TAG_TCP_TTL,        DHCP_OPTION_INT8,   1, 1  , FALSE},
-  {DHCP4_TAG_KEEP_INTERVAL,  DHCP_OPTION_INT32,  1, 1  , FALSE},
-  {DHCP4_TAG_KEEP_GARBAGE,   DHCP_OPTION_SWITCH, 1, 1  , FALSE},
+  { DHCP4_TAG_TCP_TTL,         DHCP_OPTION_INT8,   1, 1,  FALSE },
+  { DHCP4_TAG_KEEP_INTERVAL,   DHCP_OPTION_INT32,  1, 1,  FALSE },
+  { DHCP4_TAG_KEEP_GARBAGE,    DHCP_OPTION_SWITCH, 1, 1,  FALSE },
 
-  {DHCP4_TAG_NIS_DOMAIN,     DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_NIS_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_NTP_SERVER,     DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_VENDOR,         DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_NBNS,           DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_NBDD,           DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_NBTYPE,         DHCP_OPTION_INT8,   1, 1  , FALSE},
-  {DHCP4_TAG_NBSCOPE,        DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_XFONT,          DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_XDM,            DHCP_OPTION_IP,     1, -1 , FALSE},
+  { DHCP4_TAG_NIS_DOMAIN,      DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_NIS_SERVER,      DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_NTP_SERVER,      DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_VENDOR,          DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_NBNS,            DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_NBDD,            DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_NBTYPE,          DHCP_OPTION_INT8,   1, 1,  FALSE },
+  { DHCP4_TAG_NBSCOPE,         DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_XFONT,           DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_XDM,             DHCP_OPTION_IP,     1, -1, FALSE },
 
-  {DHCP4_TAG_REQUEST_IP,     DHCP_OPTION_IP,     1, 1  , FALSE},
-  {DHCP4_TAG_LEASE,          DHCP_OPTION_INT32,  1, 1  , TRUE},
-  {DHCP4_TAG_OVERLOAD,       DHCP_OPTION_INT8,   1, 1  , TRUE},
-  {DHCP4_TAG_MSG_TYPE,       DHCP_OPTION_INT8,   1, 1  , TRUE},
-  {DHCP4_TAG_SERVER_ID,      DHCP_OPTION_IP,     1, 1  , TRUE},
-  {DHCP4_TAG_PARA_LIST,      DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_MESSAGE,        DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_MAXMSG,         DHCP_OPTION_INT16,  1, 1  , FALSE},
-  {DHCP4_TAG_T1,             DHCP_OPTION_INT32,  1, 1  , TRUE},
-  {DHCP4_TAG_T2,             DHCP_OPTION_INT32,  1, 1  , TRUE},
-  {DHCP4_TAG_VENDOR_CLASS_ID,DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_CLIENT_ID,      DHCP_OPTION_INT8,   2, -1 , FALSE},
+  { DHCP4_TAG_REQUEST_IP,      DHCP_OPTION_IP,     1, 1,  FALSE },
+  { DHCP4_TAG_LEASE,           DHCP_OPTION_INT32,  1, 1,  TRUE  },
+  { DHCP4_TAG_OVERLOAD,        DHCP_OPTION_INT8,   1, 1,  TRUE  },
+  { DHCP4_TAG_MSG_TYPE,        DHCP_OPTION_INT8,   1, 1,  TRUE  },
+  { DHCP4_TAG_SERVER_ID,       DHCP_OPTION_IP,     1, 1,  TRUE  },
+  { DHCP4_TAG_PARA_LIST,       DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_MESSAGE,         DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_MAXMSG,          DHCP_OPTION_INT16,  1, 1,  FALSE },
+  { DHCP4_TAG_T1,              DHCP_OPTION_INT32,  1, 1,  TRUE  },
+  { DHCP4_TAG_T2,              DHCP_OPTION_INT32,  1, 1,  TRUE  },
+  { DHCP4_TAG_VENDOR_CLASS_ID, DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_CLIENT_ID,       DHCP_OPTION_INT8,   2, -1, FALSE },
 
-  {DHCP4_TAG_NISPLUS,        DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_NISPLUS_SERVER, DHCP_OPTION_IP,     1, -1 , FALSE},
+  { DHCP4_TAG_NISPLUS,         DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_NISPLUS_SERVER,  DHCP_OPTION_IP,     1, -1, FALSE },
 
-  {DHCP4_TAG_TFTP,           DHCP_OPTION_INT8,   1, -1 , FALSE},
-  {DHCP4_TAG_BOOTFILE,       DHCP_OPTION_INT8,   1, -1 , FALSE},
+  { DHCP4_TAG_TFTP,            DHCP_OPTION_INT8,   1, -1, FALSE },
+  { DHCP4_TAG_BOOTFILE,        DHCP_OPTION_INT8,   1, -1, FALSE },
 
-  {DHCP4_TAG_MOBILEIP,       DHCP_OPTION_IP,     0, -1 , FALSE},
-  {DHCP4_TAG_SMTP,           DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_POP3,           DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_NNTP,           DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_WWW,            DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_FINGER,         DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_IRC,            DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_STTALK,         DHCP_OPTION_IP,     1, -1 , FALSE},
-  {DHCP4_TAG_STDA,           DHCP_OPTION_IP,     1, -1 , FALSE},
+  { DHCP4_TAG_MOBILEIP,        DHCP_OPTION_IP,     0, -1, FALSE },
+  { DHCP4_TAG_SMTP,            DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_POP3,            DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_NNTP,            DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_WWW,             DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_FINGER,          DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_IRC,             DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_STTALK,          DHCP_OPTION_IP,     1, -1, FALSE },
+  { DHCP4_TAG_STDA,            DHCP_OPTION_IP,     1, -1, FALSE },
 
-  {DHCP4_TAG_CLASSLESS_ROUTE,DHCP_OPTION_INT8,   5, -1 , FALSE},
+  { DHCP4_TAG_CLASSLESS_ROUTE, DHCP_OPTION_INT8,   5, -1, FALSE },
 };
-
 
 /**
   Binary search the DhcpOptionFormats array to find the format
@@ -113,12 +112,12 @@ DHCP_OPTION_FORMAT DhcpOptionFormats[] = {
 **/
 DHCP_OPTION_FORMAT *
 DhcpFindOptionFormat (
-  IN UINT8                  Tag
+  IN UINT8  Tag
   )
 {
-  INTN                      Left;
-  INTN                      Right;
-  INTN                      Middle;
+  INTN  Left;
+  INTN  Right;
+  INTN  Middle;
 
   Left  = 0;
   Right = sizeof (DhcpOptionFormats) / sizeof (DHCP_OPTION_FORMAT) - 1;
@@ -133,13 +132,12 @@ DhcpFindOptionFormat (
     if (Tag < DhcpOptionFormats[Middle].Tag) {
       Right = Middle - 1;
     } else {
-      Left  = Middle + 1;
+      Left = Middle + 1;
     }
   }
 
   return NULL;
 }
-
 
 /**
   Validate whether a single DHCP option is valid according to its format.
@@ -154,35 +152,35 @@ DhcpFindOptionFormat (
 **/
 BOOLEAN
 DhcpOptionIsValid (
-  IN DHCP_OPTION_FORMAT     *Format,
-  IN UINT8                  *OptValue,
-  IN INTN                   Len
+  IN DHCP_OPTION_FORMAT  *Format,
+  IN UINT8               *OptValue,
+  IN INTN                Len
   )
 {
-  INTN                      Unit;
-  INTN                      Occur;
-  INTN                      Index;
+  INTN  Unit;
+  INTN  Occur;
+  INTN  Index;
 
   Unit = 0;
 
   switch (Format->Type) {
-  case DHCP_OPTION_SWITCH:
-  case DHCP_OPTION_INT8:
-    Unit = 1;
-    break;
+    case DHCP_OPTION_SWITCH:
+    case DHCP_OPTION_INT8:
+      Unit = 1;
+      break;
 
-  case DHCP_OPTION_INT16:
-    Unit = 2;
-    break;
+    case DHCP_OPTION_INT16:
+      Unit = 2;
+      break;
 
-  case DHCP_OPTION_INT32:
-  case DHCP_OPTION_IP:
-    Unit = 4;
-    break;
+    case DHCP_OPTION_INT32:
+    case DHCP_OPTION_IP:
+      Unit = 4;
+      break;
 
-  case DHCP_OPTION_IPPAIR:
-    Unit = 8;
-    break;
+    case DHCP_OPTION_IPPAIR:
+      Unit = 8;
+      break;
   }
 
   ASSERT (Unit != 0);
@@ -201,7 +199,8 @@ DhcpOptionIsValid (
 
   if (((Format->MinOccur != -1) && (Occur < Format->MinOccur)) ||
       ((Format->MaxOccur != -1) && (Occur > Format->MaxOccur))
-      ) {
+      )
+  {
     return FALSE;
   }
 
@@ -219,7 +218,6 @@ DhcpOptionIsValid (
   return TRUE;
 }
 
-
 /**
   Extract the client interested options, all the parameters are
   converted to host byte order.
@@ -235,60 +233,61 @@ DhcpOptionIsValid (
 **/
 EFI_STATUS
 DhcpGetParameter (
-  IN  UINT8                  Tag,
-  IN  INTN                   Len,
-  IN  UINT8                  *Data,
-  OUT DHCP_PARAMETER         *Para
+  IN  UINT8           Tag,
+  IN  INTN            Len,
+  IN  UINT8           *Data,
+  OUT DHCP_PARAMETER  *Para
   )
 {
   switch (Tag) {
-  case DHCP4_TAG_NETMASK:
-    Para->NetMask = NetGetUint32 (Data);
-    break;
+    case DHCP4_TAG_NETMASK:
+      Para->NetMask = NetGetUint32 (Data);
+      break;
 
-  case DHCP4_TAG_ROUTER:
-    //
-    // Return the first router to consumer which is the preferred one
-    //
-    Para->Router = NetGetUint32 (Data);
-    break;
+    case DHCP4_TAG_ROUTER:
+      //
+      // Return the first router to consumer which is the preferred one
+      //
+      Para->Router = NetGetUint32 (Data);
+      break;
 
-  case DHCP4_TAG_LEASE:
-    Para->Lease = NetGetUint32 (Data);
-    break;
+    case DHCP4_TAG_LEASE:
+      Para->Lease = NetGetUint32 (Data);
+      break;
 
-  case DHCP4_TAG_OVERLOAD:
-    Para->Overload = *Data;
+    case DHCP4_TAG_OVERLOAD:
+      Para->Overload = *Data;
 
-    if ((Para->Overload < 1) || (Para->Overload > 3)) {
-      return EFI_INVALID_PARAMETER;
-    }
-    break;
+      if ((Para->Overload < 1) || (Para->Overload > 3)) {
+        return EFI_INVALID_PARAMETER;
+      }
 
-  case DHCP4_TAG_MSG_TYPE:
-    Para->DhcpType = *Data;
+      break;
 
-    if ((Para->DhcpType < 1) || (Para->DhcpType > 9)) {
-      return EFI_INVALID_PARAMETER;
-    }
-    break;
+    case DHCP4_TAG_MSG_TYPE:
+      Para->DhcpType = *Data;
 
-  case DHCP4_TAG_SERVER_ID:
-    Para->ServerId = NetGetUint32 (Data);
-    break;
+      if ((Para->DhcpType < 1) || (Para->DhcpType > 9)) {
+        return EFI_INVALID_PARAMETER;
+      }
 
-  case DHCP4_TAG_T1:
-    Para->T1 = NetGetUint32 (Data);
-    break;
+      break;
 
-  case DHCP4_TAG_T2:
-    Para->T2 = NetGetUint32 (Data);
-    break;
+    case DHCP4_TAG_SERVER_ID:
+      Para->ServerId = NetGetUint32 (Data);
+      break;
+
+    case DHCP4_TAG_T1:
+      Para->T1 = NetGetUint32 (Data);
+      break;
+
+    case DHCP4_TAG_T2:
+      Para->T2 = NetGetUint32 (Data);
+      break;
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Inspect all the options in a single buffer. DHCP options may be contained
@@ -308,16 +307,16 @@ DhcpGetParameter (
 **/
 EFI_STATUS
 DhcpIterateBufferOptions (
-  IN  UINT8                 *Buffer,
-  IN  INTN                  BufLen,
-  IN  DHCP_CHECK_OPTION     Check             OPTIONAL,
-  IN  VOID                  *Context,
-  OUT UINT8                 *Overload         OPTIONAL
+  IN  UINT8              *Buffer,
+  IN  INTN               BufLen,
+  IN  DHCP_CHECK_OPTION  Check             OPTIONAL,
+  IN  VOID               *Context,
+  OUT UINT8              *Overload         OPTIONAL
   )
 {
-  INTN                      Cur;
-  UINT8                     Tag;
-  UINT8                     Len;
+  INTN   Cur;
+  UINT8  Tag;
+  UINT8  Len;
 
   Cur = 0;
 
@@ -364,7 +363,6 @@ DhcpIterateBufferOptions (
   return EFI_INVALID_PARAMETER;
 }
 
-
 /**
   Iterate through a DHCP message to visit each option. First inspect
   all the options in the OPTION field. Then if overloaded, inspect
@@ -382,23 +380,23 @@ DhcpIterateBufferOptions (
 **/
 EFI_STATUS
 DhcpIterateOptions (
-  IN  EFI_DHCP4_PACKET      *Packet,
-  IN  DHCP_CHECK_OPTION     Check         OPTIONAL,
-  IN  VOID                  *Context
+  IN  EFI_DHCP4_PACKET   *Packet,
+  IN  DHCP_CHECK_OPTION  Check         OPTIONAL,
+  IN  VOID               *Context
   )
 {
-  EFI_STATUS                Status;
-  UINT8                     Overload;
+  EFI_STATUS  Status;
+  UINT8       Overload;
 
   Overload = 0;
 
-  Status   = DhcpIterateBufferOptions (
-               Packet->Dhcp4.Option,
-               Packet->Length - sizeof (EFI_DHCP4_HEADER) - sizeof (UINT32),
-               Check,
-               Context,
-               &Overload
-               );
+  Status = DhcpIterateBufferOptions (
+             Packet->Dhcp4.Option,
+             Packet->Length - sizeof (EFI_DHCP4_HEADER) - sizeof (UINT32),
+             Check,
+             Context,
+             &Overload
+             );
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -406,7 +404,7 @@ DhcpIterateOptions (
 
   if ((Overload == DHCP_OVERLOAD_FILENAME) || (Overload == DHCP_OVERLOAD_BOTH)) {
     Status = DhcpIterateBufferOptions (
-               (UINT8 *) Packet->Dhcp4.Header.BootFileName,
+               (UINT8 *)Packet->Dhcp4.Header.BootFileName,
                128,
                Check,
                Context,
@@ -420,7 +418,7 @@ DhcpIterateOptions (
 
   if ((Overload == DHCP_OVERLOAD_SVRNAME) || (Overload == DHCP_OVERLOAD_BOTH)) {
     Status = DhcpIterateBufferOptions (
-               (UINT8 *) Packet->Dhcp4.Header.ServerName,
+               (UINT8 *)Packet->Dhcp4.Header.ServerName,
                64,
                Check,
                Context,
@@ -434,7 +432,6 @@ DhcpIterateOptions (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Call back function to DhcpIterateOptions to compute each option's
@@ -452,20 +449,19 @@ DhcpIterateOptions (
 **/
 EFI_STATUS
 DhcpGetOptionLen (
-  IN UINT8                  Tag,
-  IN UINT8                  Len,
-  IN UINT8                  *Data,
-  IN VOID                   *Context
+  IN UINT8  Tag,
+  IN UINT8  Len,
+  IN UINT8  *Data,
+  IN VOID   *Context
   )
 {
-  DHCP_OPTION_COUNT         *OpCount;
+  DHCP_OPTION_COUNT  *OpCount;
 
-  OpCount             = (DHCP_OPTION_COUNT *) Context;
-  OpCount[Tag].Offset = (UINT16) (OpCount[Tag].Offset + Len);
+  OpCount             = (DHCP_OPTION_COUNT *)Context;
+  OpCount[Tag].Offset = (UINT16)(OpCount[Tag].Offset + Len);
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Call back function to DhcpIterateOptions to consolidate each option's
@@ -482,24 +478,24 @@ DhcpGetOptionLen (
 **/
 EFI_STATUS
 DhcpFillOption (
-  IN UINT8                  Tag,
-  IN UINT8                  Len,
-  IN UINT8                  *Data,
-  IN VOID                   *Context
+  IN UINT8  Tag,
+  IN UINT8  Len,
+  IN UINT8  *Data,
+  IN VOID   *Context
   )
 {
-  DHCP_OPTION_CONTEXT       *OptContext;
-  DHCP_OPTION_COUNT         *OptCount;
-  DHCP_OPTION               *Options;
-  UINT8                     *Buf;
-  UINT8                     Index;
+  DHCP_OPTION_CONTEXT  *OptContext;
+  DHCP_OPTION_COUNT    *OptCount;
+  DHCP_OPTION          *Options;
+  UINT8                *Buf;
+  UINT8                Index;
 
-  OptContext  = (DHCP_OPTION_CONTEXT *) Context;
+  OptContext = (DHCP_OPTION_CONTEXT *)Context;
 
-  OptCount    = OptContext->OpCount;
-  Index       = OptCount[Tag].Index;
-  Options     = OptContext->Options;
-  Buf         = OptContext->Buf;
+  OptCount = OptContext->OpCount;
+  Index    = OptCount[Tag].Index;
+  Options  = OptContext->Options;
+  Buf      = OptContext->Buf;
 
   if (Options[Index].Data == NULL) {
     Options[Index].Tag  = Tag;
@@ -508,11 +504,10 @@ DhcpFillOption (
 
   CopyMem (Buf + OptCount[Tag].Offset, Data, Len);
 
-  OptCount[Tag].Offset  = (UINT16) (OptCount[Tag].Offset + Len);
-  Options[Index].Len    = (UINT16) (Options[Index].Len + Len);
+  OptCount[Tag].Offset = (UINT16)(OptCount[Tag].Offset + Len);
+  Options[Index].Len   = (UINT16)(Options[Index].Len + Len);
   return EFI_SUCCESS;
 }
-
 
 /**
   Parse the options of a DHCP packet. It supports RFC 3396: Encoding
@@ -544,18 +539,18 @@ DhcpFillOption (
 **/
 EFI_STATUS
 DhcpParseOption (
-  IN  EFI_DHCP4_PACKET      *Packet,
-  OUT INTN                  *Count,
-  OUT DHCP_OPTION           **OptionPoint
+  IN  EFI_DHCP4_PACKET  *Packet,
+  OUT INTN              *Count,
+  OUT DHCP_OPTION       **OptionPoint
   )
 {
-  DHCP_OPTION_CONTEXT       Context;
-  DHCP_OPTION               *Options;
-  DHCP_OPTION_COUNT         *OptCount;
-  EFI_STATUS                Status;
-  UINT16                    TotalLen;
-  INTN                      OptNum;
-  INTN                      Index;
+  DHCP_OPTION_CONTEXT  Context;
+  DHCP_OPTION          *Options;
+  DHCP_OPTION_COUNT    *OptCount;
+  EFI_STATUS           Status;
+  UINT16               TotalLen;
+  INTN                 OptNum;
+  INTN                 Index;
 
   ASSERT ((Count != NULL) && (OptionPoint != NULL));
 
@@ -580,22 +575,22 @@ DhcpParseOption (
   // OptCount[Index].Offset specifies the offset into the continuous
   // option value buffer to put the data.
   //
-  TotalLen  = 0;
-  OptNum    = 0;
+  TotalLen = 0;
+  OptNum   = 0;
 
   for (Index = 0; Index < DHCP_MAX_OPTIONS; Index++) {
     if (OptCount[Index].Offset != 0) {
-      OptCount[Index].Index   = (UINT8) OptNum;
+      OptCount[Index].Index = (UINT8)OptNum;
 
-      TotalLen                = (UINT16) (TotalLen + OptCount[Index].Offset);
-      OptCount[Index].Offset  = (UINT16) (TotalLen - OptCount[Index].Offset);
+      TotalLen               = (UINT16)(TotalLen + OptCount[Index].Offset);
+      OptCount[Index].Offset = (UINT16)(TotalLen - OptCount[Index].Offset);
 
       OptNum++;
     }
   }
 
-  *Count        = OptNum;
-  *OptionPoint  = NULL;
+  *Count       = OptNum;
+  *OptionPoint = NULL;
 
   if (OptNum == 0) {
     goto ON_EXIT;
@@ -605,7 +600,7 @@ DhcpParseOption (
   // Allocate a buffer to hold the DHCP options, and after that, a
   // continuous buffer to put all the options' data.
   //
-  Options = AllocateZeroPool ((UINTN) (OptNum * sizeof (DHCP_OPTION)) + TotalLen);
+  Options = AllocateZeroPool ((UINTN)(OptNum * sizeof (DHCP_OPTION)) + TotalLen);
 
   if (Options == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -614,9 +609,9 @@ DhcpParseOption (
 
   Context.OpCount = OptCount;
   Context.Options = Options;
-  Context.Buf     = (UINT8 *) (Options + OptNum);
+  Context.Buf     = (UINT8 *)(Options + OptNum);
 
-  Status          = DhcpIterateOptions (Packet, DhcpFillOption, &Context);
+  Status = DhcpIterateOptions (Packet, DhcpFillOption, &Context);
 
   if (EFI_ERROR (Status)) {
     FreePool (Options);
@@ -629,7 +624,6 @@ ON_EXIT:
   FreePool (OptCount);
   return Status;
 }
-
 
 /**
   Validate the packet's options. If necessary, allocate
@@ -645,18 +639,18 @@ ON_EXIT:
 **/
 EFI_STATUS
 DhcpValidateOptions (
-  IN  EFI_DHCP4_PACKET      *Packet,
-  OUT DHCP_PARAMETER        **Para       OPTIONAL
+  IN  EFI_DHCP4_PACKET  *Packet,
+  OUT DHCP_PARAMETER    **Para       OPTIONAL
   )
 {
-  DHCP_PARAMETER            Parameter;
-  DHCP_OPTION_FORMAT        *Format;
-  DHCP_OPTION               *AllOption;
-  DHCP_OPTION               *Option;
-  EFI_STATUS                Status;
-  BOOLEAN                   Updated;
-  INTN                      Count;
-  INTN                      Index;
+  DHCP_PARAMETER      Parameter;
+  DHCP_OPTION_FORMAT  *Format;
+  DHCP_OPTION         *AllOption;
+  DHCP_OPTION         *Option;
+  EFI_STATUS          Status;
+  BOOLEAN             Updated;
+  INTN                Count;
+  INTN                Index;
 
   if (Para != NULL) {
     *Para = NULL;
@@ -668,6 +662,7 @@ DhcpValidateOptions (
   if (EFI_ERROR (Status) || (Count == 0)) {
     return Status;
   }
+
   ASSERT (AllOption != NULL);
 
   Updated = FALSE;
@@ -716,8 +711,6 @@ ON_EXIT:
   return Status;
 }
 
-
-
 /**
   Append an option to the memory, if the option is longer than
   255 bytes, splits it into several options.
@@ -732,30 +725,29 @@ ON_EXIT:
 **/
 UINT8 *
 DhcpAppendOption (
-  OUT UINT8                  *Buf,
-  IN  UINT8                  Tag,
-  IN  UINT16                 DataLen,
-  IN  UINT8                  *Data
+  OUT UINT8   *Buf,
+  IN  UINT8   Tag,
+  IN  UINT16  DataLen,
+  IN  UINT8   *Data
   )
 {
-  INTN                      Index;
-  INTN                      Len;
+  INTN  Index;
+  INTN  Len;
 
   ASSERT (DataLen != 0);
 
   for (Index = 0; Index < (DataLen + 254) / 255; Index++) {
-    Len      = MIN (255, DataLen - Index * 255);
+    Len = MIN (255, DataLen - Index * 255);
 
     *(Buf++) = Tag;
-    *(Buf++) = (UINT8) Len;
-    CopyMem (Buf, Data + Index * 255, (UINTN) Len);
+    *(Buf++) = (UINT8)Len;
+    CopyMem (Buf, Data + Index * 255, (UINTN)Len);
 
-    Buf     += Len;
+    Buf += Len;
   }
 
   return Buf;
 }
-
 
 /**
   Build a new DHCP packet from a seed packet. Options may be deleted or
@@ -776,22 +768,22 @@ DhcpAppendOption (
 **/
 EFI_STATUS
 DhcpBuild (
-  IN  EFI_DHCP4_PACKET        *SeedPacket,
-  IN  UINT32                  DeleteCount,
-  IN  UINT8                   *DeleteList     OPTIONAL,
-  IN  UINT32                  AppendCount,
-  IN  EFI_DHCP4_PACKET_OPTION *AppendList[]   OPTIONAL,
-  OUT EFI_DHCP4_PACKET        **NewPacket
+  IN  EFI_DHCP4_PACKET         *SeedPacket,
+  IN  UINT32                   DeleteCount,
+  IN  UINT8                    *DeleteList     OPTIONAL,
+  IN  UINT32                   AppendCount,
+  IN  EFI_DHCP4_PACKET_OPTION  *AppendList[]   OPTIONAL,
+  OUT EFI_DHCP4_PACKET         **NewPacket
   )
 {
-  DHCP_OPTION               *Mark;
-  DHCP_OPTION               *SeedOptions;
-  EFI_DHCP4_PACKET          *Packet;
-  EFI_STATUS                Status;
-  INTN                      Count;
-  UINT32                    Index;
-  UINT32                    Len;
-  UINT8                     *Buf;
+  DHCP_OPTION       *Mark;
+  DHCP_OPTION       *SeedOptions;
+  EFI_DHCP4_PACKET  *Packet;
+  EFI_STATUS        Status;
+  INTN              Count;
+  UINT32            Index;
+  UINT32            Len;
+  UINT8             *Buf;
 
   //
   // Use an array of DHCP_OPTION to mark the existence
@@ -804,7 +796,7 @@ DhcpBuild (
   }
 
   for (Index = 0; Index < DHCP_MAX_OPTIONS; Index++) {
-    Mark[Index].Tag = (UINT8) Index;
+    Mark[Index].Tag = (UINT8)Index;
     Mark[Index].Len = 0;
   }
 
@@ -820,7 +812,7 @@ DhcpBuild (
   }
 
   if (SeedOptions != NULL) {
-    for (Index = 0; Index < (UINT32) Count; Index++) {
+    for (Index = 0; Index < (UINT32)Count; Index++) {
       Mark[SeedOptions[Index].Tag] = SeedOptions[Index];
     }
   }
@@ -854,18 +846,18 @@ DhcpBuild (
     }
   }
 
-  Status  = EFI_OUT_OF_RESOURCES;
-  Packet  = (EFI_DHCP4_PACKET *) AllocatePool (Len);
+  Status = EFI_OUT_OF_RESOURCES;
+  Packet = (EFI_DHCP4_PACKET *)AllocatePool (Len);
 
   if (Packet == NULL) {
     goto ON_ERROR;
   }
 
-  Packet->Size         = Len;
-  Packet->Length       = 0;
+  Packet->Size   = Len;
+  Packet->Length = 0;
   CopyMem (&Packet->Dhcp4.Header, &SeedPacket->Dhcp4.Header, sizeof (Packet->Dhcp4.Header));
-  Packet->Dhcp4.Magik  = DHCP_OPTION_MAGIC;
-  Buf                  = Packet->Dhcp4.Option;
+  Packet->Dhcp4.Magik = DHCP_OPTION_MAGIC;
+  Buf                 = Packet->Dhcp4.Option;
 
   for (Index = 0; Index < DHCP_MAX_OPTIONS; Index++) {
     if (Mark[Index].Len != 0) {
@@ -873,12 +865,12 @@ DhcpBuild (
     }
   }
 
-  *(Buf++)        = DHCP4_TAG_EOP;
-  Packet->Length  = sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32)
-                      + (UINT32) (Buf - Packet->Dhcp4.Option);
+  *(Buf++)       = DHCP4_TAG_EOP;
+  Packet->Length = sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32)
+                   + (UINT32)(Buf - Packet->Dhcp4.Option);
 
-  *NewPacket      = Packet;
-  Status          = EFI_SUCCESS;
+  *NewPacket = Packet;
+  Status     = EFI_SUCCESS;
 
 ON_ERROR:
   if (SeedOptions != NULL) {

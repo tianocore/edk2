@@ -9,7 +9,7 @@
 
 #include "Ip6Impl.h"
 
-UINT32 mIp6Id;
+UINT32  mIp6Id;
 
 /**
   Output all the available source addresses to a list entry head SourceList. The
@@ -28,16 +28,16 @@ UINT32 mIp6Id;
 **/
 EFI_STATUS
 Ip6CandidateSource (
-  IN IP6_SERVICE            *IpSb,
-  OUT LIST_ENTRY            *SourceList,
-  OUT UINT32                *SourceCount
+  IN IP6_SERVICE  *IpSb,
+  OUT LIST_ENTRY  *SourceList,
+  OUT UINT32      *SourceCount
   )
 {
-  IP6_INTERFACE             *IpIf;
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Entry2;
-  IP6_ADDRESS_INFO          *AddrInfo;
-  IP6_ADDRESS_INFO          *Copy;
+  IP6_INTERFACE     *IpIf;
+  LIST_ENTRY        *Entry;
+  LIST_ENTRY        *Entry2;
+  IP6_ADDRESS_INFO  *AddrInfo;
+  IP6_ADDRESS_INFO  *Copy;
 
   *SourceCount = 0;
 
@@ -47,12 +47,12 @@ Ip6CandidateSource (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    Copy->Signature         = IP6_ADDR_INFO_SIGNATURE;
+    Copy->Signature = IP6_ADDR_INFO_SIGNATURE;
     IP6_COPY_ADDRESS (&Copy->Address, &IpSb->LinkLocalAddr);
     Copy->IsAnycast         = FALSE;
     Copy->PrefixLength      = IP6_LINK_LOCAL_PREFIX_LENGTH;
-    Copy->ValidLifetime     = (UINT32) IP6_INFINIT_LIFETIME;
-    Copy->PreferredLifetime = (UINT32) IP6_INFINIT_LIFETIME;
+    Copy->ValidLifetime     = (UINT32)IP6_INFINIT_LIFETIME;
+    Copy->PreferredLifetime = (UINT32)IP6_INFINIT_LIFETIME;
 
     InsertTailList (SourceList, &Copy->Link);
     (*SourceCount)++;
@@ -95,15 +95,15 @@ Ip6CandidateSource (
 **/
 UINT8
 Ip6CommonPrefixLen (
-  IN EFI_IPv6_ADDRESS       *AddressA,
-  IN EFI_IPv6_ADDRESS       *AddressB
+  IN EFI_IPv6_ADDRESS  *AddressA,
+  IN EFI_IPv6_ADDRESS  *AddressB
   )
 {
-  UINT8                     Count;
-  UINT8                     Index;
-  UINT8                     ByteA;
-  UINT8                     ByteB;
-  UINT8                     NumBits;
+  UINT8  Count;
+  UINT8  Index;
+  UINT8  ByteA;
+  UINT8  ByteB;
+  UINT8  NumBits;
 
   Count = 0;
   Index = 0;
@@ -122,14 +122,14 @@ Ip6CommonPrefixLen (
     // Check how many bits are common between the two bytes.
     //
     NumBits = 8;
-    ByteA   = (UINT8) (ByteA ^ ByteB);
+    ByteA   = (UINT8)(ByteA ^ ByteB);
 
     while (ByteA != 0) {
       NumBits--;
-      ByteA = (UINT8) (ByteA >> 1);
+      ByteA = (UINT8)(ByteA >> 1);
     }
 
-    return (UINT8) (Count + NumBits);
+    return (UINT8)(Count + NumBits);
   }
 
   return Count;
@@ -151,21 +151,21 @@ Ip6CommonPrefixLen (
 **/
 EFI_STATUS
 Ip6SelectSourceAddress (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IPv6_ADDRESS       *Destination,
-  OUT EFI_IPv6_ADDRESS      *Source
+  IN IP6_SERVICE        *IpSb,
+  IN EFI_IPv6_ADDRESS   *Destination,
+  OUT EFI_IPv6_ADDRESS  *Source
   )
 {
-  EFI_STATUS                Status;
-  LIST_ENTRY                SourceList;
-  UINT32                    SourceCount;
-  UINT8                     ScopeD;
-  LIST_ENTRY                *Entry;
-  IP6_ADDRESS_INFO          *AddrInfo;
-  IP6_PREFIX_LIST_ENTRY     *Prefix;
-  UINT8                     LastCommonLength;
-  UINT8                     CurrentCommonLength;
-  EFI_IPv6_ADDRESS          *TmpAddress;
+  EFI_STATUS             Status;
+  LIST_ENTRY             SourceList;
+  UINT32                 SourceCount;
+  UINT8                  ScopeD;
+  LIST_ENTRY             *Entry;
+  IP6_ADDRESS_INFO       *AddrInfo;
+  IP6_PREFIX_LIST_ENTRY  *Prefix;
+  UINT8                  LastCommonLength;
+  UINT8                  CurrentCommonLength;
+  EFI_IPv6_ADDRESS       *TmpAddress;
 
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
 
@@ -188,7 +188,7 @@ Ip6SelectSourceAddress (
   // Rule 2: Prefer appropriate scope.
   //
   if (IP6_IS_MULTICAST (Destination)) {
-    ScopeD = (UINT8) (Destination->Addr[1] >> 4);
+    ScopeD = (UINT8)(Destination->Addr[1] >> 4);
   } else if (NetIp6IsLinkLocalAddr (Destination)) {
     ScopeD = 0x2;
   } else {
@@ -284,15 +284,15 @@ Exit:
 **/
 IP6_INTERFACE *
 Ip6SelectInterface (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IPv6_ADDRESS       *Destination,
-  IN OUT EFI_IPv6_ADDRESS   *Source
+  IN IP6_SERVICE           *IpSb,
+  IN EFI_IPv6_ADDRESS      *Destination,
+  IN OUT EFI_IPv6_ADDRESS  *Source
   )
 {
-  EFI_STATUS                Status;
-  EFI_IPv6_ADDRESS          SelectedSource;
-  IP6_INTERFACE             *IpIf;
-  BOOLEAN                   Exist;
+  EFI_STATUS        Status;
+  EFI_IPv6_ADDRESS  SelectedSource;
+  IP6_INTERFACE     *IpIf;
+  BOOLEAN           Exist;
 
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
   ASSERT (Destination != NULL && Source != NULL);
@@ -335,10 +335,10 @@ Ip6SelectInterface (
 **/
 VOID
 Ip6SysPacketSent (
-  NET_BUF                   *Packet,
-  EFI_STATUS                IoStatus,
-  UINT32                    LinkFlag,
-  VOID                      *Context
+  NET_BUF     *Packet,
+  EFI_STATUS  IoStatus,
+  UINT32      LinkFlag,
+  VOID        *Context
   )
 {
   NetbufFree (Packet);
@@ -365,22 +365,22 @@ Ip6SysPacketSent (
 **/
 EFI_STATUS
 Ip6PrependHead (
-  IN IP6_SERVICE            *IpSb,
-  IN NET_BUF                *Packet,
-  IN EFI_IP6_HEADER         *Head,
-  IN UINT16                 FragmentOffset,
-  IN UINT8                  *ExtHdrs,
-  IN UINT32                 ExtHdrsLen,
-  IN UINT8                  LastHeader,
-  IN UINT32                 HeadLen
+  IN IP6_SERVICE     *IpSb,
+  IN NET_BUF         *Packet,
+  IN EFI_IP6_HEADER  *Head,
+  IN UINT16          FragmentOffset,
+  IN UINT8           *ExtHdrs,
+  IN UINT32          ExtHdrsLen,
+  IN UINT8           LastHeader,
+  IN UINT32          HeadLen
   )
 {
-  UINT32                    Len;
-  UINT32                    UnFragExtHdrsLen;
-  EFI_IP6_HEADER            *PacketHead;
-  UINT8                     *UpdatedExtHdrs;
-  EFI_STATUS                Status;
-  UINT8                     NextHeader;
+  UINT32          Len;
+  UINT32          UnFragExtHdrsLen;
+  EFI_IP6_HEADER  *PacketHead;
+  UINT8           *UpdatedExtHdrs;
+  EFI_STATUS      Status;
+  UINT8           NextHeader;
 
   UpdatedExtHdrs = NULL;
 
@@ -388,7 +388,7 @@ Ip6PrependHead (
   // HeadLen is the length of the fixed part of the sequences of fragments, i.e.
   // the unfragment part.
   //
-  PacketHead = (EFI_IP6_HEADER *) NetbufAllocSpace (Packet, HeadLen, NET_BUF_HEAD);
+  PacketHead = (EFI_IP6_HEADER *)NetbufAllocSpace (Packet, HeadLen, NET_BUF_HEAD);
   if (PacketHead == NULL) {
     return EFI_BAD_BUFFER_SIZE;
   }
@@ -397,7 +397,7 @@ Ip6PrependHead (
   // Set the head up, convert the host byte order to network byte order
   //
   CopyMem (PacketHead, Head, sizeof (EFI_IP6_HEADER));
-  PacketHead->PayloadLength = HTONS ((UINT16) (Packet->TotalSize - sizeof (EFI_IP6_HEADER)));
+  PacketHead->PayloadLength = HTONS ((UINT16)(Packet->TotalSize - sizeof (EFI_IP6_HEADER)));
   Packet->Ip.Ip6            = PacketHead;
 
   Len              = HeadLen - sizeof (EFI_IP6_HEADER);
@@ -431,7 +431,7 @@ Ip6PrependHead (
   }
 
   CopyMem (
-    (UINT8 *) (PacketHead + 1),
+    (UINT8 *)(PacketHead + 1),
     UpdatedExtHdrs,
     UnFragExtHdrsLen + sizeof (IP6_FRAGMENT_HEADER)
     );
@@ -474,52 +474,52 @@ Ip6PrependHead (
 **/
 EFI_STATUS
 Ip6Output (
-  IN IP6_SERVICE            *IpSb,
-  IN IP6_INTERFACE          *Interface   OPTIONAL,
-  IN IP6_PROTOCOL           *IpInstance  OPTIONAL,
-  IN NET_BUF                *Packet,
-  IN EFI_IP6_HEADER         *Head,
-  IN UINT8                  *ExtHdrs,
-  IN UINT32                 ExtHdrsLen,
-  IN IP6_FRAME_CALLBACK     Callback,
-  IN VOID                   *Context
+  IN IP6_SERVICE         *IpSb,
+  IN IP6_INTERFACE       *Interface   OPTIONAL,
+  IN IP6_PROTOCOL        *IpInstance  OPTIONAL,
+  IN NET_BUF             *Packet,
+  IN EFI_IP6_HEADER      *Head,
+  IN UINT8               *ExtHdrs,
+  IN UINT32              ExtHdrsLen,
+  IN IP6_FRAME_CALLBACK  Callback,
+  IN VOID                *Context
   )
 {
-  IP6_INTERFACE             *IpIf;
-  EFI_IPv6_ADDRESS          NextHop;
-  IP6_NEIGHBOR_ENTRY        *NeighborCache;
-  IP6_ROUTE_CACHE_ENTRY     *RouteCache;
-  EFI_STATUS                Status;
-  UINT32                    Mtu;
-  UINT32                    HeadLen;
-  UINT16                    FragmentOffset;
-  UINT8                     *LastHeader;
-  UINT32                    UnFragmentLen;
-  UINT32                    UnFragmentHdrsLen;
-  UINT32                    FragmentHdrsLen;
-  UINT16                    *Checksum;
-  UINT16                    PacketChecksum;
-  UINT16                    PseudoChecksum;
-  UINT32                    Index;
-  UINT32                    PacketLen;
-  UINT32                    RealExtLen;
-  UINT32                    Offset;
-  NET_BUF                   *TmpPacket;
-  NET_BUF                   *Fragment;
-  UINT32                    Num;
-  UINT8                     *Buf;
-  EFI_IP6_HEADER            *PacketHead;
-  IP6_ICMP_HEAD             *IcmpHead;
-  IP6_TXTOKEN_WRAP          *Wrap;
-  IP6_ROUTE_ENTRY           *RouteEntry;
-  UINT8                     *UpdatedExtHdrs;
-  UINT8                     NextHeader;
-  UINT8                     LastHeaderBackup;
-  BOOLEAN                   FragmentHeadInserted;
-  UINT8                     *ExtHdrsBackup;
-  UINT8                     NextHeaderBackup;
-  EFI_IPv6_ADDRESS          Source;
-  EFI_IPv6_ADDRESS          Destination;
+  IP6_INTERFACE          *IpIf;
+  EFI_IPv6_ADDRESS       NextHop;
+  IP6_NEIGHBOR_ENTRY     *NeighborCache;
+  IP6_ROUTE_CACHE_ENTRY  *RouteCache;
+  EFI_STATUS             Status;
+  UINT32                 Mtu;
+  UINT32                 HeadLen;
+  UINT16                 FragmentOffset;
+  UINT8                  *LastHeader;
+  UINT32                 UnFragmentLen;
+  UINT32                 UnFragmentHdrsLen;
+  UINT32                 FragmentHdrsLen;
+  UINT16                 *Checksum;
+  UINT16                 PacketChecksum;
+  UINT16                 PseudoChecksum;
+  UINT32                 Index;
+  UINT32                 PacketLen;
+  UINT32                 RealExtLen;
+  UINT32                 Offset;
+  NET_BUF                *TmpPacket;
+  NET_BUF                *Fragment;
+  UINT32                 Num;
+  UINT8                  *Buf;
+  EFI_IP6_HEADER         *PacketHead;
+  IP6_ICMP_HEAD          *IcmpHead;
+  IP6_TXTOKEN_WRAP       *Wrap;
+  IP6_ROUTE_ENTRY        *RouteEntry;
+  UINT8                  *UpdatedExtHdrs;
+  UINT8                  NextHeader;
+  UINT8                  LastHeaderBackup;
+  BOOLEAN                FragmentHeadInserted;
+  UINT8                  *ExtHdrsBackup;
+  UINT8                  NextHeaderBackup;
+  EFI_IPv6_ADDRESS       Source;
+  EFI_IPv6_ADDRESS       Destination;
 
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
 
@@ -557,7 +557,7 @@ Ip6Output (
     // IpInstance->Interface is NULL when IpInstance is configured with both stationaddress
     // and destinationaddress is unspecified.
     //
-    if (IpInstance == NULL || IpInstance->Interface == NULL) {
+    if ((IpInstance == NULL) || (IpInstance->Interface == NULL)) {
       IpIf = Ip6SelectInterface (IpSb, &Head->DestinationAddress, &Head->SourceAddress);
       if (IpInstance != NULL) {
         IpInstance->Interface = IpIf;
@@ -578,43 +578,46 @@ Ip6Output (
   Head->TrafficClassL = 0;
   Head->TrafficClassH = 0;
 
-  Checksum            = NULL;
-  NextHeader          = *LastHeader;
+  Checksum   = NULL;
+  NextHeader = *LastHeader;
 
   switch (NextHeader) {
-  case EFI_IP_PROTO_UDP:
-    Packet->Udp = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
-    ASSERT (Packet->Udp != NULL);
-    if (Packet->Udp->Checksum == 0) {
-      Checksum = &Packet->Udp->Checksum;
-    }
-    break;
+    case EFI_IP_PROTO_UDP:
+      Packet->Udp = (EFI_UDP_HEADER *)NetbufGetByte (Packet, 0, NULL);
+      ASSERT (Packet->Udp != NULL);
+      if (Packet->Udp->Checksum == 0) {
+        Checksum = &Packet->Udp->Checksum;
+      }
 
-  case EFI_IP_PROTO_TCP:
-    Packet->Tcp = (TCP_HEAD *) NetbufGetByte (Packet, 0, NULL);
-    ASSERT (Packet->Tcp != NULL);
-    if (Packet->Tcp->Checksum == 0) {
-      Checksum = &Packet->Tcp->Checksum;
-    }
-    break;
+      break;
 
-  case IP6_ICMP:
-    //
-    // Don't send ICMP packet to an IPv6 anycast address.
-    //
-    if (Ip6IsAnycast (IpSb, &Head->DestinationAddress)) {
-      return EFI_INVALID_PARAMETER;
-    }
+    case EFI_IP_PROTO_TCP:
+      Packet->Tcp = (TCP_HEAD *)NetbufGetByte (Packet, 0, NULL);
+      ASSERT (Packet->Tcp != NULL);
+      if (Packet->Tcp->Checksum == 0) {
+        Checksum = &Packet->Tcp->Checksum;
+      }
 
-    IcmpHead = (IP6_ICMP_HEAD *) NetbufGetByte (Packet, 0, NULL);
-    ASSERT (IcmpHead != NULL);
-    if (IcmpHead->Checksum == 0) {
-      Checksum = &IcmpHead->Checksum;
-    }
-    break;
+      break;
 
-  default:
-    break;
+    case IP6_ICMP:
+      //
+      // Don't send ICMP packet to an IPv6 anycast address.
+      //
+      if (Ip6IsAnycast (IpSb, &Head->DestinationAddress)) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      IcmpHead = (IP6_ICMP_HEAD *)NetbufGetByte (Packet, 0, NULL);
+      ASSERT (IcmpHead != NULL);
+      if (IcmpHead->Checksum == 0) {
+        Checksum = &IcmpHead->Checksum;
+      }
+
+      break;
+
+    default:
+      break;
   }
 
   if (Checksum != NULL) {
@@ -624,11 +627,11 @@ Ip6Output (
     //
     PacketChecksum = NetbufChecksum (Packet);
     PseudoChecksum = NetIp6PseudoHeadChecksum (
-                      &Head->SourceAddress,
-                      &Head->DestinationAddress,
-                      NextHeader,
-                      Packet->TotalSize
-                      );
+                       &Head->SourceAddress,
+                       &Head->DestinationAddress,
+                       NextHeader,
+                       Packet->TotalSize
+                       );
     *Checksum = (UINT16) ~NetAddChecksum (PacketChecksum, PseudoChecksum);
   }
 
@@ -643,7 +646,7 @@ Ip6Output (
              Context
              );
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -663,7 +666,8 @@ Ip6Output (
          &RealExtLen,
          &UnFragmentHdrsLen,
          NULL
-         )) {
+         ))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -762,7 +766,6 @@ Ip6Output (
                  );
   if (RouteEntry != NULL) {
     if ((RouteEntry->Flag & IP6_PACKET_TOO_BIG) == IP6_PACKET_TOO_BIG) {
-
       //
       // FragmentHead is inserted after Hop-by-Hop Options header, Destination
       // Options header (first occur), Routing header, and before Fragment header,
@@ -787,10 +790,10 @@ Ip6Output (
         Head->NextHeader = IP6_FRAGMENT;
       }
 
-      ExtHdrsBackup    = ExtHdrs;
-      ExtHdrs          = UpdatedExtHdrs;
-      ExtHdrsLen       = ExtHdrsLen + sizeof (IP6_FRAGMENT_HEADER);
-      RealExtLen       = RealExtLen + sizeof (IP6_FRAGMENT_HEADER);
+      ExtHdrsBackup = ExtHdrs;
+      ExtHdrs       = UpdatedExtHdrs;
+      ExtHdrsLen    = ExtHdrsLen + sizeof (IP6_FRAGMENT_HEADER);
+      RealExtLen    = RealExtLen + sizeof (IP6_FRAGMENT_HEADER);
 
       mIp6Id++;
 
@@ -879,8 +882,8 @@ Ip6Output (
         goto Error;
       }
 
-      FragmentOffset = (UINT16) ((UINT16) Offset | 0x1);
-      if (Index == Num - 1){
+      FragmentOffset = (UINT16)((UINT16)Offset | 0x1);
+      if (Index == Num - 1) {
         //
         // The last fragment, clear the M flag.
         //
@@ -915,11 +918,11 @@ Ip6Output (
       // The last fragment of upper layer packet, update the IP6 token status.
       //
       if ((Index == Num -1) && (Context != NULL)) {
-        Wrap                = (IP6_TXTOKEN_WRAP *) Context;
+        Wrap                = (IP6_TXTOKEN_WRAP *)Context;
         Wrap->Token->Status = Status;
       }
 
-      Offset    += PacketLen;
+      Offset   += PacketLen;
       PacketLen = Packet->TotalSize - Offset;
       if (PacketLen > Mtu) {
         PacketLen = Mtu;
@@ -939,7 +942,7 @@ Ip6Output (
   //
   // Need not fragment the packet, send it in one frame.
   //
-  PacketHead = (EFI_IP6_HEADER *) NetbufAllocSpace (Packet, HeadLen, NET_BUF_HEAD);
+  PacketHead = (EFI_IP6_HEADER *)NetbufAllocSpace (Packet, HeadLen, NET_BUF_HEAD);
   if (PacketHead == NULL) {
     Status = EFI_BAD_BUFFER_SIZE;
     goto Error;
@@ -949,7 +952,7 @@ Ip6Output (
   Packet->Ip.Ip6 = PacketHead;
 
   if (ExtHdrs != NULL) {
-    Buf = (UINT8 *) (PacketHead + 1);
+    Buf = (UINT8 *)(PacketHead + 1);
     CopyMem (Buf, ExtHdrs, ExtHdrsLen);
   }
 
@@ -957,8 +960,8 @@ Ip6Output (
     //
     // A Fragment Header is inserted to the packet, update the payload length.
     //
-    PacketHead->PayloadLength = (UINT16) (NTOHS (PacketHead->PayloadLength) +
-                                sizeof (IP6_FRAGMENT_HEADER));
+    PacketHead->PayloadLength = (UINT16)(NTOHS (PacketHead->PayloadLength) +
+                                         sizeof (IP6_FRAGMENT_HEADER));
     PacketHead->PayloadLength = HTONS (PacketHead->PayloadLength);
     FreePool (UpdatedExtHdrs);
   }
@@ -976,6 +979,7 @@ Error:
   if (UpdatedExtHdrs != NULL) {
     FreePool (UpdatedExtHdrs);
   }
+
   Ip6CancelPacket (IpIf, Packet, Status);
   return Status;
 }
@@ -993,11 +997,11 @@ Error:
 **/
 BOOLEAN
 Ip6CancelPacketFragments (
-  IN IP6_LINK_TX_TOKEN   *Frame,
-  IN VOID                *Context
+  IN IP6_LINK_TX_TOKEN  *Frame,
+  IN VOID               *Context
   )
 {
-  if ((Frame->Packet == (NET_BUF *) Context) || (Frame->Context == Context)) {
+  if ((Frame->Packet == (NET_BUF *)Context) || (Frame->Context == Context)) {
     return TRUE;
   }
 
@@ -1018,18 +1022,18 @@ Ip6CancelPacketFragments (
 **/
 VOID
 Ip6CancelFrames (
-  IN IP6_INTERFACE          *Interface,
-  IN EFI_STATUS             IoStatus,
-  IN IP6_FRAME_TO_CANCEL    FrameToCancel   OPTIONAL,
-  IN VOID                   *Context        OPTIONAL
+  IN IP6_INTERFACE        *Interface,
+  IN EFI_STATUS           IoStatus,
+  IN IP6_FRAME_TO_CANCEL  FrameToCancel   OPTIONAL,
+  IN VOID                 *Context        OPTIONAL
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IP6_LINK_TX_TOKEN         *Token;
-  IP6_SERVICE               *IpSb;
-  IP6_NEIGHBOR_ENTRY        *ArpQue;
-  EFI_STATUS                Status;
+  LIST_ENTRY          *Entry;
+  LIST_ENTRY          *Next;
+  IP6_LINK_TX_TOKEN   *Token;
+  IP6_SERVICE         *IpSb;
+  IP6_NEIGHBOR_ENTRY  *ArpQue;
+  EFI_STATUS          Status;
 
   IpSb = Interface->Service;
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
@@ -1075,11 +1079,10 @@ Ip6CancelFrames (
 **/
 VOID
 Ip6CancelPacket (
-  IN IP6_INTERFACE    *IpIf,
-  IN NET_BUF          *Packet,
-  IN EFI_STATUS       IoStatus
+  IN IP6_INTERFACE  *IpIf,
+  IN NET_BUF        *Packet,
+  IN EFI_STATUS     IoStatus
   )
 {
   Ip6CancelFrames (IpIf, IoStatus, Ip6CancelPacketFragments, Packet);
 }
-

@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __EFI_IP4_IF_H__
 #define __EFI_IP4_IF_H__
 
-#define IP4_FRAME_RX_SIGNATURE  SIGNATURE_32 ('I', 'P', 'F', 'R')
-#define IP4_FRAME_TX_SIGNATURE  SIGNATURE_32 ('I', 'P', 'F', 'T')
-#define IP4_FRAME_ARP_SIGNATURE SIGNATURE_32 ('I', 'P', 'F', 'A')
-#define IP4_INTERFACE_SIGNATURE SIGNATURE_32 ('I', 'P', 'I', 'F')
+#define IP4_FRAME_RX_SIGNATURE   SIGNATURE_32 ('I', 'P', 'F', 'R')
+#define IP4_FRAME_TX_SIGNATURE   SIGNATURE_32 ('I', 'P', 'F', 'T')
+#define IP4_FRAME_ARP_SIGNATURE  SIGNATURE_32 ('I', 'P', 'F', 'A')
+#define IP4_INTERFACE_SIGNATURE  SIGNATURE_32 ('I', 'P', 'I', 'F')
 
 /**
   This prototype is used by both receive and transmission.
@@ -40,11 +40,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef
 VOID
 (*IP4_FRAME_CALLBACK)(
-  IN IP4_PROTOCOL              *IpInstance       OPTIONAL,
-  IN NET_BUF                   *Packet,
-  IN EFI_STATUS                IoStatus,
-  IN UINT32                    LinkFlag,
-  IN VOID                      *Context
+  IN IP4_PROTOCOL  *IpInstance       OPTIONAL,
+  IN NET_BUF       *Packet,
+  IN EFI_STATUS    IoStatus,
+  IN UINT32        LinkFlag,
+  IN VOID          *Context
   );
 
 ///
@@ -54,14 +54,14 @@ VOID
 /// Reference MNP's spec for information.
 ///
 typedef struct {
-  UINT32                                Signature;
-  IP4_INTERFACE                         *Interface;
+  UINT32                                  Signature;
+  IP4_INTERFACE                           *Interface;
 
-  IP4_PROTOCOL                          *IpInstance;
-  IP4_FRAME_CALLBACK                    CallBack;
-  VOID                                  *Context;
+  IP4_PROTOCOL                            *IpInstance;
+  IP4_FRAME_CALLBACK                      CallBack;
+  VOID                                    *Context;
 
-  EFI_MANAGED_NETWORK_COMPLETION_TOKEN  MnpToken;
+  EFI_MANAGED_NETWORK_COMPLETION_TOKEN    MnpToken;
 } IP4_LINK_RX_TOKEN;
 
 ///
@@ -69,22 +69,22 @@ typedef struct {
 /// Upon completion, the Callback will be called.
 ///
 typedef struct {
-  UINT32                                Signature;
-  LIST_ENTRY                            Link;
+  UINT32                                  Signature;
+  LIST_ENTRY                              Link;
 
-  IP4_INTERFACE                         *Interface;
-  IP4_SERVICE                           *IpSb;
+  IP4_INTERFACE                           *Interface;
+  IP4_SERVICE                             *IpSb;
 
-  IP4_PROTOCOL                          *IpInstance;
-  IP4_FRAME_CALLBACK                    CallBack;
-  NET_BUF                               *Packet;
-  VOID                                  *Context;
+  IP4_PROTOCOL                            *IpInstance;
+  IP4_FRAME_CALLBACK                      CallBack;
+  NET_BUF                                 *Packet;
+  VOID                                    *Context;
 
-  EFI_MAC_ADDRESS                       DstMac;
-  EFI_MAC_ADDRESS                       SrcMac;
+  EFI_MAC_ADDRESS                         DstMac;
+  EFI_MAC_ADDRESS                         SrcMac;
 
-  EFI_MANAGED_NETWORK_COMPLETION_TOKEN  MnpToken;
-  EFI_MANAGED_NETWORK_TRANSMIT_DATA     MnpTxData;
+  EFI_MANAGED_NETWORK_COMPLETION_TOKEN    MnpToken;
+  EFI_MANAGED_NETWORK_TRANSMIT_DATA       MnpTxData;
 } IP4_LINK_TX_TOKEN;
 
 ///
@@ -94,18 +94,18 @@ typedef struct {
 /// be sent all at once the ARP requests succeed.
 ///
 typedef struct {
-  UINT32                  Signature;
-  LIST_ENTRY              Link;
+  UINT32             Signature;
+  LIST_ENTRY         Link;
 
-  LIST_ENTRY              Frames;
-  IP4_INTERFACE           *Interface;
+  LIST_ENTRY         Frames;
+  IP4_INTERFACE      *Interface;
 
   //
   // ARP requesting staffs
   //
-  EFI_EVENT               OnResolved;
-  IP4_ADDR                Ip;
-  EFI_MAC_ADDRESS         Mac;
+  EFI_EVENT          OnResolved;
+  IP4_ADDR           Ip;
+  EFI_MAC_ADDRESS    Mac;
 } IP4_ARP_QUE;
 
 /**
@@ -121,8 +121,8 @@ typedef struct {
 typedef
 BOOLEAN
 (*IP4_FRAME_TO_CANCEL)(
-  IP4_LINK_TX_TOKEN       *Frame,
-  VOID                    *Context
+  IP4_LINK_TX_TOKEN  *Frame,
+  VOID               *Context
   );
 
 //
@@ -133,53 +133,53 @@ BOOLEAN
 // with 0.0.0.0/0.0.0.0.
 //
 struct _IP4_INTERFACE {
-  UINT32                        Signature;
-  LIST_ENTRY                    Link;
-  INTN                          RefCnt;
+  UINT32                          Signature;
+  LIST_ENTRY                      Link;
+  INTN                            RefCnt;
 
   //
   // IP address and subnet mask of the interface. It also contains
   // the subnet/net broadcast address for quick access. The fields
   // are invalid if (Configured == FALSE)
   //
-  IP4_ADDR                      Ip;
-  IP4_ADDR                      SubnetMask;
-  IP4_ADDR                      SubnetBrdcast;
-  IP4_ADDR                      NetBrdcast;
-  BOOLEAN                       Configured;
+  IP4_ADDR                        Ip;
+  IP4_ADDR                        SubnetMask;
+  IP4_ADDR                        SubnetBrdcast;
+  IP4_ADDR                        NetBrdcast;
+  BOOLEAN                         Configured;
 
   //
   // Handle used to create/destroy ARP child. All the IP children
   // share one MNP which is owned by IP service binding.
   //
-  EFI_HANDLE                    Controller;
-  EFI_HANDLE                    Image;
+  EFI_HANDLE                      Controller;
+  EFI_HANDLE                      Image;
 
-  EFI_MANAGED_NETWORK_PROTOCOL  *Mnp;
-  EFI_ARP_PROTOCOL              *Arp;
-  EFI_HANDLE                    ArpHandle;
+  EFI_MANAGED_NETWORK_PROTOCOL    *Mnp;
+  EFI_ARP_PROTOCOL                *Arp;
+  EFI_HANDLE                      ArpHandle;
 
   //
   // Queues to keep the frames sent and waiting ARP request.
   //
-  LIST_ENTRY                    ArpQues;
-  LIST_ENTRY                    SentFrames;
-  IP4_LINK_RX_TOKEN             *RecvRequest;
+  LIST_ENTRY                      ArpQues;
+  LIST_ENTRY                      SentFrames;
+  IP4_LINK_RX_TOKEN               *RecvRequest;
 
   //
   // The interface's MAC and broadcast MAC address.
   //
-  EFI_MAC_ADDRESS               Mac;
-  EFI_MAC_ADDRESS               BroadcastMac;
-  UINT32                        HwaddrLen;
+  EFI_MAC_ADDRESS                 Mac;
+  EFI_MAC_ADDRESS                 BroadcastMac;
+  UINT32                          HwaddrLen;
 
   //
   // All the IP instances that have the same IP/SubnetMask are linked
   // together through IpInstances. If any of the instance enables
   // promiscuous receive, PromiscRecv is true.
   //
-  LIST_ENTRY                    IpInstances;
-  BOOLEAN                       PromiscRecv;
+  LIST_ENTRY                      IpInstances;
+  BOOLEAN                         PromiscRecv;
 };
 
 /**
@@ -217,9 +217,9 @@ Ip4CreateInterface (
 **/
 EFI_STATUS
 Ip4SetAddress (
-  IN OUT IP4_INTERFACE      *Interface,
-  IN     IP4_ADDR           IpAddr,
-  IN     IP4_ADDR           SubnetMask
+  IN OUT IP4_INTERFACE  *Interface,
+  IN     IP4_ADDR       IpAddr,
+  IN     IP4_ADDR       SubnetMask
   );
 
 /**
@@ -238,8 +238,8 @@ Ip4SetAddress (
 **/
 EFI_STATUS
 Ip4FreeInterface (
-  IN  IP4_INTERFACE         *Interface,
-  IN  IP4_PROTOCOL          *IpInstance           OPTIONAL
+  IN  IP4_INTERFACE  *Interface,
+  IN  IP4_PROTOCOL   *IpInstance           OPTIONAL
   );
 
 /**
@@ -267,13 +267,13 @@ Ip4FreeInterface (
 **/
 EFI_STATUS
 Ip4SendFrame (
-  IN  IP4_INTERFACE         *Interface,
-  IN  IP4_PROTOCOL          *IpInstance       OPTIONAL,
-  IN  NET_BUF               *Packet,
-  IN  IP4_ADDR              NextHop,
-  IN  IP4_FRAME_CALLBACK    CallBack,
-  IN  VOID                  *Context,
-  IN IP4_SERVICE            *IpSb
+  IN  IP4_INTERFACE       *Interface,
+  IN  IP4_PROTOCOL        *IpInstance       OPTIONAL,
+  IN  NET_BUF             *Packet,
+  IN  IP4_ADDR            NextHop,
+  IN  IP4_FRAME_CALLBACK  CallBack,
+  IN  VOID                *Context,
+  IN IP4_SERVICE          *IpSb
   );
 
 /**
@@ -291,10 +291,10 @@ Ip4SendFrame (
 **/
 VOID
 Ip4CancelFrames (
-  IN IP4_INTERFACE          *Interface,
-  IN EFI_STATUS             IoStatus,
-  IN IP4_FRAME_TO_CANCEL    FrameToCancel    OPTIONAL,
-  IN VOID                   *Context
+  IN IP4_INTERFACE        *Interface,
+  IN EFI_STATUS           IoStatus,
+  IN IP4_FRAME_TO_CANCEL  FrameToCancel    OPTIONAL,
+  IN VOID                 *Context
   );
 
 /**
@@ -311,7 +311,7 @@ Ip4CancelFrames (
 **/
 VOID
 Ip4CancelReceive (
-  IN IP4_INTERFACE          *Interface
+  IN IP4_INTERFACE  *Interface
   );
 
 /**
@@ -331,10 +331,10 @@ Ip4CancelReceive (
 **/
 EFI_STATUS
 Ip4ReceiveFrame (
-  IN  IP4_INTERFACE         *Interface,
-  IN  IP4_PROTOCOL          *IpInstance       OPTIONAL,
-  IN  IP4_FRAME_CALLBACK    CallBack,
-  IN  VOID                  *Context
+  IN  IP4_INTERFACE       *Interface,
+  IN  IP4_PROTOCOL        *IpInstance       OPTIONAL,
+  IN  IP4_FRAME_CALLBACK  CallBack,
+  IN  VOID                *Context
   );
 
 #endif

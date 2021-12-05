@@ -13,9 +13,9 @@
 
 #include <Protocol/ServiceBinding.h>
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gDhcp6ComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gDhcp6ComponentName2;
-extern EFI_UNICODE_STRING_TABLE     *gDhcp6ControllerNameTable;
+extern EFI_COMPONENT_NAME_PROTOCOL   gDhcp6ComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gDhcp6ComponentName2;
+extern EFI_UNICODE_STRING_TABLE      *gDhcp6ControllerNameTable;
 
 /**
   Test to see if this driver supports ControllerHandle. This service

@@ -10,7 +10,6 @@
 #ifndef __EFI_DHCP6_IO_H__
 #define __EFI_DHCP6_IO_H__
 
-
 /**
   Clean up the specific nodes in the retry list.
 
@@ -20,8 +19,8 @@
 **/
 VOID
 Dhcp6CleanupRetry (
-  IN DHCP6_INSTANCE         *Instance,
-  IN UINT32                 Scope
+  IN DHCP6_INSTANCE  *Instance,
+  IN UINT32          Scope
   );
 
 /**
@@ -33,8 +32,8 @@ Dhcp6CleanupRetry (
 **/
 VOID
 Dhcp6CleanupSession (
-  IN OUT DHCP6_INSTANCE          *Instance,
-  IN     EFI_STATUS              Status
+  IN OUT DHCP6_INSTANCE  *Instance,
+  IN     EFI_STATUS      Status
   );
 
 /**
@@ -49,7 +48,7 @@ Dhcp6CleanupSession (
 **/
 EFI_STATUS
 Dhcp6SendSolicitMsg (
-  IN DHCP6_INSTANCE         *Instance
+  IN DHCP6_INSTANCE  *Instance
   );
 
 /**
@@ -65,7 +64,7 @@ Dhcp6SendSolicitMsg (
 **/
 EFI_STATUS
 Dhcp6SendRequestMsg (
-  IN DHCP6_INSTANCE         *Instance
+  IN DHCP6_INSTANCE  *Instance
   );
 
 /**
@@ -83,8 +82,8 @@ Dhcp6SendRequestMsg (
 **/
 EFI_STATUS
 Dhcp6SendRenewRebindMsg (
-  IN DHCP6_INSTANCE         *Instance,
-  IN BOOLEAN                RebindRequest
+  IN DHCP6_INSTANCE  *Instance,
+  IN BOOLEAN         RebindRequest
   );
 
 /**
@@ -101,8 +100,8 @@ Dhcp6SendRenewRebindMsg (
 **/
 EFI_STATUS
 Dhcp6SendDeclineMsg (
-  IN DHCP6_INSTANCE            *Instance,
-  IN EFI_DHCP6_IA              *DecIa
+  IN DHCP6_INSTANCE  *Instance,
+  IN EFI_DHCP6_IA    *DecIa
   );
 
 /**
@@ -119,8 +118,8 @@ Dhcp6SendDeclineMsg (
 **/
 EFI_STATUS
 Dhcp6SendReleaseMsg (
-  IN DHCP6_INSTANCE            *Instance,
-  IN EFI_DHCP6_IA              *RelIa
+  IN DHCP6_INSTANCE  *Instance,
+  IN EFI_DHCP6_IA    *RelIa
   );
 
 /**
@@ -198,10 +197,10 @@ Dhcp6SendInfoRequestMsg (
 VOID
 EFIAPI
 Dhcp6ReceivePacket (
-  IN NET_BUF                *Udp6Wrap,
-  IN UDP_END_POINT          *EndPoint,
-  IN EFI_STATUS             IoStatus,
-  IN VOID                   *Context
+  IN NET_BUF        *Udp6Wrap,
+  IN UDP_END_POINT  *EndPoint,
+  IN EFI_STATUS     IoStatus,
+  IN VOID           *Context
   );
 
 /**
@@ -214,8 +213,8 @@ Dhcp6ReceivePacket (
 VOID
 EFIAPI
 Dhcp6OnTimerTick (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 #endif

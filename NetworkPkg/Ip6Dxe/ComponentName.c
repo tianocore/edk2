@@ -132,17 +132,17 @@ Ip6ComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 Ip6ComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
 
 //
 // EFI Component Name Protocol.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL   gIp6ComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gIp6ComponentName = {
   Ip6ComponentNameGetDriverName,
   Ip6ComponentNameGetControllerName,
   "eng"
@@ -152,12 +152,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL   gIp6ComponentName = 
 // EFI Component Name 2 Protocol.
 //
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gIp6ComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) Ip6ComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) Ip6ComponentNameGetControllerName,
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)Ip6ComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)Ip6ComponentNameGetControllerName,
   "en"
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE      mIp6DriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mIp6DriverNameTable[] = {
   {
     "eng;en",
     L"IP6 Network Service Driver"
@@ -168,7 +168,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE      mIp6DriverNameTable[
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE      *gIp6ControllerNameTable = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gIp6ControllerNameTable = NULL;
 
 /**
   Retrieves a Unicode string that is the user-readable name of the driver.
@@ -218,13 +218,12 @@ Ip6ComponentNameGetDriverName (
   )
 {
   return LookupUnicodeString2 (
-          Language,
-          This->SupportedLanguages,
-          mIp6DriverNameTable,
-          DriverName,
-          (BOOLEAN) (This == &gIp6ComponentName)
-          );
-
+           Language,
+           This->SupportedLanguages,
+           mIp6DriverNameTable,
+           DriverName,
+           (BOOLEAN)(This == &gIp6ComponentName)
+           );
 }
 
 /**
@@ -239,14 +238,14 @@ Ip6ComponentNameGetDriverName (
 **/
 EFI_STATUS
 UpdateName (
-  IN    EFI_IP6_PROTOCOL         *Ip6
+  IN    EFI_IP6_PROTOCOL  *Ip6
   )
 {
-  EFI_STATUS                       Status;
-  CHAR16                           HandleName[128];
-  EFI_IP6_MODE_DATA                Ip6ModeData;
-  UINTN                            Offset;
-  CHAR16                           Address[sizeof"ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"];
+  EFI_STATUS         Status;
+  CHAR16             HandleName[128];
+  EFI_IP6_MODE_DATA  Ip6ModeData;
+  UINTN              Offset;
+  CHAR16             Address[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"];
 
   if (Ip6 == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -284,35 +283,37 @@ UpdateName (
   }
 
   if (!EFI_ERROR (Status) && Ip6ModeData.IsStarted) {
-    Status = NetLibIp6ToStr (&Ip6ModeData.ConfigData.StationAddress, Address, sizeof(Address));
+    Status = NetLibIp6ToStr (&Ip6ModeData.ConfigData.StationAddress, Address, sizeof (Address));
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     Offset += UnicodeSPrint (
                 HandleName,
-                sizeof(HandleName),
+                sizeof (HandleName),
                 L"IPv6(StationAddress=%s, ",
                 Address
                 );
-    Status = NetLibIp6ToStr (&Ip6ModeData.ConfigData.DestinationAddress, Address, sizeof(Address));
+    Status = NetLibIp6ToStr (&Ip6ModeData.ConfigData.DestinationAddress, Address, sizeof (Address));
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     UnicodeSPrint (
       HandleName + Offset,
-      sizeof(HandleName) - Offset * sizeof (CHAR16),
+      sizeof (HandleName) - Offset * sizeof (CHAR16),
       L"DestinationAddress=%s)",
       Address
       );
   } else if (!Ip6ModeData.IsStarted) {
-    UnicodeSPrint (HandleName, sizeof(HandleName), L"IPv6(Not started)");
+    UnicodeSPrint (HandleName, sizeof (HandleName), L"IPv6(Not started)");
   } else {
-    UnicodeSPrint (HandleName, sizeof(HandleName), L"IPv6(%r)", Status);
+    UnicodeSPrint (HandleName, sizeof (HandleName), L"IPv6(%r)", Status);
   }
 
   if (gIp6ControllerNameTable != NULL) {
-      FreeUnicodeStringTable (gIp6ControllerNameTable);
-      gIp6ControllerNameTable = NULL;
+    FreeUnicodeStringTable (gIp6ControllerNameTable);
+    gIp6ControllerNameTable = NULL;
   }
 
   Status = AddUnicodeString2 (
@@ -406,15 +407,15 @@ UpdateName (
 EFI_STATUS
 EFIAPI
 Ip6ComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                    Status;
-  EFI_IP6_PROTOCOL              *Ip6;
+  EFI_STATUS        Status;
+  EFI_IP6_PROTOCOL  *Ip6;
 
   //
   // Only provide names for child handles.

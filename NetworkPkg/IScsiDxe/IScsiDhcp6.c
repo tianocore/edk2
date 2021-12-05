@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "IScsiImpl.h"
 
-
 /**
   Extract the Root Path option and get the required target information from
   Boot File Uniform Resource Locator (URL) Option.
@@ -29,47 +28,49 @@ EFI_STATUS
 IScsiDhcp6ExtractRootPath (
   IN     CHAR8                        *RootPath,
   IN     UINT16                       Length,
-  IN OUT ISCSI_ATTEMPT_CONFIG_NVDATA *ConfigData
+  IN OUT ISCSI_ATTEMPT_CONFIG_NVDATA  *ConfigData
   )
 {
-  EFI_STATUS                  Status;
-  UINT16                      IScsiRootPathIdLen;
-  CHAR8                       *TmpStr;
-  ISCSI_ROOT_PATH_FIELD       Fields[RP_FIELD_IDX_MAX];
-  ISCSI_ROOT_PATH_FIELD       *Field;
-  UINT32                      FieldIndex;
-  UINT8                       Index;
-  ISCSI_SESSION_CONFIG_NVDATA *ConfigNvData;
-  EFI_IP_ADDRESS              Ip;
-  UINT8                       IpMode;
+  EFI_STATUS                   Status;
+  UINT16                       IScsiRootPathIdLen;
+  CHAR8                        *TmpStr;
+  ISCSI_ROOT_PATH_FIELD        Fields[RP_FIELD_IDX_MAX];
+  ISCSI_ROOT_PATH_FIELD        *Field;
+  UINT32                       FieldIndex;
+  UINT8                        Index;
+  ISCSI_SESSION_CONFIG_NVDATA  *ConfigNvData;
+  EFI_IP_ADDRESS               Ip;
+  UINT8                        IpMode;
 
-  ConfigNvData = &ConfigData->SessionConfigData;
+  ConfigNvData          = &ConfigData->SessionConfigData;
   ConfigNvData->DnsMode = FALSE;
   //
   // "iscsi:"<servername>":"<protocol>":"<port>":"<LUN>":"<targetname>
   //
-  IScsiRootPathIdLen = (UINT16) AsciiStrLen (ISCSI_ROOT_PATH_ID);
+  IScsiRootPathIdLen = (UINT16)AsciiStrLen (ISCSI_ROOT_PATH_ID);
 
   if ((Length <= IScsiRootPathIdLen) ||
-      (CompareMem (RootPath, ISCSI_ROOT_PATH_ID, IScsiRootPathIdLen) != 0)) {
+      (CompareMem (RootPath, ISCSI_ROOT_PATH_ID, IScsiRootPathIdLen) != 0))
+  {
     return EFI_NOT_FOUND;
   }
+
   //
   // Skip the iSCSI RootPath ID "iscsi:".
   //
   RootPath = RootPath + IScsiRootPathIdLen;
-  Length   = (UINT16) (Length - IScsiRootPathIdLen);
+  Length   = (UINT16)(Length - IScsiRootPathIdLen);
 
-  TmpStr   = (CHAR8 *) AllocatePool (Length + 1);
+  TmpStr = (CHAR8 *)AllocatePool (Length + 1);
   if (TmpStr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   CopyMem (TmpStr, RootPath, Length);
-  TmpStr[Length]  = '\0';
+  TmpStr[Length] = '\0';
 
-  Index           = 0;
-  FieldIndex      = 0;
+  Index      = 0;
+  FieldIndex = 0;
   ZeroMem (&Fields[0], sizeof (Fields));
 
   //
@@ -87,7 +88,7 @@ IScsiDhcp6ExtractRootPath (
   Fields[RP_FIELD_IDX_SERVERNAME].Str = &TmpStr[Index];
 
   if (!ConfigNvData->DnsMode) {
-    while ((TmpStr[Index] != ISCSI_ROOT_PATH_ADDR_END_DELIMITER)&& (Index < Length)) {
+    while ((TmpStr[Index] != ISCSI_ROOT_PATH_ADDR_END_DELIMITER) && (Index < Length)) {
       Index++;
     }
 
@@ -95,25 +96,25 @@ IScsiDhcp6ExtractRootPath (
     // Skip ']' and ':'.
     //
     TmpStr[Index] = '\0';
-    Index += 2;
+    Index        += 2;
   } else {
     while ((TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER) && (Index < Length)) {
       Index++;
     }
+
     //
     // Skip ':'.
     //
     TmpStr[Index] = '\0';
-    Index += 1;
+    Index        += 1;
   }
 
-  Fields[RP_FIELD_IDX_SERVERNAME].Len = (UINT8) AsciiStrLen (Fields[RP_FIELD_IDX_SERVERNAME].Str);
+  Fields[RP_FIELD_IDX_SERVERNAME].Len = (UINT8)AsciiStrLen (Fields[RP_FIELD_IDX_SERVERNAME].Str);
 
   //
   // Extract others fields in the Root Path option string.
   //
   for (FieldIndex = 1; (FieldIndex < RP_FIELD_IDX_MAX) && (Index < Length); FieldIndex++) {
-
     if (TmpStr[Index] != ISCSI_ROOT_PATH_FIELD_DELIMITER) {
       Fields[FieldIndex].Str = &TmpStr[Index];
     }
@@ -129,7 +130,7 @@ IScsiDhcp6ExtractRootPath (
       }
 
       if (Fields[FieldIndex].Str != NULL) {
-        Fields[FieldIndex].Len = (UINT8) AsciiStrLen (Fields[FieldIndex].Str);
+        Fields[FieldIndex].Len = (UINT8)AsciiStrLen (Fields[FieldIndex].Str);
       }
     }
   }
@@ -142,15 +143,16 @@ IScsiDhcp6ExtractRootPath (
   if ((Fields[RP_FIELD_IDX_SERVERNAME].Str == NULL) ||
       (Fields[RP_FIELD_IDX_TARGETNAME].Str == NULL) ||
       (Fields[RP_FIELD_IDX_PROTOCOL].Len > 1)
-      ) {
-
+      )
+  {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
+
   //
   // Get the IP address of the target.
   //
-  Field   = &Fields[RP_FIELD_IDX_SERVERNAME];
+  Field = &Fields[RP_FIELD_IDX_SERVERNAME];
   if (ConfigNvData->IpMode < IP_MODE_AUTOCONFIG) {
     IpMode = ConfigNvData->IpMode;
   } else {
@@ -164,10 +166,11 @@ IScsiDhcp6ExtractRootPath (
     if ((Field->Len + 2) > sizeof (ConfigNvData->TargetUrl)) {
       return EFI_INVALID_PARAMETER;
     }
+
     CopyMem (&ConfigNvData->TargetUrl, Field->Str, Field->Len);
     ConfigNvData->TargetUrl[Field->Len + 1] = '\0';
   } else {
-    ZeroMem(&ConfigNvData->TargetUrl, sizeof (ConfigNvData->TargetUrl));
+    ZeroMem (&ConfigNvData->TargetUrl, sizeof (ConfigNvData->TargetUrl));
     Status = IScsiAsciiStrToIp (Field->Str, IpMode, &Ip);
     CopyMem (&ConfigNvData->TargetIp, &Ip, sizeof (EFI_IP_ADDRESS));
 
@@ -184,15 +187,17 @@ IScsiDhcp6ExtractRootPath (
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
+
   //
   // Get the port of the iSCSI target.
   //
   Field = &Fields[RP_FIELD_IDX_PORT];
   if (Field->Str != NULL) {
-    ConfigNvData->TargetPort = (UINT16) AsciiStrDecimalToUintn (Field->Str);
+    ConfigNvData->TargetPort = (UINT16)AsciiStrDecimalToUintn (Field->Str);
   } else {
     ConfigNvData->TargetPort = ISCSI_WELL_KNOWN_PORT;
   }
+
   //
   // Get the LUN.
   //
@@ -205,6 +210,7 @@ IScsiDhcp6ExtractRootPath (
   } else {
     ZeroMem (ConfigNvData->BootLun, sizeof (ConfigNvData->BootLun));
   }
+
   //
   // Get the target iSCSI Name.
   //
@@ -214,6 +220,7 @@ IScsiDhcp6ExtractRootPath (
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
+
   //
   // Validate the iSCSI name.
   //
@@ -258,23 +265,23 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 IScsiDhcp6ParseReply (
-  IN EFI_DHCP6_PROTOCOL          *This,
-  IN VOID                        *Context,
-  IN EFI_DHCP6_PACKET            *Packet
+  IN EFI_DHCP6_PROTOCOL  *This,
+  IN VOID                *Context,
+  IN EFI_DHCP6_PACKET    *Packet
   )
 {
-  EFI_STATUS                  Status;
-  UINT32                      Index;
-  UINT32                      OptionCount;
-  EFI_DHCP6_PACKET_OPTION     *BootFileOpt;
-  EFI_DHCP6_PACKET_OPTION     **OptionList;
-  ISCSI_ATTEMPT_CONFIG_NVDATA *ConfigData;
-  UINT16                      ParaLen;
+  EFI_STATUS                   Status;
+  UINT32                       Index;
+  UINT32                       OptionCount;
+  EFI_DHCP6_PACKET_OPTION      *BootFileOpt;
+  EFI_DHCP6_PACKET_OPTION      **OptionList;
+  ISCSI_ATTEMPT_CONFIG_NVDATA  *ConfigData;
+  UINT16                       ParaLen;
 
   OptionCount = 0;
   BootFileOpt = NULL;
 
-  Status      = This->Parse (This, Packet, &OptionCount, NULL);
+  Status = This->Parse (This, Packet, &OptionCount, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
     return EFI_NOT_READY;
   }
@@ -290,7 +297,7 @@ IScsiDhcp6ParseReply (
     goto Exit;
   }
 
-  ConfigData = (ISCSI_ATTEMPT_CONFIG_NVDATA *) Context;
+  ConfigData = (ISCSI_ATTEMPT_CONFIG_NVDATA *)Context;
 
   for (Index = 0; Index < OptionCount; Index++) {
     OptionList[Index]->OpCode = NTOHS (OptionList[Index]->OpCode);
@@ -300,11 +307,11 @@ IScsiDhcp6ParseReply (
     // Get DNS server addresses from this reply packet.
     //
     if (OptionList[Index]->OpCode == DHCP6_OPT_DNS_SERVERS) {
-
       if (((OptionList[Index]->OpLen & 0xf) != 0) || (OptionList[Index]->OpLen == 0)) {
         Status = EFI_UNSUPPORTED;
         goto Exit;
       }
+
       //
       // Primary DNS server address.
       //
@@ -316,7 +323,6 @@ IScsiDhcp6ParseReply (
         //
         CopyMem (&ConfigData->SecondaryDns, &OptionList[Index]->Data[16], sizeof (EFI_IPv6_ADDRESS));
       }
-
     } else if (OptionList[Index]->OpCode == DHCP6_OPT_BOOT_FILE_URL) {
       //
       // The server sends this option to inform the client about an URL to a boot file.
@@ -330,6 +336,7 @@ IScsiDhcp6ParseReply (
         Status = EFI_UNSUPPORTED;
         goto Exit;
       }
+
       //
       // Check param-len 1, should be 16 bytes.
       //
@@ -352,7 +359,7 @@ IScsiDhcp6ParseReply (
   // Get iSCSI root path from Boot File Uniform Resource Locator (URL) Option
   //
   Status = IScsiDhcp6ExtractRootPath (
-             (CHAR8 *) BootFileOpt->Data,
+             (CHAR8 *)BootFileOpt->Data,
              BootFileOpt->OpLen,
              ConfigData
              );
@@ -362,7 +369,6 @@ Exit:
   FreePool (OptionList);
   return Status;
 }
-
 
 /**
   Parse the DHCP ACK to get the address configuration and DNS information.
@@ -383,9 +389,9 @@ Exit:
 **/
 EFI_STATUS
 IScsiDoDhcp6 (
-  IN     EFI_HANDLE                  Image,
-  IN     EFI_HANDLE                  Controller,
-  IN OUT ISCSI_ATTEMPT_CONFIG_NVDATA *ConfigData
+  IN     EFI_HANDLE                   Image,
+  IN     EFI_HANDLE                   Controller,
+  IN OUT ISCSI_ATTEMPT_CONFIG_NVDATA  *ConfigData
   )
 {
   EFI_HANDLE                Dhcp6Handle;
@@ -435,7 +441,7 @@ IScsiDoDhcp6 (
   Status = gBS->OpenProtocol (
                   Dhcp6Handle,
                   &gEfiDhcp6ProtocolGuid,
-                  (VOID **) &Dhcp6,
+                  (VOID **)&Dhcp6,
                   Image,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -493,7 +499,6 @@ IScsiDoDhcp6 (
     }
 
     do {
-
       TimerStatus = gBS->CheckEvent (Timer);
 
       if (!EFI_ERROR (TimerStatus)) {
@@ -509,9 +514,7 @@ IScsiDoDhcp6 (
                           ConfigData
                           );
       }
-
     } while (TimerStatus == EFI_NOT_READY);
-
   }
 
 ON_EXIT:
@@ -542,4 +545,3 @@ ON_EXIT:
 
   return Status;
 }
-

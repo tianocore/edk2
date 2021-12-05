@@ -8,10 +8,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "VlanConfigImpl.h"
 
-CHAR16                          mVlanStorageName[] = L"VlanNvData";
-EFI_HII_CONFIG_ROUTING_PROTOCOL *mHiiConfigRouting = NULL;
+CHAR16                           mVlanStorageName[] = L"VlanNvData";
+EFI_HII_CONFIG_ROUTING_PROTOCOL  *mHiiConfigRouting = NULL;
 
-VLAN_CONFIG_PRIVATE_DATA        mVlanConfigPrivateDateTemplate = {
+VLAN_CONFIG_PRIVATE_DATA  mVlanConfigPrivateDateTemplate = {
   VLAN_CONFIG_PRIVATE_DATA_SIGNATURE,
   {
     VlanExtractConfig,
@@ -20,13 +20,13 @@ VLAN_CONFIG_PRIVATE_DATA        mVlanConfigPrivateDateTemplate = {
   }
 };
 
-VENDOR_DEVICE_PATH              mHiiVendorDevicePathNode = {
+VENDOR_DEVICE_PATH  mHiiVendorDevicePathNode = {
   {
     HARDWARE_DEVICE_PATH,
     HW_VENDOR_DP,
     {
-      (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-      (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+      (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
     }
   },
   VLAN_CONFIG_FORM_SET_GUID
@@ -61,22 +61,22 @@ VENDOR_DEVICE_PATH              mHiiVendorDevicePathNode = {
 EFI_STATUS
 EFIAPI
 VlanExtractConfig (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL        *This,
-  IN CONST EFI_STRING                            Request,
-       OUT EFI_STRING                            *Progress,
-       OUT EFI_STRING                            *Results
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN CONST EFI_STRING                      Request,
+  OUT EFI_STRING                           *Progress,
+  OUT EFI_STRING                           *Results
   )
 {
-  EFI_STATUS                 Status;
-  UINTN                      BufferSize;
-  VLAN_CONFIGURATION         Configuration;
+  EFI_STATUS                Status;
+  UINTN                     BufferSize;
+  VLAN_CONFIGURATION        Configuration;
   VLAN_CONFIG_PRIVATE_DATA  *PrivateData;
-  EFI_STRING                 ConfigRequestHdr;
-  EFI_STRING                 ConfigRequest;
-  BOOLEAN                    AllocatedRequest;
-  UINTN                      Size;
+  EFI_STRING                ConfigRequestHdr;
+  EFI_STRING                ConfigRequest;
+  BOOLEAN                   AllocatedRequest;
+  UINTN                     Size;
 
-  if (Progress == NULL || Results == NULL) {
+  if ((Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -94,8 +94,9 @@ VlanExtractConfig (
   // Retrieve the pointer to the UEFI HII Config Routing Protocol
   //
   if (mHiiConfigRouting == NULL) {
-    gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &mHiiConfigRouting);
+    gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **)&mHiiConfigRouting);
   }
+
   ASSERT (mHiiConfigRouting != NULL);
 
   //
@@ -103,7 +104,7 @@ VlanExtractConfig (
   //
   PrivateData = VLAN_CONFIG_PRIVATE_DATA_FROM_THIS (This);
   ZeroMem (&Configuration, sizeof (VLAN_CONFIGURATION));
-  BufferSize = sizeof (Configuration);
+  BufferSize    = sizeof (Configuration);
   ConfigRequest = Request;
   if ((Request == NULL) || (StrStr (Request, L"OFFSET") == NULL)) {
     //
@@ -112,8 +113,8 @@ VlanExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gVlanConfigFormSetGuid, mVlanStorageName, PrivateData->DriverHandle);
-    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest = AllocateZeroPool (Size);
+    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest    = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
     AllocatedRequest = TRUE;
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
@@ -123,7 +124,7 @@ VlanExtractConfig (
   Status = mHiiConfigRouting->BlockToConfig (
                                 mHiiConfigRouting,
                                 ConfigRequest,
-                                (UINT8 *) &Configuration,
+                                (UINT8 *)&Configuration,
                                 BufferSize,
                                 Results,
                                 Progress
@@ -135,6 +136,7 @@ VlanExtractConfig (
     FreePool (ConfigRequest);
     ConfigRequest = NULL;
   }
+
   //
   // Set Progress string to the original request string.
   //
@@ -146,7 +148,6 @@ VlanExtractConfig (
 
   return Status;
 }
-
 
 /**
   This function processes the results of changes in configuration.
@@ -169,12 +170,12 @@ VlanExtractConfig (
 EFI_STATUS
 EFIAPI
 VlanRouteConfig (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
-  IN CONST EFI_STRING                          Configuration,
-       OUT EFI_STRING                          *Progress
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                           *Progress
   )
 {
-  if (Configuration == NULL || Progress == NULL) {
+  if ((Configuration == NULL) || (Progress == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -212,12 +213,12 @@ VlanRouteConfig (
 EFI_STATUS
 EFIAPI
 VlanCallback (
-  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL      *This,
-  IN     EFI_BROWSER_ACTION                    Action,
-  IN     EFI_QUESTION_ID                       QuestionId,
-  IN     UINT8                                 Type,
-  IN     EFI_IFR_TYPE_VALUE                    *Value,
-     OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
+  IN CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN     EFI_BROWSER_ACTION                Action,
+  IN     EFI_QUESTION_ID                   QuestionId,
+  IN     UINT8                             Type,
+  IN     EFI_IFR_TYPE_VALUE                *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST           *ActionRequest
   )
 {
   VLAN_CONFIG_PRIVATE_DATA  *PrivateData;
@@ -244,88 +245,88 @@ VlanCallback (
   //
   Configuration = AllocateZeroPool (sizeof (VLAN_CONFIGURATION));
   ASSERT (Configuration != NULL);
-  HiiGetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration);
+  HiiGetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *)Configuration);
 
   VlanConfig = PrivateData->VlanConfig;
 
   if (Action == EFI_BROWSER_ACTION_CHANGED) {
     switch (QuestionId) {
-    case VLAN_ADD_QUESTION_ID:
-      //
-      // Add a VLAN
-      //
-      VlanConfig->Set (VlanConfig, Configuration->VlanId, Configuration->Priority);
-      VlanUpdateForm (PrivateData);
-
-      //
-      // Connect the newly created VLAN device
-      //
-      VlanHandle = NetLibGetVlanHandle (PrivateData->ControllerHandle, Configuration->VlanId);
-      if (VlanHandle == NULL) {
+      case VLAN_ADD_QUESTION_ID:
         //
-        // There may be no child handle created for VLAN ID 0, connect the parent handle
+        // Add a VLAN
         //
-        VlanHandle = PrivateData->ControllerHandle;
-      }
-      gBS->ConnectController (VlanHandle, NULL, NULL, TRUE);
+        VlanConfig->Set (VlanConfig, Configuration->VlanId, Configuration->Priority);
+        VlanUpdateForm (PrivateData);
 
-      //
-      // Clear UI data
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
-      Configuration->VlanId = 0;
-      Configuration->Priority = 0;
-      break;
-
-    case VLAN_REMOVE_QUESTION_ID:
-      //
-      // Remove VLAN
-      //
-      ASSERT (PrivateData->NumberOfVlan <= MAX_VLAN_NUMBER);
-      for (Index = 0; Index < PrivateData->NumberOfVlan; Index++) {
-        if (Configuration->VlanList[Index] != 0) {
+        //
+        // Connect the newly created VLAN device
+        //
+        VlanHandle = NetLibGetVlanHandle (PrivateData->ControllerHandle, Configuration->VlanId);
+        if (VlanHandle == NULL) {
           //
-          // Checkbox is selected, need remove this VLAN
+          // There may be no child handle created for VLAN ID 0, connect the parent handle
           //
-          VlanConfig->Remove (VlanConfig, PrivateData->VlanId[Index]);
+          VlanHandle = PrivateData->ControllerHandle;
         }
-      }
 
-      VlanUpdateForm (PrivateData);
-      if (PrivateData->NumberOfVlan == 0) {
+        gBS->ConnectController (VlanHandle, NULL, NULL, TRUE);
+
         //
-        // No VLAN device now, connect the physical NIC handle.
-        // Note: PrivateData->NumberOfVlan has been updated by VlanUpdateForm()
+        // Clear UI data
         //
-        gBS->ConnectController (PrivateData->ControllerHandle, NULL, NULL, TRUE);
-      }
+        *ActionRequest          = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
+        Configuration->VlanId   = 0;
+        Configuration->Priority = 0;
+        break;
 
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
-      ZeroMem (Configuration->VlanList, MAX_VLAN_NUMBER);
-      break;
+      case VLAN_REMOVE_QUESTION_ID:
+        //
+        // Remove VLAN
+        //
+        ASSERT (PrivateData->NumberOfVlan <= MAX_VLAN_NUMBER);
+        for (Index = 0; Index < PrivateData->NumberOfVlan; Index++) {
+          if (Configuration->VlanList[Index] != 0) {
+            //
+            // Checkbox is selected, need remove this VLAN
+            //
+            VlanConfig->Remove (VlanConfig, PrivateData->VlanId[Index]);
+          }
+        }
 
-    default:
-      break;
+        VlanUpdateForm (PrivateData);
+        if (PrivateData->NumberOfVlan == 0) {
+          //
+          // No VLAN device now, connect the physical NIC handle.
+          // Note: PrivateData->NumberOfVlan has been updated by VlanUpdateForm()
+          //
+          gBS->ConnectController (PrivateData->ControllerHandle, NULL, NULL, TRUE);
+        }
+
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
+        ZeroMem (Configuration->VlanList, MAX_VLAN_NUMBER);
+        break;
+
+      default:
+        break;
     }
   } else if (Action == EFI_BROWSER_ACTION_CHANGING) {
     switch (QuestionId) {
-    case VLAN_UPDATE_QUESTION_ID:
-      //
-      // Update current VLAN list into Form.
-      //
-      VlanUpdateForm (PrivateData);
-      break;
+      case VLAN_UPDATE_QUESTION_ID:
+        //
+        // Update current VLAN list into Form.
+        //
+        VlanUpdateForm (PrivateData);
+        break;
 
-    default:
-      break;
+      default:
+        break;
     }
   }
 
-  HiiSetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration, NULL);
+  HiiSetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *)Configuration, NULL);
   FreePool (Configuration);
   return EFI_SUCCESS;
 }
-
 
 /**
   This function update VLAN list in the VLAN configuration Form.
@@ -335,7 +336,7 @@ VlanCallback (
 **/
 VOID
 VlanUpdateForm (
-  IN OUT VLAN_CONFIG_PRIVATE_DATA    *PrivateData
+  IN OUT VLAN_CONFIG_PRIVATE_DATA  *PrivateData
   )
 {
   EFI_VLAN_CONFIG_PROTOCOL  *VlanConfig;
@@ -355,9 +356,9 @@ VlanUpdateForm (
   //
   // Find current VLAN configuration
   //
-  VlanData = NULL;
+  VlanData     = NULL;
   NumberOfVlan = 0;
-  VlanConfig = PrivateData->VlanConfig;
+  VlanConfig   = PrivateData->VlanConfig;
   VlanConfig->Find (VlanConfig, NULL, &NumberOfVlan, &VlanData);
 
   //
@@ -366,6 +367,7 @@ VlanUpdateForm (
   if (NumberOfVlan > MAX_VLAN_NUMBER) {
     NumberOfVlan = MAX_VLAN_NUMBER;
   }
+
   PrivateData->NumberOfVlan = NumberOfVlan;
 
   //
@@ -380,24 +382,24 @@ VlanUpdateForm (
   //
   // Create Hii Extend Label OpCode as the start opcode
   //
-  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (
-                                        StartOpCodeHandle,
-                                        &gEfiIfrTianoGuid,
-                                        NULL,
-                                        sizeof (EFI_IFR_GUID_LABEL)
-                                        );
+  StartLabel = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (
+                                       StartOpCodeHandle,
+                                       &gEfiIfrTianoGuid,
+                                       NULL,
+                                       sizeof (EFI_IFR_GUID_LABEL)
+                                       );
   StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
   StartLabel->Number       = LABEL_VLAN_LIST;
 
   //
   // Create Hii Extend Label OpCode as the end opcode
   //
-  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (
-                                      EndOpCodeHandle,
-                                      &gEfiIfrTianoGuid,
-                                      NULL,
-                                      sizeof (EFI_IFR_GUID_LABEL)
-                                      );
+  EndLabel = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (
+                                     EndOpCodeHandle,
+                                     &gEfiIfrTianoGuid,
+                                     NULL,
+                                     sizeof (EFI_IFR_GUID_LABEL)
+                                     );
   EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
   EndLabel->Number       = LABEL_END;
 
@@ -416,7 +418,7 @@ VlanUpdateForm (
     StrCpyS (String + 4 - DigitalCount, (sizeof (VlanStr) /sizeof (CHAR16)) - 10 - (4 - DigitalCount), VlanIdStr);
     String += 4;
 
-    StrCpyS (String,  (sizeof (VlanStr) /sizeof (CHAR16)) - 10 - (4 - DigitalCount) - 4, L", Priority:");
+    StrCpyS (String, (sizeof (VlanStr) /sizeof (CHAR16)) - 10 - (4 - DigitalCount) - 4, L", Priority:");
     String += 11;
     UnicodeValueToStringS (
       String,
@@ -433,9 +435,9 @@ VlanUpdateForm (
 
     HiiCreateCheckBoxOpCode (
       StartOpCodeHandle,
-      (EFI_QUESTION_ID) (VLAN_LIST_VAR_OFFSET + Index),
+      (EFI_QUESTION_ID)(VLAN_LIST_VAR_OFFSET + Index),
       VLAN_CONFIGURATION_VARSTORE_ID,
-      (UINT16) (VLAN_LIST_VAR_OFFSET + Index),
+      (UINT16)(VLAN_LIST_VAR_OFFSET + Index),
       StringId,
       STRING_TOKEN (STR_VLAN_VLAN_LIST_HELP),
       0,
@@ -465,7 +467,6 @@ VlanUpdateForm (
   }
 }
 
-
 /**
   This function publish the VLAN configuration Form for a network device. The
   HII Config Access protocol will be installed on a child handle of the network
@@ -480,7 +481,7 @@ VlanUpdateForm (
 **/
 EFI_STATUS
 InstallVlanConfigForm (
-  IN OUT VLAN_CONFIG_PRIVATE_DATA    *PrivateData
+  IN OUT VLAN_CONFIG_PRIVATE_DATA  *PrivateData
   )
 {
   EFI_STATUS                      Status;
@@ -497,26 +498,28 @@ InstallVlanConfigForm (
   //
   ChildDevicePath = AppendDevicePathNode (
                       PrivateData->ParentDevicePath,
-                      (CONST EFI_DEVICE_PATH_PROTOCOL *) &mHiiVendorDevicePathNode
+                      (CONST EFI_DEVICE_PATH_PROTOCOL *)&mHiiVendorDevicePathNode
                       );
   if (ChildDevicePath == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   PrivateData->ChildDevicePath = ChildDevicePath;
 
   DriverHandle = NULL;
   ConfigAccess = &PrivateData->ConfigAccess;
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &DriverHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  ChildDevicePath,
-                  &gEfiHiiConfigAccessProtocolGuid,
-                  ConfigAccess,
-                  NULL
-                  );
+  Status       = gBS->InstallMultipleProtocolInterfaces (
+                        &DriverHandle,
+                        &gEfiDevicePathProtocolGuid,
+                        ChildDevicePath,
+                        &gEfiHiiConfigAccessProtocolGuid,
+                        ConfigAccess,
+                        NULL
+                        );
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   PrivateData->DriverHandle = DriverHandle;
 
   //
@@ -548,16 +551,18 @@ InstallVlanConfigForm (
   if (HiiHandle == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   PrivateData->HiiHandle = HiiHandle;
 
   //
   // Update formset title help string.
   //
   MacString = NULL;
-  Status = NetLibGetMacString (PrivateData->ControllerHandle, PrivateData->ImageHandle, &MacString);
+  Status    = NetLibGetMacString (PrivateData->ControllerHandle, PrivateData->ImageHandle, &MacString);
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   PrivateData->MacString = MacString;
 
   StrCpyS (Str, sizeof (Str) / sizeof (CHAR16), L"VLAN Configuration (MAC:");
@@ -595,11 +600,11 @@ InstallVlanConfigForm (
 **/
 EFI_STATUS
 UninstallVlanConfigForm (
-  IN OUT VLAN_CONFIG_PRIVATE_DATA    *PrivateData
+  IN OUT VLAN_CONFIG_PRIVATE_DATA  *PrivateData
   )
 {
-  EFI_STATUS                   Status;
-  EFI_VLAN_CONFIG_PROTOCOL     *VlanConfig;
+  EFI_STATUS                Status;
+  EFI_VLAN_CONFIG_PROTOCOL  *VlanConfig;
 
   //
   // End the parent-child relationship.
@@ -637,6 +642,7 @@ UninstallVlanConfigForm (
              );
       return Status;
     }
+
     PrivateData->DriverHandle = NULL;
 
     if (PrivateData->ChildDevicePath != NULL) {
@@ -660,5 +666,6 @@ UninstallVlanConfigForm (
     HiiRemovePackages (PrivateData->HiiHandle);
     PrivateData->HiiHandle = NULL;
   }
+
   return EFI_SUCCESS;
 }

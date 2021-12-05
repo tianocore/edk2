@@ -10,20 +10,20 @@
 #ifndef __EFI_IP6_OPTION_H__
 #define __EFI_IP6_OPTION_H__
 
-#define IP6_FRAGMENT_OFFSET_MASK (~0x3)
+#define IP6_FRAGMENT_OFFSET_MASK  (~0x3)
 
 typedef struct _IP6_FRAGMENT_HEADER {
-  UINT8                     NextHeader;
-  UINT8                     Reserved;
-  UINT16                    FragmentOffset;
-  UINT32                    Identification;
+  UINT8     NextHeader;
+  UINT8     Reserved;
+  UINT16    FragmentOffset;
+  UINT32    Identification;
 } IP6_FRAGMENT_HEADER;
 
 typedef struct _IP6_ROUTING_HEADER {
-  UINT8                     NextHeader;
-  UINT8                     HeaderLen;
-  UINT8                     RoutingType;
-  UINT8                     SegmentsLeft;
+  UINT8    NextHeader;
+  UINT8    HeaderLen;
+  UINT8    RoutingType;
+  UINT8    SegmentsLeft;
 } IP6_ROUTING_HEADER;
 
 typedef enum {
@@ -35,11 +35,11 @@ typedef enum {
   Ip6OptionParameterProblem = 0x80,
   Ip6OptionMask             = 0xc0,
 
-  Ip6OptionEtherSource      = 1,
-  Ip6OptionEtherTarget      = 2,
-  Ip6OptionPrefixInfo       = 3,
-  Ip6OptionRedirected       = 4,
-  Ip6OptionMtu              = 5
+  Ip6OptionEtherSource = 1,
+  Ip6OptionEtherTarget = 2,
+  Ip6OptionPrefixInfo  = 3,
+  Ip6OptionRedirected  = 4,
+  Ip6OptionMtu         = 5
 } IP6_OPTION_TYPE;
 
 /**
@@ -72,17 +72,17 @@ typedef enum {
 **/
 BOOLEAN
 Ip6IsExtsValid (
-  IN IP6_SERVICE            *IpSb           OPTIONAL,
-  IN NET_BUF                *Packet         OPTIONAL,
-  IN UINT8                  *NextHeader,
-  IN UINT8                  *ExtHdrs,
-  IN UINT32                 ExtHdrsLen,
-  IN BOOLEAN                Rcvd,
-  OUT UINT32                *FormerHeader   OPTIONAL,
-  OUT UINT8                 **LastHeader,
-  OUT UINT32                *RealExtsLen    OPTIONAL,
-  OUT UINT32                *UnFragmentLen  OPTIONAL,
-  OUT BOOLEAN               *Fragmented     OPTIONAL
+  IN IP6_SERVICE  *IpSb           OPTIONAL,
+  IN NET_BUF      *Packet         OPTIONAL,
+  IN UINT8        *NextHeader,
+  IN UINT8        *ExtHdrs,
+  IN UINT32       ExtHdrsLen,
+  IN BOOLEAN      Rcvd,
+  OUT UINT32      *FormerHeader   OPTIONAL,
+  OUT UINT8       **LastHeader,
+  OUT UINT32      *RealExtsLen    OPTIONAL,
+  OUT UINT32      *UnFragmentLen  OPTIONAL,
+  OUT BOOLEAN     *Fragmented     OPTIONAL
   );
 
 /**
@@ -101,9 +101,9 @@ Ip6IsExtsValid (
 **/
 EFI_STATUS
 Ip6FillHopByHop (
-  OUT UINT8                  *Buffer,
-  IN OUT UINTN               *BufferLen,
-  IN UINT8                   NextHeader
+  OUT UINT8     *Buffer,
+  IN OUT UINTN  *BufferLen,
+  IN UINT8      NextHeader
   );
 
 /**
@@ -127,13 +127,13 @@ Ip6FillHopByHop (
 **/
 EFI_STATUS
 Ip6FillFragmentHeader (
-  IN  IP6_SERVICE           *IpSb,
-  IN  UINT8                 NextHeader,
-  IN  UINT8                 LastHeader,
-  IN  UINT8                 *ExtHdrs,
-  IN  UINT32                ExtHdrsLen,
-  IN  UINT16                FragmentOffset,
-  OUT UINT8                 **UpdatedExtHdrs
+  IN  IP6_SERVICE  *IpSb,
+  IN  UINT8        NextHeader,
+  IN  UINT8        LastHeader,
+  IN  UINT8        *ExtHdrs,
+  IN  UINT32       ExtHdrsLen,
+  IN  UINT16       FragmentOffset,
+  OUT UINT8        **UpdatedExtHdrs
   );
 
 /**
@@ -155,13 +155,13 @@ Ip6FillFragmentHeader (
 **/
 EFI_STATUS
 Ip6CopyExts (
-  IN UINT8                  NextHeader,
-  IN UINT8                  *ExtHdrs,
-  IN UINT8                  *LastHeader,
-  IN UINT16                 FragmentOffset,
-  IN UINT32                 UnFragmentHdrLen,
-  IN OUT UINT8              *Buf,
-  IN OUT UINT32             *BufLen
+  IN UINT8       NextHeader,
+  IN UINT8       *ExtHdrs,
+  IN UINT8       *LastHeader,
+  IN UINT16      FragmentOffset,
+  IN UINT32      UnFragmentHdrLen,
+  IN OUT UINT8   *Buf,
+  IN OUT UINT32  *BufLen
   );
 
 /**
@@ -178,8 +178,8 @@ Ip6CopyExts (
 **/
 BOOLEAN
 Ip6IsNDOptionValid (
-  IN UINT8                  *Option,
-  IN UINT16                 OptionLen
+  IN UINT8   *Option,
+  IN UINT16  OptionLen
   );
 
 #endif

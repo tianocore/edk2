@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Ip4Impl.h"
 
-
 /**
   Create an empty assemble entry for the packet identified by
   (Dst, Src, Id, Protocol). The default life for the packet is
@@ -27,14 +26,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 IP4_ASSEMBLE_ENTRY *
 Ip4CreateAssembleEntry (
-  IN IP4_ADDR               Dst,
-  IN IP4_ADDR               Src,
-  IN UINT16                 Id,
-  IN UINT8                  Protocol
+  IN IP4_ADDR  Dst,
+  IN IP4_ADDR  Src,
+  IN UINT16    Id,
+  IN UINT8     Protocol
   )
 {
-
-  IP4_ASSEMBLE_ENTRY        *Assemble;
+  IP4_ASSEMBLE_ENTRY  *Assemble;
 
   Assemble = AllocatePool (sizeof (IP4_ASSEMBLE_ENTRY));
 
@@ -58,7 +56,6 @@ Ip4CreateAssembleEntry (
   return Assemble;
 }
 
-
 /**
   Release all the fragments of a packet, then free the assemble entry.
 
@@ -67,12 +64,12 @@ Ip4CreateAssembleEntry (
 **/
 VOID
 Ip4FreeAssembleEntry (
-  IN IP4_ASSEMBLE_ENTRY     *Assemble
+  IN IP4_ASSEMBLE_ENTRY  *Assemble
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  NET_BUF                   *Fragment;
+  LIST_ENTRY  *Entry;
+  LIST_ENTRY  *Next;
+  NET_BUF     *Fragment;
 
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &Assemble->Fragments) {
     Fragment = NET_LIST_USER_STRUCT (Entry, NET_BUF, List);
@@ -84,7 +81,6 @@ Ip4FreeAssembleEntry (
   FreePool (Assemble);
 }
 
-
 /**
   Initialize an already allocated assemble table. This is generally
   the assemble table embedded in the IP4 service instance.
@@ -94,16 +90,15 @@ Ip4FreeAssembleEntry (
 **/
 VOID
 Ip4InitAssembleTable (
-  IN OUT IP4_ASSEMBLE_TABLE     *Table
+  IN OUT IP4_ASSEMBLE_TABLE  *Table
   )
 {
-  UINT32                    Index;
+  UINT32  Index;
 
   for (Index = 0; Index < IP4_ASSEMLE_HASH_SIZE; Index++) {
     InitializeListHead (&Table->Bucket[Index]);
   }
 }
-
 
 /**
   Clean up the assemble table: remove all the fragments
@@ -114,13 +109,13 @@ Ip4InitAssembleTable (
 **/
 VOID
 Ip4CleanAssembleTable (
-  IN IP4_ASSEMBLE_TABLE     *Table
+  IN IP4_ASSEMBLE_TABLE  *Table
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IP4_ASSEMBLE_ENTRY        *Assemble;
-  UINT32                    Index;
+  LIST_ENTRY          *Entry;
+  LIST_ENTRY          *Next;
+  IP4_ASSEMBLE_ENTRY  *Assemble;
+  UINT32              Index;
 
   for (Index = 0; Index < IP4_ASSEMLE_HASH_SIZE; Index++) {
     NET_LIST_FOR_EACH_SAFE (Entry, Next, &Table->Bucket[Index]) {
@@ -131,7 +126,6 @@ Ip4CleanAssembleTable (
     }
   }
 }
-
 
 /**
   Trim the packet to fit in [Start, End), and update the per
@@ -144,23 +138,23 @@ Ip4CleanAssembleTable (
 **/
 VOID
 Ip4TrimPacket (
-  IN OUT NET_BUF                *Packet,
-  IN     INTN                   Start,
-  IN     INTN                   End
+  IN OUT NET_BUF  *Packet,
+  IN     INTN     Start,
+  IN     INTN     End
   )
 {
-  IP4_CLIP_INFO             *Info;
-  INTN                      Len;
+  IP4_CLIP_INFO  *Info;
+  INTN           Len;
 
   Info = IP4_GET_CLIP_INFO (Packet);
 
   ASSERT (Info->Start + Info->Length == Info->End);
   ASSERT ((Info->Start < End) && (Start < Info->End));
 
-   if (Info->Start < Start) {
+  if (Info->Start < Start) {
     Len = Start - Info->Start;
 
-    NetbufTrim (Packet, (UINT32) Len, NET_BUF_HEAD);
+    NetbufTrim (Packet, (UINT32)Len, NET_BUF_HEAD);
     Info->Start   = Start;
     Info->Length -= Len;
   }
@@ -168,12 +162,11 @@ Ip4TrimPacket (
   if (End < Info->End) {
     Len = End - Info->End;
 
-    NetbufTrim (Packet, (UINT32) Len, NET_BUF_TAIL);
+    NetbufTrim (Packet, (UINT32)Len, NET_BUF_TAIL);
     Info->End     = End;
     Info->Length -= Len;
   }
 }
-
 
 /**
   Release all the fragments of the packet. This is the callback for
@@ -186,12 +179,11 @@ Ip4TrimPacket (
 VOID
 EFIAPI
 Ip4OnFreeFragments (
-  IN VOID                   *Arg
+  IN VOID  *Arg
   )
 {
-  Ip4FreeAssembleEntry ((IP4_ASSEMBLE_ENTRY *) Arg);
+  Ip4FreeAssembleEntry ((IP4_ASSEMBLE_ENTRY *)Arg);
 }
-
 
 /**
   Reassemble the IP fragments. If all the fragments of the packet
@@ -210,37 +202,38 @@ Ip4OnFreeFragments (
 **/
 NET_BUF *
 Ip4Reassemble (
-  IN OUT IP4_ASSEMBLE_TABLE     *Table,
-  IN OUT NET_BUF                *Packet
+  IN OUT IP4_ASSEMBLE_TABLE  *Table,
+  IN OUT NET_BUF             *Packet
   )
 {
-  IP4_HEAD                  *IpHead;
-  IP4_CLIP_INFO             *This;
-  IP4_CLIP_INFO             *Node;
-  IP4_ASSEMBLE_ENTRY        *Assemble;
-  LIST_ENTRY                *Head;
-  LIST_ENTRY                *Prev;
-  LIST_ENTRY                *Cur;
-  NET_BUF                   *Fragment;
-  NET_BUF                   *NewPacket;
-  INTN                      Index;
+  IP4_HEAD            *IpHead;
+  IP4_CLIP_INFO       *This;
+  IP4_CLIP_INFO       *Node;
+  IP4_ASSEMBLE_ENTRY  *Assemble;
+  LIST_ENTRY          *Head;
+  LIST_ENTRY          *Prev;
+  LIST_ENTRY          *Cur;
+  NET_BUF             *Fragment;
+  NET_BUF             *NewPacket;
+  INTN                Index;
 
-  IpHead  = Packet->Ip.Ip4;
-  This    = IP4_GET_CLIP_INFO (Packet);
+  IpHead = Packet->Ip.Ip4;
+  This   = IP4_GET_CLIP_INFO (Packet);
 
   ASSERT (IpHead != NULL);
 
   //
   // First: find the related assemble entry
   //
-  Assemble  = NULL;
-  Index     = IP4_ASSEMBLE_HASH (IpHead->Dst, IpHead->Src, IpHead->Id, IpHead->Protocol);
+  Assemble = NULL;
+  Index    = IP4_ASSEMBLE_HASH (IpHead->Dst, IpHead->Src, IpHead->Id, IpHead->Protocol);
 
   NET_LIST_FOR_EACH (Cur, &Table->Bucket[Index]) {
     Assemble = NET_LIST_USER_STRUCT (Cur, IP4_ASSEMBLE_ENTRY, Link);
 
     if ((Assemble->Dst == IpHead->Dst) && (Assemble->Src == IpHead->Src) &&
-        (Assemble->Id == IpHead->Id)   && (Assemble->Protocol == IpHead->Protocol)) {
+        (Assemble->Id == IpHead->Id)   && (Assemble->Protocol == IpHead->Protocol))
+    {
       break;
     }
   }
@@ -262,6 +255,7 @@ Ip4Reassemble (
 
     InsertHeadList (&Table->Bucket[Index], &Assemble->Link);
   }
+
   //
   // Assemble shouldn't be NULL here
   //
@@ -289,8 +283,8 @@ Ip4Reassemble (
   // overlaps, trim the overlapped part off THIS fragment.
   //
   if ((Prev = Cur->BackLink) != Head) {
-    Fragment  = NET_LIST_USER_STRUCT (Prev, NET_BUF, List);
-    Node      = IP4_GET_CLIP_INFO (Fragment);
+    Fragment = NET_LIST_USER_STRUCT (Prev, NET_BUF, List);
+    Node     = IP4_GET_CLIP_INFO (Fragment);
 
     if (This->Start < Node->End) {
       if (This->End <= Node->End) {
@@ -364,8 +358,8 @@ Ip4Reassemble (
     //
     ASSERT (Assemble->Head == NULL);
 
-    Assemble->Head  = IpHead;
-    Assemble->Info  = IP4_GET_CLIP_INFO (Packet);
+    Assemble->Head = IpHead;
+    Assemble->Info = IP4_GET_CLIP_INFO (Packet);
   }
 
   //
@@ -383,7 +377,6 @@ Ip4Reassemble (
   //     queue ends at the total length, all data is received.
   //
   if ((Assemble->TotalLen != 0) && (Assemble->CurLen >= Assemble->TotalLen)) {
-
     RemoveEntryList (&Assemble->Link);
 
     //
@@ -444,12 +437,12 @@ DROP:
 VOID
 EFIAPI
 Ip4IpSecFree (
-  IN VOID                   *Arg
+  IN VOID  *Arg
   )
 {
-  IP4_IPSEC_WRAP            *Wrap;
+  IP4_IPSEC_WRAP  *Wrap;
 
-  Wrap = (IP4_IPSEC_WRAP *) Arg;
+  Wrap = (IP4_IPSEC_WRAP *)Arg;
 
   if (Wrap->IpSecRecycleSignal != NULL) {
     gBS->SignalEvent (Wrap->IpSecRecycleSignal);
@@ -496,29 +489,30 @@ Ip4IpSecProcessPacket (
   IN     VOID                   *Context
   )
 {
-  NET_FRAGMENT              *FragmentTable;
-  NET_FRAGMENT              *OriginalFragmentTable;
-  UINT32                    FragmentCount;
-  UINT32                    OriginalFragmentCount;
-  EFI_EVENT                 RecycleEvent;
-  NET_BUF                   *Packet;
-  IP4_TXTOKEN_WRAP          *TxWrap;
-  IP4_IPSEC_WRAP            *IpSecWrap;
-  EFI_STATUS                Status;
-  IP4_HEAD                  ZeroHead;
+  NET_FRAGMENT      *FragmentTable;
+  NET_FRAGMENT      *OriginalFragmentTable;
+  UINT32            FragmentCount;
+  UINT32            OriginalFragmentCount;
+  EFI_EVENT         RecycleEvent;
+  NET_BUF           *Packet;
+  IP4_TXTOKEN_WRAP  *TxWrap;
+  IP4_IPSEC_WRAP    *IpSecWrap;
+  EFI_STATUS        Status;
+  IP4_HEAD          ZeroHead;
 
-  Status        = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
 
   if (!mIpSec2Installed) {
     goto ON_EXIT;
   }
+
   ASSERT (mIpSec != NULL);
 
   Packet        = *Netbuf;
   RecycleEvent  = NULL;
   IpSecWrap     = NULL;
   FragmentTable = NULL;
-  TxWrap        = (IP4_TXTOKEN_WRAP *) Context;
+  TxWrap        = (IP4_TXTOKEN_WRAP *)Context;
   FragmentCount = Packet->BlockOpNum;
 
   ZeroMem (&ZeroHead, sizeof (IP4_HEAD));
@@ -571,11 +565,11 @@ Ip4IpSecProcessPacket (
                      mIpSec,
                      IpSb->Controller,
                      IP_VERSION_4,
-                     (VOID *) (*Head),
+                     (VOID *)(*Head),
                      &(*Head)->Protocol,
-                     (VOID **) Options,
+                     (VOID **)Options,
                      OptionsLen,
-                     (EFI_IPSEC_FRAGMENT_DATA **) (&FragmentTable),
+                     (EFI_IPSEC_FRAGMENT_DATA **)(&FragmentTable),
                      &FragmentCount,
                      Direction,
                      &RecycleEvent
@@ -590,7 +584,7 @@ Ip4IpSecProcessPacket (
     goto ON_EXIT;
   }
 
-  if (OriginalFragmentTable == FragmentTable && OriginalFragmentCount == FragmentCount) {
+  if ((OriginalFragmentTable == FragmentTable) && (OriginalFragmentCount == FragmentCount)) {
     //
     // For ByPass Packet
     //
@@ -603,8 +597,7 @@ Ip4IpSecProcessPacket (
     FreePool (OriginalFragmentTable);
   }
 
-  if (Direction == EfiIPsecOutBound && TxWrap != NULL) {
-
+  if ((Direction == EfiIPsecOutBound) && (TxWrap != NULL)) {
     TxWrap->IpSecRecycleSignal = RecycleEvent;
     TxWrap->Packet             = NetbufFromExt (
                                    FragmentTable,
@@ -620,7 +613,7 @@ Ip4IpSecProcessPacket (
       // the TxWrap.
       //
       TxWrap->Packet = *Netbuf;
-      Status = EFI_OUT_OF_RESOURCES;
+      Status         = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
 
@@ -629,9 +622,7 @@ Ip4IpSecProcessPacket (
     //
     NetIpSecNetbufFree (*Netbuf);
     *Netbuf = TxWrap->Packet;
-
   } else {
-
     IpSecWrap = AllocateZeroPool (sizeof (IP4_IPSEC_WRAP));
 
     if (IpSecWrap == NULL) {
@@ -659,7 +650,7 @@ Ip4IpSecProcessPacket (
       goto ON_EXIT;
     }
 
-    if (Direction == EfiIPsecInBound && 0 != CompareMem (*Head, &ZeroHead, sizeof (IP4_HEAD))) {
+    if ((Direction == EfiIPsecInBound) && (0 != CompareMem (*Head, &ZeroHead, sizeof (IP4_HEAD)))) {
       Ip4PrependHead (Packet, *Head, *Options, *OptionsLen);
       Ip4NtohHead (Packet->Ip.Ip4);
       NetbufTrim (Packet, ((*Head)->HeadLen << 2), TRUE);
@@ -670,6 +661,7 @@ Ip4IpSecProcessPacket (
         sizeof (IP4_CLIP_INFO)
         );
     }
+
     *Netbuf = Packet;
   }
 
@@ -695,18 +687,18 @@ ON_EXIT:
 **/
 EFI_STATUS
 Ip4PreProcessPacket (
-  IN     IP4_SERVICE    *IpSb,
-  IN OUT NET_BUF        **Packet,
-  IN     IP4_HEAD       *Head,
-  IN     UINT8          *Option,
-  IN     UINT32         OptionLen,
-  IN     UINT32         Flag
+  IN     IP4_SERVICE  *IpSb,
+  IN OUT NET_BUF      **Packet,
+  IN     IP4_HEAD     *Head,
+  IN     UINT8        *Option,
+  IN     UINT32       OptionLen,
+  IN     UINT32       Flag
   )
 {
-  IP4_CLIP_INFO             *Info;
-  UINT32                    HeadLen;
-  UINT32                    TotalLen;
-  UINT16                    Checksum;
+  IP4_CLIP_INFO  *Info;
+  UINT32         HeadLen;
+  UINT32         TotalLen;
+  UINT16         Checksum;
 
   //
   // Check if the IP4 header is correctly formatted.
@@ -722,14 +714,15 @@ Ip4PreProcessPacket (
   }
 
   if ((Head->Ver != 4) || (HeadLen < IP4_MIN_HEADLEN) ||
-      (TotalLen < HeadLen) || (TotalLen != (*Packet)->TotalSize)) {
+      (TotalLen < HeadLen) || (TotalLen != (*Packet)->TotalSize))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // Some OS may send IP packets without checksum.
   //
-  Checksum = (UINT16) (~NetblockChecksum ((UINT8 *) Head, HeadLen));
+  Checksum = (UINT16)(~NetblockChecksum ((UINT8 *)Head, HeadLen));
 
   if ((Head->Checksum != 0) && (Checksum != 0)) {
     return EFI_INVALID_PARAMETER;
@@ -738,15 +731,15 @@ Ip4PreProcessPacket (
   //
   // Convert the IP header to host byte order, then get the per packet info.
   //
-  (*Packet)->Ip.Ip4  = Ip4NtohHead (Head);
+  (*Packet)->Ip.Ip4 = Ip4NtohHead (Head);
 
-  Info            = IP4_GET_CLIP_INFO (*Packet);
-  Info->LinkFlag  = Flag;
-  Info->CastType  = Ip4GetHostCast (IpSb, Head->Dst, Head->Src);
-  Info->Start     = (Head->Fragment & IP4_HEAD_OFFSET_MASK) << 3;
-  Info->Length    = Head->TotalLen - HeadLen;
-  Info->End       = Info->Start + Info->Length;
-  Info->Status    = EFI_SUCCESS;
+  Info           = IP4_GET_CLIP_INFO (*Packet);
+  Info->LinkFlag = Flag;
+  Info->CastType = Ip4GetHostCast (IpSb, Head->Dst, Head->Src);
+  Info->Start    = (Head->Fragment & IP4_HEAD_OFFSET_MASK) << 3;
+  Info->Length   = Head->TotalLen - HeadLen;
+  Info->End      = Info->Start + Info->Length;
+  Info->Status   = EFI_SUCCESS;
 
   //
   // The packet is destinated to us if the CastType is non-zero.
@@ -815,7 +808,7 @@ Ip4PreProcessPacket (
 **/
 BOOLEAN
 Ip4IsValidPacketLength (
-  IN NET_BUF        *Packet
+  IN NET_BUF  *Packet
   )
 {
   //
@@ -843,21 +836,21 @@ Ip4IsValidPacketLength (
 **/
 VOID
 Ip4AccpetFrame (
-  IN IP4_PROTOCOL           *Ip4Instance,
-  IN NET_BUF                *Packet,
-  IN EFI_STATUS             IoStatus,
-  IN UINT32                 Flag,
-  IN VOID                   *Context
+  IN IP4_PROTOCOL  *Ip4Instance,
+  IN NET_BUF       *Packet,
+  IN EFI_STATUS    IoStatus,
+  IN UINT32        Flag,
+  IN VOID          *Context
   )
 {
-  IP4_SERVICE               *IpSb;
-  IP4_HEAD                  *Head;
-  EFI_STATUS                Status;
-  IP4_HEAD                  ZeroHead;
-  UINT8                     *Option;
-  UINT32                    OptionLen;
+  IP4_SERVICE  *IpSb;
+  IP4_HEAD     *Head;
+  EFI_STATUS   Status;
+  IP4_HEAD     ZeroHead;
+  UINT8        *Option;
+  UINT32       OptionLen;
 
-  IpSb   = (IP4_SERVICE *) Context;
+  IpSb   = (IP4_SERVICE *)Context;
   Option = NULL;
 
   if (EFI_ERROR (IoStatus) || (IpSb->State == IP4_SERVICE_DESTROY)) {
@@ -868,11 +861,11 @@ Ip4AccpetFrame (
     goto RESTART;
   }
 
-  Head      = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL);
+  Head = (IP4_HEAD *)NetbufGetByte (Packet, 0, NULL);
   ASSERT (Head != NULL);
   OptionLen = (Head->HeadLen << 2) - IP4_MIN_HEADLEN;
   if (OptionLen > 0) {
-    Option = (UINT8 *) (Head + 1);
+    Option = (UINT8 *)(Head + 1);
   }
 
   //
@@ -922,7 +915,7 @@ Ip4AccpetFrame (
       goto RESTART;
     }
 
-    Head = (IP4_HEAD *) NetbufGetByte (Packet, 0, NULL);
+    Head = (IP4_HEAD *)NetbufGetByte (Packet, 0, NULL);
     ASSERT (Head != NULL);
     Status = Ip4PreProcessPacket (
                IpSb,
@@ -938,20 +931,20 @@ Ip4AccpetFrame (
   }
 
   ASSERT (Packet != NULL);
-  Head  = Packet->Ip.Ip4;
+  Head                               = Packet->Ip.Ip4;
   IP4_GET_CLIP_INFO (Packet)->Status = EFI_SUCCESS;
 
   switch (Head->Protocol) {
-  case EFI_IP_PROTO_ICMP:
-    Ip4IcmpHandle (IpSb, Head, Packet);
-    break;
+    case EFI_IP_PROTO_ICMP:
+      Ip4IcmpHandle (IpSb, Head, Packet);
+      break;
 
-  case IP4_PROTO_IGMP:
-    Ip4IgmpHandle (IpSb, Head, Packet);
-    break;
+    case IP4_PROTO_IGMP:
+      Ip4IgmpHandle (IpSb, Head, Packet);
+      break;
 
-  default:
-    Ip4Demultiplex (IpSb, Head, Packet, Option, OptionLen);
+    default:
+      Ip4Demultiplex (IpSb, Head, Packet, Option, OptionLen);
   }
 
   Packet = NULL;
@@ -970,9 +963,8 @@ DROP:
     NetbufFree (Packet);
   }
 
-  return ;
+  return;
 }
-
 
 /**
   Check whether this IP child accepts the packet.
@@ -987,16 +979,16 @@ DROP:
 **/
 BOOLEAN
 Ip4InstanceFrameAcceptable (
-  IN IP4_PROTOCOL           *IpInstance,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet
+  IN IP4_PROTOCOL  *IpInstance,
+  IN IP4_HEAD      *Head,
+  IN NET_BUF       *Packet
   )
 {
-  IP4_ICMP_ERROR_HEAD       Icmp;
-  EFI_IP4_CONFIG_DATA       *Config;
-  IP4_CLIP_INFO             *Info;
-  UINT16                    Proto;
-  UINT32                    Index;
+  IP4_ICMP_ERROR_HEAD  Icmp;
+  EFI_IP4_CONFIG_DATA  *Config;
+  IP4_CLIP_INFO        *Info;
+  UINT16               Proto;
+  UINT32               Index;
 
   Config = &IpInstance->ConfigData;
 
@@ -1024,14 +1016,14 @@ Ip4InstanceFrameAcceptable (
   Proto = Head->Protocol;
 
   if ((Proto == EFI_IP_PROTO_ICMP) && (!Config->AcceptAnyProtocol) && (Proto != Config->DefaultProtocol)) {
-    NetbufCopy (Packet, 0, sizeof (Icmp.Head), (UINT8 *) &Icmp.Head);
+    NetbufCopy (Packet, 0, sizeof (Icmp.Head), (UINT8 *)&Icmp.Head);
 
     if (mIcmpClass[Icmp.Head.Type].IcmpClass == ICMP_ERROR_MESSAGE) {
       if (!Config->AcceptIcmpErrors) {
         return FALSE;
       }
 
-      NetbufCopy (Packet, 0, sizeof (Icmp), (UINT8 *) &Icmp);
+      NetbufCopy (Packet, 0, sizeof (Icmp), (UINT8 *)&Icmp);
       Proto = Icmp.IpHead.Protocol;
     }
   }
@@ -1076,7 +1068,6 @@ Ip4InstanceFrameAcceptable (
   return TRUE;
 }
 
-
 /**
   Enqueue a shared copy of the packet to the IP4 child if the
   packet is acceptable to it. Here the data of the packet is
@@ -1094,13 +1085,13 @@ Ip4InstanceFrameAcceptable (
 **/
 EFI_STATUS
 Ip4InstanceEnquePacket (
-  IN IP4_PROTOCOL           *IpInstance,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet
+  IN IP4_PROTOCOL  *IpInstance,
+  IN IP4_HEAD      *Head,
+  IN NET_BUF       *Packet
   )
 {
-  IP4_CLIP_INFO             *Info;
-  NET_BUF                   *Clone;
+  IP4_CLIP_INFO  *Info;
+  NET_BUF        *Clone;
 
   //
   // Check whether the packet is acceptable to this instance.
@@ -1126,13 +1117,12 @@ Ip4InstanceEnquePacket (
   // Set the receive time out for the assembled packet. If it expires,
   // packet will be removed from the queue.
   //
-  Info        = IP4_GET_CLIP_INFO (Clone);
-  Info->Life  = IP4_US_TO_SEC (IpInstance->ConfigData.ReceiveTimeout);
+  Info       = IP4_GET_CLIP_INFO (Clone);
+  Info->Life = IP4_US_TO_SEC (IpInstance->ConfigData.ReceiveTimeout);
 
   InsertTailList (&IpInstance->Received, &Clone->List);
   return EFI_SUCCESS;
 }
-
 
 /**
   The signal handle of IP4's recycle event. It is called back
@@ -1146,13 +1136,13 @@ Ip4InstanceEnquePacket (
 VOID
 EFIAPI
 Ip4OnRecyclePacket (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  IP4_RXDATA_WRAP           *Wrap;
+  IP4_RXDATA_WRAP  *Wrap;
 
-  Wrap = (IP4_RXDATA_WRAP *) Context;
+  Wrap = (IP4_RXDATA_WRAP *)Context;
 
   EfiAcquireLockOrFail (&Wrap->IpInstance->RecycleLock);
   RemoveEntryList (&Wrap->Link);
@@ -1164,7 +1154,6 @@ Ip4OnRecyclePacket (
   gBS->CloseEvent (Wrap->RxData.RecycleSignal);
   FreePool (Wrap);
 }
-
 
 /**
   Wrap the received packet to a IP4_RXDATA_WRAP, which will be
@@ -1183,14 +1172,14 @@ Ip4OnRecyclePacket (
 **/
 IP4_RXDATA_WRAP *
 Ip4WrapRxData (
-  IN IP4_PROTOCOL           *IpInstance,
-  IN NET_BUF                *Packet
+  IN IP4_PROTOCOL  *IpInstance,
+  IN NET_BUF       *Packet
   )
 {
-  IP4_RXDATA_WRAP           *Wrap;
-  EFI_IP4_RECEIVE_DATA      *RxData;
-  EFI_STATUS                Status;
-  BOOLEAN                   RawData;
+  IP4_RXDATA_WRAP       *Wrap;
+  EFI_IP4_RECEIVE_DATA  *RxData;
+  EFI_STATUS            Status;
+  BOOLEAN               RawData;
 
   Wrap = AllocatePool (IP4_RXDATA_WRAP_SIZE (Packet->BlockOpNum));
 
@@ -1200,9 +1189,9 @@ Ip4WrapRxData (
 
   InitializeListHead (&Wrap->Link);
 
-  Wrap->IpInstance  = IpInstance;
-  Wrap->Packet      = Packet;
-  RxData            = &Wrap->RxData;
+  Wrap->IpInstance = IpInstance;
+  Wrap->Packet     = Packet;
+  RxData           = &Wrap->RxData;
 
   ZeroMem (RxData, sizeof (EFI_IP4_RECEIVE_DATA));
 
@@ -1229,26 +1218,25 @@ Ip4WrapRxData (
   //
   if (!RawData) {
     RxData->HeaderLength  = (Packet->Ip.Ip4->HeadLen << 2);
-    RxData->Header        = (EFI_IP4_HEADER *) Ip4NtohHead (Packet->Ip.Ip4);
+    RxData->Header        = (EFI_IP4_HEADER *)Ip4NtohHead (Packet->Ip.Ip4);
     RxData->OptionsLength = RxData->HeaderLength - IP4_MIN_HEADLEN;
     RxData->Options       = NULL;
 
     if (RxData->OptionsLength != 0) {
-      RxData->Options = (VOID *) (RxData->Header + 1);
+      RxData->Options = (VOID *)(RxData->Header + 1);
     }
   }
 
-  RxData->DataLength  = Packet->TotalSize;
+  RxData->DataLength = Packet->TotalSize;
 
   //
   // Build the fragment table to be delivered up.
   //
   RxData->FragmentCount = Packet->BlockOpNum;
-  NetbufBuildExt (Packet, (NET_FRAGMENT *) RxData->FragmentTable, &RxData->FragmentCount);
+  NetbufBuildExt (Packet, (NET_FRAGMENT *)RxData->FragmentTable, &RxData->FragmentCount);
 
   return Wrap;
 }
-
 
 /**
   Deliver the received packets to upper layer if there are both received
@@ -1266,7 +1254,7 @@ Ip4WrapRxData (
 **/
 EFI_STATUS
 Ip4InstanceDeliverPacket (
-  IN IP4_PROTOCOL           *IpInstance
+  IN IP4_PROTOCOL  *IpInstance
   )
 {
   EFI_IP4_COMPLETION_TOKEN  *Token;
@@ -1280,8 +1268,8 @@ Ip4InstanceDeliverPacket (
   // Deliver a packet if there are both a packet and a receive token.
   //
   while (!IsListEmpty (&IpInstance->Received) &&
-         !NetMapIsEmpty (&IpInstance->RxTokens)) {
-
+         !NetMapIsEmpty (&IpInstance->RxTokens))
+  {
     Packet = NET_LIST_HEAD (&IpInstance->Received, NET_BUF, List);
 
     if (!NET_BUF_SHARED (Packet)) {
@@ -1295,7 +1283,6 @@ Ip4InstanceDeliverPacket (
       }
 
       RemoveEntryList (&Packet->List);
-
     } else {
       //
       // Create a duplicated packet if this packet is shared
@@ -1321,7 +1308,7 @@ Ip4InstanceDeliverPacket (
         Head = NetbufAllocSpace (Dup, IP4_MAX_HEADLEN, NET_BUF_HEAD);
         ASSERT (Head != NULL);
 
-        Dup->Ip.Ip4 = (IP4_HEAD *) Head;
+        Dup->Ip.Ip4 = (IP4_HEAD *)Head;
 
         CopyMem (Head, Packet->Ip.Ip4, Packet->Ip.Ip4->HeadLen << 2);
         NetbufTrim (Dup, IP4_MAX_HEADLEN, TRUE);
@@ -1358,7 +1345,6 @@ Ip4InstanceDeliverPacket (
   return EFI_SUCCESS;
 }
 
-
 /**
   Enqueue a received packet to all the IP children that share
   the same interface.
@@ -1375,20 +1361,20 @@ Ip4InstanceDeliverPacket (
 **/
 INTN
 Ip4InterfaceEnquePacket (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet,
-  IN UINT8                  *Option,
-  IN UINT32                 OptionLen,
-  IN IP4_INTERFACE          *IpIf
+  IN IP4_SERVICE    *IpSb,
+  IN IP4_HEAD       *Head,
+  IN NET_BUF        *Packet,
+  IN UINT8          *Option,
+  IN UINT32         OptionLen,
+  IN IP4_INTERFACE  *IpIf
   )
 {
-  IP4_PROTOCOL              *IpInstance;
-  IP4_CLIP_INFO             *Info;
-  LIST_ENTRY                *Entry;
-  INTN                      Enqueued;
-  INTN                      LocalType;
-  INTN                      SavedType;
+  IP4_PROTOCOL   *IpInstance;
+  IP4_CLIP_INFO  *Info;
+  LIST_ENTRY     *Entry;
+  INTN           Enqueued;
+  INTN           LocalType;
+  INTN           SavedType;
 
   //
   // First, check that the packet is acceptable to this interface
@@ -1406,7 +1392,6 @@ Ip4InterfaceEnquePacket (
     // that later.
     //
     LocalType = Info->CastType;
-
   } else {
     //
     // Check the destination against local IP. If the station
@@ -1416,7 +1401,6 @@ Ip4InterfaceEnquePacket (
     //
     if (IpIf->Ip == IP4_ALLZERO_ADDRESS) {
       LocalType = IP4_LOCAL_HOST;
-
     } else {
       LocalType = Ip4GetNetCast (Head->Dst, IpIf);
 
@@ -1436,10 +1420,10 @@ Ip4InterfaceEnquePacket (
   // and pass the local cast type to the IP children on the
   // interface. The global cast type will be restored later.
   //
-  SavedType       = Info->CastType;
-  Info->CastType  = LocalType;
+  SavedType      = Info->CastType;
+  Info->CastType = LocalType;
 
-  Enqueued        = 0;
+  Enqueued = 0;
 
   NET_LIST_FOR_EACH (Entry, &IpIf->IpInstances) {
     IpInstance = NET_LIST_USER_STRUCT (Entry, IP4_PROTOCOL, AddrLink);
@@ -1448,7 +1432,7 @@ Ip4InterfaceEnquePacket (
     //
     // In RawData mode, add IPv4 headers and options back to packet.
     //
-    if ((IpInstance->ConfigData.RawData) && (Option != NULL) && (OptionLen != 0)){
+    if ((IpInstance->ConfigData.RawData) && (Option != NULL) && (OptionLen != 0)) {
       Ip4PrependHead (Packet, Head, Option, OptionLen);
     }
 
@@ -1461,7 +1445,6 @@ Ip4InterfaceEnquePacket (
   return Enqueued;
 }
 
-
 /**
   Deliver the packet for each IP4 child on the interface.
 
@@ -1473,12 +1456,12 @@ Ip4InterfaceEnquePacket (
 **/
 EFI_STATUS
 Ip4InterfaceDeliverPacket (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_INTERFACE          *IpIf
+  IN IP4_SERVICE    *IpSb,
+  IN IP4_INTERFACE  *IpIf
   )
 {
-  IP4_PROTOCOL              *Ip4Instance;
-  LIST_ENTRY                *Entry;
+  IP4_PROTOCOL  *Ip4Instance;
+  LIST_ENTRY    *Entry;
 
   NET_LIST_FOR_EACH (Entry, &IpIf->IpInstances) {
     Ip4Instance = NET_LIST_USER_STRUCT (Entry, IP4_PROTOCOL, AddrLink);
@@ -1487,7 +1470,6 @@ Ip4InterfaceDeliverPacket (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Demultiple the packet. the packet delivery is processed in two
@@ -1511,16 +1493,16 @@ Ip4InterfaceDeliverPacket (
 **/
 EFI_STATUS
 Ip4Demultiplex (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet,
-  IN UINT8                  *Option,
-  IN UINT32                 OptionLen
+  IN IP4_SERVICE  *IpSb,
+  IN IP4_HEAD     *Head,
+  IN NET_BUF      *Packet,
+  IN UINT8        *Option,
+  IN UINT32       OptionLen
   )
 {
-  LIST_ENTRY                *Entry;
-  IP4_INTERFACE             *IpIf;
-  INTN                      Enqueued;
+  LIST_ENTRY     *Entry;
+  IP4_INTERFACE  *IpIf;
+  INTN           Enqueued;
 
   //
   // Two pass delivery: first, enqueue a shared copy of the packet
@@ -1565,7 +1547,6 @@ Ip4Demultiplex (
   return EFI_SUCCESS;
 }
 
-
 /**
   Timeout the fragment and enqueued packets.
 
@@ -1574,17 +1555,17 @@ Ip4Demultiplex (
 **/
 VOID
 Ip4PacketTimerTicking (
-  IN IP4_SERVICE            *IpSb
+  IN IP4_SERVICE  *IpSb
   )
 {
-  LIST_ENTRY                *InstanceEntry;
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  IP4_PROTOCOL              *IpInstance;
-  IP4_ASSEMBLE_ENTRY        *Assemble;
-  NET_BUF                   *Packet;
-  IP4_CLIP_INFO             *Info;
-  UINT32                    Index;
+  LIST_ENTRY          *InstanceEntry;
+  LIST_ENTRY          *Entry;
+  LIST_ENTRY          *Next;
+  IP4_PROTOCOL        *IpInstance;
+  IP4_ASSEMBLE_ENTRY  *Assemble;
+  NET_BUF             *Packet;
+  IP4_CLIP_INFO       *Info;
+  UINT32              Index;
 
   //
   // First, time out the fragments. The packet's life is counting down

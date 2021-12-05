@@ -8,14 +8,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Mtftp4Impl.h"
 
-CHAR8 *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS] = {
+CHAR8  *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS] = {
   "blksize",
   "windowsize",
   "timeout",
   "tsize",
   "multicast"
 };
-
 
 /**
   Check whether two ascii strings are equal, ignore the case.
@@ -29,16 +28,16 @@ CHAR8 *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS] = {
 **/
 BOOLEAN
 NetStringEqualNoCase (
-  IN UINT8                 *Str1,
-  IN UINT8                 *Str2
+  IN UINT8  *Str1,
+  IN UINT8  *Str2
   )
 {
-  UINT8                     Ch1;
-  UINT8                     Ch2;
+  UINT8  Ch1;
+  UINT8  Ch2;
 
   ASSERT ((Str1 != NULL) && (Str2 != NULL));
 
-  for (; (*Str1 != '\0') && (*Str2 != '\0'); Str1++, Str2++) {
+  for ( ; (*Str1 != '\0') && (*Str2 != '\0'); Str1++, Str2++) {
     Ch1 = *Str1;
     Ch2 = *Str2;
 
@@ -58,9 +57,8 @@ NetStringEqualNoCase (
     }
   }
 
-  return (BOOLEAN) (*Str1 == *Str2);
+  return (BOOLEAN)(*Str1 == *Str2);
 }
-
 
 /**
   Convert a string to a UINT32 number.
@@ -72,22 +70,21 @@ NetStringEqualNoCase (
 **/
 UINT32
 NetStringToU32 (
-  IN UINT8                 *Str
+  IN UINT8  *Str
   )
 {
-  UINT32                    Num;
+  UINT32  Num;
 
   ASSERT (Str != NULL);
 
   Num = 0;
 
-  for (; NET_IS_DIGIT (*Str); Str++) {
+  for ( ; NET_IS_DIGIT (*Str); Str++) {
     Num = Num * 10 + (*Str - '0');
   }
 
   return Num;
 }
-
 
 /**
   Convert a string of the format "192.168.0.1" to an IP address.
@@ -101,13 +98,13 @@ NetStringToU32 (
 **/
 EFI_STATUS
 NetStringToIp (
-  IN     UINT8                 *Str,
-     OUT IP4_ADDR              *Ip
+  IN     UINT8  *Str,
+  OUT IP4_ADDR  *Ip
   )
 {
-  UINT32                    Byte;
-  UINT32                    Addr;
-  UINTN                     Index;
+  UINT32  Byte;
+  UINT32  Addr;
+  UINTN   Index;
 
   *Ip  = 0;
   Addr = 0;
@@ -144,7 +141,6 @@ NetStringToIp (
   return EFI_SUCCESS;
 }
 
-
 /**
   Go through the packet to fill the Options array with the start
   addresses of each MTFTP option name/value pair.
@@ -162,21 +158,21 @@ NetStringToIp (
 **/
 EFI_STATUS
 Mtftp4FillOptions (
-  IN     EFI_MTFTP4_PACKET     *Packet,
-  IN     UINT32                PacketLen,
-  IN OUT UINT32                *Count,
-     OUT EFI_MTFTP4_OPTION     *Options          OPTIONAL
+  IN     EFI_MTFTP4_PACKET  *Packet,
+  IN     UINT32             PacketLen,
+  IN OUT UINT32             *Count,
+  OUT EFI_MTFTP4_OPTION     *Options          OPTIONAL
   )
 {
-  UINT8                     *Cur;
-  UINT8                     *Last;
-  UINT8                     Num;
-  UINT8                     *Name;
-  UINT8                     *Value;
+  UINT8  *Cur;
+  UINT8  *Last;
+  UINT8  Num;
+  UINT8  *Name;
+  UINT8  *Value;
 
-  Num   = 0;
-  Cur   = (UINT8 *) Packet + MTFTP4_OPCODE_LEN;
-  Last  = (UINT8 *) Packet + PacketLen - 1;
+  Num  = 0;
+  Cur  = (UINT8 *)Packet + MTFTP4_OPCODE_LEN;
+  Last = (UINT8 *)Packet + PacketLen - 1;
 
   //
   // process option name and value pairs. The last byte is always zero
@@ -201,8 +197,8 @@ Mtftp4FillOptions (
     Num++;
 
     if ((Options != NULL) && (Num <= *Count)) {
-      Options[Num - 1].OptionStr  = Name;
-      Options[Num - 1].ValueStr   = Value;
+      Options[Num - 1].OptionStr = Name;
+      Options[Num - 1].ValueStr  = Value;
     }
 
     Cur++;
@@ -216,7 +212,6 @@ Mtftp4FillOptions (
   *Count = Num;
   return EFI_SUCCESS;
 }
-
 
 /**
   Allocate and fill in a array of Mtftp options from the Packet.
@@ -237,13 +232,13 @@ Mtftp4FillOptions (
 **/
 EFI_STATUS
 Mtftp4ExtractOptions (
-  IN     EFI_MTFTP4_PACKET     *Packet,
-  IN     UINT32                PacketLen,
-     OUT UINT32                *OptionCount,
-     OUT EFI_MTFTP4_OPTION     **OptionList        OPTIONAL
+  IN     EFI_MTFTP4_PACKET  *Packet,
+  IN     UINT32             PacketLen,
+  OUT UINT32                *OptionCount,
+  OUT EFI_MTFTP4_OPTION     **OptionList        OPTIONAL
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   *OptionCount = 0;
 
@@ -262,7 +257,7 @@ Mtftp4ExtractOptions (
   //
   // The last byte must be zero to terminate the options
   //
-  if (*((UINT8 *) Packet + PacketLen - 1) != 0) {
+  if (*((UINT8 *)Packet + PacketLen - 1) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -293,7 +288,6 @@ Mtftp4ExtractOptions (
   return EFI_SUCCESS;
 }
 
-
 /**
   Parse the MTFTP multicast option.
 
@@ -306,19 +300,19 @@ Mtftp4ExtractOptions (
 **/
 EFI_STATUS
 Mtftp4ExtractMcast (
-  IN     UINT8                  *Value,
-  IN OUT MTFTP4_OPTION          *Option
+  IN     UINT8          *Value,
+  IN OUT MTFTP4_OPTION  *Option
   )
 {
-  EFI_STATUS                Status;
-  UINT32                    Num;
+  EFI_STATUS  Status;
+  UINT32      Num;
 
   //
   // The multicast option is formatted like "204.0.0.1,1857,1"
   // The server can also omit the ip and port, use ",,1"
   //
   if (*Value == ',') {
-    Option->McastIp   = 0;
+    Option->McastIp = 0;
   } else {
     Status = NetStringToIp (Value, &Option->McastIp);
 
@@ -350,7 +344,7 @@ Mtftp4ExtractMcast (
       return EFI_INVALID_PARAMETER;
     }
 
-    Option->McastPort = (UINT16) Num;
+    Option->McastPort = (UINT16)Num;
 
     while (NET_IS_DIGIT (*Value)) {
       Value++;
@@ -372,7 +366,7 @@ Mtftp4ExtractMcast (
     return EFI_INVALID_PARAMETER;
   }
 
-  Option->Master = (BOOLEAN) (Num == 1);
+  Option->Master = (BOOLEAN)(Num == 1);
 
   while (NET_IS_DIGIT (*Value)) {
     Value++;
@@ -384,7 +378,6 @@ Mtftp4ExtractMcast (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Parse the option in Options array to MTFTP4_OPTION which program
@@ -405,17 +398,17 @@ Mtftp4ExtractMcast (
 **/
 EFI_STATUS
 Mtftp4ParseOption (
-  IN     EFI_MTFTP4_OPTION     *Options,
-  IN     UINT32                Count,
-  IN     BOOLEAN               Request,
-  IN     UINT16                Operation,
-     OUT MTFTP4_OPTION         *MtftpOption
+  IN     EFI_MTFTP4_OPTION  *Options,
+  IN     UINT32             Count,
+  IN     BOOLEAN            Request,
+  IN     UINT16             Operation,
+  OUT MTFTP4_OPTION         *MtftpOption
   )
 {
-  EFI_STATUS                Status;
-  UINT32                    Index;
-  UINT32                    Value;
-  EFI_MTFTP4_OPTION         *This;
+  EFI_STATUS         Status;
+  UINT32             Index;
+  UINT32             Value;
+  EFI_MTFTP4_OPTION  *This;
 
   MtftpOption->Exist = 0;
 
@@ -426,7 +419,7 @@ Mtftp4ParseOption (
       return EFI_INVALID_PARAMETER;
     }
 
-    if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "blksize")) {
+    if (NetStringEqualNoCase (This->OptionStr, (UINT8 *)"blksize")) {
       //
       // block size option, valid value is between [8, 65464]
       //
@@ -436,10 +429,9 @@ Mtftp4ParseOption (
         return EFI_INVALID_PARAMETER;
       }
 
-      MtftpOption->BlkSize = (UINT16) Value;
-      MtftpOption->Exist |= MTFTP4_BLKSIZE_EXIST;
-
-    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "timeout")) {
+      MtftpOption->BlkSize = (UINT16)Value;
+      MtftpOption->Exist  |= MTFTP4_BLKSIZE_EXIST;
+    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *)"timeout")) {
       //
       // timeout option, valid value is between [1, 255]
       //
@@ -449,16 +441,14 @@ Mtftp4ParseOption (
         return EFI_INVALID_PARAMETER;
       }
 
-      MtftpOption->Timeout = (UINT8) Value;
-
-    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "tsize")) {
+      MtftpOption->Timeout = (UINT8)Value;
+    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *)"tsize")) {
       //
       // tsize option, the biggest transfer supported is 4GB with block size option
       //
-      MtftpOption->Tsize = NetStringToU32 (This->ValueStr);
+      MtftpOption->Tsize  = NetStringToU32 (This->ValueStr);
       MtftpOption->Exist |= MTFTP4_TSIZE_EXIST;
-
-    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "multicast")) {
+    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *)"multicast")) {
       //
       // Multicast option, if it is a request, the value must be a zero
       // length string, otherwise, it is formatted like "204.0.0.1,1857,1\0"
@@ -467,7 +457,6 @@ Mtftp4ParseOption (
         if (*(This->ValueStr) != '\0') {
           return EFI_INVALID_PARAMETER;
         }
-
       } else {
         Status = Mtftp4ExtractMcast (This->ValueStr, MtftpOption);
 
@@ -477,8 +466,7 @@ Mtftp4ParseOption (
       }
 
       MtftpOption->Exist |= MTFTP4_MCAST_EXIST;
-
-    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "windowsize")) {
+    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *)"windowsize")) {
       if (Operation == EFI_MTFTP4_OPCODE_WRQ) {
         //
         // Currently, windowsize is not supported in the write operation.
@@ -492,8 +480,8 @@ Mtftp4ParseOption (
         return EFI_INVALID_PARAMETER;
       }
 
-      MtftpOption->WindowSize = (UINT16) Value;
-      MtftpOption->Exist |= MTFTP4_WINDOWSIZE_EXIST;
+      MtftpOption->WindowSize = (UINT16)Value;
+      MtftpOption->Exist     |= MTFTP4_WINDOWSIZE_EXIST;
     } else if (Request) {
       //
       // Ignore the unsupported option if it is a reply, and return
@@ -505,7 +493,6 @@ Mtftp4ParseOption (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Parse the options in the OACK packet to MTFTP4_OPTION which program
@@ -523,15 +510,15 @@ Mtftp4ParseOption (
 **/
 EFI_STATUS
 Mtftp4ParseOptionOack (
-  IN     EFI_MTFTP4_PACKET     *Packet,
-  IN     UINT32                PacketLen,
-  IN     UINT16                Operation,
-     OUT MTFTP4_OPTION         *MtftpOption
+  IN     EFI_MTFTP4_PACKET  *Packet,
+  IN     UINT32             PacketLen,
+  IN     UINT16             Operation,
+  OUT MTFTP4_OPTION         *MtftpOption
   )
 {
-  EFI_MTFTP4_OPTION *OptionList;
-  EFI_STATUS        Status;
-  UINT32            Count;
+  EFI_MTFTP4_OPTION  *OptionList;
+  EFI_STATUS         Status;
+  UINT32             Count;
 
   MtftpOption->Exist = 0;
 
@@ -540,6 +527,7 @@ Mtftp4ParseOptionOack (
   if (EFI_ERROR (Status) || (Count == 0)) {
     return Status;
   }
+
   ASSERT (OptionList != NULL);
 
   Status = Mtftp4ParseOption (OptionList, Count, FALSE, Operation, MtftpOption);

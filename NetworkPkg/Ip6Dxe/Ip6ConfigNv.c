@@ -9,7 +9,7 @@
 
 #include "Ip6Impl.h"
 
-CHAR16    mIp6ConfigStorageName[]     = L"IP6_CONFIG_IFR_NVDATA";
+CHAR16  mIp6ConfigStorageName[] = L"IP6_CONFIG_IFR_NVDATA";
 
 /**
   The notify function of create event when performing a manual configuration.
@@ -21,11 +21,11 @@ CHAR16    mIp6ConfigStorageName[]     = L"IP6_CONFIG_IFR_NVDATA";
 VOID
 EFIAPI
 Ip6ConfigManualAddressNotify (
-  IN EFI_EVENT    Event,
-  IN VOID         *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  *((BOOLEAN *) Context) = TRUE;
+  *((BOOLEAN *)Context) = TRUE;
 }
 
 /**
@@ -52,27 +52,27 @@ Ip6ConfigManualAddressNotify (
 **/
 EFI_STATUS
 Ip6ConfigNvGetData (
-  IN  EFI_IP6_CONFIG_PROTOCOL                *Ip6Config,
-  IN  EFI_IP6_CONFIG_DATA_TYPE               DataType,
-  OUT UINTN                                  *DataSize,
-  OUT VOID                                   **Data
+  IN  EFI_IP6_CONFIG_PROTOCOL   *Ip6Config,
+  IN  EFI_IP6_CONFIG_DATA_TYPE  DataType,
+  OUT UINTN                     *DataSize,
+  OUT VOID                      **Data
   )
 {
-  UINTN                   BufferSize;
-  VOID                    *Buffer;
-  EFI_STATUS              Status;
+  UINTN       BufferSize;
+  VOID        *Buffer;
+  EFI_STATUS  Status;
 
   if ((Ip6Config == NULL) || (Data == NULL) || (DataSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   BufferSize = 0;
-  Status = Ip6Config->GetData (
-                        Ip6Config,
-                        DataType,
-                        &BufferSize,
-                        NULL
-                        );
+  Status     = Ip6Config->GetData (
+                            Ip6Config,
+                            DataType,
+                            &BufferSize,
+                            NULL
+                            );
   if (Status != EFI_BUFFER_TOO_SMALL) {
     return Status;
   }
@@ -108,12 +108,12 @@ Ip6ConfigNvGetData (
 **/
 VOID
 Ip6FreeAddressInfoList (
-  IN LIST_ENTRY                  *ListHead
+  IN LIST_ENTRY  *ListHead
   )
 {
-  IP6_ADDRESS_INFO_ENTRY         *Node;
-  LIST_ENTRY                     *Entry;
-  LIST_ENTRY                     *NextEntry;
+  IP6_ADDRESS_INFO_ENTRY  *Node;
+  LIST_ENTRY              *Entry;
+  LIST_ENTRY              *NextEntry;
 
   NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, ListHead) {
     Node = NET_LIST_USER_STRUCT (Entry, IP6_ADDRESS_INFO_ENTRY, Link);
@@ -135,19 +135,20 @@ Ip6ToStr (
   OUT CHAR16            *Str
   )
 {
-  UINTN                 Index;
-  BOOLEAN               Short;
-  UINTN                 Number;
-  CHAR16                FormatString[8];
+  UINTN    Index;
+  BOOLEAN  Short;
+  UINTN    Number;
+  CHAR16   FormatString[8];
 
   Short = FALSE;
 
   for (Index = 0; Index < 15; Index = Index + 2) {
     if (!Short &&
-        Index % 2 == 0 &&
-        Ip6->Addr[Index] == 0 &&
-        Ip6->Addr[Index + 1] == 0
-        ) {
+        (Index % 2 == 0) &&
+        (Ip6->Addr[Index] == 0) &&
+        (Ip6->Addr[Index + 1] == 0)
+        )
+    {
       //
       // Deal with the case of ::.
       //
@@ -156,8 +157,8 @@ Ip6ToStr (
         *(Str + 1) = L':';
         Str        = Str + 2;
       } else {
-        *Str       = L':';
-        Str        = Str + 1;
+        *Str = L':';
+        Str  = Str + 1;
       }
 
       while ((Index < 15) && (Ip6->Addr[Index] == 0) && (Ip6->Addr[Index + 1] == 0)) {
@@ -178,7 +179,7 @@ Ip6ToStr (
     ASSERT (Index < 15);
 
     if (Ip6->Addr[Index] == 0) {
-      Number = UnicodeSPrint (Str, 2 * IP6_STR_MAX_SIZE, L"%x:", (UINTN) Ip6->Addr[Index + 1]);
+      Number = UnicodeSPrint (Str, 2 * IP6_STR_MAX_SIZE, L"%x:", (UINTN)Ip6->Addr[Index + 1]);
     } else {
       if (Ip6->Addr[Index + 1] < 0x10) {
         CopyMem (FormatString, L"%x0%x:", StrSize (L"%x0%x:"));
@@ -189,9 +190,9 @@ Ip6ToStr (
       Number = UnicodeSPrint (
                  Str,
                  2 * IP6_STR_MAX_SIZE,
-                 (CONST CHAR16 *) FormatString,
-                 (UINTN) Ip6->Addr[Index],
-                 (UINTN) Ip6->Addr[Index + 1]
+                 (CONST CHAR16 *)FormatString,
+                 (UINTN)Ip6->Addr[Index],
+                 (UINTN)Ip6->Addr[Index + 1]
                  );
     }
 
@@ -218,12 +219,12 @@ Ip6ToStr (
 **/
 EFI_STATUS
 Ip6ConvertInterfaceIdToString (
-  OUT CHAR16                         *String,
-  IN  EFI_IP6_CONFIG_INTERFACE_ID    *IfId
+  OUT CHAR16                       *String,
+  IN  EFI_IP6_CONFIG_INTERFACE_ID  *IfId
   )
 {
-  UINT8                          Index;
-  UINTN                          Number;
+  UINT8  Index;
+  UINTN  Number;
 
   if ((String == NULL) || (IfId == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -234,7 +235,7 @@ Ip6ConvertInterfaceIdToString (
                String,
                2 * INTERFACE_ID_STR_STORAGE,
                L"%x:",
-               (UINTN) IfId->Id[Index]
+               (UINTN)IfId->Id[Index]
                );
     String = String + Number;
   }
@@ -256,20 +257,20 @@ Ip6ConvertInterfaceIdToString (
 **/
 EFI_STATUS
 Ip6ParseInterfaceIdFromString (
-  IN CONST CHAR16                    *String,
-  OUT EFI_IP6_CONFIG_INTERFACE_ID    *IfId
+  IN CONST CHAR16                  *String,
+  OUT EFI_IP6_CONFIG_INTERFACE_ID  *IfId
   )
 {
-  UINT8                          Index;
-  CHAR16                         *IfIdStr;
-  CHAR16                         *TempStr;
-  UINTN                          NodeVal;
+  UINT8   Index;
+  CHAR16  *IfIdStr;
+  CHAR16  *TempStr;
+  UINTN   NodeVal;
 
   if ((String == NULL) || (IfId == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  IfIdStr = (CHAR16 *) String;
+  IfIdStr = (CHAR16 *)String;
 
   ZeroMem (IfId, sizeof (EFI_IP6_CONFIG_INTERFACE_ID));
 
@@ -297,7 +298,7 @@ Ip6ParseInterfaceIdFromString (
       return EFI_INVALID_PARAMETER;
     }
 
-    IfId->Id[Index] = (UINT8) NodeVal;
+    IfId->Id[Index] = (UINT8)NodeVal;
 
     IfIdStr++;
   }
@@ -323,18 +324,18 @@ Ip6ParseInterfaceIdFromString (
 **/
 EFI_STATUS
 Ip6CreateOpCode (
-  IN  UINT16                        StartLabelNumber,
-  OUT VOID                          **StartOpCodeHandle,
-  OUT EFI_IFR_GUID_LABEL            **StartLabel,
-  OUT VOID                          **EndOpCodeHandle,
-  OUT EFI_IFR_GUID_LABEL            **EndLabel
+  IN  UINT16              StartLabelNumber,
+  OUT VOID                **StartOpCodeHandle,
+  OUT EFI_IFR_GUID_LABEL  **StartLabel,
+  OUT VOID                **EndOpCodeHandle,
+  OUT EFI_IFR_GUID_LABEL  **EndLabel
   )
 {
-  EFI_STATUS                        Status;
-  EFI_IFR_GUID_LABEL                *InternalStartLabel;
-  EFI_IFR_GUID_LABEL                *InternalEndLabel;
+  EFI_STATUS          Status;
+  EFI_IFR_GUID_LABEL  *InternalStartLabel;
+  EFI_IFR_GUID_LABEL  *InternalEndLabel;
 
-  if (StartOpCodeHandle == NULL || StartLabel == NULL || EndOpCodeHandle == NULL || EndLabel == NULL) {
+  if ((StartOpCodeHandle == NULL) || (StartLabel == NULL) || (EndOpCodeHandle == NULL) || (EndLabel == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -358,12 +359,12 @@ Ip6CreateOpCode (
   //
   // Create Hii Extend Label OpCode as the start opcode.
   //
-  InternalStartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (
-                                                *StartOpCodeHandle,
-                                                &gEfiIfrTianoGuid,
-                                                NULL,
-                                                sizeof (EFI_IFR_GUID_LABEL)
-                                                );
+  InternalStartLabel = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (
+                                               *StartOpCodeHandle,
+                                               &gEfiIfrTianoGuid,
+                                               NULL,
+                                               sizeof (EFI_IFR_GUID_LABEL)
+                                               );
   if (InternalStartLabel == NULL) {
     goto Exit;
   }
@@ -374,12 +375,12 @@ Ip6CreateOpCode (
   //
   // Create Hii Extend Label OpCode as the end opcode.
   //
-  InternalEndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (
-                                              *EndOpCodeHandle,
-                                              &gEfiIfrTianoGuid,
-                                              NULL,
-                                              sizeof (EFI_IFR_GUID_LABEL)
-                                              );
+  InternalEndLabel = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (
+                                             *EndOpCodeHandle,
+                                             &gEfiIfrTianoGuid,
+                                             NULL,
+                                             sizeof (EFI_IFR_GUID_LABEL)
+                                             );
   if (InternalEndLabel == NULL) {
     goto Exit;
   }
@@ -429,26 +430,26 @@ Exit:
 **/
 EFI_STATUS
 Ip6ConvertAddressListToString (
-  IN OUT CHAR16                         *String,
-  IN     EFI_HII_HANDLE                 HiiHandle,
-  IN     IP6_CONFIG_NV_ADDRESS_TYPE     AddressType,
-  IN     VOID                           *AddressInfo,
-  IN     UINTN                          AddressCount
+  IN OUT CHAR16                      *String,
+  IN     EFI_HII_HANDLE              HiiHandle,
+  IN     IP6_CONFIG_NV_ADDRESS_TYPE  AddressType,
+  IN     VOID                        *AddressInfo,
+  IN     UINTN                       AddressCount
   )
 {
-  UINTN                          Index;
-  UINTN                          Number;
-  CHAR16                         *TempStr;
-  EFI_STATUS                     Status;
-  VOID                           *StartOpCodeHandle;
-  EFI_IFR_GUID_LABEL             *StartLabel;
-  VOID                           *EndOpCodeHandle;
-  EFI_IFR_GUID_LABEL             *EndLabel;
-  UINT16                         StartLabelNumber;
-  EFI_STRING_ID                  TextTwo;
-  UINT8                          *AddressHead;
-  UINT8                          PrefixLength;
-  EFI_IPv6_ADDRESS               *Address;
+  UINTN               Index;
+  UINTN               Number;
+  CHAR16              *TempStr;
+  EFI_STATUS          Status;
+  VOID                *StartOpCodeHandle;
+  EFI_IFR_GUID_LABEL  *StartLabel;
+  VOID                *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL  *EndLabel;
+  UINT16              StartLabelNumber;
+  EFI_STRING_ID       TextTwo;
+  UINT8               *AddressHead;
+  UINT8               PrefixLength;
+  EFI_IPv6_ADDRESS    *Address;
 
   if ((String == NULL) || (HiiHandle == NULL) || (AddressInfo == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -478,15 +479,15 @@ Ip6ConvertAddressListToString (
     return Status;
   }
 
-  AddressHead = (UINT8 *) AddressInfo;
+  AddressHead = (UINT8 *)AddressInfo;
 
   for (Index = 0; Index < AddressCount; Index++) {
     if (AddressType == Ip6ConfigNvHostAddress) {
       AddressInfo = AddressHead + sizeof (EFI_IP6_ADDRESS_INFO) * Index;
-      Address     = &((EFI_IP6_ADDRESS_INFO *) AddressInfo)->Address;
+      Address     = &((EFI_IP6_ADDRESS_INFO *)AddressInfo)->Address;
     } else if (AddressType == Ip6ConfigNvRouteTable) {
       AddressInfo = AddressHead + sizeof (EFI_IP6_ROUTE_TABLE) * Index;
-      Address     = &((EFI_IP6_ROUTE_TABLE *) AddressInfo)->Destination;
+      Address     = &((EFI_IP6_ROUTE_TABLE *)AddressInfo)->Destination;
     } else {
       AddressInfo = AddressHead + sizeof (EFI_IPv6_ADDRESS) * Index;
       Address     = AddressInfo;
@@ -500,9 +501,9 @@ Ip6ConvertAddressListToString (
 
     if ((AddressType == Ip6ConfigNvHostAddress) || (AddressType == Ip6ConfigNvRouteTable)) {
       if (AddressType == Ip6ConfigNvHostAddress) {
-        PrefixLength = ((EFI_IP6_ADDRESS_INFO *) AddressInfo)->PrefixLength;
+        PrefixLength = ((EFI_IP6_ADDRESS_INFO *)AddressInfo)->PrefixLength;
       } else {
-        PrefixLength = ((EFI_IP6_ROUTE_TABLE *) AddressInfo)->PrefixLength;
+        PrefixLength = ((EFI_IP6_ROUTE_TABLE *)AddressInfo)->PrefixLength;
       }
 
       //
@@ -518,13 +519,13 @@ Ip6ConvertAddressListToString (
       //
       // Append " >> " to the string.
       //
-      Number   = UnicodeSPrint (TempStr, 8, L" >>  ");
-      TempStr  = TempStr + Number;
+      Number  = UnicodeSPrint (TempStr, 8, L" >>  ");
+      TempStr = TempStr + Number;
 
       //
       // Append the gateway address to the string.
       //
-      Ip6ToStr (&((EFI_IP6_ROUTE_TABLE *) AddressInfo)->Gateway, TempStr);
+      Ip6ToStr (&((EFI_IP6_ROUTE_TABLE *)AddressInfo)->Gateway, TempStr);
       TempStr = TempStr + StrLen (TempStr);
     }
 
@@ -539,7 +540,7 @@ Ip6ConvertAddressListToString (
 
     HiiCreateTextOpCode (StartOpCodeHandle, STR_NULL, STR_NULL, TextTwo);
 
-    String = TempStr;
+    String  = TempStr;
     *String = IP6_ADDRESS_DELIMITER;
     String++;
   }
@@ -576,26 +577,26 @@ Exit:
 **/
 EFI_STATUS
 Ip6ParseAddressListFromString (
-  IN CONST CHAR16                    *String,
-  OUT LIST_ENTRY                     *ListHead,
-  OUT UINT32                         *AddressCount
+  IN CONST CHAR16  *String,
+  OUT LIST_ENTRY   *ListHead,
+  OUT UINT32       *AddressCount
   )
 {
-  EFI_STATUS                     Status;
-  CHAR16                         *LocalString;
-  CHAR16                         *Temp;
-  CHAR16                         *TempStr;
-  EFI_IP6_ADDRESS_INFO           AddressInfo;
-  IP6_ADDRESS_INFO_ENTRY         *Node;
-  BOOLEAN                        Last;
-  UINT32                         Count;
+  EFI_STATUS              Status;
+  CHAR16                  *LocalString;
+  CHAR16                  *Temp;
+  CHAR16                  *TempStr;
+  EFI_IP6_ADDRESS_INFO    AddressInfo;
+  IP6_ADDRESS_INFO_ENTRY  *Node;
+  BOOLEAN                 Last;
+  UINT32                  Count;
 
   if ((String == NULL) || (ListHead == NULL) || (AddressCount == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   ZeroMem (&AddressInfo, sizeof (EFI_IP6_ADDRESS_INFO));
-  LocalString = (CHAR16 *) AllocateCopyPool (StrSize (String), String);
+  LocalString = (CHAR16 *)AllocateCopyPool (StrSize (String), String);
   if (LocalString == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -684,12 +685,12 @@ Ip6ConvertInterfaceInfoToString (
   IN OUT IP6_CONFIG_IFR_NVDATA          *IfrNvData
   )
 {
-  UINT32                         Index;
-  UINTN                          Number;
-  CHAR16                         *String;
-  CHAR16                         PortString[ADDRESS_STR_MAX_SIZE];
-  CHAR16                         FormatString[8];
-  EFI_STRING_ID                  StringId;
+  UINT32         Index;
+  UINTN          Number;
+  CHAR16         *String;
+  CHAR16         PortString[ADDRESS_STR_MAX_SIZE];
+  CHAR16         FormatString[8];
+  EFI_STRING_ID  StringId;
 
   if ((IfInfo == NULL) || (HiiHandle == NULL) || (IfrNvData == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -739,7 +740,6 @@ Ip6ConvertInterfaceInfoToString (
   ASSERT (IfInfo->HwAddressSize <= 32);
 
   for (Index = 0; Index < IfInfo->HwAddressSize; Index++) {
-
     if (IfInfo->HwAddress.Addr[Index] < 0x10) {
       CopyMem (FormatString, L"0%x-", sizeof (L"0%x-"));
     } else {
@@ -749,8 +749,8 @@ Ip6ConvertInterfaceInfoToString (
     Number = UnicodeSPrint (
                String,
                8,
-               (CONST CHAR16 *) FormatString,
-               (UINTN) IfInfo->HwAddress.Addr[Index]
+               (CONST CHAR16 *)FormatString,
+               (UINTN)IfInfo->HwAddress.Addr[Index]
                );
     String = String + Number;
   }
@@ -792,21 +792,21 @@ Ip6ConvertInterfaceInfoToString (
 **/
 EFI_STATUS
 Ip6BuildNvAddressInfo (
-  IN  IP6_CONFIG_INSTANCE            *Instance,
-  IN  IP6_CONFIG_NV_ADDRESS_TYPE     AddressType,
-  OUT VOID                           **AddressInfo,
-  OUT UINTN                          *AddressSize
+  IN  IP6_CONFIG_INSTANCE         *Instance,
+  IN  IP6_CONFIG_NV_ADDRESS_TYPE  AddressType,
+  OUT VOID                        **AddressInfo,
+  OUT UINTN                       *AddressSize
   )
 {
-  IP6_CONFIG_NVDATA                  *Ip6NvData;
-  LIST_ENTRY                         *Entry;
-  LIST_ENTRY                         *ListHead;
-  IP6_ADDRESS_INFO_ENTRY             *Node;
-  VOID                               *AddressList;
-  VOID                               *TmpStr;
-  UINTN                              DataSize;
-  EFI_IPv6_ADDRESS                   *Ip6Address;
-  EFI_IP6_CONFIG_MANUAL_ADDRESS      *ManualAddress;
+  IP6_CONFIG_NVDATA              *Ip6NvData;
+  LIST_ENTRY                     *Entry;
+  LIST_ENTRY                     *ListHead;
+  IP6_ADDRESS_INFO_ENTRY         *Node;
+  VOID                           *AddressList;
+  VOID                           *TmpStr;
+  UINTN                          DataSize;
+  EFI_IPv6_ADDRESS               *Ip6Address;
+  EFI_IP6_CONFIG_MANUAL_ADDRESS  *ManualAddress;
 
   if ((Instance == NULL) || (AddressInfo == NULL) || (AddressSize == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -839,14 +839,14 @@ Ip6BuildNvAddressInfo (
   NET_LIST_FOR_EACH (Entry, ListHead) {
     Node = NET_LIST_USER_STRUCT (Entry, IP6_ADDRESS_INFO_ENTRY, Link);
     if (AddressType == Ip6ConfigNvHostAddress) {
-      ManualAddress = (EFI_IP6_CONFIG_MANUAL_ADDRESS *) AddressList;
+      ManualAddress = (EFI_IP6_CONFIG_MANUAL_ADDRESS *)AddressList;
       IP6_COPY_ADDRESS (&ManualAddress->Address, &Node->AddrInfo.Address);
       ManualAddress->PrefixLength = Node->AddrInfo.PrefixLength;
-      AddressList = (UINT8 *) AddressList + sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS);
+      AddressList                 = (UINT8 *)AddressList + sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS);
     } else {
-      Ip6Address = (EFI_IPv6_ADDRESS *) AddressList;
+      Ip6Address = (EFI_IPv6_ADDRESS *)AddressList;
       IP6_COPY_ADDRESS (Ip6Address, &Node->AddrInfo.Address);
-      AddressList = (UINT8 *) AddressList + sizeof (EFI_IPv6_ADDRESS);
+      AddressList = (UINT8 *)AddressList + sizeof (EFI_IPv6_ADDRESS);
     }
   }
 
@@ -869,18 +869,18 @@ Ip6BuildNvAddressInfo (
 **/
 EFI_STATUS
 Ip6ConvertConfigNvDataToIfrNvData (
-  IN OUT IP6_CONFIG_IFR_NVDATA       *IfrNvData,
-  IN     IP6_CONFIG_INSTANCE         *Instance
+  IN OUT IP6_CONFIG_IFR_NVDATA  *IfrNvData,
+  IN     IP6_CONFIG_INSTANCE    *Instance
   )
 {
-  IP6_CONFIG_NVDATA                          *Ip6NvData;
-  EFI_IP6_CONFIG_PROTOCOL                    *Ip6Config;
-  UINTN                                      DataSize;
-  VOID                                       *Data;
-  EFI_STATUS                                 Status;
-  EFI_IP6_CONFIG_POLICY                      Policy;
-  EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS   DadXmits;
-  EFI_HII_HANDLE                             HiiHandle;
+  IP6_CONFIG_NVDATA                         *Ip6NvData;
+  EFI_IP6_CONFIG_PROTOCOL                   *Ip6Config;
+  UINTN                                     DataSize;
+  VOID                                      *Data;
+  EFI_STATUS                                Status;
+  EFI_IP6_CONFIG_POLICY                     Policy;
+  EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS  DadXmits;
+  EFI_HII_HANDLE                            HiiHandle;
 
   if ((IfrNvData == NULL) || (Instance == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -901,7 +901,7 @@ Ip6ConvertConfigNvDataToIfrNvData (
              Ip6Config,
              Ip6ConfigDataTypeInterfaceInfo,
              &DataSize,
-             (VOID **) &Data
+             (VOID **)&Data
              );
   if (EFI_ERROR (Status)) {
     goto Exit;
@@ -911,7 +911,7 @@ Ip6ConvertConfigNvDataToIfrNvData (
   // Convert the interface info to string and print.
   //
   Status = Ip6ConvertInterfaceInfoToString (
-             (EFI_IP6_CONFIG_INTERFACE_INFO *) Data,
+             (EFI_IP6_CONFIG_INTERFACE_INFO *)Data,
              HiiHandle,
              IfrNvData
              );
@@ -980,7 +980,7 @@ Ip6ConvertConfigNvDataToIfrNvData (
 
 Exit:
   if (Data != NULL) {
-     FreePool (Data);
+    FreePool (Data);
   }
 
   return Status;
@@ -1000,13 +1000,13 @@ Exit:
 **/
 EFI_STATUS
 Ip6ConvertIfrNvDataToConfigNvDataGeneral (
-  IN     IP6_CONFIG_IFR_NVDATA       *IfrNvData,
-  IN OUT IP6_CONFIG_INSTANCE         *Instance
+  IN     IP6_CONFIG_IFR_NVDATA  *IfrNvData,
+  IN OUT IP6_CONFIG_INSTANCE    *Instance
   )
 {
-  IP6_CONFIG_NVDATA                  *Ip6NvData;
-  EFI_IP6_CONFIG_PROTOCOL            *Ip6Config;
-  EFI_STATUS                         Status;
+  IP6_CONFIG_NVDATA        *Ip6NvData;
+  EFI_IP6_CONFIG_PROTOCOL  *Ip6Config;
+  EFI_STATUS               Status;
 
   if ((IfrNvData == NULL) || (Instance == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1083,19 +1083,19 @@ Ip6ConvertIfrNvDataToConfigNvDataGeneral (
 **/
 EFI_STATUS
 Ip6ConvertIfrNvDataToConfigNvDataAdvanced (
-  IN     IP6_CONFIG_IFR_NVDATA       *IfrNvData,
-  IN OUT IP6_CONFIG_INSTANCE         *Instance
+  IN     IP6_CONFIG_IFR_NVDATA  *IfrNvData,
+  IN OUT IP6_CONFIG_INSTANCE    *Instance
   )
 {
-  IP6_CONFIG_NVDATA                  *Ip6NvData;
-  EFI_IP6_CONFIG_PROTOCOL            *Ip6Config;
-  EFI_STATUS                         Status;
-  EFI_IP6_CONFIG_MANUAL_ADDRESS      *ManualAddress;
-  EFI_IPv6_ADDRESS                   *Address;
-  BOOLEAN                            IsAddressOk;
-  EFI_EVENT                          SetAddressEvent;
-  EFI_EVENT                          TimeoutEvent;
-  UINTN                              DataSize;
+  IP6_CONFIG_NVDATA              *Ip6NvData;
+  EFI_IP6_CONFIG_PROTOCOL        *Ip6Config;
+  EFI_STATUS                     Status;
+  EFI_IP6_CONFIG_MANUAL_ADDRESS  *ManualAddress;
+  EFI_IPv6_ADDRESS               *Address;
+  BOOLEAN                        IsAddressOk;
+  EFI_EVENT                      SetAddressEvent;
+  EFI_EVENT                      TimeoutEvent;
+  UINTN                          DataSize;
 
   if ((IfrNvData == NULL) || (Instance == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1164,7 +1164,7 @@ Ip6ConvertIfrNvDataToConfigNvDataAdvanced (
     Status = Ip6BuildNvAddressInfo (
                Instance,
                Ip6ConfigNvHostAddress,
-               (VOID **) &ManualAddress,
+               (VOID **)&ManualAddress,
                &DataSize
                );
     if (EFI_ERROR (Status)) {
@@ -1186,7 +1186,7 @@ Ip6ConvertIfrNvDataToConfigNvDataAdvanced (
                           Ip6Config,
                           Ip6ConfigDataTypeManualAddress,
                           DataSize,
-                          (VOID *) ManualAddress
+                          (VOID *)ManualAddress
                           );
     if (Status == EFI_NOT_READY) {
       gBS->SetTimer (TimeoutEvent, TimerRelative, 50000000);
@@ -1194,6 +1194,7 @@ Ip6ConvertIfrNvDataToConfigNvDataAdvanced (
         if (IsAddressOk) {
           Status = EFI_SUCCESS;
         }
+
         break;
       }
     }
@@ -1215,7 +1216,7 @@ Ip6ConvertIfrNvDataToConfigNvDataAdvanced (
     Status = Ip6BuildNvAddressInfo (
                Instance,
                Ip6ConfigNvGatewayAddress,
-               (VOID **) &Address,
+               (VOID **)&Address,
                &DataSize
                );
     if (EFI_ERROR (Status)) {
@@ -1226,7 +1227,7 @@ Ip6ConvertIfrNvDataToConfigNvDataAdvanced (
                           Ip6Config,
                           Ip6ConfigDataTypeGateway,
                           DataSize,
-                          (VOID *) Address
+                          (VOID *)Address
                           );
     if (EFI_ERROR (Status)) {
       goto Exit;
@@ -1243,7 +1244,7 @@ Ip6ConvertIfrNvDataToConfigNvDataAdvanced (
     Status = Ip6BuildNvAddressInfo (
                Instance,
                Ip6ConfigNvDnsAddress,
-               (VOID **) &Address,
+               (VOID **)&Address,
                &DataSize
                );
     if (EFI_ERROR (Status)) {
@@ -1254,7 +1255,7 @@ Ip6ConvertIfrNvDataToConfigNvDataAdvanced (
                           Ip6Config,
                           Ip6ConfigDataTypeDnsServer,
                           DataSize,
-                          (VOID *) Address
+                          (VOID *)Address
                           );
     if (EFI_ERROR (Status)) {
       goto Exit;
@@ -1282,7 +1283,6 @@ Exit:
 
   return Status;
 }
-
 
 /**
   This function allows the caller to request the current
@@ -1349,30 +1349,30 @@ Exit:
 EFI_STATUS
 EFIAPI
 Ip6FormExtractConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Request,
-  OUT EFI_STRING                             *Progress,
-  OUT EFI_STRING                             *Results
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Request,
+  OUT EFI_STRING                            *Progress,
+  OUT EFI_STRING                            *Results
   )
 {
+  EFI_STATUS              Status;
+  IP6_FORM_CALLBACK_INFO  *Private;
+  IP6_CONFIG_INSTANCE     *Ip6ConfigInstance;
+  IP6_CONFIG_IFR_NVDATA   *IfrNvData;
+  EFI_STRING              ConfigRequestHdr;
+  EFI_STRING              ConfigRequest;
+  BOOLEAN                 AllocatedRequest;
+  UINTN                   Size;
+  UINTN                   BufferSize;
 
-  EFI_STATUS                                 Status;
-  IP6_FORM_CALLBACK_INFO                     *Private;
-  IP6_CONFIG_INSTANCE                        *Ip6ConfigInstance;
-  IP6_CONFIG_IFR_NVDATA                      *IfrNvData;
-  EFI_STRING                                 ConfigRequestHdr;
-  EFI_STRING                                 ConfigRequest;
-  BOOLEAN                                    AllocatedRequest;
-  UINTN                                      Size;
-  UINTN                                      BufferSize;
-
-  if (This == NULL || Progress == NULL || Results == NULL) {
+  if ((This == NULL) || (Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   *Progress = Request;
   if ((Request != NULL) &&
-      !HiiIsConfigHdrMatch (Request, &gIp6ConfigNvDataGuid, mIp6ConfigStorageName)) {
+      !HiiIsConfigHdrMatch (Request, &gIp6ConfigNvDataGuid, mIp6ConfigStorageName))
+  {
     return EFI_NOT_FOUND;
   }
 
@@ -1381,11 +1381,11 @@ Ip6FormExtractConfig (
   AllocatedRequest = FALSE;
   Size             = 0;
 
-  Private = IP6_FORM_CALLBACK_INFO_FROM_CONFIG_ACCESS (This);
+  Private           = IP6_FORM_CALLBACK_INFO_FROM_CONFIG_ACCESS (This);
   Ip6ConfigInstance = IP6_CONFIG_INSTANCE_FROM_FORM_CALLBACK (Private);
-  BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
+  BufferSize        = sizeof (IP6_CONFIG_IFR_NVDATA);
 
-  IfrNvData = (IP6_CONFIG_IFR_NVDATA *) AllocateZeroPool (BufferSize);
+  IfrNvData = (IP6_CONFIG_IFR_NVDATA *)AllocateZeroPool (BufferSize);
   if (IfrNvData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1407,7 +1407,7 @@ Ip6FormExtractConfig (
                          mIp6ConfigStorageName,
                          Private->ChildHandle
                          );
-    Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
     AllocatedRequest = TRUE;
@@ -1416,7 +1416,7 @@ Ip6FormExtractConfig (
       Size,
       L"%s&OFFSET=0&WIDTH=%016LX",
       ConfigRequestHdr,
-      (UINT64) BufferSize
+      (UINT64)BufferSize
       );
     FreePool (ConfigRequestHdr);
   }
@@ -1427,7 +1427,7 @@ Ip6FormExtractConfig (
   Status = gHiiConfigRouting->BlockToConfig (
                                 gHiiConfigRouting,
                                 ConfigRequest,
-                                (UINT8 *) IfrNvData,
+                                (UINT8 *)IfrNvData,
                                 BufferSize,
                                 Results,
                                 Progress
@@ -1442,6 +1442,7 @@ Exit:
     FreePool (ConfigRequest);
     ConfigRequest = NULL;
   }
+
   //
   // Set Progress string to the original request string.
   //
@@ -1490,12 +1491,12 @@ Exit:
 EFI_STATUS
 EFIAPI
 Ip6FormRouteConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Configuration,
-  OUT EFI_STRING                             *Progress
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                            *Progress
   )
 {
-  if (This == NULL || Configuration == NULL || Progress == NULL) {
+  if ((This == NULL) || (Configuration == NULL) || (Progress == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1525,17 +1526,16 @@ Ip6FormRouteConfig (
 **/
 EFI_STATUS
 Ip6GetCurrentSetting (
-  IN IP6_CONFIG_INSTANCE        *Instance
+  IN IP6_CONFIG_INSTANCE  *Instance
   )
 {
-  EFI_IP6_CONFIG_PROTOCOL       *Ip6Config;
-  EFI_HII_HANDLE                HiiHandle;
-  EFI_IP6_CONFIG_INTERFACE_INFO *Data;
-  UINTN                         DataSize;
-  EFI_STATUS                    Status;
-  CHAR16                        PortString[ADDRESS_STR_MAX_SIZE];
-  EFI_IP6_CONFIG_INTERFACE_INFO *IfInfo;
-
+  EFI_IP6_CONFIG_PROTOCOL        *Ip6Config;
+  EFI_HII_HANDLE                 HiiHandle;
+  EFI_IP6_CONFIG_INTERFACE_INFO  *Data;
+  UINTN                          DataSize;
+  EFI_STATUS                     Status;
+  CHAR16                         PortString[ADDRESS_STR_MAX_SIZE];
+  EFI_IP6_CONFIG_INTERFACE_INFO  *IfInfo;
 
   Ip6Config = &Instance->Ip6Config;
   HiiHandle = Instance->CallbackInfo.RegisteredHandle;
@@ -1548,7 +1548,7 @@ Ip6GetCurrentSetting (
              Ip6Config,
              Ip6ConfigDataTypeInterfaceInfo,
              &DataSize,
-             (VOID **) &Data
+             (VOID **)&Data
              );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -1557,7 +1557,7 @@ Ip6GetCurrentSetting (
   //
   // Generate dynamic text opcode for host address and draw it.
   //
-  IfInfo = (EFI_IP6_CONFIG_INTERFACE_INFO *) Data;
+  IfInfo = (EFI_IP6_CONFIG_INTERFACE_INFO *)Data;
   Status = Ip6ConvertAddressListToString (
              PortString,
              HiiHandle,
@@ -1590,17 +1590,18 @@ Ip6GetCurrentSetting (
   //
   FreePool (Data);
   DataSize = 0;
-  Data = NULL;
-  Status = Ip6ConfigNvGetData (
-             Ip6Config,
-             Ip6ConfigDataTypeDnsServer,
-             &DataSize,
-             (VOID **) &Data
-             );
+  Data     = NULL;
+  Status   = Ip6ConfigNvGetData (
+               Ip6Config,
+               Ip6ConfigDataTypeDnsServer,
+               &DataSize,
+               (VOID **)&Data
+               );
   if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     if (Data != NULL) {
       FreePool (Data);
     }
+
     return Status;
   }
 
@@ -1629,17 +1630,18 @@ Ip6GetCurrentSetting (
   }
 
   DataSize = 0;
-  Data = NULL;
-  Status = Ip6ConfigNvGetData (
-             Ip6Config,
-             Ip6ConfigDataTypeGateway,
-             &DataSize,
-             (VOID **) &Data
-             );
+  Data     = NULL;
+  Status   = Ip6ConfigNvGetData (
+               Ip6Config,
+               Ip6ConfigDataTypeGateway,
+               &DataSize,
+               (VOID **)&Data
+               );
   if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     if (Data != NULL) {
       FreePool (Data);
     }
+
     return Status;
   }
 
@@ -1697,21 +1699,21 @@ Ip6GetCurrentSetting (
 EFI_STATUS
 EFIAPI
 Ip6FormCallback (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  EFI_BROWSER_ACTION                    Action,
+  IN  EFI_QUESTION_ID                       QuestionId,
+  IN  UINT8                                 Type,
+  IN  EFI_IFR_TYPE_VALUE                    *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   )
 {
-  IP6_FORM_CALLBACK_INFO        *Private;
-  UINTN                         BufferSize;
-  IP6_CONFIG_IFR_NVDATA         *IfrNvData;
-  EFI_STATUS                    Status;
-  EFI_INPUT_KEY                 Key;
-  IP6_CONFIG_INSTANCE           *Instance;
-  IP6_CONFIG_NVDATA             *Ip6NvData;
+  IP6_FORM_CALLBACK_INFO  *Private;
+  UINTN                   BufferSize;
+  IP6_CONFIG_IFR_NVDATA   *IfrNvData;
+  EFI_STATUS              Status;
+  EFI_INPUT_KEY           Key;
+  IP6_CONFIG_INSTANCE     *Instance;
+  IP6_CONFIG_NVDATA       *Ip6NvData;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1721,11 +1723,11 @@ Ip6FormCallback (
   Instance  = IP6_CONFIG_INSTANCE_FROM_FORM_CALLBACK (Private);
   Ip6NvData = &Instance->Ip6NvData;
 
-  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)){
+  if ((Action == EFI_BROWSER_ACTION_FORM_OPEN) || (Action == EFI_BROWSER_ACTION_FORM_CLOSE)) {
     return EFI_SUCCESS;
   }
 
-  if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {
+  if ((Action != EFI_BROWSER_ACTION_CHANGING) && (Action != EFI_BROWSER_ACTION_CHANGED)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -1738,123 +1740,124 @@ Ip6FormCallback (
   //
 
   BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
-  IfrNvData = AllocateZeroPool (BufferSize);
+  IfrNvData  = AllocateZeroPool (BufferSize);
   if (IfrNvData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   Status = EFI_SUCCESS;
 
-  HiiGetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData);
+  HiiGetBrowserData (NULL, NULL, BufferSize, (UINT8 *)IfrNvData);
 
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
     switch (QuestionId) {
-    case KEY_GET_CURRENT_SETTING:
-      Status = Ip6GetCurrentSetting (Instance);
-      break;
+      case KEY_GET_CURRENT_SETTING:
+        Status = Ip6GetCurrentSetting (Instance);
+        break;
 
-    default:
-      break;
+      default:
+        break;
     }
   } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
     switch (QuestionId) {
-    case KEY_SAVE_CONFIG_CHANGES:
-      Status = Ip6ConvertIfrNvDataToConfigNvDataAdvanced (IfrNvData, Instance);
-      if (EFI_ERROR (Status)) {
+      case KEY_SAVE_CONFIG_CHANGES:
+        Status = Ip6ConvertIfrNvDataToConfigNvDataAdvanced (IfrNvData, Instance);
+        if (EFI_ERROR (Status)) {
+          break;
+        }
+
+        Status = Ip6GetCurrentSetting (Instance);
+
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
         break;
-      }
 
-      Status = Ip6GetCurrentSetting (Instance);
+      case KEY_IGNORE_CONFIG_CHANGES:
+        Ip6FreeAddressInfoList (&Ip6NvData->ManualAddress);
+        Ip6FreeAddressInfoList (&Ip6NvData->GatewayAddress);
+        Ip6FreeAddressInfoList (&Ip6NvData->DnsAddress);
 
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_SUBMIT_EXIT;
-      break;
+        Ip6NvData->ManualAddressCount  = 0;
+        Ip6NvData->GatewayAddressCount = 0;
+        Ip6NvData->DnsAddressCount     = 0;
 
-    case KEY_IGNORE_CONFIG_CHANGES:
-      Ip6FreeAddressInfoList (&Ip6NvData->ManualAddress);
-      Ip6FreeAddressInfoList (&Ip6NvData->GatewayAddress);
-      Ip6FreeAddressInfoList (&Ip6NvData->DnsAddress);
-
-      Ip6NvData->ManualAddressCount  = 0;
-      Ip6NvData->GatewayAddressCount = 0;
-      Ip6NvData->DnsAddressCount     = 0;
-
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
-      break;
-
-    case KEY_SAVE_CHANGES:
-      Status = Ip6ConvertIfrNvDataToConfigNvDataGeneral (IfrNvData, Instance);
-      if (EFI_ERROR (Status)) {
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
         break;
-      }
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
-      break;
 
-    case KEY_INTERFACE_ID:
-      Status = Ip6ParseInterfaceIdFromString (IfrNvData->InterfaceId, &Ip6NvData->InterfaceId);
-      if (EFI_ERROR (Status)) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Invalid Interface ID!",
-          NULL
-          );
-      }
+      case KEY_SAVE_CHANGES:
+        Status = Ip6ConvertIfrNvDataToConfigNvDataGeneral (IfrNvData, Instance);
+        if (EFI_ERROR (Status)) {
+          break;
+        }
 
-      break;
+        *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
+        break;
 
-    case KEY_MANUAL_ADDRESS:
-      Status = Ip6ParseAddressListFromString (
-                 IfrNvData->ManualAddress,
-                 &Ip6NvData->ManualAddress,
-                 &Ip6NvData->ManualAddressCount
-                 );
-      if (EFI_ERROR (Status)) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Invalid Host Addresses!",
-          NULL
-          );
-      }
+      case KEY_INTERFACE_ID:
+        Status = Ip6ParseInterfaceIdFromString (IfrNvData->InterfaceId, &Ip6NvData->InterfaceId);
+        if (EFI_ERROR (Status)) {
+          CreatePopUp (
+            EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+            &Key,
+            L"Invalid Interface ID!",
+            NULL
+            );
+        }
 
-      break;
+        break;
 
-    case KEY_GATEWAY_ADDRESS:
-      Status = Ip6ParseAddressListFromString (
-                 IfrNvData->GatewayAddress,
-                 &Ip6NvData->GatewayAddress,
-                 &Ip6NvData->GatewayAddressCount
-                 );
-      if (EFI_ERROR (Status)) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Invalid Gateway Addresses!",
-          NULL
-          );
-      }
+      case KEY_MANUAL_ADDRESS:
+        Status = Ip6ParseAddressListFromString (
+                   IfrNvData->ManualAddress,
+                   &Ip6NvData->ManualAddress,
+                   &Ip6NvData->ManualAddressCount
+                   );
+        if (EFI_ERROR (Status)) {
+          CreatePopUp (
+            EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+            &Key,
+            L"Invalid Host Addresses!",
+            NULL
+            );
+        }
 
-      break;
+        break;
 
-    case KEY_DNS_ADDRESS:
-      Status = Ip6ParseAddressListFromString (
-                 IfrNvData->DnsAddress,
-                 &Ip6NvData->DnsAddress,
-                 &Ip6NvData->DnsAddressCount
-                 );
-      if (EFI_ERROR (Status)) {
-        CreatePopUp (
-          EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-          &Key,
-          L"Invalid DNS Addresses!",
-          NULL
-          );
-      }
+      case KEY_GATEWAY_ADDRESS:
+        Status = Ip6ParseAddressListFromString (
+                   IfrNvData->GatewayAddress,
+                   &Ip6NvData->GatewayAddress,
+                   &Ip6NvData->GatewayAddressCount
+                   );
+        if (EFI_ERROR (Status)) {
+          CreatePopUp (
+            EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+            &Key,
+            L"Invalid Gateway Addresses!",
+            NULL
+            );
+        }
 
-      break;
+        break;
 
-    default:
-      break;
+      case KEY_DNS_ADDRESS:
+        Status = Ip6ParseAddressListFromString (
+                   IfrNvData->DnsAddress,
+                   &Ip6NvData->DnsAddress,
+                   &Ip6NvData->DnsAddressCount
+                   );
+        if (EFI_ERROR (Status)) {
+          CreatePopUp (
+            EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+            &Key,
+            L"Invalid DNS Addresses!",
+            NULL
+            );
+        }
+
+        break;
+
+      default:
+        break;
     }
   }
 
@@ -1863,7 +1866,7 @@ Ip6FormCallback (
     // Pass changed uncommitted data back to Form Browser.
     //
     BufferSize = sizeof (IP6_CONFIG_IFR_NVDATA);
-    HiiSetBrowserData (NULL, NULL, BufferSize, (UINT8 *) IfrNvData, NULL);
+    HiiSetBrowserData (NULL, NULL, BufferSize, (UINT8 *)IfrNvData, NULL);
   }
 
   FreePool (IfrNvData);
@@ -1882,20 +1885,20 @@ Ip6FormCallback (
 **/
 EFI_STATUS
 Ip6ConfigFormInit (
-  IN OUT IP6_CONFIG_INSTANCE     *Instance
+  IN OUT IP6_CONFIG_INSTANCE  *Instance
   )
 {
-  EFI_STATUS                     Status;
-  IP6_SERVICE                    *IpSb;
-  IP6_FORM_CALLBACK_INFO         *CallbackInfo;
-  EFI_HII_CONFIG_ACCESS_PROTOCOL *ConfigAccess;
-  VENDOR_DEVICE_PATH             VendorDeviceNode;
-  EFI_SERVICE_BINDING_PROTOCOL   *MnpSb;
-  CHAR16                         *MacString;
-  CHAR16                         MenuString[128];
-  CHAR16                         PortString[128];
-  CHAR16                         *OldMenuString;
-  EFI_DEVICE_PATH_PROTOCOL       *ParentDevicePath;
+  EFI_STATUS                      Status;
+  IP6_SERVICE                     *IpSb;
+  IP6_FORM_CALLBACK_INFO          *CallbackInfo;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
+  VENDOR_DEVICE_PATH              VendorDeviceNode;
+  EFI_SERVICE_BINDING_PROTOCOL    *MnpSb;
+  CHAR16                          *MacString;
+  CHAR16                          MenuString[128];
+  CHAR16                          PortString[128];
+  CHAR16                          *OldMenuString;
+  EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
 
   IpSb = IP6_SERVICE_FROM_IP6_CONFIG_INSTANCE (Instance);
   ASSERT (IpSb != NULL);
@@ -1903,13 +1906,13 @@ Ip6ConfigFormInit (
   Status = gBS->HandleProtocol (
                   IpSb->Controller,
                   &gEfiDevicePathProtocolGuid,
-                  (VOID **) &ParentDevicePath
+                  (VOID **)&ParentDevicePath
                   );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  CallbackInfo = &Instance->CallbackInfo;
+  CallbackInfo            = &Instance->CallbackInfo;
   CallbackInfo->Signature = IP6_FORM_CALLBACK_INFO_SIGNATURE;
 
   //
@@ -1926,7 +1929,7 @@ Ip6ConfigFormInit (
   SetDevicePathNodeLength (&VendorDeviceNode.Header, sizeof (VENDOR_DEVICE_PATH));
   CallbackInfo->HiiVendorDevicePath = AppendDevicePathNode (
                                         ParentDevicePath,
-                                        (EFI_DEVICE_PATH_PROTOCOL *) &VendorDeviceNode
+                                        (EFI_DEVICE_PATH_PROTOCOL *)&VendorDeviceNode
                                         );
   if (CallbackInfo->HiiVendorDevicePath == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -1956,7 +1959,7 @@ Ip6ConfigFormInit (
     Status = gBS->OpenProtocol (
                     IpSb->Controller,
                     &gEfiManagedNetworkServiceBindingProtocolGuid,
-                    (VOID **) &MnpSb,
+                    (VOID **)&MnpSb,
                     IpSb->Image,
                     CallbackInfo->ChildHandle,
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -1990,8 +1993,9 @@ Ip6ConfigFormInit (
     OldMenuString = HiiGetString (
                       CallbackInfo->RegisteredHandle,
                       STRING_TOKEN (STR_IP6_CONFIG_FORM_HELP),
-                      NULL)
-                      ;
+                      NULL
+                      )
+    ;
     UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
     HiiSetString (
       CallbackInfo->RegisteredHandle,
@@ -2030,12 +2034,12 @@ Error:
 **/
 VOID
 Ip6ConfigFormUnload (
-  IN OUT IP6_CONFIG_INSTANCE     *Instance
+  IN OUT IP6_CONFIG_INSTANCE  *Instance
   )
 {
-  IP6_SERVICE                    *IpSb;
-  IP6_FORM_CALLBACK_INFO         *CallbackInfo;
-  IP6_CONFIG_NVDATA              *Ip6NvData;
+  IP6_SERVICE             *IpSb;
+  IP6_FORM_CALLBACK_INFO  *CallbackInfo;
+  IP6_CONFIG_NVDATA       *Ip6NvData;
 
   IpSb = IP6_SERVICE_FROM_IP6_CONFIG_INSTANCE (Instance);
   ASSERT (IpSb != NULL);
@@ -2043,7 +2047,6 @@ Ip6ConfigFormUnload (
   CallbackInfo = &Instance->CallbackInfo;
 
   if (CallbackInfo->ChildHandle != NULL) {
-
     //
     // Close the child handle
     //

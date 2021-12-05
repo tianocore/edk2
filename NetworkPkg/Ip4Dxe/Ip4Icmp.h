@@ -9,26 +9,26 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __EFI_IP4_ICMP_H__
 #define __EFI_IP4_ICMP_H__
 
-  //
-  // ICMP type definitions
-  //
-#define ICMP_ECHO_REPLY            0
-#define ICMP_DEST_UNREACHABLE      3
-#define ICMP_SOURCE_QUENCH         4
-#define ICMP_REDIRECT              5
-#define ICMP_ECHO_REQUEST          8
-#define ICMP_TIME_EXCEEDED         11
-#define ICMP_PARAMETER_PROBLEM     12
-#define ICMP_TIMESTAMP             13
-#define ICMP_INFO_REQUEST          15
-#define ICMP_INFO_REPLY            16
-#define ICMP_TYPE_MAX              ICMP_INFO_REPLY
+//
+// ICMP type definitions
+//
+#define ICMP_ECHO_REPLY         0
+#define ICMP_DEST_UNREACHABLE   3
+#define ICMP_SOURCE_QUENCH      4
+#define ICMP_REDIRECT           5
+#define ICMP_ECHO_REQUEST       8
+#define ICMP_TIME_EXCEEDED      11
+#define ICMP_PARAMETER_PROBLEM  12
+#define ICMP_TIMESTAMP          13
+#define ICMP_INFO_REQUEST       15
+#define ICMP_INFO_REPLY         16
+#define ICMP_TYPE_MAX           ICMP_INFO_REPLY
 
-#define ICMP_DEFAULT_CODE          0
+#define ICMP_DEFAULT_CODE  0
 
-  //
-  // ICMP code definitions for ICMP_DEST_UNREACHABLE
-  //
+//
+// ICMP code definitions for ICMP_DEST_UNREACHABLE
+//
 #define ICMP_NET_UNREACHABLE       0
 #define ICMP_HOST_UNREACHABLE      1
 #define ICMP_PROTO_UNREACHABLE     2  // Host may generate
@@ -43,31 +43,31 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ICMP_NET_UNREACHABLE_TOS   11
 #define ICMP_HOST_UNREACHABLE_TOS  12
 
-  //
-  // ICMP code definitions for ICMP_TIME_EXCEEDED
-  //
-#define ICMP_TIMEOUT_IN_TRANSIT    0
-#define ICMP_TIMEOUT_REASSEMBLE    1  // Host may generate
+//
+// ICMP code definitions for ICMP_TIME_EXCEEDED
+//
+#define ICMP_TIMEOUT_IN_TRANSIT  0
+#define ICMP_TIMEOUT_REASSEMBLE  1    // Host may generate
 
-  //
-  // ICMP code definitions for ICMP_TIME_EXCEEDED
-  //
-#define ICMP_NET_REDIRECT          0
-#define ICMP_HOST_REDIRECT         1
-#define ICMP_NET_TOS_REDIRECT      2
-#define ICMP_HOST_TOS_REDIRECT     3
+//
+// ICMP code definitions for ICMP_TIME_EXCEEDED
+//
+#define ICMP_NET_REDIRECT       0
+#define ICMP_HOST_REDIRECT      1
+#define ICMP_NET_TOS_REDIRECT   2
+#define ICMP_HOST_TOS_REDIRECT  3
 
-  //
-  // ICMP message classes, each class of ICMP message shares
-  // a common message format. INVALID_MESSAGE is only a flag.
-  //
-#define ICMP_INVALID_MESSAGE       0
-#define ICMP_ERROR_MESSAGE         1
-#define ICMP_QUERY_MESSAGE         2
+//
+// ICMP message classes, each class of ICMP message shares
+// a common message format. INVALID_MESSAGE is only a flag.
+//
+#define ICMP_INVALID_MESSAGE  0
+#define ICMP_ERROR_MESSAGE    1
+#define ICMP_QUERY_MESSAGE    2
 
 typedef struct {
-  UINT8                   IcmpType;
-  UINT8                   IcmpClass;
+  UINT8    IcmpType;
+  UINT8    IcmpClass;
 } IP4_ICMP_CLASS;
 
 extern IP4_ICMP_CLASS     mIcmpClass[];
@@ -90,8 +90,9 @@ extern EFI_IP4_ICMP_TYPE  mIp4SupportedIcmp[];
 **/
 EFI_STATUS
 Ip4IcmpHandle (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_HEAD               *Head,
-  IN NET_BUF                *Packet
+  IN IP4_SERVICE  *IpSb,
+  IN IP4_HEAD     *Head,
+  IN NET_BUF      *Packet
   );
+
 #endif

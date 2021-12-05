@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __EFI_MTFTP4_OPTION_H__
 #define __EFI_MTFTP4_OPTION_H__
 
@@ -16,21 +15,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MTFTP4_BLKNO_LEN          2
 #define MTFTP4_DATA_HEAD_LEN      4
 
-#define MTFTP4_BLKSIZE_EXIST      0x01
-#define MTFTP4_TIMEOUT_EXIST      0x02
-#define MTFTP4_TSIZE_EXIST        0x04
-#define MTFTP4_MCAST_EXIST        0x08
-#define MTFTP4_WINDOWSIZE_EXIST   0x10
+#define MTFTP4_BLKSIZE_EXIST     0x01
+#define MTFTP4_TIMEOUT_EXIST     0x02
+#define MTFTP4_TSIZE_EXIST       0x04
+#define MTFTP4_MCAST_EXIST       0x08
+#define MTFTP4_WINDOWSIZE_EXIST  0x10
 
 typedef struct {
-  UINT16                    BlkSize;
-  UINT16                    WindowSize;
-  UINT8                     Timeout;
-  UINT32                    Tsize;
-  IP4_ADDR                  McastIp;
-  UINT16                    McastPort;
-  BOOLEAN                   Master;
-  UINT32                    Exist;
+  UINT16      BlkSize;
+  UINT16      WindowSize;
+  UINT8       Timeout;
+  UINT32      Tsize;
+  IP4_ADDR    McastIp;
+  UINT16      McastPort;
+  BOOLEAN     Master;
+  UINT32      Exist;
 } MTFTP4_OPTION;
 
 /**
@@ -52,10 +51,10 @@ typedef struct {
 **/
 EFI_STATUS
 Mtftp4ExtractOptions (
-  IN     EFI_MTFTP4_PACKET     *Packet,
-  IN     UINT32                PacketLen,
-     OUT UINT32                *OptionCount,
-     OUT EFI_MTFTP4_OPTION     **OptionList        OPTIONAL
+  IN     EFI_MTFTP4_PACKET  *Packet,
+  IN     UINT32             PacketLen,
+  OUT UINT32                *OptionCount,
+  OUT EFI_MTFTP4_OPTION     **OptionList        OPTIONAL
   );
 
 /**
@@ -77,11 +76,11 @@ Mtftp4ExtractOptions (
 **/
 EFI_STATUS
 Mtftp4ParseOption (
-  IN     EFI_MTFTP4_OPTION     *Options,
-  IN     UINT32                Count,
-  IN     BOOLEAN               Request,
-  IN     UINT16                Operation,
-     OUT MTFTP4_OPTION         *MtftpOption
+  IN     EFI_MTFTP4_OPTION  *Options,
+  IN     UINT32             Count,
+  IN     BOOLEAN            Request,
+  IN     UINT16             Operation,
+  OUT MTFTP4_OPTION         *MtftpOption
   );
 
 /**
@@ -100,10 +99,10 @@ Mtftp4ParseOption (
 **/
 EFI_STATUS
 Mtftp4ParseOptionOack (
-  IN     EFI_MTFTP4_PACKET     *Packet,
-  IN     UINT32                PacketLen,
-  IN     UINT16                Operation,
-     OUT MTFTP4_OPTION         *MtftpOption
+  IN     EFI_MTFTP4_PACKET  *Packet,
+  IN     UINT32             PacketLen,
+  IN     UINT16             Operation,
+  OUT MTFTP4_OPTION         *MtftpOption
   );
 
 extern CHAR8  *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS];

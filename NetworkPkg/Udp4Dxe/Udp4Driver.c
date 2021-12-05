@@ -5,10 +5,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Udp4Impl.h"
 
-EFI_DRIVER_BINDING_PROTOCOL gUdp4DriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gUdp4DriverBinding = {
   Udp4DriverBindingSupported,
   Udp4DriverBindingStart,
   Udp4DriverBindingStop,
@@ -17,7 +16,7 @@ EFI_DRIVER_BINDING_PROTOCOL gUdp4DriverBinding = {
   NULL
 };
 
-EFI_SERVICE_BINDING_PROTOCOL mUdp4ServiceBinding = {
+EFI_SERVICE_BINDING_PROTOCOL  mUdp4ServiceBinding = {
   Udp4ServiceBindingCreateChild,
   Udp4ServiceBindingDestroyChild
 };
@@ -35,8 +34,8 @@ EFI_SERVICE_BINDING_PROTOCOL mUdp4ServiceBinding = {
 EFI_STATUS
 EFIAPI
 Udp4DestroyChildEntryInHandleBuffer (
-  IN LIST_ENTRY         *Entry,
-  IN VOID               *Context
+  IN LIST_ENTRY  *Entry,
+  IN VOID        *Context
   )
 {
   UDP4_INSTANCE_DATA            *Instance;
@@ -44,14 +43,14 @@ Udp4DestroyChildEntryInHandleBuffer (
   UINTN                         NumberOfChildren;
   EFI_HANDLE                    *ChildHandleBuffer;
 
-  if (Entry == NULL || Context == NULL) {
+  if ((Entry == NULL) || (Context == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Instance = NET_LIST_USER_STRUCT_S (Entry, UDP4_INSTANCE_DATA, Link, UDP4_INSTANCE_DATA_SIGNATURE);
-  ServiceBinding    = ((UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ServiceBinding;
-  NumberOfChildren  = ((UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->NumberOfChildren;
-  ChildHandleBuffer = ((UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *) Context)->ChildHandleBuffer;
+  Instance          = NET_LIST_USER_STRUCT_S (Entry, UDP4_INSTANCE_DATA, Link, UDP4_INSTANCE_DATA_SIGNATURE);
+  ServiceBinding    = ((UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *)Context)->ServiceBinding;
+  NumberOfChildren  = ((UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *)Context)->NumberOfChildren;
+  ChildHandleBuffer = ((UDP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *)Context)->ChildHandleBuffer;
 
   if (!NetIsInHandleBuffer (Instance->ChildHandle, NumberOfChildren, ChildHandleBuffer)) {
     return EFI_SUCCESS;
@@ -59,7 +58,6 @@ Udp4DestroyChildEntryInHandleBuffer (
 
   return ServiceBinding->DestroyChild (ServiceBinding, Instance->ChildHandle);
 }
-
 
 /**
   Test to see if this driver supports ControllerHandle. This service
@@ -118,7 +116,6 @@ Udp4DriverBindingSupported (
 
   return Status;
 }
-
 
 /**
   Start this driver on ControllerHandle. This service is called by the
@@ -180,7 +177,6 @@ Udp4DriverBindingStart (
   return Status;
 }
 
-
 /**
   Stop this driver on ControllerHandle. This service is called by the
   EFI boot service DisconnectController(). In order to
@@ -229,7 +225,7 @@ Udp4DriverBindingStop (
   Status = gBS->OpenProtocol (
                   NicHandle,
                   &gEfiUdp4ServiceBindingProtocolGuid,
-                  (VOID **) &ServiceBinding,
+                  (VOID **)&ServiceBinding,
                   This->DriverBindingHandle,
                   NicHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -243,16 +239,16 @@ Udp4DriverBindingStop (
     //
     // NumberOfChildren is not zero, destroy the children instances in ChildHandleBuffer.
     //
-    List = &Udp4Service->ChildrenList;
+    List                      = &Udp4Service->ChildrenList;
     Context.ServiceBinding    = ServiceBinding;
     Context.NumberOfChildren  = NumberOfChildren;
     Context.ChildHandleBuffer = ChildHandleBuffer;
-    Status = NetDestroyLinkList (
-               List,
-               Udp4DestroyChildEntryInHandleBuffer,
-               &Context,
-               NULL
-               );
+    Status                    = NetDestroyLinkList (
+                                  List,
+                                  Udp4DestroyChildEntryInHandleBuffer,
+                                  &Context,
+                                  NULL
+                                  );
   } else {
     gBS->UninstallMultipleProtocolInterfaces (
            NicHandle,
@@ -267,12 +263,12 @@ Udp4DriverBindingStop (
       FreeUnicodeStringTable (gUdpControllerNameTable);
       gUdpControllerNameTable = NULL;
     }
+
     FreePool (Udp4Service);
   }
 
   return Status;
 }
-
 
 /**
   Creates a child handle and installs a protocol.
@@ -352,7 +348,7 @@ Udp4ServiceBindingCreateChild (
   Status = gBS->OpenProtocol (
                   Udp4Service->IpIo->ChildHandle,
                   &gEfiIp4ProtocolGuid,
-                  (VOID **) &Ip4,
+                  (VOID **)&Ip4,
                   gUdp4DriverBinding.DriverBindingHandle,
                   Instance->ChildHandle,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -367,7 +363,7 @@ Udp4ServiceBindingCreateChild (
   Status = gBS->OpenProtocol (
                   Instance->IpInfo->ChildHandle,
                   &gEfiIp4ProtocolGuid,
-                  (VOID **) &Ip4,
+                  (VOID **)&Ip4,
                   gUdp4DriverBinding.DriverBindingHandle,
                   Instance->ChildHandle,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -409,7 +405,6 @@ ON_ERROR:
 
   return Status;
 }
-
 
 /**
   Destroys a child handle with a protocol installed on it.
@@ -454,7 +449,7 @@ Udp4ServiceBindingDestroyChild (
   Status = gBS->OpenProtocol (
                   ChildHandle,
                   &gEfiUdp4ProtocolGuid,
-                  (VOID **) &Udp4Proto,
+                  (VOID **)&Udp4Proto,
                   gUdp4DriverBinding.DriverBindingHandle,
                   ChildHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -499,7 +494,7 @@ Udp4ServiceBindingDestroyChild (
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   ChildHandle,
                   &gEfiUdp4ProtocolGuid,
-                  (VOID *) &Instance->Udp4Proto,
+                  (VOID *)&Instance->Udp4Proto,
                   NULL
                   );
   if (EFI_ERROR (Status)) {
@@ -576,9 +571,8 @@ Udp4DriverEntryPoint (
     //
     // Initialize the UDP random port.
     //
-    mUdp4RandomPort = (UINT16) (((UINT16) NetRandomInitSeed ()) % UDP4_PORT_KNOWN + UDP4_PORT_KNOWN);
+    mUdp4RandomPort = (UINT16)(((UINT16)NetRandomInitSeed ()) % UDP4_PORT_KNOWN + UDP4_PORT_KNOWN);
   }
 
   return Status;
 }
-

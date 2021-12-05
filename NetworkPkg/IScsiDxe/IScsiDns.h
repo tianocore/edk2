@@ -25,9 +25,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 IScsiDns4 (
-  IN     EFI_HANDLE                      Image,
-  IN     EFI_HANDLE                      Controller,
-  IN OUT ISCSI_SESSION_CONFIG_NVDATA     *NvData
+  IN     EFI_HANDLE                   Image,
+  IN     EFI_HANDLE                   Controller,
+  IN OUT ISCSI_SESSION_CONFIG_NVDATA  *NvData
   );
 
 /**
@@ -45,9 +45,9 @@ IScsiDns4 (
 **/
 EFI_STATUS
 IScsiDns6 (
-  IN     EFI_HANDLE                      Image,
-  IN     EFI_HANDLE                      Controller,
-  IN OUT ISCSI_SESSION_CONFIG_NVDATA     *NvData
+  IN     EFI_HANDLE                   Image,
+  IN     EFI_HANDLE                   Controller,
+  IN OUT ISCSI_SESSION_CONFIG_NVDATA  *NvData
   );
 
 #endif

@@ -21,12 +21,12 @@
 **/
 IP6_MLD_GROUP *
 Ip6CreateMldEntry (
-  IN OUT IP6_SERVICE        *IpSb,
-  IN EFI_IPv6_ADDRESS       *MulticastAddr,
-  IN UINT32                 DelayTimer
+  IN OUT IP6_SERVICE   *IpSb,
+  IN EFI_IPv6_ADDRESS  *MulticastAddr,
+  IN UINT32            DelayTimer
   )
 {
-  IP6_MLD_GROUP             *Entry;
+  IP6_MLD_GROUP  *Entry;
 
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
   ASSERT (MulticastAddr != NULL && IP6_IS_MULTICAST (MulticastAddr));
@@ -54,12 +54,12 @@ Ip6CreateMldEntry (
 **/
 IP6_MLD_GROUP *
 Ip6FindMldEntry (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IPv6_ADDRESS       *MulticastAddr
+  IN IP6_SERVICE       *IpSb,
+  IN EFI_IPv6_ADDRESS  *MulticastAddr
   )
 {
-  LIST_ENTRY                *Entry;
-  IP6_MLD_GROUP             *Group;
+  LIST_ENTRY     *Entry;
+  IP6_MLD_GROUP  *Group;
 
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
   ASSERT (MulticastAddr != NULL && IP6_IS_MULTICAST (MulticastAddr));
@@ -88,13 +88,13 @@ Ip6FindMldEntry (
 **/
 INTN
 Ip6FindMac (
-  IN IP6_MLD_SERVICE_DATA   *MldCtrl,
-  IN EFI_MAC_ADDRESS        *Mac
+  IN IP6_MLD_SERVICE_DATA  *MldCtrl,
+  IN EFI_MAC_ADDRESS       *Mac
   )
 {
-  LIST_ENTRY                *Entry;
-  IP6_MLD_GROUP             *Group;
-  INTN                      Count;
+  LIST_ENTRY     *Entry;
+  IP6_MLD_GROUP  *Group;
+  INTN           Count;
 
   Count = 0;
 
@@ -125,20 +125,20 @@ Ip6FindMac (
 **/
 EFI_STATUS
 Ip6SendMldReport (
-  IN IP6_SERVICE            *IpSb,
-  IN IP6_INTERFACE          *Interface OPTIONAL,
-  IN EFI_IPv6_ADDRESS       *MulticastAddr
+  IN IP6_SERVICE       *IpSb,
+  IN IP6_INTERFACE     *Interface OPTIONAL,
+  IN EFI_IPv6_ADDRESS  *MulticastAddr
   )
 {
-  IP6_MLD_HEAD              *MldHead;
-  NET_BUF                   *Packet;
-  EFI_IP6_HEADER            Head;
-  UINT16                    PayloadLen;
-  UINTN                     OptionLen;
-  UINT8                     *Options;
-  EFI_STATUS                Status;
-  UINT16                    HeadChecksum;
-  UINT16                    PseudoChecksum;
+  IP6_MLD_HEAD    *MldHead;
+  NET_BUF         *Packet;
+  EFI_IP6_HEADER  Head;
+  UINT16          PayloadLen;
+  UINTN           OptionLen;
+  UINT8           *Options;
+  EFI_STATUS      Status;
+  UINT16          HeadChecksum;
+  UINT16          PseudoChecksum;
 
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
   ASSERT (MulticastAddr != NULL && IP6_IS_MULTICAST (MulticastAddr));
@@ -149,11 +149,11 @@ Ip6SendMldReport (
   //
 
   OptionLen = 0;
-  Status = Ip6FillHopByHop (NULL, &OptionLen, IP6_ICMP);
+  Status    = Ip6FillHopByHop (NULL, &OptionLen, IP6_ICMP);
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
 
-  PayloadLen = (UINT16) (OptionLen + sizeof (IP6_MLD_HEAD));
-  Packet = NetbufAlloc (sizeof (EFI_IP6_HEADER) + (UINT32) PayloadLen);
+  PayloadLen = (UINT16)(OptionLen + sizeof (IP6_MLD_HEAD));
+  Packet     = NetbufAlloc (sizeof (EFI_IP6_HEADER) + (UINT32)PayloadLen);
   if (Packet == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -163,11 +163,11 @@ Ip6SendMldReport (
   // RFC3590: Use link-local address as source address if it is available,
   // otherwise use the unspecified address.
   //
-  Head.FlowLabelL     = 0;
-  Head.FlowLabelH     = 0;
-  Head.PayloadLength  = HTONS (PayloadLen);
-  Head.NextHeader     = IP6_HOP_BY_HOP;
-  Head.HopLimit       = 1;
+  Head.FlowLabelL    = 0;
+  Head.FlowLabelH    = 0;
+  Head.PayloadLength = HTONS (PayloadLen);
+  Head.NextHeader    = IP6_HOP_BY_HOP;
+  Head.HopLimit      = 1;
   IP6_COPY_ADDRESS (&Head.DestinationAddress, MulticastAddr);
 
   //
@@ -180,7 +180,7 @@ Ip6SendMldReport (
   //
   // Fill a IPv6 Router Alert option in a Hop-by-Hop Options Header
   //
-  Options = NetbufAllocSpace (Packet, (UINT32) OptionLen, FALSE);
+  Options = NetbufAllocSpace (Packet, (UINT32)OptionLen, FALSE);
   ASSERT (Options != NULL);
   Status = Ip6FillHopByHop (Options, &OptionLen, IP6_ICMP);
   if (EFI_ERROR (Status)) {
@@ -192,14 +192,14 @@ Ip6SendMldReport (
   //
   // Fill in MLD message - Report
   //
-  MldHead = (IP6_MLD_HEAD *) NetbufAllocSpace (Packet, sizeof (IP6_MLD_HEAD), FALSE);
+  MldHead = (IP6_MLD_HEAD *)NetbufAllocSpace (Packet, sizeof (IP6_MLD_HEAD), FALSE);
   ASSERT (MldHead != NULL);
   ZeroMem (MldHead, sizeof (IP6_MLD_HEAD));
   MldHead->Head.Type = ICMP_V6_LISTENER_REPORT;
   MldHead->Head.Code = 0;
   IP6_COPY_ADDRESS (&MldHead->Group, MulticastAddr);
 
-  HeadChecksum   = NetblockChecksum ((UINT8 *) MldHead, sizeof (IP6_MLD_HEAD));
+  HeadChecksum   = NetblockChecksum ((UINT8 *)MldHead, sizeof (IP6_MLD_HEAD));
   PseudoChecksum = NetIp6PseudoHeadChecksum (
                      &Head.SourceAddress,
                      &Head.DestinationAddress,
@@ -229,20 +229,20 @@ Ip6SendMldReport (
 **/
 EFI_STATUS
 Ip6SendMldDone (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IPv6_ADDRESS       *MulticastAddr
+  IN IP6_SERVICE       *IpSb,
+  IN EFI_IPv6_ADDRESS  *MulticastAddr
   )
 {
-  IP6_MLD_HEAD              *MldHead;
-  NET_BUF                   *Packet;
-  EFI_IP6_HEADER            Head;
-  UINT16                    PayloadLen;
-  UINTN                     OptionLen;
-  UINT8                     *Options;
-  EFI_STATUS                Status;
-  EFI_IPv6_ADDRESS          Destination;
-  UINT16                    HeadChecksum;
-  UINT16                    PseudoChecksum;
+  IP6_MLD_HEAD      *MldHead;
+  NET_BUF           *Packet;
+  EFI_IP6_HEADER    Head;
+  UINT16            PayloadLen;
+  UINTN             OptionLen;
+  UINT8             *Options;
+  EFI_STATUS        Status;
+  EFI_IPv6_ADDRESS  Destination;
+  UINT16            HeadChecksum;
+  UINT16            PseudoChecksum;
 
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
   ASSERT (MulticastAddr != NULL && IP6_IS_MULTICAST (MulticastAddr));
@@ -253,11 +253,11 @@ Ip6SendMldDone (
   //
 
   OptionLen = 0;
-  Status = Ip6FillHopByHop (NULL, &OptionLen, IP6_ICMP);
+  Status    = Ip6FillHopByHop (NULL, &OptionLen, IP6_ICMP);
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
 
-  PayloadLen = (UINT16) (OptionLen + sizeof (IP6_MLD_HEAD));
-  Packet = NetbufAlloc (sizeof (EFI_IP6_HEADER) + (UINT32) PayloadLen);
+  PayloadLen = (UINT16)(OptionLen + sizeof (IP6_MLD_HEAD));
+  Packet     = NetbufAlloc (sizeof (EFI_IP6_HEADER) + (UINT32)PayloadLen);
   if (Packet == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -265,11 +265,11 @@ Ip6SendMldDone (
   //
   // Create the basic IPv6 header.
   //
-  Head.FlowLabelL     = 0;
-  Head.FlowLabelH     = 0;
-  Head.PayloadLength  = HTONS (PayloadLen);
-  Head.NextHeader     = IP6_HOP_BY_HOP;
-  Head.HopLimit       = 1;
+  Head.FlowLabelL    = 0;
+  Head.FlowLabelH    = 0;
+  Head.PayloadLength = HTONS (PayloadLen);
+  Head.NextHeader    = IP6_HOP_BY_HOP;
+  Head.HopLimit      = 1;
 
   //
   // If Link-Local address is not ready, we use unspecified address.
@@ -284,7 +284,7 @@ Ip6SendMldDone (
   //
   // Fill a IPv6 Router Alert option in a Hop-by-Hop Options Header
   //
-  Options = NetbufAllocSpace (Packet, (UINT32) OptionLen, FALSE);
+  Options = NetbufAllocSpace (Packet, (UINT32)OptionLen, FALSE);
   ASSERT (Options != NULL);
   Status = Ip6FillHopByHop (Options, &OptionLen, IP6_ICMP);
   if (EFI_ERROR (Status)) {
@@ -296,14 +296,14 @@ Ip6SendMldDone (
   //
   // Fill in MLD message - Done
   //
-  MldHead = (IP6_MLD_HEAD *) NetbufAllocSpace (Packet, sizeof (IP6_MLD_HEAD), FALSE);
+  MldHead = (IP6_MLD_HEAD *)NetbufAllocSpace (Packet, sizeof (IP6_MLD_HEAD), FALSE);
   ASSERT (MldHead != NULL);
   ZeroMem (MldHead, sizeof (IP6_MLD_HEAD));
   MldHead->Head.Type = ICMP_V6_LISTENER_DONE;
   MldHead->Head.Code = 0;
   IP6_COPY_ADDRESS (&MldHead->Group, MulticastAddr);
 
-  HeadChecksum   = NetblockChecksum ((UINT8 *) MldHead, sizeof (IP6_MLD_HEAD));
+  HeadChecksum   = NetblockChecksum ((UINT8 *)MldHead, sizeof (IP6_MLD_HEAD));
   PseudoChecksum = NetIp6PseudoHeadChecksum (
                      &Head.SourceAddress,
                      &Head.DestinationAddress,
@@ -332,12 +332,12 @@ Ip6SendMldDone (
 **/
 EFI_STATUS
 Ip6InitMld (
-  IN IP6_SERVICE            *IpSb
+  IN IP6_SERVICE  *IpSb
   )
 {
-  EFI_IPv6_ADDRESS          AllNodes;
-  IP6_MLD_GROUP             *Group;
-  EFI_STATUS                Status;
+  EFI_IPv6_ADDRESS  AllNodes;
+  IP6_MLD_GROUP     *Group;
+  EFI_STATUS        Status;
 
   //
   // Join the link-scope all-nodes multicast address (FF02::1).
@@ -347,7 +347,7 @@ Ip6InitMld (
 
   Ip6SetToAllNodeMulticast (FALSE, IP6_LINK_LOCAL_SCOPE, &AllNodes);
 
-  Group = Ip6CreateMldEntry (IpSb, &AllNodes, (UINT32) IP6_INFINIT_LIFETIME);
+  Group = Ip6CreateMldEntry (IpSb, &AllNodes, (UINT32)IP6_INFINIT_LIFETIME);
   if (Group == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -388,11 +388,11 @@ ERROR:
 **/
 EFI_STATUS
 Ip6CombineGroups (
-  IN OUT IP6_PROTOCOL *IpInstance,
-  IN EFI_IPv6_ADDRESS *Group
+  IN OUT IP6_PROTOCOL  *IpInstance,
+  IN EFI_IPv6_ADDRESS  *Group
   )
 {
-  EFI_IPv6_ADDRESS     *GroupList;
+  EFI_IPv6_ADDRESS  *GroupList;
 
   NET_CHECK_SIGNATURE (IpInstance, IP6_PROTOCOL_SIGNATURE);
   ASSERT (Group != NULL && IP6_IS_MULTICAST (Group));
@@ -437,12 +437,12 @@ Ip6CombineGroups (
 **/
 EFI_STATUS
 Ip6RemoveGroup (
-  IN OUT IP6_PROTOCOL *IpInstance,
-  IN EFI_IPv6_ADDRESS *Group
+  IN OUT IP6_PROTOCOL  *IpInstance,
+  IN EFI_IPv6_ADDRESS  *Group
   )
 {
-  UINT32                    Index;
-  UINT32                    Count;
+  UINT32  Index;
+  UINT32  Count;
 
   Count = IpInstance->GroupCount;
 
@@ -481,13 +481,13 @@ Ip6RemoveGroup (
 **/
 EFI_STATUS
 Ip6JoinGroup (
-  IN IP6_SERVICE            *IpSb,
-  IN IP6_INTERFACE          *Interface,
-  IN EFI_IPv6_ADDRESS       *Address
+  IN IP6_SERVICE       *IpSb,
+  IN IP6_INTERFACE     *Interface,
+  IN EFI_IPv6_ADDRESS  *Address
   )
 {
-  IP6_MLD_GROUP            *Group;
-  EFI_STATUS               Status;
+  IP6_MLD_GROUP  *Group;
+  EFI_STATUS     Status;
 
   Group = Ip6FindMldEntry (IpSb, Address);
   if (Group != NULL) {
@@ -545,12 +545,12 @@ ERROR:
 **/
 EFI_STATUS
 Ip6LeaveGroup (
- IN IP6_SERVICE            *IpSb,
- IN EFI_IPv6_ADDRESS       *Address
+  IN IP6_SERVICE       *IpSb,
+  IN EFI_IPv6_ADDRESS  *Address
   )
 {
-  IP6_MLD_GROUP            *Group;
-  EFI_STATUS               Status;
+  IP6_MLD_GROUP  *Group;
+  EFI_STATUS     Status;
 
   Group = Ip6FindMldEntry (IpSb, Address);
   if (Group == NULL) {
@@ -611,15 +611,15 @@ Ip6LeaveGroup (
 **/
 EFI_STATUS
 Ip6Groups (
-  IN IP6_PROTOCOL           *IpInstance,
-  IN BOOLEAN                JoinFlag,
-  IN EFI_IPv6_ADDRESS       *GroupAddress       OPTIONAL
+  IN IP6_PROTOCOL      *IpInstance,
+  IN BOOLEAN           JoinFlag,
+  IN EFI_IPv6_ADDRESS  *GroupAddress       OPTIONAL
   )
 {
-  EFI_STATUS                Status;
-  IP6_SERVICE               *IpSb;
-  UINT32                    Index;
-  EFI_IPv6_ADDRESS          *Group;
+  EFI_STATUS        Status;
+  IP6_SERVICE       *IpSb;
+  UINT32            Index;
+  EFI_IPv6_ADDRESS  *Group;
 
   IpSb = IpInstance->Service;
 
@@ -690,13 +690,13 @@ Ip6Groups (
 **/
 EFI_STATUS
 Ip6UpdateDelayTimer (
-  IN IP6_SERVICE            *IpSb,
-  IN UINT16                 MaxRespDelay,
-  IN EFI_IPv6_ADDRESS       *MulticastAddr,
-  IN OUT IP6_MLD_GROUP      *Group
+  IN IP6_SERVICE        *IpSb,
+  IN UINT16             MaxRespDelay,
+  IN EFI_IPv6_ADDRESS   *MulticastAddr,
+  IN OUT IP6_MLD_GROUP  *Group
   )
 {
-  UINT32                    Delay;
+  UINT32  Delay;
 
   //
   // If the Query packet specifies a Maximum Response Delay of zero, perform timer
@@ -707,14 +707,14 @@ Ip6UpdateDelayTimer (
     return Ip6SendMldReport (IpSb, NULL, MulticastAddr);
   }
 
-  Delay = (UINT32) (MaxRespDelay / 1000);
+  Delay = (UINT32)(MaxRespDelay / 1000);
 
   //
   // Sets a delay timer to a random value selected from the range [0, Maximum Response Delay]
   // If a timer is already running, resets it if the request Maximum Response Delay
   // is less than the remaining value of the running timer.
   //
-  if (Group->DelayTimer == 0 || Delay < Group->DelayTimer) {
+  if ((Group->DelayTimer == 0) || (Delay < Group->DelayTimer)) {
     Group->DelayTimer = Delay / 4294967295UL * NET_RANDOM (NetRandomInitSeed ());
   }
 
@@ -736,16 +736,16 @@ Ip6UpdateDelayTimer (
 **/
 EFI_STATUS
 Ip6ProcessMldQuery (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IP6_HEADER         *Head,
-  IN NET_BUF                *Packet
+  IN IP6_SERVICE     *IpSb,
+  IN EFI_IP6_HEADER  *Head,
+  IN NET_BUF         *Packet
   )
 {
-  EFI_IPv6_ADDRESS          AllNodes;
-  IP6_MLD_GROUP             *Group;
-  IP6_MLD_HEAD              MldPacket;
-  LIST_ENTRY                *Entry;
-  EFI_STATUS                Status;
+  EFI_IPv6_ADDRESS  AllNodes;
+  IP6_MLD_GROUP     *Group;
+  IP6_MLD_HEAD      MldPacket;
+  LIST_ENTRY        *Entry;
+  EFI_STATUS        Status;
 
   Status = EFI_INVALID_PARAMETER;
 
@@ -756,14 +756,14 @@ Ip6ProcessMldQuery (
     goto Exit;
   }
 
-  if (Head->HopLimit != 1 || !IP6_IS_MULTICAST (&Head->DestinationAddress)) {
+  if ((Head->HopLimit != 1) || !IP6_IS_MULTICAST (&Head->DestinationAddress)) {
     goto Exit;
   }
 
   //
   // The Packet points to MLD report raw data without Hop-By-Hop option.
   //
-  NetbufCopy (Packet, 0, sizeof (IP6_MLD_HEAD), (UINT8 *) &MldPacket);
+  NetbufCopy (Packet, 0, sizeof (IP6_MLD_HEAD), (UINT8 *)&MldPacket);
   MldPacket.MaxRespDelay = NTOHS (MldPacket.MaxRespDelay);
 
   Ip6SetToAllNodeMulticast (FALSE, IP6_LINK_LOCAL_SCOPE, &AllNodes);
@@ -774,6 +774,7 @@ Ip6ProcessMldQuery (
     if (!EFI_IP6_EQUAL (&Head->DestinationAddress, &MldPacket.Group)) {
       goto Exit;
     }
+
     //
     // The node is not listening but it receives the specific query. Just return.
     //
@@ -824,14 +825,14 @@ Exit:
 **/
 EFI_STATUS
 Ip6ProcessMldReport (
-  IN IP6_SERVICE            *IpSb,
-  IN EFI_IP6_HEADER         *Head,
-  IN NET_BUF                *Packet
+  IN IP6_SERVICE     *IpSb,
+  IN EFI_IP6_HEADER  *Head,
+  IN NET_BUF         *Packet
   )
 {
-  IP6_MLD_HEAD              MldPacket;
-  IP6_MLD_GROUP             *Group;
-  EFI_STATUS                Status;
+  IP6_MLD_HEAD   MldPacket;
+  IP6_MLD_GROUP  *Group;
+  EFI_STATUS     Status;
 
   Status = EFI_INVALID_PARAMETER;
 
@@ -842,14 +843,14 @@ Ip6ProcessMldReport (
     goto Exit;
   }
 
-  if (Head->HopLimit != 1 || !IP6_IS_MULTICAST (&Head->DestinationAddress)) {
+  if ((Head->HopLimit != 1) || !IP6_IS_MULTICAST (&Head->DestinationAddress)) {
     goto Exit;
   }
 
   //
   // The Packet points to MLD report raw data without Hop-By-Hop option.
   //
-  NetbufCopy (Packet, 0, sizeof (IP6_MLD_HEAD), (UINT8 *) &MldPacket);
+  NetbufCopy (Packet, 0, sizeof (IP6_MLD_HEAD), (UINT8 *)&MldPacket);
   if (!EFI_IP6_EQUAL (&Head->DestinationAddress, &MldPacket.Group)) {
     goto Exit;
   }
@@ -883,11 +884,11 @@ Exit:
 **/
 VOID
 Ip6MldTimerTicking (
-  IN IP6_SERVICE            *IpSb
+  IN IP6_SERVICE  *IpSb
   )
 {
-  IP6_MLD_GROUP             *Group;
-  LIST_ENTRY                *Entry;
+  IP6_MLD_GROUP  *Group;
+  LIST_ENTRY     *Entry;
 
   //
   // Send solicited report when timer expires
@@ -899,4 +900,3 @@ Ip6MldTimerTicking (
     }
   }
 }
-

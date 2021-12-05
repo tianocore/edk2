@@ -13,9 +13,9 @@
 
 #include <Protocol/ServiceBinding.h>
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gMtftp6ComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gMtftp6ComponentName2;
-extern EFI_UNICODE_STRING_TABLE     *gMtftp6ControllerNameTable;
+extern EFI_COMPONENT_NAME_PROTOCOL   gMtftp6ComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gMtftp6ComponentName2;
+extern EFI_UNICODE_STRING_TABLE      *gMtftp6ControllerNameTable;
 
 /**
   Test to see if this driver supports Controller. This service
@@ -90,10 +90,10 @@ Mtftp6DriverBindingStart (
 EFI_STATUS
 EFIAPI
 Mtftp6DriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN  EFI_HANDLE                  Controller,
-  IN  UINTN                       NumberOfChildren,
-  IN  EFI_HANDLE                  *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Controller,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
 /**
@@ -116,8 +116,8 @@ Mtftp6DriverBindingStop (
 EFI_STATUS
 EFIAPI
 Mtftp6ServiceBindingCreateChild (
-  IN     EFI_SERVICE_BINDING_PROTOCOL *This,
-  IN OUT EFI_HANDLE                   *ChildHandle
+  IN     EFI_SERVICE_BINDING_PROTOCOL  *This,
+  IN OUT EFI_HANDLE                    *ChildHandle
   );
 
 /**
@@ -139,8 +139,8 @@ Mtftp6ServiceBindingCreateChild (
 EFI_STATUS
 EFIAPI
 Mtftp6ServiceBindingDestroyChild (
-  IN EFI_SERVICE_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                   ChildHandle
+  IN EFI_SERVICE_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                    ChildHandle
   );
 
 #endif

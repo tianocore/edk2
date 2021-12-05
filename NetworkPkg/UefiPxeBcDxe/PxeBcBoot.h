@@ -10,12 +10,11 @@
 #ifndef __EFI_PXEBC_BOOT_H__
 #define __EFI_PXEBC_BOOT_H__
 
-#define PXEBC_DISPLAY_MAX_LINE             70
-#define PXEBC_DEFAULT_UDP_OVERHEAD_SIZE    8
-#define PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE   4
+#define PXEBC_DISPLAY_MAX_LINE            70
+#define PXEBC_DEFAULT_UDP_OVERHEAD_SIZE   8
+#define PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE  4
 
-#define PXEBC_IS_SIZE_OVERFLOWED(x)   ((sizeof (UINTN) < sizeof (UINT64)) && ((x) > 0xFFFFFFFF))
-
+#define PXEBC_IS_SIZE_OVERFLOWED(x)  ((sizeof (UINTN) < sizeof (UINT64)) && ((x) > 0xFFFFFFFF))
 
 /**
   Extract the discover information and boot server entry from the
@@ -36,10 +35,9 @@ PxeBcExtractDiscoverInfo (
   IN     PXEBC_PRIVATE_DATA               *Private,
   IN     UINT16                           Type,
   IN OUT EFI_PXE_BASE_CODE_DISCOVER_INFO  **DiscoverInfo,
-     OUT PXEBC_BOOT_SVR_ENTRY             **BootEntry,
-     OUT EFI_PXE_BASE_CODE_SRVLIST        **SrvList
+  OUT PXEBC_BOOT_SVR_ENTRY                **BootEntry,
+  OUT EFI_PXE_BASE_CODE_SRVLIST           **SrvList
   );
-
 
 /**
   Build the discover packet and send out for boot.
@@ -60,15 +58,14 @@ PxeBcExtractDiscoverInfo (
 **/
 EFI_STATUS
 PxeBcDiscoverBootServer (
-  IN  PXEBC_PRIVATE_DATA                *Private,
-  IN  UINT16                            Type,
-  IN  UINT16                            *Layer,
-  IN  BOOLEAN                           UseBis,
-  IN  EFI_IP_ADDRESS                    *DestIp,
-  IN  UINT16                            IpCount,
-  IN  EFI_PXE_BASE_CODE_SRVLIST         *SrvList
+  IN  PXEBC_PRIVATE_DATA         *Private,
+  IN  UINT16                     Type,
+  IN  UINT16                     *Layer,
+  IN  BOOLEAN                    UseBis,
+  IN  EFI_IP_ADDRESS             *DestIp,
+  IN  UINT16                     IpCount,
+  IN  EFI_PXE_BASE_CODE_SRVLIST  *SrvList
   );
-
 
 /**
   Load boot file into user buffer.
@@ -86,9 +83,9 @@ PxeBcDiscoverBootServer (
 **/
 EFI_STATUS
 PxeBcLoadBootFile (
-  IN     PXEBC_PRIVATE_DATA           *Private,
-  IN OUT UINTN                        *BufferSize,
-  IN     VOID                         *Buffer         OPTIONAL
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN OUT UINTN               *BufferSize,
+  IN     VOID                *Buffer         OPTIONAL
   );
 
 #endif

@@ -8,11 +8,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "IScsiImpl.h"
 
-EFI_ISCSI_INITIATOR_NAME_PROTOCOL gIScsiInitiatorName = {
+EFI_ISCSI_INITIATOR_NAME_PROTOCOL  gIScsiInitiatorName = {
   IScsiGetInitiatorName,
   IScsiSetInitiatorName
 };
-
 
 /**
   Retrieves the current set value of iSCSI Initiator Name.
@@ -64,7 +63,6 @@ IScsiGetInitiatorName (
   return Status;
 }
 
-
 /**
   Sets the iSSI Initiator Name.
 
@@ -110,10 +108,11 @@ IScsiSetInitiatorName (
     *BufferSize = ISCSI_NAME_MAX_SIZE;
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // Only support iqn iSCSI names.
   //
-  Status = IScsiNormalizeName ((CHAR8 *) Buffer, *BufferSize - 1);
+  Status = IScsiNormalizeName ((CHAR8 *)Buffer, *BufferSize - 1);
   if (EFI_ERROR (Status)) {
     return Status;
   }

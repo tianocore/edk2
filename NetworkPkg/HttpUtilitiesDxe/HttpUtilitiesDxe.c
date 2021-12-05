@@ -9,7 +9,6 @@
 
 #include "HttpUtilitiesDxe.h"
 
-
 /**
   Unloads an image.
 
@@ -25,14 +24,13 @@ HttpUtilitiesDxeUnload (
   IN EFI_HANDLE  ImageHandle
   )
 {
-  EFI_STATUS                      Status;
-  UINTN                           HandleNum;
-  EFI_HANDLE                      *HandleBuffer;
-  UINT32                          Index;
-  EFI_HTTP_UTILITIES_PROTOCOL     *HttpUtilitiesProtocol;
+  EFI_STATUS                   Status;
+  UINTN                        HandleNum;
+  EFI_HANDLE                   *HandleBuffer;
+  UINT32                       Index;
+  EFI_HTTP_UTILITIES_PROTOCOL  *HttpUtilitiesProtocol;
 
-
-  HandleBuffer   = NULL;
+  HandleBuffer = NULL;
 
   //
   // Locate all the handles with HttpUtilities protocol.
@@ -55,7 +53,7 @@ HttpUtilitiesDxeUnload (
     Status = gBS->OpenProtocol (
                     HandleBuffer[Index],
                     &gEfiHttpUtilitiesProtocolGuid,
-                    (VOID **) &HttpUtilitiesProtocol,
+                    (VOID **)&HttpUtilitiesProtocol,
                     ImageHandle,
                     NULL,
                     EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL
@@ -69,7 +67,8 @@ HttpUtilitiesDxeUnload (
     //
     Status = gBS->UninstallMultipleProtocolInterfaces (
                     HandleBuffer[Index],
-                    &gEfiHttpUtilitiesProtocolGuid, HttpUtilitiesProtocol,
+                    &gEfiHttpUtilitiesProtocolGuid,
+                    HttpUtilitiesProtocol,
                     NULL
                     );
     if (EFI_ERROR (Status)) {
@@ -79,7 +78,6 @@ HttpUtilitiesDxeUnload (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   This is the declaration of an EFI image entry point. This entry point is
@@ -99,9 +97,9 @@ HttpUtilitiesDxeDriverEntryPoint (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS             Status;
+  EFI_STATUS  Status;
 
-  EFI_HANDLE             Handle;
+  EFI_HANDLE  Handle;
 
   Handle = NULL;
 
@@ -117,4 +115,3 @@ HttpUtilitiesDxeDriverEntryPoint (
 
   return Status;
 }
-

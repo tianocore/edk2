@@ -14,6 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0x2eea107, 0x98db, 0x400e, { 0x98, 0x30, 0x46, 0xa, 0x15, 0x42, 0xd7, 0x99 } \
   }
 
-extern EFI_GUID gIp6ConfigNvDataGuid;
+extern EFI_GUID  gIp6ConfigNvDataGuid;
 
 #endif

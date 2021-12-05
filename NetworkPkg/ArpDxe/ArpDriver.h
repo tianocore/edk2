@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _ARP_DRIVER_H_
 #define _ARP_DRIVER_H_
 
-
 #include <Uefi.h>
 
 #include <Protocol/Arp.h>
@@ -21,17 +20,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 
-
 //
 // Global variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL    gArpDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL    gArpComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL   gArpComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gArpDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gArpComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gArpComponentName2;
 
 //
 // Function prototypes for the Driver Binding Protocol
 //
+
 /**
   Tests to see if this driver supports a given controller.
 
@@ -199,10 +198,10 @@ ArpServiceBindingDestroyChild (
   IN EFI_HANDLE                    ChildHandle
   );
 
-
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -249,7 +248,6 @@ ArpComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -322,13 +320,11 @@ ArpComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 ArpComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
 
-
 #endif
-
