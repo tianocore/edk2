@@ -2734,12 +2734,12 @@ DumpSmramInfo (
   VOID
   )
 {
-  DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
     if (IS_SMRAM_PROFILE_ENABLED) {
       DumpSmramProfile ();
       DumpFreePagesList ();
       DumpFreePoolList ();
       DumpSmramRange ();
     }
-  );
+    DEBUG_CODE_END ();
 }

@@ -280,7 +280,7 @@ RecordVarErrorFlag (
   VAR_ERROR_FLAG            *VarErrFlag;
   VAR_ERROR_FLAG            TempFlag;
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     DEBUG ((DEBUG_ERROR, "RecordVarErrorFlag (0x%02x) %s:%g - 0x%08x - 0x%x\n", Flag, VariableName, VendorGuid, Attributes, VariableSize));
     if (Flag == VAR_ERROR_FLAG_SYSTEM_ERROR) {
       if (AtRuntime ()) {
@@ -291,7 +291,7 @@ RecordVarErrorFlag (
     } else {
       DEBUG ((DEBUG_ERROR, "CommonMaxUserVariableSpace = 0x%x - CommonUserVariableTotalSize = 0x%x\n", mVariableModuleGlobal->CommonMaxUserVariableSpace, mVariableModuleGlobal->CommonUserVariableTotalSize));
     }
-  );
+  DEBUG_CODE_END ();
 
   if (!mEndOfDxe) {
     //
@@ -3498,7 +3498,7 @@ GetHobVariableStore (
   //
   // Make sure there is no more than one Variable HOB.
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
     if (GuidHob != NULL) {
       if ((GetNextGuidHob (&gEfiAuthenticatedVariableGuid, GET_NEXT_HOB (GuidHob)) != NULL)) {
@@ -3517,7 +3517,7 @@ GetHobVariableStore (
         }
       }
     }
-  );
+  DEBUG_CODE_END ();
 
   //
   // Combinations supported:
