@@ -27,7 +27,7 @@
 // Maximum support address used to check input buffer
 //
 extern EFI_PHYSICAL_ADDRESS  mMmMemLibInternalMaximumSupportAddress;
-extern EFI_MMRAM_DESCRIPTOR *mMmMemLibInternalMmramRanges;
+extern EFI_MMRAM_DESCRIPTOR  *mMmMemLibInternalMmramRanges;
 extern UINTN                 mMmMemLibInternalMmramCount;
 
 /**
@@ -39,25 +39,26 @@ MmMemLibInternalCalculateMaximumSupportAddress (
   VOID
   )
 {
-  VOID         *Hob;
-  UINT32       RegEax;
-  UINT8        PhysicalAddressBits;
+  VOID    *Hob;
+  UINT32  RegEax;
+  UINT8   PhysicalAddressBits;
 
   //
   // Get physical address bits supported.
   //
   Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
   if (Hob != NULL) {
-    PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
+    PhysicalAddressBits = ((EFI_HOB_CPU *)Hob)->SizeOfMemorySpace;
   } else {
     AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
     if (RegEax >= 0x80000008) {
       AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      PhysicalAddressBits = (UINT8) RegEax;
+      PhysicalAddressBits = (UINT8)RegEax;
     } else {
       PhysicalAddressBits = 36;
     }
   }
+
   //
   // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
   //
@@ -108,32 +109,34 @@ MmMemLibInternalPopulateMmramRanges (
     }
 
     MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
-    if (MmramRangesHobData == NULL || MmramRangesHobData->Descriptor == NULL) {
+    if ((MmramRangesHobData == NULL) || (MmramRangesHobData->Descriptor == NULL)) {
       return EFI_UNSUPPORTED;
     }
 
     mMmMemLibInternalMmramCount = MmramRangesHobData->NumberOfMmReservedRegions;
-    MmramDescriptors = MmramRangesHobData->Descriptor;
+    MmramDescriptors            = MmramRangesHobData->Descriptor;
   } else {
     DataInHob = GET_GUID_HOB_DATA (GuidHob);
     if (DataInHob == NULL) {
       return EFI_UNSUPPORTED;
     }
 
-    MmCorePrivateData = (MM_CORE_PRIVATE_DATA *) (UINTN) DataInHob->Address;
-    if (MmCorePrivateData == NULL || MmCorePrivateData->MmramRanges == 0) {
+    MmCorePrivateData = (MM_CORE_PRIVATE_DATA *)(UINTN)DataInHob->Address;
+    if ((MmCorePrivateData == NULL) || (MmCorePrivateData->MmramRanges == 0)) {
       return EFI_UNSUPPORTED;
     }
 
-    mMmMemLibInternalMmramCount = (UINTN) MmCorePrivateData->MmramRangeCount;
-    MmramDescriptors = (EFI_MMRAM_DESCRIPTOR *) (UINTN) MmCorePrivateData->MmramRanges;
+    mMmMemLibInternalMmramCount = (UINTN)MmCorePrivateData->MmramRangeCount;
+    MmramDescriptors            = (EFI_MMRAM_DESCRIPTOR *)(UINTN)MmCorePrivateData->MmramRanges;
   }
 
   mMmMemLibInternalMmramRanges = AllocatePool (mMmMemLibInternalMmramCount * sizeof (EFI_MMRAM_DESCRIPTOR));
   if (mMmMemLibInternalMmramRanges) {
-    CopyMem (mMmMemLibInternalMmramRanges,
-             MmramDescriptors,
-             mMmMemLibInternalMmramCount * sizeof (EFI_MMRAM_DESCRIPTOR));
+    CopyMem (
+      mMmMemLibInternalMmramRanges,
+      MmramDescriptors,
+      mMmMemLibInternalMmramCount * sizeof (EFI_MMRAM_DESCRIPTOR)
+      );
   }
 
   return EFI_SUCCESS;
@@ -152,4 +155,3 @@ MmMemLibInternalFreeMmramRanges (
     FreePool (mMmMemLibInternalMmramRanges);
   }
 }
-

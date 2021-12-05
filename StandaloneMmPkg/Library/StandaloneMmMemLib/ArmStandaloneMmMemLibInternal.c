@@ -21,10 +21,10 @@
 extern EFI_PHYSICAL_ADDRESS  mMmMemLibInternalMaximumSupportAddress;
 
 #ifdef MDE_CPU_AARCH64
-#define ARM_PHYSICAL_ADDRESS_BITS 36
+#define ARM_PHYSICAL_ADDRESS_BITS  36
 #endif
 #ifdef MDE_CPU_ARM
-#define ARM_PHYSICAL_ADDRESS_BITS 32
+#define ARM_PHYSICAL_ADDRESS_BITS  32
 #endif
 
 /**
@@ -36,7 +36,7 @@ MmMemLibInternalCalculateMaximumSupportAddress (
   VOID
   )
 {
-  UINT8        PhysicalAddressBits;
+  UINT8  PhysicalAddressBits;
 
   PhysicalAddressBits = ARM_PHYSICAL_ADDRESS_BITS;
 
@@ -74,4 +74,3 @@ MmMemLibInternalFreeMmramRanges (
 {
   // Not implemented for AARCH64.
 }
-

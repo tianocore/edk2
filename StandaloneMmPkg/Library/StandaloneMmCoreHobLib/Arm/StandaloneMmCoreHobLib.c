@@ -19,12 +19,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Cache copy of HobList pointer.
 //
-VOID *gHobList = NULL;
+VOID  *gHobList = NULL;
 
 VOID *
 CreateHob (
-  IN  UINT16    HobType,
-  IN  UINT16    HobLength
+  IN  UINT16  HobType,
+  IN  UINT16  HobLength
   )
 {
   EFI_HOB_HANDOFF_INFO_TABLE  *HandOffHob;
@@ -42,19 +42,19 @@ CreateHob (
     return NULL;
   }
 
-  Hob = (VOID*) (UINTN) HandOffHob->EfiEndOfHobList;
-  ((EFI_HOB_GENERIC_HEADER*) Hob)->HobType = HobType;
-  ((EFI_HOB_GENERIC_HEADER*) Hob)->HobLength = HobLength;
-  ((EFI_HOB_GENERIC_HEADER*) Hob)->Reserved = 0;
+  Hob                                        = (VOID *)(UINTN)HandOffHob->EfiEndOfHobList;
+  ((EFI_HOB_GENERIC_HEADER *)Hob)->HobType   = HobType;
+  ((EFI_HOB_GENERIC_HEADER *)Hob)->HobLength = HobLength;
+  ((EFI_HOB_GENERIC_HEADER *)Hob)->Reserved  = 0;
 
-  HobEnd = (EFI_HOB_GENERIC_HEADER*) ((UINTN)Hob + HobLength);
-  HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
+  HobEnd                      = (EFI_HOB_GENERIC_HEADER *)((UINTN)Hob + HobLength);
+  HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 
   HobEnd->HobType   = EFI_HOB_TYPE_END_OF_HOB_LIST;
   HobEnd->HobLength = sizeof (EFI_HOB_GENERIC_HEADER);
   HobEnd->Reserved  = 0;
   HobEnd++;
-  HandOffHob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
+  HandOffHob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 
   return Hob;
 }
@@ -75,16 +75,18 @@ CreateHob (
 VOID
 EFIAPI
 BuildModuleHob (
-  IN CONST EFI_GUID         *ModuleName,
-  IN EFI_PHYSICAL_ADDRESS   MemoryAllocationModule,
-  IN UINT64                 ModuleLength,
-  IN EFI_PHYSICAL_ADDRESS   EntryPoint
+  IN CONST EFI_GUID        *ModuleName,
+  IN EFI_PHYSICAL_ADDRESS  MemoryAllocationModule,
+  IN UINT64                ModuleLength,
+  IN EFI_PHYSICAL_ADDRESS  EntryPoint
   )
 {
   EFI_HOB_MEMORY_ALLOCATION_MODULE  *Hob;
 
-  ASSERT (((MemoryAllocationModule & (EFI_PAGE_SIZE - 1)) == 0) &&
-          ((ModuleLength & (EFI_PAGE_SIZE - 1)) == 0));
+  ASSERT (
+    ((MemoryAllocationModule & (EFI_PAGE_SIZE - 1)) == 0) &&
+    ((ModuleLength & (EFI_PAGE_SIZE - 1)) == 0)
+    );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
 
@@ -153,22 +155,21 @@ BuildResourceDescriptorHob (
 VOID *
 EFIAPI
 BuildGuidHob (
-  IN CONST EFI_GUID              *Guid,
-  IN UINTN                       DataLength
+  IN CONST EFI_GUID  *Guid,
+  IN UINTN           DataLength
   )
 {
-  EFI_HOB_GUID_TYPE *Hob;
+  EFI_HOB_GUID_TYPE  *Hob;
 
   //
   // Make sure that data length is not too long.
   //
   ASSERT (DataLength <= (0xffff - sizeof (EFI_HOB_GUID_TYPE)));
 
-  Hob = CreateHob (EFI_HOB_TYPE_GUID_EXTENSION, (UINT16) (sizeof (EFI_HOB_GUID_TYPE) + DataLength));
+  Hob = CreateHob (EFI_HOB_TYPE_GUID_EXTENSION, (UINT16)(sizeof (EFI_HOB_GUID_TYPE) + DataLength));
   CopyGuid (&Hob->Name, Guid);
   return Hob + 1;
 }
-
 
 /**
   Copies a data buffer to a newly-built HOB.
@@ -191,9 +192,9 @@ BuildGuidHob (
 VOID *
 EFIAPI
 BuildGuidDataHob (
-  IN CONST EFI_GUID              *Guid,
-  IN VOID                        *Data,
-  IN UINTN                       DataLength
+  IN CONST EFI_GUID  *Guid,
+  IN VOID            *Data,
+  IN UINTN           DataLength
   )
 {
   VOID  *HobData;
@@ -218,8 +219,8 @@ BuildGuidDataHob (
 VOID
 EFIAPI
 BuildFvHob (
-  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN UINT64                      Length
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length
   )
 {
   EFI_HOB_FIRMWARE_VOLUME  *Hob;
@@ -229,7 +230,6 @@ BuildFvHob (
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
 }
-
 
 /**
   Builds a EFI_HOB_TYPE_FV2 HOB.
@@ -246,10 +246,10 @@ BuildFvHob (
 VOID
 EFIAPI
 BuildFv2Hob (
-  IN          EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN          UINT64                      Length,
-  IN CONST    EFI_GUID                    *FvName,
-  IN CONST    EFI_GUID                    *FileName
+  IN          EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN          UINT64                Length,
+  IN CONST    EFI_GUID              *FvName,
+  IN CONST    EFI_GUID              *FileName
   )
 {
   EFI_HOB_FIRMWARE_VOLUME2  *Hob;
@@ -261,7 +261,6 @@ BuildFv2Hob (
   CopyGuid (&Hob->FvName, FvName);
   CopyGuid (&Hob->FileName, FileName);
 }
-
 
 /**
   Builds a HOB for the CPU.
@@ -276,8 +275,8 @@ BuildFv2Hob (
 VOID
 EFIAPI
 BuildCpuHob (
-  IN UINT8                       SizeOfMemorySpace,
-  IN UINT8                       SizeOfIoSpace
+  IN UINT8  SizeOfMemorySpace,
+  IN UINT8  SizeOfIoSpace
   )
 {
   EFI_HOB_CPU  *Hob;
@@ -307,15 +306,17 @@ BuildCpuHob (
 VOID
 EFIAPI
 BuildMemoryAllocationHob (
-  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN UINT64                      Length,
-  IN EFI_MEMORY_TYPE             MemoryType
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length,
+  IN EFI_MEMORY_TYPE       MemoryType
   )
 {
   EFI_HOB_MEMORY_ALLOCATION  *Hob;
 
-  ASSERT (((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
-          ((Length & (EFI_PAGE_SIZE - 1)) == 0));
+  ASSERT (
+    ((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
+    ((Length & (EFI_PAGE_SIZE - 1)) == 0)
+    );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION));
 
