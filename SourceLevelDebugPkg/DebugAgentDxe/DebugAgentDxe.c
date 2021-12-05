@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugAgentLib.h>
 #include <Library/UefiLib.h>
 
-EFI_EVENT       mExitBootServiceEvent;
+EFI_EVENT  mExitBootServiceEvent;
 
 /**
   One notified function to disable Debug Timer interrupt when gBS->ExitBootServices() called.
@@ -24,8 +24,8 @@ EFI_EVENT       mExitBootServiceEvent;
 VOID
 EFIAPI
 DisableDebugTimerExitBootService (
-  EFI_EVENT                      Event,
-  VOID                           *Context
+  EFI_EVENT  Event,
+  VOID       *Context
   )
 
 {
@@ -46,12 +46,12 @@ DisableDebugTimerExitBootService (
 **/
 EFI_STATUS
 EFIAPI
-DebugAgentDxeInitialize(
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+DebugAgentDxeInitialize (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS  Status;
 
   if (gST->ConOut != NULL) {
     Print (L"If the Debug Port is serial port, please make sure this serial port isn't connected by");
@@ -81,14 +81,17 @@ DebugAgentDxeInitialize(
     Print (L"3: Shell> disconnect EA\r\n");
     Print (L"4: Shell> load -nc DebugAgentDxe.efi\r\n\r\n");
   }
+
   Status = EFI_UNSUPPORTED;
   InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_LOAD, &Status, NULL);
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   if (gST->ConOut != NULL) {
     Print (L"Debug Agent: Initialized successfully!\r\n\r\n");
   }
+
   //
   // Create event to disable Debug Timer interrupt when exit boot service.
   //
@@ -117,20 +120,20 @@ DebugAgentDxeInitialize(
 EFI_STATUS
 EFIAPI
 DebugAgentDxeUnload (
-  IN EFI_HANDLE           ImageHandle
+  IN EFI_HANDLE  ImageHandle
   )
 {
-  EFI_STATUS          Status;
+  EFI_STATUS  Status;
 
   Status = EFI_UNSUPPORTED;
   InitializeDebugAgent (DEBUG_AGENT_INIT_DXE_UNLOAD, &Status, NULL);
   switch (Status) {
-  case EFI_ACCESS_DENIED:
-    Print (L"Debug Agent: Host is still connected, please de-attach TARGET firstly!\r\n");
-    break;
-  case EFI_NOT_STARTED:
-    Print (L"Debug Agent: It hasn't been initialized, cannot unload it!\r\n");
-    break;
+    case EFI_ACCESS_DENIED:
+      Print (L"Debug Agent: Host is still connected, please de-attach TARGET firstly!\r\n");
+      break;
+    case EFI_NOT_STARTED:
+      Print (L"Debug Agent: It hasn't been initialized, cannot unload it!\r\n");
+      break;
   }
 
   return Status;
