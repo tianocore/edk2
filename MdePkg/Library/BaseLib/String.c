@@ -8,7 +8,6 @@
 
 #include "BaseLibInternals.h"
 
-
 /**
   Returns the length of a Null-terminated Unicode string.
 
@@ -29,13 +28,13 @@
 UINTN
 EFIAPI
 StrLen (
-  IN      CONST CHAR16              *String
+  IN      CONST CHAR16  *String
   )
 {
-  UINTN                             Length;
+  UINTN  Length;
 
   ASSERT (String != NULL);
-  ASSERT (((UINTN) String & BIT0) == 0);
+  ASSERT (((UINTN)String & BIT0) == 0);
 
   for (Length = 0; *String != L'\0'; String++, Length++) {
     //
@@ -46,6 +45,7 @@ StrLen (
       ASSERT (Length < PcdGet32 (PcdMaximumUnicodeStringLength));
     }
   }
+
   return Length;
 }
 
@@ -70,7 +70,7 @@ StrLen (
 UINTN
 EFIAPI
 StrSize (
-  IN      CONST CHAR16              *String
+  IN      CONST CHAR16  *String
   )
 {
   return (StrLen (String) + 1) * sizeof (*String);
@@ -107,8 +107,8 @@ StrSize (
 INTN
 EFIAPI
 StrCmp (
-  IN      CONST CHAR16              *FirstString,
-  IN      CONST CHAR16              *SecondString
+  IN      CONST CHAR16  *FirstString,
+  IN      CONST CHAR16  *SecondString
   )
 {
   //
@@ -121,6 +121,7 @@ StrCmp (
     FirstString++;
     SecondString++;
   }
+
   return *FirstString - *SecondString;
 }
 
@@ -159,9 +160,9 @@ StrCmp (
 INTN
 EFIAPI
 StrnCmp (
-  IN      CONST CHAR16              *FirstString,
-  IN      CONST CHAR16              *SecondString,
-  IN      UINTN                     Length
+  IN      CONST CHAR16  *FirstString,
+  IN      CONST CHAR16  *SecondString,
+  IN      UINTN         Length
   )
 {
   if (Length == 0) {
@@ -182,7 +183,8 @@ StrnCmp (
   while ((*FirstString != L'\0') &&
          (*SecondString != L'\0') &&
          (*FirstString == *SecondString) &&
-         (Length > 1)) {
+         (Length > 1))
+  {
     FirstString++;
     SecondString++;
     Length--;
@@ -190,7 +192,6 @@ StrnCmp (
 
   return *FirstString - *SecondString;
 }
-
 
 /**
   Returns the first occurrence of a Null-terminated Unicode sub-string
@@ -221,12 +222,12 @@ StrnCmp (
 CHAR16 *
 EFIAPI
 StrStr (
-  IN      CONST CHAR16              *String,
-  IN      CONST CHAR16              *SearchString
+  IN      CONST CHAR16  *String,
+  IN      CONST CHAR16  *SearchString
   )
 {
-  CONST CHAR16 *FirstMatch;
-  CONST CHAR16 *SearchStringTmp;
+  CONST CHAR16  *FirstMatch;
+  CONST CHAR16  *SearchStringTmp;
 
   //
   // ASSERT both strings are less long than PcdMaximumUnicodeStringLength.
@@ -236,21 +237,22 @@ StrStr (
   ASSERT (StrSize (SearchString) != 0);
 
   if (*SearchString == L'\0') {
-    return (CHAR16 *) String;
+    return (CHAR16 *)String;
   }
 
   while (*String != L'\0') {
     SearchStringTmp = SearchString;
-    FirstMatch = String;
+    FirstMatch      = String;
 
-    while ((*String == *SearchStringTmp)
-            && (*String != L'\0')) {
+    while (  (*String == *SearchStringTmp)
+          && (*String != L'\0'))
+    {
       String++;
       SearchStringTmp++;
     }
 
     if (*SearchStringTmp == L'\0') {
-      return (CHAR16 *) FirstMatch;
+      return (CHAR16 *)FirstMatch;
     }
 
     if (*String == L'\0') {
@@ -279,10 +281,10 @@ StrStr (
 BOOLEAN
 EFIAPI
 InternalIsDecimalDigitCharacter (
-  IN      CHAR16                    Char
+  IN      CHAR16  Char
   )
 {
-  return (BOOLEAN) (Char >= L'0' && Char <= L'9');
+  return (BOOLEAN)(Char >= L'0' && Char <= L'9');
 }
 
 /**
@@ -303,11 +305,11 @@ InternalIsDecimalDigitCharacter (
 CHAR16
 EFIAPI
 CharToUpper (
-  IN      CHAR16                    Char
+  IN      CHAR16  Char
   )
 {
-  if (Char >= L'a' && Char <= L'z') {
-    return (CHAR16) (Char - (L'a' - L'A'));
+  if ((Char >= L'a') && (Char <= L'z')) {
+    return (CHAR16)(Char - (L'a' - L'A'));
   }
 
   return Char;
@@ -329,7 +331,7 @@ CharToUpper (
 UINTN
 EFIAPI
 InternalHexCharToUintn (
-  IN      CHAR16                    Char
+  IN      CHAR16  Char
   )
 {
   if (InternalIsDecimalDigitCharacter (Char)) {
@@ -356,13 +358,12 @@ InternalHexCharToUintn (
 BOOLEAN
 EFIAPI
 InternalIsHexaDecimalDigitCharacter (
-  IN      CHAR16                    Char
+  IN      CHAR16  Char
   )
 {
-
-  return (BOOLEAN) (InternalIsDecimalDigitCharacter (Char) ||
-    (Char >= L'A' && Char <= L'F') ||
-    (Char >= L'a' && Char <= L'f'));
+  return (BOOLEAN)(InternalIsDecimalDigitCharacter (Char) ||
+                   (Char >= L'A' && Char <= L'F') ||
+                   (Char >= L'a' && Char <= L'f'));
 }
 
 /**
@@ -402,15 +403,14 @@ InternalIsHexaDecimalDigitCharacter (
 UINTN
 EFIAPI
 StrDecimalToUintn (
-  IN      CONST CHAR16              *String
+  IN      CONST CHAR16  *String
   )
 {
-  UINTN     Result;
+  UINTN  Result;
 
-  StrDecimalToUintnS (String, (CHAR16 **) NULL, &Result);
+  StrDecimalToUintnS (String, (CHAR16 **)NULL, &Result);
   return Result;
 }
-
 
 /**
   Convert a Null-terminated Unicode decimal string to a value of
@@ -449,12 +449,12 @@ StrDecimalToUintn (
 UINT64
 EFIAPI
 StrDecimalToUint64 (
-  IN      CONST CHAR16              *String
+  IN      CONST CHAR16  *String
   )
 {
-  UINT64     Result;
+  UINT64  Result;
 
-  StrDecimalToUint64S (String, (CHAR16 **) NULL, &Result);
+  StrDecimalToUint64S (String, (CHAR16 **)NULL, &Result);
   return Result;
 }
 
@@ -496,15 +496,14 @@ StrDecimalToUint64 (
 UINTN
 EFIAPI
 StrHexToUintn (
-  IN      CONST CHAR16              *String
+  IN      CONST CHAR16  *String
   )
 {
-  UINTN     Result;
+  UINTN  Result;
 
-  StrHexToUintnS (String, (CHAR16 **) NULL, &Result);
+  StrHexToUintnS (String, (CHAR16 **)NULL, &Result);
   return Result;
 }
-
 
 /**
   Convert a Null-terminated Unicode hexadecimal string to a value of type UINT64.
@@ -544,12 +543,12 @@ StrHexToUintn (
 UINT64
 EFIAPI
 StrHexToUint64 (
-  IN      CONST CHAR16             *String
+  IN      CONST CHAR16  *String
   )
 {
-  UINT64    Result;
+  UINT64  Result;
 
-  StrHexToUint64S (String, (CHAR16 **) NULL, &Result);
+  StrHexToUint64S (String, (CHAR16 **)NULL, &Result);
   return Result;
 }
 
@@ -569,10 +568,10 @@ StrHexToUint64 (
 BOOLEAN
 EFIAPI
 InternalAsciiIsDecimalDigitCharacter (
-  IN      CHAR8                     Char
+  IN      CHAR8  Char
   )
 {
-  return (BOOLEAN) (Char >= '0' && Char <= '9');
+  return (BOOLEAN)(Char >= '0' && Char <= '9');
 }
 
 /**
@@ -592,15 +591,13 @@ InternalAsciiIsDecimalDigitCharacter (
 BOOLEAN
 EFIAPI
 InternalAsciiIsHexaDecimalDigitCharacter (
-  IN      CHAR8                    Char
+  IN      CHAR8  Char
   )
 {
-
-  return (BOOLEAN) (InternalAsciiIsDecimalDigitCharacter (Char) ||
-    (Char >= 'A' && Char <= 'F') ||
-    (Char >= 'a' && Char <= 'f'));
+  return (BOOLEAN)(InternalAsciiIsDecimalDigitCharacter (Char) ||
+                   (Char >= 'A' && Char <= 'F') ||
+                   (Char >= 'a' && Char <= 'f'));
 }
-
 
 /**
   Returns the length of a Null-terminated ASCII string.
@@ -622,10 +619,10 @@ InternalAsciiIsHexaDecimalDigitCharacter (
 UINTN
 EFIAPI
 AsciiStrLen (
-  IN      CONST CHAR8               *String
+  IN      CONST CHAR8  *String
   )
 {
-  UINTN                             Length;
+  UINTN  Length;
 
   ASSERT (String != NULL);
 
@@ -638,6 +635,7 @@ AsciiStrLen (
       ASSERT (Length < PcdGet32 (PcdMaximumAsciiStringLength));
     }
   }
+
   return Length;
 }
 
@@ -661,7 +659,7 @@ AsciiStrLen (
 UINTN
 EFIAPI
 AsciiStrSize (
-  IN      CONST CHAR8               *String
+  IN      CONST CHAR8  *String
   )
 {
   return (AsciiStrLen (String) + 1) * sizeof (*String);
@@ -696,8 +694,8 @@ AsciiStrSize (
 INTN
 EFIAPI
 AsciiStrCmp (
-  IN      CONST CHAR8               *FirstString,
-  IN      CONST CHAR8               *SecondString
+  IN      CONST CHAR8  *FirstString,
+  IN      CONST CHAR8  *SecondString
   )
 {
   //
@@ -730,10 +728,10 @@ AsciiStrCmp (
 CHAR8
 EFIAPI
 AsciiCharToUpper (
-  IN      CHAR8                     Chr
+  IN      CHAR8  Chr
   )
 {
-  return (UINT8) ((Chr >= 'a' && Chr <= 'z') ? Chr - ('a' - 'A') : Chr);
+  return (UINT8)((Chr >= 'a' && Chr <= 'z') ? Chr - ('a' - 'A') : Chr);
 }
 
 /**
@@ -752,7 +750,7 @@ AsciiCharToUpper (
 UINTN
 EFIAPI
 InternalAsciiHexCharToUintn (
-  IN      CHAR8                    Char
+  IN      CHAR8  Char
   )
 {
   if (InternalIsDecimalDigitCharacter (Char)) {
@@ -761,7 +759,6 @@ InternalAsciiHexCharToUintn (
 
   return (10 + AsciiCharToUpper (Char) - 'A');
 }
-
 
 /**
   Performs a case insensitive comparison of two Null-terminated ASCII strings,
@@ -795,8 +792,8 @@ InternalAsciiHexCharToUintn (
 INTN
 EFIAPI
 AsciiStriCmp (
-  IN      CONST CHAR8               *FirstString,
-  IN      CONST CHAR8               *SecondString
+  IN      CONST CHAR8  *FirstString,
+  IN      CONST CHAR8  *SecondString
   )
 {
   CHAR8  UpperFirstString;
@@ -853,9 +850,9 @@ AsciiStriCmp (
 INTN
 EFIAPI
 AsciiStrnCmp (
-  IN      CONST CHAR8               *FirstString,
-  IN      CONST CHAR8               *SecondString,
-  IN      UINTN                     Length
+  IN      CONST CHAR8  *FirstString,
+  IN      CONST CHAR8  *SecondString,
+  IN      UINTN        Length
   )
 {
   if (Length == 0) {
@@ -875,14 +872,15 @@ AsciiStrnCmp (
   while ((*FirstString != '\0') &&
          (*SecondString != '\0') &&
          (*FirstString == *SecondString) &&
-         (Length > 1)) {
+         (Length > 1))
+  {
     FirstString++;
     SecondString++;
     Length--;
   }
+
   return *FirstString - *SecondString;
 }
-
 
 /**
   Returns the first occurrence of a Null-terminated ASCII sub-string
@@ -911,12 +909,12 @@ AsciiStrnCmp (
 CHAR8 *
 EFIAPI
 AsciiStrStr (
-  IN      CONST CHAR8               *String,
-  IN      CONST CHAR8               *SearchString
+  IN      CONST CHAR8  *String,
+  IN      CONST CHAR8  *SearchString
   )
 {
-  CONST CHAR8 *FirstMatch;
-  CONST CHAR8 *SearchStringTmp;
+  CONST CHAR8  *FirstMatch;
+  CONST CHAR8  *SearchStringTmp;
 
   //
   // ASSERT both strings are less long than PcdMaximumAsciiStringLength
@@ -925,21 +923,22 @@ AsciiStrStr (
   ASSERT (AsciiStrSize (SearchString) != 0);
 
   if (*SearchString == '\0') {
-    return (CHAR8 *) String;
+    return (CHAR8 *)String;
   }
 
   while (*String != '\0') {
     SearchStringTmp = SearchString;
-    FirstMatch = String;
+    FirstMatch      = String;
 
-    while ((*String == *SearchStringTmp)
-            && (*String != '\0')) {
+    while (  (*String == *SearchStringTmp)
+          && (*String != '\0'))
+    {
       String++;
       SearchStringTmp++;
     }
 
     if (*SearchStringTmp == '\0') {
-      return (CHAR8 *) FirstMatch;
+      return (CHAR8 *)FirstMatch;
     }
 
     if (*String == '\0') {
@@ -985,15 +984,14 @@ AsciiStrStr (
 UINTN
 EFIAPI
 AsciiStrDecimalToUintn (
-  IN      CONST CHAR8               *String
+  IN      CONST CHAR8  *String
   )
 {
-  UINTN     Result;
+  UINTN  Result;
 
-  AsciiStrDecimalToUintnS (String, (CHAR8 **) NULL, &Result);
+  AsciiStrDecimalToUintnS (String, (CHAR8 **)NULL, &Result);
   return Result;
 }
-
 
 /**
   Convert a Null-terminated ASCII decimal string to a value of type
@@ -1028,12 +1026,12 @@ AsciiStrDecimalToUintn (
 UINT64
 EFIAPI
 AsciiStrDecimalToUint64 (
-  IN      CONST CHAR8               *String
+  IN      CONST CHAR8  *String
   )
 {
-  UINT64     Result;
+  UINT64  Result;
 
-  AsciiStrDecimalToUint64S (String, (CHAR8 **) NULL, &Result);
+  AsciiStrDecimalToUint64S (String, (CHAR8 **)NULL, &Result);
   return Result;
 }
 
@@ -1074,15 +1072,14 @@ AsciiStrDecimalToUint64 (
 UINTN
 EFIAPI
 AsciiStrHexToUintn (
-  IN      CONST CHAR8               *String
+  IN      CONST CHAR8  *String
   )
 {
-  UINTN     Result;
+  UINTN  Result;
 
-  AsciiStrHexToUintnS (String, (CHAR8 **) NULL, &Result);
+  AsciiStrHexToUintnS (String, (CHAR8 **)NULL, &Result);
   return Result;
 }
-
 
 /**
   Convert a Null-terminated ASCII hexadecimal string to a value of type UINT64.
@@ -1121,17 +1118,16 @@ AsciiStrHexToUintn (
 UINT64
 EFIAPI
 AsciiStrHexToUint64 (
-  IN      CONST CHAR8                *String
+  IN      CONST CHAR8  *String
   )
 {
-  UINT64    Result;
+  UINT64  Result;
 
-  AsciiStrHexToUint64S (String, (CHAR8 **) NULL, &Result);
+  AsciiStrHexToUint64S (String, (CHAR8 **)NULL, &Result);
   return Result;
 }
 
-
-STATIC CHAR8 EncodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+STATIC CHAR8  EncodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                 "abcdefghijklmnopqrstuvwxyz"
                                 "0123456789+/";
 
@@ -1158,14 +1154,13 @@ RETURN_STATUS
 EFIAPI
 Base64Encode (
   IN  CONST UINT8  *Source,
-  IN        UINTN   SourceLength,
+  IN        UINTN  SourceLength,
   OUT       CHAR8  *Destination   OPTIONAL,
   IN OUT    UINTN  *DestinationSize
   )
 {
-
-  UINTN          RequiredSize;
-  UINTN          Left;
+  UINTN  RequiredSize;
+  UINTN  Left;
 
   //
   // Check pointers, and SourceLength is valid
@@ -1182,15 +1177,16 @@ Base64Encode (
       *DestinationSize = 1;
       return RETURN_BUFFER_TOO_SMALL;
     }
+
     *DestinationSize = 1;
-    *Destination = '\0';
+    *Destination     = '\0';
     return RETURN_SUCCESS;
   }
 
   //
   // Check if SourceLength or  DestinationSize is valid
   //
-  if ((SourceLength >= (MAX_ADDRESS - (UINTN)Source)) || (*DestinationSize >= (MAX_ADDRESS - (UINTN)Destination))){
+  if ((SourceLength >= (MAX_ADDRESS - (UINTN)Source)) || (*DestinationSize >= (MAX_ADDRESS - (UINTN)Destination))) {
     return RETURN_INVALID_PARAMETER;
   }
 
@@ -1198,7 +1194,7 @@ Base64Encode (
   // 4 ascii per 3 bytes + NULL
   //
   RequiredSize = ((SourceLength + 2) / 3) * 4 + 1;
-  if ((Destination == NULL) || *DestinationSize < RequiredSize) {
+  if ((Destination == NULL) || (*DestinationSize < RequiredSize)) {
     *DestinationSize = RequiredSize;
     return RETURN_BUFFER_TOO_SMALL;
   }
@@ -1209,13 +1205,12 @@ Base64Encode (
   // Encode 24 bits (three bytes) into 4 ascii characters
   //
   while (Left >= 3) {
-
-    *Destination++ = EncodingTable[( Source[0] & 0xfc) >> 2 ];
+    *Destination++ = EncodingTable[(Source[0] & 0xfc) >> 2];
     *Destination++ = EncodingTable[((Source[0] & 0x03) << 4) + ((Source[1] & 0xf0) >> 4)];
     *Destination++ = EncodingTable[((Source[1] & 0x0f) << 2) + ((Source[2] & 0xc0) >> 6)];
-    *Destination++ = EncodingTable[( Source[2] & 0x3f)];
-    Left -= 3;
-    Source += 3;
+    *Destination++ = EncodingTable[(Source[2] & 0x3f)];
+    Left          -= 3;
+    Source        += 3;
   }
 
   //
@@ -1233,7 +1228,7 @@ Base64Encode (
       //
       // One more data byte, two pad characters
       //
-      *Destination++ = EncodingTable[( Source[0] & 0xfc) >> 2];
+      *Destination++ = EncodingTable[(Source[0] & 0xfc) >> 2];
       *Destination++ = EncodingTable[((Source[0] & 0x03) << 4)];
       *Destination++ = '=';
       *Destination++ = '=';
@@ -1243,12 +1238,13 @@ Base64Encode (
       //
       // Two more data bytes, and one pad character
       //
-      *Destination++ = EncodingTable[( Source[0] & 0xfc) >> 2];
+      *Destination++ = EncodingTable[(Source[0] & 0xfc) >> 2];
       *Destination++ = EncodingTable[((Source[0] & 0x03) << 4) + ((Source[1] & 0xf0) >> 4)];
       *Destination++ = EncodingTable[((Source[1] & 0x0f) << 2)];
       *Destination++ = '=';
       break;
-    }
+  }
+
   //
   // Add terminating NULL
   //
@@ -1341,20 +1337,20 @@ Base64Encode (
 RETURN_STATUS
 EFIAPI
 Base64Decode (
-  IN     CONST CHAR8 *Source          OPTIONAL,
-  IN     UINTN       SourceSize,
-  OUT    UINT8       *Destination     OPTIONAL,
-  IN OUT UINTN       *DestinationSize
+  IN     CONST CHAR8  *Source          OPTIONAL,
+  IN     UINTN        SourceSize,
+  OUT    UINT8        *Destination     OPTIONAL,
+  IN OUT UINTN        *DestinationSize
   )
 {
-  BOOLEAN PaddingMode;
-  UINTN   SixBitGroupsConsumed;
-  UINT32  Accumulator;
-  UINTN   OriginalDestinationSize;
-  UINTN   SourceIndex;
-  CHAR8   SourceChar;
-  UINT32  Base64Value;
-  UINT8   DestinationOctet;
+  BOOLEAN  PaddingMode;
+  UINTN    SixBitGroupsConsumed;
+  UINT32   Accumulator;
+  UINTN    OriginalDestinationSize;
+  UINTN    SourceIndex;
+  CHAR8    SourceChar;
+  UINT32   Base64Value;
+  UINT8    DestinationOctet;
 
   if (DestinationSize == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -1397,7 +1393,7 @@ Base64Decode (
   //
   // Check for overlap.
   //
-  if (Source != NULL && Destination != NULL) {
+  if ((Source != NULL) && (Destination != NULL)) {
     //
     // Both arrays have been provided, and we know from earlier that each array
     // is valid in itself.
@@ -1436,8 +1432,9 @@ Base64Decode (
     //
     // Whitespace is ignored at all positions (regardless of padding mode).
     //
-    if (SourceChar == '\t' || SourceChar == '\n' || SourceChar == '\v' ||
-        SourceChar == '\f' || SourceChar == '\r' || SourceChar == ' ') {
+    if ((SourceChar == '\t') || (SourceChar == '\n') || (SourceChar == '\v') ||
+        (SourceChar == '\f') || (SourceChar == '\r') || (SourceChar == ' '))
+    {
       continue;
     }
 
@@ -1451,10 +1448,11 @@ Base64Decode (
     //     "=" padding characters.
     //
     if (PaddingMode) {
-      if (SourceChar == '=' && SixBitGroupsConsumed == 3) {
+      if ((SourceChar == '=') && (SixBitGroupsConsumed == 3)) {
         SixBitGroupsConsumed = 0;
         continue;
       }
+
       return RETURN_INVALID_PARAMETER;
     }
 
@@ -1462,11 +1460,11 @@ Base64Decode (
     // When not in padding mode, decode Base64Value based on RFC4648, "Table 1:
     // The Base 64 Alphabet".
     //
-    if ('A' <= SourceChar && SourceChar <= 'Z') {
+    if (('A' <= SourceChar) && (SourceChar <= 'Z')) {
       Base64Value = SourceChar - 'A';
-    } else if ('a' <= SourceChar && SourceChar <= 'z') {
+    } else if (('a' <= SourceChar) && (SourceChar <= 'z')) {
       Base64Value = 26 + (SourceChar - 'a');
-    } else if ('0' <= SourceChar && SourceChar <= '9') {
+    } else if (('0' <= SourceChar) && (SourceChar <= '9')) {
       Base64Value = 52 + (SourceChar - '0');
     } else if (SourceChar == '+') {
       Base64Value = 62;
@@ -1530,38 +1528,38 @@ Base64Decode (
     Accumulator = (Accumulator << 6) | Base64Value;
     SixBitGroupsConsumed++;
     switch (SixBitGroupsConsumed) {
-    case 1:
-      //
-      // No octet to spill after consuming the first 6-bit group of the
-      // quantum; advance to the next source character.
-      //
-      continue;
-    case 2:
-      //
-      // 12 bits accumulated (6 pending + 6 new); prepare for spilling an
-      // octet. 4 bits remain pending.
-      //
-      DestinationOctet = (UINT8)(Accumulator >> 4);
-      Accumulator &= 0xF;
-      break;
-    case 3:
-      //
-      // 10 bits accumulated (4 pending + 6 new); prepare for spilling an
-      // octet. 2 bits remain pending.
-      //
-      DestinationOctet = (UINT8)(Accumulator >> 2);
-      Accumulator &= 0x3;
-      break;
-    default:
-      ASSERT (SixBitGroupsConsumed == 4);
-      //
-      // 8 bits accumulated (2 pending + 6 new); prepare for spilling an octet.
-      // The quantum is complete, 0 bits remain pending.
-      //
-      DestinationOctet = (UINT8)Accumulator;
-      Accumulator = 0;
-      SixBitGroupsConsumed = 0;
-      break;
+      case 1:
+        //
+        // No octet to spill after consuming the first 6-bit group of the
+        // quantum; advance to the next source character.
+        //
+        continue;
+      case 2:
+        //
+        // 12 bits accumulated (6 pending + 6 new); prepare for spilling an
+        // octet. 4 bits remain pending.
+        //
+        DestinationOctet = (UINT8)(Accumulator >> 4);
+        Accumulator     &= 0xF;
+        break;
+      case 3:
+        //
+        // 10 bits accumulated (4 pending + 6 new); prepare for spilling an
+        // octet. 2 bits remain pending.
+        //
+        DestinationOctet = (UINT8)(Accumulator >> 2);
+        Accumulator     &= 0x3;
+        break;
+      default:
+        ASSERT (SixBitGroupsConsumed == 4);
+        //
+        // 8 bits accumulated (2 pending + 6 new); prepare for spilling an octet.
+        // The quantum is complete, 0 bits remain pending.
+        //
+        DestinationOctet     = (UINT8)Accumulator;
+        Accumulator          = 0;
+        SixBitGroupsConsumed = 0;
+        break;
     }
 
     //
@@ -1572,6 +1570,7 @@ Base64Decode (
       ASSERT (Destination != NULL);
       Destination[*DestinationSize] = DestinationOctet;
     }
+
     (*DestinationSize)++;
 
     //
@@ -1592,6 +1591,7 @@ Base64Decode (
   if (*DestinationSize <= OriginalDestinationSize) {
     return RETURN_SUCCESS;
   }
+
   return RETURN_BUFFER_TOO_SMALL;
 }
 
@@ -1611,11 +1611,11 @@ Base64Decode (
 UINT8
 EFIAPI
 DecimalToBcd8 (
-  IN      UINT8                     Value
+  IN      UINT8  Value
   )
 {
   ASSERT (Value < 100);
-  return (UINT8) (((Value / 10) << 4) | (Value % 10));
+  return (UINT8)(((Value / 10) << 4) | (Value % 10));
 }
 
 /**
@@ -1635,10 +1635,10 @@ DecimalToBcd8 (
 UINT8
 EFIAPI
 BcdToDecimal8 (
-  IN      UINT8                     Value
+  IN      UINT8  Value
   )
 {
   ASSERT (Value < 0xa0);
   ASSERT ((Value & 0xf) < 0xa);
-  return (UINT8) ((Value >> 4) * 10 + (Value & 0xf));
+  return (UINT8)((Value >> 4) * 10 + (Value & 0xf));
 }

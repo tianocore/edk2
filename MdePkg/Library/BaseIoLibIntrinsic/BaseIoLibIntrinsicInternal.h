@@ -10,8 +10,6 @@
 #ifndef __BASEIOLIB_INTRINSIC_INTERNAL_H_
 #define __BASEIOLIB_INTRINSIC_INTERNAL_H_
 
-
-
 #include <Base.h>
 
 #include <Library/IoLib.h>

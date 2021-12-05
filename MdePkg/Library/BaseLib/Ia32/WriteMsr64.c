@@ -6,7 +6,6 @@
 
 **/
 
-
 #include <Library/RegisterFilterLib.h>
 
 /**
@@ -33,7 +32,7 @@ AsmWriteMsr64 (
   IN UINT64  Value
   )
 {
-  BOOLEAN                           Flag;
+  BOOLEAN  Flag;
 
   Flag = FilterBeforeMsrWrite (Index, &Value);
   if (Flag) {
@@ -44,8 +43,8 @@ AsmWriteMsr64 (
       wrmsr
     }
   }
+
   FilterAfterMsrWrite (Index, &Value);
 
   return Value;
 }
-

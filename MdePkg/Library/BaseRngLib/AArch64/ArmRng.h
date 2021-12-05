@@ -24,7 +24,7 @@
 BOOLEAN
 EFIAPI
 ArmRndr (
-  OUT UINT64 *Rand
+  OUT UINT64  *Rand
   );
 
 /**

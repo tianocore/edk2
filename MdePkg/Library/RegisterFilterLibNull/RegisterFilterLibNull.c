@@ -81,13 +81,13 @@ FilterBeforeIoWrite (
   return TRUE;
 }
 
-  /**
-  Trace IO Write operation after wirte IO port.
-  It is used to trace IO operation.
+/**
+Trace IO Write operation after wirte IO port.
+It is used to trace IO operation.
 
-  @param[in]       Width    Signifies the width of the I/O operation.
-  @param[in]       Address  The base address of the I/O operation.
-  @param[in]       Buffer   The source buffer from which to Write data.
+@param[in]       Width    Signifies the width of the I/O operation.
+@param[in]       Address  The base address of the I/O operation.
+@param[in]       Buffer   The source buffer from which to Write data.
 
 **/
 VOID
@@ -205,8 +205,8 @@ FilterAfterMmIoWrite (
 BOOLEAN
 EFIAPI
 FilterBeforeMsrRead (
-  IN UINT32        Index,
-  IN OUT UINT64    *Value
+  IN UINT32      Index,
+  IN OUT UINT64  *Value
   )
 {
   return TRUE;
@@ -222,8 +222,8 @@ FilterBeforeMsrRead (
 VOID
 EFIAPI
 FilterAfterMsrRead (
-  IN UINT32    Index,
-  IN UINT64    *Value
+  IN UINT32  Index,
+  IN UINT64  *Value
   )
 {
   return;
@@ -245,8 +245,8 @@ FilterAfterMsrRead (
 BOOLEAN
 EFIAPI
 FilterBeforeMsrWrite (
-  IN UINT32    Index,
-  IN UINT64    *Value
+  IN UINT32  Index,
+  IN UINT64  *Value
   )
 {
   return TRUE;
@@ -262,10 +262,9 @@ FilterBeforeMsrWrite (
 VOID
 EFIAPI
 FilterAfterMsrWrite (
-  IN UINT32    Index,
-  IN UINT64    *Value
+  IN UINT32  Index,
+  IN UINT64  *Value
   )
 {
   return;
 }
-

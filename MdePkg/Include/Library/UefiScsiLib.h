@@ -89,10 +89,9 @@ ScsiTestUnitReadyCommand (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData   OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus
   );
-
 
 /**
   Execute Inquiry SCSI command on a specific SCSI target.
@@ -188,13 +187,12 @@ ScsiInquiryCommand (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData   OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *InquiryDataBuffer     OPTIONAL,
   IN OUT UINT32                *InquiryDataLength,
   IN     BOOLEAN               EnableVitalProductData
   );
-
 
 /**
   Execute Inquiry SCSI command on a specific SCSI target.
@@ -292,14 +290,13 @@ ScsiInquiryCommandEx (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData   OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *InquiryDataBuffer     OPTIONAL,
   IN OUT UINT32                *InquiryDataLength,
   IN     BOOLEAN               EnableVitalProductData,
   IN     UINT8                 PageCode
   );
-
 
 /**
   Execute Mode Sense(10) SCSI command on a specific SCSI target.
@@ -393,20 +390,18 @@ ScsiInquiryCommandEx (
 EFI_STATUS
 EFIAPI
 ScsiModeSense10Command (
-  IN     EFI_SCSI_IO_PROTOCOL    *ScsiIo,
-  IN     UINT64                  Timeout,
-  IN OUT VOID                    *SenseData   OPTIONAL,
-  IN OUT UINT8                   *SenseDataLength,
-     OUT UINT8                   *HostAdapterStatus,
-     OUT UINT8                   *TargetStatus,
-  IN OUT VOID                    *DataBuffer  OPTIONAL,
-  IN OUT UINT32                  *DataLength,
-  IN     UINT8                   DBDField     OPTIONAL,
-  IN     UINT8                   PageControl,
-  IN     UINT8                   PageCode
+  IN     EFI_SCSI_IO_PROTOCOL  *ScsiIo,
+  IN     UINT64                Timeout,
+  IN OUT VOID                  *SenseData   OPTIONAL,
+  IN OUT UINT8                 *SenseDataLength,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
+  IN OUT VOID                  *DataBuffer  OPTIONAL,
+  IN OUT UINT32                *DataLength,
+  IN     UINT8                 DBDField     OPTIONAL,
+  IN     UINT8                 PageControl,
+  IN     UINT8                 PageCode
   );
-
-
 
 /**
   Execute Request Sense SCSI command on a specific SCSI target.
@@ -447,10 +442,9 @@ ScsiRequestSenseCommand (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData   OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus
   );
-
 
 /**
   Execute Read Capacity SCSI command on a specific SCSI target.
@@ -503,13 +497,12 @@ ScsiReadCapacityCommand (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData     OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *DataBuffer    OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     BOOLEAN               Pmi
   );
-
 
 /**
   Execute Read Capacity SCSI 16 command on a specific SCSI target.
@@ -562,13 +555,12 @@ ScsiReadCapacity16Command (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData   OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *DataBuffer  OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     BOOLEAN               Pmi
   );
-
 
 /**
   Execute Read(10) SCSI command on a specific SCSI target.
@@ -622,14 +614,13 @@ ScsiRead10Command (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
   IN     UINT32                SectorSize
   );
-
 
 /**
   Execute Write(10) SCSI command on a specific SCSI target.
@@ -683,8 +674,8 @@ ScsiWrite10Command (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
@@ -743,14 +734,13 @@ ScsiRead16Command (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
   IN     UINT32                SectorSize
   );
-
 
 /**
   Execute Write(16) SCSI command on a specific SCSI target.
@@ -804,14 +794,13 @@ ScsiWrite16Command (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
   IN     UINT32                SectorSize
   );
-
 
 /**
   Execute Security Protocol In SCSI command on a specific SCSI target.
@@ -868,16 +857,15 @@ ScsiSecurityProtocolInCommand (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN     UINT8                 SecurityProtocol,
   IN     UINT16                SecurityProtocolSpecific,
   IN     BOOLEAN               Inc512,
   IN     UINTN                 DataLength,
   IN OUT VOID                  *DataBuffer   OPTIONAL,
-     OUT UINTN                 *TransferLength
+  OUT UINTN                    *TransferLength
   );
-
 
 /**
   Execute Security Protocol Out SCSI command on a specific SCSI target.
@@ -931,15 +919,14 @@ ScsiSecurityProtocolOutCommand (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN     UINT8                 SecurityProtocol,
   IN     UINT16                SecurityProtocolSpecific,
   IN     BOOLEAN               Inc512,
   IN     UINTN                 DataLength,
   IN OUT VOID                  *DataBuffer   OPTIONAL
   );
-
 
 /**
   Execute blocking/non-blocking Read(10) SCSI command on a specific SCSI
@@ -1021,15 +1008,14 @@ ScsiRead10CommandEx (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
   IN     UINT32                SectorSize,
   IN     EFI_EVENT             Event         OPTIONAL
   );
-
 
 /**
   Execute blocking/non-blocking Write(10) SCSI command on a specific SCSI
@@ -1111,15 +1097,14 @@ ScsiWrite10CommandEx (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
   IN     UINT32                SectorSize,
   IN     EFI_EVENT             Event         OPTIONAL
   );
-
 
 /**
   Execute blocking/non-blocking Read(16) SCSI command on a specific SCSI
@@ -1201,15 +1186,14 @@ ScsiRead16CommandEx (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
   IN     UINT32                SectorSize,
   IN     EFI_EVENT             Event         OPTIONAL
   );
-
 
 /**
   Execute blocking/non-blocking Write(16) SCSI command on a specific SCSI
@@ -1291,8 +1275,8 @@ ScsiWrite16CommandEx (
   IN     UINT64                Timeout,
   IN OUT VOID                  *SenseData    OPTIONAL,
   IN OUT UINT8                 *SenseDataLength,
-     OUT UINT8                 *HostAdapterStatus,
-     OUT UINT8                 *TargetStatus,
+  OUT UINT8                    *HostAdapterStatus,
+  OUT UINT8                    *TargetStatus,
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,

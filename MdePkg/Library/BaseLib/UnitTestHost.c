@@ -11,7 +11,7 @@
 ///
 /// Module global variable for simple system emulation of interrupt state
 ///
-STATIC BOOLEAN          mUnitTestHostBaseLibInterruptState;
+STATIC BOOLEAN  mUnitTestHostBaseLibInterruptState;
 
 /**
   Enables CPU interrupts.

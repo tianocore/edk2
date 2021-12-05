@@ -18,7 +18,7 @@
     0xC88B0B6D, 0x0DFC, 0x49A7, {0x9C, 0xB4, 0x49, 0x07, 0x4B, 0x4C, 0x3A, 0x78 } \
   }
 
-typedef struct _EFI_STORAGE_SECURITY_COMMAND_PROTOCOL  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL;
+typedef struct _EFI_STORAGE_SECURITY_COMMAND_PROTOCOL EFI_STORAGE_SECURITY_COMMAND_PROTOCOL;
 
 /**
   Send a security protocol command to a device that receives data and/or the result
@@ -166,7 +166,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_STORAGE_SECURITY_SEND_DATA) (
+(EFIAPI *EFI_STORAGE_SECURITY_SEND_DATA)(
   IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
   IN UINT32                                   MediaId,
   IN UINT64                                   Timeout,
@@ -174,7 +174,7 @@ EFI_STATUS
   IN UINT16                                   SecurityProtocolSpecificData,
   IN UINTN                                    PayloadBufferSize,
   IN VOID                                     *PayloadBuffer
-);
+  );
 
 ///
 /// The EFI_STORAGE_SECURITY_COMMAND_PROTOCOL is used to send security protocol
@@ -197,10 +197,10 @@ EFI_STATUS
 /// or their successors.
 ///
 struct _EFI_STORAGE_SECURITY_COMMAND_PROTOCOL {
-  EFI_STORAGE_SECURITY_RECEIVE_DATA ReceiveData;
-  EFI_STORAGE_SECURITY_SEND_DATA    SendData;
+  EFI_STORAGE_SECURITY_RECEIVE_DATA    ReceiveData;
+  EFI_STORAGE_SECURITY_SEND_DATA       SendData;
 };
 
-extern EFI_GUID gEfiStorageSecurityCommandProtocolGuid;
+extern EFI_GUID  gEfiStorageSecurityCommandProtocolGuid;
 
 #endif

@@ -17,12 +17,12 @@
 #include "ArmRng.h"
 #include "BaseRngLibInternals.h"
 
-STATIC BOOLEAN mRndrSupported;
+STATIC BOOLEAN  mRndrSupported;
 
 //
 // Bit mask used to determine if RNDR instruction is supported.
 //
-#define RNDR_MASK                  ((UINT64)MAX_UINT16 << 60U)
+#define RNDR_MASK  ((UINT64)MAX_UINT16 << 60U)
 
 /**
   The constructor function checks whether or not RNDR instruction is supported
@@ -41,7 +41,8 @@ BaseRngLibConstructor (
   VOID
   )
 {
-  UINT64 Isar0;
+  UINT64  Isar0;
+
   //
   // Determine RNDR support by examining bits 63:60 of the ISAR0 register returned by
   // MSR. A non-zero value indicates that the processor supports the RNDR instruction.
@@ -66,10 +67,10 @@ BaseRngLibConstructor (
 BOOLEAN
 EFIAPI
 ArchGetRandomNumber16 (
-  OUT     UINT16                    *Rand
+  OUT     UINT16  *Rand
   )
 {
-  UINT64 Rand64;
+  UINT64  Rand64;
 
   if (ArchGetRandomNumber64 (&Rand64)) {
     *Rand = Rand64 & MAX_UINT16;
@@ -91,10 +92,10 @@ ArchGetRandomNumber16 (
 BOOLEAN
 EFIAPI
 ArchGetRandomNumber32 (
-  OUT     UINT32                    *Rand
+  OUT     UINT32  *Rand
   )
 {
-  UINT64 Rand64;
+  UINT64  Rand64;
 
   if (ArchGetRandomNumber64 (&Rand64)) {
     *Rand = Rand64 & MAX_UINT32;
@@ -116,7 +117,7 @@ ArchGetRandomNumber32 (
 BOOLEAN
 EFIAPI
 ArchGetRandomNumber64 (
-  OUT     UINT64                    *Rand
+  OUT     UINT64  *Rand
   )
 {
   return ArmRndr (Rand);

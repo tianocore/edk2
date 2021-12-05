@@ -96,7 +96,7 @@ PeriodicSmiYield (
 **/
 typedef
 VOID
-(EFIAPI *PERIODIC_SMI_LIBRARY_HANDLER) (
+(EFIAPI *PERIODIC_SMI_LIBRARY_HANDLER)(
   IN CONST VOID  *Context OPTIONAL,
   IN UINT64      ElapsedTime
   );

@@ -45,11 +45,11 @@ typedef enum {
 /// The dispatch function's context
 ///
 typedef struct {
-  EFI_SLEEP_TYPE  Type;
-  EFI_SLEEP_PHASE Phase;
+  EFI_SLEEP_TYPE     Type;
+  EFI_SLEEP_PHASE    Phase;
 } EFI_MM_SX_REGISTER_CONTEXT;
 
-typedef struct _EFI_MM_SX_DISPATCH_PROTOCOL  EFI_MM_SX_DISPATCH_PROTOCOL;
+typedef struct _EFI_MM_SX_DISPATCH_PROTOCOL EFI_MM_SX_DISPATCH_PROTOCOL;
 
 /**
   Provides the parent dispatch service for a given Sx source generator.
@@ -120,10 +120,10 @@ EFI_STATUS
 /// respond to sleep state related events.
 ///
 struct _EFI_MM_SX_DISPATCH_PROTOCOL {
-  EFI_MM_SX_REGISTER    Register;
-  EFI_MM_SX_UNREGISTER  UnRegister;
+  EFI_MM_SX_REGISTER      Register;
+  EFI_MM_SX_UNREGISTER    UnRegister;
 };
 
-extern EFI_GUID gEfiMmSxDispatchProtocolGuid;
+extern EFI_GUID  gEfiMmSxDispatchProtocolGuid;
 
 #endif

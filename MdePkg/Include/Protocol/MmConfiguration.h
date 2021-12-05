@@ -21,7 +21,7 @@
     0x26eeb3de, 0xb689, 0x492e, {0x80, 0xf0, 0xbe, 0x8b, 0xd7, 0xda, 0x4b, 0xa7 }  \
   }
 
-typedef struct _EFI_MM_CONFIGURATION_PROTOCOL  EFI_MM_CONFIGURATION_PROTOCOL;
+typedef struct _EFI_MM_CONFIGURATION_PROTOCOL EFI_MM_CONFIGURATION_PROTOCOL;
 
 /**
   Register the MM Foundation entry point.
@@ -54,11 +54,10 @@ struct _EFI_MM_CONFIGURATION_PROTOCOL {
   ///
   /// A pointer to an array MMRAM ranges used by the initial MM entry code.
   ///
-  EFI_MM_RESERVED_MMRAM_REGION  *MmramReservedRegions;
-  EFI_MM_REGISTER_MM_ENTRY      RegisterMmEntry;
+  EFI_MM_RESERVED_MMRAM_REGION    *MmramReservedRegions;
+  EFI_MM_REGISTER_MM_ENTRY        RegisterMmEntry;
 };
 
-extern EFI_GUID gEfiMmConfigurationProtocolGuid;
+extern EFI_GUID  gEfiMmConfigurationProtocolGuid;
 
 #endif
-

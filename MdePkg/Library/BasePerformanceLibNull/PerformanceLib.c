@@ -6,9 +6,7 @@
 
 **/
 
-
 #include <Base.h>
-
 
 #include <Library/PerformanceLib.h>
 #include <Library/DebugLib.h>
@@ -124,12 +122,12 @@ EndPerformanceMeasurement (
 UINTN
 EFIAPI
 GetPerformanceMeasurement (
-  IN  UINTN       LogEntryKey,
-  OUT CONST VOID  **Handle,
-  OUT CONST CHAR8 **Token,
-  OUT CONST CHAR8 **Module,
-  OUT UINT64      *StartTimeStamp,
-  OUT UINT64      *EndTimeStamp
+  IN  UINTN        LogEntryKey,
+  OUT CONST VOID   **Handle,
+  OUT CONST CHAR8  **Token,
+  OUT CONST CHAR8  **Module,
+  OUT UINT64       *StartTimeStamp,
+  OUT UINT64       *EndTimeStamp
   )
 {
   ASSERT (Handle != NULL);
@@ -259,13 +257,13 @@ EndPerformanceMeasurementEx (
 UINTN
 EFIAPI
 GetPerformanceMeasurementEx (
-  IN  UINTN       LogEntryKey,
-  OUT CONST VOID  **Handle,
-  OUT CONST CHAR8 **Token,
-  OUT CONST CHAR8 **Module,
-  OUT UINT64      *StartTimeStamp,
-  OUT UINT64      *EndTimeStamp,
-  OUT UINT32      *Identifier
+  IN  UINTN        LogEntryKey,
+  OUT CONST VOID   **Handle,
+  OUT CONST CHAR8  **Token,
+  OUT CONST CHAR8  **Module,
+  OUT UINT64       *StartTimeStamp,
+  OUT UINT64       *EndTimeStamp,
+  OUT UINT32       *Identifier
   )
 {
   ASSERT (Handle != NULL);
@@ -296,7 +294,7 @@ PerformanceMeasurementEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
 }
 
 /**
@@ -342,14 +340,15 @@ LogPerformanceMeasurement (
 BOOLEAN
 EFIAPI
 LogPerformanceMeasurementEnabled (
-  IN  CONST UINTN        Type
+  IN  CONST UINTN  Type
   )
 {
   //
   // When Performance measurement is enabled and the type is not filtered, the performance can be logged.
   //
-  if (PerformanceMeasurementEnabled () && (PcdGet8(PcdPerformanceLibraryPropertyMask) & Type) == 0) {
+  if (PerformanceMeasurementEnabled () && ((PcdGet8 (PcdPerformanceLibraryPropertyMask) & Type) == 0)) {
     return TRUE;
   }
+
   return FALSE;
 }

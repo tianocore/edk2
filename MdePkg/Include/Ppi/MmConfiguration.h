@@ -21,7 +21,7 @@
     0xc109319, 0xc149, 0x450e, { 0xa3, 0xe3, 0xb9, 0xba, 0xdd, 0x9d, 0xc3, 0xa4 }  \
   }
 
-typedef struct _EFI_PEI_MM_CONFIGURATION_PPI  EFI_PEI_MM_CONFIGURATION_PPI;
+typedef struct _EFI_PEI_MM_CONFIGURATION_PPI EFI_PEI_MM_CONFIGURATION_PPI;
 
 /**
   This function registers the MM Foundation entry point with the processor code. This entry point will be
@@ -35,7 +35,7 @@ typedef struct _EFI_PEI_MM_CONFIGURATION_PPI  EFI_PEI_MM_CONFIGURATION_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_PEI_MM_REGISTER_MM_ENTRY) (
+(EFIAPI *EFI_PEI_MM_REGISTER_MM_ENTRY)(
   IN CONST EFI_PEI_MM_CONFIGURATION_PPI *This,
   IN EFI_MM_ENTRY_POINT                 MmEntryPoint
   );
@@ -53,10 +53,10 @@ EFI_STATUS
 /// MM entry vector code.
 ///
 struct _EFI_PEI_MM_CONFIGURATION_PPI {
-  EFI_MM_RESERVED_MMRAM_REGION  *MmramReservedRegions;
-  EFI_PEI_MM_REGISTER_MM_ENTRY  RegisterMmEntry;
+  EFI_MM_RESERVED_MMRAM_REGION    *MmramReservedRegions;
+  EFI_PEI_MM_REGISTER_MM_ENTRY    RegisterMmEntry;
 };
 
-extern EFI_GUID gEfiPeiMmConfigurationPpi;
+extern EFI_GUID  gEfiPeiMmConfigurationPpi;
 
 #endif

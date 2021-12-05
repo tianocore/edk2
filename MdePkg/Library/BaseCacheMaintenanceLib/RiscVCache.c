@@ -72,11 +72,11 @@ InvalidateInstructionCache (
 VOID *
 EFIAPI
 InvalidateInstructionCacheRange (
-  IN VOID *Address,
-  IN UINTN Length
+  IN VOID   *Address,
+  IN UINTN  Length
   )
 {
-  DEBUG((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
   return Address;
 }
 
@@ -96,7 +96,7 @@ WriteBackInvalidateDataCache (
   VOID
   )
 {
-  DEBUG((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
 }
 
 /**
@@ -128,11 +128,11 @@ WriteBackInvalidateDataCache (
 VOID *
 EFIAPI
 WriteBackInvalidateDataCacheRange (
-  IN      VOID                      *Address,
-  IN      UINTN                     Length
+  IN      VOID   *Address,
+  IN      UINTN  Length
   )
 {
-  DEBUG((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
   return Address;
 }
 
@@ -152,7 +152,7 @@ WriteBackDataCache (
   VOID
   )
 {
-  DEBUG((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
 }
 
 /**
@@ -183,11 +183,11 @@ WriteBackDataCache (
 VOID *
 EFIAPI
 WriteBackDataCacheRange (
-  IN      VOID                      *Address,
-  IN      UINTN                     Length
+  IN      VOID   *Address,
+  IN      UINTN  Length
   )
 {
-  DEBUG((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
   return Address;
 }
 
@@ -241,10 +241,10 @@ InvalidateDataCache (
 VOID *
 EFIAPI
 InvalidateDataCacheRange (
-  IN      VOID                      *Address,
-  IN      UINTN                     Length
+  IN      VOID   *Address,
+  IN      UINTN  Length
   )
 {
-  DEBUG((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
   return Address;
 }
