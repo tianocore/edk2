@@ -20,10 +20,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define TCG2_PHYSICAL_PRESENCE_VARIABLE  L"Tcg2PhysicalPresence"
 
 typedef struct {
-  UINT8   PPRequest;      ///< Physical Presence request command.
-  UINT32  PPRequestParameter; ///< Physical Presence request Parameter.
-  UINT8   LastPPRequest;
-  UINT32  PPResponse;
+  UINT8     PPRequest;          ///< Physical Presence request command.
+  UINT32    PPRequestParameter; ///< Physical Presence request Parameter.
+  UINT8     LastPPRequest;
+  UINT32    PPResponse;
 } EFI_TCG2_PHYSICAL_PRESENCE;
 
 //
@@ -32,10 +32,9 @@ typedef struct {
 //
 #define TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE  L"Tcg2PhysicalPresenceFlags"
 typedef struct {
-  UINT32  PPFlags;
+  UINT32    PPFlags;
 } EFI_TCG2_PHYSICAL_PRESENCE_FLAGS;
 
 extern EFI_GUID  gEfiTcg2PhysicalPresenceGuid;
 
 #endif
-
