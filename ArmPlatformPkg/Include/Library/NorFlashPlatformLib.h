@@ -10,10 +10,10 @@
 #define _NORFLASHPLATFORMLIB_H_
 
 typedef struct {
-  UINTN       DeviceBaseAddress;    // Start address of the Device Base Address (DBA)
-  UINTN       RegionBaseAddress;    // Start address of one single region
-  UINTN       Size;
-  UINTN       BlockSize;
+  UINTN    DeviceBaseAddress;       // Start address of the Device Base Address (DBA)
+  UINTN    RegionBaseAddress;       // Start address of one single region
+  UINTN    Size;
+  UINTN    BlockSize;
 } NOR_FLASH_DESCRIPTION;
 
 EFI_STATUS
@@ -23,8 +23,8 @@ NorFlashPlatformInitialization (
 
 EFI_STATUS
 NorFlashPlatformGetDevices (
-  OUT NOR_FLASH_DESCRIPTION   **NorFlashDescriptions,
-  OUT UINT32                  *Count
+  OUT NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
+  OUT UINT32                 *Count
   );
 
 #endif /* _NORFLASHPLATFORMLIB_H_ */
