@@ -23,9 +23,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 AesEncrypt (
-  IN  UINT8        *Key,
-  IN  UINT8        *InData,
-  OUT UINT8        *OutData
+  IN  UINT8  *Key,
+  IN  UINT8  *InData,
+  OUT UINT8  *OutData
   );
 
-#endif  // __AES_CORE_H__
+#endif // __AES_CORE_H__
