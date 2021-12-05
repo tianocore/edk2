@@ -6,20 +6,19 @@
 
 **/
 
-
 #include "UefiShellDebug1CommandsLib.h"
 #include <Guid/SmBios.h>
 #include "LibSmbiosView.h"
 #include "SmbiosView.h"
 
-STATIC UINT8                    mInit         = 0;
-STATIC UINT8                    m64Init       = 0;
-STATIC SMBIOS_TABLE_ENTRY_POINT     *mSmbiosTable   = NULL;
-STATIC SMBIOS_TABLE_3_0_ENTRY_POINT *mSmbios64BitTable = NULL;
-STATIC SMBIOS_STRUCTURE_POINTER m_SmbiosStruct;
-STATIC SMBIOS_STRUCTURE_POINTER *mSmbiosStruct = &m_SmbiosStruct;
-STATIC SMBIOS_STRUCTURE_POINTER m_Smbios64BitStruct;
-STATIC SMBIOS_STRUCTURE_POINTER *mSmbios64BitStruct = &m_Smbios64BitStruct;
+STATIC UINT8                         mInit              = 0;
+STATIC UINT8                         m64Init            = 0;
+STATIC SMBIOS_TABLE_ENTRY_POINT      *mSmbiosTable      = NULL;
+STATIC SMBIOS_TABLE_3_0_ENTRY_POINT  *mSmbios64BitTable = NULL;
+STATIC SMBIOS_STRUCTURE_POINTER      m_SmbiosStruct;
+STATIC SMBIOS_STRUCTURE_POINTER      *mSmbiosStruct = &m_SmbiosStruct;
+STATIC SMBIOS_STRUCTURE_POINTER      m_Smbios64BitStruct;
+STATIC SMBIOS_STRUCTURE_POINTER      *mSmbios64BitStruct = &m_Smbios64BitStruct;
 
 /**
   Init the SMBIOS VIEW API's environment.
@@ -39,25 +38,27 @@ LibSmbiosInit (
   if (mInit == 1) {
     return EFI_SUCCESS;
   }
+
   //
   // Get SMBIOS table from System Configure table
   //
-  Status = GetSystemConfigurationTable (&gEfiSmbiosTableGuid, (VOID**)&mSmbiosTable);
+  Status = GetSystemConfigurationTable (&gEfiSmbiosTableGuid, (VOID **)&mSmbiosTable);
 
   if (mSmbiosTable == NULL) {
     return EFI_NOT_FOUND;
   }
 
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_GET_TABLE_ERROR), gShellDebug1HiiHandle, Status);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_GET_TABLE_ERROR), gShellDebug1HiiHandle, Status);
     return Status;
   }
+
   //
   // Init SMBIOS structure table address
   //
-  mSmbiosStruct->Raw  = (UINT8 *) (UINTN) (mSmbiosTable->TableAddress);
+  mSmbiosStruct->Raw = (UINT8 *)(UINTN)(mSmbiosTable->TableAddress);
 
-  mInit               = 1;
+  mInit = 1;
   return EFI_SUCCESS;
 }
 
@@ -79,25 +80,27 @@ LibSmbios64BitInit (
   if (m64Init == 1) {
     return EFI_SUCCESS;
   }
+
   //
   // Get SMBIOS table from System Configure table
   //
-  Status = GetSystemConfigurationTable (&gEfiSmbios3TableGuid, (VOID**)&mSmbios64BitTable);
+  Status = GetSystemConfigurationTable (&gEfiSmbios3TableGuid, (VOID **)&mSmbios64BitTable);
 
   if (mSmbios64BitTable == NULL) {
     return EFI_NOT_FOUND;
   }
 
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_GET_TABLE_ERROR), gShellDebug1HiiHandle, Status);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_GET_TABLE_ERROR), gShellDebug1HiiHandle, Status);
     return Status;
   }
+
   //
   // Init SMBIOS structure table address
   //
-  mSmbios64BitStruct->Raw  = (UINT8 *) (UINTN) (mSmbios64BitTable->TableAddress);
+  mSmbios64BitStruct->Raw = (UINT8 *)(UINTN)(mSmbios64BitTable->TableAddress);
 
-  m64Init               = 1;
+  m64Init = 1;
   return EFI_SUCCESS;
 }
 
@@ -144,7 +147,7 @@ LibSmbios64BitCleanup (
 **/
 VOID
 LibSmbiosGetEPS (
-  OUT SMBIOS_TABLE_ENTRY_POINT **EntryPointStructure
+  OUT SMBIOS_TABLE_ENTRY_POINT  **EntryPointStructure
   )
 {
   //
@@ -160,7 +163,7 @@ LibSmbiosGetEPS (
 **/
 VOID
 LibSmbios64BitGetEPS (
-  OUT SMBIOS_TABLE_3_0_ENTRY_POINT **EntryPointStructure
+  OUT SMBIOS_TABLE_3_0_ENTRY_POINT  **EntryPointStructure
   )
 {
   //
@@ -178,10 +181,10 @@ LibSmbios64BitGetEPS (
 
   @return Pointer to string, or pointer to next SMBIOS strcuture if StringNumber == -1
 **/
-CHAR8*
+CHAR8 *
 LibGetSmbiosString (
-  IN  SMBIOS_STRUCTURE_POINTER    *Smbios,
-  IN  UINT16                      StringNumber
+  IN  SMBIOS_STRUCTURE_POINTER  *Smbios,
+  IN  UINT16                    StringNumber
   )
 {
   UINT16  Index;
@@ -192,7 +195,7 @@ LibGetSmbiosString (
   //
   // Skip over formatted section
   //
-  String = (CHAR8 *) (Smbios->Raw + Smbios->Hdr->Length);
+  String = (CHAR8 *)(Smbios->Raw + Smbios->Hdr->Length);
 
   //
   // Look through unformated section
@@ -201,10 +204,13 @@ LibGetSmbiosString (
     if (StringNumber == Index) {
       return String;
     }
+
     //
     // Skip string
     //
-    for (; *String != 0; String++);
+    for ( ; *String != 0; String++) {
+    }
+
     String++;
 
     if (*String == 0) {
@@ -254,7 +260,7 @@ LibGetSmbiosStructure (
   }
 
   if ((Buffer == NULL) || (Length == NULL)) {
-    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_NO_BUFF_LEN_SPEC), gShellDebug1HiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_NO_BUFF_LEN_SPEC), gShellDebug1HiiHandle);
     return DMI_INVALID_HANDLE;
   }
 
@@ -267,11 +273,11 @@ LibGetSmbiosStructure (
       //
       // Walk to next structure
       //
-      LibGetSmbiosString (&Smbios, (UINT16) (-1));
+      LibGetSmbiosString (&Smbios, (UINT16)(-1));
       //
       // Length = Next structure head - this structure head
       //
-      *Length = (UINT16) (Smbios.Raw - Raw);
+      *Length = (UINT16)(Smbios.Raw - Raw);
       *Buffer = Raw;
       //
       // update with the next structure handle.
@@ -281,12 +287,14 @@ LibGetSmbiosStructure (
       } else {
         *Handle = INVALID_HANDLE;
       }
+
       return DMI_SUCCESS;
     }
+
     //
     // Walk to next structure
     //
-    LibGetSmbiosString (&Smbios, (UINT16) (-1));
+    LibGetSmbiosString (&Smbios, (UINT16)(-1));
   }
 
   *Handle = INVALID_HANDLE;
@@ -326,12 +334,12 @@ LibGetSmbios64BitStructure (
   }
 
   if ((Buffer == NULL) || (Length == NULL)) {
-    ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_NO_BUFF_LEN_SPEC), gShellDebug1HiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_NO_BUFF_LEN_SPEC), gShellDebug1HiiHandle);
     return DMI_INVALID_HANDLE;
   }
 
-  *Length     = 0;
-  Smbios.Hdr  = mSmbios64BitStruct->Hdr;
+  *Length    = 0;
+  Smbios.Hdr = mSmbios64BitStruct->Hdr;
 
   SmbiosEnd.Raw = Smbios.Raw + mSmbios64BitTableLength;
   while (Smbios.Raw < SmbiosEnd.Raw) {
@@ -340,11 +348,11 @@ LibGetSmbios64BitStructure (
       //
       // Walk to next structure
       //
-      LibGetSmbiosString (&Smbios, (UINT16) (-1));
+      LibGetSmbiosString (&Smbios, (UINT16)(-1));
       //
       // Length = Next structure head - this structure head
       //
-      *Length = (UINT16) (Smbios.Raw - Raw);
+      *Length = (UINT16)(Smbios.Raw - Raw);
       *Buffer = Raw;
       //
       // update with the next structure handle.
@@ -354,12 +362,14 @@ LibGetSmbios64BitStructure (
       } else {
         *Handle = INVALID_HANDLE;
       }
+
       return DMI_SUCCESS;
     }
+
     //
     // Walk to next structure
     //
-    LibGetSmbiosString (&Smbios, (UINT16) (-1));
+    LibGetSmbiosString (&Smbios, (UINT16)(-1));
   }
 
   *Handle = INVALID_HANDLE;

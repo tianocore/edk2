@@ -11,17 +11,17 @@
 /**
   A macro to define the max file name length
 **/
-#define MAX_FILE_NAME_LEN    128
+#define MAX_FILE_NAME_LEN  128
 
 /**
   Offset to the RSDP revision from the start of the RSDP
 **/
-#define RSDP_REVISION_OFFSET 15
+#define RSDP_REVISION_OFFSET  15
 
 /**
   Offset to the RSDP length from the start of the RSDP
 **/
-#define RSDP_LENGTH_OFFSET   20
+#define RSDP_LENGTH_OFFSET  20
 
 /**
   This function resets the ACPI table error counter to Zero.
@@ -71,7 +71,7 @@ GetWarningCount (
 BOOLEAN
 ProcessTableReportOptions (
   IN CONST UINT32  Signature,
-  IN CONST UINT8*  TablePtr,
+  IN CONST UINT8   *TablePtr,
   IN CONST UINT32  Length
   );
 
@@ -88,7 +88,7 @@ ProcessTableReportOptions (
 EFI_STATUS
 EFIAPI
 AcpiView (
-  IN EFI_SYSTEM_TABLE* SystemTable
+  IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
 #endif // ACPIVIEW_H_
