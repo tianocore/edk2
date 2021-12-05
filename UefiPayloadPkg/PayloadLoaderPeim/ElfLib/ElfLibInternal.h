@@ -20,7 +20,6 @@
 #define ELF_NEXT_ENTRY(EntryType, Current, EntrySize) \
               ((EntryType *) ((UINT8 *)Current + EntrySize))
 
-
 /**
   Return the section header specified by Index.
 
@@ -31,8 +30,8 @@
 **/
 Elf32_Shdr *
 GetElf32SectionByIndex (
-  IN  UINT8                 *ImageBase,
-  IN  UINT32                Index
+  IN  UINT8   *ImageBase,
+  IN  UINT32  Index
   );
 
 /**
@@ -45,8 +44,8 @@ GetElf32SectionByIndex (
 **/
 Elf64_Shdr *
 GetElf64SectionByIndex (
-  IN  UINT8                 *ImageBase,
-  IN  UINT32                Index
+  IN  UINT8   *ImageBase,
+  IN  UINT32  Index
   );
 
 /**
@@ -59,8 +58,8 @@ GetElf64SectionByIndex (
 **/
 Elf32_Phdr *
 GetElf32SegmentByIndex (
-  IN  UINT8                 *ImageBase,
-  IN  UINT32                Index
+  IN  UINT8   *ImageBase,
+  IN  UINT32  Index
   );
 
 /**
@@ -73,8 +72,8 @@ GetElf32SegmentByIndex (
 **/
 Elf64_Phdr *
 GetElf64SegmentByIndex (
-  IN  UINT8                 *ImageBase,
-  IN  UINT32                Index
+  IN  UINT8   *ImageBase,
+  IN  UINT32  Index
   );
 
 /**
@@ -88,7 +87,7 @@ GetElf64SegmentByIndex (
 **/
 EFI_STATUS
 LoadElf32Image (
-  IN    ELF_IMAGE_CONTEXT    *ElfCt
+  IN    ELF_IMAGE_CONTEXT  *ElfCt
   );
 
 /**
@@ -103,7 +102,7 @@ LoadElf32Image (
 **/
 EFI_STATUS
 LoadElf64Image (
-  IN    ELF_IMAGE_CONTEXT    *ElfCt
+  IN    ELF_IMAGE_CONTEXT  *ElfCt
   );
 
 #endif
