@@ -23,16 +23,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 BOOLEAN
 FatCheckIs8Dot3Name (
-  IN  CHAR16    *FileName,
-  OUT CHAR8     *File8Dot3Name
+  IN  CHAR16  *FileName,
+  OUT CHAR8   *File8Dot3Name
   )
 {
-  BOOLEAN PossibleShortName;
-  CHAR16  *TempName;
-  CHAR16  *ExtendName;
-  CHAR16  *SeparateDot;
-  UINTN   MainNameLen;
-  UINTN   ExtendNameLen;
+  BOOLEAN  PossibleShortName;
+  CHAR16   *TempName;
+  CHAR16   *ExtendName;
+  CHAR16   *SeparateDot;
+  UINTN    MainNameLen;
+  UINTN    ExtendNameLen;
 
   PossibleShortName = TRUE;
   SeparateDot       = NULL;
@@ -58,12 +58,13 @@ FatCheckIs8Dot3Name (
     ExtendName    = SeparateDot + 1;
     ExtendNameLen = TempName - ExtendName;
   }
+
   //
   // We scan the filename for the second time
   // to check if there exists any extra blanks and dots
   //
   while (--TempName >= FileName) {
-    if ((*TempName == L'.' || *TempName == L' ') && (TempName != SeparateDot)) {
+    if (((*TempName == L'.') || (*TempName == L' ')) && (TempName != SeparateDot)) {
       //
       // There exist extra blanks and dots
       //
@@ -109,8 +110,8 @@ FatCheckIs8Dot3Name (
 STATIC
 UINTN
 FatTrimAsciiTrailingBlanks (
-  IN CHAR8        *Name,
-  IN UINTN        Len
+  IN CHAR8  *Name,
+  IN UINTN  Len
   )
 {
   while (Len > 0 && Name[Len - 1] == ' ') {
@@ -133,10 +134,10 @@ FatTrimAsciiTrailingBlanks (
 **/
 VOID
 FatNameToStr (
-  IN  CHAR8            *FatName,
-  IN  UINTN            Len,
-  IN  UINTN            LowerCase,
-  OUT CHAR16           *Str
+  IN  CHAR8   *FatName,
+  IN  UINTN   Len,
+  IN  UINTN   LowerCase,
+  OUT CHAR16  *Str
   )
 {
   //
@@ -166,20 +167,21 @@ FatNameToStr (
 **/
 VOID
 FatCreate8Dot3Name (
-  IN FAT_OFILE    *Parent,
-  IN FAT_DIRENT   *DirEnt
+  IN FAT_OFILE   *Parent,
+  IN FAT_DIRENT  *DirEnt
   )
 {
-  CHAR8 *ShortName;
-  CHAR8 *ShortNameChar;
-  UINTN BaseTagLen;
-  UINTN Index;
-  UINTN Retry;
-  UINT8 Segment;
+  CHAR8  *ShortName;
+  CHAR8  *ShortNameChar;
+  UINTN  BaseTagLen;
+  UINTN  Index;
+  UINTN  Retry;
+  UINT8  Segment;
+
   union {
-    UINT32  Crc;
+    UINT32    Crc;
     struct HEX_DATA {
-      UINT8 Segment : HASH_VALUE_TAG_LEN;
+      UINT8    Segment : HASH_VALUE_TAG_LEN;
     } Hex[HASH_VALUE_TAG_LEN];
   } HashValue;
   //
@@ -195,13 +197,14 @@ FatCreate8Dot3Name (
   if (BaseTagLen > SPEC_BASE_TAG_LEN) {
     BaseTagLen = SPEC_BASE_TAG_LEN;
   }
+
   //
   // We first use the algorithm described by spec.
   //
-  ShortNameChar     = ShortName + BaseTagLen;
-  *ShortNameChar++  = '~';
-  *ShortNameChar    = '1';
-  Retry = 0;
+  ShortNameChar    = ShortName + BaseTagLen;
+  *ShortNameChar++ = '~';
+  *ShortNameChar   = '1';
+  Retry            = 0;
   while (*FatShortNameHashSearch (Parent->ODir, ShortName) != NULL) {
     *ShortNameChar = (CHAR8)(*ShortNameChar + 1);
     if (++Retry == MAX_SPEC_RETRY) {
@@ -225,8 +228,8 @@ FatCreate8Dot3Name (
         }
       }
 
-      *ShortNameChar++  = '~';
-      *ShortNameChar    = '1';
+      *ShortNameChar++ = '~';
+      *ShortNameChar   = '1';
     }
   }
 }
@@ -245,8 +248,8 @@ FatCreate8Dot3Name (
 STATIC
 UINT8
 FatCheckNameCase (
-  IN CHAR16           *Str,
-  IN UINT8            InCaseFlag
+  IN CHAR16  *Str,
+  IN UINT8   InCaseFlag
   )
 {
   CHAR16  Buffer[FAT_MAIN_NAME_LEN + 1 + FAT_EXTEND_NAME_LEN + 1];
@@ -265,6 +268,7 @@ FatCheckNameCase (
   if (StrCmp (Str, Buffer) == 0) {
     OutCaseFlag = InCaseFlag;
   }
+
   //
   // Upper case a copy of the string, if it matches the
   // original then the string is upper case
@@ -287,7 +291,7 @@ FatCheckNameCase (
 **/
 VOID
 FatSetCaseFlag (
-  IN FAT_DIRENT   *DirEnt
+  IN FAT_DIRENT  *DirEnt
   )
 {
   CHAR16  LfnBuffer[FAT_MAIN_NAME_LEN + 1 + FAT_EXTEND_NAME_LEN + 1];
@@ -342,14 +346,15 @@ FatSetCaseFlag (
 **/
 VOID
 FatGetFileNameViaCaseFlag (
-  IN     FAT_DIRENT   *DirEnt,
-  IN OUT CHAR16       *FileString,
-  IN     UINTN        FileStringMax
+  IN     FAT_DIRENT  *DirEnt,
+  IN OUT CHAR16      *FileString,
+  IN     UINTN       FileStringMax
   )
 {
   UINT8   CaseFlag;
   CHAR8   *File8Dot3Name;
   CHAR16  TempExt[1 + FAT_EXTEND_NAME_LEN + 1];
+
   //
   // Store file extension like ".txt"
   //
@@ -378,8 +383,9 @@ FatCheckSum (
   IN CHAR8  *ShortNameString
   )
 {
-  UINTN ShortNameLen;
-  UINT8 Sum;
+  UINTN  ShortNameLen;
+  UINT8  Sum;
+
   Sum = 0;
   for (ShortNameLen = FAT_NAME_LEN; ShortNameLen != 0; ShortNameLen--) {
     Sum = (UINT8)((((Sum & 1) != 0) ? 0x80 : 0) + (Sum >> 1) + *ShortNameString++);
@@ -402,13 +408,14 @@ FatCheckSum (
 **/
 CHAR16 *
 FatGetNextNameComponent (
-  IN  CHAR16      *Path,
-  OUT CHAR16      *Name
+  IN  CHAR16  *Path,
+  OUT CHAR16  *Name
   )
 {
   while (*Path != 0 && *Path != PATH_NAME_SEPARATOR) {
     *Name++ = *Path++;
   }
+
   *Name = 0;
   //
   // Get off of trailing path name separator
@@ -441,6 +448,7 @@ FatFileNameIsValid (
 {
   CHAR16  *TempNamePointer;
   CHAR16  TempChar;
+
   //
   // Trim Leading blanks
   //
@@ -452,12 +460,13 @@ FatFileNameIsValid (
   while (*InputFileName != 0) {
     *TempNamePointer++ = *InputFileName++;
   }
+
   //
   // Trim Trailing blanks and dots
   //
   while (TempNamePointer > OutputFileName) {
     TempChar = *(TempNamePointer - 1);
-    if (TempChar != L' ' && TempChar != L'.') {
+    if ((TempChar != L' ') && (TempChar != L'.')) {
       break;
     }
 
@@ -475,25 +484,28 @@ FatFileNameIsValid (
   if (TempNamePointer - OutputFileName > EFI_FILE_STRING_LENGTH) {
     return FALSE;
   }
+
   //
   // See if there is any illegal characters within the name
   //
   do {
-    if (*OutputFileName < 0x20 ||
-        *OutputFileName == '\"' ||
-        *OutputFileName == '*' ||
-        *OutputFileName == '/' ||
-        *OutputFileName == ':' ||
-        *OutputFileName == '<' ||
-        *OutputFileName == '>' ||
-        *OutputFileName == '?' ||
-        *OutputFileName == '\\' ||
-        *OutputFileName == '|'
-        ) {
+    if ((*OutputFileName < 0x20) ||
+        (*OutputFileName == '\"') ||
+        (*OutputFileName == '*') ||
+        (*OutputFileName == '/') ||
+        (*OutputFileName == ':') ||
+        (*OutputFileName == '<') ||
+        (*OutputFileName == '>') ||
+        (*OutputFileName == '?') ||
+        (*OutputFileName == '\\') ||
+        (*OutputFileName == '|')
+        )
+    {
       return FALSE;
     }
 
     OutputFileName++;
   } while (*OutputFileName != 0);
+
   return TRUE;
 }

@@ -24,8 +24,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 BOOLEAN
 FatFindEltoritoPartitions (
-  IN  PEI_FAT_PRIVATE_DATA *PrivateData,
-  IN  UINTN                ParentBlockDevNo
+  IN  PEI_FAT_PRIVATE_DATA  *PrivateData,
+  IN  UINTN                 ParentBlockDevNo
   );
 
 /**
@@ -42,8 +42,8 @@ FatFindEltoritoPartitions (
 **/
 BOOLEAN
 FatFindMbrPartitions (
-  IN  PEI_FAT_PRIVATE_DATA *PrivateData,
-  IN  UINTN                ParentBlockDevNo
+  IN  PEI_FAT_PRIVATE_DATA  *PrivateData,
+  IN  UINTN                 ParentBlockDevNo
   );
 
 /**
@@ -61,8 +61,8 @@ FatFindMbrPartitions (
 **/
 BOOLEAN
 FatFindGptPartitions (
-  IN  PEI_FAT_PRIVATE_DATA *PrivateData,
-  IN  UINTN                ParentBlockDevNo
+  IN  PEI_FAT_PRIVATE_DATA  *PrivateData,
+  IN  UINTN                 ParentBlockDevNo
   );
 
 /**
@@ -76,8 +76,8 @@ FatFindPartitions (
   IN  PEI_FAT_PRIVATE_DATA  *PrivateData
   )
 {
-  BOOLEAN Found;
-  UINTN   Index;
+  BOOLEAN  Found;
+  UINTN    Index;
 
   do {
     Found = FALSE;

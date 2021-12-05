@@ -23,9 +23,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // GPT Partition Entry Status
 //
 typedef struct {
-  BOOLEAN OutOfRange;
-  BOOLEAN Overlap;
-  BOOLEAN OsSpecific;
+  BOOLEAN    OutOfRange;
+  BOOLEAN    Overlap;
+  BOOLEAN    OsSpecific;
 } EFI_PARTITION_ENTRY_STATUS;
 
 /**
@@ -42,8 +42,8 @@ PartitionCheckGptHeaderCRC (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHeader
   )
 {
-  UINT32      GptHdrCrc;
-  UINT32      Crc;
+  UINT32  GptHdrCrc;
+  UINT32  Crc;
 
   GptHdrCrc = PartHeader->Header.CRC32;
 
@@ -62,7 +62,6 @@ PartitionCheckGptHeaderCRC (
   return (GptHdrCrc == Crc);
 }
 
-
 /**
   Check if the CRC field in the Partition table header is valid
   for Partition entry array.
@@ -76,17 +75,17 @@ PartitionCheckGptHeaderCRC (
 **/
 BOOLEAN
 PartitionCheckGptEntryArrayCRC (
-  IN  EFI_PARTITION_TABLE_HEADER *PartHeader,
-  IN  EFI_PARTITION_ENTRY        *PartEntry
+  IN  EFI_PARTITION_TABLE_HEADER  *PartHeader,
+  IN  EFI_PARTITION_ENTRY         *PartEntry
   )
 {
-  UINT32      Crc;
-  UINTN       Size;
+  UINT32  Crc;
+  UINTN   Size;
 
-  Size = (UINTN)MultU64x32(PartHeader->NumberOfPartitionEntries, PartHeader->SizeOfPartitionEntry);
+  Size = (UINTN)MultU64x32 (PartHeader->NumberOfPartitionEntries, PartHeader->SizeOfPartitionEntry);
   Crc  = CalculateCrc32 (PartEntry, Size);
 
-  return (BOOLEAN) (PartHeader->PartitionEntryArrayCRC32 == Crc);
+  return (BOOLEAN)(PartHeader->PartitionEntryArrayCRC32 == Crc);
 }
 
 /**
@@ -109,14 +108,14 @@ PartitionCheckGptHeader (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHdr
   )
 {
-  PEI_FAT_BLOCK_DEVICE            *ParentBlockDev;
-  EFI_PEI_LBA                     Lba;
-  EFI_PEI_LBA                     AlternateLba;
-  EFI_PEI_LBA                     EntryArrayLastLba;
+  PEI_FAT_BLOCK_DEVICE  *ParentBlockDev;
+  EFI_PEI_LBA           Lba;
+  EFI_PEI_LBA           AlternateLba;
+  EFI_PEI_LBA           EntryArrayLastLba;
 
-  UINT64                          PartitionEntryArraySize;
-  UINT64                          PartitionEntryBlockNumb;
-  UINT32                          EntryArraySizeRemainder;
+  UINT64  PartitionEntryArraySize;
+  UINT64  PartitionEntryBlockNumb;
+  UINT32  EntryArraySizeRemainder;
 
   ParentBlockDev = &(PrivateData->BlockDevice[ParentBlockDevNo]);
 
@@ -128,13 +127,14 @@ PartitionCheckGptHeader (
     AlternateLba = PRIMARY_PART_HEADER_LBA;
   }
 
-  if ( (PartHdr->Header.Signature != EFI_PTAB_HEADER_ID) ||
-       (PartHdr->Header.Revision != 0x00010000) ||
-       (PartHdr->Header.HeaderSize < 92) ||
-       (PartHdr->Header.HeaderSize > ParentBlockDev->BlockSize) ||
-       (!PartitionCheckGptHeaderCRC (PartHdr)) ||
-       (PartHdr->Header.Reserved != 0)
-     ) {
+  if ((PartHdr->Header.Signature != EFI_PTAB_HEADER_ID) ||
+      (PartHdr->Header.Revision != 0x00010000) ||
+      (PartHdr->Header.HeaderSize < 92) ||
+      (PartHdr->Header.HeaderSize > ParentBlockDev->BlockSize) ||
+      (!PartitionCheckGptHeaderCRC (PartHdr)) ||
+      (PartHdr->Header.Reserved != 0)
+      )
+  {
     DEBUG ((DEBUG_ERROR, "Invalid efi partition table header\n"));
     return FALSE;
   }
@@ -150,17 +150,18 @@ PartitionCheckGptHeader (
   // 5. Must be remain 128*128 bytes for backup entry array.
   // 6. SizeOfPartitionEntry must be equals to 128 * 2^n.
   //
-  if ( (PartHdr->MyLBA != Lba) ||
-       (PartHdr->AlternateLBA != AlternateLba) ||
-       (PartHdr->FirstUsableLBA < 2 + EFI_SIZE_TO_BLOCKS (EFI_GPT_PART_ENTRY_MIN_SIZE, ParentBlockDev->BlockSize)) ||
-       (PartHdr->LastUsableLBA  > ParentBlockDev->LastBlock - 1 - EFI_SIZE_TO_BLOCKS (EFI_GPT_PART_ENTRY_MIN_SIZE, ParentBlockDev->BlockSize)) ||
-       (PartHdr->FirstUsableLBA > PartHdr->LastUsableLBA) ||
-       (PartHdr->PartitionEntryLBA < 2) ||
-       (PartHdr->PartitionEntryLBA > ParentBlockDev->LastBlock - 1) ||
-       (PartHdr->PartitionEntryLBA >= PartHdr->FirstUsableLBA && PartHdr->PartitionEntryLBA <= PartHdr->LastUsableLBA) ||
-       (PartHdr->SizeOfPartitionEntry%128 != 0) ||
-       (PartHdr->SizeOfPartitionEntry != sizeof (EFI_PARTITION_ENTRY))
-     ) {
+  if ((PartHdr->MyLBA != Lba) ||
+      (PartHdr->AlternateLBA != AlternateLba) ||
+      (PartHdr->FirstUsableLBA < 2 + EFI_SIZE_TO_BLOCKS (EFI_GPT_PART_ENTRY_MIN_SIZE, ParentBlockDev->BlockSize)) ||
+      (PartHdr->LastUsableLBA  > ParentBlockDev->LastBlock - 1 - EFI_SIZE_TO_BLOCKS (EFI_GPT_PART_ENTRY_MIN_SIZE, ParentBlockDev->BlockSize)) ||
+      (PartHdr->FirstUsableLBA > PartHdr->LastUsableLBA) ||
+      (PartHdr->PartitionEntryLBA < 2) ||
+      (PartHdr->PartitionEntryLBA > ParentBlockDev->LastBlock - 1) ||
+      ((PartHdr->PartitionEntryLBA >= PartHdr->FirstUsableLBA) && (PartHdr->PartitionEntryLBA <= PartHdr->LastUsableLBA)) ||
+      (PartHdr->SizeOfPartitionEntry%128 != 0) ||
+      (PartHdr->SizeOfPartitionEntry != sizeof (EFI_PARTITION_ENTRY))
+      )
+  {
     DEBUG ((DEBUG_ERROR, "Invalid efi partition table header\n"));
     return FALSE;
   }
@@ -219,30 +220,30 @@ PartitionCheckGptEntryArray (
   IN  EFI_PARTITION_TABLE_HEADER  *PartHdr
   )
 {
-  EFI_STATUS                      Status;
-  PEI_FAT_BLOCK_DEVICE            *ParentBlockDev;
-  PEI_FAT_BLOCK_DEVICE            *BlockDevPtr;
+  EFI_STATUS            Status;
+  PEI_FAT_BLOCK_DEVICE  *ParentBlockDev;
+  PEI_FAT_BLOCK_DEVICE  *BlockDevPtr;
 
-  UINT64                          PartitionEntryArraySize;
-  UINT64                          PartitionEntryBlockNumb;
-  UINT32                          EntryArraySizeRemainder;
+  UINT64  PartitionEntryArraySize;
+  UINT64  PartitionEntryBlockNumb;
+  UINT32  EntryArraySizeRemainder;
 
-  EFI_PARTITION_ENTRY             *PartitionEntryBuffer;
-  EFI_PARTITION_ENTRY_STATUS      *PartitionEntryStatus;
+  EFI_PARTITION_ENTRY         *PartitionEntryBuffer;
+  EFI_PARTITION_ENTRY_STATUS  *PartitionEntryStatus;
 
-  BOOLEAN                         Found;
-  EFI_LBA                         StartingLBA;
-  EFI_LBA                         EndingLBA;
-  UINTN                           Index;
-  UINTN                           Index1;
-  UINTN                           Index2;
-  EFI_PARTITION_ENTRY             *Entry;
+  BOOLEAN              Found;
+  EFI_LBA              StartingLBA;
+  EFI_LBA              EndingLBA;
+  UINTN                Index;
+  UINTN                Index1;
+  UINTN                Index2;
+  EFI_PARTITION_ENTRY  *Entry;
 
   PartitionEntryBuffer = NULL;
   PartitionEntryStatus = NULL;
 
-  ParentBlockDev  = &(PrivateData->BlockDevice[ParentBlockDevNo]);
-  Found           = FALSE;
+  ParentBlockDev = &(PrivateData->BlockDevice[ParentBlockDevNo]);
+  Found          = FALSE;
 
   PartitionEntryArraySize = MultU64x32 (PartHdr->NumberOfPartitionEntries, PartHdr->SizeOfPartitionEntry);
   EntryArraySizeRemainder = 0;
@@ -250,19 +251,21 @@ PartitionCheckGptEntryArray (
   if (EntryArraySizeRemainder != 0) {
     PartitionEntryBlockNumb++;
   }
+
   PartitionEntryArraySize = MultU64x32 (PartitionEntryBlockNumb, ParentBlockDev->BlockSize);
 
-  PartitionEntryBuffer = (EFI_PARTITION_ENTRY *) AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)PartitionEntryArraySize));
+  PartitionEntryBuffer = (EFI_PARTITION_ENTRY *)AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)PartitionEntryArraySize));
   if (PartitionEntryBuffer == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate memory error!\n"));
     goto EXIT;
   }
 
-  PartitionEntryStatus = (EFI_PARTITION_ENTRY_STATUS *) AllocatePages (EFI_SIZE_TO_PAGES (PartHdr->NumberOfPartitionEntries * sizeof (EFI_PARTITION_ENTRY_STATUS)));
+  PartitionEntryStatus = (EFI_PARTITION_ENTRY_STATUS *)AllocatePages (EFI_SIZE_TO_PAGES (PartHdr->NumberOfPartitionEntries * sizeof (EFI_PARTITION_ENTRY_STATUS)));
   if (PartitionEntryStatus == NULL) {
     DEBUG ((DEBUG_ERROR, "Allocate memory error!\n"));
     goto EXIT;
   }
+
   ZeroMem (PartitionEntryStatus, PartHdr->NumberOfPartitionEntries * sizeof (EFI_PARTITION_ENTRY_STATUS));
 
   Status = FatReadBlock (
@@ -283,19 +286,20 @@ PartitionCheckGptEntryArray (
   }
 
   for (Index1 = 0; Index1 < PartHdr->NumberOfPartitionEntries; Index1++) {
-    Entry = (EFI_PARTITION_ENTRY *) ((UINT8 *) PartitionEntryBuffer + Index1 * PartHdr->SizeOfPartitionEntry);
+    Entry = (EFI_PARTITION_ENTRY *)((UINT8 *)PartitionEntryBuffer + Index1 * PartHdr->SizeOfPartitionEntry);
     if (CompareGuid (&Entry->PartitionTypeGUID, &gEfiPartTypeUnusedGuid)) {
       continue;
     }
 
     StartingLBA = Entry->StartingLBA;
     EndingLBA   = Entry->EndingLBA;
-    if (StartingLBA > EndingLBA ||
-        StartingLBA < PartHdr->FirstUsableLBA ||
-        StartingLBA > PartHdr->LastUsableLBA ||
-        EndingLBA < PartHdr->FirstUsableLBA ||
-        EndingLBA > PartHdr->LastUsableLBA
-        ) {
+    if ((StartingLBA > EndingLBA) ||
+        (StartingLBA < PartHdr->FirstUsableLBA) ||
+        (StartingLBA > PartHdr->LastUsableLBA) ||
+        (EndingLBA < PartHdr->FirstUsableLBA) ||
+        (EndingLBA > PartHdr->LastUsableLBA)
+        )
+    {
       PartitionEntryStatus[Index1].OutOfRange = TRUE;
       continue;
     }
@@ -308,27 +312,28 @@ PartitionCheckGptEntryArray (
     }
 
     for (Index2 = Index1 + 1; Index2 < PartHdr->NumberOfPartitionEntries; Index2++) {
-      Entry = (EFI_PARTITION_ENTRY *) ((UINT8 *) PartitionEntryBuffer + Index2 * PartHdr->SizeOfPartitionEntry);
+      Entry = (EFI_PARTITION_ENTRY *)((UINT8 *)PartitionEntryBuffer + Index2 * PartHdr->SizeOfPartitionEntry);
       if (CompareGuid (&Entry->PartitionTypeGUID, &gEfiPartTypeUnusedGuid)) {
         continue;
       }
 
-      if (Entry->EndingLBA >= StartingLBA && Entry->StartingLBA <= EndingLBA) {
+      if ((Entry->EndingLBA >= StartingLBA) && (Entry->StartingLBA <= EndingLBA)) {
         //
         // This region overlaps with the Index1'th region
         //
-        PartitionEntryStatus[Index1].Overlap  = TRUE;
-        PartitionEntryStatus[Index2].Overlap  = TRUE;
+        PartitionEntryStatus[Index1].Overlap = TRUE;
+        PartitionEntryStatus[Index2].Overlap = TRUE;
         continue;
       }
     }
   }
 
   for (Index = 0; Index < PartHdr->NumberOfPartitionEntries; Index++) {
-    if (CompareGuid (&PartitionEntryBuffer[Index].PartitionTypeGUID, &gEfiPartTypeUnusedGuid)||
+    if (CompareGuid (&PartitionEntryBuffer[Index].PartitionTypeGUID, &gEfiPartTypeUnusedGuid) ||
         PartitionEntryStatus[Index].OutOfRange ||
         PartitionEntryStatus[Index].Overlap ||
-        PartitionEntryStatus[Index].OsSpecific) {
+        PartitionEntryStatus[Index].OsSpecific)
+    {
       //
       // Don't use null EFI Partition Entries, Invalid Partition Entries or OS specific
       // partition Entries
@@ -340,8 +345,8 @@ PartitionCheckGptEntryArray (
       break;
     }
 
-    Found                         = TRUE;
-    BlockDevPtr                   = &(PrivateData->BlockDevice[PrivateData->BlockDeviceCount]);
+    Found       = TRUE;
+    BlockDevPtr = &(PrivateData->BlockDevice[PrivateData->BlockDeviceCount]);
 
     BlockDevPtr->BlockSize        = ParentBlockDev->BlockSize;
     BlockDevPtr->LastBlock        = PartitionEntryBuffer[Index].EndingLBA;
@@ -352,13 +357,13 @@ PartitionCheckGptEntryArray (
                                       PartitionEntryBuffer[Index].StartingLBA,
                                       ParentBlockDev->BlockSize
                                       );
-    BlockDevPtr->ParentDevNo      = ParentBlockDevNo;
+    BlockDevPtr->ParentDevNo = ParentBlockDevNo;
 
     PrivateData->BlockDeviceCount++;
 
-    DEBUG ((DEBUG_INFO, "Find GPT Partition [0x%lx",  PartitionEntryBuffer[Index].StartingLBA, BlockDevPtr->LastBlock));
+    DEBUG ((DEBUG_INFO, "Find GPT Partition [0x%lx", PartitionEntryBuffer[Index].StartingLBA, BlockDevPtr->LastBlock));
     DEBUG ((DEBUG_INFO, ", 0x%lx]\n", BlockDevPtr->LastBlock));
-    DEBUG ((DEBUG_INFO, "         BlockSize %x\n",  BlockDevPtr->BlockSize));
+    DEBUG ((DEBUG_INFO, "         BlockSize %x\n", BlockDevPtr->BlockSize));
   }
 
 EXIT:
@@ -390,18 +395,18 @@ EXIT:
 **/
 BOOLEAN
 PartitionCheckGptStructure (
-  IN  PEI_FAT_PRIVATE_DATA      *PrivateData,
-  IN  UINTN                     ParentBlockDevNo,
-  IN  BOOLEAN                   IsPrimary
+  IN  PEI_FAT_PRIVATE_DATA  *PrivateData,
+  IN  UINTN                 ParentBlockDevNo,
+  IN  BOOLEAN               IsPrimary
   )
 {
-  EFI_STATUS                    Status;
-  PEI_FAT_BLOCK_DEVICE          *ParentBlockDev;
-  EFI_PARTITION_TABLE_HEADER    *PartHdr;
-  EFI_PEI_LBA                   GptHeaderLBA;
+  EFI_STATUS                  Status;
+  PEI_FAT_BLOCK_DEVICE        *ParentBlockDev;
+  EFI_PARTITION_TABLE_HEADER  *PartHdr;
+  EFI_PEI_LBA                 GptHeaderLBA;
 
-  ParentBlockDev  = &(PrivateData->BlockDevice[ParentBlockDevNo]);
-  PartHdr         = (EFI_PARTITION_TABLE_HEADER *) PrivateData->BlockData;
+  ParentBlockDev = &(PrivateData->BlockDevice[ParentBlockDevNo]);
+  PartHdr        = (EFI_PARTITION_TABLE_HEADER *)PrivateData->BlockData;
 
   if (IsPrimary) {
     GptHeaderLBA = PRIMARY_PART_HEADER_LBA;
@@ -442,18 +447,18 @@ PartitionCheckGptStructure (
 **/
 BOOLEAN
 PartitionCheckProtectiveMbr (
-  IN  PEI_FAT_PRIVATE_DATA    *PrivateData,
-  IN  UINTN                   ParentBlockDevNo
+  IN  PEI_FAT_PRIVATE_DATA  *PrivateData,
+  IN  UINTN                 ParentBlockDevNo
   )
 {
-  EFI_STATUS                  Status;
-  MASTER_BOOT_RECORD          *ProtectiveMbr;
-  MBR_PARTITION_RECORD        *MbrPartition;
-  PEI_FAT_BLOCK_DEVICE        *ParentBlockDev;
-  UINTN                       Index;
+  EFI_STATUS            Status;
+  MASTER_BOOT_RECORD    *ProtectiveMbr;
+  MBR_PARTITION_RECORD  *MbrPartition;
+  PEI_FAT_BLOCK_DEVICE  *ParentBlockDev;
+  UINTN                 Index;
 
-  ProtectiveMbr   = (MASTER_BOOT_RECORD *) PrivateData->BlockData;
-  ParentBlockDev  = &(PrivateData->BlockDevice[ParentBlockDevNo]);
+  ProtectiveMbr  = (MASTER_BOOT_RECORD *)PrivateData->BlockData;
+  ParentBlockDev = &(PrivateData->BlockDevice[ParentBlockDevNo]);
 
   //
   // Read Protective MBR
@@ -482,11 +487,12 @@ PartitionCheckProtectiveMbr (
   //
   for (Index = 0; Index < MAX_MBR_PARTITIONS; Index++) {
     MbrPartition = (MBR_PARTITION_RECORD *)&ProtectiveMbr->Partition[Index];
-    if (MbrPartition->BootIndicator   == 0x00 &&
-        MbrPartition->StartSector     == 0x02 &&
-        MbrPartition->OSIndicator     == PMBR_GPT_PARTITION &&
-        UNPACK_UINT32 (MbrPartition->StartingLBA) == 1
-       ) {
+    if ((MbrPartition->BootIndicator   == 0x00) &&
+        (MbrPartition->StartSector     == 0x02) &&
+        (MbrPartition->OSIndicator     == PMBR_GPT_PARTITION) &&
+        (UNPACK_UINT32 (MbrPartition->StartingLBA) == 1)
+        )
+    {
       return TRUE;
     }
   }
@@ -510,18 +516,18 @@ PartitionCheckProtectiveMbr (
 **/
 BOOLEAN
 FatFindGptPartitions (
-  IN  PEI_FAT_PRIVATE_DATA *PrivateData,
-  IN  UINTN                ParentBlockDevNo
+  IN  PEI_FAT_PRIVATE_DATA  *PrivateData,
+  IN  UINTN                 ParentBlockDevNo
   )
 {
-  BOOLEAN                      Found;
-  PEI_FAT_BLOCK_DEVICE         *ParentBlockDev;
+  BOOLEAN               Found;
+  PEI_FAT_BLOCK_DEVICE  *ParentBlockDev;
 
   if (ParentBlockDevNo > PEI_FAT_MAX_BLOCK_DEVICE - 1) {
     return FALSE;
   }
 
-  ParentBlockDev  = &(PrivateData->BlockDevice[ParentBlockDevNo]);
+  ParentBlockDev = &(PrivateData->BlockDevice[ParentBlockDevNo]);
   if (ParentBlockDev->BlockSize > PEI_FAT_MAX_BLOCK_SIZE) {
     DEBUG ((DEBUG_ERROR, "Device BlockSize %x exceed FAT_MAX_BLOCK_SIZE\n", ParentBlockDev->BlockSize));
     return FALSE;

@@ -35,10 +35,10 @@ FatFlushEx (
   EFI_STATUS  Status;
   FAT_TASK    *Task;
 
-  IFile   = IFILE_FROM_FHAND (FHand);
-  OFile   = IFile->OFile;
-  Volume  = OFile->Volume;
-  Task    = NULL;
+  IFile  = IFILE_FROM_FHAND (FHand);
+  OFile  = IFile->OFile;
+  Volume = OFile->Volume;
+  Task   = NULL;
 
   //
   // If the file has a permanent error, return it
@@ -50,6 +50,7 @@ FatFlushEx (
   if (Volume->ReadOnly) {
     return EFI_WRITE_PROTECTED;
   }
+
   //
   // If read only, return error
   //
@@ -67,6 +68,7 @@ FatFlushEx (
     if (FHand->Revision < EFI_FILE_PROTOCOL_REVISION2) {
       return EFI_UNSUPPORTED;
     }
+
     Task = FatCreateTask (IFile, Token);
     if (Task == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -77,8 +79,8 @@ FatFlushEx (
   // Flush the OFile
   //
   FatAcquireLock ();
-  Status  = FatOFileFlush (OFile);
-  Status  = FatCleanupVolume (OFile->Volume, OFile, Status, Task);
+  Status = FatOFileFlush (OFile);
+  Status = FatCleanupVolume (OFile->Volume, OFile, Status, Task);
   FatReleaseLock ();
 
   if (Token != NULL) {
@@ -132,9 +134,9 @@ FatClose (
   FAT_OFILE   *OFile;
   FAT_VOLUME  *Volume;
 
-  IFile   = IFILE_FROM_FHAND (FHand);
-  OFile   = IFile->OFile;
-  Volume  = OFile->Volume;
+  IFile  = IFILE_FROM_FHAND (FHand);
+  OFile  = IFile->OFile;
+  Volume = OFile->Volume;
 
   //
   // Lock the volume
@@ -169,14 +171,14 @@ FatClose (
 **/
 EFI_STATUS
 FatIFileClose (
-  FAT_IFILE           *IFile
+  FAT_IFILE  *IFile
   )
 {
   FAT_OFILE   *OFile;
   FAT_VOLUME  *Volume;
 
-  OFile   = IFile->OFile;
-  Volume  = OFile->Volume;
+  OFile  = IFile->OFile;
+  Volume = OFile->Volume;
 
   ASSERT_VOLUME_LOCKED (Volume);
 
@@ -193,6 +195,7 @@ FatIFileClose (
   if (OFile->CheckLink.ForwardLink == NULL) {
     InsertHeadList (&Volume->CheckRef, &OFile->CheckLink);
   }
+
   //
   // Done. Free the open instance structure
   //
@@ -213,13 +216,13 @@ FatIFileClose (
 **/
 EFI_STATUS
 FatOFileFlush (
-  IN FAT_OFILE    *OFile
+  IN FAT_OFILE  *OFile
   )
 {
-  EFI_STATUS    Status;
-  FAT_OFILE     *Parent;
-  FAT_DIRENT    *DirEnt;
-  FAT_DATE_TIME FatNow;
+  EFI_STATUS     Status;
+  FAT_OFILE      *Parent;
+  FAT_DIRENT     *DirEnt;
+  FAT_DATE_TIME  FatNow;
 
   //
   // Flush each entry up the tree while dirty
@@ -233,8 +236,8 @@ FatOFileFlush (
       return OFile->Error;
     }
 
-    Parent  = OFile->Parent;
-    DirEnt  = OFile->DirEnt;
+    Parent = OFile->Parent;
+    DirEnt = OFile->DirEnt;
     if (OFile->Dirty) {
       //
       // Update the last modification time
@@ -248,12 +251,13 @@ FatOFileFlush (
       OFile->PreserveLastModification = FALSE;
       if (OFile->Archive) {
         DirEnt->Entry.Attributes |= FAT_ATTRIBUTE_ARCHIVE;
-        OFile->Archive = FALSE;
+        OFile->Archive            = FALSE;
       }
+
       //
       // Write the directory entry
       //
-      if (Parent != NULL && !DirEnt->Invalid) {
+      if ((Parent != NULL) && !DirEnt->Invalid) {
         //
         // Write the OFile's directory entry
         //
@@ -265,11 +269,13 @@ FatOFileFlush (
 
       OFile->Dirty = FALSE;
     }
+
     //
     // Check the parent
     //
     OFile = Parent;
   } while (OFile != NULL);
+
   return EFI_SUCCESS;
 }
 
@@ -287,7 +293,7 @@ FatOFileFlush (
 **/
 BOOLEAN
 FatCheckOFileRef (
-  IN FAT_OFILE   *OFile
+  IN FAT_OFILE  *OFile
   )
 {
   //
@@ -308,6 +314,7 @@ FatCheckOFileRef (
     //
     return FALSE;
   }
+
   //
   // Free the Ofile
   //
@@ -328,11 +335,11 @@ FatCheckOFileRef (
 STATIC
 VOID
 FatCheckVolumeRef (
-  IN FAT_VOLUME   *Volume
+  IN FAT_VOLUME  *Volume
   )
 {
-  FAT_OFILE *OFile;
-  FAT_OFILE *Parent;
+  FAT_OFILE  *OFile;
+  FAT_OFILE  *Parent;
 
   //
   // Check all files on the pending check list
@@ -346,8 +353,8 @@ FatCheckVolumeRef (
     // Go up the tree cleaning up any un-referenced OFiles
     //
     while (Parent != NULL) {
-      OFile   = Parent;
-      Parent  = OFile->Parent;
+      OFile  = Parent;
+      Parent = OFile->Parent;
       if (!FatCheckOFileRef (OFile)) {
         break;
       }
@@ -373,19 +380,21 @@ FatCheckVolumeRef (
 **/
 EFI_STATUS
 FatCleanupVolume (
-  IN FAT_VOLUME       *Volume,
-  IN FAT_OFILE        *OFile,
-  IN EFI_STATUS       EfiStatus,
-  IN FAT_TASK         *Task
+  IN FAT_VOLUME  *Volume,
+  IN FAT_OFILE   *OFile,
+  IN EFI_STATUS  EfiStatus,
+  IN FAT_TASK    *Task
   )
 {
   EFI_STATUS  Status;
+
   //
   // Flag the OFile
   //
   if (OFile != NULL) {
     FatSetVolumeError (OFile, EfiStatus);
   }
+
   //
   // Clean up any dangling OFiles that don't have IFiles
   // we don't check return status here because we want the
@@ -403,16 +412,18 @@ FatCleanupVolume (
         return Status;
       }
     }
+
     //
     // Update that the volume is not dirty
     //
-    if (Volume->FatDirty && Volume->FatType != Fat12) {
-      Volume->FatDirty  = FALSE;
-      Status            = FatAccessVolumeDirty (Volume, WriteFat, &Volume->NotDirtyValue);
+    if (Volume->FatDirty && (Volume->FatType != Fat12)) {
+      Volume->FatDirty = FALSE;
+      Status           = FatAccessVolumeDirty (Volume, WriteFat, &Volume->NotDirtyValue);
       if (EFI_ERROR (Status)) {
         return Status;
       }
     }
+
     //
     // Flush all dirty cache entries to disk
     //
@@ -421,11 +432,12 @@ FatCleanupVolume (
       return Status;
     }
   }
+
   //
   // If the volume is cleared , remove it.
   // The only time volume be invalidated is in DriverBindingStop.
   //
-  if (Volume->Root == NULL && !Volume->Valid) {
+  if ((Volume->Root == NULL) && !Volume->Valid) {
     //
     // Free the volume structure
     //
@@ -445,12 +457,12 @@ FatCleanupVolume (
 **/
 VOID
 FatSetVolumeError (
-  IN FAT_OFILE            *OFile,
-  IN EFI_STATUS           Status
+  IN FAT_OFILE   *OFile,
+  IN EFI_STATUS  Status
   )
 {
-  LIST_ENTRY      *Link;
-  FAT_OFILE       *ChildOFile;
+  LIST_ENTRY  *Link;
+  FAT_OFILE   *ChildOFile;
 
   //
   // If this OFile doesn't already have an error, set one
@@ -458,6 +470,7 @@ FatSetVolumeError (
   if (!EFI_ERROR (OFile->Error)) {
     OFile->Error = Status;
   }
+
   //
   // Set the error on each child OFile
   //

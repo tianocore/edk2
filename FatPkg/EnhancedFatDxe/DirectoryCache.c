@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 STATIC
 VOID
 FatFreeODir (
-  IN FAT_ODIR    *ODir
+  IN FAT_ODIR  *ODir
   )
 {
   FAT_DIRENT  *DirEnt;
@@ -50,7 +50,7 @@ FatFreeODir (
 STATIC
 FAT_ODIR *
 FatAllocateODir (
-  IN FAT_OFILE   *OFile
+  IN FAT_OFILE  *OFile
   )
 {
   FAT_ODIR  *ODir;
@@ -78,14 +78,14 @@ FatAllocateODir (
 **/
 VOID
 FatDiscardODir (
-  IN FAT_OFILE    *OFile
+  IN FAT_OFILE  *OFile
   )
 {
   FAT_ODIR    *ODir;
   FAT_VOLUME  *Volume;
 
-  Volume  = OFile->Volume;
-  ODir    = OFile->ODir;
+  Volume = OFile->Volume;
+  ODir   = OFile->ODir;
   if (!OFile->DirEnt->Invalid) {
     //
     // If OFile does not represent a deleted file, then we will cache the directory
@@ -107,6 +107,7 @@ FatDiscardODir (
       ODir = NULL;
     }
   }
+
   //
   // Release ODir Structure
   //
@@ -127,14 +128,14 @@ FatDiscardODir (
 **/
 VOID
 FatRequestODir (
-  IN FAT_OFILE    *OFile
+  IN FAT_OFILE  *OFile
   )
 {
-  UINTN           DirCacheTag;
-  FAT_VOLUME      *Volume;
-  FAT_ODIR        *ODir;
-  FAT_ODIR        *CurrentODir;
-  LIST_ENTRY      *CurrentODirLink;
+  UINTN       DirCacheTag;
+  FAT_VOLUME  *Volume;
+  FAT_ODIR    *ODir;
+  FAT_ODIR    *CurrentODir;
+  LIST_ENTRY  *CurrentODirLink;
 
   Volume      = OFile->Volume;
   ODir        = NULL;
@@ -142,7 +143,8 @@ FatRequestODir (
   for (CurrentODirLink  = Volume->DirCacheList.ForwardLink;
        CurrentODirLink != &Volume->DirCacheList;
        CurrentODirLink  = CurrentODirLink->ForwardLink
-      ) {
+       )
+  {
     CurrentODir = ODIR_FROM_DIRCACHELINK (CurrentODirLink);
     if (CurrentODir->DirCacheTag == DirCacheTag) {
       RemoveEntryList (&CurrentODir->DirCacheLink);
@@ -171,10 +173,11 @@ FatRequestODir (
 **/
 VOID
 FatCleanupODirCache (
-  IN FAT_VOLUME         *Volume
+  IN FAT_VOLUME  *Volume
   )
 {
   FAT_ODIR  *ODir;
+
   while (Volume->DirCacheCount > 0) {
     ODir = ODIR_FROM_DIRCACHELINK (Volume->DirCacheList.BackLink);
     RemoveEntryList (&ODir->DirCacheLink);
