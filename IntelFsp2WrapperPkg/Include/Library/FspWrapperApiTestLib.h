@@ -22,8 +22,8 @@
 EFI_STATUS
 EFIAPI
 TestFspMemoryInitApiOutput (
-  IN  VOID        *FspmUpdDataPtr,
-  IN  VOID        **HobListPtr
+  IN  VOID  *FspmUpdDataPtr,
+  IN  VOID  **HobListPtr
   );
 
 /**
@@ -36,7 +36,7 @@ TestFspMemoryInitApiOutput (
 EFI_STATUS
 EFIAPI
 TestFspTempRamExitApiOutput (
-  IN VOID        *TempRamExitParam
+  IN VOID  *TempRamExitParam
   );
 
 /**
@@ -49,7 +49,7 @@ TestFspTempRamExitApiOutput (
 EFI_STATUS
 EFIAPI
 TestFspSiliconInitApiOutput (
-  IN  VOID        *FspsUpdDataPtr
+  IN  VOID  *FspsUpdDataPtr
   );
 
 #endif

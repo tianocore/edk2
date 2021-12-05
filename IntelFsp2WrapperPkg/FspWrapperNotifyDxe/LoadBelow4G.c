@@ -29,18 +29,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 RelocateImageUnder4GIfNeeded (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                                    Status;
-  UINT8                                         *Buffer;
-  UINTN                                         BufferSize;
-  EFI_HANDLE                                    NewImageHandle;
-  UINTN                                         Pages;
-  EFI_PHYSICAL_ADDRESS                          FfsBuffer;
-  PE_COFF_LOADER_IMAGE_CONTEXT                  ImageContext;
-  VOID                                          *Interface;
+  EFI_STATUS                    Status;
+  UINT8                         *Buffer;
+  UINTN                         BufferSize;
+  EFI_HANDLE                    NewImageHandle;
+  UINTN                         Pages;
+  EFI_PHYSICAL_ADDRESS          FfsBuffer;
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
+  VOID                          *Interface;
 
   //
   // If it is already <4G, no need do relocate
@@ -64,22 +64,22 @@ RelocateImageUnder4GIfNeeded (
   // Here we install a dummy handle
   //
   NewImageHandle = NULL;
-  Status = gBS->InstallProtocolInterface (
-                  &NewImageHandle,
-                  &gEfiCallerIdGuid,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
+  Status         = gBS->InstallProtocolInterface (
+                          &NewImageHandle,
+                          &gEfiCallerIdGuid,
+                          EFI_NATIVE_INTERFACE,
+                          NULL
+                          );
   ASSERT_EFI_ERROR (Status);
 
   //
   // Reload image itself to <4G mem
   //
-  Status = GetSectionFromAnyFv  (
+  Status = GetSectionFromAnyFv (
              &gEfiCallerIdGuid,
              EFI_SECTION_PE32,
              0,
-             (VOID **) &Buffer,
+             (VOID **)&Buffer,
              &BufferSize
              );
   ASSERT_EFI_ERROR (Status);
@@ -91,17 +91,18 @@ RelocateImageUnder4GIfNeeded (
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   ASSERT_EFI_ERROR (Status);
   if (ImageContext.SectionAlignment > EFI_PAGE_SIZE) {
-    Pages = EFI_SIZE_TO_PAGES ((UINTN) (ImageContext.ImageSize + ImageContext.SectionAlignment));
+    Pages = EFI_SIZE_TO_PAGES ((UINTN)(ImageContext.ImageSize + ImageContext.SectionAlignment));
   } else {
-    Pages = EFI_SIZE_TO_PAGES ((UINTN) ImageContext.ImageSize);
+    Pages = EFI_SIZE_TO_PAGES ((UINTN)ImageContext.ImageSize);
   }
+
   FfsBuffer = 0xFFFFFFFF;
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiBootServicesCode,
-                  Pages,
-                  &FfsBuffer
-                  );
+  Status    = gBS->AllocatePages (
+                     AllocateMaxAddress,
+                     EfiBootServicesCode,
+                     Pages,
+                     &FfsBuffer
+                     );
   ASSERT_EFI_ERROR (Status);
   ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
   //
@@ -132,7 +133,7 @@ RelocateImageUnder4GIfNeeded (
   InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
 
   DEBUG ((DEBUG_INFO, "Loading driver at 0x%08x EntryPoint=0x%08x\n", (UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.EntryPoint));
-  Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)(ImageContext.EntryPoint)) (NewImageHandle, gST);
+  Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)(ImageContext.EntryPoint))(NewImageHandle, gST);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Error: Image at 0x%08x start failed: %r\n", ImageContext.ImageAddress, Status));
     gBS->FreePages (FfsBuffer, Pages);

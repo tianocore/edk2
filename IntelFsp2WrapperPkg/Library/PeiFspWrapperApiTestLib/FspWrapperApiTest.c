@@ -23,27 +23,30 @@
 EFI_STATUS
 EFIAPI
 TestFspMemoryInitApiOutput (
-  IN  VOID        *FspmUpdDataPtr,
-  IN  VOID        **HobListPtr
+  IN  VOID  *FspmUpdDataPtr,
+  IN  VOID  **HobListPtr
   )
 {
   DEBUG_CODE_BEGIN ();
-  EFI_PEI_HOB_POINTERS        Hob;
+  EFI_PEI_HOB_POINTERS  Hob;
 
   Hob.Raw = (UINT8 *)(*(HobListPtr));
   while (TRUE) {
-    if (END_OF_HOB_LIST(Hob) == TRUE) {
-      DEBUG((DEBUG_INFO, "gFspBootLoaderTolumHobGuid not Found\n"));
+    if (END_OF_HOB_LIST (Hob) == TRUE) {
+      DEBUG ((DEBUG_INFO, "gFspBootLoaderTolumHobGuid not Found\n"));
       break;
     }
+
     if ((CompareGuid (&Hob.ResourceDescriptor->Owner, &gFspBootLoaderTolumHobGuid))) {
       DEBUG ((DEBUG_INFO, "gFspBootLoaderTolumHobGuid Found\n"));
       DEBUG ((DEBUG_INFO, "Fill Boot Loader reserved memory range with 0x5A for testing purpose\n"));
       SetMem ((VOID *)(UINTN)Hob.ResourceDescriptor->PhysicalStart, (UINTN)Hob.ResourceDescriptor->ResourceLength, 0x5A);
       break;
     }
+
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
+
   DEBUG_CODE_END ();
 
   return RETURN_SUCCESS;
@@ -59,7 +62,7 @@ TestFspMemoryInitApiOutput (
 EFI_STATUS
 EFIAPI
 TestFspTempRamExitApiOutput (
-  IN VOID         *TempRamExitParam
+  IN VOID  *TempRamExitParam
   )
 {
   return RETURN_SUCCESS;
@@ -75,7 +78,7 @@ TestFspTempRamExitApiOutput (
 EFI_STATUS
 EFIAPI
 TestFspSiliconInitApiOutput (
-  IN  VOID        *FspsUpdDataPtr
+  IN  VOID  *FspsUpdDataPtr
   )
 {
   return RETURN_SUCCESS;

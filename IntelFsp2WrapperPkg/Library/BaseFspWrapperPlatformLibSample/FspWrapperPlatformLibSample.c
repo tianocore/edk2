@@ -20,7 +20,7 @@
 VOID
 EFIAPI
 UpdateFspmUpdData (
-  IN OUT VOID        *FspUpdRgnPtr
+  IN OUT VOID  *FspUpdRgnPtr
   )
 {
 }
@@ -34,7 +34,7 @@ UpdateFspmUpdData (
 VOID
 EFIAPI
 UpdateFspsUpdData (
-  IN OUT VOID        *FspUpdRgnPtr
+  IN OUT VOID  *FspUpdRgnPtr
   )
 {
 }
@@ -69,8 +69,8 @@ UpdateTempRamExitParam (
 EFI_STATUS
 EFIAPI
 GetS3MemoryInfo (
-  OUT UINT64               *S3PeiMemSize,
-  OUT EFI_PHYSICAL_ADDRESS *S3PeiMemBase
+  OUT UINT64                *S3PeiMemSize,
+  OUT EFI_PHYSICAL_ADDRESS  *S3PeiMemBase
   )
 {
   return EFI_UNSUPPORTED;
@@ -86,12 +86,12 @@ GetS3MemoryInfo (
 VOID
 EFIAPI
 CallFspWrapperResetSystem (
-  IN UINT32    FspStatusResetType
+  IN UINT32  FspStatusResetType
   )
 {
   //
   // Perform reset according to the type.
   //
 
-  CpuDeadLoop();
+  CpuDeadLoop ();
 }
