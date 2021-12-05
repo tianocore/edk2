@@ -36,9 +36,11 @@ PendingBreakSupport (
       IS_CORE2_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
       IS_CORE_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
       IS_PENTIUM_4_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
-      IS_PENTIUM_M_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+      IS_PENTIUM_M_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel))
+  {
     return (CpuInfo->CpuIdVersionInfoEdx.Bits.PBE == 1);
   }
+
   return FALSE;
 }
 

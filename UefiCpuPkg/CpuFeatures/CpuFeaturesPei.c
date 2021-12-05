@@ -16,7 +16,7 @@
 
 #include <Guid/CpuFeaturesInitDone.h>
 
-EFI_PEI_PPI_DESCRIPTOR           mPeiCpuFeaturesInitDonePpiDesc = {
+EFI_PEI_PPI_DESCRIPTOR  mPeiCpuFeaturesInitDonePpiDesc = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEdkiiCpuFeaturesInitDoneGuid,
   NULL
@@ -40,14 +40,15 @@ CpuFeaturesPeimInitialize (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS                 Status;
-  EFI_BOOT_MODE              BootMode;
+  EFI_STATUS     Status;
+  EFI_BOOT_MODE  BootMode;
 
   Status = PeiServicesGetBootMode (&BootMode);
   ASSERT_EFI_ERROR (Status);
 
-  if (BootMode == BOOT_ON_S3_RESUME &&
-      !PcdGetBool (PcdCpuFeaturesInitOnS3Resume)) {
+  if ((BootMode == BOOT_ON_S3_RESUME) &&
+      !PcdGetBool (PcdCpuFeaturesInitOnS3Resume))
+  {
     //
     // Does nothing when if PcdCpuFeaturesInitOnS3Resume is FLASE
     // on S3 boot mode
@@ -62,7 +63,7 @@ CpuFeaturesPeimInitialize (
   //
   // Install CPU Features Init Done PPI
   //
-  Status = PeiServicesInstallPpi(&mPeiCpuFeaturesInitDonePpiDesc);
+  Status = PeiServicesInstallPpi (&mPeiCpuFeaturesInitDonePpiDesc);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -72,4 +73,3 @@ CpuFeaturesPeimInitialize (
 
   return EFI_SUCCESS;
 }
-

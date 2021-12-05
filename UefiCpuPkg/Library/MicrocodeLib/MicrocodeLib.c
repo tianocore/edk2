@@ -25,7 +25,7 @@ GetProcessorMicrocodeSignature (
   VOID
   )
 {
-  MSR_IA32_BIOS_SIGN_ID_REGISTER   BiosSignIdMsr;
+  MSR_IA32_BIOS_SIGN_ID_REGISTER  BiosSignIdMsr;
 
   AsmWriteMsr64 (MSR_IA32_BIOS_SIGN_ID, 0);
   AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, NULL);
@@ -44,12 +44,12 @@ GetProcessorMicrocodeCpuId (
   EDKII_PEI_MICROCODE_CPU_ID  *MicrocodeCpuId
   )
 {
-  MSR_IA32_PLATFORM_ID_REGISTER PlatformIdMsr;
+  MSR_IA32_PLATFORM_ID_REGISTER  PlatformIdMsr;
 
   ASSERT (MicrocodeCpuId != NULL);
 
-  PlatformIdMsr.Uint64 = AsmReadMsr64 (MSR_IA32_PLATFORM_ID);
-  MicrocodeCpuId->PlatformId = (UINT8) PlatformIdMsr.Bits.PlatformId;
+  PlatformIdMsr.Uint64       = AsmReadMsr64 (MSR_IA32_PLATFORM_ID);
+  MicrocodeCpuId->PlatformId = (UINT8)PlatformIdMsr.Bits.PlatformId;
   AsmCpuid (CPUID_VERSION_INFO, &MicrocodeCpuId->ProcessorSignature, NULL, NULL, NULL);
 }
 
@@ -71,10 +71,10 @@ GetProcessorMicrocodeCpuId (
 UINT32
 EFIAPI
 GetMicrocodeLength (
-  IN CPU_MICROCODE_HEADER *Microcode
+  IN CPU_MICROCODE_HEADER  *Microcode
   )
 {
-  UINT32   TotalSize;
+  UINT32  TotalSize;
 
   ASSERT (Microcode != NULL);
 
@@ -82,6 +82,7 @@ GetMicrocodeLength (
   if (Microcode->DataSize != 0) {
     TotalSize = Microcode->TotalSize;
   }
+
   return TotalSize;
 }
 
@@ -95,12 +96,12 @@ GetMicrocodeLength (
 VOID
 EFIAPI
 LoadMicrocode (
-  IN CPU_MICROCODE_HEADER *Microcode
+  IN CPU_MICROCODE_HEADER  *Microcode
   )
 {
   ASSERT (Microcode != NULL);
 
-  AsmWriteMsr64 (MSR_IA32_BIOS_UPDT_TRIG, (UINT64) (UINTN) (Microcode + 1));
+  AsmWriteMsr64 (MSR_IA32_BIOS_UPDT_TRIG, (UINT64)(UINTN)(Microcode + 1));
 }
 
 /**
@@ -119,13 +120,13 @@ LoadMicrocode (
 **/
 BOOLEAN
 IsProcessorMatchedMicrocode (
-  IN UINT32                           ProcessorSignature,
-  IN UINT32                           ProcessorFlags,
-  IN EDKII_PEI_MICROCODE_CPU_ID       *MicrocodeCpuId,
-  IN UINTN                            MicrocodeCpuIdCount
+  IN UINT32                      ProcessorSignature,
+  IN UINT32                      ProcessorFlags,
+  IN EDKII_PEI_MICROCODE_CPU_ID  *MicrocodeCpuId,
+  IN UINTN                       MicrocodeCpuIdCount
   )
 {
-  UINTN          Index;
+  UINTN  Index;
 
   if (MicrocodeCpuIdCount == 0) {
     return TRUE;
@@ -133,7 +134,8 @@ IsProcessorMatchedMicrocode (
 
   for (Index = 0; Index < MicrocodeCpuIdCount; Index++) {
     if ((ProcessorSignature == MicrocodeCpuId[Index].ProcessorSignature) &&
-        (ProcessorFlags & (1 << MicrocodeCpuId[Index].PlatformId)) != 0) {
+        ((ProcessorFlags & (1 << MicrocodeCpuId[Index].PlatformId)) != 0))
+    {
       return TRUE;
     }
   }
@@ -182,22 +184,22 @@ IsProcessorMatchedMicrocode (
 BOOLEAN
 EFIAPI
 IsValidMicrocode (
-  IN CPU_MICROCODE_HEADER       *Microcode,
-  IN UINTN                      MicrocodeLength,
-  IN UINT32                     MinimumRevision,
-  IN EDKII_PEI_MICROCODE_CPU_ID *MicrocodeCpuIds,
-  IN UINTN                      MicrocodeCpuIdCount,
-  IN BOOLEAN                    VerifyChecksum
+  IN CPU_MICROCODE_HEADER        *Microcode,
+  IN UINTN                       MicrocodeLength,
+  IN UINT32                      MinimumRevision,
+  IN EDKII_PEI_MICROCODE_CPU_ID  *MicrocodeCpuIds,
+  IN UINTN                       MicrocodeCpuIdCount,
+  IN BOOLEAN                     VerifyChecksum
   )
 {
-  UINTN                                   Index;
-  UINT32                                  DataSize;
-  UINT32                                  TotalSize;
-  CPU_MICROCODE_EXTENDED_TABLE            *ExtendedTable;
-  CPU_MICROCODE_EXTENDED_TABLE_HEADER     *ExtendedTableHeader;
-  UINT32                                  ExtendedTableLength;
-  UINT32                                  Sum32;
-  BOOLEAN                                 Match;
+  UINTN                                Index;
+  UINT32                               DataSize;
+  UINT32                               TotalSize;
+  CPU_MICROCODE_EXTENDED_TABLE         *ExtendedTable;
+  CPU_MICROCODE_EXTENDED_TABLE_HEADER  *ExtendedTableHeader;
+  UINT32                               ExtendedTableLength;
+  UINT32                               Sum32;
+  BOOLEAN                              Match;
 
   ASSERT (Microcode != NULL);
 
@@ -206,7 +208,7 @@ IsValidMicrocode (
   //   the input microcode buffer is so small that even cannot contain the header.
   //   the input microcode buffer is so large that exceeds MAX_ADDRESS.
   //
-  if ((MicrocodeLength < sizeof (CPU_MICROCODE_HEADER)) || (MicrocodeLength > (MAX_ADDRESS - (UINTN) Microcode))) {
+  if ((MicrocodeLength < sizeof (CPU_MICROCODE_HEADER)) || (MicrocodeLength > (MAX_ADDRESS - (UINTN)Microcode))) {
     return FALSE;
   }
 
@@ -249,7 +251,7 @@ IsValidMicrocode (
   //
   // The summation of all DWORDs in microcode should be zero.
   //
-  if (VerifyChecksum && (CalculateSum32 ((UINT32 *) Microcode, TotalSize) != 0)) {
+  if (VerifyChecksum && (CalculateSum32 ((UINT32 *)Microcode, TotalSize) != 0)) {
     return FALSE;
   }
 
@@ -272,29 +274,34 @@ IsValidMicrocode (
   if ((ExtendedTableLength < sizeof (CPU_MICROCODE_EXTENDED_TABLE_HEADER)) || ((ExtendedTableLength % 4) != 0)) {
     return FALSE;
   }
+
   //
   // Extended Table exist, check if the CPU in support list
   //
-  ExtendedTableHeader = (CPU_MICROCODE_EXTENDED_TABLE_HEADER *) ((UINTN) (Microcode + 1) + DataSize);
+  ExtendedTableHeader = (CPU_MICROCODE_EXTENDED_TABLE_HEADER *)((UINTN)(Microcode + 1) + DataSize);
   if (ExtendedTableHeader->ExtendedSignatureCount > MAX_UINT32 / sizeof (CPU_MICROCODE_EXTENDED_TABLE)) {
     return FALSE;
   }
+
   if (ExtendedTableHeader->ExtendedSignatureCount * sizeof (CPU_MICROCODE_EXTENDED_TABLE)
-      > ExtendedTableLength - sizeof (CPU_MICROCODE_EXTENDED_TABLE_HEADER)) {
-    return FALSE;
-  }
-  //
-  // Check the extended table checksum
-  //
-  if (VerifyChecksum && (CalculateSum32 ((UINT32 *) ExtendedTableHeader, ExtendedTableLength) != 0)) {
+      > ExtendedTableLength - sizeof (CPU_MICROCODE_EXTENDED_TABLE_HEADER))
+  {
     return FALSE;
   }
 
-  ExtendedTable = (CPU_MICROCODE_EXTENDED_TABLE *) (ExtendedTableHeader + 1);
-  for (Index = 0; Index < ExtendedTableHeader->ExtendedSignatureCount; Index ++) {
+  //
+  // Check the extended table checksum
+  //
+  if (VerifyChecksum && (CalculateSum32 ((UINT32 *)ExtendedTableHeader, ExtendedTableLength) != 0)) {
+    return FALSE;
+  }
+
+  ExtendedTable = (CPU_MICROCODE_EXTENDED_TABLE *)(ExtendedTableHeader + 1);
+  for (Index = 0; Index < ExtendedTableHeader->ExtendedSignatureCount; Index++) {
     if (VerifyChecksum &&
         (ExtendedTable[Index].ProcessorSignature.Uint32 + ExtendedTable[Index].ProcessorFlag
-        + ExtendedTable[Index].Checksum != Sum32)) {
+         + ExtendedTable[Index].Checksum != Sum32))
+    {
       //
       // The extended table entry is valid when the summation of Processor Signature, Processor Flags
       // and Checksum equal to the coresponding summation from primary header. Because:
@@ -308,6 +315,7 @@ IsValidMicrocode (
       //
       continue;
     }
+
     Match = IsProcessorMatchedMicrocode (
               ExtendedTable[Index].ProcessorSignature.Uint32,
               ExtendedTable[Index].ProcessorFlag,
@@ -318,5 +326,6 @@ IsValidMicrocode (
       return TRUE;
     }
   }
+
   return FALSE;
 }

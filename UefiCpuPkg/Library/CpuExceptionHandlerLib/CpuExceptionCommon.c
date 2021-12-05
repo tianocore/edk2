@@ -14,15 +14,15 @@
 //
 // 1 means an error code will be pushed, otherwise 0
 //
-CONST UINT32 mErrorCodeFlag = 0x20227d00;
+CONST UINT32  mErrorCodeFlag = 0x20227d00;
 
 //
 // Define the maximum message length
 //
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
 
-CONST CHAR8 mExceptionReservedStr[] = "Reserved";
-CONST CHAR8 *mExceptionNameStr[] = {
+CONST CHAR8  mExceptionReservedStr[] = "Reserved";
+CONST CHAR8  *mExceptionNameStr[]    = {
   "#DE - Divide Error",
   "#DB - Debug",
   "NMI Interrupt",
@@ -66,10 +66,10 @@ CONST CHAR8 *mExceptionNameStr[] = {
 **/
 CONST CHAR8 *
 GetExceptionNameStr (
-  IN EFI_EXCEPTION_TYPE          ExceptionType
+  IN EFI_EXCEPTION_TYPE  ExceptionType
   )
 {
-  if ((UINTN) ExceptionType < EXCEPTION_KNOWN_NAME_NUM) {
+  if ((UINTN)ExceptionType < EXCEPTION_KNOWN_NAME_NUM) {
     return mExceptionNameStr[ExceptionType];
   } else {
     return mExceptionReservedStr;
@@ -115,13 +115,13 @@ InternalPrintMessage (
 **/
 VOID
 DumpModuleImageInfo (
-  IN  UINTN              CurrentEip
+  IN  UINTN  CurrentEip
   )
 {
-  EFI_STATUS                           Status;
-  UINTN                                Pe32Data;
-  VOID                                 *PdbPointer;
-  VOID                                 *EntryPoint;
+  EFI_STATUS  Status;
+  UINTN       Pe32Data;
+  VOID        *PdbPointer;
+  VOID        *EntryPoint;
 
   Pe32Data = PeCoffSearchImageBase (CurrentEip);
   if (Pe32Data == 0) {
@@ -130,20 +130,22 @@ DumpModuleImageInfo (
     //
     // Find Image Base entry point
     //
-    Status = PeCoffLoaderGetEntryPoint ((VOID *) Pe32Data, &EntryPoint);
+    Status = PeCoffLoaderGetEntryPoint ((VOID *)Pe32Data, &EntryPoint);
     if (EFI_ERROR (Status)) {
       EntryPoint = NULL;
     }
+
     InternalPrintMessage ("!!!! Find image based on IP(0x%x) ", CurrentEip);
-    PdbPointer = PeCoffLoaderGetPdbPointer ((VOID *) Pe32Data);
+    PdbPointer = PeCoffLoaderGetPdbPointer ((VOID *)Pe32Data);
     if (PdbPointer != NULL) {
       InternalPrintMessage ("%a", PdbPointer);
     } else {
-      InternalPrintMessage ("(No PDB) " );
+      InternalPrintMessage ("(No PDB) ");
     }
+
     InternalPrintMessage (
       " (ImageBase=%016lp, EntryPoint=%016p) !!!!\n",
-      (VOID *) Pe32Data,
+      (VOID *)Pe32Data,
       EntryPoint
       );
   }
@@ -162,9 +164,9 @@ DumpModuleImageInfo (
 **/
 EFI_STATUS
 ReadAndVerifyVectorInfo (
-  IN  EFI_VECTOR_HANDOFF_INFO       *VectorInfo,
-  OUT RESERVED_VECTORS_DATA         *ReservedVector,
-  IN  UINTN                         VectorCount
+  IN  EFI_VECTOR_HANDOFF_INFO  *VectorInfo,
+  OUT RESERVED_VECTORS_DATA    *ReservedVector,
+  IN  UINTN                    VectorCount
   )
 {
   while (VectorInfo->Attribute != EFI_VECTOR_HANDOFF_LAST_ENTRY) {
@@ -174,10 +176,13 @@ ReadAndVerifyVectorInfo (
       //
       return EFI_INVALID_PARAMETER;
     }
+
     if (VectorInfo->VectorNumber < VectorCount) {
       ReservedVector[VectorInfo->VectorNumber].Attribute = VectorInfo->Attribute;
     }
-    VectorInfo ++;
+
+    VectorInfo++;
   }
+
   return EFI_SUCCESS;
 }

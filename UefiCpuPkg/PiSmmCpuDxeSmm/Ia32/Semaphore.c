@@ -32,7 +32,7 @@ SemaphoreHook (
 
   mRebasedFlag = RebasedFlag;
 
-  CpuState = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+  CpuState                      = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
   mSmmRelocationOriginalAddress = (UINTN)HookReturnFromSmm (
                                            CpuIndex,
                                            CpuState,

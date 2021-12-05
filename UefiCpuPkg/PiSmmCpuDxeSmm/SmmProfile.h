@@ -23,7 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 ActivateSmmProfile (
-  IN UINTN CpuIndex
+  IN UINTN  CpuIndex
   );
 
 /**
@@ -55,8 +55,8 @@ SmmProfileRecordSmiNum (
 **/
 VOID
 SmmProfilePFHandler (
-  UINTN Rip,
-  UINTN ErrorCode
+  UINTN  Rip,
+  UINTN  ErrorCode
   );
 
 /**
@@ -79,7 +79,6 @@ EFIAPI
 PageFaultIdtHandlerSmmProfile (
   VOID
   );
-
 
 /**
   Check if feature is supported by a processor.
@@ -116,20 +115,20 @@ GetCpuIndex (
 **/
 VOID
 GuardPagePFHandler (
-  UINTN ErrorCode
+  UINTN  ErrorCode
   );
 
 //
 // The flag indicates if execute-disable is supported by processor.
 //
-extern BOOLEAN    mXdSupported;
+extern BOOLEAN  mXdSupported;
 //
 // The flag indicates if execute-disable is enabled on processor.
 //
-extern BOOLEAN    mXdEnabled;
+extern BOOLEAN  mXdEnabled;
 //
 // The flag indicates if #DB will be setup in #PF handler.
 //
-extern BOOLEAN    mSetupDebugTrap;
+extern BOOLEAN  mSetupDebugTrap;
 
 #endif // _SMM_PROFILE_H_

@@ -69,7 +69,7 @@ ClearTopLevelSmiStatus (
 EFI_STATUS
 EFIAPI
 PlatformSmmBspElection (
-  OUT BOOLEAN     *IsBsp
+  OUT BOOLEAN  *IsBsp
   )
 {
   return EFI_NOT_READY;
@@ -92,10 +92,10 @@ PlatformSmmBspElection (
 EFI_STATUS
 EFIAPI
 GetPlatformPageTableAttribute (
-  IN  UINT64                Address,
-  IN OUT SMM_PAGE_SIZE_TYPE *PageSize,
-  IN OUT UINTN              *NumOfPages,
-  IN OUT UINTN              *PageAttribute
+  IN  UINT64                 Address,
+  IN OUT SMM_PAGE_SIZE_TYPE  *PageSize,
+  IN OUT UINTN               *NumOfPages,
+  IN OUT UINTN               *PageAttribute
   )
 {
   return EFI_UNSUPPORTED;

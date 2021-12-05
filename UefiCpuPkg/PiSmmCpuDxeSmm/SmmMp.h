@@ -27,10 +27,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 SmmMpGetNumberOfProcessors (
-  IN CONST EFI_MM_MP_PROTOCOL   *This,
-  OUT      UINTN                *NumberOfProcessors
+  IN CONST EFI_MM_MP_PROTOCOL  *This,
+  OUT      UINTN               *NumberOfProcessors
   );
-
 
 /**
   This service allows the caller to invoke a procedure one of the application processors (AP). This
@@ -96,13 +95,13 @@ SmmMpGetNumberOfProcessors (
 EFI_STATUS
 EFIAPI
 SmmMpDispatchProcedure (
-  IN CONST EFI_MM_MP_PROTOCOL             *This,
-  IN       EFI_AP_PROCEDURE2              Procedure,
-  IN       UINTN                          CpuNumber,
-  IN       UINTN                          TimeoutInMicroseconds,
-  IN OUT   VOID                           *ProcedureArguments OPTIONAL,
-  IN OUT   MM_COMPLETION                  *Token,
-  IN OUT   EFI_STATUS                     *CPUStatus
+  IN CONST EFI_MM_MP_PROTOCOL  *This,
+  IN       EFI_AP_PROCEDURE2   Procedure,
+  IN       UINTN               CpuNumber,
+  IN       UINTN               TimeoutInMicroseconds,
+  IN OUT   VOID                *ProcedureArguments OPTIONAL,
+  IN OUT   MM_COMPLETION       *Token,
+  IN OUT   EFI_STATUS          *CPUStatus
   );
 
 /**
@@ -174,14 +173,13 @@ SmmMpDispatchProcedure (
 EFI_STATUS
 EFIAPI
 SmmMpBroadcastProcedure (
-  IN CONST EFI_MM_MP_PROTOCOL             *This,
-  IN       EFI_AP_PROCEDURE2              Procedure,
-  IN       UINTN                          TimeoutInMicroseconds,
-  IN OUT   VOID                           *ProcedureArguments OPTIONAL,
-  IN OUT   MM_COMPLETION                  *Token,
-  IN OUT   EFI_STATUS                     *CPUStatus
+  IN CONST EFI_MM_MP_PROTOCOL  *This,
+  IN       EFI_AP_PROCEDURE2   Procedure,
+  IN       UINTN               TimeoutInMicroseconds,
+  IN OUT   VOID                *ProcedureArguments OPTIONAL,
+  IN OUT   MM_COMPLETION       *Token,
+  IN OUT   EFI_STATUS          *CPUStatus
   );
-
 
 /**
   This service allows the caller to set a startup procedure that will be executed when an AP powers
@@ -246,8 +244,8 @@ SmmMpSetStartupProcedure (
 EFI_STATUS
 EFIAPI
 SmmMpCheckForProcedure (
-  IN CONST EFI_MM_MP_PROTOCOL             *This,
-  IN       MM_COMPLETION                  Token
+  IN CONST EFI_MM_MP_PROTOCOL  *This,
+  IN       MM_COMPLETION       Token
   );
 
 /**
@@ -278,8 +276,8 @@ SmmMpCheckForProcedure (
 EFI_STATUS
 EFIAPI
 SmmMpWaitForProcedure (
-  IN CONST EFI_MM_MP_PROTOCOL            *This,
-  IN       MM_COMPLETION                 Token
+  IN CONST EFI_MM_MP_PROTOCOL  *This,
+  IN       MM_COMPLETION       Token
   );
 
 #endif

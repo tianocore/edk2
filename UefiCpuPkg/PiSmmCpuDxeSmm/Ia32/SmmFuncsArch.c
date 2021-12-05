@@ -8,18 +8,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PiSmmCpuDxeSmm.h"
 
-extern UINT64 gTaskGateDescriptor;
+extern UINT64  gTaskGateDescriptor;
 
-EFI_PHYSICAL_ADDRESS                mGdtBuffer;
-UINTN                               mGdtBufferSize;
+EFI_PHYSICAL_ADDRESS  mGdtBuffer;
+UINTN                 mGdtBufferSize;
 
-extern BOOLEAN mCetSupported;
-extern UINTN mSmmShadowStackSize;
+extern BOOLEAN  mCetSupported;
+extern UINTN    mSmmShadowStackSize;
 
-X86_ASSEMBLY_PATCH_LABEL mPatchCetPl0Ssp;
-X86_ASSEMBLY_PATCH_LABEL mPatchCetInterruptSsp;
-UINT32 mCetPl0Ssp;
-UINT32 mCetInterruptSsp;
+X86_ASSEMBLY_PATCH_LABEL  mPatchCetPl0Ssp;
+X86_ASSEMBLY_PATCH_LABEL  mPatchCetInterruptSsp;
+UINT32                    mCetPl0Ssp;
+UINT32                    mCetInterruptSsp;
 
 /**
   Initialize IDT for SMM Stack Guard.
@@ -38,8 +38,8 @@ InitializeIDTSmmStackGuard (
   // is a Task Gate Descriptor so that when a Page Fault Exception occurs,
   // the processors can use a known good stack in case stack is ran out.
   //
-  IdtGate = (IA32_IDT_GATE_DESCRIPTOR *)gcSmiIdtr.Base;
-  IdtGate += EXCEPT_IA32_PAGE_FAULT;
+  IdtGate         = (IA32_IDT_GATE_DESCRIPTOR *)gcSmiIdtr.Base;
+  IdtGate        += EXCEPT_IA32_PAGE_FAULT;
   IdtGate->Uint64 = gTaskGateDescriptor;
 }
 
@@ -58,13 +58,13 @@ InitGdt (
   OUT UINTN  *GdtStepSize
   )
 {
-  UINTN                     Index;
-  IA32_SEGMENT_DESCRIPTOR   *GdtDescriptor;
-  UINTN                     TssBase;
-  UINTN                     GdtTssTableSize;
-  UINT8                     *GdtTssTables;
-  UINTN                     GdtTableStepSize;
-  UINTN                     InterruptShadowStack;
+  UINTN                    Index;
+  IA32_SEGMENT_DESCRIPTOR  *GdtDescriptor;
+  UINTN                    TssBase;
+  UINTN                    GdtTssTableSize;
+  UINT8                    *GdtTssTables;
+  UINTN                    GdtTableStepSize;
+  UINTN                    InterruptShadowStack;
 
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
     //
@@ -79,46 +79,46 @@ InitGdt (
     gcSmiGdtr.Limit += (UINT16)(2 * sizeof (IA32_SEGMENT_DESCRIPTOR));
 
     GdtTssTableSize = (gcSmiGdtr.Limit + 1 + TSS_SIZE + EXCEPTION_TSS_SIZE + 7) & ~7; // 8 bytes aligned
-    mGdtBufferSize = GdtTssTableSize * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
+    mGdtBufferSize  = GdtTssTableSize * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
     //
     // IA32 Stack Guard need use task switch to switch stack that need
     // write GDT and TSS, so AllocateCodePages() could not be used here
     // as code pages will be set to RO.
     //
-    GdtTssTables = (UINT8*)AllocatePages (EFI_SIZE_TO_PAGES (mGdtBufferSize));
+    GdtTssTables = (UINT8 *)AllocatePages (EFI_SIZE_TO_PAGES (mGdtBufferSize));
     ASSERT (GdtTssTables != NULL);
-    mGdtBuffer = (UINTN)GdtTssTables;
+    mGdtBuffer       = (UINTN)GdtTssTables;
     GdtTableStepSize = GdtTssTableSize;
 
     for (Index = 0; Index < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; Index++) {
-      CopyMem (GdtTssTables + GdtTableStepSize * Index, (VOID*)(UINTN)gcSmiGdtr.Base, gcSmiGdtr.Limit + 1 + TSS_SIZE + EXCEPTION_TSS_SIZE);
+      CopyMem (GdtTssTables + GdtTableStepSize * Index, (VOID *)(UINTN)gcSmiGdtr.Base, gcSmiGdtr.Limit + 1 + TSS_SIZE + EXCEPTION_TSS_SIZE);
       //
       // Fixup TSS descriptors
       //
-      TssBase = (UINTN)(GdtTssTables + GdtTableStepSize * Index + gcSmiGdtr.Limit + 1);
-      GdtDescriptor = (IA32_SEGMENT_DESCRIPTOR *)(TssBase) - 2;
-      GdtDescriptor->Bits.BaseLow = (UINT16)TssBase;
-      GdtDescriptor->Bits.BaseMid = (UINT8)(TssBase >> 16);
+      TssBase                      = (UINTN)(GdtTssTables + GdtTableStepSize * Index + gcSmiGdtr.Limit + 1);
+      GdtDescriptor                = (IA32_SEGMENT_DESCRIPTOR *)(TssBase) - 2;
+      GdtDescriptor->Bits.BaseLow  = (UINT16)TssBase;
+      GdtDescriptor->Bits.BaseMid  = (UINT8)(TssBase >> 16);
       GdtDescriptor->Bits.BaseHigh = (UINT8)(TssBase >> 24);
 
       TssBase += TSS_SIZE;
       GdtDescriptor++;
-      GdtDescriptor->Bits.BaseLow = (UINT16)TssBase;
-      GdtDescriptor->Bits.BaseMid = (UINT8)(TssBase >> 16);
+      GdtDescriptor->Bits.BaseLow  = (UINT16)TssBase;
+      GdtDescriptor->Bits.BaseMid  = (UINT8)(TssBase >> 16);
       GdtDescriptor->Bits.BaseHigh = (UINT8)(TssBase >> 24);
       //
       // Fixup TSS segments
       //
       // ESP as known good stack
       //
-      *(UINTN *)(TssBase + TSS_IA32_ESP_OFFSET) =  mSmmStackArrayBase + EFI_PAGE_SIZE + Index * mSmmStackSize;
+      *(UINTN *)(TssBase + TSS_IA32_ESP_OFFSET)  =  mSmmStackArrayBase + EFI_PAGE_SIZE + Index * mSmmStackSize;
       *(UINT32 *)(TssBase + TSS_IA32_CR3_OFFSET) = Cr3;
 
       //
       // Setup ShadowStack for stack switch
       //
       if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
-        InterruptShadowStack = (UINTN)(mSmmStackArrayBase + mSmmStackSize + EFI_PAGES_TO_SIZE (1) - sizeof(UINT64) + (mSmmStackSize + mSmmShadowStackSize) * Index);
+        InterruptShadowStack                       = (UINTN)(mSmmStackArrayBase + mSmmStackSize + EFI_PAGES_TO_SIZE (1) - sizeof (UINT64) + (mSmmStackSize + mSmmShadowStackSize) * Index);
         *(UINT32 *)(TssBase + TSS_IA32_SSP_OFFSET) = (UINT32)InterruptShadowStack;
       }
     }
@@ -127,14 +127,14 @@ InitGdt (
     // Just use original table, AllocatePage and copy them here to make sure GDTs are covered in page memory.
     //
     GdtTssTableSize = gcSmiGdtr.Limit + 1;
-    mGdtBufferSize = GdtTssTableSize * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
-    GdtTssTables = (UINT8*)AllocateCodePages (EFI_SIZE_TO_PAGES (mGdtBufferSize));
+    mGdtBufferSize  = GdtTssTableSize * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
+    GdtTssTables    = (UINT8 *)AllocateCodePages (EFI_SIZE_TO_PAGES (mGdtBufferSize));
     ASSERT (GdtTssTables != NULL);
-    mGdtBuffer = (UINTN)GdtTssTables;
+    mGdtBuffer       = (UINTN)GdtTssTables;
     GdtTableStepSize = GdtTssTableSize;
 
     for (Index = 0; Index < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; Index++) {
-      CopyMem (GdtTssTables + GdtTableStepSize * Index, (VOID*)(UINTN)gcSmiGdtr.Base, gcSmiGdtr.Limit + 1);
+      CopyMem (GdtTssTables + GdtTableStepSize * Index, (VOID *)(UINTN)gcSmiGdtr.Base, gcSmiGdtr.Limit + 1);
     }
   }
 
@@ -181,24 +181,24 @@ InitShadowStack (
   IN VOID   *ShadowStack
   )
 {
-  UINTN       SmmShadowStackSize;
+  UINTN  SmmShadowStackSize;
 
   if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
     SmmShadowStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmShadowStackSize)));
     if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
       SmmShadowStackSize += EFI_PAGES_TO_SIZE (2);
     }
-    mCetPl0Ssp = (UINT32)((UINTN)ShadowStack + SmmShadowStackSize - sizeof(UINT64));
+
+    mCetPl0Ssp = (UINT32)((UINTN)ShadowStack + SmmShadowStackSize - sizeof (UINT64));
     PatchInstructionX86 (mPatchCetPl0Ssp, mCetPl0Ssp, 4);
     DEBUG ((DEBUG_INFO, "mCetPl0Ssp - 0x%x\n", mCetPl0Ssp));
     DEBUG ((DEBUG_INFO, "ShadowStack - 0x%x\n", ShadowStack));
     DEBUG ((DEBUG_INFO, "  SmmShadowStackSize - 0x%x\n", SmmShadowStackSize));
 
     if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-      mCetInterruptSsp = (UINT32)((UINTN)ShadowStack + EFI_PAGES_TO_SIZE(1) - sizeof(UINT64));
+      mCetInterruptSsp = (UINT32)((UINTN)ShadowStack + EFI_PAGES_TO_SIZE (1) - sizeof (UINT64));
       PatchInstructionX86 (mPatchCetInterruptSsp, mCetInterruptSsp, 4);
       DEBUG ((DEBUG_INFO, "mCetInterruptSsp - 0x%x\n", mCetInterruptSsp));
     }
   }
 }
-

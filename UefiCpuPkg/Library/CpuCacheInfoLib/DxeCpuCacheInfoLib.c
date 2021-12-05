@@ -23,10 +23,10 @@
 **/
 EFI_STATUS
 CpuCacheInfoGetMpServices (
-  OUT MP_SERVICES           *MpServices
+  OUT MP_SERVICES  *MpServices
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = gBS->LocateProtocol (&gEfiMpServiceProtocolGuid, NULL, (VOID **)&MpServices->Protocol);
   ASSERT_EFI_ERROR (Status);
@@ -43,12 +43,12 @@ CpuCacheInfoGetMpServices (
 **/
 VOID
 CpuCacheInfoStartupAllCPUs (
-  IN MP_SERVICES            MpServices,
-  IN EFI_AP_PROCEDURE       Procedure,
-  IN VOID                   *ProcedureArgument
+  IN MP_SERVICES       MpServices,
+  IN EFI_AP_PROCEDURE  Procedure,
+  IN VOID              *ProcedureArgument
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = MpServices.Protocol->StartupAllAPs (MpServices.Protocol, Procedure, FALSE, NULL, 0, ProcedureArgument, NULL);
   if (Status == EFI_NOT_STARTED) {
@@ -58,6 +58,7 @@ CpuCacheInfoStartupAllCPUs (
     //
     Status = EFI_SUCCESS;
   }
+
   ASSERT_EFI_ERROR (Status);
 
   Procedure (ProcedureArgument);
@@ -72,12 +73,12 @@ CpuCacheInfoStartupAllCPUs (
 **/
 VOID
 CpuCacheInfoGetProcessorInfo (
-  IN MP_SERVICES                MpServices,
-  IN UINTN                      ProcessorNum,
-  OUT EFI_PROCESSOR_INFORMATION *ProcessorInfo
+  IN MP_SERVICES                 MpServices,
+  IN UINTN                       ProcessorNum,
+  OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfo
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = MpServices.Protocol->GetProcessorInfo (MpServices.Protocol, ProcessorNum, ProcessorInfo);
   ASSERT_EFI_ERROR (Status);
@@ -92,11 +93,11 @@ CpuCacheInfoGetProcessorInfo (
 **/
 UINT32
 CpuCacheInfoWhoAmI (
-  IN MP_SERVICES            MpServices
+  IN MP_SERVICES  MpServices
   )
 {
-  EFI_STATUS                Status;
-  UINTN                     ProcessorNum;
+  EFI_STATUS  Status;
+  UINTN       ProcessorNum;
 
   Status = MpServices.Protocol->WhoAmI (MpServices.Protocol, &ProcessorNum);
   ASSERT_EFI_ERROR (Status);
@@ -113,12 +114,12 @@ CpuCacheInfoWhoAmI (
 **/
 UINT32
 CpuCacheInfoGetNumberOfProcessors (
-  IN MP_SERVICES            MpServices
+  IN MP_SERVICES  MpServices
   )
 {
-  EFI_STATUS                Status;
-  UINTN                     NumberOfProcessor;
-  UINTN                     NumberOfEnabledProcessor;
+  EFI_STATUS  Status;
+  UINTN       NumberOfProcessor;
+  UINTN       NumberOfEnabledProcessor;
 
   Status = MpServices.Protocol->GetNumberOfProcessors (MpServices.Protocol, &NumberOfProcessor, &NumberOfEnabledProcessor);
   ASSERT_EFI_ERROR (Status);

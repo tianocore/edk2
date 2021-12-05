@@ -20,21 +20,21 @@
 #include <Library/SynchronizationLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 
-#define  CPU_EXCEPTION_NUM          32
-#define  CPU_INTERRUPT_NUM         256
-#define  HOOKAFTER_STUB_SIZE        16
+#define  CPU_EXCEPTION_NUM    32
+#define  CPU_INTERRUPT_NUM    256
+#define  HOOKAFTER_STUB_SIZE  16
 
 //
 // Exception Error Code of Page-Fault Exception
 //
-#define IA32_PF_EC_P                BIT0
-#define IA32_PF_EC_WR               BIT1
-#define IA32_PF_EC_US               BIT2
-#define IA32_PF_EC_RSVD             BIT3
-#define IA32_PF_EC_ID               BIT4
-#define IA32_PF_EC_PK               BIT5
-#define IA32_PF_EC_SS               BIT6
-#define IA32_PF_EC_SGX              BIT15
+#define IA32_PF_EC_P     BIT0
+#define IA32_PF_EC_WR    BIT1
+#define IA32_PF_EC_US    BIT2
+#define IA32_PF_EC_RSVD  BIT3
+#define IA32_PF_EC_ID    BIT4
+#define IA32_PF_EC_PK    BIT5
+#define IA32_PF_EC_SS    BIT6
+#define IA32_PF_EC_SGX   BIT15
 
 #include "ArchInterruptDefs.h"
 
@@ -47,26 +47,26 @@
 #define CPU_KNOWN_GOOD_STACK_SIZE \
   FixedPcdGet32 (PcdCpuKnownGoodStackSize)
 
-#define CPU_TSS_GDT_SIZE (SIZE_2KB + CPU_TSS_DESC_SIZE + CPU_TSS_SIZE)
+#define CPU_TSS_GDT_SIZE  (SIZE_2KB + CPU_TSS_DESC_SIZE + CPU_TSS_SIZE)
 
 //
 // Record exception handler information
 //
 typedef struct {
-  UINTN ExceptionStart;
-  UINTN ExceptionStubHeaderSize;
-  UINTN HookAfterStubHeaderStart;
+  UINTN    ExceptionStart;
+  UINTN    ExceptionStubHeaderSize;
+  UINTN    HookAfterStubHeaderStart;
 } EXCEPTION_HANDLER_TEMPLATE_MAP;
 
 typedef struct {
-  UINTN                       IdtEntryCount;
-  SPIN_LOCK                   DisplayMessageSpinLock;
-  RESERVED_VECTORS_DATA       *ReservedVectors;
-  EFI_CPU_INTERRUPT_HANDLER   *ExternalInterruptHandler;
+  UINTN                        IdtEntryCount;
+  SPIN_LOCK                    DisplayMessageSpinLock;
+  RESERVED_VECTORS_DATA        *ReservedVectors;
+  EFI_CPU_INTERRUPT_HANDLER    *ExternalInterruptHandler;
 } EXCEPTION_HANDLER_DATA;
 
-extern CONST UINT32                mErrorCodeFlag;
-extern CONST UINTN                 mDoFarReturnFlag;
+extern CONST UINT32  mErrorCodeFlag;
+extern CONST UINTN   mDoFarReturnFlag;
 
 /**
   Return address map of exception handler template so that C code can generate
@@ -77,7 +77,7 @@ extern CONST UINTN                 mDoFarReturnFlag;
 VOID
 EFIAPI
 AsmGetTemplateAddressMap (
-  OUT EXCEPTION_HANDLER_TEMPLATE_MAP *AddressMap
+  OUT EXCEPTION_HANDLER_TEMPLATE_MAP  *AddressMap
   );
 
 /**
@@ -90,8 +90,8 @@ AsmGetTemplateAddressMap (
 **/
 VOID
 ArchUpdateIdtEntry (
-  OUT IA32_IDT_GATE_DESCRIPTOR       *IdtEntry,
-  IN  UINTN                          InterruptHandler
+  OUT IA32_IDT_GATE_DESCRIPTOR  *IdtEntry,
+  IN  UINTN                     InterruptHandler
   );
 
 /**
@@ -102,7 +102,7 @@ ArchUpdateIdtEntry (
 **/
 UINTN
 ArchGetIdtHandler (
-  IN IA32_IDT_GATE_DESCRIPTOR        *IdtEntry
+  IN IA32_IDT_GATE_DESCRIPTOR  *IdtEntry
   );
 
 /**
@@ -128,7 +128,7 @@ InternalPrintMessage (
 **/
 VOID
 DumpModuleImageInfo (
-  IN  UINTN              CurrentEip
+  IN  UINTN  CurrentEip
   );
 
 /**
@@ -139,8 +139,8 @@ DumpModuleImageInfo (
 **/
 VOID
 DumpImageAndCpuContent (
-  IN EFI_EXCEPTION_TYPE   ExceptionType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext
+  IN EFI_EXCEPTION_TYPE  ExceptionType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   );
 
 /**
@@ -157,8 +157,8 @@ DumpImageAndCpuContent (
 **/
 EFI_STATUS
 InitializeCpuExceptionHandlersWorker (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL,
-  IN OUT EXCEPTION_HANDLER_DATA    *ExceptionHandlerData
+  IN EFI_VECTOR_HANDOFF_INFO     *VectorInfo OPTIONAL,
+  IN OUT EXCEPTION_HANDLER_DATA  *ExceptionHandlerData
   );
 
 /**
@@ -180,9 +180,9 @@ InitializeCpuExceptionHandlersWorker (
 **/
 EFI_STATUS
 RegisterCpuInterruptHandlerWorker (
-  IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler,
-  IN EXCEPTION_HANDLER_DATA        *ExceptionHandlerData
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler,
+  IN EXCEPTION_HANDLER_DATA     *ExceptionHandlerData
   );
 
 /**
@@ -210,9 +210,9 @@ UpdateIdtTable (
 **/
 VOID
 ArchSaveExceptionContext (
-  IN UINTN                        ExceptionType,
-  IN EFI_SYSTEM_CONTEXT           SystemContext,
-  IN EXCEPTION_HANDLER_DATA       *ExceptionHandlerData
+  IN UINTN                   ExceptionType,
+  IN EFI_SYSTEM_CONTEXT      SystemContext,
+  IN EXCEPTION_HANDLER_DATA  *ExceptionHandlerData
   );
 
 /**
@@ -224,9 +224,9 @@ ArchSaveExceptionContext (
 **/
 VOID
 ArchRestoreExceptionContext (
-  IN UINTN                        ExceptionType,
-  IN EFI_SYSTEM_CONTEXT           SystemContext,
-  IN EXCEPTION_HANDLER_DATA       *ExceptionHandlerData
+  IN UINTN                   ExceptionType,
+  IN EFI_SYSTEM_CONTEXT      SystemContext,
+  IN EXCEPTION_HANDLER_DATA  *ExceptionHandlerData
   );
 
 /**
@@ -240,9 +240,9 @@ ArchRestoreExceptionContext (
 VOID
 EFIAPI
 AsmVectorNumFixup (
-  IN VOID    *NewVectorAddr,
-  IN UINT8   VectorNum,
-  IN VOID    *OldVectorAddr
+  IN VOID   *NewVectorAddr,
+  IN UINT8  VectorNum,
+  IN VOID   *OldVectorAddr
   );
 
 /**
@@ -258,9 +258,9 @@ AsmVectorNumFixup (
 **/
 EFI_STATUS
 ReadAndVerifyVectorInfo (
-  IN  EFI_VECTOR_HANDOFF_INFO       *VectorInfo,
-  OUT RESERVED_VECTORS_DATA         *ReservedVector,
-  IN  UINTN                         VectorCount
+  IN  EFI_VECTOR_HANDOFF_INFO  *VectorInfo,
+  OUT RESERVED_VECTORS_DATA    *ReservedVector,
+  IN  UINTN                    VectorCount
   );
 
 /**
@@ -272,7 +272,7 @@ ReadAndVerifyVectorInfo (
 **/
 CONST CHAR8 *
 GetExceptionNameStr (
-  IN EFI_EXCEPTION_TYPE          ExceptionType
+  IN EFI_EXCEPTION_TYPE  ExceptionType
   );
 
 /**
@@ -284,9 +284,9 @@ GetExceptionNameStr (
 **/
 VOID
 CommonExceptionHandlerWorker (
-  IN EFI_EXCEPTION_TYPE          ExceptionType,
-  IN EFI_SYSTEM_CONTEXT          SystemContext,
-  IN EXCEPTION_HANDLER_DATA      *ExceptionHandlerData
+  IN EFI_EXCEPTION_TYPE      ExceptionType,
+  IN EFI_SYSTEM_CONTEXT      SystemContext,
+  IN EXCEPTION_HANDLER_DATA  *ExceptionHandlerData
   );
 
 /**
@@ -301,7 +301,7 @@ CommonExceptionHandlerWorker (
 **/
 EFI_STATUS
 ArchSetupExceptionStack (
-  IN CPU_EXCEPTION_INIT_DATA        *StackSwitchData
+  IN CPU_EXCEPTION_INIT_DATA  *StackSwitchData
   );
 
 /**
@@ -318,4 +318,3 @@ AsmGetTssTemplateMap (
   );
 
 #endif
-

@@ -9,8 +9,8 @@
 #include "CpuDxe.h"
 #include "CpuMp.h"
 
-EFI_HANDLE     mMpServiceHandle       = NULL;
-UINTN          mNumberOfProcessors    = 1;
+EFI_HANDLE  mMpServiceHandle    = NULL;
+UINTN       mNumberOfProcessors = 1;
 
 EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate = {
   GetNumberOfProcessors,
@@ -509,7 +509,7 @@ WhoAmI (
   OUT UINTN                    *ProcessorNumber
   )
 {
-  return MpInitLibWhoAmI (ProcessorNumber);;
+  return MpInitLibWhoAmI (ProcessorNumber);
 }
 
 /**
@@ -547,8 +547,8 @@ CollectBistDataFromHob (
     // Sec Platform Information2 PPI includes BSP/APs' BIST information
     //
     SecPlatformInformation2 = GET_GUID_HOB_DATA (GuidHob);
-    NumberOfData = SecPlatformInformation2->NumberOfCpus;
-    CpuInstance  = SecPlatformInformation2->CpuInstance;
+    NumberOfData            = SecPlatformInformation2->NumberOfCpus;
+    CpuInstance             = SecPlatformInformation2->CpuInstance;
   } else {
     //
     // Otherwise, get gEfiSecPlatformInformationPpiGuid Guided HOB
@@ -556,14 +556,14 @@ CollectBistDataFromHob (
     GuidHob = GetFirstGuidHob (&gEfiSecPlatformInformationPpiGuid);
     if (GuidHob != NULL) {
       SecPlatformInformation = GET_GUID_HOB_DATA (GuidHob);
-      NumberOfData = 1;
+      NumberOfData           = 1;
       //
       // SEC Platform Information only includes BSP's BIST information
       // does not have BSP's APIC ID
       //
-      BspCpuInstance.CpuLocation = GetApicId ();
-      BspCpuInstance.InfoRecord.IA32HealthFlags.Uint32  = SecPlatformInformation->IA32HealthFlags.Uint32;
-      CpuInstance = &BspCpuInstance;
+      BspCpuInstance.CpuLocation                       = GetApicId ();
+      BspCpuInstance.InfoRecord.IA32HealthFlags.Uint32 = SecPlatformInformation->IA32HealthFlags.Uint32;
+      CpuInstance                                      = &BspCpuInstance;
     } else {
       DEBUG ((DEBUG_INFO, "Does not find any HOB stored CPU BIST information!\n"));
       //
@@ -583,6 +583,7 @@ CollectBistDataFromHob (
         BistData = CpuInstance[CpuInstanceNumber].InfoRecord.IA32HealthFlags;
       }
     }
+
     if (BistData.Uint32 != 0) {
       //
       // Report Status Code that self test is failed
@@ -607,7 +608,7 @@ CollectBistDataFromHob (
 VOID
 EFIAPI
 GetGdtr (
-  IN OUT VOID *Buffer
+  IN OUT VOID  *Buffer
   )
 {
   AsmReadGdtr ((IA32_DESCRIPTOR *)Buffer);
@@ -625,12 +626,12 @@ GetGdtr (
 VOID
 EFIAPI
 InitializeExceptionStackSwitchHandlers (
-  IN OUT VOID *Buffer
+  IN OUT VOID  *Buffer
   )
 {
-  CPU_EXCEPTION_INIT_DATA           *EssData;
-  IA32_DESCRIPTOR                   Idtr;
-  EFI_STATUS                        Status;
+  CPU_EXCEPTION_INIT_DATA  *EssData;
+  IA32_DESCRIPTOR          Idtr;
+  EFI_STATUS               Status;
 
   EssData = Buffer;
   //
@@ -638,9 +639,9 @@ InitializeExceptionStackSwitchHandlers (
   // the AP's IDT is the same as BSP's IDT either.
   //
   AsmReadIdtr (&Idtr);
-  EssData->Ia32.IdtTable = (VOID *)Idtr.Base;
+  EssData->Ia32.IdtTable     = (VOID *)Idtr.Base;
   EssData->Ia32.IdtTableSize = Idtr.Limit + 1;
-  Status = InitializeCpuExceptionHandlersEx (NULL, EssData);
+  Status                     = InitializeCpuExceptionHandlersEx (NULL, EssData);
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -656,19 +657,19 @@ InitializeMpExceptionStackSwitchHandlers (
   VOID
   )
 {
-  UINTN                           Index;
-  UINTN                           Bsp;
-  UINTN                           ExceptionNumber;
-  UINTN                           OldGdtSize;
-  UINTN                           NewGdtSize;
-  UINTN                           NewStackSize;
-  IA32_DESCRIPTOR                 Gdtr;
-  CPU_EXCEPTION_INIT_DATA         EssData;
-  UINT8                           *GdtBuffer;
-  UINT8                           *StackTop;
+  UINTN                    Index;
+  UINTN                    Bsp;
+  UINTN                    ExceptionNumber;
+  UINTN                    OldGdtSize;
+  UINTN                    NewGdtSize;
+  UINTN                    NewStackSize;
+  IA32_DESCRIPTOR          Gdtr;
+  CPU_EXCEPTION_INIT_DATA  EssData;
+  UINT8                    *GdtBuffer;
+  UINT8                    *StackTop;
 
   ExceptionNumber = FixedPcdGetSize (PcdCpuStackSwitchExceptionList);
-  NewStackSize = FixedPcdGet32 (PcdCpuKnownGoodStackSize) * ExceptionNumber;
+  NewStackSize    = FixedPcdGet32 (PcdCpuKnownGoodStackSize) * ExceptionNumber;
 
   StackTop = AllocateRuntimeZeroPool (NewStackSize * mNumberOfProcessors);
   ASSERT (StackTop != NULL);
@@ -678,17 +679,17 @@ InitializeMpExceptionStackSwitchHandlers (
   // The default exception handlers must have been initialized. Let's just skip
   // it in this method.
   //
-  EssData.Ia32.Revision = CPU_EXCEPTION_INIT_DATA_REV;
+  EssData.Ia32.Revision            = CPU_EXCEPTION_INIT_DATA_REV;
   EssData.Ia32.InitDefaultHandlers = FALSE;
 
-  EssData.Ia32.StackSwitchExceptions = FixedPcdGetPtr(PcdCpuStackSwitchExceptionList);
+  EssData.Ia32.StackSwitchExceptions      = FixedPcdGetPtr (PcdCpuStackSwitchExceptionList);
   EssData.Ia32.StackSwitchExceptionNumber = ExceptionNumber;
-  EssData.Ia32.KnownGoodStackSize = FixedPcdGet32(PcdCpuKnownGoodStackSize);
+  EssData.Ia32.KnownGoodStackSize         = FixedPcdGet32 (PcdCpuKnownGoodStackSize);
 
   //
   // Initialize Gdtr to suppress incorrect compiler/analyzer warnings.
   //
-  Gdtr.Base = 0;
+  Gdtr.Base  = 0;
   Gdtr.Limit = 0;
   MpInitLibWhoAmI (&Bsp);
   for (Index = 0; Index < mNumberOfProcessors; ++Index) {
@@ -733,7 +734,7 @@ InitializeMpExceptionStackSwitchHandlers (
     //    |                              |
     //    --------------------------------
     //
-    OldGdtSize = Gdtr.Limit + 1;
+    OldGdtSize                        = Gdtr.Limit + 1;
     EssData.Ia32.ExceptionTssDescSize = sizeof (IA32_TSS_DESCRIPTOR) *
                                         (ExceptionNumber + 1);
     EssData.Ia32.ExceptionTssSize = sizeof (IA32_TASK_STATE_SEGMENT) *
@@ -749,19 +750,21 @@ InitializeMpExceptionStackSwitchHandlers (
     //
     // Make sure GDT table alignment
     //
-    EssData.Ia32.GdtTable = ALIGN_POINTER(GdtBuffer, sizeof (IA32_TSS_DESCRIPTOR));
-    NewGdtSize -= ((UINT8 *)EssData.Ia32.GdtTable - GdtBuffer);
+    EssData.Ia32.GdtTable     = ALIGN_POINTER (GdtBuffer, sizeof (IA32_TSS_DESCRIPTOR));
+    NewGdtSize               -= ((UINT8 *)EssData.Ia32.GdtTable - GdtBuffer);
     EssData.Ia32.GdtTableSize = NewGdtSize;
 
     EssData.Ia32.ExceptionTssDesc = ((UINT8 *)EssData.Ia32.GdtTable + OldGdtSize);
-    EssData.Ia32.ExceptionTss = ((UINT8 *)EssData.Ia32.GdtTable + OldGdtSize +
-                                 EssData.Ia32.ExceptionTssDescSize);
+    EssData.Ia32.ExceptionTss     = ((UINT8 *)EssData.Ia32.GdtTable + OldGdtSize +
+                                     EssData.Ia32.ExceptionTssDescSize);
 
     EssData.Ia32.KnownGoodStackTop = (UINTN)StackTop;
-    DEBUG ((DEBUG_INFO,
-            "Exception stack top[cpu%lu]: 0x%lX\n",
-            (UINT64)(UINTN)Index,
-            (UINT64)(UINTN)StackTop));
+    DEBUG ((
+      DEBUG_INFO,
+      "Exception stack top[cpu%lu]: 0x%lX\n",
+      (UINT64)(UINTN)Index,
+      (UINT64)(UINTN)StackTop
+      ));
 
     if (Index == Bsp) {
       InitializeExceptionStackSwitchHandlers (&EssData);
@@ -776,7 +779,7 @@ InitializeMpExceptionStackSwitchHandlers (
         );
     }
 
-    StackTop  -= NewStackSize;
+    StackTop -= NewStackSize;
   }
 }
 
@@ -815,9 +818,9 @@ InitializeMpSupport (
   VOID
   )
 {
-  EFI_STATUS     Status;
-  UINTN          NumberOfProcessors;
-  UINTN          NumberOfEnabledProcessors;
+  EFI_STATUS  Status;
+  UINTN       NumberOfProcessors;
+  UINTN       NumberOfEnabledProcessors;
 
   //
   // Wakeup APs to do initialization
@@ -841,9 +844,9 @@ InitializeMpSupport (
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mMpServiceHandle,
-                  &gEfiMpServiceProtocolGuid,  &mMpServicesTemplate,
+                  &gEfiMpServiceProtocolGuid,
+                  &mMpServicesTemplate,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
 }
-

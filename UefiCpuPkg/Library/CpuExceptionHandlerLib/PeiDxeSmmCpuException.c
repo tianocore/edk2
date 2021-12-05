@@ -19,14 +19,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 CommonExceptionHandlerWorker (
-  IN EFI_EXCEPTION_TYPE          ExceptionType,
-  IN EFI_SYSTEM_CONTEXT          SystemContext,
-  IN EXCEPTION_HANDLER_DATA      *ExceptionHandlerData
+  IN EFI_EXCEPTION_TYPE      ExceptionType,
+  IN EFI_SYSTEM_CONTEXT      SystemContext,
+  IN EXCEPTION_HANDLER_DATA  *ExceptionHandlerData
   )
 {
-  EXCEPTION_HANDLER_CONTEXT      *ExceptionHandlerContext;
-  RESERVED_VECTORS_DATA          *ReservedVectors;
-  EFI_CPU_INTERRUPT_HANDLER      *ExternalInterruptHandler;
+  EXCEPTION_HANDLER_CONTEXT  *ExceptionHandlerContext;
+  RESERVED_VECTORS_DATA      *ReservedVectors;
+  EFI_CPU_INTERRUPT_HANDLER  *ExternalInterruptHandler;
 
   if (ExceptionType == VC_EXCEPTION) {
     EFI_STATUS  Status;
@@ -45,68 +45,72 @@ CommonExceptionHandlerWorker (
     }
   }
 
-  ExceptionHandlerContext  = (EXCEPTION_HANDLER_CONTEXT *) (UINTN) (SystemContext.SystemContextIa32);
+  ExceptionHandlerContext  = (EXCEPTION_HANDLER_CONTEXT *)(UINTN)(SystemContext.SystemContextIa32);
   ReservedVectors          = ExceptionHandlerData->ReservedVectors;
   ExternalInterruptHandler = ExceptionHandlerData->ExternalInterruptHandler;
 
   switch (ReservedVectors[ExceptionType].Attribute) {
-  case EFI_VECTOR_HANDOFF_HOOK_BEFORE:
-    //
-    // The new exception handler registered by RegisterCpuInterruptHandler() is executed BEFORE original handler.
-    // Save the original handler to stack so the assembly code can jump to it instead of returning from handler.
-    //
-    ExceptionHandlerContext->ExceptionDataFlag = (mErrorCodeFlag & (1 << ExceptionType)) ? TRUE : FALSE;
-    ExceptionHandlerContext->OldIdtHandler     = ReservedVectors[ExceptionType].ExceptonHandler;
-    break;
-  case EFI_VECTOR_HANDOFF_HOOK_AFTER:
-    while (TRUE) {
+    case EFI_VECTOR_HANDOFF_HOOK_BEFORE:
       //
-      // If spin-lock can be acquired, it's the first time entering here.
+      // The new exception handler registered by RegisterCpuInterruptHandler() is executed BEFORE original handler.
+      // Save the original handler to stack so the assembly code can jump to it instead of returning from handler.
       //
-      if (AcquireSpinLockOrFail (&ReservedVectors[ExceptionType].SpinLock)) {
+      ExceptionHandlerContext->ExceptionDataFlag = (mErrorCodeFlag & (1 << ExceptionType)) ? TRUE : FALSE;
+      ExceptionHandlerContext->OldIdtHandler     = ReservedVectors[ExceptionType].ExceptonHandler;
+      break;
+    case EFI_VECTOR_HANDOFF_HOOK_AFTER:
+      while (TRUE) {
         //
-        // The new exception handler registered by RegisterCpuInterruptHandler() is executed AFTER original handler.
-        // Save the original handler to stack but skip running the new handler so the original handler is executed
-        // firstly.
+        // If spin-lock can be acquired, it's the first time entering here.
         //
-        ReservedVectors[ExceptionType].ApicId = GetApicId ();
-        ArchSaveExceptionContext (ExceptionType, SystemContext, ExceptionHandlerData);
-        ExceptionHandlerContext->ExceptionDataFlag = (mErrorCodeFlag & (1 << ExceptionType)) ? TRUE : FALSE;
-        ExceptionHandlerContext->OldIdtHandler     = ReservedVectors[ExceptionType].ExceptonHandler;
-        return;
+        if (AcquireSpinLockOrFail (&ReservedVectors[ExceptionType].SpinLock)) {
+          //
+          // The new exception handler registered by RegisterCpuInterruptHandler() is executed AFTER original handler.
+          // Save the original handler to stack but skip running the new handler so the original handler is executed
+          // firstly.
+          //
+          ReservedVectors[ExceptionType].ApicId = GetApicId ();
+          ArchSaveExceptionContext (ExceptionType, SystemContext, ExceptionHandlerData);
+          ExceptionHandlerContext->ExceptionDataFlag = (mErrorCodeFlag & (1 << ExceptionType)) ? TRUE : FALSE;
+          ExceptionHandlerContext->OldIdtHandler     = ReservedVectors[ExceptionType].ExceptonHandler;
+          return;
+        }
+
+        //
+        // If spin-lock cannot be acquired, it's the second time entering here.
+        // 'break' instead of 'return' is used so the new exception handler can be executed.
+        //
+        if (ReservedVectors[ExceptionType].ApicId == GetApicId ()) {
+          //
+          // Old IDT handler has been executed, then restore CPU exception content to
+          // run new exception handler.
+          //
+          ArchRestoreExceptionContext (ExceptionType, SystemContext, ExceptionHandlerData);
+          //
+          // Release spin lock for ApicId
+          //
+          ReleaseSpinLock (&ReservedVectors[ExceptionType].SpinLock);
+          break;
+        }
+
+        CpuPause ();
       }
+
+      break;
+    case 0xffffffff:
+      break;
+    default:
       //
-      // If spin-lock cannot be acquired, it's the second time entering here.
-      // 'break' instead of 'return' is used so the new exception handler can be executed.
+      // It should never reach here
       //
-      if (ReservedVectors[ExceptionType].ApicId == GetApicId ()) {
-        //
-        // Old IDT handler has been executed, then restore CPU exception content to
-        // run new exception handler.
-        //
-        ArchRestoreExceptionContext (ExceptionType, SystemContext, ExceptionHandlerData);
-        //
-        // Release spin lock for ApicId
-        //
-        ReleaseSpinLock (&ReservedVectors[ExceptionType].SpinLock);
-        break;
-      }
-      CpuPause ();
-    }
-    break;
-  case 0xffffffff:
-    break;
-  default:
-    //
-    // It should never reach here
-    //
-    CpuDeadLoop ();
-    break;
+      CpuDeadLoop ();
+      break;
   }
 
-  if (ExternalInterruptHandler != NULL &&
-      ExternalInterruptHandler[ExceptionType] != NULL) {
-    (ExternalInterruptHandler[ExceptionType]) (ExceptionType, SystemContext);
+  if ((ExternalInterruptHandler != NULL) &&
+      (ExternalInterruptHandler[ExceptionType] != NULL))
+  {
+    (ExternalInterruptHandler[ExceptionType])(ExceptionType, SystemContext);
   } else if (ExceptionType < CPU_EXCEPTION_NUM) {
     //
     // Get Spinlock to display CPU information
@@ -114,6 +118,7 @@ CommonExceptionHandlerWorker (
     while (!AcquireSpinLockOrFail (&ExceptionHandlerData->DisplayMessageSpinLock)) {
       CpuPause ();
     }
+
     //
     // Initialize the serial port before dumping.
     //
@@ -151,10 +156,10 @@ UpdateIdtTable (
   IN EXCEPTION_HANDLER_DATA          *ExceptionHandlerData
   )
 {
-  UINT16                             CodeSegment;
-  UINTN                              Index;
-  UINTN                              InterruptHandler;
-  RESERVED_VECTORS_DATA              *ReservedVectors;
+  UINT16                 CodeSegment;
+  UINTN                  Index;
+  UINTN                  InterruptHandler;
+  RESERVED_VECTORS_DATA  *ReservedVectors;
 
   ReservedVectors = ExceptionHandlerData->ReservedVectors;
   //
@@ -162,47 +167,47 @@ UpdateIdtTable (
   //
   CodeSegment = AsmReadCs ();
 
-  for (Index = 0; Index < ExceptionHandlerData->IdtEntryCount; Index ++) {
+  for (Index = 0; Index < ExceptionHandlerData->IdtEntryCount; Index++) {
     IdtTable[Index].Bits.Selector = CodeSegment;
     //
     // Check reserved vectors attributes
     //
     switch (ReservedVectors[Index].Attribute) {
-    case EFI_VECTOR_HANDOFF_DO_NOT_HOOK:
-      //
-      // Keep original IDT entry
-      //
-      continue;
-    case EFI_VECTOR_HANDOFF_HOOK_AFTER:
-      InitializeSpinLock (&ReservedVectors[Index].SpinLock);
-      CopyMem (
-        (VOID *) ReservedVectors[Index].HookAfterStubHeaderCode,
-        (VOID *) TemplateMap->HookAfterStubHeaderStart,
-        TemplateMap->ExceptionStubHeaderSize
-        );
-      AsmVectorNumFixup (
-        (VOID *) ReservedVectors[Index].HookAfterStubHeaderCode,
-        (UINT8) Index,
-        (VOID *) TemplateMap->HookAfterStubHeaderStart
-        );
-      //
-      // Go on the following code
-      //
-    case EFI_VECTOR_HANDOFF_HOOK_BEFORE:
-      //
-      // Save original IDT handler address
-      //
-      ReservedVectors[Index].ExceptonHandler = ArchGetIdtHandler (&IdtTable[Index]);
+      case EFI_VECTOR_HANDOFF_DO_NOT_HOOK:
+        //
+        // Keep original IDT entry
+        //
+        continue;
+      case EFI_VECTOR_HANDOFF_HOOK_AFTER:
+        InitializeSpinLock (&ReservedVectors[Index].SpinLock);
+        CopyMem (
+          (VOID *)ReservedVectors[Index].HookAfterStubHeaderCode,
+          (VOID *)TemplateMap->HookAfterStubHeaderStart,
+          TemplateMap->ExceptionStubHeaderSize
+          );
+        AsmVectorNumFixup (
+          (VOID *)ReservedVectors[Index].HookAfterStubHeaderCode,
+          (UINT8)Index,
+          (VOID *)TemplateMap->HookAfterStubHeaderStart
+          );
       //
       // Go on the following code
       //
-    default:
+      case EFI_VECTOR_HANDOFF_HOOK_BEFORE:
+        //
+        // Save original IDT handler address
+        //
+        ReservedVectors[Index].ExceptonHandler = ArchGetIdtHandler (&IdtTable[Index]);
       //
-      // Update new IDT entry
+      // Go on the following code
       //
-      InterruptHandler = TemplateMap->ExceptionStart + Index * TemplateMap->ExceptionStubHeaderSize;
-      ArchUpdateIdtEntry (&IdtTable[Index], InterruptHandler);
-      break;
+      default:
+        //
+        // Update new IDT entry
+        //
+        InterruptHandler = TemplateMap->ExceptionStart + Index * TemplateMap->ExceptionStubHeaderSize;
+        ArchUpdateIdtEntry (&IdtTable[Index], InterruptHandler);
+        break;
     }
   }
 }
@@ -221,19 +226,19 @@ UpdateIdtTable (
 **/
 EFI_STATUS
 InitializeCpuExceptionHandlersWorker (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL,
-  IN OUT EXCEPTION_HANDLER_DATA    *ExceptionHandlerData
+  IN EFI_VECTOR_HANDOFF_INFO     *VectorInfo OPTIONAL,
+  IN OUT EXCEPTION_HANDLER_DATA  *ExceptionHandlerData
   )
 {
-  EFI_STATUS                       Status;
-  IA32_DESCRIPTOR                  IdtDescriptor;
-  UINTN                            IdtEntryCount;
-  EXCEPTION_HANDLER_TEMPLATE_MAP   TemplateMap;
-  IA32_IDT_GATE_DESCRIPTOR         *IdtTable;
-  RESERVED_VECTORS_DATA            *ReservedVectors;
+  EFI_STATUS                      Status;
+  IA32_DESCRIPTOR                 IdtDescriptor;
+  UINTN                           IdtEntryCount;
+  EXCEPTION_HANDLER_TEMPLATE_MAP  TemplateMap;
+  IA32_IDT_GATE_DESCRIPTOR        *IdtTable;
+  RESERVED_VECTORS_DATA           *ReservedVectors;
 
   ReservedVectors = ExceptionHandlerData->ReservedVectors;
-  SetMem ((VOID *) ReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM, 0xff);
+  SetMem ((VOID *)ReservedVectors, sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM, 0xff);
   if (VectorInfo != NULL) {
     Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectors, CPU_EXCEPTION_NUM);
     if (EFI_ERROR (Status)) {
@@ -253,7 +258,7 @@ InitializeCpuExceptionHandlersWorker (
     IdtEntryCount = CPU_EXCEPTION_NUM;
   }
 
-  IdtTable = (IA32_IDT_GATE_DESCRIPTOR *) IdtDescriptor.Base;
+  IdtTable = (IA32_IDT_GATE_DESCRIPTOR *)IdtDescriptor.Base;
   AsmGetTemplateAddressMap (&TemplateMap);
   ASSERT (TemplateMap.ExceptionStubHeaderSize <= HOOKAFTER_STUB_SIZE);
 
@@ -282,33 +287,33 @@ InitializeCpuExceptionHandlersWorker (
 **/
 EFI_STATUS
 RegisterCpuInterruptHandlerWorker (
-  IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler,
-  IN EXCEPTION_HANDLER_DATA        *ExceptionHandlerData
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler,
+  IN EXCEPTION_HANDLER_DATA     *ExceptionHandlerData
   )
 {
-  UINTN                          EnabledInterruptNum;
-  RESERVED_VECTORS_DATA          *ReservedVectors;
-  EFI_CPU_INTERRUPT_HANDLER      *ExternalInterruptHandler;
+  UINTN                      EnabledInterruptNum;
+  RESERVED_VECTORS_DATA      *ReservedVectors;
+  EFI_CPU_INTERRUPT_HANDLER  *ExternalInterruptHandler;
 
   EnabledInterruptNum      = ExceptionHandlerData->IdtEntryCount;
   ReservedVectors          = ExceptionHandlerData->ReservedVectors;
   ExternalInterruptHandler = ExceptionHandlerData->ExternalInterruptHandler;
 
-  if (InterruptType < 0 || InterruptType >= (EFI_EXCEPTION_TYPE)EnabledInterruptNum ||
-      ReservedVectors[InterruptType].Attribute == EFI_VECTOR_HANDOFF_DO_NOT_HOOK) {
+  if ((InterruptType < 0) || (InterruptType >= (EFI_EXCEPTION_TYPE)EnabledInterruptNum) ||
+      (ReservedVectors[InterruptType].Attribute == EFI_VECTOR_HANDOFF_DO_NOT_HOOK))
+  {
     return EFI_UNSUPPORTED;
   }
 
-  if (InterruptHandler == NULL && ExternalInterruptHandler[InterruptType] == NULL) {
+  if ((InterruptHandler == NULL) && (ExternalInterruptHandler[InterruptType] == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (InterruptHandler != NULL && ExternalInterruptHandler[InterruptType] != NULL) {
+  if ((InterruptHandler != NULL) && (ExternalInterruptHandler[InterruptType] != NULL)) {
     return EFI_ALREADY_STARTED;
   }
 
   ExternalInterruptHandler[InterruptType] = InterruptHandler;
   return EFI_SUCCESS;
 }
-
