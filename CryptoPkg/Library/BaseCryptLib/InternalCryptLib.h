@@ -23,8 +23,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <openssl/opensslv.h>
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
-#define OBJ_get0_data(o) ((o)->data)
-#define OBJ_length(o) ((o)->length)
+#define OBJ_get0_data(o)  ((o)->data)
+#define OBJ_length(o)     ((o)->length)
 #endif
 
 /**

@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <openssl/sha.h>
 
 #ifndef DISABLE_SHA1_DEPRECATED_INTERFACES
+
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
 
@@ -25,7 +26,7 @@ Sha1GetContextSize (
   //
   // Retrieves OpenSSL SHA Context Size
   //
-  return (UINTN) (sizeof (SHA_CTX));
+  return (UINTN)(sizeof (SHA_CTX));
 }
 
 /**
@@ -56,7 +57,7 @@ Sha1Init (
   //
   // OpenSSL SHA-1 Context Initialization
   //
-  return (BOOLEAN) (SHA1_Init ((SHA_CTX *) Sha1Context));
+  return (BOOLEAN)(SHA1_Init ((SHA_CTX *)Sha1Context));
 }
 
 /**
@@ -82,7 +83,7 @@ Sha1Duplicate (
   //
   // Check input parameters.
   //
-  if (Sha1Context == NULL || NewSha1Context == NULL) {
+  if ((Sha1Context == NULL) || (NewSha1Context == NULL)) {
     return FALSE;
   }
 
@@ -127,14 +128,14 @@ Sha1Update (
   //
   // Check invalid parameters, in case that only DataLength was checked in OpenSSL
   //
-  if (Data == NULL && DataSize != 0) {
+  if ((Data == NULL) && (DataSize != 0)) {
     return FALSE;
   }
 
   //
   // OpenSSL SHA-1 Hash Update
   //
-  return (BOOLEAN) (SHA1_Update ((SHA_CTX *) Sha1Context, Data, DataSize));
+  return (BOOLEAN)(SHA1_Update ((SHA_CTX *)Sha1Context, Data, DataSize));
 }
 
 /**
@@ -167,14 +168,14 @@ Sha1Final (
   //
   // Check input parameters.
   //
-  if (Sha1Context == NULL || HashValue == NULL) {
+  if ((Sha1Context == NULL) || (HashValue == NULL)) {
     return FALSE;
   }
 
   //
   // OpenSSL SHA-1 Hash Finalization
   //
-  return (BOOLEAN) (SHA1_Final (HashValue, (SHA_CTX *) Sha1Context));
+  return (BOOLEAN)(SHA1_Final (HashValue, (SHA_CTX *)Sha1Context));
 }
 
 /**
@@ -209,7 +210,8 @@ Sha1HashAll (
   if (HashValue == NULL) {
     return FALSE;
   }
-  if (Data == NULL && DataSize != 0) {
+
+  if ((Data == NULL) && (DataSize != 0)) {
     return FALSE;
   }
 
@@ -222,4 +224,5 @@ Sha1HashAll (
     return TRUE;
   }
 }
+
 #endif
