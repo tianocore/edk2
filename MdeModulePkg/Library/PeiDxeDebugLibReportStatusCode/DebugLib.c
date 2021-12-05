@@ -25,7 +25,7 @@
 // VA_LIST can not initialize to NULL for all compiler, so we use this to
 // indicate a null VA_LIST
 //
-VA_LIST     mVaListNull;
+VA_LIST  mVaListNull;
 
 /**
   Prints a debug message to the debug output device if the specified error level is enabled.
@@ -53,7 +53,7 @@ DebugPrint (
   ...
   )
 {
-  VA_LIST         Marker;
+  VA_LIST  Marker;
 
   VA_START (Marker, Format);
   DebugVPrint (ErrorLevel, Format, Marker);
@@ -84,10 +84,10 @@ DebugPrint (
 **/
 VOID
 DebugPrintMarker (
-  IN  UINTN         ErrorLevel,
-  IN  CONST CHAR8   *Format,
-  IN  VA_LIST       VaListMarker,
-  IN  BASE_LIST     BaseListMarker
+  IN  UINTN        ErrorLevel,
+  IN  CONST CHAR8  *Format,
+  IN  VA_LIST      VaListMarker,
+  IN  BASE_LIST    BaseListMarker
   )
 {
   UINT64          Buffer[(EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)) + 1];
@@ -152,8 +152,10 @@ DebugPrintMarker (
   // Copy the Format string into the record. It will be truncated if it's too long.
   //
   AsciiStrnCpyS (
-    FormatString, sizeof(Buffer) - (4 + sizeof(EFI_DEBUG_INFO) + 12 * sizeof(UINT64)),
-    Format,       sizeof(Buffer) - (4 + sizeof(EFI_DEBUG_INFO) + 12 * sizeof(UINT64)) - 1
+    FormatString,
+    sizeof (Buffer) - (4 + sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64)),
+    Format,
+    sizeof (Buffer) - (4 + sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64)) - 1
     );
 
   //
@@ -166,37 +168,41 @@ DebugPrintMarker (
   // Use the actual format string.
   //
   Format = FormatString;
-  for (; *Format != '\0'; Format++) {
+  for ( ; *Format != '\0'; Format++) {
     //
     // Only format with prefix % is processed.
     //
     if (*Format != '%') {
       continue;
     }
+
     Long = FALSE;
     //
     // Parse Flags and Width
     //
     for (Format++; TRUE; Format++) {
-      if (*Format == '.' || *Format == '-' || *Format == '+' || *Format == ' ') {
+      if ((*Format == '.') || (*Format == '-') || (*Format == '+') || (*Format == ' ')) {
         //
         // These characters in format field are omitted.
         //
         continue;
       }
-      if (*Format >= '0' && *Format <= '9') {
+
+      if ((*Format >= '0') && (*Format <= '9')) {
         //
         // These characters in format field are omitted.
         //
         continue;
       }
-      if (*Format == 'L' || *Format == 'l') {
+
+      if ((*Format == 'L') || (*Format == 'l')) {
         //
         // 'L" or "l" in format field means the number being printed is a UINT64
         //
         Long = TRUE;
         continue;
       }
+
       if (*Format == '*') {
         //
         // '*' in format field means the precision of the field is specified by
@@ -207,8 +213,10 @@ DebugPrintMarker (
         } else {
           BASE_ARG (BaseListMarkerPointer, UINTN) = BASE_ARG (BaseListMarker, UINTN);
         }
+
         continue;
       }
+
       if (*Format == '\0') {
         //
         // Make no output if Format string terminates unexpectedly when
@@ -216,6 +224,7 @@ DebugPrintMarker (
         //
         Format--;
       }
+
       //
       // When valid argument type detected or format string terminates unexpectedly,
       // the inner loop is done.
@@ -229,7 +238,8 @@ DebugPrintMarker (
     if ((*Format == 'p') && (sizeof (VOID *) > 4)) {
       Long = TRUE;
     }
-    if (*Format == 'p' || *Format == 'X' || *Format == 'x' || *Format == 'd' || *Format == 'u') {
+
+    if ((*Format == 'p') || (*Format == 'X') || (*Format == 'x') || (*Format == 'd') || (*Format == 'u')) {
       if (Long) {
         if (BaseListMarker == NULL) {
           BASE_ARG (BaseListMarkerPointer, INT64) = VA_ARG (VaListMarker, INT64);
@@ -243,7 +253,7 @@ DebugPrintMarker (
           BASE_ARG (BaseListMarkerPointer, int) = BASE_ARG (BaseListMarker, int);
         }
       }
-    } else if (*Format == 's' || *Format == 'S' || *Format == 'a' || *Format == 'g' || *Format == 't') {
+    } else if ((*Format == 's') || (*Format == 'S') || (*Format == 'a') || (*Format == 'g') || (*Format == 't')) {
       if (BaseListMarker == NULL) {
         BASE_ARG (BaseListMarkerPointer, VOID *) = VA_ARG (VaListMarker, VOID *);
       } else {
@@ -310,9 +320,9 @@ DebugPrintMarker (
 VOID
 EFIAPI
 DebugVPrint (
-  IN  UINTN         ErrorLevel,
-  IN  CONST CHAR8   *Format,
-  IN  VA_LIST       VaListMarker
+  IN  UINTN        ErrorLevel,
+  IN  CONST CHAR8  *Format,
+  IN  VA_LIST      VaListMarker
   )
 {
   DebugPrintMarker (ErrorLevel, Format, VaListMarker, NULL);
@@ -338,9 +348,9 @@ DebugVPrint (
 VOID
 EFIAPI
 DebugBPrint (
-  IN  UINTN         ErrorLevel,
-  IN  CONST CHAR8   *Format,
-  IN  BASE_LIST     BaseListMarker
+  IN  UINTN        ErrorLevel,
+  IN  CONST CHAR8  *Format,
+  IN  BASE_LIST    BaseListMarker
   )
 {
   DebugPrintMarker (ErrorLevel, Format, mVaListNull, BaseListMarker);
@@ -375,7 +385,7 @@ DebugAssert (
   IN CONST CHAR8  *Description
   )
 {
-  UINT64                 Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof(UINT64)];
+  UINT64                 Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)];
   EFI_DEBUG_ASSERT_DATA  *AssertData;
   UINTN                  HeaderSize;
   UINTN                  TotalSize;
@@ -387,13 +397,13 @@ DebugAssert (
   //
   // Get string size
   //
-  HeaderSize       = sizeof (EFI_DEBUG_ASSERT_DATA);
+  HeaderSize = sizeof (EFI_DEBUG_ASSERT_DATA);
   //
   // Compute string size of module name enclosed by []
   //
-  ModuleNameSize   = 2 + AsciiStrSize (gEfiCallerBaseName);
-  FileNameSize     = AsciiStrSize (FileName);
-  DescriptionSize  = AsciiStrSize (Description);
+  ModuleNameSize  = 2 + AsciiStrSize (gEfiCallerBaseName);
+  FileNameSize    = AsciiStrSize (FileName);
+  DescriptionSize = AsciiStrSize (Description);
 
   //
   // Make sure it will all fit in the passed in buffer.
@@ -422,12 +432,13 @@ DebugAssert (
       }
     }
   }
+
   //
   // Fill in EFI_DEBUG_ASSERT_DATA
   //
-  AssertData = (EFI_DEBUG_ASSERT_DATA *)Buffer;
+  AssertData             = (EFI_DEBUG_ASSERT_DATA *)Buffer;
   AssertData->LineNumber = (UINT32)LineNumber;
-  TotalSize  = sizeof (EFI_DEBUG_ASSERT_DATA);
+  TotalSize              = sizeof (EFI_DEBUG_ASSERT_DATA);
 
   Temp = (CHAR8 *)(AssertData + 1);
 
@@ -435,24 +446,24 @@ DebugAssert (
   // Copy Ascii [ModuleName].
   //
   if (ModuleNameSize != 0) {
-    CopyMem(Temp, "[", 1);
-    CopyMem(Temp + 1, gEfiCallerBaseName, ModuleNameSize - 3);
-    CopyMem(Temp + ModuleNameSize - 2, "] ", 2);
+    CopyMem (Temp, "[", 1);
+    CopyMem (Temp + 1, gEfiCallerBaseName, ModuleNameSize - 3);
+    CopyMem (Temp + ModuleNameSize - 2, "] ", 2);
   }
 
   //
   // Copy Ascii FileName including NULL terminator.
   //
-  Temp = CopyMem (Temp + ModuleNameSize, FileName, FileNameSize);
+  Temp                   = CopyMem (Temp + ModuleNameSize, FileName, FileNameSize);
   Temp[FileNameSize - 1] = 0;
-  TotalSize += (ModuleNameSize + FileNameSize);
+  TotalSize             += (ModuleNameSize + FileNameSize);
 
   //
   // Copy Ascii Description include NULL terminator.
   //
-  Temp = CopyMem (Temp + FileNameSize, Description, DescriptionSize);
+  Temp                      = CopyMem (Temp + FileNameSize, Description, DescriptionSize);
   Temp[DescriptionSize - 1] = 0;
-  TotalSize += DescriptionSize;
+  TotalSize                += DescriptionSize;
 
   REPORT_STATUS_CODE_EX (
     (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED),
@@ -473,7 +484,6 @@ DebugAssert (
     CpuDeadLoop ();
   }
 }
-
 
 /**
   Fills a target buffer with PcdDebugClearMemoryValue, and returns the target buffer.
@@ -502,7 +512,6 @@ DebugClearMemory (
   return SetMem (Buffer, Length, PcdGet8 (PcdDebugClearMemoryValue));
 }
 
-
 /**
   Returns TRUE if ASSERT() macros are enabled.
 
@@ -519,9 +528,8 @@ DebugAssertEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
 }
-
 
 /**
   Returns TRUE if DEBUG() macros are enabled.
@@ -539,9 +547,8 @@ DebugPrintEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
 }
-
 
 /**
   Returns TRUE if DEBUG_CODE() macros are enabled.
@@ -559,9 +566,8 @@ DebugCodeEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
 }
-
 
 /**
   Returns TRUE if DEBUG_CLEAR_MEMORY() macro is enabled.
@@ -579,7 +585,7 @@ DebugClearMemoryEnabled (
   VOID
   )
 {
-  return (BOOLEAN) ((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
+  return (BOOLEAN)((PcdGet8 (PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
 }
 
 /**
@@ -594,8 +600,8 @@ DebugClearMemoryEnabled (
 BOOLEAN
 EFIAPI
 DebugPrintLevelEnabled (
-  IN  CONST UINTN        ErrorLevel
+  IN  CONST UINTN  ErrorLevel
   )
 {
-  return (BOOLEAN) ((ErrorLevel & PcdGet32(PcdFixedDebugPrintErrorLevel)) != 0);
+  return (BOOLEAN)((ErrorLevel & PcdGet32 (PcdFixedDebugPrintErrorLevel)) != 0);
 }

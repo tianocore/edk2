@@ -60,9 +60,9 @@
 /// This structure will be installed into ACPI table as FPDT in normal boot path.
 ///
 typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER                             Header;            ///< Common ACPI description table header.
-  EFI_ACPI_5_0_FPDT_BOOT_PERFORMANCE_TABLE_POINTER_RECORD BootPointerRecord; ///< Basic Boot Performance Table Pointer record.
-  EFI_ACPI_5_0_FPDT_S3_PERFORMANCE_TABLE_POINTER_RECORD   S3PointerRecord;   ///< S3 Performance Table Pointer record.
+  EFI_ACPI_DESCRIPTION_HEADER                                Header;            ///< Common ACPI description table header.
+  EFI_ACPI_5_0_FPDT_BOOT_PERFORMANCE_TABLE_POINTER_RECORD    BootPointerRecord; ///< Basic Boot Performance Table Pointer record.
+  EFI_ACPI_5_0_FPDT_S3_PERFORMANCE_TABLE_POINTER_RECORD      S3PointerRecord;   ///< S3 Performance Table Pointer record.
 } FIRMWARE_PERFORMANCE_TABLE;
 
 ///
@@ -71,9 +71,9 @@ typedef struct {
 /// suspend and S3 resume boot path.
 ///
 typedef struct {
-  EFI_ACPI_5_0_FPDT_PERFORMANCE_TABLE_HEADER  Header;    ///< Common ACPI table header.
-  EFI_ACPI_5_0_FPDT_S3_RESUME_RECORD          S3Resume;  ///< Basic S3 Resume performance record.
-  EFI_ACPI_5_0_FPDT_S3_SUSPEND_RECORD         S3Suspend; ///< Basic S3 Suspend performance record.
+  EFI_ACPI_5_0_FPDT_PERFORMANCE_TABLE_HEADER    Header;    ///< Common ACPI table header.
+  EFI_ACPI_5_0_FPDT_S3_RESUME_RECORD            S3Resume;  ///< Basic S3 Resume performance record.
+  EFI_ACPI_5_0_FPDT_S3_SUSPEND_RECORD           S3Suspend; ///< Basic S3 Suspend performance record.
 } S3_PERFORMANCE_TABLE;
 
 ///
@@ -81,8 +81,8 @@ typedef struct {
 /// This structure contains BasicBoot performance record.
 ///
 typedef struct {
-  EFI_ACPI_5_0_FPDT_PERFORMANCE_TABLE_HEADER   Header;     ///< Common ACPI table header.
-  EFI_ACPI_5_0_FPDT_FIRMWARE_BASIC_BOOT_RECORD BasicBoot;  ///< Basic Boot Resume performance record.
+  EFI_ACPI_5_0_FPDT_PERFORMANCE_TABLE_HEADER      Header;    ///< Common ACPI table header.
+  EFI_ACPI_5_0_FPDT_FIRMWARE_BASIC_BOOT_RECORD    BasicBoot; ///< Basic Boot Resume performance record.
   //
   // one or more boot performance records.
   //
@@ -93,7 +93,7 @@ typedef struct {
 ///
 ///
 typedef struct {
-  EFI_ACPI_5_0_FPDT_PERFORMANCE_TABLE_HEADER   Header;     ///< Common ACPI table header.
+  EFI_ACPI_5_0_FPDT_PERFORMANCE_TABLE_HEADER    Header;    ///< Common ACPI table header.
   //
   // one or more boot performance records.
   //
@@ -103,8 +103,8 @@ typedef struct {
 /// Performance data pointed by Performance Pointer Record.
 ///
 typedef struct {
-  BOOT_PERFORMANCE_TABLE         BootPerformance; ///< Basic Boot Performance.
-  S3_PERFORMANCE_TABLE           S3Performance;   ///< S3 performance.
+  BOOT_PERFORMANCE_TABLE    BootPerformance;      ///< Basic Boot Performance.
+  S3_PERFORMANCE_TABLE      S3Performance;        ///< S3 performance.
 } FIRMWARE_PERFORMANCE_RUNTIME_DATA;
 
 ///
@@ -112,8 +112,8 @@ typedef struct {
 /// This Variable is produced by FPDT DXE module.
 ///
 typedef struct {
-  EFI_PHYSICAL_ADDRESS  BootPerformanceTablePointer; ///< Pointer to Boot Performance Table.
-  EFI_PHYSICAL_ADDRESS  S3PerformanceTablePointer;   ///< Pointer to S3 Performance Table.
+  EFI_PHYSICAL_ADDRESS    BootPerformanceTablePointer; ///< Pointer to Boot Performance Table.
+  EFI_PHYSICAL_ADDRESS    S3PerformanceTablePointer;   ///< Pointer to S3 Performance Table.
 } FIRMWARE_PERFORMANCE_VARIABLE;
 
 #pragma pack()
@@ -121,19 +121,19 @@ typedef struct {
 //
 // Log BOOT RECORD from SMM driver on boot time.
 //
-#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE           1
-#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA           2
-#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA_BY_OFFSET 3
+#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE            1
+#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA            2
+#define SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA_BY_OFFSET  3
 
 typedef struct {
-  UINTN             Function;
-  EFI_STATUS        ReturnStatus;
-  UINTN             BootRecordSize;
-  VOID              *BootRecordData;
-  UINTN             BootRecordOffset;
+  UINTN         Function;
+  EFI_STATUS    ReturnStatus;
+  UINTN         BootRecordSize;
+  VOID          *BootRecordData;
+  UINTN         BootRecordOffset;
 } SMM_BOOT_RECORD_COMMUNICATE;
 
-extern EFI_GUID gEfiFirmwarePerformanceGuid;
-extern EFI_GUID gFirmwarePerformanceS3PointerGuid;
+extern EFI_GUID  gEfiFirmwarePerformanceGuid;
+extern EFI_GUID  gFirmwarePerformanceS3PointerGuid;
 
 #endif

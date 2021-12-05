@@ -27,7 +27,7 @@
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
   return EFI_SUCCESS;
@@ -52,7 +52,7 @@ InitializeCpuExceptionHandlers (
 EFI_STATUS
 EFIAPI
 InitializeCpuInterruptHandlers (
-  IN EFI_VECTOR_HANDOFF_INFO       *VectorInfo OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL
   )
 {
   return EFI_SUCCESS;
@@ -84,8 +84,8 @@ InitializeCpuInterruptHandlers (
 EFI_STATUS
 EFIAPI
 RegisterCpuInterruptHandler (
-  IN EFI_EXCEPTION_TYPE            InterruptType,
-  IN EFI_CPU_INTERRUPT_HANDLER     InterruptHandler
+  IN EFI_EXCEPTION_TYPE         InterruptType,
+  IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   )
 {
   return EFI_UNSUPPORTED;
@@ -100,8 +100,8 @@ RegisterCpuInterruptHandler (
 VOID
 EFIAPI
 DumpCpuContext (
-  IN EFI_EXCEPTION_TYPE   ExceptionType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext
+  IN EFI_EXCEPTION_TYPE  ExceptionType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
 }
@@ -132,10 +132,9 @@ DumpCpuContext (
 EFI_STATUS
 EFIAPI
 InitializeCpuExceptionHandlersEx (
-  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
-  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  IN EFI_VECTOR_HANDOFF_INFO  *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA  *InitData OPTIONAL
   )
 {
   return InitializeCpuExceptionHandlers (VectorInfo);
 }
-

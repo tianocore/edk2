@@ -23,8 +23,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 NvmeBlockIoReset (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  BOOLEAN                 ExtendedVerification
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  BOOLEAN                ExtendedVerification
   );
 
 /**
@@ -49,11 +49,11 @@ NvmeBlockIoReset (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoReadBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  UINT32                  MediaId,
-  IN  EFI_LBA                 Lba,
-  IN  UINTN                   BufferSize,
-  OUT VOID                    *Buffer
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  UINT32                 MediaId,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  BufferSize,
+  OUT VOID                   *Buffer
   );
 
 /**
@@ -79,11 +79,11 @@ NvmeBlockIoReadBlocks (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoWriteBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  UINT32                  MediaId,
-  IN  EFI_LBA                 Lba,
-  IN  UINTN                   BufferSize,
-  IN  VOID                    *Buffer
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  UINT32                 MediaId,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  BufferSize,
+  IN  VOID                   *Buffer
   );
 
 /**
@@ -99,7 +99,7 @@ NvmeBlockIoWriteBlocks (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoFlushBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This
+  IN  EFI_BLOCK_IO_PROTOCOL  *This
   );
 
 /**
@@ -162,12 +162,12 @@ NvmeBlockIoResetEx (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoReadBlocksEx (
-  IN     EFI_BLOCK_IO2_PROTOCOL *This,
-  IN     UINT32                 MediaId,
-  IN     EFI_LBA                Lba,
-  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
-  IN     UINTN                  BufferSize,
-     OUT VOID                  *Buffer
+  IN     EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN     UINT32                  MediaId,
+  IN     EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token,
+  IN     UINTN                   BufferSize,
+  OUT VOID                       *Buffer
   );
 
 /**
@@ -212,11 +212,11 @@ EFI_STATUS
 EFIAPI
 NvmeBlockIoWriteBlocksEx (
   IN     EFI_BLOCK_IO2_PROTOCOL  *This,
-  IN     UINT32                 MediaId,
-  IN     EFI_LBA                Lba,
-  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
-  IN     UINTN                  BufferSize,
-  IN     VOID                   *Buffer
+  IN     UINT32                  MediaId,
+  IN     EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token,
+  IN     UINTN                   BufferSize,
+  IN     VOID                    *Buffer
   );
 
 /**
@@ -246,8 +246,8 @@ NvmeBlockIoWriteBlocksEx (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoFlushBlocksEx (
-  IN     EFI_BLOCK_IO2_PROTOCOL   *This,
-  IN OUT EFI_BLOCK_IO2_TOKEN      *Token
+  IN     EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token
   );
 
 /**
@@ -325,14 +325,14 @@ NvmeBlockIoFlushBlocksEx (
 EFI_STATUS
 EFIAPI
 NvmeStorageSecurityReceiveData (
-  IN  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL   *This,
-  IN  UINT32                                  MediaId,
-  IN  UINT64                                  Timeout,
-  IN  UINT8                                   SecurityProtocolId,
-  IN  UINT16                                  SecurityProtocolSpecificData,
-  IN  UINTN                                   PayloadBufferSize,
-  OUT VOID                                    *PayloadBuffer,
-  OUT UINTN                                   *PayloadTransferSize
+  IN  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL  *This,
+  IN  UINT32                                 MediaId,
+  IN  UINT64                                 Timeout,
+  IN  UINT8                                  SecurityProtocolId,
+  IN  UINT16                                 SecurityProtocolSpecificData,
+  IN  UINTN                                  PayloadBufferSize,
+  OUT VOID                                   *PayloadBuffer,
+  OUT UINTN                                  *PayloadTransferSize
   );
 
 /**
@@ -399,13 +399,13 @@ NvmeStorageSecurityReceiveData (
 EFI_STATUS
 EFIAPI
 NvmeStorageSecuritySendData (
-  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
-  IN UINT32                                   MediaId,
-  IN UINT64                                   Timeout,
-  IN UINT8                                    SecurityProtocolId,
-  IN UINT16                                   SecurityProtocolSpecificData,
-  IN UINTN                                    PayloadBufferSize,
-  IN VOID                                     *PayloadBuffer
+  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL  *This,
+  IN UINT32                                 MediaId,
+  IN UINT64                                 Timeout,
+  IN UINT8                                  SecurityProtocolId,
+  IN UINT16                                 SecurityProtocolSpecificData,
+  IN UINTN                                  PayloadBufferSize,
+  IN VOID                                   *PayloadBuffer
   );
 
 #endif

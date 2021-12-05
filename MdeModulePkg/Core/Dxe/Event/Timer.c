@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "DxeMain.h"
 #include "Event.h"
 
@@ -14,16 +13,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Internal data
 //
 
-LIST_ENTRY       mEfiTimerList = INITIALIZE_LIST_HEAD_VARIABLE (mEfiTimerList);
-EFI_LOCK         mEfiTimerLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL - 1);
-EFI_EVENT        mEfiCheckTimerEvent = NULL;
+LIST_ENTRY  mEfiTimerList       = INITIALIZE_LIST_HEAD_VARIABLE (mEfiTimerList);
+EFI_LOCK    mEfiTimerLock       = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL - 1);
+EFI_EVENT   mEfiCheckTimerEvent = NULL;
 
-EFI_LOCK         mEfiSystemTimeLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL);
-UINT64           mEfiSystemTime = 0;
+EFI_LOCK  mEfiSystemTimeLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_HIGH_LEVEL);
+UINT64    mEfiSystemTime     = 0;
 
 //
 // Timer functions
 //
+
 /**
   Inserts the timer event.
 
@@ -33,12 +33,12 @@ UINT64           mEfiSystemTime = 0;
 **/
 VOID
 CoreInsertEventTimer (
-  IN IEVENT   *Event
+  IN IEVENT  *Event
   )
 {
-  UINT64          TriggerTime;
-  LIST_ENTRY      *Link;
-  IEVENT          *Event2;
+  UINT64      TriggerTime;
+  LIST_ENTRY  *Link;
+  IEVENT      *Event2;
 
   ASSERT_LOCKED (&mEfiTimerLock);
 
@@ -72,7 +72,7 @@ CoreCurrentSystemTime (
   VOID
   )
 {
-  UINT64          SystemTime;
+  UINT64  SystemTime;
 
   CoreAcquireLock (&mEfiSystemTimeLock);
   SystemTime = mEfiSystemTime;
@@ -92,12 +92,12 @@ CoreCurrentSystemTime (
 VOID
 EFIAPI
 CoreCheckTimers (
-  IN EFI_EVENT            CheckEvent,
-  IN VOID                 *Context
+  IN EFI_EVENT  CheckEvent,
+  IN VOID       *Context
   )
 {
-  UINT64                  SystemTime;
-  IEVENT                  *Event;
+  UINT64  SystemTime;
+  IEVENT  *Event;
 
   //
   // Check the timer database for expired timers
@@ -154,7 +154,6 @@ CoreCheckTimers (
   CoreReleaseLock (&mEfiTimerLock);
 }
 
-
 /**
   Initializes timer support.
 
@@ -177,7 +176,6 @@ CoreInitializeTimer (
   ASSERT_EFI_ERROR (Status);
 }
 
-
 /**
   Called by the platform code to process a tick.
 
@@ -188,10 +186,10 @@ CoreInitializeTimer (
 VOID
 EFIAPI
 CoreTimerTick (
-  IN UINT64   Duration
+  IN UINT64  Duration
   )
 {
-  IEVENT          *Event;
+  IEVENT  *Event;
 
   //
   // Check runtiem flag in case there are ticks while exiting boot services
@@ -218,8 +216,6 @@ CoreTimerTick (
   CoreReleaseLock (&mEfiSystemTimeLock);
 }
 
-
-
 /**
   Sets the type of timer and the trigger time for a timer event.
 
@@ -238,12 +234,12 @@ CoreTimerTick (
 EFI_STATUS
 EFIAPI
 CoreSetTimer (
-  IN EFI_EVENT            UserEvent,
-  IN EFI_TIMER_DELAY      Type,
-  IN UINT64               TriggerTime
+  IN EFI_EVENT        UserEvent,
+  IN EFI_TIMER_DELAY  Type,
+  IN UINT64           TriggerTime
   )
 {
-  IEVENT      *Event;
+  IEVENT  *Event;
 
   Event = UserEvent;
 
@@ -255,7 +251,7 @@ CoreSetTimer (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((UINT32)Type > TimerRelative  || (Event->Type & EVT_TIMER) == 0) {
+  if (((UINT32)Type > TimerRelative) || ((Event->Type & EVT_TIMER) == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -270,14 +266,14 @@ CoreSetTimer (
   }
 
   Event->Timer.TriggerTime = 0;
-  Event->Timer.Period = 0;
+  Event->Timer.Period      = 0;
 
   if (Type != TimerCancel) {
-
     if (Type == TimerPeriodic) {
       if (TriggerTime == 0) {
         gTimer->GetTimerPeriod (gTimer, &TriggerTime);
       }
+
       Event->Timer.Period = TriggerTime;
     }
 

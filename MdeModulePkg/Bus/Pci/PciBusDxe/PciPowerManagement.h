@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 ResetPowerManagementFeature (
-  IN PCI_IO_DEVICE *PciIoDevice
+  IN PCI_IO_DEVICE  *PciIoDevice
   );
 
 #endif

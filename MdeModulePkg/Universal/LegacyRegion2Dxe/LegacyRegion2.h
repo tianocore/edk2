@@ -70,10 +70,10 @@ LegacyRegion2Decode (
 EFI_STATUS
 EFIAPI
 LegacyRegion2Lock (
-  IN  EFI_LEGACY_REGION2_PROTOCOL *This,
-  IN  UINT32                      Start,
-  IN  UINT32                      Length,
-  OUT UINT32                      *Granularity
+  IN  EFI_LEGACY_REGION2_PROTOCOL  *This,
+  IN  UINT32                       Start,
+  IN  UINT32                       Length,
+  OUT UINT32                       *Granularity
   );
 
 /**
@@ -104,10 +104,10 @@ LegacyRegion2Lock (
 EFI_STATUS
 EFIAPI
 LegacyRegion2BootLock (
-  IN EFI_LEGACY_REGION2_PROTOCOL          *This,
-  IN  UINT32                              Start,
-  IN  UINT32                              Length,
-  OUT UINT32                              *Granularity
+  IN EFI_LEGACY_REGION2_PROTOCOL  *This,
+  IN  UINT32                      Start,
+  IN  UINT32                      Length,
+  OUT UINT32                      *Granularity
   );
 
 /**

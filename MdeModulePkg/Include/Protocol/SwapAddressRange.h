@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Forward reference for pure ANSI compatability
 //
-typedef struct _EFI_SWAP_ADDRESS_RANGE_PROTOCOL  EFI_SWAP_ADDRESS_RANGE_PROTOCOL;
+typedef struct _EFI_SWAP_ADDRESS_RANGE_PROTOCOL EFI_SWAP_ADDRESS_RANGE_PROTOCOL;
 
 #define EFI_UNSUPPORT_LOCK  0
 #define EFI_SOFTWARE_LOCK   1
@@ -93,8 +93,6 @@ EFI_STATUS
   IN BOOLEAN                                    NewSwapState
   );
 
-
-
 /**
   This service checks if a Real Time Clock (RTC) power failure happened.
 
@@ -132,8 +130,6 @@ EFI_STATUS
   OUT EFI_SWAP_LOCK_CAPABILITY                  *LockCapability
   );
 
-
-
 /**
   This service is used to acquire or release appointed kind of lock for Swap Address Range operations.
 
@@ -155,14 +151,14 @@ EFI_STATUS
   );
 
 struct _EFI_SWAP_ADDRESS_RANGE_PROTOCOL {
-  EFI_GET_RANGE_LOCATION        GetRangeLocation;       // has output parameters for base and length
-  EFI_GET_SWAP_STATE            GetSwapState;           // are ranges swapped or not
-  EFI_SET_SWAP_STATE            SetSwapState;           // swap or unswap ranges
-  EFI_GET_RTC_POWER_STATUS      GetRtcPowerStatus;      // checks RTC battery, or whatever...
-  EFI_GET_SWAP_LOCK_CAPABILITY  GetSwapLockCapability;  // Get TOP_SWAP lock capability,
-  EFI_SET_SWAP_LOCK             SetSwapLock;            // Set TOP_SWAP lock state
+  EFI_GET_RANGE_LOCATION          GetRangeLocation;      // has output parameters for base and length
+  EFI_GET_SWAP_STATE              GetSwapState;          // are ranges swapped or not
+  EFI_SET_SWAP_STATE              SetSwapState;          // swap or unswap ranges
+  EFI_GET_RTC_POWER_STATUS        GetRtcPowerStatus;     // checks RTC battery, or whatever...
+  EFI_GET_SWAP_LOCK_CAPABILITY    GetSwapLockCapability; // Get TOP_SWAP lock capability,
+  EFI_SET_SWAP_LOCK               SetSwapLock;           // Set TOP_SWAP lock state
 };
 
-extern EFI_GUID gEfiSwapAddressRangeProtocolGuid;
+extern EFI_GUID  gEfiSwapAddressRangeProtocolGuid;
 
 #endif

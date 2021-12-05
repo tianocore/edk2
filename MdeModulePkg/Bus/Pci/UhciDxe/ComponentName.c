@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Uhci.h"
 
-
 //
 // EFI Component Name Protocol
 //
@@ -22,18 +21,16 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUhciComponentName = 
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUhciComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) UhciComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) UhciComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gUhciComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)UhciComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)UhciComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUhciDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mUhciDriverNameTable[] = {
   { "eng;en", L"Usb Uhci Driver" },
-  { NULL, NULL }
+  { NULL,     NULL               }
 };
-
 
 //
 // EFI Component Name Functions
@@ -166,16 +163,16 @@ UhciComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 UhciComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS           Status;
-  USB_HC_DEV           *UhciDev;
-  EFI_USB2_HC_PROTOCOL *Usb2Hc;
+  EFI_STATUS            Status;
+  USB_HC_DEV            *UhciDev;
+  EFI_USB2_HC_PROTOCOL  *Usb2Hc;
 
   //
   // This is a device driver, so ChildHandle must be NULL.
@@ -202,7 +199,7 @@ UhciComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiUsb2HcProtocolGuid,
-                  (VOID **) &Usb2Hc,
+                  (VOID **)&Usb2Hc,
                   gUhciDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -221,5 +218,4 @@ UhciComponentNameGetControllerName (
            ControllerName,
            (BOOLEAN)(This == &gUhciComponentName)
            );
-
 }
