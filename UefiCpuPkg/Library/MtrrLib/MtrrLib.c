@@ -2186,7 +2186,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
   //
   // 0. Dump the requests.
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     DEBUG ((DEBUG_CACHE, "Mtrr: Set Mem Attribute to %a, ScratchSize = %x%a",
             (MtrrSetting == NULL) ? "Hardware" : "Buffer", *ScratchSize,
             (RangeCount <= 1) ? "," : "\n"
@@ -2197,7 +2197,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
               Ranges[Index].BaseAddress, Ranges[Index].BaseAddress + Ranges[Index].Length
               ));
     }
-  );
+  DEBUG_CODE_END ();
 
   //
   // 1. Validate the parameters.
@@ -2715,7 +2715,7 @@ MtrrDebugPrintAllMtrrsWorker (
   IN MTRR_SETTINGS    *MtrrSetting
   )
 {
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     MTRR_SETTINGS     LocalMtrrs;
     MTRR_SETTINGS     *Mtrrs;
     UINTN             Index;
@@ -2799,7 +2799,7 @@ MtrrDebugPrintAllMtrrsWorker (
         Ranges[Index].BaseAddress, Ranges[Index].BaseAddress + Ranges[Index].Length - 1
         ));
     }
-  );
+  DEBUG_CODE_END ();
 }
 
 /**
