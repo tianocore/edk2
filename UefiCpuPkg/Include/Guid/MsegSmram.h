@@ -15,7 +15,7 @@
     0x5802bce4, 0xeeee, 0x4e33, { 0xa1, 0x30, 0xeb, 0xad, 0x27, 0xf0, 0xe4, 0x39 } \
   }
 
-extern EFI_GUID gMsegSmramGuid;
+extern EFI_GUID  gMsegSmramGuid;
 
 //
 // The data portion of this HOB is type EFI_SMRAM_DESCRIPTOR

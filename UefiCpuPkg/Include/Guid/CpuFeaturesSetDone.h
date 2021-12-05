@@ -15,6 +15,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     { 0xa82485ce, 0xad6b, 0x4101, { 0x99, 0xd3, 0xe1, 0x35, 0x8c, 0x9e, 0x7e, 0x37 } \
   }
 
-extern EFI_GUID gEdkiiCpuFeaturesSetDoneGuid;
+extern EFI_GUID  gEdkiiCpuFeaturesSetDoneGuid;
 
 #endif

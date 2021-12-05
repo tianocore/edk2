@@ -860,7 +860,7 @@ X2ApicInitialize (
 VOID *
 EFIAPI
 PpinGetConfigData (
-  IN UINTN               NumberOfProcessors
+  IN UINTN  NumberOfProcessors
   );
 
 /**

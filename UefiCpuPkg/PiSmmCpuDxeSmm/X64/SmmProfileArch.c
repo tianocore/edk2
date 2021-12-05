@@ -14,17 +14,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Current page index.
 //
-UINTN                     mPFPageIndex;
+UINTN  mPFPageIndex;
 
 //
 // Pool for dynamically creating page table in page fault handler.
 //
-UINT64                    mPFPageBuffer;
+UINT64  mPFPageBuffer;
 
 //
 // Store the uplink information for each page being used.
 //
-UINT64                    *mPFPageUplink[MAX_PF_PAGE_COUNT];
+UINT64  *mPFPageUplink[MAX_PF_PAGE_COUNT];
 
 /**
   Create SMM page table for S3 path.
@@ -35,8 +35,8 @@ InitSmmS3Cr3 (
   VOID
   )
 {
-  EFI_PHYSICAL_ADDRESS              Pages;
-  UINT64                            *PTEntry;
+  EFI_PHYSICAL_ADDRESS  Pages;
+  UINT64                *PTEntry;
 
   //
   // Generate PAE page table for the first 4GB memory space
@@ -46,7 +46,7 @@ InitSmmS3Cr3 (
   //
   // Fill Page-Table-Level4 (PML4) entry
   //
-  PTEntry = (UINT64*)AllocatePageTableMemory (1);
+  PTEntry = (UINT64 *)AllocatePageTableMemory (1);
   ASSERT (PTEntry != NULL);
   *PTEntry = Pages | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
   ZeroMem (PTEntry + 1, EFI_PAGE_SIZE - sizeof (*PTEntry));
@@ -56,7 +56,7 @@ InitSmmS3Cr3 (
   //
   mSmmS3ResumeState->SmmS3Cr3 = (UINT32)(UINTN)PTEntry;
 
-  return ;
+  return;
 }
 
 /**
@@ -68,7 +68,7 @@ InitPagesForPFHandler (
   VOID
   )
 {
-  VOID          *Address;
+  VOID  *Address;
 
   //
   // Pre-Allocate memory for page fault handler
@@ -77,9 +77,9 @@ InitPagesForPFHandler (
   Address = AllocatePages (MAX_PF_PAGE_COUNT);
   ASSERT (Address != NULL);
 
-  mPFPageBuffer =  (UINT64)(UINTN) Address;
-  mPFPageIndex = 0;
-  ZeroMem ((VOID *) (UINTN) mPFPageBuffer, EFI_PAGE_SIZE * MAX_PF_PAGE_COUNT);
+  mPFPageBuffer =  (UINT64)(UINTN)Address;
+  mPFPageIndex  = 0;
+  ZeroMem ((VOID *)(UINTN)mPFPageBuffer, EFI_PAGE_SIZE * MAX_PF_PAGE_COUNT);
   ZeroMem (mPFPageUplink, sizeof (mPFPageUplink));
 
   return;
@@ -93,16 +93,16 @@ InitPagesForPFHandler (
 **/
 VOID
 AcquirePage (
-  UINT64          *Uplink
+  UINT64  *Uplink
   )
 {
-  UINT64          Address;
+  UINT64  Address;
 
   //
   // Get the buffer
   //
   Address = mPFPageBuffer + EFI_PAGES_TO_SIZE (mPFPageIndex);
-  ZeroMem ((VOID *) (UINTN) Address, EFI_PAGE_SIZE);
+  ZeroMem ((VOID *)(UINTN)Address, EFI_PAGE_SIZE);
 
   //
   // Cut the previous uplink if it exists and wasn't overwritten
@@ -114,7 +114,7 @@ AcquirePage (
   //
   // Link & Record the current uplink
   //
-  *Uplink = Address | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+  *Uplink                     = Address | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
   mPFPageUplink[mPFPageIndex] = Uplink;
 
   mPFPageIndex = (mPFPageIndex + 1) % MAX_PF_PAGE_COUNT;
@@ -134,26 +134,26 @@ AcquirePage (
 **/
 VOID
 RestorePageTableAbove4G (
-  UINT64        *PageTable,
-  UINT64        PFAddress,
-  UINTN         CpuIndex,
-  UINTN         ErrorCode,
-  BOOLEAN       *IsValidPFAddress
+  UINT64   *PageTable,
+  UINT64   PFAddress,
+  UINTN    CpuIndex,
+  UINTN    ErrorCode,
+  BOOLEAN  *IsValidPFAddress
   )
 {
-  UINTN         PTIndex;
-  UINT64        Address;
-  BOOLEAN       Nx;
-  BOOLEAN       Existed;
-  UINTN         Index;
-  UINTN         PFIndex;
-  IA32_CR4      Cr4;
-  BOOLEAN       Enable5LevelPaging;
+  UINTN     PTIndex;
+  UINT64    Address;
+  BOOLEAN   Nx;
+  BOOLEAN   Existed;
+  UINTN     Index;
+  UINTN     PFIndex;
+  IA32_CR4  Cr4;
+  BOOLEAN   Enable5LevelPaging;
 
   ASSERT ((PageTable != NULL) && (IsValidPFAddress != NULL));
 
-  Cr4.UintN = AsmReadCr4 ();
-  Enable5LevelPaging = (BOOLEAN) (Cr4.Bits.LA57 == 1);
+  Cr4.UintN          = AsmReadCr4 ();
+  Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
 
   //
   // If page fault address is 4GB above.
@@ -164,26 +164,28 @@ RestorePageTableAbove4G (
   // If it exists in page table but page fault is generated,
   // there are 2 possible reasons: 1. present flag is set to 0; 2. instruction fetch in protected memory range.
   //
-  Existed = FALSE;
-  PageTable = (UINT64*)(AsmReadCr3 () & PHYSICAL_ADDRESS_MASK);
-  PTIndex = 0;
+  Existed   = FALSE;
+  PageTable = (UINT64 *)(AsmReadCr3 () & PHYSICAL_ADDRESS_MASK);
+  PTIndex   = 0;
   if (Enable5LevelPaging) {
     PTIndex = BitFieldRead64 (PFAddress, 48, 56);
   }
+
   if ((!Enable5LevelPaging) || ((PageTable[PTIndex] & IA32_PG_P) != 0)) {
     // PML5E
     if (Enable5LevelPaging) {
-      PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
     }
+
     PTIndex = BitFieldRead64 (PFAddress, 39, 47);
     if ((PageTable[PTIndex] & IA32_PG_P) != 0) {
       // PML4E
-      PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
-      PTIndex = BitFieldRead64 (PFAddress, 30, 38);
+      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+      PTIndex   = BitFieldRead64 (PFAddress, 30, 38);
       if ((PageTable[PTIndex] & IA32_PG_P) != 0) {
         // PDPTE
-        PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
-        PTIndex = BitFieldRead64 (PFAddress, 21, 29);
+        PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+        PTIndex   = BitFieldRead64 (PFAddress, 21, 29);
         // PD
         if ((PageTable[PTIndex] & IA32_PG_PS) != 0) {
           //
@@ -197,7 +199,7 @@ RestorePageTableAbove4G (
           //
           // 4KB page
           //
-          PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask& PHYSICAL_ADDRESS_MASK);
+          PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask& PHYSICAL_ADDRESS_MASK);
           if (PageTable != 0) {
             //
             // When there is a valid entry to map to 4KB page, need not create a new entry to map 2MB.
@@ -217,7 +219,6 @@ RestorePageTableAbove4G (
   // If page entry does not existed in page table at all, create a new entry.
   //
   if (!Existed) {
-
     if (IsAddressValid (PFAddress, &Nx)) {
       //
       // If page fault address above 4GB is in protected range but it causes a page fault exception,
@@ -234,19 +235,20 @@ RestorePageTableAbove4G (
     //
     // Find the page table entry created just now.
     //
-    PageTable = (UINT64*)(AsmReadCr3 () & PHYSICAL_ADDRESS_MASK);
+    PageTable = (UINT64 *)(AsmReadCr3 () & PHYSICAL_ADDRESS_MASK);
     PFAddress = AsmReadCr2 ();
     // PML5E
     if (Enable5LevelPaging) {
-      PTIndex = BitFieldRead64 (PFAddress, 48, 56);
-      PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+      PTIndex   = BitFieldRead64 (PFAddress, 48, 56);
+      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
     }
+
     // PML4E
-    PTIndex = BitFieldRead64 (PFAddress, 39, 47);
-    PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+    PTIndex   = BitFieldRead64 (PFAddress, 39, 47);
+    PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
     // PDPTE
-    PTIndex = BitFieldRead64 (PFAddress, 30, 38);
-    PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+    PTIndex   = BitFieldRead64 (PFAddress, 30, 38);
+    PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
     // PD
     PTIndex = BitFieldRead64 (PFAddress, 21, 29);
     Address = PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK;
@@ -257,18 +259,21 @@ RestorePageTableAbove4G (
       AcquirePage (&PageTable[PTIndex]);
 
       // PTE
-      PageTable = (UINT64*)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
       for (Index = 0; Index < 512; Index++) {
         PageTable[Index] = Address | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
         if (!IsAddressValid (Address, &Nx)) {
           PageTable[Index] = PageTable[Index] & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
         }
+
         if (Nx && mXdSupported) {
           PageTable[Index] = PageTable[Index] | IA32_PG_NX;
         }
+
         if (Address == (PFAddress & PHYSICAL_ADDRESS_MASK & ~((1ull << 12) - 1))) {
           PTIndex = Index;
         }
+
         Address += SIZE_4KB;
       } // end for PT
     } else {
@@ -281,6 +286,7 @@ RestorePageTableAbove4G (
         //
         PageTable[PTIndex] = PageTable[PTIndex] & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
       }
+
       //
       // Set XD bit to 1
       //
@@ -297,7 +303,7 @@ RestorePageTableAbove4G (
   //
   ASSERT (mPFEntryCount[CpuIndex] < MAX_PF_ENTRY_COUNT);
   if (mPFEntryCount[CpuIndex] < MAX_PF_ENTRY_COUNT) {
-    PFIndex = mPFEntryCount[CpuIndex];
+    PFIndex                                = mPFEntryCount[CpuIndex];
     mLastPFEntryValue[CpuIndex][PFIndex]   = PageTable[PTIndex];
     mLastPFEntryPointer[CpuIndex][PFIndex] = &PageTable[PTIndex];
     mPFEntryCount[CpuIndex]++;
@@ -326,7 +332,7 @@ RestorePageTableAbove4G (
 **/
 VOID
 ClearTrapFlag (
-  IN OUT EFI_SYSTEM_CONTEXT   SystemContext
+  IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
   SystemContext.SystemContextX64->Rflags &= (UINTN) ~BIT8;

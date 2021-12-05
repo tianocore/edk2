@@ -408,7 +408,7 @@ SmmCpuFeaturesCompleteSmmReadyToLock (
 VOID *
 EFIAPI
 SmmCpuFeaturesAllocatePageTableMemory (
-  IN UINTN           Pages
+  IN UINTN  Pages
   );
 
 #endif
