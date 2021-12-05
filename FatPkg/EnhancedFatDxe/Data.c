@@ -14,14 +14,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // FatFsLock - Global lock for synchronizing all requests.
 //
-EFI_LOCK FatFsLock   = EFI_INITIALIZE_LOCK_VARIABLE (TPL_CALLBACK);
+EFI_LOCK  FatFsLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_CALLBACK);
 
-EFI_LOCK FatTaskLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
+EFI_LOCK  FatTaskLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 
 //
 // Filesystem interface functions
 //
-EFI_FILE_PROTOCOL               FatFileInterface = {
+EFI_FILE_PROTOCOL  FatFileInterface = {
   EFI_FILE_PROTOCOL_REVISION,
   FatOpen,
   FatClose,
