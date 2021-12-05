@@ -375,7 +375,7 @@ TlsSetCipherList (
   // 79 non-newline characters. (MAX_DEBUG_MESSAGE_LENGTH is usually 0x100 in
   // DebugLib instances.)
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     UINTN FullLength;
     UINTN SegmentLength;
 
@@ -398,7 +398,7 @@ TlsSetCipherList (
     //
     CipherStringPosition++;
     ASSERT (CipherStringPosition == CipherString + CipherStringSize);
-  );
+  DEBUG_CODE_END ();
 
   //
   // Sets the ciphers for use by the Tls object.
@@ -1264,4 +1264,3 @@ TlsGetCertRevocationList (
 {
   return EFI_UNSUPPORTED;
 }
-
