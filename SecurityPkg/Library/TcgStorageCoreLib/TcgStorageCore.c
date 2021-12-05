@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-//#include <Library/PrintLib.h>
+// #include <Library/PrintLib.h>
 
 /**
   Required to be called before calling any other Tcg functions with the TCG_CREATE_STRUCT.
@@ -25,25 +25,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 TCG_RESULT
 EFIAPI
-TcgInitTcgCreateStruct(
-  TCG_CREATE_STRUCT      *CreateStruct,
-  VOID                   *Buffer,
-  UINT32                 BufferSize
+TcgInitTcgCreateStruct (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  VOID               *Buffer,
+  UINT32             BufferSize
   )
 {
-  NULL_CHECK(CreateStruct);
-  NULL_CHECK(Buffer);
+  NULL_CHECK (CreateStruct);
+  NULL_CHECK (Buffer);
 
   if (BufferSize == 0) {
     DEBUG ((DEBUG_INFO, "BufferSize=0\n"));
     return (TcgResultFailureZeroSize);
   }
 
-  ZeroMem(Buffer, BufferSize);
-  CreateStruct->BufferSize = BufferSize;
-  CreateStruct->Buffer = Buffer;
-  CreateStruct->ComPacket = NULL;
-  CreateStruct->CurPacket = NULL;
+  ZeroMem (Buffer, BufferSize);
+  CreateStruct->BufferSize   = BufferSize;
+  CreateStruct->Buffer       = Buffer;
+  CreateStruct->ComPacket    = NULL;
+  CreateStruct->CurPacket    = NULL;
   CreateStruct->CurSubPacket = NULL;
 
   return (TcgResultSuccess);
@@ -60,31 +60,37 @@ TcgInitTcgCreateStruct(
 **/
 TCG_RESULT
 EFIAPI
-TcgStartComPacket(
-  TCG_CREATE_STRUCT   *CreateStruct,
-  UINT16              ComId,
-  UINT16              ComIdExtension
+TcgStartComPacket (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  UINT16             ComId,
+  UINT16             ComIdExtension
   )
 {
-  NULL_CHECK(CreateStruct);
+  NULL_CHECK (CreateStruct);
 
-  if (CreateStruct->ComPacket != NULL ||
-      CreateStruct->CurPacket != NULL ||
-      CreateStruct->CurSubPacket != NULL
-     ) {
-    DEBUG ((DEBUG_INFO, "unexpected state: ComPacket=%p CurPacket=%p CurSubPacket=%p\n", CreateStruct->ComPacket, CreateStruct->CurPacket,
-    CreateStruct->CurSubPacket));
+  if ((CreateStruct->ComPacket != NULL) ||
+      (CreateStruct->CurPacket != NULL) ||
+      (CreateStruct->CurSubPacket != NULL)
+      )
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "unexpected state: ComPacket=%p CurPacket=%p CurSubPacket=%p\n",
+      CreateStruct->ComPacket,
+      CreateStruct->CurPacket,
+      CreateStruct->CurSubPacket
+      ));
     return (TcgResultFailureInvalidAction);
   }
 
-  if (sizeof(TCG_COM_PACKET) > CreateStruct->BufferSize) {
+  if (sizeof (TCG_COM_PACKET) > CreateStruct->BufferSize) {
     DEBUG ((DEBUG_INFO, "BufferSize=0x%X\n", CreateStruct->BufferSize));
     return (TcgResultFailureBufferTooSmall);
   }
 
-  CreateStruct->ComPacket = (TCG_COM_PACKET*)CreateStruct->Buffer;
-  CreateStruct->ComPacket->ComIDBE = SwapBytes16(ComId);
-  CreateStruct->ComPacket->ComIDExtensionBE = SwapBytes16(ComIdExtension);
+  CreateStruct->ComPacket                   = (TCG_COM_PACKET *)CreateStruct->Buffer;
+  CreateStruct->ComPacket->ComIDBE          = SwapBytes16 (ComId);
+  CreateStruct->ComPacket->ComIDExtensionBE = SwapBytes16 (ComIdExtension);
 
   return (TcgResultSuccess);
 }
@@ -103,48 +109,50 @@ TcgStartComPacket(
 **/
 TCG_RESULT
 EFIAPI
-TcgStartPacket(
-  TCG_CREATE_STRUCT    *CreateStruct,
-  UINT32               Tsn,
-  UINT32               Hsn,
-  UINT32               SeqNumber,
-  UINT16               AckType,
-  UINT32               Ack
+TcgStartPacket (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  UINT32             Tsn,
+  UINT32             Hsn,
+  UINT32             SeqNumber,
+  UINT16             AckType,
+  UINT32             Ack
   )
 {
-  UINT32 AddedSize;
-  NULL_CHECK(CreateStruct);
+  UINT32  AddedSize;
+
+  NULL_CHECK (CreateStruct);
 
   AddedSize = 0;
 
-  if (CreateStruct->ComPacket == NULL ||
-      CreateStruct->CurPacket != NULL ||
-      CreateStruct->CurSubPacket != NULL
-     ) {
+  if ((CreateStruct->ComPacket == NULL) ||
+      (CreateStruct->CurPacket != NULL) ||
+      (CreateStruct->CurSubPacket != NULL)
+      )
+  {
     DEBUG ((DEBUG_INFO, "unexpected state: ComPacket=%p CurPacket=%p CurSubPacket=%p\n", CreateStruct->ComPacket, CreateStruct->CurPacket, CreateStruct->CurSubPacket));
     return (TcgResultFailureInvalidAction);
   }
 
   // update TCG_COM_PACKET and packet lengths
-  AddedSize = sizeof(TCG_PACKET);
+  AddedSize = sizeof (TCG_PACKET);
 
-  if ((SwapBytes32(CreateStruct->ComPacket->LengthBE) + AddedSize) > CreateStruct->BufferSize) {
+  if ((SwapBytes32 (CreateStruct->ComPacket->LengthBE) + AddedSize) > CreateStruct->BufferSize) {
     DEBUG ((DEBUG_INFO, "BufferSize=0x%X\n", CreateStruct->BufferSize));
     return (TcgResultFailureBufferTooSmall);
   }
 
-  CreateStruct->CurPacket = (TCG_PACKET*)(CreateStruct->ComPacket->Payload + SwapBytes32(CreateStruct->ComPacket->LengthBE));
+  CreateStruct->CurPacket = (TCG_PACKET *)(CreateStruct->ComPacket->Payload + SwapBytes32 (CreateStruct->ComPacket->LengthBE));
 
-  CreateStruct->CurPacket->TperSessionNumberBE = SwapBytes32( Tsn );
-  CreateStruct->CurPacket->HostSessionNumberBE = SwapBytes32( Hsn );
-  CreateStruct->CurPacket->SequenceNumberBE = SwapBytes32( SeqNumber );
-  CreateStruct->CurPacket->AckTypeBE = SwapBytes16( AckType );
-  CreateStruct->CurPacket->AcknowledgementBE = SwapBytes32( Ack );
+  CreateStruct->CurPacket->TperSessionNumberBE = SwapBytes32 (Tsn);
+  CreateStruct->CurPacket->HostSessionNumberBE = SwapBytes32 (Hsn);
+  CreateStruct->CurPacket->SequenceNumberBE    = SwapBytes32 (SeqNumber);
+  CreateStruct->CurPacket->AckTypeBE           = SwapBytes16 (AckType);
+  CreateStruct->CurPacket->AcknowledgementBE   = SwapBytes32 (Ack);
 
   CreateStruct->CurPacket->LengthBE = 0;
 
   // update TCG_COM_PACKET Length for next pointer
-  CreateStruct->ComPacket->LengthBE = SwapBytes32( SwapBytes32(CreateStruct->ComPacket->LengthBE) + AddedSize );
+  CreateStruct->ComPacket->LengthBE = SwapBytes32 (SwapBytes32 (CreateStruct->ComPacket->LengthBE) + AddedSize);
 
   return (TcgResultSuccess);
 }
@@ -159,41 +167,42 @@ TcgStartPacket(
 **/
 TCG_RESULT
 EFIAPI
-TcgStartSubPacket(
-  TCG_CREATE_STRUCT    *CreateStruct,
-  UINT16               Kind
+TcgStartSubPacket (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  UINT16             Kind
   )
 {
-  UINT32 AddedSize;
+  UINT32  AddedSize;
 
-  NULL_CHECK(CreateStruct);
+  NULL_CHECK (CreateStruct);
 
   AddedSize = 0;
 
-  if (CreateStruct->ComPacket == NULL ||
-      CreateStruct->CurPacket == NULL ||
-      CreateStruct->CurSubPacket != NULL
-     ) {
+  if ((CreateStruct->ComPacket == NULL) ||
+      (CreateStruct->CurPacket == NULL) ||
+      (CreateStruct->CurSubPacket != NULL)
+      )
+  {
     DEBUG ((DEBUG_INFO, "unexpected state: ComPacket=%p CurPacket=%p CurSubPacket=%p\n", CreateStruct->ComPacket, CreateStruct->CurPacket, CreateStruct->CurSubPacket));
     return (TcgResultFailureInvalidAction);
   }
 
-  AddedSize = sizeof(TCG_SUB_PACKET);
+  AddedSize = sizeof (TCG_SUB_PACKET);
 
-  if ((SwapBytes32(CreateStruct->ComPacket->LengthBE) + AddedSize) > CreateStruct->BufferSize) {
+  if ((SwapBytes32 (CreateStruct->ComPacket->LengthBE) + AddedSize) > CreateStruct->BufferSize) {
     DEBUG ((DEBUG_INFO, "BufferSize=0x%X\n", CreateStruct->BufferSize));
     return (TcgResultFailureBufferTooSmall);
   }
 
-  CreateStruct->CurSubPacket = (TCG_SUB_PACKET*)(CreateStruct->CurPacket->Payload + SwapBytes32(CreateStruct->CurPacket->LengthBE));
-  CreateStruct->CurSubPacket->KindBE = SwapBytes16(Kind);
+  CreateStruct->CurSubPacket         = (TCG_SUB_PACKET *)(CreateStruct->CurPacket->Payload + SwapBytes32 (CreateStruct->CurPacket->LengthBE));
+  CreateStruct->CurSubPacket->KindBE = SwapBytes16 (Kind);
 
   // update lengths
   CreateStruct->CurSubPacket->LengthBE = 0;
 
   // update TCG_COM_PACKET and packet lengths
-  CreateStruct->ComPacket->LengthBE = SwapBytes32(SwapBytes32(CreateStruct->ComPacket->LengthBE) + AddedSize);
-  CreateStruct->CurPacket->LengthBE = SwapBytes32(SwapBytes32(CreateStruct->CurPacket->LengthBE) + AddedSize);
+  CreateStruct->ComPacket->LengthBE = SwapBytes32 (SwapBytes32 (CreateStruct->ComPacket->LengthBE) + AddedSize);
+  CreateStruct->CurPacket->LengthBE = SwapBytes32 (SwapBytes32 (CreateStruct->CurPacket->LengthBE) + AddedSize);
 
   return (TcgResultSuccess);
 }
@@ -208,39 +217,40 @@ TcgStartSubPacket(
 **/
 TCG_RESULT
 EFIAPI
-TcgEndSubPacket(
-  TCG_CREATE_STRUCT   *CreateStruct
+TcgEndSubPacket (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  UINT32 PadSize;
+  UINT32  PadSize;
 
-  NULL_CHECK(CreateStruct);
+  NULL_CHECK (CreateStruct);
 
   PadSize = 0;
 
-  if (CreateStruct->ComPacket == NULL ||
-      CreateStruct->CurPacket == NULL  ||
-      CreateStruct->CurSubPacket == NULL
-     ) {
+  if ((CreateStruct->ComPacket == NULL) ||
+      (CreateStruct->CurPacket == NULL) ||
+      (CreateStruct->CurSubPacket == NULL)
+      )
+  {
     DEBUG ((DEBUG_INFO, "unexpected state: ComPacket=%p CurPacket=%p CurSubPacket=%p\n", CreateStruct->ComPacket, CreateStruct->CurPacket, CreateStruct->CurSubPacket));
     return (TcgResultFailureInvalidAction);
   }
 
   // align to 4-byte boundaries, so shift padding
   // pad Size does not apply to subpacket Length
-  PadSize = TCG_SUBPACKET_ALIGNMENT - (SwapBytes32(CreateStruct->CurSubPacket->LengthBE) & (TCG_SUBPACKET_ALIGNMENT - 1));
+  PadSize = TCG_SUBPACKET_ALIGNMENT - (SwapBytes32 (CreateStruct->CurSubPacket->LengthBE) & (TCG_SUBPACKET_ALIGNMENT - 1));
 
   if (PadSize == TCG_SUBPACKET_ALIGNMENT) {
     PadSize = 0;
   }
 
-  if ((SwapBytes32(CreateStruct->ComPacket->LengthBE) + PadSize) > CreateStruct->BufferSize) {
+  if ((SwapBytes32 (CreateStruct->ComPacket->LengthBE) + PadSize) > CreateStruct->BufferSize) {
     DEBUG ((DEBUG_INFO, "BufferSize=0x%X\n", CreateStruct->BufferSize));
     return (TcgResultFailureBufferTooSmall);
   }
 
-  CreateStruct->CurPacket->LengthBE = SwapBytes32(SwapBytes32(CreateStruct->CurPacket->LengthBE) + PadSize);
-  CreateStruct->ComPacket->LengthBE = SwapBytes32(SwapBytes32(CreateStruct->ComPacket->LengthBE) + PadSize);
+  CreateStruct->CurPacket->LengthBE = SwapBytes32 (SwapBytes32 (CreateStruct->CurPacket->LengthBE) + PadSize);
+  CreateStruct->ComPacket->LengthBE = SwapBytes32 (SwapBytes32 (CreateStruct->ComPacket->LengthBE) + PadSize);
 
   CreateStruct->CurSubPacket = NULL;
 
@@ -256,16 +266,17 @@ TcgEndSubPacket(
 **/
 TCG_RESULT
 EFIAPI
-TcgEndPacket(
-  TCG_CREATE_STRUCT     *CreateStruct
+TcgEndPacket (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  NULL_CHECK(CreateStruct);
+  NULL_CHECK (CreateStruct);
 
-  if (CreateStruct->ComPacket == NULL ||
-      CreateStruct->CurPacket == NULL ||
-      CreateStruct->CurSubPacket != NULL
-     ) {
+  if ((CreateStruct->ComPacket == NULL) ||
+      (CreateStruct->CurPacket == NULL) ||
+      (CreateStruct->CurSubPacket != NULL)
+      )
+  {
     DEBUG ((DEBUG_INFO, "unexpected state: ComPacket=%p CurPacket=%p CurSubPacket=%p\n", CreateStruct->ComPacket, CreateStruct->CurPacket, CreateStruct->CurSubPacket));
     return (TcgResultFailureInvalidAction);
   }
@@ -285,23 +296,24 @@ TcgEndPacket(
 **/
 TCG_RESULT
 EFIAPI
-TcgEndComPacket(
-  TCG_CREATE_STRUCT      *CreateStruct,
-  UINT32                 *Size
+TcgEndComPacket (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  UINT32             *Size
   )
 {
-  NULL_CHECK(CreateStruct);
-  NULL_CHECK(Size);
+  NULL_CHECK (CreateStruct);
+  NULL_CHECK (Size);
 
-  if (CreateStruct->ComPacket == NULL ||
-      CreateStruct->CurPacket != NULL ||
-      CreateStruct->CurSubPacket != NULL
-     ) {
+  if ((CreateStruct->ComPacket == NULL) ||
+      (CreateStruct->CurPacket != NULL) ||
+      (CreateStruct->CurSubPacket != NULL)
+      )
+  {
     DEBUG ((DEBUG_INFO, "unexpected state: ComPacket=%p CurPacket=%p CurSubPacket=%p\n", CreateStruct->ComPacket, CreateStruct->CurPacket, CreateStruct->CurSubPacket));
     return (TcgResultFailureInvalidAction);
   }
 
-  *Size = SwapBytes32(CreateStruct->ComPacket->LengthBE) + sizeof(*CreateStruct->ComPacket);
+  *Size                   = SwapBytes32 (CreateStruct->ComPacket->LengthBE) + sizeof (*CreateStruct->ComPacket);
   CreateStruct->ComPacket = NULL;
 
   return (TcgResultSuccess);
@@ -319,55 +331,57 @@ TcgEndComPacket(
 
 **/
 TCG_RESULT
-TcgAddRawTokenData(
-  TCG_CREATE_STRUCT      *CreateStruct,
-  const VOID             *Header,
-  UINT8                  HeaderSize,
-  const VOID             *Data,
-  UINT32                 DataSize,
-  BOOLEAN                ByteSwapData
+TcgAddRawTokenData (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  const VOID         *Header,
+  UINT8              HeaderSize,
+  const VOID         *Data,
+  UINT32             DataSize,
+  BOOLEAN            ByteSwapData
   )
 {
-  UINT32 AddedSize;
-  UINT8* Dest;
-  const UINT8* DataBytes;
-  UINT32 Index;
+  UINT32       AddedSize;
+  UINT8        *Dest;
+  const UINT8  *DataBytes;
+  UINT32       Index;
 
   AddedSize = 0;
-  Index = 0;
-  Dest = NULL;
+  Index     = 0;
+  Dest      = NULL;
 
-  NULL_CHECK(CreateStruct);
+  NULL_CHECK (CreateStruct);
 
-  if ((HeaderSize != 0 && Header == NULL) ||
-      (DataSize != 0 && Data == NULL)
-     ) {
+  if (((HeaderSize != 0) && (Header == NULL)) ||
+      ((DataSize != 0) && (Data == NULL))
+      )
+  {
     DEBUG ((DEBUG_INFO, "HeaderSize=0x%X Header=%p DataSize=0x%X Data=%p\n", HeaderSize, Header, DataSize, Data));
     return (TcgResultFailureNullPointer);
   }
 
-  if (CreateStruct->ComPacket == NULL ||
-      CreateStruct->CurPacket == NULL ||
-      CreateStruct->CurSubPacket == NULL
-     ) {
+  if ((CreateStruct->ComPacket == NULL) ||
+      (CreateStruct->CurPacket == NULL) ||
+      (CreateStruct->CurSubPacket == NULL)
+      )
+  {
     DEBUG ((DEBUG_INFO, "unexpected state: ComPacket=%p CurPacket=%p CurSubPacket=%p\n", CreateStruct->ComPacket, CreateStruct->CurPacket, CreateStruct->CurSubPacket));
     return (TcgResultFailureInvalidAction);
   }
 
   // verify there is enough Buffer Size
   AddedSize = HeaderSize + DataSize;
-  if ((SwapBytes32(CreateStruct->ComPacket->LengthBE) + AddedSize) > CreateStruct->BufferSize) {
+  if ((SwapBytes32 (CreateStruct->ComPacket->LengthBE) + AddedSize) > CreateStruct->BufferSize) {
     return (TcgResultFailureBufferTooSmall);
   }
 
   // Get a pointer to where the new bytes should go
-  Dest = CreateStruct->ComPacket->Payload + SwapBytes32(CreateStruct->ComPacket->LengthBE);
+  Dest = CreateStruct->ComPacket->Payload + SwapBytes32 (CreateStruct->ComPacket->LengthBE);
 
   switch (HeaderSize) {
-    case sizeof(TCG_SIMPLE_TOKEN_SHORT_ATOM):
-    case sizeof(TCG_SIMPLE_TOKEN_MEDIUM_ATOM):
-    case sizeof(TCG_SIMPLE_TOKEN_LONG_ATOM):
-      CopyMem(Dest, Header, HeaderSize);
+    case sizeof (TCG_SIMPLE_TOKEN_SHORT_ATOM):
+    case sizeof (TCG_SIMPLE_TOKEN_MEDIUM_ATOM):
+    case sizeof (TCG_SIMPLE_TOKEN_LONG_ATOM):
+      CopyMem (Dest, Header, HeaderSize);
       Dest += HeaderSize;
     case 0: // no Header is valid
       break;
@@ -379,18 +393,18 @@ TcgAddRawTokenData(
 
   // copy the Data bytes
   if (ByteSwapData) {
-    DataBytes = (const UINT8*)Data;
+    DataBytes = (const UINT8 *)Data;
     for (Index = 0; Index < DataSize; Index++) {
       Dest[Index] = DataBytes[DataSize - 1 - Index];
     }
   } else {
-    CopyMem(Dest, Data, DataSize);
+    CopyMem (Dest, Data, DataSize);
   }
 
   // Update all the packet sizes
-  CreateStruct->ComPacket->LengthBE = SwapBytes32(SwapBytes32(CreateStruct->ComPacket->LengthBE) + AddedSize);
-  CreateStruct->CurPacket->LengthBE = SwapBytes32(SwapBytes32(CreateStruct->CurPacket->LengthBE) + AddedSize);
-  CreateStruct->CurSubPacket->LengthBE = SwapBytes32(SwapBytes32(CreateStruct->CurSubPacket->LengthBE) + AddedSize);
+  CreateStruct->ComPacket->LengthBE    = SwapBytes32 (SwapBytes32 (CreateStruct->ComPacket->LengthBE) + AddedSize);
+  CreateStruct->CurPacket->LengthBE    = SwapBytes32 (SwapBytes32 (CreateStruct->CurPacket->LengthBE) + AddedSize);
+  CreateStruct->CurSubPacket->LengthBE = SwapBytes32 (SwapBytes32 (CreateStruct->CurSubPacket->LengthBE) + AddedSize);
 
   return (TcgResultSuccess);
 }
@@ -405,14 +419,13 @@ TcgAddRawTokenData(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddRawByte(
-  TCG_CREATE_STRUCT     *CreateStruct,
-  UINT8                 Byte
+TcgAddRawByte (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  UINT8              Byte
   )
 {
-  return TcgAddRawTokenData(CreateStruct, NULL, 0, &Byte, 1, FALSE);
+  return TcgAddRawTokenData (CreateStruct, NULL, 0, &Byte, 1, FALSE);
 }
-
 
 /**
    simple tokens - atoms: tiny, short, medium, long and empty atoms.
@@ -428,21 +441,21 @@ TcgAddRawByte(
 
 **/
 TCG_RESULT
-TcgAddAtom(
-  TCG_CREATE_STRUCT   *CreateStruct,
-  const VOID          *Data,
-  UINT32              DataSize,
-  UINT8               ByteOrInt,
-  UINT8               SignOrCont
+TcgAddAtom (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  const VOID         *Data,
+  UINT32             DataSize,
+  UINT8              ByteOrInt,
+  UINT8              SignOrCont
   )
 {
-  const UINT8* DataBytes;
-  TCG_SIMPLE_TOKEN_TINY_ATOM TinyAtom;
-  TCG_SIMPLE_TOKEN_SHORT_ATOM ShortAtom;
-  TCG_SIMPLE_TOKEN_MEDIUM_ATOM MediumAtom;
-  TCG_SIMPLE_TOKEN_LONG_ATOM LongAtom;
+  const UINT8                   *DataBytes;
+  TCG_SIMPLE_TOKEN_TINY_ATOM    TinyAtom;
+  TCG_SIMPLE_TOKEN_SHORT_ATOM   ShortAtom;
+  TCG_SIMPLE_TOKEN_MEDIUM_ATOM  MediumAtom;
+  TCG_SIMPLE_TOKEN_LONG_ATOM    LongAtom;
 
-  NULL_CHECK(CreateStruct);
+  NULL_CHECK (CreateStruct);
 
   if (DataSize == 0) {
     if (ByteOrInt == TCG_ATOM_TYPE_INTEGER) {
@@ -451,52 +464,53 @@ TcgAddAtom(
     }
   } else {
     // if DataSize != 0, Data must be valid
-    NULL_CHECK(Data);
+    NULL_CHECK (Data);
   }
 
   // encode Data using the shortest possible atom
-  DataBytes = (const UINT8*)Data;
+  DataBytes = (const UINT8 *)Data;
   if ((DataSize == 1) &&
       (ByteOrInt == TCG_ATOM_TYPE_INTEGER) &&
-      ((SignOrCont != 0 && ((TCG_TOKEN_TINYATOM_SIGNED_MIN_VALUE <= *(INT8*)Data) && (*(INT8*)Data <= TCG_TOKEN_TINYATOM_SIGNED_MAX_VALUE))) ||
-       (SignOrCont == 0 && ((*DataBytes <= TCG_TOKEN_TINYATOM_UNSIGNED_MAX_VALUE))))
-     ) {
+      (((SignOrCont != 0) && ((TCG_TOKEN_TINYATOM_SIGNED_MIN_VALUE <= *(INT8 *)Data) && (*(INT8 *)Data <= TCG_TOKEN_TINYATOM_SIGNED_MAX_VALUE))) ||
+       ((SignOrCont == 0) && ((*DataBytes <= TCG_TOKEN_TINYATOM_UNSIGNED_MAX_VALUE))))
+      )
+  {
     TinyAtom.TinyAtomBits.IsZero = 0;
-    TinyAtom.TinyAtomBits.Sign = SignOrCont;
-    TinyAtom.TinyAtomBits.Data = *DataBytes & TCG_TOKEN_TINYATOM_UNSIGNED_MAX_VALUE;
-    return TcgAddRawTokenData(CreateStruct, NULL, 0, (UINT8*)&TinyAtom, sizeof(TCG_SIMPLE_TOKEN_TINY_ATOM), FALSE);
+    TinyAtom.TinyAtomBits.Sign   = SignOrCont;
+    TinyAtom.TinyAtomBits.Data   = *DataBytes & TCG_TOKEN_TINYATOM_UNSIGNED_MAX_VALUE;
+    return TcgAddRawTokenData (CreateStruct, NULL, 0, (UINT8 *)&TinyAtom, sizeof (TCG_SIMPLE_TOKEN_TINY_ATOM), FALSE);
   }
 
   if (DataSize <= TCG_TOKEN_SHORTATOM_MAX_BYTE_SIZE) {
-    ShortAtom.ShortAtomBits.IsOne = 1;
-    ShortAtom.ShortAtomBits.IsZero = 0;
-    ShortAtom.ShortAtomBits.ByteOrInt = ByteOrInt;
+    ShortAtom.ShortAtomBits.IsOne      = 1;
+    ShortAtom.ShortAtomBits.IsZero     = 0;
+    ShortAtom.ShortAtomBits.ByteOrInt  = ByteOrInt;
     ShortAtom.ShortAtomBits.SignOrCont = SignOrCont;
-    ShortAtom.ShortAtomBits.Length = DataSize & 0x0F;
-    return TcgAddRawTokenData(CreateStruct, &ShortAtom, sizeof(TCG_SIMPLE_TOKEN_SHORT_ATOM), Data, DataSize, ByteOrInt == TCG_ATOM_TYPE_INTEGER);
+    ShortAtom.ShortAtomBits.Length     = DataSize & 0x0F;
+    return TcgAddRawTokenData (CreateStruct, &ShortAtom, sizeof (TCG_SIMPLE_TOKEN_SHORT_ATOM), Data, DataSize, ByteOrInt == TCG_ATOM_TYPE_INTEGER);
   }
 
   if (DataSize <= TCG_TOKEN_MEDIUMATOM_MAX_BYTE_SIZE) {
-    MediumAtom.MediumAtomBits.IsOne1 = 1;
-    MediumAtom.MediumAtomBits.IsOne2 = 1;
-    MediumAtom.MediumAtomBits.IsZero = 0;
-    MediumAtom.MediumAtomBits.ByteOrInt = ByteOrInt;
+    MediumAtom.MediumAtomBits.IsOne1     = 1;
+    MediumAtom.MediumAtomBits.IsOne2     = 1;
+    MediumAtom.MediumAtomBits.IsZero     = 0;
+    MediumAtom.MediumAtomBits.ByteOrInt  = ByteOrInt;
     MediumAtom.MediumAtomBits.SignOrCont = SignOrCont;
-    MediumAtom.MediumAtomBits.LengthLow = DataSize & 0xFF;
+    MediumAtom.MediumAtomBits.LengthLow  = DataSize & 0xFF;
     MediumAtom.MediumAtomBits.LengthHigh = (DataSize >> TCG_MEDIUM_ATOM_LENGTH_HIGH_SHIFT) & TCG_MEDIUM_ATOM_LENGTH_HIGH_MASK;
-    return TcgAddRawTokenData(CreateStruct, &MediumAtom, sizeof(TCG_SIMPLE_TOKEN_MEDIUM_ATOM), Data, DataSize, ByteOrInt == TCG_ATOM_TYPE_INTEGER);
+    return TcgAddRawTokenData (CreateStruct, &MediumAtom, sizeof (TCG_SIMPLE_TOKEN_MEDIUM_ATOM), Data, DataSize, ByteOrInt == TCG_ATOM_TYPE_INTEGER);
   }
 
-  LongAtom.LongAtomBits.IsOne1 = 1;
-  LongAtom.LongAtomBits.IsOne2 = 1;
-  LongAtom.LongAtomBits.IsOne3 = 1;
-  LongAtom.LongAtomBits.IsZero = 0;
-  LongAtom.LongAtomBits.ByteOrInt = ByteOrInt;
+  LongAtom.LongAtomBits.IsOne1     = 1;
+  LongAtom.LongAtomBits.IsOne2     = 1;
+  LongAtom.LongAtomBits.IsOne3     = 1;
+  LongAtom.LongAtomBits.IsZero     = 0;
+  LongAtom.LongAtomBits.ByteOrInt  = ByteOrInt;
   LongAtom.LongAtomBits.SignOrCont = SignOrCont;
-  LongAtom.LongAtomBits.LengthLow = DataSize & 0xFF;
-  LongAtom.LongAtomBits.LengthMid = (DataSize >> TCG_LONG_ATOM_LENGTH_MID_SHIFT) & 0xFF;
+  LongAtom.LongAtomBits.LengthLow  = DataSize & 0xFF;
+  LongAtom.LongAtomBits.LengthMid  = (DataSize >> TCG_LONG_ATOM_LENGTH_MID_SHIFT) & 0xFF;
   LongAtom.LongAtomBits.LengthHigh = (DataSize >> TCG_LONG_ATOM_LENGTH_HIGH_SHIFT) & 0xFF;
-  return TcgAddRawTokenData(CreateStruct, &LongAtom, sizeof(TCG_SIMPLE_TOKEN_LONG_ATOM), Data, DataSize, ByteOrInt == TCG_ATOM_TYPE_INTEGER);
+  return TcgAddRawTokenData (CreateStruct, &LongAtom, sizeof (TCG_SIMPLE_TOKEN_LONG_ATOM), Data, DataSize, ByteOrInt == TCG_ATOM_TYPE_INTEGER);
 }
 
 /**
@@ -512,14 +526,14 @@ TcgAddAtom(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddByteSequence(
-  TCG_CREATE_STRUCT     *CreateStruct,
-  const VOID            *Data,
-  UINT32                DataSize,
-  BOOLEAN               Continued
+TcgAddByteSequence (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  const VOID         *Data,
+  UINT32             DataSize,
+  BOOLEAN            Continued
   )
 {
-  return TcgAddAtom(CreateStruct, Data, DataSize, TCG_ATOM_TYPE_BYTE, Continued ? 1 : 0);
+  return TcgAddAtom (CreateStruct, Data, DataSize, TCG_ATOM_TYPE_BYTE, Continued ? 1 : 0);
 }
 
 /**
@@ -535,30 +549,30 @@ TcgAddByteSequence(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddInteger(
+TcgAddInteger (
   TCG_CREATE_STRUCT  *CreateStruct,
   const VOID         *Data,
   UINT32             DataSize,
   BOOLEAN            SignedInteger
   )
 {
-  const UINT8* DataBytes;
-  UINT32 ActualDataSize;
-  BOOLEAN ValueIsNegative;
+  const UINT8  *DataBytes;
+  UINT32       ActualDataSize;
+  BOOLEAN      ValueIsNegative;
 
-  NULL_CHECK(CreateStruct);
-  NULL_CHECK(Data);
+  NULL_CHECK (CreateStruct);
+  NULL_CHECK (Data);
 
   if (DataSize == 0) {
     DEBUG ((DEBUG_INFO, "invalid DataSize=0\n"));
     return TcgResultFailure;
   }
 
-  DataBytes = (const UINT8*)Data;
+  DataBytes = (const UINT8 *)Data;
 
   // integer should be represented by smallest atom possible
   // so calculate real Data Size
-  ValueIsNegative = SignedInteger && DataBytes[ DataSize - 1 ] & 0x80;
+  ValueIsNegative = SignedInteger && DataBytes[DataSize - 1] & 0x80;
 
   // assumes native Data is little endian
   // shorten Data to smallest byte representation
@@ -572,7 +586,7 @@ TcgAddInteger(
     }
   }
 
-  return TcgAddAtom(CreateStruct, Data, ActualDataSize, TCG_ATOM_TYPE_INTEGER, SignedInteger ? 1 : 0);
+  return TcgAddAtom (CreateStruct, Data, ActualDataSize, TCG_ATOM_TYPE_INTEGER, SignedInteger ? 1 : 0);
 }
 
 /**
@@ -584,12 +598,12 @@ TcgAddInteger(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddUINT8(
-  TCG_CREATE_STRUCT   *CreateStruct,
-  UINT8               Value
+TcgAddUINT8 (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  UINT8              Value
   )
 {
-  return TcgAddInteger(CreateStruct, &Value, sizeof(Value), FALSE);
+  return TcgAddInteger (CreateStruct, &Value, sizeof (Value), FALSE);
 }
 
 /**
@@ -603,11 +617,11 @@ TcgAddUINT8(
 TCG_RESULT
 EFIAPI
 TcgAddUINT16 (
-  TCG_CREATE_STRUCT   *CreateStruct,
-  UINT16              Value
+  TCG_CREATE_STRUCT  *CreateStruct,
+  UINT16             Value
   )
 {
-  return TcgAddInteger(CreateStruct, &Value, sizeof(Value), FALSE);
+  return TcgAddInteger (CreateStruct, &Value, sizeof (Value), FALSE);
 }
 
 /**
@@ -620,14 +634,13 @@ TcgAddUINT16 (
 **/
 TCG_RESULT
 EFIAPI
-TcgAddUINT32(
-  TCG_CREATE_STRUCT    *CreateStruct,
-  UINT32               Value
+TcgAddUINT32 (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  UINT32             Value
   )
 {
-  return TcgAddInteger(CreateStruct, &Value, sizeof(Value), FALSE);
+  return TcgAddInteger (CreateStruct, &Value, sizeof (Value), FALSE);
 }
-
 
 /**
 
@@ -639,12 +652,12 @@ TcgAddUINT32(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddUINT64(
-  TCG_CREATE_STRUCT   *CreateStruct,
-  UINT64              Value
+TcgAddUINT64 (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  UINT64             Value
   )
 {
-  return TcgAddInteger(CreateStruct, &Value, sizeof(Value), FALSE);
+  return TcgAddInteger (CreateStruct, &Value, sizeof (Value), FALSE);
 }
 
 /**
@@ -656,12 +669,12 @@ TcgAddUINT64(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddBOOLEAN(
-  TCG_CREATE_STRUCT    *CreateStruct,
-  BOOLEAN              Value
+TcgAddBOOLEAN (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  BOOLEAN            Value
   )
 {
-  return TcgAddInteger(CreateStruct, &Value, sizeof(Value), FALSE);
+  return TcgAddInteger (CreateStruct, &Value, sizeof (Value), FALSE);
 }
 
 /**
@@ -675,12 +688,12 @@ TcgAddBOOLEAN(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddTcgUid(
-  TCG_CREATE_STRUCT   *CreateStruct,
-  TCG_UID             Uid
+TcgAddTcgUid (
+  TCG_CREATE_STRUCT  *CreateStruct,
+  TCG_UID            Uid
   )
 {
-  return TcgAddByteSequence(CreateStruct, &Uid, sizeof(TCG_UID), FALSE);
+  return TcgAddByteSequence (CreateStruct, &Uid, sizeof (TCG_UID), FALSE);
 }
 
 /**
@@ -693,11 +706,11 @@ TcgAddTcgUid(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddStartList(
-  TCG_CREATE_STRUCT          *CreateStruct
+TcgAddStartList (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  return TcgAddRawByte(CreateStruct, TCG_TOKEN_STARTLIST);
+  return TcgAddRawByte (CreateStruct, TCG_TOKEN_STARTLIST);
 }
 
 /**
@@ -710,11 +723,11 @@ TcgAddStartList(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddEndList(
-  TCG_CREATE_STRUCT       *CreateStruct
+TcgAddEndList (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  return TcgAddRawByte(CreateStruct, TCG_TOKEN_ENDLIST);
+  return TcgAddRawByte (CreateStruct, TCG_TOKEN_ENDLIST);
 }
 
 /**
@@ -727,11 +740,11 @@ TcgAddEndList(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddStartName(
-  TCG_CREATE_STRUCT          *CreateStruct
+TcgAddStartName (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  return TcgAddRawByte(CreateStruct, TCG_TOKEN_STARTNAME);
+  return TcgAddRawByte (CreateStruct, TCG_TOKEN_STARTNAME);
 }
 
 /**
@@ -744,11 +757,11 @@ TcgAddStartName(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddEndName(
-  TCG_CREATE_STRUCT          *CreateStruct
+TcgAddEndName (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  return TcgAddRawByte(CreateStruct, TCG_TOKEN_ENDNAME);
+  return TcgAddRawByte (CreateStruct, TCG_TOKEN_ENDNAME);
 }
 
 /**
@@ -761,11 +774,11 @@ TcgAddEndName(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddCall(
-  TCG_CREATE_STRUCT      *CreateStruct
+TcgAddCall (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  return TcgAddRawByte(CreateStruct, TCG_TOKEN_CALL);
+  return TcgAddRawByte (CreateStruct, TCG_TOKEN_CALL);
 }
 
 /**
@@ -778,11 +791,11 @@ TcgAddCall(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddEndOfData(
-  TCG_CREATE_STRUCT          *CreateStruct
+TcgAddEndOfData (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  return TcgAddRawByte(CreateStruct, TCG_TOKEN_ENDDATA);
+  return TcgAddRawByte (CreateStruct, TCG_TOKEN_ENDDATA);
 }
 
 /**
@@ -795,11 +808,11 @@ TcgAddEndOfData(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddEndOfSession(
-  TCG_CREATE_STRUCT              *CreateStruct
+TcgAddEndOfSession (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  return TcgAddRawByte(CreateStruct, TCG_TOKEN_ENDSESSION);
+  return TcgAddRawByte (CreateStruct, TCG_TOKEN_ENDSESSION);
 }
 
 /**
@@ -812,11 +825,11 @@ TcgAddEndOfSession(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddStartTransaction(
-  TCG_CREATE_STRUCT             *CreateStruct
+TcgAddStartTransaction (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  return TcgAddRawByte(CreateStruct, TCG_TOKEN_STARTTRANSACTION);
+  return TcgAddRawByte (CreateStruct, TCG_TOKEN_STARTTRANSACTION);
 }
 
 /**
@@ -829,11 +842,11 @@ TcgAddStartTransaction(
 **/
 TCG_RESULT
 EFIAPI
-TcgAddEndTransaction(
-  TCG_CREATE_STRUCT           *CreateStruct
+TcgAddEndTransaction (
+  TCG_CREATE_STRUCT  *CreateStruct
   )
 {
-  return TcgAddRawByte(CreateStruct, TCG_TOKEN_ENDTRANSACTION);
+  return TcgAddRawByte (CreateStruct, TCG_TOKEN_ENDTRANSACTION);
 }
 
 /**
@@ -848,59 +861,60 @@ TcgAddEndTransaction(
 **/
 TCG_RESULT
 EFIAPI
-TcgInitTcgParseStruct(
-  TCG_PARSE_STRUCT          *ParseStruct,
-  const VOID                *Buffer,
-  UINT32                    BufferSize
+TcgInitTcgParseStruct (
+  TCG_PARSE_STRUCT  *ParseStruct,
+  const VOID        *Buffer,
+  UINT32            BufferSize
   )
 {
-  UINT32 ComPacketLength;
-  UINT32 PacketLength;
+  UINT32  ComPacketLength;
+  UINT32  PacketLength;
 
-  NULL_CHECK(ParseStruct);
-  NULL_CHECK(Buffer);
+  NULL_CHECK (ParseStruct);
+  NULL_CHECK (Buffer);
 
-  if (BufferSize < sizeof(TCG_COM_PACKET)) {
+  if (BufferSize < sizeof (TCG_COM_PACKET)) {
     return (TcgResultFailureBufferTooSmall);
   }
 
-  ParseStruct->ComPacket = (TCG_COM_PACKET*)Buffer;
+  ParseStruct->ComPacket = (TCG_COM_PACKET *)Buffer;
 
-  ComPacketLength = SwapBytes32(ParseStruct->ComPacket->LengthBE);
+  ComPacketLength = SwapBytes32 (ParseStruct->ComPacket->LengthBE);
 
-  if ((BufferSize - sizeof(TCG_COM_PACKET)) < ComPacketLength) {
+  if ((BufferSize - sizeof (TCG_COM_PACKET)) < ComPacketLength) {
     DEBUG ((DEBUG_INFO, "Buffer %u too small for ComPacket %u\n", BufferSize, ComPacketLength));
     return (TcgResultFailureBufferTooSmall);
   }
 
   ParseStruct->BufferSize = BufferSize;
-  ParseStruct->Buffer = Buffer;
+  ParseStruct->Buffer     = Buffer;
 
-  ParseStruct->CurPacket = NULL;
+  ParseStruct->CurPacket    = NULL;
   ParseStruct->CurSubPacket = NULL;
-  ParseStruct->CurPtr = NULL;
+  ParseStruct->CurPtr       = NULL;
 
   // if payload > 0, then must have a packet
   if (ComPacketLength != 0) {
-    if (ComPacketLength < sizeof(TCG_PACKET)) {
+    if (ComPacketLength < sizeof (TCG_PACKET)) {
       DEBUG ((DEBUG_INFO, "ComPacket too small for Packet\n"));
       return (TcgResultFailureBufferTooSmall);
     }
-    ParseStruct->CurPacket = (TCG_PACKET*)ParseStruct->ComPacket->Payload;
 
-    PacketLength = SwapBytes32(ParseStruct->CurPacket->LengthBE);
+    ParseStruct->CurPacket = (TCG_PACKET *)ParseStruct->ComPacket->Payload;
+
+    PacketLength = SwapBytes32 (ParseStruct->CurPacket->LengthBE);
 
     if (PacketLength > 0) {
-      if (PacketLength < sizeof(TCG_SUB_PACKET)) {
-          DEBUG ((DEBUG_INFO, "Packet too small for SubPacket\n"));
-          return (TcgResultFailureBufferTooSmall);
+      if (PacketLength < sizeof (TCG_SUB_PACKET)) {
+        DEBUG ((DEBUG_INFO, "Packet too small for SubPacket\n"));
+        return (TcgResultFailureBufferTooSmall);
       }
 
-      ParseStruct->CurSubPacket = (TCG_SUB_PACKET*)ParseStruct->CurPacket->Payload;
+      ParseStruct->CurSubPacket = (TCG_SUB_PACKET *)ParseStruct->CurPacket->Payload;
     }
   }
 
-  //TODO should check for method status list at this point?
+  // TODO should check for method status list at this point?
 
   return (TcgResultSuccess);
 }
@@ -916,25 +930,26 @@ TcgInitTcgParseStruct(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextToken(
-  TCG_PARSE_STRUCT      *ParseStruct,
-  TCG_TOKEN             *TcgToken
+TcgGetNextToken (
+  TCG_PARSE_STRUCT  *ParseStruct,
+  TCG_TOKEN         *TcgToken
   )
 {
-  const UINT8* EndOfSubPacket;
-  UINT8* TokenEnd;
-  UINT8 Hdr;
-  TCG_SIMPLE_TOKEN_SHORT_ATOM* TmpShort;
-  const TCG_SIMPLE_TOKEN_MEDIUM_ATOM* TmpMed;
-  const TCG_SIMPLE_TOKEN_LONG_ATOM* TmpLong;
+  const UINT8                         *EndOfSubPacket;
+  UINT8                               *TokenEnd;
+  UINT8                               Hdr;
+  TCG_SIMPLE_TOKEN_SHORT_ATOM         *TmpShort;
+  const TCG_SIMPLE_TOKEN_MEDIUM_ATOM  *TmpMed;
+  const TCG_SIMPLE_TOKEN_LONG_ATOM    *TmpLong;
 
-  NULL_CHECK(ParseStruct);
-  NULL_CHECK(TcgToken);
+  NULL_CHECK (ParseStruct);
+  NULL_CHECK (TcgToken);
 
-  if (ParseStruct->ComPacket == NULL ||
-      ParseStruct->CurPacket == NULL ||
-      ParseStruct->CurSubPacket == NULL
-     ) {
+  if ((ParseStruct->ComPacket == NULL) ||
+      (ParseStruct->CurPacket == NULL) ||
+      (ParseStruct->CurSubPacket == NULL)
+      )
+  {
     DEBUG ((DEBUG_INFO, "unexpected state: ComPacket=%p CurPacket=%p CurSubPacket=%p\n", ParseStruct->ComPacket, ParseStruct->CurPacket, ParseStruct->CurSubPacket));
     return TcgResultFailureInvalidAction;
   }
@@ -944,8 +959,8 @@ TcgGetNextToken(
     ParseStruct->CurPtr = ParseStruct->CurSubPacket->Payload;
   }
 
-  EndOfSubPacket = ParseStruct->CurSubPacket->Payload + SwapBytes32(ParseStruct->CurSubPacket->LengthBE);
-  TokenEnd = NULL;
+  EndOfSubPacket = ParseStruct->CurSubPacket->Payload + SwapBytes32 (ParseStruct->CurSubPacket->LengthBE);
+  TokenEnd       = NULL;
 
   // confirmed that subpacket Length falls within end of Buffer and TCG_COM_PACKET,
   // so simply need to verify the loop stays within current subpacket
@@ -954,7 +969,7 @@ TcgGetNextToken(
     return (TcgResultFailureEndBuffer);
   }
 
-  Hdr = *ParseStruct->CurPtr;
+  Hdr                = *ParseStruct->CurPtr;
   TcgToken->HdrStart = ParseStruct->CurPtr;
 
   // Tiny Atom range
@@ -962,7 +977,7 @@ TcgGetNextToken(
     // tiny atom Header is only 1 byte, so don't need to verify Size before cast and access
     TcgToken->Type = TcgTokenTypeTinyAtom;
 
-    TokenEnd = TcgToken->HdrStart + sizeof(TCG_SIMPLE_TOKEN_TINY_ATOM);
+    TokenEnd = TcgToken->HdrStart + sizeof (TCG_SIMPLE_TOKEN_TINY_ATOM);
 
     // verify caller will have enough Size to reference token
     if (TokenEnd >= EndOfSubPacket) {
@@ -971,12 +986,12 @@ TcgGetNextToken(
     }
   }
   // Short Atom Range
-  else if (0x80 <= Hdr && Hdr <= 0xBF) {
+  else if ((0x80 <= Hdr) && (Hdr <= 0xBF)) {
     // short atom Header is only 1 byte, so don't need to verify Size before cast and access
-    TmpShort = (TCG_SIMPLE_TOKEN_SHORT_ATOM*)(ParseStruct->CurPtr);
+    TmpShort       = (TCG_SIMPLE_TOKEN_SHORT_ATOM *)(ParseStruct->CurPtr);
     TcgToken->Type = TcgTokenTypeShortAtom;
 
-    TokenEnd = (TcgToken->HdrStart + sizeof(TCG_SIMPLE_TOKEN_SHORT_ATOM) + TmpShort->ShortAtomBits.Length);
+    TokenEnd = (TcgToken->HdrStart + sizeof (TCG_SIMPLE_TOKEN_SHORT_ATOM) + TmpShort->ShortAtomBits.Length);
 
     // verify caller will have enough Size to reference token
     if (TokenEnd >= EndOfSubPacket) {
@@ -985,15 +1000,16 @@ TcgGetNextToken(
     }
   }
   // Medium Atom Range
-  else if (0xC0 <= Hdr && Hdr <= 0xDF) {
-    if (TcgToken->HdrStart + sizeof(TCG_SIMPLE_TOKEN_MEDIUM_ATOM) >= EndOfSubPacket) {
+  else if ((0xC0 <= Hdr) && (Hdr <= 0xDF)) {
+    if (TcgToken->HdrStart + sizeof (TCG_SIMPLE_TOKEN_MEDIUM_ATOM) >= EndOfSubPacket) {
       return (TcgResultFailureEndBuffer);
     }
-    TmpMed = (const TCG_SIMPLE_TOKEN_MEDIUM_ATOM*)ParseStruct->CurPtr;
+
+    TmpMed         = (const TCG_SIMPLE_TOKEN_MEDIUM_ATOM *)ParseStruct->CurPtr;
     TcgToken->Type = TcgTokenTypeMediumAtom;
-    TokenEnd = TcgToken->HdrStart + sizeof(TCG_SIMPLE_TOKEN_MEDIUM_ATOM) +
-               ((TmpMed->MediumAtomBits.LengthHigh << TCG_MEDIUM_ATOM_LENGTH_HIGH_SHIFT) |
-                TmpMed->MediumAtomBits.LengthLow);
+    TokenEnd       = TcgToken->HdrStart + sizeof (TCG_SIMPLE_TOKEN_MEDIUM_ATOM) +
+                     ((TmpMed->MediumAtomBits.LengthHigh << TCG_MEDIUM_ATOM_LENGTH_HIGH_SHIFT) |
+                      TmpMed->MediumAtomBits.LengthLow);
 
     // verify caller will have enough Size to reference token
     if (TokenEnd >= EndOfSubPacket) {
@@ -1002,14 +1018,15 @@ TcgGetNextToken(
     }
   }
   // Long Atom Range
-  else if (0xE0 <= Hdr && Hdr <= 0xE3) {
-    if (TcgToken->HdrStart + sizeof(TCG_SIMPLE_TOKEN_LONG_ATOM) >= EndOfSubPacket) {
+  else if ((0xE0 <= Hdr) && (Hdr <= 0xE3)) {
+    if (TcgToken->HdrStart + sizeof (TCG_SIMPLE_TOKEN_LONG_ATOM) >= EndOfSubPacket) {
       return (TcgResultFailureEndBuffer);
     }
-    TmpLong = (const TCG_SIMPLE_TOKEN_LONG_ATOM*)ParseStruct->CurPtr;
+
+    TmpLong        = (const TCG_SIMPLE_TOKEN_LONG_ATOM *)ParseStruct->CurPtr;
     TcgToken->Type = TcgTokenTypeLongAtom;
 
-    TokenEnd = TcgToken->HdrStart + sizeof(TCG_SIMPLE_TOKEN_LONG_ATOM) +
+    TokenEnd = TcgToken->HdrStart + sizeof (TCG_SIMPLE_TOKEN_LONG_ATOM) +
                ((TmpLong->LongAtomBits.LengthHigh << TCG_LONG_ATOM_LENGTH_HIGH_SHIFT) |
                 (TmpLong->LongAtomBits.LengthMid << TCG_LONG_ATOM_LENGTH_MID_SHIFT)   |
                 TmpLong->LongAtomBits.LengthLow);
@@ -1023,40 +1040,41 @@ TcgGetNextToken(
     // single byte tokens
     switch (Hdr) {
       case TCG_TOKEN_STARTLIST:
-          TcgToken->Type = TcgTokenTypeStartList;
-          break;
+        TcgToken->Type = TcgTokenTypeStartList;
+        break;
       case TCG_TOKEN_ENDLIST:
-          TcgToken->Type = TcgTokenTypeEndList;
-          break;
+        TcgToken->Type = TcgTokenTypeEndList;
+        break;
       case TCG_TOKEN_STARTNAME:
-          TcgToken->Type = TcgTokenTypeStartName;
-          break;
+        TcgToken->Type = TcgTokenTypeStartName;
+        break;
       case TCG_TOKEN_ENDNAME:
-          TcgToken->Type = TcgTokenTypeEndName;
-          break;
+        TcgToken->Type = TcgTokenTypeEndName;
+        break;
       case TCG_TOKEN_CALL:
-          TcgToken->Type = TcgTokenTypeCall;
-          break;
+        TcgToken->Type = TcgTokenTypeCall;
+        break;
       case TCG_TOKEN_ENDDATA:
-          TcgToken->Type = TcgTokenTypeEndOfData;
-          break;
+        TcgToken->Type = TcgTokenTypeEndOfData;
+        break;
       case TCG_TOKEN_ENDSESSION:
-          TcgToken->Type = TcgTokenTypeEndOfSession;
-          break;
+        TcgToken->Type = TcgTokenTypeEndOfSession;
+        break;
       case TCG_TOKEN_STARTTRANSACTION:
-          TcgToken->Type = TcgTokenTypeStartTransaction;
-          break;
+        TcgToken->Type = TcgTokenTypeStartTransaction;
+        break;
       case TCG_TOKEN_ENDTRANSACTION:
-          TcgToken->Type = TcgTokenTypeEndTransaction;
-          break;
+        TcgToken->Type = TcgTokenTypeEndTransaction;
+        break;
       case TCG_TOKEN_EMPTY:
-          TcgToken->Type = TcgTokenTypeEmptyAtom;
-          break;
+        TcgToken->Type = TcgTokenTypeEmptyAtom;
+        break;
       default:
-          DEBUG ((DEBUG_INFO, "WARNING: reserved token Type 0x%02X\n", Hdr));
-          TcgToken->Type = TcgTokenTypeReserved;
-          break;
+        DEBUG ((DEBUG_INFO, "WARNING: reserved token Type 0x%02X\n", Hdr));
+        TcgToken->Type = TcgTokenTypeReserved;
+        break;
     }
+
     ParseStruct->CurPtr++;
     TokenEnd = TcgToken->HdrStart + 1;
   }
@@ -1080,61 +1098,65 @@ TcgGetNextToken(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetAtomInfo(
-  const TCG_TOKEN      *TcgToken,
-  UINT32               *HeaderLength,
-  UINT32               *DataLength,
-  UINT8                *ByteOrInt,
-  UINT8                *SignOrCont
+TcgGetAtomInfo (
+  const TCG_TOKEN  *TcgToken,
+  UINT32           *HeaderLength,
+  UINT32           *DataLength,
+  UINT8            *ByteOrInt,
+  UINT8            *SignOrCont
   )
 {
-  TCG_SIMPLE_TOKEN_TINY_ATOM* TinyAtom;
-  TCG_SIMPLE_TOKEN_SHORT_ATOM* ShortAtom;
-  TCG_SIMPLE_TOKEN_MEDIUM_ATOM* MediumAtom;
-  TCG_SIMPLE_TOKEN_LONG_ATOM* LongAtom;
+  TCG_SIMPLE_TOKEN_TINY_ATOM    *TinyAtom;
+  TCG_SIMPLE_TOKEN_SHORT_ATOM   *ShortAtom;
+  TCG_SIMPLE_TOKEN_MEDIUM_ATOM  *MediumAtom;
+  TCG_SIMPLE_TOKEN_LONG_ATOM    *LongAtom;
 
-  NULL_CHECK(TcgToken);
-  NULL_CHECK(HeaderLength);
-  NULL_CHECK(DataLength);
-  NULL_CHECK(ByteOrInt);
-  NULL_CHECK(SignOrCont);
+  NULL_CHECK (TcgToken);
+  NULL_CHECK (HeaderLength);
+  NULL_CHECK (DataLength);
+  NULL_CHECK (ByteOrInt);
+  NULL_CHECK (SignOrCont);
 
   switch (TcgToken->Type) {
-    case TcgTokenTypeTinyAtom: {
-      TinyAtom = (TCG_SIMPLE_TOKEN_TINY_ATOM*)TcgToken->HdrStart;
-      *ByteOrInt      = TCG_ATOM_TYPE_INTEGER;
-      *SignOrCont     = TinyAtom->TinyAtomBits.Sign;
-      *HeaderLength   = 0;
-      *DataLength     = 0; // tiny atom must be handled as a special case - Header and Data in the same byte
+    case TcgTokenTypeTinyAtom:
+    {
+      TinyAtom      = (TCG_SIMPLE_TOKEN_TINY_ATOM *)TcgToken->HdrStart;
+      *ByteOrInt    = TCG_ATOM_TYPE_INTEGER;
+      *SignOrCont   = TinyAtom->TinyAtomBits.Sign;
+      *HeaderLength = 0;
+      *DataLength   = 0;   // tiny atom must be handled as a special case - Header and Data in the same byte
       return TcgResultSuccess;
     }
 
-    case TcgTokenTypeShortAtom: {
-      ShortAtom = (TCG_SIMPLE_TOKEN_SHORT_ATOM*)TcgToken->HdrStart;
-      *ByteOrInt      = ShortAtom->ShortAtomBits.ByteOrInt;
-      *SignOrCont     = ShortAtom->ShortAtomBits.SignOrCont;
-      *HeaderLength   = sizeof(TCG_SIMPLE_TOKEN_SHORT_ATOM);
-      *DataLength     = ShortAtom->ShortAtomBits.Length;
+    case TcgTokenTypeShortAtom:
+    {
+      ShortAtom     = (TCG_SIMPLE_TOKEN_SHORT_ATOM *)TcgToken->HdrStart;
+      *ByteOrInt    = ShortAtom->ShortAtomBits.ByteOrInt;
+      *SignOrCont   = ShortAtom->ShortAtomBits.SignOrCont;
+      *HeaderLength = sizeof (TCG_SIMPLE_TOKEN_SHORT_ATOM);
+      *DataLength   = ShortAtom->ShortAtomBits.Length;
       return TcgResultSuccess;
     }
 
-    case TcgTokenTypeMediumAtom: {
-      MediumAtom = (TCG_SIMPLE_TOKEN_MEDIUM_ATOM*)TcgToken->HdrStart;
-      *ByteOrInt      = MediumAtom->MediumAtomBits.ByteOrInt;
-      *SignOrCont     = MediumAtom->MediumAtomBits.SignOrCont;
-      *HeaderLength   = sizeof(TCG_SIMPLE_TOKEN_MEDIUM_ATOM);
-      *DataLength     = (MediumAtom->MediumAtomBits.LengthHigh << TCG_MEDIUM_ATOM_LENGTH_HIGH_SHIFT) | MediumAtom->MediumAtomBits.LengthLow;
+    case TcgTokenTypeMediumAtom:
+    {
+      MediumAtom    = (TCG_SIMPLE_TOKEN_MEDIUM_ATOM *)TcgToken->HdrStart;
+      *ByteOrInt    = MediumAtom->MediumAtomBits.ByteOrInt;
+      *SignOrCont   = MediumAtom->MediumAtomBits.SignOrCont;
+      *HeaderLength = sizeof (TCG_SIMPLE_TOKEN_MEDIUM_ATOM);
+      *DataLength   = (MediumAtom->MediumAtomBits.LengthHigh << TCG_MEDIUM_ATOM_LENGTH_HIGH_SHIFT) | MediumAtom->MediumAtomBits.LengthLow;
       return TcgResultSuccess;
     }
 
-    case TcgTokenTypeLongAtom: {
-      LongAtom = (TCG_SIMPLE_TOKEN_LONG_ATOM*)TcgToken->HdrStart;
-      *ByteOrInt      = LongAtom->LongAtomBits.ByteOrInt;
-      *SignOrCont     = LongAtom->LongAtomBits.SignOrCont;
-      *HeaderLength   = sizeof(TCG_SIMPLE_TOKEN_LONG_ATOM);
-      *DataLength     = (LongAtom->LongAtomBits.LengthHigh << TCG_LONG_ATOM_LENGTH_HIGH_SHIFT) |
-                        (LongAtom->LongAtomBits.LengthMid << TCG_LONG_ATOM_LENGTH_MID_SHIFT) |
-                        LongAtom->LongAtomBits.LengthLow;
+    case TcgTokenTypeLongAtom:
+    {
+      LongAtom      = (TCG_SIMPLE_TOKEN_LONG_ATOM *)TcgToken->HdrStart;
+      *ByteOrInt    = LongAtom->LongAtomBits.ByteOrInt;
+      *SignOrCont   = LongAtom->LongAtomBits.SignOrCont;
+      *HeaderLength = sizeof (TCG_SIMPLE_TOKEN_LONG_ATOM);
+      *DataLength   = (LongAtom->LongAtomBits.LengthHigh << TCG_LONG_ATOM_LENGTH_HIGH_SHIFT) |
+                      (LongAtom->LongAtomBits.LengthMid << TCG_LONG_ATOM_LENGTH_MID_SHIFT) |
+                      LongAtom->LongAtomBits.LengthLow;
       return TcgResultSuccess;
     }
 
@@ -1155,25 +1177,25 @@ TcgGetAtomInfo(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetTokenUINT64(
-  const TCG_TOKEN      *TcgToken,
-  UINT64               *Value
+TcgGetTokenUINT64 (
+  const TCG_TOKEN  *TcgToken,
+  UINT64           *Value
   )
 {
-  UINT32 HdrLength;
-  UINT32 DataLength;
-  UINT8 ByteOrInt;
-  UINT8 IsSigned;
-  TCG_SIMPLE_TOKEN_TINY_ATOM* TmpTiny;
-  const UINT8* Data;
-  UINT32 Index;
+  UINT32                      HdrLength;
+  UINT32                      DataLength;
+  UINT8                       ByteOrInt;
+  UINT8                       IsSigned;
+  TCG_SIMPLE_TOKEN_TINY_ATOM  *TmpTiny;
+  const UINT8                 *Data;
+  UINT32                      Index;
 
-  NULL_CHECK(TcgToken);
-  NULL_CHECK(Value);
+  NULL_CHECK (TcgToken);
+  NULL_CHECK (Value);
 
-  Index = 0;
+  Index  = 0;
   *Value = 0;
-  ERROR_CHECK(TcgGetAtomInfo(TcgToken, &HdrLength, &DataLength, &ByteOrInt, &IsSigned));
+  ERROR_CHECK (TcgGetAtomInfo (TcgToken, &HdrLength, &DataLength, &ByteOrInt, &IsSigned));
 
   if (ByteOrInt != TCG_ATOM_TYPE_INTEGER) {
     DEBUG ((DEBUG_INFO, "Invalid Type, expected integer not byte sequence\n"));
@@ -1188,12 +1210,12 @@ TcgGetTokenUINT64(
   // special case for tiny atom
   // Header and Data are in one byte, so extract only the Data bitfield
   if (TcgToken->Type == TcgTokenTypeTinyAtom) {
-    TmpTiny = (TCG_SIMPLE_TOKEN_TINY_ATOM*)TcgToken->HdrStart;
-    *Value = TmpTiny->TinyAtomBits.Data;
+    TmpTiny = (TCG_SIMPLE_TOKEN_TINY_ATOM *)TcgToken->HdrStart;
+    *Value  = TmpTiny->TinyAtomBits.Data;
     return TcgResultSuccess;
   }
 
-  if (DataLength > sizeof(UINT64)) {
+  if (DataLength > sizeof (UINT64)) {
     DEBUG ((DEBUG_INFO, "Length %d is greater than Size of UINT64\n", DataLength));
     return TcgResultFailureBufferTooSmall;
   }
@@ -1201,7 +1223,7 @@ TcgGetTokenUINT64(
   // read big-endian integer
   Data = TcgToken->HdrStart + HdrLength;
   for (Index = 0; Index < DataLength; Index++) {
-    *Value = LShiftU64(*Value, 8) | Data[Index];
+    *Value = LShiftU64 (*Value, 8) | Data[Index];
   }
 
   return TcgResultSuccess;
@@ -1216,23 +1238,23 @@ TcgGetTokenUINT64(
   @retval   Return the value data.
 
 **/
-UINT8*
+UINT8 *
 EFIAPI
-TcgGetTokenByteSequence(
-  const TCG_TOKEN     *TcgToken,
-  UINT32              *Length
+TcgGetTokenByteSequence (
+  const TCG_TOKEN  *TcgToken,
+  UINT32           *Length
   )
 {
-  UINT32 HdrLength;
-  UINT8 ByteOrInt;
-  UINT8 SignOrCont;
+  UINT32  HdrLength;
+  UINT8   ByteOrInt;
+  UINT8   SignOrCont;
 
-  if (TcgToken == NULL || Length == NULL) {
+  if ((TcgToken == NULL) || (Length == NULL)) {
     return NULL;
   }
 
   *Length = 0;
-  if (TcgGetAtomInfo(TcgToken, &HdrLength, Length, &ByteOrInt, &SignOrCont) != TcgResultSuccess) {
+  if (TcgGetAtomInfo (TcgToken, &HdrLength, Length, &ByteOrInt, &SignOrCont) != TcgResultSuccess) {
     DEBUG ((DEBUG_INFO, "Failed to get simple token info\n"));
     return NULL;
   }
@@ -1256,18 +1278,18 @@ TcgGetTokenByteSequence(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextUINT8(
-  TCG_PARSE_STRUCT      *ParseStruct,
-  UINT8                 *Value
+TcgGetNextUINT8 (
+  TCG_PARSE_STRUCT  *ParseStruct,
+  UINT8             *Value
   )
 {
-  UINT64 Value64;
-  TCG_TOKEN Tok;
+  UINT64     Value64;
+  TCG_TOKEN  Tok;
 
-  NULL_CHECK(Value);
+  NULL_CHECK (Value);
 
-  ERROR_CHECK(TcgGetNextToken(ParseStruct, &Tok));
-  ERROR_CHECK(TcgGetTokenUINT64(&Tok, &Value64));
+  ERROR_CHECK (TcgGetNextToken (ParseStruct, &Tok));
+  ERROR_CHECK (TcgGetTokenUINT64 (&Tok, &Value64));
 
   if (Value64 > MAX_UINT8) {
     return TcgResultFailure;
@@ -1289,18 +1311,18 @@ TcgGetNextUINT8(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextUINT16(
-  TCG_PARSE_STRUCT     *ParseStruct,
-  UINT16               *Value
+TcgGetNextUINT16 (
+  TCG_PARSE_STRUCT  *ParseStruct,
+  UINT16            *Value
   )
 {
-  UINT64 Value64;
-  TCG_TOKEN Tok;
+  UINT64     Value64;
+  TCG_TOKEN  Tok;
 
-  NULL_CHECK(Value);
+  NULL_CHECK (Value);
 
-  ERROR_CHECK(TcgGetNextToken(ParseStruct, &Tok));
-  ERROR_CHECK(TcgGetTokenUINT64(&Tok, &Value64));
+  ERROR_CHECK (TcgGetNextToken (ParseStruct, &Tok));
+  ERROR_CHECK (TcgGetTokenUINT64 (&Tok, &Value64));
 
   if (Value64 > MAX_UINT16) {
     return TcgResultFailure;
@@ -1322,18 +1344,18 @@ TcgGetNextUINT16(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextUINT32(
-  TCG_PARSE_STRUCT          *ParseStruct,
-  UINT32                    *Value
+TcgGetNextUINT32 (
+  TCG_PARSE_STRUCT  *ParseStruct,
+  UINT32            *Value
   )
 {
-  UINT64 Value64;
-  TCG_TOKEN Tok;
+  UINT64     Value64;
+  TCG_TOKEN  Tok;
 
-  NULL_CHECK(Value);
+  NULL_CHECK (Value);
 
-  ERROR_CHECK(TcgGetNextToken(ParseStruct, &Tok));
-  ERROR_CHECK(TcgGetTokenUINT64(&Tok, &Value64));
+  ERROR_CHECK (TcgGetNextToken (ParseStruct, &Tok));
+  ERROR_CHECK (TcgGetTokenUINT64 (&Tok, &Value64));
 
   if (Value64 > MAX_UINT32) {
     return TcgResultFailure;
@@ -1355,14 +1377,15 @@ TcgGetNextUINT32(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextUINT64(
-  TCG_PARSE_STRUCT           *ParseStruct,
-  UINT64                     *Value
+TcgGetNextUINT64 (
+  TCG_PARSE_STRUCT  *ParseStruct,
+  UINT64            *Value
   )
 {
-  TCG_TOKEN Tok;
-  ERROR_CHECK(TcgGetNextToken(ParseStruct, &Tok));
-  ERROR_CHECK(TcgGetTokenUINT64(&Tok, Value));
+  TCG_TOKEN  Tok;
+
+  ERROR_CHECK (TcgGetNextToken (ParseStruct, &Tok));
+  ERROR_CHECK (TcgGetTokenUINT64 (&Tok, Value));
   return TcgResultSuccess;
 }
 
@@ -1377,18 +1400,18 @@ TcgGetNextUINT64(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextBOOLEAN(
-  TCG_PARSE_STRUCT        *ParseStruct,
-  BOOLEAN                 *Value
+TcgGetNextBOOLEAN (
+  TCG_PARSE_STRUCT  *ParseStruct,
+  BOOLEAN           *Value
   )
 {
-  UINT64 Value64;
-  TCG_TOKEN Tok;
+  UINT64     Value64;
+  TCG_TOKEN  Tok;
 
-  NULL_CHECK(Value);
+  NULL_CHECK (Value);
 
-  ERROR_CHECK(TcgGetNextToken(ParseStruct, &Tok));
-  ERROR_CHECK(TcgGetTokenUINT64(&Tok, &Value64));
+  ERROR_CHECK (TcgGetNextToken (ParseStruct, &Tok));
+  ERROR_CHECK (TcgGetTokenUINT64 (&Tok, &Value64));
 
   if (Value64 > 1) {
     return TcgResultFailure;
@@ -1410,28 +1433,28 @@ TcgGetNextBOOLEAN(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextTcgUid(
-  TCG_PARSE_STRUCT         *ParseStruct,
-  TCG_UID                  *Uid
+TcgGetNextTcgUid (
+  TCG_PARSE_STRUCT  *ParseStruct,
+  TCG_UID           *Uid
   )
 {
-  TCG_TOKEN Tok;
-  UINT32 Length;
-  const UINT8* ByteSeq;
+  TCG_TOKEN    Tok;
+  UINT32       Length;
+  const UINT8  *ByteSeq;
 
-  NULL_CHECK(Uid);
+  NULL_CHECK (Uid);
 
-  ERROR_CHECK(TcgGetNextToken(ParseStruct, &Tok));
-  ByteSeq = TcgGetTokenByteSequence(&Tok, &Length);
+  ERROR_CHECK (TcgGetNextToken (ParseStruct, &Tok));
+  ByteSeq = TcgGetTokenByteSequence (&Tok, &Length);
 
-  if (Length != sizeof(TCG_UID)) {
-    DEBUG ((DEBUG_INFO, "Token Length %u != TCG_UID Size %u\n", Length, (UINT32)sizeof(TCG_UID)));
+  if (Length != sizeof (TCG_UID)) {
+    DEBUG ((DEBUG_INFO, "Token Length %u != TCG_UID Size %u\n", Length, (UINT32)sizeof (TCG_UID)));
     return TcgResultFailure;
   }
 
   ASSERT (ByteSeq != NULL);
 
-  CopyMem(Uid, ByteSeq, sizeof(TCG_UID));
+  CopyMem (Uid, ByteSeq, sizeof (TCG_UID));
 
   return TcgResultSuccess;
 }
@@ -1448,21 +1471,22 @@ TcgGetNextTcgUid(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextByteSequence(
-  TCG_PARSE_STRUCT      *ParseStruct,
-  const VOID            **Data,
-  UINT32                *Length
+TcgGetNextByteSequence (
+  TCG_PARSE_STRUCT  *ParseStruct,
+  const VOID        **Data,
+  UINT32            *Length
   )
 {
-  TCG_TOKEN Tok;
-  const UINT8* Bs;
+  TCG_TOKEN    Tok;
+  const UINT8  *Bs;
 
-  ERROR_CHECK(TcgGetNextToken(ParseStruct, &Tok));
-  Bs = TcgGetTokenByteSequence(&Tok, Length);
+  ERROR_CHECK (TcgGetNextToken (ParseStruct, &Tok));
+  Bs = TcgGetTokenByteSequence (&Tok, Length);
 
   if (Bs == NULL) {
     return TcgResultFailure;
   }
+
   *Data = Bs;
   return TcgResultSuccess;
 }
@@ -1478,17 +1502,19 @@ TcgGetNextByteSequence(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextTokenType(
-  TCG_PARSE_STRUCT        *ParseStruct,
-  TCG_TOKEN_TYPE          Type
+TcgGetNextTokenType (
+  TCG_PARSE_STRUCT  *ParseStruct,
+  TCG_TOKEN_TYPE    Type
   )
 {
-  TCG_TOKEN Tok;
-  ERROR_CHECK(TcgGetNextToken(ParseStruct, &Tok));
+  TCG_TOKEN  Tok;
+
+  ERROR_CHECK (TcgGetNextToken (ParseStruct, &Tok));
   if (Tok.Type != Type) {
     DEBUG ((DEBUG_INFO, "expected Type %u, got Type %u\n", Type, Tok.Type));
     return TcgResultFailure;
   }
+
   return TcgResultSuccess;
 }
 
@@ -1502,11 +1528,11 @@ TcgGetNextTokenType(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextStartList(
-  TCG_PARSE_STRUCT          *ParseStruct
+TcgGetNextStartList (
+  TCG_PARSE_STRUCT  *ParseStruct
   )
 {
-  return TcgGetNextTokenType(ParseStruct, TcgTokenTypeStartList);
+  return TcgGetNextTokenType (ParseStruct, TcgTokenTypeStartList);
 }
 
 /**
@@ -1519,11 +1545,11 @@ TcgGetNextStartList(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextEndList(
-  TCG_PARSE_STRUCT             *ParseStruct
+TcgGetNextEndList (
+  TCG_PARSE_STRUCT  *ParseStruct
   )
 {
-  return TcgGetNextTokenType(ParseStruct, TcgTokenTypeEndList);
+  return TcgGetNextTokenType (ParseStruct, TcgTokenTypeEndList);
 }
 
 /**
@@ -1536,11 +1562,11 @@ TcgGetNextEndList(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextStartName(
-  TCG_PARSE_STRUCT              *ParseStruct
+TcgGetNextStartName (
+  TCG_PARSE_STRUCT  *ParseStruct
   )
 {
-  return TcgGetNextTokenType(ParseStruct, TcgTokenTypeStartName);
+  return TcgGetNextTokenType (ParseStruct, TcgTokenTypeStartName);
 }
 
 /**
@@ -1553,11 +1579,11 @@ TcgGetNextStartName(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextEndName(
-  TCG_PARSE_STRUCT               *ParseStruct
+TcgGetNextEndName (
+  TCG_PARSE_STRUCT  *ParseStruct
   )
 {
-  return TcgGetNextTokenType(ParseStruct, TcgTokenTypeEndName);
+  return TcgGetNextTokenType (ParseStruct, TcgTokenTypeEndName);
 }
 
 /**
@@ -1570,11 +1596,11 @@ TcgGetNextEndName(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextCall(
-  TCG_PARSE_STRUCT                   *ParseStruct
+TcgGetNextCall (
+  TCG_PARSE_STRUCT  *ParseStruct
   )
 {
-  return TcgGetNextTokenType(ParseStruct, TcgTokenTypeCall);
+  return TcgGetNextTokenType (ParseStruct, TcgTokenTypeCall);
 }
 
 /**
@@ -1587,11 +1613,11 @@ TcgGetNextCall(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextEndOfData(
-  TCG_PARSE_STRUCT                    *ParseStruct
+TcgGetNextEndOfData (
+  TCG_PARSE_STRUCT  *ParseStruct
   )
 {
-  return TcgGetNextTokenType(ParseStruct, TcgTokenTypeEndOfData);
+  return TcgGetNextTokenType (ParseStruct, TcgTokenTypeEndOfData);
 }
 
 /**
@@ -1604,11 +1630,11 @@ TcgGetNextEndOfData(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextEndOfSession(
-  TCG_PARSE_STRUCT                      *ParseStruct
+TcgGetNextEndOfSession (
+  TCG_PARSE_STRUCT  *ParseStruct
   )
 {
-  return TcgGetNextTokenType(ParseStruct, TcgTokenTypeEndOfSession);
+  return TcgGetNextTokenType (ParseStruct, TcgTokenTypeEndOfSession);
 }
 
 /**
@@ -1621,11 +1647,11 @@ TcgGetNextEndOfSession(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextStartTransaction(
-  TCG_PARSE_STRUCT                        *ParseStruct
+TcgGetNextStartTransaction (
+  TCG_PARSE_STRUCT  *ParseStruct
   )
 {
-  return TcgGetNextTokenType(ParseStruct, TcgTokenTypeStartTransaction);
+  return TcgGetNextTokenType (ParseStruct, TcgTokenTypeStartTransaction);
 }
 
 /**
@@ -1638,9 +1664,9 @@ TcgGetNextStartTransaction(
 **/
 TCG_RESULT
 EFIAPI
-TcgGetNextEndTransaction(
-  TCG_PARSE_STRUCT                  *ParseStruct
+TcgGetNextEndTransaction (
+  TCG_PARSE_STRUCT  *ParseStruct
   )
 {
-  return TcgGetNextTokenType(ParseStruct, TcgTokenTypeEndTransaction);
+  return TcgGetNextTokenType (ParseStruct, TcgTokenTypeEndTransaction);
 }

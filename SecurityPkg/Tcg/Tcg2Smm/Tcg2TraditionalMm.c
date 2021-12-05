@@ -27,8 +27,8 @@ Tcg2NotifyMmReady (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  EFI_HANDLE            Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   Handle = NULL;
   Status = gBS->InstallProtocolInterface (
@@ -74,8 +74,8 @@ IsBufferOutsideMmValid (
 EFI_STATUS
 EFIAPI
 InitializeTcgSmm (
-  IN EFI_HANDLE                  ImageHandle,
-  IN EFI_SYSTEM_TABLE            *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return InitializeTcgCommon ();

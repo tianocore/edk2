@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/TcgStorageOpalLib.h>
 
-
 /**
 
   The function retrieves the MSID from the device specified
@@ -22,8 +21,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 TCG_RESULT
 OpalPyrite2GetActiveDataRemovalMechanism (
-  OPAL_SESSION    *AdminSpSession,
-  UINT8           *ActiveDataRemovalMechanism
+  OPAL_SESSION  *AdminSpSession,
+  UINT8         *ActiveDataRemovalMechanism
   );
 
 /**
@@ -38,10 +37,10 @@ OpalPyrite2GetActiveDataRemovalMechanism (
 **/
 TCG_RESULT
 OpalGetFeatureDescriptor (
-  IN     OPAL_SESSION              *Session,
-  IN     UINT16                    FeatureCode,
-  IN OUT UINTN                     *DataSize,
-  OUT    VOID                      *Data
+  IN     OPAL_SESSION  *Session,
+  IN     UINT16        FeatureCode,
+  IN OUT UINTN         *DataSize,
+  OUT    VOID          *Data
   );
 
 /**
@@ -52,7 +51,7 @@ OpalGetFeatureDescriptor (
 **/
 UINT32
 GetRevertTimeOut (
-  IN OPAL_SESSION                *Session
+  IN OPAL_SESSION  *Session
   );
 
 /**
@@ -64,9 +63,9 @@ GetRevertTimeOut (
 
 **/
 TCG_RESULT
-OpalPyrite2PsidRevert(
-  OPAL_SESSION              *AdminSpSession,
-  UINT32                    EstimateTimeCost
+OpalPyrite2PsidRevert (
+  OPAL_SESSION  *AdminSpSession,
+  UINT32        EstimateTimeCost
   );
 
 /**
@@ -81,11 +80,11 @@ OpalPyrite2PsidRevert(
 
 **/
 TCG_RESULT
-OpalPyrite2AdminRevert(
-  OPAL_SESSION    *LockingSpSession,
-  BOOLEAN         KeepUserData,
-  UINT8           *MethodStatus,
-  UINT32          EstimateTimeCost
+OpalPyrite2AdminRevert (
+  OPAL_SESSION  *LockingSpSession,
+  BOOLEAN       KeepUserData,
+  UINT8         *MethodStatus,
+  UINT32        EstimateTimeCost
   );
 
 #endif // _OPAL_CORE_H_

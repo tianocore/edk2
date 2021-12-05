@@ -24,11 +24,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 Tpm2SetSha256ToDigestList (
-  IN TPML_DIGEST_VALUES *DigestList,
-  IN UINT8              *Sha256Digest
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN UINT8               *Sha256Digest
   )
 {
-  DigestList->count = 1;
+  DigestList->count              = 1;
   DigestList->digests[0].hashAlg = TPM_ALG_SHA256;
   CopyMem (
     DigestList->digests[0].digest.sha256,
@@ -48,13 +48,13 @@ Tpm2SetSha256ToDigestList (
 EFI_STATUS
 EFIAPI
 Sha256HashInit (
-  OUT HASH_HANDLE    *HashHandle
+  OUT HASH_HANDLE  *HashHandle
   )
 {
-  VOID     *Sha256Ctx;
-  UINTN    CtxSize;
+  VOID   *Sha256Ctx;
+  UINTN  CtxSize;
 
-  CtxSize = Sha256GetContextSize ();
+  CtxSize   = Sha256GetContextSize ();
   Sha256Ctx = AllocatePool (CtxSize);
   ASSERT (Sha256Ctx != NULL);
 
@@ -77,12 +77,12 @@ Sha256HashInit (
 EFI_STATUS
 EFIAPI
 Sha256HashUpdate (
-  IN HASH_HANDLE    HashHandle,
-  IN VOID           *DataToHash,
-  IN UINTN          DataToHashLen
+  IN HASH_HANDLE  HashHandle,
+  IN VOID         *DataToHash,
+  IN UINTN        DataToHashLen
   )
 {
-  VOID     *Sha256Ctx;
+  VOID  *Sha256Ctx;
 
   Sha256Ctx = (VOID *)HashHandle;
   Sha256Update (Sha256Ctx, DataToHash, DataToHashLen);
@@ -101,12 +101,12 @@ Sha256HashUpdate (
 EFI_STATUS
 EFIAPI
 Sha256HashFinal (
-  IN HASH_HANDLE         HashHandle,
-  OUT TPML_DIGEST_VALUES *DigestList
+  IN HASH_HANDLE          HashHandle,
+  OUT TPML_DIGEST_VALUES  *DigestList
   )
 {
-  UINT8         Digest[SHA256_DIGEST_SIZE];
-  VOID          *Sha256Ctx;
+  UINT8  Digest[SHA256_DIGEST_SIZE];
+  VOID   *Sha256Ctx;
 
   Sha256Ctx = (VOID *)HashHandle;
   Sha256Final (Sha256Ctx, Digest);
@@ -145,5 +145,6 @@ HashInstanceLibSha256Constructor (
     //
     return EFI_SUCCESS;
   }
+
   return Status;
 }
