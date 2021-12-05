@@ -9,8 +9,8 @@
 #include "UefiShellDebug1CommandsLib.h"
 #include <Library/BcfgCommandLib.h>
 
-STATIC CONST CHAR16 mFileName[] = L"Debug1Commands";
-EFI_HII_HANDLE gShellDebug1HiiHandle = NULL;
+STATIC CONST CHAR16  mFileName[]           = L"Debug1Commands";
+EFI_HII_HANDLE       gShellDebug1HiiHandle = NULL;
 
 /**
   Gets the debug file name.  This will be used if HII is not working.
@@ -18,7 +18,7 @@ EFI_HII_HANDLE gShellDebug1HiiHandle = NULL;
   @retval NULL    No file is available.
   @return         The NULL-terminated filename to get help from.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
 ShellCommandGetManFileNameDebug1 (
   VOID
@@ -46,7 +46,7 @@ UefiShellDebug1CommandsLibConstructor (
   //
   // check our bit of the profiles mask
   //
-  if ((PcdGet8(PcdShellProfileMask) & BIT1) == 0) {
+  if ((PcdGet8 (PcdShellProfileMask) & BIT1) == 0) {
     return (EFI_SUCCESS);
   }
 
@@ -61,27 +61,27 @@ UefiShellDebug1CommandsLibConstructor (
   //
   // install our shell command handlers that are always installed
   //
-  ShellCommandRegisterCommandName(L"setsize",       ShellCommandRunSetSize            , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_SETSIZE)      );
-  ShellCommandRegisterCommandName(L"comp",          ShellCommandRunComp               , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_COMP)         );
-  ShellCommandRegisterCommandName(L"mode",          ShellCommandRunMode               , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_MODE)         );
-  ShellCommandRegisterCommandName(L"memmap",        ShellCommandRunMemMap             , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_MEMMAP)       );
-  ShellCommandRegisterCommandName(L"eficompress",   ShellCommandRunEfiCompress        , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_EFICOMPRESS)  );
-  ShellCommandRegisterCommandName(L"efidecompress", ShellCommandRunEfiDecompress      , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_EFIDCOMPRESS) );
-  ShellCommandRegisterCommandName(L"dmem",          ShellCommandRunDmem               , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_DMEM)         );
-  ShellCommandRegisterCommandName(L"loadpcirom",    ShellCommandRunLoadPciRom         , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_LOAD_PCI_ROM) );
-  ShellCommandRegisterCommandName(L"mm",            ShellCommandRunMm                 , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_MM)           );
-  ShellCommandRegisterCommandName(L"setvar",        ShellCommandRunSetVar             , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_SETVAR)       );
-  ShellCommandRegisterCommandName(L"sermode",       ShellCommandRunSerMode            , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_SERMODE)      );
-  ShellCommandRegisterCommandName(L"pci",           ShellCommandRunPci                , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_PCI)          );
-  ShellCommandRegisterCommandName(L"smbiosview",    ShellCommandRunSmbiosView         , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_SMBIOSVIEW)   );
-  ShellCommandRegisterCommandName(L"dmpstore",      ShellCommandRunDmpStore           , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_DMPSTORE)     );
-  ShellCommandRegisterCommandName(L"dblk",          ShellCommandRunDblk               , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_DBLK)         );
-  ShellCommandRegisterCommandName(L"edit",          ShellCommandRunEdit               , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_EDIT)         );
-  ShellCommandRegisterCommandName(L"hexedit",       ShellCommandRunHexEdit            , ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN(STR_GET_HELP_HEXEDIT)      );
+  ShellCommandRegisterCommandName (L"setsize", ShellCommandRunSetSize, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_SETSIZE));
+  ShellCommandRegisterCommandName (L"comp", ShellCommandRunComp, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_COMP));
+  ShellCommandRegisterCommandName (L"mode", ShellCommandRunMode, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_MODE));
+  ShellCommandRegisterCommandName (L"memmap", ShellCommandRunMemMap, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_MEMMAP));
+  ShellCommandRegisterCommandName (L"eficompress", ShellCommandRunEfiCompress, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_EFICOMPRESS));
+  ShellCommandRegisterCommandName (L"efidecompress", ShellCommandRunEfiDecompress, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_EFIDCOMPRESS));
+  ShellCommandRegisterCommandName (L"dmem", ShellCommandRunDmem, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_DMEM));
+  ShellCommandRegisterCommandName (L"loadpcirom", ShellCommandRunLoadPciRom, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_LOAD_PCI_ROM));
+  ShellCommandRegisterCommandName (L"mm", ShellCommandRunMm, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_MM));
+  ShellCommandRegisterCommandName (L"setvar", ShellCommandRunSetVar, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_SETVAR));
+  ShellCommandRegisterCommandName (L"sermode", ShellCommandRunSerMode, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_SERMODE));
+  ShellCommandRegisterCommandName (L"pci", ShellCommandRunPci, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_PCI));
+  ShellCommandRegisterCommandName (L"smbiosview", ShellCommandRunSmbiosView, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_SMBIOSVIEW));
+  ShellCommandRegisterCommandName (L"dmpstore", ShellCommandRunDmpStore, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_DMPSTORE));
+  ShellCommandRegisterCommandName (L"dblk", ShellCommandRunDblk, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_DBLK));
+  ShellCommandRegisterCommandName (L"edit", ShellCommandRunEdit, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_EDIT));
+  ShellCommandRegisterCommandName (L"hexedit", ShellCommandRunHexEdit, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_HEXEDIT));
 
-  ShellCommandRegisterAlias(L"dmem", L"mem");
+  ShellCommandRegisterAlias (L"dmem", L"mem");
 
-  BcfgLibraryRegisterBcfgCommand(ImageHandle, SystemTable, L"Debug1");
+  BcfgLibraryRegisterBcfgCommand (ImageHandle, SystemTable, L"Debug1");
 
   return (EFI_SUCCESS);
 }
@@ -100,13 +100,12 @@ UefiShellDebug1CommandsLibDestructor (
   )
 {
   if (gShellDebug1HiiHandle != NULL) {
-    HiiRemovePackages(gShellDebug1HiiHandle);
+    HiiRemovePackages (gShellDebug1HiiHandle);
   }
 
-  BcfgLibraryUnregisterBcfgCommand(ImageHandle, SystemTable);
+  BcfgLibraryUnregisterBcfgCommand (ImageHandle, SystemTable);
   return (EFI_SUCCESS);
 }
-
 
 /**
   Function returns a system configuration table that is stored in the
@@ -120,11 +119,12 @@ UefiShellDebug1CommandsLibDestructor (
 **/
 EFI_STATUS
 GetSystemConfigurationTable (
-  IN EFI_GUID *TableGuid,
-  IN OUT VOID **Table
+  IN EFI_GUID  *TableGuid,
+  IN OUT VOID  **Table
   )
 {
-  UINTN Index;
+  UINTN  Index;
+
   ASSERT (Table != NULL);
 
   for (Index = 0; Index < gST->NumberOfTableEntries; Index++) {
@@ -146,13 +146,13 @@ GetSystemConfigurationTable (
 **/
 VOID
 EditorClearLine (
-  IN UINTN Row,
-  IN UINTN LastCol,
-  IN UINTN LastRow
+  IN UINTN  Row,
+  IN UINTN  LastCol,
+  IN UINTN  LastRow
   )
 {
-  UINTN  Col;
-  CHAR16 Line[200];
+  UINTN   Col;
+  CHAR16  Line[200];
 
   if (Row == 0) {
     Row = 1;
@@ -180,7 +180,7 @@ EditorClearLine (
     //
     // print out the blank line
     //
-    ShellPrintEx ((INT32) Col - 1, (INT32) Row - 1, Line);
+    ShellPrintEx ((INT32)Col - 1, (INT32)Row - 1, Line);
   }
 }
 
@@ -194,13 +194,13 @@ EditorClearLine (
 **/
 BOOLEAN
 IsValidFileNameChar (
-  IN CONST CHAR16 Ch
+  IN CONST CHAR16  Ch
   )
 {
   //
   // See if there are any illegal characters within the name
   //
-  if (Ch < 0x20 || Ch == L'\"' || Ch == L'*' || Ch == L'/' || Ch == L'<' || Ch == L'>' || Ch == L'?' || Ch == L'|') {
+  if ((Ch < 0x20) || (Ch == L'\"') || (Ch == L'*') || (Ch == L'/') || (Ch == L'<') || (Ch == L'>') || (Ch == L'?') || (Ch == L'|')) {
     return FALSE;
   }
 
@@ -217,25 +217,25 @@ IsValidFileNameChar (
 **/
 BOOLEAN
 IsValidFileName (
-  IN CONST CHAR16 *Name
+  IN CONST CHAR16  *Name
   )
 {
-
-  UINTN Index;
-  UINTN Len;
+  UINTN  Index;
+  UINTN  Len;
 
   //
   // check the length of Name
   //
   for (Len = 0, Index = StrLen (Name) - 1; Index + 1 != 0; Index--, Len++) {
-    if (Name[Index] == '\\' || Name[Index] == ':') {
+    if ((Name[Index] == '\\') || (Name[Index] == ':')) {
       break;
     }
   }
 
-  if (Len == 0 || Len > 255) {
+  if ((Len == 0) || (Len > 255)) {
     return FALSE;
   }
+
   //
   // check whether any char in Name not appears in valid file name char
   //
@@ -258,14 +258,14 @@ IsValidFileName (
 **/
 CHAR16 *
 EditGetDefaultFileName (
-  IN CONST CHAR16 *Extension
+  IN CONST CHAR16  *Extension
   )
 {
-  EFI_STATUS         Status;
-  UINTN              Suffix;
-  CHAR16             *FileNameTmp;
+  EFI_STATUS  Status;
+  UINTN       Suffix;
+  CHAR16      *FileNameTmp;
 
-  Suffix       = 0;
+  Suffix = 0;
 
   do {
     FileNameTmp = CatSPrint (NULL, L"NewFile%d.%s", Suffix, Extension);
@@ -311,27 +311,27 @@ EditGetDefaultFileName (
 **/
 EFI_STATUS
 ReadFileIntoBuffer (
-  IN CONST CHAR16 *FileName,
-  OUT VOID        **Buffer,
-  OUT UINTN       *BufferSize OPTIONAL,
-  OUT BOOLEAN     *ReadOnly
+  IN CONST CHAR16  *FileName,
+  OUT VOID         **Buffer,
+  OUT UINTN        *BufferSize OPTIONAL,
+  OUT BOOLEAN      *ReadOnly
   )
 {
-  VOID              *InternalBuffer;
-  UINTN             FileSize;
-  SHELL_FILE_HANDLE FileHandle;
-  BOOLEAN           CreateFile;
-  EFI_STATUS        Status;
-  EFI_FILE_INFO     *Info;
+  VOID               *InternalBuffer;
+  UINTN              FileSize;
+  SHELL_FILE_HANDLE  FileHandle;
+  BOOLEAN            CreateFile;
+  EFI_STATUS         Status;
+  EFI_FILE_INFO      *Info;
 
-  InternalBuffer  = NULL;
-  FileSize        = 0;
-  FileHandle      = NULL;
-  CreateFile      = FALSE;
-  Status          = EFI_SUCCESS;
-  Info            = NULL;
+  InternalBuffer = NULL;
+  FileSize       = 0;
+  FileHandle     = NULL;
+  CreateFile     = FALSE;
+  Status         = EFI_SUCCESS;
+  Info           = NULL;
 
-  if (FileName == NULL || Buffer == NULL || ReadOnly == NULL) {
+  if ((FileName == NULL) || (Buffer == NULL) || (ReadOnly == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -340,13 +340,13 @@ ReadFileIntoBuffer (
   //
   Status = ShellOpenFileByName (FileName, &FileHandle, EFI_FILE_MODE_READ, 0);
 
-  if (!EFI_ERROR(Status)) {
-    ASSERT(CreateFile == FALSE);
+  if (!EFI_ERROR (Status)) {
+    ASSERT (CreateFile == FALSE);
     if (FileHandle == NULL) {
       return EFI_LOAD_ERROR;
     }
 
-    Info = ShellGetFileInfo(FileHandle);
+    Info = ShellGetFileInfo (FileHandle);
 
     if (Info->Attribute & EFI_FILE_DIRECTORY) {
       FreePool (Info);
@@ -358,10 +358,11 @@ ReadFileIntoBuffer (
     } else {
       *ReadOnly = FALSE;
     }
+
     //
     // get file size
     //
-    FileSize = (UINTN) Info->FileSize;
+    FileSize = (UINTN)Info->FileSize;
 
     FreePool (Info);
   } else if (Status == EFI_NOT_FOUND) {
@@ -379,10 +380,12 @@ ReadFileIntoBuffer (
       if (Status == EFI_WARN_DELETE_FAILURE) {
         Status = EFI_ACCESS_DENIED;
       }
+
       if (EFI_ERROR (Status)) {
         return Status;
       }
     }
+
     //
     // file doesn't exist, so set CreateFile to TRUE and can't be read-only
     //
@@ -401,21 +404,23 @@ ReadFileIntoBuffer (
     if (InternalBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     //
     // read file into InternalBuffer
     //
     Status = ShellReadFile (FileHandle, &FileSize, InternalBuffer);
-    ShellCloseFile(&FileHandle);
+    ShellCloseFile (&FileHandle);
     FileHandle = NULL;
     if (EFI_ERROR (Status)) {
       SHELL_FREE_NON_NULL (InternalBuffer);
       return EFI_LOAD_ERROR;
     }
   }
+
   *Buffer = InternalBuffer;
   if (BufferSize != NULL) {
     *BufferSize = FileSize;
   }
-  return (EFI_SUCCESS);
 
+  return (EFI_SUCCESS);
 }
