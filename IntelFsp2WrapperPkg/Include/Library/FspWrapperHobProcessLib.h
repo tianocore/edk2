@@ -19,7 +19,7 @@
 EFI_STATUS
 EFIAPI
 PostFspmHobProcess (
-  IN VOID                 *FspHobList
+  IN VOID  *FspHobList
   );
 
 /**
@@ -32,7 +32,7 @@ PostFspmHobProcess (
 EFI_STATUS
 EFIAPI
 PostFspsHobProcess (
-  IN VOID                 *FspHobList
+  IN VOID  *FspHobList
   );
 
 #endif
