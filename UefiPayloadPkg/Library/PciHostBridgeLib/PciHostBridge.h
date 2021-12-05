@@ -14,8 +14,8 @@
 #include <UniversalPayload/PciRootBridges.h>
 
 typedef struct {
-  ACPI_HID_DEVICE_PATH     AcpiDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL EndDevicePath;
+  ACPI_HID_DEVICE_PATH        AcpiDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    EndDevicePath;
 } CB_PCI_ROOT_BRIDGE_DEVICE_PATH;
 
 /**
@@ -27,8 +27,8 @@ typedef struct {
 **/
 PCI_ROOT_BRIDGE *
 ScanForRootBridges (
-  OUT UINTN      *NumberOfRootBridges
-);
+  OUT UINTN  *NumberOfRootBridges
+  );
 
 /**
   Scan for all root bridges from Universal Payload PciRootBridgeInfoHob
@@ -43,7 +43,7 @@ PCI_ROOT_BRIDGE *
 RetrieveRootBridgeInfoFromHob (
   IN  UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *PciRootBridgeInfo,
   OUT UINTN                               *NumberOfRootBridges
-);
+  );
 
 /**
   Initialize a PCI_ROOT_BRIDGE structure.
@@ -88,18 +88,18 @@ RetrieveRootBridgeInfoFromHob (
 **/
 EFI_STATUS
 InitRootBridge (
-  IN  UINT64                   Supports,
-  IN  UINT64                   Attributes,
-  IN  UINT64                   AllocAttributes,
-  IN  UINT8                    RootBusNumber,
-  IN  UINT8                    MaxSubBusNumber,
-  IN  PCI_ROOT_BRIDGE_APERTURE *Io,
-  IN  PCI_ROOT_BRIDGE_APERTURE *Mem,
-  IN  PCI_ROOT_BRIDGE_APERTURE *MemAbove4G,
-  IN  PCI_ROOT_BRIDGE_APERTURE *PMem,
-  IN  PCI_ROOT_BRIDGE_APERTURE *PMemAbove4G,
-  OUT PCI_ROOT_BRIDGE          *RootBus
-);
+  IN  UINT64                    Supports,
+  IN  UINT64                    Attributes,
+  IN  UINT64                    AllocAttributes,
+  IN  UINT8                     RootBusNumber,
+  IN  UINT8                     MaxSubBusNumber,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Io,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Mem,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *MemAbove4G,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *PMem,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *PMemAbove4G,
+  OUT PCI_ROOT_BRIDGE           *RootBus
+  );
 
 /**
   Initialize DevicePath for a PCI_ROOT_BRIDGE.
@@ -110,7 +110,8 @@ InitRootBridge (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 CreateRootBridgeDevicePath (
-  IN     UINT32                   HID,
-  IN     UINT32                   UID
-);
+  IN     UINT32  HID,
+  IN     UINT32  UID
+  );
+
 #endif
