@@ -19,11 +19,11 @@
 
 #include <ImageDebugSupport.h>
 
-#define DEBUG_LOAD_IMAGE_METHOD_IO_HW_BREAKPOINT    1
-#define DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3           2
+#define DEBUG_LOAD_IMAGE_METHOD_IO_HW_BREAKPOINT  1
+#define DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3         2
 
-#define IO_HW_BREAKPOINT_VECTOR_NUM                 1
-#define SOFT_INT_VECTOR_NUM                         3
+#define IO_HW_BREAKPOINT_VECTOR_NUM  1
+#define SOFT_INT_VECTOR_NUM          3
 
 extern UINTN  AsmInterruptHandle;
 
@@ -39,8 +39,8 @@ extern UINTN  AsmInterruptHandle;
 **/
 BOOLEAN
 CheckDebugAgentHandler (
-  IN  IA32_DESCRIPTOR            *IdtDescriptor,
-  IN  UINTN                      InterruptType
+  IN  IA32_DESCRIPTOR  *IdtDescriptor,
+  IN  UINTN            InterruptType
   );
 
 /**
@@ -52,8 +52,8 @@ CheckDebugAgentHandler (
 **/
 VOID
 SaveAndUpdateIdtEntry1 (
-  IN  IA32_DESCRIPTOR            *IdtDescriptor,
-  OUT IA32_IDT_GATE_DESCRIPTOR   *SavedIdtEntry
+  IN  IA32_DESCRIPTOR           *IdtDescriptor,
+  OUT IA32_IDT_GATE_DESCRIPTOR  *SavedIdtEntry
   );
 
 /**
@@ -65,9 +65,8 @@ SaveAndUpdateIdtEntry1 (
 **/
 VOID
 RestoreIdtEntry1 (
-  IN  IA32_DESCRIPTOR            *IdtDescriptor,
-  IN  IA32_IDT_GATE_DESCRIPTOR   *RestoredIdtEntry
+  IN  IA32_DESCRIPTOR           *IdtDescriptor,
+  IN  IA32_IDT_GATE_DESCRIPTOR  *RestoredIdtEntry
   );
 
 #endif
-
