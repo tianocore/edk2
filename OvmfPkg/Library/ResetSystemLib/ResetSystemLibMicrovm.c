@@ -16,9 +16,12 @@
 #include <Library/UefiRuntimeLib.h> // EfiGoneVirtual()
 #include <OvmfPlatforms.h>          // PIIX4_PMBA_VALUE
 
-static UINTN MicrovmGedBase (VOID)
+static UINTN
+MicrovmGedBase (
+  VOID
+  )
 {
-  VOID *Address = (VOID*)(UINTN) MICROVM_GED_MMIO_BASE_REGS;
+  VOID  *Address = (VOID *)(UINTN)MICROVM_GED_MMIO_BASE_REGS;
 
   if (EfiGoneVirtual ()) {
     EfiConvertPointer (0, &Address);
@@ -27,63 +30,82 @@ static UINTN MicrovmGedBase (VOID)
     DEBUG ((DEBUG_INFO, "%a: physical -> 0x%x\n", __FUNCTION__, Address));
   }
 
-  return (UINTN) Address;
+  return (UINTN)Address;
 }
 
-static VOID MicrovmReset (VOID)
+static VOID
+MicrovmReset (
+  VOID
+  )
 {
-  UINTN Address = MicrovmGedBase();
+  UINTN  Address = MicrovmGedBase ();
 
   DEBUG ((DEBUG_INFO, "%a: microvm reset via ged\n", __FUNCTION__));
-  MmioWrite8 (Address + MICROVM_ACPI_GED_REG_RESET,
-              MICROVM_ACPI_GED_RESET_VALUE);
+  MmioWrite8 (
+    Address + MICROVM_ACPI_GED_REG_RESET,
+    MICROVM_ACPI_GED_RESET_VALUE
+    );
   CpuDeadLoop ();
 }
 
-static VOID MicrovmShutdown (VOID)
+static VOID
+MicrovmShutdown (
+  VOID
+  )
 {
-  UINTN Address = MicrovmGedBase();
+  UINTN  Address = MicrovmGedBase ();
 
   DEBUG ((DEBUG_INFO, "%a: microvm poweroff via ged\n", __FUNCTION__));
-  MmioWrite8 (Address + MICROVM_ACPI_GED_REG_SLEEP_CTL,
-              (1 << 5) /* enable bit */ |
-              (5 << 2) /* typ == S5  */);
+  MmioWrite8 (
+    Address + MICROVM_ACPI_GED_REG_SLEEP_CTL,
+    (1 << 5) /* enable bit */ |
+    (5 << 2)           /* typ == S5  */
+    );
   CpuDeadLoop ();
 }
 
-VOID EFIAPI ResetCold (VOID)
+VOID EFIAPI
+ResetCold (
+  VOID
+  )
 {
-  MicrovmReset();
+  MicrovmReset ();
 }
 
-VOID EFIAPI ResetWarm (VOID)
+VOID EFIAPI
+ResetWarm (
+  VOID
+  )
 {
-  MicrovmReset();
+  MicrovmReset ();
 }
 
 VOID
 EFIAPI
 ResetPlatformSpecific (
-  IN UINTN   DataSize,
-  IN VOID    *ResetData
+  IN UINTN  DataSize,
+  IN VOID   *ResetData
   )
 {
-  MicrovmReset();
+  MicrovmReset ();
 }
 
 VOID
 EFIAPI
 ResetSystem (
-  IN EFI_RESET_TYPE               ResetType,
-  IN EFI_STATUS                   ResetStatus,
-  IN UINTN                        DataSize,
-  IN VOID                         *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   )
 {
-  MicrovmReset();
+  MicrovmReset ();
 }
 
-VOID EFIAPI ResetShutdown (VOID)
+VOID EFIAPI
+ResetShutdown (
+  VOID
+  )
 {
-  MicrovmShutdown();
+  MicrovmShutdown ();
 }

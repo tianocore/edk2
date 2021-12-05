@@ -15,40 +15,40 @@
 
 VOID
 AddIoMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
   );
 
 VOID
 AddIoMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit
   );
 
 VOID
 AddMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
   );
 
 VOID
 AddMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit
   );
 
 VOID
 AddReservedMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  UINT64                      MemorySize,
-  BOOLEAN                     Cacheable
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize,
+  BOOLEAN               Cacheable
   );
 
 VOID
 AddReservedMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS        MemoryBase,
-  EFI_PHYSICAL_ADDRESS        MemoryLimit,
-  BOOLEAN                     Cacheable
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  EFI_PHYSICAL_ADDRESS  MemoryLimit,
+  BOOLEAN               Cacheable
   );
 
 VOID
@@ -118,13 +118,13 @@ XenPublishRamRegions (
 
 EFI_STATUS
 XenGetE820Map (
-  EFI_E820_ENTRY64 **Entries,
-  UINT32 *Count
+  EFI_E820_ENTRY64  **Entries,
+  UINT32            *Count
   );
 
 EFI_STATUS
 PhysicalAddressIdentityMapping (
-  IN EFI_PHYSICAL_ADDRESS AddressToMap
+  IN EFI_PHYSICAL_ADDRESS  AddressToMap
   );
 
 VOID
@@ -132,10 +132,10 @@ CalibrateLapicTimer (
   VOID
   );
 
-extern EFI_BOOT_MODE mBootMode;
+extern EFI_BOOT_MODE  mBootMode;
 
-extern UINT8 mPhysMemAddressWidth;
+extern UINT8  mPhysMemAddressWidth;
 
-extern UINT16 mHostBridgeDevId;
+extern UINT16  mHostBridgeDevId;
 
 #endif // _PLATFORM_PEI_H_INCLUDED_

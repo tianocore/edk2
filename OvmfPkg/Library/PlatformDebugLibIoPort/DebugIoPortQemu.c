@@ -15,7 +15,7 @@
 //
 // The constant value that is read from the debug I/O port
 //
-#define BOCHS_DEBUG_PORT_MAGIC    0xE9
+#define BOCHS_DEBUG_PORT_MAGIC  0xE9
 
 /**
   Return the result of detecting the debug I/O port device.

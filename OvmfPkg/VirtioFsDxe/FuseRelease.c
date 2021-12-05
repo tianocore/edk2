@@ -39,20 +39,20 @@
 **/
 EFI_STATUS
 VirtioFsFuseReleaseFileOrDir (
-  IN OUT VIRTIO_FS *VirtioFs,
-  IN     UINT64    NodeId,
-  IN     UINT64    FuseHandle,
-  IN     BOOLEAN   IsDir
+  IN OUT VIRTIO_FS  *VirtioFs,
+  IN     UINT64     NodeId,
+  IN     UINT64     FuseHandle,
+  IN     BOOLEAN    IsDir
   )
 {
-  VIRTIO_FS_FUSE_REQUEST         CommonReq;
-  VIRTIO_FS_FUSE_RELEASE_REQUEST ReleaseReq;
-  VIRTIO_FS_IO_VECTOR            ReqIoVec[2];
-  VIRTIO_FS_SCATTER_GATHER_LIST  ReqSgList;
-  VIRTIO_FS_FUSE_RESPONSE        CommonResp;
-  VIRTIO_FS_IO_VECTOR            RespIoVec[1];
-  VIRTIO_FS_SCATTER_GATHER_LIST  RespSgList;
-  EFI_STATUS                     Status;
+  VIRTIO_FS_FUSE_REQUEST          CommonReq;
+  VIRTIO_FS_FUSE_RELEASE_REQUEST  ReleaseReq;
+  VIRTIO_FS_IO_VECTOR             ReqIoVec[2];
+  VIRTIO_FS_SCATTER_GATHER_LIST   ReqSgList;
+  VIRTIO_FS_FUSE_RESPONSE         CommonResp;
+  VIRTIO_FS_IO_VECTOR             RespIoVec[1];
+  VIRTIO_FS_SCATTER_GATHER_LIST   RespSgList;
+  EFI_STATUS                      Status;
 
   //
   // Set up the scatter-gather lists.
@@ -112,10 +112,19 @@ VirtioFsFuseReleaseFileOrDir (
   //
   Status = VirtioFsFuseCheckResponse (&RespSgList, CommonReq.Unique, NULL);
   if (Status == EFI_DEVICE_ERROR) {
-    DEBUG ((DEBUG_ERROR, "%a: Label=\"%s\" NodeId=%Lu FuseHandle=%Lu "
-      "IsDir=%d Errno=%d\n", __FUNCTION__, VirtioFs->Label, NodeId, FuseHandle,
-      IsDir, CommonResp.Error));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Label=\"%s\" NodeId=%Lu FuseHandle=%Lu "
+      "IsDir=%d Errno=%d\n",
+      __FUNCTION__,
+      VirtioFs->Label,
+      NodeId,
+      FuseHandle,
+      IsDir,
+      CommonResp.Error
+      ));
     Status = VirtioFsErrnoToEfiStatus (CommonResp.Error);
   }
+
   return Status;
 }

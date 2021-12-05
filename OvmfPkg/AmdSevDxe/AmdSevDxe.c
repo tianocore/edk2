@@ -22,8 +22,8 @@
 EFI_STATUS
 EFIAPI
 AmdSevDxeEntryPoint (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                       Status;
@@ -48,11 +48,12 @@ AmdSevDxeEntryPoint (
   Status = gDS->GetMemorySpaceMap (&NumEntries, &AllDescMap);
   if (!EFI_ERROR (Status)) {
     for (Index = 0; Index < NumEntries; Index++) {
-      CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR *Desc;
+      CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Desc;
 
       Desc = &AllDescMap[Index];
-      if (Desc->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo ||
-          Desc->GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
+      if ((Desc->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) ||
+          (Desc->GcdMemoryType == EfiGcdMemoryTypeNonExistent))
+      {
         Status = MemEncryptSevClearMmioPageEncMask (
                    0,
                    Desc->BaseAddress,
@@ -101,8 +102,8 @@ AmdSevDxeEntryPoint (
   // is completed (See OvmfPkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLib.c).
   //
   if (FeaturePcdGet (PcdSmmSmramRequire)) {
-    UINTN MapPagesBase;
-    UINTN MapPagesCount;
+    UINTN  MapPagesBase;
+    UINTN  MapPagesCount;
 
     Status = MemEncryptSevLocateInitialSmramSaveStateMapPages (
                &MapPagesBase,
@@ -123,8 +124,12 @@ AmdSevDxeEntryPoint (
                MapPagesCount  // NumPages
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: MemEncryptSevClearPageEncMask(): %r\n",
-        __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: MemEncryptSevClearPageEncMask(): %r\n",
+        __FUNCTION__,
+        Status
+        ));
       ASSERT (FALSE);
       CpuDeadLoop ();
     }

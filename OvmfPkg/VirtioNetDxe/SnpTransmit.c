@@ -54,17 +54,16 @@
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetTransmit (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  IN UINTN                       HeaderSize,
-  IN UINTN                       BufferSize,
-  IN /* +OUT! */ VOID            *Buffer,
-  IN EFI_MAC_ADDRESS             *SrcAddr  OPTIONAL,
-  IN EFI_MAC_ADDRESS             *DestAddr OPTIONAL,
-  IN UINT16                      *Protocol OPTIONAL
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN UINTN                        HeaderSize,
+  IN UINTN                        BufferSize,
+  IN /* +OUT! */ VOID             *Buffer,
+  IN EFI_MAC_ADDRESS              *SrcAddr  OPTIONAL,
+  IN EFI_MAC_ADDRESS              *DestAddr OPTIONAL,
+  IN UINT16                       *Protocol OPTIONAL
   )
 {
   VNET_DEV              *Dev;
@@ -74,27 +73,28 @@ VirtioNetTransmit (
   UINT16                AvailIdx;
   EFI_PHYSICAL_ADDRESS  DeviceAddress;
 
-  if (This == NULL || BufferSize == 0 || Buffer == NULL) {
+  if ((This == NULL) || (BufferSize == 0) || (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Dev = VIRTIO_NET_FROM_SNP (This);
+  Dev    = VIRTIO_NET_FROM_SNP (This);
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   switch (Dev->Snm.State) {
-  case EfiSimpleNetworkStopped:
-    Status = EFI_NOT_STARTED;
-    goto Exit;
-  case EfiSimpleNetworkStarted:
-    Status = EFI_DEVICE_ERROR;
-    goto Exit;
-  default:
-    break;
+    case EfiSimpleNetworkStopped:
+      Status = EFI_NOT_STARTED;
+      goto Exit;
+    case EfiSimpleNetworkStarted:
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    default:
+      break;
   }
 
   if (BufferSize < Dev->Snm.MediaHeaderSize) {
     Status = EFI_BUFFER_TOO_SMALL;
     goto Exit;
   }
+
   if (BufferSize > Dev->Snm.MediaHeaderSize + Dev->Snm.MaxPacketSize) {
     Status = EFI_INVALID_PARAMETER;
     goto Exit;
@@ -114,28 +114,32 @@ VirtioNetTransmit (
   // dst MAC, src MAC, Ethertype
   //
   if (HeaderSize != 0) {
-    UINT8 *Ptr;
+    UINT8  *Ptr;
 
-    if (HeaderSize != Dev->Snm.MediaHeaderSize ||
-        DestAddr == NULL || Protocol == NULL) {
+    if ((HeaderSize != Dev->Snm.MediaHeaderSize) ||
+        (DestAddr == NULL) || (Protocol == NULL))
+    {
       Status = EFI_INVALID_PARAMETER;
       goto Exit;
     }
+
     Ptr = Buffer;
     ASSERT (SIZE_OF_VNET (Mac) <= sizeof (EFI_MAC_ADDRESS));
 
     CopyMem (Ptr, DestAddr, SIZE_OF_VNET (Mac));
     Ptr += SIZE_OF_VNET (Mac);
 
-    CopyMem (Ptr,
+    CopyMem (
+      Ptr,
       (SrcAddr == NULL) ? &Dev->Snm.CurrentAddress : SrcAddr,
-      SIZE_OF_VNET (Mac));
+      SIZE_OF_VNET (Mac)
+      );
     Ptr += SIZE_OF_VNET (Mac);
 
-    *Ptr++ = (UINT8) (*Protocol >> 8);
-    *Ptr++ = (UINT8) *Protocol;
+    *Ptr++ = (UINT8)(*Protocol >> 8);
+    *Ptr++ = (UINT8)*Protocol;
 
-    ASSERT ((UINTN) (Ptr - (UINT8 *) Buffer) == Dev->Snm.MediaHeaderSize);
+    ASSERT ((UINTN)(Ptr - (UINT8 *)Buffer) == Dev->Snm.MediaHeaderSize);
   }
 
   //
@@ -155,15 +159,15 @@ VirtioNetTransmit (
   //
   // virtio-0.9.5, 2.4.1 Supplying Buffers to The Device
   //
-  DescIdx = Dev->TxFreeStack[Dev->TxCurPending++];
-  Dev->TxRing.Desc[DescIdx + 1].Addr  = DeviceAddress;
-  Dev->TxRing.Desc[DescIdx + 1].Len   = (UINT32) BufferSize;
+  DescIdx                            = Dev->TxFreeStack[Dev->TxCurPending++];
+  Dev->TxRing.Desc[DescIdx + 1].Addr = DeviceAddress;
+  Dev->TxRing.Desc[DescIdx + 1].Len  = (UINT32)BufferSize;
 
   //
   // the available index is never written by the host, we can read it back
   // without a barrier
   //
-  AvailIdx = *Dev->TxRing.Avail.Idx;
+  AvailIdx                                                   = *Dev->TxRing.Avail.Idx;
   Dev->TxRing.Avail.Ring[AvailIdx++ % Dev->TxRing.QueueSize] = DescIdx;
 
   MemoryFence ();

@@ -14,14 +14,14 @@
 EFI_STATUS
 EFIAPI
 VirtioFsSimpleFileSetPosition (
-  IN EFI_FILE_PROTOCOL *This,
-  IN UINT64            Position
+  IN EFI_FILE_PROTOCOL  *This,
+  IN UINT64             Position
   )
 {
-  VIRTIO_FS_FILE                     *VirtioFsFile;
-  VIRTIO_FS                          *VirtioFs;
-  EFI_STATUS                         Status;
-  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE FuseAttr;
+  VIRTIO_FS_FILE                      *VirtioFsFile;
+  VIRTIO_FS                           *VirtioFs;
+  EFI_STATUS                          Status;
+  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE  FuseAttr;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
 
@@ -32,11 +32,13 @@ VirtioFsSimpleFileSetPosition (
     if (Position != 0) {
       return EFI_UNSUPPORTED;
     }
+
     VirtioFsFile->FilePosition = 0;
     if (VirtioFsFile->FileInfoArray != NULL) {
       FreePool (VirtioFsFile->FileInfoArray);
       VirtioFsFile->FileInfoArray = NULL;
     }
+
     VirtioFsFile->SingleFileInfoSize = 0;
     VirtioFsFile->NumFileInfo        = 0;
     VirtioFsFile->NextFileInfo       = 0;
@@ -58,10 +60,11 @@ VirtioFsSimpleFileSetPosition (
   // Caller is requesting a seek to EOF.
   //
   VirtioFs = VirtioFsFile->OwnerFs;
-  Status = VirtioFsFuseGetAttr (VirtioFs, VirtioFsFile->NodeId, &FuseAttr);
+  Status   = VirtioFsFuseGetAttr (VirtioFs, VirtioFsFile->NodeId, &FuseAttr);
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   VirtioFsFile->FilePosition = FuseAttr.Size;
   return EFI_SUCCESS;
 }

@@ -34,15 +34,15 @@
 RETURN_STATUS
 EFIAPI
 MemEncryptSevLocateInitialSmramSaveStateMapPages (
-  OUT UINTN *BaseAddress,
-  OUT UINTN *NumberOfPages
+  OUT UINTN  *BaseAddress,
+  OUT UINTN  *NumberOfPages
   )
 {
-  UINTN MapStart;
-  UINTN MapEnd;
-  UINTN MapPagesStart; // MapStart rounded down to page boundary
-  UINTN MapPagesEnd;   // MapEnd rounded up to page boundary
-  UINTN MapPagesSize;  // difference between MapPagesStart and MapPagesEnd
+  UINTN  MapStart;
+  UINTN  MapEnd;
+  UINTN  MapPagesStart; // MapStart rounded down to page boundary
+  UINTN  MapPagesEnd;   // MapEnd rounded up to page boundary
+  UINTN  MapPagesSize;  // difference between MapPagesStart and MapPagesEnd
 
   if (!FeaturePcdGet (PcdSmmSmramRequire)) {
     return RETURN_UNSUPPORTED;

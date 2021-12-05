@@ -11,7 +11,6 @@
 
 #include "AcpiPlatform.h"
 
-
 /**
   Collect all PciIo protocol instances in the system. Save their original
   attributes, and enable IO and MMIO decoding for each.
@@ -38,15 +37,15 @@
 **/
 VOID
 EnablePciDecoding (
-  OUT ORIGINAL_ATTRIBUTES **OriginalAttributes,
-  OUT UINTN               *Count
+  OUT ORIGINAL_ATTRIBUTES  **OriginalAttributes,
+  OUT UINTN                *Count
   )
 {
-  EFI_STATUS          Status;
-  UINTN               NoHandles;
-  EFI_HANDLE          *Handles;
-  ORIGINAL_ATTRIBUTES *OrigAttrs;
-  UINTN               Idx;
+  EFI_STATUS           Status;
+  UINTN                NoHandles;
+  EFI_HANDLE           *Handles;
+  ORIGINAL_ATTRIBUTES  *OrigAttrs;
+  UINTN                Idx;
 
   *OriginalAttributes = NULL;
   *Count              = 0;
@@ -59,8 +58,13 @@ EnablePciDecoding (
     return;
   }
 
-  Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiPciIoProtocolGuid,
-                  NULL /* SearchKey */, &NoHandles, &Handles);
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiPciIoProtocolGuid,
+                  NULL /* SearchKey */,
+                  &NoHandles,
+                  &Handles
+                  );
   if (Status == EFI_NOT_FOUND) {
     //
     // No PCI devices were found on either of the root bridges. We're done.
@@ -69,49 +73,75 @@ EnablePciDecoding (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "%a: LocateHandleBuffer(): %r\n", __FUNCTION__,
-      Status));
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: LocateHandleBuffer(): %r\n",
+      __FUNCTION__,
+      Status
+      ));
     return;
   }
 
   OrigAttrs = AllocatePool (NoHandles * sizeof *OrigAttrs);
   if (OrigAttrs == NULL) {
-    DEBUG ((DEBUG_WARN, "%a: AllocatePool(): out of resources\n",
-      __FUNCTION__));
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: AllocatePool(): out of resources\n",
+      __FUNCTION__
+      ));
     goto FreeHandles;
   }
 
   for (Idx = 0; Idx < NoHandles; ++Idx) {
-    EFI_PCI_IO_PROTOCOL *PciIo;
-    UINT64              Attributes;
+    EFI_PCI_IO_PROTOCOL  *PciIo;
+    UINT64               Attributes;
 
     //
     // Look up PciIo on the handle and stash it
     //
-    Status = gBS->HandleProtocol (Handles[Idx], &gEfiPciIoProtocolGuid,
-                    (VOID**)&PciIo);
+    Status = gBS->HandleProtocol (
+                    Handles[Idx],
+                    &gEfiPciIoProtocolGuid,
+                    (VOID **)&PciIo
+                    );
     ASSERT_EFI_ERROR (Status);
     OrigAttrs[Idx].PciIo = PciIo;
 
     //
     // Stash the current attributes
     //
-    Status = PciIo->Attributes (PciIo, EfiPciIoAttributeOperationGet, 0,
-                      &OrigAttrs[Idx].PciAttributes);
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationGet,
+                      0,
+                      &OrigAttrs[Idx].PciAttributes
+                      );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "%a: EfiPciIoAttributeOperationGet: %r\n",
-        __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: EfiPciIoAttributeOperationGet: %r\n",
+        __FUNCTION__,
+        Status
+        ));
       goto RestoreAttributes;
     }
 
     //
     // Retrieve supported attributes
     //
-    Status = PciIo->Attributes (PciIo, EfiPciIoAttributeOperationSupported, 0,
-                      &Attributes);
+    Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationSupported,
+                      0,
+                      &Attributes
+                      );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "%a: EfiPciIoAttributeOperationSupported: %r\n",
-        __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: EfiPciIoAttributeOperationSupported: %r\n",
+        __FUNCTION__,
+        Status
+        ));
       goto RestoreAttributes;
     }
 
@@ -119,11 +149,19 @@ EnablePciDecoding (
     // Enable IO and MMIO decoding
     //
     Attributes &= EFI_PCI_IO_ATTRIBUTE_IO | EFI_PCI_IO_ATTRIBUTE_MEMORY;
-    Status = PciIo->Attributes (PciIo, EfiPciIoAttributeOperationEnable,
-                      Attributes, NULL);
+    Status      = PciIo->Attributes (
+                           PciIo,
+                           EfiPciIoAttributeOperationEnable,
+                           Attributes,
+                           NULL
+                           );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "%a: EfiPciIoAttributeOperationEnable: %r\n",
-        __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: EfiPciIoAttributeOperationEnable: %r\n",
+        __FUNCTION__,
+        Status
+        ));
       goto RestoreAttributes;
     }
   }
@@ -139,18 +177,19 @@ EnablePciDecoding (
 RestoreAttributes:
   while (Idx > 0) {
     --Idx;
-    OrigAttrs[Idx].PciIo->Attributes (OrigAttrs[Idx].PciIo,
+    OrigAttrs[Idx].PciIo->Attributes (
+                            OrigAttrs[Idx].PciIo,
                             EfiPciIoAttributeOperationSet,
                             OrigAttrs[Idx].PciAttributes,
                             NULL
                             );
   }
+
   FreePool (OrigAttrs);
 
 FreeHandles:
   FreePool (Handles);
 }
-
 
 /**
   Restore the original PCI attributes saved with EnablePciDecoding().
@@ -169,11 +208,11 @@ FreeHandles:
 **/
 VOID
 RestorePciDecoding (
-  IN ORIGINAL_ATTRIBUTES *OriginalAttributes,
-  IN UINTN               Count
+  IN ORIGINAL_ATTRIBUTES  *OriginalAttributes,
+  IN UINTN                Count
   )
 {
-  UINTN Idx;
+  UINTN  Idx;
 
   ASSERT ((OriginalAttributes == NULL) == (Count == 0));
   if (OriginalAttributes == NULL) {
@@ -188,5 +227,6 @@ RestorePciDecoding (
                                      NULL
                                      );
   }
+
   FreePool (OriginalAttributes);
 }

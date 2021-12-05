@@ -43,18 +43,18 @@
 **/
 EFI_STATUS
 VirtioFsFuseInitSession (
-  IN OUT VIRTIO_FS *VirtioFs
+  IN OUT VIRTIO_FS  *VirtioFs
   )
 {
-  VIRTIO_FS_FUSE_REQUEST        CommonReq;
-  VIRTIO_FS_FUSE_INIT_REQUEST   InitReq;
-  VIRTIO_FS_IO_VECTOR           ReqIoVec[2];
-  VIRTIO_FS_SCATTER_GATHER_LIST ReqSgList;
-  VIRTIO_FS_FUSE_RESPONSE       CommonResp;
-  VIRTIO_FS_FUSE_INIT_RESPONSE  InitResp;
-  VIRTIO_FS_IO_VECTOR           RespIoVec[2];
-  VIRTIO_FS_SCATTER_GATHER_LIST RespSgList;
-  EFI_STATUS                    Status;
+  VIRTIO_FS_FUSE_REQUEST         CommonReq;
+  VIRTIO_FS_FUSE_INIT_REQUEST    InitReq;
+  VIRTIO_FS_IO_VECTOR            ReqIoVec[2];
+  VIRTIO_FS_SCATTER_GATHER_LIST  ReqSgList;
+  VIRTIO_FS_FUSE_RESPONSE        CommonResp;
+  VIRTIO_FS_FUSE_INIT_RESPONSE   InitResp;
+  VIRTIO_FS_IO_VECTOR            RespIoVec[2];
+  VIRTIO_FS_SCATTER_GATHER_LIST  RespSgList;
+  EFI_STATUS                     Status;
 
   //
   // Initialize the FUSE request counter.
@@ -89,8 +89,13 @@ VirtioFsFuseInitSession (
   //
   // Populate the common request header.
   //
-  Status = VirtioFsFuseNewRequest (VirtioFs, &CommonReq, ReqSgList.TotalSize,
-             VirtioFsFuseOpInit, 0);
+  Status = VirtioFsFuseNewRequest (
+             VirtioFs,
+             &CommonReq,
+             ReqSgList.TotalSize,
+             VirtioFsFuseOpInit,
+             0
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -117,20 +122,27 @@ VirtioFsFuseInitSession (
   Status = VirtioFsFuseCheckResponse (&RespSgList, CommonReq.Unique, NULL);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_DEVICE_ERROR) {
-      DEBUG ((DEBUG_ERROR, "%a: Label=\"%s\" Errno=%d\n", __FUNCTION__,
-        VirtioFs->Label, CommonResp.Error));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Label=\"%s\" Errno=%d\n",
+        __FUNCTION__,
+        VirtioFs->Label,
+        CommonResp.Error
+        ));
       Status = VirtioFsErrnoToEfiStatus (CommonResp.Error);
     }
+
     return Status;
   }
 
   //
   // Check FUSE interface version / feature compatibility.
   //
-  if (InitResp.Major < InitReq.Major ||
-      (InitResp.Major == InitReq.Major && InitResp.Minor < InitReq.Minor) ||
-      (InitResp.Flags & VIRTIO_FS_FUSE_INIT_REQ_F_DO_READDIRPLUS) == 0 ||
-      InitResp.MaxWrite < SIZE_4KB) {
+  if ((InitResp.Major < InitReq.Major) ||
+      ((InitResp.Major == InitReq.Major) && (InitResp.Minor < InitReq.Minor)) ||
+      ((InitResp.Flags & VIRTIO_FS_FUSE_INIT_REQ_F_DO_READDIRPLUS) == 0) ||
+      (InitResp.MaxWrite < SIZE_4KB))
+  {
     return EFI_UNSUPPORTED;
   }
 

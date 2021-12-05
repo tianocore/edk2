@@ -29,7 +29,7 @@
 **/
 typedef
 VOID
-(EFIAPI *CPU_HOT_EJECT_HANDLER) (
+(EFIAPI *CPU_HOT_EJECT_HANDLER)(
   IN UINTN  ProcessorNum
   );
 
@@ -40,21 +40,21 @@ VOID
 // QEMU CPU Selector is UINT32, so we choose an invalid value larger
 // than that type.
 //
-#define CPU_EJECT_QEMU_SELECTOR_INVALID       (MAX_UINT64)
+#define CPU_EJECT_QEMU_SELECTOR_INVALID  (MAX_UINT64)
 
 typedef struct {
   //
   // Maps ProcessorNum -> QemuSelector for pending hot-ejects
   //
-  volatile UINT64 *QemuSelectorMap;
+  volatile UINT64                   *QemuSelectorMap;
   //
   // Handler to do the CPU ejection
   //
-  volatile CPU_HOT_EJECT_HANDLER Handler;
+  volatile CPU_HOT_EJECT_HANDLER    Handler;
   //
   // Entries in the QemuSelectorMap
   //
-  UINT32 ArrayLength;
+  UINT32                            ArrayLength;
 } CPU_HOT_EJECT_DATA;
 
 #endif // CPU_HOT_EJECT_DATA_H_

@@ -13,7 +13,6 @@
 #include <Uefi/UefiBaseType.h>
 #include <Base.h>
 
-
 /**
   Connect devices based on the boot order retrieved from QEMU.
 
@@ -48,7 +47,6 @@ ConnectDevicesFromQemu (
   VOID
   );
 
-
 /**
 
   Set the boot order based on configuration retrieved from QEMU.
@@ -82,7 +80,6 @@ EFIAPI
 SetBootOrderFromQemu (
   VOID
   );
-
 
 /**
   Calculate the number of seconds we should be showing the FrontPage progress
