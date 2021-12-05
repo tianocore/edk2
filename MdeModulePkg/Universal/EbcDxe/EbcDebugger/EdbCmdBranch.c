@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Edb.h"
 
-CHAR16 *mBranchTypeStr[] = {
+CHAR16  *mBranchTypeStr[] = {
   L"(CALL)",
   L"(CALLEX)",
   L"(RET)",
@@ -30,11 +30,11 @@ EdbBranchTypeToStr (
   IN EFI_DEBUGGER_BRANCH_TYPE  Type
   )
 {
-  if (Type < 0 || Type >= EfiDebuggerBranchTypeEbcMax) {
+  if ((Type < 0) || (Type >= EfiDebuggerBranchTypeEbcMax)) {
     return L"(Unknown Type)";
   }
 
-  return mBranchTypeStr [Type];
+  return mBranchTypeStr[Type];
 }
 
 /**
@@ -51,20 +51,20 @@ EdbBranchTypeToStr (
 **/
 EFI_DEBUG_STATUS
 DebuggerCallStack (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
-  INTN                           Index;
-  UINTN                          SubIndex;
-  CHAR8                          *FuncName;
-  EFI_DEBUGGER_CALLSTACK_CONTEXT *CallStackEntry;
-  BOOLEAN                        ShowParameter;
-  UINTN                          ParameterNumber;
+  INTN                            Index;
+  UINTN                           SubIndex;
+  CHAR8                           *FuncName;
+  EFI_DEBUGGER_CALLSTACK_CONTEXT  *CallStackEntry;
+  BOOLEAN                         ShowParameter;
+  UINTN                           ParameterNumber;
 
-  ShowParameter = FALSE;
+  ShowParameter   = FALSE;
   ParameterNumber = EFI_DEBUGGER_CALL_DEFAULT_PARAMETER;
 
   //
@@ -76,7 +76,7 @@ DebuggerCallStack (
       // Clear Call-Stack
       //
       DebuggerPrivate->CallStackEntryCount = 0;
-      ZeroMem (DebuggerPrivate->CallStackEntry, sizeof(DebuggerPrivate->CallStackEntry));
+      ZeroMem (DebuggerPrivate->CallStackEntry, sizeof (DebuggerPrivate->CallStackEntry));
       EDBPrint (L"Call-Stack is cleared\n");
       return EFI_DEBUG_CONTINUE;
     } else if (StriCmp (CommandArg, L"p") == 0) {
@@ -84,7 +84,7 @@ DebuggerCallStack (
       // Print Call-Stack with parameter
       //
       ShowParameter = TRUE;
-      CommandArg = StrGetNextTokenLine (L" ");
+      CommandArg    = StrGetNextTokenLine (L" ");
       if (CommandArg != NULL) {
         //
         // Try to get the parameter number
@@ -119,7 +119,7 @@ DebuggerCallStack (
   EDBPrint (L"Call-Stack (TOP):\n");
   EDBPrint (L"         Caller             Callee        Name\n");
   EDBPrint (L"  ================== ================== ========\n");
-//EDBPrint (L"  0x00000000FFFFFFFF 0xFFFFFFFF00000000 EfiMain\n");
+  // EDBPrint (L"  0x00000000FFFFFFFF 0xFFFFFFFF00000000 EfiMain\n");
   for (Index = (INTN)(DebuggerPrivate->CallStackEntryCount - 1); Index >= 0; Index--) {
     //
     // Get CallStack and print
@@ -134,13 +134,14 @@ DebuggerCallStack (
     if (FuncName != NULL) {
       EDBPrint (L" %a()", FuncName);
     }
+
     EDBPrint (L"\n");
 
     if (ShowParameter) {
       //
       // Print parameter
       //
-      if (sizeof(UINTN) == sizeof(UINT64)) {
+      if (sizeof (UINTN) == sizeof (UINT64)) {
         EDBPrint (
           L"    Parameter Address (0x%016lx) (\n",
           CallStackEntry->ParameterAddr
@@ -149,6 +150,7 @@ DebuggerCallStack (
           EDBPrint (L"        )\n");
           continue;
         }
+
         //
         // Print each parameter
         //
@@ -156,6 +158,7 @@ DebuggerCallStack (
           if (SubIndex % 2 == 0) {
             EDBPrint (L"        ");
           }
+
           EDBPrint (
             L"0x%016lx, ",
             CallStackEntry->Parameter[SubIndex]
@@ -164,9 +167,11 @@ DebuggerCallStack (
             EDBPrint (L"\n");
           }
         }
+
         if (SubIndex % 2 == 0) {
           EDBPrint (L"        ");
         }
+
         EDBPrint (
           L"0x%016lx\n",
           CallStackEntry->Parameter[SubIndex]
@@ -176,7 +181,8 @@ DebuggerCallStack (
         // break only for parameter
         //
         if ((((DebuggerPrivate->CallStackEntryCount - Index) % (16 / ParameterNumber)) == 0) &&
-            (Index != 0)) {
+            (Index != 0))
+        {
           if (SetPageBreak ()) {
             break;
           }
@@ -190,6 +196,7 @@ DebuggerCallStack (
           EDBPrint (L"        )\n");
           continue;
         }
+
         //
         // Print each parameter
         //
@@ -197,6 +204,7 @@ DebuggerCallStack (
           if (SubIndex % 4 == 0) {
             EDBPrint (L"        ");
           }
+
           EDBPrint (
             L"0x%08x, ",
             CallStackEntry->Parameter[SubIndex]
@@ -205,9 +213,11 @@ DebuggerCallStack (
             EDBPrint (L"\n");
           }
         }
+
         if (SubIndex % 4 == 0) {
           EDBPrint (L"        ");
         }
+
         EDBPrint (
           L"0x%08x\n",
           CallStackEntry->Parameter[SubIndex]
@@ -217,7 +227,8 @@ DebuggerCallStack (
         // break only for parameter
         //
         if ((((DebuggerPrivate->CallStackEntryCount - Index) % (32 / ParameterNumber)) == 0) &&
-            (Index != 0)) {
+            (Index != 0))
+        {
           if (SetPageBreak ()) {
             break;
           }
@@ -246,10 +257,10 @@ DebuggerCallStack (
 **/
 EFI_DEBUG_STATUS
 DebuggerInstructionBranch (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
   UINTN  Index;
@@ -263,11 +274,12 @@ DebuggerInstructionBranch (
       // Clear Trace
       //
       DebuggerPrivate->TraceEntryCount = 0;
-      ZeroMem (DebuggerPrivate->TraceEntry, sizeof(DebuggerPrivate->TraceEntry));
+      ZeroMem (DebuggerPrivate->TraceEntry, sizeof (DebuggerPrivate->TraceEntry));
       EDBPrint (L"Instruction Trace is cleared\n");
     } else {
       EDBPrint (L"Trace argument Invalid\n");
     }
+
     return EFI_DEBUG_CONTINUE;
   }
 
@@ -289,7 +301,7 @@ DebuggerInstructionBranch (
   EDBPrint (L"Instruction Trace (->Latest):\n");
   EDBPrint (L"    Source Addr        Destination Addr   Type\n");
   EDBPrint (L"  ================== ================== ========\n");
-//EDBPrint (L"  0x00000000FFFFFFFF 0xFFFFFFFF00000000  (CALLEX)\n");
+  // EDBPrint (L"  0x00000000FFFFFFFF 0xFFFFFFFF00000000  (CALLEX)\n");
   for (Index = 0; Index < DebuggerPrivate->TraceEntryCount; Index++) {
     EDBPrint (
       L"  0x%016lx 0x%016lx  %s\n",

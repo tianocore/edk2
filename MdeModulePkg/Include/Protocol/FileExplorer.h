@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Forward reference for pure ANSI compatability
 //
-typedef struct _EFI_FILE_EXPLORER_PROTOCOL  EFI_FILE_EXPLORER_PROTOCOL;
+typedef struct _EFI_FILE_EXPLORER_PROTOCOL EFI_FILE_EXPLORER_PROTOCOL;
 
 /**
   Prototype for the next process after user chosed one file.
@@ -53,7 +53,7 @@ BOOLEAN
 **/
 typedef
 EFI_STATUS
-(EFIAPI   *CHOOSE_FILE) (
+(EFIAPI   *CHOOSE_FILE)(
   IN  EFI_DEVICE_PATH_PROTOCOL  *RootDirectory,
   IN  CHAR16                    *FileType   OPTIONAL,
   IN  CHOOSE_HANDLER            ChooseHandler   OPTIONAL,
@@ -61,9 +61,9 @@ EFI_STATUS
   );
 
 struct _EFI_FILE_EXPLORER_PROTOCOL {
-  CHOOSE_FILE                          ChooseFile;
+  CHOOSE_FILE    ChooseFile;
 };
 
-extern EFI_GUID gEfiFileExplorerProtocolGuid;
+extern EFI_GUID  gEfiFileExplorerProtocolGuid;
 
 #endif

@@ -61,9 +61,9 @@ typedef enum {
 //
 // The maximum data length of each descriptor line
 //
-#define ADMA_MAX_DATA_PER_LINE      0x10000
-#define EMMC_SDMA_BOUNDARY          512 * 1024
-#define EMMC_SDMA_ROUND_UP(x, n)    (((x) + n) & ~(n - 1))
+#define ADMA_MAX_DATA_PER_LINE  0x10000
+#define EMMC_SDMA_BOUNDARY      512 * 1024
+#define EMMC_SDMA_ROUND_UP(x, n)  (((x) + n) & ~(n - 1))
 
 typedef enum {
   EmmcCommandTypeBc,  // Broadcast commands, no response
@@ -85,76 +85,76 @@ typedef enum {
 } EMMC_RESPONSE_TYPE;
 
 typedef struct _EMMC_COMMAND_BLOCK {
-  UINT16                            CommandIndex;
-  UINT32                            CommandArgument;
-  UINT32                            CommandType;      // One of the EMMC_COMMAND_TYPE values
-  UINT32                            ResponseType;     // One of the EMMC_RESPONSE_TYPE values
+  UINT16    CommandIndex;
+  UINT32    CommandArgument;
+  UINT32    CommandType;                              // One of the EMMC_COMMAND_TYPE values
+  UINT32    ResponseType;                             // One of the EMMC_RESPONSE_TYPE values
 } EMMC_COMMAND_BLOCK;
 
 typedef struct _EMMC_STATUS_BLOCK {
-  UINT32                            Resp0;
-  UINT32                            Resp1;
-  UINT32                            Resp2;
-  UINT32                            Resp3;
+  UINT32    Resp0;
+  UINT32    Resp1;
+  UINT32    Resp2;
+  UINT32    Resp3;
 } EMMC_STATUS_BLOCK;
 
 typedef struct _EMMC_COMMAND_PACKET {
-  UINT64                            Timeout;
-  EMMC_COMMAND_BLOCK                *EmmcCmdBlk;
-  EMMC_STATUS_BLOCK                 *EmmcStatusBlk;
-  VOID                              *InDataBuffer;
-  VOID                              *OutDataBuffer;
-  UINT32                            InTransferLength;
-  UINT32                            OutTransferLength;
+  UINT64                Timeout;
+  EMMC_COMMAND_BLOCK    *EmmcCmdBlk;
+  EMMC_STATUS_BLOCK     *EmmcStatusBlk;
+  VOID                  *InDataBuffer;
+  VOID                  *OutDataBuffer;
+  UINT32                InTransferLength;
+  UINT32                OutTransferLength;
 } EMMC_COMMAND_PACKET;
 
 #pragma pack(1)
 
 typedef struct {
-  UINT32 Valid:1;
-  UINT32 End:1;
-  UINT32 Int:1;
-  UINT32 Reserved:1;
-  UINT32 Act:2;
-  UINT32 Reserved1:10;
-  UINT32 Length:16;
-  UINT32 Address;
+  UINT32    Valid     : 1;
+  UINT32    End       : 1;
+  UINT32    Int       : 1;
+  UINT32    Reserved  : 1;
+  UINT32    Act       : 2;
+  UINT32    Reserved1 : 10;
+  UINT32    Length    : 16;
+  UINT32    Address;
 } EMMC_HC_ADMA_DESC_LINE;
 
 typedef struct {
-  UINT32   TimeoutFreq:6;     // bit 0:5
-  UINT32   Reserved:1;        // bit 6
-  UINT32   TimeoutUnit:1;     // bit 7
-  UINT32   BaseClkFreq:8;     // bit 8:15
-  UINT32   MaxBlkLen:2;       // bit 16:17
-  UINT32   BusWidth8:1;       // bit 18
-  UINT32   Adma2:1;           // bit 19
-  UINT32   Reserved2:1;       // bit 20
-  UINT32   HighSpeed:1;       // bit 21
-  UINT32   Sdma:1;            // bit 22
-  UINT32   SuspRes:1;         // bit 23
-  UINT32   Voltage33:1;       // bit 24
-  UINT32   Voltage30:1;       // bit 25
-  UINT32   Voltage18:1;       // bit 26
-  UINT32   Reserved3:1;       // bit 27
-  UINT32   SysBus64:1;        // bit 28
-  UINT32   AsyncInt:1;        // bit 29
-  UINT32   SlotType:2;        // bit 30:31
-  UINT32   Sdr50:1;           // bit 32
-  UINT32   Sdr104:1;          // bit 33
-  UINT32   Ddr50:1;           // bit 34
-  UINT32   Reserved4:1;       // bit 35
-  UINT32   DriverTypeA:1;     // bit 36
-  UINT32   DriverTypeC:1;     // bit 37
-  UINT32   DriverTypeD:1;     // bit 38
-  UINT32   DriverType4:1;     // bit 39
-  UINT32   TimerCount:4;      // bit 40:43
-  UINT32   Reserved5:1;       // bit 44
-  UINT32   TuningSDR50:1;     // bit 45
-  UINT32   RetuningMod:2;     // bit 46:47
-  UINT32   ClkMultiplier:8;   // bit 48:55
-  UINT32   Reserved6:7;       // bit 56:62
-  UINT32   Hs400:1;           // bit 63
+  UINT32    TimeoutFreq   : 6; // bit 0:5
+  UINT32    Reserved      : 1; // bit 6
+  UINT32    TimeoutUnit   : 1; // bit 7
+  UINT32    BaseClkFreq   : 8; // bit 8:15
+  UINT32    MaxBlkLen     : 2; // bit 16:17
+  UINT32    BusWidth8     : 1; // bit 18
+  UINT32    Adma2         : 1; // bit 19
+  UINT32    Reserved2     : 1; // bit 20
+  UINT32    HighSpeed     : 1; // bit 21
+  UINT32    Sdma          : 1; // bit 22
+  UINT32    SuspRes       : 1; // bit 23
+  UINT32    Voltage33     : 1; // bit 24
+  UINT32    Voltage30     : 1; // bit 25
+  UINT32    Voltage18     : 1; // bit 26
+  UINT32    Reserved3     : 1; // bit 27
+  UINT32    SysBus64      : 1; // bit 28
+  UINT32    AsyncInt      : 1; // bit 29
+  UINT32    SlotType      : 2; // bit 30:31
+  UINT32    Sdr50         : 1; // bit 32
+  UINT32    Sdr104        : 1; // bit 33
+  UINT32    Ddr50         : 1; // bit 34
+  UINT32    Reserved4     : 1; // bit 35
+  UINT32    DriverTypeA   : 1; // bit 36
+  UINT32    DriverTypeC   : 1; // bit 37
+  UINT32    DriverTypeD   : 1; // bit 38
+  UINT32    DriverType4   : 1; // bit 39
+  UINT32    TimerCount    : 4; // bit 40:43
+  UINT32    Reserved5     : 1; // bit 44
+  UINT32    TuningSDR50   : 1; // bit 45
+  UINT32    RetuningMod   : 2; // bit 46:47
+  UINT32    ClkMultiplier : 8; // bit 48:55
+  UINT32    Reserved6     : 7; // bit 56:62
+  UINT32    Hs400         : 1; // bit 63
 } EMMC_HC_SLOT_CAP;
 
 #pragma pack()
@@ -170,7 +170,7 @@ typedef struct {
 **/
 EFI_STATUS
 EmmcPeimHcReset (
-  IN UINTN                  Bar
+  IN UINTN  Bar
   );
 
 /**
@@ -185,7 +185,7 @@ EmmcPeimHcReset (
 **/
 EFI_STATUS
 EmmcPeimHcEnableInterrupt (
-  IN UINTN                  Bar
+  IN UINTN  Bar
   );
 
 /**
@@ -200,8 +200,8 @@ EmmcPeimHcEnableInterrupt (
 **/
 EFI_STATUS
 EmmcPeimHcGetCapability (
-  IN     UINTN              Bar,
-     OUT EMMC_HC_SLOT_CAP   *Capability
+  IN     UINTN          Bar,
+  OUT EMMC_HC_SLOT_CAP  *Capability
   );
 
 /**
@@ -219,7 +219,7 @@ EmmcPeimHcGetCapability (
 **/
 EFI_STATUS
 EmmcPeimHcCardDetect (
-  IN UINTN                  Bar
+  IN UINTN  Bar
   );
 
 /**
@@ -234,7 +234,7 @@ EmmcPeimHcCardDetect (
 **/
 EFI_STATUS
 EmmcPeimHcInitHost (
-  IN UINTN                  Bar
+  IN UINTN  Bar
   );
 
 /**
@@ -255,11 +255,11 @@ EmmcPeimHcInitHost (
 **/
 EFI_STATUS
 EmmcPeimSwitch (
-  IN EMMC_PEIM_HC_SLOT                  *Slot,
-  IN UINT8                              Access,
-  IN UINT8                              Index,
-  IN UINT8                              Value,
-  IN UINT8                              CmdSet
+  IN EMMC_PEIM_HC_SLOT  *Slot,
+  IN UINT8              Access,
+  IN UINT8              Index,
+  IN UINT8              Value,
+  IN UINT8              CmdSet
   );
 
 /**
@@ -277,8 +277,8 @@ EmmcPeimSwitch (
 **/
 EFI_STATUS
 EmmcPeimSetBlkCount (
-  IN EMMC_PEIM_HC_SLOT              *Slot,
-  IN UINT16                         BlockCount
+  IN EMMC_PEIM_HC_SLOT  *Slot,
+  IN UINT16             BlockCount
   );
 
 /**
@@ -300,12 +300,12 @@ EmmcPeimSetBlkCount (
 **/
 EFI_STATUS
 EmmcPeimRwMultiBlocks (
-  IN EMMC_PEIM_HC_SLOT              *Slot,
-  IN EFI_LBA                        Lba,
-  IN UINT32                         BlockSize,
-  IN VOID                           *Buffer,
-  IN UINTN                          BufferSize,
-  IN BOOLEAN                        IsRead
+  IN EMMC_PEIM_HC_SLOT  *Slot,
+  IN EFI_LBA            Lba,
+  IN UINT32             BlockSize,
+  IN VOID               *Buffer,
+  IN UINTN              BufferSize,
+  IN BOOLEAN            IsRead
   );
 
 /**
@@ -321,7 +321,7 @@ EmmcPeimRwMultiBlocks (
 **/
 EFI_STATUS
 EmmcPeimIdentification (
-  IN EMMC_PEIM_HC_SLOT           *Slot
+  IN EMMC_PEIM_HC_SLOT  *Slot
   );
 
 /**
@@ -332,8 +332,7 @@ EmmcPeimIdentification (
 **/
 VOID
 EmmcPeimFreeTrb (
-  IN EMMC_TRB           *Trb
+  IN EMMC_TRB  *Trb
   );
 
 #endif
-

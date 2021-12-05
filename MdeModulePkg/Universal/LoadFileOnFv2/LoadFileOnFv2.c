@@ -25,19 +25,19 @@
 #define LOAD_FILE_ON_FV2_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('l', 'f', 'f', 'v')
 
 typedef struct {
-  UINTN                          Signature;
-  EFI_LOAD_FILE_PROTOCOL         LoadFile;
-  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
-  EFI_GUID                       NameGuid;
-  LIST_ENTRY                     Link;
+  UINTN                            Signature;
+  EFI_LOAD_FILE_PROTOCOL           LoadFile;
+  EFI_DEVICE_PATH_PROTOCOL         *DevicePath;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL    *Fv;
+  EFI_GUID                         NameGuid;
+  LIST_ENTRY                       Link;
 } LOAD_FILE_ON_FV2_PRIVATE_DATA;
 
-#define LOAD_FILE_ON_FV2_PRIVATE_DATA_FROM_THIS(a) CR (a, LOAD_FILE_ON_FV2_PRIVATE_DATA, LoadFile, LOAD_FILE_ON_FV2_PRIVATE_DATA_SIGNATURE)
-#define LOAD_FILE_ON_FV2_PRIVATE_DATA_FROM_LINK(a) CR (a, LOAD_FILE_ON_FV2_PRIVATE_DATA, Link, LOAD_FILE_ON_FV2_PRIVATE_DATA_SIGNATURE)
+#define LOAD_FILE_ON_FV2_PRIVATE_DATA_FROM_THIS(a)  CR (a, LOAD_FILE_ON_FV2_PRIVATE_DATA, LoadFile, LOAD_FILE_ON_FV2_PRIVATE_DATA_SIGNATURE)
+#define LOAD_FILE_ON_FV2_PRIVATE_DATA_FROM_LINK(a)  CR (a, LOAD_FILE_ON_FV2_PRIVATE_DATA, Link, LOAD_FILE_ON_FV2_PRIVATE_DATA_SIGNATURE)
 
-VOID       *mFvRegistration;
-LIST_ENTRY mPrivateDataList;
+VOID        *mFvRegistration;
+LIST_ENTRY  mPrivateDataList;
 
 /**
   Causes the driver to load a specified file from firmware volume.
@@ -82,7 +82,7 @@ LoadFileOnFv2LoadFile (
   UINTN                          Pe32BufferSize;
   UINT32                         AuthenticationStatus;
 
-  if (This == NULL || BufferSize == NULL) {
+  if ((This == NULL) || (BufferSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -103,15 +103,15 @@ LoadFileOnFv2LoadFile (
   //
   Pe32Buffer     = NULL;
   Pe32BufferSize = 0;
-  Status = Private->Fv->ReadSection (
-                        Private->Fv,
-                        &Private->NameGuid,
-                        EFI_SECTION_PE32,
-                        0,
-                        &Pe32Buffer,
-                        &Pe32BufferSize,
-                        &AuthenticationStatus
-                        );
+  Status         = Private->Fv->ReadSection (
+                                  Private->Fv,
+                                  &Private->NameGuid,
+                                  EFI_SECTION_PE32,
+                                  0,
+                                  &Pe32Buffer,
+                                  &Pe32BufferSize,
+                                  &AuthenticationStatus
+                                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -120,7 +120,7 @@ LoadFileOnFv2LoadFile (
   // If the buffer passed in is not large enough, return the size of the required
   // buffer in BufferSize and return EFI_BUFFER_TOO_SMALL
   //
-  if (*BufferSize < Pe32BufferSize || Buffer == NULL) {
+  if ((*BufferSize < Pe32BufferSize) || (Buffer == NULL)) {
     *BufferSize = Pe32BufferSize;
     return EFI_BUFFER_TOO_SMALL;
   }
@@ -160,24 +160,25 @@ LOAD_FILE_ON_FV2_PRIVATE_DATA  mLoadFileOnFv2PrivateDataTemplate = {
 BOOLEAN
 EFIAPI
 IsInPrivateList (
-  IN EFI_GUID      *NameGuid
-)
+  IN EFI_GUID  *NameGuid
+  )
 {
- LIST_ENTRY  *Entry;
- LOAD_FILE_ON_FV2_PRIVATE_DATA *PrivateData;
+  LIST_ENTRY                     *Entry;
+  LOAD_FILE_ON_FV2_PRIVATE_DATA  *PrivateData;
 
- if (IsListEmpty (&mPrivateDataList)) {
-   return FALSE;
- }
+  if (IsListEmpty (&mPrivateDataList)) {
+    return FALSE;
+  }
 
- for(Entry = (&mPrivateDataList)->ForwardLink; Entry != (&mPrivateDataList); Entry = Entry->ForwardLink) {
-   PrivateData = LOAD_FILE_ON_FV2_PRIVATE_DATA_FROM_LINK (Entry);
-   if (CompareGuid (NameGuid, &PrivateData->NameGuid)) {
-     DEBUG ((DEBUG_INFO, "LoadFileOnFv2:FileLoadProtocol has been installed in:%g\n", NameGuid));
-     return TRUE;
-   }
- }
- return FALSE;
+  for (Entry = (&mPrivateDataList)->ForwardLink; Entry != (&mPrivateDataList); Entry = Entry->ForwardLink) {
+    PrivateData = LOAD_FILE_ON_FV2_PRIVATE_DATA_FROM_LINK (Entry);
+    if (CompareGuid (NameGuid, &PrivateData->NameGuid)) {
+      DEBUG ((DEBUG_INFO, "LoadFileOnFv2:FileLoadProtocol has been installed in:%g\n", NameGuid));
+      return TRUE;
+    }
+  }
+
+  return FALSE;
 }
 
 /**
@@ -192,27 +193,27 @@ IsInPrivateList (
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 CreateFileDevicePath (
-  IN EFI_HANDLE                      Device,
-  IN EFI_GUID                        *NameGuid,
-  IN CONST CHAR16                    *FileName
+  IN EFI_HANDLE    Device,
+  IN EFI_GUID      *NameGuid,
+  IN CONST CHAR16  *FileName
   )
 {
-  UINTN                     Size;
-  FILEPATH_DEVICE_PATH      *FilePath;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *FileDevicePath;
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH FileNode;
+  UINTN                              Size;
+  FILEPATH_DEVICE_PATH               *FilePath;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL           *FileDevicePath;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
 
   EfiInitializeFwVolDevicepathNode (&FileNode, NameGuid);
   DevicePath = AppendDevicePathNode (
                  DevicePathFromHandle (Device),
-                 (EFI_DEVICE_PATH_PROTOCOL *) &FileNode
+                 (EFI_DEVICE_PATH_PROTOCOL *)&FileNode
                  );
 
-  Size = StrSize (FileName);
+  Size           = StrSize (FileName);
   FileDevicePath = AllocatePool (Size + SIZE_OF_FILEPATH_DEVICE_PATH + END_DEVICE_PATH_LENGTH);
   if (FileDevicePath != NULL) {
-    FilePath = (FILEPATH_DEVICE_PATH *) FileDevicePath;
+    FilePath                 = (FILEPATH_DEVICE_PATH *)FileDevicePath;
     FilePath->Header.Type    = MEDIA_DEVICE_PATH;
     FilePath->Header.SubType = MEDIA_FILEPATH_DP;
     CopyMem (&FilePath->PathName, FileName, Size);
@@ -235,23 +236,23 @@ CreateFileDevicePath (
 VOID
 EFIAPI
 InstallFileLoadProtocol (
-  EFI_HANDLE Handle
-)
+  EFI_HANDLE  Handle
+  )
 {
-  EFI_STATUS                     Status;
-  LOAD_FILE_ON_FV2_PRIVATE_DATA  *Private;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL *Fvb;
-  EFI_PHYSICAL_ADDRESS           Address;
-  EFI_FV_FILETYPE                FileType;
-  UINTN                          Key;
-  EFI_GUID                       NameGuid;
-  EFI_FV_FILE_ATTRIBUTES         Attributes;
-  UINTN                          Size;
-  EFI_HANDLE                     LoadFileHandle;
-  UINT32                         AuthenticationStatus;
-  CHAR16                         *UiName;
-  UINTN                          UiNameSize;
+  EFI_STATUS                          Status;
+  LOAD_FILE_ON_FV2_PRIVATE_DATA       *Private;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL       *Fv;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  EFI_PHYSICAL_ADDRESS                Address;
+  EFI_FV_FILETYPE                     FileType;
+  UINTN                               Key;
+  EFI_GUID                            NameGuid;
+  EFI_FV_FILE_ATTRIBUTES              Attributes;
+  UINTN                               Size;
+  EFI_HANDLE                          LoadFileHandle;
+  UINT32                              AuthenticationStatus;
+  CHAR16                              *UiName;
+  UINTN                               UiNameSize;
 
   DEBUG ((DEBUG_INFO, "LoadFileOnFv2:Find a FV!\n"));
   Status = gBS->HandleProtocol (Handle, &gEfiFirmwareVolume2ProtocolGuid, (VOID **)&Fv);
@@ -266,7 +267,7 @@ InstallFileLoadProtocol (
   // each one found.
   //
   FileType = EFI_FV_FILETYPE_APPLICATION;
-  Key = 0;
+  Key      = 0;
   while (TRUE) {
     Status = Fv->GetNextFile (Fv, &Key, &FileType, &NameGuid, &Attributes, &Size);
     if (EFI_ERROR (Status)) {
@@ -286,18 +287,21 @@ InstallFileLoadProtocol (
     if (EFI_ERROR (Status)) {
       continue;
     }
+
     if (!IsInPrivateList (&NameGuid)) {
       Private = (LOAD_FILE_ON_FV2_PRIVATE_DATA *)AllocateCopyPool (sizeof (mLoadFileOnFv2PrivateDataTemplate), &mLoadFileOnFv2PrivateDataTemplate);
       ASSERT (Private != NULL);
-      Private->Fv = Fv;
+      Private->Fv         = Fv;
       Private->DevicePath = CreateFileDevicePath (Handle, &NameGuid, UiName);
       CopyGuid (&Private->NameGuid, &NameGuid);
       LoadFileHandle = NULL;
       DEBUG ((DEBUG_INFO, "Find a APPLICATION in this FV!\n"));
       Status = gBS->InstallMultipleProtocolInterfaces (
                       &LoadFileHandle,
-                      &gEfiDevicePathProtocolGuid, Private->DevicePath,
-                      &gEfiLoadFileProtocolGuid, &Private->LoadFile,
+                      &gEfiDevicePathProtocolGuid,
+                      Private->DevicePath,
+                      &gEfiLoadFileProtocolGuid,
+                      &Private->LoadFile,
                       NULL
                       );
       if (!EFI_ERROR (Status)) {
@@ -324,16 +328,15 @@ InstallFileLoadProtocol (
 VOID
 EFIAPI
 FvNotificationEvent (
-  IN  EFI_EVENT       Event,
-  IN  VOID            *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
-  EFI_STATUS                     Status;
-  UINTN                          BufferSize;
-  EFI_HANDLE                     *Handle;
-  UINTN                          Index;
-  EFI_HANDLE                     *CurHandle;
-
+  EFI_STATUS  Status;
+  UINTN       BufferSize;
+  EFI_HANDLE  *Handle;
+  UINTN       Index;
+  EFI_HANDLE  *CurHandle;
 
   Handle     = NULL;
   Index      = 0;
@@ -342,19 +345,21 @@ FvNotificationEvent (
   if (Handle == NULL) {
     return;
   }
+
   Status = gBS->LocateHandle (
-                    ByProtocol,
-                    &gEfiFirmwareVolume2ProtocolGuid,
-                    NULL,
-                    &BufferSize,
-                    Handle
-                    );
+                  ByProtocol,
+                  &gEfiFirmwareVolume2ProtocolGuid,
+                  NULL,
+                  &BufferSize,
+                  Handle
+                  );
   if (EFI_BUFFER_TOO_SMALL == Status) {
     FreePool (Handle);
     Handle = AllocateZeroPool (BufferSize);
     if (Handle == NULL) {
       return;
     }
+
     Status = gBS->LocateHandle (
                     ByProtocol,
                     &gEfiFirmwareVolume2ProtocolGuid,
@@ -370,13 +375,14 @@ FvNotificationEvent (
   }
 
   CurHandle = Handle;
-  for (Index=0; Index < BufferSize/sizeof (EFI_HANDLE); Index++) {
+  for (Index = 0; Index < BufferSize/sizeof (EFI_HANDLE); Index++) {
     CurHandle = Handle + Index;
     //
     // Install LoadFile Protocol
     //
     InstallFileLoadProtocol (*CurHandle);
   }
+
   if (Handle != NULL) {
     FreePool (Handle);
   }
@@ -409,13 +415,12 @@ LoadFileOnFv2Intialize (
     );
 
   EfiCreateProtocolNotifyEvent (
-     &gLzmaCustomDecompressGuid,
-     TPL_CALLBACK,
-     FvNotificationEvent,
-     NULL,
-     &mFvRegistration
+    &gLzmaCustomDecompressGuid,
+    TPL_CALLBACK,
+    FvNotificationEvent,
+    NULL,
+    &mFvRegistration
     );
 
   return EFI_SUCCESS;
 }
-

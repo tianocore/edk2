@@ -42,10 +42,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 FtwGetMaxBlockSize (
-  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL      *This,
-  OUT UINTN                                 *BlockSize
+  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL  *This,
+  OUT UINTN                             *BlockSize
   );
-
 
 /**
   Allocates space for the protocol to maintain information about writes.
@@ -71,12 +70,11 @@ FtwGetMaxBlockSize (
 EFI_STATUS
 EFIAPI
 FtwAllocate (
-  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL      *This,
-  IN EFI_GUID                               *CallerId,
-  IN UINTN                                  PrivateDataSize,
-  IN UINTN                                  NumberOfWrites
+  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL  *This,
+  IN EFI_GUID                           *CallerId,
+  IN UINTN                              PrivateDataSize,
+  IN UINTN                              NumberOfWrites
   );
-
 
 /**
   Starts a target block update. This records information about the write
@@ -108,15 +106,14 @@ FtwAllocate (
 EFI_STATUS
 EFIAPI
 FtwWrite (
-  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL      *This,
-  IN EFI_LBA                                Lba,
-  IN UINTN                                  Offset,
-  IN UINTN                                  Length,
-  IN VOID                                   *PrivateData,
-  IN EFI_HANDLE                             FvBlockHandle,
-  IN VOID                                   *Buffer
+  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL  *This,
+  IN EFI_LBA                            Lba,
+  IN UINTN                              Offset,
+  IN UINTN                              Length,
+  IN VOID                               *PrivateData,
+  IN EFI_HANDLE                         FvBlockHandle,
+  IN VOID                               *Buffer
   );
-
 
 /**
   Restarts a previously interrupted write. The caller must provide the
@@ -133,10 +130,9 @@ FtwWrite (
 EFI_STATUS
 EFIAPI
 FtwRestart (
-  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL      *This,
-  IN EFI_HANDLE                             FvBlockHandle
+  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL  *This,
+  IN EFI_HANDLE                         FvBlockHandle
   );
-
 
 /**
   Aborts all previously allocated writes.
@@ -151,9 +147,8 @@ FtwRestart (
 EFI_STATUS
 EFIAPI
 FtwAbort (
-  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL      *This
+  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL  *This
   );
-
 
 /**
   Starts a target block update. This function records information about the write
@@ -183,14 +178,14 @@ FtwAbort (
 EFI_STATUS
 EFIAPI
 FtwGetLastWrite (
-  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL      *This,
-  OUT EFI_GUID                              *CallerId,
-  OUT EFI_LBA                               *Lba,
-  OUT UINTN                                 *Offset,
-  OUT UINTN                                 *Length,
-  IN OUT UINTN                              *PrivateDataSize,
-  OUT VOID                                  *PrivateData,
-  OUT BOOLEAN                               *Complete
+  IN EFI_FAULT_TOLERANT_WRITE_PROTOCOL  *This,
+  OUT EFI_GUID                          *CallerId,
+  OUT EFI_LBA                           *Lba,
+  OUT UINTN                             *Offset,
+  OUT UINTN                             *Length,
+  IN OUT UINTN                          *PrivateDataSize,
+  OUT VOID                              *PrivateData,
+  OUT BOOLEAN                           *Complete
   );
 
 #endif

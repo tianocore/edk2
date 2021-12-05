@@ -18,11 +18,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EDKII_WORKING_BLOCK_SIGNATURE_GUID \
   {0x9e58292b, 0x7c68, 0x497d, {0xa0, 0xce, 0x65,  0x0, 0xfd, 0x9f, 0x1b, 0x95} }
 
-extern EFI_GUID gEfiSystemNvDataFvGuid;
-extern EFI_GUID gEdkiiWorkingBlockSignatureGuid;
+extern EFI_GUID  gEfiSystemNvDataFvGuid;
+extern EFI_GUID  gEdkiiWorkingBlockSignatureGuid;
 
-#define WORKING_BLOCK_VALID   0x1
-#define WORKING_BLOCK_INVALID 0x2
+#define WORKING_BLOCK_VALID    0x1
+#define WORKING_BLOCK_INVALID  0x2
 
 ///
 /// The EDKII Fault tolerant working block header.
@@ -34,22 +34,22 @@ typedef struct {
   /// Its value has be updated from gEfiSystemNvDataFvGuid to gEdkiiWorkingBlockSignatureGuid,
   /// because its write queue data format has been updated to support the crossing archs.
   ///
-  EFI_GUID  Signature;
+  EFI_GUID    Signature;
   ///
   /// 32bit CRC calculated for this header.
   ///
-  UINT32    Crc;
+  UINT32      Crc;
   ///
   /// Working block valid bit.
   ///
-  UINT8     WorkingBlockValid : 1;
-  UINT8     WorkingBlockInvalid : 1;
-  UINT8     Reserved : 6;
-  UINT8     Reserved3[3];
+  UINT8       WorkingBlockValid   : 1;
+  UINT8       WorkingBlockInvalid : 1;
+  UINT8       Reserved            : 6;
+  UINT8       Reserved3[3];
   ///
   /// Total size of the following write queue range.
   ///
-  UINT64    WriteQueueSize;
+  UINT64      WriteQueueSize;
   ///
   /// Write Queue data.
   ///
@@ -61,37 +61,37 @@ typedef struct {
   ///
 } EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER;
 
-#define FTW_VALID_STATE     0
-#define FTW_INVALID_STATE   1
+#define FTW_VALID_STATE    0
+#define FTW_INVALID_STATE  1
 
 //
 // EFI Fault tolerant block update write queue entry.
 //
 typedef struct {
-  UINT8     HeaderAllocated : 1;
-  UINT8     WritesAllocated : 1;
-  UINT8     Complete : 1;
-  UINT8     Reserved : 5;
-  EFI_GUID  CallerId;
-  UINT64    NumberOfWrites;
-  UINT64    PrivateDataSize;
+  UINT8       HeaderAllocated : 1;
+  UINT8       WritesAllocated : 1;
+  UINT8       Complete        : 1;
+  UINT8       Reserved        : 5;
+  EFI_GUID    CallerId;
+  UINT64      NumberOfWrites;
+  UINT64      PrivateDataSize;
 } EFI_FAULT_TOLERANT_WRITE_HEADER;
 
 //
 // EFI Fault tolerant block update write queue record.
 //
 typedef struct {
-  UINT8   BootBlockUpdate : 1;
-  UINT8   SpareComplete : 1;
-  UINT8   DestinationComplete : 1;
-  UINT8   Reserved : 5;
-  EFI_LBA Lba;
-  UINT64  Offset;
-  UINT64  Length;
+  UINT8      BootBlockUpdate     : 1;
+  UINT8      SpareComplete       : 1;
+  UINT8      DestinationComplete : 1;
+  UINT8      Reserved            : 5;
+  EFI_LBA    Lba;
+  UINT64     Offset;
+  UINT64     Length;
   //
   // Relative offset to spare block.
   //
-  INT64   RelativeOffset;
+  INT64      RelativeOffset;
   //
   // UINT8    PrivateData[PrivateDataSize]
   //
