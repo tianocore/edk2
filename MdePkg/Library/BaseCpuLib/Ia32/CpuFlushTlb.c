@@ -6,8 +6,6 @@
 
 **/
 
-
-
 /**
   Flushes all the Translation Lookaside Buffers(TLB) entries in a CPU.
 
@@ -25,4 +23,3 @@ CpuFlushTlb (
     mov     cr3, eax
   }
 }
-

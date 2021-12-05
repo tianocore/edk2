@@ -125,7 +125,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SPI_IO_PROTOCOL_TRANSACTION) (
+(EFIAPI *EFI_SPI_IO_PROTOCOL_TRANSACTION)(
   IN  CONST EFI_SPI_IO_PROTOCOL  *This,
   IN  EFI_SPI_TRANSACTION_TYPE   TransactionType,
   IN  BOOLEAN                    DebugTransaction,
@@ -158,7 +158,7 @@ EFI_STATUS
 
 **/
 typedef EFI_STATUS
-(EFIAPI *EFI_SPI_IO_PROTOCOL_UPDATE_SPI_PERIPHERAL) (
+(EFIAPI *EFI_SPI_IO_PROTOCOL_UPDATE_SPI_PERIPHERAL)(
   IN CONST EFI_SPI_IO_PROTOCOL  *This,
   IN CONST EFI_SPI_PERIPHERAL   *SpiPeripheral
   );
@@ -171,13 +171,13 @@ typedef struct _EFI_SPI_BUS_TRANSACTION {
   ///
   /// Pointer to the SPI peripheral being manipulated.
   ///
-  CONST EFI_SPI_PERIPHERAL *SpiPeripheral;
+  CONST EFI_SPI_PERIPHERAL    *SpiPeripheral;
 
   ///
   /// Type of transaction specified by one of the EFI_SPI_TRANSACTION_TYPE
   /// values.
   ///
-  EFI_SPI_TRANSACTION_TYPE TransactionType;
+  EFI_SPI_TRANSACTION_TYPE    TransactionType;
 
   ///
   /// TRUE if the transaction is being debugged. Debugging may be turned on for
@@ -185,34 +185,34 @@ typedef struct _EFI_SPI_BUS_TRANSACTION {
   /// messages. All other transactions with this value set to FALSE will not
   /// display any debugging messages.
   ///
-  BOOLEAN                  DebugTransaction;
+  BOOLEAN                     DebugTransaction;
 
   ///
   /// SPI bus width in bits: 1, 2, 4
   ///
-  UINT32                   BusWidth;
+  UINT32                      BusWidth;
 
   ///
   /// Frame size in bits, range: 1 - 32
   ///
-  UINT32                   FrameSize;
+  UINT32                      FrameSize;
 
   ///
   /// Length of the write buffer in bytes
   ///
-  UINT32                   WriteBytes;
+  UINT32                      WriteBytes;
 
   ///
   /// Buffer containing data to send to the SPI peripheral
   /// Frame sizes 1 - 8 bits: UINT8 (one byte) per frame
   /// Frame sizes 7 - 16 bits : UINT16 (two bytes) per frame
   ///
-  UINT8                    *WriteBuffer;
+  UINT8                       *WriteBuffer;
 
   ///
   /// Length of the read buffer in bytes
   ///
-  UINT32                   ReadBytes;
+  UINT32                      ReadBytes;
 
   ///
   /// Buffer to receive the data from the SPI peripheral
@@ -220,7 +220,7 @@ typedef struct _EFI_SPI_BUS_TRANSACTION {
   /// * Frame sizes 7 - 16 bits : UINT16 (two bytes) per frame
   /// * Frame sizes 17 - 32 bits : UINT32 (four bytes) per frame
   ///
-  UINT8                    *ReadBuffer;
+  UINT8                       *ReadBuffer;
 } EFI_SPI_BUS_TRANSACTION;
 
 ///
@@ -232,13 +232,13 @@ struct _EFI_SPI_IO_PROTOCOL {
   /// Address of an EFI_SPI_PERIPHERAL data structure associated with this
   /// protocol instance.
   ///
-  CONST EFI_SPI_PERIPHERAL                  *SpiPeripheral;
+  CONST EFI_SPI_PERIPHERAL    *SpiPeripheral;
 
   ///
   /// Address of the original EFI_SPI_PERIPHERAL data structure associated with
   /// this protocol instance.
   ///
-  CONST EFI_SPI_PERIPHERAL                  *OriginalSpiPeripheral;
+  CONST EFI_SPI_PERIPHERAL    *OriginalSpiPeripheral;
 
   ///
   /// Mask of frame sizes which the SPI 10 layer supports. Frame size of N-bits
@@ -247,12 +247,12 @@ struct _EFI_SPI_IO_PROTOCOL {
   /// 8-bit frame sizes by the SPI bus layer if the frame size is not supported
   /// by the SPI host controller.
   ///
-  UINT32                                    FrameSizeSupportMask;
+  UINT32    FrameSizeSupportMask;
 
   ///
   /// Maximum transfer size in bytes: 1 - Oxffffffff
   ///
-  UINT32                                    MaximumTransferBytes;
+  UINT32    MaximumTransferBytes;
 
   ///
   /// Transaction attributes: One or more from:
@@ -265,22 +265,22 @@ struct _EFI_SPI_IO_PROTOCOL {
   /// * SPI_IO_TRANSFER_SIZE_INCLUDES_ADDRESS
   ///   - Transfer size includes the 3 address bytes
   ///
-  UINT32                                    Attributes;
+  UINT32                                       Attributes;
 
   ///
   /// Pointer to legacy SPI controller protocol
   ///
-  CONST EFI_LEGACY_SPI_CONTROLLER_PROTOCOL  *LegacySpiProtocol;
+  CONST EFI_LEGACY_SPI_CONTROLLER_PROTOCOL     *LegacySpiProtocol;
 
   ///
   /// Initiate a SPI transaction between the host and a SPI peripheral.
   ///
-  EFI_SPI_IO_PROTOCOL_TRANSACTION           Transaction;
+  EFI_SPI_IO_PROTOCOL_TRANSACTION              Transaction;
 
   ///
   /// Update the SPI peripheral associated with this SPI 10 instance.
   ///
-  EFI_SPI_IO_PROTOCOL_UPDATE_SPI_PERIPHERAL UpdateSpiPeripheral;
+  EFI_SPI_IO_PROTOCOL_UPDATE_SPI_PERIPHERAL    UpdateSpiPeripheral;
 };
 
 #endif // __SPI_IO_PROTOCOL_H__
