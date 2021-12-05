@@ -34,7 +34,7 @@
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SM_MONITOR_LOAD_MONITOR) (
+(EFIAPI *EFI_SM_MONITOR_LOAD_MONITOR)(
   IN EFI_PHYSICAL_ADDRESS StmImage,
   IN UINTN                StmImageSize
   );
@@ -54,7 +54,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SM_MONITOR_ADD_PI_RESOURCE) (
+(EFIAPI *EFI_SM_MONITOR_ADD_PI_RESOURCE)(
   IN STM_RSC *ResourceList,
   IN UINT32   NumEntries OPTIONAL
   );
@@ -74,7 +74,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SM_MONITOR_DELETE_PI_RESOURCE) (
+(EFIAPI *EFI_SM_MONITOR_DELETE_PI_RESOURCE)(
   IN STM_RSC *ResourceList OPTIONAL,
   IN UINT32   NumEntries OPTIONAL
   );
@@ -94,14 +94,14 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EFI_SM_MONITOR_GET_PI_RESOURCE) (
+(EFIAPI *EFI_SM_MONITOR_GET_PI_RESOURCE)(
   OUT    STM_RSC *ResourceList,
   IN OUT UINT32  *ResourceSize
   );
 
 typedef UINT32 EFI_SM_MONITOR_STATE;
-#define EFI_SM_MONITOR_STATE_ENABLED     0x1
-#define EFI_SM_MONITOR_STATE_ACTIVATED   0x2
+#define EFI_SM_MONITOR_STATE_ENABLED    0x1
+#define EFI_SM_MONITOR_STATE_ACTIVATED  0x2
 
 /**
 
@@ -112,7 +112,7 @@ typedef UINT32 EFI_SM_MONITOR_STATE;
 **/
 typedef
 EFI_SM_MONITOR_STATE
-(EFIAPI *EFI_SM_MONITOR_GET_MONITOR_STATE) (
+(EFIAPI *EFI_SM_MONITOR_GET_MONITOR_STATE)(
   VOID
   );
 
@@ -120,16 +120,16 @@ typedef struct _EFI_SM_MONITOR_INIT_PROTOCOL {
   //
   // Valid at boot-time only
   //
-  EFI_SM_MONITOR_LOAD_MONITOR                      LoadMonitor;
-  EFI_SM_MONITOR_ADD_PI_RESOURCE                   AddPiResource;
-  EFI_SM_MONITOR_DELETE_PI_RESOURCE                DeletePiResource;
-  EFI_SM_MONITOR_GET_PI_RESOURCE                   GetPiResource;
+  EFI_SM_MONITOR_LOAD_MONITOR          LoadMonitor;
+  EFI_SM_MONITOR_ADD_PI_RESOURCE       AddPiResource;
+  EFI_SM_MONITOR_DELETE_PI_RESOURCE    DeletePiResource;
+  EFI_SM_MONITOR_GET_PI_RESOURCE       GetPiResource;
   //
   // Valid at runtime
   //
-  EFI_SM_MONITOR_GET_MONITOR_STATE                 GetMonitorState;
+  EFI_SM_MONITOR_GET_MONITOR_STATE     GetMonitorState;
 } EFI_SM_MONITOR_INIT_PROTOCOL;
 
-extern EFI_GUID gEfiSmMonitorInitProtocolGuid;
+extern EFI_GUID  gEfiSmMonitorInitProtocolGuid;
 
 #endif
