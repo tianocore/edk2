@@ -29,6 +29,7 @@ ReportPrint (
   } else {
     gST->ConOut->OutputString (gST->ConOut, String);
   }
+
   VA_END (Marker);
 }
 

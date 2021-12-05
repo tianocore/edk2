@@ -26,11 +26,11 @@
 /// aligned allocation.
 ///
 typedef struct {
-  UINT32  Signature;
-  VOID    *AllocatedBufffer;
-  UINTN   TotalPages;
-  VOID    *AlignedBuffer;
-  UINTN   AlignedPages;
+  UINT32    Signature;
+  VOID      *AllocatedBufffer;
+  UINTN     TotalPages;
+  VOID      *AlignedBuffer;
+  UINTN     AlignedPages;
 } PAGE_HEAD;
 
 /**
@@ -159,25 +159,27 @@ AllocateAlignedPages (
   if (Alignment < SIZE_4KB) {
     Alignment = SIZE_4KB;
   }
-  AlignmentMask  = Alignment - 1;
+
+  AlignmentMask = Alignment - 1;
 
   //
   // We need reserve Alignment pages for PAGE_HEAD, as meta data.
   //
-  PageHead.Signature = PAGE_HEAD_PRIVATE_SIGNATURE;
-  PageHead.TotalPages = Pages + EFI_SIZE_TO_PAGES (Alignment) * 2;
-  PageHead.AlignedPages = Pages;
+  PageHead.Signature        = PAGE_HEAD_PRIVATE_SIGNATURE;
+  PageHead.TotalPages       = Pages + EFI_SIZE_TO_PAGES (Alignment) * 2;
+  PageHead.AlignedPages     = Pages;
   PageHead.AllocatedBufffer = malloc (EFI_PAGES_TO_SIZE (PageHead.TotalPages));
   if (PageHead.AllocatedBufffer == NULL) {
     return NULL;
   }
-  PageHead.AlignedBuffer = (VOID *)(((UINTN) PageHead.AllocatedBufffer + AlignmentMask) & ~AlignmentMask);
-  if ((UINTN)PageHead.AlignedBuffer - (UINTN)PageHead.AllocatedBufffer < sizeof(PAGE_HEAD)) {
+
+  PageHead.AlignedBuffer = (VOID *)(((UINTN)PageHead.AllocatedBufffer + AlignmentMask) & ~AlignmentMask);
+  if ((UINTN)PageHead.AlignedBuffer - (UINTN)PageHead.AllocatedBufffer < sizeof (PAGE_HEAD)) {
     PageHead.AlignedBuffer = (VOID *)((UINTN)PageHead.AlignedBuffer + Alignment);
   }
 
-  PageHeadPtr = (VOID *)((UINTN)PageHead.AlignedBuffer - sizeof(PAGE_HEAD));
-  memcpy (PageHeadPtr, &PageHead, sizeof(PAGE_HEAD));
+  PageHeadPtr = (VOID *)((UINTN)PageHead.AlignedBuffer - sizeof (PAGE_HEAD));
+  memcpy (PageHeadPtr, &PageHead, sizeof (PAGE_HEAD));
 
   return PageHead.AlignedBuffer;
 }
@@ -267,10 +269,11 @@ FreeAlignedPages (
   //
   // NOTE: Partial free is not supported. Just keep it.
   //
-  PageHeadPtr = (VOID *)((UINTN)Buffer - sizeof(PAGE_HEAD));
+  PageHeadPtr = (VOID *)((UINTN)Buffer - sizeof (PAGE_HEAD));
   if (PageHeadPtr->Signature != PAGE_HEAD_PRIVATE_SIGNATURE) {
     return;
   }
+
   if (PageHeadPtr->AlignedPages != Pages) {
     return;
   }
@@ -366,6 +369,7 @@ AllocateZeroPool (
   if (Buffer == NULL) {
     return NULL;
   }
+
   memset (Buffer, 0, AllocationSize);
   return Buffer;
 }
@@ -444,6 +448,7 @@ AllocateCopyPool (
   if (Memory == NULL) {
     return NULL;
   }
+
   memcpy (Memory, Buffer, AllocationSize);
   return Memory;
 }
@@ -534,12 +539,14 @@ ReallocatePool (
   VOID  *NewBuffer;
 
   NewBuffer = malloc (NewSize);
-  if (NewBuffer != NULL && OldBuffer != NULL) {
+  if ((NewBuffer != NULL) && (OldBuffer != NULL)) {
     memcpy (NewBuffer, OldBuffer, MIN (OldSize, NewSize));
   }
+
   if (OldBuffer != NULL) {
-    FreePool(OldBuffer);
+    FreePool (OldBuffer);
   }
+
   return NewBuffer;
 }
 
