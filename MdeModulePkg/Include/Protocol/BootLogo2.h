@@ -92,8 +92,8 @@ EFI_STATUS
   );
 
 struct _EDKII_BOOT_LOGO2_PROTOCOL {
-  EDKII_SET_BOOT_LOGO2  SetBootLogo;
-  EDKII_GET_BOOT_LOGO2  GetBootLogo;
+  EDKII_SET_BOOT_LOGO2    SetBootLogo;
+  EDKII_GET_BOOT_LOGO2    GetBootLogo;
 };
 
 extern EFI_GUID  gEdkiiBootLogo2ProtocolGuid;

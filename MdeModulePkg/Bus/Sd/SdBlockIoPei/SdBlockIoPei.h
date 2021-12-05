@@ -26,27 +26,27 @@
 
 #include <IndustryStandard/Sd.h>
 
-typedef struct _SD_PEIM_HC_PRIVATE_DATA SD_PEIM_HC_PRIVATE_DATA;
-typedef struct _SD_PEIM_HC_SLOT         SD_PEIM_HC_SLOT;
-typedef struct _SD_TRB                  SD_TRB;
+typedef struct _SD_PEIM_HC_PRIVATE_DATA  SD_PEIM_HC_PRIVATE_DATA;
+typedef struct _SD_PEIM_HC_SLOT          SD_PEIM_HC_SLOT;
+typedef struct _SD_TRB                   SD_TRB;
 
 #include "SdHci.h"
 #include "SdHcMem.h"
 
-#define SD_PEIM_SIG               SIGNATURE_32 ('S', 'D', 'C', 'P')
-#define SD_PEIM_SLOT_SIG          SIGNATURE_32 ('S', 'D', 'C', 'S')
+#define SD_PEIM_SIG       SIGNATURE_32 ('S', 'D', 'C', 'P')
+#define SD_PEIM_SLOT_SIG  SIGNATURE_32 ('S', 'D', 'C', 'S')
 
-#define SD_PEIM_MAX_SLOTS         6
+#define SD_PEIM_MAX_SLOTS  6
 
 struct _SD_PEIM_HC_SLOT {
-  UINT32                            Signature;
-  EFI_PEI_BLOCK_IO2_MEDIA           Media;
+  UINT32                     Signature;
+  EFI_PEI_BLOCK_IO2_MEDIA    Media;
 
-  UINTN                             SdHcBase;
-  SD_HC_SLOT_CAP                    Capability;
-  SD_CSD                            Csd;
-  BOOLEAN                           SectorAddressing;
-  SD_PEIM_HC_PRIVATE_DATA           *Private;
+  UINTN                      SdHcBase;
+  SD_HC_SLOT_CAP             Capability;
+  SD_CSD                     Csd;
+  BOOLEAN                    SectorAddressing;
+  SD_PEIM_HC_PRIVATE_DATA    *Private;
 };
 
 struct _SD_PEIM_HC_PRIVATE_DATA {
@@ -67,27 +67,27 @@ struct _SD_PEIM_HC_PRIVATE_DATA {
   UINT8                             TotalBlkIoDevices;
 };
 
-#define SD_TIMEOUT                  MultU64x32((UINT64)(3), 1000000)
-#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS(a) CR (a, SD_PEIM_HC_PRIVATE_DATA, BlkIoPpi, SD_PEIM_SIG)
-#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS2(a) CR (a, SD_PEIM_HC_PRIVATE_DATA, BlkIo2Ppi, SD_PEIM_SIG)
-#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY(a) CR (a, SD_PEIM_HC_PRIVATE_DATA, EndOfPeiNotifyList, SD_PEIM_SIG)
+#define SD_TIMEOUT  MultU64x32((UINT64)(3), 1000000)
+#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS(a)         CR (a, SD_PEIM_HC_PRIVATE_DATA, BlkIoPpi, SD_PEIM_SIG)
+#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS2(a)        CR (a, SD_PEIM_HC_PRIVATE_DATA, BlkIo2Ppi, SD_PEIM_SIG)
+#define GET_SD_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY(a)  CR (a, SD_PEIM_HC_PRIVATE_DATA, EndOfPeiNotifyList, SD_PEIM_SIG)
 
 struct _SD_TRB {
-  SD_PEIM_HC_SLOT                   *Slot;
-  UINT16                            BlockSize;
+  SD_PEIM_HC_SLOT         *Slot;
+  UINT16                  BlockSize;
 
-  SD_COMMAND_PACKET                 *Packet;
-  VOID                              *Data;
-  UINT32                            DataLen;
-  BOOLEAN                           Read;
-  EFI_PHYSICAL_ADDRESS              DataPhy;
-  VOID                              *DataMap;
-  SD_HC_TRANSFER_MODE               Mode;
+  SD_COMMAND_PACKET       *Packet;
+  VOID                    *Data;
+  UINT32                  DataLen;
+  BOOLEAN                 Read;
+  EFI_PHYSICAL_ADDRESS    DataPhy;
+  VOID                    *DataMap;
+  SD_HC_TRANSFER_MODE     Mode;
 
-  UINT64                            Timeout;
+  UINT64                  Timeout;
 
-  SD_HC_ADMA_DESC_LINE              *AdmaDesc;
-  UINTN                             AdmaDescSize;
+  SD_HC_ADMA_DESC_LINE    *AdmaDesc;
+  UINTN                   AdmaDescSize;
 };
 
 /**
@@ -234,9 +234,9 @@ SdBlockIoPeimReadBlocks (
 EFI_STATUS
 EFIAPI
 SdBlockIoPeimGetDeviceNo2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  OUT UINTN                          *NumberBlockDevices
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  OUT UINTN                           *NumberBlockDevices
   );
 
 /**
@@ -283,10 +283,10 @@ SdBlockIoPeimGetDeviceNo2 (
 EFI_STATUS
 EFIAPI
 SdBlockIoPeimGetMediaInfo2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  IN  UINTN                          DeviceIndex,
-  OUT EFI_PEI_BLOCK_IO2_MEDIA        *MediaInfo
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  IN  UINTN                           DeviceIndex,
+  OUT EFI_PEI_BLOCK_IO2_MEDIA         *MediaInfo
   );
 
 /**
@@ -326,12 +326,12 @@ SdBlockIoPeimGetMediaInfo2 (
 EFI_STATUS
 EFIAPI
 SdBlockIoPeimReadBlocks2 (
-  IN  EFI_PEI_SERVICES               **PeiServices,
-  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI *This,
-  IN  UINTN                          DeviceIndex,
-  IN  EFI_PEI_LBA                    StartLBA,
-  IN  UINTN                          BufferSize,
-  OUT VOID                           *Buffer
+  IN  EFI_PEI_SERVICES                **PeiServices,
+  IN  EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *This,
+  IN  UINTN                           DeviceIndex,
+  IN  EFI_PEI_LBA                     StartLBA,
+  IN  UINTN                           BufferSize,
+  OUT VOID                            *Buffer
   );
 
 /**
@@ -345,7 +345,7 @@ SdBlockIoPeimReadBlocks2 (
 **/
 EFI_STATUS
 SdPeimInitMemPool (
-  IN  SD_PEIM_HC_PRIVATE_DATA      *Private
+  IN  SD_PEIM_HC_PRIVATE_DATA  *Private
   );
 
 /**
@@ -359,7 +359,7 @@ SdPeimInitMemPool (
 **/
 EFI_STATUS
 SdPeimFreeMemPool (
-  IN SD_PEIM_MEM_POOL       *Pool
+  IN SD_PEIM_MEM_POOL  *Pool
   );
 
 /**
@@ -374,8 +374,8 @@ SdPeimFreeMemPool (
 **/
 VOID *
 SdPeimAllocateMem (
-  IN  SD_PEIM_MEM_POOL        *Pool,
-  IN  UINTN                    Size
+  IN  SD_PEIM_MEM_POOL  *Pool,
+  IN  UINTN             Size
   );
 
 /**
@@ -388,9 +388,9 @@ SdPeimAllocateMem (
 **/
 VOID
 SdPeimFreeMem (
-  IN SD_PEIM_MEM_POOL    *Pool,
-  IN VOID                 *Mem,
-  IN UINTN                Size
+  IN SD_PEIM_MEM_POOL  *Pool,
+  IN VOID              *Mem,
+  IN UINTN             Size
   );
 
 /**
@@ -422,11 +422,11 @@ IoMmuInit (
 **/
 EFI_STATUS
 IoMmuMap (
-  IN  EDKII_IOMMU_OPERATION Operation,
-  IN  VOID                  *HostAddress,
-  IN  OUT UINTN             *NumberOfBytes,
-  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
-  OUT VOID                  **Mapping
+  IN  EDKII_IOMMU_OPERATION  Operation,
+  IN  VOID                   *HostAddress,
+  IN  OUT UINTN              *NumberOfBytes,
+  OUT EFI_PHYSICAL_ADDRESS   *DeviceAddress,
+  OUT VOID                   **Mapping
   );
 
 /**
@@ -440,7 +440,7 @@ IoMmuMap (
 **/
 EFI_STATUS
 IoMmuUnmap (
-  IN VOID                  *Mapping
+  IN VOID  *Mapping
   );
 
 /**
@@ -483,9 +483,9 @@ IoMmuAllocateBuffer (
 **/
 EFI_STATUS
 IoMmuFreeBuffer (
-  IN UINTN                  Pages,
-  IN VOID                   *HostAddress,
-  IN VOID                   *Mapping
+  IN UINTN  Pages,
+  IN VOID   *HostAddress,
+  IN VOID   *Mapping
   );
 
 /**

@@ -16,8 +16,8 @@
 #define EDKII_PLATFORM_SPECIFIC_RESET_HANDLER_PPI_GUID \
   { 0x75cf14ae, 0x3441, 0x49dc, { 0xaa, 0x10, 0xbb, 0x35, 0xa7, 0xba, 0x8b, 0xab } }
 
-typedef EFI_RESET_NOTIFICATION_PROTOCOL  EDKII_PLATFORM_SPECIFIC_RESET_HANDLER_PPI;
+typedef EFI_RESET_NOTIFICATION_PROTOCOL EDKII_PLATFORM_SPECIFIC_RESET_HANDLER_PPI;
 
-extern EFI_GUID gEdkiiPlatformSpecificResetHandlerPpiGuid;
+extern EFI_GUID  gEdkiiPlatformSpecificResetHandlerPpiGuid;
 
 #endif

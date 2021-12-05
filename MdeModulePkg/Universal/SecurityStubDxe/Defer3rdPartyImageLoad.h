@@ -55,10 +55,10 @@ EFIAPI
 GetDefferedImageInfo (
   IN     EFI_DEFERRED_IMAGE_LOAD_PROTOCOL  *This,
   IN     UINTN                             ImageIndex,
-     OUT EFI_DEVICE_PATH_PROTOCOL          **ImageDevicePath,
-     OUT VOID                              **Image,
-     OUT UINTN                             *ImageSize,
-     OUT BOOLEAN                           *BootOption
+  OUT EFI_DEVICE_PATH_PROTOCOL             **ImageDevicePath,
+  OUT VOID                                 **Image,
+  OUT UINTN                                *ImageSize,
+  OUT BOOLEAN                              *BootOption
   );
 
 /**
@@ -74,8 +74,8 @@ GetDefferedImageInfo (
 **/
 EFI_STATUS
 Defer3rdPartyImageLoad (
-  IN  CONST EFI_DEVICE_PATH_PROTOCOL   *File,
-  IN  BOOLEAN                          BootPolicy
+  IN  CONST EFI_DEVICE_PATH_PROTOCOL  *File,
+  IN  BOOLEAN                         BootPolicy
   );
 
 /**

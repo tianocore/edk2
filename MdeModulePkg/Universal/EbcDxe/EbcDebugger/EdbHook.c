@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 EbcDebuggerCheckHookFlag (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT32     Flag
+  IN VM_CONTEXT  *VmPtr,
+  IN UINT32      Flag
   )
 {
   if ((mDebuggerPrivate.FeatureFlags & Flag) == Flag) {
@@ -30,7 +30,8 @@ EbcDebuggerCheckHookFlag (
       VmPtr
       );
   }
-  return ;
+
+  return;
 }
 
 /**
@@ -43,25 +44,26 @@ EbcDebuggerCheckHookFlag (
 **/
 VOID
 EbcDebuggerPushCallstackSource (
-  IN UINT64                   SourceEntry,
-  IN EFI_DEBUGGER_BRANCH_TYPE Type
+  IN UINT64                    SourceEntry,
+  IN EFI_DEBUGGER_BRANCH_TYPE  Type
   )
 {
   if (mDebuggerPrivate.CallStackEntryCount > EFI_DEBUGGER_CALLSTACK_MAX) {
     ASSERT (FALSE);
     mDebuggerPrivate.CallStackEntryCount = EFI_DEBUGGER_CALLSTACK_MAX;
   }
+
   //
   // Record the new callstack entry
   //
   mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].SourceAddress = SourceEntry;
-  mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].Type = Type;
+  mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].Type          = Type;
 
   //
   // Do not change CallStackEntryCount
   //
 
-  return ;
+  return;
 }
 
 /**
@@ -74,14 +76,15 @@ EbcDebuggerPushCallstackSource (
 **/
 VOID
 EbcDebuggerPushCallstackParameter (
-  IN UINT64                   ParameterAddress,
-  IN EFI_DEBUGGER_BRANCH_TYPE Type
+  IN UINT64                    ParameterAddress,
+  IN EFI_DEBUGGER_BRANCH_TYPE  Type
   )
 {
   if (mDebuggerPrivate.CallStackEntryCount > EFI_DEBUGGER_CALLSTACK_MAX) {
     ASSERT (FALSE);
     mDebuggerPrivate.CallStackEntryCount = EFI_DEBUGGER_CALLSTACK_MAX;
   }
+
   //
   // Record the new callstack parameter
   //
@@ -89,14 +92,14 @@ EbcDebuggerPushCallstackParameter (
   CopyMem (
     mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].Parameter,
     (VOID *)(UINTN)ParameterAddress,
-    sizeof(mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].Parameter)
+    sizeof (mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].Parameter)
     );
 
   //
   // Do not change CallStackEntryCount
   //
 
-  return ;
+  return;
 }
 
 /**
@@ -109,11 +112,11 @@ EbcDebuggerPushCallstackParameter (
 **/
 VOID
 EbcDebuggerPushCallstackDest (
-  IN UINT64                   DestEntry,
-  IN EFI_DEBUGGER_BRANCH_TYPE Type
+  IN UINT64                    DestEntry,
+  IN EFI_DEBUGGER_BRANCH_TYPE  Type
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   if (mDebuggerPrivate.CallStackEntryCount < EFI_DEBUGGER_CALLSTACK_MAX) {
     //
@@ -121,23 +124,25 @@ EbcDebuggerPushCallstackDest (
     //
     ASSERT (mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].Type == Type);
     mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].DestAddress = DestEntry;
-    mDebuggerPrivate.CallStackEntryCount ++;
+    mDebuggerPrivate.CallStackEntryCount++;
   } else {
     //
     // If there is no empty entry for callstack, throw the oldest one
     //
     ASSERT (mDebuggerPrivate.CallStackEntry[EFI_DEBUGGER_TRACE_MAX].Type == Type);
     for (Index = 0; Index < EFI_DEBUGGER_CALLSTACK_MAX; Index++) {
-      CopyMem (&mDebuggerPrivate.CallStackEntry[Index],
-               &mDebuggerPrivate.CallStackEntry[Index + 1],
-               sizeof (mDebuggerPrivate.CallStackEntry[Index])
-               );
+      CopyMem (
+        &mDebuggerPrivate.CallStackEntry[Index],
+        &mDebuggerPrivate.CallStackEntry[Index + 1],
+        sizeof (mDebuggerPrivate.CallStackEntry[Index])
+        );
     }
+
     mDebuggerPrivate.CallStackEntry[EFI_DEBUGGER_CALLSTACK_MAX - 1].DestAddress = DestEntry;
-    mDebuggerPrivate.CallStackEntryCount = EFI_DEBUGGER_CALLSTACK_MAX;
+    mDebuggerPrivate.CallStackEntryCount                                        = EFI_DEBUGGER_CALLSTACK_MAX;
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -151,13 +156,14 @@ EbcDebuggerPopCallstack (
   )
 {
   if ((mDebuggerPrivate.CallStackEntryCount > 0) &&
-      (mDebuggerPrivate.CallStackEntryCount <= EFI_DEBUGGER_CALLSTACK_MAX)) {
+      (mDebuggerPrivate.CallStackEntryCount <= EFI_DEBUGGER_CALLSTACK_MAX))
+  {
     //
     // Throw the newest one
     //
-    mDebuggerPrivate.CallStackEntryCount --;
+    mDebuggerPrivate.CallStackEntryCount--;
     mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].SourceAddress = 0;
-    mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].DestAddress = 0;
+    mDebuggerPrivate.CallStackEntry[mDebuggerPrivate.CallStackEntryCount].DestAddress   = 0;
   } else if (mDebuggerPrivate.CallStackEntryCount == 0) {
     //
     // NOT assert here because it is reasonable, because when we start to build
@@ -167,7 +173,7 @@ EbcDebuggerPopCallstack (
     ASSERT (FALSE);
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -180,25 +186,26 @@ EbcDebuggerPopCallstack (
 **/
 VOID
 EbcDebuggerPushTraceSourceEntry (
-  IN UINT64                   SourceEntry,
-  IN EFI_DEBUGGER_BRANCH_TYPE Type
+  IN UINT64                    SourceEntry,
+  IN EFI_DEBUGGER_BRANCH_TYPE  Type
   )
 {
   if (mDebuggerPrivate.TraceEntryCount > EFI_DEBUGGER_TRACE_MAX) {
     ASSERT (FALSE);
     mDebuggerPrivate.TraceEntryCount = EFI_DEBUGGER_TRACE_MAX;
   }
+
   //
   // Record the new trace entry
   //
   mDebuggerPrivate.TraceEntry[mDebuggerPrivate.TraceEntryCount].SourceAddress = SourceEntry;
-  mDebuggerPrivate.TraceEntry[mDebuggerPrivate.TraceEntryCount].Type = Type;
+  mDebuggerPrivate.TraceEntry[mDebuggerPrivate.TraceEntryCount].Type          = Type;
 
   //
   // Do not change TraceEntryCount
   //
 
-  return ;
+  return;
 }
 
 /**
@@ -211,11 +218,11 @@ EbcDebuggerPushTraceSourceEntry (
 **/
 VOID
 EbcDebuggerPushTraceDestEntry (
-  IN UINT64                   DestEntry,
-  IN EFI_DEBUGGER_BRANCH_TYPE Type
+  IN UINT64                    DestEntry,
+  IN EFI_DEBUGGER_BRANCH_TYPE  Type
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   if (mDebuggerPrivate.TraceEntryCount < EFI_DEBUGGER_TRACE_MAX) {
     //
@@ -223,7 +230,7 @@ EbcDebuggerPushTraceDestEntry (
     //
     ASSERT (mDebuggerPrivate.TraceEntry[mDebuggerPrivate.TraceEntryCount].Type == Type);
     mDebuggerPrivate.TraceEntry[mDebuggerPrivate.TraceEntryCount].DestAddress = DestEntry;
-    mDebuggerPrivate.TraceEntryCount ++;
+    mDebuggerPrivate.TraceEntryCount++;
   } else {
     //
     // If there is no empty entry for trace, throw the oldest one
@@ -236,11 +243,12 @@ EbcDebuggerPushTraceDestEntry (
         sizeof (mDebuggerPrivate.TraceEntry[Index])
         );
     }
+
     mDebuggerPrivate.TraceEntry[EFI_DEBUGGER_CALLSTACK_MAX - 1].DestAddress = DestEntry;
-    mDebuggerPrivate.TraceEntryCount = EFI_DEBUGGER_TRACE_MAX;
+    mDebuggerPrivate.TraceEntryCount                                        = EFI_DEBUGGER_TRACE_MAX;
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -254,31 +262,33 @@ EbcDebuggerPushTraceDestEntry (
 **/
 VOID
 EbcDebuggerPushStepEntry (
-  IN UINT64                   Entry,
-  IN UINT64                   FramePtr,
-  IN UINT32                   Flag
+  IN UINT64  Entry,
+  IN UINT64  FramePtr,
+  IN UINT32  Flag
   )
 {
   //
   // Check StepOver
   //
   if ((Flag == EFI_DEBUG_FLAG_EBC_STEPOVER) &&
-      ((mDebuggerPrivate.FeatureFlags & EFI_DEBUG_FLAG_EBC_STEPOVER) == EFI_DEBUG_FLAG_EBC_STEPOVER)) {
+      ((mDebuggerPrivate.FeatureFlags & EFI_DEBUG_FLAG_EBC_STEPOVER) == EFI_DEBUG_FLAG_EBC_STEPOVER))
+  {
     mDebuggerPrivate.StepContext.BreakAddress = Entry;
     mDebuggerPrivate.StepContext.FramePointer = FramePtr;
-    mDebuggerPrivate.FeatureFlags &= ~EFI_DEBUG_FLAG_EBC_B_STEPOVER;
+    mDebuggerPrivate.FeatureFlags            &= ~EFI_DEBUG_FLAG_EBC_B_STEPOVER;
   }
+
   //
   // Check StepOut
   //
   if ((Flag == EFI_DEBUG_FLAG_EBC_STEPOUT) &&
-      ((mDebuggerPrivate.FeatureFlags & EFI_DEBUG_FLAG_EBC_STEPOUT) == EFI_DEBUG_FLAG_EBC_STEPOUT)) {
+      ((mDebuggerPrivate.FeatureFlags & EFI_DEBUG_FLAG_EBC_STEPOUT) == EFI_DEBUG_FLAG_EBC_STEPOUT))
+  {
     mDebuggerPrivate.StepContext.BreakAddress = Entry;
     mDebuggerPrivate.StepContext.FramePointer = FramePtr;
-    mDebuggerPrivate.FeatureFlags &= ~EFI_DEBUG_FLAG_EBC_B_STEPOUT;
+    mDebuggerPrivate.FeatureFlags            &= ~EFI_DEBUG_FLAG_EBC_B_STEPOUT;
   }
 }
-
 
 /**
   Notify the callback function when an event is triggered.
@@ -290,14 +300,14 @@ EbcDebuggerPushStepEntry (
 VOID
 EFIAPI
 EbcDebuggerBreakEventFunc (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   EFI_STATUS  Status;
 
   if ((mDebuggerPrivate.FeatureFlags & EFI_DEBUG_FLAG_EBC_BOK) != EFI_DEBUG_FLAG_EBC_BOK) {
-    return ;
+    return;
   }
 
   Status = gBS->CheckEvent (gST->ConIn->WaitForKey);
@@ -321,44 +331,43 @@ EbcDebuggerHookInit (
   IN EFI_DEBUG_SUPPORT_PROTOCOL  *EbcDebugProtocol
   )
 {
-  EFI_STATUS                 Status;
-  UINTN                      Index;
-  EFI_DEBUGGER_SYMBOL_OBJECT *Object;
-  EFI_DEBUGGER_SYMBOL_ENTRY  *Entry;
-
+  EFI_STATUS                  Status;
+  UINTN                       Index;
+  EFI_DEBUGGER_SYMBOL_OBJECT  *Object;
+  EFI_DEBUGGER_SYMBOL_ENTRY   *Entry;
 
   //
   // Register all exception handler
   //
   for (Index = EXCEPT_EBC_UNDEFINED; Index <= EXCEPT_EBC_STEP; Index++) {
     EbcDebugProtocol->RegisterExceptionCallback (
-      EbcDebugProtocol,
-      0,
-      NULL,
-      Index
-      );
+                        EbcDebugProtocol,
+                        0,
+                        NULL,
+                        Index
+                        );
     EbcDebugProtocol->RegisterExceptionCallback (
-      EbcDebugProtocol,
-      0,
-      EdbExceptionHandler,
-      Index
-      );
+                        EbcDebugProtocol,
+                        0,
+                        EdbExceptionHandler,
+                        Index
+                        );
   }
 
   //
   // Init Symbol
   //
-  Object = AllocateZeroPool (sizeof(EFI_DEBUGGER_SYMBOL_OBJECT) * EFI_DEBUGGER_SYMBOL_OBJECT_MAX);
+  Object = AllocateZeroPool (sizeof (EFI_DEBUGGER_SYMBOL_OBJECT) * EFI_DEBUGGER_SYMBOL_OBJECT_MAX);
   ASSERT (Object != NULL);
-  mDebuggerPrivate.DebuggerSymbolContext.Object = Object;
-  mDebuggerPrivate.DebuggerSymbolContext.ObjectCount = 0;
+  mDebuggerPrivate.DebuggerSymbolContext.Object         = Object;
+  mDebuggerPrivate.DebuggerSymbolContext.ObjectCount    = 0;
   mDebuggerPrivate.DebuggerSymbolContext.MaxObjectCount = EFI_DEBUGGER_SYMBOL_OBJECT_MAX;
   for (Index = 0; Index < EFI_DEBUGGER_SYMBOL_OBJECT_MAX; Index++) {
-    Entry = AllocateZeroPool (sizeof(EFI_DEBUGGER_SYMBOL_ENTRY) * EFI_DEBUGGER_SYMBOL_ENTRY_MAX);
+    Entry = AllocateZeroPool (sizeof (EFI_DEBUGGER_SYMBOL_ENTRY) * EFI_DEBUGGER_SYMBOL_ENTRY_MAX);
     ASSERT (Entry != NULL);
-    Object[Index].Entry = Entry;
+    Object[Index].Entry         = Entry;
     Object[Index].MaxEntryCount = EFI_DEBUGGER_SYMBOL_ENTRY_MAX;
-    Object[Index].SourceBuffer = AllocateZeroPool (sizeof(VOID *) * (EFI_DEBUGGER_SYMBOL_ENTRY_MAX + 1));
+    Object[Index].SourceBuffer  = AllocateZeroPool (sizeof (VOID *) * (EFI_DEBUGGER_SYMBOL_ENTRY_MAX + 1));
     ASSERT (Object[Index].SourceBuffer != NULL);
   }
 
@@ -368,7 +377,7 @@ EbcDebuggerHookInit (
   Status = gBS->LocateProtocol (
                   &gEfiPciRootBridgeIoProtocolGuid,
                   NULL,
-                  (VOID**) &mDebuggerPrivate.PciRootBridgeIo
+                  (VOID **)&mDebuggerPrivate.PciRootBridgeIo
                   );
 
   //
@@ -376,7 +385,7 @@ EbcDebuggerHookInit (
   //
   Status = EfiGetSystemConfigurationTable (
              &gEfiDebugImageInfoTableGuid,
-             (VOID**) &mDebuggerPrivate.DebugImageInfoTableHeader
+             (VOID **)&mDebuggerPrivate.DebugImageInfoTableHeader
              );
 
   //
@@ -408,7 +417,7 @@ EbcDebuggerHookInit (
                     );
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -422,9 +431,9 @@ EbcDebuggerHookUnload (
   VOID
   )
 {
-  UINTN                      Index;
-  UINTN                      SubIndex;
-  EFI_DEBUGGER_SYMBOL_OBJECT *Object;
+  UINTN                       Index;
+  UINTN                       SubIndex;
+  EFI_DEBUGGER_SYMBOL_OBJECT  *Object;
 
   //
   // Close the break event
@@ -442,7 +451,7 @@ EbcDebuggerHookUnload (
     // Clean up Entry
     //
     gBS->FreePool (Object[Index].Entry);
-    Object[Index].Entry = NULL;
+    Object[Index].Entry      = NULL;
     Object[Index].EntryCount = 0;
     //
     // Clean up source buffer
@@ -451,6 +460,7 @@ EbcDebuggerHookUnload (
       gBS->FreePool (Object[Index].SourceBuffer[SubIndex]);
       Object[Index].SourceBuffer[SubIndex] = NULL;
     }
+
     gBS->FreePool (Object[Index].SourceBuffer);
     Object[Index].SourceBuffer = NULL;
   }
@@ -459,13 +469,13 @@ EbcDebuggerHookUnload (
   // Clean up Object
   //
   gBS->FreePool (Object);
-  mDebuggerPrivate.DebuggerSymbolContext.Object = NULL;
+  mDebuggerPrivate.DebuggerSymbolContext.Object      = NULL;
   mDebuggerPrivate.DebuggerSymbolContext.ObjectCount = 0;
 
   //
   // Done
   //
-  return ;
+  return;
 }
 
 /**
@@ -478,10 +488,10 @@ EbcDebuggerHookUnload (
 **/
 VOID
 EbcDebuggerHookEbcUnloadImage (
-  IN EFI_HANDLE                  Handle
+  IN EFI_HANDLE  Handle
   )
 {
-  return ;
+  return;
 }
 
 /**
@@ -496,14 +506,14 @@ EbcDebuggerHookEbcUnloadImage (
 **/
 VOID
 EbcDebuggerHookExecuteEbcImageEntryPoint (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   EbcDebuggerPushCallstackSource ((UINT64)(UINTN)-1, EfiDebuggerBranchTypeEbcCall);
   EbcDebuggerPushCallstackParameter ((UINT64)(UINTN)VmPtr->Gpr[0], EfiDebuggerBranchTypeEbcCall);
   EbcDebuggerPushCallstackDest ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCall);
   EbcDebuggerCheckHookFlag (VmPtr, EFI_DEBUG_FLAG_EBC_BOE);
-  return ;
+  return;
 }
 
 /**
@@ -517,14 +527,14 @@ EbcDebuggerHookExecuteEbcImageEntryPoint (
 **/
 VOID
 EbcDebuggerHookEbcInterpret (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   EbcDebuggerPushCallstackSource ((UINT64)(UINTN)-2, EfiDebuggerBranchTypeEbcCall);
   EbcDebuggerPushCallstackParameter ((UINT64)(UINTN)VmPtr->Gpr[0], EfiDebuggerBranchTypeEbcCall);
   EbcDebuggerPushCallstackDest ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCall);
   EbcDebuggerCheckHookFlag (VmPtr, EFI_DEBUG_FLAG_EBC_BOT);
-  return ;
+  return;
 }
 
 /**
@@ -537,16 +547,16 @@ EbcDebuggerHookEbcInterpret (
 **/
 VOID
 EbcDebuggerHookExecuteStart (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
-  EFI_TPL   CurrentTpl;
+  EFI_TPL  CurrentTpl;
 
   //
   // Check Ip for GoTil
   //
   if (mDebuggerPrivate.GoTilContext.BreakAddress == (UINT64)(UINTN)VmPtr->Ip) {
-    mDebuggerPrivate.StatusFlags = EFI_DEBUG_FLAG_EBC_GT;
+    mDebuggerPrivate.StatusFlags               = EFI_DEBUG_FLAG_EBC_GT;
     mDebuggerPrivate.GoTilContext.BreakAddress = 0;
     EbcDebugSignalException (
       EXCEPT_EBC_BREAKPOINT,
@@ -554,14 +564,16 @@ EbcDebuggerHookExecuteStart (
       VmPtr
       );
     mDebuggerPrivate.StatusFlags &= ~EFI_DEBUG_FLAG_EBC_B_GT;
-    return ;
+    return;
   }
+
   //
   // Check ReturnAddress for StepOver
   //
   if ((mDebuggerPrivate.StepContext.BreakAddress == (UINT64)(UINTN)VmPtr->Ip) &&
-      (mDebuggerPrivate.StepContext.FramePointer == (UINT64)(UINTN)VmPtr->FramePtr)) {
-    mDebuggerPrivate.StatusFlags = EFI_DEBUG_FLAG_EBC_STEPOVER;
+      (mDebuggerPrivate.StepContext.FramePointer == (UINT64)(UINTN)VmPtr->FramePtr))
+  {
+    mDebuggerPrivate.StatusFlags              = EFI_DEBUG_FLAG_EBC_STEPOVER;
     mDebuggerPrivate.StepContext.BreakAddress = 0;
     mDebuggerPrivate.StepContext.FramePointer = 0;
     EbcDebugSignalException (
@@ -571,11 +583,12 @@ EbcDebuggerHookExecuteStart (
       );
     mDebuggerPrivate.StatusFlags &= ~EFI_DEBUG_FLAG_EBC_B_STEPOVER;
   }
+
   //
   // Check FramePtr for StepOut
   //
   if (mDebuggerPrivate.StepContext.BreakAddress == (UINT64)(UINTN)VmPtr->FramePtr) {
-    mDebuggerPrivate.StatusFlags = EFI_DEBUG_FLAG_EBC_STEPOUT;
+    mDebuggerPrivate.StatusFlags              = EFI_DEBUG_FLAG_EBC_STEPOUT;
     mDebuggerPrivate.StepContext.BreakAddress = 0;
     mDebuggerPrivate.StepContext.FramePointer = 0;
     EbcDebugSignalException (
@@ -585,6 +598,7 @@ EbcDebuggerHookExecuteStart (
       );
     mDebuggerPrivate.StatusFlags &= ~EFI_DEBUG_FLAG_EBC_B_STEPOUT;
   }
+
   //
   // Check Flags for BreakOnKey
   //
@@ -603,7 +617,8 @@ EbcDebuggerHookExecuteStart (
       mDebuggerPrivate.StatusFlags &= ~EFI_DEBUG_FLAG_EBC_B_BOK;
     }
   }
-  return ;
+
+  return;
 }
 
 /**
@@ -616,7 +631,7 @@ EbcDebuggerHookExecuteStart (
 **/
 VOID
 EbcDebuggerHookExecuteEnd (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   UINTN  Address;
@@ -624,10 +639,10 @@ EbcDebuggerHookExecuteEnd (
   //
   // Use FramePtr as checkpoint for StepOut
   //
-  CopyMem (&Address, (VOID *)((UINTN)VmPtr->FramePtr), sizeof(Address));
+  CopyMem (&Address, (VOID *)((UINTN)VmPtr->FramePtr), sizeof (Address));
   EbcDebuggerPushStepEntry (Address, (UINT64)(UINTN)VmPtr->FramePtr, EFI_DEBUG_FLAG_EBC_STEPOUT);
 
-  return ;
+  return;
 }
 
 /**
@@ -641,14 +656,14 @@ EbcDebuggerHookExecuteEnd (
 **/
 VOID
 EbcDebuggerHookCALLStart (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   EbcDebuggerCheckHookFlag (VmPtr, EFI_DEBUG_FLAG_EBC_BOC);
   EbcDebuggerPushCallstackSource ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCall);
   EbcDebuggerPushCallstackParameter ((UINT64)(UINTN)VmPtr->Gpr[0], EfiDebuggerBranchTypeEbcCall);
   EbcDebuggerPushTraceSourceEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCall);
-  return ;
+  return;
 }
 
 /**
@@ -662,7 +677,7 @@ EbcDebuggerHookCALLStart (
 **/
 VOID
 EbcDebuggerHookCALLEnd (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   UINT64  Address;
@@ -674,22 +689,22 @@ EbcDebuggerHookCALLEnd (
   //
   // Get Old FramePtr
   //
-  CopyMem (&FramePtr, (VOID *)((UINTN)VmPtr->FramePtr), sizeof(FramePtr));
+  CopyMem (&FramePtr, (VOID *)((UINTN)VmPtr->FramePtr), sizeof (FramePtr));
 
   //
   // Use ReturnAddress as checkpoint for StepOver
   //
-  CopyMem (&Address, (VOID *)(UINTN)VmPtr->Gpr[0], sizeof(Address));
+  CopyMem (&Address, (VOID *)(UINTN)VmPtr->Gpr[0], sizeof (Address));
   EbcDebuggerPushStepEntry (Address, FramePtr, EFI_DEBUG_FLAG_EBC_STEPOVER);
 
   //
   // Use FramePtr as checkpoint for StepOut
   //
   Address = 0;
-  CopyMem (&Address, (VOID *)(FramePtr), sizeof(UINTN));
+  CopyMem (&Address, (VOID *)(FramePtr), sizeof (UINTN));
   EbcDebuggerPushStepEntry (Address, FramePtr, EFI_DEBUG_FLAG_EBC_STEPOUT);
 
-  return ;
+  return;
 }
 
 /**
@@ -703,14 +718,14 @@ EbcDebuggerHookCALLEnd (
 **/
 VOID
 EbcDebuggerHookCALLEXStart (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   EbcDebuggerCheckHookFlag (VmPtr, EFI_DEBUG_FLAG_EBC_BOCX);
-//  EbcDebuggerPushCallstackSource ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCallEx);
-//  EbcDebuggerPushCallstackParameter ((UINT64)(UINTN)VmPtr->R[0], EfiDebuggerBranchTypeEbcCallEx);
+  //  EbcDebuggerPushCallstackSource ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCallEx);
+  //  EbcDebuggerPushCallstackParameter ((UINT64)(UINTN)VmPtr->R[0], EfiDebuggerBranchTypeEbcCallEx);
   EbcDebuggerPushTraceSourceEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCallEx);
-  return ;
+  return;
 }
 
 /**
@@ -723,12 +738,12 @@ EbcDebuggerHookCALLEXStart (
 **/
 VOID
 EbcDebuggerHookCALLEXEnd (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
-//  EbcDebuggerPushCallstackDest ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCallEx);
+  //  EbcDebuggerPushCallstackDest ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCallEx);
   EbcDebuggerPushTraceDestEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcCallEx);
-  return ;
+  return;
 }
 
 /**
@@ -742,13 +757,13 @@ EbcDebuggerHookCALLEXEnd (
 **/
 VOID
 EbcDebuggerHookRETStart (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   EbcDebuggerCheckHookFlag (VmPtr, EFI_DEBUG_FLAG_EBC_BOR);
   EbcDebuggerPopCallstack ();
   EbcDebuggerPushTraceSourceEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcRet);
-  return ;
+  return;
 }
 
 /**
@@ -761,11 +776,11 @@ EbcDebuggerHookRETStart (
 **/
 VOID
 EbcDebuggerHookRETEnd (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   EbcDebuggerPushTraceDestEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcRet);
-  return ;
+  return;
 }
 
 /**
@@ -778,11 +793,11 @@ EbcDebuggerHookRETEnd (
 **/
 VOID
 EbcDebuggerHookJMPStart (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   EbcDebuggerPushTraceSourceEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcJmp);
-  return ;
+  return;
 }
 
 /**
@@ -795,11 +810,11 @@ EbcDebuggerHookJMPStart (
 **/
 VOID
 EbcDebuggerHookJMPEnd (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   EbcDebuggerPushTraceDestEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcJmp);
-  return ;
+  return;
 }
 
 /**
@@ -812,11 +827,11 @@ EbcDebuggerHookJMPEnd (
 **/
 VOID
 EbcDebuggerHookJMP8Start (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   EbcDebuggerPushTraceSourceEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcJmp8);
-  return ;
+  return;
 }
 
 /**
@@ -829,9 +844,9 @@ EbcDebuggerHookJMP8Start (
 **/
 VOID
 EbcDebuggerHookJMP8End (
-  IN VM_CONTEXT *VmPtr
+  IN VM_CONTEXT  *VmPtr
   )
 {
   EbcDebuggerPushTraceDestEntry ((UINT64)(UINTN)VmPtr->Ip, EfiDebuggerBranchTypeEbcJmp8);
-  return ;
+  return;
 }

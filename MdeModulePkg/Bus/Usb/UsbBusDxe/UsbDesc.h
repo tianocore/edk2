@@ -26,11 +26,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #pragma pack(1)
 typedef struct {
-  UINT8                   Len;
-  UINT8                   Type;
+  UINT8    Len;
+  UINT8    Type;
 } USB_DESC_HEAD;
 #pragma pack()
-
 
 //
 // Each USB device has a device descriptor. Each device may
@@ -42,13 +41,13 @@ typedef struct {
 // structure.
 //
 typedef struct {
-  EFI_USB_ENDPOINT_DESCRIPTOR   Desc;
-  UINT8                         Toggle;
+  EFI_USB_ENDPOINT_DESCRIPTOR    Desc;
+  UINT8                          Toggle;
 } USB_ENDPOINT_DESC;
 
 typedef struct {
-  EFI_USB_INTERFACE_DESCRIPTOR  Desc;
-  USB_ENDPOINT_DESC             **Endpoints;
+  EFI_USB_INTERFACE_DESCRIPTOR    Desc;
+  USB_ENDPOINT_DESC               **Endpoints;
 } USB_INTERFACE_SETTING;
 
 //
@@ -57,19 +56,19 @@ typedef struct {
 // It should sufice in most environments.
 //
 typedef struct {
-  USB_INTERFACE_SETTING*        Settings[USB_MAX_INTERFACE_SETTING];
-  UINTN                         NumOfSetting;
-  UINTN                         ActiveIndex;  // Index of active setting
+  USB_INTERFACE_SETTING    *Settings[USB_MAX_INTERFACE_SETTING];
+  UINTN                    NumOfSetting;
+  UINTN                    ActiveIndex;       // Index of active setting
 } USB_INTERFACE_DESC;
 
 typedef struct {
-  EFI_USB_CONFIG_DESCRIPTOR     Desc;
-  USB_INTERFACE_DESC            **Interfaces;
+  EFI_USB_CONFIG_DESCRIPTOR    Desc;
+  USB_INTERFACE_DESC           **Interfaces;
 } USB_CONFIG_DESC;
 
 typedef struct {
-  EFI_USB_DEVICE_DESCRIPTOR     Desc;
-  USB_CONFIG_DESC               **Configs;
+  EFI_USB_DEVICE_DESCRIPTOR    Desc;
+  USB_CONFIG_DESC              **Configs;
 } USB_DEVICE_DESC;
 
 /**
@@ -94,15 +93,15 @@ typedef struct {
 **/
 EFI_STATUS
 UsbCtrlRequest (
-  IN USB_DEVICE             *UsbDev,
-  IN EFI_USB_DATA_DIRECTION Direction,
-  IN UINTN                  Type,
-  IN UINTN                  Target,
-  IN UINTN                  Request,
-  IN UINT16                 Value,
-  IN UINT16                 Index,
-  IN OUT VOID               *Buf,
-  IN UINTN                  Length
+  IN USB_DEVICE              *UsbDev,
+  IN EFI_USB_DATA_DIRECTION  Direction,
+  IN UINTN                   Type,
+  IN UINTN                   Target,
+  IN UINTN                   Request,
+  IN UINT16                  Value,
+  IN UINT16                  Index,
+  IN OUT VOID                *Buf,
+  IN UINTN                   Length
   );
 
 /**
@@ -118,7 +117,7 @@ UsbCtrlRequest (
 **/
 EFI_STATUS
 UsbGetMaxPacketSize0 (
-  IN USB_DEVICE           *UsbDev
+  IN USB_DEVICE  *UsbDev
   );
 
 /**
@@ -131,7 +130,7 @@ UsbGetMaxPacketSize0 (
 **/
 VOID
 UsbFreeDevDesc (
-  IN USB_DEVICE_DESC      *DevDesc
+  IN USB_DEVICE_DESC  *DevDesc
   );
 
 /**
@@ -146,11 +145,11 @@ UsbFreeDevDesc (
   @return The created string descriptor or NULL.
 
 **/
-EFI_USB_STRING_DESCRIPTOR*
+EFI_USB_STRING_DESCRIPTOR *
 UsbGetOneString (
-  IN     USB_DEVICE       *UsbDev,
-  IN     UINT8            StringIndex,
-  IN     UINT16           LangId
+  IN     USB_DEVICE  *UsbDev,
+  IN     UINT8       StringIndex,
+  IN     UINT16      LangId
   );
 
 /**
@@ -166,7 +165,7 @@ UsbGetOneString (
 **/
 EFI_STATUS
 UsbBuildDescTable (
-  IN USB_DEVICE           *UsbDev
+  IN USB_DEVICE  *UsbDev
   );
 
 /**
@@ -181,8 +180,8 @@ UsbBuildDescTable (
 **/
 EFI_STATUS
 UsbSetAddress (
-  IN USB_DEVICE           *UsbDev,
-  IN UINT8                Address
+  IN USB_DEVICE  *UsbDev,
+  IN UINT8       Address
   );
 
 /**
@@ -199,8 +198,8 @@ UsbSetAddress (
 **/
 EFI_STATUS
 UsbSetConfig (
-  IN USB_DEVICE           *UsbDev,
-  IN UINT8                ConfigIndex
+  IN USB_DEVICE  *UsbDev,
+  IN UINT8       ConfigIndex
   );
 
 /**
@@ -219,9 +218,10 @@ UsbSetConfig (
 **/
 EFI_STATUS
 UsbIoClearFeature (
-  IN  EFI_USB_IO_PROTOCOL *UsbIo,
-  IN  UINTN               Target,
-  IN  UINT16              Feature,
-  IN  UINT16              Index
+  IN  EFI_USB_IO_PROTOCOL  *UsbIo,
+  IN  UINTN                Target,
+  IN  UINT16               Feature,
+  IN  UINT16               Index
   );
+
 #endif

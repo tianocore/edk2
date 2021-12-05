@@ -20,10 +20,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 BOOLEAN
 IsEBCCALL (
-  IN UINTN            Address
+  IN UINTN  Address
   )
 {
-  if (GET_OPCODE(Address) != OPCODE_CALL) {
+  if (GET_OPCODE (Address) != OPCODE_CALL) {
     return FALSE;
   }
 
@@ -46,10 +46,10 @@ IsEBCCALL (
 **/
 BOOLEAN
 IsEBCRET (
-  IN UINTN            Address
+  IN UINTN  Address
   )
 {
-  if (GET_OPCODE(Address) != OPCODE_RET) {
+  if (GET_OPCODE (Address) != OPCODE_RET) {
     return FALSE;
   }
 
@@ -74,10 +74,10 @@ IsEBCRET (
 **/
 EFI_DEBUG_STATUS
 DebuggerStepInto (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
   SystemContext.SystemContextEbc->Flags |= VMFLAGS_STEP;
@@ -99,13 +99,13 @@ DebuggerStepInto (
 **/
 EFI_DEBUG_STATUS
 DebuggerStepOver (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
-  if (IsEBCCALL((UINTN)SystemContext.SystemContextEbc->Ip)) {
+  if (IsEBCCALL ((UINTN)SystemContext.SystemContextEbc->Ip)) {
     //
     // Check CALL (NOTE: CALLEX is exclusive)
     //
@@ -134,13 +134,13 @@ DebuggerStepOver (
 **/
 EFI_DEBUG_STATUS
 DebuggerStepOut (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
-  if (IsEBCRET((UINTN)SystemContext.SystemContextEbc->Ip)) {
+  if (IsEBCRET ((UINTN)SystemContext.SystemContextEbc->Ip)) {
     //
     // Check RET
     //

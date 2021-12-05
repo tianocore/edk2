@@ -34,19 +34,19 @@
 VOID
 EFIAPI
 PerformQuickSort (
-  IN OUT VOID                           *BufferToSort,
-  IN CONST UINTN                        Count,
-  IN CONST UINTN                        ElementSize,
-  IN       SORT_COMPARE                 CompareFunction
+  IN OUT VOID            *BufferToSort,
+  IN CONST UINTN         Count,
+  IN CONST UINTN         ElementSize,
+  IN       SORT_COMPARE  CompareFunction
   )
 {
   VOID  *Buffer;
 
-  ASSERT(BufferToSort     != NULL);
-  ASSERT(CompareFunction  != NULL);
+  ASSERT (BufferToSort     != NULL);
+  ASSERT (CompareFunction  != NULL);
 
-  Buffer = AllocateZeroPool(ElementSize);
-  ASSERT(Buffer != NULL);
+  Buffer = AllocateZeroPool (ElementSize);
+  ASSERT (Buffer != NULL);
 
   QuickSort (
     BufferToSort,
@@ -56,7 +56,7 @@ PerformQuickSort (
     Buffer
     );
 
-  FreePool(Buffer);
+  FreePool (Buffer);
   return;
 }
 
@@ -71,11 +71,11 @@ PerformQuickSort (
 INTN
 EFIAPI
 DevicePathCompare (
-  IN  CONST VOID             *Buffer1,
-  IN  CONST VOID             *Buffer2
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -90,14 +90,13 @@ DevicePathCompare (
 INTN
 EFIAPI
 StringNoCaseCompare (
-  IN  CONST VOID             *Buffer1,
-  IN  CONST VOID             *Buffer2
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
-
 
 /**
   Not supported in Base version.
@@ -110,12 +109,10 @@ StringNoCaseCompare (
 INTN
 EFIAPI
 StringCompare (
-  IN  CONST VOID                *Buffer1,
-  IN  CONST VOID                *Buffer2
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
-
-

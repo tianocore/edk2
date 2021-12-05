@@ -22,15 +22,14 @@
 //
 // Forward declaration for the EDKII_PEI_ATA_PASS_THRU_PPI.
 //
-typedef struct _EDKII_PEI_ATA_PASS_THRU_PPI  EDKII_PEI_ATA_PASS_THRU_PPI;
+typedef struct _EDKII_PEI_ATA_PASS_THRU_PPI EDKII_PEI_ATA_PASS_THRU_PPI;
 
 //
 // Revision The revision to which the ATA Pass Thru PPI interface adheres.
 //          All future revisions must be backwards compatible.
 //          If a future version is not back wards compatible it is not the same GUID.
 //
-#define EDKII_PEI_ATA_PASS_THRU_PPI_REVISION    0x00010000
-
+#define EDKII_PEI_ATA_PASS_THRU_PPI_REVISION  0x00010000
 
 /**
   Sends an ATA command to an ATA device that is attached to the ATA controller.
@@ -69,7 +68,7 @@ typedef struct _EDKII_PEI_ATA_PASS_THRU_PPI  EDKII_PEI_ATA_PASS_THRU_PPI;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_ATA_PASS_THRU_PASSTHRU) (
+(EFIAPI *EDKII_PEI_ATA_PASS_THRU_PASSTHRU)(
   IN     EDKII_PEI_ATA_PASS_THRU_PPI         *This,
   IN     UINT16                              Port,
   IN     UINT16                              PortMultiplierPort,
@@ -110,7 +109,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_ATA_PASS_THRU_THRU_GET_NEXT_PORT) (
+(EFIAPI *EDKII_PEI_ATA_PASS_THRU_THRU_GET_NEXT_PORT)(
   IN     EDKII_PEI_ATA_PASS_THRU_PPI    *This,
   IN OUT UINT16                         *Port
   );
@@ -164,7 +163,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_ATA_PASS_THRU_GET_NEXT_DEVICE) (
+(EFIAPI *EDKII_PEI_ATA_PASS_THRU_GET_NEXT_DEVICE)(
   IN     EDKII_PEI_ATA_PASS_THRU_PPI    *This,
   IN     UINT16                         Port,
   IN OUT UINT16                         *PortMultiplierPort
@@ -189,7 +188,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *EDKII_PEI_ATA_PASS_THRU_GET_DEVICE_PATH) (
+(EFIAPI *EDKII_PEI_ATA_PASS_THRU_GET_DEVICE_PATH)(
   IN  EDKII_PEI_ATA_PASS_THRU_PPI    *This,
   OUT UINTN                          *DevicePathLength,
   OUT EFI_DEVICE_PATH_PROTOCOL       **DevicePath
@@ -208,6 +207,6 @@ struct _EDKII_PEI_ATA_PASS_THRU_PPI {
   EDKII_PEI_ATA_PASS_THRU_GET_DEVICE_PATH       GetDevicePath;
 };
 
-extern EFI_GUID gEdkiiPeiAtaPassThruPpiGuid;
+extern EFI_GUID  gEdkiiPeiAtaPassThruPpiGuid;
 
 #endif

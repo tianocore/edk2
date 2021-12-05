@@ -63,10 +63,10 @@ EFI_STATUS
   );
 
 struct _EDKII_PERFORMANCE_MEASUREMENT_PROTOCOL {
-  CREATE_PERFORMANCE_MEASUREMENT CreatePerformanceMeasurement;
+  CREATE_PERFORMANCE_MEASUREMENT    CreatePerformanceMeasurement;
 };
 
-extern EFI_GUID gEdkiiPerformanceMeasurementProtocolGuid;
-extern EFI_GUID gEdkiiSmmPerformanceMeasurementProtocolGuid;
+extern EFI_GUID  gEdkiiPerformanceMeasurementProtocolGuid;
+extern EFI_GUID  gEdkiiSmmPerformanceMeasurementProtocolGuid;
 
 #endif // _PERFORMANCE_MEASUREMENT_H_

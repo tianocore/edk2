@@ -26,8 +26,8 @@
 EFI_STATUS
 EFIAPI
 EmmcReset (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  BOOLEAN                 ExtendedVerification
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  BOOLEAN                ExtendedVerification
   );
 
 /**
@@ -56,7 +56,7 @@ EmmcReadBlocks (
   IN     UINT32                 MediaId,
   IN     EFI_LBA                Lba,
   IN     UINTN                  BufferSize,
-     OUT VOID                   *Buffer
+  OUT VOID                      *Buffer
   );
 
 /**
@@ -82,11 +82,11 @@ EmmcReadBlocks (
 EFI_STATUS
 EFIAPI
 EmmcWriteBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  UINT32                  MediaId,
-  IN  EFI_LBA                 Lba,
-  IN  UINTN                   BufferSize,
-  IN  VOID                    *Buffer
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  UINT32                 MediaId,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  BufferSize,
+  IN  VOID                   *Buffer
   );
 
 /**
@@ -102,7 +102,7 @@ EmmcWriteBlocks (
 EFI_STATUS
 EFIAPI
 EmmcFlushBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This
+  IN  EFI_BLOCK_IO_PROTOCOL  *This
   );
 
 /**
@@ -152,12 +152,12 @@ EmmcResetEx (
 EFI_STATUS
 EFIAPI
 EmmcReadBlocksEx (
-  IN     EFI_BLOCK_IO2_PROTOCOL *This,
-  IN     UINT32                 MediaId,
-  IN     EFI_LBA                Lba,
-  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
-  IN     UINTN                  BufferSize,
-     OUT VOID                   *Buffer
+  IN     EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN     UINT32                  MediaId,
+  IN     EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token,
+  IN     UINTN                   BufferSize,
+  OUT VOID                       *Buffer
   );
 
 /**
@@ -185,12 +185,12 @@ EmmcReadBlocksEx (
 EFI_STATUS
 EFIAPI
 EmmcWriteBlocksEx (
-  IN     EFI_BLOCK_IO2_PROTOCOL *This,
-  IN     UINT32                 MediaId,
-  IN     EFI_LBA                Lba,
-  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
-  IN     UINTN                  BufferSize,
-  IN     VOID                   *Buffer
+  IN     EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN     UINT32                  MediaId,
+  IN     EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token,
+  IN     UINTN                   BufferSize,
+  IN     VOID                    *Buffer
   );
 
 /**
@@ -287,15 +287,15 @@ EmmcFlushBlocksEx (
 EFI_STATUS
 EFIAPI
 EmmcSecurityProtocolInOut (
-  IN     EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
-  IN     UINT32                                   MediaId,
-  IN     UINT64                                   Timeout,
-  IN     UINT8                                    SecurityProtocolId,
-  IN     UINT16                                   SecurityProtocolSpecificData,
-  IN     UINTN                                    PayloadBufferSize,
-     OUT VOID                                     *PayloadBuffer,
-     OUT UINTN                                    *PayloadTransferSize,
-  IN     BOOLEAN                                  IsRead
+  IN     EFI_STORAGE_SECURITY_COMMAND_PROTOCOL  *This,
+  IN     UINT32                                 MediaId,
+  IN     UINT64                                 Timeout,
+  IN     UINT8                                  SecurityProtocolId,
+  IN     UINT16                                 SecurityProtocolSpecificData,
+  IN     UINTN                                  PayloadBufferSize,
+  OUT VOID                                      *PayloadBuffer,
+  OUT UINTN                                     *PayloadTransferSize,
+  IN     BOOLEAN                                IsRead
   );
 
 /**
@@ -373,14 +373,14 @@ EmmcSecurityProtocolInOut (
 EFI_STATUS
 EFIAPI
 EmmcSecurityProtocolIn (
-  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
-  IN UINT32                                   MediaId,
-  IN UINT64                                   Timeout,
-  IN UINT8                                    SecurityProtocolId,
-  IN UINT16                                   SecurityProtocolSpecificData,
-  IN UINTN                                    PayloadBufferSize,
-  OUT VOID                                    *PayloadBuffer,
-  OUT UINTN                                   *PayloadTransferSize
+  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL  *This,
+  IN UINT32                                 MediaId,
+  IN UINT64                                 Timeout,
+  IN UINT8                                  SecurityProtocolId,
+  IN UINT16                                 SecurityProtocolSpecificData,
+  IN UINTN                                  PayloadBufferSize,
+  OUT VOID                                  *PayloadBuffer,
+  OUT UINTN                                 *PayloadTransferSize
   );
 
 /**
@@ -447,13 +447,13 @@ EmmcSecurityProtocolIn (
 EFI_STATUS
 EFIAPI
 EmmcSecurityProtocolOut (
-  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
-  IN UINT32                                   MediaId,
-  IN UINT64                                   Timeout,
-  IN UINT8                                    SecurityProtocolId,
-  IN UINT16                                   SecurityProtocolSpecificData,
-  IN UINTN                                    PayloadBufferSize,
-  IN VOID                                     *PayloadBuffer
+  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL  *This,
+  IN UINT32                                 MediaId,
+  IN UINT64                                 Timeout,
+  IN UINT8                                  SecurityProtocolId,
+  IN UINT16                                 SecurityProtocolSpecificData,
+  IN UINTN                                  PayloadBufferSize,
+  IN VOID                                   *PayloadBuffer
   );
 
 /**
@@ -486,12 +486,11 @@ EmmcSecurityProtocolOut (
 EFI_STATUS
 EFIAPI
 EmmcEraseBlocks (
-  IN     EFI_ERASE_BLOCK_PROTOCOL      *This,
-  IN     UINT32                        MediaId,
-  IN     EFI_LBA                       Lba,
-  IN OUT EFI_ERASE_BLOCK_TOKEN         *Token,
-  IN     UINTN                         Size
+  IN     EFI_ERASE_BLOCK_PROTOCOL  *This,
+  IN     UINT32                    MediaId,
+  IN     EFI_LBA                   Lba,
+  IN OUT EFI_ERASE_BLOCK_TOKEN     *Token,
+  IN     UINTN                     Size
   );
 
 #endif
-

@@ -15,15 +15,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 
 typedef struct {
-  EFI_IMAGE_ID                          ImageId;
-  EDKII_PLATFORM_LOGO_DISPLAY_ATTRIBUTE Attribute;
-  INTN                                  OffsetX;
-  INTN                                  OffsetY;
+  EFI_IMAGE_ID                             ImageId;
+  EDKII_PLATFORM_LOGO_DISPLAY_ATTRIBUTE    Attribute;
+  INTN                                     OffsetX;
+  INTN                                     OffsetY;
 } LOGO_ENTRY;
 
-EFI_HII_IMAGE_EX_PROTOCOL *mHiiImageEx;
-EFI_HII_HANDLE            mHiiHandle;
-LOGO_ENTRY                mLogos[] = {
+EFI_HII_IMAGE_EX_PROTOCOL  *mHiiImageEx;
+EFI_HII_HANDLE             mHiiHandle;
+LOGO_ENTRY                 mLogos[] = {
   {
     IMAGE_TOKEN (IMG_LOGO),
     EdkiiPlatformLogoDisplayAttributeCenter,
@@ -48,17 +48,19 @@ LOGO_ENTRY                mLogos[] = {
 EFI_STATUS
 EFIAPI
 GetImage (
-  IN     EDKII_PLATFORM_LOGO_PROTOCOL          *This,
-  IN OUT UINT32                                *Instance,
-     OUT EFI_IMAGE_INPUT                       *Image,
-     OUT EDKII_PLATFORM_LOGO_DISPLAY_ATTRIBUTE *Attribute,
-     OUT INTN                                  *OffsetX,
-     OUT INTN                                  *OffsetY
+  IN     EDKII_PLATFORM_LOGO_PROTOCOL        *This,
+  IN OUT UINT32                              *Instance,
+  OUT EFI_IMAGE_INPUT                        *Image,
+  OUT EDKII_PLATFORM_LOGO_DISPLAY_ATTRIBUTE  *Attribute,
+  OUT INTN                                   *OffsetX,
+  OUT INTN                                   *OffsetY
   )
 {
-  UINT32 Current;
-  if (Instance == NULL || Image == NULL ||
-      Attribute == NULL || OffsetX == NULL || OffsetY == NULL) {
+  UINT32  Current;
+
+  if ((Instance == NULL) || (Image == NULL) ||
+      (Attribute == NULL) || (OffsetX == NULL) || (OffsetY == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -74,7 +76,7 @@ GetImage (
   return mHiiImageEx->GetImageEx (mHiiImageEx, mHiiHandle, mLogos[Current].ImageId, Image);
 }
 
-EDKII_PLATFORM_LOGO_PROTOCOL mPlatformLogo = {
+EDKII_PLATFORM_LOGO_PROTOCOL  mPlatformLogo = {
   GetImage
 };
 
@@ -93,26 +95,26 @@ EDKII_PLATFORM_LOGO_PROTOCOL mPlatformLogo = {
 EFI_STATUS
 EFIAPI
 InitializeLogo (
-  IN EFI_HANDLE               ImageHandle,
-  IN EFI_SYSTEM_TABLE         *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                  Status;
-  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
-  EFI_HII_DATABASE_PROTOCOL   *HiiDatabase;
-  EFI_HANDLE                  Handle;
+  EFI_STATUS                   Status;
+  EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
+  EFI_HII_DATABASE_PROTOCOL    *HiiDatabase;
+  EFI_HANDLE                   Handle;
 
   Status = gBS->LocateProtocol (
                   &gEfiHiiDatabaseProtocolGuid,
                   NULL,
-                  (VOID **) &HiiDatabase
+                  (VOID **)&HiiDatabase
                   );
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->LocateProtocol (
                   &gEfiHiiImageExProtocolGuid,
                   NULL,
-                  (VOID **) &mHiiImageEx
+                  (VOID **)&mHiiImageEx
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -122,7 +124,7 @@ InitializeLogo (
   Status = gBS->OpenProtocol (
                   ImageHandle,
                   &gEfiHiiPackageListProtocolGuid,
-                  (VOID **) &PackageList,
+                  (VOID **)&PackageList,
                   ImageHandle,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -145,9 +147,11 @@ InitializeLogo (
     Handle = NULL;
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &Handle,
-                    &gEdkiiPlatformLogoProtocolGuid, &mPlatformLogo,
+                    &gEdkiiPlatformLogoProtocolGuid,
+                    &mPlatformLogo,
                     NULL
                     );
   }
+
   return Status;
 }

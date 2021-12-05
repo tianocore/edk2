@@ -9,7 +9,6 @@
 #ifndef _RESET_SYSTEM2_H_
 #define _RESET_SYSTEM2_H_
 
-
 #include <Uefi.h>
 #include <PiPei.h>
 
@@ -26,26 +25,24 @@
 #include <Library/ResetSystemLib.h>
 #include <Library/ReportStatusCodeLib.h>
 
-
 //
 // The maximum recursion depth to ResetSystem() by reset notification handlers
 //
-#define MAX_RESET_NOTIFY_DEPTH 10
+#define MAX_RESET_NOTIFY_DEPTH  10
 
 //
 // Data to put in GUIDed HOB
 //
 typedef struct {
-  UINT32                          Signature;
-  UINT32                          Count;
-  EFI_RESET_SYSTEM                ResetFilters[0]; // ResetFilters[PcdGet32 (PcdMaximumResetNotifies)]
+  UINT32              Signature;
+  UINT32              Count;
+  EFI_RESET_SYSTEM    ResetFilters[0];             // ResetFilters[PcdGet32 (PcdMaximumResetNotifies)]
 } RESET_FILTER_LIST;
-#define RESET_FILTER_LIST_SIGNATURE    SIGNATURE_32('r', 's', 't', 'l')
-
+#define RESET_FILTER_LIST_SIGNATURE  SIGNATURE_32('r', 's', 't', 'l')
 
 typedef struct {
-  EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PPI ResetFilter;
-  EFI_GUID                                 *Guid;
+  EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PPI    ResetFilter;
+  EFI_GUID                                    *Guid;
 } RESET_FILTER_INSTANCE;
 
 /**
@@ -67,11 +64,12 @@ typedef struct {
 VOID
 EFIAPI
 ResetSystem2 (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN VOID             *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   );
+
 /**
   Register a notification function to be called when ResetSystem() is called.
 
@@ -93,8 +91,8 @@ ResetSystem2 (
 EFI_STATUS
 EFIAPI
 RegisterResetNotify (
-  IN EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PPI *This,
-  IN EFI_RESET_SYSTEM                         ResetFunction
+  IN EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PPI  *This,
+  IN EFI_RESET_SYSTEM                          ResetFunction
   );
 
 /**
@@ -115,7 +113,8 @@ RegisterResetNotify (
 EFI_STATUS
 EFIAPI
 UnregisterResetNotify (
-  IN EFI_RESET_NOTIFICATION_PROTOCOL *This,
-  IN EFI_RESET_SYSTEM                ResetFunction
+  IN EFI_RESET_NOTIFICATION_PROTOCOL  *This,
+  IN EFI_RESET_SYSTEM                 ResetFunction
   );
+
 #endif

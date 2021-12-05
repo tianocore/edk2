@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "Bds.h"
-#define ISO_639_2_ENTRY_SIZE 3
+#define ISO_639_2_ENTRY_SIZE  3
 
 /**
   Check if lang is in supported language codes according to language string.
@@ -37,15 +37,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 BOOLEAN
-IsLangInSupportedLangCodes(
-  IN  CHAR8            *SupportedLang,
-  IN  CHAR8            *Lang,
-  IN  BOOLEAN          Iso639Language
+IsLangInSupportedLangCodes (
+  IN  CHAR8    *SupportedLang,
+  IN  CHAR8    *Lang,
+  IN  BOOLEAN  Iso639Language
   )
 {
-  UINTN    Index;
-  UINTN    CompareLength;
-  UINTN    LanguageLength;
+  UINTN  Index;
+  UINTN  CompareLength;
+  UINTN  LanguageLength;
 
   if (Iso639Language) {
     CompareLength = ISO_639_2_ENTRY_SIZE;
@@ -57,31 +57,38 @@ IsLangInSupportedLangCodes(
         return TRUE;
       }
     }
+
     return FALSE;
   } else {
     //
     // Compare RFC4646 language code
     //
-    for (LanguageLength = 0; Lang[LanguageLength] != '\0'; LanguageLength++);
+    for (LanguageLength = 0; Lang[LanguageLength] != '\0'; LanguageLength++) {
+    }
 
-    for (; *SupportedLang != '\0'; SupportedLang += CompareLength) {
+    for ( ; *SupportedLang != '\0'; SupportedLang += CompareLength) {
       //
       // Skip ';' characters in SupportedLang
       //
-      for (; *SupportedLang != '\0' && *SupportedLang == ';'; SupportedLang++);
+      for ( ; *SupportedLang != '\0' && *SupportedLang == ';'; SupportedLang++) {
+      }
+
       //
       // Determine the length of the next language code in SupportedLang
       //
-      for (CompareLength = 0; SupportedLang[CompareLength] != '\0' && SupportedLang[CompareLength] != ';'; CompareLength++);
+      for (CompareLength = 0; SupportedLang[CompareLength] != '\0' && SupportedLang[CompareLength] != ';'; CompareLength++) {
+      }
 
       if ((CompareLength == LanguageLength) &&
-          (AsciiStrnCmp (Lang, SupportedLang, CompareLength) == 0)) {
+          (AsciiStrnCmp (Lang, SupportedLang, CompareLength) == 0))
+      {
         //
         // Successfully find the Lang string in SupportedLang string.
         //
         return TRUE;
       }
     }
+
     return FALSE;
   }
 }
@@ -100,18 +107,18 @@ IsLangInSupportedLangCodes(
 **/
 VOID
 InitializeLangVariable (
-  IN CHAR16     *LangName,
-  IN CHAR8      *SupportedLang,
-  IN CHAR8      *DefaultLang,
-  IN BOOLEAN    Iso639Language
+  IN CHAR16   *LangName,
+  IN CHAR8    *SupportedLang,
+  IN CHAR8    *DefaultLang,
+  IN BOOLEAN  Iso639Language
   )
 {
-  CHAR8       *Lang;
+  CHAR8  *Lang;
 
   //
   // Find current Lang or PlatformLang from EFI Variable.
   //
-  GetEfiGlobalVariable2 (LangName, (VOID **) &Lang, NULL);
+  GetEfiGlobalVariable2 (LangName, (VOID **)&Lang, NULL);
 
   //
   // If Lang or PlatformLang variable is not found,
@@ -146,14 +153,14 @@ InitializeLangVariable (
 **/
 VOID
 InitializeLanguage (
-  BOOLEAN LangCodesSettingRequired
+  BOOLEAN  LangCodesSettingRequired
   )
 {
   EFI_STATUS  Status;
   CHAR8       *LangCodes;
   CHAR8       *PlatformLangCodes;
 
-  LangCodes = (CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultLangCodes);
+  LangCodes         = (CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultLangCodes);
   PlatformLangCodes = (CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes);
   if (LangCodesSettingRequired) {
     if (!FeaturePcdGet (PcdUefiVariableDefaultLangDeprecate)) {
@@ -170,7 +177,7 @@ InitializeLanguage (
       //
       // Platform needs to make sure setting volatile variable before calling 3rd party code shouldn't fail.
       //
-      ASSERT_EFI_ERROR(Status);
+      ASSERT_EFI_ERROR (Status);
     }
 
     Status = gRT->SetVariable (
@@ -183,14 +190,15 @@ InitializeLanguage (
     //
     // Platform needs to make sure setting volatile variable before calling 3rd party code shouldn't fail.
     //
-    ASSERT_EFI_ERROR(Status);
+    ASSERT_EFI_ERROR (Status);
   }
 
   if (!FeaturePcdGet (PcdUefiVariableDefaultLangDeprecate)) {
     //
     // UEFI 2.1 depricated this variable so we support turning it off
     //
-    InitializeLangVariable (L"Lang", LangCodes, (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultLang), TRUE);
+    InitializeLangVariable (L"Lang", LangCodes, (CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultLang), TRUE);
   }
-  InitializeLangVariable (L"PlatformLang", PlatformLangCodes, (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLang), FALSE);
+
+  InitializeLangVariable (L"PlatformLang", PlatformLangCodes, (CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultPlatformLang), FALSE);
 }

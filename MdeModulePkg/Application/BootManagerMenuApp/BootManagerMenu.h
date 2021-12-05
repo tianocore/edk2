@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef _BOOT_MANAGER_MENU_H_
 #define _BOOT_MANAGER_MENU_H_
 
@@ -23,21 +22,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/LoadedImage.h>
 #include <Protocol/BootLogo.h>
 
-#define TITLE_TOKEN_COUNT   1
-#define HELP_TOKEN_COUNT    3
+#define TITLE_TOKEN_COUNT  1
+#define HELP_TOKEN_COUNT   3
 
 typedef struct _BOOT_MENU_SCREEN {
-  UINTN        StartCol;
-  UINTN        StartRow;
-  UINTN        Width;
-  UINTN        Height;
+  UINTN    StartCol;
+  UINTN    StartRow;
+  UINTN    Width;
+  UINTN    Height;
 } BOOT_MENU_SCREEN;
 
 typedef struct _BOOT_MENU_SCROLL_BAR_CONTROL {
-  BOOLEAN      HasScrollBar;
-  UINTN        ItemCountPerScreen;
-  UINTN        FirstItem;
-  UINTN        LastItem;
+  BOOLEAN    HasScrollBar;
+  UINTN      ItemCountPerScreen;
+  UINTN      FirstItem;
+  UINTN      LastItem;
 } BOOT_MENU_SCROLL_BAR_CONTROL;
 
 typedef struct _BOOT_MENU_POPUP_DATA {
@@ -51,4 +50,3 @@ typedef struct _BOOT_MENU_POPUP_DATA {
 } BOOT_MENU_POPUP_DATA;
 
 #endif
-

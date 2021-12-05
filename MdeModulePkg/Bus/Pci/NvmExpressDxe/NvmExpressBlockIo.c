@@ -23,27 +23,27 @@
 **/
 EFI_STATUS
 ReadSectors (
-  IN NVME_DEVICE_PRIVATE_DATA           *Device,
-  IN UINT64                             Buffer,
-  IN UINT64                             Lba,
-  IN UINT32                             Blocks
+  IN NVME_DEVICE_PRIVATE_DATA  *Device,
+  IN UINT64                    Buffer,
+  IN UINT64                    Lba,
+  IN UINT32                    Blocks
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA             *Private;
-  UINT32                                   Bytes;
-  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
-  EFI_NVM_EXPRESS_COMMAND                  Command;
-  EFI_NVM_EXPRESS_COMPLETION               Completion;
-  EFI_STATUS                               Status;
-  UINT32                                   BlockSize;
+  NVME_CONTROLLER_PRIVATE_DATA              *Private;
+  UINT32                                    Bytes;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET  CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                   Command;
+  EFI_NVM_EXPRESS_COMPLETION                Completion;
+  EFI_STATUS                                Status;
+  UINT32                                    BlockSize;
 
-  Private    = Device->Controller;
-  BlockSize  = Device->Media.BlockSize;
-  Bytes      = Blocks * BlockSize;
+  Private   = Device->Controller;
+  BlockSize = Device->Media.BlockSize;
+  Bytes     = Blocks * BlockSize;
 
-  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
+  ZeroMem (&CommandPacket, sizeof (EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof (EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof (EFI_NVM_EXPRESS_COMPLETION));
 
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
@@ -57,7 +57,7 @@ ReadSectors (
   CommandPacket.QueueType      = NVME_IO_QUEUE;
 
   CommandPacket.NvmeCmd->Cdw10 = (UINT32)Lba;
-  CommandPacket.NvmeCmd->Cdw11 = (UINT32)RShiftU64(Lba, 32);
+  CommandPacket.NvmeCmd->Cdw11 = (UINT32)RShiftU64 (Lba, 32);
   CommandPacket.NvmeCmd->Cdw12 = (Blocks - 1) & 0xFFFF;
 
   CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID | CDW12_VALID;
@@ -86,41 +86,41 @@ ReadSectors (
 **/
 EFI_STATUS
 WriteSectors (
-  IN NVME_DEVICE_PRIVATE_DATA      *Device,
-  IN UINT64                        Buffer,
-  IN UINT64                        Lba,
-  IN UINT32                        Blocks
+  IN NVME_DEVICE_PRIVATE_DATA  *Device,
+  IN UINT64                    Buffer,
+  IN UINT64                    Lba,
+  IN UINT32                    Blocks
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA             *Private;
-  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
-  EFI_NVM_EXPRESS_COMMAND                  Command;
-  EFI_NVM_EXPRESS_COMPLETION               Completion;
-  EFI_STATUS                               Status;
-  UINT32                                   Bytes;
-  UINT32                                   BlockSize;
+  NVME_CONTROLLER_PRIVATE_DATA              *Private;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET  CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                   Command;
+  EFI_NVM_EXPRESS_COMPLETION                Completion;
+  EFI_STATUS                                Status;
+  UINT32                                    Bytes;
+  UINT32                                    BlockSize;
 
-  Private    = Device->Controller;
-  BlockSize  = Device->Media.BlockSize;
-  Bytes      = Blocks * BlockSize;
+  Private   = Device->Controller;
+  BlockSize = Device->Media.BlockSize;
+  Bytes     = Blocks * BlockSize;
 
-  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
+  ZeroMem (&CommandPacket, sizeof (EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof (EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof (EFI_NVM_EXPRESS_COMPLETION));
 
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
 
   CommandPacket.NvmeCmd->Cdw0.Opcode = NVME_IO_WRITE_OPC;
-  CommandPacket.NvmeCmd->Nsid  = Device->NamespaceId;
-  CommandPacket.TransferBuffer = (VOID *)(UINTN)Buffer;
+  CommandPacket.NvmeCmd->Nsid        = Device->NamespaceId;
+  CommandPacket.TransferBuffer       = (VOID *)(UINTN)Buffer;
 
   CommandPacket.TransferLength = Bytes;
   CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
   CommandPacket.QueueType      = NVME_IO_QUEUE;
 
   CommandPacket.NvmeCmd->Cdw10 = (UINT32)Lba;
-  CommandPacket.NvmeCmd->Cdw11 = (UINT32)RShiftU64(Lba, 32);
+  CommandPacket.NvmeCmd->Cdw11 = (UINT32)RShiftU64 (Lba, 32);
   //
   // Set Force Unit Access bit (bit 30) to use write-through behaviour
   //
@@ -155,19 +155,19 @@ WriteSectors (
 **/
 EFI_STATUS
 NvmeRead (
-  IN     NVME_DEVICE_PRIVATE_DATA       *Device,
-     OUT VOID                           *Buffer,
-  IN     UINT64                         Lba,
-  IN     UINTN                          Blocks
+  IN     NVME_DEVICE_PRIVATE_DATA  *Device,
+  OUT VOID                         *Buffer,
+  IN     UINT64                    Lba,
+  IN     UINTN                     Blocks
   )
 {
-  EFI_STATUS                       Status;
-  UINT32                           BlockSize;
-  NVME_CONTROLLER_PRIVATE_DATA     *Private;
-  UINT32                           MaxTransferBlocks;
-  UINTN                            OrginalBlocks;
-  BOOLEAN                          IsEmpty;
-  EFI_TPL                          OldTpl;
+  EFI_STATUS                    Status;
+  UINT32                        BlockSize;
+  NVME_CONTROLLER_PRIVATE_DATA  *Private;
+  UINT32                        MaxTransferBlocks;
+  UINTN                         OrginalBlocks;
+  BOOLEAN                       IsEmpty;
+  EFI_TPL                       OldTpl;
 
   //
   // Wait for the device's asynchronous I/O queue to become empty.
@@ -207,14 +207,22 @@ NvmeRead (
       Blocks = 0;
     }
 
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       break;
     }
   }
 
-  DEBUG ((DEBUG_BLKIO, "%a: Lba = 0x%08Lx, Original = 0x%08Lx, "
-    "Remaining = 0x%08Lx, BlockSize = 0x%x, Status = %r\n", __FUNCTION__, Lba,
-    (UINT64)OrginalBlocks, (UINT64)Blocks, BlockSize, Status));
+  DEBUG ((
+    DEBUG_BLKIO,
+    "%a: Lba = 0x%08Lx, Original = 0x%08Lx, "
+    "Remaining = 0x%08Lx, BlockSize = 0x%x, Status = %r\n",
+    __FUNCTION__,
+    Lba,
+    (UINT64)OrginalBlocks,
+    (UINT64)Blocks,
+    BlockSize,
+    Status
+    ));
 
   return Status;
 }
@@ -233,19 +241,19 @@ NvmeRead (
 **/
 EFI_STATUS
 NvmeWrite (
-  IN NVME_DEVICE_PRIVATE_DATA           *Device,
-  IN VOID                               *Buffer,
-  IN UINT64                             Lba,
-  IN UINTN                              Blocks
+  IN NVME_DEVICE_PRIVATE_DATA  *Device,
+  IN VOID                      *Buffer,
+  IN UINT64                    Lba,
+  IN UINTN                     Blocks
   )
 {
-  EFI_STATUS                       Status;
-  UINT32                           BlockSize;
-  NVME_CONTROLLER_PRIVATE_DATA     *Private;
-  UINT32                           MaxTransferBlocks;
-  UINTN                            OrginalBlocks;
-  BOOLEAN                          IsEmpty;
-  EFI_TPL                          OldTpl;
+  EFI_STATUS                    Status;
+  UINT32                        BlockSize;
+  NVME_CONTROLLER_PRIVATE_DATA  *Private;
+  UINT32                        MaxTransferBlocks;
+  UINTN                         OrginalBlocks;
+  BOOLEAN                       IsEmpty;
+  EFI_TPL                       OldTpl;
 
   //
   // Wait for the device's asynchronous I/O queue to become empty.
@@ -285,14 +293,22 @@ NvmeWrite (
       Blocks = 0;
     }
 
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       break;
     }
   }
 
-  DEBUG ((DEBUG_BLKIO, "%a: Lba = 0x%08Lx, Original = 0x%08Lx, "
-    "Remaining = 0x%08Lx, BlockSize = 0x%x, Status = %r\n", __FUNCTION__, Lba,
-    (UINT64)OrginalBlocks, (UINT64)Blocks, BlockSize, Status));
+  DEBUG ((
+    DEBUG_BLKIO,
+    "%a: Lba = 0x%08Lx, Original = 0x%08Lx, "
+    "Remaining = 0x%08Lx, BlockSize = 0x%x, Status = %r\n",
+    __FUNCTION__,
+    Lba,
+    (UINT64)OrginalBlocks,
+    (UINT64)Blocks,
+    BlockSize,
+    Status
+    ));
 
   return Status;
 }
@@ -308,28 +324,28 @@ NvmeWrite (
 **/
 EFI_STATUS
 NvmeFlush (
-  IN NVME_DEVICE_PRIVATE_DATA      *Device
+  IN NVME_DEVICE_PRIVATE_DATA  *Device
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA             *Private;
-  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
-  EFI_NVM_EXPRESS_COMMAND                  Command;
-  EFI_NVM_EXPRESS_COMPLETION               Completion;
-  EFI_STATUS                               Status;
+  NVME_CONTROLLER_PRIVATE_DATA              *Private;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET  CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                   Command;
+  EFI_NVM_EXPRESS_COMPLETION                Completion;
+  EFI_STATUS                                Status;
 
   Private = Device->Controller;
 
-  ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
-  ZeroMem (&Command, sizeof(EFI_NVM_EXPRESS_COMMAND));
-  ZeroMem (&Completion, sizeof(EFI_NVM_EXPRESS_COMPLETION));
+  ZeroMem (&CommandPacket, sizeof (EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
+  ZeroMem (&Command, sizeof (EFI_NVM_EXPRESS_COMMAND));
+  ZeroMem (&Completion, sizeof (EFI_NVM_EXPRESS_COMPLETION));
 
   CommandPacket.NvmeCmd        = &Command;
   CommandPacket.NvmeCompletion = &Completion;
 
   CommandPacket.NvmeCmd->Cdw0.Opcode = NVME_IO_FLUSH_OPC;
-  CommandPacket.NvmeCmd->Nsid  = Device->NamespaceId;
-  CommandPacket.CommandTimeout = NVME_GENERIC_TIMEOUT;
-  CommandPacket.QueueType      = NVME_IO_QUEUE;
+  CommandPacket.NvmeCmd->Nsid        = Device->NamespaceId;
+  CommandPacket.CommandTimeout       = NVME_GENERIC_TIMEOUT;
+  CommandPacket.QueueType            = NVME_IO_QUEUE;
 
   Status = Private->Passthru.PassThru (
                                &Private->Passthru,
@@ -352,19 +368,19 @@ NvmeFlush (
 VOID
 EFIAPI
 AsyncIoCallback (
-  IN EFI_EVENT                Event,
-  IN VOID                     *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  NVME_BLKIO2_SUBTASK         *Subtask;
-  NVME_BLKIO2_REQUEST         *Request;
-  NVME_CQ                     *Completion;
-  EFI_BLOCK_IO2_TOKEN         *Token;
+  NVME_BLKIO2_SUBTASK  *Subtask;
+  NVME_BLKIO2_REQUEST  *Request;
+  NVME_CQ              *Completion;
+  EFI_BLOCK_IO2_TOKEN  *Token;
 
   gBS->CloseEvent (Event);
 
-  Subtask    = (NVME_BLKIO2_SUBTASK *) Context;
-  Completion = (NVME_CQ *) Subtask->CommandPacket->NvmeCompletion;
+  Subtask    = (NVME_BLKIO2_SUBTASK *)Context;
+  Completion = (NVME_CQ *)Subtask->CommandPacket->NvmeCompletion;
   Request    = Subtask->BlockIo2Request;
   Token      = Request->Token;
 
@@ -379,9 +395,9 @@ AsyncIoCallback (
       //
       // Dump completion entry status for debugging.
       //
-      DEBUG_CODE_BEGIN();
-        NvmeDumpStatus (Completion);
-      DEBUG_CODE_END();
+      DEBUG_CODE_BEGIN ();
+      NvmeDumpStatus (Completion);
+      DEBUG_CODE_END ();
     }
   }
 
@@ -422,23 +438,23 @@ AsyncIoCallback (
 **/
 EFI_STATUS
 AsyncReadSectors (
-  IN NVME_DEVICE_PRIVATE_DATA           *Device,
-  IN NVME_BLKIO2_REQUEST                *Request,
-  IN UINT64                             Buffer,
-  IN UINT64                             Lba,
-  IN UINT32                             Blocks,
-  IN BOOLEAN                            IsLast
+  IN NVME_DEVICE_PRIVATE_DATA  *Device,
+  IN NVME_BLKIO2_REQUEST       *Request,
+  IN UINT64                    Buffer,
+  IN UINT64                    Lba,
+  IN UINT32                    Blocks,
+  IN BOOLEAN                   IsLast
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA             *Private;
-  UINT32                                   Bytes;
-  NVME_BLKIO2_SUBTASK                      *Subtask;
-  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET *CommandPacket;
-  EFI_NVM_EXPRESS_COMMAND                  *Command;
-  EFI_NVM_EXPRESS_COMPLETION               *Completion;
-  EFI_STATUS                               Status;
-  UINT32                                   BlockSize;
-  EFI_TPL                                  OldTpl;
+  NVME_CONTROLLER_PRIVATE_DATA              *Private;
+  UINT32                                    Bytes;
+  NVME_BLKIO2_SUBTASK                       *Subtask;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET  *CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                   *Command;
+  EFI_NVM_EXPRESS_COMPLETION                *Completion;
+  EFI_STATUS                                Status;
+  UINT32                                    BlockSize;
+  EFI_TPL                                   OldTpl;
 
   Private       = Device->Controller;
   BlockSize     = Device->Media.BlockSize;
@@ -488,7 +504,7 @@ AsyncReadSectors (
                   Subtask,
                   &Subtask->Event
                   );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
 
@@ -504,7 +520,7 @@ AsyncReadSectors (
   CommandPacket->QueueType      = NVME_IO_QUEUE;
 
   CommandPacket->NvmeCmd->Cdw10 = (UINT32)Lba;
-  CommandPacket->NvmeCmd->Cdw11 = (UINT32)RShiftU64(Lba, 32);
+  CommandPacket->NvmeCmd->Cdw11 = (UINT32)RShiftU64 (Lba, 32);
   CommandPacket->NvmeCmd->Cdw12 = (Blocks - 1) & 0xFFFF;
 
   CommandPacket->NvmeCmd->Flags = CDW10_VALID | CDW11_VALID | CDW12_VALID;
@@ -561,23 +577,23 @@ ErrorExit:
 **/
 EFI_STATUS
 AsyncWriteSectors (
-  IN NVME_DEVICE_PRIVATE_DATA           *Device,
-  IN NVME_BLKIO2_REQUEST                *Request,
-  IN UINT64                             Buffer,
-  IN UINT64                             Lba,
-  IN UINT32                             Blocks,
-  IN BOOLEAN                            IsLast
+  IN NVME_DEVICE_PRIVATE_DATA  *Device,
+  IN NVME_BLKIO2_REQUEST       *Request,
+  IN UINT64                    Buffer,
+  IN UINT64                    Lba,
+  IN UINT32                    Blocks,
+  IN BOOLEAN                   IsLast
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA             *Private;
-  UINT32                                   Bytes;
-  NVME_BLKIO2_SUBTASK                      *Subtask;
-  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET *CommandPacket;
-  EFI_NVM_EXPRESS_COMMAND                  *Command;
-  EFI_NVM_EXPRESS_COMPLETION               *Completion;
-  EFI_STATUS                               Status;
-  UINT32                                   BlockSize;
-  EFI_TPL                                  OldTpl;
+  NVME_CONTROLLER_PRIVATE_DATA              *Private;
+  UINT32                                    Bytes;
+  NVME_BLKIO2_SUBTASK                       *Subtask;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET  *CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                   *Command;
+  EFI_NVM_EXPRESS_COMPLETION                *Completion;
+  EFI_STATUS                                Status;
+  UINT32                                    BlockSize;
+  EFI_TPL                                   OldTpl;
 
   Private       = Device->Controller;
   BlockSize     = Device->Media.BlockSize;
@@ -627,7 +643,7 @@ AsyncWriteSectors (
                   Subtask,
                   &Subtask->Event
                   );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     goto ErrorExit;
   }
 
@@ -643,7 +659,7 @@ AsyncWriteSectors (
   CommandPacket->QueueType      = NVME_IO_QUEUE;
 
   CommandPacket->NvmeCmd->Cdw10 = (UINT32)Lba;
-  CommandPacket->NvmeCmd->Cdw11 = (UINT32)RShiftU64(Lba, 32);
+  CommandPacket->NvmeCmd->Cdw11 = (UINT32)RShiftU64 (Lba, 32);
   //
   // Set Force Unit Access bit (bit 30) to use write-through behaviour
   //
@@ -701,21 +717,21 @@ ErrorExit:
 **/
 EFI_STATUS
 NvmeAsyncRead (
-  IN     NVME_DEVICE_PRIVATE_DATA       *Device,
-     OUT VOID                           *Buffer,
-  IN     UINT64                         Lba,
-  IN     UINTN                          Blocks,
-  IN     EFI_BLOCK_IO2_TOKEN            *Token
+  IN     NVME_DEVICE_PRIVATE_DATA  *Device,
+  OUT VOID                         *Buffer,
+  IN     UINT64                    Lba,
+  IN     UINTN                     Blocks,
+  IN     EFI_BLOCK_IO2_TOKEN       *Token
   )
 {
-  EFI_STATUS                       Status;
-  UINT32                           BlockSize;
-  NVME_CONTROLLER_PRIVATE_DATA     *Private;
-  NVME_BLKIO2_REQUEST              *BlkIo2Req;
-  UINT32                           MaxTransferBlocks;
-  UINTN                            OrginalBlocks;
-  BOOLEAN                          IsEmpty;
-  EFI_TPL                          OldTpl;
+  EFI_STATUS                    Status;
+  UINT32                        BlockSize;
+  NVME_CONTROLLER_PRIVATE_DATA  *Private;
+  NVME_BLKIO2_REQUEST           *BlkIo2Req;
+  UINT32                        MaxTransferBlocks;
+  UINTN                         OrginalBlocks;
+  BOOLEAN                       IsEmpty;
+  EFI_TPL                       OldTpl;
 
   Status        = EFI_SUCCESS;
   Private       = Device->Controller;
@@ -745,7 +761,8 @@ NvmeAsyncRead (
     if (Blocks > MaxTransferBlocks) {
       Status = AsyncReadSectors (
                  Device,
-                 BlkIo2Req, (UINT64)(UINTN)Buffer,
+                 BlkIo2Req,
+                 (UINT64)(UINTN)Buffer,
                  Lba,
                  MaxTransferBlocks,
                  FALSE
@@ -767,7 +784,7 @@ NvmeAsyncRead (
       Blocks = 0;
     }
 
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
       IsEmpty = IsListEmpty (&BlkIo2Req->SubtasksQueue) &&
                 (BlkIo2Req->UnsubmittedSubtaskNum == 0);
@@ -785,8 +802,8 @@ NvmeAsyncRead (
         // should be returned to make sure that the caller does not free
         // resources still using by these requests.
         //
-        Status = EFI_SUCCESS;
-        Token->TransactionStatus = EFI_DEVICE_ERROR;
+        Status                          = EFI_SUCCESS;
+        Token->TransactionStatus        = EFI_DEVICE_ERROR;
         BlkIo2Req->LastSubtaskSubmitted = TRUE;
       }
 
@@ -796,9 +813,17 @@ NvmeAsyncRead (
     }
   }
 
-  DEBUG ((DEBUG_BLKIO, "%a: Lba = 0x%08Lx, Original = 0x%08Lx, "
-    "Remaining = 0x%08Lx, BlockSize = 0x%x, Status = %r\n", __FUNCTION__, Lba,
-    (UINT64)OrginalBlocks, (UINT64)Blocks, BlockSize, Status));
+  DEBUG ((
+    DEBUG_BLKIO,
+    "%a: Lba = 0x%08Lx, Original = 0x%08Lx, "
+    "Remaining = 0x%08Lx, BlockSize = 0x%x, Status = %r\n",
+    __FUNCTION__,
+    Lba,
+    (UINT64)OrginalBlocks,
+    (UINT64)Blocks,
+    BlockSize,
+    Status
+    ));
 
   return Status;
 }
@@ -820,21 +845,21 @@ NvmeAsyncRead (
 **/
 EFI_STATUS
 NvmeAsyncWrite (
-  IN NVME_DEVICE_PRIVATE_DATA           *Device,
-  IN VOID                               *Buffer,
-  IN UINT64                             Lba,
-  IN UINTN                              Blocks,
-  IN EFI_BLOCK_IO2_TOKEN                *Token
+  IN NVME_DEVICE_PRIVATE_DATA  *Device,
+  IN VOID                      *Buffer,
+  IN UINT64                    Lba,
+  IN UINTN                     Blocks,
+  IN EFI_BLOCK_IO2_TOKEN       *Token
   )
 {
-  EFI_STATUS                       Status;
-  UINT32                           BlockSize;
-  NVME_CONTROLLER_PRIVATE_DATA     *Private;
-  NVME_BLKIO2_REQUEST              *BlkIo2Req;
-  UINT32                           MaxTransferBlocks;
-  UINTN                            OrginalBlocks;
-  BOOLEAN                          IsEmpty;
-  EFI_TPL                          OldTpl;
+  EFI_STATUS                    Status;
+  UINT32                        BlockSize;
+  NVME_CONTROLLER_PRIVATE_DATA  *Private;
+  NVME_BLKIO2_REQUEST           *BlkIo2Req;
+  UINT32                        MaxTransferBlocks;
+  UINTN                         OrginalBlocks;
+  BOOLEAN                       IsEmpty;
+  EFI_TPL                       OldTpl;
 
   Status        = EFI_SUCCESS;
   Private       = Device->Controller;
@@ -862,14 +887,14 @@ NvmeAsyncWrite (
 
   while (Blocks > 0) {
     if (Blocks > MaxTransferBlocks) {
-      Status  = AsyncWriteSectors (
-                  Device,
-                  BlkIo2Req,
-                  (UINT64)(UINTN)Buffer,
-                  Lba,
-                  MaxTransferBlocks,
-                  FALSE
-                  );
+      Status = AsyncWriteSectors (
+                 Device,
+                 BlkIo2Req,
+                 (UINT64)(UINTN)Buffer,
+                 Lba,
+                 MaxTransferBlocks,
+                 FALSE
+                 );
 
       Blocks -= MaxTransferBlocks;
       Buffer  = (VOID *)(UINTN)((UINT64)(UINTN)Buffer + MaxTransferBlocks * BlockSize);
@@ -887,7 +912,7 @@ NvmeAsyncWrite (
       Blocks = 0;
     }
 
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       OldTpl  = gBS->RaiseTPL (TPL_NOTIFY);
       IsEmpty = IsListEmpty (&BlkIo2Req->SubtasksQueue) &&
                 (BlkIo2Req->UnsubmittedSubtaskNum == 0);
@@ -905,8 +930,8 @@ NvmeAsyncWrite (
         // should be returned to make sure that the caller does not free
         // resources still using by these requests.
         //
-        Status = EFI_SUCCESS;
-        Token->TransactionStatus = EFI_DEVICE_ERROR;
+        Status                          = EFI_SUCCESS;
+        Token->TransactionStatus        = EFI_DEVICE_ERROR;
         BlkIo2Req->LastSubtaskSubmitted = TRUE;
       }
 
@@ -916,9 +941,17 @@ NvmeAsyncWrite (
     }
   }
 
-  DEBUG ((DEBUG_BLKIO, "%a: Lba = 0x%08Lx, Original = 0x%08Lx, "
-    "Remaining = 0x%08Lx, BlockSize = 0x%x, Status = %r\n", __FUNCTION__, Lba,
-    (UINT64)OrginalBlocks, (UINT64)Blocks, BlockSize, Status));
+  DEBUG ((
+    DEBUG_BLKIO,
+    "%a: Lba = 0x%08Lx, Original = 0x%08Lx, "
+    "Remaining = 0x%08Lx, BlockSize = 0x%x, Status = %r\n",
+    __FUNCTION__,
+    Lba,
+    (UINT64)OrginalBlocks,
+    (UINT64)Blocks,
+    BlockSize,
+    Status
+    ));
 
   return Status;
 }
@@ -937,14 +970,14 @@ NvmeAsyncWrite (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoReset (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  BOOLEAN                 ExtendedVerification
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  BOOLEAN                ExtendedVerification
   )
 {
-  EFI_TPL                         OldTpl;
-  NVME_CONTROLLER_PRIVATE_DATA    *Private;
-  NVME_DEVICE_PRIVATE_DATA        *Device;
-  EFI_STATUS                      Status;
+  EFI_TPL                       OldTpl;
+  NVME_CONTROLLER_PRIVATE_DATA  *Private;
+  NVME_DEVICE_PRIVATE_DATA      *Device;
+  EFI_STATUS                    Status;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -953,13 +986,13 @@ NvmeBlockIoReset (
   //
   // For Nvm Express subsystem, reset block device means reset controller.
   //
-  OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  Device  = NVME_DEVICE_PRIVATE_DATA_FROM_BLOCK_IO (This);
+  Device = NVME_DEVICE_PRIVATE_DATA_FROM_BLOCK_IO (This);
 
   Private = Device->Controller;
 
-  Status  = NvmeControllerInit (Private);
+  Status = NvmeControllerInit (Private);
 
   if (EFI_ERROR (Status)) {
     Status = EFI_DEVICE_ERROR;
@@ -992,20 +1025,20 @@ NvmeBlockIoReset (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoReadBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  UINT32                  MediaId,
-  IN  EFI_LBA                 Lba,
-  IN  UINTN                   BufferSize,
-  OUT VOID                    *Buffer
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  UINT32                 MediaId,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  BufferSize,
+  OUT VOID                   *Buffer
   )
 {
-  NVME_DEVICE_PRIVATE_DATA          *Device;
-  EFI_STATUS                        Status;
-  EFI_BLOCK_IO_MEDIA                *Media;
-  UINTN                             BlockSize;
-  UINTN                             NumberOfBlocks;
-  UINTN                             IoAlign;
-  EFI_TPL                           OldTpl;
+  NVME_DEVICE_PRIVATE_DATA  *Device;
+  EFI_STATUS                Status;
+  EFI_BLOCK_IO_MEDIA        *Media;
+  UINTN                     BlockSize;
+  UINTN                     NumberOfBlocks;
+  UINTN                     IoAlign;
+  EFI_TPL                   OldTpl;
 
   //
   // Check parameters.
@@ -1033,13 +1066,13 @@ NvmeBlockIoReadBlocks (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  NumberOfBlocks  = BufferSize / BlockSize;
+  NumberOfBlocks = BufferSize / BlockSize;
   if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
   IoAlign = Media->IoAlign;
-  if (IoAlign > 0 && (((UINTN) Buffer & (IoAlign - 1)) != 0)) {
+  if ((IoAlign > 0) && (((UINTN)Buffer & (IoAlign - 1)) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1076,20 +1109,20 @@ NvmeBlockIoReadBlocks (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoWriteBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  UINT32                  MediaId,
-  IN  EFI_LBA                 Lba,
-  IN  UINTN                   BufferSize,
-  IN  VOID                    *Buffer
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  UINT32                 MediaId,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  BufferSize,
+  IN  VOID                   *Buffer
   )
 {
-  NVME_DEVICE_PRIVATE_DATA          *Device;
-  EFI_STATUS                        Status;
-  EFI_BLOCK_IO_MEDIA                *Media;
-  UINTN                             BlockSize;
-  UINTN                             NumberOfBlocks;
-  UINTN                             IoAlign;
-  EFI_TPL                           OldTpl;
+  NVME_DEVICE_PRIVATE_DATA  *Device;
+  EFI_STATUS                Status;
+  EFI_BLOCK_IO_MEDIA        *Media;
+  UINTN                     BlockSize;
+  UINTN                     NumberOfBlocks;
+  UINTN                     IoAlign;
+  EFI_TPL                   OldTpl;
 
   //
   // Check parameters.
@@ -1117,13 +1150,13 @@ NvmeBlockIoWriteBlocks (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  NumberOfBlocks  = BufferSize / BlockSize;
+  NumberOfBlocks = BufferSize / BlockSize;
   if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
   IoAlign = Media->IoAlign;
-  if (IoAlign > 0 && (((UINTN) Buffer & (IoAlign - 1)) != 0)) {
+  if ((IoAlign > 0) && (((UINTN)Buffer & (IoAlign - 1)) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1151,12 +1184,12 @@ NvmeBlockIoWriteBlocks (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoFlushBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This
+  IN  EFI_BLOCK_IO_PROTOCOL  *This
   )
 {
-  NVME_DEVICE_PRIVATE_DATA          *Device;
-  EFI_STATUS                        Status;
-  EFI_TPL                           OldTpl;
+  NVME_DEVICE_PRIVATE_DATA  *Device;
+  EFI_STATUS                Status;
+  EFI_TPL                   OldTpl;
 
   //
   // Check parameters.
@@ -1196,11 +1229,11 @@ NvmeBlockIoResetEx (
   IN BOOLEAN                 ExtendedVerification
   )
 {
-  EFI_STATUS                      Status;
-  NVME_DEVICE_PRIVATE_DATA        *Device;
-  NVME_CONTROLLER_PRIVATE_DATA    *Private;
-  BOOLEAN                         IsEmpty;
-  EFI_TPL                         OldTpl;
+  EFI_STATUS                    Status;
+  NVME_DEVICE_PRIVATE_DATA      *Device;
+  NVME_CONTROLLER_PRIVATE_DATA  *Private;
+  BOOLEAN                       IsEmpty;
+  EFI_TPL                       OldTpl;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1227,7 +1260,7 @@ NvmeBlockIoResetEx (
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  Status  = NvmeControllerInit (Private);
+  Status = NvmeControllerInit (Private);
 
   if (EFI_ERROR (Status)) {
     Status = EFI_DEVICE_ERROR;
@@ -1278,21 +1311,21 @@ NvmeBlockIoResetEx (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoReadBlocksEx (
-  IN     EFI_BLOCK_IO2_PROTOCOL *This,
-  IN     UINT32                 MediaId,
-  IN     EFI_LBA                Lba,
-  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
-  IN     UINTN                  BufferSize,
-     OUT VOID                  *Buffer
+  IN     EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN     UINT32                  MediaId,
+  IN     EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token,
+  IN     UINTN                   BufferSize,
+  OUT VOID                       *Buffer
   )
 {
-  NVME_DEVICE_PRIVATE_DATA        *Device;
-  EFI_STATUS                      Status;
-  EFI_BLOCK_IO_MEDIA              *Media;
-  UINTN                           BlockSize;
-  UINTN                           NumberOfBlocks;
-  UINTN                           IoAlign;
-  EFI_TPL                         OldTpl;
+  NVME_DEVICE_PRIVATE_DATA  *Device;
+  EFI_STATUS                Status;
+  EFI_BLOCK_IO_MEDIA        *Media;
+  UINTN                     BlockSize;
+  UINTN                     NumberOfBlocks;
+  UINTN                     IoAlign;
+  EFI_TPL                   OldTpl;
 
   //
   // Check parameters.
@@ -1316,6 +1349,7 @@ NvmeBlockIoReadBlocksEx (
       Token->TransactionStatus = EFI_SUCCESS;
       gBS->SignalEvent (Token->Event);
     }
+
     return EFI_SUCCESS;
   }
 
@@ -1324,13 +1358,13 @@ NvmeBlockIoReadBlocksEx (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  NumberOfBlocks  = BufferSize / BlockSize;
+  NumberOfBlocks = BufferSize / BlockSize;
   if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
   IoAlign = Media->IoAlign;
-  if (IoAlign > 0 && (((UINTN) Buffer & (IoAlign - 1)) != 0)) {
+  if ((IoAlign > 0) && (((UINTN)Buffer & (IoAlign - 1)) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1340,7 +1374,7 @@ NvmeBlockIoReadBlocksEx (
 
   if ((Token != NULL) && (Token->Event != NULL)) {
     Token->TransactionStatus = EFI_SUCCESS;
-    Status = NvmeAsyncRead (Device, Buffer, Lba, NumberOfBlocks, Token);
+    Status                   = NvmeAsyncRead (Device, Buffer, Lba, NumberOfBlocks, Token);
   } else {
     Status = NvmeRead (Device, Buffer, Lba, NumberOfBlocks);
   }
@@ -1391,20 +1425,20 @@ EFI_STATUS
 EFIAPI
 NvmeBlockIoWriteBlocksEx (
   IN     EFI_BLOCK_IO2_PROTOCOL  *This,
-  IN     UINT32                 MediaId,
-  IN     EFI_LBA                Lba,
-  IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
-  IN     UINTN                  BufferSize,
-  IN     VOID                   *Buffer
+  IN     UINT32                  MediaId,
+  IN     EFI_LBA                 Lba,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token,
+  IN     UINTN                   BufferSize,
+  IN     VOID                    *Buffer
   )
 {
-  NVME_DEVICE_PRIVATE_DATA        *Device;
-  EFI_STATUS                      Status;
-  EFI_BLOCK_IO_MEDIA              *Media;
-  UINTN                           BlockSize;
-  UINTN                           NumberOfBlocks;
-  UINTN                           IoAlign;
-  EFI_TPL                         OldTpl;
+  NVME_DEVICE_PRIVATE_DATA  *Device;
+  EFI_STATUS                Status;
+  EFI_BLOCK_IO_MEDIA        *Media;
+  UINTN                     BlockSize;
+  UINTN                     NumberOfBlocks;
+  UINTN                     IoAlign;
+  EFI_TPL                   OldTpl;
 
   //
   // Check parameters.
@@ -1428,6 +1462,7 @@ NvmeBlockIoWriteBlocksEx (
       Token->TransactionStatus = EFI_SUCCESS;
       gBS->SignalEvent (Token->Event);
     }
+
     return EFI_SUCCESS;
   }
 
@@ -1436,13 +1471,13 @@ NvmeBlockIoWriteBlocksEx (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  NumberOfBlocks  = BufferSize / BlockSize;
+  NumberOfBlocks = BufferSize / BlockSize;
   if ((Lba + NumberOfBlocks - 1) > Media->LastBlock) {
     return EFI_INVALID_PARAMETER;
   }
 
   IoAlign = Media->IoAlign;
-  if (IoAlign > 0 && (((UINTN) Buffer & (IoAlign - 1)) != 0)) {
+  if ((IoAlign > 0) && (((UINTN)Buffer & (IoAlign - 1)) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1452,7 +1487,7 @@ NvmeBlockIoWriteBlocksEx (
 
   if ((Token != NULL) && (Token->Event != NULL)) {
     Token->TransactionStatus = EFI_SUCCESS;
-    Status = NvmeAsyncWrite (Device, Buffer, Lba, NumberOfBlocks, Token);
+    Status                   = NvmeAsyncWrite (Device, Buffer, Lba, NumberOfBlocks, Token);
   } else {
     Status = NvmeWrite (Device, Buffer, Lba, NumberOfBlocks);
   }
@@ -1488,13 +1523,13 @@ NvmeBlockIoWriteBlocksEx (
 EFI_STATUS
 EFIAPI
 NvmeBlockIoFlushBlocksEx (
-  IN     EFI_BLOCK_IO2_PROTOCOL   *This,
-  IN OUT EFI_BLOCK_IO2_TOKEN      *Token
+  IN     EFI_BLOCK_IO2_PROTOCOL  *This,
+  IN OUT EFI_BLOCK_IO2_TOKEN     *Token
   )
 {
-  NVME_DEVICE_PRIVATE_DATA        *Device;
-  BOOLEAN                         IsEmpty;
-  EFI_TPL                         OldTpl;
+  NVME_DEVICE_PRIVATE_DATA  *Device;
+  BOOLEAN                   IsEmpty;
+  EFI_TPL                   OldTpl;
 
   //
   // Check parameters.
@@ -1560,21 +1595,21 @@ NvmeBlockIoFlushBlocksEx (
 **/
 EFI_STATUS
 TrustTransferNvmeDevice (
-  IN OUT NVME_CONTROLLER_PRIVATE_DATA      *Private,
-  IN OUT VOID                              *Buffer,
-  IN UINT8                                 SecurityProtocolId,
-  IN UINT16                                SecurityProtocolSpecificData,
-  IN UINTN                                 TransferLength,
-  IN BOOLEAN                               IsTrustSend,
-  IN UINT64                                Timeout,
-  OUT UINTN                                *TransferLengthOut
+  IN OUT NVME_CONTROLLER_PRIVATE_DATA  *Private,
+  IN OUT VOID                          *Buffer,
+  IN UINT8                             SecurityProtocolId,
+  IN UINT16                            SecurityProtocolSpecificData,
+  IN UINTN                             TransferLength,
+  IN BOOLEAN                           IsTrustSend,
+  IN UINT64                            Timeout,
+  OUT UINTN                            *TransferLengthOut
   )
 {
-  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET CommandPacket;
-  EFI_NVM_EXPRESS_COMMAND                  Command;
-  EFI_NVM_EXPRESS_COMPLETION               Completion;
-  EFI_STATUS                               Status;
-  UINT16                                   SpecificData;
+  EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET  CommandPacket;
+  EFI_NVM_EXPRESS_COMMAND                   Command;
+  EFI_NVM_EXPRESS_COMPLETION                Completion;
+  EFI_STATUS                                Status;
+  UINT16                                    SpecificData;
 
   ZeroMem (&CommandPacket, sizeof (EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
   ZeroMem (&Command, sizeof (EFI_NVM_EXPRESS_COMMAND));
@@ -1615,10 +1650,10 @@ TrustTransferNvmeDevice (
                                );
 
   if (!IsTrustSend) {
-    if (EFI_ERROR (Status))  {
+    if (EFI_ERROR (Status)) {
       *TransferLengthOut = 0;
     } else {
-      *TransferLengthOut = (UINTN) TransferLength;
+      *TransferLengthOut = (UINTN)TransferLength;
     }
   }
 
@@ -1700,20 +1735,20 @@ TrustTransferNvmeDevice (
 EFI_STATUS
 EFIAPI
 NvmeStorageSecurityReceiveData (
-  IN  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
-  IN  UINT32                                   MediaId,
-  IN  UINT64                                   Timeout,
-  IN  UINT8                                    SecurityProtocolId,
-  IN  UINT16                                   SecurityProtocolSpecificData,
-  IN  UINTN                                    PayloadBufferSize,
-  OUT VOID                                     *PayloadBuffer,
-  OUT UINTN                                    *PayloadTransferSize
+  IN  EFI_STORAGE_SECURITY_COMMAND_PROTOCOL  *This,
+  IN  UINT32                                 MediaId,
+  IN  UINT64                                 Timeout,
+  IN  UINT8                                  SecurityProtocolId,
+  IN  UINT16                                 SecurityProtocolSpecificData,
+  IN  UINTN                                  PayloadBufferSize,
+  OUT VOID                                   *PayloadBuffer,
+  OUT UINTN                                  *PayloadTransferSize
   )
 {
-  EFI_STATUS                       Status;
-  NVME_DEVICE_PRIVATE_DATA         *Device;
+  EFI_STATUS                Status;
+  NVME_DEVICE_PRIVATE_DATA  *Device;
 
-  Status  = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
 
   if ((PayloadBuffer == NULL) || (PayloadTransferSize == NULL) || (PayloadBufferSize == 0)) {
     return EFI_INVALID_PARAMETER;
@@ -1807,19 +1842,19 @@ NvmeStorageSecurityReceiveData (
 EFI_STATUS
 EFIAPI
 NvmeStorageSecuritySendData (
-  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL    *This,
-  IN UINT32                                   MediaId,
-  IN UINT64                                   Timeout,
-  IN UINT8                                    SecurityProtocolId,
-  IN UINT16                                   SecurityProtocolSpecificData,
-  IN UINTN                                    PayloadBufferSize,
-  IN VOID                                     *PayloadBuffer
+  IN EFI_STORAGE_SECURITY_COMMAND_PROTOCOL  *This,
+  IN UINT32                                 MediaId,
+  IN UINT64                                 Timeout,
+  IN UINT8                                  SecurityProtocolId,
+  IN UINT16                                 SecurityProtocolSpecificData,
+  IN UINTN                                  PayloadBufferSize,
+  IN VOID                                   *PayloadBuffer
   )
 {
-  EFI_STATUS                       Status;
-  NVME_DEVICE_PRIVATE_DATA         *Device;
+  EFI_STATUS                Status;
+  NVME_DEVICE_PRIVATE_DATA  *Device;
 
-  Status  = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
 
   if ((PayloadBuffer == NULL) && (PayloadBufferSize != 0)) {
     return EFI_INVALID_PARAMETER;
@@ -1848,7 +1883,3 @@ NvmeStorageSecuritySendData (
 
   return Status;
 }
-
-
-
-

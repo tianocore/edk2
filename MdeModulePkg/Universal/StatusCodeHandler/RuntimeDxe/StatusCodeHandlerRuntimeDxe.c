@@ -40,8 +40,8 @@ UnregisterSerialBootTimeHandlers (
 VOID
 EFIAPI
 VirtualAddressChangeCallBack (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -49,7 +49,7 @@ VirtualAddressChangeCallBack (
   //
   EfiConvertPointer (
     0,
-    (VOID **) &mRtMemoryStatusCodeTable
+    (VOID **)&mRtMemoryStatusCodeTable
     );
 }
 
@@ -63,12 +63,12 @@ InitializationDispatcherWorker (
   VOID
   )
 {
-  EFI_PEI_HOB_POINTERS              Hob;
-  EFI_STATUS                        Status;
-  MEMORY_STATUSCODE_PACKET_HEADER   *PacketHeader;
-  MEMORY_STATUSCODE_RECORD          *Record;
-  UINTN                             Index;
-  UINTN                             MaxRecordNumber;
+  EFI_PEI_HOB_POINTERS             Hob;
+  EFI_STATUS                       Status;
+  MEMORY_STATUSCODE_PACKET_HEADER  *PacketHeader;
+  MEMORY_STATUSCODE_RECORD         *Record;
+  UINTN                            Index;
+  UINTN                            MaxRecordNumber;
 
   //
   // If enable UseSerial, then initialize serial port.
@@ -81,6 +81,7 @@ InitializationDispatcherWorker (
     Status = SerialPortInitialize ();
     ASSERT_EFI_ERROR (Status);
   }
+
   if (PcdGetBool (PcdStatusCodeUseMemory)) {
     Status = RtMemoryStatusCodeInitializeWorker ();
     ASSERT_EFI_ERROR (Status);
@@ -94,17 +95,18 @@ InitializationDispatcherWorker (
     // Journal GUID'ed HOBs to find all record entry, if found,
     // then output record to support replay device.
     //
-    Hob.Raw   = GetFirstGuidHob (&gMemoryStatusCodeRecordGuid);
+    Hob.Raw = GetFirstGuidHob (&gMemoryStatusCodeRecordGuid);
     if (Hob.Raw != NULL) {
-      PacketHeader = (MEMORY_STATUSCODE_PACKET_HEADER *) GET_GUID_HOB_DATA (Hob.Guid);
-      Record = (MEMORY_STATUSCODE_RECORD *) (PacketHeader + 1);
-      MaxRecordNumber = (UINTN) PacketHeader->RecordIndex;
+      PacketHeader    = (MEMORY_STATUSCODE_PACKET_HEADER *)GET_GUID_HOB_DATA (Hob.Guid);
+      Record          = (MEMORY_STATUSCODE_RECORD *)(PacketHeader + 1);
+      MaxRecordNumber = (UINTN)PacketHeader->RecordIndex;
       if (PacketHeader->PacketIndex > 0) {
         //
         // Record has been wrapped around. So, record number has arrived at max number.
         //
-        MaxRecordNumber = (UINTN) PacketHeader->MaxRecordsNumber;
+        MaxRecordNumber = (UINTN)PacketHeader->MaxRecordsNumber;
       }
+
       for (Index = 0; Index < MaxRecordNumber; Index++) {
         //
         // Dispatch records to devices based on feature flag.
@@ -118,6 +120,7 @@ InitializationDispatcherWorker (
             NULL
             );
         }
+
         if (PcdGetBool (PcdStatusCodeUseMemory)) {
           RtMemoryStatusCodeReportWorker (
             Record[Index].CodeType,
@@ -147,16 +150,16 @@ InitializationDispatcherWorker (
 EFI_STATUS
 EFIAPI
 StatusCodeHandlerRuntimeDxeEntry (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = gBS->LocateProtocol (
                   &gEfiRscHandlerProtocolGuid,
                   NULL,
-                  (VOID **) &mRscHandlerProtocol
+                  (VOID **)&mRscHandlerProtocol
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -168,6 +171,7 @@ StatusCodeHandlerRuntimeDxeEntry (
   if (PcdGetBool (PcdStatusCodeUseSerial)) {
     mRscHandlerProtocol->Register (SerialStatusCodeReportWorker, TPL_HIGH_LEVEL);
   }
+
   if (PcdGetBool (PcdStatusCodeUseMemory)) {
     mRscHandlerProtocol->Register (RtMemoryStatusCodeReportWorker, TPL_HIGH_LEVEL);
   }

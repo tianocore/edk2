@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "EdbCommon.h"
 
-#define EBC_DEBUGGER_MAJOR_VERSION   1
-#define EBC_DEBUGGER_MINOR_VERSION   0
+#define EBC_DEBUGGER_MAJOR_VERSION  1
+#define EBC_DEBUGGER_MINOR_VERSION  0
 
 #define EFI_DEBUG_RETURN    1
 #define EFI_DEBUG_BREAK     2
@@ -27,8 +27,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 EfiDebuggerEntrypoint (
-  IN EFI_HANDLE                     ImageHandle,
-  IN EFI_SYSTEM_TABLE               *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
 /**
@@ -44,11 +44,11 @@ EfiDebuggerEntrypoint (
 VOID
 EFIAPI
 EdbExceptionHandler (
-  IN     EFI_EXCEPTION_TYPE   ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT   SystemContext
+  IN     EFI_EXCEPTION_TYPE  ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
 
-extern EFI_DEBUGGER_PRIVATE_DATA mDebuggerPrivate;
+extern EFI_DEBUGGER_PRIVATE_DATA  mDebuggerPrivate;
 
 #include "EdbSupport.h"
 #include "EdbCommand.h"

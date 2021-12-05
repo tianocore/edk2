@@ -21,13 +21,13 @@
 **/
 EFI_STATUS
 AmlGetChildFromObjectBuffer (
-  IN EFI_AML_HANDLE         *AmlParentHandle,
-  IN UINT8                  *CurrentBuffer,
-  OUT VOID                  **Buffer
+  IN EFI_AML_HANDLE  *AmlParentHandle,
+  IN UINT8           *CurrentBuffer,
+  OUT VOID           **Buffer
   )
 {
-  AML_BYTE_ENCODING   *AmlByteEncoding;
-  UINTN               DataSize;
+  AML_BYTE_ENCODING  *AmlByteEncoding;
+  UINTN              DataSize;
 
   //
   // Root is considered as SCOPE, which has TermList.
@@ -38,6 +38,7 @@ AmlGetChildFromObjectBuffer (
     if (AmlByteEncoding == NULL) {
       return EFI_INVALID_PARAMETER;
     }
+
     //
     // NOTE: We need return everything, because user might need parse the returned object.
     //
@@ -54,6 +55,7 @@ AmlGetChildFromObjectBuffer (
     if (DataSize == 0) {
       return EFI_INVALID_PARAMETER;
     }
+
     CurrentBuffer += DataSize;
   }
 
@@ -77,12 +79,12 @@ AmlGetChildFromObjectBuffer (
 **/
 EFI_STATUS
 AmlGetChildFromRoot (
-  IN EFI_AML_HANDLE         *AmlParentHandle,
-  IN EFI_AML_HANDLE         *AmlHandle,
-  OUT VOID                  **Buffer
+  IN EFI_AML_HANDLE  *AmlParentHandle,
+  IN EFI_AML_HANDLE  *AmlHandle,
+  OUT VOID           **Buffer
   )
 {
-  UINT8               *CurrentBuffer;
+  UINT8  *CurrentBuffer;
 
   if (AmlHandle == NULL) {
     //
@@ -109,9 +111,9 @@ AmlGetChildFromRoot (
 **/
 EFI_STATUS
 AmlGetChildFromOptionList (
-  IN EFI_AML_HANDLE         *AmlParentHandle,
-  IN EFI_AML_HANDLE         *AmlHandle,
-  OUT VOID                  **Buffer
+  IN EFI_AML_HANDLE  *AmlParentHandle,
+  IN EFI_AML_HANDLE  *AmlHandle,
+  OUT VOID           **Buffer
   )
 {
   EFI_ACPI_DATA_TYPE  DataType;
@@ -121,7 +123,7 @@ AmlGetChildFromOptionList (
   EFI_STATUS          Status;
   AML_OP_PARSE_INDEX  MaxTerm;
 
-  Index = AML_OP_PARSE_INDEX_GET_TERM1;
+  Index   = AML_OP_PARSE_INDEX_GET_TERM1;
   MaxTerm = AmlParentHandle->AmlByteEncoding->MaxIndex;
   while (Index <= MaxTerm) {
     Status = AmlParseOptionHandleCommon (
@@ -134,6 +136,7 @@ AmlGetChildFromOptionList (
     if (EFI_ERROR (Status)) {
       return EFI_INVALID_PARAMETER;
     }
+
     if (DataType == EFI_ACPI_DATA_TYPE_NONE) {
       //
       // Not found
@@ -145,17 +148,19 @@ AmlGetChildFromOptionList (
     // Find it, and Check Data
     //
     if ((DataType == EFI_ACPI_DATA_TYPE_CHILD) &&
-        ((UINTN)AmlHandle->Buffer < (UINTN)Data)) {
+        ((UINTN)AmlHandle->Buffer < (UINTN)Data))
+    {
       //
       // Buffer < Data means current node is next one
       //
       *Buffer = Data;
       return EFI_SUCCESS;
     }
+
     //
     // Not Child
     //
-    Index ++;
+    Index++;
   }
 
   *Buffer = NULL;
@@ -175,13 +180,13 @@ AmlGetChildFromOptionList (
 **/
 EFI_STATUS
 AmlGetChildFromObjectChildList (
-  IN EFI_AML_HANDLE         *AmlParentHandle,
-  IN EFI_AML_HANDLE         *AmlHandle,
-  OUT VOID                  **Buffer
+  IN EFI_AML_HANDLE  *AmlParentHandle,
+  IN EFI_AML_HANDLE  *AmlHandle,
+  OUT VOID           **Buffer
   )
 {
-  EFI_STATUS          Status;
-  UINT8               *CurrentBuffer;
+  EFI_STATUS  Status;
+  UINT8       *CurrentBuffer;
 
   CurrentBuffer = NULL;
 
@@ -242,12 +247,12 @@ AmlGetChildFromObjectChildList (
 **/
 EFI_STATUS
 AmlGetChildFromNonRoot (
-  IN EFI_AML_HANDLE         *AmlParentHandle,
-  IN EFI_AML_HANDLE         *AmlHandle,
-  OUT VOID                  **Buffer
+  IN EFI_AML_HANDLE  *AmlParentHandle,
+  IN EFI_AML_HANDLE  *AmlHandle,
+  OUT VOID           **Buffer
   )
 {
-  EFI_STATUS          Status;
+  EFI_STATUS  Status;
 
   if (AmlHandle == NULL) {
     //
@@ -263,6 +268,7 @@ AmlGetChildFromNonRoot (
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (*Buffer != NULL) {
     return EFI_SUCCESS;
   }

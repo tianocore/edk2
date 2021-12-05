@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// This default instance of EFI_PEI_CPU_IO_PPI install assigned to EFI_PEI_SERVICE.CpuIo
 /// when PeiCore's initialization.
 ///
-EFI_PEI_CPU_IO_PPI gPeiDefaultCpuIoPpi = {
+EFI_PEI_CPU_IO_PPI  gPeiDefaultCpuIoPpi = {
   {
     PeiDefaultMemRead,
     PeiDefaultMemWrite
@@ -66,12 +66,12 @@ EFI_PEI_CPU_IO_PPI gPeiDefaultCpuIoPpi = {
 EFI_STATUS
 EFIAPI
 PeiDefaultMemRead (
-  IN  CONST EFI_PEI_SERVICES            **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI          *This,
-  IN  EFI_PEI_CPU_IO_PPI_WIDTH          Width,
-  IN  UINT64                            Address,
-  IN  UINTN                             Count,
-  IN  OUT VOID                          *Buffer
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  EFI_PEI_CPU_IO_PPI_WIDTH  Width,
+  IN  UINT64                    Address,
+  IN  UINTN                     Count,
+  IN  OUT VOID                  *Buffer
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -99,12 +99,12 @@ PeiDefaultMemRead (
 EFI_STATUS
 EFIAPI
 PeiDefaultMemWrite (
-  IN  CONST EFI_PEI_SERVICES            **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI          *This,
-  IN  EFI_PEI_CPU_IO_PPI_WIDTH          Width,
-  IN  UINT64                            Address,
-  IN  UINTN                             Count,
-  IN  OUT VOID                          *Buffer
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  EFI_PEI_CPU_IO_PPI_WIDTH  Width,
+  IN  UINT64                    Address,
+  IN  UINTN                     Count,
+  IN  OUT VOID                  *Buffer
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -131,12 +131,12 @@ PeiDefaultMemWrite (
 EFI_STATUS
 EFIAPI
 PeiDefaultIoRead (
-  IN      CONST EFI_PEI_SERVICES          **PeiServices,
-  IN      CONST EFI_PEI_CPU_IO_PPI        *This,
-  IN      EFI_PEI_CPU_IO_PPI_WIDTH        Width,
-  IN      UINT64                          Address,
-  IN      UINTN                           Count,
-  IN OUT  VOID                            *Buffer
+  IN      CONST EFI_PEI_SERVICES    **PeiServices,
+  IN      CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN      EFI_PEI_CPU_IO_PPI_WIDTH  Width,
+  IN      UINT64                    Address,
+  IN      UINTN                     Count,
+  IN OUT  VOID                      *Buffer
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -163,12 +163,12 @@ PeiDefaultIoRead (
 EFI_STATUS
 EFIAPI
 PeiDefaultIoWrite (
-  IN      CONST EFI_PEI_SERVICES          **PeiServices,
-  IN      CONST EFI_PEI_CPU_IO_PPI        *This,
-  IN      EFI_PEI_CPU_IO_PPI_WIDTH        Width,
-  IN      UINT64                          Address,
-  IN      UINTN                           Count,
-  IN OUT  VOID                            *Buffer
+  IN      CONST EFI_PEI_SERVICES    **PeiServices,
+  IN      CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN      EFI_PEI_CPU_IO_PPI_WIDTH  Width,
+  IN      UINT64                    Address,
+  IN      UINTN                     Count,
+  IN OUT  VOID                      *Buffer
   )
 {
   return EFI_NOT_AVAILABLE_YET;
@@ -189,9 +189,9 @@ PeiDefaultIoWrite (
 UINT8
 EFIAPI
 PeiDefaultIoRead8 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address
   )
 {
   return 0;
@@ -212,9 +212,9 @@ PeiDefaultIoRead8 (
 UINT16
 EFIAPI
 PeiDefaultIoRead16 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address
   )
 {
   return 0;
@@ -235,9 +235,9 @@ PeiDefaultIoRead16 (
 UINT32
 EFIAPI
 PeiDefaultIoRead32 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address
   )
 {
   return 0;
@@ -258,9 +258,9 @@ PeiDefaultIoRead32 (
 UINT64
 EFIAPI
 PeiDefaultIoRead64 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address
   )
 {
   return 0;
@@ -279,10 +279,10 @@ PeiDefaultIoRead64 (
 VOID
 EFIAPI
 PeiDefaultIoWrite8 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address,
-  IN  UINT8                       Data
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address,
+  IN  UINT8                     Data
   )
 {
 }
@@ -300,10 +300,10 @@ PeiDefaultIoWrite8 (
 VOID
 EFIAPI
 PeiDefaultIoWrite16 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address,
-  IN  UINT16                      Data
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address,
+  IN  UINT16                    Data
   )
 {
 }
@@ -321,10 +321,10 @@ PeiDefaultIoWrite16 (
 VOID
 EFIAPI
 PeiDefaultIoWrite32 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address,
-  IN  UINT32                      Data
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address,
+  IN  UINT32                    Data
   )
 {
 }
@@ -342,10 +342,10 @@ PeiDefaultIoWrite32 (
 VOID
 EFIAPI
 PeiDefaultIoWrite64 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address,
-  IN  UINT64                      Data
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address,
+  IN  UINT64                    Data
   )
 {
 }
@@ -366,9 +366,9 @@ PeiDefaultIoWrite64 (
 UINT8
 EFIAPI
 PeiDefaultMemRead8 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address
   )
 {
   return 0;
@@ -390,9 +390,9 @@ PeiDefaultMemRead8 (
 UINT16
 EFIAPI
 PeiDefaultMemRead16 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address
   )
 {
   return 0;
@@ -414,9 +414,9 @@ PeiDefaultMemRead16 (
 UINT32
 EFIAPI
 PeiDefaultMemRead32 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address
   )
 {
   return 0;
@@ -438,9 +438,9 @@ PeiDefaultMemRead32 (
 UINT64
 EFIAPI
 PeiDefaultMemRead64 (
-  IN  CONST EFI_PEI_SERVICES      **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI    *This,
-  IN  UINT64                      Address
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address
   )
 {
   return 0;
@@ -460,10 +460,10 @@ PeiDefaultMemRead64 (
 VOID
 EFIAPI
 PeiDefaultMemWrite8 (
-  IN  CONST EFI_PEI_SERVICES        **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                        Address,
-  IN  UINT8                         Data
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address,
+  IN  UINT8                     Data
   )
 {
 }
@@ -482,10 +482,10 @@ PeiDefaultMemWrite8 (
 VOID
 EFIAPI
 PeiDefaultMemWrite16 (
-  IN  CONST EFI_PEI_SERVICES        **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                        Address,
-  IN  UINT16                        Data
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address,
+  IN  UINT16                    Data
   )
 {
 }
@@ -504,10 +504,10 @@ PeiDefaultMemWrite16 (
 VOID
 EFIAPI
 PeiDefaultMemWrite32 (
-  IN  CONST EFI_PEI_SERVICES        **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                        Address,
-  IN  UINT32                        Data
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address,
+  IN  UINT32                    Data
   )
 {
 }
@@ -526,10 +526,10 @@ PeiDefaultMemWrite32 (
 VOID
 EFIAPI
 PeiDefaultMemWrite64 (
-  IN  CONST EFI_PEI_SERVICES        **PeiServices,
-  IN  CONST EFI_PEI_CPU_IO_PPI      *This,
-  IN  UINT64                        Address,
-  IN  UINT64                        Data
+  IN  CONST EFI_PEI_SERVICES    **PeiServices,
+  IN  CONST EFI_PEI_CPU_IO_PPI  *This,
+  IN  UINT64                    Address,
+  IN  UINT64                    Data
   )
 {
 }

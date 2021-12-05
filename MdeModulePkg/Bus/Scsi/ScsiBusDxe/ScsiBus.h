@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _SCSI_BUS_H_
 #define _SCSI_BUS_H_
 
-
 #include <Uefi.h>
 
 #include <Protocol/ScsiPassThru.h>
@@ -31,22 +30,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/Scsi.h>
 
-#define SCSI_IO_DEV_SIGNATURE SIGNATURE_32 ('s', 'c', 'i', 'o')
+#define SCSI_IO_DEV_SIGNATURE  SIGNATURE_32 ('s', 'c', 'i', 'o')
 
 typedef union {
-  UINT32  Scsi;
-  UINT8   ExtScsi[4];
+  UINT32    Scsi;
+  UINT8     ExtScsi[4];
 } SCSI_ID;
 
 typedef struct _SCSI_TARGET_ID {
-  SCSI_ID ScsiId;
-  UINT8   ExtScsiId[12];
-}SCSI_TARGET_ID;
-
+  SCSI_ID    ScsiId;
+  UINT8      ExtScsiId[12];
+} SCSI_TARGET_ID;
 
 typedef struct {
-   VOID   *Data1;
-   VOID   *Data2;
+  VOID    *Data1;
+  VOID    *Data2;
 } SCSI_EVENT_DATA;
 
 //
@@ -57,7 +55,7 @@ typedef struct {
 //
 // SCSI Bus Timeout Experience Value
 //
-#define SCSI_BUS_TIMEOUT           EFI_TIMER_PERIOD_SECONDS (3)
+#define SCSI_BUS_TIMEOUT  EFI_TIMER_PERIOD_SECONDS (3)
 
 //
 // The ScsiBusProtocol is just used to locate ScsiBusDev
@@ -67,16 +65,16 @@ typedef struct {
 // gEfiCallerIdGuid will be used as its protocol guid.
 //
 typedef struct _EFI_SCSI_BUS_PROTOCOL {
-  UINT64  Reserved;
+  UINT64    Reserved;
 } EFI_SCSI_BUS_PROTOCOL;
 
 typedef struct _SCSI_BUS_DEVICE {
-  UINTN                                 Signature;
-  EFI_SCSI_BUS_PROTOCOL                 BusIdentify;
-  BOOLEAN                               ExtScsiSupport;
-  EFI_SCSI_PASS_THRU_PROTOCOL           *ScsiInterface;
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL       *ExtScsiInterface;
-  EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
+  UINTN                              Signature;
+  EFI_SCSI_BUS_PROTOCOL              BusIdentify;
+  BOOLEAN                            ExtScsiSupport;
+  EFI_SCSI_PASS_THRU_PROTOCOL        *ScsiInterface;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL    *ExtScsiInterface;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
 } SCSI_BUS_DEVICE;
 
 #define SCSI_BUS_CONTROLLER_DEVICE_FROM_THIS(a)  CR (a, SCSI_BUS_DEVICE, BusIdentify, SCSI_BUS_DEVICE_SIGNATURE)
@@ -182,15 +180,16 @@ SCSIBusDriverBindingStart (
 EFI_STATUS
 EFIAPI
 SCSIBusDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Controller,
-  IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Controller,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -309,11 +308,11 @@ ScsiBusComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 ScsiBusComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
 
 /**
@@ -330,8 +329,8 @@ ScsiBusComponentNameGetControllerName (
 EFI_STATUS
 EFIAPI
 ScsiGetDeviceType (
-  IN  EFI_SCSI_IO_PROTOCOL     *This,
-  OUT UINT8                    *DeviceType
+  IN  EFI_SCSI_IO_PROTOCOL  *This,
+  OUT UINT8                 *DeviceType
   );
 
 /**
@@ -350,9 +349,9 @@ ScsiGetDeviceType (
 EFI_STATUS
 EFIAPI
 ScsiGetDeviceLocation (
-  IN  EFI_SCSI_IO_PROTOCOL    *This,
-  IN OUT UINT8                **Target,
-  OUT UINT64                  *Lun
+  IN  EFI_SCSI_IO_PROTOCOL  *This,
+  IN OUT UINT8              **Target,
+  OUT UINT64                *Lun
   );
 
 /**
@@ -370,7 +369,7 @@ ScsiGetDeviceLocation (
 EFI_STATUS
 EFIAPI
 ScsiResetBus (
-  IN  EFI_SCSI_IO_PROTOCOL     *This
+  IN  EFI_SCSI_IO_PROTOCOL  *This
   );
 
 /**
@@ -387,7 +386,7 @@ ScsiResetBus (
 EFI_STATUS
 EFIAPI
 ScsiResetDevice (
-  IN  EFI_SCSI_IO_PROTOCOL     *This
+  IN  EFI_SCSI_IO_PROTOCOL  *This
   );
 
 /**
@@ -462,11 +461,11 @@ ScsiExecuteSCSICommand (
 EFI_STATUS
 EFIAPI
 ScsiScanCreateDevice (
-  IN     EFI_DRIVER_BINDING_PROTOCOL   *This,
-  IN     EFI_HANDLE                    Controller,
-  IN     SCSI_TARGET_ID                *TargetId,
-  IN     UINT64                        Lun,
-  IN OUT SCSI_BUS_DEVICE               *ScsiBusDev
+  IN     EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN     EFI_HANDLE                   Controller,
+  IN     SCSI_TARGET_ID               *TargetId,
+  IN     UINT64                       Lun,
+  IN OUT SCSI_BUS_DEVICE              *ScsiBusDev
   );
 
 /**
@@ -480,7 +479,7 @@ ScsiScanCreateDevice (
 **/
 BOOLEAN
 DiscoverScsiDevice (
-  IN  OUT  SCSI_IO_DEV   *ScsiIoDevice
+  IN  OUT  SCSI_IO_DEV  *ScsiIoDevice
   );
 
 #endif

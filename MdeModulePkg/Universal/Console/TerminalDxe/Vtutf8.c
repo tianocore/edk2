@@ -17,12 +17,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 VTUTF8RawDataToUnicode (
-  IN  TERMINAL_DEV    *TerminalDevice
+  IN  TERMINAL_DEV  *TerminalDevice
   )
 {
-  UTF8_CHAR Utf8Char;
-  UINT8     ValidBytes;
-  UINT16    UnicodeChar;
+  UTF8_CHAR  Utf8Char;
+  UINT8      ValidBytes;
+  UINT16     UnicodeChar;
 
   ValidBytes = 0;
   //
@@ -31,14 +31,13 @@ VTUTF8RawDataToUnicode (
   // the unicode into unicode fifo, until the raw fifo is empty.
   //
   while (!IsRawFiFoEmpty (TerminalDevice) && !IsUnicodeFiFoFull (TerminalDevice)) {
-
     GetOneValidUtf8Char (TerminalDevice, &Utf8Char, &ValidBytes);
 
-    if (ValidBytes < 1 || ValidBytes > 3) {
+    if ((ValidBytes < 1) || (ValidBytes > 3)) {
       continue;
     }
 
-    Utf8ToUnicode (Utf8Char, ValidBytes, (CHAR16 *) &UnicodeChar);
+    Utf8ToUnicode (Utf8Char, ValidBytes, (CHAR16 *)&UnicodeChar);
 
     UnicodeFiFoInsertOneKey (TerminalDevice, UnicodeChar);
   }
@@ -55,14 +54,14 @@ VTUTF8RawDataToUnicode (
 **/
 VOID
 GetOneValidUtf8Char (
-  IN  TERMINAL_DEV      *Utf8Device,
-  OUT UTF8_CHAR         *Utf8Char,
-  OUT UINT8             *ValidBytes
+  IN  TERMINAL_DEV  *Utf8Device,
+  OUT UTF8_CHAR     *Utf8Char,
+  OUT UINT8         *ValidBytes
   )
 {
-  UINT8   Temp;
-  UINT8   Index;
-  BOOLEAN FetchFlag;
+  UINT8    Temp;
+  UINT8    Index;
+  BOOLEAN  FetchFlag;
 
   Temp      = 0;
   Index     = 0;
@@ -75,88 +74,82 @@ GetOneValidUtf8Char (
   *ValidBytes = 0;
 
   while (!IsRawFiFoEmpty (Utf8Device)) {
-
     RawFiFoRemoveOneKey (Utf8Device, &Temp);
 
     switch (*ValidBytes) {
+      case 0:
+        if ((Temp & 0x80) == 0) {
+          //
+          // one-byte utf8 char
+          //
+          *ValidBytes = 1;
 
-    case 0:
-      if ((Temp & 0x80) == 0) {
-        //
-        // one-byte utf8 char
-        //
-        *ValidBytes       = 1;
+          Utf8Char->Utf8_1 = Temp;
 
-        Utf8Char->Utf8_1  = Temp;
+          FetchFlag = FALSE;
+        } else if ((Temp & 0xe0) == 0xc0) {
+          //
+          // two-byte utf8 char
+          //
+          *ValidBytes = 2;
 
-        FetchFlag         = FALSE;
+          Utf8Char->Utf8_2[1] = Temp;
+        } else if ((Temp & 0xf0) == 0xe0) {
+          //
+          // three-byte utf8 char
+          //
+          *ValidBytes = 3;
 
-      } else if ((Temp & 0xe0) == 0xc0) {
-        //
-        // two-byte utf8 char
-        //
-        *ValidBytes         = 2;
+          Utf8Char->Utf8_3[2] = Temp;
 
-        Utf8Char->Utf8_2[1] = Temp;
-
-      } else if ((Temp & 0xf0) == 0xe0) {
-        //
-        // three-byte utf8 char
-        //
-        *ValidBytes         = 3;
-
-        Utf8Char->Utf8_3[2] = Temp;
-
-        Index++;
-
-      } else {
-        //
-        // reset *ValidBytes to zero, let valid utf8 char search restart
-        //
-        *ValidBytes = 0;
-      }
-
-      break;
-
-    case 2:
-      //
-      // two-byte utf8 char go on
-      //
-      if ((Temp & 0xc0) == 0x80) {
-
-        Utf8Char->Utf8_2[0] = Temp;
-
-        FetchFlag           = FALSE;
-
-      } else {
-
-        *ValidBytes = 0;
-      }
-      break;
-
-    case 3:
-      //
-      // three-byte utf8 char go on
-      //
-      if ((Temp & 0xc0) == 0x80) {
-        if (Index == 1) {
-          Utf8Char->Utf8_3[1] = Temp;
           Index++;
         } else {
-          Utf8Char->Utf8_3[0] = Temp;
-          FetchFlag = FALSE;
+          //
+          // reset *ValidBytes to zero, let valid utf8 char search restart
+          //
+          *ValidBytes = 0;
         }
-      } else {
-        //
-        // reset *ValidBytes and Index to zero, let valid utf8 char search restart
-        //
-        *ValidBytes = 0;
-        Index       = 0;
-      }
-      break;
 
-    default:
-      break;
+        break;
+
+      case 2:
+        //
+        // two-byte utf8 char go on
+        //
+        if ((Temp & 0xc0) == 0x80) {
+          Utf8Char->Utf8_2[0] = Temp;
+
+          FetchFlag = FALSE;
+        } else {
+          *ValidBytes = 0;
+        }
+
+        break;
+
+      case 3:
+        //
+        // three-byte utf8 char go on
+        //
+        if ((Temp & 0xc0) == 0x80) {
+          if (Index == 1) {
+            Utf8Char->Utf8_3[1] = Temp;
+            Index++;
+          } else {
+            Utf8Char->Utf8_3[0] = Temp;
+            FetchFlag           = FALSE;
+          }
+        } else {
+          //
+          // reset *ValidBytes and Index to zero, let valid utf8 char search restart
+          //
+          *ValidBytes = 0;
+          Index       = 0;
+        }
+
+        break;
+
+      default:
+        break;
     }
 
     if (!FetchFlag) {
@@ -164,7 +157,7 @@ GetOneValidUtf8Char (
     }
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -184,16 +177,16 @@ GetOneValidUtf8Char (
 **/
 VOID
 Utf8ToUnicode (
-  IN  UTF8_CHAR       Utf8Char,
-  IN  UINT8           ValidBytes,
-  OUT CHAR16          *UnicodeChar
+  IN  UTF8_CHAR  Utf8Char,
+  IN  UINT8      ValidBytes,
+  OUT CHAR16     *UnicodeChar
   )
 {
-  UINT8 UnicodeByte0;
-  UINT8 UnicodeByte1;
-  UINT8 Byte0;
-  UINT8 Byte1;
-  UINT8 Byte2;
+  UINT8  UnicodeByte0;
+  UINT8  UnicodeByte1;
+  UINT8  Byte0;
+  UINT8  Byte1;
+  UINT8  Byte2;
 
   *UnicodeChar = 0;
 
@@ -202,42 +195,42 @@ Utf8ToUnicode (
   // up to 3 bytes utf8 code is supported.
   //
   switch (ValidBytes) {
-  case 1:
-    //
-    // one-byte utf8 code
-    //
-    *UnicodeChar = (UINT16) Utf8Char.Utf8_1;
-    break;
+    case 1:
+      //
+      // one-byte utf8 code
+      //
+      *UnicodeChar = (UINT16)Utf8Char.Utf8_1;
+      break;
 
-  case 2:
-    //
-    // two-byte utf8 code
-    //
-    Byte0         = Utf8Char.Utf8_2[0];
-    Byte1         = Utf8Char.Utf8_2[1];
+    case 2:
+      //
+      // two-byte utf8 code
+      //
+      Byte0 = Utf8Char.Utf8_2[0];
+      Byte1 = Utf8Char.Utf8_2[1];
 
-    UnicodeByte0  = (UINT8) ((Byte1 << 6) | (Byte0 & 0x3f));
-    UnicodeByte1  = (UINT8) ((Byte1 >> 2) & 0x07);
-    *UnicodeChar  = (UINT16) (UnicodeByte0 | (UnicodeByte1 << 8));
-    break;
+      UnicodeByte0 = (UINT8)((Byte1 << 6) | (Byte0 & 0x3f));
+      UnicodeByte1 = (UINT8)((Byte1 >> 2) & 0x07);
+      *UnicodeChar = (UINT16)(UnicodeByte0 | (UnicodeByte1 << 8));
+      break;
 
-  case 3:
-    //
-    // three-byte utf8 code
-    //
-    Byte0         = Utf8Char.Utf8_3[0];
-    Byte1         = Utf8Char.Utf8_3[1];
-    Byte2         = Utf8Char.Utf8_3[2];
+    case 3:
+      //
+      // three-byte utf8 code
+      //
+      Byte0 = Utf8Char.Utf8_3[0];
+      Byte1 = Utf8Char.Utf8_3[1];
+      Byte2 = Utf8Char.Utf8_3[2];
 
-    UnicodeByte0  = (UINT8) ((Byte1 << 6) | (Byte0 & 0x3f));
-    UnicodeByte1  = (UINT8) ((Byte2 << 4) | ((Byte1 >> 2) & 0x0f));
-    *UnicodeChar  = (UINT16) (UnicodeByte0 | (UnicodeByte1 << 8));
+      UnicodeByte0 = (UINT8)((Byte1 << 6) | (Byte0 & 0x3f));
+      UnicodeByte1 = (UINT8)((Byte2 << 4) | ((Byte1 >> 2) & 0x0f));
+      *UnicodeChar = (UINT16)(UnicodeByte0 | (UnicodeByte1 << 8));
 
-  default:
-    break;
+    default:
+      break;
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -258,47 +251,44 @@ Utf8ToUnicode (
 **/
 VOID
 UnicodeToUtf8 (
-  IN  CHAR16      Unicode,
-  OUT UTF8_CHAR   *Utf8Char,
-  OUT UINT8       *ValidBytes
+  IN  CHAR16     Unicode,
+  OUT UTF8_CHAR  *Utf8Char,
+  OUT UINT8      *ValidBytes
   )
 {
-  UINT8 UnicodeByte0;
-  UINT8 UnicodeByte1;
+  UINT8  UnicodeByte0;
+  UINT8  UnicodeByte1;
+
   //
   // translate unicode to utf8 code
   //
-  UnicodeByte0  = (UINT8) Unicode;
-  UnicodeByte1  = (UINT8) (Unicode >> 8);
+  UnicodeByte0 = (UINT8)Unicode;
+  UnicodeByte1 = (UINT8)(Unicode >> 8);
 
   if (Unicode < 0x0080) {
-
-    Utf8Char->Utf8_1  = (UINT8) (UnicodeByte0 & 0x7f);
-    *ValidBytes       = 1;
-
+    Utf8Char->Utf8_1 = (UINT8)(UnicodeByte0 & 0x7f);
+    *ValidBytes      = 1;
   } else if (Unicode < 0x0800) {
     //
     // byte sequence: high -> low
     //                Utf8_2[0], Utf8_2[1]
     //
-    Utf8Char->Utf8_2[1] = (UINT8) ((UnicodeByte0 & 0x3f) + 0x80);
-    Utf8Char->Utf8_2[0] = (UINT8) ((((UnicodeByte1 << 2) + (UnicodeByte0 >> 6)) & 0x1f) + 0xc0);
+    Utf8Char->Utf8_2[1] = (UINT8)((UnicodeByte0 & 0x3f) + 0x80);
+    Utf8Char->Utf8_2[0] = (UINT8)((((UnicodeByte1 << 2) + (UnicodeByte0 >> 6)) & 0x1f) + 0xc0);
 
-    *ValidBytes         = 2;
-
+    *ValidBytes = 2;
   } else {
     //
     // byte sequence: high -> low
     //                Utf8_3[0], Utf8_3[1], Utf8_3[2]
     //
-    Utf8Char->Utf8_3[2] = (UINT8) ((UnicodeByte0 & 0x3f) + 0x80);
-    Utf8Char->Utf8_3[1] = (UINT8) ((((UnicodeByte1 << 2) + (UnicodeByte0 >> 6)) & 0x3f) + 0x80);
-    Utf8Char->Utf8_3[0] = (UINT8) (((UnicodeByte1 >> 4) & 0x0f) + 0xe0);
+    Utf8Char->Utf8_3[2] = (UINT8)((UnicodeByte0 & 0x3f) + 0x80);
+    Utf8Char->Utf8_3[1] = (UINT8)((((UnicodeByte1 << 2) + (UnicodeByte0 >> 6)) & 0x3f) + 0x80);
+    Utf8Char->Utf8_3[0] = (UINT8)(((UnicodeByte1 >> 4) & 0x0f) + 0xe0);
 
-    *ValidBytes         = 3;
+    *ValidBytes = 3;
   }
 }
-
 
 /**
   Check if input string is valid VT-UTF8 string.
@@ -311,8 +301,8 @@ UnicodeToUtf8 (
 **/
 EFI_STATUS
 VTUTF8TestString (
-  IN  TERMINAL_DEV    *TerminalDevice,
-  IN  CHAR16          *WString
+  IN  TERMINAL_DEV  *TerminalDevice,
+  IN  CHAR16        *WString
   )
 {
   //

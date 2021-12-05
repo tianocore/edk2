@@ -34,7 +34,7 @@ EFI_GRAPHICS_OUTPUT_PROTOCOL  *mGop = NULL;
 //
 // Set to 100 percent so it is reset on first call.
 //
-UINTN mPreviousProgress = 100;
+UINTN  mPreviousProgress = 100;
 
 //
 // Display coordinates for the progress bar.
@@ -99,7 +99,7 @@ const EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  mProgressBarDefaultColor = {
 // Set to TRUE if a valid Graphics Output Protocol is found and the progress
 // bar fits under the boot logo using the current graphics mode.
 //
-BOOLEAN mGraphicsGood = FALSE;
+BOOLEAN  mGraphicsGood = FALSE;
 
 /**
   Internal function used to find the bounds of the white logo (on black or
@@ -110,7 +110,7 @@ BOOLEAN mGraphicsGood = FALSE;
 **/
 VOID
 FindDim (
-   VOID
+  VOID
   )
 {
   EFI_STATUS                           Status;
@@ -189,6 +189,7 @@ FindDim (
         DEBUG ((DEBUG_INFO, "StartX found at (%d, %d) Color is: 0x%X \n", LogoX, LogoY, Pixel->Raw));
         break;
       }
+
       Pixel = Pixel + Width;
     }
   }
@@ -204,6 +205,7 @@ FindDim (
         DEBUG ((DEBUG_INFO, "EndX found at (%d, %d) Color is: 0x%X \n", LogoX, LogoY, Pixel->Raw));
         break;
       }
+
       Pixel = Pixel + Width;
     }
   }
@@ -226,13 +228,14 @@ FindDim (
   for (LogoY = 0, LogoStartY = Height; LogoY < LogoStartY; LogoY++) {
     Pixel = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION *)(Logo + (Width * LogoY));
     for (LogoX = 0; LogoX < (INTN)Width; LogoX++) {
-      //not black or red
+      // not black or red
       if ((Pixel->Raw & mLogoDetectionColorMask.Raw) != 0x0) {
         LogoStartY = LogoY;
-        LogoEndY = LogoY; //for next loop will search from bottom side back to this row.
+        LogoEndY   = LogoY; // for next loop will search from bottom side back to this row.
         DEBUG ((DEBUG_INFO, "StartY found at (%d, %d) Color is: 0x%X \n", LogoX, LogoY, Pixel->Raw));
         break;
       }
+
       Pixel++;
     }
   }
@@ -248,6 +251,7 @@ FindDim (
         DEBUG ((DEBUG_INFO, "EndY found at (%d, %d) Color is: 0x%X \n", LogoX, LogoY, Pixel->Raw));
         break;
       }
+
       Pixel++;
     }
   }
@@ -360,7 +364,7 @@ DisplayUpdateProgress (
     Status = gBS->HandleProtocol (
                     gST->ConsoleOutHandle,
                     &gEfiGraphicsOutputProtocolGuid,
-                    (VOID**)&mGop
+                    (VOID **)&mGop
                     );
     if (EFI_ERROR (Status)) {
       Status = gBS->LocateProtocol (&gEfiGraphicsOutputProtocolGuid, NULL, (VOID **)&mGop);
@@ -405,7 +409,9 @@ DisplayUpdateProgress (
             0
             );
 
-    DEBUG ((DEBUG_VERBOSE, "Color is 0x%X\n",
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "Color is 0x%X\n",
       (Color == NULL) ? mProgressBarDefaultColor.Raw : Color->Raw
       ));
 

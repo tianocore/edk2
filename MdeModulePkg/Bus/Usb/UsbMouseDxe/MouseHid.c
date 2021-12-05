@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "UsbMouse.h"
 
-
 /**
   Get next HID item from report descriptor.
 
@@ -31,12 +30,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 UINT8 *
 GetNextHidItem (
-  IN  UINT8    *StartPos,
-  IN  UINT8    *EndPos,
-  OUT HID_ITEM *HidItem
+  IN  UINT8     *StartPos,
+  IN  UINT8     *EndPos,
+  OUT HID_ITEM  *HidItem
   )
 {
-  UINT8 Temp;
+  UINT8  Temp;
 
   if (EndPos <= StartPos) {
     return NULL;
@@ -66,7 +65,7 @@ GetNextHidItem (
 
       if ((EndPos - StartPos) >= HidItem->Size) {
         HidItem->Data.LongData = StartPos;
-        StartPos += HidItem->Size;
+        StartPos              += HidItem->Size;
         return StartPos;
       }
     }
@@ -75,47 +74,46 @@ GetNextHidItem (
     HidItem->Size   = BitFieldRead8 (Temp, 0, 1);
 
     switch (HidItem->Size) {
-    case 0:
-      //
-      // No data
-      //
-      return StartPos;
-
-    case 1:
-      //
-      // 1-byte data
-      //
-      if ((EndPos - StartPos) >= 1) {
-        HidItem->Data.Uint8 = *StartPos++;
+      case 0:
+        //
+        // No data
+        //
         return StartPos;
-      }
 
-    case 2:
-      //
-      // 2-byte data
-      //
-      if ((EndPos - StartPos) >= 2) {
-        CopyMem (&HidItem->Data.Uint16, StartPos, sizeof (UINT16));
-        StartPos += 2;
-        return StartPos;
-      }
+      case 1:
+        //
+        // 1-byte data
+        //
+        if ((EndPos - StartPos) >= 1) {
+          HidItem->Data.Uint8 = *StartPos++;
+          return StartPos;
+        }
 
-    case 3:
-      //
-      // 4-byte data, adjust size
-      //
-      HidItem->Size = 4;
-      if ((EndPos - StartPos) >= 4) {
-        CopyMem (&HidItem->Data.Uint32, StartPos, sizeof (UINT32));
-        StartPos += 4;
-        return StartPos;
-      }
+      case 2:
+        //
+        // 2-byte data
+        //
+        if ((EndPos - StartPos) >= 2) {
+          CopyMem (&HidItem->Data.Uint16, StartPos, sizeof (UINT16));
+          StartPos += 2;
+          return StartPos;
+        }
+
+      case 3:
+        //
+        // 4-byte data, adjust size
+        //
+        HidItem->Size = 4;
+        if ((EndPos - StartPos) >= 4) {
+          CopyMem (&HidItem->Data.Uint32, StartPos, sizeof (UINT32));
+          StartPos += 4;
+          return StartPos;
+        }
     }
   }
 
   return NULL;
 }
-
 
 /**
   Get data from HID item.
@@ -131,20 +129,21 @@ GetNextHidItem (
 **/
 UINT32
 GetItemData (
-  IN  HID_ITEM *HidItem
+  IN  HID_ITEM  *HidItem
   )
 {
   //
   // Get data from HID item.
   //
   switch (HidItem->Size) {
-  case 1:
-    return HidItem->Data.Uint8;
-  case 2:
-    return HidItem->Data.Uint16;
-  case 4:
-    return HidItem->Data.Uint32;
+    case 1:
+      return HidItem->Data.Uint8;
+    case 2:
+      return HidItem->Data.Uint16;
+    case 4:
+      return HidItem->Data.Uint32;
   }
+
   return 0;
 }
 
@@ -161,66 +160,67 @@ GetItemData (
 **/
 VOID
 ParseHidItem (
-  IN  USB_MOUSE_DEV   *UsbMouse,
-  IN  HID_ITEM        *HidItem
+  IN  USB_MOUSE_DEV  *UsbMouse,
+  IN  HID_ITEM       *HidItem
   )
 {
   UINT8  Data;
 
   switch (HidItem->Type) {
-
-  case HID_ITEM_TYPE_MAIN:
-    //
-    // we don't care any main items, just skip
-    //
-    return;
-
-  case HID_ITEM_TYPE_GLOBAL:
-    //
-    // For global items, we only care Usage Page tag for Button Page here
-    //
-    if (HidItem->Tag == HID_GLOBAL_ITEM_TAG_USAGE_PAGE) {
-      Data = (UINT8) GetItemData (HidItem);
-      if (Data == 0x09) {
-        //
-        // Button Page
-        //
-        UsbMouse->PrivateData.ButtonDetected = TRUE;
-      }
-    }
-    return;
-
-  case HID_ITEM_TYPE_LOCAL:
-    if (HidItem->Size == 0) {
+    case HID_ITEM_TYPE_MAIN:
       //
-      // No expected data for local item
+      // we don't care any main items, just skip
       //
-      return ;
-    }
-
-    Data = (UINT8) GetItemData (HidItem);
-
-    switch (HidItem->Tag) {
-    case HID_LOCAL_ITEM_TAG_USAGE_MINIMUM:
-      if (UsbMouse->PrivateData.ButtonDetected) {
-        UsbMouse->PrivateData.ButtonMinIndex = Data;
-      }
-      return ;
-
-    case HID_LOCAL_ITEM_TAG_USAGE_MAXIMUM:
-    {
-      if (UsbMouse->PrivateData.ButtonDetected) {
-        UsbMouse->PrivateData.ButtonMaxIndex = Data;
-      }
-      return ;
-    }
-
-    default:
       return;
-    }
+
+    case HID_ITEM_TYPE_GLOBAL:
+      //
+      // For global items, we only care Usage Page tag for Button Page here
+      //
+      if (HidItem->Tag == HID_GLOBAL_ITEM_TAG_USAGE_PAGE) {
+        Data = (UINT8)GetItemData (HidItem);
+        if (Data == 0x09) {
+          //
+          // Button Page
+          //
+          UsbMouse->PrivateData.ButtonDetected = TRUE;
+        }
+      }
+
+      return;
+
+    case HID_ITEM_TYPE_LOCAL:
+      if (HidItem->Size == 0) {
+        //
+        // No expected data for local item
+        //
+        return;
+      }
+
+      Data = (UINT8)GetItemData (HidItem);
+
+      switch (HidItem->Tag) {
+        case HID_LOCAL_ITEM_TAG_USAGE_MINIMUM:
+          if (UsbMouse->PrivateData.ButtonDetected) {
+            UsbMouse->PrivateData.ButtonMinIndex = Data;
+          }
+
+          return;
+
+        case HID_LOCAL_ITEM_TAG_USAGE_MAXIMUM:
+        {
+          if (UsbMouse->PrivateData.ButtonDetected) {
+            UsbMouse->PrivateData.ButtonMaxIndex = Data;
+          }
+
+          return;
+        }
+
+        default:
+          return;
+      }
   }
 }
-
 
 /**
   Parse Mouse Report Descriptor.
@@ -240,9 +240,9 @@ ParseHidItem (
 **/
 EFI_STATUS
 ParseMouseReportDescriptor (
-  OUT USB_MOUSE_DEV   *UsbMouse,
-  IN  UINT8           *ReportDescriptor,
-  IN  UINTN           ReportSize
+  OUT USB_MOUSE_DEV  *UsbMouse,
+  IN  UINT8          *ReportDescriptor,
+  IN  UINTN          ReportSize
   )
 {
   UINT8     *DescriptorEnd;
@@ -265,11 +265,11 @@ ParseMouseReportDescriptor (
     Ptr = GetNextHidItem (Ptr, DescriptorEnd, &HidItem);
   }
 
-  UsbMouse->NumberOfButtons = (UINT8) (UsbMouse->PrivateData.ButtonMaxIndex - UsbMouse->PrivateData.ButtonMinIndex + 1);
-  UsbMouse->XLogicMax = 127;
-  UsbMouse->YLogicMax = 127;
-  UsbMouse->XLogicMin = -127;
-  UsbMouse->YLogicMin = -127;
+  UsbMouse->NumberOfButtons = (UINT8)(UsbMouse->PrivateData.ButtonMaxIndex - UsbMouse->PrivateData.ButtonMinIndex + 1);
+  UsbMouse->XLogicMax       = 127;
+  UsbMouse->YLogicMax       = 127;
+  UsbMouse->XLogicMin       = -127;
+  UsbMouse->YLogicMin       = -127;
 
   return EFI_SUCCESS;
 }

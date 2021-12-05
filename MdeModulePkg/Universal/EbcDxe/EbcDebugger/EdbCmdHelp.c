@@ -22,13 +22,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_DEBUG_STATUS
 DebuggerHelp (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   //
   // if no argument, print all the command title
@@ -41,6 +41,7 @@ DebuggerHelp (
         EDBPrint (DebuggerPrivate->DebuggerCommandSet[Index].CommandTitle);
       }
     }
+
     return EFI_DEBUG_CONTINUE;
   }
 

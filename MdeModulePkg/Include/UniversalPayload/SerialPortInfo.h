@@ -15,16 +15,16 @@
 
 #pragma pack(1)
 typedef struct {
-  UNIVERSAL_PAYLOAD_GENERIC_HEADER   Header;
-  BOOLEAN                            UseMmio;
-  UINT8                              RegisterStride;
-  UINT32                             BaudRate;
-  EFI_PHYSICAL_ADDRESS               RegisterBase;
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER    Header;
+  BOOLEAN                             UseMmio;
+  UINT8                               RegisterStride;
+  UINT32                              BaudRate;
+  EFI_PHYSICAL_ADDRESS                RegisterBase;
 } UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO;
 #pragma pack()
 
-#define UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION 1
+#define UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION  1
 
-extern GUID gUniversalPayloadSerialPortInfoGuid;
+extern GUID  gUniversalPayloadSerialPortInfoGuid;
 
 #endif //  UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_H_

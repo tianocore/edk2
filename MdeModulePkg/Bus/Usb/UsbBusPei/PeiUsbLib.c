@@ -28,23 +28,23 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 PeiUsbGetDescriptor (
-  IN  EFI_PEI_SERVICES         **PeiServices,
-  IN  PEI_USB_IO_PPI           *UsbIoPpi,
-  IN  UINT16                   Value,
-  IN  UINT16                   Index,
-  IN  UINT16                   DescriptorLength,
-  OUT VOID                     *Descriptor
+  IN  EFI_PEI_SERVICES  **PeiServices,
+  IN  PEI_USB_IO_PPI    *UsbIoPpi,
+  IN  UINT16            Value,
+  IN  UINT16            Index,
+  IN  UINT16            DescriptorLength,
+  OUT VOID              *Descriptor
   )
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
   ASSERT (UsbIoPpi != NULL);
 
-  DevReq.RequestType  = USB_DEV_GET_DESCRIPTOR_REQ_TYPE;
-  DevReq.Request      = USB_DEV_GET_DESCRIPTOR;
-  DevReq.Value        = Value;
-  DevReq.Index        = Index;
-  DevReq.Length       = DescriptorLength;
+  DevReq.RequestType = USB_DEV_GET_DESCRIPTOR_REQ_TYPE;
+  DevReq.Request     = USB_DEV_GET_DESCRIPTOR;
+  DevReq.Value       = Value;
+  DevReq.Index       = Index;
+  DevReq.Length      = DescriptorLength;
 
   return UsbIoPpi->UsbControlTransfer (
                      PeiServices,
@@ -71,20 +71,20 @@ PeiUsbGetDescriptor (
 **/
 EFI_STATUS
 PeiUsbSetDeviceAddress (
-  IN EFI_PEI_SERVICES         **PeiServices,
-  IN PEI_USB_IO_PPI           *UsbIoPpi,
-  IN UINT16                   AddressValue
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_USB_IO_PPI    *UsbIoPpi,
+  IN UINT16            AddressValue
   )
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
 
   ASSERT (UsbIoPpi != NULL);
 
-  DevReq.RequestType  = USB_DEV_SET_ADDRESS_REQ_TYPE;
-  DevReq.Request      = USB_DEV_SET_ADDRESS;
-  DevReq.Value        = AddressValue;
-  DevReq.Index        = 0;
-  DevReq.Length       = 0;
+  DevReq.RequestType = USB_DEV_SET_ADDRESS_REQ_TYPE;
+  DevReq.Request     = USB_DEV_SET_ADDRESS;
+  DevReq.Value       = AddressValue;
+  DevReq.Index       = 0;
+  DevReq.Length      = 0;
 
   return UsbIoPpi->UsbControlTransfer (
                      PeiServices,
@@ -96,8 +96,6 @@ PeiUsbSetDeviceAddress (
                      0
                      );
 }
-
-
 
 /**
   Configure a usb device to Configuration 1.
@@ -112,16 +110,17 @@ PeiUsbSetDeviceAddress (
 **/
 EFI_STATUS
 PeiUsbSetConfiguration (
-  IN EFI_PEI_SERVICES         **PeiServices,
-  IN PEI_USB_IO_PPI           *UsbIoPpi
+  IN EFI_PEI_SERVICES  **PeiServices,
+  IN PEI_USB_IO_PPI    *UsbIoPpi
   )
 {
   EFI_USB_DEVICE_REQUEST  DevReq;
+
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
 
-  DevReq.RequestType  = USB_DEV_SET_CONFIGURATION_REQ_TYPE;
-  DevReq.Request      = USB_DEV_SET_CONFIGURATION;
-  DevReq.Value        = 1;
+  DevReq.RequestType = USB_DEV_SET_CONFIGURATION_REQ_TYPE;
+  DevReq.Request     = USB_DEV_SET_CONFIGURATION;
+  DevReq.Value       = 1;
 
   return UsbIoPpi->UsbControlTransfer (
                      PeiServices,
@@ -168,12 +167,12 @@ IsPortConnect (
 **/
 UINTN
 PeiUsbGetDeviceSpeed (
-  IN UINT16 PortStatus
+  IN UINT16  PortStatus
   )
 {
   if ((PortStatus & USB_PORT_STAT_LOW_SPEED) != 0) {
     return EFI_USB_SPEED_LOW;
-  } else if ((PortStatus & USB_PORT_STAT_HIGH_SPEED) != 0){
+  } else if ((PortStatus & USB_PORT_STAT_HIGH_SPEED) != 0) {
     return EFI_USB_SPEED_HIGH;
   } else if ((PortStatus & USB_PORT_STAT_SUPER_SPEED) != 0) {
     return EFI_USB_SPEED_SUPER;
@@ -181,5 +180,3 @@ PeiUsbGetDeviceSpeed (
     return EFI_USB_SPEED_FULL;
   }
 }
-
-

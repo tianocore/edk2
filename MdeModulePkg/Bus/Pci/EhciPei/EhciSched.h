@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 EhcInitSched (
-  IN PEI_USB2_HC_DEV          *Ehc
+  IN PEI_USB2_HC_DEV  *Ehc
   )
 ;
 
@@ -33,7 +33,7 @@ EhcInitSched (
 **/
 VOID
 EhcFreeSched (
-  IN PEI_USB2_HC_DEV          *Ehc
+  IN PEI_USB2_HC_DEV  *Ehc
   )
 ;
 
@@ -50,8 +50,8 @@ EhcFreeSched (
 **/
 VOID
 EhcLinkQhToAsync (
-  IN PEI_USB2_HC_DEV      *Ehc,
-  IN PEI_EHC_QH           *Qh
+  IN PEI_USB2_HC_DEV  *Ehc,
+  IN PEI_EHC_QH       *Qh
   )
 ;
 
@@ -65,8 +65,8 @@ EhcLinkQhToAsync (
 **/
 VOID
 EhcUnlinkQhFromAsync (
-  IN PEI_USB2_HC_DEV      *Ehc,
-  IN PEI_EHC_QH           *Qh
+  IN PEI_USB2_HC_DEV  *Ehc,
+  IN PEI_EHC_QH       *Qh
   )
 ;
 
@@ -84,9 +84,9 @@ EhcUnlinkQhFromAsync (
 **/
 EFI_STATUS
 EhcExecTransfer (
-  IN  PEI_USB2_HC_DEV     *Ehc,
-  IN  PEI_URB             *Urb,
-  IN  UINTN               TimeOut
+  IN  PEI_USB2_HC_DEV  *Ehc,
+  IN  PEI_URB          *Urb,
+  IN  UINTN            TimeOut
   )
 ;
 

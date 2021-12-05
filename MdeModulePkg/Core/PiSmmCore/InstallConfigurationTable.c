@@ -8,7 +8,7 @@
 
 #include "PiSmmCore.h"
 
-#define CONFIG_TABLE_SIZE_INCREASED 0x10
+#define CONFIG_TABLE_SIZE_INCREASED  0x10
 
 UINTN  mSmmSystemTableAllocateSize = 0;
 
@@ -86,7 +86,6 @@ SmmInstallConfigurationTable (
       &(ConfigurationTable[Index + 1]),
       (gSmmCoreSmst.NumberOfTableEntries - Index) * sizeof (EFI_CONFIGURATION_TABLE)
       );
-
   } else {
     //
     // No matching GUIDs were found, so this is an add operation.
@@ -106,7 +105,7 @@ SmmInstallConfigurationTable (
       // Allocate a table with one additional entry.
       //
       mSmmSystemTableAllocateSize += (CONFIG_TABLE_SIZE_INCREASED * sizeof (EFI_CONFIGURATION_TABLE));
-      ConfigurationTable = AllocatePool (mSmmSystemTableAllocateSize);
+      ConfigurationTable           = AllocatePool (mSmmSystemTableAllocateSize);
       if (ConfigurationTable == NULL) {
         //
         // If a new table could not be allocated, then return an error.

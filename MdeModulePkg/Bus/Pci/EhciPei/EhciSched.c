@@ -22,13 +22,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 EhcCreateHelpQ (
-  IN PEI_USB2_HC_DEV      *Ehc
+  IN PEI_USB2_HC_DEV  *Ehc
   )
 {
-  USB_ENDPOINT            Ep;
-  PEI_EHC_QH              *Qh;
-  QH_HW                   *QhHw;
-  PEI_EHC_QTD             *Qtd;
+  USB_ENDPOINT  Ep;
+  PEI_EHC_QH    *Qh;
+  QH_HW         *QhHw;
+  PEI_EHC_QTD   *Qtd;
 
   //
   // Create an inactive Qtd to terminate the short packet read.
@@ -39,25 +39,25 @@ EhcCreateHelpQ (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Qtd->QtdHw.Status   = QTD_STAT_HALTED;
-  Ehc->ShortReadStop  = Qtd;
+  Qtd->QtdHw.Status  = QTD_STAT_HALTED;
+  Ehc->ShortReadStop = Qtd;
 
   //
   // Create a QH to act as the EHC reclamation header.
   // Set the header to loopback to itself.
   //
-  Ep.DevAddr    = 0;
-  Ep.EpAddr     = 1;
-  Ep.Direction  = EfiUsbDataIn;
-  Ep.DevSpeed   = EFI_USB_SPEED_HIGH;
-  Ep.MaxPacket  = 64;
-  Ep.HubAddr    = 0;
-  Ep.HubPort    = 0;
-  Ep.Toggle     = 0;
-  Ep.Type       = EHC_BULK_TRANSFER;
-  Ep.PollRate   = 1;
+  Ep.DevAddr   = 0;
+  Ep.EpAddr    = 1;
+  Ep.Direction = EfiUsbDataIn;
+  Ep.DevSpeed  = EFI_USB_SPEED_HIGH;
+  Ep.MaxPacket = 64;
+  Ep.HubAddr   = 0;
+  Ep.HubPort   = 0;
+  Ep.Toggle    = 0;
+  Ep.Type      = EHC_BULK_TRANSFER;
+  Ep.PollRate  = 1;
 
-  Qh            = EhcCreateQh (Ehc, &Ep);
+  Qh = EhcCreateQh (Ehc, &Ep);
 
   if (Qh == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -72,10 +72,10 @@ EhcCreateHelpQ (
   //
   // Create a dummy QH to act as the terminator for periodical schedule
   //
-  Ep.EpAddr   = 2;
-  Ep.Type     = EHC_INT_TRANSFER_SYNC;
+  Ep.EpAddr = 2;
+  Ep.Type   = EHC_INT_TRANSFER_SYNC;
 
-  Qh          = EhcCreateQh (Ehc, &Ep);
+  Qh = EhcCreateQh (Ehc, &Ep);
 
   if (Qh == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -98,7 +98,7 @@ EhcCreateHelpQ (
 **/
 EFI_STATUS
 EhcInitSched (
-  IN PEI_USB2_HC_DEV      *Ehc
+  IN PEI_USB2_HC_DEV  *Ehc
   )
 {
   VOID                  *Buf;
@@ -132,9 +132,9 @@ EhcInitSched (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Ehc->PeriodFrame      = Buf;
-  Ehc->PeriodFrameMap   = Map;
-  Ehc->High32bitAddr    = EHC_HIGH_32BIT (PhyAddr);
+  Ehc->PeriodFrame    = Buf;
+  Ehc->PeriodFrameMap = Map;
+  Ehc->High32bitAddr  = EHC_HIGH_32BIT (PhyAddr);
 
   //
   // Init memory pool management then create the helper
@@ -160,8 +160,8 @@ EhcInitSched (
   //
   // Initialize the frame list entries then set the registers
   //
-  Desc = (UINT32 *) Ehc->PeriodFrame;
-  PciAddr  = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (PEI_EHC_QH));
+  Desc    = (UINT32 *)Ehc->PeriodFrame;
+  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->PeriodOne, sizeof (PEI_EHC_QH));
   for (Index = 0; Index < EHC_FRAME_LEN; Index++) {
     Desc[Index] = QH_LINK (PciAddr, EHC_TYPE_QH, FALSE);
   }
@@ -173,7 +173,7 @@ EhcInitSched (
   // Only need to set the AsynListAddr register to
   // the reclamation header
   //
-  PciAddr  = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->ReclaimHead, sizeof (PEI_EHC_QH));
+  PciAddr = UsbHcGetPciAddressForHostMem (Ehc->MemPool, Ehc->ReclaimHead, sizeof (PEI_EHC_QH));
   EhcWriteOpReg (Ehc, EHC_ASYNC_HEAD_OFFSET, EHC_LOW_32BIT (PciAddr));
   return EFI_SUCCESS;
 }
@@ -186,7 +186,7 @@ EhcInitSched (
 **/
 VOID
 EhcFreeSched (
-  IN PEI_USB2_HC_DEV      *Ehc
+  IN PEI_USB2_HC_DEV  *Ehc
   )
 {
   EhcWriteOpReg (Ehc, EHC_FRAME_BASE_OFFSET, 0);
@@ -231,24 +231,24 @@ EhcFreeSched (
 **/
 VOID
 EhcLinkQhToAsync (
-  IN PEI_USB2_HC_DEV      *Ehc,
-  IN PEI_EHC_QH           *Qh
+  IN PEI_USB2_HC_DEV  *Ehc,
+  IN PEI_EHC_QH       *Qh
   )
 {
-  PEI_EHC_QH               *Head;
+  PEI_EHC_QH  *Head;
 
   //
   // Append the queue head after the reclaim header, then
   // fix the hardware visiable parts (EHCI R1.0 page 72).
   // ReclaimHead is always linked to the EHCI's AsynListAddr.
   //
-  Head                    = Ehc->ReclaimHead;
+  Head = Ehc->ReclaimHead;
 
-  Qh->NextQh              = Head->NextQh;
-  Head->NextQh            = Qh;
+  Qh->NextQh   = Head->NextQh;
+  Head->NextQh = Qh;
 
-  Qh->QhHw.HorizonLink    = QH_LINK (Head, EHC_TYPE_QH, FALSE);;
-  Head->QhHw.HorizonLink  = QH_LINK (Qh, EHC_TYPE_QH, FALSE);
+  Qh->QhHw.HorizonLink   = QH_LINK (Head, EHC_TYPE_QH, FALSE);
+  Head->QhHw.HorizonLink = QH_LINK (Qh, EHC_TYPE_QH, FALSE);
 }
 
 /**
@@ -261,11 +261,11 @@ EhcLinkQhToAsync (
 **/
 VOID
 EhcUnlinkQhFromAsync (
-  IN PEI_USB2_HC_DEV      *Ehc,
-  IN PEI_EHC_QH           *Qh
+  IN PEI_USB2_HC_DEV  *Ehc,
+  IN PEI_EHC_QH       *Qh
   )
 {
-  PEI_EHC_QH              *Head;
+  PEI_EHC_QH  *Head;
 
   ASSERT (Ehc->ReclaimHead->NextQh == Qh);
 
@@ -274,12 +274,12 @@ EhcUnlinkQhFromAsync (
   // visiable part: Only need to loopback the ReclaimHead. The Qh
   // is pointing to ReclaimHead (which is staill in the list).
   //
-  Head                    = Ehc->ReclaimHead;
+  Head = Ehc->ReclaimHead;
 
-  Head->NextQh            = Qh->NextQh;
-  Qh->NextQh              = NULL;
+  Head->NextQh = Qh->NextQh;
+  Qh->NextQh   = NULL;
 
-  Head->QhHw.HorizonLink  = QH_LINK (Head, EHC_TYPE_QH, FALSE);
+  Head->QhHw.HorizonLink = QH_LINK (Head, EHC_TYPE_QH, FALSE);
 
   //
   // Set and wait the door bell to synchronize with the hardware
@@ -302,22 +302,22 @@ EhcUnlinkQhFromAsync (
 **/
 BOOLEAN
 EhcCheckUrbResult (
-  IN  PEI_USB2_HC_DEV     *Ehc,
-  IN  PEI_URB             *Urb
+  IN  PEI_USB2_HC_DEV  *Ehc,
+  IN  PEI_URB          *Urb
   )
 {
-  EFI_LIST_ENTRY          *Entry;
-  PEI_EHC_QTD             *Qtd;
-  QTD_HW                  *QtdHw;
-  UINT8                   State;
-  BOOLEAN                 Finished;
+  EFI_LIST_ENTRY  *Entry;
+  PEI_EHC_QTD     *Qtd;
+  QTD_HW          *QtdHw;
+  UINT8           State;
+  BOOLEAN         Finished;
 
   ASSERT ((Ehc != NULL) && (Urb != NULL) && (Urb->Qh != NULL));
 
-  Finished        = TRUE;
-  Urb->Completed  = 0;
+  Finished       = TRUE;
+  Urb->Completed = 0;
 
-  Urb->Result     = EFI_USB_NOERROR;
+  Urb->Result = EFI_USB_NOERROR;
 
   if (EhcIsHalt (Ehc) || EhcIsSysError (Ehc)) {
     Urb->Result |= EFI_USB_ERR_SYSTEM;
@@ -327,7 +327,7 @@ EhcCheckUrbResult (
   BASE_LIST_FOR_EACH (Entry, &Urb->Qh->Qtds) {
     Qtd   = EFI_LIST_CONTAINER (Entry, PEI_EHC_QTD, QtdList);
     QtdHw = &Qtd->QtdHw;
-    State = (UINT8) QtdHw->Status;
+    State = (UINT8)QtdHw->Status;
 
     if (EHC_BIT_IS_SET (State, QTD_STAT_HALTED)) {
       //
@@ -352,7 +352,6 @@ EhcCheckUrbResult (
 
       Finished = TRUE;
       goto ON_EXIT;
-
     } else if (EHC_BIT_IS_SET (State, QTD_STAT_ACTIVE)) {
       //
       // The QTD is still active, no need to check furthur.
@@ -361,7 +360,6 @@ EhcCheckUrbResult (
 
       Finished = FALSE;
       goto ON_EXIT;
-
     } else {
       //
       // This QTD is finished OK or met short packet read. Update the
@@ -372,7 +370,7 @@ EhcCheckUrbResult (
       }
 
       if ((QtdHw->TotalBytes != 0) && (QtdHw->Pid == QTD_PID_INPUT)) {
-        //EHC_DUMP_QH ((Urb->Qh, "Short packet read", FALSE));
+        // EHC_DUMP_QH ((Urb->Qh, "Short packet read", FALSE));
 
         //
         // Short packet read condition. If it isn't a setup transfer,
@@ -381,7 +379,6 @@ EhcCheckUrbResult (
         // Status Stage of the setup transfer to get the finial result
         //
         if (QtdHw->AltNext == QTD_LINK (Ehc->ShortReadStop, FALSE)) {
-
           Finished = TRUE;
           goto ON_EXIT;
         }
@@ -399,7 +396,7 @@ ON_EXIT:
   // NOTICE: don't move DT update before the loop, otherwise there is
   // a race condition that DT is wrong.
   //
-  Urb->DataToggle = (UINT8) Urb->Qh->QhHw.DataToggle;
+  Urb->DataToggle = (UINT8)Urb->Qh->QhHw.DataToggle;
 
   return Finished;
 }
@@ -418,19 +415,19 @@ ON_EXIT:
 **/
 EFI_STATUS
 EhcExecTransfer (
-  IN  PEI_USB2_HC_DEV     *Ehc,
-  IN  PEI_URB             *Urb,
-  IN  UINTN               TimeOut
+  IN  PEI_USB2_HC_DEV  *Ehc,
+  IN  PEI_URB          *Urb,
+  IN  UINTN            TimeOut
   )
 {
-  EFI_STATUS              Status;
-  UINTN                   Index;
-  UINTN                   Loop;
-  BOOLEAN                 Finished;
-  BOOLEAN                 InfiniteLoop;
+  EFI_STATUS  Status;
+  UINTN       Index;
+  UINTN       Loop;
+  BOOLEAN     Finished;
+  BOOLEAN     InfiniteLoop;
 
-  Status    = EFI_SUCCESS;
-  Loop      = TimeOut * EHC_1_MILLISECOND;
+  Status       = EFI_SUCCESS;
+  Loop         = TimeOut * EHC_1_MILLISECOND;
   Finished     = FALSE;
   InfiniteLoop = FALSE;
 
@@ -460,4 +457,3 @@ EhcExecTransfer (
 
   return Status;
 }
-

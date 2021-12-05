@@ -19,9 +19,9 @@ DEVICE_MANAGER_CALLBACK_DATA  gDeviceManagerPrivate = {
   }
 };
 
-#define  MAX_MAC_ADDRESS_NODE_LIST_LEN    10
+#define  MAX_MAC_ADDRESS_NODE_LIST_LEN  10
 
-EFI_GUID mDeviceManagerGuid = DEVICE_MANAGER_FORMSET_GUID;
+EFI_GUID  mDeviceManagerGuid = DEVICE_MANAGER_FORMSET_GUID;
 
 //
 // Which Mac Address string is select
@@ -40,21 +40,22 @@ HII_VENDOR_DEVICE_PATH  mDeviceManagerHiiVendorDevicePath = {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
       {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
     //
     // {102579A0-3686-466e-ACD8-80C087044F4A}
     //
-    { 0x102579a0, 0x3686, 0x466e, { 0xac, 0xd8, 0x80, 0xc0, 0x87, 0x4, 0x4f, 0x4a } }
+    { 0x102579a0, 0x3686, 0x466e, { 0xac, 0xd8, 0x80, 0xc0, 0x87, 0x4, 0x4f, 0x4a }
+    }
   },
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
     {
-      (UINT8) (END_DEVICE_PATH_LENGTH),
-      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+      (UINT8)(END_DEVICE_PATH_LENGTH),
+      (UINT8)((END_DEVICE_PATH_LENGTH) >> 8)
     }
   }
 };
@@ -70,11 +71,11 @@ HII_VENDOR_DEVICE_PATH  mDeviceManagerHiiVendorDevicePath = {
 **/
 CHAR16 *
 DmExtractDevicePathFromHiiHandle (
-  IN      EFI_HII_HANDLE      Handle
+  IN      EFI_HII_HANDLE  Handle
   )
 {
-  EFI_STATUS                       Status;
-  EFI_HANDLE                       DriverHandle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  DriverHandle;
 
   ASSERT (Handle != NULL);
 
@@ -86,10 +87,11 @@ DmExtractDevicePathFromHiiHandle (
   if (EFI_ERROR (Status)) {
     return NULL;
   }
+
   //
   // Get device path string.
   //
-  return ConvertDevicePathToText(DevicePathFromHandle (DriverHandle), FALSE, FALSE);
+  return ConvertDevicePathToText (DevicePathFromHandle (DriverHandle), FALSE, FALSE);
 }
 
 /**
@@ -101,25 +103,25 @@ DmExtractDevicePathFromHiiHandle (
 
 **/
 BOOLEAN
-GetMacAddressString(
-  IN  MAC_ADDR_DEVICE_PATH   *MacAddressNode,
-  OUT CHAR16                 **PBuffer
+GetMacAddressString (
+  IN  MAC_ADDR_DEVICE_PATH  *MacAddressNode,
+  OUT CHAR16                **PBuffer
   )
 {
-  UINTN                 HwAddressSize;
-  UINTN                 Index;
-  UINT8                 *HwAddress;
+  UINTN                     HwAddressSize;
+  UINTN                     Index;
+  UINT8                     *HwAddress;
   EFI_DEVICE_PATH_PROTOCOL  *Node;
-  UINT16                VlanId;
-  CHAR16                *String;
-  UINTN                 BufferLen;
+  UINT16                    VlanId;
+  CHAR16                    *String;
+  UINTN                     BufferLen;
 
   VlanId = 0;
   String = NULL;
-  ASSERT(MacAddressNode != NULL);
+  ASSERT (MacAddressNode != NULL);
 
   HwAddressSize = sizeof (EFI_MAC_ADDRESS);
-  if (MacAddressNode->IfType == 0x01 || MacAddressNode->IfType == 0x00) {
+  if ((MacAddressNode->IfType == 0x01) || (MacAddressNode->IfType == 0x00)) {
     HwAddressSize = 6;
   }
 
@@ -128,13 +130,13 @@ GetMacAddressString(
   // The size is the Number size + ":" size + Vlan size(\XXXX) + End
   //
   BufferLen = (4 + 2 * HwAddressSize + (HwAddressSize - 1) + 5 + 1) * sizeof (CHAR16);
-  String = AllocateZeroPool (BufferLen);
+  String    = AllocateZeroPool (BufferLen);
   if (String == NULL) {
     return FALSE;
   }
 
   *PBuffer = String;
-  StrCpyS(String, BufferLen / sizeof (CHAR16), L"MAC:");
+  StrCpyS (String, BufferLen / sizeof (CHAR16), L"MAC:");
   String += 4;
 
   //
@@ -161,9 +163,10 @@ GetMacAddressString(
   //
   Node = (EFI_DEVICE_PATH_PROTOCOL  *)MacAddressNode;
   while (!IsDevicePathEnd (Node)) {
-    if (Node->Type == MESSAGING_DEVICE_PATH && Node->SubType == MSG_VLAN_DP) {
-      VlanId = ((VLAN_DEVICE_PATH *) Node)->VlanId;
+    if ((Node->Type == MESSAGING_DEVICE_PATH) && (Node->SubType == MSG_VLAN_DP)) {
+      VlanId = ((VLAN_DEVICE_PATH *)Node)->VlanId;
     }
+
     Node = NextDevicePathNode (Node);
   }
 
@@ -198,19 +201,19 @@ GetMacAddressString(
 **/
 BOOLEAN
 AddIdToMacDeviceList (
-  IN  EFI_STRING        MacAddrString
+  IN  EFI_STRING  MacAddrString
   )
 {
-  MENU_INFO_ITEM *TempDeviceList;
-  UINTN          Index;
-  EFI_STRING     StoredString;
-  EFI_STRING_ID  PromptId;
-  EFI_HII_HANDLE HiiHandle;
+  MENU_INFO_ITEM  *TempDeviceList;
+  UINTN           Index;
+  EFI_STRING      StoredString;
+  EFI_STRING_ID   PromptId;
+  EFI_HII_HANDLE  HiiHandle;
 
-  HiiHandle =   gDeviceManagerPrivate.HiiHandle;
+  HiiHandle      =   gDeviceManagerPrivate.HiiHandle;
   TempDeviceList = NULL;
 
-  for (Index = 0; Index < mMacDeviceList.CurListLen; Index ++) {
+  for (Index = 0; Index < mMacDeviceList.CurListLen; Index++) {
     StoredString = HiiGetString (HiiHandle, mMacDeviceList.NodeList[Index].PromptId, NULL);
     if (StoredString == NULL) {
       return FALSE;
@@ -224,13 +227,13 @@ AddIdToMacDeviceList (
     }
   }
 
-  PromptId = HiiSetString(HiiHandle, 0, MacAddrString, NULL);
+  PromptId = HiiSetString (HiiHandle, 0, MacAddrString, NULL);
   //
   // If not in the list, save it.
   //
   if (mMacDeviceList.MaxListLen > mMacDeviceList.CurListLen + 1) {
-    mMacDeviceList.NodeList[mMacDeviceList.CurListLen].PromptId = PromptId;
-    mMacDeviceList.NodeList[mMacDeviceList.CurListLen].QuestionId = (EFI_QUESTION_ID) (mMacDeviceList.CurListLen + NETWORK_DEVICE_LIST_KEY_OFFSET);
+    mMacDeviceList.NodeList[mMacDeviceList.CurListLen].PromptId   = PromptId;
+    mMacDeviceList.NodeList[mMacDeviceList.CurListLen].QuestionId = (EFI_QUESTION_ID)(mMacDeviceList.CurListLen + NETWORK_DEVICE_LIST_KEY_OFFSET);
   } else {
     mMacDeviceList.MaxListLen += MAX_MAC_ADDRESS_NODE_LIST_LEN;
     if (mMacDeviceList.CurListLen != 0) {
@@ -246,12 +249,14 @@ AddIdToMacDeviceList (
     if (TempDeviceList == NULL) {
       return FALSE;
     }
-    TempDeviceList[mMacDeviceList.CurListLen].PromptId = PromptId;
-    TempDeviceList[mMacDeviceList.CurListLen].QuestionId = (EFI_QUESTION_ID) (mMacDeviceList.CurListLen + NETWORK_DEVICE_LIST_KEY_OFFSET);
+
+    TempDeviceList[mMacDeviceList.CurListLen].PromptId   = PromptId;
+    TempDeviceList[mMacDeviceList.CurListLen].QuestionId = (EFI_QUESTION_ID)(mMacDeviceList.CurListLen + NETWORK_DEVICE_LIST_KEY_OFFSET);
 
     mMacDeviceList.NodeList = TempDeviceList;
   }
-  mMacDeviceList.CurListLen ++;
+
+  mMacDeviceList.CurListLen++;
 
   return TRUE;
 }
@@ -273,28 +278,29 @@ AddIdToMacDeviceList (
 **/
 BOOLEAN
 IsMacAddressDevicePath (
-  IN  VOID          *Node,
-  IN EFI_FORM_ID    NextShowFormId,
-  OUT BOOLEAN       *NeedAddItem
+  IN  VOID        *Node,
+  IN EFI_FORM_ID  NextShowFormId,
+  OUT BOOLEAN     *NeedAddItem
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
-  CHAR16                     *Buffer;
-  BOOLEAN                    ReturnVal;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  CHAR16                    *Buffer;
+  BOOLEAN                   ReturnVal;
 
   ASSERT (Node != NULL);
   *NeedAddItem = FALSE;
   ReturnVal    = FALSE;
-  Buffer    = NULL;
+  Buffer       = NULL;
 
-  DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) Node;
+  DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)Node;
 
   //
   // find the partition device path node
   //
   while (!IsDevicePathEnd (DevicePath)) {
     if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
-       (DevicePathSubType (DevicePath) == MSG_MAC_ADDR_DP)) {
+        (DevicePathSubType (DevicePath) == MSG_MAC_ADDR_DP))
+    {
       ReturnVal = TRUE;
 
       if (DEVICE_MANAGER_FORM_ID == NextShowFormId) {
@@ -302,7 +308,7 @@ IsMacAddressDevicePath (
         break;
       }
 
-      if (!GetMacAddressString((MAC_ADDR_DEVICE_PATH*)DevicePath, &Buffer)) {
+      if (!GetMacAddressString ((MAC_ADDR_DEVICE_PATH *)DevicePath, &Buffer)) {
         break;
       }
 
@@ -310,6 +316,7 @@ IsMacAddressDevicePath (
         if (StrCmp (Buffer, mSelectedMacAddrString) == 0) {
           *NeedAddItem = TRUE;
         }
+
         break;
       }
 
@@ -321,9 +328,11 @@ IsMacAddressDevicePath (
         if (AddIdToMacDeviceList (Buffer)) {
           *NeedAddItem = TRUE;
         }
+
         break;
       }
     }
+
     DevicePath = NextDevicePathNode (DevicePath);
   }
 
@@ -347,40 +356,43 @@ IsMacAddressDevicePath (
 **/
 BOOLEAN
 IsNeedAddNetworkMenu (
-  IN      EFI_HII_HANDLE      Handle,
-  IN      EFI_FORM_ID         NextShowFormId,
-  OUT     UINTN               *ItemCount
+  IN      EFI_HII_HANDLE  Handle,
+  IN      EFI_FORM_ID     NextShowFormId,
+  OUT     UINTN           *ItemCount
   )
 {
-  EFI_STATUS     Status;
-  UINTN          EntryCount;
-  UINTN          Index;
-  EFI_HANDLE     DriverHandle;
-  EFI_HANDLE     ControllerHandle;
-  EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL   *TmpDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL   *ChildDevicePath;
-  EFI_OPEN_PROTOCOL_INFORMATION_ENTRY   *OpenInfoBuffer;
-  BOOLEAN        IsNeedAdd;
+  EFI_STATUS                           Status;
+  UINTN                                EntryCount;
+  UINTN                                Index;
+  EFI_HANDLE                           DriverHandle;
+  EFI_HANDLE                           ControllerHandle;
+  EFI_DEVICE_PATH_PROTOCOL             *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL             *TmpDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL             *ChildDevicePath;
+  EFI_OPEN_PROTOCOL_INFORMATION_ENTRY  *OpenInfoBuffer;
+  BOOLEAN                              IsNeedAdd;
 
-  IsNeedAdd  = FALSE;
+  IsNeedAdd      = FALSE;
   OpenInfoBuffer = NULL;
   if ((Handle == NULL) || (ItemCount == NULL)) {
     return FALSE;
   }
+
   *ItemCount = 0;
 
   Status = gHiiDatabase->GetPackageListHandle (gHiiDatabase, Handle, &DriverHandle);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
+
   //
   // Get the device path by the got Driver handle .
   //
-  Status = gBS->HandleProtocol (DriverHandle, &gEfiDevicePathProtocolGuid, (VOID **) &DevicePath);
+  Status = gBS->HandleProtocol (DriverHandle, &gEfiDevicePathProtocolGuid, (VOID **)&DevicePath);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
+
   TmpDevicePath = DevicePath;
 
   //
@@ -389,10 +401,11 @@ IsNeedAddNetworkMenu (
   // add this info to the menu and return.
   // Else check more about the child handle devcie path.
   //
-  if (IsMacAddressDevicePath(TmpDevicePath, NextShowFormId,&IsNeedAdd)) {
+  if (IsMacAddressDevicePath (TmpDevicePath, NextShowFormId, &IsNeedAdd)) {
     if ((NETWORK_DEVICE_LIST_FORM_ID == NextShowFormId) && IsNeedAdd) {
       (*ItemCount) = 1;
     }
+
     return IsNeedAdd;
   }
 
@@ -401,7 +414,7 @@ IsNeedAddNetworkMenu (
   // And the child handle has the network devcie connected.
   //
   TmpDevicePath = DevicePath;
-  Status = gBS->LocateDevicePath(&gEfiDevicePathProtocolGuid, &TmpDevicePath, &ControllerHandle);
+  Status        = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &TmpDevicePath, &ControllerHandle);
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
@@ -437,7 +450,7 @@ IsNeedAddNetworkMenu (
       Status = gBS->OpenProtocol (
                       OpenInfoBuffer[Index].ControllerHandle,
                       &gEfiDevicePathProtocolGuid,
-                      (VOID **) &ChildDevicePath,
+                      (VOID **)&ChildDevicePath,
                       NULL,
                       NULL,
                       EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -449,7 +462,7 @@ IsNeedAddNetworkMenu (
       //
       // Check whether this device path include mac address device path.
       //
-      if (!IsMacAddressDevicePath(ChildDevicePath, NextShowFormId,&IsNeedAdd)) {
+      if (!IsMacAddressDevicePath (ChildDevicePath, NextShowFormId, &IsNeedAdd)) {
         //
         // If this path not has mac address path, check the other.
         //
@@ -462,6 +475,7 @@ IsNeedAddNetworkMenu (
           if (IsNeedAdd) {
             (*ItemCount) += 1;
           }
+
           continue;
         } else {
           //
@@ -477,6 +491,7 @@ Done:
   if (OpenInfoBuffer != NULL) {
     FreePool (OpenInfoBuffer);
   }
+
   return IsNeedAdd;
 }
 
@@ -487,42 +502,42 @@ Done:
 
 **/
 VOID
-CreateDeviceManagerForm(
-  IN EFI_FORM_ID      NextShowFormId
-)
+CreateDeviceManagerForm (
+  IN EFI_FORM_ID  NextShowFormId
+  )
 {
-  UINTN                       Index;
-  EFI_STRING                  String;
-  EFI_STRING_ID               Token;
-  EFI_STRING_ID               TokenHelp;
-  EFI_HII_HANDLE              *HiiHandles;
-  EFI_HII_HANDLE              HiiHandle;
-  EFI_GUID                    FormSetGuid;
-  VOID                        *StartOpCodeHandle;
-  VOID                        *EndOpCodeHandle;
-  EFI_IFR_GUID_LABEL          *StartLabel;
-  EFI_IFR_GUID_LABEL          *EndLabel;
-  BOOLEAN                     AddNetworkMenu;
-  UINTN                       AddItemCount;
-  UINTN                       NewStringLen;
-  EFI_STRING                  NewStringTitle;
-  CHAR16                      *DevicePathStr;
-  EFI_STRING_ID               DevicePathId;
-  EFI_IFR_FORM_SET            *Buffer;
-  UINTN                       BufferSize;
-  UINT8                       ClassGuidNum;
-  EFI_GUID                    *ClassGuid;
-  UINTN                       TempSize;
-  UINT8                       *Ptr;
-  EFI_STATUS                  Status;
+  UINTN               Index;
+  EFI_STRING          String;
+  EFI_STRING_ID       Token;
+  EFI_STRING_ID       TokenHelp;
+  EFI_HII_HANDLE      *HiiHandles;
+  EFI_HII_HANDLE      HiiHandle;
+  EFI_GUID            FormSetGuid;
+  VOID                *StartOpCodeHandle;
+  VOID                *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL  *StartLabel;
+  EFI_IFR_GUID_LABEL  *EndLabel;
+  BOOLEAN             AddNetworkMenu;
+  UINTN               AddItemCount;
+  UINTN               NewStringLen;
+  EFI_STRING          NewStringTitle;
+  CHAR16              *DevicePathStr;
+  EFI_STRING_ID       DevicePathId;
+  EFI_IFR_FORM_SET    *Buffer;
+  UINTN               BufferSize;
+  UINT8               ClassGuidNum;
+  EFI_GUID            *ClassGuid;
+  UINTN               TempSize;
+  UINT8               *Ptr;
+  EFI_STATUS          Status;
 
-  TempSize =0;
+  TempSize   = 0;
   BufferSize = 0;
-  Buffer = NULL;
+  Buffer     = NULL;
 
-  HiiHandle = gDeviceManagerPrivate.HiiHandle;
+  HiiHandle      = gDeviceManagerPrivate.HiiHandle;
   AddNetworkMenu = FALSE;
-  AddItemCount = 0;
+  AddItemCount   = 0;
   //
   // If need show the Network device list form, clear the old save list first.
   //
@@ -538,8 +553,9 @@ CreateDeviceManagerForm(
     if (String == NULL) {
       return;
     }
-    NewStringLen = StrLen (mSelectedMacAddrString) * 2;
-    NewStringLen += (StrLen (String) + 2) * 2;
+
+    NewStringLen   = StrLen (mSelectedMacAddrString) * 2;
+    NewStringLen  += (StrLen (String) + 2) * 2;
     NewStringTitle = AllocatePool (NewStringLen);
     UnicodeSPrint (NewStringTitle, NewStringLen, L"%s %s", String, mSelectedMacAddrString);
     HiiSetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NewStringTitle, NULL);
@@ -559,17 +575,17 @@ CreateDeviceManagerForm(
   //
   // Create Hii Extend Label OpCode as the start opcode
   //
-  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
   StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
   //
   // According to the next show Form id(mNextShowFormId) to decide which form need to update.
   //
-  StartLabel->Number       = (UINT16) (LABEL_FORM_ID_OFFSET + NextShowFormId);
+  StartLabel->Number = (UINT16)(LABEL_FORM_ID_OFFSET + NextShowFormId);
 
   //
   // Create Hii Extend Label OpCode as the end opcode
   //
-  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
   EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
   EndLabel->Number       = LABEL_END;
 
@@ -583,23 +599,24 @@ CreateDeviceManagerForm(
   // Search for formset of each class type
   //
   for (Index = 0; HiiHandles[Index] != NULL; Index++) {
-    Status = HiiGetFormSetFromHiiHandle(HiiHandles[Index], &Buffer,&BufferSize);
-    if (EFI_ERROR (Status)){
+    Status = HiiGetFormSetFromHiiHandle (HiiHandles[Index], &Buffer, &BufferSize);
+    if (EFI_ERROR (Status)) {
       continue;
     }
+
     Ptr = (UINT8 *)Buffer;
-    while(TempSize < BufferSize)  {
-      TempSize += ((EFI_IFR_OP_HEADER *) Ptr)->Length;
-      if (((EFI_IFR_OP_HEADER *) Ptr)->Length <= OFFSET_OF (EFI_IFR_FORM_SET, Flags)){
-        Ptr += ((EFI_IFR_OP_HEADER *) Ptr)->Length;
+    while (TempSize < BufferSize) {
+      TempSize += ((EFI_IFR_OP_HEADER *)Ptr)->Length;
+      if (((EFI_IFR_OP_HEADER *)Ptr)->Length <= OFFSET_OF (EFI_IFR_FORM_SET, Flags)) {
+        Ptr += ((EFI_IFR_OP_HEADER *)Ptr)->Length;
         continue;
       }
 
-      ClassGuidNum = (UINT8) (((EFI_IFR_FORM_SET *)Ptr)->Flags & 0x3);
-      ClassGuid = (EFI_GUID *) (VOID *)(Ptr + sizeof (EFI_IFR_FORM_SET));
+      ClassGuidNum = (UINT8)(((EFI_IFR_FORM_SET *)Ptr)->Flags & 0x3);
+      ClassGuid    = (EFI_GUID *)(VOID *)(Ptr + sizeof (EFI_IFR_FORM_SET));
       while (ClassGuidNum-- > 0) {
-        if (CompareGuid (&gEfiHiiPlatformSetupFormsetGuid, ClassGuid)== 0) {
-          ClassGuid ++;
+        if (CompareGuid (&gEfiHiiPlatformSetupFormsetGuid, ClassGuid) == 0) {
+          ClassGuid++;
           continue;
         }
 
@@ -608,6 +625,7 @@ CreateDeviceManagerForm(
           String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
           ASSERT (String != NULL);
         }
+
         Token = HiiSetString (HiiHandle, 0, String, NULL);
         FreePool (String);
 
@@ -616,15 +634,16 @@ CreateDeviceManagerForm(
           String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
           ASSERT (String != NULL);
         }
+
         TokenHelp = HiiSetString (HiiHandle, 0, String, NULL);
         FreePool (String);
 
-        CopyMem (&FormSetGuid, &((EFI_IFR_FORM_SET *) Ptr)->Guid, sizeof (EFI_GUID));
+        CopyMem (&FormSetGuid, &((EFI_IFR_FORM_SET *)Ptr)->Guid, sizeof (EFI_GUID));
 
         //
         // Network device process
         //
-        if (IsNeedAddNetworkMenu (HiiHandles[Index], NextShowFormId,&AddItemCount)) {
+        if (IsNeedAddNetworkMenu (HiiHandles[Index], NextShowFormId, &AddItemCount)) {
           if (NextShowFormId == DEVICE_MANAGER_FORM_ID) {
             //
             // Only show one menu item "Network Config" in the device manger form.
@@ -637,8 +656,8 @@ CreateDeviceManagerForm(
                 STRING_TOKEN (STR_FORM_NETWORK_DEVICE_LIST_TITLE),
                 STRING_TOKEN (STR_FORM_NETWORK_DEVICE_LIST_HELP),
                 EFI_IFR_FLAG_CALLBACK,
-                (EFI_QUESTION_ID) QUESTION_NETWORK_DEVICE_ID
-              );
+                (EFI_QUESTION_ID)QUESTION_NETWORK_DEVICE_ID
+                );
             }
           } else if (NextShowFormId == NETWORK_DEVICE_LIST_FORM_ID) {
             //
@@ -652,63 +671,67 @@ CreateDeviceManagerForm(
                 STRING_TOKEN (STR_NETWORK_DEVICE_HELP),
                 EFI_IFR_FLAG_CALLBACK,
                 mMacDeviceList.NodeList[mMacDeviceList.CurListLen - AddItemCount].QuestionId
-              );
+                );
               AddItemCount -= 1;
             }
           } else if (NextShowFormId == NETWORK_DEVICE_FORM_ID) {
             //
             // In network device form, only the selected mac address device need to be show.
             //
-            DevicePathStr = DmExtractDevicePathFromHiiHandle(HiiHandles[Index]);
+            DevicePathStr = DmExtractDevicePathFromHiiHandle (HiiHandles[Index]);
             DevicePathId  = 0;
-            if (DevicePathStr != NULL){
+            if (DevicePathStr != NULL) {
               DevicePathId =  HiiSetString (HiiHandle, 0, DevicePathStr, NULL);
-              FreePool(DevicePathStr);
+              FreePool (DevicePathStr);
             }
+
             HiiCreateGotoExOpCode (
               StartOpCodeHandle,
               0,
               Token,
               TokenHelp,
               0,
-              (EFI_QUESTION_ID) (Index + DEVICE_KEY_OFFSET),
+              (EFI_QUESTION_ID)(Index + DEVICE_KEY_OFFSET),
               0,
               &FormSetGuid,
               DevicePathId
-            );
+              );
           }
         } else {
           //
           // Not network device process, only need to show at device manger form.
           //
           if (NextShowFormId == DEVICE_MANAGER_FORM_ID) {
-            DevicePathStr = DmExtractDevicePathFromHiiHandle(HiiHandles[Index]);
+            DevicePathStr = DmExtractDevicePathFromHiiHandle (HiiHandles[Index]);
             DevicePathId  = 0;
-            if (DevicePathStr != NULL){
+            if (DevicePathStr != NULL) {
               DevicePathId =  HiiSetString (HiiHandle, 0, DevicePathStr, NULL);
-              FreePool(DevicePathStr);
+              FreePool (DevicePathStr);
             }
+
             HiiCreateGotoExOpCode (
               StartOpCodeHandle,
               0,
               Token,
               TokenHelp,
               0,
-              (EFI_QUESTION_ID) (Index + DEVICE_KEY_OFFSET),
+              (EFI_QUESTION_ID)(Index + DEVICE_KEY_OFFSET),
               0,
               &FormSetGuid,
               DevicePathId
-            );
+              );
           }
         }
+
         break;
       }
 
-      Ptr += ((EFI_IFR_OP_HEADER *) Ptr)->Length;
+      Ptr += ((EFI_IFR_OP_HEADER *)Ptr)->Length;
     }
-    FreePool(Buffer);
-    Buffer = NULL;
-    TempSize = 0;
+
+    FreePool (Buffer);
+    Buffer     = NULL;
+    TempSize   = 0;
     BufferSize = 0;
   }
 
@@ -750,15 +773,16 @@ CreateDeviceManagerForm(
 EFI_STATUS
 EFIAPI
 DeviceManagerExtractConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Request,
-  OUT EFI_STRING                             *Progress,
-  OUT EFI_STRING                             *Results
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Request,
+  OUT EFI_STRING                            *Progress,
+  OUT EFI_STRING                            *Results
   )
 {
-  if (Progress == NULL || Results == NULL) {
+  if ((Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   *Progress = Request;
   return EFI_NOT_FOUND;
 }
@@ -781,12 +805,12 @@ DeviceManagerExtractConfig (
 EFI_STATUS
 EFIAPI
 DeviceManagerRouteConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Configuration,
-  OUT EFI_STRING                             *Progress
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                            *Progress
   )
 {
-  if (Configuration == NULL || Progress == NULL) {
+  if ((Configuration == NULL) || (Progress == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -814,15 +838,15 @@ DeviceManagerRouteConfig (
 EFI_STATUS
 EFIAPI
 DeviceManagerCallback (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  EFI_BROWSER_ACTION                    Action,
+  IN  EFI_QUESTION_ID                       QuestionId,
+  IN  UINT8                                 Type,
+  IN  EFI_IFR_TYPE_VALUE                    *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   )
 {
-  UINTN CurIndex;
+  UINTN  CurIndex;
 
   if (Action != EFI_BROWSER_ACTION_CHANGING) {
     //
@@ -830,21 +854,24 @@ DeviceManagerCallback (
     //
     return EFI_UNSUPPORTED;
   }
+
   if ((Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   if ((QuestionId < MAX_KEY_SECTION_LEN + NETWORK_DEVICE_LIST_KEY_OFFSET) && (QuestionId >= NETWORK_DEVICE_LIST_KEY_OFFSET)) {
     //
     // If user select the mac address, need to record mac address string to support next form show.
     //
-    for (CurIndex = 0; CurIndex < mMacDeviceList.CurListLen; CurIndex ++) {
+    for (CurIndex = 0; CurIndex < mMacDeviceList.CurListLen; CurIndex++) {
       if (mMacDeviceList.NodeList[CurIndex].QuestionId == QuestionId) {
-         mSelectedMacAddrString = HiiGetString (gDeviceManagerPrivate.HiiHandle, mMacDeviceList.NodeList[CurIndex].PromptId, NULL);
+        mSelectedMacAddrString = HiiGetString (gDeviceManagerPrivate.HiiHandle, mMacDeviceList.NodeList[CurIndex].PromptId, NULL);
       }
     }
-    CreateDeviceManagerForm(NETWORK_DEVICE_FORM_ID);
-  } else if(QuestionId == QUESTION_NETWORK_DEVICE_ID){
-    CreateDeviceManagerForm(NETWORK_DEVICE_LIST_FORM_ID);
+
+    CreateDeviceManagerForm (NETWORK_DEVICE_FORM_ID);
+  } else if (QuestionId == QUESTION_NETWORK_DEVICE_ID) {
+    CreateDeviceManagerForm (NETWORK_DEVICE_LIST_FORM_ID);
   }
 
   return EFI_SUCCESS;
@@ -863,33 +890,33 @@ DeviceManagerCallback (
 EFI_STATUS
 EFIAPI
 DeviceManagerUiLibConstructor (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
-)
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
   gDeviceManagerPrivate.DriverHandle = NULL;
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &gDeviceManagerPrivate.DriverHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  &mDeviceManagerHiiVendorDevicePath,
-                  &gEfiHiiConfigAccessProtocolGuid,
-                  &gDeviceManagerPrivate.ConfigAccess,
-                  NULL
-                  );
+  Status                             = gBS->InstallMultipleProtocolInterfaces (
+                                              &gDeviceManagerPrivate.DriverHandle,
+                                              &gEfiDevicePathProtocolGuid,
+                                              &mDeviceManagerHiiVendorDevicePath,
+                                              &gEfiHiiConfigAccessProtocolGuid,
+                                              &gDeviceManagerPrivate.ConfigAccess,
+                                              NULL
+                                              );
   ASSERT_EFI_ERROR (Status);
 
   //
   // Publish our HII data.
   //
   gDeviceManagerPrivate.HiiHandle = HiiAddPackages (
-                  &mDeviceManagerGuid,
-                  gDeviceManagerPrivate.DriverHandle,
-                  DeviceManagerVfrBin,
-                  DeviceManagerUiLibStrings,
-                  NULL
-                  );
+                                      &mDeviceManagerGuid,
+                                      gDeviceManagerPrivate.DriverHandle,
+                                      DeviceManagerVfrBin,
+                                      DeviceManagerUiLibStrings,
+                                      NULL
+                                      );
   ASSERT (gDeviceManagerPrivate.HiiHandle != NULL);
 
   //
@@ -917,12 +944,12 @@ DeviceManagerUiLibConstructor (
 **/
 EFI_STATUS
 EFIAPI
-DeviceManagerUiLibDestructor(
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
-)
+DeviceManagerUiLibDestructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   gDeviceManagerPrivate.DriverHandle,
@@ -938,4 +965,3 @@ DeviceManagerUiLibDestructor(
 
   return EFI_SUCCESS;
 }
-

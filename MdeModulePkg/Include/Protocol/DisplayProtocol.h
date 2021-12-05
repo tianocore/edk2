@@ -17,11 +17,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Do nothing.
 //
-#define BROWSER_ACTION_NONE         BIT16
+#define BROWSER_ACTION_NONE  BIT16
 //
 // ESC Exit
 //
-#define BROWSER_ACTION_FORM_EXIT    BIT17
+#define BROWSER_ACTION_FORM_EXIT  BIT17
 
 #define BROWSER_SUCCESS                   0x0
 #define BROWSER_ERROR                     BIT31
@@ -44,53 +44,53 @@ typedef struct {
   //
   // HII Data Type
   //
-  UINT8               Type;
+  UINT8                 Type;
   //
   // Buffer Data and Length if Type is EFI_IFR_TYPE_BUFFER or EFI_IFR_TYPE_STRING
   //
-  UINT8               *Buffer;
-  UINT16              BufferLen;
-  EFI_IFR_TYPE_VALUE  Value;
+  UINT8                 *Buffer;
+  UINT16                BufferLen;
+  EFI_IFR_TYPE_VALUE    Value;
 } EFI_HII_VALUE;
 
 #define DISPLAY_QUESTION_OPTION_SIGNATURE  SIGNATURE_32 ('Q', 'O', 'P', 'T')
 
 typedef struct {
-  UINTN                  Signature;
-  LIST_ENTRY             Link;
+  UINTN                    Signature;
+  LIST_ENTRY               Link;
   //
   // OneOfOption Data
   //
-  EFI_IFR_ONE_OF_OPTION  *OptionOpCode;
+  EFI_IFR_ONE_OF_OPTION    *OptionOpCode;
   //
   // Option ImageId and AnimationId
   //
-  EFI_IMAGE_ID           ImageId;
-  EFI_ANIMATION_ID       AnimationId;
+  EFI_IMAGE_ID             ImageId;
+  EFI_ANIMATION_ID         AnimationId;
 } DISPLAY_QUESTION_OPTION;
 
 #define DISPLAY_QUESTION_OPTION_FROM_LINK(a)  CR (a, DISPLAY_QUESTION_OPTION, Link, DISPLAY_QUESTION_OPTION_SIGNATURE)
 
-typedef struct _FORM_DISPLAY_ENGINE_STATEMENT FORM_DISPLAY_ENGINE_STATEMENT;
-typedef struct _FORM_DISPLAY_ENGINE_FORM      FORM_DISPLAY_ENGINE_FORM;
+typedef struct _FORM_DISPLAY_ENGINE_STATEMENT  FORM_DISPLAY_ENGINE_STATEMENT;
+typedef struct _FORM_DISPLAY_ENGINE_FORM       FORM_DISPLAY_ENGINE_FORM;
 
-#define STATEMENT_VALID             0x0
-#define STATEMENT_INVALID           BIT31
+#define STATEMENT_VALID    0x0
+#define STATEMENT_INVALID  BIT31
 
-#define INCOSISTENT_IF_TRUE         STATEMENT_INVALID | 0x01
-#define WARNING_IF_TRUE             STATEMENT_INVALID | 0x02
-#define STRING_TOO_LONG             STATEMENT_INVALID | 0x03
+#define INCOSISTENT_IF_TRUE  STATEMENT_INVALID | 0x01
+#define WARNING_IF_TRUE      STATEMENT_INVALID | 0x02
+#define STRING_TOO_LONG      STATEMENT_INVALID | 0x03
 // ... to be extended.
 
 typedef struct {
   //
   // StringId for INCONSITENT_IF or WARNING_IF
   //
-  EFI_STRING_ID  StringId;
+  EFI_STRING_ID    StringId;
   //
   // TimeOut for WARNING_IF
   //
-  UINT8          TimeOut;
+  UINT8            TimeOut;
 } STATEMENT_ERROR_INFO;
 
 /**
@@ -105,7 +105,7 @@ typedef struct {
 **/
 typedef
 UINT32
-(EFIAPI *VALIDATE_QUESTION) (
+(EFIAPI *VALIDATE_QUESTION)(
   IN FORM_DISPLAY_ENGINE_FORM      *Form,
   IN FORM_DISPLAY_ENGINE_STATEMENT *Statement,
   IN EFI_HII_VALUE                 *Value,
@@ -126,7 +126,7 @@ UINT32
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PASSWORD_CHECK) (
+(EFIAPI *PASSWORD_CHECK)(
   IN FORM_DISPLAY_ENGINE_FORM      *Form,
   IN FORM_DISPLAY_ENGINE_STATEMENT *Statement,
   IN EFI_STRING                    PasswordString  OPTIONAL
@@ -137,66 +137,66 @@ EFI_STATUS
 //
 // Attribute for Statement and Form
 //
-#define HII_DISPLAY_NONE             0
-#define HII_DISPLAY_GRAYOUT          BIT0
-#define HII_DISPLAY_LOCK             BIT1
-#define HII_DISPLAY_READONLY         BIT2
-#define HII_DISPLAY_MODAL            BIT3
-#define HII_DISPLAY_SUPPRESS         BIT4
+#define HII_DISPLAY_NONE      0
+#define HII_DISPLAY_GRAYOUT   BIT0
+#define HII_DISPLAY_LOCK      BIT1
+#define HII_DISPLAY_READONLY  BIT2
+#define HII_DISPLAY_MODAL     BIT3
+#define HII_DISPLAY_SUPPRESS  BIT4
 
-struct _FORM_DISPLAY_ENGINE_STATEMENT{
-  UINTN                 Signature;
+struct _FORM_DISPLAY_ENGINE_STATEMENT {
+  UINTN                Signature;
   //
   // Version for future structure extension
   //
-  UINTN                 Version;
+  UINTN                Version;
   //
   // link to all the statement which will show in the display form.
   //
-  LIST_ENTRY            DisplayLink;
+  LIST_ENTRY           DisplayLink;
   //
   // Pointer to statement opcode.
   // for Guided Opcode. All buffers will be here if GUIDED opcode scope is set.
   //
-  EFI_IFR_OP_HEADER     *OpCode;
+  EFI_IFR_OP_HEADER    *OpCode;
   //
   // Question CurrentValue
   //
-  EFI_HII_VALUE         CurrentValue;
+  EFI_HII_VALUE        CurrentValue;
   //
   // Flag to describe whether setting is changed or not.
   // Displayer may depend on it to show it with the different color.
   //
-  BOOLEAN               SettingChangedFlag;
+  BOOLEAN              SettingChangedFlag;
   //
   // nested Statement list inside of EFI_IFR_SUBTITLE
   //
-  LIST_ENTRY            NestStatementList;
+  LIST_ENTRY           NestStatementList;
   //
   // nested EFI_IFR_ONE_OF_OPTION list (QUESTION_OPTION)
   //
-  LIST_ENTRY            OptionListHead;
+  LIST_ENTRY           OptionListHead;
   //
   // Statement attributes: GRAYOUT, LOCK and READONLY
   //
-  UINT32                Attribute;
+  UINT32               Attribute;
 
   //
   // ValidateQuestion to do InconsistIf check
   // It may be NULL if any value is valid.
   //
-  VALIDATE_QUESTION     ValidateQuestion;
+  VALIDATE_QUESTION    ValidateQuestion;
 
   //
   // Password additional check. It may be NULL when the additional check is not required.
   //
-  PASSWORD_CHECK        PasswordCheck;
+  PASSWORD_CHECK       PasswordCheck;
 
   //
   // Statement ImageId and AnimationId
   //
-  EFI_IMAGE_ID          ImageId;
-  EFI_ANIMATION_ID      AnimationId;
+  EFI_IMAGE_ID         ImageId;
+  EFI_ANIMATION_ID     AnimationId;
 };
 
 #define FORM_DISPLAY_ENGINE_STATEMENT_FROM_LINK(a)  CR (a, FORM_DISPLAY_ENGINE_STATEMENT, DisplayLink, FORM_DISPLAY_ENGINE_STATEMENT_SIGNATURE)
@@ -204,19 +204,19 @@ struct _FORM_DISPLAY_ENGINE_STATEMENT{
 #define BROWSER_HOT_KEY_SIGNATURE  SIGNATURE_32 ('B', 'H', 'K', 'S')
 
 typedef struct {
-  UINTN                 Signature;
-  LIST_ENTRY            Link;
+  UINTN            Signature;
+  LIST_ENTRY       Link;
 
-  EFI_INPUT_KEY         *KeyData;
+  EFI_INPUT_KEY    *KeyData;
   //
   // Action is Discard, Default, Submit, Reset and Exit.
   //
-  UINT32                 Action;
-  UINT16                 DefaultId;
+  UINT32           Action;
+  UINT16           DefaultId;
   //
   // HotKey Help String
   //
-  EFI_STRING             HelpString;
+  EFI_STRING       HelpString;
 } BROWSER_HOT_KEY;
 
 #define BROWSER_HOT_KEY_FROM_LINK(a)  CR (a, BROWSER_HOT_KEY, Link, BROWSER_HOT_KEY_SIGNATURE)
@@ -224,86 +224,86 @@ typedef struct {
 #define FORM_DISPLAY_ENGINE_FORM_SIGNATURE  SIGNATURE_32 ('F', 'F', 'R', 'M')
 
 struct _FORM_DISPLAY_ENGINE_FORM {
-  UINTN                Signature;
+  UINTN                            Signature;
   //
   // Version for future structure extension
   //
-  UINTN                Version;
+  UINTN                            Version;
   //
   // Statement List inside of Form
   //
-  LIST_ENTRY            StatementListHead;
+  LIST_ENTRY                       StatementListHead;
   //
   // Statement List outside of Form
   //
-  LIST_ENTRY            StatementListOSF;
+  LIST_ENTRY                       StatementListOSF;
   //
   // The input screen dimenstions info.
   //
-  EFI_SCREEN_DESCRIPTOR *ScreenDimensions;
+  EFI_SCREEN_DESCRIPTOR            *ScreenDimensions;
   //
   // FormSet information
   //
-  EFI_GUID             FormSetGuid;
+  EFI_GUID                         FormSetGuid;
   //
   // HiiHandle can be used to get String, Image or Animation
   //
-  EFI_HII_HANDLE       HiiHandle;
+  EFI_HII_HANDLE                   HiiHandle;
 
   //
   // Form ID and Title.
   //
-  UINT16               FormId;
-  EFI_STRING_ID        FormTitle;
+  UINT16                           FormId;
+  EFI_STRING_ID                    FormTitle;
   //
   // Form Attributes: Lock, Modal.
   //
-  UINT32               Attribute;
+  UINT32                           Attribute;
   //
   // Flag to describe whether setting is changed or not.
   // Displayer depends on it to show ChangedFlag.
   //
-  BOOLEAN              SettingChangedFlag;
+  BOOLEAN                          SettingChangedFlag;
 
   //
   // Statement to be HighLighted
   //
-  FORM_DISPLAY_ENGINE_STATEMENT *HighLightedStatement;
+  FORM_DISPLAY_ENGINE_STATEMENT    *HighLightedStatement;
   //
   // Event to notify Displayer that FormData is updated to be refreshed.
   //
-  EFI_EVENT              FormRefreshEvent;
+  EFI_EVENT                        FormRefreshEvent;
   //
   // Additional Hotkey registered by BrowserEx protocol.
   //
-  LIST_ENTRY             HotKeyListHead;
+  LIST_ENTRY                       HotKeyListHead;
 
   //
   // Form ImageId and AnimationId
   //
-  EFI_IMAGE_ID         ImageId;
-  EFI_ANIMATION_ID     AnimationId;
+  EFI_IMAGE_ID                     ImageId;
+  EFI_ANIMATION_ID                 AnimationId;
 
   //
   // If Status is error, display needs to handle it.
   //
-  UINT32               BrowserStatus;
+  UINT32                           BrowserStatus;
   //
   // String for error status. It may be NULL.
   //
-  EFI_STRING           ErrorString;
+  EFI_STRING                       ErrorString;
 };
 
 #define FORM_DISPLAY_ENGINE_FORM_FROM_LINK(a)  CR (a, FORM_DISPLAY_ENGINE_FORM, Link, FORM_DISPLAY_ENGINE_FORM_SIGNATURE)
 
 typedef struct {
-  FORM_DISPLAY_ENGINE_STATEMENT  *SelectedStatement; // Selected Statement and InputValue
+  FORM_DISPLAY_ENGINE_STATEMENT    *SelectedStatement; // Selected Statement and InputValue
 
-  EFI_HII_VALUE                  InputValue;
+  EFI_HII_VALUE                    InputValue;
 
-  UINT32                         Action;             // If SelectedStatement is NULL, Action will be used.
+  UINT32                           Action;           // If SelectedStatement is NULL, Action will be used.
                                                      // Trig Action (Discard, Default, Submit, Reset and Exit)
-  UINT16                         DefaultId;
+  UINT16                           DefaultId;
 } USER_INPUT;
 
 /**
@@ -316,10 +316,10 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *FORM_DISPLAY) (
+(EFIAPI *FORM_DISPLAY)(
   IN FORM_DISPLAY_ENGINE_FORM  *FormData,
   OUT USER_INPUT               *UserInputData
-);
+  );
 
 /**
   Exit Display and Clear Screen to the original state.
@@ -327,9 +327,9 @@ EFI_STATUS
 **/
 typedef
 VOID
-(EFIAPI *EXIT_DISPLAY) (
+(EFIAPI *EXIT_DISPLAY)(
   VOID
-);
+  );
 
 /**
   Confirm how to handle the changed data.
@@ -338,15 +338,15 @@ VOID
 **/
 typedef
 UINTN
-(EFIAPI *CONFIRM_DATA_CHANGE) (
+(EFIAPI *CONFIRM_DATA_CHANGE)(
   VOID
-);
+  );
 
 typedef struct {
-  FORM_DISPLAY        FormDisplay;
-  EXIT_DISPLAY        ExitDisplay;
-  CONFIRM_DATA_CHANGE ConfirmDataChange;
+  FORM_DISPLAY           FormDisplay;
+  EXIT_DISPLAY           ExitDisplay;
+  CONFIRM_DATA_CHANGE    ConfirmDataChange;
 } EDKII_FORM_DISPLAY_ENGINE_PROTOCOL;
 
-extern EFI_GUID gEdkiiFormDisplayEngineProtocolGuid;
+extern EFI_GUID  gEdkiiFormDisplayEngineProtocolGuid;
 #endif

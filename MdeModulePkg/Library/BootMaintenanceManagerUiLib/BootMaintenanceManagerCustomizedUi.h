@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __CUSTOMIZED_UI_H__
 #define __CUSTOMIZED_UI_H__
 
-
 /**
   Customize menus in the page.
 
@@ -43,12 +42,12 @@ UiCustomizeBMMPage (
 **/
 EFI_STATUS
 UiBMMCallbackHandler (
-  IN  EFI_HII_HANDLE                         HiiHandle,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  EFI_HII_HANDLE              HiiHandle,
+  IN  EFI_BROWSER_ACTION          Action,
+  IN  EFI_QUESTION_ID             QuestionId,
+  IN  UINT8                       Type,
+  IN  EFI_IFR_TYPE_VALUE          *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest
   );
 
 #endif

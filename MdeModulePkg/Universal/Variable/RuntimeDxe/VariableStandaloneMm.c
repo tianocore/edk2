@@ -63,8 +63,8 @@ VariableNotifySmmWriteReady (
 EFI_STATUS
 EFIAPI
 VariableServiceInitialize (
-  IN EFI_HANDLE                           ImageHandle,
-  IN EFI_MM_SYSTEM_TABLE                  *MmSystemTable
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
   )
 {
   return MmVariableServiceInitialize ();

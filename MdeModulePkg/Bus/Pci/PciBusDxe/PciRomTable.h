@@ -42,7 +42,7 @@ PciRomAddImageMapping (
 **/
 BOOLEAN
 PciRomGetImageMapping (
-  IN  PCI_IO_DEVICE                       *PciIoDevice
+  IN  PCI_IO_DEVICE  *PciIoDevice
   );
 
 #endif

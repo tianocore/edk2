@@ -24,12 +24,12 @@
 **/
 PEI_AHCI_ATA_DEVICE_DATA *
 SearchTrustComputingDeviceByIndex (
-  IN PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private,
-  IN UINTN                               TrustComputingDeviceIndex
+  IN PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private,
+  IN UINTN                             TrustComputingDeviceIndex
   )
 {
-  PEI_AHCI_ATA_DEVICE_DATA    *DeviceData;
-  LIST_ENTRY                  *Node;
+  PEI_AHCI_ATA_DEVICE_DATA  *DeviceData;
+  LIST_ENTRY                *Node;
 
   Node = GetFirstNode (&Private->DeviceList);
   while (!IsNull (&Private->DeviceList, Node)) {
@@ -58,17 +58,17 @@ SearchTrustComputingDeviceByIndex (
 EFI_STATUS
 EFIAPI
 AhciStorageSecurityGetDeviceNo (
-  IN  EDKII_PEI_STORAGE_SECURITY_CMD_PPI    *This,
-  OUT UINTN                                 *NumberofDevices
+  IN  EDKII_PEI_STORAGE_SECURITY_CMD_PPI  *This,
+  OUT UINTN                               *NumberofDevices
   )
 {
-  PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private;
+  PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private;
 
-  if (This == NULL || NumberofDevices == NULL) {
+  if ((This == NULL) || (NumberofDevices == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Private = GET_AHCI_PEIM_HC_PRIVATE_DATA_FROM_THIS_STROAGE_SECURITY (This);
+  Private          = GET_AHCI_PEIM_HC_PRIVATE_DATA_FROM_THIS_STROAGE_SECURITY (This);
   *NumberofDevices = Private->TrustComputingDevices;
 
   return EFI_SUCCESS;
@@ -102,17 +102,17 @@ AhciStorageSecurityGetDeviceNo (
 EFI_STATUS
 EFIAPI
 AhciStorageSecurityGetDevicePath (
-  IN  EDKII_PEI_STORAGE_SECURITY_CMD_PPI    *This,
-  IN  UINTN                                 DeviceIndex,
-  OUT UINTN                                 *DevicePathLength,
-  OUT EFI_DEVICE_PATH_PROTOCOL              **DevicePath
+  IN  EDKII_PEI_STORAGE_SECURITY_CMD_PPI  *This,
+  IN  UINTN                               DeviceIndex,
+  OUT UINTN                               *DevicePathLength,
+  OUT EFI_DEVICE_PATH_PROTOCOL            **DevicePath
   )
 {
-  PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private;
-  PEI_AHCI_ATA_DEVICE_DATA            *DeviceData;
-  EFI_STATUS                          Status;
+  PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private;
+  PEI_AHCI_ATA_DEVICE_DATA          *DeviceData;
+  EFI_STATUS                        Status;
 
-  if (This == NULL || DevicePathLength == NULL || DevicePath == NULL) {
+  if ((This == NULL) || (DevicePathLength == NULL) || (DevicePath == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -229,18 +229,18 @@ AhciStorageSecurityGetDevicePath (
 EFI_STATUS
 EFIAPI
 AhciStorageSecurityReceiveData (
-  IN  EDKII_PEI_STORAGE_SECURITY_CMD_PPI    *This,
-  IN  UINTN                                 DeviceIndex,
-  IN  UINT64                                Timeout,
-  IN  UINT8                                 SecurityProtocolId,
-  IN  UINT16                                SecurityProtocolSpecificData,
-  IN  UINTN                                 PayloadBufferSize,
-  OUT VOID                                  *PayloadBuffer,
-  OUT UINTN                                 *PayloadTransferSize
+  IN  EDKII_PEI_STORAGE_SECURITY_CMD_PPI  *This,
+  IN  UINTN                               DeviceIndex,
+  IN  UINT64                              Timeout,
+  IN  UINT8                               SecurityProtocolId,
+  IN  UINT16                              SecurityProtocolSpecificData,
+  IN  UINTN                               PayloadBufferSize,
+  OUT VOID                                *PayloadBuffer,
+  OUT UINTN                               *PayloadTransferSize
   )
 {
-  PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private;
-  PEI_AHCI_ATA_DEVICE_DATA            *DeviceData;
+  PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private;
+  PEI_AHCI_ATA_DEVICE_DATA          *DeviceData;
 
   if ((PayloadBuffer == NULL) || (PayloadTransferSize == NULL) || (PayloadBufferSize == 0)) {
     return EFI_INVALID_PARAMETER;
@@ -349,8 +349,8 @@ AhciStorageSecuritySendData (
   IN VOID                                *PayloadBuffer
   )
 {
-  PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private;
-  PEI_AHCI_ATA_DEVICE_DATA            *DeviceData;
+  PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private;
+  PEI_AHCI_ATA_DEVICE_DATA          *DeviceData;
 
   if ((PayloadBuffer == NULL) && (PayloadBufferSize != 0)) {
     return EFI_INVALID_PARAMETER;

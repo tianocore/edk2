@@ -34,18 +34,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   0x3ebfa8e6, 0x511d, 0x4b5b, {0xa9, 0x5f, 0xfb, 0x38, 0x26, 0xf, 0x1c, 0x27} \
   }
 
-#define LABEL_END                            0xffff
-#define LABEL_FORM_ID_OFFSET                 0x0100
+#define LABEL_END             0xffff
+#define LABEL_FORM_ID_OFFSET  0x0100
 
-#define DEVICE_MANAGER_FORM_ID               0x1000
-#define NETWORK_DEVICE_LIST_FORM_ID          0x1001
-#define NETWORK_DEVICE_FORM_ID               0x1002
-#define DEVICE_KEY_OFFSET                    0x4000
-#define NETWORK_DEVICE_LIST_KEY_OFFSET       0x2000
+#define DEVICE_MANAGER_FORM_ID          0x1000
+#define NETWORK_DEVICE_LIST_FORM_ID     0x1001
+#define NETWORK_DEVICE_FORM_ID          0x1002
+#define DEVICE_KEY_OFFSET               0x4000
+#define NETWORK_DEVICE_LIST_KEY_OFFSET  0x2000
 
-#define MAX_KEY_SECTION_LEN                  0x1000
+#define MAX_KEY_SECTION_LEN  0x1000
 
-#define QUESTION_NETWORK_DEVICE_ID           0x3FFF
+#define QUESTION_NETWORK_DEVICE_ID  0x3FFF
 //
 // These are the VFR compiler generated data representing our VFR data.
 //
@@ -57,40 +57,40 @@ extern UINT8  DeviceManagerVfrBin[];
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH             VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL       End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
 typedef struct {
-  UINTN                           Signature;
+  UINTN                             Signature;
 
   ///
   /// Device Manager HII relative handles
   ///
-  EFI_HII_HANDLE                  HiiHandle;
+  EFI_HII_HANDLE                    HiiHandle;
 
-  EFI_HANDLE                      DriverHandle;
+  EFI_HANDLE                        DriverHandle;
 
   ///
   /// Device Manager Produced protocols
   ///
-  EFI_HII_CONFIG_ACCESS_PROTOCOL  ConfigAccess;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL    ConfigAccess;
 
   ///
   /// Configuration data
   ///
-  UINT8                           VideoBios;
+  UINT8                             VideoBios;
 } DEVICE_MANAGER_CALLBACK_DATA;
 
 typedef struct {
-  EFI_STRING_ID    PromptId;
-  EFI_QUESTION_ID  QuestionId;
-}MENU_INFO_ITEM;
+  EFI_STRING_ID      PromptId;
+  EFI_QUESTION_ID    QuestionId;
+} MENU_INFO_ITEM;
 
 typedef struct {
-  UINTN           CurListLen;
-  UINTN           MaxListLen;
-  MENU_INFO_ITEM  *NodeList;
+  UINTN             CurListLen;
+  UINTN             MaxListLen;
+  MENU_INFO_ITEM    *NodeList;
 } MAC_ADDRESS_NODE_LIST;
 
 #define DEVICE_MANAGER_CALLBACK_DATA_FROM_THIS(a) \
@@ -100,8 +100,8 @@ typedef struct {
       DEVICE_MANAGER_CALLBACK_DATA_SIGNATURE \
       )
 typedef struct {
-  EFI_STRING_ID  StringId;
-  UINT16         Class;
+  EFI_STRING_ID    StringId;
+  UINT16           Class;
 } DEVICE_MANAGER_MENU_ITEM;
 
 /**
@@ -129,10 +129,10 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 DeviceManagerExtractConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Request,
-  OUT EFI_STRING                             *Progress,
-  OUT EFI_STRING                             *Results
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Request,
+  OUT EFI_STRING                            *Progress,
+  OUT EFI_STRING                            *Results
   );
 
 /**
@@ -154,9 +154,9 @@ DeviceManagerExtractConfig (
 EFI_STATUS
 EFIAPI
 DeviceManagerRouteConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Configuration,
-  OUT EFI_STRING                             *Progress
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                            *Progress
   );
 
 /**
@@ -178,12 +178,12 @@ DeviceManagerRouteConfig (
 EFI_STATUS
 EFIAPI
 DeviceManagerCallback (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  EFI_BROWSER_ACTION                    Action,
+  IN  EFI_QUESTION_ID                       QuestionId,
+  IN  UINT8                                 Type,
+  IN  EFI_IFR_TYPE_VALUE                    *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   );
 
 #endif

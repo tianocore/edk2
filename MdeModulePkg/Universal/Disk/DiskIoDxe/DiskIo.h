@@ -26,60 +26,60 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define DISK_IO_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('d', 's', 'k', 'I')
 typedef struct {
-  UINT32                          Signature;
+  UINT32                    Signature;
 
-  EFI_DISK_IO_PROTOCOL            DiskIo;
-  EFI_DISK_IO2_PROTOCOL           DiskIo2;
-  EFI_BLOCK_IO_PROTOCOL           *BlockIo;
-  EFI_BLOCK_IO2_PROTOCOL          *BlockIo2;
+  EFI_DISK_IO_PROTOCOL      DiskIo;
+  EFI_DISK_IO2_PROTOCOL     DiskIo2;
+  EFI_BLOCK_IO_PROTOCOL     *BlockIo;
+  EFI_BLOCK_IO2_PROTOCOL    *BlockIo2;
 
-  UINT8                           *SharedWorkingBuffer;
+  UINT8                     *SharedWorkingBuffer;
 
-  EFI_LOCK                        TaskQueueLock;
-  LIST_ENTRY                      TaskQueue;
+  EFI_LOCK                  TaskQueueLock;
+  LIST_ENTRY                TaskQueue;
 } DISK_IO_PRIVATE_DATA;
-#define DISK_IO_PRIVATE_DATA_FROM_DISK_IO(a)  CR (a, DISK_IO_PRIVATE_DATA, DiskIo,  DISK_IO_PRIVATE_DATA_SIGNATURE)
-#define DISK_IO_PRIVATE_DATA_FROM_DISK_IO2(a) CR (a, DISK_IO_PRIVATE_DATA, DiskIo2, DISK_IO_PRIVATE_DATA_SIGNATURE)
+#define DISK_IO_PRIVATE_DATA_FROM_DISK_IO(a)   CR (a, DISK_IO_PRIVATE_DATA, DiskIo,  DISK_IO_PRIVATE_DATA_SIGNATURE)
+#define DISK_IO_PRIVATE_DATA_FROM_DISK_IO2(a)  CR (a, DISK_IO_PRIVATE_DATA, DiskIo2, DISK_IO_PRIVATE_DATA_SIGNATURE)
 
-#define DISK_IO2_TASK_SIGNATURE   SIGNATURE_32 ('d', 'i', 'a', 't')
+#define DISK_IO2_TASK_SIGNATURE  SIGNATURE_32 ('d', 'i', 'a', 't')
 typedef struct {
-  UINT32                          Signature;
-  LIST_ENTRY                      Link;     /// < link to other task
-  EFI_LOCK                        SubtasksLock;
-  LIST_ENTRY                      Subtasks; /// < header of subtasks
-  EFI_DISK_IO2_TOKEN              *Token;
-  DISK_IO_PRIVATE_DATA            *Instance;
+  UINT32                  Signature;
+  LIST_ENTRY              Link;             /// < link to other task
+  EFI_LOCK                SubtasksLock;
+  LIST_ENTRY              Subtasks;         /// < header of subtasks
+  EFI_DISK_IO2_TOKEN      *Token;
+  DISK_IO_PRIVATE_DATA    *Instance;
 } DISK_IO2_TASK;
 
-#define DISK_IO2_FLUSH_TASK_SIGNATURE SIGNATURE_32 ('d', 'i', 'f', 't')
+#define DISK_IO2_FLUSH_TASK_SIGNATURE  SIGNATURE_32 ('d', 'i', 'f', 't')
 typedef struct {
-  UINT32                          Signature;
-  EFI_BLOCK_IO2_TOKEN             BlockIo2Token;
-  EFI_DISK_IO2_TOKEN              *Token;
+  UINT32                 Signature;
+  EFI_BLOCK_IO2_TOKEN    BlockIo2Token;
+  EFI_DISK_IO2_TOKEN     *Token;
 } DISK_IO2_FLUSH_TASK;
 
-#define DISK_IO_SUBTASK_SIGNATURE SIGNATURE_32 ('d', 'i', 's', 't')
+#define DISK_IO_SUBTASK_SIGNATURE  SIGNATURE_32 ('d', 'i', 's', 't')
 typedef struct {
   //
   // UnderRun:  Offset != 0, Length < BlockSize
   // OverRun:   Offset == 0, Length < BlockSize
   // Middle:    Offset is block aligned, Length is multiple of block size
   //
-  UINT32                          Signature;
-  LIST_ENTRY                      Link;
-  BOOLEAN                         Write;
-  UINT64                          Lba;
-  UINT32                          Offset;
-  UINTN                           Length;
-  UINT8                           *WorkingBuffer; /// < NULL indicates using "Buffer" directly
-  UINT8                           *Buffer;
-  BOOLEAN                         Blocking;
+  UINT32                 Signature;
+  LIST_ENTRY             Link;
+  BOOLEAN                Write;
+  UINT64                 Lba;
+  UINT32                 Offset;
+  UINTN                  Length;
+  UINT8                  *WorkingBuffer;          /// < NULL indicates using "Buffer" directly
+  UINT8                  *Buffer;
+  BOOLEAN                Blocking;
 
   //
   // Following fields are for DiskIo2
   //
-  DISK_IO2_TASK                   *Task;
-  EFI_BLOCK_IO2_TOKEN             BlockIo2Token;
+  DISK_IO2_TASK          *Task;
+  EFI_BLOCK_IO2_TOKEN    BlockIo2Token;
 } DISK_IO_SUBTASK;
 
 //
@@ -93,6 +93,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gDiskIoComponentName2;
 // Prototypes
 // Driver model protocol interface
 //
+
 /**
   Test to see if this driver supports ControllerHandle.
 
@@ -153,15 +154,16 @@ DiskIoDriverBindingStart (
 EFI_STATUS
 EFIAPI
 DiskIoDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     ControllerHandle,
-  IN  UINTN                          NumberOfChildren,
-  IN  EFI_HANDLE                     *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
 //
 // Disk I/O Protocol Interface
 //
+
 /**
   Read BufferSize bytes from Offset into Buffer.
   Reads may support reads that are not aligned on
@@ -230,7 +232,6 @@ DiskIoWriteDisk (
   IN VOID                  *Buffer
   );
 
-
 /**
   Terminate outstanding asynchronous requests to a device.
 
@@ -243,7 +244,7 @@ DiskIoWriteDisk (
 EFI_STATUS
 EFIAPI
 DiskIo2Cancel (
-  IN EFI_DISK_IO2_PROTOCOL *This
+  IN EFI_DISK_IO2_PROTOCOL  *This
   );
 
 /**
@@ -271,12 +272,12 @@ DiskIo2Cancel (
 EFI_STATUS
 EFIAPI
 DiskIo2ReadDiskEx (
-  IN EFI_DISK_IO2_PROTOCOL        *This,
-  IN UINT32                       MediaId,
-  IN UINT64                       Offset,
-  IN OUT EFI_DISK_IO2_TOKEN       *Token,
-  IN UINTN                        BufferSize,
-  OUT VOID                        *Buffer
+  IN EFI_DISK_IO2_PROTOCOL   *This,
+  IN UINT32                  MediaId,
+  IN UINT64                  Offset,
+  IN OUT EFI_DISK_IO2_TOKEN  *Token,
+  IN UINTN                   BufferSize,
+  OUT VOID                   *Buffer
   );
 
 /**
@@ -304,12 +305,12 @@ DiskIo2ReadDiskEx (
 EFI_STATUS
 EFIAPI
 DiskIo2WriteDiskEx (
-  IN EFI_DISK_IO2_PROTOCOL        *This,
-  IN UINT32                       MediaId,
-  IN UINT64                       Offset,
-  IN EFI_DISK_IO2_TOKEN           *Token,
-  IN UINTN                        BufferSize,
-  IN VOID                         *Buffer
+  IN EFI_DISK_IO2_PROTOCOL  *This,
+  IN UINT32                 MediaId,
+  IN UINT64                 Offset,
+  IN EFI_DISK_IO2_TOKEN     *Token,
+  IN UINTN                  BufferSize,
+  IN VOID                   *Buffer
   );
 
 /**
@@ -330,13 +331,14 @@ DiskIo2WriteDiskEx (
 EFI_STATUS
 EFIAPI
 DiskIo2FlushDiskEx (
-  IN EFI_DISK_IO2_PROTOCOL        *This,
-  IN OUT EFI_DISK_IO2_TOKEN       *Token
+  IN EFI_DISK_IO2_PROTOCOL   *This,
+  IN OUT EFI_DISK_IO2_TOKEN  *Token
   );
 
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -383,7 +385,6 @@ DiskIoComponentNameGetDriverName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **DriverName
   );
-
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
@@ -456,12 +457,11 @@ DiskIoComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 DiskIoComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
-
 
 #endif

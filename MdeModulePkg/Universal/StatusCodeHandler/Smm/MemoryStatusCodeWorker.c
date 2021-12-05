@@ -22,7 +22,7 @@ MemoryStatusCodeInitializeWorker (
   VOID
   )
 {
-  EFI_STATUS                        Status;
+  EFI_STATUS  Status;
 
   //
   // Allocate MM memory status code pool.
@@ -31,15 +31,14 @@ MemoryStatusCodeInitializeWorker (
   ASSERT (mMmMemoryStatusCodeTable != NULL);
 
   mMmMemoryStatusCodeTable->MaxRecordsNumber = (PcdGet16 (PcdStatusCodeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
-  Status = gMmst->MmInstallConfigurationTable (
-                    gMmst,
-                    &gMemoryStatusCodeRecordGuid,
-                    &mMmMemoryStatusCodeTable,
-                    sizeof (mMmMemoryStatusCodeTable)
-                    );
+  Status                                     = gMmst->MmInstallConfigurationTable (
+                                                        gMmst,
+                                                        &gMemoryStatusCodeRecordGuid,
+                                                        &mMmMemoryStatusCodeTable,
+                                                        sizeof (mMmMemoryStatusCodeTable)
+                                                        );
   return Status;
 }
-
 
 /**
   Report status code into runtime memory. If the runtime pool is full, roll back to the
@@ -62,19 +61,19 @@ MemoryStatusCodeInitializeWorker (
 EFI_STATUS
 EFIAPI
 MemoryStatusCodeReportWorker (
-  IN EFI_STATUS_CODE_TYPE               CodeType,
-  IN EFI_STATUS_CODE_VALUE              Value,
-  IN UINT32                             Instance,
-  IN EFI_GUID                           *CallerId,
-  IN EFI_STATUS_CODE_DATA               *Data OPTIONAL
+  IN EFI_STATUS_CODE_TYPE   CodeType,
+  IN EFI_STATUS_CODE_VALUE  Value,
+  IN UINT32                 Instance,
+  IN EFI_GUID               *CallerId,
+  IN EFI_STATUS_CODE_DATA   *Data OPTIONAL
   )
 {
-  MEMORY_STATUSCODE_RECORD              *Record;
+  MEMORY_STATUSCODE_RECORD  *Record;
 
   //
   // Locate current record buffer.
   //
-  Record = (MEMORY_STATUSCODE_RECORD *) (mMmMemoryStatusCodeTable + 1);
+  Record = (MEMORY_STATUSCODE_RECORD *)(mMmMemoryStatusCodeTable + 1);
   Record = &Record[mMmMemoryStatusCodeTable->RecordIndex++];
 
   //
@@ -102,6 +101,3 @@ MemoryStatusCodeReportWorker (
 
   return EFI_SUCCESS;
 }
-
-
-

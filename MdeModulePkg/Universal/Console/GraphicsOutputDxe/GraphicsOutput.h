@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 
 **/
+
 #ifndef _GRAPHICS_OUTPUT_DXE_H_
 #define _GRAPHICS_OUTPUT_DXE_H_
 #include <PiDxe.h>
@@ -33,21 +34,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MAX_PCI_BAR  6
 
 typedef struct {
-  UINT32                            Signature;
-  EFI_HANDLE                        GraphicsOutputHandle;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL      GraphicsOutput;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE GraphicsOutputMode;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
-  EFI_PCI_IO_PROTOCOL               *PciIo;
-  UINT64                            PciAttributes;
-  FRAME_BUFFER_CONFIGURE            *FrameBufferBltLibConfigure;
-  UINTN                             FrameBufferBltLibConfigureSize;
+  UINT32                               Signature;
+  EFI_HANDLE                           GraphicsOutputHandle;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL         GraphicsOutput;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE    GraphicsOutputMode;
+  EFI_DEVICE_PATH_PROTOCOL             *DevicePath;
+  EFI_PCI_IO_PROTOCOL                  *PciIo;
+  UINT64                               PciAttributes;
+  FRAME_BUFFER_CONFIGURE               *FrameBufferBltLibConfigure;
+  UINTN                                FrameBufferBltLibConfigureSize;
 } GRAPHICS_OUTPUT_PRIVATE_DATA;
 
 #define GRAPHICS_OUTPUT_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('g', 'g', 'o', 'p')
 #define GRAPHICS_OUTPUT_PRIVATE_FROM_THIS(a) \
   CR(a, GRAPHICS_OUTPUT_PRIVATE_DATA, GraphicsOutput, GRAPHICS_OUTPUT_PRIVATE_DATA_SIGNATURE)
 
-extern EFI_COMPONENT_NAME_PROTOCOL  mGraphicsOutputComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL mGraphicsOutputComponentName2;
+extern EFI_COMPONENT_NAME_PROTOCOL   mGraphicsOutputComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  mGraphicsOutputComponentName2;
 #endif

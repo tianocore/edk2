@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/PlatformBootManagerLib.h>
 
-
 /**
   Do the platform specific action before the console is connected.
 
@@ -54,7 +53,7 @@ PlatformBootManagerAfterConsole (
 VOID
 EFIAPI
 PlatformBootManagerWaitCallback (
-  UINT16          TimeoutRemain
+  UINT16  TimeoutRemain
   )
 {
   return;
@@ -75,4 +74,3 @@ PlatformBootManagerUnableToBoot (
 {
   return;
 }
-

@@ -26,7 +26,6 @@ PlatformHookBeforeSmmDispatch (
   return EFI_SUCCESS;
 }
 
-
 /**
   Performs platform specific tasks after invoking registered SMI handlers.
 

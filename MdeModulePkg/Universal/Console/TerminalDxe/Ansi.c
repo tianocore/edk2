@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Terminal.h"
 
 /**
@@ -18,10 +17,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 AnsiRawDataToUnicode (
-  IN  TERMINAL_DEV    *TerminalDevice
+  IN  TERMINAL_DEV  *TerminalDevice
   )
 {
-  UINT8 RawData;
+  UINT8  RawData;
 
   //
   // pop the raw data out from the raw fifo,
@@ -29,10 +28,9 @@ AnsiRawDataToUnicode (
   // the unicode into unicode fifo, until the raw fifo is empty.
   //
   while (!IsRawFiFoEmpty (TerminalDevice) && !IsUnicodeFiFoFull (TerminalDevice)) {
-
     RawFiFoRemoveOneKey (TerminalDevice, &RawData);
 
-    UnicodeFiFoInsertOneKey (TerminalDevice, (UINT16) RawData);
+    UnicodeFiFoInsertOneKey (TerminalDevice, (UINT16)RawData);
   }
 }
 
@@ -49,22 +47,21 @@ AnsiRawDataToUnicode (
 **/
 EFI_STATUS
 AnsiTestString (
-  IN  TERMINAL_DEV    *TerminalDevice,
-  IN  CHAR16          *WString
+  IN  TERMINAL_DEV  *TerminalDevice,
+  IN  CHAR16        *WString
   )
 {
-  CHAR8 GraphicChar;
+  CHAR8  GraphicChar;
 
   //
   // support three kind of character:
   // valid ascii, valid efi control char, valid text graphics.
   //
-  for (; *WString != CHAR_NULL; WString++) {
-
+  for ( ; *WString != CHAR_NULL; WString++) {
     if ( !(TerminalIsValidAscii (*WString) ||
-        TerminalIsValidEfiCntlChar (*WString) ||
-        TerminalIsValidTextGraphics (*WString, &GraphicChar, NULL) )) {
-
+           TerminalIsValidEfiCntlChar (*WString) ||
+           TerminalIsValidTextGraphics (*WString, &GraphicChar, NULL)))
+    {
       return EFI_UNSUPPORTED;
     }
   }

@@ -22,41 +22,41 @@
 //
 // PCI Defintions.
 //
-#define PCI_BRIDGE_32_BIT_IO_SPACE              0x01
+#define PCI_BRIDGE_32_BIT_IO_SPACE  0x01
 
 //
 // 16550 UART register offsets and bitfields
 //
-#define R_UART_RXBUF          0   // LCR_DLAB = 0
-#define R_UART_TXBUF          0   // LCR_DLAB = 0
-#define R_UART_BAUD_LOW       0   // LCR_DLAB = 1
-#define R_UART_BAUD_HIGH      1   // LCR_DLAB = 1
-#define R_UART_IER            1   // LCR_DLAB = 0
-#define R_UART_FCR            2
-#define   B_UART_FCR_FIFOE    BIT0
-#define   B_UART_FCR_FIFO64   BIT5
-#define R_UART_LCR            3
-#define   B_UART_LCR_DLAB     BIT7
-#define R_UART_MCR            4
-#define   B_UART_MCR_DTRC     BIT0
-#define   B_UART_MCR_RTS      BIT1
-#define R_UART_LSR            5
-#define   B_UART_LSR_RXRDY    BIT0
-#define   B_UART_LSR_TXRDY    BIT5
-#define   B_UART_LSR_TEMT     BIT6
-#define R_UART_MSR            6
-#define   B_UART_MSR_CTS      BIT4
-#define   B_UART_MSR_DSR      BIT5
-#define   B_UART_MSR_RI       BIT6
-#define   B_UART_MSR_DCD      BIT7
+#define R_UART_RXBUF         0    // LCR_DLAB = 0
+#define R_UART_TXBUF         0    // LCR_DLAB = 0
+#define R_UART_BAUD_LOW      0    // LCR_DLAB = 1
+#define R_UART_BAUD_HIGH     1    // LCR_DLAB = 1
+#define R_UART_IER           1    // LCR_DLAB = 0
+#define R_UART_FCR           2
+#define   B_UART_FCR_FIFOE   BIT0
+#define   B_UART_FCR_FIFO64  BIT5
+#define R_UART_LCR           3
+#define   B_UART_LCR_DLAB    BIT7
+#define R_UART_MCR           4
+#define   B_UART_MCR_DTRC    BIT0
+#define   B_UART_MCR_RTS     BIT1
+#define R_UART_LSR           5
+#define   B_UART_LSR_RXRDY   BIT0
+#define   B_UART_LSR_TXRDY   BIT5
+#define   B_UART_LSR_TEMT    BIT6
+#define R_UART_MSR           6
+#define   B_UART_MSR_CTS     BIT4
+#define   B_UART_MSR_DSR     BIT5
+#define   B_UART_MSR_RI      BIT6
+#define   B_UART_MSR_DCD     BIT7
 
 //
 // 4-byte structure for each PCI node in PcdSerialPciDeviceInfo
 //
 typedef struct {
-  UINT8   Device;
-  UINT8   Function;
-  UINT16  PowerManagementStatusAndControlRegister;
+  UINT8     Device;
+  UINT8     Function;
+  UINT16    PowerManagementStatusAndControlRegister;
 } PCI_UART_DEVICE_INFO;
 
 /**
@@ -80,8 +80,9 @@ SerialPortReadRegister (
 {
   if (PcdGetBool (PcdSerialUseMmio)) {
     if (PcdGet8 (PcdSerialRegisterAccessWidth) == 32) {
-      return (UINT8) MmioRead32 (Base + Offset * PcdGet32 (PcdSerialRegisterStride));
+      return (UINT8)MmioRead32 (Base + Offset * PcdGet32 (PcdSerialRegisterStride));
     }
+
     return MmioRead8 (Base + Offset * PcdGet32 (PcdSerialRegisterStride));
   } else {
     return IoRead8 (Base + Offset * PcdGet32 (PcdSerialRegisterStride));
@@ -111,8 +112,9 @@ SerialPortWriteRegister (
 {
   if (PcdGetBool (PcdSerialUseMmio)) {
     if (PcdGet8 (PcdSerialRegisterAccessWidth) == 32) {
-      return (UINT8) MmioWrite32 (Base + Offset * PcdGet32 (PcdSerialRegisterStride), (UINT8)Value);
+      return (UINT8)MmioWrite32 (Base + Offset * PcdGet32 (PcdSerialRegisterStride), (UINT8)Value);
     }
+
     return MmioWrite8 (Base + Offset * PcdGet32 (PcdSerialRegisterStride), Value);
   } else {
     return IoWrite8 (Base + Offset * PcdGet32 (PcdSerialRegisterStride), Value);
@@ -145,6 +147,7 @@ SerialPortLibUpdatePciRegister16 (
   if (CurrentValue != 0) {
     return CurrentValue;
   }
+
   return PciWrite16 (PciAddress, Value & Mask);
 }
 
@@ -176,6 +179,7 @@ SerialPortLibUpdatePciRegister32 (
   if (CurrentValue != 0) {
     return CurrentValue;
   }
+
   return PciWrite32 (PciAddress, Value & Mask);
 }
 
@@ -212,7 +216,7 @@ GetSerialRegisterBase (
   //
   // Get PCI Device Info
   //
-  DeviceInfo = (PCI_UART_DEVICE_INFO *) PcdGetPtr (PcdSerialPciDeviceInfo);
+  DeviceInfo = (PCI_UART_DEVICE_INFO *)PcdGetPtr (PcdSerialPciDeviceInfo);
 
   //
   // If PCI Device Info is empty, then assume fixed address UART and return PcdSerialRegisterBase
@@ -244,7 +248,7 @@ GetSerialRegisterBase (
     //
     BusNumber            = PciRead8 (PciLibAddress + PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET);
     SubordinateBusNumber = PciRead8 (PciLibAddress + PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET);
-    if (BusNumber == 0 || BusNumber > SubordinateBusNumber) {
+    if ((BusNumber == 0) || (BusNumber > SubordinateBusNumber)) {
       return 0;
     }
 
@@ -265,20 +269,22 @@ GetSerialRegisterBase (
       //
       // If PCI Bridge MMIO window is not in the address range decoded by the parent PCI Bridge, then return 0
       //
-      if (MemoryBase < ParentMemoryBase || MemoryBase > ParentMemoryLimit || MemoryLimit > ParentMemoryLimit) {
+      if ((MemoryBase < ParentMemoryBase) || (MemoryBase > ParentMemoryLimit) || (MemoryLimit > ParentMemoryLimit)) {
         return 0;
       }
+
       ParentMemoryBase  = MemoryBase;
       ParentMemoryLimit = MemoryLimit;
     } else {
       IoLimit = PciRead8 (PciLibAddress + OFFSET_OF (PCI_TYPE01, Bridge.IoLimit));
-      if ((IoLimit & PCI_BRIDGE_32_BIT_IO_SPACE ) == 0) {
+      if ((IoLimit & PCI_BRIDGE_32_BIT_IO_SPACE) == 0) {
         IoLimit = IoLimit >> 4;
       } else {
         IoLimit = (PciRead16 (PciLibAddress + OFFSET_OF (PCI_TYPE01, Bridge.IoLimitUpper16)) << 4) | (IoLimit >> 4);
       }
+
       IoBase = PciRead8 (PciLibAddress + OFFSET_OF (PCI_TYPE01, Bridge.IoBase));
-      if ((IoBase & PCI_BRIDGE_32_BIT_IO_SPACE ) == 0) {
+      if ((IoBase & PCI_BRIDGE_32_BIT_IO_SPACE) == 0) {
         IoBase = IoBase >> 4;
       } else {
         IoBase = (PciRead16 (PciLibAddress + OFFSET_OF (PCI_TYPE01, Bridge.IoBaseUpper16)) << 4) | (IoBase >> 4);
@@ -294,9 +300,10 @@ GetSerialRegisterBase (
       //
       // If PCI Bridge I/O window is not in the address range decoded by the parent PCI Bridge, then return 0
       //
-      if (IoBase < ParentIoBase || IoBase > ParentIoLimit || IoLimit > ParentIoLimit) {
+      if ((IoBase < ParentIoBase) || (IoBase > ParentIoLimit) || (IoLimit > ParentIoLimit)) {
         return 0;
       }
+
       ParentIoBase  = IoBase;
       ParentIoLimit = IoLimit;
     }
@@ -311,7 +318,7 @@ GetSerialRegisterBase (
   // Find the first IO or MMIO BAR
   //
   RegisterBaseMask = 0xFFFFFFF0;
-  for (BarIndex = 0; BarIndex < PCI_MAX_BAR; BarIndex ++) {
+  for (BarIndex = 0; BarIndex < PCI_MAX_BAR; BarIndex++) {
     SerialRegisterBase = PciRead32 (PciLibAddress + PCI_BASE_ADDRESSREG_OFFSET + BarIndex * 4);
     if (PcdGetBool (PcdSerialUseMmio) && ((SerialRegisterBase & BIT0) == 0)) {
       //
@@ -350,11 +357,11 @@ GetSerialRegisterBase (
   // Verify that the UART BAR is in the address range decoded by the parent PCI Bridge
   //
   if (PcdGetBool (PcdSerialUseMmio)) {
-    if (((SerialRegisterBase >> 16) & 0xfff0) < ParentMemoryBase || ((SerialRegisterBase >> 16) & 0xfff0) > ParentMemoryLimit) {
+    if ((((SerialRegisterBase >> 16) & 0xfff0) < ParentMemoryBase) || (((SerialRegisterBase >> 16) & 0xfff0) > ParentMemoryLimit)) {
       return 0;
     }
   } else {
-    if ((SerialRegisterBase >> 12) < ParentIoBase || (SerialRegisterBase >> 12) > ParentIoLimit) {
+    if (((SerialRegisterBase >> 12) < ParentIoBase) || ((SerialRegisterBase >> 12) > ParentIoLimit)) {
       return 0;
     }
   }
@@ -372,7 +379,7 @@ GetSerialRegisterBase (
   //
   if (DeviceInfo->PowerManagementStatusAndControlRegister != 0x00) {
     if ((PciRead16 (PciLibAddress + DeviceInfo->PowerManagementStatusAndControlRegister) & (BIT0 | BIT1)) != 0x00) {
-      PciAnd16 (PciLibAddress + DeviceInfo->PowerManagementStatusAndControlRegister, (UINT16)~(BIT0 | BIT1));
+      PciAnd16 (PciLibAddress + DeviceInfo->PowerManagementStatusAndControlRegister, (UINT16) ~(BIT0 | BIT1));
       //
       // If PCI UART was not in D0, then make sure FIFOs are enabled, but do not reset FIFOs
       //
@@ -383,7 +390,7 @@ GetSerialRegisterBase (
   //
   // Get PCI Device Info
   //
-  DeviceInfo = (PCI_UART_DEVICE_INFO *) PcdGetPtr (PcdSerialPciDeviceInfo);
+  DeviceInfo = (PCI_UART_DEVICE_INFO *)PcdGetPtr (PcdSerialPciDeviceInfo);
 
   //
   // Enable I/O or MMIO in PCI Bridge
@@ -408,7 +415,7 @@ GetSerialRegisterBase (
     //
     if (DeviceInfo->PowerManagementStatusAndControlRegister != 0x00) {
       if ((PciRead16 (PciLibAddress + DeviceInfo->PowerManagementStatusAndControlRegister) & (BIT0 | BIT1)) != 0x00) {
-        PciAnd16 (PciLibAddress + DeviceInfo->PowerManagementStatusAndControlRegister, (UINT16)~(BIT0 | BIT1));
+        PciAnd16 (PciLibAddress + DeviceInfo->PowerManagementStatusAndControlRegister, (UINT16) ~(BIT0 | BIT1));
       }
     }
 
@@ -445,7 +452,7 @@ SerialPortWritable (
       //    1    0   Cable connected, but not clear to send.   Wait
       //    1    1   Cable connected, and clear to send.       Transmit
       //
-      return (BOOLEAN) ((SerialPortReadRegister (SerialRegisterBase, R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) == (B_UART_MSR_DSR | B_UART_MSR_CTS));
+      return (BOOLEAN)((SerialPortReadRegister (SerialRegisterBase, R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) == (B_UART_MSR_DSR | B_UART_MSR_CTS));
     } else {
       //
       // Wait for both DSR and CTS to be set OR for DSR to be clear.
@@ -459,7 +466,7 @@ SerialPortWritable (
       //    1    0   Cable connected, but not clear to send.   Wait
       //    1    1   Cable connected, and clar to send.        Transmit
       //
-      return (BOOLEAN) ((SerialPortReadRegister (SerialRegisterBase, R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) != (B_UART_MSR_DSR));
+      return (BOOLEAN)((SerialPortReadRegister (SerialRegisterBase, R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) != (B_UART_MSR_DSR));
     }
   }
 
@@ -511,7 +518,7 @@ SerialPortInitialize (
   // Get the base address of the serial port in either I/O or MMIO space
   //
   SerialRegisterBase = GetSerialRegisterBase ();
-  if (SerialRegisterBase ==0) {
+  if (SerialRegisterBase == 0) {
     return RETURN_DEVICE_ERROR;
   }
 
@@ -522,13 +529,15 @@ SerialPortInitialize (
   if ((SerialPortReadRegister (SerialRegisterBase, R_UART_LCR) & 0x3F) != (PcdGet8 (PcdSerialLineControl) & 0x3F)) {
     Initialized = FALSE;
   }
+
   SerialPortWriteRegister (SerialRegisterBase, R_UART_LCR, (UINT8)(SerialPortReadRegister (SerialRegisterBase, R_UART_LCR) | B_UART_LCR_DLAB));
-  CurrentDivisor =  SerialPortReadRegister (SerialRegisterBase, R_UART_BAUD_HIGH) << 8;
-  CurrentDivisor |= (UINT32) SerialPortReadRegister (SerialRegisterBase, R_UART_BAUD_LOW);
+  CurrentDivisor  =  SerialPortReadRegister (SerialRegisterBase, R_UART_BAUD_HIGH) << 8;
+  CurrentDivisor |= (UINT32)SerialPortReadRegister (SerialRegisterBase, R_UART_BAUD_LOW);
   SerialPortWriteRegister (SerialRegisterBase, R_UART_LCR, (UINT8)(SerialPortReadRegister (SerialRegisterBase, R_UART_LCR) & ~B_UART_LCR_DLAB));
   if (CurrentDivisor != Divisor) {
     Initialized = FALSE;
   }
+
   if (Initialized) {
     return RETURN_SUCCESS;
   }
@@ -537,14 +546,15 @@ SerialPortInitialize (
   // Wait for the serial port to be ready.
   // Verify that both the transmit FIFO and the shift register are empty.
   //
-  while ((SerialPortReadRegister (SerialRegisterBase, R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) != (B_UART_LSR_TEMT | B_UART_LSR_TXRDY));
+  while ((SerialPortReadRegister (SerialRegisterBase, R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) != (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) {
+  }
 
   //
   // Configure baud rate
   //
   SerialPortWriteRegister (SerialRegisterBase, R_UART_LCR, B_UART_LCR_DLAB);
-  SerialPortWriteRegister (SerialRegisterBase, R_UART_BAUD_HIGH, (UINT8) (Divisor >> 8));
-  SerialPortWriteRegister (SerialRegisterBase, R_UART_BAUD_LOW, (UINT8) (Divisor & 0xff));
+  SerialPortWriteRegister (SerialRegisterBase, R_UART_BAUD_HIGH, (UINT8)(Divisor >> 8));
+  SerialPortWriteRegister (SerialRegisterBase, R_UART_BAUD_LOW, (UINT8)(Divisor & 0xff));
 
   //
   // Clear DLAB and configure Data Bits, Parity, and Stop Bits.
@@ -594,8 +604,8 @@ SerialPortInitialize (
 UINTN
 EFIAPI
 SerialPortWrite (
-  IN UINT8     *Buffer,
-  IN UINTN     NumberOfBytes
+  IN UINT8  *Buffer,
+  IN UINTN  NumberOfBytes
   )
 {
   UINTN  SerialRegisterBase;
@@ -608,7 +618,7 @@ SerialPortWrite (
   }
 
   SerialRegisterBase = GetSerialRegisterBase ();
-  if (SerialRegisterBase ==0) {
+  if (SerialRegisterBase == 0) {
     return 0;
   }
 
@@ -620,12 +630,15 @@ SerialPortWrite (
     //
     // Wait for both the transmit FIFO and shift register empty.
     //
-    while ((SerialPortReadRegister (SerialRegisterBase, R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) != (B_UART_LSR_TEMT | B_UART_LSR_TXRDY));
+    while ((SerialPortReadRegister (SerialRegisterBase, R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) != (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) {
+    }
 
     //
     // Wait for the hardware flow control signal
     //
-    while (!SerialPortWritable (SerialRegisterBase));
+    while (!SerialPortWritable (SerialRegisterBase)) {
+    }
+
     return 0;
   }
 
@@ -647,7 +660,8 @@ SerialPortWrite (
     // Wait for the serial port to be ready, to make sure both the transmit FIFO
     // and shift register empty.
     //
-    while ((SerialPortReadRegister (SerialRegisterBase, R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) != (B_UART_LSR_TEMT | B_UART_LSR_TXRDY));
+    while ((SerialPortReadRegister (SerialRegisterBase, R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) != (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) {
+    }
 
     //
     // Fill then entire Tx FIFO
@@ -656,7 +670,8 @@ SerialPortWrite (
       //
       // Wait for the hardware flow control signal
       //
-      while (!SerialPortWritable (SerialRegisterBase));
+      while (!SerialPortWritable (SerialRegisterBase)) {
+      }
 
       //
       // Write byte to the transmit buffer.
@@ -664,6 +679,7 @@ SerialPortWrite (
       SerialPortWriteRegister (SerialRegisterBase, R_UART_TXBUF, *Buffer);
     }
   }
+
   return Result;
 }
 
@@ -681,8 +697,8 @@ SerialPortWrite (
 UINTN
 EFIAPI
 SerialPortRead (
-  OUT UINT8     *Buffer,
-  IN  UINTN     NumberOfBytes
+  OUT UINT8  *Buffer,
+  IN  UINTN  NumberOfBytes
   )
 {
   UINTN  SerialRegisterBase;
@@ -694,7 +710,7 @@ SerialPortRead (
   }
 
   SerialRegisterBase = GetSerialRegisterBase ();
-  if (SerialRegisterBase ==0) {
+  if (SerialRegisterBase == 0) {
     return 0;
   }
 
@@ -712,6 +728,7 @@ SerialPortRead (
         SerialPortWriteRegister (SerialRegisterBase, R_UART_MCR, (UINT8)(Mcr | B_UART_MCR_RTS));
       }
     }
+
     if (PcdGetBool (PcdSerialUseHardwareFlowControl)) {
       //
       // Clear RTS to prevent peer from sending data
@@ -727,7 +744,6 @@ SerialPortRead (
 
   return Result;
 }
-
 
 /**
   Polls a serial device to see if there is any data waiting to be read.
@@ -749,7 +765,7 @@ SerialPortPoll (
   UINTN  SerialRegisterBase;
 
   SerialRegisterBase = GetSerialRegisterBase ();
-  if (SerialRegisterBase ==0) {
+  if (SerialRegisterBase == 0) {
     return FALSE;
   }
 
@@ -763,6 +779,7 @@ SerialPortPoll (
       //
       SerialPortWriteRegister (SerialRegisterBase, R_UART_MCR, (UINT8)(SerialPortReadRegister (SerialRegisterBase, R_UART_MCR) & ~B_UART_MCR_RTS));
     }
+
     return TRUE;
   }
 
@@ -789,29 +806,30 @@ SerialPortPoll (
 RETURN_STATUS
 EFIAPI
 SerialPortSetControl (
-  IN UINT32 Control
+  IN UINT32  Control
   )
 {
-  UINTN SerialRegisterBase;
-  UINT8 Mcr;
+  UINTN  SerialRegisterBase;
+  UINT8  Mcr;
 
   //
   // First determine the parameter is invalid.
   //
   if ((Control & (~(EFI_SERIAL_REQUEST_TO_SEND | EFI_SERIAL_DATA_TERMINAL_READY |
-                    EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE))) != 0) {
+                    EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE))) != 0)
+  {
     return RETURN_UNSUPPORTED;
   }
 
   SerialRegisterBase = GetSerialRegisterBase ();
-  if (SerialRegisterBase ==0) {
+  if (SerialRegisterBase == 0) {
     return RETURN_UNSUPPORTED;
   }
 
   //
   // Read the Modem Control Register.
   //
-  Mcr = SerialPortReadRegister (SerialRegisterBase, R_UART_MCR);
+  Mcr  = SerialPortReadRegister (SerialRegisterBase, R_UART_MCR);
   Mcr &= (~(B_UART_MCR_DTRC | B_UART_MCR_RTS));
 
   if ((Control & EFI_SERIAL_DATA_TERMINAL_READY) == EFI_SERIAL_DATA_TERMINAL_READY) {
@@ -843,16 +861,16 @@ SerialPortSetControl (
 RETURN_STATUS
 EFIAPI
 SerialPortGetControl (
-  OUT UINT32 *Control
+  OUT UINT32  *Control
   )
 {
-  UINTN SerialRegisterBase;
-  UINT8 Msr;
-  UINT8 Mcr;
-  UINT8 Lsr;
+  UINTN  SerialRegisterBase;
+  UINT8  Msr;
+  UINT8  Mcr;
+  UINT8  Lsr;
 
   SerialRegisterBase = GetSerialRegisterBase ();
-  if (SerialRegisterBase ==0) {
+  if (SerialRegisterBase == 0) {
     return RETURN_UNSUPPORTED;
   }
 
@@ -948,24 +966,24 @@ SerialPortGetControl (
 RETURN_STATUS
 EFIAPI
 SerialPortSetAttributes (
-  IN OUT UINT64             *BaudRate,
-  IN OUT UINT32             *ReceiveFifoDepth,
-  IN OUT UINT32             *Timeout,
-  IN OUT EFI_PARITY_TYPE    *Parity,
-  IN OUT UINT8              *DataBits,
-  IN OUT EFI_STOP_BITS_TYPE *StopBits
+  IN OUT UINT64              *BaudRate,
+  IN OUT UINT32              *ReceiveFifoDepth,
+  IN OUT UINT32              *Timeout,
+  IN OUT EFI_PARITY_TYPE     *Parity,
+  IN OUT UINT8               *DataBits,
+  IN OUT EFI_STOP_BITS_TYPE  *StopBits
   )
 {
-  UINTN     SerialRegisterBase;
-  UINT32    SerialBaudRate;
-  UINTN     Divisor;
-  UINT8     Lcr;
-  UINT8     LcrData;
-  UINT8     LcrParity;
-  UINT8     LcrStop;
+  UINTN   SerialRegisterBase;
+  UINT32  SerialBaudRate;
+  UINTN   Divisor;
+  UINT8   Lcr;
+  UINT8   LcrData;
+  UINT8   LcrParity;
+  UINT8   LcrStop;
 
   SerialRegisterBase = GetSerialRegisterBase ();
-  if (SerialRegisterBase ==0) {
+  if (SerialRegisterBase == 0) {
     return RETURN_UNSUPPORTED;
   }
 
@@ -975,23 +993,25 @@ SerialPortSetAttributes (
   if (*BaudRate == 0) {
     *BaudRate = PcdGet32 (PcdSerialBaudRate);
   }
-  SerialBaudRate = (UINT32) *BaudRate;
+
+  SerialBaudRate = (UINT32)*BaudRate;
 
   if (*DataBits == 0) {
-    LcrData = (UINT8) (PcdGet8 (PcdSerialLineControl) & 0x3);
+    LcrData   = (UINT8)(PcdGet8 (PcdSerialLineControl) & 0x3);
     *DataBits = LcrData + 5;
   } else {
     if ((*DataBits < 5) || (*DataBits > 8)) {
       return RETURN_INVALID_PARAMETER;
     }
+
     //
     // Map 5..8 to 0..3
     //
-    LcrData = (UINT8) (*DataBits - (UINT8) 5);
+    LcrData = (UINT8)(*DataBits - (UINT8)5);
   }
 
   if (*Parity == DefaultParity) {
-    LcrParity = (UINT8) ((PcdGet8 (PcdSerialLineControl) >> 3) & 0x7);
+    LcrParity = (UINT8)((PcdGet8 (PcdSerialLineControl) >> 3) & 0x7);
     switch (LcrParity) {
       case 0:
         *Parity = NoParity;
@@ -1044,7 +1064,7 @@ SerialPortSetAttributes (
   }
 
   if (*StopBits == DefaultStopBits) {
-    LcrStop = (UINT8) ((PcdGet8 (PcdSerialLineControl) >> 2) & 0x1);
+    LcrStop = (UINT8)((PcdGet8 (PcdSerialLineControl) >> 2) & 0x1);
     switch (LcrStop) {
       case 0:
         *StopBits = OneStopBit;
@@ -1056,6 +1076,7 @@ SerialPortSetAttributes (
         } else {
           *StopBits = TwoStopBits;
         }
+
         break;
 
       default:
@@ -1090,15 +1111,15 @@ SerialPortSetAttributes (
   // Configure baud rate
   //
   SerialPortWriteRegister (SerialRegisterBase, R_UART_LCR, B_UART_LCR_DLAB);
-  SerialPortWriteRegister (SerialRegisterBase, R_UART_BAUD_HIGH, (UINT8) (Divisor >> 8));
-  SerialPortWriteRegister (SerialRegisterBase, R_UART_BAUD_LOW, (UINT8) (Divisor & 0xff));
+  SerialPortWriteRegister (SerialRegisterBase, R_UART_BAUD_HIGH, (UINT8)(Divisor >> 8));
+  SerialPortWriteRegister (SerialRegisterBase, R_UART_BAUD_LOW, (UINT8)(Divisor & 0xff));
 
   //
   // Clear DLAB and configure Data Bits, Parity, and Stop Bits.
   // Strip reserved bits from line control value
   //
-  Lcr = (UINT8) ((LcrParity << 3) | (LcrStop << 2) | LcrData);
-  SerialPortWriteRegister (SerialRegisterBase, R_UART_LCR, (UINT8) (Lcr & 0x3F));
+  Lcr = (UINT8)((LcrParity << 3) | (LcrStop << 2) | LcrData);
+  SerialPortWriteRegister (SerialRegisterBase, R_UART_LCR, (UINT8)(Lcr & 0x3F));
 
   return RETURN_SUCCESS;
 }

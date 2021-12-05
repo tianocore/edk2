@@ -11,17 +11,17 @@
 //
 // Driver name table
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mEmmcDxeDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mEmmcDxeDriverNameTable[] = {
   { "eng;en", L"Edkii Emmc Device Driver" },
-  { NULL , NULL }
+  { NULL,     NULL                        }
 };
 
 //
 // Controller name table
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mEmmcDxeControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mEmmcDxeControllerNameTable[] = {
   { "eng;en", L"Edkii Emmc Host Controller" },
-  { NULL , NULL }
+  { NULL,     NULL                          }
 };
 
 //
@@ -36,9 +36,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gEmmcDxeComponentName
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gEmmcDxeComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) EmmcDxeComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) EmmcDxeComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gEmmcDxeComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)EmmcDxeComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)EmmcDxeComponentNameGetControllerName,
   "en"
 };
 
@@ -96,7 +96,6 @@ EmmcDxeComponentNameGetDriverName (
            DriverName,
            (BOOLEAN)(This == &gEmmcDxeComponentName)
            );
-
 }
 
 /**
@@ -170,11 +169,11 @@ EmmcDxeComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 EmmcDxeComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   EFI_STATUS                Status;
@@ -205,13 +204,14 @@ EmmcDxeComponentNameGetControllerName (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     //
     // Get the child context
     //
     Status = gBS->OpenProtocol (
                     ChildHandle,
                     &gEfiBlockIoProtocolGuid,
-                    (VOID **) &BlockIo,
+                    (VOID **)&BlockIo,
                     gEmmcDxeDriverBinding.DriverBindingHandle,
                     ChildHandle,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -220,8 +220,8 @@ EmmcDxeComponentNameGetControllerName (
       return EFI_UNSUPPORTED;
     }
 
-    Partition = EMMC_PARTITION_DATA_FROM_BLKIO (BlockIo);
-    Device    = Partition->Device;
+    Partition           = EMMC_PARTITION_DATA_FROM_BLKIO (BlockIo);
+    Device              = Partition->Device;
     ControllerNameTable = Device->ControllerNameTable;
   }
 
@@ -233,4 +233,3 @@ EmmcDxeComponentNameGetControllerName (
            (BOOLEAN)(This == &gEmmcDxeComponentName)
            );
 }
-

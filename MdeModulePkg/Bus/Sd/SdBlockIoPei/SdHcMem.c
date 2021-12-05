@@ -18,25 +18,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 SD_PEIM_MEM_BLOCK *
 SdPeimAllocMemBlock (
-  IN  UINTN                    Pages
+  IN  UINTN  Pages
   )
 {
-  SD_PEIM_MEM_BLOCK            *Block;
-  VOID                         *BufHost;
-  VOID                         *Mapping;
-  EFI_PHYSICAL_ADDRESS         MappedAddr;
-  EFI_STATUS                   Status;
-  VOID                         *TempPtr;
+  SD_PEIM_MEM_BLOCK     *Block;
+  VOID                  *BufHost;
+  VOID                  *Mapping;
+  EFI_PHYSICAL_ADDRESS  MappedAddr;
+  EFI_STATUS            Status;
+  VOID                  *TempPtr;
 
   TempPtr = NULL;
   Block   = NULL;
 
-  Status = PeiServicesAllocatePool (sizeof(SD_PEIM_MEM_BLOCK), &TempPtr);
+  Status = PeiServicesAllocatePool (sizeof (SD_PEIM_MEM_BLOCK), &TempPtr);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
 
-  ZeroMem ((VOID*)(UINTN)TempPtr, sizeof(SD_PEIM_MEM_BLOCK));
+  ZeroMem ((VOID *)(UINTN)TempPtr, sizeof (SD_PEIM_MEM_BLOCK));
 
   //
   // each bit in the bit array represents SD_PEIM_MEM_UNIT
@@ -44,18 +44,18 @@ SdPeimAllocMemBlock (
   //
   ASSERT (SD_PEIM_MEM_UNIT * 8 <= EFI_PAGE_SIZE);
 
-  Block = (SD_PEIM_MEM_BLOCK*)(UINTN)TempPtr;
-  Block->BufLen   = EFI_PAGES_TO_SIZE (Pages);
-  Block->BitsLen  = Block->BufLen / (SD_PEIM_MEM_UNIT * 8);
+  Block          = (SD_PEIM_MEM_BLOCK *)(UINTN)TempPtr;
+  Block->BufLen  = EFI_PAGES_TO_SIZE (Pages);
+  Block->BitsLen = Block->BufLen / (SD_PEIM_MEM_UNIT * 8);
 
   Status = PeiServicesAllocatePool (Block->BitsLen, &TempPtr);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
 
-  ZeroMem ((VOID*)(UINTN)TempPtr, Block->BitsLen);
+  ZeroMem ((VOID *)(UINTN)TempPtr, Block->BitsLen);
 
-  Block->Bits = (UINT8*)(UINTN)TempPtr;
+  Block->Bits = (UINT8 *)(UINTN)TempPtr;
 
   Status = IoMmuAllocateBuffer (
              Pages,
@@ -67,10 +67,10 @@ SdPeimAllocMemBlock (
     return NULL;
   }
 
-  ZeroMem ((VOID*)(UINTN)BufHost, EFI_PAGES_TO_SIZE (Pages));
+  ZeroMem ((VOID *)(UINTN)BufHost, EFI_PAGES_TO_SIZE (Pages));
 
-  Block->BufHost = (UINT8 *) (UINTN) BufHost;
-  Block->Buf     = (UINT8 *) (UINTN) MappedAddr;
+  Block->BufHost = (UINT8 *)(UINTN)BufHost;
+  Block->Buf     = (UINT8 *)(UINTN)MappedAddr;
   Block->Mapping = Mapping;
   Block->Next    = NULL;
 
@@ -86,8 +86,8 @@ SdPeimAllocMemBlock (
 **/
 VOID
 SdPeimFreeMemBlock (
-  IN SD_PEIM_MEM_POOL       *Pool,
-  IN SD_PEIM_MEM_BLOCK      *Block
+  IN SD_PEIM_MEM_POOL   *Pool,
+  IN SD_PEIM_MEM_BLOCK  *Block
   )
 {
   ASSERT ((Pool != NULL) && (Block != NULL));
@@ -107,22 +107,22 @@ SdPeimFreeMemBlock (
 **/
 VOID *
 SdPeimAllocMemFromBlock (
-  IN  SD_PEIM_MEM_BLOCK   *Block,
-  IN  UINTN               Units
+  IN  SD_PEIM_MEM_BLOCK  *Block,
+  IN  UINTN              Units
   )
 {
-  UINTN                   Byte;
-  UINT8                   Bit;
-  UINTN                   StartByte;
-  UINT8                   StartBit;
-  UINTN                   Available;
-  UINTN                   Count;
+  UINTN  Byte;
+  UINT8  Bit;
+  UINTN  StartByte;
+  UINT8  StartBit;
+  UINTN  Available;
+  UINTN  Count;
 
   ASSERT ((Block != 0) && (Units != 0));
 
-  StartByte  = 0;
-  StartBit   = 0;
-  Available  = 0;
+  StartByte = 0;
+  StartBit  = 0;
+  Available = 0;
 
   for (Byte = 0, Bit = 0; Byte < Block->BitsLen;) {
     //
@@ -138,13 +138,12 @@ SdPeimAllocMemFromBlock (
       }
 
       SD_PEIM_NEXT_BIT (Byte, Bit);
-
     } else {
       SD_PEIM_NEXT_BIT (Byte, Bit);
 
-      Available  = 0;
-      StartByte  = Byte;
-      StartBit   = Bit;
+      Available = 0;
+      StartByte = Byte;
+      StartBit  = Bit;
     }
   }
 
@@ -155,13 +154,13 @@ SdPeimAllocMemFromBlock (
   //
   // Mark the memory as allocated
   //
-  Byte  = StartByte;
-  Bit   = StartBit;
+  Byte = StartByte;
+  Bit  = StartBit;
 
   for (Count = 0; Count < Units; Count++) {
     ASSERT (!SD_PEIM_MEM_BIT_IS_SET (Block->Bits[Byte], Bit));
 
-    Block->Bits[Byte] = (UINT8) (Block->Bits[Byte] | (UINT8) SD_PEIM_MEM_BIT (Bit));
+    Block->Bits[Byte] = (UINT8)(Block->Bits[Byte] | (UINT8)SD_PEIM_MEM_BIT (Bit));
     SD_PEIM_NEXT_BIT (Byte, Bit);
   }
 
@@ -177,8 +176,8 @@ SdPeimAllocMemFromBlock (
 **/
 VOID
 SdPeimInsertMemBlockToPool (
-  IN SD_PEIM_MEM_BLOCK      *Head,
-  IN SD_PEIM_MEM_BLOCK      *Block
+  IN SD_PEIM_MEM_BLOCK  *Head,
+  IN SD_PEIM_MEM_BLOCK  *Block
   )
 {
   ASSERT ((Head != NULL) && (Block != NULL));
@@ -197,11 +196,10 @@ SdPeimInsertMemBlockToPool (
 **/
 BOOLEAN
 SdPeimIsMemBlockEmpty (
-  IN SD_PEIM_MEM_BLOCK     *Block
+  IN SD_PEIM_MEM_BLOCK  *Block
   )
 {
-  UINTN                    Index;
-
+  UINTN  Index;
 
   for (Index = 0; Index < Block->BitsLen; Index++) {
     if (Block->Bits[Index] != 0) {
@@ -211,8 +209,6 @@ SdPeimIsMemBlockEmpty (
 
   return TRUE;
 }
-
-
 
 /**
   Initialize the memory management pool for the host controller.
@@ -228,9 +224,9 @@ SdPeimInitMemPool (
   IN  SD_PEIM_HC_PRIVATE_DATA  *Private
   )
 {
-  SD_PEIM_MEM_POOL           *Pool;
-  EFI_STATUS                 Status;
-  VOID                       *TempPtr;
+  SD_PEIM_MEM_POOL  *Pool;
+  EFI_STATUS        Status;
+  VOID              *TempPtr;
 
   TempPtr = NULL;
   Pool    = NULL;
@@ -240,7 +236,7 @@ SdPeimInitMemPool (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ZeroMem ((VOID*)(UINTN)TempPtr, sizeof (SD_PEIM_MEM_POOL));
+  ZeroMem ((VOID *)(UINTN)TempPtr, sizeof (SD_PEIM_MEM_POOL));
 
   Pool = (SD_PEIM_MEM_POOL *)((UINTN)TempPtr);
 
@@ -265,10 +261,10 @@ SdPeimInitMemPool (
 **/
 EFI_STATUS
 SdPeimFreeMemPool (
-  IN SD_PEIM_MEM_POOL       *Pool
+  IN SD_PEIM_MEM_POOL  *Pool
   )
 {
-  SD_PEIM_MEM_BLOCK         *Block;
+  SD_PEIM_MEM_BLOCK  *Block;
 
   ASSERT (Pool->Head != NULL);
 
@@ -296,16 +292,16 @@ SdPeimFreeMemPool (
 **/
 VOID *
 SdPeimAllocateMem (
-  IN  SD_PEIM_MEM_POOL       *Pool,
-  IN  UINTN                  Size
+  IN  SD_PEIM_MEM_POOL  *Pool,
+  IN  UINTN             Size
   )
 {
-  SD_PEIM_MEM_BLOCK          *Head;
-  SD_PEIM_MEM_BLOCK          *Block;
-  SD_PEIM_MEM_BLOCK          *NewBlock;
-  VOID                       *Mem;
-  UINTN                      AllocSize;
-  UINTN                      Pages;
+  SD_PEIM_MEM_BLOCK  *Head;
+  SD_PEIM_MEM_BLOCK  *Block;
+  SD_PEIM_MEM_BLOCK  *NewBlock;
+  VOID               *Mem;
+  UINTN              AllocSize;
+  UINTN              Pages;
 
   Mem       = NULL;
   AllocSize = SD_PEIM_MEM_ROUND (Size);
@@ -368,22 +364,22 @@ SdPeimAllocateMem (
 **/
 VOID
 SdPeimFreeMem (
-  IN SD_PEIM_MEM_POOL     *Pool,
-  IN VOID                 *Mem,
-  IN UINTN                Size
+  IN SD_PEIM_MEM_POOL  *Pool,
+  IN VOID              *Mem,
+  IN UINTN             Size
   )
 {
-  SD_PEIM_MEM_BLOCK       *Head;
-  SD_PEIM_MEM_BLOCK       *Block;
-  UINT8                   *ToFree;
-  UINTN                   AllocSize;
-  UINTN                   Byte;
-  UINTN                   Bit;
-  UINTN                   Count;
+  SD_PEIM_MEM_BLOCK  *Head;
+  SD_PEIM_MEM_BLOCK  *Block;
+  UINT8              *ToFree;
+  UINTN              AllocSize;
+  UINTN              Byte;
+  UINTN              Bit;
+  UINTN              Count;
 
   Head      = Pool->Head;
   AllocSize = SD_PEIM_MEM_ROUND (Size);
-  ToFree    = (UINT8 *) Mem;
+  ToFree    = (UINT8 *)Mem;
 
   for (Block = Head; Block != NULL; Block = Block->Next) {
     //
@@ -394,8 +390,8 @@ SdPeimFreeMem (
       //
       // compute the start byte and bit in the bit array
       //
-      Byte  = ((ToFree - Block->Buf) / SD_PEIM_MEM_UNIT) / 8;
-      Bit   = ((ToFree - Block->Buf) / SD_PEIM_MEM_UNIT) % 8;
+      Byte = ((ToFree - Block->Buf) / SD_PEIM_MEM_UNIT) / 8;
+      Bit  = ((ToFree - Block->Buf) / SD_PEIM_MEM_UNIT) % 8;
 
       //
       // reset associated bits in bit array
@@ -403,7 +399,7 @@ SdPeimFreeMem (
       for (Count = 0; Count < (AllocSize / SD_PEIM_MEM_UNIT); Count++) {
         ASSERT (SD_PEIM_MEM_BIT_IS_SET (Block->Bits[Byte], Bit));
 
-        Block->Bits[Byte] = (UINT8) (Block->Bits[Byte] ^ SD_PEIM_MEM_BIT (Bit));
+        Block->Bits[Byte] = (UINT8)(Block->Bits[Byte] ^ SD_PEIM_MEM_BIT (Bit));
         SD_PEIM_NEXT_BIT (Byte, Bit);
       }
 
@@ -425,5 +421,5 @@ SdPeimFreeMem (
     SdPeimFreeMemBlock (Pool, Block);
   }
 
-  return ;
+  return;
 }

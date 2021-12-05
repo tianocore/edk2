@@ -12,33 +12,32 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/Usb.h>
 
-#define USB_ENDPOINT_ADDR(EpAddr) ((EpAddr) & 0x7F)
-#define USB_ENDPOINT_TYPE(Desc)   ((Desc)->Attributes & USB_ENDPOINT_TYPE_MASK)
+#define USB_ENDPOINT_ADDR(EpAddr)  ((EpAddr) & 0x7F)
+#define USB_ENDPOINT_TYPE(Desc)    ((Desc)->Attributes & USB_ENDPOINT_TYPE_MASK)
 
-
-#define USB_DESC_TYPE_HUB     0x29
+#define USB_DESC_TYPE_HUB  0x29
 
 #define USB_DESC_TYPE_HUB_SUPER_SPEED  0x2a
 
 //
 // Hub class control transfer target
 //
-#define USB_HUB_TARGET_HUB    0
-#define USB_HUB_TARGET_PORT   3
+#define USB_HUB_TARGET_HUB   0
+#define USB_HUB_TARGET_PORT  3
 //
 // HUB class specific contrl transfer request type
 //
-#define USB_HUB_REQ_GET_STATUS      0
-#define USB_HUB_REQ_CLEAR_FEATURE   1
-#define USB_HUB_REQ_SET_FEATURE     3
-#define USB_HUB_REQ_GET_DESC        6
-#define USB_HUB_REQ_SET_DESC        7
-#define USB_HUB_REQ_CLEAR_TT        8
-#define USB_HUB_REQ_RESET_TT        9
-#define USB_HUB_REQ_GET_TT_STATE    10
-#define USB_HUB_REQ_STOP_TT         11
+#define USB_HUB_REQ_GET_STATUS     0
+#define USB_HUB_REQ_CLEAR_FEATURE  1
+#define USB_HUB_REQ_SET_FEATURE    3
+#define USB_HUB_REQ_GET_DESC       6
+#define USB_HUB_REQ_SET_DESC       7
+#define USB_HUB_REQ_CLEAR_TT       8
+#define USB_HUB_REQ_RESET_TT       9
+#define USB_HUB_REQ_GET_TT_STATE   10
+#define USB_HUB_REQ_STOP_TT        11
 
-#define USB_HUB_REQ_SET_DEPTH       12
+#define USB_HUB_REQ_SET_DEPTH  12
 
 //
 // USB hub class feature selector
@@ -51,22 +50,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define USB_HUB_PORT_OVER_CURRENT   3
 #define USB_HUB_PORT_RESET          4
 
-#define USB_HUB_PORT_LINK_STATE     5
+#define USB_HUB_PORT_LINK_STATE  5
 
-#define USB_HUB_PORT_POWER          8
-#define USB_HUB_PORT_LOW_SPEED      9
-#define USB_HUB_C_PORT_CONNECT      16
-#define USB_HUB_C_PORT_ENABLE       17
-#define USB_HUB_C_PORT_SUSPEND      18
-#define USB_HUB_C_PORT_OVER_CURRENT 19
-#define USB_HUB_C_PORT_RESET        20
-#define USB_HUB_PORT_TEST           21
-#define USB_HUB_PORT_INDICATOR      22
+#define USB_HUB_PORT_POWER           8
+#define USB_HUB_PORT_LOW_SPEED       9
+#define USB_HUB_C_PORT_CONNECT       16
+#define USB_HUB_C_PORT_ENABLE        17
+#define USB_HUB_C_PORT_SUSPEND       18
+#define USB_HUB_C_PORT_OVER_CURRENT  19
+#define USB_HUB_C_PORT_RESET         20
+#define USB_HUB_PORT_TEST            21
+#define USB_HUB_PORT_INDICATOR       22
 
-#define USB_HUB_C_PORT_LINK_STATE     25
-#define USB_HUB_PORT_REMOTE_WAKE_MASK 27
-#define USB_HUB_BH_PORT_RESET         28
-#define USB_HUB_C_BH_PORT_RESET       29
+#define USB_HUB_C_PORT_LINK_STATE      25
+#define USB_HUB_PORT_REMOTE_WAKE_MASK  27
+#define USB_HUB_BH_PORT_RESET          28
+#define USB_HUB_C_BH_PORT_RESET        29
 
 //
 // Constant value for Port Status & Port Change Status of SuperSpeed port
@@ -76,18 +75,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // USB hub power control method. In gang power control
 //
-#define USB_HUB_GANG_POWER_CTRL     0
-#define USB_HUB_PORT_POWER_CTRL     0x01
+#define USB_HUB_GANG_POWER_CTRL  0
+#define USB_HUB_PORT_POWER_CTRL  0x01
 //
 // USB hub status bits
 //
-#define USB_HUB_STAT_LOCAL_POWER    0x01
-#define USB_HUB_STAT_OVER_CURRENT   0x02
-#define USB_HUB_STAT_C_LOCAL_POWER  0x01
-#define USB_HUB_STAT_C_OVER_CURRENT 0x02
+#define USB_HUB_STAT_LOCAL_POWER     0x01
+#define USB_HUB_STAT_OVER_CURRENT    0x02
+#define USB_HUB_STAT_C_LOCAL_POWER   0x01
+#define USB_HUB_STAT_C_OVER_CURRENT  0x02
 
-#define USB_HUB_CLASS_CODE          0x09
-#define USB_HUB_SUBCLASS_CODE       0x00
+#define USB_HUB_CLASS_CODE     0x09
+#define USB_HUB_SUBCLASS_CODE  0x00
 
 //
 // Host software return timeout if port status doesn't change
@@ -100,23 +99,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Hub descriptor, the last two fields are of variable length.
 //
 typedef struct {
-  UINT8           Length;
-  UINT8           DescType;
-  UINT8           NumPorts;
-  UINT16          HubCharacter;
-  UINT8           PwrOn2PwrGood;
-  UINT8           HubContrCurrent;
-  UINT8           Filler[16];
+  UINT8     Length;
+  UINT8     DescType;
+  UINT8     NumPorts;
+  UINT16    HubCharacter;
+  UINT8     PwrOn2PwrGood;
+  UINT8     HubContrCurrent;
+  UINT8     Filler[16];
 } EFI_USB_HUB_DESCRIPTOR;
 
 #pragma pack()
 
-
 typedef struct {
-  UINT16                ChangedBit;
-  EFI_USB_PORT_FEATURE  Feature;
+  UINT16                  ChangedBit;
+  EFI_USB_PORT_FEATURE    Feature;
 } USB_CHANGE_FEATURE_MAP;
-
 
 /**
   Clear the transaction translate buffer if full/low
@@ -137,13 +134,12 @@ typedef struct {
 **/
 EFI_STATUS
 UsbHubCtrlClearTTBuffer (
-  IN USB_DEVICE           *UsbDev,
-  IN UINT8                Port,
-  IN UINT16               DevAddr,
-  IN UINT16               EpNum,
-  IN UINT16               EpType
+  IN USB_DEVICE  *UsbDev,
+  IN UINT8       Port,
+  IN UINT16      DevAddr,
+  IN UINT16      EpNum,
+  IN UINT16      EpType
   );
-
 
 /**
   Test whether the interface is a hub interface.
@@ -156,9 +152,8 @@ UsbHubCtrlClearTTBuffer (
 **/
 BOOLEAN
 UsbIsHubInterface (
-  IN USB_INTERFACE        *UsbIf
+  IN USB_INTERFACE  *UsbIf
   );
-
 
 /**
   Ack the hub change bits. If these bits are not ACKed, Hub will
@@ -172,10 +167,9 @@ UsbIsHubInterface (
 **/
 EFI_STATUS
 UsbHubAckHubStatus (
-  IN  USB_DEVICE         *UsbDev
+  IN  USB_DEVICE  *UsbDev
   );
 
-extern USB_HUB_API        mUsbHubApi;
-extern USB_HUB_API        mUsbRootHubApi;
+extern USB_HUB_API  mUsbHubApi;
+extern USB_HUB_API  mUsbRootHubApi;
 #endif
-

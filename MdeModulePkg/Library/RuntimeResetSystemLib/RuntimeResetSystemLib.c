@@ -12,8 +12,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 
-EFI_EVENT                     mRuntimeResetSystemLibVirtualAddressChangeEvent;
-EFI_RUNTIME_SERVICES          *mInternalRT;
+EFI_EVENT             mRuntimeResetSystemLibVirtualAddressChangeEvent;
+EFI_RUNTIME_SERVICES  *mInternalRT;
 
 /**
   This function causes a system-wide reset (cold reset), in which
@@ -76,8 +76,8 @@ ResetShutdown (
 VOID
 EFIAPI
 ResetPlatformSpecific (
-  IN UINTN   DataSize,
-  IN VOID    *ResetData
+  IN UINTN  DataSize,
+  IN VOID   *ResetData
   )
 {
   mInternalRT->ResetSystem (EfiResetPlatformSpecific, EFI_SUCCESS, DataSize, ResetData);
@@ -98,10 +98,10 @@ ResetPlatformSpecific (
 VOID
 EFIAPI
 ResetSystem (
-  IN EFI_RESET_TYPE               ResetType,
-  IN EFI_STATUS                   ResetStatus,
-  IN UINTN                        DataSize,
-  IN VOID                         *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   )
 {
   mInternalRT->ResetSystem (ResetType, ResetStatus, DataSize, ResetData);
@@ -117,11 +117,11 @@ ResetSystem (
 VOID
 EFIAPI
 RuntimeResetSystemLibVirtualAddressChange (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  mInternalRT->ConvertPointer (0, (VOID **) &mInternalRT);
+  mInternalRT->ConvertPointer (0, (VOID **)&mInternalRT);
 }
 
 /**
@@ -139,8 +139,8 @@ RuntimeResetSystemLibVirtualAddressChange (
 EFI_STATUS
 EFIAPI
 RuntimeResetSystemLibConstruct (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -181,8 +181,8 @@ RuntimeResetSystemLibConstruct (
 EFI_STATUS
 EFIAPI
 RuntimeResetSystemLibDeconstruct (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;

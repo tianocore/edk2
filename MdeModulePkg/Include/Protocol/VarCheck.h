@@ -11,9 +11,9 @@
 
 #include <Uefi/UefiSpec.h>
 
-typedef struct _EDKII_VAR_CHECK_PROTOCOL    EDKII_VAR_CHECK_PROTOCOL;
+typedef struct _EDKII_VAR_CHECK_PROTOCOL EDKII_VAR_CHECK_PROTOCOL;
 
-#define EDKII_VAR_CHECK_PROTOCOL_GUID { \
+#define EDKII_VAR_CHECK_PROTOCOL_GUID  {\
   0xaf23b340, 0x97b4, 0x4685, { 0x8d, 0x4f, 0xa3, 0xf2, 0x81, 0x69, 0xb2, 0x1d } \
 };
 
@@ -36,31 +36,31 @@ typedef EFI_SET_VARIABLE VAR_CHECK_SET_VARIABLE_CHECK_HANDLER;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_VAR_CHECK_REGISTER_SET_VARIABLE_CHECK_HANDLER) (
+(EFIAPI *EDKII_VAR_CHECK_REGISTER_SET_VARIABLE_CHECK_HANDLER)(
   IN VAR_CHECK_SET_VARIABLE_CHECK_HANDLER   Handler
   );
 
-#define VAR_CHECK_VARIABLE_PROPERTY_REVISION      0x0001
+#define VAR_CHECK_VARIABLE_PROPERTY_REVISION  0x0001
 //
 // 1. Set by VariableLock PROTOCOL
 // 2. Set by VarCheck PROTOCOL
 //
 // If set, other fields for check will be ignored.
 //
-#define VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY     BIT0
+#define VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY  BIT0
 
 typedef struct {
-  UINT16                            Revision;
-  UINT16                            Property;
-  UINT32                            Attributes;
-  UINTN                             MinSize;
-  UINTN                             MaxSize;
+  UINT16    Revision;
+  UINT16    Property;
+  UINT32    Attributes;
+  UINTN     MinSize;
+  UINTN     MaxSize;
 } VAR_CHECK_VARIABLE_PROPERTY;
 
 typedef struct {
-  EFI_GUID                      *Guid;
-  CHAR16                        *Name;
-  VAR_CHECK_VARIABLE_PROPERTY   VariableProperty;
+  EFI_GUID                       *Guid;
+  CHAR16                         *Name;
+  VAR_CHECK_VARIABLE_PROPERTY    VariableProperty;
 } VARIABLE_ENTRY_PROPERTY;
 
 /**
@@ -82,7 +82,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_VAR_CHECK_VARIABLE_PROPERTY_SET) (
+(EFIAPI *EDKII_VAR_CHECK_VARIABLE_PROPERTY_SET)(
   IN CHAR16                         *Name,
   IN EFI_GUID                       *Guid,
   IN VAR_CHECK_VARIABLE_PROPERTY    *VariableProperty
@@ -102,19 +102,18 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_VAR_CHECK_VARIABLE_PROPERTY_GET) (
+(EFIAPI *EDKII_VAR_CHECK_VARIABLE_PROPERTY_GET)(
   IN CHAR16                         *Name,
   IN EFI_GUID                       *Guid,
   OUT VAR_CHECK_VARIABLE_PROPERTY   *VariableProperty
   );
 
 struct _EDKII_VAR_CHECK_PROTOCOL {
-  EDKII_VAR_CHECK_REGISTER_SET_VARIABLE_CHECK_HANDLER   RegisterSetVariableCheckHandler;
-  EDKII_VAR_CHECK_VARIABLE_PROPERTY_SET                 VariablePropertySet;
-  EDKII_VAR_CHECK_VARIABLE_PROPERTY_GET                 VariablePropertyGet;
+  EDKII_VAR_CHECK_REGISTER_SET_VARIABLE_CHECK_HANDLER    RegisterSetVariableCheckHandler;
+  EDKII_VAR_CHECK_VARIABLE_PROPERTY_SET                  VariablePropertySet;
+  EDKII_VAR_CHECK_VARIABLE_PROPERTY_GET                  VariablePropertyGet;
 };
 
-extern EFI_GUID gEdkiiVarCheckProtocolGuid;
+extern EFI_GUID  gEdkiiVarCheckProtocolGuid;
 
 #endif
-

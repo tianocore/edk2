@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeMain.h"
 #include "FwVolDriver.h"
 
-
 /**
   Writes one or more files to the firmware volume.
 
@@ -42,5 +41,3 @@ FvWriteFile (
 {
   return EFI_UNSUPPORTED;
 }
-
-

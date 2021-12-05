@@ -12,7 +12,7 @@
 **/
 VOID *
 BrDummyMalloc (
-  IN size_t    Size
+  IN size_t  Size
   )
 {
   ASSERT (FALSE);
@@ -24,7 +24,7 @@ BrDummyMalloc (
 **/
 VOID
 BrDummyFree (
-  IN VOID *    Ptr
+  IN VOID  *Ptr
   )
 {
   ASSERT (FALSE);

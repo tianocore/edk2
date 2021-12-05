@@ -17,8 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_LOAD_FIXED_ADDRESS_CONFIGURATION_TABLE_GUID \
   { 0x2CA88B53,0xD296,0x4080, { 0xA4,0xA5,0xCA,0xD9,0xBA,0xE2,0x4B,0x9} }
 
-
-extern EFI_GUID gLoadFixedAddressConfigurationTableGuid;
+extern EFI_GUID  gLoadFixedAddressConfigurationTableGuid;
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS    DxeCodeTopAddress;   ///< The top address below which the Dxe runtime code and below which the Dxe runtime/boot code and PEI code.

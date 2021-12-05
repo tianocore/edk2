@@ -44,68 +44,68 @@ typedef struct _PEI_NVME_CONTROLLER_PRIVATE_DATA  PEI_NVME_CONTROLLER_PRIVATE_DA
 //
 // NVME PEI driver implementation related definitions
 //
-#define NVME_MAX_QUEUES                               2     // Number of I/O queues supported by the driver, 1 for AQ, 1 for CQ
-#define NVME_ASQ_SIZE                                 1     // Number of admin submission queue entries, which is 0-based
-#define NVME_ACQ_SIZE                                 1     // Number of admin completion queue entries, which is 0-based
-#define NVME_CSQ_SIZE                                 63    // Number of I/O submission queue entries, which is 0-based
-#define NVME_CCQ_SIZE                                 63    // Number of I/O completion queue entries, which is 0-based
-#define NVME_PRP_SIZE                                 (8)   // Pages of PRP list
+#define NVME_MAX_QUEUES  2                                  // Number of I/O queues supported by the driver, 1 for AQ, 1 for CQ
+#define NVME_ASQ_SIZE    1                                  // Number of admin submission queue entries, which is 0-based
+#define NVME_ACQ_SIZE    1                                  // Number of admin completion queue entries, which is 0-based
+#define NVME_CSQ_SIZE    63                                 // Number of I/O submission queue entries, which is 0-based
+#define NVME_CCQ_SIZE    63                                 // Number of I/O completion queue entries, which is 0-based
+#define NVME_PRP_SIZE    (8)                                // Pages of PRP list
 
 #define NVME_MEM_MAX_PAGES                                           \
   (                                                                  \
-  1                                         /* ASQ */             +  \
-  1                                         /* ACQ */             +  \
-  1                                         /* SQs */             +  \
-  1                                         /* CQs */             +  \
+  1 /* ASQ */ +                                                      \
+  1 /* ACQ */ +                                                      \
+  1 /* SQs */ +                                                      \
+  1 /* CQs */ +                                                      \
   NVME_PRP_SIZE)                            /* PRPs */
 
-#define NVME_ADMIN_QUEUE                              0x00
-#define NVME_IO_QUEUE                                 0x01
-#define NVME_GENERIC_TIMEOUT                          5000000   // Generic PassThru command timeout value, in us unit
-#define NVME_POLL_INTERVAL                            100       // Poll interval for PassThru command, in us unit
+#define NVME_ADMIN_QUEUE      0x00
+#define NVME_IO_QUEUE         0x01
+#define NVME_GENERIC_TIMEOUT  5000000                           // Generic PassThru command timeout value, in us unit
+#define NVME_POLL_INTERVAL    100                               // Poll interval for PassThru command, in us unit
 
 //
 // Nvme namespace data structure.
 //
 struct _PEI_NVME_NAMESPACE_INFO {
-  UINT32                                    NamespaceId;
-  UINT64                                    NamespaceUuid;
-  EFI_PEI_BLOCK_IO2_MEDIA                   Media;
+  UINT32                              NamespaceId;
+  UINT64                              NamespaceUuid;
+  EFI_PEI_BLOCK_IO2_MEDIA             Media;
 
-  PEI_NVME_CONTROLLER_PRIVATE_DATA          *Controller;
+  PEI_NVME_CONTROLLER_PRIVATE_DATA    *Controller;
 };
 
-#define NVME_CONTROLLER_NSID        0
+#define NVME_CONTROLLER_NSID  0
 
 //
 // Unique signature for private data structure.
 //
-#define NVME_PEI_CONTROLLER_PRIVATE_DATA_SIGNATURE    SIGNATURE_32 ('N','V','P','C')
+#define NVME_PEI_CONTROLLER_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('N','V','P','C')
 
 //
 // Nvme controller private data structure.
 //
 struct _PEI_NVME_CONTROLLER_PRIVATE_DATA {
-  UINT32                                    Signature;
-  UINTN                                     MmioBase;
-  EFI_NVM_EXPRESS_PASS_THRU_MODE            PassThruMode;
-  UINTN                                     DevicePathLength;
-  EFI_DEVICE_PATH_PROTOCOL                  *DevicePath;
+  UINT32                                 Signature;
+  UINTN                                  MmioBase;
+  EFI_NVM_EXPRESS_PASS_THRU_MODE         PassThruMode;
+  UINTN                                  DevicePathLength;
+  EFI_DEVICE_PATH_PROTOCOL               *DevicePath;
 
-  EFI_PEI_RECOVERY_BLOCK_IO_PPI             BlkIoPpi;
-  EFI_PEI_RECOVERY_BLOCK_IO2_PPI            BlkIo2Ppi;
-  EDKII_PEI_STORAGE_SECURITY_CMD_PPI        StorageSecurityPpi;
-  EDKII_PEI_NVM_EXPRESS_PASS_THRU_PPI       NvmePassThruPpi;
-  EFI_PEI_PPI_DESCRIPTOR                    BlkIoPpiList;
-  EFI_PEI_PPI_DESCRIPTOR                    BlkIo2PpiList;
-  EFI_PEI_PPI_DESCRIPTOR                    StorageSecurityPpiList;
-  EFI_PEI_PPI_DESCRIPTOR                    NvmePassThruPpiList;
-  EFI_PEI_NOTIFY_DESCRIPTOR                 EndOfPeiNotifyList;
+  EFI_PEI_RECOVERY_BLOCK_IO_PPI          BlkIoPpi;
+  EFI_PEI_RECOVERY_BLOCK_IO2_PPI         BlkIo2Ppi;
+  EDKII_PEI_STORAGE_SECURITY_CMD_PPI     StorageSecurityPpi;
+  EDKII_PEI_NVM_EXPRESS_PASS_THRU_PPI    NvmePassThruPpi;
+  EFI_PEI_PPI_DESCRIPTOR                 BlkIoPpiList;
+  EFI_PEI_PPI_DESCRIPTOR                 BlkIo2PpiList;
+  EFI_PEI_PPI_DESCRIPTOR                 StorageSecurityPpiList;
+  EFI_PEI_PPI_DESCRIPTOR                 NvmePassThruPpiList;
+  EFI_PEI_NOTIFY_DESCRIPTOR              EndOfPeiNotifyList;
 
   //
   // Pointer to identify controller data
   //
-  NVME_ADMIN_CONTROLLER_DATA                *ControllerData;
+  NVME_ADMIN_CONTROLLER_DATA             *ControllerData;
 
   //
   // (4 + NVME_PRP_SIZE) x 4kB aligned buffers will be carved out of this buffer
@@ -115,34 +115,34 @@ struct _PEI_NVME_CONTROLLER_PRIVATE_DATA {
   // 4th 4kB boundary is the start of I/O completion queue
   // 5th 4kB boundary is the start of PRP list buffers
   //
-  VOID                                      *Buffer;
-  VOID                                      *BufferMapping;
+  VOID                       *Buffer;
+  VOID                       *BufferMapping;
 
   //
   // Pointers to 4kB aligned submission & completion queues
   //
-  NVME_SQ                                   *SqBuffer[NVME_MAX_QUEUES];
-  NVME_CQ                                   *CqBuffer[NVME_MAX_QUEUES];
+  NVME_SQ                    *SqBuffer[NVME_MAX_QUEUES];
+  NVME_CQ                    *CqBuffer[NVME_MAX_QUEUES];
 
   //
   // Submission and completion queue indices
   //
-  NVME_SQTDBL                               SqTdbl[NVME_MAX_QUEUES];
-  NVME_CQHDBL                               CqHdbl[NVME_MAX_QUEUES];
+  NVME_SQTDBL                SqTdbl[NVME_MAX_QUEUES];
+  NVME_CQHDBL                CqHdbl[NVME_MAX_QUEUES];
 
-  UINT8                                     Pt[NVME_MAX_QUEUES];
-  UINT16                                    Cid[NVME_MAX_QUEUES];
+  UINT8                      Pt[NVME_MAX_QUEUES];
+  UINT16                     Cid[NVME_MAX_QUEUES];
 
   //
   // Nvme controller capabilities
   //
-  NVME_CAP                                  Cap;
+  NVME_CAP                   Cap;
 
   //
   // Namespaces information on the controller
   //
-  UINT32                                    ActiveNamespaceNum;
-  PEI_NVME_NAMESPACE_INFO                   *NamespaceInfo;
+  UINT32                     ActiveNamespaceNum;
+  PEI_NVME_NAMESPACE_INFO    *NamespaceInfo;
 };
 
 #define GET_NVME_PEIM_HC_PRIVATE_DATA_FROM_THIS_BLKIO(a)               \
@@ -155,7 +155,6 @@ struct _PEI_NVME_CONTROLLER_PRIVATE_DATA {
   CR (a, PEI_NVME_CONTROLLER_PRIVATE_DATA, NvmePassThruPpi, NVME_PEI_CONTROLLER_PRIVATE_DATA_SIGNATURE)
 #define GET_NVME_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY(a)              \
   CR (a, PEI_NVME_CONTROLLER_PRIVATE_DATA, EndOfPeiNotifyList, NVME_PEI_CONTROLLER_PRIVATE_DATA_SIGNATURE)
-
 
 //
 // Internal functions
@@ -201,9 +200,9 @@ IoMmuAllocateBuffer (
 **/
 EFI_STATUS
 IoMmuFreeBuffer (
-  IN UINTN                  Pages,
-  IN VOID                   *HostAddress,
-  IN VOID                   *Mapping
+  IN UINTN  Pages,
+  IN VOID   *HostAddress,
+  IN VOID   *Mapping
   );
 
 /**
@@ -227,11 +226,11 @@ IoMmuFreeBuffer (
 **/
 EFI_STATUS
 IoMmuMap (
-  IN  EDKII_IOMMU_OPERATION Operation,
-  IN VOID                   *HostAddress,
-  IN  OUT UINTN             *NumberOfBytes,
-  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
-  OUT VOID                  **Mapping
+  IN  EDKII_IOMMU_OPERATION  Operation,
+  IN VOID                    *HostAddress,
+  IN  OUT UINTN              *NumberOfBytes,
+  OUT EFI_PHYSICAL_ADDRESS   *DeviceAddress,
+  OUT VOID                   **Mapping
   );
 
 /**
@@ -245,7 +244,7 @@ IoMmuMap (
 **/
 EFI_STATUS
 IoMmuUnmap (
-  IN VOID                  *Mapping
+  IN VOID  *Mapping
   );
 
 /**
@@ -282,9 +281,9 @@ NvmePeimEndOfPei (
 **/
 EFI_STATUS
 GetDevicePathInstanceSize (
-  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
-  OUT UINTN                       *InstanceSize,
-  OUT BOOLEAN                     *EntireDevicePathEnd
+  IN  EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  OUT UINTN                     *InstanceSize,
+  OUT BOOLEAN                   *EntireDevicePathEnd
   );
 
 /**
@@ -300,8 +299,8 @@ GetDevicePathInstanceSize (
 **/
 EFI_STATUS
 NvmeIsHcDevicePathValid (
-  IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
-  IN UINTN                       DevicePathLength
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN UINTN                     DevicePathLength
   );
 
 /**
@@ -323,11 +322,11 @@ NvmeIsHcDevicePathValid (
 **/
 EFI_STATUS
 NvmeBuildDevicePath (
-  IN  PEI_NVME_CONTROLLER_PRIVATE_DATA    *Private,
-  IN  UINT32                              NamespaceId,
-  IN  UINT64                              NamespaceUuid,
-  OUT UINTN                               *DevicePathLength,
-  OUT EFI_DEVICE_PATH_PROTOCOL            **DevicePath
+  IN  PEI_NVME_CONTROLLER_PRIVATE_DATA  *Private,
+  IN  UINT32                            NamespaceId,
+  IN  UINT64                            NamespaceUuid,
+  OUT UINTN                             *DevicePathLength,
+  OUT EFI_DEVICE_PATH_PROTOCOL          **DevicePath
   );
 
 /**
@@ -342,8 +341,8 @@ NvmeBuildDevicePath (
 **/
 BOOLEAN
 NvmeS3SkipThisController (
-  IN  EFI_DEVICE_PATH_PROTOCOL    *HcDevicePath,
-  IN  UINTN                       HcDevicePathLength
+  IN  EFI_DEVICE_PATH_PROTOCOL  *HcDevicePath,
+  IN  UINTN                     HcDevicePathLength
   );
 
 #endif

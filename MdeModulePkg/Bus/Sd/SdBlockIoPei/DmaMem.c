@@ -32,11 +32,11 @@ EDKII_IOMMU_PPI  *mIoMmu;
 **/
 EFI_STATUS
 IoMmuMap (
-  IN  EDKII_IOMMU_OPERATION Operation,
-  IN VOID                   *HostAddress,
-  IN  OUT UINTN             *NumberOfBytes,
-  OUT EFI_PHYSICAL_ADDRESS  *DeviceAddress,
-  OUT VOID                  **Mapping
+  IN  EDKII_IOMMU_OPERATION  Operation,
+  IN VOID                    *HostAddress,
+  IN  OUT UINTN              *NumberOfBytes,
+  OUT EFI_PHYSICAL_ADDRESS   *DeviceAddress,
+  OUT VOID                   **Mapping
   )
 {
   EFI_STATUS  Status;
@@ -54,23 +54,25 @@ IoMmuMap (
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     switch (Operation) {
-    case EdkiiIoMmuOperationBusMasterRead:
-    case EdkiiIoMmuOperationBusMasterRead64:
-      Attribute = EDKII_IOMMU_ACCESS_READ;
-      break;
-    case EdkiiIoMmuOperationBusMasterWrite:
-    case EdkiiIoMmuOperationBusMasterWrite64:
-      Attribute = EDKII_IOMMU_ACCESS_WRITE;
-      break;
-    case EdkiiIoMmuOperationBusMasterCommonBuffer:
-    case EdkiiIoMmuOperationBusMasterCommonBuffer64:
-      Attribute = EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE;
-      break;
-    default:
-      ASSERT(FALSE);
-      return EFI_INVALID_PARAMETER;
+      case EdkiiIoMmuOperationBusMasterRead:
+      case EdkiiIoMmuOperationBusMasterRead64:
+        Attribute = EDKII_IOMMU_ACCESS_READ;
+        break;
+      case EdkiiIoMmuOperationBusMasterWrite:
+      case EdkiiIoMmuOperationBusMasterWrite64:
+        Attribute = EDKII_IOMMU_ACCESS_WRITE;
+        break;
+      case EdkiiIoMmuOperationBusMasterCommonBuffer:
+      case EdkiiIoMmuOperationBusMasterCommonBuffer64:
+        Attribute = EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE;
+        break;
+      default:
+        ASSERT (FALSE);
+        return EFI_INVALID_PARAMETER;
     }
+
     Status = mIoMmu->SetAttribute (
                        mIoMmu,
                        *Mapping,
@@ -81,9 +83,10 @@ IoMmuMap (
     }
   } else {
     *DeviceAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress;
-    *Mapping = NULL;
-    Status = EFI_SUCCESS;
+    *Mapping       = NULL;
+    Status         = EFI_SUCCESS;
   }
+
   return Status;
 }
 
@@ -98,7 +101,7 @@ IoMmuMap (
 **/
 EFI_STATUS
 IoMmuUnmap (
-  IN VOID                  *Mapping
+  IN VOID  *Mapping
   )
 {
   EFI_STATUS  Status;
@@ -109,6 +112,7 @@ IoMmuUnmap (
   } else {
     Status = EFI_SUCCESS;
   }
+
   return Status;
 }
 
@@ -142,7 +146,7 @@ IoMmuAllocateBuffer (
   UINTN                 NumberOfBytes;
   EFI_PHYSICAL_ADDRESS  HostPhyAddress;
 
-  *HostAddress = NULL;
+  *HostAddress   = NULL;
   *DeviceAddress = 0;
 
   if (mIoMmu != NULL) {
@@ -157,18 +161,19 @@ IoMmuAllocateBuffer (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    NumberOfBytes = EFI_PAGES_TO_SIZE(Pages);
-    Status = mIoMmu->Map (
-                       mIoMmu,
-                       EdkiiIoMmuOperationBusMasterCommonBuffer,
-                       *HostAddress,
-                       &NumberOfBytes,
-                       DeviceAddress,
-                       Mapping
-                       );
+    NumberOfBytes = EFI_PAGES_TO_SIZE (Pages);
+    Status        = mIoMmu->Map (
+                              mIoMmu,
+                              EdkiiIoMmuOperationBusMasterCommonBuffer,
+                              *HostAddress,
+                              &NumberOfBytes,
+                              DeviceAddress,
+                              Mapping
+                              );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     Status = mIoMmu->SetAttribute (
                        mIoMmu,
                        *Mapping,
@@ -186,10 +191,12 @@ IoMmuAllocateBuffer (
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
-    *HostAddress = (VOID *)(UINTN)HostPhyAddress;
+
+    *HostAddress   = (VOID *)(UINTN)HostPhyAddress;
     *DeviceAddress = HostPhyAddress;
-    *Mapping = NULL;
+    *Mapping       = NULL;
   }
+
   return Status;
 }
 
@@ -207,9 +214,9 @@ IoMmuAllocateBuffer (
 **/
 EFI_STATUS
 IoMmuFreeBuffer (
-  IN UINTN                  Pages,
-  IN VOID                   *HostAddress,
-  IN VOID                   *Mapping
+  IN UINTN  Pages,
+  IN VOID   *HostAddress,
+  IN VOID   *Mapping
   )
 {
   EFI_STATUS  Status;
@@ -221,6 +228,7 @@ IoMmuFreeBuffer (
   } else {
     Status = EFI_SUCCESS;
   }
+
   return Status;
 }
 
@@ -239,4 +247,3 @@ IoMmuInit (
     (VOID **)&mIoMmu
     );
 }
-

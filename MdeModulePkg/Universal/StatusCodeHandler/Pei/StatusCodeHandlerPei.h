@@ -9,7 +9,6 @@
 #ifndef __STATUS_CODE_HANDLER_PEI_H__
 #define __STATUS_CODE_HANDLER_PEI_H__
 
-
 #include <Ppi/ReportStatusCodeHandler.h>
 
 #include <Guid/MemoryStatusCodeRecord.h>
@@ -29,7 +28,7 @@
 //
 // Define the maximum message length
 //
-#define MAX_DEBUG_MESSAGE_LENGTH 0x100
+#define MAX_DEBUG_MESSAGE_LENGTH  0x100
 
 /**
   Convert status code value and extended data to readable ASCII string, send string to serial I/O device.
@@ -57,14 +56,13 @@
 EFI_STATUS
 EFIAPI
 SerialStatusCodeReportWorker (
-  IN CONST  EFI_PEI_SERVICES        **PeiServices,
-  IN EFI_STATUS_CODE_TYPE           CodeType,
-  IN EFI_STATUS_CODE_VALUE          Value,
-  IN UINT32                         Instance,
-  IN CONST EFI_GUID                 *CallerId,
-  IN CONST EFI_STATUS_CODE_DATA     *Data OPTIONAL
+  IN CONST  EFI_PEI_SERVICES     **PeiServices,
+  IN EFI_STATUS_CODE_TYPE        CodeType,
+  IN EFI_STATUS_CODE_VALUE       Value,
+  IN UINT32                      Instance,
+  IN CONST EFI_GUID              *CallerId,
+  IN CONST EFI_STATUS_CODE_DATA  *Data OPTIONAL
   );
-
 
 /**
   Create the first memory status code GUID'ed HOB as initialization for memory status code worker.
@@ -106,14 +104,12 @@ MemoryStatusCodeInitializeWorker (
 EFI_STATUS
 EFIAPI
 MemoryStatusCodeReportWorker (
-  IN CONST  EFI_PEI_SERVICES    **PeiServices,
-  IN EFI_STATUS_CODE_TYPE       CodeType,
-  IN EFI_STATUS_CODE_VALUE      Value,
-  IN UINT32                     Instance,
-  IN CONST EFI_GUID             *CallerId,
-  IN CONST EFI_STATUS_CODE_DATA *Data OPTIONAL
+  IN CONST  EFI_PEI_SERVICES     **PeiServices,
+  IN EFI_STATUS_CODE_TYPE        CodeType,
+  IN EFI_STATUS_CODE_VALUE       Value,
+  IN UINT32                      Instance,
+  IN CONST EFI_GUID              *CallerId,
+  IN CONST EFI_STATUS_CODE_DATA  *Data OPTIONAL
   );
 
 #endif
-
-

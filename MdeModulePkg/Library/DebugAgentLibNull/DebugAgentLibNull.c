@@ -58,7 +58,7 @@ InitializeDebugAgent (
 BOOLEAN
 EFIAPI
 SaveAndSetDebugTimerInterrupt (
-  IN BOOLEAN                EnableStatus
+  IN BOOLEAN  EnableStatus
   )
 {
   return FALSE;

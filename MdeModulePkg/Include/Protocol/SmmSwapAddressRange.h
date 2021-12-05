@@ -29,6 +29,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 typedef EFI_SWAP_ADDRESS_RANGE_PROTOCOL EFI_SMM_SWAP_ADDRESS_RANGE_PROTOCOL;
 
-extern EFI_GUID gEfiSmmSwapAddressRangeProtocolGuid;
+extern EFI_GUID  gEfiSmmSwapAddressRangeProtocolGuid;
 
 #endif

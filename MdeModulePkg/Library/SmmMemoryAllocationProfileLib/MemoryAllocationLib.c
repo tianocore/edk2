@@ -69,11 +69,11 @@ SmmMemoryAllocationLibConstructor (
   //
   // Get SMRAM range information
   //
-  Size = 0;
+  Size   = 0;
   Status = SmmAccess->GetCapabilities (SmmAccess, &Size, NULL);
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
 
-  mSmramRanges = (EFI_SMRAM_DESCRIPTOR *) AllocatePool (Size);
+  mSmramRanges = (EFI_SMRAM_DESCRIPTOR *)AllocatePool (Size);
   ASSERT (mSmramRanges != NULL);
 
   Status = SmmAccess->GetCapabilities (SmmAccess, &Size, mSmramRanges);
@@ -116,14 +116,15 @@ SmmMemoryAllocationLibDestructor (
 BOOLEAN
 EFIAPI
 BufferInSmram (
-  IN VOID *Buffer
+  IN VOID  *Buffer
   )
 {
   UINTN  Index;
 
-  for (Index = 0; Index < mSmramRangeCount; Index ++) {
-    if (((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer >= mSmramRanges[Index].CpuStart) &&
-        ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer < (mSmramRanges[Index].CpuStart + mSmramRanges[Index].PhysicalSize))) {
+  for (Index = 0; Index < mSmramRangeCount; Index++) {
+    if (((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer >= mSmramRanges[Index].CpuStart) &&
+        ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer < (mSmramRanges[Index].CpuStart + mSmramRanges[Index].PhysicalSize)))
+    {
       return TRUE;
     }
   }
@@ -162,7 +163,8 @@ InternalAllocatePages (
   if (EFI_ERROR (Status)) {
     return NULL;
   }
-  return (VOID *) (UINTN) Memory;
+
+  return (VOID *)(UINTN)Memory;
 }
 
 /**
@@ -189,14 +191,15 @@ AllocatePages (
   Buffer = InternalAllocatePages (EfiRuntimeServicesData, Pages);
   if (Buffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_ALLOCATE_PAGES,
       EfiRuntimeServicesData,
       Buffer,
-      EFI_PAGES_TO_SIZE(Pages),
+      EFI_PAGES_TO_SIZE (Pages),
       NULL
       );
   }
+
   return Buffer;
 }
 
@@ -224,14 +227,15 @@ AllocateRuntimePages (
   Buffer = InternalAllocatePages (EfiRuntimeServicesData, Pages);
   if (Buffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_PAGES,
       EfiRuntimeServicesData,
       Buffer,
-      EFI_PAGES_TO_SIZE(Pages),
+      EFI_PAGES_TO_SIZE (Pages),
       NULL
       );
   }
+
   return Buffer;
 }
 
@@ -289,14 +293,15 @@ FreePages (
     // When Buffer is in SMRAM range, it should be allocated by gSmst->SmmAllocatePages() service.
     // So, gSmst->SmmFreePages() service is used to free it.
     //
-    Status = gSmst->SmmFreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+    Status = gSmst->SmmFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Pages);
   } else {
     //
     // When Buffer is out of SMRAM range, it should be allocated by gBS->AllocatePages() service.
     // So, gBS->FreePages() service is used to free it.
     //
-    Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+    Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Pages);
   }
+
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -341,23 +346,25 @@ InternalAllocateAlignedPages (
   if (Pages == 0) {
     return NULL;
   }
+
   if (Alignment > EFI_PAGE_SIZE) {
     //
     // Calculate the total number of pages since alignment is larger than page size.
     //
-    AlignmentMask  = Alignment - 1;
-    RealPages      = Pages + EFI_SIZE_TO_PAGES (Alignment);
+    AlignmentMask = Alignment - 1;
+    RealPages     = Pages + EFI_SIZE_TO_PAGES (Alignment);
     //
     // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
     //
     ASSERT (RealPages > Pages);
 
-    Status         = gSmst->SmmAllocatePages (AllocateAnyPages, MemoryType, RealPages, &Memory);
+    Status = gSmst->SmmAllocatePages (AllocateAnyPages, MemoryType, RealPages, &Memory);
     if (EFI_ERROR (Status)) {
       return NULL;
     }
-    AlignedMemory  = ((UINTN) Memory + AlignmentMask) & ~AlignmentMask;
-    UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN) Memory);
+
+    AlignedMemory  = ((UINTN)Memory + AlignmentMask) & ~AlignmentMask;
+    UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN)Memory);
     if (UnalignedPages > 0) {
       //
       // Free first unaligned page(s).
@@ -365,6 +372,7 @@ InternalAllocateAlignedPages (
       Status = gSmst->SmmFreePages (Memory, UnalignedPages);
       ASSERT_EFI_ERROR (Status);
     }
+
     Memory         = AlignedMemory + EFI_PAGES_TO_SIZE (Pages);
     UnalignedPages = RealPages - Pages - UnalignedPages;
     if (UnalignedPages > 0) {
@@ -382,9 +390,11 @@ InternalAllocateAlignedPages (
     if (EFI_ERROR (Status)) {
       return NULL;
     }
-    AlignedMemory  = (UINTN) Memory;
+
+    AlignedMemory = (UINTN)Memory;
   }
-  return (VOID *) AlignedMemory;
+
+  return (VOID *)AlignedMemory;
 }
 
 /**
@@ -418,14 +428,15 @@ AllocateAlignedPages (
   Buffer = InternalAllocateAlignedPages (EfiRuntimeServicesData, Pages, Alignment);
   if (Buffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ALIGNED_PAGES,
       EfiRuntimeServicesData,
       Buffer,
-      EFI_PAGES_TO_SIZE(Pages),
+      EFI_PAGES_TO_SIZE (Pages),
       NULL
       );
   }
+
   return Buffer;
 }
 
@@ -460,14 +471,15 @@ AllocateAlignedRuntimePages (
   Buffer = InternalAllocateAlignedPages (EfiRuntimeServicesData, Pages, Alignment);
   if (Buffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ALIGNED_RUNTIME_PAGES,
       EfiRuntimeServicesData,
       Buffer,
-      EFI_PAGES_TO_SIZE(Pages),
+      EFI_PAGES_TO_SIZE (Pages),
       NULL
       );
   }
+
   return Buffer;
 }
 
@@ -532,14 +544,15 @@ FreeAlignedPages (
     // When Buffer is in SMRAM range, it should be allocated by gSmst->SmmAllocatePages() service.
     // So, gSmst->SmmFreePages() service is used to free it.
     //
-    Status = gSmst->SmmFreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+    Status = gSmst->SmmFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Pages);
   } else {
     //
     // When Buffer is out of SMRAM range, it should be allocated by gBS->AllocatePages() service.
     // So, gBS->FreePages() service is used to free it.
     //
-    Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS) (UINTN) Buffer, Pages);
+    Status = gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Pages);
   }
+
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -570,6 +583,7 @@ InternalAllocatePool (
   if (EFI_ERROR (Status)) {
     Memory = NULL;
   }
+
   return Memory;
 }
 
@@ -597,7 +611,7 @@ AllocatePool (
   Buffer = InternalAllocatePool (EfiRuntimeServicesData, AllocationSize);
   if (Buffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_ALLOCATE_POOL,
       EfiRuntimeServicesData,
       Buffer,
@@ -605,6 +619,7 @@ AllocatePool (
       NULL
       );
   }
+
   return Buffer;
 }
 
@@ -632,7 +647,7 @@ AllocateRuntimePool (
   Buffer = InternalAllocatePool (EfiRuntimeServicesData, AllocationSize);
   if (Buffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_POOL,
       EfiRuntimeServicesData,
       Buffer,
@@ -640,6 +655,7 @@ AllocateRuntimePool (
       NULL
       );
   }
+
   return Buffer;
 }
 
@@ -691,6 +707,7 @@ InternalAllocateZeroPool (
   if (Memory != NULL) {
     Memory = ZeroMem (Memory, AllocationSize);
   }
+
   return Memory;
 }
 
@@ -718,7 +735,7 @@ AllocateZeroPool (
   Buffer = InternalAllocateZeroPool (EfiRuntimeServicesData, AllocationSize);
   if (Buffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_ALLOCATE_ZERO_POOL,
       EfiRuntimeServicesData,
       Buffer,
@@ -726,6 +743,7 @@ AllocateZeroPool (
       NULL
       );
   }
+
   return Buffer;
 }
 
@@ -753,7 +771,7 @@ AllocateRuntimeZeroPool (
   Buffer = InternalAllocateZeroPool (EfiRuntimeServicesData, AllocationSize);
   if (Buffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_ZERO_POOL,
       EfiRuntimeServicesData,
       Buffer,
@@ -761,6 +779,7 @@ AllocateRuntimeZeroPool (
       NULL
       );
   }
+
   return Buffer;
 }
 
@@ -813,12 +832,13 @@ InternalAllocateCopyPool (
   VOID  *Memory;
 
   ASSERT (Buffer != NULL);
-  ASSERT (AllocationSize <= (MAX_ADDRESS - (UINTN) Buffer + 1));
+  ASSERT (AllocationSize <= (MAX_ADDRESS - (UINTN)Buffer + 1));
 
   Memory = InternalAllocatePool (PoolType, AllocationSize);
   if (Memory != NULL) {
-     Memory = CopyMem (Memory, Buffer, AllocationSize);
+    Memory = CopyMem (Memory, Buffer, AllocationSize);
   }
+
   return Memory;
 }
 
@@ -852,7 +872,7 @@ AllocateCopyPool (
   NewBuffer = InternalAllocateCopyPool (EfiRuntimeServicesData, AllocationSize, Buffer);
   if (NewBuffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_ALLOCATE_COPY_POOL,
       EfiRuntimeServicesData,
       NewBuffer,
@@ -860,6 +880,7 @@ AllocateCopyPool (
       NULL
       );
   }
+
   return NewBuffer;
 }
 
@@ -893,7 +914,7 @@ AllocateRuntimeCopyPool (
   NewBuffer = InternalAllocateCopyPool (EfiRuntimeServicesData, AllocationSize, Buffer);
   if (NewBuffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_ALLOCATE_RUNTIME_COPY_POOL,
       EfiRuntimeServicesData,
       NewBuffer,
@@ -901,6 +922,7 @@ AllocateRuntimeCopyPool (
       NULL
       );
   }
+
   return NewBuffer;
 }
 
@@ -965,10 +987,11 @@ InternalReallocatePool (
   VOID  *NewBuffer;
 
   NewBuffer = InternalAllocateZeroPool (PoolType, NewSize);
-  if (NewBuffer != NULL && OldBuffer != NULL) {
+  if ((NewBuffer != NULL) && (OldBuffer != NULL)) {
     CopyMem (NewBuffer, OldBuffer, MIN (OldSize, NewSize));
     FreePool (OldBuffer);
   }
+
   return NewBuffer;
 }
 
@@ -1006,7 +1029,7 @@ ReallocatePool (
   Buffer = InternalReallocatePool (EfiRuntimeServicesData, OldSize, NewSize, OldBuffer);
   if (Buffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_REALLOCATE_POOL,
       EfiRuntimeServicesData,
       Buffer,
@@ -1014,6 +1037,7 @@ ReallocatePool (
       NULL
       );
   }
+
   return Buffer;
 }
 
@@ -1051,7 +1075,7 @@ ReallocateRuntimePool (
   Buffer = InternalReallocatePool (EfiRuntimeServicesData, OldSize, NewSize, OldBuffer);
   if (Buffer != NULL) {
     MemoryProfileLibRecord (
-      (PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS(0),
+      (PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0),
       MEMORY_PROFILE_ACTION_LIB_REALLOCATE_RUNTIME_POOL,
       EfiRuntimeServicesData,
       Buffer,
@@ -1059,6 +1083,7 @@ ReallocateRuntimePool (
       NULL
       );
   }
+
   return Buffer;
 }
 
@@ -1112,10 +1137,10 @@ ReallocateReservedPool (
 VOID
 EFIAPI
 FreePool (
-  IN VOID   *Buffer
+  IN VOID  *Buffer
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if (BufferInSmram (Buffer)) {
     //
@@ -1130,5 +1155,6 @@ FreePool (
     //
     Status = gBS->FreePool (Buffer);
   }
+
   ASSERT_EFI_ERROR (Status);
 }

@@ -7,6 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef _RESET_UTILITY_LIB_H_
 #define _RESET_UTILITY_LIB_H_
 
@@ -32,8 +33,8 @@
 VOID
 EFIAPI
 ResetSystemWithSubtype (
-  IN EFI_RESET_TYPE     ResetType,
-  IN CONST  GUID        *ResetSubtype
+  IN EFI_RESET_TYPE  ResetType,
+  IN CONST  GUID     *ResetSubtype
   );
 
 /**
@@ -55,7 +56,7 @@ ResetSystemWithSubtype (
 VOID
 EFIAPI
 ResetPlatformSpecificGuid (
-  IN CONST  GUID        *ResetSubtype
+  IN CONST  GUID  *ResetSubtype
   );
 
 /**
@@ -119,12 +120,12 @@ GetResetPlatformSpecificGuid (
 RETURN_STATUS
 EFIAPI
 BuildResetData (
-  IN OUT   UINTN     *ResetDataSize,
-  IN OUT   VOID      *ResetData,
-  IN CONST GUID      *ResetSubtype  OPTIONAL,
-  IN CONST CHAR16    *ResetString   OPTIONAL,
-  IN       UINTN     ExtraDataSize  OPTIONAL,
-  IN CONST VOID      *ExtraData     OPTIONAL
+  IN OUT   UINTN   *ResetDataSize,
+  IN OUT   VOID    *ResetData,
+  IN CONST GUID    *ResetSubtype  OPTIONAL,
+  IN CONST CHAR16  *ResetString   OPTIONAL,
+  IN       UINTN   ExtraDataSize  OPTIONAL,
+  IN CONST VOID    *ExtraData     OPTIONAL
   );
 
 #endif // _RESET_UTILITY_LIB_H_

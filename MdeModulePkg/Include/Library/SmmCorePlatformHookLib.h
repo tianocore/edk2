@@ -25,7 +25,6 @@ PlatformHookBeforeSmmDispatch (
   VOID
   );
 
-
 /**
   Performs platform specific tasks after invoking registered SMI handlers.
 

@@ -22,14 +22,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_DEBUG_STATUS
 DebuggerScope (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
-  EFI_STATUS   Status;
-  UINTN        Address;
+  EFI_STATUS  Status;
+  UINTN       Address;
 
   if (CommandArg == NULL) {
     EDBPrint (L"Scope: invalid Address\n");
@@ -42,7 +42,7 @@ DebuggerScope (
   Status = Symboltoi (CommandArg, &Address);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_NOT_FOUND) {
-      Address = Xtoi(CommandArg);
+      Address = Xtoi (CommandArg);
     } else {
       //
       // Something wrong, let Symboltoi print error info.
@@ -51,6 +51,7 @@ DebuggerScope (
       return EFI_DEBUG_CONTINUE;
     }
   }
+
   DebuggerPrivate->InstructionScope = Address;
   EDBPrint (L"Scope: 0x%x\n", DebuggerPrivate->InstructionScope);
   EdbShowDisasm (DebuggerPrivate, SystemContext);
@@ -75,10 +76,10 @@ DebuggerScope (
 **/
 EFI_DEBUG_STATUS
 DebuggerList (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
   if (CommandArg == NULL) {
@@ -87,7 +88,7 @@ DebuggerList (
     //
     // Load new list number
     //
-    DebuggerPrivate->InstructionNumber = Atoi(CommandArg);
+    DebuggerPrivate->InstructionNumber = Atoi (CommandArg);
     EDBPrint (L"List Number: %d\n", DebuggerPrivate->InstructionNumber);
     EdbShowDisasm (DebuggerPrivate, SystemContext);
   }

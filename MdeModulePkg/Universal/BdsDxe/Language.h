@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 InitializeLanguage (
-  BOOLEAN LangCodesSettingRequired
+  BOOLEAN  LangCodesSettingRequired
   );
 
 #endif // _LANGUAGE_H_

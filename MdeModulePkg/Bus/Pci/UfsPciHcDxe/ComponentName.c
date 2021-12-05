@@ -12,7 +12,7 @@
 //
 // EFI Component Name Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gUfsHcComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gUfsHcComponentName = {
   UfsHcComponentNameGetDriverName,
   UfsHcComponentNameGetControllerName,
   "eng"
@@ -21,13 +21,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gUfsHcComponentName = 
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gUfsHcComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) UfsHcComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) UfsHcComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gUfsHcComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)UfsHcComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)UfsHcComponentNameGetControllerName,
   "en"
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUfsHcDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mUfsHcDriverNameTable[] = {
   {
     "eng;en",
     L"Universal Flash Storage (UFS) Pci Host Controller Driver"
@@ -38,7 +38,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUfsHcDriverNameTable[] =
   }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUfsHcControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mUfsHcControllerNameTable[] = {
   {
     "eng;en",
     L"Universal Flash Storage (UFS) Pci Host Controller"
@@ -91,9 +91,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUfsHcControllerNameTable
 EFI_STATUS
 EFIAPI
 UfsHcComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL       *This,
-  IN  CHAR8                             *Language,
-  OUT CHAR16                            **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -176,16 +176,16 @@ UfsHcComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 UfsHcComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                    Status;
+  EFI_STATUS  Status;
 
-  if (Language == NULL || ControllerName == NULL) {
+  if ((Language == NULL) || (ControllerName == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -215,5 +215,4 @@ UfsHcComponentNameGetControllerName (
            ControllerName,
            (BOOLEAN)(This == &gUfsHcComponentName)
            );
-
 }

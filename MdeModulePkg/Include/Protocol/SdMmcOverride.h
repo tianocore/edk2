@@ -16,16 +16,16 @@
 #define EDKII_SD_MMC_OVERRIDE_PROTOCOL_GUID \
   { 0xeaf9e3c1, 0xc9cd, 0x46db, { 0xa5, 0xe5, 0x5a, 0x12, 0x4c, 0x83, 0x23, 0x23 } }
 
-#define EDKII_SD_MMC_OVERRIDE_PROTOCOL_VERSION    0x3
+#define EDKII_SD_MMC_OVERRIDE_PROTOCOL_VERSION  0x3
 
 typedef struct _EDKII_SD_MMC_OVERRIDE EDKII_SD_MMC_OVERRIDE;
 
-#define EDKII_SD_MMC_BUS_WIDTH_IGNORE MAX_UINT8
-#define EDKII_SD_MMC_CLOCK_FREQ_IGNORE MAX_UINT32
+#define EDKII_SD_MMC_BUS_WIDTH_IGNORE        MAX_UINT8
+#define EDKII_SD_MMC_CLOCK_FREQ_IGNORE       MAX_UINT32
 #define EDKII_SD_MMC_DRIVER_STRENGTH_IGNORE  MAX_UINT8
 
 typedef enum {
-  SdDriverStrengthTypeB        = 0,
+  SdDriverStrengthTypeB = 0,
   SdDriverStrengthTypeA,
   SdDriverStrengthTypeC,
   SdDriverStrengthTypeD,
@@ -33,7 +33,7 @@ typedef enum {
 } SD_DRIVER_STRENGTH_TYPE;
 
 typedef enum {
-  EmmcDriverStrengthType0      = 0,
+  EmmcDriverStrengthType0 = 0,
   EmmcDriverStrengthType1,
   EmmcDriverStrengthType2,
   EmmcDriverStrengthType3,
@@ -52,20 +52,20 @@ typedef struct {
   // or specifies unsupported width driver will choose highest supported
   // bus width for a given mode.
   //
-  UINT8                         BusWidth;
+  UINT8                           BusWidth;
   //
   // The target clock frequency of the bus in MHz. If user tells driver to ignore
   // it or specifies unsupported frequency driver will choose highest supported
   // clock frequency for a given mode.
   //
-  UINT32                        ClockFreq;
+  UINT32                          ClockFreq;
   //
   // The target driver strength of the bus. If user tells driver to
   // ignore it or specifies unsupported driver strength, driver will
   // default to Type0 for eMMC cards and TypeB for SD cards. Driver strength
   // setting is only considered if chosen bus timing supports them.
   //
-  EDKII_SD_MMC_DRIVER_STRENGTH  DriverStrength;
+  EDKII_SD_MMC_DRIVER_STRENGTH    DriverStrength;
 } EDKII_SD_MMC_OPERATING_PARAMETERS;
 
 typedef enum {
@@ -109,7 +109,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_SD_MMC_CAPABILITY) (
+(EFIAPI *EDKII_SD_MMC_CAPABILITY)(
   IN      EFI_HANDLE                      ControllerHandle,
   IN      UINT8                           Slot,
   IN OUT  VOID                            *SdMmcHcSlotCapability,
@@ -133,7 +133,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_SD_MMC_NOTIFY_PHASE) (
+(EFIAPI *EDKII_SD_MMC_NOTIFY_PHASE)(
   IN      EFI_HANDLE                      ControllerHandle,
   IN      UINT8                           Slot,
   IN      EDKII_SD_MMC_PHASE_TYPE         PhaseType,
@@ -144,17 +144,17 @@ struct _EDKII_SD_MMC_OVERRIDE {
   //
   // Protocol version of this implementation
   //
-  UINTN                         Version;
+  UINTN                        Version;
   //
   // Callback to override SD/MMC host controller capability bits
   //
-  EDKII_SD_MMC_CAPABILITY       Capability;
+  EDKII_SD_MMC_CAPABILITY      Capability;
   //
   // Callback to invoke SD/MMC override hooks
   //
-  EDKII_SD_MMC_NOTIFY_PHASE     NotifyPhase;
+  EDKII_SD_MMC_NOTIFY_PHASE    NotifyPhase;
 };
 
-extern EFI_GUID gEdkiiSdMmcOverrideProtocolGuid;
+extern EFI_GUID  gEdkiiSdMmcOverrideProtocolGuid;
 
 #endif

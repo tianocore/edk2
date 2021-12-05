@@ -20,8 +20,8 @@ InitializeHwErrRecSupport (
   VOID
   )
 {
-  EFI_STATUS    Status;
-  UINT16        HardwareErrorRecordLevel;
+  EFI_STATUS  Status;
+  UINT16      HardwareErrorRecordLevel;
 
   HardwareErrorRecordLevel = PcdGet16 (PcdHardwareErrorRecordLevel);
 
@@ -37,6 +37,6 @@ InitializeHwErrRecSupport (
                     sizeof (UINT16),
                     &HardwareErrorRecordLevel
                     );
-    ASSERT_EFI_ERROR(Status);
+    ASSERT_EFI_ERROR (Status);
   }
 }

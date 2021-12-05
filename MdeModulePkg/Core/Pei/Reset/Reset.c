@@ -59,7 +59,7 @@ PeiResetSystem (
   //
   // No reset PPIs are available yet.
   //
-  return  EFI_NOT_AVAILABLE_YET;
+  return EFI_NOT_AVAILABLE_YET;
 }
 
 /**

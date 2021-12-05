@@ -9,9 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _NULL_MEMORY_TEST_H_
 #define _NULL_MEMORY_TEST_H_
 
-
 #include <PiDxe.h>
-
 
 #include <Protocol/GenericMemoryTest.h>
 
@@ -48,9 +46,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 InitializeMemoryTest (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
-  IN  EXTENDMEM_COVERAGE_LEVEL                 Level,
-  OUT BOOLEAN                                  *RequireSoftECCInit
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This,
+  IN  EXTENDMEM_COVERAGE_LEVEL         Level,
+  OUT BOOLEAN                          *RequireSoftECCInit
   );
 
 /**
@@ -79,11 +77,11 @@ InitializeMemoryTest (
 EFI_STATUS
 EFIAPI
 GenPerformMemoryTest (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
-  IN OUT UINT64                                *TestedMemorySize,
-  OUT UINT64                                   *TotalMemorySize,
-  OUT BOOLEAN                                  *ErrorOut,
-  IN BOOLEAN                                   TestAbort
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This,
+  IN OUT UINT64                        *TestedMemorySize,
+  OUT UINT64                           *TotalMemorySize,
+  OUT BOOLEAN                          *ErrorOut,
+  IN BOOLEAN                           TestAbort
   );
 
 /**
@@ -102,7 +100,7 @@ GenPerformMemoryTest (
 EFI_STATUS
 EFIAPI
 GenMemoryTestFinished (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This
   );
 
 /**
@@ -123,9 +121,9 @@ GenMemoryTestFinished (
 EFI_STATUS
 EFIAPI
 GenCompatibleRangeTest (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
-  IN  EFI_PHYSICAL_ADDRESS                     StartAddress,
-  IN  UINT64                                   Length
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This,
+  IN  EFI_PHYSICAL_ADDRESS             StartAddress,
+  IN  UINT64                           Length
   );
 
 #endif

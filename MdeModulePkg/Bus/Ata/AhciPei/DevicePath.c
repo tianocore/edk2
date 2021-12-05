@@ -17,8 +17,8 @@ SATA_DEVICE_PATH  mAhciSataDevicePathNodeTemplate = {
     MESSAGING_DEVICE_PATH,
     MSG_SATA_DP,
     {
-      (UINT8) (sizeof (SATA_DEVICE_PATH)),
-      (UINT8) ((sizeof (SATA_DEVICE_PATH)) >> 8)
+      (UINT8)(sizeof (SATA_DEVICE_PATH)),
+      (UINT8)((sizeof (SATA_DEVICE_PATH)) >> 8)
     }
   },
   0x0,     // HBAPortNumber
@@ -33,8 +33,8 @@ EFI_DEVICE_PATH_PROTOCOL  mAhciEndDevicePathNodeTemplate = {
   END_DEVICE_PATH_TYPE,
   END_ENTIRE_DEVICE_PATH_SUBTYPE,
   {
-    (UINT8) (sizeof (EFI_DEVICE_PATH_PROTOCOL)),
-    (UINT8) ((sizeof (EFI_DEVICE_PATH_PROTOCOL)) >> 8)
+    (UINT8)(sizeof (EFI_DEVICE_PATH_PROTOCOL)),
+    (UINT8)((sizeof (EFI_DEVICE_PATH_PROTOCOL)) >> 8)
   }
 };
 
@@ -79,7 +79,7 @@ NextDevicePathNode (
   )
 {
   ASSERT (Node != NULL);
-  return (EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)(Node) + DevicePathNodeLength(Node));
+  return (EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)(Node) + DevicePathNodeLength (Node));
 }
 
 /**
@@ -97,14 +97,14 @@ NextDevicePathNode (
 **/
 EFI_STATUS
 GetDevicePathInstanceSize (
-  IN  EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
-  OUT UINTN                       *InstanceSize,
-  OUT BOOLEAN                     *EntireDevicePathEnd
+  IN  EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  OUT UINTN                     *InstanceSize,
+  OUT BOOLEAN                   *EntireDevicePathEnd
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL    *Walker;
+  EFI_DEVICE_PATH_PROTOCOL  *Walker;
 
-  if (DevicePath == NULL || InstanceSize == NULL || EntireDevicePathEnd == NULL) {
+  if ((DevicePath == NULL) || (InstanceSize == NULL) || (EntireDevicePathEnd == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -130,7 +130,7 @@ GetDevicePathInstanceSize (
   //
   // Compute the size of the device path instance
   //
-  *InstanceSize = ((UINTN) Walker - (UINTN) (DevicePath)) + sizeof (EFI_DEVICE_PATH_PROTOCOL);
+  *InstanceSize = ((UINTN)Walker - (UINTN)(DevicePath)) + sizeof (EFI_DEVICE_PATH_PROTOCOL);
 
   return EFI_SUCCESS;
 }
@@ -148,12 +148,12 @@ GetDevicePathInstanceSize (
 **/
 EFI_STATUS
 AhciIsHcDevicePathValid (
-  IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
-  IN UINTN                       DevicePathLength
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN UINTN                     DevicePathLength
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL    *Start;
-  UINTN                       Size;
+  EFI_DEVICE_PATH_PROTOCOL  *Start;
+  UINTN                     Size;
 
   if (DevicePath == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -168,22 +168,24 @@ AhciIsHcDevicePathValid (
 
   Start = DevicePath;
   while (!(DevicePath->Type == END_DEVICE_PATH_TYPE &&
-           DevicePath->SubType == END_ENTIRE_DEVICE_PATH_SUBTYPE)) {
+           DevicePath->SubType == END_ENTIRE_DEVICE_PATH_SUBTYPE))
+  {
     DevicePath = NextDevicePathNode (DevicePath);
 
     //
     // Prevent overflow and invalid zero in the 'Length' field of a device path
     // node.
     //
-    if ((UINTN) DevicePath <= (UINTN) Start) {
+    if ((UINTN)DevicePath <= (UINTN)Start) {
       return EFI_INVALID_PARAMETER;
     }
 
     //
     // Prevent touching memory beyond given DevicePathLength.
     //
-    if ((UINTN) DevicePath - (UINTN) Start >
-        DevicePathLength - sizeof (EFI_DEVICE_PATH_PROTOCOL)) {
+    if ((UINTN)DevicePath - (UINTN)Start >
+        DevicePathLength - sizeof (EFI_DEVICE_PATH_PROTOCOL))
+    {
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -191,7 +193,7 @@ AhciIsHcDevicePathValid (
   //
   // Check if the device path and its size match each other.
   //
-  Size = ((UINTN) DevicePath - (UINTN) Start) + sizeof (EFI_DEVICE_PATH_PROTOCOL);
+  Size = ((UINTN)DevicePath - (UINTN)Start) + sizeof (EFI_DEVICE_PATH_PROTOCOL);
   if (Size != DevicePathLength) {
     return EFI_INVALID_PARAMETER;
   }
@@ -217,17 +219,17 @@ AhciIsHcDevicePathValid (
 **/
 EFI_STATUS
 AhciBuildDevicePath (
-  IN  PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private,
-  IN  UINT16                              Port,
-  IN  UINT16                              PortMultiplierPort,
-  OUT UINTN                               *DevicePathLength,
-  OUT EFI_DEVICE_PATH_PROTOCOL            **DevicePath
+  IN  PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private,
+  IN  UINT16                            Port,
+  IN  UINT16                            PortMultiplierPort,
+  OUT UINTN                             *DevicePathLength,
+  OUT EFI_DEVICE_PATH_PROTOCOL          **DevicePath
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL    *DevicePathWalker;
-  SATA_DEVICE_PATH            *SataDeviceNode;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePathWalker;
+  SATA_DEVICE_PATH          *SataDeviceNode;
 
-  if (DevicePathLength == NULL || DevicePath == NULL) {
+  if ((DevicePathLength == NULL) || (DevicePath == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -251,8 +253,8 @@ AhciBuildDevicePath (
   //
   // Construct the SATA device node
   //
-  DevicePathWalker = (EFI_DEVICE_PATH_PROTOCOL *) ((UINT8 *)DevicePathWalker +
-                     (Private->DevicePathLength - sizeof (EFI_DEVICE_PATH_PROTOCOL)));
+  DevicePathWalker = (EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)DevicePathWalker +
+                                                  (Private->DevicePathLength - sizeof (EFI_DEVICE_PATH_PROTOCOL)));
   CopyMem (
     DevicePathWalker,
     &mAhciSataDevicePathNodeTemplate,
@@ -265,8 +267,8 @@ AhciBuildDevicePath (
   //
   // Construct the end device node
   //
-  DevicePathWalker = (EFI_DEVICE_PATH_PROTOCOL *) ((UINT8 *)DevicePathWalker +
-                     sizeof (SATA_DEVICE_PATH));
+  DevicePathWalker = (EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)DevicePathWalker +
+                                                  sizeof (SATA_DEVICE_PATH));
   CopyMem (
     DevicePathWalker,
     &mAhciEndDevicePathNodeTemplate,

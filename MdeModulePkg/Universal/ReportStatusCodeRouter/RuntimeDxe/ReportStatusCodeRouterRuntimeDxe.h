@@ -9,7 +9,6 @@
 #ifndef __REPORT_STATUS_CODE_ROUTER_RUNTIME_DXE_H__
 #define __REPORT_STATUS_CODE_ROUTER_RUNTIME_DXE_H__
 
-
 #include <Protocol/ReportStatusCodeHandler.h>
 #include <Protocol/StatusCode.h>
 
@@ -29,23 +28,23 @@
 #define RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE  SIGNATURE_32 ('r', 'h', 'c', 'e')
 
 typedef struct {
-  UINTN                     Signature;
-  EFI_RSC_HANDLER_CALLBACK  RscHandlerCallback;
-  EFI_TPL                   Tpl;
-  EFI_EVENT                 Event;
-  EFI_PHYSICAL_ADDRESS      StatusCodeDataBuffer;
-  UINTN                     BufferSize;
-  EFI_PHYSICAL_ADDRESS      EndPointer;
-  LIST_ENTRY                Node;
+  UINTN                       Signature;
+  EFI_RSC_HANDLER_CALLBACK    RscHandlerCallback;
+  EFI_TPL                     Tpl;
+  EFI_EVENT                   Event;
+  EFI_PHYSICAL_ADDRESS        StatusCodeDataBuffer;
+  UINTN                       BufferSize;
+  EFI_PHYSICAL_ADDRESS        EndPointer;
+  LIST_ENTRY                  Node;
 } RSC_HANDLER_CALLBACK_ENTRY;
 
 typedef struct {
-  EFI_STATUS_CODE_TYPE      Type;
-  EFI_STATUS_CODE_VALUE     Value;
-  UINT32                    Instance;
-  UINT32                    Reserved;
-  EFI_GUID                  CallerId;
-  EFI_STATUS_CODE_DATA      Data;
+  EFI_STATUS_CODE_TYPE     Type;
+  EFI_STATUS_CODE_VALUE    Value;
+  UINT32                   Instance;
+  UINT32                   Reserved;
+  EFI_GUID                 CallerId;
+  EFI_STATUS_CODE_DATA     Data;
 } RSC_DATA_ENTRY;
 
 /**
@@ -79,8 +78,8 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 Register (
-  IN EFI_RSC_HANDLER_CALLBACK   Callback,
-  IN EFI_TPL                    Tpl
+  IN EFI_RSC_HANDLER_CALLBACK  Callback,
+  IN EFI_TPL                   Tpl
   );
 
 /**
@@ -100,7 +99,7 @@ Register (
 EFI_STATUS
 EFIAPI
 Unregister (
-  IN EFI_RSC_HANDLER_CALLBACK Callback
+  IN EFI_RSC_HANDLER_CALLBACK  Callback
   );
 
 /**
@@ -124,13 +123,11 @@ Unregister (
 EFI_STATUS
 EFIAPI
 ReportDispatcher (
-  IN EFI_STATUS_CODE_TYPE     Type,
-  IN EFI_STATUS_CODE_VALUE    Value,
-  IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId  OPTIONAL,
-  IN EFI_STATUS_CODE_DATA     *Data      OPTIONAL
+  IN EFI_STATUS_CODE_TYPE   Type,
+  IN EFI_STATUS_CODE_VALUE  Value,
+  IN UINT32                 Instance,
+  IN EFI_GUID               *CallerId  OPTIONAL,
+  IN EFI_STATUS_CODE_DATA   *Data      OPTIONAL
   );
 
 #endif
-
-

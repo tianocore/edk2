@@ -10,42 +10,41 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "DxeIpl.h"
 
-
 //
 // Module Globals used in the DXE to PEI hand off
 // These must be module globals, so the stack can be switched
 //
-CONST EFI_DXE_IPL_PPI mDxeIplPpi = {
+CONST EFI_DXE_IPL_PPI  mDxeIplPpi = {
   DxeLoadCore
 };
 
-CONST EFI_PEI_PPI_DESCRIPTOR mDxeIplPpiList = {
+CONST EFI_PEI_PPI_DESCRIPTOR  mDxeIplPpiList = {
   EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
   &gEfiDxeIplPpiGuid,
-  (VOID *) &mDxeIplPpi
+  (VOID *)&mDxeIplPpi
 };
 
-CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI mCustomGuidedSectionExtractionPpi = {
+CONST EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI  mCustomGuidedSectionExtractionPpi = {
   CustomGuidedSectionExtract
 };
 
-CONST EFI_PEI_DECOMPRESS_PPI mDecompressPpi = {
+CONST EFI_PEI_DECOMPRESS_PPI  mDecompressPpi = {
   Decompress
 };
 
-CONST EFI_PEI_PPI_DESCRIPTOR mDecompressPpiList = {
+CONST EFI_PEI_PPI_DESCRIPTOR  mDecompressPpiList = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiDecompressPpiGuid,
-  (VOID *) &mDecompressPpi
+  (VOID *)&mDecompressPpi
 };
 
-CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi = {
+CONST EFI_PEI_PPI_DESCRIPTOR  gEndOfPeiSignalPpi = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiEndOfPeiSignalPpiGuid,
   NULL
 };
 
-CONST EFI_PEI_NOTIFY_DESCRIPTOR mMemoryDiscoveredNotifyList = {
+CONST EFI_PEI_NOTIFY_DESCRIPTOR  mMemoryDiscoveredNotifyList = {
   (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiMemoryDiscoveredPpiGuid,
   InstallIplPermanentMemoryPpis
@@ -71,9 +70,9 @@ PeimInitializeDxeIpl (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS                                Status;
-  EFI_BOOT_MODE                             BootMode;
-  VOID                                      *Dummy;
+  EFI_STATUS     Status;
+  EFI_BOOT_MODE  BootMode;
+  VOID           *Dummy;
 
   BootMode = GetBootModeHob ();
 
@@ -98,7 +97,7 @@ PeimInitializeDxeIpl (
                &gEfiPeiMemoryDiscoveredPpiGuid,
                0,
                NULL,
-               (VOID **) &Dummy
+               (VOID **)&Dummy
                );
     ASSERT_EFI_ERROR (Status);
     if (EFI_ERROR (Status)) {
@@ -124,7 +123,7 @@ PeimInitializeDxeIpl (
   // Install DxeIpl PPI.
   //
   Status = PeiServicesInstallPpi (&mDxeIplPpiList);
-  ASSERT_EFI_ERROR(Status);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
@@ -148,10 +147,10 @@ InstallIplPermanentMemoryPpis (
   IN VOID                       *Ppi
   )
 {
-  EFI_STATUS                    Status;
-  EFI_GUID                      *ExtractHandlerGuidTable;
-  UINTN                         ExtractHandlerNumber;
-  EFI_PEI_PPI_DESCRIPTOR        *GuidPpi;
+  EFI_STATUS              Status;
+  EFI_GUID                *ExtractHandlerGuidTable;
+  UINTN                   ExtractHandlerNumber;
+  EFI_PEI_PPI_DESCRIPTOR  *GuidPpi;
 
   //
   // Get custom extract guided section method guid list
@@ -162,14 +161,14 @@ InstallIplPermanentMemoryPpis (
   // Install custom guided section extraction PPI
   //
   if (ExtractHandlerNumber > 0) {
-    GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *) AllocatePool (ExtractHandlerNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR));
+    GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *)AllocatePool (ExtractHandlerNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR));
     ASSERT (GuidPpi != NULL);
     while (ExtractHandlerNumber-- > 0) {
       GuidPpi->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
-      GuidPpi->Ppi   = (VOID *) &mCustomGuidedSectionExtractionPpi;
+      GuidPpi->Ppi   = (VOID *)&mCustomGuidedSectionExtractionPpi;
       GuidPpi->Guid  = &ExtractHandlerGuidTable[ExtractHandlerNumber];
-      Status = PeiServicesInstallPpi (GuidPpi++);
-      ASSERT_EFI_ERROR(Status);
+      Status         = PeiServicesInstallPpi (GuidPpi++);
+      ASSERT_EFI_ERROR (Status);
     }
   }
 
@@ -177,7 +176,7 @@ InstallIplPermanentMemoryPpis (
   // Install Decompress PPI.
   //
   Status = PeiServicesInstallPpi (&mDecompressPpiList);
-  ASSERT_EFI_ERROR(Status);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
@@ -194,12 +193,12 @@ InstallIplPermanentMemoryPpis (
 **/
 BOOLEAN
 ValidateMemoryTypeInfoVariable (
-  IN EFI_MEMORY_TYPE_INFORMATION      *MemoryData,
-  IN UINTN                            MemoryDataSize
+  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryData,
+  IN UINTN                        MemoryDataSize
   )
 {
-  UINTN                       Count;
-  UINTN                       Index;
+  UINTN  Count;
+  UINTN  Index;
 
   // Check the input parameter.
   if (MemoryData == NULL) {
@@ -210,7 +209,7 @@ ValidateMemoryTypeInfoVariable (
   Count = MemoryDataSize / sizeof (*MemoryData);
 
   // Check Size
-  if (Count * sizeof(*MemoryData) != MemoryDataSize) {
+  if (Count * sizeof (*MemoryData) != MemoryDataSize) {
     return FALSE;
   }
 
@@ -246,28 +245,28 @@ ValidateMemoryTypeInfoVariable (
 EFI_STATUS
 EFIAPI
 DxeLoadCore (
-  IN CONST EFI_DXE_IPL_PPI *This,
-  IN EFI_PEI_SERVICES      **PeiServices,
-  IN EFI_PEI_HOB_POINTERS  HobList
+  IN CONST EFI_DXE_IPL_PPI  *This,
+  IN EFI_PEI_SERVICES       **PeiServices,
+  IN EFI_PEI_HOB_POINTERS   HobList
   )
 {
-  EFI_STATUS                                Status;
-  EFI_FV_FILE_INFO                          DxeCoreFileInfo;
-  EFI_PHYSICAL_ADDRESS                      DxeCoreAddress;
-  UINT64                                    DxeCoreSize;
-  EFI_PHYSICAL_ADDRESS                      DxeCoreEntryPoint;
-  EFI_BOOT_MODE                             BootMode;
-  EFI_PEI_FILE_HANDLE                       FileHandle;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI           *Variable;
-  EFI_PEI_LOAD_FILE_PPI                     *LoadFile;
-  UINTN                                     Instance;
-  UINT32                                    AuthenticationState;
-  UINTN                                     DataSize;
-  EFI_PEI_S3_RESUME2_PPI                    *S3Resume;
-  EFI_PEI_RECOVERY_MODULE_PPI               *PeiRecovery;
-  EDKII_PEI_CAPSULE_ON_DISK_PPI             *PeiCapsuleOnDisk;
-  EFI_MEMORY_TYPE_INFORMATION               MemoryData[EfiMaxMemoryType + 1];
-  VOID                                      *CapsuleOnDiskModePpi;
+  EFI_STATUS                       Status;
+  EFI_FV_FILE_INFO                 DxeCoreFileInfo;
+  EFI_PHYSICAL_ADDRESS             DxeCoreAddress;
+  UINT64                           DxeCoreSize;
+  EFI_PHYSICAL_ADDRESS             DxeCoreEntryPoint;
+  EFI_BOOT_MODE                    BootMode;
+  EFI_PEI_FILE_HANDLE              FileHandle;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI  *Variable;
+  EFI_PEI_LOAD_FILE_PPI            *LoadFile;
+  UINTN                            Instance;
+  UINT32                           AuthenticationState;
+  UINTN                            DataSize;
+  EFI_PEI_S3_RESUME2_PPI           *S3Resume;
+  EFI_PEI_RECOVERY_MODULE_PPI      *PeiRecovery;
+  EDKII_PEI_CAPSULE_ON_DISK_PPI    *PeiCapsuleOnDisk;
+  EFI_MEMORY_TYPE_INFORMATION      MemoryData[EfiMaxMemoryType + 1];
+  VOID                             *CapsuleOnDiskModePpi;
 
   //
   // if in S3 Resume, restore configure
@@ -279,7 +278,7 @@ DxeLoadCore (
                &gEfiPeiS3Resume2PpiGuid,
                0,
                NULL,
-               (VOID **) &S3Resume
+               (VOID **)&S3Resume
                );
     if (EFI_ERROR (Status)) {
       //
@@ -290,6 +289,7 @@ DxeLoadCore (
         (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_S3_RESUME_PPI_NOT_FOUND)
         );
     }
+
     ASSERT_EFI_ERROR (Status);
 
     Status = S3Resume->S3RestoreConfig2 (S3Resume);
@@ -300,7 +300,7 @@ DxeLoadCore (
                &gEfiPeiRecoveryModulePpiGuid,
                0,
                NULL,
-               (VOID **) &PeiRecovery
+               (VOID **)&PeiRecovery
                );
 
     if (EFI_ERROR (Status)) {
@@ -328,6 +328,7 @@ DxeLoadCore (
         );
       CpuDeadLoop ();
     }
+
     REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_CAPSULE_START));
     //
     // Now should have a HOB with the DXE core
@@ -343,12 +344,12 @@ DxeLoadCore (
                NULL,
                &CapsuleOnDiskModePpi
                );
-    if (!EFI_ERROR(Status)) {
+    if (!EFI_ERROR (Status)) {
       Status = PeiServicesLocatePpi (
                  &gEdkiiPeiCapsuleOnDiskPpiGuid,
                  0,
                  NULL,
-                 (VOID **) &PeiCapsuleOnDisk
+                 (VOID **)&PeiCapsuleOnDisk
                  );
 
       //
@@ -372,15 +373,15 @@ DxeLoadCore (
                );
     if (!EFI_ERROR (Status)) {
       DataSize = sizeof (MemoryData);
-      Status = Variable->GetVariable (
-                           Variable,
-                           EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
-                           &gEfiMemoryTypeInformationGuid,
-                           NULL,
-                           &DataSize,
-                           &MemoryData
-                           );
-      if (!EFI_ERROR (Status) && ValidateMemoryTypeInfoVariable(MemoryData, DataSize)) {
+      Status   = Variable->GetVariable (
+                             Variable,
+                             EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
+                             &gEfiMemoryTypeInformationGuid,
+                             NULL,
+                             &DataSize,
+                             &MemoryData
+                             );
+      if (!EFI_ERROR (Status) && ValidateMemoryTypeInfoVariable (MemoryData, DataSize)) {
         //
         // Build the GUID'd HOB for DXE
         //
@@ -403,7 +404,7 @@ DxeLoadCore (
   //
   Instance = 0;
   do {
-    Status = PeiServicesLocatePpi (&gEfiPeiLoadFilePpiGuid, Instance++, NULL, (VOID **) &LoadFile);
+    Status = PeiServicesLocatePpi (&gEfiPeiLoadFilePpiGuid, Instance++, NULL, (VOID **)&LoadFile);
     //
     // These must exist an instance of EFI_PEI_LOAD_FILE_PPI to support to load DxeCore file handle successfully.
     //
@@ -457,7 +458,6 @@ DxeLoadCore (
   return EFI_OUT_OF_RESOURCES;
 }
 
-
 /**
    Searches DxeCore in all firmware Volumes and loads the first
    instance that contains DxeCore.
@@ -470,12 +470,12 @@ DxeIplFindDxeCore (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  UINTN                 Instance;
-  EFI_PEI_FV_HANDLE     VolumeHandle;
-  EFI_PEI_FILE_HANDLE   FileHandle;
+  EFI_STATUS           Status;
+  UINTN                Instance;
+  EFI_PEI_FV_HANDLE    VolumeHandle;
+  EFI_PEI_FILE_HANDLE  FileHandle;
 
-  Instance    = 0;
+  Instance = 0;
   while (TRUE) {
     //
     // Traverse all firmware volume instances
@@ -488,13 +488,14 @@ DxeIplFindDxeCore (
     if (EFI_ERROR (Status)) {
       REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_EC_DXE_CORRUPT));
     }
+
     ASSERT_EFI_ERROR (Status);
 
     //
     // Find the DxeCore file type from the beginning in this firmware volume.
     //
     FileHandle = NULL;
-    Status = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_DXE_CORE, VolumeHandle, &FileHandle);
+    Status     = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_DXE_CORE, VolumeHandle, &FileHandle);
     if (!EFI_ERROR (Status)) {
       //
       // Find DxeCore FileHandle in this volume, then we skip other firmware volume and
@@ -502,14 +503,13 @@ DxeIplFindDxeCore (
       //
       return FileHandle;
     }
+
     //
     // We cannot find DxeCore in this firmware volume, then search the next volume.
     //
     Instance++;
   }
 }
-
-
 
 /**
   The ExtractSection() function processes the input section and
@@ -568,18 +568,18 @@ DxeIplFindDxeCore (
 EFI_STATUS
 EFIAPI
 CustomGuidedSectionExtract (
-  IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI *This,
-  IN CONST  VOID                                  *InputSection,
-  OUT       VOID                                  **OutputBuffer,
-  OUT       UINTN                                 *OutputSize,
-  OUT       UINT32                                *AuthenticationStatus
-)
+  IN CONST  EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI  *This,
+  IN CONST  VOID                                   *InputSection,
+  OUT       VOID                                   **OutputBuffer,
+  OUT       UINTN                                  *OutputSize,
+  OUT       UINT32                                 *AuthenticationStatus
+  )
 {
-  EFI_STATUS      Status;
-  UINT8           *ScratchBuffer;
-  UINT32          ScratchBufferSize;
-  UINT32          OutputBufferSize;
-  UINT16          SectionAttribute;
+  EFI_STATUS  Status;
+  UINT8       *ScratchBuffer;
+  UINT32      ScratchBufferSize;
+  UINT32      OutputBufferSize;
+  UINT16      SectionAttribute;
 
   //
   // Init local variable
@@ -611,7 +611,7 @@ CustomGuidedSectionExtract (
     }
   }
 
-  if (((SectionAttribute & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) && OutputBufferSize > 0) {
+  if (((SectionAttribute & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) && (OutputBufferSize > 0)) {
     //
     // Allocate output buffer
     //
@@ -619,6 +619,7 @@ CustomGuidedSectionExtract (
     if (*OutputBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     DEBUG ((DEBUG_INFO, "Customized Guided section Memory Size required is 0x%x and address is 0x%p\n", OutputBufferSize, *OutputBuffer));
   }
 
@@ -636,12 +637,10 @@ CustomGuidedSectionExtract (
     return Status;
   }
 
-  *OutputSize = (UINTN) OutputBufferSize;
+  *OutputSize = (UINTN)OutputBufferSize;
 
   return EFI_SUCCESS;
 }
-
-
 
 /**
    Decompresses a section to the output buffer.
@@ -666,21 +665,21 @@ CustomGuidedSectionExtract (
 EFI_STATUS
 EFIAPI
 Decompress (
-  IN CONST  EFI_PEI_DECOMPRESS_PPI  *This,
-  IN CONST  EFI_COMPRESSION_SECTION *CompressionSection,
-  OUT       VOID                    **OutputBuffer,
-  OUT       UINTN                   *OutputSize
- )
+  IN CONST  EFI_PEI_DECOMPRESS_PPI   *This,
+  IN CONST  EFI_COMPRESSION_SECTION  *CompressionSection,
+  OUT       VOID                     **OutputBuffer,
+  OUT       UINTN                    *OutputSize
+  )
 {
-  EFI_STATUS                      Status;
-  UINT8                           *DstBuffer;
-  UINT8                           *ScratchBuffer;
-  UINT32                          DstBufferSize;
-  UINT32                          ScratchBufferSize;
-  VOID                            *CompressionSource;
-  UINT32                          CompressionSourceSize;
-  UINT32                          UncompressedLength;
-  UINT8                           CompressionType;
+  EFI_STATUS  Status;
+  UINT8       *DstBuffer;
+  UINT8       *ScratchBuffer;
+  UINT32      DstBufferSize;
+  UINT32      ScratchBufferSize;
+  VOID        *CompressionSource;
+  UINT32      CompressionSourceSize;
+  UINT32      UncompressedLength;
+  UINT8       CompressionType;
 
   if (CompressionSection->CommonHeader.Type != EFI_SECTION_COMPRESSION) {
     ASSERT (FALSE);
@@ -688,108 +687,112 @@ Decompress (
   }
 
   if (IS_SECTION2 (CompressionSection)) {
-    CompressionSource = (VOID *) ((UINT8 *) CompressionSection + sizeof (EFI_COMPRESSION_SECTION2));
-    CompressionSourceSize = (UINT32) (SECTION2_SIZE (CompressionSection) - sizeof (EFI_COMPRESSION_SECTION2));
-    UncompressedLength = ((EFI_COMPRESSION_SECTION2 *) CompressionSection)->UncompressedLength;
-    CompressionType = ((EFI_COMPRESSION_SECTION2 *) CompressionSection)->CompressionType;
+    CompressionSource     = (VOID *)((UINT8 *)CompressionSection + sizeof (EFI_COMPRESSION_SECTION2));
+    CompressionSourceSize = (UINT32)(SECTION2_SIZE (CompressionSection) - sizeof (EFI_COMPRESSION_SECTION2));
+    UncompressedLength    = ((EFI_COMPRESSION_SECTION2 *)CompressionSection)->UncompressedLength;
+    CompressionType       = ((EFI_COMPRESSION_SECTION2 *)CompressionSection)->CompressionType;
   } else {
-    CompressionSource = (VOID *) ((UINT8 *) CompressionSection + sizeof (EFI_COMPRESSION_SECTION));
-    CompressionSourceSize = (UINT32) (SECTION_SIZE (CompressionSection) - sizeof (EFI_COMPRESSION_SECTION));
-    UncompressedLength = CompressionSection->UncompressedLength;
-    CompressionType = CompressionSection->CompressionType;
+    CompressionSource     = (VOID *)((UINT8 *)CompressionSection + sizeof (EFI_COMPRESSION_SECTION));
+    CompressionSourceSize = (UINT32)(SECTION_SIZE (CompressionSection) - sizeof (EFI_COMPRESSION_SECTION));
+    UncompressedLength    = CompressionSection->UncompressedLength;
+    CompressionType       = CompressionSection->CompressionType;
   }
 
   //
   // This is a compression set, expand it
   //
   switch (CompressionType) {
-  case EFI_STANDARD_COMPRESSION:
-    if (FeaturePcdGet(PcdDxeIplSupportUefiDecompress)) {
-      //
-      // Load EFI standard compression.
-      // For compressed data, decompress them to destination buffer.
-      //
-      Status = UefiDecompressGetInfo (
-                 CompressionSource,
-                 CompressionSourceSize,
-                 &DstBufferSize,
-                 &ScratchBufferSize
-                 );
-      if (EFI_ERROR (Status)) {
+    case EFI_STANDARD_COMPRESSION:
+      if (FeaturePcdGet (PcdDxeIplSupportUefiDecompress)) {
         //
-        // GetInfo failed
+        // Load EFI standard compression.
+        // For compressed data, decompress them to destination buffer.
         //
-        DEBUG ((DEBUG_ERROR, "Decompress GetInfo Failed - %r\n", Status));
+        Status = UefiDecompressGetInfo (
+                   CompressionSource,
+                   CompressionSourceSize,
+                   &DstBufferSize,
+                   &ScratchBufferSize
+                   );
+        if (EFI_ERROR (Status)) {
+          //
+          // GetInfo failed
+          //
+          DEBUG ((DEBUG_ERROR, "Decompress GetInfo Failed - %r\n", Status));
+          return EFI_NOT_FOUND;
+        }
+
+        //
+        // Allocate scratch buffer
+        //
+        ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchBufferSize));
+        if (ScratchBuffer == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+
+        //
+        // Allocate destination buffer
+        //
+        DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
+        if (DstBuffer == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+
+        //
+        // Call decompress function
+        //
+        Status = UefiDecompress (
+                   CompressionSource,
+                   DstBuffer,
+                   ScratchBuffer
+                   );
+        if (EFI_ERROR (Status)) {
+          //
+          // Decompress failed
+          //
+          DEBUG ((DEBUG_ERROR, "Decompress Failed - %r\n", Status));
+          return EFI_NOT_FOUND;
+        }
+
+        break;
+      } else {
+        //
+        // PcdDxeIplSupportUefiDecompress is FALSE
+        // Don't support UEFI decompression algorithm.
+        //
+        ASSERT (FALSE);
         return EFI_NOT_FOUND;
       }
-      //
-      // Allocate scratch buffer
-      //
-      ScratchBuffer = AllocatePages (EFI_SIZE_TO_PAGES (ScratchBufferSize));
-      if (ScratchBuffer == NULL) {
-        return EFI_OUT_OF_RESOURCES;
-      }
+
+    case EFI_NOT_COMPRESSED:
       //
       // Allocate destination buffer
       //
-      DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
+      DstBufferSize = UncompressedLength;
+      DstBuffer     = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
       if (DstBuffer == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
+
       //
-      // Call decompress function
+      // stream is not actually compressed, just encapsulated.  So just copy it.
       //
-      Status = UefiDecompress (
-                  CompressionSource,
-                  DstBuffer,
-                  ScratchBuffer
-                  );
-      if (EFI_ERROR (Status)) {
-        //
-        // Decompress failed
-        //
-        DEBUG ((DEBUG_ERROR, "Decompress Failed - %r\n", Status));
-        return EFI_NOT_FOUND;
-      }
+      CopyMem (DstBuffer, CompressionSource, DstBufferSize);
       break;
-    } else {
+
+    default:
       //
-      // PcdDxeIplSupportUefiDecompress is FALSE
-      // Don't support UEFI decompression algorithm.
+      // Don't support other unknown compression type.
       //
       ASSERT (FALSE);
       return EFI_NOT_FOUND;
-    }
-
-  case EFI_NOT_COMPRESSED:
-    //
-    // Allocate destination buffer
-    //
-    DstBufferSize = UncompressedLength;
-    DstBuffer     = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
-    if (DstBuffer == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    //
-    // stream is not actually compressed, just encapsulated.  So just copy it.
-    //
-    CopyMem (DstBuffer, CompressionSource, DstBufferSize);
-    break;
-
-  default:
-    //
-    // Don't support other unknown compression type.
-    //
-    ASSERT (FALSE);
-    return EFI_NOT_FOUND;
   }
 
-  *OutputSize = DstBufferSize;
+  *OutputSize   = DstBufferSize;
   *OutputBuffer = DstBuffer;
 
   return EFI_SUCCESS;
 }
-
 
 /**
    Updates the Stack HOB passed to DXE phase.
@@ -803,11 +806,11 @@ Decompress (
 **/
 VOID
 UpdateStackHob (
-  IN EFI_PHYSICAL_ADDRESS        BaseAddress,
-  IN UINT64                      Length
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length
   )
 {
-  EFI_PEI_HOB_POINTERS           Hob;
+  EFI_PEI_HOB_POINTERS  Hob;
 
   Hob.Raw = GetHobList ();
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
@@ -826,10 +829,10 @@ UpdateStackHob (
       // Update the BSP Stack Hob to reflect the new stack info.
       //
       Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress = BaseAddress;
-      Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength = Length;
+      Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength      = Length;
       break;
     }
+
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 }
-

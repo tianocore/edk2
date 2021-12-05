@@ -10,9 +10,9 @@
 
 #include "AhciPei.h"
 
-#define ATA_CMD_TRUST_NON_DATA           0x5B
-#define ATA_CMD_TRUST_RECEIVE            0x5C
-#define ATA_CMD_TRUST_SEND               0x5E
+#define ATA_CMD_TRUST_NON_DATA  0x5B
+#define ATA_CMD_TRUST_RECEIVE   0x5C
+#define ATA_CMD_TRUST_SEND      0x5E
 
 //
 // Look up table (IsWrite) for EFI_ATA_PASS_THRU_CMD_PROTOCOL
@@ -25,7 +25,7 @@ EFI_ATA_PASS_THRU_CMD_PROTOCOL  mAtaPassThruCmdProtocols[2] = {
 //
 // Look up table (Lba48Bit, IsIsWrite) for ATA_CMD
 //
-UINT8 mAtaCommands[2][2] = {
+UINT8  mAtaCommands[2][2] = {
   {
     ATA_CMD_READ_SECTORS,            // 28-bit LBA; PIO read
     ATA_CMD_WRITE_SECTORS            // 28-bit LBA; PIO write
@@ -47,16 +47,16 @@ UINT8  mAtaTrustCommands[2] = {
 //
 // Look up table (Lba48Bit) for maximum transfer block number
 //
-#define MAX_28BIT_TRANSFER_BLOCK_NUM     0x100
+#define MAX_28BIT_TRANSFER_BLOCK_NUM  0x100
 //
 // Due to limited resource for VTd PEI DMA buffer on platforms, the driver
 // limits the maximum transfer block number for 48-bit addressing.
 // Here, setting to 0x800 means that for device with 512-byte block size, the
 // maximum buffer for DMA mapping will be 1M bytes in size.
 //
-#define MAX_48BIT_TRANSFER_BLOCK_NUM     0x800
+#define MAX_48BIT_TRANSFER_BLOCK_NUM  0x800
 
-UINT32 mMaxTransferBlockNumber[2] = {
+UINT32  mMaxTransferBlockNumber[2] = {
   MAX_28BIT_TRANSFER_BLOCK_NUM,
   MAX_48BIT_TRANSFER_BLOCK_NUM
 };
@@ -64,8 +64,7 @@ UINT32 mMaxTransferBlockNumber[2] = {
 //
 // The maximum total sectors count in 28 bit addressing mode
 //
-#define MAX_28BIT_ADDRESSING_CAPACITY    0xfffffff
-
+#define MAX_28BIT_ADDRESSING_CAPACITY  0xfffffff
 
 /**
   Read AHCI Operation register.
@@ -78,11 +77,11 @@ UINT32 mMaxTransferBlockNumber[2] = {
 **/
 UINT32
 AhciReadReg (
-  IN UINTN     AhciBar,
-  IN UINT32    Offset
+  IN UINTN   AhciBar,
+  IN UINT32  Offset
   )
 {
-  UINT32   Data;
+  UINT32  Data;
 
   Data = 0;
   Data = MmioRead32 (AhciBar + Offset);
@@ -100,9 +99,9 @@ AhciReadReg (
 **/
 VOID
 AhciWriteReg (
-  IN UINTN     AhciBar,
-  IN UINT32    Offset,
-  IN UINT32    Data
+  IN UINTN   AhciBar,
+  IN UINT32  Offset,
+  IN UINT32  Data
   )
 {
   MmioWrite32 (AhciBar + Offset, Data);
@@ -118,12 +117,12 @@ AhciWriteReg (
 **/
 VOID
 AhciAndReg (
-  IN UINTN     AhciBar,
-  IN UINT32    Offset,
-  IN UINT32    AndData
+  IN UINTN   AhciBar,
+  IN UINT32  Offset,
+  IN UINT32  AndData
   )
 {
-  UINT32 Data;
+  UINT32  Data;
 
   Data  = AhciReadReg (AhciBar, Offset);
   Data &= AndData;
@@ -141,12 +140,12 @@ AhciAndReg (
 **/
 VOID
 AhciOrReg (
-  IN UINTN     AhciBar,
-  IN UINT32    Offset,
-  IN UINT32    OrData
+  IN UINTN   AhciBar,
+  IN UINT32  Offset,
+  IN UINT32  OrData
   )
 {
-  UINT32 Data;
+  UINT32  Data;
 
   Data  = AhciReadReg (AhciBar, Offset);
   Data |= OrData;
@@ -171,17 +170,17 @@ AhciOrReg (
 EFI_STATUS
 EFIAPI
 AhciWaitMmioSet (
-  IN UINTN     AhciBar,
-  IN UINT32    Offset,
-  IN UINT32    MaskValue,
-  IN UINT32    TestValue,
-  IN UINT64    Timeout
+  IN UINTN   AhciBar,
+  IN UINT32  Offset,
+  IN UINT32  MaskValue,
+  IN UINT32  TestValue,
+  IN UINT64  Timeout
   )
 {
-  UINT32    Value;
-  UINT32    Delay;
+  UINT32  Value;
+  UINT32  Delay;
 
-  Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
+  Delay = (UINT32)(DivU64x32 (Timeout, 1000) + 1);
 
   do {
     Value = AhciReadReg (AhciBar, Offset) & MaskValue;
@@ -196,7 +195,6 @@ AhciWaitMmioSet (
     MicroSecondDelay (100);
 
     Delay--;
-
   } while (Delay > 0);
 
   return EFI_TIMEOUT;
@@ -215,14 +213,14 @@ AhciWaitMmioSet (
 **/
 EFI_STATUS
 AhciCheckMemSet (
-  IN UINTN     Address,
-  IN UINT32    MaskValue,
-  IN UINT32    TestValue
+  IN UINTN   Address,
+  IN UINT32  MaskValue,
+  IN UINT32  TestValue
   )
 {
-  UINT32     Value;
+  UINT32  Value;
 
-  Value  = *(volatile UINT32 *) Address;
+  Value  = *(volatile UINT32 *)Address;
   Value &= MaskValue;
 
   if (Value == TestValue) {
@@ -246,15 +244,15 @@ AhciCheckMemSet (
 **/
 EFI_STATUS
 AhciWaitMemSet (
-  IN  EFI_PHYSICAL_ADDRESS    Address,
-  IN  UINT32                  MaskValue,
-  IN  UINT32                  TestValue,
-  IN  UINT64                  Timeout
+  IN  EFI_PHYSICAL_ADDRESS  Address,
+  IN  UINT32                MaskValue,
+  IN  UINT32                TestValue,
+  IN  UINT64                Timeout
   )
 {
-  UINT32     Value;
-  UINT64     Delay;
-  BOOLEAN    InfiniteWait;
+  UINT32   Value;
+  UINT64   Delay;
+  BOOLEAN  InfiniteWait;
 
   if (Timeout == 0) {
     InfiniteWait = TRUE;
@@ -273,7 +271,7 @@ AhciWaitMemSet (
     // compiler from optimizing the access to the memory address
     // to only read once.
     //
-    Value  = *(volatile UINT32 *) (UINTN) Address;
+    Value  = *(volatile UINT32 *)(UINTN)Address;
     Value &= MaskValue;
 
     if (Value == TestValue) {
@@ -286,7 +284,6 @@ AhciWaitMemSet (
     MicroSecondDelay (100);
 
     Delay--;
-
   } while (InfiniteWait || (Delay > 0));
 
   return EFI_TIMEOUT;
@@ -303,11 +300,11 @@ AhciWaitMemSet (
 **/
 VOID
 AhciClearPortStatus (
-  IN UINTN    AhciBar,
-  IN UINT8    Port
+  IN UINTN  AhciBar,
+  IN UINT8  Port
   )
 {
-  UINT32    Offset;
+  UINT32  Offset;
 
   //
   // Clear any error status
@@ -341,12 +338,12 @@ AhciClearPortStatus (
 **/
 EFI_STATUS
 AhciEnableFisReceive (
-  IN UINTN     AhciBar,
-  IN UINT8     Port,
-  IN UINT64    Timeout
+  IN UINTN   AhciBar,
+  IN UINT8   Port,
+  IN UINT64  Timeout
   )
 {
-  UINT32 Offset;
+  UINT32  Offset;
 
   Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CMD;
   AhciOrReg (AhciBar, Offset, AHCI_PORT_CMD_FRE);
@@ -369,13 +366,13 @@ AhciEnableFisReceive (
 **/
 EFI_STATUS
 AhciDisableFisReceive (
-  IN UINTN     AhciBar,
-  IN UINT8     Port,
-  IN UINT64    Timeout
+  IN UINTN   AhciBar,
+  IN UINT8   Port,
+  IN UINT64  Timeout
   )
 {
-  UINT32    Offset;
-  UINT32    Data;
+  UINT32  Offset;
+  UINT32  Data;
 
   Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CMD;
   Data   = AhciReadReg (AhciBar, Offset);
@@ -395,7 +392,7 @@ AhciDisableFisReceive (
     return EFI_SUCCESS;
   }
 
-  AhciAndReg (AhciBar, Offset, (UINT32)~(AHCI_PORT_CMD_FRE));
+  AhciAndReg (AhciBar, Offset, (UINT32) ~(AHCI_PORT_CMD_FRE));
 
   return AhciWaitMmioSet (
            AhciBar,
@@ -423,26 +420,26 @@ AhciDisableFisReceive (
 **/
 VOID
 AhciBuildCommand (
-  IN     PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private,
-  IN     UINT8                               Port,
-  IN     UINT8                               PortMultiplier,
-  IN     UINT8                               FisIndex,
-  IN     EFI_AHCI_COMMAND_FIS                *CommandFis,
-  IN     EFI_AHCI_COMMAND_LIST               *CommandList,
-  IN     UINT8                               CommandSlotNumber,
-  IN OUT VOID                                *DataPhysicalAddr,
-  IN     UINT32                              DataLength
+  IN     PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private,
+  IN     UINT8                             Port,
+  IN     UINT8                             PortMultiplier,
+  IN     UINT8                             FisIndex,
+  IN     EFI_AHCI_COMMAND_FIS              *CommandFis,
+  IN     EFI_AHCI_COMMAND_LIST             *CommandList,
+  IN     UINT8                             CommandSlotNumber,
+  IN OUT VOID                              *DataPhysicalAddr,
+  IN     UINT32                            DataLength
   )
 {
-  EFI_AHCI_REGISTERS    *AhciRegisters;
-  UINTN                 AhciBar;
-  UINT64                BaseAddr;
-  UINT32                PrdtNumber;
-  UINT32                PrdtIndex;
-  UINTN                 RemainedData;
-  UINTN                 MemAddr;
-  DATA_64               Data64;
-  UINT32                Offset;
+  EFI_AHCI_REGISTERS  *AhciRegisters;
+  UINTN               AhciBar;
+  UINT64              BaseAddr;
+  UINT32              PrdtNumber;
+  UINT32              PrdtIndex;
+  UINTN               RemainedData;
+  UINTN               MemAddr;
+  DATA_64             Data64;
+  UINT32              Offset;
 
   AhciRegisters = &Private->AhciRegisters;
   AhciBar       = Private->MmioBase;
@@ -467,11 +464,11 @@ AhciBuildCommand (
     return;
   }
 
-  Data64.Uint64 = (UINTN) (AhciRegisters->AhciRFis) + sizeof (EFI_AHCI_RECEIVED_FIS) * FisIndex;
+  Data64.Uint64 = (UINTN)(AhciRegisters->AhciRFis) + sizeof (EFI_AHCI_RECEIVED_FIS) * FisIndex;
 
   BaseAddr = Data64.Uint64;
 
-  ZeroMem ((VOID *)((UINTN) BaseAddr), sizeof (EFI_AHCI_RECEIVED_FIS));
+  ZeroMem ((VOID *)((UINTN)BaseAddr), sizeof (EFI_AHCI_RECEIVED_FIS));
 
   ZeroMem (AhciRegisters->AhciCmdTable, sizeof (EFI_AHCI_COMMAND_TABLE));
 
@@ -480,10 +477,10 @@ AhciBuildCommand (
   CopyMem (&AhciRegisters->AhciCmdTable->CommandFis, CommandFis, sizeof (EFI_AHCI_COMMAND_FIS));
 
   Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CMD;
-  AhciAndReg (AhciBar, Offset, (UINT32)~(AHCI_PORT_CMD_DLAE | AHCI_PORT_CMD_ATAPI));
+  AhciAndReg (AhciBar, Offset, (UINT32) ~(AHCI_PORT_CMD_DLAE | AHCI_PORT_CMD_ATAPI));
 
-  RemainedData = (UINTN) DataLength;
-  MemAddr      = (UINTN) DataPhysicalAddr;
+  RemainedData              = (UINTN)DataLength;
+  MemAddr                   = (UINTN)DataPhysicalAddr;
   CommandList->AhciCmdPrdtl = PrdtNumber;
 
   for (PrdtIndex = 0; PrdtIndex < PrdtNumber; PrdtIndex++) {
@@ -493,11 +490,11 @@ AhciBuildCommand (
       AhciRegisters->AhciCmdTable->PrdtTable[PrdtIndex].AhciPrdtDbc = AHCI_MAX_DATA_PER_PRDT - 1;
     }
 
-    Data64.Uint64 = (UINT64)MemAddr;
+    Data64.Uint64                                                  = (UINT64)MemAddr;
     AhciRegisters->AhciCmdTable->PrdtTable[PrdtIndex].AhciPrdtDba  = Data64.Uint32.Lower32;
     AhciRegisters->AhciCmdTable->PrdtTable[PrdtIndex].AhciPrdtDbau = Data64.Uint32.Upper32;
-    RemainedData -= AHCI_MAX_DATA_PER_PRDT;
-    MemAddr      += AHCI_MAX_DATA_PER_PRDT;
+    RemainedData                                                  -= AHCI_MAX_DATA_PER_PRDT;
+    MemAddr                                                       += AHCI_MAX_DATA_PER_PRDT;
   }
 
   //
@@ -508,12 +505,12 @@ AhciBuildCommand (
   }
 
   CopyMem (
-    (VOID *) ((UINTN) AhciRegisters->AhciCmdList + (UINTN) CommandSlotNumber * sizeof (EFI_AHCI_COMMAND_LIST)),
+    (VOID *)((UINTN)AhciRegisters->AhciCmdList + (UINTN)CommandSlotNumber * sizeof (EFI_AHCI_COMMAND_LIST)),
     CommandList,
     sizeof (EFI_AHCI_COMMAND_LIST)
     );
 
-  Data64.Uint64 = (UINT64)(UINTN) AhciRegisters->AhciCmdTable;
+  Data64.Uint64                                              = (UINT64)(UINTN)AhciRegisters->AhciCmdTable;
   AhciRegisters->AhciCmdList[CommandSlotNumber].AhciCmdCtba  = Data64.Uint32.Lower32;
   AhciRegisters->AhciCmdList[CommandSlotNumber].AhciCmdCtbau = Data64.Uint32.Upper32;
   AhciRegisters->AhciCmdList[CommandSlotNumber].AhciCmdPmp   = PortMultiplier;
@@ -530,8 +527,8 @@ AhciBuildCommand (
 **/
 VOID
 AhciBuildCommandFis (
-  IN OUT EFI_AHCI_COMMAND_FIS     *CmdFis,
-  IN     EFI_ATA_COMMAND_BLOCK    *AtaCommandBlock
+  IN OUT EFI_AHCI_COMMAND_FIS   *CmdFis,
+  IN     EFI_ATA_COMMAND_BLOCK  *AtaCommandBlock
   )
 {
   ZeroMem (CmdFis, sizeof (EFI_AHCI_COMMAND_FIS));
@@ -540,25 +537,25 @@ AhciBuildCommandFis (
   //
   // Indicator it's a command
   //
-  CmdFis->AhciCFisCmdInd      = 0x1;
-  CmdFis->AhciCFisCmd         = AtaCommandBlock->AtaCommand;
+  CmdFis->AhciCFisCmdInd = 0x1;
+  CmdFis->AhciCFisCmd    = AtaCommandBlock->AtaCommand;
 
-  CmdFis->AhciCFisFeature     = AtaCommandBlock->AtaFeatures;
-  CmdFis->AhciCFisFeatureExp  = AtaCommandBlock->AtaFeaturesExp;
+  CmdFis->AhciCFisFeature    = AtaCommandBlock->AtaFeatures;
+  CmdFis->AhciCFisFeatureExp = AtaCommandBlock->AtaFeaturesExp;
 
-  CmdFis->AhciCFisSecNum      = AtaCommandBlock->AtaSectorNumber;
-  CmdFis->AhciCFisSecNumExp   = AtaCommandBlock->AtaSectorNumberExp;
+  CmdFis->AhciCFisSecNum    = AtaCommandBlock->AtaSectorNumber;
+  CmdFis->AhciCFisSecNumExp = AtaCommandBlock->AtaSectorNumberExp;
 
-  CmdFis->AhciCFisClyLow      = AtaCommandBlock->AtaCylinderLow;
-  CmdFis->AhciCFisClyLowExp   = AtaCommandBlock->AtaCylinderLowExp;
+  CmdFis->AhciCFisClyLow    = AtaCommandBlock->AtaCylinderLow;
+  CmdFis->AhciCFisClyLowExp = AtaCommandBlock->AtaCylinderLowExp;
 
-  CmdFis->AhciCFisClyHigh     = AtaCommandBlock->AtaCylinderHigh;
-  CmdFis->AhciCFisClyHighExp  = AtaCommandBlock->AtaCylinderHighExp;
+  CmdFis->AhciCFisClyHigh    = AtaCommandBlock->AtaCylinderHigh;
+  CmdFis->AhciCFisClyHighExp = AtaCommandBlock->AtaCylinderHighExp;
 
   CmdFis->AhciCFisSecCount    = AtaCommandBlock->AtaSectorCount;
   CmdFis->AhciCFisSecCountExp = AtaCommandBlock->AtaSectorCountExp;
 
-  CmdFis->AhciCFisDevHead     = (UINT8) (AtaCommandBlock->AtaDeviceHead | 0xE0);
+  CmdFis->AhciCFisDevHead = (UINT8)(AtaCommandBlock->AtaDeviceHead | 0xE0);
 }
 
 /**
@@ -575,13 +572,13 @@ AhciBuildCommandFis (
 **/
 EFI_STATUS
 AhciStopCommand (
-  IN  UINTN     AhciBar,
-  IN  UINT8     Port,
-  IN  UINT64    Timeout
+  IN  UINTN   AhciBar,
+  IN  UINT8   Port,
+  IN  UINT64  Timeout
   )
 {
-  UINT32    Offset;
-  UINT32    Data;
+  UINT32  Offset;
+  UINT32  Data;
 
   Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CMD;
   Data   = AhciReadReg (AhciBar, Offset);
@@ -591,7 +588,7 @@ AhciStopCommand (
   }
 
   if ((Data & AHCI_PORT_CMD_ST) != 0) {
-    AhciAndReg (AhciBar, Offset, (UINT32)~(AHCI_PORT_CMD_ST));
+    AhciAndReg (AhciBar, Offset, (UINT32) ~(AHCI_PORT_CMD_ST));
   }
 
   return AhciWaitMmioSet (
@@ -618,26 +615,26 @@ AhciStopCommand (
 **/
 EFI_STATUS
 AhciStartCommand (
-  IN  UINTN     AhciBar,
-  IN  UINT8     Port,
-  IN  UINT8     CommandSlot,
-  IN  UINT64    Timeout
+  IN  UINTN   AhciBar,
+  IN  UINT8   Port,
+  IN  UINT8   CommandSlot,
+  IN  UINT64  Timeout
   )
 {
-  UINT32        CmdSlotBit;
-  EFI_STATUS    Status;
-  UINT32        PortStatus;
-  UINT32        StartCmd;
-  UINT32        PortTfd;
-  UINT32        Offset;
-  UINT32        Capability;
+  UINT32      CmdSlotBit;
+  EFI_STATUS  Status;
+  UINT32      PortStatus;
+  UINT32      StartCmd;
+  UINT32      PortTfd;
+  UINT32      Offset;
+  UINT32      Capability;
 
   //
   // Collect AHCI controller information
   //
   Capability = AhciReadReg (AhciBar, AHCI_CAPABILITY_OFFSET);
 
-  CmdSlotBit = (UINT32) (1 << CommandSlot);
+  CmdSlotBit = (UINT32)(1 << CommandSlot);
 
   AhciClearPortStatus (
     AhciBar,
@@ -653,17 +650,17 @@ AhciStartCommand (
     return Status;
   }
 
-  Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CMD;
+  Offset     = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CMD;
   PortStatus = AhciReadReg (AhciBar, Offset);
 
   StartCmd = 0;
   if ((PortStatus & AHCI_PORT_CMD_ALPE) != 0) {
-    StartCmd = AhciReadReg (AhciBar, Offset);
+    StartCmd  = AhciReadReg (AhciBar, Offset);
     StartCmd &= ~AHCI_PORT_CMD_ICC_MASK;
     StartCmd |= AHCI_PORT_CMD_ACTIVE;
   }
 
-  Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_TFD;
+  Offset  = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_TFD;
   PortTfd = AhciReadReg (AhciBar, Offset);
 
   if ((PortTfd & (AHCI_PORT_TFD_BSY | AHCI_PORT_TFD_DRQ)) != 0) {
@@ -689,7 +686,7 @@ AhciStartCommand (
   //
   Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CI;
   AhciAndReg (AhciBar, Offset, 0);
-  AhciOrReg  (AhciBar, Offset, CmdSlotBit);
+  AhciOrReg (AhciBar, Offset, CmdSlotBit);
 
   return EFI_SUCCESS;
 }
@@ -718,40 +715,40 @@ AhciStartCommand (
 **/
 EFI_STATUS
 AhciPioTransfer (
-  IN     PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private,
-  IN     UINT8                               Port,
-  IN     UINT8                               PortMultiplier,
-  IN     UINT8                               FisIndex,
-  IN     BOOLEAN                             Read,
-  IN     EFI_ATA_COMMAND_BLOCK               *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK                *AtaStatusBlock,
-  IN OUT VOID                                *MemoryAddr,
-  IN     UINT32                              DataCount,
-  IN     UINT64                              Timeout
+  IN     PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private,
+  IN     UINT8                             Port,
+  IN     UINT8                             PortMultiplier,
+  IN     UINT8                             FisIndex,
+  IN     BOOLEAN                           Read,
+  IN     EFI_ATA_COMMAND_BLOCK             *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK              *AtaStatusBlock,
+  IN OUT VOID                              *MemoryAddr,
+  IN     UINT32                            DataCount,
+  IN     UINT64                            Timeout
   )
 {
-  EFI_STATUS                    Status;
-  EDKII_IOMMU_OPERATION         MapOp;
-  UINTN                         MapLength;
-  EFI_PHYSICAL_ADDRESS          PhyAddr;
-  VOID                          *MapData;
-  EFI_AHCI_REGISTERS            *AhciRegisters;
-  UINTN                         AhciBar;
-  BOOLEAN                       InfiniteWait;
-  UINT32                        Offset;
-  UINT32                        OldRfisLo;
-  UINT32                        OldRfisHi;
-  UINT32                        OldCmdListLo;
-  UINT32                        OldCmdListHi;
-  DATA_64                       Data64;
-  UINT32                        FisBaseAddr;
-  UINT32                        Delay;
-  EFI_AHCI_COMMAND_FIS          CFis;
-  EFI_AHCI_COMMAND_LIST         CmdList;
-  UINT32                        PortTfd;
-  UINT32                        PrdCount;
-  BOOLEAN                       PioFisReceived;
-  BOOLEAN                       D2hFisReceived;
+  EFI_STATUS             Status;
+  EDKII_IOMMU_OPERATION  MapOp;
+  UINTN                  MapLength;
+  EFI_PHYSICAL_ADDRESS   PhyAddr;
+  VOID                   *MapData;
+  EFI_AHCI_REGISTERS     *AhciRegisters;
+  UINTN                  AhciBar;
+  BOOLEAN                InfiniteWait;
+  UINT32                 Offset;
+  UINT32                 OldRfisLo;
+  UINT32                 OldRfisHi;
+  UINT32                 OldCmdListLo;
+  UINT32                 OldCmdListHi;
+  DATA_64                Data64;
+  UINT32                 FisBaseAddr;
+  UINT32                 Delay;
+  EFI_AHCI_COMMAND_FIS   CFis;
+  EFI_AHCI_COMMAND_LIST  CmdList;
+  UINT32                 PortTfd;
+  UINT32                 PrdCount;
+  BOOLEAN                PioFisReceived;
+  BOOLEAN                D2hFisReceived;
 
   //
   // Current driver implementation supports up to a maximum of AHCI_MAX_PRDT_NUMBER
@@ -762,14 +759,16 @@ AhciPioTransfer (
       DEBUG_ERROR,
       "%a: Driver only support a maximum of 0x%x PRDT entries, "
       "current number of data byte 0x%x is too large, maximum allowed is 0x%x.\n",
-      __FUNCTION__, AHCI_MAX_PRDT_NUMBER, DataCount,
+      __FUNCTION__,
+      AHCI_MAX_PRDT_NUMBER,
+      DataCount,
       AHCI_MAX_PRDT_NUMBER * AHCI_MAX_DATA_PER_PRDT
       ));
     return EFI_UNSUPPORTED;
   }
 
-  MapOp     = Read ? EdkiiIoMmuOperationBusMasterWrite :
-                     EdkiiIoMmuOperationBusMasterRead;
+  MapOp = Read ? EdkiiIoMmuOperationBusMasterWrite :
+          EdkiiIoMmuOperationBusMasterRead;
   MapLength = DataCount;
   Status    = IoMmuMap (
                 MapOp,
@@ -783,9 +782,9 @@ AhciPioTransfer (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  AhciRegisters  = &Private->AhciRegisters;
-  AhciBar        = Private->MmioBase;
-  InfiniteWait   = (Timeout == 0) ? TRUE : FALSE;
+  AhciRegisters = &Private->AhciRegisters;
+  AhciBar       = Private->MmioBase;
+  InfiniteWait  = (Timeout == 0) ? TRUE : FALSE;
 
   //
   // Fill FIS base address register
@@ -794,23 +793,23 @@ AhciPioTransfer (
   OldRfisLo     = AhciReadReg (AhciBar, Offset);
   Offset        = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_FBU;
   OldRfisHi     = AhciReadReg (AhciBar, Offset);
-  Data64.Uint64 = (UINTN) (AhciRegisters->AhciRFis) + sizeof (EFI_AHCI_RECEIVED_FIS) * FisIndex;
+  Data64.Uint64 = (UINTN)(AhciRegisters->AhciRFis) + sizeof (EFI_AHCI_RECEIVED_FIS) * FisIndex;
   Offset        = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_FB;
   AhciWriteReg (AhciBar, Offset, Data64.Uint32.Lower32);
-  Offset        = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_FBU;
+  Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_FBU;
   AhciWriteReg (AhciBar, Offset, Data64.Uint32.Upper32);
 
   //
   // Single task environment, we only use one command table for all port
   //
-  Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLB;
+  Offset        = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLB;
   OldCmdListLo  = AhciReadReg (AhciBar, Offset);
-  Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLBU;
+  Offset        = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLBU;
   OldCmdListHi  = AhciReadReg (AhciBar, Offset);
-  Data64.Uint64 = (UINTN) (AhciRegisters->AhciCmdList);
+  Data64.Uint64 = (UINTN)(AhciRegisters->AhciCmdList);
   Offset        = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLB;
   AhciWriteReg (AhciBar, Offset, Data64.Uint32.Lower32);
-  Offset        = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLBU;
+  Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLBU;
   AhciWriteReg (AhciBar, Offset, Data64.Uint32.Upper32);
 
   //
@@ -854,16 +853,17 @@ AhciPioTransfer (
     // Wait device sends the PIO setup fis before data transfer
     //
     Status = EFI_TIMEOUT;
-    Delay  = (UINT32) DivU64x32 (Timeout, 1000) + 1;
+    Delay  = (UINT32)DivU64x32 (Timeout, 1000) + 1;
     do {
       PioFisReceived = FALSE;
       D2hFisReceived = FALSE;
-      Offset = FisBaseAddr + AHCI_PIO_FIS_OFFSET;
-      Status = AhciCheckMemSet (Offset, AHCI_FIS_TYPE_MASK, AHCI_FIS_PIO_SETUP);
+      Offset         = FisBaseAddr + AHCI_PIO_FIS_OFFSET;
+      Status         = AhciCheckMemSet (Offset, AHCI_FIS_TYPE_MASK, AHCI_FIS_PIO_SETUP);
       if (!EFI_ERROR (Status)) {
         DEBUG ((DEBUG_INFO, "%a: PioFisReceived.\n", __FUNCTION__));
         PioFisReceived = TRUE;
       }
+
       //
       // According to SATA 2.6 spec section 11.7, D2h FIS means an error encountered.
       // But Qemu and Marvel 9230 sata controller may just receive a D2h FIS from
@@ -879,8 +879,8 @@ AhciPioTransfer (
       }
 
       if (PioFisReceived || D2hFisReceived) {
-        Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_TFD;
-        PortTfd = AhciReadReg (AhciBar, (UINT32) Offset);
+        Offset  = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_TFD;
+        PortTfd = AhciReadReg (AhciBar, (UINT32)Offset);
         //
         // PxTFD will be updated if there is a D2H or SetupFIS received.
         //
@@ -889,7 +889,7 @@ AhciPioTransfer (
           break;
         }
 
-        PrdCount = *(volatile UINT32 *) (&(AhciRegisters->AhciCmdList[0].AhciCmdPrdbc));
+        PrdCount = *(volatile UINT32 *)(&(AhciRegisters->AhciCmdList[0].AhciCmdPrdbc));
         if (PrdCount == DataCount) {
           Status = EFI_SUCCESS;
           break;
@@ -899,7 +899,7 @@ AhciPioTransfer (
       //
       // Stall for 100 microseconds.
       //
-      MicroSecondDelay(100);
+      MicroSecondDelay (100);
 
       Delay--;
       if (Delay == 0) {
@@ -922,8 +922,8 @@ AhciPioTransfer (
       goto Exit;
     }
 
-    Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_TFD;
-    PortTfd = AhciReadReg (AhciBar, (UINT32) Offset);
+    Offset  = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_TFD;
+    PortTfd = AhciReadReg (AhciBar, (UINT32)Offset);
     if ((PortTfd & AHCI_PORT_TFD_ERR) != 0) {
       Status = EFI_DEVICE_ERROR;
     }
@@ -979,25 +979,25 @@ Exit:
 **/
 EFI_STATUS
 AhciNonDataTransfer (
-  IN     PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private,
-  IN     UINT8                               Port,
-  IN     UINT8                               PortMultiplier,
-  IN     UINT8                               FisIndex,
-  IN     EFI_ATA_COMMAND_BLOCK               *AtaCommandBlock,
-  IN OUT EFI_ATA_STATUS_BLOCK                *AtaStatusBlock,
-  IN     UINT64                              Timeout
+  IN     PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private,
+  IN     UINT8                             Port,
+  IN     UINT8                             PortMultiplier,
+  IN     UINT8                             FisIndex,
+  IN     EFI_ATA_COMMAND_BLOCK             *AtaCommandBlock,
+  IN OUT EFI_ATA_STATUS_BLOCK              *AtaStatusBlock,
+  IN     UINT64                            Timeout
   )
 {
-  EFI_STATUS                  Status;
-  UINTN                       AhciBar;
-  EFI_AHCI_REGISTERS          *AhciRegisters;
-  UINTN                       FisBaseAddr;
-  UINTN                       Offset;
-  UINT32                      PortTfd;
-  EFI_AHCI_COMMAND_FIS        CFis;
-  EFI_AHCI_COMMAND_LIST       CmdList;
+  EFI_STATUS             Status;
+  UINTN                  AhciBar;
+  EFI_AHCI_REGISTERS     *AhciRegisters;
+  UINTN                  FisBaseAddr;
+  UINTN                  Offset;
+  UINT32                 PortTfd;
+  EFI_AHCI_COMMAND_FIS   CFis;
+  EFI_AHCI_COMMAND_LIST  CmdList;
 
-  AhciBar        = Private->MmioBase;
+  AhciBar       = Private->MmioBase;
   AhciRegisters = &Private->AhciRegisters;
 
   //
@@ -1047,8 +1047,8 @@ AhciNonDataTransfer (
     goto Exit;
   }
 
-  Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_TFD;
-  PortTfd = AhciReadReg (AhciBar, (UINT32) Offset);
+  Offset  = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_TFD;
+  PortTfd = AhciReadReg (AhciBar, (UINT32)Offset);
   if ((PortTfd & AHCI_PORT_TFD_ERR) != 0) {
     Status = EFI_DEVICE_ERROR;
   }
@@ -1082,13 +1082,13 @@ Exit:
 **/
 EFI_STATUS
 AhciReset (
-  IN UINTN     AhciBar,
-  IN UINT64    Timeout
+  IN UINTN   AhciBar,
+  IN UINT64  Timeout
   )
 {
-  UINT32    Delay;
-  UINT32    Value;
-  UINT32    Capability;
+  UINT32  Delay;
+  UINT32  Value;
+  UINT32  Capability;
 
   //
   // Collect AHCI controller information
@@ -1104,10 +1104,10 @@ AhciReset (
 
   AhciOrReg (AhciBar, AHCI_GHC_OFFSET, AHCI_GHC_RESET);
 
-  Delay = (UINT32) (DivU64x32(Timeout, 1000) + 1);
+  Delay = (UINT32)(DivU64x32 (Timeout, 1000) + 1);
 
   do {
-    Value = AhciReadReg(AhciBar, AHCI_GHC_OFFSET);
+    Value = AhciReadReg (AhciBar, AHCI_GHC_OFFSET);
     if ((Value & AHCI_GHC_RESET) == 0) {
       return EFI_SUCCESS;
     }
@@ -1115,7 +1115,7 @@ AhciReset (
     //
     // Stall for 100 microseconds.
     //
-    MicroSecondDelay(100);
+    MicroSecondDelay (100);
 
     Delay--;
   } while (Delay > 0);
@@ -1141,16 +1141,16 @@ AhciReset (
 **/
 EFI_STATUS
 AhciIdentify (
-  IN PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private,
-  IN UINT8                               Port,
-  IN UINT8                               PortMultiplier,
-  IN UINT8                               FisIndex,
-  IN ATA_IDENTIFY_DATA                   *Buffer
+  IN PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private,
+  IN UINT8                             Port,
+  IN UINT8                             PortMultiplier,
+  IN UINT8                             FisIndex,
+  IN ATA_IDENTIFY_DATA                 *Buffer
   )
 {
-  EFI_STATUS                     Status;
-  EFI_ATA_COMMAND_BLOCK    Acb;
-  EFI_ATA_STATUS_BLOCK     Asb;
+  EFI_STATUS             Status;
+  EFI_ATA_COMMAND_BLOCK  Acb;
+  EFI_ATA_STATUS_BLOCK   Asb;
 
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1178,7 +1178,6 @@ AhciIdentify (
   return Status;
 }
 
-
 /**
   Collect the number of bits set within a port bitmap.
 
@@ -1189,10 +1188,10 @@ AhciIdentify (
 **/
 UINT8
 AhciGetNumberOfPortsFromMap (
-  IN UINT32    PortBitMap
+  IN UINT32  PortBitMap
   )
 {
-  UINT8    NumberOfPorts;
+  UINT8  NumberOfPorts;
 
   NumberOfPorts = 0;
 
@@ -1200,6 +1199,7 @@ AhciGetNumberOfPortsFromMap (
     if ((PortBitMap & ((UINT32)BIT0)) != 0) {
       NumberOfPorts++;
     }
+
     PortBitMap = PortBitMap >> 1;
   }
 
@@ -1220,9 +1220,9 @@ AhciGetNumberOfPortsFromMap (
 **/
 EFI_STATUS
 AhciGetPortFromMap (
-  IN  UINT32    PortBitMap,
-  IN  UINT8     PortIndex,
-  OUT UINT8     *Port
+  IN  UINT32  PortBitMap,
+  IN  UINT8   PortIndex,
+  OUT UINT8   *Port
   )
 {
   if (PortIndex == 0) {
@@ -1242,6 +1242,7 @@ AhciGetPortFromMap (
         return EFI_SUCCESS;
       }
     }
+
     PortBitMap = PortBitMap >> 1;
     *Port      = *Port + 1;
   }
@@ -1260,22 +1261,22 @@ AhciGetPortFromMap (
 **/
 EFI_STATUS
 AhciCreateTransferDescriptor (
-  IN OUT PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private
+  IN OUT PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private
   )
 {
-  EFI_STATUS              Status;
-  UINTN                   AhciBar;
-  EFI_AHCI_REGISTERS      *AhciRegisters;
-  EFI_PHYSICAL_ADDRESS    DeviceAddress;
-  VOID                    *Base;
-  VOID                    *Mapping;
-  UINT32                  Capability;
-  UINT32                  PortImplementBitMap;
-  UINT8                   MaxPortNumber;
-  UINT8                   MaxCommandSlotNumber;
-  UINTN                   MaxRFisSize;
-  UINTN                   MaxCmdListSize;
-  UINTN                   MaxCmdTableSize;
+  EFI_STATUS            Status;
+  UINTN                 AhciBar;
+  EFI_AHCI_REGISTERS    *AhciRegisters;
+  EFI_PHYSICAL_ADDRESS  DeviceAddress;
+  VOID                  *Base;
+  VOID                  *Mapping;
+  UINT32                Capability;
+  UINT32                PortImplementBitMap;
+  UINT8                 MaxPortNumber;
+  UINT8                 MaxCommandSlotNumber;
+  UINTN                 MaxRFisSize;
+  UINTN                 MaxCmdListSize;
+  UINTN                 MaxCmdTableSize;
 
   AhciBar       = Private->MmioBase;
   AhciRegisters = &Private->AhciRegisters;
@@ -1288,7 +1289,7 @@ AhciCreateTransferDescriptor (
   //
   // Get the number of command slots per port supported by this HBA.
   //
-  MaxCommandSlotNumber = (UINT8) (((Capability & 0x1F00) >> 8) + 1);
+  MaxCommandSlotNumber = (UINT8)(((Capability & 0x1F00) >> 8) + 1);
   ASSERT (MaxCommandSlotNumber > 0);
   if (MaxCommandSlotNumber == 0) {
     return EFI_DEVICE_ERROR;
@@ -1299,10 +1300,11 @@ AhciCreateTransferDescriptor (
   // allocated for recived FIS.
   //
   PortImplementBitMap = AhciReadReg (AhciBar, AHCI_PI_OFFSET);
-  MaxPortNumber       = (UINT8)(UINTN)(HighBitSet32(PortImplementBitMap) + 1);
+  MaxPortNumber       = (UINT8)(UINTN)(HighBitSet32 (PortImplementBitMap) + 1);
   if (MaxPortNumber == 0) {
     return EFI_DEVICE_ERROR;
   }
+
   //
   // Get the number of ports that actually needed to be initialized.
   //
@@ -1312,16 +1314,17 @@ AhciCreateTransferDescriptor (
   // Allocate memory for received FIS.
   //
   MaxRFisSize = MaxPortNumber * sizeof (EFI_AHCI_RECEIVED_FIS);
-  Status = IoMmuAllocateBuffer (
-             EFI_SIZE_TO_PAGES (MaxRFisSize),
-             &Base,
-             &DeviceAddress,
-             &Mapping
-             );
+  Status      = IoMmuAllocateBuffer (
+                  EFI_SIZE_TO_PAGES (MaxRFisSize),
+                  &Base,
+                  &DeviceAddress,
+                  &Mapping
+                  );
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
-  ASSERT (DeviceAddress == ((EFI_PHYSICAL_ADDRESS) (UINTN) Base));
+
+  ASSERT (DeviceAddress == ((EFI_PHYSICAL_ADDRESS)(UINTN)Base));
   AhciRegisters->AhciRFis    = Base;
   AhciRegisters->AhciRFisMap = Mapping;
   AhciRegisters->MaxRFisSize = MaxRFisSize;
@@ -1333,17 +1336,18 @@ AhciCreateTransferDescriptor (
   // list for each port.
   //
   MaxCmdListSize = 1 * sizeof (EFI_AHCI_COMMAND_LIST);
-  Status = IoMmuAllocateBuffer (
-             EFI_SIZE_TO_PAGES (MaxCmdListSize),
-             &Base,
-             &DeviceAddress,
-             &Mapping
-             );
+  Status         = IoMmuAllocateBuffer (
+                     EFI_SIZE_TO_PAGES (MaxCmdListSize),
+                     &Base,
+                     &DeviceAddress,
+                     &Mapping
+                     );
   if (EFI_ERROR (Status)) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ErrorExit;
   }
-  ASSERT (DeviceAddress == ((EFI_PHYSICAL_ADDRESS) (UINTN) Base));
+
+  ASSERT (DeviceAddress == ((EFI_PHYSICAL_ADDRESS)(UINTN)Base));
   AhciRegisters->AhciCmdList    = Base;
   AhciRegisters->AhciCmdListMap = Mapping;
   AhciRegisters->MaxCmdListSize = MaxCmdListSize;
@@ -1354,17 +1358,18 @@ AhciCreateTransferDescriptor (
   // According to AHCI 1.3 spec, a PRD table can contain maximum 65535 entries.
   //
   MaxCmdTableSize = sizeof (EFI_AHCI_COMMAND_TABLE);
-  Status = IoMmuAllocateBuffer (
-             EFI_SIZE_TO_PAGES (MaxCmdTableSize),
-             &Base,
-             &DeviceAddress,
-             &Mapping
-             );
+  Status          = IoMmuAllocateBuffer (
+                      EFI_SIZE_TO_PAGES (MaxCmdTableSize),
+                      &Base,
+                      &DeviceAddress,
+                      &Mapping
+                      );
   if (EFI_ERROR (Status)) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ErrorExit;
   }
-  ASSERT (DeviceAddress == ((EFI_PHYSICAL_ADDRESS) (UINTN) Base));
+
+  ASSERT (DeviceAddress == ((EFI_PHYSICAL_ADDRESS)(UINTN)Base));
   AhciRegisters->AhciCmdTable    = Base;
   AhciRegisters->AhciCmdTableMap = Mapping;
   AhciRegisters->MaxCmdTableSize = MaxCmdTableSize;
@@ -1375,19 +1380,19 @@ AhciCreateTransferDescriptor (
 ErrorExit:
   if (AhciRegisters->AhciRFisMap != NULL) {
     IoMmuFreeBuffer (
-       EFI_SIZE_TO_PAGES (AhciRegisters->MaxRFisSize),
-       AhciRegisters->AhciRFis,
-       AhciRegisters->AhciRFisMap
-       );
+      EFI_SIZE_TO_PAGES (AhciRegisters->MaxRFisSize),
+      AhciRegisters->AhciRFis,
+      AhciRegisters->AhciRFisMap
+      );
     AhciRegisters->AhciRFis = NULL;
   }
 
   if (AhciRegisters->AhciCmdListMap != NULL) {
     IoMmuFreeBuffer (
-       EFI_SIZE_TO_PAGES (AhciRegisters->MaxCmdListSize),
-       AhciRegisters->AhciCmdList,
-       AhciRegisters->AhciCmdListMap
-       );
+      EFI_SIZE_TO_PAGES (AhciRegisters->MaxCmdListSize),
+      AhciRegisters->AhciCmdList,
+      AhciRegisters->AhciCmdListMap
+      );
     AhciRegisters->AhciCmdList = NULL;
   }
 
@@ -1408,12 +1413,12 @@ ErrorExit:
 **/
 EFI_LBA
 GetAtapi6Capacity (
-  IN ATA_IDENTIFY_DATA    *IdentifyData
+  IN ATA_IDENTIFY_DATA  *IdentifyData
   )
 {
-  EFI_LBA                       Capacity;
-  EFI_LBA                       TmpLba;
-  UINTN                         Index;
+  EFI_LBA  Capacity;
+  EFI_LBA  TmpLba;
+  UINTN    Index;
 
   if ((IdentifyData->command_set_supported_83 & BIT10) == 0) {
     //
@@ -1430,7 +1435,7 @@ GetAtapi6Capacity (
     //
     // Lower byte goes first: word[100] is the lowest word, word[103] is highest
     //
-    TmpLba = IdentifyData->maximum_lba_for_48bit_addressing[Index];
+    TmpLba    = IdentifyData->maximum_lba_for_48bit_addressing[Index];
     Capacity |= LShiftU64 (TmpLba, 16 * Index);
   }
 
@@ -1458,29 +1463,35 @@ GetAtapi6Capacity (
 **/
 EFI_STATUS
 IdentifyAtaDevice (
-  IN OUT PEI_AHCI_ATA_DEVICE_DATA    *DeviceData
+  IN OUT PEI_AHCI_ATA_DEVICE_DATA  *DeviceData
   )
 {
-  ATA_IDENTIFY_DATA          *IdentifyData;
-  EFI_PEI_BLOCK_IO2_MEDIA    *Media;
-  EFI_LBA                    Capacity;
-  UINT32                     MaxSectorCount;
-  UINT16                     PhyLogicSectorSupport;
+  ATA_IDENTIFY_DATA        *IdentifyData;
+  EFI_PEI_BLOCK_IO2_MEDIA  *Media;
+  EFI_LBA                  Capacity;
+  UINT32                   MaxSectorCount;
+  UINT16                   PhyLogicSectorSupport;
 
   IdentifyData = DeviceData->IdentifyData;
   Media        = &DeviceData->Media;
 
   if ((IdentifyData->config & BIT15) != 0) {
     DEBUG ((
-      DEBUG_ERROR, "%a: Not a hard disk device on Port 0x%x PortMultiplierPort 0x%x\n",
-      __FUNCTION__, DeviceData->Port, DeviceData->PortMultiplier
+      DEBUG_ERROR,
+      "%a: Not a hard disk device on Port 0x%x PortMultiplierPort 0x%x\n",
+      __FUNCTION__,
+      DeviceData->Port,
+      DeviceData->PortMultiplier
       ));
     return EFI_UNSUPPORTED;
   }
 
   DEBUG ((
-    DEBUG_INFO, "%a: Identify Device: Port 0x%x PortMultiplierPort 0x%x\n",
-    __FUNCTION__, DeviceData->Port, DeviceData->PortMultiplier
+    DEBUG_INFO,
+    "%a: Identify Device: Port 0x%x PortMultiplierPort 0x%x\n",
+    __FUNCTION__,
+    DeviceData->Port,
+    DeviceData->PortMultiplier
     ));
 
   //
@@ -1502,7 +1513,7 @@ IdentifyAtaDevice (
     // This is a hard disk <= 120GB capacity, treat it as normal hard disk
     //
     Capacity = ((UINT32)IdentifyData->user_addressable_sectors_hi << 16) |
-                        IdentifyData->user_addressable_sectors_lo;
+               IdentifyData->user_addressable_sectors_lo;
     DeviceData->Lba48Bit = FALSE;
   }
 
@@ -1510,7 +1521,8 @@ IdentifyAtaDevice (
     DEBUG ((DEBUG_ERROR, "%a: Invalid Capacity (0) for ATA device.\n", __FUNCTION__));
     return EFI_UNSUPPORTED;
   }
-  Media->LastBlock = (EFI_PEI_LBA) (Capacity - 1);
+
+  Media->LastBlock = (EFI_PEI_LBA)(Capacity - 1);
 
   Media->BlockSize = 0x200;
   //
@@ -1518,16 +1530,18 @@ IdentifyAtaDevice (
   //
   PhyLogicSectorSupport = IdentifyData->phy_logic_sector_support;
   DEBUG ((
-    DEBUG_INFO, "%a: PhyLogicSectorSupport = 0x%x\n",
-    __FUNCTION__, PhyLogicSectorSupport
+    DEBUG_INFO,
+    "%a: PhyLogicSectorSupport = 0x%x\n",
+    __FUNCTION__,
+    PhyLogicSectorSupport
     ));
   if ((PhyLogicSectorSupport & (BIT14 | BIT15)) == BIT14) {
     //
     // Check logical block size
     //
     if ((PhyLogicSectorSupport & BIT12) != 0) {
-      Media->BlockSize = (UINT32) (((IdentifyData->logic_sector_size_hi << 16) |
-                                     IdentifyData->logic_sector_size_lo) * sizeof (UINT16));
+      Media->BlockSize = (UINT32)(((IdentifyData->logic_sector_size_hi << 16) |
+                                   IdentifyData->logic_sector_size_lo) * sizeof (UINT16));
     }
   }
 
@@ -1541,8 +1555,11 @@ IdentifyAtaDevice (
   }
 
   DEBUG ((
-    DEBUG_INFO, "%a: BlockSize = 0x%x, LastBlock = 0x%lx\n",
-    __FUNCTION__, Media->BlockSize, Media->LastBlock
+    DEBUG_INFO,
+    "%a: BlockSize = 0x%x, LastBlock = 0x%lx\n",
+    __FUNCTION__,
+    Media->BlockSize,
+    Media->LastBlock
     ));
 
   if ((IdentifyData->trusted_computing_support & BIT0) != 0) {
@@ -1583,16 +1600,16 @@ IdentifyAtaDevice (
 **/
 EFI_STATUS
 CreateNewDevice (
-  IN OUT PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private,
-  IN     UINTN                               DeviceIndex,
-  IN     UINT16                              Port,
-  IN     UINT16                              PortMultiplier,
-  IN     UINT8                               FisIndex,
-  IN     ATA_IDENTIFY_DATA                   *IdentifyData
+  IN OUT PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private,
+  IN     UINTN                             DeviceIndex,
+  IN     UINT16                            Port,
+  IN     UINT16                            PortMultiplier,
+  IN     UINT8                             FisIndex,
+  IN     ATA_IDENTIFY_DATA                 *IdentifyData
   )
 {
-  PEI_AHCI_ATA_DEVICE_DATA    *DeviceData;
-  EFI_STATUS                  Status;
+  PEI_AHCI_ATA_DEVICE_DATA  *DeviceData;
+  EFI_STATUS                Status;
 
   DeviceData = AllocateZeroPool (sizeof (PEI_AHCI_ATA_DEVICE_DATA));
   if (DeviceData == NULL) {
@@ -1622,6 +1639,7 @@ CreateNewDevice (
     Private->TrustComputingDevices++;
     DeviceData->TrustComputingDeviceIndex = Private->TrustComputingDevices;
   }
+
   Private->ActiveDevices++;
   InsertTailList (&Private->DeviceList, &DeviceData->Link);
 
@@ -1644,25 +1662,25 @@ CreateNewDevice (
 **/
 EFI_STATUS
 AhciModeInitialization (
-  IN OUT PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private
+  IN OUT PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private
   )
 {
-  EFI_STATUS            Status;
-  UINTN                 AhciBar;
-  UINT32                Capability;
-  UINT32                Value;
-  UINT8                 MaxPortNumber;
-  UINT32                PortImplementBitMap;
-  UINT32                PortInitializeBitMap;
-  EFI_AHCI_REGISTERS    *AhciRegisters;
-  UINT8                 PortIndex;
-  UINT8                 Port;
-  DATA_64               Data64;
-  UINT32                Data;
-  UINT32                Offset;
-  UINT32                PhyDetectDelay;
-  UINTN                 DeviceIndex;
-  ATA_IDENTIFY_DATA     IdentifyData;
+  EFI_STATUS          Status;
+  UINTN               AhciBar;
+  UINT32              Capability;
+  UINT32              Value;
+  UINT8               MaxPortNumber;
+  UINT32              PortImplementBitMap;
+  UINT32              PortInitializeBitMap;
+  EFI_AHCI_REGISTERS  *AhciRegisters;
+  UINT8               PortIndex;
+  UINT8               Port;
+  DATA_64             Data64;
+  UINT32              Data;
+  UINT32              Offset;
+  UINT32              PhyDetectDelay;
+  UINTN               DeviceIndex;
+  ATA_IDENTIFY_DATA   IdentifyData;
 
   AhciBar = Private->MmioBase;
 
@@ -1690,7 +1708,8 @@ AhciModeInitialization (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Transfer-related data allocation failed with %r.\n",
-      __FUNCTION__, Status
+      __FUNCTION__,
+      Status
       ));
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1698,7 +1717,7 @@ AhciModeInitialization (
   //
   // Get the number of command slots per port supported by this HBA.
   //
-  MaxPortNumber = (UINT8) ((Capability & 0x1F) + 1);
+  MaxPortNumber = (UINT8)((Capability & 0x1F) + 1);
 
   //
   // Get the bit map of those ports exposed by this HBA.
@@ -1710,7 +1729,7 @@ AhciModeInitialization (
   //
   // Get the number of ports that actually needed to be initialized.
   //
-  MaxPortNumber = MIN (MaxPortNumber, (UINT8)(UINTN)(HighBitSet32(PortImplementBitMap) + 1));
+  MaxPortNumber = MIN (MaxPortNumber, (UINT8)(UINTN)(HighBitSet32 (PortImplementBitMap) + 1));
   MaxPortNumber = MIN (MaxPortNumber, AhciGetNumberOfPortsFromMap (Private->PortBitMap));
 
   PortInitializeBitMap = Private->PortBitMap & PortImplementBitMap;
@@ -1719,7 +1738,7 @@ AhciModeInitialization (
   //
   // Enumerate ATA ports
   //
-  for (PortIndex = 1; PortIndex <= MaxPortNumber; PortIndex ++) {
+  for (PortIndex = 1; PortIndex <= MaxPortNumber; PortIndex++) {
     Status = AhciGetPortFromMap (PortInitializeBitMap, PortIndex, &Port);
     if (EFI_ERROR (Status)) {
       //
@@ -1733,21 +1752,21 @@ AhciModeInitialization (
       // Initialize FIS Base Address Register and Command List Base Address
       // Register for use.
       //
-      Data64.Uint64 = (UINTN) (AhciRegisters->AhciRFis) +
+      Data64.Uint64 = (UINTN)(AhciRegisters->AhciRFis) +
                       sizeof (EFI_AHCI_RECEIVED_FIS) * (PortIndex - 1);
       Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_FB;
       AhciWriteReg (AhciBar, Offset, Data64.Uint32.Lower32);
       Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_FBU;
       AhciWriteReg (AhciBar, Offset, Data64.Uint32.Upper32);
 
-      Data64.Uint64 = (UINTN) (AhciRegisters->AhciCmdList);
-      Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLB;
+      Data64.Uint64 = (UINTN)(AhciRegisters->AhciCmdList);
+      Offset        = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLB;
       AhciWriteReg (AhciBar, Offset, Data64.Uint32.Lower32);
       Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CLBU;
       AhciWriteReg (AhciBar, Offset, Data64.Uint32.Upper32);
 
       Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CMD;
-      Data = AhciReadReg (AhciBar, Offset);
+      Data   = AhciReadReg (AhciBar, Offset);
       if ((Data & AHCI_PORT_CMD_CPD) != 0) {
         AhciOrReg (AhciBar, Offset, AHCI_PORT_CMD_POD);
       }
@@ -1777,7 +1796,7 @@ AhciModeInitialization (
       // Wait no longer than 15 ms to wait the Phy to detect the presence of a device.
       //
       PhyDetectDelay = AHCI_BUS_PHY_DETECT_TIMEOUT;
-      Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_SSTS;
+      Offset         = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_SSTS;
       do {
         Data = AhciReadReg (AhciBar, Offset) & AHCI_PORT_SSTS_DET_MASK;
         if ((Data == AHCI_PORT_SSTS_DET_PCE) || (Data == AHCI_PORT_SSTS_DET)) {
@@ -1806,9 +1825,10 @@ AhciModeInitialization (
       PhyDetectDelay = 16 * 1000;
       do {
         Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_SERR;
-        if (AhciReadReg(AhciBar, Offset) != 0) {
+        if (AhciReadReg (AhciBar, Offset) != 0) {
           AhciWriteReg (AhciBar, Offset, AhciReadReg (AhciBar, Offset));
         }
+
         Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_TFD;
 
         Data = AhciReadReg (AhciBar, Offset) & AHCI_PORT_TFD_MASK;
@@ -1824,7 +1844,9 @@ AhciModeInitialization (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Port %d device presence detected but phy not ready (TFD=0x%x).\n",
-          __FUNCTION__, Port, Data
+          __FUNCTION__,
+          Port,
+          Data
           ));
         continue;
       }
@@ -1844,7 +1866,8 @@ AhciModeInitialization (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Error occurred when waiting for the first D2H register FIS - %r\n",
-          __FUNCTION__, Status
+          __FUNCTION__,
+          Status
           ));
         continue;
       }
@@ -1856,6 +1879,7 @@ AhciModeInitialization (
           DEBUG ((DEBUG_ERROR, "%a: AhciIdentify() failed with %r\n", __FUNCTION__, Status));
           continue;
         }
+
         DEBUG ((DEBUG_INFO, "%a: ATA hard disk found on Port %d.\n", __FUNCTION__, Port));
       } else {
         continue;
@@ -1898,17 +1922,17 @@ AhciModeInitialization (
 **/
 EFI_STATUS
 TransferAtaDevice (
-  IN     PEI_AHCI_ATA_DEVICE_DATA    *DeviceData,
-  IN OUT VOID                        *Buffer,
-  IN     EFI_LBA                     StartLba,
-  IN     UINT32                      TransferLength,
-  IN     BOOLEAN                     IsWrite
+  IN     PEI_AHCI_ATA_DEVICE_DATA  *DeviceData,
+  IN OUT VOID                      *Buffer,
+  IN     EFI_LBA                   StartLba,
+  IN     UINT32                    TransferLength,
+  IN     BOOLEAN                   IsWrite
   )
 {
-  PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private;
-  EDKII_PEI_ATA_PASS_THRU_PPI         *AtaPassThru;
-  EFI_ATA_COMMAND_BLOCK               Acb;
-  EFI_ATA_PASS_THRU_COMMAND_PACKET    Packet;
+  PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private;
+  EDKII_PEI_ATA_PASS_THRU_PPI       *AtaPassThru;
+  EFI_ATA_COMMAND_BLOCK             Acb;
+  EFI_ATA_PASS_THRU_COMMAND_PACKET  Packet;
 
   Private     = DeviceData->Private;
   AtaPassThru = &Private->AtaPassThruPpi;
@@ -1916,10 +1940,11 @@ TransferAtaDevice (
   //
   // Ensure Lba48Bit and IsWrite are valid boolean values
   //
-  ASSERT ((UINTN) DeviceData->Lba48Bit < 2);
-  ASSERT ((UINTN) IsWrite < 2);
-  if (((UINTN) DeviceData->Lba48Bit >= 2) ||
-      ((UINTN) IsWrite >= 2)) {
+  ASSERT ((UINTN)DeviceData->Lba48Bit < 2);
+  ASSERT ((UINTN)IsWrite < 2);
+  if (((UINTN)DeviceData->Lba48Bit >= 2) ||
+      ((UINTN)IsWrite >= 2))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1927,21 +1952,21 @@ TransferAtaDevice (
   // Prepare for ATA command block.
   //
   ZeroMem (&Acb, sizeof (EFI_ATA_COMMAND_BLOCK));
-  Acb.AtaCommand = mAtaCommands[DeviceData->Lba48Bit][IsWrite];
-  Acb.AtaSectorNumber = (UINT8) StartLba;
-  Acb.AtaCylinderLow  = (UINT8) RShiftU64 (StartLba, 8);
-  Acb.AtaCylinderHigh = (UINT8) RShiftU64 (StartLba, 16);
-  Acb.AtaDeviceHead   = (UINT8) (BIT7 | BIT6 | BIT5 |
-                                 (DeviceData->PortMultiplier == 0xFFFF ?
+  Acb.AtaCommand      = mAtaCommands[DeviceData->Lba48Bit][IsWrite];
+  Acb.AtaSectorNumber = (UINT8)StartLba;
+  Acb.AtaCylinderLow  = (UINT8)RShiftU64 (StartLba, 8);
+  Acb.AtaCylinderHigh = (UINT8)RShiftU64 (StartLba, 16);
+  Acb.AtaDeviceHead   = (UINT8)(BIT7 | BIT6 | BIT5 |
+                                (DeviceData->PortMultiplier == 0xFFFF ?
                                  0 : (DeviceData->PortMultiplier << 4)));
-  Acb.AtaSectorCount  = (UINT8) TransferLength;
+  Acb.AtaSectorCount = (UINT8)TransferLength;
   if (DeviceData->Lba48Bit) {
-    Acb.AtaSectorNumberExp = (UINT8) RShiftU64 (StartLba, 24);
-    Acb.AtaCylinderLowExp  = (UINT8) RShiftU64 (StartLba, 32);
-    Acb.AtaCylinderHighExp = (UINT8) RShiftU64 (StartLba, 40);
-    Acb.AtaSectorCountExp  = (UINT8) (TransferLength >> 8);
+    Acb.AtaSectorNumberExp = (UINT8)RShiftU64 (StartLba, 24);
+    Acb.AtaCylinderLowExp  = (UINT8)RShiftU64 (StartLba, 32);
+    Acb.AtaCylinderHighExp = (UINT8)RShiftU64 (StartLba, 40);
+    Acb.AtaSectorCountExp  = (UINT8)(TransferLength >> 8);
   } else {
-    Acb.AtaDeviceHead      = (UINT8) (Acb.AtaDeviceHead | RShiftU64 (StartLba, 24));
+    Acb.AtaDeviceHead = (UINT8)(Acb.AtaDeviceHead | RShiftU64 (StartLba, 24));
   }
 
   //
@@ -1952,9 +1977,10 @@ TransferAtaDevice (
     Packet.OutDataBuffer     = Buffer;
     Packet.OutTransferLength = TransferLength;
   } else {
-    Packet.InDataBuffer      = Buffer;
-    Packet.InTransferLength  = TransferLength;
+    Packet.InDataBuffer     = Buffer;
+    Packet.InTransferLength = TransferLength;
   }
+
   Packet.Asb      = NULL;
   Packet.Acb      = &Acb;
   Packet.Protocol = mAtaPassThruCmdProtocols[IsWrite];
@@ -2035,22 +2061,22 @@ TransferAtaDevice (
 **/
 EFI_STATUS
 TrustTransferAtaDevice (
-  IN     PEI_AHCI_ATA_DEVICE_DATA    *DeviceData,
-  IN OUT VOID                        *Buffer,
-  IN     UINT8                       SecurityProtocolId,
-  IN     UINT16                      SecurityProtocolSpecificData,
-  IN     UINTN                       TransferLength,
-  IN     BOOLEAN                     IsTrustSend,
-  IN     UINT64                      Timeout,
-  OUT    UINTN                       *TransferLengthOut
+  IN     PEI_AHCI_ATA_DEVICE_DATA  *DeviceData,
+  IN OUT VOID                      *Buffer,
+  IN     UINT8                     SecurityProtocolId,
+  IN     UINT16                    SecurityProtocolSpecificData,
+  IN     UINTN                     TransferLength,
+  IN     BOOLEAN                   IsTrustSend,
+  IN     UINT64                    Timeout,
+  OUT    UINTN                     *TransferLengthOut
   )
 {
-  PEI_AHCI_CONTROLLER_PRIVATE_DATA    *Private;
-  EDKII_PEI_ATA_PASS_THRU_PPI         *AtaPassThru;
-  EFI_ATA_COMMAND_BLOCK               Acb;
-  EFI_ATA_PASS_THRU_COMMAND_PACKET    Packet;
-  EFI_STATUS                          Status;
-  VOID                                *NewBuffer;
+  PEI_AHCI_CONTROLLER_PRIVATE_DATA  *Private;
+  EDKII_PEI_ATA_PASS_THRU_PPI       *AtaPassThru;
+  EFI_ATA_COMMAND_BLOCK             Acb;
+  EFI_ATA_PASS_THRU_COMMAND_PACKET  Packet;
+  EFI_STATUS                        Status;
+  VOID                              *NewBuffer;
 
   Private     = DeviceData->Private;
   AtaPassThru = &Private->AtaPassThruPpi;
@@ -2058,8 +2084,8 @@ TrustTransferAtaDevice (
   //
   // Ensure IsTrustSend are valid boolean values
   //
-  ASSERT ((UINTN) IsTrustSend < 2);
-  if ((UINTN) IsTrustSend >= 2) {
+  ASSERT ((UINTN)IsTrustSend < 2);
+  if ((UINTN)IsTrustSend >= 2) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2068,22 +2094,23 @@ TrustTransferAtaDevice (
   //
   ZeroMem (&Acb, sizeof (EFI_ATA_COMMAND_BLOCK));
   if (TransferLength == 0) {
-    Acb.AtaCommand    = ATA_CMD_TRUST_NON_DATA;
+    Acb.AtaCommand = ATA_CMD_TRUST_NON_DATA;
   } else {
-    Acb.AtaCommand    = mAtaTrustCommands[IsTrustSend];
+    Acb.AtaCommand = mAtaTrustCommands[IsTrustSend];
   }
-  Acb.AtaFeatures      = SecurityProtocolId;
-  Acb.AtaSectorCount   = (UINT8) (TransferLength / 512);
-  Acb.AtaSectorNumber  = (UINT8) ((TransferLength / 512) >> 8);
+
+  Acb.AtaFeatures     = SecurityProtocolId;
+  Acb.AtaSectorCount  = (UINT8)(TransferLength / 512);
+  Acb.AtaSectorNumber = (UINT8)((TransferLength / 512) >> 8);
   //
   // NOTE: ATA Spec has no explicitly definition for Security Protocol Specific layout.
   // Here use big endian for Cylinder register.
   //
-  Acb.AtaCylinderHigh  = (UINT8) SecurityProtocolSpecificData;
-  Acb.AtaCylinderLow   = (UINT8) (SecurityProtocolSpecificData >> 8);
-  Acb.AtaDeviceHead    = (UINT8) (BIT7 | BIT6 | BIT5 |
-                                  (DeviceData->PortMultiplier == 0xFFFF ?
-                                  0 : (DeviceData->PortMultiplier << 4)));
+  Acb.AtaCylinderHigh = (UINT8)SecurityProtocolSpecificData;
+  Acb.AtaCylinderLow  = (UINT8)(SecurityProtocolSpecificData >> 8);
+  Acb.AtaDeviceHead   = (UINT8)(BIT7 | BIT6 | BIT5 |
+                                (DeviceData->PortMultiplier == 0xFFFF ?
+                                 0 : (DeviceData->PortMultiplier << 4)));
 
   //
   // Prepare for ATA pass through packet.
@@ -2092,14 +2119,15 @@ TrustTransferAtaDevice (
   if (TransferLength == 0) {
     Packet.InTransferLength  = 0;
     Packet.OutTransferLength = 0;
-    Packet.Protocol = EFI_ATA_PASS_THRU_PROTOCOL_ATA_NON_DATA;
+    Packet.Protocol          = EFI_ATA_PASS_THRU_PROTOCOL_ATA_NON_DATA;
   } else if (IsTrustSend) {
     //
     // Check the alignment of the incoming buffer prior to invoking underlying
     // ATA PassThru PPI.
     //
     if ((AtaPassThru->Mode->IoAlign > 1) &&
-        !IS_ALIGNED (Buffer, AtaPassThru->Mode->IoAlign)) {
+        !IS_ALIGNED (Buffer, AtaPassThru->Mode->IoAlign))
+    {
       NewBuffer = AllocateAlignedPages (
                     EFI_SIZE_TO_PAGES (TransferLength),
                     AtaPassThru->Mode->IoAlign
@@ -2111,18 +2139,20 @@ TrustTransferAtaDevice (
       CopyMem (NewBuffer, Buffer, TransferLength);
       Buffer = NewBuffer;
     }
-    Packet.OutDataBuffer = Buffer;
-    Packet.OutTransferLength = (UINT32) TransferLength;
-    Packet.Protocol = mAtaPassThruCmdProtocols[IsTrustSend];
+
+    Packet.OutDataBuffer     = Buffer;
+    Packet.OutTransferLength = (UINT32)TransferLength;
+    Packet.Protocol          = mAtaPassThruCmdProtocols[IsTrustSend];
   } else {
-    Packet.InDataBuffer = Buffer;
-    Packet.InTransferLength = (UINT32) TransferLength;
-    Packet.Protocol = mAtaPassThruCmdProtocols[IsTrustSend];
+    Packet.InDataBuffer     = Buffer;
+    Packet.InTransferLength = (UINT32)TransferLength;
+    Packet.Protocol         = mAtaPassThruCmdProtocols[IsTrustSend];
   }
-  Packet.Asb      = NULL;
-  Packet.Acb      = &Acb;
-  Packet.Timeout  = Timeout;
-  Packet.Length   = EFI_ATA_PASS_THRU_LENGTH_BYTES;
+
+  Packet.Asb     = NULL;
+  Packet.Acb     = &Acb;
+  Packet.Timeout = Timeout;
+  Packet.Length  = EFI_ATA_PASS_THRU_LENGTH_BYTES;
 
   Status = AtaPassThru->PassThru (
                           AtaPassThru,
@@ -2135,5 +2165,6 @@ TrustTransferAtaDevice (
       *TransferLengthOut = Packet.InTransferLength;
     }
   }
+
   return Status;
 }

@@ -236,15 +236,14 @@ EFI_STATUS
 /// Specification for more information on these interfaces.
 ///
 struct _PEI_USB_HOST_CONTROLLER_PPI {
-  PEI_USB_HOST_CONTROLLER_CONTROL_TRANSFER            ControlTransfer;
-  PEI_USB_HOST_CONTROLLER_BULK_TRANSFER               BulkTransfer;
-  PEI_USB_HOST_CONTROLLER_GET_ROOTHUB_PORT_NUMBER     GetRootHubPortNumber;
-  PEI_USB_HOST_CONTROLLER_GET_ROOTHUB_PORT_STATUS     GetRootHubPortStatus;
-  PEI_USB_HOST_CONTROLLER_SET_ROOTHUB_PORT_FEATURE    SetRootHubPortFeature;
-  PEI_USB_HOST_CONTROLLER_CLEAR_ROOTHUB_PORT_FEATURE  ClearRootHubPortFeature;
+  PEI_USB_HOST_CONTROLLER_CONTROL_TRANSFER              ControlTransfer;
+  PEI_USB_HOST_CONTROLLER_BULK_TRANSFER                 BulkTransfer;
+  PEI_USB_HOST_CONTROLLER_GET_ROOTHUB_PORT_NUMBER       GetRootHubPortNumber;
+  PEI_USB_HOST_CONTROLLER_GET_ROOTHUB_PORT_STATUS       GetRootHubPortStatus;
+  PEI_USB_HOST_CONTROLLER_SET_ROOTHUB_PORT_FEATURE      SetRootHubPortFeature;
+  PEI_USB_HOST_CONTROLLER_CLEAR_ROOTHUB_PORT_FEATURE    ClearRootHubPortFeature;
 };
 
-extern EFI_GUID gPeiUsbHostControllerPpiGuid;
+extern EFI_GUID  gPeiUsbHostControllerPpiGuid;
 
 #endif
-

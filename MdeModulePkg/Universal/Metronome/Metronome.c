@@ -26,7 +26,7 @@ EFI_HANDLE  mMetronomeHandle = NULL;
 //
 // The Metronome Architectural Protocol instance produced by this driver
 //
-EFI_METRONOME_ARCH_PROTOCOL mMetronome = {
+EFI_METRONOME_ARCH_PROTOCOL  mMetronome = {
   WaitForTick,
   1  // TickPeriod = 1*100 ns units
 };
@@ -78,6 +78,7 @@ WaitForTick (
     //
     MicroSecondDelay (TickNumber / 10);
   }
+
   return EFI_SUCCESS;
 }
 
@@ -110,7 +111,8 @@ InstallMetronome (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mMetronomeHandle,
-                  &gEfiMetronomeArchProtocolGuid, &mMetronome,
+                  &gEfiMetronomeArchProtocolGuid,
+                  &mMetronome,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

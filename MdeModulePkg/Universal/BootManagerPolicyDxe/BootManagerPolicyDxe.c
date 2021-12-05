@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiBootManagerLib.h>
 
-CHAR16 mNetworkDeviceList[] = L"_NDL";
+CHAR16  mNetworkDeviceList[] = L"_NDL";
 
 /**
   Connect all the system drivers to controllers and create the network device list in NV storage.
@@ -32,29 +32,30 @@ ConnectAllAndCreateNetworkDeviceList (
   VOID
   )
 {
-  EFI_STATUS                      Status;
-  EFI_HANDLE                      *Handles;
-  UINTN                           HandleCount;
-  EFI_DEVICE_PATH_PROTOCOL        *SingleDevice;
-  EFI_DEVICE_PATH_PROTOCOL        *Devices;
-  EFI_DEVICE_PATH_PROTOCOL        *TempDevicePath;
+  EFI_STATUS                Status;
+  EFI_HANDLE                *Handles;
+  UINTN                     HandleCount;
+  EFI_DEVICE_PATH_PROTOCOL  *SingleDevice;
+  EFI_DEVICE_PATH_PROTOCOL  *Devices;
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
 
   EfiBootManagerConnectAll ();
 
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiManagedNetworkServiceBindingProtocolGuid, NULL, &HandleCount, &Handles);
   if (EFI_ERROR (Status)) {
-    Handles = NULL;
+    Handles     = NULL;
     HandleCount = 0;
   }
 
   Devices = NULL;
   while (HandleCount-- != 0) {
-    Status = gBS->HandleProtocol (Handles[HandleCount], &gEfiDevicePathProtocolGuid, (VOID **) &SingleDevice);
+    Status = gBS->HandleProtocol (Handles[HandleCount], &gEfiDevicePathProtocolGuid, (VOID **)&SingleDevice);
     if (EFI_ERROR (Status) || (SingleDevice == NULL)) {
       continue;
     }
+
     TempDevicePath = Devices;
-    Devices = AppendDevicePathInstance (Devices, SingleDevice);
+    Devices        = AppendDevicePathInstance (Devices, SingleDevice);
     if (TempDevicePath != NULL) {
       FreePool (TempDevicePath);
     }
@@ -89,24 +90,26 @@ ConnectNetwork (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  BOOLEAN                       OneConnected;
-  EFI_DEVICE_PATH_PROTOCOL      *Devices;
-  EFI_DEVICE_PATH_PROTOCOL      *TempDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL      *SingleDevice;
-  UINTN                         Size;
+  EFI_STATUS                Status;
+  BOOLEAN                   OneConnected;
+  EFI_DEVICE_PATH_PROTOCOL  *Devices;
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *SingleDevice;
+  UINTN                     Size;
 
   OneConnected = FALSE;
-  GetVariable2 (mNetworkDeviceList, &gEfiCallerIdGuid, (VOID **) &Devices, NULL);
+  GetVariable2 (mNetworkDeviceList, &gEfiCallerIdGuid, (VOID **)&Devices, NULL);
   TempDevicePath = Devices;
   while (TempDevicePath != NULL) {
     SingleDevice = GetNextDevicePathInstance (&TempDevicePath, &Size);
-    Status = EfiBootManagerConnectDevicePath (SingleDevice, NULL);
+    Status       = EfiBootManagerConnectDevicePath (SingleDevice, NULL);
     if (!EFI_ERROR (Status)) {
       OneConnected = TRUE;
     }
+
     FreePool (SingleDevice);
   }
+
   if (Devices != NULL) {
     FreePool (Devices);
   }
@@ -148,13 +151,13 @@ ConnectNetwork (
 EFI_STATUS
 EFIAPI
 BootManagerPolicyConnectDevicePath (
-  IN EFI_BOOT_MANAGER_POLICY_PROTOCOL *This,
-  IN EFI_DEVICE_PATH                  *DevicePath,
-  IN BOOLEAN                          Recursive
+  IN EFI_BOOT_MANAGER_POLICY_PROTOCOL  *This,
+  IN EFI_DEVICE_PATH                   *DevicePath,
+  IN BOOLEAN                           Recursive
   )
 {
-  EFI_STATUS                          Status;
-  EFI_HANDLE                          Controller;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Controller;
 
   if (EfiGetCurrentTpl () != TPL_APPLICATION) {
     return EFI_UNSUPPORTED;
@@ -173,8 +176,10 @@ BootManagerPolicyConnectDevicePath (
       Status = gBS->ConnectController (Controller, NULL, DevicePath, FALSE);
     }
   }
+
   return Status;
 }
+
 /**
   Connect a class of devices using the platform Boot Manager policy.
 
@@ -221,8 +226,8 @@ BootManagerPolicyConnectDevicePath (
 EFI_STATUS
 EFIAPI
 BootManagerPolicyConnectDeviceClass (
-  IN EFI_BOOT_MANAGER_POLICY_PROTOCOL *This,
-  IN EFI_GUID                         *Class
+  IN EFI_BOOT_MANAGER_POLICY_PROTOCOL  *This,
+  IN EFI_GUID                          *Class
   )
 {
   if (EfiGetCurrentTpl () != TPL_APPLICATION) {
@@ -264,18 +269,19 @@ EFI_BOOT_MANAGER_POLICY_PROTOCOL  mBootManagerPolicy = {
 EFI_STATUS
 EFIAPI
 BootManagerPolicyInitialize (
-  IN EFI_HANDLE                            ImageHandle,
-  IN EFI_SYSTEM_TABLE                      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_HANDLE                               Handle;
+  EFI_HANDLE  Handle;
 
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiBootManagerPolicyProtocolGuid);
 
   Handle = NULL;
   return gBS->InstallMultipleProtocolInterfaces (
                 &Handle,
-                &gEfiBootManagerPolicyProtocolGuid, &mBootManagerPolicy,
+                &gEfiBootManagerPolicyProtocolGuid,
+                &mBootManagerPolicy,
                 NULL
                 );
 }

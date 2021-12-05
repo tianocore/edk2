@@ -20,15 +20,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 typedef struct {
-  EFI_GUID   Guid;
-  UINTN      NameSize;
-  UINTN      DataSize;
-  EFI_STATUS SetStatus;
-  UINT32     Attributes;
+  EFI_GUID      Guid;
+  UINTN         NameSize;
+  UINTN         DataSize;
+  EFI_STATUS    SetStatus;
+  UINT32        Attributes;
   // CHAR16  Name[];
   // UINT8   Data[];
 } EDKII_SET_VARIABLE_STATUS;
 
-extern EFI_GUID gEdkiiStatusCodeDataTypeVariableGuid;
+extern EFI_GUID  gEdkiiStatusCodeDataTypeVariableGuid;
 
 #endif // _STATUS_CODE_DATA_TYPE_VARIABLE_H_

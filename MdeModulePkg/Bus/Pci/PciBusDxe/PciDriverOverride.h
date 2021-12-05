@@ -6,22 +6,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef _EFI_PCI_DRIVER_OVERRRIDE_H_
 #define _EFI_PCI_DRIVER_OVERRRIDE_H_
 
-#define DRIVER_OVERRIDE_SIGNATURE SIGNATURE_32 ('d', 'r', 'o', 'v')
+#define DRIVER_OVERRIDE_SIGNATURE  SIGNATURE_32 ('d', 'r', 'o', 'v')
 
 //
 // PCI driver override driver image list
 //
 typedef struct {
-  UINT32                   Signature;
-  LIST_ENTRY               Link;
-  EFI_HANDLE               DriverImageHandle;
-  EFI_DEVICE_PATH_PROTOCOL *DriverImagePath;
+  UINT32                      Signature;
+  LIST_ENTRY                  Link;
+  EFI_HANDLE                  DriverImageHandle;
+  EFI_DEVICE_PATH_PROTOCOL    *DriverImagePath;
 } PCI_DRIVER_OVERRIDE_LIST;
-
 
 #define DRIVER_OVERRIDE_FROM_LINK(a) \
   CR (a, PCI_DRIVER_OVERRIDE_LIST, Link, DRIVER_OVERRIDE_SIGNATURE)
@@ -34,7 +32,7 @@ typedef struct {
 **/
 VOID
 InitializePciDriverOverrideInstance (
-  IN OUT PCI_IO_DEVICE          *PciIoDevice
+  IN OUT PCI_IO_DEVICE  *PciIoDevice
   );
 
 /**
@@ -51,11 +49,10 @@ InitializePciDriverOverrideInstance (
 **/
 EFI_STATUS
 AddDriver (
-  IN PCI_IO_DEVICE            *PciIoDevice,
-  IN EFI_HANDLE               DriverImageHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL *DriverImagePath
+  IN PCI_IO_DEVICE             *PciIoDevice,
+  IN EFI_HANDLE                DriverImageHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL  *DriverImagePath
   );
-
 
 /**
   Uses a bus specific algorithm to retrieve a driver image handle for a controller.
@@ -76,8 +73,8 @@ AddDriver (
 EFI_STATUS
 EFIAPI
 GetDriver (
-  IN EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL              *This,
-  IN OUT EFI_HANDLE                                         *DriverImageHandle
+  IN EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL  *This,
+  IN OUT EFI_HANDLE                             *DriverImageHandle
   );
 
 #endif

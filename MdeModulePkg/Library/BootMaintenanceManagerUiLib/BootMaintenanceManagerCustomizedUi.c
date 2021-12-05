@@ -27,19 +27,19 @@ UiCustomizeBMMPage (
   //
   // Create "Boot Option" menu.
   //
-  BmmCreateBootOptionMenu(HiiHandle, StartOpCodeHandle);
+  BmmCreateBootOptionMenu (HiiHandle, StartOpCodeHandle);
   //
   // Create "Driver Option" menu.
   //
-  BmmCreateDriverOptionMenu(HiiHandle, StartOpCodeHandle);
+  BmmCreateDriverOptionMenu (HiiHandle, StartOpCodeHandle);
   //
   // Create "Com Option" menu.
   //
-  BmmCreateComOptionMenu(HiiHandle, StartOpCodeHandle);
+  BmmCreateComOptionMenu (HiiHandle, StartOpCodeHandle);
   //
   // Create "Boot From File" menu.
   //
-  BmmCreateBootFromFileMenu(HiiHandle, StartOpCodeHandle);
+  BmmCreateBootFromFileMenu (HiiHandle, StartOpCodeHandle);
 
   //
   // Find third party drivers which need to be shown in the Bmm page.
@@ -81,12 +81,12 @@ UiCustomizeBMMPage (
 **/
 EFI_STATUS
 UiBMMCallbackHandler (
-  IN  EFI_HII_HANDLE                         HiiHandle,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  EFI_HII_HANDLE              HiiHandle,
+  IN  EFI_BROWSER_ACTION          Action,
+  IN  EFI_QUESTION_ID             QuestionId,
+  IN  UINT8                       Type,
+  IN  EFI_IFR_TYPE_VALUE          *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest
   )
 {
   return EFI_UNSUPPORTED;

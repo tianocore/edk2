@@ -17,54 +17,54 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //       based on whether or not a debugger is present, and other
 //       platform-specific configurations.
 //
-#define VM_STACK_SIZE   (1024 * 8)
+#define VM_STACK_SIZE  (1024 * 8)
 
-#define STACK_REMAIN_SIZE (1024 * 4)
+#define STACK_REMAIN_SIZE  (1024 * 4)
 
 //
 // This is instruction buffer used to create EBC thunk
 //
-#define EBC_ENTRYPOINT_SIGNATURE           0xAFAFAFAFAFAFAFAFull
-#define EBC_LL_EBC_ENTRYPOINT_SIGNATURE    0xFAFAFAFAFAFAFAFAull
+#define EBC_ENTRYPOINT_SIGNATURE         0xAFAFAFAFAFAFAFAFull
+#define EBC_LL_EBC_ENTRYPOINT_SIGNATURE  0xFAFAFAFAFAFAFAFAull
 UINT8  mInstructionBufferTemplate[] = {
   //
   // Add a magic code here to help the VM recognize the thunk..
   // mov rax, 0xca112ebcca112ebc  => 48 B8 BC 2E 11 CA BC 2E 11 CA
   //
-  0x48, 0xB8, 0xBC, 0x2E, 0x11, 0xCA, 0xBC, 0x2E, 0x11, 0xCA,
+  0x48,                                                    0xB8, 0xBC, 0x2E, 0x11, 0xCA, 0xBC, 0x2E, 0x11, 0xCA,
   //
   // Add code bytes to load up a processor register with the EBC entry point.
   //  mov r10, EbcEntryPoint  => 49 BA XX XX XX XX XX XX XX XX (To be fixed at runtime)
   // These 8 bytes of the thunk entry is the address of the EBC
   // entry point.
   //
-  0x49, 0xBA,
-    (UINT8)(EBC_ENTRYPOINT_SIGNATURE & 0xFF),
-    (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 8) & 0xFF),
-    (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 16) & 0xFF),
-    (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 24) & 0xFF),
-    (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 32) & 0xFF),
-    (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 40) & 0xFF),
-    (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 48) & 0xFF),
-    (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 56) & 0xFF),
+  0x49,                                                    0xBA,
+  (UINT8)(EBC_ENTRYPOINT_SIGNATURE & 0xFF),
+  (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 8) & 0xFF),
+  (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 16) & 0xFF),
+  (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 24) & 0xFF),
+  (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 32) & 0xFF),
+  (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 40) & 0xFF),
+  (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 48) & 0xFF),
+  (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 56) & 0xFF),
   //
   // Stick in a load of r11 with the address of appropriate VM function.
   //  mov r11, EbcLLEbcInterpret  => 49 BB XX XX XX XX XX XX XX XX (To be fixed at runtime)
   //
-  0x49, 0xBB,
-    (UINT8)(EBC_LL_EBC_ENTRYPOINT_SIGNATURE & 0xFF),
-    (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 8) & 0xFF),
-    (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 16) & 0xFF),
-    (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 24) & 0xFF),
-    (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 32) & 0xFF),
-    (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 40) & 0xFF),
-    (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 48) & 0xFF),
-    (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 56) & 0xFF),
+  0x49,                                                    0xBB,
+  (UINT8)(EBC_LL_EBC_ENTRYPOINT_SIGNATURE & 0xFF),
+  (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 8) & 0xFF),
+  (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 16) & 0xFF),
+  (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 24) & 0xFF),
+  (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 32) & 0xFF),
+  (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 40) & 0xFF),
+  (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 48) & 0xFF),
+  (UINT8)((EBC_LL_EBC_ENTRYPOINT_SIGNATURE >> 56) & 0xFF),
   //
   // Stick in jump opcode bytes
   //  jmp r11 => 41 FF E3
   //
-  0x41, 0xFF, 0xE3,
+  0x41,                                                    0xFF, 0xE3,
 };
 
 /**
@@ -102,19 +102,18 @@ EbcLLExecuteEbcImageEntryPoint (
 **/
 VOID
 PushU64 (
-  IN VM_CONTEXT *VmPtr,
-  IN UINT64     Arg
+  IN VM_CONTEXT  *VmPtr,
+  IN UINT64      Arg
   )
 {
   //
   // Advance the VM stack down, and then copy the argument to the stack.
   // Hope it's aligned.
   //
-  VmPtr->Gpr[0] -= sizeof (UINT64);
-  *(UINT64 *) VmPtr->Gpr[0] = Arg;
+  VmPtr->Gpr[0]           -= sizeof (UINT64);
+  *(UINT64 *)VmPtr->Gpr[0] = Arg;
   return;
 }
-
 
 /**
   Begin executing an EBC image.
@@ -147,23 +146,23 @@ PushU64 (
 UINT64
 EFIAPI
 EbcInterpret (
-  IN UINTN      EntryPoint,
-  IN UINTN      Arg1,
-  IN UINTN      Arg2,
-  IN UINTN      Arg3,
-  IN UINTN      Arg4,
-  IN UINTN      Arg5,
-  IN UINTN      Arg6,
-  IN UINTN      Arg7,
-  IN UINTN      Arg8,
-  IN UINTN      Arg9,
-  IN UINTN      Arg10,
-  IN UINTN      Arg11,
-  IN UINTN      Arg12,
-  IN UINTN      Arg13,
-  IN UINTN      Arg14,
-  IN UINTN      Arg15,
-  IN UINTN      Arg16
+  IN UINTN  EntryPoint,
+  IN UINTN  Arg1,
+  IN UINTN  Arg2,
+  IN UINTN  Arg3,
+  IN UINTN  Arg4,
+  IN UINTN  Arg5,
+  IN UINTN  Arg6,
+  IN UINTN  Arg7,
+  IN UINTN  Arg8,
+  IN UINTN  Arg9,
+  IN UINTN  Arg10,
+  IN UINTN  Arg11,
+  IN UINTN  Arg12,
+  IN UINTN  Arg13,
+  IN UINTN  Arg14,
+  IN UINTN  Arg15,
+  IN UINTN  Arg16
   )
 {
   //
@@ -182,12 +181,12 @@ EbcInterpret (
   //
   // Now clear out our context
   //
-  ZeroMem ((VOID *) &VmContext, sizeof (VM_CONTEXT));
+  ZeroMem ((VOID *)&VmContext, sizeof (VM_CONTEXT));
 
   //
   // Set the VM instruction pointer to the correct location in memory.
   //
-  VmContext.Ip = (VMIP) Addr;
+  VmContext.Ip = (VMIP)Addr;
 
   //
   // Initialize the stack pointer for the EBC. Get the current system stack
@@ -198,14 +197,15 @@ EbcInterpret (
   // Adjust the VM's stack pointer down.
   //
 
-  Status = GetEBCStack((EFI_HANDLE)(UINTN)-1, &VmContext.StackPool, &StackIndex);
-  if (EFI_ERROR(Status)) {
+  Status = GetEBCStack ((EFI_HANDLE)(UINTN)-1, &VmContext.StackPool, &StackIndex);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
-  VmContext.StackTop = (UINT8*)VmContext.StackPool + (STACK_REMAIN_SIZE);
-  VmContext.Gpr[0] = (UINT64) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
-  VmContext.HighStackBottom = (UINTN) VmContext.Gpr[0];
-  VmContext.Gpr[0] -= sizeof (UINTN);
+
+  VmContext.StackTop        = (UINT8 *)VmContext.StackPool + (STACK_REMAIN_SIZE);
+  VmContext.Gpr[0]          = (UINT64)((UINT8 *)VmContext.StackPool + STACK_POOL_SIZE);
+  VmContext.HighStackBottom = (UINTN)VmContext.Gpr[0];
+  VmContext.Gpr[0]         -= sizeof (UINTN);
 
   //
   // Align the stack on a natural boundary.
@@ -215,46 +215,46 @@ EbcInterpret (
   //
   // Put a magic value in the stack gap, then adjust down again.
   //
-  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) VM_STACK_KEY_VALUE;
-  VmContext.StackMagicPtr             = (UINTN *) (UINTN) VmContext.Gpr[0];
+  *(UINTN *)(UINTN)(VmContext.Gpr[0]) = (UINTN)VM_STACK_KEY_VALUE;
+  VmContext.StackMagicPtr             = (UINTN *)(UINTN)VmContext.Gpr[0];
 
   //
   // The stack upper to LowStackTop is belong to the VM.
   //
-  VmContext.LowStackTop   = (UINTN) VmContext.Gpr[0];
+  VmContext.LowStackTop = (UINTN)VmContext.Gpr[0];
 
   //
   // For the worst case, assume there are 4 arguments passed in registers, store
   // them to VM's stack.
   //
-  PushU64 (&VmContext, (UINT64) Arg16);
-  PushU64 (&VmContext, (UINT64) Arg15);
-  PushU64 (&VmContext, (UINT64) Arg14);
-  PushU64 (&VmContext, (UINT64) Arg13);
-  PushU64 (&VmContext, (UINT64) Arg12);
-  PushU64 (&VmContext, (UINT64) Arg11);
-  PushU64 (&VmContext, (UINT64) Arg10);
-  PushU64 (&VmContext, (UINT64) Arg9);
-  PushU64 (&VmContext, (UINT64) Arg8);
-  PushU64 (&VmContext, (UINT64) Arg7);
-  PushU64 (&VmContext, (UINT64) Arg6);
-  PushU64 (&VmContext, (UINT64) Arg5);
-  PushU64 (&VmContext, (UINT64) Arg4);
-  PushU64 (&VmContext, (UINT64) Arg3);
-  PushU64 (&VmContext, (UINT64) Arg2);
-  PushU64 (&VmContext, (UINT64) Arg1);
+  PushU64 (&VmContext, (UINT64)Arg16);
+  PushU64 (&VmContext, (UINT64)Arg15);
+  PushU64 (&VmContext, (UINT64)Arg14);
+  PushU64 (&VmContext, (UINT64)Arg13);
+  PushU64 (&VmContext, (UINT64)Arg12);
+  PushU64 (&VmContext, (UINT64)Arg11);
+  PushU64 (&VmContext, (UINT64)Arg10);
+  PushU64 (&VmContext, (UINT64)Arg9);
+  PushU64 (&VmContext, (UINT64)Arg8);
+  PushU64 (&VmContext, (UINT64)Arg7);
+  PushU64 (&VmContext, (UINT64)Arg6);
+  PushU64 (&VmContext, (UINT64)Arg5);
+  PushU64 (&VmContext, (UINT64)Arg4);
+  PushU64 (&VmContext, (UINT64)Arg3);
+  PushU64 (&VmContext, (UINT64)Arg2);
+  PushU64 (&VmContext, (UINT64)Arg1);
 
   //
   // Interpreter assumes 64-bit return address is pushed on the stack.
   // The x64 does not do this so pad the stack accordingly.
   //
-  PushU64 (&VmContext, (UINT64) 0);
-  PushU64 (&VmContext, (UINT64) 0x1234567887654321ULL);
+  PushU64 (&VmContext, (UINT64)0);
+  PushU64 (&VmContext, (UINT64)0x1234567887654321ULL);
 
   //
   // For x64, this is where we say our return address is
   //
-  VmContext.StackRetAddr  = (UINT64) VmContext.Gpr[0];
+  VmContext.StackRetAddr = (UINT64)VmContext.Gpr[0];
 
   //
   // We need to keep track of where the EBC stack starts. This way, if the EBC
@@ -279,10 +279,9 @@ EbcInterpret (
   //
   // Return the value in Gpr[7] unless there was an error
   //
-  ReturnEBCStack(StackIndex);
-  return (UINT64) VmContext.Gpr[7];
+  ReturnEBCStack (StackIndex);
+  return (UINT64)VmContext.Gpr[7];
 }
-
 
 /**
   Begin executing an EBC image.
@@ -298,9 +297,9 @@ EbcInterpret (
 UINT64
 EFIAPI
 ExecuteEbcImageEntryPoint (
-  IN UINTN                EntryPoint,
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN UINTN             EntryPoint,
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   //
@@ -319,7 +318,7 @@ ExecuteEbcImageEntryPoint (
   //
   // Now clear out our context
   //
-  ZeroMem ((VOID *) &VmContext, sizeof (VM_CONTEXT));
+  ZeroMem ((VOID *)&VmContext, sizeof (VM_CONTEXT));
 
   //
   // Save the image handle so we can track the thunks created for this image
@@ -330,52 +329,52 @@ ExecuteEbcImageEntryPoint (
   //
   // Set the VM instruction pointer to the correct location in memory.
   //
-  VmContext.Ip = (VMIP) Addr;
+  VmContext.Ip = (VMIP)Addr;
 
   //
   // Initialize the stack pointer for the EBC. Get the current system stack
   // pointer and adjust it down by the max needed for the interpreter.
   //
 
-  Status = GetEBCStack(ImageHandle, &VmContext.StackPool, &StackIndex);
-  if (EFI_ERROR(Status)) {
+  Status = GetEBCStack (ImageHandle, &VmContext.StackPool, &StackIndex);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
-  VmContext.StackTop = (UINT8*)VmContext.StackPool + (STACK_REMAIN_SIZE);
-  VmContext.Gpr[0] = (UINT64) ((UINT8*)VmContext.StackPool + STACK_POOL_SIZE);
-  VmContext.HighStackBottom = (UINTN) VmContext.Gpr[0];
-  VmContext.Gpr[0] -= sizeof (UINTN);
 
+  VmContext.StackTop        = (UINT8 *)VmContext.StackPool + (STACK_REMAIN_SIZE);
+  VmContext.Gpr[0]          = (UINT64)((UINT8 *)VmContext.StackPool + STACK_POOL_SIZE);
+  VmContext.HighStackBottom = (UINTN)VmContext.Gpr[0];
+  VmContext.Gpr[0]         -= sizeof (UINTN);
 
   //
   // Put a magic value in the stack gap, then adjust down again
   //
-  *(UINTN *) (UINTN) (VmContext.Gpr[0]) = (UINTN) VM_STACK_KEY_VALUE;
-  VmContext.StackMagicPtr             = (UINTN *) (UINTN) VmContext.Gpr[0];
+  *(UINTN *)(UINTN)(VmContext.Gpr[0]) = (UINTN)VM_STACK_KEY_VALUE;
+  VmContext.StackMagicPtr             = (UINTN *)(UINTN)VmContext.Gpr[0];
 
   //
   // Align the stack on a natural boundary
-  VmContext.Gpr[0] &= ~(VM_REGISTER)(sizeof(UINTN) - 1);
+  VmContext.Gpr[0] &= ~(VM_REGISTER)(sizeof (UINTN) - 1);
   //
-  VmContext.LowStackTop   = (UINTN) VmContext.Gpr[0];
+  VmContext.LowStackTop = (UINTN)VmContext.Gpr[0];
 
   //
   // Simply copy the image handle and system table onto the EBC stack.
   // Greatly simplifies things by not having to spill the args.
   //
-  PushU64 (&VmContext, (UINT64) SystemTable);
-  PushU64 (&VmContext, (UINT64) ImageHandle);
+  PushU64 (&VmContext, (UINT64)SystemTable);
+  PushU64 (&VmContext, (UINT64)ImageHandle);
 
   //
   // VM pushes 16-bytes for return address. Simulate that here.
   //
-  PushU64 (&VmContext, (UINT64) 0);
-  PushU64 (&VmContext, (UINT64) 0x1234567887654321ULL);
+  PushU64 (&VmContext, (UINT64)0);
+  PushU64 (&VmContext, (UINT64)0x1234567887654321ULL);
 
   //
   // For x64, this is where we say our return address is
   //
-  VmContext.StackRetAddr  = (UINT64) VmContext.Gpr[0];
+  VmContext.StackRetAddr = (UINT64)VmContext.Gpr[0];
 
   //
   // Entry function needn't access high stack context, simply
@@ -391,10 +390,9 @@ ExecuteEbcImageEntryPoint (
   //
   // Return the value in Gpr[7] unless there was an error
   //
-  ReturnEBCStack(StackIndex);
-  return (UINT64) VmContext.Gpr[7];
+  ReturnEBCStack (StackIndex);
+  return (UINT64)VmContext.Gpr[7];
 }
-
 
 /**
   Create thunks for an EBC image entry point, or an EBC protocol service.
@@ -415,31 +413,32 @@ ExecuteEbcImageEntryPoint (
 **/
 EFI_STATUS
 EbcCreateThunks (
-  IN EFI_HANDLE           ImageHandle,
-  IN VOID                 *EbcEntryPoint,
-  OUT VOID                **Thunk,
-  IN  UINT32              Flags
+  IN EFI_HANDLE  ImageHandle,
+  IN VOID        *EbcEntryPoint,
+  OUT VOID       **Thunk,
+  IN  UINT32     Flags
   )
 {
-  UINT8       *Ptr;
-  UINT8       *ThunkBase;
-  UINT32      Index;
-  INT32       ThunkSize;
+  UINT8   *Ptr;
+  UINT8   *ThunkBase;
+  UINT32  Index;
+  INT32   ThunkSize;
 
   //
   // Check alignment of pointer to EBC code
   //
-  if ((UINT32) (UINTN) EbcEntryPoint & 0x01) {
+  if ((UINT32)(UINTN)EbcEntryPoint & 0x01) {
     return EFI_INVALID_PARAMETER;
   }
 
-  ThunkSize = sizeof(mInstructionBufferTemplate);
+  ThunkSize = sizeof (mInstructionBufferTemplate);
 
-  Ptr = EbcAllocatePoolForThunk (sizeof(mInstructionBufferTemplate));
+  Ptr = EbcAllocatePoolForThunk (sizeof (mInstructionBufferTemplate));
 
   if (Ptr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   //
   //  Print(L"Allocate TH: 0x%X\n", (UINT32)Ptr);
   //
@@ -450,20 +449,21 @@ EbcCreateThunks (
   //
   // Give them the address of our buffer we're going to fix up
   //
-  *Thunk = (VOID *) Ptr;
+  *Thunk = (VOID *)Ptr;
 
   //
   // Copy whole thunk instruction buffer template
   //
-  CopyMem (Ptr, mInstructionBufferTemplate, sizeof(mInstructionBufferTemplate));
+  CopyMem (Ptr, mInstructionBufferTemplate, sizeof (mInstructionBufferTemplate));
 
   //
   // Patch EbcEntryPoint and EbcLLEbcInterpret
   //
-  for (Index = 0; Index < sizeof(mInstructionBufferTemplate) - sizeof(UINTN); Index++) {
+  for (Index = 0; Index < sizeof (mInstructionBufferTemplate) - sizeof (UINTN); Index++) {
     if (*(UINTN *)&Ptr[Index] == EBC_ENTRYPOINT_SIGNATURE) {
       *(UINTN *)&Ptr[Index] = (UINTN)EbcEntryPoint;
     }
+
     if (*(UINTN *)&Ptr[Index] == EBC_LL_EBC_ENTRYPOINT_SIGNATURE) {
       if ((Flags & FLAG_THUNK_ENTRY_POINT) != 0) {
         *(UINTN *)&Ptr[Index] = (UINTN)EbcLLExecuteEbcImageEntryPoint;
@@ -477,11 +477,10 @@ EbcCreateThunks (
   // Add the thunk to the list for this image. Do this last since the add
   // function flushes the cache for us.
   //
-  EbcAddImageThunk (ImageHandle, (VOID *) ThunkBase, ThunkSize);
+  EbcAddImageThunk (ImageHandle, (VOID *)ThunkBase, ThunkSize);
 
   return EFI_SUCCESS;
 }
-
 
 /**
   This function is called to execute an EBC CALLEX instruction.
@@ -500,60 +499,62 @@ EbcCreateThunks (
 **/
 VOID
 EbcLLCALLEX (
-  IN VM_CONTEXT   *VmPtr,
-  IN UINTN        FuncAddr,
-  IN UINTN        NewStackPointer,
-  IN VOID         *FramePtr,
-  IN UINT8        Size
+  IN VM_CONTEXT  *VmPtr,
+  IN UINTN       FuncAddr,
+  IN UINTN       NewStackPointer,
+  IN VOID        *FramePtr,
+  IN UINT8       Size
   )
 {
-  UINTN    IsThunk;
-  UINTN    TargetEbcAddr;
-  UINT8    InstructionBuffer[sizeof(mInstructionBufferTemplate)];
-  UINTN    Index;
-  UINTN    IndexOfEbcEntrypoint;
+  UINTN  IsThunk;
+  UINTN  TargetEbcAddr;
+  UINT8  InstructionBuffer[sizeof (mInstructionBufferTemplate)];
+  UINTN  Index;
+  UINTN  IndexOfEbcEntrypoint;
 
-  IsThunk       = 1;
-  TargetEbcAddr = 0;
+  IsThunk              = 1;
+  TargetEbcAddr        = 0;
   IndexOfEbcEntrypoint = 0;
 
   //
   // Processor specific code to check whether the callee is a thunk to EBC.
   //
-  CopyMem (InstructionBuffer, (VOID *)FuncAddr, sizeof(InstructionBuffer));
+  CopyMem (InstructionBuffer, (VOID *)FuncAddr, sizeof (InstructionBuffer));
   //
   // Fill the signature according to mInstructionBufferTemplate
   //
-  for (Index = 0; Index < sizeof(mInstructionBufferTemplate) - sizeof(UINTN); Index++) {
+  for (Index = 0; Index < sizeof (mInstructionBufferTemplate) - sizeof (UINTN); Index++) {
     if (*(UINTN *)&mInstructionBufferTemplate[Index] == EBC_ENTRYPOINT_SIGNATURE) {
       *(UINTN *)&InstructionBuffer[Index] = EBC_ENTRYPOINT_SIGNATURE;
-      IndexOfEbcEntrypoint = Index;
+      IndexOfEbcEntrypoint                = Index;
     }
+
     if (*(UINTN *)&mInstructionBufferTemplate[Index] == EBC_LL_EBC_ENTRYPOINT_SIGNATURE) {
       *(UINTN *)&InstructionBuffer[Index] = EBC_LL_EBC_ENTRYPOINT_SIGNATURE;
     }
   }
+
   //
   // Check if we need thunk to native
   //
-  if (CompareMem (InstructionBuffer, mInstructionBufferTemplate, sizeof(mInstructionBufferTemplate)) != 0) {
+  if (CompareMem (InstructionBuffer, mInstructionBufferTemplate, sizeof (mInstructionBufferTemplate)) != 0) {
     IsThunk = 0;
   }
 
-  if (IsThunk == 1){
+  if (IsThunk == 1) {
     //
     // The callee is a thunk to EBC, adjust the stack pointer down 16 bytes and
     // put our return address and frame pointer on the VM stack.
     // Then set the VM's IP to new EBC code.
     //
     VmPtr->Gpr[0] -= 8;
-    VmWriteMemN (VmPtr, (UINTN) VmPtr->Gpr[0], (UINTN) FramePtr);
-    VmPtr->FramePtr = (VOID *) (UINTN) VmPtr->Gpr[0];
-    VmPtr->Gpr[0] -= 8;
-    VmWriteMem64 (VmPtr, (UINTN) VmPtr->Gpr[0], (UINT64) (UINTN) (VmPtr->Ip + Size));
+    VmWriteMemN (VmPtr, (UINTN)VmPtr->Gpr[0], (UINTN)FramePtr);
+    VmPtr->FramePtr = (VOID *)(UINTN)VmPtr->Gpr[0];
+    VmPtr->Gpr[0]  -= 8;
+    VmWriteMem64 (VmPtr, (UINTN)VmPtr->Gpr[0], (UINT64)(UINTN)(VmPtr->Ip + Size));
 
-    CopyMem (&TargetEbcAddr, (UINT8 *)FuncAddr + IndexOfEbcEntrypoint, sizeof(UINTN));
-    VmPtr->Ip = (VMIP) (UINTN) TargetEbcAddr;
+    CopyMem (&TargetEbcAddr, (UINT8 *)FuncAddr + IndexOfEbcEntrypoint, sizeof (UINTN));
+    VmPtr->Ip = (VMIP)(UINTN)TargetEbcAddr;
   } else {
     //
     // The callee is not a thunk to EBC, call native code,
@@ -567,4 +568,3 @@ EbcLLCALLEX (
     VmPtr->Ip += Size;
   }
 }
-

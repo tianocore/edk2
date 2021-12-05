@@ -11,16 +11,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Uefi.h>
 
-#define EDB_BYTECODE_NUMBER_IN_LINE     5
+#define EDB_BYTECODE_NUMBER_IN_LINE  5
 
 #ifdef EFI32
-#define EDB_PRINT_ADDRESS_FORMAT    L"%08x: "
+#define EDB_PRINT_ADDRESS_FORMAT  L"%08x: "
 #else
 // To use 012l instead of 016l because space is not enough
-#define EDB_PRINT_ADDRESS_FORMAT    L"%012lx: "
+#define EDB_PRINT_ADDRESS_FORMAT  L"%012lx: "
 #endif
 
-#define OPCODE_MAX 0x40
+#define OPCODE_MAX  0x40
 
 #define EDB_INSTRUCTION_NAME_MAX_LENGTH     10
 #define EDB_INSTRUCTION_NAME_MAX_SIZE       (EDB_INSTRUCTION_NAME_MAX_LENGTH * sizeof(CHAR16))
@@ -37,8 +37,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 EdbSetOffset (
-  IN UINTN InstructionNameOffset,
-  IN UINTN InstructionContentOffset
+  IN UINTN  InstructionNameOffset,
+  IN UINTN  InstructionContentOffset
   );
 
 /**
@@ -76,7 +76,7 @@ EdbPostInstructionString (
 **/
 UINTN
 EdbPrintInstructionName (
-  IN CHAR16                 *Name
+  IN CHAR16  *Name
   );
 
 /**
@@ -144,7 +144,7 @@ EdbGetNaturalIndex64 (
 **/
 UINTN
 EdbPrintRawIndexData16 (
-  IN UINT16                 Data16
+  IN UINT16  Data16
   );
 
 /**
@@ -158,7 +158,7 @@ EdbPrintRawIndexData16 (
 **/
 UINTN
 EdbPrintRawIndexData32 (
-  IN UINT32                 Data32
+  IN UINT32  Data32
   );
 
 /**
@@ -172,7 +172,7 @@ EdbPrintRawIndexData32 (
 **/
 UINTN
 EdbPrintRawIndexData64 (
-  IN UINT64                 Data64
+  IN UINT64  Data64
   );
 
 /**
@@ -186,7 +186,7 @@ EdbPrintRawIndexData64 (
 **/
 UINTN
 EdbPrintRegister1 (
-  IN UINT8                  Operands
+  IN UINT8  Operands
   );
 
 /**
@@ -200,7 +200,7 @@ EdbPrintRegister1 (
 **/
 UINTN
 EdbPrintRegister2 (
-  IN UINT8                  Operands
+  IN UINT8  Operands
   );
 
 /**
@@ -214,7 +214,7 @@ EdbPrintRegister2 (
 **/
 UINTN
 EdbPrintDedicatedRegister1 (
-  IN UINT8                  Operands
+  IN UINT8  Operands
   );
 
 /**
@@ -228,7 +228,7 @@ EdbPrintDedicatedRegister1 (
 **/
 UINTN
 EdbPrintDedicatedRegister2 (
-  IN UINT8                  Operands
+  IN UINT8  Operands
   );
 
 /**
@@ -244,9 +244,9 @@ EdbPrintDedicatedRegister2 (
 **/
 UINTN
 EdbPrintIndexData (
-  IN BOOLEAN                Sign,
-  IN UINTN                  NaturalUnits,
-  IN UINTN                  ConstantUnits
+  IN BOOLEAN  Sign,
+  IN UINTN    NaturalUnits,
+  IN UINTN    ConstantUnits
   );
 
 /**
@@ -262,9 +262,9 @@ EdbPrintIndexData (
 **/
 UINTN
 EdbPrintIndexData64 (
-  IN BOOLEAN                Sign,
-  IN UINT64                 NaturalUnits,
-  IN UINT64                 ConstantUnits
+  IN BOOLEAN  Sign,
+  IN UINT64   NaturalUnits,
+  IN UINT64   ConstantUnits
   );
 
 /**
@@ -278,7 +278,7 @@ EdbPrintIndexData64 (
 **/
 UINTN
 EdbPrintImmData8 (
-  IN UINT8                  Data
+  IN UINT8  Data
   );
 
 /**
@@ -292,7 +292,7 @@ EdbPrintImmData8 (
 **/
 UINTN
 EdbPrintImmData16 (
-  IN UINT16                 Data
+  IN UINT16  Data
   );
 
 /**
@@ -306,7 +306,7 @@ EdbPrintImmData16 (
 **/
 UINTN
 EdbPrintImmData32 (
-  IN UINT32                 Data
+  IN UINT32  Data
   );
 
 /**
@@ -320,7 +320,7 @@ EdbPrintImmData32 (
 **/
 UINTN
 EdbPrintImmData64 (
-  IN UINT64                 Data
+  IN UINT64  Data
   );
 
 /**
@@ -334,7 +334,7 @@ EdbPrintImmData64 (
 **/
 UINTN
 EdbPrintImmDatan (
-  IN UINTN                  Data
+  IN UINTN  Data
   );
 
 /**
@@ -348,7 +348,7 @@ EdbPrintImmDatan (
 **/
 UINTN
 EdbPrintImmData64n (
-  IN UINT64                 Data64
+  IN UINT64  Data64
   );
 
 /**
@@ -362,7 +362,7 @@ EdbPrintImmData64n (
 **/
 UINTN
 EdbPrintData8 (
-  IN UINT8                  Data8
+  IN UINT8  Data8
   );
 
 /**
@@ -376,7 +376,7 @@ EdbPrintData8 (
 **/
 UINTN
 EdbPrintData16 (
-  IN UINT16                 Data16
+  IN UINT16  Data16
   );
 
 /**
@@ -390,7 +390,7 @@ EdbPrintData16 (
 **/
 UINTN
 EdbPrintData32 (
-  IN UINT32                 Data32
+  IN UINT32  Data32
   );
 
 /**
@@ -404,7 +404,7 @@ EdbPrintData32 (
 **/
 UINTN
 EdbPrintData64 (
-  IN UINT64                 Data64
+  IN UINT64  Data64
   );
 
 /**
@@ -418,7 +418,7 @@ EdbPrintData64 (
 **/
 UINTN
 EdbPrintDatan (
-  IN UINTN                  Data
+  IN UINTN  Data
   );
 
 /**
@@ -432,7 +432,7 @@ EdbPrintDatan (
 **/
 UINTN
 EdbPrintData64n (
-  IN UINT64                 Data64
+  IN UINT64  Data64
   );
 
 /**
@@ -446,7 +446,7 @@ EdbPrintData64n (
 **/
 UINTN
 EdbPrintData8s (
-  IN UINT8                  Data8
+  IN UINT8  Data8
   );
 
 /**
@@ -460,7 +460,7 @@ EdbPrintData8s (
 **/
 UINTN
 EdbPrintData16s (
-  IN UINT16                 Data16
+  IN UINT16  Data16
   );
 
 /**
@@ -474,7 +474,7 @@ EdbPrintData16s (
 **/
 UINTN
 EdbPrintData32s (
-  IN UINT32                 Data32
+  IN UINT32  Data32
   );
 
 /**
@@ -488,7 +488,7 @@ EdbPrintData32s (
 **/
 UINTN
 EdbPrintData64s (
-  IN UINT64                 Data64
+  IN UINT64  Data64
   );
 
 /**
@@ -515,7 +515,7 @@ EdbPrintComma (
 **/
 UINTN
 EdbFindAndPrintSymbol (
-  IN UINTN                  Address
+  IN UINTN  Address
   );
 
 /**
@@ -528,8 +528,8 @@ EdbFindAndPrintSymbol (
 **/
 VOID
 EdbPrintRaw (
-  IN EFI_PHYSICAL_ADDRESS   InstructionAddress,
-  IN UINTN                  InstructionNumber
+  IN EFI_PHYSICAL_ADDRESS  InstructionAddress,
+  IN UINTN                 InstructionNumber
   );
 
 /**
@@ -544,8 +544,8 @@ EdbPrintRaw (
 **/
 EFI_STATUS
 EdbShowDisasm (
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_SYSTEM_CONTEXT        SystemContext
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_SYSTEM_CONTEXT         SystemContext
   );
 
 /**
@@ -560,8 +560,8 @@ EdbShowDisasm (
 **/
 UINT64
 GetRegisterValue (
-  IN     EFI_SYSTEM_CONTEXT        SystemContext,
-  IN     UINT8                     Index
+  IN     EFI_SYSTEM_CONTEXT  SystemContext,
+  IN     UINT8               Index
   );
 
 #endif

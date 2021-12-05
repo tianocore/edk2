@@ -48,7 +48,7 @@ InitEmuNonVolatileVariableStore (
 **/
 EFI_STATUS
 InitRealNonVolatileVariableStore (
-  OUT EFI_PHYSICAL_ADDRESS              *VariableStoreBase
+  OUT EFI_PHYSICAL_ADDRESS  *VariableStoreBase
   );
 
 /**

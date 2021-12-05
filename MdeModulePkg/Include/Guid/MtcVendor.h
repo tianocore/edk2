@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Name of the variable for the high part of monotonic counter
 //
-#define MTC_VARIABLE_NAME L"MTC"
+#define MTC_VARIABLE_NAME  L"MTC"
 
-extern EFI_GUID gMtcVendorGuid;
+extern EFI_GUID  gMtcVendorGuid;
 
 #endif

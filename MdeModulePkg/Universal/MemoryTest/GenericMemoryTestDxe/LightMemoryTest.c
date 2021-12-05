@@ -14,12 +14,12 @@
 // protocol, so we do not need to dynamically allocate the PrivateData.
 //
 EFI_PHYSICAL_ADDRESS    mCurrentAddress;
-LIST_ENTRY          *mCurrentLink;
+LIST_ENTRY              *mCurrentLink;
 NONTESTED_MEMORY_RANGE  *mCurrentRange;
 UINT64                  mTestedSystemMemory;
 UINT64                  mNonTestedSystemMemory;
 
-UINT32                  GenericMemoryTestMonoPattern[GENERIC_CACHELINE_SIZE / 4] = {
+UINT32  GenericMemoryTestMonoPattern[GENERIC_CACHELINE_SIZE / 4] = {
   0x5a5a5a5a,
   0xa5a5a5a5,
   0x5a5a5a5a,
@@ -60,18 +60,20 @@ UINT32                  GenericMemoryTestMonoPattern[GENERIC_CACHELINE_SIZE / 4]
 INTN
 EFIAPI
 CompareMemWithoutCheckArgument (
-  IN      CONST VOID                *DestinationBuffer,
-  IN      CONST VOID                *SourceBuffer,
-  IN      UINTN                     Length
+  IN      CONST VOID  *DestinationBuffer,
+  IN      CONST VOID  *SourceBuffer,
+  IN      UINTN       Length
   )
 {
   ASSERT (Length > 0);
   while ((--Length != 0) &&
-         (*(INT8*)DestinationBuffer == *(INT8*)SourceBuffer)) {
-    DestinationBuffer = (INT8*)DestinationBuffer + 1;
-    SourceBuffer = (INT8*)SourceBuffer + 1;
+         (*(INT8 *)DestinationBuffer == *(INT8 *)SourceBuffer))
+  {
+    DestinationBuffer = (INT8 *)DestinationBuffer + 1;
+    SourceBuffer      = (INT8 *)SourceBuffer + 1;
   }
-  return (INTN)*(UINT8*)DestinationBuffer - (INTN)*(UINT8*)SourceBuffer;
+
+  return (INTN)*(UINT8 *)DestinationBuffer - (INTN)*(UINT8 *)SourceBuffer;
 }
 
 /**
@@ -89,9 +91,9 @@ ConstructBaseMemoryRange (
   IN  GENERIC_MEMORY_TEST_PRIVATE  *Private
   )
 {
-  UINTN                           NumberOfDescriptors;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR *MemorySpaceMap;
-  UINTN                           Index;
+  UINTN                            NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
+  UINTN                            Index;
 
   //
   // Base memory will always below 4G
@@ -100,7 +102,8 @@ ConstructBaseMemoryRange (
 
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
     if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeSystemMemory) ||
-        (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMoreReliable)) {
+        (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMoreReliable))
+    {
       Private->BaseMemorySize += MemorySpaceMap[Index].Length;
     }
   }
@@ -119,7 +122,7 @@ DestroyLinkList (
   IN  GENERIC_MEMORY_TEST_PRIVATE  *Private
   )
 {
-  LIST_ENTRY          *Link;
+  LIST_ENTRY              *Link;
   NONTESTED_MEMORY_RANGE  *NontestedRange;
 
   Link = Private->NonTestedMemRanList.BackLink;
@@ -128,7 +131,7 @@ DestroyLinkList (
     RemoveEntryList (Link);
     NontestedRange = NONTESTED_MEMORY_RANGE_FROM_LINK (Link);
     gBS->FreePool (NontestedRange);
-    Link = Private->NonTestedMemRanList.BackLink;;
+    Link = Private->NonTestedMemRanList.BackLink;
   }
 }
 
@@ -144,12 +147,13 @@ DestroyLinkList (
 **/
 EFI_STATUS
 ConvertToTestedMemory (
-  IN UINT64           BaseAddress,
-  IN UINT64           Length,
-  IN UINT64           Capabilities
+  IN UINT64  BaseAddress,
+  IN UINT64  Length,
+  IN UINT64  Capabilities
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
+
   Status = gDS->RemoveMemorySpace (
                   BaseAddress,
                   Length
@@ -164,6 +168,7 @@ ConvertToTestedMemory (
                     (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
                     );
   }
+
   return Status;
 }
 
@@ -181,7 +186,7 @@ UpdateMemoryMap (
   IN  GENERIC_MEMORY_TEST_PRIVATE  *Private
   )
 {
-  LIST_ENTRY          *Link;
+  LIST_ENTRY              *Link;
   NONTESTED_MEMORY_RANGE  *Range;
 
   Link = Private->NonTestedMemRanList.ForwardLink;
@@ -235,15 +240,16 @@ DirectRangeTest (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   //
   // Add the tested compatible memory to system memory using GCD service
   //
   ConvertToTestedMemory (
-      StartAddress,
-      Length,
-      Capabilities &~
-      (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
-      );
+    StartAddress,
+    Length,
+    Capabilities &~
+    (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
+    );
 
   return EFI_SUCCESS;
 }
@@ -263,11 +269,11 @@ ConstructNonTestedMemoryRange (
   IN  GENERIC_MEMORY_TEST_PRIVATE  *Private
   )
 {
-  NONTESTED_MEMORY_RANGE          *Range;
-  BOOLEAN                         NoFound;
-  UINTN                           NumberOfDescriptors;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR *MemorySpaceMap;
-  UINTN                           Index;
+  NONTESTED_MEMORY_RANGE           *Range;
+  BOOLEAN                          NoFound;
+  UINTN                            NumberOfDescriptors;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
+  UINTN                            Index;
 
   //
   // Non tested memory range may be span 4G here
@@ -277,19 +283,20 @@ ConstructNonTestedMemoryRange (
   gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
 
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeReserved &&
-        (MemorySpaceMap[Index].Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
-          (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED)
-          ) {
+    if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeReserved) &&
+        ((MemorySpaceMap[Index].Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
+         (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED))
+        )
+    {
       NoFound = FALSE;
       //
       // Light version do not need to process >4G memory range
       //
       gBS->AllocatePool (
-            EfiBootServicesData,
-            sizeof (NONTESTED_MEMORY_RANGE),
-            (VOID **) &Range
-            );
+             EfiBootServicesData,
+             sizeof (NONTESTED_MEMORY_RANGE),
+             (VOID **)&Range
+             );
 
       Range->Signature    = EFI_NONTESTED_MEMORY_RANGE_SIGNATURE;
       Range->StartAddress = MemorySpaceMap[Index].BaseAddress;
@@ -339,9 +346,10 @@ WriteMemory (
   }
 
   while (Address < (Start + Size)) {
-    CopyMem ((VOID *) (UINTN) Address, Private->MonoPattern, Private->MonoTestSize);
+    CopyMem ((VOID *)(UINTN)Address, Private->MonoPattern, Private->MonoTestSize);
     Address += Private->CoverageSpan;
   }
+
   //
   // bug bug: we may need GCD service to make the code cache and data uncache,
   // if GCD do not support it or return fail, then just flush the whole cache.
@@ -396,10 +404,10 @@ VerifyMemory (
   //
   while (Address < (Start + Size)) {
     ErrorFound = CompareMemWithoutCheckArgument (
-                  (VOID *) (UINTN) (Address),
-                  Private->MonoPattern,
-                  Private->MonoTestSize
-                  );
+                   (VOID *)(UINTN)(Address),
+                   Private->MonoPattern,
+                   Private->MonoTestSize
+                   );
     if (ErrorFound != 0) {
       //
       // Report uncorrectable errors
@@ -409,23 +417,23 @@ VerifyMemory (
         return EFI_OUT_OF_RESOURCES;
       }
 
-      ExtendedErrorData->DataHeader.HeaderSize  = (UINT16) sizeof (EFI_STATUS_CODE_DATA);
-      ExtendedErrorData->DataHeader.Size        = (UINT16) (sizeof (EFI_MEMORY_EXTENDED_ERROR_DATA) - sizeof (EFI_STATUS_CODE_DATA));
-      ExtendedErrorData->Granularity            = EFI_MEMORY_ERROR_DEVICE;
-      ExtendedErrorData->Operation              = EFI_MEMORY_OPERATION_READ;
-      ExtendedErrorData->Syndrome               = 0x0;
-      ExtendedErrorData->Address                = Address;
-      ExtendedErrorData->Resolution             = 0x40;
+      ExtendedErrorData->DataHeader.HeaderSize = (UINT16)sizeof (EFI_STATUS_CODE_DATA);
+      ExtendedErrorData->DataHeader.Size       = (UINT16)(sizeof (EFI_MEMORY_EXTENDED_ERROR_DATA) - sizeof (EFI_STATUS_CODE_DATA));
+      ExtendedErrorData->Granularity           = EFI_MEMORY_ERROR_DEVICE;
+      ExtendedErrorData->Operation             = EFI_MEMORY_OPERATION_READ;
+      ExtendedErrorData->Syndrome              = 0x0;
+      ExtendedErrorData->Address               = Address;
+      ExtendedErrorData->Resolution            = 0x40;
 
       REPORT_STATUS_CODE_EX (
-          EFI_ERROR_CODE,
-          EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE,
-          0,
-          &gEfiGenericMemTestProtocolGuid,
-          NULL,
-          (UINT8 *) ExtendedErrorData + sizeof (EFI_STATUS_CODE_DATA),
-          ExtendedErrorData->DataHeader.Size
-          );
+        EFI_ERROR_CODE,
+        EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_EC_UNCORRECTABLE,
+        0,
+        &gEfiGenericMemTestProtocolGuid,
+        NULL,
+        (UINT8 *)ExtendedErrorData + sizeof (EFI_STATUS_CODE_DATA),
+        ExtendedErrorData->DataHeader.Size
+        );
 
       return EFI_DEVICE_ERROR;
     }
@@ -450,14 +458,14 @@ VerifyMemory (
 EFI_STATUS
 EFIAPI
 InitializeMemoryTest (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
-  IN  EXTENDMEM_COVERAGE_LEVEL                 Level,
-  OUT BOOLEAN                                  *RequireSoftECCInit
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This,
+  IN  EXTENDMEM_COVERAGE_LEVEL         Level,
+  OUT BOOLEAN                          *RequireSoftECCInit
   )
 {
-  EFI_STATUS                  Status;
-  GENERIC_MEMORY_TEST_PRIVATE *Private;
-  EFI_CPU_ARCH_PROTOCOL       *Cpu;
+  EFI_STATUS                   Status;
+  GENERIC_MEMORY_TEST_PRIVATE  *Private;
+  EFI_CPU_ARCH_PROTOCOL        *Cpu;
 
   Private             = GENERIC_MEMORY_TEST_PRIVATE_FROM_THIS (This);
   *RequireSoftECCInit = FALSE;
@@ -487,31 +495,33 @@ InitializeMemoryTest (
   Status = gBS->LocateProtocol (
                   &gEfiCpuArchProtocolGuid,
                   NULL,
-                  (VOID **) &Cpu
+                  (VOID **)&Cpu
                   );
   if (!EFI_ERROR (Status)) {
     Private->Cpu = Cpu;
   }
+
   //
   // Create the CoverageSpan of the memory test base on the coverage level
   //
   switch (Private->CoverLevel) {
-  case EXTENSIVE:
-    Private->CoverageSpan = GENERIC_CACHELINE_SIZE;
-    break;
+    case EXTENSIVE:
+      Private->CoverageSpan = GENERIC_CACHELINE_SIZE;
+      break;
 
-  case SPARSE:
-    Private->CoverageSpan = SPARSE_SPAN_SIZE;
-    break;
+    case SPARSE:
+      Private->CoverageSpan = SPARSE_SPAN_SIZE;
+      break;
 
-  //
-  // Even the BDS do not need to test any memory, but in some case it
-  // still need to init ECC memory.
-  //
-  default:
-    Private->CoverageSpan = QUICK_SPAN_SIZE;
-    break;
+    //
+    // Even the BDS do not need to test any memory, but in some case it
+    // still need to init ECC memory.
+    //
+    default:
+      Private->CoverageSpan = QUICK_SPAN_SIZE;
+      break;
   }
+
   //
   // This is the first time we construct the non-tested memory range, if no
   // extended memory found, we know the system have not any extended memory
@@ -521,6 +531,7 @@ InitializeMemoryTest (
   if (Status == EFI_NOT_FOUND) {
     return EFI_NO_MEDIA;
   }
+
   //
   // ready to perform the R/W/V memory test
   //
@@ -550,11 +561,11 @@ InitializeMemoryTest (
 EFI_STATUS
 EFIAPI
 GenPerformMemoryTest (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL          *This,
-  OUT UINT64                                   *TestedMemorySize,
-  OUT UINT64                                   *TotalMemorySize,
-  OUT BOOLEAN                                  *ErrorOut,
-  IN BOOLEAN                                   TestAbort
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This,
+  OUT UINT64                           *TestedMemorySize,
+  OUT UINT64                           *TotalMemorySize,
+  OUT BOOLEAN                          *ErrorOut,
+  IN BOOLEAN                           TestAbort
   )
 {
   EFI_STATUS                      Status;
@@ -578,31 +589,33 @@ GenPerformMemoryTest (
     } else {
       BlockBoundary = mCurrentRange->StartAddress + mCurrentRange->Length - mCurrentAddress;
     }
+
     //
     // If TestAbort is true, means user cancel the memory test
     //
-    if (!TestAbort && Private->CoverLevel != IGNORE) {
+    if (!TestAbort && (Private->CoverLevel != IGNORE)) {
       //
       // Report status code of every memory range
       //
-      RangeData                         = AllocateZeroPool (sizeof (EFI_MEMORY_RANGE_EXTENDED_DATA));
+      RangeData = AllocateZeroPool (sizeof (EFI_MEMORY_RANGE_EXTENDED_DATA));
       if (RangeData == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
-      RangeData->DataHeader.HeaderSize  = (UINT16) sizeof (EFI_STATUS_CODE_DATA);
-      RangeData->DataHeader.Size        = (UINT16) (sizeof (EFI_MEMORY_RANGE_EXTENDED_DATA) - sizeof (EFI_STATUS_CODE_DATA));
-      RangeData->Start                  = mCurrentAddress;
-      RangeData->Length                 = BlockBoundary;
+
+      RangeData->DataHeader.HeaderSize = (UINT16)sizeof (EFI_STATUS_CODE_DATA);
+      RangeData->DataHeader.Size       = (UINT16)(sizeof (EFI_MEMORY_RANGE_EXTENDED_DATA) - sizeof (EFI_STATUS_CODE_DATA));
+      RangeData->Start                 = mCurrentAddress;
+      RangeData->Length                = BlockBoundary;
 
       REPORT_STATUS_CODE_EX (
-          EFI_PROGRESS_CODE,
-          EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST,
-          0,
-          &gEfiGenericMemTestProtocolGuid,
-          NULL,
-          (UINT8 *) RangeData + sizeof (EFI_STATUS_CODE_DATA),
-          RangeData->DataHeader.Size
-          );
+        EFI_PROGRESS_CODE,
+        EFI_COMPUTING_UNIT_MEMORY | EFI_CU_MEMORY_PC_TEST,
+        0,
+        &gEfiGenericMemTestProtocolGuid,
+        NULL,
+        (UINT8 *)RangeData + sizeof (EFI_STATUS_CODE_DATA),
+        RangeData->DataHeader.Size
+        );
 
       //
       // The software memory test (R/W/V) perform here. It will detect the
@@ -622,7 +635,7 @@ GenPerformMemoryTest (
     }
 
     mTestedSystemMemory += BlockBoundary;
-    *TestedMemorySize = mTestedSystemMemory;
+    *TestedMemorySize    = mTestedSystemMemory;
 
     //
     // If the memory test restart after the platform driver disable dimms,
@@ -638,6 +651,7 @@ GenPerformMemoryTest (
 
     return EFI_SUCCESS;
   }
+
   //
   // Change to next non tested memory range
   //
@@ -654,7 +668,6 @@ GenPerformMemoryTest (
     *TotalMemorySize  = Private->BaseMemorySize + mNonTestedSystemMemory;
     return EFI_NOT_FOUND;
   }
-
 }
 
 /**
@@ -668,11 +681,11 @@ GenPerformMemoryTest (
 EFI_STATUS
 EFIAPI
 GenMemoryTestFinished (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL *This
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This
   )
 {
-  EFI_STATUS                  Status;
-  GENERIC_MEMORY_TEST_PRIVATE *Private;
+  EFI_STATUS                   Status;
+  GENERIC_MEMORY_TEST_PRIVATE  *Private;
 
   Private = GENERIC_MEMORY_TEST_PRIVATE_FROM_THIS (This);
 
@@ -712,16 +725,16 @@ GenMemoryTestFinished (
 EFI_STATUS
 EFIAPI
 GenCompatibleRangeTest (
-  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL         *This,
-  IN EFI_PHYSICAL_ADDRESS                     StartAddress,
-  IN UINT64                                   Length
+  IN EFI_GENERIC_MEMORY_TEST_PROTOCOL  *This,
+  IN EFI_PHYSICAL_ADDRESS              StartAddress,
+  IN UINT64                            Length
   )
 {
-  EFI_STATUS                      Status;
-  GENERIC_MEMORY_TEST_PRIVATE     *Private;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
-  EFI_PHYSICAL_ADDRESS            CurrentBase;
-  UINT64                          CurrentLength;
+  EFI_STATUS                       Status;
+  GENERIC_MEMORY_TEST_PRIVATE      *Private;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Descriptor;
+  EFI_PHYSICAL_ADDRESS             CurrentBase;
+  UINT64                           CurrentLength;
 
   Private = GENERIC_MEMORY_TEST_PRIVATE_FROM_THIS (This);
 
@@ -731,6 +744,7 @@ GenCompatibleRangeTest (
   if (StartAddress + Length > 0x1000000) {
     return EFI_INVALID_PARAMETER;
   }
+
   CurrentBase = StartAddress;
   do {
     //
@@ -745,14 +759,16 @@ GenCompatibleRangeTest (
       return Status;
     }
 
-    if (Descriptor.GcdMemoryType == EfiGcdMemoryTypeReserved &&
-        (Descriptor.Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
-          (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED)
-          ) {
+    if ((Descriptor.GcdMemoryType == EfiGcdMemoryTypeReserved) &&
+        ((Descriptor.Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
+         (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED))
+        )
+    {
       CurrentLength = Descriptor.BaseAddress + Descriptor.Length - CurrentBase;
       if (CurrentBase + CurrentLength > StartAddress + Length) {
         CurrentLength = StartAddress + Length - CurrentBase;
       }
+
       Status = DirectRangeTest (
                  Private,
                  CurrentBase,
@@ -763,8 +779,10 @@ GenCompatibleRangeTest (
         return Status;
       }
     }
+
     CurrentBase = Descriptor.BaseAddress + Descriptor.Length;
   } while (CurrentBase < StartAddress + Length);
+
   //
   // Here means the required range already be tested, so just return success.
   //
@@ -784,7 +802,7 @@ GenCompatibleRangeTest (
 **/
 EFI_STATUS
 PerformAddressDataLineTest (
-  IN  GENERIC_MEMORY_TEST_PRIVATE      *Private
+  IN  GENERIC_MEMORY_TEST_PRIVATE  *Private
   )
 {
   LIST_ENTRY              *ExtendedLink;
@@ -795,7 +813,7 @@ PerformAddressDataLineTest (
   //
   // Light version no data line test, only perform the address line test
   //
-  TestAddress = (EFI_PHYSICAL_ADDRESS) 0x1;
+  TestAddress = (EFI_PHYSICAL_ADDRESS)0x1;
   while (TestAddress < MAX_ADDRESS && TestAddress > 0) {
     //
     // only test if the address falls in the enabled range
@@ -806,7 +824,8 @@ PerformAddressDataLineTest (
       ExtendedRange = NONTESTED_MEMORY_RANGE_FROM_LINK (ExtendedLink);
       if ((TestAddress >= ExtendedRange->StartAddress) &&
           (TestAddress < (ExtendedRange->StartAddress + ExtendedRange->Length))
-          ) {
+          )
+      {
         InExtendedRange = TRUE;
       }
 
@@ -814,9 +833,9 @@ PerformAddressDataLineTest (
     }
 
     if (InExtendedRange) {
-      *(EFI_PHYSICAL_ADDRESS *) (UINTN) TestAddress = TestAddress;
+      *(EFI_PHYSICAL_ADDRESS *)(UINTN)TestAddress = TestAddress;
       Private->Cpu->FlushDataCache (Private->Cpu, TestAddress, 1, EfiCpuFlushTypeWriteBackInvalidate);
-      if (*(EFI_PHYSICAL_ADDRESS *) (UINTN) TestAddress != TestAddress) {
+      if (*(EFI_PHYSICAL_ADDRESS *)(UINTN)TestAddress != TestAddress) {
         return EFI_ACCESS_DENIED;
       }
     }
@@ -826,10 +845,11 @@ PerformAddressDataLineTest (
 
   return EFI_SUCCESS;
 }
+
 //
 // Driver entry here
 //
-GENERIC_MEMORY_TEST_PRIVATE mGenericMemoryTestPrivate = {
+GENERIC_MEMORY_TEST_PRIVATE  mGenericMemoryTestPrivate = {
   EFI_GENERIC_MEMORY_TEST_PRIVATE_SIGNATURE,
   NULL,
   NULL,
@@ -839,7 +859,7 @@ GENERIC_MEMORY_TEST_PRIVATE mGenericMemoryTestPrivate = {
     GenMemoryTestFinished,
     GenCompatibleRangeTest
   },
-  (EXTENDMEM_COVERAGE_LEVEL) 0,
+  (EXTENDMEM_COVERAGE_LEVEL)0,
   0,
   0,
   NULL,
@@ -867,8 +887,8 @@ GENERIC_MEMORY_TEST_PRIVATE mGenericMemoryTestPrivate = {
 EFI_STATUS
 EFIAPI
 GenericMemoryTestEntryPoint (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE     *SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS            Status;
@@ -879,8 +899,8 @@ GenericMemoryTestEntryPoint (
   //
   // Use the generic pattern to test compatible memory range
   //
-  mGenericMemoryTestPrivate.MonoPattern   = GenericMemoryTestMonoPattern;
-  mGenericMemoryTestPrivate.MonoTestSize  = GENERIC_CACHELINE_SIZE;
+  mGenericMemoryTestPrivate.MonoPattern  = GenericMemoryTestMonoPattern;
+  mGenericMemoryTestPrivate.MonoTestSize = GENERIC_CACHELINE_SIZE;
 
   //
   // Get the platform boot mode
@@ -899,19 +919,20 @@ GenericMemoryTestEntryPoint (
   // level and span size for compatible memory test using
   //
   switch (BootMode) {
-  case BOOT_WITH_FULL_CONFIGURATION:
-  case BOOT_WITH_DEFAULT_SETTINGS:
-    mGenericMemoryTestPrivate.CoverageSpan = SPARSE_SPAN_SIZE;
-    break;
+    case BOOT_WITH_FULL_CONFIGURATION:
+    case BOOT_WITH_DEFAULT_SETTINGS:
+      mGenericMemoryTestPrivate.CoverageSpan = SPARSE_SPAN_SIZE;
+      break;
 
-  case BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS:
-    mGenericMemoryTestPrivate.CoverageSpan = GENERIC_CACHELINE_SIZE;
-    break;
+    case BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS:
+      mGenericMemoryTestPrivate.CoverageSpan = GENERIC_CACHELINE_SIZE;
+      break;
 
-  default:
-    mGenericMemoryTestPrivate.CoverageSpan = QUICK_SPAN_SIZE;
-    break;
+    default:
+      mGenericMemoryTestPrivate.CoverageSpan = QUICK_SPAN_SIZE;
+      break;
   }
+
   //
   // Install the protocol
   //

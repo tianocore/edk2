@@ -16,10 +16,10 @@
 #define EFI_DEBUGGER_CONFIGURATION_VERSION  0x00000001
 
 typedef struct _EFI_DEBUGGER_CONFIGURATION_PROTOCOL {
-  UINT32                      DebuggerConfigurationRevision;
-  VOID                        *DebuggerPrivateData;
+  UINT32    DebuggerConfigurationRevision;
+  VOID      *DebuggerPrivateData;
 } EFI_DEBUGGER_CONFIGURATION_PROTOCOL;
 
-extern EFI_GUID gEfiDebuggerConfigurationProtocolGuid;
+extern EFI_GUID  gEfiDebuggerConfigurationProtocolGuid;
 
 #endif

@@ -22,10 +22,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_DEBUG_STATUS
 DebuggerRegister (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
   CHAR16  *RegName;
@@ -80,6 +80,7 @@ DebuggerRegister (
     EDBPrint (L"Invalid Register Value\n");
     return EFI_DEBUG_CONTINUE;
   }
+
   RegVal = LXtoi (RegValStr);
 
   //

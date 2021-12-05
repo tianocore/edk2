@@ -14,22 +14,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // 8 extra pages for PF handler.
 //
-#define EXTRA_PAGE_TABLE_PAGES      8
+#define EXTRA_PAGE_TABLE_PAGES  8
 
-#define PAGING_1G_ADDRESS_MASK_64   0x000FFFFFC0000000ull
+#define PAGING_1G_ADDRESS_MASK_64  0x000FFFFFC0000000ull
 
 //
 // This capsule PEIM puts its private data at the start of the
 // coalesced capsule. Here's the structure definition.
 //
-#define EFI_CAPSULE_PEIM_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('C', 'a', 'p', 'P')
+#define EFI_CAPSULE_PEIM_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('C', 'a', 'p', 'P')
 
 #pragma pack(1)
 typedef struct {
-  UINT64  Signature;
-  UINT64  CapsuleAllImageSize;
-  UINT64  CapsuleNumber;
-  UINT64  CapsuleOffset[1];
+  UINT64    Signature;
+  UINT64    CapsuleAllImageSize;
+  UINT64    CapsuleNumber;
+  UINT64    CapsuleOffset[1];
 } EFI_CAPSULE_PEIM_PRIVATE_DATA;
 #pragma pack()
 
@@ -37,34 +37,34 @@ typedef struct {
   ///
   /// The physical start address of the resource region.
   ///
-  EFI_PHYSICAL_ADDRESS        PhysicalStart;
+  EFI_PHYSICAL_ADDRESS    PhysicalStart;
   ///
   /// The number of bytes of the resource region.
   ///
-  UINT64                      ResourceLength;
+  UINT64                  ResourceLength;
 } MEMORY_RESOURCE_DESCRIPTOR;
 
-#define CAPSULE_TEST_SIGNATURE SIGNATURE_32('T', 'E', 'S', 'T')
+#define CAPSULE_TEST_SIGNATURE  SIGNATURE_32('T', 'E', 'S', 'T')
 
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
-#pragma pack(1)
+  #pragma pack(1)
 typedef struct {
-  EFI_PHYSICAL_ADDRESS  EntryPoint;
-  EFI_PHYSICAL_ADDRESS  StackBufferBase;
-  UINT64                StackBufferLength;
-  EFI_PHYSICAL_ADDRESS  JumpBuffer;
-  EFI_PHYSICAL_ADDRESS  BlockListAddr;
-  EFI_PHYSICAL_ADDRESS  MemoryResource;
-  EFI_PHYSICAL_ADDRESS  MemoryBase64Ptr;
-  EFI_PHYSICAL_ADDRESS  MemorySize64Ptr;
-  BOOLEAN               Page1GSupport;
-  UINT64                AddressEncMask;
+  EFI_PHYSICAL_ADDRESS    EntryPoint;
+  EFI_PHYSICAL_ADDRESS    StackBufferBase;
+  UINT64                  StackBufferLength;
+  EFI_PHYSICAL_ADDRESS    JumpBuffer;
+  EFI_PHYSICAL_ADDRESS    BlockListAddr;
+  EFI_PHYSICAL_ADDRESS    MemoryResource;
+  EFI_PHYSICAL_ADDRESS    MemoryBase64Ptr;
+  EFI_PHYSICAL_ADDRESS    MemorySize64Ptr;
+  BOOLEAN                 Page1GSupport;
+  UINT64                  AddressEncMask;
 } SWITCH_32_TO_64_CONTEXT;
 
 typedef struct {
-  UINT16                ReturnCs;
-  EFI_PHYSICAL_ADDRESS  ReturnEntryPoint;
-  UINT64                ReturnStatus;
+  UINT16                  ReturnCs;
+  EFI_PHYSICAL_ADDRESS    ReturnEntryPoint;
+  UINT64                  ReturnStatus;
   //
   // NOTICE:
   // Be careful about the Base field of IA32_DESCRIPTOR
@@ -72,9 +72,9 @@ typedef struct {
   // To extend new field for this structure, add it to
   // right before this Gdtr field.
   //
-  IA32_DESCRIPTOR       Gdtr;
+  IA32_DESCRIPTOR         Gdtr;
 } SWITCH_64_TO_32_CONTEXT;
-#pragma pack()
+  #pragma pack()
 #endif
 
 /**
@@ -105,11 +105,11 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 CapsuleDataCoalesce (
-  IN EFI_PEI_SERVICES                **PeiServices,
-  IN EFI_PHYSICAL_ADDRESS            *BlockListBuffer,
-  IN MEMORY_RESOURCE_DESCRIPTOR      *MemoryResource,
-  IN OUT VOID                        **MemoryBase,
-  IN OUT UINTN                       *MemorySize
+  IN EFI_PEI_SERVICES            **PeiServices,
+  IN EFI_PHYSICAL_ADDRESS        *BlockListBuffer,
+  IN MEMORY_RESOURCE_DESCRIPTOR  *MemoryResource,
+  IN OUT VOID                    **MemoryBase,
+  IN OUT UINTN                   *MemorySize
   );
 
 #endif

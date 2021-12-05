@@ -47,21 +47,21 @@ PrintOutEsrtEntry (
   // Entry Type (12 chars plus table formatting)
   //
   switch (Entry->FwType) {
-  case (ESRT_FW_TYPE_SYSTEMFIRMWARE) :
-    DEBUG ((DEBUG_INFO, " System FW    |"));
-    break;
-  case (ESRT_FW_TYPE_DEVICEFIRMWARE) :
-    DEBUG ((DEBUG_INFO, " Device FW    |"));
-    break;
-  case (ESRT_FW_TYPE_UEFIDRIVER) :
-    DEBUG ((DEBUG_INFO, " Uefi Driver  |"));
-    break;
-  case (ESRT_FW_TYPE_UNKNOWN) :
-    DEBUG ((DEBUG_INFO, " Unknown Type |"));
-    break;
-  default:
-    DEBUG ((DEBUG_INFO, " ? 0x%8X |", Entry->FwType));
-    break;
+    case (ESRT_FW_TYPE_SYSTEMFIRMWARE):
+      DEBUG ((DEBUG_INFO, " System FW    |"));
+      break;
+    case (ESRT_FW_TYPE_DEVICEFIRMWARE):
+      DEBUG ((DEBUG_INFO, " Device FW    |"));
+      break;
+    case (ESRT_FW_TYPE_UEFIDRIVER):
+      DEBUG ((DEBUG_INFO, " Uefi Driver  |"));
+      break;
+    case (ESRT_FW_TYPE_UNKNOWN):
+      DEBUG ((DEBUG_INFO, " Unknown Type |"));
+      break;
+    default:
+      DEBUG ((DEBUG_INFO, " ? 0x%8X |", Entry->FwType));
+      break;
   }
 
   //
@@ -71,7 +71,8 @@ PrintOutEsrtEntry (
   // Last Attempt Version (10 char UINT32 string plus table formatting)
   // Last Attempt Status (10 char UINT32 string plus table formatting)
   //
-  DEBUG ((DEBUG_INFO,
+  DEBUG ((
+    DEBUG_INFO,
     " 0x%8X | 0x%8X | 0x%8X | 0x%8X | 0x%8X |\n",
     Entry->FwVersion,
     Entry->LowestSupportedFwVersion,
@@ -109,9 +110,9 @@ PrintTable (
   }
 
   DEBUG ((DEBUG_INFO, "+--------------------------------------------------------+\n"));
-  DEBUG ((DEBUG_INFO, "| Firmware Resource Count          : 0x%08x          |\n",  Table->FwResourceCount));
-  DEBUG ((DEBUG_INFO, "| Firmware Resource Count Max      : 0x%08x          |\n",  Table->FwResourceCountMax));
-  DEBUG ((DEBUG_INFO, "| Firmware Resource Entry Version  : 0x%016x  |\n",         Table->FwResourceVersion));
+  DEBUG ((DEBUG_INFO, "| Firmware Resource Count          : 0x%08x          |\n", Table->FwResourceCount));
+  DEBUG ((DEBUG_INFO, "| Firmware Resource Count Max      : 0x%08x          |\n", Table->FwResourceCountMax));
+  DEBUG ((DEBUG_INFO, "| Firmware Resource Entry Version  : 0x%016x  |\n", Table->FwResourceVersion));
   DEBUG ((DEBUG_INFO, "+--------------------------------------------------------+\n"));
 
   //
@@ -141,4 +142,3 @@ PrintTable (
   DEBUG ((DEBUG_INFO, "+--------------------------------------+--------------+------------"));
   DEBUG ((DEBUG_INFO, "+------------+------------+------------+------------+\n"));
 }
-

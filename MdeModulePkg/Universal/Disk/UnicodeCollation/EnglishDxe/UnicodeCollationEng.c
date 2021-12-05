@@ -6,14 +6,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "UnicodeCollationEng.h"
 
-CHAR8 mEngUpperMap[MAP_TABLE_SIZE];
-CHAR8 mEngLowerMap[MAP_TABLE_SIZE];
-CHAR8 mEngInfoMap[MAP_TABLE_SIZE];
+CHAR8  mEngUpperMap[MAP_TABLE_SIZE];
+CHAR8  mEngLowerMap[MAP_TABLE_SIZE];
+CHAR8  mEngInfoMap[MAP_TABLE_SIZE];
 
-CHAR8 mOtherChars[] = {
+CHAR8  mOtherChars[] = {
   '0',
   '1',
   '2',
@@ -89,8 +88,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_COLLATION_PROTOCOL  Unicode2Eng = {
 EFI_STATUS
 EFIAPI
 InitializeUnicodeCollationEng (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -101,23 +100,22 @@ InitializeUnicodeCollationEng (
   // Initialize mapping tables for the supported languages
   //
   for (Index = 0; Index < MAP_TABLE_SIZE; Index++) {
-    mEngUpperMap[Index] = (CHAR8) Index;
-    mEngLowerMap[Index] = (CHAR8) Index;
+    mEngUpperMap[Index] = (CHAR8)Index;
+    mEngLowerMap[Index] = (CHAR8)Index;
     mEngInfoMap[Index]  = 0;
 
-    if ((Index >= 'a' && Index <= 'z') || (Index >= 0xe0 && Index <= 0xf6) || (Index >= 0xf8 && Index <= 0xfe)) {
+    if (((Index >= 'a') && (Index <= 'z')) || ((Index >= 0xe0) && (Index <= 0xf6)) || ((Index >= 0xf8) && (Index <= 0xfe))) {
+      Index2               = Index - 0x20;
+      mEngUpperMap[Index]  = (CHAR8)Index2;
+      mEngLowerMap[Index2] = (CHAR8)Index;
 
-      Index2                = Index - 0x20;
-      mEngUpperMap[Index]   = (CHAR8) Index2;
-      mEngLowerMap[Index2]  = (CHAR8) Index;
-
-      mEngInfoMap[Index] |= CHAR_FAT_VALID;
+      mEngInfoMap[Index]  |= CHAR_FAT_VALID;
       mEngInfoMap[Index2] |= CHAR_FAT_VALID;
     }
   }
 
   for (Index = 0; mOtherChars[Index] != 0; Index++) {
-    Index2 = mOtherChars[Index];
+    Index2               = mOtherChars[Index];
     mEngInfoMap[Index2] |= CHAR_FAT_VALID;
   }
 
@@ -163,7 +161,6 @@ InitializeUnicodeCollationEng (
   return Status;
 }
 
-
 /**
   Performs a case-insensitive comparison of two Null-terminated strings.
 
@@ -179,9 +176,9 @@ InitializeUnicodeCollationEng (
 INTN
 EFIAPI
 EngStriColl (
-  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
-  IN CHAR16                           *Str1,
-  IN CHAR16                           *Str2
+  IN EFI_UNICODE_COLLATION_PROTOCOL  *This,
+  IN CHAR16                          *Str1,
+  IN CHAR16                          *Str2
   )
 {
   while (*Str1 != 0) {
@@ -196,7 +193,6 @@ EngStriColl (
   return TO_UPPER (*Str1) - TO_UPPER (*Str2);
 }
 
-
 /**
   Converts all the characters in a Null-terminated string to
   lower case characters.
@@ -208,8 +204,8 @@ EngStriColl (
 VOID
 EFIAPI
 EngStrLwr (
-  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
-  IN OUT CHAR16                       *Str
+  IN EFI_UNICODE_COLLATION_PROTOCOL  *This,
+  IN OUT CHAR16                      *Str
   )
 {
   while (*Str != 0) {
@@ -217,7 +213,6 @@ EngStrLwr (
     Str += 1;
   }
 }
-
 
 /**
   Converts all the characters in a Null-terminated string to upper
@@ -230,8 +225,8 @@ EngStrLwr (
 VOID
 EFIAPI
 EngStrUpr (
-  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
-  IN OUT CHAR16                       *Str
+  IN EFI_UNICODE_COLLATION_PROTOCOL  *This,
+  IN OUT CHAR16                      *Str
   )
 {
   while (*Str != 0) {
@@ -255,127 +250,127 @@ EngStrUpr (
 BOOLEAN
 EFIAPI
 EngMetaiMatch (
-  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
-  IN CHAR16                           *String,
-  IN CHAR16                           *Pattern
+  IN EFI_UNICODE_COLLATION_PROTOCOL  *This,
+  IN CHAR16                          *String,
+  IN CHAR16                          *Pattern
   )
 {
   CHAR16  CharC;
   CHAR16  CharP;
   CHAR16  Index3;
 
-  for (;;) {
-    CharP = *Pattern;
+  for ( ; ;) {
+    CharP    = *Pattern;
     Pattern += 1;
 
     switch (CharP) {
-    case 0:
-      //
-      // End of pattern.  If end of string, TRUE match
-      //
-      if (*String != 0) {
-        return FALSE;
-      } else {
-        return TRUE;
-      }
-
-    case '*':
-      //
-      // Match zero or more chars
-      //
-      while (*String != 0) {
-        if (EngMetaiMatch (This, String, Pattern)) {
+      case 0:
+        //
+        // End of pattern.  If end of string, TRUE match
+        //
+        if (*String != 0) {
+          return FALSE;
+        } else {
           return TRUE;
         }
 
-        String += 1;
-      }
-
-      return EngMetaiMatch (This, String, Pattern);
-
-    case '?':
-      //
-      // Match any one char
-      //
-      if (*String == 0) {
-        return FALSE;
-      }
-
-      String += 1;
-      break;
-
-    case '[':
-      //
-      // Match char set
-      //
-      CharC = *String;
-      if (CharC == 0) {
+      case '*':
         //
-        // syntax problem
+        // Match zero or more chars
         //
-        return FALSE;
-      }
+        while (*String != 0) {
+          if (EngMetaiMatch (This, String, Pattern)) {
+            return TRUE;
+          }
 
-      Index3  = 0;
-      CharP   = *Pattern++;
-      while (CharP != 0) {
-        if (CharP == ']') {
+          String += 1;
+        }
+
+        return EngMetaiMatch (This, String, Pattern);
+
+      case '?':
+        //
+        // Match any one char
+        //
+        if (*String == 0) {
           return FALSE;
         }
 
-        if (CharP == '-') {
+        String += 1;
+        break;
+
+      case '[':
+        //
+        // Match char set
+        //
+        CharC = *String;
+        if (CharC == 0) {
           //
-          // if range of chars, get high range
+          // syntax problem
           //
-          CharP = *Pattern;
-          if (CharP == 0 || CharP == ']') {
-            //
-            // syntax problem
-            //
+          return FALSE;
+        }
+
+        Index3 = 0;
+        CharP  = *Pattern++;
+        while (CharP != 0) {
+          if (CharP == ']') {
             return FALSE;
           }
 
-          if (TO_UPPER (CharC) >= TO_UPPER (Index3) && TO_UPPER (CharC) <= TO_UPPER (CharP)) {
+          if (CharP == '-') {
             //
-            // if in range, it's a match
+            // if range of chars, get high range
+            //
+            CharP = *Pattern;
+            if ((CharP == 0) || (CharP == ']')) {
+              //
+              // syntax problem
+              //
+              return FALSE;
+            }
+
+            if ((TO_UPPER (CharC) >= TO_UPPER (Index3)) && (TO_UPPER (CharC) <= TO_UPPER (CharP))) {
+              //
+              // if in range, it's a match
+              //
+              break;
+            }
+          }
+
+          Index3 = CharP;
+          if (TO_UPPER (CharC) == TO_UPPER (CharP)) {
+            //
+            // if char matches
             //
             break;
           }
+
+          CharP = *Pattern++;
         }
 
-        Index3 = CharP;
-        if (TO_UPPER (CharC) == TO_UPPER (CharP)) {
-          //
-          // if char matches
-          //
-          break;
+        //
+        // skip to end of match char set
+        //
+        while ((CharP != 0) && (CharP != ']')) {
+          CharP    = *Pattern;
+          Pattern += 1;
         }
 
-        CharP = *Pattern++;
-      }
-      //
-      // skip to end of match char set
-      //
-      while ((CharP != 0) && (CharP != ']')) {
-        CharP = *Pattern;
-        Pattern += 1;
-      }
+        String += 1;
+        break;
 
-      String += 1;
-      break;
+      default:
+        CharC = *String;
+        if (TO_UPPER (CharC) != TO_UPPER (CharP)) {
+          return FALSE;
+        }
 
-    default:
-      CharC = *String;
-      if (TO_UPPER (CharC) != TO_UPPER (CharP)) {
-        return FALSE;
-      }
-
-      String += 1;
-      break;
+        String += 1;
+        break;
     }
   }
 }
-
 
 /**
   Converts an 8.3 FAT file name in an OEM character set to a Null-terminated string.
@@ -391,25 +386,24 @@ EngMetaiMatch (
 VOID
 EFIAPI
 EngFatToStr (
-  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
-  IN UINTN                            FatSize,
-  IN CHAR8                            *Fat,
-  OUT CHAR16                          *String
+  IN EFI_UNICODE_COLLATION_PROTOCOL  *This,
+  IN UINTN                           FatSize,
+  IN CHAR8                           *Fat,
+  OUT CHAR16                         *String
   )
 {
   //
   // No DBCS issues, just expand and add null terminate to end of string
   //
   while ((*Fat != 0) && (FatSize != 0)) {
-    *String = *Fat;
-    String += 1;
-    Fat += 1;
+    *String  = *Fat;
+    String  += 1;
+    Fat     += 1;
     FatSize -= 1;
   }
 
   *String = 0;
 }
-
 
 /**
   Converts a Null-terminated string to legal characters in a FAT
@@ -429,37 +423,38 @@ EngFatToStr (
 BOOLEAN
 EFIAPI
 EngStrToFat (
-  IN EFI_UNICODE_COLLATION_PROTOCOL   *This,
-  IN CHAR16                           *String,
-  IN UINTN                            FatSize,
-  OUT CHAR8                           *Fat
+  IN EFI_UNICODE_COLLATION_PROTOCOL  *This,
+  IN CHAR16                          *String,
+  IN UINTN                           FatSize,
+  OUT CHAR8                          *Fat
   )
 {
-  BOOLEAN SpecialCharExist;
+  BOOLEAN  SpecialCharExist;
 
   SpecialCharExist = FALSE;
   while ((*String != 0) && (FatSize != 0)) {
     //
     // Skip '.' or ' ' when making a fat name
     //
-    if (*String != '.' && *String != ' ') {
+    if ((*String != '.') && (*String != ' ')) {
       //
       // If this is a valid fat char, move it.
       // Otherwise, move a '_' and flag the fact that the name needs a long file name.
       //
-      if (*String < MAP_TABLE_SIZE && ((mEngInfoMap[*String] & CHAR_FAT_VALID) != 0)) {
+      if ((*String < MAP_TABLE_SIZE) && ((mEngInfoMap[*String] & CHAR_FAT_VALID) != 0)) {
         *Fat = mEngUpperMap[*String];
       } else {
-        *Fat              = '_';
-        SpecialCharExist  = TRUE;
+        *Fat             = '_';
+        SpecialCharExist = TRUE;
       }
 
-      Fat += 1;
+      Fat     += 1;
       FatSize -= 1;
     }
 
     String += 1;
   }
+
   //
   // Do not terminate that fat string
   //

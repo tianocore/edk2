@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Edb.h"
 
-extern EDB_DISASM_INSTRUCTION mEdbDisasmInstructionTable[];
+extern EDB_DISASM_INSTRUCTION  mEdbDisasmInstructionTable[];
 
 typedef struct {
   CHAR16    Name[EDB_INSTRUCTION_NAME_MAX_LENGTH];
@@ -16,9 +16,9 @@ typedef struct {
   CHAR16    Tail;
 } EDB_INSTRUCTION_STRING;
 
-EDB_INSTRUCTION_STRING mInstructionString;
-UINTN                  mInstructionNameOffset;
-UINTN                  mInstructionContentOffset;
+EDB_INSTRUCTION_STRING  mInstructionString;
+UINTN                   mInstructionNameOffset;
+UINTN                   mInstructionContentOffset;
 
 /**
 
@@ -30,14 +30,14 @@ UINTN                  mInstructionContentOffset;
 **/
 VOID
 EdbSetOffset (
-  IN UINTN InstructionNameOffset,
-  IN UINTN InstructionContentOffset
+  IN UINTN  InstructionNameOffset,
+  IN UINTN  InstructionContentOffset
   )
 {
-  mInstructionNameOffset = InstructionNameOffset;
+  mInstructionNameOffset    = InstructionNameOffset;
   mInstructionContentOffset = InstructionContentOffset;
 
-  return ;
+  return;
 }
 
 /**
@@ -52,7 +52,7 @@ EdbPreInstructionString (
   VOID
   )
 {
-  ZeroMem (&mInstructionString, sizeof(mInstructionString));
+  ZeroMem (&mInstructionString, sizeof (mInstructionString));
   mInstructionNameOffset    = 0;
   mInstructionContentOffset = 0;
 
@@ -71,13 +71,14 @@ EdbPostInstructionString (
   VOID
   )
 {
-  CHAR16 *Char;
+  CHAR16  *Char;
 
   for (Char = (CHAR16 *)&mInstructionString; Char < &mInstructionString.Tail; Char++) {
     if (*Char == 0) {
       *Char = L' ';
     }
   }
+
   mInstructionString.Tail = 0;
 
   mInstructionNameOffset    = 0;
@@ -104,15 +105,15 @@ EdbGetNaturalIndex16 (
   OUT UINTN   *ConstantUnits
   )
 {
-  BOOLEAN Sign;
-  UINTN   NaturalUnitBit;
+  BOOLEAN  Sign;
+  UINTN    NaturalUnitBit;
 
-  Sign = (BOOLEAN)(Data16 >> 15);
-  NaturalUnitBit = (UINTN)((Data16 >> 12) & 0x7);
+  Sign            = (BOOLEAN)(Data16 >> 15);
+  NaturalUnitBit  = (UINTN)((Data16 >> 12) & 0x7);
   NaturalUnitBit *= 2;
-  Data16 = Data16 & 0xFFF;
-  *NaturalUnits = (UINTN)(Data16 & ((1 << NaturalUnitBit) - 1));
-  *ConstantUnits = (UINTN)((Data16 >> NaturalUnitBit) & ((1 << (12 - NaturalUnitBit)) - 1));
+  Data16          = Data16 & 0xFFF;
+  *NaturalUnits   = (UINTN)(Data16 & ((1 << NaturalUnitBit) - 1));
+  *ConstantUnits  = (UINTN)((Data16 >> NaturalUnitBit) & ((1 << (12 - NaturalUnitBit)) - 1));
 
   return Sign;
 }
@@ -135,15 +136,15 @@ EdbGetNaturalIndex32 (
   OUT UINTN   *ConstantUnits
   )
 {
-  BOOLEAN Sign;
-  UINTN   NaturalUnitBit;
+  BOOLEAN  Sign;
+  UINTN    NaturalUnitBit;
 
-  Sign = (BOOLEAN)(Data32 >> 31);
-  NaturalUnitBit = (UINTN)((Data32 >> 28) & 0x7);
+  Sign            = (BOOLEAN)(Data32 >> 31);
+  NaturalUnitBit  = (UINTN)((Data32 >> 28) & 0x7);
   NaturalUnitBit *= 4;
-  Data32 = Data32 & 0xFFFFFFF;
-  *NaturalUnits = (UINTN)(Data32 & ((1 << NaturalUnitBit) - 1));
-  *ConstantUnits = (UINTN)((Data32 >> NaturalUnitBit) & ((1 << (28 - NaturalUnitBit)) - 1));
+  Data32          = Data32 & 0xFFFFFFF;
+  *NaturalUnits   = (UINTN)(Data32 & ((1 << NaturalUnitBit) - 1));
+  *ConstantUnits  = (UINTN)((Data32 >> NaturalUnitBit) & ((1 << (28 - NaturalUnitBit)) - 1));
 
   return Sign;
 }
@@ -166,15 +167,15 @@ EdbGetNaturalIndex64 (
   OUT UINT64  *ConstantUnits
   )
 {
-  BOOLEAN Sign;
-  UINTN   NaturalUnitBit;
+  BOOLEAN  Sign;
+  UINTN    NaturalUnitBit;
 
-  Sign = (BOOLEAN)RShiftU64 (Data64, 63);
-  NaturalUnitBit = (UINTN)(RShiftU64 (Data64, 60) & 0x7);
+  Sign            = (BOOLEAN)RShiftU64 (Data64, 63);
+  NaturalUnitBit  = (UINTN)(RShiftU64 (Data64, 60) & 0x7);
   NaturalUnitBit *= 8;
-  Data64 = RShiftU64 (LShiftU64 (Data64, 4), 4);
-  *NaturalUnits = (UINT64)(Data64 & (LShiftU64 (1, NaturalUnitBit) - 1));
-  *ConstantUnits = (UINT64)(RShiftU64 (Data64, NaturalUnitBit) & (LShiftU64 (1, (60 - NaturalUnitBit)) - 1));
+  Data64          = RShiftU64 (LShiftU64 (Data64, 4), 4);
+  *NaturalUnits   = (UINT64)(Data64 & (LShiftU64 (1, NaturalUnitBit) - 1));
+  *ConstantUnits  = (UINT64)(RShiftU64 (Data64, NaturalUnitBit) & (LShiftU64 (1, (60 - NaturalUnitBit)) - 1));
 
   return Sign;
 }
@@ -235,7 +236,7 @@ EdbGetBitWidth (
 **/
 UINTN
 EdbPrintInstructionName (
-  IN CHAR16                 *Name
+  IN CHAR16  *Name
   )
 {
   EDBSPrintWithOffset (
@@ -261,7 +262,7 @@ EdbPrintInstructionName (
 **/
 UINTN
 EdbPrintRegister1 (
-  IN UINT8                  Operands
+  IN UINT8  Operands
   )
 {
   if ((Operands & OPERAND_M_INDIRECT1) != 0) {
@@ -273,6 +274,7 @@ EdbPrintRegister1 (
       );
     mInstructionContentOffset += 1;
   }
+
   EDBSPrintWithOffset (
     mInstructionString.Content,
     EDB_INSTRUCTION_CONTENT_MAX_SIZE,
@@ -296,7 +298,7 @@ EdbPrintRegister1 (
 **/
 UINTN
 EdbPrintRegister2 (
-  IN UINT8                  Operands
+  IN UINT8  Operands
   )
 {
   if ((Operands & OPERAND_M_INDIRECT2) != 0) {
@@ -308,6 +310,7 @@ EdbPrintRegister2 (
       );
     mInstructionContentOffset += 1;
   }
+
   EDBSPrintWithOffset (
     mInstructionString.Content,
     EDB_INSTRUCTION_CONTENT_MAX_SIZE,
@@ -331,28 +334,28 @@ EdbPrintRegister2 (
 **/
 UINTN
 EdbPrintDedicatedRegister1 (
-  IN UINT8                  Operands
+  IN UINT8  Operands
   )
 {
   switch (Operands & OPERAND_M_OP1) {
-  case 0:
-    EDBSPrintWithOffset (
-      mInstructionString.Content,
-      EDB_INSTRUCTION_CONTENT_MAX_SIZE,
-      mInstructionContentOffset,
-      L"[FLAGS]"
-      );
-    mInstructionContentOffset += 7;
-    break;
-  case 1:
-    EDBSPrintWithOffset (
-      mInstructionString.Content,
-      EDB_INSTRUCTION_CONTENT_MAX_SIZE,
-      mInstructionContentOffset,
-      L"[IP]"
-      );
-    mInstructionContentOffset += 4;
-    break;
+    case 0:
+      EDBSPrintWithOffset (
+        mInstructionString.Content,
+        EDB_INSTRUCTION_CONTENT_MAX_SIZE,
+        mInstructionContentOffset,
+        L"[FLAGS]"
+        );
+      mInstructionContentOffset += 7;
+      break;
+    case 1:
+      EDBSPrintWithOffset (
+        mInstructionString.Content,
+        EDB_INSTRUCTION_CONTENT_MAX_SIZE,
+        mInstructionContentOffset,
+        L"[IP]"
+        );
+      mInstructionContentOffset += 4;
+      break;
   }
 
   return mInstructionContentOffset;
@@ -369,28 +372,28 @@ EdbPrintDedicatedRegister1 (
 **/
 UINTN
 EdbPrintDedicatedRegister2 (
-  IN UINT8                  Operands
+  IN UINT8  Operands
   )
 {
   switch ((Operands & OPERAND_M_OP2) >> 4) {
-  case 0:
-    EDBSPrintWithOffset (
-      mInstructionString.Content,
-      EDB_INSTRUCTION_CONTENT_MAX_SIZE,
-      mInstructionContentOffset,
-      L"[FLAGS]"
-      );
-    mInstructionContentOffset += 7;
-    break;
-  case 1:
-    EDBSPrintWithOffset (
-      mInstructionString.Content,
-      EDB_INSTRUCTION_CONTENT_MAX_SIZE,
-      mInstructionContentOffset,
-      L"[IP]"
-      );
-    mInstructionContentOffset += 4;
-    break;
+    case 0:
+      EDBSPrintWithOffset (
+        mInstructionString.Content,
+        EDB_INSTRUCTION_CONTENT_MAX_SIZE,
+        mInstructionContentOffset,
+        L"[FLAGS]"
+        );
+      mInstructionContentOffset += 7;
+      break;
+    case 1:
+      EDBSPrintWithOffset (
+        mInstructionString.Content,
+        EDB_INSTRUCTION_CONTENT_MAX_SIZE,
+        mInstructionContentOffset,
+        L"[IP]"
+        );
+      mInstructionContentOffset += 4;
+      break;
   }
 
   return mInstructionContentOffset;
@@ -409,9 +412,9 @@ EdbPrintDedicatedRegister2 (
 **/
 UINTN
 EdbPrintIndexData (
-  IN BOOLEAN                Sign,
-  IN UINTN                  NaturalUnits,
-  IN UINTN                  ConstantUnits
+  IN BOOLEAN  Sign,
+  IN UINTN    NaturalUnits,
+  IN UINTN    ConstantUnits
   )
 {
   EDBSPrintWithOffset (
@@ -424,7 +427,7 @@ EdbPrintIndexData (
     Sign ? L"-" : L"+",
     ConstantUnits
     );
-  mInstructionContentOffset  = mInstructionContentOffset + 5 + EdbGetBitWidth (NaturalUnits) + EdbGetBitWidth (ConstantUnits);
+  mInstructionContentOffset = mInstructionContentOffset + 5 + EdbGetBitWidth (NaturalUnits) + EdbGetBitWidth (ConstantUnits);
 
   return mInstructionContentOffset;
 }
@@ -442,9 +445,9 @@ EdbPrintIndexData (
 **/
 UINTN
 EdbPrintIndexData64 (
-  IN BOOLEAN                Sign,
-  IN UINT64                 NaturalUnits,
-  IN UINT64                 ConstantUnits
+  IN BOOLEAN  Sign,
+  IN UINT64   NaturalUnits,
+  IN UINT64   ConstantUnits
   )
 {
   EDBSPrintWithOffset (
@@ -457,7 +460,7 @@ EdbPrintIndexData64 (
     Sign ? L"-" : L"+",
     ConstantUnits
     );
-  mInstructionContentOffset  = mInstructionContentOffset + 5 + EdbGetBitWidth (NaturalUnits) + EdbGetBitWidth (ConstantUnits);
+  mInstructionContentOffset = mInstructionContentOffset + 5 + EdbGetBitWidth (NaturalUnits) + EdbGetBitWidth (ConstantUnits);
 
   return mInstructionContentOffset;
 }
@@ -473,15 +476,15 @@ EdbPrintIndexData64 (
 **/
 UINTN
 EdbPrintRawIndexData16 (
-  IN UINT16                 Data16
+  IN UINT16  Data16
   )
 {
-  BOOLEAN Sign;
-  UINTN   NaturalUnits;
-  UINTN   ConstantUnits;
-  UINTN   Offset;
+  BOOLEAN  Sign;
+  UINTN    NaturalUnits;
+  UINTN    ConstantUnits;
+  UINTN    Offset;
 
-  Sign = EdbGetNaturalIndex16 (Data16, &NaturalUnits, &ConstantUnits);
+  Sign   = EdbGetNaturalIndex16 (Data16, &NaturalUnits, &ConstantUnits);
   Offset = EdbPrintIndexData (Sign, NaturalUnits, ConstantUnits);
 
   return Offset;
@@ -498,15 +501,15 @@ EdbPrintRawIndexData16 (
 **/
 UINTN
 EdbPrintRawIndexData32 (
-  IN UINT32                 Data32
+  IN UINT32  Data32
   )
 {
-  BOOLEAN Sign;
-  UINTN   NaturalUnits;
-  UINTN   ConstantUnits;
-  UINTN   Offset;
+  BOOLEAN  Sign;
+  UINTN    NaturalUnits;
+  UINTN    ConstantUnits;
+  UINTN    Offset;
 
-  Sign = EdbGetNaturalIndex32 (Data32, &NaturalUnits, &ConstantUnits);
+  Sign   = EdbGetNaturalIndex32 (Data32, &NaturalUnits, &ConstantUnits);
   Offset = EdbPrintIndexData (Sign, NaturalUnits, ConstantUnits);
 
   return Offset;
@@ -523,15 +526,15 @@ EdbPrintRawIndexData32 (
 **/
 UINTN
 EdbPrintRawIndexData64 (
-  IN UINT64                 Data64
+  IN UINT64  Data64
   )
 {
-  BOOLEAN Sign;
-  UINT64  NaturalUnits;
-  UINT64  ConstantUnits;
-  UINTN   Offset;
+  BOOLEAN  Sign;
+  UINT64   NaturalUnits;
+  UINT64   ConstantUnits;
+  UINTN    Offset;
 
-  Sign = EdbGetNaturalIndex64 (Data64, &NaturalUnits, &ConstantUnits);
+  Sign   = EdbGetNaturalIndex64 (Data64, &NaturalUnits, &ConstantUnits);
   Offset = EdbPrintIndexData64 (Sign, NaturalUnits, ConstantUnits);
 
   return Offset;
@@ -548,7 +551,7 @@ EdbPrintRawIndexData64 (
 **/
 UINTN
 EdbPrintImmData8 (
-  IN UINT8                  Data
+  IN UINT8  Data
   )
 {
   EDBSPrintWithOffset (
@@ -558,7 +561,7 @@ EdbPrintImmData8 (
     L"(0x%02x)",
     (UINTN)Data
     );
-  mInstructionContentOffset  += 6;
+  mInstructionContentOffset += 6;
 
   return mInstructionContentOffset;
 }
@@ -574,7 +577,7 @@ EdbPrintImmData8 (
 **/
 UINTN
 EdbPrintImmData16 (
-  IN UINT16                 Data
+  IN UINT16  Data
   )
 {
   EDBSPrintWithOffset (
@@ -584,7 +587,7 @@ EdbPrintImmData16 (
     L"(0x%04x)",
     (UINTN)Data
     );
-  mInstructionContentOffset  += 8;
+  mInstructionContentOffset += 8;
 
   return mInstructionContentOffset;
 }
@@ -600,7 +603,7 @@ EdbPrintImmData16 (
 **/
 UINTN
 EdbPrintImmData32 (
-  IN UINT32                 Data
+  IN UINT32  Data
   )
 {
   EDBSPrintWithOffset (
@@ -610,7 +613,7 @@ EdbPrintImmData32 (
     L"(0x%08x)",
     (UINTN)Data
     );
-  mInstructionContentOffset  += 12;
+  mInstructionContentOffset += 12;
 
   return mInstructionContentOffset;
 }
@@ -626,7 +629,7 @@ EdbPrintImmData32 (
 **/
 UINTN
 EdbPrintImmData64 (
-  IN UINT64                 Data
+  IN UINT64  Data
   )
 {
   EDBSPrintWithOffset (
@@ -636,7 +639,7 @@ EdbPrintImmData64 (
     L"(0x%016lx)",
     Data
     );
-  mInstructionContentOffset  += 20;
+  mInstructionContentOffset += 20;
 
   return mInstructionContentOffset;
 }
@@ -652,7 +655,7 @@ EdbPrintImmData64 (
 **/
 UINTN
 EdbPrintImmDatan (
-  IN UINTN                  Data
+  IN UINTN  Data
   )
 {
   EDBSPrintWithOffset (
@@ -662,7 +665,7 @@ EdbPrintImmDatan (
     L"(%d)",
     (UINTN)Data
     );
-  mInstructionContentOffset  = mInstructionContentOffset + 2 + EdbGetBitWidth (Data);
+  mInstructionContentOffset = mInstructionContentOffset + 2 + EdbGetBitWidth (Data);
 
   return mInstructionContentOffset;
 }
@@ -678,7 +681,7 @@ EdbPrintImmDatan (
 **/
 UINTN
 EdbPrintImmData64n (
-  IN UINT64                 Data64
+  IN UINT64  Data64
   )
 {
   EDBSPrintWithOffset (
@@ -688,7 +691,7 @@ EdbPrintImmData64n (
     L"(%ld)",
     Data64
     );
-  mInstructionContentOffset  = mInstructionContentOffset + 2 + EdbGetBitWidth (Data64);
+  mInstructionContentOffset = mInstructionContentOffset + 2 + EdbGetBitWidth (Data64);
 
   return mInstructionContentOffset;
 }
@@ -704,7 +707,7 @@ EdbPrintImmData64n (
 **/
 UINTN
 EdbPrintData8 (
-  IN UINT8                  Data8
+  IN UINT8  Data8
   )
 {
   EDBSPrintWithOffset (
@@ -730,7 +733,7 @@ EdbPrintData8 (
 **/
 UINTN
 EdbPrintData16 (
-  IN UINT16                 Data16
+  IN UINT16  Data16
   )
 {
   EDBSPrintWithOffset (
@@ -756,7 +759,7 @@ EdbPrintData16 (
 **/
 UINTN
 EdbPrintData32 (
-  IN UINT32                 Data32
+  IN UINT32  Data32
   )
 {
   EDBSPrintWithOffset (
@@ -782,7 +785,7 @@ EdbPrintData32 (
 **/
 UINTN
 EdbPrintData64 (
-  IN UINT64                 Data64
+  IN UINT64  Data64
   )
 {
   EDBSPrintWithOffset (
@@ -808,7 +811,7 @@ EdbPrintData64 (
 **/
 UINTN
 EdbPrintDatan (
-  IN UINTN                  Data
+  IN UINTN  Data
   )
 {
   EDBSPrintWithOffset (
@@ -834,7 +837,7 @@ EdbPrintDatan (
 **/
 UINTN
 EdbPrintData64n (
-  IN UINT64                 Data64
+  IN UINT64  Data64
   )
 {
   EDBSPrintWithOffset (
@@ -860,10 +863,10 @@ EdbPrintData64n (
 **/
 UINTN
 EdbPrintData8s (
-  IN UINT8                  Data8
+  IN UINT8  Data8
   )
 {
-  BOOLEAN Sign;
+  BOOLEAN  Sign;
 
   Sign = (BOOLEAN)(Data8 >> 7);
 
@@ -891,10 +894,10 @@ EdbPrintData8s (
 **/
 UINTN
 EdbPrintData16s (
-  IN UINT16                 Data16
+  IN UINT16  Data16
   )
 {
-  BOOLEAN Sign;
+  BOOLEAN  Sign;
 
   Sign = (BOOLEAN)(Data16 >> 15);
 
@@ -922,10 +925,10 @@ EdbPrintData16s (
 **/
 UINTN
 EdbPrintData32s (
-  IN UINT32                 Data32
+  IN UINT32  Data32
   )
 {
-  BOOLEAN Sign;
+  BOOLEAN  Sign;
 
   Sign = (BOOLEAN)(Data32 >> 31);
 
@@ -953,13 +956,13 @@ EdbPrintData32s (
 **/
 UINTN
 EdbPrintData64s (
-  IN UINT64                 Data64
+  IN UINT64  Data64
   )
 {
-  BOOLEAN Sign;
-  INT64   Data64s;
+  BOOLEAN  Sign;
+  INT64    Data64s;
 
-  Sign = (BOOLEAN)RShiftU64 (Data64, 63);
+  Sign    = (BOOLEAN)RShiftU64 (Data64, 63);
   Data64s = (INT64)RShiftU64 (LShiftU64 (Data64, 1), 1);
 
   EDBSPrintWithOffset (
@@ -1010,10 +1013,10 @@ EdbPrintComma (
 **/
 UINTN
 EdbFindAndPrintSymbol (
-  IN UINTN                  Address
+  IN UINTN  Address
   )
 {
-  CHAR8 *SymbolStr;
+  CHAR8  *SymbolStr;
 
   SymbolStr = FindSymbolStr (Address);
   if (SymbolStr != NULL) {
@@ -1040,8 +1043,8 @@ EdbFindAndPrintSymbol (
 **/
 VOID
 EdbPrintRaw (
-  IN EFI_PHYSICAL_ADDRESS   InstructionAddress,
-  IN UINTN                  InstructionNumber
+  IN EFI_PHYSICAL_ADDRESS  InstructionAddress,
+  IN UINTN                 InstructionNumber
   )
 {
   UINTN  LineNumber;
@@ -1051,7 +1054,7 @@ EdbPrintRaw (
   CHAR8  *SymbolStr;
 
   if (InstructionNumber == 0) {
-    return ;
+    return;
   }
 
   LineNumber = InstructionNumber / EDB_BYTECODE_NUMBER_IN_LINE;
@@ -1075,6 +1078,7 @@ EdbPrintRaw (
       EDBPrint (L"%02x ", *(UINT8 *)(UINTN)InstructionAddress);
       InstructionAddress += 1;
     }
+
     EDBPrint (L"\n");
   }
 
@@ -1083,11 +1087,12 @@ EdbPrintRaw (
     EDBPrint (L"%02x ", *(UINT8 *)(UINTN)InstructionAddress);
     InstructionAddress += 1;
   }
+
   for (ByteIndex = 0; ByteIndex < EDB_BYTECODE_NUMBER_IN_LINE - ByteNumber; ByteIndex++) {
     EDBPrint (L"   ");
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -1102,42 +1107,41 @@ EdbPrintRaw (
 **/
 EFI_STATUS
 EdbShowDisasm (
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_SYSTEM_CONTEXT        SystemContext
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
-  EFI_PHYSICAL_ADDRESS    InstructionAddress;
-  UINTN                   InstructionNumber;
-  UINTN                   InstructionLength;
-  UINT8                   Opcode;
-  CHAR16                  *InstructionString;
-//  UINTN                   Result;
+  EFI_PHYSICAL_ADDRESS  InstructionAddress;
+  UINTN                 InstructionNumber;
+  UINTN                 InstructionLength;
+  UINT8                 Opcode;
+  CHAR16                *InstructionString;
+
+  //  UINTN                   Result;
 
   InstructionAddress = DebuggerPrivate->InstructionScope;
   for (InstructionNumber = 0; InstructionNumber < DebuggerPrivate->InstructionNumber; InstructionNumber++) {
-
     //
     // Break each 0x10 instruction
     //
     if (((InstructionNumber % EFI_DEBUGGER_LINE_NUMBER_IN_PAGE) == 0) &&
-        (InstructionNumber != 0)) {
+        (InstructionNumber != 0))
+    {
       if (SetPageBreak ()) {
         break;
       }
     }
 
-    Opcode = GET_OPCODE(InstructionAddress);
+    Opcode = GET_OPCODE (InstructionAddress);
     if ((Opcode < OPCODE_MAX) && (mEdbDisasmInstructionTable[Opcode] != NULL)) {
-      InstructionLength = mEdbDisasmInstructionTable [Opcode] (InstructionAddress, SystemContext, &InstructionString);
+      InstructionLength = mEdbDisasmInstructionTable[Opcode](InstructionAddress, SystemContext, &InstructionString);
       if (InstructionLength != 0) {
-
         //
         // Print Source
         //
-//        Result = EdbPrintSource ((UINTN)InstructionAddress, FALSE);
+        //        Result = EdbPrintSource ((UINTN)InstructionAddress, FALSE);
 
         if (!DebuggerPrivate->DebuggerSymbolContext.DisplayCodeOnly) {
-
           EdbPrintRaw (InstructionAddress, InstructionLength);
           if (InstructionString != NULL) {
             EDBPrint (L"%s\n", InstructionString);
@@ -1182,30 +1186,31 @@ EdbShowDisasm (
 **/
 UINT64
 GetRegisterValue (
-  IN     EFI_SYSTEM_CONTEXT        SystemContext,
-  IN     UINT8                     Index
+  IN     EFI_SYSTEM_CONTEXT  SystemContext,
+  IN     UINT8               Index
   )
 {
   switch (Index) {
-  case 0:
-    return SystemContext.SystemContextEbc->R0;
-  case 1:
-    return SystemContext.SystemContextEbc->R1;
-  case 2:
-    return SystemContext.SystemContextEbc->R2;
-  case 3:
-    return SystemContext.SystemContextEbc->R3;
-  case 4:
-    return SystemContext.SystemContextEbc->R4;
-  case 5:
-    return SystemContext.SystemContextEbc->R5;
-  case 6:
-    return SystemContext.SystemContextEbc->R6;
-  case 7:
-    return SystemContext.SystemContextEbc->R7;
-  default:
-    ASSERT (FALSE);
-    break;
+    case 0:
+      return SystemContext.SystemContextEbc->R0;
+    case 1:
+      return SystemContext.SystemContextEbc->R1;
+    case 2:
+      return SystemContext.SystemContextEbc->R2;
+    case 3:
+      return SystemContext.SystemContextEbc->R3;
+    case 4:
+      return SystemContext.SystemContextEbc->R4;
+    case 5:
+      return SystemContext.SystemContextEbc->R5;
+    case 6:
+      return SystemContext.SystemContextEbc->R6;
+    case 7:
+      return SystemContext.SystemContextEbc->R7;
+    default:
+      ASSERT (FALSE);
+      break;
   }
+
   return 0;
 }

@@ -53,10 +53,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0xc770a27f, 0x956a, 0x497a, {0x85, 0x48, 0xe0, 0x61, 0x97, 0x58, 0x8b, 0xf6 } \
   }
 
-extern EFI_GUID gRecoveryOnDataCdGuid;
-extern EFI_GUID gRecoveryOnFatFloppyDiskGuid;
-extern EFI_GUID gRecoveryOnFatIdeDiskGuid;
-extern EFI_GUID gRecoveryOnFatUsbDiskGuid;
-extern EFI_GUID gRecoveryOnFatNvmeDiskGuid;
+extern EFI_GUID  gRecoveryOnDataCdGuid;
+extern EFI_GUID  gRecoveryOnFatFloppyDiskGuid;
+extern EFI_GUID  gRecoveryOnFatIdeDiskGuid;
+extern EFI_GUID  gRecoveryOnFatUsbDiskGuid;
+extern EFI_GUID  gRecoveryOnFatNvmeDiskGuid;
 
 #endif

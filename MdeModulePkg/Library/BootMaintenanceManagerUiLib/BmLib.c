@@ -23,8 +23,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 EfiLibDeleteVariable (
-  IN CHAR16   *VarName,
-  IN EFI_GUID *VarGuid
+  IN CHAR16    *VarName,
+  IN EFI_GUID  *VarGuid
   )
 {
   return gRT->SetVariable (
@@ -49,11 +49,11 @@ EfiLibDeleteVariable (
 **/
 UINTN
 EfiDevicePathInstanceCount (
-  IN EFI_DEVICE_PATH_PROTOCOL      *DevicePath
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
-  UINTN Count;
-  UINTN Size;
+  UINTN  Count;
+  UINTN  Size;
 
   Count = 0;
   while (GetNextDevicePathInstance (&DevicePath, &Size) != NULL) {
@@ -76,7 +76,7 @@ EfiDevicePathInstanceCount (
 **/
 UINT16 *
 EfiLibStrFromDatahub (
-  IN EFI_DEVICE_PATH_PROTOCOL                 *DevPath
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevPath
   )
 {
   return NULL;

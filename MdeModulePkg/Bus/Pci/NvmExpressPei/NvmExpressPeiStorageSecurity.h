@@ -24,8 +24,8 @@
 EFI_STATUS
 EFIAPI
 NvmeStorageSecurityGetDeviceNo (
-  IN  EDKII_PEI_STORAGE_SECURITY_CMD_PPI    *This,
-  OUT UINTN                                 *NumberofDevices
+  IN  EDKII_PEI_STORAGE_SECURITY_CMD_PPI  *This,
+  OUT UINTN                               *NumberofDevices
   );
 
 /**

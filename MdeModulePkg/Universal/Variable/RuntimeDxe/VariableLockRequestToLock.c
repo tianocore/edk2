@@ -53,17 +53,17 @@ VariableLockRequestToLock (
   DEBUG ((DEBUG_WARN, "!!! DEPRECATED INTERFACE !!! Variable: %g %s\n", VendorGuid, VariableName));
 
   NewPolicy = NULL;
-  Status = CreateBasicVariablePolicy(
-             VendorGuid,
-             VariableName,
-             VARIABLE_POLICY_NO_MIN_SIZE,
-             VARIABLE_POLICY_NO_MAX_SIZE,
-             VARIABLE_POLICY_NO_MUST_ATTR,
-             VARIABLE_POLICY_NO_CANT_ATTR,
-             VARIABLE_POLICY_TYPE_LOCK_NOW,
-             &NewPolicy
-             );
-  if (!EFI_ERROR( Status )) {
+  Status    = CreateBasicVariablePolicy (
+                VendorGuid,
+                VariableName,
+                VARIABLE_POLICY_NO_MIN_SIZE,
+                VARIABLE_POLICY_NO_MAX_SIZE,
+                VARIABLE_POLICY_NO_MUST_ATTR,
+                VARIABLE_POLICY_NO_CANT_ATTR,
+                VARIABLE_POLICY_TYPE_LOCK_NOW,
+                &NewPolicy
+                );
+  if (!EFI_ERROR (Status)) {
     Status = RegisterVariablePolicy (NewPolicy);
 
     //
@@ -83,11 +83,13 @@ VariableLockRequestToLock (
       }
     }
   }
+
   if (EFI_ERROR (Status)) {
-    DEBUG(( DEBUG_ERROR, "%a - Failed to lock variable %s! %r\n", __FUNCTION__, VariableName, Status ));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to lock variable %s! %r\n", __FUNCTION__, VariableName, Status));
   }
+
   if (NewPolicy != NULL) {
-    FreePool( NewPolicy );
+    FreePool (NewPolicy);
   }
 
   return Status;

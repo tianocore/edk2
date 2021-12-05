@@ -14,8 +14,8 @@
 //
 // Handle to install ACPI Table Protocol
 //
-EFI_HANDLE    mHandle = NULL;
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE   *mPrivateData = NULL;
+EFI_HANDLE                                             mHandle       = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE  *mPrivateData = NULL;
 
 /**
   Entry point of the ACPI table driver.
@@ -33,12 +33,12 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE   *mPrivateData = NULL;
 EFI_STATUS
 EFIAPI
 InitializeAcpiTableDxe (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
-  EFI_ACPI_TABLE_INSTANCE   *PrivateData;
+  EFI_STATUS               Status;
+  EFI_ACPI_TABLE_INSTANCE  *PrivateData;
 
   //
   // Initialize our protocol
@@ -61,14 +61,14 @@ InitializeAcpiTableDxe (
   //
   if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
     mPrivateData = PrivateData;
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &mHandle,
-                    &gEfiAcpiTableProtocolGuid,
-                    &PrivateData->AcpiTableProtocol,
-                    &gEfiAcpiSdtProtocolGuid,
-                    &mPrivateData->AcpiSdtProtocol,
-                    NULL
-                    );
+    Status       = gBS->InstallMultipleProtocolInterfaces (
+                          &mHandle,
+                          &gEfiAcpiTableProtocolGuid,
+                          &PrivateData->AcpiTableProtocol,
+                          &gEfiAcpiSdtProtocolGuid,
+                          &mPrivateData->AcpiSdtProtocol,
+                          NULL
+                          );
   } else {
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &mHandle,
@@ -77,8 +77,8 @@ InitializeAcpiTableDxe (
                     NULL
                     );
   }
+
   ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
-

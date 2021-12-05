@@ -17,18 +17,18 @@
 **/
 VOID *
 BrAlloc (
-  IN VOID *    Ptr,
-  IN size_t    Size
+  IN VOID    *Ptr,
+  IN size_t  Size
   )
 {
-  VOID          *Addr;
-  BROTLI_BUFF   *Private;
+  VOID         *Addr;
+  BROTLI_BUFF  *Private;
 
   Private = (BROTLI_BUFF *)Ptr;
 
   if (Private->BuffSize >= Size) {
-    Addr = Private->Buff;
-    Private->Buff = (VOID *) ((UINT8 *)Addr + Size);
+    Addr               = Private->Buff;
+    Private->Buff      = (VOID *)((UINT8 *)Addr + Size);
     Private->BuffSize -= Size;
     return Addr;
   } else {
@@ -45,8 +45,8 @@ BrAlloc (
 **/
 VOID
 BrFree (
-  IN VOID *    Ptr,
-  IN VOID *    Address
+  IN VOID  *Ptr,
+  IN VOID  *Address
   )
 {
   //
@@ -79,83 +79,89 @@ BrFree (
 **/
 EFI_STATUS
 BrotliDecompress (
-  IN CONST VOID*  Source,
-  IN UINTN        SourceSize,
-  IN OUT VOID*    Destination,
-  IN OUT UINTN    DestSize,
-  IN VOID *       BuffInfo
+  IN CONST VOID  *Source,
+  IN UINTN       SourceSize,
+  IN OUT VOID    *Destination,
+  IN OUT UINTN   DestSize,
+  IN VOID        *BuffInfo
   )
 {
-  UINT8 *        Input;
-  UINT8 *        Output;
-  const UINT8 *  NextIn;
-  UINT8 *        NextOut;
-  size_t         TotalOut;
-  size_t         AvailableIn;
-  size_t         AvailableOut;
-  VOID *         Temp;
-  BrotliDecoderResult   Result;
-  BrotliDecoderState *  BroState;
+  UINT8                *Input;
+  UINT8                *Output;
+  const UINT8          *NextIn;
+  UINT8                *NextOut;
+  size_t               TotalOut;
+  size_t               AvailableIn;
+  size_t               AvailableOut;
+  VOID                 *Temp;
+  BrotliDecoderResult  Result;
+  BrotliDecoderState   *BroState;
 
-  TotalOut = 0;
+  TotalOut     = 0;
   AvailableOut = FILE_BUFFER_SIZE;
-  Result = BROTLI_DECODER_RESULT_ERROR;
-  BroState = BrotliDecoderCreateInstance(BrAlloc, BrFree, BuffInfo);
-  Temp = Destination;
+  Result       = BROTLI_DECODER_RESULT_ERROR;
+  BroState     = BrotliDecoderCreateInstance (BrAlloc, BrFree, BuffInfo);
+  Temp         = Destination;
 
   if (BroState == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  Input = (UINT8 *)BrAlloc(BuffInfo, FILE_BUFFER_SIZE);
-  Output = (UINT8 *)BrAlloc(BuffInfo, FILE_BUFFER_SIZE);
-  if ((Input==NULL) || (Output==NULL)) {
-    BrFree(BuffInfo, Input);
-    BrFree(BuffInfo, Output);
-    BrotliDecoderDestroyInstance(BroState);
+
+  Input  = (UINT8 *)BrAlloc (BuffInfo, FILE_BUFFER_SIZE);
+  Output = (UINT8 *)BrAlloc (BuffInfo, FILE_BUFFER_SIZE);
+  if ((Input == NULL) || (Output == NULL)) {
+    BrFree (BuffInfo, Input);
+    BrFree (BuffInfo, Output);
+    BrotliDecoderDestroyInstance (BroState);
     return EFI_INVALID_PARAMETER;
   }
+
   NextOut = Output;
-  Result = BROTLI_DECODER_RESULT_NEEDS_MORE_INPUT;
+  Result  = BROTLI_DECODER_RESULT_NEEDS_MORE_INPUT;
   while (1) {
     if (Result == BROTLI_DECODER_RESULT_NEEDS_MORE_INPUT) {
       if (SourceSize == 0) {
         break;
       }
+
       if (SourceSize >= FILE_BUFFER_SIZE) {
         AvailableIn = FILE_BUFFER_SIZE;
-      }else{
+      } else {
         AvailableIn = SourceSize;
       }
-      CopyMem(Input, Source, AvailableIn);
-      Source = (VOID *)((UINT8 *)Source + AvailableIn);
+
+      CopyMem (Input, Source, AvailableIn);
+      Source      = (VOID *)((UINT8 *)Source + AvailableIn);
       SourceSize -= AvailableIn;
-      NextIn = Input;
+      NextIn      = Input;
     } else if (Result == BROTLI_DECODER_RESULT_NEEDS_MORE_OUTPUT) {
-      CopyMem(Temp, Output, FILE_BUFFER_SIZE);
+      CopyMem (Temp, Output, FILE_BUFFER_SIZE);
       AvailableOut = FILE_BUFFER_SIZE;
-      Temp = (VOID *)((UINT8 *)Temp +FILE_BUFFER_SIZE);
-      NextOut = Output;
+      Temp         = (VOID *)((UINT8 *)Temp +FILE_BUFFER_SIZE);
+      NextOut      = Output;
     } else {
       break; /* Error or success. */
     }
-    Result = BrotliDecoderDecompressStream(
-                          BroState,
-                          &AvailableIn,
-                          &NextIn,
-                          &AvailableOut,
-                          &NextOut,
-                          &TotalOut
-                          );
+
+    Result = BrotliDecoderDecompressStream (
+               BroState,
+               &AvailableIn,
+               &NextIn,
+               &AvailableOut,
+               &NextOut,
+               &TotalOut
+               );
   }
+
   if (NextOut != Output) {
-    CopyMem(Temp, Output, (size_t)(NextOut - Output));
+    CopyMem (Temp, Output, (size_t)(NextOut - Output));
   }
 
   DestSize = TotalOut;
 
-  BrFree(BuffInfo, Input);
-  BrFree(BuffInfo, Output);
-  BrotliDecoderDestroyInstance(BroState);
+  BrFree (BuffInfo, Input);
+  BrFree (BuffInfo, Output);
+  BrotliDecoderDestroyInstance (BroState);
   return (Result == BROTLI_DECODER_RESULT_SUCCESS) ? EFI_SUCCESS : EFI_INVALID_PARAMETER;
 }
 
@@ -169,19 +175,20 @@ BrotliDecompress (
   @return The size of the uncompressed buffer.
 **/
 UINT64
-BrGetDecodedSizeOfBuf(
-  IN UINT8 *  EncodedData,
-  IN UINT8    StartOffset,
-  IN UINT8    EndOffset
+BrGetDecodedSizeOfBuf (
+  IN UINT8  *EncodedData,
+  IN UINT8  StartOffset,
+  IN UINT8  EndOffset
   )
 {
-  UINT64 DecodedSize;
-  INTN   Index;
+  UINT64  DecodedSize;
+  INTN    Index;
 
   /* Parse header */
   DecodedSize = 0;
-  for (Index = EndOffset - 1; Index >= StartOffset; Index--)
-    DecodedSize = LShiftU64(DecodedSize, 8) + EncodedData[Index];
+  for (Index = EndOffset - 1; Index >= StartOffset; Index--) {
+    DecodedSize = LShiftU64 (DecodedSize, 8) + EncodedData[Index];
+  }
 
   return DecodedSize;
 }
@@ -218,23 +225,23 @@ BrGetDecodedSizeOfBuf(
 EFI_STATUS
 EFIAPI
 BrotliUefiDecompressGetInfo (
-  IN  CONST VOID *  Source,
-  IN  UINT32        SourceSize,
-  OUT UINT32 *      DestinationSize,
-  OUT UINT32 *      ScratchSize
+  IN  CONST VOID  *Source,
+  IN  UINT32      SourceSize,
+  OUT UINT32      *DestinationSize,
+  OUT UINT32      *ScratchSize
   )
 {
   UINT64  GetSize;
   UINT8   MaxOffset;
 
-  ASSERT(SourceSize >= BROTLI_SCRATCH_MAX);
+  ASSERT (SourceSize >= BROTLI_SCRATCH_MAX);
 
-  MaxOffset = BROTLI_DECODE_MAX;
-  GetSize = BrGetDecodedSizeOfBuf((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
+  MaxOffset        = BROTLI_DECODE_MAX;
+  GetSize          = BrGetDecodedSizeOfBuf ((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
   *DestinationSize = (UINT32)GetSize;
-  MaxOffset = BROTLI_SCRATCH_MAX;
-  GetSize = BrGetDecodedSizeOfBuf((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
-  *ScratchSize = (UINT32)GetSize;
+  MaxOffset        = BROTLI_SCRATCH_MAX;
+  GetSize          = BrGetDecodedSizeOfBuf ((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
+  *ScratchSize     = (UINT32)GetSize;
   return EFI_SUCCESS;
 }
 
@@ -263,31 +270,31 @@ BrotliUefiDecompressGetInfo (
 EFI_STATUS
 EFIAPI
 BrotliUefiDecompress (
-  IN CONST VOID *   Source,
-  IN UINTN          SourceSize,
-  IN OUT VOID *     Destination,
-  IN OUT VOID *     Scratch
+  IN CONST VOID  *Source,
+  IN UINTN       SourceSize,
+  IN OUT VOID    *Destination,
+  IN OUT VOID    *Scratch
   )
 {
-  UINTN          DestSize = 0;
-  EFI_STATUS     Status;
-  BROTLI_BUFF    BroBuff;
-  UINT64         GetSize;
-  UINT8          MaxOffset;
+  UINTN        DestSize = 0;
+  EFI_STATUS   Status;
+  BROTLI_BUFF  BroBuff;
+  UINT64       GetSize;
+  UINT8        MaxOffset;
 
   MaxOffset = BROTLI_SCRATCH_MAX;
-  GetSize = BrGetDecodedSizeOfBuf((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
+  GetSize   = BrGetDecodedSizeOfBuf ((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
 
   BroBuff.Buff     = Scratch;
   BroBuff.BuffSize = (UINTN)GetSize;
 
-  Status = BrotliDecompress(
-            (VOID *)((UINT8 *)Source + BROTLI_SCRATCH_MAX),
-            SourceSize - BROTLI_SCRATCH_MAX,
-            Destination,
-            DestSize,
-            (VOID *)(&BroBuff)
-            );
+  Status = BrotliDecompress (
+             (VOID *)((UINT8 *)Source + BROTLI_SCRATCH_MAX),
+             SourceSize - BROTLI_SCRATCH_MAX,
+             Destination,
+             DestSize,
+             (VOID *)(&BroBuff)
+             );
 
   return Status;
 }

@@ -6,16 +6,14 @@
 
 **/
 
-
 #include <Uefi.h>
-
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 
 #include <Guid/MemoryProfile.h>
 
-EDKII_MEMORY_PROFILE_PROTOCOL *mLibProfileProtocol;
+EDKII_MEMORY_PROFILE_PROTOCOL  *mLibProfileProtocol;
 
 /**
   The constructor function initializes memory profile for DXE phase.
@@ -33,12 +31,12 @@ MemoryProfileLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS           Status;
+  EFI_STATUS  Status;
 
   Status = gBS->LocateProtocol (
                   &gEdkiiMemoryProfileGuid,
                   NULL,
-                  (VOID **) &mLibProfileProtocol
+                  (VOID **)&mLibProfileProtocol
                   );
   if (EFI_ERROR (Status)) {
     mLibProfileProtocol = NULL;
@@ -72,17 +70,18 @@ MemoryProfileLibConstructor (
 EFI_STATUS
 EFIAPI
 MemoryProfileLibRecord (
-  IN PHYSICAL_ADDRESS           CallerAddress,
-  IN MEMORY_PROFILE_ACTION      Action,
-  IN EFI_MEMORY_TYPE            MemoryType,
-  IN VOID                       *Buffer,
-  IN UINTN                      Size,
-  IN CHAR8                      *ActionString OPTIONAL
+  IN PHYSICAL_ADDRESS       CallerAddress,
+  IN MEMORY_PROFILE_ACTION  Action,
+  IN EFI_MEMORY_TYPE        MemoryType,
+  IN VOID                   *Buffer,
+  IN UINTN                  Size,
+  IN CHAR8                  *ActionString OPTIONAL
   )
 {
   if (mLibProfileProtocol == NULL) {
     return EFI_UNSUPPORTED;
   }
+
   return mLibProfileProtocol->Record (
                                 mLibProfileProtocol,
                                 CallerAddress,
@@ -93,4 +92,3 @@ MemoryProfileLibRecord (
                                 ActionString
                                 );
 }
-

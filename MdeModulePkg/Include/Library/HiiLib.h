@@ -71,7 +71,7 @@ HiiAddPackages (
 VOID
 EFIAPI
 HiiRemovePackages (
-  IN      EFI_HII_HANDLE      HiiHandle
+  IN      EFI_HII_HANDLE  HiiHandle
   )
 ;
 
@@ -269,10 +269,10 @@ HiiGetHiiHandles (
 **/
 EFI_STATUS
 EFIAPI
-HiiGetFormSetFromHiiHandle(
-  IN  EFI_HII_HANDLE     Handle,
-  OUT EFI_IFR_FORM_SET   **Buffer,
-  OUT UINTN              *BufferSize
+HiiGetFormSetFromHiiHandle (
+  IN  EFI_HII_HANDLE    Handle,
+  OUT EFI_IFR_FORM_SET  **Buffer,
+  OUT UINTN             *BufferSize
   );
 
 /**
@@ -296,7 +296,7 @@ HiiGetFormSetFromHiiHandle(
 CHAR8 *
 EFIAPI
 HiiGetSupportedLanguages (
-  IN EFI_HII_HANDLE           HiiHandle
+  IN EFI_HII_HANDLE  HiiHandle
   )
 ;
 

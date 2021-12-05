@@ -17,12 +17,12 @@
 
 #include "DebugService.h"
 
-EDKII_DEBUG_PPI mDebugPpi = {
+EDKII_DEBUG_PPI  mDebugPpi = {
   PeiDebugBPrint,
   PeiDebugAssert
 };
 
-EFI_PEI_PPI_DESCRIPTOR mDebugServicePpi = {
+EFI_PEI_PPI_DESCRIPTOR  mDebugServicePpi = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEdkiiDebugPpiGuid,
   (VOID *)&mDebugPpi
@@ -39,13 +39,13 @@ EFI_PEI_PPI_DESCRIPTOR mDebugServicePpi = {
 **/
 VOID
 EFIAPI
-PeiDebugBPrint(
-  IN UINTN                          ErrorLevel,
-  IN CONST CHAR8                    *Format,
-  IN BASE_LIST                      Marker
+PeiDebugBPrint (
+  IN UINTN        ErrorLevel,
+  IN CONST CHAR8  *Format,
+  IN BASE_LIST    Marker
   )
 {
-  DebugBPrint(ErrorLevel, Format, Marker);
+  DebugBPrint (ErrorLevel, Format, Marker);
 }
 
 /**
@@ -61,13 +61,13 @@ PeiDebugBPrint(
 **/
 VOID
 EFIAPI
-PeiDebugAssert(
-  IN CONST CHAR8                    *FileName,
-  IN UINTN                          LineNumber,
-  IN CONST CHAR8                    *Description
+PeiDebugAssert (
+  IN CONST CHAR8  *FileName,
+  IN UINTN        LineNumber,
+  IN CONST CHAR8  *Description
   )
 {
-  DebugAssert(FileName, LineNumber, Description);
+  DebugAssert (FileName, LineNumber, Description);
 }
 
 /**
@@ -85,10 +85,9 @@ PeiDebugAssert(
 EFI_STATUS
 EFIAPI
 DebugSerivceInitialize (
-  IN EFI_PEI_FILE_HANDLE        FileHandle,
-  IN CONST EFI_PEI_SERVICES     **PeiServices
+  IN EFI_PEI_FILE_HANDLE     FileHandle,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
   return PeiServicesInstallPpi (&mDebugServicePpi);
 }
-

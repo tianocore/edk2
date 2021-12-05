@@ -26,24 +26,24 @@ typedef struct {
   ///
   /// The version of this structure.  Initial version value is 0x00000001.
   ///
-  UINT32                               Version;
+  UINT32                                 Version;
   ///
   /// The foreground color of a progress bar that is used by the Progress()
   /// function that is passed into the Firmware Management Protocol SetImage()
   /// service is called.
   ///
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  ProgressBarForegroundColor;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION    ProgressBarForegroundColor;
   ///
   /// The time in seconds to arm the watchdog timer each time the Progress()
   /// function passed into the  Firmware Management Protocol SetImage() service
   /// is called.
   ///
-  UINTN                                WatchdogSeconds;
+  UINTN                                  WatchdogSeconds;
 } EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL;
 
 ///
 /// EDK II Firmware Management Progress Protocol GUID variable.
 ///
-extern EFI_GUID gEdkiiFirmwareManagementProgressProtocolGuid;
+extern EFI_GUID  gEdkiiFirmwareManagementProgressProtocolGuid;
 
 #endif

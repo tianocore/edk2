@@ -30,9 +30,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 RegisterVariablePolicy (
-  IN CONST VARIABLE_POLICY_ENTRY    *NewPolicy
+  IN CONST VARIABLE_POLICY_ENTRY  *NewPolicy
   );
-
 
 /**
   This API function checks to see whether the parameters to SetVariable would
@@ -56,13 +55,12 @@ RegisterVariablePolicy (
 EFI_STATUS
 EFIAPI
 ValidateSetVariable (
-  IN  CHAR16                       *VariableName,
-  IN  EFI_GUID                     *VendorGuid,
-  IN  UINT32                       Attributes,
-  IN  UINTN                        DataSize,
-  IN  VOID                         *Data
+  IN  CHAR16    *VariableName,
+  IN  EFI_GUID  *VendorGuid,
+  IN  UINT32    Attributes,
+  IN  UINTN     DataSize,
+  IN  VOID      *Data
   );
-
 
 /**
   This API function disables the variable policy enforcement. If it's
@@ -80,7 +78,6 @@ EFIAPI
 DisableVariablePolicy (
   VOID
   );
-
 
 /**
   This API function will dump the entire contents of the variable policy table.
@@ -101,10 +98,9 @@ DisableVariablePolicy (
 EFI_STATUS
 EFIAPI
 DumpVariablePolicy (
-  OUT     UINT8         *Policy,
-  IN OUT  UINT32        *Size
+  OUT     UINT8   *Policy,
+  IN OUT  UINT32  *Size
   );
-
 
 /**
   This API function returns whether or not the policy engine is
@@ -121,7 +117,6 @@ IsVariablePolicyEnabled (
   VOID
   );
 
-
 /**
   This API function locks the interface so that no more policy updates
   can be performed or changes made to the enforcement until the next boot.
@@ -135,7 +130,6 @@ EFIAPI
 LockVariablePolicy (
   VOID
   );
-
 
 /**
   This API function returns whether or not the policy interface is locked
@@ -151,7 +145,6 @@ EFIAPI
 IsVariablePolicyInterfaceLocked (
   VOID
   );
-
 
 /**
   This helper function initializes the library and sets
@@ -170,9 +163,8 @@ IsVariablePolicyInterfaceLocked (
 EFI_STATUS
 EFIAPI
 InitVariablePolicyLib (
-  IN  EFI_GET_VARIABLE    GetVariableHelper
+  IN  EFI_GET_VARIABLE  GetVariableHelper
   );
-
 
 /**
   This helper function returns whether or not the library is currently initialized.
@@ -186,7 +178,6 @@ EFIAPI
 IsVariablePolicyLibInitialized (
   VOID
   );
-
 
 /**
   This helper function tears down  the library.
@@ -202,6 +193,5 @@ EFIAPI
 DeinitVariablePolicyLib (
   VOID
   );
-
 
 #endif // _VARIABLE_POLICY_LIB_H_
