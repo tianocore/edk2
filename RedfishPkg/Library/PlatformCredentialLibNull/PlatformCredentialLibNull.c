@@ -8,6 +8,7 @@
 **/
 #include <Uefi.h>
 #include <Protocol/EdkIIRedfishCredential.h>
+
 /**
   Notification of Exit Boot Service.
 
@@ -17,7 +18,7 @@ VOID
 EFIAPI
 LibCredentialExitBootServicesNotify (
   IN  EDKII_REDFISH_CREDENTIAL_PROTOCOL  *This
-)
+  )
 {
   return;
 }
@@ -31,7 +32,7 @@ VOID
 EFIAPI
 LibCredentialEndOfDxeNotify (
   IN  EDKII_REDFISH_CREDENTIAL_PROTOCOL  *This
-)
+  )
 {
   return;
 }
@@ -67,7 +68,7 @@ LibCredentialGetAuthInfo (
   OUT EDKII_REDFISH_AUTH_METHOD          *AuthMethod,
   OUT CHAR8                              **UserId,
   OUT CHAR8                              **Password
-)
+  )
 {
   return EFI_UNSUPPORTED;
 }
@@ -92,10 +93,9 @@ LibCredentialGetAuthInfo (
 EFI_STATUS
 EFIAPI
 LibStopRedfishService (
-  IN     EDKII_REDFISH_CREDENTIAL_PROTOCOL    *This,
-  IN     EDKII_REDFISH_CREDENTIAL_STOP_SERVICE_TYPE ServiceStopType
+  IN     EDKII_REDFISH_CREDENTIAL_PROTOCOL           *This,
+  IN     EDKII_REDFISH_CREDENTIAL_STOP_SERVICE_TYPE  ServiceStopType
   )
 {
   return EFI_UNSUPPORTED;
 }
-

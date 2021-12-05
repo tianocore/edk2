@@ -33,11 +33,11 @@
 
 #include <IndustryStandard/RedfishHostInterface.h>
 
-#define REDFISH_DISCOVER_VERSION  0x00010000
-#define EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_TPL TPL_NOTIFY
+#define REDFISH_DISCOVER_VERSION                    0x00010000
+#define EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_TPL  TPL_NOTIFY
 
 //
-//GUID definitions
+// GUID definitions
 //
 
 #define EFI_REDFISH_DISCOVER_TCP4_INSTANCE_GUID \
@@ -75,11 +75,11 @@ typedef enum {
 // the network interface.
 //
 typedef struct {
-  EFI_GUID ProtocolGuid;                ///< Network protocol GUID.
-  EFI_GUID ProtocolServiceGuid;         ///< Network protocol service GUID.
-  UINT32   ProtocolDiscoverId;          ///< The identifier installed on network protocol handle.
-  EFI_HANDLE ProtocolControllerHandle;  ///< The controller handle on network protocol.
-  VOID *NetworkProtocolInterface;       ///< The protocol interface of network protocol.
+  EFI_GUID      ProtocolGuid;              ///< Network protocol GUID.
+  EFI_GUID      ProtocolServiceGuid;       ///< Network protocol service GUID.
+  UINT32        ProtocolDiscoverId;        ///< The identifier installed on network protocol handle.
+  EFI_HANDLE    ProtocolControllerHandle;  ///< The controller handle on network protocol.
+  VOID          *NetworkProtocolInterface; ///< The protocol interface of network protocol.
 } REDFISH_DISCOVER_NETWORK_INTERFACE_PROTOCOL;
 
 //
@@ -87,39 +87,39 @@ typedef struct {
 // interface properties.
 //
 typedef struct {
-  LIST_ENTRY      Entry;                        ///< Link list entry.
-  EFI_HANDLE      OpenDriverAgentHandle;        ///< The agent to open network protocol.
-  EFI_HANDLE      OpenDriverControllerHandle;   ///< The controller handle to open network protocol.
-  UINTN           HwAddressSize;                ///< The size of network interface hardware address.
-  EFI_MAC_ADDRESS MacAddress;                   ///< MAC address of network interface.
-  CHAR16          *StrMacAddr;                  ///< String to MAC address of network interface.
-  BOOLEAN         GotSubnetInfo;                ///< Indicates sub net information is retrieved.
-  EFI_IP_ADDRESS  SubnetAddr;                   ///< Subnet ID.
-  EFI_IP_ADDRESS  SubnetMask;                   ///< Subnet mask (IPv4 only)
-  UINT8           SubnetPrefixLength;           ///< Subnet prefix.
-  UINT16          VlanId;                       ///< VLAN ID
-  UINT32          SubnetAddrInfoIPv6Number;     ///< IPv6 address info number.
-  EFI_IP6_ADDRESS_INFO *SubnetAddrInfoIPv6;     ///< IPv6 address info.
+  LIST_ENTRY                                     Entry;                      ///< Link list entry.
+  EFI_HANDLE                                     OpenDriverAgentHandle;      ///< The agent to open network protocol.
+  EFI_HANDLE                                     OpenDriverControllerHandle; ///< The controller handle to open network protocol.
+  UINTN                                          HwAddressSize;              ///< The size of network interface hardware address.
+  EFI_MAC_ADDRESS                                MacAddress;                 ///< MAC address of network interface.
+  CHAR16                                         *StrMacAddr;                ///< String to MAC address of network interface.
+  BOOLEAN                                        GotSubnetInfo;              ///< Indicates sub net information is retrieved.
+  EFI_IP_ADDRESS                                 SubnetAddr;                 ///< Subnet ID.
+  EFI_IP_ADDRESS                                 SubnetMask;                 ///< Subnet mask (IPv4 only)
+  UINT8                                          SubnetPrefixLength;         ///< Subnet prefix.
+  UINT16                                         VlanId;                     ///< VLAN ID
+  UINT32                                         SubnetAddrInfoIPv6Number;   ///< IPv6 address info number.
+  EFI_IP6_ADDRESS_INFO                           *SubnetAddrInfoIPv6;        ///< IPv6 address info.
   //
   // Network interface protocol and REST EX infor.
   //
-  UINT32          NetworkProtocolType;          ///< Network protocol type. Refer to
-                                                ///< NETWORK_INTERFACE_PROTOCOL_TYPE.
-  REDFISH_DISCOVER_NETWORK_INTERFACE_PROTOCOL NetworkInterfaceProtocolInfo; ///< Network interface protocol information.
-  EFI_HANDLE      RestExHandle;                 ///< REST EX handle associated with this network interface.
+  UINT32                                         NetworkProtocolType;          ///< Network protocol type. Refer to
+                                                                               ///< NETWORK_INTERFACE_PROTOCOL_TYPE.
+  REDFISH_DISCOVER_NETWORK_INTERFACE_PROTOCOL    NetworkInterfaceProtocolInfo; ///< Network interface protocol information.
+  EFI_HANDLE                                     RestExHandle;                 ///< REST EX handle associated with this network interface.
 } EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL;
 
 //
 // Internal structure used to maintain REST EX properties.
 //
 typedef struct {
-    LIST_ENTRY      Entry;                          ///< Link list entry.
-    EFI_HANDLE      OpenDriverAgentHandle;          ///< The agent to open network protocol.
-    EFI_HANDLE      OpenDriverControllerHandle;     ///< The controller handle to open network protocol.
-    EFI_HANDLE      RestExChildHandle;              ///< The child handle created throught REST EX Service Protocol.
-    EFI_HANDLE      RestExControllerHandle;         ///< The controller handle which provide REST EX protocol.
-    EFI_REST_EX_PROTOCOL *RestExProtocolInterface;  ///< Pointer to EFI_REST_EX_PROTOCOL.
-    UINT32          RestExId;                       ///< The identifier installed on REST EX controller handle.
+  LIST_ENTRY              Entry;                      ///< Link list entry.
+  EFI_HANDLE              OpenDriverAgentHandle;      ///< The agent to open network protocol.
+  EFI_HANDLE              OpenDriverControllerHandle; ///< The controller handle to open network protocol.
+  EFI_HANDLE              RestExChildHandle;          ///< The child handle created throught REST EX Service Protocol.
+  EFI_HANDLE              RestExControllerHandle;     ///< The controller handle which provide REST EX protocol.
+  EFI_REST_EX_PROTOCOL    *RestExProtocolInterface;   ///< Pointer to EFI_REST_EX_PROTOCOL.
+  UINT32                  RestExId;                   ///< The identifier installed on REST EX controller handle.
 } EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_INTERNAL;
 
 /**
@@ -135,46 +135,46 @@ EFI_STATUS
 (EFIAPI *EFI_REDFISH_DISCOVER_GET_SUBNET_INFO)(
   IN EFI_HANDLE ImageHandle,
   IN EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *Instance
-);
+  );
 
 //
 // The require network protocol matrix.
 //
 typedef struct {
-  UINT32   ProtocolType;                                ///< Network protocol type,
-                                                        ///< Refer to NETWORK_INTERFACE_PROTOCOL_TYPE.
-  CHAR16   *ProtocolName;                               ///< Protocol name.
-  EFI_GUID *RequiredProtocolGuid;                       ///< Network protocol interface GUID.
-  EFI_GUID *RequiredServiceBindingProtocolGuid;         ///< Network protocol service GUID.
-  EFI_GUID *DiscoveredProtocolGuid;                     ///< Protocol interface GUID use to install identifier.
-  EFI_REDFISH_DISCOVER_GET_SUBNET_INFO GetSubnetInfo;   ///< Function of getting subnet information.
+  UINT32                                  ProtocolType;                        ///< Network protocol type,
+                                                                               ///< Refer to NETWORK_INTERFACE_PROTOCOL_TYPE.
+  CHAR16                                  *ProtocolName;                       ///< Protocol name.
+  EFI_GUID                                *RequiredProtocolGuid;               ///< Network protocol interface GUID.
+  EFI_GUID                                *RequiredServiceBindingProtocolGuid; ///< Network protocol service GUID.
+  EFI_GUID                                *DiscoveredProtocolGuid;             ///< Protocol interface GUID use to install identifier.
+  EFI_REDFISH_DISCOVER_GET_SUBNET_INFO    GetSubnetInfo;                       ///< Function of getting subnet information.
 } REDFISH_DISCOVER_REQUIRED_PROTOCOL;
 
 //
 // Link list of Redfish discover instance.
 //
 typedef struct {
-  LIST_ENTRY  NextInstance;                             ///< Next list.
-  EFI_REDFISH_DISCOVERED_INSTANCE *Instance;            ///< Pointer to EFI_REDFISH_DISCOVERED_INSTANCE.
+  LIST_ENTRY                         NextInstance;      ///< Next list.
+  EFI_REDFISH_DISCOVERED_INSTANCE    *Instance;         ///< Pointer to EFI_REDFISH_DISCOVERED_INSTANCE.
 } EFI_REDFISH_DISCOVERED_INTERNAL_LIST;
 
 //
 // Internal structure of Redfish discover instance.
 //
 typedef struct {
-  LIST_ENTRY  Entry;                                    ///< Link list entry.
-  EFI_HANDLE  Owner;                                    ///< The owner owns this Redfish service discovery.
-                                                        ///< It's the EFI image handle of driver uses
-                                                        ///< EFI Redfish Discover Protocol.
-  EFI_REDFISH_DISCOVER_FLAG DiscoverFlags;              ///< EFI_REDFISH_DISCOVER_FLAG
-  EFI_REDFISH_DISCOVERED_TOKEN *DiscoverToken;          ///< Token used to signal when Redfish service is discovered.
-  EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *NetworkInterface; ///< EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL
-                                                                     ///< instance used to discover Redfish service.
+  LIST_ENTRY                                         Entry;             ///< Link list entry.
+  EFI_HANDLE                                         Owner;             ///< The owner owns this Redfish service discovery.
+                                                                        ///< It's the EFI image handle of driver uses
+                                                                        ///< EFI Redfish Discover Protocol.
+  EFI_REDFISH_DISCOVER_FLAG                          DiscoverFlags;     ///< EFI_REDFISH_DISCOVER_FLAG
+  EFI_REDFISH_DISCOVERED_TOKEN                       *DiscoverToken;    ///< Token used to signal when Redfish service is discovered.
+  EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL    *NetworkInterface; ///< EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL
+                                                                        ///< instance used to discover Redfish service.
   //
   // Below for Host insterface discovery.
   //
-  BOOLEAN         HostIntfValidation;                   ///< Indicates whether to validate Redfish Host interface.
-  EFI_IP_ADDRESS  TargetIpAddress;                      ///< Target IP address reported in Redfish Host interface.
+  BOOLEAN                                            HostIntfValidation; ///< Indicates whether to validate Redfish Host interface.
+  EFI_IP_ADDRESS                                     TargetIpAddress;    ///< Target IP address reported in Redfish Host interface.
 } EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE;
 
 /**
@@ -197,15 +197,15 @@ typedef struct {
 **/
 EFI_STATUS
 AddAndSignalNewRedfishService (
-  IN EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE *Instance,
-  IN UINTN *RedfishVersion OPTIONAL,
-  IN CHAR8 *RedfishLocation OPTIONAL,
-  IN CHAR8 *Uuid  OPTIONAL,
-  IN CHAR8 *Os  OPTIONAL,
-  IN CHAR8 *OsVer  OPTIONAL,
-  IN CHAR8 *Product  OPTIONAL,
-  IN CHAR8 *ProductVer  OPTIONAL,
-  IN BOOLEAN UseHttps
+  IN EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE  *Instance,
+  IN UINTN                                     *RedfishVersion OPTIONAL,
+  IN CHAR8                                     *RedfishLocation OPTIONAL,
+  IN CHAR8                                     *Uuid  OPTIONAL,
+  IN CHAR8                                     *Os  OPTIONAL,
+  IN CHAR8                                     *OsVer  OPTIONAL,
+  IN CHAR8                                     *Product  OPTIONAL,
+  IN CHAR8                                     *ProductVer  OPTIONAL,
+  IN BOOLEAN                                   UseHttps
   );
 
 /**
@@ -223,12 +223,12 @@ AddAndSignalNewRedfishService (
 **/
 EFI_STATUS
 RedfishGetHostInterfaceProtocolData (
-  IN EFI_SMBIOS_PROTOCOL              *Smbios,
-  OUT REDFISH_INTERFACE_DATA          **DeviceDescriptor,
-  OUT REDFISH_OVER_IP_PROTOCOL_DATA   **ProtocolData
+  IN EFI_SMBIOS_PROTOCOL             *Smbios,
+  OUT REDFISH_INTERFACE_DATA         **DeviceDescriptor,
+  OUT REDFISH_OVER_IP_PROTOCOL_DATA  **ProtocolData
   );
 
-extern EFI_GUID gRedfishDiscoverTcp4Instance;
-extern EFI_GUID gRedfishDiscoverTcp6Instance;
-extern EFI_GUID gRedfishDiscoverRestEXInstance;
+extern EFI_GUID  gRedfishDiscoverTcp4Instance;
+extern EFI_GUID  gRedfishDiscoverTcp6Instance;
+extern EFI_GUID  gRedfishDiscoverRestEXInstance;
 #endif

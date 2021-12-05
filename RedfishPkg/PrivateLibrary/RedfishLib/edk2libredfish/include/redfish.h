@@ -14,6 +14,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef LIBREDFISH_REDFISH_H_
 #define LIBREDFISH_REDFISH_H_
 

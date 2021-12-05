@@ -7,6 +7,7 @@
     SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef REDFISH_CRT_TIME_H_
 #define REDFISH_CRT_TIME_H_
 

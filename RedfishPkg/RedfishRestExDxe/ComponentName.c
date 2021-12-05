@@ -18,6 +18,7 @@
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user-readable name of the EFI Driver.
 
@@ -92,10 +93,10 @@ EFI_STATUS
 EFIAPI
 RedfishRestExComponentNameGetControllerName (
   IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
-  IN  EFI_HANDLE                    ControllerHandle,
-  IN  EFI_HANDLE                    ChildHandle        OPTIONAL,
-  IN  CHAR8                         *Language,
-  OUT CHAR16                        **ControllerName
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
 
 ///
@@ -113,8 +114,8 @@ EFI_COMPONENT_NAME_PROTOCOL  gRedfishRestExComponentName = {
 ///
 GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_COMPONENT_NAME2_PROTOCOL  gRedfishRestExComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     RedfishRestExComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) RedfishRestExComponentNameGetControllerName,
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)RedfishRestExComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)RedfishRestExComponentNameGetControllerName,
   "en"
 };
 
@@ -122,12 +123,12 @@ EFI_COMPONENT_NAME2_PROTOCOL  gRedfishRestExComponentName2 = {
 /// Table of driver names
 ///
 GLOBAL_REMOVE_IF_UNREFERENCED
-EFI_UNICODE_STRING_TABLE mRedfishRestExDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE  mRedfishRestExDriverNameTable[] = {
   { "eng;en", (CHAR16 *)L"Redfish RestEx Network Service Driver" },
-  { NULL, NULL }
+  { NULL,     NULL                                               }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE *gRedfishRestExControllerNameTable = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gRedfishRestExControllerNameTable = NULL;
 
 /**
   Retrieves a Unicode string that is the user-readable name of the EFI Driver.
@@ -212,10 +213,10 @@ EFI_STATUS
 EFIAPI
 RedfishRestExComponentNameGetControllerName (
   IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
-  IN  EFI_HANDLE                    ControllerHandle,
-  IN  EFI_HANDLE                    ChildHandle        OPTIONAL,
-  IN  CHAR8                         *Language,
-  OUT CHAR16                        **ControllerName
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   return EFI_UNSUPPORTED;

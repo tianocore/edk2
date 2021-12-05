@@ -34,11 +34,11 @@
 **/
 EFI_STATUS
 RedfishContentEncode  (
-  IN CHAR8  *ContentEncodedValue,
-  IN CHAR8  *OriginalContent,
-  IN UINTN  OriginalContentLength,
-  OUT VOID  **EncodedContentPointer,
-  OUT UINTN *EncodedContentLength
+  IN CHAR8   *ContentEncodedValue,
+  IN CHAR8   *OriginalContent,
+  IN UINTN   OriginalContentLength,
+  OUT VOID   **EncodedContentPointer,
+  OUT UINTN  *EncodedContentLength
   )
 {
   return EFI_UNSUPPORTED;
@@ -70,11 +70,11 @@ RedfishContentEncode  (
 **/
 EFI_STATUS
 RedfishContentDecode (
-  IN CHAR8  *ContentDecodedValue,
-  IN VOID   *ContentPointer,
-  IN UINTN  ContentLength,
-  OUT VOID  **DecodedContentPointer,
-  OUT UINTN *DecodedContentLength
+  IN CHAR8   *ContentDecodedValue,
+  IN VOID    *ContentPointer,
+  IN UINTN   ContentLength,
+  OUT VOID   **DecodedContentPointer,
+  OUT UINTN  *DecodedContentLength
   )
 {
   return EFI_UNSUPPORTED;
