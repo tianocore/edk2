@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _VIRTUAL_KEYBOARD_H_
 #define _VIRTUAL_KEYBOARD_H_
 
-
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/PlatformVirtualKeyboard.h>
@@ -31,70 +30,69 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Driver Binding Externs
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gVirtualKeyboardDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gVirtualKeyboardComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gVirtualKeyboardComponentName2;
-
+extern EFI_DRIVER_BINDING_PROTOCOL   gVirtualKeyboardDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gVirtualKeyboardComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gVirtualKeyboardComponentName2;
 
 //
 // VIRTUAL Keyboard Defines
 //
-#define CHAR_SCANCODE                        0xe0
-#define CHAR_ESC                             0x1b
+#define CHAR_SCANCODE  0xe0
+#define CHAR_ESC       0x1b
 
-#define KEYBOARD_TIMEOUT                     65536   // 0.07s
-#define KEYBOARD_WAITFORVALUE_TIMEOUT        1000000 // 1s
-#define KEYBOARD_BAT_TIMEOUT                 4000000 // 4s
-#define KEYBOARD_TIMER_INTERVAL              500000  // 0.5s
+#define KEYBOARD_TIMEOUT               65536         // 0.07s
+#define KEYBOARD_WAITFORVALUE_TIMEOUT  1000000       // 1s
+#define KEYBOARD_BAT_TIMEOUT           4000000       // 4s
+#define KEYBOARD_TIMER_INTERVAL        500000        // 0.5s
 
-#define QUEUE_MAX_COUNT                      32
+#define QUEUE_MAX_COUNT  32
 
-#define KEYBOARD_SCAN_CODE_MAX_COUNT         32
+#define KEYBOARD_SCAN_CODE_MAX_COUNT  32
 
 //
 // VIRTUAL Keyboard Device Structure
 //
-#define VIRTUAL_KEYBOARD_DEV_SIGNATURE SIGNATURE_32 ('V', 'K', 'B', 'D')
-#define VIRTUAL_KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('v', 'k', 'c', 'n')
+#define VIRTUAL_KEYBOARD_DEV_SIGNATURE                   SIGNATURE_32 ('V', 'K', 'B', 'D')
+#define VIRTUAL_KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE  SIGNATURE_32 ('v', 'k', 'c', 'n')
 
 typedef struct _VIRTUAL_KEYBOARD_CONSOLE_IN_EX_NOTIFY {
-  UINTN                                      Signature;
-  EFI_KEY_DATA                               KeyData;
-  EFI_KEY_NOTIFY_FUNCTION                    KeyNotificationFn;
-  LIST_ENTRY                                 NotifyEntry;
+  UINTN                      Signature;
+  EFI_KEY_DATA               KeyData;
+  EFI_KEY_NOTIFY_FUNCTION    KeyNotificationFn;
+  LIST_ENTRY                 NotifyEntry;
 } VIRTUAL_KEYBOARD_CONSOLE_IN_EX_NOTIFY;
 
 typedef struct {
-  UINTN                                      Front;
-  UINTN                                      Rear;
-  EFI_KEY_DATA                               Buffer[QUEUE_MAX_COUNT];
+  UINTN           Front;
+  UINTN           Rear;
+  EFI_KEY_DATA    Buffer[QUEUE_MAX_COUNT];
 } SIMPLE_QUEUE;
 
 typedef struct {
-  UINT8                                      Buffer[KEYBOARD_SCAN_CODE_MAX_COUNT];
-  UINTN                                      Head;
-  UINTN                                      Tail;
+  UINT8    Buffer[KEYBOARD_SCAN_CODE_MAX_COUNT];
+  UINTN    Head;
+  UINTN    Tail;
 } SCAN_CODE_QUEUE;
 
 typedef struct {
-  UINTN                                      Signature;
-  EFI_HANDLE                                 Handle;
-  PLATFORM_VIRTUAL_KBD_PROTOCOL              *PlatformVirtual;
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL             SimpleTextIn;
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL          SimpleTextInputEx;
+  UINTN                                Signature;
+  EFI_HANDLE                           Handle;
+  PLATFORM_VIRTUAL_KBD_PROTOCOL        *PlatformVirtual;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL       SimpleTextIn;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    SimpleTextInputEx;
 
   //
   // Buffer storing EFI_KEY_DATA
   //
-  SIMPLE_QUEUE                               Queue;
-  SIMPLE_QUEUE                               QueueForNotify;
+  SIMPLE_QUEUE                         Queue;
+  SIMPLE_QUEUE                         QueueForNotify;
 
   //
   // Notification Function List
   //
-  LIST_ENTRY                                 NotifyList;
-  EFI_EVENT                                  KeyNotifyProcessEvent;
-  EFI_EVENT                                  TimerEvent;
+  LIST_ENTRY                           NotifyList;
+  EFI_EVENT                            KeyNotifyProcessEvent;
+  EFI_EVENT                            TimerEvent;
 } VIRTUAL_KEYBOARD_DEV;
 
 #define VIRTUAL_KEYBOARD_DEV_FROM_THIS(a)  CR (a, VIRTUAL_KEYBOARD_DEV, SimpleTextIn, VIRTUAL_KEYBOARD_DEV_SIGNATURE)
@@ -108,7 +106,7 @@ typedef struct {
 //
 // Global Variables
 //
-extern EFI_DRIVER_BINDING_PROTOCOL   gVirtualKeyboardDriverBinding;
+extern EFI_DRIVER_BINDING_PROTOCOL  gVirtualKeyboardDriverBinding;
 
 //
 // Driver Binding Protocol functions
@@ -222,7 +220,6 @@ VirtualKeyboardComponentNameGetDriverName (
   OUT CHAR16                       **DriverName
   );
 
-
 /**
   Retrieves a Unicode string that is the user readable name of the controller
   that is being managed by a driver.
@@ -294,17 +291,17 @@ VirtualKeyboardComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 VirtualKeyboardComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL      *This,
-  IN  EFI_HANDLE                       ControllerHandle,
-  IN  EFI_HANDLE                       ChildHandle        OPTIONAL,
-  IN  CHAR8                            *Language,
-  OUT CHAR16                           **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
-
 
 //
 // Simple Text Input Protocol functions
 //
+
 /**
   Reset the Keyboard and do BAT test for it, if (ExtendedVerification == TRUE) then do some extra keyboard validations.
 
@@ -406,6 +403,7 @@ VirtualKeyboardUnregisterKeyNotify (
 //
 // Private worker functions
 //
+
 /**
   Free keyboard notify list.
 
@@ -417,7 +415,7 @@ VirtualKeyboardUnregisterKeyNotify (
 **/
 EFI_STATUS
 VirtualKeyboardFreeNotifyList (
-  IN OUT LIST_ENTRY           *ListHead
+  IN OUT LIST_ENTRY  *ListHead
   );
 
 /**
@@ -478,8 +476,8 @@ VirtualKeyboardWaitForKeyEx (
 VOID
 EFIAPI
 VirtualKeyboardTimerHandler (
-  IN EFI_EVENT    Event,
-  IN VOID         *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -491,8 +489,8 @@ VirtualKeyboardTimerHandler (
 VOID
 EFIAPI
 KeyNotifyProcessHandler (
-  IN  EFI_EVENT                 Event,
-  IN  VOID                      *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   );
 
 /**
@@ -530,8 +528,8 @@ VirtualKeyboardReadKeyStroke (
 EFI_STATUS
 EFIAPI
 VirtualKeyboardReadKeyStrokeEx (
-  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
-  OUT EFI_KEY_DATA                      *KeyData
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  OUT EFI_KEY_DATA                       *KeyData
   );
 
 #endif /* _VIRTUAL_KEYBOARD_H_ */

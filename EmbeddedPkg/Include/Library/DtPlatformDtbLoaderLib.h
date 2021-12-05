@@ -26,8 +26,8 @@
 EFI_STATUS
 EFIAPI
 DtPlatformLoadDtb (
-  OUT   VOID        **Dtb,
-  OUT   UINTN       *DtbSize
+  OUT   VOID   **Dtb,
+  OUT   UINTN  *DtbSize
   );
 
 #endif

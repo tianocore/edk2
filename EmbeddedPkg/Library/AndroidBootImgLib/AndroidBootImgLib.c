@@ -20,24 +20,24 @@
 
 #include <Guid/LinuxEfiInitrdMedia.h>
 
-#define FDT_ADDITIONAL_ENTRIES_SIZE 0x400
+#define FDT_ADDITIONAL_ENTRIES_SIZE  0x400
 
 typedef struct {
-  MEMMAP_DEVICE_PATH                      Node1;
-  EFI_DEVICE_PATH_PROTOCOL                End;
+  MEMMAP_DEVICE_PATH          Node1;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } MEMORY_DEVICE_PATH;
 
 typedef struct {
-  VENDOR_DEVICE_PATH                      VendorMediaNode;
-  EFI_DEVICE_PATH_PROTOCOL                EndNode;
+  VENDOR_DEVICE_PATH          VendorMediaNode;
+  EFI_DEVICE_PATH_PROTOCOL    EndNode;
 } RAMDISK_DEVICE_PATH;
 
-STATIC ANDROID_BOOTIMG_PROTOCOL                 *mAndroidBootImg;
-STATIC VOID                                     *mRamdiskData = NULL;
-STATIC UINTN                                    mRamdiskSize = 0;
-STATIC EFI_HANDLE                               mRamDiskLoadFileHandle = NULL;
+STATIC ANDROID_BOOTIMG_PROTOCOL  *mAndroidBootImg;
+STATIC VOID                      *mRamdiskData          = NULL;
+STATIC UINTN                     mRamdiskSize           = 0;
+STATIC EFI_HANDLE                mRamDiskLoadFileHandle = NULL;
 
-STATIC CONST MEMORY_DEVICE_PATH mMemoryDevicePathTemplate =
+STATIC CONST MEMORY_DEVICE_PATH  mMemoryDevicePathTemplate =
 {
   {
     {
@@ -58,13 +58,13 @@ STATIC CONST MEMORY_DEVICE_PATH mMemoryDevicePathTemplate =
   } // End
 };
 
-STATIC CONST RAMDISK_DEVICE_PATH mRamdiskDevicePath =
+STATIC CONST RAMDISK_DEVICE_PATH  mRamdiskDevicePath =
 {
   {
     {
       MEDIA_DEVICE_PATH,
       MEDIA_VENDOR_DP,
-      { sizeof (VENDOR_DEVICE_PATH), 0 }
+      { sizeof (VENDOR_DEVICE_PATH),       0 }
     },
     LINUX_EFI_INITRD_MEDIA_GUID
   },
@@ -107,19 +107,20 @@ STATIC CONST RAMDISK_DEVICE_PATH mRamdiskDevicePath =
 EFI_STATUS
 EFIAPI
 AndroidBootImgLoadFile2 (
-  IN EFI_LOAD_FILE2_PROTOCOL    *This,
-  IN EFI_DEVICE_PATH_PROTOCOL   *FilePath,
-  IN BOOLEAN                    BootPolicy,
-  IN OUT UINTN                  *BufferSize,
-  IN VOID                       *Buffer OPTIONAL
+  IN EFI_LOAD_FILE2_PROTOCOL   *This,
+  IN EFI_DEVICE_PATH_PROTOCOL  *FilePath,
+  IN BOOLEAN                   BootPolicy,
+  IN OUT UINTN                 *BufferSize,
+  IN VOID                      *Buffer OPTIONAL
   )
 
 {
   // Verify if the valid parameters
-  if (This == NULL ||
-      BufferSize == NULL ||
-      FilePath == NULL ||
-      !IsDevicePathValid (FilePath, 0)) {
+  if ((This == NULL) ||
+      (BufferSize == NULL) ||
+      (FilePath == NULL) ||
+      !IsDevicePathValid (FilePath, 0))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -132,7 +133,8 @@ AndroidBootImgLoadFile2 (
   if (mRamdiskSize == 0) {
     return EFI_NOT_FOUND;
   }
-  if (Buffer == NULL || *BufferSize < mRamdiskSize) {
+
+  if ((Buffer == NULL) || (*BufferSize < mRamdiskSize)) {
     *BufferSize = mRamdiskSize;
     return EFI_BUFFER_TOO_SMALL;
   }
@@ -153,16 +155,20 @@ STATIC EFI_LOAD_FILE2_PROTOCOL  mAndroidBootImgLoadFile2 = {
 
 EFI_STATUS
 AndroidBootImgGetImgSize (
-  IN  VOID    *BootImg,
-  OUT UINTN   *ImgSize
+  IN  VOID   *BootImg,
+  OUT UINTN  *ImgSize
   )
 {
-  ANDROID_BOOTIMG_HEADER   *Header;
+  ANDROID_BOOTIMG_HEADER  *Header;
 
-  Header = (ANDROID_BOOTIMG_HEADER *) BootImg;
+  Header = (ANDROID_BOOTIMG_HEADER *)BootImg;
 
-  if (AsciiStrnCmp ((CONST CHAR8 *)Header->BootMagic, ANDROID_BOOT_MAGIC,
-                    ANDROID_BOOT_MAGIC_LENGTH) != 0) {
+  if (AsciiStrnCmp (
+        (CONST CHAR8 *)Header->BootMagic,
+        ANDROID_BOOT_MAGIC,
+        ANDROID_BOOT_MAGIC_LENGTH
+        ) != 0)
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -179,17 +185,21 @@ AndroidBootImgGetImgSize (
 
 EFI_STATUS
 AndroidBootImgGetKernelInfo (
-  IN  VOID    *BootImg,
+  IN  VOID   *BootImg,
   OUT VOID   **Kernel,
-  OUT UINTN   *KernelSize
+  OUT UINTN  *KernelSize
   )
 {
-  ANDROID_BOOTIMG_HEADER   *Header;
+  ANDROID_BOOTIMG_HEADER  *Header;
 
-  Header = (ANDROID_BOOTIMG_HEADER *) BootImg;
+  Header = (ANDROID_BOOTIMG_HEADER *)BootImg;
 
-  if (AsciiStrnCmp ((CONST CHAR8 *)Header->BootMagic, ANDROID_BOOT_MAGIC,
-                    ANDROID_BOOT_MAGIC_LENGTH) != 0) {
+  if (AsciiStrnCmp (
+        (CONST CHAR8 *)Header->BootMagic,
+        ANDROID_BOOT_MAGIC,
+        ANDROID_BOOT_MAGIC_LENGTH
+        ) != 0)
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -200,23 +210,27 @@ AndroidBootImgGetKernelInfo (
   ASSERT (IS_VALID_ANDROID_PAGE_SIZE (Header->PageSize));
 
   *KernelSize = Header->KernelSize;
-  *Kernel = (VOID *)((UINTN)BootImg + Header->PageSize);
+  *Kernel     = (VOID *)((UINTN)BootImg + Header->PageSize);
   return EFI_SUCCESS;
 }
 
 EFI_STATUS
 AndroidBootImgGetRamdiskInfo (
-  IN  VOID    *BootImg,
+  IN  VOID   *BootImg,
   OUT VOID   **Ramdisk,
-  OUT UINTN   *RamdiskSize
+  OUT UINTN  *RamdiskSize
   )
 {
-  ANDROID_BOOTIMG_HEADER   *Header;
+  ANDROID_BOOTIMG_HEADER  *Header;
 
   Header = (ANDROID_BOOTIMG_HEADER *)BootImg;
 
-  if (AsciiStrnCmp ((CONST CHAR8 *)Header->BootMagic, ANDROID_BOOT_MAGIC,
-                    ANDROID_BOOT_MAGIC_LENGTH) != 0) {
+  if (AsciiStrnCmp (
+        (CONST CHAR8 *)Header->BootMagic,
+        ANDROID_BOOT_MAGIC,
+        ANDROID_BOOT_MAGIC_LENGTH
+        ) != 0)
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -229,22 +243,27 @@ AndroidBootImgGetRamdiskInfo (
                         + Header->PageSize
                         + ALIGN_VALUE (Header->KernelSize, Header->PageSize));
   }
+
   return EFI_SUCCESS;
 }
 
 EFI_STATUS
 AndroidBootImgGetSecondBootLoaderInfo (
-  IN  VOID    *BootImg,
+  IN  VOID   *BootImg,
   OUT VOID   **Second,
-  OUT UINTN   *SecondSize
+  OUT UINTN  *SecondSize
   )
 {
-  ANDROID_BOOTIMG_HEADER   *Header;
+  ANDROID_BOOTIMG_HEADER  *Header;
 
   Header = (ANDROID_BOOTIMG_HEADER *)BootImg;
 
-  if (AsciiStrnCmp ((CONST CHAR8 *)Header->BootMagic, ANDROID_BOOT_MAGIC,
-                    ANDROID_BOOT_MAGIC_LENGTH) != 0) {
+  if (AsciiStrnCmp (
+        (CONST CHAR8 *)Header->BootMagic,
+        ANDROID_BOOT_MAGIC,
+        ANDROID_BOOT_MAGIC_LENGTH
+        ) != 0)
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -258,32 +277,37 @@ AndroidBootImgGetSecondBootLoaderInfo (
                        + ALIGN_VALUE (Header->KernelSize, Header->PageSize)
                        + ALIGN_VALUE (Header->RamdiskSize, Header->PageSize));
   }
+
   return EFI_SUCCESS;
 }
 
 EFI_STATUS
 AndroidBootImgGetKernelArgs (
-  IN  VOID    *BootImg,
-  OUT CHAR8   *KernelArgs
+  IN  VOID   *BootImg,
+  OUT CHAR8  *KernelArgs
   )
 {
-  ANDROID_BOOTIMG_HEADER   *Header;
+  ANDROID_BOOTIMG_HEADER  *Header;
 
-  Header = (ANDROID_BOOTIMG_HEADER *) BootImg;
-  AsciiStrnCpyS (KernelArgs, ANDROID_BOOTIMG_KERNEL_ARGS_SIZE, Header->KernelArgs,
-    ANDROID_BOOTIMG_KERNEL_ARGS_SIZE);
+  Header = (ANDROID_BOOTIMG_HEADER *)BootImg;
+  AsciiStrnCpyS (
+    KernelArgs,
+    ANDROID_BOOTIMG_KERNEL_ARGS_SIZE,
+    Header->KernelArgs,
+    ANDROID_BOOTIMG_KERNEL_ARGS_SIZE
+    );
 
   return EFI_SUCCESS;
 }
 
 EFI_STATUS
 AndroidBootImgGetFdt (
-  IN  VOID                  *BootImg,
-  IN  VOID                 **FdtBase
+  IN  VOID  *BootImg,
+  IN  VOID  **FdtBase
   )
 {
-  UINTN                      SecondLoaderSize;
-  EFI_STATUS                 Status;
+  UINTN       SecondLoaderSize;
+  EFI_STATUS  Status;
 
   /* Check whether FDT is located in second boot region as some vendor do so,
    * because second loader is never used as far as I know. */
@@ -291,43 +315,50 @@ AndroidBootImgGetFdt (
              BootImg,
              FdtBase,
              &SecondLoaderSize
-           );
+             );
   return Status;
 }
 
 EFI_STATUS
 AndroidBootImgUpdateArgs (
-  IN  VOID                  *BootImg,
-  OUT VOID                  *KernelArgs
+  IN  VOID  *BootImg,
+  OUT VOID  *KernelArgs
   )
 {
-  CHAR8                      ImageKernelArgs[ANDROID_BOOTIMG_KERNEL_ARGS_SIZE];
-  EFI_STATUS                 Status;
+  CHAR8       ImageKernelArgs[ANDROID_BOOTIMG_KERNEL_ARGS_SIZE];
+  EFI_STATUS  Status;
 
   // Get kernel arguments from Android boot image
   Status = AndroidBootImgGetKernelArgs (BootImg, ImageKernelArgs);
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  AsciiStrToUnicodeStrS (ImageKernelArgs, KernelArgs,
-                         ANDROID_BOOTIMG_KERNEL_ARGS_SIZE >> 1);
+
+  AsciiStrToUnicodeStrS (
+    ImageKernelArgs,
+    KernelArgs,
+    ANDROID_BOOTIMG_KERNEL_ARGS_SIZE >> 1
+    );
   // Append platform kernel arguments
-  if(mAndroidBootImg->AppendArgs) {
-    Status = mAndroidBootImg->AppendArgs (KernelArgs,
-                                ANDROID_BOOTIMG_KERNEL_ARGS_SIZE);
+  if (mAndroidBootImg->AppendArgs) {
+    Status = mAndroidBootImg->AppendArgs (
+                                KernelArgs,
+                                ANDROID_BOOTIMG_KERNEL_ARGS_SIZE
+                                );
   }
+
   return Status;
 }
 
 EFI_STATUS
 AndroidBootImgInstallLoadFile2 (
-  IN  VOID                  *RamdiskData,
-  IN  UINTN                  RamdiskSize
+  IN  VOID   *RamdiskData,
+  IN  UINTN  RamdiskSize
   )
 {
   mRamDiskLoadFileHandle = NULL;
-  mRamdiskData = RamdiskData;
-  mRamdiskSize = RamdiskSize;
+  mRamdiskData           = RamdiskData;
+  mRamdiskSize           = RamdiskSize;
   return gBS->InstallMultipleProtocolInterfaces (
                 &mRamDiskLoadFileHandle,
                 &gEfiLoadFile2ProtocolGuid,
@@ -343,9 +374,9 @@ AndroidBootImgUninstallLoadFile2 (
   VOID
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
-  Status = EFI_SUCCESS;
+  Status       = EFI_SUCCESS;
   mRamdiskData = NULL;
   mRamdiskSize = 0;
   if (mRamDiskLoadFileHandle != NULL) {
@@ -359,15 +390,17 @@ AndroidBootImgUninstallLoadFile2 (
                     );
     mRamDiskLoadFileHandle = NULL;
   }
+
   return Status;
 }
 
-BOOLEAN AndroidBootImgAcpiSupported (
+BOOLEAN
+AndroidBootImgAcpiSupported (
   VOID
   )
 {
   EFI_STATUS  Status;
-  VOID       *AcpiTable;
+  VOID        *AcpiTable;
 
   Status = EfiGetSystemConfigurationTable (&gEfiAcpiTableGuid, &AcpiTable);
   return !EFI_ERROR (Status);
@@ -375,12 +408,12 @@ BOOLEAN AndroidBootImgAcpiSupported (
 
 EFI_STATUS
 AndroidBootImgLocateFdt (
-  IN  VOID                  *BootImg,
-  IN  VOID                 **FdtBase
+  IN  VOID  *BootImg,
+  IN  VOID  **FdtBase
   )
 {
-  INTN                       Err;
-  EFI_STATUS                 Status;
+  INTN        Err;
+  EFI_STATUS  Status;
 
   Status = EfiGetSystemConfigurationTable (&gFdtTableGuid, FdtBase);
   if (!EFI_ERROR (Status)) {
@@ -391,58 +424,77 @@ AndroidBootImgLocateFdt (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   Err = fdt_check_header (*FdtBase);
   if (Err != 0) {
-    DEBUG ((DEBUG_ERROR, "ERROR: Device Tree header not valid (Err:%d)\n",
-           Err));
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: Device Tree header not valid (Err:%d)\n",
+      Err
+      ));
     return EFI_INVALID_PARAMETER;
   }
+
   return EFI_SUCCESS;
 }
 
 INTN
 AndroidBootImgGetChosenNode (
-  IN  INTN   UpdatedFdtBase
+  IN  INTN  UpdatedFdtBase
   )
 {
-  INTN                   ChosenNode;
+  INTN  ChosenNode;
 
   ChosenNode = fdt_subnode_offset ((CONST VOID *)UpdatedFdtBase, 0, "chosen");
   if (ChosenNode < 0) {
-    ChosenNode = fdt_add_subnode((VOID *)UpdatedFdtBase, 0, "chosen");
-      if (ChosenNode < 0) {
-        DEBUG ((DEBUG_ERROR, "Fail to find fdt node chosen!\n"));
-        return 0;
+    ChosenNode = fdt_add_subnode ((VOID *)UpdatedFdtBase, 0, "chosen");
+    if (ChosenNode < 0) {
+      DEBUG ((DEBUG_ERROR, "Fail to find fdt node chosen!\n"));
+      return 0;
     }
   }
+
   return ChosenNode;
 }
 
 EFI_STATUS
 AndroidBootImgSetProperty64 (
-  IN  INTN                   UpdatedFdtBase,
-  IN  INTN                   ChosenNode,
-  IN  CHAR8                 *PropertyName,
-  IN  UINT64                 Val
+  IN  INTN    UpdatedFdtBase,
+  IN  INTN    ChosenNode,
+  IN  CHAR8   *PropertyName,
+  IN  UINT64  Val
   )
 {
-  INTN                      Err;
-  struct fdt_property      *Property;
-  int                       Len;
+  INTN                 Err;
+  struct fdt_property  *Property;
+  int                  Len;
 
-  Property = fdt_get_property_w((VOID *)UpdatedFdtBase, ChosenNode,
-                            PropertyName, &Len);
-  if (NULL == Property && Len == -FDT_ERR_NOTFOUND) {
-    Val = cpu_to_fdt64(Val);
-    Err = fdt_appendprop ((VOID *)UpdatedFdtBase, ChosenNode,
-                          PropertyName, &Val, sizeof (UINT64));
+  Property = fdt_get_property_w (
+               (VOID *)UpdatedFdtBase,
+               ChosenNode,
+               PropertyName,
+               &Len
+               );
+  if ((NULL == Property) && (Len == -FDT_ERR_NOTFOUND)) {
+    Val = cpu_to_fdt64 (Val);
+    Err = fdt_appendprop (
+            (VOID *)UpdatedFdtBase,
+            ChosenNode,
+            PropertyName,
+            &Val,
+            sizeof (UINT64)
+            );
     if (Err) {
       DEBUG ((DEBUG_ERROR, "fdt_appendprop() fail: %a\n", fdt_strerror (Err)));
       return EFI_INVALID_PARAMETER;
     }
   } else if (Property != NULL) {
-    Err = fdt_setprop_u64((VOID *)UpdatedFdtBase, ChosenNode,
-                          PropertyName, Val);
+    Err = fdt_setprop_u64 (
+            (VOID *)UpdatedFdtBase,
+            ChosenNode,
+            PropertyName,
+            Val
+            );
     if (Err) {
       DEBUG ((DEBUG_ERROR, "fdt_setprop_u64() fail: %a\n", fdt_strerror (Err)));
       return EFI_INVALID_PARAMETER;
@@ -451,33 +503,41 @@ AndroidBootImgSetProperty64 (
     DEBUG ((DEBUG_ERROR, "Failed to set fdt Property %a\n", PropertyName));
     return EFI_INVALID_PARAMETER;
   }
+
   return EFI_SUCCESS;
 }
 
 EFI_STATUS
 AndroidBootImgUpdateFdt (
-  IN  VOID                  *BootImg,
-  IN  VOID                  *FdtBase,
-  IN  VOID                  *RamdiskData,
-  IN  UINTN                  RamdiskSize
+  IN  VOID   *BootImg,
+  IN  VOID   *FdtBase,
+  IN  VOID   *RamdiskData,
+  IN  UINTN  RamdiskSize
   )
 {
-  INTN                       ChosenNode, Err, NewFdtSize;
-  EFI_STATUS                 Status;
-  EFI_PHYSICAL_ADDRESS       UpdatedFdtBase, NewFdtBase;
+  INTN                  ChosenNode, Err, NewFdtSize;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  UpdatedFdtBase, NewFdtBase;
 
   NewFdtSize = (UINTN)fdt_totalsize (FdtBase)
                + FDT_ADDITIONAL_ENTRIES_SIZE;
-  Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData,
-                  EFI_SIZE_TO_PAGES (NewFdtSize), &UpdatedFdtBase);
+  Status = gBS->AllocatePages (
+                  AllocateAnyPages,
+                  EfiBootServicesData,
+                  EFI_SIZE_TO_PAGES (NewFdtSize),
+                  &UpdatedFdtBase
+                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "Warning: Failed to reallocate FDT, err %d.\n",
-           Status));
+    DEBUG ((
+      DEBUG_WARN,
+      "Warning: Failed to reallocate FDT, err %d.\n",
+      Status
+      ));
     return Status;
   }
 
   // Load the Original FDT tree into the new region
-  Err = fdt_open_into(FdtBase, (VOID*)(INTN)UpdatedFdtBase, NewFdtSize);
+  Err = fdt_open_into (FdtBase, (VOID *)(INTN)UpdatedFdtBase, NewFdtSize);
   if (Err) {
     DEBUG ((DEBUG_ERROR, "fdt_open_into(): %a\n", fdt_strerror (Err)));
     Status = EFI_INVALID_PARAMETER;
@@ -490,21 +550,27 @@ AndroidBootImgUpdateFdt (
       goto Fdt_Exit;
     }
   } else {
-    ChosenNode = AndroidBootImgGetChosenNode(UpdatedFdtBase);
+    ChosenNode = AndroidBootImgGetChosenNode (UpdatedFdtBase);
     if (!ChosenNode) {
       goto Fdt_Exit;
     }
 
-    Status = AndroidBootImgSetProperty64 (UpdatedFdtBase, ChosenNode,
-                                          "linux,initrd-start",
-                                          (UINTN)RamdiskData);
+    Status = AndroidBootImgSetProperty64 (
+               UpdatedFdtBase,
+               ChosenNode,
+               "linux,initrd-start",
+               (UINTN)RamdiskData
+               );
     if (EFI_ERROR (Status)) {
       goto Fdt_Exit;
     }
 
-    Status = AndroidBootImgSetProperty64 (UpdatedFdtBase, ChosenNode,
-                                          "linux,initrd-end",
-                                          (UINTN)RamdiskData + RamdiskSize);
+    Status = AndroidBootImgSetProperty64 (
+               UpdatedFdtBase,
+               ChosenNode,
+               "linux,initrd-end",
+               (UINTN)RamdiskData + RamdiskSize
+               );
     if (EFI_ERROR (Status)) {
       goto Fdt_Exit;
     }
@@ -518,6 +584,7 @@ AndroidBootImgUpdateFdt (
   } else {
     NewFdtBase = UpdatedFdtBase;
   }
+
   Status = gBS->InstallConfigurationTable (
                   &gFdtTableGuid,
                   (VOID *)(UINTN)NewFdtBase
@@ -534,35 +601,38 @@ Fdt_Exit:
 
 EFI_STATUS
 AndroidBootImgBoot (
-  IN VOID                            *Buffer,
-  IN UINTN                            BufferSize
+  IN VOID   *Buffer,
+  IN UINTN  BufferSize
   )
 {
-  EFI_STATUS                          Status;
-  VOID                               *Kernel;
-  UINTN                               KernelSize;
-  MEMORY_DEVICE_PATH                  KernelDevicePath;
-  EFI_HANDLE                          ImageHandle;
-  VOID                               *NewKernelArg;
-  EFI_LOADED_IMAGE_PROTOCOL          *ImageInfo;
-  VOID                               *RamdiskData;
-  UINTN                               RamdiskSize;
-  IN  VOID                           *FdtBase;
+  EFI_STATUS                 Status;
+  VOID                       *Kernel;
+  UINTN                      KernelSize;
+  MEMORY_DEVICE_PATH         KernelDevicePath;
+  EFI_HANDLE                 ImageHandle;
+  VOID                       *NewKernelArg;
+  EFI_LOADED_IMAGE_PROTOCOL  *ImageInfo;
+  VOID                       *RamdiskData;
+  UINTN                      RamdiskSize;
+  IN  VOID                   *FdtBase;
 
   NewKernelArg = NULL;
-  ImageHandle = NULL;
+  ImageHandle  = NULL;
 
-  Status = gBS->LocateProtocol (&gAndroidBootImgProtocolGuid, NULL,
-                                (VOID **) &mAndroidBootImg);
+  Status = gBS->LocateProtocol (
+                  &gAndroidBootImgProtocolGuid,
+                  NULL,
+                  (VOID **)&mAndroidBootImg
+                  );
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
 
   Status = AndroidBootImgGetKernelInfo (
-            Buffer,
-            &Kernel,
-            &KernelSize
-            );
+             Buffer,
+             &Kernel,
+             &KernelSize
+             );
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -580,10 +650,10 @@ AndroidBootImgBoot (
   }
 
   Status = AndroidBootImgGetRamdiskInfo (
-            Buffer,
-            &RamdiskData,
-            &RamdiskSize
-            );
+             Buffer,
+             &RamdiskData,
+             &RamdiskSize
+             );
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
@@ -607,24 +677,33 @@ AndroidBootImgBoot (
 
   KernelDevicePath = mMemoryDevicePathTemplate;
 
-  KernelDevicePath.Node1.StartingAddress = (EFI_PHYSICAL_ADDRESS)(UINTN) Kernel;
-  KernelDevicePath.Node1.EndingAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN) Kernel
+  KernelDevicePath.Node1.StartingAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Kernel;
+  KernelDevicePath.Node1.EndingAddress   = (EFI_PHYSICAL_ADDRESS)(UINTN)Kernel
                                            + KernelSize;
 
-  Status = gBS->LoadImage (TRUE, gImageHandle,
-                           (EFI_DEVICE_PATH *)&KernelDevicePath,
-                           (VOID*)(UINTN)Kernel, KernelSize, &ImageHandle);
+  Status = gBS->LoadImage (
+                  TRUE,
+                  gImageHandle,
+                  (EFI_DEVICE_PATH *)&KernelDevicePath,
+                  (VOID *)(UINTN)Kernel,
+                  KernelSize,
+                  &ImageHandle
+                  );
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
 
   // Set kernel arguments
-  Status = gBS->HandleProtocol (ImageHandle, &gEfiLoadedImageProtocolGuid,
-                                (VOID **) &ImageInfo);
+  Status = gBS->HandleProtocol (
+                  ImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **)&ImageInfo
+                  );
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
-  ImageInfo->LoadOptions = NewKernelArg;
+
+  ImageInfo->LoadOptions     = NewKernelArg;
   ImageInfo->LoadOptionsSize = StrLen (NewKernelArg) * sizeof (CHAR16);
 
   // Before calling the image, enable the Watchdog Timer for  the 5 Minute period
@@ -635,17 +714,19 @@ AndroidBootImgBoot (
   gBS->SetWatchdogTimer (0, 0x10000, 0, NULL);
 
 Exit:
-  //Unload image as it will not be used anymore
+  // Unload image as it will not be used anymore
   if (ImageHandle != NULL) {
     gBS->UnloadImage (ImageHandle);
     ImageHandle = NULL;
   }
+
   if (EFI_ERROR (Status)) {
     if (NewKernelArg != NULL) {
       FreePool (NewKernelArg);
       NewKernelArg = NULL;
     }
   }
+
   AndroidBootImgUninstallLoadFile2 ();
   return Status;
 }
