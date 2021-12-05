@@ -86,7 +86,7 @@ IoApicEnableInterrupt (
   ASSERT (Irq <= Version.Bits.MaximumRedirectionEntry);
 
   Entry.Uint32.Low = IoApicRead (IO_APIC_REDIRECTION_TABLE_ENTRY_INDEX + Irq * 2);
-  Entry.Bits.Mask = Enable ? 0 : 1;
+  Entry.Bits.Mask  = Enable ? 0 : 1;
   IoApicWrite (IO_APIC_REDIRECTION_TABLE_ENTRY_INDEX + Irq * 2, Entry.Uint32.Low);
 }
 
@@ -137,7 +137,7 @@ IoApicConfigureInterrupt (
   ASSERT (Vector <= 0xFF);
   ASSERT (DeliveryMode < 8 && DeliveryMode != 6 && DeliveryMode != 3);
 
-  Entry.Uint32.Low = IoApicRead (IO_APIC_REDIRECTION_TABLE_ENTRY_INDEX + Irq * 2);
+  Entry.Uint32.Low           = IoApicRead (IO_APIC_REDIRECTION_TABLE_ENTRY_INDEX + Irq * 2);
   Entry.Bits.Vector          = (UINT8)Vector;
   Entry.Bits.DeliveryMode    = (UINT32)DeliveryMode;
   Entry.Bits.DestinationMode = 0;
@@ -146,7 +146,7 @@ IoApicConfigureInterrupt (
   Entry.Bits.Mask            = 1;
   IoApicWrite (IO_APIC_REDIRECTION_TABLE_ENTRY_INDEX + Irq * 2, Entry.Uint32.Low);
 
-  Entry.Uint32.High = IoApicRead (IO_APIC_REDIRECTION_TABLE_ENTRY_INDEX + Irq * 2 + 1);
+  Entry.Uint32.High        = IoApicRead (IO_APIC_REDIRECTION_TABLE_ENTRY_INDEX + Irq * 2 + 1);
   Entry.Bits.DestinationID = GetApicId ();
   IoApicWrite (IO_APIC_REDIRECTION_TABLE_ENTRY_INDEX + Irq * 2 + 1, Entry.Uint32.High);
 }

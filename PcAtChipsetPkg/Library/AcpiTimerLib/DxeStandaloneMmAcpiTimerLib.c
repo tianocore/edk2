@@ -11,7 +11,7 @@
 #include <Library/BaseLib.h>
 #include <Library/HobLib.h>
 
-extern GUID mFrequencyHobGuid;
+extern GUID  mFrequencyHobGuid;
 
 /**
   The constructor function enables ACPI IO space.
@@ -66,7 +66,7 @@ InternalGetPerformanceCounterFrequency (
   VOID
   )
 {
-  return  mPerformanceCounterFrequency;
+  return mPerformanceCounterFrequency;
 }
 
 /**
@@ -80,7 +80,7 @@ CommonAcpiTimerLibConstructor (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE   *GuidHob;
+  EFI_HOB_GUID_TYPE  *GuidHob;
 
   //
   // Enable ACPI IO space.
@@ -92,7 +92,7 @@ CommonAcpiTimerLibConstructor (
   //
   GuidHob = GetFirstGuidHob (&mFrequencyHobGuid);
   if (GuidHob != NULL) {
-    mPerformanceCounterFrequency = *(UINT64*)GET_GUID_HOB_DATA (GuidHob);
+    mPerformanceCounterFrequency = *(UINT64 *)GET_GUID_HOB_DATA (GuidHob);
   } else {
     mPerformanceCounterFrequency = InternalCalculateTscFrequency ();
   }

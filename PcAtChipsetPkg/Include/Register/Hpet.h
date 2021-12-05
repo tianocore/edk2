@@ -20,15 +20,15 @@
 ///
 /// HPET Timer Register Offsets
 ///
-#define HPET_MAIN_COUNTER_OFFSET              0x0F0
-#define HPET_TIMER_CONFIGURATION_OFFSET       0x100
-#define HPET_TIMER_COMPARATOR_OFFSET          0x108
-#define HPET_TIMER_MSI_ROUTE_OFFSET           0x110
+#define HPET_MAIN_COUNTER_OFFSET         0x0F0
+#define HPET_TIMER_CONFIGURATION_OFFSET  0x100
+#define HPET_TIMER_COMPARATOR_OFFSET     0x108
+#define HPET_TIMER_MSI_ROUTE_OFFSET      0x110
 
 ///
 /// Stride between sets of HPET Timer Registers
 ///
-#define HPET_TIMER_STRIDE         0x20
+#define HPET_TIMER_STRIDE  0x20
 
 #pragma pack(1)
 
@@ -37,15 +37,15 @@
 ///
 typedef union {
   struct {
-    UINT32  Revision:8;
-    UINT32  NumberOfTimers:5;
-    UINT32  CounterSize:1;
-    UINT32  Reserved0:1;
-    UINT32  LegacyRoute:1;
-    UINT32  VendorId:16;
-    UINT32  CounterClockPeriod:32;
+    UINT32    Revision           : 8;
+    UINT32    NumberOfTimers     : 5;
+    UINT32    CounterSize        : 1;
+    UINT32    Reserved0          : 1;
+    UINT32    LegacyRoute        : 1;
+    UINT32    VendorId           : 16;
+    UINT32    CounterClockPeriod : 32;
   } Bits;
-  UINT64  Uint64;
+  UINT64    Uint64;
 } HPET_GENERAL_CAPABILITIES_ID_REGISTER;
 
 ///
@@ -53,12 +53,12 @@ typedef union {
 ///
 typedef union {
   struct {
-    UINT32  MainCounterEnable:1;
-    UINT32  LegacyRouteEnable:1;
-    UINT32  Reserved0:30;
-    UINT32  Reserved1:32;
+    UINT32    MainCounterEnable : 1;
+    UINT32    LegacyRouteEnable : 1;
+    UINT32    Reserved0         : 30;
+    UINT32    Reserved1         : 32;
   } Bits;
-  UINT64  Uint64;
+  UINT64    Uint64;
 } HPET_GENERAL_CONFIGURATION_REGISTER;
 
 ///
@@ -66,22 +66,22 @@ typedef union {
 ///
 typedef union {
   struct {
-    UINT32  Reserved0:1;
-    UINT32  LevelTriggeredInterrupt:1;
-    UINT32  InterruptEnable:1;
-    UINT32  PeriodicInterruptEnable:1;
-    UINT32  PeriodicInterruptCapability:1;
-    UINT32  CounterSizeCapability:1;
-    UINT32  ValueSetEnable:1;
-    UINT32  Reserved1:1;
-    UINT32  CounterSizeEnable:1;
-    UINT32  InterruptRoute:5;
-    UINT32  MsiInterruptEnable:1;
-    UINT32  MsiInterruptCapability:1;
-    UINT32  Reserved2:16;
-    UINT32  InterruptRouteCapability;
+    UINT32    Reserved0                   : 1;
+    UINT32    LevelTriggeredInterrupt     : 1;
+    UINT32    InterruptEnable             : 1;
+    UINT32    PeriodicInterruptEnable     : 1;
+    UINT32    PeriodicInterruptCapability : 1;
+    UINT32    CounterSizeCapability       : 1;
+    UINT32    ValueSetEnable              : 1;
+    UINT32    Reserved1                   : 1;
+    UINT32    CounterSizeEnable           : 1;
+    UINT32    InterruptRoute              : 5;
+    UINT32    MsiInterruptEnable          : 1;
+    UINT32    MsiInterruptCapability      : 1;
+    UINT32    Reserved2                   : 16;
+    UINT32    InterruptRouteCapability;
   } Bits;
-  UINT64  Uint64;
+  UINT64    Uint64;
 } HPET_TIMER_CONFIGURATION_REGISTER;
 
 ///
@@ -89,10 +89,10 @@ typedef union {
 ///
 typedef union {
   struct {
-    UINT32  Value:32;
-    UINT32  Address:32;
+    UINT32    Value   : 32;
+    UINT32    Address : 32;
   } Bits;
-  UINT64  Uint64;
+  UINT64    Uint64;
 } HPET_TIMER_MSI_ROUTE_REGISTER;
 
 #pragma pack()
