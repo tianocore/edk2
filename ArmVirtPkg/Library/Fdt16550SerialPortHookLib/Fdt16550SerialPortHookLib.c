@@ -35,8 +35,8 @@ PlatformHookSerialPortInitialize (
   VOID
   )
 {
-  VOID            *Hob;
-  UINT64          *UartBase;
+  VOID    *Hob;
+  UINT64  *UartBase;
 
   if (PcdGet64 (PcdSerialRegisterBase) != 0) {
     return RETURN_SUCCESS;

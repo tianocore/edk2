@@ -19,30 +19,30 @@
 
 #pragma pack(1)
 typedef struct {
-  ACPI_HID_DEVICE_PATH     AcpiDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL EndDevicePath;
+  ACPI_HID_DEVICE_PATH        AcpiDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    EndDevicePath;
 } EFI_PCI_ROOT_BRIDGE_DEVICE_PATH;
 #pragma pack ()
 
 GLOBAL_REMOVE_IF_UNREFERENCED
-CHAR16 *mPciHostBridgeAcpiAddressSpaceTypeStr[] = {
+CHAR16  *mPciHostBridgeAcpiAddressSpaceTypeStr[] = {
   L"Mem",
   L"I/O",
   L"Bus"
 };
 
-STATIC CONST EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath = {
+STATIC CONST EFI_PCI_ROOT_BRIDGE_DEVICE_PATH  mEfiPciRootBridgeDevicePath = {
   {
     {
       ACPI_DEVICE_PATH,
       ACPI_DP,
       {
-        (UINT8) (sizeof (ACPI_HID_DEVICE_PATH)),
-        (UINT8) ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (ACPI_HID_DEVICE_PATH)),
+        (UINT8)((sizeof (ACPI_HID_DEVICE_PATH)) >> 8)
       }
     },
     EISA_PNP_ID (0x0A03), // HID
-    0                    // UID
+    0                     // UID
   },
 
   {
@@ -55,13 +55,12 @@ STATIC CONST EFI_PCI_ROOT_BRIDGE_DEVICE_PATH mEfiPciRootBridgeDevicePath = {
   }
 };
 
-
 GLOBAL_REMOVE_IF_UNREFERENCED
-CHAR16 *mPciHostBridgeLibAcpiAddressSpaceTypeStr[] = {
+CHAR16  *mPciHostBridgeLibAcpiAddressSpaceTypeStr[] = {
   L"Mem", L"I/O", L"Bus"
 };
 
-STATIC PCI_ROOT_BRIDGE mRootBridge;
+STATIC PCI_ROOT_BRIDGE  mRootBridge;
 
 /**
   Utility function to return all the root bridge instances in an array.
@@ -84,18 +83,18 @@ STATIC PCI_ROOT_BRIDGE mRootBridge;
 PCI_ROOT_BRIDGE *
 EFIAPI
 PciHostBridgeUtilityGetRootBridges (
-  OUT UINTN                    *Count,
-  IN  UINT64                   Attributes,
-  IN  UINT64                   AllocationAttributes,
-  IN  BOOLEAN                  DmaAbove4G,
-  IN  BOOLEAN                  NoExtendedConfigSpace,
-  IN  UINTN                    BusMin,
-  IN  UINTN                    BusMax,
-  IN  PCI_ROOT_BRIDGE_APERTURE *Io,
-  IN  PCI_ROOT_BRIDGE_APERTURE *Mem,
-  IN  PCI_ROOT_BRIDGE_APERTURE *MemAbove4G,
-  IN  PCI_ROOT_BRIDGE_APERTURE *PMem,
-  IN  PCI_ROOT_BRIDGE_APERTURE *PMemAbove4G
+  OUT UINTN                     *Count,
+  IN  UINT64                    Attributes,
+  IN  UINT64                    AllocationAttributes,
+  IN  BOOLEAN                   DmaAbove4G,
+  IN  BOOLEAN                   NoExtendedConfigSpace,
+  IN  UINTN                     BusMin,
+  IN  UINTN                     BusMax,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Io,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Mem,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *MemAbove4G,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *PMem,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *PMemAbove4G
   )
 {
   if ((Count == NULL)       ||
@@ -103,38 +102,38 @@ PciHostBridgeUtilityGetRootBridges (
       (Mem == NULL)         ||
       (MemAbove4G == NULL)  ||
       (PMem == NULL)        ||
-      (PMemAbove4G == NULL)) {
+      (PMemAbove4G == NULL))
+  {
     return NULL;
   }
 
-
   *Count = 1;
 
-  mRootBridge.Segment               = 0;
-  mRootBridge.Supports              = Attributes;
-  mRootBridge.Attributes            = Attributes;
+  mRootBridge.Segment    = 0;
+  mRootBridge.Supports   = Attributes;
+  mRootBridge.Attributes = Attributes;
 
   mRootBridge.DmaAbove4G            = DmaAbove4G;
   mRootBridge.NoExtendedConfigSpace = NoExtendedConfigSpace;
   mRootBridge.ResourceAssigned      = FALSE;
 
-  mRootBridge.AllocationAttributes  = AllocationAttributes;
+  mRootBridge.AllocationAttributes = AllocationAttributes;
 
-  mRootBridge.Bus.Base              = BusMin;
-  mRootBridge.Bus.Limit             = BusMax;
-  mRootBridge.Io.Base               = Io->Base;
-  mRootBridge.Io.Limit              = Io->Limit;
-  mRootBridge.Mem.Base              = Mem->Base;
-  mRootBridge.Mem.Limit             = Mem->Limit;
-  mRootBridge.MemAbove4G.Base       = MemAbove4G->Base;
-  mRootBridge.MemAbove4G.Limit      = MemAbove4G->Limit;
-  mRootBridge.PMem.Base             = PMem->Base;
-  mRootBridge.PMem.Limit            = PMem->Limit;
-  mRootBridge.PMemAbove4G.Base      = PMemAbove4G->Base;
-  mRootBridge.PMemAbove4G.Limit     = PMemAbove4G->Limit;
+  mRootBridge.Bus.Base          = BusMin;
+  mRootBridge.Bus.Limit         = BusMax;
+  mRootBridge.Io.Base           = Io->Base;
+  mRootBridge.Io.Limit          = Io->Limit;
+  mRootBridge.Mem.Base          = Mem->Base;
+  mRootBridge.Mem.Limit         = Mem->Limit;
+  mRootBridge.MemAbove4G.Base   = MemAbove4G->Base;
+  mRootBridge.MemAbove4G.Limit  = MemAbove4G->Limit;
+  mRootBridge.PMem.Base         = PMem->Base;
+  mRootBridge.PMem.Limit        = PMem->Limit;
+  mRootBridge.PMemAbove4G.Base  = PMemAbove4G->Base;
+  mRootBridge.PMemAbove4G.Limit = PMemAbove4G->Limit;
 
   mRootBridge.DevicePath =
-    (EFI_DEVICE_PATH_PROTOCOL*)&mEfiPciRootBridgeDevicePath;
+    (EFI_DEVICE_PATH_PROTOCOL *)&mEfiPciRootBridgeDevicePath;
 
   return &mRootBridge;
 }
@@ -149,8 +148,8 @@ PciHostBridgeUtilityGetRootBridges (
 VOID
 EFIAPI
 PciHostBridgeUtilityFreeRootBridges (
-  IN PCI_ROOT_BRIDGE *Bridges,
-  IN UINTN           Count
+  IN PCI_ROOT_BRIDGE  *Bridges,
+  IN UINTN            Count
   )
 {
   // Nothing to do here.
@@ -176,18 +175,20 @@ PciHostBridgeUtilityResourceConflict (
   IN VOID  *Configuration
   )
 {
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
-  UINTN                             RootBridgeIndex;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+  UINTN                              RootBridgeIndex;
+
   DEBUG ((DEBUG_ERROR, "PciHostBridge: Resource conflict happens!\n"));
 
   RootBridgeIndex = 0;
-  Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR*)Configuration;
+  Descriptor      = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)Configuration;
   while (Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR) {
     DEBUG ((DEBUG_ERROR, "RootBridge[%d]:\n", RootBridgeIndex++));
-    for (; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
-      ASSERT (Descriptor->ResType <
-              ARRAY_SIZE (mPciHostBridgeAcpiAddressSpaceTypeStr)
-              );
+    for ( ; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
+      ASSERT (
+        Descriptor->ResType <
+        ARRAY_SIZE (mPciHostBridgeAcpiAddressSpaceTypeStr)
+        );
       DEBUG ((
         DEBUG_ERROR,
         " %s: Length/Alignment = 0x%lx / 0x%lx\n",
@@ -207,12 +208,13 @@ PciHostBridgeUtilityResourceConflict (
           ));
       }
     }
+
     //
     // Skip the END descriptor for root bridge
     //
     ASSERT (Descriptor->Desc == ACPI_END_TAG_DESCRIPTOR);
-    Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR*)(
-                   (EFI_ACPI_END_TAG_DESCRIPTOR*)Descriptor + 1
-                   );
+    Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)(
+                                                       (EFI_ACPI_END_TAG_DESCRIPTOR *)Descriptor + 1
+                                                       );
   }
 }
