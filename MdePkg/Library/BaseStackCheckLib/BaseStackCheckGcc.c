@@ -17,10 +17,10 @@
 #include <Library/PcdLib.h>
 
 /// "canary" value that is inserted by the compiler into the stack frame.
-VOID *__stack_chk_guard = (VOID*)0x0AFF;
+VOID  *__stack_chk_guard = (VOID *)0x0AFF;
 
 // If ASLR was enabled we could use
-//void (*__stack_chk_guard)(void) = __stack_chk_fail;
+// void (*__stack_chk_guard)(void) = __stack_chk_fail;
 
 /**
  Error path for compiler generated stack "canary" value check code. If the
@@ -29,12 +29,12 @@ VOID *__stack_chk_guard = (VOID*)0x0AFF;
 **/
 VOID
 __stack_chk_fail (
- VOID
- )
+  VOID
+  )
 {
-  UINT8 DebugPropertyMask;
+  UINT8  DebugPropertyMask;
 
-  DEBUG ((DEBUG_ERROR, "STACK FAULT: Buffer Overflow in function %a.\n", __builtin_return_address(0)));
+  DEBUG ((DEBUG_ERROR, "STACK FAULT: Buffer Overflow in function %a.\n", __builtin_return_address (0)));
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings even if
@@ -44,6 +44,6 @@ __stack_chk_fail (
   if ((DebugPropertyMask & DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED) != 0) {
     CpuBreakpoint ();
   } else if ((DebugPropertyMask & DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED) != 0) {
-   CpuDeadLoop ();
+    CpuDeadLoop ();
   }
 }

@@ -69,8 +69,8 @@ EfiGoneVirtual (
 EFI_STATUS
 EFIAPI
 EfiGetTime (
-  OUT EFI_TIME                    *Time,
-  OUT EFI_TIME_CAPABILITIES       *Capabilities  OPTIONAL
+  OUT EFI_TIME               *Time,
+  OUT EFI_TIME_CAPABILITIES  *Capabilities  OPTIONAL
   );
 
 /**
@@ -98,7 +98,7 @@ EfiGetTime (
 EFI_STATUS
 EFIAPI
 EfiSetTime (
-  IN EFI_TIME                   *Time
+  IN EFI_TIME  *Time
   );
 
 /**
@@ -125,9 +125,9 @@ EfiSetTime (
 EFI_STATUS
 EFIAPI
 EfiGetWakeupTime (
-  OUT BOOLEAN                     *Enabled,
-  OUT BOOLEAN                     *Pending,
-  OUT EFI_TIME                    *Time
+  OUT BOOLEAN   *Enabled,
+  OUT BOOLEAN   *Pending,
+  OUT EFI_TIME  *Time
   );
 
 /**
@@ -155,8 +155,8 @@ EfiGetWakeupTime (
 EFI_STATUS
 EFIAPI
 EfiSetWakeupTime (
-  IN BOOLEAN                      Enable,
-  IN EFI_TIME                     *Time   OPTIONAL
+  IN BOOLEAN   Enable,
+  IN EFI_TIME  *Time   OPTIONAL
   );
 
 /**
@@ -192,11 +192,11 @@ EfiSetWakeupTime (
 EFI_STATUS
 EFIAPI
 EfiGetVariable (
-  IN      CHAR16                   *VariableName,
-  IN      EFI_GUID                 *VendorGuid,
-  OUT     UINT32                   *Attributes OPTIONAL,
-  IN OUT  UINTN                    *DataSize,
-  OUT     VOID                     *Data
+  IN      CHAR16    *VariableName,
+  IN      EFI_GUID  *VendorGuid,
+  OUT     UINT32    *Attributes OPTIONAL,
+  IN OUT  UINTN     *DataSize,
+  OUT     VOID      *Data
   );
 
 /**
@@ -232,9 +232,9 @@ EfiGetVariable (
 EFI_STATUS
 EFIAPI
 EfiGetNextVariableName (
-  IN OUT UINTN                    *VariableNameSize,
-  IN OUT CHAR16                   *VariableName,
-  IN OUT EFI_GUID                 *VendorGuid
+  IN OUT UINTN     *VariableNameSize,
+  IN OUT CHAR16    *VariableName,
+  IN OUT EFI_GUID  *VendorGuid
   );
 
 /**
@@ -269,11 +269,11 @@ EfiGetNextVariableName (
 EFI_STATUS
 EFIAPI
 EfiSetVariable (
-  IN CHAR16                       *VariableName,
-  IN EFI_GUID                     *VendorGuid,
-  IN UINT32                       Attributes,
-  IN UINTN                        DataSize,
-  IN VOID                         *Data
+  IN CHAR16    *VariableName,
+  IN EFI_GUID  *VendorGuid,
+  IN UINT32    Attributes,
+  IN UINTN     DataSize,
+  IN VOID      *Data
   );
 
 /**
@@ -295,7 +295,7 @@ EfiSetVariable (
 EFI_STATUS
 EFIAPI
 EfiGetNextHighMonotonicCount (
-  OUT UINT32                      *HighCount
+  OUT UINT32  *HighCount
   );
 
 /**
@@ -329,10 +329,10 @@ EfiGetNextHighMonotonicCount (
 VOID
 EFIAPI
 EfiResetSystem (
-  IN EFI_RESET_TYPE               ResetType,
-  IN EFI_STATUS                   ResetStatus,
-  IN UINTN                        DataSize,
-  IN VOID                         *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   );
 
 /**
@@ -356,8 +356,8 @@ EfiResetSystem (
 EFI_STATUS
 EFIAPI
 EfiConvertPointer (
-  IN UINTN                  DebugDisposition,
-  IN OUT VOID               **Address
+  IN UINTN     DebugDisposition,
+  IN OUT VOID  **Address
   );
 
 /**
@@ -385,8 +385,8 @@ EfiConvertPointer (
 EFI_STATUS
 EFIAPI
 EfiConvertFunctionPointer (
-  IN UINTN                DebugDisposition,
-  IN OUT VOID             **Address
+  IN UINTN     DebugDisposition,
+  IN OUT VOID  **Address
   );
 
 /**
@@ -418,12 +418,11 @@ EfiConvertFunctionPointer (
 EFI_STATUS
 EFIAPI
 EfiSetVirtualAddressMap (
-  IN UINTN                          MemoryMapSize,
-  IN UINTN                          DescriptorSize,
-  IN UINT32                         DescriptorVersion,
-  IN CONST EFI_MEMORY_DESCRIPTOR    *VirtualMap
+  IN UINTN                        MemoryMapSize,
+  IN UINTN                        DescriptorSize,
+  IN UINT32                       DescriptorVersion,
+  IN CONST EFI_MEMORY_DESCRIPTOR  *VirtualMap
   );
-
 
 /**
   Convert the standard Lib double linked list to a virtual mapping.
@@ -442,8 +441,8 @@ EfiSetVirtualAddressMap (
 EFI_STATUS
 EFIAPI
 EfiConvertList (
-  IN UINTN                DebugDisposition,
-  IN OUT LIST_ENTRY       *ListHead
+  IN UINTN           DebugDisposition,
+  IN OUT LIST_ENTRY  *ListHead
   );
 
 /**
@@ -484,11 +483,10 @@ EfiConvertList (
 EFI_STATUS
 EFIAPI
 EfiUpdateCapsule (
-  IN EFI_CAPSULE_HEADER       **CapsuleHeaderArray,
-  IN UINTN                    CapsuleCount,
-  IN EFI_PHYSICAL_ADDRESS     ScatterGatherList OPTIONAL
+  IN EFI_CAPSULE_HEADER    **CapsuleHeaderArray,
+  IN UINTN                 CapsuleCount,
+  IN EFI_PHYSICAL_ADDRESS  ScatterGatherList OPTIONAL
   );
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service QueryCapsuleCapabilities().
@@ -527,12 +525,11 @@ EfiUpdateCapsule (
 EFI_STATUS
 EFIAPI
 EfiQueryCapsuleCapabilities (
-  IN  EFI_CAPSULE_HEADER       **CapsuleHeaderArray,
-  IN  UINTN                    CapsuleCount,
-  OUT UINT64                   *MaximumCapsuleSize,
-  OUT EFI_RESET_TYPE           *ResetType
+  IN  EFI_CAPSULE_HEADER  **CapsuleHeaderArray,
+  IN  UINTN               CapsuleCount,
+  OUT UINT64              *MaximumCapsuleSize,
+  OUT EFI_RESET_TYPE      *ResetType
   );
-
 
 /**
   This service is a wrapper for the UEFI Runtime Service QueryVariableInfo().
@@ -578,4 +575,3 @@ EfiQueryVariableInfo (
   );
 
 #endif
-
