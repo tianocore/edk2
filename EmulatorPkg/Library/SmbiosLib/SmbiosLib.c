@@ -18,9 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiLib.h>
 #include <Library/SmbiosLib.h>
 
-
-EFI_SMBIOS_PROTOCOL *gSmbios = NULL;
-
+EFI_SMBIOS_PROTOCOL  *gSmbios = NULL;
 
 /**
   Create an initial SMBIOS Table from an array of SMBIOS_TEMPLATE_ENTRY
@@ -34,11 +32,11 @@ EFI_SMBIOS_PROTOCOL *gSmbios = NULL;
 EFI_STATUS
 EFIAPI
 SmbiosLibInitializeFromTemplate (
-  IN  SMBIOS_TEMPLATE_ENTRY   *Template
+  IN  SMBIOS_TEMPLATE_ENTRY  *Template
   )
 {
-  EFI_STATUS    Status;
-  UINTN         Index;
+  EFI_STATUS  Status;
+  UINTN       Index;
 
   if (Template == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -52,8 +50,6 @@ SmbiosLibInitializeFromTemplate (
 
   return Status;
 }
-
-
 
 /**
   Create SMBIOS record.
@@ -85,17 +81,17 @@ SmbiosLibInitializeFromTemplate (
 EFI_STATUS
 EFIAPI
 SmbiosLibCreateEntry (
-  IN  SMBIOS_STRUCTURE *SmbiosEntry,
-  IN  CHAR8            **StringArray
+  IN  SMBIOS_STRUCTURE  *SmbiosEntry,
+  IN  CHAR8             **StringArray
   )
 {
-  EFI_STATUS                Status;
-  EFI_SMBIOS_HANDLE         SmbiosHandle;
-  EFI_SMBIOS_TABLE_HEADER   *Record;
-  UINTN                     Index;
-  UINTN                     StringSize;
-  UINTN                     Size;
-  CHAR8                     *Str;
+  EFI_STATUS               Status;
+  EFI_SMBIOS_HANDLE        SmbiosHandle;
+  EFI_SMBIOS_TABLE_HEADER  *Record;
+  UINTN                    Index;
+  UINTN                    StringSize;
+  UINTN                    Size;
+  CHAR8                    *Str;
 
   // Calculate the size of the fixed record and optional string pack
   Size = SmbiosEntry->Length;
@@ -106,8 +102,9 @@ SmbiosLibCreateEntry (
   } else {
     for (Index = 0; StringArray[Index] != NULL; Index++) {
       StringSize = AsciiStrSize (StringArray[Index]);
-      Size += StringSize;
+      Size      += StringSize;
     }
+
     // Don't forget the terminating double null
     Size += 1;
   }
@@ -117,6 +114,7 @@ SmbiosLibCreateEntry (
   if (Record == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   CopyMem (Record, SmbiosEntry, SmbiosEntry->Length);
 
   if (StringArray != NULL) {
@@ -127,22 +125,21 @@ SmbiosLibCreateEntry (
       CopyMem (Str, StringArray[Index], StringSize);
       Str += StringSize;
     }
+
     *Str = 0;
   }
 
   SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
-  Status = gSmbios->Add (
-                     gSmbios,
-                     gImageHandle,
-                     &SmbiosHandle,
-                     Record
-                     );
+  Status       = gSmbios->Add (
+                            gSmbios,
+                            gImageHandle,
+                            &SmbiosHandle,
+                            Record
+                            );
 
   FreePool (Record);
   return Status;
 }
-
-
 
 /**
   Update the string associated with an existing SMBIOS record.
@@ -162,12 +159,12 @@ SmbiosLibCreateEntry (
 EFI_STATUS
 EFIAPI
 SmbiosLibUpdateString (
-  IN  EFI_SMBIOS_HANDLE     SmbiosHandle,
-  IN  SMBIOS_TABLE_STRING   StringNumber,
-  IN  CHAR8                 *String
+  IN  EFI_SMBIOS_HANDLE    SmbiosHandle,
+  IN  SMBIOS_TABLE_STRING  StringNumber,
+  IN  CHAR8                *String
   )
 {
-  UINTN StringIndex;
+  UINTN  StringIndex;
 
   if (String == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -181,7 +178,6 @@ SmbiosLibUpdateString (
   StringIndex = StringNumber;
   return gSmbios->UpdateString (gSmbios, &SmbiosHandle, &StringIndex, String);
 }
-
 
 /**
   Update the string associated with an existing SMBIOS record.
@@ -201,9 +197,9 @@ SmbiosLibUpdateString (
 EFI_STATUS
 EFIAPI
 SmbiosLibUpdateUnicodeString (
-  IN  EFI_SMBIOS_HANDLE     SmbiosHandle,
-  IN  SMBIOS_TABLE_STRING   StringNumber,
-  IN  CHAR16                *String
+  IN  EFI_SMBIOS_HANDLE    SmbiosHandle,
+  IN  SMBIOS_TABLE_STRING  StringNumber,
+  IN  CHAR16               *String
   )
 {
   EFI_STATUS  Status;
@@ -223,15 +219,15 @@ SmbiosLibUpdateUnicodeString (
   if (Ascii == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   UnicodeStrToAsciiStrS (String, Ascii, StrSize (String));
 
   StringIndex = StringNumber;
-  Status = gSmbios->UpdateString (gSmbios, &SmbiosHandle, &StringIndex, Ascii);
+  Status      = gSmbios->UpdateString (gSmbios, &SmbiosHandle, &StringIndex, Ascii);
 
   FreePool (Ascii);
   return Status;
 }
-
 
 /**
   Allow caller to read a specific SMBIOS string
@@ -249,14 +245,15 @@ SmbiosLibReadString (
   IN EFI_SMBIOS_STRING  StringNumber
   )
 {
-  CHAR8       *Data;
-  UINTN       Match;
+  CHAR8  *Data;
+  UINTN  Match;
 
   Data = (CHAR8 *)Header + Header->Length;
-  for (Match = 1;!(*Data == 0 && *(Data+1) == 0); ) {
+  for (Match = 1; !(*Data == 0 && *(Data+1) == 0); ) {
     if (StringNumber == Match) {
       return Data;
     }
+
     Data++;
     if (*(Data - 1) == '\0') {
       Match++;
@@ -265,7 +262,6 @@ SmbiosLibReadString (
 
   return NULL;
 }
-
 
 /**
   Allow the caller to discover a specific SMBIOS entry, and patch it if necissary.
@@ -280,14 +276,14 @@ SmbiosLibReadString (
 SMBIOS_STRUCTURE *
 EFIAPI
 SmbiosLibGetRecord (
-  IN  EFI_SMBIOS_TYPE   Type,
-  IN  UINTN             Instance,
-  OUT EFI_SMBIOS_HANDLE *SmbiosHandle
+  IN  EFI_SMBIOS_TYPE    Type,
+  IN  UINTN              Instance,
+  OUT EFI_SMBIOS_HANDLE  *SmbiosHandle
   )
 {
-  EFI_STATUS              Status;
-  EFI_SMBIOS_TABLE_HEADER *Record;
-  UINTN                   Match;
+  EFI_STATUS               Status;
+  EFI_SMBIOS_TABLE_HEADER  *Record;
+  UINTN                    Match;
 
   Match         = 0;
   *SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
@@ -297,13 +293,13 @@ SmbiosLibGetRecord (
       if (Match == Instance) {
         return (SMBIOS_STRUCTURE *)Record;
       }
+
       Match++;
     }
   } while (!EFI_ERROR (Status));
 
   return NULL;
 }
-
 
 /**
   Remove an SMBIOS record.
@@ -318,13 +314,11 @@ SmbiosLibGetRecord (
 EFI_STATUS
 EFIAPI
 SmbiosLibRemove (
-  OUT EFI_SMBIOS_HANDLE SmbiosHandle
+  OUT EFI_SMBIOS_HANDLE  SmbiosHandle
   )
 {
   return gSmbios->Remove (gSmbios, SmbiosHandle);
 }
-
-
 
 /**
 
@@ -343,4 +337,3 @@ SmbiosLibConstructor (
 {
   return gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **)&gSmbios);
 }
-
