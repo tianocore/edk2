@@ -19,7 +19,7 @@
 **/
 EFI_STATUS
 InstallAllStructures (
-  IN UINT8                     *TableAddress
+  IN UINT8  *TableAddress
   );
 
 #endif

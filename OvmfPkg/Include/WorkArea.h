@@ -17,7 +17,6 @@ typedef enum {
   GUEST_TYPE_NON_ENCRYPTED,
   GUEST_TYPE_AMD_SEV,
   GUEST_TYPE_INTEL_TDX,
-
 } GUEST_TYPE;
 
 //
@@ -31,8 +30,8 @@ typedef enum {
 //   OvmfPkg/OvmfPkg.dec
 //   OvmfPkg/OvmfPkgDefines.fdf.inc
 typedef struct _CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER {
-  UINT8                   GuestType;
-  UINT8                   Reserved1[3];
+  UINT8    GuestType;
+  UINT8    Reserved1[3];
 } CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER;
 
 //
@@ -47,26 +46,26 @@ typedef struct _CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER {
 // any changes must stay in sync with its usage.
 //
 typedef struct _SEC_SEV_ES_WORK_AREA {
-  UINT8    SevEsEnabled;
-  UINT8    Reserved1[7];
+  UINT8     SevEsEnabled;
+  UINT8     Reserved1[7];
 
-  UINT64   RandomData;
+  UINT64    RandomData;
 
-  UINT64   EncryptionMask;
+  UINT64    EncryptionMask;
 } SEC_SEV_ES_WORK_AREA;
 
 //
 // The SEV work area definition.
 //
 typedef struct _SEV_WORK_AREA {
-  CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER   Header;
+  CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER    Header;
 
-  SEC_SEV_ES_WORK_AREA                      SevEsWorkArea;
+  SEC_SEV_ES_WORK_AREA                       SevEsWorkArea;
 } SEV_WORK_AREA;
 
 typedef union {
-  CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER   Header;
-  SEV_WORK_AREA                             SevWorkArea;
+  CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER    Header;
+  SEV_WORK_AREA                              SevWorkArea;
 } OVMF_WORK_AREA;
 
 #endif

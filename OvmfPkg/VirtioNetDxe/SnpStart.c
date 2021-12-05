@@ -28,29 +28,27 @@
   @retval EFI_UNSUPPORTED       This function is not supported by the network
                                 interface.
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetStart (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This
   )
 {
-  VNET_DEV   *Dev;
-  EFI_TPL    OldTpl;
-  EFI_STATUS Status;
+  VNET_DEV    *Dev;
+  EFI_TPL     OldTpl;
+  EFI_STATUS  Status;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  Dev = VIRTIO_NET_FROM_SNP (This);
+  Dev    = VIRTIO_NET_FROM_SNP (This);
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   if (Dev->Snm.State != EfiSimpleNetworkStopped) {
     Status = EFI_ALREADY_STARTED;
-  }
-  else {
+  } else {
     Dev->Snm.State = EfiSimpleNetworkStarted;
-    Status = EFI_SUCCESS;
+    Status         = EFI_SUCCESS;
   }
 
   gBS->RestoreTPL (OldTpl);

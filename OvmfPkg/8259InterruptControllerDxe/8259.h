@@ -22,11 +22,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 // 8259 Hardware definitions
 
-#define LEGACY_MODE_BASE_VECTOR_MASTER                    0x08
-#define LEGACY_MODE_BASE_VECTOR_SLAVE                     0x70
+#define LEGACY_MODE_BASE_VECTOR_MASTER  0x08
+#define LEGACY_MODE_BASE_VECTOR_SLAVE   0x70
 
-#define PROTECTED_MODE_BASE_VECTOR_MASTER                 0x68
-#define PROTECTED_MODE_BASE_VECTOR_SLAVE                  0x70
+#define PROTECTED_MODE_BASE_VECTOR_MASTER  0x68
+#define PROTECTED_MODE_BASE_VECTOR_SLAVE   0x70
 
 #define LEGACY_8259_CONTROL_REGISTER_MASTER               0x20
 #define LEGACY_8259_MASK_REGISTER_MASTER                  0x21
@@ -35,7 +35,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_MASTER  0x4D0
 #define LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_SLAVE   0x4D1
 
-#define LEGACY_8259_EOI                                   0x20
+#define LEGACY_8259_EOI  0x20
 
 // Protocol Function Prototypes
 

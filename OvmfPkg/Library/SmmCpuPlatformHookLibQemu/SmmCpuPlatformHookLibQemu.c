@@ -75,13 +75,13 @@ ClearTopLevelSmiStatus (
 EFI_STATUS
 EFIAPI
 PlatformSmmBspElection (
-  OUT BOOLEAN     *IsBsp
+  OUT BOOLEAN  *IsBsp
   )
 {
-  MSR_IA32_APIC_BASE_REGISTER ApicBaseMsr;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
   ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
-  *IsBsp = (BOOLEAN)(ApicBaseMsr.Bits.BSP == 1);
+  *IsBsp             = (BOOLEAN)(ApicBaseMsr.Bits.BSP == 1);
   return EFI_SUCCESS;
 }
 
@@ -105,10 +105,10 @@ PlatformSmmBspElection (
 EFI_STATUS
 EFIAPI
 GetPlatformPageTableAttribute (
-  IN  UINT64                Address,
-  IN OUT SMM_PAGE_SIZE_TYPE *PageSize,
-  IN OUT UINTN              *NumOfPages,
-  IN OUT UINTN              *PageAttribute
+  IN  UINT64                 Address,
+  IN OUT SMM_PAGE_SIZE_TYPE  *PageSize,
+  IN OUT UINTN               *NumOfPages,
+  IN OUT UINTN               *PageAttribute
   )
 {
   return EFI_UNSUPPORTED;

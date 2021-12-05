@@ -36,18 +36,18 @@
 **/
 EFI_STATUS
 VirtioFsFuseStatFs (
-  IN OUT VIRTIO_FS                      *VirtioFs,
-  IN     UINT64                         NodeId,
-     OUT VIRTIO_FS_FUSE_STATFS_RESPONSE *FilesysAttr
-     )
+  IN OUT VIRTIO_FS                    *VirtioFs,
+  IN     UINT64                       NodeId,
+  OUT VIRTIO_FS_FUSE_STATFS_RESPONSE  *FilesysAttr
+  )
 {
-  VIRTIO_FS_FUSE_REQUEST        CommonReq;
-  VIRTIO_FS_IO_VECTOR           ReqIoVec[1];
-  VIRTIO_FS_SCATTER_GATHER_LIST ReqSgList;
-  VIRTIO_FS_FUSE_RESPONSE       CommonResp;
-  VIRTIO_FS_IO_VECTOR           RespIoVec[2];
-  VIRTIO_FS_SCATTER_GATHER_LIST RespSgList;
-  EFI_STATUS                    Status;
+  VIRTIO_FS_FUSE_REQUEST         CommonReq;
+  VIRTIO_FS_IO_VECTOR            ReqIoVec[1];
+  VIRTIO_FS_SCATTER_GATHER_LIST  ReqSgList;
+  VIRTIO_FS_FUSE_RESPONSE        CommonResp;
+  VIRTIO_FS_IO_VECTOR            RespIoVec[2];
+  VIRTIO_FS_SCATTER_GATHER_LIST  RespSgList;
+  EFI_STATUS                     Status;
 
   //
   // Set up the scatter-gather lists.
@@ -75,8 +75,13 @@ VirtioFsFuseStatFs (
   //
   // Populate the common request header.
   //
-  Status = VirtioFsFuseNewRequest (VirtioFs, &CommonReq, ReqSgList.TotalSize,
-             VirtioFsFuseOpStatFs, NodeId);
+  Status = VirtioFsFuseNewRequest (
+             VirtioFs,
+             &CommonReq,
+             ReqSgList.TotalSize,
+             VirtioFsFuseOpStatFs,
+             NodeId
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -94,9 +99,16 @@ VirtioFsFuseStatFs (
   //
   Status = VirtioFsFuseCheckResponse (&RespSgList, CommonReq.Unique, NULL);
   if (Status == EFI_DEVICE_ERROR) {
-    DEBUG ((DEBUG_ERROR, "%a: Label=\"%s\" NodeId=%Lu Errno=%d\n",
-      __FUNCTION__, VirtioFs->Label, NodeId, CommonResp.Error));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Label=\"%s\" NodeId=%Lu Errno=%d\n",
+      __FUNCTION__,
+      VirtioFs->Label,
+      NodeId,
+      CommonResp.Error
+      ));
     Status = VirtioFsErrnoToEfiStatus (CommonResp.Error);
   }
+
   return Status;
 }

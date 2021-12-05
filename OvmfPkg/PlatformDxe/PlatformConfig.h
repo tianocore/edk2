@@ -23,8 +23,8 @@ typedef struct {
   //
   // preferred graphics console resolution when booting
   //
-  UINT32 HorizontalResolution;
-  UINT32 VerticalResolution;
+  UINT32    HorizontalResolution;
+  UINT32    VerticalResolution;
 } PLATFORM_CONFIG;
 #pragma pack()
 
@@ -34,20 +34,20 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 PlatformConfigSave (
-  IN PLATFORM_CONFIG *PlatformConfig
+  IN PLATFORM_CONFIG  *PlatformConfig
   );
 
 EFI_STATUS
 EFIAPI
 PlatformConfigLoad (
-  OUT PLATFORM_CONFIG *PlatformConfig,
-  OUT UINT64          *OptionalElements
+  OUT PLATFORM_CONFIG  *PlatformConfig,
+  OUT UINT64           *OptionalElements
   );
 
 //
 // Feature flags for OptionalElements.
 //
-#define PLATFORM_CONFIG_F_GRAPHICS_RESOLUTION BIT0
-#define PLATFORM_CONFIG_F_DOWNGRADE           BIT63
+#define PLATFORM_CONFIG_F_GRAPHICS_RESOLUTION  BIT0
+#define PLATFORM_CONFIG_F_DOWNGRADE            BIT63
 
 #endif // _PLATFORM_CONFIG_H_

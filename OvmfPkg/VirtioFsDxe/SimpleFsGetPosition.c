@@ -12,16 +12,17 @@
 EFI_STATUS
 EFIAPI
 VirtioFsSimpleFileGetPosition (
-  IN     EFI_FILE_PROTOCOL *This,
-     OUT UINT64            *Position
+  IN     EFI_FILE_PROTOCOL  *This,
+  OUT UINT64                *Position
   )
 {
-  VIRTIO_FS_FILE *VirtioFsFile;
+  VIRTIO_FS_FILE  *VirtioFsFile;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
   if (VirtioFsFile->IsDirectory) {
     return EFI_UNSUPPORTED;
   }
+
   *Position = VirtioFsFile->FilePosition;
   return EFI_SUCCESS;
 }

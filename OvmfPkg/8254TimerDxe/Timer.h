@@ -32,17 +32,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // The maximum tick duration for 8254 timer
 //
-#define MAX_TIMER_TICK_DURATION     549254
+#define MAX_TIMER_TICK_DURATION  549254
 //
 // The default timer tick duration is set to 10 ms = 100000 100 ns units
 //
-#define DEFAULT_TIMER_TICK_DURATION 100000
-#define TIMER_CONTROL_PORT          0x43
-#define TIMER0_COUNT_PORT           0x40
+#define DEFAULT_TIMER_TICK_DURATION  100000
+#define TIMER_CONTROL_PORT           0x43
+#define TIMER0_COUNT_PORT            0x40
 
 //
 // Function Prototypes
 //
+
 /**
   Initialize the Timer Architectural Protocol driver
 
@@ -153,8 +154,8 @@ TimerDriverSetTimerPeriod (
 EFI_STATUS
 EFIAPI
 TimerDriverGetTimerPeriod (
-  IN EFI_TIMER_ARCH_PROTOCOL   *This,
-  OUT UINT64                   *TimerPeriod
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  OUT UINT64                  *TimerPeriod
   )
 ;
 

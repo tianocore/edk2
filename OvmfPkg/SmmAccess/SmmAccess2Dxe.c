@@ -114,14 +114,18 @@ SmmAccess2DxeGetCapabilities (
   IN OUT EFI_SMRAM_DESCRIPTOR        *SmramMap
   )
 {
-  return SmramAccessGetCapabilities (This->LockState, This->OpenState,
-           SmramMapSize, SmramMap);
+  return SmramAccessGetCapabilities (
+           This->LockState,
+           This->OpenState,
+           SmramMapSize,
+           SmramMap
+           );
 }
 
 //
 // LockState and OpenState will be filled in by the entry point.
 //
-STATIC EFI_SMM_ACCESS2_PROTOCOL mAccess2 = {
+STATIC EFI_SMM_ACCESS2_PROTOCOL  mAccess2 = {
   &SmmAccess2DxeOpen,
   &SmmAccess2DxeClose,
   &SmmAccess2DxeLock,
@@ -134,8 +138,8 @@ STATIC EFI_SMM_ACCESS2_PROTOCOL mAccess2 = {
 EFI_STATUS
 EFIAPI
 SmmAccess2DxeEntryPoint (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   //
@@ -152,7 +156,10 @@ SmmAccess2DxeEntryPoint (
   //
   InitQ35SmramAtDefaultSmbase ();
 
-  return gBS->InstallMultipleProtocolInterfaces (&ImageHandle,
-                &gEfiSmmAccess2ProtocolGuid, &mAccess2,
-                NULL);
+  return gBS->InstallMultipleProtocolInterfaces (
+                &ImageHandle,
+                &gEfiSmmAccess2ProtocolGuid,
+                &mAccess2,
+                NULL
+                );
 }

@@ -42,25 +42,25 @@
 #define SEV_CMDLINE_HASH_GUID \
   (GUID) { 0x97d02dd8, 0xbd20, 0x4c94, { 0xaa, 0x78, 0xe7, 0x71, 0x4d, 0x36, 0xab, 0x2a } }
 
-STATIC CONST EFI_GUID mSevKernelHashGuid = SEV_KERNEL_HASH_GUID;
-STATIC CONST EFI_GUID mSevInitrdHashGuid = SEV_INITRD_HASH_GUID;
-STATIC CONST EFI_GUID mSevCmdlineHashGuid = SEV_CMDLINE_HASH_GUID;
+STATIC CONST EFI_GUID  mSevKernelHashGuid  = SEV_KERNEL_HASH_GUID;
+STATIC CONST EFI_GUID  mSevInitrdHashGuid  = SEV_INITRD_HASH_GUID;
+STATIC CONST EFI_GUID  mSevCmdlineHashGuid = SEV_CMDLINE_HASH_GUID;
 
 #pragma pack (1)
 typedef struct {
-  GUID   Guid;
-  UINT16 Len;
-  UINT8  Data[];
+  GUID      Guid;
+  UINT16    Len;
+  UINT8     Data[];
 } HASH_TABLE;
 #pragma pack ()
 
-STATIC HASH_TABLE *mHashesTable;
-STATIC UINT16 mHashesTableSize;
+STATIC HASH_TABLE  *mHashesTable;
+STATIC UINT16      mHashesTableSize;
 
 STATIC
-CONST GUID*
+CONST GUID *
 FindBlobEntryGuid (
-  IN  CONST CHAR16    *BlobName
+  IN  CONST CHAR16  *BlobName
   )
 {
   if (StrCmp (BlobName, L"kernel") == 0) {
@@ -88,26 +88,32 @@ FindBlobEntryGuid (
 EFI_STATUS
 EFIAPI
 VerifyBlob (
-  IN  CONST CHAR16    *BlobName,
-  IN  CONST VOID      *Buf,
-  IN  UINT32          BufSize
+  IN  CONST CHAR16  *BlobName,
+  IN  CONST VOID    *Buf,
+  IN  UINT32        BufSize
   )
 {
-  CONST GUID *Guid;
-  INT32 Remaining;
-  HASH_TABLE *Entry;
+  CONST GUID  *Guid;
+  INT32       Remaining;
+  HASH_TABLE  *Entry;
 
-  if (mHashesTable == NULL || mHashesTableSize == 0) {
-    DEBUG ((DEBUG_ERROR,
+  if ((mHashesTable == NULL) || (mHashesTableSize == 0)) {
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: Verifier called but no hashes table discoverd in MEMFD\n",
-      __FUNCTION__));
+      __FUNCTION__
+      ));
     return EFI_ACCESS_DENIED;
   }
 
   Guid = FindBlobEntryGuid (BlobName);
   if (Guid == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Unknown blob name \"%s\"\n", __FUNCTION__,
-      BlobName));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Unknown blob name \"%s\"\n",
+      __FUNCTION__,
+      BlobName
+      ));
     return EFI_ACCESS_DENIED;
   }
 
@@ -118,10 +124,11 @@ VerifyBlob (
   for (Entry = mHashesTable, Remaining = mHashesTableSize;
        Remaining >= sizeof *Entry && Remaining >= Entry->Len;
        Remaining -= Entry->Len,
-       Entry = (HASH_TABLE *)((UINT8 *)Entry + Entry->Len)) {
-    UINTN EntrySize;
-    EFI_STATUS Status;
-    UINT8 Hash[SHA256_DIGEST_SIZE];
+       Entry = (HASH_TABLE *)((UINT8 *)Entry + Entry->Len))
+  {
+    UINTN       EntrySize;
+    EFI_STATUS  Status;
+    UINT8       Hash[SHA256_DIGEST_SIZE];
 
     if (!CompareGuid (&Entry->Guid, Guid)) {
       continue;
@@ -131,8 +138,13 @@ VerifyBlob (
 
     EntrySize = Entry->Len - sizeof Entry->Guid - sizeof Entry->Len;
     if (EntrySize != SHA256_DIGEST_SIZE) {
-      DEBUG ((DEBUG_ERROR, "%a: Hash has the wrong size %d != %d\n",
-        __FUNCTION__, EntrySize, SHA256_DIGEST_SIZE));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Hash has the wrong size %d != %d\n",
+        __FUNCTION__,
+        EntrySize,
+        SHA256_DIGEST_SIZE
+        ));
       return EFI_ACCESS_DENIED;
     }
 
@@ -144,18 +156,31 @@ VerifyBlob (
 
     if (CompareMem (Entry->Data, Hash, EntrySize) == 0) {
       Status = EFI_SUCCESS;
-      DEBUG ((DEBUG_INFO, "%a: Hash comparison succeeded for \"%s\"\n",
-        __FUNCTION__, BlobName));
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: Hash comparison succeeded for \"%s\"\n",
+        __FUNCTION__,
+        BlobName
+        ));
     } else {
       Status = EFI_ACCESS_DENIED;
-      DEBUG ((DEBUG_ERROR, "%a: Hash comparison failed for \"%s\"\n",
-        __FUNCTION__, BlobName));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Hash comparison failed for \"%s\"\n",
+        __FUNCTION__,
+        BlobName
+        ));
     }
+
     return Status;
   }
 
-  DEBUG ((DEBUG_ERROR, "%a: Hash GUID %g not found in table\n", __FUNCTION__,
-    Guid));
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a: Hash GUID %g not found in table\n",
+    __FUNCTION__,
+    Guid
+    ));
   return EFI_ACCESS_DENIED;
 }
 
@@ -174,29 +199,38 @@ BlobVerifierLibSevHashesConstructor (
   VOID
   )
 {
-  HASH_TABLE *Ptr;
-  UINT32 Size;
+  HASH_TABLE  *Ptr;
+  UINT32      Size;
 
-  mHashesTable = NULL;
+  mHashesTable     = NULL;
   mHashesTableSize = 0;
 
-  Ptr = (void *)(UINTN)FixedPcdGet64 (PcdQemuHashTableBase);
+  Ptr  = (void *)(UINTN)FixedPcdGet64 (PcdQemuHashTableBase);
   Size = FixedPcdGet32 (PcdQemuHashTableSize);
 
-  if (Ptr == NULL || Size < sizeof *Ptr ||
+  if ((Ptr == NULL) || (Size < sizeof *Ptr) ||
       !CompareGuid (&Ptr->Guid, &SEV_HASH_TABLE_GUID) ||
-      Ptr->Len < sizeof *Ptr || Ptr->Len > Size) {
+      (Ptr->Len < sizeof *Ptr) || (Ptr->Len > Size))
+  {
     return RETURN_SUCCESS;
   }
 
-  DEBUG ((DEBUG_INFO, "%a: Found injected hashes table in secure location\n",
-    __FUNCTION__));
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: Found injected hashes table in secure location\n",
+    __FUNCTION__
+    ));
 
-  mHashesTable = (HASH_TABLE *)Ptr->Data;
+  mHashesTable     = (HASH_TABLE *)Ptr->Data;
   mHashesTableSize = Ptr->Len - sizeof Ptr->Guid - sizeof Ptr->Len;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: mHashesTable=0x%p, Size=%u\n", __FUNCTION__,
-    mHashesTable, mHashesTableSize));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: mHashesTable=0x%p, Size=%u\n",
+    __FUNCTION__,
+    mHashesTable,
+    mHashesTableSize
+    ));
 
   return RETURN_SUCCESS;
 }

@@ -66,7 +66,7 @@ XenHypercall2 (
 UINT64
 EFIAPI
 XenHypercallHvmGetParam (
-  UINT32 Index
+  UINT32  Index
   );
 
 /**
@@ -81,8 +81,8 @@ XenHypercallHvmGetParam (
 INTN
 EFIAPI
 XenHypercallMemoryOp (
-  IN     UINTN Operation,
-  IN OUT VOID *Arguments
+  IN     UINTN  Operation,
+  IN OUT VOID   *Arguments
   );
 
 /**
@@ -97,8 +97,8 @@ XenHypercallMemoryOp (
 INTN
 EFIAPI
 XenHypercallEventChannelOp (
-  IN     INTN Operation,
-  IN OUT VOID *Arguments
+  IN     INTN  Operation,
+  IN OUT VOID  *Arguments
   );
 
 #endif

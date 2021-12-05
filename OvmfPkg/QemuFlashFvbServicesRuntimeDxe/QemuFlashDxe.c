@@ -16,7 +16,7 @@
 
 #include "QemuFlash.h"
 
-STATIC EFI_PHYSICAL_ADDRESS mSevEsFlashPhysBase;
+STATIC EFI_PHYSICAL_ADDRESS  mSevEsFlashPhysBase;
 
 VOID
 QemuFlashConvertPointers (
@@ -24,17 +24,17 @@ QemuFlashConvertPointers (
   )
 {
   if (MemEncryptSevEsIsEnabled ()) {
-    mSevEsFlashPhysBase = (UINTN) mFlashBase;
+    mSevEsFlashPhysBase = (UINTN)mFlashBase;
   }
 
-  EfiConvertPointer (0x0, (VOID **) &mFlashBase);
+  EfiConvertPointer (0x0, (VOID **)&mFlashBase);
 }
 
 VOID
 QemuFlashBeforeProbe (
-  IN  EFI_PHYSICAL_ADDRESS    BaseAddress,
-  IN  UINTN                   FdBlockSize,
-  IN  UINTN                   FdBlockCount
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINTN                 FdBlockSize,
+  IN  UINTN                 FdBlockCount
   )
 {
   //
@@ -51,8 +51,8 @@ QemuFlashBeforeProbe (
 **/
 VOID
 QemuFlashPtrWrite (
-  IN        volatile UINT8    *Ptr,
-  IN        UINT8             Value
+  IN        volatile UINT8  *Ptr,
+  IN        UINT8           Value
   )
 {
   if (MemEncryptSevEsIsEnabled ()) {
@@ -62,7 +62,7 @@ QemuFlashPtrWrite (
     BOOLEAN                   InterruptState;
 
     Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
-    Ghcb = Msr.Ghcb;
+    Ghcb                    = Msr.Ghcb;
 
     //
     // The MMIO write needs to be to the physical address of the flash pointer.
@@ -70,7 +70,7 @@ QemuFlashPtrWrite (
     // account for a non-identity mapped VA after SetVirtualAddressMap().
     //
     if (mSevEsFlashPhysBase == 0) {
-      PhysAddr = (UINTN) Ptr;
+      PhysAddr = (UINTN)Ptr;
     } else {
       PhysAddr = mSevEsFlashPhysBase + (Ptr - mFlashBase);
     }
@@ -83,8 +83,8 @@ QemuFlashPtrWrite (
     // to perform the update.
     //
     VmgInit (Ghcb, &InterruptState);
-    Ghcb->SharedBuffer[0] = Value;
-    Ghcb->SaveArea.SwScratch = (UINT64) (UINTN) Ghcb->SharedBuffer;
+    Ghcb->SharedBuffer[0]    = Value;
+    Ghcb->SaveArea.SwScratch = (UINT64)(UINTN)Ghcb->SharedBuffer;
     VmgSetOffsetValid (Ghcb, GhcbSwScratch);
     VmgExit (Ghcb, SVM_EXIT_MMIO_WRITE, PhysAddr, 1);
     VmgDone (Ghcb, InterruptState);

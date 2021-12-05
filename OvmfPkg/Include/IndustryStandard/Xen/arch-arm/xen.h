@@ -152,9 +152,9 @@
  *   at Documentation/devicetree/bindings/arm/xen.txt.
  */
 
-#define XEN_HYPERCALL_TAG   0xEA1
+#define XEN_HYPERCALL_TAG  0xEA1
 
-#define uint64_aligned_t UINT64 __attribute__((aligned(8)))
+#define uint64_aligned_t  UINT64 __attribute__((aligned(8)))
 
 #ifndef __ASSEMBLY__
 #define ___DEFINE_XEN_GUEST_HANDLE(name, type)                  \
@@ -173,134 +173,137 @@
 #define __DEFINE_XEN_GUEST_HANDLE(name, type) \
     ___DEFINE_XEN_GUEST_HANDLE(name, type);   \
     ___DEFINE_XEN_GUEST_HANDLE(const_##name, const type)
-#define DEFINE_XEN_GUEST_HANDLE(name)   __DEFINE_XEN_GUEST_HANDLE(name, name)
-#define __XEN_GUEST_HANDLE(name)        __guest_handle_64_ ## name
-#define XEN_GUEST_HANDLE(name)          __XEN_GUEST_HANDLE(name)
+#define DEFINE_XEN_GUEST_HANDLE(name)  __DEFINE_XEN_GUEST_HANDLE(name, name)
+#define __XEN_GUEST_HANDLE(name)       __guest_handle_64_ ## name
+#define XEN_GUEST_HANDLE(name)         __XEN_GUEST_HANDLE(name)
 /* this is going to be changed on 64 bit */
-#define XEN_GUEST_HANDLE_PARAM(name)    __guest_handle_ ## name
+#define XEN_GUEST_HANDLE_PARAM(name)  __guest_handle_ ## name
 #define set_xen_guest_handle_raw(hnd, val)                  \
     do {                                                    \
         typeof(&(hnd)) _sxghr_tmp = &(hnd);                 \
         _sxghr_tmp->q = 0;                                  \
         _sxghr_tmp->p = val;                                \
     } while ( 0 )
-#ifdef __XEN_TOOLS__
+  #ifdef __XEN_TOOLS__
 #define get_xen_guest_handle(val, hnd)  do { val = (hnd).p; } while (0)
-#endif
-#define set_xen_guest_handle(hnd, val) set_xen_guest_handle_raw(hnd, val)
+  #endif
+#define set_xen_guest_handle(hnd, val)  set_xen_guest_handle_raw(hnd, val)
 
-#if defined(__GNUC__) && !defined(__STRICT_ANSI__)
+  #if defined (__GNUC__) && !defined (__STRICT_ANSI__)
 /* Anonymous union includes both 32- and 64-bit names (e.g., r0/x0). */
-# define __DECL_REG(n64, n32) union {          \
+#define __DECL_REG(n64, n32)  union {          \
         UINT64 n64;                          \
         UINT32 n32;                          \
     }
-#else
+  #else
 /* Non-gcc sources must always use the proper 64-bit name (e.g., x0). */
-#define __DECL_REG(n64, n32) UINT64 n64
-#endif
+#define __DECL_REG(n64, n32)  UINT64 n64
+  #endif
 
-struct vcpu_guest_core_regs
-{
-    /*         Aarch64       Aarch32 */
-    __DECL_REG(x0,           r0_usr);
-    __DECL_REG(x1,           r1_usr);
-    __DECL_REG(x2,           r2_usr);
-    __DECL_REG(x3,           r3_usr);
-    __DECL_REG(x4,           r4_usr);
-    __DECL_REG(x5,           r5_usr);
-    __DECL_REG(x6,           r6_usr);
-    __DECL_REG(x7,           r7_usr);
-    __DECL_REG(x8,           r8_usr);
-    __DECL_REG(x9,           r9_usr);
-    __DECL_REG(x10,          r10_usr);
-    __DECL_REG(x11,          r11_usr);
-    __DECL_REG(x12,          r12_usr);
+struct vcpu_guest_core_regs {
+  /*         Aarch64       Aarch32 */
+  __DECL_REG (x0, r0_usr);
+  __DECL_REG (x1, r1_usr);
+  __DECL_REG (x2, r2_usr);
+  __DECL_REG (x3, r3_usr);
+  __DECL_REG (x4, r4_usr);
+  __DECL_REG (x5, r5_usr);
+  __DECL_REG (x6, r6_usr);
+  __DECL_REG (x7, r7_usr);
+  __DECL_REG (x8, r8_usr);
+  __DECL_REG (x9, r9_usr);
+  __DECL_REG (x10, r10_usr);
+  __DECL_REG (x11, r11_usr);
+  __DECL_REG (x12, r12_usr);
 
-    __DECL_REG(x13,          sp_usr);
-    __DECL_REG(x14,          lr_usr);
+  __DECL_REG (x13, sp_usr);
+  __DECL_REG (x14, lr_usr);
 
-    __DECL_REG(x15,          __unused_sp_hyp);
+  __DECL_REG (x15, __unused_sp_hyp);
 
-    __DECL_REG(x16,          lr_irq);
-    __DECL_REG(x17,          sp_irq);
+  __DECL_REG (x16, lr_irq);
+  __DECL_REG (x17, sp_irq);
 
-    __DECL_REG(x18,          lr_svc);
-    __DECL_REG(x19,          sp_svc);
+  __DECL_REG (x18, lr_svc);
+  __DECL_REG (x19, sp_svc);
 
-    __DECL_REG(x20,          lr_abt);
-    __DECL_REG(x21,          sp_abt);
+  __DECL_REG (x20, lr_abt);
+  __DECL_REG (x21, sp_abt);
 
-    __DECL_REG(x22,          lr_und);
-    __DECL_REG(x23,          sp_und);
+  __DECL_REG (x22, lr_und);
+  __DECL_REG (x23, sp_und);
 
-    __DECL_REG(x24,          r8_fiq);
-    __DECL_REG(x25,          r9_fiq);
-    __DECL_REG(x26,          r10_fiq);
-    __DECL_REG(x27,          r11_fiq);
-    __DECL_REG(x28,          r12_fiq);
+  __DECL_REG (x24, r8_fiq);
+  __DECL_REG (x25, r9_fiq);
+  __DECL_REG (x26, r10_fiq);
+  __DECL_REG (x27, r11_fiq);
+  __DECL_REG (x28, r12_fiq);
 
-    __DECL_REG(x29,          sp_fiq);
-    __DECL_REG(x30,          lr_fiq);
+  __DECL_REG (x29, sp_fiq);
+  __DECL_REG (x30, lr_fiq);
 
-    /* Return address and mode */
-    __DECL_REG(pc64,         pc32);             /* ELR_EL2 */
-    UINT32 cpsr;                              /* SPSR_EL2 */
+  /* Return address and mode */
+  __DECL_REG (pc64, pc32);                    /* ELR_EL2 */
+  UINT32    cpsr;                             /* SPSR_EL2 */
 
-    union {
-        UINT32 spsr_el1;       /* AArch64 */
-        UINT32 spsr_svc;       /* AArch32 */
-    };
+  union {
+    UINT32    spsr_el1;        /* AArch64 */
+    UINT32    spsr_svc;        /* AArch32 */
+  };
 
-    /* AArch32 guests only */
-    UINT32 spsr_fiq, spsr_irq, spsr_und, spsr_abt;
+  /* AArch32 guests only */
+  UINT32    spsr_fiq, spsr_irq, spsr_und, spsr_abt;
 
-    /* AArch64 guests only */
-    UINT64 sp_el0;
-    UINT64 sp_el1, elr_el1;
+  /* AArch64 guests only */
+  UINT64    sp_el0;
+  UINT64    sp_el1, elr_el1;
 };
-typedef struct vcpu_guest_core_regs vcpu_guest_core_regs_t;
-DEFINE_XEN_GUEST_HANDLE(vcpu_guest_core_regs_t);
 
-#undef __DECL_REG
+typedef struct vcpu_guest_core_regs vcpu_guest_core_regs_t;
+DEFINE_XEN_GUEST_HANDLE (vcpu_guest_core_regs_t);
+
+  #undef __DECL_REG
 
 typedef UINT64 xen_pfn_t;
-#define PRI_xen_pfn PRIx64
+#define PRI_xen_pfn  PRIx64
 
 /* Maximum number of virtual CPUs in legacy multi-processor guests. */
 /* Only one. All other VCPUS must use VCPUOP_register_vcpu_info */
-#define XEN_LEGACY_MAX_VCPUS 1
+#define XEN_LEGACY_MAX_VCPUS  1
 
 typedef UINT64 xen_ulong_t;
-#define PRI_xen_ulong PRIx64
+#define PRI_xen_ulong  PRIx64
 
-#if defined(__XEN__) || defined(__XEN_TOOLS__)
+  #if defined (__XEN__) || defined (__XEN_TOOLS__)
 struct vcpu_guest_context {
-#define _VGCF_online                   0
-#define VGCF_online                    (1<<_VGCF_online)
-    UINT32 flags;                         /* VGCF_* */
+  #define _VGCF_online  0
+  #define VGCF_online   (1<<_VGCF_online)
+  UINT32                         flags;   /* VGCF_* */
 
-    struct vcpu_guest_core_regs user_regs;  /* Core CPU registers */
+  struct vcpu_guest_core_regs    user_regs; /* Core CPU registers */
 
-    UINT32 sctlr;
-    UINT64 ttbcr, ttbr0, ttbr1;
+  UINT32                         sctlr;
+  UINT64                         ttbcr, ttbr0, ttbr1;
 };
+
 typedef struct vcpu_guest_context vcpu_guest_context_t;
-DEFINE_XEN_GUEST_HANDLE(vcpu_guest_context_t);
-#endif
+DEFINE_XEN_GUEST_HANDLE (vcpu_guest_context_t);
+  #endif
 
 struct arch_vcpu_info {
 };
+
 typedef struct arch_vcpu_info arch_vcpu_info_t;
 
 struct arch_shared_info {
 };
+
 typedef struct arch_shared_info arch_shared_info_t;
-typedef UINT64 xen_callback_t;
+typedef UINT64                  xen_callback_t;
 
 #endif
 
-#if defined(__XEN__) || defined(__XEN_TOOLS__)
+#if defined (__XEN__) || defined (__XEN_TOOLS__)
 
 /* PSR bits (CPSR, SPSR)*/
 
@@ -314,30 +317,30 @@ typedef UINT64 xen_callback_t;
 #define PSR_JAZELLE     (1<<24)       /* Jazelle Mode */
 
 /* 32 bit modes */
-#define PSR_MODE_USR 0x10
-#define PSR_MODE_FIQ 0x11
-#define PSR_MODE_IRQ 0x12
-#define PSR_MODE_SVC 0x13
-#define PSR_MODE_MON 0x16
-#define PSR_MODE_ABT 0x17
-#define PSR_MODE_HYP 0x1a
-#define PSR_MODE_UND 0x1b
-#define PSR_MODE_SYS 0x1f
+#define PSR_MODE_USR  0x10
+#define PSR_MODE_FIQ  0x11
+#define PSR_MODE_IRQ  0x12
+#define PSR_MODE_SVC  0x13
+#define PSR_MODE_MON  0x16
+#define PSR_MODE_ABT  0x17
+#define PSR_MODE_HYP  0x1a
+#define PSR_MODE_UND  0x1b
+#define PSR_MODE_SYS  0x1f
 
 /* 64 bit modes */
-#define PSR_MODE_BIT  0x10 /* Set iff AArch32 */
-#define PSR_MODE_EL3h 0x0d
-#define PSR_MODE_EL3t 0x0c
-#define PSR_MODE_EL2h 0x09
-#define PSR_MODE_EL2t 0x08
-#define PSR_MODE_EL1h 0x05
-#define PSR_MODE_EL1t 0x04
-#define PSR_MODE_EL0t 0x00
+#define PSR_MODE_BIT   0x10/* Set iff AArch32 */
+#define PSR_MODE_EL3h  0x0d
+#define PSR_MODE_EL3t  0x0c
+#define PSR_MODE_EL2h  0x09
+#define PSR_MODE_EL2t  0x08
+#define PSR_MODE_EL1h  0x05
+#define PSR_MODE_EL1t  0x04
+#define PSR_MODE_EL0t  0x00
 
 #define PSR_GUEST32_INIT  (PSR_ABT_MASK|PSR_FIQ_MASK|PSR_IRQ_MASK|PSR_MODE_SVC)
-#define PSR_GUEST64_INIT (PSR_ABT_MASK|PSR_FIQ_MASK|PSR_IRQ_MASK|PSR_MODE_EL1h)
+#define PSR_GUEST64_INIT  (PSR_ABT_MASK|PSR_FIQ_MASK|PSR_IRQ_MASK|PSR_MODE_EL1h)
 
-#define SCTLR_GUEST_INIT    0x00c50078
+#define SCTLR_GUEST_INIT  0x00c50078
 
 /*
  * Virtual machine platform (memory layout, interrupts)
@@ -354,56 +357,56 @@ typedef UINT64 xen_callback_t;
  */
 
 /* vGIC v2 mappings */
-#define GUEST_GICD_BASE   0x03001000ULL
-#define GUEST_GICD_SIZE   0x00001000ULL
-#define GUEST_GICC_BASE   0x03002000ULL
-#define GUEST_GICC_SIZE   0x00000100ULL
+#define GUEST_GICD_BASE  0x03001000ULL
+#define GUEST_GICD_SIZE  0x00001000ULL
+#define GUEST_GICC_BASE  0x03002000ULL
+#define GUEST_GICC_SIZE  0x00000100ULL
 
 /* vGIC v3 mappings */
-#define GUEST_GICV3_GICD_BASE      0x03001000ULL
-#define GUEST_GICV3_GICD_SIZE      0x00010000ULL
+#define GUEST_GICV3_GICD_BASE  0x03001000ULL
+#define GUEST_GICV3_GICD_SIZE  0x00010000ULL
 
 #define GUEST_GICV3_RDIST_STRIDE   0x20000ULL
 #define GUEST_GICV3_RDIST_REGIONS  1
 
-#define GUEST_GICV3_GICR0_BASE     0x03020000ULL    /* vCPU0 - vCPU7 */
-#define GUEST_GICV3_GICR0_SIZE     0x00100000ULL
+#define GUEST_GICV3_GICR0_BASE  0x03020000ULL       /* vCPU0 - vCPU7 */
+#define GUEST_GICV3_GICR0_SIZE  0x00100000ULL
 
 /* 16MB == 4096 pages reserved for guest to use as a region to map its
  * grant table in.
  */
-#define GUEST_GNTTAB_BASE 0x38000000ULL
-#define GUEST_GNTTAB_SIZE 0x01000000ULL
+#define GUEST_GNTTAB_BASE  0x38000000ULL
+#define GUEST_GNTTAB_SIZE  0x01000000ULL
 
 #define GUEST_MAGIC_BASE  0x39000000ULL
 #define GUEST_MAGIC_SIZE  0x01000000ULL
 
-#define GUEST_RAM_BANKS   2
+#define GUEST_RAM_BANKS  2
 
-#define GUEST_RAM0_BASE   0x40000000ULL /* 3GB of low RAM @ 1GB */
-#define GUEST_RAM0_SIZE   0xc0000000ULL
+#define GUEST_RAM0_BASE  0x40000000ULL  /* 3GB of low RAM @ 1GB */
+#define GUEST_RAM0_SIZE  0xc0000000ULL
 
-#define GUEST_RAM1_BASE   0x0200000000ULL /* 1016GB of RAM @ 8GB */
-#define GUEST_RAM1_SIZE   0xfe00000000ULL
+#define GUEST_RAM1_BASE  0x0200000000ULL  /* 1016GB of RAM @ 8GB */
+#define GUEST_RAM1_SIZE  0xfe00000000ULL
 
-#define GUEST_RAM_BASE    GUEST_RAM0_BASE /* Lowest RAM address */
+#define GUEST_RAM_BASE  GUEST_RAM0_BASE   /* Lowest RAM address */
 /* Largest amount of actual RAM, not including holes */
-#define GUEST_RAM_MAX     (GUEST_RAM0_SIZE + GUEST_RAM1_SIZE)
+#define GUEST_RAM_MAX  (GUEST_RAM0_SIZE + GUEST_RAM1_SIZE)
 /* Suitable for e.g. const uint64_t ramfoo[] = GUEST_RAM_BANK_FOOS; */
-#define GUEST_RAM_BANK_BASES   { GUEST_RAM0_BASE, GUEST_RAM1_BASE }
-#define GUEST_RAM_BANK_SIZES   { GUEST_RAM0_SIZE, GUEST_RAM1_SIZE }
+#define GUEST_RAM_BANK_BASES  { GUEST_RAM0_BASE, GUEST_RAM1_BASE }
+#define GUEST_RAM_BANK_SIZES  { GUEST_RAM0_SIZE, GUEST_RAM1_SIZE }
 
 /* Interrupts */
-#define GUEST_TIMER_VIRT_PPI    27
-#define GUEST_TIMER_PHYS_S_PPI  29
-#define GUEST_TIMER_PHYS_NS_PPI 30
-#define GUEST_EVTCHN_PPI        31
+#define GUEST_TIMER_VIRT_PPI     27
+#define GUEST_TIMER_PHYS_S_PPI   29
+#define GUEST_TIMER_PHYS_NS_PPI  30
+#define GUEST_EVTCHN_PPI         31
 
 /* PSCI functions */
-#define PSCI_cpu_suspend 0
-#define PSCI_cpu_off     1
-#define PSCI_cpu_on      2
-#define PSCI_migrate     3
+#define PSCI_cpu_suspend  0
+#define PSCI_cpu_off      1
+#define PSCI_cpu_on       2
+#define PSCI_migrate      3
 
 #endif
 

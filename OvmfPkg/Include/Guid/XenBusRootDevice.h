@@ -13,6 +13,6 @@
 #define XENBUS_ROOT_DEVICE_GUID \
 {0xa732241f, 0x383d, 0x4d9c, {0x8a, 0xe1, 0x8e, 0x09, 0x83, 0x75, 0x89, 0xd7}}
 
-extern EFI_GUID gXenBusRootDeviceGuid;
+extern EFI_GUID  gXenBusRootDeviceGuid;
 
 #endif

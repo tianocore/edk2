@@ -19,18 +19,18 @@
 STATIC
 EFI_STATUS
 GetFileInfo (
-  IN     EFI_FILE_PROTOCOL *This,
-  IN OUT UINTN             *BufferSize,
-     OUT VOID              *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN OUT UINTN              *BufferSize,
+  OUT VOID                  *Buffer
   )
 {
-  VIRTIO_FS_FILE                     *VirtioFsFile;
-  VIRTIO_FS                          *VirtioFs;
-  UINTN                              AllocSize;
-  UINTN                              BasenameSize;
-  EFI_STATUS                         Status;
-  EFI_FILE_INFO                      *FileInfo;
-  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE FuseAttr;
+  VIRTIO_FS_FILE                      *VirtioFsFile;
+  VIRTIO_FS                           *VirtioFs;
+  UINTN                               AllocSize;
+  UINTN                               BasenameSize;
+  EFI_STATUS                          Status;
+  EFI_FILE_INFO                       *FileInfo;
+  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE  FuseAttr;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
   VirtioFs     = VirtioFsFile->OwnerFs;
@@ -41,8 +41,11 @@ GetFileInfo (
   // Calculate the needed size.
   //
   BasenameSize = 0;
-  Status = VirtioFsGetBasename (VirtioFsFile->CanonicalPathname, NULL,
-             &BasenameSize);
+  Status       = VirtioFsGetBasename (
+                   VirtioFsFile->CanonicalPathname,
+                   NULL,
+                   &BasenameSize
+                   );
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
   *BufferSize = OFFSET_OF (EFI_FILE_INFO, FileName) + BasenameSize;
 
@@ -53,10 +56,13 @@ GetFileInfo (
   //
   // Set the structure size, and store the basename.
   //
-  FileInfo = Buffer;
+  FileInfo       = Buffer;
   FileInfo->Size = *BufferSize;
-  Status = VirtioFsGetBasename (VirtioFsFile->CanonicalPathname,
-             FileInfo->FileName, &BasenameSize);
+  Status         = VirtioFsGetBasename (
+                     VirtioFsFile->CanonicalPathname,
+                     FileInfo->FileName,
+                     &BasenameSize
+                     );
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -66,6 +72,7 @@ GetFileInfo (
   if (!EFI_ERROR (Status)) {
     Status = VirtioFsFuseAttrToEfiFileInfo (&FuseAttr, FileInfo);
   }
+
   return (Status == EFI_BUFFER_TOO_SMALL) ? EFI_DEVICE_ERROR : Status;
 }
 
@@ -75,19 +82,19 @@ GetFileInfo (
 STATIC
 EFI_STATUS
 GetFileSystemInfo (
-  IN     EFI_FILE_PROTOCOL *This,
-  IN OUT UINTN             *BufferSize,
-     OUT VOID              *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN OUT UINTN              *BufferSize,
+  OUT VOID                  *Buffer
   )
 {
-  VIRTIO_FS_FILE                 *VirtioFsFile;
-  VIRTIO_FS                      *VirtioFs;
-  UINTN                          AllocSize;
-  UINTN                          LabelSize;
-  EFI_STATUS                     Status;
-  VIRTIO_FS_FUSE_STATFS_RESPONSE FilesysAttr;
-  UINT64                         MaxBlocks;
-  EFI_FILE_SYSTEM_INFO           *FilesysInfo;
+  VIRTIO_FS_FILE                  *VirtioFsFile;
+  VIRTIO_FS                       *VirtioFs;
+  UINTN                           AllocSize;
+  UINTN                           LabelSize;
+  EFI_STATUS                      Status;
+  VIRTIO_FS_FUSE_STATFS_RESPONSE  FilesysAttr;
+  UINT64                          MaxBlocks;
+  EFI_FILE_SYSTEM_INFO            *FilesysInfo;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
   VirtioFs     = VirtioFsFile->OwnerFs;
@@ -97,7 +104,7 @@ GetFileSystemInfo (
   //
   // Calculate the needed size.
   //
-  LabelSize = StrSize (VirtioFs->Label);
+  LabelSize   = StrSize (VirtioFs->Label);
   *BufferSize = OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel) + LabelSize;
 
   if (*BufferSize > AllocSize) {
@@ -111,18 +118,22 @@ GetFileSystemInfo (
   if (EFI_ERROR (Status)) {
     return (Status == EFI_BUFFER_TOO_SMALL) ? EFI_DEVICE_ERROR : Status;
   }
+
   //
   // Sanity checks...
   //
   if (FilesysAttr.Frsize != FilesysAttr.Bsize) {
     return EFI_UNSUPPORTED;
   }
-  if (FilesysAttr.Frsize == 0 || FilesysAttr.Blocks == 0 ||
-      FilesysAttr.Bavail > FilesysAttr.Blocks) {
+
+  if ((FilesysAttr.Frsize == 0) || (FilesysAttr.Blocks == 0) ||
+      (FilesysAttr.Bavail > FilesysAttr.Blocks))
+  {
     return EFI_DEVICE_ERROR;
   }
+
   MaxBlocks = DivU64x32 (MAX_UINT64, FilesysAttr.Frsize);
-  if (FilesysAttr.Blocks > MaxBlocks || FilesysAttr.Bavail > MaxBlocks) {
+  if ((FilesysAttr.Blocks > MaxBlocks) || (FilesysAttr.Bavail > MaxBlocks)) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -132,11 +143,15 @@ GetFileSystemInfo (
   FilesysInfo             = Buffer;
   FilesysInfo->Size       = *BufferSize;
   FilesysInfo->ReadOnly   = FALSE;
-  FilesysInfo->VolumeSize = MultU64x32 (FilesysAttr.Blocks,
-                              FilesysAttr.Frsize);
-  FilesysInfo->FreeSpace  = MultU64x32 (FilesysAttr.Bavail,
-                              FilesysAttr.Frsize);
-  FilesysInfo->BlockSize  = FilesysAttr.Frsize;
+  FilesysInfo->VolumeSize = MultU64x32 (
+                              FilesysAttr.Blocks,
+                              FilesysAttr.Frsize
+                              );
+  FilesysInfo->FreeSpace = MultU64x32 (
+                             FilesysAttr.Bavail,
+                             FilesysAttr.Frsize
+                             );
+  FilesysInfo->BlockSize = FilesysAttr.Frsize;
   CopyMem (FilesysInfo->VolumeLabel, VirtioFs->Label, LabelSize);
 
   return EFI_SUCCESS;
@@ -148,16 +163,16 @@ GetFileSystemInfo (
 STATIC
 EFI_STATUS
 GetFileSystemVolumeLabelInfo (
-  IN     EFI_FILE_PROTOCOL *This,
-  IN OUT UINTN             *BufferSize,
-     OUT VOID              *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN OUT UINTN              *BufferSize,
+  OUT VOID                  *Buffer
   )
 {
-  VIRTIO_FS_FILE               *VirtioFsFile;
-  VIRTIO_FS                    *VirtioFs;
-  UINTN                        AllocSize;
-  UINTN                        LabelSize;
-  EFI_FILE_SYSTEM_VOLUME_LABEL *FilesysVolumeLabel;
+  VIRTIO_FS_FILE                *VirtioFsFile;
+  VIRTIO_FS                     *VirtioFs;
+  UINTN                         AllocSize;
+  UINTN                         LabelSize;
+  EFI_FILE_SYSTEM_VOLUME_LABEL  *FilesysVolumeLabel;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
   VirtioFs     = VirtioFsFile->OwnerFs;
@@ -167,7 +182,7 @@ GetFileSystemVolumeLabelInfo (
   //
   // Calculate the needed size.
   //
-  LabelSize = StrSize (VirtioFs->Label);
+  LabelSize   = StrSize (VirtioFs->Label);
   *BufferSize = (OFFSET_OF (EFI_FILE_SYSTEM_VOLUME_LABEL, VolumeLabel) +
                  LabelSize);
 
@@ -187,10 +202,10 @@ GetFileSystemVolumeLabelInfo (
 EFI_STATUS
 EFIAPI
 VirtioFsSimpleFileGetInfo (
-  IN     EFI_FILE_PROTOCOL *This,
-  IN     EFI_GUID          *InformationType,
-  IN OUT UINTN             *BufferSize,
-     OUT VOID              *Buffer
+  IN     EFI_FILE_PROTOCOL  *This,
+  IN     EFI_GUID           *InformationType,
+  IN OUT UINTN              *BufferSize,
+  OUT VOID                  *Buffer
   )
 {
   if (CompareGuid (InformationType, &gEfiFileInfoGuid)) {

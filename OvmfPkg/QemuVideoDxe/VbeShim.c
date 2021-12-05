@@ -26,8 +26,8 @@
 
 #pragma pack (1)
 typedef struct {
-  UINT16 Offset;
-  UINT16 Segment;
+  UINT16    Offset;
+  UINT16    Segment;
 } IVT_ENTRY;
 #pragma pack ()
 
@@ -35,7 +35,7 @@ typedef struct {
 // This string is displayed by Windows 2008 R2 SP1 in the Screen Resolution,
 // Advanced Settings dialog. It should be short.
 //
-STATIC CONST CHAR8 mProductRevision[] = "OVMF Int10h (fake)";
+STATIC CONST CHAR8  mProductRevision[] = "OVMF Int10h (fake)";
 
 /**
   Install the VBE Info and VBE Mode Info structures, and the VBE service
@@ -51,23 +51,23 @@ STATIC CONST CHAR8 mProductRevision[] = "OVMF Int10h (fake)";
 **/
 VOID
 InstallVbeShim (
-  IN CONST CHAR16         *CardName,
-  IN EFI_PHYSICAL_ADDRESS FrameBufferBase
+  IN CONST CHAR16          *CardName,
+  IN EFI_PHYSICAL_ADDRESS  FrameBufferBase
   )
 {
-  EFI_PHYSICAL_ADDRESS Segment0, SegmentC, SegmentF;
-  UINTN                Segment0Pages;
-  IVT_ENTRY            *Int0x10;
-  EFI_STATUS           Segment0AllocationStatus;
-  UINT16               HostBridgeDevId;
-  UINTN                Pam1Address;
-  UINT8                Pam1;
-  UINTN                SegmentCPages;
-  VBE_INFO             *VbeInfoFull;
-  VBE_INFO_BASE        *VbeInfo;
-  UINT8                *Ptr;
-  UINTN                Printed;
-  VBE_MODE_INFO        *VbeModeInfo;
+  EFI_PHYSICAL_ADDRESS  Segment0, SegmentC, SegmentF;
+  UINTN                 Segment0Pages;
+  IVT_ENTRY             *Int0x10;
+  EFI_STATUS            Segment0AllocationStatus;
+  UINT16                HostBridgeDevId;
+  UINTN                 Pam1Address;
+  UINT8                 Pam1;
+  UINTN                 SegmentCPages;
+  VBE_INFO              *VbeInfoFull;
+  VBE_INFO_BASE         *VbeInfo;
+  UINT8                 *Ptr;
+  UINTN                 Printed;
+  VBE_MODE_INFO         *VbeModeInfo;
 
   if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7)) == BIT0) {
     DEBUG ((
@@ -95,8 +95,8 @@ InstallVbeShim (
   //
   // The allocation request may fail, eg. if LegacyBiosDxe has already run.
   //
-  Segment0Pages = 1;
-  Int0x10       = (IVT_ENTRY *)(UINTN)(Segment0 + 0x10 * sizeof (IVT_ENTRY));
+  Segment0Pages            = 1;
+  Int0x10                  = (IVT_ENTRY *)(UINTN)(Segment0 + 0x10 * sizeof (IVT_ENTRY));
   Segment0AllocationStatus = gBS->AllocatePages (
                                     AllocateAddress,
                                     EfiBootServicesCode,
@@ -105,7 +105,7 @@ InstallVbeShim (
                                     );
 
   if (EFI_ERROR (Segment0AllocationStatus)) {
-    EFI_PHYSICAL_ADDRESS Handler;
+    EFI_PHYSICAL_ADDRESS  Handler;
 
     //
     // Check if a video BIOS handler has been installed previously -- we
@@ -113,9 +113,14 @@ InstallVbeShim (
     // it's already present.
     //
     Handler = (Int0x10->Segment << 4) + Int0x10->Offset;
-    if (Handler >= SegmentC && Handler < SegmentF) {
-      DEBUG ((DEBUG_INFO, "%a: Video BIOS handler found at %04x:%04x\n",
-        __FUNCTION__, Int0x10->Segment, Int0x10->Offset));
+    if ((Handler >= SegmentC) && (Handler < SegmentF)) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: Video BIOS handler found at %04x:%04x\n",
+        __FUNCTION__,
+        Int0x10->Segment,
+        Int0x10->Offset
+        ));
       return;
     }
 
@@ -145,26 +150,28 @@ InstallVbeShim (
   //
   HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
   switch (HostBridgeDevId) {
-  case INTEL_82441_DEVICE_ID:
-    Pam1Address = PMC_REGISTER_PIIX4 (PIIX4_PAM1);
-    break;
-  case INTEL_Q35_MCH_DEVICE_ID:
-    Pam1Address = DRAMC_REGISTER_Q35 (MCH_PAM1);
-    break;
-  default:
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: unknown host bridge device ID: 0x%04x\n",
-      __FUNCTION__,
-      HostBridgeDevId
-      ));
-    ASSERT (FALSE);
+    case INTEL_82441_DEVICE_ID:
+      Pam1Address = PMC_REGISTER_PIIX4 (PIIX4_PAM1);
+      break;
+    case INTEL_Q35_MCH_DEVICE_ID:
+      Pam1Address = DRAMC_REGISTER_Q35 (MCH_PAM1);
+      break;
+    default:
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: unknown host bridge device ID: 0x%04x\n",
+        __FUNCTION__,
+        HostBridgeDevId
+        ));
+      ASSERT (FALSE);
 
-    if (!EFI_ERROR (Segment0AllocationStatus)) {
-      gBS->FreePages (Segment0, Segment0Pages);
-    }
-    return;
+      if (!EFI_ERROR (Segment0AllocationStatus)) {
+        gBS->FreePages (Segment0, Segment0Pages);
+      }
+
+      return;
   }
+
   //
   // low nibble covers 0xC0000 to 0xC3FFF
   // high nibble covers 0xC4000 to 0xC7FFF
@@ -201,12 +208,12 @@ InstallVbeShim (
   VbeInfo->Capabilities = BIT0; // DAC can be switched into 8-bit mode
 
   VbeInfo->ModeListAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
-  *(UINT16*)Ptr = 0x00f1; // mode number
-  Ptr += 2;
-  *(UINT16*)Ptr = 0xFFFF; // mode list terminator
-  Ptr += 2;
+  *(UINT16 *)Ptr           = 0x00f1; // mode number
+  Ptr                     += 2;
+  *(UINT16 *)Ptr           = 0xFFFF; // mode list terminator
+  Ptr                     += 2;
 
-  VbeInfo->VideoMem64K = (UINT16)((1024 * 768 * 4 + 65535) / 65536);
+  VbeInfo->VideoMem64K        = (UINT16)((1024 * 768 * 4 + 65535) / 65536);
   VbeInfo->OemSoftwareVersion = 0x0000;
 
   VbeInfo->VendorNameAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
@@ -214,9 +221,12 @@ InstallVbeShim (
   Ptr += 5;
 
   VbeInfo->ProductNameAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
-  Printed = AsciiSPrint ((CHAR8 *)Ptr,
-              sizeof VbeInfoFull->Buffer - (Ptr - VbeInfoFull->Buffer), "%s",
-              CardName);
+  Printed                     = AsciiSPrint (
+                                  (CHAR8 *)Ptr,
+                                  sizeof VbeInfoFull->Buffer - (Ptr - VbeInfoFull->Buffer),
+                                  "%s",
+                                  CardName
+                                  );
   Ptr += Printed + 1;
 
   VbeInfo->ProductRevAddress = (UINT32)SegmentC << 12 | (UINT16)(UINTN)Ptr;
@@ -246,7 +256,7 @@ InstallVbeShim (
   // bit1: bit1: readable
   // bit2: writeable
   //
-  VbeModeInfo->WindowAAttr              = BIT2 | BIT1 | BIT0;
+  VbeModeInfo->WindowAAttr = BIT2 | BIT1 | BIT0;
 
   VbeModeInfo->WindowBAttr              = 0x00;
   VbeModeInfo->WindowGranularityKB      = 0x0040;
@@ -309,8 +319,8 @@ InstallVbeShim (
   //
   // Second, point the Int10h vector at the shim.
   //
-  Int0x10->Segment = (UINT16) ((UINT32)SegmentC >> 4);
-  Int0x10->Offset  = (UINT16) ((UINTN) (VbeModeInfo + 1) - SegmentC);
+  Int0x10->Segment = (UINT16)((UINT32)SegmentC >> 4);
+  Int0x10->Offset  = (UINT16)((UINTN)(VbeModeInfo + 1) - SegmentC);
 
   DEBUG ((DEBUG_INFO, "%a: VBE shim installed\n", __FUNCTION__));
 }

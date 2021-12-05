@@ -14,16 +14,16 @@
 
 #include "AmdSevIoMmu.h"
 
-#define MAP_INFO_SIG SIGNATURE_64 ('M', 'A', 'P', '_', 'I', 'N', 'F', 'O')
+#define MAP_INFO_SIG  SIGNATURE_64 ('M', 'A', 'P', '_', 'I', 'N', 'F', 'O')
 
 typedef struct {
-  UINT64                                    Signature;
-  LIST_ENTRY                                Link;
-  EDKII_IOMMU_OPERATION                     Operation;
-  UINTN                                     NumberOfBytes;
-  UINTN                                     NumberOfPages;
-  EFI_PHYSICAL_ADDRESS                      CryptedAddress;
-  EFI_PHYSICAL_ADDRESS                      PlainTextAddress;
+  UINT64                   Signature;
+  LIST_ENTRY               Link;
+  EDKII_IOMMU_OPERATION    Operation;
+  UINTN                    NumberOfBytes;
+  UINTN                    NumberOfPages;
+  EFI_PHYSICAL_ADDRESS     CryptedAddress;
+  EFI_PHYSICAL_ADDRESS     PlainTextAddress;
 } MAP_INFO;
 
 //
@@ -31,14 +31,14 @@ typedef struct {
 // yet torn down by IoMmuUnmap(). The list represents the full set of mappings
 // currently in effect.
 //
-STATIC LIST_ENTRY mMapInfos = INITIALIZE_LIST_HEAD_VARIABLE (mMapInfos);
+STATIC LIST_ENTRY  mMapInfos = INITIALIZE_LIST_HEAD_VARIABLE (mMapInfos);
 
-#define COMMON_BUFFER_SIG SIGNATURE_64 ('C', 'M', 'N', 'B', 'U', 'F', 'F', 'R')
+#define COMMON_BUFFER_SIG  SIGNATURE_64 ('C', 'M', 'N', 'B', 'U', 'F', 'F', 'R')
 
 //
 // ASCII names for EDKII_IOMMU_OPERATION constants, for debug logging.
 //
-STATIC CONST CHAR8 * CONST
+STATIC CONST CHAR8 *CONST
 mBusMasterOperationName[EdkiiIoMmuOperationMaximum] = {
   "Read",
   "Write",
@@ -58,13 +58,13 @@ mBusMasterOperationName[EdkiiIoMmuOperationMaximum] = {
 //
 #pragma pack (1)
 typedef struct {
-  UINT64 Signature;
+  UINT64    Signature;
 
   //
   // Always allocated from EfiBootServicesData type memory, and always
   // encrypted.
   //
-  VOID *StashBuffer;
+  VOID      *StashBuffer;
 
   //
   // Followed by the actual common buffer, starting at the next page.
@@ -105,19 +105,19 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 IoMmuMap (
-  IN     EDKII_IOMMU_PROTOCOL                       *This,
-  IN     EDKII_IOMMU_OPERATION                      Operation,
-  IN     VOID                                       *HostAddress,
-  IN OUT UINTN                                      *NumberOfBytes,
-  OUT    EFI_PHYSICAL_ADDRESS                       *DeviceAddress,
-  OUT    VOID                                       **Mapping
+  IN     EDKII_IOMMU_PROTOCOL   *This,
+  IN     EDKII_IOMMU_OPERATION  Operation,
+  IN     VOID                   *HostAddress,
+  IN OUT UINTN                  *NumberOfBytes,
+  OUT    EFI_PHYSICAL_ADDRESS   *DeviceAddress,
+  OUT    VOID                   **Mapping
   )
 {
-  EFI_STATUS                                        Status;
-  MAP_INFO                                          *MapInfo;
-  EFI_ALLOCATE_TYPE                                 AllocateType;
-  COMMON_BUFFER_HEADER                              *CommonBufferHeader;
-  VOID                                              *DecryptionSource;
+  EFI_STATUS            Status;
+  MAP_INFO              *MapInfo;
+  EFI_ALLOCATE_TYPE     AllocateType;
+  COMMON_BUFFER_HEADER  *CommonBufferHeader;
+  VOID                  *DecryptionSource;
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -131,8 +131,9 @@ IoMmuMap (
     (UINT64)((NumberOfBytes == NULL) ? 0 : *NumberOfBytes)
     ));
 
-  if (HostAddress == NULL || NumberOfBytes == NULL || DeviceAddress == NULL ||
-      Mapping == NULL) {
+  if ((HostAddress == NULL) || (NumberOfBytes == NULL) || (DeviceAddress == NULL) ||
+      (Mapping == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -150,100 +151,103 @@ IoMmuMap (
   // Initialize the MAP_INFO structure, except the PlainTextAddress field
   //
   ZeroMem (&MapInfo->Link, sizeof MapInfo->Link);
-  MapInfo->Signature         = MAP_INFO_SIG;
-  MapInfo->Operation         = Operation;
-  MapInfo->NumberOfBytes     = *NumberOfBytes;
-  MapInfo->NumberOfPages     = EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes);
-  MapInfo->CryptedAddress    = (UINTN)HostAddress;
+  MapInfo->Signature      = MAP_INFO_SIG;
+  MapInfo->Operation      = Operation;
+  MapInfo->NumberOfBytes  = *NumberOfBytes;
+  MapInfo->NumberOfPages  = EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes);
+  MapInfo->CryptedAddress = (UINTN)HostAddress;
 
   //
   // In the switch statement below, we point "MapInfo->PlainTextAddress" to the
   // plaintext buffer, according to Operation. We also set "DecryptionSource".
   //
   MapInfo->PlainTextAddress = MAX_ADDRESS;
-  AllocateType = AllocateAnyPages;
-  DecryptionSource = (VOID *)(UINTN)MapInfo->CryptedAddress;
+  AllocateType              = AllocateAnyPages;
+  DecryptionSource          = (VOID *)(UINTN)MapInfo->CryptedAddress;
   switch (Operation) {
-  //
-  // For BusMasterRead[64] and BusMasterWrite[64] operations, a bounce buffer
-  // is necessary regardless of whether the original (crypted) buffer crosses
-  // the 4GB limit or not -- we have to allocate a separate plaintext buffer.
-  // The only variable is whether the plaintext buffer should be under 4GB.
-  //
-  case EdkiiIoMmuOperationBusMasterRead:
-  case EdkiiIoMmuOperationBusMasterWrite:
-    MapInfo->PlainTextAddress = BASE_4GB - 1;
-    AllocateType = AllocateMaxAddress;
+    //
+    // For BusMasterRead[64] and BusMasterWrite[64] operations, a bounce buffer
+    // is necessary regardless of whether the original (crypted) buffer crosses
+    // the 4GB limit or not -- we have to allocate a separate plaintext buffer.
+    // The only variable is whether the plaintext buffer should be under 4GB.
+    //
+    case EdkiiIoMmuOperationBusMasterRead:
+    case EdkiiIoMmuOperationBusMasterWrite:
+      MapInfo->PlainTextAddress = BASE_4GB - 1;
+      AllocateType              = AllocateMaxAddress;
     //
     // fall through
     //
-  case EdkiiIoMmuOperationBusMasterRead64:
-  case EdkiiIoMmuOperationBusMasterWrite64:
-    //
-    // Allocate the implicit plaintext bounce buffer.
-    //
-    Status = gBS->AllocatePages (
-                    AllocateType,
-                    EfiBootServicesData,
-                    MapInfo->NumberOfPages,
-                    &MapInfo->PlainTextAddress
-                    );
-    if (EFI_ERROR (Status)) {
-      goto FreeMapInfo;
-    }
-    break;
+    case EdkiiIoMmuOperationBusMasterRead64:
+    case EdkiiIoMmuOperationBusMasterWrite64:
+      //
+      // Allocate the implicit plaintext bounce buffer.
+      //
+      Status = gBS->AllocatePages (
+                      AllocateType,
+                      EfiBootServicesData,
+                      MapInfo->NumberOfPages,
+                      &MapInfo->PlainTextAddress
+                      );
+      if (EFI_ERROR (Status)) {
+        goto FreeMapInfo;
+      }
 
-  //
-  // For BusMasterCommonBuffer[64] operations, a to-be-plaintext buffer and a
-  // stash buffer (for in-place decryption) have been allocated already, with
-  // AllocateBuffer(). We only check whether the address of the to-be-plaintext
-  // buffer is low enough for the requested operation.
-  //
-  case EdkiiIoMmuOperationBusMasterCommonBuffer:
-    if ((MapInfo->CryptedAddress > BASE_4GB) ||
-        (EFI_PAGES_TO_SIZE (MapInfo->NumberOfPages) >
-         BASE_4GB - MapInfo->CryptedAddress)) {
-      //
-      // CommonBuffer operations cannot be remapped. If the common buffer is
-      // above 4GB, then it is not possible to generate a mapping, so return an
-      // error.
-      //
-      Status = EFI_UNSUPPORTED;
-      goto FreeMapInfo;
-    }
+      break;
+
+    //
+    // For BusMasterCommonBuffer[64] operations, a to-be-plaintext buffer and a
+    // stash buffer (for in-place decryption) have been allocated already, with
+    // AllocateBuffer(). We only check whether the address of the to-be-plaintext
+    // buffer is low enough for the requested operation.
+    //
+    case EdkiiIoMmuOperationBusMasterCommonBuffer:
+      if ((MapInfo->CryptedAddress > BASE_4GB) ||
+          (EFI_PAGES_TO_SIZE (MapInfo->NumberOfPages) >
+           BASE_4GB - MapInfo->CryptedAddress))
+      {
+        //
+        // CommonBuffer operations cannot be remapped. If the common buffer is
+        // above 4GB, then it is not possible to generate a mapping, so return an
+        // error.
+        //
+        Status = EFI_UNSUPPORTED;
+        goto FreeMapInfo;
+      }
+
     //
     // fall through
     //
-  case EdkiiIoMmuOperationBusMasterCommonBuffer64:
-    //
-    // The buffer at MapInfo->CryptedAddress comes from AllocateBuffer().
-    //
-    MapInfo->PlainTextAddress = MapInfo->CryptedAddress;
-    //
-    // Stash the crypted data.
-    //
-    CommonBufferHeader = (COMMON_BUFFER_HEADER *)(
-                           (UINTN)MapInfo->CryptedAddress - EFI_PAGE_SIZE
-                           );
-    ASSERT (CommonBufferHeader->Signature == COMMON_BUFFER_SIG);
-    CopyMem (
-      CommonBufferHeader->StashBuffer,
-      (VOID *)(UINTN)MapInfo->CryptedAddress,
-      MapInfo->NumberOfBytes
-      );
-    //
-    // Point "DecryptionSource" to the stash buffer so that we decrypt
-    // it to the original location, after the switch statement.
-    //
-    DecryptionSource = CommonBufferHeader->StashBuffer;
-    break;
+    case EdkiiIoMmuOperationBusMasterCommonBuffer64:
+      //
+      // The buffer at MapInfo->CryptedAddress comes from AllocateBuffer().
+      //
+      MapInfo->PlainTextAddress = MapInfo->CryptedAddress;
+      //
+      // Stash the crypted data.
+      //
+      CommonBufferHeader = (COMMON_BUFFER_HEADER *)(
+                                                    (UINTN)MapInfo->CryptedAddress - EFI_PAGE_SIZE
+                                                    );
+      ASSERT (CommonBufferHeader->Signature == COMMON_BUFFER_SIG);
+      CopyMem (
+        CommonBufferHeader->StashBuffer,
+        (VOID *)(UINTN)MapInfo->CryptedAddress,
+        MapInfo->NumberOfBytes
+        );
+      //
+      // Point "DecryptionSource" to the stash buffer so that we decrypt
+      // it to the original location, after the switch statement.
+      //
+      DecryptionSource = CommonBufferHeader->StashBuffer;
+      break;
 
-  default:
-    //
-    // Operation is invalid
-    //
-    Status = EFI_INVALID_PARAMETER;
-    goto FreeMapInfo;
+    default:
+      //
+      // Operation is invalid
+      //
+      Status = EFI_INVALID_PARAMETER;
+      goto FreeMapInfo;
   }
 
   //
@@ -267,12 +271,13 @@ IoMmuMap (
   // For BusMasterCommonBuffer[64] operations, the CopyMem() below will decrypt
   // the original data (from the stash buffer) back to the original location.
   //
-  if (Operation == EdkiiIoMmuOperationBusMasterRead ||
-      Operation == EdkiiIoMmuOperationBusMasterRead64 ||
-      Operation == EdkiiIoMmuOperationBusMasterCommonBuffer ||
-      Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64) {
+  if ((Operation == EdkiiIoMmuOperationBusMasterRead) ||
+      (Operation == EdkiiIoMmuOperationBusMasterRead64) ||
+      (Operation == EdkiiIoMmuOperationBusMasterCommonBuffer) ||
+      (Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64))
+  {
     CopyMem (
-      (VOID *) (UINTN) MapInfo->PlainTextAddress,
+      (VOID *)(UINTN)MapInfo->PlainTextAddress,
       DecryptionSource,
       MapInfo->NumberOfBytes
       );
@@ -330,15 +335,15 @@ STATIC
 EFI_STATUS
 EFIAPI
 IoMmuUnmapWorker (
-  IN  EDKII_IOMMU_PROTOCOL                     *This,
-  IN  VOID                                     *Mapping,
-  IN  BOOLEAN                                  MemoryMapLocked
+  IN  EDKII_IOMMU_PROTOCOL  *This,
+  IN  VOID                  *Mapping,
+  IN  BOOLEAN               MemoryMapLocked
   )
 {
-  MAP_INFO                 *MapInfo;
-  EFI_STATUS               Status;
-  COMMON_BUFFER_HEADER     *CommonBufferHeader;
-  VOID                     *EncryptionTarget;
+  MAP_INFO              *MapInfo;
+  EFI_STATUS            Status;
+  COMMON_BUFFER_HEADER  *CommonBufferHeader;
+  VOID                  *EncryptionTarget;
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -370,33 +375,33 @@ IoMmuUnmapWorker (
   EncryptionTarget = (VOID *)(UINTN)MapInfo->CryptedAddress;
 
   switch (MapInfo->Operation) {
-  case EdkiiIoMmuOperationBusMasterCommonBuffer:
-  case EdkiiIoMmuOperationBusMasterCommonBuffer64:
-    ASSERT (MapInfo->PlainTextAddress == MapInfo->CryptedAddress);
+    case EdkiiIoMmuOperationBusMasterCommonBuffer:
+    case EdkiiIoMmuOperationBusMasterCommonBuffer64:
+      ASSERT (MapInfo->PlainTextAddress == MapInfo->CryptedAddress);
 
-    CommonBufferHeader = (COMMON_BUFFER_HEADER *)(
-                           (UINTN)MapInfo->PlainTextAddress - EFI_PAGE_SIZE
-                           );
-    ASSERT (CommonBufferHeader->Signature == COMMON_BUFFER_SIG);
-    EncryptionTarget = CommonBufferHeader->StashBuffer;
+      CommonBufferHeader = (COMMON_BUFFER_HEADER *)(
+                                                    (UINTN)MapInfo->PlainTextAddress - EFI_PAGE_SIZE
+                                                    );
+      ASSERT (CommonBufferHeader->Signature == COMMON_BUFFER_SIG);
+      EncryptionTarget = CommonBufferHeader->StashBuffer;
     //
     // fall through
     //
 
-  case EdkiiIoMmuOperationBusMasterWrite:
-  case EdkiiIoMmuOperationBusMasterWrite64:
-    CopyMem (
-      EncryptionTarget,
-      (VOID *) (UINTN) MapInfo->PlainTextAddress,
-      MapInfo->NumberOfBytes
-      );
-    break;
+    case EdkiiIoMmuOperationBusMasterWrite:
+    case EdkiiIoMmuOperationBusMasterWrite64:
+      CopyMem (
+        EncryptionTarget,
+        (VOID *)(UINTN)MapInfo->PlainTextAddress,
+        MapInfo->NumberOfBytes
+        );
+      break;
 
-  default:
-    //
-    // nothing to encrypt after BusMasterRead[64] operations
-    //
-    break;
+    default:
+      //
+      // nothing to encrypt after BusMasterRead[64] operations
+      //
+      break;
   }
 
   //
@@ -421,8 +426,9 @@ IoMmuUnmapWorker (
   // plaintext at some point) with zeros, and then release it (unless the UEFI
   // memory map is locked).
   //
-  if (MapInfo->Operation == EdkiiIoMmuOperationBusMasterCommonBuffer ||
-      MapInfo->Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64) {
+  if ((MapInfo->Operation == EdkiiIoMmuOperationBusMasterCommonBuffer) ||
+      (MapInfo->Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64))
+  {
     CopyMem (
       (VOID *)(UINTN)MapInfo->CryptedAddress,
       CommonBufferHeader->StashBuffer,
@@ -465,8 +471,8 @@ IoMmuUnmapWorker (
 EFI_STATUS
 EFIAPI
 IoMmuUnmap (
-  IN  EDKII_IOMMU_PROTOCOL                     *This,
-  IN  VOID                                     *Mapping
+  IN  EDKII_IOMMU_PROTOCOL  *This,
+  IN  VOID                  *Mapping
   )
 {
   return IoMmuUnmapWorker (
@@ -501,19 +507,19 @@ IoMmuUnmap (
 EFI_STATUS
 EFIAPI
 IoMmuAllocateBuffer (
-  IN     EDKII_IOMMU_PROTOCOL                     *This,
-  IN     EFI_ALLOCATE_TYPE                        Type,
-  IN     EFI_MEMORY_TYPE                          MemoryType,
-  IN     UINTN                                    Pages,
-  IN OUT VOID                                     **HostAddress,
-  IN     UINT64                                   Attributes
+  IN     EDKII_IOMMU_PROTOCOL  *This,
+  IN     EFI_ALLOCATE_TYPE     Type,
+  IN     EFI_MEMORY_TYPE       MemoryType,
+  IN     UINTN                 Pages,
+  IN OUT VOID                  **HostAddress,
+  IN     UINT64                Attributes
   )
 {
-  EFI_STATUS                Status;
-  EFI_PHYSICAL_ADDRESS      PhysicalAddress;
-  VOID                      *StashBuffer;
-  UINTN                     CommonBufferPages;
-  COMMON_BUFFER_HEADER      *CommonBufferHeader;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
+  VOID                  *StashBuffer;
+  UINTN                 CommonBufferPages;
+  COMMON_BUFFER_HEADER  *CommonBufferHeader;
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -542,8 +548,9 @@ IoMmuAllocateBuffer (
   // The only valid memory types are EfiBootServicesData and
   // EfiRuntimeServicesData
   //
-  if (MemoryType != EfiBootServicesData &&
-      MemoryType != EfiRuntimeServicesData) {
+  if ((MemoryType != EfiBootServicesData) &&
+      (MemoryType != EfiRuntimeServicesData))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -553,6 +560,7 @@ IoMmuAllocateBuffer (
   if (Pages > MAX_UINTN - 1) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   CommonBufferPages = Pages + 1;
 
   //
@@ -580,6 +588,7 @@ IoMmuAllocateBuffer (
     //
     PhysicalAddress = SIZE_4GB - 1;
   }
+
   Status = gBS->AllocatePages (
                   AllocateMaxAddress,
                   MemoryType,
@@ -591,9 +600,9 @@ IoMmuAllocateBuffer (
   }
 
   CommonBufferHeader = (VOID *)(UINTN)PhysicalAddress;
-  PhysicalAddress += EFI_PAGE_SIZE;
+  PhysicalAddress   += EFI_PAGE_SIZE;
 
-  CommonBufferHeader->Signature = COMMON_BUFFER_SIG;
+  CommonBufferHeader->Signature   = COMMON_BUFFER_SIG;
   CommonBufferHeader->StashBuffer = StashBuffer;
 
   *HostAddress = (VOID *)(UINTN)PhysicalAddress;
@@ -628,13 +637,13 @@ FreeStashBuffer:
 EFI_STATUS
 EFIAPI
 IoMmuFreeBuffer (
-  IN  EDKII_IOMMU_PROTOCOL                     *This,
-  IN  UINTN                                    Pages,
-  IN  VOID                                     *HostAddress
+  IN  EDKII_IOMMU_PROTOCOL  *This,
+  IN  UINTN                 Pages,
+  IN  VOID                  *HostAddress
   )
 {
-  UINTN                CommonBufferPages;
-  COMMON_BUFFER_HEADER *CommonBufferHeader;
+  UINTN                 CommonBufferPages;
+  COMMON_BUFFER_HEADER  *CommonBufferHeader;
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -644,10 +653,10 @@ IoMmuFreeBuffer (
     (UINT64)Pages
     ));
 
-  CommonBufferPages = Pages + 1;
+  CommonBufferPages  = Pages + 1;
   CommonBufferHeader = (COMMON_BUFFER_HEADER *)(
-                         (UINTN)HostAddress - EFI_PAGE_SIZE
-                         );
+                                                (UINTN)HostAddress - EFI_PAGE_SIZE
+                                                );
 
   //
   // Check the signature.
@@ -669,7 +678,6 @@ IoMmuFreeBuffer (
   //
   return gBS->FreePages ((UINTN)CommonBufferHeader, CommonBufferPages);
 }
-
 
 /**
   Set IOMMU attribute for a system memory.
@@ -764,8 +772,8 @@ STATIC
 VOID
 EFIAPI
 AmdSevExitBoot (
-  IN EFI_EVENT Event,
-  IN VOID      *EventToSignal
+  IN EFI_EVENT  Event,
+  IN VOID       *EventToSignal
   )
 {
   //
@@ -816,13 +824,13 @@ STATIC
 VOID
 EFIAPI
 AmdSevUnmapAllMappings (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  LIST_ENTRY *Node;
-  LIST_ENTRY *NextNode;
-  MAP_INFO   *MapInfo;
+  LIST_ENTRY  *Node;
+  LIST_ENTRY  *NextNode;
+  MAP_INFO    *MapInfo;
 
   DEBUG ((DEBUG_VERBOSE, "%a\n", __FUNCTION__));
 
@@ -832,7 +840,7 @@ AmdSevUnmapAllMappings (
   //
   for (Node = GetFirstNode (&mMapInfos); Node != &mMapInfos; Node = NextNode) {
     NextNode = GetNextNode (&mMapInfos, Node);
-    MapInfo = CR (Node, MAP_INFO, Link, MAP_INFO_SIG);
+    MapInfo  = CR (Node, MAP_INFO, Link, MAP_INFO_SIG);
     IoMmuUnmapWorker (
       &mAmdSev, // This
       MapInfo,  // Mapping
@@ -889,7 +897,8 @@ AmdSevInstallIoMmuProtocol (
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEdkiiIoMmuProtocolGuid, &mAmdSev,
+                  &gEdkiiIoMmuProtocolGuid,
+                  &mAmdSev,
                   NULL
                   );
   if (EFI_ERROR (Status)) {

@@ -17,7 +17,6 @@
 
 #include "BasePciCapLib.h"
 
-
 /**
   Compare a standalone PCI_CAP_KEY against a PCI_CAP containing an embedded
   PCI_CAP_KEY.
@@ -36,12 +35,12 @@ STATIC
 INTN
 EFIAPI
 ComparePciCapKey (
-  IN CONST VOID *PciCapKey,
-  IN CONST VOID *PciCap
+  IN CONST VOID  *PciCapKey,
+  IN CONST VOID  *PciCap
   )
 {
-  CONST PCI_CAP_KEY *Key1;
-  CONST PCI_CAP_KEY *Key2;
+  CONST PCI_CAP_KEY  *Key1;
+  CONST PCI_CAP_KEY  *Key2;
 
   Key1 = PciCapKey;
   Key2 = &((CONST PCI_CAP *)PciCap)->Key;
@@ -49,24 +48,29 @@ ComparePciCapKey (
   if (Key1->Domain < Key2->Domain) {
     return -1;
   }
+
   if (Key1->Domain > Key2->Domain) {
     return 1;
   }
+
   if (Key1->CapId < Key2->CapId) {
     return -1;
   }
+
   if (Key1->CapId > Key2->CapId) {
     return 1;
   }
+
   if (Key1->Instance < Key2->Instance) {
     return -1;
   }
+
   if (Key1->Instance > Key2->Instance) {
     return 1;
   }
+
   return 0;
 }
-
 
 /**
   Compare two PCI_CAP objects based on PCI_CAP.Key.
@@ -85,16 +89,15 @@ STATIC
 INTN
 EFIAPI
 ComparePciCap (
-  IN CONST VOID *PciCap1,
-  IN CONST VOID *PciCap2
+  IN CONST VOID  *PciCap1,
+  IN CONST VOID  *PciCap2
   )
 {
-  CONST PCI_CAP_KEY *PciCap1Key;
+  CONST PCI_CAP_KEY  *PciCap1Key;
 
   PciCap1Key = &((CONST PCI_CAP *)PciCap1)->Key;
   return ComparePciCapKey (PciCap1Key, PciCap2);
 }
-
 
 /**
   Compare the standalone UINT16 config space offset of a capability header
@@ -114,12 +117,12 @@ STATIC
 INTN
 EFIAPI
 ComparePciCapOffsetKey (
-  IN CONST VOID *CapHdrOffset,
-  IN CONST VOID *PciCap
+  IN CONST VOID  *CapHdrOffset,
+  IN CONST VOID  *PciCap
   )
 {
-  UINT16 Offset1;
-  UINT16 Offset2;
+  UINT16  Offset1;
+  UINT16  Offset2;
 
   Offset1 = *(CONST UINT16 *)CapHdrOffset;
   Offset2 = ((CONST PCI_CAP *)PciCap)->Offset;
@@ -129,7 +132,6 @@ ComparePciCapOffsetKey (
   //
   return Offset1 - Offset2;
 }
-
 
 /**
   Compare two PCI_CAP objects based on PCI_CAP.Offset.
@@ -148,12 +150,12 @@ STATIC
 INTN
 EFIAPI
 ComparePciCapOffset (
-  IN CONST VOID *PciCap1,
-  IN CONST VOID *PciCap2
+  IN CONST VOID  *PciCap1,
+  IN CONST VOID  *PciCap2
   )
 {
-  UINT16 Offset1;
-  UINT16 Offset2;
+  UINT16  Offset1;
+  UINT16  Offset2;
 
   Offset1 = ((CONST PCI_CAP *)PciCap1)->Offset;
   Offset2 = ((CONST PCI_CAP *)PciCap2)->Offset;
@@ -163,7 +165,6 @@ ComparePciCapOffset (
   //
   return Offset1 - Offset2;
 }
-
 
 /**
   Insert a new instance of the PCI capability given by (Domain, CapId) in
@@ -205,22 +206,24 @@ ComparePciCapOffset (
 STATIC
 RETURN_STATUS
 InsertPciCap (
-  IN OUT PCI_CAP_LIST       *CapList,
-  IN OUT ORDERED_COLLECTION *CapHdrOffsets,
-  IN     PCI_CAP_DOMAIN     Domain,
-  IN     UINT16             CapId,
-  IN     UINT16             Offset,
-  IN     UINT8              Version
+  IN OUT PCI_CAP_LIST        *CapList,
+  IN OUT ORDERED_COLLECTION  *CapHdrOffsets,
+  IN     PCI_CAP_DOMAIN      Domain,
+  IN     UINT16              CapId,
+  IN     UINT16              Offset,
+  IN     UINT8               Version
   )
 {
-  PCI_CAP                  *PciCap;
-  RETURN_STATUS            Status;
-  ORDERED_COLLECTION_ENTRY *PciCapEntry;
-  PCI_CAP                  *InstanceZero;
+  PCI_CAP                   *PciCap;
+  RETURN_STATUS             Status;
+  ORDERED_COLLECTION_ENTRY  *PciCapEntry;
+  PCI_CAP                   *InstanceZero;
 
   ASSERT ((Offset & 0x3) == 0);
-  ASSERT (Offset < (Domain == PciCapNormal ?
-                    PCI_MAX_CONFIG_OFFSET : PCI_EXP_MAX_CONFIG_OFFSET));
+  ASSERT (
+    Offset < (Domain == PciCapNormal ?
+              PCI_MAX_CONFIG_OFFSET : PCI_EXP_MAX_CONFIG_OFFSET)
+    );
   ASSERT (Domain == PciCapExtended || Version == 0);
 
   //
@@ -237,6 +240,7 @@ InsertPciCap (
   if (PciCap == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
+
   PciCap->Key.Domain                     = Domain;
   PciCap->Key.CapId                      = CapId;
   PciCap->Key.Instance                   = 0;
@@ -248,12 +252,16 @@ InsertPciCap (
   //
   // Add PciCap to CapList.
   //
-  Status = OrderedCollectionInsert (CapList->Capabilities, &PciCapEntry,
-             PciCap);
+  Status = OrderedCollectionInsert (
+             CapList->Capabilities,
+             &PciCapEntry,
+             PciCap
+             );
   if (RETURN_ERROR (Status)) {
     if (Status == RETURN_OUT_OF_RESOURCES) {
       goto FreePciCap;
     }
+
     ASSERT (Status == RETURN_ALREADY_STARTED);
     //
     // PciCap is not the first instance of (Domain, CapId). Add it as a new
@@ -261,17 +269,21 @@ InsertPciCap (
     // we don't bump the instance count maintained in Instance#0 just yet, to
     // keep rollback on errors simple.
     //
-    InstanceZero = OrderedCollectionUserStruct (PciCapEntry);
-    PciCap->Key.Instance = InstanceZero->NumInstancesUnion.NumInstances;
+    InstanceZero                           = OrderedCollectionUserStruct (PciCapEntry);
+    PciCap->Key.Instance                   = InstanceZero->NumInstancesUnion.NumInstances;
     PciCap->NumInstancesUnion.InstanceZero = InstanceZero;
 
     ASSERT (PciCap->Key.Instance > 0);
-    Status = OrderedCollectionInsert (CapList->Capabilities, &PciCapEntry,
-               PciCap);
+    Status = OrderedCollectionInsert (
+               CapList->Capabilities,
+               &PciCapEntry,
+               PciCap
+               );
     if (Status == RETURN_OUT_OF_RESOURCES) {
       goto FreePciCap;
     }
   }
+
   //
   // At this point, PciCap has been inserted in CapList->Capabilities, either
   // with Instance==0 or with Instance>0. PciCapEntry is the iterator that
@@ -295,6 +307,7 @@ InsertPciCap (
       //
       Status = RETURN_DEVICE_ERROR;
     }
+
     goto DeletePciCapFromCapList;
   }
 
@@ -312,6 +325,7 @@ InsertPciCap (
 
     InstanceZero->NumInstancesUnion.NumInstances++;
   }
+
   return RETURN_SUCCESS;
 
 DeletePciCapFromCapList:
@@ -322,7 +336,6 @@ FreePciCap:
 
   return Status;
 }
-
 
 /**
   Calculate the MaxSizeHint member for a PCI_CAP object.
@@ -347,11 +360,11 @@ FreePciCap:
 STATIC
 VOID
 CalculatePciCapMaxSizeHint (
-  IN OUT PCI_CAP *PciCap,
-  IN     PCI_CAP *NextPciCap OPTIONAL
+  IN OUT PCI_CAP  *PciCap,
+  IN     PCI_CAP  *NextPciCap OPTIONAL
   )
 {
-  UINT16 ConfigSpaceSize;
+  UINT16  ConfigSpaceSize;
 
   ConfigSpaceSize = (PciCap->Key.Domain == PciCapNormal ?
                      PCI_MAX_CONFIG_OFFSET : PCI_EXP_MAX_CONFIG_OFFSET);
@@ -372,13 +385,13 @@ CalculatePciCapMaxSizeHint (
   // PciCap extends from PciCap->Offset to NextPciCap->Offset (if any), except
   // it cannot cross config space boundary.
   //
-  if (NextPciCap == NULL || NextPciCap->Offset >= ConfigSpaceSize) {
+  if ((NextPciCap == NULL) || (NextPciCap->Offset >= ConfigSpaceSize)) {
     PciCap->MaxSizeHint = ConfigSpaceSize - PciCap->Offset;
     return;
   }
+
   PciCap->MaxSizeHint = NextPciCap->Offset - PciCap->Offset;
 }
-
 
 /**
   Debug dump a PCI_CAP_LIST object at the DEBUG_VERBOSE level.
@@ -389,18 +402,19 @@ STATIC
 VOID
 EFIAPI
 DebugDumpPciCapList (
-  IN PCI_CAP_LIST *CapList
+  IN PCI_CAP_LIST  *CapList
   )
 {
   DEBUG_CODE_BEGIN ();
-  ORDERED_COLLECTION_ENTRY *PciCapEntry;
+  ORDERED_COLLECTION_ENTRY  *PciCapEntry;
 
   for (PciCapEntry = OrderedCollectionMin (CapList->Capabilities);
        PciCapEntry != NULL;
-       PciCapEntry = OrderedCollectionNext (PciCapEntry)) {
-    PCI_CAP       *PciCap;
-    RETURN_STATUS Status;
-    PCI_CAP_INFO  Info;
+       PciCapEntry = OrderedCollectionNext (PciCapEntry))
+  {
+    PCI_CAP        *PciCap;
+    RETURN_STATUS  Status;
+    PCI_CAP_INFO   Info;
 
     PciCap = OrderedCollectionUserStruct (PciCapEntry);
     Status = PciCapGetInfo (PciCap, &Info);
@@ -409,15 +423,23 @@ DebugDumpPciCapList (
     //
     ASSERT_RETURN_ERROR (Status);
 
-    DEBUG ((DEBUG_VERBOSE,
-      "%a:%a: %a 0x%04x %03u/%03u v0x%x @0x%03x+0x%03x\n", gEfiCallerBaseName,
-      __FUNCTION__, (Info.Domain == PciCapNormal ? "Norm" : "Extd"),
-      Info.CapId, Info.Instance, Info.NumInstances, Info.Version, Info.Offset,
-      Info.MaxSizeHint));
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "%a:%a: %a 0x%04x %03u/%03u v0x%x @0x%03x+0x%03x\n",
+      gEfiCallerBaseName,
+      __FUNCTION__,
+      (Info.Domain == PciCapNormal ? "Norm" : "Extd"),
+      Info.CapId,
+      Info.Instance,
+      Info.NumInstances,
+      Info.Version,
+      Info.Offset,
+      Info.MaxSizeHint
+      ));
   }
+
   DEBUG_CODE_END ();
 }
-
 
 /**
   Empty a collection of PCI_CAP structures, optionally releasing the referenced
@@ -435,17 +457,18 @@ DebugDumpPciCapList (
 STATIC
 VOID
 EmptyAndUninitPciCapCollection (
-  IN OUT ORDERED_COLLECTION *PciCapCollection,
-  IN     BOOLEAN            FreePciCap
+  IN OUT ORDERED_COLLECTION  *PciCapCollection,
+  IN     BOOLEAN             FreePciCap
   )
 {
-  ORDERED_COLLECTION_ENTRY *PciCapEntry;
-  ORDERED_COLLECTION_ENTRY *NextEntry;
+  ORDERED_COLLECTION_ENTRY  *PciCapEntry;
+  ORDERED_COLLECTION_ENTRY  *NextEntry;
 
   for (PciCapEntry = OrderedCollectionMin (PciCapCollection);
        PciCapEntry != NULL;
-       PciCapEntry = NextEntry) {
-    PCI_CAP *PciCap;
+       PciCapEntry = NextEntry)
+  {
+    PCI_CAP  *PciCap;
 
     NextEntry = OrderedCollectionNext (PciCapEntry);
     OrderedCollectionDelete (PciCapCollection, PciCapEntry, (VOID **)&PciCap);
@@ -453,9 +476,9 @@ EmptyAndUninitPciCapCollection (
       FreePool (PciCap);
     }
   }
+
   OrderedCollectionUninit (PciCapCollection);
 }
-
 
 /**
   Parse the capabilities lists (both normal and extended, as applicable) of a
@@ -492,16 +515,16 @@ EmptyAndUninitPciCapCollection (
 RETURN_STATUS
 EFIAPI
 PciCapListInit (
-  IN  PCI_CAP_DEV  *PciDevice,
-  OUT PCI_CAP_LIST **CapList
+  IN  PCI_CAP_DEV   *PciDevice,
+  OUT PCI_CAP_LIST  **CapList
   )
 {
-  PCI_CAP_LIST             *OutCapList;
-  RETURN_STATUS            Status;
-  ORDERED_COLLECTION       *CapHdrOffsets;
-  UINT16                   PciStatusReg;
-  BOOLEAN                  DeviceIsExpress;
-  ORDERED_COLLECTION_ENTRY *OffsetEntry;
+  PCI_CAP_LIST              *OutCapList;
+  RETURN_STATUS             Status;
+  ORDERED_COLLECTION        *CapHdrOffsets;
+  UINT16                    PciStatusReg;
+  BOOLEAN                   DeviceIsExpress;
+  ORDERED_COLLECTION_ENTRY  *OffsetEntry;
 
   //
   // Allocate the output structure.
@@ -510,12 +533,15 @@ PciCapListInit (
   if (OutCapList == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
+
   //
   // The OutCapList->Capabilities collection owns the PCI_CAP structures and
   // orders them based on PCI_CAP.Key.
   //
-  OutCapList->Capabilities = OrderedCollectionInit (ComparePciCap,
-                               ComparePciCapKey);
+  OutCapList->Capabilities = OrderedCollectionInit (
+                               ComparePciCap,
+                               ComparePciCapKey
+                               );
   if (OutCapList->Capabilities == NULL) {
     Status = RETURN_OUT_OF_RESOURCES;
     goto FreeOutCapList;
@@ -525,8 +551,10 @@ PciCapListInit (
   // The (temporary) CapHdrOffsets collection only references PCI_CAP
   // structures, and orders them based on PCI_CAP.Offset.
   //
-  CapHdrOffsets = OrderedCollectionInit (ComparePciCapOffset,
-                    ComparePciCapOffsetKey);
+  CapHdrOffsets = OrderedCollectionInit (
+                    ComparePciCapOffset,
+                    ComparePciCapOffsetKey
+                    );
   if (CapHdrOffsets == NULL) {
     Status = RETURN_OUT_OF_RESOURCES;
     goto FreeCapabilities;
@@ -542,19 +570,28 @@ PciCapListInit (
   // Check whether a normal capabilities list is present. If there's none,
   // that's not an error; we'll just return OutCapList->Capabilities empty.
   //
-  Status = PciDevice->ReadConfig (PciDevice, PCI_PRIMARY_STATUS_OFFSET,
-                        &PciStatusReg, sizeof PciStatusReg);
+  Status = PciDevice->ReadConfig (
+                        PciDevice,
+                        PCI_PRIMARY_STATUS_OFFSET,
+                        &PciStatusReg,
+                        sizeof PciStatusReg
+                        );
   if (RETURN_ERROR (Status)) {
     goto FreeCapHdrOffsets;
   }
+
   if ((PciStatusReg & EFI_PCI_STATUS_CAPABILITY) != 0) {
-    UINT8 NormalCapHdrOffset;
+    UINT8  NormalCapHdrOffset;
 
     //
     // Fetch the start offset of the normal capabilities list.
     //
-    Status = PciDevice->ReadConfig (PciDevice, PCI_CAPBILITY_POINTER_OFFSET,
-                          &NormalCapHdrOffset, sizeof NormalCapHdrOffset);
+    Status = PciDevice->ReadConfig (
+                          PciDevice,
+                          PCI_CAPBILITY_POINTER_OFFSET,
+                          &NormalCapHdrOffset,
+                          sizeof NormalCapHdrOffset
+                          );
     if (RETURN_ERROR (Status)) {
       goto FreeCapHdrOffsets;
     }
@@ -564,16 +601,26 @@ PciCapListInit (
     //
     NormalCapHdrOffset &= 0xFC;
     while (NormalCapHdrOffset > 0) {
-      EFI_PCI_CAPABILITY_HDR NormalCapHdr;
+      EFI_PCI_CAPABILITY_HDR  NormalCapHdr;
 
-      Status = PciDevice->ReadConfig (PciDevice, NormalCapHdrOffset,
-                            &NormalCapHdr, sizeof NormalCapHdr);
+      Status = PciDevice->ReadConfig (
+                            PciDevice,
+                            NormalCapHdrOffset,
+                            &NormalCapHdr,
+                            sizeof NormalCapHdr
+                            );
       if (RETURN_ERROR (Status)) {
         goto FreeCapHdrOffsets;
       }
 
-      Status = InsertPciCap (OutCapList, CapHdrOffsets, PciCapNormal,
-                 NormalCapHdr.CapabilityID, NormalCapHdrOffset, 0);
+      Status = InsertPciCap (
+                 OutCapList,
+                 CapHdrOffsets,
+                 PciCapNormal,
+                 NormalCapHdr.CapabilityID,
+                 NormalCapHdrOffset,
+                 0
+                 );
       if (RETURN_ERROR (Status)) {
         goto FreeCapHdrOffsets;
       }
@@ -581,6 +628,7 @@ PciCapListInit (
       if (NormalCapHdr.CapabilityID == EFI_PCI_CAPABILITY_ID_PCIEXP) {
         DeviceIsExpress = TRUE;
       }
+
       NormalCapHdrOffset = NormalCapHdr.NextItemPtr & 0xFC;
     }
   }
@@ -590,39 +638,51 @@ PciCapListInit (
   // capabilities list. It starts right after the normal config space.
   //
   if (DeviceIsExpress) {
-    UINT16 ExtendedCapHdrOffset;
+    UINT16  ExtendedCapHdrOffset;
 
     ExtendedCapHdrOffset = PCI_MAX_CONFIG_OFFSET;
     while (ExtendedCapHdrOffset > 0) {
-      PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER ExtendedCapHdr;
+      PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER  ExtendedCapHdr;
 
-      Status = PciDevice->ReadConfig (PciDevice, ExtendedCapHdrOffset,
-                            &ExtendedCapHdr, sizeof ExtendedCapHdr);
+      Status = PciDevice->ReadConfig (
+                            PciDevice,
+                            ExtendedCapHdrOffset,
+                            &ExtendedCapHdr,
+                            sizeof ExtendedCapHdr
+                            );
       //
       // If the first extended config space access fails, assume the device has
       // no extended capabilities. If the first extended config space access
       // succeeds but we read an "all bits zero" extended capability header,
       // that means (by spec) the device has no extended capabilities.
       //
-      if (ExtendedCapHdrOffset == PCI_MAX_CONFIG_OFFSET &&
+      if ((ExtendedCapHdrOffset == PCI_MAX_CONFIG_OFFSET) &&
           (RETURN_ERROR (Status) ||
-           IsZeroBuffer (&ExtendedCapHdr, sizeof ExtendedCapHdr))) {
+           IsZeroBuffer (&ExtendedCapHdr, sizeof ExtendedCapHdr)))
+      {
         break;
       }
+
       if (RETURN_ERROR (Status)) {
         goto FreeCapHdrOffsets;
       }
 
-      Status = InsertPciCap (OutCapList, CapHdrOffsets, PciCapExtended,
-                 (UINT16)ExtendedCapHdr.CapabilityId, ExtendedCapHdrOffset,
-                 (UINT8)ExtendedCapHdr.CapabilityVersion);
+      Status = InsertPciCap (
+                 OutCapList,
+                 CapHdrOffsets,
+                 PciCapExtended,
+                 (UINT16)ExtendedCapHdr.CapabilityId,
+                 ExtendedCapHdrOffset,
+                 (UINT8)ExtendedCapHdr.CapabilityVersion
+                 );
       if (RETURN_ERROR (Status)) {
         goto FreeCapHdrOffsets;
       }
 
       ExtendedCapHdrOffset = ExtendedCapHdr.NextCapabilityOffset & 0xFFC;
-      if (ExtendedCapHdrOffset > 0 &&
-          ExtendedCapHdrOffset < PCI_MAX_CONFIG_OFFSET) {
+      if ((ExtendedCapHdrOffset > 0) &&
+          (ExtendedCapHdrOffset < PCI_MAX_CONFIG_OFFSET))
+      {
         //
         // Invalid capability pointer.
         //
@@ -642,8 +702,8 @@ PciCapListInit (
   //
   OffsetEntry = OrderedCollectionMin (CapHdrOffsets);
   if (OffsetEntry != NULL) {
-    ORDERED_COLLECTION_ENTRY *NextOffsetEntry;
-    PCI_CAP                  *PciCap;
+    ORDERED_COLLECTION_ENTRY  *NextOffsetEntry;
+    PCI_CAP                   *PciCap;
 
     //
     // Initialize NextOffsetEntry to the iterator of the PCI_CAP object with
@@ -655,21 +715,23 @@ PciCapListInit (
     // highest Offset.
     //
     while (NextOffsetEntry != NULL) {
-      PCI_CAP *NextPciCap;
+      PCI_CAP  *NextPciCap;
 
       OrderedCollectionDelete (CapHdrOffsets, OffsetEntry, (VOID **)&PciCap);
       NextPciCap = OrderedCollectionUserStruct (NextOffsetEntry);
       CalculatePciCapMaxSizeHint (PciCap, NextPciCap);
 
-      OffsetEntry = NextOffsetEntry;
+      OffsetEntry     = NextOffsetEntry;
       NextOffsetEntry = OrderedCollectionNext (OffsetEntry);
     }
+
     //
     // Calculate MaxSizeHint for the PCI_CAP object with the highest Offset.
     //
     OrderedCollectionDelete (CapHdrOffsets, OffsetEntry, (VOID **)&PciCap);
     CalculatePciCapMaxSizeHint (PciCap, NULL);
   }
+
   ASSERT (OrderedCollectionIsEmpty (CapHdrOffsets));
   OrderedCollectionUninit (CapHdrOffsets);
 
@@ -687,11 +749,15 @@ FreeOutCapList:
   FreePool (OutCapList);
 
   ASSERT (RETURN_ERROR (Status));
-  DEBUG ((DEBUG_ERROR, "%a:%a: %r\n", gEfiCallerBaseName, __FUNCTION__,
-    Status));
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a:%a: %r\n",
+    gEfiCallerBaseName,
+    __FUNCTION__,
+    Status
+    ));
   return Status;
 }
-
 
 /**
   Free the resources used by CapList.
@@ -702,13 +768,12 @@ FreeOutCapList:
 VOID
 EFIAPI
 PciCapListUninit (
-  IN PCI_CAP_LIST *CapList
+  IN PCI_CAP_LIST  *CapList
   )
 {
   EmptyAndUninitPciCapCollection (CapList->Capabilities, TRUE);
   FreePool (CapList);
 }
-
 
 /**
   Locate a capability instance in the parsed capabilities lists.
@@ -746,15 +811,15 @@ PciCapListUninit (
 RETURN_STATUS
 EFIAPI
 PciCapListFindCap (
-  IN  PCI_CAP_LIST   *CapList,
-  IN  PCI_CAP_DOMAIN Domain,
-  IN  UINT16         CapId,
-  IN  UINT16         Instance,
-  OUT PCI_CAP        **Cap    OPTIONAL
+  IN  PCI_CAP_LIST    *CapList,
+  IN  PCI_CAP_DOMAIN  Domain,
+  IN  UINT16          CapId,
+  IN  UINT16          Instance,
+  OUT PCI_CAP         **Cap    OPTIONAL
   )
 {
-  PCI_CAP_KEY              Key;
-  ORDERED_COLLECTION_ENTRY *PciCapEntry;
+  PCI_CAP_KEY               Key;
+  ORDERED_COLLECTION_ENTRY  *PciCapEntry;
 
   Key.Domain   = Domain;
   Key.CapId    = CapId;
@@ -764,12 +829,13 @@ PciCapListFindCap (
   if (PciCapEntry == NULL) {
     return RETURN_NOT_FOUND;
   }
+
   if (Cap != NULL) {
     *Cap = OrderedCollectionUserStruct (PciCapEntry);
   }
+
   return RETURN_SUCCESS;
 }
-
 
 /**
   Locate the first instance of the capability given by (Domain, CapId) such
@@ -807,15 +873,15 @@ PciCapListFindCap (
 RETURN_STATUS
 EFIAPI
 PciCapListFindCapVersion (
-  IN  PCI_CAP_LIST   *CapList,
-  IN  PCI_CAP_DOMAIN Domain,
-  IN  UINT16         CapId,
-  IN  UINT8          MinVersion,
-  OUT PCI_CAP        **Cap      OPTIONAL
+  IN  PCI_CAP_LIST    *CapList,
+  IN  PCI_CAP_DOMAIN  Domain,
+  IN  UINT16          CapId,
+  IN  UINT8           MinVersion,
+  OUT PCI_CAP         **Cap      OPTIONAL
   )
 {
-  PCI_CAP_KEY              Key;
-  ORDERED_COLLECTION_ENTRY *PciCapEntry;
+  PCI_CAP_KEY               Key;
+  ORDERED_COLLECTION_ENTRY  *PciCapEntry;
 
   //
   // Start the version checks at Instance#0 of (Domain, CapId).
@@ -826,8 +892,9 @@ PciCapListFindCapVersion (
 
   for (PciCapEntry = OrderedCollectionFind (CapList->Capabilities, &Key);
        PciCapEntry != NULL;
-       PciCapEntry = OrderedCollectionNext (PciCapEntry)) {
-    PCI_CAP *PciCap;
+       PciCapEntry = OrderedCollectionNext (PciCapEntry))
+  {
+    PCI_CAP  *PciCap;
 
     PciCap = OrderedCollectionUserStruct (PciCapEntry);
     //
@@ -835,9 +902,10 @@ PciCapListFindCapVersion (
     // adjacent to each other, so stop searching if either Domain or CapId
     // changes.
     //
-    if (PciCap->Key.Domain != Domain || PciCap->Key.CapId != CapId) {
+    if ((PciCap->Key.Domain != Domain) || (PciCap->Key.CapId != CapId)) {
       break;
     }
+
     if (PciCap->Version >= MinVersion) {
       //
       // Match found.
@@ -845,12 +913,13 @@ PciCapListFindCapVersion (
       if (Cap != NULL) {
         *Cap = PciCap;
       }
+
       return RETURN_SUCCESS;
     }
   }
+
   return RETURN_NOT_FOUND;
 }
-
 
 /**
   Get information about a PCI Capability instance.
@@ -869,11 +938,11 @@ PciCapListFindCapVersion (
 RETURN_STATUS
 EFIAPI
 PciCapGetInfo (
-  IN  PCI_CAP      *Cap,
-  OUT PCI_CAP_INFO *Info
+  IN  PCI_CAP       *Cap,
+  OUT PCI_CAP_INFO  *Info
   )
 {
-  PCI_CAP *InstanceZero;
+  PCI_CAP  *InstanceZero;
 
   ASSERT (Info != NULL);
 
@@ -890,7 +959,6 @@ PciCapGetInfo (
 
   return RETURN_SUCCESS;
 }
-
 
 /**
   Read a slice of a capability instance.
@@ -931,11 +999,11 @@ PciCapGetInfo (
 RETURN_STATUS
 EFIAPI
 PciCapRead (
-  IN  PCI_CAP_DEV *PciDevice,
-  IN  PCI_CAP     *Cap,
-  IN  UINT16      SourceOffsetInCap,
-  OUT VOID        *DestinationBuffer,
-  IN  UINT16      Size
+  IN  PCI_CAP_DEV  *PciDevice,
+  IN  PCI_CAP      *Cap,
+  IN  UINT16       SourceOffsetInCap,
+  OUT VOID         *DestinationBuffer,
+  IN  UINT16       Size
   )
 {
   //
@@ -945,10 +1013,14 @@ PciCapRead (
   if (SourceOffsetInCap + Size > Cap->MaxSizeHint) {
     return RETURN_BAD_BUFFER_SIZE;
   }
-  return PciDevice->ReadConfig (PciDevice, Cap->Offset + SourceOffsetInCap,
-                      DestinationBuffer, Size);
-}
 
+  return PciDevice->ReadConfig (
+                      PciDevice,
+                      Cap->Offset + SourceOffsetInCap,
+                      DestinationBuffer,
+                      Size
+                      );
+}
 
 /**
   Write a slice of a capability instance.
@@ -990,11 +1062,11 @@ PciCapRead (
 RETURN_STATUS
 EFIAPI
 PciCapWrite (
-  IN PCI_CAP_DEV *PciDevice,
-  IN PCI_CAP     *Cap,
-  IN UINT16      DestinationOffsetInCap,
-  IN VOID        *SourceBuffer,
-  IN UINT16      Size
+  IN PCI_CAP_DEV  *PciDevice,
+  IN PCI_CAP      *Cap,
+  IN UINT16       DestinationOffsetInCap,
+  IN VOID         *SourceBuffer,
+  IN UINT16       Size
   )
 {
   //
@@ -1004,7 +1076,11 @@ PciCapWrite (
   if (DestinationOffsetInCap + Size > Cap->MaxSizeHint) {
     return RETURN_BAD_BUFFER_SIZE;
   }
-  return PciDevice->WriteConfig (PciDevice,
-                      Cap->Offset + DestinationOffsetInCap, SourceBuffer,
-                      Size);
+
+  return PciDevice->WriteConfig (
+                      PciDevice,
+                      Cap->Offset + DestinationOffsetInCap,
+                      SourceBuffer,
+                      Size
+                      );
 }

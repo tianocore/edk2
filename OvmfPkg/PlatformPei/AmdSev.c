@@ -58,10 +58,10 @@ AmdSevEsInitialize (
   //   make them reserved.
   //
   GhcbPageCount = mMaxCpuCount * 2;
-  GhcbBase = AllocateReservedPages (GhcbPageCount);
+  GhcbBase      = AllocateReservedPages (GhcbPageCount);
   ASSERT (GhcbBase != NULL);
 
-  GhcbBasePa = (PHYSICAL_ADDRESS)(UINTN) GhcbBase;
+  GhcbBasePa = (PHYSICAL_ADDRESS)(UINTN)GhcbBase;
 
   //
   // Each vCPU gets two consecutive pages, the first is the GHCB and the
@@ -70,10 +70,10 @@ AmdSevEsInitialize (
   //
   for (PageCount = 0; PageCount < GhcbPageCount; PageCount += 2) {
     DecryptStatus = MemEncryptSevClearPageEncMask (
-      0,
-      GhcbBasePa + EFI_PAGES_TO_SIZE (PageCount),
-      1
-      );
+                      0,
+                      GhcbBasePa + EFI_PAGES_TO_SIZE (PageCount),
+                      1
+                      );
     ASSERT_RETURN_ERROR (DecryptStatus);
   }
 
@@ -84,16 +84,19 @@ AmdSevEsInitialize (
   PcdStatus = PcdSet64S (PcdGhcbSize, EFI_PAGES_TO_SIZE (GhcbPageCount));
   ASSERT_RETURN_ERROR (PcdStatus);
 
-  DEBUG ((DEBUG_INFO,
+  DEBUG ((
+    DEBUG_INFO,
     "SEV-ES is enabled, %lu GHCB pages allocated starting at 0x%p\n",
-    (UINT64)GhcbPageCount, GhcbBase));
+    (UINT64)GhcbPageCount,
+    GhcbBase
+    ));
 
   //
   // Allocate #VC recursion backup pages. The number of backup pages needed is
   // one less than the maximum VC count.
   //
   GhcbBackupPageCount = mMaxCpuCount * (VMGEXIT_MAXIMUM_VC_COUNT - 1);
-  GhcbBackupBase = AllocatePages (GhcbBackupPageCount);
+  GhcbBackupBase      = AllocatePages (GhcbBackupPageCount);
   ASSERT (GhcbBackupBase != NULL);
 
   GhcbBackupPages = GhcbBackupBase;
@@ -105,9 +108,12 @@ AmdSevEsInitialize (
     GhcbBackupPages += EFI_PAGE_SIZE * (VMGEXIT_MAXIMUM_VC_COUNT - 1);
   }
 
-  DEBUG ((DEBUG_INFO,
+  DEBUG ((
+    DEBUG_INFO,
     "SEV-ES is enabled, %lu GHCB backup pages allocated starting at 0x%p\n",
-    (UINT64)GhcbBackupPageCount, GhcbBackupBase));
+    (UINT64)GhcbBackupPageCount,
+    GhcbBackupBase
+    ));
 
   AsmWriteMsr64 (MSR_SEV_ES_GHCB, GhcbBasePa);
 
@@ -120,11 +126,11 @@ AmdSevEsInitialize (
   //
   AsmReadGdtr (&Gdtr);
 
-  Gdt = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN) Gdtr.Limit + 1));
+  Gdt = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)Gdtr.Limit + 1));
   ASSERT (Gdt != NULL);
 
-  CopyMem (Gdt, (VOID *) Gdtr.Base, Gdtr.Limit + 1);
-  Gdtr.Base = (UINTN) Gdt;
+  CopyMem (Gdt, (VOID *)Gdtr.Base, Gdtr.Limit + 1);
+  Gdtr.Base = (UINTN)Gdt;
   AsmWriteGdtr (&Gdtr);
 }
 
@@ -139,8 +145,8 @@ AmdSevInitialize (
   VOID
   )
 {
-  UINT64                            EncryptionMask;
-  RETURN_STATUS                     PcdStatus;
+  UINT64         EncryptionMask;
+  RETURN_STATUS  PcdStatus;
 
   //
   // Check if SEV is enabled
@@ -153,7 +159,7 @@ AmdSevInitialize (
   // Set Memory Encryption Mask PCD
   //
   EncryptionMask = MemEncryptSevGetEncryptionMask ();
-  PcdStatus = PcdSet64S (PcdPteMemoryEncryptionAddressOrMask, EncryptionMask);
+  PcdStatus      = PcdSet64S (PcdPteMemoryEncryptionAddressOrMask, EncryptionMask);
   ASSERT_RETURN_ERROR (PcdStatus);
 
   DEBUG ((DEBUG_INFO, "SEV is enabled (mask 0x%lx)\n", EncryptionMask));
@@ -176,9 +182,9 @@ AmdSevInitialize (
   // hypervisor.
   //
   if (FeaturePcdGet (PcdSmmSmramRequire) && (mBootMode != BOOT_ON_S3_RESUME)) {
-    RETURN_STATUS LocateMapStatus;
-    UINTN         MapPagesBase;
-    UINTN         MapPagesCount;
+    RETURN_STATUS  LocateMapStatus;
+    UINTN          MapPagesBase;
+    UINTN          MapPagesCount;
 
     LocateMapStatus = MemEncryptSevLocateInitialSmramSaveStateMapPages (
                         &MapPagesBase,

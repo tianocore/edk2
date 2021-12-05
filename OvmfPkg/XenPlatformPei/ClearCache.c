@@ -30,7 +30,7 @@ STATIC
 VOID
 EFIAPI
 ClearCache (
-  IN OUT VOID *WorkSpace
+  IN OUT VOID  *WorkSpace
   )
 {
   WriteBackInvalidateDataCache ();
@@ -57,8 +57,8 @@ ClearCacheOnMpServicesAvailable (
   IN VOID                       *Ppi
   )
 {
-  EFI_PEI_MP_SERVICES_PPI *MpServices;
-  EFI_STATUS              Status;
+  EFI_PEI_MP_SERVICES_PPI  *MpServices;
+  EFI_STATUS               Status;
 
   DEBUG ((DEBUG_INFO, "%a: %a\n", gEfiCallerBaseName, __FUNCTION__));
 
@@ -66,15 +66,15 @@ ClearCacheOnMpServicesAvailable (
   // Clear cache on all the APs in parallel.
   //
   MpServices = Ppi;
-  Status = MpServices->StartupAllAPs (
-                         (CONST EFI_PEI_SERVICES **)PeiServices,
-                         MpServices,
-                         ClearCache,          // Procedure
-                         FALSE,               // SingleThread
-                         0,                   // TimeoutInMicroSeconds: inf.
-                         NULL                 // ProcedureArgument
-                         );
-  if (EFI_ERROR (Status) && Status != EFI_NOT_STARTED) {
+  Status     = MpServices->StartupAllAPs (
+                             (CONST EFI_PEI_SERVICES **)PeiServices,
+                             MpServices,
+                             ClearCache,      // Procedure
+                             FALSE,           // SingleThread
+                             0,               // TimeoutInMicroSeconds: inf.
+                             NULL             // ProcedureArgument
+                             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_STARTED)) {
     DEBUG ((DEBUG_ERROR, "%a: StartupAllAps(): %r\n", __FUNCTION__, Status));
     return Status;
   }
@@ -90,7 +90,7 @@ ClearCacheOnMpServicesAvailable (
 // Notification object for registering the callback, for when
 // EFI_PEI_MP_SERVICES_PPI becomes available.
 //
-STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR mMpServicesNotify = {
+STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR  mMpServicesNotify = {
   EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | // Flags
   EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
   &gEfiPeiMpServicesPpiGuid,               // Guid
@@ -102,11 +102,15 @@ InstallClearCacheCallback (
   VOID
   )
 {
-  EFI_STATUS           Status;
+  EFI_STATUS  Status;
 
   Status = PeiServicesNotifyPpi (&mMpServicesNotify);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to set up MP Services callback: %r\n",
-      __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: failed to set up MP Services callback: %r\n",
+      __FUNCTION__,
+      Status
+      ));
   }
 }

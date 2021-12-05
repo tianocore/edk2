@@ -23,9 +23,9 @@
 STATIC
 VOID
 PcatPciRootBridgeBarExisted (
-  IN  UINTN                          Address,
-  OUT UINT32                         *OriginalValue,
-  OUT UINT32                         *Value
+  IN  UINTN   Address,
+  OUT UINT32  *OriginalValue,
+  OUT UINT32  *Value
   )
 {
   //
@@ -48,15 +48,15 @@ PcatPciRootBridgeBarExisted (
   EnableInterrupts ();
 }
 
-#define PCI_COMMAND_DECODE ((UINT16)(EFI_PCI_COMMAND_IO_SPACE | \
+#define PCI_COMMAND_DECODE  ((UINT16)(EFI_PCI_COMMAND_IO_SPACE |\
                                      EFI_PCI_COMMAND_MEMORY_SPACE))
 STATIC
 VOID
 PcatPciRootBridgeDecodingDisable (
-  IN  UINTN                          Address
+  IN  UINTN  Address
   )
 {
-  UINT16                             Value;
+  UINT16  Value;
 
   Value = PciRead16 (Address);
   if (Value & PCI_COMMAND_DECODE) {
@@ -67,59 +67,63 @@ PcatPciRootBridgeDecodingDisable (
 STATIC
 VOID
 PcatPciRootBridgeParseBars (
-  IN UINT16                         Command,
-  IN UINTN                          Bus,
-  IN UINTN                          Device,
-  IN UINTN                          Function,
-  IN UINTN                          BarOffsetBase,
-  IN UINTN                          BarOffsetEnd,
-  IN PCI_ROOT_BRIDGE_APERTURE       *Io,
-  IN PCI_ROOT_BRIDGE_APERTURE       *Mem,
-  IN PCI_ROOT_BRIDGE_APERTURE       *MemAbove4G
+  IN UINT16                    Command,
+  IN UINTN                     Bus,
+  IN UINTN                     Device,
+  IN UINTN                     Function,
+  IN UINTN                     BarOffsetBase,
+  IN UINTN                     BarOffsetEnd,
+  IN PCI_ROOT_BRIDGE_APERTURE  *Io,
+  IN PCI_ROOT_BRIDGE_APERTURE  *Mem,
+  IN PCI_ROOT_BRIDGE_APERTURE  *MemAbove4G
 
-)
+  )
 {
-  UINT32                            OriginalValue;
-  UINT32                            Value;
-  UINT32                            OriginalUpperValue;
-  UINT32                            UpperValue;
-  UINT64                            Mask;
-  UINTN                             Offset;
-  UINT64                            Base;
-  UINT64                            Length;
-  UINT64                            Limit;
-  PCI_ROOT_BRIDGE_APERTURE          *MemAperture;
+  UINT32                    OriginalValue;
+  UINT32                    Value;
+  UINT32                    OriginalUpperValue;
+  UINT32                    UpperValue;
+  UINT64                    Mask;
+  UINTN                     Offset;
+  UINT64                    Base;
+  UINT64                    Length;
+  UINT64                    Limit;
+  PCI_ROOT_BRIDGE_APERTURE  *MemAperture;
 
   // Disable address decoding for every device before OVMF starts sizing it
   PcatPciRootBridgeDecodingDisable (
     PCI_LIB_ADDRESS (Bus, Device, Function, PCI_COMMAND_OFFSET)
-  );
+    );
 
   for (Offset = BarOffsetBase; Offset < BarOffsetEnd; Offset += sizeof (UINT32)) {
     PcatPciRootBridgeBarExisted (
       PCI_LIB_ADDRESS (Bus, Device, Function, Offset),
-      &OriginalValue, &Value
-    );
+      &OriginalValue,
+      &Value
+      );
     if (Value == 0) {
       continue;
     }
+
     if ((Value & BIT0) == BIT0) {
       //
       // IO Bar
       //
       if (Command & EFI_PCI_COMMAND_IO_SPACE) {
-        Mask = 0xfffffffc;
-        Base = OriginalValue & Mask;
+        Mask   = 0xfffffffc;
+        Base   = OriginalValue & Mask;
         Length = ((~(Value & Mask)) & Mask) + 0x04;
         if (!(Value & 0xFFFF0000)) {
           Length &= 0x0000FFFF;
         }
+
         Limit = Base + Length - 1;
 
         if (Base < Limit) {
           if (Io->Base > Base) {
             Io->Base = Base;
           }
+
           if (Io->Limit < Limit) {
             Io->Limit = Limit;
           }
@@ -130,9 +134,8 @@ PcatPciRootBridgeParseBars (
       // Mem Bar
       //
       if (Command & EFI_PCI_COMMAND_MEMORY_SPACE) {
-
-        Mask = 0xfffffff0;
-        Base = OriginalValue & Mask;
+        Mask   = 0xfffffff0;
+        Base   = OriginalValue & Mask;
         Length = Value & Mask;
 
         if ((Value & (BIT1 | BIT2)) == 0) {
@@ -151,10 +154,10 @@ PcatPciRootBridgeParseBars (
             PCI_LIB_ADDRESS (Bus, Device, Function, Offset),
             &OriginalUpperValue,
             &UpperValue
-          );
+            );
 
-          Base = Base | LShiftU64 ((UINT64) OriginalUpperValue, 32);
-          Length = Length | LShiftU64 ((UINT64) UpperValue, 32);
+          Base   = Base | LShiftU64 ((UINT64)OriginalUpperValue, 32);
+          Length = Length | LShiftU64 ((UINT64)UpperValue, 32);
           Length = (~Length) + 1;
 
           if (Base < BASE_4GB) {
@@ -169,6 +172,7 @@ PcatPciRootBridgeParseBars (
           if (MemAperture->Base > Base) {
             MemAperture->Base = Base;
           }
+
           if (MemAperture->Limit < Limit) {
             MemAperture->Limit = Limit;
           }
@@ -178,31 +182,30 @@ PcatPciRootBridgeParseBars (
   }
 }
 
-STATIC PCI_ROOT_BRIDGE_APERTURE mNonExistAperture = { MAX_UINT64, 0 };
+STATIC PCI_ROOT_BRIDGE_APERTURE  mNonExistAperture = { MAX_UINT64, 0 };
 
 PCI_ROOT_BRIDGE *
 ScanForRootBridges (
-  UINTN      *NumberOfRootBridges
+  UINTN  *NumberOfRootBridges
   )
 {
-  UINTN      PrimaryBus;
-  UINTN      SubBus;
-  UINT8      Device;
-  UINT8      Function;
-  UINTN      NumberOfDevices;
-  UINTN      Address;
-  PCI_TYPE01 Pci;
-  UINT64     Attributes;
-  UINT64     Base;
-  UINT64     Limit;
-  UINT64     Value;
-  PCI_ROOT_BRIDGE_APERTURE Io, Mem, MemAbove4G, *MemAperture;
-  PCI_ROOT_BRIDGE *RootBridges;
-  UINTN      BarOffsetEnd;
-
+  UINTN                     PrimaryBus;
+  UINTN                     SubBus;
+  UINT8                     Device;
+  UINT8                     Function;
+  UINTN                     NumberOfDevices;
+  UINTN                     Address;
+  PCI_TYPE01                Pci;
+  UINT64                    Attributes;
+  UINT64                    Base;
+  UINT64                    Limit;
+  UINT64                    Value;
+  PCI_ROOT_BRIDGE_APERTURE  Io, Mem, MemAbove4G, *MemAperture;
+  PCI_ROOT_BRIDGE           *RootBridges;
+  UINTN                     BarOffsetEnd;
 
   *NumberOfRootBridges = 0;
-  RootBridges = NULL;
+  RootBridges          = NULL;
 
   //
   // After scanning all the PCI devices on the PCI root bridge's primary bus,
@@ -210,7 +213,7 @@ ScanForRootBridges (
   // root bridge's subordinate bus number + 1.
   //
   for (PrimaryBus = 0; PrimaryBus <= PCI_MAX_BUS; PrimaryBus = SubBus + 1) {
-    SubBus = PrimaryBus;
+    SubBus     = PrimaryBus;
     Attributes = 0;
 
     ZeroMem (&Io, sizeof (Io));
@@ -221,9 +224,7 @@ ScanForRootBridges (
     // Scan all the PCI devices on the primary bus of the PCI root bridge
     //
     for (Device = 0, NumberOfDevices = 0; Device <= PCI_MAX_DEVICE; Device++) {
-
       for (Function = 0; Function <= PCI_MAX_FUNC; Function++) {
-
         //
         // Compute the PCI configuration address of the PCI device to probe
         //
@@ -290,16 +291,18 @@ ScanForRootBridges (
           // Get the I/O range that the PPB is decoding
           //
           Value = Pci.Bridge.IoBase & 0x0f;
-          Base = ((UINT32) Pci.Bridge.IoBase & 0xf0) << 8;
-          Limit = (((UINT32) Pci.Bridge.IoLimit & 0xf0) << 8) | 0x0fff;
+          Base  = ((UINT32)Pci.Bridge.IoBase & 0xf0) << 8;
+          Limit = (((UINT32)Pci.Bridge.IoLimit & 0xf0) << 8) | 0x0fff;
           if (Value == BIT0) {
-            Base |= ((UINT32) Pci.Bridge.IoBaseUpper16 << 16);
-            Limit |= ((UINT32) Pci.Bridge.IoLimitUpper16 << 16);
+            Base  |= ((UINT32)Pci.Bridge.IoBaseUpper16 << 16);
+            Limit |= ((UINT32)Pci.Bridge.IoLimitUpper16 << 16);
           }
+
           if (Base < Limit) {
             if (Io.Base > Base) {
               Io.Base = Base;
             }
+
             if (Io.Limit < Limit) {
               Io.Limit = Limit;
             }
@@ -308,12 +311,13 @@ ScanForRootBridges (
           //
           // Get the Memory range that the PPB is decoding
           //
-          Base = ((UINT32) Pci.Bridge.MemoryBase & 0xfff0) << 16;
-          Limit = (((UINT32) Pci.Bridge.MemoryLimit & 0xfff0) << 16) | 0xfffff;
+          Base  = ((UINT32)Pci.Bridge.MemoryBase & 0xfff0) << 16;
+          Limit = (((UINT32)Pci.Bridge.MemoryLimit & 0xfff0) << 16) | 0xfffff;
           if (Base < Limit) {
             if (Mem.Base > Base) {
               Mem.Base = Base;
             }
+
             if (Mem.Limit < Limit) {
               Mem.Limit = Limit;
             }
@@ -324,19 +328,21 @@ ScanForRootBridges (
           // and merge it into Memory range
           //
           Value = Pci.Bridge.PrefetchableMemoryBase & 0x0f;
-          Base = ((UINT32) Pci.Bridge.PrefetchableMemoryBase & 0xfff0) << 16;
-          Limit = (((UINT32) Pci.Bridge.PrefetchableMemoryLimit & 0xfff0)
+          Base  = ((UINT32)Pci.Bridge.PrefetchableMemoryBase & 0xfff0) << 16;
+          Limit = (((UINT32)Pci.Bridge.PrefetchableMemoryLimit & 0xfff0)
                    << 16) | 0xfffff;
           MemAperture = &Mem;
           if (Value == BIT0) {
-            Base |= LShiftU64 (Pci.Bridge.PrefetchableBaseUpper32, 32);
-            Limit |= LShiftU64 (Pci.Bridge.PrefetchableLimitUpper32, 32);
+            Base       |= LShiftU64 (Pci.Bridge.PrefetchableBaseUpper32, 32);
+            Limit      |= LShiftU64 (Pci.Bridge.PrefetchableLimitUpper32, 32);
             MemAperture = &MemAbove4G;
           }
+
           if (Base < Limit) {
             if (MemAperture->Base > Base) {
               MemAperture->Base = Base;
             }
+
             if (MemAperture->Limit < Limit) {
               MemAperture->Limit = Limit;
             }
@@ -346,18 +352,22 @@ ScanForRootBridges (
           // Look at the PPB Configuration for legacy decoding attributes
           //
           if ((Pci.Bridge.BridgeControl & EFI_PCI_BRIDGE_CONTROL_ISA)
-              == EFI_PCI_BRIDGE_CONTROL_ISA) {
+              == EFI_PCI_BRIDGE_CONTROL_ISA)
+          {
             Attributes |= EFI_PCI_ATTRIBUTE_ISA_IO;
             Attributes |= EFI_PCI_ATTRIBUTE_ISA_IO_16;
             Attributes |= EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO;
           }
+
           if ((Pci.Bridge.BridgeControl & EFI_PCI_BRIDGE_CONTROL_VGA)
-              == EFI_PCI_BRIDGE_CONTROL_VGA) {
+              == EFI_PCI_BRIDGE_CONTROL_VGA)
+          {
             Attributes |= EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO;
             Attributes |= EFI_PCI_ATTRIBUTE_VGA_MEMORY;
             Attributes |= EFI_PCI_ATTRIBUTE_VGA_IO;
             if ((Pci.Bridge.BridgeControl & EFI_PCI_BRIDGE_CONTROL_VGA_16)
-                != 0) {
+                != 0)
+            {
               Attributes |= EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
               Attributes |= EFI_PCI_ATTRIBUTE_VGA_IO_16;
             }
@@ -382,21 +392,28 @@ ScanForRootBridges (
           OFFSET_OF (PCI_TYPE00, Device.Bar),
           BarOffsetEnd,
           &Io,
-          &Mem, &MemAbove4G
-        );
+          &Mem,
+          &MemAbove4G
+          );
 
         //
         // See if the PCI device is an IDE controller
         //
-        if (IS_CLASS2 (&Pci, PCI_CLASS_MASS_STORAGE,
-                       PCI_CLASS_MASS_STORAGE_IDE)) {
+        if (IS_CLASS2 (
+              &Pci,
+              PCI_CLASS_MASS_STORAGE,
+              PCI_CLASS_MASS_STORAGE_IDE
+              ))
+        {
           if (Pci.Hdr.ClassCode[0] & 0x80) {
             Attributes |= EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO;
             Attributes |= EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO;
           }
+
           if (Pci.Hdr.ClassCode[0] & 0x01) {
             Attributes |= EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO;
           }
+
           if (Pci.Hdr.ClassCode[0] & 0x04) {
             Attributes |= EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO;
           }
@@ -408,7 +425,8 @@ ScanForRootBridges (
         //
         if (IS_CLASS2 (&Pci, PCI_CLASS_OLD, PCI_CLASS_OLD_VGA) ||
             IS_CLASS2 (&Pci, PCI_CLASS_DISPLAY, PCI_CLASS_DISPLAY_VGA)
-            ) {
+            )
+        {
           Attributes |= EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO;
           Attributes |= EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO_16;
           Attributes |= EFI_PCI_ATTRIBUTE_VGA_MEMORY;
@@ -421,9 +439,10 @@ ScanForRootBridges (
         // or ISA_POSITIVE_DECODE Bridge device
         //
         if (Pci.Hdr.ClassCode[2] == PCI_CLASS_BRIDGE) {
-          if (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA ||
-              Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_EISA ||
-              Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA_PDECODE) {
+          if ((Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA) ||
+              (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_EISA) ||
+              (Pci.Hdr.ClassCode[1] == PCI_CLASS_BRIDGE_ISA_PDECODE))
+          {
             Attributes |= EFI_PCI_ATTRIBUTE_ISA_IO;
             Attributes |= EFI_PCI_ATTRIBUTE_ISA_IO_16;
             Attributes |= EFI_PCI_ATTRIBUTE_ISA_MOTHERBOARD_IO;
@@ -434,7 +453,7 @@ ScanForRootBridges (
         // If this device is not a multi function device, then skip the rest
         // of this PCI device
         //
-        if (Function == 0 && !IS_PCI_MULTI_FUNC (&Pci)) {
+        if ((Function == 0) && !IS_PCI_MULTI_FUNC (&Pci)) {
           break;
         }
       }
@@ -446,18 +465,26 @@ ScanForRootBridges (
     //
     if (NumberOfDevices > 0) {
       RootBridges = ReallocatePool (
-        (*NumberOfRootBridges) * sizeof (PCI_ROOT_BRIDGE),
-        (*NumberOfRootBridges + 1) * sizeof (PCI_ROOT_BRIDGE),
-        RootBridges
-      );
+                      (*NumberOfRootBridges) * sizeof (PCI_ROOT_BRIDGE),
+                      (*NumberOfRootBridges + 1) * sizeof (PCI_ROOT_BRIDGE),
+                      RootBridges
+                      );
       ASSERT (RootBridges != NULL);
       PciHostBridgeUtilityInitRootBridge (
-        Attributes, Attributes, 0,
-        FALSE, TRUE /* NoExtendedConfigSpace */,
-        (UINT8) PrimaryBus, (UINT8) SubBus,
-        &Io, &Mem, &MemAbove4G, &mNonExistAperture, &mNonExistAperture,
+        Attributes,
+        Attributes,
+        0,
+        FALSE,
+        TRUE /* NoExtendedConfigSpace */,
+        (UINT8)PrimaryBus,
+        (UINT8)SubBus,
+        &Io,
+        &Mem,
+        &MemAbove4G,
+        &mNonExistAperture,
+        &mNonExistAperture,
         &RootBridges[*NumberOfRootBridges]
-      );
+        );
       RootBridges[*NumberOfRootBridges].ResourceAssigned = TRUE;
       //
       // Increment the index for the next PCI Root Bridge

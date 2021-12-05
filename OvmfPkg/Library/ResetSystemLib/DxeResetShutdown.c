@@ -15,29 +15,29 @@
 #include <Library/ResetSystemLib.h> // ResetShutdown()
 #include <OvmfPlatforms.h>          // PIIX4_PMBA_VALUE
 
-STATIC UINT16 mAcpiPmBaseAddress;
+STATIC UINT16  mAcpiPmBaseAddress;
 
 EFI_STATUS
 EFIAPI
 DxeResetInit (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINT16 HostBridgeDevId;
+  UINT16  HostBridgeDevId;
 
   HostBridgeDevId = PcdGet16 (PcdOvmfHostBridgePciDevId);
   switch (HostBridgeDevId) {
-  case INTEL_82441_DEVICE_ID:
-    mAcpiPmBaseAddress = PIIX4_PMBA_VALUE;
-    break;
-  case INTEL_Q35_MCH_DEVICE_ID:
-    mAcpiPmBaseAddress = ICH9_PMBASE_VALUE;
-    break;
-  default:
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-    return EFI_UNSUPPORTED;
+    case INTEL_82441_DEVICE_ID:
+      mAcpiPmBaseAddress = PIIX4_PMBA_VALUE;
+      break;
+    case INTEL_Q35_MCH_DEVICE_ID:
+      mAcpiPmBaseAddress = ICH9_PMBASE_VALUE;
+      break;
+    default:
+      ASSERT (FALSE);
+      CpuDeadLoop ();
+      return EFI_UNSUPPORTED;
   }
 
   return EFI_SUCCESS;

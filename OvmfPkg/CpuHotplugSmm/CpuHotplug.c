@@ -28,19 +28,19 @@
 //
 // We use this protocol for accessing IO Ports.
 //
-STATIC EFI_MM_CPU_IO_PROTOCOL *mMmCpuIo;
+STATIC EFI_MM_CPU_IO_PROTOCOL  *mMmCpuIo;
 //
 // The following protocol is used to report the addition or removal of a CPU to
 // the SMM CPU driver (PiSmmCpuDxeSmm).
 //
-STATIC EFI_SMM_CPU_SERVICE_PROTOCOL *mMmCpuService;
+STATIC EFI_SMM_CPU_SERVICE_PROTOCOL  *mMmCpuService;
 //
 // These structures serve as communication side-channels between the
 // EFI_SMM_CPU_SERVICE_PROTOCOL consumer (i.e., this driver) and provider
 // (i.e., PiSmmCpuDxeSmm).
 //
-STATIC CPU_HOT_PLUG_DATA *mCpuHotPlugData;
-STATIC CPU_HOT_EJECT_DATA *mCpuHotEjectData;
+STATIC CPU_HOT_PLUG_DATA   *mCpuHotPlugData;
+STATIC CPU_HOT_EJECT_DATA  *mCpuHotEjectData;
 //
 // SMRAM arrays for fetching the APIC IDs of processors with pending events (of
 // known event types), for the time of just one MMI.
@@ -56,18 +56,18 @@ STATIC CPU_HOT_EJECT_DATA *mCpuHotEjectData;
 // in a single MMI. The numbers of used (populated) elements in the arrays are
 // determined on every MMI separately.
 //
-STATIC APIC_ID *mPluggedApicIds;
-STATIC APIC_ID *mToUnplugApicIds;
-STATIC UINT32  *mToUnplugSelectors;
+STATIC APIC_ID  *mPluggedApicIds;
+STATIC APIC_ID  *mToUnplugApicIds;
+STATIC UINT32   *mToUnplugSelectors;
 //
 // Address of the non-SMRAM reserved memory page that contains the Post-SMM Pen
 // for hot-added CPUs.
 //
-STATIC UINT32 mPostSmmPenAddress;
+STATIC UINT32  mPostSmmPenAddress;
 //
 // Represents the registration of the CPU Hotplug MMI handler.
 //
-STATIC EFI_HANDLE mDispatchHandle;
+STATIC EFI_HANDLE  mDispatchHandle;
 
 /**
   Process CPUs that have been hot-added, per QemuCpuhpCollectApicIds().
@@ -93,13 +93,13 @@ STATIC EFI_HANDLE mDispatchHandle;
 STATIC
 EFI_STATUS
 ProcessHotAddedCpus (
-  IN APIC_ID                      *PluggedApicIds,
-  IN UINT32                       PluggedCount
+  IN APIC_ID  *PluggedApicIds,
+  IN UINT32   PluggedCount
   )
 {
-  EFI_STATUS Status;
-  UINT32     PluggedIdx;
-  UINT32     NewSlot;
+  EFI_STATUS  Status;
+  UINT32      PluggedIdx;
+  UINT32      NewSlot;
 
   //
   // The Post-SMM Pen need not be reinstalled multiple times within a single
@@ -110,11 +110,11 @@ ProcessHotAddedCpus (
   SmbaseReinstallPostSmmPen (mPostSmmPenAddress);
 
   PluggedIdx = 0;
-  NewSlot = 0;
+  NewSlot    = 0;
   while (PluggedIdx < PluggedCount) {
-    APIC_ID NewApicId;
-    UINT32  CheckSlot;
-    UINTN   NewProcessorNumberByProtocol;
+    APIC_ID  NewApicId;
+    UINT32   CheckSlot;
+    UINTN    NewProcessorNumberByProtocol;
 
     NewApicId = PluggedApicIds[PluggedIdx];
 
@@ -123,14 +123,21 @@ ProcessHotAddedCpus (
     //
     for (CheckSlot = 0;
          CheckSlot < mCpuHotPlugData->ArrayLength;
-         CheckSlot++) {
+         CheckSlot++)
+    {
       if (mCpuHotPlugData->ApicId[CheckSlot] == NewApicId) {
         break;
       }
     }
+
     if (CheckSlot < mCpuHotPlugData->ArrayLength) {
-      DEBUG ((DEBUG_VERBOSE, "%a: APIC ID " FMT_APIC_ID " was hot-plugged "
-        "before; ignoring it\n", __FUNCTION__, NewApicId));
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: APIC ID " FMT_APIC_ID " was hot-plugged "
+                                   "before; ignoring it\n",
+        __FUNCTION__,
+        NewApicId
+        ));
       PluggedIdx++;
       continue;
     }
@@ -139,12 +146,18 @@ ProcessHotAddedCpus (
     // Find the first empty slot in CPU_HOT_PLUG_DATA.
     //
     while (NewSlot < mCpuHotPlugData->ArrayLength &&
-           mCpuHotPlugData->ApicId[NewSlot] != MAX_UINT64) {
+           mCpuHotPlugData->ApicId[NewSlot] != MAX_UINT64)
+    {
       NewSlot++;
     }
+
     if (NewSlot == mCpuHotPlugData->ArrayLength) {
-      DEBUG ((DEBUG_ERROR, "%a: no room for APIC ID " FMT_APIC_ID "\n",
-        __FUNCTION__, NewApicId));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: no room for APIC ID " FMT_APIC_ID "\n",
+        __FUNCTION__,
+        NewApicId
+        ));
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -156,8 +169,11 @@ ProcessHotAddedCpus (
     //
     // Relocate the SMBASE of the new CPU.
     //
-    Status = SmbaseRelocate (NewApicId, mCpuHotPlugData->SmBase[NewSlot],
-               mPostSmmPenAddress);
+    Status = SmbaseRelocate (
+               NewApicId,
+               mCpuHotPlugData->SmBase[NewSlot],
+               mPostSmmPenAddress
+               );
     if (EFI_ERROR (Status)) {
       goto RevokeNewSlot;
     }
@@ -165,18 +181,31 @@ ProcessHotAddedCpus (
     //
     // Add the new CPU with EFI_SMM_CPU_SERVICE_PROTOCOL.
     //
-    Status = mMmCpuService->AddProcessor (mMmCpuService, NewApicId,
-                              &NewProcessorNumberByProtocol);
+    Status = mMmCpuService->AddProcessor (
+                              mMmCpuService,
+                              NewApicId,
+                              &NewProcessorNumberByProtocol
+                              );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: AddProcessor(" FMT_APIC_ID "): %r\n",
-        __FUNCTION__, NewApicId, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: AddProcessor(" FMT_APIC_ID "): %r\n",
+        __FUNCTION__,
+        NewApicId,
+        Status
+        ));
       goto RevokeNewSlot;
     }
 
-    DEBUG ((DEBUG_INFO, "%a: hot-added APIC ID " FMT_APIC_ID ", SMBASE 0x%Lx, "
-      "EFI_SMM_CPU_SERVICE_PROTOCOL assigned number %Lu\n", __FUNCTION__,
-      NewApicId, (UINT64)mCpuHotPlugData->SmBase[NewSlot],
-      (UINT64)NewProcessorNumberByProtocol));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: hot-added APIC ID " FMT_APIC_ID ", SMBASE 0x%Lx, "
+                                           "EFI_SMM_CPU_SERVICE_PROTOCOL assigned number %Lu\n",
+      __FUNCTION__,
+      NewApicId,
+      (UINT64)mCpuHotPlugData->SmBase[NewSlot],
+      (UINT64)NewProcessorNumberByProtocol
+      ));
 
     NewSlot++;
     PluggedIdx++;
@@ -210,11 +239,11 @@ CheckIfBsp (
   VOID
   )
 {
-  MSR_IA32_APIC_BASE_REGISTER ApicBaseMsr;
-  BOOLEAN                     IsBsp;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
+  BOOLEAN                      IsBsp;
 
   ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
-  IsBsp = (BOOLEAN)(ApicBaseMsr.Bits.BSP == 1);
+  IsBsp              = (BOOLEAN)(ApicBaseMsr.Bits.BSP == 1);
   return IsBsp;
 }
 
@@ -238,13 +267,13 @@ CheckIfBsp (
 VOID
 EFIAPI
 EjectCpu (
-  IN UINTN ProcessorNum
+  IN UINTN  ProcessorNum
   )
 {
-  UINT64 QemuSelector;
+  UINT64  QemuSelector;
 
   if (CheckIfBsp ()) {
-    UINT32 Idx;
+    UINT32  Idx;
 
     for (Idx = 0; Idx < mCpuHotEjectData->ArrayLength; Idx++) {
       QemuSelector = mCpuHotEjectData->QemuSelectorMap[Idx];
@@ -258,7 +287,7 @@ EjectCpu (
         //
         // Tell QEMU to context-switch it out.
         //
-        QemuCpuhpWriteCpuSelector (mMmCpuIo, (UINT32) QemuSelector);
+        QemuCpuhpWriteCpuSelector (mMmCpuIo, (UINT32)QemuSelector);
         QemuCpuhpWriteCpuStatus (mMmCpuIo, QEMU_CPUHP_STAT_EJECT);
 
         //
@@ -277,8 +306,14 @@ EjectCpu (
         mCpuHotEjectData->QemuSelectorMap[Idx] =
           CPU_EJECT_QEMU_SELECTOR_INVALID;
 
-        DEBUG ((DEBUG_INFO, "%a: Unplugged ProcessorNum %u, "
-          "QemuSelector %Lu\n", __FUNCTION__, Idx, QemuSelector));
+        DEBUG ((
+          DEBUG_INFO,
+          "%a: Unplugged ProcessorNum %u, "
+          "QemuSelector %Lu\n",
+          __FUNCTION__,
+          Idx,
+          QemuSelector
+          ));
       }
     }
 
@@ -330,7 +365,7 @@ EjectCpu (
   //
   // Keep them penned here until the BSP tells QEMU to eject them.
   //
-  for (;;) {
+  for ( ; ;) {
     DisableInterrupts ();
     CpuSleep ();
   }
@@ -371,21 +406,21 @@ EjectCpu (
 STATIC
 EFI_STATUS
 UnplugCpus (
-  IN APIC_ID                      *ToUnplugApicIds,
-  IN UINT32                       *ToUnplugSelectors,
-  IN UINT32                       ToUnplugCount
+  IN APIC_ID  *ToUnplugApicIds,
+  IN UINT32   *ToUnplugSelectors,
+  IN UINT32   ToUnplugCount
   )
 {
-  EFI_STATUS Status;
-  UINT32     ToUnplugIdx;
-  UINT32     EjectCount;
-  UINTN      ProcessorNum;
+  EFI_STATUS  Status;
+  UINT32      ToUnplugIdx;
+  UINT32      EjectCount;
+  UINTN       ProcessorNum;
 
   ToUnplugIdx = 0;
-  EjectCount = 0;
+  EjectCount  = 0;
   while (ToUnplugIdx < ToUnplugCount) {
-    APIC_ID    RemoveApicId;
-    UINT32     QemuSelector;
+    APIC_ID  RemoveApicId;
+    UINT32   QemuSelector;
 
     RemoveApicId = ToUnplugApicIds[ToUnplugIdx];
     QemuSelector = ToUnplugSelectors[ToUnplugIdx];
@@ -404,7 +439,8 @@ UnplugCpus (
 
     for (ProcessorNum = 0;
          ProcessorNum < mCpuHotPlugData->ArrayLength;
-         ProcessorNum++) {
+         ProcessorNum++)
+    {
       if (mCpuHotPlugData->ApicId[ProcessorNum] == RemoveApicId) {
         break;
       }
@@ -414,8 +450,13 @@ UnplugCpus (
     // Ignore the unplug if APIC ID not found
     //
     if (ProcessorNum == mCpuHotPlugData->ArrayLength) {
-      DEBUG ((DEBUG_VERBOSE, "%a: did not find APIC ID " FMT_APIC_ID
-        " to unplug\n", __FUNCTION__, RemoveApicId));
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: did not find APIC ID " FMT_APIC_ID
+        " to unplug\n",
+        __FUNCTION__,
+        RemoveApicId
+        ));
       ToUnplugIdx++;
       continue;
     }
@@ -425,13 +466,19 @@ UnplugCpus (
     //
     Status = mMmCpuService->RemoveProcessor (mMmCpuService, ProcessorNum);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: RemoveProcessor(" FMT_APIC_ID "): %r\n",
-        __FUNCTION__, RemoveApicId, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: RemoveProcessor(" FMT_APIC_ID "): %r\n",
+        __FUNCTION__,
+        RemoveApicId,
+        Status
+        ));
       return Status;
     }
 
     if (mCpuHotEjectData->QemuSelectorMap[ProcessorNum] !=
-        CPU_EJECT_QEMU_SELECTOR_INVALID) {
+        CPU_EJECT_QEMU_SELECTOR_INVALID)
+    {
       //
       // mCpuHotEjectData->QemuSelectorMap[ProcessorNum] is set to
       // CPU_EJECT_QEMU_SELECTOR_INVALID when mCpuHotEjectData->QemuSelectorMap
@@ -442,9 +489,15 @@ UnplugCpus (
       // never match more than one APIC ID -- nor, by transitivity, designate
       // more than one QemuSelector -- in a single invocation of UnplugCpus().
       //
-      DEBUG ((DEBUG_ERROR, "%a: ProcessorNum %Lu maps to QemuSelector %Lu, "
-        "cannot also map to %u\n", __FUNCTION__, (UINT64)ProcessorNum,
-        mCpuHotEjectData->QemuSelectorMap[ProcessorNum], QemuSelector));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: ProcessorNum %Lu maps to QemuSelector %Lu, "
+        "cannot also map to %u\n",
+        __FUNCTION__,
+        (UINT64)ProcessorNum,
+        mCpuHotEjectData->QemuSelectorMap[ProcessorNum],
+        QemuSelector
+        ));
 
       return EFI_ALREADY_STARTED;
     }
@@ -454,9 +507,15 @@ UnplugCpus (
     //
     mCpuHotEjectData->QemuSelectorMap[ProcessorNum] = (UINT64)QemuSelector;
 
-    DEBUG ((DEBUG_INFO, "%a: Started hot-unplug on ProcessorNum %Lu, APIC ID "
-      FMT_APIC_ID ", QemuSelector %u\n", __FUNCTION__, (UINT64)ProcessorNum,
-      RemoveApicId, QemuSelector));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Started hot-unplug on ProcessorNum %Lu, APIC ID "
+      FMT_APIC_ID ", QemuSelector %u\n",
+      __FUNCTION__,
+      (UINT64)ProcessorNum,
+      RemoveApicId,
+      QemuSelector
+      ));
 
     EjectCount++;
     ToUnplugIdx++;
@@ -539,16 +598,16 @@ STATIC
 EFI_STATUS
 EFIAPI
 CpuHotplugMmi (
-  IN EFI_HANDLE DispatchHandle,
-  IN CONST VOID *Context        OPTIONAL,
-  IN OUT VOID   *CommBuffer     OPTIONAL,
-  IN OUT UINTN  *CommBufferSize OPTIONAL
+  IN EFI_HANDLE  DispatchHandle,
+  IN CONST VOID  *Context        OPTIONAL,
+  IN OUT VOID    *CommBuffer     OPTIONAL,
+  IN OUT UINTN   *CommBufferSize OPTIONAL
   )
 {
-  EFI_STATUS Status;
-  UINT8      ApmControl;
-  UINT32     PluggedCount;
-  UINT32     ToUnplugCount;
+  EFI_STATUS  Status;
+  UINT8       ApmControl;
+  UINT32      PluggedCount;
+  UINT32      ToUnplugCount;
 
   //
   // Assert that we are entering this function due to our root MMI handler
@@ -565,11 +624,20 @@ CpuHotplugMmi (
   // Read the MMI command value from the APM Control Port, to see if this is an
   // MMI we should care about.
   //
-  Status = mMmCpuIo->Io.Read (mMmCpuIo, MM_IO_UINT8, ICH9_APM_CNT, 1,
-                          &ApmControl);
+  Status = mMmCpuIo->Io.Read (
+                          mMmCpuIo,
+                          MM_IO_UINT8,
+                          ICH9_APM_CNT,
+                          1,
+                          &ApmControl
+                          );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to read ICH9_APM_CNT: %r\n", __FUNCTION__,
-      Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: failed to read ICH9_APM_CNT: %r\n",
+      __FUNCTION__,
+      Status
+      ));
     //
     // We couldn't even determine if the MMI was for us or not.
     //
@@ -628,21 +696,20 @@ Fatal:
   return EFI_INTERRUPT_PENDING;
 }
 
-
 //
 // Entry point function of this driver.
 //
 EFI_STATUS
 EFIAPI
 CpuHotplugEntry (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS Status;
-  UINTN      Len;
-  UINTN      Size;
-  UINTN      SizeSel;
+  EFI_STATUS  Status;
+  UINTN       Len;
+  UINTN       Size;
+  UINTN       SizeSel;
 
   //
   // This module should only be included when SMM support is required.
@@ -663,17 +730,28 @@ CpuHotplugEntry (
   // First, collect the protocols needed later. All of these protocols are
   // listed in our module DEPEX.
   //
-  Status = gMmst->MmLocateProtocol (&gEfiMmCpuIoProtocolGuid,
-                    NULL /* Registration */, (VOID **)&mMmCpuIo);
+  Status = gMmst->MmLocateProtocol (
+                    &gEfiMmCpuIoProtocolGuid,
+                    NULL /* Registration */,
+                    (VOID **)&mMmCpuIo
+                    );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: locate MmCpuIo: %r\n", __FUNCTION__, Status));
     goto Fatal;
   }
-  Status = gMmst->MmLocateProtocol (&gEfiSmmCpuServiceProtocolGuid,
-                    NULL /* Registration */, (VOID **)&mMmCpuService);
+
+  Status = gMmst->MmLocateProtocol (
+                    &gEfiSmmCpuServiceProtocolGuid,
+                    NULL /* Registration */,
+                    (VOID **)&mMmCpuService
+                    );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: locate MmCpuService: %r\n", __FUNCTION__,
-      Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: locate MmCpuService: %r\n",
+      __FUNCTION__,
+      Status
+      ));
     goto Fatal;
   }
 
@@ -684,7 +762,7 @@ CpuHotplugEntry (
   // - PcdCpuHotEjectDataAddress to CPU_HOT_EJECT_DATA in SMRAM, if the
   //   possible CPU count is greater than 1.
   //
-  mCpuHotPlugData = (VOID *)(UINTN)PcdGet64 (PcdCpuHotPlugDataAddress);
+  mCpuHotPlugData  = (VOID *)(UINTN)PcdGet64 (PcdCpuHotPlugDataAddress);
   mCpuHotEjectData = (VOID *)(UINTN)PcdGet64 (PcdCpuHotEjectDataAddress);
 
   if (mCpuHotPlugData == NULL) {
@@ -692,6 +770,7 @@ CpuHotplugEntry (
     DEBUG ((DEBUG_ERROR, "%a: CPU_HOT_PLUG_DATA: %r\n", __FUNCTION__, Status));
     goto Fatal;
   }
+
   //
   // If the possible CPU count is 1, there's nothing for this driver to do.
   //
@@ -706,6 +785,7 @@ CpuHotplugEntry (
   } else {
     Status = EFI_SUCCESS;
   }
+
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: CPU_HOT_EJECT_DATA: %r\n", __FUNCTION__, Status));
     goto Fatal;
@@ -716,25 +796,38 @@ CpuHotplugEntry (
   //
   if (RETURN_ERROR (SafeUintnSub (mCpuHotPlugData->ArrayLength, 1, &Len)) ||
       RETURN_ERROR (SafeUintnMult (sizeof (APIC_ID), Len, &Size)) ||
-      RETURN_ERROR (SafeUintnMult (sizeof (UINT32), Len, &SizeSel))) {
+      RETURN_ERROR (SafeUintnMult (sizeof (UINT32), Len, &SizeSel)))
+  {
     Status = EFI_ABORTED;
     DEBUG ((DEBUG_ERROR, "%a: invalid CPU_HOT_PLUG_DATA\n", __FUNCTION__));
     goto Fatal;
   }
-  Status = gMmst->MmAllocatePool (EfiRuntimeServicesData, Size,
-                    (VOID **)&mPluggedApicIds);
+
+  Status = gMmst->MmAllocatePool (
+                    EfiRuntimeServicesData,
+                    Size,
+                    (VOID **)&mPluggedApicIds
+                    );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __FUNCTION__, Status));
     goto Fatal;
   }
-  Status = gMmst->MmAllocatePool (EfiRuntimeServicesData, Size,
-                    (VOID **)&mToUnplugApicIds);
+
+  Status = gMmst->MmAllocatePool (
+                    EfiRuntimeServicesData,
+                    Size,
+                    (VOID **)&mToUnplugApicIds
+                    );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __FUNCTION__, Status));
     goto ReleasePluggedApicIds;
   }
-  Status = gMmst->MmAllocatePool (EfiRuntimeServicesData, SizeSel,
-                    (VOID **)&mToUnplugSelectors);
+
+  Status = gMmst->MmAllocatePool (
+                    EfiRuntimeServicesData,
+                    SizeSel,
+                    (VOID **)&mToUnplugSelectors
+                    );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __FUNCTION__, Status));
     goto ReleaseToUnplugApicIds;
@@ -743,8 +836,10 @@ CpuHotplugEntry (
   //
   // Allocate the Post-SMM Pen for hot-added CPUs.
   //
-  Status = SmbaseAllocatePostSmmPen (&mPostSmmPenAddress,
-             SystemTable->BootServices);
+  Status = SmbaseAllocatePostSmmPen (
+             &mPostSmmPenAddress,
+             SystemTable->BootServices
+             );
   if (EFI_ERROR (Status)) {
     goto ReleaseToUnplugSelectors;
   }
@@ -776,8 +871,12 @@ CpuHotplugEntry (
   QemuCpuhpWriteCommand (mMmCpuIo, QEMU_CPUHP_CMD_GET_PENDING);
   if (QemuCpuhpReadCommandData2 (mMmCpuIo) != 0) {
     Status = EFI_NOT_FOUND;
-    DEBUG ((DEBUG_ERROR, "%a: modern CPU hotplug interface: %r\n",
-      __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: modern CPU hotplug interface: %r\n",
+      __FUNCTION__,
+      Status
+      ));
     goto ReleasePostSmmPen;
   }
 
@@ -790,8 +889,12 @@ CpuHotplugEntry (
                     &mDispatchHandle
                     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: MmiHandlerRegister(): %r\n", __FUNCTION__,
-      Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: MmiHandlerRegister(): %r\n",
+      __FUNCTION__,
+      Status
+      ));
     goto ReleasePostSmmPen;
   }
 

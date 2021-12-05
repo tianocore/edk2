@@ -52,46 +52,44 @@
 //
 
 typedef struct {
-  CONST VOID  *Data;
-  UINT32      Len;
+  CONST VOID    *Data;
+  UINT32        Len;
 } WRITE_REQUEST;
 
 /* Register callback to watch subtree (node) in the XenStore. */
-#define XENSTORE_WATCH_SIGNATURE SIGNATURE_32 ('X','S','w','a')
-struct _XENSTORE_WATCH
-{
-  UINT32      Signature;
-  LIST_ENTRY  Link;
+#define XENSTORE_WATCH_SIGNATURE  SIGNATURE_32 ('X','S','w','a')
+struct _XENSTORE_WATCH {
+  UINT32        Signature;
+  LIST_ENTRY    Link;
 
   /* Path being watched. */
-  CHAR8       *Node;
+  CHAR8         *Node;
 };
 
 #define XENSTORE_WATCH_FROM_LINK(l) \
   CR (l, XENSTORE_WATCH, Link, XENSTORE_WATCH_SIGNATURE)
 
-
 /**
  * Structure capturing messages received from the XenStore service.
  */
-#define XENSTORE_MESSAGE_SIGNATURE SIGNATURE_32 ('X', 'S', 's', 'm')
+#define XENSTORE_MESSAGE_SIGNATURE  SIGNATURE_32 ('X', 'S', 's', 'm')
 typedef struct {
-  UINT32 Signature;
-  LIST_ENTRY Link;
+  UINT32                Signature;
+  LIST_ENTRY            Link;
 
-  struct xsd_sockmsg Header;
+  struct xsd_sockmsg    Header;
 
   union {
     /* Queued replies. */
     struct {
-      CHAR8 *Body;
+      CHAR8    *Body;
     } Reply;
 
     /* Queued watch events. */
     struct {
-      XENSTORE_WATCH *Handle;
-      CONST CHAR8 **Vector;
-      UINT32 VectorSize;
+      XENSTORE_WATCH    *Handle;
+      CONST CHAR8       **Vector;
+      UINT32            VectorSize;
     } Watch;
   } u;
 } XENSTORE_MESSAGE;
@@ -106,9 +104,9 @@ typedef struct {
    * Pointer to shared memory communication structures allowing us
    * to communicate with the XenStore service.
    */
-  struct xenstore_domain_interface *XenStore;
+  struct xenstore_domain_interface    *XenStore;
 
-  XENBUS_DEVICE *Dev;
+  XENBUS_DEVICE                       *Dev;
 
   /**
    * A list of replies to our requests.
@@ -120,42 +118,41 @@ typedef struct {
    *
    * /note Only one requesting context can be active at a time.
    */
-  LIST_ENTRY ReplyList;
+  LIST_ENTRY       ReplyList;
 
   /** Lock protecting the reply list. */
-  EFI_LOCK ReplyLock;
+  EFI_LOCK         ReplyLock;
 
   /**
    * List of registered watches.
    */
-  LIST_ENTRY RegisteredWatches;
+  LIST_ENTRY       RegisteredWatches;
 
   /** Lock protecting the registered watches list. */
-  EFI_LOCK RegisteredWatchesLock;
+  EFI_LOCK         RegisteredWatchesLock;
 
   /**
    * List of pending watch callback events.
    */
-  LIST_ENTRY WatchEvents;
+  LIST_ENTRY       WatchEvents;
 
   /** Lock protecting the watch callback list. */
-  EFI_LOCK WatchEventsLock;
+  EFI_LOCK         WatchEventsLock;
 
   /**
    * The event channel for communicating with the
    * XenStore service.
    */
-  evtchn_port_t EventChannel;
+  evtchn_port_t    EventChannel;
 
   /** Handle for XenStore events. */
-  EFI_EVENT EventChannelEvent;
+  EFI_EVENT        EventChannelEvent;
 } XENSTORE_PRIVATE;
 
 //
 // Global Data
 //
-static XENSTORE_PRIVATE xs;
-
+static XENSTORE_PRIVATE  xs;
 
 //
 // Private Utility Functions
@@ -174,18 +171,19 @@ static XENSTORE_PRIVATE xs;
 STATIC
 UINT32
 ExtractStrings (
-  IN  CONST CHAR8 *Strings,
-  IN  UINTN       Len,
-  OUT CONST CHAR8 **Dst OPTIONAL
+  IN  CONST CHAR8  *Strings,
+  IN  UINTN        Len,
+  OUT CONST CHAR8  **Dst OPTIONAL
   )
 {
-  UINT32 Num = 0;
-  CONST CHAR8 *Ptr;
+  UINT32       Num = 0;
+  CONST CHAR8  *Ptr;
 
   for (Ptr = Strings; Ptr < Strings + Len; Ptr += AsciiStrSize (Ptr)) {
     if (Dst != NULL) {
       *Dst++ = Ptr;
     }
+
     Num++;
   }
 
@@ -217,10 +215,10 @@ Split (
   OUT UINT32  *NumPtr
   )
 {
-  CONST CHAR8 **Dst;
+  CONST CHAR8  **Dst;
 
-  ASSERT(NumPtr != NULL);
-  ASSERT(Strings != NULL);
+  ASSERT (NumPtr != NULL);
+  ASSERT (Strings != NULL);
 
   /* Protect against unterminated buffers. */
   if (Len > 0) {
@@ -232,11 +230,11 @@ Split (
 
   /* Transfer to one big alloc for easy freeing by the caller. */
   Dst = AllocatePool (*NumPtr * sizeof (CHAR8 *) + Len);
-  CopyMem ((VOID*)&Dst[*NumPtr], Strings, Len);
+  CopyMem ((VOID *)&Dst[*NumPtr], Strings, Len);
   FreePool (Strings);
 
   /* Extract pointers to newly allocated array. */
-  Strings = (CHAR8 *) &Dst[*NumPtr];
+  Strings = (CHAR8 *)&Dst[*NumPtr];
   ExtractStrings (Strings, Len, Dst);
 
   return (Dst);
@@ -253,23 +251,26 @@ Split (
 STATIC
 XENSTORE_WATCH *
 XenStoreFindWatch (
-  IN CONST CHAR8 *Token
+  IN CONST CHAR8  *Token
   )
 {
-  XENSTORE_WATCH *Watch, *WantedWatch;
-  LIST_ENTRY *Entry;
+  XENSTORE_WATCH  *Watch, *WantedWatch;
+  LIST_ENTRY      *Entry;
 
-  WantedWatch = (VOID *) AsciiStrHexToUintn (Token);
+  WantedWatch = (VOID *)AsciiStrHexToUintn (Token);
 
   if (IsListEmpty (&xs.RegisteredWatches)) {
     return NULL;
   }
+
   for (Entry = GetFirstNode (&xs.RegisteredWatches);
        !IsNull (&xs.RegisteredWatches, Entry);
-       Entry = GetNextNode (&xs.RegisteredWatches, Entry)) {
+       Entry = GetNextNode (&xs.RegisteredWatches, Entry))
+  {
     Watch = XENSTORE_WATCH_FROM_LINK (Entry);
-    if (Watch == WantedWatch)
+    if (Watch == WantedWatch) {
       return Watch;
+    }
   }
 
   return NULL;
@@ -282,16 +283,16 @@ XenStoreFindWatch (
 
 CHAR8 *
 XenStoreJoin (
-  IN CONST CHAR8 *DirectoryPath,
-  IN CONST CHAR8 *Node
+  IN CONST CHAR8  *DirectoryPath,
+  IN CONST CHAR8  *Node
   )
 {
-  CHAR8 *Buf;
-  UINTN BufSize;
+  CHAR8  *Buf;
+  UINTN  BufSize;
 
   /* +1 for '/' and +1 for '\0' */
   BufSize = AsciiStrLen (DirectoryPath) + AsciiStrLen (Node) + 2;
-  Buf = AllocatePool (BufSize);
+  Buf     = AllocatePool (BufSize);
   ASSERT (Buf != NULL);
 
   if (Node[0] == '\0') {
@@ -322,8 +323,8 @@ XenStoreJoin (
 STATIC
 BOOLEAN
 XenStoreCheckIndexes (
-  XENSTORE_RING_IDX Cons,
-  XENSTORE_RING_IDX Prod
+  XENSTORE_RING_IDX  Cons,
+  XENSTORE_RING_IDX  Prod
   )
 {
   return ((Prod - Cons) <= XENSTORE_RING_SIZE);
@@ -343,17 +344,19 @@ XenStoreCheckIndexes (
 STATIC
 VOID *
 XenStoreGetOutputChunk (
-  IN  XENSTORE_RING_IDX Cons,
-  IN  XENSTORE_RING_IDX Prod,
-  IN  CHAR8             *Buffer,
-  OUT UINT32            *LenPtr
+  IN  XENSTORE_RING_IDX  Cons,
+  IN  XENSTORE_RING_IDX  Prod,
+  IN  CHAR8              *Buffer,
+  OUT UINT32             *LenPtr
   )
 {
-  UINT32 Len;
+  UINT32  Len;
+
   Len = XENSTORE_RING_SIZE - MASK_XENSTORE_IDX (Prod);
   if ((XENSTORE_RING_SIZE - (Prod - Cons)) < Len) {
     Len = XENSTORE_RING_SIZE - (Prod - Cons);
   }
+
   *LenPtr = Len;
   return (Buffer + MASK_XENSTORE_IDX (Prod));
 }
@@ -372,18 +375,19 @@ XenStoreGetOutputChunk (
 STATIC
 CONST VOID *
 XenStoreGetInputChunk (
-  IN  XENSTORE_RING_IDX Cons,
-  IN  XENSTORE_RING_IDX Prod,
-  IN  CONST CHAR8       *Buffer,
-  OUT UINT32            *LenPtr
+  IN  XENSTORE_RING_IDX  Cons,
+  IN  XENSTORE_RING_IDX  Prod,
+  IN  CONST CHAR8        *Buffer,
+  OUT UINT32             *LenPtr
   )
 {
-  UINT32 Len;
+  UINT32  Len;
 
   Len = XENSTORE_RING_SIZE - MASK_XENSTORE_IDX (Cons);
   if ((Prod - Cons) < Len) {
     Len = Prod - Cons;
   }
+
   *LenPtr = Len;
   return (Buffer + MASK_XENSTORE_IDX (Cons));
 }
@@ -401,26 +405,27 @@ XenStoreGetInputChunk (
 STATIC
 EFI_STATUS
 XenStoreWaitForEvent (
-  IN EFI_EVENT Event,
-  IN UINT64    Timeout
+  IN EFI_EVENT  Event,
+  IN UINT64     Timeout
   )
 {
-  UINTN Index;
-  EFI_STATUS Status;
-  EFI_EVENT TimerEvent;
-  EFI_EVENT WaitList[2];
+  UINTN       Index;
+  EFI_STATUS  Status;
+  EFI_EVENT   TimerEvent;
+  EFI_EVENT   WaitList[2];
 
   gBS->CreateEvent (EVT_TIMER, 0, NULL, NULL, &TimerEvent);
   gBS->SetTimer (TimerEvent, TimerRelative, Timeout);
 
   WaitList[0] = xs.EventChannelEvent;
   WaitList[1] = TimerEvent;
-  Status = gBS->WaitForEvent (2, WaitList, &Index);
+  Status      = gBS->WaitForEvent (2, WaitList, &Index);
   ASSERT (Status != EFI_INVALID_PARAMETER);
   gBS->CloseEvent (TimerEvent);
   if (Status == EFI_UNSUPPORTED) {
     return EFI_SUCCESS;
   }
+
   if (Index == 1) {
     return EFI_TIMEOUT;
   } else {
@@ -442,16 +447,16 @@ XenStoreWaitForEvent (
 STATIC
 XENSTORE_STATUS
 XenStoreWriteStore (
-  IN CONST VOID *DataPtr,
-  IN UINT32     Len
+  IN CONST VOID  *DataPtr,
+  IN UINT32      Len
   )
 {
-  XENSTORE_RING_IDX Cons, Prod;
-  CONST CHAR8 *Data = (CONST CHAR8 *)DataPtr;
+  XENSTORE_RING_IDX  Cons, Prod;
+  CONST CHAR8        *Data = (CONST CHAR8 *)DataPtr;
 
   while (Len != 0) {
-    void *Dest;
-    UINT32 Available;
+    void    *Dest;
+    UINT32  Available;
 
     Cons = xs.XenStore->req_cons;
     Prod = xs.XenStore->req_prod;
@@ -462,13 +467,16 @@ XenStoreWriteStore (
        * Note that the events from both queues are combined, so being woken
        * does not guarantee that data exist in the read ring.
        */
-      EFI_STATUS Status;
+      EFI_STATUS  Status;
 
-      Status = XenStoreWaitForEvent (xs.EventChannelEvent,
-                                     EFI_TIMER_PERIOD_SECONDS (1));
+      Status = XenStoreWaitForEvent (
+                 xs.EventChannelEvent,
+                 EFI_TIMER_PERIOD_SECONDS (1)
+                 );
       if (Status == EFI_TIMEOUT) {
         DEBUG ((DEBUG_WARN, "XenStore Write, waiting for a ring event.\n"));
       }
+
       continue;
     }
 
@@ -485,7 +493,7 @@ XenStoreWriteStore (
 
     CopyMem (Dest, Data, Available);
     Data += Available;
-    Len -= Available;
+    Len  -= Available;
 
     /*
      * The store to the producer index, which indicates
@@ -521,16 +529,16 @@ XenStoreWriteStore (
 STATIC
 XENSTORE_STATUS
 XenStoreReadStore (
-  OUT VOID *DataPtr,
-  IN  UINT32 Len
+  OUT VOID    *DataPtr,
+  IN  UINT32  Len
   )
 {
-  XENSTORE_RING_IDX Cons, Prod;
-  CHAR8 *Data = (CHAR8 *) DataPtr;
+  XENSTORE_RING_IDX  Cons, Prod;
+  CHAR8              *Data = (CHAR8 *)DataPtr;
 
   while (Len != 0) {
-    UINT32 Available;
-    CONST CHAR8 *Src;
+    UINT32       Available;
+    CONST CHAR8  *Src;
 
     Cons = xs.XenStore->rsp_cons;
     Prod = xs.XenStore->rsp_prod;
@@ -541,13 +549,16 @@ XenStoreReadStore (
        * Note that the events from both queues are combined, so being woken
        * does not guarantee that data exist in the read ring.
        */
-      EFI_STATUS Status;
+      EFI_STATUS  Status;
 
-      Status = XenStoreWaitForEvent (xs.EventChannelEvent,
-                                     EFI_TIMER_PERIOD_SECONDS (1));
+      Status = XenStoreWaitForEvent (
+                 xs.EventChannelEvent,
+                 EFI_TIMER_PERIOD_SECONDS (1)
+                 );
       if (Status == EFI_TIMEOUT) {
         DEBUG ((DEBUG_WARN, "XenStore Read, waiting for a ring event.\n"));
       }
+
       continue;
     }
 
@@ -570,7 +581,7 @@ XenStoreReadStore (
 
     CopyMem (Data, Src, Available);
     Data += Available;
-    Len -= Available;
+    Len  -= Available;
 
     /*
      * Insure that the producer of this ring does not see
@@ -608,20 +619,20 @@ XenStoreProcessMessage (
   VOID
   )
 {
-  XENSTORE_MESSAGE *Message;
-  CHAR8 *Body;
-  XENSTORE_STATUS Status;
+  XENSTORE_MESSAGE  *Message;
+  CHAR8             *Body;
+  XENSTORE_STATUS   Status;
 
-  Message = AllocateZeroPool (sizeof (XENSTORE_MESSAGE));
+  Message            = AllocateZeroPool (sizeof (XENSTORE_MESSAGE));
   Message->Signature = XENSTORE_MESSAGE_SIGNATURE;
-  Status = XenStoreReadStore (&Message->Header, sizeof (Message->Header));
+  Status             = XenStoreReadStore (&Message->Header, sizeof (Message->Header));
   if (Status != XENSTORE_STATUS_SUCCESS) {
     FreePool (Message);
     DEBUG ((DEBUG_ERROR, "XenStore: Error read store (%d)\n", Status));
     return Status;
   }
 
-  Body = AllocatePool (Message->Header.len + 1);
+  Body   = AllocatePool (Message->Header.len + 1);
   Status = XenStoreReadStore (Body, Message->Header.len);
   if (Status != XENSTORE_STATUS_SUCCESS) {
     FreePool (Body);
@@ -629,27 +640,38 @@ XenStoreProcessMessage (
     DEBUG ((DEBUG_ERROR, "XenStore: Error read store (%d)\n", Status));
     return Status;
   }
+
   Body[Message->Header.len] = '\0';
 
   if (Message->Header.type == XS_WATCH_EVENT) {
-    Message->u.Watch.Vector = Split(Body, Message->Header.len,
-                                    &Message->u.Watch.VectorSize);
+    Message->u.Watch.Vector = Split (
+                                Body,
+                                Message->Header.len,
+                                &Message->u.Watch.VectorSize
+                                );
 
     EfiAcquireLock (&xs.RegisteredWatchesLock);
     Message->u.Watch.Handle =
       XenStoreFindWatch (Message->u.Watch.Vector[XS_WATCH_TOKEN]);
-    DEBUG ((DEBUG_INFO, "XenStore: Watch event %a\n",
-            Message->u.Watch.Vector[XS_WATCH_TOKEN]));
+    DEBUG ((
+      DEBUG_INFO,
+      "XenStore: Watch event %a\n",
+      Message->u.Watch.Vector[XS_WATCH_TOKEN]
+      ));
     if (Message->u.Watch.Handle != NULL) {
       EfiAcquireLock (&xs.WatchEventsLock);
       InsertHeadList (&xs.WatchEvents, &Message->Link);
       EfiReleaseLock (&xs.WatchEventsLock);
     } else {
-      DEBUG ((DEBUG_WARN, "XenStore: Watch handle %a not found\n",
-              Message->u.Watch.Vector[XS_WATCH_TOKEN]));
-      FreePool((VOID*)Message->u.Watch.Vector);
-      FreePool(Message);
+      DEBUG ((
+        DEBUG_WARN,
+        "XenStore: Watch handle %a not found\n",
+        Message->u.Watch.Vector[XS_WATCH_TOKEN]
+        ));
+      FreePool ((VOID *)Message->u.Watch.Vector);
+      FreePool (Message);
     }
+
     EfiReleaseLock (&xs.RegisteredWatchesLock);
   } else {
     Message->u.Reply.Body = Body;
@@ -676,41 +698,42 @@ XenStoreProcessMessage (
 
 **/
 typedef struct {
-  XENSTORE_STATUS Status;
-  CONST CHAR8 *ErrorStr;
+  XENSTORE_STATUS    Status;
+  CONST CHAR8        *ErrorStr;
 } XenStoreErrors;
 
-static XenStoreErrors gXenStoreErrors[] = {
-  { XENSTORE_STATUS_EINVAL, "EINVAL" },
-  { XENSTORE_STATUS_EACCES, "EACCES" },
-  { XENSTORE_STATUS_EEXIST, "EEXIST" },
-  { XENSTORE_STATUS_EISDIR, "EISDIR" },
-  { XENSTORE_STATUS_ENOENT, "ENOENT" },
-  { XENSTORE_STATUS_ENOMEM, "ENOMEM" },
-  { XENSTORE_STATUS_ENOSPC, "ENOSPC" },
-  { XENSTORE_STATUS_EIO, "EIO" },
+static XenStoreErrors  gXenStoreErrors[] = {
+  { XENSTORE_STATUS_EINVAL,    "EINVAL"    },
+  { XENSTORE_STATUS_EACCES,    "EACCES"    },
+  { XENSTORE_STATUS_EEXIST,    "EEXIST"    },
+  { XENSTORE_STATUS_EISDIR,    "EISDIR"    },
+  { XENSTORE_STATUS_ENOENT,    "ENOENT"    },
+  { XENSTORE_STATUS_ENOMEM,    "ENOMEM"    },
+  { XENSTORE_STATUS_ENOSPC,    "ENOSPC"    },
+  { XENSTORE_STATUS_EIO,       "EIO"       },
   { XENSTORE_STATUS_ENOTEMPTY, "ENOTEMPTY" },
-  { XENSTORE_STATUS_ENOSYS, "ENOSYS" },
-  { XENSTORE_STATUS_EROFS, "EROFS" },
-  { XENSTORE_STATUS_EBUSY, "EBUSY" },
-  { XENSTORE_STATUS_EAGAIN, "EAGAIN" },
-  { XENSTORE_STATUS_EISCONN, "EISCONN" },
-  { XENSTORE_STATUS_E2BIG, "E2BIG" }
+  { XENSTORE_STATUS_ENOSYS,    "ENOSYS"    },
+  { XENSTORE_STATUS_EROFS,     "EROFS"     },
+  { XENSTORE_STATUS_EBUSY,     "EBUSY"     },
+  { XENSTORE_STATUS_EAGAIN,    "EAGAIN"    },
+  { XENSTORE_STATUS_EISCONN,   "EISCONN"   },
+  { XENSTORE_STATUS_E2BIG,     "E2BIG"     }
 };
 
 STATIC
 XENSTORE_STATUS
 XenStoreGetError (
-  CONST CHAR8 *ErrorStr
+  CONST CHAR8  *ErrorStr
   )
 {
-  UINT32 Index;
+  UINT32  Index;
 
-  for (Index = 0; Index < ARRAY_SIZE(gXenStoreErrors); Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (gXenStoreErrors); Index++) {
     if (!AsciiStrCmp (ErrorStr, gXenStoreErrors[Index].ErrorStr)) {
       return gXenStoreErrors[Index].Status;
     }
   }
+
   DEBUG ((DEBUG_WARN, "XenStore gave unknown error %a\n", ErrorStr));
   return XENSTORE_STATUS_EINVAL;
 }
@@ -725,26 +748,30 @@ XenStoreGetError (
 STATIC
 XENSTORE_STATUS
 XenStoreReadReply (
-  OUT enum xsd_sockmsg_type *TypePtr,
-  OUT UINT32 *LenPtr OPTIONAL,
-  OUT VOID **Result
+  OUT enum xsd_sockmsg_type  *TypePtr,
+  OUT UINT32                 *LenPtr OPTIONAL,
+  OUT VOID                   **Result
   )
 {
-  XENSTORE_MESSAGE *Message;
-  LIST_ENTRY *Entry;
-  CHAR8 *Body;
+  XENSTORE_MESSAGE  *Message;
+  LIST_ENTRY        *Entry;
+  CHAR8             *Body;
 
   while (IsListEmpty (&xs.ReplyList)) {
-    XENSTORE_STATUS Status;
+    XENSTORE_STATUS  Status;
     Status = XenStoreProcessMessage ();
-    if (Status != XENSTORE_STATUS_SUCCESS && Status != XENSTORE_STATUS_EAGAIN) {
-      DEBUG ((DEBUG_ERROR, "XenStore, error while reading the ring (%d).",
-              Status));
+    if ((Status != XENSTORE_STATUS_SUCCESS) && (Status != XENSTORE_STATUS_EAGAIN)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "XenStore, error while reading the ring (%d).",
+        Status
+        ));
       return Status;
     }
   }
+
   EfiAcquireLock (&xs.ReplyLock);
-  Entry = GetFirstNode (&xs.ReplyList);
+  Entry   = GetFirstNode (&xs.ReplyList);
   Message = XENSTORE_MESSAGE_FROM_LINK (Entry);
   RemoveEntryList (Entry);
   EfiReleaseLock (&xs.ReplyLock);
@@ -753,6 +780,7 @@ XenStoreReadReply (
   if (LenPtr != NULL) {
     *LenPtr = Message->Header.len;
   }
+
   Body = Message->u.Reply.Body;
 
   FreePool (Message);
@@ -776,27 +804,28 @@ XenStoreReadReply (
 STATIC
 XENSTORE_STATUS
 XenStoreTalkv (
-  IN  CONST XENSTORE_TRANSACTION *Transaction,
-  IN  enum xsd_sockmsg_type   RequestType,
-  IN  CONST WRITE_REQUEST     *WriteRequest,
-  IN  UINT32                  NumRequests,
-  OUT UINT32                  *LenPtr OPTIONAL,
-  OUT VOID                    **ResultPtr OPTIONAL
+  IN  CONST XENSTORE_TRANSACTION  *Transaction,
+  IN  enum xsd_sockmsg_type       RequestType,
+  IN  CONST WRITE_REQUEST         *WriteRequest,
+  IN  UINT32                      NumRequests,
+  OUT UINT32                      *LenPtr OPTIONAL,
+  OUT VOID                        **ResultPtr OPTIONAL
   )
 {
-  struct xsd_sockmsg Message;
-  void *Return = NULL;
-  UINT32 Index;
-  XENSTORE_STATUS Status;
+  struct xsd_sockmsg  Message;
+  void                *Return = NULL;
+  UINT32              Index;
+  XENSTORE_STATUS     Status;
 
   if (Transaction == XST_NIL) {
     Message.tx_id = 0;
   } else {
     Message.tx_id = Transaction->Id;
   }
+
   Message.req_id = 0;
-  Message.type = RequestType;
-  Message.len = 0;
+  Message.type   = RequestType;
+  Message.len    = 0;
   for (Index = 0; Index < NumRequests; Index++) {
     Message.len += WriteRequest[Index].Len;
   }
@@ -859,20 +888,26 @@ Error:
 STATIC
 XENSTORE_STATUS
 XenStoreSingle (
-  IN  CONST XENSTORE_TRANSACTION *Transaction,
-  IN  enum xsd_sockmsg_type   RequestType,
-  IN  CONST CHAR8             *Body,
-  OUT UINT32                  *LenPtr OPTIONAL,
-  OUT VOID                    **Result OPTIONAL
+  IN  CONST XENSTORE_TRANSACTION  *Transaction,
+  IN  enum xsd_sockmsg_type       RequestType,
+  IN  CONST CHAR8                 *Body,
+  OUT UINT32                      *LenPtr OPTIONAL,
+  OUT VOID                        **Result OPTIONAL
   )
 {
-  WRITE_REQUEST WriteRequest;
+  WRITE_REQUEST  WriteRequest;
 
-  WriteRequest.Data = (VOID *) Body;
-  WriteRequest.Len = (UINT32)AsciiStrSize (Body);
+  WriteRequest.Data = (VOID *)Body;
+  WriteRequest.Len  = (UINT32)AsciiStrSize (Body);
 
-  return XenStoreTalkv (Transaction, RequestType, &WriteRequest, 1,
-                        LenPtr, Result);
+  return XenStoreTalkv (
+           Transaction,
+           RequestType,
+           &WriteRequest,
+           1,
+           LenPtr,
+           Result
+           );
 }
 
 //
@@ -891,16 +926,16 @@ XenStoreSingle (
 STATIC
 XENSTORE_STATUS
 XenStoreWatch (
-  CONST CHAR8 *Path,
-  CONST CHAR8 *Token
+  CONST CHAR8  *Path,
+  CONST CHAR8  *Token
   )
 {
-  WRITE_REQUEST WriteRequest[2];
+  WRITE_REQUEST  WriteRequest[2];
 
-  WriteRequest[0].Data = (VOID *) Path;
-  WriteRequest[0].Len = (UINT32)AsciiStrSize (Path);
-  WriteRequest[1].Data = (VOID *) Token;
-  WriteRequest[1].Len = (UINT32)AsciiStrSize (Token);
+  WriteRequest[0].Data = (VOID *)Path;
+  WriteRequest[0].Len  = (UINT32)AsciiStrSize (Path);
+  WriteRequest[1].Data = (VOID *)Token;
+  WriteRequest[1].Len  = (UINT32)AsciiStrSize (Token);
 
   return XenStoreTalkv (XST_NIL, XS_WATCH, WriteRequest, 2, NULL, NULL);
 }
@@ -917,16 +952,16 @@ XenStoreWatch (
 STATIC
 XENSTORE_STATUS
 XenStoreUnwatch (
-  CONST CHAR8 *Path,
-  CONST CHAR8 *Token
+  CONST CHAR8  *Path,
+  CONST CHAR8  *Token
   )
 {
-  WRITE_REQUEST WriteRequest[2];
+  WRITE_REQUEST  WriteRequest[2];
 
-  WriteRequest[0].Data = (VOID *) Path;
-  WriteRequest[0].Len = (UINT32)AsciiStrSize (Path);
-  WriteRequest[1].Data = (VOID *) Token;
-  WriteRequest[1].Len = (UINT32)AsciiStrSize (Token);
+  WriteRequest[0].Data = (VOID *)Path;
+  WriteRequest[0].Len  = (UINT32)AsciiStrSize (Path);
+  WriteRequest[1].Data = (VOID *)Token;
+  WriteRequest[1].Len  = (UINT32)AsciiStrSize (Token);
 
   return XenStoreTalkv (XST_NIL, XS_UNWATCH, WriteRequest, 2, NULL, NULL);
 }
@@ -934,38 +969,42 @@ XenStoreUnwatch (
 STATIC
 XENSTORE_STATUS
 XenStoreWaitWatch (
-  VOID *Token
+  VOID  *Token
   )
 {
-  XENSTORE_MESSAGE *Message;
-  LIST_ENTRY *Entry = NULL;
-  LIST_ENTRY *Last = NULL;
-  XENSTORE_STATUS Status;
+  XENSTORE_MESSAGE  *Message;
+  LIST_ENTRY        *Entry = NULL;
+  LIST_ENTRY        *Last  = NULL;
+  XENSTORE_STATUS   Status;
 
   while (TRUE) {
     EfiAcquireLock (&xs.WatchEventsLock);
     if (IsListEmpty (&xs.WatchEvents) ||
-        Last == GetFirstNode (&xs.WatchEvents)) {
+        (Last == GetFirstNode (&xs.WatchEvents)))
+    {
       EfiReleaseLock (&xs.WatchEventsLock);
       Status = XenStoreProcessMessage ();
-      if (Status != XENSTORE_STATUS_SUCCESS && Status != XENSTORE_STATUS_EAGAIN) {
+      if ((Status != XENSTORE_STATUS_SUCCESS) && (Status != XENSTORE_STATUS_EAGAIN)) {
         return Status;
       }
+
       continue;
     }
 
     for (Entry = GetFirstNode (&xs.WatchEvents);
          Entry != Last && !IsNull (&xs.WatchEvents, Entry);
-         Entry = GetNextNode (&xs.WatchEvents, Entry)) {
+         Entry = GetNextNode (&xs.WatchEvents, Entry))
+    {
       Message = XENSTORE_MESSAGE_FROM_LINK (Entry);
       if (Message->u.Watch.Handle == Token) {
         RemoveEntryList (Entry);
         EfiReleaseLock (&xs.WatchEventsLock);
-        FreePool((VOID*)Message->u.Watch.Vector);
-        FreePool(Message);
+        FreePool ((VOID *)Message->u.Watch.Vector);
+        FreePool (Message);
         return XENSTORE_STATUS_SUCCESS;
       }
     }
+
     Last = GetFirstNode (&xs.WatchEvents);
     EfiReleaseLock (&xs.WatchEventsLock);
   }
@@ -974,11 +1013,12 @@ XenStoreWaitWatch (
 VOID
 EFIAPI
 NotifyEventChannelCheckForEvent (
-  IN EFI_EVENT Event,
-  IN VOID *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  XENSTORE_PRIVATE *xsp;
+  XENSTORE_PRIVATE  *xsp;
+
   xsp = (XENSTORE_PRIVATE *)Context;
   if (TestAndClearBit (xsp->EventChannel, xsp->Dev->SharedInfo->evtchn_pending)) {
     gBS->SignalEvent (Event);
@@ -993,30 +1033,42 @@ NotifyEventChannelCheckForEvent (
 STATIC
 EFI_STATUS
 XenStoreInitComms (
-  XENSTORE_PRIVATE *xsp
+  XENSTORE_PRIVATE  *xsp
   )
 {
-  EFI_STATUS Status;
-  EFI_EVENT TimerEvent;
-  struct xenstore_domain_interface *XenStore = xsp->XenStore;
+  EFI_STATUS                        Status;
+  EFI_EVENT                         TimerEvent;
+  struct xenstore_domain_interface  *XenStore = xsp->XenStore;
 
   Status = gBS->CreateEvent (EVT_TIMER, 0, NULL, NULL, &TimerEvent);
-  Status = gBS->SetTimer (TimerEvent, TimerRelative,
-                          EFI_TIMER_PERIOD_SECONDS (5));
+  Status = gBS->SetTimer (
+                  TimerEvent,
+                  TimerRelative,
+                  EFI_TIMER_PERIOD_SECONDS (5)
+                  );
   while (XenStore->rsp_prod != XenStore->rsp_cons) {
     Status = gBS->CheckEvent (TimerEvent);
     if (!EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "XENSTORE response ring is not quiescent "
-              "(%08x:%08x): fixing up\n",
-              XenStore->rsp_cons, XenStore->rsp_prod));
+      DEBUG ((
+        DEBUG_WARN,
+        "XENSTORE response ring is not quiescent "
+        "(%08x:%08x): fixing up\n",
+        XenStore->rsp_cons,
+        XenStore->rsp_prod
+        ));
       XenStore->rsp_cons = XenStore->rsp_prod;
     }
   }
+
   gBS->CloseEvent (TimerEvent);
 
-  Status = gBS->CreateEvent (EVT_NOTIFY_WAIT, TPL_NOTIFY,
-                             NotifyEventChannelCheckForEvent, xsp,
-                             &xsp->EventChannelEvent);
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_WAIT,
+                  TPL_NOTIFY,
+                  NotifyEventChannelCheckForEvent,
+                  xsp,
+                  &xsp->EventChannelEvent
+                  );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
@@ -1031,23 +1083,28 @@ XenStoreInitComms (
 **/
 EFI_STATUS
 XenStoreInit (
-  XENBUS_DEVICE *Dev
+  XENBUS_DEVICE  *Dev
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
+
   /**
    * The HVM guest pseudo-physical frame number.  This is Xen's mapping
    * of the true machine frame number into our "physical address space".
    */
-  UINTN XenStoreGpfn;
+  UINTN  XenStoreGpfn;
 
   xs.Dev = Dev;
 
   xs.EventChannel = (evtchn_port_t)XenHypercallHvmGetParam (HVM_PARAM_STORE_EVTCHN);
-  XenStoreGpfn = (UINTN)XenHypercallHvmGetParam (HVM_PARAM_STORE_PFN);
-  xs.XenStore = (VOID *) (XenStoreGpfn << EFI_PAGE_SHIFT);
-  DEBUG ((DEBUG_INFO, "XenBusInit: XenBus rings @%p, event channel %x\n",
-          xs.XenStore, xs.EventChannel));
+  XenStoreGpfn    = (UINTN)XenHypercallHvmGetParam (HVM_PARAM_STORE_PFN);
+  xs.XenStore     = (VOID *)(XenStoreGpfn << EFI_PAGE_SHIFT);
+  DEBUG ((
+    DEBUG_INFO,
+    "XenBusInit: XenBus rings @%p, event channel %x\n",
+    xs.XenStore,
+    xs.EventChannel
+    ));
 
   InitializeListHead (&xs.ReplyList);
   InitializeListHead (&xs.WatchEvents);
@@ -1065,7 +1122,7 @@ XenStoreInit (
 
 VOID
 XenStoreDeinit (
-  IN XENBUS_DEVICE *Dev
+  IN XENBUS_DEVICE  *Dev
   )
 {
   //
@@ -1074,8 +1131,8 @@ XenStoreDeinit (
   // it is stopped.
   //
   if (!IsListEmpty (&xs.RegisteredWatches)) {
-    XENSTORE_WATCH *Watch;
-    LIST_ENTRY *Entry;
+    XENSTORE_WATCH  *Watch;
+    LIST_ENTRY      *Entry;
     DEBUG ((DEBUG_WARN, "XenStore: RegisteredWatches is not empty, cleaning up..."));
     Entry = GetFirstNode (&xs.RegisteredWatches);
     while (!IsNull (&xs.RegisteredWatches, Entry)) {
@@ -1091,25 +1148,25 @@ XenStoreDeinit (
   // having cleanup the list RegisteredWatches.
   //
   if (!IsListEmpty (&xs.WatchEvents)) {
-    LIST_ENTRY *Entry;
+    LIST_ENTRY  *Entry;
     DEBUG ((DEBUG_WARN, "XenStore: WatchEvents is not empty, cleaning up..."));
     Entry = GetFirstNode (&xs.WatchEvents);
     while (!IsNull (&xs.WatchEvents, Entry)) {
-      XENSTORE_MESSAGE *Message = XENSTORE_MESSAGE_FROM_LINK (Entry);
+      XENSTORE_MESSAGE  *Message = XENSTORE_MESSAGE_FROM_LINK (Entry);
       Entry = GetNextNode (&xs.WatchEvents, Entry);
       RemoveEntryList (&Message->Link);
-      FreePool ((VOID*)Message->u.Watch.Vector);
+      FreePool ((VOID *)Message->u.Watch.Vector);
       FreePool (Message);
     }
   }
 
   if (!IsListEmpty (&xs.ReplyList)) {
-    XENSTORE_MESSAGE *Message;
-    LIST_ENTRY *Entry;
+    XENSTORE_MESSAGE  *Message;
+    LIST_ENTRY        *Entry;
     Entry = GetFirstNode (&xs.ReplyList);
     while (!IsNull (&xs.ReplyList, Entry)) {
       Message = XENSTORE_MESSAGE_FROM_LINK (Entry);
-      Entry = GetNextNode (&xs.ReplyList, Entry);
+      Entry   = GetNextNode (&xs.ReplyList, Entry);
       RemoveEntryList (&Message->Link);
       FreePool (Message->u.Reply.Body);
       FreePool (Message);
@@ -1121,7 +1178,7 @@ XenStoreDeinit (
   if (xs.XenStore->server_features & XENSTORE_SERVER_FEATURE_RECONNECTION) {
     xs.XenStore->connection = XENSTORE_RECONNECT;
     XenEventChannelNotify (xs.Dev, xs.EventChannel);
-    while (*(volatile UINT32*)&xs.XenStore->connection == XENSTORE_RECONNECT) {
+    while (*(volatile UINT32 *)&xs.XenStore->connection == XENSTORE_RECONNECT) {
       XenStoreWaitForEvent (xs.EventChannelEvent, EFI_TIMER_PERIOD_MILLISECONDS (100));
     }
   } else {
@@ -1134,6 +1191,7 @@ XenStoreDeinit (
     xs.XenStore->req_cons = xs.XenStore->req_prod = 0;
     xs.XenStore->rsp_cons = xs.XenStore->rsp_prod = 0;
   }
+
   xs.XenStore = NULL;
 }
 
@@ -1144,21 +1202,26 @@ XenStoreDeinit (
 
 XENSTORE_STATUS
 XenStoreListDirectory (
-  IN  CONST XENSTORE_TRANSACTION *Transaction,
-  IN  CONST CHAR8           *DirectoryPath,
-  IN  CONST CHAR8           *Node,
-  OUT UINT32                *DirectoryCountPtr,
-  OUT CONST CHAR8           ***DirectoryListPtr
+  IN  CONST XENSTORE_TRANSACTION  *Transaction,
+  IN  CONST CHAR8                 *DirectoryPath,
+  IN  CONST CHAR8                 *Node,
+  OUT UINT32                      *DirectoryCountPtr,
+  OUT CONST CHAR8                 ***DirectoryListPtr
   )
 {
-  CHAR8 *Path;
-  CHAR8 *TempStr;
-  UINT32 Len = 0;
-  XENSTORE_STATUS Status;
+  CHAR8            *Path;
+  CHAR8            *TempStr;
+  UINT32           Len = 0;
+  XENSTORE_STATUS  Status;
 
-  Path = XenStoreJoin (DirectoryPath, Node);
-  Status = XenStoreSingle (Transaction, XS_DIRECTORY, Path, &Len,
-                           (VOID **) &TempStr);
+  Path   = XenStoreJoin (DirectoryPath, Node);
+  Status = XenStoreSingle (
+             Transaction,
+             XS_DIRECTORY,
+             Path,
+             &Len,
+             (VOID **)&TempStr
+             );
   FreePool (Path);
   if (Status != XENSTORE_STATUS_SUCCESS) {
     return Status;
@@ -1171,38 +1234,44 @@ XenStoreListDirectory (
 
 BOOLEAN
 XenStorePathExists (
-  IN CONST XENSTORE_TRANSACTION *Transaction,
-  IN CONST CHAR8           *Directory,
-  IN CONST CHAR8           *Node
+  IN CONST XENSTORE_TRANSACTION  *Transaction,
+  IN CONST CHAR8                 *Directory,
+  IN CONST CHAR8                 *Node
   )
 {
-  CONST CHAR8 **TempStr;
-  XENSTORE_STATUS Status;
-  UINT32 TempNum;
+  CONST CHAR8      **TempStr;
+  XENSTORE_STATUS  Status;
+  UINT32           TempNum;
 
-  Status = XenStoreListDirectory (Transaction, Directory, Node,
-                                  &TempNum, &TempStr);
+  Status = XenStoreListDirectory (
+             Transaction,
+             Directory,
+             Node,
+             &TempNum,
+             &TempStr
+             );
   if (Status != XENSTORE_STATUS_SUCCESS) {
     return FALSE;
   }
-  FreePool ((VOID*)TempStr);
+
+  FreePool ((VOID *)TempStr);
   return TRUE;
 }
 
 XENSTORE_STATUS
 XenStoreRead (
-  IN  CONST XENSTORE_TRANSACTION *Transaction,
-  IN  CONST CHAR8             *DirectoryPath,
-  IN  CONST CHAR8             *Node,
-  OUT UINT32                  *LenPtr OPTIONAL,
-  OUT VOID                    **Result
+  IN  CONST XENSTORE_TRANSACTION  *Transaction,
+  IN  CONST CHAR8                 *DirectoryPath,
+  IN  CONST CHAR8                 *Node,
+  OUT UINT32                      *LenPtr OPTIONAL,
+  OUT VOID                        **Result
   )
 {
-  CHAR8 *Path;
-  VOID *Value;
-  XENSTORE_STATUS Status;
+  CHAR8            *Path;
+  VOID             *Value;
+  XENSTORE_STATUS  Status;
 
-  Path = XenStoreJoin (DirectoryPath, Node);
+  Path   = XenStoreJoin (DirectoryPath, Node);
   Status = XenStoreSingle (Transaction, XS_READ, Path, LenPtr, &Value);
   FreePool (Path);
   if (Status != XENSTORE_STATUS_SUCCESS) {
@@ -1215,22 +1284,22 @@ XenStoreRead (
 
 XENSTORE_STATUS
 XenStoreWrite (
-  IN CONST XENSTORE_TRANSACTION *Transaction,
-  IN CONST CHAR8           *DirectoryPath,
-  IN CONST CHAR8           *Node,
-  IN CONST CHAR8           *Str
+  IN CONST XENSTORE_TRANSACTION  *Transaction,
+  IN CONST CHAR8                 *DirectoryPath,
+  IN CONST CHAR8                 *Node,
+  IN CONST CHAR8                 *Str
   )
 {
-  CHAR8 *Path;
-  WRITE_REQUEST WriteRequest[2];
-  XENSTORE_STATUS Status;
+  CHAR8            *Path;
+  WRITE_REQUEST    WriteRequest[2];
+  XENSTORE_STATUS  Status;
 
   Path = XenStoreJoin (DirectoryPath, Node);
 
-  WriteRequest[0].Data = (VOID *) Path;
-  WriteRequest[0].Len = (UINT32)AsciiStrSize (Path);
-  WriteRequest[1].Data = (VOID *) Str;
-  WriteRequest[1].Len = (UINT32)AsciiStrLen (Str);
+  WriteRequest[0].Data = (VOID *)Path;
+  WriteRequest[0].Len  = (UINT32)AsciiStrSize (Path);
+  WriteRequest[1].Data = (VOID *)Str;
+  WriteRequest[1].Len  = (UINT32)AsciiStrLen (Str);
 
   Status = XenStoreTalkv (Transaction, XS_WRITE, WriteRequest, 2, NULL, NULL);
   FreePool (Path);
@@ -1240,15 +1309,15 @@ XenStoreWrite (
 
 XENSTORE_STATUS
 XenStoreRemove (
-  IN CONST XENSTORE_TRANSACTION *Transaction,
-  IN CONST CHAR8            *DirectoryPath,
-  IN CONST CHAR8            *Node
+  IN CONST XENSTORE_TRANSACTION  *Transaction,
+  IN CONST CHAR8                 *DirectoryPath,
+  IN CONST CHAR8                 *Node
   )
 {
-  CHAR8 *Path;
-  XENSTORE_STATUS Status;
+  CHAR8            *Path;
+  XENSTORE_STATUS  Status;
 
-  Path = XenStoreJoin (DirectoryPath, Node);
+  Path   = XenStoreJoin (DirectoryPath, Node);
   Status = XenStoreSingle (Transaction, XS_RM, Path, NULL, NULL);
   FreePool (Path);
 
@@ -1260,11 +1329,16 @@ XenStoreTransactionStart (
   OUT XENSTORE_TRANSACTION  *Transaction
   )
 {
-  CHAR8 *IdStr;
-  XENSTORE_STATUS Status;
+  CHAR8            *IdStr;
+  XENSTORE_STATUS  Status;
 
-  Status = XenStoreSingle (XST_NIL, XS_TRANSACTION_START, "", NULL,
-                           (VOID **) &IdStr);
+  Status = XenStoreSingle (
+             XST_NIL,
+             XS_TRANSACTION_START,
+             "",
+             NULL,
+             (VOID **)&IdStr
+             );
   if (Status == XENSTORE_STATUS_SUCCESS) {
     Transaction->Id = (UINT32)AsciiStrDecimalToUintn (IdStr);
     FreePool (IdStr);
@@ -1275,11 +1349,11 @@ XenStoreTransactionStart (
 
 XENSTORE_STATUS
 XenStoreTransactionEnd (
-  IN CONST XENSTORE_TRANSACTION *Transaction,
-  IN BOOLEAN                Abort
+  IN CONST XENSTORE_TRANSACTION  *Transaction,
+  IN BOOLEAN                     Abort
   )
 {
-  CHAR8 AbortStr[2];
+  CHAR8  AbortStr[2];
 
   AbortStr[0] = Abort ? 'F' : 'T';
   AbortStr[1] = '\0';
@@ -1290,17 +1364,17 @@ XenStoreTransactionEnd (
 XENSTORE_STATUS
 EFIAPI
 XenStoreVSPrint (
-  IN CONST XENSTORE_TRANSACTION *Transaction,
-  IN CONST CHAR8           *DirectoryPath,
-  IN CONST CHAR8           *Node,
-  IN CONST CHAR8           *FormatString,
-  IN VA_LIST               Marker
+  IN CONST XENSTORE_TRANSACTION  *Transaction,
+  IN CONST CHAR8                 *DirectoryPath,
+  IN CONST CHAR8                 *Node,
+  IN CONST CHAR8                 *FormatString,
+  IN VA_LIST                     Marker
   )
 {
-  CHAR8 *Buf;
-  XENSTORE_STATUS Status;
-  UINTN BufSize;
-  VA_LIST Marker2;
+  CHAR8            *Buf;
+  XENSTORE_STATUS  Status;
+  UINTN            BufSize;
+  VA_LIST          Marker2;
 
   VA_COPY (Marker2, Marker);
   BufSize = SPrintLengthAsciiFormat (FormatString, Marker2) + 1;
@@ -1316,15 +1390,15 @@ XenStoreVSPrint (
 XENSTORE_STATUS
 EFIAPI
 XenStoreSPrint (
-  IN CONST XENSTORE_TRANSACTION *Transaction,
-  IN CONST CHAR8            *DirectoryPath,
-  IN CONST CHAR8            *Node,
-  IN CONST CHAR8            *FormatString,
+  IN CONST XENSTORE_TRANSACTION  *Transaction,
+  IN CONST CHAR8                 *DirectoryPath,
+  IN CONST CHAR8                 *Node,
+  IN CONST CHAR8                 *FormatString,
   ...
   )
 {
-  VA_LIST Marker;
-  XENSTORE_STATUS Status;
+  VA_LIST          Marker;
+  XENSTORE_STATUS  Status;
 
   VA_START (Marker, FormatString);
   Status = XenStoreVSPrint (Transaction, DirectoryPath, Node, FormatString, Marker);
@@ -1341,19 +1415,19 @@ XenStoreRegisterWatch (
   )
 {
   /* Pointer in ascii is the token. */
-  CHAR8 Token[sizeof (XENSTORE_WATCH) * 2 + 1];
-  XENSTORE_STATUS Status;
-  XENSTORE_WATCH *Watch;
+  CHAR8            Token[sizeof (XENSTORE_WATCH) * 2 + 1];
+  XENSTORE_STATUS  Status;
+  XENSTORE_WATCH   *Watch;
 
-  Watch = AllocateZeroPool (sizeof (XENSTORE_WATCH));
+  Watch            = AllocateZeroPool (sizeof (XENSTORE_WATCH));
   Watch->Signature = XENSTORE_WATCH_SIGNATURE;
-  Watch->Node = XenStoreJoin (DirectoryPath, Node);
+  Watch->Node      = XenStoreJoin (DirectoryPath, Node);
 
   EfiAcquireLock (&xs.RegisteredWatchesLock);
   InsertTailList (&xs.RegisteredWatches, &Watch->Link);
   EfiReleaseLock (&xs.RegisteredWatchesLock);
 
-  AsciiSPrint (Token, sizeof (Token), "%p", (VOID*) Watch);
+  AsciiSPrint (Token, sizeof (Token), "%p", (VOID *)Watch);
   Status = XenStoreWatch (Watch->Node, Token);
 
   /* Ignore errors due to multiple registration. */
@@ -1376,15 +1450,15 @@ XenStoreRegisterWatch (
 
 VOID
 XenStoreUnregisterWatch (
-  IN XENSTORE_WATCH *Watch
+  IN XENSTORE_WATCH  *Watch
   )
 {
-  CHAR8 Token[sizeof (Watch) * 2 + 1];
-  LIST_ENTRY *Entry;
+  CHAR8       Token[sizeof (Watch) * 2 + 1];
+  LIST_ENTRY  *Entry;
 
   ASSERT (Watch->Signature == XENSTORE_WATCH_SIGNATURE);
 
-  AsciiSPrint (Token, sizeof (Token), "%p", (VOID *) Watch);
+  AsciiSPrint (Token, sizeof (Token), "%p", (VOID *)Watch);
   if (XenStoreFindWatch (Token) == NULL) {
     return;
   }
@@ -1399,20 +1473,20 @@ XenStoreUnregisterWatch (
   EfiAcquireLock (&xs.WatchEventsLock);
   Entry = GetFirstNode (&xs.WatchEvents);
   while (!IsNull (&xs.WatchEvents, Entry)) {
-    XENSTORE_MESSAGE *Message = XENSTORE_MESSAGE_FROM_LINK (Entry);
+    XENSTORE_MESSAGE  *Message = XENSTORE_MESSAGE_FROM_LINK (Entry);
     Entry = GetNextNode (&xs.WatchEvents, Entry);
     if (Message->u.Watch.Handle == Watch) {
       RemoveEntryList (&Message->Link);
-      FreePool ((VOID*)Message->u.Watch.Vector);
+      FreePool ((VOID *)Message->u.Watch.Vector);
       FreePool (Message);
     }
   }
+
   EfiReleaseLock (&xs.WatchEventsLock);
 
   FreePool (Watch->Node);
   FreePool (Watch);
 }
-
 
 //
 // XENBUS protocol
@@ -1421,8 +1495,8 @@ XenStoreUnregisterWatch (
 XENSTORE_STATUS
 EFIAPI
 XenBusWaitForWatch (
-  IN XENBUS_PROTOCOL *This,
-  IN VOID *Token
+  IN XENBUS_PROTOCOL  *This,
+  IN VOID             *Token
   )
 {
   return XenStoreWaitWatch (Token);
@@ -1431,10 +1505,10 @@ XenBusWaitForWatch (
 XENSTORE_STATUS
 EFIAPI
 XenBusXenStoreRead (
-  IN  XENBUS_PROTOCOL       *This,
-  IN  CONST XENSTORE_TRANSACTION *Transaction,
-  IN  CONST CHAR8           *Node,
-  OUT VOID                  **Value
+  IN  XENBUS_PROTOCOL             *This,
+  IN  CONST XENSTORE_TRANSACTION  *Transaction,
+  IN  CONST CHAR8                 *Node,
+  OUT VOID                        **Value
   )
 {
   return XenStoreRead (Transaction, This->Node, Node, NULL, Value);
@@ -1443,10 +1517,10 @@ XenBusXenStoreRead (
 XENSTORE_STATUS
 EFIAPI
 XenBusXenStoreBackendRead (
-  IN  XENBUS_PROTOCOL       *This,
-  IN  CONST XENSTORE_TRANSACTION *Transaction,
-  IN  CONST CHAR8           *Node,
-  OUT VOID                  **Value
+  IN  XENBUS_PROTOCOL             *This,
+  IN  CONST XENSTORE_TRANSACTION  *Transaction,
+  IN  CONST CHAR8                 *Node,
+  OUT VOID                        **Value
   )
 {
   return XenStoreRead (Transaction, This->Backend, Node, NULL, Value);
@@ -1455,9 +1529,9 @@ XenBusXenStoreBackendRead (
 XENSTORE_STATUS
 EFIAPI
 XenBusXenStoreRemove (
-  IN XENBUS_PROTOCOL        *This,
-  IN CONST XENSTORE_TRANSACTION *Transaction,
-  IN const char             *Node
+  IN XENBUS_PROTOCOL             *This,
+  IN CONST XENSTORE_TRANSACTION  *Transaction,
+  IN const char                  *Node
   )
 {
   return XenStoreRemove (Transaction, This->Node, Node);
@@ -1476,9 +1550,9 @@ XenBusXenStoreTransactionStart (
 XENSTORE_STATUS
 EFIAPI
 XenBusXenStoreTransactionEnd (
-  IN XENBUS_PROTOCOL        *This,
-  IN CONST XENSTORE_TRANSACTION *Transaction,
-  IN BOOLEAN                Abort
+  IN XENBUS_PROTOCOL             *This,
+  IN CONST XENSTORE_TRANSACTION  *Transaction,
+  IN BOOLEAN                     Abort
   )
 {
   return XenStoreTransactionEnd (Transaction, Abort);
@@ -1487,16 +1561,16 @@ XenBusXenStoreTransactionEnd (
 XENSTORE_STATUS
 EFIAPI
 XenBusXenStoreSPrint (
-  IN XENBUS_PROTOCOL        *This,
-  IN CONST XENSTORE_TRANSACTION *Transaction,
-  IN CONST CHAR8            *DirectoryPath,
-  IN CONST CHAR8            *Node,
-  IN CONST CHAR8            *FormatString,
+  IN XENBUS_PROTOCOL             *This,
+  IN CONST XENSTORE_TRANSACTION  *Transaction,
+  IN CONST CHAR8                 *DirectoryPath,
+  IN CONST CHAR8                 *Node,
+  IN CONST CHAR8                 *FormatString,
   ...
   )
 {
-  VA_LIST Marker;
-  XENSTORE_STATUS Status;
+  VA_LIST          Marker;
+  XENSTORE_STATUS  Status;
 
   VA_START (Marker, FormatString);
   Status = XenStoreVSPrint (Transaction, DirectoryPath, Node, FormatString, Marker);
@@ -1508,23 +1582,23 @@ XenBusXenStoreSPrint (
 XENSTORE_STATUS
 EFIAPI
 XenBusRegisterWatch (
-  IN  XENBUS_PROTOCOL *This,
-  IN  CONST CHAR8     *Node,
-  OUT VOID            **Token
+  IN  XENBUS_PROTOCOL  *This,
+  IN  CONST CHAR8      *Node,
+  OUT VOID             **Token
   )
 {
-  return XenStoreRegisterWatch (This->Node, Node, (XENSTORE_WATCH **) Token);
+  return XenStoreRegisterWatch (This->Node, Node, (XENSTORE_WATCH **)Token);
 }
 
 XENSTORE_STATUS
 EFIAPI
 XenBusRegisterWatchBackend (
-  IN  XENBUS_PROTOCOL *This,
-  IN  CONST CHAR8     *Node,
-  OUT VOID            **Token
+  IN  XENBUS_PROTOCOL  *This,
+  IN  CONST CHAR8      *Node,
+  OUT VOID             **Token
   )
 {
-  return XenStoreRegisterWatch (This->Backend, Node, (XENSTORE_WATCH **) Token);
+  return XenStoreRegisterWatch (This->Backend, Node, (XENSTORE_WATCH **)Token);
 }
 
 VOID
@@ -1534,5 +1608,5 @@ XenBusUnregisterWatch (
   IN VOID             *Token
   )
 {
-  XenStoreUnregisterWatch ((XENSTORE_WATCH *) Token);
+  XenStoreUnregisterWatch ((XENSTORE_WATCH *)Token);
 }

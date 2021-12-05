@@ -21,15 +21,15 @@
 EFI_STATUS
 EFIAPI
 VirtioFsOpenVolume (
-  IN  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *This,
-  OUT EFI_FILE_PROTOCOL               **Root
+  IN  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *This,
+  OUT EFI_FILE_PROTOCOL                **Root
   )
 {
-  VIRTIO_FS      *VirtioFs;
-  VIRTIO_FS_FILE *VirtioFsFile;
-  EFI_STATUS     Status;
-  CHAR8          *CanonicalPathname;
-  UINT64         RootDirHandle;
+  VIRTIO_FS       *VirtioFs;
+  VIRTIO_FS_FILE  *VirtioFsFile;
+  EFI_STATUS      Status;
+  CHAR8           *CanonicalPathname;
+  UINT64          RootDirHandle;
 
   VirtioFs = VIRTIO_FS_FROM_SIMPLE_FS (This);
 
@@ -47,8 +47,11 @@ VirtioFsOpenVolume (
   //
   // Open the root directory.
   //
-  Status = VirtioFsFuseOpenDir (VirtioFs, VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID,
-             &RootDirHandle);
+  Status = VirtioFsFuseOpenDir (
+             VirtioFs,
+             VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID,
+             &RootDirHandle
+             );
   if (EFI_ERROR (Status)) {
     goto FreeCanonicalPathname;
   }

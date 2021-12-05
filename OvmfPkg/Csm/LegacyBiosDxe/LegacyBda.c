@@ -21,25 +21,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 LegacyBiosInitBda (
-  IN  LEGACY_BIOS_INSTANCE    *Private
+  IN  LEGACY_BIOS_INSTANCE  *Private
   )
 {
-  BDA_STRUC *Bda;
-  UINT8     *Ebda;
+  BDA_STRUC  *Bda;
+  UINT8      *Ebda;
 
-  Bda   = (BDA_STRUC *) ((UINTN) 0x400);
-  Ebda  = (UINT8 *) ((UINTN) 0x9fc00);
+  Bda  = (BDA_STRUC *)((UINTN)0x400);
+  Ebda = (UINT8 *)((UINTN)0x9fc00);
 
   ACCESS_PAGE0_CODE (
     ZeroMem (Bda, 0x100);
     //
     // 640k-1k for EBDA
     //
-    Bda->MemSize        = 0x27f;
-    Bda->KeyHead        = 0x1e;
-    Bda->KeyTail        = 0x1e;
-    Bda->FloppyData     = 0x00;
-    Bda->FloppyTimeout  = 0xff;
+    Bda->MemSize       = 0x27f;
+    Bda->KeyHead       = 0x1e;
+    Bda->KeyTail       = 0x1e;
+    Bda->FloppyData    = 0x00;
+    Bda->FloppyTimeout = 0xff;
 
     Bda->KeyStart       = 0x001E;
     Bda->KeyEnd         = 0x003E;
@@ -50,10 +50,10 @@ LegacyBiosInitBda (
     // Move LPT time out here and zero out LPT4 since some SCSI OPROMS
     // use this as scratch pad (LPT4 is Reserved)
     //
-    Bda->Lpt1_2Timeout  = 0x1414;
-    Bda->Lpt3_4Timeout  = 0x1400;
+    Bda->Lpt1_2Timeout = 0x1414;
+    Bda->Lpt3_4Timeout = 0x1400;
 
-  );
+    );
 
   ZeroMem (Ebda, 0x400);
   *Ebda = 0x01;

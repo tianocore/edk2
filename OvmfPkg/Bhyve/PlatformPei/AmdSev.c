@@ -30,8 +30,8 @@ AmdSevInitialize (
   VOID
   )
 {
-  UINT64                            EncryptionMask;
-  RETURN_STATUS                     PcdStatus;
+  UINT64         EncryptionMask;
+  RETURN_STATUS  PcdStatus;
 
   //
   // Check if SEV is enabled
@@ -44,7 +44,7 @@ AmdSevInitialize (
   // Set Memory Encryption Mask PCD
   //
   EncryptionMask = MemEncryptSevGetEncryptionMask ();
-  PcdStatus = PcdSet64S (PcdPteMemoryEncryptionAddressOrMask, EncryptionMask);
+  PcdStatus      = PcdSet64S (PcdPteMemoryEncryptionAddressOrMask, EncryptionMask);
   ASSERT_RETURN_ERROR (PcdStatus);
 
   DEBUG ((DEBUG_INFO, "SEV is enabled (mask 0x%lx)\n", EncryptionMask));
@@ -67,9 +67,9 @@ AmdSevInitialize (
   // hypervisor.
   //
   if (FeaturePcdGet (PcdSmmSmramRequire) && (mBootMode != BOOT_ON_S3_RESUME)) {
-    RETURN_STATUS LocateMapStatus;
-    UINTN         MapPagesBase;
-    UINTN         MapPagesCount;
+    RETURN_STATUS  LocateMapStatus;
+    UINTN          MapPagesBase;
+    UINTN          MapPagesCount;
 
     LocateMapStatus = MemEncryptSevLocateInitialSmramSaveStateMapPages (
                         &MapPagesBase,

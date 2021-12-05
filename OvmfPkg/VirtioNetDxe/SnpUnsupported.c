@@ -32,17 +32,15 @@
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetReset (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  IN BOOLEAN                     ExtendedVerification
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      ExtendedVerification
   )
 {
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Modifies or resets the current station address, if supported.
@@ -63,18 +61,16 @@ VirtioNetReset (
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetStationAddress (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  IN BOOLEAN                     Reset,
-  IN EFI_MAC_ADDRESS             *New OPTIONAL
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      Reset,
+  IN EFI_MAC_ADDRESS              *New OPTIONAL
   )
 {
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Resets or collects the statistics on a network interface.
@@ -102,19 +98,17 @@ VirtioNetStationAddress (
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetStatistics (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  IN BOOLEAN                     Reset,
-  IN OUT UINTN                   *StatisticsSize   OPTIONAL,
-  OUT EFI_NETWORK_STATISTICS     *StatisticsTable  OPTIONAL
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      Reset,
+  IN OUT UINTN                    *StatisticsSize   OPTIONAL,
+  OUT EFI_NETWORK_STATISTICS      *StatisticsTable  OPTIONAL
   )
 {
   return EFI_UNSUPPORTED;
 }
-
 
 /**
   Performs read and write operations on the NVRAM device attached to a  network
@@ -139,15 +133,14 @@ VirtioNetStatistics (
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetNvData (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  IN BOOLEAN                     ReadWrite,
-  IN UINTN                       Offset,
-  IN UINTN                       BufferSize,
-  IN OUT VOID                    *Buffer
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      ReadWrite,
+  IN UINTN                        Offset,
+  IN UINTN                        BufferSize,
+  IN OUT VOID                     *Buffer
   )
 {
   return EFI_UNSUPPORTED;

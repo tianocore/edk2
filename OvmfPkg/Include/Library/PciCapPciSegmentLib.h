@@ -12,7 +12,6 @@
 
 #include <Library/PciCapLib.h>
 
-
 /**
   Create a PCI_CAP_DEV object from the PCI Segment:Bus:Device.Function
   quadruplet. The config space accessors are based upon PciSegmentLib.
@@ -52,14 +51,13 @@
 RETURN_STATUS
 EFIAPI
 PciCapPciSegmentDeviceInit (
-  IN  PCI_CAP_DOMAIN MaxDomain,
-  IN  UINT16         Segment,
-  IN  UINT8          Bus,
-  IN  UINT8          Device,
-  IN  UINT8          Function,
-  OUT PCI_CAP_DEV    **PciDevice
+  IN  PCI_CAP_DOMAIN  MaxDomain,
+  IN  UINT16          Segment,
+  IN  UINT8           Bus,
+  IN  UINT8           Device,
+  IN  UINT8           Function,
+  OUT PCI_CAP_DEV     **PciDevice
   );
-
 
 /**
   Free the resources used by PciDevice.
@@ -70,7 +68,7 @@ PciCapPciSegmentDeviceInit (
 VOID
 EFIAPI
 PciCapPciSegmentDeviceUninit (
-  IN PCI_CAP_DEV *PciDevice
+  IN PCI_CAP_DEV  *PciDevice
   );
 
 #endif // __PCI_CAP_PCI_SEGMENT_LIB_H__

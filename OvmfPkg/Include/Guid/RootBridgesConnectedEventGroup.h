@@ -22,6 +22,6 @@
     { 0x90, 0x42, 0xf2, 0x6e, 0x47, 0x97, 0xee, 0x69 }, \
   }
 
-extern EFI_GUID gRootBridgesConnectedEventGroupGuid;
+extern EFI_GUID  gRootBridgesConnectedEventGroupGuid;
 
 #endif

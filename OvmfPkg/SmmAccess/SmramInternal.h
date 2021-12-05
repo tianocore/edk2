@@ -28,7 +28,7 @@ typedef enum {
 //
 // The value of PcdQ35TsegMbytes is saved into this variable at module startup.
 //
-extern UINT16 mQ35TsegMbytes;
+extern UINT16  mQ35TsegMbytes;
 
 /**
   Save PcdQ35TsegMbytes into mQ35TsegMbytes.
@@ -62,8 +62,8 @@ InitQ35SmramAtDefaultSmbase (
 **/
 VOID
 GetStates (
-  OUT BOOLEAN *LockState,
-  OUT BOOLEAN *OpenState
+  OUT BOOLEAN  *LockState,
+  OUT BOOLEAN  *OpenState
   );
 
 //
@@ -79,26 +79,26 @@ GetStates (
 
 EFI_STATUS
 SmramAccessOpen (
-  OUT BOOLEAN *LockState,
-  OUT BOOLEAN *OpenState
+  OUT BOOLEAN  *LockState,
+  OUT BOOLEAN  *OpenState
   );
 
 EFI_STATUS
 SmramAccessClose (
-  OUT BOOLEAN *LockState,
-  OUT BOOLEAN *OpenState
+  OUT BOOLEAN  *LockState,
+  OUT BOOLEAN  *OpenState
   );
 
 EFI_STATUS
 SmramAccessLock (
-  OUT    BOOLEAN *LockState,
-  IN OUT BOOLEAN *OpenState
+  OUT    BOOLEAN  *LockState,
+  IN OUT BOOLEAN  *OpenState
   );
 
 EFI_STATUS
 SmramAccessGetCapabilities (
-  IN BOOLEAN                  LockState,
-  IN BOOLEAN                  OpenState,
-  IN OUT UINTN                *SmramMapSize,
-  IN OUT EFI_SMRAM_DESCRIPTOR *SmramMap
+  IN BOOLEAN                   LockState,
+  IN BOOLEAN                   OpenState,
+  IN OUT UINTN                 *SmramMapSize,
+  IN OUT EFI_SMRAM_DESCRIPTOR  *SmramMap
   );

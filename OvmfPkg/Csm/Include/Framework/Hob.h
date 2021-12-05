@@ -17,12 +17,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// This macro is defined to comply with the hob Framework Spec. And the marco was
 /// retired in the PI1.0 specification.
 ///
-#define EFI_HOB_TYPE_CV           0x0008
+#define EFI_HOB_TYPE_CV  0x0008
 
 typedef struct {
-  EFI_HOB_GENERIC_HEADER            Header;
-  EFI_PHYSICAL_ADDRESS              BaseAddress;
-  UINT64                            Length;
+  EFI_HOB_GENERIC_HEADER    Header;
+  EFI_PHYSICAL_ADDRESS      BaseAddress;
+  UINT64                    Length;
 } EFI_HOB_CAPSULE_VOLUME;
 
 #endif

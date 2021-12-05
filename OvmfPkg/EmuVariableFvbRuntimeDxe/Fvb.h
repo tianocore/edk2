@@ -19,35 +19,32 @@ Abstract:
 //
 // Fvb Protocol instance data
 //
-#define FVB_DEVICE_FROM_THIS(a)         CR (a, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
-#define FVB_DEVICE_SIGNATURE            SIGNATURE_32 ('F', 'V', 'B', 'N')
+#define FVB_DEVICE_FROM_THIS(a)  CR (a, EFI_FW_VOL_BLOCK_DEVICE, FwVolBlockInstance, FVB_DEVICE_SIGNATURE)
+#define FVB_DEVICE_SIGNATURE  SIGNATURE_32 ('F', 'V', 'B', 'N')
 
 #pragma pack (1)
 
 typedef struct {
-
-  EFI_FIRMWARE_VOLUME_HEADER FvHdr;
-  EFI_FV_BLOCK_MAP_ENTRY     EndBlockMap;
-  VARIABLE_STORE_HEADER      VarHdr;
-
+  EFI_FIRMWARE_VOLUME_HEADER    FvHdr;
+  EFI_FV_BLOCK_MAP_ENTRY        EndBlockMap;
+  VARIABLE_STORE_HEADER         VarHdr;
 } FVB_FV_HDR_AND_VARS_TEMPLATE;
 
 typedef struct {
-  MEMMAP_DEVICE_PATH        MemMapDevPath;
-  EFI_DEVICE_PATH_PROTOCOL  EndDevPath;
+  MEMMAP_DEVICE_PATH          MemMapDevPath;
+  EFI_DEVICE_PATH_PROTOCOL    EndDevPath;
 } FV_DEVICE_PATH;
 
 #pragma pack ()
 
 typedef struct {
-  UINTN                               Signature;
-  FV_DEVICE_PATH                      DevicePath;
-  VOID                                *BufferPtr;
-  UINTN                               BlockSize;
-  UINTN                               Size;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  FwVolBlockInstance;
+  UINTN                                 Signature;
+  FV_DEVICE_PATH                        DevicePath;
+  VOID                                  *BufferPtr;
+  UINTN                                 BlockSize;
+  UINTN                                 Size;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    FwVolBlockInstance;
 } EFI_FW_VOL_BLOCK_DEVICE;
-
 
 //
 // Constants
@@ -63,12 +60,12 @@ typedef struct {
 #define FTW_WRITE_QUEUE_SIZE \
   (FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) - \
    sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER))
-#define EMU_FV_HEADER_LENGTH OFFSET_OF (FVB_FV_HDR_AND_VARS_TEMPLATE, VarHdr)
+#define EMU_FV_HEADER_LENGTH  OFFSET_OF (FVB_FV_HDR_AND_VARS_TEMPLATE, VarHdr)
 
-#define NOT_ERASED_BIT 0
-#define ERASED_BIT     1
-#define ERASED_UINT8   0xff
-#define ERASED_UINT32  0xffffffff
+#define NOT_ERASED_BIT  0
+#define ERASED_BIT      1
+#define ERASED_UINT8    0xff
+#define ERASED_UINT32   0xffffffff
 
 //
 // Protocol APIs

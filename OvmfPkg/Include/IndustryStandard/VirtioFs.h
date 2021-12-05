@@ -22,12 +22,12 @@
 //
 // Lowest numbered queue for sending normal priority requests.
 //
-#define VIRTIO_FS_REQUEST_QUEUE 1
+#define VIRTIO_FS_REQUEST_QUEUE  1
 
 //
 // Number of bytes in the "VIRTIO_FS_CONFIG.Tag" field.
 //
-#define VIRTIO_FS_TAG_BYTES 36
+#define VIRTIO_FS_TAG_BYTES  36
 
 //
 // Device configuration layout.
@@ -40,12 +40,12 @@ typedef struct {
   // encoded bytes take up the entire Tag field, then there is no NUL
   // terminator.
   //
-  UINT8 Tag[VIRTIO_FS_TAG_BYTES];
+  UINT8     Tag[VIRTIO_FS_TAG_BYTES];
   //
   // The total number of request virtqueues exposed by the device (i.e.,
   // excluding the "hiprio" queue).
   //
-  UINT32 NumReqQueues;
+  UINT32    NumReqQueues;
 } VIRTIO_FS_CONFIG;
 #pragma pack ()
 
@@ -74,56 +74,56 @@ typedef struct {
 // interface version 7.32.
 //
 #define VIRTIO_FS_FUSE_MAJOR  7
-#define VIRTIO_FS_FUSE_MINOR 31
+#define VIRTIO_FS_FUSE_MINOR  31
 
 //
 // The inode number of the root directory.
 //
-#define VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID 1
+#define VIRTIO_FS_FUSE_ROOT_DIR_NODE_ID  1
 
 //
 // Distinguished errno values.
 //
-#define VIRTIO_FS_FUSE_ERRNO_ENOENT (-2)
+#define VIRTIO_FS_FUSE_ERRNO_ENOENT  (-2)
 
 //
 // File mode bitmasks.
 //
-#define VIRTIO_FS_FUSE_MODE_TYPE_MASK 0170000u
-#define VIRTIO_FS_FUSE_MODE_TYPE_REG  0100000u
-#define VIRTIO_FS_FUSE_MODE_TYPE_DIR  0040000u
-#define VIRTIO_FS_FUSE_MODE_PERM_RWXU 0000700u
-#define VIRTIO_FS_FUSE_MODE_PERM_RUSR 0000400u
-#define VIRTIO_FS_FUSE_MODE_PERM_WUSR 0000200u
-#define VIRTIO_FS_FUSE_MODE_PERM_XUSR 0000100u
-#define VIRTIO_FS_FUSE_MODE_PERM_RWXG 0000070u
-#define VIRTIO_FS_FUSE_MODE_PERM_RGRP 0000040u
-#define VIRTIO_FS_FUSE_MODE_PERM_WGRP 0000020u
-#define VIRTIO_FS_FUSE_MODE_PERM_XGRP 0000010u
-#define VIRTIO_FS_FUSE_MODE_PERM_RWXO 0000007u
-#define VIRTIO_FS_FUSE_MODE_PERM_ROTH 0000004u
-#define VIRTIO_FS_FUSE_MODE_PERM_WOTH 0000002u
-#define VIRTIO_FS_FUSE_MODE_PERM_XOTH 0000001u
+#define VIRTIO_FS_FUSE_MODE_TYPE_MASK  0170000u
+#define VIRTIO_FS_FUSE_MODE_TYPE_REG   0100000u
+#define VIRTIO_FS_FUSE_MODE_TYPE_DIR   0040000u
+#define VIRTIO_FS_FUSE_MODE_PERM_RWXU  0000700u
+#define VIRTIO_FS_FUSE_MODE_PERM_RUSR  0000400u
+#define VIRTIO_FS_FUSE_MODE_PERM_WUSR  0000200u
+#define VIRTIO_FS_FUSE_MODE_PERM_XUSR  0000100u
+#define VIRTIO_FS_FUSE_MODE_PERM_RWXG  0000070u
+#define VIRTIO_FS_FUSE_MODE_PERM_RGRP  0000040u
+#define VIRTIO_FS_FUSE_MODE_PERM_WGRP  0000020u
+#define VIRTIO_FS_FUSE_MODE_PERM_XGRP  0000010u
+#define VIRTIO_FS_FUSE_MODE_PERM_RWXO  0000007u
+#define VIRTIO_FS_FUSE_MODE_PERM_ROTH  0000004u
+#define VIRTIO_FS_FUSE_MODE_PERM_WOTH  0000002u
+#define VIRTIO_FS_FUSE_MODE_PERM_XOTH  0000001u
 
 //
 // Flags for VirtioFsFuseOpSetAttr, in the VIRTIO_FS_FUSE_SETATTR_REQUEST.Valid
 // field.
 //
-#define VIRTIO_FS_FUSE_SETATTR_REQ_F_MODE  BIT0
-#define VIRTIO_FS_FUSE_SETATTR_REQ_F_SIZE  BIT3
-#define VIRTIO_FS_FUSE_SETATTR_REQ_F_ATIME BIT4
-#define VIRTIO_FS_FUSE_SETATTR_REQ_F_MTIME BIT5
+#define VIRTIO_FS_FUSE_SETATTR_REQ_F_MODE   BIT0
+#define VIRTIO_FS_FUSE_SETATTR_REQ_F_SIZE   BIT3
+#define VIRTIO_FS_FUSE_SETATTR_REQ_F_ATIME  BIT4
+#define VIRTIO_FS_FUSE_SETATTR_REQ_F_MTIME  BIT5
 
 //
 // Flags for VirtioFsFuseOpOpen.
 //
-#define VIRTIO_FS_FUSE_OPEN_REQ_F_RDONLY 0
-#define VIRTIO_FS_FUSE_OPEN_REQ_F_RDWR   2
+#define VIRTIO_FS_FUSE_OPEN_REQ_F_RDONLY  0
+#define VIRTIO_FS_FUSE_OPEN_REQ_F_RDWR    2
 
 //
 // Flags for VirtioFsFuseOpInit.
 //
-#define VIRTIO_FS_FUSE_INIT_REQ_F_DO_READDIRPLUS BIT13
+#define VIRTIO_FS_FUSE_INIT_REQ_F_DO_READDIRPLUS  BIT13
 
 /**
   Macro for calculating the size of a directory stream entry.
@@ -156,7 +156,7 @@ typedef struct {
 //
 // Flags for VirtioFsFuseOpRename2.
 //
-#define VIRTIO_FS_FUSE_RENAME2_REQ_F_NOREPLACE BIT0
+#define VIRTIO_FS_FUSE_RENAME2_REQ_F_NOREPLACE  BIT0
 
 //
 // FUSE operation codes.
@@ -190,20 +190,20 @@ typedef enum {
 // Request-response headers common to all request types.
 //
 typedef struct {
-  UINT32 Len;
-  UINT32 Opcode;
-  UINT64 Unique;
-  UINT64 NodeId;
-  UINT32 Uid;
-  UINT32 Gid;
-  UINT32 Pid;
-  UINT32 Padding;
+  UINT32    Len;
+  UINT32    Opcode;
+  UINT64    Unique;
+  UINT64    NodeId;
+  UINT32    Uid;
+  UINT32    Gid;
+  UINT32    Pid;
+  UINT32    Padding;
 } VIRTIO_FS_FUSE_REQUEST;
 
 typedef struct {
-  UINT32 Len;
-  INT32  Error;
-  UINT64 Unique;
+  UINT32    Len;
+  INT32     Error;
+  UINT64    Unique;
 } VIRTIO_FS_FUSE_RESPONSE;
 
 //
@@ -213,12 +213,12 @@ typedef struct {
 // an inode.
 //
 typedef struct {
-  UINT64 NodeId;
-  UINT64 Generation;
-  UINT64 EntryValid;
-  UINT64 AttrValid;
-  UINT32 EntryValidNsec;
-  UINT32 AttrValidNsec;
+  UINT64    NodeId;
+  UINT64    Generation;
+  UINT64    EntryValid;
+  UINT64    AttrValid;
+  UINT32    EntryValidNsec;
+  UINT32    AttrValidNsec;
 } VIRTIO_FS_FUSE_NODE_RESPONSE;
 
 //
@@ -227,29 +227,29 @@ typedef struct {
 // an inode.
 //
 typedef struct {
-  UINT64 Ino;
-  UINT64 Size;
-  UINT64 Blocks;
-  UINT64 Atime;
-  UINT64 Mtime;
-  UINT64 Ctime;
-  UINT32 AtimeNsec;
-  UINT32 MtimeNsec;
-  UINT32 CtimeNsec;
-  UINT32 Mode;
-  UINT32 Nlink;
-  UINT32 Uid;
-  UINT32 Gid;
-  UINT32 Rdev;
-  UINT32 Blksize;
-  UINT32 Padding;
+  UINT64    Ino;
+  UINT64    Size;
+  UINT64    Blocks;
+  UINT64    Atime;
+  UINT64    Mtime;
+  UINT64    Ctime;
+  UINT32    AtimeNsec;
+  UINT32    MtimeNsec;
+  UINT32    CtimeNsec;
+  UINT32    Mode;
+  UINT32    Nlink;
+  UINT32    Uid;
+  UINT32    Gid;
+  UINT32    Rdev;
+  UINT32    Blksize;
+  UINT32    Padding;
 } VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpForget.
 //
 typedef struct {
-  UINT64 NumberOfLookups;
+  UINT64    NumberOfLookups;
 } VIRTIO_FS_FUSE_FORGET_REQUEST;
 
 //
@@ -257,169 +257,169 @@ typedef struct {
 // for VirtioFsFuseOpSetAttr).
 //
 typedef struct {
-  UINT32 GetAttrFlags;
-  UINT32 Dummy;
-  UINT64 FileHandle;
+  UINT32    GetAttrFlags;
+  UINT32    Dummy;
+  UINT64    FileHandle;
 } VIRTIO_FS_FUSE_GETATTR_REQUEST;
 
 typedef struct {
-  UINT64 AttrValid;
-  UINT32 AttrValidNsec;
-  UINT32 Dummy;
+  UINT64    AttrValid;
+  UINT32    AttrValidNsec;
+  UINT32    Dummy;
 } VIRTIO_FS_FUSE_GETATTR_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpSetAttr.
 //
 typedef struct {
-  UINT32 Valid;
-  UINT32 Padding;
-  UINT64 FileHandle;
-  UINT64 Size;
-  UINT64 LockOwner;
-  UINT64 Atime;
-  UINT64 Mtime;
-  UINT64 Ctime;
-  UINT32 AtimeNsec;
-  UINT32 MtimeNsec;
-  UINT32 CtimeNsec;
-  UINT32 Mode;
-  UINT32 Unused4;
-  UINT32 Uid;
-  UINT32 Gid;
-  UINT32 Unused5;
+  UINT32    Valid;
+  UINT32    Padding;
+  UINT64    FileHandle;
+  UINT64    Size;
+  UINT64    LockOwner;
+  UINT64    Atime;
+  UINT64    Mtime;
+  UINT64    Ctime;
+  UINT32    AtimeNsec;
+  UINT32    MtimeNsec;
+  UINT32    CtimeNsec;
+  UINT32    Mode;
+  UINT32    Unused4;
+  UINT32    Uid;
+  UINT32    Gid;
+  UINT32    Unused5;
 } VIRTIO_FS_FUSE_SETATTR_REQUEST;
 
 //
 // Header for VirtioFsFuseOpMkDir.
 //
 typedef struct {
-  UINT32 Mode;
-  UINT32 Umask;
+  UINT32    Mode;
+  UINT32    Umask;
 } VIRTIO_FS_FUSE_MKDIR_REQUEST;
 
 //
 // Headers for VirtioFsFuseOpOpen and VirtioFsFuseOpOpenDir.
 //
 typedef struct {
-  UINT32 Flags;
-  UINT32 Unused;
+  UINT32    Flags;
+  UINT32    Unused;
 } VIRTIO_FS_FUSE_OPEN_REQUEST;
 
 typedef struct {
-  UINT64 FileHandle;
-  UINT32 OpenFlags;
-  UINT32 Padding;
+  UINT64    FileHandle;
+  UINT32    OpenFlags;
+  UINT32    Padding;
 } VIRTIO_FS_FUSE_OPEN_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpRead and VirtioFsFuseOpReadDirPlus.
 //
 typedef struct {
-  UINT64 FileHandle;
-  UINT64 Offset;
-  UINT32 Size;
-  UINT32 ReadFlags;
-  UINT64 LockOwner;
-  UINT32 Flags;
-  UINT32 Padding;
+  UINT64    FileHandle;
+  UINT64    Offset;
+  UINT32    Size;
+  UINT32    ReadFlags;
+  UINT64    LockOwner;
+  UINT32    Flags;
+  UINT32    Padding;
 } VIRTIO_FS_FUSE_READ_REQUEST;
 
 //
 // Headers for VirtioFsFuseOpWrite.
 //
 typedef struct {
-  UINT64 FileHandle;
-  UINT64 Offset;
-  UINT32 Size;
-  UINT32 WriteFlags;
-  UINT64 LockOwner;
-  UINT32 Flags;
-  UINT32 Padding;
+  UINT64    FileHandle;
+  UINT64    Offset;
+  UINT32    Size;
+  UINT32    WriteFlags;
+  UINT64    LockOwner;
+  UINT32    Flags;
+  UINT32    Padding;
 } VIRTIO_FS_FUSE_WRITE_REQUEST;
 
 typedef struct {
-  UINT32 Size;
-  UINT32 Padding;
+  UINT32    Size;
+  UINT32    Padding;
 } VIRTIO_FS_FUSE_WRITE_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpStatFs.
 //
 typedef struct {
-  UINT64 Blocks;
-  UINT64 Bfree;
-  UINT64 Bavail;
-  UINT64 Files;
-  UINT64 Ffree;
-  UINT32 Bsize;
-  UINT32 Namelen;
-  UINT32 Frsize;
-  UINT32 Padding;
-  UINT32 Spare[6];
+  UINT64    Blocks;
+  UINT64    Bfree;
+  UINT64    Bavail;
+  UINT64    Files;
+  UINT64    Ffree;
+  UINT32    Bsize;
+  UINT32    Namelen;
+  UINT32    Frsize;
+  UINT32    Padding;
+  UINT32    Spare[6];
 } VIRTIO_FS_FUSE_STATFS_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpRelease and VirtioFsFuseOpReleaseDir.
 //
 typedef struct {
-  UINT64 FileHandle;
-  UINT32 Flags;
-  UINT32 ReleaseFlags;
-  UINT64 LockOwner;
+  UINT64    FileHandle;
+  UINT32    Flags;
+  UINT32    ReleaseFlags;
+  UINT64    LockOwner;
 } VIRTIO_FS_FUSE_RELEASE_REQUEST;
 
 //
 // Header for VirtioFsFuseOpFsync and VirtioFsFuseOpFsyncDir.
 //
 typedef struct {
-  UINT64 FileHandle;
-  UINT32 FsyncFlags;
-  UINT32 Padding;
+  UINT64    FileHandle;
+  UINT32    FsyncFlags;
+  UINT32    Padding;
 } VIRTIO_FS_FUSE_FSYNC_REQUEST;
 
 //
 // Header for VirtioFsFuseOpFlush.
 //
 typedef struct {
-  UINT64 FileHandle;
-  UINT32 Unused;
-  UINT32 Padding;
-  UINT64 LockOwner;
+  UINT64    FileHandle;
+  UINT32    Unused;
+  UINT32    Padding;
+  UINT64    LockOwner;
 } VIRTIO_FS_FUSE_FLUSH_REQUEST;
 
 //
 // Headers for VirtioFsFuseOpInit.
 //
 typedef struct {
-  UINT32 Major;
-  UINT32 Minor;
-  UINT32 MaxReadahead;
-  UINT32 Flags;
+  UINT32    Major;
+  UINT32    Minor;
+  UINT32    MaxReadahead;
+  UINT32    Flags;
 } VIRTIO_FS_FUSE_INIT_REQUEST;
 
 typedef struct {
-  UINT32 Major;
-  UINT32 Minor;
-  UINT32 MaxReadahead;
-  UINT32 Flags;
-  UINT16 MaxBackground;
-  UINT16 CongestionThreshold;
-  UINT32 MaxWrite;
-  UINT32 TimeGran;
-  UINT16 MaxPages;
-  UINT16 MapAlignment;
-  UINT32 Unused[8];
+  UINT32    Major;
+  UINT32    Minor;
+  UINT32    MaxReadahead;
+  UINT32    Flags;
+  UINT16    MaxBackground;
+  UINT16    CongestionThreshold;
+  UINT32    MaxWrite;
+  UINT32    TimeGran;
+  UINT16    MaxPages;
+  UINT16    MapAlignment;
+  UINT32    Unused[8];
 } VIRTIO_FS_FUSE_INIT_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpCreate.
 //
 typedef struct {
-  UINT32 Flags;
-  UINT32 Mode;
-  UINT32 Umask;
-  UINT32 Padding;
+  UINT32    Flags;
+  UINT32    Mode;
+  UINT32    Umask;
+  UINT32    Padding;
 } VIRTIO_FS_FUSE_CREATE_REQUEST;
 
 //
@@ -433,21 +433,21 @@ typedef struct {
 // sizes.
 //
 typedef struct {
-  VIRTIO_FS_FUSE_NODE_RESPONSE       NodeResp;
-  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE AttrResp;
-  UINT64                             NodeId;
-  UINT64                             CookieForNextEntry;
-  UINT32                             Namelen;
-  UINT32                             Type;
+  VIRTIO_FS_FUSE_NODE_RESPONSE          NodeResp;
+  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE    AttrResp;
+  UINT64                                NodeId;
+  UINT64                                CookieForNextEntry;
+  UINT32                                Namelen;
+  UINT32                                Type;
 } VIRTIO_FS_FUSE_DIRENTPLUS_RESPONSE;
 
 //
 // Header for VirtioFsFuseOpRename2.
 //
 typedef struct {
-  UINT64 NewDir;
-  UINT32 Flags;
-  UINT32 Padding;
+  UINT64    NewDir;
+  UINT32    Flags;
+  UINT32    Padding;
 } VIRTIO_FS_FUSE_RENAME2_REQUEST;
 #pragma pack ()
 

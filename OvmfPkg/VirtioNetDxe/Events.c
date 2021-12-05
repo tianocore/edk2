@@ -26,12 +26,11 @@
                                 context, which is implementation-dependent.
 
 **/
-
 VOID
 EFIAPI
 VirtioNetIsPacketAvailable (
-  IN  EFI_EVENT Event,
-  IN  VOID      *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
   //
@@ -42,8 +41,8 @@ VirtioNetIsPacketAvailable (
   // almost no documentation in either the UEFI-2.3.1+errC spec or the
   // DWG-2.3.1, but WaitForKey does have some.
   //
-  VNET_DEV *Dev;
-  UINT16   RxCurUsed;
+  VNET_DEV  *Dev;
+  UINT16    RxCurUsed;
 
   Dev = Context;
   if (Dev->Snm.State != EfiSimpleNetworkInitialized) {
@@ -65,8 +64,8 @@ VirtioNetIsPacketAvailable (
 VOID
 EFIAPI
 VirtioNetExitBoot (
-  IN  EFI_EVENT Event,
-  IN  VOID      *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
   //
@@ -76,7 +75,7 @@ VirtioNetExitBoot (
   // Shut down pending transfers according to DWG-2.3.1, "25.5.1 Exit Boot
   // Services Event".
   //
-  VNET_DEV *Dev;
+  VNET_DEV  *Dev;
 
   DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
   Dev = Context;

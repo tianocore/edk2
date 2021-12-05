@@ -46,24 +46,24 @@
 **/
 EFI_STATUS
 VirtioFsFuseOpenOrCreate (
-  IN OUT VIRTIO_FS *VirtioFs,
-  IN     UINT64    ParentNodeId,
-  IN     CHAR8     *Name,
-     OUT UINT64    *NodeId,
-     OUT UINT64    *FuseHandle
+  IN OUT VIRTIO_FS  *VirtioFs,
+  IN     UINT64     ParentNodeId,
+  IN     CHAR8      *Name,
+  OUT UINT64        *NodeId,
+  OUT UINT64        *FuseHandle
   )
 {
-  VIRTIO_FS_FUSE_REQUEST             CommonReq;
-  VIRTIO_FS_FUSE_CREATE_REQUEST      CreateReq;
-  VIRTIO_FS_IO_VECTOR                ReqIoVec[3];
-  VIRTIO_FS_SCATTER_GATHER_LIST      ReqSgList;
-  VIRTIO_FS_FUSE_RESPONSE            CommonResp;
-  VIRTIO_FS_FUSE_NODE_RESPONSE       NodeResp;
-  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE AttrResp;
-  VIRTIO_FS_FUSE_OPEN_RESPONSE       OpenResp;
-  VIRTIO_FS_IO_VECTOR                RespIoVec[4];
-  VIRTIO_FS_SCATTER_GATHER_LIST      RespSgList;
-  EFI_STATUS                         Status;
+  VIRTIO_FS_FUSE_REQUEST              CommonReq;
+  VIRTIO_FS_FUSE_CREATE_REQUEST       CreateReq;
+  VIRTIO_FS_IO_VECTOR                 ReqIoVec[3];
+  VIRTIO_FS_SCATTER_GATHER_LIST       ReqSgList;
+  VIRTIO_FS_FUSE_RESPONSE             CommonResp;
+  VIRTIO_FS_FUSE_NODE_RESPONSE        NodeResp;
+  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE  AttrResp;
+  VIRTIO_FS_FUSE_OPEN_RESPONSE        OpenResp;
+  VIRTIO_FS_IO_VECTOR                 RespIoVec[4];
+  VIRTIO_FS_SCATTER_GATHER_LIST       RespSgList;
+  EFI_STATUS                          Status;
 
   //
   // Set up the scatter-gather lists.
@@ -99,8 +99,13 @@ VirtioFsFuseOpenOrCreate (
   //
   // Populate the common request header.
   //
-  Status = VirtioFsFuseNewRequest (VirtioFs, &CommonReq, ReqSgList.TotalSize,
-             VirtioFsFuseOpCreate, ParentNodeId);
+  Status = VirtioFsFuseNewRequest (
+             VirtioFs,
+             &CommonReq,
+             ReqSgList.TotalSize,
+             VirtioFsFuseOpCreate,
+             ParentNodeId
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -113,13 +118,13 @@ VirtioFsFuseOpenOrCreate (
   // the only OpenMode of EFI_FILE_PROTOCOL.Open() that enables filesystem
   // object creation -- that is, Create/Read/Write.
   //
-  CreateReq.Flags   = VIRTIO_FS_FUSE_OPEN_REQ_F_RDWR;
-  CreateReq.Mode    = (VIRTIO_FS_FUSE_MODE_PERM_RUSR |
-                       VIRTIO_FS_FUSE_MODE_PERM_WUSR |
-                       VIRTIO_FS_FUSE_MODE_PERM_RGRP |
-                       VIRTIO_FS_FUSE_MODE_PERM_WGRP |
-                       VIRTIO_FS_FUSE_MODE_PERM_ROTH |
-                       VIRTIO_FS_FUSE_MODE_PERM_WOTH);
+  CreateReq.Flags = VIRTIO_FS_FUSE_OPEN_REQ_F_RDWR;
+  CreateReq.Mode  = (VIRTIO_FS_FUSE_MODE_PERM_RUSR |
+                     VIRTIO_FS_FUSE_MODE_PERM_WUSR |
+                     VIRTIO_FS_FUSE_MODE_PERM_RGRP |
+                     VIRTIO_FS_FUSE_MODE_PERM_WGRP |
+                     VIRTIO_FS_FUSE_MODE_PERM_ROTH |
+                     VIRTIO_FS_FUSE_MODE_PERM_WOTH);
   CreateReq.Umask   = 0;
   CreateReq.Padding = 0;
 
@@ -137,11 +142,19 @@ VirtioFsFuseOpenOrCreate (
   Status = VirtioFsFuseCheckResponse (&RespSgList, CommonReq.Unique, NULL);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_DEVICE_ERROR) {
-      DEBUG ((DEBUG_ERROR, "%a: Label=\"%s\" ParentNodeId=%Lu Name=\"%a\" "
-        "Errno=%d\n", __FUNCTION__, VirtioFs->Label, ParentNodeId, Name,
-        CommonResp.Error));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Label=\"%s\" ParentNodeId=%Lu Name=\"%a\" "
+        "Errno=%d\n",
+        __FUNCTION__,
+        VirtioFs->Label,
+        ParentNodeId,
+        Name,
+        CommonResp.Error
+        ));
       Status = VirtioFsErrnoToEfiStatus (CommonResp.Error);
     }
+
     return Status;
   }
 

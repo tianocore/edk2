@@ -21,21 +21,20 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gQemuVideoComponentNa
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gQemuVideoComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) QemuVideoComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) QemuVideoComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gQemuVideoComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)QemuVideoComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)QemuVideoComponentNameGetControllerName,
   "en"
 };
 
-
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mQemuVideoDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mQemuVideoDriverNameTable[] = {
   { "eng;en", L"QEMU Video Driver" },
-  { NULL , NULL }
+  { NULL,     NULL                 }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mQemuVideoControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mQemuVideoControllerNameTable[] = {
   { "eng;en", L"QEMU Video PCI Adapter" },
-  { NULL , NULL }
+  { NULL,     NULL                      }
 };
 
 /**
@@ -165,14 +164,14 @@ QemuVideoComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 QemuVideoComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL                     *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                      Status;
+  EFI_STATUS  Status;
 
   //
   // This is a device driver, so ChildHandle must be NULL.

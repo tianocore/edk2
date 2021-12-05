@@ -28,7 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #pragma pack(1)
 typedef struct {
-  UINT16     BbsIndex;
+  UINT16    BbsIndex;
 } LEGACY_BM_BOOT_OPTION_BBS_DATA;
 #pragma pack()
 
@@ -44,7 +44,7 @@ typedef struct {
 VOID
 EFIAPI
 LegacyBmBoot (
-  IN  EFI_BOOT_MANAGER_LOAD_OPTION           *BootOption
+  IN  EFI_BOOT_MANAGER_LOAD_OPTION  *BootOption
   );
 
 /**

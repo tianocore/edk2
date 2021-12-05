@@ -24,12 +24,11 @@
 PCI_ROOT_BRIDGE *
 EFIAPI
 PciHostBridgeGetRootBridges (
-  UINTN *Count
+  UINTN  *Count
   )
 {
   return ScanForRootBridges (Count);
 }
-
 
 /**
   Free the root bridge instances array returned from
@@ -41,13 +40,12 @@ PciHostBridgeGetRootBridges (
 VOID
 EFIAPI
 PciHostBridgeFreeRootBridges (
-  PCI_ROOT_BRIDGE *Bridges,
-  UINTN           Count
+  PCI_ROOT_BRIDGE  *Bridges,
+  UINTN            Count
   )
 {
   PciHostBridgeUtilityFreeRootBridges (Bridges, Count);
 }
-
 
 /**
   Inform the platform that the resource conflict happens.
@@ -66,8 +64,8 @@ PciHostBridgeFreeRootBridges (
 VOID
 EFIAPI
 PciHostBridgeResourceConflict (
-  EFI_HANDLE                        HostBridgeHandle,
-  VOID                              *Configuration
+  EFI_HANDLE  HostBridgeHandle,
+  VOID        *Configuration
   )
 {
   PciHostBridgeUtilityResourceConflict (Configuration);

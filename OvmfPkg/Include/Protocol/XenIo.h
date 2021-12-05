@@ -34,9 +34,9 @@ struct _XENIO_PROTOCOL {
   //
   // Protocol data fields
   //
-  EFI_PHYSICAL_ADDRESS          GrantTableAddress;
+  EFI_PHYSICAL_ADDRESS    GrantTableAddress;
 };
 
-extern EFI_GUID gXenIoProtocolGuid;
+extern EFI_GUID  gXenIoProtocolGuid;
 
 #endif

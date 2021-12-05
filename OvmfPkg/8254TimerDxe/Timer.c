@@ -11,12 +11,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // The handle onto which the Timer Architectural Protocol will be installed
 //
-EFI_HANDLE                mTimerHandle = NULL;
+EFI_HANDLE  mTimerHandle = NULL;
 
 //
 // The Timer Architectural Protocol that this driver produces
 //
-EFI_TIMER_ARCH_PROTOCOL   mTimer = {
+EFI_TIMER_ARCH_PROTOCOL  mTimer = {
   TimerDriverRegisterHandler,
   TimerDriverSetTimerPeriod,
   TimerDriverGetTimerPeriod,
@@ -26,7 +26,7 @@ EFI_TIMER_ARCH_PROTOCOL   mTimer = {
 //
 // Pointer to the CPU Architectural Protocol instance
 //
-EFI_CPU_ARCH_PROTOCOL     *mCpu;
+EFI_CPU_ARCH_PROTOCOL  *mCpu;
 
 //
 // Pointer to the Legacy 8259 Protocol instance
@@ -37,16 +37,17 @@ EFI_LEGACY_8259_PROTOCOL  *mLegacy8259;
 // The notification function to call on every timer interrupt.
 // A bug in the compiler prevents us from initializing this here.
 //
-EFI_TIMER_NOTIFY mTimerNotifyFunction;
+EFI_TIMER_NOTIFY  mTimerNotifyFunction;
 
 //
 // The current period of the timer interrupt
 //
-volatile UINT64           mTimerPeriod = 0;
+volatile UINT64  mTimerPeriod = 0;
 
 //
 // Worker Functions
 //
+
 /**
   Sets the counter value for Timer #0 in a legacy 8254 timer.
 
@@ -71,11 +72,11 @@ SetPitCount (
 VOID
 EFIAPI
 TimerInterruptHandler (
-  IN EFI_EXCEPTION_TYPE   InterruptType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext
+  IN EFI_EXCEPTION_TYPE  InterruptType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  EFI_TPL OriginalTPL;
+  EFI_TPL  OriginalTPL;
 
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
@@ -133,11 +134,11 @@ TimerDriverRegisterHandler (
   //
   // Check for invalid parameters
   //
-  if (NotifyFunction == NULL && mTimerNotifyFunction == NULL) {
+  if ((NotifyFunction == NULL) && (mTimerNotifyFunction == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (NotifyFunction != NULL && mTimerNotifyFunction != NULL) {
+  if ((NotifyFunction != NULL) && (mTimerNotifyFunction != NULL)) {
     return EFI_ALREADY_STARTED;
   }
 
@@ -203,29 +204,30 @@ TimerDriverSetTimerPeriod (
     //
     mLegacy8259->DisableIrq (mLegacy8259, Efi8259Irq0);
   } else {
-
     //
     // Convert TimerPeriod into 8254 counts
     //
-    TimerCount = DivU64x32 (MultU64x32 (119318, (UINT32) TimerPeriod) + 500000, 1000000);
+    TimerCount = DivU64x32 (MultU64x32 (119318, (UINT32)TimerPeriod) + 500000, 1000000);
 
     //
     // Check for overflow
     //
     if (TimerCount >= 65536) {
-      TimerCount = 0;
+      TimerCount  = 0;
       TimerPeriod = MAX_TIMER_TICK_DURATION;
     }
+
     //
     // Program the 8254 timer with the new count value
     //
-    SetPitCount ((UINT16) TimerCount);
+    SetPitCount ((UINT16)TimerCount);
 
     //
     // Enable timer interrupt
     //
     mLegacy8259->EnableIrq (mLegacy8259, Efi8259Irq0, FALSE);
   }
+
   //
   // Save the new timer period
   //
@@ -253,8 +255,8 @@ TimerDriverSetTimerPeriod (
 EFI_STATUS
 EFIAPI
 TimerDriverGetTimerPeriod (
-  IN EFI_TIMER_ARCH_PROTOCOL   *This,
-  OUT UINT64                   *TimerPeriod
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  OUT UINT64                  *TimerPeriod
   )
 {
   if (TimerPeriod == NULL) {
@@ -353,13 +355,13 @@ TimerDriverInitialize (
   //
   // Find the CPU architectural protocol.
   //
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **) &mCpu);
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
   ASSERT_EFI_ERROR (Status);
 
   //
   // Find the Legacy8259 protocol.
   //
-  Status = gBS->LocateProtocol (&gEfiLegacy8259ProtocolGuid, NULL, (VOID **) &mLegacy8259);
+  Status = gBS->LocateProtocol (&gEfiLegacy8259ProtocolGuid, NULL, (VOID **)&mLegacy8259);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -372,7 +374,7 @@ TimerDriverInitialize (
   // Get the interrupt vector number corresponding to IRQ0 from the 8259 driver
   //
   TimerVector = 0;
-  Status      = mLegacy8259->GetVector (mLegacy8259, Efi8259Irq0, (UINT8 *) &TimerVector);
+  Status      = mLegacy8259->GetVector (mLegacy8259, Efi8259Irq0, (UINT8 *)&TimerVector);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -392,11 +394,11 @@ TimerDriverInitialize (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mTimerHandle,
-                  &gEfiTimerArchProtocolGuid, &mTimer,
+                  &gEfiTimerArchProtocolGuid,
+                  &mTimer,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
-

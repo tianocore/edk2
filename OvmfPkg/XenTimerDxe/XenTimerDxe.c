@@ -13,12 +13,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // The handle onto which the Timer Architectural Protocol will be installed
 //
-EFI_HANDLE                mTimerHandle = NULL;
+EFI_HANDLE  mTimerHandle = NULL;
 
 //
 // The Timer Architectural Protocol that this driver produces
 //
-EFI_TIMER_ARCH_PROTOCOL   mTimer = {
+EFI_TIMER_ARCH_PROTOCOL  mTimer = {
   TimerDriverRegisterHandler,
   TimerDriverSetTimerPeriod,
   TimerDriverGetTimerPeriod,
@@ -28,22 +28,23 @@ EFI_TIMER_ARCH_PROTOCOL   mTimer = {
 //
 // Pointer to the CPU Architectural Protocol instance
 //
-EFI_CPU_ARCH_PROTOCOL     *mCpu;
+EFI_CPU_ARCH_PROTOCOL  *mCpu;
 
 //
 // The notification function to call on every timer interrupt.
 // A bug in the compiler prevents us from initializing this here.
 //
-EFI_TIMER_NOTIFY mTimerNotifyFunction;
+EFI_TIMER_NOTIFY  mTimerNotifyFunction;
 
 //
 // The current period of the timer interrupt
 //
-volatile UINT64           mTimerPeriod = 0;
+volatile UINT64  mTimerPeriod = 0;
 
 //
 // Worker Functions
 //
+
 /**
   Interrupt Handler.
 
@@ -53,11 +54,11 @@ volatile UINT64           mTimerPeriod = 0;
 VOID
 EFIAPI
 TimerInterruptHandler (
-  IN EFI_EXCEPTION_TYPE   InterruptType,
-  IN EFI_SYSTEM_CONTEXT   SystemContext
+  IN EFI_EXCEPTION_TYPE  InterruptType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  EFI_TPL OriginalTPL;
+  EFI_TPL  OriginalTPL;
 
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
@@ -115,11 +116,11 @@ TimerDriverRegisterHandler (
   //
   // Check for invalid parameters
   //
-  if (NotifyFunction == NULL && mTimerNotifyFunction == NULL) {
+  if ((NotifyFunction == NULL) && (mTimerNotifyFunction == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (NotifyFunction != NULL && mTimerNotifyFunction != NULL) {
+  if ((NotifyFunction != NULL) && (mTimerNotifyFunction != NULL)) {
     return EFI_ALREADY_STARTED;
   }
 
@@ -171,17 +172,19 @@ TimerDriverSetTimerPeriod (
     //
     // Disable timer interrupt for a TimerPeriod of 0
     //
-    DisableApicTimerInterrupt();
+    DisableApicTimerInterrupt ();
   } else {
-    TimerFrequency = PcdGet32(PcdFSBClock) / DivideValue;
+    TimerFrequency = PcdGet32 (PcdFSBClock) / DivideValue;
 
     //
     // Convert TimerPeriod into local APIC counts
     //
     // TimerPeriod is in 100ns
     // TimerPeriod/10000000 will be in seconds.
-    TimerCount = DivU64x32 (MultU64x32 (TimerPeriod, TimerFrequency),
-                            10000000);
+    TimerCount = DivU64x32 (
+                   MultU64x32 (TimerPeriod, TimerFrequency),
+                   10000000
+                   );
 
     // Check for overflow
     if (TimerCount > MAX_UINT32) {
@@ -193,13 +196,14 @@ TimerDriverSetTimerPeriod (
     //
     // Program the timer with the new count value
     //
-    InitializeApicTimer(DivideValue, (UINT32)TimerCount, TRUE, LOCAL_APIC_TIMER_VECTOR);
+    InitializeApicTimer (DivideValue, (UINT32)TimerCount, TRUE, LOCAL_APIC_TIMER_VECTOR);
 
     //
     // Enable timer interrupt
     //
-    EnableApicTimerInterrupt();
+    EnableApicTimerInterrupt ();
   }
+
   //
   // Save the new timer period
   //
@@ -227,8 +231,8 @@ TimerDriverSetTimerPeriod (
 EFI_STATUS
 EFIAPI
 TimerDriverGetTimerPeriod (
-  IN EFI_TIMER_ARCH_PROTOCOL   *This,
-  OUT UINT64                   *TimerPeriod
+  IN EFI_TIMER_ARCH_PROTOCOL  *This,
+  OUT UINT64                  *TimerPeriod
   )
 {
   if (TimerPeriod == NULL) {
@@ -263,9 +267,9 @@ TimerDriverGenerateSoftInterrupt (
   IN EFI_TIMER_ARCH_PROTOCOL  *This
   )
 {
-  EFI_TPL     OriginalTPL;
+  EFI_TPL  OriginalTPL;
 
-  if (GetApicTimerInterruptState()) {
+  if (GetApicTimerInterruptState ()) {
     //
     // Invoke the registered handler
     //
@@ -319,7 +323,7 @@ TimerDriverInitialize (
   //
   // Find the CPU architectural protocol.
   //
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **) &mCpu);
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&mCpu);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -331,8 +335,11 @@ TimerDriverInitialize (
   //
   // Install interrupt handler for Local APIC Timer
   //
-  Status = mCpu->RegisterInterruptHandler (mCpu, LOCAL_APIC_TIMER_VECTOR,
-                                           TimerInterruptHandler);
+  Status = mCpu->RegisterInterruptHandler (
+                   mCpu,
+                   LOCAL_APIC_TIMER_VECTOR,
+                   TimerInterruptHandler
+                   );
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -346,11 +353,11 @@ TimerDriverInitialize (
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mTimerHandle,
-                  &gEfiTimerArchProtocolGuid, &mTimer,
+                  &gEfiTimerArchProtocolGuid,
+                  &mTimer,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
-

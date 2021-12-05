@@ -20,35 +20,32 @@
 #include <Library/PciLib.h>
 #include <Library/QemuFwCfgLib.h>
 
-
 #pragma pack(1)
 typedef struct {
-  ACPI_HID_DEVICE_PATH     AcpiDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL EndDevicePath;
+  ACPI_HID_DEVICE_PATH        AcpiDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    EndDevicePath;
 } OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH;
 #pragma pack ()
 
-
 GLOBAL_REMOVE_IF_UNREFERENCED
-CHAR16 *mPciHostBridgeUtilityLibAcpiAddressSpaceTypeStr[] = {
+CHAR16  *mPciHostBridgeUtilityLibAcpiAddressSpaceTypeStr[] = {
   L"Mem", L"I/O", L"Bus"
 };
 
-
 STATIC
 CONST
-OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
+OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH  mRootBridgeDevicePathTemplate = {
   {
     {
       ACPI_DEVICE_PATH,
       ACPI_DP,
       {
-        (UINT8) (sizeof(ACPI_HID_DEVICE_PATH)),
-        (UINT8) ((sizeof(ACPI_HID_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (ACPI_HID_DEVICE_PATH)),
+        (UINT8)((sizeof (ACPI_HID_DEVICE_PATH)) >> 8)
       }
     },
-    EISA_PNP_ID(0x0A03), // HID
-    0                    // UID
+    EISA_PNP_ID (0x0A03), // HID
+    0                     // UID
   },
 
   {
@@ -60,7 +57,6 @@ OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
     }
   }
 };
-
 
 /**
   Utility function to initialize a PCI_ROOT_BRIDGE structure.
@@ -112,22 +108,22 @@ OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH mRootBridgeDevicePathTemplate = {
 EFI_STATUS
 EFIAPI
 PciHostBridgeUtilityInitRootBridge (
-  IN  UINT64                   Supports,
-  IN  UINT64                   Attributes,
-  IN  UINT64                   AllocAttributes,
-  IN  BOOLEAN                  DmaAbove4G,
-  IN  BOOLEAN                  NoExtendedConfigSpace,
-  IN  UINT8                    RootBusNumber,
-  IN  UINT8                    MaxSubBusNumber,
-  IN  PCI_ROOT_BRIDGE_APERTURE *Io,
-  IN  PCI_ROOT_BRIDGE_APERTURE *Mem,
-  IN  PCI_ROOT_BRIDGE_APERTURE *MemAbove4G,
-  IN  PCI_ROOT_BRIDGE_APERTURE *PMem,
-  IN  PCI_ROOT_BRIDGE_APERTURE *PMemAbove4G,
-  OUT PCI_ROOT_BRIDGE          *RootBus
+  IN  UINT64                    Supports,
+  IN  UINT64                    Attributes,
+  IN  UINT64                    AllocAttributes,
+  IN  BOOLEAN                   DmaAbove4G,
+  IN  BOOLEAN                   NoExtendedConfigSpace,
+  IN  UINT8                     RootBusNumber,
+  IN  UINT8                     MaxSubBusNumber,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Io,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Mem,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *MemAbove4G,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *PMem,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *PMemAbove4G,
+  OUT PCI_ROOT_BRIDGE           *RootBus
   )
 {
-  OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH *DevicePath;
+  OVMF_PCI_ROOT_BRIDGE_DEVICE_PATH  *DevicePath;
 
   //
   // Be safe if other fields are added to PCI_ROOT_BRIDGE later.
@@ -142,8 +138,8 @@ PciHostBridgeUtilityInitRootBridge (
   RootBus->DmaAbove4G = DmaAbove4G;
 
   RootBus->AllocationAttributes = AllocAttributes;
-  RootBus->Bus.Base  = RootBusNumber;
-  RootBus->Bus.Limit = MaxSubBusNumber;
+  RootBus->Bus.Base             = RootBusNumber;
+  RootBus->Bus.Limit            = MaxSubBusNumber;
   CopyMem (&RootBus->Io, Io, sizeof (*Io));
   CopyMem (&RootBus->Mem, Mem, sizeof (*Mem));
   CopyMem (&RootBus->MemAbove4G, MemAbove4G, sizeof (*MemAbove4G));
@@ -152,21 +148,27 @@ PciHostBridgeUtilityInitRootBridge (
 
   RootBus->NoExtendedConfigSpace = NoExtendedConfigSpace;
 
-  DevicePath = AllocateCopyPool (sizeof mRootBridgeDevicePathTemplate,
-                 &mRootBridgeDevicePathTemplate);
+  DevicePath = AllocateCopyPool (
+                 sizeof mRootBridgeDevicePathTemplate,
+                 &mRootBridgeDevicePathTemplate
+                 );
   if (DevicePath == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
     return EFI_OUT_OF_RESOURCES;
   }
-  DevicePath->AcpiDevicePath.UID = RootBusNumber;
-  RootBus->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)DevicePath;
 
-  DEBUG ((DEBUG_INFO,
+  DevicePath->AcpiDevicePath.UID = RootBusNumber;
+  RootBus->DevicePath            = (EFI_DEVICE_PATH_PROTOCOL *)DevicePath;
+
+  DEBUG ((
+    DEBUG_INFO,
     "%a: populated root bus %d, with room for %d subordinate bus(es)\n",
-    __FUNCTION__, RootBusNumber, MaxSubBusNumber - RootBusNumber));
+    __FUNCTION__,
+    RootBusNumber,
+    MaxSubBusNumber - RootBusNumber
+    ));
   return EFI_SUCCESS;
 }
-
 
 /**
   Utility function to uninitialize a PCI_ROOT_BRIDGE structure set up with
@@ -180,12 +182,11 @@ PciHostBridgeUtilityInitRootBridge (
 VOID
 EFIAPI
 PciHostBridgeUtilityUninitRootBridge (
-  IN PCI_ROOT_BRIDGE *RootBus
+  IN PCI_ROOT_BRIDGE  *RootBus
   )
 {
   FreePool (RootBus->DevicePath);
 }
-
 
 /**
   Utility function to return all the root bridge instances in an array.
@@ -219,34 +220,40 @@ PciHostBridgeUtilityUninitRootBridge (
 PCI_ROOT_BRIDGE *
 EFIAPI
 PciHostBridgeUtilityGetRootBridges (
-  OUT UINTN                    *Count,
-  IN  UINT64                   Attributes,
-  IN  UINT64                   AllocationAttributes,
-  IN  BOOLEAN                  DmaAbove4G,
-  IN  BOOLEAN                  NoExtendedConfigSpace,
-  IN  UINTN                    BusMin,
-  IN  UINTN                    BusMax,
-  IN  PCI_ROOT_BRIDGE_APERTURE *Io,
-  IN  PCI_ROOT_BRIDGE_APERTURE *Mem,
-  IN  PCI_ROOT_BRIDGE_APERTURE *MemAbove4G,
-  IN  PCI_ROOT_BRIDGE_APERTURE *PMem,
-  IN  PCI_ROOT_BRIDGE_APERTURE *PMemAbove4G
+  OUT UINTN                     *Count,
+  IN  UINT64                    Attributes,
+  IN  UINT64                    AllocationAttributes,
+  IN  BOOLEAN                   DmaAbove4G,
+  IN  BOOLEAN                   NoExtendedConfigSpace,
+  IN  UINTN                     BusMin,
+  IN  UINTN                     BusMax,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Io,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *Mem,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *MemAbove4G,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *PMem,
+  IN  PCI_ROOT_BRIDGE_APERTURE  *PMemAbove4G
   )
 {
-  EFI_STATUS           Status;
-  FIRMWARE_CONFIG_ITEM FwCfgItem;
-  UINTN                FwCfgSize;
-  UINT64               ExtraRootBridges;
-  PCI_ROOT_BRIDGE      *Bridges;
-  UINTN                Initialized;
-  UINTN                LastRootBridgeNumber;
-  UINTN                RootBridgeNumber;
+  EFI_STATUS            Status;
+  FIRMWARE_CONFIG_ITEM  FwCfgItem;
+  UINTN                 FwCfgSize;
+  UINT64                ExtraRootBridges;
+  PCI_ROOT_BRIDGE       *Bridges;
+  UINTN                 Initialized;
+  UINTN                 LastRootBridgeNumber;
+  UINTN                 RootBridgeNumber;
 
   *Count = 0;
 
-  if (BusMin > BusMax || BusMax > PCI_MAX_BUS) {
-    DEBUG ((DEBUG_ERROR, "%a: invalid bus range with BusMin %Lu and BusMax "
-      "%Lu\n", __FUNCTION__, (UINT64)BusMin, (UINT64)BusMax));
+  if ((BusMin > BusMax) || (BusMax > PCI_MAX_BUS)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: invalid bus range with BusMin %Lu and BusMax "
+      "%Lu\n",
+      __FUNCTION__,
+      (UINT64)BusMin,
+      (UINT64)BusMax
+      ));
     return NULL;
   }
 
@@ -255,7 +262,7 @@ PciHostBridgeUtilityGetRootBridges (
   // search below. If there is no hint, the feature is missing.
   //
   Status = QemuFwCfgFindFile ("etc/extra-pci-roots", &FwCfgItem, &FwCfgSize);
-  if (EFI_ERROR (Status) || FwCfgSize != sizeof ExtraRootBridges) {
+  if (EFI_ERROR (Status) || (FwCfgSize != sizeof ExtraRootBridges)) {
     ExtraRootBridges = 0;
   } else {
     QemuFwCfgSelectItem (FwCfgItem);
@@ -269,12 +276,22 @@ PciHostBridgeUtilityGetRootBridges (
     // invalid behavior.
     //
     if (ExtraRootBridges > BusMax - BusMin) {
-      DEBUG ((DEBUG_ERROR, "%a: invalid count of extra root buses (%Lu) "
-        "reported by QEMU\n", __FUNCTION__, ExtraRootBridges));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: invalid count of extra root buses (%Lu) "
+        "reported by QEMU\n",
+        __FUNCTION__,
+        ExtraRootBridges
+        ));
       return NULL;
     }
-    DEBUG ((DEBUG_INFO, "%a: %Lu extra root buses reported by QEMU\n",
-      __FUNCTION__, ExtraRootBridges));
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: %Lu extra root buses reported by QEMU\n",
+      __FUNCTION__,
+      ExtraRootBridges
+      ));
   }
 
   //
@@ -285,6 +302,7 @@ PciHostBridgeUtilityGetRootBridges (
     DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
     return NULL;
   }
+
   Initialized = 0;
 
   //
@@ -299,15 +317,24 @@ PciHostBridgeUtilityGetRootBridges (
   //
   for (RootBridgeNumber = BusMin + 1;
        RootBridgeNumber <= BusMax && Initialized < ExtraRootBridges;
-       ++RootBridgeNumber) {
-    UINTN Device;
+       ++RootBridgeNumber)
+  {
+    UINTN  Device;
 
     for (Device = 0; Device <= PCI_MAX_DEVICE; ++Device) {
-      if (PciRead16 (PCI_LIB_ADDRESS (RootBridgeNumber, Device, 0,
-                       PCI_VENDOR_ID_OFFSET)) != MAX_UINT16) {
+      if (PciRead16 (
+            PCI_LIB_ADDRESS (
+              RootBridgeNumber,
+              Device,
+              0,
+              PCI_VENDOR_ID_OFFSET
+              )
+            ) != MAX_UINT16)
+      {
         break;
       }
     }
+
     if (Device <= PCI_MAX_DEVICE) {
       //
       // Found the next root bus. We can now install the *previous* one,
@@ -315,23 +342,24 @@ PciHostBridgeUtilityGetRootBridges (
       // subordinate buses that might exist behind PCI bridges hanging off it.
       //
       Status = PciHostBridgeUtilityInitRootBridge (
-        Attributes,
-        Attributes,
-        AllocationAttributes,
-        DmaAbove4G,
-        NoExtendedConfigSpace,
-        (UINT8) LastRootBridgeNumber,
-        (UINT8) (RootBridgeNumber - 1),
-        Io,
-        Mem,
-        MemAbove4G,
-        PMem,
-        PMemAbove4G,
-        &Bridges[Initialized]
-        );
+                 Attributes,
+                 Attributes,
+                 AllocationAttributes,
+                 DmaAbove4G,
+                 NoExtendedConfigSpace,
+                 (UINT8)LastRootBridgeNumber,
+                 (UINT8)(RootBridgeNumber - 1),
+                 Io,
+                 Mem,
+                 MemAbove4G,
+                 PMem,
+                 PMemAbove4G,
+                 &Bridges[Initialized]
+                 );
       if (EFI_ERROR (Status)) {
         goto FreeBridges;
       }
+
       ++Initialized;
       LastRootBridgeNumber = RootBridgeNumber;
     }
@@ -342,23 +370,24 @@ PciHostBridgeUtilityGetRootBridges (
   // we've found no extra root buses).
   //
   Status = PciHostBridgeUtilityInitRootBridge (
-    Attributes,
-    Attributes,
-    AllocationAttributes,
-    DmaAbove4G,
-    NoExtendedConfigSpace,
-    (UINT8) LastRootBridgeNumber,
-    (UINT8) BusMax,
-    Io,
-    Mem,
-    MemAbove4G,
-    PMem,
-    PMemAbove4G,
-    &Bridges[Initialized]
-    );
+             Attributes,
+             Attributes,
+             AllocationAttributes,
+             DmaAbove4G,
+             NoExtendedConfigSpace,
+             (UINT8)LastRootBridgeNumber,
+             (UINT8)BusMax,
+             Io,
+             Mem,
+             MemAbove4G,
+             PMem,
+             PMemAbove4G,
+             &Bridges[Initialized]
+             );
   if (EFI_ERROR (Status)) {
     goto FreeBridges;
   }
+
   ++Initialized;
 
   *Count = Initialized;
@@ -374,7 +403,6 @@ FreeBridges:
   return NULL;
 }
 
-
 /**
   Utility function to free root bridge instances array from
   PciHostBridgeUtilityGetRootBridges().
@@ -385,13 +413,14 @@ FreeBridges:
 VOID
 EFIAPI
 PciHostBridgeUtilityFreeRootBridges (
-  IN PCI_ROOT_BRIDGE *Bridges,
-  IN UINTN           Count
+  IN PCI_ROOT_BRIDGE  *Bridges,
+  IN UINTN            Count
   )
 {
-  if (Bridges == NULL && Count == 0) {
+  if ((Bridges == NULL) && (Count == 0)) {
     return;
   }
+
   ASSERT (Bridges != NULL && Count > 0);
 
   do {
@@ -401,7 +430,6 @@ PciHostBridgeUtilityFreeRootBridges (
 
   FreePool (Bridges);
 }
-
 
 /**
   Utility function to inform the platform that the resource conflict happens.
@@ -423,38 +451,46 @@ PciHostBridgeUtilityResourceConflict (
   IN VOID  *Configuration
   )
 {
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *Descriptor;
-  UINTN                             RootBridgeIndex;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
+  UINTN                              RootBridgeIndex;
+
   DEBUG ((DEBUG_ERROR, "PciHostBridge: Resource conflict happens!\n"));
 
   RootBridgeIndex = 0;
-  Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *) Configuration;
+  Descriptor      = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)Configuration;
   while (Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR) {
     DEBUG ((DEBUG_ERROR, "RootBridge[%d]:\n", RootBridgeIndex++));
-    for (; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
-      ASSERT (Descriptor->ResType <
-              ARRAY_SIZE (mPciHostBridgeUtilityLibAcpiAddressSpaceTypeStr)
-              );
-      DEBUG ((DEBUG_ERROR, " %s: Length/Alignment = 0x%lx / 0x%lx\n",
-              mPciHostBridgeUtilityLibAcpiAddressSpaceTypeStr[Descriptor->ResType],
-              Descriptor->AddrLen, Descriptor->AddrRangeMax
-              ));
+    for ( ; Descriptor->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR; Descriptor++) {
+      ASSERT (
+        Descriptor->ResType <
+        ARRAY_SIZE (mPciHostBridgeUtilityLibAcpiAddressSpaceTypeStr)
+        );
+      DEBUG ((
+        DEBUG_ERROR,
+        " %s: Length/Alignment = 0x%lx / 0x%lx\n",
+        mPciHostBridgeUtilityLibAcpiAddressSpaceTypeStr[Descriptor->ResType],
+        Descriptor->AddrLen,
+        Descriptor->AddrRangeMax
+        ));
       if (Descriptor->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) {
-        DEBUG ((DEBUG_ERROR, "     Granularity/SpecificFlag = %ld / %02x%s\n",
-                Descriptor->AddrSpaceGranularity, Descriptor->SpecificFlag,
-                ((Descriptor->SpecificFlag &
-                  EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE
-                  ) != 0) ? L" (Prefetchable)" : L""
-                ));
+        DEBUG ((
+          DEBUG_ERROR,
+          "     Granularity/SpecificFlag = %ld / %02x%s\n",
+          Descriptor->AddrSpaceGranularity,
+          Descriptor->SpecificFlag,
+          ((Descriptor->SpecificFlag &
+            EFI_ACPI_MEMORY_RESOURCE_SPECIFIC_FLAG_CACHEABLE_PREFETCHABLE
+            ) != 0) ? L" (Prefetchable)" : L""
+          ));
       }
     }
+
     //
     // Skip the END descriptor for root bridge
     //
     ASSERT (Descriptor->Desc == ACPI_END_TAG_DESCRIPTOR);
     Descriptor = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)(
-                   (EFI_ACPI_END_TAG_DESCRIPTOR *)Descriptor + 1
-                   );
+                                                       (EFI_ACPI_END_TAG_DESCRIPTOR *)Descriptor + 1
+                                                       );
   }
 }
-

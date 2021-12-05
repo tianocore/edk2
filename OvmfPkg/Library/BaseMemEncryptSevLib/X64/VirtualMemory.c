@@ -96,10 +96,10 @@ InternalMemEncryptSevGetAddressRangeState (
   // If Cr3BaseAddress is not specified then read the current CR3
   //
   if (Cr3BaseAddress == 0) {
-    Cr3BaseAddress = AsmReadCr3();
+    Cr3BaseAddress = AsmReadCr3 ();
   }
 
-  AddressEncMask = MemEncryptSevGetEncryptionMask ();
+  AddressEncMask  = MemEncryptSevGetEncryptionMask ();
   AddressEncMask &= PAGING_1G_ADDRESS_MASK_64;
 
   PgTableMask = AddressEncMask | EFI_PAGE_MASK;
@@ -110,21 +110,21 @@ InternalMemEncryptSevGetAddressRangeState (
   // Encryption is on a page basis, so start at the beginning of the
   // virtual address page boundary and walk page-by-page.
   //
-  Address = (PHYSICAL_ADDRESS) (UINTN) BaseAddress & ~EFI_PAGE_MASK;
+  Address    = (PHYSICAL_ADDRESS)(UINTN)BaseAddress & ~EFI_PAGE_MASK;
   AddressEnd = (PHYSICAL_ADDRESS)
-                 (UINTN) (BaseAddress + Length);
+               (UINTN)(BaseAddress + Length);
 
   while (Address < AddressEnd) {
-    PageMapLevel4Entry = (VOID*) (Cr3BaseAddress & ~PgTableMask);
+    PageMapLevel4Entry  = (VOID *)(Cr3BaseAddress & ~PgTableMask);
     PageMapLevel4Entry += PML4_OFFSET (Address);
     if (!PageMapLevel4Entry->Bits.Present) {
       return MemEncryptSevAddressRangeError;
     }
 
-    PageDirectory1GEntry = (VOID *) (
-                             (PageMapLevel4Entry->Bits.PageTableBaseAddress <<
-                              12) & ~PgTableMask
-                             );
+    PageDirectory1GEntry = (VOID *)(
+                                    (PageMapLevel4Entry->Bits.PageTableBaseAddress <<
+                                     12) & ~PgTableMask
+                                    );
     PageDirectory1GEntry += PDP_OFFSET (Address);
     if (!PageDirectory1GEntry->Bits.Present) {
       return MemEncryptSevAddressRangeError;
@@ -151,12 +151,12 @@ InternalMemEncryptSevGetAddressRangeState (
     // Actually a PDP
     //
     PageUpperDirectoryPointerEntry =
-      (PAGE_MAP_AND_DIRECTORY_POINTER *) PageDirectory1GEntry;
+      (PAGE_MAP_AND_DIRECTORY_POINTER *)PageDirectory1GEntry;
     PageDirectory2MEntry =
-      (VOID *) (
-        (PageUpperDirectoryPointerEntry->Bits.PageTableBaseAddress <<
-         12) & ~PgTableMask
-        );
+      (VOID *)(
+               (PageUpperDirectoryPointerEntry->Bits.PageTableBaseAddress <<
+                12) & ~PgTableMask
+               );
     PageDirectory2MEntry += PDE_OFFSET (Address);
     if (!PageDirectory2MEntry->Bits.Present) {
       return MemEncryptSevAddressRangeError;
@@ -186,9 +186,9 @@ InternalMemEncryptSevGetAddressRangeState (
       (PAGE_MAP_AND_DIRECTORY_POINTER *)PageDirectory2MEntry;
     PageTableEntry =
       (VOID *)(
-        (PageDirectoryPointerEntry->Bits.PageTableBaseAddress <<
-         12) & ~PgTableMask
-        );
+               (PageDirectoryPointerEntry->Bits.PageTableBaseAddress <<
+                12) & ~PgTableMask
+               );
     PageTableEntry += PTE_OFFSET (Address);
     if (!PageTableEntry->Bits.Present) {
       return MemEncryptSevAddressRangeError;

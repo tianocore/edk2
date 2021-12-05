@@ -75,30 +75,30 @@
 //
 #pragma pack (1)
 typedef struct {
-  EFI_TIME TimeStamp;
+  EFI_TIME    TimeStamp;
 
   //
   // dwLength covers data below
   //
-  UINT32   dwLength;
-  UINT16   wRevision;
-  UINT16   wCertificateType;
-  EFI_GUID CertType;
+  UINT32      dwLength;
+  UINT16      wRevision;
+  UINT16      wCertificateType;
+  EFI_GUID    CertType;
 } SINGLE_HEADER;
 
 typedef struct {
   //
   // SignatureListSize covers data below
   //
-  EFI_GUID SignatureType;
-  UINT32   SignatureListSize;
-  UINT32   SignatureHeaderSize; // constant 0
-  UINT32   SignatureSize;
+  EFI_GUID    SignatureType;
+  UINT32      SignatureListSize;
+  UINT32      SignatureHeaderSize; // constant 0
+  UINT32      SignatureSize;
 
   //
   // SignatureSize covers data below
   //
-  EFI_GUID SignatureOwner;
+  EFI_GUID    SignatureOwner;
 
   //
   // X.509 certificate follows
@@ -106,33 +106,31 @@ typedef struct {
 } REPEATING_HEADER;
 #pragma pack ()
 
-
 //
 // A structure that collects the values of UEFI variables related to Secure
 // Boot.
 //
 typedef struct {
-  UINT8 SetupMode;
-  UINT8 SecureBoot;
-  UINT8 SecureBootEnable;
-  UINT8 CustomMode;
-  UINT8 VendorKeys;
+  UINT8    SetupMode;
+  UINT8    SecureBoot;
+  UINT8    SecureBootEnable;
+  UINT8    CustomMode;
+  UINT8    VendorKeys;
 } SETTINGS;
-
 
 //
 // Refer to "AuthData.c" for details on the following objects.
 //
-extern CONST UINT8 mMicrosoftKek[];
-extern CONST UINTN mSizeOfMicrosoftKek;
+extern CONST UINT8  mMicrosoftKek[];
+extern CONST UINTN  mSizeOfMicrosoftKek;
 
-extern CONST UINT8 mMicrosoftPca[];
-extern CONST UINTN mSizeOfMicrosoftPca;
+extern CONST UINT8  mMicrosoftPca[];
+extern CONST UINTN  mSizeOfMicrosoftPca;
 
-extern CONST UINT8 mMicrosoftUefiCa[];
-extern CONST UINTN mSizeOfMicrosoftUefiCa;
+extern CONST UINT8  mMicrosoftUefiCa[];
+extern CONST UINTN  mSizeOfMicrosoftUefiCa;
 
-extern CONST UINT8 mSha256OfDevNull[];
-extern CONST UINTN mSizeOfSha256OfDevNull;
+extern CONST UINT8  mSha256OfDevNull[];
+extern CONST UINTN  mSizeOfSha256OfDevNull;
 
 #endif /* ENROLL_DEFAULT_KEYS_H_ */

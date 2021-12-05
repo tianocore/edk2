@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __E820_H__
 #define __E820_H__
 
@@ -21,17 +20,17 @@ typedef enum {
 } EFI_ACPI_MEMORY_TYPE;
 
 typedef struct {
-  UINT64                BaseAddr;
-  UINT64                Length;
-  EFI_ACPI_MEMORY_TYPE  Type;
+  UINT64                  BaseAddr;
+  UINT64                  Length;
+  EFI_ACPI_MEMORY_TYPE    Type;
 } EFI_E820_ENTRY64;
 
 typedef struct {
-  UINT32                BassAddrLow;
-  UINT32                BaseAddrHigh;
-  UINT32                LengthLow;
-  UINT32                LengthHigh;
-  EFI_ACPI_MEMORY_TYPE  Type;
+  UINT32                  BassAddrLow;
+  UINT32                  BaseAddrHigh;
+  UINT32                  LengthLow;
+  UINT32                  LengthHigh;
+  EFI_ACPI_MEMORY_TYPE    Type;
 } EFI_E820_ENTRY;
 
 #pragma pack()

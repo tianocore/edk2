@@ -14,12 +14,12 @@
 EFI_STATUS
 EFIAPI
 VirtioFsSimpleFileDelete (
-  IN EFI_FILE_PROTOCOL *This
+  IN EFI_FILE_PROTOCOL  *This
   )
 {
-  VIRTIO_FS_FILE *VirtioFsFile;
-  VIRTIO_FS      *VirtioFs;
-  EFI_STATUS     Status;
+  VIRTIO_FS_FILE  *VirtioFsFile;
+  VIRTIO_FS       *VirtioFs;
+  EFI_STATUS      Status;
 
   VirtioFsFile = VIRTIO_FS_FILE_FROM_SIMPLE_FILE (This);
   VirtioFs     = VirtioFsFile->OwnerFs;
@@ -38,8 +38,12 @@ VirtioFsSimpleFileDelete (
   //
   // If any action fails below, we still try the others.
   //
-  VirtioFsFuseReleaseFileOrDir (VirtioFs, VirtioFsFile->NodeId,
-    VirtioFsFile->FuseHandle, VirtioFsFile->IsDirectory);
+  VirtioFsFuseReleaseFileOrDir (
+    VirtioFs,
+    VirtioFsFile->NodeId,
+    VirtioFsFile->FuseHandle,
+    VirtioFsFile->IsDirectory
+    );
 
   //
   // VirtioFsFile->FuseHandle is gone at this point, but VirtioFsFile->NodeId
@@ -47,8 +51,8 @@ VirtioFsSimpleFileDelete (
   // of this operation determines the return status of the function.
   //
   if (VirtioFsFile->IsOpenForWriting) {
-    UINT64 ParentNodeId;
-    CHAR8  *LastComponent;
+    UINT64  ParentNodeId;
+    CHAR8   *LastComponent;
 
     //
     // Split our canonical pathname into most specific parent directory
@@ -78,6 +82,7 @@ VirtioFsSimpleFileDelete (
         VirtioFsFuseForget (VirtioFs, ParentNodeId);
       }
     }
+
     if (EFI_ERROR (Status)) {
       //
       // Map any failure to the spec-mandated warning code.
@@ -105,6 +110,7 @@ VirtioFsSimpleFileDelete (
   if (VirtioFsFile->FileInfoArray != NULL) {
     FreePool (VirtioFsFile->FileInfoArray);
   }
+
   FreePool (VirtioFsFile);
   return Status;
 }

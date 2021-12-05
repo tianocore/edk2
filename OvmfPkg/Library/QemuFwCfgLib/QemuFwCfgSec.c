@@ -33,8 +33,8 @@ QemuFwCfgIsAvailable (
   VOID
   )
 {
-  UINT32 Signature;
-  UINT32 Revision;
+  UINT32  Signature;
+  UINT32  Revision;
 
   QemuFwCfgSelectItem (QemuFwCfgItemSignature);
   Signature = QemuFwCfgRead32 ();
@@ -44,7 +44,8 @@ QemuFwCfgIsAvailable (
   DEBUG ((DEBUG_INFO, "FW CFG Revision: 0x%x\n", Revision));
   if ((Signature != SIGNATURE_32 ('Q', 'E', 'M', 'U')) ||
       (Revision < 1)
-     ) {
+      )
+  {
     DEBUG ((DEBUG_INFO, "QemuFwCfg interface not supported.\n"));
     return FALSE;
   }
@@ -52,7 +53,6 @@ QemuFwCfgIsAvailable (
   DEBUG ((DEBUG_INFO, "QemuFwCfg interface is supported.\n"));
   return TRUE;
 }
-
 
 /**
   Returns a boolean indicating if the firmware configuration interface is
@@ -108,9 +108,9 @@ InternalQemuFwCfgDmaIsAvailable (
 **/
 VOID
 InternalQemuFwCfgDmaBytes (
-  IN     UINT32   Size,
-  IN OUT VOID     *Buffer OPTIONAL,
-  IN     UINT32   Control
+  IN     UINT32  Size,
+  IN OUT VOID    *Buffer OPTIONAL,
+  IN     UINT32  Control
   )
 {
   //

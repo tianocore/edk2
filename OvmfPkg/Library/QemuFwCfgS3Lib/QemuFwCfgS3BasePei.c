@@ -53,14 +53,13 @@
 RETURN_STATUS
 EFIAPI
 QemuFwCfgS3ScriptWriteBytes (
-  IN INT32 FirmwareConfigItem,
-  IN UINTN NumberOfBytes
+  IN INT32  FirmwareConfigItem,
+  IN UINTN  NumberOfBytes
   )
 {
   ASSERT (FALSE);
   return RETURN_UNSUPPORTED;
 }
-
 
 /**
   Produce ACPI S3 Boot Script opcodes that (optionally) select an fw_cfg item,
@@ -104,14 +103,13 @@ QemuFwCfgS3ScriptWriteBytes (
 RETURN_STATUS
 EFIAPI
 QemuFwCfgS3ScriptReadBytes (
-  IN INT32 FirmwareConfigItem,
-  IN UINTN NumberOfBytes
+  IN INT32  FirmwareConfigItem,
+  IN UINTN  NumberOfBytes
   )
 {
   ASSERT (FALSE);
   return RETURN_UNSUPPORTED;
 }
-
 
 /**
   Produce ACPI S3 Boot Script opcodes that (optionally) select an fw_cfg item,
@@ -148,14 +146,13 @@ QemuFwCfgS3ScriptReadBytes (
 RETURN_STATUS
 EFIAPI
 QemuFwCfgS3ScriptSkipBytes (
-  IN INT32 FirmwareConfigItem,
-  IN UINTN NumberOfBytes
+  IN INT32  FirmwareConfigItem,
+  IN UINTN  NumberOfBytes
   )
 {
   ASSERT (FALSE);
   return RETURN_UNSUPPORTED;
 }
-
 
 /**
   Produce ACPI S3 Boot Script opcodes that check a value in ScratchBuffer.
@@ -210,10 +207,10 @@ QemuFwCfgS3ScriptSkipBytes (
 RETURN_STATUS
 EFIAPI
 QemuFwCfgS3ScriptCheckValue (
-  IN VOID   *ScratchData,
-  IN UINT8  ValueSize,
-  IN UINT64 ValueMask,
-  IN UINT64 Value
+  IN VOID    *ScratchData,
+  IN UINT8   ValueSize,
+  IN UINT64  ValueMask,
+  IN UINT64  Value
   )
 {
   ASSERT (FALSE);

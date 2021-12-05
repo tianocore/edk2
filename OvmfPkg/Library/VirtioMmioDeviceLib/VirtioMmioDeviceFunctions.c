@@ -15,12 +15,12 @@
 EFI_STATUS
 EFIAPI
 VirtioMmioGetDeviceFeatures (
-  IN VIRTIO_DEVICE_PROTOCOL *This,
-  OUT UINT64                *DeviceFeatures
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
+  OUT UINT64                 *DeviceFeatures
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
-  UINT32  LowBits, HighBits;
+  VIRTIO_MMIO_DEVICE  *Device;
+  UINT32              LowBits, HighBits;
 
   if (DeviceFeatures == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -34,8 +34,8 @@ VirtioMmioGetDeviceFeatures (
     VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES_SEL, 0);
     LowBits = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES);
     VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES_SEL, 1);
-    HighBits = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES);
-    *DeviceFeatures = LShiftU64(HighBits, 32) | LowBits;
+    HighBits        = VIRTIO_CFG_READ (Device, VIRTIO_MMIO_OFFSET_HOST_FEATURES);
+    *DeviceFeatures = LShiftU64 (HighBits, 32) | LowBits;
   }
 
   return EFI_SUCCESS;
@@ -48,7 +48,7 @@ VirtioMmioGetQueueSize (
   OUT UINT16                  *QueueNumMax
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   if (QueueNumMax == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -68,7 +68,7 @@ VirtioMmioGetDeviceStatus (
   OUT UINT8                   *DeviceStatus
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   if (DeviceStatus == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -84,11 +84,11 @@ VirtioMmioGetDeviceStatus (
 EFI_STATUS
 EFIAPI
 VirtioMmioSetQueueSize (
-  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
   IN UINT16                  QueueSize
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
@@ -104,11 +104,11 @@ VirtioMmioSetQueueSize (
 EFI_STATUS
 EFIAPI
 VirtioMmioSetDeviceStatus (
-  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
   IN UINT8                   DeviceStatus
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
@@ -120,11 +120,11 @@ VirtioMmioSetDeviceStatus (
 EFI_STATUS
 EFIAPI
 VirtioMmioSetQueueNotify (
-  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
   IN UINT16                  QueueNotify
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
@@ -136,11 +136,11 @@ VirtioMmioSetQueueNotify (
 EFI_STATUS
 EFIAPI
 VirtioMmioSetQueueAlignment (
-  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
   IN UINT32                  Alignment
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
@@ -152,11 +152,11 @@ VirtioMmioSetQueueAlignment (
 EFI_STATUS
 EFIAPI
 VirtioMmioSetPageSize (
-  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
   IN UINT32                  PageSize
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   if (PageSize != EFI_PAGE_SIZE) {
     return EFI_UNSUPPORTED;
@@ -174,11 +174,11 @@ VirtioMmioSetPageSize (
 EFI_STATUS
 EFIAPI
 VirtioMmioSetQueueSel (
-  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
   IN UINT16                  Sel
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
@@ -199,36 +199,57 @@ VirtioMmioSetQueueAddress (
   IN UINT64                  RingBaseShift
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
-  UINT64 Address;
+  VIRTIO_MMIO_DEVICE  *Device;
+  UINT64              Address;
 
   ASSERT (RingBaseShift == 0);
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
   if (Device->Version == VIRTIO_MMIO_DEVICE_VERSION_0_95) {
-    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_PFN,
-      (UINT32)((UINTN)Ring->Base >> EFI_PAGE_SHIFT));
+    VIRTIO_CFG_WRITE (
+      Device,
+      VIRTIO_MMIO_OFFSET_QUEUE_PFN,
+      (UINT32)((UINTN)Ring->Base >> EFI_PAGE_SHIFT)
+      );
   } else {
     VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_NUM, Device->QueueNum);
 
     Address = (UINTN)Ring->Base;
-    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_DESC_LO,
-                      (UINT32)Address);
-    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_DESC_HI,
-                      (UINT32)RShiftU64(Address, 32));
+    VIRTIO_CFG_WRITE (
+      Device,
+      VIRTIO_MMIO_OFFSET_QUEUE_DESC_LO,
+      (UINT32)Address
+      );
+    VIRTIO_CFG_WRITE (
+      Device,
+      VIRTIO_MMIO_OFFSET_QUEUE_DESC_HI,
+      (UINT32)RShiftU64 (Address, 32)
+      );
 
     Address = (UINTN)Ring->Avail.Flags;
-    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_AVAIL_LO,
-                      (UINT32)Address);
-    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_AVAIL_HI,
-                      (UINT32)RShiftU64(Address, 32));
+    VIRTIO_CFG_WRITE (
+      Device,
+      VIRTIO_MMIO_OFFSET_QUEUE_AVAIL_LO,
+      (UINT32)Address
+      );
+    VIRTIO_CFG_WRITE (
+      Device,
+      VIRTIO_MMIO_OFFSET_QUEUE_AVAIL_HI,
+      (UINT32)RShiftU64 (Address, 32)
+      );
 
     Address = (UINTN)Ring->Used.Flags;
-    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_USED_LO,
-                      (UINT32)Address);
-    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_USED_HI,
-                      (UINT32)RShiftU64(Address, 32));
+    VIRTIO_CFG_WRITE (
+      Device,
+      VIRTIO_MMIO_OFFSET_QUEUE_USED_LO,
+      (UINT32)Address
+      );
+    VIRTIO_CFG_WRITE (
+      Device,
+      VIRTIO_MMIO_OFFSET_QUEUE_USED_HI,
+      (UINT32)RShiftU64 (Address, 32)
+      );
 
     VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_QUEUE_READY, 1);
   }
@@ -239,11 +260,11 @@ VirtioMmioSetQueueAddress (
 EFI_STATUS
 EFIAPI
 VirtioMmioSetGuestFeatures (
-  IN VIRTIO_DEVICE_PROTOCOL *This,
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
   IN UINT64                  Features
   )
 {
-  VIRTIO_MMIO_DEVICE *Device;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
@@ -251,15 +272,25 @@ VirtioMmioSetGuestFeatures (
     if (Features > MAX_UINT32) {
       return EFI_UNSUPPORTED;
     }
-    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
-                      (UINT32)Features);
+
+    VIRTIO_CFG_WRITE (
+      Device,
+      VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
+      (UINT32)Features
+      );
   } else {
     VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES_SEL, 0);
-    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
-                      (UINT32)Features);
+    VIRTIO_CFG_WRITE (
+      Device,
+      VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
+      (UINT32)Features
+      );
     VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES_SEL, 1);
-    VIRTIO_CFG_WRITE (Device, VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
-                      (UINT32)RShiftU64(Features, 32));
+    VIRTIO_CFG_WRITE (
+      Device,
+      VIRTIO_MMIO_OFFSET_GUEST_FEATURES,
+      (UINT32)RShiftU64 (Features, 32)
+      );
   }
 
   return EFI_SUCCESS;
@@ -268,14 +299,14 @@ VirtioMmioSetGuestFeatures (
 EFI_STATUS
 EFIAPI
 VirtioMmioDeviceWrite (
-  IN VIRTIO_DEVICE_PROTOCOL *This,
-  IN UINTN                  FieldOffset,
-  IN UINTN                  FieldSize,
-  IN UINT64                 Value
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
+  IN UINTN                   FieldOffset,
+  IN UINTN                   FieldSize,
+  IN UINT64                  Value
   )
 {
-  UINTN                     DstBaseAddress;
-  VIRTIO_MMIO_DEVICE       *Device;
+  UINTN               DstBaseAddress;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
@@ -283,7 +314,8 @@ VirtioMmioDeviceWrite (
   // Double-check fieldsize
   //
   if ((FieldSize != 1) && (FieldSize != 2) &&
-      (FieldSize != 4) && (FieldSize != 8)) {
+      (FieldSize != 4) && (FieldSize != 8))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -291,13 +323,13 @@ VirtioMmioDeviceWrite (
   // Compute base address
   //
   DstBaseAddress = Device->BaseAddress +
-      VIRTIO_DEVICE_SPECIFIC_CONFIGURATION_OFFSET_MMIO + FieldOffset;
+                   VIRTIO_DEVICE_SPECIFIC_CONFIGURATION_OFFSET_MMIO + FieldOffset;
 
   //
   // The device-specific memory area of Virtio-MMIO can only be written in
   // byte accesses. This is not currently in the Virtio spec.
   //
-  MmioWriteBuffer8 (DstBaseAddress, FieldSize, (UINT8*)&Value);
+  MmioWriteBuffer8 (DstBaseAddress, FieldSize, (UINT8 *)&Value);
 
   return EFI_SUCCESS;
 }
@@ -305,15 +337,15 @@ VirtioMmioDeviceWrite (
 EFI_STATUS
 EFIAPI
 VirtioMmioDeviceRead (
-  IN  VIRTIO_DEVICE_PROTOCOL    *This,
-  IN  UINTN                     FieldOffset,
-  IN  UINTN                     FieldSize,
-  IN  UINTN                     BufferSize,
-  OUT VOID                      *Buffer
+  IN  VIRTIO_DEVICE_PROTOCOL  *This,
+  IN  UINTN                   FieldOffset,
+  IN  UINTN                   FieldSize,
+  IN  UINTN                   BufferSize,
+  OUT VOID                    *Buffer
   )
 {
-  UINTN                     SrcBaseAddress;
-  VIRTIO_MMIO_DEVICE       *Device;
+  UINTN               SrcBaseAddress;
+  VIRTIO_MMIO_DEVICE  *Device;
 
   Device = VIRTIO_MMIO_DEVICE_FROM_VIRTIO_DEVICE (This);
 
@@ -326,7 +358,8 @@ VirtioMmioDeviceRead (
   // Double-check fieldsize
   //
   if ((FieldSize != 1) && (FieldSize != 2) &&
-      (FieldSize != 4) && (FieldSize != 8)) {
+      (FieldSize != 4) && (FieldSize != 8))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -334,7 +367,7 @@ VirtioMmioDeviceRead (
   // Compute base address
   //
   SrcBaseAddress = Device->BaseAddress +
-      VIRTIO_DEVICE_SPECIFIC_CONFIGURATION_OFFSET_MMIO + FieldOffset;
+                   VIRTIO_DEVICE_SPECIFIC_CONFIGURATION_OFFSET_MMIO + FieldOffset;
 
   //
   // The device-specific memory area of Virtio-MMIO can only be read in
@@ -353,7 +386,7 @@ VirtioMmioAllocateSharedPages (
   OUT VOID                    **HostAddress
   )
 {
-  VOID        *Buffer;
+  VOID  *Buffer;
 
   Buffer = AllocatePages (NumPages);
   if (Buffer == NULL) {
@@ -386,8 +419,8 @@ VirtioMmioMapSharedBuffer (
   OUT     VOID                    **Mapping
   )
 {
-  *DeviceAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) HostAddress;
-  *Mapping = NULL;
+  *DeviceAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress;
+  *Mapping       = NULL;
 
   return EFI_SUCCESS;
 }
@@ -395,8 +428,8 @@ VirtioMmioMapSharedBuffer (
 EFI_STATUS
 EFIAPI
 VirtioMmioUnmapSharedBuffer (
-  IN VIRTIO_DEVICE_PROTOCOL    *This,
-  IN VOID                      *Mapping
+  IN VIRTIO_DEVICE_PROTOCOL  *This,
+  IN VOID                    *Mapping
   )
 {
   return EFI_SUCCESS;

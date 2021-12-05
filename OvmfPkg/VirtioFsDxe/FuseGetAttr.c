@@ -37,20 +37,20 @@
 **/
 EFI_STATUS
 VirtioFsFuseGetAttr (
-  IN OUT VIRTIO_FS                          *VirtioFs,
-  IN     UINT64                             NodeId,
-     OUT VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE *FuseAttr
+  IN OUT VIRTIO_FS                        *VirtioFs,
+  IN     UINT64                           NodeId,
+  OUT VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE  *FuseAttr
   )
 {
-  VIRTIO_FS_FUSE_REQUEST          CommonReq;
-  VIRTIO_FS_FUSE_GETATTR_REQUEST  GetAttrReq;
-  VIRTIO_FS_IO_VECTOR             ReqIoVec[2];
-  VIRTIO_FS_SCATTER_GATHER_LIST   ReqSgList;
-  VIRTIO_FS_FUSE_RESPONSE         CommonResp;
-  VIRTIO_FS_FUSE_GETATTR_RESPONSE GetAttrResp;
-  VIRTIO_FS_IO_VECTOR             RespIoVec[3];
-  VIRTIO_FS_SCATTER_GATHER_LIST   RespSgList;
-  EFI_STATUS                      Status;
+  VIRTIO_FS_FUSE_REQUEST           CommonReq;
+  VIRTIO_FS_FUSE_GETATTR_REQUEST   GetAttrReq;
+  VIRTIO_FS_IO_VECTOR              ReqIoVec[2];
+  VIRTIO_FS_SCATTER_GATHER_LIST    ReqSgList;
+  VIRTIO_FS_FUSE_RESPONSE          CommonResp;
+  VIRTIO_FS_FUSE_GETATTR_RESPONSE  GetAttrResp;
+  VIRTIO_FS_IO_VECTOR              RespIoVec[3];
+  VIRTIO_FS_SCATTER_GATHER_LIST    RespSgList;
+  EFI_STATUS                       Status;
 
   //
   // Set up the scatter-gather lists.
@@ -82,8 +82,13 @@ VirtioFsFuseGetAttr (
   //
   // Populate the common request header.
   //
-  Status = VirtioFsFuseNewRequest (VirtioFs, &CommonReq, ReqSgList.TotalSize,
-             VirtioFsFuseOpGetAttr, NodeId);
+  Status = VirtioFsFuseNewRequest (
+             VirtioFs,
+             &CommonReq,
+             ReqSgList.TotalSize,
+             VirtioFsFuseOpGetAttr,
+             NodeId
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -108,9 +113,16 @@ VirtioFsFuseGetAttr (
   //
   Status = VirtioFsFuseCheckResponse (&RespSgList, CommonReq.Unique, NULL);
   if (Status == EFI_DEVICE_ERROR) {
-    DEBUG ((DEBUG_ERROR, "%a: Label=\"%s\" NodeId=%Lu Errno=%d\n",
-      __FUNCTION__, VirtioFs->Label, NodeId, CommonResp.Error));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Label=\"%s\" NodeId=%Lu Errno=%d\n",
+      __FUNCTION__,
+      VirtioFs->Label,
+      NodeId,
+      CommonResp.Error
+      ));
     Status = VirtioFsErrnoToEfiStatus (CommonResp.Error);
   }
+
   return Status;
 }

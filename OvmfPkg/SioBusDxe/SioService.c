@@ -13,7 +13,7 @@
 //
 // Super I/O Protocol interfaces
 //
-EFI_SIO_PROTOCOL mSioInterface = {
+EFI_SIO_PROTOCOL  mSioInterface = {
   SioRegisterAccess,
   SioGetResources,
   SioSetResources,
@@ -25,48 +25,54 @@ EFI_SIO_PROTOCOL mSioInterface = {
 // COM 1 UART Controller
 //
 GLOBAL_REMOVE_IF_UNREFERENCED
-SIO_RESOURCES_IO mCom1Resources = {
-  { { ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR }, 0x3F8, 8 },
-  { ACPI_END_TAG_DESCRIPTOR,                    0        }
+SIO_RESOURCES_IO  mCom1Resources = {
+  {
+    { ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR }, 0x3F8, 8
+  },
+  { ACPI_END_TAG_DESCRIPTOR, 0             }
 };
 
 //
 // COM 2 UART Controller
 //
 GLOBAL_REMOVE_IF_UNREFERENCED
-SIO_RESOURCES_IO mCom2Resources = {
-  { { ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR }, 0x2F8, 8 },
-  { ACPI_END_TAG_DESCRIPTOR,                    0        }
+SIO_RESOURCES_IO  mCom2Resources = {
+  {
+    { ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR }, 0x2F8, 8
+  },
+  { ACPI_END_TAG_DESCRIPTOR, 0             }
 };
 
 //
 // PS/2 Keyboard Controller
 //
 GLOBAL_REMOVE_IF_UNREFERENCED
-SIO_RESOURCES_IO mPs2KeyboardDeviceResources = {
-  { { ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR }, 0x60, 5 },
-  { ACPI_END_TAG_DESCRIPTOR,                    0       }
+SIO_RESOURCES_IO  mPs2KeyboardDeviceResources = {
+  {
+    { ACPI_FIXED_LOCATION_IO_PORT_DESCRIPTOR }, 0x60, 5
+  },
+  { ACPI_END_TAG_DESCRIPTOR, 0             }
 };
 
 //
 // Table of SIO Controllers
 //
 GLOBAL_REMOVE_IF_UNREFERENCED
-SIO_DEVICE_INFO mDevicesInfo[] = {
+SIO_DEVICE_INFO  mDevicesInfo[] = {
   {
     EISA_PNP_ID (0x501),
     0,
-    { (ACPI_SMALL_RESOURCE_HEADER *) &mCom1Resources }
+    { (ACPI_SMALL_RESOURCE_HEADER *)&mCom1Resources              }
   },  // COM 1 UART Controller
   {
     EISA_PNP_ID (0x501),
     1,
-    { (ACPI_SMALL_RESOURCE_HEADER *) &mCom2Resources }
+    { (ACPI_SMALL_RESOURCE_HEADER *)&mCom2Resources              }
   },  // COM 2 UART Controller
   {
-    EISA_PNP_ID(0x303),
+    EISA_PNP_ID (0x303),
     0,
-    { (ACPI_SMALL_RESOURCE_HEADER *) &mPs2KeyboardDeviceResources }
+    { (ACPI_SMALL_RESOURCE_HEADER *)&mPs2KeyboardDeviceResources }
   }   // PS/2 Keyboard Controller
 };
 
@@ -74,19 +80,18 @@ SIO_DEVICE_INFO mDevicesInfo[] = {
 // ACPI Device Path Node template
 //
 GLOBAL_REMOVE_IF_UNREFERENCED
-ACPI_HID_DEVICE_PATH mAcpiDeviceNodeTemplate = {
+ACPI_HID_DEVICE_PATH  mAcpiDeviceNodeTemplate = {
   {        // Header
     ACPI_DEVICE_PATH,
     ACPI_DP,
     {
-      (UINT8) (sizeof (ACPI_HID_DEVICE_PATH)),
-      (UINT8) ((sizeof (ACPI_HID_DEVICE_PATH)) >> 8)
+      (UINT8)(sizeof (ACPI_HID_DEVICE_PATH)),
+      (UINT8)((sizeof (ACPI_HID_DEVICE_PATH)) >> 8)
     }
   },
   0x0,     // HID
   0x0      // UID
 };
-
 
 /**
   Provides a low level access to the registers for the Super I/O.
@@ -124,11 +129,11 @@ ACPI_HID_DEVICE_PATH mAcpiDeviceNodeTemplate = {
 EFI_STATUS
 EFIAPI
 SioRegisterAccess (
-  IN CONST EFI_SIO_PROTOCOL    *This,
-  IN       BOOLEAN             Write,
-  IN       BOOLEAN             ExitCfgMode,
-  IN       UINT8               Register,
-  IN OUT   UINT8               *Value
+  IN CONST EFI_SIO_PROTOCOL  *This,
+  IN       BOOLEAN           Write,
+  IN       BOOLEAN           ExitCfgMode,
+  IN       UINT8             Register,
+  IN OUT   UINT8             *Value
   )
 {
   return EFI_SUCCESS;
@@ -156,11 +161,11 @@ SioRegisterAccess (
 EFI_STATUS
 EFIAPI
 SioGetResources (
-  IN CONST EFI_SIO_PROTOCOL            *This,
-  OUT      ACPI_RESOURCE_HEADER_PTR    *ResourceList
+  IN CONST EFI_SIO_PROTOCOL          *This,
+  OUT      ACPI_RESOURCE_HEADER_PTR  *ResourceList
   )
 {
-  SIO_DEV    *SioDevice;
+  SIO_DEV  *SioDevice;
 
   if (ResourceList == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -189,8 +194,8 @@ SioGetResources (
 EFI_STATUS
 EFIAPI
 SioSetResources (
-  IN CONST EFI_SIO_PROTOCOL            *This,
-  IN       ACPI_RESOURCE_HEADER_PTR    ResourceList
+  IN CONST EFI_SIO_PROTOCOL          *This,
+  IN       ACPI_RESOURCE_HEADER_PTR  ResourceList
   )
 {
   return EFI_SUCCESS;
@@ -212,8 +217,8 @@ SioSetResources (
 EFI_STATUS
 EFIAPI
 SioPossibleResources (
-  IN CONST EFI_SIO_PROTOCOL            *This,
-  OUT      ACPI_RESOURCE_HEADER_PTR    *ResourceCollection
+  IN CONST EFI_SIO_PROTOCOL          *This,
+  OUT      ACPI_RESOURCE_HEADER_PTR  *ResourceCollection
   )
 {
   return EFI_SUCCESS;
@@ -247,9 +252,9 @@ SioPossibleResources (
 EFI_STATUS
 EFIAPI
 SioModify (
-  IN CONST EFI_SIO_PROTOCOL           *This,
-  IN CONST EFI_SIO_REGISTER_MODIFY    *Command,
-  IN       UINTN                      NumberOfCommands
+  IN CONST EFI_SIO_PROTOCOL         *This,
+  IN CONST EFI_SIO_REGISTER_MODIFY  *Command,
+  IN       UINTN                    NumberOfCommands
   )
 {
   return EFI_SUCCESS;
@@ -277,8 +282,8 @@ SioCreateChildDevice (
   IN UINT32                       DeviceIndex
   )
 {
-  EFI_STATUS    Status;
-  SIO_DEV       *SioDevice;
+  EFI_STATUS  Status;
+  SIO_DEV     *SioDevice;
 
   //
   // Initialize the SIO_DEV structure
@@ -288,19 +293,19 @@ SioCreateChildDevice (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  SioDevice->Signature  = SIO_DEV_SIGNATURE;
-  SioDevice->Handle     = NULL;
-  SioDevice->PciIo      = PciIo;
+  SioDevice->Signature = SIO_DEV_SIGNATURE;
+  SioDevice->Handle    = NULL;
+  SioDevice->PciIo     = PciIo;
 
   //
   // Construct the child device path
   //
   mAcpiDeviceNodeTemplate.HID = mDevicesInfo[DeviceIndex].Hid;
   mAcpiDeviceNodeTemplate.UID = mDevicesInfo[DeviceIndex].Uid;
-  SioDevice->DevicePath = AppendDevicePathNode (
-                            ParentDevicePath,
-                            (EFI_DEVICE_PATH_PROTOCOL *) &mAcpiDeviceNodeTemplate
-                            );
+  SioDevice->DevicePath       = AppendDevicePathNode (
+                                  ParentDevicePath,
+                                  (EFI_DEVICE_PATH_PROTOCOL *)&mAcpiDeviceNodeTemplate
+                                  );
   if (SioDevice->DevicePath == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -327,7 +332,7 @@ SioCreateChildDevice (
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIo,
+                  (VOID **)&PciIo,
                   This->DriverBindingHandle,
                   SioDevice->Handle,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
@@ -375,9 +380,9 @@ SioCreateAllChildDevices (
   IN EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath
   )
 {
-  UINT32        Index;
-  UINT32        ChildDeviceNumber;
-  EFI_STATUS    Status;
+  UINT32      Index;
+  UINT32      ChildDeviceNumber;
+  EFI_STATUS  Status;
 
   ChildDeviceNumber = 0;
 

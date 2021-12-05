@@ -18,37 +18,38 @@
  * layers.
  */
 enum xenbus_state {
-    XenbusStateUnknown       = 0,
+  XenbusStateUnknown = 0,
 
-    XenbusStateInitialising  = 1,
+  XenbusStateInitialising = 1,
 
-    /*
-     * InitWait: Finished early initialisation but waiting for information
-     * from the peer or hotplug scripts.
-     */
-    XenbusStateInitWait      = 2,
+  /*
+   * InitWait: Finished early initialisation but waiting for information
+   * from the peer or hotplug scripts.
+   */
+  XenbusStateInitWait = 2,
 
-    /*
-     * Initialised: Waiting for a connection from the peer.
-     */
-    XenbusStateInitialised   = 3,
+  /*
+   * Initialised: Waiting for a connection from the peer.
+   */
+  XenbusStateInitialised = 3,
 
-    XenbusStateConnected     = 4,
+  XenbusStateConnected = 4,
 
-    /*
-     * Closing: The device is being closed due to an error or an unplug event.
-     */
-    XenbusStateClosing       = 5,
+  /*
+   * Closing: The device is being closed due to an error or an unplug event.
+   */
+  XenbusStateClosing = 5,
 
-    XenbusStateClosed        = 6,
+  XenbusStateClosed = 6,
 
-    /*
-     * Reconfiguring: The device is being reconfigured.
-     */
-    XenbusStateReconfiguring = 7,
+  /*
+   * Reconfiguring: The device is being reconfigured.
+   */
+  XenbusStateReconfiguring = 7,
 
-    XenbusStateReconfigured  = 8
+  XenbusStateReconfigured = 8
 };
+
 typedef enum xenbus_state XenbusState;
 
 #endif /* _XEN_PUBLIC_IO_XENBUS_H */

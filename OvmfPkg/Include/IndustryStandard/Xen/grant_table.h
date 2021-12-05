@@ -109,28 +109,30 @@ typedef UINT32 grant_ref_t;
  * for backwards compatibility.  New guests should use version 2.
  */
 #if __XEN_INTERFACE_VERSION__ < 0x0003020a
-#define grant_entry_v1 grant_entry
-#define grant_entry_v1_t grant_entry_t
+#define grant_entry_v1    grant_entry
+#define grant_entry_v1_t  grant_entry_t
 #endif
 struct grant_entry_v1 {
-    /* GTF_xxx: various type and flag information.  [XEN,GST] */
-    UINT16 flags;
-    /* The domain being granted foreign privileges. [GST] */
-    domid_t  domid;
-    /*
-     * GTF_permit_access: Frame that @domid is allowed to map and access. [GST]
-     * GTF_accept_transfer: Frame whose ownership transferred by @domid. [XEN]
-     */
-    UINT32 frame;
+  /* GTF_xxx: various type and flag information.  [XEN,GST] */
+  UINT16     flags;
+  /* The domain being granted foreign privileges. [GST] */
+  domid_t    domid;
+
+  /*
+   * GTF_permit_access: Frame that @domid is allowed to map and access. [GST]
+   * GTF_accept_transfer: Frame whose ownership transferred by @domid. [XEN]
+   */
+  UINT32     frame;
 };
+
 typedef struct grant_entry_v1 grant_entry_v1_t;
 
 /* The first few grant table entries will be preserved across grant table
  * version changes and may be pre-populated at domain creation by tools.
  */
-#define GNTTAB_NR_RESERVED_ENTRIES     8
-#define GNTTAB_RESERVED_CONSOLE        0
-#define GNTTAB_RESERVED_XENSTORE       1
+#define GNTTAB_NR_RESERVED_ENTRIES  8
+#define GNTTAB_RESERVED_CONSOLE     0
+#define GNTTAB_RESERVED_XENSTORE    1
 
 /*
  * Type of grant entry.
@@ -141,11 +143,11 @@ typedef struct grant_entry_v1 grant_entry_v1_t;
  *  GTF_transitive: Allow @domid to transitively access a subrange of
  *                  @trans_grant in @trans_domid.  No mappings are allowed.
  */
-#define GTF_invalid         (0U<<0)
-#define GTF_permit_access   (1U<<0)
-#define GTF_accept_transfer (2U<<0)
-#define GTF_transitive      (3U<<0)
-#define GTF_type_mask       (3U<<0)
+#define GTF_invalid          (0U<<0)
+#define GTF_permit_access    (1U<<0)
+#define GTF_accept_transfer  (2U<<0)
+#define GTF_transitive       (3U<<0)
+#define GTF_type_mask        (3U<<0)
 
 /*
  * Subflags for GTF_permit_access.
@@ -157,20 +159,20 @@ typedef struct grant_entry_v1 grant_entry_v1_t;
  *                will only be allowed to copy from the grant, and not
  *                map it. [GST]
  */
-#define _GTF_readonly       (2)
-#define GTF_readonly        (1U<<_GTF_readonly)
-#define _GTF_reading        (3)
-#define GTF_reading         (1U<<_GTF_reading)
-#define _GTF_writing        (4)
-#define GTF_writing         (1U<<_GTF_writing)
-#define _GTF_PWT            (5)
-#define GTF_PWT             (1U<<_GTF_PWT)
-#define _GTF_PCD            (6)
-#define GTF_PCD             (1U<<_GTF_PCD)
-#define _GTF_PAT            (7)
-#define GTF_PAT             (1U<<_GTF_PAT)
-#define _GTF_sub_page       (8)
-#define GTF_sub_page        (1U<<_GTF_sub_page)
+#define _GTF_readonly  (2)
+#define GTF_readonly   (1U<<_GTF_readonly)
+#define _GTF_reading   (3)
+#define GTF_reading    (1U<<_GTF_reading)
+#define _GTF_writing   (4)
+#define GTF_writing    (1U<<_GTF_writing)
+#define _GTF_PWT       (5)
+#define GTF_PWT        (1U<<_GTF_PWT)
+#define _GTF_PCD       (6)
+#define GTF_PCD        (1U<<_GTF_PCD)
+#define _GTF_PAT       (7)
+#define GTF_PAT        (1U<<_GTF_PAT)
+#define _GTF_sub_page  (8)
+#define GTF_sub_page   (1U<<_GTF_sub_page)
 
 /*
  * Subflags for GTF_accept_transfer:
@@ -182,10 +184,10 @@ typedef struct grant_entry_v1 grant_entry_v1_t;
  *      after reading GTF_transfer_committed. Xen will always write the frame
  *      address, followed by ORing this flag, in a timely manner.
  */
-#define _GTF_transfer_committed (2)
-#define GTF_transfer_committed  (1U<<_GTF_transfer_committed)
-#define _GTF_transfer_completed (3)
-#define GTF_transfer_completed  (1U<<_GTF_transfer_completed)
+#define _GTF_transfer_committed  (2)
+#define GTF_transfer_committed   (1U<<_GTF_transfer_committed)
+#define _GTF_transfer_completed  (3)
+#define GTF_transfer_completed   (1U<<_GTF_transfer_completed)
 
 /*
  * Version 2 grant table entries.  These fulfil the same role as
@@ -197,68 +199,71 @@ typedef struct grant_entry_v1 grant_entry_v1_t;
  * on the grant table version in use by the other domain.
  */
 #if __XEN_INTERFACE_VERSION__ >= 0x0003020a
+
 /*
  * Version 1 and version 2 grant entries share a common prefix.  The
  * fields of the prefix are documented as part of struct
  * grant_entry_v1.
  */
 struct grant_entry_header {
-    UINT16 flags;
-    domid_t  domid;
+  UINT16     flags;
+  domid_t    domid;
 };
+
 typedef struct grant_entry_header grant_entry_header_t;
 
 /*
  * Version 2 of the grant entry structure.
  */
 union grant_entry_v2 {
-    grant_entry_header_t hdr;
+  grant_entry_header_t    hdr;
 
-    /*
-     * This member is used for V1-style full page grants, where either:
-     *
-     * -- hdr.type is GTF_accept_transfer, or
-     * -- hdr.type is GTF_permit_access and GTF_sub_page is not set.
-     *
-     * In that case, the frame field has the same semantics as the
-     * field of the same name in the V1 entry structure.
-     */
-    struct {
-        grant_entry_header_t hdr;
-        UINT32 pad0;
-        UINT64 frame;
-    } full_page;
+  /*
+   * This member is used for V1-style full page grants, where either:
+   *
+   * -- hdr.type is GTF_accept_transfer, or
+   * -- hdr.type is GTF_permit_access and GTF_sub_page is not set.
+   *
+   * In that case, the frame field has the same semantics as the
+   * field of the same name in the V1 entry structure.
+   */
+  struct {
+    grant_entry_header_t    hdr;
+    UINT32                  pad0;
+    UINT64                  frame;
+  } full_page;
 
-    /*
-     * If the grant type is GTF_grant_access and GTF_sub_page is set,
-     * @domid is allowed to access bytes [@page_off,@page_off+@length)
-     * in frame @frame.
-     */
-    struct {
-        grant_entry_header_t hdr;
-        UINT16 page_off;
-        UINT16 length;
-        UINT64 frame;
-    } sub_page;
+  /*
+   * If the grant type is GTF_grant_access and GTF_sub_page is set,
+   * @domid is allowed to access bytes [@page_off,@page_off+@length)
+   * in frame @frame.
+   */
+  struct {
+    grant_entry_header_t    hdr;
+    UINT16                  page_off;
+    UINT16                  length;
+    UINT64                  frame;
+  } sub_page;
 
-    /*
-     * If the grant is GTF_transitive, @domid is allowed to use the
-     * grant @gref in domain @trans_domid, as if it was the local
-     * domain.  Obviously, the transitive access must be compatible
-     * with the original grant.
-     *
-     * The current version of Xen does not allow transitive grants
-     * to be mapped.
-     */
-    struct {
-        grant_entry_header_t hdr;
-        domid_t trans_domid;
-        UINT16 pad0;
-        grant_ref_t gref;
-    } transitive;
+  /*
+   * If the grant is GTF_transitive, @domid is allowed to use the
+   * grant @gref in domain @trans_domid, as if it was the local
+   * domain.  Obviously, the transitive access must be compatible
+   * with the original grant.
+   *
+   * The current version of Xen does not allow transitive grants
+   * to be mapped.
+   */
+  struct {
+    grant_entry_header_t    hdr;
+    domid_t                 trans_domid;
+    UINT16                  pad0;
+    grant_ref_t             gref;
+  } transitive;
 
-    UINT32 __spacer[4]; /* Pad to a power of two */
+  UINT32    __spacer[4]; /* Pad to a power of two */
 };
+
 typedef union grant_entry_v2 grant_entry_v2_t;
 
 typedef UINT16 grant_status_t;
@@ -280,8 +285,8 @@ typedef UINT16 grant_status_t;
  */
 
 /* ` enum grant_table_op { // GNTTABOP_* => struct gnttab_* */
-#define GNTTABOP_map_grant_ref        0
-#define GNTTABOP_unmap_grant_ref      1
+#define GNTTABOP_map_grant_ref    0
+#define GNTTABOP_unmap_grant_ref  1
 /* ` } */
 
 /*
@@ -307,18 +312,19 @@ typedef UINT32 grant_handle_t;
  *     to be accounted to the correct grant reference!
  */
 struct gnttab_map_grant_ref {
-    /* IN parameters. */
-    UINT64 host_addr;
-    UINT32 flags;               /* GNTMAP_* */
-    grant_ref_t ref;
-    domid_t  dom;
-    /* OUT parameters. */
-    INT16  status;              /* => enum grant_status */
-    grant_handle_t handle;
-    UINT64 dev_bus_addr;
+  /* IN parameters. */
+  UINT64            host_addr;
+  UINT32            flags;      /* GNTMAP_* */
+  grant_ref_t       ref;
+  domid_t           dom;
+  /* OUT parameters. */
+  INT16             status;     /* => enum grant_status */
+  grant_handle_t    handle;
+  UINT64            dev_bus_addr;
 };
+
 typedef struct gnttab_map_grant_ref gnttab_map_grant_ref_t;
-DEFINE_XEN_GUEST_HANDLE(gnttab_map_grant_ref_t);
+DEFINE_XEN_GUEST_HANDLE (gnttab_map_grant_ref_t);
 
 /*
  * GNTTABOP_unmap_grant_ref: Destroy one or more grant-reference mappings
@@ -332,74 +338,76 @@ DEFINE_XEN_GUEST_HANDLE(gnttab_map_grant_ref_t);
  *     mappings will remain in the device or host TLBs.
  */
 struct gnttab_unmap_grant_ref {
-    /* IN parameters. */
-    UINT64 host_addr;
-    UINT64 dev_bus_addr;
-    grant_handle_t handle;
-    /* OUT parameters. */
-    INT16  status;              /* => enum grant_status */
+  /* IN parameters. */
+  UINT64            host_addr;
+  UINT64            dev_bus_addr;
+  grant_handle_t    handle;
+  /* OUT parameters. */
+  INT16             status;     /* => enum grant_status */
 };
+
 typedef struct gnttab_unmap_grant_ref gnttab_unmap_grant_ref_t;
-DEFINE_XEN_GUEST_HANDLE(gnttab_unmap_grant_ref_t);
+DEFINE_XEN_GUEST_HANDLE (gnttab_unmap_grant_ref_t);
 
 /*
  * Bitfield values for gnttab_map_grant_ref.flags.
  */
- /* Map the grant entry for access by I/O devices. */
-#define _GNTMAP_device_map      (0)
-#define GNTMAP_device_map       (1<<_GNTMAP_device_map)
- /* Map the grant entry for access by host CPUs. */
-#define _GNTMAP_host_map        (1)
-#define GNTMAP_host_map         (1<<_GNTMAP_host_map)
- /* Accesses to the granted frame will be restricted to read-only access. */
-#define _GNTMAP_readonly        (2)
-#define GNTMAP_readonly         (1<<_GNTMAP_readonly)
- /*
-  * GNTMAP_host_map subflag:
-  *  0 => The host mapping is usable only by the guest OS.
-  *  1 => The host mapping is usable by guest OS + current application.
-  */
-#define _GNTMAP_application_map (3)
-#define GNTMAP_application_map  (1<<_GNTMAP_application_map)
+/* Map the grant entry for access by I/O devices. */
+#define _GNTMAP_device_map  (0)
+#define GNTMAP_device_map   (1<<_GNTMAP_device_map)
+/* Map the grant entry for access by host CPUs. */
+#define _GNTMAP_host_map  (1)
+#define GNTMAP_host_map   (1<<_GNTMAP_host_map)
+/* Accesses to the granted frame will be restricted to read-only access. */
+#define _GNTMAP_readonly  (2)
+#define GNTMAP_readonly   (1<<_GNTMAP_readonly)
 
- /*
-  * GNTMAP_contains_pte subflag:
-  *  0 => This map request contains a host virtual address.
-  *  1 => This map request contains the machine address of the PTE to update.
-  */
-#define _GNTMAP_contains_pte    (4)
-#define GNTMAP_contains_pte     (1<<_GNTMAP_contains_pte)
+/*
+ * GNTMAP_host_map subflag:
+ *  0 => The host mapping is usable only by the guest OS.
+ *  1 => The host mapping is usable by guest OS + current application.
+ */
+#define _GNTMAP_application_map  (3)
+#define GNTMAP_application_map   (1<<_GNTMAP_application_map)
 
-#define _GNTMAP_can_fail        (5)
-#define GNTMAP_can_fail         (1<<_GNTMAP_can_fail)
+/*
+ * GNTMAP_contains_pte subflag:
+ *  0 => This map request contains a host virtual address.
+ *  1 => This map request contains the machine address of the PTE to update.
+ */
+#define _GNTMAP_contains_pte  (4)
+#define GNTMAP_contains_pte   (1<<_GNTMAP_contains_pte)
+
+#define _GNTMAP_can_fail  (5)
+#define GNTMAP_can_fail   (1<<_GNTMAP_can_fail)
 
 /*
  * Bits to be placed in guest kernel available PTE bits (architecture
  * dependent; only supported when XENFEAT_gnttab_map_avail_bits is set).
  */
-#define _GNTMAP_guest_avail0    (16)
-#define GNTMAP_guest_avail_mask ((UINT32)~0 << _GNTMAP_guest_avail0)
+#define _GNTMAP_guest_avail0     (16)
+#define GNTMAP_guest_avail_mask  ((UINT32)~0 << _GNTMAP_guest_avail0)
 
 /*
  * Values for error status returns. All errors are -ve.
  */
 /* ` enum grant_status { */
-#define GNTST_okay             (0)  /* Normal return.                        */
-#define GNTST_general_error    (-1) /* General undefined error.              */
-#define GNTST_bad_domain       (-2) /* Unrecognised domain id.               */
-#define GNTST_bad_gntref       (-3) /* Unrecognised or inappropriate gntref. */
-#define GNTST_bad_handle       (-4) /* Unrecognised or inappropriate handle. */
-#define GNTST_bad_virt_addr    (-5) /* Inappropriate virtual address to map. */
-#define GNTST_bad_dev_addr     (-6) /* Inappropriate device address to unmap.*/
-#define GNTST_no_device_space  (-7) /* Out of space in I/O MMU.              */
-#define GNTST_permission_denied (-8) /* Not enough privilege for operation.  */
-#define GNTST_bad_page         (-9) /* Specified page was invalid for op.    */
-#define GNTST_bad_copy_arg    (-10) /* copy arguments cross page boundary.   */
-#define GNTST_address_too_big (-11) /* transfer page address too large.      */
-#define GNTST_eagain          (-12) /* Operation not done; try again.        */
+#define GNTST_okay               (0)   /* Normal return.                        */
+#define GNTST_general_error      (-1)  /* General undefined error.              */
+#define GNTST_bad_domain         (-2)  /* Unrecognised domain id.               */
+#define GNTST_bad_gntref         (-3)  /* Unrecognised or inappropriate gntref. */
+#define GNTST_bad_handle         (-4)  /* Unrecognised or inappropriate handle. */
+#define GNTST_bad_virt_addr      (-5)  /* Inappropriate virtual address to map. */
+#define GNTST_bad_dev_addr       (-6)  /* Inappropriate device address to unmap.*/
+#define GNTST_no_device_space    (-7)  /* Out of space in I/O MMU.              */
+#define GNTST_permission_denied  (-8)  /* Not enough privilege for operation.  */
+#define GNTST_bad_page           (-9)  /* Specified page was invalid for op.    */
+#define GNTST_bad_copy_arg       (-10) /* copy arguments cross page boundary.   */
+#define GNTST_address_too_big    (-11) /* transfer page address too large.      */
+#define GNTST_eagain             (-12) /* Operation not done; try again.        */
 /* ` } */
 
-#define GNTTABOP_error_msgs {                   \
+#define GNTTABOP_error_msgs  {                  \
     "okay",                                     \
     "undefined error",                          \
     "unrecognised domain id",                   \

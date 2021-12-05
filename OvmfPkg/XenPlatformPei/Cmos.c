@@ -8,7 +8,6 @@
 
 **/
 
-
 #include "Cmos.h"
 #include "Library/IoLib.h"
 
@@ -26,13 +25,12 @@
 UINT8
 EFIAPI
 CmosRead8 (
-  IN      UINTN                     Index
+  IN      UINTN  Index
   )
 {
-  IoWrite8 (0x70, (UINT8) Index);
+  IoWrite8 (0x70, (UINT8)Index);
   return IoRead8 (0x71);
 }
-
 
 /**
   Writes 8-bits of CMOS data.
@@ -49,12 +47,11 @@ CmosRead8 (
 UINT8
 EFIAPI
 CmosWrite8 (
-  IN      UINTN                     Index,
-  IN      UINT8                     Value
+  IN      UINTN  Index,
+  IN      UINT8  Value
   )
 {
-  IoWrite8 (0x70, (UINT8) Index);
+  IoWrite8 (0x70, (UINT8)Index);
   IoWrite8 (0x71, Value);
   return Value;
 }
-

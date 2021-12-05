@@ -21,13 +21,13 @@
 
 #pragma pack (1)
 typedef struct {
-  VENDOR_DEVICE_PATH                  Vendor;
-  EFI_PHYSICAL_ADDRESS                GrantTableAddress;
-  EFI_DEVICE_PATH_PROTOCOL            End;
+  VENDOR_DEVICE_PATH          Vendor;
+  EFI_PHYSICAL_ADDRESS        GrantTableAddress;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } XENBUS_ROOT_DEVICE_PATH;
 #pragma pack ()
 
-STATIC CONST XENBUS_ROOT_DEVICE_PATH mXenBusRootDevicePathTemplate = {
+STATIC CONST XENBUS_ROOT_DEVICE_PATH  mXenBusRootDevicePathTemplate = {
   {
     {
       HARDWARE_DEVICE_PATH,
@@ -40,7 +40,7 @@ STATIC CONST XENBUS_ROOT_DEVICE_PATH mXenBusRootDevicePathTemplate = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { sizeof (EFI_DEVICE_PATH_PROTOCOL), 0 }
+    { sizeof (EFI_DEVICE_PATH_PROTOCOL),                           0 }
   }
 };
 
@@ -66,14 +66,14 @@ STATIC CONST XENBUS_ROOT_DEVICE_PATH mXenBusRootDevicePathTemplate = {
 **/
 EFI_STATUS
 XenIoMmioInstall (
-  IN OUT   EFI_HANDLE              *Handle,
-  IN       EFI_PHYSICAL_ADDRESS    GrantTableAddress
+  IN OUT   EFI_HANDLE            *Handle,
+  IN       EFI_PHYSICAL_ADDRESS  GrantTableAddress
   )
 {
-  EFI_STATUS                     Status;
-  XENIO_PROTOCOL                 *XenIo;
-  XENBUS_ROOT_DEVICE_PATH        *XenBusDevicePath;
-  EFI_HANDLE                     OutHandle;
+  EFI_STATUS               Status;
+  XENIO_PROTOCOL           *XenIo;
+  XENBUS_ROOT_DEVICE_PATH  *XenBusDevicePath;
+  EFI_HANDLE               OutHandle;
 
   ASSERT (Handle != NULL);
 
@@ -83,29 +83,42 @@ XenIoMmioInstall (
   if (!XenIo) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   XenIo->GrantTableAddress = GrantTableAddress;
 
-  XenBusDevicePath = AllocateCopyPool (sizeof *XenBusDevicePath,
-                       &mXenBusRootDevicePathTemplate);
+  XenBusDevicePath = AllocateCopyPool (
+                       sizeof *XenBusDevicePath,
+                       &mXenBusRootDevicePathTemplate
+                       );
   if (!XenBusDevicePath) {
     DEBUG ((DEBUG_ERROR, "%a: Out of memory\n", __FUNCTION__));
     Status = EFI_OUT_OF_RESOURCES;
     goto FreeXenIo;
   }
+
   XenBusDevicePath->GrantTableAddress = GrantTableAddress;
 
-  Status = gBS->InstallMultipleProtocolInterfaces (&OutHandle,
-                  &gEfiDevicePathProtocolGuid, XenBusDevicePath,
-                  &gXenIoProtocolGuid, XenIo,
-                  NULL);
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &OutHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  XenBusDevicePath,
+                  &gXenIoProtocolGuid,
+                  XenIo,
+                  NULL
+                  );
   if (!EFI_ERROR (Status)) {
     *Handle = OutHandle;
     return EFI_SUCCESS;
   }
 
-  DEBUG ((DEBUG_ERROR, "%a: Failed to install the EFI_DEVICE_PATH and "
+  DEBUG ((
+    DEBUG_ERROR,
+    "%a: Failed to install the EFI_DEVICE_PATH and "
     "XENIO_PROTOCOL protocols on handle %p (Status == %r)\n",
-    __FUNCTION__, OutHandle, Status));
+    __FUNCTION__,
+    OutHandle,
+    Status
+    ));
 
   FreePool (XenBusDevicePath);
 
@@ -129,25 +142,41 @@ FreeXenIo:
 **/
 EFI_STATUS
 XenIoMmioUninstall (
-  IN       EFI_HANDLE              Handle
+  IN       EFI_HANDLE  Handle
   )
 {
-  EFI_STATUS    Status;
-  VOID          *XenIo;
-  VOID          *XenBusDevicePath;
+  EFI_STATUS  Status;
+  VOID        *XenIo;
+  VOID        *XenBusDevicePath;
 
   XenBusDevicePath = NULL;
-  gBS->OpenProtocol (Handle, &gEfiDevicePathProtocolGuid, &XenBusDevicePath,
-         NULL, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  gBS->OpenProtocol (
+         Handle,
+         &gEfiDevicePathProtocolGuid,
+         &XenBusDevicePath,
+         NULL,
+         NULL,
+         EFI_OPEN_PROTOCOL_GET_PROTOCOL
+         );
 
   XenIo = NULL;
-  gBS->OpenProtocol (Handle, &gXenIoProtocolGuid, &XenIo,
-         NULL, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  gBS->OpenProtocol (
+         Handle,
+         &gXenIoProtocolGuid,
+         &XenIo,
+         NULL,
+         NULL,
+         EFI_OPEN_PROTOCOL_GET_PROTOCOL
+         );
 
-  Status = gBS->UninstallMultipleProtocolInterfaces (Handle,
-                  &gEfiDevicePathProtocolGuid, XenBusDevicePath,
-                  &gXenIoProtocolGuid, XenIo,
-                  NULL);
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+                  Handle,
+                  &gEfiDevicePathProtocolGuid,
+                  XenBusDevicePath,
+                  &gXenIoProtocolGuid,
+                  XenIo,
+                  NULL
+                  );
 
   if (EFI_ERROR (Status)) {
     return Status;

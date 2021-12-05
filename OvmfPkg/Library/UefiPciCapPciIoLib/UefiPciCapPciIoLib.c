@@ -10,7 +10,6 @@
 
 #include "UefiPciCapPciIoLib.h"
 
-
 /**
   Transfer bytes between the config space of a given PCI device and a memory
   buffer.
@@ -46,18 +45,18 @@
 STATIC
 EFI_STATUS
 ProtoDevTransferConfig (
-  IN     EFI_PCI_IO_PROTOCOL        *PciIo,
-  IN     EFI_PCI_IO_PROTOCOL_CONFIG TransferFunction,
-  IN     UINT16                     ConfigOffset,
-  IN OUT UINT8                      *Buffer,
-  IN     UINT16                     Size
+  IN     EFI_PCI_IO_PROTOCOL         *PciIo,
+  IN     EFI_PCI_IO_PROTOCOL_CONFIG  TransferFunction,
+  IN     UINT16                      ConfigOffset,
+  IN OUT UINT8                       *Buffer,
+  IN     UINT16                      Size
   )
 {
   while (Size > 0) {
-    EFI_PCI_IO_PROTOCOL_WIDTH Width;
-    UINT16                    Count;
-    EFI_STATUS                Status;
-    UINT16                    Progress;
+    EFI_PCI_IO_PROTOCOL_WIDTH  Width;
+    UINT16                     Count;
+    EFI_STATUS                 Status;
+    UINT16                     Progress;
 
     //
     // Pick the largest access size that is allowed by the remaining transfer
@@ -67,28 +66,30 @@ ProtoDevTransferConfig (
     // possible in one iteration of the loop. Otherwise, transfer only one
     // unit, to improve the alignment.
     //
-    if (Size >= 4 && (ConfigOffset & 3) == 0) {
+    if ((Size >= 4) && ((ConfigOffset & 3) == 0)) {
       Width = EfiPciIoWidthUint32;
       Count = Size >> Width;
-    } else if (Size >= 2 && (ConfigOffset & 1) == 0) {
+    } else if ((Size >= 2) && ((ConfigOffset & 1) == 0)) {
       Width = EfiPciIoWidthUint16;
       Count = 1;
     } else {
       Width = EfiPciIoWidthUint8;
       Count = 1;
     }
+
     Status = TransferFunction (PciIo, Width, ConfigOffset, Count, Buffer);
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     Progress      = Count << Width;
     ConfigOffset += Progress;
     Buffer       += Progress;
     Size         -= Progress;
   }
+
   return EFI_SUCCESS;
 }
-
 
 /**
   Read the config space of a given PCI device (both normal and extended).
@@ -121,19 +122,23 @@ STATIC
 RETURN_STATUS
 EFIAPI
 ProtoDevReadConfig (
-  IN  PCI_CAP_DEV *PciDevice,
-  IN  UINT16      SourceOffset,
-  OUT VOID        *DestinationBuffer,
-  IN  UINT16      Size
+  IN  PCI_CAP_DEV  *PciDevice,
+  IN  UINT16       SourceOffset,
+  OUT VOID         *DestinationBuffer,
+  IN  UINT16       Size
   )
 {
-  PROTO_DEV *ProtoDev;
+  PROTO_DEV  *ProtoDev;
 
   ProtoDev = PROTO_DEV_FROM_PCI_CAP_DEV (PciDevice);
-  return ProtoDevTransferConfig (ProtoDev->PciIo, ProtoDev->PciIo->Pci.Read,
-           SourceOffset, DestinationBuffer, Size);
+  return ProtoDevTransferConfig (
+           ProtoDev->PciIo,
+           ProtoDev->PciIo->Pci.Read,
+           SourceOffset,
+           DestinationBuffer,
+           Size
+           );
 }
-
 
 /**
   Write the config space of a given PCI device (both normal and extended).
@@ -166,19 +171,23 @@ STATIC
 RETURN_STATUS
 EFIAPI
 ProtoDevWriteConfig (
-  IN PCI_CAP_DEV *PciDevice,
-  IN UINT16      DestinationOffset,
-  IN VOID        *SourceBuffer,
-  IN UINT16      Size
+  IN PCI_CAP_DEV  *PciDevice,
+  IN UINT16       DestinationOffset,
+  IN VOID         *SourceBuffer,
+  IN UINT16       Size
   )
 {
-  PROTO_DEV *ProtoDev;
+  PROTO_DEV  *ProtoDev;
 
   ProtoDev = PROTO_DEV_FROM_PCI_CAP_DEV (PciDevice);
-  return ProtoDevTransferConfig (ProtoDev->PciIo, ProtoDev->PciIo->Pci.Write,
-           DestinationOffset, SourceBuffer, Size);
+  return ProtoDevTransferConfig (
+           ProtoDev->PciIo,
+           ProtoDev->PciIo->Pci.Write,
+           DestinationOffset,
+           SourceBuffer,
+           Size
+           );
 }
-
 
 /**
   Create a PCI_CAP_DEV object from an EFI_PCI_IO_PROTOCOL instance. The config
@@ -197,11 +206,11 @@ ProtoDevWriteConfig (
 EFI_STATUS
 EFIAPI
 PciCapPciIoDeviceInit (
-  IN  EFI_PCI_IO_PROTOCOL *PciIo,
-  OUT PCI_CAP_DEV         **PciDevice
+  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
+  OUT PCI_CAP_DEV          **PciDevice
   )
 {
-  PROTO_DEV *ProtoDev;
+  PROTO_DEV  *ProtoDev;
 
   ProtoDev = AllocatePool (sizeof *ProtoDev);
   if (ProtoDev == NULL) {
@@ -217,7 +226,6 @@ PciCapPciIoDeviceInit (
   return EFI_SUCCESS;
 }
 
-
 /**
   Free the resources used by PciDevice.
 
@@ -227,10 +235,10 @@ PciCapPciIoDeviceInit (
 VOID
 EFIAPI
 PciCapPciIoDeviceUninit (
-  IN PCI_CAP_DEV *PciDevice
+  IN PCI_CAP_DEV  *PciDevice
   )
 {
-  PROTO_DEV *ProtoDev;
+  PROTO_DEV  *ProtoDev;
 
   ProtoDev = PROTO_DEV_FROM_PCI_CAP_DEV (PciDevice);
   FreePool (ProtoDev);

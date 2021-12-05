@@ -16,7 +16,7 @@
 //
 // The types and the documentation reflects the SeaBIOS interface.
 //
-#define QEMU_LOADER_FNAME_SIZE QEMU_FW_CFG_FNAME_SIZE
+#define QEMU_LOADER_FNAME_SIZE  QEMU_FW_CFG_FNAME_SIZE
 
 typedef enum {
   QemuLoaderCmdAllocate = 1,
@@ -36,9 +36,9 @@ typedef enum {
 // allocated in the zone specified by Zone, aligned at a multiple of Alignment.
 //
 typedef struct {
-  UINT8  File[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
-  UINT32 Alignment;                    // power of two
-  UINT8  Zone;                         // QEMU_LOADER_ALLOC_ZONE values
+  UINT8     File[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
+  UINT32    Alignment;                    // power of two
+  UINT8     Zone;                         // QEMU_LOADER_ALLOC_ZONE values
 } QEMU_LOADER_ALLOCATE;
 
 //
@@ -49,10 +49,10 @@ typedef struct {
 // been placed (when QemuLoaderCmdAllocate has been executed for PointeeFile).
 //
 typedef struct {
-  UINT8  PointerFile[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
-  UINT8  PointeeFile[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
-  UINT32 PointerOffset;
-  UINT8  PointerSize;                         // one of 1, 2, 4, 8
+  UINT8     PointerFile[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
+  UINT8     PointeeFile[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
+  UINT32    PointerOffset;
+  UINT8     PointerSize;                      // one of 1, 2, 4, 8
 } QEMU_LOADER_ADD_POINTER;
 
 //
@@ -61,10 +61,10 @@ typedef struct {
 // UINT8 result at ResultOffset in the same File.
 //
 typedef struct {
-  UINT8  File[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
-  UINT32 ResultOffset;
-  UINT32 Start;
-  UINT32 Length;
+  UINT8     File[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
+  UINT32    ResultOffset;
+  UINT32    Start;
+  UINT32    Length;
 } QEMU_LOADER_ADD_CHECKSUM;
 
 //
@@ -84,21 +84,21 @@ typedef struct {
 // field.
 //
 typedef struct {
-  UINT8  PointerFile[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
-  UINT8  PointeeFile[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
-  UINT32 PointerOffset;
-  UINT32 PointeeOffset;
-  UINT8  PointerSize;                         // one of 1, 2, 4, 8
+  UINT8     PointerFile[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
+  UINT8     PointeeFile[QEMU_LOADER_FNAME_SIZE]; // NUL-terminated
+  UINT32    PointerOffset;
+  UINT32    PointeeOffset;
+  UINT8     PointerSize;                      // one of 1, 2, 4, 8
 } QEMU_LOADER_WRITE_POINTER;
 
 typedef struct {
-  UINT32 Type;                             // QEMU_LOADER_COMMAND_TYPE values
+  UINT32    Type;                          // QEMU_LOADER_COMMAND_TYPE values
   union {
-    QEMU_LOADER_ALLOCATE      Allocate;
-    QEMU_LOADER_ADD_POINTER   AddPointer;
-    QEMU_LOADER_ADD_CHECKSUM  AddChecksum;
-    QEMU_LOADER_WRITE_POINTER WritePointer;
-    UINT8                     Padding[124];
+    QEMU_LOADER_ALLOCATE         Allocate;
+    QEMU_LOADER_ADD_POINTER      AddPointer;
+    QEMU_LOADER_ADD_CHECKSUM     AddChecksum;
+    QEMU_LOADER_WRITE_POINTER    WritePointer;
+    UINT8                        Padding[124];
   } Command;
 } QEMU_LOADER_ENTRY;
 #pragma pack ()

@@ -25,9 +25,9 @@ XenGetInfoHOB (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE   *GuidHob;
-  STATIC BOOLEAN      Cached = FALSE;
-  STATIC EFI_XEN_INFO *XenInfo;
+  EFI_HOB_GUID_TYPE    *GuidHob;
+  STATIC BOOLEAN       Cached = FALSE;
+  STATIC EFI_XEN_INFO  *XenInfo;
 
   //
   // Return the cached result for the benefit of XenDetected that can be
@@ -41,8 +41,9 @@ XenGetInfoHOB (
   if (GuidHob == NULL) {
     XenInfo = NULL;
   } else {
-    XenInfo = (EFI_XEN_INFO *) GET_GUID_HOB_DATA (GuidHob);
+    XenInfo = (EFI_XEN_INFO *)GET_GUID_HOB_DATA (GuidHob);
   }
+
   Cached = TRUE;
   return XenInfo;
 }
@@ -74,7 +75,7 @@ XenPvhDetected (
   VOID
   )
 {
-  EFI_XEN_INFO        *XenInfo;
+  EFI_XEN_INFO  *XenInfo;
 
   XenInfo = XenGetInfoHOB ();
   return (XenInfo != NULL && XenInfo->RsdpPvh != NULL);
