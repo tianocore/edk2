@@ -78,7 +78,7 @@ Requirements:
   Note: fields marked with "{Template}" will be updated dynamically.
 */
 STATIC
-EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE AcpiFadt = {
+EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
   ACPI_HEADER (
     EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
     EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE,
@@ -250,11 +250,11 @@ STATIC
 EFI_STATUS
 EFIAPI
 FadtAddPmProfileInfo (
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol
-)
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
+  )
 {
-  EFI_STATUS                              Status;
-  CM_ARM_POWER_MANAGEMENT_PROFILE_INFO  * PmProfile;
+  EFI_STATUS                            Status;
+  CM_ARM_POWER_MANAGEMENT_PROFILE_INFO  *PmProfile;
 
   ASSERT (CfgMgrProtocol != NULL);
 
@@ -303,11 +303,11 @@ STATIC
 EFI_STATUS
 EFIAPI
 FadtAddBootArchInfo (
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol
-)
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
+  )
 {
-  EFI_STATUS               Status;
-  CM_ARM_BOOT_ARCH_INFO  * BootArchInfo;
+  EFI_STATUS             Status;
+  CM_ARM_BOOT_ARCH_INFO  *BootArchInfo;
 
   ASSERT (CfgMgrProtocol != NULL);
 
@@ -355,11 +355,11 @@ STATIC
 EFI_STATUS
 EFIAPI
 FadtAddHypervisorVendorId (
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol
-)
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
+  )
 {
-  EFI_STATUS                     Status;
-  CM_ARM_HYPERVISOR_VENDOR_ID  * HypervisorVendorInfo;
+  EFI_STATUS                   Status;
+  CM_ARM_HYPERVISOR_VENDOR_ID  *HypervisorVendorInfo;
 
   ASSERT (CfgMgrProtocol != NULL);
 
@@ -385,6 +385,7 @@ FadtAddHypervisorVendorId (
         Status
         ));
     }
+
     goto error_handler;
   }
 
@@ -416,11 +417,11 @@ STATIC
 EFI_STATUS
 EFIAPI
 FadtAddFixedFeatureFlags (
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol
-)
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
+  )
 {
-  EFI_STATUS                    Status;
-  CM_ARM_FIXED_FEATURE_FLAGS  * FixedFeatureFlags;
+  EFI_STATUS                  Status;
+  CM_ARM_FIXED_FEATURE_FLAGS  *FixedFeatureFlags;
 
   ASSERT (CfgMgrProtocol != NULL);
 
@@ -446,6 +447,7 @@ FadtAddFixedFeatureFlags (
         Status
         ));
     }
+
     goto error_handler;
   }
 
@@ -497,10 +499,10 @@ STATIC
 EFI_STATUS
 EFIAPI
 BuildFadtTable (
-  IN  CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
   EFI_STATUS  Status;
@@ -513,7 +515,8 @@ BuildFadtTable (
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
 
   if ((AcpiTableInfo->AcpiTableRevision < This->MinAcpiTableRevision) ||
-      (AcpiTableInfo->AcpiTableRevision > This->AcpiTableRevision)) {
+      (AcpiTableInfo->AcpiTableRevision > This->AcpiTableRevision))
+  {
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: FADT: Requested table revision = %d, is not supported."
@@ -530,7 +533,7 @@ BuildFadtTable (
   Status = AddAcpiHeader (
              CfgMgrProtocol,
              This,
-             (EFI_ACPI_DESCRIPTION_HEADER*)&AcpiFadt,
+             (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiFadt,
              AcpiTableInfo,
              sizeof (EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE)
              );
@@ -595,20 +598,20 @@ BuildFadtTable (
     }
   }
 
-  *Table = (EFI_ACPI_DESCRIPTION_HEADER*)&AcpiFadt;
+  *Table = (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiFadt;
 error_handler:
   return Status;
 }
 
 /** This macro defines the FADT Table Generator revision.
 */
-#define FADT_GENERATOR_REVISION CREATE_REVISION (1, 0)
+#define FADT_GENERATOR_REVISION  CREATE_REVISION (1, 0)
 
 /** The interface for the FADT Table Generator.
 */
 STATIC
 CONST
-ACPI_TABLE_GENERATOR FadtGenerator = {
+ACPI_TABLE_GENERATOR  FadtGenerator = {
   // Generator ID
   CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdFadt),
   // Generator Description
@@ -648,11 +651,12 @@ ACPI_TABLE_GENERATOR FadtGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiFadtLibConstructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = RegisterAcpiTableGenerator (&FadtGenerator);
   DEBUG ((DEBUG_INFO, "FADT: Register Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);
@@ -671,11 +675,12 @@ AcpiFadtLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiFadtLibDestructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = DeregisterAcpiTableGenerator (&FadtGenerator);
   DEBUG ((DEBUG_INFO, "FADT: Deregister Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);
