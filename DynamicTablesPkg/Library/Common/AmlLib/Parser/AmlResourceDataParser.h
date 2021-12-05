@@ -40,7 +40,7 @@
 BOOLEAN
 EFIAPI
 AmlRdIsResourceDataBuffer (
-  IN  CONST AML_STREAM    * FStream
+  IN  CONST AML_STREAM  *FStream
   );
 
 /** Parse a ResourceDataBuffer.
@@ -63,9 +63,8 @@ AmlRdIsResourceDataBuffer (
 EFI_STATUS
 EFIAPI
 AmlParseResourceData (
-  IN  AML_OBJECT_NODE   * BufferNode,
-  IN  AML_STREAM        * FStream
+  IN  AML_OBJECT_NODE  *BufferNode,
+  IN  AML_STREAM       *FStream
   );
 
 #endif // AML_RESOURCE_DATA_PARSER_H_
-

@@ -37,17 +37,18 @@
 AML_NODE_HEADER *
 EFIAPI
 AmlGetSiblingVariableArgument (
-  IN  AML_NODE_HEADER   * VarArgNode
+  IN  AML_NODE_HEADER  *VarArgNode
   )
 {
-  EAML_PARSE_INDEX    Index;
-  AML_NODE_HEADER   * ParentNode;
+  EAML_PARSE_INDEX  Index;
+  AML_NODE_HEADER   *ParentNode;
 
   // VarArgNode must be an object node or a data node,
   // and be in a variable list of arguments.
   if ((!IS_AML_OBJECT_NODE (VarArgNode) &&
        !IS_AML_DATA_NODE (VarArgNode))  ||
-      AmlIsNodeFixedArgument (VarArgNode, &Index)) {
+      AmlIsNodeFixedArgument (VarArgNode, &Index))
+  {
     ASSERT (0);
     return NULL;
   }
@@ -85,12 +86,12 @@ AmlGetSiblingVariableArgument (
 AML_NODE_HEADER *
 EFIAPI
 AmlGetNextVariableArgument (
-  IN  AML_NODE_HEADER  * Node,
-  IN  AML_NODE_HEADER  * CurrVarArg
+  IN  AML_NODE_HEADER  *Node,
+  IN  AML_NODE_HEADER  *CurrVarArg
   )
 {
-  CONST LIST_ENTRY       * StartLink;
-  CONST LIST_ENTRY       * NextLink;
+  CONST LIST_ENTRY  *StartLink;
+  CONST LIST_ENTRY  *NextLink;
 
   // Node must be a RootNode or an Object Node
   // and the CurrVarArg must not be a Root Node.
@@ -98,7 +99,8 @@ AmlGetNextVariableArgument (
        !IS_AML_OBJECT_NODE (Node))        ||
       ((CurrVarArg != NULL)               &&
        (!IS_AML_OBJECT_NODE (CurrVarArg)  &&
-        !IS_AML_DATA_NODE (CurrVarArg)))) {
+        !IS_AML_DATA_NODE (CurrVarArg))))
+  {
     ASSERT (0);
     return NULL;
   }
@@ -112,8 +114,9 @@ AmlGetNextVariableArgument (
   if (CurrVarArg == NULL) {
     NextLink = StartLink->ForwardLink;
     if (NextLink != StartLink) {
-      return (AML_NODE_HEADER*)NextLink;
+      return (AML_NODE_HEADER *)NextLink;
     }
+
     // List is empty.
     return NULL;
   }
@@ -127,7 +130,7 @@ AmlGetNextVariableArgument (
   // Get the node following the CurrVarArg.
   NextLink = CurrVarArg->Link.ForwardLink;
   if (NextLink != StartLink) {
-    return (AML_NODE_HEADER*)NextLink;
+    return (AML_NODE_HEADER *)NextLink;
   }
 
   // End of the list has been reached.
@@ -159,12 +162,12 @@ AmlGetNextVariableArgument (
 AML_NODE_HEADER *
 EFIAPI
 AmlGetPreviousVariableArgument (
-  IN  AML_NODE_HEADER  * Node,
-  IN  AML_NODE_HEADER  * CurrVarArg
+  IN  AML_NODE_HEADER  *Node,
+  IN  AML_NODE_HEADER  *CurrVarArg
   )
 {
-  CONST LIST_ENTRY       * StartLink;
-  CONST LIST_ENTRY       * PreviousLink;
+  CONST LIST_ENTRY  *StartLink;
+  CONST LIST_ENTRY  *PreviousLink;
 
   // Node must be a RootNode or an Object Node
   // and the CurrVarArg must not be a Root Node.
@@ -172,7 +175,8 @@ AmlGetPreviousVariableArgument (
        !IS_AML_OBJECT_NODE (Node))        ||
       ((CurrVarArg != NULL)               &&
        (!IS_AML_OBJECT_NODE (CurrVarArg)  &&
-        !IS_AML_DATA_NODE (CurrVarArg)))) {
+        !IS_AML_DATA_NODE (CurrVarArg))))
+  {
     ASSERT (0);
     return NULL;
   }
@@ -186,8 +190,9 @@ AmlGetPreviousVariableArgument (
   if (CurrVarArg == NULL) {
     PreviousLink = StartLink->BackLink;
     if (PreviousLink != StartLink) {
-      return (AML_NODE_HEADER*)PreviousLink;
+      return (AML_NODE_HEADER *)PreviousLink;
     }
+
     // List is empty.
     return NULL;
   }
@@ -201,7 +206,7 @@ AmlGetPreviousVariableArgument (
   // Get the node before the CurrVarArg.
   PreviousLink = CurrVarArg->Link.BackLink;
   if (PreviousLink != StartLink) {
-    return (AML_NODE_HEADER*)PreviousLink;
+    return (AML_NODE_HEADER *)PreviousLink;
   }
 
   // We have reached the beginning of the list.
@@ -240,12 +245,12 @@ AmlGetPreviousVariableArgument (
 AML_NODE_HEADER *
 EFIAPI
 AmlGetNextSibling (
-  IN  CONST AML_NODE_HEADER   * Node,
-  IN  CONST AML_NODE_HEADER   * ChildNode
+  IN  CONST AML_NODE_HEADER  *Node,
+  IN  CONST AML_NODE_HEADER  *ChildNode
   )
 {
-  EAML_PARSE_INDEX    Index;
-  AML_NODE_HEADER   * CandidateNode;
+  EAML_PARSE_INDEX  Index;
+  AML_NODE_HEADER   *CandidateNode;
 
   // Node must be a RootNode or an Object Node
   // and the CurrVarArg must not be a Root Node.
@@ -253,7 +258,8 @@ AmlGetNextSibling (
        !IS_AML_OBJECT_NODE (Node))        ||
       ((ChildNode != NULL)                &&
        (!IS_AML_OBJECT_NODE (ChildNode)   &&
-        !IS_AML_DATA_NODE (ChildNode)))) {
+        !IS_AML_DATA_NODE (ChildNode))))
+  {
     ASSERT (0);
     return NULL;
   }
@@ -262,7 +268,7 @@ AmlGetNextSibling (
     if (ChildNode == NULL) {
       // Get the fixed argument at index 0 of the ChildNode.
       CandidateNode = AmlGetFixedArgument (
-                        (AML_OBJECT_NODE*)Node,
+                        (AML_OBJECT_NODE *)Node,
                         EAmlParseIndexTerm0
                         );
       if (CandidateNode != NULL) {
@@ -275,14 +281,16 @@ AmlGetNextSibling (
         Index++;
         // The node is part of the list of fixed arguments.
         if (Index == (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (
-                                         (AML_OBJECT_NODE*)Node)
-                                         ) {
-        // It is at the last argument of the fixed argument list.
-        // Get the first argument of the variable list of arguments.
+                                         (AML_OBJECT_NODE *)Node
+                                         )
+            )
+        {
+          // It is at the last argument of the fixed argument list.
+          // Get the first argument of the variable list of arguments.
           ChildNode = NULL;
         } else {
           // Else return the next node in the list of fixed arguments.
-          return AmlGetFixedArgument ((AML_OBJECT_NODE*)Node, Index);
+          return AmlGetFixedArgument ((AML_OBJECT_NODE *)Node, Index);
         }
       }
     }
@@ -290,8 +298,8 @@ AmlGetNextSibling (
 
   // Else, get the next node in the variable list of arguments.
   return AmlGetNextVariableArgument (
-           (AML_NODE_HEADER*)Node,
-           (AML_NODE_HEADER*)ChildNode
+           (AML_NODE_HEADER *)Node,
+           (AML_NODE_HEADER *)ChildNode
            );
 }
 
@@ -325,14 +333,14 @@ AmlGetNextSibling (
 AML_NODE_HEADER *
 EFIAPI
 AmlGetPreviousSibling (
-  IN  CONST  AML_NODE_HEADER  * Node,
-  IN  CONST  AML_NODE_HEADER  * ChildNode
+  IN  CONST  AML_NODE_HEADER  *Node,
+  IN  CONST  AML_NODE_HEADER  *ChildNode
   )
 {
-  EAML_PARSE_INDEX    Index;
-  EAML_PARSE_INDEX    MaxIndex;
+  EAML_PARSE_INDEX  Index;
+  EAML_PARSE_INDEX  MaxIndex;
 
-  AML_NODE_HEADER   * CandidateNode;
+  AML_NODE_HEADER  *CandidateNode;
 
   // Node must be a Root Node or an Object Node
   // and the ChildNode must not be a Root Node.
@@ -340,20 +348,22 @@ AmlGetPreviousSibling (
        !IS_AML_OBJECT_NODE (Node))        ||
       ((ChildNode != NULL)                &&
        (!IS_AML_OBJECT_NODE (ChildNode)   &&
-        !IS_AML_DATA_NODE (ChildNode)))) {
+        !IS_AML_DATA_NODE (ChildNode))))
+  {
     ASSERT (0);
     return NULL;
   }
 
   MaxIndex = (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (
-                                 (AML_OBJECT_NODE*)Node
+                                 (AML_OBJECT_NODE *)Node
                                  );
 
   // Get the last variable argument if no ChildNode.
   // Otherwise the fixed argument list is checked first.
   if ((ChildNode != NULL)         &&
       IS_AML_OBJECT_NODE (Node)   &&
-      (MaxIndex != EAmlParseIndexTerm0)) {
+      (MaxIndex != EAmlParseIndexTerm0))
+  {
     if (AmlIsNodeFixedArgument (ChildNode, &Index)) {
       // The node is part of the list of fixed arguments.
       if (Index == EAmlParseIndexTerm0) {
@@ -362,7 +372,7 @@ AmlGetPreviousSibling (
       } else {
         // Return the previous node in the fixed argument list.
         return AmlGetFixedArgument (
-                 (AML_OBJECT_NODE*)Node,
+                 (AML_OBJECT_NODE *)Node,
                  (EAML_PARSE_INDEX)(Index - 1)
                  );
       }
@@ -371,20 +381,21 @@ AmlGetPreviousSibling (
 
   // ChildNode is in the variable list of arguments.
   CandidateNode = AmlGetPreviousVariableArgument (
-                    (AML_NODE_HEADER*)Node,
-                    (AML_NODE_HEADER*)ChildNode
+                    (AML_NODE_HEADER *)Node,
+                    (AML_NODE_HEADER *)ChildNode
                     );
   if (CandidateNode != NULL) {
     if (!IS_AML_NODE_VALID (CandidateNode)) {
       ASSERT (0);
       return NULL;
     }
+
     // A Node has been found
     return CandidateNode;
   } else if (MaxIndex != EAmlParseIndexTerm0) {
     // ChildNode was the first node of the variable list of arguments.
     return AmlGetFixedArgument (
-             (AML_OBJECT_NODE*)Node,
+             (AML_OBJECT_NODE *)Node,
              (EAML_PARSE_INDEX)(MaxIndex - 1)
              );
   } else {
@@ -416,11 +427,11 @@ AmlGetPreviousSibling (
 AML_NODE_HEADER *
 EFIAPI
 AmlGetNextNode (
-  IN  CONST AML_NODE_HEADER   * Node
+  IN  CONST AML_NODE_HEADER  *Node
   )
 {
-  AML_NODE_HEADER   * ParentNode;
-  AML_NODE_HEADER   * CandidateNode;
+  AML_NODE_HEADER  *ParentNode;
+  AML_NODE_HEADER  *CandidateNode;
 
   if (!IS_AML_NODE_VALID (Node)) {
     ASSERT (0);
@@ -435,6 +446,7 @@ AmlGetNextNode (
         ASSERT (0);
         return NULL;
       }
+
       // A Node has been found
       return CandidateNode;
     } else if (IS_AML_ROOT_NODE (Node)) {
@@ -452,7 +464,7 @@ AmlGetNextNode (
       return NULL;
     }
 
-    ParentNode = AmlGetParent ((AML_NODE_HEADER*)Node);
+    ParentNode = AmlGetParent ((AML_NODE_HEADER *)Node);
     if (!IS_AML_NODE_VALID (ParentNode)) {
       ASSERT (0);
       return NULL;
@@ -464,6 +476,7 @@ AmlGetNextNode (
         ASSERT (0);
         return NULL;
       }
+
       // A Node has been found
       return CandidateNode;
     }
@@ -498,12 +511,12 @@ AmlGetNextNode (
 AML_NODE_HEADER *
 EFIAPI
 AmlGetPreviousNode (
-  IN  CONST  AML_NODE_HEADER * Node
+  IN  CONST  AML_NODE_HEADER  *Node
   )
 {
-  AML_NODE_HEADER  * ParentNode;
-  AML_NODE_HEADER  * CandidateNode;
-  AML_NODE_HEADER  * PreviousNode;
+  AML_NODE_HEADER  *ParentNode;
+  AML_NODE_HEADER  *CandidateNode;
+  AML_NODE_HEADER  *PreviousNode;
 
   if (!IS_AML_NODE_VALID (Node)) {
     ASSERT (0);
@@ -511,13 +524,12 @@ AmlGetPreviousNode (
   }
 
   while (1) {
-
     if (IS_AML_ROOT_NODE (Node)) {
       // This is the root node.
       return NULL;
     }
 
-    ParentNode = AmlGetParent ((AML_NODE_HEADER*)Node);
+    ParentNode    = AmlGetParent ((AML_NODE_HEADER *)Node);
     CandidateNode = AmlGetPreviousSibling (ParentNode, Node);
 
     if (CandidateNode == NULL) {
@@ -531,7 +543,7 @@ AmlGetPreviousNode (
       // then get the last child of this node.
       // If this node has children, get its last child, etc.
       while (1) {
-        PreviousNode = CandidateNode;
+        PreviousNode  = CandidateNode;
         CandidateNode = AmlGetPreviousSibling (PreviousNode, NULL);
         if (CandidateNode == NULL) {
           return PreviousNode;
@@ -539,7 +551,6 @@ AmlGetPreviousNode (
           return CandidateNode;
         }
       } // while
-
     } else {
       ASSERT (0);
       return NULL;

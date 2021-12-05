@@ -34,8 +34,8 @@
 EFI_STATUS
 EFIAPI
 GetCgfMgrInfo (
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL      * CONST  CfgMgrProtocol,
-  OUT       CM_STD_OBJ_CONFIGURATION_MANAGER_INFO    **        CfgMfrInfo
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL      *CONST  CfgMgrProtocol,
+  OUT       CM_STD_OBJ_CONFIGURATION_MANAGER_INFO             **CfgMfrInfo
   )
 {
   EFI_STATUS         Status;
@@ -45,12 +45,12 @@ GetCgfMgrInfo (
   ASSERT (CfgMfrInfo != NULL);
 
   *CfgMfrInfo = NULL;
-  Status = CfgMgrProtocol->GetObject (
-                             CfgMgrProtocol,
-                             CREATE_CM_STD_OBJECT_ID (EStdObjCfgMgrInfo),
-                             CM_NULL_TOKEN,
-                             &CmObjectDesc
-                             );
+  Status      = CfgMgrProtocol->GetObject (
+                                  CfgMgrProtocol,
+                                  CREATE_CM_STD_OBJECT_ID (EStdObjCfgMgrInfo),
+                                  CM_NULL_TOKEN,
+                                  &CmObjectDesc
+                                  );
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
@@ -72,7 +72,8 @@ GetCgfMgrInfo (
   }
 
   if (CmObjectDesc.Size <
-      (sizeof (CM_STD_OBJ_CONFIGURATION_MANAGER_INFO) * CmObjectDesc.Count)) {
+      (sizeof (CM_STD_OBJ_CONFIGURATION_MANAGER_INFO) * CmObjectDesc.Count))
+  {
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: EStdObjCfgMgrInfo: Buffer too small, size  = 0x%x\n",
@@ -82,7 +83,7 @@ GetCgfMgrInfo (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  *CfgMfrInfo = (CM_STD_OBJ_CONFIGURATION_MANAGER_INFO*)CmObjectDesc.Data;
+  *CfgMfrInfo = (CM_STD_OBJ_CONFIGURATION_MANAGER_INFO *)CmObjectDesc.Data;
   return Status;
 }
 
@@ -109,15 +110,15 @@ GetCgfMgrInfo (
 EFI_STATUS
 EFIAPI
 AddAcpiHeader (
-  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN      CONST ACPI_TABLE_GENERATOR                  * CONST Generator,
-  IN OUT  EFI_ACPI_DESCRIPTION_HEADER                 * CONST AcpiHeader,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST ACPI_TABLE_GENERATOR                  *CONST  Generator,
+  IN OUT  EFI_ACPI_DESCRIPTION_HEADER                 *CONST  AcpiHeader,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
   IN      CONST UINT32                                        Length
   )
 {
-  EFI_STATUS                               Status;
-  CM_STD_OBJ_CONFIGURATION_MANAGER_INFO  * CfgMfrInfo;
+  EFI_STATUS                             Status;
+  CM_STD_OBJ_CONFIGURATION_MANAGER_INFO  *CfgMfrInfo;
 
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (Generator != NULL);
@@ -130,7 +131,8 @@ AddAcpiHeader (
       (AcpiHeader == NULL) ||
       (AcpiTableInfo == NULL) ||
       (Length < sizeof (EFI_ACPI_DESCRIPTION_HEADER))
-    ) {
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -212,16 +214,16 @@ error_handler:
 EFI_STATUS
 EFIAPI
 AddSsdtAcpiHeader (
-  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN      CONST ACPI_TABLE_GENERATOR                  * CONST Generator,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-      OUT       AML_ROOT_NODE_HANDLE                  *       RootNode
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST ACPI_TABLE_GENERATOR                  *CONST  Generator,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  OUT       AML_ROOT_NODE_HANDLE                              *RootNode
   )
 {
-  EFI_STATUS                               Status;
-  UINT64                                   OemTableId;
-  UINT32                                   OemRevision;
-  CM_STD_OBJ_CONFIGURATION_MANAGER_INFO  * CfgMfrInfo;
+  EFI_STATUS                             Status;
+  UINT64                                 OemTableId;
+  UINT32                                 OemRevision;
+  CM_STD_OBJ_CONFIGURATION_MANAGER_INFO  *CfgMfrInfo;
 
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (Generator != NULL);
@@ -229,7 +231,8 @@ AddSsdtAcpiHeader (
 
   if ((CfgMgrProtocol == NULL)  ||
       (Generator == NULL)       ||
-      (AcpiTableInfo == NULL)) {
+      (AcpiTableInfo == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -263,8 +266,8 @@ AddSsdtAcpiHeader (
 
   Status = AmlCodeGenDefinitionBlock (
              "SSDT",
-             (CONST CHAR8*)&CfgMfrInfo->OemId,
-             (CONST CHAR8*)&OemTableId,
+             (CONST CHAR8 *)&CfgMfrInfo->OemId,
+             (CONST CHAR8 *)&OemTableId,
              OemRevision,
              RootNode
              );
@@ -289,16 +292,16 @@ AddSsdtAcpiHeader (
 BOOLEAN
 EFIAPI
 FindDuplicateValue (
-  IN  CONST VOID          * Array,
-  IN  CONST UINTN           Count,
-  IN  CONST UINTN           ElementSize,
-  IN        PFN_IS_EQUAL    EqualTestFunction
+  IN  CONST VOID          *Array,
+  IN  CONST UINTN         Count,
+  IN  CONST UINTN         ElementSize,
+  IN        PFN_IS_EQUAL  EqualTestFunction
   )
 {
-  UINTN         Index1;
-  UINTN         Index2;
-  UINT8       * Element1;
-  UINT8       * Element2;
+  UINTN  Index1;
+  UINTN  Index2;
+  UINT8  *Element1;
+  UINT8  *Element2;
 
   if (Array == NULL) {
     DEBUG ((DEBUG_ERROR, "ERROR: FindDuplicateValues: Array is NULL.\n"));
@@ -324,13 +327,14 @@ FindDuplicateValue (
 
   for (Index1 = 0; Index1 < Count - 1; Index1++) {
     for (Index2 = Index1 + 1; Index2 < Count; Index2++) {
-      Element1 = (UINT8*)Array + (Index1 * ElementSize);
-      Element2 = (UINT8*)Array + (Index2 * ElementSize);
+      Element1 = (UINT8 *)Array + (Index1 * ElementSize);
+      Element2 = (UINT8 *)Array + (Index2 * ElementSize);
 
       if (EqualTestFunction (Element1, Element2, Index1, Index2)) {
         return TRUE;
       }
     }
   }
+
   return FALSE;
 }

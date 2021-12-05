@@ -31,8 +31,8 @@
 EFI_STATUS
 EFIAPI
 GetCgfMgrInfo (
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL      * CONST  CfgMgrProtocol,
-  OUT       CM_STD_OBJ_CONFIGURATION_MANAGER_INFO    **        CfgMfrInfo
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL      *CONST  CfgMgrProtocol,
+  OUT       CM_STD_OBJ_CONFIGURATION_MANAGER_INFO             **CfgMfrInfo
   );
 
 /** The AddAcpiHeader function updates the ACPI header structure. It uses the
@@ -57,10 +57,10 @@ GetCgfMgrInfo (
 EFI_STATUS
 EFIAPI
 AddAcpiHeader (
-  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN      CONST ACPI_TABLE_GENERATOR                  * CONST Generator,
-  IN OUT  EFI_ACPI_DESCRIPTION_HEADER                 * CONST AcpiHeader,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST ACPI_TABLE_GENERATOR                  *CONST  Generator,
+  IN OUT  EFI_ACPI_DESCRIPTION_HEADER                 *CONST  AcpiHeader,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
   IN      CONST UINT32                                        Length
   );
 
@@ -91,10 +91,10 @@ AddAcpiHeader (
 EFI_STATUS
 EFIAPI
 AddSsdtAcpiHeader (
-  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN      CONST ACPI_TABLE_GENERATOR                  * CONST Generator,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-      OUT       AML_ROOT_NODE_HANDLE                  *       RootNode
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST ACPI_TABLE_GENERATOR                  *CONST  Generator,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  OUT       AML_ROOT_NODE_HANDLE                              *RootNode
   );
 
 /**
@@ -113,8 +113,8 @@ AddSsdtAcpiHeader (
 typedef
 BOOLEAN
 (EFIAPI *PFN_IS_EQUAL)(
-  IN CONST  VOID            * Object1,
-  IN CONST  VOID            * Object2,
+  IN CONST  VOID            *Object1,
+  IN CONST  VOID            *Object2,
   IN        UINTN             Index1 OPTIONAL,
   IN        UINTN             Index2 OPTIONAL
   );
@@ -136,10 +136,10 @@ BOOLEAN
 BOOLEAN
 EFIAPI
 FindDuplicateValue (
-  IN  CONST VOID          * Array,
-  IN  CONST UINTN           Count,
-  IN  CONST UINTN           ElementSize,
-  IN        PFN_IS_EQUAL    EqualTestFunction
+  IN  CONST VOID          *Array,
+  IN  CONST UINTN         Count,
+  IN  CONST UINTN         ElementSize,
+  IN        PFN_IS_EQUAL  EqualTestFunction
   );
 
 /** Parse and print a CmObjDesc.
@@ -149,7 +149,7 @@ FindDuplicateValue (
 VOID
 EFIAPI
 ParseCmObjDesc (
-  IN  CONST CM_OBJ_DESCRIPTOR * CmObjDesc
+  IN  CONST CM_OBJ_DESCRIPTOR  *CmObjDesc
   );
 
 #endif // TABLE_HELPER_LIB_H_

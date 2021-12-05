@@ -38,7 +38,7 @@
   Note: The token value 0 is reserved for a NULL token and does
         not identify any object.
 **/
-typedef UINTN   CM_OBJECT_TOKEN;
+typedef UINTN CM_OBJECT_TOKEN;
 
 /** The ESTD_OBJECT_ID enum describes the Object IDs
     in the Standard Namespace.
@@ -54,12 +54,12 @@ typedef enum StdObjectID {
 */
 typedef struct CmStdObjConfigurationManagerInfo {
   /// The Configuration Manager Revision.
-  UINT32  Revision;
+  UINT32    Revision;
 
   /** The OEM ID. This information is used to
       populate the ACPI table header information.
   */
-  UINT8   OemId[6];
+  UINT8     OemId[6];
 } CM_STD_OBJ_CONFIGURATION_MANAGER_INFO;
 
 /** A structure used to describe the ACPI table generators to be invoked.
@@ -85,7 +85,7 @@ typedef struct CmAStdObjAcpiTableInfo {
   ACPI_TABLE_GENERATOR_ID        TableGeneratorId;
 
   /// Optional pointer to the ACPI table data
-  EFI_ACPI_DESCRIPTION_HEADER  * AcpiTableData;
+  EFI_ACPI_DESCRIPTION_HEADER    *AcpiTableData;
 
   /// An OEM-supplied string that the OEM uses to identify the particular
   /// data table. This field is particularly useful when defining a definition
@@ -97,14 +97,14 @@ typedef struct CmAStdObjAcpiTableInfo {
   /// Generators shall populate this information using part of the
   /// CM_STD_OBJ_CONFIGURATION_MANAGER_INFO.OemId field and the
   /// ACPI table signature.
-  UINT64                         OemTableId;
+  UINT64    OemTableId;
 
   /// An OEM-supplied revision number. Larger numbers are assumed to be
   /// newer revisions.
   /// Note: If this field is not populated (has value of Zero), then the
   /// Generators shall populate this information using the revision of the
   /// Configuration Manager (CM_STD_OBJ_CONFIGURATION_MANAGER_INFO.Revision).
-  UINT32                         OemRevision;
+  UINT32    OemRevision;
 } CM_STD_OBJ_ACPI_TABLE_INFO;
 
 /** A structure used to describe the SMBIOS table generators to be invoked.
@@ -120,10 +120,10 @@ typedef struct CmAStdObjAcpiTableInfo {
 */
 typedef struct CmStdObjSmbiosTableInfo {
   /// The SMBIOS Table Generator ID
-  SMBIOS_TABLE_GENERATOR_ID   TableGeneratorId;
+  SMBIOS_TABLE_GENERATOR_ID    TableGeneratorId;
 
   /// Optional pointer to the SMBIOS table data
-  SMBIOS_STRUCTURE           * SmbiosTableData;
+  SMBIOS_STRUCTURE             *SmbiosTableData;
 } CM_STD_OBJ_SMBIOS_TABLE_INFO;
 
 #pragma pack()

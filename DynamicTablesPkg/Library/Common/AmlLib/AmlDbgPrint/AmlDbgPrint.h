@@ -24,7 +24,7 @@
 
 #if !defined (MDEPKG_NDEBUG)
 
-#include <AmlInclude.h>
+  #include <AmlInclude.h>
 
 /**
   @defgroup DbgPrintApis Print APIs for debugging.
@@ -46,8 +46,8 @@
 VOID
 EFIAPI
 AmlDbgDumpRaw (
-  IN  CONST UINT8   * Ptr,
-  IN        UINT32    Length
+  IN  CONST UINT8   *Ptr,
+  IN        UINT32  Length
   );
 
 /** Print Size chars at Buffer address.
@@ -61,9 +61,9 @@ AmlDbgDumpRaw (
 VOID
 EFIAPI
 AmlDbgPrintChars (
-  IN        UINT32      ErrorLevel,
-  IN  CONST CHAR8     * Buffer,
-  IN        UINT32      Size
+  IN        UINT32  ErrorLevel,
+  IN  CONST CHAR8   *Buffer,
+  IN        UINT32  Size
   );
 
 /** Print an AML NameSeg.
@@ -74,7 +74,7 @@ AmlDbgPrintChars (
 VOID
 EFIAPI
 AmlDbgPrintNameSeg (
-  IN  CONST CHAR8   * Buffer
+  IN  CONST CHAR8  *Buffer
   );
 
 /** Print an AML NameString.
@@ -85,8 +85,8 @@ AmlDbgPrintNameSeg (
 VOID
 EFIAPI
 AmlDbgPrintNameString (
-  IN  CONST CHAR8   * Buffer,
-  IN        BOOLEAN   NewLine
+  IN  CONST CHAR8    *Buffer,
+  IN        BOOLEAN  NewLine
   );
 
 /** Print Node information.
@@ -99,7 +99,7 @@ AmlDbgPrintNameString (
 VOID
 EFIAPI
 AmlDbgPrintNode (
-  IN  AML_NODE_HANDLE   Node
+  IN  AML_NODE_HANDLE  Node
   );
 
 /** Recursively print the subtree under the Node.
@@ -112,7 +112,7 @@ AmlDbgPrintNode (
 VOID
 EFIAPI
 AmlDbgPrintTree (
-  IN  AML_NODE_HANDLE   Node
+  IN  AML_NODE_HANDLE  Node
   );
 
 /** Print the absolute pathnames in the AML namespace of
@@ -145,7 +145,7 @@ AmlDbgPrintNameSpace (
 #define AMLDBG_PRINT_NAMESEG(Buffer)                  \
           AmlDbgPrintNameSeg (Buffer)
 
-#define AMLDBG_PRINT_NAMESTR(Buffer,NewLine)          \
+#define AMLDBG_PRINT_NAMESTR(Buffer, NewLine)          \
           AmlDbgPrintNameString (Buffer,NewLine)
 
 #define AMLDBG_PRINT_NODE(Node)                       \
@@ -165,7 +165,7 @@ AmlDbgPrintNameSpace (
 
 #define AMLDBG_PRINT_NAMESEG(Buffer)
 
-#define AMLDBG_PRINT_NAMESTR(Buffer,NewLine)
+#define AMLDBG_PRINT_NAMESTR(Buffer, NewLine)
 
 #define AMLDBG_PRINT_NODE(Node)
 

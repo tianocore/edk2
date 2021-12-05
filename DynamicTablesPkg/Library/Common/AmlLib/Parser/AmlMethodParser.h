@@ -23,20 +23,20 @@
 typedef struct AmlNameSpaceRefNode {
   /// Double linked list.
   /// This must be the first field in this structure.
-  LIST_ENTRY                Link;
+  LIST_ENTRY               Link;
 
   /// Node part of the AML namespace. It must have the AML_IN_NAMESPACE
   /// attribute.
-  CONST AML_OBJECT_NODE   * NodeRef;
+  CONST AML_OBJECT_NODE    *NodeRef;
 
   /// Raw AML absolute pathname of the NodeRef.
   /// This is a raw AML NameString (cf AmlNameSpace.c: A concatenated list
   /// of 4 chars long names. The dual/multi NameString prefix have been
   /// stripped.).
-  CONST CHAR8             * RawAbsolutePath;
+  CONST CHAR8              *RawAbsolutePath;
 
   /// Size of the raw AML absolute pathname buffer.
-  UINT32                    RawAbsolutePathSize;
+  UINT32                   RawAbsolutePathSize;
 } AML_NAMESPACE_REF_NODE;
 
 /** Delete a list of namespace reference nodes.
@@ -49,11 +49,11 @@ typedef struct AmlNameSpaceRefNode {
 EFI_STATUS
 EFIAPI
 AmlDeleteNameSpaceRefList (
-  IN  LIST_ENTRY      * NameSpaceRefList
+  IN  LIST_ENTRY  *NameSpaceRefList
   );
 
-
 #if !defined (MDEPKG_NDEBUG)
+
 /** Print the list of raw absolute paths of the NameSpace reference list.
 
   @param  [in]    NameSpaceRefList    List of NameSpace reference nodes.
@@ -61,7 +61,7 @@ AmlDeleteNameSpaceRefList (
 VOID
 EFIAPI
 AmlDbgPrintNameSpaceRefList (
-  IN  CONST LIST_ENTRY    * NameSpaceRefList
+  IN  CONST LIST_ENTRY  *NameSpaceRefList
   );
 
 #endif // MDEPKG_NDEBUG
@@ -95,10 +95,10 @@ AmlDbgPrintNameSpaceRefList (
 EFI_STATUS
 EFIAPI
 AmlIsMethodInvocation (
-  IN  CONST AML_NODE_HEADER     * ParentNode,
-  IN  CONST AML_STREAM          * FStream,
-  IN  CONST LIST_ENTRY          * NameSpaceRefList,
-  OUT AML_NAMESPACE_REF_NODE   ** OutNameSpaceRefNode
+  IN  CONST AML_NODE_HEADER   *ParentNode,
+  IN  CONST AML_STREAM        *FStream,
+  IN  CONST LIST_ENTRY        *NameSpaceRefList,
+  OUT AML_NAMESPACE_REF_NODE  **OutNameSpaceRefNode
   );
 
 /** Create a namespace reference node and add it to the NameSpaceRefList.
@@ -119,8 +119,8 @@ AmlIsMethodInvocation (
 EFI_STATUS
 EFIAPI
 AmlAddNameSpaceReference (
-  IN      CONST AML_OBJECT_NODE   * Node,
-  IN  OUT       LIST_ENTRY        * NameSpaceRefList
+  IN      CONST AML_OBJECT_NODE  *Node,
+  IN  OUT       LIST_ENTRY       *NameSpaceRefList
   );
 
 /** Create a method invocation node.
@@ -154,9 +154,9 @@ AmlAddNameSpaceReference (
 EFI_STATUS
 EFIAPI
 AmlCreateMethodInvocationNode (
-  IN  CONST AML_NAMESPACE_REF_NODE   * NameSpaceRefNode,
-  IN        AML_DATA_NODE            * MethodInvocationName,
-  OUT       AML_OBJECT_NODE         ** MethodInvocationNodePtr
+  IN  CONST AML_NAMESPACE_REF_NODE  *NameSpaceRefNode,
+  IN        AML_DATA_NODE           *MethodInvocationName,
+  OUT       AML_OBJECT_NODE         **MethodInvocationNodePtr
   );
 
 /** Get the number of arguments of a method invocation node.
@@ -180,9 +180,9 @@ AmlCreateMethodInvocationNode (
 EFI_STATUS
 EFIAPI
 AmlGetMethodInvocationArgCount (
-  IN  CONST AML_OBJECT_NODE   * MethodInvocationNode,
-  OUT       BOOLEAN           * IsMethodInvocation,
-  OUT       UINT8             * ArgCount
+  IN  CONST AML_OBJECT_NODE  *MethodInvocationNode,
+  OUT       BOOLEAN          *IsMethodInvocation,
+  OUT       UINT8            *ArgCount
   );
 
 #endif // AML_METHOD_PARSER_H_

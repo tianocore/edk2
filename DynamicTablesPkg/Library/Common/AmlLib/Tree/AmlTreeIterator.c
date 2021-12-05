@@ -25,10 +25,10 @@ typedef struct AmlTreeInternalIterator {
   //       of the Tree iterator APIs.
 
   /// Pointer to the node on which the iterator has been initialized.
-  CONST  AML_NODE_HEADER  * InitialNode;
+  CONST  AML_NODE_HEADER    *InitialNode;
 
   /// Pointer to the current node.
-  CONST  AML_NODE_HEADER  * CurrentNode;
+  CONST  AML_NODE_HEADER    *CurrentNode;
 
   /// Iteration mode.
   /// Allow to choose how to traverse the tree/choose which node is next.
@@ -47,13 +47,13 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlIteratorGetNode (
-  IN  AML_TREE_ITERATOR   * Iterator,
-  OUT AML_NODE_HEADER    ** OutNode
+  IN  AML_TREE_ITERATOR  *Iterator,
+  OUT AML_NODE_HEADER    **OutNode
   )
 {
-  AML_TREE_ITERATOR_INTERNAL  * InternalIterator;
+  AML_TREE_ITERATOR_INTERNAL  *InternalIterator;
 
-  InternalIterator = (AML_TREE_ITERATOR_INTERNAL*)Iterator;
+  InternalIterator = (AML_TREE_ITERATOR_INTERNAL *)Iterator;
 
   // CurrentNode can be NULL, but InitialNode cannot.
   if ((OutNode == NULL)                                       ||
@@ -62,12 +62,13 @@ AmlIteratorGetNode (
       (InternalIterator->Mode >= EAmlIteratorModeMax)         ||
       !IS_AML_NODE_VALID (InternalIterator->InitialNode)      ||
       ((InternalIterator->CurrentNode != NULL)                &&
-        !IS_AML_NODE_VALID (InternalIterator->CurrentNode))) {
+       !IS_AML_NODE_VALID (InternalIterator->CurrentNode)))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  *OutNode = (AML_NODE_HEADER*)InternalIterator->CurrentNode;
+  *OutNode = (AML_NODE_HEADER *)InternalIterator->CurrentNode;
 
   return EFI_SUCCESS;
 }
@@ -87,19 +88,20 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlIteratorGetNextLinear (
-  IN  AML_TREE_ITERATOR  * Iterator,
-  OUT AML_NODE_HEADER   ** NextNode
+  IN  AML_TREE_ITERATOR  *Iterator,
+  OUT AML_NODE_HEADER    **NextNode
   )
 {
-  AML_TREE_ITERATOR_INTERNAL  * InternalIterator;
+  AML_TREE_ITERATOR_INTERNAL  *InternalIterator;
 
-  InternalIterator = (AML_TREE_ITERATOR_INTERNAL*)Iterator;
+  InternalIterator = (AML_TREE_ITERATOR_INTERNAL *)Iterator;
 
   // CurrentNode can be NULL, but InitialNode cannot.
   if ((InternalIterator == NULL)                              ||
       (InternalIterator->Mode != EAmlIteratorLinear)          ||
       !IS_AML_NODE_VALID (InternalIterator->InitialNode)      ||
-      !IS_AML_NODE_VALID (InternalIterator->CurrentNode)) {
+      !IS_AML_NODE_VALID (InternalIterator->CurrentNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -110,8 +112,9 @@ AmlIteratorGetNextLinear (
                                     );
 
   if (NextNode != NULL) {
-    *NextNode = (AML_NODE_HEADER*)InternalIterator->CurrentNode;
+    *NextNode = (AML_NODE_HEADER *)InternalIterator->CurrentNode;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -130,19 +133,20 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlIteratorGetPreviousLinear (
-  IN  AML_TREE_ITERATOR  * Iterator,
-  OUT AML_NODE_HEADER   ** PrevNode
+  IN  AML_TREE_ITERATOR  *Iterator,
+  OUT AML_NODE_HEADER    **PrevNode
   )
 {
-  AML_TREE_ITERATOR_INTERNAL  * InternalIterator;
+  AML_TREE_ITERATOR_INTERNAL  *InternalIterator;
 
-  InternalIterator = (AML_TREE_ITERATOR_INTERNAL*)Iterator;
+  InternalIterator = (AML_TREE_ITERATOR_INTERNAL *)Iterator;
 
   // CurrentNode can be NULL, but InitialNode cannot.
   if ((InternalIterator == NULL)                              ||
       (InternalIterator->Mode != EAmlIteratorLinear)          ||
       !IS_AML_NODE_VALID (InternalIterator->InitialNode)      ||
-      !IS_AML_NODE_VALID (InternalIterator->CurrentNode)) {
+      !IS_AML_NODE_VALID (InternalIterator->CurrentNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -152,8 +156,9 @@ AmlIteratorGetPreviousLinear (
                                     InternalIterator->CurrentNode
                                     );
   if (PrevNode != NULL) {
-    *PrevNode = (AML_NODE_HEADER*)InternalIterator->CurrentNode;
+    *PrevNode = (AML_NODE_HEADER *)InternalIterator->CurrentNode;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -172,20 +177,21 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlIteratorGetNextBranch (
-  IN  AML_TREE_ITERATOR  * Iterator,
-  OUT AML_NODE_HEADER   ** NextNode
+  IN  AML_TREE_ITERATOR  *Iterator,
+  OUT AML_NODE_HEADER    **NextNode
   )
 {
-  AML_TREE_ITERATOR_INTERNAL  * InternalIterator;
-  AML_NODE_HEADER             * Node;
+  AML_TREE_ITERATOR_INTERNAL  *InternalIterator;
+  AML_NODE_HEADER             *Node;
 
-  InternalIterator = (AML_TREE_ITERATOR_INTERNAL*)Iterator;
+  InternalIterator = (AML_TREE_ITERATOR_INTERNAL *)Iterator;
 
   // CurrentNode can be NULL, but InitialNode cannot.
   if ((InternalIterator == NULL)                              ||
       (InternalIterator->Mode != EAmlIteratorBranch)          ||
       !IS_AML_NODE_VALID (InternalIterator->InitialNode)      ||
-      !IS_AML_NODE_VALID (InternalIterator->CurrentNode)) {
+      !IS_AML_NODE_VALID (InternalIterator->CurrentNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -193,7 +199,8 @@ AmlIteratorGetNextBranch (
   Node = AmlGetNextNode (InternalIterator->CurrentNode);
   // Check whether NextNode is a sibling of InitialNode.
   if (AmlGetParent (Node) ==
-        AmlGetParent ((AML_NODE_HEADER*)InternalIterator->InitialNode)) {
+      AmlGetParent ((AML_NODE_HEADER *)InternalIterator->InitialNode))
+  {
     Node = NULL;
   }
 
@@ -202,6 +209,7 @@ AmlIteratorGetNextBranch (
   if (NextNode != NULL) {
     *NextNode = Node;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -220,20 +228,21 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlIteratorGetPreviousBranch (
-  IN  AML_TREE_ITERATOR  * Iterator,
-  OUT AML_NODE_HEADER   ** PrevNode
+  IN  AML_TREE_ITERATOR  *Iterator,
+  OUT AML_NODE_HEADER    **PrevNode
   )
 {
-  AML_TREE_ITERATOR_INTERNAL  * InternalIterator;
-  AML_NODE_HEADER             * Node;
+  AML_TREE_ITERATOR_INTERNAL  *InternalIterator;
+  AML_NODE_HEADER             *Node;
 
-  InternalIterator = (AML_TREE_ITERATOR_INTERNAL*)Iterator;
+  InternalIterator = (AML_TREE_ITERATOR_INTERNAL *)Iterator;
 
   // CurrentNode can be NULL, but InitialNode cannot.
   if ((InternalIterator == NULL)                              ||
       (InternalIterator->Mode != EAmlIteratorBranch)          ||
       !IS_AML_NODE_VALID (InternalIterator->InitialNode)      ||
-      !IS_AML_NODE_VALID (InternalIterator->CurrentNode)) {
+      !IS_AML_NODE_VALID (InternalIterator->CurrentNode))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -241,7 +250,8 @@ AmlIteratorGetPreviousBranch (
   Node = AmlGetPreviousNode (InternalIterator->CurrentNode);
   // Check whether PreviousNode is a sibling of InitialNode.
   if (AmlGetParent (Node) ==
-        AmlGetParent ((AML_NODE_HEADER*)InternalIterator->InitialNode)) {
+      AmlGetParent ((AML_NODE_HEADER *)InternalIterator->InitialNode))
+  {
     Node = NULL;
   }
 
@@ -250,6 +260,7 @@ AmlIteratorGetPreviousBranch (
   if (PrevNode != NULL) {
     *PrevNode = Node;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -269,47 +280,48 @@ AmlIteratorGetPreviousBranch (
 EFI_STATUS
 EFIAPI
 AmlInitializeIterator (
-  IN   AML_NODE_HEADER      * Node,
-  IN   EAML_ITERATOR_MODE     IteratorMode,
-  OUT  AML_TREE_ITERATOR   ** IteratorPtr
+  IN   AML_NODE_HEADER     *Node,
+  IN   EAML_ITERATOR_MODE  IteratorMode,
+  OUT  AML_TREE_ITERATOR   **IteratorPtr
   )
 {
-  AML_TREE_ITERATOR_INTERNAL * InternalIterator;
+  AML_TREE_ITERATOR_INTERNAL  *InternalIterator;
 
   if (!IS_AML_NODE_VALID (Node)             ||
       (IteratorMode <= EAmlIteratorUnknown) ||
       (IteratorMode >= EAmlIteratorModeMax) ||
-      (IteratorPtr == NULL)) {
+      (IteratorPtr == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  *IteratorPtr = NULL;
-  InternalIterator = (AML_TREE_ITERATOR_INTERNAL*)AllocateZeroPool (
-                                                    sizeof (
-                                                      AML_TREE_ITERATOR_INTERNAL
-                                                      )
-                                                    );
+  *IteratorPtr     = NULL;
+  InternalIterator = (AML_TREE_ITERATOR_INTERNAL *)AllocateZeroPool (
+                                                     sizeof (
+                                                             AML_TREE_ITERATOR_INTERNAL
+                                                             )
+                                                     );
   if (InternalIterator == NULL) {
     ASSERT (0);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  InternalIterator->InitialNode = Node;
-  InternalIterator->CurrentNode = Node;
-  InternalIterator->Mode = IteratorMode;
+  InternalIterator->InitialNode      = Node;
+  InternalIterator->CurrentNode      = Node;
+  InternalIterator->Mode             = IteratorMode;
   InternalIterator->Iterator.GetNode = AmlIteratorGetNode;
 
   switch (InternalIterator->Mode) {
     case EAmlIteratorLinear:
     {
-      InternalIterator->Iterator.GetNext = AmlIteratorGetNextLinear;
+      InternalIterator->Iterator.GetNext     = AmlIteratorGetNextLinear;
       InternalIterator->Iterator.GetPrevious = AmlIteratorGetPreviousLinear;
       break;
     }
     case EAmlIteratorBranch:
     {
-      InternalIterator->Iterator.GetNext = AmlIteratorGetNextBranch;
+      InternalIterator->Iterator.GetNext     = AmlIteratorGetNextBranch;
       InternalIterator->Iterator.GetPrevious = AmlIteratorGetPreviousBranch;
       break;
     }
@@ -339,7 +351,7 @@ AmlInitializeIterator (
 EFI_STATUS
 EFIAPI
 AmlDeleteIterator (
-  IN  AML_TREE_ITERATOR   * Iterator
+  IN  AML_TREE_ITERATOR  *Iterator
   )
 {
   if (Iterator == NULL) {

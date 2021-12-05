@@ -22,7 +22,7 @@ typedef struct AmlNodeHeader {
   LIST_ENTRY              Link;
 
   /// Parent of this node. NULL for the root node.
-  struct AmlNodeHeader  * Parent;
+  struct AmlNodeHeader    *Parent;
 
   /// Node type allowing to identify a root/object/data node.
   EAML_NODE_TYPE          NodeType;
@@ -30,7 +30,7 @@ typedef struct AmlNodeHeader {
 
 /** Node handle.
 */
-typedef AML_NODE_HEADER* AML_NODE_HANDLE;
+typedef AML_NODE_HEADER *AML_NODE_HANDLE;
 
 /** AML root node.
 
@@ -47,12 +47,12 @@ typedef struct AmlRootNode {
   LIST_ENTRY                     VariableArgs;
 
   /// ACPI DSDT/SSDT header.
-  EFI_ACPI_DESCRIPTION_HEADER  * SdtHeader;
+  EFI_ACPI_DESCRIPTION_HEADER    *SdtHeader;
 } AML_ROOT_NODE;
 
 /** Root Node handle.
 */
-typedef AML_ROOT_NODE* AML_ROOT_NODE_HANDLE;
+typedef AML_ROOT_NODE *AML_ROOT_NODE_HANDLE;
 
 /** AML object node.
 
@@ -71,11 +71,11 @@ typedef struct AmlObjectNode {
   /// Fixed arguments of this object node.
   /// These are children and can be object/data nodes.
   /// Cf ACPI specification, s20.3.
-  AML_NODE_HEADER          * FixedArgs[EAmlParseIndexMax];
+  AML_NODE_HEADER            *FixedArgs[EAmlParseIndexMax];
 
   /// AML byte encoding. Stores the encoding information:
   /// (OpCode/SubOpCode/number of fixed arguments/ attributes).
-  CONST AML_BYTE_ENCODING  * AmlByteEncoding;
+  CONST AML_BYTE_ENCODING    *AmlByteEncoding;
 
   /// Some nodes have a PkgLen following their OpCode/SubOpCode in the
   /// AML bytestream. This field stores the decoded value of the PkgLen.
@@ -84,7 +84,7 @@ typedef struct AmlObjectNode {
 
 /** Object Node handle.
 */
-typedef AML_OBJECT_NODE* AML_OBJECT_NODE_HANDLE;
+typedef AML_OBJECT_NODE *AML_OBJECT_NODE_HANDLE;
 
 /** AML data node.
 
@@ -94,22 +94,22 @@ typedef AML_OBJECT_NODE* AML_OBJECT_NODE_HANDLE;
 */
 typedef struct AmlDataNode {
   /// Header information. Must be the first field of the struct.
-  AML_NODE_HEADER       NodeHeader;
+  AML_NODE_HEADER        NodeHeader;
 
   /// Tag identifying what data is stored in this node.
   /// E.g. UINT, NULL terminated string, resource data element, etc.
-  EAML_NODE_DATA_TYPE   DataType;
+  EAML_NODE_DATA_TYPE    DataType;
 
   /// Buffer containing the data stored by this node.
-  UINT8               * Buffer;
+  UINT8                  *Buffer;
 
   /// Size of the Buffer.
-  UINT32                Size;
+  UINT32                 Size;
 } AML_DATA_NODE;
 
 /** Data Node handle.
 */
-typedef AML_DATA_NODE* AML_DATA_NODE_HANDLE;
+typedef AML_DATA_NODE *AML_DATA_NODE_HANDLE;
 
 /** Check whether a Node has a valid NodeType.
 

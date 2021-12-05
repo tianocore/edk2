@@ -22,7 +22,7 @@
 
 #include "DynamicTableFactory.h"
 
-extern EDKII_DYNAMIC_TABLE_FACTORY_INFO TableFactoryInfo;
+extern EDKII_DYNAMIC_TABLE_FACTORY_INFO  TableFactoryInfo;
 
 /** Return a pointer to the SMBIOS table generator.
 
@@ -40,13 +40,13 @@ extern EDKII_DYNAMIC_TABLE_FACTORY_INFO TableFactoryInfo;
 EFI_STATUS
 EFIAPI
 GetSmbiosTableGenerator (
-  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  * CONST This,
+  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST  This,
   IN  CONST SMBIOS_TABLE_GENERATOR_ID                     GeneratorId,
-  OUT CONST SMBIOS_TABLE_GENERATOR               ** CONST Generator
+  OUT CONST SMBIOS_TABLE_GENERATOR               **CONST  Generator
   )
 {
-  UINT16                             TableId;
-  EDKII_DYNAMIC_TABLE_FACTORY_INFO * FactoryInfo;
+  UINT16                            TableId;
+  EDKII_DYNAMIC_TABLE_FACTORY_INFO  *FactoryInfo;
 
   ASSERT (This != NULL);
 
@@ -63,12 +63,13 @@ GetSmbiosTableGenerator (
   }
 
   *Generator = NULL;
-  TableId = GET_TABLE_ID (GeneratorId);
+  TableId    = GET_TABLE_ID (GeneratorId);
   if (IS_GENERATOR_NAMESPACE_STD (GeneratorId)) {
     if (TableId >= EStdSmbiosTableIdMax) {
       ASSERT (TableId < EStdSmbiosTableIdMax);
       return EFI_INVALID_PARAMETER;
     }
+
     if (FactoryInfo->StdSmbiosTableGeneratorList[TableId] != NULL) {
       *Generator = FactoryInfo->StdSmbiosTableGeneratorList[TableId];
     } else {
@@ -79,12 +80,14 @@ GetSmbiosTableGenerator (
       ASSERT (TableId <= FixedPcdGet16 (PcdMaxCustomSMBIOSGenerators));
       return EFI_INVALID_PARAMETER;
     }
+
     if (FactoryInfo->CustomSmbiosTableGeneratorList[TableId] != NULL) {
       *Generator = FactoryInfo->CustomSmbiosTableGeneratorList[TableId];
     } else {
       return EFI_NOT_FOUND;
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -105,7 +108,7 @@ GetSmbiosTableGenerator (
 EFI_STATUS
 EFIAPI
 RegisterSmbiosTableGenerator (
-  IN  CONST SMBIOS_TABLE_GENERATOR              * CONST Generator
+  IN  CONST SMBIOS_TABLE_GENERATOR              *CONST  Generator
   )
 {
   UINT16  TableId;
@@ -132,6 +135,7 @@ RegisterSmbiosTableGenerator (
       ASSERT (TableId < EStdSmbiosTableIdMax);
       return EFI_INVALID_PARAMETER;
     }
+
     if (TableFactoryInfo.StdSmbiosTableGeneratorList[TableId] == NULL) {
       TableFactoryInfo.StdSmbiosTableGeneratorList[TableId] = Generator;
     } else {
@@ -142,12 +146,14 @@ RegisterSmbiosTableGenerator (
       ASSERT (TableId <= FixedPcdGet16 (PcdMaxCustomSMBIOSGenerators));
       return EFI_INVALID_PARAMETER;
     }
+
     if (TableFactoryInfo.CustomSmbiosTableGeneratorList[TableId] == NULL) {
       TableFactoryInfo.CustomSmbiosTableGeneratorList[TableId] = Generator;
     } else {
       return EFI_ALREADY_STARTED;
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -166,7 +172,7 @@ RegisterSmbiosTableGenerator (
 EFI_STATUS
 EFIAPI
 DeregisterSmbiosTableGenerator (
-  IN  CONST SMBIOS_TABLE_GENERATOR              * CONST Generator
+  IN  CONST SMBIOS_TABLE_GENERATOR              *CONST  Generator
   )
 {
   UINT16  TableId;
@@ -191,10 +197,12 @@ DeregisterSmbiosTableGenerator (
       ASSERT (TableId < EStdSmbiosTableIdMax);
       return EFI_INVALID_PARAMETER;
     }
+
     if (TableFactoryInfo.StdSmbiosTableGeneratorList[TableId] != NULL) {
       if (Generator != TableFactoryInfo.StdSmbiosTableGeneratorList[TableId]) {
         return EFI_INVALID_PARAMETER;
       }
+
       TableFactoryInfo.StdSmbiosTableGeneratorList[TableId] = NULL;
     } else {
       return EFI_NOT_FOUND;
@@ -204,11 +212,14 @@ DeregisterSmbiosTableGenerator (
       ASSERT (TableId <= FixedPcdGet16 (PcdMaxCustomSMBIOSGenerators));
       return EFI_INVALID_PARAMETER;
     }
+
     if (TableFactoryInfo.CustomSmbiosTableGeneratorList[TableId] != NULL) {
       if (Generator !=
-          TableFactoryInfo.CustomSmbiosTableGeneratorList[TableId]) {
+          TableFactoryInfo.CustomSmbiosTableGeneratorList[TableId])
+      {
         return EFI_INVALID_PARAMETER;
       }
+
       TableFactoryInfo.CustomSmbiosTableGeneratorList[TableId] = NULL;
     } else {
       return EFI_NOT_FOUND;

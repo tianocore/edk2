@@ -29,11 +29,11 @@
 EFI_STATUS
 EFIAPI
 BuildSsdtSerialPortTable (
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO    *  AcpiTableInfo,
-  IN  CONST CM_ARM_SERIAL_PORT_INFO       *  SerialPortInfo,
-  IN  CONST CHAR8                         *  Name,
-  IN  CONST UINT64                           Uid,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER  **  Table
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO   *AcpiTableInfo,
+  IN  CONST CM_ARM_SERIAL_PORT_INFO      *SerialPortInfo,
+  IN  CONST CHAR8                        *Name,
+  IN  CONST UINT64                       Uid,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER  **Table
   );
 
 /** Free an SSDT table previously created by
@@ -47,7 +47,7 @@ BuildSsdtSerialPortTable (
 EFI_STATUS
 EFIAPI
 FreeSsdtSerialPortTable (
-  IN EFI_ACPI_DESCRIPTION_HEADER  * Table
+  IN EFI_ACPI_DESCRIPTION_HEADER  *Table
   );
 
 /** Validate the Serial Port Information.
@@ -61,8 +61,8 @@ FreeSsdtSerialPortTable (
 EFI_STATUS
 EFIAPI
 ValidateSerialPortInfo (
-  IN  CONST CM_ARM_SERIAL_PORT_INFO  * SerialPortInfoTable,
-  IN        UINT32                     SerialPortCount
+  IN  CONST CM_ARM_SERIAL_PORT_INFO  *SerialPortInfoTable,
+  IN        UINT32                   SerialPortCount
   );
 
 #endif // SSDT_SERIAL_PORT_LIB_H_

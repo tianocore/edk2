@@ -46,31 +46,32 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseFieldElement (
-  IN      CONST AML_BYTE_ENCODING   * FieldByteEncoding,
-  IN  OUT       AML_OBJECT_NODE     * FieldNode,
-  IN  OUT       AML_STREAM          * FStream,
-  IN  OUT       LIST_ENTRY          * NameSpaceRefList
+  IN      CONST AML_BYTE_ENCODING  *FieldByteEncoding,
+  IN  OUT       AML_OBJECT_NODE    *FieldNode,
+  IN  OUT       AML_STREAM         *FStream,
+  IN  OUT       LIST_ENTRY         *NameSpaceRefList
   )
 {
-  EFI_STATUS          Status;
+  EFI_STATUS  Status;
 
-  UINT8             * CurrPos;
-  AML_OBJECT_NODE   * NewNode;
+  UINT8            *CurrPos;
+  AML_OBJECT_NODE  *NewNode;
 
-  UINT32              PkgLenOffset;
-  UINT32              PkgLenSize;
+  UINT32  PkgLenOffset;
+  UINT32  PkgLenSize;
 
   // Check whether the node is an Object Node and has a field list.
   // The byte encoding must be a field element.
   if ((FieldByteEncoding == NULL)                                   ||
       ((FieldByteEncoding->Attribute & AML_IS_FIELD_ELEMENT) == 0)  ||
       ((FieldByteEncoding->Attribute & AML_IS_PSEUDO_OPCODE) ==
-          AML_IS_PSEUDO_OPCODE)                                     ||
+       AML_IS_PSEUDO_OPCODE)                                     ||
       !AmlNodeHasAttribute (FieldNode, AML_HAS_FIELD_LIST)          ||
       !IS_STREAM (FStream)                                          ||
       IS_END_OF_STREAM (FStream)                                    ||
       !IS_STREAM_FORWARD (FStream)                                  ||
-      (NameSpaceRefList == NULL)) {
+      (NameSpaceRefList == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -98,7 +99,8 @@ AmlParseFieldElement (
   // Parse the PkgLen if available.
   PkgLenSize = 0;
   if ((FieldByteEncoding->Attribute & AML_HAS_PKG_LENGTH) ==
-        AML_HAS_PKG_LENGTH) {
+      AML_HAS_PKG_LENGTH)
+  {
     PkgLenOffset = AmlGetPkgLength (CurrPos, &PkgLenSize);
     if (PkgLenOffset == 0) {
       ASSERT (0);
@@ -129,14 +131,14 @@ AmlParseFieldElement (
 
   // Add the FieldElement to the Variable Argument List.
   Status = AmlVarListAddTailInternal (
-             (AML_NODE_HEADER*)FieldNode,
-             (AML_NODE_HEADER*)NewNode
+             (AML_NODE_HEADER *)FieldNode,
+             (AML_NODE_HEADER *)NewNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     // Delete the sub-tree if the insertion failed.
     // Otherwise its reference will be lost.
-    AmlDeleteTree ((AML_NODE_HEADER*)NewNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)NewNode);
     return Status;
   }
 
@@ -144,10 +146,10 @@ AmlParseFieldElement (
   if (!IS_END_OF_STREAM (FStream)) {
     // Parse the fixed arguments of the field element.
     Status = AmlParseFixedArguments (
-              NewNode,
-              FStream,
-              NameSpaceRefList
-              );
+               NewNode,
+               FStream,
+               NameSpaceRefList
+               );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
     }
@@ -182,14 +184,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlParseNamedFieldElement (
-  IN      CONST AML_BYTE_ENCODING   * NamedFieldByteEncoding,
-  IN  OUT       AML_OBJECT_NODE     * FieldNode,
-  IN  OUT       AML_STREAM          * FStream,
-  IN  OUT       LIST_ENTRY          * NameSpaceRefList
-)
+  IN      CONST AML_BYTE_ENCODING  *NamedFieldByteEncoding,
+  IN  OUT       AML_OBJECT_NODE    *FieldNode,
+  IN  OUT       AML_STREAM         *FStream,
+  IN  OUT       LIST_ENTRY         *NameSpaceRefList
+  )
 {
-  EFI_STATUS          Status;
-  AML_OBJECT_NODE   * NewNode;
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *NewNode;
 
   // Check whether the node is an Object Node and has a field list.
   // The byte encoding must be a char.
@@ -199,7 +201,8 @@ AmlParseNamedFieldElement (
       !IS_STREAM (FStream)                                          ||
       IS_END_OF_STREAM (FStream)                                    ||
       !IS_STREAM_FORWARD (FStream)                                  ||
-      (NameSpaceRefList == NULL)) {
+      (NameSpaceRefList == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -217,14 +220,14 @@ AmlParseNamedFieldElement (
 
   // Add the NamedField node to the variable argument list.
   Status = AmlVarListAddTailInternal (
-             (AML_NODE_HEADER*)FieldNode,
-             (AML_NODE_HEADER*)NewNode
+             (AML_NODE_HEADER *)FieldNode,
+             (AML_NODE_HEADER *)NewNode
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     // Delete the sub-tree if the insertion failed.
     // Otherwise its reference will be lost.
-    AmlDeleteTree ((AML_NODE_HEADER*)NewNode);
+    AmlDeleteTree ((AML_NODE_HEADER *)NewNode);
     return Status;
   }
 
@@ -306,23 +309,24 @@ AmlParseNamedFieldElement (
 EFI_STATUS
 EFIAPI
 AmlParseFieldList (
-  IN  AML_OBJECT_NODE   * FieldNode,
-  IN  AML_STREAM        * FStream,
-  IN  LIST_ENTRY        * NameSpaceRefList
+  IN  AML_OBJECT_NODE  *FieldNode,
+  IN  AML_STREAM       *FStream,
+  IN  LIST_ENTRY       *NameSpaceRefList
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
-  UINT8                     * CurrPos;
-  CONST AML_BYTE_ENCODING   * FieldByteEncoding;
-  CONST AML_BYTE_ENCODING   * NamedFieldByteEncoding;
+  UINT8                    *CurrPos;
+  CONST AML_BYTE_ENCODING  *FieldByteEncoding;
+  CONST AML_BYTE_ENCODING  *NamedFieldByteEncoding;
 
   // Check whether the node is an Object Node and has a field list.
   if (!AmlNodeHasAttribute (FieldNode, AML_HAS_FIELD_LIST)  ||
       !IS_STREAM (FStream)                                  ||
       IS_END_OF_STREAM (FStream)                            ||
       !IS_STREAM_FORWARD (FStream)                          ||
-      (NameSpaceRefList == NULL)) {
+      (NameSpaceRefList == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -351,7 +355,8 @@ AmlParseFieldList (
       // call AmlGetByteEncoding() to check that the encoding is NameChar.
       NamedFieldByteEncoding = AmlGetByteEncoding (CurrPos);
       if ((NamedFieldByteEncoding != NULL) &&
-          (NamedFieldByteEncoding->Attribute & AML_IS_NAME_CHAR)) {
+          (NamedFieldByteEncoding->Attribute & AML_IS_NAME_CHAR))
+      {
         // This is a NamedField field element since it is starting with a char.
         Status = AmlParseNamedFieldElement (
                    NamedFieldByteEncoding,

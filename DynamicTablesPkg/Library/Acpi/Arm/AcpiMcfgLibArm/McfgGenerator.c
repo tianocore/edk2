@@ -68,27 +68,27 @@ GET_OBJECT_LIST (
 STATIC
 VOID
 AddPciConfigurationSpaceList (
-  IN       MCFG_TABLE                   * CONST Mcfg,
+  IN       MCFG_TABLE                   *CONST  Mcfg,
   IN CONST UINT32                               PciCfgSpaceOffset,
-  IN CONST CM_ARM_PCI_CONFIG_SPACE_INFO *       PciCfgSpaceInfoList,
+  IN CONST CM_ARM_PCI_CONFIG_SPACE_INFO         *PciCfgSpaceInfoList,
   IN       UINT32                               PciCfgSpaceCount
-)
+  )
 {
-  MCFG_CFG_SPACE_ADDR  * PciCfgSpace;
+  MCFG_CFG_SPACE_ADDR  *PciCfgSpace;
 
   ASSERT (Mcfg != NULL);
   ASSERT (PciCfgSpaceInfoList != NULL);
 
-  PciCfgSpace = (MCFG_CFG_SPACE_ADDR *)((UINT8*)Mcfg + PciCfgSpaceOffset);
+  PciCfgSpace = (MCFG_CFG_SPACE_ADDR *)((UINT8 *)Mcfg + PciCfgSpaceOffset);
 
   while (PciCfgSpaceCount-- != 0) {
     // Add PCI Configuration Space entry
-    PciCfgSpace->BaseAddress = PciCfgSpaceInfoList->BaseAddress;
+    PciCfgSpace->BaseAddress           = PciCfgSpaceInfoList->BaseAddress;
     PciCfgSpace->PciSegmentGroupNumber =
       PciCfgSpaceInfoList->PciSegmentGroupNumber;
     PciCfgSpace->StartBusNumber = PciCfgSpaceInfoList->StartBusNumber;
-    PciCfgSpace->EndBusNumber = PciCfgSpaceInfoList->EndBusNumber;
-    PciCfgSpace->Reserved = EFI_ACPI_RESERVED_DWORD;
+    PciCfgSpace->EndBusNumber   = PciCfgSpaceInfoList->EndBusNumber;
+    PciCfgSpace->Reserved       = EFI_ACPI_RESERVED_DWORD;
     PciCfgSpace++;
     PciCfgSpaceInfoList++;
   }
@@ -120,17 +120,17 @@ STATIC
 EFI_STATUS
 EFIAPI
 BuildMcfgTable (
-  IN  CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
-  EFI_STATUS                      Status;
-  UINT32                          TableSize;
-  UINT32                          ConfigurationSpaceCount;
-  CM_ARM_PCI_CONFIG_SPACE_INFO  * PciConfigSpaceInfoList;
-  MCFG_TABLE                    * Mcfg;
+  EFI_STATUS                    Status;
+  UINT32                        TableSize;
+  UINT32                        ConfigurationSpaceCount;
+  CM_ARM_PCI_CONFIG_SPACE_INFO  *PciConfigSpaceInfoList;
+  MCFG_TABLE                    *Mcfg;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -140,7 +140,8 @@ BuildMcfgTable (
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
 
   if ((AcpiTableInfo->AcpiTableRevision < This->MinAcpiTableRevision) ||
-      (AcpiTableInfo->AcpiTableRevision > This->AcpiTableRevision)) {
+      (AcpiTableInfo->AcpiTableRevision > This->AcpiTableRevision))
+  {
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: MCFG: Requested table revision = %d, is not supported."
@@ -154,13 +155,14 @@ BuildMcfgTable (
 
   *Table = NULL;
   Status = GetEArmObjPciConfigSpaceInfo (
-              CfgMgrProtocol,
-              CM_NULL_TOKEN,
-              &PciConfigSpaceInfoList,
-              &ConfigurationSpaceCount
-              );
+             CfgMgrProtocol,
+             CM_NULL_TOKEN,
+             &PciConfigSpaceInfoList,
+             &ConfigurationSpaceCount
+             );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR,
+    DEBUG ((
+      DEBUG_ERROR,
       "ERROR: MCFG: Failed to get PCI Configuration Space Information." \
       " Status = %r\n",
       Status
@@ -187,9 +189,9 @@ BuildMcfgTable (
 
   // Calculate the MCFG Table Size
   TableSize = sizeof (MCFG_TABLE) +
-    ((sizeof (MCFG_CFG_SPACE_ADDR) * ConfigurationSpaceCount));
+              ((sizeof (MCFG_CFG_SPACE_ADDR) * ConfigurationSpaceCount));
 
-  *Table = (EFI_ACPI_DESCRIPTION_HEADER*)AllocateZeroPool (TableSize);
+  *Table = (EFI_ACPI_DESCRIPTION_HEADER *)AllocateZeroPool (TableSize);
   if (*Table == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     DEBUG ((
@@ -202,7 +204,7 @@ BuildMcfgTable (
     goto error_handler;
   }
 
-  Mcfg = (MCFG_TABLE*)*Table;
+  Mcfg = (MCFG_TABLE *)*Table;
   DEBUG ((
     DEBUG_INFO,
     "MCFG: Mcfg = 0x%p TableSize = 0x%x\n",
@@ -242,6 +244,7 @@ error_handler:
     FreePool (*Table);
     *Table = NULL;
   }
+
   return Status;
 }
 
@@ -259,10 +262,10 @@ error_handler:
 STATIC
 EFI_STATUS
 FreeMcfgTableResources (
-  IN      CONST ACPI_TABLE_GENERATOR                  * CONST This,
-  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            * CONST AcpiTableInfo,
-  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          ** CONST Table
+  IN      CONST ACPI_TABLE_GENERATOR                  *CONST  This,
+  IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN OUT        EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
   ASSERT (This != NULL);
@@ -284,13 +287,13 @@ FreeMcfgTableResources (
 
 /** This macro defines the MCFG Table Generator revision.
 */
-#define MCFG_GENERATOR_REVISION CREATE_REVISION (1, 0)
+#define MCFG_GENERATOR_REVISION  CREATE_REVISION (1, 0)
 
 /** The interface for the MCFG Table Generator.
 */
 STATIC
 CONST
-ACPI_TABLE_GENERATOR McfgGenerator = {
+ACPI_TABLE_GENERATOR  McfgGenerator = {
   // Generator ID
   CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdMcfg),
   // Generator Description
@@ -329,11 +332,12 @@ ACPI_TABLE_GENERATOR McfgGenerator = {
 EFI_STATUS
 EFIAPI
 AcpiMcfgLibConstructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = RegisterAcpiTableGenerator (&McfgGenerator);
   DEBUG ((DEBUG_INFO, "MCFG: Register Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);
@@ -352,11 +356,12 @@ AcpiMcfgLibConstructor (
 EFI_STATUS
 EFIAPI
 AcpiMcfgLibDestructor (
-  IN  EFI_HANDLE           ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *  SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
+
   Status = DeregisterAcpiTableGenerator (&McfgGenerator);
   DEBUG ((DEBUG_INFO, "MCFG: Deregister Generator. Status = %r\n", Status));
   ASSERT_EFI_ERROR (Status);

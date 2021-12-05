@@ -115,9 +115,9 @@ typedef struct AmlTreeIterator AML_TREE_ITERATOR;
 */
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_AML_TREE_ITERATOR_GET_NODE) (
-  IN  AML_TREE_ITERATOR  * Iterator,
-  OUT AML_NODE_HANDLE    * OutNode
+(EFIAPI *EDKII_AML_TREE_ITERATOR_GET_NODE)(
+  IN  AML_TREE_ITERATOR  *Iterator,
+  OUT AML_NODE_HANDLE    *OutNode
   );
 
 /** Function pointer to move the current node of the iterator to the
@@ -135,9 +135,9 @@ EFI_STATUS
 */
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_AML_TREE_ITERATOR_GET_NEXT) (
-  IN  AML_TREE_ITERATOR  * Iterator,
-  OUT AML_NODE_HANDLE    * NextNode
+(EFIAPI *EDKII_AML_TREE_ITERATOR_GET_NEXT)(
+  IN  AML_TREE_ITERATOR  *Iterator,
+  OUT AML_NODE_HANDLE    *NextNode
   );
 
 /** Function pointer to move the current node of the iterator to the
@@ -155,9 +155,9 @@ EFI_STATUS
 */
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_AML_TREE_ITERATOR_GET_PREVIOUS) (
-  IN  AML_TREE_ITERATOR  * Iterator,
-  OUT AML_NODE_HANDLE    * PrevNode
+(EFIAPI *EDKII_AML_TREE_ITERATOR_GET_PREVIOUS)(
+  IN  AML_TREE_ITERATOR  *Iterator,
+  OUT AML_NODE_HANDLE    *PrevNode
   );
 
 /**  Iterator structure to traverse the tree.
@@ -166,15 +166,14 @@ EFI_STATUS
 */
 typedef struct AmlTreeIterator {
   /// Get the current node of the iterator.
-  EDKII_AML_TREE_ITERATOR_GET_NODE      GetNode;
+  EDKII_AML_TREE_ITERATOR_GET_NODE        GetNode;
 
   /// Update the current node of the iterator with the next node.
-  EDKII_AML_TREE_ITERATOR_GET_NEXT      GetNext;
+  EDKII_AML_TREE_ITERATOR_GET_NEXT        GetNext;
 
   /// Update the current node of the iterator with the previous node.
-  EDKII_AML_TREE_ITERATOR_GET_PREVIOUS  GetPrevious;
+  EDKII_AML_TREE_ITERATOR_GET_PREVIOUS    GetPrevious;
 } AML_TREE_ITERATOR;
-
 
 /** Initialize an iterator.
 
@@ -194,9 +193,9 @@ typedef struct AmlTreeIterator {
 EFI_STATUS
 EFIAPI
 AmlInitializeIterator (
-  IN   AML_NODE_HANDLE        Node,
-  IN   EAML_ITERATOR_MODE     IteratorMode,
-  OUT  AML_TREE_ITERATOR   ** IteratorPtr
+  IN   AML_NODE_HANDLE     Node,
+  IN   EAML_ITERATOR_MODE  IteratorMode,
+  OUT  AML_TREE_ITERATOR   **IteratorPtr
   );
 
 /** Delete an iterator.
@@ -214,7 +213,7 @@ AmlInitializeIterator (
 EFI_STATUS
 EFIAPI
 AmlDeleteIterator (
-  IN  AML_TREE_ITERATOR   * Iterator
+  IN  AML_TREE_ITERATOR  *Iterator
   );
 
 #endif // AML_ITERATOR_H_

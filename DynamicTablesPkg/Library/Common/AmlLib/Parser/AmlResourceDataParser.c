@@ -36,19 +36,20 @@
 UINT32
 EFIAPI
 AmlRdStreamGetRdSize (
-  IN  CONST AML_STREAM    * FStream
+  IN  CONST AML_STREAM  *FStream
   )
 {
-  CONST AML_RD_HEADER   * CurrRdElement;
+  CONST AML_RD_HEADER  *CurrRdElement;
 
   if (!IS_STREAM (FStream)        ||
       IS_END_OF_STREAM (FStream)  ||
-      !IS_STREAM_FORWARD (FStream)) {
+      !IS_STREAM_FORWARD (FStream))
+  {
     ASSERT (0);
     return 0;
   }
 
-  CurrRdElement = (CONST AML_RD_HEADER*)AmlStreamGetCurrPos (FStream);
+  CurrRdElement = (CONST AML_RD_HEADER *)AmlStreamGetCurrPos (FStream);
   if (CurrRdElement == NULL) {
     ASSERT (0);
     return 0;
@@ -57,7 +58,8 @@ AmlRdStreamGetRdSize (
   // If the resource data element is of the large type, check for overflow.
   if (AML_RD_IS_LARGE (CurrRdElement) &&
       (AmlStreamGetFreeSpace (FStream) <
-         sizeof (ACPI_LARGE_RESOURCE_HEADER))) {
+       sizeof (ACPI_LARGE_RESOURCE_HEADER)))
+  {
     return 0;
   }
 
@@ -86,15 +88,16 @@ STATIC
 BOOLEAN
 EFIAPI
 AmlRdCheckFunctionDescNesting (
-  IN      CONST AML_STREAM    * FStream,
-  IN  OUT       BOOLEAN       * InFunctionDesc
+  IN      CONST AML_STREAM  *FStream,
+  IN  OUT       BOOLEAN     *InFunctionDesc
   )
 {
-  CONST AML_RD_HEADER   * CurrRdElement;
+  CONST AML_RD_HEADER  *CurrRdElement;
 
   if (!IS_STREAM (FStream)        ||
       IS_END_OF_STREAM (FStream)  ||
-      (InFunctionDesc == NULL)) {
+      (InFunctionDesc == NULL))
+  {
     ASSERT (0);
     return FALSE;
   }
@@ -110,7 +113,10 @@ AmlRdCheckFunctionDescNesting (
   if (AmlRdCompareDescId (
         CurrRdElement,
         AML_RD_BUILD_SMALL_DESC_ID (
-          ACPI_SMALL_START_DEPENDENT_DESCRIPTOR_NAME))) {
+          ACPI_SMALL_START_DEPENDENT_DESCRIPTOR_NAME
+          )
+        ))
+  {
     *InFunctionDesc = TRUE;
     return TRUE;
   }
@@ -119,7 +125,10 @@ AmlRdCheckFunctionDescNesting (
   if (AmlRdCompareDescId (
         CurrRdElement,
         AML_RD_BUILD_SMALL_DESC_ID (
-          ACPI_SMALL_END_DEPENDENT_DESCRIPTOR_NAME))) {
+          ACPI_SMALL_END_DEPENDENT_DESCRIPTOR_NAME
+          )
+        ))
+  {
     if (*InFunctionDesc) {
       *InFunctionDesc = FALSE;
       return TRUE;
@@ -155,19 +164,20 @@ AmlRdCheckFunctionDescNesting (
 BOOLEAN
 EFIAPI
 AmlRdIsResourceDataBuffer (
-  IN  CONST AML_STREAM    * FStream
+  IN  CONST AML_STREAM  *FStream
   )
 {
-  EFI_STATUS              Status;
-  UINT32                  FreeSpace;
-  AML_STREAM              SubStream;
-  CONST AML_RD_HEADER   * CurrRdElement;
-  UINT32                  CurrRdElementSize;
-  BOOLEAN                 InFunctionDesc;
+  EFI_STATUS           Status;
+  UINT32               FreeSpace;
+  AML_STREAM           SubStream;
+  CONST AML_RD_HEADER  *CurrRdElement;
+  UINT32               CurrRdElementSize;
+  BOOLEAN              InFunctionDesc;
 
   if (!IS_STREAM (FStream)        ||
       IS_END_OF_STREAM (FStream)  ||
-      !IS_STREAM_FORWARD (FStream)) {
+      !IS_STREAM_FORWARD (FStream))
+  {
     ASSERT (0);
     return FALSE;
   }
@@ -187,19 +197,22 @@ AmlRdIsResourceDataBuffer (
 
   // The first element cannot be an end tag.
   if (AmlRdCompareDescId (
-       CurrRdElement,
-       AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME))) {
+        CurrRdElement,
+        AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME)
+        ))
+  {
     return FALSE;
   }
 
   InFunctionDesc = FALSE;
   while (TRUE) {
-    FreeSpace = AmlStreamGetFreeSpace (&SubStream);
-    CurrRdElement = AmlStreamGetCurrPos (&SubStream);
+    FreeSpace         = AmlStreamGetFreeSpace (&SubStream);
+    CurrRdElement     = AmlStreamGetCurrPos (&SubStream);
     CurrRdElementSize = AmlRdStreamGetRdSize (&SubStream);
     if ((FreeSpace == 0)          ||
         (CurrRdElement == NULL)   ||
-        (CurrRdElementSize == 0)) {
+        (CurrRdElementSize == 0))
+    {
       return FALSE;
     }
 
@@ -218,7 +231,9 @@ AmlRdIsResourceDataBuffer (
     // Thus the function should have already returned.
     if (AmlRdCompareDescId (
           CurrRdElement,
-          AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME))) {
+          AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME)
+          ))
+    {
       return FALSE;
     }
 
@@ -252,21 +267,22 @@ AmlRdIsResourceDataBuffer (
 EFI_STATUS
 EFIAPI
 AmlParseResourceData (
-  IN  AML_OBJECT_NODE   * BufferNode,
-  IN  AML_STREAM        * FStream
+  IN  AML_OBJECT_NODE  *BufferNode,
+  IN  AML_STREAM       *FStream
   )
 {
-  EFI_STATUS              Status;
-  AML_DATA_NODE         * NewNode;
-  UINT32                  FreeSpace;
-  CONST AML_RD_HEADER   * CurrRdElement;
-  UINT32                  CurrRdElementSize;
+  EFI_STATUS           Status;
+  AML_DATA_NODE        *NewNode;
+  UINT32               FreeSpace;
+  CONST AML_RD_HEADER  *CurrRdElement;
+  UINT32               CurrRdElementSize;
 
   // Check that BufferNode is an ObjectNode and has a ByteList.
   if (!AmlNodeHasAttribute (BufferNode, AML_HAS_BYTE_LIST)  ||
       !IS_STREAM (FStream)                                  ||
       IS_END_OF_STREAM (FStream)                            ||
-      !IS_STREAM_FORWARD (FStream)) {
+      !IS_STREAM_FORWARD (FStream))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -280,12 +296,12 @@ AmlParseResourceData (
       break;
     }
 
-    CurrRdElement = (CONST AML_RD_HEADER*)AmlStreamGetCurrPos (FStream);
+    CurrRdElement     = (CONST AML_RD_HEADER *)AmlStreamGetCurrPos (FStream);
     CurrRdElementSize = AmlRdStreamGetRdSize (FStream);
 
     Status = AmlCreateDataNode (
                EAmlNodeDataTypeResourceData,
-               (CONST UINT8*)CurrRdElement,
+               (CONST UINT8 *)CurrRdElement,
                CurrRdElementSize,
                &NewNode
                );
@@ -295,12 +311,12 @@ AmlParseResourceData (
     }
 
     Status = AmlVarListAddTailInternal (
-               (AML_NODE_HEADER*)BufferNode,
-               (AML_NODE_HEADER*)NewNode
+               (AML_NODE_HEADER *)BufferNode,
+               (AML_NODE_HEADER *)NewNode
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
-      AmlDeleteTree ((AML_NODE_HEADER*)NewNode);
+      AmlDeleteTree ((AML_NODE_HEADER *)NewNode);
       return Status;
     }
 
@@ -315,11 +331,14 @@ AmlParseResourceData (
     // Exit the loop when finding the resource data end tag.
     if (AmlRdCompareDescId (
           CurrRdElement,
-          AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME))) {
+          AML_RD_BUILD_SMALL_DESC_ID (ACPI_SMALL_END_TAG_DESCRIPTOR_NAME)
+          ))
+    {
       if (FreeSpace != CurrRdElementSize) {
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
+
       break;
     }
   } // while

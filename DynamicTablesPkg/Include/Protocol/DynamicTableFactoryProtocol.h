@@ -35,8 +35,8 @@
 /**
   Forward declarations:
 */
-typedef struct DynamicTableFactoryProtocol EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL;
-typedef struct DynamicTableFactoryInfo EDKII_DYNAMIC_TABLE_FACTORY_INFO;
+typedef struct DynamicTableFactoryProtocol  EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL;
+typedef struct DynamicTableFactoryInfo      EDKII_DYNAMIC_TABLE_FACTORY_INFO;
 
 /** Return a pointer to the ACPI table generator.
 
@@ -53,10 +53,10 @@ typedef struct DynamicTableFactoryInfo EDKII_DYNAMIC_TABLE_FACTORY_INFO;
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_DYNAMIC_TABLE_FACTORY_GET_ACPI_TABLE_GENERATOR) (
-  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  * CONST This,
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_GET_ACPI_TABLE_GENERATOR)(
+  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST This,
   IN  CONST ACPI_TABLE_GENERATOR_ID                       GeneratorId,
-  OUT CONST ACPI_TABLE_GENERATOR                 ** CONST Generator
+  OUT CONST ACPI_TABLE_GENERATOR                 **CONST Generator
   );
 
 /** Registers an ACPI table generator.
@@ -72,8 +72,8 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_ACPI_TABLE_GENERATOR) (
-  IN  CONST ACPI_TABLE_GENERATOR                * CONST Generator
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_ACPI_TABLE_GENERATOR)(
+  IN  CONST ACPI_TABLE_GENERATOR                *CONST Generator
   );
 
 /** Deregister an ACPI table generator.
@@ -87,8 +87,8 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_ACPI_TABLE_GENERATOR) (
-  IN  CONST ACPI_TABLE_GENERATOR                * CONST Generator
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_ACPI_TABLE_GENERATOR)(
+  IN  CONST ACPI_TABLE_GENERATOR                *CONST Generator
   );
 
 /** Return a pointer to the SMBIOS table generator.
@@ -106,10 +106,10 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_DYNAMIC_TABLE_FACTORY_GET_SMBIOS_TABLE_GENERATOR) (
-  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  * CONST This,
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_GET_SMBIOS_TABLE_GENERATOR)(
+  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST This,
   IN  CONST SMBIOS_TABLE_GENERATOR_ID                     GeneratorId,
-  OUT CONST SMBIOS_TABLE_GENERATOR               ** CONST Generator
+  OUT CONST SMBIOS_TABLE_GENERATOR               **CONST Generator
   );
 
 /** Register a SMBIOS table generator.
@@ -125,8 +125,8 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_SMBIOS_TABLE_GENERATOR) (
-  IN  CONST SMBIOS_TABLE_GENERATOR              * CONST Generator
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_SMBIOS_TABLE_GENERATOR)(
+  IN  CONST SMBIOS_TABLE_GENERATOR              *CONST Generator
   );
 
 /** Deregister a SMBIOS table generator.
@@ -140,8 +140,8 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_SMBIOS_TABLE_GENERATOR) (
-  IN  CONST SMBIOS_TABLE_GENERATOR              * CONST Generator
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_SMBIOS_TABLE_GENERATOR)(
+  IN  CONST SMBIOS_TABLE_GENERATOR              *CONST Generator
   );
 
 /** Return a pointer to the Device Tree table generator.
@@ -159,10 +159,10 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_DYNAMIC_TABLE_FACTORY_GET_DT_TABLE_GENERATOR) (
-  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  * CONST This,
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_GET_DT_TABLE_GENERATOR)(
+  IN  CONST EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL  *CONST This,
   IN  CONST DT_TABLE_GENERATOR_ID                         GeneratorId,
-  OUT CONST DT_TABLE_GENERATOR                   ** CONST Generator
+  OUT CONST DT_TABLE_GENERATOR                   **CONST Generator
   );
 
 /** Register a DT table generator.
@@ -178,8 +178,8 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_DT_TABLE_GENERATOR) (
-  IN  CONST DT_TABLE_GENERATOR                * CONST Generator
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_DT_TABLE_GENERATOR)(
+  IN  CONST DT_TABLE_GENERATOR                *CONST Generator
   );
 
 /** Deregister a DT table generator.
@@ -196,58 +196,58 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI * EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_DT_TABLE_GENERATOR) (
-  IN  CONST DT_TABLE_GENERATOR                * CONST Generator
+(EFIAPI *EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_DT_TABLE_GENERATOR)(
+  IN  CONST DT_TABLE_GENERATOR                *CONST Generator
   );
 
 /** A structure describing the Dynamic Table Factory Protocol interface.
 */
 typedef struct DynamicTableFactoryProtocol {
   /// The Dynamic Table Factory Protocol revision.
-  UINT32                                                 Revision;
+  UINT32                                                    Revision;
 
   /// The interface used to request an ACPI Table Generator.
-  EDKII_DYNAMIC_TABLE_FACTORY_GET_ACPI_TABLE_GENERATOR   GetAcpiTableGenerator;
+  EDKII_DYNAMIC_TABLE_FACTORY_GET_ACPI_TABLE_GENERATOR      GetAcpiTableGenerator;
 
   /// Register an ACPI table Generator
   EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_ACPI_TABLE_GENERATOR
-    RegisterAcpiTableGenerator;
+                                                            RegisterAcpiTableGenerator;
 
   /// Deregister an ACPI table Generator
   EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_ACPI_TABLE_GENERATOR
-    DeregisterAcpiTableGenerator;
+                                                            DeregisterAcpiTableGenerator;
 
   /// The interface used to request a SMBIOS Table Generator.
-  EDKII_DYNAMIC_TABLE_FACTORY_GET_SMBIOS_TABLE_GENERATOR GetSmbiosTableGenerator;
+  EDKII_DYNAMIC_TABLE_FACTORY_GET_SMBIOS_TABLE_GENERATOR    GetSmbiosTableGenerator;
 
   /// Register an SMBIOS table Generator
   EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_SMBIOS_TABLE_GENERATOR
-    RegisterSmbiosTableGenerator;
+                                                            RegisterSmbiosTableGenerator;
 
   /// Deregister an SMBIOS table Generator
   EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_SMBIOS_TABLE_GENERATOR
-    DeregisterSmbiosTableGenerator;
+                                                            DeregisterSmbiosTableGenerator;
 
   /// The interface used to request a Device Tree Table Generator.
-  EDKII_DYNAMIC_TABLE_FACTORY_GET_DT_TABLE_GENERATOR     GetDtTableGenerator;
+  EDKII_DYNAMIC_TABLE_FACTORY_GET_DT_TABLE_GENERATOR        GetDtTableGenerator;
 
   /// Register a DT generator
   EDKII_DYNAMIC_TABLE_FACTORY_REGISTER_DT_TABLE_GENERATOR
-    RegisterDtTableGenerator;
+                                                            RegisterDtTableGenerator;
 
   /// Deregister a DT generator
   EDKII_DYNAMIC_TABLE_FACTORY_DEREGISTER_DT_TABLE_GENERATOR
-    DeregisterDtTableGenerator;
+                                                            DeregisterDtTableGenerator;
 
   /** Pointer to the data structure that holds the
       list of registered table generators
   */
-  EDKII_DYNAMIC_TABLE_FACTORY_INFO          * TableFactoryInfo;
+  EDKII_DYNAMIC_TABLE_FACTORY_INFO                          *TableFactoryInfo;
 } EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL;
 
 /** The Dynamic Table Factory Protocol GUID.
 */
-extern EFI_GUID gEdkiiDynamicTableFactoryProtocolGuid;
+extern EFI_GUID  gEdkiiDynamicTableFactoryProtocolGuid;
 
 #pragma pack()
 
