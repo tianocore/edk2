@@ -9,8 +9,6 @@
 
 #include "Mtftp6Impl.h"
 
-
-
 /**
   Build and send a Mtftp6 data packet for upload.
 
@@ -24,17 +22,17 @@
 **/
 EFI_STATUS
 Mtftp6WrqSendBlock (
-  IN MTFTP6_INSTANCE        *Instance,
-  IN UINT16                 BlockNum
+  IN MTFTP6_INSTANCE  *Instance,
+  IN UINT16           BlockNum
   )
 {
-  EFI_MTFTP6_PACKET         *Packet;
-  EFI_MTFTP6_TOKEN          *Token;
-  NET_BUF                   *UdpPacket;
-  EFI_STATUS                Status;
-  UINT16                    DataLen;
-  UINT8                     *DataBuf;
-  UINT64                    Start;
+  EFI_MTFTP6_PACKET  *Packet;
+  EFI_MTFTP6_TOKEN   *Token;
+  NET_BUF            *UdpPacket;
+  EFI_STATUS         Status;
+  UINT16             DataLen;
+  UINT8              *DataBuf;
+  UINT64             Start;
 
   //
   // Allocate net buffer to create data packet.
@@ -45,11 +43,11 @@ Mtftp6WrqSendBlock (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Packet = (EFI_MTFTP6_PACKET *) NetbufAllocSpace (
-                                   UdpPacket,
-                                   MTFTP6_DATA_HEAD_LEN,
-                                   FALSE
-                                   );
+  Packet = (EFI_MTFTP6_PACKET *)NetbufAllocSpace (
+                                  UdpPacket,
+                                  MTFTP6_DATA_HEAD_LEN,
+                                  FALSE
+                                  );
   ASSERT (Packet != NULL);
 
   Packet->Data.OpCode = HTONS (EFI_MTFTP6_OPCODE_DATA);
@@ -65,34 +63,34 @@ Mtftp6WrqSendBlock (
     Start = MultU64x32 (BlockNum - 1, Instance->BlkSize);
 
     if (Token->BufferSize < Start + Instance->BlkSize) {
-      DataLen           = (UINT16) (Token->BufferSize - Start);
+      DataLen           = (UINT16)(Token->BufferSize - Start);
       Instance->LastBlk = BlockNum;
       Mtftp6SetLastBlockNum (&Instance->BlkList, BlockNum);
     }
 
     if (DataLen > 0) {
       NetbufAllocSpace (UdpPacket, DataLen, FALSE);
-      CopyMem (Packet->Data.Data, (UINT8 *) Token->Buffer + Start, DataLen);
+      CopyMem (Packet->Data.Data, (UINT8 *)Token->Buffer + Start, DataLen);
     }
-
   } else {
     //
     // Get data from PacketNeeded
     //
     DataBuf = NULL;
-    Status  = Token->PacketNeeded (&Instance->Mtftp6, Token, &DataLen, (VOID*) &DataBuf);
+    Status  = Token->PacketNeeded (&Instance->Mtftp6, Token, &DataLen, (VOID *)&DataBuf);
 
     if (EFI_ERROR (Status) || (DataLen > Instance->BlkSize)) {
       if (DataBuf != NULL) {
         gBS->FreePool (DataBuf);
       }
+
       //
       // The received packet has already been freed.
       //
       Mtftp6SendError (
         Instance,
         EFI_MTFTP6_ERRORCODE_REQUEST_DENIED,
-        (UINT8 *) "User aborted the transfer"
+        (UINT8 *)"User aborted the transfer"
         );
 
       return EFI_ABORTED;
@@ -118,7 +116,6 @@ Mtftp6WrqSendBlock (
   return Mtftp6TransmitPacket (Instance, UdpPacket);
 }
 
-
 /**
   Function to handle received ACK packet. If the ACK number matches the
   expected block number, with more data pending, send the next
@@ -138,16 +135,16 @@ Mtftp6WrqSendBlock (
 **/
 EFI_STATUS
 Mtftp6WrqHandleAck (
-  IN  MTFTP6_INSTANCE       *Instance,
-  IN  EFI_MTFTP6_PACKET     *Packet,
-  IN  UINT32                Len,
-  OUT NET_BUF               **UdpPacket,
-  OUT BOOLEAN               *IsCompleted
+  IN  MTFTP6_INSTANCE    *Instance,
+  IN  EFI_MTFTP6_PACKET  *Packet,
+  IN  UINT32             Len,
+  OUT NET_BUF            **UdpPacket,
+  OUT BOOLEAN            *IsCompleted
   )
 {
-  UINT16                    AckNum;
-  INTN                      Expected;
-  UINT64                    BlockCounter;
+  UINT16  AckNum;
+  INTN    Expected;
+  UINT64  BlockCounter;
 
   *IsCompleted = FALSE;
   AckNum       = NTOHS (Packet->Ack.Block[0]);
@@ -182,7 +179,6 @@ Mtftp6WrqHandleAck (
       ASSERT (Instance->LastBlk >= 1);
       *IsCompleted = TRUE;
       return EFI_SUCCESS;
-
     } else {
       //
       // Free the received packet before send new packet in ReceiveNotify,
@@ -196,7 +192,7 @@ Mtftp6WrqHandleAck (
       Mtftp6SendError (
         Instance,
         EFI_MTFTP6_ERRORCODE_REQUEST_DENIED,
-        (UINT8 *) "Block number rolls back, not supported, try blksize option"
+        (UINT8 *)"Block number rolls back, not supported, try blksize option"
         );
 
       return EFI_TFTP_ERROR;
@@ -210,9 +206,8 @@ Mtftp6WrqHandleAck (
   NetbufFree (*UdpPacket);
   *UdpPacket = NULL;
 
-  return Mtftp6WrqSendBlock (Instance, (UINT16) Expected);
+  return Mtftp6WrqSendBlock (Instance, (UINT16)Expected);
 }
-
 
 /**
   Check whether the received OACK is valid. The OACK is valid
@@ -231,8 +226,8 @@ Mtftp6WrqHandleAck (
 **/
 BOOLEAN
 Mtftp6WrqOackValid (
-  IN MTFTP6_EXT_OPTION_INFO     *ReplyInfo,
-  IN MTFTP6_EXT_OPTION_INFO     *RequestInfo
+  IN MTFTP6_EXT_OPTION_INFO  *ReplyInfo,
+  IN MTFTP6_EXT_OPTION_INFO  *RequestInfo
   )
 {
   //
@@ -248,14 +243,13 @@ Mtftp6WrqOackValid (
   //
   if ((((ReplyInfo->BitMap & MTFTP6_OPT_BLKSIZE_BIT) != 0) && (ReplyInfo->BlkSize > RequestInfo->BlkSize)) ||
       (((ReplyInfo->BitMap & MTFTP6_OPT_TIMEOUT_BIT) != 0) && (ReplyInfo->Timeout != RequestInfo->Timeout))
-      ) {
-
+      )
+  {
     return FALSE;
   }
 
   return TRUE;
 }
-
 
 /**
   Process the OACK packet for Wrq.
@@ -274,22 +268,22 @@ Mtftp6WrqOackValid (
 **/
 EFI_STATUS
 Mtftp6WrqHandleOack (
-  IN  MTFTP6_INSTANCE       *Instance,
-  IN  EFI_MTFTP6_PACKET     *Packet,
-  IN  UINT32                Len,
-  OUT NET_BUF               **UdpPacket,
-  OUT BOOLEAN               *IsCompleted
+  IN  MTFTP6_INSTANCE    *Instance,
+  IN  EFI_MTFTP6_PACKET  *Packet,
+  IN  UINT32             Len,
+  OUT NET_BUF            **UdpPacket,
+  OUT BOOLEAN            *IsCompleted
   )
 {
-  EFI_MTFTP6_OPTION         *Options;
-  UINT32                    Count;
-  MTFTP6_EXT_OPTION_INFO    ExtInfo;
-  EFI_MTFTP6_PACKET         Dummy;
-  EFI_STATUS                Status;
-  INTN                      Expected;
+  EFI_MTFTP6_OPTION       *Options;
+  UINT32                  Count;
+  MTFTP6_EXT_OPTION_INFO  ExtInfo;
+  EFI_MTFTP6_PACKET       Dummy;
+  EFI_STATUS              Status;
+  INTN                    Expected;
 
   *IsCompleted = FALSE;
-  Options = NULL;
+  Options      = NULL;
 
   //
   // Ignore the OACK if already started the upload
@@ -310,11 +304,12 @@ Mtftp6WrqHandleOack (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   ASSERT (Options != NULL);
 
   Status = Mtftp6ParseExtensionOption (Options, Count, FALSE, Instance->Operation, &ExtInfo);
 
-  if (EFI_ERROR(Status) || !Mtftp6WrqOackValid (&ExtInfo, &Instance->ExtInfo)) {
+  if (EFI_ERROR (Status) || !Mtftp6WrqOackValid (&ExtInfo, &Instance->ExtInfo)) {
     //
     // Don't send a MTFTP error packet when out of resource, it can
     // only make it worse.
@@ -332,7 +327,7 @@ Mtftp6WrqHandleOack (
       Mtftp6SendError (
         Instance,
         EFI_MTFTP6_ERRORCODE_ILLEGAL_OPERATION,
-        (UINT8 *) "Malformatted OACK packet"
+        (UINT8 *)"Malformatted OACK packet"
         );
     }
 
@@ -363,7 +358,6 @@ Mtftp6WrqHandleOack (
            );
 }
 
-
 /**
   The packet process callback for Mtftp6 upload.
 
@@ -376,21 +370,21 @@ Mtftp6WrqHandleOack (
 VOID
 EFIAPI
 Mtftp6WrqInput (
-  IN NET_BUF                *UdpPacket,
-  IN UDP_END_POINT          *UdpEpt,
-  IN EFI_STATUS             IoStatus,
-  IN VOID                   *Context
+  IN NET_BUF        *UdpPacket,
+  IN UDP_END_POINT  *UdpEpt,
+  IN EFI_STATUS     IoStatus,
+  IN VOID           *Context
   )
 {
-  MTFTP6_INSTANCE           *Instance;
-  EFI_MTFTP6_PACKET         *Packet;
-  BOOLEAN                   IsCompleted;
-  EFI_STATUS                Status;
-  UINT32                    TotalNum;
-  UINT32                    Len;
-  UINT16                    Opcode;
+  MTFTP6_INSTANCE    *Instance;
+  EFI_MTFTP6_PACKET  *Packet;
+  BOOLEAN            IsCompleted;
+  EFI_STATUS         Status;
+  UINT32             TotalNum;
+  UINT32             Len;
+  UINT16             Opcode;
 
-  Instance = (MTFTP6_INSTANCE *) Context;
+  Instance = (MTFTP6_INSTANCE *)Context;
 
   NET_CHECK_SIGNATURE (Instance, MTFTP6_INSTANCE_SIGNATURE);
 
@@ -439,10 +433,9 @@ Mtftp6WrqInput (
       goto ON_EXIT;
     }
 
-    NetbufCopy (UdpPacket, 0, Len, (UINT8 *) Packet);
-
+    NetbufCopy (UdpPacket, 0, Len, (UINT8 *)Packet);
   } else {
-    Packet = (EFI_MTFTP6_PACKET *) NetbufGetByte (UdpPacket, 0, NULL);
+    Packet = (EFI_MTFTP6_PACKET *)NetbufGetByte (UdpPacket, 0, NULL);
     ASSERT (Packet != NULL);
   }
 
@@ -452,14 +445,14 @@ Mtftp6WrqInput (
   // Callback to the user's CheckPacket if provided. Abort the transmission
   // if CheckPacket returns an EFI_ERROR code.
   //
-  if (Instance->Token->CheckPacket != NULL &&
-      (Opcode == EFI_MTFTP6_OPCODE_OACK || Opcode == EFI_MTFTP6_OPCODE_ERROR)
-      ) {
-
+  if ((Instance->Token->CheckPacket != NULL) &&
+      ((Opcode == EFI_MTFTP6_OPCODE_OACK) || (Opcode == EFI_MTFTP6_OPCODE_ERROR))
+      )
+  {
     Status = Instance->Token->CheckPacket (
                                 &Instance->Mtftp6,
                                 Instance->Token,
-                                (UINT16) Len,
+                                (UINT16)Len,
                                 Packet
                                 );
 
@@ -480,7 +473,7 @@ Mtftp6WrqInput (
         Mtftp6SendError (
           Instance,
           EFI_MTFTP6_ERRORCODE_REQUEST_DENIED,
-          (UINT8 *) "User aborted the transfer"
+          (UINT8 *)"User aborted the transfer"
           );
       }
 
@@ -493,32 +486,34 @@ Mtftp6WrqInput (
   // Switch the process routines by the operation code.
   //
   switch (Opcode) {
-  case EFI_MTFTP6_OPCODE_ACK:
-    if (Len != MTFTP6_OPCODE_LEN + MTFTP6_BLKNO_LEN) {
-      goto ON_EXIT;
-    }
-    //
-    // Handle the Ack packet of Wrq.
-    //
-    Status = Mtftp6WrqHandleAck (Instance, Packet, Len, &UdpPacket, &IsCompleted);
-    break;
+    case EFI_MTFTP6_OPCODE_ACK:
+      if (Len != MTFTP6_OPCODE_LEN + MTFTP6_BLKNO_LEN) {
+        goto ON_EXIT;
+      }
 
-  case EFI_MTFTP6_OPCODE_OACK:
-    if (Len <= MTFTP6_OPCODE_LEN) {
-      goto ON_EXIT;
-    }
-    //
-    // Handle the Oack packet of Wrq.
-    //
-    Status = Mtftp6WrqHandleOack (Instance, Packet, Len, &UdpPacket, &IsCompleted);
-    break;
+      //
+      // Handle the Ack packet of Wrq.
+      //
+      Status = Mtftp6WrqHandleAck (Instance, Packet, Len, &UdpPacket, &IsCompleted);
+      break;
 
-  default:
-    //
-    // Drop and return eror if received error message.
-    //
-    Status = EFI_TFTP_ERROR;
-    break;
+    case EFI_MTFTP6_OPCODE_OACK:
+      if (Len <= MTFTP6_OPCODE_LEN) {
+        goto ON_EXIT;
+      }
+
+      //
+      // Handle the Oack packet of Wrq.
+      //
+      Status = Mtftp6WrqHandleOack (Instance, Packet, Len, &UdpPacket, &IsCompleted);
+      break;
+
+    default:
+      //
+      // Drop and return eror if received error message.
+      //
+      Status = EFI_TFTP_ERROR;
+      break;
   }
 
 ON_EXIT:
@@ -526,7 +521,7 @@ ON_EXIT:
   // Free the resources, then if !EFI_ERROR (Status) and not completed,
   // restart the receive, otherwise end the session.
   //
-  if (Packet != NULL && TotalNum > 1) {
+  if ((Packet != NULL) && (TotalNum > 1)) {
     FreePool (Packet);
   }
 
@@ -542,6 +537,7 @@ ON_EXIT:
                0
                );
   }
+
   //
   // Clean up the current session if failed to continue.
   //
@@ -549,7 +545,6 @@ ON_EXIT:
     Mtftp6OperationClean (Instance, Status);
   }
 }
-
 
 /**
   Start the Mtftp6 instance to upload. It will first init some states,
@@ -564,11 +559,11 @@ ON_EXIT:
 **/
 EFI_STATUS
 Mtftp6WrqStart (
-  IN MTFTP6_INSTANCE        *Instance,
-  IN UINT16                 Operation
+  IN MTFTP6_INSTANCE  *Instance,
+  IN UINT16           Operation
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   //
   // The valid block number range are [0, 0xffff]. For example:
@@ -595,4 +590,3 @@ Mtftp6WrqStart (
            0
            );
 }
-

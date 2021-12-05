@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Mtftp4Impl.h"
 
-
 /**
   Allocate a MTFTP4 block range, then init it to the range of [Start, End]
 
@@ -20,11 +19,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 MTFTP4_BLOCK_RANGE *
 Mtftp4AllocateRange (
-  IN UINT16                 Start,
-  IN UINT16                 End
+  IN UINT16  Start,
+  IN UINT16  End
   )
 {
-  MTFTP4_BLOCK_RANGE        *Range;
+  MTFTP4_BLOCK_RANGE  *Range;
 
   Range = AllocateZeroPool (sizeof (MTFTP4_BLOCK_RANGE));
 
@@ -33,13 +32,12 @@ Mtftp4AllocateRange (
   }
 
   InitializeListHead (&Range->Link);
-  Range->Start  = Start;
-  Range->End    = End;
-  Range->Bound  = End;
+  Range->Start = Start;
+  Range->End   = End;
+  Range->Bound = End;
 
   return Range;
 }
-
 
 /**
   Initialize the block range for either RRQ or WRQ.
@@ -64,12 +62,12 @@ Mtftp4AllocateRange (
 **/
 EFI_STATUS
 Mtftp4InitBlockRange (
-  IN LIST_ENTRY             *Head,
-  IN UINT16                 Start,
-  IN UINT16                 End
+  IN LIST_ENTRY  *Head,
+  IN UINT16      Start,
+  IN UINT16      End
   )
 {
-  MTFTP4_BLOCK_RANGE        *Range;
+  MTFTP4_BLOCK_RANGE  *Range;
 
   Range = Mtftp4AllocateRange (Start, End);
 
@@ -81,7 +79,6 @@ Mtftp4InitBlockRange (
   return EFI_SUCCESS;
 }
 
-
 /**
   Get the first valid block number on the range list.
 
@@ -92,7 +89,7 @@ Mtftp4InitBlockRange (
 **/
 INTN
 Mtftp4GetNextBlockNum (
-  IN LIST_ENTRY             *Head
+  IN LIST_ENTRY  *Head
   )
 {
   MTFTP4_BLOCK_RANGE  *Range;
@@ -104,7 +101,6 @@ Mtftp4GetNextBlockNum (
   Range = NET_LIST_HEAD (Head, MTFTP4_BLOCK_RANGE, Link);
   return Range->Start;
 }
-
 
 /**
   Set the last block number of the block range list.
@@ -119,11 +115,11 @@ Mtftp4GetNextBlockNum (
 **/
 VOID
 Mtftp4SetLastBlockNum (
-  IN LIST_ENTRY             *Head,
-  IN UINT16                 Last
+  IN LIST_ENTRY  *Head,
+  IN UINT16      Last
   )
 {
-  MTFTP4_BLOCK_RANGE        *Range;
+  MTFTP4_BLOCK_RANGE  *Range;
 
   //
   // Iterate from the tail to head to remove the block number
@@ -142,10 +138,9 @@ Mtftp4SetLastBlockNum (
       Range->End = Last;
     }
 
-    return ;
+    return;
   }
 }
-
 
 /**
   Remove the block number from the block range list.
@@ -162,18 +157,17 @@ Mtftp4SetLastBlockNum (
 **/
 EFI_STATUS
 Mtftp4RemoveBlockNum (
-  IN LIST_ENTRY             *Head,
-  IN UINT16                 Num,
-  IN BOOLEAN                Completed,
-  OUT UINT64                *BlockCounter
+  IN LIST_ENTRY  *Head,
+  IN UINT16      Num,
+  IN BOOLEAN     Completed,
+  OUT UINT64     *BlockCounter
   )
 {
-  MTFTP4_BLOCK_RANGE        *Range;
-  MTFTP4_BLOCK_RANGE        *NewRange;
-  LIST_ENTRY                *Entry;
+  MTFTP4_BLOCK_RANGE  *Range;
+  MTFTP4_BLOCK_RANGE  *NewRange;
+  LIST_ENTRY          *Entry;
 
   NET_LIST_FOR_EACH (Entry, Head) {
-
     //
     // Each block represents a hole [Start, End] in the file,
     // skip to the first range with End >= Num
@@ -202,7 +196,6 @@ Mtftp4RemoveBlockNum (
     //
     if (Range->Start > Num) {
       return EFI_NOT_FOUND;
-
     } else if (Range->Start == Num) {
       Range->Start++;
 
@@ -214,15 +207,15 @@ Mtftp4RemoveBlockNum (
       // wrap to zero, because this is the simplest to implement. Here we choose
       // this solution.
       //
-      *BlockCounter  = Num;
+      *BlockCounter = Num;
 
       if (Range->Round > 0) {
-        *BlockCounter += Range->Bound +  MultU64x32 ((UINTN) (Range->Round -1), (UINT32) (Range->Bound + 1)) + 1;
+        *BlockCounter += Range->Bound +  MultU64x32 ((UINTN)(Range->Round -1), (UINT32)(Range->Bound + 1)) + 1;
       }
 
       if (Range->Start > Range->Bound) {
         Range->Start = 0;
-        Range->Round ++;
+        Range->Round++;
       }
 
       if ((Range->Start > Range->End) || Completed) {
@@ -231,12 +224,11 @@ Mtftp4RemoveBlockNum (
       }
 
       return EFI_SUCCESS;
-
     } else {
       if (Range->End == Num) {
         Range->End--;
       } else {
-        NewRange = Mtftp4AllocateRange ((UINT16) (Num + 1), (UINT16) Range->End);
+        NewRange = Mtftp4AllocateRange ((UINT16)(Num + 1), (UINT16)Range->End);
 
         if (NewRange == NULL) {
           return EFI_OUT_OF_RESOURCES;
@@ -253,7 +245,6 @@ Mtftp4RemoveBlockNum (
   return EFI_NOT_FOUND;
 }
 
-
 /**
   Build then transmit the request packet for the MTFTP session.
 
@@ -266,43 +257,44 @@ Mtftp4RemoveBlockNum (
 **/
 EFI_STATUS
 Mtftp4SendRequest (
-  IN MTFTP4_PROTOCOL        *Instance
+  IN MTFTP4_PROTOCOL  *Instance
   )
 {
-  EFI_MTFTP4_PACKET         *Packet;
-  EFI_MTFTP4_OPTION         *Options;
-  EFI_MTFTP4_TOKEN          *Token;
-  RETURN_STATUS             Status;
-  NET_BUF                   *Nbuf;
-  UINT8                     *Mode;
-  UINT8                     *Cur;
-  UINTN                     Index;
-  UINT32                    BufferLength;
-  UINTN                     FileNameLength;
-  UINTN                     ModeLength;
-  UINTN                     OptionStrLength;
-  UINTN                     ValueStrLength;
+  EFI_MTFTP4_PACKET  *Packet;
+  EFI_MTFTP4_OPTION  *Options;
+  EFI_MTFTP4_TOKEN   *Token;
+  RETURN_STATUS      Status;
+  NET_BUF            *Nbuf;
+  UINT8              *Mode;
+  UINT8              *Cur;
+  UINTN              Index;
+  UINT32             BufferLength;
+  UINTN              FileNameLength;
+  UINTN              ModeLength;
+  UINTN              OptionStrLength;
+  UINTN              ValueStrLength;
 
   Token   = Instance->Token;
   Options = Token->OptionList;
   Mode    = Instance->Token->ModeStr;
 
   if (Mode == NULL) {
-    Mode = (UINT8 *) "octet";
+    Mode = (UINT8 *)"octet";
   }
 
   //
   // Compute the packet length
   //
-  FileNameLength = AsciiStrLen ((CHAR8 *) Token->Filename);
-  ModeLength     = AsciiStrLen ((CHAR8 *) Mode);
-  BufferLength   = (UINT32) FileNameLength + (UINT32) ModeLength + 4;
+  FileNameLength = AsciiStrLen ((CHAR8 *)Token->Filename);
+  ModeLength     = AsciiStrLen ((CHAR8 *)Mode);
+  BufferLength   = (UINT32)FileNameLength + (UINT32)ModeLength + 4;
 
   for (Index = 0; Index < Token->OptionCount; Index++) {
-    OptionStrLength = AsciiStrLen ((CHAR8 *) Options[Index].OptionStr);
-    ValueStrLength  = AsciiStrLen ((CHAR8 *) Options[Index].ValueStr);
-    BufferLength   += (UINT32) OptionStrLength + (UINT32) ValueStrLength + 2;
+    OptionStrLength = AsciiStrLen ((CHAR8 *)Options[Index].OptionStr);
+    ValueStrLength  = AsciiStrLen ((CHAR8 *)Options[Index].ValueStr);
+    BufferLength   += (UINT32)OptionStrLength + (UINT32)ValueStrLength + 2;
   }
+
   //
   // Allocate a packet then copy the data over
   //
@@ -310,41 +302,39 @@ Mtftp4SendRequest (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Packet         = (EFI_MTFTP4_PACKET *) NetbufAllocSpace (Nbuf, BufferLength, FALSE);
+  Packet = (EFI_MTFTP4_PACKET *)NetbufAllocSpace (Nbuf, BufferLength, FALSE);
   ASSERT (Packet != NULL);
 
   Packet->OpCode = HTONS (Instance->Operation);
   BufferLength  -= sizeof (Packet->OpCode);
 
-  Cur            = Packet->Rrq.Filename;
-  Status         = AsciiStrCpyS ((CHAR8 *) Cur, BufferLength, (CHAR8 *) Token->Filename);
+  Cur    = Packet->Rrq.Filename;
+  Status = AsciiStrCpyS ((CHAR8 *)Cur, BufferLength, (CHAR8 *)Token->Filename);
   ASSERT_EFI_ERROR (Status);
-  BufferLength  -= (UINT32) (FileNameLength + 1);
-  Cur           += FileNameLength + 1;
-  Status         = AsciiStrCpyS ((CHAR8 *) Cur, BufferLength, (CHAR8 *) Mode);
+  BufferLength -= (UINT32)(FileNameLength + 1);
+  Cur          += FileNameLength + 1;
+  Status        = AsciiStrCpyS ((CHAR8 *)Cur, BufferLength, (CHAR8 *)Mode);
   ASSERT_EFI_ERROR (Status);
-  BufferLength  -= (UINT32) (ModeLength + 1);
-  Cur           += ModeLength + 1;
+  BufferLength -= (UINT32)(ModeLength + 1);
+  Cur          += ModeLength + 1;
 
   for (Index = 0; Index < Token->OptionCount; ++Index) {
-    OptionStrLength = AsciiStrLen ((CHAR8 *) Options[Index].OptionStr);
-    ValueStrLength  = AsciiStrLen ((CHAR8 *) Options[Index].ValueStr);
+    OptionStrLength = AsciiStrLen ((CHAR8 *)Options[Index].OptionStr);
+    ValueStrLength  = AsciiStrLen ((CHAR8 *)Options[Index].ValueStr);
 
-    Status          = AsciiStrCpyS ((CHAR8 *) Cur, BufferLength, (CHAR8 *) Options[Index].OptionStr);
+    Status = AsciiStrCpyS ((CHAR8 *)Cur, BufferLength, (CHAR8 *)Options[Index].OptionStr);
     ASSERT_EFI_ERROR (Status);
-    BufferLength   -= (UINT32) (OptionStrLength + 1);
-    Cur            += OptionStrLength + 1;
+    BufferLength -= (UINT32)(OptionStrLength + 1);
+    Cur          += OptionStrLength + 1;
 
-    Status          = AsciiStrCpyS ((CHAR8 *) Cur, BufferLength, (CHAR8 *) Options[Index].ValueStr);
+    Status = AsciiStrCpyS ((CHAR8 *)Cur, BufferLength, (CHAR8 *)Options[Index].ValueStr);
     ASSERT_EFI_ERROR (Status);
-    BufferLength   -= (UINT32) (ValueStrLength + 1);
-    Cur            += ValueStrLength + 1;
-
+    BufferLength -= (UINT32)(ValueStrLength + 1);
+    Cur          += ValueStrLength + 1;
   }
 
   return Mtftp4SendPacket (Instance, Nbuf);
 }
-
 
 /**
   Build then send an error message.
@@ -360,32 +350,31 @@ Mtftp4SendRequest (
 **/
 EFI_STATUS
 Mtftp4SendError (
-  IN MTFTP4_PROTOCOL        *Instance,
-  IN UINT16                 ErrCode,
-  IN UINT8                  *ErrInfo
+  IN MTFTP4_PROTOCOL  *Instance,
+  IN UINT16           ErrCode,
+  IN UINT8            *ErrInfo
   )
 {
-  NET_BUF                   *Packet;
-  EFI_MTFTP4_PACKET         *TftpError;
-  UINT32                    Len;
+  NET_BUF            *Packet;
+  EFI_MTFTP4_PACKET  *TftpError;
+  UINT32             Len;
 
-  Len     = (UINT32) (AsciiStrLen ((CHAR8 *) ErrInfo) + sizeof (EFI_MTFTP4_ERROR_HEADER));
-  Packet  = NetbufAlloc (Len);
+  Len    = (UINT32)(AsciiStrLen ((CHAR8 *)ErrInfo) + sizeof (EFI_MTFTP4_ERROR_HEADER));
+  Packet = NetbufAlloc (Len);
   if (Packet == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  TftpError         = (EFI_MTFTP4_PACKET *) NetbufAllocSpace (Packet, Len, FALSE);
+  TftpError = (EFI_MTFTP4_PACKET *)NetbufAllocSpace (Packet, Len, FALSE);
   ASSERT (TftpError != NULL);
 
-  TftpError->OpCode = HTONS (EFI_MTFTP4_OPCODE_ERROR);
+  TftpError->OpCode          = HTONS (EFI_MTFTP4_OPCODE_ERROR);
   TftpError->Error.ErrorCode = HTONS (ErrCode);
 
-  AsciiStrCpyS ((CHAR8 *) TftpError->Error.ErrorMessage, Len, (CHAR8 *) ErrInfo);
+  AsciiStrCpyS ((CHAR8 *)TftpError->Error.ErrorMessage, Len, (CHAR8 *)ErrInfo);
 
   return Mtftp4SendPacket (Instance, Packet);
 }
-
 
 /**
   The callback function called when the packet is transmitted.
@@ -401,15 +390,14 @@ Mtftp4SendError (
 VOID
 EFIAPI
 Mtftp4OnPacketSent (
-  IN NET_BUF                   *Packet,
-  IN UDP_END_POINT             *EndPoint,
-  IN EFI_STATUS                IoStatus,
-  IN VOID                      *Context
+  IN NET_BUF        *Packet,
+  IN UDP_END_POINT  *EndPoint,
+  IN EFI_STATUS     IoStatus,
+  IN VOID           *Context
   )
 {
   NetbufFree (Packet);
 }
-
 
 /**
   Set the timeout for the instance. User a longer time for passive instances.
@@ -419,7 +407,7 @@ Mtftp4OnPacketSent (
 **/
 VOID
 Mtftp4SetTimeout (
-  IN OUT MTFTP4_PROTOCOL        *Instance
+  IN OUT MTFTP4_PROTOCOL  *Instance
   )
 {
   if (Instance->Master) {
@@ -428,7 +416,6 @@ Mtftp4SetTimeout (
     Instance->PacketToLive = Instance->Timeout * 2;
   }
 }
-
 
 /**
   Send the packet for the instance.
@@ -446,14 +433,14 @@ Mtftp4SetTimeout (
 **/
 EFI_STATUS
 Mtftp4SendPacket (
-  IN OUT MTFTP4_PROTOCOL        *Instance,
-  IN OUT NET_BUF                *Packet
+  IN OUT MTFTP4_PROTOCOL  *Instance,
+  IN OUT NET_BUF          *Packet
   )
 {
-  UDP_END_POINT             UdpPoint;
-  EFI_STATUS                Status;
-  UINT16                    OpCode;
-  UINT8                     *Buffer;
+  UDP_END_POINT  UdpPoint;
+  EFI_STATUS     Status;
+  UINT16         OpCode;
+  UINT8          *Buffer;
 
   //
   // Save the packet for retransmission
@@ -462,9 +449,9 @@ Mtftp4SendPacket (
     NetbufFree (Instance->LastPacket);
   }
 
-  Instance->LastPacket        = Packet;
+  Instance->LastPacket = Packet;
 
-  Instance->CurRetry          = 0;
+  Instance->CurRetry = 0;
   Mtftp4SetTimeout (Instance);
 
   ZeroMem (&UdpPoint, sizeof (UdpPoint));
@@ -480,7 +467,8 @@ Mtftp4SendPacket (
 
   if ((OpCode == EFI_MTFTP4_OPCODE_RRQ) ||
       (OpCode == EFI_MTFTP4_OPCODE_DIR) ||
-      (OpCode == EFI_MTFTP4_OPCODE_WRQ)) {
+      (OpCode == EFI_MTFTP4_OPCODE_WRQ))
+  {
     UdpPoint.RemotePort = Instance->ListeningPort;
   } else {
     UdpPoint.RemotePort = Instance->ConnectedPort;
@@ -504,7 +492,6 @@ Mtftp4SendPacket (
   return Status;
 }
 
-
 /**
   Retransmit the last packet for the instance.
 
@@ -516,13 +503,13 @@ Mtftp4SendPacket (
 **/
 EFI_STATUS
 Mtftp4Retransmit (
-  IN MTFTP4_PROTOCOL        *Instance
+  IN MTFTP4_PROTOCOL  *Instance
   )
 {
-  UDP_END_POINT             UdpPoint;
-  EFI_STATUS                Status;
-  UINT16                    OpCode;
-  UINT8                     *Buffer;
+  UDP_END_POINT  UdpPoint;
+  EFI_STATUS     Status;
+  UINT16         OpCode;
+  UINT8          *Buffer;
 
   ASSERT (Instance->LastPacket != NULL);
 
@@ -534,10 +521,11 @@ Mtftp4Retransmit (
   //
   Buffer = NetbufGetByte (Instance->LastPacket, 0, NULL);
   ASSERT (Buffer != NULL);
-  OpCode = NTOHS (*(UINT16 *) Buffer);
+  OpCode = NTOHS (*(UINT16 *)Buffer);
 
   if ((OpCode == EFI_MTFTP4_OPCODE_RRQ) || (OpCode == EFI_MTFTP4_OPCODE_DIR) ||
-      (OpCode == EFI_MTFTP4_OPCODE_WRQ)) {
+      (OpCode == EFI_MTFTP4_OPCODE_WRQ))
+  {
     UdpPoint.RemotePort = Instance->ListeningPort;
   } else {
     UdpPoint.RemotePort = Instance->ConnectedPort;
@@ -561,7 +549,6 @@ Mtftp4Retransmit (
   return Status;
 }
 
-
 /**
   The timer ticking function in TPL_NOTIFY level for the Mtftp service instance.
 
@@ -572,16 +559,16 @@ Mtftp4Retransmit (
 VOID
 EFIAPI
 Mtftp4OnTimerTickNotifyLevel (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  MTFTP4_SERVICE            *MtftpSb;
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  MTFTP4_PROTOCOL           *Instance;
+  MTFTP4_SERVICE   *MtftpSb;
+  LIST_ENTRY       *Entry;
+  LIST_ENTRY       *Next;
+  MTFTP4_PROTOCOL  *Instance;
 
-  MtftpSb = (MTFTP4_SERVICE *) Context;
+  MtftpSb = (MTFTP4_SERVICE *)Context;
 
   //
   // Iterate through all the children of the Mtftp service instance. Time
@@ -597,7 +584,6 @@ Mtftp4OnTimerTickNotifyLevel (
   }
 }
 
-
 /**
   The timer ticking function for the Mtftp service instance.
 
@@ -608,17 +594,17 @@ Mtftp4OnTimerTickNotifyLevel (
 VOID
 EFIAPI
 Mtftp4OnTimerTick (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  MTFTP4_SERVICE            *MtftpSb;
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *Next;
-  MTFTP4_PROTOCOL           *Instance;
-  EFI_MTFTP4_TOKEN          *Token;
+  MTFTP4_SERVICE    *MtftpSb;
+  LIST_ENTRY        *Entry;
+  LIST_ENTRY        *Next;
+  MTFTP4_PROTOCOL   *Instance;
+  EFI_MTFTP4_TOKEN  *Token;
 
-  MtftpSb = (MTFTP4_SERVICE *) Context;
+  MtftpSb = (MTFTP4_SERVICE *)Context;
 
   //
   // Iterate through all the children of the Mtftp service instance.
@@ -636,12 +622,13 @@ Mtftp4OnTimerTick (
     //
     Token = Instance->Token;
 
-    if (Token != NULL && Token->TimeoutCallback != NULL &&
-        EFI_ERROR (Token->TimeoutCallback (&Instance->Mtftp4, Token))) {
+    if ((Token != NULL) && (Token->TimeoutCallback != NULL) &&
+        EFI_ERROR (Token->TimeoutCallback (&Instance->Mtftp4, Token)))
+    {
       Mtftp4SendError (
         Instance,
         EFI_MTFTP4_ERRORCODE_REQUEST_DENIED,
-        (UINT8 *) "User aborted the transfer in time out"
+        (UINT8 *)"User aborted the transfer in time out"
         );
 
       Mtftp4CleanOperation (Instance, EFI_ABORTED);

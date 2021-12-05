@@ -23,11 +23,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 Ip4SysPacketSent (
-  IP4_PROTOCOL              *Ip4Instance,
-  NET_BUF                   *Packet,
-  EFI_STATUS                IoStatus,
-  UINT32                    LinkFlag,
-  VOID                      *Context
+  IP4_PROTOCOL  *Ip4Instance,
+  NET_BUF       *Packet,
+  EFI_STATUS    IoStatus,
+  UINT32        LinkFlag,
+  VOID          *Context
   );
 
 /**
@@ -63,15 +63,15 @@ Ip4SysPacketSent (
 **/
 EFI_STATUS
 Ip4Output (
-  IN IP4_SERVICE            *IpSb,
-  IN IP4_PROTOCOL           *IpInstance  OPTIONAL,
-  IN NET_BUF                *Packet,
-  IN IP4_HEAD               *Head,
-  IN UINT8                  *Option,
-  IN UINT32                 OptLen,
-  IN IP4_ADDR               GateWay,
-  IN IP4_FRAME_CALLBACK     Callback,
-  IN VOID                   *Context
+  IN IP4_SERVICE         *IpSb,
+  IN IP4_PROTOCOL        *IpInstance  OPTIONAL,
+  IN NET_BUF             *Packet,
+  IN IP4_HEAD            *Head,
+  IN UINT8               *Option,
+  IN UINT32              OptLen,
+  IN IP4_ADDR            GateWay,
+  IN IP4_FRAME_CALLBACK  Callback,
+  IN VOID                *Context
   );
 
 /**
@@ -84,9 +84,9 @@ Ip4Output (
 **/
 VOID
 Ip4CancelPacket (
-  IN IP4_INTERFACE    *IpIf,
-  IN NET_BUF          *Packet,
-  IN EFI_STATUS       IoStatus
+  IN IP4_INTERFACE  *IpIf,
+  IN NET_BUF        *Packet,
+  IN EFI_STATUS     IoStatus
   );
 
 /**
@@ -109,10 +109,10 @@ Ip4CancelPacket (
 **/
 EFI_STATUS
 Ip4PrependHead (
-  IN OUT NET_BUF                *Packet,
-  IN     IP4_HEAD               *Head,
-  IN     UINT8                  *Option,
-  IN     UINT32                 OptLen
+  IN OUT NET_BUF   *Packet,
+  IN     IP4_HEAD  *Head,
+  IN     UINT8     *Option,
+  IN     UINT32    OptLen
   );
 
 extern UINT16  mIp4Id;

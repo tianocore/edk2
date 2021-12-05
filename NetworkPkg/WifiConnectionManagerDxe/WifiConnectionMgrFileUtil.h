@@ -30,10 +30,10 @@
 **/
 EFI_STATUS
 ReadFileContent (
-  IN      EFI_FILE_HANDLE           FileHandle,
-  IN OUT  VOID                      **BufferPtr,
-     OUT  UINTN                     *FileSize,
-  IN      UINTN                     AddtionAllocateSize
+  IN      EFI_FILE_HANDLE  FileHandle,
+  IN OUT  VOID             **BufferPtr,
+  OUT  UINTN               *FileSize,
+  IN      UINTN            AddtionAllocateSize
   );
 
 /**
@@ -48,8 +48,8 @@ ReadFileContent (
 **/
 BOOLEAN
 UpdateCAFromFile (
-  IN  WIFI_MGR_PRIVATE_DATA           *Private,
-  IN  EFI_DEVICE_PATH_PROTOCOL        *FilePath
+  IN  WIFI_MGR_PRIVATE_DATA     *Private,
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
 
 /**
@@ -64,8 +64,8 @@ UpdateCAFromFile (
 **/
 BOOLEAN
 UpdatePrivateKeyFromFile (
-  IN  WIFI_MGR_PRIVATE_DATA           *Private,
-  IN  EFI_DEVICE_PATH_PROTOCOL        *FilePath
+  IN  WIFI_MGR_PRIVATE_DATA     *Private,
+  IN  EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
 
 #endif
