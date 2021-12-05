@@ -14,9 +14,9 @@
 ///
 /// Page Table Entry
 ///
-#define IA32_PG_P                   BIT0
-#define IA32_PG_RW                  BIT1
-#define IA32_PG_PS                  BIT7
+#define IA32_PG_P   BIT0
+#define IA32_PG_RW  BIT1
+#define IA32_PG_PS  BIT7
 
 /**
 
@@ -28,14 +28,14 @@
 **/
 VOID
 StmGen4GPageTable (
-  IN UINTN              PageTableBase
+  IN UINTN  PageTableBase
   )
 {
-  UINTN                             Index;
-  UINT32                            *Pte;
-  UINT32                            Address;
+  UINTN   Index;
+  UINT32  *Pte;
+  UINT32  Address;
 
-  Pte = (UINT32*)(UINTN)PageTableBase;
+  Pte = (UINT32 *)(UINTN)PageTableBase;
 
   Address = 0;
   for (Index = 0; Index < SIZE_4KB / sizeof (*Pte); Index++) {
@@ -63,7 +63,7 @@ StmGen4GPageTable (
 UINT32
 EFIAPI
 SmmStmExceptionHandler (
-  IN OUT STM_PROTECTION_EXCEPTION_STACK_FRAME Context
+  IN OUT STM_PROTECTION_EXCEPTION_STACK_FRAME  Context
   )
 {
   // TBD - SmmStmExceptionHandler, record information

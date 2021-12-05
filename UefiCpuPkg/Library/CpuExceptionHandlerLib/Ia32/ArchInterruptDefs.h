@@ -10,29 +10,29 @@
 #define _ARCH_CPU_INTERRUPT_DEFS_H_
 
 typedef struct {
-  EFI_SYSTEM_CONTEXT_IA32 SystemContext;
-  BOOLEAN                 ExceptionDataFlag;
-  UINTN                   OldIdtHandler;
+  EFI_SYSTEM_CONTEXT_IA32    SystemContext;
+  BOOLEAN                    ExceptionDataFlag;
+  UINTN                      OldIdtHandler;
 } EXCEPTION_HANDLER_CONTEXT;
 
 //
 // Register Structure Definitions
 //
 typedef struct {
-  EFI_STATUS_CODE_DATA      Header;
-  EFI_SYSTEM_CONTEXT_IA32   SystemContext;
+  EFI_STATUS_CODE_DATA       Header;
+  EFI_SYSTEM_CONTEXT_IA32    SystemContext;
 } CPU_STATUS_CODE_TEMPLATE;
 
 typedef struct {
-  SPIN_LOCK   SpinLock;
-  UINT32      ApicId;
-  UINT32      Attribute;
-  UINTN       ExceptonHandler;
-  UINTN       OldFlags;
-  UINTN       OldCs;
-  UINTN       OldIp;
-  UINTN       ExceptionData;
-  UINT8       HookAfterStubHeaderCode[HOOKAFTER_STUB_SIZE];
+  SPIN_LOCK    SpinLock;
+  UINT32       ApicId;
+  UINT32       Attribute;
+  UINTN        ExceptonHandler;
+  UINTN        OldFlags;
+  UINTN        OldCs;
+  UINTN        OldIp;
+  UINTN        ExceptionData;
+  UINT8        HookAfterStubHeaderCode[HOOKAFTER_STUB_SIZE];
 } RESERVED_VECTORS_DATA;
 
 #define CPU_TSS_DESC_SIZE \

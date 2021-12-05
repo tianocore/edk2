@@ -24,21 +24,21 @@
 #include "CpuFeaturesLib.h"
 #include "SmmStm.h"
 
-#define TXT_EVTYPE_BASE                  0x400
-#define TXT_EVTYPE_STM_HASH              (TXT_EVTYPE_BASE + 14)
+#define TXT_EVTYPE_BASE      0x400
+#define TXT_EVTYPE_STM_HASH  (TXT_EVTYPE_BASE + 14)
 
-#define RDWR_ACCS             3
-#define FULL_ACCS             7
+#define RDWR_ACCS  3
+#define FULL_ACCS  7
 
 EFI_HANDLE  mStmSmmCpuHandle = NULL;
 
-BOOLEAN mLockLoadMonitor = FALSE;
+BOOLEAN  mLockLoadMonitor = FALSE;
 
 //
 // Template of STM_RSC_END structure for copying.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED STM_RSC_END mRscEndNode = {
-  {END_OF_RESOURCES, sizeof (STM_RSC_END)},
+GLOBAL_REMOVE_IF_UNREFERENCED STM_RSC_END  mRscEndNode = {
+  { END_OF_RESOURCES, sizeof (STM_RSC_END) },
 };
 
 GLOBAL_REMOVE_IF_UNREFERENCED UINT8  *mStmResourcesPtr         = NULL;
@@ -52,7 +52,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED UINT32  mStmState = 0;
 // System Configuration Table pointing to STM Configuration Table
 //
 GLOBAL_REMOVE_IF_UNREFERENCED
-EFI_SM_MONITOR_INIT_PROTOCOL mSmMonitorInitProtocol = {
+EFI_SM_MONITOR_INIT_PROTOCOL  mSmMonitorInitProtocol = {
   LoadMonitor,
   AddPiResource,
   DeletePiResource,
@@ -60,10 +60,7 @@ EFI_SM_MONITOR_INIT_PROTOCOL mSmMonitorInitProtocol = {
   GetMonitorState,
 };
 
-
-
-
-#define   CPUID1_EDX_XD_SUPPORT      0x100000
+#define   CPUID1_EDX_XD_SUPPORT  0x100000
 
 //
 // External global variables associated with SMI Handler Template
@@ -146,10 +143,10 @@ SmmCpuFeaturesLibStmConstructor (
       //
       // Retrieve MSEG location from MSEG SRAM HOB
       //
-      SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *) GET_GUID_HOB_DATA (GuidHob);
+      SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *)GET_GUID_HOB_DATA (GuidHob);
       if (SmramDescriptor->PhysicalSize > 0) {
-        mMsegBase       = (UINTN)SmramDescriptor->CpuStart;
-        mMsegSize       = (UINTN)SmramDescriptor->PhysicalSize;
+        mMsegBase = (UINTN)SmramDescriptor->CpuStart;
+        mMsegSize = (UINTN)SmramDescriptor->PhysicalSize;
       }
     } else if (PcdGet32 (PcdCpuMsegSize) > 0) {
       //
@@ -162,6 +159,7 @@ SmmCpuFeaturesLibStmConstructor (
         DEBUG ((DEBUG_ERROR, "Not enough SMRAM resource to allocate MSEG size %08x\n", PcdGet32 (PcdCpuMsegSize)));
       }
     }
+
     if (mMsegBase > 0) {
       DEBUG ((DEBUG_INFO, "MsegBase: 0x%08x, MsegSize: 0x%08x\n", mMsegBase, mMsegSize));
     }
@@ -251,16 +249,16 @@ SmmCpuFeaturesInstallSmiHandler (
   IN UINT32  Cr3
   )
 {
-  EFI_STATUS                     Status;
-  TXT_PROCESSOR_SMM_DESCRIPTOR   *Psd;
-  VOID                           *Hob;
-  UINT32                         RegEax;
-  UINT32                         RegEdx;
-  EFI_PROCESSOR_INFORMATION      ProcessorInfo;
+  EFI_STATUS                    Status;
+  TXT_PROCESSOR_SMM_DESCRIPTOR  *Psd;
+  VOID                          *Hob;
+  UINT32                        RegEax;
+  UINT32                        RegEdx;
+  EFI_PROCESSOR_INFORMATION     ProcessorInfo;
 
   CopyMem ((VOID *)((UINTN)SmBase + TXT_SMM_PSD_OFFSET), &gcStmPsd, sizeof (gcStmPsd));
-  Psd = (TXT_PROCESSOR_SMM_DESCRIPTOR *)(VOID *)((UINTN)SmBase + TXT_SMM_PSD_OFFSET);
-  Psd->SmmGdtPtr = GdtBase;
+  Psd             = (TXT_PROCESSOR_SMM_DESCRIPTOR *)(VOID *)((UINTN)SmBase + TXT_SMM_PSD_OFFSET);
+  Psd->SmmGdtPtr  = GdtBase;
   Psd->SmmGdtSize = (UINT32)GdtSize;
 
   //
@@ -293,49 +291,49 @@ SmmCpuFeaturesInstallSmiHandler (
   //
   // Set the value at the top of the CPU stack to the CPU Index
   //
-  *(UINTN*)(UINTN)gStmSmiStack = CpuIndex;
+  *(UINTN *)(UINTN)gStmSmiStack = CpuIndex;
 
   //
   // Copy template to CPU specific SMI handler location
   //
   CopyMem (
-    (VOID*)((UINTN)SmBase + SMM_HANDLER_OFFSET),
-    (VOID*)gcStmSmiHandlerTemplate,
+    (VOID *)((UINTN)SmBase + SMM_HANDLER_OFFSET),
+    (VOID *)gcStmSmiHandlerTemplate,
     gcStmSmiHandlerSize
     );
 
   Psd->SmmSmiHandlerRip = SmBase + SMM_HANDLER_OFFSET + gcStmSmiHandlerOffset;
-  Psd->SmmSmiHandlerRsp = (UINTN)SmiStack + StackSize - sizeof(UINTN);
+  Psd->SmmSmiHandlerRsp = (UINTN)SmiStack + StackSize - sizeof (UINTN);
   Psd->SmmCr3           = Cr3;
 
-  DEBUG((DEBUG_INFO, "CpuSmmStmExceptionStackSize - %x\n", PcdGet32(PcdCpuSmmStmExceptionStackSize)));
-  DEBUG((DEBUG_INFO, "Pages - %x\n", EFI_SIZE_TO_PAGES(PcdGet32(PcdCpuSmmStmExceptionStackSize))));
-  Psd->StmProtectionExceptionHandler.SpeRsp = (UINT64)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStmExceptionStackSize)));
+  DEBUG ((DEBUG_INFO, "CpuSmmStmExceptionStackSize - %x\n", PcdGet32 (PcdCpuSmmStmExceptionStackSize)));
+  DEBUG ((DEBUG_INFO, "Pages - %x\n", EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStmExceptionStackSize))));
+  Psd->StmProtectionExceptionHandler.SpeRsp  = (UINT64)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStmExceptionStackSize)));
   Psd->StmProtectionExceptionHandler.SpeRsp += EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStmExceptionStackSize)));
 
-  Psd->BiosHwResourceRequirementsPtr        = (UINT64)(UINTN)GetStmResource ();
+  Psd->BiosHwResourceRequirementsPtr = (UINT64)(UINTN)GetStmResource ();
 
   //
   // Get the APIC ID for the CPU specified by CpuIndex
   //
   Status = mSmmCpuFeaturesLibMpService->GetProcessorInfo (
-             mSmmCpuFeaturesLibMpService,
-             CpuIndex,
-             &ProcessorInfo
-             );
+                                          mSmmCpuFeaturesLibMpService,
+                                          CpuIndex,
+                                          &ProcessorInfo
+                                          );
   ASSERT_EFI_ERROR (Status);
 
   Psd->LocalApicId = (UINT32)ProcessorInfo.ProcessorId;
-  Psd->AcpiRsdp = 0;
+  Psd->AcpiRsdp    = 0;
 
   Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
   if (Hob != NULL) {
-    Psd->PhysicalAddressBits = ((EFI_HOB_CPU *) Hob)->SizeOfMemorySpace;
+    Psd->PhysicalAddressBits = ((EFI_HOB_CPU *)Hob)->SizeOfMemorySpace;
   } else {
     AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
     if (RegEax >= 0x80000008) {
       AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      Psd->PhysicalAddressBits = (UINT8) RegEax;
+      Psd->PhysicalAddressBits = (UINT8)RegEax;
     } else {
       Psd->PhysicalAddressBits = 36;
     }
@@ -385,6 +383,7 @@ SmmEndOfDxeEventNotify (
       break;
     }
   }
+
   if (Rsdp == NULL) {
     for (Index = 0; Index < gST->NumberOfTableEntries; Index++) {
       if (CompareGuid (&(gST->ConfigurationTable[Index].VendorGuid), &gEfiAcpi10TableGuid)) {
@@ -416,8 +415,8 @@ StmSmmConfigurationTableInit (
   VOID
   )
 {
-  EFI_STATUS    Status;
-    VOID        *Registration;
+  EFI_STATUS  Status;
+  VOID        *Registration;
 
   Status = gSmst->SmmInstallProtocolInterface (
                     &mStmSmmCpuHandle,
@@ -468,19 +467,19 @@ GetMonitorState (
 **/
 BOOLEAN
 HandleSingleResource (
-  IN  STM_RSC      *Resource,
-  IN  STM_RSC      *Record
+  IN  STM_RSC  *Resource,
+  IN  STM_RSC  *Record
   )
 {
-  UINT64      ResourceLo;
-  UINT64      ResourceHi;
-  UINT64      RecordLo;
-  UINT64      RecordHi;
+  UINT64  ResourceLo;
+  UINT64  ResourceHi;
+  UINT64  RecordLo;
+  UINT64  RecordHi;
 
   ResourceLo = 0;
   ResourceHi = 0;
-  RecordLo = 0;
-  RecordHi = 0;
+  RecordLo   = 0;
+  RecordHi   = 0;
 
   //
   // Calling code is responsible for making sure that
@@ -488,62 +487,69 @@ HandleSingleResource (
   // thus we use just one of them as switch variable.
   //
   switch (Resource->Header.RscType) {
-  case MEM_RANGE:
-  case MMIO_RANGE:
-    ResourceLo = Resource->Mem.Base;
-    ResourceHi = Resource->Mem.Base + Resource->Mem.Length;
-    RecordLo = Record->Mem.Base;
-    RecordHi = Record->Mem.Base + Record->Mem.Length;
-    if (Resource->Mem.RWXAttributes != Record->Mem.RWXAttributes) {
-      if ((ResourceLo == RecordLo) && (ResourceHi == RecordHi)) {
-        Record->Mem.RWXAttributes = Resource->Mem.RWXAttributes | Record->Mem.RWXAttributes;
-        return TRUE;
-      } else {
+    case MEM_RANGE:
+    case MMIO_RANGE:
+      ResourceLo = Resource->Mem.Base;
+      ResourceHi = Resource->Mem.Base + Resource->Mem.Length;
+      RecordLo   = Record->Mem.Base;
+      RecordHi   = Record->Mem.Base + Record->Mem.Length;
+      if (Resource->Mem.RWXAttributes != Record->Mem.RWXAttributes) {
+        if ((ResourceLo == RecordLo) && (ResourceHi == RecordHi)) {
+          Record->Mem.RWXAttributes = Resource->Mem.RWXAttributes | Record->Mem.RWXAttributes;
+          return TRUE;
+        } else {
+          return FALSE;
+        }
+      }
+
+      break;
+    case IO_RANGE:
+    case TRAPPED_IO_RANGE:
+      ResourceLo = (UINT64)Resource->Io.Base;
+      ResourceHi = (UINT64)Resource->Io.Base + (UINT64)Resource->Io.Length;
+      RecordLo   = (UINT64)Record->Io.Base;
+      RecordHi   = (UINT64)Record->Io.Base + (UINT64)Record->Io.Length;
+      break;
+    case PCI_CFG_RANGE:
+      if ((Resource->PciCfg.OriginatingBusNumber != Record->PciCfg.OriginatingBusNumber) ||
+          (Resource->PciCfg.LastNodeIndex != Record->PciCfg.LastNodeIndex))
+      {
         return FALSE;
       }
-    }
-    break;
-  case IO_RANGE:
-  case TRAPPED_IO_RANGE:
-    ResourceLo = (UINT64) Resource->Io.Base;
-    ResourceHi = (UINT64) Resource->Io.Base + (UINT64) Resource->Io.Length;
-    RecordLo = (UINT64) Record->Io.Base;
-    RecordHi = (UINT64) Record->Io.Base + (UINT64) Record->Io.Length;
-    break;
-  case PCI_CFG_RANGE:
-    if ((Resource->PciCfg.OriginatingBusNumber != Record->PciCfg.OriginatingBusNumber) ||
-        (Resource->PciCfg.LastNodeIndex != Record->PciCfg.LastNodeIndex)) {
-      return FALSE;
-    }
-    if (CompareMem (Resource->PciCfg.PciDevicePath, Record->PciCfg.PciDevicePath, sizeof(STM_PCI_DEVICE_PATH_NODE) * (Resource->PciCfg.LastNodeIndex + 1)) != 0) {
-      return FALSE;
-    }
-    ResourceLo = (UINT64) Resource->PciCfg.Base;
-    ResourceHi = (UINT64) Resource->PciCfg.Base + (UINT64) Resource->PciCfg.Length;
-    RecordLo = (UINT64) Record->PciCfg.Base;
-    RecordHi = (UINT64) Record->PciCfg.Base + (UINT64) Record->PciCfg.Length;
-    if (Resource->PciCfg.RWAttributes != Record->PciCfg.RWAttributes) {
-      if ((ResourceLo == RecordLo) && (ResourceHi == RecordHi)) {
-        Record->PciCfg.RWAttributes = Resource->PciCfg.RWAttributes | Record->PciCfg.RWAttributes;
-        return TRUE;
-      } else {
+
+      if (CompareMem (Resource->PciCfg.PciDevicePath, Record->PciCfg.PciDevicePath, sizeof (STM_PCI_DEVICE_PATH_NODE) * (Resource->PciCfg.LastNodeIndex + 1)) != 0) {
         return FALSE;
       }
-    }
-    break;
-  case MACHINE_SPECIFIC_REG:
-    //
-    // Special case - merge MSR masks in place.
-    //
-    if (Resource->Msr.MsrIndex != Record->Msr.MsrIndex) {
+
+      ResourceLo = (UINT64)Resource->PciCfg.Base;
+      ResourceHi = (UINT64)Resource->PciCfg.Base + (UINT64)Resource->PciCfg.Length;
+      RecordLo   = (UINT64)Record->PciCfg.Base;
+      RecordHi   = (UINT64)Record->PciCfg.Base + (UINT64)Record->PciCfg.Length;
+      if (Resource->PciCfg.RWAttributes != Record->PciCfg.RWAttributes) {
+        if ((ResourceLo == RecordLo) && (ResourceHi == RecordHi)) {
+          Record->PciCfg.RWAttributes = Resource->PciCfg.RWAttributes | Record->PciCfg.RWAttributes;
+          return TRUE;
+        } else {
+          return FALSE;
+        }
+      }
+
+      break;
+    case MACHINE_SPECIFIC_REG:
+      //
+      // Special case - merge MSR masks in place.
+      //
+      if (Resource->Msr.MsrIndex != Record->Msr.MsrIndex) {
+        return FALSE;
+      }
+
+      Record->Msr.ReadMask  |= Resource->Msr.ReadMask;
+      Record->Msr.WriteMask |= Resource->Msr.WriteMask;
+      return TRUE;
+    default:
       return FALSE;
-    }
-    Record->Msr.ReadMask |= Resource->Msr.ReadMask;
-    Record->Msr.WriteMask |= Resource->Msr.WriteMask;
-    return TRUE;
-  default:
-    return FALSE;
   }
+
   //
   // If resources are disjoint
   //
@@ -557,6 +563,7 @@ HandleSingleResource (
   if ((ResourceLo >= RecordLo) && (ResourceHi <= RecordHi)) {
     return TRUE;
   }
+
   //
   // Resources are overlapping.
   // Resource and record are merged.
@@ -565,22 +572,22 @@ HandleSingleResource (
   ResourceHi = (ResourceHi > RecordHi) ? ResourceHi : RecordHi;
 
   switch (Resource->Header.RscType) {
-  case MEM_RANGE:
-  case MMIO_RANGE:
-    Record->Mem.Base = ResourceLo;
-    Record->Mem.Length = ResourceHi - ResourceLo;
-    break;
-  case IO_RANGE:
-  case TRAPPED_IO_RANGE:
-    Record->Io.Base = (UINT16) ResourceLo;
-    Record->Io.Length = (UINT16) (ResourceHi - ResourceLo);
-    break;
-  case PCI_CFG_RANGE:
-    Record->PciCfg.Base = (UINT16) ResourceLo;
-    Record->PciCfg.Length = (UINT16) (ResourceHi - ResourceLo);
-    break;
-  default:
-    return FALSE;
+    case MEM_RANGE:
+    case MMIO_RANGE:
+      Record->Mem.Base   = ResourceLo;
+      Record->Mem.Length = ResourceHi - ResourceLo;
+      break;
+    case IO_RANGE:
+    case TRAPPED_IO_RANGE:
+      Record->Io.Base   = (UINT16)ResourceLo;
+      Record->Io.Length = (UINT16)(ResourceHi - ResourceLo);
+      break;
+    case PCI_CFG_RANGE:
+      Record->PciCfg.Base   = (UINT16)ResourceLo;
+      Record->PciCfg.Length = (UINT16)(ResourceHi - ResourceLo);
+      break;
+    default:
+      return FALSE;
   }
 
   return TRUE;
@@ -595,10 +602,10 @@ HandleSingleResource (
 **/
 VOID
 AddSingleResource (
-  IN  STM_RSC    *Resource
+  IN  STM_RSC  *Resource
   )
 {
-  STM_RSC    *Record;
+  STM_RSC  *Record;
 
   Record = (STM_RSC *)mStmResourcesPtr;
 
@@ -606,6 +613,7 @@ AddSingleResource (
     if (Record->Header.RscType == END_OF_RESOURCES) {
       break;
     }
+
     //
     // Go to next record if resource and record types don't match.
     //
@@ -613,12 +621,14 @@ AddSingleResource (
       Record = (STM_RSC *)((UINTN)Record + Record->Header.Length);
       continue;
     }
+
     //
     // Record is handled inside of procedure - don't adjust.
     //
     if (HandleSingleResource (Resource, Record)) {
-      return ;
+      return;
     }
+
     Record = (STM_RSC *)((UINTN)Record + Record->Header.Length);
   }
 
@@ -626,19 +636,19 @@ AddSingleResource (
   // Add resource to the end of area.
   //
   CopyMem (
-    mStmResourcesPtr + mStmResourceSizeUsed - sizeof(mRscEndNode),
+    mStmResourcesPtr + mStmResourceSizeUsed - sizeof (mRscEndNode),
     Resource,
     Resource->Header.Length
     );
   CopyMem (
-    mStmResourcesPtr + mStmResourceSizeUsed - sizeof(mRscEndNode) + Resource->Header.Length,
+    mStmResourcesPtr + mStmResourceSizeUsed - sizeof (mRscEndNode) + Resource->Header.Length,
     &mRscEndNode,
-    sizeof(mRscEndNode)
+    sizeof (mRscEndNode)
     );
-  mStmResourceSizeUsed += Resource->Header.Length;
+  mStmResourceSizeUsed     += Resource->Header.Length;
   mStmResourceSizeAvailable = mStmResourceTotalSize - mStmResourceSizeUsed;
 
-  return ;
+  return;
 }
 
 /**
@@ -652,13 +662,13 @@ AddSingleResource (
 **/
 VOID
 AddResource (
-  IN  STM_RSC    *ResourceList,
-  IN  UINT32      NumEntries OPTIONAL
+  IN  STM_RSC  *ResourceList,
+  IN  UINT32   NumEntries OPTIONAL
   )
 {
-  UINT32      Count;
-  UINTN       Index;
-  STM_RSC    *Resource;
+  UINT32   Count;
+  UINTN    Index;
+  STM_RSC  *Resource;
 
   if (NumEntries == 0) {
     Count = 0xFFFFFFFF;
@@ -670,12 +680,14 @@ AddResource (
 
   for (Index = 0; Index < Count; Index++) {
     if (Resource->Header.RscType == END_OF_RESOURCES) {
-      return ;
+      return;
     }
+
     AddSingleResource (Resource);
     Resource = (STM_RSC *)((UINTN)Resource + Resource->Header.Length);
   }
-  return ;
+
+  return;
 }
 
 /**
@@ -692,14 +704,14 @@ AddResource (
 **/
 BOOLEAN
 ValidateResource (
-  IN  STM_RSC    *ResourceList,
-  IN  UINT32      NumEntries OPTIONAL
+  IN  STM_RSC  *ResourceList,
+  IN  UINT32   NumEntries OPTIONAL
   )
 {
-  UINT32      Count;
-  UINTN       Index;
-  STM_RSC    *Resource;
-  UINTN       SubIndex;
+  UINT32   Count;
+  UINTN    Index;
+  STM_RSC  *Resource;
+  UINTN    SubIndex;
 
   //
   // If NumEntries == 0 make it very big. Scan will be terminated by
@@ -724,21 +736,23 @@ ValidateResource (
     switch (Resource->Header.RscType) {
       case END_OF_RESOURCES:
         if (Resource->Header.Length != sizeof (STM_RSC_END)) {
-          return  FALSE;
+          return FALSE;
         }
+
         //
         // If we are passed actual number of resources to add,
         // END_OF_RESOURCES structure between them is considered an
         // error. If NumEntries == 0 END_OF_RESOURCES is a termination.
         //
         if (NumEntries != 0) {
-          return  FALSE;
+          return FALSE;
         } else {
           //
           // If NumEntries == 0 and list reached end - return success.
           //
           return TRUE;
         }
+
         break;
 
       case MEM_RANGE:
@@ -750,6 +764,7 @@ ValidateResource (
         if (Resource->Mem.RWXAttributes > FULL_ACCS) {
           return FALSE;
         }
+
         break;
 
       case IO_RANGE:
@@ -761,35 +776,42 @@ ValidateResource (
         if ((Resource->Io.Base + Resource->Io.Length) > 0xFFFF) {
           return FALSE;
         }
+
         break;
 
       case PCI_CFG_RANGE:
         DEBUG ((DEBUG_INFO, "ValidateResource - PCI (0x%02x, 0x%08x, 0x%02x, 0x%02x)\n", Resource->PciCfg.OriginatingBusNumber, Resource->PciCfg.LastNodeIndex, Resource->PciCfg.PciDevicePath[0].PciDevice, Resource->PciCfg.PciDevicePath[0].PciFunction));
-        if (Resource->Header.Length != sizeof (STM_RSC_PCI_CFG_DESC) + (sizeof(STM_PCI_DEVICE_PATH_NODE) * Resource->PciCfg.LastNodeIndex)) {
+        if (Resource->Header.Length != sizeof (STM_RSC_PCI_CFG_DESC) + (sizeof (STM_PCI_DEVICE_PATH_NODE) * Resource->PciCfg.LastNodeIndex)) {
           return FALSE;
         }
+
         for (SubIndex = 0; SubIndex <= Resource->PciCfg.LastNodeIndex; SubIndex++) {
           if ((Resource->PciCfg.PciDevicePath[SubIndex].PciDevice > 0x1F) || (Resource->PciCfg.PciDevicePath[SubIndex].PciFunction > 7)) {
             return FALSE;
           }
         }
+
         if ((Resource->PciCfg.Base + Resource->PciCfg.Length) > 0x1000) {
           return FALSE;
         }
+
         break;
 
       case MACHINE_SPECIFIC_REG:
         if (Resource->Header.Length != sizeof (STM_RSC_MSR_DESC)) {
           return FALSE;
         }
+
         break;
 
-      default :
+      default:
         DEBUG ((DEBUG_ERROR, "ValidateResource - Unknown RscType(%x)\n", Resource->Header.RscType));
         return FALSE;
     }
+
     Resource = (STM_RSC *)((UINTN)Resource + Resource->Header.Length);
   }
+
   return TRUE;
 }
 
@@ -808,13 +830,13 @@ ValidateResource (
 **/
 UINTN
 GetResourceSize (
-  IN  STM_RSC    *ResourceList,
-  IN  UINT32      NumEntries OPTIONAL
+  IN  STM_RSC  *ResourceList,
+  IN  UINT32   NumEntries OPTIONAL
   )
 {
-  UINT32      Count;
-  UINTN       Index;
-  STM_RSC    *Resource;
+  UINT32   Count;
+  UINTN    Index;
+  STM_RSC  *Resource;
 
   Resource = ResourceList;
 
@@ -837,6 +859,7 @@ GetResourceSize (
     if (Resource->Header.RscType == END_OF_RESOURCES) {
       break;
     }
+
     Resource = (STM_RSC *)((UINTN)Resource + Resource->Header.Length);
   }
 
@@ -859,8 +882,8 @@ GetResourceSize (
 EFI_STATUS
 EFIAPI
 AddPiResource (
-  IN  STM_RSC    *ResourceList,
-  IN  UINT32      NumEntries OPTIONAL
+  IN  STM_RSC  *ResourceList,
+  IN  UINT32   NumEntries OPTIONAL
   )
 {
   EFI_STATUS            Status;
@@ -884,7 +907,7 @@ AddPiResource (
     //
     // First time allocation
     //
-    NewResourceSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (ResourceSize + sizeof(mRscEndNode)));
+    NewResourceSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (ResourceSize + sizeof (mRscEndNode)));
     DEBUG ((DEBUG_INFO, "Allocate - 0x%08x\n", NewResourceSize));
     Status = gSmst->SmmAllocatePages (
                       AllocateAnyPages,
@@ -899,11 +922,11 @@ AddPiResource (
     //
     // Copy EndResource for initialization
     //
-    mStmResourcesPtr = (UINT8 *)(UINTN)NewResource;
+    mStmResourcesPtr      = (UINT8 *)(UINTN)NewResource;
     mStmResourceTotalSize = NewResourceSize;
-    CopyMem (mStmResourcesPtr, &mRscEndNode, sizeof(mRscEndNode));
-    mStmResourceSizeUsed      = sizeof(mRscEndNode);
-    mStmResourceSizeAvailable = mStmResourceTotalSize - sizeof(mRscEndNode);
+    CopyMem (mStmResourcesPtr, &mRscEndNode, sizeof (mRscEndNode));
+    mStmResourceSizeUsed      = sizeof (mRscEndNode);
+    mStmResourceSizeAvailable = mStmResourceTotalSize - sizeof (mRscEndNode);
 
     //
     // Let SmmCore change resource ptr
@@ -925,6 +948,7 @@ AddPiResource (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     CopyMem ((VOID *)(UINTN)NewResource, mStmResourcesPtr, mStmResourceSizeUsed);
     mStmResourceSizeAvailable = NewResourceSize - mStmResourceSizeUsed;
 
@@ -934,7 +958,7 @@ AddPiResource (
              );
 
     mStmResourceTotalSize = NewResourceSize;
-    mStmResourcesPtr = (UINT8 *)(UINTN)NewResource;
+    mStmResourcesPtr      = (UINT8 *)(UINTN)NewResource;
 
     //
     // Let SmmCore change resource ptr
@@ -966,8 +990,8 @@ AddPiResource (
 EFI_STATUS
 EFIAPI
 DeletePiResource (
-  IN  STM_RSC    *ResourceList,
-  IN  UINT32      NumEntries OPTIONAL
+  IN  STM_RSC  *ResourceList,
+  IN  UINT32   NumEntries OPTIONAL
   )
 {
   if (ResourceList != NULL) {
@@ -975,12 +999,13 @@ DeletePiResource (
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
+
   //
   // Delete all
   //
-  CopyMem (mStmResourcesPtr, &mRscEndNode, sizeof(mRscEndNode));
-  mStmResourceSizeUsed      = sizeof(mRscEndNode);
-  mStmResourceSizeAvailable = mStmResourceTotalSize - sizeof(mRscEndNode);
+  CopyMem (mStmResourcesPtr, &mRscEndNode, sizeof (mRscEndNode));
+  mStmResourceSizeUsed      = sizeof (mRscEndNode);
+  mStmResourceSizeAvailable = mStmResourceTotalSize - sizeof (mRscEndNode);
   return EFI_SUCCESS;
 }
 
@@ -1000,8 +1025,8 @@ DeletePiResource (
 EFI_STATUS
 EFIAPI
 GetPiResource (
-  OUT    STM_RSC *ResourceList,
-  IN OUT UINT32  *ResourceSize
+  OUT    STM_RSC  *ResourceList,
+  IN OUT UINT32   *ResourceSize
   )
 {
   if (*ResourceSize < mStmResourceSizeUsed) {
@@ -1029,7 +1054,7 @@ EnableMsegMsr (
 {
   MSR_IA32_SMM_MONITOR_CTL_REGISTER  SmmMonitorCtl;
 
-  SmmMonitorCtl.Uint64 = AsmReadMsr64 (MSR_IA32_SMM_MONITOR_CTL);
+  SmmMonitorCtl.Uint64     = AsmReadMsr64 (MSR_IA32_SMM_MONITOR_CTL);
   SmmMonitorCtl.Bits.Valid = 1;
   AsmWriteMsr64 (MSR_IA32_SMM_MONITOR_CTL, SmmMonitorCtl.Uint64);
 }
@@ -1067,18 +1092,18 @@ GetVmcsSize (
 **/
 BOOLEAN
 StmCheckStmImage (
-  IN EFI_PHYSICAL_ADDRESS StmImage,
-  IN UINTN                StmImageSize
+  IN EFI_PHYSICAL_ADDRESS  StmImage,
+  IN UINTN                 StmImageSize
   )
 {
-  UINTN                     MinMsegSize;
-  STM_HEADER                *StmHeader;
-  IA32_VMX_MISC_REGISTER    VmxMiscMsr;
+  UINTN                   MinMsegSize;
+  STM_HEADER              *StmHeader;
+  IA32_VMX_MISC_REGISTER  VmxMiscMsr;
 
   //
   // Check to see if STM image is compatible with CPU
   //
-  StmHeader = (STM_HEADER *)(UINTN)StmImage;
+  StmHeader         = (STM_HEADER *)(UINTN)StmImage;
   VmxMiscMsr.Uint64 = AsmReadMsr64 (MSR_IA32_VMX_MISC);
   if (StmHeader->HwStmHdr.MsegHeaderRevision != VmxMiscMsr.Bits.MsegRevisionIdentifier) {
     DEBUG ((DEBUG_ERROR, "STM Image not compatible with CPU\n"));
@@ -1101,8 +1126,8 @@ StmCheckStmImage (
     //
     // We will create page table, just in case that SINIT does not create it.
     //
-    if (MinMsegSize < StmHeader->HwStmHdr.Cr3Offset + EFI_PAGES_TO_SIZE(6)) {
-      MinMsegSize = StmHeader->HwStmHdr.Cr3Offset + EFI_PAGES_TO_SIZE(6);
+    if (MinMsegSize < StmHeader->HwStmHdr.Cr3Offset + EFI_PAGES_TO_SIZE (6)) {
+      MinMsegSize = StmHeader->HwStmHdr.Cr3Offset + EFI_PAGES_TO_SIZE (6);
     }
   }
 
@@ -1133,8 +1158,8 @@ StmCheckStmImage (
 **/
 VOID
 StmLoadStmImage (
-  IN EFI_PHYSICAL_ADDRESS StmImage,
-  IN UINTN                StmImageSize
+  IN EFI_PHYSICAL_ADDRESS  StmImage,
+  IN UINTN                 StmImageSize
   )
 {
   MSR_IA32_SMM_MONITOR_CTL_REGISTER  SmmMonitorCtl;
@@ -1145,7 +1170,7 @@ StmLoadStmImage (
   // Get MSEG base address from MSR_IA32_SMM_MONITOR_CTL
   //
   SmmMonitorCtl.Uint64 = AsmReadMsr64 (MSR_IA32_SMM_MONITOR_CTL);
-  MsegBase = SmmMonitorCtl.Bits.MsegBase << 12;
+  MsegBase             = SmmMonitorCtl.Bits.MsegBase << 12;
 
   //
   // Zero all of MSEG base address
@@ -1181,8 +1206,8 @@ StmLoadStmImage (
 EFI_STATUS
 EFIAPI
 LoadMonitor (
-  IN EFI_PHYSICAL_ADDRESS StmImage,
-  IN UINTN                StmImageSize
+  IN EFI_PHYSICAL_ADDRESS  StmImage,
+  IN UINTN                 StmImageSize
   )
 {
   MSR_IA32_SMM_MONITOR_CTL_REGISTER  SmmMonitorCtl;
@@ -1201,7 +1226,7 @@ LoadMonitor (
   }
 
   // Record STM_HASH to PCR 0, just in case it is NOT TXT launch, we still need provide the evidence.
-  TpmMeasureAndLogData(
+  TpmMeasureAndLogData (
     0,                        // PcrIndex
     TXT_EVTYPE_STM_HASH,      // EventType
     NULL,                     // EventLog
@@ -1226,7 +1251,7 @@ LoadMonitor (
 
 **/
 VOID *
-GetStmResource(
+GetStmResource (
   VOID
   )
 {
@@ -1241,19 +1266,19 @@ GetStmResource(
 **/
 VOID
 NotifyStmResourceChange (
-  VOID *StmResource
+  VOID  *StmResource
   )
 {
   UINTN                         Index;
   TXT_PROCESSOR_SMM_DESCRIPTOR  *Psd;
 
   for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
-    Psd = (TXT_PROCESSOR_SMM_DESCRIPTOR *)((UINTN)gSmst->CpuSaveState[Index] - SMRAM_SAVE_STATE_MAP_OFFSET + TXT_SMM_PSD_OFFSET);
+    Psd                                = (TXT_PROCESSOR_SMM_DESCRIPTOR *)((UINTN)gSmst->CpuSaveState[Index] - SMRAM_SAVE_STATE_MAP_OFFSET + TXT_SMM_PSD_OFFSET);
     Psd->BiosHwResourceRequirementsPtr = (UINT64)(UINTN)StmResource;
   }
-  return ;
-}
 
+  return;
+}
 
 /**
   This is STM setup BIOS callback.
@@ -1278,4 +1303,3 @@ SmmStmTeardown (
 {
   mStmState &= ~EFI_SM_MONITOR_STATE_ACTIVATED;
 }
-
