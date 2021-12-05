@@ -36,16 +36,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 MnpGetModeData (
-  IN     EFI_MANAGED_NETWORK_PROTOCOL      *This,
-     OUT EFI_MANAGED_NETWORK_CONFIG_DATA   *MnpConfigData OPTIONAL,
-     OUT EFI_SIMPLE_NETWORK_MODE           *SnpModeData OPTIONAL
+  IN     EFI_MANAGED_NETWORK_PROTOCOL  *This,
+  OUT EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData OPTIONAL,
+  OUT EFI_SIMPLE_NETWORK_MODE          *SnpModeData OPTIONAL
   )
 {
-  MNP_INSTANCE_DATA           *Instance;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
-  EFI_TPL                     OldTpl;
-  EFI_STATUS                  Status;
-  UINT32                      InterruptStatus;
+  MNP_INSTANCE_DATA            *Instance;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
+  EFI_TPL                      OldTpl;
+  EFI_STATUS                   Status;
+  UINT32                       InterruptStatus;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -86,7 +86,6 @@ MnpGetModeData (
 
   return Status;
 }
-
 
 /**
   Sets or clears the operational parameters for the MNP child driver.
@@ -143,8 +142,8 @@ MnpGetModeData (
 EFI_STATUS
 EFIAPI
 MnpConfigure (
-  IN EFI_MANAGED_NETWORK_PROTOCOL        *This,
-  IN EFI_MANAGED_NETWORK_CONFIG_DATA     *MnpConfigData OPTIONAL
+  IN EFI_MANAGED_NETWORK_PROTOCOL     *This,
+  IN EFI_MANAGED_NETWORK_CONFIG_DATA  *MnpConfigData OPTIONAL
   )
 {
   MNP_INSTANCE_DATA  *Instance;
@@ -155,7 +154,8 @@ MnpConfigure (
       ((MnpConfigData != NULL) &&
        (MnpConfigData->ProtocolTypeFilter > 0) &&
        (MnpConfigData->ProtocolTypeFilter <= 1500))
-     ) {
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -181,7 +181,6 @@ ON_EXIT:
 
   return Status;
 }
-
 
 /**
   Translates an IP multicast address to a hardware (MAC) multicast address. This
@@ -216,17 +215,17 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpMcastIpToMac (
-  IN     EFI_MANAGED_NETWORK_PROTOCOL    *This,
-  IN     BOOLEAN                         Ipv6Flag,
-  IN     EFI_IP_ADDRESS                  *IpAddress,
-     OUT EFI_MAC_ADDRESS                 *MacAddress
+  IN     EFI_MANAGED_NETWORK_PROTOCOL  *This,
+  IN     BOOLEAN                       Ipv6Flag,
+  IN     EFI_IP_ADDRESS                *IpAddress,
+  OUT EFI_MAC_ADDRESS                  *MacAddress
   )
 {
-  EFI_STATUS                  Status;
-  MNP_INSTANCE_DATA           *Instance;
-  EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
-  EFI_TPL                     OldTpl;
-  EFI_IPv6_ADDRESS            *Ip6Address;
+  EFI_STATUS                   Status;
+  MNP_INSTANCE_DATA            *Instance;
+  EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
+  EFI_TPL                      OldTpl;
+  EFI_IPv6_ADDRESS             *Ip6Address;
 
   if ((This == NULL) || (IpAddress == NULL) || (MacAddress == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -236,7 +235,8 @@ MnpMcastIpToMac (
 
   if ((Ipv6Flag && !IP6_IS_MULTICAST (Ip6Address)) ||
       (!Ipv6Flag && !IP4_IS_MULTICAST (EFI_NTOHL (*IpAddress)))
-      ) {
+      )
+  {
     //
     // The IP address passed in is not a multicast address.
     //
@@ -248,7 +248,6 @@ MnpMcastIpToMac (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
-
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
@@ -267,7 +266,7 @@ MnpMcastIpToMac (
       MacAddress->Addr[0] = 0x01;
       MacAddress->Addr[1] = 0x00;
       MacAddress->Addr[2] = 0x5E;
-      MacAddress->Addr[3] = (UINT8) (IpAddress->v4.Addr[1] & 0x7F);
+      MacAddress->Addr[3] = (UINT8)(IpAddress->v4.Addr[1] & 0x7F);
       MacAddress->Addr[4] = IpAddress->v4.Addr[2];
       MacAddress->Addr[5] = IpAddress->v4.Addr[3];
     } else {
@@ -342,29 +341,29 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpGroups (
-  IN EFI_MANAGED_NETWORK_PROTOCOL    *This,
-  IN BOOLEAN                         JoinFlag,
-  IN EFI_MAC_ADDRESS                 *MacAddress OPTIONAL
+  IN EFI_MANAGED_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                       JoinFlag,
+  IN EFI_MAC_ADDRESS               *MacAddress OPTIONAL
   )
 {
-  MNP_INSTANCE_DATA       *Instance;
-  EFI_SIMPLE_NETWORK_MODE *SnpMode;
-  MNP_GROUP_CONTROL_BLOCK *GroupCtrlBlk;
-  MNP_GROUP_ADDRESS       *GroupAddress;
-  LIST_ENTRY              *ListEntry;
-  BOOLEAN                 AddressExist;
-  EFI_TPL                 OldTpl;
-  EFI_STATUS              Status;
+  MNP_INSTANCE_DATA        *Instance;
+  EFI_SIMPLE_NETWORK_MODE  *SnpMode;
+  MNP_GROUP_CONTROL_BLOCK  *GroupCtrlBlk;
+  MNP_GROUP_ADDRESS        *GroupAddress;
+  LIST_ENTRY               *ListEntry;
+  BOOLEAN                  AddressExist;
+  EFI_TPL                  OldTpl;
+  EFI_STATUS               Status;
 
-  if (This == NULL || (JoinFlag && (MacAddress == NULL))) {
+  if ((This == NULL) || (JoinFlag && (MacAddress == NULL))) {
     //
     // This is NULL, or it's a join operation but MacAddress is NULL.
     //
     return EFI_INVALID_PARAMETER;
   }
 
-  Instance  = MNP_INSTANCE_DATA_FROM_THIS (This);
-  SnpMode   = Instance->MnpServiceData->MnpDeviceData->Snp->Mode;
+  Instance = MNP_INSTANCE_DATA_FROM_THIS (This);
+  SnpMode  = Instance->MnpServiceData->MnpDeviceData->Snp->Mode;
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
@@ -374,7 +373,8 @@ MnpGroups (
   }
 
   if ((!Instance->ConfigData.EnableMulticastReceive) ||
-    ((MacAddress != NULL) && !NET_MAC_IS_MULTICAST (MacAddress, &SnpMode->BroadcastAddress, SnpMode->HwAddressSize))) {
+      ((MacAddress != NULL) && !NET_MAC_IS_MULTICAST (MacAddress, &SnpMode->BroadcastAddress, SnpMode->HwAddressSize)))
+  {
     //
     // The instance isn't configured to do multicast receive. OR
     // the passed in MacAddress is not a multicast mac address.
@@ -392,18 +392,18 @@ MnpGroups (
     // Search the instance's GroupCtrlBlkList to find the specific address.
     //
     NET_LIST_FOR_EACH (ListEntry, &Instance->GroupCtrlBlkList) {
-
       GroupCtrlBlk = NET_LIST_USER_STRUCT (
-                      ListEntry,
-                      MNP_GROUP_CONTROL_BLOCK,
-                      CtrlBlkEntry
-                      );
+                       ListEntry,
+                       MNP_GROUP_CONTROL_BLOCK,
+                       CtrlBlkEntry
+                       );
       GroupAddress = GroupCtrlBlk->GroupAddress;
       if (0 == CompareMem (
-                MacAddress,
-                &GroupAddress->Address,
-                SnpMode->HwAddressSize
-                )) {
+                 MacAddress,
+                 &GroupAddress->Address,
+                 SnpMode->HwAddressSize
+                 ))
+      {
         //
         // There is already the same multicast mac address configured.
         //
@@ -506,16 +506,16 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpTransmit (
-  IN EFI_MANAGED_NETWORK_PROTOCOL            *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token
+  IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
   )
 {
-  EFI_STATUS        Status;
-  MNP_INSTANCE_DATA *Instance;
-  MNP_SERVICE_DATA  *MnpServiceData;
-  UINT8             *PktBuf;
-  UINT32            PktLen;
-  EFI_TPL           OldTpl;
+  EFI_STATUS         Status;
+  MNP_INSTANCE_DATA  *Instance;
+  MNP_SERVICE_DATA   *MnpServiceData;
+  UINT8              *PktBuf;
+  UINT32             PktLen;
+  EFI_TPL            OldTpl;
 
   if ((This == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -526,7 +526,6 @@ MnpTransmit (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (!Instance->Configured) {
-
     Status = EFI_NOT_STARTED;
     goto ON_EXIT;
   }
@@ -560,7 +559,6 @@ ON_EXIT:
 
   return Status;
 }
-
 
 /**
   Places an asynchronous receiving request into the receiving queue.
@@ -600,8 +598,8 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpReceive (
-  IN EFI_MANAGED_NETWORK_PROTOCOL            *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token
+  IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token
   )
 {
   EFI_STATUS         Status;
@@ -624,7 +622,7 @@ MnpReceive (
   //
   // Check whether this token(event) is already in the rx token queue.
   //
-  Status = NetMapIterate (&Instance->RxTokenMap, MnpTokenExist, (VOID *) Token);
+  Status = NetMapIterate (&Instance->RxTokenMap, MnpTokenExist, (VOID *)Token);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
@@ -632,7 +630,7 @@ MnpReceive (
   //
   // Insert the Token into the RxTokenMap.
   //
-  Status = NetMapInsertTail (&Instance->RxTokenMap, (VOID *) Token, NULL);
+  Status = NetMapInsertTail (&Instance->RxTokenMap, (VOID *)Token, NULL);
   if (!EFI_ERROR (Status)) {
     //
     // Try to deliver any buffered packets.
@@ -683,8 +681,8 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpCancel (
-  IN EFI_MANAGED_NETWORK_PROTOCOL            *This,
-  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN    *Token OPTIONAL
+  IN EFI_MANAGED_NETWORK_PROTOCOL          *This,
+  IN EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *Token OPTIONAL
   )
 {
   EFI_STATUS         Status;
@@ -707,7 +705,7 @@ MnpCancel (
   //
   // Iterate the RxTokenMap to cancel the specified Token.
   //
-  Status = NetMapIterate (&Instance->RxTokenMap, MnpCancelTokens, (VOID *) Token);
+  Status = NetMapIterate (&Instance->RxTokenMap, MnpCancelTokens, (VOID *)Token);
   if (Token != NULL) {
     Status = (Status == EFI_ABORTED) ? EFI_SUCCESS : EFI_NOT_FOUND;
   }
@@ -752,7 +750,7 @@ ON_EXIT:
 EFI_STATUS
 EFIAPI
 MnpPoll (
-  IN EFI_MANAGED_NETWORK_PROTOCOL    *This
+  IN EFI_MANAGED_NETWORK_PROTOCOL  *This
   )
 {
   EFI_STATUS         Status;

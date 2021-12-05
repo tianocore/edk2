@@ -70,109 +70,108 @@ extern EFI_DNS6_PROTOCOL             mDns6Protocol;
 //
 // DNS related
 //
-#define DNS_SERVER_PORT   53
+#define DNS_SERVER_PORT  53
 
-#define DNS_PROTOCOL_UDP   EFI_IP_PROTO_UDP
-#define DNS_PROTOCOL_TCP   EFI_IP_PROTO_TCP
+#define DNS_PROTOCOL_UDP  EFI_IP_PROTO_UDP
+#define DNS_PROTOCOL_TCP  EFI_IP_PROTO_TCP
 
-#define DNS_STATE_UNCONFIGED     0
-#define DNS_STATE_CONFIGED       1
-#define DNS_STATE_DESTROY        2
+#define DNS_STATE_UNCONFIGED  0
+#define DNS_STATE_CONFIGED    1
+#define DNS_STATE_DESTROY     2
 
-#define DNS_DEFAULT_TIMEOUT      2
+#define DNS_DEFAULT_TIMEOUT  2
 
-#define DNS_TIME_TO_GETMAP       5
+#define DNS_TIME_TO_GETMAP  5
 
 #pragma pack(1)
 
-typedef union _DNS_FLAGS  DNS_FLAGS;
+typedef union _DNS_FLAGS DNS_FLAGS;
 
 typedef struct {
-  LIST_ENTRY             AllCacheLink;
-  EFI_DNS4_CACHE_ENTRY   DnsCache;
+  LIST_ENTRY              AllCacheLink;
+  EFI_DNS4_CACHE_ENTRY    DnsCache;
 } DNS4_CACHE;
 
 typedef struct {
-  LIST_ENTRY             AllCacheLink;
-  EFI_DNS6_CACHE_ENTRY   DnsCache;
+  LIST_ENTRY              AllCacheLink;
+  EFI_DNS6_CACHE_ENTRY    DnsCache;
 } DNS6_CACHE;
 
 typedef struct {
-  LIST_ENTRY             AllServerLink;
-  EFI_IPv4_ADDRESS       Dns4ServerIp;
+  LIST_ENTRY          AllServerLink;
+  EFI_IPv4_ADDRESS    Dns4ServerIp;
 } DNS4_SERVER_IP;
 
 typedef struct {
-  LIST_ENTRY             AllServerLink;
-  EFI_IPv6_ADDRESS       Dns6ServerIp;
+  LIST_ENTRY          AllServerLink;
+  EFI_IPv6_ADDRESS    Dns6ServerIp;
 } DNS6_SERVER_IP;
 
 typedef struct {
-  UINT32                     RetryCounting;
-  UINT32                     PacketToLive;
-  CHAR16                     *QueryHostName;
-  EFI_IPv4_ADDRESS           QueryIpAddress;
-  BOOLEAN                    GeneralLookUp;
-  EFI_DNS4_COMPLETION_TOKEN  *Token;
+  UINT32                       RetryCounting;
+  UINT32                       PacketToLive;
+  CHAR16                       *QueryHostName;
+  EFI_IPv4_ADDRESS             QueryIpAddress;
+  BOOLEAN                      GeneralLookUp;
+  EFI_DNS4_COMPLETION_TOKEN    *Token;
 } DNS4_TOKEN_ENTRY;
 
 typedef struct {
-  UINT32                     RetryCounting;
-  UINT32                     PacketToLive;
-  CHAR16                     *QueryHostName;
-  EFI_IPv6_ADDRESS           QueryIpAddress;
-  BOOLEAN                    GeneralLookUp;
-  EFI_DNS6_COMPLETION_TOKEN  *Token;
+  UINT32                       RetryCounting;
+  UINT32                       PacketToLive;
+  CHAR16                       *QueryHostName;
+  EFI_IPv6_ADDRESS             QueryIpAddress;
+  BOOLEAN                      GeneralLookUp;
+  EFI_DNS6_COMPLETION_TOKEN    *Token;
 } DNS6_TOKEN_ENTRY;
 
 union _DNS_FLAGS {
   struct {
-    UINT16     RCode:4;
-    UINT16     Zero:3;
-    UINT16     RA:1;
-    UINT16     RD:1;
-    UINT16     TC:1;
-    UINT16     AA:1;
-    UINT16     OpCode:4;
-    UINT16     QR:1;
+    UINT16    RCode  : 4;
+    UINT16    Zero   : 3;
+    UINT16    RA     : 1;
+    UINT16    RD     : 1;
+    UINT16    TC     : 1;
+    UINT16    AA     : 1;
+    UINT16    OpCode : 4;
+    UINT16    QR     : 1;
   } Bits;
-  UINT16  Uint16;
+  UINT16    Uint16;
 };
 
 #define DNS_FLAGS_QR_QUERY     0
 #define DNS_FLAGS_QR_RESPONSE  1
 
-#define DNS_FLAGS_OPCODE_STANDARD     0
-#define DNS_FLAGS_OPCODE_INVERSE      1
-#define DNS_FLAGS_OPCODE_SERVER_STATE 2
+#define DNS_FLAGS_OPCODE_STANDARD      0
+#define DNS_FLAGS_OPCODE_INVERSE       1
+#define DNS_FLAGS_OPCODE_SERVER_STATE  2
 
 #define DNS_FLAGS_RCODE_NO_ERROR    0
 #define DNS_FLAGS_RCODE_NAME_ERROR  3
 
 typedef struct {
-  UINT16      Identification;
-  DNS_FLAGS   Flags;
-  UINT16      QuestionsNum;
-  UINT16      AnswersNum;
-  UINT16      AuthorityNum;
-  UINT16      AditionalNum;
+  UINT16       Identification;
+  DNS_FLAGS    Flags;
+  UINT16       QuestionsNum;
+  UINT16       AnswersNum;
+  UINT16       AuthorityNum;
+  UINT16       AditionalNum;
 } DNS_HEADER;
 
 typedef struct {
-  UINT16      Type;
-  UINT16      Class;
+  UINT16    Type;
+  UINT16    Class;
 } DNS_QUERY_SECTION;
 
 typedef struct {
-  UINT16      Type;
-  UINT16      Class;
-  UINT32      Ttl;
-  UINT16      DataLength;
+  UINT16    Type;
+  UINT16    Class;
+  UINT32    Ttl;
+  UINT16    DataLength;
 } DNS_ANSWER_SECTION;
 
 #define DNS4_DOMAIN  L"in-addr.arpa"
 #define DNS6_DOMAIN  L"IP6.ARPA"
-
 
 #pragma pack()
 
@@ -188,8 +187,8 @@ typedef struct {
 **/
 EFI_STATUS
 Dns4RemoveTokenEntry (
-  IN NET_MAP                    *TokenMap,
-  IN DNS4_TOKEN_ENTRY           *TokenEntry
+  IN NET_MAP           *TokenMap,
+  IN DNS4_TOKEN_ENTRY  *TokenEntry
   );
 
 /**
@@ -204,8 +203,8 @@ Dns4RemoveTokenEntry (
 **/
 EFI_STATUS
 Dns6RemoveTokenEntry (
-  IN NET_MAP                    *TokenMap,
-  IN DNS6_TOKEN_ENTRY           *TokenEntry
+  IN NET_MAP           *TokenMap,
+  IN DNS6_TOKEN_ENTRY  *TokenEntry
   );
 
 /**
@@ -270,9 +269,9 @@ Dns6CancelTokens (
 EFI_STATUS
 EFIAPI
 GetDns4TokenEntry (
-  IN     NET_MAP                   *TokensMap,
-  IN     EFI_DNS4_COMPLETION_TOKEN *Token,
-     OUT DNS4_TOKEN_ENTRY          **TokenEntry
+  IN     NET_MAP                    *TokensMap,
+  IN     EFI_DNS4_COMPLETION_TOKEN  *Token,
+  OUT DNS4_TOKEN_ENTRY              **TokenEntry
   );
 
 /**
@@ -289,9 +288,9 @@ GetDns4TokenEntry (
 EFI_STATUS
 EFIAPI
 GetDns6TokenEntry (
-  IN     NET_MAP                   *TokensMap,
-  IN     EFI_DNS6_COMPLETION_TOKEN *Token,
-     OUT DNS6_TOKEN_ENTRY          **TokenEntry
+  IN     NET_MAP                    *TokensMap,
+  IN     EFI_DNS6_COMPLETION_TOKEN  *Token,
+  OUT DNS6_TOKEN_ENTRY              **TokenEntry
   );
 
 /**
@@ -395,7 +394,7 @@ Dns6CopyConfigure (
 VOID
 EFIAPI
 DnsDummyExtFree (
-  IN VOID                   *Arg
+  IN VOID  *Arg
   );
 
 /**
@@ -415,9 +414,9 @@ DnsDummyExtFree (
 **/
 BOOLEAN
 Dns4GetMapping (
-  IN DNS_INSTANCE           *Instance,
-  IN UDP_IO                 *UdpIo,
-  IN EFI_UDP4_CONFIG_DATA   *UdpCfgData
+  IN DNS_INSTANCE          *Instance,
+  IN UDP_IO                *UdpIo,
+  IN EFI_UDP4_CONFIG_DATA  *UdpCfgData
   );
 
 /**
@@ -434,9 +433,9 @@ Dns4GetMapping (
 **/
 BOOLEAN
 Dns6GetMapping (
-  IN DNS_INSTANCE           *Instance,
-  IN UDP_IO                 *UdpIo,
-  IN EFI_UDP6_CONFIG_DATA   *UdpCfgData
+  IN DNS_INSTANCE          *Instance,
+  IN UDP_IO                *UdpIo,
+  IN EFI_UDP6_CONFIG_DATA  *UdpCfgData
   );
 
 /**
@@ -451,8 +450,8 @@ Dns6GetMapping (
 **/
 EFI_STATUS
 Dns4ConfigUdp (
-  IN DNS_INSTANCE           *Instance,
-  IN UDP_IO                 *UdpIo
+  IN DNS_INSTANCE  *Instance,
+  IN UDP_IO        *UdpIo
   );
 
 /**
@@ -467,8 +466,8 @@ Dns4ConfigUdp (
 **/
 EFI_STATUS
 Dns6ConfigUdp (
-  IN DNS_INSTANCE           *Instance,
-  IN UDP_IO                 *UdpIo
+  IN DNS_INSTANCE  *Instance,
+  IN UDP_IO        *UdpIo
   );
 
 /**
@@ -488,10 +487,10 @@ Dns6ConfigUdp (
 EFI_STATUS
 EFIAPI
 UpdateDns4Cache (
-  IN LIST_ENTRY             *Dns4CacheList,
-  IN BOOLEAN                DeleteFlag,
-  IN BOOLEAN                Override,
-  IN EFI_DNS4_CACHE_ENTRY   DnsCacheEntry
+  IN LIST_ENTRY            *Dns4CacheList,
+  IN BOOLEAN               DeleteFlag,
+  IN BOOLEAN               Override,
+  IN EFI_DNS4_CACHE_ENTRY  DnsCacheEntry
   );
 
 /**
@@ -510,10 +509,10 @@ UpdateDns4Cache (
 EFI_STATUS
 EFIAPI
 UpdateDns6Cache (
-  IN LIST_ENTRY             *Dns6CacheList,
-  IN BOOLEAN                DeleteFlag,
-  IN BOOLEAN                Override,
-  IN EFI_DNS6_CACHE_ENTRY   DnsCacheEntry
+  IN LIST_ENTRY            *Dns6CacheList,
+  IN BOOLEAN               DeleteFlag,
+  IN BOOLEAN               Override,
+  IN EFI_DNS6_CACHE_ENTRY  DnsCacheEntry
   );
 
 /**
@@ -529,8 +528,8 @@ UpdateDns6Cache (
 EFI_STATUS
 EFIAPI
 AddDns4ServerIp (
-  IN LIST_ENTRY                *Dns4ServerList,
-  IN EFI_IPv4_ADDRESS           ServerIp
+  IN LIST_ENTRY        *Dns4ServerList,
+  IN EFI_IPv4_ADDRESS  ServerIp
   );
 
 /**
@@ -546,8 +545,8 @@ AddDns4ServerIp (
 EFI_STATUS
 EFIAPI
 AddDns6ServerIp (
-  IN LIST_ENTRY                *Dns6ServerList,
-  IN EFI_IPv6_ADDRESS           ServerIp
+  IN LIST_ENTRY        *Dns6ServerList,
+  IN EFI_IPv6_ADDRESS  ServerIp
   );
 
 /**
@@ -565,11 +564,11 @@ AddDns6ServerIp (
 **/
 BOOLEAN
 IsValidDnsResponse (
-  IN     NET_MAP      *TokensMap,
-  IN     UINT16       Identification,
-  IN     UINT16       Type,
-  IN     UINT16       Class,
-     OUT NET_MAP_ITEM **Item
+  IN     NET_MAP    *TokensMap,
+  IN     UINT16     Identification,
+  IN     UINT16     Type,
+  IN     UINT16     Class,
+  OUT NET_MAP_ITEM  **Item
   );
 
 /**
@@ -586,10 +585,10 @@ IsValidDnsResponse (
 **/
 EFI_STATUS
 ParseDnsResponse (
-  IN OUT DNS_INSTANCE              *Instance,
-  IN     UINT8                     *RxString,
-  IN     UINT32                    Length,
-     OUT BOOLEAN                   *Completed
+  IN OUT DNS_INSTANCE  *Instance,
+  IN     UINT8         *RxString,
+  IN     UINT32        Length,
+  OUT BOOLEAN          *Completed
   );
 
 /**
@@ -604,10 +603,10 @@ ParseDnsResponse (
 VOID
 EFIAPI
 DnsOnPacketReceived (
-  NET_BUF                   *Packet,
-  UDP_END_POINT             *EndPoint,
-  EFI_STATUS                IoStatus,
-  VOID                      *Context
+  NET_BUF        *Packet,
+  UDP_END_POINT  *EndPoint,
+  EFI_STATUS     IoStatus,
+  VOID           *Context
   );
 
 /**
@@ -622,10 +621,10 @@ DnsOnPacketReceived (
 VOID
 EFIAPI
 DnsOnPacketSent (
-  NET_BUF                   *Packet,
-  UDP_END_POINT             *EndPoint,
-  EFI_STATUS                IoStatus,
-  VOID                      *Context
+  NET_BUF        *Packet,
+  UDP_END_POINT  *EndPoint,
+  EFI_STATUS     IoStatus,
+  VOID           *Context
   );
 
 /**
@@ -640,8 +639,8 @@ DnsOnPacketSent (
 **/
 EFI_STATUS
 DoDnsQuery (
-  IN  DNS_INSTANCE              *Instance,
-  IN  NET_BUF                   *Packet
+  IN  DNS_INSTANCE  *Instance,
+  IN  NET_BUF       *Packet
   );
 
 /**
@@ -659,11 +658,11 @@ DoDnsQuery (
 **/
 EFI_STATUS
 ConstructDNSQuery (
-  IN  DNS_INSTANCE              *Instance,
-  IN  CHAR8                     *QueryName,
-  IN  UINT16                    Type,
-  IN  UINT16                    Class,
-  OUT NET_BUF                   **Packet
+  IN  DNS_INSTANCE  *Instance,
+  IN  CHAR8         *QueryName,
+  IN  UINT16        Type,
+  IN  UINT16        Class,
+  OUT NET_BUF       **Packet
   );
 
 /**
@@ -678,8 +677,8 @@ ConstructDNSQuery (
 **/
 EFI_STATUS
 DnsRetransmit (
-  IN DNS_INSTANCE        *Instance,
-  IN NET_BUF             *Packet
+  IN DNS_INSTANCE  *Instance,
+  IN NET_BUF       *Packet
   );
 
 /**
@@ -692,8 +691,8 @@ DnsRetransmit (
 VOID
 EFIAPI
 DnsOnTimerRetransmit (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -706,10 +705,9 @@ DnsOnTimerRetransmit (
 VOID
 EFIAPI
 DnsOnTimerUpdate (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
-
 
 /**
   Retrieve mode data of this DNS instance.
@@ -729,8 +727,8 @@ DnsOnTimerUpdate (
 EFI_STATUS
 EFIAPI
 Dns4GetModeData (
-  IN  EFI_DNS4_PROTOCOL          *This,
-  OUT EFI_DNS4_MODE_DATA         *DnsModeData
+  IN  EFI_DNS4_PROTOCOL   *This,
+  OUT EFI_DNS4_MODE_DATA  *DnsModeData
   );
 
 /**
@@ -761,8 +759,8 @@ Dns4GetModeData (
 EFI_STATUS
 EFIAPI
 Dns4Configure (
-  IN EFI_DNS4_PROTOCOL           *This,
-  IN EFI_DNS4_CONFIG_DATA        *DnsConfigData
+  IN EFI_DNS4_PROTOCOL     *This,
+  IN EFI_DNS4_CONFIG_DATA  *DnsConfigData
   );
 
 /**
@@ -789,7 +787,7 @@ EFI_STATUS
 EFIAPI
 Dns4HostNameToIp (
   IN  EFI_DNS4_PROTOCOL          *This,
-  IN  CHAR16                    *HostName,
+  IN  CHAR16                     *HostName,
   IN  EFI_DNS4_COMPLETION_TOKEN  *Token
   );
 
@@ -818,9 +816,9 @@ Dns4HostNameToIp (
 EFI_STATUS
 EFIAPI
 Dns4IpToHostName (
-  IN  EFI_DNS4_PROTOCOL             *This,
-  IN  EFI_IPv4_ADDRESS              IpAddress,
-  IN  EFI_DNS4_COMPLETION_TOKEN     *Token
+  IN  EFI_DNS4_PROTOCOL          *This,
+  IN  EFI_IPv4_ADDRESS           IpAddress,
+  IN  EFI_DNS4_COMPLETION_TOKEN  *Token
   );
 
 /**
@@ -853,11 +851,11 @@ Dns4IpToHostName (
 EFI_STATUS
 EFIAPI
 Dns4GeneralLookUp (
-  IN  EFI_DNS4_PROTOCOL                *This,
-  IN  CHAR8                            *QName,
-  IN  UINT16                           QType,
-  IN  UINT16                           QClass,
-  IN  EFI_DNS4_COMPLETION_TOKEN        *Token
+  IN  EFI_DNS4_PROTOCOL          *This,
+  IN  CHAR8                      *QName,
+  IN  UINT16                     QType,
+  IN  UINT16                     QClass,
+  IN  EFI_DNS4_COMPLETION_TOKEN  *Token
   );
 
 /**
@@ -889,10 +887,10 @@ Dns4GeneralLookUp (
 EFI_STATUS
 EFIAPI
 Dns4UpdateDnsCache (
-  IN EFI_DNS4_PROTOCOL      *This,
+  IN EFI_DNS4_PROTOCOL     *This,
   IN BOOLEAN               DeleteFlag,
   IN BOOLEAN               Override,
-  IN EFI_DNS4_CACHE_ENTRY   DnsCacheEntry
+  IN EFI_DNS4_CACHE_ENTRY  DnsCacheEntry
   );
 
 /**
@@ -919,7 +917,7 @@ Dns4UpdateDnsCache (
 EFI_STATUS
 EFIAPI
 Dns4Poll (
-  IN EFI_DNS4_PROTOCOL    *This
+  IN EFI_DNS4_PROTOCOL  *This
   );
 
 /**
@@ -954,7 +952,6 @@ Dns4Cancel (
   IN  EFI_DNS4_COMPLETION_TOKEN  *Token
   );
 
-
 /**
   Retrieve mode data of this DNS instance.
 
@@ -974,8 +971,8 @@ Dns4Cancel (
 EFI_STATUS
 EFIAPI
 Dns6GetModeData (
-  IN  EFI_DNS6_PROTOCOL          *This,
-  OUT EFI_DNS6_MODE_DATA         *DnsModeData
+  IN  EFI_DNS6_PROTOCOL   *This,
+  OUT EFI_DNS6_MODE_DATA  *DnsModeData
   );
 
 /**
@@ -1004,8 +1001,8 @@ Dns6GetModeData (
 EFI_STATUS
 EFIAPI
 Dns6Configure (
-  IN EFI_DNS6_PROTOCOL           *This,
-  IN EFI_DNS6_CONFIG_DATA        *DnsConfigData
+  IN EFI_DNS6_PROTOCOL     *This,
+  IN EFI_DNS6_CONFIG_DATA  *DnsConfigData
   );
 
 /**
@@ -1064,9 +1061,9 @@ Dns6HostNameToIp (
 EFI_STATUS
 EFIAPI
 Dns6IpToHostName (
-  IN  EFI_DNS6_PROTOCOL             *This,
-  IN  EFI_IPv6_ADDRESS              IpAddress,
-  IN  EFI_DNS6_COMPLETION_TOKEN     *Token
+  IN  EFI_DNS6_PROTOCOL          *This,
+  IN  EFI_IPv6_ADDRESS           IpAddress,
+  IN  EFI_DNS6_COMPLETION_TOKEN  *Token
   );
 
 /**
@@ -1101,11 +1098,11 @@ Dns6IpToHostName (
 EFI_STATUS
 EFIAPI
 Dns6GeneralLookUp (
-  IN  EFI_DNS6_PROTOCOL                *This,
-  IN  CHAR8                            *QName,
-  IN  UINT16                           QType,
-  IN  UINT16                           QClass,
-  IN  EFI_DNS6_COMPLETION_TOKEN        *Token
+  IN  EFI_DNS6_PROTOCOL          *This,
+  IN  CHAR8                      *QName,
+  IN  UINT16                     QType,
+  IN  UINT16                     QClass,
+  IN  EFI_DNS6_COMPLETION_TOKEN  *Token
   );
 
 /**
@@ -1138,10 +1135,10 @@ Dns6GeneralLookUp (
 EFI_STATUS
 EFIAPI
 Dns6UpdateDnsCache (
-  IN EFI_DNS6_PROTOCOL      *This,
+  IN EFI_DNS6_PROTOCOL     *This,
   IN BOOLEAN               DeleteFlag,
   IN BOOLEAN               Override,
-  IN EFI_DNS6_CACHE_ENTRY   DnsCacheEntry
+  IN EFI_DNS6_CACHE_ENTRY  DnsCacheEntry
   );
 
 /**
@@ -1170,7 +1167,7 @@ Dns6UpdateDnsCache (
 EFI_STATUS
 EFIAPI
 Dns6Poll (
-  IN EFI_DNS6_PROTOCOL    *This
+  IN EFI_DNS6_PROTOCOL  *This
   );
 
 /**

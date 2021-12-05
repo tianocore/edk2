@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // EFI Component Name Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gIScsiComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gIScsiComponentName = {
   IScsiComponentNameGetDriverName,
   IScsiComponentNameGetControllerName,
   "eng"
@@ -20,13 +20,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gIScsiComponentName = 
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gIScsiComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME) IScsiComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) IScsiComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gIScsiComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)IScsiComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)IScsiComponentNameGetControllerName,
   "en"
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE     mIScsiDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mIScsiDriverNameTable[] = {
   {
     "eng;en",
     L"iSCSI Driver"
@@ -81,9 +81,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *gIScsiControllerNameTab
 EFI_STATUS
 EFIAPI
 IScsiComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL   *This,
-  IN  CHAR8                         *Language,
-  OUT CHAR16                        **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -91,7 +91,7 @@ IScsiComponentNameGetDriverName (
            This->SupportedLanguages,
            mIScsiDriverNameTable,
            DriverName,
-           (BOOLEAN) (This == &gIScsiComponentName)
+           (BOOLEAN)(This == &gIScsiComponentName)
            );
 }
 
@@ -108,14 +108,14 @@ IScsiComponentNameGetDriverName (
 **/
 EFI_STATUS
 UpdateName (
-  IN   EFI_EXT_SCSI_PASS_THRU_PROTOCOL *IScsiExtScsiPassThru,
-  IN   BOOLEAN     Ipv6Flag
+  IN   EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *IScsiExtScsiPassThru,
+  IN   BOOLEAN                          Ipv6Flag
   )
 {
-  EFI_STATUS                       Status;
-  CHAR16                           HandleName[80];
-  ISCSI_DRIVER_DATA                *Private;
-  UINT8                            NicIndex;
+  EFI_STATUS         Status;
+  CHAR16             HandleName[80];
+  ISCSI_DRIVER_DATA  *Private;
+  UINT8              NicIndex;
 
   if (IScsiExtScsiPassThru == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -130,7 +130,7 @@ UpdateName (
     L"iSCSI (%s, NicIndex=%d)",
     Ipv6Flag ? L"IPv6" : L"IPv4",
     NicIndex
-  );
+    );
 
   if (gIScsiControllerNameTable != NULL) {
     FreeUnicodeStringTable (gIScsiControllerNameTable);
@@ -228,21 +228,21 @@ UpdateName (
 EFI_STATUS
 EFIAPI
 IScsiComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL   *This,
-  IN  EFI_HANDLE                    ControllerHandle,
-  IN  EFI_HANDLE                    ChildHandle        OPTIONAL,
-  IN  CHAR8                         *Language,
-  OUT CHAR16                        **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS                      Status;
+  EFI_STATUS  Status;
 
-  EFI_HANDLE                      IScsiController;
-  BOOLEAN                         Ipv6Flag;
-  EFI_GUID                        *IScsiPrivateGuid;
-  ISCSI_PRIVATE_PROTOCOL          *IScsiIdentifier;
+  EFI_HANDLE              IScsiController;
+  BOOLEAN                 Ipv6Flag;
+  EFI_GUID                *IScsiPrivateGuid;
+  ISCSI_PRIVATE_PROTOCOL  *IScsiIdentifier;
 
-  EFI_EXT_SCSI_PASS_THRU_PROTOCOL *IScsiExtScsiPassThru;
+  EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *IScsiExtScsiPassThru;
 
   if (ControllerHandle == NULL) {
     return EFI_UNSUPPORTED;
@@ -254,12 +254,12 @@ IScsiComponentNameGetControllerName (
   IScsiController = NetLibGetNicHandle (ControllerHandle, &gEfiTcp4ProtocolGuid);
   if (IScsiController != NULL) {
     IScsiPrivateGuid = &gIScsiV4PrivateGuid;
-    Ipv6Flag = FALSE;
+    Ipv6Flag         = FALSE;
   } else {
     IScsiController = NetLibGetNicHandle (ControllerHandle, &gEfiTcp6ProtocolGuid);
     if (IScsiController != NULL) {
       IScsiPrivateGuid = &gIScsiV6PrivateGuid;
-      Ipv6Flag = TRUE;
+      Ipv6Flag         = TRUE;
     } else {
       return EFI_UNSUPPORTED;
     }
@@ -268,7 +268,7 @@ IScsiComponentNameGetControllerName (
   Status = gBS->OpenProtocol (
                   IScsiController,
                   IScsiPrivateGuid,
-                  (VOID **) &IScsiIdentifier,
+                  (VOID **)&IScsiIdentifier,
                   NULL,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -277,8 +277,8 @@ IScsiComponentNameGetControllerName (
     return Status;
   }
 
-  if(ChildHandle != NULL) {
-    if(!Ipv6Flag) {
+  if (ChildHandle != NULL) {
+    if (!Ipv6Flag) {
       //
       // Make sure this driver produced ChildHandle
       //
@@ -310,7 +310,7 @@ IScsiComponentNameGetControllerName (
     Status = gBS->OpenProtocol (
                     ChildHandle,
                     &gEfiExtScsiPassThruProtocolGuid,
-                   (VOID **)&IScsiExtScsiPassThru,
+                    (VOID **)&IScsiExtScsiPassThru,
                     NULL,
                     NULL,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
