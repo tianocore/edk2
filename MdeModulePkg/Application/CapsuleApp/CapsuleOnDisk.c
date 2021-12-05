@@ -336,7 +336,7 @@ GetEfiSysPartitionFromBootOptionFilePath (
       break;
     }
 
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       CHAR16 *DevicePathStr;
 
       DevicePathStr = ConvertDevicePathToText (CurFullPath, TRUE, TRUE);
@@ -344,7 +344,7 @@ GetEfiSysPartitionFromBootOptionFilePath (
         DEBUG ((DEBUG_INFO, "Full device path %s\n", DevicePathStr));
         FreePool (DevicePathStr);
       }
-    );
+    DEBUG_CODE_END ();
 
     Status = GetEfiSysPartitionFromDevPath (CurFullPath, &FsFullPath, Fs);
   } while (EFI_ERROR (Status));
@@ -468,7 +468,7 @@ GetUpdateFileSystem (
       continue;
     }
 
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       CHAR16 *DevicePathStr;
 
       DevicePathStr = ConvertDevicePathToText (DevicePath, TRUE, TRUE);
@@ -478,7 +478,7 @@ GetUpdateFileSystem (
       } else {
         DEBUG ((DEBUG_INFO, "DevicePathToStr failed\n"));
       }
-    );
+    DEBUG_CODE_END ();
 
     Status = GetEfiSysPartitionFromBootOptionFilePath (DevicePath, &FullPath, Fs);
     if (!EFI_ERROR (Status)) {

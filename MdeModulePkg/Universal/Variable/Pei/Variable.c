@@ -512,7 +512,7 @@ GetHobVariableStore (
   //
   // Make sure there is no more than one Variable HOB.
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
     if (GuidHob != NULL) {
       if ((GetNextGuidHob (&gEfiAuthenticatedVariableGuid, GET_NEXT_HOB (GuidHob)) != NULL)) {
@@ -531,7 +531,7 @@ GetHobVariableStore (
         }
       }
     }
-  );
+  DEBUG_CODE_END ();
 
   GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
   if (GuidHob != NULL) {

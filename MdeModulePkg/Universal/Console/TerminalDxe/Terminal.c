@@ -327,13 +327,13 @@ InitializeTerminalConsoleTextMode (
   }
   *TextModeCount = ARRAY_SIZE (mTerminalConsoleModeData);
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     INT32 Index;
     for (Index = 0; Index < *TextModeCount; Index++) {
       DEBUG ((DEBUG_INFO, "Terminal - Mode %d, Column = %d, Row = %d\n",
               Index, TextModeData[Index].Columns, TextModeData[Index].Rows));
     }
-  );
+  DEBUG_CODE_END ();
   return TextModeData;
 }
 
@@ -1380,4 +1380,3 @@ IsHotPlugDevice (
 
   return FALSE;
 }
-

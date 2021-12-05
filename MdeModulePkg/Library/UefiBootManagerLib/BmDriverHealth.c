@@ -545,7 +545,7 @@ BmRepairAllControllers (
   EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
 
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     CHAR16 *ControllerName;
 
     DriverHealthInfo = EfiBootManagerGetDriverHealthInfo (&Count);
@@ -567,7 +567,7 @@ BmRepairAllControllers (
       }
     }
     EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
-    );
+  DEBUG_CODE_END ();
 
   if (ReconnectRequired) {
     if (ReconnectRepairCount < MAX_RECONNECT_REPAIR) {

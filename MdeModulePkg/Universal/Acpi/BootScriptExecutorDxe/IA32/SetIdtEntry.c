@@ -38,7 +38,7 @@ SetIdtEntry (
   Status = InitializeCpuExceptionHandlers (NULL);
   ASSERT_EFI_ERROR (Status);
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     //
     // Update IDT entry INT3 if the instruction is valid in it
     //
@@ -51,6 +51,5 @@ SetIdtEntry (
       IdtEntry->Bits.GateType       = IA32_IDT_GATE_TYPE_INTERRUPT_32;
       IdtEntry->Bits.OffsetHigh     = (UINT16)(S3DebugBuffer >> 16);
     }
-  );
+  DEBUG_CODE_END ();
 }
-
