@@ -26,7 +26,7 @@ TlsInitialize (
   VOID
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return FALSE;
 }
 
@@ -39,10 +39,10 @@ TlsInitialize (
 VOID
 EFIAPI
 TlsCtxFree (
-  IN   VOID                  *TlsCtx
+  IN   VOID  *TlsCtx
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return;
 }
 
@@ -60,11 +60,11 @@ TlsCtxFree (
 VOID *
 EFIAPI
 TlsCtxNew (
-  IN     UINT8                    MajorVer,
-  IN     UINT8                    MinorVer
+  IN     UINT8  MajorVer,
+  IN     UINT8  MinorVer
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return NULL;
 }
 
@@ -80,10 +80,10 @@ TlsCtxNew (
 VOID
 EFIAPI
 TlsFree (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 /**
@@ -102,10 +102,9 @@ TlsFree (
 VOID *
 EFIAPI
 TlsNew (
-  IN     VOID                     *TlsCtx
+  IN     VOID  *TlsCtx
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return NULL;
 }
-
