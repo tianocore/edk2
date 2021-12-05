@@ -20,70 +20,70 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 UINT32
 HttpBootBuildDhcp6Options (
-  IN  HTTP_BOOT_PRIVATE_DATA       *Private,
-  OUT EFI_DHCP6_PACKET_OPTION      **OptList,
-  IN  UINT8                        *Buffer
+  IN  HTTP_BOOT_PRIVATE_DATA   *Private,
+  OUT EFI_DHCP6_PACKET_OPTION  **OptList,
+  IN  UINT8                    *Buffer
   )
 {
-  HTTP_BOOT_DHCP6_OPTION_ENTRY     OptEnt;
-  UINT16                           Value;
-  UINT32                           Index;
+  HTTP_BOOT_DHCP6_OPTION_ENTRY  OptEnt;
+  UINT16                        Value;
+  UINT32                        Index;
 
   Index      = 0;
-  OptList[0] = (EFI_DHCP6_PACKET_OPTION *) Buffer;
+  OptList[0] = (EFI_DHCP6_PACKET_OPTION *)Buffer;
 
   //
   // Append client option request option
   //
-  OptList[Index]->OpCode     = HTONS (DHCP6_OPT_ORO);
-  OptList[Index]->OpLen      = HTONS (8);
-  OptEnt.Oro                 = (HTTP_BOOT_DHCP6_OPTION_ORO *) OptList[Index]->Data;
-  OptEnt.Oro->OpCode[0]      = HTONS(DHCP6_OPT_BOOT_FILE_URL);
-  OptEnt.Oro->OpCode[1]      = HTONS(DHCP6_OPT_BOOT_FILE_PARAM);
-  OptEnt.Oro->OpCode[2]      = HTONS(DHCP6_OPT_DNS_SERVERS);
-  OptEnt.Oro->OpCode[3]      = HTONS(DHCP6_OPT_VENDOR_CLASS);
+  OptList[Index]->OpCode = HTONS (DHCP6_OPT_ORO);
+  OptList[Index]->OpLen  = HTONS (8);
+  OptEnt.Oro             = (HTTP_BOOT_DHCP6_OPTION_ORO *)OptList[Index]->Data;
+  OptEnt.Oro->OpCode[0]  = HTONS (DHCP6_OPT_BOOT_FILE_URL);
+  OptEnt.Oro->OpCode[1]  = HTONS (DHCP6_OPT_BOOT_FILE_PARAM);
+  OptEnt.Oro->OpCode[2]  = HTONS (DHCP6_OPT_DNS_SERVERS);
+  OptEnt.Oro->OpCode[3]  = HTONS (DHCP6_OPT_VENDOR_CLASS);
   Index++;
-  OptList[Index]             = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
+  OptList[Index] = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
 
   //
   // Append client network device interface option
   //
-  OptList[Index]->OpCode     = HTONS (DHCP6_OPT_UNDI);
-  OptList[Index]->OpLen      = HTONS ((UINT16)3);
-  OptEnt.Undi                = (HTTP_BOOT_DHCP6_OPTION_UNDI *) OptList[Index]->Data;
+  OptList[Index]->OpCode = HTONS (DHCP6_OPT_UNDI);
+  OptList[Index]->OpLen  = HTONS ((UINT16)3);
+  OptEnt.Undi            = (HTTP_BOOT_DHCP6_OPTION_UNDI *)OptList[Index]->Data;
 
   if (Private->Nii != NULL) {
-    OptEnt.Undi->Type        = Private->Nii->Type;
-    OptEnt.Undi->MajorVer    = Private->Nii->MajorVer;
-    OptEnt.Undi->MinorVer    = Private->Nii->MinorVer;
+    OptEnt.Undi->Type     = Private->Nii->Type;
+    OptEnt.Undi->MajorVer = Private->Nii->MajorVer;
+    OptEnt.Undi->MinorVer = Private->Nii->MinorVer;
   } else {
-    OptEnt.Undi->Type        = DEFAULT_UNDI_TYPE;
-    OptEnt.Undi->MajorVer    = DEFAULT_UNDI_MAJOR;
-    OptEnt.Undi->MinorVer    = DEFAULT_UNDI_MINOR;
+    OptEnt.Undi->Type     = DEFAULT_UNDI_TYPE;
+    OptEnt.Undi->MajorVer = DEFAULT_UNDI_MAJOR;
+    OptEnt.Undi->MinorVer = DEFAULT_UNDI_MINOR;
   }
 
   Index++;
-  OptList[Index]             = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
+  OptList[Index] = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
 
   //
   // Append client system architecture option
   //
-  OptList[Index]->OpCode     = HTONS (DHCP6_OPT_ARCH);
-  OptList[Index]->OpLen      = HTONS ((UINT16) sizeof (HTTP_BOOT_DHCP6_OPTION_ARCH));
-  OptEnt.Arch                = (HTTP_BOOT_DHCP6_OPTION_ARCH *) OptList[Index]->Data;
-  Value                      = HTONS (EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE);
+  OptList[Index]->OpCode = HTONS (DHCP6_OPT_ARCH);
+  OptList[Index]->OpLen  = HTONS ((UINT16)sizeof (HTTP_BOOT_DHCP6_OPTION_ARCH));
+  OptEnt.Arch            = (HTTP_BOOT_DHCP6_OPTION_ARCH *)OptList[Index]->Data;
+  Value                  = HTONS (EFI_HTTP_BOOT_CLIENT_SYSTEM_ARCHITECTURE);
   CopyMem (&OptEnt.Arch->Type, &Value, sizeof (UINT16));
   Index++;
-  OptList[Index]             = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
+  OptList[Index] = GET_NEXT_DHCP6_OPTION (OptList[Index - 1]);
 
   //
   // Append vendor class identify option.
   //
   OptList[Index]->OpCode       = HTONS (DHCP6_OPT_VENDOR_CLASS);
-  OptList[Index]->OpLen        = HTONS ((UINT16) sizeof (HTTP_BOOT_DHCP6_OPTION_VENDOR_CLASS));
-  OptEnt.VendorClass           = (HTTP_BOOT_DHCP6_OPTION_VENDOR_CLASS *) OptList[Index]->Data;
+  OptList[Index]->OpLen        = HTONS ((UINT16)sizeof (HTTP_BOOT_DHCP6_OPTION_VENDOR_CLASS));
+  OptEnt.VendorClass           = (HTTP_BOOT_DHCP6_OPTION_VENDOR_CLASS *)OptList[Index]->Data;
   OptEnt.VendorClass->Vendor   = HTONL (HTTP_BOOT_DHCP6_ENTERPRISE_NUM);
-  OptEnt.VendorClass->ClassLen = HTONS ((UINT16) sizeof (HTTP_BOOT_CLASS_ID));
+  OptEnt.VendorClass->ClassLen = HTONS ((UINT16)sizeof (HTTP_BOOT_CLASS_ID));
   CopyMem (
     &OptEnt.VendorClass->ClassId,
     DEFAULT_CLASS_ID_DATA,
@@ -131,33 +131,30 @@ HttpBootBuildDhcp6Options (
 **/
 EFI_DHCP6_PACKET_OPTION *
 HttpBootParseDhcp6Options (
-  IN UINT8                       *Buffer,
-  IN UINT32                      Length,
-  IN UINT16                      OptTag
+  IN UINT8   *Buffer,
+  IN UINT32  Length,
+  IN UINT16  OptTag
   )
 {
-  EFI_DHCP6_PACKET_OPTION        *Option;
-  UINT32                         Offset;
+  EFI_DHCP6_PACKET_OPTION  *Option;
+  UINT32                   Offset;
 
-  Option  = (EFI_DHCP6_PACKET_OPTION *) Buffer;
-  Offset  = 0;
+  Option = (EFI_DHCP6_PACKET_OPTION *)Buffer;
+  Offset = 0;
 
   //
   // OpLen and OpCode here are both stored in network order.
   //
   while (Offset < Length) {
-
     if (NTOHS (Option->OpCode) == OptTag) {
-
       return Option;
     }
 
-    Offset += (NTOHS(Option->OpLen) + 4);
-    Option  = (EFI_DHCP6_PACKET_OPTION *) (Buffer + Offset);
+    Offset += (NTOHS (Option->OpLen) + 4);
+    Option  = (EFI_DHCP6_PACKET_OPTION *)(Buffer + Offset);
   }
 
   return NULL;
-
 }
 
 /**
@@ -171,40 +168,39 @@ HttpBootParseDhcp6Options (
 **/
 EFI_STATUS
 HttpBootParseDhcp6Packet (
-  IN  HTTP_BOOT_DHCP6_PACKET_CACHE    *Cache6
+  IN  HTTP_BOOT_DHCP6_PACKET_CACHE  *Cache6
   )
 {
-  EFI_DHCP6_PACKET               *Offer;
-  EFI_DHCP6_PACKET_OPTION        **Options;
-  EFI_DHCP6_PACKET_OPTION        *Option;
-  HTTP_BOOT_OFFER_TYPE           OfferType;
-  EFI_IPv6_ADDRESS               IpAddr;
-  BOOLEAN                        IsProxyOffer;
-  BOOLEAN                        IsHttpOffer;
-  BOOLEAN                        IsDnsOffer;
-  BOOLEAN                        IpExpressedUri;
-  EFI_STATUS                     Status;
-  UINT32                         Offset;
-  UINT32                         Length;
+  EFI_DHCP6_PACKET         *Offer;
+  EFI_DHCP6_PACKET_OPTION  **Options;
+  EFI_DHCP6_PACKET_OPTION  *Option;
+  HTTP_BOOT_OFFER_TYPE     OfferType;
+  EFI_IPv6_ADDRESS         IpAddr;
+  BOOLEAN                  IsProxyOffer;
+  BOOLEAN                  IsHttpOffer;
+  BOOLEAN                  IsDnsOffer;
+  BOOLEAN                  IpExpressedUri;
+  EFI_STATUS               Status;
+  UINT32                   Offset;
+  UINT32                   Length;
 
   IsDnsOffer     = FALSE;
   IpExpressedUri = FALSE;
   IsProxyOffer   = TRUE;
   IsHttpOffer    = FALSE;
-  Offer        = &Cache6->Packet.Offer;
-  Options      = Cache6->OptList;
+  Offer          = &Cache6->Packet.Offer;
+  Options        = Cache6->OptList;
 
   ZeroMem (Cache6->OptList, sizeof (Cache6->OptList));
 
-  Option  = (EFI_DHCP6_PACKET_OPTION *) (Offer->Dhcp6.Option);
-  Offset  = 0;
-  Length  = GET_DHCP6_OPTION_SIZE (Offer);
+  Option = (EFI_DHCP6_PACKET_OPTION *)(Offer->Dhcp6.Option);
+  Offset = 0;
+  Length = GET_DHCP6_OPTION_SIZE (Offer);
 
   //
   // OpLen and OpCode here are both stored in network order, since they are from original packet.
   //
   while (Offset < Length) {
-
     if (NTOHS (Option->OpCode) == DHCP6_OPT_IA_NA) {
       Options[HTTP_BOOT_DHCP6_IDX_IA_NA] = Option;
     } else if (NTOHS (Option->OpCode) == DHCP6_OPT_BOOT_FILE_URL) {
@@ -221,8 +217,9 @@ HttpBootParseDhcp6Packet (
     }
 
     Offset += (NTOHS (Option->OpLen) + 4);
-    Option  = (EFI_DHCP6_PACKET_OPTION *) (Offer->Dhcp6.Option + Offset);
+    Option  = (EFI_DHCP6_PACKET_OPTION *)(Offer->Dhcp6.Option + Offset);
   }
+
   //
   // The offer with assigned client address is NOT a proxy offer.
   // An ia_na option, embedded with valid ia_addr option and a status_code of success.
@@ -234,7 +231,7 @@ HttpBootParseDhcp6Packet (
                NTOHS (Option->OpLen),
                DHCP6_OPT_STATUS_CODE
                );
-    if ((Option != NULL && Option->Data[0] == 0) || (Option == NULL)) {
+    if (((Option != NULL) && (Option->Data[0] == 0)) || (Option == NULL)) {
       IsProxyOffer = FALSE;
     }
   }
@@ -244,10 +241,11 @@ HttpBootParseDhcp6Packet (
   //
   Option = Options[HTTP_BOOT_DHCP6_IDX_VENDOR_CLASS];
 
-  if (Option != NULL &&
-      NTOHS(Option->OpLen) >= 16 &&
-      CompareMem ((Option->Data + 6), DEFAULT_CLASS_ID_DATA, 10) == 0) {
-      IsHttpOffer = TRUE;
+  if ((Option != NULL) &&
+      (NTOHS (Option->OpLen) >= 16) &&
+      (CompareMem ((Option->Data + 6), DEFAULT_CLASS_ID_DATA, 10) == 0))
+  {
+    IsHttpOffer = TRUE;
   }
 
   //
@@ -261,7 +259,7 @@ HttpBootParseDhcp6Packet (
   //
   // Http offer must have a boot URI.
   //
-  if (IsHttpOffer && Options[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL] == NULL) {
+  if (IsHttpOffer && (Options[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL] == NULL)) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -270,8 +268,8 @@ HttpBootParseDhcp6Packet (
   //
   if (IsHttpOffer) {
     Status = HttpParseUrl (
-               (CHAR8*) Options[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data,
-               (UINT32) AsciiStrLen ((CHAR8*) Options[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data),
+               (CHAR8 *)Options[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data,
+               (UINT32)AsciiStrLen ((CHAR8 *)Options[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data),
                FALSE,
                &Cache6->UriParser
                );
@@ -280,7 +278,7 @@ HttpBootParseDhcp6Packet (
     }
 
     Status = HttpUrlGetIp6 (
-               (CHAR8*) Options[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data,
+               (CHAR8 *)Options[HTTP_BOOT_DHCP6_IDX_BOOT_FILE_URL]->Data,
                Cache6->UriParser,
                &IpAddr
                );
@@ -304,7 +302,6 @@ HttpBootParseDhcp6Packet (
         OfferType = HttpOfferTypeProxyNameUri;
       }
     }
-
   } else {
     if (!IsProxyOffer) {
       OfferType = IsDnsOffer ? HttpOfferTypeDhcpDns : HttpOfferTypeDhcpOnly;
@@ -329,8 +326,8 @@ HttpBootParseDhcp6Packet (
 **/
 EFI_STATUS
 HttpBootCacheDhcp6Packet (
-  IN EFI_DHCP6_PACKET          *Dst,
-  IN EFI_DHCP6_PACKET          *Src
+  IN EFI_DHCP6_PACKET  *Dst,
+  IN EFI_DHCP6_PACKET  *Src
   )
 {
   if (Dst->Size < Src->Length) {
@@ -359,10 +356,10 @@ HttpBootCacheDhcp6Offer (
   IN EFI_DHCP6_PACKET        *RcvdOffer
   )
 {
-  HTTP_BOOT_DHCP6_PACKET_CACHE   *Cache6;
-  EFI_DHCP6_PACKET               *Offer;
-  HTTP_BOOT_OFFER_TYPE           OfferType;
-  EFI_STATUS                     Status;
+  HTTP_BOOT_DHCP6_PACKET_CACHE  *Cache6;
+  EFI_DHCP6_PACKET              *Offer;
+  HTTP_BOOT_OFFER_TYPE          OfferType;
+  EFI_STATUS                    Status;
 
   Cache6 = &Private->OfferBuffer[Private->OfferNum].Dhcp6;
   Offer  = &Cache6->Packet.Offer;
@@ -370,7 +367,7 @@ HttpBootCacheDhcp6Offer (
   //
   // Cache the content of DHCPv6 packet firstly.
   //
-  Status = HttpBootCacheDhcp6Packet(Offer, RcvdOffer);
+  Status = HttpBootCacheDhcp6Packet (Offer, RcvdOffer);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -417,86 +414,91 @@ HttpBootCacheDhcp6Offer (
 EFI_STATUS
 EFIAPI
 HttpBootDhcp6CallBack (
-  IN  EFI_DHCP6_PROTOCOL           *This,
-  IN  VOID                         *Context,
-  IN  EFI_DHCP6_STATE              CurrentState,
-  IN  EFI_DHCP6_EVENT              Dhcp6Event,
-  IN  EFI_DHCP6_PACKET             *Packet,
-  OUT EFI_DHCP6_PACKET             **NewPacket     OPTIONAL
+  IN  EFI_DHCP6_PROTOCOL  *This,
+  IN  VOID                *Context,
+  IN  EFI_DHCP6_STATE     CurrentState,
+  IN  EFI_DHCP6_EVENT     Dhcp6Event,
+  IN  EFI_DHCP6_PACKET    *Packet,
+  OUT EFI_DHCP6_PACKET    **NewPacket     OPTIONAL
   )
 {
-  HTTP_BOOT_PRIVATE_DATA          *Private;
-  EFI_DHCP6_PACKET                *SelectAd;
-  EFI_STATUS                      Status;
-  BOOLEAN                         Received;
+  HTTP_BOOT_PRIVATE_DATA  *Private;
+  EFI_DHCP6_PACKET        *SelectAd;
+  EFI_STATUS              Status;
+  BOOLEAN                 Received;
 
   if ((Dhcp6Event != Dhcp6SendSolicit) &&
-    (Dhcp6Event != Dhcp6RcvdAdvertise) &&
-    (Dhcp6Event != Dhcp6SendRequest) &&
-    (Dhcp6Event != Dhcp6RcvdReply) &&
-    (Dhcp6Event != Dhcp6SelectAdvertise)) {
+      (Dhcp6Event != Dhcp6RcvdAdvertise) &&
+      (Dhcp6Event != Dhcp6SendRequest) &&
+      (Dhcp6Event != Dhcp6RcvdReply) &&
+      (Dhcp6Event != Dhcp6SelectAdvertise))
+  {
     return EFI_SUCCESS;
   }
 
   ASSERT (Packet != NULL);
 
-  Private     = (HTTP_BOOT_PRIVATE_DATA *) Context;
-  Status = EFI_SUCCESS;
-  if (Private->HttpBootCallback != NULL && Dhcp6Event != Dhcp6SelectAdvertise) {
-    Received = (BOOLEAN) (Dhcp6Event == Dhcp6RcvdAdvertise || Dhcp6Event == Dhcp6RcvdReply);
-    Status = Private->HttpBootCallback->Callback (
-               Private->HttpBootCallback,
-               HttpBootDhcp6,
-               Received,
-               Packet->Length,
-               &Packet->Dhcp6
-               );
+  Private = (HTTP_BOOT_PRIVATE_DATA *)Context;
+  Status  = EFI_SUCCESS;
+  if ((Private->HttpBootCallback != NULL) && (Dhcp6Event != Dhcp6SelectAdvertise)) {
+    Received = (BOOLEAN)(Dhcp6Event == Dhcp6RcvdAdvertise || Dhcp6Event == Dhcp6RcvdReply);
+    Status   = Private->HttpBootCallback->Callback (
+                                            Private->HttpBootCallback,
+                                            HttpBootDhcp6,
+                                            Received,
+                                            Packet->Length,
+                                            &Packet->Dhcp6
+                                            );
     if (EFI_ERROR (Status)) {
       return EFI_ABORTED;
     }
   }
+
   switch (Dhcp6Event) {
-
-  case Dhcp6RcvdAdvertise:
-    Status = EFI_NOT_READY;
-    if (Packet->Length > HTTP_BOOT_DHCP6_PACKET_MAX_SIZE) {
-      //
-      // Ignore the incoming packets which exceed the maximum length.
-      //
-      break;
-    }
-    if (Private->OfferNum < HTTP_BOOT_OFFER_MAX_NUM) {
-      //
-      // Cache the dhcp offers to OfferBuffer[] for select later, and record
-      // the OfferIndex and OfferCount.
-      // If error happens, just ignore this packet and continue to wait more offer.
-      //
-      HttpBootCacheDhcp6Offer (Private, Packet);
-    }
-    break;
-
-  case Dhcp6SelectAdvertise:
-    //
-    // Select offer by the default policy or by order, and record the SelectIndex
-    // and SelectProxyType.
-    //
-    HttpBootSelectDhcpOffer (Private);
-
-    if (Private->SelectIndex == 0) {
-      Status = EFI_ABORTED;
-    } else {
-      ASSERT (NewPacket != NULL);
-      SelectAd   = &Private->OfferBuffer[Private->SelectIndex - 1].Dhcp6.Packet.Offer;
-      *NewPacket = AllocateZeroPool (SelectAd->Size);
-      if (*NewPacket == NULL) {
-        return EFI_OUT_OF_RESOURCES;
+    case Dhcp6RcvdAdvertise:
+      Status = EFI_NOT_READY;
+      if (Packet->Length > HTTP_BOOT_DHCP6_PACKET_MAX_SIZE) {
+        //
+        // Ignore the incoming packets which exceed the maximum length.
+        //
+        break;
       }
-      CopyMem (*NewPacket, SelectAd, SelectAd->Size);
-    }
-    break;
 
-  default:
-    break;
+      if (Private->OfferNum < HTTP_BOOT_OFFER_MAX_NUM) {
+        //
+        // Cache the dhcp offers to OfferBuffer[] for select later, and record
+        // the OfferIndex and OfferCount.
+        // If error happens, just ignore this packet and continue to wait more offer.
+        //
+        HttpBootCacheDhcp6Offer (Private, Packet);
+      }
+
+      break;
+
+    case Dhcp6SelectAdvertise:
+      //
+      // Select offer by the default policy or by order, and record the SelectIndex
+      // and SelectProxyType.
+      //
+      HttpBootSelectDhcpOffer (Private);
+
+      if (Private->SelectIndex == 0) {
+        Status = EFI_ABORTED;
+      } else {
+        ASSERT (NewPacket != NULL);
+        SelectAd   = &Private->OfferBuffer[Private->SelectIndex - 1].Dhcp6.Packet.Offer;
+        *NewPacket = AllocateZeroPool (SelectAd->Size);
+        if (*NewPacket == NULL) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+
+        CopyMem (*NewPacket, SelectAd, SelectAd->Size);
+      }
+
+      break;
+
+    default:
+      break;
   }
 
   return Status;
@@ -519,18 +521,18 @@ HttpBootDhcp6CallBack (
 **/
 EFI_STATUS
 HttpBootCheckRouteTable (
-  IN  HTTP_BOOT_PRIVATE_DATA        *Private,
-  IN  UINTN                         TimeOutInSecond,
-  OUT EFI_IPv6_ADDRESS              *GatewayAddr
+  IN  HTTP_BOOT_PRIVATE_DATA  *Private,
+  IN  UINTN                   TimeOutInSecond,
+  OUT EFI_IPv6_ADDRESS        *GatewayAddr
   )
 {
-  EFI_STATUS                       Status;
-  EFI_IP6_PROTOCOL                 *Ip6;
-  EFI_IP6_MODE_DATA                Ip6ModeData;
-  UINTN                            Index;
-  EFI_EVENT                        TimeOutEvt;
-  UINTN                            RetryCount;
-  BOOLEAN                          GatewayIsFound;
+  EFI_STATUS         Status;
+  EFI_IP6_PROTOCOL   *Ip6;
+  EFI_IP6_MODE_DATA  Ip6ModeData;
+  UINTN              Index;
+  EFI_EVENT          TimeOutEvt;
+  UINTN              RetryCount;
+  BOOLEAN            GatewayIsFound;
 
   ASSERT (GatewayAddr != NULL);
   ASSERT (Private != NULL);
@@ -562,23 +564,28 @@ HttpBootCheckRouteTable (
     if (Ip6ModeData.AddressList != NULL) {
       FreePool (Ip6ModeData.AddressList);
     }
+
     if (Ip6ModeData.GroupTable != NULL) {
       FreePool (Ip6ModeData.GroupTable);
     }
+
     if (Ip6ModeData.RouteTable != NULL) {
       FreePool (Ip6ModeData.RouteTable);
     }
+
     if (Ip6ModeData.NeighborCache != NULL) {
       FreePool (Ip6ModeData.NeighborCache);
     }
+
     if (Ip6ModeData.PrefixTable != NULL) {
       FreePool (Ip6ModeData.PrefixTable);
     }
+
     if (Ip6ModeData.IcmpTypeList != NULL) {
       FreePool (Ip6ModeData.IcmpTypeList);
     }
 
-    if (GatewayIsFound || RetryCount == TimeOutInSecond) {
+    if (GatewayIsFound || (RetryCount == TimeOutInSecond)) {
       break;
     }
 
@@ -604,6 +611,7 @@ HttpBootCheckRouteTable (
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
+
     while (EFI_ERROR (gBS->CheckEvent (TimeOutEvt))) {
       Ip6->Poll (Ip6);
     }
@@ -634,16 +642,16 @@ ON_EXIT:
 **/
 EFI_STATUS
 HttpBootSetIp6Policy (
-  IN HTTP_BOOT_PRIVATE_DATA        *Private
+  IN HTTP_BOOT_PRIVATE_DATA  *Private
   )
 {
-  EFI_IP6_CONFIG_POLICY            Policy;
-  EFI_IP6_CONFIG_PROTOCOL          *Ip6Config;
-  EFI_STATUS                       Status;
-  UINTN                            DataSize;
+  EFI_IP6_CONFIG_POLICY    Policy;
+  EFI_IP6_CONFIG_PROTOCOL  *Ip6Config;
+  EFI_STATUS               Status;
+  UINTN                    DataSize;
 
-  Ip6Config       = Private->Ip6Config;
-  DataSize        = sizeof (EFI_IP6_CONFIG_POLICY);
+  Ip6Config = Private->Ip6Config;
+  DataSize  = sizeof (EFI_IP6_CONFIG_POLICY);
 
   //
   // Get and store the current policy of IP6 driver.
@@ -663,13 +671,14 @@ HttpBootSetIp6Policy (
     Status = Ip6Config->SetData (
                           Ip6Config,
                           Ip6ConfigDataTypePolicy,
-                          sizeof(EFI_IP6_CONFIG_POLICY),
+                          sizeof (EFI_IP6_CONFIG_POLICY),
                           &Policy
                           );
     if (EFI_ERROR (Status)) {
       return Status;
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -687,12 +696,12 @@ HttpBootSetIp6Policy (
 **/
 EFI_STATUS
 HttpBootSetIp6Dns (
-  IN HTTP_BOOT_PRIVATE_DATA         *Private,
-  IN UINTN                          DataLength,
-  IN VOID                           *DnsServerData
+  IN HTTP_BOOT_PRIVATE_DATA  *Private,
+  IN UINTN                   DataLength,
+  IN VOID                    *DnsServerData
   )
 {
-  EFI_IP6_CONFIG_PROTOCOL        *Ip6Config;
+  EFI_IP6_CONFIG_PROTOCOL  *Ip6Config;
 
   ASSERT (Private->UsingIpv6);
 
@@ -717,11 +726,11 @@ HttpBootSetIp6Dns (
 **/
 EFI_STATUS
 HttpBootSetIp6Gateway (
-  IN HTTP_BOOT_PRIVATE_DATA         *Private
+  IN HTTP_BOOT_PRIVATE_DATA  *Private
   )
 {
-  EFI_IP6_CONFIG_PROTOCOL           *Ip6Config;
-  EFI_STATUS                        Status;
+  EFI_IP6_CONFIG_PROTOCOL  *Ip6Config;
+  EFI_STATUS               Status;
 
   ASSERT (Private->UsingIpv6);
   Ip6Config = Private->Ip6Config;
@@ -736,7 +745,7 @@ HttpBootSetIp6Gateway (
                           sizeof (EFI_IPv6_ADDRESS),
                           &Private->GatewayIp.v6
                           );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       return Status;
     }
   }
@@ -755,21 +764,21 @@ HttpBootSetIp6Gateway (
 **/
 EFI_STATUS
 HttpBootSetIp6Address (
-  IN HTTP_BOOT_PRIVATE_DATA         *Private
-)
+  IN HTTP_BOOT_PRIVATE_DATA  *Private
+  )
 {
-  EFI_STATUS                         Status;
-  EFI_IP6_PROTOCOL                   *Ip6;
-  EFI_IP6_CONFIG_PROTOCOL            *Ip6Cfg;
-  EFI_IP6_CONFIG_POLICY              Policy;
-  EFI_IP6_CONFIG_MANUAL_ADDRESS      CfgAddr;
-  EFI_IPv6_ADDRESS                   *Ip6Addr;
-  EFI_IPv6_ADDRESS                   GatewayAddr;
-  EFI_IP6_CONFIG_DATA                Ip6CfgData;
-  EFI_EVENT                          MappedEvt;
-  UINTN                              DataSize;
-  BOOLEAN                            IsAddressOk;
-  UINTN                              Index;
+  EFI_STATUS                     Status;
+  EFI_IP6_PROTOCOL               *Ip6;
+  EFI_IP6_CONFIG_PROTOCOL        *Ip6Cfg;
+  EFI_IP6_CONFIG_POLICY          Policy;
+  EFI_IP6_CONFIG_MANUAL_ADDRESS  CfgAddr;
+  EFI_IPv6_ADDRESS               *Ip6Addr;
+  EFI_IPv6_ADDRESS               GatewayAddr;
+  EFI_IP6_CONFIG_DATA            Ip6CfgData;
+  EFI_EVENT                      MappedEvt;
+  UINTN                          DataSize;
+  BOOLEAN                        IsAddressOk;
+  UINTN                          Index;
 
   ASSERT (Private->UsingIpv6);
 
@@ -783,11 +792,11 @@ HttpBootSetIp6Address (
   CopyMem (&CfgAddr, &Private->StationIp.v6, sizeof (EFI_IPv6_ADDRESS));
   ZeroMem (&Ip6CfgData, sizeof (EFI_IP6_CONFIG_DATA));
 
-  Ip6CfgData.AcceptIcmpErrors    = TRUE;
-  Ip6CfgData.DefaultProtocol     = IP6_ICMP;
-  Ip6CfgData.HopLimit            = HTTP_BOOT_DEFAULT_HOPLIMIT;
-  Ip6CfgData.ReceiveTimeout      = HTTP_BOOT_DEFAULT_LIFETIME;
-  Ip6CfgData.TransmitTimeout     = HTTP_BOOT_DEFAULT_LIFETIME;
+  Ip6CfgData.AcceptIcmpErrors = TRUE;
+  Ip6CfgData.DefaultProtocol  = IP6_ICMP;
+  Ip6CfgData.HopLimit         = HTTP_BOOT_DEFAULT_HOPLIMIT;
+  Ip6CfgData.ReceiveTimeout   = HTTP_BOOT_DEFAULT_LIFETIME;
+  Ip6CfgData.TransmitTimeout  = HTTP_BOOT_DEFAULT_LIFETIME;
 
   Status = Ip6->Configure (Ip6, &Ip6CfgData);
   if (EFI_ERROR (Status)) {
@@ -811,7 +820,7 @@ HttpBootSetIp6Address (
   Status = Ip6Cfg->SetData (
                      Ip6Cfg,
                      Ip6ConfigDataTypePolicy,
-                     sizeof(EFI_IP6_CONFIG_POLICY),
+                     sizeof (EFI_IP6_CONFIG_POLICY),
                      &Policy
                      );
   if (EFI_ERROR (Status)) {
@@ -840,7 +849,7 @@ HttpBootSetIp6Address (
                      Ip6ConfigDataTypeManualAddress,
                      MappedEvt
                      );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
 
@@ -850,7 +859,7 @@ HttpBootSetIp6Address (
                      sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS),
                      &CfgAddr
                      );
-  if (EFI_ERROR (Status) && Status != EFI_NOT_READY) {
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_READY)) {
     goto ON_EXIT;
   } else if (Status == EFI_NOT_READY) {
     //
@@ -859,17 +868,18 @@ HttpBootSetIp6Address (
     while (!IsAddressOk) {
       Ip6->Poll (Ip6);
     }
+
     //
     // Check whether the Ip6 Address setting is successed.
     //
     DataSize = 0;
-    Status = Ip6Cfg->GetData (
-                       Ip6Cfg,
-                       Ip6ConfigDataTypeManualAddress,
-                       &DataSize,
-                       NULL
-                       );
-    if (Status != EFI_BUFFER_TOO_SMALL || DataSize == 0) {
+    Status   = Ip6Cfg->GetData (
+                         Ip6Cfg,
+                         Ip6ConfigDataTypeManualAddress,
+                         &DataSize,
+                         NULL
+                         );
+    if ((Status != EFI_BUFFER_TOO_SMALL) || (DataSize == 0)) {
       Status = EFI_DEVICE_ERROR;
       goto ON_EXIT;
     }
@@ -878,22 +888,24 @@ HttpBootSetIp6Address (
     if (Ip6Addr == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     Status = Ip6Cfg->GetData (
                        Ip6Cfg,
                        Ip6ConfigDataTypeManualAddress,
                        &DataSize,
-                       (VOID *) Ip6Addr
+                       (VOID *)Ip6Addr
                        );
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;
       goto ON_EXIT;
     }
 
-    for (Index = 0; Index < DataSize / sizeof (EFI_IPv6_ADDRESS); Index ++) {
+    for (Index = 0; Index < DataSize / sizeof (EFI_IPv6_ADDRESS); Index++) {
       if (CompareMem (Ip6Addr + Index, &CfgAddr, sizeof (EFI_IPv6_ADDRESS)) == 0) {
         break;
       }
     }
+
     if (Index == DataSize / sizeof (EFI_IPv6_ADDRESS)) {
       Status = EFI_ABORTED;
       goto ON_EXIT;
@@ -928,17 +940,17 @@ ON_EXIT:
 **/
 EFI_STATUS
 HttpBootDhcp6Sarr (
-  IN HTTP_BOOT_PRIVATE_DATA         *Private
+  IN HTTP_BOOT_PRIVATE_DATA  *Private
   )
 {
-  EFI_DHCP6_PROTOCOL               *Dhcp6;
-  EFI_DHCP6_CONFIG_DATA            Config;
-  EFI_DHCP6_MODE_DATA              Mode;
-  EFI_DHCP6_RETRANSMISSION         *Retransmit;
-  EFI_DHCP6_PACKET_OPTION          *OptList[HTTP_BOOT_DHCP6_OPTION_MAX_NUM];
-  UINT32                           OptCount;
-  UINT8                            Buffer[HTTP_BOOT_DHCP6_OPTION_MAX_SIZE];
-  EFI_STATUS                       Status;
+  EFI_DHCP6_PROTOCOL        *Dhcp6;
+  EFI_DHCP6_CONFIG_DATA     Config;
+  EFI_DHCP6_MODE_DATA       Mode;
+  EFI_DHCP6_RETRANSMISSION  *Retransmit;
+  EFI_DHCP6_PACKET_OPTION   *OptList[HTTP_BOOT_DHCP6_OPTION_MAX_NUM];
+  UINT32                    OptCount;
+  UINT8                     Buffer[HTTP_BOOT_DHCP6_OPTION_MAX_SIZE];
+  EFI_STATUS                Status;
 
   Dhcp6 = Private->Dhcp6;
   ASSERT (Dhcp6 != NULL);
@@ -947,7 +959,7 @@ HttpBootDhcp6Sarr (
   // Build options list for the request packet.
   //
   OptCount = HttpBootBuildDhcp6Options (Private, OptList, Buffer);
-  ASSERT (OptCount >0);
+  ASSERT (OptCount > 0);
 
   Retransmit = AllocateZeroPool (sizeof (EFI_DHCP6_RETRANSMISSION));
   if (Retransmit == NULL) {
@@ -980,11 +992,12 @@ HttpBootDhcp6Sarr (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
+
   //
   // Initialize the record fields for DHCPv6 offer in private data.
   //
-  Private->OfferNum      = 0;
-  Private->SelectIndex   = 0;
+  Private->OfferNum    = 0;
+  Private->SelectIndex = 0;
   ZeroMem (Private->OfferCount, sizeof (Private->OfferCount));
   ZeroMem (Private->OfferIndex, sizeof (Private->OfferIndex));
 
@@ -1021,12 +1034,11 @@ ON_EXIT:
     if (Mode.ClientId != NULL) {
       FreePool (Mode.ClientId);
     }
+
     if (Mode.Ia != NULL) {
       FreePool (Mode.Ia);
     }
   }
 
   return Status;
-
 }
-

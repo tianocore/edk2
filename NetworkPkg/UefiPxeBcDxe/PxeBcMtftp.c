@@ -9,14 +9,13 @@
 
 #include "PxeBcImpl.h"
 
-CHAR8 *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
+CHAR8  *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
   "blksize",
   "timeout",
   "tsize",
   "multicast",
   "windowsize"
 };
-
 
 /**
   This is a callback function when packets are received or transmitted in Mtftp driver.
@@ -39,30 +38,30 @@ CHAR8 *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
 EFI_STATUS
 EFIAPI
 PxeBcMtftp6CheckPacket (
-  IN EFI_MTFTP6_PROTOCOL              *This,
-  IN EFI_MTFTP6_TOKEN                 *Token,
-  IN UINT16                           PacketLen,
-  IN EFI_MTFTP6_PACKET                *Packet
+  IN EFI_MTFTP6_PROTOCOL  *This,
+  IN EFI_MTFTP6_TOKEN     *Token,
+  IN UINT16               PacketLen,
+  IN EFI_MTFTP6_PACKET    *Packet
   )
 {
-  PXEBC_PRIVATE_DATA                  *Private;
-  EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL *Callback;
-  EFI_STATUS                          Status;
+  PXEBC_PRIVATE_DATA                   *Private;
+  EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL  *Callback;
+  EFI_STATUS                           Status;
 
-  Private   = (PXEBC_PRIVATE_DATA *) Token->Context;
-  Callback  = Private->PxeBcCallback;
-  Status    = EFI_SUCCESS;
+  Private  = (PXEBC_PRIVATE_DATA *)Token->Context;
+  Callback = Private->PxeBcCallback;
+  Status   = EFI_SUCCESS;
 
   if (Packet->OpCode == EFI_MTFTP6_OPCODE_ERROR) {
     //
     // Store the tftp error message into mode data and set the received flag.
     //
     Private->Mode.TftpErrorReceived   = TRUE;
-    Private->Mode.TftpError.ErrorCode = (UINT8) Packet->Error.ErrorCode;
+    Private->Mode.TftpError.ErrorCode = (UINT8)Packet->Error.ErrorCode;
     AsciiStrnCpyS (
       Private->Mode.TftpError.ErrorString,
       PXE_MTFTP_ERROR_STRING_LENGTH,
-      (CHAR8 *) Packet->Error.ErrorMessage,
+      (CHAR8 *)Packet->Error.ErrorMessage,
       PXE_MTFTP_ERROR_STRING_LENGTH - 1
       );
     Private->Mode.TftpError.ErrorString[PXE_MTFTP_ERROR_STRING_LENGTH - 1] = '\0';
@@ -73,12 +72,12 @@ PxeBcMtftp6CheckPacket (
     // Callback to user if has when received any tftp packet.
     //
     Status = Callback->Callback (
-                        Callback,
-                        Private->Function,
-                        TRUE,
-                        PacketLen,
-                        (EFI_PXE_BASE_CODE_PACKET *) Packet
-                        );
+                         Callback,
+                         Private->Function,
+                         TRUE,
+                         PacketLen,
+                         (EFI_PXE_BASE_CODE_PACKET *)Packet
+                         );
     if (Status != EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE) {
       //
       // User wants to abort current process if not EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE.
@@ -94,7 +93,6 @@ PxeBcMtftp6CheckPacket (
 
   return Status;
 }
-
 
 /**
   This function is to get the size of a file using Tftp.
@@ -114,23 +112,23 @@ PxeBcMtftp6CheckPacket (
 **/
 EFI_STATUS
 PxeBcMtftp6GetFileSize (
-  IN     PXEBC_PRIVATE_DATA           *Private,
-  IN     EFI_MTFTP6_CONFIG_DATA       *Config,
-  IN     UINT8                        *Filename,
-  IN     UINTN                        *BlockSize,
-  IN     UINTN                        *WindowSize,
-  IN OUT UINT64                       *BufferSize
+  IN     PXEBC_PRIVATE_DATA      *Private,
+  IN     EFI_MTFTP6_CONFIG_DATA  *Config,
+  IN     UINT8                   *Filename,
+  IN     UINTN                   *BlockSize,
+  IN     UINTN                   *WindowSize,
+  IN OUT UINT64                  *BufferSize
   )
 {
-  EFI_MTFTP6_PROTOCOL                 *Mtftp6;
-  EFI_MTFTP6_OPTION                   ReqOpt[3];
-  EFI_MTFTP6_PACKET                   *Packet;
-  EFI_MTFTP6_OPTION                   *Option;
-  UINT32                              PktLen;
-  UINT8                               OptBuf[PXE_MTFTP_OPTBUF_MAXNUM_INDEX];
-  UINTN                               OptBufSize;
-  UINT32                              OptCnt;
-  EFI_STATUS                          Status;
+  EFI_MTFTP6_PROTOCOL  *Mtftp6;
+  EFI_MTFTP6_OPTION    ReqOpt[3];
+  EFI_MTFTP6_PACKET    *Packet;
+  EFI_MTFTP6_OPTION    *Option;
+  UINT32               PktLen;
+  UINT8                OptBuf[PXE_MTFTP_OPTBUF_MAXNUM_INDEX];
+  UINTN                OptBufSize;
+  UINT32               OptCnt;
+  EFI_STATUS           Status;
 
   *BufferSize               = 0;
   Status                    = EFI_DEVICE_ERROR;
@@ -150,22 +148,22 @@ PxeBcMtftp6GetFileSize (
   //
   // Build the required options for get info.
   //
-  ReqOpt[0].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_TSIZE_INDEX];
+  ReqOpt[0].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_TSIZE_INDEX];
   PxeBcUintnToAscDec (0, OptBuf, OptBufSize);
-  ReqOpt[0].ValueStr  = OptBuf;
+  ReqOpt[0].ValueStr = OptBuf;
 
   if (BlockSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
-    ReqOpt[OptCnt].ValueStr  = (UINT8 *) (ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
-    OptBufSize -= (AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = (UINT8 *)(ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *)ReqOpt[OptCnt-1].ValueStr) + 1);
+    OptBufSize              -= (AsciiStrLen ((CHAR8 *)ReqOpt[OptCnt-1].ValueStr) + 1);
     PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, OptBufSize);
     OptCnt++;
   }
 
   if (WindowSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
-    ReqOpt[OptCnt].ValueStr  = (UINT8 *) (ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
-    OptBufSize -= (AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = (UINT8 *)(ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *)ReqOpt[OptCnt-1].ValueStr) + 1);
+    OptBufSize              -= (AsciiStrLen ((CHAR8 *)ReqOpt[OptCnt-1].ValueStr) + 1);
     PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, OptBufSize);
     OptCnt++;
   }
@@ -175,7 +173,7 @@ PxeBcMtftp6GetFileSize (
                      NULL,
                      Filename,
                      NULL,
-                     (UINT8) OptCnt,
+                     (UINT8)OptCnt,
                      ReqOpt,
                      &PktLen,
                      &Packet
@@ -186,15 +184,16 @@ PxeBcMtftp6GetFileSize (
       // Store the tftp error message into mode data and set the received flag.
       //
       Private->Mode.TftpErrorReceived   = TRUE;
-      Private->Mode.TftpError.ErrorCode = (UINT8) Packet->Error.ErrorCode;
+      Private->Mode.TftpError.ErrorCode = (UINT8)Packet->Error.ErrorCode;
       AsciiStrnCpyS (
         Private->Mode.TftpError.ErrorString,
         PXE_MTFTP_ERROR_STRING_LENGTH,
-        (CHAR8 *) Packet->Error.ErrorMessage,
+        (CHAR8 *)Packet->Error.ErrorMessage,
         PXE_MTFTP_ERROR_STRING_LENGTH - 1
         );
       Private->Mode.TftpError.ErrorString[PXE_MTFTP_ERROR_STRING_LENGTH - 1] = '\0';
     }
+
     goto ON_ERROR;
   }
 
@@ -206,7 +205,7 @@ PxeBcMtftp6GetFileSize (
                      Mtftp6,
                      PktLen,
                      Packet,
-                     (UINT32 *) &OptCnt,
+                     (UINT32 *)&OptCnt,
                      &Option
                      );
   if (EFI_ERROR (Status)) {
@@ -218,23 +217,25 @@ PxeBcMtftp6GetFileSize (
   //
   Status = EFI_NOT_FOUND;
   while (OptCnt != 0) {
-    if (AsciiStrnCmp ((CHAR8 *) Option[OptCnt - 1].OptionStr, "tsize", 5) == 0) {
-      *BufferSize = AsciiStrDecimalToUint64 ((CHAR8 *) (Option[OptCnt - 1].ValueStr));
+    if (AsciiStrnCmp ((CHAR8 *)Option[OptCnt - 1].OptionStr, "tsize", 5) == 0) {
+      *BufferSize = AsciiStrDecimalToUint64 ((CHAR8 *)(Option[OptCnt - 1].ValueStr));
       Status      = EFI_SUCCESS;
     }
+
     OptCnt--;
   }
+
   FreePool (Option);
 
 ON_ERROR:
   if (Packet != NULL) {
     FreePool (Packet);
   }
+
   Mtftp6->Configure (Mtftp6, NULL);
 
   return Status;
 }
-
 
 /**
   This function is to get data of a file using Tftp.
@@ -255,23 +256,23 @@ ON_ERROR:
 **/
 EFI_STATUS
 PxeBcMtftp6ReadFile (
-  IN    PXEBC_PRIVATE_DATA            *Private,
-  IN     EFI_MTFTP6_CONFIG_DATA       *Config,
-  IN     UINT8                        *Filename,
-  IN     UINTN                        *BlockSize,
-  IN     UINTN                        *WindowSize,
-  IN     UINT8                        *BufferPtr,
-  IN OUT UINT64                       *BufferSize,
-  IN     BOOLEAN                      DontUseBuffer
+  IN    PXEBC_PRIVATE_DATA       *Private,
+  IN     EFI_MTFTP6_CONFIG_DATA  *Config,
+  IN     UINT8                   *Filename,
+  IN     UINTN                   *BlockSize,
+  IN     UINTN                   *WindowSize,
+  IN     UINT8                   *BufferPtr,
+  IN OUT UINT64                  *BufferSize,
+  IN     BOOLEAN                 DontUseBuffer
   )
 {
-  EFI_MTFTP6_PROTOCOL                 *Mtftp6;
-  EFI_MTFTP6_TOKEN                    Token;
-  EFI_MTFTP6_OPTION                   ReqOpt[2];
-  UINT32                              OptCnt;
-  UINT8                               BlksizeBuf[10];
-  UINT8                               WindowsizeBuf[10];
-  EFI_STATUS                          Status;
+  EFI_MTFTP6_PROTOCOL  *Mtftp6;
+  EFI_MTFTP6_TOKEN     Token;
+  EFI_MTFTP6_OPTION    ReqOpt[2];
+  UINT32               OptCnt;
+  UINT8                BlksizeBuf[10];
+  UINT8                WindowsizeBuf[10];
+  EFI_STATUS           Status;
 
   Status                    = EFI_DEVICE_ERROR;
   Mtftp6                    = Private->Mtftp6;
@@ -284,34 +285,33 @@ PxeBcMtftp6ReadFile (
   }
 
   if (BlockSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[OptCnt].ValueStr  = BlksizeBuf;
     PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, sizeof (BlksizeBuf));
     OptCnt++;
   }
 
   if (WindowSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
     ReqOpt[OptCnt].ValueStr  = WindowsizeBuf;
     PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, sizeof (WindowsizeBuf));
     OptCnt++;
   }
 
-
-  Token.Event         = NULL;
-  Token.OverrideData  = NULL;
-  Token.Filename      = Filename;
-  Token.ModeStr       = NULL;
-  Token.OptionCount   = OptCnt;
-  Token.OptionList    = ReqOpt;
-  Token.Context       = Private;
+  Token.Event        = NULL;
+  Token.OverrideData = NULL;
+  Token.Filename     = Filename;
+  Token.ModeStr      = NULL;
+  Token.OptionCount  = OptCnt;
+  Token.OptionList   = ReqOpt;
+  Token.Context      = Private;
 
   if (DontUseBuffer) {
-    Token.BufferSize  = 0;
-    Token.Buffer      = NULL;
+    Token.BufferSize = 0;
+    Token.Buffer     = NULL;
   } else {
-    Token.BufferSize  = *BufferSize;
-    Token.Buffer      = BufferPtr;
+    Token.BufferSize = *BufferSize;
+    Token.Buffer     = BufferPtr;
   }
 
   Token.CheckPacket     = PxeBcMtftp6CheckPacket;
@@ -328,7 +328,6 @@ PxeBcMtftp6ReadFile (
 
   return Status;
 }
-
 
 /**
   This function is used to write the data of a file using Tftp.
@@ -348,21 +347,21 @@ PxeBcMtftp6ReadFile (
 **/
 EFI_STATUS
 PxeBcMtftp6WriteFile (
-  IN     PXEBC_PRIVATE_DATA           *Private,
-  IN     EFI_MTFTP6_CONFIG_DATA       *Config,
-  IN     UINT8                        *Filename,
-  IN     BOOLEAN                      Overwrite,
-  IN     UINTN                        *BlockSize,
-  IN     UINT8                        *BufferPtr,
-  IN OUT UINT64                       *BufferSize
+  IN     PXEBC_PRIVATE_DATA      *Private,
+  IN     EFI_MTFTP6_CONFIG_DATA  *Config,
+  IN     UINT8                   *Filename,
+  IN     BOOLEAN                 Overwrite,
+  IN     UINTN                   *BlockSize,
+  IN     UINT8                   *BufferPtr,
+  IN OUT UINT64                  *BufferSize
   )
 {
-  EFI_MTFTP6_PROTOCOL                 *Mtftp6;
-  EFI_MTFTP6_TOKEN                    Token;
-  EFI_MTFTP6_OPTION                   ReqOpt[1];
-  UINT32                              OptCnt;
-  UINT8                               OptBuf[128];
-  EFI_STATUS                          Status;
+  EFI_MTFTP6_PROTOCOL  *Mtftp6;
+  EFI_MTFTP6_TOKEN     Token;
+  EFI_MTFTP6_OPTION    ReqOpt[1];
+  UINT32               OptCnt;
+  UINT8                OptBuf[128];
+  EFI_STATUS           Status;
 
   Status                    = EFI_DEVICE_ERROR;
   Mtftp6                    = Private->Mtftp6;
@@ -375,7 +374,7 @@ PxeBcMtftp6WriteFile (
   }
 
   if (BlockSize != NULL) {
-    ReqOpt[0].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[0].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[0].ValueStr  = OptBuf;
     PxeBcUintnToAscDec (*BlockSize, ReqOpt[0].ValueStr, PXE_MTFTP_OPTBUF_MAXNUM_INDEX);
     OptCnt++;
@@ -404,7 +403,6 @@ PxeBcMtftp6WriteFile (
   return Status;
 }
 
-
 /**
   This function is to read the data (file) from a directory using Tftp.
 
@@ -424,23 +422,23 @@ PxeBcMtftp6WriteFile (
 **/
 EFI_STATUS
 PxeBcMtftp6ReadDirectory (
-  IN     PXEBC_PRIVATE_DATA            *Private,
-  IN     EFI_MTFTP6_CONFIG_DATA        *Config,
-  IN     UINT8                         *Filename,
-  IN     UINTN                         *BlockSize,
-  IN     UINTN                         *WindowSize,
-  IN     UINT8                         *BufferPtr,
-  IN OUT UINT64                        *BufferSize,
-  IN     BOOLEAN                       DontUseBuffer
+  IN     PXEBC_PRIVATE_DATA      *Private,
+  IN     EFI_MTFTP6_CONFIG_DATA  *Config,
+  IN     UINT8                   *Filename,
+  IN     UINTN                   *BlockSize,
+  IN     UINTN                   *WindowSize,
+  IN     UINT8                   *BufferPtr,
+  IN OUT UINT64                  *BufferSize,
+  IN     BOOLEAN                 DontUseBuffer
   )
 {
-  EFI_MTFTP6_PROTOCOL                  *Mtftp6;
-  EFI_MTFTP6_TOKEN                     Token;
-  EFI_MTFTP6_OPTION                    ReqOpt[2];
-  UINT32                               OptCnt;
-  UINT8                                BlksizeBuf[10];
-  UINT8                                WindowsizeBuf[10];
-  EFI_STATUS                           Status;
+  EFI_MTFTP6_PROTOCOL  *Mtftp6;
+  EFI_MTFTP6_TOKEN     Token;
+  EFI_MTFTP6_OPTION    ReqOpt[2];
+  UINT32               OptCnt;
+  UINT8                BlksizeBuf[10];
+  UINT8                WindowsizeBuf[10];
+  EFI_STATUS           Status;
 
   Status                    = EFI_DEVICE_ERROR;
   Mtftp6                    = Private->Mtftp6;
@@ -453,33 +451,33 @@ PxeBcMtftp6ReadDirectory (
   }
 
   if (BlockSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[OptCnt].ValueStr  = BlksizeBuf;
     PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, sizeof (BlksizeBuf));
     OptCnt++;
   }
 
   if (WindowSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
     ReqOpt[OptCnt].ValueStr  = WindowsizeBuf;
     PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, sizeof (WindowsizeBuf));
     OptCnt++;
   }
 
-  Token.Event         = NULL;
-  Token.OverrideData  = NULL;
-  Token.Filename      = Filename;
-  Token.ModeStr       = NULL;
-  Token.OptionCount   = OptCnt;
-  Token.OptionList    = ReqOpt;
-  Token.Context       = Private;
+  Token.Event        = NULL;
+  Token.OverrideData = NULL;
+  Token.Filename     = Filename;
+  Token.ModeStr      = NULL;
+  Token.OptionCount  = OptCnt;
+  Token.OptionList   = ReqOpt;
+  Token.Context      = Private;
 
   if (DontUseBuffer) {
-    Token.BufferSize  = 0;
-    Token.Buffer      = NULL;
+    Token.BufferSize = 0;
+    Token.Buffer     = NULL;
   } else {
-    Token.BufferSize  = *BufferSize;
-    Token.Buffer      = BufferPtr;
+    Token.BufferSize = *BufferSize;
+    Token.Buffer     = BufferPtr;
   }
 
   Token.CheckPacket     = PxeBcMtftp6CheckPacket;
@@ -496,7 +494,6 @@ PxeBcMtftp6ReadDirectory (
 
   return Status;
 }
-
 
 /**
   This is a callback function when packets are received or transmitted in Mtftp driver.
@@ -519,30 +516,30 @@ PxeBcMtftp6ReadDirectory (
 EFI_STATUS
 EFIAPI
 PxeBcMtftp4CheckPacket (
-  IN EFI_MTFTP4_PROTOCOL        *This,
-  IN EFI_MTFTP4_TOKEN           *Token,
-  IN UINT16                     PacketLen,
-  IN EFI_MTFTP4_PACKET          *Packet
+  IN EFI_MTFTP4_PROTOCOL  *This,
+  IN EFI_MTFTP4_TOKEN     *Token,
+  IN UINT16               PacketLen,
+  IN EFI_MTFTP4_PACKET    *Packet
   )
 {
-  PXEBC_PRIVATE_DATA                  *Private;
-  EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL *Callback;
-  EFI_STATUS                          Status;
+  PXEBC_PRIVATE_DATA                   *Private;
+  EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL  *Callback;
+  EFI_STATUS                           Status;
 
-  Private   = (PXEBC_PRIVATE_DATA *) Token->Context;
-  Callback  = Private->PxeBcCallback;
-  Status    = EFI_SUCCESS;
+  Private  = (PXEBC_PRIVATE_DATA *)Token->Context;
+  Callback = Private->PxeBcCallback;
+  Status   = EFI_SUCCESS;
 
   if (Packet->OpCode == EFI_MTFTP4_OPCODE_ERROR) {
     //
     // Store the tftp error message into mode data and set the received flag.
     //
     Private->Mode.TftpErrorReceived   = TRUE;
-    Private->Mode.TftpError.ErrorCode = (UINT8) Packet->Error.ErrorCode;
+    Private->Mode.TftpError.ErrorCode = (UINT8)Packet->Error.ErrorCode;
     AsciiStrnCpyS (
       Private->Mode.TftpError.ErrorString,
       PXE_MTFTP_ERROR_STRING_LENGTH,
-      (CHAR8 *) Packet->Error.ErrorMessage,
+      (CHAR8 *)Packet->Error.ErrorMessage,
       PXE_MTFTP_ERROR_STRING_LENGTH - 1
       );
     Private->Mode.TftpError.ErrorString[PXE_MTFTP_ERROR_STRING_LENGTH - 1] = '\0';
@@ -553,12 +550,12 @@ PxeBcMtftp4CheckPacket (
     // Callback to user if has when received any tftp packet.
     //
     Status = Callback->Callback (
-                        Callback,
-                        Private->Function,
-                        TRUE,
-                        PacketLen,
-                        (EFI_PXE_BASE_CODE_PACKET *) Packet
-                        );
+                         Callback,
+                         Private->Function,
+                         TRUE,
+                         PacketLen,
+                         (EFI_PXE_BASE_CODE_PACKET *)Packet
+                         );
     if (Status != EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE) {
       //
       // User wants to abort current process if not EFI_PXE_BASE_CODE_CALLBACK_STATUS_CONTINUE.
@@ -574,7 +571,6 @@ PxeBcMtftp4CheckPacket (
 
   return Status;
 }
-
 
 /**
   This function is to get size of a file using Tftp.
@@ -594,23 +590,23 @@ PxeBcMtftp4CheckPacket (
 **/
 EFI_STATUS
 PxeBcMtftp4GetFileSize (
-  IN     PXEBC_PRIVATE_DATA         *Private,
-  IN     EFI_MTFTP4_CONFIG_DATA     *Config,
-  IN     UINT8                      *Filename,
-  IN     UINTN                      *BlockSize,
-  IN     UINTN                      *WindowSize,
-  IN OUT UINT64                     *BufferSize
+  IN     PXEBC_PRIVATE_DATA      *Private,
+  IN     EFI_MTFTP4_CONFIG_DATA  *Config,
+  IN     UINT8                   *Filename,
+  IN     UINTN                   *BlockSize,
+  IN     UINTN                   *WindowSize,
+  IN OUT UINT64                  *BufferSize
   )
 {
-  EFI_MTFTP4_PROTOCOL *Mtftp4;
-  EFI_MTFTP4_OPTION   ReqOpt[3];
-  EFI_MTFTP4_PACKET   *Packet;
-  EFI_MTFTP4_OPTION   *Option;
-  UINT32              PktLen;
-  UINT8               OptBuf[PXE_MTFTP_OPTBUF_MAXNUM_INDEX];
-  UINTN               OptBufSize;
-  UINT32              OptCnt;
-  EFI_STATUS          Status;
+  EFI_MTFTP4_PROTOCOL  *Mtftp4;
+  EFI_MTFTP4_OPTION    ReqOpt[3];
+  EFI_MTFTP4_PACKET    *Packet;
+  EFI_MTFTP4_OPTION    *Option;
+  UINT32               PktLen;
+  UINT8                OptBuf[PXE_MTFTP_OPTBUF_MAXNUM_INDEX];
+  UINTN                OptBufSize;
+  UINT32               OptCnt;
+  EFI_STATUS           Status;
 
   *BufferSize               = 0;
   Status                    = EFI_DEVICE_ERROR;
@@ -630,22 +626,22 @@ PxeBcMtftp4GetFileSize (
   //
   // Build the required options for get info.
   //
-  ReqOpt[0].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_TSIZE_INDEX];
+  ReqOpt[0].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_TSIZE_INDEX];
   PxeBcUintnToAscDec (0, OptBuf, OptBufSize);
-  ReqOpt[0].ValueStr  = OptBuf;
+  ReqOpt[0].ValueStr = OptBuf;
 
   if (BlockSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
-    ReqOpt[OptCnt].ValueStr  = (UINT8 *) (ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
-    OptBufSize -= (AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = (UINT8 *)(ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *)ReqOpt[OptCnt-1].ValueStr) + 1);
+    OptBufSize              -= (AsciiStrLen ((CHAR8 *)ReqOpt[OptCnt-1].ValueStr) + 1);
     PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, OptBufSize);
     OptCnt++;
   }
 
   if (WindowSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
-    ReqOpt[OptCnt].ValueStr  = (UINT8 *) (ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
-    OptBufSize -= (AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = (UINT8 *)(ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *)ReqOpt[OptCnt-1].ValueStr) + 1);
+    OptBufSize              -= (AsciiStrLen ((CHAR8 *)ReqOpt[OptCnt-1].ValueStr) + 1);
     PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, OptBufSize);
     OptCnt++;
   }
@@ -655,7 +651,7 @@ PxeBcMtftp4GetFileSize (
                      NULL,
                      Filename,
                      NULL,
-                     (UINT8) OptCnt,
+                     (UINT8)OptCnt,
                      ReqOpt,
                      &PktLen,
                      &Packet
@@ -666,15 +662,16 @@ PxeBcMtftp4GetFileSize (
       // Store the tftp error message into mode data and set the received flag.
       //
       Private->Mode.TftpErrorReceived   = TRUE;
-      Private->Mode.TftpError.ErrorCode = (UINT8) Packet->Error.ErrorCode;
+      Private->Mode.TftpError.ErrorCode = (UINT8)Packet->Error.ErrorCode;
       AsciiStrnCpyS (
         Private->Mode.TftpError.ErrorString,
         PXE_MTFTP_ERROR_STRING_LENGTH,
-        (CHAR8 *) Packet->Error.ErrorMessage,
+        (CHAR8 *)Packet->Error.ErrorMessage,
         PXE_MTFTP_ERROR_STRING_LENGTH - 1
         );
       Private->Mode.TftpError.ErrorString[PXE_MTFTP_ERROR_STRING_LENGTH - 1] = '\0';
     }
+
     goto ON_ERROR;
   }
 
@@ -686,7 +683,7 @@ PxeBcMtftp4GetFileSize (
                      Mtftp4,
                      PktLen,
                      Packet,
-                     (UINT32 *) &OptCnt,
+                     (UINT32 *)&OptCnt,
                      &Option
                      );
   if (EFI_ERROR (Status)) {
@@ -698,23 +695,25 @@ PxeBcMtftp4GetFileSize (
   //
   Status = EFI_NOT_FOUND;
   while (OptCnt != 0) {
-    if (AsciiStrnCmp ((CHAR8 *) Option[OptCnt - 1].OptionStr, "tsize", 5) == 0) {
-      *BufferSize = AsciiStrDecimalToUint64 ((CHAR8 *) (Option[OptCnt - 1].ValueStr));
+    if (AsciiStrnCmp ((CHAR8 *)Option[OptCnt - 1].OptionStr, "tsize", 5) == 0) {
+      *BufferSize = AsciiStrDecimalToUint64 ((CHAR8 *)(Option[OptCnt - 1].ValueStr));
       Status      = EFI_SUCCESS;
     }
+
     OptCnt--;
   }
+
   FreePool (Option);
 
 ON_ERROR:
   if (Packet != NULL) {
     FreePool (Packet);
   }
+
   Mtftp4->Configure (Mtftp4, NULL);
 
   return Status;
 }
-
 
 /**
   This function is to read the data of a file using Tftp.
@@ -735,23 +734,23 @@ ON_ERROR:
 **/
 EFI_STATUS
 PxeBcMtftp4ReadFile (
-  IN     PXEBC_PRIVATE_DATA         *Private,
-  IN     EFI_MTFTP4_CONFIG_DATA     *Config,
-  IN     UINT8                      *Filename,
-  IN     UINTN                      *BlockSize,
-  IN     UINTN                      *WindowSize,
-  IN     UINT8                      *BufferPtr,
-  IN OUT UINT64                     *BufferSize,
-  IN     BOOLEAN                    DontUseBuffer
+  IN     PXEBC_PRIVATE_DATA      *Private,
+  IN     EFI_MTFTP4_CONFIG_DATA  *Config,
+  IN     UINT8                   *Filename,
+  IN     UINTN                   *BlockSize,
+  IN     UINTN                   *WindowSize,
+  IN     UINT8                   *BufferPtr,
+  IN OUT UINT64                  *BufferSize,
+  IN     BOOLEAN                 DontUseBuffer
   )
 {
-  EFI_MTFTP4_PROTOCOL *Mtftp4;
-  EFI_MTFTP4_TOKEN    Token;
-  EFI_MTFTP4_OPTION   ReqOpt[2];
-  UINT32              OptCnt;
-  UINT8               BlksizeBuf[10];
-  UINT8               WindowsizeBuf[10];
-  EFI_STATUS          Status;
+  EFI_MTFTP4_PROTOCOL  *Mtftp4;
+  EFI_MTFTP4_TOKEN     Token;
+  EFI_MTFTP4_OPTION    ReqOpt[2];
+  UINT32               OptCnt;
+  UINT8                BlksizeBuf[10];
+  UINT8                WindowsizeBuf[10];
+  EFI_STATUS           Status;
 
   Status                    = EFI_DEVICE_ERROR;
   Mtftp4                    = Private->Mtftp4;
@@ -764,33 +763,33 @@ PxeBcMtftp4ReadFile (
   }
 
   if (BlockSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[OptCnt].ValueStr  = BlksizeBuf;
     PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, sizeof (BlksizeBuf));
     OptCnt++;
   }
 
   if (WindowSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
     ReqOpt[OptCnt].ValueStr  = WindowsizeBuf;
     PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, sizeof (WindowsizeBuf));
     OptCnt++;
   }
 
-  Token.Event         = NULL;
-  Token.OverrideData  = NULL;
-  Token.Filename      = Filename;
-  Token.ModeStr       = NULL;
-  Token.OptionCount   = OptCnt;
-  Token.OptionList    = ReqOpt;
-  Token.Context       = Private;
+  Token.Event        = NULL;
+  Token.OverrideData = NULL;
+  Token.Filename     = Filename;
+  Token.ModeStr      = NULL;
+  Token.OptionCount  = OptCnt;
+  Token.OptionList   = ReqOpt;
+  Token.Context      = Private;
 
   if (DontUseBuffer) {
-    Token.BufferSize  = 0;
-    Token.Buffer      = NULL;
+    Token.BufferSize = 0;
+    Token.Buffer     = NULL;
   } else {
-    Token.BufferSize  = *BufferSize;
-    Token.Buffer      = BufferPtr;
+    Token.BufferSize = *BufferSize;
+    Token.Buffer     = BufferPtr;
   }
 
   Token.CheckPacket     = PxeBcMtftp4CheckPacket;
@@ -807,7 +806,6 @@ PxeBcMtftp4ReadFile (
 
   return Status;
 }
-
 
 /**
   This function is to write the data of a file using Tftp.
@@ -827,34 +825,34 @@ PxeBcMtftp4ReadFile (
 **/
 EFI_STATUS
 PxeBcMtftp4WriteFile (
-  IN     PXEBC_PRIVATE_DATA         *Private,
-  IN     EFI_MTFTP4_CONFIG_DATA     *Config,
-  IN     UINT8                      *Filename,
-  IN     BOOLEAN                    Overwrite,
-  IN     UINTN                      *BlockSize,
-  IN     UINT8                      *BufferPtr,
-  IN OUT UINT64                     *BufferSize
+  IN     PXEBC_PRIVATE_DATA      *Private,
+  IN     EFI_MTFTP4_CONFIG_DATA  *Config,
+  IN     UINT8                   *Filename,
+  IN     BOOLEAN                 Overwrite,
+  IN     UINTN                   *BlockSize,
+  IN     UINT8                   *BufferPtr,
+  IN OUT UINT64                  *BufferSize
   )
 {
-  EFI_MTFTP4_PROTOCOL *Mtftp4;
-  EFI_MTFTP4_TOKEN    Token;
-  EFI_MTFTP4_OPTION   ReqOpt[1];
-  UINT32              OptCnt;
-  UINT8               OptBuf[128];
-  EFI_STATUS          Status;
+  EFI_MTFTP4_PROTOCOL  *Mtftp4;
+  EFI_MTFTP4_TOKEN     Token;
+  EFI_MTFTP4_OPTION    ReqOpt[1];
+  UINT32               OptCnt;
+  UINT8                OptBuf[128];
+  EFI_STATUS           Status;
 
   Status                    = EFI_DEVICE_ERROR;
   Mtftp4                    = Private->Mtftp4;
   OptCnt                    = 0;
   Config->InitialServerPort = PXEBC_BS_DOWNLOAD_PORT;
 
-  Status  = Mtftp4->Configure (Mtftp4, Config);
+  Status = Mtftp4->Configure (Mtftp4, Config);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   if (BlockSize != NULL) {
-    ReqOpt[0].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[0].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[0].ValueStr  = OptBuf;
     PxeBcUintnToAscDec (*BlockSize, ReqOpt[0].ValueStr, PXE_MTFTP_OPTBUF_MAXNUM_INDEX);
     OptCnt++;
@@ -883,7 +881,6 @@ PxeBcMtftp4WriteFile (
   return Status;
 }
 
-
 /**
   This function is to get data (file) from a directory using Tftp.
 
@@ -903,23 +900,23 @@ PxeBcMtftp4WriteFile (
 **/
 EFI_STATUS
 PxeBcMtftp4ReadDirectory (
-  IN     PXEBC_PRIVATE_DATA            *Private,
-  IN     EFI_MTFTP4_CONFIG_DATA        *Config,
-  IN     UINT8                         *Filename,
-  IN     UINTN                         *BlockSize,
-  IN     UINTN                         *WindowSize,
-  IN     UINT8                         *BufferPtr,
-  IN OUT UINT64                        *BufferSize,
-  IN     BOOLEAN                       DontUseBuffer
+  IN     PXEBC_PRIVATE_DATA      *Private,
+  IN     EFI_MTFTP4_CONFIG_DATA  *Config,
+  IN     UINT8                   *Filename,
+  IN     UINTN                   *BlockSize,
+  IN     UINTN                   *WindowSize,
+  IN     UINT8                   *BufferPtr,
+  IN OUT UINT64                  *BufferSize,
+  IN     BOOLEAN                 DontUseBuffer
   )
 {
-  EFI_MTFTP4_PROTOCOL *Mtftp4;
-  EFI_MTFTP4_TOKEN    Token;
-  EFI_MTFTP4_OPTION   ReqOpt[2];
-  UINT32              OptCnt;
-  UINT8               BlksizeBuf[10];
-  UINT8               WindowsizeBuf[10];
-  EFI_STATUS          Status;
+  EFI_MTFTP4_PROTOCOL  *Mtftp4;
+  EFI_MTFTP4_TOKEN     Token;
+  EFI_MTFTP4_OPTION    ReqOpt[2];
+  UINT32               OptCnt;
+  UINT8                BlksizeBuf[10];
+  UINT8                WindowsizeBuf[10];
+  EFI_STATUS           Status;
 
   Status                    = EFI_DEVICE_ERROR;
   Mtftp4                    = Private->Mtftp4;
@@ -932,33 +929,33 @@ PxeBcMtftp4ReadDirectory (
   }
 
   if (BlockSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
     ReqOpt[OptCnt].ValueStr  = BlksizeBuf;
     PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, sizeof (BlksizeBuf));
     OptCnt++;
   }
 
   if (WindowSize != NULL) {
-    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].OptionStr = (UINT8 *)mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
     ReqOpt[OptCnt].ValueStr  = WindowsizeBuf;
     PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, sizeof (WindowsizeBuf));
     OptCnt++;
   }
 
-  Token.Event         = NULL;
-  Token.OverrideData  = NULL;
-  Token.Filename      = Filename;
-  Token.ModeStr       = NULL;
-  Token.OptionCount   = OptCnt;
-  Token.OptionList    = ReqOpt;
-  Token.Context       = Private;
+  Token.Event        = NULL;
+  Token.OverrideData = NULL;
+  Token.Filename     = Filename;
+  Token.ModeStr      = NULL;
+  Token.OptionCount  = OptCnt;
+  Token.OptionList   = ReqOpt;
+  Token.Context      = Private;
 
   if (DontUseBuffer) {
-    Token.BufferSize  = 0;
-    Token.Buffer      = NULL;
+    Token.BufferSize = 0;
+    Token.Buffer     = NULL;
   } else {
-    Token.BufferSize  = *BufferSize;
-    Token.Buffer      = BufferPtr;
+    Token.BufferSize = *BufferSize;
+    Token.Buffer     = BufferPtr;
   }
 
   Token.CheckPacket     = PxeBcMtftp4CheckPacket;
@@ -975,7 +972,6 @@ PxeBcMtftp4ReadDirectory (
 
   return Status;
 }
-
 
 /**
   This function is wrapper to get the file size using TFTP.
@@ -995,18 +991,18 @@ PxeBcMtftp4ReadDirectory (
 **/
 EFI_STATUS
 PxeBcTftpGetFileSize (
-  IN     PXEBC_PRIVATE_DATA         *Private,
-  IN     VOID                       *Config,
-  IN     UINT8                      *Filename,
-  IN     UINTN                      *BlockSize,
-  IN     UINTN                      *WindowSize,
-  IN OUT UINT64                     *BufferSize
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN     VOID                *Config,
+  IN     UINT8               *Filename,
+  IN     UINTN               *BlockSize,
+  IN     UINTN               *WindowSize,
+  IN OUT UINT64              *BufferSize
   )
 {
   if (Private->PxeBc.Mode->UsingIpv6) {
     return PxeBcMtftp6GetFileSize (
              Private,
-             (EFI_MTFTP6_CONFIG_DATA *) Config,
+             (EFI_MTFTP6_CONFIG_DATA *)Config,
              Filename,
              BlockSize,
              WindowSize,
@@ -1015,7 +1011,7 @@ PxeBcTftpGetFileSize (
   } else {
     return PxeBcMtftp4GetFileSize (
              Private,
-             (EFI_MTFTP4_CONFIG_DATA *) Config,
+             (EFI_MTFTP4_CONFIG_DATA *)Config,
              Filename,
              BlockSize,
              WindowSize,
@@ -1023,7 +1019,6 @@ PxeBcTftpGetFileSize (
              );
   }
 }
-
 
 /**
   This function is a wrapper to get file using TFTP.
@@ -1044,20 +1039,20 @@ PxeBcTftpGetFileSize (
 **/
 EFI_STATUS
 PxeBcTftpReadFile (
-  IN     PXEBC_PRIVATE_DATA         *Private,
-  IN     VOID                       *Config,
-  IN     UINT8                      *Filename,
-  IN     UINTN                      *BlockSize,
-  IN     UINTN                      *WindowSize,
-  IN     UINT8                      *BufferPtr,
-  IN OUT UINT64                     *BufferSize,
-  IN     BOOLEAN                    DontUseBuffer
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN     VOID                *Config,
+  IN     UINT8               *Filename,
+  IN     UINTN               *BlockSize,
+  IN     UINTN               *WindowSize,
+  IN     UINT8               *BufferPtr,
+  IN OUT UINT64              *BufferSize,
+  IN     BOOLEAN             DontUseBuffer
   )
 {
   if (Private->PxeBc.Mode->UsingIpv6) {
     return PxeBcMtftp6ReadFile (
              Private,
-             (EFI_MTFTP6_CONFIG_DATA *) Config,
+             (EFI_MTFTP6_CONFIG_DATA *)Config,
              Filename,
              BlockSize,
              WindowSize,
@@ -1068,7 +1063,7 @@ PxeBcTftpReadFile (
   } else {
     return PxeBcMtftp4ReadFile (
              Private,
-             (EFI_MTFTP4_CONFIG_DATA *) Config,
+             (EFI_MTFTP4_CONFIG_DATA *)Config,
              Filename,
              BlockSize,
              WindowSize,
@@ -1078,7 +1073,6 @@ PxeBcTftpReadFile (
              );
   }
 }
-
 
 /**
   This function is a wrapper to write file using TFTP.
@@ -1098,19 +1092,19 @@ PxeBcTftpReadFile (
 **/
 EFI_STATUS
 PxeBcTftpWriteFile (
-  IN     PXEBC_PRIVATE_DATA         *Private,
-  IN     VOID                       *Config,
-  IN     UINT8                      *Filename,
-  IN     BOOLEAN                    Overwrite,
-  IN     UINTN                      *BlockSize,
-  IN     UINT8                      *BufferPtr,
-  IN OUT UINT64                     *BufferSize
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN     VOID                *Config,
+  IN     UINT8               *Filename,
+  IN     BOOLEAN             Overwrite,
+  IN     UINTN               *BlockSize,
+  IN     UINT8               *BufferPtr,
+  IN OUT UINT64              *BufferSize
   )
 {
   if (Private->PxeBc.Mode->UsingIpv6) {
     return PxeBcMtftp6WriteFile (
              Private,
-             (EFI_MTFTP6_CONFIG_DATA *) Config,
+             (EFI_MTFTP6_CONFIG_DATA *)Config,
              Filename,
              Overwrite,
              BlockSize,
@@ -1120,7 +1114,7 @@ PxeBcTftpWriteFile (
   } else {
     return PxeBcMtftp4WriteFile (
              Private,
-             (EFI_MTFTP4_CONFIG_DATA *) Config,
+             (EFI_MTFTP4_CONFIG_DATA *)Config,
              Filename,
              Overwrite,
              BlockSize,
@@ -1129,7 +1123,6 @@ PxeBcTftpWriteFile (
              );
   }
 }
-
 
 /**
   This function is a wrapper to get the data (file) from a directory using TFTP.
@@ -1150,20 +1143,20 @@ PxeBcTftpWriteFile (
 **/
 EFI_STATUS
 PxeBcTftpReadDirectory (
-  IN     PXEBC_PRIVATE_DATA            *Private,
-  IN     VOID                          *Config,
-  IN     UINT8                         *Filename,
-  IN     UINTN                         *BlockSize,
-  IN     UINTN                         *WindowSize,
-  IN     UINT8                         *BufferPtr,
-  IN OUT UINT64                        *BufferSize,
-  IN     BOOLEAN                       DontUseBuffer
+  IN     PXEBC_PRIVATE_DATA  *Private,
+  IN     VOID                *Config,
+  IN     UINT8               *Filename,
+  IN     UINTN               *BlockSize,
+  IN     UINTN               *WindowSize,
+  IN     UINT8               *BufferPtr,
+  IN OUT UINT64              *BufferSize,
+  IN     BOOLEAN             DontUseBuffer
   )
 {
   if (Private->PxeBc.Mode->UsingIpv6) {
     return PxeBcMtftp6ReadDirectory (
              Private,
-             (EFI_MTFTP6_CONFIG_DATA *) Config,
+             (EFI_MTFTP6_CONFIG_DATA *)Config,
              Filename,
              BlockSize,
              WindowSize,
@@ -1174,7 +1167,7 @@ PxeBcTftpReadDirectory (
   } else {
     return PxeBcMtftp4ReadDirectory (
              Private,
-             (EFI_MTFTP4_CONFIG_DATA *) Config,
+             (EFI_MTFTP4_CONFIG_DATA *)Config,
              Filename,
              BlockSize,
              WindowSize,
@@ -1184,4 +1177,3 @@ PxeBcTftpReadDirectory (
              );
   }
 }
-

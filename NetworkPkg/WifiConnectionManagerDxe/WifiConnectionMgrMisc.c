@@ -19,8 +19,8 @@
 VOID
 EFIAPI
 WifiMgrInternalEmptyFunction (
-  IN  EFI_EVENT    Event,
-  IN  VOID         *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
   return;
@@ -41,7 +41,7 @@ WifiMgrMacAddrToStr (
   OUT CHAR16                 *Str
   )
 {
-  if (Mac == NULL || Str == NULL) {
+  if ((Mac == NULL) || (Str == NULL)) {
     return;
   }
 
@@ -49,8 +49,12 @@ WifiMgrMacAddrToStr (
     Str,
     StrSize,
     L"%02X:%02X:%02X:%02X:%02X:%02X",
-    Mac->Addr[0], Mac->Addr[1], Mac->Addr[2],
-    Mac->Addr[3], Mac->Addr[4], Mac->Addr[5]
+    Mac->Addr[0],
+    Mac->Addr[1],
+    Mac->Addr[2],
+    Mac->Addr[3],
+    Mac->Addr[4],
+    Mac->Addr[5]
     );
 }
 
@@ -68,15 +72,14 @@ WifiMgrMacAddrToStr (
 **/
 EFI_STATUS
 WifiMgrReadFileToBuffer (
-  IN   WIFI_MGR_FILE_CONTEXT          *FileContext,
-  OUT  VOID                           **DataAddr,
-  OUT  UINTN                          *DataSize
+  IN   WIFI_MGR_FILE_CONTEXT  *FileContext,
+  OUT  VOID                   **DataAddr,
+  OUT  UINTN                  *DataSize
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
-  if (FileContext != NULL && FileContext->FHandle != NULL) {
-
+  if ((FileContext != NULL) && (FileContext->FHandle != NULL)) {
     Status = ReadFileContent (
                FileContext->FHandle,
                DataAddr,
@@ -87,6 +90,7 @@ WifiMgrReadFileToBuffer (
     if (FileContext->FHandle != NULL) {
       FileContext->FHandle->Close (FileContext->FHandle);
     }
+
     FileContext->FHandle = NULL;
     return Status;
   }
@@ -105,20 +109,24 @@ WifiMgrReadFileToBuffer (
 **/
 WIFI_MGR_DEVICE_DATA *
 WifiMgrGetNicByIndex (
-  IN WIFI_MGR_PRIVATE_DATA   *Private,
-  IN UINT32                  NicIndex
+  IN WIFI_MGR_PRIVATE_DATA  *Private,
+  IN UINT32                 NicIndex
   )
 {
-  LIST_ENTRY             *Entry;
-  WIFI_MGR_DEVICE_DATA   *Nic;
+  LIST_ENTRY            *Entry;
+  WIFI_MGR_DEVICE_DATA  *Nic;
 
   if (Private == NULL) {
     return NULL;
   }
 
   NET_LIST_FOR_EACH (Entry, &Private->NicList) {
-    Nic = NET_LIST_USER_STRUCT_S (Entry, WIFI_MGR_DEVICE_DATA,
-            Link, WIFI_MGR_DEVICE_DATA_SIGNATURE);
+    Nic = NET_LIST_USER_STRUCT_S (
+            Entry,
+            WIFI_MGR_DEVICE_DATA,
+            Link,
+            WIFI_MGR_DEVICE_DATA_SIGNATURE
+            );
     if (Nic->NicIndex == NicIndex) {
       return Nic;
     }
@@ -139,22 +147,26 @@ WifiMgrGetNicByIndex (
 **/
 WIFI_MGR_NETWORK_PROFILE *
 WifiMgrGetProfileByUnicodeSSId (
-  IN  CHAR16                         *SSId,
-  IN  UINT8                          SecurityType,
-  IN  LIST_ENTRY                     *ProfileList
+  IN  CHAR16      *SSId,
+  IN  UINT8       SecurityType,
+  IN  LIST_ENTRY  *ProfileList
   )
 {
-  LIST_ENTRY                         *Entry;
-  WIFI_MGR_NETWORK_PROFILE           *Profile;
+  LIST_ENTRY                *Entry;
+  WIFI_MGR_NETWORK_PROFILE  *Profile;
 
-  if (SSId == NULL || ProfileList == NULL) {
+  if ((SSId == NULL) || (ProfileList == NULL)) {
     return NULL;
   }
 
   NET_LIST_FOR_EACH (Entry, ProfileList) {
-    Profile = NET_LIST_USER_STRUCT_S (Entry, WIFI_MGR_NETWORK_PROFILE,
-                Link, WIFI_MGR_PROFILE_SIGNATURE);
-    if (StrCmp (SSId, Profile->SSId) == 0 && SecurityType == Profile->SecurityType) {
+    Profile = NET_LIST_USER_STRUCT_S (
+                Entry,
+                WIFI_MGR_NETWORK_PROFILE,
+                Link,
+                WIFI_MGR_PROFILE_SIGNATURE
+                );
+    if ((StrCmp (SSId, Profile->SSId) == 0) && (SecurityType == Profile->SecurityType)) {
       return Profile;
     }
   }
@@ -174,16 +186,17 @@ WifiMgrGetProfileByUnicodeSSId (
 **/
 WIFI_MGR_NETWORK_PROFILE *
 WifiMgrGetProfileByAsciiSSId (
-  IN  CHAR8                      *SSId,
-  IN  UINT8                      SecurityType,
-  IN  LIST_ENTRY                 *ProfileList
+  IN  CHAR8       *SSId,
+  IN  UINT8       SecurityType,
+  IN  LIST_ENTRY  *ProfileList
   )
 {
-  CHAR16   SSIdUniCode[SSID_STORAGE_SIZE];
+  CHAR16  SSIdUniCode[SSID_STORAGE_SIZE];
 
   if (SSId == NULL) {
     return NULL;
   }
+
   if (AsciiStrToUnicodeStrS (SSId, SSIdUniCode, SSID_STORAGE_SIZE) != RETURN_SUCCESS) {
     return NULL;
   }
@@ -202,19 +215,24 @@ WifiMgrGetProfileByAsciiSSId (
 **/
 WIFI_MGR_NETWORK_PROFILE *
 WifiMgrGetProfileByProfileIndex (
-  IN  UINT32                         ProfileIndex,
-  IN  LIST_ENTRY                     *ProfileList
+  IN  UINT32      ProfileIndex,
+  IN  LIST_ENTRY  *ProfileList
   )
 {
-  WIFI_MGR_NETWORK_PROFILE           *Profile;
-  LIST_ENTRY                         *Entry;
+  WIFI_MGR_NETWORK_PROFILE  *Profile;
+  LIST_ENTRY                *Entry;
 
   if (ProfileList == NULL) {
     return NULL;
   }
+
   NET_LIST_FOR_EACH (Entry, ProfileList) {
-    Profile = NET_LIST_USER_STRUCT_S (Entry, WIFI_MGR_NETWORK_PROFILE,
-                Link, WIFI_MGR_PROFILE_SIGNATURE);
+    Profile = NET_LIST_USER_STRUCT_S (
+                Entry,
+                WIFI_MGR_NETWORK_PROFILE,
+                Link,
+                WIFI_MGR_PROFILE_SIGNATURE
+                );
     if (Profile->ProfileIndex == ProfileIndex) {
       return Profile;
     }
@@ -234,19 +252,20 @@ WifiMgrGetProfileByProfileIndex (
 **/
 BOOLEAN
 WifiMgrSupportAKMSuite (
-  IN  UINT16                               SupportedAKMSuiteCount,
-  IN  UINT32                               *SupportedAKMSuiteList,
-  IN  UINT32                               *AKMSuite
+  IN  UINT16  SupportedAKMSuiteCount,
+  IN  UINT32  *SupportedAKMSuiteList,
+  IN  UINT32  *AKMSuite
   )
 {
-  UINT16    Index;
+  UINT16  Index;
 
-  if (AKMSuite == NULL || SupportedAKMSuiteList == NULL ||
-    SupportedAKMSuiteCount == 0) {
+  if ((AKMSuite == NULL) || (SupportedAKMSuiteList == NULL) ||
+      (SupportedAKMSuiteCount == 0))
+  {
     return FALSE;
   }
 
-  for (Index = 0; Index < SupportedAKMSuiteCount; Index ++) {
+  for (Index = 0; Index < SupportedAKMSuiteCount; Index++) {
     if (SupportedAKMSuiteList[Index] == *AKMSuite) {
       return TRUE;
     }
@@ -267,19 +286,20 @@ WifiMgrSupportAKMSuite (
 **/
 BOOLEAN
 WifiMgrSupportCipherSuite (
-  IN  UINT16                                  SupportedCipherSuiteCount,
-  IN  UINT32                                  *SupportedCipherSuiteList,
-  IN  UINT32                                  *CipherSuite
+  IN  UINT16  SupportedCipherSuiteCount,
+  IN  UINT32  *SupportedCipherSuiteList,
+  IN  UINT32  *CipherSuite
   )
 {
   UINT16  Index;
 
-  if (CipherSuite == NULL || SupportedCipherSuiteCount == 0 ||
-    SupportedCipherSuiteList == NULL) {
+  if ((CipherSuite == NULL) || (SupportedCipherSuiteCount == 0) ||
+      (SupportedCipherSuiteList == NULL))
+  {
     return FALSE;
   }
 
-  for (Index = 0; Index < SupportedCipherSuiteCount; Index ++) {
+  for (Index = 0; Index < SupportedCipherSuiteCount; Index++) {
     if (SupportedCipherSuiteList[Index] == *CipherSuite) {
       return TRUE;
     }
@@ -309,23 +329,23 @@ WifiMgrSupportCipherSuite (
 **/
 EFI_STATUS
 WifiMgrCheckRSN (
-  IN    EFI_80211_AKM_SUITE_SELECTOR       *AKMList,
-  IN    EFI_80211_CIPHER_SUITE_SELECTOR    *CipherList,
-  IN    WIFI_MGR_DEVICE_DATA               *Nic,
-  OUT   UINT8                              *SecurityType,
-  OUT   BOOLEAN                            *AKMSuiteSupported,
-  OUT   BOOLEAN                            *CipherSuiteSupported
+  IN    EFI_80211_AKM_SUITE_SELECTOR     *AKMList,
+  IN    EFI_80211_CIPHER_SUITE_SELECTOR  *CipherList,
+  IN    WIFI_MGR_DEVICE_DATA             *Nic,
+  OUT   UINT8                            *SecurityType,
+  OUT   BOOLEAN                          *AKMSuiteSupported,
+  OUT   BOOLEAN                          *CipherSuiteSupported
   )
 {
-  EFI_80211_AKM_SUITE_SELECTOR             *SupportedAKMSuites;
-  EFI_80211_CIPHER_SUITE_SELECTOR          *SupportedSwCipherSuites;
-  EFI_80211_CIPHER_SUITE_SELECTOR          *SupportedHwCipherSuites;
-  EFI_80211_SUITE_SELECTOR                 *AKMSuite;
-  EFI_80211_SUITE_SELECTOR                 *CipherSuite;
-  UINT16                                   AKMIndex;
-  UINT16                                   CipherIndex;
+  EFI_80211_AKM_SUITE_SELECTOR     *SupportedAKMSuites;
+  EFI_80211_CIPHER_SUITE_SELECTOR  *SupportedSwCipherSuites;
+  EFI_80211_CIPHER_SUITE_SELECTOR  *SupportedHwCipherSuites;
+  EFI_80211_SUITE_SELECTOR         *AKMSuite;
+  EFI_80211_SUITE_SELECTOR         *CipherSuite;
+  UINT16                           AKMIndex;
+  UINT16                           CipherIndex;
 
-  if (Nic == NULL || AKMList == NULL || CipherList == NULL|| SecurityType == NULL) {
+  if ((Nic == NULL) || (AKMList == NULL) || (CipherList == NULL) || (SecurityType == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -334,7 +354,7 @@ WifiMgrCheckRSN (
   SupportedHwCipherSuites = Nic->SupportedSuites.SupportedHwCipherSuites;
 
   *SecurityType = SECURITY_TYPE_UNKNOWN;
-  if (AKMSuiteSupported != NULL && CipherSuiteSupported != NULL) {
+  if ((AKMSuiteSupported != NULL) && (CipherSuiteSupported != NULL)) {
     *AKMSuiteSupported    = FALSE;
     *CipherSuiteSupported = FALSE;
   }
@@ -342,7 +362,7 @@ WifiMgrCheckRSN (
   if (AKMList->AKMSuiteCount == 0) {
     if (CipherList->CipherSuiteCount == 0) {
       *SecurityType = SECURITY_TYPE_NONE;
-      if (AKMSuiteSupported != NULL && CipherSuiteSupported != NULL) {
+      if ((AKMSuiteSupported != NULL) && (CipherSuiteSupported != NULL)) {
         *AKMSuiteSupported    = TRUE;
         *CipherSuiteSupported = TRUE;
       }
@@ -351,48 +371,54 @@ WifiMgrCheckRSN (
     return EFI_SUCCESS;
   }
 
-  for (AKMIndex = 0; AKMIndex < AKMList->AKMSuiteCount; AKMIndex ++) {
-
+  for (AKMIndex = 0; AKMIndex < AKMList->AKMSuiteCount; AKMIndex++) {
     AKMSuite = AKMList->AKMSuiteList + AKMIndex;
-    if (WifiMgrSupportAKMSuite(SupportedAKMSuites->AKMSuiteCount,
-      (UINT32*) SupportedAKMSuites->AKMSuiteList, (UINT32*) AKMSuite)) {
-
-      if (AKMSuiteSupported != NULL && CipherSuiteSupported != NULL) {
+    if (WifiMgrSupportAKMSuite (
+          SupportedAKMSuites->AKMSuiteCount,
+          (UINT32 *)SupportedAKMSuites->AKMSuiteList,
+          (UINT32 *)AKMSuite
+          ))
+    {
+      if ((AKMSuiteSupported != NULL) && (CipherSuiteSupported != NULL)) {
         *AKMSuiteSupported = TRUE;
       }
-      for (CipherIndex = 0; CipherIndex < CipherList->CipherSuiteCount; CipherIndex ++) {
 
+      for (CipherIndex = 0; CipherIndex < CipherList->CipherSuiteCount; CipherIndex++) {
         CipherSuite = CipherList->CipherSuiteList + CipherIndex;
 
         if (SupportedSwCipherSuites != NULL) {
-
-          if (WifiMgrSupportCipherSuite(SupportedSwCipherSuites->CipherSuiteCount,
-            (UINT32*) SupportedSwCipherSuites->CipherSuiteList, (UINT32*) CipherSuite)) {
-
-            *SecurityType = WifiMgrGetSecurityType ((UINT32*) AKMSuite, (UINT32*) CipherSuite);
+          if (WifiMgrSupportCipherSuite (
+                SupportedSwCipherSuites->CipherSuiteCount,
+                (UINT32 *)SupportedSwCipherSuites->CipherSuiteList,
+                (UINT32 *)CipherSuite
+                ))
+          {
+            *SecurityType = WifiMgrGetSecurityType ((UINT32 *)AKMSuite, (UINT32 *)CipherSuite);
 
             if (*SecurityType != SECURITY_TYPE_UNKNOWN) {
-
-              if (AKMSuiteSupported != NULL && CipherSuiteSupported != NULL) {
+              if ((AKMSuiteSupported != NULL) && (CipherSuiteSupported != NULL)) {
                 *CipherSuiteSupported = TRUE;
               }
+
               return EFI_SUCCESS;
             }
           }
         }
 
         if (SupportedHwCipherSuites != NULL) {
-
-          if (WifiMgrSupportCipherSuite(SupportedHwCipherSuites->CipherSuiteCount,
-            (UINT32*) SupportedHwCipherSuites->CipherSuiteList, (UINT32*) CipherSuite)) {
-
-            *SecurityType = WifiMgrGetSecurityType ((UINT32*) AKMSuite, (UINT32*) CipherSuite);
+          if (WifiMgrSupportCipherSuite (
+                SupportedHwCipherSuites->CipherSuiteCount,
+                (UINT32 *)SupportedHwCipherSuites->CipherSuiteList,
+                (UINT32 *)CipherSuite
+                ))
+          {
+            *SecurityType = WifiMgrGetSecurityType ((UINT32 *)AKMSuite, (UINT32 *)CipherSuite);
 
             if (*SecurityType != SECURITY_TYPE_UNKNOWN) {
-
-              if (AKMSuiteSupported != NULL && CipherSuiteSupported != NULL) {
+              if ((AKMSuiteSupported != NULL) && (CipherSuiteSupported != NULL)) {
                 *CipherSuiteSupported = TRUE;
               }
+
               return EFI_SUCCESS;
             }
           }
@@ -401,8 +427,10 @@ WifiMgrCheckRSN (
     }
   }
 
-  *SecurityType = WifiMgrGetSecurityType ((UINT32*) AKMList->AKMSuiteList,
-                    (UINT32*) CipherList->CipherSuiteList);
+  *SecurityType = WifiMgrGetSecurityType (
+                    (UINT32 *)AKMList->AKMSuiteList,
+                    (UINT32 *)CipherList->CipherSuiteList
+                    );
 
   return EFI_SUCCESS;
 }
@@ -418,60 +446,56 @@ WifiMgrCheckRSN (
 **/
 UINT8
 WifiMgrGetSecurityType (
-  IN  UINT32    *AKMSuite,
-  IN  UINT32    *CipherSuite
+  IN  UINT32  *AKMSuite,
+  IN  UINT32  *CipherSuite
   )
 {
   if (CipherSuite == NULL) {
-
     if (AKMSuite == NULL) {
       return SECURITY_TYPE_NONE;
     } else {
       return SECURITY_TYPE_UNKNOWN;
     }
   } else if (*CipherSuite == IEEE_80211_PAIRWISE_CIPHER_SUITE_USE_GROUP) {
-
     if (AKMSuite == NULL) {
       return SECURITY_TYPE_NONE;
     } else {
       return SECURITY_TYPE_UNKNOWN;
     }
-  } else if (*CipherSuite == IEEE_80211_PAIRWISE_CIPHER_SUITE_WEP40 ||
-    *CipherSuite == IEEE_80211_PAIRWISE_CIPHER_SUITE_WEP104) {
-
+  } else if ((*CipherSuite == IEEE_80211_PAIRWISE_CIPHER_SUITE_WEP40) ||
+             (*CipherSuite == IEEE_80211_PAIRWISE_CIPHER_SUITE_WEP104))
+  {
     return SECURITY_TYPE_WEP;
   } else if (*CipherSuite == IEEE_80211_PAIRWISE_CIPHER_SUITE_CCMP) {
-
     if (AKMSuite == NULL) {
       return SECURITY_TYPE_UNKNOWN;
     }
 
-    if (*AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA ||
-      *AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA_SHA256) {
-
+    if ((*AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA) ||
+        (*AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA_SHA256))
+    {
       return SECURITY_TYPE_WPA2_ENTERPRISE;
-    } else if (*AKMSuite == IEEE_80211_AKM_SUITE_PSK ||
-        *AKMSuite == IEEE_80211_AKM_SUITE_PSK_SHA256){
-
+    } else if ((*AKMSuite == IEEE_80211_AKM_SUITE_PSK) ||
+               (*AKMSuite == IEEE_80211_AKM_SUITE_PSK_SHA256))
+    {
       return SECURITY_TYPE_WPA2_PERSONAL;
-    }else {
+    } else {
       return SECURITY_TYPE_UNKNOWN;
     }
   } else if (*CipherSuite == IEEE_80211_PAIRWISE_CIPHER_SUITE_TKIP) {
-
     if (AKMSuite == NULL) {
       return SECURITY_TYPE_UNKNOWN;
     }
 
-    if (*AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA ||
-      *AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA_SHA256) {
-
+    if ((*AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA) ||
+        (*AKMSuite == IEEE_80211_AKM_SUITE_8021X_OR_PMKSA_SHA256))
+    {
       return SECURITY_TYPE_WPA_ENTERPRISE;
-    } else if (*AKMSuite == IEEE_80211_AKM_SUITE_PSK ||
-        *AKMSuite == IEEE_80211_AKM_SUITE_PSK_SHA256){
-
+    } else if ((*AKMSuite == IEEE_80211_AKM_SUITE_PSK) ||
+               (*AKMSuite == IEEE_80211_AKM_SUITE_PSK_SHA256))
+    {
       return SECURITY_TYPE_WPA_PERSONAL;
-    }else {
+    } else {
       return SECURITY_TYPE_UNKNOWN;
     }
   } else {
@@ -490,36 +514,40 @@ WifiMgrGetSecurityType (
 **/
 EFI_STATUS
 WifiMgrGetSupportedSuites (
-  IN    WIFI_MGR_DEVICE_DATA            *Nic
+  IN    WIFI_MGR_DEVICE_DATA  *Nic
   )
 {
-  EFI_STATUS                            Status;
-  EFI_SUPPLICANT_PROTOCOL               *Supplicant;
-  EFI_80211_AKM_SUITE_SELECTOR          *SupportedAKMSuites;
-  EFI_80211_CIPHER_SUITE_SELECTOR       *SupportedSwCipherSuites;
-  EFI_80211_CIPHER_SUITE_SELECTOR       *SupportedHwCipherSuites;
-  UINTN                                 DataSize;
+  EFI_STATUS                       Status;
+  EFI_SUPPLICANT_PROTOCOL          *Supplicant;
+  EFI_80211_AKM_SUITE_SELECTOR     *SupportedAKMSuites;
+  EFI_80211_CIPHER_SUITE_SELECTOR  *SupportedSwCipherSuites;
+  EFI_80211_CIPHER_SUITE_SELECTOR  *SupportedHwCipherSuites;
+  UINTN                            DataSize;
 
   SupportedAKMSuites      = NULL;
   SupportedSwCipherSuites = NULL;
   SupportedHwCipherSuites = NULL;
 
-  if (Nic == NULL || Nic->Supplicant == NULL) {
+  if ((Nic == NULL) || (Nic->Supplicant == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   Supplicant = Nic->Supplicant;
 
-  DataSize  = 0;
-  Status = Supplicant->GetData (Supplicant, EfiSupplicant80211SupportedAKMSuites, NULL, &DataSize);
-  if (Status == EFI_BUFFER_TOO_SMALL && DataSize > 0) {
-
-    SupportedAKMSuites = AllocateZeroPool(DataSize);
+  DataSize = 0;
+  Status   = Supplicant->GetData (Supplicant, EfiSupplicant80211SupportedAKMSuites, NULL, &DataSize);
+  if ((Status == EFI_BUFFER_TOO_SMALL) && (DataSize > 0)) {
+    SupportedAKMSuites = AllocateZeroPool (DataSize);
     if (SupportedAKMSuites == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    Status = Supplicant->GetData (Supplicant, EfiSupplicant80211SupportedAKMSuites,
-                           (UINT8 *) SupportedAKMSuites, &DataSize);
+
+    Status = Supplicant->GetData (
+                           Supplicant,
+                           EfiSupplicant80211SupportedAKMSuites,
+                           (UINT8 *)SupportedAKMSuites,
+                           &DataSize
+                           );
     if (!EFI_ERROR (Status)) {
       Nic->SupportedSuites.SupportedAKMSuites = SupportedAKMSuites;
     } else {
@@ -529,17 +557,20 @@ WifiMgrGetSupportedSuites (
     SupportedAKMSuites = NULL;
   }
 
-  DataSize  = 0;
-  Status = Supplicant->GetData (Supplicant, EfiSupplicant80211SupportedSoftwareCipherSuites, NULL, &DataSize);
-  if (Status == EFI_BUFFER_TOO_SMALL && DataSize > 0) {
-
-
-    SupportedSwCipherSuites = AllocateZeroPool(DataSize);
+  DataSize = 0;
+  Status   = Supplicant->GetData (Supplicant, EfiSupplicant80211SupportedSoftwareCipherSuites, NULL, &DataSize);
+  if ((Status == EFI_BUFFER_TOO_SMALL) && (DataSize > 0)) {
+    SupportedSwCipherSuites = AllocateZeroPool (DataSize);
     if (SupportedSwCipherSuites == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    Status = Supplicant->GetData (Supplicant, EfiSupplicant80211SupportedSoftwareCipherSuites,
-                           (UINT8 *) SupportedSwCipherSuites, &DataSize);
+
+    Status = Supplicant->GetData (
+                           Supplicant,
+                           EfiSupplicant80211SupportedSoftwareCipherSuites,
+                           (UINT8 *)SupportedSwCipherSuites,
+                           &DataSize
+                           );
     if (!EFI_ERROR (Status)) {
       Nic->SupportedSuites.SupportedSwCipherSuites = SupportedSwCipherSuites;
     } else {
@@ -549,16 +580,20 @@ WifiMgrGetSupportedSuites (
     SupportedSwCipherSuites = NULL;
   }
 
-  DataSize  = 0;
-  Status = Supplicant->GetData (Supplicant, EfiSupplicant80211SupportedHardwareCipherSuites, NULL, &DataSize);
-  if (Status == EFI_BUFFER_TOO_SMALL && DataSize > 0) {
-
-    SupportedHwCipherSuites = AllocateZeroPool(DataSize);
+  DataSize = 0;
+  Status   = Supplicant->GetData (Supplicant, EfiSupplicant80211SupportedHardwareCipherSuites, NULL, &DataSize);
+  if ((Status == EFI_BUFFER_TOO_SMALL) && (DataSize > 0)) {
+    SupportedHwCipherSuites = AllocateZeroPool (DataSize);
     if (SupportedHwCipherSuites == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    Status = Supplicant->GetData (Supplicant, EfiSupplicant80211SupportedHardwareCipherSuites,
-                           (UINT8 *) SupportedHwCipherSuites, &DataSize);
+
+    Status = Supplicant->GetData (
+                           Supplicant,
+                           EfiSupplicant80211SupportedHardwareCipherSuites,
+                           (UINT8 *)SupportedHwCipherSuites,
+                           &DataSize
+                           );
     if (!EFI_ERROR (Status)) {
       Nic->SupportedSuites.SupportedHwCipherSuites = SupportedHwCipherSuites;
     } else {
@@ -579,7 +614,7 @@ WifiMgrGetSupportedSuites (
 **/
 VOID
 WifiMgrCleanProfileSecrets (
-  IN  WIFI_MGR_NETWORK_PROFILE       *Profile
+  IN  WIFI_MGR_NETWORK_PROFILE  *Profile
   )
 {
   ZeroMem (Profile->Password, sizeof (CHAR16) * PASSWORD_STORAGE_SIZE);
@@ -587,26 +622,26 @@ WifiMgrCleanProfileSecrets (
   ZeroMem (Profile->PrivateKeyPassword, sizeof (CHAR16) * PASSWORD_STORAGE_SIZE);
 
   if (Profile->CACertData != NULL) {
-
     ZeroMem (Profile->CACertData, Profile->CACertSize);
     FreePool (Profile->CACertData);
   }
+
   Profile->CACertData = NULL;
   Profile->CACertSize = 0;
 
   if (Profile->ClientCertData != NULL) {
-
     ZeroMem (Profile->ClientCertData, Profile->ClientCertSize);
     FreePool (Profile->ClientCertData);
   }
+
   Profile->ClientCertData = NULL;
   Profile->ClientCertSize = 0;
 
   if (Profile->PrivateKeyData != NULL) {
-
     ZeroMem (Profile->PrivateKeyData, Profile->PrivateKeyDataSize);
     FreePool (Profile->PrivateKeyData);
   }
+
   Profile->PrivateKeyData     = NULL;
   Profile->PrivateKeyDataSize = 0;
 }
@@ -619,30 +654,33 @@ WifiMgrCleanProfileSecrets (
 **/
 VOID
 WifiMgrFreeProfileList (
-  IN  LIST_ENTRY                     *ProfileList
+  IN  LIST_ENTRY  *ProfileList
   )
 {
-  WIFI_MGR_NETWORK_PROFILE           *Profile;
-  LIST_ENTRY                         *Entry;
-  LIST_ENTRY                         *NextEntry;
+  WIFI_MGR_NETWORK_PROFILE  *Profile;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *NextEntry;
 
   if (ProfileList == NULL) {
     return;
   }
 
   NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, ProfileList) {
-
-    Profile = NET_LIST_USER_STRUCT_S (Entry, WIFI_MGR_NETWORK_PROFILE,
-                Link, WIFI_MGR_PROFILE_SIGNATURE);
+    Profile = NET_LIST_USER_STRUCT_S (
+                Entry,
+                WIFI_MGR_NETWORK_PROFILE,
+                Link,
+                WIFI_MGR_PROFILE_SIGNATURE
+                );
 
     WifiMgrCleanProfileSecrets (Profile);
 
     if (Profile->Network.AKMSuite != NULL) {
-      FreePool(Profile->Network.AKMSuite);
+      FreePool (Profile->Network.AKMSuite);
     }
 
     if (Profile->Network.CipherSuite != NULL) {
-      FreePool(Profile->Network.CipherSuite);
+      FreePool (Profile->Network.CipherSuite);
     }
 
     FreePool (Profile);
@@ -657,25 +695,27 @@ WifiMgrFreeProfileList (
 **/
 VOID
 WifiMgrFreeHiddenList (
-  IN  LIST_ENTRY                     *HiddenList
+  IN  LIST_ENTRY  *HiddenList
   )
 {
-  WIFI_HIDDEN_NETWORK_DATA           *HiddenNetwork;
-  LIST_ENTRY                         *Entry;
-  LIST_ENTRY                         *NextEntry;
+  WIFI_HIDDEN_NETWORK_DATA  *HiddenNetwork;
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *NextEntry;
 
   if (HiddenList == NULL) {
     return;
   }
 
   NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, HiddenList) {
-
-    HiddenNetwork = NET_LIST_USER_STRUCT_S (Entry, WIFI_HIDDEN_NETWORK_DATA,
-                      Link, WIFI_MGR_HIDDEN_NETWORK_SIGNATURE);
+    HiddenNetwork = NET_LIST_USER_STRUCT_S (
+                      Entry,
+                      WIFI_HIDDEN_NETWORK_DATA,
+                      Link,
+                      WIFI_MGR_HIDDEN_NETWORK_SIGNATURE
+                      );
     FreePool (HiddenNetwork);
   }
 }
-
 
 /**
   Free the resources of a config token.
@@ -684,24 +724,22 @@ WifiMgrFreeHiddenList (
 **/
 VOID
 WifiMgrFreeToken (
-  IN   WIFI_MGR_MAC_CONFIG_TOKEN    *ConfigToken
+  IN   WIFI_MGR_MAC_CONFIG_TOKEN  *ConfigToken
   )
 {
-  EFI_80211_GET_NETWORKS_RESULT     *Result;
+  EFI_80211_GET_NETWORKS_RESULT  *Result;
 
   if (ConfigToken == NULL) {
     return;
   }
 
   switch (ConfigToken->Type) {
-
     case TokenTypeGetNetworksToken:
 
       if (ConfigToken->Token.GetNetworksToken != NULL) {
-
         gBS->CloseEvent (ConfigToken->Token.GetNetworksToken->Event);
         if (ConfigToken->Token.GetNetworksToken->Data != NULL) {
-          FreePool(ConfigToken->Token.GetNetworksToken->Data);
+          FreePool (ConfigToken->Token.GetNetworksToken->Data);
         }
 
         Result = ConfigToken->Token.GetNetworksToken->Result;
@@ -709,7 +747,7 @@ WifiMgrFreeToken (
           FreePool (Result);
         }
 
-        FreePool(ConfigToken->Token.GetNetworksToken);
+        FreePool (ConfigToken->Token.GetNetworksToken);
       }
 
       FreePool (ConfigToken);
@@ -718,27 +756,27 @@ WifiMgrFreeToken (
     case TokenTypeConnectNetworkToken:
 
       if (ConfigToken->Token.ConnectNetworkToken != NULL) {
-
         gBS->CloseEvent (ConfigToken->Token.ConnectNetworkToken->Event);
         if (ConfigToken->Token.ConnectNetworkToken->Data != NULL) {
-          FreePool(ConfigToken->Token.ConnectNetworkToken->Data);
+          FreePool (ConfigToken->Token.ConnectNetworkToken->Data);
         }
-        FreePool(ConfigToken->Token.ConnectNetworkToken);
+
+        FreePool (ConfigToken->Token.ConnectNetworkToken);
       }
+
       FreePool (ConfigToken);
       break;
 
     case TokenTypeDisconnectNetworkToken:
 
       if (ConfigToken->Token.DisconnectNetworkToken != NULL) {
-
-        FreePool(ConfigToken->Token.DisconnectNetworkToken);
+        FreePool (ConfigToken->Token.DisconnectNetworkToken);
       }
 
       FreePool (ConfigToken);
       break;
 
-    default :
+    default:
       break;
   }
 }
