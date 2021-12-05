@@ -282,7 +282,7 @@ InitializeCapsuleOnDiskLoad (
     return EFI_ABORTED;
   }
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
    VOID *CapsuleOnDiskModePpi;
 
   if (!IsCapsuleOnDiskMode()){
@@ -302,7 +302,7 @@ InitializeCapsuleOnDiskLoad (
       DEBUG((DEBUG_ERROR, "Locate CapsuleOnDiskModePpi error %x\n", Status));
       return Status;
     }
-  );
+  DEBUG_CODE_END ();
 
   Status = PeiServicesInstallPpi (&mCapsuleOnDiskPpiList);
   ASSERT_EFI_ERROR (Status);

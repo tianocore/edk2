@@ -941,7 +941,7 @@ BdsEntry (
     OsIndication = 0;
   }
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType;
     DEBUG ((DEBUG_INFO, "[Bds]OsIndication: %016x\n", OsIndication));
     DEBUG ((DEBUG_INFO, "[Bds]=============Begin Load Options Dumping ...=============\n"));
@@ -963,7 +963,7 @@ BdsEntry (
       EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
     }
     DEBUG ((DEBUG_INFO, "[Bds]=============End Load Options Dumping=============\n"));
-  );
+  DEBUG_CODE_END ();
 
   //
   // BootManagerMenu doesn't contain the correct information when return status is EFI_NOT_FOUND.
