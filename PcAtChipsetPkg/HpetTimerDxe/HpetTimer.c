@@ -800,7 +800,7 @@ TimerDriverInitialize (
   //
   // Dump HPET Configuration Information
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     DEBUG ((DEBUG_INFO, "HPET Base Address = 0x%08x\n", PcdGet32 (PcdHpetBaseAddress)));
     DEBUG ((DEBUG_INFO, "  HPET_GENERAL_CAPABILITIES_ID  = 0x%016lx\n", mHpetGeneralCapabilities));
     DEBUG ((DEBUG_INFO, "  HPET_GENERAL_CONFIGURATION    = 0x%016lx\n", mHpetGeneralConfiguration.Uint64));
@@ -812,7 +812,7 @@ TimerDriverInitialize (
       DEBUG ((DEBUG_INFO, "  HPET_TIMER%d_COMPARATOR        = 0x%016lx\n", TimerIndex, HpetRead (HPET_TIMER_COMPARATOR_OFFSET    + TimerIndex * HPET_TIMER_STRIDE)));
       DEBUG ((DEBUG_INFO, "  HPET_TIMER%d_MSI_ROUTE         = 0x%016lx\n", TimerIndex, HpetRead (HPET_TIMER_MSI_ROUTE_OFFSET     + TimerIndex * HPET_TIMER_STRIDE)));
     }
-  );
+  DEBUG_CODE_END ();
 
   //
   // Capture the current HPET main counter value.
@@ -958,7 +958,7 @@ TimerDriverInitialize (
   //
   // Show state of enabled HPET timer
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     if (mTimerConfiguration.Bits.MsiInterruptCapability != 0 && FeaturePcdGet (PcdHpetMsiEnable)) {
       DEBUG ((DEBUG_INFO, "HPET Interrupt Mode MSI\n"));
     } else {
@@ -977,7 +977,7 @@ TimerDriverInitialize (
     // Wait for a few timer interrupts to fire before continuing
     //
     while (mNumTicks < 10);
-  );
+  DEBUG_CODE_END ();
 
   //
   // Install the Timer Architectural Protocol onto a new handle
