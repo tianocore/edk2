@@ -23,10 +23,10 @@
 #include "ScmiDxe.h"
 #include "ScmiPrivate.h"
 
-STATIC CONST SCMI_PROTOCOL_ENTRY Protocols[] = {
-  { ScmiProtocolIdBase, ScmiBaseProtocolInit },
+STATIC CONST SCMI_PROTOCOL_ENTRY  Protocols[] = {
+  { ScmiProtocolIdBase,        ScmiBaseProtocolInit        },
   { ScmiProtocolIdPerformance, ScmiPerformanceProtocolInit },
-  { ScmiProtocolIdClock, ScmiClockProtocolInit }
+  { ScmiProtocolIdClock,       ScmiClockProtocolInit       }
 };
 
 /** ARM SCMI driver entry point function.
@@ -47,8 +47,8 @@ STATIC CONST SCMI_PROTOCOL_ENTRY Protocols[] = {
 EFI_STATUS
 EFIAPI
 ArmScmiDxeEntryPoint (
-  IN EFI_HANDLE             ImageHandle,
-  IN EFI_SYSTEM_TABLE       *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS          Status;
@@ -72,7 +72,7 @@ ArmScmiDxeEntryPoint (
   Status = gBS->LocateProtocol (
                   &gArmScmiBaseProtocolGuid,
                   NULL,
-                  (VOID**)&BaseProtocol
+                  (VOID **)&BaseProtocol
                   );
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
@@ -88,7 +88,8 @@ ArmScmiDxeEntryPoint (
 
   // Accept any version between SCMI v1.0 and SCMI v2.0
   if ((Version < BASE_PROTOCOL_VERSION_V1) ||
-    (Version > BASE_PROTOCOL_VERSION_V2)) {
+      (Version > BASE_PROTOCOL_VERSION_V2))
+  {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -96,7 +97,7 @@ ArmScmiDxeEntryPoint (
   // Apart from Base protocol, SCMI may implement various other protocols,
   // query total protocols implemented by the SCP firmware.
   NumProtocols = 0;
-  Status = BaseProtocol->GetTotalProtocols (BaseProtocol, &NumProtocols);
+  Status       = BaseProtocol->GetTotalProtocols (BaseProtocol, &NumProtocols);
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
     return Status;
@@ -109,7 +110,7 @@ ArmScmiDxeEntryPoint (
   Status = gBS->AllocatePool (
                   EfiBootServicesData,
                   SupportedListSize,
-                  (VOID**)&SupportedList
+                  (VOID **)&SupportedList
                   );
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
@@ -130,7 +131,8 @@ ArmScmiDxeEntryPoint (
 
   // Install supported protocol on ImageHandle.
   for (ProtocolIndex = 1; ProtocolIndex < ARRAY_SIZE (Protocols);
-       ProtocolIndex++) {
+       ProtocolIndex++)
+  {
     for (Index = 0; Index < NumProtocols; Index++) {
       if (Protocols[ProtocolIndex].Id == SupportedList[Index]) {
         Status = Protocols[ProtocolIndex].InitFn (&ImageHandle);
@@ -138,6 +140,7 @@ ArmScmiDxeEntryPoint (
           ASSERT_EFI_ERROR (Status);
           return Status;
         }
+
         break;
       }
     }

@@ -19,9 +19,9 @@ ConvertSectionAttributesToPageAttributes (
   IN BOOLEAN  IsLargePage
   )
 {
-  UINT32 PageAttributes;
+  UINT32  PageAttributes;
 
-  PageAttributes = 0;
+  PageAttributes  = 0;
   PageAttributes |= TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY (SectionAttributes, IsLargePage);
   PageAttributes |= TT_DESCRIPTOR_CONVERT_TO_PAGE_AP (SectionAttributes);
   PageAttributes |= TT_DESCRIPTOR_CONVERT_TO_PAGE_XN (SectionAttributes, IsLargePage);
