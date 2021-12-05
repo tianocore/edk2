@@ -18,7 +18,7 @@
 //
 // SystemFmp driver private data
 //
-SYSTEM_FMP_PRIVATE_DATA *mSystemFmpPrivate = NULL;
+SYSTEM_FMP_PRIVATE_DATA  *mSystemFmpPrivate = NULL;
 
 /**
   Dispatch system FMP images.
@@ -37,57 +37,57 @@ SYSTEM_FMP_PRIVATE_DATA *mSystemFmpPrivate = NULL;
 **/
 EFI_STATUS
 DispatchSystemFmpImages (
-  IN VOID                         *Image,
-  IN UINTN                        ImageSize,
-  OUT UINT32                      *LastAttemptVersion,
-  OUT UINT32                      *LastAttemptStatus
+  IN VOID     *Image,
+  IN UINTN    ImageSize,
+  OUT UINT32  *LastAttemptVersion,
+  OUT UINT32  *LastAttemptStatus
   )
 {
-  EFI_STATUS                                    Status;
-  VOID                                          *AuthenticatedImage;
-  UINTN                                         AuthenticatedImageSize;
-  VOID                                          *DispatchFvImage;
-  UINTN                                         DispatchFvImageSize;
-  EFI_HANDLE                                    FvProtocolHandle;
-  EFI_FIRMWARE_VOLUME_HEADER                    *FvImage;
-  BOOLEAN                                       Result;
+  EFI_STATUS                  Status;
+  VOID                        *AuthenticatedImage;
+  UINTN                       AuthenticatedImageSize;
+  VOID                        *DispatchFvImage;
+  UINTN                       DispatchFvImageSize;
+  EFI_HANDLE                  FvProtocolHandle;
+  EFI_FIRMWARE_VOLUME_HEADER  *FvImage;
+  BOOLEAN                     Result;
 
   AuthenticatedImage     = NULL;
   AuthenticatedImageSize = 0;
 
-  DEBUG((DEBUG_INFO, "DispatchSystemFmpImages\n"));
+  DEBUG ((DEBUG_INFO, "DispatchSystemFmpImages\n"));
 
   //
   // Verify
   //
-  Status = CapsuleAuthenticateSystemFirmware(Image, ImageSize, FALSE, LastAttemptVersion, LastAttemptStatus, &AuthenticatedImage, &AuthenticatedImageSize);
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "SystemFirmwareAuthenticateImage - %r\n", Status));
+  Status = CapsuleAuthenticateSystemFirmware (Image, ImageSize, FALSE, LastAttemptVersion, LastAttemptStatus, &AuthenticatedImage, &AuthenticatedImageSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "SystemFirmwareAuthenticateImage - %r\n", Status));
     return Status;
   }
 
   //
   // Get FV
   //
-  Result = ExtractDriverFvImage(AuthenticatedImage, AuthenticatedImageSize, &DispatchFvImage, &DispatchFvImageSize);
+  Result = ExtractDriverFvImage (AuthenticatedImage, AuthenticatedImageSize, &DispatchFvImage, &DispatchFvImageSize);
   if (Result) {
-    DEBUG((DEBUG_INFO, "ExtractDriverFvImage\n"));
+    DEBUG ((DEBUG_INFO, "ExtractDriverFvImage\n"));
     //
     // Dispatch
     //
     if (((EFI_FIRMWARE_VOLUME_HEADER *)DispatchFvImage)->FvLength == DispatchFvImageSize) {
-      FvImage = AllocatePages(EFI_SIZE_TO_PAGES(DispatchFvImageSize));
+      FvImage = AllocatePages (EFI_SIZE_TO_PAGES (DispatchFvImageSize));
       if (FvImage != NULL) {
-        CopyMem(FvImage, DispatchFvImage, DispatchFvImageSize);
-        Status = gDS->ProcessFirmwareVolume(
+        CopyMem (FvImage, DispatchFvImage, DispatchFvImageSize);
+        Status = gDS->ProcessFirmwareVolume (
                         (VOID *)FvImage,
                         (UINTN)FvImage->FvLength,
                         &FvProtocolHandle
                         );
-        DEBUG((DEBUG_INFO, "ProcessFirmwareVolume - %r\n", Status));
-        if (!EFI_ERROR(Status)) {
-          gDS->Dispatch();
-          DEBUG((DEBUG_INFO, "Dispatch Done\n"));
+        DEBUG ((DEBUG_INFO, "ProcessFirmwareVolume - %r\n", Status));
+        if (!EFI_ERROR (Status)) {
+          gDS->Dispatch ();
+          DEBUG ((DEBUG_INFO, "Dispatch Done\n"));
         }
       }
     }
@@ -145,78 +145,78 @@ DispatchSystemFmpImages (
 EFI_STATUS
 EFIAPI
 FmpSetImage (
-  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL                 *This,
-  IN  UINT8                                            ImageIndex,
-  IN  CONST VOID                                       *Image,
-  IN  UINTN                                            ImageSize,
-  IN  CONST VOID                                       *VendorCode,
-  IN  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS    Progress,
-  OUT CHAR16                                           **AbortReason
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL               *This,
+  IN  UINT8                                          ImageIndex,
+  IN  CONST VOID                                     *Image,
+  IN  UINTN                                          ImageSize,
+  IN  CONST VOID                                     *VendorCode,
+  IN  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress,
+  OUT CHAR16                                         **AbortReason
   )
 {
-  SYSTEM_FMP_PRIVATE_DATA             *SystemFmpPrivate;
-  EFI_FIRMWARE_MANAGEMENT_PROTOCOL    *SystemFmp;
-  EFI_STATUS                          Status;
-  EFI_STATUS                          VarStatus;
+  SYSTEM_FMP_PRIVATE_DATA           *SystemFmpPrivate;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *SystemFmp;
+  EFI_STATUS                        Status;
+  EFI_STATUS                        VarStatus;
 
-  if (Image == NULL || ImageSize == 0 || AbortReason == NULL) {
+  if ((Image == NULL) || (ImageSize == 0) || (AbortReason == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  SystemFmpPrivate = SYSTEM_FMP_PRIVATE_DATA_FROM_FMP(This);
+  SystemFmpPrivate = SYSTEM_FMP_PRIVATE_DATA_FROM_FMP (This);
   *AbortReason     = NULL;
 
-  if (ImageIndex == 0 || ImageIndex > SystemFmpPrivate->DescriptorCount) {
+  if ((ImageIndex == 0) || (ImageIndex > SystemFmpPrivate->DescriptorCount)) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // Process FV
   //
-  Status = DispatchSystemFmpImages((VOID *)Image, ImageSize, &SystemFmpPrivate->LastAttempt.LastAttemptVersion, &SystemFmpPrivate->LastAttempt.LastAttemptStatus);
-  DEBUG((DEBUG_INFO, "(Agent)SetImage - LastAttempt Version - 0x%x, State - 0x%x\n", SystemFmpPrivate->LastAttempt.LastAttemptVersion, SystemFmpPrivate->LastAttempt.LastAttemptStatus));
-  if (EFI_ERROR(Status)) {
-    VarStatus = gRT->SetVariable(
+  Status = DispatchSystemFmpImages ((VOID *)Image, ImageSize, &SystemFmpPrivate->LastAttempt.LastAttemptVersion, &SystemFmpPrivate->LastAttempt.LastAttemptStatus);
+  DEBUG ((DEBUG_INFO, "(Agent)SetImage - LastAttempt Version - 0x%x, State - 0x%x\n", SystemFmpPrivate->LastAttempt.LastAttemptVersion, SystemFmpPrivate->LastAttempt.LastAttemptStatus));
+  if (EFI_ERROR (Status)) {
+    VarStatus = gRT->SetVariable (
                        SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_NAME,
                        &gSystemFmpLastAttemptVariableGuid,
                        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                       sizeof(SystemFmpPrivate->LastAttempt),
+                       sizeof (SystemFmpPrivate->LastAttempt),
                        &SystemFmpPrivate->LastAttempt
                        );
-    DEBUG((DEBUG_INFO, "(Agent)SetLastAttempt - %r\n", VarStatus));
+    DEBUG ((DEBUG_INFO, "(Agent)SetLastAttempt - %r\n", VarStatus));
     return Status;
   }
 
   //
   // Pass Thru to System FMP Protocol on same handle as FMP Protocol
   //
-  Status = gBS->HandleProtocol(
+  Status = gBS->HandleProtocol (
                   SystemFmpPrivate->Handle,
                   &gSystemFmpProtocolGuid,
                   (VOID **)&SystemFmp
                   );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     Status = gBS->LocateProtocol (
                     &gSystemFmpProtocolGuid,
                     NULL,
                     (VOID **)&SystemFmp
                     );
-    if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_INFO, "(Agent)SetImage - SystemFmpProtocol - %r\n", Status));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "(Agent)SetImage - SystemFmpProtocol - %r\n", Status));
       SystemFmpPrivate->LastAttempt.LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
-      VarStatus = gRT->SetVariable(
-                         SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_NAME,
-                         &gSystemFmpLastAttemptVariableGuid,
-                         EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                         sizeof(SystemFmpPrivate->LastAttempt),
-                         &SystemFmpPrivate->LastAttempt
-                         );
-      DEBUG((DEBUG_INFO, "(Agent)SetLastAttempt - %r\n", VarStatus));
+      VarStatus                                       = gRT->SetVariable (
+                                                               SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_NAME,
+                                                               &gSystemFmpLastAttemptVariableGuid,
+                                                               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                                                               sizeof (SystemFmpPrivate->LastAttempt),
+                                                               &SystemFmpPrivate->LastAttempt
+                                                               );
+      DEBUG ((DEBUG_INFO, "(Agent)SetLastAttempt - %r\n", VarStatus));
       return Status;
     }
   }
 
-  return SystemFmp->SetImage(SystemFmp, ImageIndex, Image, ImageSize, VendorCode, Progress, AbortReason);
+  return SystemFmp->SetImage (SystemFmp, ImageIndex, Image, ImageSize, VendorCode, Progress, AbortReason);
 }
 
 /**
@@ -230,23 +230,23 @@ FmpSetImage (
 EFI_STATUS
 EFIAPI
 SystemFirmwareReportMainDxe (
-  IN EFI_HANDLE                         ImageHandle,
-  IN EFI_SYSTEM_TABLE                   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                                      Status;
+  EFI_STATUS  Status;
 
   //
   // Initialize SystemFmpPrivateData
   //
-  mSystemFmpPrivate = AllocateZeroPool (sizeof(SYSTEM_FMP_PRIVATE_DATA));
+  mSystemFmpPrivate = AllocateZeroPool (sizeof (SYSTEM_FMP_PRIVATE_DATA));
   if (mSystemFmpPrivate == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = InitializePrivateData(mSystemFmpPrivate);
-  if (EFI_ERROR(Status)) {
-    FreePool(mSystemFmpPrivate);
+  Status = InitializePrivateData (mSystemFmpPrivate);
+  if (EFI_ERROR (Status)) {
+    FreePool (mSystemFmpPrivate);
     mSystemFmpPrivate = NULL;
     return Status;
   }
@@ -261,7 +261,7 @@ SystemFirmwareReportMainDxe (
                   &mSystemFmpPrivate->Fmp
                   );
   if (EFI_ERROR (Status)) {
-    FreePool(mSystemFmpPrivate);
+    FreePool (mSystemFmpPrivate);
     mSystemFmpPrivate = NULL;
     return Status;
   }

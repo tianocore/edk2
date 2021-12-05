@@ -8,10 +8,10 @@
 
 #include "SystemFirmwareDxe.h"
 
-EFI_GUID gSystemFmpLastAttemptVariableGuid = SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_GUID;
-EFI_GUID gSystemFmpProtocolGuid = SYSTEM_FMP_PROTOCOL_GUID;
+EFI_GUID  gSystemFmpLastAttemptVariableGuid = SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_GUID;
+EFI_GUID  gSystemFmpProtocolGuid            = SYSTEM_FMP_PROTOCOL_GUID;
 
-EFI_FIRMWARE_MANAGEMENT_PROTOCOL mFirmwareManagementProtocol = {
+EFI_FIRMWARE_MANAGEMENT_PROTOCOL  mFirmwareManagementProtocol = {
   FmpGetImageInfo,
   FmpGetImage,
   FmpSetImage,
@@ -61,48 +61,49 @@ EFI_FIRMWARE_MANAGEMENT_PROTOCOL mFirmwareManagementProtocol = {
 EFI_STATUS
 EFIAPI
 FmpGetImageInfo (
-  IN        EFI_FIRMWARE_MANAGEMENT_PROTOCOL *This,
-  IN OUT    UINTN                            *ImageInfoSize,
-  IN OUT    EFI_FIRMWARE_IMAGE_DESCRIPTOR    *ImageInfo,
-  OUT       UINT32                           *DescriptorVersion,
-  OUT       UINT8                            *DescriptorCount,
-  OUT       UINTN                            *DescriptorSize,
-  OUT       UINT32                           *PackageVersion,
-  OUT       CHAR16                           **PackageVersionName
+  IN        EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  IN OUT    UINTN                             *ImageInfoSize,
+  IN OUT    EFI_FIRMWARE_IMAGE_DESCRIPTOR     *ImageInfo,
+  OUT       UINT32                            *DescriptorVersion,
+  OUT       UINT8                             *DescriptorCount,
+  OUT       UINTN                             *DescriptorSize,
+  OUT       UINT32                            *PackageVersion,
+  OUT       CHAR16                            **PackageVersionName
   )
 {
-  SYSTEM_FMP_PRIVATE_DATA                *SystemFmpPrivate;
-  EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR *ImageDescriptor;
+  SYSTEM_FMP_PRIVATE_DATA                 *SystemFmpPrivate;
+  EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR  *ImageDescriptor;
 
-  SystemFmpPrivate = SYSTEM_FMP_PRIVATE_DATA_FROM_FMP(This);
+  SystemFmpPrivate = SYSTEM_FMP_PRIVATE_DATA_FROM_FMP (This);
 
-  if(ImageInfoSize == NULL) {
+  if (ImageInfoSize == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (*ImageInfoSize < sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR) * SystemFmpPrivate->DescriptorCount) {
-    *ImageInfoSize = sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR) * SystemFmpPrivate->DescriptorCount;
+  if (*ImageInfoSize < sizeof (EFI_FIRMWARE_IMAGE_DESCRIPTOR) * SystemFmpPrivate->DescriptorCount) {
+    *ImageInfoSize = sizeof (EFI_FIRMWARE_IMAGE_DESCRIPTOR) * SystemFmpPrivate->DescriptorCount;
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  if (ImageInfo == NULL ||
-      DescriptorVersion == NULL ||
-      DescriptorCount == NULL ||
-      DescriptorSize == NULL ||
-      PackageVersion == NULL ||
-      PackageVersionName == NULL) {
+  if ((ImageInfo == NULL) ||
+      (DescriptorVersion == NULL) ||
+      (DescriptorCount == NULL) ||
+      (DescriptorSize == NULL) ||
+      (PackageVersion == NULL) ||
+      (PackageVersionName == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
-  *ImageInfoSize      = sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR) * SystemFmpPrivate->DescriptorCount;
-  *DescriptorSize     = sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR);
-  *DescriptorCount    = SystemFmpPrivate->DescriptorCount;
-  *DescriptorVersion  = EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION;
+  *ImageInfoSize     = sizeof (EFI_FIRMWARE_IMAGE_DESCRIPTOR) * SystemFmpPrivate->DescriptorCount;
+  *DescriptorSize    = sizeof (EFI_FIRMWARE_IMAGE_DESCRIPTOR);
+  *DescriptorCount   = SystemFmpPrivate->DescriptorCount;
+  *DescriptorVersion = EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION;
 
   //
   // supports 1 ImageInfo descriptor
   //
-  ImageDescriptor = SystemFmpPrivate->ImageDescriptor;
+  ImageDescriptor       = SystemFmpPrivate->ImageDescriptor;
   ImageInfo->ImageIndex = ImageDescriptor->ImageIndex;
   CopyGuid (&ImageInfo->ImageTypeId, &ImageDescriptor->ImageTypeId);
   ImageInfo->ImageId = ImageDescriptor->ImageId;
@@ -111,20 +112,22 @@ FmpGetImageInfo (
   } else {
     ImageInfo->ImageIdName = NULL;
   }
+
   ImageInfo->Version = ImageDescriptor->Version;
   if (ImageDescriptor->VersionNameStringOffset != 0) {
     ImageInfo->VersionName = (CHAR16 *)((UINTN)ImageDescriptor + ImageDescriptor->VersionNameStringOffset);
   } else {
     ImageInfo->VersionName = NULL;
   }
-  ImageInfo->Size = (UINTN)ImageDescriptor->Size;
-  ImageInfo->AttributesSupported = ImageDescriptor->AttributesSupported;
-  ImageInfo->AttributesSetting = ImageDescriptor->AttributesSetting;
-  ImageInfo->Compatibilities = ImageDescriptor->Compatibilities;
+
+  ImageInfo->Size                        = (UINTN)ImageDescriptor->Size;
+  ImageInfo->AttributesSupported         = ImageDescriptor->AttributesSupported;
+  ImageInfo->AttributesSetting           = ImageDescriptor->AttributesSetting;
+  ImageInfo->Compatibilities             = ImageDescriptor->Compatibilities;
   ImageInfo->LowestSupportedImageVersion = ImageDescriptor->LowestSupportedImageVersion;
-  ImageInfo->LastAttemptVersion = SystemFmpPrivate->LastAttempt.LastAttemptVersion;
-  ImageInfo->LastAttemptStatus = SystemFmpPrivate->LastAttempt.LastAttemptStatus;
-  ImageInfo->HardwareInstance = ImageDescriptor->HardwareInstance;
+  ImageInfo->LastAttemptVersion          = SystemFmpPrivate->LastAttempt.LastAttemptVersion;
+  ImageInfo->LastAttemptStatus           = SystemFmpPrivate->LastAttempt.LastAttemptStatus;
+  ImageInfo->HardwareInstance            = ImageDescriptor->HardwareInstance;
 
   //
   // package version
@@ -132,7 +135,7 @@ FmpGetImageInfo (
   *PackageVersion = ImageDescriptor->PackageVersion;
   if (ImageDescriptor->PackageVersionNameStringOffset != 0) {
     *PackageVersionName = (VOID *)((UINTN)ImageDescriptor + ImageDescriptor->PackageVersionNameStringOffset);
-    *PackageVersionName = AllocateCopyPool(StrSize(*PackageVersionName), *PackageVersionName);
+    *PackageVersionName = AllocateCopyPool (StrSize (*PackageVersionName), *PackageVersionName);
   } else {
     *PackageVersionName = NULL;
   }
@@ -243,12 +246,12 @@ FmpCheckImage (
 EFI_STATUS
 EFIAPI
 FmpGetPackageInfo (
-  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL *This,
-  OUT UINT32                           *PackageVersion,
-  OUT CHAR16                           **PackageVersionName,
-  OUT UINT32                           *PackageVersionNameMaxLen,
-  OUT UINT64                           *AttributesSupported,
-  OUT UINT64                           *AttributesSetting
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  OUT UINT32                            *PackageVersion,
+  OUT CHAR16                            **PackageVersionName,
+  OUT UINT32                            *PackageVersionNameMaxLen,
+  OUT UINT64                            *AttributesSupported,
+  OUT UINT64                            *AttributesSetting
   )
 {
   return EFI_UNSUPPORTED;
@@ -288,12 +291,12 @@ FmpGetPackageInfo (
 EFI_STATUS
 EFIAPI
 FmpSetPackageInfo (
-  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL   *This,
-  IN  CONST VOID                         *Image,
-  IN  UINTN                              ImageSize,
-  IN  CONST VOID                         *VendorCode,
-  IN  UINT32                             PackageVersion,
-  IN  CONST CHAR16                       *PackageVersionName
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  IN  CONST VOID                        *Image,
+  IN  UINTN                             ImageSize,
+  IN  CONST VOID                        *VendorCode,
+  IN  UINT32                            PackageVersion,
+  IN  CONST CHAR16                      *PackageVersionName
   )
 {
   return EFI_UNSUPPORTED;
@@ -311,30 +314,28 @@ InitializePrivateData (
   IN SYSTEM_FMP_PRIVATE_DATA  *SystemFmpPrivate
   )
 {
-  EFI_STATUS       VarStatus;
-  UINTN            VarSize;
+  EFI_STATUS  VarStatus;
+  UINTN       VarSize;
 
   SystemFmpPrivate->Signature       = SYSTEM_FMP_PRIVATE_DATA_SIGNATURE;
   SystemFmpPrivate->Handle          = NULL;
   SystemFmpPrivate->DescriptorCount = 1;
-  CopyMem(&SystemFmpPrivate->Fmp, &mFirmwareManagementProtocol, sizeof(EFI_FIRMWARE_MANAGEMENT_PROTOCOL));
+  CopyMem (&SystemFmpPrivate->Fmp, &mFirmwareManagementProtocol, sizeof (EFI_FIRMWARE_MANAGEMENT_PROTOCOL));
 
-  SystemFmpPrivate->ImageDescriptor = PcdGetPtr(PcdEdkiiSystemFirmwareImageDescriptor);
+  SystemFmpPrivate->ImageDescriptor = PcdGetPtr (PcdEdkiiSystemFirmwareImageDescriptor);
 
   SystemFmpPrivate->LastAttempt.LastAttemptVersion = 0x0;
-  SystemFmpPrivate->LastAttempt.LastAttemptStatus = 0x0;
-  VarSize = sizeof(SystemFmpPrivate->LastAttempt);
-  VarStatus = gRT->GetVariable(
-                     SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_NAME,
-                     &gSystemFmpLastAttemptVariableGuid,
-                     NULL,
-                     &VarSize,
-                     &SystemFmpPrivate->LastAttempt
-                     );
-  DEBUG((DEBUG_INFO, "GetLastAttempt - %r\n", VarStatus));
-  DEBUG((DEBUG_INFO, "GetLastAttempt Version - 0x%x, State - 0x%x\n", SystemFmpPrivate->LastAttempt.LastAttemptVersion, SystemFmpPrivate->LastAttempt.LastAttemptStatus));
+  SystemFmpPrivate->LastAttempt.LastAttemptStatus  = 0x0;
+  VarSize                                          = sizeof (SystemFmpPrivate->LastAttempt);
+  VarStatus                                        = gRT->GetVariable (
+                                                            SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_NAME,
+                                                            &gSystemFmpLastAttemptVariableGuid,
+                                                            NULL,
+                                                            &VarSize,
+                                                            &SystemFmpPrivate->LastAttempt
+                                                            );
+  DEBUG ((DEBUG_INFO, "GetLastAttempt - %r\n", VarStatus));
+  DEBUG ((DEBUG_INFO, "GetLastAttempt Version - 0x%x, State - 0x%x\n", SystemFmpPrivate->LastAttempt.LastAttemptVersion, SystemFmpPrivate->LastAttempt.LastAttemptStatus));
 
   return EFI_SUCCESS;
 }
-
-

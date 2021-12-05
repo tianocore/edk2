@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef __EDKII_SYSTEM_CAPSULE_LIB_H__
 #define __EDKII_SYSTEM_CAPSULE_LIB_H__
 
@@ -26,10 +25,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN
 EFIAPI
 ExtractSystemFirmwareImageFmpInfo (
-  IN VOID                                      *SystemFirmwareImage,
-  IN UINTN                                     SystemFirmwareImageSize,
-  OUT EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR   **ImageFmpInfo,
-  OUT UINTN                                    *ImageFmpInfoSize
+  IN VOID                                     *SystemFirmwareImage,
+  IN UINTN                                    SystemFirmwareImageSize,
+  OUT EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR  **ImageFmpInfo,
+  OUT UINTN                                   *ImageFmpInfoSize
   );
 
 /**
@@ -46,10 +45,10 @@ ExtractSystemFirmwareImageFmpInfo (
 BOOLEAN
 EFIAPI
 ExtractDriverFvImage (
-  IN VOID                         *AuthenticatedImage,
-  IN UINTN                        AuthenticatedImageSize,
-  OUT VOID                        **DriverFvImage,
-  OUT UINTN                       *DriverFvImageSize
+  IN VOID    *AuthenticatedImage,
+  IN UINTN   AuthenticatedImageSize,
+  OUT VOID   **DriverFvImage,
+  OUT UINTN  *DriverFvImageSize
   );
 
 /**
@@ -66,10 +65,10 @@ ExtractDriverFvImage (
 BOOLEAN
 EFIAPI
 ExtractConfigImage (
-  IN VOID                         *AuthenticatedImage,
-  IN UINTN                        AuthenticatedImageSize,
-  OUT VOID                        **ConfigImage,
-  OUT UINTN                       *ConfigImageSize
+  IN VOID    *AuthenticatedImage,
+  IN UINTN   AuthenticatedImageSize,
+  OUT VOID   **ConfigImage,
+  OUT UINTN  *ConfigImageSize
   );
 
 /**
@@ -86,10 +85,10 @@ ExtractConfigImage (
 BOOLEAN
 EFIAPI
 ExtractSystemFirmwareImage (
-  IN VOID                         *AuthenticatedImage,
-  IN UINTN                        AuthenticatedImageSize,
-  OUT VOID                        **SystemFirmwareImage,
-  OUT UINTN                       *SystemFirmwareImageSize
+  IN VOID    *AuthenticatedImage,
+  IN UINTN   AuthenticatedImageSize,
+  OUT VOID   **SystemFirmwareImage,
+  OUT UINTN  *SystemFirmwareImageSize
   );
 
 /**
@@ -107,11 +106,11 @@ ExtractSystemFirmwareImage (
 BOOLEAN
 EFIAPI
 ExtractAuthenticatedImage (
-  IN VOID                         *Image,
-  IN UINTN                        ImageSize,
-  OUT UINT32                      *LastAttemptStatus,
-  OUT VOID                        **AuthenticatedImage,
-  OUT UINTN                       *AuthenticatedImageSize
+  IN VOID     *Image,
+  IN UINTN    ImageSize,
+  OUT UINT32  *LastAttemptStatus,
+  OUT VOID    **AuthenticatedImage,
+  OUT UINTN   *AuthenticatedImageSize
   );
 
 /**
@@ -135,14 +134,13 @@ ExtractAuthenticatedImage (
 EFI_STATUS
 EFIAPI
 CapsuleAuthenticateSystemFirmware (
-  IN VOID                         *Image,
-  IN UINTN                        ImageSize,
-  IN BOOLEAN                      ForceVersionMatch,
-  OUT UINT32                      *LastAttemptVersion,
-  OUT UINT32                      *LastAttemptStatus,
-  OUT VOID                        **AuthenticatedImage,
-  OUT UINTN                       *AuthenticatedImageSize
+  IN VOID     *Image,
+  IN UINTN    ImageSize,
+  IN BOOLEAN  ForceVersionMatch,
+  OUT UINT32  *LastAttemptVersion,
+  OUT UINT32  *LastAttemptStatus,
+  OUT VOID    **AuthenticatedImage,
+  OUT UINTN   *AuthenticatedImageSize
   );
 
 #endif
-

@@ -24,15 +24,14 @@
 //
 
 typedef struct {
-  UINTN                           NumOfRecovery;
+  UINTN    NumOfRecovery;
 } CONFIG_HEADER;
 
 typedef struct {
-  UINTN                           Index;
-  EFI_GUID                        FileGuid;
-  UINTN                           Length;
-  UINTN                           ImageOffset;
+  UINTN       Index;
+  EFI_GUID    FileGuid;
+  UINTN       Length;
+  UINTN       ImageOffset;
 } RECOVERY_CONFIG_DATA;
 
 #endif
-
