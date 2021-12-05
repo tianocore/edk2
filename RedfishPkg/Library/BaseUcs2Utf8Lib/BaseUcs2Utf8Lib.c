@@ -26,17 +26,16 @@
 **/
 UINT8
 GetUTF8SizeForUCS2 (
-  IN    CHAR8      *Utf8Buffer
+  IN    CHAR8  *Utf8Buffer
   )
 {
-  CHAR8    TempChar;
-  UINT8    Utf8Size;
+  CHAR8  TempChar;
+  UINT8  Utf8Size;
 
   ASSERT (Utf8Buffer != NULL);
 
   TempChar = *Utf8Buffer;
   if ((TempChar & 0xF0) == 0xF0) {
-
     //
     // This format is not for UCS2.
     //
@@ -46,11 +45,9 @@ GetUTF8SizeForUCS2 (
   Utf8Size = 1;
   if ((TempChar & 0x80) == 0x80) {
     if ((TempChar & 0xC0) == 0xC0) {
-
-      Utf8Size ++;
+      Utf8Size++;
       if ((TempChar & 0xE0) == 0xE0) {
-
-        Utf8Size ++;
+        Utf8Size++;
       }
     }
   }
@@ -74,16 +71,16 @@ GetUTF8SizeForUCS2 (
 **/
 EFI_STATUS
 GetUCS2CharByFormat (
-  IN    CHAR8      *Utf8Buffer,
-  OUT   CHAR16     *Ucs2Char
+  IN    CHAR8   *Utf8Buffer,
+  OUT   CHAR16  *Ucs2Char
   )
 {
-  UINT8     Num1;
-  UINT8     Num2;
-  UINT8     Index;
-  CHAR8     Ucs2CharFormat[UNICODE_FORMAT_CHAR_SIZE];  /// two Hexadecimal digits Ascii string, like "3F"
+  UINT8  Num1;
+  UINT8  Num2;
+  UINT8  Index;
+  CHAR8  Ucs2CharFormat[UNICODE_FORMAT_CHAR_SIZE];     /// two Hexadecimal digits Ascii string, like "3F"
 
-  for (Index = 0; Index < 4; Index ++) {
+  for (Index = 0; Index < 4; Index++) {
     if ((*(Utf8Buffer + 2 + Index) & 0x80) != 0x00) {
       return EFI_INVALID_PARAMETER;
     }
@@ -95,19 +92,19 @@ GetUCS2CharByFormat (
   // Get the First Number, Offset is 2
   //
   CopyMem (Ucs2CharFormat, Utf8Buffer + 2, UNICODE_FORMAT_CHAR_LEN);
-  Num1 = (UINT8) AsciiStrHexToUintn (Ucs2CharFormat);
+  Num1 = (UINT8)AsciiStrHexToUintn (Ucs2CharFormat);
 
   //
   // Get the Second Number, Offset is 4
   //
   CopyMem (Ucs2CharFormat, Utf8Buffer + 4, UNICODE_FORMAT_CHAR_LEN);
-  Num2 = (UINT8) AsciiStrHexToUintn (Ucs2CharFormat);
+  Num2 = (UINT8)AsciiStrHexToUintn (Ucs2CharFormat);
 
   //
   // Ucs2Char is Little-Endian
   //
-  *((CHAR8 *) Ucs2Char)        = Num2;
-  *(((CHAR8 *) Ucs2Char) + 1) = Num1;
+  *((CHAR8 *)Ucs2Char)       = Num2;
+  *(((CHAR8 *)Ucs2Char) + 1) = Num1;
 
   return EFI_SUCCESS;
 }
@@ -123,33 +120,30 @@ GetUCS2CharByFormat (
 **/
 UINT8
 UCS2CharToUTF8 (
-  IN  CHAR16     Ucs2Char,
-  OUT CHAR8      *Utf8Buffer
+  IN  CHAR16  Ucs2Char,
+  OUT CHAR8   *Utf8Buffer
   )
 {
-  UINT16    Ucs2Number;
+  UINT16  Ucs2Number;
 
   ASSERT (Utf8Buffer != NULL);
 
-  Ucs2Number = (UINT16) Ucs2Char;
+  Ucs2Number = (UINT16)Ucs2Char;
   if (Ucs2Number <= 0x007F) {
-
     //
     // UTF8 format: 0xxxxxxx
     //
     *Utf8Buffer = Ucs2Char & 0x7F;
     return 1;
-
-  } else if (Ucs2Number >= 0x0080 && Ucs2Number <= 0x07FF) {
-
+  } else if ((Ucs2Number >= 0x0080) && (Ucs2Number <= 0x07FF)) {
     //
     // UTF8 format: 110xxxxx 10xxxxxx
     //
     *(Utf8Buffer + 1) = (Ucs2Char & 0x3F) | 0x80;
     *Utf8Buffer       = ((Ucs2Char >> 6) & 0x1F) | 0xC0;
     return 2;
-
-  } else {  /// Ucs2Number >= 0x0800 && Ucs2Number <= 0xFFFF
+  } else {
+    /// Ucs2Number >= 0x0800 && Ucs2Number <= 0xFFFF
 
     //
     // UTF8 format: 1110xxxx 10xxxxxx 10xxxxxx
@@ -174,23 +168,22 @@ UCS2CharToUTF8 (
 **/
 EFI_STATUS
 UTF8ToUCS2Char (
-  IN   CHAR8      *Utf8Buffer,
-  OUT  CHAR16     *Ucs2Char
+  IN   CHAR8   *Utf8Buffer,
+  OUT  CHAR16  *Ucs2Char
   )
 {
-  UINT8    Utf8Size;
-  CHAR8    *Ucs2Buffer;
-  CHAR8    TempChar1;
-  CHAR8    TempChar2;
-  CHAR8    TempChar3;
+  UINT8  Utf8Size;
+  CHAR8  *Ucs2Buffer;
+  CHAR8  TempChar1;
+  CHAR8  TempChar2;
+  CHAR8  TempChar3;
 
   ASSERT (Utf8Buffer != NULL && Ucs2Char != NULL);
   ZeroMem (Ucs2Char, sizeof (CHAR16));
-  Ucs2Buffer = (CHAR8 *) Ucs2Char;
+  Ucs2Buffer = (CHAR8 *)Ucs2Char;
 
   Utf8Size = GetUTF8SizeForUCS2 (Utf8Buffer);
   switch (Utf8Size) {
-
     case 1:
 
       //
@@ -271,27 +264,26 @@ UTF8ToUCS2Char (
 **/
 EFI_STATUS
 UCS2StrToUTF8 (
-  IN  CHAR16     *Ucs2Str,
-  OUT CHAR8      **Utf8StrAddr
+  IN  CHAR16  *Ucs2Str,
+  OUT CHAR8   **Utf8StrAddr
   )
 {
-  UINTN    Ucs2StrIndex;
-  UINTN    Ucs2StrLength;
-  CHAR8    *Utf8Str;
-  UINTN    Utf8StrLength;
-  UINTN    Utf8StrIndex;
-  CHAR8    Utf8Buffer[UTF8_BUFFER_FOR_UCS2_MAX_SIZE];
-  UINT8    Utf8BufferSize;
+  UINTN  Ucs2StrIndex;
+  UINTN  Ucs2StrLength;
+  CHAR8  *Utf8Str;
+  UINTN  Utf8StrLength;
+  UINTN  Utf8StrIndex;
+  CHAR8  Utf8Buffer[UTF8_BUFFER_FOR_UCS2_MAX_SIZE];
+  UINT8  Utf8BufferSize;
 
-  if (Ucs2Str == NULL || Utf8StrAddr == NULL) {
+  if ((Ucs2Str == NULL) || (Utf8StrAddr == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   Ucs2StrLength = StrLen (Ucs2Str);
   Utf8StrLength = 0;
 
-  for (Ucs2StrIndex = 0; Ucs2StrIndex < Ucs2StrLength; Ucs2StrIndex ++) {
-
+  for (Ucs2StrIndex = 0; Ucs2StrIndex < Ucs2StrLength; Ucs2StrIndex++) {
     ZeroMem (Utf8Buffer, sizeof (Utf8Buffer));
     Utf8BufferSize = UCS2CharToUTF8 (Ucs2Str[Ucs2StrIndex], Utf8Buffer);
     Utf8StrLength += Utf8BufferSize;
@@ -303,8 +295,7 @@ UCS2StrToUTF8 (
   }
 
   Utf8StrIndex = 0;
-  for (Ucs2StrIndex = 0; Ucs2StrIndex < Ucs2StrLength; Ucs2StrIndex ++) {
-
+  for (Ucs2StrIndex = 0; Ucs2StrIndex < Ucs2StrLength; Ucs2StrIndex++) {
     ZeroMem (Utf8Buffer, sizeof (Utf8Buffer));
     Utf8BufferSize = UCS2CharToUTF8 (Ucs2Str[Ucs2StrIndex], Utf8Buffer);
 
@@ -313,7 +304,7 @@ UCS2StrToUTF8 (
   }
 
   Utf8Str[Utf8StrIndex] = '\0';
-  *Utf8StrAddr = Utf8Str;
+  *Utf8StrAddr          = Utf8Str;
 
   return EFI_SUCCESS;
 }
@@ -334,18 +325,18 @@ UCS2StrToUTF8 (
 **/
 EFI_STATUS
 UTF8StrToUCS2 (
-  IN  CHAR8      *Utf8Str,
-  OUT CHAR16     **Ucs2StrAddr
+  IN  CHAR8   *Utf8Str,
+  OUT CHAR16  **Ucs2StrAddr
   )
 {
-  EFI_STATUS    Status;
-  UINTN         Utf8StrIndex;
-  UINTN         Utf8StrLength;
-  UINTN         Ucs2StrIndex;
-  UINT8         Utf8BufferSize;
-  CHAR16        *Ucs2StrTemp;
+  EFI_STATUS  Status;
+  UINTN       Utf8StrIndex;
+  UINTN       Utf8StrLength;
+  UINTN       Ucs2StrIndex;
+  UINT8       Utf8BufferSize;
+  CHAR16      *Ucs2StrTemp;
 
-  if (Utf8Str == NULL || Ucs2StrAddr == NULL) {
+  if ((Utf8Str == NULL) || (Ucs2StrAddr == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -354,7 +345,7 @@ UTF8StrToUCS2 (
   //
   Utf8StrLength = 0;
   while (*(Utf8Str + Utf8StrLength) != '\0') {
-    Utf8StrLength ++;
+    Utf8StrLength++;
   }
 
   //
@@ -368,46 +359,39 @@ UTF8StrToUCS2 (
   Utf8StrIndex = 0;
   Ucs2StrIndex = 0;
   while (Utf8Str[Utf8StrIndex] != '\0') {
-
-    if (CompareMem (Utf8Str + Utf8StrIndex, "\\u", 2) == 0 &&
-      Utf8StrLength - Utf8StrIndex >= UNICODE_FORMAT_LEN) {
-
+    if ((CompareMem (Utf8Str + Utf8StrIndex, "\\u", 2) == 0) &&
+        (Utf8StrLength - Utf8StrIndex >= UNICODE_FORMAT_LEN))
+    {
       Status = GetUCS2CharByFormat (Utf8Str + Utf8StrIndex, Ucs2StrTemp + Ucs2StrIndex);
       if (!EFI_ERROR (Status)) {
-
         Utf8StrIndex += UNICODE_FORMAT_LEN;
-        Ucs2StrIndex ++;
+        Ucs2StrIndex++;
       } else {
-
         StrCpyS (Ucs2StrTemp + Ucs2StrIndex, 3, L"\\u");
 
         Ucs2StrIndex += 2;
         Utf8StrIndex += 2;
       }
     } else {
-
       Utf8BufferSize = GetUTF8SizeForUCS2 (Utf8Str + Utf8StrIndex);
-      if (Utf8BufferSize == 0 || Utf8StrLength - Utf8StrIndex < Utf8BufferSize) {
-
+      if ((Utf8BufferSize == 0) || (Utf8StrLength - Utf8StrIndex < Utf8BufferSize)) {
         FreePool (Ucs2StrTemp);
         return EFI_INVALID_PARAMETER;
       }
 
       Status = UTF8ToUCS2Char (Utf8Str + Utf8StrIndex, Ucs2StrTemp + Ucs2StrIndex);
       if (EFI_ERROR (Status)) {
-
         FreePool (Ucs2StrTemp);
         return EFI_INVALID_PARAMETER;
       }
 
-      Ucs2StrIndex ++;
+      Ucs2StrIndex++;
       Utf8StrIndex += Utf8BufferSize;
     }
   }
 
   *Ucs2StrAddr = AllocateZeroPool ((Ucs2StrIndex + 1) * sizeof (CHAR16));
   if (*Ucs2StrAddr == NULL) {
-
     FreePool (Ucs2StrTemp);
     return EFI_OUT_OF_RESOURCES;
   }
@@ -418,4 +402,3 @@ UTF8StrToUCS2 (
 
   return EFI_SUCCESS;
 }
-
