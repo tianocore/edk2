@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <openssl/md5.h>
 
 #ifdef ENABLE_MD5_DEPRECATED_INTERFACES
+
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
@@ -25,9 +26,8 @@ Md5GetContextSize (
   //
   // Retrieves the OpenSSL MD5 Context Size
   //
-  return (UINTN) (sizeof (MD5_CTX));
+  return (UINTN)(sizeof (MD5_CTX));
 }
-
 
 /**
   Initializes user-supplied memory pointed by Md5Context as MD5 hash context for
@@ -57,7 +57,7 @@ Md5Init (
   //
   // OpenSSL MD5 Context Initialization
   //
-  return (BOOLEAN) (MD5_Init ((MD5_CTX *) Md5Context));
+  return (BOOLEAN)(MD5_Init ((MD5_CTX *)Md5Context));
 }
 
 /**
@@ -83,7 +83,7 @@ Md5Duplicate (
   //
   // Check input parameters.
   //
-  if (Md5Context == NULL || NewMd5Context == NULL) {
+  if ((Md5Context == NULL) || (NewMd5Context == NULL)) {
     return FALSE;
   }
 
@@ -128,14 +128,14 @@ Md5Update (
   //
   // Check invalid parameters, in case that only DataLength was checked in OpenSSL
   //
-  if (Data == NULL && (DataSize != 0)) {
+  if ((Data == NULL) && (DataSize != 0)) {
     return FALSE;
   }
 
   //
   // OpenSSL MD5 Hash Update
   //
-  return (BOOLEAN) (MD5_Update ((MD5_CTX *) Md5Context, Data, DataSize));
+  return (BOOLEAN)(MD5_Update ((MD5_CTX *)Md5Context, Data, DataSize));
 }
 
 /**
@@ -168,14 +168,14 @@ Md5Final (
   //
   // Check input parameters.
   //
-  if (Md5Context == NULL || HashValue == NULL) {
+  if ((Md5Context == NULL) || (HashValue == NULL)) {
     return FALSE;
   }
 
   //
   // OpenSSL MD5 Hash Finalization
   //
-  return (BOOLEAN) (MD5_Final (HashValue, (MD5_CTX *) Md5Context));
+  return (BOOLEAN)(MD5_Final (HashValue, (MD5_CTX *)Md5Context));
 }
 
 /**
@@ -210,7 +210,8 @@ Md5HashAll (
   if (HashValue == NULL) {
     return FALSE;
   }
-  if (Data == NULL && (DataSize != 0)) {
+
+  if ((Data == NULL) && (DataSize != 0)) {
     return FALSE;
   }
 
@@ -223,4 +224,5 @@ Md5HashAll (
     return TRUE;
   }
 }
+
 #endif

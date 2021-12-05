@@ -30,14 +30,14 @@ PasswordCallback (
 {
   INTN  KeyLength;
 
-  ZeroMem ((VOID *) Buf, (UINTN) Size);
+  ZeroMem ((VOID *)Buf, (UINTN)Size);
   if (Key != NULL) {
     //
     // Duplicate key phrase directly.
     //
-    KeyLength = (INTN) AsciiStrLen ((CHAR8 *)Key);
-    KeyLength = (KeyLength > Size ) ? Size : KeyLength;
-    CopyMem (Buf, Key, (UINTN) KeyLength);
+    KeyLength = (INTN)AsciiStrLen ((CHAR8 *)Key);
+    KeyLength = (KeyLength > Size) ? Size : KeyLength;
+    CopyMem (Buf, Key, (UINTN)KeyLength);
     return KeyLength;
   } else {
     return 0;
@@ -76,7 +76,7 @@ RsaGetPrivateKeyFromPem (
   //
   // Check input parameters.
   //
-  if (PemData == NULL || RsaContext == NULL || PemSize > INT_MAX) {
+  if ((PemData == NULL) || (RsaContext == NULL) || (PemSize > INT_MAX)) {
     return FALSE;
   }
 
@@ -87,9 +87,11 @@ RsaGetPrivateKeyFromPem (
   if (EVP_add_cipher (EVP_aes_128_cbc ()) == 0) {
     return FALSE;
   }
+
   if (EVP_add_cipher (EVP_aes_192_cbc ()) == 0) {
     return FALSE;
   }
+
   if (EVP_add_cipher (EVP_aes_256_cbc ()) == 0) {
     return FALSE;
   }
@@ -104,14 +106,14 @@ RsaGetPrivateKeyFromPem (
     goto _Exit;
   }
 
-  if (BIO_write (PemBio, PemData, (int) PemSize) <= 0) {
+  if (BIO_write (PemBio, PemData, (int)PemSize) <= 0) {
     goto _Exit;
   }
 
   //
   // Retrieve RSA Private Key from encrypted PEM data.
   //
-  *RsaContext = PEM_read_bio_RSAPrivateKey (PemBio, NULL, (pem_password_cb *) &PasswordCallback, (void *) Password);
+  *RsaContext = PEM_read_bio_RSAPrivateKey (PemBio, NULL, (pem_password_cb *)&PasswordCallback, (void *)Password);
   if (*RsaContext != NULL) {
     Status = TRUE;
   }

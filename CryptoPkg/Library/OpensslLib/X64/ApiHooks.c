@@ -14,9 +14,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID *
 __imp_RtlVirtualUnwind (
-  VOID *    Args
+  VOID  *Args
   )
 {
   return NULL;
 }
-

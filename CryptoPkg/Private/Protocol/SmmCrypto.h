@@ -16,6 +16,6 @@
 ///
 typedef EDKII_CRYPTO_PROTOCOL EDKII_SMM_CRYPTO_PROTOCOL;
 
-extern GUID gEdkiiSmmCryptoProtocolGuid;
+extern GUID  gEdkiiSmmCryptoProtocolGuid;
 
 #endif

@@ -39,37 +39,42 @@ HkdfSha256ExtractAndExpand (
   IN   UINTN        OutSize
   )
 {
-  EVP_PKEY_CTX *pHkdfCtx;
-  BOOLEAN Result;
+  EVP_PKEY_CTX  *pHkdfCtx;
+  BOOLEAN       Result;
 
-  if (Key == NULL || Salt == NULL || Info == NULL || Out == NULL ||
-    KeySize > INT_MAX || SaltSize > INT_MAX || InfoSize > INT_MAX || OutSize > INT_MAX ) {
+  if ((Key == NULL) || (Salt == NULL) || (Info == NULL) || (Out == NULL) ||
+      (KeySize > INT_MAX) || (SaltSize > INT_MAX) || (InfoSize > INT_MAX) || (OutSize > INT_MAX))
+  {
     return FALSE;
   }
 
-  pHkdfCtx = EVP_PKEY_CTX_new_id(EVP_PKEY_HKDF, NULL);
+  pHkdfCtx = EVP_PKEY_CTX_new_id (EVP_PKEY_HKDF, NULL);
   if (pHkdfCtx == NULL) {
     return FALSE;
   }
 
-  Result = EVP_PKEY_derive_init(pHkdfCtx) > 0;
+  Result = EVP_PKEY_derive_init (pHkdfCtx) > 0;
   if (Result) {
-    Result = EVP_PKEY_CTX_set_hkdf_md(pHkdfCtx, EVP_sha256()) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_set1_hkdf_salt(pHkdfCtx, Salt, (UINT32)SaltSize) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_set1_hkdf_key(pHkdfCtx, Key, (UINT32)KeySize) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_add1_hkdf_info(pHkdfCtx, Info, (UINT32)InfoSize) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_derive(pHkdfCtx, Out, &OutSize) > 0;
+    Result = EVP_PKEY_CTX_set_hkdf_md (pHkdfCtx, EVP_sha256 ()) > 0;
   }
 
-  EVP_PKEY_CTX_free(pHkdfCtx);
+  if (Result) {
+    Result = EVP_PKEY_CTX_set1_hkdf_salt (pHkdfCtx, Salt, (UINT32)SaltSize) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_set1_hkdf_key (pHkdfCtx, Key, (UINT32)KeySize) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_add1_hkdf_info (pHkdfCtx, Info, (UINT32)InfoSize) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_PKEY_derive (pHkdfCtx, Out, &OutSize) > 0;
+  }
+
+  EVP_PKEY_CTX_free (pHkdfCtx);
   pHkdfCtx = NULL;
   return Result;
 }

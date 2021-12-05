@@ -16,7 +16,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <openssl/objects.h>
 #include <openssl/evp.h>
 
-
 /**
   Retrieve a pointer to EVP message digest object.
 
@@ -25,26 +24,25 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 STATIC
 const
-EVP_MD*
+EVP_MD *
 GetEvpMD (
-  IN UINT16 DigestLen
+  IN UINT16  DigestLen
   )
 {
-  switch (DigestLen){
+  switch (DigestLen) {
     case SHA256_DIGEST_SIZE:
-      return EVP_sha256();
+      return EVP_sha256 ();
       break;
     case SHA384_DIGEST_SIZE:
-      return EVP_sha384();
+      return EVP_sha384 ();
       break;
     case SHA512_DIGEST_SIZE:
-      return EVP_sha512();
+      return EVP_sha512 ();
       break;
     default:
       return NULL;
   }
 }
-
 
 /**
   Carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme.
@@ -90,23 +88,24 @@ RsaPssSign (
   IN OUT  UINTN        *SigSize
   )
 {
-  BOOLEAN               Result;
-  UINTN                 RsaSigSize;
-  EVP_PKEY              *EvpRsaKey;
-  EVP_MD_CTX            *EvpVerifyCtx;
-  EVP_PKEY_CTX          *KeyCtx;
-  CONST EVP_MD          *HashAlg;
+  BOOLEAN       Result;
+  UINTN         RsaSigSize;
+  EVP_PKEY      *EvpRsaKey;
+  EVP_MD_CTX    *EvpVerifyCtx;
+  EVP_PKEY_CTX  *KeyCtx;
+  CONST EVP_MD  *HashAlg;
 
-  Result = FALSE;
-  EvpRsaKey = NULL;
+  Result       = FALSE;
+  EvpRsaKey    = NULL;
   EvpVerifyCtx = NULL;
-  KeyCtx = NULL;
-  HashAlg = NULL;
+  KeyCtx       = NULL;
+  HashAlg      = NULL;
 
   if (RsaContext == NULL) {
     return FALSE;
   }
-  if (Message == NULL || MsgSize == 0 || MsgSize > INT_MAX) {
+
+  if ((Message == NULL) || (MsgSize == 0) || (MsgSize > INT_MAX)) {
     return FALSE;
   }
 
@@ -124,51 +123,56 @@ RsaPssSign (
     return FALSE;
   }
 
-  HashAlg = GetEvpMD(DigestLen);
+  HashAlg = GetEvpMD (DigestLen);
 
   if (HashAlg == NULL) {
     return FALSE;
   }
 
-  EvpRsaKey = EVP_PKEY_new();
+  EvpRsaKey = EVP_PKEY_new ();
   if (EvpRsaKey == NULL) {
     goto _Exit;
   }
 
-  EVP_PKEY_set1_RSA(EvpRsaKey, RsaContext);
+  EVP_PKEY_set1_RSA (EvpRsaKey, RsaContext);
 
-  EvpVerifyCtx = EVP_MD_CTX_create();
+  EvpVerifyCtx = EVP_MD_CTX_create ();
   if (EvpVerifyCtx == NULL) {
     goto _Exit;
   }
 
-  Result = EVP_DigestSignInit(EvpVerifyCtx, &KeyCtx, HashAlg, NULL, EvpRsaKey) > 0;
+  Result = EVP_DigestSignInit (EvpVerifyCtx, &KeyCtx, HashAlg, NULL, EvpRsaKey) > 0;
   if (KeyCtx == NULL) {
     goto _Exit;
   }
 
   if (Result) {
-    Result = EVP_PKEY_CTX_set_rsa_padding(KeyCtx, RSA_PKCS1_PSS_PADDING) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_set_rsa_pss_saltlen(KeyCtx, SaltLen) > 0;
-  }
-  if (Result) {
-    Result = EVP_PKEY_CTX_set_rsa_mgf1_md(KeyCtx, HashAlg) > 0;
-  }
-  if (Result) {
-    Result = EVP_DigestSignUpdate(EvpVerifyCtx, Message, (UINT32)MsgSize) > 0;
-  }
-  if (Result) {
-    Result = EVP_DigestSignFinal(EvpVerifyCtx, Signature, SigSize) > 0;
+    Result = EVP_PKEY_CTX_set_rsa_padding (KeyCtx, RSA_PKCS1_PSS_PADDING) > 0;
   }
 
-_Exit :
-  if (EvpRsaKey != NULL) {
-    EVP_PKEY_free(EvpRsaKey);
+  if (Result) {
+    Result = EVP_PKEY_CTX_set_rsa_pss_saltlen (KeyCtx, SaltLen) > 0;
   }
+
+  if (Result) {
+    Result = EVP_PKEY_CTX_set_rsa_mgf1_md (KeyCtx, HashAlg) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_DigestSignUpdate (EvpVerifyCtx, Message, (UINT32)MsgSize) > 0;
+  }
+
+  if (Result) {
+    Result = EVP_DigestSignFinal (EvpVerifyCtx, Signature, SigSize) > 0;
+  }
+
+_Exit:
+  if (EvpRsaKey != NULL) {
+    EVP_PKEY_free (EvpRsaKey);
+  }
+
   if (EvpVerifyCtx != NULL) {
-    EVP_MD_CTX_destroy(EvpVerifyCtx);
+    EVP_MD_CTX_destroy (EvpVerifyCtx);
   }
 
   return Result;

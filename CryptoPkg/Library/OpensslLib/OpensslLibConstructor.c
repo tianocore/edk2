@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Uefi.h>
 
-
 /**
   An internal OpenSSL function which fetches a local copy of the hardware
   capability flags.
@@ -41,4 +40,3 @@ OpensslLibConstructor (
 
   return EFI_SUCCESS;
 }
-

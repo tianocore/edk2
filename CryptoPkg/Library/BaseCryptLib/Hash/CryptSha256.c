@@ -24,7 +24,7 @@ Sha256GetContextSize (
   //
   // Retrieves OpenSSL SHA-256 Context Size
   //
-  return (UINTN) (sizeof (SHA256_CTX));
+  return (UINTN)(sizeof (SHA256_CTX));
 }
 
 /**
@@ -55,7 +55,7 @@ Sha256Init (
   //
   // OpenSSL SHA-256 Context Initialization
   //
-  return (BOOLEAN) (SHA256_Init ((SHA256_CTX *) Sha256Context));
+  return (BOOLEAN)(SHA256_Init ((SHA256_CTX *)Sha256Context));
 }
 
 /**
@@ -81,7 +81,7 @@ Sha256Duplicate (
   //
   // Check input parameters.
   //
-  if (Sha256Context == NULL || NewSha256Context == NULL) {
+  if ((Sha256Context == NULL) || (NewSha256Context == NULL)) {
     return FALSE;
   }
 
@@ -126,14 +126,14 @@ Sha256Update (
   //
   // Check invalid parameters, in case that only DataLength was checked in OpenSSL
   //
-  if (Data == NULL && DataSize != 0) {
+  if ((Data == NULL) && (DataSize != 0)) {
     return FALSE;
   }
 
   //
   // OpenSSL SHA-256 Hash Update
   //
-  return (BOOLEAN) (SHA256_Update ((SHA256_CTX *) Sha256Context, Data, DataSize));
+  return (BOOLEAN)(SHA256_Update ((SHA256_CTX *)Sha256Context, Data, DataSize));
 }
 
 /**
@@ -166,14 +166,14 @@ Sha256Final (
   //
   // Check input parameters.
   //
-  if (Sha256Context == NULL || HashValue == NULL) {
+  if ((Sha256Context == NULL) || (HashValue == NULL)) {
     return FALSE;
   }
 
   //
   // OpenSSL SHA-256 Hash Finalization
   //
-  return (BOOLEAN) (SHA256_Final (HashValue, (SHA256_CTX *) Sha256Context));
+  return (BOOLEAN)(SHA256_Final (HashValue, (SHA256_CTX *)Sha256Context));
 }
 
 /**
@@ -208,7 +208,8 @@ Sha256HashAll (
   if (HashValue == NULL) {
     return FALSE;
   }
-  if (Data == NULL && DataSize != 0) {
+
+  if ((Data == NULL) && (DataSize != 0)) {
     return FALSE;
   }
 

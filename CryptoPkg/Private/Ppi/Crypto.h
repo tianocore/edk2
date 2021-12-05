@@ -16,6 +16,6 @@
 ///
 typedef EDKII_CRYPTO_PROTOCOL EDKII_CRYPTO_PPI;
 
-extern GUID gEdkiiCryptoPpiGuid;
+extern GUID  gEdkiiCryptoPpiGuid;
 
 #endif

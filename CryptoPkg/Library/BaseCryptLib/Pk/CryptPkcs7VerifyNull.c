@@ -57,7 +57,7 @@ Pkcs7GetSigners (
 VOID
 EFIAPI
 Pkcs7FreeSigners (
-  IN  UINT8        *Certs
+  IN  UINT8  *Certs
   )
 {
   ASSERT (FALSE);

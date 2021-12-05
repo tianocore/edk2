@@ -54,82 +54,81 @@ RsaGetKey (
   IN OUT  UINTN        *BnSize
   )
 {
-  RSA    *RsaKey;
-  BIGNUM *BnKey;
-  UINTN  Size;
+  RSA     *RsaKey;
+  BIGNUM  *BnKey;
+  UINTN   Size;
 
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL || BnSize == NULL) {
+  if ((RsaContext == NULL) || (BnSize == NULL)) {
     return FALSE;
   }
 
-  RsaKey  = (RSA *) RsaContext;
+  RsaKey  = (RSA *)RsaContext;
   Size    = *BnSize;
   *BnSize = 0;
   BnKey   = NULL;
 
   switch (KeyTag) {
+    //
+    // RSA Public Modulus (N)
+    //
+    case RsaKeyN:
+      RSA_get0_key (RsaKey, (const BIGNUM **)&BnKey, NULL, NULL);
+      break;
 
-  //
-  // RSA Public Modulus (N)
-  //
-  case RsaKeyN:
-    RSA_get0_key (RsaKey, (const BIGNUM **)&BnKey, NULL, NULL);
-    break;
+    //
+    // RSA Public Exponent (e)
+    //
+    case RsaKeyE:
+      RSA_get0_key (RsaKey, NULL, (const BIGNUM **)&BnKey, NULL);
+      break;
 
-  //
-  // RSA Public Exponent (e)
-  //
-  case RsaKeyE:
-    RSA_get0_key (RsaKey, NULL, (const BIGNUM **)&BnKey, NULL);
-    break;
+    //
+    // RSA Private Exponent (d)
+    //
+    case RsaKeyD:
+      RSA_get0_key (RsaKey, NULL, NULL, (const BIGNUM **)&BnKey);
+      break;
 
-  //
-  // RSA Private Exponent (d)
-  //
-  case RsaKeyD:
-    RSA_get0_key (RsaKey, NULL, NULL, (const BIGNUM **)&BnKey);
-    break;
+    //
+    // RSA Secret Prime Factor of Modulus (p)
+    //
+    case RsaKeyP:
+      RSA_get0_factors (RsaKey, (const BIGNUM **)&BnKey, NULL);
+      break;
 
-  //
-  // RSA Secret Prime Factor of Modulus (p)
-  //
-  case RsaKeyP:
-    RSA_get0_factors (RsaKey, (const BIGNUM **)&BnKey, NULL);
-    break;
+    //
+    // RSA Secret Prime Factor of Modules (q)
+    //
+    case RsaKeyQ:
+      RSA_get0_factors (RsaKey, NULL, (const BIGNUM **)&BnKey);
+      break;
 
-  //
-  // RSA Secret Prime Factor of Modules (q)
-  //
-  case RsaKeyQ:
-    RSA_get0_factors (RsaKey, NULL, (const BIGNUM **)&BnKey);
-    break;
+    //
+    // p's CRT Exponent (== d mod (p - 1))
+    //
+    case RsaKeyDp:
+      RSA_get0_crt_params (RsaKey, (const BIGNUM **)&BnKey, NULL, NULL);
+      break;
 
-  //
-  // p's CRT Exponent (== d mod (p - 1))
-  //
-  case RsaKeyDp:
-    RSA_get0_crt_params (RsaKey, (const BIGNUM **)&BnKey, NULL, NULL);
-    break;
+    //
+    // q's CRT Exponent (== d mod (q - 1))
+    //
+    case RsaKeyDq:
+      RSA_get0_crt_params (RsaKey, NULL, (const BIGNUM **)&BnKey, NULL);
+      break;
 
-  //
-  // q's CRT Exponent (== d mod (q - 1))
-  //
-  case RsaKeyDq:
-    RSA_get0_crt_params (RsaKey, NULL, (const BIGNUM **)&BnKey, NULL);
-    break;
+    //
+    // The CRT Coefficient (== 1/q mod p)
+    //
+    case RsaKeyQInv:
+      RSA_get0_crt_params (RsaKey, NULL, NULL, (const BIGNUM **)&BnKey);
+      break;
 
-  //
-  // The CRT Coefficient (== 1/q mod p)
-  //
-  case RsaKeyQInv:
-    RSA_get0_crt_params (RsaKey, NULL, NULL, (const BIGNUM **)&BnKey);
-    break;
-
-  default:
-    return FALSE;
+    default:
+      return FALSE;
   }
 
   if (BnKey == NULL) {
@@ -148,7 +147,8 @@ RsaGetKey (
     *BnSize = Size;
     return TRUE;
   }
-  *BnSize = BN_bn2bin (BnKey, BigNumber) ;
+
+  *BnSize = BN_bn2bin (BnKey, BigNumber);
 
   return TRUE;
 }
@@ -189,7 +189,7 @@ RsaGenerateKey (
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL || ModulusLength > INT_MAX || PublicExponentSize > INT_MAX) {
+  if ((RsaContext == NULL) || (ModulusLength > INT_MAX) || (PublicExponentSize > INT_MAX)) {
     return FALSE;
   }
 
@@ -205,13 +205,13 @@ RsaGenerateKey (
       goto _Exit;
     }
   } else {
-    if (BN_bin2bn (PublicExponent, (UINT32) PublicExponentSize, KeyE) == NULL) {
+    if (BN_bin2bn (PublicExponent, (UINT32)PublicExponentSize, KeyE) == NULL) {
       goto _Exit;
     }
   }
 
-  if (RSA_generate_key_ex ((RSA *) RsaContext, (UINT32) ModulusLength, KeyE, NULL) == 1) {
-   RetVal = TRUE;
+  if (RSA_generate_key_ex ((RSA *)RsaContext, (UINT32)ModulusLength, KeyE, NULL) == 1) {
+    RetVal = TRUE;
   }
 
 _Exit:
@@ -253,12 +253,13 @@ RsaCheckKey (
     return FALSE;
   }
 
-  if  (RSA_check_key ((RSA *) RsaContext) != 1) {
+  if (RSA_check_key ((RSA *)RsaContext) != 1) {
     Reason = ERR_GET_REASON (ERR_peek_last_error ());
-    if (Reason == RSA_R_P_NOT_PRIME ||
-        Reason == RSA_R_Q_NOT_PRIME ||
-        Reason == RSA_R_N_DOES_NOT_EQUAL_P_Q ||
-        Reason == RSA_R_D_E_NOT_CONGRUENT_TO_1) {
+    if ((Reason == RSA_R_P_NOT_PRIME) ||
+        (Reason == RSA_R_Q_NOT_PRIME) ||
+        (Reason == RSA_R_N_DOES_NOT_EQUAL_P_Q) ||
+        (Reason == RSA_R_D_E_NOT_CONGRUENT_TO_1))
+    {
       return FALSE;
     }
   }
@@ -301,18 +302,18 @@ RsaPkcs1Sign (
   IN OUT  UINTN        *SigSize
   )
 {
-  RSA      *Rsa;
-  UINTN    Size;
-  INT32    DigestType;
+  RSA    *Rsa;
+  UINTN  Size;
+  INT32  DigestType;
 
   //
   // Check input parameters.
   //
-  if (RsaContext == NULL || MessageHash == NULL) {
+  if ((RsaContext == NULL) || (MessageHash == NULL)) {
     return FALSE;
   }
 
-  Rsa = (RSA *) RsaContext;
+  Rsa  = (RSA *)RsaContext;
   Size = RSA_size (Rsa);
 
   if (*SigSize < Size) {
@@ -329,36 +330,36 @@ RsaPkcs1Sign (
   //   Only MD5, SHA-1, SHA-256, SHA-384 or SHA-512 algorithm is supported.
   //
   switch (HashSize) {
-  case MD5_DIGEST_SIZE:
-    DigestType = NID_md5;
-    break;
+    case MD5_DIGEST_SIZE:
+      DigestType = NID_md5;
+      break;
 
-  case SHA1_DIGEST_SIZE:
-    DigestType = NID_sha1;
-    break;
+    case SHA1_DIGEST_SIZE:
+      DigestType = NID_sha1;
+      break;
 
-  case SHA256_DIGEST_SIZE:
-    DigestType = NID_sha256;
-    break;
+    case SHA256_DIGEST_SIZE:
+      DigestType = NID_sha256;
+      break;
 
-  case SHA384_DIGEST_SIZE:
-    DigestType = NID_sha384;
-    break;
+    case SHA384_DIGEST_SIZE:
+      DigestType = NID_sha384;
+      break;
 
-  case SHA512_DIGEST_SIZE:
-    DigestType = NID_sha512;
-    break;
+    case SHA512_DIGEST_SIZE:
+      DigestType = NID_sha512;
+      break;
 
-  default:
-    return FALSE;
+    default:
+      return FALSE;
   }
 
-  return (BOOLEAN) RSA_sign (
-                     DigestType,
-                     MessageHash,
-                     (UINT32) HashSize,
-                     Signature,
-                     (UINT32 *) SigSize,
-                     (RSA *) RsaContext
-                     );
+  return (BOOLEAN)RSA_sign (
+                    DigestType,
+                    MessageHash,
+                    (UINT32)HashSize,
+                    Signature,
+                    (UINT32 *)SigSize,
+                    (RSA *)RsaContext
+                    );
 }

@@ -26,12 +26,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 TlsSetVersion (
-  IN     VOID                     *Tls,
-  IN     UINT8                    MajorVer,
-  IN     UINT8                    MinorVer
+  IN     VOID   *Tls,
+  IN     UINT8  MajorVer,
+  IN     UINT8  MinorVer
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -51,11 +51,11 @@ TlsSetVersion (
 EFI_STATUS
 EFIAPI
 TlsSetConnectionEnd (
-  IN     VOID                     *Tls,
-  IN     BOOLEAN                  IsServer
+  IN     VOID     *Tls,
+  IN     BOOLEAN  IsServer
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -80,12 +80,12 @@ TlsSetConnectionEnd (
 EFI_STATUS
 EFIAPI
 TlsSetCipherList (
-  IN     VOID                     *Tls,
-  IN     UINT16                   *CipherId,
-  IN     UINTN                    CipherNum
+  IN     VOID    *Tls,
+  IN     UINT16  *CipherId,
+  IN     UINTN   CipherNum
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -104,10 +104,10 @@ TlsSetCipherList (
 EFI_STATUS
 EFIAPI
 TlsSetCompressionMethod (
-  IN     UINT8                    CompMethod
+  IN     UINT8  CompMethod
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -123,14 +123,15 @@ TlsSetCompressionMethod (
 VOID
 EFIAPI
 TlsSetVerify (
-  IN     VOID                     *Tls,
-  IN     UINT32                   VerifyMode
+  IN     VOID    *Tls,
+  IN     UINT32  VerifyMode
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 // MU_CHANGE - Proposed fixes for TCBZ960, invalid domain name (CN) accepted. [BEGIN]
+
 /**
   Set the specified host name to be verified.
 
@@ -146,12 +147,12 @@ TlsSetVerify (
 EFI_STATUS
 EFIAPI
 TlsSetVerifyHost (
-  IN     VOID                     *Tls,
-  IN     UINT32                   Flags,
-  IN     CHAR8                    *HostName
+  IN     VOID    *Tls,
+  IN     UINT32  Flags,
+  IN     CHAR8   *HostName
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -175,12 +176,12 @@ TlsSetVerifyHost (
 EFI_STATUS
 EFIAPI
 TlsSetSessionId (
-  IN     VOID                     *Tls,
-  IN     UINT8                    *SessionId,
-  IN     UINT16                   SessionIdLen
+  IN     VOID    *Tls,
+  IN     UINT8   *SessionId,
+  IN     UINT16  SessionIdLen
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -204,12 +205,12 @@ TlsSetSessionId (
 EFI_STATUS
 EFIAPI
 TlsSetCaCertificate (
-  IN     VOID                     *Tls,
-  IN     VOID                     *Data,
-  IN     UINTN                    DataSize
+  IN     VOID   *Tls,
+  IN     VOID   *Data,
+  IN     UINTN  DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -233,12 +234,12 @@ TlsSetCaCertificate (
 EFI_STATUS
 EFIAPI
 TlsSetHostPublicCert (
-  IN     VOID                     *Tls,
-  IN     VOID                     *Data,
-  IN     UINTN                    DataSize
+  IN     VOID   *Tls,
+  IN     VOID   *Data,
+  IN     UINTN  DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -261,12 +262,12 @@ TlsSetHostPublicCert (
 EFI_STATUS
 EFIAPI
 TlsSetHostPrivateKey (
-  IN     VOID                     *Tls,
-  IN     VOID                     *Data,
-  IN     UINTN                    DataSize
+  IN     VOID   *Tls,
+  IN     VOID   *Data,
+  IN     UINTN  DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -287,11 +288,11 @@ TlsSetHostPrivateKey (
 EFI_STATUS
 EFIAPI
 TlsSetCertRevocationList (
-  IN     VOID                     *Data,
-  IN     UINTN                    DataSize
+  IN     VOID   *Data,
+  IN     UINTN  DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -311,10 +312,10 @@ TlsSetCertRevocationList (
 UINT16
 EFIAPI
 TlsGetVersion (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -334,10 +335,10 @@ TlsGetVersion (
 UINT8
 EFIAPI
 TlsGetConnectionEnd (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -358,11 +359,11 @@ TlsGetConnectionEnd (
 EFI_STATUS
 EFIAPI
 TlsGetCurrentCipher (
-  IN     VOID                     *Tls,
-  IN OUT UINT16                   *CipherId
+  IN     VOID    *Tls,
+  IN OUT UINT16  *CipherId
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -385,11 +386,11 @@ TlsGetCurrentCipher (
 EFI_STATUS
 EFIAPI
 TlsGetCurrentCompressionId (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *CompressionId
+  IN     VOID   *Tls,
+  IN OUT UINT8  *CompressionId
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -409,10 +410,10 @@ TlsGetCurrentCompressionId (
 UINT32
 EFIAPI
 TlsGetVerify (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return 0;
 }
 
@@ -434,12 +435,12 @@ TlsGetVerify (
 EFI_STATUS
 EFIAPI
 TlsGetSessionId (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *SessionId,
-  IN OUT UINT16                   *SessionIdLen
+  IN     VOID    *Tls,
+  IN OUT UINT8   *SessionId,
+  IN OUT UINT16  *SessionIdLen
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -457,11 +458,11 @@ TlsGetSessionId (
 VOID
 EFIAPI
 TlsGetClientRandom (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *ClientRandom
+  IN     VOID   *Tls,
+  IN OUT UINT8  *ClientRandom
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 /**
@@ -478,11 +479,11 @@ TlsGetClientRandom (
 VOID
 EFIAPI
 TlsGetServerRandom (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *ServerRandom
+  IN     VOID   *Tls,
+  IN OUT UINT8  *ServerRandom
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 /**
@@ -502,11 +503,11 @@ TlsGetServerRandom (
 EFI_STATUS
 EFIAPI
 TlsGetKeyMaterial (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *KeyMaterial
+  IN     VOID   *Tls,
+  IN OUT UINT8  *KeyMaterial
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -529,12 +530,12 @@ TlsGetKeyMaterial (
 EFI_STATUS
 EFIAPI
 TlsGetCaCertificate (
-  IN     VOID                     *Tls,
-  OUT    VOID                     *Data,
-  IN OUT UINTN                    *DataSize
+  IN     VOID   *Tls,
+  OUT    VOID   *Data,
+  IN OUT UINTN  *DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -558,12 +559,12 @@ TlsGetCaCertificate (
 EFI_STATUS
 EFIAPI
 TlsGetHostPublicCert (
-  IN     VOID                     *Tls,
-  OUT    VOID                     *Data,
-  IN OUT UINTN                    *DataSize
+  IN     VOID   *Tls,
+  OUT    VOID   *Data,
+  IN OUT UINTN  *DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -586,12 +587,12 @@ TlsGetHostPublicCert (
 EFI_STATUS
 EFIAPI
 TlsGetHostPrivateKey (
-  IN     VOID                     *Tls,
-  OUT    VOID                     *Data,
-  IN OUT UINTN                    *DataSize
+  IN     VOID   *Tls,
+  OUT    VOID   *Data,
+  IN OUT UINTN  *DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
@@ -613,10 +614,10 @@ TlsGetHostPrivateKey (
 EFI_STATUS
 EFIAPI
 TlsGetCertRevocationList (
-  OUT    VOID                     *Data,
-  IN OUT UINTN                    *DataSize
+  OUT    VOID   *Data,
+  IN OUT UINTN  *DataSize
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }

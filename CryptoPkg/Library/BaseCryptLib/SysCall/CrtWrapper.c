@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <CrtLibSupport.h>
 
-int errno = 0;
+int  errno = 0;
 
 FILE  *stderr = NULL;
 FILE  *stdin  = NULL;
@@ -35,15 +35,15 @@ QuickSortWorker (
   IN        VOID          *Buffer
   )
 {
-  VOID        *Pivot;
-  UINTN       LoopCount;
-  UINTN       NextSwapLocation;
+  VOID   *Pivot;
+  UINTN  LoopCount;
+  UINTN  NextSwapLocation;
 
-  ASSERT(BufferToSort    != NULL);
-  ASSERT(CompareFunction != NULL);
-  ASSERT(Buffer          != NULL);
+  ASSERT (BufferToSort    != NULL);
+  ASSERT (CompareFunction != NULL);
+  ASSERT (Buffer          != NULL);
 
-  if (Count < 2 || ElementSize  < 1) {
+  if ((Count < 2) || (ElementSize  < 1)) {
     return;
   }
 
@@ -58,8 +58,7 @@ QuickSortWorker (
   // Now get the pivot such that all on "left" are below it
   // and everything "right" are above it
   //
-  for (LoopCount = 0; LoopCount < Count - 1;  LoopCount++)
-  {
+  for (LoopCount = 0; LoopCount < Count - 1; LoopCount++) {
     //
     // If the element is less than the pivot
     //
@@ -77,6 +76,7 @@ QuickSortWorker (
       NextSwapLocation++;
     }
   }
+
   //
   // Swap pivot to its final position (NextSwapLocation)
   //
@@ -107,28 +107,37 @@ QuickSortWorker (
   return;
 }
 
-//---------------------------------------------------------
+// ---------------------------------------------------------
 // Standard C Run-time Library Interface Wrapper
-//---------------------------------------------------------
+// ---------------------------------------------------------
 
 //
 // -- String Manipulation Routines --
 //
 
-char *strchr(const char *str, int ch)
+char *
+strchr (
+  const char  *str,
+  int         ch
+  )
 {
   return ScanMem8 (str, AsciiStrSize (str), (UINT8)ch);
 }
 
 /* Scan a string for the last occurrence of a character */
-char *strrchr (const char *str, int c)
+char *
+strrchr (
+  const char  *str,
+  int         c
+  )
 {
-  char * save;
+  char  *save;
 
   for (save = NULL; ; ++str) {
     if (*str == c) {
       save = (char *)str;
     }
+
     if (*str == 0) {
       return (save);
     }
@@ -136,19 +145,25 @@ char *strrchr (const char *str, int c)
 }
 
 /* Compare first n bytes of string s1 with string s2, ignoring case */
-int strncasecmp (const char *s1, const char *s2, size_t n)
+int
+strncasecmp (
+  const char  *s1,
+  const char  *s2,
+  size_t      n
+  )
 {
-  int Val;
+  int  Val;
 
-  ASSERT(s1 != NULL);
-  ASSERT(s2 != NULL);
+  ASSERT (s1 != NULL);
+  ASSERT (s2 != NULL);
 
   if (n != 0) {
     do {
-      Val = tolower(*s1) - tolower(*s2);
+      Val = tolower (*s1) - tolower (*s2);
       if (Val != 0) {
         return Val;
       }
+
       ++s1;
       ++s2;
       if (*s1 == '\0') {
@@ -156,11 +171,17 @@ int strncasecmp (const char *s1, const char *s2, size_t n)
       }
     } while (--n != 0);
   }
+
   return 0;
 }
 
 /* Read formatted data from a string */
-int sscanf (const char *buffer, const char *format, ...)
+int
+sscanf (
+  const char  *buffer,
+  const char  *format,
+  ...
+  )
 {
   //
   // Null sscanf() function implementation to satisfy the linker, since
@@ -170,14 +191,21 @@ int sscanf (const char *buffer, const char *format, ...)
 }
 
 /* Maps errnum to an error-message string */
-char * strerror (int errnum)
+char *
+strerror (
+  int  errnum
+  )
 {
   return NULL;
 }
 
 /* Computes the length of the maximum initial segment of the string pointed to by s1
    which consists entirely of characters from the string pointed to by s2. */
-size_t strspn (const char *s1 , const char *s2)
+size_t
+strspn (
+  const char  *s1,
+  const char  *s2
+  )
 {
   UINT8   Map[32];
   UINT32  Index;
@@ -207,11 +235,15 @@ size_t strspn (const char *s1 , const char *s2)
 
 /* Computes the length of the maximum initial segment of the string pointed to by s1
    which consists entirely of characters not from the string pointed to by s2. */
-size_t strcspn (const char *s1, const char *s2)
+size_t
+strcspn (
+  const char  *s1,
+  const char  *s2
+  )
 {
-  UINT8  Map[32];
-  UINT32 Index;
-  size_t Count;
+  UINT8   Map[32];
+  UINT32  Index;
+  size_t  Count;
 
   for (Index = 0; Index < 32; Index++) {
     Map[Index] = 0;
@@ -224,9 +256,9 @@ size_t strcspn (const char *s1, const char *s2)
 
   Map[0] |= 1;
 
-  Count   = 0;
+  Count = 0;
   while (!(Map[*s1 >> 3] & (1 << (*s1 & 7)))) {
-    Count ++;
+    Count++;
     s1++;
   }
 
@@ -238,7 +270,10 @@ size_t strcspn (const char *s1, const char *s2)
 //
 
 /* Determines if a particular character is a decimal-digit character */
-int isdigit (int c)
+int
+isdigit (
+  int  c
+  )
 {
   //
   // <digit> ::= [0-9]
@@ -247,7 +282,10 @@ int isdigit (int c)
 }
 
 /* Determine if an integer represents character that is a hex digit */
-int isxdigit (int c)
+int
+isxdigit (
+  int  c
+  )
 {
   //
   // <hexdigit> ::= [0-9] | [a-f] | [A-F]
@@ -258,7 +296,10 @@ int isxdigit (int c)
 }
 
 /* Determines if a particular character represents a space character */
-int isspace (int c)
+int
+isspace (
+  int  c
+  )
 {
   //
   // <space> ::= [ ]
@@ -267,7 +308,10 @@ int isspace (int c)
 }
 
 /* Determine if a particular character is an alphanumeric character */
-int isalnum (int c)
+int
+isalnum (
+  int  c
+  )
 {
   //
   // <alnum> ::= [0-9] | [a-z] | [A-Z]
@@ -278,7 +322,10 @@ int isalnum (int c)
 }
 
 /* Determines if a particular character is in upper case */
-int isupper (int c)
+int
+isupper (
+  int  c
+  )
 {
   //
   // <uppercase letter> := [A-Z]
@@ -291,7 +338,12 @@ int isupper (int c)
 //
 
 /* Convert strings to a long-integer value */
-long strtol (const char *nptr, char **endptr, int base)
+long
+strtol (
+  const char  *nptr,
+  char        **endptr,
+  int         base
+  )
 {
   //
   // Null strtol() function implementation to satisfy the linker, since there is
@@ -301,7 +353,12 @@ long strtol (const char *nptr, char **endptr, int base)
 }
 
 /* Convert strings to an unsigned long-integer value */
-unsigned long strtoul (const char *nptr, char **endptr, int base)
+unsigned long
+strtoul (
+  const char  *nptr,
+  char        **endptr,
+  int         base
+  )
 {
   //
   // Null strtoul() function implementation to satisfy the linker, since there is
@@ -311,11 +368,15 @@ unsigned long strtoul (const char *nptr, char **endptr, int base)
 }
 
 /* Convert character to lowercase */
-int tolower (int c)
+int
+tolower (
+  int  c
+  )
 {
   if (('A' <= (c)) && ((c) <= 'Z')) {
     return (c - ('A' - 'a'));
   }
+
   return (c);
 }
 
@@ -324,7 +385,13 @@ int tolower (int c)
 //
 
 /* Performs a quick sort */
-void qsort (void *base, size_t num, size_t width, int (*compare)(const void *, const void *))
+void
+qsort (
+  void *base,
+  size_t num,
+  size_t width,
+  int ( *compare )(const void *, const void *)
+  )
 {
   VOID  *Buffer;
 
@@ -351,7 +418,10 @@ void qsort (void *base, size_t num, size_t width, int (*compare)(const void *, c
 //
 
 /* Get a value from the current environment */
-char *getenv (const char *varname)
+char *
+getenv (
+  const char  *varname
+  )
 {
   //
   // Null getenv() function implementation to satisfy the linker, since there is
@@ -361,7 +431,10 @@ char *getenv (const char *varname)
 }
 
 /* Get a value from the current environment */
-char *secure_getenv (const char *varname)
+char *
+secure_getenv (
+  const char  *varname
+  )
 {
   //
   // Null secure_getenv() function implementation to satisfy the linker, since
@@ -378,7 +451,13 @@ char *secure_getenv (const char *varname)
 //
 
 /* Write data to a stream */
-size_t fwrite (const void *buffer, size_t size, size_t count, FILE *stream)
+size_t
+fwrite (
+  const void  *buffer,
+  size_t      size,
+  size_t      count,
+  FILE        *stream
+  )
 {
   return 0;
 }
@@ -387,12 +466,23 @@ size_t fwrite (const void *buffer, size_t size, size_t count, FILE *stream)
 //  -- Dummy OpenSSL Support Routines --
 //
 
-int BIO_printf (void *bio, const char *format, ...)
+int
+BIO_printf (
+  void        *bio,
+  const char  *format,
+  ...
+  )
 {
   return 0;
 }
 
-int BIO_snprintf(char *buf, size_t n, const char *format, ...)
+int
+BIO_snprintf (
+  char        *buf,
+  size_t      n,
+  const char  *format,
+  ...
+  )
 {
   return 0;
 }
@@ -403,7 +493,7 @@ typedef
 VOID
 (EFIAPI *NoReturnFuncPtr)(
   VOID
-  ) __attribute__((__noreturn__));
+  ) __attribute__ ((__noreturn__));
 
 STATIC
 VOID
@@ -414,60 +504,95 @@ NopFunction (
 {
 }
 
-void abort (void)
+void
+abort (
+  void
+  )
 {
-  NoReturnFuncPtr NoReturnFunc;
+  NoReturnFuncPtr  NoReturnFunc;
 
-  NoReturnFunc = (NoReturnFuncPtr) NopFunction;
+  NoReturnFunc = (NoReturnFuncPtr)NopFunction;
 
   NoReturnFunc ();
 }
 
 #else
 
-void abort (void)
+void
+abort (
+  void
+  )
 {
   // Do nothing
 }
 
 #endif
 
-int fclose (FILE *f)
+int
+fclose (
+  FILE  *f
+  )
 {
   return 0;
 }
 
-FILE *fopen (const char *c, const char *m)
+FILE *
+fopen (
+  const char  *c,
+  const char  *m
+  )
 {
   return NULL;
 }
 
-size_t fread (void *b, size_t c, size_t i, FILE *f)
+size_t
+fread (
+  void    *b,
+  size_t  c,
+  size_t  i,
+  FILE    *f
+  )
 {
   return 0;
 }
 
-uid_t getuid (void)
+uid_t
+getuid (
+  void
+  )
 {
   return 0;
 }
 
-uid_t geteuid (void)
+uid_t
+geteuid (
+  void
+  )
 {
   return 0;
 }
 
-gid_t getgid (void)
+gid_t
+getgid (
+  void
+  )
 {
   return 0;
 }
 
-gid_t getegid (void)
+gid_t
+getegid (
+  void
+  )
 {
   return 0;
 }
 
-int printf (char const *fmt, ...)
+int
+printf (
+  char const  *fmt,
+  ...
+  )
 {
   return 0;
 }
