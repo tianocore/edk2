@@ -10,15 +10,15 @@
 
 /** Is a character upper case
 */
-#define IS_UPPER_CHAR(x) ((x >= 'A') && (x <= 'Z'))
+#define IS_UPPER_CHAR(x)  ((x >= 'A') && (x <= 'Z'))
 
 /** Is a character a decimal digit
 */
-#define IS_DIGIT(x) ((x >= '0') && (x <= '9'))
+#define IS_DIGIT(x)  ((x >= '0') && (x <= '9'))
 
 /** Is a character an upper case hexadecimal digit
 */
-#define IS_UPPER_HEX(x) (((x >= 'A') && (x <= 'F')) || IS_DIGIT (x))
+#define IS_UPPER_HEX(x)  (((x >= 'A') && (x <= 'F')) || IS_DIGIT (x))
 
 /** Convert a hex number to its ASCII code.
 
@@ -31,7 +31,7 @@
 UINT8
 EFIAPI
 AsciiFromHex (
-  IN  UINT8   Hex
+  IN  UINT8  Hex
   );
 
 /** Convert an ASCII char representing an hexadecimal number
@@ -46,7 +46,7 @@ AsciiFromHex (
 UINT8
 EFIAPI
 HexFromAscii (
-  IN  CHAR8   Char
+  IN  CHAR8  Char
   );
 
 /** Check if a HID is a valid PNP ID.
@@ -58,7 +58,7 @@ HexFromAscii (
 **/
 BOOLEAN
 IsValidPnpId (
-  IN  CONST CHAR8  * Hid
+  IN  CONST CHAR8  *Hid
   );
 
 /** Check if a HID is a valid ACPI ID.
@@ -70,7 +70,7 @@ IsValidPnpId (
 **/
 BOOLEAN
 IsValidAcpiId (
-  IN  CONST CHAR8  * Hid
+  IN  CONST CHAR8  *Hid
   );
 
 /** Convert a EisaId string to its compressed UINT32 equivalent.
@@ -86,8 +86,8 @@ IsValidAcpiId (
 EFI_STATUS
 EFIAPI
 AmlGetEisaIdFromString (
-  IN  CONST CHAR8   * EisaIdStr,
-  OUT       UINT32  * EisaIdInt
+  IN  CONST CHAR8   *EisaIdStr,
+  OUT       UINT32  *EisaIdInt
   );
 
 #endif // ACPI_HELPER_LIB_H_

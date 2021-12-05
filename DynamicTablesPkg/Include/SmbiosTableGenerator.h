@@ -142,10 +142,10 @@ typedef struct SmbiosTableGenerator         SMBIOS_TABLE_GENERATOR;
                         failure codes as returned by the generator.
 **/
 typedef EFI_STATUS (*SMBIOS_TABLE_GENERATOR_BUILD_TABLE) (
-  IN  CONST SMBIOS_TABLE_GENERATOR                *       Generator,
-  IN        CM_STD_OBJ_SMBIOS_TABLE_INFO          * CONST SmbiosTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  OUT       SMBIOS_STRUCTURE                     **       Table
+  IN  CONST SMBIOS_TABLE_GENERATOR                        *Generator,
+  IN        CM_STD_OBJ_SMBIOS_TABLE_INFO          *CONST  SmbiosTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  OUT       SMBIOS_STRUCTURE                              **Table
   );
 
 /** This function pointer describes the interface to used by the
@@ -162,10 +162,10 @@ typedef EFI_STATUS (*SMBIOS_TABLE_GENERATOR_BUILD_TABLE) (
                         as returned by the generator.
 **/
 typedef EFI_STATUS (*SMBIOS_TABLE_GENERATOR_FREE_TABLE) (
-  IN  CONST SMBIOS_TABLE_GENERATOR                *       Generator,
-  IN  CONST CM_STD_OBJ_SMBIOS_TABLE_INFO          * CONST SmbiosTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  * CONST CfgMgrProtocol,
-  IN        SMBIOS_STRUCTURE                     **       Table
+  IN  CONST SMBIOS_TABLE_GENERATOR                        *Generator,
+  IN  CONST CM_STD_OBJ_SMBIOS_TABLE_INFO          *CONST  SmbiosTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN        SMBIOS_STRUCTURE                              **Table
   );
 
 /** The SMBIOS_TABLE_GENERATOR structure provides an interface that the
@@ -173,22 +173,22 @@ typedef EFI_STATUS (*SMBIOS_TABLE_GENERATOR_FREE_TABLE) (
 */
 typedef struct SmbiosTableGenerator {
   /// The SMBIOS table generator ID.
-  SMBIOS_TABLE_GENERATOR_ID                GeneratorID;
+  SMBIOS_TABLE_GENERATOR_ID             GeneratorID;
 
   /// String describing the DT table
   /// generator.
-  CONST CHAR16*                            Description;
+  CONST CHAR16                          *Description;
 
   /// The SMBIOS table type.
-  SMBIOS_TYPE                              Type;
+  SMBIOS_TYPE                           Type;
 
   /// SMBIOS table build function pointer.
-  SMBIOS_TABLE_GENERATOR_BUILD_TABLE       BuildSmbiosTable;
+  SMBIOS_TABLE_GENERATOR_BUILD_TABLE    BuildSmbiosTable;
 
   /** The function to free any resources
       allocated for building the SMBIOS table.
   */
-  SMBIOS_TABLE_GENERATOR_FREE_TABLE        FreeTableResources;
+  SMBIOS_TABLE_GENERATOR_FREE_TABLE     FreeTableResources;
 } SMBIOS_TABLE_GENERATOR;
 
 /** Register SMBIOS table factory generator.
@@ -208,7 +208,7 @@ typedef struct SmbiosTableGenerator {
 EFI_STATUS
 EFIAPI
 RegisterSmbiosTableGenerator (
-  IN CONST SMBIOS_TABLE_GENERATOR                 * CONST Generator
+  IN CONST SMBIOS_TABLE_GENERATOR                 *CONST  Generator
   );
 
 /** Deregister SMBIOS generator.
@@ -226,9 +226,9 @@ RegisterSmbiosTableGenerator (
 EFI_STATUS
 EFIAPI
 DeregisterSmbiosTableGenerator (
-  IN CONST SMBIOS_TABLE_GENERATOR                 * CONST Generator
+  IN CONST SMBIOS_TABLE_GENERATOR                 *CONST  Generator
   );
+
 #pragma pack()
 
 #endif // SMBIOS_TABLE_GENERATOR_H_
-
