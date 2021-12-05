@@ -38,41 +38,41 @@
                                 interface.
 
 **/
-
 EFI_STATUS
 EFIAPI
 VirtioNetMcastIpToMac (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  IN BOOLEAN                     IPv6,
-  IN EFI_IP_ADDRESS              *Ip,
-  OUT EFI_MAC_ADDRESS            *Mac
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      IPv6,
+  IN EFI_IP_ADDRESS               *Ip,
+  OUT EFI_MAC_ADDRESS             *Mac
   )
 {
-  VNET_DEV   *Dev;
-  EFI_TPL    OldTpl;
-  EFI_STATUS Status;
+  VNET_DEV    *Dev;
+  EFI_TPL     OldTpl;
+  EFI_STATUS  Status;
 
   //
   // http://en.wikipedia.org/wiki/Multicast_address
   //
-  if (This == NULL || Ip == NULL || Mac == NULL ||
-      ( IPv6 && (Ip->v6.Addr[0]       ) != 0xFF) || // invalid IPv6 mcast addr
-      (!IPv6 && (Ip->v4.Addr[0] & 0xF0) != 0xE0)    // invalid IPv4 mcast addr
-      ) {
+  if ((This == NULL) || (Ip == NULL) || (Mac == NULL) ||
+      (IPv6 && ((Ip->v6.Addr[0]) != 0xFF)) ||       // invalid IPv6 mcast addr
+      (!IPv6 && ((Ip->v4.Addr[0] & 0xF0) != 0xE0))  // invalid IPv4 mcast addr
+      )
+  {
     return EFI_INVALID_PARAMETER;
   }
 
-  Dev = VIRTIO_NET_FROM_SNP (This);
+  Dev    = VIRTIO_NET_FROM_SNP (This);
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   switch (Dev->Snm.State) {
-  case EfiSimpleNetworkStopped:
-    Status = EFI_NOT_STARTED;
-    goto Exit;
-  case EfiSimpleNetworkStarted:
-    Status = EFI_DEVICE_ERROR;
-    goto Exit;
-  default:
-    break;
+    case EfiSimpleNetworkStopped:
+      Status = EFI_NOT_STARTED;
+      goto Exit;
+    case EfiSimpleNetworkStarted:
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    default:
+      break;
   }
 
   //
@@ -85,8 +85,7 @@ VirtioNetMcastIpToMac (
     Mac->Addr[3] = Ip->v6.Addr[13];
     Mac->Addr[4] = Ip->v6.Addr[14];
     Mac->Addr[5] = Ip->v6.Addr[15];
-  }
-  else {
+  } else {
     Mac->Addr[0] = 0x01;
     Mac->Addr[1] = 0x00;
     Mac->Addr[2] = 0x5E;
@@ -94,6 +93,7 @@ VirtioNetMcastIpToMac (
     Mac->Addr[4] = Ip->v4.Addr[2];
     Mac->Addr[5] = Ip->v4.Addr[3];
   }
+
   Status = EFI_SUCCESS;
 
 Exit:

@@ -31,12 +31,12 @@
 #include <Library/PcdLib.h>
 
 typedef struct {
-  UINT64                      FvLength;
-  EFI_FIRMWARE_VOLUME_HEADER  FvbInfo;
+  UINT64                        FvLength;
+  EFI_FIRMWARE_VOLUME_HEADER    FvbInfo;
   //
   // EFI_FV_BLOCK_MAP_ENTRY    ExtraBlockMap[n];//n=0
   //
-  EFI_FV_BLOCK_MAP_ENTRY      End[1];
+  EFI_FV_BLOCK_MAP_ENTRY        End[1];
 } EFI_FVB_MEDIA_INFO;
 
 EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
@@ -59,12 +59,12 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize),
       EFI_FVH_SIGNATURE,
       EFI_FVB2_MEMORY_MAPPED |
-        EFI_FVB2_READ_ENABLED_CAP |
-        EFI_FVB2_READ_STATUS |
-        EFI_FVB2_WRITE_ENABLED_CAP |
-        EFI_FVB2_WRITE_STATUS |
-        EFI_FVB2_ERASE_POLARITY |
-        EFI_FVB2_ALIGNMENT_16,
+      EFI_FVB2_READ_ENABLED_CAP |
+      EFI_FVB2_READ_STATUS |
+      EFI_FVB2_WRITE_ENABLED_CAP |
+      EFI_FVB2_WRITE_STATUS |
+      EFI_FVB2_ERASE_POLARITY |
+      EFI_FVB2_ALIGNMENT_16,
       sizeof (EFI_FIRMWARE_VOLUME_HEADER) + sizeof (EFI_FV_BLOCK_MAP_ENTRY),
       0,  // CheckSum
       0,  // ExtHeaderOffset
@@ -94,31 +94,34 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
 
 EFI_STATUS
 GetFvbInfo (
-  IN  UINT64                        FvLength,
-  OUT EFI_FIRMWARE_VOLUME_HEADER    **FvbInfo
+  IN  UINT64                      FvLength,
+  OUT EFI_FIRMWARE_VOLUME_HEADER  **FvbInfo
   )
 {
-  STATIC BOOLEAN Checksummed = FALSE;
-  UINTN Index;
+  STATIC BOOLEAN  Checksummed = FALSE;
+  UINTN           Index;
 
   if (!Checksummed) {
     for (Index = 0;
          Index < sizeof (mPlatformFvbMediaInfo) / sizeof (EFI_FVB_MEDIA_INFO);
-         Index += 1) {
-      UINT16 Checksum;
+         Index += 1)
+    {
+      UINT16  Checksum;
       mPlatformFvbMediaInfo[Index].FvbInfo.Checksum = 0;
-      Checksum = CalculateCheckSum16 (
-                   (UINT16*) &mPlatformFvbMediaInfo[Index].FvbInfo,
-                   mPlatformFvbMediaInfo[Index].FvbInfo.HeaderLength
-                   );
+      Checksum                                      = CalculateCheckSum16 (
+                                                        (UINT16 *)&mPlatformFvbMediaInfo[Index].FvbInfo,
+                                                        mPlatformFvbMediaInfo[Index].FvbInfo.HeaderLength
+                                                        );
       mPlatformFvbMediaInfo[Index].FvbInfo.Checksum = Checksum;
     }
+
     Checksummed = TRUE;
   }
 
   for (Index = 0;
        Index < sizeof (mPlatformFvbMediaInfo) / sizeof (EFI_FVB_MEDIA_INFO);
-       Index += 1) {
+       Index += 1)
+  {
     if (mPlatformFvbMediaInfo[Index].FvLength == FvLength) {
       *FvbInfo = &mPlatformFvbMediaInfo[Index].FvbInfo;
       return EFI_SUCCESS;

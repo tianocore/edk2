@@ -36,20 +36,20 @@
 **/
 EFI_STATUS
 VirtioFsFuseOpenDir (
-  IN OUT VIRTIO_FS *VirtioFs,
-  IN     UINT64    NodeId,
-     OUT UINT64    *FuseHandle
+  IN OUT VIRTIO_FS  *VirtioFs,
+  IN     UINT64     NodeId,
+  OUT UINT64        *FuseHandle
   )
 {
-  VIRTIO_FS_FUSE_REQUEST        CommonReq;
-  VIRTIO_FS_FUSE_OPEN_REQUEST   OpenReq;
-  VIRTIO_FS_IO_VECTOR           ReqIoVec[2];
-  VIRTIO_FS_SCATTER_GATHER_LIST ReqSgList;
-  VIRTIO_FS_FUSE_RESPONSE       CommonResp;
-  VIRTIO_FS_FUSE_OPEN_RESPONSE  OpenResp;
-  VIRTIO_FS_IO_VECTOR           RespIoVec[2];
-  VIRTIO_FS_SCATTER_GATHER_LIST RespSgList;
-  EFI_STATUS                    Status;
+  VIRTIO_FS_FUSE_REQUEST         CommonReq;
+  VIRTIO_FS_FUSE_OPEN_REQUEST    OpenReq;
+  VIRTIO_FS_IO_VECTOR            ReqIoVec[2];
+  VIRTIO_FS_SCATTER_GATHER_LIST  ReqSgList;
+  VIRTIO_FS_FUSE_RESPONSE        CommonResp;
+  VIRTIO_FS_FUSE_OPEN_RESPONSE   OpenResp;
+  VIRTIO_FS_IO_VECTOR            RespIoVec[2];
+  VIRTIO_FS_SCATTER_GATHER_LIST  RespSgList;
+  EFI_STATUS                     Status;
 
   //
   // Set up the scatter-gather lists.
@@ -79,8 +79,13 @@ VirtioFsFuseOpenDir (
   //
   // Populate the common request header.
   //
-  Status = VirtioFsFuseNewRequest (VirtioFs, &CommonReq, ReqSgList.TotalSize,
-             VirtioFsFuseOpOpenDir, NodeId);
+  Status = VirtioFsFuseNewRequest (
+             VirtioFs,
+             &CommonReq,
+             ReqSgList.TotalSize,
+             VirtioFsFuseOpOpenDir,
+             NodeId
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -105,10 +110,17 @@ VirtioFsFuseOpenDir (
   Status = VirtioFsFuseCheckResponse (&RespSgList, CommonReq.Unique, NULL);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_DEVICE_ERROR) {
-      DEBUG ((DEBUG_ERROR, "%a: Label=\"%s\" NodeId=%Lu Errno=%d\n",
-        __FUNCTION__, VirtioFs->Label, NodeId, CommonResp.Error));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Label=\"%s\" NodeId=%Lu Errno=%d\n",
+        __FUNCTION__,
+        VirtioFs->Label,
+        NodeId,
+        CommonResp.Error
+        ));
       Status = VirtioFsErrnoToEfiStatus (CommonResp.Error);
     }
+
     return Status;
   }
 

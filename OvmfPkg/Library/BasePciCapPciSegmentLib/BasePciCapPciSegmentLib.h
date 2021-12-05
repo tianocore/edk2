@@ -14,25 +14,25 @@
 
 #include <Library/PciCapPciSegmentLib.h>
 
-#define SEGMENT_DEV_SIG SIGNATURE_64 ('P', 'C', 'P', 'S', 'G', 'M', 'N', 'T')
+#define SEGMENT_DEV_SIG  SIGNATURE_64 ('P', 'C', 'P', 'S', 'G', 'M', 'N', 'T')
 
 typedef struct {
   //
   // Signature identifying the derived class.
   //
-  UINT64 Signature;
+  UINT64            Signature;
   //
   // Members added by the derived class, specific to the use of PciSegmentLib.
   //
-  PCI_CAP_DOMAIN MaxDomain;
-  UINT16         SegmentNr;
-  UINT8          BusNr;
-  UINT8          DeviceNr;
-  UINT8          FunctionNr;
+  PCI_CAP_DOMAIN    MaxDomain;
+  UINT16            SegmentNr;
+  UINT8             BusNr;
+  UINT8             DeviceNr;
+  UINT8             FunctionNr;
   //
   // Base class.
   //
-  PCI_CAP_DEV BaseDevice;
+  PCI_CAP_DEV       BaseDevice;
 } SEGMENT_DEV;
 
 #define SEGMENT_DEV_FROM_PCI_CAP_DEV(PciDevice) \

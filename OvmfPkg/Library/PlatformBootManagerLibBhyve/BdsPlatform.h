@@ -18,7 +18,6 @@ Abstract:
 #ifndef _PLATFORM_SPECIFIC_BDS_PLATFORM_H_
 #define _PLATFORM_SPECIFIC_BDS_PLATFORM_H_
 
-
 #include <PiDxe.h>
 
 #include <IndustryStandard/Pci.h>
@@ -65,11 +64,11 @@ Abstract:
 
 #include <OvmfPlatforms.h>
 
-extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformConnectSequence[];
-extern ACPI_HID_DEVICE_PATH       gPnpPs2KeyboardDeviceNode;
-extern ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode;
-extern UART_DEVICE_PATH           gUartDeviceNode;
-extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
+extern EFI_DEVICE_PATH_PROTOCOL  *gPlatformConnectSequence[];
+extern ACPI_HID_DEVICE_PATH      gPnpPs2KeyboardDeviceNode;
+extern ACPI_HID_DEVICE_PATH      gPnp16550ComPortDeviceNode;
+extern UART_DEVICE_PATH          gUartDeviceNode;
+extern VENDOR_DEVICE_PATH        gTerminalTypeDeviceNode;
 
 #define PCI_DEVICE_PATH_NODE(Func, Dev) \
   { \
@@ -151,20 +150,20 @@ extern VENDOR_DEVICE_PATH         gTerminalTypeDeviceNode;
     } \
   }
 
-#define PCI_CLASS_SCC          0x07
-#define PCI_SUBCLASS_SERIAL    0x00
-#define PCI_IF_16550           0x02
-#define IS_PCI_16550SERIAL(_p)           IS_CLASS3 (_p, PCI_CLASS_SCC, PCI_SUBCLASS_SERIAL, PCI_IF_16550)
-#define IS_PCI_ISA_PDECODE(_p)        IS_CLASS3 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_ISA_PDECODE, 0)
+#define PCI_CLASS_SCC        0x07
+#define PCI_SUBCLASS_SERIAL  0x00
+#define PCI_IF_16550         0x02
+#define IS_PCI_16550SERIAL(_p)  IS_CLASS3 (_p, PCI_CLASS_SCC, PCI_SUBCLASS_SERIAL, PCI_IF_16550)
+#define IS_PCI_ISA_PDECODE(_p)  IS_CLASS3 (_p, PCI_CLASS_BRIDGE, PCI_CLASS_BRIDGE_ISA_PDECODE, 0)
 
 typedef struct {
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  UINTN                     ConnectType;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  UINTN                       ConnectType;
 } PLATFORM_CONSOLE_CONNECT_ENTRY;
 
-#define CONSOLE_OUT BIT0
-#define CONSOLE_IN  BIT1
-#define STD_ERROR   BIT2
+#define CONSOLE_OUT  BIT0
+#define CONSOLE_IN   BIT1
+#define STD_ERROR    BIT2
 extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 
 //
@@ -173,7 +172,7 @@ extern PLATFORM_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
 
 VOID
 PlatformInitializeConsole (
-  IN PLATFORM_CONSOLE_CONNECT_ENTRY   *PlatformConsole
+  IN PLATFORM_CONSOLE_CONNECT_ENTRY  *PlatformConsole
   );
 
 /**

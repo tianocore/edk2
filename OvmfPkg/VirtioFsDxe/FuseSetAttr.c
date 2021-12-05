@@ -52,24 +52,24 @@
 **/
 EFI_STATUS
 VirtioFsFuseSetAttr (
-  IN OUT VIRTIO_FS *VirtioFs,
-  IN     UINT64    NodeId,
-  IN     UINT64    *Size      OPTIONAL,
-  IN     UINT64    *Atime     OPTIONAL,
-  IN     UINT64    *Mtime     OPTIONAL,
-  IN     UINT32    *Mode      OPTIONAL
+  IN OUT VIRTIO_FS  *VirtioFs,
+  IN     UINT64     NodeId,
+  IN     UINT64     *Size      OPTIONAL,
+  IN     UINT64     *Atime     OPTIONAL,
+  IN     UINT64     *Mtime     OPTIONAL,
+  IN     UINT32     *Mode      OPTIONAL
   )
 {
-  VIRTIO_FS_FUSE_REQUEST             CommonReq;
-  VIRTIO_FS_FUSE_SETATTR_REQUEST     AttrReq;
-  VIRTIO_FS_IO_VECTOR                ReqIoVec[2];
-  VIRTIO_FS_SCATTER_GATHER_LIST      ReqSgList;
-  VIRTIO_FS_FUSE_RESPONSE            CommonResp;
-  VIRTIO_FS_FUSE_GETATTR_RESPONSE    GetAttrResp;
-  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE AttrResp;
-  VIRTIO_FS_IO_VECTOR                RespIoVec[3];
-  VIRTIO_FS_SCATTER_GATHER_LIST      RespSgList;
-  EFI_STATUS                         Status;
+  VIRTIO_FS_FUSE_REQUEST              CommonReq;
+  VIRTIO_FS_FUSE_SETATTR_REQUEST      AttrReq;
+  VIRTIO_FS_IO_VECTOR                 ReqIoVec[2];
+  VIRTIO_FS_SCATTER_GATHER_LIST       ReqSgList;
+  VIRTIO_FS_FUSE_RESPONSE             CommonResp;
+  VIRTIO_FS_FUSE_GETATTR_RESPONSE     GetAttrResp;
+  VIRTIO_FS_FUSE_ATTRIBUTES_RESPONSE  AttrResp;
+  VIRTIO_FS_IO_VECTOR                 RespIoVec[3];
+  VIRTIO_FS_SCATTER_GATHER_LIST       RespSgList;
+  EFI_STATUS                          Status;
 
   //
   // Set up the scatter-gather lists.
@@ -101,8 +101,13 @@ VirtioFsFuseSetAttr (
   //
   // Populate the common request header.
   //
-  Status = VirtioFsFuseNewRequest (VirtioFs, &CommonReq, ReqSgList.TotalSize,
-             VirtioFsFuseOpSetAttr, NodeId);
+  Status = VirtioFsFuseNewRequest (
+             VirtioFs,
+             &CommonReq,
+             ReqSgList.TotalSize,
+             VirtioFsFuseOpSetAttr,
+             NodeId
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -130,12 +135,15 @@ VirtioFsFuseSetAttr (
   if (Size != NULL) {
     AttrReq.Valid |= VIRTIO_FS_FUSE_SETATTR_REQ_F_SIZE;
   }
+
   if (Atime != NULL) {
     AttrReq.Valid |= VIRTIO_FS_FUSE_SETATTR_REQ_F_ATIME;
   }
+
   if (Mtime != NULL) {
     AttrReq.Valid |= VIRTIO_FS_FUSE_SETATTR_REQ_F_MTIME;
   }
+
   if (Mode != NULL) {
     AttrReq.Valid |= VIRTIO_FS_FUSE_SETATTR_REQ_F_MODE;
   }
@@ -153,22 +161,32 @@ VirtioFsFuseSetAttr (
   //
   Status = VirtioFsFuseCheckResponse (&RespSgList, CommonReq.Unique, NULL);
   if (Status == EFI_DEVICE_ERROR) {
-    DEBUG ((DEBUG_ERROR, "%a: Label=\"%s\" NodeId=%Lu", __FUNCTION__,
-      VirtioFs->Label, NodeId));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Label=\"%s\" NodeId=%Lu",
+      __FUNCTION__,
+      VirtioFs->Label,
+      NodeId
+      ));
     if (Size != NULL) {
       DEBUG ((DEBUG_ERROR, " Size=0x%Lx", *Size));
     }
+
     if (Atime != NULL) {
       DEBUG ((DEBUG_ERROR, " Atime=%Lu", *Atime));
     }
+
     if (Mtime != NULL) {
       DEBUG ((DEBUG_ERROR, " Mtime=%Lu", *Mtime));
     }
+
     if (Mode != NULL) {
       DEBUG ((DEBUG_ERROR, " Mode=0x%x", *Mode)); // no support for octal :/
     }
-    DEBUG ((DEBUG_ERROR, " Errno=%d\n",  CommonResp.Error));
+
+    DEBUG ((DEBUG_ERROR, " Errno=%d\n", CommonResp.Error));
     Status = VirtioFsErrnoToEfiStatus (CommonResp.Error);
   }
+
   return Status;
 }

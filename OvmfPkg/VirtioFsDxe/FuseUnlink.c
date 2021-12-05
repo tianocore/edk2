@@ -41,19 +41,19 @@
 **/
 EFI_STATUS
 VirtioFsFuseRemoveFileOrDir (
-  IN OUT VIRTIO_FS *VirtioFs,
-  IN     UINT64    ParentNodeId,
-  IN     CHAR8     *Name,
-  IN     BOOLEAN   IsDir
+  IN OUT VIRTIO_FS  *VirtioFs,
+  IN     UINT64     ParentNodeId,
+  IN     CHAR8      *Name,
+  IN     BOOLEAN    IsDir
   )
 {
-  VIRTIO_FS_FUSE_REQUEST        CommonReq;
-  VIRTIO_FS_IO_VECTOR           ReqIoVec[2];
-  VIRTIO_FS_SCATTER_GATHER_LIST ReqSgList;
-  VIRTIO_FS_FUSE_RESPONSE       CommonResp;
-  VIRTIO_FS_IO_VECTOR           RespIoVec[1];
-  VIRTIO_FS_SCATTER_GATHER_LIST RespSgList;
-  EFI_STATUS                    Status;
+  VIRTIO_FS_FUSE_REQUEST         CommonReq;
+  VIRTIO_FS_IO_VECTOR            ReqIoVec[2];
+  VIRTIO_FS_SCATTER_GATHER_LIST  ReqSgList;
+  VIRTIO_FS_FUSE_RESPONSE        CommonResp;
+  VIRTIO_FS_IO_VECTOR            RespIoVec[1];
+  VIRTIO_FS_SCATTER_GATHER_LIST  RespSgList;
+  EFI_STATUS                     Status;
 
   //
   // Set up the scatter-gather lists.
@@ -105,10 +105,19 @@ VirtioFsFuseRemoveFileOrDir (
   //
   Status = VirtioFsFuseCheckResponse (&RespSgList, CommonReq.Unique, NULL);
   if (Status == EFI_DEVICE_ERROR) {
-    DEBUG ((DEBUG_ERROR, "%a: Label=\"%s\" ParentNodeId=%Lu Name=\"%a\" "
-      "IsDir=%d Errno=%d\n", __FUNCTION__, VirtioFs->Label, ParentNodeId, Name,
-      IsDir, CommonResp.Error));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Label=\"%s\" ParentNodeId=%Lu Name=\"%a\" "
+      "IsDir=%d Errno=%d\n",
+      __FUNCTION__,
+      VirtioFs->Label,
+      ParentNodeId,
+      Name,
+      IsDir,
+      CommonResp.Error
+      ));
     Status = VirtioFsErrnoToEfiStatus (CommonResp.Error);
   }
+
   return Status;
 }
