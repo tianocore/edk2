@@ -14,7 +14,7 @@
 
 #include <UnitTestFrameworkTypes.h>
 
-#define UNIT_TEST_PERSISTENCE_LIB_VERSION   1
+#define UNIT_TEST_PERSISTENCE_LIB_VERSION  1
 
 /**
   Determines whether a persistence cache already exists for
