@@ -263,7 +263,7 @@ Tpm12TisTpmCommand (
   UINT32                            Data32;
   UINT16                            RspTag;
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     UINTN  DebugSize;
 
     DEBUG ((DEBUG_VERBOSE, "Tpm12TisTpmCommand Send - "));
@@ -282,7 +282,7 @@ Tpm12TisTpmCommand (
       }
     }
     DEBUG ((DEBUG_VERBOSE, "\n"));
-  );
+  DEBUG_CODE_END ();
   TpmOutSize = 0;
 
   Status = Tpm12TisPcPrepareCommand (TisReg);
@@ -351,13 +351,13 @@ Tpm12TisTpmCommand (
       if (Index == sizeof (TPM_RSP_COMMAND_HDR)) break;
     }
   }
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     DEBUG ((DEBUG_VERBOSE, "Tpm12TisTpmCommand ReceiveHeader - "));
     for (Index = 0; Index < sizeof (TPM_RSP_COMMAND_HDR); Index++) {
       DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
     }
     DEBUG ((DEBUG_VERBOSE, "\n"));
-  );
+  DEBUG_CODE_END ();
   //
   // Check the response data header (tag, parasize and returncode)
   //
@@ -395,13 +395,13 @@ Tpm12TisTpmCommand (
     }
   }
 Exit:
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     DEBUG ((DEBUG_VERBOSE, "Tpm12TisTpmCommand Receive - "));
     for (Index = 0; Index < TpmOutSize; Index++) {
       DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
     }
     DEBUG ((DEBUG_VERBOSE, "\n"));
-  );
+  DEBUG_CODE_END ();
   MmioWrite8((UINTN)&TisReg->Status, TIS_PC_STS_READY);
   return Status;
 }
