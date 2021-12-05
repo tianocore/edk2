@@ -24,4 +24,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 extern VOID  *gHobList;
 
 #endif
-
