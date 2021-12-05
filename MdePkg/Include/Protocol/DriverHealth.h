@@ -37,7 +37,7 @@
     0x2a534210, 0x9280, 0x41d8, { 0xae, 0x79, 0xca, 0xda, 0x1, 0xa2, 0xb1, 0x27 } \
   }
 
-typedef struct _EFI_DRIVER_HEALTH_PROTOCOL  EFI_DRIVER_HEALTH_PROTOCOL;
+typedef struct _EFI_DRIVER_HEALTH_PROTOCOL EFI_DRIVER_HEALTH_PROTOCOL;
 
 ///
 /// EFI_DRIVER_HEALTH_HEALTH_STATUS
@@ -55,8 +55,8 @@ typedef enum {
 /// EFI_DRIVER_HEALTH_HII_MESSAGE
 ///
 typedef struct {
-  EFI_HII_HANDLE  HiiHandle;
-  EFI_STRING_ID   StringId;
+  EFI_HII_HANDLE    HiiHandle;
+  EFI_STRING_ID     StringId;
 
   ///
   /// 64-bit numeric value of the warning/error specified by this message.
@@ -66,7 +66,7 @@ typedef struct {
   ///   The values 0x8000000000000000 to 0x8fffffffffffffff is reserved for platform/OEM drivers.
   ///   All other values are reserved and should not be used.
   ///
-  UINT64          MessageCode;
+  UINT64    MessageCode;
 } EFI_DRIVER_HEALTH_HII_MESSAGE;
 
 /**
@@ -228,14 +228,10 @@ EFI_STATUS
 /// hardware configuration changes.
 ///
 struct _EFI_DRIVER_HEALTH_PROTOCOL {
-  EFI_DRIVER_HEALTH_GET_HEALTH_STATUS  GetHealthStatus;
-  EFI_DRIVER_HEALTH_REPAIR             Repair;
+  EFI_DRIVER_HEALTH_GET_HEALTH_STATUS    GetHealthStatus;
+  EFI_DRIVER_HEALTH_REPAIR               Repair;
 };
 
-extern EFI_GUID gEfiDriverHealthProtocolGuid;
+extern EFI_GUID  gEfiDriverHealthProtocolGuid;
 
 #endif
-
-
-
-

@@ -23,7 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN
 EFIAPI
 GetRandomNumber16 (
-  OUT     UINT16                    *Rand
+  OUT     UINT16  *Rand
   );
 
 /**
@@ -40,7 +40,7 @@ GetRandomNumber16 (
 BOOLEAN
 EFIAPI
 GetRandomNumber32 (
-  OUT     UINT32                    *Rand
+  OUT     UINT32  *Rand
   );
 
 /**
@@ -57,7 +57,7 @@ GetRandomNumber32 (
 BOOLEAN
 EFIAPI
 GetRandomNumber64 (
-  OUT     UINT64                    *Rand
+  OUT     UINT64  *Rand
   );
 
 /**
@@ -74,7 +74,7 @@ GetRandomNumber64 (
 BOOLEAN
 EFIAPI
 GetRandomNumber128 (
-  OUT     UINT64                    *Rand
+  OUT     UINT64  *Rand
   );
 
-#endif  // __RNG_LIB_H__
+#endif // __RNG_LIB_H__

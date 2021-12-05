@@ -22,15 +22,15 @@
     0x5db12509, 0x4550, 0x4347, { 0x96, 0xb3, 0x73, 0xc0, 0xff, 0x6e, 0x86, 0x9f } \
   }
 
-#define REDFISH_DISCOVER_TOKEN_SIGNATURE    SIGNATURE_32 ('R', 'F', 'T', 'S')
+#define REDFISH_DISCOVER_TOKEN_SIGNATURE  SIGNATURE_32 ('R', 'F', 'T', 'S')
 
 typedef UINT32 EFI_REDFISH_DISCOVER_FLAG;
-#define EFI_REDFISH_DISCOVER_HOST_INTERFACE 0x00000001 ///< Discover Redfish server reported in SMBIOS 42h.
-#define EFI_REDFISH_DISCOVER_SSDP           0x00000002 ///< Discover Redfish server using UPnP Http search method.
-#define EFI_REDFISH_DISCOVER_SSDP_UDP6      0x00000004 ///< Use UDP version 6.
-#define EFI_REDFISH_DISCOVER_KEEP_ALIVE     0x00000008 ///< Keep to send UPnP Search in the duration indicated in
-                                                       ///< EFI_REDFISH_DISCOVER_DURATION_MASK.
-#define EFI_REDFISH_DISCOVER_RENEW          0x00000010 ///< Set this bit to indicate this function to notify the caller
+#define EFI_REDFISH_DISCOVER_HOST_INTERFACE  0x00000001 ///< Discover Redfish server reported in SMBIOS 42h.
+#define EFI_REDFISH_DISCOVER_SSDP            0x00000002 ///< Discover Redfish server using UPnP Http search method.
+#define EFI_REDFISH_DISCOVER_SSDP_UDP6       0x00000004 ///< Use UDP version 6.
+#define EFI_REDFISH_DISCOVER_KEEP_ALIVE      0x00000008 ///< Keep to send UPnP Search in the duration indicated in
+                                                        ///< EFI_REDFISH_DISCOVER_DURATION_MASK.
+#define EFI_REDFISH_DISCOVER_RENEW  0x00000010         ///< Set this bit to indicate this function to notify the caller
                                                        ///< a list of all Redfish servers it found. Otherwise, this fucntion
                                                        ///< just notify the caller new found Redfish servers.
                                                        ///<
@@ -56,37 +56,37 @@ typedef struct {
 } EFI_REDFISH_DISCOVERED_INFORMATION;
 
 typedef struct {
-  EFI_STATUS Status;                                ///< Status of Redfish service discovery.
-  EFI_REDFISH_DISCOVERED_INFORMATION Information;   ///< Redfish service discovered.
+  EFI_STATUS                            Status;      ///< Status of Redfish service discovery.
+  EFI_REDFISH_DISCOVERED_INFORMATION    Information; ///< Redfish service discovered.
 } EFI_REDFISH_DISCOVERED_INSTANCE;
 
 typedef struct {
-  UINTN   NumberOfServiceFound;                      ///< Must be 0 when pass to Acquire ().
-  EFI_REDFISH_DISCOVERED_INSTANCE *RedfishInstances; ///< Must be NULL when pass to Acquire ().
+  UINTN                              NumberOfServiceFound; ///< Must be 0 when pass to Acquire ().
+  EFI_REDFISH_DISCOVERED_INSTANCE    *RedfishInstances;    ///< Must be NULL when pass to Acquire ().
 } EFI_REDFISH_DISCOVERED_LIST;
 
 typedef struct {
-    EFI_MAC_ADDRESS       MacAddress;             ///< MAC address of network interfase to discover Redfish service.
-    BOOLEAN               IsIpv6;                 ///< Indicates it's IP versino 6.
-    EFI_IP_ADDRESS        SubnetId;               ///< Subnet ID.
-    UINT8                 SubnetPrefixLength;     ///< Subnet prefix-length for IPv4 and IPv6.
-    UINT16                VlanId;                 ///< VLAN ID.
+  EFI_MAC_ADDRESS    MacAddress;                  ///< MAC address of network interfase to discover Redfish service.
+  BOOLEAN            IsIpv6;                      ///< Indicates it's IP versino 6.
+  EFI_IP_ADDRESS     SubnetId;                    ///< Subnet ID.
+  UINT8              SubnetPrefixLength;          ///< Subnet prefix-length for IPv4 and IPv6.
+  UINT16             VlanId;                      ///< VLAN ID.
 } EFI_REDFISH_DISCOVER_NETWORK_INTERFACE;
 
 typedef struct {
-  UINT32    Signature;            ///< Token signature.
-  EFI_REDFISH_DISCOVERED_LIST DiscoverList; ///< The memory of EFI_REDFISH_DISCOVERED_LIST is
-                                            ///< allocated by Acquire() and freed when caller invoke Release().
-  EFI_EVENT Event;                ///< The TPL_CALLBACK event to be notified when Redfish services
-                                  ///< are discovered or any errors occurred during discovery.
-  UINTN Timeout;                  ///< The timeout value declared in EFI_REDFISH_DISCOVERED_TOKEN
-                                  ///< determines the seconds to drop discover process.
-                                  ///< Basically, the nearby Redfish services must response in >=1
-                                  ///< and <= 5 seconds. The valid timeout value used to have
-                                  ///< asynchronous discovery is >= 1 and <= 5 seconds. Set the
-                                  ///< timeout to zero means to discover Redfish service synchronously.
-                                  ///< Event in token is created by caller to listen the Reefish services
-                                  ///< found by Acquire().
+  UINT32                         Signature;    ///< Token signature.
+  EFI_REDFISH_DISCOVERED_LIST    DiscoverList; ///< The memory of EFI_REDFISH_DISCOVERED_LIST is
+                                               ///< allocated by Acquire() and freed when caller invoke Release().
+  EFI_EVENT                      Event;        ///< The TPL_CALLBACK event to be notified when Redfish services
+                                               ///< are discovered or any errors occurred during discovery.
+  UINTN                          Timeout;      ///< The timeout value declared in EFI_REDFISH_DISCOVERED_TOKEN
+                                               ///< determines the seconds to drop discover process.
+                                               ///< Basically, the nearby Redfish services must response in >=1
+                                               ///< and <= 5 seconds. The valid timeout value used to have
+                                               ///< asynchronous discovery is >= 1 and <= 5 seconds. Set the
+                                               ///< timeout to zero means to discover Redfish service synchronously.
+                                               ///< Event in token is created by caller to listen the Reefish services
+                                               ///< found by Acquire().
 } EFI_REDFISH_DISCOVERED_TOKEN;
 
 /**
@@ -112,7 +112,7 @@ EFI_STATUS
   IN EFI_HANDLE                              ImageHandle,
   OUT UINTN                                  *NumberOfNetworkInterfaces,
   OUT EFI_REDFISH_DISCOVER_NETWORK_INTERFACE **NetworkInterfaces
-);
+  );
 
 /**
   This function acquires Redfish services by discovering static Redfish setting
@@ -146,7 +146,7 @@ EFI_STATUS
   IN EFI_REDFISH_DISCOVER_NETWORK_INTERFACE *TargetNetworkInterface OPTIONAL,
   IN EFI_REDFISH_DISCOVER_FLAG              Flags,
   IN EFI_REDFISH_DISCOVERED_TOKEN           *Token
-);
+  );
 
 /**
   This function aborts Redfish service discovery on the given network interface.
@@ -163,7 +163,7 @@ EFI_STATUS
 (EFIAPI *EFI_REDFISH_DISCOVER_ABORT_ACQUIRE)(
   IN EFI_REDFISH_DISCOVER_PROTOCOL          *This,
   IN EFI_REDFISH_DISCOVER_NETWORK_INTERFACE *TargetNetworkInterface OPTIONAL
-);
+  );
 
 /**
   This function releases Redfish services found by RedfishServiceAcquire().
@@ -180,14 +180,14 @@ EFI_STATUS
 (EFIAPI *EFI_REDFISH_DISCOVER_RELEASE_SERVICE)(
   IN EFI_REDFISH_DISCOVER_PROTOCOL   *This,
   IN EFI_REDFISH_DISCOVERED_LIST     *List
-);
+  );
 
 struct _EFI_REDFISH_DISCOVER_PROTOCOL {
-  EFI_REDFISH_DISCOVER_NETWORK_LIST    GetNetworkInterfaceList;
-  EFI_REDFISH_DISCOVER_ACQUIRE_SERVICE AcquireRedfishService;
-  EFI_REDFISH_DISCOVER_ABORT_ACQUIRE   AbortAcquireRedfishService;
-  EFI_REDFISH_DISCOVER_RELEASE_SERVICE ReleaseRedfishService;
+  EFI_REDFISH_DISCOVER_NETWORK_LIST       GetNetworkInterfaceList;
+  EFI_REDFISH_DISCOVER_ACQUIRE_SERVICE    AcquireRedfishService;
+  EFI_REDFISH_DISCOVER_ABORT_ACQUIRE      AbortAcquireRedfishService;
+  EFI_REDFISH_DISCOVER_RELEASE_SERVICE    ReleaseRedfishService;
 };
 
-extern EFI_GUID gEfiRedfishDiscoverProtocolGuid;
+extern EFI_GUID  gEfiRedfishDiscoverProtocolGuid;
 #endif

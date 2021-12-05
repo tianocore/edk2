@@ -192,10 +192,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// Flags bitmask values use in UnicodeValueToString() and
 /// AsciiValueToString()
 ///
-#define LEFT_JUSTIFY      0x01
-#define COMMA_TYPE        0x08
-#define PREFIX_ZERO       0x20
-#define RADIX_HEX         0x80
+#define LEFT_JUSTIFY  0x01
+#define COMMA_TYPE    0x08
+#define PREFIX_ZERO   0x20
+#define RADIX_HEX     0x80
 
 /**
   Produces a Null-terminated Unicode string in an output buffer based on
@@ -586,10 +586,10 @@ UnicodeValueToStringS (
 UINTN
 EFIAPI
 AsciiVSPrint (
-  OUT CHAR8         *StartOfBuffer,
-  IN  UINTN         BufferSize,
-  IN  CONST CHAR8   *FormatString,
-  IN  VA_LIST       Marker
+  OUT CHAR8        *StartOfBuffer,
+  IN  UINTN        BufferSize,
+  IN  CONST CHAR8  *FormatString,
+  IN  VA_LIST      Marker
   );
 
 /**
@@ -630,10 +630,10 @@ AsciiVSPrint (
 UINTN
 EFIAPI
 AsciiBSPrint (
-  OUT CHAR8         *StartOfBuffer,
-  IN  UINTN         BufferSize,
-  IN  CONST CHAR8   *FormatString,
-  IN  BASE_LIST     Marker
+  OUT CHAR8        *StartOfBuffer,
+  IN  UINTN        BufferSize,
+  IN  CONST CHAR8  *FormatString,
+  IN  BASE_LIST    Marker
   );
 
 /**
@@ -826,7 +826,6 @@ AsciiSPrintUnicodeFormat (
   ...
   );
 
-
 /**
   Converts a decimal value to a Null-terminated Ascii string.
 
@@ -879,11 +878,11 @@ AsciiSPrintUnicodeFormat (
 RETURN_STATUS
 EFIAPI
 AsciiValueToStringS (
-  IN OUT CHAR8   *Buffer,
-  IN UINTN       BufferSize,
-  IN UINTN       Flags,
-  IN INT64       Value,
-  IN UINTN       Width
+  IN OUT CHAR8  *Buffer,
+  IN UINTN      BufferSize,
+  IN UINTN      Flags,
+  IN INT64      Value,
+  IN UINTN      Width
   );
 
 /**
@@ -906,7 +905,7 @@ AsciiValueToStringS (
 UINTN
 EFIAPI
 SPrintLength (
-  IN  CONST CHAR16   *FormatString,
+  IN  CONST CHAR16  *FormatString,
   IN  VA_LIST       Marker
   );
 
@@ -928,8 +927,8 @@ SPrintLength (
 UINTN
 EFIAPI
 SPrintLengthAsciiFormat (
-  IN  CONST CHAR8   *FormatString,
-  IN  VA_LIST       Marker
+  IN  CONST CHAR8  *FormatString,
+  IN  VA_LIST      Marker
   );
 
 #endif
