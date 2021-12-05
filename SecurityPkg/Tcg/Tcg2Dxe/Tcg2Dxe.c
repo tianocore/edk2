@@ -2677,7 +2677,7 @@ DriverEntry (
     DEBUG ((DEBUG_INFO, "Tpm2GetCapabilityManufactureID - %08x\n", mTcgDxeData.BsCap.ManufacturerID));
   }
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     UINT32                    FirmwareVersion1;
     UINT32                    FirmwareVersion2;
 
@@ -2687,7 +2687,7 @@ DriverEntry (
     } else {
       DEBUG ((DEBUG_INFO, "Tpm2GetCapabilityFirmwareVersion - %08x %08x\n", FirmwareVersion1, FirmwareVersion2));
     }
-  );
+  DEBUG_CODE_END ();
 
   Status = Tpm2GetCapabilityMaxCommandResponseSize (&MaxCommandSize, &MaxResponseSize);
   if (EFI_ERROR (Status)) {
