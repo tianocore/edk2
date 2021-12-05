@@ -29,10 +29,10 @@ STATIC ARM_MEMORY_REGION_DESCRIPTOR  mVirtualMemoryTable[2];
 VOID
 EFIAPI
 ArmVirtGetMemoryMap (
-  OUT ARM_MEMORY_REGION_DESCRIPTOR   **VirtualMemoryMap
+  OUT ARM_MEMORY_REGION_DESCRIPTOR  **VirtualMemoryMap
   )
 {
-  EFI_PHYSICAL_ADDRESS TopOfAddressSpace;
+  EFI_PHYSICAL_ADDRESS  TopOfAddressSpace;
 
   ASSERT (VirtualMemoryMap != NULL);
 

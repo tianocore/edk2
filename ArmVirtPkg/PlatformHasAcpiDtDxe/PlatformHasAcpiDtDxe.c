@@ -18,20 +18,20 @@
 EFI_STATUS
 EFIAPI
 PlatformHasAcpiDt (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS           Status;
-  FIRMWARE_CONFIG_ITEM FwCfgItem;
-  UINTN                FwCfgSize;
+  EFI_STATUS            Status;
+  FIRMWARE_CONFIG_ITEM  FwCfgItem;
+  UINTN                 FwCfgSize;
 
   //
   // If we fail to install any of the necessary protocols below, the OS will be
   // unbootable anyway (due to lacking hardware description), so tolerate no
   // errors here.
   //
-  if (MAX_UINTN == MAX_UINT64 &&
+  if ((MAX_UINTN == MAX_UINT64) &&
       !PcdGetBool (PcdForceNoAcpi) &&
       !EFI_ERROR (
          QemuFwCfgFindFile (
@@ -39,7 +39,8 @@ PlatformHasAcpiDt (
            &FwCfgItem,
            &FwCfgSize
            )
-         )) {
+         ))
+  {
     //
     // Only make ACPI available on 64-bit systems, and only if QEMU generates
     // (a subset of) the ACPI tables.

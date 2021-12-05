@@ -16,11 +16,11 @@
 
 /** RTC Index register is at offset 0x0
 */
-#define RTC_INDEX_REG_OFFSET    0x0ULL
+#define RTC_INDEX_REG_OFFSET  0x0ULL
 
 /** RTC Target register is at offset 0x1
 */
-#define RTC_TARGET_REG_OFFSET   0x1ULL
+#define RTC_TARGET_REG_OFFSET  0x1ULL
 
 /** Add the RTC controller address range to the memory map.
 
@@ -34,8 +34,8 @@
 STATIC
 EFI_STATUS
 KvmtoolRtcMapMemory (
-  IN EFI_HANDLE               ImageHandle,
-  IN EFI_PHYSICAL_ADDRESS     RtcPageBase
+  IN EFI_HANDLE            ImageHandle,
+  IN EFI_PHYSICAL_ADDRESS  RtcPageBase
   )
 {
   EFI_STATUS  Status;
@@ -48,7 +48,8 @@ KvmtoolRtcMapMemory (
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((
-      DEBUG_ERROR, "Failed to add memory space. Status = %r\n",
+      DEBUG_ERROR,
+      "Failed to add memory space. Status = %r\n",
       Status
       ));
     return Status;
@@ -117,18 +118,18 @@ KvmtoolRtcMapMemory (
 EFI_STATUS
 EFIAPI
 KvmtoolRtcFdtClientLibConstructor (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS            Status;
-  FDT_CLIENT_PROTOCOL   *FdtClient;
-  INT32                 Node;
-  CONST UINT32          *Reg;
-  UINT32                RegSize;
-  UINT64                RegBase;
-  UINT64                Range;
-  RETURN_STATUS         PcdStatus;
+  EFI_STATUS           Status;
+  FDT_CLIENT_PROTOCOL  *FdtClient;
+  INT32                Node;
+  CONST UINT32         *Reg;
+  UINT32               RegSize;
+  UINT64               RegBase;
+  UINT64               Range;
+  RETURN_STATUS        PcdStatus;
 
   Status = gBS->LocateProtocol (
                   &gFdtClientProtocolGuid,
@@ -170,7 +171,7 @@ KvmtoolRtcFdtClientLibConstructor (
   ASSERT (RegSize == 16);
 
   RegBase = SwapBytes64 (ReadUnaligned64 ((VOID *)&Reg[0]));
-  Range = SwapBytes64 (ReadUnaligned64 ((VOID *)&Reg[2]));
+  Range   = SwapBytes64 (ReadUnaligned64 ((VOID *)&Reg[2]));
   DEBUG ((
     DEBUG_INFO,
     "Found motorola,mc146818 RTC @ 0x%Lx Range = 0x%x\n",

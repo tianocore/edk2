@@ -15,7 +15,7 @@
 #include <Library/MemoryAllocationLib.h>
 
 // Number of Virtual Memory Map Descriptors
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          5
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS  5
 
 /**
   Return the Virtual Memory Map of your platform
@@ -32,24 +32,24 @@
 **/
 VOID
 ArmVirtGetMemoryMap (
-  OUT ARM_MEMORY_REGION_DESCRIPTOR   **VirtualMemoryMap
+  OUT ARM_MEMORY_REGION_DESCRIPTOR  **VirtualMemoryMap
   )
 {
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
-  UINTN                          Idx;
-  EFI_PHYSICAL_ADDRESS           TopOfAddressSpace;
+  UINTN                         Idx;
+  EFI_PHYSICAL_ADDRESS          TopOfAddressSpace;
 
   ASSERT (VirtualMemoryMap != NULL);
 
   TopOfAddressSpace = LShiftU64 (1ULL, ArmGetPhysicalAddressBits ());
 
-  VirtualMemoryTable = (ARM_MEMORY_REGION_DESCRIPTOR*)
-                        AllocatePages (
-                          EFI_SIZE_TO_PAGES (
-                            sizeof (ARM_MEMORY_REGION_DESCRIPTOR) *
-                            MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS
-                            )
-                          );
+  VirtualMemoryTable = (ARM_MEMORY_REGION_DESCRIPTOR *)
+                       AllocatePages (
+                         EFI_SIZE_TO_PAGES (
+                           sizeof (ARM_MEMORY_REGION_DESCRIPTOR) *
+                           MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS
+                           )
+                         );
   if (VirtualMemoryTable == NULL) {
     DEBUG ((
       DEBUG_ERROR,
@@ -75,24 +75,24 @@ ArmVirtGetMemoryMap (
   // Peripheral space after DRAM
   VirtualMemoryTable[++Idx].PhysicalBase = PcdGet64 (PcdSystemMemoryBase) +
                                            PcdGet64 (PcdSystemMemorySize);
-  VirtualMemoryTable[Idx].VirtualBase    = VirtualMemoryTable[Idx].PhysicalBase;
-  VirtualMemoryTable[Idx].Length         = TopOfAddressSpace -
-                                           VirtualMemoryTable[Idx].PhysicalBase;
-  VirtualMemoryTable[Idx].Attributes     = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
+  VirtualMemoryTable[Idx].VirtualBase = VirtualMemoryTable[Idx].PhysicalBase;
+  VirtualMemoryTable[Idx].Length      = TopOfAddressSpace -
+                                        VirtualMemoryTable[Idx].PhysicalBase;
+  VirtualMemoryTable[Idx].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // Map the FV region as normal executable memory
   VirtualMemoryTable[++Idx].PhysicalBase = PcdGet64 (PcdFvBaseAddress);
-  VirtualMemoryTable[Idx].VirtualBase  = VirtualMemoryTable[Idx].PhysicalBase;
-  VirtualMemoryTable[Idx].Length       = FixedPcdGet32 (PcdFvSize);
-  VirtualMemoryTable[Idx].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+  VirtualMemoryTable[Idx].VirtualBase    = VirtualMemoryTable[Idx].PhysicalBase;
+  VirtualMemoryTable[Idx].Length         = FixedPcdGet32 (PcdFvSize);
+  VirtualMemoryTable[Idx].Attributes     = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 
   // End of Table
-  VirtualMemoryTable[++Idx].PhysicalBase  = 0;
-  VirtualMemoryTable[Idx].VirtualBase     = 0;
-  VirtualMemoryTable[Idx].Length          = 0;
-  VirtualMemoryTable[Idx].Attributes      = (ARM_MEMORY_REGION_ATTRIBUTES)0;
+  VirtualMemoryTable[++Idx].PhysicalBase = 0;
+  VirtualMemoryTable[Idx].VirtualBase    = 0;
+  VirtualMemoryTable[Idx].Length         = 0;
+  VirtualMemoryTable[Idx].Attributes     = (ARM_MEMORY_REGION_ATTRIBUTES)0;
 
-  ASSERT((Idx + 1) <= MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS);
+  ASSERT ((Idx + 1) <= MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS);
 
   *VirtualMemoryMap = VirtualMemoryTable;
 }

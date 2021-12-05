@@ -14,11 +14,11 @@ FindMemnode (
   OUT UINT64  *SystemMemorySize
   )
 {
-  INT32         MemoryNode;
-  INT32         AddressCells;
-  INT32         SizeCells;
-  INT32         Length;
-  CONST INT32   *Prop;
+  INT32        MemoryNode;
+  INT32        AddressCells;
+  INT32        SizeCells;
+  INT32        Length;
+  CONST INT32  *Prop;
 
   if (fdt_check_header (DeviceTreeBlob) != 0) {
     return FALSE;
@@ -37,7 +37,7 @@ FindMemnode (
   // from the root node, or use the default if not provided.
   //
   AddressCells = 1;
-  SizeCells = 1;
+  SizeCells    = 1;
 
   Prop = fdt_getprop (DeviceTreeBlob, 0, "#address-cells", &Length);
   if (Length == 4) {
@@ -63,6 +63,7 @@ FindMemnode (
   if (AddressCells > 1) {
     *SystemMemoryBase = (*SystemMemoryBase << 32) | fdt32_to_cpu (Prop[1]);
   }
+
   Prop += AddressCells;
 
   *SystemMemorySize = fdt32_to_cpu (Prop[0]);
@@ -75,10 +76,10 @@ FindMemnode (
 
 VOID
 CopyFdt (
-  IN    VOID    *FdtDest,
-  IN    VOID    *FdtSource
+  IN    VOID  *FdtDest,
+  IN    VOID  *FdtSource
   )
 {
-  fdt_pack(FdtSource);
+  fdt_pack (FdtSource);
   CopyMem (FdtDest, FdtSource, fdt_totalsize (FdtSource));
 }

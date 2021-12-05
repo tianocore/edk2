@@ -29,7 +29,7 @@
 VOID
 EFIAPI
 ArmVirtGetMemoryMap (
-  OUT ARM_MEMORY_REGION_DESCRIPTOR    **VirtualMemoryMap
+  OUT ARM_MEMORY_REGION_DESCRIPTOR  **VirtualMemoryMap
   );
 
 #endif

@@ -16,9 +16,9 @@ ArmGenericTimerEnableTimer (
   VOID
   )
 {
-  UINTN TimerCtrlReg;
+  UINTN  TimerCtrlReg;
 
-  TimerCtrlReg = ArmReadCntvCtl ();
+  TimerCtrlReg  = ArmReadCntvCtl ();
   TimerCtrlReg |= ARM_ARCH_TIMER_ENABLE;
   ArmWriteCntvCtl (TimerCtrlReg);
 }
@@ -29,9 +29,9 @@ ArmGenericTimerReenableTimer (
   VOID
   )
 {
-  UINTN TimerCtrlReg;
+  UINTN  TimerCtrlReg;
 
-  TimerCtrlReg = ArmReadCntvCtl ();
+  TimerCtrlReg  = ArmReadCntvCtl ();
   TimerCtrlReg |= ARM_ARCH_TIMER_ENABLE;
 
   //
@@ -50,9 +50,9 @@ ArmGenericTimerDisableTimer (
   VOID
   )
 {
-  UINTN TimerCtrlReg;
+  UINTN  TimerCtrlReg;
 
-  TimerCtrlReg = ArmReadCntvCtl ();
+  TimerCtrlReg  = ArmReadCntvCtl ();
   TimerCtrlReg &= ~ARM_ARCH_TIMER_ENABLE;
   ArmWriteCntvCtl (TimerCtrlReg);
 }
@@ -84,11 +84,10 @@ ArmGenericTimerGetTimerVal (
   return ArmReadCntvTval ();
 }
 
-
 VOID
 EFIAPI
 ArmGenericTimerSetTimerVal (
-  IN   UINTN   Value
+  IN   UINTN  Value
   )
 {
   ArmWriteCntvTval (Value);
@@ -115,7 +114,7 @@ ArmGenericTimerGetTimerCtrlReg (
 VOID
 EFIAPI
 ArmGenericTimerSetTimerCtrlReg (
-  UINTN Value
+  UINTN  Value
   )
 {
   ArmWriteCntvCtl (Value);
@@ -133,7 +132,7 @@ ArmGenericTimerGetCompareVal (
 VOID
 EFIAPI
 ArmGenericTimerSetCompareVal (
-  IN   UINT64   Value
+  IN   UINT64  Value
   )
 {
   ArmWriteCntvCval (Value);

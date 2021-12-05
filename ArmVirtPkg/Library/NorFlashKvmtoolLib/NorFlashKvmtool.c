@@ -19,15 +19,15 @@
 
 /** Macro defining the maximum number of Flash devices.
 */
-#define MAX_FLASH_DEVICES       4
+#define MAX_FLASH_DEVICES  4
 
 /** Macro defining the cfi-flash label describing the UEFI variable store.
 */
-#define LABEL_UEFI_VAR_STORE    "System-firmware"
+#define LABEL_UEFI_VAR_STORE  "System-firmware"
 
 STATIC NOR_FLASH_DESCRIPTION  mNorFlashDevices[MAX_FLASH_DEVICES];
 STATIC UINTN                  mNorFlashDeviceCount = 0;
-STATIC INT32                  mUefiVarStoreNode = MAX_INT32;
+STATIC INT32                  mUefiVarStoreNode    = MAX_INT32;
 STATIC FDT_CLIENT_PROTOCOL    *mFdtClient;
 
 /** This function performs platform specific actions to initialise
@@ -40,7 +40,7 @@ NorFlashPlatformInitialization (
   VOID
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
   DEBUG ((DEBUG_INFO, "NorFlashPlatformInitialization\n"));
 
@@ -89,24 +89,25 @@ NorFlashPlatformInitialization (
 STATIC
 EFI_STATUS
 SetupVariableStore (
-  IN NOR_FLASH_DESCRIPTION * FlashDevice
+  IN NOR_FLASH_DESCRIPTION  *FlashDevice
   )
 {
-  UINTN   FlashRegion;
-  UINTN   FlashNvStorageVariableBase;
-  UINTN   FlashNvStorageFtwWorkingBase;
-  UINTN   FlashNvStorageFtwSpareBase;
-  UINTN   FlashNvStorageVariableSize;
-  UINTN   FlashNvStorageFtwWorkingSize;
-  UINTN   FlashNvStorageFtwSpareSize;
+  UINTN  FlashRegion;
+  UINTN  FlashNvStorageVariableBase;
+  UINTN  FlashNvStorageFtwWorkingBase;
+  UINTN  FlashNvStorageFtwSpareBase;
+  UINTN  FlashNvStorageVariableSize;
+  UINTN  FlashNvStorageFtwWorkingSize;
+  UINTN  FlashNvStorageFtwSpareSize;
 
-  FlashNvStorageVariableSize = PcdGet32 (PcdFlashNvStorageVariableSize);
+  FlashNvStorageVariableSize   = PcdGet32 (PcdFlashNvStorageVariableSize);
   FlashNvStorageFtwWorkingSize = PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
-  FlashNvStorageFtwSpareSize =  PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  FlashNvStorageFtwSpareSize   =  PcdGet32 (PcdFlashNvStorageFtwSpareSize);
 
   if ((FlashNvStorageVariableSize == 0)   ||
       (FlashNvStorageFtwWorkingSize == 0) ||
-      (FlashNvStorageFtwSpareSize == 0)) {
+      (FlashNvStorageFtwSpareSize == 0))
+  {
     DEBUG ((DEBUG_ERROR, "FlashNvStorage size not defined\n"));
     return EFI_INVALID_PARAMETER;
   }
@@ -115,13 +116,13 @@ SetupVariableStore (
   FlashRegion = FlashDevice->DeviceBaseAddress;
 
   FlashNvStorageVariableBase = FlashRegion;
-  FlashRegion += PcdGet32 (PcdFlashNvStorageVariableSize);
+  FlashRegion               += PcdGet32 (PcdFlashNvStorageVariableSize);
 
   FlashNvStorageFtwWorkingBase = FlashRegion;
-  FlashRegion += PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
+  FlashRegion                 += PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
 
   FlashNvStorageFtwSpareBase = FlashRegion;
-  FlashRegion += PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  FlashRegion               += PcdGet32 (PcdFlashNvStorageFtwSpareSize);
 
   if (FlashRegion > (FlashDevice->DeviceBaseAddress + FlashDevice->Size)) {
     DEBUG ((DEBUG_ERROR, "Insufficient flash storage size\n"));
@@ -187,15 +188,16 @@ SetupVariableStore (
 **/
 EFI_STATUS
 NorFlashPlatformGetDevices (
-  OUT NOR_FLASH_DESCRIPTION   **NorFlashDescriptions,
-  OUT UINT32                  *Count
+  OUT NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
+  OUT UINT32                 *Count
   )
 {
   if (mNorFlashDeviceCount > 0) {
     *NorFlashDescriptions = mNorFlashDevices;
-    *Count = mNorFlashDeviceCount;
+    *Count                = mNorFlashDeviceCount;
     return EFI_SUCCESS;
   }
+
   return EFI_NOT_FOUND;
 }
 
@@ -211,20 +213,20 @@ NorFlashPlatformGetDevices (
 EFI_STATUS
 EFIAPI
 NorFlashPlatformLibConstructor (
-  IN  EFI_HANDLE          ImageHandle,
-  IN  EFI_SYSTEM_TABLE  * SystemTable
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  INT32                       Node;
-  EFI_STATUS                  Status;
-  EFI_STATUS                  FindNodeStatus;
-  CONST UINT32                *Reg;
-  UINT32                      PropSize;
-  UINT64                      Base;
-  UINT64                      Size;
-  UINTN                       UefiVarStoreIndex;
-  CONST CHAR8                 *Label;
-  UINT32                      LabelLen;
+  INT32         Node;
+  EFI_STATUS    Status;
+  EFI_STATUS    FindNodeStatus;
+  CONST UINT32  *Reg;
+  UINT32        PropSize;
+  UINT64        Base;
+  UINT64        Size;
+  UINTN         UefiVarStoreIndex;
+  CONST CHAR8   *Label;
+  UINT32        LabelLen;
 
   if (mNorFlashDeviceCount != 0) {
     return EFI_SUCCESS;
@@ -244,13 +246,14 @@ NorFlashPlatformLibConstructor (
                                       &Node
                                       );
        !EFI_ERROR (FindNodeStatus) &&
-         (mNorFlashDeviceCount < MAX_FLASH_DEVICES);
+       (mNorFlashDeviceCount < MAX_FLASH_DEVICES);
        FindNodeStatus = mFdtClient->FindNextCompatibleNode (
                                       mFdtClient,
                                       "cfi-flash",
                                       Node,
                                       &Node
-    )) {
+                                      ))
+  {
     Status = mFdtClient->GetNodeProperty (
                            mFdtClient,
                            Node,
@@ -278,15 +281,20 @@ NorFlashPlatformLibConstructor (
                            &PropSize
                            );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: GetNodeProperty () failed (Status == %r)\n",
-        __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: GetNodeProperty () failed (Status == %r)\n",
+        __FUNCTION__,
+        Status
+        ));
       continue;
     }
 
     ASSERT ((PropSize % (4 * sizeof (UINT32))) == 0);
 
     while ((PropSize >= (4 * sizeof (UINT32))) &&
-           (mNorFlashDeviceCount < MAX_FLASH_DEVICES)) {
+           (mNorFlashDeviceCount < MAX_FLASH_DEVICES))
+    {
       Base = SwapBytes64 (ReadUnaligned64 ((VOID *)&Reg[0]));
       Size = SwapBytes64 (ReadUnaligned64 ((VOID *)&Reg[2]));
       Reg += 4;
@@ -298,7 +306,8 @@ NorFlashPlatformLibConstructor (
       // The firmware is not updatable from inside the guest anyway.
       //
       if ((PcdGet64 (PcdFvBaseAddress) + PcdGet32 (PcdFvSize) > Base) &&
-          (Base + Size) > PcdGet64 (PcdFvBaseAddress)) {
+          ((Base + Size) > PcdGet64 (PcdFvBaseAddress)))
+      {
         continue;
       }
 
@@ -312,8 +321,8 @@ NorFlashPlatformLibConstructor (
 
       mNorFlashDevices[mNorFlashDeviceCount].DeviceBaseAddress = (UINTN)Base;
       mNorFlashDevices[mNorFlashDeviceCount].RegionBaseAddress = (UINTN)Base;
-      mNorFlashDevices[mNorFlashDeviceCount].Size = (UINTN)Size;
-      mNorFlashDevices[mNorFlashDeviceCount].BlockSize = KVMTOOL_NOR_BLOCK_SIZE;
+      mNorFlashDevices[mNorFlashDeviceCount].Size              = (UINTN)Size;
+      mNorFlashDevices[mNorFlashDeviceCount].BlockSize         = KVMTOOL_NOR_BLOCK_SIZE;
       mNorFlashDeviceCount++;
     }
   } // for
@@ -326,6 +335,7 @@ NorFlashPlatformLibConstructor (
       UefiVarStoreIndex = mNorFlashDeviceCount - 1;
       mUefiVarStoreNode = Node;
     }
+
     if (mNorFlashDevices[UefiVarStoreIndex].DeviceBaseAddress != 0) {
       return SetupVariableStore (&mNorFlashDevices[UefiVarStoreIndex]);
     }

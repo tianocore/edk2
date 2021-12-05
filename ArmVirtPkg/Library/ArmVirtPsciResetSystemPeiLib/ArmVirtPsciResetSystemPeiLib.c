@@ -34,20 +34,20 @@ DiscoverPsciMethod (
   VOID
   )
 {
-  VOID                            *DeviceTreeBase;
-  INT32                           Node, Prev;
-  INT32                           Len;
-  CONST CHAR8                     *Compatible;
-  CONST CHAR8                     *CompatibleItem;
-  CONST VOID                      *Prop;
+  VOID         *DeviceTreeBase;
+  INT32        Node, Prev;
+  INT32        Len;
+  CONST CHAR8  *Compatible;
+  CONST CHAR8  *CompatibleItem;
+  CONST VOID   *Prop;
 
-  DeviceTreeBase = (VOID*)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
+  DeviceTreeBase = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   ASSERT (fdt_check_header (DeviceTreeBase) == 0);
 
   //
   // Enumerate all FDT nodes looking for the PSCI node and capture the method
   //
-  for (Prev = 0;; Prev = Node) {
+  for (Prev = 0; ; Prev = Node) {
     Node = fdt_next_node (DeviceTreeBase, Prev, NULL);
     if (Node < 0) {
       break;
@@ -62,16 +62,19 @@ DiscoverPsciMethod (
     // Iterate over the NULL-separated items in the compatible string
     //
     for (CompatibleItem = Compatible; CompatibleItem < Compatible + Len;
-      CompatibleItem += 1 + AsciiStrLen (CompatibleItem)) {
-
+         CompatibleItem += 1 + AsciiStrLen (CompatibleItem))
+    {
       if (AsciiStrCmp (CompatibleItem, "arm,psci-0.2") != 0) {
         continue;
       }
 
       Prop = fdt_getprop (DeviceTreeBase, Node, "method", NULL);
       if (!Prop) {
-        DEBUG ((DEBUG_ERROR, "%a: Missing PSCI method property\n",
-          __FUNCTION__));
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: Missing PSCI method property\n",
+          __FUNCTION__
+          ));
         return PsciMethodUnknown;
       }
 
@@ -80,39 +83,44 @@ DiscoverPsciMethod (
       } else if (AsciiStrnCmp (Prop, "smc", 3) == 0) {
         return PsciMethodSmc;
       } else {
-        DEBUG ((DEBUG_ERROR, "%a: Unknown PSCI method \"%a\"\n", __FUNCTION__,
-          Prop));
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: Unknown PSCI method \"%a\"\n",
+          __FUNCTION__,
+          Prop
+          ));
         return PsciMethodUnknown;
       }
     }
   }
+
   return PsciMethodUnknown;
 }
 
 STATIC
 VOID
 PerformPsciAction (
-  IN  UINTN     Arg0
+  IN  UINTN  Arg0
   )
 {
-  ARM_SMC_ARGS ArmSmcArgs;
-  ARM_HVC_ARGS ArmHvcArgs;
+  ARM_SMC_ARGS  ArmSmcArgs;
+  ARM_HVC_ARGS  ArmHvcArgs;
 
   ArmSmcArgs.Arg0 = Arg0;
   ArmHvcArgs.Arg0 = Arg0;
 
   switch (DiscoverPsciMethod ()) {
-  case PsciMethodHvc:
-    ArmCallHvc (&ArmHvcArgs);
-    break;
+    case PsciMethodHvc:
+      ArmCallHvc (&ArmHvcArgs);
+      break;
 
-  case PsciMethodSmc:
-    ArmCallSmc (&ArmSmcArgs);
-    break;
+    case PsciMethodSmc:
+      ArmCallSmc (&ArmSmcArgs);
+      break;
 
-  default:
-    DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
-    ASSERT (FALSE);
+    default:
+      DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
+      ASSERT (FALSE);
   }
 }
 
@@ -180,8 +188,8 @@ ResetShutdown (
 VOID
 EFIAPI
 ResetPlatformSpecific (
-  IN UINTN   DataSize,
-  IN VOID    *ResetData
+  IN UINTN  DataSize,
+  IN VOID   *ResetData
   )
 {
   // Map the platform specific reset as reboot
@@ -203,30 +211,30 @@ ResetPlatformSpecific (
 VOID
 EFIAPI
 ResetSystem (
-  IN EFI_RESET_TYPE               ResetType,
-  IN EFI_STATUS                   ResetStatus,
-  IN UINTN                        DataSize,
-  IN VOID                         *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
   )
 {
   switch (ResetType) {
-  case EfiResetWarm:
-    ResetWarm ();
-    break;
+    case EfiResetWarm:
+      ResetWarm ();
+      break;
 
-  case EfiResetCold:
-    ResetCold ();
-    break;
+    case EfiResetCold:
+      ResetCold ();
+      break;
 
-  case EfiResetShutdown:
-    ResetShutdown ();
-    return;
+    case EfiResetShutdown:
+      ResetShutdown ();
+      return;
 
-  case EfiResetPlatformSpecific:
-    ResetPlatformSpecific (DataSize, ResetData);
-    return;
+    case EfiResetPlatformSpecific:
+      ResetPlatformSpecific (DataSize, ResetData);
+      return;
 
-  default:
-    return;
+    default:
+      return;
   }
 }
