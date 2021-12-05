@@ -13,6 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_CRC32_GUIDED_SECTION_EXTRACTION_GUID \
   { 0xFC1BCDB0, 0x7D31, 0x49aa, {0x93, 0x6A, 0xA4, 0x60, 0x0D, 0x9D, 0xD0, 0x83 } }
 
-extern EFI_GUID gEfiCrc32GuidedSectionExtractionGuid;
+extern EFI_GUID  gEfiCrc32GuidedSectionExtractionGuid;
 
 #endif

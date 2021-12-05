@@ -43,9 +43,9 @@ FlushPendingRuntimeVariableCacheUpdates (
 **/
 EFI_STATUS
 SynchronizeRuntimeVariableCache (
-  IN  VARIABLE_RUNTIME_CACHE          *VariableRuntimeCache,
-  IN  UINTN                           Offset,
-  IN  UINTN                           Length
+  IN  VARIABLE_RUNTIME_CACHE  *VariableRuntimeCache,
+  IN  UINTN                   Offset,
+  IN  UINTN                   Length
   );
 
 #endif

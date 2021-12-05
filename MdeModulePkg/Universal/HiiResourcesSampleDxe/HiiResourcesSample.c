@@ -21,13 +21,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// HII specific Vendor Device Path definition.
 ///
 typedef struct {
-  VENDOR_DEVICE_PATH             VendorDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL       End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 #pragma pack()
 
-
-EFI_HII_HANDLE  mHiiHandle = NULL;
+EFI_HII_HANDLE  mHiiHandle    = NULL;
 EFI_HANDLE      mDriverHandle = NULL;
 
 HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
@@ -36,8 +35,8 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
       {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
     HII_RESOURCE_SAMPLE_FORM_SET_GUID
@@ -46,8 +45,8 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
     {
-      (UINT8) (END_DEVICE_PATH_LENGTH),
-      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+      (UINT8)(END_DEVICE_PATH_LENGTH),
+      (UINT8)((END_DEVICE_PATH_LENGTH) >> 8)
     }
   }
 };
@@ -64,12 +63,12 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
 EFI_STATUS
 EFIAPI
 HiiResourcesSampleInit (
-  IN EFI_HANDLE                   ImageHandle,
-  IN EFI_SYSTEM_TABLE             *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                      Status;
-  EFI_HII_PACKAGE_LIST_HEADER     *PackageList;
+  EFI_STATUS                   Status;
+  EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
 
   //
   // Retrieve HII package list from ImageHandle
@@ -77,7 +76,7 @@ HiiResourcesSampleInit (
   Status = gBS->OpenProtocol (
                   ImageHandle,
                   &gEfiHiiPackageListProtocolGuid,
-                  (VOID **) &PackageList,
+                  (VOID **)&PackageList,
                   ImageHandle,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -103,11 +102,11 @@ HiiResourcesSampleInit (
   // Publish HII package list to HII Database.
   //
   Status = gHiiDatabase->NewPackageList (
-                          gHiiDatabase,
-                          PackageList,
-                          mDriverHandle,
-                          &mHiiHandle
-                          );
+                           gHiiDatabase,
+                           PackageList,
+                           mDriverHandle,
+                           &mHiiHandle
+                           );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -130,9 +129,9 @@ HiiResourcesSampleUnload (
 {
   if (mDriverHandle != NULL) {
     gBS->UninstallProtocolInterface (
-            mDriverHandle,
-            &gEfiDevicePathProtocolGuid,
-            &mHiiVendorDevicePath
+           mDriverHandle,
+           &gEfiDevicePathProtocolGuid,
+           &mHiiVendorDevicePath
            );
     mDriverHandle = NULL;
   }

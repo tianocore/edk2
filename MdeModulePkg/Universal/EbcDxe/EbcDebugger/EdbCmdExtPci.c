@@ -22,10 +22,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_DEBUG_STATUS
 DebuggerExtPciPCIL (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
   EDBPrint (L"Unsupported\n");
@@ -49,10 +49,10 @@ DebuggerExtPciPCIL (
 **/
 EFI_DEBUG_STATUS
 DebuggerExtPciPCID (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
   EDBPrint (L"Unsupported\n");
@@ -76,10 +76,10 @@ DebuggerExtPciPCID (
 **/
 EFI_DEBUG_STATUS
 DebuggerExtPciCFGB (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
   EDBPrint (L"Unsupported\n");
@@ -88,7 +88,6 @@ DebuggerExtPciCFGB (
   //
   return EFI_DEBUG_CONTINUE;
 }
-
 
 /**
 
@@ -104,10 +103,10 @@ DebuggerExtPciCFGB (
 **/
 EFI_DEBUG_STATUS
 DebuggerExtPciCFGW (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
   EDBPrint (L"Unsupported\n");
@@ -131,10 +130,10 @@ DebuggerExtPciCFGW (
 **/
 EFI_DEBUG_STATUS
 DebuggerExtPciCFGD (
-  IN     CHAR16                    *CommandArg,
-  IN     EFI_DEBUGGER_PRIVATE_DATA *DebuggerPrivate,
-  IN     EFI_EXCEPTION_TYPE        ExceptionType,
-  IN OUT EFI_SYSTEM_CONTEXT        SystemContext
+  IN     CHAR16                     *CommandArg,
+  IN     EFI_DEBUGGER_PRIVATE_DATA  *DebuggerPrivate,
+  IN     EFI_EXCEPTION_TYPE         ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT         SystemContext
   )
 {
   EDBPrint (L"Unsupported\n");

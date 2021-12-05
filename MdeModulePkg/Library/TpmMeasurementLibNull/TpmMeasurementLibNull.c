@@ -24,12 +24,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 TpmMeasureAndLogData (
-  IN UINT32             PcrIndex,
-  IN UINT32             EventType,
-  IN VOID               *EventLog,
-  IN UINT32             LogLen,
-  IN VOID               *HashData,
-  IN UINT64             HashDataLen
+  IN UINT32  PcrIndex,
+  IN UINT32  EventType,
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
   )
 {
   //

@@ -9,36 +9,36 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Ui.h"
 #include "FrontPage.h"
 
-EFI_HII_HANDLE gStringPackHandle;
+EFI_HII_HANDLE  gStringPackHandle;
 
-EFI_GUID mUiStringPackGuid = {
+EFI_GUID  mUiStringPackGuid = {
   0x136a3048, 0x752a, 0x4bf6, { 0xa7, 0x57, 0x9, 0x36, 0x11, 0x95, 0x38, 0xed }
 };
 
 EFI_GUID  mFontPackageGuid = {
-  0x78941450, 0x90ab, 0x4fb1, {0xb7, 0x5f, 0x58, 0x92, 0x14, 0xe2, 0x4a, 0xc}
+  0x78941450, 0x90ab, 0x4fb1, { 0xb7, 0x5f, 0x58, 0x92, 0x14, 0xe2, 0x4a, 0xc }
 };
 
-#define NARROW_GLYPH_NUMBER 8
-#define WIDE_GLYPH_NUMBER   75
+#define NARROW_GLYPH_NUMBER  8
+#define WIDE_GLYPH_NUMBER    75
 
 typedef struct {
   ///
   /// This 4-bytes total array length is required by HiiAddPackages()
   ///
-  UINT32                 Length;
+  UINT32                    Length;
 
   //
   // This is the Font package definition
   //
-  EFI_HII_PACKAGE_HEADER Header;
-  UINT16                 NumberOfNarrowGlyphs;
-  UINT16                 NumberOfWideGlyphs;
-  EFI_NARROW_GLYPH       NarrowArray[NARROW_GLYPH_NUMBER];
-  EFI_WIDE_GLYPH         WideArray[WIDE_GLYPH_NUMBER];
+  EFI_HII_PACKAGE_HEADER    Header;
+  UINT16                    NumberOfNarrowGlyphs;
+  UINT16                    NumberOfWideGlyphs;
+  EFI_NARROW_GLYPH          NarrowArray[NARROW_GLYPH_NUMBER];
+  EFI_WIDE_GLYPH            WideArray[WIDE_GLYPH_NUMBER];
 } FONT_PACK_BIN;
 
-FONT_PACK_BIN mFontBin = {
+FONT_PACK_BIN  mFontBin = {
   sizeof (FONT_PACK_BIN),
   {
     sizeof (FONT_PACK_BIN) - sizeof (UINT32),
@@ -260,11 +260,11 @@ InitializeStringSupport (
   )
 {
   gStringPackHandle = HiiAddPackages (
-                         &mUiStringPackGuid,
-                         gImageHandle,
-                         UiAppStrings,
-                         NULL
-                         );
+                        &mUiStringPackGuid,
+                        gImageHandle,
+                        UiAppStrings,
+                        NULL
+                        );
   ASSERT (gStringPackHandle != NULL);
 }
 
@@ -292,7 +292,7 @@ UninitializeStringSupport (
 **/
 CHAR16 *
 GetStringById (
-  IN  EFI_STRING_ID   Id
+  IN  EFI_STRING_ID  Id
   )
 {
   return HiiGetString (gStringPackHandle, Id, NULL);

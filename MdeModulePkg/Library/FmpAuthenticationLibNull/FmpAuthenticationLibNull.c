@@ -55,6 +55,6 @@ AuthenticateFmpImage (
   IN UINTN                              PublicKeyDataLength
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
   return RETURN_UNSUPPORTED;
 }

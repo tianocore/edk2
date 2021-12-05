@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _EFI_USBMASS_H_
 #define _EFI_USBMASS_H_
 
-
 #include <Uefi.h>
 #include <IndustryStandard/Scsi.h>
 #include <Protocol/BlockIo.h>
@@ -26,8 +25,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
 
-typedef struct _USB_MASS_TRANSPORT USB_MASS_TRANSPORT;
-typedef struct _USB_MASS_DEVICE    USB_MASS_DEVICE;
+typedef struct _USB_MASS_TRANSPORT  USB_MASS_TRANSPORT;
+typedef struct _USB_MASS_DEVICE     USB_MASS_DEVICE;
 
 #include "UsbMassBot.h"
 #include "UsbMassCbi.h"
@@ -44,9 +43,9 @@ typedef struct _USB_MASS_DEVICE    USB_MASS_DEVICE;
 #define USB_MASS_1_MILLISECOND  1000
 #define USB_MASS_1_SECOND       (1000 * USB_MASS_1_MILLISECOND)
 
-#define USB_MASS_CMD_SUCCESS    0
-#define USB_MASS_CMD_FAIL       1
-#define USB_MASS_CMD_PERSISTENT 2
+#define USB_MASS_CMD_SUCCESS     0
+#define USB_MASS_CMD_FAIL        1
+#define USB_MASS_CMD_PERSISTENT  2
 
 /**
   Initializes USB transport protocol.
@@ -65,8 +64,8 @@ typedef struct _USB_MASS_DEVICE    USB_MASS_DEVICE;
 typedef
 EFI_STATUS
 (*USB_MASS_INIT_TRANSPORT) (
-  IN  EFI_USB_IO_PROTOCOL     *Usb,
-  OUT VOID                    **Context    OPTIONAL
+  IN  EFI_USB_IO_PROTOCOL  *Usb,
+  OUT VOID                 **Context    OPTIONAL
   );
 
 /**
@@ -114,8 +113,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (*USB_MASS_RESET) (
-  IN  VOID                    *Context,
-  IN  BOOLEAN                 ExtendedVerification
+  IN  VOID     *Context,
+  IN  BOOLEAN  ExtendedVerification
   );
 
 /**
@@ -132,8 +131,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (*USB_MASS_GET_MAX_LUN) (
-  IN  VOID                    *Context,
-  IN  UINT8                   *MaxLun
+  IN  VOID   *Context,
+  IN  UINT8  *MaxLun
   );
 
 /**
@@ -147,7 +146,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (*USB_MASS_CLEAN_UP) (
-  IN  VOID                    *Context
+  IN  VOID  *Context
   );
 
 ///
@@ -159,29 +158,29 @@ EFI_STATUS
 /// it is no longer necessary.
 ///
 struct _USB_MASS_TRANSPORT {
-  UINT8                   Protocol;
-  USB_MASS_INIT_TRANSPORT Init;        ///< Initialize the mass storage transport protocol
-  USB_MASS_EXEC_COMMAND   ExecCommand; ///< Transport command to the device then get result
-  USB_MASS_RESET          Reset;       ///< Reset the device
-  USB_MASS_GET_MAX_LUN    GetMaxLun;   ///< Get max lun, only for bot
-  USB_MASS_CLEAN_UP       CleanUp;     ///< Clean up the resources.
+  UINT8                      Protocol;
+  USB_MASS_INIT_TRANSPORT    Init;        ///< Initialize the mass storage transport protocol
+  USB_MASS_EXEC_COMMAND      ExecCommand; ///< Transport command to the device then get result
+  USB_MASS_RESET             Reset;       ///< Reset the device
+  USB_MASS_GET_MAX_LUN       GetMaxLun;   ///< Get max lun, only for bot
+  USB_MASS_CLEAN_UP          CleanUp;     ///< Clean up the resources.
 };
 
 struct _USB_MASS_DEVICE {
-  UINT32                    Signature;
-  EFI_HANDLE                Controller;
-  EFI_USB_IO_PROTOCOL       *UsbIo;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_BLOCK_IO_PROTOCOL     BlockIo;
-  EFI_BLOCK_IO_MEDIA        BlockIoMedia;
-  BOOLEAN                   OpticalStorage;
-  UINT8                     Lun;          ///< Logical Unit Number
-  UINT8                     Pdt;          ///< Peripheral Device Type
-  USB_MASS_TRANSPORT        *Transport;   ///< USB mass storage transport protocol
-  VOID                      *Context;
-  EFI_DISK_INFO_PROTOCOL    DiskInfo;
-  USB_BOOT_INQUIRY_DATA     InquiryData;
-  BOOLEAN                   Cdb16Byte;
+  UINT32                      Signature;
+  EFI_HANDLE                  Controller;
+  EFI_USB_IO_PROTOCOL         *UsbIo;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  EFI_BLOCK_IO_PROTOCOL       BlockIo;
+  EFI_BLOCK_IO_MEDIA          BlockIoMedia;
+  BOOLEAN                     OpticalStorage;
+  UINT8                       Lun;        ///< Logical Unit Number
+  UINT8                       Pdt;        ///< Peripheral Device Type
+  USB_MASS_TRANSPORT          *Transport; ///< USB mass storage transport protocol
+  VOID                        *Context;
+  EFI_DISK_INFO_PROTOCOL      DiskInfo;
+  USB_BOOT_INQUIRY_DATA       InquiryData;
+  BOOLEAN                     Cdb16Byte;
 };
 
 #endif

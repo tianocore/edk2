@@ -22,8 +22,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 BOOLEAN
 IsValidVariableHeader (
-  IN  VARIABLE_HEADER       *Variable,
-  IN  VARIABLE_HEADER       *VariableStoreEnd
+  IN  VARIABLE_HEADER  *Variable,
+  IN  VARIABLE_HEADER  *VariableStoreEnd
   )
 {
   if ((Variable == NULL) || (Variable >= VariableStoreEnd) || (Variable->StartId != VARIABLE_DATA)) {
@@ -50,25 +50,25 @@ IsValidVariableHeader (
 **/
 VARIABLE_STORE_STATUS
 GetVariableStoreStatus (
-  IN VARIABLE_STORE_HEADER *VarStoreHeader
+  IN VARIABLE_STORE_HEADER  *VarStoreHeader
   )
 {
   if ((CompareGuid (&VarStoreHeader->Signature, &gEfiAuthenticatedVariableGuid) ||
        CompareGuid (&VarStoreHeader->Signature, &gEfiVariableGuid)) &&
-      VarStoreHeader->Format == VARIABLE_STORE_FORMATTED &&
-      VarStoreHeader->State == VARIABLE_STORE_HEALTHY
-      ) {
-
+      (VarStoreHeader->Format == VARIABLE_STORE_FORMATTED) &&
+      (VarStoreHeader->State == VARIABLE_STORE_HEALTHY)
+      )
+  {
     return EfiValid;
-  } else if (((UINT32 *)(&VarStoreHeader->Signature))[0] == 0xffffffff &&
-             ((UINT32 *)(&VarStoreHeader->Signature))[1] == 0xffffffff &&
-             ((UINT32 *)(&VarStoreHeader->Signature))[2] == 0xffffffff &&
-             ((UINT32 *)(&VarStoreHeader->Signature))[3] == 0xffffffff &&
-             VarStoreHeader->Size == 0xffffffff &&
-             VarStoreHeader->Format == 0xff &&
-             VarStoreHeader->State == 0xff
-          ) {
-
+  } else if ((((UINT32 *)(&VarStoreHeader->Signature))[0] == 0xffffffff) &&
+             (((UINT32 *)(&VarStoreHeader->Signature))[1] == 0xffffffff) &&
+             (((UINT32 *)(&VarStoreHeader->Signature))[2] == 0xffffffff) &&
+             (((UINT32 *)(&VarStoreHeader->Signature))[3] == 0xffffffff) &&
+             (VarStoreHeader->Size == 0xffffffff) &&
+             (VarStoreHeader->Format == 0xff) &&
+             (VarStoreHeader->State == 0xff)
+             )
+  {
     return EfiRaw;
   } else {
     return EfiInvalid;
@@ -86,10 +86,10 @@ GetVariableStoreStatus (
 **/
 UINTN
 GetVariableHeaderSize (
-  IN  BOOLEAN   AuthFormat
+  IN  BOOLEAN  AuthFormat
   )
 {
-  UINTN Value;
+  UINTN  Value;
 
   if (AuthFormat) {
     Value = sizeof (AUTHENTICATED_VARIABLE_HEADER);
@@ -113,29 +113,33 @@ GetVariableHeaderSize (
 **/
 UINTN
 NameSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable,
-  IN  BOOLEAN           AuthFormat
+  IN  VARIABLE_HEADER  *Variable,
+  IN  BOOLEAN          AuthFormat
   )
 {
-  AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
+  AUTHENTICATED_VARIABLE_HEADER  *AuthVariable;
 
-  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
+  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *)Variable;
   if (AuthFormat) {
-    if (AuthVariable->State == (UINT8) (-1) ||
-       AuthVariable->DataSize == (UINT32) (-1) ||
-       AuthVariable->NameSize == (UINT32) (-1) ||
-       AuthVariable->Attributes == (UINT32) (-1)) {
+    if ((AuthVariable->State == (UINT8)(-1)) ||
+        (AuthVariable->DataSize == (UINT32)(-1)) ||
+        (AuthVariable->NameSize == (UINT32)(-1)) ||
+        (AuthVariable->Attributes == (UINT32)(-1)))
+    {
       return 0;
     }
-    return (UINTN) AuthVariable->NameSize;
+
+    return (UINTN)AuthVariable->NameSize;
   } else {
-    if (Variable->State == (UINT8) (-1) ||
-        Variable->DataSize == (UINT32) (-1) ||
-        Variable->NameSize == (UINT32) (-1) ||
-        Variable->Attributes == (UINT32) (-1)) {
+    if ((Variable->State == (UINT8)(-1)) ||
+        (Variable->DataSize == (UINT32)(-1)) ||
+        (Variable->NameSize == (UINT32)(-1)) ||
+        (Variable->Attributes == (UINT32)(-1)))
+    {
       return 0;
     }
-    return (UINTN) Variable->NameSize;
+
+    return (UINTN)Variable->NameSize;
   }
 }
 
@@ -150,18 +154,18 @@ NameSizeOfVariable (
 **/
 VOID
 SetNameSizeOfVariable (
-  IN VARIABLE_HEADER    *Variable,
-  IN UINTN              NameSize,
-  IN BOOLEAN            AuthFormat
+  IN VARIABLE_HEADER  *Variable,
+  IN UINTN            NameSize,
+  IN BOOLEAN          AuthFormat
   )
 {
-  AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
+  AUTHENTICATED_VARIABLE_HEADER  *AuthVariable;
 
-  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
+  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *)Variable;
   if (AuthFormat) {
-    AuthVariable->NameSize = (UINT32) NameSize;
+    AuthVariable->NameSize = (UINT32)NameSize;
   } else {
-    Variable->NameSize = (UINT32) NameSize;
+    Variable->NameSize = (UINT32)NameSize;
   }
 }
 
@@ -178,29 +182,33 @@ SetNameSizeOfVariable (
 **/
 UINTN
 DataSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable,
-  IN  BOOLEAN           AuthFormat
+  IN  VARIABLE_HEADER  *Variable,
+  IN  BOOLEAN          AuthFormat
   )
 {
-  AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
+  AUTHENTICATED_VARIABLE_HEADER  *AuthVariable;
 
-  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
+  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *)Variable;
   if (AuthFormat) {
-    if (AuthVariable->State == (UINT8) (-1) ||
-       AuthVariable->DataSize == (UINT32) (-1) ||
-       AuthVariable->NameSize == (UINT32) (-1) ||
-       AuthVariable->Attributes == (UINT32) (-1)) {
+    if ((AuthVariable->State == (UINT8)(-1)) ||
+        (AuthVariable->DataSize == (UINT32)(-1)) ||
+        (AuthVariable->NameSize == (UINT32)(-1)) ||
+        (AuthVariable->Attributes == (UINT32)(-1)))
+    {
       return 0;
     }
-    return (UINTN) AuthVariable->DataSize;
+
+    return (UINTN)AuthVariable->DataSize;
   } else {
-    if (Variable->State == (UINT8) (-1) ||
-        Variable->DataSize == (UINT32) (-1) ||
-        Variable->NameSize == (UINT32) (-1) ||
-        Variable->Attributes == (UINT32) (-1)) {
+    if ((Variable->State == (UINT8)(-1)) ||
+        (Variable->DataSize == (UINT32)(-1)) ||
+        (Variable->NameSize == (UINT32)(-1)) ||
+        (Variable->Attributes == (UINT32)(-1)))
+    {
       return 0;
     }
-    return (UINTN) Variable->DataSize;
+
+    return (UINTN)Variable->DataSize;
   }
 }
 
@@ -215,18 +223,18 @@ DataSizeOfVariable (
 **/
 VOID
 SetDataSizeOfVariable (
-  IN  VARIABLE_HEADER   *Variable,
-  IN  UINTN             DataSize,
-  IN  BOOLEAN           AuthFormat
+  IN  VARIABLE_HEADER  *Variable,
+  IN  UINTN            DataSize,
+  IN  BOOLEAN          AuthFormat
   )
 {
-  AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
+  AUTHENTICATED_VARIABLE_HEADER  *AuthVariable;
 
-  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
+  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *)Variable;
   if (AuthFormat) {
-    AuthVariable->DataSize = (UINT32) DataSize;
+    AuthVariable->DataSize = (UINT32)DataSize;
   } else {
-    Variable->DataSize = (UINT32) DataSize;
+    Variable->DataSize = (UINT32)DataSize;
   }
 }
 
@@ -243,11 +251,11 @@ SetDataSizeOfVariable (
 **/
 CHAR16 *
 GetVariableNamePtr (
-  IN  VARIABLE_HEADER   *Variable,
-  IN  BOOLEAN           AuthFormat
+  IN  VARIABLE_HEADER  *Variable,
+  IN  BOOLEAN          AuthFormat
   )
 {
-  return (CHAR16 *) ((UINTN) Variable + GetVariableHeaderSize (AuthFormat));
+  return (CHAR16 *)((UINTN)Variable + GetVariableHeaderSize (AuthFormat));
 }
 
 /**
@@ -262,13 +270,13 @@ GetVariableNamePtr (
 **/
 EFI_GUID *
 GetVendorGuidPtr (
-  IN  VARIABLE_HEADER    *Variable,
-  IN  BOOLEAN            AuthFormat
+  IN  VARIABLE_HEADER  *Variable,
+  IN  BOOLEAN          AuthFormat
   )
 {
-  AUTHENTICATED_VARIABLE_HEADER *AuthVariable;
+  AUTHENTICATED_VARIABLE_HEADER  *AuthVariable;
 
-  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *) Variable;
+  AuthVariable = (AUTHENTICATED_VARIABLE_HEADER *)Variable;
   if (AuthFormat) {
     return &AuthVariable->VendorGuid;
   } else {
@@ -289,20 +297,20 @@ GetVendorGuidPtr (
 **/
 UINT8 *
 GetVariableDataPtr (
-  IN  VARIABLE_HEADER    *Variable,
-  IN  BOOLEAN            AuthFormat
+  IN  VARIABLE_HEADER  *Variable,
+  IN  BOOLEAN          AuthFormat
   )
 {
-  UINTN Value;
+  UINTN  Value;
 
   //
   // Be careful about pad size for alignment.
   //
-  Value =  (UINTN) GetVariableNamePtr (Variable, AuthFormat);
+  Value  =  (UINTN)GetVariableNamePtr (Variable, AuthFormat);
   Value += NameSizeOfVariable (Variable, AuthFormat);
   Value += GET_PAD_SIZE (NameSizeOfVariable (Variable, AuthFormat));
 
-  return (UINT8 *) Value;
+  return (UINT8 *)Value;
 }
 
 /**
@@ -317,16 +325,16 @@ GetVariableDataPtr (
 **/
 UINTN
 GetVariableDataOffset (
-  IN  VARIABLE_HEADER   *Variable,
-  IN  BOOLEAN           AuthFormat
+  IN  VARIABLE_HEADER  *Variable,
+  IN  BOOLEAN          AuthFormat
   )
 {
-  UINTN Value;
+  UINTN  Value;
 
   //
   // Be careful about pad size for alignment
   //
-  Value = GetVariableHeaderSize (AuthFormat);
+  Value  = GetVariableHeaderSize (AuthFormat);
   Value += NameSizeOfVariable (Variable, AuthFormat);
   Value += GET_PAD_SIZE (NameSizeOfVariable (Variable, AuthFormat));
 
@@ -346,20 +354,20 @@ GetVariableDataOffset (
 **/
 VARIABLE_HEADER *
 GetNextVariablePtr (
-  IN  VARIABLE_HEADER   *Variable,
-  IN  BOOLEAN           AuthFormat
+  IN  VARIABLE_HEADER  *Variable,
+  IN  BOOLEAN          AuthFormat
   )
 {
-  UINTN Value;
+  UINTN  Value;
 
-  Value =  (UINTN) GetVariableDataPtr (Variable, AuthFormat);
+  Value  =  (UINTN)GetVariableDataPtr (Variable, AuthFormat);
   Value += DataSizeOfVariable (Variable, AuthFormat);
   Value += GET_PAD_SIZE (DataSizeOfVariable (Variable, AuthFormat));
 
   //
   // Be careful about pad size for alignment.
   //
-  return (VARIABLE_HEADER *) HEADER_ALIGN (Value);
+  return (VARIABLE_HEADER *)HEADER_ALIGN (Value);
 }
 
 /**
@@ -373,13 +381,13 @@ GetNextVariablePtr (
 **/
 VARIABLE_HEADER *
 GetStartPointer (
-  IN VARIABLE_STORE_HEADER       *VarStoreHeader
+  IN VARIABLE_STORE_HEADER  *VarStoreHeader
   )
 {
   //
   // The start of variable store.
   //
-  return (VARIABLE_HEADER *) HEADER_ALIGN (VarStoreHeader + 1);
+  return (VARIABLE_HEADER *)HEADER_ALIGN (VarStoreHeader + 1);
 }
 
 /**
@@ -396,13 +404,13 @@ GetStartPointer (
 **/
 VARIABLE_HEADER *
 GetEndPointer (
-  IN VARIABLE_STORE_HEADER       *VarStoreHeader
+  IN VARIABLE_STORE_HEADER  *VarStoreHeader
   )
 {
   //
   // The end of variable store
   //
-  return (VARIABLE_HEADER *) HEADER_ALIGN ((UINTN) VarStoreHeader + VarStoreHeader->Size);
+  return (VARIABLE_HEADER *)HEADER_ALIGN ((UINTN)VarStoreHeader + VarStoreHeader->Size);
 }
 
 /**
@@ -418,23 +426,23 @@ GetEndPointer (
 **/
 BOOLEAN
 VariableCompareTimeStampInternal (
-  IN EFI_TIME               *FirstTime,
-  IN EFI_TIME               *SecondTime
+  IN EFI_TIME  *FirstTime,
+  IN EFI_TIME  *SecondTime
   )
 {
   if (FirstTime->Year != SecondTime->Year) {
-    return (BOOLEAN) (FirstTime->Year < SecondTime->Year);
+    return (BOOLEAN)(FirstTime->Year < SecondTime->Year);
   } else if (FirstTime->Month != SecondTime->Month) {
-    return (BOOLEAN) (FirstTime->Month < SecondTime->Month);
+    return (BOOLEAN)(FirstTime->Month < SecondTime->Month);
   } else if (FirstTime->Day != SecondTime->Day) {
-    return (BOOLEAN) (FirstTime->Day < SecondTime->Day);
+    return (BOOLEAN)(FirstTime->Day < SecondTime->Day);
   } else if (FirstTime->Hour != SecondTime->Hour) {
-    return (BOOLEAN) (FirstTime->Hour < SecondTime->Hour);
+    return (BOOLEAN)(FirstTime->Hour < SecondTime->Hour);
   } else if (FirstTime->Minute != SecondTime->Minute) {
-    return (BOOLEAN) (FirstTime->Minute < SecondTime->Minute);
+    return (BOOLEAN)(FirstTime->Minute < SecondTime->Minute);
   }
 
-  return (BOOLEAN) (FirstTime->Second <= SecondTime->Second);
+  return (BOOLEAN)(FirstTime->Second <= SecondTime->Second);
 }
 
 /**
@@ -460,39 +468,41 @@ FindVariableEx (
   IN     BOOLEAN                 AuthFormat
   )
 {
-  VARIABLE_HEADER                *InDeletedVariable;
-  VOID                           *Point;
+  VARIABLE_HEADER  *InDeletedVariable;
+  VOID             *Point;
 
   PtrTrack->InDeletedTransitionPtr = NULL;
 
   //
   // Find the variable by walk through HOB, volatile and non-volatile variable store.
   //
-  InDeletedVariable  = NULL;
+  InDeletedVariable = NULL;
 
   for ( PtrTrack->CurrPtr = PtrTrack->StartPtr
-      ; IsValidVariableHeader (PtrTrack->CurrPtr, PtrTrack->EndPtr)
-      ; PtrTrack->CurrPtr = GetNextVariablePtr (PtrTrack->CurrPtr, AuthFormat)
-      ) {
-    if (PtrTrack->CurrPtr->State == VAR_ADDED ||
-        PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
-       ) {
+        ; IsValidVariableHeader (PtrTrack->CurrPtr, PtrTrack->EndPtr)
+        ; PtrTrack->CurrPtr = GetNextVariablePtr (PtrTrack->CurrPtr, AuthFormat)
+        )
+  {
+    if ((PtrTrack->CurrPtr->State == VAR_ADDED) ||
+        (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED))
+        )
+    {
       if (IgnoreRtCheck || !AtRuntime () || ((PtrTrack->CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) != 0)) {
         if (VariableName[0] == 0) {
           if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
-            InDeletedVariable   = PtrTrack->CurrPtr;
+            InDeletedVariable = PtrTrack->CurrPtr;
           } else {
             PtrTrack->InDeletedTransitionPtr = InDeletedVariable;
             return EFI_SUCCESS;
           }
         } else {
           if (CompareGuid (VendorGuid, GetVendorGuidPtr (PtrTrack->CurrPtr, AuthFormat))) {
-            Point = (VOID *) GetVariableNamePtr (PtrTrack->CurrPtr, AuthFormat);
+            Point = (VOID *)GetVariableNamePtr (PtrTrack->CurrPtr, AuthFormat);
 
             ASSERT (NameSizeOfVariable (PtrTrack->CurrPtr, AuthFormat) != 0);
             if (CompareMem (VariableName, Point, NameSizeOfVariable (PtrTrack->CurrPtr, AuthFormat)) == 0) {
               if (PtrTrack->CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
-                InDeletedVariable     = PtrTrack->CurrPtr;
+                InDeletedVariable = PtrTrack->CurrPtr;
               } else {
                 PtrTrack->InDeletedTransitionPtr = InDeletedVariable;
                 return EFI_SUCCESS;
@@ -532,11 +542,11 @@ FindVariableEx (
 EFI_STATUS
 EFIAPI
 VariableServiceGetNextVariableInternal (
-  IN  CHAR16                *VariableName,
-  IN  EFI_GUID              *VendorGuid,
-  IN  VARIABLE_STORE_HEADER **VariableStoreList,
-  OUT VARIABLE_HEADER       **VariablePtr,
-  IN  BOOLEAN               AuthFormat
+  IN  CHAR16                 *VariableName,
+  IN  EFI_GUID               *VendorGuid,
+  IN  VARIABLE_STORE_HEADER  **VariableStoreList,
+  OUT VARIABLE_HEADER        **VariablePtr,
+  IN  BOOLEAN                AuthFormat
   )
 {
   EFI_STATUS              Status;
@@ -554,14 +564,14 @@ VariableServiceGetNextVariableInternal (
   ZeroMem (&Variable, sizeof (Variable));
 
   // Check if the variable exists in the given variable store list
-  for (StoreType = (VARIABLE_STORE_TYPE) 0; StoreType < VariableStoreTypeMax; StoreType++) {
+  for (StoreType = (VARIABLE_STORE_TYPE)0; StoreType < VariableStoreTypeMax; StoreType++) {
     if (VariableStoreList[StoreType] == NULL) {
       continue;
     }
 
     Variable.StartPtr = GetStartPointer (VariableStoreList[StoreType]);
-    Variable.EndPtr   = GetEndPointer   (VariableStoreList[StoreType]);
-    Variable.Volatile = (BOOLEAN) (StoreType == VariableStoreTypeVolatile);
+    Variable.EndPtr   = GetEndPointer (VariableStoreList[StoreType]);
+    Variable.Volatile = (BOOLEAN)(StoreType == VariableStoreTypeVolatile);
 
     Status = FindVariableEx (VariableName, VendorGuid, FALSE, &Variable, AuthFormat);
     if (!EFI_ERROR (Status)) {
@@ -569,7 +579,7 @@ VariableServiceGetNextVariableInternal (
     }
   }
 
-  if (Variable.CurrPtr == NULL || EFI_ERROR (Status)) {
+  if ((Variable.CurrPtr == NULL) || EFI_ERROR (Status)) {
     //
     // For VariableName is an empty string, FindVariableEx() will try to find and return
     // the first qualified variable, and if FindVariableEx() returns error (EFI_NOT_FOUND)
@@ -583,6 +593,7 @@ VariableServiceGetNextVariableInternal (
       //
       Status = EFI_INVALID_PARAMETER;
     }
+
     goto Done;
   }
 
@@ -601,11 +612,12 @@ VariableServiceGetNextVariableInternal (
       //
       // Find current storage index
       //
-      for (StoreType = (VARIABLE_STORE_TYPE) 0; StoreType < VariableStoreTypeMax; StoreType++) {
+      for (StoreType = (VARIABLE_STORE_TYPE)0; StoreType < VariableStoreTypeMax; StoreType++) {
         if ((VariableStoreList[StoreType] != NULL) && (Variable.StartPtr == GetStartPointer (VariableStoreList[StoreType]))) {
           break;
         }
       }
+
       ASSERT (StoreType < VariableStoreTypeMax);
       //
       // Switch to next storage
@@ -615,6 +627,7 @@ VariableServiceGetNextVariableInternal (
           break;
         }
       }
+
       //
       // Capture the case that
       // 1. current storage is the last one, or
@@ -624,15 +637,16 @@ VariableServiceGetNextVariableInternal (
         Status = EFI_NOT_FOUND;
         goto Done;
       }
+
       Variable.StartPtr = GetStartPointer (VariableStoreList[StoreType]);
-      Variable.EndPtr   = GetEndPointer   (VariableStoreList[StoreType]);
+      Variable.EndPtr   = GetEndPointer (VariableStoreList[StoreType]);
       Variable.CurrPtr  = Variable.StartPtr;
     }
 
     //
     // Variable is found
     //
-    if (Variable.CurrPtr->State == VAR_ADDED || Variable.CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
+    if ((Variable.CurrPtr->State == VAR_ADDED) || (Variable.CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED))) {
       if (!AtRuntime () || ((Variable.CurrPtr->Attributes & EFI_VARIABLE_RUNTIME_ACCESS) != 0)) {
         if (Variable.CurrPtr->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
           //
@@ -641,15 +655,15 @@ VariableServiceGetNextVariableInternal (
           // don't return it.
           //
           VariablePtrTrack.StartPtr = Variable.StartPtr;
-          VariablePtrTrack.EndPtr = Variable.EndPtr;
-          Status = FindVariableEx (
-                     GetVariableNamePtr (Variable.CurrPtr, AuthFormat),
-                     GetVendorGuidPtr (Variable.CurrPtr, AuthFormat),
-                     FALSE,
-                     &VariablePtrTrack,
-                     AuthFormat
-                     );
-          if (!EFI_ERROR (Status) && VariablePtrTrack.CurrPtr->State == VAR_ADDED) {
+          VariablePtrTrack.EndPtr   = Variable.EndPtr;
+          Status                    = FindVariableEx (
+                                        GetVariableNamePtr (Variable.CurrPtr, AuthFormat),
+                                        GetVendorGuidPtr (Variable.CurrPtr, AuthFormat),
+                                        FALSE,
+                                        &VariablePtrTrack,
+                                        AuthFormat
+                                        );
+          if (!EFI_ERROR (Status) && (VariablePtrTrack.CurrPtr->State == VAR_ADDED)) {
             Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr, AuthFormat);
             continue;
           }
@@ -660,16 +674,17 @@ VariableServiceGetNextVariableInternal (
         //
         if ((VariableStoreList[VariableStoreTypeHob] != NULL) && (VariableStoreList[VariableStoreTypeNv] != NULL) &&
             (Variable.StartPtr == GetStartPointer (VariableStoreList[VariableStoreTypeNv]))
-           ) {
+            )
+        {
           VariableInHob.StartPtr = GetStartPointer (VariableStoreList[VariableStoreTypeHob]);
-          VariableInHob.EndPtr   = GetEndPointer   (VariableStoreList[VariableStoreTypeHob]);
-          Status = FindVariableEx (
-                     GetVariableNamePtr (Variable.CurrPtr, AuthFormat),
-                     GetVendorGuidPtr (Variable.CurrPtr, AuthFormat),
-                     FALSE,
-                     &VariableInHob,
-                     AuthFormat
-                     );
+          VariableInHob.EndPtr   = GetEndPointer (VariableStoreList[VariableStoreTypeHob]);
+          Status                 = FindVariableEx (
+                                     GetVariableNamePtr (Variable.CurrPtr, AuthFormat),
+                                     GetVendorGuidPtr (Variable.CurrPtr, AuthFormat),
+                                     FALSE,
+                                     &VariableInHob,
+                                     AuthFormat
+                                     );
           if (!EFI_ERROR (Status)) {
             Variable.CurrPtr = GetNextVariablePtr (Variable.CurrPtr, AuthFormat);
             continue;
@@ -677,7 +692,7 @@ VariableServiceGetNextVariableInternal (
         }
 
         *VariablePtr = Variable.CurrPtr;
-        Status = EFI_SUCCESS;
+        Status       = EFI_SUCCESS;
         goto Done;
       }
     }
@@ -722,12 +737,13 @@ UpdateVariableInfo (
   IN OUT VARIABLE_INFO_ENTRY  **VariableInfo
   )
 {
-  VARIABLE_INFO_ENTRY   *Entry;
+  VARIABLE_INFO_ENTRY  *Entry;
 
   if (FeaturePcdGet (PcdVariableCollectStatistics)) {
-    if (VariableName == NULL || VendorGuid == NULL || VariableInfo == NULL) {
+    if ((VariableName == NULL) || (VendorGuid == NULL) || (VariableInfo == NULL)) {
       return;
     }
+
     if (AtRuntime ()) {
       // Don't collect statistics at runtime.
       return;
@@ -744,10 +760,9 @@ UpdateVariableInfo (
       CopyGuid (&(*VariableInfo)->VendorGuid, VendorGuid);
       (*VariableInfo)->Name = AllocateZeroPool (StrSize (VariableName));
       ASSERT ((*VariableInfo)->Name != NULL);
-      StrCpyS ((*VariableInfo)->Name, StrSize(VariableName)/sizeof(CHAR16), VariableName);
+      StrCpyS ((*VariableInfo)->Name, StrSize (VariableName)/sizeof (CHAR16), VariableName);
       (*VariableInfo)->Volatile = Volatile;
     }
-
 
     for (Entry = (*VariableInfo); Entry != NULL; Entry = Entry->Next) {
       if (CompareGuid (VendorGuid, &Entry->VendorGuid)) {
@@ -755,12 +770,15 @@ UpdateVariableInfo (
           if (Read) {
             Entry->ReadCount++;
           }
+
           if (Write) {
             Entry->WriteCount++;
           }
+
           if (Delete) {
             Entry->DeleteCount++;
           }
+
           if (Cache) {
             Entry->CacheCount++;
           }
@@ -780,7 +798,7 @@ UpdateVariableInfo (
         CopyGuid (&Entry->Next->VendorGuid, VendorGuid);
         Entry->Next->Name = AllocateZeroPool (StrSize (VariableName));
         ASSERT (Entry->Next->Name != NULL);
-        StrCpyS (Entry->Next->Name, StrSize(VariableName)/sizeof(CHAR16), VariableName);
+        StrCpyS (Entry->Next->Name, StrSize (VariableName)/sizeof (CHAR16), VariableName);
         Entry->Next->Volatile = Volatile;
       }
     }

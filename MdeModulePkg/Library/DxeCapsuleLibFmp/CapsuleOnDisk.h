@@ -38,26 +38,26 @@
 //
 // This data structure is the part of FILE_INFO_ENTRY
 //
-#define FILE_INFO_SIGNATURE SIGNATURE_32 ('F', 'L', 'I', 'F')
+#define FILE_INFO_SIGNATURE  SIGNATURE_32 ('F', 'L', 'I', 'F')
 
 //
 // LoadOptionNumber of the boot option where the capsules is relocated.
 //
-#define COD_RELOCATION_LOAD_OPTION_VAR_NAME   L"CodRelocationLoadOption"
+#define COD_RELOCATION_LOAD_OPTION_VAR_NAME  L"CodRelocationLoadOption"
 
 //
 // (20 * (6+5+2))+1) unicode characters from EFI FAT spec (doubled for bytes)
 //
-#define MAX_FILE_NAME_SIZE   522
-#define MAX_FILE_NAME_LEN    (MAX_FILE_NAME_SIZE / sizeof(CHAR16))
-#define MAX_FILE_INFO_LEN    (OFFSET_OF(EFI_FILE_INFO, FileName) + MAX_FILE_NAME_LEN)
+#define MAX_FILE_NAME_SIZE  522
+#define MAX_FILE_NAME_LEN   (MAX_FILE_NAME_SIZE / sizeof(CHAR16))
+#define MAX_FILE_INFO_LEN   (OFFSET_OF(EFI_FILE_INFO, FileName) + MAX_FILE_NAME_LEN)
 
 typedef struct {
-  UINTN           Signature;
-  LIST_ENTRY      Link;                  ///  Linked list members.
-  EFI_FILE_INFO   *FileInfo;             ///  Pointer to the FileInfo struct for this file or NULL.
-  CHAR16          *FileNameFirstPart;    ///  Text to the left of right-most period in the file name. String is capitialized
-  CHAR16          *FileNameSecondPart;   ///  Text to the right of right-most period in the file name.String is capitialized. Maybe NULL
+  UINTN            Signature;
+  LIST_ENTRY       Link;                 ///  Linked list members.
+  EFI_FILE_INFO    *FileInfo;            ///  Pointer to the FileInfo struct for this file or NULL.
+  CHAR16           *FileNameFirstPart;   ///  Text to the left of right-most period in the file name. String is capitialized
+  CHAR16           *FileNameSecondPart;  ///  Text to the right of right-most period in the file name.String is capitialized. Maybe NULL
 } FILE_INFO_ENTRY;
 
 typedef struct {
