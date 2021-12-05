@@ -21,11 +21,10 @@
 
 #include "SmbiosMisc.h"
 
-
 STATIC EFI_HANDLE           mSmbiosMiscImageHandle;
 STATIC EFI_SMBIOS_PROTOCOL  *mSmbiosMiscSmbios = NULL;
 
-EFI_HII_HANDLE       mSmbiosMiscHiiHandle;
+EFI_HII_HANDLE  mSmbiosMiscHiiHandle;
 
 /**
   Standard EFI driver point.  This driver parses the mSmbiosMiscDataTable
@@ -39,28 +38,32 @@ EFI_HII_HANDLE       mSmbiosMiscHiiHandle;
 **/
 EFI_STATUS
 EFIAPI
-SmbiosMiscEntryPoint(
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+SmbiosMiscEntryPoint (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINTN                Index;
-  EFI_STATUS           EfiStatus;
+  UINTN       Index;
+  EFI_STATUS  EfiStatus;
 
   mSmbiosMiscImageHandle = ImageHandle;
 
-  EfiStatus = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL,
-                                   (VOID**)&mSmbiosMiscSmbios);
+  EfiStatus = gBS->LocateProtocol (
+                     &gEfiSmbiosProtocolGuid,
+                     NULL,
+                     (VOID **)&mSmbiosMiscSmbios
+                     );
   if (EFI_ERROR (EfiStatus)) {
     DEBUG ((DEBUG_ERROR, "Could not locate SMBIOS protocol.  %r\n", EfiStatus));
     return EfiStatus;
   }
 
-  mSmbiosMiscHiiHandle = HiiAddPackages (&gEfiCallerIdGuid,
-                                         mSmbiosMiscImageHandle,
-                                         SmbiosMiscDxeStrings,
-                                         NULL
-                                         );
+  mSmbiosMiscHiiHandle = HiiAddPackages (
+                           &gEfiCallerIdGuid,
+                           mSmbiosMiscImageHandle,
+                           SmbiosMiscDxeStrings,
+                           NULL
+                           );
   if (mSmbiosMiscHiiHandle == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -70,13 +73,19 @@ SmbiosMiscEntryPoint(
     // If the entry have a function pointer, just log the data.
     //
     if (mSmbiosMiscDataTable[Index].Function != NULL) {
-      EfiStatus = (*mSmbiosMiscDataTable[Index].Function)(mSmbiosMiscDataTable[Index].RecordData,
-                                                          mSmbiosMiscSmbios
-                                                          );
+      EfiStatus = (*mSmbiosMiscDataTable[Index].Function)(
+  mSmbiosMiscDataTable[Index].RecordData,
+  mSmbiosMiscSmbios
+  );
 
-      if (EFI_ERROR(EfiStatus)) {
-        DEBUG ((DEBUG_ERROR, "Misc smbios store error.  Index=%d,"
-                "ReturnStatus=%r\n", Index, EfiStatus));
+      if (EFI_ERROR (EfiStatus)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "Misc smbios store error.  Index=%d,"
+          "ReturnStatus=%r\n",
+          Index,
+          EfiStatus
+          ));
         return EfiStatus;
       }
     }
@@ -84,7 +93,6 @@ SmbiosMiscEntryPoint(
 
   return EfiStatus;
 }
-
 
 /**
   Adds an SMBIOS record.
@@ -119,11 +127,11 @@ SmbiosMiscAddRecord (
   }
 
   Status = mSmbiosMiscSmbios->Add (
-             mSmbiosMiscSmbios,
-             NULL,
-             &Handle,
-             (EFI_SMBIOS_TABLE_HEADER *)Buffer
-             );
+                                mSmbiosMiscSmbios,
+                                NULL,
+                                &Handle,
+                                (EFI_SMBIOS_TABLE_HEADER *)Buffer
+                                );
 
   if (SmbiosHandle != NULL) {
     *SmbiosHandle = Handle;
@@ -131,7 +139,6 @@ SmbiosMiscAddRecord (
 
   return Status;
 }
-
 
 /** Fetches the number of handles of the specified SMBIOS type.
  *
@@ -143,7 +150,7 @@ SmbiosMiscAddRecord (
 STATIC
 UINTN
 GetHandleCount (
-  IN  UINT8 SmbiosType
+  IN  UINT8  SmbiosType
   )
 {
   UINTN                    HandleCount;
@@ -155,12 +162,13 @@ GetHandleCount (
 
   // Iterate through entries to get the number
   do {
-    Status = mSmbiosMiscSmbios->GetNext (mSmbiosMiscSmbios,
-                                         &SmbiosHandle,
-                                         &SmbiosType,
-                                         &Record,
-                                         NULL
-                                         );
+    Status = mSmbiosMiscSmbios->GetNext (
+                                  mSmbiosMiscSmbios,
+                                  &SmbiosHandle,
+                                  &SmbiosType,
+                                  &Record,
+                                  NULL
+                                  );
 
     if (Status == EFI_SUCCESS) {
       HandleCount++;
@@ -178,10 +186,10 @@ GetHandleCount (
   @param[out] *HandleCount  Number of handles in the array
 **/
 VOID
-SmbiosMiscGetLinkTypeHandle(
-  IN  UINT8                 SmbiosType,
-  OUT SMBIOS_HANDLE         **HandleArray,
-  OUT UINTN                 *HandleCount
+SmbiosMiscGetLinkTypeHandle (
+  IN  UINT8          SmbiosType,
+  OUT SMBIOS_HANDLE  **HandleArray,
+  OUT UINTN          *HandleCount
   )
 {
   UINTN                    Index;
@@ -206,12 +214,13 @@ SmbiosMiscGetLinkTypeHandle(
   SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
 
   for (Index = 0; Index < (*HandleCount); Index++) {
-    Status = mSmbiosMiscSmbios->GetNext (mSmbiosMiscSmbios,
-                                         &SmbiosHandle,
-                                         &SmbiosType,
-                                         &Record,
-                                         NULL
-                                         );
+    Status = mSmbiosMiscSmbios->GetNext (
+                                  mSmbiosMiscSmbios,
+                                  &SmbiosHandle,
+                                  &SmbiosType,
+                                  &Record,
+                                  NULL
+                                  );
 
     if (!EFI_ERROR (Status)) {
       (*HandleArray)[Index] = Record->Handle;
@@ -220,4 +229,3 @@ SmbiosMiscGetLinkTypeHandle(
     }
   }
 }
-
