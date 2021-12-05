@@ -6,7 +6,6 @@
 
 **/
 
-
 #ifndef FLASHDEVICE_LIB_H_
 #define FLASHDEVICE_LIB_H_
 
@@ -26,11 +25,10 @@
 EFI_STATUS
 EFIAPI
 LibFvbFlashDeviceRead (
-  IN      UINTN                           PAddress,
-  IN  OUT UINTN                           *NumBytes,
-      OUT UINT8                           *Buffer
+  IN      UINTN  PAddress,
+  IN  OUT UINTN  *NumBytes,
+  OUT UINT8      *Buffer
   );
-
 
 /**
   Write NumBytes bytes of data from Buffer to the address specified by
@@ -48,11 +46,10 @@ LibFvbFlashDeviceRead (
 EFI_STATUS
 EFIAPI
 LibFvbFlashDeviceWrite (
-  IN        UINTN                           PAddress,
-  IN OUT    UINTN                           *NumBytes,
-  IN        UINT8                           *Buffer
+  IN        UINTN  PAddress,
+  IN OUT    UINTN  *NumBytes,
+  IN        UINT8  *Buffer
   );
-
 
 /**
   Erase the block starting at PAddress.
@@ -72,10 +69,9 @@ LibFvbFlashDeviceWrite (
 EFI_STATUS
 EFIAPI
 LibFvbFlashDeviceBlockErase (
-  IN    UINTN                      PAddress,
-  IN    UINTN                      LbaLength
-);
-
+  IN    UINTN  PAddress,
+  IN    UINTN  LbaLength
+  );
 
 /**
   Lock or unlock the block starting at PAddress.
@@ -95,14 +91,14 @@ LibFvbFlashDeviceBlockErase (
 EFI_STATUS
 EFIAPI
 LibFvbFlashDeviceBlockLock (
-  IN    UINTN                          PAddress,
-  IN    UINTN                          LbaLength,
-  IN    BOOLEAN                        Lock
-);
+  IN    UINTN    PAddress,
+  IN    UINTN    LbaLength,
+  IN    BOOLEAN  Lock
+  );
 
 PHYSICAL_ADDRESS
 EFIAPI
 LibFvbFlashDeviceMemoryMap (
-);
+  );
 
 #endif

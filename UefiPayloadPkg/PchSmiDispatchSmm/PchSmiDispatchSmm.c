@@ -11,16 +11,16 @@
 #include "PchSmiDispatchSmm.h"
 
 typedef struct {
-  UINT8   EosBitOffset;
-  UINT8   ApmBitOffset;
-  UINT32  SmiEosAddr;
-  UINT32  SmiApmStsAddr;
+  UINT8     EosBitOffset;
+  UINT8     ApmBitOffset;
+  UINT32    SmiEosAddr;
+  UINT32    SmiApmStsAddr;
 } SMM_PCH_REGISTER;
 
-SMM_PCH_REGISTER       mSmiPchReg;
+SMM_PCH_REGISTER  mSmiPchReg;
 
-EFI_SMM_CPU_PROTOCOL   *mSmmCpuProtocol;
-LIST_ENTRY             mSmmSwDispatch2Queue = INITIALIZE_LIST_HEAD_VARIABLE (mSmmSwDispatch2Queue);
+EFI_SMM_CPU_PROTOCOL  *mSmmCpuProtocol;
+LIST_ENTRY            mSmmSwDispatch2Queue = INITIALIZE_LIST_HEAD_VARIABLE (mSmmSwDispatch2Queue);
 
 /**
   Find SmmSwDispatch2Context by SwSmiInputValue.
@@ -31,19 +31,20 @@ LIST_ENTRY             mSmmSwDispatch2Queue = INITIALIZE_LIST_HEAD_VARIABLE (mSm
 **/
 EFI_SMM_SW_DISPATCH2_CONTEXT *
 FindContextBySwSmiInputValue (
-  IN UINTN                              SwSmiInputValue
+  IN UINTN  SwSmiInputValue
   )
 {
-  LIST_ENTRY                            *Node;
-  EFI_SMM_SW_DISPATCH2_CONTEXT          *Dispatch2Context;
+  LIST_ENTRY                    *Node;
+  EFI_SMM_SW_DISPATCH2_CONTEXT  *Dispatch2Context;
 
   Node = mSmmSwDispatch2Queue.ForwardLink;
-  for (; Node != &mSmmSwDispatch2Queue; Node = Node->ForwardLink) {
+  for ( ; Node != &mSmmSwDispatch2Queue; Node = Node->ForwardLink) {
     Dispatch2Context = BASE_CR (Node, EFI_SMM_SW_DISPATCH2_CONTEXT, Link);
     if (Dispatch2Context->SwSmiInputValue == SwSmiInputValue) {
       return Dispatch2Context;
     }
   }
+
   return NULL;
 }
 
@@ -56,19 +57,20 @@ FindContextBySwSmiInputValue (
 **/
 EFI_SMM_SW_DISPATCH2_CONTEXT *
 FindContextByDispatchHandle (
-  IN EFI_HANDLE                         DispatchHandle
+  IN EFI_HANDLE  DispatchHandle
   )
 {
-  LIST_ENTRY                            *Node;
-  EFI_SMM_SW_DISPATCH2_CONTEXT          *Dispatch2Context;
+  LIST_ENTRY                    *Node;
+  EFI_SMM_SW_DISPATCH2_CONTEXT  *Dispatch2Context;
 
   Node = mSmmSwDispatch2Queue.ForwardLink;
-  for (; Node != &mSmmSwDispatch2Queue; Node = Node->ForwardLink) {
+  for ( ; Node != &mSmmSwDispatch2Queue; Node = Node->ForwardLink) {
     Dispatch2Context = BASE_CR (Node, EFI_SMM_SW_DISPATCH2_CONTEXT, Link);
     if (Dispatch2Context->DispatchHandle == DispatchHandle) {
       return Dispatch2Context;
     }
   }
+
   return NULL;
 }
 
@@ -86,20 +88,20 @@ FindContextByDispatchHandle (
 **/
 EFI_STATUS
 SmmSwDispatcher (
-  IN     EFI_HANDLE               DispatchHandle,
-  IN     CONST VOID               *RegisterContext,
-  IN OUT VOID                     *CommBuffer,
-  IN OUT UINTN                    *CommBufferSize
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *RegisterContext,
+  IN OUT VOID        *CommBuffer,
+  IN OUT UINTN       *CommBufferSize
   )
 {
-  EFI_STATUS                      Status;
-  EFI_SMM_SW_CONTEXT              SwContext;
-  UINTN                           Index;
-  EFI_SMM_SW_DISPATCH2_CONTEXT    *Context;
-  EFI_SMM_HANDLER_ENTRY_POINT2    DispatchFunction;
-  EFI_SMM_SW_REGISTER_CONTEXT     DispatchContext;
-  UINTN                           Size;
-  EFI_SMM_SAVE_STATE_IO_INFO      IoInfo;
+  EFI_STATUS                    Status;
+  EFI_SMM_SW_CONTEXT            SwContext;
+  UINTN                         Index;
+  EFI_SMM_SW_DISPATCH2_CONTEXT  *Context;
+  EFI_SMM_HANDLER_ENTRY_POINT2  DispatchFunction;
+  EFI_SMM_SW_REGISTER_CONTEXT   DispatchContext;
+  UINTN                         Size;
+  EFI_SMM_SAVE_STATE_IO_INFO    IoInfo;
 
   //
   // Construct new context
@@ -114,7 +116,7 @@ SmmSwDispatcher (
   for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
     Status = mSmmCpuProtocol->ReadSaveState (
                                 mSmmCpuProtocol,
-                                sizeof(IoInfo),
+                                sizeof (IoInfo),
                                 EFI_SMM_SAVE_STATE_REGISTER_IO,
                                 Index,
                                 &IoInfo
@@ -122,6 +124,7 @@ SmmSwDispatcher (
     if (EFI_ERROR (Status)) {
       continue;
     }
+
     if (IoInfo.IoPort == SMM_CONTROL_PORT) {
       //
       // Great! Find it.
@@ -147,22 +150,22 @@ SmmSwDispatcher (
     Status = EFI_SUCCESS;
     goto End;
   }
+
   DEBUG ((DEBUG_VERBOSE, "Prepare to call handler for 0x%x\n", SwContext.CommandPort));
 
   //
   // Dispatch
   //
   DispatchContext.SwSmiInputValue = SwContext.CommandPort;
-  Size = sizeof(SwContext);
-  DispatchFunction = (EFI_SMM_HANDLER_ENTRY_POINT2)Context->DispatchFunction;
-  Status = DispatchFunction (DispatchHandle, &DispatchContext, &SwContext, &Size);
+  Size                            = sizeof (SwContext);
+  DispatchFunction                = (EFI_SMM_HANDLER_ENTRY_POINT2)Context->DispatchFunction;
+  Status                          = DispatchFunction (DispatchHandle, &DispatchContext, &SwContext, &Size);
 
 End:
   //
   // Clear SMI APM status
   //
   IoOr32 (mSmiPchReg.SmiApmStsAddr, 1 << mSmiPchReg.ApmBitOffset);
-
 
   //
   // Set EOS bit
@@ -171,7 +174,6 @@ End:
 
   return Status;
 }
-
 
 /**
 Check the SwSmiInputValue is already used
@@ -184,14 +186,14 @@ Check the SwSmiInputValue is already used
 **/
 EFI_STATUS
 SmiInputValueCheck (
-  IN UINTN                              SwSmiInputValue
+  IN UINTN  SwSmiInputValue
   )
 {
-  LIST_ENTRY                            *Node;
-  EFI_SMM_SW_DISPATCH2_CONTEXT          *Dispatch2Context;
+  LIST_ENTRY                    *Node;
+  EFI_SMM_SW_DISPATCH2_CONTEXT  *Dispatch2Context;
 
   Node = mSmmSwDispatch2Queue.ForwardLink;
-  for (; Node != &mSmmSwDispatch2Queue; Node = Node->ForwardLink) {
+  for ( ; Node != &mSmmSwDispatch2Queue; Node = Node->ForwardLink) {
     Dispatch2Context = BASE_CR (Node, EFI_SMM_SW_DISPATCH2_CONTEXT, Link);
     if (Dispatch2Context->SwSmiInputValue == SwSmiInputValue) {
       return EFI_INVALID_PARAMETER;
@@ -200,7 +202,6 @@ SmiInputValueCheck (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Register a child SMI source dispatch function for the specified software SMI.
@@ -239,9 +240,9 @@ SmmSwDispatch2Register (
   OUT       EFI_HANDLE                     *DispatchHandle
   )
 {
-  EFI_STATUS                                Status;
-  UINTN                                     Index;
-  EFI_SMM_SW_DISPATCH2_CONTEXT             *Context;
+  EFI_STATUS                    Status;
+  UINTN                         Index;
+  EFI_SMM_SW_DISPATCH2_CONTEXT  *Context;
 
   if (RegContext->SwSmiInputValue == (UINTN)-1) {
     //
@@ -256,6 +257,7 @@ SmmSwDispatch2Register (
         break;
       }
     }
+
     if (RegContext->SwSmiInputValue == (UINTN)-1) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -269,13 +271,13 @@ SmmSwDispatch2Register (
   //
   // Register
   //
-  Status = gSmst->SmmAllocatePool (EfiRuntimeServicesData, sizeof(*Context), (VOID **)&Context);
+  Status = gSmst->SmmAllocatePool (EfiRuntimeServicesData, sizeof (*Context), (VOID **)&Context);
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  *DispatchHandle  = (EFI_HANDLE )Context;
+  *DispatchHandle           = (EFI_HANDLE)Context;
   Context->Signature        = SMI_SW_HANDLER_SIGNATURE;
   Context->SwSmiInputValue  = RegContext->SwSmiInputValue;
   Context->DispatchFunction = (UINTN)DispatchFunction;
@@ -284,7 +286,6 @@ SmmSwDispatch2Register (
 
   return Status;
 }
-
 
 /**
   Unregister a child SMI source dispatch function for the specified software SMI.
@@ -305,7 +306,7 @@ SmmSwDispatch2UnRegister (
   IN       EFI_HANDLE                     DispatchHandle
   )
 {
-  EFI_SMM_SW_DISPATCH2_CONTEXT            *Context;
+  EFI_SMM_SW_DISPATCH2_CONTEXT  *Context;
 
   //
   // Unregister
@@ -320,13 +321,11 @@ SmmSwDispatch2UnRegister (
   return EFI_SUCCESS;
 }
 
-
-EFI_SMM_SW_DISPATCH2_PROTOCOL gSmmSwDispatch2 = {
+EFI_SMM_SW_DISPATCH2_PROTOCOL  gSmmSwDispatch2 = {
   SmmSwDispatch2Register,
   SmmSwDispatch2UnRegister,
   MAXIMUM_SWI_VALUE
 };
-
 
 /**
   Get specified SMI register based on given register ID
@@ -340,12 +339,12 @@ EFI_SMM_SW_DISPATCH2_PROTOCOL gSmmSwDispatch2 = {
 **/
 PLD_GENERIC_REGISTER *
 GetSmmCtrlRegById (
-  IN PLD_SMM_REGISTERS    *SmmRegister,
-  IN UINT32               Id
+  IN PLD_SMM_REGISTERS  *SmmRegister,
+  IN UINT32             Id
   )
 {
-  UINT32                  Index;
-  PLD_GENERIC_REGISTER    *PldReg;
+  UINT32                Index;
+  PLD_GENERIC_REGISTER  *PldReg;
 
   PldReg = NULL;
   for (Index = 0; Index < SmmRegister->Count; Index++) {
@@ -367,19 +366,19 @@ GetSmmCtrlRegById (
       (PldReg->Address.Address          == 0) ||
       (PldReg->Address.RegisterBitWidth != 1) ||
       (PldReg->Address.AddressSpaceId   != EFI_ACPI_3_0_SYSTEM_IO) ||
-      (PldReg->Value != 1)) {
+      (PldReg->Value != 1))
+  {
     DEBUG ((DEBUG_INFO, "Unexpected SMM register.\n"));
     DEBUG ((DEBUG_INFO, "AddressSpaceId= 0x%x\n", PldReg->Address.AddressSpaceId));
     DEBUG ((DEBUG_INFO, "RegBitWidth   = 0x%x\n", PldReg->Address.RegisterBitWidth));
     DEBUG ((DEBUG_INFO, "RegBitOffset  = 0x%x\n", PldReg->Address.RegisterBitOffset));
     DEBUG ((DEBUG_INFO, "AccessSize    = 0x%x\n", PldReg->Address.AccessSize));
-    DEBUG ((DEBUG_INFO, "Address       = 0x%lx\n",PldReg->Address.Address ));
+    DEBUG ((DEBUG_INFO, "Address       = 0x%lx\n", PldReg->Address.Address));
     return NULL;
   }
 
   return PldReg;
 }
-
 
 /**
   Entry Point for this driver.
@@ -393,28 +392,29 @@ GetSmmCtrlRegById (
 EFI_STATUS
 EFIAPI
 PchSmiDispatchEntryPoint (
-  IN EFI_HANDLE            ImageHandle,
-  IN EFI_SYSTEM_TABLE      *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS               Status;
-  EFI_HANDLE               DispatchHandle;
-  EFI_HOB_GUID_TYPE       *GuidHob;
-  PLD_SMM_REGISTERS       *SmmRegister;
-  PLD_GENERIC_REGISTER    *SmiEosReg;
-  PLD_GENERIC_REGISTER    *SmiApmStsReg;
+  EFI_STATUS            Status;
+  EFI_HANDLE            DispatchHandle;
+  EFI_HOB_GUID_TYPE     *GuidHob;
+  PLD_SMM_REGISTERS     *SmmRegister;
+  PLD_GENERIC_REGISTER  *SmiEosReg;
+  PLD_GENERIC_REGISTER  *SmiApmStsReg;
 
   GuidHob = GetFirstGuidHob (&gSmmRegisterInfoGuid);
   if (GuidHob == NULL) {
     return EFI_UNSUPPORTED;
   }
 
-  SmmRegister = (PLD_SMM_REGISTERS *) GET_GUID_HOB_DATA(GuidHob);
-  SmiEosReg = GetSmmCtrlRegById (SmmRegister, REGISTER_ID_SMI_EOS);
+  SmmRegister = (PLD_SMM_REGISTERS *)GET_GUID_HOB_DATA (GuidHob);
+  SmiEosReg   = GetSmmCtrlRegById (SmmRegister, REGISTER_ID_SMI_EOS);
   if (SmiEosReg == NULL) {
     DEBUG ((DEBUG_ERROR, "SMI EOS reg not found.\n"));
     return EFI_NOT_FOUND;
   }
+
   mSmiPchReg.SmiEosAddr   = (UINT32)SmiEosReg->Address.Address;
   mSmiPchReg.EosBitOffset = SmiEosReg->Address.RegisterBitOffset;
 
@@ -423,6 +423,7 @@ PchSmiDispatchEntryPoint (
     DEBUG ((DEBUG_ERROR, "SMI APM status reg not found.\n"));
     return EFI_NOT_FOUND;
   }
+
   mSmiPchReg.SmiApmStsAddr = (UINT32)SmiApmStsReg->Address.Address;
   mSmiPchReg.ApmBitOffset  = SmiApmStsReg->Address.RegisterBitOffset;
 
@@ -442,14 +443,13 @@ PchSmiDispatchEntryPoint (
   // Publish PI SMM SwDispatch2 Protocol
   //
   ImageHandle = NULL;
-  Status = gSmst->SmmInstallProtocolInterface (
-                    &ImageHandle,
-                    &gEfiSmmSwDispatch2ProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &gSmmSwDispatch2
-                    );
+  Status      = gSmst->SmmInstallProtocolInterface (
+                         &ImageHandle,
+                         &gEfiSmmSwDispatch2ProtocolGuid,
+                         EFI_NATIVE_INTERFACE,
+                         &gSmmSwDispatch2
+                         );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
-

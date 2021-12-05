@@ -25,4 +25,3 @@ ParsePlatformInfo (
   );
 
 #endif // __BOOTLOADER_PLATFORM_SUPPORT_LIB__
-

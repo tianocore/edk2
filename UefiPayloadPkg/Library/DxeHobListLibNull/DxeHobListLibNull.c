@@ -7,7 +7,6 @@
 
 **/
 
-
 #include <Uefi.h>
 
 /**

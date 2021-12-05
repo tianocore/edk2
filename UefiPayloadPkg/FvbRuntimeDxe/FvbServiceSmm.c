@@ -26,21 +26,21 @@
 **/
 EFI_STATUS
 InstallFvbProtocol (
-  IN  EFI_FW_VOL_INSTANCE               *FwhInstance,
-  IN  UINTN                             InstanceNum
+  IN  EFI_FW_VOL_INSTANCE  *FwhInstance,
+  IN  UINTN                InstanceNum
   )
 {
-  EFI_FW_VOL_BLOCK_DEVICE               *FvbDevice;
-  EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
-  EFI_STATUS                            Status;
-  EFI_HANDLE                            FvbHandle;
-  FV_MEMMAP_DEVICE_PATH                 *FvDevicePath;
-  VOID                                  *TempPtr;
+  EFI_FW_VOL_BLOCK_DEVICE     *FvbDevice;
+  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
+  EFI_STATUS                  Status;
+  EFI_HANDLE                  FvbHandle;
+  FV_MEMMAP_DEVICE_PATH       *FvDevicePath;
+  VOID                        *TempPtr;
 
-  FvbDevice = (EFI_FW_VOL_BLOCK_DEVICE *) AllocateRuntimeCopyPool (
-                                            sizeof (EFI_FW_VOL_BLOCK_DEVICE),
-                                            &mFvbDeviceTemplate
-                                            );
+  FvbDevice = (EFI_FW_VOL_BLOCK_DEVICE *)AllocateRuntimeCopyPool (
+                                           sizeof (EFI_FW_VOL_BLOCK_DEVICE),
+                                           &mFvbDeviceTemplate
+                                           );
   if (FvbDevice == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -55,18 +55,19 @@ InstallFvbProtocol (
     //
     // FV does not contains extension header, then produce MEMMAP_DEVICE_PATH
     //
-    TempPtr = AllocateRuntimeCopyPool (sizeof (FV_MEMMAP_DEVICE_PATH), &mFvMemmapDevicePathTemplate);
-    FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) TempPtr;
+    TempPtr               = AllocateRuntimeCopyPool (sizeof (FV_MEMMAP_DEVICE_PATH), &mFvMemmapDevicePathTemplate);
+    FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)TempPtr;
     if (FvbDevice->DevicePath == NULL) {
       ASSERT (FALSE);
       return EFI_OUT_OF_RESOURCES;
     }
-    FvDevicePath = (FV_MEMMAP_DEVICE_PATH *) FvbDevice->DevicePath;
+
+    FvDevicePath                                = (FV_MEMMAP_DEVICE_PATH *)FvbDevice->DevicePath;
     FvDevicePath->MemMapDevPath.StartingAddress = FwhInstance->FvBase;
     FvDevicePath->MemMapDevPath.EndingAddress   = FwhInstance->FvBase + FwVolHeader->FvLength - 1;
   } else {
-    TempPtr = AllocateRuntimeCopyPool (sizeof (FV_PIWG_DEVICE_PATH), &mFvPIWGDevicePathTemplate);
-    FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) TempPtr;
+    TempPtr               = AllocateRuntimeCopyPool (sizeof (FV_PIWG_DEVICE_PATH), &mFvPIWGDevicePathTemplate);
+    FvbDevice->DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)TempPtr;
     if (FvbDevice->DevicePath == NULL) {
       ASSERT (FALSE);
       return EFI_OUT_OF_RESOURCES;
@@ -82,12 +83,12 @@ InstallFvbProtocol (
   // Install the SMM Firmware Volume Block Protocol and Device Path Protocol
   //
   FvbHandle = NULL;
-  Status = gSmst->SmmInstallProtocolInterface (
-                    &FvbHandle,
-                    &gEfiSmmFirmwareVolumeBlockProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &FvbDevice->FwVolBlockInstance
-                    );
+  Status    = gSmst->SmmInstallProtocolInterface (
+                       &FvbHandle,
+                       &gEfiSmmFirmwareVolumeBlockProtocolGuid,
+                       EFI_NATIVE_INTERFACE,
+                       &FvbDevice->FwVolBlockInstance
+                       );
   ASSERT_EFI_ERROR (Status);
 
   Status = gSmst->SmmInstallProtocolInterface (
@@ -102,16 +103,15 @@ InstallFvbProtocol (
   // Notify the Fvb wrapper driver SMM fvb is ready
   //
   FvbHandle = NULL;
-  Status = gBS->InstallProtocolInterface (
-                  &FvbHandle,
-                  &gEfiSmmFirmwareVolumeBlockProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &FvbDevice->FwVolBlockInstance
-                  );
+  Status    = gBS->InstallProtocolInterface (
+                     &FvbHandle,
+                     &gEfiSmmFirmwareVolumeBlockProtocolGuid,
+                     EFI_NATIVE_INTERFACE,
+                     &FvbDevice->FwVolBlockInstance
+                     );
 
   return Status;
 }
-
 
 /**
   The driver entry point for SMM Firmware Volume Block Driver.
@@ -129,8 +129,8 @@ InstallFvbProtocol (
 EFI_STATUS
 EFIAPI
 FvbSmmInitialize (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   FvbInitialize ();

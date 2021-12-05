@@ -5,6 +5,7 @@ Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
 #ifndef __DXE_BOOTLOADER_SUPPORT_H__
 #define __DXE_BOOTLOADER_SUPPORT_H__
 

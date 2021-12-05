@@ -8,7 +8,7 @@
 
 #include "SmmAccessDxe.h"
 
-SMM_ACCESS_PRIVATE_DATA         mSmmAccess;
+SMM_ACCESS_PRIVATE_DATA  mSmmAccess;
 
 /**
    Update region state from SMRAM description
@@ -18,12 +18,12 @@ SMM_ACCESS_PRIVATE_DATA         mSmmAccess;
 
 **/
 VOID
-SyncRegionState2SmramDesc(
-  IN BOOLEAN                OrLogic,
-  IN UINT64                 Value
+SyncRegionState2SmramDesc (
+  IN BOOLEAN  OrLogic,
+  IN UINT64   Value
   )
 {
-  UINT32                    Index;
+  UINT32  Index;
 
   for (Index = 0; Index < mSmmAccess.NumberRegions; Index++) {
     if (OrLogic) {
@@ -50,7 +50,7 @@ SyncRegionState2SmramDesc(
 EFI_STATUS
 EFIAPI
 Open (
-  IN EFI_SMM_ACCESS2_PROTOCOL          *This
+  IN EFI_SMM_ACCESS2_PROTOCOL  *This
   )
 {
   if ((mSmmAccess.SmmRegionState & EFI_SMRAM_LOCKED) != 0) {
@@ -62,10 +62,10 @@ Open (
   }
 
   mSmmAccess.SmmRegionState &= ~(EFI_SMRAM_CLOSED | EFI_ALLOCATED);
-  SyncRegionState2SmramDesc(FALSE, (UINT64)(UINTN)(~(EFI_SMRAM_CLOSED | EFI_ALLOCATED)));
+  SyncRegionState2SmramDesc (FALSE, (UINT64)(UINTN)(~(EFI_SMRAM_CLOSED | EFI_ALLOCATED)));
 
   mSmmAccess.SmmRegionState |= EFI_SMRAM_OPEN;
-  SyncRegionState2SmramDesc(TRUE, EFI_SMRAM_OPEN);
+  SyncRegionState2SmramDesc (TRUE, EFI_SMRAM_OPEN);
   mSmmAccess.SmmAccess.OpenState = TRUE;
 
   return EFI_SUCCESS;
@@ -88,7 +88,7 @@ Open (
 EFI_STATUS
 EFIAPI
 Close (
-  IN EFI_SMM_ACCESS2_PROTOCOL    *This
+  IN EFI_SMM_ACCESS2_PROTOCOL  *This
   )
 {
   if ((mSmmAccess.SmmRegionState & EFI_SMRAM_LOCKED) != 0) {
@@ -104,10 +104,10 @@ Close (
   }
 
   mSmmAccess.SmmRegionState &= ~EFI_SMRAM_OPEN;
-  SyncRegionState2SmramDesc(FALSE, (UINT64)(UINTN)(~EFI_SMRAM_OPEN));
+  SyncRegionState2SmramDesc (FALSE, (UINT64)(UINTN)(~EFI_SMRAM_OPEN));
 
   mSmmAccess.SmmRegionState |= (EFI_SMRAM_CLOSED | EFI_ALLOCATED);
-  SyncRegionState2SmramDesc(TRUE, EFI_SMRAM_CLOSED | EFI_ALLOCATED);
+  SyncRegionState2SmramDesc (TRUE, EFI_SMRAM_CLOSED | EFI_ALLOCATED);
 
   mSmmAccess.SmmAccess.OpenState = FALSE;
 
@@ -131,7 +131,7 @@ Close (
 EFI_STATUS
 EFIAPI
 Lock (
-  IN EFI_SMM_ACCESS2_PROTOCOL    *This
+  IN EFI_SMM_ACCESS2_PROTOCOL  *This
   )
 {
   if (mSmmAccess.SmmAccess.OpenState) {
@@ -140,7 +140,7 @@ Lock (
   }
 
   mSmmAccess.SmmRegionState |= EFI_SMRAM_LOCKED;
-  SyncRegionState2SmramDesc(TRUE, EFI_SMRAM_LOCKED);
+  SyncRegionState2SmramDesc (TRUE, EFI_SMRAM_LOCKED);
   mSmmAccess.SmmAccess.LockState = TRUE;
   return EFI_SUCCESS;
 }
@@ -164,19 +164,19 @@ Lock (
 EFI_STATUS
 EFIAPI
 GetCapabilities (
-  IN CONST EFI_SMM_ACCESS2_PROTOCOL     *This,
-  IN OUT   UINTN                        *SmramMapSize,
-  IN OUT   EFI_SMRAM_DESCRIPTOR         *SmramMap
+  IN CONST EFI_SMM_ACCESS2_PROTOCOL  *This,
+  IN OUT   UINTN                     *SmramMapSize,
+  IN OUT   EFI_SMRAM_DESCRIPTOR      *SmramMap
   )
 {
-  EFI_STATUS                            Status;
-  UINTN                                 NecessaryBufferSize;
+  EFI_STATUS  Status;
+  UINTN       NecessaryBufferSize;
 
-  NecessaryBufferSize = mSmmAccess.NumberRegions * sizeof(EFI_SMRAM_DESCRIPTOR);
+  NecessaryBufferSize = mSmmAccess.NumberRegions * sizeof (EFI_SMRAM_DESCRIPTOR);
   if (*SmramMapSize < NecessaryBufferSize) {
     Status = EFI_BUFFER_TOO_SMALL;
   } else {
-    CopyMem(SmramMap, mSmmAccess.SmramDesc, NecessaryBufferSize);
+    CopyMem (SmramMap, mSmmAccess.SmramDesc, NecessaryBufferSize);
     Status = EFI_SUCCESS;
   }
 
@@ -197,8 +197,8 @@ GetCapabilities (
 EFI_STATUS
 EFIAPI
 SmmAccessEntryPoint (
-  IN EFI_HANDLE                   ImageHandle,
-  IN EFI_SYSTEM_TABLE             *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS                      Status;
@@ -215,33 +215,39 @@ SmmAccessEntryPoint (
     DEBUG ((DEBUG_INFO, "SMRAM HOB NOT found\n"));
     return EFI_NOT_FOUND;
   }
-  SmramHob     = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *) GET_GUID_HOB_DATA(GuidHob);
-  SmmRegionNum = SmramHob->NumberOfSmmReservedRegions;
+
+  SmramHob             = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)GET_GUID_HOB_DATA (GuidHob);
+  SmmRegionNum         = SmramHob->NumberOfSmmReservedRegions;
   mSmmAccess.SmramDesc = AllocateZeroPool (sizeof (EFI_SMRAM_DESCRIPTOR) * SmmRegionNum);
   if (mSmmAccess.SmramDesc == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   CopyMem (mSmmAccess.SmramDesc, &SmramHob->Descriptor, sizeof (EFI_SMRAM_DESCRIPTOR) * SmmRegionNum);
 
   DEBUG ((DEBUG_INFO, "NumberOfSmmReservedRegions = 0x%x\n", SmmRegionNum));
   for (Index = 0; Index < SmmRegionNum; Index++) {
-    DEBUG ((DEBUG_INFO, "%d: base=0x%x, size = 0x%x, State=0x%x\n",Index,
-       SmramHob->Descriptor[Index].PhysicalStart,
-       SmramHob->Descriptor[Index].PhysicalSize,
-       SmramHob->Descriptor[Index].RegionState));
-     mSmmAccess.SmramDesc[Index].RegionState &= EFI_ALLOCATED;
-     mSmmAccess.SmramDesc[Index].RegionState |= EFI_SMRAM_CLOSED | EFI_CACHEABLE;
+    DEBUG ((
+      DEBUG_INFO,
+      "%d: base=0x%x, size = 0x%x, State=0x%x\n",
+      Index,
+      SmramHob->Descriptor[Index].PhysicalStart,
+      SmramHob->Descriptor[Index].PhysicalSize,
+      SmramHob->Descriptor[Index].RegionState
+      ));
+    mSmmAccess.SmramDesc[Index].RegionState &= EFI_ALLOCATED;
+    mSmmAccess.SmramDesc[Index].RegionState |= EFI_SMRAM_CLOSED | EFI_CACHEABLE;
   }
 
-  mSmmAccess.Signature                    = SMM_ACCESS_PRIVATE_DATA_SIGNATURE;
-  mSmmAccess.NumberRegions                = SmmRegionNum;
-  mSmmAccess.SmmAccess.Open               = Open;
-  mSmmAccess.SmmAccess.Close              = Close;
-  mSmmAccess.SmmAccess.Lock               = Lock;
-  mSmmAccess.SmmAccess.GetCapabilities    = GetCapabilities;
-  mSmmAccess.SmmAccess.LockState          = FALSE;
-  mSmmAccess.SmmAccess.OpenState          = FALSE;
-  mSmmAccess.SmmRegionState               = EFI_SMRAM_CLOSED;
+  mSmmAccess.Signature                 = SMM_ACCESS_PRIVATE_DATA_SIGNATURE;
+  mSmmAccess.NumberRegions             = SmmRegionNum;
+  mSmmAccess.SmmAccess.Open            = Open;
+  mSmmAccess.SmmAccess.Close           = Close;
+  mSmmAccess.SmmAccess.Lock            = Lock;
+  mSmmAccess.SmmAccess.GetCapabilities = GetCapabilities;
+  mSmmAccess.SmmAccess.LockState       = FALSE;
+  mSmmAccess.SmmAccess.OpenState       = FALSE;
+  mSmmAccess.SmmRegionState            = EFI_SMRAM_CLOSED;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mSmmAccess.Handle,

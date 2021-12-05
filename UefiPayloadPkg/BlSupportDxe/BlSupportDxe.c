@@ -30,7 +30,7 @@ ReserveResourceInGcd (
   IN EFI_HANDLE            ImageHandle
   )
 {
-  EFI_STATUS               Status;
+  EFI_STATUS  Status;
 
   if (IsMMIO) {
     Status = gDS->AddMemorySpace (
@@ -47,6 +47,7 @@ ReserveResourceInGcd (
         Length
         ));
     }
+
     Status = gDS->AllocateMemorySpace (
                     EfiGcdAllocateAddress,
                     GcdType,
@@ -70,6 +71,7 @@ ReserveResourceInGcd (
         Length
         ));
     }
+
     Status = gDS->AllocateIoSpace (
                     EfiGcdAllocateAddress,
                     GcdType,
@@ -80,9 +82,9 @@ ReserveResourceInGcd (
                     NULL
                     );
   }
+
   return Status;
 }
-
 
 /**
   Main entry for the bootloader support DXE module.
@@ -97,11 +99,11 @@ ReserveResourceInGcd (
 EFI_STATUS
 EFIAPI
 BlDxeEntryPoint (
-  IN EFI_HANDLE              ImageHandle,
-  IN EFI_SYSTEM_TABLE        *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS                 Status;
   EFI_HOB_GUID_TYPE          *GuidHob;
   EFI_PEI_GRAPHICS_INFO_HOB  *GfxInfo;
   ACPI_BOARD_INFO            *AcpiBoardInfo;
@@ -120,7 +122,7 @@ BlDxeEntryPoint (
   GuidHob = GetFirstGuidHob (&gEfiGraphicsInfoHobGuid);
   if (GuidHob != NULL) {
     GfxInfo = (EFI_PEI_GRAPHICS_INFO_HOB *)GET_GUID_HOB_DATA (GuidHob);
-    Status = PcdSet32S (PcdVideoHorizontalResolution, GfxInfo->GraphicsMode.HorizontalResolution);
+    Status  = PcdSet32S (PcdVideoHorizontalResolution, GfxInfo->GraphicsMode.HorizontalResolution);
     ASSERT_EFI_ERROR (Status);
     Status = PcdSet32S (PcdVideoVerticalResolution, GfxInfo->GraphicsMode.VerticalResolution);
     ASSERT_EFI_ERROR (Status);
@@ -136,7 +138,7 @@ BlDxeEntryPoint (
   GuidHob = GetFirstGuidHob (&gUefiAcpiBoardInfoGuid);
   if (GuidHob != NULL) {
     AcpiBoardInfo = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob);
-    Status = PcdSet64S (PcdPciExpressBaseAddress, AcpiBoardInfo->PcieBaseAddress);
+    Status        = PcdSet64S (PcdPciExpressBaseAddress, AcpiBoardInfo->PcieBaseAddress);
     ASSERT_EFI_ERROR (Status);
     Status = PcdSet64S (PcdPciExpressBaseSize, AcpiBoardInfo->PcieBaseSize);
     ASSERT_EFI_ERROR (Status);
@@ -144,4 +146,3 @@ BlDxeEntryPoint (
 
   return EFI_SUCCESS;
 }
-

@@ -12,13 +12,13 @@
 //
 // NV variable hob info GUID
 //
-extern EFI_GUID gNvVariableInfoGuid;
+extern EFI_GUID  gNvVariableInfoGuid;
 
 typedef struct {
-  UINT8                  Revision;
-  UINT8                  Reserved[3];
-  UINT32                 VariableStoreBase;
-  UINT32                 VariableStoreSize;
+  UINT8     Revision;
+  UINT8     Reserved[3];
+  UINT32    VariableStoreBase;
+  UINT32    VariableStoreSize;
 } NV_VARIABLE_INFO;
 
 #endif
