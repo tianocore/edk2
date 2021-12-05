@@ -29,11 +29,11 @@ ShellInstall1CommandsLibConstructor (
   //
   // check our bit of the profiles mask
   //
-  if ((PcdGet8(PcdShellProfileMask) & BIT2) == 0) {
+  if ((PcdGet8 (PcdShellProfileMask) & BIT2) == 0) {
     return (EFI_SUCCESS);
   }
 
-  return (BcfgLibraryRegisterBcfgCommand(ImageHandle, SystemTable, L"Install1"));
+  return (BcfgLibraryRegisterBcfgCommand (ImageHandle, SystemTable, L"Install1"));
 }
 
 /**
@@ -49,5 +49,5 @@ ShellInstall1CommandsLibDestructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  return (BcfgLibraryUnregisterBcfgCommand(ImageHandle, SystemTable));
+  return (BcfgLibraryUnregisterBcfgCommand (ImageHandle, SystemTable));
 }

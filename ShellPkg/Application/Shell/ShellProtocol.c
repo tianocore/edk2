@@ -27,11 +27,11 @@
 EFI_STATUS
 EFIAPI
 EfiShellClose (
-  IN SHELL_FILE_HANDLE            FileHandle
+  IN SHELL_FILE_HANDLE  FileHandle
   )
 {
-  ShellFileHandleRemove(FileHandle);
-  return (FileHandleClose(ConvertShellHandleToEfiFileProtocol(FileHandle)));
+  ShellFileHandleRemove (FileHandle);
+  return (FileHandleClose (ConvertShellHandleToEfiFileProtocol (FileHandle)));
 }
 
 /**
@@ -44,8 +44,8 @@ EfiShellClose (
   @retval FALSE     gEfiBlockIoProtocolGuid was not found.
 **/
 BOOLEAN
-InternalShellProtocolIsBlockIoPresent(
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath
+InternalShellProtocolIsBlockIoPresent (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathCopy;
@@ -54,12 +54,13 @@ InternalShellProtocolIsBlockIoPresent(
 
   Handle = NULL;
 
-  DevicePathCopy = (EFI_DEVICE_PATH_PROTOCOL*)DevicePath;
-  Status = gBS->LocateDevicePath(&gEfiBlockIoProtocolGuid, &DevicePathCopy, &Handle);
+  DevicePathCopy = (EFI_DEVICE_PATH_PROTOCOL *)DevicePath;
+  Status         = gBS->LocateDevicePath (&gEfiBlockIoProtocolGuid, &DevicePathCopy, &Handle);
 
-  if ((Handle != NULL) && (!EFI_ERROR(Status))) {
+  if ((Handle != NULL) && (!EFI_ERROR (Status))) {
     return (TRUE);
   }
+
   return (FALSE);
 }
 
@@ -73,8 +74,8 @@ InternalShellProtocolIsBlockIoPresent(
   @retval FALSE     gEfiSimpleFileSystemProtocolGuid was not found.
 **/
 BOOLEAN
-InternalShellProtocolIsSimpleFileSystemPresent(
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath
+InternalShellProtocolIsSimpleFileSystemPresent (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathCopy;
@@ -83,15 +84,15 @@ InternalShellProtocolIsSimpleFileSystemPresent(
 
   Handle = NULL;
 
-  DevicePathCopy = (EFI_DEVICE_PATH_PROTOCOL*)DevicePath;
-  Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &DevicePathCopy, &Handle);
+  DevicePathCopy = (EFI_DEVICE_PATH_PROTOCOL *)DevicePath;
+  Status         = gBS->LocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, &DevicePathCopy, &Handle);
 
-  if ((Handle != NULL) && (!EFI_ERROR(Status))) {
+  if ((Handle != NULL) && (!EFI_ERROR (Status))) {
     return (TRUE);
   }
+
   return (FALSE);
 }
-
 
 /**
   This function creates a mapping for a device path.
@@ -114,19 +115,19 @@ InternalShellProtocolIsSimpleFileSystemPresent(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellSetMap(
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath OPTIONAL,
-  IN CONST CHAR16 *Mapping
+EfiShellSetMap (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath OPTIONAL,
+  IN CONST CHAR16                    *Mapping
   )
 {
   EFI_STATUS      Status;
   SHELL_MAP_LIST  *MapListNode;
 
-  if (Mapping == NULL){
+  if (Mapping == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
 
-  if (Mapping[StrLen(Mapping)-1] != ':') {
+  if (Mapping[StrLen (Mapping)-1] != ':') {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -134,21 +135,23 @@ EfiShellSetMap(
   // Delete the mapping
   //
   if (DevicePath == NULL) {
-    if (IsListEmpty(&gShellMapList.Link)) {
+    if (IsListEmpty (&gShellMapList.Link)) {
       return (EFI_NOT_FOUND);
     }
-    for ( MapListNode = (SHELL_MAP_LIST *)GetFirstNode(&gShellMapList.Link)
-        ; !IsNull(&gShellMapList.Link, &MapListNode->Link)
-        ; MapListNode = (SHELL_MAP_LIST *)GetNextNode(&gShellMapList.Link, &MapListNode->Link)
-       ){
-          if (StringNoCaseCompare(&MapListNode->MapName, &Mapping) == 0) {
-            RemoveEntryList(&MapListNode->Link);
-            SHELL_FREE_NON_NULL(MapListNode->DevicePath);
-            SHELL_FREE_NON_NULL(MapListNode->MapName);
-            SHELL_FREE_NON_NULL(MapListNode->CurrentDirectoryPath);
-            FreePool(MapListNode);
-            return (EFI_SUCCESS);
-          }
+
+    for ( MapListNode = (SHELL_MAP_LIST *)GetFirstNode (&gShellMapList.Link)
+          ; !IsNull (&gShellMapList.Link, &MapListNode->Link)
+          ; MapListNode = (SHELL_MAP_LIST *)GetNextNode (&gShellMapList.Link, &MapListNode->Link)
+          )
+    {
+      if (StringNoCaseCompare (&MapListNode->MapName, &Mapping) == 0) {
+        RemoveEntryList (&MapListNode->Link);
+        SHELL_FREE_NON_NULL (MapListNode->DevicePath);
+        SHELL_FREE_NON_NULL (MapListNode->MapName);
+        SHELL_FREE_NON_NULL (MapListNode->CurrentDirectoryPath);
+        FreePool (MapListNode);
+        return (EFI_SUCCESS);
+      }
     } // for loop
 
     //
@@ -160,16 +163,17 @@ EfiShellSetMap(
   //
   // make sure this is a valid to add device path
   //
-  ///@todo add BlockIo to this test...
-  if (!InternalShellProtocolIsSimpleFileSystemPresent(DevicePath)
-    && !InternalShellProtocolIsBlockIoPresent(DevicePath)) {
+  /// @todo add BlockIo to this test...
+  if (  !InternalShellProtocolIsSimpleFileSystemPresent (DevicePath)
+     && !InternalShellProtocolIsBlockIoPresent (DevicePath))
+  {
     return (EFI_INVALID_PARAMETER);
   }
 
   //
   // First make sure there is no old mapping
   //
-  Status = EfiShellSetMap(NULL, Mapping);
+  Status = EfiShellSetMap (NULL, Mapping);
   if ((Status != EFI_SUCCESS) && (Status != EFI_NOT_FOUND)) {
     return (Status);
   }
@@ -177,9 +181,9 @@ EfiShellSetMap(
   //
   // now add the new one.
   //
-  Status = ShellCommandAddMapItemAndUpdatePath(Mapping, DevicePath, 0, FALSE);
+  Status = ShellCommandAddMapItemAndUpdatePath (Mapping, DevicePath, 0, FALSE);
 
-  return(Status);
+  return (Status);
 }
 
 /**
@@ -197,8 +201,8 @@ EfiShellSetMap(
 **/
 CONST EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-EfiShellGetDevicePathFromMap(
-  IN CONST CHAR16 *Mapping
+EfiShellGetDevicePathFromMap (
+  IN CONST CHAR16  *Mapping
   )
 {
   SHELL_MAP_LIST  *MapListItem;
@@ -208,19 +212,20 @@ EfiShellGetDevicePathFromMap(
   NewName = NULL;
   Size    = 0;
 
-  StrnCatGrow(&NewName, &Size, Mapping, 0);
-  if (Mapping[StrLen(Mapping)-1] != L':') {
-    StrnCatGrow(&NewName, &Size, L":", 0);
+  StrnCatGrow (&NewName, &Size, Mapping, 0);
+  if (Mapping[StrLen (Mapping)-1] != L':') {
+    StrnCatGrow (&NewName, &Size, L":", 0);
   }
 
-  MapListItem = ShellCommandFindMapItem(NewName);
+  MapListItem = ShellCommandFindMapItem (NewName);
 
-  FreePool(NewName);
+  FreePool (NewName);
 
   if (MapListItem != NULL) {
     return (MapListItem->DevicePath);
   }
-  return(NULL);
+
+  return (NULL);
 }
 
 /**
@@ -245,103 +250,109 @@ EfiShellGetDevicePathFromMap(
 **/
 CONST CHAR16 *
 EFIAPI
-EfiShellGetMapFromDevicePath(
-  IN OUT EFI_DEVICE_PATH_PROTOCOL **DevicePath
+EfiShellGetMapFromDevicePath (
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  **DevicePath
   )
 {
-  SHELL_MAP_LIST              *Node;
-  CHAR16                      *PathForReturn;
-  UINTN                       PathSize;
-//  EFI_HANDLE                  PathHandle;
-//  EFI_HANDLE                  MapHandle;
-//  EFI_STATUS                  Status;
-//  EFI_DEVICE_PATH_PROTOCOL    *DevicePathCopy;
-//  EFI_DEVICE_PATH_PROTOCOL    *MapPathCopy;
+  SHELL_MAP_LIST  *Node;
+  CHAR16          *PathForReturn;
+  UINTN           PathSize;
 
-  if (DevicePath == NULL || *DevicePath == NULL) {
+  //  EFI_HANDLE                  PathHandle;
+  //  EFI_HANDLE                  MapHandle;
+  //  EFI_STATUS                  Status;
+  //  EFI_DEVICE_PATH_PROTOCOL    *DevicePathCopy;
+  //  EFI_DEVICE_PATH_PROTOCOL    *MapPathCopy;
+
+  if ((DevicePath == NULL) || (*DevicePath == NULL)) {
     return (NULL);
   }
 
   PathForReturn = NULL;
   PathSize      = 0;
 
-  for ( Node = (SHELL_MAP_LIST *)GetFirstNode(&gShellMapList.Link)
-      ; !IsNull(&gShellMapList.Link, &Node->Link)
-      ; Node = (SHELL_MAP_LIST *)GetNextNode(&gShellMapList.Link, &Node->Link)
-     ){
+  for ( Node = (SHELL_MAP_LIST *)GetFirstNode (&gShellMapList.Link)
+        ; !IsNull (&gShellMapList.Link, &Node->Link)
+        ; Node = (SHELL_MAP_LIST *)GetNextNode (&gShellMapList.Link, &Node->Link)
+        )
+  {
     //
     // check for exact match
     //
-    if (DevicePathCompare(DevicePath, &Node->DevicePath) == 0) {
-      ASSERT((PathForReturn == NULL && PathSize == 0) || (PathForReturn != NULL));
+    if (DevicePathCompare (DevicePath, &Node->DevicePath) == 0) {
+      ASSERT ((PathForReturn == NULL && PathSize == 0) || (PathForReturn != NULL));
       if (PathSize != 0) {
-        PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, L";", 0);
+        PathForReturn = StrnCatGrow (&PathForReturn, &PathSize, L";", 0);
       }
-      PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, Node->MapName, 0);
+
+      PathForReturn = StrnCatGrow (&PathForReturn, &PathSize, Node->MapName, 0);
     }
   }
+
   if (PathForReturn != NULL) {
     while (!IsDevicePathEndType (*DevicePath)) {
       *DevicePath = NextDevicePathNode (*DevicePath);
     }
+
     SetDevicePathEndNode (*DevicePath);
   }
-/*
-  ///@todo finish code for inexact matches.
-  if (PathForReturn == NULL) {
-    PathSize = 0;
 
-    DevicePathCopy = DuplicateDevicePath(*DevicePath);
-    ASSERT(DevicePathCopy != NULL);
-    Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &DevicePathCopy, &PathHandle);
-    ASSERT_EFI_ERROR(Status);
-    //
-    //  check each of the device paths we have to get the root of the path for consist mappings
-    //
-    for ( Node = (SHELL_MAP_LIST *)GetFirstNode(&gShellMapList.Link)
-        ; !IsNull(&gShellMapList.Link, &Node->Link)
-        ; Node = (SHELL_MAP_LIST *)GetNextNode(&gShellMapList.Link, &Node->Link)
-       ){
-      if ((Node->Flags & SHELL_MAP_FLAGS_CONSIST) == 0) {
-        continue;
+  /*
+    ///@todo finish code for inexact matches.
+    if (PathForReturn == NULL) {
+      PathSize = 0;
+
+      DevicePathCopy = DuplicateDevicePath(*DevicePath);
+      ASSERT(DevicePathCopy != NULL);
+      Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &DevicePathCopy, &PathHandle);
+      ASSERT_EFI_ERROR(Status);
+      //
+      //  check each of the device paths we have to get the root of the path for consist mappings
+      //
+      for ( Node = (SHELL_MAP_LIST *)GetFirstNode(&gShellMapList.Link)
+          ; !IsNull(&gShellMapList.Link, &Node->Link)
+          ; Node = (SHELL_MAP_LIST *)GetNextNode(&gShellMapList.Link, &Node->Link)
+         ){
+        if ((Node->Flags & SHELL_MAP_FLAGS_CONSIST) == 0) {
+          continue;
+        }
+        MapPathCopy = DuplicateDevicePath(Node->DevicePath);
+        ASSERT(MapPathCopy != NULL);
+        Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &MapPathCopy, &MapHandle);
+        if (MapHandle == PathHandle) {
+
+          *DevicePath = DevicePathCopy;
+
+          MapPathCopy = NULL;
+          DevicePathCopy = NULL;
+          PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, Node->MapName, 0);
+          PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, L";", 0);
+          break;
+        }
       }
-      MapPathCopy = DuplicateDevicePath(Node->DevicePath);
-      ASSERT(MapPathCopy != NULL);
-      Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &MapPathCopy, &MapHandle);
-      if (MapHandle == PathHandle) {
-
-        *DevicePath = DevicePathCopy;
-
-        MapPathCopy = NULL;
-        DevicePathCopy = NULL;
-        PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, Node->MapName, 0);
-        PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, L";", 0);
-        break;
+      //
+      // now add on the non-consistent mappings
+      //
+      for ( Node = (SHELL_MAP_LIST *)GetFirstNode(&gShellMapList.Link)
+          ; !IsNull(&gShellMapList.Link, &Node->Link)
+          ; Node = (SHELL_MAP_LIST *)GetNextNode(&gShellMapList.Link, &Node->Link)
+         ){
+        if ((Node->Flags & SHELL_MAP_FLAGS_CONSIST) != 0) {
+          continue;
+        }
+        MapPathCopy = Node->DevicePath;
+        ASSERT(MapPathCopy != NULL);
+        Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &MapPathCopy, &MapHandle);
+        if (MapHandle == PathHandle) {
+          PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, Node->MapName, 0);
+          PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, L";", 0);
+          break;
+        }
       }
     }
-    //
-    // now add on the non-consistent mappings
-    //
-    for ( Node = (SHELL_MAP_LIST *)GetFirstNode(&gShellMapList.Link)
-        ; !IsNull(&gShellMapList.Link, &Node->Link)
-        ; Node = (SHELL_MAP_LIST *)GetNextNode(&gShellMapList.Link, &Node->Link)
-       ){
-      if ((Node->Flags & SHELL_MAP_FLAGS_CONSIST) != 0) {
-        continue;
-      }
-      MapPathCopy = Node->DevicePath;
-      ASSERT(MapPathCopy != NULL);
-      Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &MapPathCopy, &MapHandle);
-      if (MapHandle == PathHandle) {
-        PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, Node->MapName, 0);
-        PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, L";", 0);
-        break;
-      }
-    }
-  }
-*/
+  */
 
-  return (AddBufferToFreeList(PathForReturn));
+  return (AddBufferToFreeList (PathForReturn));
 }
 
 /**
@@ -359,71 +370,76 @@ EfiShellGetMapFromDevicePath(
 **/
 CHAR16 *
 EFIAPI
-EfiShellGetFilePathFromDevicePath(
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *Path
+EfiShellGetFilePathFromDevicePath (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *Path
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathCopy;
-  EFI_DEVICE_PATH_PROTOCOL        *MapPathCopy;
-  SHELL_MAP_LIST                  *MapListItem;
-  CHAR16                          *PathForReturn;
-  UINTN                           PathSize;
-  EFI_HANDLE                      PathHandle;
-  EFI_HANDLE                      MapHandle;
-  EFI_STATUS                      Status;
-  FILEPATH_DEVICE_PATH            *FilePath;
-  FILEPATH_DEVICE_PATH            *AlignedNode;
+  EFI_DEVICE_PATH_PROTOCOL  *MapPathCopy;
+  SHELL_MAP_LIST            *MapListItem;
+  CHAR16                    *PathForReturn;
+  UINTN                     PathSize;
+  EFI_HANDLE                PathHandle;
+  EFI_HANDLE                MapHandle;
+  EFI_STATUS                Status;
+  FILEPATH_DEVICE_PATH      *FilePath;
+  FILEPATH_DEVICE_PATH      *AlignedNode;
 
   PathForReturn = NULL;
-  PathSize = 0;
+  PathSize      = 0;
 
-  DevicePathCopy = (EFI_DEVICE_PATH_PROTOCOL*)Path;
-  ASSERT(DevicePathCopy != NULL);
+  DevicePathCopy = (EFI_DEVICE_PATH_PROTOCOL *)Path;
+  ASSERT (DevicePathCopy != NULL);
   if (DevicePathCopy == NULL) {
     return (NULL);
   }
-  ///@todo BlockIo?
-  Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &DevicePathCopy, &PathHandle);
 
-  if (EFI_ERROR(Status)) {
+  /// @todo BlockIo?
+  Status = gBS->LocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, &DevicePathCopy, &PathHandle);
+
+  if (EFI_ERROR (Status)) {
     return (NULL);
   }
+
   //
   //  check each of the device paths we have to get the root of the path
   //
-  for ( MapListItem = (SHELL_MAP_LIST *)GetFirstNode(&gShellMapList.Link)
-      ; !IsNull(&gShellMapList.Link, &MapListItem->Link)
-      ; MapListItem = (SHELL_MAP_LIST *)GetNextNode(&gShellMapList.Link, &MapListItem->Link)
-     ){
-    MapPathCopy = (EFI_DEVICE_PATH_PROTOCOL*)MapListItem->DevicePath;
-    ASSERT(MapPathCopy != NULL);
-    ///@todo BlockIo?
-    Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &MapPathCopy, &MapHandle);
+  for ( MapListItem = (SHELL_MAP_LIST *)GetFirstNode (&gShellMapList.Link)
+        ; !IsNull (&gShellMapList.Link, &MapListItem->Link)
+        ; MapListItem = (SHELL_MAP_LIST *)GetNextNode (&gShellMapList.Link, &MapListItem->Link)
+        )
+  {
+    MapPathCopy = (EFI_DEVICE_PATH_PROTOCOL *)MapListItem->DevicePath;
+    ASSERT (MapPathCopy != NULL);
+    /// @todo BlockIo?
+    Status = gBS->LocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, &MapPathCopy, &MapHandle);
     if (MapHandle == PathHandle) {
-      ASSERT((PathForReturn == NULL && PathSize == 0) || (PathForReturn != NULL));
-      PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, MapListItem->MapName, 0);
+      ASSERT ((PathForReturn == NULL && PathSize == 0) || (PathForReturn != NULL));
+      PathForReturn = StrnCatGrow (&PathForReturn, &PathSize, MapListItem->MapName, 0);
       //
       // go through all the remaining nodes in the device path
       //
-      for ( FilePath = (FILEPATH_DEVICE_PATH*)DevicePathCopy
-          ; !IsDevicePathEnd (&FilePath->Header)
-          ; FilePath = (FILEPATH_DEVICE_PATH*)NextDevicePathNode (&FilePath->Header)
-         ){
+      for ( FilePath = (FILEPATH_DEVICE_PATH *)DevicePathCopy
+            ; !IsDevicePathEnd (&FilePath->Header)
+            ; FilePath = (FILEPATH_DEVICE_PATH *)NextDevicePathNode (&FilePath->Header)
+            )
+      {
         //
         // If any node is not a file path node, then the conversion can not be completed
         //
-        if ((DevicePathType(&FilePath->Header) != MEDIA_DEVICE_PATH) ||
-            (DevicePathSubType(&FilePath->Header) != MEDIA_FILEPATH_DP)) {
-          FreePool(PathForReturn);
+        if ((DevicePathType (&FilePath->Header) != MEDIA_DEVICE_PATH) ||
+            (DevicePathSubType (&FilePath->Header) != MEDIA_FILEPATH_DP))
+        {
+          FreePool (PathForReturn);
           return NULL;
         }
 
         //
         // append the path part onto the filepath.
         //
-        ASSERT((PathForReturn == NULL && PathSize == 0) || (PathForReturn != NULL));
+        ASSERT ((PathForReturn == NULL && PathSize == 0) || (PathForReturn != NULL));
 
-        AlignedNode = AllocateCopyPool (DevicePathNodeLength(FilePath), FilePath);
+        AlignedNode = AllocateCopyPool (DevicePathNodeLength (FilePath), FilePath);
         if (AlignedNode == NULL) {
           FreePool (PathForReturn);
           return NULL;
@@ -438,19 +454,22 @@ EfiShellGetFilePathFromDevicePath(
         if ((PathSize != 0)                        &&
             (PathForReturn != NULL)                &&
             (PathForReturn[PathSize / sizeof (CHAR16) - 1] != L'\\') &&
-            (AlignedNode->PathName[0]    != L'\\')) {
+            (AlignedNode->PathName[0]    != L'\\'))
+        {
           PathForReturn = StrnCatGrow (&PathForReturn, &PathSize, L"\\", 1);
         }
 
-        PathForReturn = StrnCatGrow(&PathForReturn, &PathSize, AlignedNode->PathName, 0);
-        FreePool(AlignedNode);
+        PathForReturn = StrnCatGrow (&PathForReturn, &PathSize, AlignedNode->PathName, 0);
+        FreePool (AlignedNode);
       } // for loop of remaining nodes
     }
+
     if (PathForReturn != NULL) {
       break;
     }
   } // for loop of paths to check
-  return(PathForReturn);
+
+  return (PathForReturn);
 }
 
 /**
@@ -468,8 +487,8 @@ EfiShellGetFilePathFromDevicePath(
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
-EfiShellGetDevicePathFromFilePath(
-  IN CONST CHAR16 *Path
+EfiShellGetDevicePathFromFilePath (
+  IN CONST CHAR16  *Path
   )
 {
   CHAR16                          *MapName;
@@ -490,25 +509,29 @@ EfiShellGetDevicePathFromFilePath(
   MapName = NULL;
   NewPath = NULL;
 
-  if (StrStr(Path, L":") == NULL) {
-    Cwd = EfiShellGetCurDir(NULL);
+  if (StrStr (Path, L":") == NULL) {
+    Cwd = EfiShellGetCurDir (NULL);
     if (Cwd == NULL) {
       return (NULL);
     }
-    Size = StrSize(Cwd) + StrSize(Path);
-    NewPath = AllocateZeroPool(Size);
+
+    Size    = StrSize (Cwd) + StrSize (Path);
+    NewPath = AllocateZeroPool (Size);
     if (NewPath == NULL) {
       return (NULL);
     }
-    StrCpyS(NewPath, Size/sizeof(CHAR16), Cwd);
-    StrCatS(NewPath, Size/sizeof(CHAR16), L"\\");
+
+    StrCpyS (NewPath, Size/sizeof (CHAR16), Cwd);
+    StrCatS (NewPath, Size/sizeof (CHAR16), L"\\");
     if (*Path == L'\\') {
       Path++;
-      while (PathRemoveLastItem(NewPath)) ;
+      while (PathRemoveLastItem (NewPath)) {
+      }
     }
-    StrCatS(NewPath, Size/sizeof(CHAR16), Path);
-    DevicePathForReturn = EfiShellGetDevicePathFromFilePath(NewPath);
-    FreePool(NewPath);
+
+    StrCatS (NewPath, Size/sizeof (CHAR16), Path);
+    DevicePathForReturn = EfiShellGetDevicePathFromFilePath (NewPath);
+    FreePool (NewPath);
     return (DevicePathForReturn);
   }
 
@@ -516,16 +539,16 @@ EfiShellGetDevicePathFromFilePath(
   //
   // find the part before (but including) the : for the map name
   //
-  ASSERT((MapName == NULL && Size == 0) || (MapName != NULL));
-  MapName = StrnCatGrow(&MapName, &Size, Path, (StrStr(Path, L":")-Path+1));
-  if (MapName == NULL || MapName[StrLen(MapName)-1] != L':') {
+  ASSERT ((MapName == NULL && Size == 0) || (MapName != NULL));
+  MapName = StrnCatGrow (&MapName, &Size, Path, (StrStr (Path, L":")-Path+1));
+  if ((MapName == NULL) || (MapName[StrLen (MapName)-1] != L':')) {
     return (NULL);
   }
 
   //
   // look up the device path in the map
   //
-  DevicePath = EfiShellGetDevicePathFromMap(MapName);
+  DevicePath = EfiShellGetDevicePathFromMap (MapName);
   if (DevicePath == NULL) {
     //
     // Must have been a bad Mapname
@@ -536,38 +559,40 @@ EfiShellGetDevicePathFromFilePath(
   //
   // make a copy for LocateDevicePath to modify (also save a pointer to call FreePool with)
   //
-  DevicePathCopyForFree = DevicePathCopy = DuplicateDevicePath(DevicePath);
+  DevicePathCopyForFree = DevicePathCopy = DuplicateDevicePath (DevicePath);
   if (DevicePathCopy == NULL) {
-    FreePool(MapName);
+    FreePool (MapName);
     return (NULL);
   }
 
   //
   // get the handle
   //
-  ///@todo BlockIo?
-  Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid, &DevicePathCopy, &Handle);
-  if (EFI_ERROR(Status)) {
+  /// @todo BlockIo?
+  Status = gBS->LocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, &DevicePathCopy, &Handle);
+  if (EFI_ERROR (Status)) {
     if (DevicePathCopyForFree != NULL) {
-      FreePool(DevicePathCopyForFree);
+      FreePool (DevicePathCopyForFree);
     }
-    FreePool(MapName);
+
+    FreePool (MapName);
     return (NULL);
   }
 
   //
   // build the full device path
   //
-  if ((*(Path+StrLen(MapName)) != CHAR_NULL) &&
-      (*(Path+StrLen(MapName)+1) == CHAR_NULL)) {
-    DevicePathForReturn = FileDevicePath(Handle, L"\\");
+  if ((*(Path+StrLen (MapName)) != CHAR_NULL) &&
+      (*(Path+StrLen (MapName)+1) == CHAR_NULL))
+  {
+    DevicePathForReturn = FileDevicePath (Handle, L"\\");
   } else {
-    DevicePathForReturn = FileDevicePath(Handle, Path+StrLen(MapName));
+    DevicePathForReturn = FileDevicePath (Handle, Path+StrLen (MapName));
   }
 
-  FreePool(MapName);
+  FreePool (MapName);
   if (DevicePathCopyForFree != NULL) {
-    FreePool(DevicePathCopyForFree);
+    FreePool (DevicePathCopyForFree);
   }
 
   return (DevicePathForReturn);
@@ -611,29 +636,30 @@ EfiShellGetDevicePathFromFilePath(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellGetDeviceName(
-  IN EFI_HANDLE DeviceHandle,
-  IN EFI_SHELL_DEVICE_NAME_FLAGS Flags,
-  IN CHAR8 *Language,
-  OUT CHAR16 **BestDeviceName
+EfiShellGetDeviceName (
+  IN EFI_HANDLE                   DeviceHandle,
+  IN EFI_SHELL_DEVICE_NAME_FLAGS  Flags,
+  IN CHAR8                        *Language,
+  OUT CHAR16                      **BestDeviceName
   )
 {
-  EFI_STATUS                        Status;
-  EFI_COMPONENT_NAME2_PROTOCOL      *CompName2;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
-  EFI_HANDLE                        *HandleList;
-  UINTN                             HandleCount;
-  UINTN                             LoopVar;
-  CHAR16                            *DeviceNameToReturn;
-  CHAR8                             *Lang;
-  UINTN                             ParentControllerCount;
-  EFI_HANDLE                        *ParentControllerBuffer;
-  UINTN                             ParentDriverCount;
-  EFI_HANDLE                        *ParentDriverBuffer;
+  EFI_STATUS                    Status;
+  EFI_COMPONENT_NAME2_PROTOCOL  *CompName2;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  EFI_HANDLE                    *HandleList;
+  UINTN                         HandleCount;
+  UINTN                         LoopVar;
+  CHAR16                        *DeviceNameToReturn;
+  CHAR8                         *Lang;
+  UINTN                         ParentControllerCount;
+  EFI_HANDLE                    *ParentControllerBuffer;
+  UINTN                         ParentDriverCount;
+  EFI_HANDLE                    *ParentDriverBuffer;
 
-  if (BestDeviceName == NULL ||
-      DeviceHandle   == NULL
-     ){
+  if ((BestDeviceName == NULL) ||
+      (DeviceHandle   == NULL)
+      )
+  {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -641,133 +667,145 @@ EfiShellGetDeviceName(
   // make sure one of the 2 supported bits is on
   //
   if (((Flags & EFI_DEVICE_NAME_USE_COMPONENT_NAME) == 0) &&
-      ((Flags & EFI_DEVICE_NAME_USE_DEVICE_PATH) == 0)) {
+      ((Flags & EFI_DEVICE_NAME_USE_DEVICE_PATH) == 0))
+  {
     return (EFI_INVALID_PARAMETER);
   }
 
-  DeviceNameToReturn  = NULL;
-  *BestDeviceName     = NULL;
-  HandleList          = NULL;
-  HandleCount         = 0;
-  Lang                = NULL;
+  DeviceNameToReturn = NULL;
+  *BestDeviceName    = NULL;
+  HandleList         = NULL;
+  HandleCount        = 0;
+  Lang               = NULL;
 
   if ((Flags & EFI_DEVICE_NAME_USE_COMPONENT_NAME) != 0) {
-    Status = ParseHandleDatabaseByRelationship(
-      NULL,
-      DeviceHandle,
-      HR_DRIVER_BINDING_HANDLE|HR_DEVICE_DRIVER,
-      &HandleCount,
-      &HandleList);
-    for (LoopVar = 0; LoopVar < HandleCount ; LoopVar++){
+    Status = ParseHandleDatabaseByRelationship (
+               NULL,
+               DeviceHandle,
+               HR_DRIVER_BINDING_HANDLE|HR_DEVICE_DRIVER,
+               &HandleCount,
+               &HandleList
+               );
+    for (LoopVar = 0; LoopVar < HandleCount; LoopVar++) {
       //
       // Go through those handles until we get one that passes for GetComponentName
       //
-      Status = gBS->OpenProtocol(
-        HandleList[LoopVar],
-        &gEfiComponentName2ProtocolGuid,
-        (VOID**)&CompName2,
-        gImageHandle,
-        NULL,
-        EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-      if (EFI_ERROR(Status)) {
-        Status = gBS->OpenProtocol(
-          HandleList[LoopVar],
-          &gEfiComponentNameProtocolGuid,
-          (VOID**)&CompName2,
-          gImageHandle,
-          NULL,
-          EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+      Status = gBS->OpenProtocol (
+                      HandleList[LoopVar],
+                      &gEfiComponentName2ProtocolGuid,
+                      (VOID **)&CompName2,
+                      gImageHandle,
+                      NULL,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
+      if (EFI_ERROR (Status)) {
+        Status = gBS->OpenProtocol (
+                        HandleList[LoopVar],
+                        &gEfiComponentNameProtocolGuid,
+                        (VOID **)&CompName2,
+                        gImageHandle,
+                        NULL,
+                        EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                        );
       }
 
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         continue;
       }
-      Lang = GetBestLanguageForDriver(CompName2->SupportedLanguages, Language, FALSE);
-      Status = CompName2->GetControllerName(CompName2, DeviceHandle, NULL, Lang, &DeviceNameToReturn);
-      FreePool(Lang);
+
+      Lang   = GetBestLanguageForDriver (CompName2->SupportedLanguages, Language, FALSE);
+      Status = CompName2->GetControllerName (CompName2, DeviceHandle, NULL, Lang, &DeviceNameToReturn);
+      FreePool (Lang);
       Lang = NULL;
-      if (!EFI_ERROR(Status) && DeviceNameToReturn != NULL) {
+      if (!EFI_ERROR (Status) && (DeviceNameToReturn != NULL)) {
         break;
       }
     }
+
     if (HandleList != NULL) {
-      FreePool(HandleList);
+      FreePool (HandleList);
     }
 
     //
     // Now check the parent controller using this as the child.
     //
-    if (DeviceNameToReturn == NULL){
-      PARSE_HANDLE_DATABASE_PARENTS(DeviceHandle, &ParentControllerCount, &ParentControllerBuffer);
-      for (LoopVar = 0 ; LoopVar < ParentControllerCount ; LoopVar++) {
-        PARSE_HANDLE_DATABASE_UEFI_DRIVERS(ParentControllerBuffer[LoopVar], &ParentDriverCount, &ParentDriverBuffer);
-        for (HandleCount = 0 ; HandleCount < ParentDriverCount ; HandleCount++) {
+    if (DeviceNameToReturn == NULL) {
+      PARSE_HANDLE_DATABASE_PARENTS (DeviceHandle, &ParentControllerCount, &ParentControllerBuffer);
+      for (LoopVar = 0; LoopVar < ParentControllerCount; LoopVar++) {
+        PARSE_HANDLE_DATABASE_UEFI_DRIVERS (ParentControllerBuffer[LoopVar], &ParentDriverCount, &ParentDriverBuffer);
+        for (HandleCount = 0; HandleCount < ParentDriverCount; HandleCount++) {
           //
           // try using that driver's component name with controller and our driver as the child.
           //
-          Status = gBS->OpenProtocol(
-            ParentDriverBuffer[HandleCount],
-            &gEfiComponentName2ProtocolGuid,
-            (VOID**)&CompName2,
-            gImageHandle,
-            NULL,
-            EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-          if (EFI_ERROR(Status)) {
-            Status = gBS->OpenProtocol(
-              ParentDriverBuffer[HandleCount],
-              &gEfiComponentNameProtocolGuid,
-              (VOID**)&CompName2,
-              gImageHandle,
-              NULL,
-              EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+          Status = gBS->OpenProtocol (
+                          ParentDriverBuffer[HandleCount],
+                          &gEfiComponentName2ProtocolGuid,
+                          (VOID **)&CompName2,
+                          gImageHandle,
+                          NULL,
+                          EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                          );
+          if (EFI_ERROR (Status)) {
+            Status = gBS->OpenProtocol (
+                            ParentDriverBuffer[HandleCount],
+                            &gEfiComponentNameProtocolGuid,
+                            (VOID **)&CompName2,
+                            gImageHandle,
+                            NULL,
+                            EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                            );
           }
 
-          if (EFI_ERROR(Status)) {
+          if (EFI_ERROR (Status)) {
             continue;
           }
-          Lang = GetBestLanguageForDriver(CompName2->SupportedLanguages, Language, FALSE);
-          Status = CompName2->GetControllerName(CompName2, ParentControllerBuffer[LoopVar], DeviceHandle, Lang, &DeviceNameToReturn);
-          FreePool(Lang);
+
+          Lang   = GetBestLanguageForDriver (CompName2->SupportedLanguages, Language, FALSE);
+          Status = CompName2->GetControllerName (CompName2, ParentControllerBuffer[LoopVar], DeviceHandle, Lang, &DeviceNameToReturn);
+          FreePool (Lang);
           Lang = NULL;
-          if (!EFI_ERROR(Status) && DeviceNameToReturn != NULL) {
+          if (!EFI_ERROR (Status) && (DeviceNameToReturn != NULL)) {
             break;
           }
-
-
-
         }
-        SHELL_FREE_NON_NULL(ParentDriverBuffer);
-        if (!EFI_ERROR(Status) && DeviceNameToReturn != NULL) {
+
+        SHELL_FREE_NON_NULL (ParentDriverBuffer);
+        if (!EFI_ERROR (Status) && (DeviceNameToReturn != NULL)) {
           break;
         }
       }
-      SHELL_FREE_NON_NULL(ParentControllerBuffer);
+
+      SHELL_FREE_NON_NULL (ParentControllerBuffer);
     }
+
     //
     // dont return on fail since we will try device path if that bit is on
     //
-    if (DeviceNameToReturn != NULL){
-      ASSERT(BestDeviceName != NULL);
-      StrnCatGrow(BestDeviceName, NULL, DeviceNameToReturn, 0);
+    if (DeviceNameToReturn != NULL) {
+      ASSERT (BestDeviceName != NULL);
+      StrnCatGrow (BestDeviceName, NULL, DeviceNameToReturn, 0);
       return (EFI_SUCCESS);
     }
   }
+
   if ((Flags & EFI_DEVICE_NAME_USE_DEVICE_PATH) != 0) {
-    Status = gBS->OpenProtocol(
-      DeviceHandle,
-      &gEfiDevicePathProtocolGuid,
-      (VOID**)&DevicePath,
-      gImageHandle,
-      NULL,
-      EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-    if (!EFI_ERROR(Status)) {
+    Status = gBS->OpenProtocol (
+                    DeviceHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    (VOID **)&DevicePath,
+                    gImageHandle,
+                    NULL,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+    if (!EFI_ERROR (Status)) {
       //
       // use device path to text on the device path
       //
-      *BestDeviceName = ConvertDevicePathToText(DevicePath, TRUE, TRUE);
+      *BestDeviceName = ConvertDevicePathToText (DevicePath, TRUE, TRUE);
       return (EFI_SUCCESS);
     }
   }
+
   //
   // none of the selected bits worked.
   //
@@ -792,47 +830,52 @@ EfiShellGetDeviceName(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellOpenRootByHandle(
-  IN EFI_HANDLE DeviceHandle,
-  OUT SHELL_FILE_HANDLE *FileHandle
+EfiShellOpenRootByHandle (
+  IN EFI_HANDLE          DeviceHandle,
+  OUT SHELL_FILE_HANDLE  *FileHandle
   )
 {
-  EFI_STATUS                      Status;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *SimpleFileSystem;
-  EFI_FILE_PROTOCOL               *RealFileHandle;
-  EFI_DEVICE_PATH_PROTOCOL        *DevPath;
+  EFI_STATUS                       Status;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *SimpleFileSystem;
+  EFI_FILE_PROTOCOL                *RealFileHandle;
+  EFI_DEVICE_PATH_PROTOCOL         *DevPath;
 
   //
   // get the simple file system interface
   //
-  Status = gBS->OpenProtocol(DeviceHandle,
-                             &gEfiSimpleFileSystemProtocolGuid,
-                             (VOID**)&SimpleFileSystem,
-                             gImageHandle,
-                             NULL,
-                             EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (EFI_ERROR(Status)) {
+  Status = gBS->OpenProtocol (
+                  DeviceHandle,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  (VOID **)&SimpleFileSystem,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
     return (EFI_NOT_FOUND);
   }
 
-  Status = gBS->OpenProtocol(DeviceHandle,
-                             &gEfiDevicePathProtocolGuid,
-                             (VOID**)&DevPath,
-                             gImageHandle,
-                             NULL,
-                             EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (EFI_ERROR(Status)) {
+  Status = gBS->OpenProtocol (
+                  DeviceHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  (VOID **)&DevPath,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
     return (EFI_NOT_FOUND);
   }
+
   //
   // Open the root volume now...
   //
-  Status = SimpleFileSystem->OpenVolume(SimpleFileSystem, &RealFileHandle);
-  if (EFI_ERROR(Status)) {
+  Status = SimpleFileSystem->OpenVolume (SimpleFileSystem, &RealFileHandle);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  *FileHandle = ConvertEfiFileProtocolToShellHandle(RealFileHandle, EfiShellGetMapFromDevicePath(&DevPath));
+  *FileHandle = ConvertEfiFileProtocolToShellHandle (RealFileHandle, EfiShellGetMapFromDevicePath (&DevPath));
   return (EFI_SUCCESS);
 }
 
@@ -855,13 +898,13 @@ EfiShellOpenRootByHandle(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellOpenRoot(
-  IN EFI_DEVICE_PATH_PROTOCOL *DevicePath,
-  OUT SHELL_FILE_HANDLE *FileHandle
+EfiShellOpenRoot (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  OUT SHELL_FILE_HANDLE        *FileHandle
   )
 {
-  EFI_STATUS Status;
-  EFI_HANDLE Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   if (FileHandle == NULL) {
     return (EFI_INVALID_PARAMETER);
@@ -870,15 +913,17 @@ EfiShellOpenRoot(
   //
   // find the handle of the device with that device handle and the file system
   //
-  ///@todo BlockIo?
-  Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid,
-                                 &DevicePath,
-                                 &Handle);
-  if (EFI_ERROR(Status)) {
+  /// @todo BlockIo?
+  Status = gBS->LocateDevicePath (
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  &DevicePath,
+                  &Handle
+                  );
+  if (EFI_ERROR (Status)) {
     return (EFI_NOT_FOUND);
   }
 
-  return (EfiShellOpenRootByHandle(Handle, FileHandle));
+  return (EfiShellOpenRootByHandle (Handle, FileHandle));
 }
 
 /**
@@ -894,9 +939,10 @@ EfiShellBatchIsActive (
   VOID
   )
 {
-  if (ShellCommandGetCurrentScriptFile() == NULL) {
+  if (ShellCommandGetCurrentScriptFile () == NULL) {
     return (FALSE);
   }
+
   return (TRUE);
 }
 
@@ -914,62 +960,67 @@ EfiShellBatchIsActive (
   @retval other                   an error occurred.
 **/
 EFI_STATUS
-InternalOpenFileDevicePath(
-  IN OUT EFI_DEVICE_PATH_PROTOCOL *DevicePath,
-  OUT SHELL_FILE_HANDLE           *FileHandle,
-  IN UINT64                       OpenMode,
-  IN UINT64                       Attributes OPTIONAL
+InternalOpenFileDevicePath (
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  OUT SHELL_FILE_HANDLE            *FileHandle,
+  IN UINT64                        OpenMode,
+  IN UINT64                        Attributes OPTIONAL
   )
 {
-  EFI_STATUS                      Status;
-  FILEPATH_DEVICE_PATH            *FilePathNode;
-  EFI_HANDLE                      Handle;
-  SHELL_FILE_HANDLE               ShellHandle;
-  EFI_FILE_PROTOCOL               *Handle1;
-  EFI_FILE_PROTOCOL               *Handle2;
-  FILEPATH_DEVICE_PATH            *AlignedNode;
+  EFI_STATUS            Status;
+  FILEPATH_DEVICE_PATH  *FilePathNode;
+  EFI_HANDLE            Handle;
+  SHELL_FILE_HANDLE     ShellHandle;
+  EFI_FILE_PROTOCOL     *Handle1;
+  EFI_FILE_PROTOCOL     *Handle2;
+  FILEPATH_DEVICE_PATH  *AlignedNode;
 
   if (FileHandle == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
-  *FileHandle   = NULL;
-  Handle1       = NULL;
-  Handle2       = NULL;
-  Handle        = NULL;
-  ShellHandle   = NULL;
-  FilePathNode  = NULL;
-  AlignedNode   = NULL;
 
-  Status = EfiShellOpenRoot(DevicePath, &ShellHandle);
+  *FileHandle  = NULL;
+  Handle1      = NULL;
+  Handle2      = NULL;
+  Handle       = NULL;
+  ShellHandle  = NULL;
+  FilePathNode = NULL;
+  AlignedNode  = NULL;
 
-  if (!EFI_ERROR(Status)) {
-    Handle1 = ConvertShellHandleToEfiFileProtocol(ShellHandle);
+  Status = EfiShellOpenRoot (DevicePath, &ShellHandle);
+
+  if (!EFI_ERROR (Status)) {
+    Handle1 = ConvertShellHandleToEfiFileProtocol (ShellHandle);
     if (Handle1 != NULL) {
       //
       // chop off the beginning part before the file system part...
       //
-      ///@todo BlockIo?
-      Status = gBS->LocateDevicePath(&gEfiSimpleFileSystemProtocolGuid,
-                                     &DevicePath,
-                                     &Handle);
-        if (!EFI_ERROR(Status)) {
+      /// @todo BlockIo?
+      Status = gBS->LocateDevicePath (
+                      &gEfiSimpleFileSystemProtocolGuid,
+                      &DevicePath,
+                      &Handle
+                      );
+      if (!EFI_ERROR (Status)) {
         //
         // To access as a file system, the file path should only
         // contain file path components.  Follow the file path nodes
         // and find the target file
         //
         for ( FilePathNode = (FILEPATH_DEVICE_PATH *)DevicePath
-            ; !IsDevicePathEnd (&FilePathNode->Header)
-            ; FilePathNode = (FILEPATH_DEVICE_PATH *) NextDevicePathNode (&FilePathNode->Header)
-           ){
-          SHELL_FREE_NON_NULL(AlignedNode);
-          AlignedNode = AllocateCopyPool (DevicePathNodeLength(FilePathNode), FilePathNode);
+              ; !IsDevicePathEnd (&FilePathNode->Header)
+              ; FilePathNode = (FILEPATH_DEVICE_PATH *)NextDevicePathNode (&FilePathNode->Header)
+              )
+        {
+          SHELL_FREE_NON_NULL (AlignedNode);
+          AlignedNode = AllocateCopyPool (DevicePathNodeLength (FilePathNode), FilePathNode);
           //
           // For file system access each node should be a file path component
           //
-          if (DevicePathType (&FilePathNode->Header) != MEDIA_DEVICE_PATH ||
-              DevicePathSubType (&FilePathNode->Header) != MEDIA_FILEPATH_DP
-             ) {
+          if ((DevicePathType (&FilePathNode->Header) != MEDIA_DEVICE_PATH) ||
+              (DevicePathSubType (&FilePathNode->Header) != MEDIA_FILEPATH_DP)
+              )
+          {
             Status = EFI_UNSUPPORTED;
             break;
           }
@@ -985,14 +1036,13 @@ InternalOpenFileDevicePath(
           //
           if (IsDevicePathEnd ((NextDevicePathNode (&FilePathNode->Header)))) {
             Status = Handle2->Open (
-                                  Handle2,
-                                  &Handle1,
-                                  AlignedNode->PathName,
-                                  OpenMode,
-                                  Attributes
-                                 );
+                                Handle2,
+                                &Handle1,
+                                AlignedNode->PathName,
+                                OpenMode,
+                                Attributes
+                                );
           } else {
-
             //
             //  This is not the last node and we dont want to 'create' existing
             //  directory entries...
@@ -1003,26 +1053,27 @@ InternalOpenFileDevicePath(
             // prevents error on existing files/directories
             //
             Status = Handle2->Open (
-                                  Handle2,
-                                  &Handle1,
-                                  AlignedNode->PathName,
-                                  OpenMode &~EFI_FILE_MODE_CREATE,
-                                  Attributes
-                                 );
+                                Handle2,
+                                &Handle1,
+                                AlignedNode->PathName,
+                                OpenMode &~EFI_FILE_MODE_CREATE,
+                                Attributes
+                                );
             //
             // if above failed now open and create the 'item'
             // if OpenMode EFI_FILE_MODE_CREATE bit was on (but disabled above)
             //
             if ((EFI_ERROR (Status)) && ((OpenMode & EFI_FILE_MODE_CREATE) != 0)) {
               Status = Handle2->Open (
-                                    Handle2,
-                                    &Handle1,
-                                    AlignedNode->PathName,
-                                    OpenMode,
-                                    Attributes
-                                   );
+                                  Handle2,
+                                  &Handle1,
+                                  AlignedNode->PathName,
+                                  OpenMode,
+                                  Attributes
+                                  );
             }
           }
+
           //
           // Close the last node
           //
@@ -1038,14 +1089,16 @@ InternalOpenFileDevicePath(
       }
     }
   }
-  SHELL_FREE_NON_NULL(AlignedNode);
-  if (EFI_ERROR(Status)) {
+
+  SHELL_FREE_NON_NULL (AlignedNode);
+  if (EFI_ERROR (Status)) {
     if (Handle1 != NULL) {
-      ShellInfoObject.NewEfiShellProtocol->CloseFile(Handle1);
+      ShellInfoObject.NewEfiShellProtocol->CloseFile (Handle1);
     }
   } else {
-    *FileHandle = ConvertEfiFileProtocolToShellHandle(Handle1, ShellFileHandleGetPath(ShellHandle));
+    *FileHandle = ConvertEfiFileProtocolToShellHandle (Handle1, ShellFileHandleGetPath (ShellHandle));
   }
+
   return (Status);
 }
 
@@ -1087,10 +1140,10 @@ InternalOpenFileDevicePath(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellCreateFile(
-  IN CONST CHAR16       *FileName,
-  IN UINT64             FileAttribs,
-  OUT SHELL_FILE_HANDLE *FileHandle
+EfiShellCreateFile (
+  IN CONST CHAR16        *FileName,
+  IN UINT64              FileAttribs,
+  OUT SHELL_FILE_HANDLE  *FileHandle
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
@@ -1101,30 +1154,32 @@ EfiShellCreateFile(
   // Is this for an environment variable
   // do we start with >v
   //
-  if (StrStr(FileName, L">v") == FileName) {
+  if (StrStr (FileName, L">v") == FileName) {
     Status = IsVolatileEnv (FileName + 2, &Volatile);
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     if (!Volatile) {
       return (EFI_INVALID_PARAMETER);
     }
-    *FileHandle = CreateFileInterfaceEnv(FileName+2);
+
+    *FileHandle = CreateFileInterfaceEnv (FileName+2);
     return (EFI_SUCCESS);
   }
 
   //
   // We are opening a regular file.
   //
-  DevicePath = EfiShellGetDevicePathFromFilePath(FileName);
+  DevicePath = EfiShellGetDevicePathFromFilePath (FileName);
   if (DevicePath == NULL) {
     return (EFI_NOT_FOUND);
   }
 
-  Status = InternalOpenFileDevicePath(DevicePath, FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, FileAttribs);
-  FreePool(DevicePath);
+  Status = InternalOpenFileDevicePath (DevicePath, FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, FileAttribs);
+  FreePool (DevicePath);
 
-  return(Status);
+  return (Status);
 }
 
 /**
@@ -1146,12 +1201,12 @@ EfiShellCreateFile(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellRegisterGuidName(
-  IN CONST EFI_GUID *Guid,
-  IN CONST CHAR16   *GuidName
+EfiShellRegisterGuidName (
+  IN CONST EFI_GUID  *Guid,
+  IN CONST CHAR16    *GuidName
   )
 {
-  return (AddNewGuidNameMapping(Guid, GuidName, NULL));
+  return (AddNewGuidNameMapping (Guid, GuidName, NULL));
 }
 
 /**
@@ -1208,43 +1263,45 @@ EfiShellRegisterGuidName(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellOpenFileByName(
-  IN CONST CHAR16       *FileName,
-  OUT SHELL_FILE_HANDLE *FileHandle,
-  IN UINT64             OpenMode
+EfiShellOpenFileByName (
+  IN CONST CHAR16        *FileName,
+  OUT SHELL_FILE_HANDLE  *FileHandle,
+  IN UINT64              OpenMode
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
-  EFI_STATUS                      Status;
-  BOOLEAN                         Volatile;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  EFI_STATUS                Status;
+  BOOLEAN                   Volatile;
 
   *FileHandle = NULL;
 
   //
   // Is this for StdIn
   //
-  if (StrCmp(FileName, L">i") == 0) {
+  if (StrCmp (FileName, L">i") == 0) {
     //
     // make sure not writing to StdIn
     //
     if ((OpenMode & EFI_FILE_MODE_WRITE) != 0) {
       return (EFI_INVALID_PARAMETER);
     }
+
     *FileHandle = ShellInfoObject.NewShellParametersProtocol->StdIn;
-    ASSERT(*FileHandle != NULL);
+    ASSERT (*FileHandle != NULL);
     return (EFI_SUCCESS);
   }
 
   //
   // Is this for StdOut
   //
-  if (StrCmp(FileName, L">o") == 0) {
+  if (StrCmp (FileName, L">o") == 0) {
     //
     // make sure not writing to StdIn
     //
     if ((OpenMode & EFI_FILE_MODE_READ) != 0) {
       return (EFI_INVALID_PARAMETER);
     }
+
     *FileHandle = &FileInterfaceStdOut;
     return (EFI_SUCCESS);
   }
@@ -1252,8 +1309,9 @@ EfiShellOpenFileByName(
   //
   // Is this for NUL / NULL file
   //
-  if ((gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16*)FileName, L"NUL") == 0) ||
-      (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16*)FileName, L"NULL") == 0)) {
+  if ((gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)FileName, L"NUL") == 0) ||
+      (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)FileName, L"NULL") == 0))
+  {
     *FileHandle = &FileInterfaceNulFile;
     return (EFI_SUCCESS);
   }
@@ -1261,13 +1319,14 @@ EfiShellOpenFileByName(
   //
   // Is this for StdErr
   //
-  if (StrCmp(FileName, L">e") == 0) {
+  if (StrCmp (FileName, L">e") == 0) {
     //
     // make sure not writing to StdIn
     //
     if ((OpenMode & EFI_FILE_MODE_READ) != 0) {
       return (EFI_INVALID_PARAMETER);
     }
+
     *FileHandle = &FileInterfaceStdErr;
     return (EFI_SUCCESS);
   }
@@ -1276,23 +1335,26 @@ EfiShellOpenFileByName(
   // Is this for an environment variable
   // do we start with >v
   //
-  if (StrStr(FileName, L">v") == FileName) {
+  if (StrStr (FileName, L">v") == FileName) {
     Status = IsVolatileEnv (FileName + 2, &Volatile);
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     if (!Volatile &&
-        ((OpenMode & EFI_FILE_MODE_WRITE) != 0)) {
+        ((OpenMode & EFI_FILE_MODE_WRITE) != 0))
+    {
       return (EFI_INVALID_PARAMETER);
     }
-    *FileHandle = CreateFileInterfaceEnv(FileName+2);
+
+    *FileHandle = CreateFileInterfaceEnv (FileName+2);
     return (EFI_SUCCESS);
   }
 
   //
   // We are opening a regular file.
   //
-  DevicePath = EfiShellGetDevicePathFromFilePath(FileName);
+  DevicePath = EfiShellGetDevicePathFromFilePath (FileName);
 
   if (DevicePath == NULL) {
     return (EFI_NOT_FOUND);
@@ -1301,10 +1363,10 @@ EfiShellOpenFileByName(
   //
   // Copy the device path, open the file, then free the memory
   //
-  Status = InternalOpenFileDevicePath(DevicePath, FileHandle, OpenMode, 0); // 0 = no specific file attributes
-  FreePool(DevicePath);
+  Status = InternalOpenFileDevicePath (DevicePath, FileHandle, OpenMode, 0); // 0 = no specific file attributes
+  FreePool (DevicePath);
 
-  return(Status);
+  return (Status);
 }
 
 /**
@@ -1320,29 +1382,32 @@ EfiShellOpenFileByName(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellDeleteFileByName(
-  IN CONST CHAR16 *FileName
+EfiShellDeleteFileByName (
+  IN CONST CHAR16  *FileName
   )
 {
-  SHELL_FILE_HANDLE FileHandle;
-  EFI_STATUS        Status;
+  SHELL_FILE_HANDLE  FileHandle;
+  EFI_STATUS         Status;
 
   FileHandle = NULL;
 
   //
   // get a handle to the file
   //
-  Status = EfiShellCreateFile(FileName,
-                              0,
-                              &FileHandle);
-  if (EFI_ERROR(Status)) {
+  Status = EfiShellCreateFile (
+             FileName,
+             0,
+             &FileHandle
+             );
+  if (EFI_ERROR (Status)) {
     return (Status);
   }
+
   //
   // now delete the file
   //
-  ShellFileHandleRemove(FileHandle);
-  return (ShellInfoObject.NewEfiShellProtocol->DeleteFile(FileHandle));
+  ShellFileHandleRemove (FileHandle);
+  return (ShellInfoObject.NewEfiShellProtocol->DeleteFile (FileHandle));
 }
 
 /**
@@ -1392,32 +1457,32 @@ EfiShellEnablePageBreak (
   @retval EFI_UNSUPPORTED   Nested shell invocations are not allowed.
 **/
 EFI_STATUS
-InternalShellExecuteDevicePath(
-  IN CONST EFI_HANDLE               *ParentImageHandle,
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
-  IN CONST CHAR16                   *CommandLine OPTIONAL,
-  IN CONST CHAR16                   **Environment OPTIONAL,
-  OUT EFI_STATUS                    *StartImageStatus OPTIONAL
+InternalShellExecuteDevicePath (
+  IN CONST EFI_HANDLE                *ParentImageHandle,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN CONST CHAR16                    *CommandLine OPTIONAL,
+  IN CONST CHAR16                    **Environment OPTIONAL,
+  OUT EFI_STATUS                     *StartImageStatus OPTIONAL
   )
 {
-  EFI_STATUS                    Status;
-  EFI_STATUS                    StartStatus;
-  EFI_STATUS                    CleanupStatus;
-  EFI_HANDLE                    NewHandle;
-  EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
-  LIST_ENTRY                    OrigEnvs;
-  EFI_SHELL_PARAMETERS_PROTOCOL ShellParamsProtocol;
-  CHAR16                        *ImagePath;
-  UINTN                         Index;
-  CHAR16                        *Walker;
-  CHAR16                        *NewCmdLine;
+  EFI_STATUS                     Status;
+  EFI_STATUS                     StartStatus;
+  EFI_STATUS                     CleanupStatus;
+  EFI_HANDLE                     NewHandle;
+  EFI_LOADED_IMAGE_PROTOCOL      *LoadedImage;
+  LIST_ENTRY                     OrigEnvs;
+  EFI_SHELL_PARAMETERS_PROTOCOL  ShellParamsProtocol;
+  CHAR16                         *ImagePath;
+  UINTN                          Index;
+  CHAR16                         *Walker;
+  CHAR16                         *NewCmdLine;
 
   if (ParentImageHandle == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
 
-  InitializeListHead(&OrigEnvs);
-  ZeroMem(&ShellParamsProtocol, sizeof(EFI_SHELL_PARAMETERS_PROTOCOL));
+  InitializeListHead (&OrigEnvs);
+  ZeroMem (&ShellParamsProtocol, sizeof (EFI_SHELL_PARAMETERS_PROTOCOL));
 
   NewHandle = NULL;
 
@@ -1426,9 +1491,9 @@ InternalShellExecuteDevicePath(
     return EFI_OUT_OF_RESOURCES;
   }
 
-  for (Walker = NewCmdLine; Walker != NULL && *Walker != CHAR_NULL ; Walker++) {
-    if (*Walker == L'^' && *(Walker+1) == L'#') {
-      CopyMem(Walker, Walker+1, StrSize(Walker) - sizeof(Walker[0]));
+  for (Walker = NewCmdLine; Walker != NULL && *Walker != CHAR_NULL; Walker++) {
+    if ((*Walker == L'^') && (*(Walker+1) == L'#')) {
+      CopyMem (Walker, Walker+1, StrSize (Walker) - sizeof (Walker[0]));
     }
   }
 
@@ -1436,67 +1501,71 @@ InternalShellExecuteDevicePath(
   // Load the image with:
   // FALSE - not from boot manager and NULL, 0 being not already in memory
   //
-  Status = gBS->LoadImage(
-    FALSE,
-    *ParentImageHandle,
-    (EFI_DEVICE_PATH_PROTOCOL*)DevicePath,
-    NULL,
-    0,
-    &NewHandle);
+  Status = gBS->LoadImage (
+                  FALSE,
+                  *ParentImageHandle,
+                  (EFI_DEVICE_PATH_PROTOCOL *)DevicePath,
+                  NULL,
+                  0,
+                  &NewHandle
+                  );
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     if (NewHandle != NULL) {
-      gBS->UnloadImage(NewHandle);
+      gBS->UnloadImage (NewHandle);
     }
+
     FreePool (NewCmdLine);
     return (Status);
   }
-  Status = gBS->OpenProtocol(
-    NewHandle,
-    &gEfiLoadedImageProtocolGuid,
-    (VOID**)&LoadedImage,
-    gImageHandle,
-    NULL,
-    EFI_OPEN_PROTOCOL_GET_PROTOCOL);
 
-  if (!EFI_ERROR(Status)) {
+  Status = gBS->OpenProtocol (
+                  NewHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **)&LoadedImage,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  if (!EFI_ERROR (Status)) {
     //
     // If the image is not an app abort it.
     //
-    if (LoadedImage->ImageCodeType != EfiLoaderCode){
-      ShellPrintHiiEx(
+    if (LoadedImage->ImageCodeType != EfiLoaderCode) {
+      ShellPrintHiiEx (
         -1,
         -1,
         NULL,
         STRING_TOKEN (STR_SHELL_IMAGE_NOT_APP),
         ShellInfoObject.HiiHandle
-      );
+        );
       goto UnloadImage;
     }
 
-    ASSERT(LoadedImage->LoadOptionsSize == 0);
+    ASSERT (LoadedImage->LoadOptionsSize == 0);
     if (NewCmdLine != NULL) {
-      LoadedImage->LoadOptionsSize  = (UINT32)StrSize(NewCmdLine);
-      LoadedImage->LoadOptions      = (VOID*)NewCmdLine;
+      LoadedImage->LoadOptionsSize = (UINT32)StrSize (NewCmdLine);
+      LoadedImage->LoadOptions     = (VOID *)NewCmdLine;
     }
 
     //
     // Save our current environment settings for later restoration if necessary
     //
     if (Environment != NULL) {
-      Status = GetEnvironmentVariableList(&OrigEnvs);
-      if (!EFI_ERROR(Status)) {
-        Status = SetEnvironmentVariables(Environment);
+      Status = GetEnvironmentVariableList (&OrigEnvs);
+      if (!EFI_ERROR (Status)) {
+        Status = SetEnvironmentVariables (Environment);
       }
     }
 
     //
     // Initialize and install a shell parameters protocol on the image.
     //
-    ShellParamsProtocol.StdIn   = ShellInfoObject.NewShellParametersProtocol->StdIn;
-    ShellParamsProtocol.StdOut  = ShellInfoObject.NewShellParametersProtocol->StdOut;
-    ShellParamsProtocol.StdErr  = ShellInfoObject.NewShellParametersProtocol->StdErr;
-    Status = UpdateArgcArgv(&ShellParamsProtocol, NewCmdLine, Efi_Application, NULL, NULL);
+    ShellParamsProtocol.StdIn  = ShellInfoObject.NewShellParametersProtocol->StdIn;
+    ShellParamsProtocol.StdOut = ShellInfoObject.NewShellParametersProtocol->StdOut;
+    ShellParamsProtocol.StdErr = ShellInfoObject.NewShellParametersProtocol->StdErr;
+    Status                     = UpdateArgcArgv (&ShellParamsProtocol, NewCmdLine, Efi_Application, NULL, NULL);
     if (EFI_ERROR (Status)) {
       goto UnloadImage;
     }
@@ -1520,38 +1589,40 @@ InternalShellExecuteDevicePath(
           Status = EFI_OUT_OF_RESOURCES;
           goto UnloadImage;
         }
+
         ShellParamsProtocol.Argc = 1;
       } else {
         // Free the string UpdateArgcArgv put in Argv[0];
         FreePool (ShellParamsProtocol.Argv[0]);
       }
+
       ShellParamsProtocol.Argv[0] = ImagePath;
     }
 
-    Status = gBS->InstallProtocolInterface(&NewHandle, &gEfiShellParametersProtocolGuid, EFI_NATIVE_INTERFACE, &ShellParamsProtocol);
-    ASSERT_EFI_ERROR(Status);
+    Status = gBS->InstallProtocolInterface (&NewHandle, &gEfiShellParametersProtocolGuid, EFI_NATIVE_INTERFACE, &ShellParamsProtocol);
+    ASSERT_EFI_ERROR (Status);
 
-    ///@todo initialize and install ShellInterface protocol on the new image for compatibility if - PcdGetBool(PcdShellSupportOldProtocols)
+    /// @todo initialize and install ShellInterface protocol on the new image for compatibility if - PcdGetBool(PcdShellSupportOldProtocols)
 
     //
     // now start the image and if the caller wanted the return code pass it to them...
     //
-    if (!EFI_ERROR(Status)) {
-      StartStatus      = gBS->StartImage(
-                          NewHandle,
-                          0,
-                          NULL
-                          );
+    if (!EFI_ERROR (Status)) {
+      StartStatus = gBS->StartImage (
+                           NewHandle,
+                           0,
+                           NULL
+                           );
       if (StartImageStatus != NULL) {
         *StartImageStatus = StartStatus;
       }
 
-      CleanupStatus = gBS->UninstallProtocolInterface(
-                            NewHandle,
-                            &gEfiShellParametersProtocolGuid,
-                            &ShellParamsProtocol
-                            );
-      ASSERT_EFI_ERROR(CleanupStatus);
+      CleanupStatus = gBS->UninstallProtocolInterface (
+                             NewHandle,
+                             &gEfiShellParametersProtocolGuid,
+                             &ShellParamsProtocol
+                             );
+      ASSERT_EFI_ERROR (CleanupStatus);
 
       goto FreeAlloc;
     }
@@ -1568,19 +1639,20 @@ FreeAlloc:
           FreePool (ShellParamsProtocol.Argv[Index]);
         }
       }
+
       FreePool (ShellParamsProtocol.Argv);
     }
   }
 
   // Restore environment variables
-  if (!IsListEmpty(&OrigEnvs)) {
-    CleanupStatus = SetEnvironmentVariableList(&OrigEnvs);
+  if (!IsListEmpty (&OrigEnvs)) {
+    CleanupStatus = SetEnvironmentVariableList (&OrigEnvs);
     ASSERT_EFI_ERROR (CleanupStatus);
   }
 
   FreePool (NewCmdLine);
 
-  return(Status);
+  return (Status);
 }
 
 /**
@@ -1603,39 +1675,39 @@ FreeAlloc:
   @retval EFI_UNSUPPORTED   Nested shell invocations are not allowed.
 **/
 EFI_STATUS
-InternalShellExecute(
-  IN CONST CHAR16                   *CommandLine OPTIONAL,
-  IN CONST CHAR16                   **Environment OPTIONAL,
-  OUT EFI_STATUS                    *StartImageStatus OPTIONAL
+InternalShellExecute (
+  IN CONST CHAR16  *CommandLine OPTIONAL,
+  IN CONST CHAR16  **Environment OPTIONAL,
+  OUT EFI_STATUS   *StartImageStatus OPTIONAL
   )
 {
-  EFI_STATUS                    Status;
-  EFI_STATUS                    CleanupStatus;
-  LIST_ENTRY                    OrigEnvs;
+  EFI_STATUS  Status;
+  EFI_STATUS  CleanupStatus;
+  LIST_ENTRY  OrigEnvs;
 
-  InitializeListHead(&OrigEnvs);
+  InitializeListHead (&OrigEnvs);
 
   //
   // Save our current environment settings for later restoration if necessary
   //
   if (Environment != NULL) {
-    Status = GetEnvironmentVariableList(&OrigEnvs);
-    if (!EFI_ERROR(Status)) {
-      Status = SetEnvironmentVariables(Environment);
+    Status = GetEnvironmentVariableList (&OrigEnvs);
+    if (!EFI_ERROR (Status)) {
+      Status = SetEnvironmentVariables (Environment);
     } else {
       return Status;
     }
   }
 
-  Status = RunShellCommand(CommandLine, StartImageStatus);
+  Status = RunShellCommand (CommandLine, StartImageStatus);
 
   // Restore environment variables
-  if (!IsListEmpty(&OrigEnvs)) {
-    CleanupStatus = SetEnvironmentVariableList(&OrigEnvs);
+  if (!IsListEmpty (&OrigEnvs)) {
+    CleanupStatus = SetEnvironmentVariableList (&OrigEnvs);
     ASSERT_EFI_ERROR (CleanupStatus);
   }
 
-  return(Status);
+  return (Status);
 }
 
 /**
@@ -1646,9 +1718,9 @@ InternalShellExecute(
 **/
 STATIC
 BOOLEAN
-NestingEnabled(
+NestingEnabled (
   VOID
-)
+  )
 {
   EFI_STATUS  Status;
   CHAR16      *Temp;
@@ -1663,15 +1735,16 @@ NestingEnabled(
   if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoNest) {
     TempSize = 0;
     Temp     = NULL;
-    Status = SHELL_GET_ENVIRONMENT_VARIABLE(mNoNestingEnvVarName, &TempSize, Temp);
+    Status   = SHELL_GET_ENVIRONMENT_VARIABLE (mNoNestingEnvVarName, &TempSize, Temp);
     if (Status == EFI_BUFFER_TOO_SMALL) {
-      Temp = AllocateZeroPool(TempSize + sizeof(CHAR16));
+      Temp = AllocateZeroPool (TempSize + sizeof (CHAR16));
       if (Temp != NULL) {
-        Status = SHELL_GET_ENVIRONMENT_VARIABLE(mNoNestingEnvVarName, &TempSize, Temp);
+        Status = SHELL_GET_ENVIRONMENT_VARIABLE (mNoNestingEnvVarName, &TempSize, Temp);
       }
     }
-    Temp2 = StrnCatGrow(&Temp2, NULL, mNoNestingTrue, 0);
-    if (Temp != NULL && Temp2 != NULL && StringNoCaseCompare(&Temp, &Temp2) == 0) {
+
+    Temp2 = StrnCatGrow (&Temp2, NULL, mNoNestingTrue, 0);
+    if ((Temp != NULL) && (Temp2 != NULL) && (StringNoCaseCompare (&Temp, &Temp2) == 0)) {
       //
       // Use the no nesting method.
       //
@@ -1679,8 +1752,8 @@ NestingEnabled(
     }
   }
 
-  SHELL_FREE_NON_NULL(Temp);
-  SHELL_FREE_NON_NULL(Temp2);
+  SHELL_FREE_NON_NULL (Temp);
+  SHELL_FREE_NON_NULL (Temp2);
   return (RetVal);
 }
 
@@ -1720,11 +1793,11 @@ NestingEnabled(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellExecute(
-  IN EFI_HANDLE *ParentImageHandle,
-  IN CHAR16 *CommandLine OPTIONAL,
-  IN CHAR16 **Environment OPTIONAL,
-  OUT EFI_STATUS *StatusCode OPTIONAL
+EfiShellExecute (
+  IN EFI_HANDLE   *ParentImageHandle,
+  IN CHAR16       *CommandLine OPTIONAL,
+  IN CHAR16       **Environment OPTIONAL,
+  OUT EFI_STATUS  *StatusCode OPTIONAL
   )
 {
   EFI_STATUS                Status;
@@ -1732,48 +1805,50 @@ EfiShellExecute(
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   UINTN                     Size;
 
-  if ((PcdGet8(PcdShellSupportLevel) < 1)) {
+  if ((PcdGet8 (PcdShellSupportLevel) < 1)) {
     return (EFI_UNSUPPORTED);
   }
 
-  if (NestingEnabled()) {
+  if (NestingEnabled ()) {
     DevPath = AppendDevicePath (ShellInfoObject.ImageDevPath, ShellInfoObject.FileDevPath);
 
-    DEBUG_CODE_BEGIN();
-    Temp = ConvertDevicePathToText(ShellInfoObject.FileDevPath, TRUE, TRUE);
-    FreePool(Temp);
-    Temp = ConvertDevicePathToText(ShellInfoObject.ImageDevPath, TRUE, TRUE);
-    FreePool(Temp);
-    Temp = ConvertDevicePathToText(DevPath, TRUE, TRUE);
-    FreePool(Temp);
-    DEBUG_CODE_END();
+    DEBUG_CODE_BEGIN ();
+    Temp = ConvertDevicePathToText (ShellInfoObject.FileDevPath, TRUE, TRUE);
+    FreePool (Temp);
+    Temp = ConvertDevicePathToText (ShellInfoObject.ImageDevPath, TRUE, TRUE);
+    FreePool (Temp);
+    Temp = ConvertDevicePathToText (DevPath, TRUE, TRUE);
+    FreePool (Temp);
+    DEBUG_CODE_END ();
 
     Temp = NULL;
     Size = 0;
-    ASSERT((Temp == NULL && Size == 0) || (Temp != NULL));
-    StrnCatGrow(&Temp, &Size, L"Shell.efi -exit ", 0);
-    StrnCatGrow(&Temp, &Size, CommandLine, 0);
+    ASSERT ((Temp == NULL && Size == 0) || (Temp != NULL));
+    StrnCatGrow (&Temp, &Size, L"Shell.efi -exit ", 0);
+    StrnCatGrow (&Temp, &Size, CommandLine, 0);
 
-    Status = InternalShellExecuteDevicePath(
-      ParentImageHandle,
-      DevPath,
-      Temp,
-      (CONST CHAR16**)Environment,
-      StatusCode);
+    Status = InternalShellExecuteDevicePath (
+               ParentImageHandle,
+               DevPath,
+               Temp,
+               (CONST CHAR16 **)Environment,
+               StatusCode
+               );
 
     //
     // de-allocate and return
     //
-    FreePool(DevPath);
-    FreePool(Temp);
+    FreePool (DevPath);
+    FreePool (Temp);
   } else {
-    Status = InternalShellExecute(
-      (CONST CHAR16*)CommandLine,
-      (CONST CHAR16**)Environment,
-      StatusCode);
+    Status = InternalShellExecute (
+               (CONST CHAR16 *)CommandLine,
+               (CONST CHAR16 **)Environment,
+               StatusCode
+               );
   }
 
-  return(Status);
+  return (Status);
 }
 
 /**
@@ -1785,24 +1860,29 @@ EfiShellExecute(
   @param FileListNode     pointer to the list node to free
 **/
 VOID
-InternalFreeShellFileInfoNode(
-  IN EFI_SHELL_FILE_INFO *FileListNode
+InternalFreeShellFileInfoNode (
+  IN EFI_SHELL_FILE_INFO  *FileListNode
   )
 {
   if (FileListNode->Info != NULL) {
-    FreePool((VOID*)FileListNode->Info);
+    FreePool ((VOID *)FileListNode->Info);
   }
+
   if (FileListNode->FileName != NULL) {
-    FreePool((VOID*)FileListNode->FileName);
+    FreePool ((VOID *)FileListNode->FileName);
   }
+
   if (FileListNode->FullName != NULL) {
-    FreePool((VOID*)FileListNode->FullName);
+    FreePool ((VOID *)FileListNode->FullName);
   }
+
   if (FileListNode->Handle != NULL) {
-    ShellInfoObject.NewEfiShellProtocol->CloseFile(FileListNode->Handle);
+    ShellInfoObject.NewEfiShellProtocol->CloseFile (FileListNode->Handle);
   }
-  FreePool(FileListNode);
+
+  FreePool (FileListNode);
 }
+
 /**
   Frees the file list.
 
@@ -1817,26 +1897,28 @@ InternalFreeShellFileInfoNode(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellFreeFileList(
-  IN EFI_SHELL_FILE_INFO **FileList
+EfiShellFreeFileList (
+  IN EFI_SHELL_FILE_INFO  **FileList
   )
 {
-  EFI_SHELL_FILE_INFO *ShellFileListItem;
+  EFI_SHELL_FILE_INFO  *ShellFileListItem;
 
-  if (FileList == NULL || *FileList == NULL) {
+  if ((FileList == NULL) || (*FileList == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
-  for ( ShellFileListItem = (EFI_SHELL_FILE_INFO*)GetFirstNode(&(*FileList)->Link)
-      ; !IsListEmpty(&(*FileList)->Link)
-      ; ShellFileListItem = (EFI_SHELL_FILE_INFO*)GetFirstNode(&(*FileList)->Link)
-     ){
-    RemoveEntryList(&ShellFileListItem->Link);
-    InternalFreeShellFileInfoNode(ShellFileListItem);
+  for ( ShellFileListItem = (EFI_SHELL_FILE_INFO *)GetFirstNode (&(*FileList)->Link)
+        ; !IsListEmpty (&(*FileList)->Link)
+        ; ShellFileListItem = (EFI_SHELL_FILE_INFO *)GetFirstNode (&(*FileList)->Link)
+        )
+  {
+    RemoveEntryList (&ShellFileListItem->Link);
+    InternalFreeShellFileInfoNode (ShellFileListItem);
   }
-  InternalFreeShellFileInfoNode(*FileList);
+
+  InternalFreeShellFileInfoNode (*FileList);
   *FileList = NULL;
-  return(EFI_SUCCESS);
+  return (EFI_SUCCESS);
 }
 
 /**
@@ -1851,17 +1933,17 @@ EfiShellFreeFileList(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellRemoveDupInFileList(
-  IN EFI_SHELL_FILE_INFO **FileList
+EfiShellRemoveDupInFileList (
+  IN EFI_SHELL_FILE_INFO  **FileList
   )
 {
-  EFI_STATUS          Status;
-  EFI_SHELL_FILE_INFO *Duplicates;
-  EFI_SHELL_FILE_INFO *ShellFileListItem;
-  EFI_SHELL_FILE_INFO *ShellFileListItem2;
-  EFI_SHELL_FILE_INFO *TempNode;
+  EFI_STATUS           Status;
+  EFI_SHELL_FILE_INFO  *Duplicates;
+  EFI_SHELL_FILE_INFO  *ShellFileListItem;
+  EFI_SHELL_FILE_INFO  *ShellFileListItem2;
+  EFI_SHELL_FILE_INFO  *TempNode;
 
-  if (FileList == NULL || *FileList == NULL) {
+  if ((FileList == NULL) || (*FileList == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -1874,35 +1956,41 @@ EfiShellRemoveDupInFileList(
     EfiShellFreeFileList (&Duplicates);
     return EFI_SUCCESS;
   }
+
   //
   // Fall back to the slow method that needs no extra memory, and so cannot
   // fail.
   //
-  for ( ShellFileListItem = (EFI_SHELL_FILE_INFO*)GetFirstNode(&(*FileList)->Link)
-      ; !IsNull(&(*FileList)->Link, &ShellFileListItem->Link)
-      ; ShellFileListItem = (EFI_SHELL_FILE_INFO*)GetNextNode(&(*FileList)->Link, &ShellFileListItem->Link)
-     ){
-    for ( ShellFileListItem2 = (EFI_SHELL_FILE_INFO*)GetNextNode(&(*FileList)->Link, &ShellFileListItem->Link)
-        ; !IsNull(&(*FileList)->Link, &ShellFileListItem2->Link)
-        ; ShellFileListItem2 = (EFI_SHELL_FILE_INFO*)GetNextNode(&(*FileList)->Link, &ShellFileListItem2->Link)
-       ){
-      if (gUnicodeCollation->StriColl(
-            gUnicodeCollation,
-            (CHAR16*)ShellFileListItem->FullName,
-            (CHAR16*)ShellFileListItem2->FullName) == 0
-         ){
-        TempNode = (EFI_SHELL_FILE_INFO *)GetPreviousNode(
+  for ( ShellFileListItem = (EFI_SHELL_FILE_INFO *)GetFirstNode (&(*FileList)->Link)
+        ; !IsNull (&(*FileList)->Link, &ShellFileListItem->Link)
+        ; ShellFileListItem = (EFI_SHELL_FILE_INFO *)GetNextNode (&(*FileList)->Link, &ShellFileListItem->Link)
+        )
+  {
+    for ( ShellFileListItem2 = (EFI_SHELL_FILE_INFO *)GetNextNode (&(*FileList)->Link, &ShellFileListItem->Link)
+          ; !IsNull (&(*FileList)->Link, &ShellFileListItem2->Link)
+          ; ShellFileListItem2 = (EFI_SHELL_FILE_INFO *)GetNextNode (&(*FileList)->Link, &ShellFileListItem2->Link)
+          )
+    {
+      if (gUnicodeCollation->StriColl (
+                               gUnicodeCollation,
+                               (CHAR16 *)ShellFileListItem->FullName,
+                               (CHAR16 *)ShellFileListItem2->FullName
+                               ) == 0
+          )
+      {
+        TempNode = (EFI_SHELL_FILE_INFO *)GetPreviousNode (
                                             &(*FileList)->Link,
                                             &ShellFileListItem2->Link
                                             );
-        RemoveEntryList(&ShellFileListItem2->Link);
-        InternalFreeShellFileInfoNode(ShellFileListItem2);
+        RemoveEntryList (&ShellFileListItem2->Link);
+        InternalFreeShellFileInfoNode (ShellFileListItem2);
         // Set ShellFileListItem2 to PreviousNode so we don't access Freed
         // memory in GetNextNode in the loop expression above.
         ShellFileListItem2 = TempNode;
       }
     }
   }
+
   return (EFI_SUCCESS);
 }
 
@@ -1910,12 +1998,12 @@ EfiShellRemoveDupInFileList(
 // This is the same structure as the external version, but it has no CONST qualifiers.
 //
 typedef struct {
-  LIST_ENTRY        Link;       ///< Linked list members.
-  EFI_STATUS        Status;     ///< Status of opening the file.  Valid only if Handle != NULL.
-        CHAR16      *FullName;  ///< Fully qualified filename.
-        CHAR16      *FileName;  ///< name of this file.
-  SHELL_FILE_HANDLE Handle;     ///< Handle for interacting with the opened file or NULL if closed.
-  EFI_FILE_INFO     *Info;      ///< Pointer to the FileInfo struct for this file or NULL.
+  LIST_ENTRY           Link;      ///< Linked list members.
+  EFI_STATUS           Status;    ///< Status of opening the file.  Valid only if Handle != NULL.
+  CHAR16               *FullName; ///< Fully qualified filename.
+  CHAR16               *FileName; ///< name of this file.
+  SHELL_FILE_HANDLE    Handle;    ///< Handle for interacting with the opened file or NULL if closed.
+  EFI_FILE_INFO        *Info;     ///< Pointer to the FileInfo struct for this file or NULL.
 } EFI_SHELL_FILE_INFO_NO_CONST;
 
 /**
@@ -1927,43 +2015,46 @@ typedef struct {
   @retval NULL        a memory allocation error occurred
   @return != NULL     a pointer to the new node
 **/
-EFI_SHELL_FILE_INFO*
-InternalDuplicateShellFileInfo(
-  IN       EFI_SHELL_FILE_INFO *Node,
-  IN BOOLEAN                   Save
+EFI_SHELL_FILE_INFO *
+InternalDuplicateShellFileInfo (
+  IN       EFI_SHELL_FILE_INFO  *Node,
+  IN BOOLEAN                    Save
   )
 {
-  EFI_SHELL_FILE_INFO_NO_CONST *NewNode;
+  EFI_SHELL_FILE_INFO_NO_CONST  *NewNode;
 
   //
   // try to confirm that the objects are in sync
   //
-  ASSERT(sizeof(EFI_SHELL_FILE_INFO_NO_CONST) == sizeof(EFI_SHELL_FILE_INFO));
+  ASSERT (sizeof (EFI_SHELL_FILE_INFO_NO_CONST) == sizeof (EFI_SHELL_FILE_INFO));
 
-  NewNode = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
+  NewNode = AllocateZeroPool (sizeof (EFI_SHELL_FILE_INFO));
   if (NewNode == NULL) {
     return (NULL);
   }
-  NewNode->FullName = AllocateCopyPool(StrSize(Node->FullName), Node->FullName);
-  NewNode->FileName = AllocateCopyPool(StrSize(Node->FileName), Node->FileName);
-  NewNode->Info     = AllocateCopyPool((UINTN)Node->Info->Size, Node->Info);
-  if ( NewNode->FullName == NULL
-    || NewNode->FileName == NULL
-    || NewNode->Info == NULL
-  ){
-    SHELL_FREE_NON_NULL(NewNode->FullName);
-    SHELL_FREE_NON_NULL(NewNode->FileName);
-    SHELL_FREE_NON_NULL(NewNode->Info);
-    SHELL_FREE_NON_NULL(NewNode);
-    return(NULL);
+
+  NewNode->FullName = AllocateCopyPool (StrSize (Node->FullName), Node->FullName);
+  NewNode->FileName = AllocateCopyPool (StrSize (Node->FileName), Node->FileName);
+  NewNode->Info     = AllocateCopyPool ((UINTN)Node->Info->Size, Node->Info);
+  if (  (NewNode->FullName == NULL)
+     || (NewNode->FileName == NULL)
+     || (NewNode->Info == NULL)
+        )
+  {
+    SHELL_FREE_NON_NULL (NewNode->FullName);
+    SHELL_FREE_NON_NULL (NewNode->FileName);
+    SHELL_FREE_NON_NULL (NewNode->Info);
+    SHELL_FREE_NON_NULL (NewNode);
+    return (NULL);
   }
+
   NewNode->Status = Node->Status;
   NewNode->Handle = Node->Handle;
   if (!Save) {
     Node->Handle = NULL;
   }
 
-  return((EFI_SHELL_FILE_INFO*)NewNode);
+  return ((EFI_SHELL_FILE_INFO *)NewNode);
 }
 
 /**
@@ -1980,70 +2071,75 @@ InternalDuplicateShellFileInfo(
   @return                     a pointer to the newly allocated structure.
 **/
 EFI_SHELL_FILE_INFO *
-CreateAndPopulateShellFileInfo(
-  IN CONST CHAR16 *BasePath,
-  IN CONST EFI_STATUS Status,
-  IN CONST CHAR16 *FileName,
-  IN CONST SHELL_FILE_HANDLE Handle,
-  IN CONST EFI_FILE_INFO *Info
+CreateAndPopulateShellFileInfo (
+  IN CONST CHAR16             *BasePath,
+  IN CONST EFI_STATUS         Status,
+  IN CONST CHAR16             *FileName,
+  IN CONST SHELL_FILE_HANDLE  Handle,
+  IN CONST EFI_FILE_INFO      *Info
   )
 {
-  EFI_SHELL_FILE_INFO *ShellFileListItem;
-  CHAR16              *TempString;
-  UINTN               Size;
+  EFI_SHELL_FILE_INFO  *ShellFileListItem;
+  CHAR16               *TempString;
+  UINTN                Size;
 
   TempString = NULL;
-  Size = 0;
+  Size       = 0;
 
-  ShellFileListItem = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
+  ShellFileListItem = AllocateZeroPool (sizeof (EFI_SHELL_FILE_INFO));
   if (ShellFileListItem == NULL) {
     return (NULL);
   }
-  if (Info != NULL && Info->Size != 0) {
-    ShellFileListItem->Info = AllocateZeroPool((UINTN)Info->Size);
+
+  if ((Info != NULL) && (Info->Size != 0)) {
+    ShellFileListItem->Info = AllocateZeroPool ((UINTN)Info->Size);
     if (ShellFileListItem->Info == NULL) {
-      FreePool(ShellFileListItem);
+      FreePool (ShellFileListItem);
       return (NULL);
     }
-    CopyMem(ShellFileListItem->Info, Info, (UINTN)Info->Size);
+
+    CopyMem (ShellFileListItem->Info, Info, (UINTN)Info->Size);
   } else {
     ShellFileListItem->Info = NULL;
   }
+
   if (FileName != NULL) {
-    ASSERT(TempString == NULL);
-    ShellFileListItem->FileName = StrnCatGrow(&TempString, 0, FileName, 0);
+    ASSERT (TempString == NULL);
+    ShellFileListItem->FileName = StrnCatGrow (&TempString, 0, FileName, 0);
     if (ShellFileListItem->FileName == NULL) {
-      FreePool(ShellFileListItem->Info);
-      FreePool(ShellFileListItem);
+      FreePool (ShellFileListItem->Info);
+      FreePool (ShellFileListItem);
       return (NULL);
     }
   } else {
     ShellFileListItem->FileName = NULL;
   }
-  Size = 0;
+
+  Size       = 0;
   TempString = NULL;
   if (BasePath != NULL) {
-    ASSERT((TempString == NULL && Size == 0) || (TempString != NULL));
-    TempString = StrnCatGrow(&TempString, &Size, BasePath, 0);
+    ASSERT ((TempString == NULL && Size == 0) || (TempString != NULL));
+    TempString = StrnCatGrow (&TempString, &Size, BasePath, 0);
     if (TempString == NULL) {
-      FreePool((VOID*)ShellFileListItem->FileName);
-      SHELL_FREE_NON_NULL(ShellFileListItem->Info);
-      FreePool(ShellFileListItem);
-      return (NULL);
-    }
-  }
-  if (ShellFileListItem->FileName != NULL) {
-    ASSERT((TempString == NULL && Size == 0) || (TempString != NULL));
-    TempString = StrnCatGrow(&TempString, &Size, ShellFileListItem->FileName, 0);
-    if (TempString == NULL) {
-      FreePool((VOID*)ShellFileListItem->FileName);
-      FreePool(ShellFileListItem->Info);
-      FreePool(ShellFileListItem);
+      FreePool ((VOID *)ShellFileListItem->FileName);
+      SHELL_FREE_NON_NULL (ShellFileListItem->Info);
+      FreePool (ShellFileListItem);
       return (NULL);
     }
   }
 
-  TempString = PathCleanUpDirectories(TempString);
+  if (ShellFileListItem->FileName != NULL) {
+    ASSERT ((TempString == NULL && Size == 0) || (TempString != NULL));
+    TempString = StrnCatGrow (&TempString, &Size, ShellFileListItem->FileName, 0);
+    if (TempString == NULL) {
+      FreePool ((VOID *)ShellFileListItem->FileName);
+      FreePool (ShellFileListItem->Info);
+      FreePool (ShellFileListItem);
+      return (NULL);
+    }
+  }
+
+  TempString = PathCleanUpDirectories (TempString);
 
   ShellFileListItem->FullName = TempString;
   ShellFileListItem->Status   = Status;
@@ -2068,48 +2164,50 @@ CreateAndPopulateShellFileInfo(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellFindFilesInDir(
-  IN SHELL_FILE_HANDLE FileDirHandle,
-  OUT EFI_SHELL_FILE_INFO **FileList
+EfiShellFindFilesInDir (
+  IN SHELL_FILE_HANDLE     FileDirHandle,
+  OUT EFI_SHELL_FILE_INFO  **FileList
   )
 {
-  EFI_SHELL_FILE_INFO       *ShellFileList;
-  EFI_SHELL_FILE_INFO       *ShellFileListItem;
-  EFI_FILE_INFO             *FileInfo;
-  EFI_STATUS                Status;
-  BOOLEAN                   NoFile;
-  CHAR16                    *TempString;
-  CHAR16                    *BasePath;
-  UINTN                     Size;
-  CHAR16                    *TempSpot;
+  EFI_SHELL_FILE_INFO  *ShellFileList;
+  EFI_SHELL_FILE_INFO  *ShellFileListItem;
+  EFI_FILE_INFO        *FileInfo;
+  EFI_STATUS           Status;
+  BOOLEAN              NoFile;
+  CHAR16               *TempString;
+  CHAR16               *BasePath;
+  UINTN                Size;
+  CHAR16               *TempSpot;
 
   BasePath = NULL;
-  Status = FileHandleGetFileName(FileDirHandle, &BasePath);
-  if (EFI_ERROR(Status)) {
+  Status   = FileHandleGetFileName (FileDirHandle, &BasePath);
+  if (EFI_ERROR (Status)) {
     return (Status);
   }
 
-  if (ShellFileHandleGetPath(FileDirHandle) != NULL) {
-    TempString        = NULL;
-    Size              = 0;
-    TempString        = StrnCatGrow(&TempString, &Size, ShellFileHandleGetPath(FileDirHandle), 0);
+  if (ShellFileHandleGetPath (FileDirHandle) != NULL) {
+    TempString = NULL;
+    Size       = 0;
+    TempString = StrnCatGrow (&TempString, &Size, ShellFileHandleGetPath (FileDirHandle), 0);
     if (TempString == NULL) {
-      SHELL_FREE_NON_NULL(BasePath);
+      SHELL_FREE_NON_NULL (BasePath);
       return (EFI_OUT_OF_RESOURCES);
     }
-    TempSpot          = StrStr(TempString, L";");
+
+    TempSpot = StrStr (TempString, L";");
 
     if (TempSpot != NULL) {
       *TempSpot = CHAR_NULL;
     }
 
-    TempString        = StrnCatGrow(&TempString, &Size, BasePath, 0);
+    TempString = StrnCatGrow (&TempString, &Size, BasePath, 0);
     if (TempString == NULL) {
-      SHELL_FREE_NON_NULL(BasePath);
+      SHELL_FREE_NON_NULL (BasePath);
       return (EFI_OUT_OF_RESOURCES);
     }
-    SHELL_FREE_NON_NULL(BasePath);
-    BasePath          = TempString;
+
+    SHELL_FREE_NON_NULL (BasePath);
+    BasePath = TempString;
   }
 
   NoFile            = FALSE;
@@ -2118,28 +2216,31 @@ EfiShellFindFilesInDir(
   FileInfo          = NULL;
   Status            = EFI_SUCCESS;
 
-
-  for ( Status = FileHandleFindFirstFile(FileDirHandle, &FileInfo)
-      ; !EFI_ERROR(Status) && !NoFile
-      ; Status = FileHandleFindNextFile(FileDirHandle, FileInfo, &NoFile)
-     ){
+  for ( Status = FileHandleFindFirstFile (FileDirHandle, &FileInfo)
+        ; !EFI_ERROR (Status) && !NoFile
+        ; Status = FileHandleFindNextFile (FileDirHandle, FileInfo, &NoFile)
+        )
+  {
     if (ShellFileList == NULL) {
-      ShellFileList = (EFI_SHELL_FILE_INFO*)AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
+      ShellFileList = (EFI_SHELL_FILE_INFO *)AllocateZeroPool (sizeof (EFI_SHELL_FILE_INFO));
       if (ShellFileList == NULL) {
         SHELL_FREE_NON_NULL (BasePath);
         return EFI_OUT_OF_RESOURCES;
       }
-      InitializeListHead(&ShellFileList->Link);
+
+      InitializeListHead (&ShellFileList->Link);
     }
+
     //
     // allocate a new EFI_SHELL_FILE_INFO and populate it...
     //
-    ShellFileListItem = CreateAndPopulateShellFileInfo(
-      BasePath,
-      EFI_SUCCESS,  // success since we didn't fail to open it...
-      FileInfo->FileName,
-      NULL,         // no handle since not open
-      FileInfo);
+    ShellFileListItem = CreateAndPopulateShellFileInfo (
+                          BasePath,
+                          EFI_SUCCESS, // success since we didn't fail to open it...
+                          FileInfo->FileName,
+                          NULL, // no handle since not open
+                          FileInfo
+                          );
     if (ShellFileListItem == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       //
@@ -2147,16 +2248,19 @@ EfiShellFindFilesInDir(
       //
       break;
     }
-    InsertTailList(&ShellFileList->Link, &ShellFileListItem->Link);
+
+    InsertTailList (&ShellFileList->Link, &ShellFileListItem->Link);
   }
-  if (EFI_ERROR(Status)) {
-    EfiShellFreeFileList(&ShellFileList);
+
+  if (EFI_ERROR (Status)) {
+    EfiShellFreeFileList (&ShellFileList);
     *FileList = NULL;
   } else {
     *FileList = ShellFileList;
   }
-  SHELL_FREE_NON_NULL(BasePath);
-  return(Status);
+
+  SHELL_FREE_NON_NULL (BasePath);
+  return (Status);
 }
 
 /**
@@ -2178,22 +2282,22 @@ EfiShellFindFilesInDir(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellGetGuidFromName(
-  IN  CONST CHAR16   *GuidName,
-  OUT       EFI_GUID *Guid
+EfiShellGetGuidFromName (
+  IN  CONST CHAR16    *GuidName,
+  OUT       EFI_GUID  *Guid
   )
 {
   EFI_GUID    *NewGuid;
   EFI_STATUS  Status;
 
-  if (Guid == NULL || GuidName == NULL) {
+  if ((Guid == NULL) || (GuidName == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
-  Status = GetGuidFromStringName(GuidName, NULL, &NewGuid);
+  Status = GetGuidFromStringName (GuidName, NULL, &NewGuid);
 
-  if (!EFI_ERROR(Status)) {
-    CopyGuid(Guid, NewGuid);
+  if (!EFI_ERROR (Status)) {
+    CopyGuid (Guid, NewGuid);
   }
 
   return (Status);
@@ -2218,29 +2322,27 @@ EfiShellGetGuidFromName(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellGetGuidName(
-  IN  CONST EFI_GUID *Guid,
-  OUT CONST CHAR16   **GuidName
+EfiShellGetGuidName (
+  IN  CONST EFI_GUID  *Guid,
+  OUT CONST CHAR16    **GuidName
   )
 {
-  CHAR16   *Name;
+  CHAR16  *Name;
 
-  if (Guid == NULL || GuidName == NULL) {
+  if ((Guid == NULL) || (GuidName == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
-  Name = GetStringNameFromGuid(Guid, NULL);
-  if (Name == NULL || StrLen(Name) == 0) {
-    SHELL_FREE_NON_NULL(Name);
+  Name = GetStringNameFromGuid (Guid, NULL);
+  if ((Name == NULL) || (StrLen (Name) == 0)) {
+    SHELL_FREE_NON_NULL (Name);
     return (EFI_NOT_FOUND);
   }
 
-  *GuidName = AddBufferToFreeList(Name);
+  *GuidName = AddBufferToFreeList (Name);
 
   return (EFI_SUCCESS);
 }
-
-
 
 /**
   If FileHandle is a directory then the function reads from FileHandle and reads in
@@ -2265,53 +2367,58 @@ EfiShellGetGuidName(
   @retval EFI_OUT_OF_RESOURCES  a memory allocation failed
 **/
 EFI_STATUS
-ShellSearchHandle(
-  IN     CONST CHAR16                         *FilePattern,
-  IN           EFI_UNICODE_COLLATION_PROTOCOL *UnicodeCollation,
-  IN           SHELL_FILE_HANDLE              FileHandle,
-  IN OUT       EFI_SHELL_FILE_INFO            **FileList,
-  IN     CONST EFI_SHELL_FILE_INFO            *ParentNode OPTIONAL,
-  IN     CONST CHAR16                         *MapName
+ShellSearchHandle (
+  IN     CONST CHAR16                          *FilePattern,
+  IN           EFI_UNICODE_COLLATION_PROTOCOL  *UnicodeCollation,
+  IN           SHELL_FILE_HANDLE               FileHandle,
+  IN OUT       EFI_SHELL_FILE_INFO             **FileList,
+  IN     CONST EFI_SHELL_FILE_INFO             *ParentNode OPTIONAL,
+  IN     CONST CHAR16                          *MapName
   )
 {
-  EFI_STATUS          Status;
-  CONST CHAR16        *NextFilePatternStart;
-  CHAR16              *CurrentFilePattern;
-  EFI_SHELL_FILE_INFO *ShellInfo;
-  EFI_SHELL_FILE_INFO *ShellInfoNode;
-  EFI_SHELL_FILE_INFO *NewShellNode;
-  EFI_FILE_INFO       *FileInfo;
-  BOOLEAN             Directory;
-  CHAR16              *NewFullName;
-  UINTN               Size;
+  EFI_STATUS           Status;
+  CONST CHAR16         *NextFilePatternStart;
+  CHAR16               *CurrentFilePattern;
+  EFI_SHELL_FILE_INFO  *ShellInfo;
+  EFI_SHELL_FILE_INFO  *ShellInfoNode;
+  EFI_SHELL_FILE_INFO  *NewShellNode;
+  EFI_FILE_INFO        *FileInfo;
+  BOOLEAN              Directory;
+  CHAR16               *NewFullName;
+  UINTN                Size;
 
-  if ( FilePattern      == NULL
-    || UnicodeCollation == NULL
-    || FileList         == NULL
-   ){
+  if (  (FilePattern      == NULL)
+     || (UnicodeCollation == NULL)
+     || (FileList         == NULL)
+        )
+  {
     return (EFI_INVALID_PARAMETER);
   }
-  ShellInfo = NULL;
+
+  ShellInfo          = NULL;
   CurrentFilePattern = NULL;
 
   if (*FilePattern == L'\\') {
     FilePattern++;
   }
 
-  for( NextFilePatternStart = FilePattern
-     ; *NextFilePatternStart != CHAR_NULL && *NextFilePatternStart != L'\\'
-     ; NextFilePatternStart++);
+  for ( NextFilePatternStart = FilePattern
+        ; *NextFilePatternStart != CHAR_NULL && *NextFilePatternStart != L'\\'
+        ; NextFilePatternStart++)
+  {
+  }
 
-  CurrentFilePattern = AllocateZeroPool((NextFilePatternStart-FilePattern+1)*sizeof(CHAR16));
+  CurrentFilePattern = AllocateZeroPool ((NextFilePatternStart-FilePattern+1)*sizeof (CHAR16));
   if (CurrentFilePattern == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  StrnCpyS(CurrentFilePattern, NextFilePatternStart-FilePattern+1, FilePattern, NextFilePatternStart-FilePattern);
+  StrnCpyS (CurrentFilePattern, NextFilePatternStart-FilePattern+1, FilePattern, NextFilePatternStart-FilePattern);
 
-  if (CurrentFilePattern[0]   == CHAR_NULL
-    &&NextFilePatternStart[0] == CHAR_NULL
-    ){
+  if (  (CurrentFilePattern[0]   == CHAR_NULL)
+     && (NextFilePatternStart[0] == CHAR_NULL)
+        )
+  {
     //
     // we want the parent or root node (if no parent)
     //
@@ -2319,64 +2426,68 @@ ShellSearchHandle(
       //
       // We want the root node.  create the node.
       //
-      FileInfo = FileHandleGetInfo(FileHandle);
-      NewShellNode = CreateAndPopulateShellFileInfo(
-        MapName,
-        EFI_SUCCESS,
-        L"\\",
-        FileHandle,
-        FileInfo
-        );
-      SHELL_FREE_NON_NULL(FileInfo);
+      FileInfo     = FileHandleGetInfo (FileHandle);
+      NewShellNode = CreateAndPopulateShellFileInfo (
+                       MapName,
+                       EFI_SUCCESS,
+                       L"\\",
+                       FileHandle,
+                       FileInfo
+                       );
+      SHELL_FREE_NON_NULL (FileInfo);
     } else {
       //
       // Add the current parameter FileHandle to the list, then end...
       //
-      NewShellNode = InternalDuplicateShellFileInfo((EFI_SHELL_FILE_INFO*)ParentNode, TRUE);
+      NewShellNode = InternalDuplicateShellFileInfo ((EFI_SHELL_FILE_INFO *)ParentNode, TRUE);
     }
+
     if (NewShellNode == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
     } else {
       NewShellNode->Handle = NULL;
       if (*FileList == NULL) {
-        *FileList = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
-        InitializeListHead(&((*FileList)->Link));
+        *FileList = AllocateZeroPool (sizeof (EFI_SHELL_FILE_INFO));
+        InitializeListHead (&((*FileList)->Link));
       }
 
       //
       // Add to the returning to use list
       //
-      InsertTailList(&(*FileList)->Link, &NewShellNode->Link);
+      InsertTailList (&(*FileList)->Link, &NewShellNode->Link);
 
       Status = EFI_SUCCESS;
     }
   } else {
-    Status = EfiShellFindFilesInDir(FileHandle, &ShellInfo);
+    Status = EfiShellFindFilesInDir (FileHandle, &ShellInfo);
 
-    if (!EFI_ERROR(Status)){
-      if (StrStr(NextFilePatternStart, L"\\") != NULL){
+    if (!EFI_ERROR (Status)) {
+      if (StrStr (NextFilePatternStart, L"\\") != NULL) {
         Directory = TRUE;
       } else {
         Directory = FALSE;
       }
-      for ( ShellInfoNode = (EFI_SHELL_FILE_INFO*)GetFirstNode(&ShellInfo->Link)
-          ; !IsNull (&ShellInfo->Link, &ShellInfoNode->Link)
-          ; ShellInfoNode = (EFI_SHELL_FILE_INFO*)GetNextNode(&ShellInfo->Link, &ShellInfoNode->Link)
-         ){
-        if (UnicodeCollation->MetaiMatch(UnicodeCollation, (CHAR16*)ShellInfoNode->FileName, CurrentFilePattern)){
-          if (ShellInfoNode->FullName != NULL && StrStr(ShellInfoNode->FullName, L":") == NULL) {
-            Size = StrSize (ShellInfoNode->FullName) + StrSize (MapName);
-            NewFullName = AllocateZeroPool(Size);
+
+      for ( ShellInfoNode = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ShellInfo->Link)
+            ; !IsNull (&ShellInfo->Link, &ShellInfoNode->Link)
+            ; ShellInfoNode = (EFI_SHELL_FILE_INFO *)GetNextNode (&ShellInfo->Link, &ShellInfoNode->Link)
+            )
+      {
+        if (UnicodeCollation->MetaiMatch (UnicodeCollation, (CHAR16 *)ShellInfoNode->FileName, CurrentFilePattern)) {
+          if ((ShellInfoNode->FullName != NULL) && (StrStr (ShellInfoNode->FullName, L":") == NULL)) {
+            Size        = StrSize (ShellInfoNode->FullName) + StrSize (MapName);
+            NewFullName = AllocateZeroPool (Size);
             if (NewFullName == NULL) {
               Status = EFI_OUT_OF_RESOURCES;
             } else {
-              StrCpyS(NewFullName, Size / sizeof(CHAR16), MapName);
-              StrCatS(NewFullName, Size / sizeof(CHAR16), ShellInfoNode->FullName);
-              FreePool ((VOID *) ShellInfoNode->FullName);
+              StrCpyS (NewFullName, Size / sizeof (CHAR16), MapName);
+              StrCatS (NewFullName, Size / sizeof (CHAR16), ShellInfoNode->FullName);
+              FreePool ((VOID *)ShellInfoNode->FullName);
               ShellInfoNode->FullName = NewFullName;
             }
           }
-          if (Directory && !EFI_ERROR(Status) && ShellInfoNode->FullName != NULL && ShellInfoNode->FileName != NULL){
+
+          if (Directory && !EFI_ERROR (Status) && (ShellInfoNode->FullName != NULL) && (ShellInfoNode->FileName != NULL)) {
             //
             // should be a directory
             //
@@ -2384,15 +2495,17 @@ ShellSearchHandle(
             //
             // don't open the . and .. directories
             //
-            if ( (StrCmp(ShellInfoNode->FileName, L".") != 0)
-              && (StrCmp(ShellInfoNode->FileName, L"..") != 0)
-             ){
+            if (  (StrCmp (ShellInfoNode->FileName, L".") != 0)
+               && (StrCmp (ShellInfoNode->FileName, L"..") != 0)
+                  )
+            {
               //
               //
               //
-              if (EFI_ERROR(Status)) {
+              if (EFI_ERROR (Status)) {
                 break;
               }
+
               //
               // Open the directory since we need that handle in the next recursion.
               //
@@ -2401,11 +2514,11 @@ ShellSearchHandle(
               //
               // recurse with the next part of the pattern
               //
-              Status = ShellSearchHandle(NextFilePatternStart, UnicodeCollation, ShellInfoNode->Handle, FileList, ShellInfoNode, MapName);
-              EfiShellClose(ShellInfoNode->Handle);
+              Status = ShellSearchHandle (NextFilePatternStart, UnicodeCollation, ShellInfoNode->Handle, FileList, ShellInfoNode, MapName);
+              EfiShellClose (ShellInfoNode->Handle);
               ShellInfoNode->Handle = NULL;
             }
-          } else if (!EFI_ERROR(Status)) {
+          } else if (!EFI_ERROR (Status)) {
             //
             // should be a file
             //
@@ -2413,38 +2526,41 @@ ShellSearchHandle(
             //
             // copy the information we need into a new Node
             //
-            NewShellNode = InternalDuplicateShellFileInfo(ShellInfoNode, FALSE);
+            NewShellNode = InternalDuplicateShellFileInfo (ShellInfoNode, FALSE);
             if (NewShellNode == NULL) {
               Status = EFI_OUT_OF_RESOURCES;
             }
+
             if (*FileList == NULL) {
-              *FileList = AllocateZeroPool(sizeof(EFI_SHELL_FILE_INFO));
-              InitializeListHead(&((*FileList)->Link));
+              *FileList = AllocateZeroPool (sizeof (EFI_SHELL_FILE_INFO));
+              InitializeListHead (&((*FileList)->Link));
             }
 
             //
             // Add to the returning to use list
             //
-            InsertTailList(&(*FileList)->Link, &NewShellNode->Link);
+            InsertTailList (&(*FileList)->Link, &NewShellNode->Link);
           }
         }
-        if (EFI_ERROR(Status)) {
+
+        if (EFI_ERROR (Status)) {
           break;
         }
       }
-      if (EFI_ERROR(Status)) {
-        EfiShellFreeFileList(&ShellInfo);
+
+      if (EFI_ERROR (Status)) {
+        EfiShellFreeFileList (&ShellInfo);
       } else {
-        Status = EfiShellFreeFileList(&ShellInfo);
+        Status = EfiShellFreeFileList (&ShellInfo);
       }
     }
   }
 
-  if (*FileList == NULL || (*FileList != NULL && IsListEmpty(&(*FileList)->Link))) {
+  if ((*FileList == NULL) || ((*FileList != NULL) && IsListEmpty (&(*FileList)->Link))) {
     Status = EFI_NOT_FOUND;
   }
 
-  FreePool(CurrentFilePattern);
+  FreePool (CurrentFilePattern);
   return (Status);
 }
 
@@ -2476,65 +2592,71 @@ ShellSearchHandle(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellFindFiles(
-  IN CONST CHAR16 *FilePattern,
-  OUT EFI_SHELL_FILE_INFO **FileList
+EfiShellFindFiles (
+  IN CONST CHAR16          *FilePattern,
+  OUT EFI_SHELL_FILE_INFO  **FileList
   )
 {
-  EFI_STATUS                      Status;
-  CHAR16                          *PatternCopy;
-  CHAR16                          *PatternCurrentLocation;
-  EFI_DEVICE_PATH_PROTOCOL        *RootDevicePath;
-  SHELL_FILE_HANDLE               RootFileHandle;
-  CHAR16                          *MapName;
-  UINTN                           Count;
+  EFI_STATUS                Status;
+  CHAR16                    *PatternCopy;
+  CHAR16                    *PatternCurrentLocation;
+  EFI_DEVICE_PATH_PROTOCOL  *RootDevicePath;
+  SHELL_FILE_HANDLE         RootFileHandle;
+  CHAR16                    *MapName;
+  UINTN                     Count;
 
-  if ( FilePattern      == NULL
-    || FileList         == NULL
-    || StrStr(FilePattern, L":") == NULL
-   ){
+  if (  (FilePattern      == NULL)
+     || (FileList         == NULL)
+     || (StrStr (FilePattern, L":") == NULL)
+        )
+  {
     return (EFI_INVALID_PARAMETER);
   }
-  Status = EFI_SUCCESS;
+
+  Status         = EFI_SUCCESS;
   RootDevicePath = NULL;
   RootFileHandle = NULL;
   MapName        = NULL;
-  PatternCopy = AllocateCopyPool(StrSize(FilePattern), FilePattern);
+  PatternCopy    = AllocateCopyPool (StrSize (FilePattern), FilePattern);
   if (PatternCopy == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
 
-  PatternCopy = PathCleanUpDirectories(PatternCopy);
+  PatternCopy = PathCleanUpDirectories (PatternCopy);
 
-  Count = StrStr(PatternCopy, L":") - PatternCopy + 1;
+  Count = StrStr (PatternCopy, L":") - PatternCopy + 1;
   ASSERT (Count <= StrLen (PatternCopy));
 
-  ASSERT(MapName == NULL);
-  MapName = StrnCatGrow(&MapName, NULL, PatternCopy, Count);
+  ASSERT (MapName == NULL);
+  MapName = StrnCatGrow (&MapName, NULL, PatternCopy, Count);
   if (MapName == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
   } else {
-    RootDevicePath = EfiShellGetDevicePathFromFilePath(PatternCopy);
+    RootDevicePath = EfiShellGetDevicePathFromFilePath (PatternCopy);
     if (RootDevicePath == NULL) {
       Status = EFI_INVALID_PARAMETER;
     } else {
-      Status = EfiShellOpenRoot(RootDevicePath, &RootFileHandle);
-      if (!EFI_ERROR(Status)) {
+      Status = EfiShellOpenRoot (RootDevicePath, &RootFileHandle);
+      if (!EFI_ERROR (Status)) {
         for ( PatternCurrentLocation = PatternCopy
-            ; *PatternCurrentLocation != ':'
-            ; PatternCurrentLocation++);
+              ; *PatternCurrentLocation != ':'
+              ; PatternCurrentLocation++)
+        {
+        }
+
         PatternCurrentLocation++;
-        Status = ShellSearchHandle(PatternCurrentLocation, gUnicodeCollation, RootFileHandle, FileList, NULL, MapName);
-        EfiShellClose(RootFileHandle);
+        Status = ShellSearchHandle (PatternCurrentLocation, gUnicodeCollation, RootFileHandle, FileList, NULL, MapName);
+        EfiShellClose (RootFileHandle);
       }
-      FreePool(RootDevicePath);
+
+      FreePool (RootDevicePath);
     }
   }
 
-  SHELL_FREE_NON_NULL(PatternCopy);
-  SHELL_FREE_NON_NULL(MapName);
+  SHELL_FREE_NON_NULL (PatternCopy);
+  SHELL_FREE_NON_NULL (MapName);
 
-  return(Status);
+  return (Status);
 }
 
 /**
@@ -2554,49 +2676,51 @@ EfiShellFindFiles(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellOpenFileList(
-  IN CHAR16 *Path,
-  IN UINT64 OpenMode,
-  IN OUT EFI_SHELL_FILE_INFO **FileList
+EfiShellOpenFileList (
+  IN CHAR16                   *Path,
+  IN UINT64                   OpenMode,
+  IN OUT EFI_SHELL_FILE_INFO  **FileList
   )
 {
-  EFI_STATUS Status;
-  EFI_SHELL_FILE_INFO *ShellFileListItem;
-  CHAR16              *Path2;
-  UINTN               Path2Size;
-  CONST CHAR16        *CurDir;
-  BOOLEAN             Found;
+  EFI_STATUS           Status;
+  EFI_SHELL_FILE_INFO  *ShellFileListItem;
+  CHAR16               *Path2;
+  UINTN                Path2Size;
+  CONST CHAR16         *CurDir;
+  BOOLEAN              Found;
 
-  PathCleanUpDirectories(Path);
+  PathCleanUpDirectories (Path);
 
-  Path2Size     = 0;
-  Path2         = NULL;
+  Path2Size = 0;
+  Path2     = NULL;
 
-  if (FileList == NULL || *FileList == NULL) {
+  if ((FileList == NULL) || (*FileList == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
-  if (*Path == L'.' && *(Path+1) == L'\\') {
-    Path+=2;
+  if ((*Path == L'.') && (*(Path+1) == L'\\')) {
+    Path += 2;
   }
 
   //
   // convert a local path to an absolute path
   //
-  if (StrStr(Path, L":") == NULL) {
-    CurDir = EfiShellGetCurDir(NULL);
-    ASSERT((Path2 == NULL && Path2Size == 0) || (Path2 != NULL));
-    StrnCatGrow(&Path2, &Path2Size, CurDir, 0);
-    StrnCatGrow(&Path2, &Path2Size, L"\\", 0);
+  if (StrStr (Path, L":") == NULL) {
+    CurDir = EfiShellGetCurDir (NULL);
+    ASSERT ((Path2 == NULL && Path2Size == 0) || (Path2 != NULL));
+    StrnCatGrow (&Path2, &Path2Size, CurDir, 0);
+    StrnCatGrow (&Path2, &Path2Size, L"\\", 0);
     if (*Path == L'\\') {
       Path++;
-      while (PathRemoveLastItem(Path2)) ;
+      while (PathRemoveLastItem (Path2)) {
+      }
     }
-    ASSERT((Path2 == NULL && Path2Size == 0) || (Path2 != NULL));
-    StrnCatGrow(&Path2, &Path2Size, Path, 0);
+
+    ASSERT ((Path2 == NULL && Path2Size == 0) || (Path2 != NULL));
+    StrnCatGrow (&Path2, &Path2Size, Path, 0);
   } else {
-    ASSERT(Path2 == NULL);
-    StrnCatGrow(&Path2, NULL, Path, 0);
+    ASSERT (Path2 == NULL);
+    StrnCatGrow (&Path2, NULL, Path, 0);
   }
 
   PathCleanUpDirectories (Path2);
@@ -2604,11 +2728,11 @@ EfiShellOpenFileList(
   //
   // do the search
   //
-  Status = EfiShellFindFiles(Path2, FileList);
+  Status = EfiShellFindFiles (Path2, FileList);
 
-  FreePool(Path2);
+  FreePool (Path2);
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return (Status);
   }
 
@@ -2616,20 +2740,22 @@ EfiShellOpenFileList(
   //
   // We had no errors so open all the files (that are not already opened...)
   //
-  for ( ShellFileListItem = (EFI_SHELL_FILE_INFO*)GetFirstNode(&(*FileList)->Link)
-      ; !IsNull(&(*FileList)->Link, &ShellFileListItem->Link)
-      ; ShellFileListItem = (EFI_SHELL_FILE_INFO*)GetNextNode(&(*FileList)->Link, &ShellFileListItem->Link)
-     ){
-    if (ShellFileListItem->Status == 0 && ShellFileListItem->Handle == NULL) {
+  for ( ShellFileListItem = (EFI_SHELL_FILE_INFO *)GetFirstNode (&(*FileList)->Link)
+        ; !IsNull (&(*FileList)->Link, &ShellFileListItem->Link)
+        ; ShellFileListItem = (EFI_SHELL_FILE_INFO *)GetNextNode (&(*FileList)->Link, &ShellFileListItem->Link)
+        )
+  {
+    if ((ShellFileListItem->Status == 0) && (ShellFileListItem->Handle == NULL)) {
       ShellFileListItem->Status = EfiShellOpenFileByName (ShellFileListItem->FullName, &ShellFileListItem->Handle, OpenMode);
-      Found = TRUE;
+      Found                     = TRUE;
     }
   }
 
   if (!Found) {
     return (EFI_NOT_FOUND);
   }
-  return(EFI_SUCCESS);
+
+  return (EFI_SUCCESS);
 }
 
 /**
@@ -2656,79 +2782,83 @@ EfiShellOpenFileList(
 **/
 CONST CHAR16 *
 EFIAPI
-EfiShellGetEnvEx(
-  IN  CONST CHAR16 *Name,
-  OUT       UINT32 *Attributes OPTIONAL
+EfiShellGetEnvEx (
+  IN  CONST CHAR16  *Name,
+  OUT       UINT32  *Attributes OPTIONAL
   )
 {
-  EFI_STATUS  Status;
-  VOID        *Buffer;
-  UINTN       Size;
-  ENV_VAR_LIST *Node;
-  CHAR16      *CurrentWriteLocation;
+  EFI_STATUS    Status;
+  VOID          *Buffer;
+  UINTN         Size;
+  ENV_VAR_LIST  *Node;
+  CHAR16        *CurrentWriteLocation;
 
-  Size = 0;
+  Size   = 0;
   Buffer = NULL;
 
   if (Name == NULL) {
-
     //
     // Build the semi-colon delimited list. (2 passes)
     //
-    for ( Node = (ENV_VAR_LIST*)GetFirstNode(&gShellEnvVarList.Link)
-      ; !IsNull(&gShellEnvVarList.Link, &Node->Link)
-      ; Node = (ENV_VAR_LIST*)GetNextNode(&gShellEnvVarList.Link, &Node->Link)
-     ){
-      ASSERT(Node->Key != NULL);
-      Size += StrSize(Node->Key);
+    for ( Node = (ENV_VAR_LIST *)GetFirstNode (&gShellEnvVarList.Link)
+          ; !IsNull (&gShellEnvVarList.Link, &Node->Link)
+          ; Node = (ENV_VAR_LIST *)GetNextNode (&gShellEnvVarList.Link, &Node->Link)
+          )
+    {
+      ASSERT (Node->Key != NULL);
+      Size += StrSize (Node->Key);
     }
 
-    Size += 2*sizeof(CHAR16);
+    Size += 2*sizeof (CHAR16);
 
-    Buffer = AllocateZeroPool(Size);
+    Buffer = AllocateZeroPool (Size);
     if (Buffer == NULL) {
       return (NULL);
     }
-    CurrentWriteLocation = (CHAR16*)Buffer;
 
-    for ( Node = (ENV_VAR_LIST*)GetFirstNode(&gShellEnvVarList.Link)
-      ; !IsNull(&gShellEnvVarList.Link, &Node->Link)
-      ; Node = (ENV_VAR_LIST*)GetNextNode(&gShellEnvVarList.Link, &Node->Link)
-     ){
-      ASSERT(Node->Key != NULL);
-      StrCpyS( CurrentWriteLocation,
-                (Size)/sizeof(CHAR16) - (CurrentWriteLocation - ((CHAR16*)Buffer)),
-                Node->Key
-                );
-      CurrentWriteLocation += StrLen(CurrentWriteLocation) + 1;
+    CurrentWriteLocation = (CHAR16 *)Buffer;
+
+    for ( Node = (ENV_VAR_LIST *)GetFirstNode (&gShellEnvVarList.Link)
+          ; !IsNull (&gShellEnvVarList.Link, &Node->Link)
+          ; Node = (ENV_VAR_LIST *)GetNextNode (&gShellEnvVarList.Link, &Node->Link)
+          )
+    {
+      ASSERT (Node->Key != NULL);
+      StrCpyS (
+        CurrentWriteLocation,
+        (Size)/sizeof (CHAR16) - (CurrentWriteLocation - ((CHAR16 *)Buffer)),
+        Node->Key
+        );
+      CurrentWriteLocation += StrLen (CurrentWriteLocation) + 1;
     }
-
   } else {
     //
     // We are doing a specific environment variable
     //
-    Status = ShellFindEnvVarInList(Name, (CHAR16**)&Buffer, &Size, Attributes);
+    Status = ShellFindEnvVarInList (Name, (CHAR16 **)&Buffer, &Size, Attributes);
 
-    if (EFI_ERROR(Status)){
+    if (EFI_ERROR (Status)) {
       //
       // get the size we need for this EnvVariable
       //
-      Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(Name, Attributes, &Size, Buffer);
+      Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES (Name, Attributes, &Size, Buffer);
       if (Status == EFI_BUFFER_TOO_SMALL) {
         //
         // Allocate the space and recall the get function
         //
-        Buffer = AllocateZeroPool(Size);
-        Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES(Name, Attributes, &Size, Buffer);
+        Buffer = AllocateZeroPool (Size);
+        Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES (Name, Attributes, &Size, Buffer);
       }
+
       //
       // we didn't get it (might not exist)
       // free the memory if we allocated any and return NULL
       //
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         if (Buffer != NULL) {
-          FreePool(Buffer);
+          FreePool (Buffer);
         }
+
         return (NULL);
       } else {
         //
@@ -2746,7 +2876,7 @@ EfiShellGetEnvEx(
   //
   // return the buffer
   //
-  return (AddBufferToFreeList(Buffer));
+  return (AddBufferToFreeList (Buffer));
 }
 
 /**
@@ -2774,11 +2904,11 @@ EfiShellGetEnvEx(
 **/
 CONST CHAR16 *
 EFIAPI
-EfiShellGetEnv(
-  IN CONST CHAR16 *Name
+EfiShellGetEnv (
+  IN CONST CHAR16  *Name
   )
 {
-  return (EfiShellGetEnvEx(Name, NULL));
+  return (EfiShellGetEnvEx (Name, NULL));
 }
 
 /**
@@ -2792,23 +2922,25 @@ EfiShellGetEnv(
   @retval EFI_SUCCESS           The environment variable was successfully updated.
 **/
 EFI_STATUS
-InternalEfiShellSetEnv(
-  IN CONST CHAR16 *Name,
-  IN CONST CHAR16 *Value,
-  IN BOOLEAN Volatile
+InternalEfiShellSetEnv (
+  IN CONST CHAR16  *Name,
+  IN CONST CHAR16  *Value,
+  IN BOOLEAN       Volatile
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS  Status;
 
-  if (Value == NULL || StrLen(Value) == 0) {
-    Status = SHELL_DELETE_ENVIRONMENT_VARIABLE(Name);
-    if (!EFI_ERROR(Status)) {
-      ShellRemvoeEnvVarFromList(Name);
+  if ((Value == NULL) || (StrLen (Value) == 0)) {
+    Status = SHELL_DELETE_ENVIRONMENT_VARIABLE (Name);
+    if (!EFI_ERROR (Status)) {
+      ShellRemvoeEnvVarFromList (Name);
     }
   } else {
-    SHELL_DELETE_ENVIRONMENT_VARIABLE(Name);
-    Status = ShellAddEnvVarToList(
-               Name, Value, StrSize(Value),
+    SHELL_DELETE_ENVIRONMENT_VARIABLE (Name);
+    Status = ShellAddEnvVarToList (
+               Name,
+               Value,
+               StrSize (Value),
                EFI_VARIABLE_BOOTSERVICE_ACCESS | (Volatile ? 0 : EFI_VARIABLE_NON_VOLATILE)
                );
     if (!EFI_ERROR (Status)) {
@@ -2816,10 +2948,11 @@ InternalEfiShellSetEnv(
              ? SHELL_SET_ENVIRONMENT_VARIABLE_V (Name, StrSize (Value) - sizeof (CHAR16), Value)
              : SHELL_SET_ENVIRONMENT_VARIABLE_NV (Name, StrSize (Value) - sizeof (CHAR16), Value);
       if (EFI_ERROR (Status)) {
-        ShellRemvoeEnvVarFromList(Name);
+        ShellRemvoeEnvVarFromList (Name);
       }
     }
   }
+
   return Status;
 }
 
@@ -2846,15 +2979,16 @@ InternalEfiShellSetEnv(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellSetEnv(
-  IN CONST CHAR16 *Name,
-  IN CONST CHAR16 *Value,
-  IN BOOLEAN Volatile
+EfiShellSetEnv (
+  IN CONST CHAR16  *Name,
+  IN CONST CHAR16  *Value,
+  IN BOOLEAN       Volatile
   )
 {
-  if (Name == NULL || *Name == CHAR_NULL) {
+  if ((Name == NULL) || (*Name == CHAR_NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
+
   //
   // Make sure we dont 'set' a predefined read only variable
   //
@@ -2865,11 +2999,13 @@ EfiShellSetEnv(
       (StrCmp (Name, L"uefishellversion") == 0) ||
       (StrCmp (Name, L"uefiversion") == 0) ||
       (!ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoNest &&
-       StrCmp (Name, mNoNestingEnvVarName) == 0)
-     ) {
+       (StrCmp (Name, mNoNestingEnvVarName) == 0))
+      )
+  {
     return (EFI_INVALID_PARAMETER);
   }
-  return (InternalEfiShellSetEnv(Name, Value, Volatile));
+
+  return (InternalEfiShellSetEnv (Name, Value, Volatile));
 }
 
 /**
@@ -2890,30 +3026,32 @@ EfiShellSetEnv(
 **/
 CONST CHAR16 *
 EFIAPI
-EfiShellGetCurDir(
-  IN CONST CHAR16 *FileSystemMapping OPTIONAL
+EfiShellGetCurDir (
+  IN CONST CHAR16  *FileSystemMapping OPTIONAL
   )
 {
-  CHAR16  *PathToReturn;
-  UINTN   Size;
-  SHELL_MAP_LIST *MapListItem;
-  if (!IsListEmpty(&gShellMapList.Link)) {
+  CHAR16          *PathToReturn;
+  UINTN           Size;
+  SHELL_MAP_LIST  *MapListItem;
+
+  if (!IsListEmpty (&gShellMapList.Link)) {
     //
     // if parameter is NULL, use current
     //
     if (FileSystemMapping == NULL) {
-      return (EfiShellGetEnv(L"cwd"));
+      return (EfiShellGetEnv (L"cwd"));
     } else {
-      Size = 0;
+      Size         = 0;
       PathToReturn = NULL;
-      MapListItem = ShellCommandFindMapItem(FileSystemMapping);
+      MapListItem  = ShellCommandFindMapItem (FileSystemMapping);
       if (MapListItem != NULL) {
-        ASSERT((PathToReturn == NULL && Size == 0) || (PathToReturn != NULL));
-        PathToReturn = StrnCatGrow(&PathToReturn, &Size, MapListItem->MapName, 0);
-        PathToReturn = StrnCatGrow(&PathToReturn, &Size, MapListItem->CurrentDirectoryPath, 0);
+        ASSERT ((PathToReturn == NULL && Size == 0) || (PathToReturn != NULL));
+        PathToReturn = StrnCatGrow (&PathToReturn, &Size, MapListItem->MapName, 0);
+        PathToReturn = StrnCatGrow (&PathToReturn, &Size, MapListItem->CurrentDirectoryPath, 0);
       }
     }
-    return (AddBufferToFreeList(PathToReturn));
+
+    return (AddBufferToFreeList (PathToReturn));
   } else {
     return (NULL);
   }
@@ -2948,9 +3086,9 @@ EfiShellGetCurDir(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellSetCurDir(
-  IN CONST CHAR16 *FileSystem OPTIONAL,
-  IN CONST CHAR16 *Dir
+EfiShellSetCurDir (
+  IN CONST CHAR16  *FileSystem OPTIONAL,
+  IN CONST CHAR16  *Dir
   )
 {
   CHAR16          *MapName;
@@ -2967,33 +3105,34 @@ EfiShellSetCurDir(
   TempString    = NULL;
   DirectoryName = NULL;
 
-  if ((FileSystem == NULL && Dir == NULL) || Dir == NULL) {
+  if (((FileSystem == NULL) && (Dir == NULL)) || (Dir == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
-  if (IsListEmpty(&gShellMapList.Link)){
+  if (IsListEmpty (&gShellMapList.Link)) {
     return (EFI_NOT_FOUND);
   }
 
-  DirectoryName = StrnCatGrow(&DirectoryName, NULL, Dir, 0);
-  ASSERT(DirectoryName != NULL);
+  DirectoryName = StrnCatGrow (&DirectoryName, NULL, Dir, 0);
+  ASSERT (DirectoryName != NULL);
 
-  PathCleanUpDirectories(DirectoryName);
+  PathCleanUpDirectories (DirectoryName);
 
   if (FileSystem == NULL) {
     //
     // determine the file system mapping to use
     //
-    if (StrStr(DirectoryName, L":") != NULL) {
-      ASSERT(MapName == NULL);
-      MapName = StrnCatGrow(&MapName, NULL, DirectoryName, (StrStr(DirectoryName, L":")-DirectoryName+1));
+    if (StrStr (DirectoryName, L":") != NULL) {
+      ASSERT (MapName == NULL);
+      MapName = StrnCatGrow (&MapName, NULL, DirectoryName, (StrStr (DirectoryName, L":")-DirectoryName+1));
     }
+
     //
     // find the file system mapping's entry in the list
     // or use current
     //
     if (MapName != NULL) {
-      MapListItem = ShellCommandFindMapItem(MapName);
+      MapListItem = ShellCommandFindMapItem (MapName);
 
       //
       // make that the current file system mapping
@@ -3007,87 +3146,97 @@ EfiShellSetCurDir(
 
     if (MapListItem == NULL) {
       FreePool (DirectoryName);
-      SHELL_FREE_NON_NULL(MapName);
+      SHELL_FREE_NON_NULL (MapName);
       return (EFI_NOT_FOUND);
     }
 
     //
     // now update the MapListItem's current directory
     //
-    if (MapListItem->CurrentDirectoryPath != NULL && DirectoryName[StrLen(DirectoryName) - 1] != L':') {
-      FreePool(MapListItem->CurrentDirectoryPath);
+    if ((MapListItem->CurrentDirectoryPath != NULL) && (DirectoryName[StrLen (DirectoryName) - 1] != L':')) {
+      FreePool (MapListItem->CurrentDirectoryPath);
       MapListItem->CurrentDirectoryPath = NULL;
     }
+
     if (MapName != NULL) {
-      TempLen = StrLen(MapName);
-      if (TempLen != StrLen(DirectoryName)) {
-        ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
-        MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, DirectoryName+StrLen(MapName), 0);
+      TempLen = StrLen (MapName);
+      if (TempLen != StrLen (DirectoryName)) {
+        ASSERT ((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
+        MapListItem->CurrentDirectoryPath = StrnCatGrow (&MapListItem->CurrentDirectoryPath, &Size, DirectoryName+StrLen (MapName), 0);
       }
+
       FreePool (MapName);
     } else {
-      ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
-      MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, DirectoryName, 0);
+      ASSERT ((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
+      MapListItem->CurrentDirectoryPath = StrnCatGrow (&MapListItem->CurrentDirectoryPath, &Size, DirectoryName, 0);
     }
-    if ((MapListItem->CurrentDirectoryPath != NULL && MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] == L'\\') || (MapListItem->CurrentDirectoryPath == NULL)) {
-      ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
+
+    if (((MapListItem->CurrentDirectoryPath != NULL) && (MapListItem->CurrentDirectoryPath[StrLen (MapListItem->CurrentDirectoryPath)-1] == L'\\')) || (MapListItem->CurrentDirectoryPath == NULL)) {
+      ASSERT ((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
       if (MapListItem->CurrentDirectoryPath != NULL) {
-        MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] = CHAR_NULL;
-    }
+        MapListItem->CurrentDirectoryPath[StrLen (MapListItem->CurrentDirectoryPath)-1] = CHAR_NULL;
+      }
     }
   } else {
     //
     // cant have a mapping in the directory...
     //
-    if (StrStr(DirectoryName, L":") != NULL) {
+    if (StrStr (DirectoryName, L":") != NULL) {
       FreePool (DirectoryName);
       return (EFI_INVALID_PARAMETER);
     }
+
     //
     // FileSystem != NULL
     //
-    MapListItem = ShellCommandFindMapItem(FileSystem);
+    MapListItem = ShellCommandFindMapItem (FileSystem);
     if (MapListItem == NULL) {
       FreePool (DirectoryName);
       return (EFI_INVALID_PARAMETER);
     }
-//    gShellCurMapping = MapListItem;
+
+    //    gShellCurMapping = MapListItem;
     if (DirectoryName != NULL) {
       //
       // change current dir on that file system
       //
 
       if (MapListItem->CurrentDirectoryPath != NULL) {
-        FreePool(MapListItem->CurrentDirectoryPath);
-        DEBUG_CODE(MapListItem->CurrentDirectoryPath = NULL;);
+        FreePool (MapListItem->CurrentDirectoryPath);
+        DEBUG_CODE (
+          MapListItem->CurrentDirectoryPath = NULL;
+          );
       }
-//      ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
-//      MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, FileSystem, 0);
-      ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
-      MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, L"\\", 0);
-      ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
-      MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, DirectoryName, 0);
-      if (MapListItem->CurrentDirectoryPath != NULL && MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] == L'\\') {
-        ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
-        MapListItem->CurrentDirectoryPath[StrLen(MapListItem->CurrentDirectoryPath)-1] = CHAR_NULL;
+
+      //      ASSERT((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
+      //      MapListItem->CurrentDirectoryPath = StrnCatGrow(&MapListItem->CurrentDirectoryPath, &Size, FileSystem, 0);
+      ASSERT ((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
+      MapListItem->CurrentDirectoryPath = StrnCatGrow (&MapListItem->CurrentDirectoryPath, &Size, L"\\", 0);
+      ASSERT ((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
+      MapListItem->CurrentDirectoryPath = StrnCatGrow (&MapListItem->CurrentDirectoryPath, &Size, DirectoryName, 0);
+      if ((MapListItem->CurrentDirectoryPath != NULL) && (MapListItem->CurrentDirectoryPath[StrLen (MapListItem->CurrentDirectoryPath)-1] == L'\\')) {
+        ASSERT ((MapListItem->CurrentDirectoryPath == NULL && Size == 0) || (MapListItem->CurrentDirectoryPath != NULL));
+        MapListItem->CurrentDirectoryPath[StrLen (MapListItem->CurrentDirectoryPath)-1] = CHAR_NULL;
       }
     }
   }
+
   FreePool (DirectoryName);
   //
   // if updated the current directory then update the environment variable
   //
   if (MapListItem == gShellCurMapping) {
     Size = 0;
-    ASSERT((TempString == NULL && Size == 0) || (TempString != NULL));
-    StrnCatGrow(&TempString, &Size, MapListItem->MapName, 0);
-    ASSERT((TempString == NULL && Size == 0) || (TempString != NULL));
-    StrnCatGrow(&TempString, &Size, MapListItem->CurrentDirectoryPath, 0);
-    Status =  InternalEfiShellSetEnv(L"cwd", TempString, TRUE);
-    FreePool(TempString);
+    ASSERT ((TempString == NULL && Size == 0) || (TempString != NULL));
+    StrnCatGrow (&TempString, &Size, MapListItem->MapName, 0);
+    ASSERT ((TempString == NULL && Size == 0) || (TempString != NULL));
+    StrnCatGrow (&TempString, &Size, MapListItem->CurrentDirectoryPath, 0);
+    Status =  InternalEfiShellSetEnv (L"cwd", TempString, TRUE);
+    FreePool (TempString);
     return (Status);
   }
-  return(EFI_SUCCESS);
+
+  return (EFI_SUCCESS);
 }
 
 /**
@@ -3117,45 +3266,47 @@ EfiShellSetCurDir(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellGetHelpText(
-  IN CONST CHAR16 *Command,
-  IN CONST CHAR16 *Sections OPTIONAL,
-  OUT CHAR16 **HelpText
+EfiShellGetHelpText (
+  IN CONST CHAR16  *Command,
+  IN CONST CHAR16  *Sections OPTIONAL,
+  OUT CHAR16       **HelpText
   )
 {
   CONST CHAR16  *ManFileName;
   CHAR16        *FixCommand;
   EFI_STATUS    Status;
 
-  ASSERT(HelpText != NULL);
+  ASSERT (HelpText != NULL);
   FixCommand = NULL;
 
-  ManFileName = ShellCommandGetManFileNameHandler(Command);
+  ManFileName = ShellCommandGetManFileNameHandler (Command);
 
   if (ManFileName != NULL) {
-    return (ProcessManFile(ManFileName, Command, Sections, NULL, HelpText));
+    return (ProcessManFile (ManFileName, Command, Sections, NULL, HelpText));
   } else {
-    if ((StrLen(Command)> 4)
-    && (Command[StrLen(Command)-1] == L'i' || Command[StrLen(Command)-1] == L'I')
-    && (Command[StrLen(Command)-2] == L'f' || Command[StrLen(Command)-2] == L'F')
-    && (Command[StrLen(Command)-3] == L'e' || Command[StrLen(Command)-3] == L'E')
-    && (Command[StrLen(Command)-4] == L'.')
-    ) {
-      FixCommand = AllocateZeroPool(StrSize(Command) - 4 * sizeof (CHAR16));
+    if (  (StrLen (Command) > 4)
+       && ((Command[StrLen (Command)-1] == L'i') || (Command[StrLen (Command)-1] == L'I'))
+       && ((Command[StrLen (Command)-2] == L'f') || (Command[StrLen (Command)-2] == L'F'))
+       && ((Command[StrLen (Command)-3] == L'e') || (Command[StrLen (Command)-3] == L'E'))
+       && (Command[StrLen (Command)-4] == L'.')
+          )
+    {
+      FixCommand = AllocateZeroPool (StrSize (Command) - 4 * sizeof (CHAR16));
       if (FixCommand == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
 
-      StrnCpyS( FixCommand,
-                (StrSize(Command) - 4 * sizeof (CHAR16))/sizeof(CHAR16),
-                Command,
-                StrLen(Command)-4
-                );
-      Status = ProcessManFile(FixCommand, FixCommand, Sections, NULL, HelpText);
-      FreePool(FixCommand);
+      StrnCpyS (
+        FixCommand,
+        (StrSize (Command) - 4 * sizeof (CHAR16))/sizeof (CHAR16),
+        Command,
+        StrLen (Command)-4
+        );
+      Status = ProcessManFile (FixCommand, FixCommand, Sections, NULL, HelpText);
+      FreePool (FixCommand);
       return Status;
     } else {
-      return (ProcessManFile(Command, Command, Sections, NULL, HelpText));
+      return (ProcessManFile (Command, Command, Sections, NULL, HelpText));
     }
   }
 }
@@ -3170,11 +3321,11 @@ EfiShellGetHelpText(
 **/
 BOOLEAN
 EFIAPI
-EfiShellGetPageBreak(
+EfiShellGetPageBreak (
   VOID
   )
 {
-  return(ShellInfoObject.PageBreakEnabled);
+  return (ShellInfoObject.PageBreakEnabled);
 }
 
 /**
@@ -3187,11 +3338,11 @@ EfiShellGetPageBreak(
 **/
 BOOLEAN
 EFIAPI
-EfiShellIsRootShell(
+EfiShellIsRootShell (
   VOID
   )
 {
-  return(ShellInfoObject.RootShellInstance);
+  return (ShellInfoObject.RootShellInstance);
 }
 
 /**
@@ -3204,23 +3355,22 @@ EfiShellIsRootShell(
   @return !NULL   a list of all alias'
 **/
 CHAR16 *
-InternalEfiShellGetListAlias(
+InternalEfiShellGetListAlias (
   VOID
   )
 {
-
-  EFI_STATUS        Status;
-  EFI_GUID          Guid;
-  CHAR16            *VariableName;
-  UINTN             NameSize;
-  UINTN             NameBufferSize;
-  CHAR16            *RetVal;
-  UINTN             RetSize;
+  EFI_STATUS  Status;
+  EFI_GUID    Guid;
+  CHAR16      *VariableName;
+  UINTN       NameSize;
+  UINTN       NameBufferSize;
+  CHAR16      *RetVal;
+  UINTN       RetSize;
 
   NameBufferSize = INIT_NAME_BUFFER_SIZE;
-  VariableName  = AllocateZeroPool(NameBufferSize);
-  RetSize       = 0;
-  RetVal        = NULL;
+  VariableName   = AllocateZeroPool (NameBufferSize);
+  RetSize        = 0;
+  RetVal         = NULL;
 
   if (VariableName == NULL) {
     return (NULL);
@@ -3230,37 +3380,38 @@ InternalEfiShellGetListAlias(
 
   while (TRUE) {
     NameSize = NameBufferSize;
-    Status = gRT->GetNextVariableName(&NameSize, VariableName, &Guid);
-    if (Status == EFI_NOT_FOUND){
+    Status   = gRT->GetNextVariableName (&NameSize, VariableName, &Guid);
+    if (Status == EFI_NOT_FOUND) {
       break;
     } else if (Status == EFI_BUFFER_TOO_SMALL) {
       NameBufferSize = NameSize > NameBufferSize * 2 ? NameSize : NameBufferSize * 2;
-      SHELL_FREE_NON_NULL(VariableName);
-      VariableName = AllocateZeroPool(NameBufferSize);
+      SHELL_FREE_NON_NULL (VariableName);
+      VariableName = AllocateZeroPool (NameBufferSize);
       if (VariableName == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
-        SHELL_FREE_NON_NULL(RetVal);
+        SHELL_FREE_NON_NULL (RetVal);
         RetVal = NULL;
         break;
       }
 
       NameSize = NameBufferSize;
-      Status = gRT->GetNextVariableName(&NameSize, VariableName, &Guid);
+      Status   = gRT->GetNextVariableName (&NameSize, VariableName, &Guid);
     }
 
     if (EFI_ERROR (Status)) {
-      SHELL_FREE_NON_NULL(RetVal);
+      SHELL_FREE_NON_NULL (RetVal);
       RetVal = NULL;
       break;
     }
 
-    if (CompareGuid(&Guid, &gShellAliasGuid)){
-      ASSERT((RetVal == NULL && RetSize == 0) || (RetVal != NULL));
-      RetVal = StrnCatGrow(&RetVal, &RetSize, VariableName, 0);
-      RetVal = StrnCatGrow(&RetVal, &RetSize, L";", 0);
+    if (CompareGuid (&Guid, &gShellAliasGuid)) {
+      ASSERT ((RetVal == NULL && RetSize == 0) || (RetVal != NULL));
+      RetVal = StrnCatGrow (&RetVal, &RetSize, VariableName, 0);
+      RetVal = StrnCatGrow (&RetVal, &RetSize, L";", 0);
     } // compare guid
   } // while
-  SHELL_FREE_NON_NULL(VariableName);
+
+  SHELL_FREE_NON_NULL (VariableName);
 
   return (RetVal);
 }
@@ -3275,16 +3426,17 @@ InternalEfiShellGetListAlias(
 **/
 CHAR16 *
 ToLower (
-  CHAR16 *Str
+  CHAR16  *Str
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   for (Index = 0; Str[Index] != L'\0'; Index++) {
-    if (Str[Index] >= L'A' && Str[Index] <= L'Z') {
+    if ((Str[Index] >= L'A') && (Str[Index] <= L'Z')) {
       Str[Index] -= (CHAR16)(L'A' - L'a');
     }
   }
+
   return Str;
 }
 
@@ -3308,9 +3460,9 @@ ToLower (
 **/
 CONST CHAR16 *
 EFIAPI
-EfiShellGetAlias(
-  IN  CONST CHAR16 *Alias,
-  OUT BOOLEAN      *Volatile OPTIONAL
+EfiShellGetAlias (
+  IN  CONST CHAR16  *Alias,
+  OUT BOOLEAN       *Volatile OPTIONAL
   )
 {
   CHAR16      *RetVal;
@@ -3326,27 +3478,32 @@ EfiShellGetAlias(
     if (AliasLower == NULL) {
       return NULL;
     }
+
     ToLower (AliasLower);
 
     if (Volatile == NULL) {
       GetVariable2 (AliasLower, &gShellAliasGuid, (VOID **)&AliasVal, NULL);
-      FreePool(AliasLower);
-      return (AddBufferToFreeList(AliasVal));
+      FreePool (AliasLower);
+      return (AddBufferToFreeList (AliasVal));
     }
+
     RetSize = 0;
-    RetVal = NULL;
-    Status = gRT->GetVariable(AliasLower, &gShellAliasGuid, &Attribs, &RetSize, RetVal);
+    RetVal  = NULL;
+    Status  = gRT->GetVariable (AliasLower, &gShellAliasGuid, &Attribs, &RetSize, RetVal);
     if (Status == EFI_BUFFER_TOO_SMALL) {
-      RetVal = AllocateZeroPool(RetSize);
-      Status = gRT->GetVariable(AliasLower, &gShellAliasGuid, &Attribs, &RetSize, RetVal);
+      RetVal = AllocateZeroPool (RetSize);
+      Status = gRT->GetVariable (AliasLower, &gShellAliasGuid, &Attribs, &RetSize, RetVal);
     }
-    if (EFI_ERROR(Status)) {
+
+    if (EFI_ERROR (Status)) {
       if (RetVal != NULL) {
-        FreePool(RetVal);
+        FreePool (RetVal);
       }
-      FreePool(AliasLower);
+
+      FreePool (AliasLower);
       return (NULL);
     }
+
     if ((EFI_VARIABLE_NON_VOLATILE & Attribs) == EFI_VARIABLE_NON_VOLATILE) {
       *Volatile = FALSE;
     } else {
@@ -3354,9 +3511,10 @@ EfiShellGetAlias(
     }
 
     FreePool (AliasLower);
-    return (AddBufferToFreeList(RetVal));
+    return (AddBufferToFreeList (RetVal));
   }
-  return (AddBufferToFreeList(InternalEfiShellGetListAlias()));
+
+  return (AddBufferToFreeList (InternalEfiShellGetListAlias ()));
 }
 
 /**
@@ -3376,10 +3534,10 @@ EfiShellGetAlias(
   @retval EFI_NOT_FOUND         the Alias intended to be deleted was not found
 **/
 EFI_STATUS
-InternalSetAlias(
-  IN CONST CHAR16 *Command,
-  IN CONST CHAR16 *Alias,
-  IN BOOLEAN Volatile
+InternalSetAlias (
+  IN CONST CHAR16  *Command,
+  IN CONST CHAR16  *Alias,
+  IN BOOLEAN       Volatile
   )
 {
   EFI_STATUS  Status;
@@ -3395,6 +3553,7 @@ InternalSetAlias(
     Alias       = Command;
     DeleteAlias = TRUE;
   }
+
   ASSERT (Alias != NULL);
 
   //
@@ -3404,15 +3563,18 @@ InternalSetAlias(
   if (AliasLower == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   ToLower (AliasLower);
 
   if (DeleteAlias) {
     Status = gRT->SetVariable (AliasLower, &gShellAliasGuid, 0, 0, NULL);
   } else {
     Status = gRT->SetVariable (
-                    AliasLower, &gShellAliasGuid,
+                    AliasLower,
+                    &gShellAliasGuid,
                     EFI_VARIABLE_BOOTSERVICE_ACCESS | (Volatile ? 0 : EFI_VARIABLE_NON_VOLATILE),
-                    StrSize (Command), (VOID *) Command
+                    StrSize (Command),
+                    (VOID *)Command
                     );
   }
 
@@ -3444,36 +3606,36 @@ InternalSetAlias(
 **/
 EFI_STATUS
 EFIAPI
-EfiShellSetAlias(
-  IN CONST CHAR16 *Command,
-  IN CONST CHAR16 *Alias,
-  IN BOOLEAN Replace,
-  IN BOOLEAN Volatile
+EfiShellSetAlias (
+  IN CONST CHAR16  *Command,
+  IN CONST CHAR16  *Alias,
+  IN BOOLEAN       Replace,
+  IN BOOLEAN       Volatile
   )
 {
-  if (ShellCommandIsOnAliasList(Alias==NULL?Command:Alias)) {
+  if (ShellCommandIsOnAliasList ((Alias == NULL) ? Command : Alias)) {
     //
     // cant set over a built in alias
     //
     return (EFI_ACCESS_DENIED);
-  } else if (Command == NULL || *Command == CHAR_NULL || StrLen(Command) == 0) {
+  } else if ((Command == NULL) || (*Command == CHAR_NULL) || (StrLen (Command) == 0)) {
     //
     // Command is null or empty
     //
     return (EFI_INVALID_PARAMETER);
-  } else if (EfiShellGetAlias(Command, NULL) != NULL && !Replace) {
+  } else if ((EfiShellGetAlias (Command, NULL) != NULL) && !Replace) {
     //
     // Alias already exists, Replace not set
     //
     return (EFI_ACCESS_DENIED);
   } else {
-    return (InternalSetAlias(Command, Alias, Volatile));
+    return (InternalSetAlias (Command, Alias, Volatile));
   }
 }
 
 // Pure FILE_HANDLE operations are passed to FileHandleLib
 // these functions are indicated by the *
-EFI_SHELL_PROTOCOL         mShellProtocol = {
+EFI_SHELL_PROTOCOL  mShellProtocol = {
   EfiShellExecute,
   EfiShellGetEnv,
   EfiShellSetEnv,
@@ -3496,21 +3658,21 @@ EFI_SHELL_PROTOCOL         mShellProtocol = {
   EfiShellDisablePageBreak,
   EfiShellGetPageBreak,
   EfiShellGetDeviceName,
-  (EFI_SHELL_GET_FILE_INFO)FileHandleGetInfo,         //*
-  (EFI_SHELL_SET_FILE_INFO)FileHandleSetInfo,         //*
+  (EFI_SHELL_GET_FILE_INFO)FileHandleGetInfo,         // *
+  (EFI_SHELL_SET_FILE_INFO)FileHandleSetInfo,         // *
   EfiShellOpenFileByName,
   EfiShellClose,
   EfiShellCreateFile,
-  (EFI_SHELL_READ_FILE)FileHandleRead,                //*
-  (EFI_SHELL_WRITE_FILE)FileHandleWrite,              //*
-  (EFI_SHELL_DELETE_FILE)FileHandleDelete,            //*
+  (EFI_SHELL_READ_FILE)FileHandleRead,                // *
+  (EFI_SHELL_WRITE_FILE)FileHandleWrite,              // *
+  (EFI_SHELL_DELETE_FILE)FileHandleDelete,            // *
   EfiShellDeleteFileByName,
-  (EFI_SHELL_GET_FILE_POSITION)FileHandleGetPosition, //*
-  (EFI_SHELL_SET_FILE_POSITION)FileHandleSetPosition, //*
-  (EFI_SHELL_FLUSH_FILE)FileHandleFlush,              //*
+  (EFI_SHELL_GET_FILE_POSITION)FileHandleGetPosition, // *
+  (EFI_SHELL_SET_FILE_POSITION)FileHandleSetPosition, // *
+  (EFI_SHELL_FLUSH_FILE)FileHandleFlush,              // *
   EfiShellFindFiles,
   EfiShellFindFilesInDir,
-  (EFI_SHELL_GET_FILE_SIZE)FileHandleGetSize,         //*
+  (EFI_SHELL_GET_FILE_SIZE)FileHandleGetSize,         // *
   EfiShellOpenRoot,
   EfiShellOpenRootByHandle,
   NULL,
@@ -3554,79 +3716,91 @@ CreatePopulateInstallShellProtocol (
     return (EFI_INVALID_PARAMETER);
   }
 
-  BufferSize = 0;
-  Buffer = NULL;
+  BufferSize      = 0;
+  Buffer          = NULL;
   OldProtocolNode = NULL;
-  InitializeListHead(&ShellInfoObject.OldShellList.Link);
+  InitializeListHead (&ShellInfoObject.OldShellList.Link);
 
   //
   // Initialize EfiShellProtocol object...
   //
-  Status = gBS->CreateEvent(0,
-                            0,
-                            NULL,
-                            NULL,
-                            &mShellProtocol.ExecutionBreak);
-  if (EFI_ERROR(Status)) {
+  Status = gBS->CreateEvent (
+                  0,
+                  0,
+                  NULL,
+                  NULL,
+                  &mShellProtocol.ExecutionBreak
+                  );
+  if (EFI_ERROR (Status)) {
     return (Status);
   }
 
   //
   // Get the size of the buffer we need.
   //
-  Status = gBS->LocateHandle(ByProtocol,
-                             &gEfiShellProtocolGuid,
-                             NULL,
-                             &BufferSize,
-                             Buffer);
+  Status = gBS->LocateHandle (
+                  ByProtocol,
+                  &gEfiShellProtocolGuid,
+                  NULL,
+                  &BufferSize,
+                  Buffer
+                  );
   if (Status == EFI_BUFFER_TOO_SMALL) {
     //
     // Allocate and recall with buffer of correct size
     //
-    Buffer = AllocateZeroPool(BufferSize);
+    Buffer = AllocateZeroPool (BufferSize);
     if (Buffer == NULL) {
       return (EFI_OUT_OF_RESOURCES);
     }
-    Status = gBS->LocateHandle(ByProtocol,
-                               &gEfiShellProtocolGuid,
-                               NULL,
-                               &BufferSize,
-                               Buffer);
-    if (EFI_ERROR(Status)) {
-      FreePool(Buffer);
+
+    Status = gBS->LocateHandle (
+                    ByProtocol,
+                    &gEfiShellProtocolGuid,
+                    NULL,
+                    &BufferSize,
+                    Buffer
+                    );
+    if (EFI_ERROR (Status)) {
+      FreePool (Buffer);
       return (Status);
     }
+
     //
     // now overwrite each of them, but save the info to restore when we end.
     //
-    for (HandleCounter = 0 ; HandleCounter < (BufferSize/sizeof(EFI_HANDLE)) ; HandleCounter++) {
-      Status = gBS->OpenProtocol(Buffer[HandleCounter],
-                                &gEfiShellProtocolGuid,
-                                (VOID **) &OldShell,
-                                gImageHandle,
-                                NULL,
-                                EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                               );
-      if (!EFI_ERROR(Status)) {
-        OldProtocolNode = AllocateZeroPool(sizeof(SHELL_PROTOCOL_HANDLE_LIST));
+    for (HandleCounter = 0; HandleCounter < (BufferSize/sizeof (EFI_HANDLE)); HandleCounter++) {
+      Status = gBS->OpenProtocol (
+                      Buffer[HandleCounter],
+                      &gEfiShellProtocolGuid,
+                      (VOID **)&OldShell,
+                      gImageHandle,
+                      NULL,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
+      if (!EFI_ERROR (Status)) {
+        OldProtocolNode = AllocateZeroPool (sizeof (SHELL_PROTOCOL_HANDLE_LIST));
         if (OldProtocolNode == NULL) {
           if (!IsListEmpty (&ShellInfoObject.OldShellList.Link)) {
             CleanUpShellProtocol (&mShellProtocol);
           }
+
           Status = EFI_OUT_OF_RESOURCES;
           break;
         }
+
         //
         // reinstall over the old one...
         //
         OldProtocolNode->Handle    = Buffer[HandleCounter];
         OldProtocolNode->Interface = OldShell;
-        Status = gBS->ReinstallProtocolInterface(
-                            OldProtocolNode->Handle,
-                            &gEfiShellProtocolGuid,
-                            OldProtocolNode->Interface,
-                            (VOID*)(&mShellProtocol));
-        if (!EFI_ERROR(Status)) {
+        Status                     = gBS->ReinstallProtocolInterface (
+                                            OldProtocolNode->Handle,
+                                            &gEfiShellProtocolGuid,
+                                            OldProtocolNode->Interface,
+                                            (VOID *)(&mShellProtocol)
+                                            );
+        if (!EFI_ERROR (Status)) {
           //
           // we reinstalled successfully.  log this so we can reverse it later.
           //
@@ -3634,31 +3808,34 @@ CreatePopulateInstallShellProtocol (
           //
           // add to the list for subsequent...
           //
-          InsertTailList(&ShellInfoObject.OldShellList.Link, &OldProtocolNode->Link);
+          InsertTailList (&ShellInfoObject.OldShellList.Link, &OldProtocolNode->Link);
         }
       }
     }
-    FreePool(Buffer);
+
+    FreePool (Buffer);
   } else if (Status == EFI_NOT_FOUND) {
-    ASSERT(IsListEmpty(&ShellInfoObject.OldShellList.Link));
+    ASSERT (IsListEmpty (&ShellInfoObject.OldShellList.Link));
     //
     // no one else published yet.  just publish it ourselves.
     //
     Status = gBS->InstallProtocolInterface (
-                      &gImageHandle,
-                      &gEfiShellProtocolGuid,
-                      EFI_NATIVE_INTERFACE,
-                      (VOID*)(&mShellProtocol));
+                    &gImageHandle,
+                    &gEfiShellProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    (VOID *)(&mShellProtocol)
+                    );
   }
 
-  if (PcdGetBool(PcdShellSupportOldProtocols)){
-    ///@todo support ShellEnvironment2
-    ///@todo do we need to support ShellEnvironment (not ShellEnvironment2) also?
+  if (PcdGetBool (PcdShellSupportOldProtocols)) {
+    /// @todo support ShellEnvironment2
+    /// @todo do we need to support ShellEnvironment (not ShellEnvironment2) also?
   }
 
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     *NewShell = &mShellProtocol;
   }
+
   return (Status);
 }
 
@@ -3677,16 +3854,17 @@ CleanUpShellProtocol (
   IN OUT EFI_SHELL_PROTOCOL  *NewShell
   )
 {
-  SHELL_PROTOCOL_HANDLE_LIST        *Node2;
+  SHELL_PROTOCOL_HANDLE_LIST  *Node2;
 
   //
   // if we need to restore old protocols...
   //
-  if (!IsListEmpty(&ShellInfoObject.OldShellList.Link)) {
-    for (Node2 = (SHELL_PROTOCOL_HANDLE_LIST *) GetFirstNode (&ShellInfoObject.OldShellList.Link)
+  if (!IsListEmpty (&ShellInfoObject.OldShellList.Link)) {
+    for (Node2 = (SHELL_PROTOCOL_HANDLE_LIST *)GetFirstNode (&ShellInfoObject.OldShellList.Link)
          ; !IsListEmpty (&ShellInfoObject.OldShellList.Link)
-         ; Node2 = (SHELL_PROTOCOL_HANDLE_LIST *) GetFirstNode (&ShellInfoObject.OldShellList.Link)
-         ) {
+         ; Node2 = (SHELL_PROTOCOL_HANDLE_LIST *)GetFirstNode (&ShellInfoObject.OldShellList.Link)
+         )
+    {
       RemoveEntryList (&Node2->Link);
       gBS->ReinstallProtocolInterface (Node2->Handle, &gEfiShellProtocolGuid, NewShell, Node2->Interface);
       FreePool (Node2);
@@ -3697,6 +3875,7 @@ CleanUpShellProtocol (
     //
     gBS->UninstallProtocolInterface (gImageHandle, &gEfiShellProtocolGuid, NewShell);
   }
+
   return EFI_SUCCESS;
 }
 
@@ -3712,32 +3891,34 @@ CleanUpShellEnvironment (
   IN OUT EFI_SHELL_PROTOCOL  *NewShell
   )
 {
-  EFI_STATUS                        Status;
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleEx;
+  EFI_STATUS                         Status;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *SimpleEx;
 
   CleanUpShellProtocol (NewShell);
 
-  Status = gBS->CloseEvent(NewShell->ExecutionBreak);
+  Status                   = gBS->CloseEvent (NewShell->ExecutionBreak);
   NewShell->ExecutionBreak = NULL;
 
-  Status = gBS->OpenProtocol(
-    gST->ConsoleInHandle,
-    &gEfiSimpleTextInputExProtocolGuid,
-    (VOID**)&SimpleEx,
-    gImageHandle,
-    NULL,
-    EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  Status = gBS->OpenProtocol (
+                  gST->ConsoleInHandle,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  (VOID **)&SimpleEx,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
 
   if (!EFI_ERROR (Status)) {
-    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle1);
-    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle2);
-    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle3);
-    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlCNotifyHandle4);
-    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle1);
-    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle2);
-    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle3);
-    Status = SimpleEx->UnregisterKeyNotify(SimpleEx, ShellInfoObject.CtrlSNotifyHandle4);
+    Status = SimpleEx->UnregisterKeyNotify (SimpleEx, ShellInfoObject.CtrlCNotifyHandle1);
+    Status = SimpleEx->UnregisterKeyNotify (SimpleEx, ShellInfoObject.CtrlCNotifyHandle2);
+    Status = SimpleEx->UnregisterKeyNotify (SimpleEx, ShellInfoObject.CtrlCNotifyHandle3);
+    Status = SimpleEx->UnregisterKeyNotify (SimpleEx, ShellInfoObject.CtrlCNotifyHandle4);
+    Status = SimpleEx->UnregisterKeyNotify (SimpleEx, ShellInfoObject.CtrlSNotifyHandle1);
+    Status = SimpleEx->UnregisterKeyNotify (SimpleEx, ShellInfoObject.CtrlSNotifyHandle2);
+    Status = SimpleEx->UnregisterKeyNotify (SimpleEx, ShellInfoObject.CtrlSNotifyHandle3);
+    Status = SimpleEx->UnregisterKeyNotify (SimpleEx, ShellInfoObject.CtrlSNotifyHandle4);
   }
+
   return (Status);
 }
 
@@ -3750,23 +3931,27 @@ CleanUpShellEnvironment (
 **/
 EFI_STATUS
 EFIAPI
-NotificationFunction(
-  IN EFI_KEY_DATA *KeyData
+NotificationFunction (
+  IN EFI_KEY_DATA  *KeyData
   )
 {
-  if ( ((KeyData->Key.UnicodeChar == L'c') &&
-        (KeyData->KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))) ||
+  if (((KeyData->Key.UnicodeChar == L'c') &&
+       ((KeyData->KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED)) || (KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED)))) ||
       (KeyData->Key.UnicodeChar == 3)
-      ){
+      )
+  {
     if (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak == NULL) {
       return (EFI_UNSUPPORTED);
     }
-    return (gBS->SignalEvent(ShellInfoObject.NewEfiShellProtocol->ExecutionBreak));
-  } else if  ((KeyData->Key.UnicodeChar == L's') &&
-              (KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))
-              ){
+
+    return (gBS->SignalEvent (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak));
+  } else if ((KeyData->Key.UnicodeChar == L's') &&
+             ((KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED)) || (KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED)))
+             )
+  {
     ShellInfoObject.HaltOutput = TRUE;
   }
+
   return (EFI_SUCCESS);
 }
 
@@ -3778,28 +3963,30 @@ NotificationFunction(
   @retval EFI_OUT_OF_RESOURCES  There is not enough memory available.
 **/
 EFI_STATUS
-InernalEfiShellStartMonitor(
+InernalEfiShellStartMonitor (
   VOID
   )
 {
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleEx;
-  EFI_KEY_DATA                      KeyData;
-  EFI_STATUS                        Status;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *SimpleEx;
+  EFI_KEY_DATA                       KeyData;
+  EFI_STATUS                         Status;
 
-  Status = gBS->OpenProtocol(
-    gST->ConsoleInHandle,
-    &gEfiSimpleTextInputExProtocolGuid,
-    (VOID**)&SimpleEx,
-    gImageHandle,
-    NULL,
-    EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (EFI_ERROR(Status)) {
-    ShellPrintHiiEx(
+  Status = gBS->OpenProtocol (
+                  gST->ConsoleInHandle,
+                  &gEfiSimpleTextInputExProtocolGuid,
+                  (VOID **)&SimpleEx,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiEx (
       -1,
       -1,
       NULL,
       STRING_TOKEN (STR_SHELL_NO_IN_EX),
-      ShellInfoObject.HiiHandle);
+      ShellInfoObject.HiiHandle
+      );
     return (EFI_SUCCESS);
   }
 
@@ -3812,37 +3999,43 @@ InernalEfiShellStartMonitor(
   KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED;
   KeyData.Key.UnicodeChar         = L'c';
 
-  Status = SimpleEx->RegisterKeyNotify(
-    SimpleEx,
-    &KeyData,
-    NotificationFunction,
-    &ShellInfoObject.CtrlCNotifyHandle1);
+  Status = SimpleEx->RegisterKeyNotify (
+                       SimpleEx,
+                       &KeyData,
+                       NotificationFunction,
+                       &ShellInfoObject.CtrlCNotifyHandle1
+                       );
 
-  KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
-  if (!EFI_ERROR(Status)) {
-    Status = SimpleEx->RegisterKeyNotify(
-      SimpleEx,
-      &KeyData,
-      NotificationFunction,
-      &ShellInfoObject.CtrlCNotifyHandle2);
+  KeyData.KeyState.KeyShiftState = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
+  if (!EFI_ERROR (Status)) {
+    Status = SimpleEx->RegisterKeyNotify (
+                         SimpleEx,
+                         &KeyData,
+                         NotificationFunction,
+                         &ShellInfoObject.CtrlCNotifyHandle2
+                         );
   }
-  KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED;
-  KeyData.Key.UnicodeChar         = 3;
-  if (!EFI_ERROR(Status)) {
-    Status = SimpleEx->RegisterKeyNotify(
-      SimpleEx,
-      &KeyData,
-      NotificationFunction,
-      &ShellInfoObject.CtrlCNotifyHandle3);
+
+  KeyData.KeyState.KeyShiftState = EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED;
+  KeyData.Key.UnicodeChar        = 3;
+  if (!EFI_ERROR (Status)) {
+    Status = SimpleEx->RegisterKeyNotify (
+                         SimpleEx,
+                         &KeyData,
+                         NotificationFunction,
+                         &ShellInfoObject.CtrlCNotifyHandle3
+                         );
   }
-  KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
-  if (!EFI_ERROR(Status)) {
-    Status = SimpleEx->RegisterKeyNotify(
-      SimpleEx,
-      &KeyData,
-      NotificationFunction,
-      &ShellInfoObject.CtrlCNotifyHandle4);
+
+  KeyData.KeyState.KeyShiftState = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
+  if (!EFI_ERROR (Status)) {
+    Status = SimpleEx->RegisterKeyNotify (
+                         SimpleEx,
+                         &KeyData,
+                         NotificationFunction,
+                         &ShellInfoObject.CtrlCNotifyHandle4
+                         );
   }
+
   return (Status);
 }
-

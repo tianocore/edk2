@@ -47,16 +47,16 @@ EFI_EDITOR_FILE_BUFFER  FileBufferConst = {
 //
 // the whole edit area needs to be refreshed
 //
-BOOLEAN          FileBufferNeedRefresh;
+BOOLEAN  FileBufferNeedRefresh;
 
 //
 // only the current line in edit area needs to be refresh
 //
-BOOLEAN                 FileBufferOnlyLineNeedRefresh;
+BOOLEAN  FileBufferOnlyLineNeedRefresh;
 
-BOOLEAN                 FileBufferMouseNeedRefresh;
+BOOLEAN  FileBufferMouseNeedRefresh;
 
-extern BOOLEAN          EditorMouseAction;
+extern BOOLEAN  EditorMouseAction;
 
 /**
   Initialization function for FileBuffer.
@@ -73,7 +73,7 @@ FileBufferInit (
   //
   // basically initialize the FileBuffer
   //
-  CopyMem (&FileBuffer         , &FileBufferConst, sizeof (EFI_EDITOR_FILE_BUFFER));
+  CopyMem (&FileBuffer, &FileBufferConst, sizeof (EFI_EDITOR_FILE_BUFFER));
   CopyMem (&FileBufferBackupVar, &FileBufferConst, sizeof (EFI_EDITOR_FILE_BUFFER));
 
   //
@@ -96,9 +96,9 @@ FileBufferInit (
   FileBuffer.LowVisibleRange.Row    = 2;
   FileBuffer.LowVisibleRange.Column = 1;
 
-  FileBufferNeedRefresh             = FALSE;
-  FileBufferMouseNeedRefresh        = FALSE;
-  FileBufferOnlyLineNeedRefresh     = FALSE;
+  FileBufferNeedRefresh         = FALSE;
+  FileBufferMouseNeedRefresh    = FALSE;
+  FileBufferOnlyLineNeedRefresh = FALSE;
 
   return EFI_SUCCESS;
 }
@@ -121,17 +121,17 @@ FileBufferBackup (
   FileBufferBackupVar.MousePosition = FileBuffer.MousePosition;
 
   SHELL_FREE_NON_NULL (FileBufferBackupVar.FileName);
-  FileBufferBackupVar.FileName        = NULL;
-  FileBufferBackupVar.FileName        = StrnCatGrow (&FileBufferBackupVar.FileName, NULL, FileBuffer.FileName, 0);
+  FileBufferBackupVar.FileName = NULL;
+  FileBufferBackupVar.FileName = StrnCatGrow (&FileBufferBackupVar.FileName, NULL, FileBuffer.FileName, 0);
 
-  FileBufferBackupVar.ModeInsert      = FileBuffer.ModeInsert;
-  FileBufferBackupVar.FileType        = FileBuffer.FileType;
+  FileBufferBackupVar.ModeInsert = FileBuffer.ModeInsert;
+  FileBufferBackupVar.FileType   = FileBuffer.FileType;
 
   FileBufferBackupVar.FilePosition    = FileBuffer.FilePosition;
   FileBufferBackupVar.LowVisibleRange = FileBuffer.LowVisibleRange;
 
-  FileBufferBackupVar.FileModified    = FileBuffer.FileModified;
-  FileBufferBackupVar.ReadOnly        = FileBuffer.ReadOnly;
+  FileBufferBackupVar.FileModified = FileBuffer.FileModified;
+  FileBufferBackupVar.ReadOnly     = FileBuffer.ReadOnly;
 
   return EFI_SUCCESS;
 }
@@ -154,10 +154,10 @@ InternalEditorMiscLineAdvance (
   )
 
 {
-  UINTN                 Index;
-  CONST EFI_EDITOR_LINE *Line;
+  UINTN                  Index;
+  CONST EFI_EDITOR_LINE  *Line;
 
-  if (CurrentLine == NULL || LineList == NULL) {
+  if ((CurrentLine == NULL) || (LineList == NULL)) {
     return NULL;
   }
 
@@ -193,10 +193,10 @@ InternalEditorMiscLineRetreat (
   )
 
 {
-  UINTN                 Index;
-  CONST EFI_EDITOR_LINE *Line;
+  UINTN                  Index;
+  CONST EFI_EDITOR_LINE  *Line;
 
-  if (CurrentLine == NULL || LineList == NULL) {
+  if ((CurrentLine == NULL) || (LineList == NULL)) {
     return NULL;
   }
 
@@ -226,21 +226,21 @@ InternalEditorMiscLineRetreat (
 **/
 EFI_EDITOR_LINE *
 MoveLine (
-  IN CONST INTN Count
+  IN CONST INTN  Count
   )
 {
-  EFI_EDITOR_LINE *Line;
-  UINTN           AbsCount;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            AbsCount;
 
   //
   // if < 0, then retreat
   // if > 0, the advance
   //
   if (Count <= 0) {
-    AbsCount  = (UINTN)ABS(Count);
-    Line      = InternalEditorMiscLineRetreat (AbsCount,MainEditor.FileBuffer->CurrentLine,MainEditor.FileBuffer->ListHead);
+    AbsCount = (UINTN)ABS (Count);
+    Line     = InternalEditorMiscLineRetreat (AbsCount, MainEditor.FileBuffer->CurrentLine, MainEditor.FileBuffer->ListHead);
   } else {
-    Line = InternalEditorMiscLineAdvance ((UINTN)Count,MainEditor.FileBuffer->CurrentLine,MainEditor.FileBuffer->ListHead);
+    Line = InternalEditorMiscLineAdvance ((UINTN)Count, MainEditor.FileBuffer->CurrentLine, MainEditor.FileBuffer->ListHead);
   }
 
   return Line;
@@ -271,20 +271,20 @@ FileBufferRestoreMousePosition (
   Line = NULL;
 
   if (MainEditor.MouseSupported) {
-
     if (FileBufferMouseNeedRefresh) {
-
       FileBufferMouseNeedRefresh = FALSE;
 
       //
       // if mouse position not moved and only mouse action
       // so do not need to refresh mouse position
       //
-      if ((FileBuffer.MousePosition.Row == FileBufferBackupVar.MousePosition.Row &&
-          FileBuffer.MousePosition.Column == FileBufferBackupVar.MousePosition.Column)
-          && EditorMouseAction) {
+      if (  ((FileBuffer.MousePosition.Row == FileBufferBackupVar.MousePosition.Row) &&
+             (FileBuffer.MousePosition.Column == FileBufferBackupVar.MousePosition.Column))
+         && EditorMouseAction)
+      {
         return EFI_SUCCESS;
       }
+
       //
       // backup the old screen attributes
       //
@@ -296,18 +296,18 @@ FileBufferRestoreMousePosition (
       //
       // clear the old mouse position
       //
-      FRow          = FileBuffer.LowVisibleRange.Row + FileBufferBackupVar.MousePosition.Row - 2;
+      FRow = FileBuffer.LowVisibleRange.Row + FileBufferBackupVar.MousePosition.Row - 2;
 
-      FColumn       = FileBuffer.LowVisibleRange.Column + FileBufferBackupVar.MousePosition.Column - 1;
+      FColumn = FileBuffer.LowVisibleRange.Column + FileBufferBackupVar.MousePosition.Column - 1;
 
-      HasCharacter  = TRUE;
+      HasCharacter = TRUE;
       if (FRow > FileBuffer.NumLines) {
         HasCharacter = FALSE;
       } else {
         CurrentLine = FileBuffer.CurrentLine;
         Line        = MoveLine (FRow - FileBuffer.FilePosition.Row);
 
-        if (Line == NULL || FColumn > Line->Size) {
+        if ((Line == NULL) || (FColumn > Line->Size)) {
           HasCharacter = FALSE;
         }
 
@@ -329,6 +329,7 @@ FileBufferRestoreMousePosition (
           Value
           );
       }
+
       //
       // set the new mouse position
       //
@@ -337,17 +338,17 @@ FileBufferRestoreMousePosition (
       //
       // clear the old mouse position
       //
-      FRow          = FileBuffer.LowVisibleRange.Row + FileBuffer.MousePosition.Row - 2;
-      FColumn       = FileBuffer.LowVisibleRange.Column + FileBuffer.MousePosition.Column - 1;
+      FRow    = FileBuffer.LowVisibleRange.Row + FileBuffer.MousePosition.Row - 2;
+      FColumn = FileBuffer.LowVisibleRange.Column + FileBuffer.MousePosition.Column - 1;
 
-      HasCharacter  = TRUE;
+      HasCharacter = TRUE;
       if (FRow > FileBuffer.NumLines) {
         HasCharacter = FALSE;
       } else {
         CurrentLine = FileBuffer.CurrentLine;
         Line        = MoveLine (FRow - FileBuffer.FilePosition.Row);
 
-        if (Line == NULL || FColumn > Line->Size) {
+        if ((Line == NULL) || (FColumn > Line->Size)) {
           HasCharacter = FALSE;
         }
 
@@ -369,15 +370,18 @@ FileBufferRestoreMousePosition (
           Value
           );
       }
+
       //
       // end of HasCharacter
       //
       gST->ConOut->SetAttribute (gST->ConOut, Orig.Data);
     }
+
     //
     // end of MouseNeedRefresh
     //
   }
+
   //
   // end of MouseSupported
   //
@@ -399,19 +403,18 @@ FileBufferFreeLines (
   VOID
   )
 {
-  LIST_ENTRY  *Link;
-  EFI_EDITOR_LINE *Line;
+  LIST_ENTRY       *Link;
+  EFI_EDITOR_LINE  *Line;
 
   //
   // free all the lines
   //
   if (FileBuffer.Lines != NULL) {
-
-    Line  = FileBuffer.Lines;
-    Link  = &(Line->Link);
+    Line = FileBuffer.Lines;
+    Link = &(Line->Link);
     do {
-      Line  = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
-      Link  = Link->ForwardLink;
+      Line = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
+      Link = Link->ForwardLink;
 
       //
       // free line's buffer and line itself
@@ -419,15 +422,16 @@ FileBufferFreeLines (
       LineFree (Line);
     } while (Link != FileBuffer.ListHead);
   }
+
   //
   // clean the line list related structure
   //
-  FileBuffer.Lines            = NULL;
-  FileBuffer.CurrentLine      = NULL;
-  FileBuffer.NumLines         = 0;
+  FileBuffer.Lines       = NULL;
+  FileBuffer.CurrentLine = NULL;
+  FileBuffer.NumLines    = 0;
 
-  FileBuffer.ListHead->ForwardLink  = FileBuffer.ListHead;
-  FileBuffer.ListHead->BackLink  = FileBuffer.ListHead;
+  FileBuffer.ListHead->ForwardLink = FileBuffer.ListHead;
+  FileBuffer.ListHead->BackLink    = FileBuffer.ListHead;
 
   return EFI_SUCCESS;
 }
@@ -456,7 +460,6 @@ FileBufferCleanup (
 
   SHELL_FREE_NON_NULL (FileBufferBackupVar.FileName);
   return Status;
-
 }
 
 /**
@@ -473,7 +476,6 @@ FileBufferPrintLine (
   IN CONST UINTN            Row
   )
 {
-
   CHAR16  *Buffer;
   UINTN   Limit;
   CHAR16  *PrintLine;
@@ -483,17 +485,17 @@ FileBufferPrintLine (
   //
   // print start from correct character
   //
-  Buffer  = Line->Buffer + FileBuffer.LowVisibleRange.Column - 1;
+  Buffer = Line->Buffer + FileBuffer.LowVisibleRange.Column - 1;
 
-  Limit   = Line->Size - FileBuffer.LowVisibleRange.Column + 1;
+  Limit = Line->Size - FileBuffer.LowVisibleRange.Column + 1;
   if (Limit > Line->Size) {
     Limit = 0;
   }
 
-  BufLen = (MainEditor.ScreenSize.Column + 1) * sizeof (CHAR16);
+  BufLen    = (MainEditor.ScreenSize.Column + 1) * sizeof (CHAR16);
   PrintLine = AllocatePool (BufLen);
   if (PrintLine != NULL) {
-    StrnCpyS (PrintLine, BufLen/sizeof(CHAR16), Buffer, MIN(Limit, MainEditor.ScreenSize.Column));
+    StrnCpyS (PrintLine, BufLen/sizeof (CHAR16), Buffer, MIN (Limit, MainEditor.ScreenSize.Column));
     for (Limit = StrLen (PrintLine); Limit < MainEditor.ScreenSize.Column; Limit++) {
       PrintLine[Limit] = L' ';
     }
@@ -502,7 +504,7 @@ FileBufferPrintLine (
 
     PrintLine2 = AllocatePool (BufLen * 2);
     if (PrintLine2 != NULL) {
-      ShellCopySearchAndReplace(PrintLine, PrintLine2, BufLen * 2, L"%", L"^%", FALSE, FALSE);
+      ShellCopySearchAndReplace (PrintLine, PrintLine2, BufLen * 2, L"%", L"^%", FALSE, FALSE);
 
       ShellPrintEx (
         0,
@@ -512,6 +514,7 @@ FileBufferPrintLine (
         );
       FreePool (PrintLine2);
     }
+
     FreePool (PrintLine);
   }
 
@@ -532,10 +535,10 @@ FileBufferRestorePosition (
   // set cursor position
   //
   return (gST->ConOut->SetCursorPosition (
-        gST->ConOut,
-        FileBuffer.DisplayPosition.Column - 1,
-        FileBuffer.DisplayPosition.Row - 1
-        ));
+                         gST->ConOut,
+                         FileBuffer.DisplayPosition.Column - 1,
+                         FileBuffer.DisplayPosition.Row - 1
+                         ));
 }
 
 /**
@@ -549,9 +552,9 @@ FileBufferRefresh (
   VOID
   )
 {
-  LIST_ENTRY  *Link;
-  EFI_EDITOR_LINE *Line;
-  UINTN           Row;
+  LIST_ENTRY       *Link;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            Row;
 
   //
   // if it's the first time after editor launch, so should refresh
@@ -563,10 +566,10 @@ FileBufferRefresh (
     //
     if (!FileBufferNeedRefresh &&
         !FileBufferOnlyLineNeedRefresh &&
-        FileBufferBackupVar.LowVisibleRange.Row == FileBuffer.LowVisibleRange.Row &&
-        FileBufferBackupVar.LowVisibleRange.Column == FileBuffer.LowVisibleRange.Column
-        ) {
-
+        (FileBufferBackupVar.LowVisibleRange.Row == FileBuffer.LowVisibleRange.Row) &&
+        (FileBufferBackupVar.LowVisibleRange.Column == FileBuffer.LowVisibleRange.Column)
+        )
+    {
       FileBufferRestoreMousePosition ();
       FileBufferRestorePosition ();
 
@@ -580,10 +583,10 @@ FileBufferRefresh (
   // only need to refresh current line
   //
   if (FileBufferOnlyLineNeedRefresh &&
-      FileBufferBackupVar.LowVisibleRange.Row == FileBuffer.LowVisibleRange.Row &&
-      FileBufferBackupVar.LowVisibleRange.Column == FileBuffer.LowVisibleRange.Column
-      ) {
-
+      (FileBufferBackupVar.LowVisibleRange.Row == FileBuffer.LowVisibleRange.Row) &&
+      (FileBufferBackupVar.LowVisibleRange.Column == FileBuffer.LowVisibleRange.Column)
+      )
+  {
     EditorClearLine (FileBuffer.DisplayPosition.Row, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row);
     FileBufferPrintLine (
       FileBuffer.CurrentLine,
@@ -604,6 +607,7 @@ FileBufferRefresh (
 
       return EFI_SUCCESS;
     }
+
     //
     // get the first line that will be displayed
     //
@@ -614,8 +618,8 @@ FileBufferRefresh (
       return EFI_LOAD_ERROR;
     }
 
-    Link  = &(Line->Link);
-    Row   = 2;
+    Link = &(Line->Link);
+    Row  = 2;
     do {
       Line = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
 
@@ -627,6 +631,7 @@ FileBufferRefresh (
       Link = Link->ForwardLink;
       Row++;
     } while (Link != FileBuffer.ListHead && Row <= (MainEditor.ScreenSize.Row - 1));
+
     //
     // while not file end and not screen full
     //
@@ -660,7 +665,7 @@ FileBufferCreateLine (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
+  EFI_EDITOR_LINE  *Line;
 
   //
   // allocate a line structure
@@ -669,6 +674,7 @@ FileBufferCreateLine (
   if (Line == NULL) {
     return NULL;
   }
+
   //
   // initialize the structure
   //
@@ -680,7 +686,7 @@ FileBufferCreateLine (
   //
   // initial buffer of the line is "\0"
   //
-  ASSERT(CHAR_NULL == CHAR_NULL);
+  ASSERT (CHAR_NULL == CHAR_NULL);
   Line->Buffer = CatSPrint (NULL, L"\0");
   if (Line->Buffer == NULL) {
     return NULL;
@@ -711,15 +717,16 @@ FileBufferCreateLine (
 **/
 EFI_STATUS
 FileBufferSetFileName (
-  IN CONST CHAR16 *Str
+  IN CONST CHAR16  *Str
   )
 {
   //
   // Verify the parameters
   //
-  if (!IsValidFileName(Str)) {
+  if (!IsValidFileName (Str)) {
     return (EFI_INVALID_PARAMETER);
   }
+
   //
   // free the old file name
   //
@@ -735,6 +742,7 @@ FileBufferSetFileName (
 
   return EFI_SUCCESS;
 }
+
 /**
   Free the existing file lines and reset the modified flag.
 
@@ -754,7 +762,6 @@ FileBufferFree (
   return EFI_SUCCESS;
 }
 
-
 /**
   Read a file from disk into the FileBuffer.
 
@@ -768,24 +775,24 @@ FileBufferFree (
 **/
 EFI_STATUS
 FileBufferRead (
-  IN CONST CHAR16  *FileName,
-  IN CONST BOOLEAN Recover
+  IN CONST CHAR16   *FileName,
+  IN CONST BOOLEAN  Recover
   )
 {
-  EFI_EDITOR_LINE                 *Line;
-  EE_NEWLINE_TYPE                 Type;
-  UINTN                           LoopVar1;
-  UINTN                           LoopVar2;
-  UINTN                           LineSize;
-  VOID                            *Buffer;
-  CHAR16                          *UnicodeBuffer;
-  UINT8                           *AsciiBuffer;
-  UINTN                           FileSize;
-  SHELL_FILE_HANDLE               FileHandle;
-  BOOLEAN                         CreateFile;
-  EFI_STATUS                      Status;
-  UINTN                           LineSizeBackup;
-  EFI_FILE_INFO                   *Info;
+  EFI_EDITOR_LINE    *Line;
+  EE_NEWLINE_TYPE    Type;
+  UINTN              LoopVar1;
+  UINTN              LoopVar2;
+  UINTN              LineSize;
+  VOID               *Buffer;
+  CHAR16             *UnicodeBuffer;
+  UINT8              *AsciiBuffer;
+  UINTN              FileSize;
+  SHELL_FILE_HANDLE  FileHandle;
+  BOOLEAN            CreateFile;
+  EFI_STATUS         Status;
+  UINTN              LineSizeBackup;
+  EFI_FILE_INFO      *Info;
 
   Line          = NULL;
   LoopVar1      = 0;
@@ -809,14 +816,14 @@ FileBufferRead (
   //
   Status = ShellOpenFileByName (FileName, &FileHandle, EFI_FILE_MODE_READ, 0);
 
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     CreateFile = FALSE;
     if (FileHandle == NULL) {
       StatusBarSetStatusString (L"Disk Error");
       return EFI_LOAD_ERROR;
     }
 
-    Info = ShellGetFileInfo(FileHandle);
+    Info = ShellGetFileInfo (FileHandle);
 
     if (Info->Attribute & EFI_FILE_DIRECTORY) {
       StatusBarSetStatusString (L"Directory Can Not Be Edited");
@@ -829,10 +836,11 @@ FileBufferRead (
     } else {
       FileBuffer.ReadOnly = FALSE;
     }
+
     //
     // get file size
     //
-    FileSize = (UINTN) Info->FileSize;
+    FileSize = (UINTN)Info->FileSize;
 
     FreePool (Info);
   } else if (Status == EFI_NOT_FOUND) {
@@ -841,13 +849,14 @@ FileBufferRead (
     //
     Status = ShellOpenFileByName (FileName, &FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
     if (EFI_ERROR (Status)) {
-      if (Status == EFI_WRITE_PROTECTED ||
-          Status == EFI_ACCESS_DENIED ||
-          Status == EFI_NO_MEDIA ||
-          Status == EFI_MEDIA_CHANGED
-          ) {
+      if ((Status == EFI_WRITE_PROTECTED) ||
+          (Status == EFI_ACCESS_DENIED) ||
+          (Status == EFI_NO_MEDIA) ||
+          (Status == EFI_MEDIA_CHANGED)
+          )
+      {
         StatusBarSetStatusString (L"Access Denied");
-      } else if (Status == EFI_DEVICE_ERROR || Status == EFI_VOLUME_CORRUPTED || Status == EFI_VOLUME_FULL) {
+      } else if ((Status == EFI_DEVICE_ERROR) || (Status == EFI_VOLUME_CORRUPTED) || (Status == EFI_VOLUME_FULL)) {
         StatusBarSetStatusString (L"Disk Error");
       } else {
         StatusBarSetStatusString (L"Invalid File Name or Current-working-directory");
@@ -862,12 +871,14 @@ FileBufferRead (
       if (Status == EFI_WARN_DELETE_FAILURE) {
         Status = EFI_ACCESS_DENIED;
       }
+
       FileHandle = NULL;
       if (EFI_ERROR (Status)) {
         StatusBarSetStatusString (L"Access Denied");
         return Status;
       }
     }
+
     //
     // file doesn't exist, so set CreateFile to TRUE
     //
@@ -881,12 +892,13 @@ FileBufferRead (
     if (StrCmp (FileName, FileBuffer.FileName) != 0) {
       FileBufferSetFileName (FileName);
     }
+
     //
     // free the old lines
     //
     FileBufferFree ();
-
   }
+
   //
   // the file exists
   //
@@ -898,17 +910,19 @@ FileBufferRead (
     if (Buffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     //
     // read file into Buffer
     //
     Status = ShellReadFile (FileHandle, &FileSize, Buffer);
-    ShellCloseFile(&FileHandle);
+    ShellCloseFile (&FileHandle);
     FileHandle = NULL;
     if (EFI_ERROR (Status)) {
       StatusBarSetStatusString (L"Read File Failed");
       SHELL_FREE_NON_NULL (Buffer);
       return EFI_LOAD_ERROR;
     }
+
     //
     // nothing in this file
     //
@@ -933,7 +947,7 @@ FileBufferRead (
       //
       // Unicode file
       //
-      if (*(UINT16 *) Buffer == EFI_UNICODE_BYTE_ORDER_MARK) {
+      if (*(UINT16 *)Buffer == EFI_UNICODE_BYTE_ORDER_MARK) {
         //
         // Unicode file's size should be even
         //
@@ -956,10 +970,12 @@ FileBufferRead (
       } else {
         FileBuffer.FileType = FileTypeAscii;
       }
+
       //
       // end of AsciiBuffer ==
       //
     }
+
     //
     // end of FileSize < 2
     // all the check ends
@@ -1038,10 +1054,12 @@ FileBufferRead (
             break;
           }
         }
+
         //
         // endif == ASCII
         //
       }
+
       //
       // end of for LineSize
       //
@@ -1064,6 +1082,7 @@ FileBufferRead (
         SHELL_FREE_NON_NULL (Buffer);
         return EFI_OUT_OF_RESOURCES;
       }
+
       //
       // calculate file length
       //
@@ -1079,53 +1098,58 @@ FileBufferRead (
         RemoveEntryList (&Line->Link);
         return EFI_OUT_OF_RESOURCES;
       }
+
       //
       // copy this line to Line->Buffer
       //
       for (LoopVar2 = 0; LoopVar2 < LineSize; LoopVar2++) {
         if (FileBuffer.FileType == FileTypeAscii) {
-          Line->Buffer[LoopVar2] = (CHAR16) AsciiBuffer[LoopVar1];
+          Line->Buffer[LoopVar2] = (CHAR16)AsciiBuffer[LoopVar1];
         } else {
           Line->Buffer[LoopVar2] = UnicodeBuffer[LoopVar1];
         }
 
         LoopVar1++;
       }
+
       //
       // LoopVar1 now points to where CHAR_CARRIAGE_RETURN or CHAR_LINEFEED;
       //
-      Line->Buffer[LineSize]  = 0;
+      Line->Buffer[LineSize] = 0;
 
-      Line->Size              = LineSize;
-      Line->TotalSize         = LineSize;
-      Line->Type              = Type;
+      Line->Size      = LineSize;
+      Line->TotalSize = LineSize;
+      Line->Type      = Type;
 
-      if (Type == NewLineTypeCarriageReturnLineFeed || Type == NewLineTypeLineFeedCarriageReturn) {
+      if ((Type == NewLineTypeCarriageReturnLineFeed) || (Type == NewLineTypeLineFeedCarriageReturn)) {
         LoopVar1++;
       }
 
       //
       // last character is a return, SO create a new line
       //
-      if (((Type == NewLineTypeCarriageReturnLineFeed || Type == NewLineTypeLineFeedCarriageReturn) && LineSizeBackup == FileSize - 2) ||
-          ((Type == NewLineTypeLineFeed || Type == NewLineTypeCarriageReturn) && LineSizeBackup == FileSize - 1)
-          ) {
+      if ((((Type == NewLineTypeCarriageReturnLineFeed) || (Type == NewLineTypeLineFeedCarriageReturn)) && (LineSizeBackup == FileSize - 2)) ||
+          (((Type == NewLineTypeLineFeed) || (Type == NewLineTypeCarriageReturn)) && (LineSizeBackup == FileSize - 1))
+          )
+      {
         Line = FileBufferCreateLine ();
         if (Line == NULL) {
           SHELL_FREE_NON_NULL (Buffer);
           return EFI_OUT_OF_RESOURCES;
         }
       }
+
       //
       // end of if
       //
     }
+
     //
     // end of LoopVar1
     //
     SHELL_FREE_NON_NULL (Buffer);
-
   }
+
   //
   // end of if CreateFile
   //
@@ -1149,83 +1173,84 @@ Done:
     StatusBarSetStatusString (UnicodeBuffer);
     FreePool (UnicodeBuffer);
   }
-/*
-    //
-    // check whether we have fs?: in filename
-    //
-    LoopVar1             = 0;
-    FSMappingPtr  = NULL;
-    while (FileName[LoopVar1] != 0) {
-      if (FileName[LoopVar1] == L':') {
-        FSMappingPtr = &FileName[LoopVar1];
-        break;
-      }
 
-      LoopVar1++;
-    }
-
-    if (FSMappingPtr == NULL) {
-      CurDir = ShellGetCurrentDir (NULL);
-    } else {
-      LoopVar1 = 0;
-      LoopVar2 = 0;
+  /*
+      //
+      // check whether we have fs?: in filename
+      //
+      LoopVar1             = 0;
+      FSMappingPtr  = NULL;
       while (FileName[LoopVar1] != 0) {
         if (FileName[LoopVar1] == L':') {
+          FSMappingPtr = &FileName[LoopVar1];
           break;
         }
-
-        FSMapping[LoopVar2++] = FileName[LoopVar1];
 
         LoopVar1++;
       }
 
-      FSMapping[LoopVar2]  = 0;
-      CurDir        = ShellGetCurrentDir (FSMapping);
-    }
+      if (FSMappingPtr == NULL) {
+        CurDir = ShellGetCurrentDir (NULL);
+      } else {
+        LoopVar1 = 0;
+        LoopVar2 = 0;
+        while (FileName[LoopVar1] != 0) {
+          if (FileName[LoopVar1] == L':') {
+            break;
+          }
 
-    if (CurDir != NULL) {
-      for (LoopVar1 = 0; LoopVar1 < StrLen (CurDir) && CurDir[LoopVar1] != ':'; LoopVar1++);
+          FSMapping[LoopVar2++] = FileName[LoopVar1];
 
-      CurDir[LoopVar1]   = 0;
-      DevicePath  = (EFI_DEVICE_PATH_PROTOCOL *) ShellGetMap (CurDir);
-      FreePool (CurDir);
-    } else {
-      return EFI_LOAD_ERROR;
-    }
+          LoopVar1++;
+        }
 
-    Status = LibDevicePathToInterface (
-              &gEfiSimpleFileSystemProtocolGuid,
-              DevicePath,
-              (VOID **) &Vol
-              );
-    if (EFI_ERROR (Status)) {
-      return EFI_LOAD_ERROR;
-    }
+        FSMapping[LoopVar2]  = 0;
+        CurDir        = ShellGetCurrentDir (FSMapping);
+      }
 
-    Status = Vol->OpenVolume (Vol, &RootFs);
-    if (EFI_ERROR (Status)) {
-      return EFI_LOAD_ERROR;
-    }
-    //
-    // Get volume information of file system
-    //
-    Size        = SIZE_OF_EFI_FILE_SYSTEM_INFO + 100;
-    VolumeInfo  = (EFI_FILE_SYSTEM_INFO *) AllocateZeroPool (Size);
-    Status      = RootFs->GetInfo (RootFs, &gEfiFileSystemInfoGuid, &Size, VolumeInfo);
-    if (EFI_ERROR (Status)) {
+      if (CurDir != NULL) {
+        for (LoopVar1 = 0; LoopVar1 < StrLen (CurDir) && CurDir[LoopVar1] != ':'; LoopVar1++);
+
+        CurDir[LoopVar1]   = 0;
+        DevicePath  = (EFI_DEVICE_PATH_PROTOCOL *) ShellGetMap (CurDir);
+        FreePool (CurDir);
+      } else {
+        return EFI_LOAD_ERROR;
+      }
+
+      Status = LibDevicePathToInterface (
+                &gEfiSimpleFileSystemProtocolGuid,
+                DevicePath,
+                (VOID **) &Vol
+                );
+      if (EFI_ERROR (Status)) {
+        return EFI_LOAD_ERROR;
+      }
+
+      Status = Vol->OpenVolume (Vol, &RootFs);
+      if (EFI_ERROR (Status)) {
+        return EFI_LOAD_ERROR;
+      }
+      //
+      // Get volume information of file system
+      //
+      Size        = SIZE_OF_EFI_FILE_SYSTEM_INFO + 100;
+      VolumeInfo  = (EFI_FILE_SYSTEM_INFO *) AllocateZeroPool (Size);
+      Status      = RootFs->GetInfo (RootFs, &gEfiFileSystemInfoGuid, &Size, VolumeInfo);
+      if (EFI_ERROR (Status)) {
+        RootFs->Close (RootFs);
+        return EFI_LOAD_ERROR;
+      }
+
+      if (VolumeInfo->ReadOnly) {
+        StatusBarSetStatusString (L"WARNING: Volume Read Only");
+      }
+
+      FreePool (VolumeInfo);
       RootFs->Close (RootFs);
-      return EFI_LOAD_ERROR;
     }
-
-    if (VolumeInfo->ReadOnly) {
-      StatusBarSetStatusString (L"WARNING: Volume Read Only");
-    }
-
-    FreePool (VolumeInfo);
-    RootFs->Close (RootFs);
-  }
-//
-*/
+  //
+  */
   //
   // has line
   //
@@ -1248,7 +1273,6 @@ Done:
   FileBufferOnlyLineNeedRefresh = FALSE;
   FileBufferMouseNeedRefresh    = TRUE;
 
-
   return EFI_SUCCESS;
 }
 
@@ -1262,12 +1286,12 @@ Done:
 **/
 VOID
 GetNewLine (
-  IN CONST EE_NEWLINE_TYPE Type,
-  OUT CHAR8           *Buffer,
-  OUT UINT8           *Size
+  IN CONST EE_NEWLINE_TYPE  Type,
+  OUT CHAR8                 *Buffer,
+  OUT UINT8                 *Size
   )
 {
-  UINT8 NewLineSize;
+  UINT8  NewLineSize;
 
   //
   // give new line buffer,
@@ -1278,10 +1302,11 @@ GetNewLine (
   //
   // not legal new line type
   //
-  if (Type != NewLineTypeLineFeed && Type != NewLineTypeCarriageReturn && Type != NewLineTypeCarriageReturnLineFeed && Type != NewLineTypeLineFeedCarriageReturn) {
+  if ((Type != NewLineTypeLineFeed) && (Type != NewLineTypeCarriageReturn) && (Type != NewLineTypeCarriageReturnLineFeed) && (Type != NewLineTypeLineFeedCarriageReturn)) {
     *Size = 0;
-    return ;
+    return;
   }
+
   //
   // use_cr: give 0x0d
   //
@@ -1296,8 +1321,9 @@ GetNewLine (
     }
 
     *Size = NewLineSize;
-    return ;
+    return;
   }
+
   //
   // use_lf: give 0x0a
   //
@@ -1312,17 +1338,18 @@ GetNewLine (
     }
 
     *Size = NewLineSize;
-    return ;
+    return;
   }
+
   //
   // use_crlf: give 0x0d 0x0a
   //
   if (Type == NewLineTypeCarriageReturnLineFeed) {
     if (MainEditor.FileBuffer->FileType == FileTypeUnicode) {
-      Buffer[0]   = 0x0d;
-      Buffer[1]   = 0;
-      Buffer[2]   = 0x0a;
-      Buffer[3]   = 0;
+      Buffer[0] = 0x0d;
+      Buffer[1] = 0;
+      Buffer[2] = 0x0a;
+      Buffer[3] = 0;
 
       NewLineSize = 4;
     } else {
@@ -1332,17 +1359,18 @@ GetNewLine (
     }
 
     *Size = NewLineSize;
-    return ;
+    return;
   }
+
   //
   // use_lfcr: give 0x0a 0x0d
   //
   if (Type == NewLineTypeLineFeedCarriageReturn) {
     if (MainEditor.FileBuffer->FileType == FileTypeUnicode) {
-      Buffer[0]   = 0x0a;
-      Buffer[1]   = 0;
-      Buffer[2]   = 0x0d;
-      Buffer[3]   = 0;
+      Buffer[0] = 0x0a;
+      Buffer[1] = 0;
+      Buffer[2] = 0x0d;
+      Buffer[3] = 0;
 
       NewLineSize = 4;
     } else {
@@ -1352,9 +1380,8 @@ GetNewLine (
     }
 
     *Size = NewLineSize;
-    return ;
+    return;
   }
-
 }
 
 /**
@@ -1368,18 +1395,18 @@ GetNewLine (
 **/
 UINTN
 UnicodeToAscii (
-  IN CONST CHAR16   *UStr,
-  IN CONST UINTN    Length,
-  OUT CHAR8         *AStr
+  IN CONST CHAR16  *UStr,
+  IN CONST UINTN   Length,
+  OUT CHAR8        *AStr
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   //
   // just buffer copy, not character copy
   //
   for (Index = 0; Index < Length; Index++) {
-    *AStr++ = (CHAR8) *UStr++;
+    *AStr++ = (CHAR8)*UStr++;
   }
 
   return Index;
@@ -1396,36 +1423,36 @@ UnicodeToAscii (
 **/
 EFI_STATUS
 FileBufferSave (
-  IN CONST CHAR16 *FileName
+  IN CONST CHAR16  *FileName
   )
 {
-  SHELL_FILE_HANDLE FileHandle;
-  LIST_ENTRY        *Link;
-  EFI_EDITOR_LINE   *Line;
-  CHAR16            *Str;
+  SHELL_FILE_HANDLE  FileHandle;
+  LIST_ENTRY         *Link;
+  EFI_EDITOR_LINE    *Line;
+  CHAR16             *Str;
 
-  EFI_STATUS        Status;
-  UINTN             Length;
-  UINTN             NumLines;
-  CHAR8             NewLineBuffer[4];
-  UINT8             NewLineSize;
+  EFI_STATUS  Status;
+  UINTN       Length;
+  UINTN       NumLines;
+  CHAR8       NewLineBuffer[4];
+  UINT8       NewLineSize;
 
-  EFI_FILE_INFO     *Info;
+  EFI_FILE_INFO  *Info;
 
-  UINT64            Attribute;
+  UINT64  Attribute;
 
-  EE_NEWLINE_TYPE   Type;
+  EE_NEWLINE_TYPE  Type;
 
-  UINTN             TotalSize;
+  UINTN  TotalSize;
   //
   // 2M
   //
-  CHAR8             *Cache;
-  UINTN             LeftSize;
-  UINTN             Size;
-  CHAR8             *Ptr;
+  CHAR8  *Cache;
+  UINTN  LeftSize;
+  UINTN  Size;
+  CHAR8  *Ptr;
 
-  Length    = 0;
+  Length = 0;
   //
   // 2M
   //
@@ -1433,12 +1460,10 @@ FileBufferSave (
 
   Attribute = 0;
 
-
-
   //
   // if is the old file
   //
-  if (FileBuffer.FileName != NULL && StrCmp (FileName, FileBuffer.FileName) == 0) {
+  if ((FileBuffer.FileName != NULL) && (StrCmp (FileName, FileBuffer.FileName) == 0)) {
     //
     // file has not been modified
     //
@@ -1458,29 +1483,29 @@ FileBufferSave (
   Status = ShellOpenFileByName (FileName, &FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, 0);
 
   if (!EFI_ERROR (Status)) {
-    Info = ShellGetFileInfo(FileHandle);
+    Info = ShellGetFileInfo (FileHandle);
 
-    if (Info != NULL && Info->Attribute & EFI_FILE_DIRECTORY) {
+    if ((Info != NULL) && Info->Attribute & EFI_FILE_DIRECTORY) {
       StatusBarSetStatusString (L"Directory Can Not Be Saved");
       ShellCloseFile (&FileHandle);
-      FreePool(Info);
+      FreePool (Info);
       return EFI_LOAD_ERROR;
     }
 
     if (Info != NULL) {
       Attribute = Info->Attribute & ~EFI_FILE_READ_ONLY;
-      FreePool(Info);
+      FreePool (Info);
     }
 
     //
     // if file exits, so delete it
     //
     Status = ShellDeleteFile (&FileHandle);
-    if (EFI_ERROR (Status) || Status == EFI_WARN_DELETE_FAILURE) {
+    if (EFI_ERROR (Status) || (Status == EFI_WARN_DELETE_FAILURE)) {
       StatusBarSetStatusString (L"Write File Failed");
       return EFI_LOAD_ERROR;
     }
- }
+  }
 
   Status = ShellOpenFileByName (FileName, &FileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, Attribute);
 
@@ -1493,8 +1518,8 @@ FileBufferSave (
   // if file is Unicode file, write Unicode header to it.
   //
   if (FileBuffer.FileType == FileTypeUnicode) {
-    Length  = 2;
-    Status  = ShellWriteFile (FileHandle, &Length, (VOID*)&gUnicodeFileTag);
+    Length = 2;
+    Status = ShellWriteFile (FileHandle, &Length, (VOID *)&gUnicodeFileTag);
     if (EFI_ERROR (Status)) {
       ShellDeleteFile (&FileHandle);
       return EFI_LOAD_ERROR;
@@ -1510,11 +1535,11 @@ FileBufferSave (
   //
   // write all the lines back to disk
   //
-  NumLines  = 0;
-  Type      = NewLineTypeCarriageReturnLineFeed;
+  NumLines = 0;
+  Type     = NewLineTypeCarriageReturnLineFeed;
 
-  Ptr       = Cache;
-  LeftSize  = TotalSize;
+  Ptr      = Cache;
+  LeftSize = TotalSize;
 
   for (Link = FileBuffer.ListHead->ForwardLink; Link != FileBuffer.ListHead; Link = Link->ForwardLink) {
     Line = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
@@ -1522,16 +1547,18 @@ FileBufferSave (
     if (Line->Type != NewLineTypeDefault) {
       Type = Line->Type;
     }
+
     //
     // newline character is at most 4 bytes ( two Unicode characters )
     //
     Length = 4;
-    if (Line->Buffer != NULL && Line->Size != 0) {
+    if ((Line->Buffer != NULL) && (Line->Size != 0)) {
       if (FileBuffer.FileType == FileTypeAscii) {
         Length += Line->Size;
       } else {
         Length += (Line->Size * 2);
       }
+
       //
       // end if FileTypeAscii
       //
@@ -1541,32 +1568,34 @@ FileBufferSave (
     // no cache room left, so write cache to disk
     //
     if (LeftSize < Length) {
-      Size    = TotalSize - LeftSize;
-      Status  = ShellWriteFile (FileHandle, &Size, Cache);
+      Size   = TotalSize - LeftSize;
+      Status = ShellWriteFile (FileHandle, &Size, Cache);
       if (EFI_ERROR (Status)) {
         ShellDeleteFile (&FileHandle);
         FreePool (Cache);
         return EFI_LOAD_ERROR;
       }
-      Ptr       = Cache;
-      LeftSize  = TotalSize;
+
+      Ptr      = Cache;
+      LeftSize = TotalSize;
     }
 
-    if (Line->Buffer != NULL && Line->Size != 0) {
+    if ((Line->Buffer != NULL) && (Line->Size != 0)) {
       if (FileBuffer.FileType == FileTypeAscii) {
         UnicodeToAscii (Line->Buffer, Line->Size, Ptr);
         Length = Line->Size;
       } else {
         Length = (Line->Size * 2);
-        CopyMem (Ptr, (CHAR8 *) Line->Buffer, Length);
+        CopyMem (Ptr, (CHAR8 *)Line->Buffer, Length);
       }
+
       //
       // end if FileTypeAscii
       //
-      Ptr += Length;
+      Ptr      += Length;
       LeftSize -= Length;
-
     }
+
     //
     // end of if Line -> Buffer != NULL && Line -> Size != 0
     //
@@ -1574,9 +1603,9 @@ FileBufferSave (
     //
     if (Link->ForwardLink != FileBuffer.ListHead) {
       GetNewLine (Type, NewLineBuffer, &NewLineSize);
-      CopyMem (Ptr, (CHAR8 *) NewLineBuffer, NewLineSize);
+      CopyMem (Ptr, (CHAR8 *)NewLineBuffer, NewLineSize);
 
-      Ptr += NewLineSize;
+      Ptr      += NewLineSize;
       LeftSize -= NewLineSize;
     }
 
@@ -1584,8 +1613,8 @@ FileBufferSave (
   }
 
   if (TotalSize != LeftSize) {
-    Size    = TotalSize - LeftSize;
-    Status  = ShellWriteFile (FileHandle, &Size, Cache);
+    Size   = TotalSize - LeftSize;
+    Status = ShellWriteFile (FileHandle, &Size, Cache);
     if (EFI_ERROR (Status)) {
       ShellDeleteFile (&FileHandle);
       FreePool (Cache);
@@ -1595,7 +1624,7 @@ FileBufferSave (
 
   FreePool (Cache);
 
-  ShellCloseFile(&FileHandle);
+  ShellCloseFile (&FileHandle);
 
   FileBuffer.FileModified = FALSE;
 
@@ -1613,7 +1642,7 @@ FileBufferSave (
   //
   // now everything is ready , you can set the new file name to filebuffer
   //
-  if (FileName != NULL && FileBuffer.FileName != NULL && StrCmp (FileName, FileBuffer.FileName) != 0) {
+  if ((FileName != NULL) && (FileBuffer.FileName != NULL) && (StrCmp (FileName, FileBuffer.FileName) != 0)) {
     //
     // not the same
     //
@@ -1638,14 +1667,14 @@ FileBufferScrollLeft (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  UINTN           FRow;
-  UINTN           FCol;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            FRow;
+  UINTN            FCol;
 
-  Line  = FileBuffer.CurrentLine;
+  Line = FileBuffer.CurrentLine;
 
-  FRow  = FileBuffer.FilePosition.Row;
-  FCol  = FileBuffer.FilePosition.Column;
+  FRow = FileBuffer.FilePosition.Row;
+  FCol = FileBuffer.FilePosition.Column;
 
   //
   // if already at start of this line, so move to the end of previous line
@@ -1656,8 +1685,8 @@ FileBufferScrollLeft (
     //
     if (Line->Link.BackLink != FileBuffer.ListHead) {
       FRow--;
-      Line  = CR (Line->Link.BackLink, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
-      FCol  = Line->Size + 1;
+      Line = CR (Line->Link.BackLink, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
+      FCol = Line->Size + 1;
     } else {
       return EFI_SUCCESS;
     }
@@ -1681,11 +1710,11 @@ FileBufferScrollLeft (
 **/
 VOID
 LineDeleteAt (
-  IN  OUT EFI_EDITOR_LINE       *Line,
-  IN      UINTN                 Pos
+  IN  OUT EFI_EDITOR_LINE  *Line,
+  IN      UINTN            Pos
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   //
   // move the latter characters front
@@ -1705,16 +1734,16 @@ LineDeleteAt (
 **/
 VOID
 LineCat (
-  IN  OUT EFI_EDITOR_LINE *Dest,
-  IN      EFI_EDITOR_LINE *Src
+  IN  OUT EFI_EDITOR_LINE  *Dest,
+  IN      EFI_EDITOR_LINE  *Src
   )
 {
   CHAR16  *Str;
   UINTN   Size;
 
-  Size                = Dest->Size;
+  Size = Dest->Size;
 
-  Dest->Buffer[Size]  = 0;
+  Dest->Buffer[Size] = 0;
 
   //
   // concatenate the two strings
@@ -1722,7 +1751,7 @@ LineCat (
   Str = CatSPrint (NULL, L"%s%s", Dest->Buffer, Src->Buffer);
   if (Str == NULL) {
     Dest->Buffer = NULL;
-    return ;
+    return;
   }
 
   Dest->Size      = Size + Src->Size;
@@ -1748,14 +1777,14 @@ FileBufferDoBackspace (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  EFI_EDITOR_LINE *End;
-  LIST_ENTRY  *Link;
-  UINTN           FileColumn;
+  EFI_EDITOR_LINE  *Line;
+  EFI_EDITOR_LINE  *End;
+  LIST_ENTRY       *Link;
+  UINTN            FileColumn;
 
-  FileColumn  = FileBuffer.FilePosition.Column;
+  FileColumn = FileBuffer.FilePosition.Column;
 
-  Line        = FileBuffer.CurrentLine;
+  Line = FileBuffer.CurrentLine;
 
   //
   // the first column
@@ -1770,9 +1799,9 @@ FileBufferDoBackspace (
 
     FileBufferScrollLeft ();
 
-    Line  = FileBuffer.CurrentLine;
-    Link  = Line->Link.ForwardLink;
-    End   = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
+    Line = FileBuffer.CurrentLine;
+    Link = Line->Link.ForwardLink;
+    End  = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
 
     //
     // concatenate this line with previous line
@@ -1781,6 +1810,7 @@ FileBufferDoBackspace (
     if (Line->Buffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     //
     // remove End from line list
     //
@@ -1791,7 +1821,6 @@ FileBufferDoBackspace (
 
     FileBufferNeedRefresh         = TRUE;
     FileBufferOnlyLineNeedRefresh = FALSE;
-
   } else {
     //
     // just delete the previous character
@@ -1819,30 +1848,30 @@ FileBufferDoReturn (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  EFI_EDITOR_LINE *NewLine;
-  UINTN           FileColumn;
-  UINTN           Index;
-  CHAR16          *Buffer;
-  UINTN           Row;
-  UINTN           Col;
+  EFI_EDITOR_LINE  *Line;
+  EFI_EDITOR_LINE  *NewLine;
+  UINTN            FileColumn;
+  UINTN            Index;
+  CHAR16           *Buffer;
+  UINTN            Row;
+  UINTN            Col;
 
   FileBufferNeedRefresh         = TRUE;
   FileBufferOnlyLineNeedRefresh = FALSE;
 
-  Line                          = FileBuffer.CurrentLine;
+  Line = FileBuffer.CurrentLine;
 
-  FileColumn                    = FileBuffer.FilePosition.Column;
+  FileColumn = FileBuffer.FilePosition.Column;
 
-  NewLine                       = AllocateZeroPool (sizeof (EFI_EDITOR_LINE));
+  NewLine = AllocateZeroPool (sizeof (EFI_EDITOR_LINE));
   if (NewLine == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NewLine->Signature  = LINE_LIST_SIGNATURE;
-  NewLine->Size       = Line->Size - FileColumn + 1;
-  NewLine->TotalSize  = NewLine->Size;
-  NewLine->Buffer     = CatSPrint (NULL, L"\0");
+  NewLine->Signature = LINE_LIST_SIGNATURE;
+  NewLine->Size      = Line->Size - FileColumn + 1;
+  NewLine->TotalSize = NewLine->Size;
+  NewLine->Buffer    = CatSPrint (NULL, L"\0");
   if (NewLine->Buffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1868,11 +1897,12 @@ FileBufferDoReturn (
       NewLine->Buffer[Index] = Line->Buffer[Index + FileColumn - 1];
     }
 
-    NewLine->Buffer[NewLine->Size]  = CHAR_NULL;
+    NewLine->Buffer[NewLine->Size] = CHAR_NULL;
 
-    Line->Buffer[FileColumn - 1]    = CHAR_NULL;
-    Line->Size                      = FileColumn - 1;
+    Line->Buffer[FileColumn - 1] = CHAR_NULL;
+    Line->Size                   = FileColumn - 1;
   }
+
   //
   // increase NumLines
   //
@@ -1881,10 +1911,10 @@ FileBufferDoReturn (
   //
   // insert it into the correct position of line list
   //
-  NewLine->Link.BackLink     = &(Line->Link);
-  NewLine->Link.ForwardLink     = Line->Link.ForwardLink;
+  NewLine->Link.BackLink           = &(Line->Link);
+  NewLine->Link.ForwardLink        = Line->Link.ForwardLink;
   Line->Link.ForwardLink->BackLink = &(NewLine->Link);
-  Line->Link.ForwardLink        = &(NewLine->Link);
+  Line->Link.ForwardLink           = &(NewLine->Link);
 
   //
   // move cursor to the start of next line
@@ -1915,13 +1945,13 @@ FileBufferDoDelete (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  EFI_EDITOR_LINE *Next;
-  LIST_ENTRY  *Link;
-  UINTN           FileColumn;
+  EFI_EDITOR_LINE  *Line;
+  EFI_EDITOR_LINE  *Next;
+  LIST_ENTRY       *Link;
+  UINTN            FileColumn;
 
-  Line        = FileBuffer.CurrentLine;
-  FileColumn  = FileBuffer.FilePosition.Column;
+  Line       = FileBuffer.CurrentLine;
+  FileColumn = FileBuffer.FilePosition.Column;
 
   //
   // the last column
@@ -1933,12 +1963,13 @@ FileBufferDoDelete (
     if (Line->Link.ForwardLink == FileBuffer.ListHead) {
       return EFI_SUCCESS;
     }
+
     //
     // since last character,
     // so will add the next line to this line
     //
-    Link  = Line->Link.ForwardLink;
-    Next  = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
+    Link = Line->Link.ForwardLink;
+    Next = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
     LineCat (Line, Next);
     if (Line->Buffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -1951,7 +1982,6 @@ FileBufferDoDelete (
 
     FileBufferNeedRefresh         = TRUE;
     FileBufferOnlyLineNeedRefresh = FALSE;
-
   } else {
     //
     // just delete current character
@@ -1977,17 +2007,17 @@ FileBufferScrollRight (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  UINTN           FRow;
-  UINTN           FCol;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            FRow;
+  UINTN            FCol;
 
   Line = FileBuffer.CurrentLine;
   if (Line->Buffer == NULL) {
     return EFI_SUCCESS;
   }
 
-  FRow  = FileBuffer.FilePosition.Row;
-  FCol  = FileBuffer.FilePosition.Column;
+  FRow = FileBuffer.FilePosition.Row;
+  FCol = FileBuffer.FilePosition.Column;
 
   //
   // if already at end of this line, scroll it to the start of next line
@@ -2039,7 +2069,7 @@ LineStrInsert (
 
   Index = (StrSize) * 2;
 
-  Str   = Line->Buffer;
+  Str = Line->Buffer;
 
   //
   // do not have free space
@@ -2052,6 +2082,7 @@ LineStrInsert (
 
     Line->TotalSize += 8;
   }
+
   //
   // move the later part of the string one character right
   //
@@ -2059,12 +2090,13 @@ LineStrInsert (
   for (Index = StrSize; Index > Pos; Index--) {
     TempStringPtr[Index] = TempStringPtr[Index - 1];
   }
+
   //
   // insert char into it.
   //
-  TempStringPtr[Index]      = Char;
+  TempStringPtr[Index] = Char;
 
-  Line->Buffer  = Str;
+  Line->Buffer = Str;
   Line->Size++;
 
   return StrSize + 1;
@@ -2082,8 +2114,8 @@ FileBufferAddChar (
   IN  CHAR16  Char
   )
 {
-  EFI_EDITOR_LINE *Line;
-  UINTN           FilePos;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            FilePos;
 
   Line = FileBuffer.CurrentLine;
 
@@ -2098,11 +2130,12 @@ FileBufferAddChar (
   // or replace the character.
   //
   FilePos = FileBuffer.FilePosition.Column - 1;
-  if (FileBuffer.ModeInsert || FilePos + 1 > Line->Size) {
+  if (FileBuffer.ModeInsert || (FilePos + 1 > Line->Size)) {
     LineStrInsert (Line, Char, FilePos, Line->Size + 1);
   } else {
     Line->Buffer[FilePos] = Char;
   }
+
   //
   // move cursor to right
   //
@@ -2126,7 +2159,7 @@ FileBufferAddChar (
 **/
 EFI_STATUS
 FileBufferDoCharInput (
-  IN CONST CHAR16 Char
+  IN CONST CHAR16  Char
   )
 {
   EFI_STATUS  Status;
@@ -2134,36 +2167,35 @@ FileBufferDoCharInput (
   Status = EFI_SUCCESS;
 
   switch (Char) {
-  case CHAR_NULL:
-    break;
+    case CHAR_NULL:
+      break;
 
-  case CHAR_BACKSPACE:
-    Status = FileBufferDoBackspace ();
-    break;
+    case CHAR_BACKSPACE:
+      Status = FileBufferDoBackspace ();
+      break;
 
-  case CHAR_TAB:
-    //
-    // Tabs are ignored
-    //
-    break;
+    case CHAR_TAB:
+      //
+      // Tabs are ignored
+      //
+      break;
 
-  case CHAR_LINEFEED:
-  case CHAR_CARRIAGE_RETURN:
-    Status = FileBufferDoReturn ();
-    break;
+    case CHAR_LINEFEED:
+    case CHAR_CARRIAGE_RETURN:
+      Status = FileBufferDoReturn ();
+      break;
 
-  default:
-    //
-    // DEAL WITH ASCII CHAR, filter out thing like ctrl+f
-    //
-    if (Char > 127 || Char < 32) {
-      Status = StatusBarSetStatusString (L"Unknown Command");
-    } else {
-      Status = FileBufferAddChar (Char);
-    }
+    default:
+      //
+      // DEAL WITH ASCII CHAR, filter out thing like ctrl+f
+      //
+      if ((Char > 127) || (Char < 32)) {
+        Status = StatusBarSetStatusString (L"Unknown Command");
+      } else {
+        Status = FileBufferAddChar (Char);
+      }
 
-    break;
-
+      break;
   }
 
   return Status;
@@ -2179,17 +2211,17 @@ FileBufferScrollDown (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  UINTN           FRow;
-  UINTN           FCol;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            FRow;
+  UINTN            FCol;
 
   Line = FileBuffer.CurrentLine;
   if (Line->Buffer == NULL) {
     return EFI_SUCCESS;
   }
 
-  FRow  = FileBuffer.FilePosition.Row;
-  FCol  = FileBuffer.FilePosition.Column;
+  FRow = FileBuffer.FilePosition.Row;
+  FCol = FileBuffer.FilePosition.Column;
 
   //
   // has next line
@@ -2204,7 +2236,6 @@ FileBufferScrollDown (
     if (FCol > Line->Size) {
       FCol = Line->Size + 1;
     }
-
   } else {
     return EFI_SUCCESS;
   }
@@ -2224,14 +2255,14 @@ FileBufferScrollUp (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  UINTN           FRow;
-  UINTN           FCol;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            FRow;
+  UINTN            FCol;
 
-  Line  = FileBuffer.CurrentLine;
+  Line = FileBuffer.CurrentLine;
 
-  FRow  = FileBuffer.FilePosition.Row;
-  FCol  = FileBuffer.FilePosition.Column;
+  FRow = FileBuffer.FilePosition.Row;
+  FCol = FileBuffer.FilePosition.Column;
 
   //
   // has previous line
@@ -2246,7 +2277,6 @@ FileBufferScrollUp (
     if (FCol > Line->Size) {
       FCol = Line->Size + 1;
     }
-
   } else {
     return EFI_SUCCESS;
   }
@@ -2266,15 +2296,15 @@ FileBufferPageDown (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  UINTN           FRow;
-  UINTN           FCol;
-  UINTN           Gap;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            FRow;
+  UINTN            FCol;
+  UINTN            Gap;
 
-  Line  = FileBuffer.CurrentLine;
+  Line = FileBuffer.CurrentLine;
 
-  FRow  = FileBuffer.FilePosition.Row;
-  FCol  = FileBuffer.FilePosition.Column;
+  FRow = FileBuffer.FilePosition.Row;
+  FCol = FileBuffer.FilePosition.Column;
 
   //
   // has next page
@@ -2287,6 +2317,7 @@ FileBufferPageDown (
     //
     Gap = FileBuffer.NumLines - FRow;
   }
+
   //
   // get correct line
   //
@@ -2295,7 +2326,7 @@ FileBufferPageDown (
   //
   // if that line, is not that long, so move to the end of that line
   //
-  if (Line != NULL && FCol > Line->Size) {
+  if ((Line != NULL) && (FCol > Line->Size)) {
     FCol = Line->Size + 1;
   }
 
@@ -2316,16 +2347,16 @@ FileBufferPageUp (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  UINTN           FRow;
-  UINTN           FCol;
-  UINTN           Gap;
-  INTN            Retreat;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            FRow;
+  UINTN            FCol;
+  UINTN            Gap;
+  INTN             Retreat;
 
-  Line  = FileBuffer.CurrentLine;
+  Line = FileBuffer.CurrentLine;
 
-  FRow  = FileBuffer.FilePosition.Row;
-  FCol  = FileBuffer.FilePosition.Column;
+  FRow = FileBuffer.FilePosition.Row;
+  FCol = FileBuffer.FilePosition.Column;
 
   //
   // has previous page
@@ -2350,7 +2381,7 @@ FileBufferPageUp (
   //
   // if that line is not that long, so move to the end of that line
   //
-  if (Line != NULL && FCol > Line->Size) {
+  if ((Line != NULL) && (FCol > Line->Size)) {
     FCol = Line->Size + 1;
   }
 
@@ -2371,13 +2402,13 @@ FileBufferEnd (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  UINTN           FRow;
-  UINTN           FCol;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            FRow;
+  UINTN            FCol;
 
-  Line  = FileBuffer.CurrentLine;
+  Line = FileBuffer.CurrentLine;
 
-  FRow  = FileBuffer.FilePosition.Row;
+  FRow = FileBuffer.FilePosition.Row;
 
   //
   // goto the last column of the line
@@ -2405,7 +2436,7 @@ FileBufferEnd (
 **/
 EFI_STATUS
 FileBufferHandleInput (
-  IN CONST EFI_INPUT_KEY *Key
+  IN CONST EFI_INPUT_KEY  *Key
   )
 {
   EFI_STATUS  Status;
@@ -2413,98 +2444,98 @@ FileBufferHandleInput (
   Status = EFI_SUCCESS;
 
   switch (Key->ScanCode) {
-  //
-  // ordinary key input
-  //
-  case SCAN_NULL:
-    if (!FileBuffer.ReadOnly) {
-      Status = FileBufferDoCharInput (Key->UnicodeChar);
-    } else {
-      Status = StatusBarSetStatusString (L"Read Only File Can Not Be Modified");
-    }
+    //
+    // ordinary key input
+    //
+    case SCAN_NULL:
+      if (!FileBuffer.ReadOnly) {
+        Status = FileBufferDoCharInput (Key->UnicodeChar);
+      } else {
+        Status = StatusBarSetStatusString (L"Read Only File Can Not Be Modified");
+      }
 
-    break;
+      break;
 
-  //
-  // up arrow
-  //
-  case SCAN_UP:
-    Status = FileBufferScrollUp ();
-    break;
+    //
+    // up arrow
+    //
+    case SCAN_UP:
+      Status = FileBufferScrollUp ();
+      break;
 
-  //
-  // down arrow
-  //
-  case SCAN_DOWN:
-    Status = FileBufferScrollDown ();
-    break;
+    //
+    // down arrow
+    //
+    case SCAN_DOWN:
+      Status = FileBufferScrollDown ();
+      break;
 
-  //
-  // right arrow
-  //
-  case SCAN_RIGHT:
-    Status = FileBufferScrollRight ();
-    break;
+    //
+    // right arrow
+    //
+    case SCAN_RIGHT:
+      Status = FileBufferScrollRight ();
+      break;
 
-  //
-  // left arrow
-  //
-  case SCAN_LEFT:
-    Status = FileBufferScrollLeft ();
-    break;
+    //
+    // left arrow
+    //
+    case SCAN_LEFT:
+      Status = FileBufferScrollLeft ();
+      break;
 
-  //
-  // page up
-  //
-  case SCAN_PAGE_UP:
-    Status = FileBufferPageUp ();
-    break;
+    //
+    // page up
+    //
+    case SCAN_PAGE_UP:
+      Status = FileBufferPageUp ();
+      break;
 
-  //
-  // page down
-  //
-  case SCAN_PAGE_DOWN:
-    Status = FileBufferPageDown ();
-    break;
+    //
+    // page down
+    //
+    case SCAN_PAGE_DOWN:
+      Status = FileBufferPageDown ();
+      break;
 
-  //
-  // delete
-  //
-  case SCAN_DELETE:
-    if (!FileBuffer.ReadOnly) {
-      Status = FileBufferDoDelete ();
-    } else {
-      Status = StatusBarSetStatusString (L"Read Only File Can Not Be Modified");
-    }
+    //
+    // delete
+    //
+    case SCAN_DELETE:
+      if (!FileBuffer.ReadOnly) {
+        Status = FileBufferDoDelete ();
+      } else {
+        Status = StatusBarSetStatusString (L"Read Only File Can Not Be Modified");
+      }
 
-    break;
+      break;
 
-  //
-  // home
-  //
-  case SCAN_HOME:
-    FileBufferMovePosition (FileBuffer.FilePosition.Row, 1);
-    Status = EFI_SUCCESS;
-    break;
+    //
+    // home
+    //
+    case SCAN_HOME:
+      FileBufferMovePosition (FileBuffer.FilePosition.Row, 1);
+      Status = EFI_SUCCESS;
+      break;
 
-  //
-  // end
-  //
-  case SCAN_END:
-    Status = FileBufferEnd ();
-    break;
+    //
+    // end
+    //
+    case SCAN_END:
+      Status = FileBufferEnd ();
+      break;
 
-  //
-  // insert
-  //
-  case SCAN_INSERT:
-    FileBuffer.ModeInsert = (BOOLEAN)!FileBuffer.ModeInsert;
-    Status = EFI_SUCCESS;
-    break;
+    //
+    // insert
+    //
+    case SCAN_INSERT:
+      FileBuffer.ModeInsert = (BOOLEAN) !FileBuffer.ModeInsert;
+      Status                = EFI_SUCCESS;
+      break;
 
-  default:
-    Status = StatusBarSetStatusString (L"Unknown Command");
-    break;
+    default:
+      Status = StatusBarSetStatusString (L"Unknown Command");
+      break;
   }
 
   return Status;
@@ -2520,7 +2551,7 @@ FileBufferHandleInput (
 **/
 BOOLEAN
 AboveCurrentScreen (
-  IN UINTN FileRow
+  IN UINTN  FileRow
   )
 {
   //
@@ -2543,7 +2574,7 @@ AboveCurrentScreen (
 **/
 BOOLEAN
 UnderCurrentScreen (
-  IN UINTN FileRow
+  IN UINTN  FileRow
   )
 {
   //
@@ -2566,7 +2597,7 @@ UnderCurrentScreen (
 **/
 BOOLEAN
 LeftCurrentScreen (
-  IN UINTN FileCol
+  IN UINTN  FileCol
   )
 {
   //
@@ -2589,7 +2620,7 @@ LeftCurrentScreen (
 **/
 BOOLEAN
 RightCurrentScreen (
-  IN UINTN FileCol
+  IN UINTN  FileCol
   )
 {
   //
@@ -2614,17 +2645,17 @@ RightCurrentScreen (
 **/
 EFI_EDITOR_LINE *
 MoveCurrentLine (
-  IN  INTN Count
+  IN  INTN  Count
   )
 {
-  EFI_EDITOR_LINE *Line;
-  UINTN           AbsCount;
+  EFI_EDITOR_LINE  *Line;
+  UINTN            AbsCount;
 
   if (Count <= 0) {
-    AbsCount  = (UINTN)ABS(Count);
-    Line      = InternalEditorMiscLineRetreat (AbsCount,MainEditor.FileBuffer->CurrentLine,MainEditor.FileBuffer->ListHead);
+    AbsCount = (UINTN)ABS (Count);
+    Line     = InternalEditorMiscLineRetreat (AbsCount, MainEditor.FileBuffer->CurrentLine, MainEditor.FileBuffer->ListHead);
   } else {
-    Line = InternalEditorMiscLineAdvance ((UINTN)Count,MainEditor.FileBuffer->CurrentLine,MainEditor.FileBuffer->ListHead);
+    Line = InternalEditorMiscLineAdvance ((UINTN)Count, MainEditor.FileBuffer->CurrentLine, MainEditor.FileBuffer->ListHead);
   }
 
   if (Line == NULL) {
@@ -2644,26 +2675,26 @@ MoveCurrentLine (
 **/
 VOID
 FileBufferMovePosition (
-  IN CONST UINTN NewFilePosRow,
-  IN CONST UINTN NewFilePosCol
+  IN CONST UINTN  NewFilePosRow,
+  IN CONST UINTN  NewFilePosCol
   )
 {
-  INTN    RowGap;
-  INTN    ColGap;
-  UINTN   Abs;
-  BOOLEAN Above;
-  BOOLEAN Under;
-  BOOLEAN Right;
-  BOOLEAN Left;
+  INTN     RowGap;
+  INTN     ColGap;
+  UINTN    Abs;
+  BOOLEAN  Above;
+  BOOLEAN  Under;
+  BOOLEAN  Right;
+  BOOLEAN  Left;
 
   //
   // CALCULATE gap between current file position and new file position
   //
-  RowGap  = NewFilePosRow - FileBuffer.FilePosition.Row;
-  ColGap  = NewFilePosCol - FileBuffer.FilePosition.Column;
+  RowGap = NewFilePosRow - FileBuffer.FilePosition.Row;
+  ColGap = NewFilePosCol - FileBuffer.FilePosition.Column;
 
-  Under   = UnderCurrentScreen (NewFilePosRow);
-  Above   = AboveCurrentScreen (NewFilePosRow);
+  Under = UnderCurrentScreen (NewFilePosRow);
+  Above = AboveCurrentScreen (NewFilePosRow);
   //
   // if is below current screen
   //
@@ -2690,7 +2721,7 @@ FileBufferMovePosition (
       //
       FileBuffer.FilePosition.Row = NewFilePosRow;
       if (RowGap < 0) {
-        Abs = (UINTN)ABS(RowGap);
+        Abs                             = (UINTN)ABS (RowGap);
         FileBuffer.DisplayPosition.Row -= Abs;
       } else {
         FileBuffer.DisplayPosition.Row += RowGap;
@@ -2698,10 +2729,10 @@ FileBufferMovePosition (
     }
   }
 
-  FileBuffer.LowVisibleRange.Row  = FileBuffer.FilePosition.Row - (FileBuffer.DisplayPosition.Row - 2);
+  FileBuffer.LowVisibleRange.Row = FileBuffer.FilePosition.Row - (FileBuffer.DisplayPosition.Row - 2);
 
   Right = RightCurrentScreen (NewFilePosCol);
-  Left = LeftCurrentScreen (NewFilePosCol);
+  Left  = LeftCurrentScreen (NewFilePosCol);
 
   //
   // if right to current screen
@@ -2730,7 +2761,7 @@ FileBufferMovePosition (
       //
       FileBuffer.FilePosition.Column = NewFilePosCol;
       if (ColGap < 0) {
-        Abs = (UINTN)(-ColGap);
+        Abs                                = (UINTN)(-ColGap);
         FileBuffer.DisplayPosition.Column -= Abs;
       } else {
         FileBuffer.DisplayPosition.Column += ColGap;
@@ -2744,7 +2775,6 @@ FileBufferMovePosition (
   // let CurrentLine point to correct line;
   //
   FileBuffer.CurrentLine = MoveCurrentLine (RowGap);
-
 }
 
 /**
@@ -2759,15 +2789,15 @@ FileBufferMovePosition (
 **/
 EFI_STATUS
 FileBufferCutLine (
-  OUT EFI_EDITOR_LINE **CutLine
+  OUT EFI_EDITOR_LINE  **CutLine
   )
 {
-  EFI_EDITOR_LINE *Line;
-  EFI_EDITOR_LINE *NewLine;
-  UINTN           Row;
-  UINTN           Col;
+  EFI_EDITOR_LINE  *Line;
+  EFI_EDITOR_LINE  *NewLine;
+  UINTN            Row;
+  UINTN            Col;
 
-  *CutLine      = NULL;
+  *CutLine = NULL;
 
   if (FileBuffer.ReadOnly) {
     StatusBarSetStatusString (L"Read Only File Can Not Be Modified");
@@ -2779,17 +2809,19 @@ FileBufferCutLine (
   //
   // if is the last dummy line, SO CAN not cut
   //
-  if (StrCmp (Line->Buffer, L"\0") == 0 && Line->Link.ForwardLink == FileBuffer.ListHead
-  //
-  // last line
-  //
-  ) {
+  if ((StrCmp (Line->Buffer, L"\0") == 0) && (Line->Link.ForwardLink == FileBuffer.ListHead)
+      //
+      // last line
+      //
+      )
+  {
     //
     // LAST LINE AND NOTHING ON THIS LINE, SO CUT NOTHING
     //
     StatusBarSetStatusString (L"Nothing to Cut");
     return EFI_NOT_FOUND;
   }
+
   //
   // if is the last line, so create a dummy line
   //
@@ -2811,11 +2843,11 @@ FileBufferCutLine (
   // move home
   //
   FileBuffer.CurrentLine = CR (
-                            FileBuffer.CurrentLine->Link.ForwardLink,
-                            EFI_EDITOR_LINE,
-                            Link,
-                            LINE_LIST_SIGNATURE
-                            );
+                             FileBuffer.CurrentLine->Link.ForwardLink,
+                             EFI_EDITOR_LINE,
+                             Link,
+                             LINE_LIST_SIGNATURE
+                             );
 
   RemoveEntryList (&Line->Link);
 
@@ -2827,7 +2859,7 @@ FileBufferCutLine (
   FileBufferNeedRefresh         = TRUE;
   FileBufferOnlyLineNeedRefresh = FALSE;
 
-  *CutLine                      = Line;
+  *CutLine = Line;
 
   return EFI_SUCCESS;
 }
@@ -2843,10 +2875,10 @@ FileBufferPasteLine (
   VOID
   )
 {
-  EFI_EDITOR_LINE *Line;
-  EFI_EDITOR_LINE *NewLine;
-  UINTN           Row;
-  UINTN           Col;
+  EFI_EDITOR_LINE  *Line;
+  EFI_EDITOR_LINE  *NewLine;
+  UINTN            Row;
+  UINTN            Col;
 
   //
   // if nothing is on clip board
@@ -2855,6 +2887,7 @@ FileBufferPasteLine (
   if (MainEditor.CutLine == NULL) {
     return EFI_SUCCESS;
   }
+
   //
   // read only file can not be pasted on
   //
@@ -2867,22 +2900,23 @@ FileBufferPasteLine (
   if (NewLine == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   //
   // insert it above current line
   //
-  Line                    = FileBuffer.CurrentLine;
-  NewLine->Link.BackLink     = Line->Link.BackLink;
-  NewLine->Link.ForwardLink     = &Line->Link;
+  Line                      = FileBuffer.CurrentLine;
+  NewLine->Link.BackLink    = Line->Link.BackLink;
+  NewLine->Link.ForwardLink = &Line->Link;
 
   Line->Link.BackLink->ForwardLink = &NewLine->Link;
-  Line->Link.BackLink        = &NewLine->Link;
+  Line->Link.BackLink              = &NewLine->Link;
 
   FileBuffer.NumLines++;
-  FileBuffer.CurrentLine  = NewLine;
+  FileBuffer.CurrentLine = NewLine;
 
-  FileBuffer.Lines        = CR (FileBuffer.ListHead->ForwardLink, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
+  FileBuffer.Lines = CR (FileBuffer.ListHead->ForwardLink, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
 
-  Col                     = 1;
+  Col = 1;
   //
   // move home
   //
@@ -2912,19 +2946,19 @@ FileBufferPasteLine (
 EFI_STATUS
 FileBufferSearch (
   IN CONST CHAR16  *Str,
-  IN CONST UINTN Offset
+  IN CONST UINTN   Offset
   )
 {
-  CHAR16          *Current;
-  UINTN           Position;
-  UINTN           Row;
-  UINTN           Column;
-  EFI_EDITOR_LINE *Line;
-  CHAR16          *CharPos;
-  LIST_ENTRY      *Link;
-  BOOLEAN         Found;
+  CHAR16           *Current;
+  UINTN            Position;
+  UINTN            Row;
+  UINTN            Column;
+  EFI_EDITOR_LINE  *Line;
+  CHAR16           *CharPos;
+  LIST_ENTRY       *Link;
+  BOOLEAN          Found;
 
-  Column = 0;
+  Column   = 0;
   Position = 0;
 
   //
@@ -2941,32 +2975,32 @@ FileBufferSearch (
 
   Found = FALSE;
 
-  CharPos  =  StrStr (Current, Str);
+  CharPos =  StrStr (Current, Str);
   if (CharPos != NULL) {
     Position = CharPos - Current + 1;
-    Found   = TRUE;
+    Found    = TRUE;
   }
 
   //
   // found
   //
   if (Found) {
-    Column  = (Position - 1) + FileBuffer.FilePosition.Column + Offset;
-    Row     = FileBuffer.FilePosition.Row;
+    Column = (Position - 1) + FileBuffer.FilePosition.Column + Offset;
+    Row    = FileBuffer.FilePosition.Row;
   } else {
     //
     // not found so find through next lines
     //
-    Link  = FileBuffer.CurrentLine->Link.ForwardLink;
+    Link = FileBuffer.CurrentLine->Link.ForwardLink;
 
-    Row   = FileBuffer.FilePosition.Row + 1;
+    Row = FileBuffer.FilePosition.Row + 1;
     while (Link != FileBuffer.ListHead) {
-      Line      = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
-//      Position  = StrStr (Line->Buffer, Str);
-      CharPos  =  StrStr (Line->Buffer, Str);
+      Line = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
+      //      Position  = StrStr (Line->Buffer, Str);
+      CharPos =  StrStr (Line->Buffer, Str);
       if (CharPos != NULL) {
         Position = CharPos - Line->Buffer + 1;
-        Found   = TRUE;
+        Found    = TRUE;
       }
 
       if (Found) {
@@ -3016,8 +3050,8 @@ FileBufferSearch (
 **/
 EFI_STATUS
 FileBufferReplace (
-  IN CONST CHAR16   *Replace,
-  IN CONST UINTN    SearchLen
+  IN CONST CHAR16  *Replace,
+  IN CONST UINTN   SearchLen
   )
 {
   UINTN   ReplaceLen;
@@ -3027,9 +3061,9 @@ FileBufferReplace (
   UINTN   OldSize;
   UINTN   Gap;
 
-  ReplaceLen  = StrLen (Replace);
+  ReplaceLen = StrLen (Replace);
 
-  OldSize     = FileBuffer.CurrentLine->Size + 1;
+  OldSize = FileBuffer.CurrentLine->Size + 1;
   //
   // include CHAR_NULL
   //
@@ -3041,21 +3075,22 @@ FileBufferReplace (
     //
     if (FileBuffer.CurrentLine->TotalSize + 1 <= NewSize) {
       FileBuffer.CurrentLine->Buffer = ReallocatePool (
-                                        2 * OldSize,
-                                        2 * NewSize,
-                                        FileBuffer.CurrentLine->Buffer
-                                        );
+                                         2 * OldSize,
+                                         2 * NewSize,
+                                         FileBuffer.CurrentLine->Buffer
+                                         );
       FileBuffer.CurrentLine->TotalSize = NewSize - 1;
     }
 
     if (FileBuffer.CurrentLine->Buffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
+
     //
     // the end CHAR_NULL character;
     //
-    Buffer  = FileBuffer.CurrentLine->Buffer + (NewSize - 1);
-    Gap     = ReplaceLen - SearchLen;
+    Buffer = FileBuffer.CurrentLine->Buffer + (NewSize - 1);
+    Gap    = ReplaceLen - SearchLen;
 
     //
     // keep the latter part
@@ -3064,6 +3099,7 @@ FileBufferReplace (
       *Buffer = *(Buffer - Gap);
       Buffer--;
     }
+
     //
     // set replace into it
     //
@@ -3081,7 +3117,7 @@ FileBufferReplace (
     }
 
     Buffer += ReplaceLen;
-    Gap = SearchLen - ReplaceLen;
+    Gap     = SearchLen - ReplaceLen;
 
     //
     // set replace into it
@@ -3103,7 +3139,7 @@ FileBufferReplace (
 
   FileBufferOnlyLineNeedRefresh = TRUE;
 
-  FileBuffer.FileModified       = TRUE;
+  FileBuffer.FileModified = TRUE;
 
   MainTitleBarRefresh (MainEditor.FileBuffer->FileName, MainEditor.FileBuffer->FileType, MainEditor.FileBuffer->ReadOnly, MainEditor.FileBuffer->FileModified, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row, 0, 0);
   FileBufferRestorePosition ();
@@ -3120,14 +3156,14 @@ FileBufferReplace (
 **/
 VOID
 FileBufferAdjustMousePosition (
-  IN CONST INT32 TextX,
-  IN CONST INT32 TextY
+  IN CONST INT32  TextX,
+  IN CONST INT32  TextY
   )
 {
-  UINTN CoordinateX;
-  UINTN CoordinateY;
-  UINTN AbsX;
-  UINTN AbsY;
+  UINTN  CoordinateX;
+  UINTN  CoordinateY;
+  UINTN  AbsX;
+  UINTN  AbsY;
 
   //
   // TextX and TextY is mouse movement data returned by mouse driver
@@ -3137,8 +3173,8 @@ FileBufferAdjustMousePosition (
   // get absolute value
   //
 
-  AbsX = ABS(TextX);
-  AbsY = ABS(TextY);
+  AbsX = ABS (TextX);
+  AbsY = ABS (TextY);
 
   CoordinateX = FileBuffer.MousePosition.Column;
   CoordinateY = FileBuffer.MousePosition.Row;
@@ -3162,29 +3198,30 @@ FileBufferAdjustMousePosition (
       CoordinateY = 0;
     }
   }
+
   //
   // check whether new mouse column position is beyond screen
   // if not, adjust it
   //
-  if (CoordinateX >= 1 && CoordinateX <= MainEditor.ScreenSize.Column) {
+  if ((CoordinateX >= 1) && (CoordinateX <= MainEditor.ScreenSize.Column)) {
     FileBuffer.MousePosition.Column = CoordinateX;
   } else if (CoordinateX < 1) {
     FileBuffer.MousePosition.Column = 1;
   } else if (CoordinateX > MainEditor.ScreenSize.Column) {
     FileBuffer.MousePosition.Column = MainEditor.ScreenSize.Column;
   }
+
   //
   // check whether new mouse row position is beyond screen
   // if not, adjust it
   //
-  if (CoordinateY >= 2 && CoordinateY <= (MainEditor.ScreenSize.Row - 1)) {
+  if ((CoordinateY >= 2) && (CoordinateY <= (MainEditor.ScreenSize.Row - 1))) {
     FileBuffer.MousePosition.Row = CoordinateY;
   } else if (CoordinateY < 2) {
     FileBuffer.MousePosition.Row = 2;
   } else if (CoordinateY > (MainEditor.ScreenSize.Row - 1)) {
     FileBuffer.MousePosition.Row = (MainEditor.ScreenSize.Row - 1);
   }
-
 }
 
 /**
@@ -3196,28 +3233,28 @@ FileBufferAdjustMousePosition (
 **/
 EFI_STATUS
 FileBufferReplaceAll (
-  IN CHAR16 *SearchStr,
-  IN CHAR16 *ReplaceStr,
-  IN UINTN  Offset
+  IN CHAR16  *SearchStr,
+  IN CHAR16  *ReplaceStr,
+  IN UINTN   Offset
   )
 {
-  CHAR16          *Buffer;
-  UINTN           Position;
-  UINTN           Column;
-  UINTN           ReplaceLen;
-  UINTN           SearchLen;
-  UINTN           Index;
-  UINTN           NewSize;
-  UINTN           OldSize;
-  UINTN           Gap;
-  EFI_EDITOR_LINE *Line;
-  LIST_ENTRY      *Link;
-  CHAR16          *CharPos;
+  CHAR16           *Buffer;
+  UINTN            Position;
+  UINTN            Column;
+  UINTN            ReplaceLen;
+  UINTN            SearchLen;
+  UINTN            Index;
+  UINTN            NewSize;
+  UINTN            OldSize;
+  UINTN            Gap;
+  EFI_EDITOR_LINE  *Line;
+  LIST_ENTRY       *Link;
+  CHAR16           *CharPos;
 
-  SearchLen   = StrLen (SearchStr);
-  ReplaceLen  = StrLen (ReplaceStr);
+  SearchLen  = StrLen (SearchStr);
+  ReplaceLen = StrLen (ReplaceStr);
 
-  Column      = FileBuffer.FilePosition.Column + Offset - 1;
+  Column = FileBuffer.FilePosition.Column + Offset - 1;
 
   if (Column > FileBuffer.CurrentLine->Size) {
     Column = FileBuffer.CurrentLine->Size;
@@ -3226,8 +3263,8 @@ FileBufferReplaceAll (
   Link = &(FileBuffer.CurrentLine->Link);
 
   while (Link != FileBuffer.ListHead) {
-    Line      = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
-    CharPos  =  StrStr (Line->Buffer + Column, SearchStr);
+    Line    = CR (Link, EFI_EDITOR_LINE, Link, LINE_LIST_SIGNATURE);
+    CharPos =  StrStr (Line->Buffer + Column, SearchStr);
     if (CharPos != NULL) {
       Position = CharPos - Line->Buffer;// + Column;
       //
@@ -3245,21 +3282,22 @@ FileBufferReplaceAll (
         //
         if (Line->TotalSize + 1 <= NewSize) {
           Line->Buffer = ReallocatePool (
-                          2 * OldSize,
-                          2 * NewSize,
-                          Line->Buffer
-                          );
+                           2 * OldSize,
+                           2 * NewSize,
+                           Line->Buffer
+                           );
           Line->TotalSize = NewSize - 1;
         }
 
         if (Line->Buffer == NULL) {
           return EFI_OUT_OF_RESOURCES;
         }
+
         //
         // the end CHAR_NULL character;
         //
-        Buffer  = Line->Buffer + (NewSize - 1);
-        Gap     = ReplaceLen - SearchLen;
+        Buffer = Line->Buffer + (NewSize - 1);
+        Gap    = ReplaceLen - SearchLen;
 
         //
         // keep the latter part
@@ -3268,18 +3306,18 @@ FileBufferReplaceAll (
           *Buffer = *(Buffer - Gap);
           Buffer--;
         }
-
-      } else if (ReplaceLen < SearchLen){
-        Buffer  = Line->Buffer + Position + ReplaceLen;
-        Gap     = SearchLen - ReplaceLen;
+      } else if (ReplaceLen < SearchLen) {
+        Buffer = Line->Buffer + Position + ReplaceLen;
+        Gap    = SearchLen - ReplaceLen;
 
         for (Index = 0; Index < (Line->Size - Position - ReplaceLen + 1); Index++) {
           *Buffer = *(Buffer + Gap);
           Buffer++;
         }
       } else {
-        ASSERT(ReplaceLen == SearchLen);
+        ASSERT (ReplaceLen == SearchLen);
       }
+
       //
       // set replace into it
       //
@@ -3289,15 +3327,16 @@ FileBufferReplaceAll (
       }
 
       Line->Size += (ReplaceLen - SearchLen);
-      Column += ReplaceLen;
+      Column     += ReplaceLen;
     } else {
       //
       // not found
       //
-      Column  = 0;
-      Link    = Link->ForwardLink;
+      Column = 0;
+      Link   = Link->ForwardLink;
     }
   }
+
   //
   // call refresh to fresh edit area
   //
@@ -3318,4 +3357,3 @@ FileBufferSetModified (
 {
   FileBuffer.FileModified = TRUE;
 }
-

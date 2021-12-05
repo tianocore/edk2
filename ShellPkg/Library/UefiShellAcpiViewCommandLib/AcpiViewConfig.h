@@ -27,7 +27,7 @@ GetColourHighlighting (
 VOID
 EFIAPI
 SetColourHighlighting (
-  BOOLEAN Highlight
+  BOOLEAN  Highlight
   );
 
 /**
@@ -49,7 +49,7 @@ GetConsistencyChecking (
 VOID
 EFIAPI
 SetConsistencyChecking (
-  BOOLEAN ConsistencyChecking
+  BOOLEAN  ConsistencyChecking
   );
 
 /**
@@ -71,7 +71,7 @@ GetMandatoryTableValidate (
 VOID
 EFIAPI
 SetMandatoryTableValidate (
-  BOOLEAN Validate
+  BOOLEAN  Validate
   );
 
 /**
@@ -95,7 +95,7 @@ GetMandatoryTableSpec (
 VOID
 EFIAPI
 SetMandatoryTableSpec (
-  UINTN Spec
+  UINTN  Spec
   );
 
 /**
@@ -128,7 +128,7 @@ GetReportOption (
 VOID
 EFIAPI
 SetReportOption (
-  EREPORT_OPTION ReportType
+  EREPORT_OPTION  ReportType
   );
 
 /**
@@ -136,9 +136,9 @@ SetReportOption (
   ACPI table is to be examined by the AcpiView code.
 **/
 typedef struct {
-  UINT32              Type;    ///< 32bit signature of the selected ACPI table.
-  CONST CHAR16*       Name;    ///< User friendly name of the selected ACPI table.
-  BOOLEAN             Found;   ///< The selected table has been found in the system.
+  UINT32          Type;        ///< 32bit signature of the selected ACPI table.
+  CONST CHAR16    *Name;       ///< User friendly name of the selected ACPI table.
+  BOOLEAN         Found;       ///< The selected table has been found in the system.
 } SELECTED_ACPI_TABLE;
 
 /**
@@ -149,7 +149,7 @@ typedef struct {
 VOID
 EFIAPI
 GetSelectedAcpiTable (
-  OUT SELECTED_ACPI_TABLE** SelectedAcpiTable
+  OUT SELECTED_ACPI_TABLE  **SelectedAcpiTable
   );
 
 /**
@@ -162,7 +162,7 @@ GetSelectedAcpiTable (
 VOID
 EFIAPI
 SelectAcpiTable (
-  CONST CHAR16* TableName
+  CONST CHAR16  *TableName
   );
 
 /**

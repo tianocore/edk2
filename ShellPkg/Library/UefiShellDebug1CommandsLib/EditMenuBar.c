@@ -10,9 +10,9 @@
 #include "UefiShellDebug1CommandsLib.h"
 #include "EditStatusBar.h"
 
-EDITOR_MENU_ITEM   *MenuItems;
-MENU_ITEM_FUNCTION *ControlBasedMenuFunctions;
-UINTN                 NumItems;
+EDITOR_MENU_ITEM    *MenuItems;
+MENU_ITEM_FUNCTION  *ControlBasedMenuFunctions;
+UINTN               NumItems;
 
 /**
   Cleanup function for a menu bar.  frees all allocated memory.
@@ -22,7 +22,7 @@ MenuBarCleanup (
   VOID
   )
 {
-  SHELL_FREE_NON_NULL(MenuItems);
+  SHELL_FREE_NON_NULL (MenuItems);
 }
 
 /**
@@ -40,13 +40,15 @@ MenuBarInit (
 {
   CONST EDITOR_MENU_ITEM  *ItemsWalker;
 
-  for (NumItems = 0, ItemsWalker = Items ; ItemsWalker != NULL && ItemsWalker->Function != NULL ; ItemsWalker++,NumItems++);
+  for (NumItems = 0, ItemsWalker = Items; ItemsWalker != NULL && ItemsWalker->Function != NULL; ItemsWalker++, NumItems++) {
+  }
 
-  MenuItems = AllocateZeroPool((NumItems+1) * sizeof(EDITOR_MENU_ITEM));
+  MenuItems = AllocateZeroPool ((NumItems+1) * sizeof (EDITOR_MENU_ITEM));
   if (MenuItems == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  CopyMem(MenuItems, Items, (NumItems+1) * sizeof(EDITOR_MENU_ITEM));
+
+  CopyMem (MenuItems, Items, (NumItems+1) * sizeof (EDITOR_MENU_ITEM));
   return EFI_SUCCESS;
 }
 
@@ -65,6 +67,7 @@ ControlHotKeyInit (
   ControlBasedMenuFunctions = Items;
   return EFI_SUCCESS;
 }
+
 /**
   Refresh function for the menu bar.
 
@@ -75,16 +78,16 @@ ControlHotKeyInit (
 **/
 EFI_STATUS
 MenuBarRefresh (
-  IN CONST UINTN LastRow,
-  IN CONST UINTN LastCol
+  IN CONST UINTN  LastRow,
+  IN CONST UINTN  LastCol
   )
 {
   EDITOR_MENU_ITEM  *Item;
-  UINTN                 Col;
-  UINTN                 Row;
-  UINTN                 Width;
-  CHAR16                *NameString;
-  CHAR16                *FunctionKeyString;
+  UINTN             Col;
+  UINTN             Row;
+  UINTN             Width;
+  CHAR16            *NameString;
+  CHAR16            *FunctionKeyString;
 
   //
   // variable initialization
@@ -97,25 +100,21 @@ MenuBarRefresh (
   //
   EditorClearLine (LastRow - 2, LastCol, LastRow);
   EditorClearLine (LastRow - 1, LastCol, LastRow);
-  EditorClearLine (LastRow    , LastCol, LastRow);
-
+  EditorClearLine (LastRow, LastCol, LastRow);
 
   //
   // print out the menu items
   //
   for (Item = MenuItems; Item != NULL && Item->Function != NULL; Item++) {
+    NameString = HiiGetString (gShellDebug1HiiHandle, Item->NameToken, NULL);
 
-
-    NameString = HiiGetString(gShellDebug1HiiHandle, Item->NameToken, NULL);
-
-
-    Width             = MAX ((StrLen (NameString) + 6), 20);
+    Width = MAX ((StrLen (NameString) + 6), 20);
     if (((Col + Width) > LastCol)) {
       Row++;
       Col = 1;
     }
 
-    FunctionKeyString = HiiGetString(gShellDebug1HiiHandle, Item->FunctionKeyToken, NULL);
+    FunctionKeyString = HiiGetString (gShellDebug1HiiHandle, Item->FunctionKeyToken, NULL);
 
     ShellPrintEx ((INT32)(Col) - 1, (INT32)(Row) - 1, L"%E%s%N  %H%s%N  ", FunctionKeyString, NameString);
 
@@ -138,12 +137,12 @@ MenuBarRefresh (
 **/
 EFI_STATUS
 MenuBarDispatchFunctionKey (
-  IN CONST EFI_INPUT_KEY   *Key
+  IN CONST EFI_INPUT_KEY  *Key
   )
 {
-  UINTN                 Index;
+  UINTN  Index;
 
-  Index     = Key->ScanCode - SCAN_F1;
+  Index = Key->ScanCode - SCAN_F1;
 
   //
   // check whether in range
@@ -167,10 +166,10 @@ MenuBarDispatchFunctionKey (
 **/
 EFI_STATUS
 MenuBarDispatchControlHotKey (
-  IN CONST EFI_KEY_DATA   *KeyData
+  IN CONST EFI_KEY_DATA  *KeyData
   )
 {
-  UINT16                  ControlIndex;
+  UINT16  ControlIndex;
 
   //
   // Set to invalid value first.
@@ -178,7 +177,8 @@ MenuBarDispatchControlHotKey (
   ControlIndex = MAX_UINT16;
 
   if (((KeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) == 0) ||
-      (KeyData->KeyState.KeyShiftState == EFI_SHIFT_STATE_VALID)) {
+      (KeyData->KeyState.KeyShiftState == EFI_SHIFT_STATE_VALID))
+  {
     //
     // For consoles that don't support/report shift state,
     // Ctrl+A is translated to 1 (UnicodeChar).
@@ -186,7 +186,8 @@ MenuBarDispatchControlHotKey (
     ControlIndex = KeyData->Key.UnicodeChar;
   } else if (((KeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) &&
              ((KeyData->KeyState.KeyShiftState & (EFI_RIGHT_CONTROL_PRESSED | EFI_LEFT_CONTROL_PRESSED)) != 0) &&
-             ((KeyData->KeyState.KeyShiftState & ~(EFI_SHIFT_STATE_VALID | EFI_RIGHT_CONTROL_PRESSED | EFI_LEFT_CONTROL_PRESSED)) == 0)) {
+             ((KeyData->KeyState.KeyShiftState & ~(EFI_SHIFT_STATE_VALID | EFI_RIGHT_CONTROL_PRESSED | EFI_LEFT_CONTROL_PRESSED)) == 0))
+  {
     //
     // For consoles that supports/reports shift state,
     // make sure only CONTROL is pressed.
@@ -197,14 +198,13 @@ MenuBarDispatchControlHotKey (
       ControlIndex = KeyData->Key.UnicodeChar - L'a' + 1;
     }
   }
-  if ((SCAN_CONTROL_Z < ControlIndex)
-    ||(NULL == ControlBasedMenuFunctions[ControlIndex]))
+
+  if (  (SCAN_CONTROL_Z < ControlIndex)
+     || (NULL == ControlBasedMenuFunctions[ControlIndex]))
   {
-      return EFI_NOT_FOUND;
+    return EFI_NOT_FOUND;
   }
 
   ControlBasedMenuFunctions[ControlIndex]();
   return EFI_SUCCESS;
 }
-
-

@@ -25,18 +25,18 @@
 #pragma pack(1)
 
 typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER  Header;
-  UINT32                       Entry;
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  UINT32                         Entry;
 } RSDT_TABLE;
 
 typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER  Header;
-  UINT64                       Entry;
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  UINT64                         Entry;
 } XSDT_TABLE;
 
 #pragma pack()
 
-EFI_HII_HANDLE   mDpHiiHandle;
+EFI_HII_HANDLE  mDpHiiHandle;
 
 typedef struct {
   EFI_HANDLE    Handle;
@@ -49,21 +49,21 @@ UINTN            mCachePairCount = 0;
 //
 /// Module-Global Variables
 ///@{
-CHAR16           mGaugeString[DP_GAUGE_STRING_LENGTH + 1];
-CHAR16           mUnicodeToken[DXE_PERFORMANCE_STRING_SIZE];
-UINT64           mInterestThreshold;
-BOOLEAN          mShowId = FALSE;
-UINT8            *mBootPerformanceTable;
-UINTN            mBootPerformanceTableSize;
-BOOLEAN          mPeiPhase = FALSE;
-BOOLEAN          mDxePhase = FALSE;
+CHAR16   mGaugeString[DP_GAUGE_STRING_LENGTH + 1];
+CHAR16   mUnicodeToken[DXE_PERFORMANCE_STRING_SIZE];
+UINT64   mInterestThreshold;
+BOOLEAN  mShowId = FALSE;
+UINT8    *mBootPerformanceTable;
+UINTN    mBootPerformanceTableSize;
+BOOLEAN  mPeiPhase = FALSE;
+BOOLEAN  mDxePhase = FALSE;
 
-PERF_SUMMARY_DATA SummaryData = { 0 };    ///< Create the SummaryData structure and init. to ZERO.
+PERF_SUMMARY_DATA   SummaryData       = { 0 }; ///< Create the SummaryData structure and init. to ZERO.
 MEASUREMENT_RECORD  *mMeasurementList = NULL;
-UINTN               mMeasurementNum    = 0;
+UINTN               mMeasurementNum   = 0;
 
 /// Items for which to gather cumulative statistics.
-PERF_CUM_DATA CumData[] = {
+PERF_CUM_DATA  CumData[] = {
   PERF_INIT_CUM_DATA (LOAD_IMAGE_TOK),
   PERF_INIT_CUM_DATA (START_IMAGE_TOK),
   PERF_INIT_CUM_DATA (DRIVERBINDING_START_TOK),
@@ -72,20 +72,20 @@ PERF_CUM_DATA CumData[] = {
 };
 
 /// Number of items for which we are gathering cumulative statistics.
-UINT32 const      NumCum = sizeof(CumData) / sizeof(PERF_CUM_DATA);
+UINT32 const  NumCum = sizeof (CumData) / sizeof (PERF_CUM_DATA);
 
-STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
-  {L"-v", TypeFlag},   // -v   Verbose Mode
-  {L"-A", TypeFlag},   // -A   All, Cooked
-  {L"-R", TypeFlag},   // -R   RAW All
-  {L"-s", TypeFlag},   // -s   Summary
-  {L"-x", TypeFlag},   // -x   eXclude Cumulative Items
-  {L"-i", TypeFlag},   // -i   Display Identifier
-  {L"-c", TypeValue},  // -c   Display cumulative data.
-  {L"-n", TypeValue},  // -n # Number of records to display for A and R
-  {L"-t", TypeValue},  // -t # Threshold of interest
-  {NULL, TypeMax}
-  };
+STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
+  { L"-v", TypeFlag  }, // -v   Verbose Mode
+  { L"-A", TypeFlag  }, // -A   All, Cooked
+  { L"-R", TypeFlag  }, // -R   RAW All
+  { L"-s", TypeFlag  }, // -s   Summary
+  { L"-x", TypeFlag  }, // -x   eXclude Cumulative Items
+  { L"-i", TypeFlag  }, // -i   Display Identifier
+  { L"-c", TypeValue }, // -c   Display cumulative data.
+  { L"-n", TypeValue }, // -n # Number of records to display for A and R
+  { L"-t", TypeValue }, // -t # Threshold of interest
+  { NULL,  TypeMax   }
+};
 
 ///@}
 
@@ -93,20 +93,29 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
    Display the trailing Verbose information.
 **/
 VOID
-DumpStatistics( void )
+DumpStatistics (
+  void
+  )
 {
-  EFI_STRING                StringPtr;
-  EFI_STRING                StringPtrUnknown;
+  EFI_STRING  StringPtr;
+  EFI_STRING  StringPtrUnknown;
+
   StringPtr        = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_DP_SECTION_STATISTICS), NULL);
   StringPtrUnknown = HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_ALIT_UNKNOWN), NULL);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_SECTION_HEADER), mDpHiiHandle,
-              (StringPtr == NULL) ? StringPtrUnknown : StringPtr);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMTRACE), mDpHiiHandle,      SummaryData.NumTrace);
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_DP_SECTION_HEADER),
+    mDpHiiHandle,
+    (StringPtr == NULL) ? StringPtrUnknown : StringPtr
+    );
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMTRACE), mDpHiiHandle, SummaryData.NumTrace);
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMINCOMPLETE), mDpHiiHandle, SummaryData.NumIncomplete);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPHASES), mDpHiiHandle,     SummaryData.NumSummary);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMHANDLES), mDpHiiHandle,    SummaryData.NumHandles, SummaryData.NumTrace - SummaryData.NumHandles);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPEIMS), mDpHiiHandle,      SummaryData.NumPEIMs);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMGLOBALS), mDpHiiHandle,    SummaryData.NumGlobal);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPHASES), mDpHiiHandle, SummaryData.NumSummary);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMHANDLES), mDpHiiHandle, SummaryData.NumHandles, SummaryData.NumTrace - SummaryData.NumHandles);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPEIMS), mDpHiiHandle, SummaryData.NumPEIMs);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMGLOBALS), mDpHiiHandle, SummaryData.NumGlobal);
   SHELL_FREE_NON_NULL (StringPtr);
   SHELL_FREE_NON_NULL (StringPtrUnknown);
 }
@@ -121,16 +130,16 @@ GetBootPerformanceTable (
 {
   FIRMWARE_PERFORMANCE_TABLE  *FirmwarePerformanceTable;
 
-  FirmwarePerformanceTable = (FIRMWARE_PERFORMANCE_TABLE *) EfiLocateFirstAcpiTable (
-                                                              EFI_ACPI_5_0_FIRMWARE_PERFORMANCE_DATA_TABLE_SIGNATURE
-                                                              );
+  FirmwarePerformanceTable = (FIRMWARE_PERFORMANCE_TABLE *)EfiLocateFirstAcpiTable (
+                                                             EFI_ACPI_5_0_FIRMWARE_PERFORMANCE_DATA_TABLE_SIGNATURE
+                                                             );
   if (FirmwarePerformanceTable == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GET_ACPI_FPDT_FAIL), mDpHiiHandle);
     return EFI_NOT_FOUND;
   }
 
-  mBootPerformanceTable = (UINT8*) (UINTN)FirmwarePerformanceTable->BootPointerRecord.BootPerformanceTablePointer;
-  mBootPerformanceTableSize = ((BOOT_PERFORMANCE_TABLE *) mBootPerformanceTable)->Header.Length;
+  mBootPerformanceTable     = (UINT8 *)(UINTN)FirmwarePerformanceTable->BootPointerRecord.BootPerformanceTablePointer;
+  mBootPerformanceTableSize = ((BOOT_PERFORMANCE_TABLE *)mBootPerformanceTable)->Header.Length;
 
   return EFI_SUCCESS;
 }
@@ -144,15 +153,16 @@ GetBootPerformanceTable (
 **/
 VOID
 GetHandleFormModuleGuid (
-  IN      EFI_GUID        *ModuleGuid,
-  IN OUT  EFI_HANDLE      *Handle
+  IN      EFI_GUID    *ModuleGuid,
+  IN OUT  EFI_HANDLE  *Handle
   )
 {
-  UINTN                             Index;
+  UINTN  Index;
 
   if (IsZeroGuid (ModuleGuid)) {
     *Handle = NULL;
   }
+
   //
   // Try to get the Handle from the cached array.
   //
@@ -162,6 +172,7 @@ GetHandleFormModuleGuid (
       break;
     }
   }
+
   if (Index >= mCachePairCount) {
     *Handle = NULL;
   }
@@ -176,14 +187,14 @@ BuildCachedGuidHandleTable (
   VOID
   )
 {
-  EFI_STATUS                        Status;
-  EFI_HANDLE                        *HandleBuffer;
-  UINTN                             HandleCount;
-  UINTN                             Index;
-  EFI_LOADED_IMAGE_PROTOCOL         *LoadedImage;
-  EFI_DRIVER_BINDING_PROTOCOL       *DriverBinding;
-  EFI_GUID                          *TempGuid;
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FvFilePath;
+  EFI_STATUS                         Status;
+  EFI_HANDLE                         *HandleBuffer;
+  UINTN                              HandleCount;
+  UINTN                              Index;
+  EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
+  EFI_DRIVER_BINDING_PROTOCOL        *DriverBinding;
+  EFI_GUID                           *TempGuid;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvFilePath;
 
   Status = gBS->LocateHandleBuffer (AllHandles, NULL, NULL, &HandleCount, &HandleBuffer);
   if (EFI_ERROR (Status)) {
@@ -201,55 +212,58 @@ BuildCachedGuidHandleTable (
     // Try Handle as ImageHandle.
     //
     Status = gBS->HandleProtocol (
-                  HandleBuffer[Index],
-                  &gEfiLoadedImageProtocolGuid,
-                  (VOID**) &LoadedImage
-                  );
+                    HandleBuffer[Index],
+                    &gEfiLoadedImageProtocolGuid,
+                    (VOID **)&LoadedImage
+                    );
     if (EFI_ERROR (Status)) {
       //
       // Try Handle as Controller Handle
       //
       Status = gBS->OpenProtocol (
-                    HandleBuffer[Index],
-                    &gEfiDriverBindingProtocolGuid,
-                    (VOID **) &DriverBinding,
-                    NULL,
-                    NULL,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
+                      HandleBuffer[Index],
+                      &gEfiDriverBindingProtocolGuid,
+                      (VOID **)&DriverBinding,
+                      NULL,
+                      NULL,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
       if (!EFI_ERROR (Status)) {
         //
         // Get Image protocol from ImageHandle
         //
         Status = gBS->HandleProtocol (
-                      DriverBinding->ImageHandle,
-                      &gEfiLoadedImageProtocolGuid,
-                      (VOID**) &LoadedImage
-                      );
+                        DriverBinding->ImageHandle,
+                        &gEfiLoadedImageProtocolGuid,
+                        (VOID **)&LoadedImage
+                        );
       }
     }
 
-    if (!EFI_ERROR (Status) && LoadedImage != NULL) {
+    if (!EFI_ERROR (Status) && (LoadedImage != NULL)) {
       //
       // Get Module Guid from DevicePath.
       //
-      if (LoadedImage->FilePath != NULL &&
-          LoadedImage->FilePath->Type == MEDIA_DEVICE_PATH &&
-          LoadedImage->FilePath->SubType == MEDIA_PIWG_FW_FILE_DP
-         ) {
-        FvFilePath      = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) LoadedImage->FilePath;
-        TempGuid        = &FvFilePath->FvFileName;
+      if ((LoadedImage->FilePath != NULL) &&
+          (LoadedImage->FilePath->Type == MEDIA_DEVICE_PATH) &&
+          (LoadedImage->FilePath->SubType == MEDIA_PIWG_FW_FILE_DP)
+          )
+      {
+        FvFilePath = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)LoadedImage->FilePath;
+        TempGuid   = &FvFilePath->FvFileName;
 
         mCacheHandleGuidTable[mCachePairCount].Handle = HandleBuffer[Index];
         CopyGuid (&mCacheHandleGuidTable[mCachePairCount].ModuleGuid, TempGuid);
-        mCachePairCount ++;
+        mCachePairCount++;
       }
     }
   }
+
   if (HandleBuffer != NULL) {
     FreePool (HandleBuffer);
     HandleBuffer = NULL;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -268,198 +282,209 @@ GetMeasurementInfo (
   IN OUT MEASUREMENT_RECORD                           *Measurement
   )
 {
-  VOID                                         *ModuleGuid;
-  EFI_HANDLE                                   StartHandle;
+  VOID        *ModuleGuid;
+  EFI_HANDLE  StartHandle;
 
   switch (RecordHeader->Type) {
-  case FPDT_GUID_EVENT_TYPE:
-    ModuleGuid                    = &(((FPDT_GUID_EVENT_RECORD *)RecordHeader)->Guid);
-    Measurement->Identifier       = ((UINT32)((FPDT_GUID_EVENT_RECORD *)RecordHeader)->ProgressID);
-    if (IsStart) {
-      Measurement->StartTimeStamp = ((FPDT_GUID_EVENT_RECORD *)RecordHeader)->Timestamp;
-    } else {
-      Measurement->EndTimeStamp   = ((FPDT_GUID_EVENT_RECORD *)RecordHeader)->Timestamp;
-    }
-    switch (Measurement->Identifier) {
-    case MODULE_START_ID:
-    case MODULE_END_ID:
-      if (mPeiPhase) {
-        Measurement->Token        = ALit_PEIM;
-        Measurement->Module       = ALit_PEIM;
-      } else if (mDxePhase) {
-        Measurement->Token        = ALit_START_IMAGE;
-        Measurement->Module       = ALit_START_IMAGE;
+    case FPDT_GUID_EVENT_TYPE:
+      ModuleGuid              = &(((FPDT_GUID_EVENT_RECORD *)RecordHeader)->Guid);
+      Measurement->Identifier = ((UINT32)((FPDT_GUID_EVENT_RECORD *)RecordHeader)->ProgressID);
+      if (IsStart) {
+        Measurement->StartTimeStamp = ((FPDT_GUID_EVENT_RECORD *)RecordHeader)->Timestamp;
+      } else {
+        Measurement->EndTimeStamp = ((FPDT_GUID_EVENT_RECORD *)RecordHeader)->Timestamp;
       }
-      break;
-    default:
-      ASSERT(FALSE);
-    }
 
-    if (Measurement->Token != NULL && AsciiStrCmp (Measurement->Token, ALit_PEIM) == 0) {
-      Measurement->Handle         = &(((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Guid);
-    } else {
-      GetHandleFormModuleGuid(ModuleGuid, &StartHandle);
-      Measurement->Handle = StartHandle;
-      //
-      // When no perf entry to record the PEI and DXE phase,
-      // For start image, we need detect the PEIM and non PEIM here.
-      //
-      if (Measurement->Token == NULL) {
-        if (StartHandle == NULL && !IsZeroGuid (ModuleGuid)) {
-          Measurement->Token      = ALit_PEIM;
-          Measurement->Module     = ALit_PEIM;
-          Measurement->Handle     = ModuleGuid;
-        } else {
-          Measurement->Token      = ALit_START_IMAGE;
-          Measurement->Module     = ALit_START_IMAGE;
+      switch (Measurement->Identifier) {
+        case MODULE_START_ID:
+        case MODULE_END_ID:
+          if (mPeiPhase) {
+            Measurement->Token  = ALit_PEIM;
+            Measurement->Module = ALit_PEIM;
+          } else if (mDxePhase) {
+            Measurement->Token  = ALit_START_IMAGE;
+            Measurement->Module = ALit_START_IMAGE;
+          }
+
+          break;
+        default:
+          ASSERT (FALSE);
+      }
+
+      if ((Measurement->Token != NULL) && (AsciiStrCmp (Measurement->Token, ALit_PEIM) == 0)) {
+        Measurement->Handle = &(((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Guid);
+      } else {
+        GetHandleFormModuleGuid (ModuleGuid, &StartHandle);
+        Measurement->Handle = StartHandle;
+        //
+        // When no perf entry to record the PEI and DXE phase,
+        // For start image, we need detect the PEIM and non PEIM here.
+        //
+        if (Measurement->Token == NULL) {
+          if ((StartHandle == NULL) && !IsZeroGuid (ModuleGuid)) {
+            Measurement->Token  = ALit_PEIM;
+            Measurement->Module = ALit_PEIM;
+            Measurement->Handle = ModuleGuid;
+          } else {
+            Measurement->Token  = ALit_START_IMAGE;
+            Measurement->Module = ALit_START_IMAGE;
+          }
         }
       }
-    }
-    break;
 
-  case FPDT_DYNAMIC_STRING_EVENT_TYPE:
-    ModuleGuid                    = &(((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Guid);
-    Measurement->Identifier       = ((UINT32)((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->ProgressID);
-    if (IsStart) {
-      Measurement->StartTimeStamp = ((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
-    } else {
-      Measurement->EndTimeStamp   = ((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
-    }
-    switch (Measurement->Identifier) {
-    case MODULE_START_ID:
-    case MODULE_END_ID:
-      if (mPeiPhase) {
-        Measurement->Token        = ALit_PEIM;
-      } else if (mDxePhase) {
-        Measurement->Token        = ALit_START_IMAGE;
+      break;
+
+    case FPDT_DYNAMIC_STRING_EVENT_TYPE:
+      ModuleGuid              = &(((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Guid);
+      Measurement->Identifier = ((UINT32)((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->ProgressID);
+      if (IsStart) {
+        Measurement->StartTimeStamp = ((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
+      } else {
+        Measurement->EndTimeStamp = ((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
       }
-      break;
 
-    case MODULE_LOADIMAGE_START_ID:
-    case MODULE_LOADIMAGE_END_ID:
-      Measurement->Token          = ALit_LOAD_IMAGE;
-      break;
+      switch (Measurement->Identifier) {
+        case MODULE_START_ID:
+        case MODULE_END_ID:
+          if (mPeiPhase) {
+            Measurement->Token = ALit_PEIM;
+          } else if (mDxePhase) {
+            Measurement->Token = ALit_START_IMAGE;
+          }
 
-    case MODULE_DB_START_ID:
-    case MODULE_DB_END_ID:
-      Measurement->Token          = ALit_DB_START;
-      break;
+          break;
 
-    case MODULE_DB_SUPPORT_START_ID:
-    case MODULE_DB_SUPPORT_END_ID:
-      Measurement->Token          = ALit_DB_SUPPORT;
-      break;
+        case MODULE_LOADIMAGE_START_ID:
+        case MODULE_LOADIMAGE_END_ID:
+          Measurement->Token = ALit_LOAD_IMAGE;
+          break;
 
-    case MODULE_DB_STOP_START_ID:
-    case MODULE_DB_STOP_END_ID:
-      Measurement->Token          = ALit_DB_STOP;
-      break;
+        case MODULE_DB_START_ID:
+        case MODULE_DB_END_ID:
+          Measurement->Token = ALit_DB_START;
+          break;
 
-    default:
-      Measurement->Token          = ((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->String;
-      break;
-    }
+        case MODULE_DB_SUPPORT_START_ID:
+        case MODULE_DB_SUPPORT_END_ID:
+          Measurement->Token = ALit_DB_SUPPORT;
+          break;
 
-    Measurement->Module           = ((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->String;
+        case MODULE_DB_STOP_START_ID:
+        case MODULE_DB_STOP_END_ID:
+          Measurement->Token = ALit_DB_STOP;
+          break;
 
-    if (Measurement->Token != NULL && AsciiStrCmp (Measurement->Token, ALit_PEIM) == 0) {
-      Measurement->Handle         = &(((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Guid);
-    } else {
-      GetHandleFormModuleGuid(ModuleGuid, &StartHandle);
-      Measurement->Handle = StartHandle;
-      //
-      // When no perf entry to record the PEI and DXE phase,
-      // For start image, we need detect the PEIM and non PEIM here.
-      //
-      if (Measurement->Token == NULL  && (Measurement->Identifier == MODULE_START_ID || Measurement->Identifier == MODULE_END_ID)) {
-        if (StartHandle == NULL && !IsZeroGuid (ModuleGuid)) {
-          Measurement->Token      = ALit_PEIM;
-          Measurement->Handle     = ModuleGuid;
-        } else {
-          Measurement->Token      = ALit_START_IMAGE;
+        default:
+          Measurement->Token = ((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->String;
+          break;
+      }
+
+      Measurement->Module = ((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->String;
+
+      if ((Measurement->Token != NULL) && (AsciiStrCmp (Measurement->Token, ALit_PEIM) == 0)) {
+        Measurement->Handle = &(((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Guid);
+      } else {
+        GetHandleFormModuleGuid (ModuleGuid, &StartHandle);
+        Measurement->Handle = StartHandle;
+        //
+        // When no perf entry to record the PEI and DXE phase,
+        // For start image, we need detect the PEIM and non PEIM here.
+        //
+        if ((Measurement->Token == NULL) && ((Measurement->Identifier == MODULE_START_ID) || (Measurement->Identifier == MODULE_END_ID))) {
+          if ((StartHandle == NULL) && !IsZeroGuid (ModuleGuid)) {
+            Measurement->Token  = ALit_PEIM;
+            Measurement->Handle = ModuleGuid;
+          } else {
+            Measurement->Token = ALit_START_IMAGE;
+          }
         }
       }
-    }
-    break;
 
-  case FPDT_GUID_QWORD_EVENT_TYPE:
-    ModuleGuid                    = &(((FPDT_GUID_QWORD_EVENT_RECORD *)RecordHeader)->Guid);
-    Measurement->Identifier       = ((UINT32)((FPDT_GUID_QWORD_EVENT_RECORD *)RecordHeader)->ProgressID);
-    if (IsStart) {
-      Measurement->StartTimeStamp = ((FPDT_GUID_QWORD_EVENT_RECORD *)RecordHeader)->Timestamp;
-    } else {
-      Measurement->EndTimeStamp   = ((FPDT_GUID_QWORD_EVENT_RECORD *)RecordHeader)->Timestamp;
-    }
-    switch (Measurement->Identifier) {
-    case MODULE_DB_START_ID:
-      Measurement->Token          = ALit_DB_START;
-      Measurement->Module         = ALit_DB_START;
       break;
 
-    case MODULE_DB_SUPPORT_START_ID:
-    case MODULE_DB_SUPPORT_END_ID:
-      Measurement->Token          = ALit_DB_SUPPORT;
-      Measurement->Module         = ALit_DB_SUPPORT;
+    case FPDT_GUID_QWORD_EVENT_TYPE:
+      ModuleGuid              = &(((FPDT_GUID_QWORD_EVENT_RECORD *)RecordHeader)->Guid);
+      Measurement->Identifier = ((UINT32)((FPDT_GUID_QWORD_EVENT_RECORD *)RecordHeader)->ProgressID);
+      if (IsStart) {
+        Measurement->StartTimeStamp = ((FPDT_GUID_QWORD_EVENT_RECORD *)RecordHeader)->Timestamp;
+      } else {
+        Measurement->EndTimeStamp = ((FPDT_GUID_QWORD_EVENT_RECORD *)RecordHeader)->Timestamp;
+      }
+
+      switch (Measurement->Identifier) {
+        case MODULE_DB_START_ID:
+          Measurement->Token  = ALit_DB_START;
+          Measurement->Module = ALit_DB_START;
+          break;
+
+        case MODULE_DB_SUPPORT_START_ID:
+        case MODULE_DB_SUPPORT_END_ID:
+          Measurement->Token  = ALit_DB_SUPPORT;
+          Measurement->Module = ALit_DB_SUPPORT;
+          break;
+
+        case MODULE_DB_STOP_START_ID:
+        case MODULE_DB_STOP_END_ID:
+          Measurement->Token  = ALit_DB_STOP;
+          Measurement->Module = ALit_DB_STOP;
+          break;
+
+        case MODULE_LOADIMAGE_START_ID:
+        case MODULE_LOADIMAGE_END_ID:
+          Measurement->Token  = ALit_LOAD_IMAGE;
+          Measurement->Module = ALit_LOAD_IMAGE;
+          break;
+
+        default:
+          ASSERT (FALSE);
+      }
+
+      GetHandleFormModuleGuid (ModuleGuid, &StartHandle);
+      Measurement->Handle = StartHandle;
       break;
 
-    case MODULE_DB_STOP_START_ID:
-    case MODULE_DB_STOP_END_ID:
-      Measurement->Token          = ALit_DB_STOP;
-      Measurement->Module         = ALit_DB_STOP;
+    case FPDT_GUID_QWORD_STRING_EVENT_TYPE:
+      ModuleGuid              = &(((FPDT_GUID_QWORD_STRING_EVENT_RECORD *)RecordHeader)->Guid);
+      Measurement->Identifier = ((UINT32)((FPDT_GUID_QWORD_STRING_EVENT_RECORD *)RecordHeader)->ProgressID);
+      if (IsStart) {
+        Measurement->StartTimeStamp = ((FPDT_GUID_QWORD_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
+      } else {
+        Measurement->EndTimeStamp = ((FPDT_GUID_QWORD_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
+      }
+
+      //
+      // Currently only "DB:Start:" end record with FPDT_GUID_QWORD_STRING_EVENT_TYPE.
+      //
+      switch (Measurement->Identifier) {
+        case MODULE_DB_END_ID:
+          Measurement->Token  = ALit_DB_START;
+          Measurement->Module = ALit_DB_START;
+          break;
+        default:
+          ASSERT (FALSE);
+      }
+
+      GetHandleFormModuleGuid (ModuleGuid, &StartHandle);
+      Measurement->Handle = StartHandle;
       break;
 
-    case MODULE_LOADIMAGE_START_ID:
-    case MODULE_LOADIMAGE_END_ID:
-      Measurement->Token          = ALit_LOAD_IMAGE;
-      Measurement->Module         = ALit_LOAD_IMAGE;
+    case FPDT_DUAL_GUID_STRING_EVENT_TYPE:
+      ModuleGuid              = &(((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->Guid1);
+      Measurement->Identifier = ((UINT32)((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->ProgressID);
+      if (IsStart) {
+        Measurement->StartTimeStamp = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
+      } else {
+        Measurement->EndTimeStamp = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
+      }
+
+      Measurement->Token  = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->String;
+      Measurement->Module = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->String;
+      GetHandleFormModuleGuid (ModuleGuid, &StartHandle);
+      Measurement->Handle = StartHandle;
       break;
 
     default:
-      ASSERT(FALSE);
-    }
-    GetHandleFormModuleGuid(ModuleGuid, &StartHandle);
-    Measurement->Handle = StartHandle;
-    break;
-
-  case  FPDT_GUID_QWORD_STRING_EVENT_TYPE:
-    ModuleGuid                    = &(((FPDT_GUID_QWORD_STRING_EVENT_RECORD *)RecordHeader)->Guid);
-    Measurement->Identifier       = ((UINT32)((FPDT_GUID_QWORD_STRING_EVENT_RECORD *)RecordHeader)->ProgressID);
-    if (IsStart) {
-      Measurement->StartTimeStamp = ((FPDT_GUID_QWORD_STRING_EVENT_RECORD*)RecordHeader)->Timestamp;
-    } else {
-      Measurement->EndTimeStamp   = ((FPDT_GUID_QWORD_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
-    }
-    //
-    // Currently only "DB:Start:" end record with FPDT_GUID_QWORD_STRING_EVENT_TYPE.
-    //
-    switch (Measurement->Identifier) {
-    case MODULE_DB_END_ID:
-      Measurement->Token          = ALit_DB_START;
-      Measurement->Module         = ALit_DB_START;
       break;
-    default:
-      ASSERT(FALSE);
-    }
-    GetHandleFormModuleGuid(ModuleGuid, &StartHandle);
-    Measurement->Handle = StartHandle;
-    break;
-
-  case FPDT_DUAL_GUID_STRING_EVENT_TYPE:
-    ModuleGuid                    = &(((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->Guid1);
-    Measurement->Identifier       = ((UINT32)((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->ProgressID);
-    if (IsStart) {
-      Measurement->StartTimeStamp = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
-    } else {
-      Measurement->EndTimeStamp   = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
-    }
-    Measurement->Token            = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->String;
-    Measurement->Module           = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->String;
-    GetHandleFormModuleGuid(ModuleGuid, &StartHandle);
-    Measurement->Handle = StartHandle;
-    break;
-
-  default:
-    break;
   }
 }
 
@@ -471,32 +496,35 @@ GetMeasurementInfo (
 **/
 VOID
 SearchMeasurement (
-  IN MEASUREMENT_RECORD                           *EndMeasureMent
+  IN MEASUREMENT_RECORD  *EndMeasureMent
   )
 {
-  INTN                            Index;
+  INTN  Index;
 
   for (Index = mMeasurementNum - 1; Index >= 0; Index--) {
     if (AsciiStrCmp (EndMeasureMent->Token, ALit_PEIM) == 0) {
-      if (mMeasurementList[Index].EndTimeStamp == 0 && EndMeasureMent->Handle!= NULL && mMeasurementList[Index].Handle != NULL&&
-          CompareGuid(mMeasurementList[Index].Handle, EndMeasureMent->Handle) &&
+      if ((mMeasurementList[Index].EndTimeStamp == 0) && (EndMeasureMent->Handle != NULL) && (mMeasurementList[Index].Handle != NULL) &&
+          CompareGuid (mMeasurementList[Index].Handle, EndMeasureMent->Handle) &&
           (AsciiStrCmp (mMeasurementList[Index].Token, EndMeasureMent->Token) == 0) &&
-          (AsciiStrCmp (mMeasurementList[Index].Module, EndMeasureMent->Module) == 0)) {
+          (AsciiStrCmp (mMeasurementList[Index].Module, EndMeasureMent->Module) == 0))
+      {
         mMeasurementList[Index].EndTimeStamp = EndMeasureMent->EndTimeStamp;
         break;
       }
     } else if (EndMeasureMent->Identifier == PERF_CROSSMODULE_END_ID) {
-      if (mMeasurementList[Index].EndTimeStamp == 0 &&
-         (AsciiStrCmp (mMeasurementList[Index].Token, EndMeasureMent->Token) == 0) &&
-         (AsciiStrCmp (mMeasurementList[Index].Module, EndMeasureMent->Module) == 0) &&
-         mMeasurementList[Index].Identifier == PERF_CROSSMODULE_START_ID) {
+      if ((mMeasurementList[Index].EndTimeStamp == 0) &&
+          (AsciiStrCmp (mMeasurementList[Index].Token, EndMeasureMent->Token) == 0) &&
+          (AsciiStrCmp (mMeasurementList[Index].Module, EndMeasureMent->Module) == 0) &&
+          (mMeasurementList[Index].Identifier == PERF_CROSSMODULE_START_ID))
+      {
         mMeasurementList[Index].EndTimeStamp = EndMeasureMent->EndTimeStamp;
         break;
       }
     } else {
-      if (mMeasurementList[Index].EndTimeStamp == 0 && mMeasurementList[Index].Handle == EndMeasureMent->Handle &&
-         (AsciiStrCmp (mMeasurementList[Index].Token, EndMeasureMent->Token) == 0) &&
-         (AsciiStrCmp (mMeasurementList[Index].Module, EndMeasureMent->Module) == 0)) {
+      if ((mMeasurementList[Index].EndTimeStamp == 0) && (mMeasurementList[Index].Handle == EndMeasureMent->Handle) &&
+          (AsciiStrCmp (mMeasurementList[Index].Token, EndMeasureMent->Token) == 0) &&
+          (AsciiStrCmp (mMeasurementList[Index].Module, EndMeasureMent->Module) == 0))
+      {
         mMeasurementList[Index].EndTimeStamp = EndMeasureMent->EndTimeStamp;
         break;
       }
@@ -528,9 +556,9 @@ BuildMeasurementList (
   PerformanceTablePtr = (mBootPerformanceTable + TableLength);
 
   while (TableLength < mBootPerformanceTableSize) {
-    RecordHeader      = (EFI_ACPI_5_0_FPDT_PERFORMANCE_RECORD_HEADER*) PerformanceTablePtr;
-    StartRecordEvent  = (UINT8 *)RecordHeader;
-    StartProgressId   = ((FPDT_GUID_EVENT_RECORD *)StartRecordEvent)->ProgressID;
+    RecordHeader     = (EFI_ACPI_5_0_FPDT_PERFORMANCE_RECORD_HEADER *)PerformanceTablePtr;
+    StartRecordEvent = (UINT8 *)RecordHeader;
+    StartProgressId  = ((FPDT_GUID_EVENT_RECORD *)StartRecordEvent)->ProgressID;
 
     //
     // If the record with ProgressId 0, the record doesn't appear in pairs. The timestamp in the record is the EndTimeStamp, its StartTimeStamp is 0.
@@ -539,14 +567,15 @@ BuildMeasurementList (
     //
     if (StartProgressId == 0) {
       GetMeasurementInfo (RecordHeader, FALSE, &(mMeasurementList[mMeasurementNum]));
-      mMeasurementNum ++;
-    } else if (((StartProgressId >= PERF_EVENTSIGNAL_START_ID && ((StartProgressId & 0x000F) == 0)) ||
-        (StartProgressId < PERF_EVENTSIGNAL_START_ID && ((StartProgressId & 0x0001) != 0)))) {
+      mMeasurementNum++;
+    } else if ((((StartProgressId >= PERF_EVENTSIGNAL_START_ID) && ((StartProgressId & 0x000F) == 0)) ||
+                ((StartProgressId < PERF_EVENTSIGNAL_START_ID) && ((StartProgressId & 0x0001) != 0))))
+    {
       //
       // Since PEIM and StartImage has same Type and ID when PCD PcdEdkiiFpdtStringRecordEnableOnly = FALSE
       // So we need to identify these two kinds of record through different phase.
       //
-      if(StartProgressId == PERF_CROSSMODULE_START_ID ){
+      if (StartProgressId == PERF_CROSSMODULE_START_ID ) {
         if (AsciiStrCmp (((FPDT_DYNAMIC_STRING_EVENT_RECORD *)StartRecordEvent)->String, ALit_PEI) == 0) {
           mPeiPhase = TRUE;
         } else if (AsciiStrCmp (((FPDT_DYNAMIC_STRING_EVENT_RECORD *)StartRecordEvent)->String, ALit_DXE) == 0) {
@@ -554,17 +583,20 @@ BuildMeasurementList (
           mPeiPhase = FALSE;
         }
       }
+
       // Get measurement info form the start record to the mMeasurementList.
       GetMeasurementInfo (RecordHeader, TRUE, &(mMeasurementList[mMeasurementNum]));
-      mMeasurementNum ++;
+      mMeasurementNum++;
     } else {
-      ZeroMem(&MeasureMent, sizeof(MEASUREMENT_RECORD));
+      ZeroMem (&MeasureMent, sizeof (MEASUREMENT_RECORD));
       GetMeasurementInfo (RecordHeader, FALSE, &MeasureMent);
       SearchMeasurement (&MeasureMent);
     }
+
     TableLength         += RecordHeader->Length;
     PerformanceTablePtr += RecordHeader->Length;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -577,12 +609,12 @@ InitCumulativeData (
   VOID
   )
 {
-  UINTN                             Index;
+  UINTN  Index;
 
   for (Index = 0; Index < NumCum; ++Index) {
-    CumData[Index].Count = 0;
-    CumData[Index].MinDur = PERF_MAXDUR;
-    CumData[Index].MaxDur = 0;
+    CumData[Index].Count    = 0;
+    CumData[Index].MinDur   = PERF_MAXDUR;
+    CumData[Index].MaxDur   = 0;
     CumData[Index].Duration = 0;
   }
 }
@@ -617,55 +649,55 @@ InitSummaryData (
 **/
 SHELL_STATUS
 RunDp (
-  IN EFI_HANDLE               ImageHandle,
-  IN EFI_SYSTEM_TABLE         *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  LIST_ENTRY                *ParamPackage;
-  CONST CHAR16              *CmdLineArg;
-  EFI_STATUS                Status;
+  LIST_ENTRY    *ParamPackage;
+  CONST CHAR16  *CmdLineArg;
+  EFI_STATUS    Status;
 
-  PERFORMANCE_PROPERTY      *PerformanceProperty;
-  UINTN                     Number2Display;
+  PERFORMANCE_PROPERTY  *PerformanceProperty;
+  UINTN                 Number2Display;
 
-  EFI_STRING                StringPtr;
-  BOOLEAN                   SummaryMode;
-  BOOLEAN                   VerboseMode;
-  BOOLEAN                   AllMode;
-  BOOLEAN                   RawMode;
-  BOOLEAN                   ExcludeMode;
-  BOOLEAN                   CumulativeMode;
-  CONST CHAR16              *CustomCumulativeToken;
-  PERF_CUM_DATA             *CustomCumulativeData;
-  UINTN                     NameSize;
-  SHELL_STATUS              ShellStatus;
-  TIMER_INFO                TimerInfo;
-  UINT64                    Intermediate;
+  EFI_STRING     StringPtr;
+  BOOLEAN        SummaryMode;
+  BOOLEAN        VerboseMode;
+  BOOLEAN        AllMode;
+  BOOLEAN        RawMode;
+  BOOLEAN        ExcludeMode;
+  BOOLEAN        CumulativeMode;
+  CONST CHAR16   *CustomCumulativeToken;
+  PERF_CUM_DATA  *CustomCumulativeData;
+  UINTN          NameSize;
+  SHELL_STATUS   ShellStatus;
+  TIMER_INFO     TimerInfo;
+  UINT64         Intermediate;
 
-  StringPtr   = NULL;
-  SummaryMode = FALSE;
-  VerboseMode = FALSE;
-  AllMode     = FALSE;
-  RawMode     = FALSE;
-  ExcludeMode = FALSE;
-  CumulativeMode = FALSE;
+  StringPtr            = NULL;
+  SummaryMode          = FALSE;
+  VerboseMode          = FALSE;
+  AllMode              = FALSE;
+  RawMode              = FALSE;
+  ExcludeMode          = FALSE;
+  CumulativeMode       = FALSE;
   CustomCumulativeData = NULL;
-  ShellStatus = SHELL_SUCCESS;
+  ShellStatus          = SHELL_SUCCESS;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
   //
-  Status = ShellInitialize();
-  ASSERT_EFI_ERROR(Status);
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Process Command Line arguments
   //
   Status = ShellCommandLineParse (ParamList, &ParamPackage, NULL, TRUE);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_INVALID_ARG), mDpHiiHandle);
     return SHELL_INVALID_PARAMETER;
-  } else if (ShellCommandLineGetCount(ParamPackage) > 1){
+  } else if (ShellCommandLineGetCount (ParamPackage) > 1) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_TOO_MANY), mDpHiiHandle);
     return SHELL_INVALID_PARAMETER;
   }
@@ -673,12 +705,12 @@ RunDp (
   //
   // Boolean options
   //
-  VerboseMode = ShellCommandLineGetFlag (ParamPackage, L"-v");
-  SummaryMode = (BOOLEAN) (ShellCommandLineGetFlag (ParamPackage, L"-S") || ShellCommandLineGetFlag (ParamPackage, L"-s"));
-  AllMode     = ShellCommandLineGetFlag (ParamPackage, L"-A");
-  RawMode     = ShellCommandLineGetFlag (ParamPackage, L"-R");
-  ExcludeMode = ShellCommandLineGetFlag (ParamPackage, L"-x");
-  mShowId     = ShellCommandLineGetFlag (ParamPackage, L"-i");
+  VerboseMode    = ShellCommandLineGetFlag (ParamPackage, L"-v");
+  SummaryMode    = (BOOLEAN)(ShellCommandLineGetFlag (ParamPackage, L"-S") || ShellCommandLineGetFlag (ParamPackage, L"-s"));
+  AllMode        = ShellCommandLineGetFlag (ParamPackage, L"-A");
+  RawMode        = ShellCommandLineGetFlag (ParamPackage, L"-R");
+  ExcludeMode    = ShellCommandLineGetFlag (ParamPackage, L"-x");
+  mShowId        = ShellCommandLineGetFlag (ParamPackage, L"-i");
   CumulativeMode = ShellCommandLineGetFlag (ParamPackage, L"-c");
 
   if (AllMode && RawMode) {
@@ -688,7 +720,7 @@ RunDp (
 
   // Options with Values
   if (ShellCommandLineGetFlag (ParamPackage, L"-n")) {
-    CmdLineArg  = ShellCommandLineGetValue (ParamPackage, L"-n");
+    CmdLineArg = ShellCommandLineGetValue (ParamPackage, L"-n");
     if (CmdLineArg == NULL) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_TOO_FEW), mDpHiiHandle);
       return SHELL_INVALID_PARAMETER;
@@ -697,13 +729,14 @@ RunDp (
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_NO_RAW_ALL), mDpHiiHandle);
         return SHELL_INVALID_PARAMETER;
       }
-      Status = ShellConvertStringToUint64(CmdLineArg, &Intermediate, FALSE, TRUE);
+
+      Status = ShellConvertStringToUint64 (CmdLineArg, &Intermediate, FALSE, TRUE);
       if (EFI_ERROR (Status)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_INVALID_NUM_ARG), mDpHiiHandle, L"-n");
         return SHELL_INVALID_PARAMETER;
       } else {
         Number2Display = (UINTN)Intermediate;
-        if (Number2Display == 0 || Number2Display > MAXIMUM_DISPLAYCOUNT) {
+        if ((Number2Display == 0) || (Number2Display > MAXIMUM_DISPLAYCOUNT)) {
           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_INVALID_RANGE), mDpHiiHandle, L"-n", 0, MAXIMUM_DISPLAYCOUNT);
           return SHELL_INVALID_PARAMETER;
         }
@@ -714,12 +747,12 @@ RunDp (
   }
 
   if (ShellCommandLineGetFlag (ParamPackage, L"-t")) {
-    CmdLineArg  = ShellCommandLineGetValue (ParamPackage, L"-t");
+    CmdLineArg = ShellCommandLineGetValue (ParamPackage, L"-t");
     if (CmdLineArg == NULL) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_TOO_FEW), mDpHiiHandle);
       return SHELL_INVALID_PARAMETER;
     } else {
-      Status = ShellConvertStringToUint64(CmdLineArg, &Intermediate, FALSE, TRUE);
+      Status = ShellConvertStringToUint64 (CmdLineArg, &Intermediate, FALSE, TRUE);
       if (EFI_ERROR (Status)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_INVALID_NUM_ARG), mDpHiiHandle, L"-t");
         return SHELL_INVALID_PARAMETER;
@@ -742,16 +775,18 @@ RunDp (
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto Done;
       }
-      CustomCumulativeData->MinDur = PERF_MAXDUR;
-      CustomCumulativeData->MaxDur = 0;
-      CustomCumulativeData->Count  = 0;
+
+      CustomCumulativeData->MinDur   = PERF_MAXDUR;
+      CustomCumulativeData->MaxDur   = 0;
+      CustomCumulativeData->Count    = 0;
       CustomCumulativeData->Duration = 0;
-      NameSize = StrLen (CustomCumulativeToken) + 1;
-      CustomCumulativeData->Name   = AllocateZeroPool (NameSize);
+      NameSize                       = StrLen (CustomCumulativeToken) + 1;
+      CustomCumulativeData->Name     = AllocateZeroPool (NameSize);
       if (CustomCumulativeData->Name == NULL) {
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto Done;
       }
+
       UnicodeStrToAsciiStrS (CustomCumulativeToken, CustomCumulativeData->Name, NameSize);
     }
   }
@@ -762,7 +797,7 @@ RunDp (
   //
 
   //
-  //1. Get FPDT from ACPI table.
+  // 1. Get FPDT from ACPI table.
   //
   Status = GetBootPerformanceTable ();
   if (EFI_ERROR (Status)) {
@@ -771,16 +806,16 @@ RunDp (
   }
 
   //
-  //2. Cache the ModuleGuid and hanlde mapping table.
+  // 2. Cache the ModuleGuid and hanlde mapping table.
   //
-  Status = BuildCachedGuidHandleTable();
+  Status = BuildCachedGuidHandleTable ();
   if (EFI_ERROR (Status)) {
     ShellStatus = Status;
     goto Done;
   }
 
   //
-  //3. Build the measurement array form the FPDT records.
+  // 3. Build the measurement array form the FPDT records.
   //
   Status = BuildMeasurementList ();
   if (EFI_ERROR (Status)) {
@@ -806,7 +841,7 @@ RunDp (
   //    StartCount = Value loaded into the counter when it starts counting
   //      EndCount = Value counter counts to before it needs to be reset
   //
-  Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, (VOID **) &PerformanceProperty);
+  Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, (VOID **)&PerformanceProperty);
   if (EFI_ERROR (Status) || (PerformanceProperty == NULL)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_PERF_PROPERTY_NOT_FOUND), mDpHiiHandle);
     goto Done;
@@ -815,7 +850,7 @@ RunDp (
   TimerInfo.Frequency  = (UINT32)DivU64x32 (PerformanceProperty->Frequency, 1000);
   TimerInfo.StartCount = 0;
   TimerInfo.EndCount   = 0xFFFF;
-  TimerInfo.CountUp = TRUE;
+  TimerInfo.CountUp    = TRUE;
 
   //
   // Print header
@@ -827,52 +862,60 @@ RunDp (
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_KHZ), mDpHiiHandle, TimerInfo.Frequency);
 
   if (VerboseMode && !RawMode) {
-    StringPtr = HiiGetString (mDpHiiHandle,
-                  (EFI_STRING_ID) (TimerInfo.CountUp ? STRING_TOKEN (STR_DP_UP) : STRING_TOKEN (STR_DP_DOWN)), NULL);
+    StringPtr = HiiGetString (
+                  mDpHiiHandle,
+                  (EFI_STRING_ID)(TimerInfo.CountUp ? STRING_TOKEN (STR_DP_UP) : STRING_TOKEN (STR_DP_DOWN)),
+                  NULL
+                  );
     ASSERT (StringPtr != NULL);
     // Print Timer count range and direction
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_TIMER_PROPERTIES), mDpHiiHandle,
-                StringPtr,
-                TimerInfo.StartCount,
-                TimerInfo.EndCount
-                );
+    ShellPrintHiiEx (
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN (STR_DP_TIMER_PROPERTIES),
+      mDpHiiHandle,
+      StringPtr,
+      TimerInfo.StartCount,
+      TimerInfo.EndCount
+      );
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_VERBOSE_THRESHOLD), mDpHiiHandle, mInterestThreshold);
   }
 
-/****************************************************************************
-****            Print Sections based on command line options
-****
-****  Option modes have the following priority:
-****    v Verbose     --  Valid in combination with any other options
-****    t Threshold   --  Modifies All, Raw, and Cooked output
-****                      Default is 0 for All and Raw mode
-****                      Default is DEFAULT_THRESHOLD for "Cooked" mode
-****    n Number2Display  Used by All and Raw mode.  Otherwise ignored.
-****    A All         --  R and S options are ignored
-****    R Raw         --  S option is ignored
-****    s Summary     --  Modifies "Cooked" output only
-****    Cooked (Default)
-****************************************************************************/
+  /****************************************************************************
+  ****            Print Sections based on command line options
+  ****
+  ****  Option modes have the following priority:
+  ****    v Verbose     --  Valid in combination with any other options
+  ****    t Threshold   --  Modifies All, Raw, and Cooked output
+  ****                      Default is 0 for All and Raw mode
+  ****                      Default is DEFAULT_THRESHOLD for "Cooked" mode
+  ****    n Number2Display  Used by All and Raw mode.  Otherwise ignored.
+  ****    A All         --  R and S options are ignored
+  ****    R Raw         --  S option is ignored
+  ****    s Summary     --  Modifies "Cooked" output only
+  ****    Cooked (Default)
+  ****************************************************************************/
   GatherStatistics (CustomCumulativeData);
   if (CumulativeMode) {
     ProcessCumulative (CustomCumulativeData);
   } else if (AllMode) {
-    Status = DumpAllTrace( Number2Display, ExcludeMode);
+    Status = DumpAllTrace (Number2Display, ExcludeMode);
     if (Status == EFI_ABORTED) {
       ShellStatus = SHELL_ABORTED;
       goto Done;
     }
   } else if (RawMode) {
-    Status = DumpRawTrace( Number2Display, ExcludeMode);
+    Status = DumpRawTrace (Number2Display, ExcludeMode);
     if (Status == EFI_ABORTED) {
       ShellStatus = SHELL_ABORTED;
       goto Done;
     }
   } else {
-    //------------- Begin Cooked Mode Processing
+    // ------------- Begin Cooked Mode Processing
     ProcessPhases ();
-    if ( ! SummaryMode) {
-      Status = ProcessHandles ( ExcludeMode);
+    if ( !SummaryMode) {
+      Status = ProcessHandles (ExcludeMode);
       if (Status == EFI_ABORTED) {
         ShellStatus = SHELL_ABORTED;
         goto Done;
@@ -890,21 +933,24 @@ RunDp (
         goto Done;
       }
 
-       ProcessCumulative (NULL);
+      ProcessCumulative (NULL);
     }
-  } //------------- End of Cooked Mode Processing
+  } // ------------- End of Cooked Mode Processing
+
   if ( VerboseMode || SummaryMode) {
-    DumpStatistics();
+    DumpStatistics ();
   }
 
 Done:
   if (ParamPackage != NULL) {
     ShellCommandLineFreeVarList (ParamPackage);
   }
+
   SHELL_FREE_NON_NULL (StringPtr);
   if (CustomCumulativeData != NULL) {
     SHELL_FREE_NON_NULL (CustomCumulativeData->Name);
   }
+
   SHELL_FREE_NON_NULL (CustomCumulativeData);
 
   SHELL_FREE_NON_NULL (mMeasurementList);
@@ -916,7 +962,6 @@ Done:
   return ShellStatus;
 }
 
-
 /**
   Retrieve HII package list from ImageHandle and publish to HII database.
 
@@ -926,12 +971,12 @@ Done:
 **/
 EFI_HII_HANDLE
 InitializeHiiPackage (
-  EFI_HANDLE                  ImageHandle
+  EFI_HANDLE  ImageHandle
   )
 {
-  EFI_STATUS                  Status;
-  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
-  EFI_HII_HANDLE              HiiHandle;
+  EFI_STATUS                   Status;
+  EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
+  EFI_HII_HANDLE               HiiHandle;
 
   //
   // Retrieve HII package list from ImageHandle
@@ -962,5 +1007,6 @@ InitializeHiiPackage (
   if (EFI_ERROR (Status)) {
     return NULL;
   }
+
   return HiiHandle;
 }

@@ -32,7 +32,7 @@
 #include <Library/HiiLib.h>
 #include <Library/FileHandleLib.h>
 
-extern EFI_HII_HANDLE gShellLevel3HiiHandle;
+extern EFI_HII_HANDLE  gShellLevel3HiiHandle;
 
 /**
   Function for 'type' command.
@@ -152,4 +152,3 @@ ShellCommandRunHelp (
   );
 
 #endif
-

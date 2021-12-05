@@ -45,8 +45,8 @@ HMemImageBackup (
 **/
 EFI_STATUS
 HMemImageSetMemOffsetSize (
-  IN UINTN Offset,
-  IN UINTN Size
+  IN UINTN  Offset,
+  IN UINTN  Size
   );
 
 /**
@@ -62,9 +62,9 @@ HMemImageSetMemOffsetSize (
 **/
 EFI_STATUS
 HMemImageRead (
-  IN UINTN     Offset,
-  IN UINTN     Size,
-  IN BOOLEAN   Recover
+  IN UINTN    Offset,
+  IN UINTN    Size,
+  IN BOOLEAN  Recover
   );
 
 /**
@@ -79,8 +79,8 @@ HMemImageRead (
 **/
 EFI_STATUS
 HMemImageSave (
-  IN UINTN Offset,
-  IN UINTN Size
+  IN UINTN  Offset,
+  IN UINTN  Size
   );
 
 #endif

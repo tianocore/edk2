@@ -10,14 +10,14 @@
 #include "UefiShellNetwork2CommandsLib.h"
 
 enum {
-  IfConfig6OpList     = 1,
-  IfConfig6OpSet      = 2,
-  IfConfig6OpClear    = 3
+  IfConfig6OpList  = 1,
+  IfConfig6OpSet   = 2,
+  IfConfig6OpClear = 3
 };
 
 typedef enum {
-  VarCheckReserved      = -1,
-  VarCheckOk            = 0,
+  VarCheckReserved = -1,
+  VarCheckOk       = 0,
   VarCheckDuplicate,
   VarCheckConflict,
   VarCheckUnknown,
@@ -26,14 +26,14 @@ typedef enum {
 } VAR_CHECK_CODE;
 
 typedef enum {
-  FlagTypeSingle         = 0,
+  FlagTypeSingle = 0,
   FlagTypeNeedVar,
   FlagTypeNeedSet,
   FlagTypeSkipUnknown
 } VAR_CHECK_FLAG_TYPE;
 
-#define MACADDRMAXSIZE    32
-#define PREFIXMAXLEN      16
+#define MACADDRMAXSIZE  32
+#define PREFIXMAXLEN    16
 
 typedef struct _IFCONFIG6_INTERFACE_CB {
   EFI_HANDLE                                  NicHandle;
@@ -55,23 +55,22 @@ struct _ARG_LIST {
 };
 
 typedef struct _IFCONFIG6_PRIVATE_DATA {
-  EFI_HANDLE  ImageHandle;
-  LIST_ENTRY  IfList;
+  EFI_HANDLE    ImageHandle;
+  LIST_ENTRY    IfList;
 
-  UINT32      OpCode;
-  CHAR16      *IfName;
-  ARG_LIST    *VarArg;
+  UINT32        OpCode;
+  CHAR16        *IfName;
+  ARG_LIST      *VarArg;
 } IFCONFIG6_PRIVATE_DATA;
 
-typedef struct _VAR_CHECK_ITEM{
+typedef struct _VAR_CHECK_ITEM {
   CHAR16                 *FlagStr;
   UINT32                 FlagID;
   UINT32                 ConflictMask;
   VAR_CHECK_FLAG_TYPE    FlagType;
 } VAR_CHECK_ITEM;
 
-
-SHELL_PARAM_ITEM    mIfConfig6CheckList[] = {
+SHELL_PARAM_ITEM  mIfConfig6CheckList[] = {
   {
     L"-b",
     TypeFlag
@@ -100,7 +99,7 @@ SHELL_PARAM_ITEM    mIfConfig6CheckList[] = {
 
 VAR_CHECK_ITEM  mIfConfig6SetCheckList[] = {
   {
-   L"auto",
+    L"auto",
     0x00000001,
     0x00000001,
     FlagTypeSingle
@@ -156,10 +155,11 @@ VAR_CHECK_ITEM  mIfConfig6SetCheckList[] = {
 **/
 VOID
 IfConfig6FreeArgList (
-  ARG_LIST       *List
-)
+  ARG_LIST  *List
+  )
 {
-  ARG_LIST       *Next;
+  ARG_LIST  *Next;
+
   while (List->Next != NULL) {
     Next = List->Next;
     FreePool (List);
@@ -180,16 +180,16 @@ IfConfig6FreeArgList (
 **/
 ARG_LIST *
 IfConfig6SplitStrToList (
-  IN CONST CHAR16    *String,
-  IN CHAR16          Separator
+  IN CONST CHAR16  *String,
+  IN CHAR16        Separator
   )
 {
-  CHAR16      *Str;
-  CHAR16      *ArgStr;
-  ARG_LIST    *ArgList;
-  ARG_LIST    *ArgNode;
+  CHAR16    *Str;
+  CHAR16    *ArgStr;
+  ARG_LIST  *ArgList;
+  ARG_LIST  *ArgNode;
 
-  if (String == NULL || *String == L'\0') {
+  if ((String == NULL) || (*String == L'\0')) {
     return NULL;
   }
 
@@ -200,15 +200,17 @@ IfConfig6SplitStrToList (
   if (Str == NULL) {
     return NULL;
   }
-  ArgStr  = Str;
+
+  ArgStr = Str;
 
   //
   // init a node for the list head.
   //
-  ArgNode = (ARG_LIST *) AllocateZeroPool (sizeof (ARG_LIST));
+  ArgNode = (ARG_LIST *)AllocateZeroPool (sizeof (ARG_LIST));
   if (ArgNode == NULL) {
     return NULL;
   }
+
   ArgList = ArgNode;
 
   //
@@ -219,7 +221,7 @@ IfConfig6SplitStrToList (
       *Str          = L'\0';
       ArgNode->Arg  = ArgStr;
       ArgStr        = Str + 1;
-      ArgNode->Next = (ARG_LIST *) AllocateZeroPool (sizeof (ARG_LIST));
+      ArgNode->Next = (ARG_LIST *)AllocateZeroPool (sizeof (ARG_LIST));
       if (ArgNode->Next == NULL) {
         //
         // Free the local copy of string stored in the first node
@@ -228,6 +230,7 @@ IfConfig6SplitStrToList (
         IfConfig6FreeArgList (ArgList);
         return NULL;
       }
+
       ArgNode = ArgNode->Next;
     }
 
@@ -251,17 +254,17 @@ IfConfig6SplitStrToList (
 
 **/
 VAR_CHECK_CODE
-IfConfig6RetriveCheckListByName(
-  IN VAR_CHECK_ITEM    *CheckList,
-  IN CHAR16            *Name,
-  IN BOOLEAN           Init
-)
+IfConfig6RetriveCheckListByName (
+  IN VAR_CHECK_ITEM  *CheckList,
+  IN CHAR16          *Name,
+  IN BOOLEAN         Init
+  )
 {
-  STATIC UINT32     CheckDuplicate;
-  STATIC UINT32     CheckConflict;
-  VAR_CHECK_CODE    RtCode;
-  UINT32            Index;
-  VAR_CHECK_ITEM    Arg;
+  STATIC UINT32   CheckDuplicate;
+  STATIC UINT32   CheckConflict;
+  VAR_CHECK_CODE  RtCode;
+  UINT32          Index;
+  VAR_CHECK_ITEM  Arg;
 
   if (Init) {
     CheckDuplicate = 0;
@@ -269,16 +272,15 @@ IfConfig6RetriveCheckListByName(
     return VarCheckOk;
   }
 
-  RtCode  = VarCheckOk;
-  Index   = 0;
-  Arg     = CheckList[Index];
+  RtCode = VarCheckOk;
+  Index  = 0;
+  Arg    = CheckList[Index];
 
   //
   // Check the Duplicated/Conflicted/Unknown input Args.
   //
   while (Arg.FlagStr != NULL) {
     if (StrCmp (Arg.FlagStr, Name) == 0) {
-
       if (CheckDuplicate & Arg.FlagID) {
         RtCode = VarCheckDuplicate;
         break;
@@ -314,11 +316,11 @@ IfConfig6RetriveCheckListByName(
 VOID
 EFIAPI
 IfConfig6ManualAddressNotify (
-  IN EFI_EVENT    Event,
-  IN VOID         *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  *((BOOLEAN *) Context) = TRUE;
+  *((BOOLEAN *)Context) = TRUE;
 }
 
 /**
@@ -330,11 +332,11 @@ IfConfig6ManualAddressNotify (
 **/
 VOID
 IfConfig6PrintMacAddr (
-  IN UINT8     *Node,
-  IN UINT32    Size
+  IN UINT8   *Node,
+  IN UINT32  Size
   )
 {
-  UINTN    Index;
+  UINTN  Index;
 
   ASSERT (Size <= MACADDRMAXSIZE);
 
@@ -357,17 +359,16 @@ IfConfig6PrintMacAddr (
 **/
 VOID
 IfConfig6PrintIpAddr (
-  IN EFI_IPv6_ADDRESS    *Ip,
-  IN UINT8               *PrefixLen
+  IN EFI_IPv6_ADDRESS  *Ip,
+  IN UINT8             *PrefixLen
   )
 {
-  UINTN      Index;
-  BOOLEAN    Short;
+  UINTN    Index;
+  BOOLEAN  Short;
 
   Short = FALSE;
 
   for (Index = 0; Index < PREFIXMAXLEN; Index = Index + 2) {
-
     if (!Short && (Index + 1 < PREFIXMAXLEN) && (Index % 2 == 0) && (Ip->Addr[Index] == 0) && (Ip->Addr[Index + 1] == 0)) {
       //
       // Deal with the case of ::.
@@ -378,6 +379,7 @@ IfConfig6PrintIpAddr (
         //
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
       }
+
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
 
       while ((Ip->Addr[Index] == 0) && (Ip->Addr[Index + 1] == 0) && (Index < PREFIXMAXLEN)) {
@@ -425,17 +427,17 @@ IfConfig6PrintIpAddr (
 **/
 EFI_STATUS
 IfConfig6ParseManualAddressList (
-  IN OUT ARG_LIST                         **Arg,
-     OUT EFI_IP6_CONFIG_MANUAL_ADDRESS    **Buf,
-     OUT UINTN                            *BufSize
+  IN OUT ARG_LIST                    **Arg,
+  OUT EFI_IP6_CONFIG_MANUAL_ADDRESS  **Buf,
+  OUT UINTN                          *BufSize
   )
 {
-  EFI_STATUS                       Status;
-  EFI_IP6_CONFIG_MANUAL_ADDRESS    *AddrBuf;
-  ARG_LIST                         *VarArg;
-  EFI_IPv6_ADDRESS                 Address;
-  UINT8                            Prefix;
-  UINT8                            AddrCnt;
+  EFI_STATUS                     Status;
+  EFI_IP6_CONFIG_MANUAL_ADDRESS  *AddrBuf;
+  ARG_LIST                       *VarArg;
+  EFI_IPv6_ADDRESS               Address;
+  UINT8                          Prefix;
+  UINT8                          AddrCnt;
 
   Prefix   = 0;
   AddrCnt  = 0;
@@ -448,7 +450,6 @@ IfConfig6ParseManualAddressList (
   // Go through the list to check the correctness of input host ip6 address.
   //
   while ((!EFI_ERROR (Status)) && (VarArg != NULL)) {
-
     Status = NetLibStrToIp6andPrefix (VarArg->Arg, &Address, &Prefix);
 
     if (EFI_ERROR (Status)) {
@@ -477,7 +478,6 @@ IfConfig6ParseManualAddressList (
   // Go through the list to fill in the EFI_IP6_CONFIG_MANUAL_ADDRESS structure.
   //
   while ((!EFI_ERROR (Status)) && (VarArg != NULL)) {
-
     Status = NetLibStrToIp6andPrefix (VarArg->Arg, &Address, &Prefix);
 
     if (EFI_ERROR (Status)) {
@@ -491,6 +491,7 @@ IfConfig6ParseManualAddressList (
     if (Prefix == 0xFF) {
       Prefix = 0;
     }
+
     AddrBuf[AddrCnt].IsAnycast    = FALSE;
     AddrBuf[AddrCnt].PrefixLength = Prefix;
     IP6_COPY_ADDRESS (&AddrBuf[AddrCnt].Address, &Address);
@@ -528,17 +529,17 @@ ON_ERROR:
 **/
 EFI_STATUS
 IfConfig6ParseGwDnsAddressList (
-  IN OUT ARG_LIST            **Arg,
-     OUT EFI_IPv6_ADDRESS    **Buf,
-     OUT UINTN               *BufSize
+  IN OUT ARG_LIST       **Arg,
+  OUT EFI_IPv6_ADDRESS  **Buf,
+  OUT UINTN             *BufSize
   )
 {
-  EFI_STATUS          Status;
-  EFI_IPv6_ADDRESS    *AddrBuf;
-  ARG_LIST            *VarArg;
-  EFI_IPv6_ADDRESS    Address;
-  UINT8               Prefix;
-  UINT8               AddrCnt;
+  EFI_STATUS        Status;
+  EFI_IPv6_ADDRESS  *AddrBuf;
+  ARG_LIST          *VarArg;
+  EFI_IPv6_ADDRESS  Address;
+  UINT8             Prefix;
+  UINT8             AddrCnt;
 
   AddrCnt  = 0;
   *BufSize = 0;
@@ -550,7 +551,6 @@ IfConfig6ParseGwDnsAddressList (
   // Go through the list to check the correctness of input gw/dns address.
   //
   while ((!EFI_ERROR (Status)) && (VarArg != NULL)) {
-
     Status = NetLibStrToIp6andPrefix (VarArg->Arg, &Address, &Prefix);
 
     if (EFI_ERROR (Status)) {
@@ -579,7 +579,6 @@ IfConfig6ParseGwDnsAddressList (
   // Go through the list to fill in the EFI_IPv6_ADDRESS structure.
   //
   while ((!EFI_ERROR (Status)) && (VarArg != NULL)) {
-
     Status = NetLibStrToIp6andPrefix (VarArg->Arg, &Address, &Prefix);
 
     if (EFI_ERROR (Status)) {
@@ -595,7 +594,7 @@ IfConfig6ParseGwDnsAddressList (
   *Arg = VarArg;
 
   if (EFI_ERROR (Status) && (Status != EFI_INVALID_PARAMETER)) {
-   goto ON_ERROR;
+    goto ON_ERROR;
   }
 
   *Buf     = AddrBuf;
@@ -621,13 +620,13 @@ ON_ERROR:
 **/
 EFI_STATUS
 IfConfig6ParseInterfaceId (
-  IN OUT ARG_LIST                       **Arg,
-     OUT EFI_IP6_CONFIG_INTERFACE_ID    **IfId
+  IN OUT ARG_LIST                  **Arg,
+  OUT EFI_IP6_CONFIG_INTERFACE_ID  **IfId
   )
 {
-  UINT8     Index;
-  UINT8     NodeVal;
-  CHAR16    *IdStr;
+  UINT8   Index;
+  UINT8   NodeVal;
+  CHAR16  *IdStr;
 
   if (*Arg == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -640,10 +639,8 @@ IfConfig6ParseInterfaceId (
   ASSERT (*IfId != NULL);
 
   while ((*IdStr != L'\0') && (Index < 8)) {
-
     NodeVal = 0;
     while ((*IdStr != L':') && (*IdStr != L'\0')) {
-
       if ((*IdStr <= L'F') && (*IdStr >= L'A')) {
         NodeVal = (UINT8)((NodeVal << 4) + *IdStr - L'A' + 10);
       } else if ((*IdStr <= L'f') && (*IdStr >= L'a')) {
@@ -681,11 +678,11 @@ IfConfig6ParseInterfaceId (
 **/
 EFI_STATUS
 IfConfig6ParseDadXmits (
-  IN OUT ARG_LIST    **Arg,
-     OUT UINT32      *Xmits
+  IN OUT ARG_LIST  **Arg,
+  OUT UINT32       *Xmits
   )
 {
-  CHAR16    *ValStr;
+  CHAR16  *ValStr;
 
   if (*Arg == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -695,13 +692,9 @@ IfConfig6ParseDadXmits (
   *Xmits = 0;
 
   while (*ValStr != L'\0') {
-
     if ((*ValStr <= L'9') && (*ValStr >= L'0')) {
-
       *Xmits = (*Xmits * 10) + (*ValStr - L'0');
-
     } else {
-
       return EFI_INVALID_PARAMETER;
     }
 
@@ -725,25 +718,25 @@ IfConfig6ParseDadXmits (
 **/
 EFI_STATUS
 IfConfig6GetInterfaceInfo (
-  IN EFI_HANDLE    ImageHandle,
-  IN CHAR16        *IfName,
-  IN LIST_ENTRY    *IfList
+  IN EFI_HANDLE  ImageHandle,
+  IN CHAR16      *IfName,
+  IN LIST_ENTRY  *IfList
   )
 {
-  EFI_STATUS                       Status;
-  UINTN                            HandleIndex;
-  UINTN                            HandleNum;
-  EFI_HANDLE                       *HandleBuffer;
-  EFI_IP6_CONFIG_PROTOCOL          *Ip6Cfg;
-  EFI_IP6_CONFIG_INTERFACE_INFO    *IfInfo;
-  IFCONFIG6_INTERFACE_CB           *IfCb;
-  UINTN                            DataSize;
+  EFI_STATUS                     Status;
+  UINTN                          HandleIndex;
+  UINTN                          HandleNum;
+  EFI_HANDLE                     *HandleBuffer;
+  EFI_IP6_CONFIG_PROTOCOL        *Ip6Cfg;
+  EFI_IP6_CONFIG_INTERFACE_INFO  *IfInfo;
+  IFCONFIG6_INTERFACE_CB         *IfCb;
+  UINTN                          DataSize;
 
   HandleBuffer = NULL;
   HandleNum    = 0;
 
-  IfInfo       = NULL;
-  IfCb         = NULL;
+  IfInfo = NULL;
+  IfCb   = NULL;
 
   //
   // Locate all the handles with ip6 service binding protocol.
@@ -754,7 +747,7 @@ IfConfig6GetInterfaceInfo (
                   NULL,
                   &HandleNum,
                   &HandleBuffer
-                 );
+                  );
   if (EFI_ERROR (Status) || (HandleNum == 0)) {
     return Status;
   }
@@ -763,9 +756,9 @@ IfConfig6GetInterfaceInfo (
   // Enumerate all handles that installed with ip6 service binding protocol.
   //
   for (HandleIndex = 0; HandleIndex < HandleNum; HandleIndex++) {
-    IfCb      = NULL;
-    IfInfo    = NULL;
-    DataSize  = 0;
+    IfCb     = NULL;
+    IfInfo   = NULL;
+    DataSize = 0;
 
     //
     // Ip6config protocol and ip6 service binding protocol are installed
@@ -775,12 +768,13 @@ IfConfig6GetInterfaceInfo (
     Status = gBS->HandleProtocol (
                     HandleBuffer[HandleIndex],
                     &gEfiIp6ConfigProtocolGuid,
-                    (VOID **) &Ip6Cfg
+                    (VOID **)&Ip6Cfg
                     );
 
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
     }
+
     //
     // Get the interface information size.
     //
@@ -802,6 +796,7 @@ IfConfig6GetInterfaceInfo (
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_ERROR;
     }
+
     //
     // Get the interface info.
     //
@@ -816,6 +811,7 @@ IfConfig6GetInterfaceInfo (
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
       goto ON_ERROR;
     }
+
     //
     // Check the interface name if required.
     //
@@ -850,13 +846,12 @@ IfConfig6GetInterfaceInfo (
     IfCb->NicHandle = HandleBuffer[HandleIndex];
     IfCb->IfInfo    = IfInfo;
     IfCb->IfCfg     = Ip6Cfg;
-    IfCb->DnsCnt    = (UINT32) (DataSize / sizeof (EFI_IPv6_ADDRESS));
+    IfCb->DnsCnt    = (UINT32)(DataSize / sizeof (EFI_IPv6_ADDRESS));
 
     //
     // Get the dns server list if has.
     //
     if (DataSize > 0) {
-
       Status = Ip6Cfg->GetData (
                          Ip6Cfg,
                          Ip6ConfigDataTypeDnsServer,
@@ -869,6 +864,7 @@ IfConfig6GetInterfaceInfo (
         goto ON_ERROR;
       }
     }
+
     //
     // Get the interface id if has.
     //
@@ -895,6 +891,7 @@ IfConfig6GetInterfaceInfo (
       FreePool (IfCb->IfId);
       IfCb->IfId = NULL;
     }
+
     //
     // Get the config policy.
     //
@@ -910,6 +907,7 @@ IfConfig6GetInterfaceInfo (
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
       goto ON_ERROR;
     }
+
     //
     // Get the dad transmits.
     //
@@ -972,14 +970,14 @@ ON_ERROR:
 **/
 SHELL_STATUS
 IfConfig6ShowInterfaceInfo (
-  IN LIST_ENTRY    *IfList
+  IN LIST_ENTRY  *IfList
   )
 {
-  LIST_ENTRY                *Entry;
-  IFCONFIG6_INTERFACE_CB    *IfCb;
-  UINTN                     Index;
+  LIST_ENTRY              *Entry;
+  IFCONFIG6_INTERFACE_CB  *IfCb;
+  UINTN                   Index;
 
-  Entry  = IfList->ForwardLink;
+  Entry = IfList->ForwardLink;
 
   if (IsListEmpty (IfList)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_INTERFACE), gShellNetwork2HiiHandle);
@@ -989,7 +987,6 @@ IfConfig6ShowInterfaceInfo (
   // Go through the interface list.
   //
   while (Entry != IfList) {
-
     IfCb = BASE_CR (Entry, IFCONFIG6_INTERFACE_CB, Link);
 
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_BREAK), gShellNetwork2HiiHandle);
@@ -1024,6 +1021,7 @@ IfConfig6ShowInterfaceInfo (
         8
         );
     }
+
     //
     // Print mac address of the interface.
     //
@@ -1100,18 +1098,18 @@ IfConfig6ShowInterfaceInfo (
 **/
 SHELL_STATUS
 IfConfig6ClearInterfaceInfo (
-  IN LIST_ENTRY    *IfList,
-  IN CHAR16        *IfName
+  IN LIST_ENTRY  *IfList,
+  IN CHAR16      *IfName
   )
 {
-  EFI_STATUS                Status;
-  SHELL_STATUS              ShellStatus;
-  LIST_ENTRY                *Entry;
-  IFCONFIG6_INTERFACE_CB    *IfCb;
-  EFI_IP6_CONFIG_POLICY     Policy;
+  EFI_STATUS              Status;
+  SHELL_STATUS            ShellStatus;
+  LIST_ENTRY              *Entry;
+  IFCONFIG6_INTERFACE_CB  *IfCb;
+  EFI_IP6_CONFIG_POLICY   Policy;
 
-  Entry  = IfList->ForwardLink;
-  Status = EFI_SUCCESS;
+  Entry       = IfList->ForwardLink;
+  Status      = EFI_SUCCESS;
   ShellStatus = SHELL_SUCCESS;
 
   if (IsListEmpty (IfList)) {
@@ -1123,7 +1121,6 @@ IfConfig6ClearInterfaceInfo (
   // need to refresh the configuration.
   //
   while (Entry != IfList) {
-
     IfCb = BASE_CR (Entry, IFCONFIG6_INTERFACE_CB, Link);
 
     if ((IfName != NULL) && (StrCmp (IfName, IfCb->IfInfo->Name) == 0)) {
@@ -1157,7 +1154,7 @@ IfConfig6ClearInterfaceInfo (
       break;
     }
 
-    Entry  = Entry->ForwardLink;
+    Entry = Entry->ForwardLink;
   }
 
   return ShellStatus;
@@ -1175,32 +1172,32 @@ IfConfig6ClearInterfaceInfo (
 **/
 SHELL_STATUS
 IfConfig6SetInterfaceInfo (
-  IN LIST_ENTRY    *IfList,
-  IN ARG_LIST      *VarArg
+  IN LIST_ENTRY  *IfList,
+  IN ARG_LIST    *VarArg
   )
 {
-  EFI_STATUS                       Status;
-  SHELL_STATUS                     ShellStatus;
-  IFCONFIG6_INTERFACE_CB           *IfCb;
-  EFI_IP6_CONFIG_MANUAL_ADDRESS    *CfgManAddr;
-  EFI_IPv6_ADDRESS                 *CfgAddr;
-  UINTN                            AddrSize;
-  EFI_IP6_CONFIG_INTERFACE_ID      *InterfaceId;
-  UINT32                           DadXmits;
-  UINT32                           CurDadXmits;
-  UINTN                            CurDadXmitsLen;
-  EFI_IP6_CONFIG_POLICY            Policy;
+  EFI_STATUS                     Status;
+  SHELL_STATUS                   ShellStatus;
+  IFCONFIG6_INTERFACE_CB         *IfCb;
+  EFI_IP6_CONFIG_MANUAL_ADDRESS  *CfgManAddr;
+  EFI_IPv6_ADDRESS               *CfgAddr;
+  UINTN                          AddrSize;
+  EFI_IP6_CONFIG_INTERFACE_ID    *InterfaceId;
+  UINT32                         DadXmits;
+  UINT32                         CurDadXmits;
+  UINTN                          CurDadXmitsLen;
+  EFI_IP6_CONFIG_POLICY          Policy;
 
-  VAR_CHECK_CODE                   CheckCode;
-  EFI_EVENT                        TimeOutEvt;
-  EFI_EVENT                        MappedEvt;
-  BOOLEAN                          IsAddressOk;
+  VAR_CHECK_CODE  CheckCode;
+  EFI_EVENT       TimeOutEvt;
+  EFI_EVENT       MappedEvt;
+  BOOLEAN         IsAddressOk;
 
-  UINTN                            DataSize;
-  UINT32                           Index;
-  UINT32                           Index2;
-  BOOLEAN                          IsAddressSet;
-  EFI_IP6_CONFIG_INTERFACE_INFO    *IfInfo;
+  UINTN                          DataSize;
+  UINT32                         Index;
+  UINT32                         Index2;
+  BOOLEAN                        IsAddressSet;
+  EFI_IP6_CONFIG_INTERFACE_INFO  *IfInfo;
 
   CfgManAddr  = NULL;
   CfgAddr     = NULL;
@@ -1214,17 +1211,18 @@ IfConfig6SetInterfaceInfo (
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_INTERFACE), gShellNetwork2HiiHandle);
     return SHELL_INVALID_PARAMETER;
   }
+
   //
   // Make sure to set only one interface each time.
   //
-  IfCb   = BASE_CR (IfList->ForwardLink, IFCONFIG6_INTERFACE_CB, Link);
-  Status = EFI_SUCCESS;
+  IfCb        = BASE_CR (IfList->ForwardLink, IFCONFIG6_INTERFACE_CB, Link);
+  Status      = EFI_SUCCESS;
   ShellStatus = SHELL_SUCCESS;
 
   //
   // Initialize check list mechanism.
   //
-  CheckCode = IfConfig6RetriveCheckListByName(
+  CheckCode = IfConfig6RetriveCheckListByName (
                 NULL,
                 NULL,
                 TRUE
@@ -1256,14 +1254,15 @@ IfConfig6SetInterfaceInfo (
     ShellStatus = SHELL_ACCESS_DENIED;
     goto ON_EXIT;
   }
+
   //
   // Parse the setting variables.
   //
   while (VarArg != NULL) {
-     //
-     // Check invalid parameters (duplication & unknown & conflict).
-     //
-    CheckCode = IfConfig6RetriveCheckListByName(
+    //
+    // Check invalid parameters (duplication & unknown & conflict).
+    //
+    CheckCode = IfConfig6RetriveCheckListByName (
                   mIfConfig6SetCheckList,
                   VarArg->Arg,
                   FALSE
@@ -1290,10 +1289,11 @@ IfConfig6SetInterfaceInfo (
       VarArg = VarArg->Next;
       continue;
     }
+
     //
     // Process valid variables.
     //
-    if (StrCmp(VarArg->Arg, L"auto") == 0) {
+    if (StrCmp (VarArg->Arg, L"auto") == 0) {
       //
       // Set automaic config policy
       //
@@ -1305,12 +1305,12 @@ IfConfig6SetInterfaceInfo (
                               &Policy
                               );
 
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
 
-      VarArg= VarArg->Next;
+      VarArg = VarArg->Next;
 
       if (VarArg != NULL) {
         if (StrCmp (VarArg->Arg, L"host") == 0) {
@@ -1339,13 +1339,12 @@ IfConfig6SetInterfaceInfo (
                               &Policy
                               );
 
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
 
-      VarArg= VarArg->Next;
-
+      VarArg = VarArg->Next;
     } else if (StrCmp (VarArg->Arg, L"host") == 0) {
       //
       // Parse till the next tag or the end of command line.
@@ -1367,6 +1366,7 @@ IfConfig6SetInterfaceInfo (
           goto ON_EXIT;
         }
       }
+
       //
       // Set static host ip6 address list.
       //   This is a asynchronous process.
@@ -1462,7 +1462,7 @@ IfConfig6SetInterfaceInfo (
         goto ON_EXIT;
       }
 
-      for ( Index = 0; Index < (UINTN) (AddrSize / sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS)); Index++) {
+      for ( Index = 0; Index < (UINTN)(AddrSize / sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS)); Index++) {
         IsAddressSet = FALSE;
         //
         // By default, the prefix length 0 is regarded as 64.
@@ -1473,7 +1473,8 @@ IfConfig6SetInterfaceInfo (
 
         for (Index2 = 0; Index2 < IfInfo->AddressInfoCount; Index2++) {
           if (EFI_IP6_EQUAL (&IfInfo->AddressInfo[Index2].Address, &CfgManAddr[Index].Address) &&
-              (IfInfo->AddressInfo[Index2].PrefixLength == CfgManAddr[Index].PrefixLength)) {
+              (IfInfo->AddressInfo[Index2].PrefixLength == CfgManAddr[Index].PrefixLength))
+          {
             IsAddressSet = TRUE;
             break;
           }
@@ -1488,7 +1489,6 @@ IfConfig6SetInterfaceInfo (
           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
         }
       }
-
     } else if (StrCmp (VarArg->Arg, L"gw") == 0) {
       //
       // Parse till the next tag or the end of command line.
@@ -1510,6 +1510,7 @@ IfConfig6SetInterfaceInfo (
           goto ON_EXIT;
         }
       }
+
       //
       // Set static gateway ip6 address list.
       //
@@ -1525,7 +1526,6 @@ IfConfig6SetInterfaceInfo (
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_MAN_GW), gShellNetwork2HiiHandle, Status);
         goto ON_EXIT;
       }
-
     } else if (StrCmp (VarArg->Arg, L"dns") == 0) {
       //
       // Parse till the next tag or the end of command line.
@@ -1547,6 +1547,7 @@ IfConfig6SetInterfaceInfo (
           goto ON_EXIT;
         }
       }
+
       //
       // Set static DNS server ip6 address list.
       //
@@ -1561,7 +1562,6 @@ IfConfig6SetInterfaceInfo (
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
-
     } else if (StrCmp (VarArg->Arg, L"id") == 0) {
       //
       // Parse till the next tag or the end of command line.
@@ -1573,6 +1573,7 @@ IfConfig6SetInterfaceInfo (
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto ON_EXIT;
       }
+
       //
       // Set alternative interface id.
       //
@@ -1587,7 +1588,6 @@ IfConfig6SetInterfaceInfo (
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
-
     } else if (StrCmp (VarArg->Arg, L"dad") == 0) {
       //
       // Parse till the next tag or the end of command line.
@@ -1599,6 +1599,7 @@ IfConfig6SetInterfaceInfo (
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
+
       //
       // Set dad transmits count.
       //
@@ -1609,7 +1610,7 @@ IfConfig6SetInterfaceInfo (
                               &DadXmits
                               );
 
-      if (EFI_ERROR(Status)) {
+      if (EFI_ERROR (Status)) {
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
@@ -1639,7 +1640,6 @@ ON_EXIT:
   }
 
   return ShellStatus;
-
 }
 
 /**
@@ -1653,7 +1653,7 @@ ON_EXIT:
 **/
 SHELL_STATUS
 IfConfig6 (
-  IN IFCONFIG6_PRIVATE_DATA    *Private
+  IN IFCONFIG6_PRIVATE_DATA  *Private
   )
 {
   EFI_STATUS    Status;
@@ -1676,20 +1676,20 @@ IfConfig6 (
   }
 
   switch (Private->OpCode) {
-  case IfConfig6OpList:
-    ShellStatus = IfConfig6ShowInterfaceInfo (&Private->IfList);
-    break;
+    case IfConfig6OpList:
+      ShellStatus = IfConfig6ShowInterfaceInfo (&Private->IfList);
+      break;
 
-  case IfConfig6OpClear:
-    ShellStatus = IfConfig6ClearInterfaceInfo (&Private->IfList, Private->IfName);
-    break;
+    case IfConfig6OpClear:
+      ShellStatus = IfConfig6ClearInterfaceInfo (&Private->IfList, Private->IfName);
+      break;
 
-  case IfConfig6OpSet:
-    ShellStatus = IfConfig6SetInterfaceInfo (&Private->IfList, Private->VarArg);
-    break;
+    case IfConfig6OpSet:
+      ShellStatus = IfConfig6SetInterfaceInfo (&Private->IfList, Private->VarArg);
+      break;
 
-  default:
-    ShellStatus = SHELL_UNSUPPORTED;
+    default:
+      ShellStatus = SHELL_UNSUPPORTED;
   }
 
 ON_EXIT:
@@ -1705,12 +1705,12 @@ ON_EXIT:
 **/
 VOID
 IfConfig6Cleanup (
-  IN IFCONFIG6_PRIVATE_DATA    *Private
+  IN IFCONFIG6_PRIVATE_DATA  *Private
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *NextEntry;
-  IFCONFIG6_INTERFACE_CB    *IfCb;
+  LIST_ENTRY              *Entry;
+  LIST_ENTRY              *NextEntry;
+  IFCONFIG6_INTERFACE_CB  *IfCb;
 
   ASSERT (Private != NULL);
 
@@ -1721,9 +1721,9 @@ IfConfig6Cleanup (
     IfConfig6FreeArgList (Private->VarArg);
   }
 
-  if (Private->IfName != NULL)
+  if (Private->IfName != NULL) {
     FreePool (Private->IfName);
-
+  }
 
   //
   // Clean the IFCONFIG6_INTERFACE_CB list.
@@ -1732,18 +1732,15 @@ IfConfig6Cleanup (
   NextEntry = Entry->ForwardLink;
 
   while (Entry != &Private->IfList) {
-
     IfCb = BASE_CR (Entry, IFCONFIG6_INTERFACE_CB, Link);
 
     RemoveEntryList (&IfCb->Link);
 
     if (IfCb->IfId != NULL) {
-
       FreePool (IfCb->IfId);
     }
 
     if (IfCb->IfInfo != NULL) {
-
       FreePool (IfCb->IfInfo);
     }
 
@@ -1773,17 +1770,17 @@ ShellCommandRunIfconfig6 (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
-  SHELL_STATUS              ShellStatus;
-  IFCONFIG6_PRIVATE_DATA    *Private;
-  LIST_ENTRY                *ParamPackage;
-  CONST CHAR16              *ValueStr;
-  ARG_LIST                  *ArgList;
-  CHAR16                    *ProblemParam;
-  CHAR16                    *Str;
+  EFI_STATUS              Status;
+  SHELL_STATUS            ShellStatus;
+  IFCONFIG6_PRIVATE_DATA  *Private;
+  LIST_ENTRY              *ParamPackage;
+  CONST CHAR16            *ValueStr;
+  ARG_LIST                *ArgList;
+  CHAR16                  *ProblemParam;
+  CHAR16                  *Str;
 
-  Private = NULL;
-  Status = EFI_INVALID_PARAMETER;
+  Private     = NULL;
+  Status      = EFI_INVALID_PARAMETER;
   ShellStatus = SHELL_SUCCESS;
 
   Status = ShellCommandLineParseEx (mIfConfig6CheckList, &ParamPackage, &ProblemParam, TRUE, FALSE);
@@ -1797,11 +1794,13 @@ ShellCommandRunIfconfig6 (
   // To handle no option.
   //
   if (!ShellCommandLineGetFlag (ParamPackage, L"-r") && !ShellCommandLineGetFlag (ParamPackage, L"-s") &&
-      !ShellCommandLineGetFlag (ParamPackage, L"-?") && !ShellCommandLineGetFlag (ParamPackage, L"-l")) {
+      !ShellCommandLineGetFlag (ParamPackage, L"-?") && !ShellCommandLineGetFlag (ParamPackage, L"-l"))
+  {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_LACK_OPTION), gShellNetwork2HiiHandle);
     ShellStatus = SHELL_INVALID_PARAMETER;
     goto ON_EXIT;
   }
+
   //
   // To handle conflict options.
   //
@@ -1810,7 +1809,8 @@ ShellCommandRunIfconfig6 (
       ((ShellCommandLineGetFlag (ParamPackage, L"-r")) && (ShellCommandLineGetFlag (ParamPackage, L"-?"))) ||
       ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-l"))) ||
       ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-?"))) ||
-      ((ShellCommandLineGetFlag (ParamPackage, L"-l")) && (ShellCommandLineGetFlag (ParamPackage, L"-?")))) {
+      ((ShellCommandLineGetFlag (ParamPackage, L"-l")) && (ShellCommandLineGetFlag (ParamPackage, L"-?"))))
+  {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_CONFLICT_OPTIONS), gShellNetwork2HiiHandle);
     ShellStatus = SHELL_INVALID_PARAMETER;
     goto ON_EXIT;
@@ -1830,7 +1830,7 @@ ShellCommandRunIfconfig6 (
   //
   if (ShellCommandLineGetFlag (ParamPackage, L"-l")) {
     Private->OpCode = IfConfig6OpList;
-    ValueStr = ShellCommandLineGetValue (ParamPackage, L"-l");
+    ValueStr        = ShellCommandLineGetValue (ParamPackage, L"-l");
     if (ValueStr != NULL) {
       Str = AllocateCopyPool (StrSize (ValueStr), ValueStr);
       if (Str == NULL) {
@@ -1838,15 +1838,17 @@ ShellCommandRunIfconfig6 (
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       Private->IfName = Str;
     }
   }
+
   //
   // To get interface name for the clear option.
   //
   if (ShellCommandLineGetFlag (ParamPackage, L"-r")) {
     Private->OpCode = IfConfig6OpClear;
-    ValueStr = ShellCommandLineGetValue (ParamPackage, L"-r");
+    ValueStr        = ShellCommandLineGetValue (ParamPackage, L"-r");
     if (ValueStr != NULL) {
       Str = AllocateCopyPool (StrSize (ValueStr), ValueStr);
       if (Str == NULL) {
@@ -1854,20 +1856,22 @@ ShellCommandRunIfconfig6 (
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
+
       Private->IfName = Str;
     }
   }
+
   //
   // To get interface name and corresponding Args for the set option.
   //
   if (ShellCommandLineGetFlag (ParamPackage, L"-s")) {
-
     ValueStr = ShellCommandLineGetValue (ParamPackage, L"-s");
     if (ValueStr == NULL) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_INTERFACE), gShellNetwork2HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto ON_EXIT;
     }
+
     //
     // To split the configuration into multi-section.
     //
@@ -1883,12 +1887,13 @@ ShellCommandRunIfconfig6 (
 
     Private->VarArg = ArgList->Next;
 
-    if (Private->IfName == NULL || Private->VarArg == NULL) {
+    if ((Private->IfName == NULL) || (Private->VarArg == NULL)) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_COMMAND), gShellNetwork2HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto ON_EXIT;
     }
   }
+
   //
   // Main process of ifconfig6.
   //
@@ -1900,7 +1905,6 @@ ON_EXIT:
   if (Private != NULL) {
     IfConfig6Cleanup (Private);
   }
+
   return ShellStatus;
-
 }
-

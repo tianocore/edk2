@@ -8,16 +8,16 @@
 
 #include "UefiShellDriver1CommandsLib.h"
 
-STATIC CONST CHAR16 mFileName[] = L"Driver1Commands";
-EFI_HII_HANDLE gShellDriver1HiiHandle = NULL;
-BOOLEAN    gInReconnect = FALSE;
+STATIC CONST CHAR16  mFileName[]            = L"Driver1Commands";
+EFI_HII_HANDLE       gShellDriver1HiiHandle = NULL;
+BOOLEAN              gInReconnect           = FALSE;
 
 /**
   Function to return the name of the file containing help if HII will not be used.
 
   @return The filename.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
 ShellCommandGetManFileNameDriver1 (
   VOID
@@ -45,7 +45,7 @@ UefiShellDriver1CommandsLibConstructor (
   //
   // check our bit of the profiles mask
   //
-  if ((PcdGet8(PcdShellProfileMask) & BIT0) == 0) {
+  if ((PcdGet8 (PcdShellProfileMask) & BIT0) == 0) {
     return (EFI_SUCCESS);
   }
 
@@ -60,17 +60,17 @@ UefiShellDriver1CommandsLibConstructor (
   //
   // install our shell command handlers that are always installed
   //
-  ShellCommandRegisterCommandName(L"connect",    ShellCommandRunConnect               , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_CONNECT)   );
-  ShellCommandRegisterCommandName(L"devices",    ShellCommandRunDevices               , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_DEVICES)   );
-  ShellCommandRegisterCommandName(L"openinfo",   ShellCommandRunOpenInfo              , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_OPENINFO)  );
-  ShellCommandRegisterCommandName(L"disconnect", ShellCommandRunDisconnect            , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_DISCONNECT));
-  ShellCommandRegisterCommandName(L"reconnect",  ShellCommandRunReconnect             , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_RECONNECT) );
-  ShellCommandRegisterCommandName(L"unload",     ShellCommandRunUnload                , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_UNLOAD)    );
-  ShellCommandRegisterCommandName(L"drvdiag",    ShellCommandRunDrvDiag               , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_DRVDIAG)   );
-  ShellCommandRegisterCommandName(L"dh",         ShellCommandRunDh                    , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_DH)        );
-  ShellCommandRegisterCommandName(L"drivers",    ShellCommandRunDrivers               , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_DRIVERS)   );
-  ShellCommandRegisterCommandName(L"devtree",    ShellCommandRunDevTree               , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_DEVTREE)   );
-  ShellCommandRegisterCommandName(L"drvcfg",     ShellCommandRunDrvCfg                , ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN(STR_GET_HELP_DRVCFG)    );
+  ShellCommandRegisterCommandName (L"connect", ShellCommandRunConnect, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_CONNECT));
+  ShellCommandRegisterCommandName (L"devices", ShellCommandRunDevices, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_DEVICES));
+  ShellCommandRegisterCommandName (L"openinfo", ShellCommandRunOpenInfo, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_OPENINFO));
+  ShellCommandRegisterCommandName (L"disconnect", ShellCommandRunDisconnect, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_DISCONNECT));
+  ShellCommandRegisterCommandName (L"reconnect", ShellCommandRunReconnect, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_RECONNECT));
+  ShellCommandRegisterCommandName (L"unload", ShellCommandRunUnload, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_UNLOAD));
+  ShellCommandRegisterCommandName (L"drvdiag", ShellCommandRunDrvDiag, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_DRVDIAG));
+  ShellCommandRegisterCommandName (L"dh", ShellCommandRunDh, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_DH));
+  ShellCommandRegisterCommandName (L"drivers", ShellCommandRunDrivers, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_DRIVERS));
+  ShellCommandRegisterCommandName (L"devtree", ShellCommandRunDevTree, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_DEVTREE));
+  ShellCommandRegisterCommandName (L"drvcfg", ShellCommandRunDrvCfg, ShellCommandGetManFileNameDriver1, 0, L"Driver1", TRUE, gShellDriver1HiiHandle, STRING_TOKEN (STR_GET_HELP_DRVCFG));
 
   return (EFI_SUCCESS);
 }
@@ -89,10 +89,8 @@ UefiShellDriver1CommandsLibDestructor (
   )
 {
   if (gShellDriver1HiiHandle != NULL) {
-    HiiRemovePackages(gShellDriver1HiiHandle);
+    HiiRemovePackages (gShellDriver1HiiHandle);
   }
+
   return (EFI_SUCCESS);
 }
-
-
-

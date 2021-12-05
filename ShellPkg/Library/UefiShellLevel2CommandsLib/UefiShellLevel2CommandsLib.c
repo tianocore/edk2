@@ -28,15 +28,15 @@
 **/
 #include "UefiShellLevel2CommandsLib.h"
 
-CONST CHAR16 mFileName[] = L"ShellCommands";
-EFI_HII_HANDLE gShellLevel2HiiHandle = NULL;
+CONST CHAR16    mFileName[]           = L"ShellCommands";
+EFI_HII_HANDLE  gShellLevel2HiiHandle = NULL;
 
 /**
   Get the filename to get help text from if not using HII.
 
   @retval The filename.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
 ShellCommandGetManFileNameLevel2 (
   VOID
@@ -66,7 +66,7 @@ ShellLevel2CommandsLibConstructor (
   //
   // if shell level is less than 2 do nothing
   //
-  if (PcdGet8(PcdShellSupportLevel) < 2) {
+  if (PcdGet8 (PcdShellSupportLevel) < 2) {
     return (EFI_SUCCESS);
   }
 
@@ -78,48 +78,48 @@ ShellLevel2CommandsLibConstructor (
   //
   // install our shell command handlers that are always installed
   //
-  ShellCommandRegisterCommandName(L"attrib",   ShellCommandRunAttrib  , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_ATTRIB) );
-  ShellCommandRegisterCommandName(L"cd",       ShellCommandRunCd      , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_CD)     );
-  ShellCommandRegisterCommandName(L"cp",       ShellCommandRunCp      , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_CP)     );
-  ShellCommandRegisterCommandName(L"load",     ShellCommandRunLoad    , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_LOAD)   );
-  ShellCommandRegisterCommandName(L"map",      ShellCommandRunMap     , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_MAP)    );
-  ShellCommandRegisterCommandName(L"mkdir",    ShellCommandRunMkDir   , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_MKDIR)  );
-  ShellCommandRegisterCommandName(L"mv",       ShellCommandRunMv      , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_MV)     );
-  ShellCommandRegisterCommandName(L"parse",    ShellCommandRunParse   , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_PARSE)  );
-  ShellCommandRegisterCommandName(L"reset",    ShellCommandRunReset   , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_RESET)  );
-  ShellCommandRegisterCommandName(L"set",      ShellCommandRunSet     , ShellCommandGetManFileNameLevel2, 2, L"",FALSE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_SET)    );
-  ShellCommandRegisterCommandName(L"ls",       ShellCommandRunLs      , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_LS)     );
-  ShellCommandRegisterCommandName(L"rm",       ShellCommandRunRm      , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_RM)     );
-  ShellCommandRegisterCommandName(L"vol",      ShellCommandRunVol     , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_VOL)    );
+  ShellCommandRegisterCommandName (L"attrib", ShellCommandRunAttrib, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_ATTRIB));
+  ShellCommandRegisterCommandName (L"cd", ShellCommandRunCd, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_CD));
+  ShellCommandRegisterCommandName (L"cp", ShellCommandRunCp, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_CP));
+  ShellCommandRegisterCommandName (L"load", ShellCommandRunLoad, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_LOAD));
+  ShellCommandRegisterCommandName (L"map", ShellCommandRunMap, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_MAP));
+  ShellCommandRegisterCommandName (L"mkdir", ShellCommandRunMkDir, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_MKDIR));
+  ShellCommandRegisterCommandName (L"mv", ShellCommandRunMv, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_MV));
+  ShellCommandRegisterCommandName (L"parse", ShellCommandRunParse, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_PARSE));
+  ShellCommandRegisterCommandName (L"reset", ShellCommandRunReset, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_RESET));
+  ShellCommandRegisterCommandName (L"set", ShellCommandRunSet, ShellCommandGetManFileNameLevel2, 2, L"", FALSE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_SET));
+  ShellCommandRegisterCommandName (L"ls", ShellCommandRunLs, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_LS));
+  ShellCommandRegisterCommandName (L"rm", ShellCommandRunRm, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_RM));
+  ShellCommandRegisterCommandName (L"vol", ShellCommandRunVol, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_VOL));
 
   //
   // support for permanent (built in) aliases
   //
-  ShellCommandRegisterAlias(L"rm", L"del");
-  ShellCommandRegisterAlias(L"ls", L"dir");
-  ShellCommandRegisterAlias(L"cp", L"copy");
-  ShellCommandRegisterAlias(L"mkdir", L"md");
-  ShellCommandRegisterAlias(L"cd ..", L"cd..");
-  ShellCommandRegisterAlias(L"cd \\", L"cd\\");
-  ShellCommandRegisterAlias(L"mv", L"ren");
-  ShellCommandRegisterAlias(L"mv", L"move");
-  ShellCommandRegisterAlias(L"map", L"mount");
+  ShellCommandRegisterAlias (L"rm", L"del");
+  ShellCommandRegisterAlias (L"ls", L"dir");
+  ShellCommandRegisterAlias (L"cp", L"copy");
+  ShellCommandRegisterAlias (L"mkdir", L"md");
+  ShellCommandRegisterAlias (L"cd ..", L"cd..");
+  ShellCommandRegisterAlias (L"cd \\", L"cd\\");
+  ShellCommandRegisterAlias (L"mv", L"ren");
+  ShellCommandRegisterAlias (L"mv", L"move");
+  ShellCommandRegisterAlias (L"map", L"mount");
   //
   // These are installed in level 2 or 3...
   //
-  if (PcdGet8(PcdShellSupportLevel) == 2 || PcdGet8(PcdShellSupportLevel) == 3) {
-    ShellCommandRegisterCommandName(L"date",     ShellCommandRunDate    , ShellCommandGetManFileNameLevel2, PcdGet8(PcdShellSupportLevel), L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_DATE)   );
-    ShellCommandRegisterCommandName(L"time",     ShellCommandRunTime    , ShellCommandGetManFileNameLevel2, PcdGet8(PcdShellSupportLevel), L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_TIME)   );
-    ShellCommandRegisterCommandName(L"timezone", ShellCommandRunTimeZone, ShellCommandGetManFileNameLevel2, PcdGet8(PcdShellSupportLevel), L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_TIMEZONE));
+  if ((PcdGet8 (PcdShellSupportLevel) == 2) || (PcdGet8 (PcdShellSupportLevel) == 3)) {
+    ShellCommandRegisterCommandName (L"date", ShellCommandRunDate, ShellCommandGetManFileNameLevel2, PcdGet8 (PcdShellSupportLevel), L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_DATE));
+    ShellCommandRegisterCommandName (L"time", ShellCommandRunTime, ShellCommandGetManFileNameLevel2, PcdGet8 (PcdShellSupportLevel), L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_TIME));
+    ShellCommandRegisterCommandName (L"timezone", ShellCommandRunTimeZone, ShellCommandGetManFileNameLevel2, PcdGet8 (PcdShellSupportLevel), L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_TIMEZONE));
   } else {
-    DEBUG_CODE_BEGIN();
+    DEBUG_CODE_BEGIN ();
     //
     // we want to be able to test these so install them under a different name in debug mode...
     //
-    ShellCommandRegisterCommandName(L"l2date",     ShellCommandRunDate    , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_DATE)   );
-    ShellCommandRegisterCommandName(L"l2time",     ShellCommandRunTime    , ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_TIME)   );
-    ShellCommandRegisterCommandName(L"l2timezone", ShellCommandRunTimeZone, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN(STR_GET_HELP_TIMEZONE));
-    DEBUG_CODE_END();
+    ShellCommandRegisterCommandName (L"l2date", ShellCommandRunDate, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_DATE));
+    ShellCommandRegisterCommandName (L"l2time", ShellCommandRunTime, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_TIME));
+    ShellCommandRegisterCommandName (L"l2timezone", ShellCommandRunTimeZone, ShellCommandGetManFileNameLevel2, 2, L"", TRUE, gShellLevel2HiiHandle, STRING_TOKEN (STR_GET_HELP_TIMEZONE));
+    DEBUG_CODE_END ();
   }
 
   return (EFI_SUCCESS);
@@ -141,8 +141,9 @@ ShellLevel2CommandsLibDestructor (
   )
 {
   if (gShellLevel2HiiHandle != NULL) {
-    HiiRemovePackages(gShellLevel2HiiHandle);
+    HiiRemovePackages (gShellLevel2HiiHandle);
   }
+
   return (EFI_SUCCESS);
 }
 
@@ -162,40 +163,41 @@ ShellLevel2CommandsLibDestructor (
   @retval NULL            A fully qualified path could not be discovered.
   @retval other           An allocated pointer to a fuly qualified path.
 **/
-CHAR16*
-GetFullyQualifiedPath(
-  IN CONST CHAR16* Path
+CHAR16 *
+GetFullyQualifiedPath (
+  IN CONST CHAR16  *Path
   )
 {
   CHAR16        *PathToReturn;
   UINTN         Size;
   CONST CHAR16  *CurDir;
 
-  PathToReturn  = NULL;
-  Size          = 0;
+  PathToReturn = NULL;
+  Size         = 0;
 
-  ASSERT((PathToReturn == NULL && Size == 0) || (PathToReturn != NULL));
+  ASSERT ((PathToReturn == NULL && Size == 0) || (PathToReturn != NULL));
   //
   // convert a local path to an absolute path
   //
-  if (StrStr(Path, L":") == NULL) {
-    CurDir = gEfiShellProtocol->GetCurDir(NULL);
-    StrnCatGrow(&PathToReturn, &Size, CurDir, 0);
-    StrnCatGrow(&PathToReturn, &Size, L"\\", 0);
+  if (StrStr (Path, L":") == NULL) {
+    CurDir = gEfiShellProtocol->GetCurDir (NULL);
+    StrnCatGrow (&PathToReturn, &Size, CurDir, 0);
+    StrnCatGrow (&PathToReturn, &Size, L"\\", 0);
     if (*Path == L'\\') {
       Path++;
     }
   }
-  StrnCatGrow(&PathToReturn, &Size, Path, 0);
 
-  PathCleanUpDirectories(PathToReturn);
+  StrnCatGrow (&PathToReturn, &Size, Path, 0);
+
+  PathCleanUpDirectories (PathToReturn);
 
   if (PathToReturn == NULL) {
     return NULL;
   }
 
-  while (PathToReturn[StrLen(PathToReturn)-1] == L'*') {
-    PathToReturn[StrLen(PathToReturn)-1] = CHAR_NULL;
+  while (PathToReturn[StrLen (PathToReturn)-1] == L'*') {
+    PathToReturn[StrLen (PathToReturn)-1] = CHAR_NULL;
   }
 
   return (PathToReturn);
@@ -210,46 +212,47 @@ GetFullyQualifiedPath(
 **/
 EFI_STATUS
 VerifyIntermediateDirectories (
-  IN CONST CHAR16 *Path
+  IN CONST CHAR16  *Path
   )
 {
-  EFI_STATUS      Status;
-  CHAR16          *PathCopy;
-  CHAR16          *TempSpot;
-  SHELL_FILE_HANDLE          FileHandle;
+  EFI_STATUS         Status;
+  CHAR16             *PathCopy;
+  CHAR16             *TempSpot;
+  SHELL_FILE_HANDLE  FileHandle;
 
-  ASSERT(Path != NULL);
+  ASSERT (Path != NULL);
 
-  Status      = EFI_SUCCESS;
-  PathCopy    = NULL;
-  PathCopy    = StrnCatGrow(&PathCopy, NULL, Path, 0);
-  FileHandle  = NULL;
+  Status     = EFI_SUCCESS;
+  PathCopy   = NULL;
+  PathCopy   = StrnCatGrow (&PathCopy, NULL, Path, 0);
+  FileHandle = NULL;
 
   if (PathCopy == NULL) {
     return (EFI_OUT_OF_RESOURCES);
   }
 
-  for (TempSpot = &PathCopy[StrLen(PathCopy)-1] ; *TempSpot != CHAR_NULL && *TempSpot != L'\\' ; TempSpot = &PathCopy[StrLen(PathCopy)-1]){
+  for (TempSpot = &PathCopy[StrLen (PathCopy)-1]; *TempSpot != CHAR_NULL && *TempSpot != L'\\'; TempSpot = &PathCopy[StrLen (PathCopy)-1]) {
     *TempSpot = CHAR_NULL;
   }
+
   if (*TempSpot == L'\\') {
     *TempSpot = CHAR_NULL;
   }
 
-  if (PathCopy != NULL && *PathCopy != CHAR_NULL) {
-    Status = VerifyIntermediateDirectories(PathCopy);
+  if ((PathCopy != NULL) && (*PathCopy != CHAR_NULL)) {
+    Status = VerifyIntermediateDirectories (PathCopy);
 
-    if (PathCopy[StrLen(PathCopy)-1] != L':') {
-      if (!EFI_ERROR(Status)) {
-        Status = ShellOpenFileByName(PathCopy, &FileHandle, EFI_FILE_MODE_READ, 0);
+    if (PathCopy[StrLen (PathCopy)-1] != L':') {
+      if (!EFI_ERROR (Status)) {
+        Status = ShellOpenFileByName (PathCopy, &FileHandle, EFI_FILE_MODE_READ, 0);
         if (FileHandle != NULL) {
-          ShellCloseFile(&FileHandle);
+          ShellCloseFile (&FileHandle);
         }
       }
     }
   }
 
-  SHELL_FREE_NON_NULL(PathCopy);
+  SHELL_FREE_NON_NULL (PathCopy);
 
   return (Status);
 }
@@ -266,17 +269,17 @@ VerifyIntermediateDirectories (
 
 **/
 INTN
-StrniCmp(
-  IN CONST CHAR16 *Source,
-  IN CONST CHAR16 *Target,
-  IN CONST UINTN  Count
+StrniCmp (
+  IN CONST CHAR16  *Source,
+  IN CONST CHAR16  *Target,
+  IN CONST UINTN   Count
   )
 {
-  CHAR16                    *SourceCopy;
-  CHAR16                    *TargetCopy;
-  UINTN                     SourceLength;
-  UINTN                     TargetLength;
-  INTN                      Result;
+  CHAR16  *SourceCopy;
+  CHAR16  *TargetCopy;
+  UINTN   SourceLength;
+  UINTN   TargetLength;
+  INTN    Result;
 
   if (Count == 0) {
     return 0;
@@ -286,10 +289,11 @@ StrniCmp(
   TargetLength = StrLen (Target);
   SourceLength = MIN (SourceLength, Count);
   TargetLength = MIN (TargetLength, Count);
-  SourceCopy = AllocateCopyPool ((SourceLength + 1) * sizeof (CHAR16), Source);
+  SourceCopy   = AllocateCopyPool ((SourceLength + 1) * sizeof (CHAR16), Source);
   if (SourceCopy == NULL) {
     return -1;
   }
+
   TargetCopy = AllocateCopyPool ((TargetLength + 1) * sizeof (CHAR16), Target);
   if (TargetCopy == NULL) {
     FreePool (SourceCopy);
@@ -298,12 +302,11 @@ StrniCmp(
 
   SourceCopy[SourceLength] = L'\0';
   TargetCopy[TargetLength] = L'\0';
-  Result = gUnicodeCollation->StriColl (gUnicodeCollation, SourceCopy, TargetCopy);
+  Result                   = gUnicodeCollation->StriColl (gUnicodeCollation, SourceCopy, TargetCopy);
   FreePool (SourceCopy);
   FreePool (TargetCopy);
   return Result;
 }
-
 
 /**
   Cleans off all the quotes in the string.
@@ -317,13 +320,13 @@ StrniCmp(
 **/
 EFI_STATUS
 ShellLevel2StripQuotes (
-  IN  CONST CHAR16     *OriginalString,
-  OUT CHAR16           **CleanString
+  IN  CONST CHAR16  *OriginalString,
+  OUT CHAR16        **CleanString
   )
 {
-  CHAR16            *Walker;
+  CHAR16  *Walker;
 
-  if (OriginalString == NULL || CleanString == NULL) {
+  if ((OriginalString == NULL) || (CleanString == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -332,13 +335,11 @@ ShellLevel2StripQuotes (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  for (Walker = *CleanString; Walker != NULL && *Walker != CHAR_NULL ; Walker++) {
+  for (Walker = *CleanString; Walker != NULL && *Walker != CHAR_NULL; Walker++) {
     if (*Walker == L'\"') {
-      CopyMem(Walker, Walker+1, StrSize(Walker) - sizeof(Walker[0]));
+      CopyMem (Walker, Walker+1, StrSize (Walker) - sizeof (Walker[0]));
     }
   }
 
   return EFI_SUCCESS;
 }
-
-

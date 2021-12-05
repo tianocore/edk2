@@ -25,10 +25,10 @@
 SHELL_STATUS
 EFIAPI
 DpCommandHandler (
-  IN EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL    *This,
-  IN EFI_SYSTEM_TABLE                      *SystemTable,
-  IN EFI_SHELL_PARAMETERS_PROTOCOL         *ShellParameters,
-  IN EFI_SHELL_PROTOCOL                    *Shell
+  IN EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  *This,
+  IN EFI_SYSTEM_TABLE                    *SystemTable,
+  IN EFI_SHELL_PARAMETERS_PROTOCOL       *ShellParameters,
+  IN EFI_SHELL_PROTOCOL                  *Shell
   )
 {
   gEfiShellParametersProtocol = ShellParameters;
@@ -49,14 +49,14 @@ DpCommandHandler (
 CHAR16 *
 EFIAPI
 DpCommandGetHelp (
-  IN EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL    *This,
-  IN CONST CHAR8                           *Language
+  IN EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  *This,
+  IN CONST CHAR8                         *Language
   )
 {
   return HiiGetString (mDpHiiHandle, STRING_TOKEN (STR_GET_HELP_DP), Language);
 }
 
-EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL mDpDynamicCommand = {
+EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL  mDpDynamicCommand = {
   L"dp",
   DpCommandHandler,
   DpCommandGetHelp
@@ -77,11 +77,12 @@ EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL mDpDynamicCommand = {
 EFI_STATUS
 EFIAPI
 DpCommandInitialize (
-  IN EFI_HANDLE               ImageHandle,
-  IN EFI_SYSTEM_TABLE         *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
+
   mDpHiiHandle = InitializeHiiPackage (ImageHandle);
   if (mDpHiiHandle == NULL) {
     return EFI_ABORTED;
@@ -108,10 +109,11 @@ DpCommandInitialize (
 EFI_STATUS
 EFIAPI
 DpUnload (
-  IN EFI_HANDLE               ImageHandle
-)
+  IN EFI_HANDLE  ImageHandle
+  )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
+
   Status = gBS->UninstallProtocolInterface (
                   ImageHandle,
                   &gEfiShellDynamicCommandProtocolGuid,
@@ -120,6 +122,7 @@ DpUnload (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   HiiRemovePackages (mDpHiiHandle);
   return EFI_SUCCESS;
 }

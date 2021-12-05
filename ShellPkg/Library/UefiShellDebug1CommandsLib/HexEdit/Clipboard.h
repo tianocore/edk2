@@ -44,8 +44,8 @@ HClipBoardCleanup (
 **/
 EFI_STATUS
 HClipBoardSet (
-  IN UINT8 *Buffer,
-  IN UINTN Size
+  IN UINT8  *Buffer,
+  IN UINTN  Size
   );
 
 /**

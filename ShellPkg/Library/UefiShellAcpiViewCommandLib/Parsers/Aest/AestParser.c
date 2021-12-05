@@ -18,16 +18,16 @@
 #include "AcpiViewConfig.h"
 
 // Local variables
-STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
-STATIC UINT8*                       AestNodeType;
-STATIC UINT16*                      AestNodeLength;
-STATIC UINT32*                      NodeDataOffset;
-STATIC UINT32*                      NodeInterfaceOffset;
-STATIC UINT32*                      NodeInterruptArrayOffset;
-STATIC UINT32*                      NodeInterruptCount;
-STATIC UINT32*                      ProcessorId;
-STATIC UINT8*                       ProcessorFlags;
-STATIC UINT8*                       ProcessorResourceType;
+STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
+STATIC UINT8                         *AestNodeType;
+STATIC UINT16                        *AestNodeLength;
+STATIC UINT32                        *NodeDataOffset;
+STATIC UINT32                        *NodeInterfaceOffset;
+STATIC UINT32                        *NodeInterruptArrayOffset;
+STATIC UINT32                        *NodeInterruptCount;
+STATIC UINT32                        *ProcessorId;
+STATIC UINT8                         *ProcessorFlags;
+STATIC UINT8                         *ProcessorResourceType;
 
 /**
   Validate Processor Flags.
@@ -40,16 +40,18 @@ STATIC
 VOID
 EFIAPI
 ValidateProcessorFlags (
-  IN UINT8* Ptr,
-  IN VOID*  Context
+  IN UINT8  *Ptr,
+  IN VOID   *Context
   )
 {
   // If the global or shared node flag is set then the ACPI Processor ID
   // field must be set to 0 and ignored.
   if (((*Ptr & 0x3) != 0) && (*ProcessorId != 0)) {
     IncrementErrorCount ();
-    Print (L"\nERROR: 'ACPI Processor ID' field must be set to 0 for global"
-           L" or shared nodes.");
+    Print (
+      L"\nERROR: 'ACPI Processor ID' field must be set to 0 for global"
+      L" or shared nodes."
+      );
   }
 }
 
@@ -64,13 +66,13 @@ STATIC
 VOID
 EFIAPI
 ValidateGicInterfaceType (
-  IN UINT8* Ptr,
-  IN VOID*  Context
+  IN UINT8  *Ptr,
+  IN VOID   *Context
   )
 {
-  UINT32 GicInterfaceType;
+  UINT32  GicInterfaceType;
 
-  GicInterfaceType = *(UINT32*)Ptr;
+  GicInterfaceType = *(UINT32 *)Ptr;
   if (GicInterfaceType > 3) {
     IncrementErrorCount ();
     Print (L"\nError: Invalid GIC Interface type %d", GicInterfaceType);
@@ -88,8 +90,8 @@ STATIC
 VOID
 EFIAPI
 ValidateInterfaceType (
-  IN UINT8* Ptr,
-  IN VOID*  Context
+  IN UINT8  *Ptr,
+  IN VOID   *Context
   )
 {
   if (*Ptr > 1) {
@@ -109,8 +111,8 @@ STATIC
 VOID
 EFIAPI
 ValidateInterruptType (
-  IN UINT8* Ptr,
-  IN VOID*  Context
+  IN UINT8  *Ptr,
+  IN VOID   *Context
   )
 {
   if (*Ptr > 1) {
@@ -130,8 +132,8 @@ STATIC
 VOID
 EFIAPI
 ValidateInterruptFlags (
-  IN UINT8* Ptr,
-  IN VOID*  Context
+  IN UINT8  *Ptr,
+  IN VOID   *Context
   )
 {
   if ((*Ptr & 0xfe) != 0) {
@@ -149,8 +151,8 @@ ValidateInterruptFlags (
 VOID
 EFIAPI
 DumpVendorSpecificData (
-  IN CONST CHAR16* Format OPTIONAL,
-  IN UINT8*        Ptr
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr
   )
 {
   Print (
@@ -183,27 +185,27 @@ DumpVendorSpecificData (
 /**
   An ACPI_PARSER array describing the ACPI AEST Table.
 **/
-STATIC CONST ACPI_PARSER AestParser[] = {
+STATIC CONST ACPI_PARSER  AestParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo)
 };
 
 /**
   An ACPI_PARSER array describing the AEST Node Header.
 **/
-STATIC CONST ACPI_PARSER AestNodeHeaderParser[] = {
-  {L"Type", 1, 0, L"%d", NULL, (VOID**)&AestNodeType, NULL, NULL},
-  {L"Length", 2, 1, L"%d", NULL, (VOID**)&AestNodeLength, NULL, NULL},
-  {L"Reserved", 1, 3, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Node Data Offset", 4, 4, L"%d", NULL, (VOID**)&NodeDataOffset, NULL, NULL},
-  {L"Node Interface Offset", 4, 8, L"%d", NULL,
-    (VOID**)&NodeInterfaceOffset, NULL, NULL},
-  {L"Node Interrupt Array Offset", 4, 12, L"%d", NULL,
-    (VOID**)&NodeInterruptArrayOffset, NULL, NULL},
-  {L"Node Interrupt Count", 4, 16, L"%d", NULL,
-    (VOID**)&NodeInterruptCount, NULL, NULL},
-  {L"Timestamp Rate", 8, 20, L"%ld", NULL, NULL, NULL, NULL},
-  {L"Reserved1", 8, 28, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Error Injection Countdown Rate", 8, 36, L"%ld", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  AestNodeHeaderParser[] = {
+  { L"Type",                           1, 0,  L"%d",    NULL, (VOID **)&AestNodeType,   NULL, NULL },
+  { L"Length",                         2, 1,  L"%d",    NULL, (VOID **)&AestNodeLength, NULL, NULL },
+  { L"Reserved",                       1, 3,  L"0x%x",  NULL, NULL,                     NULL, NULL },
+  { L"Node Data Offset",               4, 4,  L"%d",    NULL, (VOID **)&NodeDataOffset, NULL, NULL },
+  { L"Node Interface Offset",          4, 8,  L"%d",    NULL,
+    (VOID **)&NodeInterfaceOffset, NULL, NULL },
+  { L"Node Interrupt Array Offset",    4, 12, L"%d",    NULL,
+    (VOID **)&NodeInterruptArrayOffset, NULL, NULL },
+  { L"Node Interrupt Count",           4, 16, L"%d",    NULL,
+    (VOID **)&NodeInterruptCount, NULL, NULL },
+  { L"Timestamp Rate",                 8, 20, L"%ld",   NULL, NULL,                     NULL, NULL },
+  { L"Reserved1",                      8, 28, L"0x%lx", NULL, NULL,                     NULL, NULL },
+  { L"Error Injection Countdown Rate", 8, 36, L"%ld",   NULL, NULL,                     NULL, NULL }
   // Node specific data...
   // Node interface...
   // Node interrupt array...
@@ -212,100 +214,100 @@ STATIC CONST ACPI_PARSER AestNodeHeaderParser[] = {
 /**
   An ACPI_PARSER array describing the Processor error node specific data.
 **/
-STATIC CONST ACPI_PARSER AestProcessorStructure[] = {
-  {L"ACPI Processor ID", 4, 0, L"0x%x", NULL, (VOID**)&ProcessorId, NULL, NULL},
-  {L"Resource Type", 1, 4, L"%d", NULL, (VOID**)&ProcessorResourceType, NULL,
-    NULL},
-  {L"Reserved", 1, 5, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Flags", 1, 6, L"0x%x", NULL, (VOID**)&ProcessorFlags,
-    ValidateProcessorFlags, NULL},
-  {L"Revision", 1, 7, L"%d", NULL, NULL, NULL, NULL},
-  {L"Processor Affinity Level Indicator", 8, 8, L"0x%lx", NULL, NULL, NULL,
-    NULL},
+STATIC CONST ACPI_PARSER  AestProcessorStructure[] = {
+  { L"ACPI Processor ID",                  4, 0, L"0x%x",  NULL, (VOID **)&ProcessorId,           NULL, NULL },
+  { L"Resource Type",                      1, 4, L"%d",    NULL, (VOID **)&ProcessorResourceType, NULL,
+    NULL },
+  { L"Reserved",                           1, 5, L"0x%x",  NULL, NULL,                            NULL, NULL },
+  { L"Flags",                              1, 6, L"0x%x",  NULL, (VOID **)&ProcessorFlags,
+    ValidateProcessorFlags, NULL },
+  { L"Revision",                           1, 7, L"%d",    NULL, NULL,                            NULL, NULL },
+  { L"Processor Affinity Level Indicator", 8, 8, L"0x%lx", NULL, NULL,                            NULL,
+    NULL },
   // Resource specific data...
 };
 
 /**
   An ACPI_PARSER array describing the processor cache resource substructure.
 **/
-STATIC CONST ACPI_PARSER AestProcessorCacheResourceSubstructure[] = {
-  {L"Cache reference ID", 4, 0, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Reserved", 4, 4, L"%d", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  AestProcessorCacheResourceSubstructure[] = {
+  { L"Cache reference ID", 4, 0, L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Reserved",           4, 4, L"%d",   NULL, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the processor TLB resource substructure.
 **/
-STATIC CONST ACPI_PARSER AestProcessorTlbResourceSubstructure[] = {
-  {L"TLB reference ID", 4, 0, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Reserved", 4, 4, L"%d", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  AestProcessorTlbResourceSubstructure[] = {
+  { L"TLB reference ID", 4, 0, L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Reserved",         4, 4, L"%d",   NULL, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the processor generic resource substructure.
 **/
-STATIC CONST ACPI_PARSER AestProcessorGenericResourceSubstructure[] = {
-  {L"Vendor-defined data", 4, 0, L"%x", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  AestProcessorGenericResourceSubstructure[] = {
+  { L"Vendor-defined data", 4, 0, L"%x", NULL, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the memory controller structure.
 **/
-STATIC CONST ACPI_PARSER AestMemoryControllerStructure[] = {
-  {L"Proximity Domain", 4, 0, L"0x%x", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  AestMemoryControllerStructure[] = {
+  { L"Proximity Domain", 4, 0, L"0x%x", NULL, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the SMMU structure.
 **/
-STATIC CONST ACPI_PARSER AestSmmuStructure[] = {
-  {L"IORT Node reference ID", 4, 0, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"SubComponent reference ID", 4, 4, L"0x%x", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  AestSmmuStructure[] = {
+  { L"IORT Node reference ID",    4, 0, L"0x%x", NULL, NULL, NULL, NULL },
+  { L"SubComponent reference ID", 4, 4, L"0x%x", NULL, NULL, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the vendor-defined structure.
 **/
-STATIC CONST ACPI_PARSER AestVendorDefinedStructure[] = {
-  {L"Hardware ID", 4, 0, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Unique ID", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Vendor-specific data", 16, 8, NULL, DumpVendorSpecificData, NULL, NULL}
+STATIC CONST ACPI_PARSER  AestVendorDefinedStructure[] = {
+  { L"Hardware ID",          4,  0, L"0x%x", NULL,                   NULL, NULL, NULL },
+  { L"Unique ID",            4,  4, L"0x%x", NULL,                   NULL, NULL, NULL },
+  { L"Vendor-specific data", 16, 8, NULL,    DumpVendorSpecificData, NULL, NULL }
 };
 
 /**
   An ACPI_PARSER array describing the GIC structure.
 **/
-STATIC CONST ACPI_PARSER AestGicStructure[] = {
-  {L"GIC Interface Type", 4, 0, L"0x%x", NULL, NULL, ValidateGicInterfaceType,
-    NULL},
-  {L"GIC Interface reference ID", 4, 4, L"0x%x", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  AestGicStructure[] = {
+  { L"GIC Interface Type",         4, 0, L"0x%x", NULL, NULL, ValidateGicInterfaceType,
+    NULL },
+  { L"GIC Interface reference ID", 4, 4, L"0x%x", NULL, NULL, NULL,                    NULL}
 };
 
 /**
   An ACPI_PARSER array describing the node interface.
 **/
-STATIC CONST ACPI_PARSER AestNodeInterface[] = {
-  {L"Interface Type", 1, 0, L"%d", NULL, NULL, ValidateInterfaceType, NULL},
-  {L"Reserved", 3, 1, L"%x %x %x", Dump3Chars, NULL, NULL, NULL},
-  {L"Flags", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Base Address", 8, 8, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Start Error Record Index", 4, 16, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Number of Error Records", 4, 20, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Error Records Implemented", 8, 24, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Error Records Support", 8, 32, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"Addressing mode", 8, 40, L"0x%lx", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  AestNodeInterface[] = {
+  { L"Interface Type",            1, 0,  L"%d",       NULL,       NULL, ValidateInterfaceType, NULL },
+  { L"Reserved",                  3, 1,  L"%x %x %x", Dump3Chars, NULL, NULL,                  NULL },
+  { L"Flags",                     4, 4,  L"0x%x",     NULL,       NULL, NULL,                  NULL },
+  { L"Base Address",              8, 8,  L"0x%lx",    NULL,       NULL, NULL,                  NULL },
+  { L"Start Error Record Index",  4, 16, L"0x%x",     NULL,       NULL, NULL,                  NULL },
+  { L"Number of Error Records",   4, 20, L"0x%x",     NULL,       NULL, NULL,                  NULL },
+  { L"Error Records Implemented", 8, 24, L"0x%lx",    NULL,       NULL, NULL,                  NULL },
+  { L"Error Records Support",     8, 32, L"0x%lx",    NULL,       NULL, NULL,                  NULL },
+  { L"Addressing mode",           8, 40, L"0x%lx",    NULL,       NULL, NULL,                  NULL }
 };
 
 /**
   An ACPI_PARSER array describing the node interrupts.
 **/
-STATIC CONST ACPI_PARSER AestNodeInterrupt[] = {
-  {L"Interrupt Type", 1, 0, L"%d", NULL, NULL, ValidateInterruptType, NULL},
-  {L"Reserved", 2, 1, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Interrupt Flags", 1, 3, L"0x%x", NULL, NULL, ValidateInterruptFlags, NULL},
-  {L"Interrupt GSIV", 4, 4, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"ID", 1, 8, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Reserved1", 3, 9, L"%x %x %x", Dump3Chars, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  AestNodeInterrupt[] = {
+  { L"Interrupt Type",  1, 0, L"%d",       NULL,       NULL, ValidateInterruptType,  NULL },
+  { L"Reserved",        2, 1, L"0x%x",     NULL,       NULL, NULL,                   NULL },
+  { L"Interrupt Flags", 1, 3, L"0x%x",     NULL,       NULL, ValidateInterruptFlags, NULL },
+  { L"Interrupt GSIV",  4, 4, L"0x%x",     NULL,       NULL, NULL,                   NULL },
+  { L"ID",              1, 8, L"0x%x",     NULL,       NULL, NULL,                   NULL },
+  { L"Reserved1",       3, 9, L"%x %x %x", Dump3Chars, NULL, NULL,                   NULL }
 };
 
 /**
@@ -318,11 +320,11 @@ STATIC CONST ACPI_PARSER AestNodeInterrupt[] = {
 STATIC
 VOID
 DumpProcessorNode (
-  IN UINT8* Ptr,
-  IN UINT32 Length
+  IN UINT8   *Ptr,
+  IN UINT32  Length
   )
 {
-  UINT32 Offset;
+  UINT32  Offset;
 
   Offset = ParseAcpi (
              TRUE,
@@ -337,7 +339,8 @@ DumpProcessorNode (
   // successfully read.
   if ((ProcessorId == NULL)           ||
       (ProcessorResourceType == NULL) ||
-      (ProcessorFlags == NULL)) {
+      (ProcessorFlags == NULL))
+  {
     IncrementErrorCount ();
     Print (
       L"ERROR: Insufficient Processor Error Node length. Length = %d.\n",
@@ -393,8 +396,8 @@ DumpProcessorNode (
 STATIC
 VOID
 DumpMemoryControllerNode (
-  IN UINT8* Ptr,
-  IN UINT32 Length
+  IN UINT8   *Ptr,
+  IN UINT32  Length
   )
 {
   ParseAcpi (
@@ -416,8 +419,8 @@ DumpMemoryControllerNode (
 STATIC
 VOID
 DumpSmmuNode (
-  IN UINT8* Ptr,
-  IN UINT32 Length
+  IN UINT8   *Ptr,
+  IN UINT32  Length
   )
 {
   ParseAcpi (
@@ -439,8 +442,8 @@ DumpSmmuNode (
 STATIC
 VOID
 DumpVendorDefinedNode (
-  IN UINT8* Ptr,
-  IN UINT32 Length
+  IN UINT8   *Ptr,
+  IN UINT32  Length
   )
 {
   ParseAcpi (
@@ -462,8 +465,8 @@ DumpVendorDefinedNode (
 STATIC
 VOID
 DumpGicNode (
-  IN UINT8* Ptr,
-  IN UINT32 Length
+  IN UINT8   *Ptr,
+  IN UINT32  Length
   )
 {
   ParseAcpi (
@@ -485,8 +488,8 @@ DumpGicNode (
 STATIC
 VOID
 DumpNodeInterface (
-  IN UINT8* Ptr,
-  IN UINT32 Length
+  IN UINT8   *Ptr,
+  IN UINT32  Length
   )
 {
   ParseAcpi (
@@ -509,19 +512,19 @@ DumpNodeInterface (
 STATIC
 VOID
 DumpNodeInterrupts (
-  IN UINT8* Ptr,
-  IN UINT32 Length,
-  IN UINT32 InterruptCount
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN UINT32  InterruptCount
   )
 {
-  UINT32 Offset;
-  UINT32 Index;
-  CHAR8  Buffer[64];
+  UINT32  Offset;
+  UINT32  Index;
+  CHAR8   Buffer[64];
 
   if (Length < (InterruptCount * sizeof (EFI_ACPI_AEST_INTERRUPT_STRUCT))) {
     IncrementErrorCount ();
     Print (
-      L"ERROR: Node not long enough for Interrupt Array.\n"\
+      L"ERROR: Node not long enough for Interrupt Array.\n" \
       L"       Length left = %d, Required = %d, Interrupt Count = %d\n",
       Length,
       (InterruptCount * sizeof (EFI_ACPI_AEST_INTERRUPT_STRUCT)),
@@ -547,7 +550,7 @@ DumpNodeInterrupts (
                 Length - Offset,
                 PARSER_PARAMS (AestNodeInterrupt)
                 );
-  } //for
+  } // for
 }
 
 /**
@@ -564,7 +567,7 @@ DumpNodeInterrupts (
 STATIC
 VOID
 DumpAestNodeStructure (
-  IN UINT8*  Ptr,
+  IN UINT8   *Ptr,
   IN UINT32  Length,
   IN UINT8   NodeType,
   IN UINT32  DataOffset,
@@ -573,9 +576,9 @@ DumpAestNodeStructure (
   IN UINT32  InterruptCount
   )
 {
-  UINT32 Offset;
-  UINT32 RemainingLength;
-  UINT8* NodeDataPtr;
+  UINT32  Offset;
+  UINT32  RemainingLength;
+  UINT8   *NodeDataPtr;
 
   Offset = ParseAcpi (
              TRUE,
@@ -589,7 +592,7 @@ DumpAestNodeStructure (
   if ((Offset > DataOffset) || (DataOffset > Length)) {
     IncrementErrorCount ();
     Print (
-      L"ERROR: Invalid Node Data Offset: %d.\n"\
+      L"ERROR: Invalid Node Data Offset: %d.\n" \
       L"       It should be between %d and %d.\n",
       DataOffset,
       Offset,
@@ -600,7 +603,7 @@ DumpAestNodeStructure (
   if ((Offset > InterfaceOffset) || (InterfaceOffset > Length)) {
     IncrementErrorCount ();
     Print (
-      L"ERROR: Invalid Node Interface Offset: %d.\n"\
+      L"ERROR: Invalid Node Interface Offset: %d.\n" \
       L"       It should be between %d and %d.\n",
       InterfaceOffset,
       Offset,
@@ -611,7 +614,7 @@ DumpAestNodeStructure (
   if ((Offset > InterruptArrayOffset) || (InterruptArrayOffset > Length)) {
     IncrementErrorCount ();
     Print (
-      L"ERROR: Invalid Node Interrupt Array Offset: %d.\n"\
+      L"ERROR: Invalid Node Interrupt Array Offset: %d.\n" \
       L"       It should be between %d and %d.\n",
       InterruptArrayOffset,
       Offset,
@@ -620,7 +623,7 @@ DumpAestNodeStructure (
   }
 
   // Parse Node Data Field.
-  NodeDataPtr = Ptr + DataOffset;
+  NodeDataPtr     = Ptr + DataOffset;
   RemainingLength = Length - DataOffset;
   switch (NodeType) {
     case EFI_ACPI_AEST_NODE_TYPE_PROCESSOR:
@@ -675,14 +678,14 @@ DumpAestNodeStructure (
 VOID
 EFIAPI
 ParseAcpiAest (
-  IN BOOLEAN Trace,
-  IN UINT8*  Ptr,
-  IN UINT32  AcpiTableLength,
-  IN UINT8   AcpiTableRevision
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
   )
 {
   UINT32  Offset;
-  UINT8*  NodePtr;
+  UINT8   *NodePtr;
 
   if (!Trace) {
     return;
@@ -716,10 +719,11 @@ ParseAcpiAest (
         (NodeDataOffset == NULL)           ||
         (NodeInterfaceOffset == NULL)      ||
         (NodeInterruptArrayOffset == NULL) ||
-        (NodeInterruptCount == NULL)) {
+        (NodeInterruptCount == NULL))
+    {
       IncrementErrorCount ();
       Print (
-        L"ERROR: Insufficient length left for Node Structure.\n"\
+        L"ERROR: Insufficient length left for Node Structure.\n" \
         L"       Length left = %d.\n",
         AcpiTableLength - Offset
         );
@@ -728,11 +732,12 @@ ParseAcpiAest (
 
     // Validate AEST Node length
     if ((*AestNodeLength == 0) ||
-        ((Offset + (*AestNodeLength)) > AcpiTableLength)) {
+        ((Offset + (*AestNodeLength)) > AcpiTableLength))
+    {
       IncrementErrorCount ();
       Print (
         L"ERROR: Invalid AEST Node length. " \
-          L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
+        L"Length = %d. Offset = %d. AcpiTableLength = %d.\n",
         *AestNodeLength,
         Offset,
         AcpiTableLength

@@ -13,8 +13,6 @@
 #include <Protocol/BlockIo.h>
 #include <Protocol/SimpleFileSystem.h>
 
-
-
 typedef enum {
   MTDTypeUnknown,
   MTDTypeFloppy,
@@ -24,20 +22,20 @@ typedef enum {
 } MTD_TYPE;
 
 typedef struct {
-  CHAR16  *Str;
-  UINTN   Len;
+  CHAR16    *Str;
+  UINTN     Len;
 } POOL_PRINT;
 
 typedef struct {
-  UINTN       Hi;
-  MTD_TYPE    Mtd;
-  POOL_PRINT  Csd;
-  BOOLEAN     Digital;
+  UINTN         Hi;
+  MTD_TYPE      Mtd;
+  POOL_PRINT    Csd;
+  BOOLEAN       Digital;
 } DEVICE_CONSIST_MAPPING_INFO;
 
 typedef struct {
-  MTD_TYPE  MTDType;
-  CHAR16    *Name;
+  MTD_TYPE    MTDType;
+  CHAR16      *Name;
 } MTD_NAME;
 
 /**
@@ -53,18 +51,17 @@ typedef struct {
 typedef
 EFI_STATUS
 (*SERIAL_DECODE_FUNCTION) (
-  EFI_DEVICE_PATH_PROTOCOL    *DevPath,
-  DEVICE_CONSIST_MAPPING_INFO *MapInfo,
-  EFI_DEVICE_PATH_PROTOCOL    *OrigDevPath
+  EFI_DEVICE_PATH_PROTOCOL     *DevPath,
+  DEVICE_CONSIST_MAPPING_INFO  *MapInfo,
+  EFI_DEVICE_PATH_PROTOCOL     *OrigDevPath
   );
 
 typedef struct {
-  UINT8 Type;
-  UINT8 SubType;
-  SERIAL_DECODE_FUNCTION SerialFun;
-  INTN (EFIAPI *CompareFun) (EFI_DEVICE_PATH_PROTOCOL *DevPath, EFI_DEVICE_PATH_PROTOCOL *DevPath2);
+  UINT8                     Type;
+  UINT8                     SubType;
+  SERIAL_DECODE_FUNCTION    SerialFun;
+  INTN (EFIAPI *CompareFun)(EFI_DEVICE_PATH_PROTOCOL *DevPath, EFI_DEVICE_PATH_PROTOCOL *DevPath2);
 } DEV_PATH_CONSIST_MAPPING_TABLE;
-
 
 /**
   Concatenates a formatted unicode string to allocated pool.
@@ -81,15 +78,15 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 CatPrint (
-  IN OUT POOL_PRINT   *Str,
-  IN CHAR16           *Fmt,
+  IN OUT POOL_PRINT  *Str,
+  IN CHAR16          *Fmt,
   ...
   )
 {
-  UINT16  *AppendStr;
-  VA_LIST Args;
-  UINTN   StringSize;
-  CHAR16  *NewStr;
+  UINT16   *AppendStr;
+  VA_LIST  Args;
+  UINTN    StringSize;
+  CHAR16   *NewStr;
 
   AppendStr = AllocateZeroPool (0x1000);
   if (AppendStr == NULL) {
@@ -101,9 +98,9 @@ CatPrint (
   VA_END (Args);
   if (NULL == Str->Str) {
     StringSize = StrSize (AppendStr);
-    NewStr = AllocateZeroPool (StringSize);
+    NewStr     = AllocateZeroPool (StringSize);
   } else {
-    StringSize = StrSize (AppendStr);
+    StringSize  = StrSize (AppendStr);
     StringSize += (StrSize (Str->Str) - sizeof (UINT16));
 
     NewStr = ReallocatePool (
@@ -112,13 +109,14 @@ CatPrint (
                Str->Str
                );
   }
+
   if (NewStr == NULL) {
     FreePool (AppendStr);
     return EFI_OUT_OF_RESOURCES;
   }
 
   Str->Str = NewStr;
-  StrCatS (Str->Str, StringSize/sizeof(CHAR16), AppendStr);
+  StrCatS (Str->Str, StringSize/sizeof (CHAR16), AppendStr);
   Str->Len = StringSize;
 
   FreePool (AppendStr);
@@ -159,13 +157,13 @@ MTD_NAME  mMTDName[] = {
 **/
 EFI_STATUS
 AppendCSDNum2 (
-  IN OUT POOL_PRINT       *Str,
-  IN UINT64               Num
+  IN OUT POOL_PRINT  *Str,
+  IN UINT64          Num
   )
 {
-  EFI_STATUS Status;
-  UINT64     Result;
-  UINT32     Rem;
+  EFI_STATUS  Status;
+  UINT64      Result;
+  UINT32      Rem;
 
   ASSERT (Str != NULL);
 
@@ -192,11 +190,12 @@ AppendCSDNum2 (
 **/
 EFI_STATUS
 AppendCSDNum (
-  IN OUT DEVICE_CONSIST_MAPPING_INFO            *MappingItem,
-  IN     UINT64                                 Num
+  IN OUT DEVICE_CONSIST_MAPPING_INFO  *MappingItem,
+  IN     UINT64                       Num
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
+
   ASSERT (MappingItem != NULL);
 
   if (MappingItem->Digital) {
@@ -223,12 +222,12 @@ AppendCSDNum (
 **/
 EFI_STATUS
 AppendCSDStr (
-  IN OUT DEVICE_CONSIST_MAPPING_INFO            *MappingItem,
-  IN     CHAR16                                 *Str
+  IN OUT DEVICE_CONSIST_MAPPING_INFO  *MappingItem,
+  IN     CHAR16                       *Str
   )
 {
-  CHAR16     *Index;
-  EFI_STATUS Status;
+  CHAR16      *Index;
+  EFI_STATUS  Status;
 
   ASSERT (Str != NULL && MappingItem != NULL);
 
@@ -242,39 +241,39 @@ AppendCSDStr (
     //
     for (Index = Str; *Index != 0; Index++) {
       switch (*Index) {
-      case '0':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-        Status = CatPrint (&MappingItem->Csd, L"%c", *Index);
-        break;
+        case '0':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+          Status = CatPrint (&MappingItem->Csd, L"%c", *Index);
+          break;
 
-      case '1':
-        Status = CatPrint (&MappingItem->Csd, L"16");
-        break;
+        case '1':
+          Status = CatPrint (&MappingItem->Csd, L"16");
+          break;
 
-      case 'a':
-      case 'b':
-      case 'c':
-      case 'd':
-      case 'e':
-      case 'f':
-        Status = CatPrint (&MappingItem->Csd, L"1%c", *Index - 'a' + '0');
-        break;
+        case 'a':
+        case 'b':
+        case 'c':
+        case 'd':
+        case 'e':
+        case 'f':
+          Status = CatPrint (&MappingItem->Csd, L"1%c", *Index - 'a' + '0');
+          break;
 
-      case 'A':
-      case 'B':
-      case 'C':
-      case 'D':
-      case 'E':
-      case 'F':
-        Status = CatPrint (&MappingItem->Csd, L"1%c", *Index - 'A' + '0');
-        break;
+        case 'A':
+        case 'B':
+        case 'C':
+        case 'D':
+        case 'E':
+        case 'F':
+          Status = CatPrint (&MappingItem->Csd, L"1%c", *Index - 'A' + '0');
+          break;
       }
 
       if (EFI_ERROR (Status)) {
@@ -288,11 +287,11 @@ AppendCSDStr (
       //  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
       //  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p
       //
-      if (*Index >= '0' && *Index <= '9') {
+      if ((*Index >= '0') && (*Index <= '9')) {
         Status = CatPrint (&MappingItem->Csd, L"%c", *Index - '0' + 'a');
-      } else if (*Index >= 'a' && *Index <= 'f') {
+      } else if ((*Index >= 'a') && (*Index <= 'f')) {
         Status = CatPrint (&MappingItem->Csd, L"%c", *Index - 'a' + 'k');
-      } else if (*Index >= 'A' && *Index <= 'F') {
+      } else if ((*Index >= 'A') && (*Index <= 'F')) {
         Status = CatPrint (&MappingItem->Csd, L"%c", *Index - 'A' + 'k');
       }
 
@@ -302,7 +301,7 @@ AppendCSDStr (
     }
   }
 
-  MappingItem->Digital = (BOOLEAN)!(MappingItem->Digital);
+  MappingItem->Digital = (BOOLEAN) !(MappingItem->Digital);
 
   return (EFI_SUCCESS);
 }
@@ -318,8 +317,8 @@ AppendCSDStr (
 **/
 EFI_STATUS
 AppendCSDGuid (
-  DEVICE_CONSIST_MAPPING_INFO            *MappingItem,
-  EFI_GUID                               *Guid
+  DEVICE_CONSIST_MAPPING_INFO  *MappingItem,
+  EFI_GUID                     *Guid
   )
 {
   CHAR16  Buffer[64];
@@ -331,7 +330,7 @@ AppendCSDGuid (
     0,
     L"%g",
     Guid
-   );
+    );
 
   return AppendCSDStr (MappingItem, Buffer);
 }
@@ -348,24 +347,24 @@ AppendCSDGuid (
 INTN
 EFIAPI
 DevPathCompareAcpi (
-  IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath1,
-  IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath2
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath1,
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath2
   )
 {
   ACPI_HID_DEVICE_PATH  *Acpi1;
   ACPI_HID_DEVICE_PATH  *Acpi2;
 
-  if (DevicePath1 == NULL || DevicePath2 == NULL) {
+  if ((DevicePath1 == NULL) || (DevicePath2 == NULL)) {
     return (-2);
   }
 
-  Acpi1 = (ACPI_HID_DEVICE_PATH *) DevicePath1;
-  Acpi2 = (ACPI_HID_DEVICE_PATH *) DevicePath2;
-  if (Acpi1->HID > Acpi2->HID || (Acpi1->HID == Acpi2->HID && Acpi1->UID > Acpi2->UID)) {
+  Acpi1 = (ACPI_HID_DEVICE_PATH *)DevicePath1;
+  Acpi2 = (ACPI_HID_DEVICE_PATH *)DevicePath2;
+  if ((Acpi1->HID > Acpi2->HID) || ((Acpi1->HID == Acpi2->HID) && (Acpi1->UID > Acpi2->UID))) {
     return 1;
   }
 
-  if (Acpi1->HID == Acpi2->HID && Acpi1->UID == Acpi2->UID) {
+  if ((Acpi1->HID == Acpi2->HID) && (Acpi1->UID == Acpi2->UID)) {
     return 0;
   }
 
@@ -384,23 +383,23 @@ DevPathCompareAcpi (
 INTN
 EFIAPI
 DevPathComparePci (
-  IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath1,
-  IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath2
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath1,
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath2
   )
 {
-  PCI_DEVICE_PATH *Pci1;
-  PCI_DEVICE_PATH *Pci2;
+  PCI_DEVICE_PATH  *Pci1;
+  PCI_DEVICE_PATH  *Pci2;
 
-  ASSERT(DevicePath1 != NULL);
-  ASSERT(DevicePath2 != NULL);
+  ASSERT (DevicePath1 != NULL);
+  ASSERT (DevicePath2 != NULL);
 
-  Pci1  = (PCI_DEVICE_PATH *) DevicePath1;
-  Pci2  = (PCI_DEVICE_PATH *) DevicePath2;
-  if (Pci1->Device > Pci2->Device || (Pci1->Device == Pci2->Device && Pci1->Function > Pci2->Function)) {
+  Pci1 = (PCI_DEVICE_PATH *)DevicePath1;
+  Pci2 = (PCI_DEVICE_PATH *)DevicePath2;
+  if ((Pci1->Device > Pci2->Device) || ((Pci1->Device == Pci2->Device) && (Pci1->Function > Pci2->Function))) {
     return 1;
   }
 
-  if (Pci1->Device == Pci2->Device && Pci1->Function == Pci2->Function) {
+  if ((Pci1->Device == Pci2->Device) && (Pci1->Function == Pci2->Function)) {
     return 0;
   }
 
@@ -420,18 +419,18 @@ DevPathComparePci (
 INTN
 EFIAPI
 DevPathCompareDefault (
-  IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath1,
-  IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath2
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath1,
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath2
   )
 {
-  UINTN DevPathSize1;
-  UINTN DevPathSize2;
+  UINTN  DevPathSize1;
+  UINTN  DevPathSize2;
 
-  ASSERT(DevicePath1 != NULL);
-  ASSERT(DevicePath2 != NULL);
+  ASSERT (DevicePath1 != NULL);
+  ASSERT (DevicePath2 != NULL);
 
-  DevPathSize1  = DevicePathNodeLength (DevicePath1);
-  DevPathSize2  = DevicePathNodeLength (DevicePath2);
+  DevPathSize1 = DevicePathNodeLength (DevicePath1);
+  DevPathSize2 = DevicePathNodeLength (DevicePath2);
   if (DevPathSize1 > DevPathSize2) {
     return 1;
   } else if (DevPathSize1 < DevPathSize2) {
@@ -458,12 +457,12 @@ DevPathSerialHardDrive (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  HARDDRIVE_DEVICE_PATH *Hd;
+  HARDDRIVE_DEVICE_PATH  *Hd;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Hd = (HARDDRIVE_DEVICE_PATH *) DevicePathNode;
+  Hd = (HARDDRIVE_DEVICE_PATH *)DevicePathNode;
   if (MappingItem->Mtd == MTDTypeUnknown) {
     MappingItem->Mtd = MTDTypeHardDisk;
   }
@@ -488,12 +487,12 @@ DevPathSerialAtapi (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  ATAPI_DEVICE_PATH *Atapi;
+  ATAPI_DEVICE_PATH  *Atapi;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Atapi = (ATAPI_DEVICE_PATH *) DevicePathNode;
+  Atapi = (ATAPI_DEVICE_PATH *)DevicePathNode;
   return AppendCSDNum (MappingItem, (Atapi->PrimarySecondary * 2 + Atapi->SlaveMaster));
 }
 
@@ -514,13 +513,13 @@ DevPathSerialCdRom (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  CDROM_DEVICE_PATH *Cd;
+  CDROM_DEVICE_PATH  *Cd;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Cd                = (CDROM_DEVICE_PATH *) DevicePathNode;
-  MappingItem->Mtd  = MTDTypeCDRom;
+  Cd               = (CDROM_DEVICE_PATH *)DevicePathNode;
+  MappingItem->Mtd = MTDTypeCDRom;
   return AppendCSDNum (MappingItem, Cd->BootEntry);
 }
 
@@ -544,14 +543,15 @@ DevPathSerialFibre (
   EFI_STATUS                Status;
   FIBRECHANNEL_DEVICE_PATH  *Fibre;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Fibre = (FIBRECHANNEL_DEVICE_PATH *) DevicePathNode;
+  Fibre  = (FIBRECHANNEL_DEVICE_PATH *)DevicePathNode;
   Status = AppendCSDNum (MappingItem, Fibre->WWN);
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Fibre->Lun);
   }
+
   return Status;
 }
 
@@ -572,23 +572,26 @@ DevPathSerialUart (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  EFI_STATUS                Status;
-  UART_DEVICE_PATH          *Uart;
+  EFI_STATUS        Status;
+  UART_DEVICE_PATH  *Uart;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Uart = (UART_DEVICE_PATH *) DevicePathNode;
+  Uart   = (UART_DEVICE_PATH *)DevicePathNode;
   Status = AppendCSDNum (MappingItem, Uart->BaudRate);
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Uart->DataBits);
   }
+
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Uart->Parity);
   }
+
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Uart->StopBits);
   }
+
   return Status;
 }
 
@@ -615,11 +618,10 @@ DevPathSerialUsb (
   EFI_STATUS                Status;
   USB_INTERFACE_DESCRIPTOR  InterfaceDesc;
 
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
-
-  Usb = (USB_DEVICE_PATH *) DevicePathNode;
+  Usb    = (USB_DEVICE_PATH *)DevicePathNode;
   Status = AppendCSDNum (MappingItem, Usb->ParentPortNumber);
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Usb->InterfaceNumber);
@@ -629,19 +631,19 @@ DevPathSerialUsb (
     return Status;
   }
 
-  if (PcdGetBool(PcdUsbExtendedDecode)) {
-    Status = gBS->LocateDevicePath( &gEfiUsbIoProtocolGuid, &DevicePath, &TempHandle );
-    UsbIo = NULL;
-    if (!EFI_ERROR(Status)) {
-      Status = gBS->OpenProtocol(TempHandle, &gEfiUsbIoProtocolGuid, (VOID**)&UsbIo, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (PcdGetBool (PcdUsbExtendedDecode)) {
+    Status = gBS->LocateDevicePath (&gEfiUsbIoProtocolGuid, &DevicePath, &TempHandle);
+    UsbIo  = NULL;
+    if (!EFI_ERROR (Status)) {
+      Status = gBS->OpenProtocol (TempHandle, &gEfiUsbIoProtocolGuid, (VOID **)&UsbIo, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
     }
 
-    if (!EFI_ERROR(Status)) {
-      ASSERT(UsbIo != NULL);
-      Status = UsbIo->UsbGetInterfaceDescriptor(UsbIo, &InterfaceDesc);
-      if (!EFI_ERROR(Status)) {
-        if (InterfaceDesc.InterfaceClass == USB_MASS_STORE_CLASS && MappingItem->Mtd == MTDTypeUnknown) {
-          switch (InterfaceDesc.InterfaceSubClass){
+    if (!EFI_ERROR (Status)) {
+      ASSERT (UsbIo != NULL);
+      Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &InterfaceDesc);
+      if (!EFI_ERROR (Status)) {
+        if ((InterfaceDesc.InterfaceClass == USB_MASS_STORE_CLASS) && (MappingItem->Mtd == MTDTypeUnknown)) {
+          switch (InterfaceDesc.InterfaceSubClass) {
             case USB_MASS_STORE_SCSI:
               MappingItem->Mtd = MTDTypeHardDisk;
               break;
@@ -650,13 +652,14 @@ DevPathSerialUsb (
               MappingItem->Mtd = MTDTypeFloppy;
               break;
             case USB_MASS_STORE_8020I:
-              MappingItem->Mtd  = MTDTypeCDRom;
+              MappingItem->Mtd = MTDTypeCDRom;
               break;
           }
         }
       }
     }
   }
+
   return Status;
 }
 
@@ -685,34 +688,36 @@ DevPathSerialVendor (
   CHAR16              *Buffer;
   CHAR16              *NewBuffer;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Vendor = (VENDOR_DEVICE_PATH *) DevicePathNode;
+  Vendor = (VENDOR_DEVICE_PATH *)DevicePathNode;
   Status = AppendCSDGuid (MappingItem, &Vendor->Guid);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   if (CompareGuid (&gEfiSasDevicePathGuid, &Vendor->Guid)) {
-    Sas = (SAS_DEVICE_PATH *) Vendor;
+    Sas    = (SAS_DEVICE_PATH *)Vendor;
     Status = AppendCSDNum (MappingItem, Sas->SasAddress);
     if (!EFI_ERROR (Status)) {
       Status = AppendCSDNum (MappingItem, Sas->Lun);
     }
+
     if (!EFI_ERROR (Status)) {
       Status = AppendCSDNum (MappingItem, Sas->DeviceTopology);
     }
+
     if (!EFI_ERROR (Status)) {
       Status = AppendCSDNum (MappingItem, Sas->RelativeTargetPort);
     }
   } else {
-    TargetNameLength = MIN(DevicePathNodeLength (DevicePathNode) - sizeof (VENDOR_DEVICE_PATH), PcdGet32(PcdShellVendorExtendedDecode));
+    TargetNameLength = MIN (DevicePathNodeLength (DevicePathNode) - sizeof (VENDOR_DEVICE_PATH), PcdGet32 (PcdShellVendorExtendedDecode));
     if (TargetNameLength != 0) {
       //
       // String is 2 chars per data byte, plus NULL terminator
       //
-      Buffer = AllocateZeroPool (((TargetNameLength * 2) + 1) * sizeof(CHAR16));
+      Buffer = AllocateZeroPool (((TargetNameLength * 2) + 1) * sizeof (CHAR16));
       if (Buffer == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
@@ -721,11 +726,12 @@ DevPathSerialVendor (
       // Build the string data
       //
       for (Index = 0; Index < TargetNameLength; Index++) {
-        NewBuffer = CatSPrint (Buffer, L"%02x", *((UINT8*)Vendor + sizeof (VENDOR_DEVICE_PATH) + Index));
+        NewBuffer = CatSPrint (Buffer, L"%02x", *((UINT8 *)Vendor + sizeof (VENDOR_DEVICE_PATH) + Index));
         if (NewBuffer == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
           break;
         }
+
         Buffer = NewBuffer;
       }
 
@@ -736,9 +742,10 @@ DevPathSerialVendor (
         Status = AppendCSDStr (MappingItem, Buffer);
       }
 
-      FreePool(Buffer);
+      FreePool (Buffer);
     }
   }
+
   return Status;
 }
 
@@ -759,12 +766,12 @@ DevPathSerialLun (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  DEVICE_LOGICAL_UNIT_DEVICE_PATH *Lun;
+  DEVICE_LOGICAL_UNIT_DEVICE_PATH  *Lun;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Lun = (DEVICE_LOGICAL_UNIT_DEVICE_PATH *) DevicePathNode;
+  Lun = (DEVICE_LOGICAL_UNIT_DEVICE_PATH *)DevicePathNode;
   return AppendCSDNum (MappingItem, Lun->Lun);
 }
 
@@ -788,17 +795,19 @@ DevPathSerialSata (
   EFI_STATUS        Status;
   SATA_DEVICE_PATH  *Sata;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Sata = (SATA_DEVICE_PATH  *) DevicePathNode;
+  Sata   = (SATA_DEVICE_PATH  *)DevicePathNode;
   Status = AppendCSDNum (MappingItem, Sata->HBAPortNumber);
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Sata->PortMultiplierPortNumber);
   }
+
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Sata->Lun);
   }
+
   return Status;
 }
 
@@ -826,41 +835,47 @@ DevPathSerialIScsi (
   UINTN              TargetNameLength;
   UINTN              Index;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
   Status = EFI_SUCCESS;
 
-  if (PcdGetBool(PcdShellDecodeIScsiMapNames)) {
-    IScsi = (ISCSI_DEVICE_PATH  *) DevicePathNode;
+  if (PcdGetBool (PcdShellDecodeIScsiMapNames)) {
+    IScsi  = (ISCSI_DEVICE_PATH  *)DevicePathNode;
     Status = AppendCSDNum (MappingItem, IScsi->NetworkProtocol);
     if (!EFI_ERROR (Status)) {
       Status = AppendCSDNum (MappingItem, IScsi->LoginOption);
     }
+
     if (!EFI_ERROR (Status)) {
       Status = AppendCSDNum (MappingItem, IScsi->Lun);
     }
+
     if (!EFI_ERROR (Status)) {
       Status = AppendCSDNum (MappingItem, IScsi->TargetPortalGroupTag);
     }
+
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     TargetNameLength = DevicePathNodeLength (DevicePathNode) - sizeof (ISCSI_DEVICE_PATH);
     if (TargetNameLength > 0) {
       TargetName = AllocateZeroPool ((TargetNameLength + 1) * sizeof (CHAR16));
       if (TargetName == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
       } else {
-        IScsiTargetName = (UINT8 *) (IScsi + 1);
+        IScsiTargetName = (UINT8 *)(IScsi + 1);
         for (Index = 0; Index < TargetNameLength; Index++) {
-          TargetName[Index] = (CHAR16) IScsiTargetName[Index];
+          TargetName[Index] = (CHAR16)IScsiTargetName[Index];
         }
+
         Status = AppendCSDStr (MappingItem, TargetName);
         FreePool (TargetName);
       }
     }
   }
+
   return Status;
 }
 
@@ -881,12 +896,12 @@ DevPathSerialI2O (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  I2O_DEVICE_PATH *DevicePath_I20;
+  I2O_DEVICE_PATH  *DevicePath_I20;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  DevicePath_I20 = (I2O_DEVICE_PATH *) DevicePathNode;
+  DevicePath_I20 = (I2O_DEVICE_PATH *)DevicePathNode;
   return AppendCSDNum (MappingItem, DevicePath_I20->Tid);
 }
 
@@ -913,18 +928,18 @@ DevPathSerialMacAddr (
   CHAR16                Buffer[64];
   CHAR16                *PBuffer;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Mac           = (MAC_ADDR_DEVICE_PATH *) DevicePathNode;
+  Mac = (MAC_ADDR_DEVICE_PATH *)DevicePathNode;
 
   HwAddressSize = sizeof (EFI_MAC_ADDRESS);
-  if (Mac->IfType == 0x01 || Mac->IfType == 0x00) {
+  if ((Mac->IfType == 0x01) || (Mac->IfType == 0x00)) {
     HwAddressSize = 6;
   }
 
   for (Index = 0, PBuffer = Buffer; Index < HwAddressSize; Index++, PBuffer += 2) {
-    UnicodeSPrint (PBuffer, 0, L"%02x", (UINTN) Mac->MacAddress.Addr[Index]);
+    UnicodeSPrint (PBuffer, 0, L"%02x", (UINTN)Mac->MacAddress.Addr[Index]);
   }
 
   return AppendCSDStr (MappingItem, Buffer);
@@ -953,24 +968,27 @@ DevPathSerialInfiniBand (
   CHAR16                  Buffer[64];
   CHAR16                  *PBuffer;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  InfiniBand = (INFINIBAND_DEVICE_PATH *) DevicePathNode;
+  InfiniBand = (INFINIBAND_DEVICE_PATH *)DevicePathNode;
   for (Index = 0, PBuffer = Buffer; Index < 16; Index++, PBuffer += 2) {
-    UnicodeSPrint (PBuffer, 0, L"%02x", (UINTN) InfiniBand->PortGid[Index]);
+    UnicodeSPrint (PBuffer, 0, L"%02x", (UINTN)InfiniBand->PortGid[Index]);
   }
 
   Status = AppendCSDStr (MappingItem, Buffer);
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, InfiniBand->ServiceId);
   }
+
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, InfiniBand->TargetPortId);
   }
+
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, InfiniBand->DeviceId);
   }
+
   return Status;
 }
 
@@ -995,38 +1013,41 @@ DevPathSerialIPv4 (
   IPv4_DEVICE_PATH  *Ip;
   CHAR16            Buffer[10];
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Ip = (IPv4_DEVICE_PATH *) DevicePathNode;
+  Ip = (IPv4_DEVICE_PATH *)DevicePathNode;
   UnicodeSPrint (
     Buffer,
     0,
     L"%02x%02x%02x%02x",
-    (UINTN) Ip->LocalIpAddress.Addr[0],
-    (UINTN) Ip->LocalIpAddress.Addr[1],
-    (UINTN) Ip->LocalIpAddress.Addr[2],
-    (UINTN) Ip->LocalIpAddress.Addr[3]
-   );
+    (UINTN)Ip->LocalIpAddress.Addr[0],
+    (UINTN)Ip->LocalIpAddress.Addr[1],
+    (UINTN)Ip->LocalIpAddress.Addr[2],
+    (UINTN)Ip->LocalIpAddress.Addr[3]
+    );
   Status = AppendCSDStr (MappingItem, Buffer);
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Ip->LocalPort);
   }
+
   if (!EFI_ERROR (Status)) {
     UnicodeSPrint (
       Buffer,
       0,
       L"%02x%02x%02x%02x",
-      (UINTN) Ip->RemoteIpAddress.Addr[0],
-      (UINTN) Ip->RemoteIpAddress.Addr[1],
-      (UINTN) Ip->RemoteIpAddress.Addr[2],
-      (UINTN) Ip->RemoteIpAddress.Addr[3]
-     );
+      (UINTN)Ip->RemoteIpAddress.Addr[0],
+      (UINTN)Ip->RemoteIpAddress.Addr[1],
+      (UINTN)Ip->RemoteIpAddress.Addr[2],
+      (UINTN)Ip->RemoteIpAddress.Addr[3]
+      );
     Status = AppendCSDStr (MappingItem, Buffer);
   }
+
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Ip->RemotePort);
   }
+
   return Status;
 }
 
@@ -1053,28 +1074,31 @@ DevPathSerialIPv6 (
   CHAR16            Buffer[64];
   CHAR16            *PBuffer;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Ip = (IPv6_DEVICE_PATH *) DevicePathNode;
+  Ip = (IPv6_DEVICE_PATH *)DevicePathNode;
   for (Index = 0, PBuffer = Buffer; Index < 16; Index++, PBuffer += 2) {
-    UnicodeSPrint (PBuffer, 0, L"%02x", (UINTN) Ip->LocalIpAddress.Addr[Index]);
+    UnicodeSPrint (PBuffer, 0, L"%02x", (UINTN)Ip->LocalIpAddress.Addr[Index]);
   }
 
   Status = AppendCSDStr (MappingItem, Buffer);
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Ip->LocalPort);
   }
+
   if (!EFI_ERROR (Status)) {
     for (Index = 0, PBuffer = Buffer; Index < 16; Index++, PBuffer += 2) {
-      UnicodeSPrint (PBuffer, 0, L"%02x", (UINTN) Ip->RemoteIpAddress.Addr[Index]);
+      UnicodeSPrint (PBuffer, 0, L"%02x", (UINTN)Ip->RemoteIpAddress.Addr[Index]);
     }
 
     Status = AppendCSDStr (MappingItem, Buffer);
   }
+
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Ip->RemotePort);
   }
+
   return Status;
 }
 
@@ -1098,14 +1122,15 @@ DevPathSerialScsi (
   EFI_STATUS        Status;
   SCSI_DEVICE_PATH  *Scsi;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Scsi = (SCSI_DEVICE_PATH *) DevicePathNode;
+  Scsi   = (SCSI_DEVICE_PATH *)DevicePathNode;
   Status = AppendCSDNum (MappingItem, Scsi->Pun);
   if (!EFI_ERROR (Status)) {
     Status = AppendCSDNum (MappingItem, Scsi->Lun);
   }
+
   return Status;
 }
 
@@ -1126,13 +1151,13 @@ DevPathSerial1394 (
   IN EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  F1394_DEVICE_PATH *DevicePath_F1394;
-  CHAR16            Buffer[20];
+  F1394_DEVICE_PATH  *DevicePath_F1394;
+  CHAR16             Buffer[20];
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  DevicePath_F1394 = (F1394_DEVICE_PATH *) DevicePathNode;
+  DevicePath_F1394 = (F1394_DEVICE_PATH *)DevicePathNode;
   UnicodeSPrint (Buffer, 0, L"%lx", DevicePath_F1394->Guid);
   return AppendCSDStr (MappingItem, Buffer);
 }
@@ -1156,16 +1181,17 @@ DevPathSerialAcpi (
 {
   ACPI_HID_DEVICE_PATH  *Acpi;
 
-  ASSERT(DevicePathNode != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePathNode != NULL);
+  ASSERT (MappingItem != NULL);
 
-  Acpi = (ACPI_HID_DEVICE_PATH *) DevicePathNode;
+  Acpi = (ACPI_HID_DEVICE_PATH *)DevicePathNode;
   if ((Acpi->HID & PNP_EISA_ID_MASK) == PNP_EISA_ID_CONST) {
     if (EISA_ID_TO_NUM (Acpi->HID) == 0x0604) {
       MappingItem->Mtd = MTDTypeFloppy;
       return AppendCSDNum (MappingItem, Acpi->UID);
     }
   }
+
   return EFI_SUCCESS;
 }
 
@@ -1328,25 +1354,25 @@ DEV_PATH_CONSIST_MAPPING_TABLE  DevPathConsistMappingTable[] = {
 **/
 BOOLEAN
 IsHIDevicePathNode (
-  IN EFI_DEVICE_PATH_PROTOCOL *DevicePathNode
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode
   )
 {
   ACPI_HID_DEVICE_PATH  *Acpi;
 
-  ASSERT(DevicePathNode != NULL);
+  ASSERT (DevicePathNode != NULL);
 
   if (DevicePathNode->Type == HARDWARE_DEVICE_PATH) {
     return TRUE;
   }
 
   if (DevicePathNode->Type == ACPI_DEVICE_PATH) {
-    Acpi = (ACPI_HID_DEVICE_PATH *) DevicePathNode;
+    Acpi = (ACPI_HID_DEVICE_PATH *)DevicePathNode;
     switch (EISA_ID_TO_NUM (Acpi->HID)) {
-    case 0x0301:
-    case 0x0401:
-    case 0x0501:
-    case 0x0604:
-      return FALSE;
+      case 0x0301:
+      case 0x0401:
+      case 0x0501:
+      case 0x0604:
+        return FALSE;
     }
 
     return TRUE;
@@ -1364,7 +1390,7 @@ IsHIDevicePathNode (
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 GetHIDevicePath (
-  IN EFI_DEVICE_PATH_PROTOCOL        *DevicePath
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
   UINTN                     NonHIDevicePathNodeCount;
@@ -1373,17 +1399,17 @@ GetHIDevicePath (
   EFI_DEVICE_PATH_PROTOCOL  *HIDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
 
-  ASSERT(DevicePath != NULL);
+  ASSERT (DevicePath != NULL);
 
-  NonHIDevicePathNodeCount  = 0;
+  NonHIDevicePathNodeCount = 0;
 
-  HIDevicePath              = AllocateZeroPool (sizeof (EFI_DEVICE_PATH_PROTOCOL));
+  HIDevicePath = AllocateZeroPool (sizeof (EFI_DEVICE_PATH_PROTOCOL));
   SetDevicePathEndNode (HIDevicePath);
 
-  Node.DevPath.Type       = END_DEVICE_PATH_TYPE;
-  Node.DevPath.SubType    = END_INSTANCE_DEVICE_PATH_SUBTYPE;
-  Node.DevPath.Length[0]  = (UINT8)sizeof (EFI_DEVICE_PATH_PROTOCOL);
-  Node.DevPath.Length[1]  = 0;
+  Node.DevPath.Type      = END_DEVICE_PATH_TYPE;
+  Node.DevPath.SubType   = END_INSTANCE_DEVICE_PATH_SUBTYPE;
+  Node.DevPath.Length[0] = (UINT8)sizeof (EFI_DEVICE_PATH_PROTOCOL);
+  Node.DevPath.Length[1] = 0;
 
   while (!IsDevicePathEnd (DevicePath)) {
     if (IsHIDevicePathNode (DevicePath)) {
@@ -1399,10 +1425,11 @@ GetHIDevicePath (
     } else {
       NonHIDevicePathNodeCount++;
     }
+
     //
     // Next device path node
     //
-    DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) NextDevicePathNode (DevicePath);
+    DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)NextDevicePathNode (DevicePath);
   }
 
   return HIDevicePath;
@@ -1418,8 +1445,8 @@ GetHIDevicePath (
 **/
 EFI_STATUS
 GetDeviceConsistMappingInfo (
-  IN DEVICE_CONSIST_MAPPING_INFO    *MappingItem,
-  IN EFI_DEVICE_PATH_PROTOCOL       *DevicePath
+  IN DEVICE_CONSIST_MAPPING_INFO  *MappingItem,
+  IN EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
   EFI_STATUS                Status;
@@ -1427,8 +1454,8 @@ GetDeviceConsistMappingInfo (
   UINTN                     Index;
   EFI_DEVICE_PATH_PROTOCOL  *OriginalDevicePath;
 
-  ASSERT(DevicePath != NULL);
-  ASSERT(MappingItem != NULL);
+  ASSERT (DevicePath != NULL);
+  ASSERT (MappingItem != NULL);
 
   SetMem (&MappingItem->Csd, sizeof (POOL_PRINT), 0);
   OriginalDevicePath = DevicePath;
@@ -1439,10 +1466,10 @@ GetDeviceConsistMappingInfo (
     // initialize with generic function in case nothing is found
     //
     for (SerialFun = DevPathSerialDefault, Index = 0; DevPathConsistMappingTable[Index].SerialFun != NULL; Index += 1) {
-
-      if (DevicePathType (DevicePath) == DevPathConsistMappingTable[Index].Type &&
-          DevicePathSubType (DevicePath) == DevPathConsistMappingTable[Index].SubType
-         ) {
+      if ((DevicePathType (DevicePath) == DevPathConsistMappingTable[Index].Type) &&
+          (DevicePathSubType (DevicePath) == DevPathConsistMappingTable[Index].SubType)
+          )
+      {
         SerialFun = DevPathConsistMappingTable[Index].SerialFun;
         break;
       }
@@ -1457,7 +1484,7 @@ GetDeviceConsistMappingInfo (
     //
     // Next device path node
     //
-    DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) NextDevicePathNode (DevicePath);
+    DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)NextDevicePathNode (DevicePath);
   }
 
   return EFI_SUCCESS;
@@ -1473,37 +1500,37 @@ GetDeviceConsistMappingInfo (
 EFI_STATUS
 EFIAPI
 ShellCommandConsistMappingInitialize (
-  OUT EFI_DEVICE_PATH_PROTOCOL           ***Table
+  OUT EFI_DEVICE_PATH_PROTOCOL  ***Table
   )
 {
-  EFI_HANDLE                      *HandleBuffer;
-  UINTN                           HandleNum;
-  UINTN                           HandleLoop;
-  EFI_DEVICE_PATH_PROTOCOL        **TempTable;
-  EFI_DEVICE_PATH_PROTOCOL        *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL        *HIDevicePath;
-  EFI_BLOCK_IO_PROTOCOL           *BlockIo;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *SimpleFileSystem;
-  UINTN                           Index;
-  EFI_STATUS                      Status;
+  EFI_HANDLE                       *HandleBuffer;
+  UINTN                            HandleNum;
+  UINTN                            HandleLoop;
+  EFI_DEVICE_PATH_PROTOCOL         **TempTable;
+  EFI_DEVICE_PATH_PROTOCOL         *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL         *HIDevicePath;
+  EFI_BLOCK_IO_PROTOCOL            *BlockIo;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *SimpleFileSystem;
+  UINTN                            Index;
+  EFI_STATUS                       Status;
 
-  HandleBuffer              = NULL;
+  HandleBuffer = NULL;
 
   Status = gBS->LocateHandleBuffer (
-              ByProtocol,
-              &gEfiDevicePathProtocolGuid,
-              NULL,
-              &HandleNum,
-              &HandleBuffer
-             );
-  ASSERT_EFI_ERROR(Status);
+                  ByProtocol,
+                  &gEfiDevicePathProtocolGuid,
+                  NULL,
+                  &HandleNum,
+                  &HandleBuffer
+                  );
+  ASSERT_EFI_ERROR (Status);
 
-  TempTable     = AllocateZeroPool ((HandleNum + 1) * sizeof (EFI_DEVICE_PATH_PROTOCOL *));
+  TempTable = AllocateZeroPool ((HandleNum + 1) * sizeof (EFI_DEVICE_PATH_PROTOCOL *));
   if (TempTable == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  for (HandleLoop = 0 ; HandleLoop < HandleNum ; HandleLoop++) {
+  for (HandleLoop = 0; HandleLoop < HandleNum; HandleLoop++) {
     DevicePath = DevicePathFromHandle (HandleBuffer[HandleLoop]);
     if (DevicePath == NULL) {
       continue;
@@ -1514,16 +1541,18 @@ ShellCommandConsistMappingInitialize (
       continue;
     }
 
-    Status = gBS->HandleProtocol( HandleBuffer[HandleLoop],
-                                  &gEfiBlockIoProtocolGuid,
-                                  (VOID **)&BlockIo
-                                  );
-    if (EFI_ERROR(Status)) {
-      Status = gBS->HandleProtocol( HandleBuffer[HandleLoop],
-                                    &gEfiSimpleFileSystemProtocolGuid,
-                                    (VOID **)&SimpleFileSystem
-                                    );
-      if (EFI_ERROR(Status)) {
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[HandleLoop],
+                    &gEfiBlockIoProtocolGuid,
+                    (VOID **)&BlockIo
+                    );
+    if (EFI_ERROR (Status)) {
+      Status = gBS->HandleProtocol (
+                      HandleBuffer[HandleLoop],
+                      &gEfiSimpleFileSystemProtocolGuid,
+                      (VOID **)&SimpleFileSystem
+                      );
+      if (EFI_ERROR (Status)) {
         FreePool (HIDevicePath);
         continue;
       }
@@ -1541,8 +1570,10 @@ ShellCommandConsistMappingInitialize (
     }
   }
 
-  for (Index = 0; TempTable[Index] != NULL; Index++);
-  PerformQuickSort(TempTable, Index, sizeof(EFI_DEVICE_PATH_PROTOCOL*), DevicePathCompare);
+  for (Index = 0; TempTable[Index] != NULL; Index++) {
+  }
+
+  PerformQuickSort (TempTable, Index, sizeof (EFI_DEVICE_PATH_PROTOCOL *), DevicePathCompare);
   *Table = TempTable;
 
   if (HandleBuffer != NULL) {
@@ -1564,12 +1595,12 @@ ShellCommandConsistMappingInitialize (
 EFI_STATUS
 EFIAPI
 ShellCommandConsistMappingUnInitialize (
-  EFI_DEVICE_PATH_PROTOCOL **Table
+  EFI_DEVICE_PATH_PROTOCOL  **Table
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
-  ASSERT(Table  != NULL);
+  ASSERT (Table  != NULL);
 
   for (Index = 0; Table[Index] != NULL; Index++) {
     FreePool (Table[Index]);
@@ -1595,18 +1626,18 @@ ShellCommandConsistMappingUnInitialize (
 CHAR16 *
 EFIAPI
 ShellCommandConsistMappingGenMappingName (
-  IN EFI_DEVICE_PATH_PROTOCOL    *DevicePath,
-  IN EFI_DEVICE_PATH_PROTOCOL    **Table
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN EFI_DEVICE_PATH_PROTOCOL  **Table
   )
 {
-  EFI_STATUS                  Status;
-  POOL_PRINT                  Str;
-  DEVICE_CONSIST_MAPPING_INFO MappingInfo;
-  EFI_DEVICE_PATH_PROTOCOL    *HIDevicePath;
-  UINTN                       Index;
+  EFI_STATUS                   Status;
+  POOL_PRINT                   Str;
+  DEVICE_CONSIST_MAPPING_INFO  MappingInfo;
+  EFI_DEVICE_PATH_PROTOCOL     *HIDevicePath;
+  UINTN                        Index;
 
-  ASSERT(DevicePath         != NULL);
-  ASSERT(Table  != NULL);
+  ASSERT (DevicePath         != NULL);
+  ASSERT (Table  != NULL);
 
   HIDevicePath = GetHIDevicePath (DevicePath);
   if (HIDevicePath == NULL) {
@@ -1645,16 +1676,18 @@ ShellCommandConsistMappingGenMappingName (
   }
 
   if (!EFI_ERROR (Status)) {
-    Status = CatPrint (&Str, L"%d", (UINTN) MappingInfo.Hi);
+    Status = CatPrint (&Str, L"%d", (UINTN)MappingInfo.Hi);
   }
-  if (!EFI_ERROR (Status) && MappingInfo.Csd.Str != NULL) {
+
+  if (!EFI_ERROR (Status) && (MappingInfo.Csd.Str != NULL)) {
     Status = CatPrint (&Str, L"%s", MappingInfo.Csd.Str);
     FreePool (MappingInfo.Csd.Str);
   }
 
-  if (!EFI_ERROR (Status) && Str.Str != NULL) {
+  if (!EFI_ERROR (Status) && (Str.Str != NULL)) {
     Status = CatPrint (&Str, L":");
   }
+
   if (EFI_ERROR (Status)) {
     SHELL_FREE_NON_NULL (Str.Str);
     return NULL;
@@ -1673,20 +1706,20 @@ ShellCommandConsistMappingGenMappingName (
 SHELL_MAP_LIST *
 EFIAPI
 ShellCommandFindMapItem (
-  IN CONST CHAR16 *MapKey
+  IN CONST CHAR16  *MapKey
   )
 {
-  SHELL_MAP_LIST *MapListItem;
+  SHELL_MAP_LIST  *MapListItem;
 
-  for ( MapListItem = (SHELL_MAP_LIST *)GetFirstNode(&gShellMapList.Link)
-      ; !IsNull(&gShellMapList.Link, &MapListItem->Link)
-      ; MapListItem = (SHELL_MAP_LIST *)GetNextNode(&gShellMapList.Link, &MapListItem->Link)
-     ){
-    if (gUnicodeCollation->StriColl(gUnicodeCollation,MapListItem->MapName,(CHAR16*)MapKey) == 0) {
+  for ( MapListItem = (SHELL_MAP_LIST *)GetFirstNode (&gShellMapList.Link)
+        ; !IsNull (&gShellMapList.Link, &MapListItem->Link)
+        ; MapListItem = (SHELL_MAP_LIST *)GetNextNode (&gShellMapList.Link, &MapListItem->Link)
+        )
+  {
+    if (gUnicodeCollation->StriColl (gUnicodeCollation, MapListItem->MapName, (CHAR16 *)MapKey) == 0) {
       return (MapListItem);
     }
   }
+
   return (NULL);
 }
-
-

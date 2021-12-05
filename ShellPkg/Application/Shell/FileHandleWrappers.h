@@ -10,34 +10,34 @@
 #define _SHELL_FILE_HANDLE_WRAPPERS_HEADER_
 
 typedef struct {
-  LIST_ENTRY        Link;
-  CHAR16*           Buffer;
+  LIST_ENTRY    Link;
+  CHAR16        *Buffer;
 } SHELL_LINE_LIST;
 
 typedef struct {
-  UINTN             LogCount;
-  SHELL_LINE_LIST   *Log;
+  UINTN              LogCount;
+  SHELL_LINE_LIST    *Log;
 } SHELL_LINE_LOG;
 
 ///
 /// FILE styte interfaces for StdIn.
 ///
-extern EFI_FILE_PROTOCOL FileInterfaceStdIn;
+extern EFI_FILE_PROTOCOL  FileInterfaceStdIn;
 
 ///
 /// FILE styte interfaces for StdOut.
 ///
-extern EFI_FILE_PROTOCOL FileInterfaceStdOut;
+extern EFI_FILE_PROTOCOL  FileInterfaceStdOut;
 
 ///
 /// FILE styte interfaces for StdErr.
 ///
-extern EFI_FILE_PROTOCOL FileInterfaceStdErr;
+extern EFI_FILE_PROTOCOL  FileInterfaceStdErr;
 
 ///
 /// FILE style interface for NUL file.
 ///
-extern EFI_FILE_PROTOCOL FileInterfaceNulFile;
+extern EFI_FILE_PROTOCOL  FileInterfaceNulFile;
 
 /**
   Creates a EFI_FILE_PROTOCOL (almost) object for using to access
@@ -48,9 +48,9 @@ extern EFI_FILE_PROTOCOL FileInterfaceNulFile;
   @retval NULL      Memory could not be allocated.
   @return other     a pointer to an EFI_FILE_PROTOCOL structure
 **/
-EFI_FILE_PROTOCOL*
-CreateFileInterfaceEnv(
-  CONST CHAR16 *EnvName
+EFI_FILE_PROTOCOL *
+CreateFileInterfaceEnv (
+  CONST CHAR16  *EnvName
   );
 
 /**
@@ -62,9 +62,9 @@ CreateFileInterfaceEnv(
   @retval NULL      Memory could not be allocated.
   @return other     a pointer to an EFI_FILE_PROTOCOL structure
 **/
-EFI_FILE_PROTOCOL*
-CreateFileInterfaceMem(
-  IN CONST BOOLEAN Unicode
+EFI_FILE_PROTOCOL *
+CreateFileInterfaceMem (
+  IN CONST BOOLEAN  Unicode
   );
 
 /**
@@ -77,11 +77,10 @@ CreateFileInterfaceMem(
   @retval NULL      Memory could not be allocated.
   @return other     a pointer to an EFI_FILE_PROTOCOL structure
 **/
-EFI_FILE_PROTOCOL*
-CreateFileInterfaceFile(
+EFI_FILE_PROTOCOL *
+CreateFileInterfaceFile (
   IN CONST EFI_FILE_PROTOCOL  *Template,
   IN CONST BOOLEAN            Unicode
   );
 
 #endif //_SHELL_FILE_HANDLE_WRAPPERS_HEADER_
-

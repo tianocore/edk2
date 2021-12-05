@@ -22,37 +22,38 @@ ShellCommandRunShift (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS          Status;
-  SCRIPT_FILE         *CurrentScriptFile;
-  UINTN               LoopVar;
+  EFI_STATUS   Status;
+  SCRIPT_FILE  *CurrentScriptFile;
+  UINTN        LoopVar;
 
-  Status = CommandInit();
-  ASSERT_EFI_ERROR(Status);
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
 
-  if (!gEfiShellProtocol->BatchIsActive()) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"shift");
+  if (!gEfiShellProtocol->BatchIsActive ()) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"shift");
     return (SHELL_UNSUPPORTED);
   }
 
-  CurrentScriptFile = ShellCommandGetCurrentScriptFile();
-  ASSERT(CurrentScriptFile != NULL);
+  CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
+  ASSERT (CurrentScriptFile != NULL);
 
   if (CurrentScriptFile->Argc < 2) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"shift");
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"shift");
     return (SHELL_UNSUPPORTED);
   }
 
-  for (LoopVar = 0 ; LoopVar < CurrentScriptFile->Argc ; LoopVar++) {
+  for (LoopVar = 0; LoopVar < CurrentScriptFile->Argc; LoopVar++) {
     if (LoopVar == 0) {
-      SHELL_FREE_NON_NULL(CurrentScriptFile->Argv[LoopVar]);
+      SHELL_FREE_NON_NULL (CurrentScriptFile->Argv[LoopVar]);
     }
+
     if (LoopVar < CurrentScriptFile->Argc -1) {
       CurrentScriptFile->Argv[LoopVar] = CurrentScriptFile->Argv[LoopVar+1];
     } else {
       CurrentScriptFile->Argv[LoopVar] = NULL;
     }
   }
+
   CurrentScriptFile->Argc--;
   return (SHELL_SUCCESS);
 }
-

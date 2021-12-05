@@ -60,10 +60,10 @@ HDiskImageBackup (
 **/
 EFI_STATUS
 HDiskImageRead (
-  IN CONST CHAR16   *DeviceName,
-  IN UINTN    Offset,
-  IN UINTN    Size,
-  IN BOOLEAN  Recover
+  IN CONST CHAR16  *DeviceName,
+  IN UINTN         Offset,
+  IN UINTN         Size,
+  IN BOOLEAN       Recover
   );
 
 /**
@@ -81,9 +81,9 @@ HDiskImageRead (
 **/
 EFI_STATUS
 HDiskImageSave (
-  IN CHAR16 *DeviceName,
-  IN UINTN  Offset,
-  IN UINTN  Size
+  IN CHAR16  *DeviceName,
+  IN UINTN   Offset,
+  IN UINTN   Size
   );
 
 #endif

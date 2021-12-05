@@ -27,6 +27,6 @@ UefiMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  Print(L"ShellExecute - Pass");
+  Print (L"ShellExecute - Pass");
   return EFI_SUCCESS;
 }

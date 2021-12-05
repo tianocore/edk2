@@ -11,14 +11,14 @@
 #include "AcpiViewConfig.h"
 
 // Report variables
-STATIC BOOLEAN        mConsistencyCheck;
-STATIC BOOLEAN        mColourHighlighting;
-STATIC EREPORT_OPTION mReportType;
-STATIC BOOLEAN        mMandatoryTableValidate;
-STATIC UINTN          mMandatoryTableSpec;
+STATIC BOOLEAN         mConsistencyCheck;
+STATIC BOOLEAN         mColourHighlighting;
+STATIC EREPORT_OPTION  mReportType;
+STATIC BOOLEAN         mMandatoryTableValidate;
+STATIC UINTN           mMandatoryTableSpec;
 
 // User selection of which ACPI table should be checked
-SELECTED_ACPI_TABLE mSelectedAcpiTable;
+SELECTED_ACPI_TABLE  mSelectedAcpiTable;
 
 /**
  Reset the AcpiView user configuration to defaults
@@ -29,13 +29,13 @@ AcpiConfigSetDefaults (
   VOID
   )
 {
-  mReportType = ReportAll;
-  mSelectedAcpiTable.Type = 0;
-  mSelectedAcpiTable.Name = NULL;
+  mReportType              = ReportAll;
+  mSelectedAcpiTable.Type  = 0;
+  mSelectedAcpiTable.Name  = NULL;
   mSelectedAcpiTable.Found = FALSE;
-  mConsistencyCheck = TRUE;
-  mMandatoryTableValidate = FALSE;
-  mMandatoryTableSpec = 0;
+  mConsistencyCheck        = TRUE;
+  mMandatoryTableValidate  = FALSE;
+  mMandatoryTableSpec      = 0;
 }
 
 /**
@@ -49,25 +49,27 @@ AcpiConfigSetDefaults (
 STATIC
 UINT32
 ConvertStrToAcpiSignature (
-  IN CONST CHAR16 *Str
+  IN CONST CHAR16  *Str
   )
 {
-  UINT8 Index;
-  CHAR8 Ptr[4];
+  UINT8  Index;
+  CHAR8  Ptr[4];
 
   ZeroMem (Ptr, sizeof (Ptr));
   Index = 0;
 
   // Convert to Upper case and convert to ASCII
   while ((Index < 4) && (Str[Index] != 0)) {
-    if (Str[Index] >= L'a' && Str[Index] <= L'z') {
+    if ((Str[Index] >= L'a') && (Str[Index] <= L'z')) {
       Ptr[Index] = (CHAR8)(Str[Index] - (L'a' - L'A'));
     } else {
       Ptr[Index] = (CHAR8)Str[Index];
     }
+
     Index++;
   }
-  return *(UINT32 *) Ptr;
+
+  return *(UINT32 *)Ptr;
 }
 
 /**
@@ -80,7 +82,7 @@ ConvertStrToAcpiSignature (
 VOID
 EFIAPI
 SelectAcpiTable (
-  IN CONST CHAR16 *TableName
+  IN CONST CHAR16  *TableName
   )
 {
   ASSERT (TableName != NULL);
@@ -97,7 +99,7 @@ SelectAcpiTable (
 VOID
 EFIAPI
 GetSelectedAcpiTable (
-  OUT SELECTED_ACPI_TABLE **SelectedAcpiTable
+  OUT SELECTED_ACPI_TABLE  **SelectedAcpiTable
   )
 {
   *SelectedAcpiTable = &mSelectedAcpiTable;
@@ -125,7 +127,7 @@ GetColourHighlighting (
 VOID
 EFIAPI
 SetColourHighlighting (
-  BOOLEAN Highlight
+  BOOLEAN  Highlight
   )
 {
   mColourHighlighting = Highlight;
@@ -153,7 +155,7 @@ GetConsistencyChecking (
 VOID
 EFIAPI
 SetConsistencyChecking (
-  BOOLEAN ConsistencyChecking
+  BOOLEAN  ConsistencyChecking
   )
 {
   mConsistencyCheck = ConsistencyChecking;
@@ -181,7 +183,7 @@ GetReportOption (
 VOID
 EFIAPI
 SetReportOption (
-  EREPORT_OPTION ReportType
+  EREPORT_OPTION  ReportType
   )
 {
   mReportType = ReportType;
@@ -209,7 +211,7 @@ GetMandatoryTableValidate (
 VOID
 EFIAPI
 SetMandatoryTableValidate (
-  BOOLEAN Validate
+  BOOLEAN  Validate
   )
 {
   mMandatoryTableValidate = Validate;
@@ -239,7 +241,7 @@ GetMandatoryTableSpec (
 VOID
 EFIAPI
 SetMandatoryTableSpec (
-  UINTN Spec
+  UINTN  Spec
   )
 {
   mMandatoryTableSpec = Spec;

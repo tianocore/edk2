@@ -14,25 +14,25 @@
 #include "AcpiTableParser.h"
 
 // Local variables
-STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
+STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
 
 /**
   An ACPI_PARSER array describing the ACPI MCFG Table.
 **/
-STATIC CONST ACPI_PARSER McfgParser[] = {
+STATIC CONST ACPI_PARSER  McfgParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
-  {L"Reserved", 8, 36, L"0x%lx", NULL, NULL, NULL, NULL},
+  { L"Reserved",                   8,36, L"0x%lx", NULL, NULL, NULL, NULL },
 };
 
 /**
   An ACPI_PARSER array describing the PCI configuration Space Base Address structure.
 **/
-STATIC CONST ACPI_PARSER PciCfgSpaceBaseAddrParser[] = {
-  {L"Base Address", 8, 0, L"0x%lx", NULL, NULL, NULL, NULL},
-  {L"PCI Segment Group No.", 2, 8, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Start Bus No.", 1, 10, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"End Bus No.", 1, 11, L"0x%x", NULL, NULL, NULL, NULL},
-  {L"Reserved", 4, 12, L"0x%x", NULL, NULL, NULL, NULL}
+STATIC CONST ACPI_PARSER  PciCfgSpaceBaseAddrParser[] = {
+  { L"Base Address",          8, 0,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"PCI Segment Group No.", 2, 8,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Start Bus No.",         1, 10, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"End Bus No.",           1, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Reserved",              4, 12, L"0x%x",  NULL, NULL, NULL, NULL }
 };
 
 /**
@@ -50,15 +50,15 @@ STATIC CONST ACPI_PARSER PciCfgSpaceBaseAddrParser[] = {
 VOID
 EFIAPI
 ParseAcpiMcfg (
-  IN BOOLEAN Trace,
-  IN UINT8*  Ptr,
-  IN UINT32  AcpiTableLength,
-  IN UINT8   AcpiTableRevision
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
   )
 {
-  UINT32 Offset;
-  UINT32 PciCfgOffset;
-  UINT8* PciCfgSpacePtr;
+  UINT32  Offset;
+  UINT32  PciCfgOffset;
+  UINT8   *PciCfgSpacePtr;
 
   if (!Trace) {
     return;
@@ -85,6 +85,6 @@ ParseAcpiMcfg (
                      PARSER_PARAMS (PciCfgSpaceBaseAddrParser)
                      );
     PciCfgSpacePtr += PciCfgOffset;
-    Offset += PciCfgOffset;
+    Offset         += PciCfgOffset;
   }
 }

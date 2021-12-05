@@ -15,22 +15,22 @@
 #include "AcpiTableParser.h"
 
 // Local Variables
-STATIC CONST UINT64* SlitSystemLocalityCount;
-STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
+STATIC CONST UINT64                  *SlitSystemLocalityCount;
+STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
 
 /**
   An ACPI_PARSER array describing the ACPI SLIT table.
 **/
-STATIC CONST ACPI_PARSER SlitParser[] = {
+STATIC CONST ACPI_PARSER  SlitParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
-  {L"Number of System Localities", 8, 36, L"0x%lx", NULL,
-   (VOID**)&SlitSystemLocalityCount, NULL, NULL}
+  { L"Number of System Localities",   8,     36, L"0x%lx", NULL,
+    (VOID **)&SlitSystemLocalityCount,NULL,  NULL }
 };
 
 /**
   Macro to get the value of a System Locality
 **/
-#define SLIT_ELEMENT(Ptr, i, j) *(Ptr + (i * LocalityCount) + j)
+#define SLIT_ELEMENT(Ptr, i, j)  *(Ptr + (i * LocalityCount) + j)
 
 /**
   This function parses the ACPI SLIT table.
@@ -50,18 +50,18 @@ STATIC CONST ACPI_PARSER SlitParser[] = {
 VOID
 EFIAPI
 ParseAcpiSlit (
-  IN BOOLEAN Trace,
-  IN UINT8*  Ptr,
-  IN UINT32  AcpiTableLength,
-  IN UINT8   AcpiTableRevision
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
   )
 {
-  UINT32 Offset;
-  UINT32 Count;
-  UINT32 Index;
-  UINT32 LocalityCount;
-  UINT8* LocalityPtr;
-  CHAR16 Buffer[80];  // Used for AsciiName param of ParseAcpi
+  UINT32  Offset;
+  UINT32  Count;
+  UINT32  Index;
+  UINT32  LocalityCount;
+  UINT8   *LocalityPtr;
+  CHAR16  Buffer[80]; // Used for AsciiName param of ParseAcpi
 
   if (!Trace) {
     return;
@@ -103,8 +103,8 @@ ParseAcpiSlit (
     IncrementErrorCount ();
     Print (
       L"ERROR: The Number of System Localities provided can't be represented " \
-        L"in the SLIT table. SlitSystemLocalityCount = %ld. " \
-        L"MaxLocalityCountAllowed = %d.\n",
+      L"in the SLIT table. SlitSystemLocalityCount = %ld. " \
+      L"MaxLocalityCountAllowed = %d.\n",
       *SlitSystemLocalityCount,
       MAX_UINT16
       );
@@ -118,7 +118,7 @@ ParseAcpiSlit (
     IncrementErrorCount ();
     Print (
       L"ERROR: Invalid Number of System Localities. " \
-        L"SlitSystemLocalityCount = %ld. AcpiTableLength = %d.\n",
+      L"SlitSystemLocalityCount = %ld. AcpiTableLength = %d.\n",
       *SlitSystemLocalityCount,
       AcpiTableLength
       );
@@ -144,12 +144,14 @@ ParseAcpiSlit (
     for (Index = 0; Index < LocalityCount; Index++) {
       Print (L" (%3d) ", Index);
     }
+
     Print (L"\n");
-    for (Count = 0; Count< LocalityCount; Count++) {
+    for (Count = 0; Count < LocalityCount; Count++) {
       Print (L" (%3d) ", Count);
       for (Index = 0; Index < LocalityCount; Index++) {
         Print (L"  %3d  ", SLIT_ELEMENT (LocalityPtr, Count, Index));
       }
+
       Print (L"\n");
     }
   }
@@ -158,23 +160,25 @@ ParseAcpiSlit (
   for (Count = 0; Count < LocalityCount; Count++) {
     for (Index = 0; Index < LocalityCount; Index++) {
       // Element[x][x] must be equal to 10
-      if ((Count == Index) && (SLIT_ELEMENT (LocalityPtr, Count,Index) != 10)) {
+      if ((Count == Index) && (SLIT_ELEMENT (LocalityPtr, Count, Index) != 10)) {
         IncrementErrorCount ();
         Print (
           L"ERROR: Diagonal Element[0x%lx][0x%lx] (%3d)."
-            L" Normalized Value is not 10\n",
+          L" Normalized Value is not 10\n",
           Count,
           Index,
           SLIT_ELEMENT (LocalityPtr, Count, Index)
           );
       }
+
       // Element[i][j] must be equal to Element[j][i]
       if (SLIT_ELEMENT (LocalityPtr, Count, Index) !=
-          SLIT_ELEMENT (LocalityPtr, Index, Count)) {
+          SLIT_ELEMENT (LocalityPtr, Index, Count))
+      {
         IncrementErrorCount ();
         Print (
           L"ERROR: Relative distances for Element[0x%lx][0x%lx] (%3d) and \n"
-           L"Element[0x%lx][0x%lx] (%3d) do not match.\n",
+          L"Element[0x%lx][0x%lx] (%3d) do not match.\n",
           Count,
           Index,
           SLIT_ELEMENT (LocalityPtr, Count, Index),

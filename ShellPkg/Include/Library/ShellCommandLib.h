@@ -26,23 +26,23 @@
 //
 // The extern global protocol poionters.
 //
-extern        EFI_UNICODE_COLLATION_PROTOCOL    *gUnicodeCollation;
-extern        CONST CHAR16*                     SupportLevel[];
+extern        EFI_UNICODE_COLLATION_PROTOCOL  *gUnicodeCollation;
+extern        CONST CHAR16                    *SupportLevel[];
 
 //
 // The map list objects.
 //
 typedef struct {
-  LIST_ENTRY                    Link;
-  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
-  CHAR16                        *MapName;
-  CHAR16                        *CurrentDirectoryPath;
-  UINT64                         Flags;
+  LIST_ENTRY                  Link;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  CHAR16                      *MapName;
+  CHAR16                      *CurrentDirectoryPath;
+  UINT64                      Flags;
 } SHELL_MAP_LIST;
 /// List of Mappings - DeviceName and Drive Letter(ism).
-extern        SHELL_MAP_LIST                      gShellMapList;
+extern        SHELL_MAP_LIST  gShellMapList;
 /// Pointer to node of current directory in the mMapList.
-extern        SHELL_MAP_LIST                      *gShellCurMapping;
+extern        SHELL_MAP_LIST  *gShellCurMapping;
 
 /**
   Returns the help MAN fileName for a given shell command.
@@ -130,14 +130,14 @@ SHELL_STATUS
 RETURN_STATUS
 EFIAPI
 ShellCommandRegisterCommandName (
-  IN CONST  CHAR16                      *CommandString,
-  IN        SHELL_RUN_COMMAND           CommandHandler,
-  IN        SHELL_GET_MAN_FILENAME      GetManFileName,
-  IN        UINT32                      ShellMinSupportLevel,
-  IN CONST  CHAR16                      *ProfileName,
-  IN CONST  BOOLEAN                     CanAffectLE,
-  IN CONST  EFI_HII_HANDLE              HiiHandle,
-  IN CONST  EFI_STRING_ID               ManFormatHelp
+  IN CONST  CHAR16                  *CommandString,
+  IN        SHELL_RUN_COMMAND       CommandHandler,
+  IN        SHELL_GET_MAN_FILENAME  GetManFileName,
+  IN        UINT32                  ShellMinSupportLevel,
+  IN CONST  CHAR16                  *ProfileName,
+  IN CONST  BOOLEAN                 CanAffectLE,
+  IN CONST  EFI_HII_HANDLE          HiiHandle,
+  IN CONST  EFI_STRING_ID           ManFormatHelp
   );
 
 /**
@@ -167,9 +167,9 @@ ShellCommandRegisterCommandName (
 RETURN_STATUS
 EFIAPI
 ShellCommandRunCommandHandler (
-  IN CONST CHAR16               *CommandString,
-  IN OUT SHELL_STATUS           *RetVal,
-  IN OUT BOOLEAN                *CanAffectLE OPTIONAL
+  IN CONST CHAR16      *CommandString,
+  IN OUT SHELL_STATUS  *RetVal,
+  IN OUT BOOLEAN       *CanAffectLE OPTIONAL
   );
 
 /**
@@ -185,16 +185,15 @@ ShellCommandRunCommandHandler (
   @retval other                     The name of the MAN file.
   @sa SHELL_GET_MAN_FILENAME
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
 ShellCommandGetManFileNameHandler (
-  IN CONST CHAR16               *CommandString
+  IN CONST CHAR16  *CommandString
   );
 
-
 typedef struct {
-  LIST_ENTRY  Link;
-  CHAR16      *CommandString;
+  LIST_ENTRY    Link;
+  CHAR16        *CommandString;
 } COMMAND_LIST;
 
 /**
@@ -206,16 +205,16 @@ typedef struct {
 
   @return A linked list of all available shell commands.
 **/
-CONST COMMAND_LIST*
+CONST COMMAND_LIST *
 EFIAPI
 ShellCommandGetCommandList (
-  IN CONST BOOLEAN Sort
+  IN CONST BOOLEAN  Sort
   );
 
 typedef struct {
-  LIST_ENTRY  Link;
-  CHAR16      *CommandString;
-  CHAR16      *Alias;
+  LIST_ENTRY    Link;
+  CHAR16        *CommandString;
+  CHAR16        *Alias;
 } ALIAS_LIST;
 
 /**
@@ -234,8 +233,8 @@ typedef struct {
 RETURN_STATUS
 EFIAPI
 ShellCommandRegisterAlias (
-  IN CONST CHAR16                       *Command,
-  IN CONST CHAR16                       *Alias
+  IN CONST CHAR16  *Command,
+  IN CONST CHAR16  *Alias
   );
 
 /**
@@ -245,7 +244,7 @@ ShellCommandRegisterAlias (
 
   @return A linked list of all requested shell aliases.
 **/
-CONST ALIAS_LIST*
+CONST ALIAS_LIST *
 EFIAPI
 ShellCommandGetInitAliasList (
   VOID
@@ -262,7 +261,7 @@ ShellCommandGetInitAliasList (
 BOOLEAN
 EFIAPI
 ShellCommandIsOnAliasList (
-  IN CONST CHAR16 *Alias
+  IN CONST CHAR16  *Alias
   );
 
 /**
@@ -276,7 +275,7 @@ ShellCommandIsOnAliasList (
 BOOLEAN
 EFIAPI
 ShellCommandIsCommandOnList (
-  IN CONST  CHAR16                      *CommandString
+  IN CONST  CHAR16  *CommandString
   );
 
 /**
@@ -287,10 +286,10 @@ ShellCommandIsCommandOnList (
   @retval NULL  No help text was found.
   @return       The string of the help text.  The caller required to free.
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
 ShellCommandGetCommandHelp (
-  IN CONST  CHAR16                      *CommandString
+  IN CONST  CHAR16  *CommandString
   );
 
 /**
@@ -324,10 +323,8 @@ ShellCommandGetEchoState (
 VOID
 EFIAPI
 ShellCommandSetEchoState (
-  IN BOOLEAN State
+  IN BOOLEAN  State
   );
-
-
 
 /**
   Indicate that the current shell or script should exit.
@@ -338,8 +335,8 @@ ShellCommandSetEchoState (
 VOID
 EFIAPI
 ShellCommandRegisterExit (
-  IN BOOLEAN      ScriptOnly,
-  IN CONST UINT64 ErrorCode
+  IN BOOLEAN       ScriptOnly,
+  IN CONST UINT64  ErrorCode
   );
 
 /**
@@ -380,20 +377,20 @@ ShellCommandGetScriptExit (
   );
 
 typedef struct {
-  LIST_ENTRY      Link;     ///< List enumerator items.
-  UINTN           Line;     ///< What line of the script file this was on.
-  CHAR16          *Cl;      ///< The original command line.
-  VOID            *Data;    ///< The data structure format dependant upon Command. (not always used)
-  BOOLEAN         Reset;    ///< Reset the command (it must be treated like a initial run (but it may have data already))
+  LIST_ENTRY    Link;       ///< List enumerator items.
+  UINTN         Line;       ///< What line of the script file this was on.
+  CHAR16        *Cl;        ///< The original command line.
+  VOID          *Data;      ///< The data structure format dependant upon Command. (not always used)
+  BOOLEAN       Reset;      ///< Reset the command (it must be treated like a initial run (but it may have data already))
 } SCRIPT_COMMAND_LIST;
 
 typedef struct {
-  CHAR16              *ScriptName;        ///< The filename of this script.
-  CHAR16              **Argv;             ///< The parmameters to the script file.
-  UINTN               Argc;               ///< The count of parameters.
-  LIST_ENTRY          CommandList;        ///< The script converted to a list of commands (SCRIPT_COMMAND_LIST objects).
-  SCRIPT_COMMAND_LIST *CurrentCommand;    ///< The command currently being operated.  If !=NULL must be a member of CommandList.
-  LIST_ENTRY          SubstList;          ///< A list of current script loop alias' (ALIAS_LIST objects) (Used for the for %-based replacement).
+  CHAR16                 *ScriptName;     ///< The filename of this script.
+  CHAR16                 **Argv;          ///< The parmameters to the script file.
+  UINTN                  Argc;            ///< The count of parameters.
+  LIST_ENTRY             CommandList;     ///< The script converted to a list of commands (SCRIPT_COMMAND_LIST objects).
+  SCRIPT_COMMAND_LIST    *CurrentCommand; ///< The command currently being operated.  If !=NULL must be a member of CommandList.
+  LIST_ENTRY             SubstList;       ///< A list of current script loop alias' (ALIAS_LIST objects) (Used for the for %-based replacement).
 } SCRIPT_FILE;
 
 /**
@@ -402,7 +399,7 @@ typedef struct {
   @retval NULL        A script file is not currently running.
   @return             A pointer to the current script file object.
 **/
-SCRIPT_FILE*
+SCRIPT_FILE *
 EFIAPI
 ShellCommandGetCurrentScriptFile (
   VOID
@@ -419,10 +416,10 @@ ShellCommandGetCurrentScriptFile (
   @return             A pointer to the current running script file after this
                       change.  It is NULL if removing the final script.
 **/
-SCRIPT_FILE*
+SCRIPT_FILE *
 EFIAPI
 ShellCommandSetNewScript (
-  IN SCRIPT_FILE *Script OPTIONAL
+  IN SCRIPT_FILE  *Script OPTIONAL
   );
 
 /**
@@ -433,7 +430,7 @@ ShellCommandSetNewScript (
 VOID
 EFIAPI
 DeleteScriptFileStruct (
-  IN SCRIPT_FILE *Script
+  IN SCRIPT_FILE  *Script
   );
 
 /**
@@ -466,10 +463,10 @@ typedef enum {
   @retval NULL                  a memory allocation failed.
   @return a new map name string
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
-ShellCommandCreateNewMappingName(
-  IN CONST SHELL_MAPPING_TYPE Type
+ShellCommandCreateNewMappingName (
+  IN CONST SHELL_MAPPING_TYPE  Type
   );
 
 /**
@@ -482,7 +479,7 @@ ShellCommandCreateNewMappingName(
 EFI_STATUS
 EFIAPI
 ShellCommandConsistMappingInitialize (
-  EFI_DEVICE_PATH_PROTOCOL           ***Table
+  EFI_DEVICE_PATH_PROTOCOL  ***Table
   );
 
 /**
@@ -497,7 +494,7 @@ ShellCommandConsistMappingInitialize (
 EFI_STATUS
 EFIAPI
 ShellCommandConsistMappingUnInitialize (
-  EFI_DEVICE_PATH_PROTOCOL      **Table
+  EFI_DEVICE_PATH_PROTOCOL  **Table
   );
 
 /**
@@ -513,11 +510,11 @@ ShellCommandConsistMappingUnInitialize (
   @retval NULL            A consistent mapped name could not be created.
   @return                 A pointer to a string allocated from pool with the device name.
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
 ShellCommandConsistMappingGenMappingName (
-  IN EFI_DEVICE_PATH_PROTOCOL      *DevicePath,
-  IN EFI_DEVICE_PATH_PROTOCOL      **Table
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN EFI_DEVICE_PATH_PROTOCOL  **Table
   );
 
 /**
@@ -528,10 +525,10 @@ ShellCommandConsistMappingGenMappingName (
 
   @return the node on the list.
 **/
-SHELL_MAP_LIST*
+SHELL_MAP_LIST *
 EFIAPI
 ShellCommandFindMapItem (
-  IN CONST CHAR16               *MapKey
+  IN CONST CHAR16  *MapKey
   );
 
 /**
@@ -553,11 +550,11 @@ ShellCommandFindMapItem (
 **/
 EFI_STATUS
 EFIAPI
-ShellCommandAddMapItemAndUpdatePath(
-  IN CONST CHAR16                   *Name,
-  IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
-  IN CONST UINT64                   Flags,
-  IN CONST BOOLEAN                  Path
+ShellCommandAddMapItemAndUpdatePath (
+  IN CONST CHAR16                    *Name,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN CONST UINT64                    Flags,
+  IN CONST BOOLEAN                   Path
   );
 
 /**
@@ -574,7 +571,7 @@ ShellCommandAddMapItemAndUpdatePath(
 **/
 EFI_STATUS
 EFIAPI
-ShellCommandCreateInitialMappingsAndPaths(
+ShellCommandCreateInitialMappingsAndPaths (
   VOID
   );
 
@@ -596,10 +593,10 @@ ShellCommandUpdateMapping (
 
   @return a EFI_FILE_PROTOCOL* representing the same file.
 **/
-EFI_FILE_PROTOCOL*
+EFI_FILE_PROTOCOL *
 EFIAPI
-ConvertShellHandleToEfiFileProtocol(
-  IN CONST SHELL_FILE_HANDLE Handle
+ConvertShellHandleToEfiFileProtocol (
+  IN CONST SHELL_FILE_HANDLE  Handle
   );
 
 /**
@@ -612,8 +609,8 @@ ConvertShellHandleToEfiFileProtocol(
 **/
 BOOLEAN
 EFIAPI
-ShellFileHandleRemove(
-  IN CONST SHELL_FILE_HANDLE Handle
+ShellFileHandleRemove (
+  IN CONST SHELL_FILE_HANDLE  Handle
   );
 
 /**
@@ -626,9 +623,9 @@ ShellFileHandleRemove(
 **/
 SHELL_FILE_HANDLE
 EFIAPI
-ConvertEfiFileProtocolToShellHandle(
-  IN CONST EFI_FILE_PROTOCOL *Handle,
-  IN CONST CHAR16            *Path
+ConvertEfiFileProtocolToShellHandle (
+  IN CONST EFI_FILE_PROTOCOL  *Handle,
+  IN CONST CHAR16             *Path
   );
 
 /**
@@ -638,12 +635,11 @@ ConvertEfiFileProtocolToShellHandle(
 
   @return A pointer to the path for the file.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
-ShellFileHandleGetPath(
-  IN CONST SHELL_FILE_HANDLE Handle
+ShellFileHandleGetPath (
+  IN CONST SHELL_FILE_HANDLE  Handle
   );
-
 
 /**
   Function to determine if a SHELL_FILE_HANDLE is at the end of the file.
@@ -659,8 +655,8 @@ ShellFileHandleGetPath(
 **/
 BOOLEAN
 EFIAPI
-ShellFileHandleEof(
-  IN SHELL_FILE_HANDLE Handle
+ShellFileHandleEof (
+  IN SHELL_FILE_HANDLE  Handle
   );
 
 typedef struct {
@@ -676,7 +672,7 @@ typedef struct {
 VOID
 EFIAPI
 FreeBufferList (
-  IN BUFFER_LIST *List
+  IN BUFFER_LIST  *List
   );
 
 /**
@@ -690,10 +686,10 @@ FreeBufferList (
 VOID
 EFIAPI
 DumpHex (
-  IN UINTN        Indent,
-  IN UINTN        Offset,
-  IN UINTN        DataSize,
-  IN VOID         *UserData
+  IN UINTN  Indent,
+  IN UINTN  Offset,
+  IN UINTN  DataSize,
+  IN VOID   *UserData
   );
 
 /**
@@ -705,7 +701,7 @@ DumpHex (
   @param[in] DataSize   The size in bytes of UserData.
   @param[in] UserData   The data to print out.
 **/
-CHAR16*
+CHAR16 *
 EFIAPI
 CatSDumpHex (
   IN CHAR16  *Buffer,
@@ -791,8 +787,9 @@ typedef enum {
 EFI_STATUS
 EFIAPI
 ShellSortFileList (
-  IN OUT EFI_SHELL_FILE_INFO  **FileList,
-     OUT EFI_SHELL_FILE_INFO  **Duplicates OPTIONAL,
-  IN     SHELL_SORT_FILE_LIST Order
+  IN OUT EFI_SHELL_FILE_INFO   **FileList,
+  OUT EFI_SHELL_FILE_INFO      **Duplicates OPTIONAL,
+  IN     SHELL_SORT_FILE_LIST  Order
   );
+
 #endif //_SHELL_COMMAND_LIB_

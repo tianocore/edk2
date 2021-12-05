@@ -11,7 +11,7 @@
 
 #include "Http.h"
 
-#define IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH 32
+#define IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH  32
 
 //
 // Constant strings and definitions related to the message
@@ -37,17 +37,17 @@
 //
 // Buffer size. Note that larger buffer does not mean better speed.
 //
-#define DEFAULT_BUF_SIZE      SIZE_32KB
-#define MAX_BUF_SIZE          SIZE_4MB
+#define DEFAULT_BUF_SIZE  SIZE_32KB
+#define MAX_BUF_SIZE      SIZE_4MB
 
-#define MIN_PARAM_COUNT       2
-#define MAX_PARAM_COUNT       4
+#define MIN_PARAM_COUNT  2
+#define MAX_PARAM_COUNT  4
 #define NEED_REDIRECTION(Code) \
   (((Code >= HTTP_STATUS_300_MULTIPLE_CHOICES) \
   && (Code <= HTTP_STATUS_307_TEMPORARY_REDIRECT)) \
   || (Code == HTTP_STATUS_308_PERMANENT_REDIRECT))
 
-#define CLOSE_HTTP_HANDLE(ControllerHandle,HttpChildHandle) \
+#define CLOSE_HTTP_HANDLE(ControllerHandle, HttpChildHandle) \
   do { \
     if (HttpChildHandle) { \
       CloseProtocolAndDestroyServiceChild ( \
@@ -69,13 +69,13 @@ typedef enum {
 
 #define USER_AGENT_HDR  "Mozilla/5.0 (EDK2; Linux) Gecko/20100101 Firefox/79.0"
 
-#define TIMER_MAX_TIMEOUT_S   10
+#define TIMER_MAX_TIMEOUT_S  10
 
 //
 // File name to use when Uri ends with "/".
 //
-#define DEFAULT_HTML_FILE     L"index.html"
-#define DEFAULT_HTTP_PROTO    L"http"
+#define DEFAULT_HTML_FILE   L"index.html"
+#define DEFAULT_HTTP_PROTO  L"http"
 
 //
 // String to delete the HTTP progress message to be able to update it :
@@ -85,20 +85,20 @@ typedef enum {
   L"\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\
 \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
 
-#define HTTP_KB              L"\b\b\b\b\b\b\b\b\b\b"
+#define HTTP_KB  L"\b\b\b\b\b\b\b\b\b\b"
 //
 // Frame for the progression slider.
 //
-#define HTTP_PROGR_FRAME     L"[                                        ]"
+#define HTTP_PROGR_FRAME  L"[                                        ]"
 
 //
 // Improve readability by using these macros.
 //
-#define PRINT_HII(token,...) \
+#define PRINT_HII(token, ...) \
   ShellPrintHiiEx (\
       -1, -1, NULL, token, mHttpHiiHandle, __VA_ARGS__)
 
-#define PRINT_HII_APP(token,value) \
+#define PRINT_HII_APP(token, value) \
   PRINT_HII (token, HTTP_APP_NAME, value)
 
 //
@@ -109,19 +109,19 @@ typedef enum {
 //
 // Define EPOCH (1970-JANUARY-01) in the Julian Date representation.
 //
-#define EPOCH_JULIAN_DATE                               2440588
+#define EPOCH_JULIAN_DATE  2440588
 
 //
 // Seconds per unit.
 //
-#define SEC_PER_MIN                                     ((UINTN)    60)
-#define SEC_PER_HOUR                                    ((UINTN)  3600)
-#define SEC_PER_DAY                                     ((UINTN) 86400)
+#define SEC_PER_MIN   ((UINTN)    60)
+#define SEC_PER_HOUR  ((UINTN)  3600)
+#define SEC_PER_DAY   ((UINTN) 86400)
 
 //
 // String descriptions for server errors.
 //
-STATIC CONST CHAR16 *ErrStatusDesc[] =
+STATIC CONST CHAR16  *ErrStatusDesc[] =
 {
   L"400 Bad Request",
   L"401 Unauthorized",
@@ -149,32 +149,32 @@ STATIC CONST CHAR16 *ErrStatusDesc[] =
   L"505 HTTP version not supported"
 };
 
-STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
-  {L"-i", TypeValue},
-  {L"-k", TypeFlag},
-  {L"-l", TypeValue},
-  {L"-m", TypeFlag},
-  {L"-s", TypeValue},
-  {L"-t", TypeValue},
-  {NULL , TypeMax}
+STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
+  { L"-i", TypeValue },
+  { L"-k", TypeFlag  },
+  { L"-l", TypeValue },
+  { L"-m", TypeFlag  },
+  { L"-s", TypeValue },
+  { L"-t", TypeValue },
+  { NULL,  TypeMax   }
 };
 
 //
 // Local File Handle.
 //
-STATIC SHELL_FILE_HANDLE   mFileHandle = NULL;
+STATIC SHELL_FILE_HANDLE  mFileHandle = NULL;
 
 //
 // Path of the local file, Unicode encoded.
 //
-STATIC CONST CHAR16        *mLocalFilePath;
+STATIC CONST CHAR16  *mLocalFilePath;
 
-STATIC BOOLEAN             gRequestCallbackComplete = FALSE;
-STATIC BOOLEAN             gResponseCallbackComplete = FALSE;
+STATIC BOOLEAN  gRequestCallbackComplete  = FALSE;
+STATIC BOOLEAN  gResponseCallbackComplete = FALSE;
 
-STATIC BOOLEAN             gHttpError;
+STATIC BOOLEAN  gHttpError;
 
-EFI_HII_HANDLE             mHttpHiiHandle;
+EFI_HII_HANDLE  mHttpHiiHandle;
 
 //
 // Functions declarations.
@@ -286,9 +286,9 @@ CloseProtocolAndDestroyServiceChild (
 STATIC
 EFI_STATUS
 DownloadFile (
-  IN   HTTP_DOWNLOAD_CONTEXT   *Context,
-  IN   EFI_HANDLE              ControllerHandle,
-  IN   CHAR16                  *NicName
+  IN   HTTP_DOWNLOAD_CONTEXT  *Context,
+  IN   EFI_HANDLE             ControllerHandle,
+  IN   CHAR16                 *NicName
   );
 
 /**
@@ -302,11 +302,11 @@ DownloadFile (
 STATIC
 EFI_STATUS
 TrimSpaces (
-  IN CHAR16 *String
+  IN CHAR16  *String
   )
 {
-  CHAR16 *Str;
-  UINTN  Len;
+  CHAR16  *Str;
+  UINTN   Len;
 
   ASSERT (String != NULL);
 
@@ -328,7 +328,7 @@ TrimSpaces (
   //
   do {
     Len = StrLen (Str);
-    if (!Len || (Str[Len - 1] != L' ' && Str[Len - 1] != '\t')) {
+    if (!Len || ((Str[Len - 1] != L' ') && (Str[Len - 1] != '\t'))) {
       break;
     }
 
@@ -355,8 +355,8 @@ STATIC
 VOID
 EFIAPI
 RequestCallback (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   gRequestCallbackComplete = TRUE;
@@ -371,8 +371,8 @@ STATIC
 VOID
 EFIAPI
 ResponseCallback (
-  IN EFI_EVENT Event,
-  IN VOID      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   gResponseCallbackComplete = TRUE;
@@ -396,19 +396,19 @@ EfiGetEpochDays (
   IN  EFI_TIME  *Time
   )
 {
-  UINTN a;
-  UINTN y;
-  UINTN m;
+  UINTN  a;
+  UINTN  y;
+  UINTN  m;
   //
   // Absolute Julian Date representation of the supplied Time.
   //
-  UINTN JulianDate;
+  UINTN  JulianDate;
   //
   // Number of days elapsed since EPOCH_JULIAN_DAY.
   //
-  UINTN EpochDays;
+  UINTN  EpochDays;
 
-  a = (14 - Time->Month) / 12 ;
+  a = (14 - Time->Month) / 12;
   y = Time->Year + 4800 - a;
   m = Time->Month + (12 * a) - 3;
 
@@ -437,8 +437,8 @@ EfiTimeToEpoch (
   //
   // Number of days elapsed since EPOCH_JULIAN_DAY.
   //
-  UINTN EpochDays;
-  UINTN EpochSeconds;
+  UINTN  EpochDays;
+  UINTN  EpochSeconds;
 
   EpochDays = EfiGetEpochDays (Time);
 
@@ -471,32 +471,32 @@ RunHttp (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
-  LIST_ENTRY              *CheckPackage;
-  UINTN                   ParamCount;
-  UINTN                   HandleCount;
-  UINTN                   NicNumber;
-  UINTN                   InitialSize;
-  UINTN                   ParamOffset;
-  UINTN                   StartSize;
-  CHAR16                  *ProblemParam;
-  CHAR16                  NicName[IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH];
-  CHAR16                  *Walker1;
-  CHAR16                  *VStr;
-  CONST CHAR16            *UserNicName;
-  CONST CHAR16            *ValueStr;
-  CONST CHAR16            *RemoteFilePath;
-  CONST CHAR16            *Walker;
-  EFI_HTTPv4_ACCESS_POINT IPv4Node;
-  EFI_HANDLE              *Handles;
-  EFI_HANDLE              ControllerHandle;
-  HTTP_DOWNLOAD_CONTEXT   Context;
-  BOOLEAN                 NicFound;
+  EFI_STATUS               Status;
+  LIST_ENTRY               *CheckPackage;
+  UINTN                    ParamCount;
+  UINTN                    HandleCount;
+  UINTN                    NicNumber;
+  UINTN                    InitialSize;
+  UINTN                    ParamOffset;
+  UINTN                    StartSize;
+  CHAR16                   *ProblemParam;
+  CHAR16                   NicName[IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH];
+  CHAR16                   *Walker1;
+  CHAR16                   *VStr;
+  CONST CHAR16             *UserNicName;
+  CONST CHAR16             *ValueStr;
+  CONST CHAR16             *RemoteFilePath;
+  CONST CHAR16             *Walker;
+  EFI_HTTPv4_ACCESS_POINT  IPv4Node;
+  EFI_HANDLE               *Handles;
+  EFI_HANDLE               ControllerHandle;
+  HTTP_DOWNLOAD_CONTEXT    Context;
+  BOOLEAN                  NicFound;
 
-  ProblemParam        = NULL;
-  RemoteFilePath      = NULL;
-  NicFound            = FALSE;
-  Handles             = NULL;
+  ProblemParam   = NULL;
+  RemoteFilePath = NULL;
+  NicFound       = FALSE;
+  Handles        = NULL;
 
   //
   // Initialize the Shell library (we must be in non-auto-init...).
@@ -522,8 +522,8 @@ RunHttp (
              TRUE
              );
   if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED)
-     && (ProblemParam != NULL))
+    if (  (Status == EFI_VOLUME_CORRUPTED)
+       && (ProblemParam != NULL))
     {
       PRINT_HII_APP (STRING_TOKEN (STR_GEN_PROBLEM), ProblemParam);
       SHELL_FREE_NON_NULL (ProblemParam);
@@ -554,7 +554,7 @@ RunHttp (
   ZeroMem (&IPv4Node, sizeof (IPv4Node));
   IPv4Node.UseDefaultAddress = TRUE;
 
-  Context.HttpConfigData.HttpVersion = HttpVersion11;
+  Context.HttpConfigData.HttpVersion          = HttpVersion11;
   Context.HttpConfigData.AccessPoint.IPv4Node = &IPv4Node;
 
   //
@@ -592,7 +592,7 @@ RunHttp (
     }
 
     if (*Walker1 == L'/') {
-      ParamOffset = 1;
+      ParamOffset    = 1;
       RemoteFilePath = Walker1;
     }
 
@@ -629,7 +629,8 @@ RunHttp (
     Walker = RemoteFilePath + StrLen (RemoteFilePath);
     while ((--Walker) >= RemoteFilePath) {
       if ((*Walker == L'\\') ||
-          (*Walker == L'/' )    ) {
+          (*Walker == L'/'))
+      {
         break;
       }
     }
@@ -659,12 +660,12 @@ RunHttp (
   UserNicName = ShellCommandLineGetValue (CheckPackage, L"-i");
 
   ValueStr = ShellCommandLineGetValue (CheckPackage, L"-l");
-  if ((ValueStr != NULL)
-   && (!StringToUint16 (
-          ValueStr,
-          &Context.HttpConfigData.AccessPoint.IPv4Node->LocalPort
-          )
-      ))
+  if (  (ValueStr != NULL)
+     && (!StringToUint16 (
+            ValueStr,
+            &Context.HttpConfigData.AccessPoint.IPv4Node->LocalPort
+            )
+         ))
   {
     goto Error;
   }
@@ -674,7 +675,7 @@ RunHttp (
   ValueStr = ShellCommandLineGetValue (CheckPackage, L"-s");
   if (ValueStr != NULL) {
     Context.BufferSize = ShellStrToUintn (ValueStr);
-    if (!Context.BufferSize || Context.BufferSize > MAX_BUF_SIZE) {
+    if (!Context.BufferSize || (Context.BufferSize > MAX_BUF_SIZE)) {
       PRINT_HII_APP (STRING_TOKEN (STR_GEN_PARAM_INV), ValueStr);
       goto Error;
     }
@@ -756,10 +757,10 @@ RunHttp (
     }
 
     if (gHttpError) {
-     //
-     // This is not related to connection, so no need to repeat with
-     // another interface.
-     //
+      //
+      // This is not related to connection, so no need to repeat with
+      // another interface.
+      //
       break;
     }
   }
@@ -841,7 +842,7 @@ GetNicName (
              &gEfiManagedNetworkServiceBindingProtocolGuid,
              &gEfiManagedNetworkProtocolGuid,
              &MnpHandle,
-             (VOID**)&Mnp
+             (VOID **)&Mnp
              );
   if (EFI_ERROR (Status)) {
     goto Error;
@@ -907,12 +908,12 @@ CreateServiceChildAndOpenProtocol (
   EFI_STATUS  Status;
 
   *ChildHandle = NULL;
-  Status = NetLibCreateServiceChild (
-             ControllerHandle,
-             gImageHandle,
-             ServiceBindingProtocolGuid,
-             ChildHandle
-             );
+  Status       = NetLibCreateServiceChild (
+                   ControllerHandle,
+                   gImageHandle,
+                   ServiceBindingProtocolGuid,
+                   ChildHandle
+                   );
   if (!EFI_ERROR (Status)) {
     Status = gBS->OpenProtocol (
                     *ChildHandle,
@@ -990,8 +991,8 @@ WaitForCompletion (
   IN OUT BOOLEAN            *CallBackComplete
   )
 {
-  EFI_STATUS                Status;
-  EFI_EVENT                 WaitEvt;
+  EFI_STATUS  Status;
+  EFI_EVENT   WaitEvt;
 
   Status = EFI_SUCCESS;
 
@@ -1005,25 +1006,25 @@ WaitForCompletion (
                   NULL,
                   &WaitEvt
                   );
-   ASSERT_EFI_ERROR (Status);
+  ASSERT_EFI_ERROR (Status);
 
-   if (!EFI_ERROR (Status)) {
-     Status = gBS->SetTimer (
-                     WaitEvt,
-                     TimerRelative,
-                     EFI_TIMER_PERIOD_SECONDS (TIMER_MAX_TIMEOUT_S)
-                     );
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->SetTimer (
+                    WaitEvt,
+                    TimerRelative,
+                    EFI_TIMER_PERIOD_SECONDS (TIMER_MAX_TIMEOUT_S)
+                    );
 
-     ASSERT_EFI_ERROR (Status);
-   }
+    ASSERT_EFI_ERROR (Status);
+  }
 
-  while (! *CallBackComplete
-      && (!EFI_ERROR (Status))
-      && EFI_ERROR (gBS->CheckEvent (WaitEvt)))
+  while (  !*CallBackComplete
+        && (!EFI_ERROR (Status))
+        && EFI_ERROR (gBS->CheckEvent (WaitEvt)))
   {
     Status = Context->Http->Poll (Context->Http);
-    if (!Context->ContentDownloaded
-     && CallBackComplete == &gResponseCallbackComplete)
+    if (  !Context->ContentDownloaded
+       && (CallBackComplete == &gResponseCallbackComplete))
     {
       //
       // An HTTP server may just send a response redirection header.
@@ -1032,12 +1033,12 @@ WaitForCompletion (
       // Note that at this point Response may not has been populated,
       // so it needs to be checked first.
       //
-      if (Context->ResponseToken.Message
-       && Context->ResponseToken.Message->Data.Response
-       && (NEED_REDIRECTION (
-            Context->ResponseToken.Message->Data.Response->StatusCode
-            )
-         ))
+      if (  Context->ResponseToken.Message
+         && Context->ResponseToken.Message->Data.Response
+         && (NEED_REDIRECTION (
+               Context->ResponseToken.Message->Data.Response->StatusCode
+               )
+             ))
       {
         break;
       }
@@ -1079,20 +1080,20 @@ SendRequest (
   IN CHAR16                 *DownloadUrl
   )
 {
-  EFI_HTTP_REQUEST_DATA       RequestData;
-  EFI_HTTP_HEADER             RequestHeader[HdrMax];
-  EFI_HTTP_MESSAGE            RequestMessage;
-  EFI_STATUS                  Status;
-  CHAR16                      *Host;
-  UINTN                       StringSize;
+  EFI_HTTP_REQUEST_DATA  RequestData;
+  EFI_HTTP_HEADER        RequestHeader[HdrMax];
+  EFI_HTTP_MESSAGE       RequestMessage;
+  EFI_STATUS             Status;
+  CHAR16                 *Host;
+  UINTN                  StringSize;
 
   ZeroMem (&RequestData, sizeof (RequestData));
   ZeroMem (&RequestHeader, sizeof (RequestHeader));
   ZeroMem (&RequestMessage, sizeof (RequestMessage));
   ZeroMem (&Context->RequestToken, sizeof (Context->RequestToken));
 
-  RequestHeader[HdrHost].FieldName = "Host";
-  RequestHeader[HdrConn].FieldName = "Connection";
+  RequestHeader[HdrHost].FieldName  = "Host";
+  RequestHeader[HdrConn].FieldName  = "Connection";
   RequestHeader[HdrAgent].FieldName = "User-Agent";
 
   Host = (CHAR16 *)Context->ServerAddrAndProto;
@@ -1113,7 +1114,7 @@ SendRequest (
   //
   Host++;
 
-  StringSize = StrLen (Host) + 1;
+  StringSize                        = StrLen (Host) + 1;
   RequestHeader[HdrHost].FieldValue = AllocatePool (StringSize);
   if (!RequestHeader[HdrHost].FieldValue) {
     return EFI_OUT_OF_RESOURCES;
@@ -1125,17 +1126,17 @@ SendRequest (
     StringSize
     );
 
-  RequestHeader[HdrConn].FieldValue = "close";
+  RequestHeader[HdrConn].FieldValue  = "close";
   RequestHeader[HdrAgent].FieldValue = USER_AGENT_HDR;
-  RequestMessage.HeaderCount = HdrMax;
+  RequestMessage.HeaderCount         = HdrMax;
 
   RequestData.Method = HttpMethodGet;
-  RequestData.Url = DownloadUrl;
+  RequestData.Url    = DownloadUrl;
 
   RequestMessage.Data.Request = &RequestData;
-  RequestMessage.Headers = RequestHeader;
-  RequestMessage.BodyLength = 0;
-  RequestMessage.Body = NULL;
+  RequestMessage.Headers      = RequestHeader;
+  RequestMessage.BodyLength   = 0;
+  RequestMessage.Body         = NULL;
   Context->RequestToken.Event = NULL;
 
   //
@@ -1150,10 +1151,10 @@ SendRequest (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  Context->RequestToken.Status = EFI_SUCCESS;
+  Context->RequestToken.Status  = EFI_SUCCESS;
   Context->RequestToken.Message = &RequestMessage;
-  gRequestCallbackComplete = FALSE;
-  Status = Context->Http->Request (Context->Http, &Context->RequestToken);
+  gRequestCallbackComplete      = FALSE;
+  Status                        = Context->Http->Request (Context->Http, &Context->RequestToken);
   if (EFI_ERROR (Status)) {
     goto Error;
   }
@@ -1193,15 +1194,15 @@ SavePortion (
   IN CHAR8                  *Buffer
   )
 {
-  CHAR16            Progress[HTTP_PROGRESS_MESSAGE_SIZE];
-  UINTN             NbOfKb;
-  UINTN             Index;
-  UINTN             LastStep;
-  UINTN             Step;
-  EFI_STATUS        Status;
+  CHAR16      Progress[HTTP_PROGRESS_MESSAGE_SIZE];
+  UINTN       NbOfKb;
+  UINTN       Index;
+  UINTN       LastStep;
+  UINTN       Step;
+  EFI_STATUS  Status;
 
   LastStep = 0;
-  Step = 0;
+  Step     = 0;
 
   ShellSetFilePosition (mFileHandle, Context->LastReportedNbOfBytes);
   Status = ShellWriteFile (mFileHandle, &DownloadLen, Buffer);
@@ -1219,14 +1220,14 @@ SavePortion (
   }
 
   Context->ContentDownloaded += DownloadLen;
-  NbOfKb = Context->ContentDownloaded >> 10;
+  NbOfKb                      = Context->ContentDownloaded >> 10;
 
   Progress[0] = L'\0';
   if (Context->ContentLength) {
-    LastStep  = (Context->LastReportedNbOfBytes * HTTP_PROGRESS_SLIDER_STEPS) /
-                 Context->ContentLength;
-    Step      = (Context->ContentDownloaded * HTTP_PROGRESS_SLIDER_STEPS) /
-                 Context->ContentLength;
+    LastStep = (Context->LastReportedNbOfBytes * HTTP_PROGRESS_SLIDER_STEPS) /
+               Context->ContentLength;
+    Step = (Context->ContentDownloaded * HTTP_PROGRESS_SLIDER_STEPS) /
+           Context->ContentLength;
   }
 
   Context->LastReportedNbOfBytes = Context->ContentDownloaded;
@@ -1265,7 +1266,6 @@ SavePortion (
     NbOfKb
     );
 
-
   ShellPrintEx (-1, -1, L"%s", Progress);
 
   return EFI_SUCCESS;
@@ -1286,29 +1286,29 @@ SavePortion (
 STATIC
 EFI_STATUS
 SetHostURI (
-  IN CHAR8                 *Location,
-  IN HTTP_DOWNLOAD_CONTEXT *Context,
-  IN CHAR16                *DownloadUrl
+  IN CHAR8                  *Location,
+  IN HTTP_DOWNLOAD_CONTEXT  *Context,
+  IN CHAR16                 *DownloadUrl
   )
 {
-  EFI_STATUS    Status;
-  UINTN         StringSize;
-  UINTN         FirstStep;
-  UINTN         Idx;
-  UINTN         Step;
-  CHAR8         *Walker;
-  CHAR16        *Temp;
-  CHAR8         *Tmp;
-  CHAR16        *Url;
-  BOOLEAN       IsAbEmptyUrl;
+  EFI_STATUS  Status;
+  UINTN       StringSize;
+  UINTN       FirstStep;
+  UINTN       Idx;
+  UINTN       Step;
+  CHAR8       *Walker;
+  CHAR16      *Temp;
+  CHAR8       *Tmp;
+  CHAR16      *Url;
+  BOOLEAN     IsAbEmptyUrl;
 
-  Tmp = NULL;
-  Url = NULL;
+  Tmp          = NULL;
+  Url          = NULL;
   IsAbEmptyUrl = FALSE;
-  FirstStep = 0;
+  FirstStep    = 0;
 
   StringSize = (AsciiStrSize (Location) * sizeof (CHAR16));
-  Url = AllocateZeroPool (StringSize);
+  Url        = AllocateZeroPool (StringSize);
   if (!Url) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1320,7 +1320,7 @@ SetHostURI (
              );
 
   if (EFI_ERROR (Status)) {
-        goto Error;
+    goto Error;
   }
 
   //
@@ -1347,11 +1347,11 @@ SetHostURI (
   }
 
   if (AsciiStrStr (Location, "://") || IsAbEmptyUrl) {
-    Idx = 0;
+    Idx    = 0;
     Walker = Location;
 
     for (Step = FirstStep; Step < 2; Step++) {
-      for (; *Walker != '/' && *Walker != '\0'; Walker++) {
+      for ( ; *Walker != '/' && *Walker != '\0'; Walker++) {
         Idx++;
       }
 
@@ -1359,7 +1359,7 @@ SetHostURI (
         //
         // Skip "//"
         //
-        Idx += 2;
+        Idx    += 2;
         Walker += 2;
       }
     }
@@ -1375,7 +1375,7 @@ SetHostURI (
     //
     // Location now points to Uri
     //
-    Location += Idx;
+    Location  += Idx;
     StringSize = (Idx + 1) * sizeof (CHAR16);
 
     SHELL_FREE_NON_NULL (Context->ServerAddrAndProto);
@@ -1421,7 +1421,7 @@ SetHostURI (
 
   SHELL_FREE_NON_NULL (Context->Uri);
 
-  StringSize = AsciiStrSize (Location) * sizeof (CHAR16);
+  StringSize   = AsciiStrSize (Location) * sizeof (CHAR16);
   Context->Uri = AllocateZeroPool (StringSize);
   if (!Context->Uri) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -1460,22 +1460,21 @@ STATIC
 EFI_STATUS
 EFIAPI
 ParseMsg (
-  IN HTTP_BODY_PARSE_EVENT      EventType,
-  IN CHAR8                      *Data,
-  IN UINTN                      Length,
-  IN VOID                       *Context
+  IN HTTP_BODY_PARSE_EVENT  EventType,
+  IN CHAR8                  *Data,
+  IN UINTN                  Length,
+  IN VOID                   *Context
   )
 {
-  if ((Data == NULL)
-   || (EventType == BodyParseEventOnComplete)
-   || (Context == NULL))
+  if (  (Data == NULL)
+     || (EventType == BodyParseEventOnComplete)
+     || (Context == NULL))
   {
     return EFI_SUCCESS;
   }
 
   return SavePortion (Context, Length, Data);
 }
-
 
 /**
   Get HTTP server response and collect the whole body as a file.
@@ -1498,38 +1497,38 @@ ParseMsg (
 STATIC
 EFI_STATUS
 GetResponse (
-  IN HTTP_DOWNLOAD_CONTEXT    *Context,
-  IN CHAR16                   *DownloadUrl
+  IN HTTP_DOWNLOAD_CONTEXT  *Context,
+  IN CHAR16                 *DownloadUrl
   )
 {
-  EFI_HTTP_RESPONSE_DATA      ResponseData;
-  EFI_HTTP_MESSAGE            ResponseMessage;
-  EFI_HTTP_HEADER             *Header;
-  EFI_STATUS                  Status;
-  VOID                        *MsgParser;
-  EFI_TIME                    StartTime;
-  EFI_TIME                    EndTime;
-  CONST CHAR16                *Desc;
-  UINTN                       ElapsedSeconds;
-  BOOLEAN                     IsTrunked;
-  BOOLEAN                     CanMeasureTime;
+  EFI_HTTP_RESPONSE_DATA  ResponseData;
+  EFI_HTTP_MESSAGE        ResponseMessage;
+  EFI_HTTP_HEADER         *Header;
+  EFI_STATUS              Status;
+  VOID                    *MsgParser;
+  EFI_TIME                StartTime;
+  EFI_TIME                EndTime;
+  CONST CHAR16            *Desc;
+  UINTN                   ElapsedSeconds;
+  BOOLEAN                 IsTrunked;
+  BOOLEAN                 CanMeasureTime;
 
   ZeroMem (&ResponseData, sizeof (ResponseData));
   ZeroMem (&ResponseMessage, sizeof (ResponseMessage));
   ZeroMem (&Context->ResponseToken, sizeof (Context->ResponseToken));
   IsTrunked = FALSE;
 
-  ResponseMessage.Body = Context->Buffer;
-  Context->ResponseToken.Status = EFI_SUCCESS;
+  ResponseMessage.Body           = Context->Buffer;
+  Context->ResponseToken.Status  = EFI_SUCCESS;
   Context->ResponseToken.Message = &ResponseMessage;
-  Context->ContentLength = 0;
-  Context->Status = REQ_OK;
-  Status = EFI_SUCCESS;
-  MsgParser = NULL;
-  ResponseData.StatusCode = HTTP_STATUS_UNSUPPORTED_STATUS;
-  ResponseMessage.Data.Response = &ResponseData;
-  Context->ResponseToken.Event = NULL;
-  CanMeasureTime = FALSE;
+  Context->ContentLength         = 0;
+  Context->Status                = REQ_OK;
+  Status                         = EFI_SUCCESS;
+  MsgParser                      = NULL;
+  ResponseData.StatusCode        = HTTP_STATUS_UNSUPPORTED_STATUS;
+  ResponseMessage.Data.Response  = &ResponseData;
+  Context->ResponseToken.Event   = NULL;
+  CanMeasureTime                 = FALSE;
   if (Context->Flags & DL_FLAG_TIME) {
     ZeroMem (&StartTime, sizeof (StartTime));
     CanMeasureTime = !EFI_ERROR (gRT->GetTime (&StartTime, NULL));
@@ -1538,8 +1537,8 @@ GetResponse (
   do {
     SHELL_FREE_NON_NULL (ResponseMessage.Headers);
     ResponseMessage.HeaderCount = 0;
-    gResponseCallbackComplete = FALSE;
-    ResponseMessage.BodyLength = Context->BufferSize;
+    gResponseCallbackComplete   = FALSE;
+    ResponseMessage.BodyLength  = Context->BufferSize;
 
     if (ShellGetExecutionBreakFlag ()) {
       Status = EFI_ABORTED;
@@ -1642,8 +1641,8 @@ GetResponse (
 
       HttpGetEntityLength (MsgParser, &Context->ContentLength);
 
-      if (ResponseData.StatusCode >= HTTP_STATUS_400_BAD_REQUEST
-       && (ResponseData.StatusCode != HTTP_STATUS_308_PERMANENT_REDIRECT))
+      if (  (ResponseData.StatusCode >= HTTP_STATUS_400_BAD_REQUEST)
+         && (ResponseData.StatusCode != HTTP_STATUS_308_PERMANENT_REDIRECT))
       {
         //
         // Server reported an error via Response code.
@@ -1665,7 +1664,7 @@ GetResponse (
           // This gives an RFC HTTP error.
           //
           Context->Status = ShellStrToUintn (Desc);
-          Status = ENCODE_ERROR (Context->Status);
+          Status          = ENCODE_ERROR (Context->Status);
         }
       }
     }
@@ -1680,13 +1679,13 @@ GetResponse (
                  ResponseMessage.Body
                  );
     }
-  } while (!HttpIsMessageComplete (MsgParser)
-        && !EFI_ERROR (Status)
-        && ResponseMessage.BodyLength);
+  } while (  !HttpIsMessageComplete (MsgParser)
+          && !EFI_ERROR (Status)
+          && ResponseMessage.BodyLength);
 
-  if (Context->Status != REQ_NEED_REPEAT
-   && Status == EFI_SUCCESS
-   && CanMeasureTime)
+  if (  (Context->Status != REQ_NEED_REPEAT)
+     && (Status == EFI_SUCCESS)
+     && CanMeasureTime)
   {
     if (!EFI_ERROR (gRT->GetTime (&EndTime, NULL))) {
       ElapsedSeconds = EfiTimeToEpoch (&EndTime) - EfiTimeToEpoch (&StartTime);
@@ -1726,22 +1725,22 @@ GetResponse (
 STATIC
 EFI_STATUS
 DownloadFile (
-  IN HTTP_DOWNLOAD_CONTEXT   *Context,
-  IN EFI_HANDLE              ControllerHandle,
-  IN CHAR16                  *NicName
+  IN HTTP_DOWNLOAD_CONTEXT  *Context,
+  IN EFI_HANDLE             ControllerHandle,
+  IN CHAR16                 *NicName
   )
 {
-  EFI_STATUS                 Status;
-  CHAR16                     *DownloadUrl;
-  UINTN                      UrlSize;
-  EFI_HANDLE                 HttpChildHandle;
+  EFI_STATUS  Status;
+  CHAR16      *DownloadUrl;
+  UINTN       UrlSize;
+  EFI_HANDLE  HttpChildHandle;
 
   ASSERT (Context);
   if (Context == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  DownloadUrl = NULL;
+  DownloadUrl     = NULL;
   HttpChildHandle = NULL;
 
   Context->Buffer = AllocatePool (Context->BufferSize);
@@ -1780,7 +1779,7 @@ DownloadFile (
                &gEfiHttpServiceBindingProtocolGuid,
                &gEfiHttpProtocolGuid,
                &HttpChildHandle,
-               (VOID**)&Context->Http
+               (VOID **)&Context->Http
                );
 
     if (EFI_ERROR (Status)) {
@@ -1794,7 +1793,7 @@ DownloadFile (
       goto ON_EXIT;
     }
 
-    UrlSize = 0;
+    UrlSize     = 0;
     DownloadUrl = StrnCatGrow (
                     &DownloadUrl,
                     &UrlSize,
@@ -1814,7 +1813,8 @@ DownloadFile (
                     &DownloadUrl,
                     &UrlSize,
                     Context->Uri,
-                    StrLen (Context->Uri));
+                    StrLen (Context->Uri)
+                    );
 
     PRINT_HII (STRING_TOKEN (STR_HTTP_DOWNLOADING), DownloadUrl);
 
@@ -1828,7 +1828,6 @@ DownloadFile (
     if (Status) {
       goto ON_EXIT;
     }
-
   } while (Context->Status == REQ_NEED_REPEAT);
 
   if (Context->Status) {
@@ -1864,12 +1863,12 @@ ON_EXIT:
 **/
 EFI_HII_HANDLE
 InitializeHiiPackage (
-  IN EFI_HANDLE                  ImageHandle
+  IN EFI_HANDLE  ImageHandle
   )
 {
-  EFI_STATUS                  Status;
-  EFI_HII_PACKAGE_LIST_HEADER *PackageList;
-  EFI_HII_HANDLE              HiiHandle;
+  EFI_STATUS                   Status;
+  EFI_HII_PACKAGE_LIST_HEADER  *PackageList;
+  EFI_HII_HANDLE               HiiHandle;
 
   //
   // Retrieve HII package list from ImageHandle.
@@ -1891,11 +1890,11 @@ InitializeHiiPackage (
   // Publish HII package list to HII Database.
   //
   Status = gHiiDatabase->NewPackageList (
-             gHiiDatabase,
-             PackageList,
-             NULL,
-             &HiiHandle
-             );
+                           gHiiDatabase,
+                           PackageList,
+                           NULL,
+                           &HiiHandle
+                           );
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     return NULL;
