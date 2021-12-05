@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef _DXE_STANDALONE_MM_ACPI_TIMER_LIB_H_
 #define _DXE_STANDALONE_MM_ACPI_TIMER_LIB_H_
 
