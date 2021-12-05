@@ -26,7 +26,7 @@ TlsInitialize (
   VOID
   )
 {
-  INTN            Ret;
+  INTN  Ret;
 
   //
   // Performs initialization of crypto and ssl library, and loads required
@@ -55,7 +55,7 @@ TlsInitialize (
 VOID
 EFIAPI
 TlsCtxFree (
-  IN   VOID                  *TlsCtx
+  IN   VOID  *TlsCtx
   )
 {
   if (TlsCtx == NULL) {
@@ -63,7 +63,7 @@ TlsCtxFree (
   }
 
   if (TlsCtx != NULL) {
-    SSL_CTX_free ((SSL_CTX *) (TlsCtx));
+    SSL_CTX_free ((SSL_CTX *)(TlsCtx));
   }
 }
 
@@ -81,8 +81,8 @@ TlsCtxFree (
 VOID *
 EFIAPI
 TlsCtxNew (
-  IN     UINT8                    MajorVer,
-  IN     UINT8                    MinorVer
+  IN     UINT8  MajorVer,
+  IN     UINT8  MinorVer
   )
 {
   SSL_CTX  *TlsCtx;
@@ -106,7 +106,7 @@ TlsCtxNew (
   //
   SSL_CTX_set_min_proto_version (TlsCtx, ProtoVersion);
 
-  return (VOID *) TlsCtx;
+  return (VOID *)TlsCtx;
 }
 
 /**
@@ -121,12 +121,12 @@ TlsCtxNew (
 VOID
 EFIAPI
 TlsFree (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
   TLS_CONNECTION  *TlsConn;
 
-  TlsConn = (TLS_CONNECTION *) Tls;
+  TlsConn = (TLS_CONNECTION *)Tls;
   if (TlsConn == NULL) {
     return;
   }
@@ -157,7 +157,7 @@ TlsFree (
 VOID *
 EFIAPI
 TlsNew (
-  IN     VOID                     *TlsCtx
+  IN     VOID  *TlsCtx
   )
 {
   TLS_CONNECTION  *TlsConn;
@@ -169,7 +169,7 @@ TlsNew (
   //
   // Allocate one new TLS_CONNECTION object
   //
-  TlsConn = (TLS_CONNECTION *) OPENSSL_malloc (sizeof (TLS_CONNECTION));
+  TlsConn = (TLS_CONNECTION *)OPENSSL_malloc (sizeof (TLS_CONNECTION));
   if (TlsConn == NULL) {
     return NULL;
   }
@@ -179,9 +179,9 @@ TlsNew (
   //
   // Create a new SSL Object
   //
-  TlsConn->Ssl = SSL_new ((SSL_CTX *) TlsCtx);
+  TlsConn->Ssl = SSL_new ((SSL_CTX *)TlsCtx);
   if (TlsConn->Ssl == NULL) {
-    TlsFree ((VOID *) TlsConn);
+    TlsFree ((VOID *)TlsConn);
     return NULL;
   }
 
@@ -202,7 +202,7 @@ TlsNew (
   //
   TlsConn->InBio = BIO_new (BIO_s_mem ());
   if (TlsConn->InBio == NULL) {
-    TlsFree ((VOID *) TlsConn);
+    TlsFree ((VOID *)TlsConn);
     return NULL;
   }
 
@@ -219,7 +219,7 @@ TlsNew (
   //
   TlsConn->OutBio = BIO_new (BIO_s_mem ());
   if (TlsConn->OutBio == NULL) {
-    TlsFree ((VOID *) TlsConn);
+    TlsFree ((VOID *)TlsConn);
     return NULL;
   }
 
@@ -244,9 +244,10 @@ TlsNew (
   if (X509Store == NULL) {
     X509Store = X509_STORE_new ();
     if (X509Store == NULL) {
-      TlsFree ((VOID *) TlsConn);
+      TlsFree ((VOID *)TlsConn);
       return NULL;
     }
+
     SSL_CTX_set1_verify_cert_store (SslCtx, X509Store);
     X509_STORE_free (X509Store);
   }
@@ -258,6 +259,5 @@ TlsNew (
     X509Store,
     X509_V_FLAG_PARTIAL_CHAIN | X509_V_FLAG_NO_CHECK_TIME
     );
-  return (VOID *) TlsConn;
+  return (VOID *)TlsConn;
 }
-
