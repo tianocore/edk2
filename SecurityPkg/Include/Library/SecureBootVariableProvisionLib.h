@@ -23,7 +23,7 @@ EFI_STATUS
 EFIAPI
 EnrollDbFromDefault (
   VOID
-);
+  );
 
 /**
   Sets the content of the 'dbx' variable based on 'dbxDefault' variable content.
@@ -36,7 +36,7 @@ EFI_STATUS
 EFIAPI
 EnrollDbxFromDefault (
   VOID
-);
+  );
 
 /**
   Sets the content of the 'dbt' variable based on 'dbtDefault' variable content.
@@ -49,7 +49,7 @@ EFI_STATUS
 EFIAPI
 EnrollDbtFromDefault (
   VOID
-);
+  );
 
 /**
   Sets the content of the 'KEK' variable based on 'KEKDefault' variable content.
@@ -62,7 +62,7 @@ EFI_STATUS
 EFIAPI
 EnrollKEKFromDefault (
   VOID
-);
+  );
 
 /**
   Sets the content of the 'PK' variable based on 'PKDefault' variable content.
@@ -75,7 +75,7 @@ EFI_STATUS
 EFIAPI
 EnrollPKFromDefault (
   VOID
-);
+  );
 
 /**
   Initializes PKDefault variable with data from FFS section.
@@ -131,4 +131,5 @@ EFI_STATUS
 SecureBootInitDbxDefault (
   IN VOID
   );
+
 #endif

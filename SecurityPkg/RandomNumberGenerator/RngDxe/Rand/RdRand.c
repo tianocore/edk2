@@ -28,7 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 RdRandGetSeed128 (
-  OUT UINT8        *SeedBuffer
+  OUT UINT8  *SeedBuffer
   )
 {
   EFI_STATUS  Status;
@@ -43,7 +43,7 @@ RdRandGetSeed128 (
   // Chose an arbitrary key and zero the feed_forward_value (FFV)
   //
   for (Index = 0; Index < 16; Index++) {
-    Key[Index] = (UINT8) Index;
+    Key[Index] = (UINT8)Index;
     Ffv[Index] = 0;
   }
 
@@ -88,8 +88,8 @@ RdRandGetSeed128 (
 EFI_STATUS
 EFIAPI
 RdRandGenerateEntropy (
-  IN UINTN         Length,
-  OUT UINT8        *Entropy
+  IN UINTN   Length,
+  OUT UINT8  *Entropy
   )
 {
   EFI_STATUS  Status;
@@ -109,6 +109,7 @@ RdRandGenerateEntropy (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     CopyMem (Ptr, Seed, 16);
 
     BlockCount--;
@@ -122,6 +123,7 @@ RdRandGenerateEntropy (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   CopyMem (Ptr, Seed, (Length % 16));
 
   return Status;

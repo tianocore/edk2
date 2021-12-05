@@ -20,8 +20,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/Acpi.h>
 #include <IndustryStandard/Acpi.h>
 
-
-
 /**
   Tpm12 measure and log data, and extend the measurement result into a specific PCR.
 
@@ -39,32 +37,32 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 Tpm12MeasureAndLogData (
-  IN UINT32             PcrIndex,
-  IN UINT32             EventType,
-  IN VOID               *EventLog,
-  IN UINT32             LogLen,
-  IN VOID               *HashData,
-  IN UINT64             HashDataLen
+  IN UINT32  PcrIndex,
+  IN UINT32  EventType,
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
   )
 {
-  EFI_STATUS                Status;
-  EFI_TCG_PROTOCOL          *TcgProtocol;
-  TCG_PCR_EVENT             *TcgEvent;
-  EFI_PHYSICAL_ADDRESS      EventLogLastEntry;
-  UINT32                    EventNumber;
+  EFI_STATUS            Status;
+  EFI_TCG_PROTOCOL      *TcgProtocol;
+  TCG_PCR_EVENT         *TcgEvent;
+  EFI_PHYSICAL_ADDRESS  EventLogLastEntry;
+  UINT32                EventNumber;
 
   TcgEvent = NULL;
 
   //
   // Tpm activation state is checked in HashLogExtendEvent
   //
-  Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **) &TcgProtocol);
-  if (EFI_ERROR(Status)){
+  Status = gBS->LocateProtocol (&gEfiTcgProtocolGuid, NULL, (VOID **)&TcgProtocol);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
   TcgEvent = (TCG_PCR_EVENT *)AllocateZeroPool (sizeof (TCG_PCR_EVENT_HDR) + LogLen);
-  if(TcgEvent == NULL) {
+  if (TcgEvent == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -73,15 +71,15 @@ Tpm12MeasureAndLogData (
   TcgEvent->EventSize = LogLen;
   CopyMem (&TcgEvent->Event[0], EventLog, LogLen);
   EventNumber = 1;
-  Status = TcgProtocol->HashLogExtendEvent (
-                          TcgProtocol,
-                          (EFI_PHYSICAL_ADDRESS)(UINTN)HashData,
-                          HashDataLen,
-                          TPM_ALG_SHA,
-                          TcgEvent,
-                          &EventNumber,
-                          &EventLogLastEntry
-                          );
+  Status      = TcgProtocol->HashLogExtendEvent (
+                               TcgProtocol,
+                               (EFI_PHYSICAL_ADDRESS)(UINTN)HashData,
+                               HashDataLen,
+                               TPM_ALG_SHA,
+                               TcgEvent,
+                               &EventNumber,
+                               &EventLogLastEntry
+                               );
 
   FreePool (TcgEvent);
 
@@ -105,33 +103,33 @@ Tpm12MeasureAndLogData (
 **/
 EFI_STATUS
 Tpm20MeasureAndLogData (
-  IN UINT32             PcrIndex,
-  IN UINT32             EventType,
-  IN VOID               *EventLog,
-  IN UINT32             LogLen,
-  IN VOID               *HashData,
-  IN UINT64             HashDataLen
+  IN UINT32  PcrIndex,
+  IN UINT32  EventType,
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
   )
 {
-  EFI_STATUS                Status;
-  EFI_TCG2_PROTOCOL         *Tcg2Protocol;
-  EFI_TCG2_EVENT            *Tcg2Event;
+  EFI_STATUS         Status;
+  EFI_TCG2_PROTOCOL  *Tcg2Protocol;
+  EFI_TCG2_EVENT     *Tcg2Event;
 
   //
   // TPMPresentFlag is checked in HashLogExtendEvent
   //
-  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **) &Tcg2Protocol);
+  Status = gBS->LocateProtocol (&gEfiTcg2ProtocolGuid, NULL, (VOID **)&Tcg2Protocol);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Tcg2Event = (EFI_TCG2_EVENT *) AllocateZeroPool (LogLen + sizeof (EFI_TCG2_EVENT));
-  if(Tcg2Event == NULL) {
+  Tcg2Event = (EFI_TCG2_EVENT *)AllocateZeroPool (LogLen + sizeof (EFI_TCG2_EVENT));
+  if (Tcg2Event == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Tcg2Event->Size = (UINT32)LogLen + sizeof (EFI_TCG2_EVENT) - sizeof(Tcg2Event->Event);
-  Tcg2Event->Header.HeaderSize    = sizeof(EFI_TCG2_EVENT_HEADER);
+  Tcg2Event->Size                 = (UINT32)LogLen + sizeof (EFI_TCG2_EVENT) - sizeof (Tcg2Event->Event);
+  Tcg2Event->Header.HeaderSize    = sizeof (EFI_TCG2_EVENT_HEADER);
   Tcg2Event->Header.HeaderVersion = EFI_TCG2_EVENT_HEADER_VERSION;
   Tcg2Event->Header.PCRIndex      = PcrIndex;
   Tcg2Event->Header.EventType     = EventType;
@@ -167,12 +165,12 @@ Tpm20MeasureAndLogData (
 EFI_STATUS
 EFIAPI
 TpmMeasureAndLogData (
-  IN UINT32             PcrIndex,
-  IN UINT32             EventType,
-  IN VOID               *EventLog,
-  IN UINT32             LogLen,
-  IN VOID               *HashData,
-  IN UINT64             HashDataLen
+  IN UINT32  PcrIndex,
+  IN UINT32  EventType,
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
   )
 {
   EFI_STATUS  Status;
@@ -180,7 +178,7 @@ TpmMeasureAndLogData (
   //
   // Try to measure using Tpm20 protocol
   //
-  Status = Tpm20MeasureAndLogData(
+  Status = Tpm20MeasureAndLogData (
              PcrIndex,
              EventType,
              EventLog,
@@ -193,7 +191,7 @@ TpmMeasureAndLogData (
     //
     // Try to measure using Tpm1.2 protocol
     //
-    Status = Tpm12MeasureAndLogData(
+    Status = Tpm12MeasureAndLogData (
                PcrIndex,
                EventType,
                EventLog,

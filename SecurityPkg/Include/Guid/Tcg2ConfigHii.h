@@ -14,6 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0x6339d487, 0x26ba, 0x424b, { 0x9a, 0x5d, 0x68, 0x7e, 0x25, 0xd7, 0x40, 0xbc } \
   }
 
-extern EFI_GUID gTcg2ConfigFormSetGuid;
+extern EFI_GUID  gTcg2ConfigFormSetGuid;
 
 #endif

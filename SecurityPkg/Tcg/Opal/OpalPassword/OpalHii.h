@@ -20,35 +20,35 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     0x0d510a4f, 0xa81b, 0x473f, { 0x87, 0x07, 0xb7, 0xfd, 0xfb, 0xc0, 0x45, 0xba } \
   }
 
-#define OPAL_REQUEST_VARIABLE_NAME     L"OpalRequest"
+#define OPAL_REQUEST_VARIABLE_NAME  L"OpalRequest"
 
 #pragma pack(1)
 
 typedef struct {
-  UINT32                   Length;
-  OPAL_REQUEST             OpalRequest;
-  //EFI_DEVICE_PATH_PROTOCOL OpalDevicePath;
+  UINT32          Length;
+  OPAL_REQUEST    OpalRequest;
+  // EFI_DEVICE_PATH_PROTOCOL OpalDevicePath;
 } OPAL_REQUEST_VARIABLE;
 
 typedef struct {
-  UINT16 Id: HII_KEY_ID_BITS;
-  UINT16 Index: HII_KEY_INDEX_BITS;
-  UINT16 Flag: HII_KEY_FLAG_BITS;
+  UINT16    Id    : HII_KEY_ID_BITS;
+  UINT16    Index : HII_KEY_INDEX_BITS;
+  UINT16    Flag  : HII_KEY_FLAG_BITS;
 } KEY_BITS;
 
 typedef union {
-    UINT16    Raw;
-    KEY_BITS  KeyBits;
+  UINT16      Raw;
+  KEY_BITS    KeyBits;
 } HII_KEY;
 
 typedef struct {
-    VENDOR_DEVICE_PATH             VendorDevicePath;
-    EFI_DEVICE_PATH_PROTOCOL       End;
+  VENDOR_DEVICE_PATH          VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 
 #pragma pack()
 
-extern const EFI_GUID gHiiSetupVariableGuid;
+extern const EFI_GUID  gHiiSetupVariableGuid;
 
 /**
   This function processes the results of changes in configuration.
@@ -70,10 +70,10 @@ extern const EFI_GUID gHiiSetupVariableGuid;
 **/
 EFI_STATUS
 EFIAPI
-RouteConfig(
-  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL    *This,
-  CONST EFI_STRING                        Configuration,
-  EFI_STRING                              *Progress
+RouteConfig (
+  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  CONST EFI_STRING                      Configuration,
+  EFI_STRING                            *Progress
   );
 
 /**
@@ -104,11 +104,11 @@ RouteConfig(
 **/
 EFI_STATUS
 EFIAPI
-ExtractConfig(
-  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL    *This,
-  CONST EFI_STRING                        Request,
-  EFI_STRING                              *Progress,
-  EFI_STRING                              *Results
+ExtractConfig (
+  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  CONST EFI_STRING                      Request,
+  EFI_STRING                            *Progress,
+  EFI_STRING                            *Results
   );
 
 /**
@@ -135,13 +135,13 @@ ExtractConfig(
 **/
 EFI_STATUS
 EFIAPI
-DriverCallback(
-  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL*   This,
-  EFI_BROWSER_ACTION                      Action,
-  EFI_QUESTION_ID                         QuestionId,
-  UINT8                                   Type,
-  EFI_IFR_TYPE_VALUE*                     Value,
-  EFI_BROWSER_ACTION_REQUEST*             ActionRequest
+DriverCallback (
+  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  EFI_BROWSER_ACTION                    Action,
+  EFI_QUESTION_ID                       QuestionId,
+  UINT8                                 Type,
+  EFI_IFR_TYPE_VALUE                    *Value,
+  EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   );
 
 /**
@@ -171,7 +171,7 @@ OpalHiiGetBrowserData (
 
 **/
 EFI_STATUS
-HiiPopulateDiskInfoForm(
+HiiPopulateDiskInfoForm (
   VOID
   );
 
@@ -184,8 +184,8 @@ HiiPopulateDiskInfoForm(
 
 **/
 EFI_STATUS
-HiiSelectDisk(
-  UINT8 Index
+HiiSelectDisk (
+  UINT8  Index
   );
 
 /**
@@ -198,8 +198,8 @@ HiiSelectDisk(
 
 **/
 EFI_STATUS
-HiiPasswordEntered(
-  EFI_STRING_ID            Str
+HiiPasswordEntered (
+  EFI_STRING_ID  Str
   );
 
 /**
@@ -213,7 +213,7 @@ HiiPasswordEntered(
 **/
 EFI_STATUS
 HiiSetBlockSidAction (
-  UINT32          PpRequest
+  UINT32  PpRequest
   );
 
 /**
@@ -225,8 +225,8 @@ HiiSetBlockSidAction (
 
 **/
 EFI_STATUS
-HiiPsidRevert(
-  EFI_STRING_ID         PsidStringId
+HiiPsidRevert (
+  EFI_STRING_ID  PsidStringId
   );
 
 /**
@@ -238,8 +238,8 @@ HiiPsidRevert(
 
 **/
 EFI_STRING_ID
-GetDiskNameStringId(
-  UINT8 DiskIndex
+GetDiskNameStringId (
+  UINT8  DiskIndex
   );
 
 /**
@@ -254,7 +254,7 @@ GetDiskNameStringId(
 **/
 EFI_STATUS
 OpalDiskUpdateStatus (
-  OPAL_DISK        *OpalDisk
+  OPAL_DISK  *OpalDisk
   );
 
 /**
@@ -264,7 +264,7 @@ OpalDiskUpdateStatus (
 
 **/
 EFI_HANDLE
-HiiGetDriverImageHandleCB(
+HiiGetDriverImageHandleCB (
   VOID
   );
 
@@ -275,7 +275,7 @@ HiiGetDriverImageHandleCB(
   @retval  EFI_OUT_OF_RESOURCES  Out of resource error.
 **/
 EFI_STATUS
-OpalHiiAddPackages(
+OpalHiiAddPackages (
   VOID
   );
 
@@ -287,9 +287,9 @@ OpalHiiAddPackages(
   @retval The device pointer.
 
 **/
-OPAL_DISK*
-HiiGetOpalDiskCB(
-  UINT8 DiskIndex
+OPAL_DISK *
+HiiGetOpalDiskCB (
+  UINT8  DiskIndex
   );
 
 /**
@@ -300,9 +300,9 @@ HiiGetOpalDiskCB(
   @retval Returns the disk name.
 
 **/
-CHAR8*
-HiiDiskGetNameCB(
-  UINT8 DiskIndex
+CHAR8 *
+HiiDiskGetNameCB (
+  UINT8  DiskIndex
   );
 
 /**
@@ -316,9 +316,9 @@ HiiDiskGetNameCB(
 
 **/
 EFI_STATUS
-HiiSetFormString(
-  EFI_STRING_ID       DestStringId,
-  CHAR8               *SrcAsciiStr
+HiiSetFormString (
+  EFI_STRING_ID  DestStringId,
+  CHAR8          *SrcAsciiStr
   );
 
 /**
@@ -328,7 +328,7 @@ HiiSetFormString(
   @retval  other              Error occur when install the resources.
 **/
 EFI_STATUS
-HiiInstall(
+HiiInstall (
   VOID
   );
 
@@ -339,7 +339,7 @@ HiiInstall(
   @retval  others                Other errors occur when unistall the hii resource.
 **/
 EFI_STATUS
-HiiUninstall(
+HiiUninstall (
   VOID
   );
 
@@ -354,7 +354,7 @@ HiiUninstall(
 **/
 EFI_STATUS
 OpalDiskInitialize (
-  IN OPAL_DRIVER_DEVICE          *Dev
+  IN OPAL_DRIVER_DEVICE  *Dev
   );
 
 /**
@@ -369,7 +369,7 @@ OpalDiskInitialize (
 **/
 EFI_STATUS
 OpalDiskUpdateOwnerShip (
-  OPAL_DISK        *OpalDisk
+  OPAL_DISK  *OpalDisk
   );
 
 #endif // _HII_H_

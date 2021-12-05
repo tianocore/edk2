@@ -54,12 +54,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 RngGetInfo (
-  IN EFI_RNG_PROTOCOL             *This,
-  IN OUT UINTN                    *RNGAlgorithmListSize,
-  OUT EFI_RNG_ALGORITHM           *RNGAlgorithmList
+  IN EFI_RNG_PROTOCOL    *This,
+  IN OUT UINTN           *RNGAlgorithmListSize,
+  OUT EFI_RNG_ALGORITHM  *RNGAlgorithmList
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   if ((This == NULL) || (RNGAlgorithmListSize == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -80,7 +80,7 @@ RngGetInfo (
 //
 // The Random Number Generator (RNG) protocol
 //
-EFI_RNG_PROTOCOL mRngRdRand = {
+EFI_RNG_PROTOCOL  mRngRdRand = {
   RngGetInfo,
   RngGetRNG
 };
@@ -99,12 +99,12 @@ EFI_RNG_PROTOCOL mRngRdRand = {
 EFI_STATUS
 EFIAPI
 RngDriverEntry (
-  IN EFI_HANDLE          ImageHandle,
-  IN EFI_SYSTEM_TABLE    *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS    Status;
-  EFI_HANDLE    Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   //
   // Install UEFI RNG (Random Number Generator) Protocol
@@ -120,7 +120,6 @@ RngDriverEntry (
   return Status;
 }
 
-
 /**
   Calls RDRAND to fill a buffer of arbitrary size with random bytes.
 
@@ -134,24 +133,25 @@ RngDriverEntry (
 EFI_STATUS
 EFIAPI
 RngGetBytes (
-  IN UINTN         Length,
-  OUT UINT8        *RandBuffer
+  IN UINTN   Length,
+  OUT UINT8  *RandBuffer
   )
 {
-  BOOLEAN     IsRandom;
-  UINT64      TempRand[2];
+  BOOLEAN  IsRandom;
+  UINT64   TempRand[2];
 
   while (Length > 0) {
     IsRandom = GetRandomNumber128 (TempRand);
     if (!IsRandom) {
       return EFI_NOT_READY;
     }
+
     if (Length >= sizeof (TempRand)) {
-      WriteUnaligned64 ((UINT64*)RandBuffer, TempRand[0]);
+      WriteUnaligned64 ((UINT64 *)RandBuffer, TempRand[0]);
       RandBuffer += sizeof (UINT64);
-      WriteUnaligned64 ((UINT64*)RandBuffer, TempRand[1]);
+      WriteUnaligned64 ((UINT64 *)RandBuffer, TempRand[1]);
       RandBuffer += sizeof (UINT64);
-      Length -= sizeof (TempRand);
+      Length     -= sizeof (TempRand);
     } else {
       CopyMem (RandBuffer, TempRand, Length);
       Length = 0;
