@@ -14,13 +14,13 @@
 //
 // Global variable declarations
 //
-extern NOR_FLASH_INSTANCE **mNorFlashInstances;
-extern UINT32               mNorFlashDeviceCount;
+extern NOR_FLASH_INSTANCE  **mNorFlashInstances;
+extern UINT32              mNorFlashDeviceCount;
 
 UINT32
 NorFlashReadStatusRegister (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN UINTN                  SR_Address
+  IN NOR_FLASH_INSTANCE  *Instance,
+  IN UINTN               SR_Address
   )
 {
   // Prepare to read the status register
@@ -31,23 +31,23 @@ NorFlashReadStatusRegister (
 STATIC
 BOOLEAN
 NorFlashBlockIsLocked (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN UINTN                  BlockAddress
+  IN NOR_FLASH_INSTANCE  *Instance,
+  IN UINTN               BlockAddress
   )
 {
-  UINT32                LockStatus;
+  UINT32  LockStatus;
 
   // Send command for reading device id
   SEND_NOR_COMMAND (BlockAddress, 2, P30_CMD_READ_DEVICE_ID);
 
   // Read block lock status
-  LockStatus = MmioRead32 (CREATE_NOR_ADDRESS(BlockAddress, 2));
+  LockStatus = MmioRead32 (CREATE_NOR_ADDRESS (BlockAddress, 2));
 
   // Decode block lock status
-  LockStatus = FOLD_32BIT_INTO_16BIT(LockStatus);
+  LockStatus = FOLD_32BIT_INTO_16BIT (LockStatus);
 
   if ((LockStatus & 0x2) != 0) {
-    DEBUG((DEBUG_ERROR, "NorFlashBlockIsLocked: WARNING: Block LOCKED DOWN\n"));
+    DEBUG ((DEBUG_ERROR, "NorFlashBlockIsLocked: WARNING: Block LOCKED DOWN\n"));
   }
 
   return ((LockStatus & 0x1) != 0);
@@ -56,11 +56,11 @@ NorFlashBlockIsLocked (
 STATIC
 EFI_STATUS
 NorFlashUnlockSingleBlock (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN UINTN                  BlockAddress
+  IN NOR_FLASH_INSTANCE  *Instance,
+  IN UINTN               BlockAddress
   )
 {
-  UINT32                LockStatus;
+  UINT32  LockStatus;
 
   // Raise the Task Priority Level to TPL_NOTIFY to serialise all its operations
   // and to protect shared data structures.
@@ -77,10 +77,10 @@ NorFlashUnlockSingleBlock (
       SEND_NOR_COMMAND (BlockAddress, 2, P30_CMD_READ_DEVICE_ID);
 
       // Read block lock status
-      LockStatus = MmioRead32 (CREATE_NOR_ADDRESS(BlockAddress, 2));
+      LockStatus = MmioRead32 (CREATE_NOR_ADDRESS (BlockAddress, 2));
 
       // Decode block lock status
-      LockStatus = FOLD_32BIT_INTO_16BIT(LockStatus);
+      LockStatus = FOLD_32BIT_INTO_16BIT (LockStatus);
     } while ((LockStatus & 0x1) == 1);
   } else {
     // Request a lock setup
@@ -98,18 +98,18 @@ NorFlashUnlockSingleBlock (
   // Put device back into Read Array mode
   SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_READ_ARRAY);
 
-  DEBUG((DEBUG_BLKIO, "UnlockSingleBlock: BlockAddress=0x%08x\n", BlockAddress));
+  DEBUG ((DEBUG_BLKIO, "UnlockSingleBlock: BlockAddress=0x%08x\n", BlockAddress));
 
   return EFI_SUCCESS;
 }
 
 EFI_STATUS
 NorFlashUnlockSingleBlockIfNecessary (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN UINTN                  BlockAddress
+  IN NOR_FLASH_INSTANCE  *Instance,
+  IN UINTN               BlockAddress
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   Status = EFI_SUCCESS;
 
@@ -120,24 +120,23 @@ NorFlashUnlockSingleBlockIfNecessary (
   return Status;
 }
 
-
 /**
  * The following function presumes that the block has already been unlocked.
  **/
 EFI_STATUS
 NorFlashEraseSingleBlock (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN UINTN                  BlockAddress
+  IN NOR_FLASH_INSTANCE  *Instance,
+  IN UINTN               BlockAddress
   )
 {
-  EFI_STATUS            Status;
-  UINT32                StatusRegister;
+  EFI_STATUS  Status;
+  UINT32      StatusRegister;
 
   Status = EFI_SUCCESS;
 
   // Request a block erase and then confirm it
-  SEND_NOR_COMMAND(BlockAddress, 0, P30_CMD_BLOCK_ERASE_SETUP);
-  SEND_NOR_COMMAND(BlockAddress, 0, P30_CMD_BLOCK_ERASE_CONFIRM);
+  SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_BLOCK_ERASE_SETUP);
+  SEND_NOR_COMMAND (BlockAddress, 0, P30_CMD_BLOCK_ERASE_CONFIRM);
 
   // Wait until the status register gives us the all clear
   do {
@@ -145,27 +144,27 @@ NorFlashEraseSingleBlock (
   } while ((StatusRegister & P30_SR_BIT_WRITE) != P30_SR_BIT_WRITE);
 
   if (StatusRegister & P30_SR_BIT_VPP) {
-    DEBUG((DEBUG_ERROR,"EraseSingleBlock(BlockAddress=0x%08x: VPP Range Error\n", BlockAddress));
+    DEBUG ((DEBUG_ERROR, "EraseSingleBlock(BlockAddress=0x%08x: VPP Range Error\n", BlockAddress));
     Status = EFI_DEVICE_ERROR;
   }
 
   if ((StatusRegister & (P30_SR_BIT_ERASE | P30_SR_BIT_PROGRAM)) == (P30_SR_BIT_ERASE | P30_SR_BIT_PROGRAM)) {
-    DEBUG((DEBUG_ERROR,"EraseSingleBlock(BlockAddress=0x%08x: Command Sequence Error\n", BlockAddress));
+    DEBUG ((DEBUG_ERROR, "EraseSingleBlock(BlockAddress=0x%08x: Command Sequence Error\n", BlockAddress));
     Status = EFI_DEVICE_ERROR;
   }
 
   if (StatusRegister & P30_SR_BIT_ERASE) {
-    DEBUG((DEBUG_ERROR,"EraseSingleBlock(BlockAddress=0x%08x: Block Erase Error StatusRegister:0x%X\n", BlockAddress, StatusRegister));
+    DEBUG ((DEBUG_ERROR, "EraseSingleBlock(BlockAddress=0x%08x: Block Erase Error StatusRegister:0x%X\n", BlockAddress, StatusRegister));
     Status = EFI_DEVICE_ERROR;
   }
 
   if (StatusRegister & P30_SR_BIT_BLOCK_LOCKED) {
     // The debug level message has been reduced because a device lock might happen. In this case we just retry it ...
-    DEBUG((DEBUG_INFO,"EraseSingleBlock(BlockAddress=0x%08x: Block Locked Error\n", BlockAddress));
+    DEBUG ((DEBUG_INFO, "EraseSingleBlock(BlockAddress=0x%08x: Block Locked Error\n", BlockAddress));
     Status = EFI_WRITE_PROTECTED;
   }
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     // Clear the Status Register
     SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_CLEAR_STATUS_REGISTER);
   }
@@ -178,18 +177,18 @@ NorFlashEraseSingleBlock (
 
 EFI_STATUS
 NorFlashWriteSingleWord (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN UINTN                  WordAddress,
-  IN UINT32                 WriteData
+  IN NOR_FLASH_INSTANCE  *Instance,
+  IN UINTN               WordAddress,
+  IN UINT32              WriteData
   )
 {
-  EFI_STATUS            Status;
-  UINT32                StatusRegister;
+  EFI_STATUS  Status;
+  UINT32      StatusRegister;
 
   Status = EFI_SUCCESS;
 
   // Request a write single word command
-  SEND_NOR_COMMAND(WordAddress, 0, P30_CMD_WORD_PROGRAM_SETUP);
+  SEND_NOR_COMMAND (WordAddress, 0, P30_CMD_WORD_PROGRAM_SETUP);
 
   // Store the word into NOR Flash;
   MmioWrite32 (WordAddress, WriteData);
@@ -201,27 +200,26 @@ NorFlashWriteSingleWord (
     // The chip is busy while the WRITE bit is not asserted
   } while ((StatusRegister & P30_SR_BIT_WRITE) != P30_SR_BIT_WRITE);
 
-
   // Perform a full status check:
   // Mask the relevant bits of Status Register.
   // Everything should be zero, if not, we have a problem
 
   if (StatusRegister & P30_SR_BIT_VPP) {
-    DEBUG((DEBUG_ERROR,"NorFlashWriteSingleWord(WordAddress:0x%X): VPP Range Error\n",WordAddress));
+    DEBUG ((DEBUG_ERROR, "NorFlashWriteSingleWord(WordAddress:0x%X): VPP Range Error\n", WordAddress));
     Status = EFI_DEVICE_ERROR;
   }
 
   if (StatusRegister & P30_SR_BIT_PROGRAM) {
-    DEBUG((DEBUG_ERROR,"NorFlashWriteSingleWord(WordAddress:0x%X): Program Error\n",WordAddress));
+    DEBUG ((DEBUG_ERROR, "NorFlashWriteSingleWord(WordAddress:0x%X): Program Error\n", WordAddress));
     Status = EFI_DEVICE_ERROR;
   }
 
   if (StatusRegister & P30_SR_BIT_BLOCK_LOCKED) {
-    DEBUG((DEBUG_ERROR,"NorFlashWriteSingleWord(WordAddress:0x%X): Device Protect Error\n",WordAddress));
+    DEBUG ((DEBUG_ERROR, "NorFlashWriteSingleWord(WordAddress:0x%X): Device Protect Error\n", WordAddress));
     Status = EFI_DEVICE_ERROR;
   }
 
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     // Clear the Status Register
     SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_CLEAR_STATUS_REGISTER);
   }
@@ -249,19 +247,19 @@ NorFlashWriteSingleWord (
  */
 EFI_STATUS
 NorFlashWriteBuffer (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN UINTN                  TargetAddress,
-  IN UINTN                  BufferSizeInBytes,
-  IN UINT32                 *Buffer
+  IN NOR_FLASH_INSTANCE  *Instance,
+  IN UINTN               TargetAddress,
+  IN UINTN               BufferSizeInBytes,
+  IN UINT32              *Buffer
   )
 {
-  EFI_STATUS            Status;
-  UINTN                 BufferSizeInWords;
-  UINTN                 Count;
-  volatile UINT32       *Data;
-  UINTN                 WaitForBuffer;
-  BOOLEAN               BufferAvailable;
-  UINT32                StatusRegister;
+  EFI_STATUS       Status;
+  UINTN            BufferSizeInWords;
+  UINTN            Count;
+  volatile UINT32  *Data;
+  UINTN            WaitForBuffer;
+  BOOLEAN          BufferAvailable;
+  UINT32           StatusRegister;
 
   WaitForBuffer   = MAX_BUFFERED_PROG_ITERATIONS;
   BufferAvailable = FALSE;
@@ -294,7 +292,7 @@ NorFlashWriteBuffer (
   // Check the availability of the buffer
   do {
     // Issue the Buffered Program Setup command
-    SEND_NOR_COMMAND(TargetAddress, 0, P30_CMD_BUFFERED_PROGRAM_SETUP);
+    SEND_NOR_COMMAND (TargetAddress, 0, P30_CMD_BUFFERED_PROGRAM_SETUP);
 
     // Read back the status register bit#7 from the same address
     if (((*Data) & P30_SR_BIT_WRITE) == P30_SR_BIT_WRITE) {
@@ -303,7 +301,6 @@ NorFlashWriteBuffer (
 
     // Update the loop counter
     WaitForBuffer--;
-
   } while ((WaitForBuffer > 0) && (BufferAvailable == FALSE));
 
   // The buffer was not available for writing
@@ -317,10 +314,10 @@ NorFlashWriteBuffer (
 
   // Write the word count, which is (buffer_size_in_words - 1),
   // because word count 0 means one word.
-  SEND_NOR_COMMAND(TargetAddress, 0, (BufferSizeInWords - 1));
+  SEND_NOR_COMMAND (TargetAddress, 0, (BufferSizeInWords - 1));
 
   // Write the data to the NOR Flash, advancing each address by 4 bytes
-  for(Count=0; Count < BufferSizeInWords; Count++, Data++, Buffer++) {
+  for (Count = 0; Count < BufferSizeInWords; Count++, Data++, Buffer++) {
     MmioWrite32 ((UINTN)Data, *Buffer);
   }
 
@@ -333,29 +330,28 @@ NorFlashWriteBuffer (
     // The chip is busy while the WRITE bit is not asserted
   } while ((StatusRegister & P30_SR_BIT_WRITE) != P30_SR_BIT_WRITE);
 
-
   // Perform a full status check:
   // Mask the relevant bits of Status Register.
   // Everything should be zero, if not, we have a problem
 
-  Status          = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
 
   if (StatusRegister & P30_SR_BIT_VPP) {
-    DEBUG((DEBUG_ERROR,"NorFlashWriteBuffer(TargetAddress:0x%X): VPP Range Error\n", TargetAddress));
+    DEBUG ((DEBUG_ERROR, "NorFlashWriteBuffer(TargetAddress:0x%X): VPP Range Error\n", TargetAddress));
     Status = EFI_DEVICE_ERROR;
   }
 
   if (StatusRegister & P30_SR_BIT_PROGRAM) {
-    DEBUG((DEBUG_ERROR,"NorFlashWriteBuffer(TargetAddress:0x%X): Program Error\n", TargetAddress));
+    DEBUG ((DEBUG_ERROR, "NorFlashWriteBuffer(TargetAddress:0x%X): Program Error\n", TargetAddress));
     Status = EFI_DEVICE_ERROR;
   }
 
   if (StatusRegister & P30_SR_BIT_BLOCK_LOCKED) {
-    DEBUG((DEBUG_ERROR,"NorFlashWriteBuffer(TargetAddress:0x%X): Device Protect Error\n",TargetAddress));
+    DEBUG ((DEBUG_ERROR, "NorFlashWriteBuffer(TargetAddress:0x%X): Device Protect Error\n", TargetAddress));
     Status = EFI_DEVICE_ERROR;
   }
 
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     // Clear the Status Register
     SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_CLEAR_STATUS_REGISTER);
   }
@@ -369,18 +365,18 @@ EXIT:
 
 EFI_STATUS
 NorFlashWriteBlocks (
-  IN NOR_FLASH_INSTANCE     *Instance,
-  IN EFI_LBA                Lba,
-  IN UINTN                  BufferSizeInBytes,
-  IN VOID                   *Buffer
+  IN NOR_FLASH_INSTANCE  *Instance,
+  IN EFI_LBA             Lba,
+  IN UINTN               BufferSizeInBytes,
+  IN VOID                *Buffer
   )
 {
-  UINT32          *pWriteBuffer;
-  EFI_STATUS      Status;
-  EFI_LBA         CurrentBlock;
-  UINT32          BlockSizeInWords;
-  UINT32          NumBlocks;
-  UINT32          BlockCount;
+  UINT32      *pWriteBuffer;
+  EFI_STATUS  Status;
+  EFI_LBA     CurrentBlock;
+  UINT32      BlockSizeInWords;
+  UINT32      NumBlocks;
+  UINT32      BlockCount;
 
   Status = EFI_SUCCESS;
 
@@ -389,29 +385,29 @@ NorFlashWriteBlocks (
     return EFI_INVALID_PARAMETER;
   }
 
-  if(Instance->Media.ReadOnly == TRUE) {
+  if (Instance->Media.ReadOnly == TRUE) {
     return EFI_WRITE_PROTECTED;
   }
 
   // We must have some bytes to read
-  DEBUG((DEBUG_BLKIO, "NorFlashWriteBlocks: BufferSizeInBytes=0x%x\n", BufferSizeInBytes));
-  if(BufferSizeInBytes == 0) {
+  DEBUG ((DEBUG_BLKIO, "NorFlashWriteBlocks: BufferSizeInBytes=0x%x\n", BufferSizeInBytes));
+  if (BufferSizeInBytes == 0) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
   // The size of the buffer must be a multiple of the block size
-  DEBUG((DEBUG_BLKIO, "NorFlashWriteBlocks: BlockSize in bytes =0x%x\n", Instance->Media.BlockSize));
+  DEBUG ((DEBUG_BLKIO, "NorFlashWriteBlocks: BlockSize in bytes =0x%x\n", Instance->Media.BlockSize));
   if ((BufferSizeInBytes % Instance->Media.BlockSize) != 0) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
   // All blocks must be within the device
-  NumBlocks = ((UINT32)BufferSizeInBytes) / Instance->Media.BlockSize ;
+  NumBlocks = ((UINT32)BufferSizeInBytes) / Instance->Media.BlockSize;
 
-  DEBUG((DEBUG_BLKIO, "NorFlashWriteBlocks: NumBlocks=%d, LastBlock=%ld, Lba=%ld.\n", NumBlocks, Instance->Media.LastBlock, Lba));
+  DEBUG ((DEBUG_BLKIO, "NorFlashWriteBlocks: NumBlocks=%d, LastBlock=%ld, Lba=%ld.\n", NumBlocks, Instance->Media.LastBlock, Lba));
 
   if ((Lba + NumBlocks) > (Instance->Media.LastBlock + 1)) {
-    DEBUG((DEBUG_ERROR, "NorFlashWriteBlocks: ERROR - Write will exceed last block.\n"));
+    DEBUG ((DEBUG_ERROR, "NorFlashWriteBlocks: ERROR - Write will exceed last block.\n"));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -422,22 +418,21 @@ NorFlashWriteBlocks (
   pWriteBuffer = (UINT32 *)Buffer;
 
   CurrentBlock = Lba;
-  for (BlockCount=0; BlockCount < NumBlocks; BlockCount++, CurrentBlock++, pWriteBuffer = pWriteBuffer + BlockSizeInWords) {
-
-    DEBUG((DEBUG_BLKIO, "NorFlashWriteBlocks: Writing block #%d\n", (UINTN)CurrentBlock));
+  for (BlockCount = 0; BlockCount < NumBlocks; BlockCount++, CurrentBlock++, pWriteBuffer = pWriteBuffer + BlockSizeInWords) {
+    DEBUG ((DEBUG_BLKIO, "NorFlashWriteBlocks: Writing block #%d\n", (UINTN)CurrentBlock));
 
     Status = NorFlashWriteFullBlock (Instance, CurrentBlock, pWriteBuffer, BlockSizeInWords);
 
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       break;
     }
   }
 
-  DEBUG((DEBUG_BLKIO, "NorFlashWriteBlocks: Exit Status = \"%r\".\n", Status));
+  DEBUG ((DEBUG_BLKIO, "NorFlashWriteBlocks: Exit Status = \"%r\".\n", Status));
   return Status;
 }
 
-#define BOTH_ALIGNED(a, b, align) ((((UINTN)(a) | (UINTN)(b)) & ((align) - 1)) == 0)
+#define BOTH_ALIGNED(a, b, align)  ((((UINTN)(a) | (UINTN)(b)) & ((align) - 1)) == 0)
 
 /**
   Copy Length bytes from Source to Destination, using aligned accesses only.
@@ -454,61 +449,69 @@ NorFlashWriteBlocks (
 STATIC
 VOID *
 AlignedCopyMem (
-  OUT     VOID                      *DestinationBuffer,
-  IN      CONST VOID                *SourceBuffer,
-  IN      UINTN                     Length
+  OUT     VOID        *DestinationBuffer,
+  IN      CONST VOID  *SourceBuffer,
+  IN      UINTN       Length
   )
 {
-  UINT8             *Destination8;
-  CONST UINT8       *Source8;
-  UINT32            *Destination32;
-  CONST UINT32      *Source32;
-  UINT64            *Destination64;
-  CONST UINT64      *Source64;
+  UINT8         *Destination8;
+  CONST UINT8   *Source8;
+  UINT32        *Destination32;
+  CONST UINT32  *Source32;
+  UINT64        *Destination64;
+  CONST UINT64  *Source64;
 
-  if (BOTH_ALIGNED(DestinationBuffer, SourceBuffer, 8) && Length >= 8) {
+  if (BOTH_ALIGNED (DestinationBuffer, SourceBuffer, 8) && (Length >= 8)) {
     Destination64 = DestinationBuffer;
-    Source64 = SourceBuffer;
+    Source64      = SourceBuffer;
     while (Length >= 8) {
       *Destination64++ = *Source64++;
-      Length -= 8;
+      Length          -= 8;
     }
 
     Destination8 = (UINT8 *)Destination64;
-    Source8 = (CONST UINT8 *)Source64;
-  } else if (BOTH_ALIGNED(DestinationBuffer, SourceBuffer, 4) && Length >= 4) {
+    Source8      = (CONST UINT8 *)Source64;
+  } else if (BOTH_ALIGNED (DestinationBuffer, SourceBuffer, 4) && (Length >= 4)) {
     Destination32 = DestinationBuffer;
-    Source32 = SourceBuffer;
+    Source32      = SourceBuffer;
     while (Length >= 4) {
       *Destination32++ = *Source32++;
-      Length -= 4;
+      Length          -= 4;
     }
 
     Destination8 = (UINT8 *)Destination32;
-    Source8 = (CONST UINT8 *)Source32;
+    Source8      = (CONST UINT8 *)Source32;
   } else {
     Destination8 = DestinationBuffer;
-    Source8 = SourceBuffer;
+    Source8      = SourceBuffer;
   }
+
   while (Length-- != 0) {
     *Destination8++ = *Source8++;
   }
+
   return DestinationBuffer;
 }
 
 EFI_STATUS
 NorFlashReadBlocks (
-  IN NOR_FLASH_INSTANCE   *Instance,
-  IN EFI_LBA              Lba,
-  IN UINTN                BufferSizeInBytes,
-  OUT VOID                *Buffer
+  IN NOR_FLASH_INSTANCE  *Instance,
+  IN EFI_LBA             Lba,
+  IN UINTN               BufferSizeInBytes,
+  OUT VOID               *Buffer
   )
 {
-  UINT32              NumBlocks;
-  UINTN               StartAddress;
+  UINT32  NumBlocks;
+  UINTN   StartAddress;
 
-  DEBUG((DEBUG_BLKIO, "NorFlashReadBlocks: BufferSize=0x%xB BlockSize=0x%xB LastBlock=%ld, Lba=%ld.\n",
-      BufferSizeInBytes, Instance->Media.BlockSize, Instance->Media.LastBlock, Lba));
+  DEBUG ((
+    DEBUG_BLKIO,
+    "NorFlashReadBlocks: BufferSize=0x%xB BlockSize=0x%xB LastBlock=%ld, Lba=%ld.\n",
+    BufferSizeInBytes,
+    Instance->Media.BlockSize,
+    Instance->Media.LastBlock,
+    Lba
+    ));
 
   // The buffer must be valid
   if (Buffer == NULL) {
@@ -526,18 +529,19 @@ NorFlashReadBlocks (
   }
 
   // All blocks must be within the device
-  NumBlocks = ((UINT32)BufferSizeInBytes) / Instance->Media.BlockSize ;
+  NumBlocks = ((UINT32)BufferSizeInBytes) / Instance->Media.BlockSize;
 
   if ((Lba + NumBlocks) > (Instance->Media.LastBlock + 1)) {
-    DEBUG((DEBUG_ERROR, "NorFlashReadBlocks: ERROR - Read will exceed last block\n"));
+    DEBUG ((DEBUG_ERROR, "NorFlashReadBlocks: ERROR - Read will exceed last block\n"));
     return EFI_INVALID_PARAMETER;
   }
 
   // Get the address to start reading from
-  StartAddress = GET_NOR_BLOCK_ADDRESS (Instance->RegionBaseAddress,
-                                        Lba,
-                                        Instance->Media.BlockSize
-                                       );
+  StartAddress = GET_NOR_BLOCK_ADDRESS (
+                   Instance->RegionBaseAddress,
+                   Lba,
+                   Instance->Media.BlockSize
+                   );
 
   // Put the device into Read Array mode
   SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
@@ -550,11 +554,11 @@ NorFlashReadBlocks (
 
 EFI_STATUS
 NorFlashRead (
-  IN NOR_FLASH_INSTANCE   *Instance,
-  IN EFI_LBA              Lba,
-  IN UINTN                Offset,
-  IN UINTN                BufferSizeInBytes,
-  OUT VOID                *Buffer
+  IN NOR_FLASH_INSTANCE  *Instance,
+  IN EFI_LBA             Lba,
+  IN UINTN               Offset,
+  IN UINTN               BufferSizeInBytes,
+  OUT VOID               *Buffer
   )
 {
   UINTN  StartAddress;
@@ -575,10 +579,11 @@ NorFlashRead (
   }
 
   // Get the address to start reading from
-  StartAddress = GET_NOR_BLOCK_ADDRESS (Instance->RegionBaseAddress,
-                                        Lba,
-                                        Instance->Media.BlockSize
-                                       );
+  StartAddress = GET_NOR_BLOCK_ADDRESS (
+                   Instance->RegionBaseAddress,
+                   Lba,
+                   Instance->Media.BlockSize
+                   );
 
   // Put the device into Read Array mode
   SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
@@ -595,11 +600,11 @@ NorFlashRead (
 */
 EFI_STATUS
 NorFlashWriteSingleBlock (
-  IN        NOR_FLASH_INSTANCE   *Instance,
-  IN        EFI_LBA               Lba,
-  IN        UINTN                 Offset,
-  IN OUT    UINTN                *NumBytes,
-  IN        UINT8                *Buffer
+  IN        NOR_FLASH_INSTANCE  *Instance,
+  IN        EFI_LBA             Lba,
+  IN        UINTN               Offset,
+  IN OUT    UINTN               *NumBytes,
+  IN        UINT8               *Buffer
   )
 {
   EFI_STATUS  TempStatus;
@@ -631,16 +636,17 @@ NorFlashWriteSingleBlock (
 
   // The write must not span block boundaries.
   // We need to check each variable individually because adding two large values together overflows.
-  if ( ( Offset               >= BlockSize ) ||
-       ( *NumBytes            >  BlockSize ) ||
-       ( (Offset + *NumBytes) >  BlockSize )    ) {
-    DEBUG ((DEBUG_ERROR, "NorFlashWriteSingleBlock: ERROR - EFI_BAD_BUFFER_SIZE: (Offset=0x%x + NumBytes=0x%x) > BlockSize=0x%x\n", Offset, *NumBytes, BlockSize ));
+  if ((Offset               >= BlockSize) ||
+      (*NumBytes            >  BlockSize) ||
+      ((Offset + *NumBytes) >  BlockSize))
+  {
+    DEBUG ((DEBUG_ERROR, "NorFlashWriteSingleBlock: ERROR - EFI_BAD_BUFFER_SIZE: (Offset=0x%x + NumBytes=0x%x) > BlockSize=0x%x\n", Offset, *NumBytes, BlockSize));
     return EFI_BAD_BUFFER_SIZE;
   }
 
   // We must have some bytes to write
   if (*NumBytes == 0) {
-    DEBUG ((DEBUG_ERROR, "NorFlashWriteSingleBlock: ERROR - EFI_BAD_BUFFER_SIZE: (Offset=0x%x + NumBytes=0x%x) > BlockSize=0x%x\n", Offset, *NumBytes, BlockSize ));
+    DEBUG ((DEBUG_ERROR, "NorFlashWriteSingleBlock: ERROR - EFI_BAD_BUFFER_SIZE: (Offset=0x%x + NumBytes=0x%x) > BlockSize=0x%x\n", Offset, *NumBytes, BlockSize));
     return EFI_BAD_BUFFER_SIZE;
   }
 
@@ -659,16 +665,19 @@ NorFlashWriteSingleBlock (
     while (BytesToWrite > 0) {
       // Read full word from NOR, splice as required. A word is the smallest
       // unit we can write.
-      TempStatus = NorFlashRead (Instance, Lba, CurOffset & ~(0x3), sizeof(Tmp), &Tmp);
+      TempStatus = NorFlashRead (Instance, Lba, CurOffset & ~(0x3), sizeof (Tmp), &Tmp);
       if (EFI_ERROR (TempStatus)) {
         return EFI_DEVICE_ERROR;
       }
 
       // Physical address of word in NOR to write.
-      WordAddr = (CurOffset & ~(0x3)) + GET_NOR_BLOCK_ADDRESS (Instance->RegionBaseAddress,
-                                                               Lba, BlockSize);
+      WordAddr = (CurOffset & ~(0x3)) + GET_NOR_BLOCK_ADDRESS (
+                                          Instance->RegionBaseAddress,
+                                          Lba,
+                                          BlockSize
+                                          );
       // The word of data that is to be written.
-      TmpBuf = *((UINT32*)(Buffer + (*NumBytes - BytesToWrite)));
+      TmpBuf = *((UINT32 *)(Buffer + (*NumBytes - BytesToWrite)));
 
       // First do word aligned chunks.
       if ((CurOffset & 0x3) == 0) {
@@ -681,10 +690,11 @@ NorFlashWriteSingleBlock (
               break;
             }
           }
+
           // Write this word to NOR
-          WordToWrite = TmpBuf;
-          CurOffset += sizeof(TmpBuf);
-          BytesToWrite -= sizeof(TmpBuf);
+          WordToWrite   = TmpBuf;
+          CurOffset    += sizeof (TmpBuf);
+          BytesToWrite -= sizeof (TmpBuf);
         } else {
           // BytesToWrite < 4. Do small writes and left-overs
           Mask = ~((~0) << (BytesToWrite * 8));
@@ -698,9 +708,10 @@ NorFlashWriteSingleBlock (
               break;
             }
           }
+
           // Merge old and new data. Write merged word to NOR
-          WordToWrite = (Tmp & ~Mask) | TmpBuf;
-          CurOffset += BytesToWrite;
+          WordToWrite  = (Tmp & ~Mask) | TmpBuf;
+          CurOffset   += BytesToWrite;
           BytesToWrite = 0;
         }
       } else {
@@ -717,10 +728,11 @@ NorFlashWriteSingleBlock (
               break;
             }
           }
+
           // Merge old and new data. Write merged word to NOR
-          WordToWrite = (Tmp & ~Mask) | TmpBuf;
+          WordToWrite   = (Tmp & ~Mask) | TmpBuf;
           BytesToWrite -= (4 - (CurOffset & 0x3));
-          CurOffset += (4 - (CurOffset & 0x3));
+          CurOffset    += (4 - (CurOffset & 0x3));
         } else {
           // Unaligned and fits in one word.
           Mask = (~((~0) << (BytesToWrite * 8))) << ((CurOffset & 0x3) * 8);
@@ -734,9 +746,10 @@ NorFlashWriteSingleBlock (
               break;
             }
           }
+
           // Merge old and new data. Write merged word to NOR
-          WordToWrite = (Tmp & ~Mask) | TmpBuf;
-          CurOffset += BytesToWrite;
+          WordToWrite  = (Tmp & ~Mask) | TmpBuf;
+          CurOffset   += BytesToWrite;
           BytesToWrite = 0;
         }
       }
@@ -751,13 +764,16 @@ NorFlashWriteSingleBlock (
         if (EFI_ERROR (TempStatus)) {
           return EFI_DEVICE_ERROR;
         }
+
         PrevBlockAddress = BlockAddress;
       }
+
       TempStatus = NorFlashWriteSingleWord (Instance, WordAddr, WordToWrite);
       if (EFI_ERROR (TempStatus)) {
         return EFI_DEVICE_ERROR;
       }
     }
+
     // Exit if we got here and could write all the data. Otherwise do the
     // Erase-Write cycle.
     if (!DoErase) {
@@ -779,7 +795,7 @@ NorFlashWriteSingleBlock (
   }
 
   // Put the data at the appropriate location inside the buffer area
-  CopyMem ((VOID*)((UINTN)Instance->ShadowBuffer + Offset), Buffer, *NumBytes);
+  CopyMem ((VOID *)((UINTN)Instance->ShadowBuffer + Offset), Buffer, *NumBytes);
 
   // Write the modified buffer back to the NorFlash
   TempStatus = NorFlashWriteBlocks (Instance, Lba, BlockSize, Instance->ShadowBuffer);
@@ -819,26 +835,26 @@ NorFlashWriteSingleBlock (
 EFI_STATUS
 EFIAPI
 NorFlashDiskIoReadDisk (
-  IN EFI_DISK_IO_PROTOCOL         *This,
-  IN UINT32                       MediaId,
-  IN UINT64                       DiskOffset,
-  IN UINTN                        BufferSize,
-  OUT VOID                        *Buffer
+  IN EFI_DISK_IO_PROTOCOL  *This,
+  IN UINT32                MediaId,
+  IN UINT64                DiskOffset,
+  IN UINTN                 BufferSize,
+  OUT VOID                 *Buffer
   )
 {
-  NOR_FLASH_INSTANCE *Instance;
+  NOR_FLASH_INSTANCE  *Instance;
   UINT32              BlockSize;
   UINT32              BlockOffset;
   EFI_LBA             Lba;
 
-  Instance = INSTANCE_FROM_DISKIO_THIS(This);
+  Instance = INSTANCE_FROM_DISKIO_THIS (This);
 
   if (MediaId != Instance->Media.MediaId) {
     return EFI_MEDIA_CHANGED;
   }
 
   BlockSize = Instance->Media.BlockSize;
-  Lba = (EFI_LBA) DivU64x32Remainder (DiskOffset, BlockSize, &BlockOffset);
+  Lba       = (EFI_LBA)DivU64x32Remainder (DiskOffset, BlockSize, &BlockOffset);
 
   return NorFlashRead (Instance, Lba, BlockOffset, BufferSize, Buffer);
 }
@@ -864,14 +880,14 @@ NorFlashDiskIoReadDisk (
 EFI_STATUS
 EFIAPI
 NorFlashDiskIoWriteDisk (
-  IN EFI_DISK_IO_PROTOCOL         *This,
-  IN UINT32                       MediaId,
-  IN UINT64                       DiskOffset,
-  IN UINTN                        BufferSize,
-  IN VOID                         *Buffer
+  IN EFI_DISK_IO_PROTOCOL  *This,
+  IN UINT32                MediaId,
+  IN UINT64                DiskOffset,
+  IN UINTN                 BufferSize,
+  IN VOID                  *Buffer
   )
 {
-  NOR_FLASH_INSTANCE *Instance;
+  NOR_FLASH_INSTANCE  *Instance;
   UINT32              BlockSize;
   UINT32              BlockOffset;
   EFI_LBA             Lba;
@@ -879,14 +895,14 @@ NorFlashDiskIoWriteDisk (
   UINTN               WriteSize;
   EFI_STATUS          Status;
 
-  Instance = INSTANCE_FROM_DISKIO_THIS(This);
+  Instance = INSTANCE_FROM_DISKIO_THIS (This);
 
   if (MediaId != Instance->Media.MediaId) {
     return EFI_MEDIA_CHANGED;
   }
 
   BlockSize = Instance->Media.BlockSize;
-  Lba = (EFI_LBA) DivU64x32Remainder (DiskOffset, BlockSize, &BlockOffset);
+  Lba       = (EFI_LBA)DivU64x32Remainder (DiskOffset, BlockSize, &BlockOffset);
 
   RemainingBytes = BufferSize;
 
@@ -904,15 +920,17 @@ NorFlashDiskIoWriteDisk (
       // Write a partial block
       Status = NorFlashWriteSingleBlock (Instance, Lba, BlockOffset, &WriteSize, Buffer);
     }
+
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     // Now continue writing either all the remaining bytes or single blocks.
     RemainingBytes -= WriteSize;
-    Buffer = (UINT8 *) Buffer + WriteSize;
+    Buffer          = (UINT8 *)Buffer + WriteSize;
     Lba++;
     BlockOffset = 0;
-    WriteSize = MIN (RemainingBytes, BlockSize);
+    WriteSize   = MIN (RemainingBytes, BlockSize);
   } while (RemainingBytes);
 
   return Status;
@@ -920,7 +938,7 @@ NorFlashDiskIoWriteDisk (
 
 EFI_STATUS
 NorFlashReset (
-  IN  NOR_FLASH_INSTANCE *Instance
+  IN  NOR_FLASH_INSTANCE  *Instance
   )
 {
   // As there is no specific RESET to perform, ensure that the devices is in the default Read Array mode
@@ -939,33 +957,33 @@ NorFlashReset (
 VOID
 EFIAPI
 NorFlashVirtualNotifyEvent (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
   for (Index = 0; Index < mNorFlashDeviceCount; Index++) {
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->DeviceBaseAddress);
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->RegionBaseAddress);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->DeviceBaseAddress);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->RegionBaseAddress);
 
     // Convert BlockIo protocol
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.FlushBlocks);
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.ReadBlocks);
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.Reset);
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->BlockIoProtocol.WriteBlocks);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->BlockIoProtocol.FlushBlocks);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->BlockIoProtocol.ReadBlocks);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->BlockIoProtocol.Reset);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->BlockIoProtocol.WriteBlocks);
 
     // Convert Fvb
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.EraseBlocks);
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.GetAttributes);
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.GetBlockSize);
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.GetPhysicalAddress);
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.Read);
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.SetAttributes);
-    EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->FvbProtocol.Write);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.EraseBlocks);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.GetAttributes);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.GetBlockSize);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.GetPhysicalAddress);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.Read);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.SetAttributes);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.Write);
 
     if (mNorFlashInstances[Index]->ShadowBuffer != NULL) {
-      EfiConvertPointer (0x0, (VOID**)&mNorFlashInstances[Index]->ShadowBuffer);
+      EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->ShadowBuffer);
     }
   }
 

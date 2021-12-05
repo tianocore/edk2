@@ -25,10 +25,8 @@ PrePeiGetHobList (
   VOID
   )
 {
-  return (VOID *)ArmReadTpidrurw();
+  return (VOID *)ArmReadTpidrurw ();
 }
-
-
 
 /**
   Updates the pointer to the HOB list.
@@ -39,10 +37,10 @@ PrePeiGetHobList (
 EFI_STATUS
 EFIAPI
 PrePeiSetHobList (
-  IN  VOID      *HobList
+  IN  VOID  *HobList
   )
 {
-  ArmWriteTpidrurw((UINTN)HobList);
+  ArmWriteTpidrurw ((UINTN)HobList);
 
   return EFI_SUCCESS;
 }

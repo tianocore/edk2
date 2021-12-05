@@ -21,9 +21,9 @@ NorFlashBlockIoReset (
   IN BOOLEAN                ExtendedVerification
   )
 {
-  NOR_FLASH_INSTANCE *Instance;
+  NOR_FLASH_INSTANCE  *Instance;
 
-  Instance = INSTANCE_FROM_BLKIO_THIS(This);
+  Instance = INSTANCE_FROM_BLKIO_THIS (This);
 
   DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoReset(MediaId=0x%x)\n", This->Media->MediaId));
 
@@ -36,11 +36,11 @@ NorFlashBlockIoReset (
 EFI_STATUS
 EFIAPI
 NorFlashBlockIoReadBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  UINT32                  MediaId,
-  IN  EFI_LBA                 Lba,
-  IN  UINTN                   BufferSizeInBytes,
-  OUT VOID                    *Buffer
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  UINT32                 MediaId,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  BufferSizeInBytes,
+  OUT VOID                   *Buffer
   )
 {
   NOR_FLASH_INSTANCE  *Instance;
@@ -51,8 +51,8 @@ NorFlashBlockIoReadBlocks (
     return EFI_INVALID_PARAMETER;
   }
 
-  Instance = INSTANCE_FROM_BLKIO_THIS(This);
-  Media = This->Media;
+  Instance = INSTANCE_FROM_BLKIO_THIS (This);
+  Media    = This->Media;
 
   DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoReadBlocks(MediaId=0x%x, Lba=%ld, BufferSize=0x%x bytes (%d kB), BufferPtr @ 0x%08x)\n", MediaId, Lba, BufferSizeInBytes, Buffer));
 
@@ -77,28 +77,28 @@ NorFlashBlockIoReadBlocks (
 EFI_STATUS
 EFIAPI
 NorFlashBlockIoWriteBlocks (
-  IN  EFI_BLOCK_IO_PROTOCOL   *This,
-  IN  UINT32                  MediaId,
-  IN  EFI_LBA                 Lba,
-  IN  UINTN                   BufferSizeInBytes,
-  IN  VOID                    *Buffer
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  UINT32                 MediaId,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  BufferSizeInBytes,
+  IN  VOID                   *Buffer
   )
 {
   NOR_FLASH_INSTANCE  *Instance;
   EFI_STATUS          Status;
 
-  Instance = INSTANCE_FROM_BLKIO_THIS(This);
+  Instance = INSTANCE_FROM_BLKIO_THIS (This);
 
   DEBUG ((DEBUG_BLKIO, "NorFlashBlockIoWriteBlocks(MediaId=0x%x, Lba=%ld, BufferSize=0x%x bytes (%d kB), BufferPtr @ 0x%08x)\n", MediaId, Lba, BufferSizeInBytes, Buffer));
 
-  if( !This->Media->MediaPresent ) {
+  if ( !This->Media->MediaPresent ) {
     Status = EFI_NO_MEDIA;
-  } else if( This->Media->MediaId != MediaId ) {
+  } else if ( This->Media->MediaId != MediaId ) {
     Status = EFI_MEDIA_CHANGED;
-  } else if( This->Media->ReadOnly ) {
+  } else if ( This->Media->ReadOnly ) {
     Status = EFI_WRITE_PROTECTED;
   } else {
-    Status = NorFlashWriteBlocks (Instance,Lba,BufferSizeInBytes,Buffer);
+    Status = NorFlashWriteBlocks (Instance, Lba, BufferSizeInBytes, Buffer);
   }
 
   return Status;

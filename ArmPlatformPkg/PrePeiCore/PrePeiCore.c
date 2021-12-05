@@ -14,13 +14,13 @@
 
 #include "PrePeiCore.h"
 
-CONST EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mTemporaryRamSupportPpi = { PrePeiCoreTemporaryRamSupport };
+CONST EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI  mTemporaryRamSupportPpi = { PrePeiCoreTemporaryRamSupport };
 
-CONST EFI_PEI_PPI_DESCRIPTOR      gCommonPpiTable[] = {
+CONST EFI_PEI_PPI_DESCRIPTOR  gCommonPpiTable[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiTemporaryRamSupportPpiGuid,
-    (VOID *) &mTemporaryRamSupportPpi
+    (VOID *)&mTemporaryRamSupportPpi
   }
 };
 
@@ -30,10 +30,10 @@ CreatePpiList (
   OUT EFI_PEI_PPI_DESCRIPTOR  **PpiList
   )
 {
-  EFI_PEI_PPI_DESCRIPTOR *PlatformPpiList;
+  EFI_PEI_PPI_DESCRIPTOR  *PlatformPpiList;
   UINTN                   PlatformPpiListSize;
   UINTN                   ListBase;
-  EFI_PEI_PPI_DESCRIPTOR *LastPpi;
+  EFI_PEI_PPI_DESCRIPTOR  *LastPpi;
 
   // Get the Platform PPIs
   PlatformPpiListSize = 0;
@@ -41,15 +41,15 @@ CreatePpiList (
 
   // Copy the Common and Platform PPis in Temporary Memory
   ListBase = PcdGet64 (PcdCPUCoresStackBase);
-  CopyMem ((VOID*)ListBase, gCommonPpiTable, sizeof(gCommonPpiTable));
-  CopyMem ((VOID*)(ListBase + sizeof(gCommonPpiTable)), PlatformPpiList, PlatformPpiListSize);
+  CopyMem ((VOID *)ListBase, gCommonPpiTable, sizeof (gCommonPpiTable));
+  CopyMem ((VOID *)(ListBase + sizeof (gCommonPpiTable)), PlatformPpiList, PlatformPpiListSize);
 
   // Set the Terminate flag on the last PPI entry
-  LastPpi = (EFI_PEI_PPI_DESCRIPTOR*)ListBase + ((sizeof(gCommonPpiTable) + PlatformPpiListSize) / sizeof(EFI_PEI_PPI_DESCRIPTOR)) - 1;
+  LastPpi         = (EFI_PEI_PPI_DESCRIPTOR *)ListBase + ((sizeof (gCommonPpiTable) + PlatformPpiListSize) / sizeof (EFI_PEI_PPI_DESCRIPTOR)) - 1;
   LastPpi->Flags |= EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
 
-  *PpiList     = (EFI_PEI_PPI_DESCRIPTOR*)ListBase;
-  *PpiListSize = sizeof(gCommonPpiTable) + PlatformPpiListSize;
+  *PpiList     = (EFI_PEI_PPI_DESCRIPTOR *)ListBase;
+  *PpiListSize = sizeof (gCommonPpiTable) + PlatformPpiListSize;
 }
 
 VOID
@@ -65,8 +65,10 @@ CEntryPoint (
   // Enable Instruction Caches on all cores.
   ArmEnableInstructionCache ();
 
-  InvalidateDataCacheRange ((VOID *)(UINTN)PcdGet64 (PcdCPUCoresStackBase),
-                            PcdGet32 (PcdCPUCorePrimaryStackSize));
+  InvalidateDataCacheRange (
+    (VOID *)(UINTN)PcdGet64 (PcdCPUCoresStackBase),
+    PcdGet32 (PcdCPUCorePrimaryStackSize)
+    );
 
   //
   // Note: Doesn't have to Enable CPU interface in non-secure world,
@@ -84,7 +86,7 @@ CEntryPoint (
     ArmEnableVFP ();
   }
 
-  //Note: The MMU will be enabled by MemoryPeim. Only the primary core will have the MMU on.
+  // Note: The MMU will be enabled by MemoryPeim. Only the primary core will have the MMU on.
 
   // If not primary Jump to Secondary Main
   if (ArmPlatformIsPrimaryCore (MpId)) {
@@ -108,25 +110,25 @@ CEntryPoint (
 EFI_STATUS
 EFIAPI
 PrePeiCoreTemporaryRamSupport (
-  IN CONST EFI_PEI_SERVICES   **PeiServices,
-  IN EFI_PHYSICAL_ADDRESS     TemporaryMemoryBase,
-  IN EFI_PHYSICAL_ADDRESS     PermanentMemoryBase,
-  IN UINTN                    CopySize
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
+  IN EFI_PHYSICAL_ADDRESS    TemporaryMemoryBase,
+  IN EFI_PHYSICAL_ADDRESS    PermanentMemoryBase,
+  IN UINTN                   CopySize
   )
 {
-  VOID                             *OldHeap;
-  VOID                             *NewHeap;
-  VOID                             *OldStack;
-  VOID                             *NewStack;
-  UINTN                            HeapSize;
+  VOID   *OldHeap;
+  VOID   *NewHeap;
+  VOID   *OldStack;
+  VOID   *NewStack;
+  UINTN  HeapSize;
 
   HeapSize = ALIGN_VALUE (CopySize / 2, CPU_STACK_ALIGNMENT);
 
-  OldHeap = (VOID*)(UINTN)TemporaryMemoryBase;
-  NewHeap = (VOID*)((UINTN)PermanentMemoryBase + (CopySize - HeapSize));
+  OldHeap = (VOID *)(UINTN)TemporaryMemoryBase;
+  NewHeap = (VOID *)((UINTN)PermanentMemoryBase + (CopySize - HeapSize));
 
-  OldStack = (VOID*)((UINTN)TemporaryMemoryBase + HeapSize);
-  NewStack = (VOID*)(UINTN)PermanentMemoryBase;
+  OldStack = (VOID *)((UINTN)TemporaryMemoryBase + HeapSize);
+  NewStack = (VOID *)(UINTN)PermanentMemoryBase;
 
   //
   // Migrate the temporary memory stack to permanent memory stack.

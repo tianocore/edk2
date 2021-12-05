@@ -21,8 +21,8 @@
 **/
 VOID
 ArmPlatformGetVirtualMemoryMap (
-  IN ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap
+  IN ARM_MEMORY_REGION_DESCRIPTOR  **VirtualMemoryMap
   )
 {
-  ASSERT(0);
+  ASSERT (0);
 }

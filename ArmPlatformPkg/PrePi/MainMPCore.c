@@ -14,52 +14,55 @@
 
 VOID
 PrimaryMain (
-  IN  UINTN                     UefiMemoryBase,
-  IN  UINTN                     StacksBase,
-  IN  UINT64                    StartTimeStamp
+  IN  UINTN   UefiMemoryBase,
+  IN  UINTN   StacksBase,
+  IN  UINT64  StartTimeStamp
   )
 {
   // Enable the GIC Distributor
-  ArmGicEnableDistributor(PcdGet64(PcdGicDistributorBase));
+  ArmGicEnableDistributor (PcdGet64 (PcdGicDistributorBase));
 
   // In some cases, the secondary cores are waiting for an SGI from the next stage boot loader to resume their initialization
-  if (!FixedPcdGet32(PcdSendSgiToBringUpSecondaryCores)) {
+  if (!FixedPcdGet32 (PcdSendSgiToBringUpSecondaryCores)) {
     // Sending SGI to all the Secondary CPU interfaces
-    ArmGicSendSgiTo (PcdGet64(PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
+    ArmGicSendSgiTo (PcdGet64 (PcdGicDistributorBase), ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE, 0x0E, PcdGet32 (PcdGicSgiIntId));
   }
 
   PrePiMain (UefiMemoryBase, StacksBase, StartTimeStamp);
 
   // We must never return
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 VOID
 SecondaryMain (
-  IN  UINTN                     MpId
+  IN  UINTN  MpId
   )
 {
-  EFI_STATUS              Status;
-  ARM_MP_CORE_INFO_PPI    *ArmMpCoreInfoPpi;
-  UINTN                   Index;
-  UINTN                   ArmCoreCount;
-  ARM_CORE_INFO           *ArmCoreInfoTable;
-  UINT32                  ClusterId;
-  UINT32                  CoreId;
-  VOID                    (*SecondaryStart)(VOID);
-  UINTN                   SecondaryEntryAddr;
-  UINTN                   AcknowledgeInterrupt;
-  UINTN                   InterruptId;
+  EFI_STATUS            Status;
+  ARM_MP_CORE_INFO_PPI  *ArmMpCoreInfoPpi;
+  UINTN                 Index;
+  UINTN                 ArmCoreCount;
+  ARM_CORE_INFO         *ArmCoreInfoTable;
+  UINT32                ClusterId;
+  UINT32                CoreId;
 
-  ClusterId = GET_CLUSTER_ID(MpId);
-  CoreId    = GET_CORE_ID(MpId);
+  VOID  (*SecondaryStart)(
+    VOID
+    );
+  UINTN  SecondaryEntryAddr;
+  UINTN  AcknowledgeInterrupt;
+  UINTN  InterruptId;
+
+  ClusterId = GET_CLUSTER_ID (MpId);
+  CoreId    = GET_CORE_ID (MpId);
 
   // On MP Core Platform we must implement the ARM MP Core Info PPI (gArmMpCoreInfoPpiGuid)
-  Status = GetPlatformPpi (&gArmMpCoreInfoPpiGuid, (VOID**)&ArmMpCoreInfoPpi);
+  Status = GetPlatformPpi (&gArmMpCoreInfoPpiGuid, (VOID **)&ArmMpCoreInfoPpi);
   ASSERT_EFI_ERROR (Status);
 
   ArmCoreCount = 0;
-  Status = ArmMpCoreInfoPpi->GetMpCoreInfo (&ArmCoreCount, &ArmCoreInfoTable);
+  Status       = ArmMpCoreInfoPpi->GetMpCoreInfo (&ArmCoreCount, &ArmCoreInfoTable);
   ASSERT_EFI_ERROR (Status);
 
   // Find the core in the ArmCoreTable
@@ -91,9 +94,9 @@ SecondaryMain (
   } while (SecondaryEntryAddr == 0);
 
   // Jump to secondary core entry point.
-  SecondaryStart = (VOID (*)())SecondaryEntryAddr;
-  SecondaryStart();
+  SecondaryStart = (VOID (*)()) SecondaryEntryAddr;
+  SecondaryStart ();
 
   // The secondaries shouldn't reach here
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }

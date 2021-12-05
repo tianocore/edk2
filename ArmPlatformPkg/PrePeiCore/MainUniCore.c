@@ -11,10 +11,10 @@
 VOID
 EFIAPI
 SecondaryMain (
-  IN UINTN MpId
+  IN UINTN  MpId
   )
 {
-  ASSERT(FALSE);
+  ASSERT (FALSE);
 }
 
 VOID
@@ -23,17 +23,17 @@ PrimaryMain (
   IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
   )
 {
-  EFI_SEC_PEI_HAND_OFF        SecCoreData;
-  UINTN                       PpiListSize;
-  EFI_PEI_PPI_DESCRIPTOR      *PpiList;
-  UINTN                       TemporaryRamBase;
-  UINTN                       TemporaryRamSize;
+  EFI_SEC_PEI_HAND_OFF    SecCoreData;
+  UINTN                   PpiListSize;
+  EFI_PEI_PPI_DESCRIPTOR  *PpiList;
+  UINTN                   TemporaryRamBase;
+  UINTN                   TemporaryRamSize;
 
   CreatePpiList (&PpiListSize, &PpiList);
 
   // Adjust the Temporary Ram as the new Ppi List (Common + Platform Ppi Lists) is created at
   // the base of the primary core stack
-  PpiListSize = ALIGN_VALUE(PpiListSize, CPU_STACK_ALIGNMENT);
+  PpiListSize      = ALIGN_VALUE (PpiListSize, CPU_STACK_ALIGNMENT);
   TemporaryRamBase = (UINTN)PcdGet64 (PcdCPUCoresStackBase) + PpiListSize;
   TemporaryRamSize = (UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize) - PpiListSize;
 
@@ -42,7 +42,7 @@ PrimaryMain (
   // Note: this must be in sync with the stuff in the asm file
   // Note also:  HOBs (pei temp ram) MUST be above stack
   //
-  SecCoreData.DataSize               = sizeof(EFI_SEC_PEI_HAND_OFF);
+  SecCoreData.DataSize               = sizeof (EFI_SEC_PEI_HAND_OFF);
   SecCoreData.BootFirmwareVolumeBase = (VOID *)(UINTN)PcdGet64 (PcdFvBaseAddress);
   SecCoreData.BootFirmwareVolumeSize = PcdGet32 (PcdFvSize);
   SecCoreData.TemporaryRamBase       = (VOID *)TemporaryRamBase; // We run on the primary core (and so we use the first stack)

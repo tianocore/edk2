@@ -35,15 +35,15 @@ SerialPortInitialize (
   UINT8               DataBits;
   EFI_STOP_BITS_TYPE  StopBits;
 
-  BaudRate = FixedPcdGet64 (PcdUartDefaultBaudRate);
+  BaudRate         = FixedPcdGet64 (PcdUartDefaultBaudRate);
   ReceiveFifoDepth = 0;         // Use default FIFO depth
-  Parity = (EFI_PARITY_TYPE)FixedPcdGet8 (PcdUartDefaultParity);
-  DataBits = FixedPcdGet8 (PcdUartDefaultDataBits);
-  StopBits = (EFI_STOP_BITS_TYPE) FixedPcdGet8 (PcdUartDefaultStopBits);
+  Parity           = (EFI_PARITY_TYPE)FixedPcdGet8 (PcdUartDefaultParity);
+  DataBits         = FixedPcdGet8 (PcdUartDefaultDataBits);
+  StopBits         = (EFI_STOP_BITS_TYPE)FixedPcdGet8 (PcdUartDefaultStopBits);
 
   return PL011UartInitializePort (
            (UINTN)PcdGet64 (PcdSerialRegisterBase),
-           PL011UartClockGetFreq(),
+           PL011UartClockGetFreq (),
            &BaudRate,
            &ReceiveFifoDepth,
            &Parity,
@@ -65,8 +65,8 @@ SerialPortInitialize (
 UINTN
 EFIAPI
 SerialPortWrite (
-  IN UINT8     *Buffer,
-  IN UINTN     NumberOfBytes
+  IN UINT8  *Buffer,
+  IN UINTN  NumberOfBytes
   )
 {
   return PL011UartWrite ((UINTN)PcdGet64 (PcdSerialRegisterBase), Buffer, NumberOfBytes);
@@ -85,9 +85,9 @@ SerialPortWrite (
 UINTN
 EFIAPI
 SerialPortRead (
-  OUT UINT8     *Buffer,
-  IN  UINTN     NumberOfBytes
-)
+  OUT UINT8  *Buffer,
+  IN  UINTN  NumberOfBytes
+  )
 {
   return PL011UartRead ((UINTN)PcdGet64 (PcdSerialRegisterBase), Buffer, NumberOfBytes);
 }
@@ -107,6 +107,7 @@ SerialPortPoll (
 {
   return PL011UartPoll ((UINTN)PcdGet64 (PcdSerialRegisterBase));
 }
+
 /**
   Set new attributes to PL011.
 
@@ -151,7 +152,7 @@ SerialPortSetAttributes (
 {
   return PL011UartInitializePort (
            (UINTN)PcdGet64 (PcdSerialRegisterBase),
-           PL011UartClockGetFreq(),
+           PL011UartClockGetFreq (),
            BaudRate,
            ReceiveFifoDepth,
            Parity,

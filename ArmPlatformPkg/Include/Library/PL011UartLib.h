@@ -127,7 +127,7 @@ PL011UartSetControl (
 RETURN_STATUS
 EFIAPI
 PL011UartGetControl (
-  IN UINTN     UartBase,
+  IN UINTN    UartBase,
   OUT UINT32  *Control
   );
 
@@ -144,9 +144,9 @@ PL011UartGetControl (
 UINTN
 EFIAPI
 PL011UartWrite (
-  IN  UINTN       UartBase,
-  IN  UINT8       *Buffer,
-  IN  UINTN       NumberOfBytes
+  IN  UINTN  UartBase,
+  IN  UINT8  *Buffer,
+  IN  UINTN  NumberOfBytes
   );
 
 /**
@@ -162,9 +162,9 @@ PL011UartWrite (
 UINTN
 EFIAPI
 PL011UartRead (
-  IN  UINTN       UartBase,
-  OUT UINT8       *Buffer,
-  IN  UINTN       NumberOfBytes
+  IN  UINTN  UartBase,
+  OUT UINT8  *Buffer,
+  IN  UINTN  NumberOfBytes
   );
 
 /**
@@ -177,7 +177,7 @@ PL011UartRead (
 BOOLEAN
 EFIAPI
 PL011UartPoll (
-  IN  UINTN       UartBase
+  IN  UINTN  UartBase
   );
 
 #endif
