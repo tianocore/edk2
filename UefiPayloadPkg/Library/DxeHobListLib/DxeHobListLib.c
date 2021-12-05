@@ -7,7 +7,6 @@
 
 **/
 
-
 #include <Uefi.h>
 
 VOID  *gHobList = NULL;
@@ -33,10 +32,10 @@ LocalCompareGuid (
   UINT64  *Left;
   UINT64  *Right;
 
-  Left  = (UINT64 *) Guid1;
-  Right = (UINT64 *) Guid2;
+  Left  = (UINT64 *)Guid1;
+  Right = (UINT64 *)Guid2;
 
-  return (BOOLEAN) (Left[0] == Right[0] && Left[1] == Right[1]);
+  return (BOOLEAN)(Left[0] == Right[0] && Left[1] == Right[1]);
 }
 
 /**
@@ -53,7 +52,7 @@ DxeHobListLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINTN             Index;
+  UINTN  Index;
 
   for (Index = 0; Index < SystemTable->NumberOfTableEntries; Index++) {
     if (LocalCompareGuid (&gEfiHobListGuid, &SystemTable->ConfigurationTable[Index].VendorGuid)) {
