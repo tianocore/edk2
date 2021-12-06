@@ -264,6 +264,10 @@ BSD-2-Clause-Patent.
 Run the Ecc tool on the package. The Ecc tool is available in the BaseTools
 package. It checks that the code complies to the EDKII coding standard.
 
+### Coding Standard Compliance - UncrustifyCheck
+
+Runs the Uncrustify application to check for coding standard compliance issues.
+
 ## PyTool Scopes
 
 Scopes are how the PyTool ext_dep, path_env, and plugins are activated.  Meaning

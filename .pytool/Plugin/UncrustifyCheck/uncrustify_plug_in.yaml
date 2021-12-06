@@ -1,0 +1,11 @@
+## @file
+# CiBuildPlugin used to check coding standard compliance of EDK II style C source code
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "cibuild",
+  "name": "Uncrustify Coding Standard Test",
+  "module": "UncrustifyCheck"
+}
