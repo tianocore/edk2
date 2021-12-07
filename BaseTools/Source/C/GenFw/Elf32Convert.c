@@ -779,6 +779,7 @@ WriteSections32 (
             *(UINT32 *)Targ = *(UINT32 *)Targ - SymShdr->sh_addr
               + mCoffSectionsOffset[Sym->st_shndx];
             break;
+          case R_386_PLT32:
           case R_386_PC32:
             //
             // Relative relocation: Symbol - Ip + Addend
@@ -900,6 +901,7 @@ WriteRelocations32 (
           if (mEhdr->e_machine == EM_386) {
             switch (ELF_R_TYPE(Rel->r_info)) {
             case R_386_NONE:
+            case R_386_PLT32:
             case R_386_PC32:
               //
               // No fixup entry required.
@@ -1168,5 +1170,3 @@ CleanUp32 (
     free (mCoffSectionsOffset);
   }
 }
-
-
