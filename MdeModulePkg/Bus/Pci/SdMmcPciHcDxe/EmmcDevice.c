@@ -11,7 +11,7 @@
 
 /**
   Send command GO_IDLE_STATE (CMD0 with argument of 0x00000000) to the device to
-  make it go to Idle State.
+  make it go to Idle State -S0.
 
   Refer to EMMC Electrical Standard Spec 5.1 Section 6.4 for details.
 
