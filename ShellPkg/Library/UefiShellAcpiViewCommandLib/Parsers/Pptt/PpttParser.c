@@ -17,10 +17,98 @@
 #include "PpttParser.h"
 
 // Local variables
-STATIC CONST UINT8                   *ProcessorTopologyStructureType;
-STATIC CONST UINT8                   *ProcessorTopologyStructureLength;
-STATIC CONST UINT32                  *NumberOfPrivateResources;
-STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
+STATIC CONST UINT8                                    *ProcessorTopologyStructureType;
+STATIC CONST UINT8                                    *ProcessorTopologyStructureLength;
+STATIC CONST UINT32                                   *NumberOfPrivateResources;
+STATIC CONST EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE_FLAGS  *CacheFlags;
+STATIC ACPI_DESCRIPTION_HEADER_INFO                   AcpiHdrInfo;
+
+#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+
+/**
+  Increment the error count and print an error that a required flag is missing.
+
+  @param [in] FlagName  Name of the missing flag.
+**/
+STATIC
+VOID
+EFIAPI
+LogCacheFlagError (
+  IN CONST CHAR16  *FlagName
+  )
+{
+  IncrementErrorCount ();
+  Print (
+    L"\nERROR: On Arm based systems, all cache properties must be"
+    L"provided in the cache type structure."
+    L"Missing '%s' flag.",
+    *FlagName
+    );
+}
+
+#endif
+
+/**
+  This function validates the Cache Type Structure (Type 1) Cache Flags field.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
+STATIC
+VOID
+EFIAPI
+ValidateCacheFlags (
+  IN UINT8  *Ptr,
+  IN VOID   *Context
+  )
+{
+ #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+  CacheFlags = (EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE_FLAGS *)Ptr;
+
+  if (CacheFlags == NULL) {
+    IncrementErrorCount ();
+    Print (L"\nERROR: Cache Structure Flags were not successfully read.");
+    return;
+  }
+
+  if (CacheFlags->SizePropertyValid == EFI_ACPI_6_4_PPTT_CACHE_SIZE_INVALID) {
+    LogCacheFlagError (L"Size Property Valid");
+  }
+
+  if (CacheFlags->NumberOfSetsValid == EFI_ACPI_6_4_PPTT_NUMBER_OF_SETS_INVALID) {
+    LogCacheFlagError (L"Number Of Sets Valid");
+  }
+
+  if (CacheFlags->AssociativityValid == EFI_ACPI_6_4_PPTT_ASSOCIATIVITY_INVALID) {
+    LogCacheFlagError (L"Associativity Valid");
+  }
+
+  if (CacheFlags->AllocationTypeValid == EFI_ACPI_6_4_PPTT_ALLOCATION_TYPE_INVALID) {
+    LogCacheFlagError (L"Allocation Type Valid");
+  }
+
+  if (CacheFlags->CacheTypeValid == EFI_ACPI_6_4_PPTT_CACHE_TYPE_INVALID) {
+    LogCacheFlagError (L"Cache Type Valid");
+  }
+
+  if (CacheFlags->WritePolicyValid == EFI_ACPI_6_4_PPTT_WRITE_POLICY_INVALID) {
+    LogCacheFlagError (L"Write Policy Valid");
+  }
+
+  if (CacheFlags->LineSizeValid == EFI_ACPI_6_4_PPTT_LINE_SIZE_INVALID) {
+    LogCacheFlagError (L"Line Size Valid");
+  }
+
+  // Cache ID was only introduced in revision 3
+  if (*(AcpiHdrInfo.Revision) >= 3) {
+    if (CacheFlags->CacheIdValid == EFI_ACPI_6_4_PPTT_CACHE_ID_INVALID) {
+      LogCacheFlagError (L"Cache Id Valid");
+    }
+  }
+
+ #endif
+}
 
 /**
   This function validates the Cache Type Structure (Type 1) 'Number of sets'
@@ -146,6 +234,45 @@ ValidateCacheLineSize (
 }
 
 /**
+  This function validates the Cache Type Structure (Type 1) Cache ID field.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
+STATIC
+VOID
+EFIAPI
+ValidateCacheId (
+  IN UINT8  *Ptr,
+  IN VOID   *Context
+  )
+{
+  UINT32  CacheId;
+
+  CacheId = *(UINT32 *)Ptr;
+
+  // Cache ID was only introduced in revision 3
+  if (*(AcpiHdrInfo.Revision) < 3) {
+    return;
+  }
+
+  if (CacheFlags == NULL) {
+    IncrementErrorCount ();
+    Print (L"\nERROR: Cache Structure Flags were not successfully read.");
+    return;
+  }
+
+  if (CacheFlags->CacheIdValid == EFI_ACPI_6_4_PPTT_CACHE_ID_VALID) {
+    if (CacheId == 0) {
+      IncrementErrorCount ();
+      Print (L"\nERROR: 0 is not a valid Cache ID.");
+      return;
+    }
+  }
+}
+
+/**
   This function validates the Cache Type Structure (Type 1) Attributes field.
 
   @param [in] Ptr     Pointer to the start of the field data.
@@ -214,17 +341,19 @@ STATIC CONST ACPI_PARSER  ProcessorHierarchyNodeStructureParser[] = {
   An ACPI_PARSER array describing the Cache Type Structure - Type 1.
 **/
 STATIC CONST ACPI_PARSER  CacheTypeStructureParser[] = {
-  { L"Type",                1, 0,  L"0x%x", NULL, NULL, NULL,                       NULL },
-  { L"Length",              1, 1,  L"%d",   NULL, NULL, NULL,                       NULL },
-  { L"Reserved",            2, 2,  L"0x%x", NULL, NULL, NULL,                       NULL },
+  { L"Type",                1, 0,  L"0x%x", NULL, NULL,                 NULL,                       NULL },
+  { L"Length",              1, 1,  L"%d",   NULL, NULL,                 NULL,                       NULL },
+  { L"Reserved",            2, 2,  L"0x%x", NULL, NULL,                 NULL,                       NULL },
 
-  { L"Flags",               4, 4,  L"0x%x", NULL, NULL, NULL,                       NULL },
-  { L"Next Level of Cache", 4, 8,  L"0x%x", NULL, NULL, NULL,                       NULL },
-  { L"Size",                4, 12, L"0x%x", NULL, NULL, NULL,                       NULL },
-  { L"Number of sets",      4, 16, L"%d",   NULL, NULL, ValidateCacheNumberOfSets,  NULL },
-  { L"Associativity",       1, 20, L"%d",   NULL, NULL, ValidateCacheAssociativity, NULL },
-  { L"Attributes",          1, 21, L"0x%x", NULL, NULL, ValidateCacheAttributes,    NULL },
-  { L"Line size",           2, 22, L"%d",   NULL, NULL, ValidateCacheLineSize,      NULL }
+  { L"Flags",               4, 4,  L"0x%x", NULL, (VOID **)&CacheFlags, ValidateCacheFlags,
+    NULL },
+  { L"Next Level of Cache", 4, 8,  L"0x%x", NULL, NULL,                 NULL,                       NULL },
+  { L"Size",                4, 12, L"0x%x", NULL, NULL,                 NULL,                       NULL },
+  { L"Number of sets",      4, 16, L"%d",   NULL, NULL,                 ValidateCacheNumberOfSets,  NULL },
+  { L"Associativity",       1, 20, L"%d",   NULL, NULL,                 ValidateCacheAssociativity, NULL },
+  { L"Attributes",          1, 21, L"0x%x", NULL, NULL,                 ValidateCacheAttributes,    NULL },
+  { L"Line size",           2, 22, L"%d",   NULL, NULL,                 ValidateCacheLineSize,      NULL },
+  { L"Cache ID",            4, 24, L"%d",   NULL, NULL,                 ValidateCacheId,            NULL }
 };
 
 /**
