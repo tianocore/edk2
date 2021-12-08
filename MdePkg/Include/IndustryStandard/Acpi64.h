@@ -2613,7 +2613,6 @@ typedef struct {
 ///
 #define EFI_ACPI_6_4_PPTT_TYPE_PROCESSOR  0x00
 #define EFI_ACPI_6_4_PPTT_TYPE_CACHE      0x01
-#define EFI_ACPI_6_4_PPTT_TYPE_ID         0x02
 
 ///
 /// PPTT Structure Header
@@ -2736,21 +2735,6 @@ typedef struct {
   UINT16                                          LineSize;
   UINT32                                          CacheId;
 } EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE;
-
-///
-/// ID structure
-///
-typedef struct {
-  UINT8     Type;
-  UINT8     Length;
-  UINT8     Reserved[2];
-  UINT32    VendorId;
-  UINT64    Level1Id;
-  UINT64    Level2Id;
-  UINT16    MajorRev;
-  UINT16    MinorRev;
-  UINT16    SpinRev;
-} EFI_ACPI_6_4_PPTT_STRUCTURE_ID;
 
 ///
 /// Platform Health Assessment Table (PHAT) Format
