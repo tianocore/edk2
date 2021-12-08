@@ -23,7 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define LZMAF86_CUSTOM_DECOMPRESS_GUID  \
   { 0xD42AE6BD, 0x1352, 0x4bfb, { 0x90, 0x9A, 0xCA, 0x72, 0xA6, 0xEA, 0xE8, 0x89 } }
 
-extern GUID gLzmaCustomDecompressGuid;
-extern GUID gLzmaF86CustomDecompressGuid;
+extern GUID  gLzmaCustomDecompressGuid;
+extern GUID  gLzmaF86CustomDecompressGuid;
 
 #endif

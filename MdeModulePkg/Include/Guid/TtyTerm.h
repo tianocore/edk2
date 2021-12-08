@@ -27,10 +27,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EDKII_SCO_TERM_GUID     \
     {0xfc7dd6e0, 0x813c, 0x434d, {0xb4, 0xda, 0x3b, 0xd6, 0x49, 0xe9, 0xe1, 0x5a } }
 
-extern EFI_GUID gEfiTtyTermGuid;
-extern EFI_GUID gEdkiiLinuxTermGuid;
-extern EFI_GUID gEdkiiXtermR6Guid;
-extern EFI_GUID gEdkiiVT400Guid;
-extern EFI_GUID gEdkiiSCOTermGuid;
+extern EFI_GUID  gEfiTtyTermGuid;
+extern EFI_GUID  gEdkiiLinuxTermGuid;
+extern EFI_GUID  gEdkiiXtermR6Guid;
+extern EFI_GUID  gEdkiiVT400Guid;
+extern EFI_GUID  gEdkiiSCOTermGuid;
 
 #endif

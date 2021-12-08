@@ -12,7 +12,7 @@
 #include <Library/IniParsingLib.h>
 #include <Library/PrintLib.h>
 
-#define MAX_LINE_LENGTH           512
+#define MAX_LINE_LENGTH  512
 
 /**
   Parse Config data file to get the updated data array.
@@ -29,24 +29,24 @@
 **/
 EFI_STATUS
 ParseRecoveryDataFile (
-  IN      UINT8                         *DataBuffer,
-  IN      UINTN                         BufferSize,
-  IN OUT  CONFIG_HEADER                 *ConfigHeader,
-  IN OUT  RECOVERY_CONFIG_DATA          **RecoveryArray
+  IN      UINT8                 *DataBuffer,
+  IN      UINTN                 BufferSize,
+  IN OUT  CONFIG_HEADER         *ConfigHeader,
+  IN OUT  RECOVERY_CONFIG_DATA  **RecoveryArray
   )
 {
-  EFI_STATUS                            Status;
-  CHAR8                                 *SectionName;
-  CHAR8                                 Entry[MAX_LINE_LENGTH];
-  UINTN                                 Num;
-  UINTN                                 Index;
-  EFI_GUID                              FileGuid;
-  VOID                                  *Context;
+  EFI_STATUS  Status;
+  CHAR8       *SectionName;
+  CHAR8       Entry[MAX_LINE_LENGTH];
+  UINTN       Num;
+  UINTN       Index;
+  EFI_GUID    FileGuid;
+  VOID        *Context;
 
   //
   // First process the data buffer and get all sections and entries
   //
-  Context = OpenIniFile(DataBuffer, BufferSize);
+  Context = OpenIniFile (DataBuffer, BufferSize);
   if (Context == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -54,26 +54,26 @@ ParseRecoveryDataFile (
   //
   // Now get NumOfUpdate
   //
-  Status = GetDecimalUintnFromDataFile(
+  Status = GetDecimalUintnFromDataFile (
              Context,
              "Head",
              "NumOfRecovery",
              &Num
              );
-  if (EFI_ERROR(Status) || (Num == 0)) {
-    DEBUG((DEBUG_ERROR, "NumOfRecovery not found\n"));
-    CloseIniFile(Context);
+  if (EFI_ERROR (Status) || (Num == 0)) {
+    DEBUG ((DEBUG_ERROR, "NumOfRecovery not found\n"));
+    CloseIniFile (Context);
     return EFI_NOT_FOUND;
   }
 
   ConfigHeader->NumOfRecovery = Num;
-  *RecoveryArray = AllocateZeroPool ((sizeof (RECOVERY_CONFIG_DATA) * Num));
+  *RecoveryArray              = AllocateZeroPool ((sizeof (RECOVERY_CONFIG_DATA) * Num));
   if (*RecoveryArray == NULL) {
-    CloseIniFile(Context);
+    CloseIniFile (Context);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  for (Index = 0 ; Index < ConfigHeader->NumOfRecovery; Index++) {
+  for (Index = 0; Index < ConfigHeader->NumOfRecovery; Index++) {
     //
     // Get the section name of each update
     //
@@ -85,15 +85,15 @@ ParseRecoveryDataFile (
       Index,
       0
       );
-    Status = GetStringFromDataFile(
+    Status = GetStringFromDataFile (
                Context,
                "Head",
                Entry,
                &SectionName
                );
-    if (EFI_ERROR(Status) || (SectionName == NULL)) {
-      DEBUG((DEBUG_ERROR, "[%d] %a not found\n", Index, Entry));
-      CloseIniFile(Context);
+    if (EFI_ERROR (Status) || (SectionName == NULL)) {
+      DEBUG ((DEBUG_ERROR, "[%d] %a not found\n", Index, Entry));
+      CloseIniFile (Context);
       return EFI_NOT_FOUND;
     }
 
@@ -105,58 +105,59 @@ ParseRecoveryDataFile (
     //
     // FileGuid
     //
-    Status = GetGuidFromDataFile(
+    Status = GetGuidFromDataFile (
                Context,
                SectionName,
                "FileGuid",
                &FileGuid
                );
-    if (EFI_ERROR(Status)) {
-      CloseIniFile(Context);
-      DEBUG((DEBUG_ERROR, "[%d] FileGuid not found\n", Index));
+    if (EFI_ERROR (Status)) {
+      CloseIniFile (Context);
+      DEBUG ((DEBUG_ERROR, "[%d] FileGuid not found\n", Index));
       return EFI_NOT_FOUND;
     }
 
-    CopyGuid(&((*RecoveryArray)[Index].FileGuid), &FileGuid);
+    CopyGuid (&((*RecoveryArray)[Index].FileGuid), &FileGuid);
 
     //
     // Length
     //
-    Status = GetHexUintnFromDataFile(
+    Status = GetHexUintnFromDataFile (
                Context,
                SectionName,
                "Length",
                &Num
                );
-    if (EFI_ERROR(Status)) {
-      CloseIniFile(Context);
-      DEBUG((DEBUG_ERROR, "[%d] Length not found\n", Index));
+    if (EFI_ERROR (Status)) {
+      CloseIniFile (Context);
+      DEBUG ((DEBUG_ERROR, "[%d] Length not found\n", Index));
       return EFI_NOT_FOUND;
     }
+
     (*RecoveryArray)[Index].Length = Num;
 
     //
     // ImageOffset
     //
-    Status = GetHexUintnFromDataFile(
+    Status = GetHexUintnFromDataFile (
                Context,
                SectionName,
                "ImageOffset",
                &Num
                );
-    if (EFI_ERROR(Status)) {
-      CloseIniFile(Context);
-      DEBUG((DEBUG_ERROR, "[%d] ImageOffset not found\n", Index));
+    if (EFI_ERROR (Status)) {
+      CloseIniFile (Context);
+      DEBUG ((DEBUG_ERROR, "[%d] ImageOffset not found\n", Index));
       return EFI_NOT_FOUND;
     }
+
     (*RecoveryArray)[Index].ImageOffset = Num;
   }
 
   //
   // Now all configuration data got. Free those temporary buffers
   //
-  CloseIniFile(Context);
+  CloseIniFile (Context);
 
   return EFI_SUCCESS;
 }
-

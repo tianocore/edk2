@@ -19,11 +19,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "HashLibBaseCryptoRouterCommon.h"
 
-HASH_INTERFACE   mHashInterface[HASH_COUNT] = {{{0}, NULL, NULL, NULL}};
-UINTN            mHashInterfaceCount = 0;
+HASH_INTERFACE  mHashInterface[HASH_COUNT] = {
+  {
+    { 0 }, NULL, NULL, NULL
+  }
+};
+UINTN           mHashInterfaceCount = 0;
 
-UINT32           mSupportedHashMaskLast = 0;
-UINT32           mSupportedHashMaskCurrent = 0;
+UINT32  mSupportedHashMaskLast    = 0;
+UINT32  mSupportedHashMaskCurrent = 0;
 
 /**
   Check mismatch of supported HashMask between modules
@@ -57,7 +61,7 @@ CheckSupportedHashMaskMismatch (
 EFI_STATUS
 EFIAPI
 HashStart (
-  OUT HASH_HANDLE    *HashHandle
+  OUT HASH_HANDLE  *HashHandle
   )
 {
   HASH_HANDLE  *HashCtx;
@@ -70,7 +74,7 @@ HashStart (
 
   CheckSupportedHashMaskMismatch ();
 
-  HashCtx = AllocatePool (sizeof(*HashCtx) * mHashInterfaceCount);
+  HashCtx = AllocatePool (sizeof (*HashCtx) * mHashInterfaceCount);
   ASSERT (HashCtx != NULL);
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
@@ -97,9 +101,9 @@ HashStart (
 EFI_STATUS
 EFIAPI
 HashUpdate (
-  IN HASH_HANDLE    HashHandle,
-  IN VOID           *DataToHash,
-  IN UINTN          DataToHashLen
+  IN HASH_HANDLE  HashHandle,
+  IN VOID         *DataToHash,
+  IN UINTN        DataToHashLen
   )
 {
   HASH_HANDLE  *HashCtx;
@@ -138,18 +142,18 @@ HashUpdate (
 EFI_STATUS
 EFIAPI
 HashCompleteAndExtend (
-  IN HASH_HANDLE         HashHandle,
-  IN TPMI_DH_PCR         PcrIndex,
-  IN VOID                *DataToHash,
-  IN UINTN               DataToHashLen,
-  OUT TPML_DIGEST_VALUES *DigestList
+  IN HASH_HANDLE          HashHandle,
+  IN TPMI_DH_PCR          PcrIndex,
+  IN VOID                 *DataToHash,
+  IN UINTN                DataToHashLen,
+  OUT TPML_DIGEST_VALUES  *DigestList
   )
 {
-  TPML_DIGEST_VALUES Digest;
-  HASH_HANDLE        *HashCtx;
-  UINTN              Index;
-  EFI_STATUS         Status;
-  UINT32             HashMask;
+  TPML_DIGEST_VALUES  Digest;
+  HASH_HANDLE         *HashCtx;
+  UINTN               Index;
+  EFI_STATUS          Status;
+  UINT32              HashMask;
 
   if (mHashInterfaceCount == 0) {
     return EFI_UNSUPPORTED;
@@ -158,7 +162,7 @@ HashCompleteAndExtend (
   CheckSupportedHashMaskMismatch ();
 
   HashCtx = (HASH_HANDLE *)HashHandle;
-  ZeroMem (DigestList, sizeof(*DigestList));
+  ZeroMem (DigestList, sizeof (*DigestList));
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
     HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
@@ -191,14 +195,14 @@ HashCompleteAndExtend (
 EFI_STATUS
 EFIAPI
 HashAndExtend (
-  IN TPMI_DH_PCR                    PcrIndex,
-  IN VOID                           *DataToHash,
-  IN UINTN                          DataToHashLen,
-  OUT TPML_DIGEST_VALUES            *DigestList
+  IN TPMI_DH_PCR          PcrIndex,
+  IN VOID                 *DataToHash,
+  IN UINTN                DataToHashLen,
+  OUT TPML_DIGEST_VALUES  *DigestList
   )
 {
-  HASH_HANDLE    HashHandle;
-  EFI_STATUS     Status;
+  HASH_HANDLE  HashHandle;
+  EFI_STATUS   Status;
 
   if (mHashInterfaceCount == 0) {
     return EFI_UNSUPPORTED;
@@ -225,12 +229,12 @@ HashAndExtend (
 EFI_STATUS
 EFIAPI
 RegisterHashInterfaceLib (
-  IN HASH_INTERFACE   *HashInterface
+  IN HASH_INTERFACE  *HashInterface
   )
 {
-  UINTN              Index;
-  UINT32             HashMask;
-  EFI_STATUS         Status;
+  UINTN       Index;
+  UINT32      HashMask;
+  EFI_STATUS  Status;
 
   //
   // Check allow
@@ -240,7 +244,7 @@ RegisterHashInterfaceLib (
     return EFI_UNSUPPORTED;
   }
 
-  if (mHashInterfaceCount >= sizeof(mHashInterface)/sizeof(mHashInterface[0])) {
+  if (mHashInterfaceCount >= sizeof (mHashInterface)/sizeof (mHashInterface[0])) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -258,11 +262,11 @@ RegisterHashInterfaceLib (
   // Record hash algorithm bitmap of CURRENT module which consumes HashLib.
   //
   mSupportedHashMaskCurrent = PcdGet32 (PcdTcg2HashAlgorithmBitmap) | HashMask;
-  Status = PcdSet32S (PcdTcg2HashAlgorithmBitmap, mSupportedHashMaskCurrent);
+  Status                    = PcdSet32S (PcdTcg2HashAlgorithmBitmap, mSupportedHashMaskCurrent);
   ASSERT_EFI_ERROR (Status);
 
-  CopyMem (&mHashInterface[mHashInterfaceCount], HashInterface, sizeof(*HashInterface));
-  mHashInterfaceCount ++;
+  CopyMem (&mHashInterface[mHashInterfaceCount], HashInterface, sizeof (*HashInterface));
+  mHashInterfaceCount++;
 
   return EFI_SUCCESS;
 }
@@ -283,7 +287,7 @@ HashLibBaseCryptoRouterDxeConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   //
   // Record hash algorithm bitmap of LAST module which also consumes HashLib.

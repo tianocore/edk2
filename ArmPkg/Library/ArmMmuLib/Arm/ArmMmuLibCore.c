@@ -17,19 +17,19 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 
-#define ID_MMFR0_SHARELVL_SHIFT       12
-#define ID_MMFR0_SHARELVL_MASK       0xf
-#define ID_MMFR0_SHARELVL_ONE          0
-#define ID_MMFR0_SHARELVL_TWO          1
+#define ID_MMFR0_SHARELVL_SHIFT  12
+#define ID_MMFR0_SHARELVL_MASK   0xf
+#define ID_MMFR0_SHARELVL_ONE    0
+#define ID_MMFR0_SHARELVL_TWO    1
 
-#define ID_MMFR0_INNERSHR_SHIFT       28
-#define ID_MMFR0_INNERSHR_MASK       0xf
-#define ID_MMFR0_OUTERSHR_SHIFT        8
-#define ID_MMFR0_OUTERSHR_MASK       0xf
+#define ID_MMFR0_INNERSHR_SHIFT  28
+#define ID_MMFR0_INNERSHR_MASK   0xf
+#define ID_MMFR0_OUTERSHR_SHIFT  8
+#define ID_MMFR0_OUTERSHR_MASK   0xf
 
-#define ID_MMFR0_SHR_IMP_UNCACHED      0
-#define ID_MMFR0_SHR_IMP_HW_COHERENT   1
-#define ID_MMFR0_SHR_IGNORED         0xf
+#define ID_MMFR0_SHR_IMP_UNCACHED     0
+#define ID_MMFR0_SHR_IMP_HW_COHERENT  1
+#define ID_MMFR0_SHR_IGNORED          0xf
 
 UINTN
 EFIAPI
@@ -49,8 +49,8 @@ PreferNonshareableMemory (
   VOID
   )
 {
-  UINTN   Mmfr;
-  UINTN   Val;
+  UINTN  Mmfr;
+  UINTN  Val;
 
   if (FeaturePcdGet (PcdNormalMemoryNonshareableOverride)) {
     return TRUE;
@@ -63,32 +63,33 @@ PreferNonshareableMemory (
   //
   Mmfr = ArmReadIdMmfr0 ();
   switch ((Mmfr >> ID_MMFR0_SHARELVL_SHIFT) & ID_MMFR0_SHARELVL_MASK) {
-  case ID_MMFR0_SHARELVL_ONE:
-    // one level of shareability
-    Val = (Mmfr >> ID_MMFR0_OUTERSHR_SHIFT) & ID_MMFR0_OUTERSHR_MASK;
-    break;
-  case ID_MMFR0_SHARELVL_TWO:
-    // two levels of shareability
-    Val = (Mmfr >> ID_MMFR0_INNERSHR_SHIFT) & ID_MMFR0_INNERSHR_MASK;
-    break;
-  default:
-    // unexpected value -> shareable is the safe option
-    ASSERT (FALSE);
-    return FALSE;
+    case ID_MMFR0_SHARELVL_ONE:
+      // one level of shareability
+      Val = (Mmfr >> ID_MMFR0_OUTERSHR_SHIFT) & ID_MMFR0_OUTERSHR_MASK;
+      break;
+    case ID_MMFR0_SHARELVL_TWO:
+      // two levels of shareability
+      Val = (Mmfr >> ID_MMFR0_INNERSHR_SHIFT) & ID_MMFR0_INNERSHR_MASK;
+      break;
+    default:
+      // unexpected value -> shareable is the safe option
+      ASSERT (FALSE);
+      return FALSE;
   }
+
   return Val != ID_MMFR0_SHR_IMP_HW_COHERENT;
 }
 
 STATIC
 VOID
 PopulateLevel2PageTable (
-  IN UINT32                         *SectionEntry,
-  IN UINT32                         PhysicalBase,
-  IN UINT32                         RemainLength,
-  IN ARM_MEMORY_REGION_ATTRIBUTES   Attributes
+  IN UINT32                        *SectionEntry,
+  IN UINT32                        PhysicalBase,
+  IN UINT32                        RemainLength,
+  IN ARM_MEMORY_REGION_ATTRIBUTES  Attributes
   )
 {
-  UINT32* PageEntry;
+  UINT32  *PageEntry;
   UINT32  Pages;
   UINT32  Index;
   UINT32  PageAttributes;
@@ -104,7 +105,7 @@ PopulateLevel2PageTable (
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE:
     case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK_NONSHAREABLE:
-      PageAttributes = TT_DESCRIPTOR_PAGE_WRITE_BACK;
+      PageAttributes  = TT_DESCRIPTOR_PAGE_WRITE_BACK;
       PageAttributes &= ~TT_DESCRIPTOR_PAGE_S_SHARED;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
@@ -132,7 +133,7 @@ PopulateLevel2PageTable (
   // Level 2 Translation Table to it
   if (*SectionEntry != 0) {
     // The entry must be a page table. Otherwise it exists an overlapping in the memory map
-    if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE(*SectionEntry)) {
+    if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE (*SectionEntry)) {
       TranslationTable = *SectionEntry & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK;
     } else if ((*SectionEntry & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SECTION) {
       // Case where a virtual memory map descriptor overlapped a section entry
@@ -140,60 +141,66 @@ PopulateLevel2PageTable (
       // Allocate a Level2 Page Table for this Section
       TranslationTable = (UINTN)AllocateAlignedPages (
                                   EFI_SIZE_TO_PAGES (TRANSLATION_TABLE_PAGE_SIZE),
-                                  TRANSLATION_TABLE_PAGE_ALIGNMENT);
+                                  TRANSLATION_TABLE_PAGE_ALIGNMENT
+                                  );
 
       // Translate the Section Descriptor into Page Descriptor
       SectionDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (*SectionEntry, FALSE);
 
-      BaseSectionAddress = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(*SectionEntry);
+      BaseSectionAddress = TT_DESCRIPTOR_SECTION_BASE_ADDRESS (*SectionEntry);
 
       //
       // Make sure we are not inadvertently hitting in the caches
       // when populating the page tables
       //
-      InvalidateDataCacheRange ((VOID *)TranslationTable,
-        TRANSLATION_TABLE_PAGE_SIZE);
+      InvalidateDataCacheRange (
+        (VOID *)TranslationTable,
+        TRANSLATION_TABLE_PAGE_SIZE
+        );
 
       // Populate the new Level2 Page Table for the section
-      PageEntry = (UINT32*)TranslationTable;
+      PageEntry = (UINT32 *)TranslationTable;
       for (Index = 0; Index < TRANSLATION_TABLE_PAGE_COUNT; Index++) {
-        PageEntry[Index] = TT_DESCRIPTOR_PAGE_BASE_ADDRESS(BaseSectionAddress + (Index << 12)) | SectionDescriptor;
+        PageEntry[Index] = TT_DESCRIPTOR_PAGE_BASE_ADDRESS (BaseSectionAddress + (Index << 12)) | SectionDescriptor;
       }
 
       // Overwrite the section entry to point to the new Level2 Translation Table
       *SectionEntry = (TranslationTable & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) |
-          (IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE(Attributes) ? (1 << 3) : 0) |
-          TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
+                      (IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE (Attributes) ? (1 << 3) : 0) |
+                      TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
     } else {
       // We do not support the other section type (16MB Section)
-      ASSERT(0);
+      ASSERT (0);
       return;
     }
   } else {
     TranslationTable = (UINTN)AllocateAlignedPages (
                                 EFI_SIZE_TO_PAGES (TRANSLATION_TABLE_PAGE_SIZE),
-                                TRANSLATION_TABLE_PAGE_ALIGNMENT);
+                                TRANSLATION_TABLE_PAGE_ALIGNMENT
+                                );
     //
     // Make sure we are not inadvertently hitting in the caches
     // when populating the page tables
     //
-    InvalidateDataCacheRange ((VOID *)TranslationTable,
-      TRANSLATION_TABLE_PAGE_SIZE);
+    InvalidateDataCacheRange (
+      (VOID *)TranslationTable,
+      TRANSLATION_TABLE_PAGE_SIZE
+      );
     ZeroMem ((VOID *)TranslationTable, TRANSLATION_TABLE_PAGE_SIZE);
 
     *SectionEntry = (TranslationTable & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) |
-        (IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE(Attributes) ? (1 << 3) : 0) |
-        TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
+                    (IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE (Attributes) ? (1 << 3) : 0) |
+                    TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
   }
 
   FirstPageOffset = (PhysicalBase & TT_DESCRIPTOR_PAGE_INDEX_MASK) >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
-  PageEntry = (UINT32 *)TranslationTable + FirstPageOffset;
-  Pages     = RemainLength / TT_DESCRIPTOR_PAGE_SIZE;
+  PageEntry       = (UINT32 *)TranslationTable + FirstPageOffset;
+  Pages           = RemainLength / TT_DESCRIPTOR_PAGE_SIZE;
 
   ASSERT (FirstPageOffset + Pages <= TRANSLATION_TABLE_PAGE_COUNT);
 
   for (Index = 0; Index < Pages; Index++) {
-    *PageEntry++     =  TT_DESCRIPTOR_PAGE_BASE_ADDRESS(PhysicalBase) | PageAttributes;
+    *PageEntry++  =  TT_DESCRIPTOR_PAGE_BASE_ADDRESS (PhysicalBase) | PageAttributes;
     PhysicalBase += TT_DESCRIPTOR_PAGE_SIZE;
   }
 
@@ -202,8 +209,10 @@ PopulateLevel2PageTable (
   // [speculatively] since the previous invalidate are evicted again.
   //
   ArmDataMemoryBarrier ();
-  InvalidateDataCacheRange ((UINT32 *)TranslationTable + FirstPageOffset,
-    RemainLength / TT_DESCRIPTOR_PAGE_SIZE * sizeof (*PageEntry));
+  InvalidateDataCacheRange (
+    (UINT32 *)TranslationTable + FirstPageOffset,
+    RemainLength / TT_DESCRIPTOR_PAGE_SIZE * sizeof (*PageEntry)
+    );
 }
 
 STATIC
@@ -219,50 +228,50 @@ FillTranslationTable (
   UINT64  RemainLength;
   UINT32  PageMapLength;
 
-  ASSERT(MemoryRegion->Length > 0);
+  ASSERT (MemoryRegion->Length > 0);
 
   if (MemoryRegion->PhysicalBase >= SIZE_4GB) {
     return;
   }
 
   PhysicalBase = (UINT32)MemoryRegion->PhysicalBase;
-  RemainLength = MIN(MemoryRegion->Length, SIZE_4GB - PhysicalBase);
+  RemainLength = MIN (MemoryRegion->Length, SIZE_4GB - PhysicalBase);
 
   switch (MemoryRegion->Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK(0);
+      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK (0);
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK(0);
+      Attributes  = TT_DESCRIPTOR_SECTION_WRITE_BACK (0);
       Attributes &= ~TT_DESCRIPTOR_SECTION_S_SHARED;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH(0);
+      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH (0);
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
-      Attributes = TT_DESCRIPTOR_SECTION_DEVICE(0);
+      Attributes = TT_DESCRIPTOR_SECTION_DEVICE (0);
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
-      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED(0);
+      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED (0);
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK(1);
+      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK (1);
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK_NONSHAREABLE:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK(1);
+      Attributes  = TT_DESCRIPTOR_SECTION_WRITE_BACK (1);
       Attributes &= ~TT_DESCRIPTOR_SECTION_S_SHARED;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH(1);
+      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH (1);
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE:
-      Attributes = TT_DESCRIPTOR_SECTION_DEVICE(1);
+      Attributes = TT_DESCRIPTOR_SECTION_DEVICE (1);
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED:
-      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED(1);
+      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED (1);
       break;
     default:
-      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED(0);
+      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED (0);
       break;
   }
 
@@ -271,14 +280,15 @@ FillTranslationTable (
   }
 
   // Get the first section entry for this mapping
-  SectionEntry    = TRANSLATION_TABLE_ENTRY_FOR_VIRTUAL_ADDRESS(TranslationTable, MemoryRegion->VirtualBase);
+  SectionEntry = TRANSLATION_TABLE_ENTRY_FOR_VIRTUAL_ADDRESS (TranslationTable, MemoryRegion->VirtualBase);
 
   while (RemainLength != 0) {
-    if (PhysicalBase % TT_DESCRIPTOR_SECTION_SIZE == 0 &&
-        RemainLength >= TT_DESCRIPTOR_SECTION_SIZE) {
+    if ((PhysicalBase % TT_DESCRIPTOR_SECTION_SIZE == 0) &&
+        (RemainLength >= TT_DESCRIPTOR_SECTION_SIZE))
+    {
       // Case: Physical address aligned on the Section Size (1MB) && the length
       // is greater than the Section Size
-      *SectionEntry = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(PhysicalBase) | Attributes;
+      *SectionEntry = TT_DESCRIPTOR_SECTION_BASE_ADDRESS (PhysicalBase) | Attributes;
 
       //
       // Issue a DMB to ensure that the page table entry update made it to
@@ -291,14 +301,21 @@ FillTranslationTable (
       PhysicalBase += TT_DESCRIPTOR_SECTION_SIZE;
       RemainLength -= TT_DESCRIPTOR_SECTION_SIZE;
     } else {
-      PageMapLength = MIN ((UINT32)RemainLength, TT_DESCRIPTOR_SECTION_SIZE -
-                                         (PhysicalBase % TT_DESCRIPTOR_SECTION_SIZE));
+      PageMapLength = MIN (
+                        (UINT32)RemainLength,
+                        TT_DESCRIPTOR_SECTION_SIZE -
+                        (PhysicalBase % TT_DESCRIPTOR_SECTION_SIZE)
+                        );
 
       // Case: Physical address aligned on the Section Size (1MB) && the length
       //       does not fill a section
       // Case: Physical address NOT aligned on the Section Size (1MB)
-      PopulateLevel2PageTable (SectionEntry, PhysicalBase, PageMapLength,
-        MemoryRegion->Attributes);
+      PopulateLevel2PageTable (
+        SectionEntry,
+        PhysicalBase,
+        PageMapLength,
+        MemoryRegion->Attributes
+        );
 
       //
       // Issue a DMB to ensure that the page table entry update made it to
@@ -323,16 +340,17 @@ RETURN_STATUS
 EFIAPI
 ArmConfigureMmu (
   IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable,
-  OUT VOID                         **TranslationTableBase OPTIONAL,
+  OUT VOID                          **TranslationTableBase OPTIONAL,
   OUT UINTN                         *TranslationTableSize OPTIONAL
   )
 {
-  VOID                          *TranslationTable;
-  UINT32                        TTBRAttributes;
+  VOID    *TranslationTable;
+  UINT32  TTBRAttributes;
 
   TranslationTable = AllocateAlignedPages (
                        EFI_SIZE_TO_PAGES (TRANSLATION_TABLE_SECTION_SIZE),
-                       TRANSLATION_TABLE_SECTION_ALIGNMENT);
+                       TRANSLATION_TABLE_SECTION_ALIGNMENT
+                       );
   if (TranslationTable == NULL) {
     return RETURN_OUT_OF_RESOURCES;
   }
@@ -389,25 +407,27 @@ ArmConfigureMmu (
   //
   ArmSetTTBCR (0);
 
-  ArmSetDomainAccessControl (DOMAIN_ACCESS_CONTROL_NONE(15) |
-                             DOMAIN_ACCESS_CONTROL_NONE(14) |
-                             DOMAIN_ACCESS_CONTROL_NONE(13) |
-                             DOMAIN_ACCESS_CONTROL_NONE(12) |
-                             DOMAIN_ACCESS_CONTROL_NONE(11) |
-                             DOMAIN_ACCESS_CONTROL_NONE(10) |
-                             DOMAIN_ACCESS_CONTROL_NONE( 9) |
-                             DOMAIN_ACCESS_CONTROL_NONE( 8) |
-                             DOMAIN_ACCESS_CONTROL_NONE( 7) |
-                             DOMAIN_ACCESS_CONTROL_NONE( 6) |
-                             DOMAIN_ACCESS_CONTROL_NONE( 5) |
-                             DOMAIN_ACCESS_CONTROL_NONE( 4) |
-                             DOMAIN_ACCESS_CONTROL_NONE( 3) |
-                             DOMAIN_ACCESS_CONTROL_NONE( 2) |
-                             DOMAIN_ACCESS_CONTROL_NONE( 1) |
-                             DOMAIN_ACCESS_CONTROL_CLIENT(0));
+  ArmSetDomainAccessControl (
+    DOMAIN_ACCESS_CONTROL_NONE (15) |
+    DOMAIN_ACCESS_CONTROL_NONE (14) |
+    DOMAIN_ACCESS_CONTROL_NONE (13) |
+    DOMAIN_ACCESS_CONTROL_NONE (12) |
+    DOMAIN_ACCESS_CONTROL_NONE (11) |
+    DOMAIN_ACCESS_CONTROL_NONE (10) |
+    DOMAIN_ACCESS_CONTROL_NONE (9) |
+    DOMAIN_ACCESS_CONTROL_NONE (8) |
+    DOMAIN_ACCESS_CONTROL_NONE (7) |
+    DOMAIN_ACCESS_CONTROL_NONE (6) |
+    DOMAIN_ACCESS_CONTROL_NONE (5) |
+    DOMAIN_ACCESS_CONTROL_NONE (4) |
+    DOMAIN_ACCESS_CONTROL_NONE (3) |
+    DOMAIN_ACCESS_CONTROL_NONE (2) |
+    DOMAIN_ACCESS_CONTROL_NONE (1) |
+    DOMAIN_ACCESS_CONTROL_CLIENT (0)
+    );
 
-  ArmEnableInstructionCache();
-  ArmEnableDataCache();
-  ArmEnableMmu();
+  ArmEnableInstructionCache ();
+  ArmEnableDataCache ();
+  ArmEnableMmu ();
   return RETURN_SUCCESS;
 }

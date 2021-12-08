@@ -18,14 +18,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Ppi/EmuThunk.h>
 #include <Protocol/EmuThunk.h>
 
-
-
 EFI_STATUS
 EFIAPI
 PeiInitialzeThunkPpiToProtocolPei (
-  IN       EFI_PEI_FILE_HANDLE       FileHandle,
-  IN CONST EFI_PEI_SERVICES          **PeiServices
+  IN       EFI_PEI_FILE_HANDLE  FileHandle,
+  IN CONST EFI_PEI_SERVICES     **PeiServices
   )
+
 /*++
 
 Routine Description:
@@ -47,14 +46,14 @@ Returns:
   EMU_THUNK_PPI           *Thunk;
   VOID                    *Ptr;
 
-  DEBUG ((EFI_D_ERROR, "Emu Thunk PEIM Loaded\n"));
+  DEBUG ((DEBUG_ERROR, "Emu Thunk PEIM Loaded\n"));
 
   Status = PeiServicesLocatePpi (
-              &gEmuThunkPpiGuid,        // GUID
-              0,                        // INSTANCE
-              &PpiDescriptor,           // EFI_PEI_PPI_DESCRIPTOR
-              (VOID **)&Thunk           // PPI
-              );
+             &gEmuThunkPpiGuid,         // GUID
+             0,                         // INSTANCE
+             &PpiDescriptor,            // EFI_PEI_PPI_DESCRIPTOR
+             (VOID **)&Thunk            // PPI
+             );
   ASSERT_EFI_ERROR (Status);
 
   Ptr = Thunk->Thunk ();

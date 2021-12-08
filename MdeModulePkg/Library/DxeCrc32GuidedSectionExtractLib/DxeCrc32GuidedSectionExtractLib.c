@@ -21,13 +21,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// CRC32 Guided Section header
 ///
 typedef struct {
-  EFI_GUID_DEFINED_SECTION  GuidedSectionHeader; ///< EFI guided section header
-  UINT32                    CRC32Checksum;       ///< 32bit CRC check sum
+  EFI_GUID_DEFINED_SECTION    GuidedSectionHeader; ///< EFI guided section header
+  UINT32                      CRC32Checksum;       ///< 32bit CRC check sum
 } CRC32_SECTION_HEADER;
 
 typedef struct {
-  EFI_GUID_DEFINED_SECTION2 GuidedSectionHeader; ///< EFI guided section header
-  UINT32                    CRC32Checksum;       ///< 32bit CRC check sum
+  EFI_GUID_DEFINED_SECTION2    GuidedSectionHeader; ///< EFI guided section header
+  UINT32                       CRC32Checksum;       ///< 32bit CRC check sum
 } CRC32_SECTION2_HEADER;
 
 /**
@@ -60,31 +60,37 @@ Crc32GuidedSectionGetInfo (
     // Check whether the input guid section is recognized.
     //
     if (!CompareGuid (
-        &gEfiCrc32GuidedSectionExtractionGuid,
-        &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid))) {
+           &gEfiCrc32GuidedSectionExtractionGuid,
+           &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return EFI_INVALID_PARAMETER;
     }
+
     //
     // Retrieve the size and attribute of the input section data.
     //
-    *SectionAttribute  = ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->Attributes;
+    *SectionAttribute  = ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->Attributes;
     *ScratchBufferSize = 0;
-    *OutputBufferSize  = SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset;
+    *OutputBufferSize  = SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset;
   } else {
     //
     // Check whether the input guid section is recognized.
     //
     if (!CompareGuid (
-        &gEfiCrc32GuidedSectionExtractionGuid,
-        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+           &gEfiCrc32GuidedSectionExtractionGuid,
+           &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return EFI_INVALID_PARAMETER;
     }
+
     //
     // Retrieve the size and attribute of the input section data.
     //
-    *SectionAttribute  = ((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes;
+    *SectionAttribute  = ((EFI_GUID_DEFINED_SECTION *)InputSection)->Attributes;
     *ScratchBufferSize = 0;
-    *OutputBufferSize  = SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset;
+    *OutputBufferSize  = SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset;
   }
 
   return EFI_SUCCESS;
@@ -112,59 +118,63 @@ EFIAPI
 Crc32GuidedSectionHandler (
   IN CONST  VOID    *InputSection,
   OUT       VOID    **OutputBuffer,
-  IN        VOID    *ScratchBuffer,        OPTIONAL
+  IN        VOID    *ScratchBuffer         OPTIONAL,
   OUT       UINT32  *AuthenticationStatus
   )
 {
-  EFI_STATUS                Status;
-  UINT32                    SectionCrc32Checksum;
-  UINT32                    Crc32Checksum;
-  UINT32                    OutputBufferSize;
-  VOID                      *DummyInterface;
+  EFI_STATUS  Status;
+  UINT32      SectionCrc32Checksum;
+  UINT32      Crc32Checksum;
+  UINT32      OutputBufferSize;
+  VOID        *DummyInterface;
 
   if (IS_SECTION2 (InputSection)) {
     //
     // Check whether the input guid section is recognized.
     //
     if (!CompareGuid (
-        &gEfiCrc32GuidedSectionExtractionGuid,
-        &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid))) {
+           &gEfiCrc32GuidedSectionExtractionGuid,
+           &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return EFI_INVALID_PARAMETER;
     }
 
     //
     // Get section Crc32 checksum.
     //
-    SectionCrc32Checksum = ((CRC32_SECTION2_HEADER *) InputSection)->CRC32Checksum;
-    *OutputBuffer      = (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset;
-    OutputBufferSize   = SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *) InputSection)->DataOffset;
+    SectionCrc32Checksum = ((CRC32_SECTION2_HEADER *)InputSection)->CRC32Checksum;
+    *OutputBuffer        = (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset;
+    OutputBufferSize     = SECTION2_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION2 *)InputSection)->DataOffset;
 
     //
     // Implicitly CRC32 GUIDed section should have STATUS_VALID bit set
     //
-    ASSERT (((EFI_GUID_DEFINED_SECTION2 *) InputSection)->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID);
+    ASSERT (((EFI_GUID_DEFINED_SECTION2 *)InputSection)->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID);
     *AuthenticationStatus = EFI_AUTH_STATUS_IMAGE_SIGNED;
   } else {
     //
     // Check whether the input guid section is recognized.
     //
     if (!CompareGuid (
-        &gEfiCrc32GuidedSectionExtractionGuid,
-        &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+           &gEfiCrc32GuidedSectionExtractionGuid,
+           &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid)
+           ))
+    {
       return EFI_INVALID_PARAMETER;
     }
 
     //
     // Get section Crc32 checksum.
     //
-    SectionCrc32Checksum = ((CRC32_SECTION_HEADER *) InputSection)->CRC32Checksum;
-    *OutputBuffer      = (UINT8 *) InputSection + ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset;
-    OutputBufferSize   = SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *) InputSection)->DataOffset;
+    SectionCrc32Checksum = ((CRC32_SECTION_HEADER *)InputSection)->CRC32Checksum;
+    *OutputBuffer        = (UINT8 *)InputSection + ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset;
+    OutputBufferSize     = SECTION_SIZE (InputSection) - ((EFI_GUID_DEFINED_SECTION *)InputSection)->DataOffset;
 
     //
     // Implicitly CRC32 GUIDed section should have STATUS_VALID bit set
     //
-    ASSERT (((EFI_GUID_DEFINED_SECTION *) InputSection)->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID);
+    ASSERT (((EFI_GUID_DEFINED_SECTION *)InputSection)->Attributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID);
     *AuthenticationStatus = EFI_AUTH_STATUS_IMAGE_SIGNED;
   }
 
@@ -222,9 +232,8 @@ DxeCrc32GuidedSectionExtractLibConstructor (
   )
 {
   return ExtractGuidedSectionRegisterHandlers (
-          &gEfiCrc32GuidedSectionExtractionGuid,
-          Crc32GuidedSectionGetInfo,
-          Crc32GuidedSectionHandler
-          );
+           &gEfiCrc32GuidedSectionExtractionGuid,
+           Crc32GuidedSectionGetInfo,
+           Crc32GuidedSectionHandler
+           );
 }
-

@@ -110,18 +110,18 @@
 */
 typedef struct AmlPathSearchContext {
   /// Backward stream holding the raw AML absolute searched path.
-  AML_STREAM        * SearchPathBStream;
+  AML_STREAM         *SearchPathBStream;
 
   /// An empty backward stream holding a pre-allocated buffer. This prevents
   /// from having to do multiple allocations during the search.
   /// This stream is used to query the raw AML absolute path of the node
   /// currently being probed.
-  AML_STREAM        * CurrNodePathBStream;
+  AML_STREAM         *CurrNodePathBStream;
 
   /// If the node being visited is the node being searched,
   /// i.e. its path and the searched path match,
   /// save its reference in this pointer.
-  AML_NODE_HEADER   * OutNode;
+  AML_NODE_HEADER    *OutNode;
 } AML_PATH_SEARCH_CONTEXT;
 
 /** Return the first AML namespace node up in the parent hierarchy.
@@ -140,12 +140,13 @@ typedef struct AmlPathSearchContext {
 EFI_STATUS
 EFIAPI
 AmlGetFirstAncestorNameSpaceNode (
-  IN  CONST AML_NODE_HEADER   * Node,
-  OUT       AML_NODE_HEADER  ** OutNode
+  IN  CONST AML_NODE_HEADER  *Node,
+  OUT       AML_NODE_HEADER  **OutNode
   )
 {
   if (!IS_AML_NODE_VALID (Node) ||
-      (OutNode == NULL)) {
+      (OutNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -156,7 +157,7 @@ AmlGetFirstAncestorNameSpaceNode (
     return EFI_SUCCESS;
   } else {
     // Else, get the parent node.
-    Node = AmlGetParent ((AML_NODE_HEADER*)Node);
+    Node = AmlGetParent ((AML_NODE_HEADER *)Node);
     if (!IS_AML_NODE_VALID (Node)) {
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
@@ -168,12 +169,13 @@ AmlGetFirstAncestorNameSpaceNode (
     if (IS_AML_ROOT_NODE (Node)) {
       break;
     } else if (AmlNodeHasAttribute (
-                 (CONST AML_OBJECT_NODE*)Node,
+                 (CONST AML_OBJECT_NODE *)Node,
                  AML_IN_NAMESPACE
-                 )) {
+                 ))
+    {
       break;
     } else {
-      Node = AmlGetParent ((AML_NODE_HEADER*)Node);
+      Node = AmlGetParent ((AML_NODE_HEADER *)Node);
       if (!IS_AML_NODE_VALID (Node)) {
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
@@ -181,7 +183,7 @@ AmlGetFirstAncestorNameSpaceNode (
     }
   } // while
 
-  *OutNode = (AML_NODE_HEADER*)Node;
+  *OutNode = (AML_NODE_HEADER *)Node;
   return EFI_SUCCESS;
 }
 
@@ -234,46 +236,47 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlGetAncestorNameSpaceNode (
-  IN      CONST AML_OBJECT_NODE   * Node,
-  IN OUT        UINT32            * Levels,
-     OUT        UINT32            * HasRoot,
-     OUT  CONST AML_NODE_HEADER  ** OutNode
+  IN      CONST AML_OBJECT_NODE  *Node,
+  IN OUT        UINT32           *Levels,
+  OUT        UINT32              *HasRoot,
+  OUT  CONST AML_NODE_HEADER     **OutNode
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
-  CONST AML_NODE_HEADER   * NameSpaceNode;
-  CHAR8                   * NodeName;
-  UINT32                    ParentCnt;
+  CONST AML_NODE_HEADER  *NameSpaceNode;
+  CHAR8                  *NodeName;
+  UINT32                 ParentCnt;
 
-  UINT32                    Root;
-  UINT32                    ParentPrefix;
-  UINT32                    SegCount;
+  UINT32  Root;
+  UINT32  ParentPrefix;
+  UINT32  SegCount;
 
   if (!IS_AML_OBJECT_NODE (Node)    ||
       (Levels == NULL)              ||
       (HasRoot == NULL)             ||
-      (OutNode == NULL)) {
+      (OutNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   ParentCnt = *Levels;
-  *HasRoot = 0;
+  *HasRoot  = 0;
 
   // ParentCnt namespace levels need to be climbed.
   do {
     // Get the next namespace node in the hierarchy.
     Status = AmlGetFirstAncestorNameSpaceNode (
-               (CONST AML_NODE_HEADER*)Node,
-               (AML_NODE_HEADER**)&NameSpaceNode
+               (CONST AML_NODE_HEADER *)Node,
+               (AML_NODE_HEADER **)&NameSpaceNode
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
     }
 
-    Node = (CONST AML_OBJECT_NODE*)NameSpaceNode;
+    Node = (CONST AML_OBJECT_NODE *)NameSpaceNode;
 
     if (IS_AML_ROOT_NODE (Node)) {
       // Node is the root node. It is not possible to go beyond.
@@ -281,11 +284,12 @@ AmlGetAncestorNameSpaceNode (
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
       }
+
       *HasRoot = 1;
       break;
     }
 
-    NodeName = AmlNodeGetName ((CONST AML_OBJECT_NODE*)Node);
+    NodeName = AmlNodeGetName ((CONST AML_OBJECT_NODE *)Node);
     if (NodeName == NULL) {
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
@@ -293,11 +297,11 @@ AmlGetAncestorNameSpaceNode (
 
     // Analyze the node name.
     Status = AmlParseNameStringInfo (
-                NodeName,
-                &Root,
-                &ParentPrefix,
-                &SegCount
-                );
+               NodeName,
+               &Root,
+               &ParentPrefix,
+               &SegCount
+               );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       return Status;
@@ -316,9 +320,9 @@ AmlGetAncestorNameSpaceNode (
       if (SegCount == ParentCnt) {
         // There are exactly enough AML namespace levels to consume.
         // This means the root node was the searched node.
-        Node = (CONST AML_OBJECT_NODE*)AmlGetRootNode (
-                                         (CONST AML_NODE_HEADER*)Node
-                                         );
+        Node = (CONST AML_OBJECT_NODE *)AmlGetRootNode (
+                                          (CONST AML_NODE_HEADER *)Node
+                                          );
         if (!IS_AML_ROOT_NODE (Node)) {
           ASSERT (0);
           return EFI_INVALID_PARAMETER;
@@ -350,14 +354,15 @@ AmlGetAncestorNameSpaceNode (
           // The node name doesn't have any carets. Get the next namespace
           // node and return.
           Status = AmlGetFirstAncestorNameSpaceNode (
-                     (CONST AML_NODE_HEADER*)Node,
-                     (AML_NODE_HEADER**)&NameSpaceNode
+                     (CONST AML_NODE_HEADER *)Node,
+                     (AML_NODE_HEADER **)&NameSpaceNode
                      );
           if (EFI_ERROR (Status)) {
             ASSERT (0);
             return Status;
           }
-          Node = (CONST AML_OBJECT_NODE*)NameSpaceNode;
+
+          Node      = (CONST AML_OBJECT_NODE *)NameSpaceNode;
           ParentCnt = 0;
           break;
         } else {
@@ -375,8 +380,8 @@ AmlGetAncestorNameSpaceNode (
     }
   } while (ParentCnt != 0);
 
-  *OutNode = (CONST AML_NODE_HEADER*)Node;
-  *Levels = ParentCnt;
+  *OutNode = (CONST AML_NODE_HEADER *)Node;
+  *Levels  = ParentCnt;
 
   return EFI_SUCCESS;
 }
@@ -415,29 +420,31 @@ AmlGetAncestorNameSpaceNode (
 EFI_STATUS
 EFIAPI
 AmlGetRawNameSpacePath (
-  IN  CONST AML_NODE_HEADER   * Node,
-  IN        UINT32              InputParent,
-  OUT       AML_STREAM        * RawAbsPathBStream
+  IN  CONST AML_NODE_HEADER  *Node,
+  IN        UINT32           InputParent,
+  OUT       AML_STREAM       *RawAbsPathBStream
   )
 {
-  EFI_STATUS          Status;
+  EFI_STATUS  Status;
 
-  AML_NODE_HEADER   * ParentNode;
-  CHAR8             * NodeName;
+  AML_NODE_HEADER  *ParentNode;
+  CHAR8            *NodeName;
 
-  UINT32              Root;
-  UINT32              ParentPrefix;
-  UINT32              SegCount;
-  CONST   CHAR8     * NameSeg;
+  UINT32         Root;
+  UINT32         ParentPrefix;
+  UINT32         SegCount;
+  CONST   CHAR8  *NameSeg;
 
   if ((!IS_AML_ROOT_NODE (Node)                 &&
        !AmlNodeHasAttribute (
-         (CONST AML_OBJECT_NODE*)Node,
-         AML_IN_NAMESPACE))                     ||
+          (CONST AML_OBJECT_NODE *)Node,
+          AML_IN_NAMESPACE
+          ))                     ||
       !IS_STREAM (RawAbsPathBStream)            ||
       IS_END_OF_STREAM (RawAbsPathBStream)      ||
       !IS_STREAM_BACKWARD (RawAbsPathBStream)   ||
-      (InputParent > MAX_UINT8)) {
+      (InputParent > MAX_UINT8))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -447,7 +454,7 @@ AmlGetRawNameSpacePath (
       break;
     }
 
-    NodeName = AmlNodeGetName ((CONST AML_OBJECT_NODE*)Node);
+    NodeName = AmlNodeGetName ((CONST AML_OBJECT_NODE *)Node);
     if (NodeName == NULL) {
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
@@ -468,15 +475,16 @@ AmlGetRawNameSpacePath (
       // 1.1. If the Node's name has enough levels to consume all the
       //      InputParent carets, write the levels that are left.
       NameSeg = AmlGetFirstNameSeg (NodeName, Root, ParentPrefix);
-      Status = AmlStreamWrite (
+      Status  = AmlStreamWrite (
                   RawAbsPathBStream,
-                  (CONST UINT8*)NameSeg,
+                  (CONST UINT8 *)NameSeg,
                   (SegCount - InputParent) * AML_NAME_SEG_SIZE
                   );
       if (EFI_ERROR (Status)) {
         ASSERT (0);
         return Status;
       }
+
       InputParent = 0;
     } else {
       // (SegCount <= InputParent)
@@ -488,23 +496,25 @@ AmlGetRawNameSpacePath (
     InputParent += ParentPrefix;
 
     if (Root != 0) {
-    // 2. The Node's name is an absolute path.
-    //    Exit, the root has been reached.
+      // 2. The Node's name is an absolute path.
+      //    Exit, the root has been reached.
       if (InputParent != 0) {
         ASSERT (0);
         return EFI_NOT_FOUND;
       }
+
       break;
     }
 
     Status = AmlGetAncestorNameSpaceNode (
-               (CONST AML_OBJECT_NODE*)Node,
+               (CONST AML_OBJECT_NODE *)Node,
                &InputParent,
                &Root,
-               (CONST AML_NODE_HEADER**)&ParentNode
+               (CONST AML_NODE_HEADER **)&ParentNode
                );
     if (EFI_ERROR (Status)  ||
-        (!IS_AML_NODE_VALID (ParentNode))) {
+        (!IS_AML_NODE_VALID (ParentNode)))
+    {
       ASSERT (0);
       return Status;
     }
@@ -524,7 +534,7 @@ AmlGetRawNameSpacePath (
       //      Then exit.
       if (InputParent != 0) {
         // Get the absolute pathname.
-        NodeName = AmlNodeGetName ((CONST AML_OBJECT_NODE*)Node);
+        NodeName = AmlNodeGetName ((CONST AML_OBJECT_NODE *)Node);
         if (NodeName == NULL) {
           ASSERT (0);
           return EFI_INVALID_PARAMETER;
@@ -532,11 +542,11 @@ AmlGetRawNameSpacePath (
 
         // Analyze the absolute pathname.
         Status = AmlParseNameStringInfo (
-                    NodeName,
-                    &Root,
-                    &ParentPrefix,
-                    &SegCount
-                    );
+                   NodeName,
+                   &Root,
+                   &ParentPrefix,
+                   &SegCount
+                   );
         if (EFI_ERROR (Status)) {
           ASSERT (0);
           return Status;
@@ -545,9 +555,9 @@ AmlGetRawNameSpacePath (
         // Writing the n first NameSegs.
         // n = SegCount - InputParent
         NameSeg = AmlGetFirstNameSeg (NodeName, Root, ParentPrefix);
-        Status = AmlStreamWrite (
+        Status  = AmlStreamWrite (
                     RawAbsPathBStream,
-                    (CONST UINT8*)NameSeg,
+                    (CONST UINT8 *)NameSeg,
                     (SegCount - InputParent) * AML_NAME_SEG_SIZE
                     );
         if (EFI_ERROR (Status)) {
@@ -557,7 +567,6 @@ AmlGetRawNameSpacePath (
 
         break;
       } // (InputParent != 0)
-
     }
   } // while
 
@@ -584,21 +593,22 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlAddPrefix (
-  IN  OUT AML_STREAM    * AmlPathBStream
+  IN  OUT AML_STREAM  *AmlPathBStream
   )
 {
-  EFI_STATUS    Status;
-  UINT32        NameSegCount;
-  UINT32        NameSegSize;
+  EFI_STATUS  Status;
+  UINT32      NameSegCount;
+  UINT32      NameSegSize;
 
   // At most 3 bytes are needed for: RootChar + MultiNamePrefix + SegCount.
-  CHAR8         Prefix[3];
-  UINT32        PrefixSize;
+  CHAR8   Prefix[3];
+  UINT32  PrefixSize;
 
   // The Stream contains concatenated NameSegs.
   if (!IS_STREAM (AmlPathBStream)       ||
       IS_END_OF_STREAM (AmlPathBStream) ||
-      !IS_STREAM_BACKWARD (AmlPathBStream)) {
+      !IS_STREAM_BACKWARD (AmlPathBStream))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -625,7 +635,7 @@ AmlAddPrefix (
     case 0:
     {
       // Root and parents only NameString (no NameSeg(s)) end with '\0'.
-      Prefix[1] = AML_ZERO_OP;
+      Prefix[1]  = AML_ZERO_OP;
       PrefixSize = 2;
       break;
     }
@@ -636,21 +646,21 @@ AmlAddPrefix (
     }
     case 2:
     {
-      Prefix[1] = AML_DUAL_NAME_PREFIX;
+      Prefix[1]  = AML_DUAL_NAME_PREFIX;
       PrefixSize = 2;
       break;
     }
     default:
     {
-      Prefix[1] = AML_MULTI_NAME_PREFIX;
-      Prefix[2] = (UINT8)NameSegCount;
+      Prefix[1]  = AML_MULTI_NAME_PREFIX;
+      Prefix[2]  = (UINT8)NameSegCount;
       PrefixSize = 3;
       break;
     }
   }
 
   // Add the RootChar + prefix (if needed) at the beginning of the pathname.
-  Status = AmlStreamWrite (AmlPathBStream, (CONST UINT8*)Prefix, PrefixSize);
+  Status = AmlStreamWrite (AmlPathBStream, (CONST UINT8 *)Prefix, PrefixSize);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -679,27 +689,28 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlRemovePrefix (
-  IN  OUT AML_STREAM  * AmlPathBStream
+  IN  OUT AML_STREAM  *AmlPathBStream
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
-  UINT32        TotalSize;
-  UINT32        RewindSize;
+  UINT32  TotalSize;
+  UINT32  RewindSize;
 
-  UINT32        Root;
-  UINT32        ParentPrefix;
-  UINT32        SegCount;
+  UINT32  Root;
+  UINT32  ParentPrefix;
+  UINT32  SegCount;
 
   if (!IS_STREAM (AmlPathBStream)         ||
       IS_END_OF_STREAM (AmlPathBStream)   ||
-      !IS_STREAM_BACKWARD (AmlPathBStream)) {
+      !IS_STREAM_BACKWARD (AmlPathBStream))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
   Status = AmlParseNameStringInfo (
-             (CHAR8*)AmlStreamGetCurrPos (AmlPathBStream),
+             (CHAR8 *)AmlStreamGetCurrPos (AmlPathBStream),
              &Root,
              &ParentPrefix,
              &SegCount
@@ -755,31 +766,33 @@ AmlRemovePrefix (
 EFI_STATUS
 EFIAPI
 AmlGetAslPathName (
-  IN      AML_NODE_HEADER   * Node,
-      OUT CHAR8             * Buffer,
-  IN  OUT UINT32            * BufferSize
+  IN      AML_NODE_HEADER  *Node,
+  OUT CHAR8                *Buffer,
+  IN  OUT UINT32           *BufferSize
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS  Status;
 
   // Backward stream used to build the raw AML absolute path to the node.
-  AML_STREAM      RawAmlAbsPathBStream;
-  CHAR8         * RawAmlAbsPathBuffer;
-  UINT32          RawAmlAbsPathBufferSize;
+  AML_STREAM  RawAmlAbsPathBStream;
+  CHAR8       *RawAmlAbsPathBuffer;
+  UINT32      RawAmlAbsPathBufferSize;
 
-  CHAR8         * AmlPathName;
-  CHAR8         * AslPathName;
-  UINT32          AslPathNameSize;
+  CHAR8   *AmlPathName;
+  CHAR8   *AslPathName;
+  UINT32  AslPathNameSize;
 
-  UINT32          Root;
-  UINT32          ParentPrefix;
-  UINT32          SegCount;
+  UINT32  Root;
+  UINT32  ParentPrefix;
+  UINT32  SegCount;
 
   if ((!IS_AML_ROOT_NODE (Node)         &&
        !AmlNodeHasAttribute (
-         (CONST AML_OBJECT_NODE*)Node,
-         AML_IN_NAMESPACE))             ||
-      (BufferSize == NULL)) {
+          (CONST AML_OBJECT_NODE *)Node,
+          AML_IN_NAMESPACE
+          ))             ||
+      (BufferSize == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -788,7 +801,7 @@ AmlGetAslPathName (
 
   // Allocate a Stream to get the raw AML absolute pathname.
   RawAmlAbsPathBufferSize = MAX_AML_NAMESTRING_SIZE;
-  RawAmlAbsPathBuffer = AllocateZeroPool (RawAmlAbsPathBufferSize);
+  RawAmlAbsPathBuffer     = AllocateZeroPool (RawAmlAbsPathBufferSize);
   if (RawAmlAbsPathBuffer == NULL) {
     ASSERT (0);
     return EFI_OUT_OF_RESOURCES;
@@ -796,7 +809,7 @@ AmlGetAslPathName (
 
   Status = AmlStreamInit (
              &RawAmlAbsPathBStream,
-             (UINT8*)RawAmlAbsPathBuffer,
+             (UINT8 *)RawAmlAbsPathBuffer,
              RawAmlAbsPathBufferSize,
              EAmlStreamDirectionBackward
              );
@@ -821,11 +834,11 @@ AmlGetAslPathName (
     goto exit_handler;
   }
 
-  AmlPathName = (CHAR8*)AmlStreamGetCurrPos (&RawAmlAbsPathBStream);
+  AmlPathName = (CHAR8 *)AmlStreamGetCurrPos (&RawAmlAbsPathBStream);
 
   // Analyze the NameString.
   Status = AmlParseNameStringInfo (
-             (CONST CHAR8*)AmlPathName,
+             (CONST CHAR8 *)AmlPathName,
              &Root,
              &ParentPrefix,
              &SegCount
@@ -890,33 +903,36 @@ STATIC
 BOOLEAN
 EFIAPI
 AmlDbgPrintNameSpaceCallback (
-  IN      AML_NODE_HEADER  * Node,
-  IN      VOID             * Context,
-  IN  OUT EFI_STATUS       * Status   OPTIONAL
+  IN      AML_NODE_HEADER  *Node,
+  IN      VOID             *Context,
+  IN  OUT EFI_STATUS       *Status   OPTIONAL
   )
 {
-  BOOLEAN           ContinueEnum;
-  EFI_STATUS        Status1;
+  BOOLEAN     ContinueEnum;
+  EFI_STATUS  Status1;
 
-  AML_STREAM      * CurrNodePathFStream;
-  CHAR8           * CurrNodePathBuffer;
-  UINT32            CurrNodePathBufferSize;
+  AML_STREAM  *CurrNodePathFStream;
+  CHAR8       *CurrNodePathBuffer;
+  UINT32      CurrNodePathBufferSize;
 
   ContinueEnum = TRUE;
-  Status1 = EFI_SUCCESS;
+  Status1      = EFI_SUCCESS;
 
   if (!IS_AML_NODE_VALID (Node) ||
-      (Context == NULL)) {
+      (Context == NULL))
+  {
     ASSERT (0);
-    Status1 = EFI_INVALID_PARAMETER;
+    Status1      = EFI_INVALID_PARAMETER;
     ContinueEnum = FALSE;
     goto exit_handler;
   }
 
   if (!IS_AML_ROOT_NODE (Node)  &&
       !AmlNodeHasAttribute (
-         (CONST AML_OBJECT_NODE*)Node,
-         AML_IN_NAMESPACE)) {
+         (CONST AML_OBJECT_NODE *)Node,
+         AML_IN_NAMESPACE
+         ))
+  {
     // Skip this node and continue enumeration.
     goto exit_handler;
   }
@@ -924,40 +940,41 @@ AmlDbgPrintNameSpaceCallback (
   if (IS_AML_ROOT_NODE (Node)) {
     DEBUG ((DEBUG_INFO, "\\\n"));
   } else if (AmlNodeHasAttribute (
-               (CONST AML_OBJECT_NODE*)Node,
-               AML_IN_NAMESPACE)) {
+               (CONST AML_OBJECT_NODE *)Node,
+               AML_IN_NAMESPACE
+               ))
+  {
+    CurrNodePathFStream = (AML_STREAM *)Context;
 
-  CurrNodePathFStream = (AML_STREAM*)Context;
+    // Check the Context's content.
+    if (!IS_STREAM (CurrNodePathFStream)           ||
+        IS_END_OF_STREAM (CurrNodePathFStream)     ||
+        !IS_STREAM_FORWARD (CurrNodePathFStream))
+    {
+      ASSERT (0);
+      Status1      = EFI_INVALID_PARAMETER;
+      ContinueEnum = FALSE;
+      goto exit_handler;
+    }
 
-  // Check the Context's content.
-  if (!IS_STREAM (CurrNodePathFStream)           ||
-      IS_END_OF_STREAM (CurrNodePathFStream)     ||
-      !IS_STREAM_FORWARD (CurrNodePathFStream)) {
-    ASSERT (0);
-    Status1 = EFI_INVALID_PARAMETER;
-    ContinueEnum = FALSE;
-    goto exit_handler;
-  }
+    CurrNodePathBuffer     = (CHAR8 *)AmlStreamGetBuffer (CurrNodePathFStream);
+    CurrNodePathBufferSize = AmlStreamGetMaxBufferSize (CurrNodePathFStream);
 
-  CurrNodePathBuffer = (CHAR8*)AmlStreamGetBuffer (CurrNodePathFStream);
-  CurrNodePathBufferSize = AmlStreamGetMaxBufferSize (CurrNodePathFStream);
+    Status1 = AmlGetAslPathName (
+                (AML_NODE_HEADER *)Node,
+                CurrNodePathBuffer,
+                &CurrNodePathBufferSize
+                );
+    if (EFI_ERROR (Status1)) {
+      ASSERT (0);
+      ContinueEnum = FALSE;
+      goto exit_handler;
+    }
 
-  Status1 = AmlGetAslPathName (
-              (AML_NODE_HEADER*)Node,
-              CurrNodePathBuffer,
-              &CurrNodePathBufferSize
-              );
-  if (EFI_ERROR (Status1)) {
-    ASSERT (0);
-    ContinueEnum = FALSE;
-    goto exit_handler;
-  }
-
-  DEBUG ((DEBUG_INFO, "%a\n", CurrNodePathBuffer));
-
+    DEBUG ((DEBUG_INFO, "%a\n", CurrNodePathBuffer));
   } else {
     ASSERT (0);
-    Status1 = EFI_INVALID_PARAMETER;
+    Status1      = EFI_INVALID_PARAMETER;
     ContinueEnum = FALSE;
   }
 
@@ -982,14 +999,14 @@ exit_handler:
 EFI_STATUS
 EFIAPI
 AmlDbgPrintNameSpace (
-  IN  AML_ROOT_NODE   * RootNode
+  IN  AML_ROOT_NODE  *RootNode
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS  Status;
 
-  AML_STREAM      CurrNodePathFStream;
-  CHAR8         * CurrNodePathBuffer;
-  UINT32          CurrNodePathBufferSize;
+  AML_STREAM  CurrNodePathFStream;
+  CHAR8       *CurrNodePathBuffer;
+  UINT32      CurrNodePathBufferSize;
 
   if (!IS_AML_ROOT_NODE (RootNode)) {
     ASSERT (0);
@@ -1000,7 +1017,7 @@ AmlDbgPrintNameSpace (
 
   // Allocate memory to build the absolute ASL path to each node.
   CurrNodePathBufferSize = MAX_AML_NAMESTRING_SIZE;
-  CurrNodePathBuffer = AllocateZeroPool (CurrNodePathBufferSize);
+  CurrNodePathBuffer     = AllocateZeroPool (CurrNodePathBufferSize);
   if (CurrNodePathBuffer == NULL) {
     ASSERT (0);
     return EFI_OUT_OF_RESOURCES;
@@ -1010,7 +1027,7 @@ AmlDbgPrintNameSpace (
   // to avoid multiple allocations during the enumeration.
   Status = AmlStreamInit (
              &CurrNodePathFStream,
-             (UINT8*)CurrNodePathBuffer,
+             (UINT8 *)CurrNodePathBuffer,
              CurrNodePathBufferSize,
              EAmlStreamDirectionForward
              );
@@ -1020,9 +1037,9 @@ AmlDbgPrintNameSpace (
   }
 
   AmlEnumTree (
-    (AML_NODE_HEADER*)RootNode,
+    (AML_NODE_HEADER *)RootNode,
     AmlDbgPrintNameSpaceCallback,
-    (VOID*)&CurrNodePathFStream,
+    (VOID *)&CurrNodePathFStream,
     &Status
     );
   ASSERT_EFI_ERROR (Status);
@@ -1064,40 +1081,43 @@ STATIC
 BOOLEAN
 EFIAPI
 AmlEnumeratePathCallback (
-  IN      AML_NODE_HEADER  * Node,
-  IN  OUT VOID             * Context,
-  IN  OUT EFI_STATUS       * Status   OPTIONAL
-)
+  IN      AML_NODE_HEADER  *Node,
+  IN  OUT VOID             *Context,
+  IN  OUT EFI_STATUS       *Status   OPTIONAL
+  )
 {
-  BOOLEAN                     ContinueEnum;
-  EFI_STATUS                  Status1;
+  BOOLEAN     ContinueEnum;
+  EFI_STATUS  Status1;
 
-  AML_PATH_SEARCH_CONTEXT   * PathSearchContext;
+  AML_PATH_SEARCH_CONTEXT  *PathSearchContext;
 
-  AML_STREAM                * SearchPathBStream;
+  AML_STREAM  *SearchPathBStream;
 
-  AML_STREAM                * CurrNodePathBStream;
-  UINT32                      CurrNodePathSize;
+  AML_STREAM  *CurrNodePathBStream;
+  UINT32      CurrNodePathSize;
 
   ContinueEnum = TRUE;
-  Status1 = EFI_SUCCESS;
+  Status1      = EFI_SUCCESS;
 
   if (!IS_AML_NODE_VALID (Node) ||
-      (Context == NULL)) {
+      (Context == NULL))
+  {
     ASSERT (0);
-    Status1 = EFI_INVALID_PARAMETER;
+    Status1      = EFI_INVALID_PARAMETER;
     ContinueEnum = FALSE;
     goto exit_handler;
   }
 
   if (!AmlNodeHasAttribute (
-         (CONST AML_OBJECT_NODE*)Node,
-         AML_IN_NAMESPACE)) {
+         (CONST AML_OBJECT_NODE *)Node,
+         AML_IN_NAMESPACE
+         ))
+  {
     goto exit_handler;
   }
 
-  PathSearchContext = (AML_PATH_SEARCH_CONTEXT*)Context;
-  SearchPathBStream = PathSearchContext->SearchPathBStream;
+  PathSearchContext   = (AML_PATH_SEARCH_CONTEXT *)Context;
+  SearchPathBStream   = PathSearchContext->SearchPathBStream;
   CurrNodePathBStream = PathSearchContext->CurrNodePathBStream;
 
   // Check the Context's content.
@@ -1106,9 +1126,10 @@ AmlEnumeratePathCallback (
       !IS_STREAM_BACKWARD (SearchPathBStream)   ||
       !IS_STREAM (CurrNodePathBStream)          ||
       IS_END_OF_STREAM (CurrNodePathBStream)    ||
-      !IS_STREAM_BACKWARD (CurrNodePathBStream)) {
+      !IS_STREAM_BACKWARD (CurrNodePathBStream))
+  {
     ASSERT (0);
-    Status1 = EFI_INVALID_PARAMETER;
+    Status1      = EFI_INVALID_PARAMETER;
     ContinueEnum = FALSE;
     goto exit_handler;
   }
@@ -1116,7 +1137,7 @@ AmlEnumeratePathCallback (
   CurrNodePathSize = AmlStreamGetMaxBufferSize (CurrNodePathBStream);
   if (CurrNodePathSize == 0) {
     ASSERT (0);
-    Status1 = EFI_INVALID_PARAMETER;
+    Status1      = EFI_INVALID_PARAMETER;
     ContinueEnum = FALSE;
     goto exit_handler;
   }
@@ -1137,26 +1158,28 @@ AmlEnumeratePathCallback (
   DEBUG ((DEBUG_VERBOSE, "Search path:"));
   AMLDBG_PRINT_CHARS (
     DEBUG_VERBOSE,
-    (CHAR8*)AmlStreamGetCurrPos (SearchPathBStream),
+    (CHAR8 *)AmlStreamGetCurrPos (SearchPathBStream),
     AmlStreamGetIndex (SearchPathBStream)
     );
   DEBUG ((DEBUG_VERBOSE, "\nPath of the current node: "));
   AMLDBG_PRINT_CHARS (
     DEBUG_VERBOSE,
-    (CHAR8*)AmlStreamGetCurrPos (CurrNodePathBStream),
+    (CHAR8 *)AmlStreamGetCurrPos (CurrNodePathBStream),
     AmlStreamGetIndex (CurrNodePathBStream)
     );
   DEBUG ((DEBUG_VERBOSE, "\n"));
 
   // Compare the searched path and Node's path.
   if ((AmlStreamGetIndex (CurrNodePathBStream)  ==
-         AmlStreamGetIndex (SearchPathBStream))     &&
+       AmlStreamGetIndex (SearchPathBStream))     &&
       (CompareMem (
          AmlStreamGetCurrPos (CurrNodePathBStream),
          AmlStreamGetCurrPos (SearchPathBStream),
-         AmlStreamGetIndex (SearchPathBStream)) == 0)) {
-    Status1 = EFI_SUCCESS;
-    ContinueEnum = FALSE;
+         AmlStreamGetIndex (SearchPathBStream)
+         ) == 0))
+  {
+    Status1                    = EFI_SUCCESS;
+    ContinueEnum               = FALSE;
     PathSearchContext->OutNode = Node;
   } else {
     // If the paths don't match, reset the CurrNodePathStream's content.
@@ -1210,27 +1233,29 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlBuildAbsoluteAmlPath (
-  IN      AML_NODE_HEADER   * ReferenceNode,
-  IN      CHAR8             * AslPath,
-  IN  OUT AML_STREAM        * RawAmlAbsSearchPathBStream
+  IN      AML_NODE_HEADER  *ReferenceNode,
+  IN      CHAR8            *AslPath,
+  IN  OUT AML_STREAM       *RawAmlAbsSearchPathBStream
   )
 {
-  EFI_STATUS    Status;
-  CHAR8       * AmlPath;
+  EFI_STATUS  Status;
+  CHAR8       *AmlPath;
 
-  UINT32        AmlNameStringSize;
-  UINT32        Root;
-  UINT32        ParentPrefix;
-  UINT32        SegCount;
+  UINT32  AmlNameStringSize;
+  UINT32  Root;
+  UINT32  ParentPrefix;
+  UINT32  SegCount;
 
   if ((!IS_AML_ROOT_NODE (ReferenceNode)              &&
        !AmlNodeHasAttribute (
-         (CONST AML_OBJECT_NODE*)ReferenceNode,
-         AML_IN_NAMESPACE))                           ||
+          (CONST AML_OBJECT_NODE *)ReferenceNode,
+          AML_IN_NAMESPACE
+          ))                           ||
       (AslPath == NULL)                               ||
       !IS_STREAM (RawAmlAbsSearchPathBStream)         ||
       IS_END_OF_STREAM (RawAmlAbsSearchPathBStream)   ||
-      !IS_STREAM_BACKWARD (RawAmlAbsSearchPathBStream)) {
+      !IS_STREAM_BACKWARD (RawAmlAbsSearchPathBStream))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
@@ -1264,10 +1289,10 @@ AmlBuildAbsoluteAmlPath (
 
   // 2.1. Write the AML path to the stream.
   Status = AmlStreamWrite (
-              RawAmlAbsSearchPathBStream,
-              (CONST UINT8*)AmlPath,
-              AmlNameStringSize
-              );
+             RawAmlAbsSearchPathBStream,
+             (CONST UINT8 *)AmlPath,
+             AmlNameStringSize
+             );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto exit_handler;
@@ -1347,47 +1372,49 @@ exit_handler:
 EFI_STATUS
 EFIAPI
 AmlFindNode (
-  IN  AML_NODE_HEADER     * ReferenceNode,
-  IN  CHAR8               * AslPath,
-  OUT AML_NODE_HEADER    ** OutNode
+  IN  AML_NODE_HEADER  *ReferenceNode,
+  IN  CHAR8            *AslPath,
+  OUT AML_NODE_HEADER  **OutNode
   )
 {
-  EFI_STATUS                  Status;
+  EFI_STATUS  Status;
 
-  AML_PATH_SEARCH_CONTEXT     PathSearchContext;
-  AML_ROOT_NODE             * RootNode;
+  AML_PATH_SEARCH_CONTEXT  PathSearchContext;
+  AML_ROOT_NODE            *RootNode;
 
   // Backward stream used to build the raw AML absolute path to the searched
   // node.
-  AML_STREAM                  RawAmlAbsSearchPathBStream;
-  CHAR8                     * RawAmlAbsSearchPathBuffer;
-  UINT32                      RawAmlAbsSearchPathBufferSize;
+  AML_STREAM  RawAmlAbsSearchPathBStream;
+  CHAR8       *RawAmlAbsSearchPathBuffer;
+  UINT32      RawAmlAbsSearchPathBufferSize;
 
   // Backward stream used to store the raw AML absolute path of the node
   // currently enumerated in the tree. This path can then be compared to the
   // RawAmlAbsSearchPath.
-  AML_STREAM                  RawAmlAbsCurrNodePathBStream;
-  CHAR8                     * RawAmlAbsCurrNodePathBuffer;
-  UINT32                      RawAmlAbsCurrNodePathBufferSize;
+  AML_STREAM  RawAmlAbsCurrNodePathBStream;
+  CHAR8       *RawAmlAbsCurrNodePathBuffer;
+  UINT32      RawAmlAbsCurrNodePathBufferSize;
 
   if ((!IS_AML_ROOT_NODE (ReferenceNode)        &&
        !AmlNodeHasAttribute (
-         (CONST AML_OBJECT_NODE*)ReferenceNode,
-         AML_IN_NAMESPACE))                     ||
+          (CONST AML_OBJECT_NODE *)ReferenceNode,
+          AML_IN_NAMESPACE
+          ))                     ||
       (AslPath == NULL)                         ||
-      (OutNode == NULL)) {
+      (OutNode == NULL))
+  {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  *OutNode = NULL;
+  *OutNode                    = NULL;
   RawAmlAbsCurrNodePathBuffer = NULL;
 
   // 1. Build a raw absolute AML path from the reference node and the ASL
   //    path. For this:
   // 1.1. First initialize a backward stream.
   RawAmlAbsSearchPathBufferSize = MAX_AML_NAMESTRING_SIZE;
-  RawAmlAbsSearchPathBuffer = AllocateZeroPool (RawAmlAbsSearchPathBufferSize);
+  RawAmlAbsSearchPathBuffer     = AllocateZeroPool (RawAmlAbsSearchPathBufferSize);
   if (RawAmlAbsSearchPathBuffer == NULL) {
     ASSERT (0);
     return EFI_OUT_OF_RESOURCES;
@@ -1395,7 +1422,7 @@ AmlFindNode (
 
   Status = AmlStreamInit (
              &RawAmlAbsSearchPathBStream,
-             (UINT8*)RawAmlAbsSearchPathBuffer,
+             (UINT8 *)RawAmlAbsSearchPathBuffer,
              RawAmlAbsSearchPathBufferSize,
              EAmlStreamDirectionBackward
              );
@@ -1427,8 +1454,8 @@ AmlFindNode (
   //    For the Root Node there is no NameSegs so the length of
   //     the stream will be zero.
   if (AmlStreamGetIndex (&RawAmlAbsSearchPathBStream) == 0) {
-    *OutNode = (AML_NODE_HEADER*)RootNode;
-    Status = EFI_SUCCESS;
+    *OutNode = (AML_NODE_HEADER *)RootNode;
+    Status   = EFI_SUCCESS;
     goto exit_handler;
   }
 
@@ -1436,9 +1463,9 @@ AmlFindNode (
   //    during enumeration. This prevents from doing multiple allocation/free
   //    operations.
   RawAmlAbsCurrNodePathBufferSize = MAX_ASL_NAMESTRING_SIZE;
-  RawAmlAbsCurrNodePathBuffer = AllocateZeroPool (
-                                  RawAmlAbsCurrNodePathBufferSize
-                                  );
+  RawAmlAbsCurrNodePathBuffer     = AllocateZeroPool (
+                                      RawAmlAbsCurrNodePathBufferSize
+                                      );
   if (RawAmlAbsCurrNodePathBuffer == NULL) {
     ASSERT (0);
     Status = EFI_OUT_OF_RESOURCES;
@@ -1447,7 +1474,7 @@ AmlFindNode (
 
   Status = AmlStreamInit (
              &RawAmlAbsCurrNodePathBStream,
-             (UINT8*)RawAmlAbsCurrNodePathBuffer,
+             (UINT8 *)RawAmlAbsCurrNodePathBuffer,
              RawAmlAbsCurrNodePathBufferSize,
              EAmlStreamDirectionBackward
              );
@@ -1462,17 +1489,17 @@ AmlFindNode (
   //     - CurrNodePathStream: backward stream containing the raw absolute AML
   //       of the node currently being enumerated;
   //     - OutNode: node pointer to the store the potentially found node.
-  PathSearchContext.SearchPathBStream = &RawAmlAbsSearchPathBStream;
+  PathSearchContext.SearchPathBStream   = &RawAmlAbsSearchPathBStream;
   PathSearchContext.CurrNodePathBStream = &RawAmlAbsCurrNodePathBStream;
-  PathSearchContext.OutNode = NULL;
+  PathSearchContext.OutNode             = NULL;
 
   // 6. Iterate through the namespace nodes of the tree.
   //    For each namespace node, build its raw AML absolute path. Then compare
   //    it with the search path.
   AmlEnumTree (
-    (AML_NODE_HEADER*)RootNode,
+    (AML_NODE_HEADER *)RootNode,
     AmlEnumeratePathCallback,
-    (VOID*)&PathSearchContext,
+    (VOID *)&PathSearchContext,
     &Status
     );
   if (EFI_ERROR (Status)) {

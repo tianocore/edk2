@@ -33,7 +33,6 @@ QemuFwCfgS3Enabled (
   return FALSE;
 }
 
-
 /**
   Install the client module's FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION callback for
   when the production of ACPI S3 Boot Script opcodes becomes possible.
@@ -91,13 +90,12 @@ QemuFwCfgS3Enabled (
 
   @return                          Error codes from underlying functions.
 **/
-
 RETURN_STATUS
 EFIAPI
 QemuFwCfgS3CallWhenBootScriptReady (
-  IN     FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION *Callback,
-  IN OUT VOID                                 *Context,          OPTIONAL
-  IN     UINTN                                ScratchBufferSize
+  IN     FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION  *Callback,
+  IN OUT VOID                                  *Context           OPTIONAL,
+  IN     UINTN                                 ScratchBufferSize
   )
 {
   ASSERT (FALSE);

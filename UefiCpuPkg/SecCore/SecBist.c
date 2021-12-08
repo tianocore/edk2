@@ -8,21 +8,21 @@
 
 #include "SecMain.h"
 
-EFI_SEC_PLATFORM_INFORMATION_PPI mSecPlatformInformation = {
+EFI_SEC_PLATFORM_INFORMATION_PPI  mSecPlatformInformation = {
   SecPlatformInformationBist
 };
 
-EFI_PEI_PPI_DESCRIPTOR mPeiSecPlatformInformation = {
+EFI_PEI_PPI_DESCRIPTOR  mPeiSecPlatformInformation = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiSecPlatformInformationPpiGuid,
   &mSecPlatformInformation
 };
 
-EFI_SEC_PLATFORM_INFORMATION2_PPI mSecPlatformInformation2 = {
+EFI_SEC_PLATFORM_INFORMATION2_PPI  mSecPlatformInformation2 = {
   SecPlatformInformation2Bist
 };
 
-EFI_PEI_PPI_DESCRIPTOR mPeiSecPlatformInformation2 = {
+EFI_PEI_PPI_DESCRIPTOR  mPeiSecPlatformInformation2 = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiSecPlatformInformation2PpiGuid,
   &mSecPlatformInformation2
@@ -40,13 +40,13 @@ EFI_PEI_PPI_DESCRIPTOR mPeiSecPlatformInformation2 = {
 **/
 EFI_STATUS
 GetBistFromHob (
-  IN OUT UINT64           *StructureSize,
-  IN OUT VOID             *StructureBuffer
+  IN OUT UINT64  *StructureSize,
+  IN OUT VOID    *StructureBuffer
   )
 {
-  EFI_HOB_GUID_TYPE       *GuidHob;
-  VOID                    *DataInHob;
-  UINTN                   DataSize;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  VOID               *DataInHob;
+  UINTN              DataSize;
 
   GuidHob = GetFirstGuidHob (&gEfiCallerIdGuid);
   if (GuidHob == NULL) {
@@ -60,12 +60,12 @@ GetBistFromHob (
   //
   // return the information from BistHob
   //
-  if ((*StructureSize) < (UINT64) DataSize) {
-    *StructureSize = (UINT64) DataSize;
+  if ((*StructureSize) < (UINT64)DataSize) {
+    *StructureSize = (UINT64)DataSize;
     return EFI_BUFFER_TOO_SMALL;
   }
 
-  *StructureSize = (UINT64) DataSize;
+  *StructureSize = (UINT64)DataSize;
   CopyMem (StructureBuffer, DataInHob, DataSize);
   return EFI_SUCCESS;
 }
@@ -84,9 +84,9 @@ GetBistFromHob (
 EFI_STATUS
 EFIAPI
 SecPlatformInformationBist (
-  IN CONST EFI_PEI_SERVICES                  **PeiServices,
-  IN OUT UINT64                              *StructureSize,
-     OUT EFI_SEC_PLATFORM_INFORMATION_RECORD *PlatformInformationRecord
+  IN CONST EFI_PEI_SERVICES                **PeiServices,
+  IN OUT UINT64                            *StructureSize,
+  OUT EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
   )
 {
   return GetBistFromHob (StructureSize, PlatformInformationRecord);
@@ -107,9 +107,9 @@ SecPlatformInformationBist (
 EFI_STATUS
 EFIAPI
 SecPlatformInformation2Bist (
-  IN CONST EFI_PEI_SERVICES                   **PeiServices,
-  IN OUT UINT64                               *StructureSize,
-     OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2 *PlatformInformationRecord2
+  IN CONST EFI_PEI_SERVICES                 **PeiServices,
+  IN OUT UINT64                             *StructureSize,
+  OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2  *PlatformInformationRecord2
   )
 {
   return GetBistFromHob (StructureSize, PlatformInformationRecord2);
@@ -133,11 +133,11 @@ SecPlatformInformation2Bist (
 **/
 EFI_STATUS
 GetBistInfoFromPpi (
-  IN CONST EFI_PEI_SERVICES     **PeiServices,
-  IN CONST EFI_GUID             *Guid,
-     OUT EFI_PEI_PPI_DESCRIPTOR **PpiDescriptor,
-     OUT VOID                   **BistInformationData,
-     OUT UINT64                 *BistInformationSize OPTIONAL
+  IN CONST EFI_PEI_SERVICES   **PeiServices,
+  IN CONST EFI_GUID           *Guid,
+  OUT EFI_PEI_PPI_DESCRIPTOR  **PpiDescriptor,
+  OUT VOID                    **BistInformationData,
+  OUT UINT64                  *BistInformationSize OPTIONAL
   )
 {
   EFI_STATUS                            Status;
@@ -161,15 +161,15 @@ GetBistInfoFromPpi (
     //
     InformationSize         = 0;
     SecPlatformInformation2 = NULL;
-    Status = SecPlatformInformation2Ppi->PlatformInformation2 (
-                                           PeiServices,
-                                           &InformationSize,
-                                           SecPlatformInformation2
-                                           );
+    Status                  = SecPlatformInformation2Ppi->PlatformInformation2 (
+                                                            PeiServices,
+                                                            &InformationSize,
+                                                            SecPlatformInformation2
+                                                            );
     if (Status == EFI_BUFFER_TOO_SMALL) {
       Status = PeiServicesAllocatePool (
-                 (UINTN) InformationSize,
-                 (VOID **) &SecPlatformInformation2
+                 (UINTN)InformationSize,
+                 (VOID **)&SecPlatformInformation2
                  );
       if (Status == EFI_SUCCESS) {
         //
@@ -185,6 +185,7 @@ GetBistInfoFromPpi (
           if (BistInformationSize != NULL) {
             *BistInformationSize = InformationSize;
           }
+
           return EFI_SUCCESS;
         }
       }
@@ -203,25 +204,25 @@ RepublishSecPlatformInformationPpi (
   VOID
   )
 {
-  EFI_STATUS                            Status;
-  CONST EFI_PEI_SERVICES                **PeiServices;
-  UINT64                                BistInformationSize;
-  VOID                                  *BistInformationData;
-  EFI_PEI_PPI_DESCRIPTOR                *SecInformationDescriptor;
+  EFI_STATUS              Status;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+  UINT64                  BistInformationSize;
+  VOID                    *BistInformationData;
+  EFI_PEI_PPI_DESCRIPTOR  *SecInformationDescriptor;
 
   PeiServices = GetPeiServicesTablePointer ();
-  Status = GetBistInfoFromPpi (
-             PeiServices,
-             &gEfiSecPlatformInformation2PpiGuid,
-             &SecInformationDescriptor,
-             &BistInformationData,
-             &BistInformationSize
-             );
+  Status      = GetBistInfoFromPpi (
+                  PeiServices,
+                  &gEfiSecPlatformInformation2PpiGuid,
+                  &SecInformationDescriptor,
+                  &BistInformationData,
+                  &BistInformationSize
+                  );
   if (Status == EFI_SUCCESS) {
     BuildGuidDataHob (
       &gEfiCallerIdGuid,
       BistInformationData,
-      (UINTN) BistInformationSize
+      (UINTN)BistInformationSize
       );
     //
     // The old SecPlatformInformation2 data is on temporary memory.
@@ -232,7 +233,9 @@ RepublishSecPlatformInformationPpi (
                SecInformationDescriptor,
                &mPeiSecPlatformInformation2
                );
-  } if (Status == EFI_NOT_FOUND) {
+  }
+
+  if (Status == EFI_NOT_FOUND) {
     Status = GetBistInfoFromPpi (
                PeiServices,
                &gEfiSecPlatformInformationPpiGuid,
@@ -244,7 +247,7 @@ RepublishSecPlatformInformationPpi (
       BuildGuidDataHob (
         &gEfiCallerIdGuid,
         BistInformationData,
-        (UINTN) BistInformationSize
+        (UINTN)BistInformationSize
         );
       //
       // The old SecPlatformInformation data is on temporary memory.
@@ -260,5 +263,5 @@ RepublishSecPlatformInformationPpi (
     }
   }
 
-  ASSERT_EFI_ERROR(Status);
+  ASSERT_EFI_ERROR (Status);
 }

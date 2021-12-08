@@ -6,4 +6,4 @@
 
 **/
 
-extern int __BaseStackCheckNull;
+extern int  __BaseStackCheckNull;

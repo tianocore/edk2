@@ -6,9 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Snp.h"
-
 
 /**
   Resets or collects the statistics on a network interface.
@@ -60,20 +58,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 SnpUndi32Statistics (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  IN BOOLEAN                     Reset,
-  IN OUT UINTN                   *StatisticsSize, OPTIONAL
-  IN OUT EFI_NETWORK_STATISTICS  *StatisticsTable OPTIONAL
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      Reset,
+  IN OUT UINTN                    *StatisticsSize  OPTIONAL,
+  IN OUT EFI_NETWORK_STATISTICS   *StatisticsTable OPTIONAL
   )
 {
-  SNP_DRIVER        *Snp;
-  PXE_DB_STATISTICS *Db;
-  UINT64            *Stp;
-  UINT64            Mask;
-  UINTN             Size;
-  UINTN             Index;
-  EFI_TPL           OldTpl;
-  EFI_STATUS        Status;
+  SNP_DRIVER         *Snp;
+  PXE_DB_STATISTICS  *Db;
+  UINT64             *Stp;
+  UINT64             Mask;
+  UINTN              Size;
+  UINTN              Index;
+  EFI_TPL            OldTpl;
+  EFI_STATUS         Status;
 
   //
   // Get pointer to SNP driver instance for *This.
@@ -90,78 +88,81 @@ SnpUndi32Statistics (
   // Return error if the SNP is not initialized.
   //
   switch (Snp->Mode.State) {
-  case EfiSimpleNetworkInitialized:
-    break;
+    case EfiSimpleNetworkInitialized:
+      break;
 
-  case EfiSimpleNetworkStopped:
-    Status = EFI_NOT_STARTED;
-    goto ON_EXIT;
+    case EfiSimpleNetworkStopped:
+      Status = EFI_NOT_STARTED;
+      goto ON_EXIT;
 
-  default:
-    Status = EFI_DEVICE_ERROR;
-    goto ON_EXIT;
+    default:
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
   }
+
   //
   // if we are not resetting the counters, we have to have a valid stat table
   // with >0 size. if no reset, no table and no size, return success.
   //
-  if (!Reset && StatisticsSize == NULL) {
+  if (!Reset && (StatisticsSize == NULL)) {
     Status = (StatisticsTable != NULL) ? EFI_INVALID_PARAMETER : EFI_SUCCESS;
     goto ON_EXIT;
   }
+
   //
   // Initialize UNDI Statistics CDB
   //
-  Snp->Cdb.OpCode     = PXE_OPCODE_STATISTICS;
-  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.OpCode    = PXE_OPCODE_STATISTICS;
+  Snp->Cdb.CPBsize   = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr   = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum     = Snp->IfNum;
+  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   if (Reset) {
-    Snp->Cdb.OpFlags  = PXE_OPFLAGS_STATISTICS_RESET;
-    Snp->Cdb.DBsize   = PXE_DBSIZE_NOT_USED;
-    Snp->Cdb.DBaddr   = PXE_DBADDR_NOT_USED;
-    Db                = Snp->Db;
+    Snp->Cdb.OpFlags = PXE_OPFLAGS_STATISTICS_RESET;
+    Snp->Cdb.DBsize  = PXE_DBSIZE_NOT_USED;
+    Snp->Cdb.DBaddr  = PXE_DBADDR_NOT_USED;
+    Db               = Snp->Db;
   } else {
-    Snp->Cdb.OpFlags                = PXE_OPFLAGS_STATISTICS_READ;
-    Snp->Cdb.DBsize                 = (UINT16) sizeof (PXE_DB_STATISTICS);
-    Snp->Cdb.DBaddr                 = (UINT64)(UINTN) (Db = Snp->Db);
+    Snp->Cdb.OpFlags = PXE_OPFLAGS_STATISTICS_READ;
+    Snp->Cdb.DBsize  = (UINT16)sizeof (PXE_DB_STATISTICS);
+    Snp->Cdb.DBaddr  = (UINT64)(UINTN)(Db = Snp->Db);
   }
+
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.statistics()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.statistics()  "));
 
-  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
 
   switch (Snp->Cdb.StatCode) {
-  case PXE_STATCODE_SUCCESS:
-    break;
+    case PXE_STATCODE_SUCCESS:
+      break;
 
-  case PXE_STATCODE_UNSUPPORTED:
-    DEBUG (
-      (EFI_D_ERROR,
-      "\nsnp->undi.statistics()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
+    case PXE_STATCODE_UNSUPPORTED:
+      DEBUG (
+        (DEBUG_ERROR,
+         "\nsnp->undi.statistics()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
 
-    Status = EFI_UNSUPPORTED;
-    goto ON_EXIT;
+      Status = EFI_UNSUPPORTED;
+      goto ON_EXIT;
 
-  default:
-    DEBUG (
-      (EFI_D_ERROR,
-      "\nsnp->undi.statistics()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
+    default:
+      DEBUG (
+        (DEBUG_ERROR,
+         "\nsnp->undi.statistics()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
 
-    Status = EFI_DEVICE_ERROR;
-    goto ON_EXIT;
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
   }
 
   if (Reset) {
@@ -171,16 +172,17 @@ SnpUndi32Statistics (
 
   if (StatisticsTable == NULL) {
     *StatisticsSize = sizeof (EFI_NETWORK_STATISTICS);
-    Status = EFI_BUFFER_TOO_SMALL;
+    Status          = EFI_BUFFER_TOO_SMALL;
     goto ON_EXIT;
   }
+
   //
   // Convert the UNDI statistics information to SNP statistics
   // information.
   //
   ZeroMem (StatisticsTable, *StatisticsSize);
-  Stp   = (UINT64 *) StatisticsTable;
-  Size  = 0;
+  Stp  = (UINT64 *)StatisticsTable;
+  Size = 0;
 
   for (Index = 0, Mask = 1; Index < 64; Index++, Mask = LShiftU64 (Mask, 1), Stp++) {
     //
@@ -192,12 +194,13 @@ SnpUndi32Statistics (
     }
 
     if ((Db->Supported & Mask) != 0) {
-      *Stp  = Db->Data[Index];
-      Size  = Index + 1;
+      *Stp = Db->Data[Index];
+      Size = Index + 1;
     } else {
       SetMem (Stp, sizeof (UINT64), 0xFF);
     }
   }
+
   //
   // Compute size up to last supported statistic.
   //
@@ -211,10 +214,10 @@ SnpUndi32Statistics (
 
   if (*StatisticsSize >= Size) {
     *StatisticsSize = Size;
-    Status = EFI_SUCCESS;
+    Status          = EFI_SUCCESS;
   } else {
     *StatisticsSize = Size;
-    Status = EFI_BUFFER_TOO_SMALL;
+    Status          = EFI_BUFFER_TOO_SMALL;
   }
 
 ON_EXIT:

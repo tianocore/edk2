@@ -11,20 +11,18 @@
 #include "RegularExpressionDxe.h"
 
 STATIC
-EFI_REGEX_SYNTAX_TYPE * CONST mSupportedSyntaxes[] = {
+EFI_REGEX_SYNTAX_TYPE *CONST  mSupportedSyntaxes[] = {
   &gEfiRegexSyntaxTypePosixExtendedGuid,
   &gEfiRegexSyntaxTypePerlGuid
 };
 
 STATIC
-EFI_REGULAR_EXPRESSION_PROTOCOL mProtocolInstance = {
+EFI_REGULAR_EXPRESSION_PROTOCOL  mProtocolInstance = {
   RegularExpressionMatch,
   RegularExpressionGetInfo
 };
 
-
-
-#define CHAR16_ENCODING ONIG_ENCODING_UTF16_LE
+#define CHAR16_ENCODING  ONIG_ENCODING_UTF16_LE
 
 /**
   Call the Oniguruma regex match API.
@@ -69,12 +67,12 @@ EFI_REGULAR_EXPRESSION_PROTOCOL mProtocolInstance = {
 STATIC
 EFI_STATUS
 OnigurumaMatch (
-  IN  CHAR16                *String,
-  IN  CHAR16                *Pattern,
-  IN  EFI_REGEX_SYNTAX_TYPE *SyntaxType,
-  OUT BOOLEAN               *Result,
-  OUT EFI_REGEX_CAPTURE     **Captures,     OPTIONAL
-  OUT UINTN                 *CapturesCount
+  IN  CHAR16                 *String,
+  IN  CHAR16                 *Pattern,
+  IN  EFI_REGEX_SYNTAX_TYPE  *SyntaxType,
+  OUT BOOLEAN                *Result,
+  OUT EFI_REGEX_CAPTURE      **Captures      OPTIONAL,
+  OUT UINTN                  *CapturesCount
   )
 {
   regex_t         *OnigRegex;
@@ -86,7 +84,6 @@ OnigurumaMatch (
   UINT32          Index;
   OnigUChar       *Start;
   EFI_STATUS      Status;
-
 
   Status = EFI_SUCCESS;
 
@@ -106,7 +103,7 @@ OnigurumaMatch (
   //
   // Compile pattern
   //
-  Start = (OnigUChar*)Pattern;
+  Start      = (OnigUChar *)Pattern;
   OnigResult = onig_new (
                  &OnigRegex,
                  Start,
@@ -126,12 +123,13 @@ OnigurumaMatch (
   //
   // Try to match
   //
-  Start = (OnigUChar*)String;
+  Start  = (OnigUChar *)String;
   Region = onig_region_new ();
   if (Region == NULL) {
     onig_free (OnigRegex);
     return EFI_OUT_OF_RESOURCES;
   }
+
   OnigResult = onig_search (
                  OnigRegex,
                  Start,
@@ -158,18 +156,18 @@ OnigurumaMatch (
   //
   // If successful, copy out the region (capture) information
   //
-  if (*Result && Captures != NULL) {
+  if (*Result && (Captures != NULL)) {
     *CapturesCount = Region->num_regs;
-    *Captures = AllocateZeroPool (*CapturesCount * sizeof(**Captures));
+    *Captures      = AllocateZeroPool (*CapturesCount * sizeof (**Captures));
     if (*Captures != NULL) {
       for (Index = 0; Index < *CapturesCount; ++Index) {
         //
         // Region beg/end values represent bytes, not characters
         //
-        (*Captures)[Index].Length = (Region->end[Index] - Region->beg[Index]) / sizeof(CHAR16);
+        (*Captures)[Index].Length     = (Region->end[Index] - Region->beg[Index]) / sizeof (CHAR16);
         (*Captures)[Index].CapturePtr = AllocateCopyPool (
                                           ((*Captures)[Index].Length) * sizeof (CHAR16),
-                                          (CHAR16*)((UINTN)String + Region->beg[Index])
+                                          (CHAR16 *)((UINTN)String + Region->beg[Index])
                                           );
         if ((*Captures)[Index].CapturePtr == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
@@ -180,9 +178,10 @@ OnigurumaMatch (
       if (EFI_ERROR (Status)) {
         for (Index = 0; Index < *CapturesCount; ++Index) {
           if ((*Captures)[Index].CapturePtr != NULL) {
-            FreePool ((CHAR16*)(*Captures)[Index].CapturePtr);
+            FreePool ((CHAR16 *)(*Captures)[Index].CapturePtr);
           }
         }
+
         FreePool (*Captures);
       }
     }
@@ -229,23 +228,23 @@ OnigurumaMatch (
 EFI_STATUS
 EFIAPI
 RegularExpressionGetInfo (
-  IN     EFI_REGULAR_EXPRESSION_PROTOCOL *This,
-  IN OUT UINTN                           *RegExSyntaxTypeListSize,
-  OUT    EFI_REGEX_SYNTAX_TYPE           *RegExSyntaxTypeList
+  IN     EFI_REGULAR_EXPRESSION_PROTOCOL  *This,
+  IN OUT UINTN                            *RegExSyntaxTypeListSize,
+  OUT    EFI_REGEX_SYNTAX_TYPE            *RegExSyntaxTypeList
   )
 {
-  UINTN SyntaxSize;
-  UINTN Index;
+  UINTN  SyntaxSize;
+  UINTN  Index;
 
-  if (This == NULL || RegExSyntaxTypeListSize == NULL) {
+  if ((This == NULL) || (RegExSyntaxTypeListSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (*RegExSyntaxTypeListSize != 0 && RegExSyntaxTypeList == NULL) {
+  if ((*RegExSyntaxTypeListSize != 0) && (RegExSyntaxTypeList == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  SyntaxSize = ARRAY_SIZE (mSupportedSyntaxes) * sizeof(**mSupportedSyntaxes);
+  SyntaxSize = ARRAY_SIZE (mSupportedSyntaxes) * sizeof (**mSupportedSyntaxes);
 
   if (*RegExSyntaxTypeListSize < SyntaxSize) {
     *RegExSyntaxTypeListSize = SyntaxSize;
@@ -253,8 +252,9 @@ RegularExpressionGetInfo (
   }
 
   for (Index = 0; Index < ARRAY_SIZE (mSupportedSyntaxes); ++Index) {
-    CopyMem (&RegExSyntaxTypeList[Index], mSupportedSyntaxes[Index], sizeof(**mSupportedSyntaxes));
+    CopyMem (&RegExSyntaxTypeList[Index], mSupportedSyntaxes[Index], sizeof (**mSupportedSyntaxes));
   }
+
   *RegExSyntaxTypeListSize = SyntaxSize;
 
   return EFI_SUCCESS;
@@ -312,20 +312,20 @@ RegularExpressionGetInfo (
 EFI_STATUS
 EFIAPI
 RegularExpressionMatch (
-  IN  EFI_REGULAR_EXPRESSION_PROTOCOL *This,
-  IN  CHAR16                          *String,
-  IN  CHAR16                          *Pattern,
-  IN  EFI_REGEX_SYNTAX_TYPE           *SyntaxType, OPTIONAL
-  OUT BOOLEAN                         *Result,
-  OUT EFI_REGEX_CAPTURE               **Captures, OPTIONAL
-  OUT UINTN                           *CapturesCount
+  IN  EFI_REGULAR_EXPRESSION_PROTOCOL  *This,
+  IN  CHAR16                           *String,
+  IN  CHAR16                           *Pattern,
+  IN  EFI_REGEX_SYNTAX_TYPE            *SyntaxType  OPTIONAL,
+  OUT BOOLEAN                          *Result,
+  OUT EFI_REGEX_CAPTURE                **Captures  OPTIONAL,
+  OUT UINTN                            *CapturesCount
   )
 {
   EFI_STATUS  Status;
   UINT32      Index;
   BOOLEAN     Supported;
 
-  if (This == NULL || String == NULL || Pattern == NULL || Result == NULL || CapturesCount == NULL) {
+  if ((This == NULL) || (String == NULL) || (Pattern == NULL) || (Result == NULL) || (CapturesCount == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -342,6 +342,7 @@ RegularExpressionMatch (
         break;
       }
     }
+
     if (!Supported) {
       return EFI_UNSUPPORTED;
     }

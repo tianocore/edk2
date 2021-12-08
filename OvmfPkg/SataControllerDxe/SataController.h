@@ -26,88 +26,89 @@
 //
 // Global Variables definitions
 //
-extern EFI_DRIVER_BINDING_PROTOCOL  gSataControllerDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL  gSataControllerComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gSataControllerComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gSataControllerDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gSataControllerComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gSataControllerComponentName2;
 
-#define AHCI_BAR_INDEX 0x05
-#define R_AHCI_CAP 0x0
-#define   B_AHCI_CAP_NPS (BIT4 | BIT3 | BIT2 | BIT1 | BIT0) // Number of Ports
-#define   B_AHCI_CAP_SPM BIT17 // Supports Port Multiplier
+#define AHCI_BAR_INDEX    0x05
+#define R_AHCI_CAP        0x0
+#define   B_AHCI_CAP_NPS  (BIT4 | BIT3 | BIT2 | BIT1 | BIT0) // Number of Ports
+#define   B_AHCI_CAP_SPM  BIT17                              // Supports Port Multiplier
 
 ///
 /// AHCI each channel can have up to 1 device
 ///
-#define AHCI_MAX_DEVICES 0x01
+#define AHCI_MAX_DEVICES  0x01
 
 ///
 /// AHCI each channel can have 15 devices in the presence of a multiplier
 ///
-#define AHCI_MULTI_MAX_DEVICES 0x0F
+#define AHCI_MULTI_MAX_DEVICES  0x0F
 
 ///
 /// IDE supports 2 channel max
 ///
-#define IDE_MAX_CHANNEL 0x02
+#define IDE_MAX_CHANNEL  0x02
 
 ///
 /// IDE supports 2 devices max
 ///
-#define IDE_MAX_DEVICES 0x02
+#define IDE_MAX_DEVICES  0x02
 
-#define SATA_ENUMER_ALL FALSE
+#define SATA_ENUMER_ALL  FALSE
 
 //
 // Sata Controller driver private data structure
 //
 
-#define SATA_CONTROLLER_SIGNATURE SIGNATURE_32('S','A','T','A')
+#define SATA_CONTROLLER_SIGNATURE  SIGNATURE_32('S','A','T','A')
 
 typedef struct _EFI_SATA_CONTROLLER_PRIVATE_DATA {
   //
   // Standard signature used to identify Sata Controller private data
   //
-  UINT32                            Signature;
+  UINT32                              Signature;
 
   //
   // Protocol instance of IDE_CONTROLLER_INIT produced by this driver
   //
-  EFI_IDE_CONTROLLER_INIT_PROTOCOL  IdeInit;
+  EFI_IDE_CONTROLLER_INIT_PROTOCOL    IdeInit;
 
   //
   // Copy of protocol pointers used by this driver
   //
-  EFI_PCI_IO_PROTOCOL               *PciIo;
+  EFI_PCI_IO_PROTOCOL                 *PciIo;
 
   //
   // Original PCI attributes
   //
-  UINT64                            OriginalPciAttributes;
+  UINT64                              OriginalPciAttributes;
 
   //
   // The number of devices that are supported by this channel
   //
-  UINT8                             DeviceCount;
+  UINT8                               DeviceCount;
 
   //
   // The highest disqulified mode for each attached device,
   // From ATA/ATAPI spec, if a mode is not supported,
   // the modes higher than it is also not supported
   //
-  EFI_ATA_COLLECTIVE_MODE           *DisqualifiedModes;
+  EFI_ATA_COLLECTIVE_MODE             *DisqualifiedModes;
 
   //
   // A copy of EFI_IDENTIFY_DATA data for each attached SATA device and its flag
   //
-  EFI_IDENTIFY_DATA                 *IdentifyData;
-  BOOLEAN                           *IdentifyValid;
+  EFI_IDENTIFY_DATA                   *IdentifyData;
+  BOOLEAN                             *IdentifyValid;
 } EFI_SATA_CONTROLLER_PRIVATE_DATA;
 
-#define SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS(a) CR(a, EFI_SATA_CONTROLLER_PRIVATE_DATA, IdeInit, SATA_CONTROLLER_SIGNATURE)
+#define SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS(a)  CR(a, EFI_SATA_CONTROLLER_PRIVATE_DATA, IdeInit, SATA_CONTROLLER_SIGNATURE)
 
 //
 // Driver binding functions declaration
 //
+
 /**
   Supported function of Driver Binding protocol for this driver.
   Test to see if this driver supports ControllerHandle.
@@ -125,9 +126,9 @@ typedef struct _EFI_SATA_CONTROLLER_PRIVATE_DATA {
 EFI_STATUS
 EFIAPI
 SataControllerSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 ;
 
@@ -148,9 +149,9 @@ SataControllerSupported (
 EFI_STATUS
 EFIAPI
 SataControllerStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 ;
 
@@ -169,16 +170,17 @@ SataControllerStart (
 EFI_STATUS
 EFIAPI
 SataControllerStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                     Controller,
-  IN UINTN                          NumberOfChildren,
-  IN EFI_HANDLE                     *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   )
 ;
 
 //
 // IDE controller init functions declaration
 //
+
 /**
   Returns the information about the specified IDE channel.
 
@@ -218,10 +220,10 @@ SataControllerStop (
 EFI_STATUS
 EFIAPI
 IdeInitGetChannelInfo (
-  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL   *This,
-  IN UINT8                              Channel,
-  OUT BOOLEAN                           *Enabled,
-  OUT UINT8                             *MaxDevices
+  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL  *This,
+  IN UINT8                             Channel,
+  OUT BOOLEAN                          *Enabled,
+  OUT UINT8                            *MaxDevices
   )
 ;
 
@@ -252,9 +254,9 @@ IdeInitGetChannelInfo (
 EFI_STATUS
 EFIAPI
 IdeInitNotifyPhase (
-  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL   *This,
-  IN EFI_IDE_CONTROLLER_ENUM_PHASE      Phase,
-  IN UINT8                              Channel
+  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL  *This,
+  IN EFI_IDE_CONTROLLER_ENUM_PHASE     Phase,
+  IN UINT8                             Channel
   )
 ;
 
@@ -300,10 +302,10 @@ IdeInitNotifyPhase (
 EFI_STATUS
 EFIAPI
 IdeInitSubmitData (
-  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL   *This,
-  IN UINT8                              Channel,
-  IN UINT8                              Device,
-  IN EFI_IDENTIFY_DATA                  *IdentifyData
+  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL  *This,
+  IN UINT8                             Channel,
+  IN UINT8                             Device,
+  IN EFI_IDENTIFY_DATA                 *IdentifyData
   )
 ;
 
@@ -350,10 +352,10 @@ IdeInitSubmitData (
 EFI_STATUS
 EFIAPI
 IdeInitDisqualifyMode (
-  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL   *This,
-  IN UINT8                              Channel,
-  IN UINT8                              Device,
-  IN EFI_ATA_COLLECTIVE_MODE            *BadModes
+  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL  *This,
+  IN UINT8                             Channel,
+  IN UINT8                             Device,
+  IN EFI_ATA_COLLECTIVE_MODE           *BadModes
   )
 ;
 
@@ -414,10 +416,10 @@ IdeInitDisqualifyMode (
 EFI_STATUS
 EFIAPI
 IdeInitCalculateMode (
-  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL   *This,
-  IN UINT8                              Channel,
-  IN UINT8                              Device,
-  OUT EFI_ATA_COLLECTIVE_MODE           **SupportedModes
+  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL  *This,
+  IN UINT8                             Channel,
+  IN UINT8                             Device,
+  OUT EFI_ATA_COLLECTIVE_MODE          **SupportedModes
   )
 ;
 
@@ -447,16 +449,17 @@ IdeInitCalculateMode (
 EFI_STATUS
 EFIAPI
 IdeInitSetTiming (
-  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL   *This,
-  IN UINT8                              Channel,
-  IN UINT8                              Device,
-  IN EFI_ATA_COLLECTIVE_MODE            *Modes
+  IN EFI_IDE_CONTROLLER_INIT_PROTOCOL  *This,
+  IN UINT8                             Channel,
+  IN UINT8                             Device,
+  IN EFI_ATA_COLLECTIVE_MODE           *Modes
   )
 ;
 
 //
 // Forward reference declaration
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the UEFI Driver.
 
@@ -481,9 +484,9 @@ IdeInitSetTiming (
 EFI_STATUS
 EFIAPI
 SataControllerComponentNameGetDriverName (
-  IN EFI_COMPONENT_NAME_PROTOCOL    *This,
-  IN CHAR8                          *Language,
-  OUT CHAR16                        **DriverName
+  IN EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN CHAR8                        *Language,
+  OUT CHAR16                      **DriverName
   )
 ;
 
@@ -530,11 +533,11 @@ SataControllerComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 SataControllerComponentNameGetControllerName (
-  IN EFI_COMPONENT_NAME_PROTOCOL    *This,
-  IN EFI_HANDLE                     ControllerHandle,
-  IN EFI_HANDLE                     ChildHandle OPTIONAL,
-  IN CHAR8                          *Language,
-  OUT CHAR16                        **ControllerName
+  IN EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_HANDLE                   ChildHandle OPTIONAL,
+  IN CHAR8                        *Language,
+  OUT CHAR16                      **ControllerName
   )
 ;
 

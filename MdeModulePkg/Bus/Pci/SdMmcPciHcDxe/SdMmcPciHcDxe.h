@@ -35,11 +35,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "SdMmcPciHci.h"
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gSdMmcPciHcComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gSdMmcPciHcComponentName2;
-extern EFI_DRIVER_BINDING_PROTOCOL  gSdMmcPciHcDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gSdMmcPciHcComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gSdMmcPciHcComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gSdMmcPciHcDriverBinding;
 
-extern EDKII_SD_MMC_OVERRIDE        *mOverride;
+extern EDKII_SD_MMC_OVERRIDE  *mOverride;
 
 #define SD_MMC_HC_PRIVATE_SIGNATURE  SIGNATURE_32 ('s', 'd', 't', 'f')
 
@@ -49,18 +49,18 @@ extern EDKII_SD_MMC_OVERRIDE        *mOverride;
 //
 // Generic time out value, 1 microsecond as unit.
 //
-#define SD_MMC_HC_GENERIC_TIMEOUT     1 * 1000 * 1000
+#define SD_MMC_HC_GENERIC_TIMEOUT  1 * 1000 * 1000
 
 //
 // SD/MMC async transfer timer interval, set by experience.
 // The unit is 100us, takes 1ms as interval.
 //
-#define SD_MMC_HC_ASYNC_TIMER   EFI_TIMER_PERIOD_MILLISECONDS(1)
+#define SD_MMC_HC_ASYNC_TIMER  EFI_TIMER_PERIOD_MILLISECONDS(1)
 //
 // SD/MMC removable device enumeration timer interval, set by experience.
 // The unit is 100us, takes 100ms as interval.
 //
-#define SD_MMC_HC_ENUM_TIMER    EFI_TIMER_PERIOD_MILLISECONDS(100)
+#define SD_MMC_HC_ENUM_TIMER  EFI_TIMER_PERIOD_MILLISECONDS(100)
 
 typedef enum {
   UnknownCardType,
@@ -78,62 +78,66 @@ typedef enum {
 } EFI_SD_MMC_SLOT_TYPE;
 
 typedef struct {
+
   BOOLEAN                            Enable;
   EFI_SD_MMC_SLOT_TYPE               SlotType;
   BOOLEAN                            MediaPresent;
   BOOLEAN                            Initialized;
   SD_MMC_CARD_TYPE                   CardType;
   EDKII_SD_MMC_OPERATING_PARAMETERS  OperatingParameters;
+
 } SD_MMC_HC_SLOT;
 
 typedef struct {
-  UINTN                               Signature;
+  UINTN                            Signature;
 
-  EFI_HANDLE                          ControllerHandle;
-  EFI_PCI_IO_PROTOCOL                 *PciIo;
+  EFI_HANDLE                       ControllerHandle;
+  EFI_PCI_IO_PROTOCOL              *PciIo;
 
-  EFI_SD_MMC_PASS_THRU_PROTOCOL       PassThru;
+  EFI_SD_MMC_PASS_THRU_PROTOCOL    PassThru;
 
-  UINT64                              PciAttributes;
+  UINT64                           PciAttributes;
   //
   // The field is used to record the previous slot in GetNextSlot().
   //
-  UINT8                               PreviousSlot;
+  UINT8                            PreviousSlot;
   //
   // For Non-blocking operation.
   //
-  EFI_EVENT                           TimerEvent;
+  EFI_EVENT                        TimerEvent;
   //
   // For Sd removable device enumeration.
   //
-  EFI_EVENT                           ConnectEvent;
-  LIST_ENTRY                          Queue;
+  EFI_EVENT                        ConnectEvent;
+  LIST_ENTRY                       Queue;
 
-  SD_MMC_HC_SLOT                      Slot[SD_MMC_HC_MAX_SLOT];
-  SD_MMC_HC_SLOT_CAP                  Capability[SD_MMC_HC_MAX_SLOT];
-  UINT64                              MaxCurrent[SD_MMC_HC_MAX_SLOT];
-  UINT16                              ControllerVersion[SD_MMC_HC_MAX_SLOT];
+  SD_MMC_HC_SLOT                   Slot[SD_MMC_HC_MAX_SLOT];
+  SD_MMC_HC_SLOT_CAP               Capability[SD_MMC_HC_MAX_SLOT];
+  UINT64                           MaxCurrent[SD_MMC_HC_MAX_SLOT];
+  UINT16                           ControllerVersion[SD_MMC_HC_MAX_SLOT];
 
   //
   // Some controllers may require to override base clock frequency
   // value stored in Capabilities Register 1.
   //
-  UINT32                              BaseClkFreq[SD_MMC_HC_MAX_SLOT];
+  UINT32                           BaseClkFreq[SD_MMC_HC_MAX_SLOT];
 } SD_MMC_HC_PRIVATE_DATA;
 
 typedef struct {
-  SD_MMC_BUS_MODE               BusTiming;
-  UINT8                         BusWidth;
-  UINT32                        ClockFreq;
-  EDKII_SD_MMC_DRIVER_STRENGTH  DriverStrength;
+  SD_MMC_BUS_MODE                 BusTiming;
+  UINT8                           BusWidth;
+  UINT32                          ClockFreq;
+  EDKII_SD_MMC_DRIVER_STRENGTH    DriverStrength;
 } SD_MMC_BUS_SETTINGS;
 
-#define SD_MMC_HC_TRB_SIG             SIGNATURE_32 ('T', 'R', 'B', 'T')
+#define SD_MMC_HC_TRB_SIG  SIGNATURE_32 ('T', 'R', 'B', 'T')
+
 
 //
 // TRB (Transfer Request Block) contains information for the cmd request.
 //
 typedef struct {
+
   UINT32                              Signature;
   LIST_ENTRY                          TrbList;
 
@@ -161,6 +165,7 @@ typedef struct {
   UINT32                              AdmaPages;
 
   SD_MMC_HC_PRIVATE_DATA              *Private;
+
 } SD_MMC_HC_TRB;
 
 #define SD_MMC_HC_TRB_FROM_THIS(a) \
@@ -170,22 +175,23 @@ typedef struct {
 // Task for Non-blocking mode.
 //
 typedef struct {
-  UINT32                              Signature;
-  LIST_ENTRY                          Link;
+  UINT32                                 Signature;
+  LIST_ENTRY                             Link;
 
-  UINT8                               Slot;
-  EFI_SD_MMC_PASS_THRU_COMMAND_PACKET *Packet;
-  BOOLEAN                             IsStart;
-  EFI_EVENT                           Event;
-  UINT64                              RetryTimes;
-  BOOLEAN                             InfiniteWait;
-  VOID                                *Map;
-  VOID                                *MapAddress;
+  UINT8                                  Slot;
+  EFI_SD_MMC_PASS_THRU_COMMAND_PACKET    *Packet;
+  BOOLEAN                                IsStart;
+  EFI_EVENT                              Event;
+  UINT64                                 RetryTimes;
+  BOOLEAN                                InfiniteWait;
+  VOID                                   *Map;
+  VOID                                   *MapAddress;
 } SD_MMC_HC_QUEUE;
 
 //
 // Prototypes
 //
+
 /**
   Execute card identification procedure.
 
@@ -199,8 +205,8 @@ typedef struct {
 typedef
 EFI_STATUS
 (*CARD_TYPE_DETECT_ROUTINE) (
-  IN SD_MMC_HC_PRIVATE_DATA             *Private,
-  IN UINT8                              Slot
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN UINT8                   Slot
   );
 
 /**
@@ -243,10 +249,10 @@ EFI_STATUS
 EFI_STATUS
 EFIAPI
 SdMmcPassThruPassThru (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL         *This,
-  IN     UINT8                                 Slot,
-  IN OUT EFI_SD_MMC_PASS_THRU_COMMAND_PACKET   *Packet,
-  IN     EFI_EVENT                             Event    OPTIONAL
+  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL        *This,
+  IN     UINT8                                Slot,
+  IN OUT EFI_SD_MMC_PASS_THRU_COMMAND_PACKET  *Packet,
+  IN     EFI_EVENT                            Event    OPTIONAL
   );
 
 /**
@@ -281,8 +287,8 @@ SdMmcPassThruPassThru (
 EFI_STATUS
 EFIAPI
 SdMmcPassThruGetNextSlot (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL        *This,
-  IN OUT UINT8                                *Slot
+  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN OUT UINT8                          *Slot
   );
 
 /**
@@ -322,9 +328,9 @@ SdMmcPassThruGetNextSlot (
 EFI_STATUS
 EFIAPI
 SdMmcPassThruBuildDevicePath (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL       *This,
-  IN     UINT8                               Slot,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL            **DevicePath
+  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN     UINT8                          Slot,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL       **DevicePath
   );
 
 /**
@@ -351,9 +357,9 @@ SdMmcPassThruBuildDevicePath (
 EFI_STATUS
 EFIAPI
 SdMmcPassThruGetSlotNumber (
-  IN  EFI_SD_MMC_PASS_THRU_PROTOCOL          *This,
-  IN  EFI_DEVICE_PATH_PROTOCOL               *DevicePath,
-  OUT UINT8                                  *Slot
+  IN  EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN  EFI_DEVICE_PATH_PROTOCOL       *DevicePath,
+  OUT UINT8                          *Slot
   );
 
 /**
@@ -382,13 +388,14 @@ SdMmcPassThruGetSlotNumber (
 EFI_STATUS
 EFIAPI
 SdMmcPassThruResetDevice (
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL           *This,
-  IN UINT8                                   Slot
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN UINT8                          Slot
   );
 
 //
 // Driver model protocol interfaces
 //
+
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
@@ -434,9 +441,9 @@ SdMmcPassThruResetDevice (
 EFI_STATUS
 EFIAPI
 SdMmcPciHcDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -477,9 +484,9 @@ SdMmcPciHcDriverBindingSupported (
 EFI_STATUS
 EFIAPI
 SdMmcPciHcDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN EFI_HANDLE                      Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -511,15 +518,16 @@ SdMmcPciHcDriverBindingStart (
 EFI_STATUS
 EFIAPI
 SdMmcPciHcDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Controller,
-  IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Controller,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -562,9 +570,9 @@ SdMmcPciHcDriverBindingStop (
 EFI_STATUS
 EFIAPI
 SdMmcPciHcComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
-  IN  CHAR8                           *Language,
-  OUT CHAR16                          **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   );
 
 /**
@@ -638,11 +646,11 @@ SdMmcPciHcComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 SdMmcPciHcComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
-  IN  EFI_HANDLE                      ControllerHandle,
-  IN  EFI_HANDLE                      ChildHandle, OPTIONAL
-  IN  CHAR8                           *Language,
-  OUT CHAR16                          **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  EFI_HANDLE                   ChildHandle  OPTIONAL,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   );
 
 /**
@@ -660,10 +668,10 @@ SdMmcPciHcComponentNameGetControllerName (
 **/
 SD_MMC_HC_TRB *
 SdMmcCreateTrb (
-  IN SD_MMC_HC_PRIVATE_DATA              *Private,
-  IN UINT8                               Slot,
-  IN EFI_SD_MMC_PASS_THRU_COMMAND_PACKET *Packet,
-  IN EFI_EVENT                           Event
+  IN SD_MMC_HC_PRIVATE_DATA               *Private,
+  IN UINT8                                Slot,
+  IN EFI_SD_MMC_PASS_THRU_COMMAND_PACKET  *Packet,
+  IN EFI_EVENT                            Event
   );
 
 /**
@@ -674,7 +682,7 @@ SdMmcCreateTrb (
 **/
 VOID
 SdMmcFreeTrb (
-  IN SD_MMC_HC_TRB           *Trb
+  IN SD_MMC_HC_TRB  *Trb
   );
 
 /**
@@ -690,8 +698,8 @@ SdMmcFreeTrb (
 **/
 EFI_STATUS
 SdMmcCheckTrbEnv (
-  IN SD_MMC_HC_PRIVATE_DATA           *Private,
-  IN SD_MMC_HC_TRB                    *Trb
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN SD_MMC_HC_TRB           *Trb
   );
 
 /**
@@ -707,8 +715,8 @@ SdMmcCheckTrbEnv (
 **/
 EFI_STATUS
 SdMmcWaitTrbEnv (
-  IN SD_MMC_HC_PRIVATE_DATA           *Private,
-  IN SD_MMC_HC_TRB                    *Trb
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN SD_MMC_HC_TRB           *Trb
   );
 
 /**
@@ -723,8 +731,8 @@ SdMmcWaitTrbEnv (
 **/
 EFI_STATUS
 SdMmcExecTrb (
-  IN SD_MMC_HC_PRIVATE_DATA           *Private,
-  IN SD_MMC_HC_TRB                    *Trb
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN SD_MMC_HC_TRB           *Trb
   );
 
 /**
@@ -740,8 +748,8 @@ SdMmcExecTrb (
 **/
 EFI_STATUS
 SdMmcCheckTrbResult (
-  IN SD_MMC_HC_PRIVATE_DATA           *Private,
-  IN SD_MMC_HC_TRB                    *Trb
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN SD_MMC_HC_TRB           *Trb
   );
 
 /**
@@ -756,8 +764,8 @@ SdMmcCheckTrbResult (
 **/
 EFI_STATUS
 SdMmcWaitTrbResult (
-  IN SD_MMC_HC_PRIVATE_DATA           *Private,
-  IN SD_MMC_HC_TRB                    *Trb
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN SD_MMC_HC_TRB           *Trb
   );
 
 /**
@@ -774,8 +782,8 @@ SdMmcWaitTrbResult (
 **/
 EFI_STATUS
 EmmcIdentification (
-  IN SD_MMC_HC_PRIVATE_DATA             *Private,
-  IN UINT8                              Slot
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN UINT8                   Slot
   );
 
 /**
@@ -792,8 +800,8 @@ EmmcIdentification (
 **/
 EFI_STATUS
 SdCardIdentification (
-  IN SD_MMC_HC_PRIVATE_DATA             *Private,
-  IN UINT8                              Slot
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN UINT8                   Slot
   );
 
 /**
@@ -808,8 +816,8 @@ SdCardIdentification (
 **/
 EFI_STATUS
 SdMmcHcReset (
-  IN SD_MMC_HC_PRIVATE_DATA *Private,
-  IN UINT8                  Slot
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN UINT8                   Slot
   );
 
 /**
@@ -825,8 +833,8 @@ SdMmcHcReset (
 **/
 EFI_STATUS
 SdMmcHcInitHost (
-  IN SD_MMC_HC_PRIVATE_DATA *Private,
-  IN UINT8                  Slot
+  IN SD_MMC_HC_PRIVATE_DATA  *Private,
+  IN UINT8                   Slot
   );
 
 #endif

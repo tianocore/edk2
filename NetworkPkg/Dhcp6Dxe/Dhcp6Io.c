@@ -10,7 +10,6 @@
 
 #include "Dhcp6Impl.h"
 
-
 /**
   Enqueue the packet into the retry list in case of timeout.
 
@@ -34,8 +33,8 @@ Dhcp6EnqueueRetry (
   IN EFI_DHCP6_RETRANSMISSION  *RetryCtl     OPTIONAL
   )
 {
-  DHCP6_TX_CB                  *TxCb;
-  DHCP6_IA_CB                  *IaCb;
+  DHCP6_TX_CB  *TxCb;
+  DHCP6_IA_CB  *IaCb;
 
   ASSERT (Packet != NULL);
 
@@ -55,156 +54,156 @@ Dhcp6EnqueueRetry (
   //
   // Save pointer to elapsed-time value so we can update it on retransmits.
   //
-  TxCb->Elapsed  = Elapsed;
+  TxCb->Elapsed = Elapsed;
 
   //
   // Calculate the retransmission according to the message type.
   //
   switch (Packet->Dhcp6.Header.MessageType) {
-  case Dhcp6MsgSolicit:
-    //
-    // Calculate the retransmission threshold value for solicit packet.
-    // Use the default value by rfc-3315 if user doesn't configure.
-    //
-    if (RetryCtl == NULL) {
-      TxCb->RetryCtl.Irt = DHCP6_SOL_IRT;
-      TxCb->RetryCtl.Mrc = DHCP6_SOL_MRC;
-      TxCb->RetryCtl.Mrt = DHCP6_SOL_MRT;
-      TxCb->RetryCtl.Mrd = DHCP6_SOL_MRD;
-    } else {
-      TxCb->RetryCtl.Irt = (RetryCtl->Irt != 0) ? RetryCtl->Irt : DHCP6_SOL_IRT;
-      TxCb->RetryCtl.Mrc = (RetryCtl->Mrc != 0) ? RetryCtl->Mrc : DHCP6_SOL_MRC;
-      TxCb->RetryCtl.Mrt = (RetryCtl->Mrt != 0) ? RetryCtl->Mrt : DHCP6_SOL_MRT;
-      TxCb->RetryCtl.Mrd = (RetryCtl->Mrd != 0) ? RetryCtl->Mrd : DHCP6_SOL_MRD;
-    }
+    case Dhcp6MsgSolicit:
+      //
+      // Calculate the retransmission threshold value for solicit packet.
+      // Use the default value by rfc-3315 if user doesn't configure.
+      //
+      if (RetryCtl == NULL) {
+        TxCb->RetryCtl.Irt = DHCP6_SOL_IRT;
+        TxCb->RetryCtl.Mrc = DHCP6_SOL_MRC;
+        TxCb->RetryCtl.Mrt = DHCP6_SOL_MRT;
+        TxCb->RetryCtl.Mrd = DHCP6_SOL_MRD;
+      } else {
+        TxCb->RetryCtl.Irt = (RetryCtl->Irt != 0) ? RetryCtl->Irt : DHCP6_SOL_IRT;
+        TxCb->RetryCtl.Mrc = (RetryCtl->Mrc != 0) ? RetryCtl->Mrc : DHCP6_SOL_MRC;
+        TxCb->RetryCtl.Mrt = (RetryCtl->Mrt != 0) ? RetryCtl->Mrt : DHCP6_SOL_MRT;
+        TxCb->RetryCtl.Mrd = (RetryCtl->Mrd != 0) ? RetryCtl->Mrd : DHCP6_SOL_MRD;
+      }
 
-    TxCb->RetryExp       = Dhcp6CalculateExpireTime (
-                             TxCb->RetryCtl.Irt,
-                             TRUE,
-                             FALSE
-                             );
-    break;
+      TxCb->RetryExp = Dhcp6CalculateExpireTime (
+                         TxCb->RetryCtl.Irt,
+                         TRUE,
+                         FALSE
+                         );
+      break;
 
-  case Dhcp6MsgRequest:
-    //
-    // Calculate the retransmission threshold value for request packet.
-    //
-    TxCb->RetryCtl.Irt = DHCP6_REQ_IRT;
-    TxCb->RetryCtl.Mrc = DHCP6_REQ_MRC;
-    TxCb->RetryCtl.Mrt = DHCP6_REQ_MRT;
-    TxCb->RetryCtl.Mrd = DHCP6_REQ_MRD;
-    TxCb->RetryExp     = Dhcp6CalculateExpireTime (
-                           TxCb->RetryCtl.Irt,
-                           TRUE,
-                           TRUE
-                           );
-    break;
-
-  case Dhcp6MsgConfirm:
-    //
-    // Calculate the retransmission threshold value for confirm packet.
-    //
-    TxCb->RetryCtl.Irt = DHCP6_CNF_IRT;
-    TxCb->RetryCtl.Mrc = DHCP6_CNF_MRC;
-    TxCb->RetryCtl.Mrt = DHCP6_CNF_MRT;
-    TxCb->RetryCtl.Mrd = DHCP6_CNF_MRD;
-    TxCb->RetryExp     = Dhcp6CalculateExpireTime (
-                           TxCb->RetryCtl.Irt,
-                           TRUE,
-                           TRUE
-                           );
-    break;
-
-  case Dhcp6MsgRenew:
-    //
-    // Calculate the retransmission threshold value for renew packet.
-    //
-    TxCb->RetryCtl.Irt = DHCP6_REB_IRT;
-    TxCb->RetryCtl.Mrc = DHCP6_REB_MRC;
-    TxCb->RetryCtl.Mrt = DHCP6_REB_MRT;
-    TxCb->RetryCtl.Mrd = IaCb->T2 - IaCb->T1;
-    TxCb->RetryExp     = Dhcp6CalculateExpireTime (
-                           TxCb->RetryCtl.Irt,
-                           TRUE,
-                           TRUE
-                           );
-    break;
-
-  case Dhcp6MsgRebind:
-    //
-    // Calculate the retransmission threshold value for rebind packet.
-    //
-    TxCb->RetryCtl.Irt = DHCP6_REN_IRT;
-    TxCb->RetryCtl.Mrc = DHCP6_REN_MRC;
-    TxCb->RetryCtl.Mrt = DHCP6_REN_MRT;
-    TxCb->RetryCtl.Mrd = IaCb->AllExpireTime - IaCb->T2;
-    TxCb->RetryExp     = Dhcp6CalculateExpireTime (
-                           TxCb->RetryCtl.Irt,
-                           TRUE,
-                           TRUE
-                           );
-    break;
-
-  case Dhcp6MsgDecline:
-    //
-    // Calculate the retransmission threshold value for decline packet.
-    //
-    TxCb->RetryCtl.Irt = DHCP6_DEC_IRT;
-    TxCb->RetryCtl.Mrc = DHCP6_DEC_MRC;
-    TxCb->RetryCtl.Mrt = DHCP6_DEC_MRT;
-    TxCb->RetryCtl.Mrd = DHCP6_DEC_MRD;
-    TxCb->RetryExp     = Dhcp6CalculateExpireTime (
-                           TxCb->RetryCtl.Irt,
-                           TRUE,
-                           TRUE
-                           );
-    break;
-
-  case Dhcp6MsgRelease:
-    //
-    // Calculate the retransmission threshold value for release packet.
-    //
-    TxCb->RetryCtl.Irt = DHCP6_REL_IRT;
-    TxCb->RetryCtl.Mrc = DHCP6_REL_MRC;
-    TxCb->RetryCtl.Mrt = DHCP6_REL_MRT;
-    TxCb->RetryCtl.Mrd = DHCP6_REL_MRD;
-    TxCb->RetryExp     = Dhcp6CalculateExpireTime (
-                           TxCb->RetryCtl.Irt,
-                           TRUE,
-                           TRUE
-                           );
-    break;
-
-  case Dhcp6MsgInfoRequest:
-    //
-    // Calculate the retransmission threshold value for info-request packet.
-    // Use the default value by rfc-3315 if user doesn't configure.
-    //
-    if (RetryCtl == NULL) {
-      TxCb->RetryCtl.Irt = DHCP6_INF_IRT;
-      TxCb->RetryCtl.Mrc = DHCP6_INF_MRC;
-      TxCb->RetryCtl.Mrt = DHCP6_INF_MRT;
-      TxCb->RetryCtl.Mrd = DHCP6_INF_MRD;
-    } else {
-      TxCb->RetryCtl.Irt = (RetryCtl->Irt != 0) ? RetryCtl->Irt : DHCP6_INF_IRT;
-      TxCb->RetryCtl.Mrc = (RetryCtl->Mrc != 0) ? RetryCtl->Mrc : DHCP6_INF_MRC;
-      TxCb->RetryCtl.Mrt = (RetryCtl->Mrt != 0) ? RetryCtl->Mrt : DHCP6_INF_MRT;
-      TxCb->RetryCtl.Mrd = (RetryCtl->Mrd != 0) ? RetryCtl->Mrd : DHCP6_INF_MRD;
-    }
-
-    TxCb->RetryExp       = Dhcp6CalculateExpireTime (
+    case Dhcp6MsgRequest:
+      //
+      // Calculate the retransmission threshold value for request packet.
+      //
+      TxCb->RetryCtl.Irt = DHCP6_REQ_IRT;
+      TxCb->RetryCtl.Mrc = DHCP6_REQ_MRC;
+      TxCb->RetryCtl.Mrt = DHCP6_REQ_MRT;
+      TxCb->RetryCtl.Mrd = DHCP6_REQ_MRD;
+      TxCb->RetryExp     = Dhcp6CalculateExpireTime (
                              TxCb->RetryCtl.Irt,
                              TRUE,
                              TRUE
                              );
-    break;
+      break;
 
-  default:
-    //
-    // Unexpected message type.
-    //
-    FreePool(TxCb);
-    return EFI_DEVICE_ERROR;
+    case Dhcp6MsgConfirm:
+      //
+      // Calculate the retransmission threshold value for confirm packet.
+      //
+      TxCb->RetryCtl.Irt = DHCP6_CNF_IRT;
+      TxCb->RetryCtl.Mrc = DHCP6_CNF_MRC;
+      TxCb->RetryCtl.Mrt = DHCP6_CNF_MRT;
+      TxCb->RetryCtl.Mrd = DHCP6_CNF_MRD;
+      TxCb->RetryExp     = Dhcp6CalculateExpireTime (
+                             TxCb->RetryCtl.Irt,
+                             TRUE,
+                             TRUE
+                             );
+      break;
+
+    case Dhcp6MsgRenew:
+      //
+      // Calculate the retransmission threshold value for renew packet.
+      //
+      TxCb->RetryCtl.Irt = DHCP6_REB_IRT;
+      TxCb->RetryCtl.Mrc = DHCP6_REB_MRC;
+      TxCb->RetryCtl.Mrt = DHCP6_REB_MRT;
+      TxCb->RetryCtl.Mrd = IaCb->T2 - IaCb->T1;
+      TxCb->RetryExp     = Dhcp6CalculateExpireTime (
+                             TxCb->RetryCtl.Irt,
+                             TRUE,
+                             TRUE
+                             );
+      break;
+
+    case Dhcp6MsgRebind:
+      //
+      // Calculate the retransmission threshold value for rebind packet.
+      //
+      TxCb->RetryCtl.Irt = DHCP6_REN_IRT;
+      TxCb->RetryCtl.Mrc = DHCP6_REN_MRC;
+      TxCb->RetryCtl.Mrt = DHCP6_REN_MRT;
+      TxCb->RetryCtl.Mrd = IaCb->AllExpireTime - IaCb->T2;
+      TxCb->RetryExp     = Dhcp6CalculateExpireTime (
+                             TxCb->RetryCtl.Irt,
+                             TRUE,
+                             TRUE
+                             );
+      break;
+
+    case Dhcp6MsgDecline:
+      //
+      // Calculate the retransmission threshold value for decline packet.
+      //
+      TxCb->RetryCtl.Irt = DHCP6_DEC_IRT;
+      TxCb->RetryCtl.Mrc = DHCP6_DEC_MRC;
+      TxCb->RetryCtl.Mrt = DHCP6_DEC_MRT;
+      TxCb->RetryCtl.Mrd = DHCP6_DEC_MRD;
+      TxCb->RetryExp     = Dhcp6CalculateExpireTime (
+                             TxCb->RetryCtl.Irt,
+                             TRUE,
+                             TRUE
+                             );
+      break;
+
+    case Dhcp6MsgRelease:
+      //
+      // Calculate the retransmission threshold value for release packet.
+      //
+      TxCb->RetryCtl.Irt = DHCP6_REL_IRT;
+      TxCb->RetryCtl.Mrc = DHCP6_REL_MRC;
+      TxCb->RetryCtl.Mrt = DHCP6_REL_MRT;
+      TxCb->RetryCtl.Mrd = DHCP6_REL_MRD;
+      TxCb->RetryExp     = Dhcp6CalculateExpireTime (
+                             TxCb->RetryCtl.Irt,
+                             TRUE,
+                             TRUE
+                             );
+      break;
+
+    case Dhcp6MsgInfoRequest:
+      //
+      // Calculate the retransmission threshold value for info-request packet.
+      // Use the default value by rfc-3315 if user doesn't configure.
+      //
+      if (RetryCtl == NULL) {
+        TxCb->RetryCtl.Irt = DHCP6_INF_IRT;
+        TxCb->RetryCtl.Mrc = DHCP6_INF_MRC;
+        TxCb->RetryCtl.Mrt = DHCP6_INF_MRT;
+        TxCb->RetryCtl.Mrd = DHCP6_INF_MRD;
+      } else {
+        TxCb->RetryCtl.Irt = (RetryCtl->Irt != 0) ? RetryCtl->Irt : DHCP6_INF_IRT;
+        TxCb->RetryCtl.Mrc = (RetryCtl->Mrc != 0) ? RetryCtl->Mrc : DHCP6_INF_MRC;
+        TxCb->RetryCtl.Mrt = (RetryCtl->Mrt != 0) ? RetryCtl->Mrt : DHCP6_INF_MRT;
+        TxCb->RetryCtl.Mrd = (RetryCtl->Mrd != 0) ? RetryCtl->Mrd : DHCP6_INF_MRD;
+      }
+
+      TxCb->RetryExp = Dhcp6CalculateExpireTime (
+                         TxCb->RetryCtl.Irt,
+                         TRUE,
+                         TRUE
+                         );
+      break;
+
+    default:
+      //
+      // Unexpected message type.
+      //
+      FreePool (TxCb);
+      return EFI_DEVICE_ERROR;
   }
 
   //
@@ -214,7 +213,6 @@ Dhcp6EnqueueRetry (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Dequeue the packet from retry list if reply received or timeout at last.
@@ -230,40 +228,36 @@ Dhcp6EnqueueRetry (
 **/
 EFI_STATUS
 Dhcp6DequeueRetry (
-  IN DHCP6_INSTANCE         *Instance,
-  IN UINT32                 PacketXid,
-  IN BOOLEAN                NeedSignal
+  IN DHCP6_INSTANCE  *Instance,
+  IN UINT32          PacketXid,
+  IN BOOLEAN         NeedSignal
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *NextEntry;
-  DHCP6_TX_CB               *TxCb;
-  DHCP6_INF_CB              *InfCb;
+  LIST_ENTRY    *Entry;
+  LIST_ENTRY    *NextEntry;
+  DHCP6_TX_CB   *TxCb;
+  DHCP6_INF_CB  *InfCb;
 
   //
   // Seek the retransmit node in the retransmit list by packet xid.
   //
   NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Instance->TxList) {
-
     TxCb = NET_LIST_USER_STRUCT (Entry, DHCP6_TX_CB, Link);
-    ASSERT(TxCb->TxPacket);
+    ASSERT (TxCb->TxPacket);
 
     if (TxCb->Xid == PacketXid) {
-
       if (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgInfoRequest) {
-
         //
         // Seek the info-request node in the info-request list by packet xid.
         //
         NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Instance->InfList) {
-
           InfCb = NET_LIST_USER_STRUCT (Entry, DHCP6_INF_CB, Link);
 
           if (InfCb->Xid == PacketXid) {
             //
             // Remove the info-request node, and signal the event if timeout.
             //
-            if (InfCb->TimeoutEvent != NULL && NeedSignal) {
+            if ((InfCb->TimeoutEvent != NULL) && NeedSignal) {
               gBS->SignalEvent (InfCb->TimeoutEvent);
             }
 
@@ -272,11 +266,12 @@ Dhcp6DequeueRetry (
           }
         }
       }
+
       //
       // Remove the retransmit node.
       //
       RemoveEntryList (&TxCb->Link);
-      ASSERT(TxCb->TxPacket);
+      ASSERT (TxCb->TxPacket);
       FreePool (TxCb->TxPacket);
       FreePool (TxCb);
       return EFI_SUCCESS;
@@ -285,7 +280,6 @@ Dhcp6DequeueRetry (
 
   return EFI_NOT_FOUND;
 }
-
 
 /**
   Clean up the specific nodes in the retry list.
@@ -296,24 +290,22 @@ Dhcp6DequeueRetry (
 **/
 VOID
 Dhcp6CleanupRetry (
-  IN DHCP6_INSTANCE         *Instance,
-  IN UINT32                 Scope
+  IN DHCP6_INSTANCE  *Instance,
+  IN UINT32          Scope
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *NextEntry;
-  DHCP6_TX_CB               *TxCb;
-  DHCP6_INF_CB              *InfCb;
+  LIST_ENTRY    *Entry;
+  LIST_ENTRY    *NextEntry;
+  DHCP6_TX_CB   *TxCb;
+  DHCP6_INF_CB  *InfCb;
 
   //
   // Clean up all the stateful messages from the retransmit list.
   //
-  if (Scope == DHCP6_PACKET_STATEFUL || Scope == DHCP6_PACKET_ALL) {
-
+  if ((Scope == DHCP6_PACKET_STATEFUL) || (Scope == DHCP6_PACKET_ALL)) {
     NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Instance->TxList) {
-
       TxCb = NET_LIST_USER_STRUCT (Entry, DHCP6_TX_CB, Link);
-      ASSERT(TxCb->TxPacket);
+      ASSERT (TxCb->TxPacket);
 
       if (TxCb->TxPacket->Dhcp6.Header.MessageType != Dhcp6MsgInfoRequest) {
         RemoveEntryList (&TxCb->Link);
@@ -326,15 +318,13 @@ Dhcp6CleanupRetry (
   //
   // Clean up all the stateless messages from the retransmit list.
   //
-  if (Scope == DHCP6_PACKET_STATELESS || Scope == DHCP6_PACKET_ALL) {
-
+  if ((Scope == DHCP6_PACKET_STATELESS) || (Scope == DHCP6_PACKET_ALL)) {
     //
     // Clean up all the retransmit list for stateless messages.
     //
     NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Instance->TxList) {
-
       TxCb = NET_LIST_USER_STRUCT (Entry, DHCP6_TX_CB, Link);
-      ASSERT(TxCb->TxPacket);
+      ASSERT (TxCb->TxPacket);
 
       if (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgInfoRequest) {
         RemoveEntryList (&TxCb->Link);
@@ -347,12 +337,12 @@ Dhcp6CleanupRetry (
     // Clean up all the info-request messages list.
     //
     NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Instance->InfList) {
-
       InfCb = NET_LIST_USER_STRUCT (Entry, DHCP6_INF_CB, Link);
 
       if (InfCb->TimeoutEvent != NULL) {
         gBS->SignalEvent (InfCb->TimeoutEvent);
       }
+
       RemoveEntryList (&InfCb->Link);
       FreePool (InfCb);
     }
@@ -371,11 +361,11 @@ Dhcp6CleanupRetry (
 **/
 BOOLEAN
 Dhcp6IsValidTxCb (
-  IN  DHCP6_INSTANCE          *Instance,
-  IN  DHCP6_TX_CB             *TxCb
+  IN  DHCP6_INSTANCE  *Instance,
+  IN  DHCP6_TX_CB     *TxCb
   )
 {
-  LIST_ENTRY                *Entry;
+  LIST_ENTRY  *Entry;
 
   NET_LIST_FOR_EACH (Entry, &Instance->TxList) {
     if (TxCb == NET_LIST_USER_STRUCT (Entry, DHCP6_TX_CB, Link)) {
@@ -395,15 +385,15 @@ Dhcp6IsValidTxCb (
 **/
 VOID
 Dhcp6CleanupSession (
-  IN OUT DHCP6_INSTANCE          *Instance,
-  IN     EFI_STATUS              Status
+  IN OUT DHCP6_INSTANCE  *Instance,
+  IN     EFI_STATUS      Status
   )
 {
-  UINTN                          Index;
-  EFI_DHCP6_IA                   *Ia;
+  UINTN         Index;
+  EFI_DHCP6_IA  *Ia;
 
-  ASSERT(Instance->Config);
-  ASSERT(Instance->IaCb.Ia);
+  ASSERT (Instance->Config);
+  ASSERT (Instance->IaCb.Ia);
 
   //
   // Clean up the retransmit list for stateful messages.
@@ -425,23 +415,23 @@ Dhcp6CleanupSession (
   //
   // Reinitialize the Ia fields of the instance.
   //
-  Instance->UdpSts                  = Status;
-  Instance->AdSelect                = NULL;
-  Instance->AdPref                  = 0;
-  Instance->Unicast                 = NULL;
-  Instance->IaCb.T1                 = 0;
-  Instance->IaCb.T2                 = 0;
-  Instance->IaCb.AllExpireTime      = 0;
-  Instance->IaCb.LeaseTime          = 0;
+  Instance->UdpSts             = Status;
+  Instance->AdSelect           = NULL;
+  Instance->AdPref             = 0;
+  Instance->Unicast            = NULL;
+  Instance->IaCb.T1            = 0;
+  Instance->IaCb.T2            = 0;
+  Instance->IaCb.AllExpireTime = 0;
+  Instance->IaCb.LeaseTime     = 0;
 
   //
   // Clear start time
   //
-  Instance->StartTime               = 0;
+  Instance->StartTime = 0;
 
-  Ia                                = Instance->IaCb.Ia;
-  Ia->State                         = Dhcp6Init;
-  Ia->ReplyPacket                   = NULL;
+  Ia              = Instance->IaCb.Ia;
+  Ia->State       = Dhcp6Init;
+  Ia->ReplyPacket = NULL;
 
   //
   // Set the addresses as zero lifetime, and then the notify
@@ -461,7 +451,6 @@ Dhcp6CleanupSession (
   }
 }
 
-
 /**
   Callback to user when Dhcp6 transmit/receive occurs.
 
@@ -477,15 +466,15 @@ Dhcp6CleanupSession (
 EFI_STATUS
 EFIAPI
 Dhcp6CallbackUser (
-  IN     DHCP6_INSTANCE       *Instance,
-  IN     EFI_DHCP6_EVENT      Event,
-  IN OUT EFI_DHCP6_PACKET     **Packet
+  IN     DHCP6_INSTANCE    *Instance,
+  IN     EFI_DHCP6_EVENT   Event,
+  IN OUT EFI_DHCP6_PACKET  **Packet
   )
 {
-  EFI_STATUS                  Status;
-  EFI_DHCP6_PACKET            *NewPacket;
-  EFI_DHCP6_CALLBACK          Callback;
-  VOID                        *Context;
+  EFI_STATUS          Status;
+  EFI_DHCP6_PACKET    *NewPacket;
+  EFI_DHCP6_CALLBACK  Callback;
+  VOID                *Context;
 
   ASSERT (Packet != NULL);
   ASSERT (Instance->Config != NULL);
@@ -500,7 +489,6 @@ Dhcp6CallbackUser (
   // Callback to user with the new message if has.
   //
   if (Callback != NULL) {
-
     Status = Callback (
                &Instance->Dhcp6,
                Context,
@@ -522,7 +510,6 @@ Dhcp6CallbackUser (
   return Status;
 }
 
-
 /**
   Update Ia according to the new reply message.
 
@@ -535,17 +522,17 @@ Dhcp6CallbackUser (
 **/
 EFI_STATUS
 Dhcp6UpdateIaInfo (
-  IN OUT DHCP6_INSTANCE           *Instance,
-  IN     EFI_DHCP6_PACKET         *Packet
+  IN OUT DHCP6_INSTANCE    *Instance,
+  IN     EFI_DHCP6_PACKET  *Packet
   )
 {
-  EFI_STATUS                  Status;
-  UINT8                       *Option;
-  UINT8                       *IaInnerOpt;
-  UINT16                      IaInnerLen;
-  UINT16                      StsCode;
-  UINT32                      T1;
-  UINT32                      T2;
+  EFI_STATUS  Status;
+  UINT8       *Option;
+  UINT8       *IaInnerOpt;
+  UINT16      IaInnerLen;
+  UINT16      StsCode;
+  UINT32      T1;
+  UINT32      T2;
 
   ASSERT (Instance->Config != NULL);
   //
@@ -611,23 +598,24 @@ Dhcp6UpdateIaInfo (
   // The inner options still start with 2 bytes option-code and 2 bytes option-len.
   //
   if (Instance->Config->IaDescriptor.Type == Dhcp6OptIana) {
-    T1 = NTOHL (ReadUnaligned32 ((UINT32 *) (Option + 8)));
-    T2 = NTOHL (ReadUnaligned32 ((UINT32 *) (Option + 12)));
+    T1 = NTOHL (ReadUnaligned32 ((UINT32 *)(Option + 8)));
+    T2 = NTOHL (ReadUnaligned32 ((UINT32 *)(Option + 12)));
     //
     // Refer to RFC3155 Chapter 22.4. If a client receives an IA_NA with T1 greater than T2,
     // and both T1 and T2 are greater than 0, the client discards the IA_NA option and processes
     // the remainder of the message as though the server had not  included the invalid IA_NA option.
     //
-    if (T1 > T2 && T2 > 0) {
+    if ((T1 > T2) && (T2 > 0)) {
       return EFI_DEVICE_ERROR;
     }
+
     IaInnerOpt = Option + 16;
-    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 ((UINT16 *) (Option + 2))) - 12);
+    IaInnerLen = (UINT16)(NTOHS (ReadUnaligned16 ((UINT16 *)(Option + 2))) - 12);
   } else {
-    T1 = 0;
-    T2 = 0;
+    T1         = 0;
+    T2         = 0;
     IaInnerOpt = Option + 8;
-    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 ((UINT16 *) (Option + 2))) - 4);
+    IaInnerLen = (UINT16)(NTOHS (ReadUnaligned16 ((UINT16 *)(Option + 2))) - 4);
   }
 
   //
@@ -653,7 +641,7 @@ Dhcp6UpdateIaInfo (
   Option  = Dhcp6SeekOption (IaInnerOpt, IaInnerLen, Dhcp6OptStatusCode);
 
   if (Option != NULL) {
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *) (Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(Option + 4)));
     if (StsCode != Dhcp6StsSuccess) {
       return EFI_DEVICE_ERROR;
     }
@@ -673,8 +661,6 @@ Dhcp6UpdateIaInfo (
   return Status;
 }
 
-
-
 /**
   Seek StatusCode Option in package. A Status Code option may appear in the
   options field of a DHCP message and/or in the options field of another option.
@@ -690,14 +676,14 @@ Dhcp6UpdateIaInfo (
 **/
 EFI_STATUS
 Dhcp6SeekStsOption (
-  IN     DHCP6_INSTANCE           *Instance,
-  IN     EFI_DHCP6_PACKET         *Packet,
-  OUT    UINT8                    **Option
+  IN     DHCP6_INSTANCE    *Instance,
+  IN     EFI_DHCP6_PACKET  *Packet,
+  OUT    UINT8             **Option
   )
 {
-  UINT8                       *IaInnerOpt;
-  UINT16                      IaInnerLen;
-  UINT16                      StsCode;
+  UINT8   *IaInnerOpt;
+  UINT16  IaInnerLen;
+  UINT16  StsCode;
 
   //
   // Seek StatusCode option directly in DHCP message body. That is, search in
@@ -710,7 +696,7 @@ Dhcp6SeekStsOption (
               );
 
   if (*Option != NULL) {
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *) (*Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(*Option + 4)));
     if (StsCode != Dhcp6StsSuccess) {
       return EFI_DEVICE_ERROR;
     }
@@ -771,10 +757,10 @@ Dhcp6SeekStsOption (
   //
   if (Instance->Config->IaDescriptor.Type == Dhcp6OptIana) {
     IaInnerOpt = *Option + 16;
-    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 ((UINT16 *) (*Option + 2))) - 12);
+    IaInnerLen = (UINT16)(NTOHS (ReadUnaligned16 ((UINT16 *)(*Option + 2))) - 12);
   } else {
     IaInnerOpt = *Option + 8;
-    IaInnerLen = (UINT16) (NTOHS (ReadUnaligned16 ((UINT16 *) (*Option + 2))) - 4);
+    IaInnerLen = (UINT16)(NTOHS (ReadUnaligned16 ((UINT16 *)(*Option + 2))) - 4);
   }
 
   //
@@ -796,9 +782,9 @@ Dhcp6SeekStsOption (
   //
   // sizeof (option-code + option-len) = 4
   //
-  *Option  = Dhcp6SeekOption (IaInnerOpt, IaInnerLen, Dhcp6OptStatusCode);
+  *Option = Dhcp6SeekOption (IaInnerOpt, IaInnerLen, Dhcp6OptStatusCode);
   if (*Option != NULL) {
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *) (*Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(*Option + 4)));
     if (StsCode != Dhcp6StsSuccess) {
       return EFI_DEVICE_ERROR;
     }
@@ -806,7 +792,6 @@ Dhcp6SeekStsOption (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Transmit Dhcp6 message by udpio.
@@ -822,23 +807,23 @@ Dhcp6SeekStsOption (
 **/
 EFI_STATUS
 Dhcp6TransmitPacket (
-  IN DHCP6_INSTANCE         *Instance,
-  IN EFI_DHCP6_PACKET       *Packet,
-  IN UINT16                 *Elapsed
+  IN DHCP6_INSTANCE    *Instance,
+  IN EFI_DHCP6_PACKET  *Packet,
+  IN UINT16            *Elapsed
   )
 {
-  EFI_STATUS                Status;
-  NET_BUF                   *Wrap;
-  NET_FRAGMENT              Frag;
-  UDP_END_POINT             EndPt;
-  DHCP6_SERVICE             *Service;
+  EFI_STATUS     Status;
+  NET_BUF        *Wrap;
+  NET_FRAGMENT   Frag;
+  UDP_END_POINT  EndPt;
+  DHCP6_SERVICE  *Service;
 
   Service = Instance->Service;
 
   //
   // Wrap it into a netbuf then send it.
   //
-  Frag.Bulk = (UINT8 *) &Packet->Dhcp6.Header;
+  Frag.Bulk = (UINT8 *)&Packet->Dhcp6.Header;
   Frag.Len  = Packet->Length;
 
   //
@@ -899,7 +884,6 @@ Dhcp6TransmitPacket (
   return EFI_SUCCESS;
 }
 
-
 /**
   Create the solicit message and send it.
 
@@ -912,19 +896,19 @@ Dhcp6TransmitPacket (
 **/
 EFI_STATUS
 Dhcp6SendSolicitMsg   (
-  IN DHCP6_INSTANCE            *Instance
+  IN DHCP6_INSTANCE  *Instance
   )
 {
-  EFI_STATUS                   Status;
-  EFI_DHCP6_PACKET             *Packet;
-  EFI_DHCP6_PACKET_OPTION      *UserOpt;
-  EFI_DHCP6_DUID               *ClientId;
-  DHCP6_SERVICE                *Service;
-  UINT8                        *Cursor;
-  UINT16                       *Elapsed;
-  UINT32                       UserLen;
-  UINTN                        Index;
-  UINT16                       Length;
+  EFI_STATUS               Status;
+  EFI_DHCP6_PACKET         *Packet;
+  EFI_DHCP6_PACKET_OPTION  *UserOpt;
+  EFI_DHCP6_DUID           *ClientId;
+  DHCP6_SERVICE            *Service;
+  UINT8                    *Cursor;
+  UINT16                   *Elapsed;
+  UINT32                   UserLen;
+  UINTN                    Index;
+  UINT16                   Length;
 
   Service  = Instance->Service;
   ClientId = Service->ClientId;
@@ -985,9 +969,8 @@ Dhcp6SendSolicitMsg   (
   // Append user-defined when configurate Dhcp6 service.
   //
   for (Index = 0; Index < Instance->Config->OptionCount; Index++) {
-
     UserOpt = Instance->Config->OptionList[Index];
-    Cursor  = Dhcp6AppendOption(
+    Cursor  = Dhcp6AppendOption (
                 Cursor,
                 UserOpt->OpCode,
                 UserOpt->OpLen,
@@ -998,7 +981,7 @@ Dhcp6SendSolicitMsg   (
   //
   // Determine the size/length of packet.
   //
-  Packet->Length += (UINT32) (Cursor - Packet->Dhcp6.Option);
+  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
@@ -1051,16 +1034,15 @@ Dhcp6SendSolicitMsg   (
 **/
 EFI_STATUS
 Dhcp6InitSolicitMsg   (
-  IN DHCP6_INSTANCE            *Instance
+  IN DHCP6_INSTANCE  *Instance
   )
 {
-  Instance->IaCb.T1 = 0;
-  Instance->IaCb.T2 = 0;
+  Instance->IaCb.T1                 = 0;
+  Instance->IaCb.T2                 = 0;
   Instance->IaCb.Ia->IaAddressCount = 0;
 
   return Dhcp6SendSolicitMsg (Instance);
 }
-
 
 /**
   Create the request message and send it.
@@ -1075,31 +1057,31 @@ Dhcp6InitSolicitMsg   (
 **/
 EFI_STATUS
 Dhcp6SendRequestMsg (
-  IN DHCP6_INSTANCE            *Instance
+  IN DHCP6_INSTANCE  *Instance
   )
 {
-  EFI_STATUS                   Status;
-  EFI_DHCP6_PACKET             *Packet;
-  EFI_DHCP6_PACKET_OPTION      *UserOpt;
-  EFI_DHCP6_DUID               *ClientId;
-  EFI_DHCP6_DUID               *ServerId;
-  DHCP6_SERVICE                *Service;
-  UINT8                        *Option;
-  UINT8                        *Cursor;
-  UINT16                       *Elapsed;
-  UINT32                       UserLen;
-  UINTN                        Index;
-  UINT16                       Length;
+  EFI_STATUS               Status;
+  EFI_DHCP6_PACKET         *Packet;
+  EFI_DHCP6_PACKET_OPTION  *UserOpt;
+  EFI_DHCP6_DUID           *ClientId;
+  EFI_DHCP6_DUID           *ServerId;
+  DHCP6_SERVICE            *Service;
+  UINT8                    *Option;
+  UINT8                    *Cursor;
+  UINT16                   *Elapsed;
+  UINT32                   UserLen;
+  UINTN                    Index;
+  UINT16                   Length;
 
-  ASSERT(Instance->AdSelect != NULL);
-  ASSERT(Instance->Config != NULL);
-  ASSERT(Instance->IaCb.Ia != NULL);
-  ASSERT(Instance->Service != NULL);
+  ASSERT (Instance->AdSelect != NULL);
+  ASSERT (Instance->Config != NULL);
+  ASSERT (Instance->IaCb.Ia != NULL);
+  ASSERT (Instance->Service != NULL);
 
   Service  = Instance->Service;
   ClientId = Service->ClientId;
 
-  ASSERT(ClientId != NULL);
+  ASSERT (ClientId != NULL);
 
   //
   // Get the server Id from the selected advertisement message.
@@ -1113,7 +1095,7 @@ Dhcp6SendRequestMsg (
     return EFI_DEVICE_ERROR;
   }
 
-  ServerId = (EFI_DHCP6_DUID *) (Option + 2);
+  ServerId = (EFI_DHCP6_DUID *)(Option + 2);
 
   //
   // Calculate the added length of customized option list.
@@ -1174,9 +1156,8 @@ Dhcp6SendRequestMsg (
   // Append user-defined when configurate Dhcp6 service.
   //
   for (Index = 0; Index < Instance->Config->OptionCount; Index++) {
-
     UserOpt = Instance->Config->OptionList[Index];
-    Cursor  = Dhcp6AppendOption(
+    Cursor  = Dhcp6AppendOption (
                 Cursor,
                 UserOpt->OpCode,
                 UserOpt->OpLen,
@@ -1187,7 +1168,7 @@ Dhcp6SendRequestMsg (
   //
   // Determine the size/length of packet.
   //
-  Packet->Length += (UINT32) (Cursor - Packet->Dhcp6.Option);
+  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
@@ -1223,7 +1204,6 @@ Dhcp6SendRequestMsg (
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, NULL);
 }
 
-
 /**
   Create the decline message and send it.
 
@@ -1238,20 +1218,20 @@ Dhcp6SendRequestMsg (
 **/
 EFI_STATUS
 Dhcp6SendDeclineMsg (
-  IN DHCP6_INSTANCE            *Instance,
-  IN EFI_DHCP6_IA              *DecIa
+  IN DHCP6_INSTANCE  *Instance,
+  IN EFI_DHCP6_IA    *DecIa
   )
 {
-  EFI_STATUS                   Status;
-  EFI_DHCP6_PACKET             *Packet;
-  EFI_DHCP6_PACKET             *LastReply;
-  EFI_DHCP6_DUID               *ClientId;
-  EFI_DHCP6_DUID               *ServerId;
-  DHCP6_SERVICE                *Service;
-  UINT8                        *Option;
-  UINT8                        *Cursor;
-  UINT16                       *Elapsed;
-  UINT16                       Length;
+  EFI_STATUS        Status;
+  EFI_DHCP6_PACKET  *Packet;
+  EFI_DHCP6_PACKET  *LastReply;
+  EFI_DHCP6_DUID    *ClientId;
+  EFI_DHCP6_DUID    *ServerId;
+  DHCP6_SERVICE     *Service;
+  UINT8             *Option;
+  UINT8             *Cursor;
+  UINT16            *Elapsed;
+  UINT16            Length;
 
   ASSERT (Instance->Config != NULL);
   ASSERT (Instance->IaCb.Ia != NULL);
@@ -1279,7 +1259,7 @@ Dhcp6SendDeclineMsg (
   //
   // EFI_DHCP6_DUID contains a length field of 2 bytes.
   //
-  ServerId = (EFI_DHCP6_DUID *) (Option + 2);
+  ServerId = (EFI_DHCP6_DUID *)(Option + 2);
 
   //
   // Create the Dhcp6 packet and initialize common fields.
@@ -1325,7 +1305,7 @@ Dhcp6SendDeclineMsg (
   //
   // Determine the size/length of packet.
   //
-  Packet->Length += (UINT32) (Cursor - Packet->Dhcp6.Option);
+  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
@@ -1361,7 +1341,6 @@ Dhcp6SendDeclineMsg (
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, NULL);
 }
 
-
 /**
   Create the release message and send it.
 
@@ -1376,30 +1355,30 @@ Dhcp6SendDeclineMsg (
 **/
 EFI_STATUS
 Dhcp6SendReleaseMsg (
-  IN DHCP6_INSTANCE            *Instance,
-  IN EFI_DHCP6_IA              *RelIa
+  IN DHCP6_INSTANCE  *Instance,
+  IN EFI_DHCP6_IA    *RelIa
   )
 {
-  EFI_STATUS                   Status;
-  EFI_DHCP6_PACKET             *Packet;
-  EFI_DHCP6_PACKET             *LastReply;
-  EFI_DHCP6_DUID               *ClientId;
-  EFI_DHCP6_DUID               *ServerId;
-  DHCP6_SERVICE                *Service;
-  UINT8                        *Option;
-  UINT8                        *Cursor;
-  UINT16                       *Elapsed;
-  UINT16                       Length;
+  EFI_STATUS        Status;
+  EFI_DHCP6_PACKET  *Packet;
+  EFI_DHCP6_PACKET  *LastReply;
+  EFI_DHCP6_DUID    *ClientId;
+  EFI_DHCP6_DUID    *ServerId;
+  DHCP6_SERVICE     *Service;
+  UINT8             *Option;
+  UINT8             *Cursor;
+  UINT16            *Elapsed;
+  UINT16            Length;
 
-  ASSERT(Instance->Config);
-  ASSERT(Instance->IaCb.Ia);
+  ASSERT (Instance->Config);
+  ASSERT (Instance->IaCb.Ia);
 
   Service   = Instance->Service;
   ClientId  = Service->ClientId;
   LastReply = Instance->IaCb.Ia->ReplyPacket;
 
-  ASSERT(ClientId);
-  ASSERT(LastReply);
+  ASSERT (ClientId);
+  ASSERT (LastReply);
 
   //
   // Get the server Id from the last reply message.
@@ -1413,7 +1392,7 @@ Dhcp6SendReleaseMsg (
     return EFI_DEVICE_ERROR;
   }
 
-  ServerId = (EFI_DHCP6_DUID *) (Option + 2);
+  ServerId = (EFI_DHCP6_DUID *)(Option + 2);
 
   //
   // Create the Dhcp6 packet and initialize common fields.
@@ -1462,7 +1441,7 @@ Dhcp6SendReleaseMsg (
   //
   // Determine the size/length of packet
   //
-  Packet->Length += (UINT32) (Cursor - Packet->Dhcp6.Option);
+  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
@@ -1494,7 +1473,6 @@ Dhcp6SendReleaseMsg (
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, NULL);
 }
 
-
 /**
   Create the renew/rebind message and send it.
 
@@ -1510,33 +1488,33 @@ Dhcp6SendReleaseMsg (
 **/
 EFI_STATUS
 Dhcp6SendRenewRebindMsg (
-  IN DHCP6_INSTANCE         *Instance,
-  IN BOOLEAN                RebindRequest
+  IN DHCP6_INSTANCE  *Instance,
+  IN BOOLEAN         RebindRequest
   )
 {
-  EFI_STATUS                Status;
-  EFI_DHCP6_PACKET          *Packet;
-  EFI_DHCP6_PACKET          *LastReply;
-  EFI_DHCP6_PACKET_OPTION   *UserOpt;
-  EFI_DHCP6_DUID            *ClientId;
-  EFI_DHCP6_DUID            *ServerId;
-  EFI_DHCP6_STATE           State;
-  EFI_DHCP6_EVENT           Event;
-  DHCP6_SERVICE             *Service;
-  UINT8                     *Option;
-  UINT8                     *Cursor;
-  UINT16                    *Elapsed;
-  UINT32                    UserLen;
-  UINTN                     Index;
-  UINT16                    Length;
+  EFI_STATUS               Status;
+  EFI_DHCP6_PACKET         *Packet;
+  EFI_DHCP6_PACKET         *LastReply;
+  EFI_DHCP6_PACKET_OPTION  *UserOpt;
+  EFI_DHCP6_DUID           *ClientId;
+  EFI_DHCP6_DUID           *ServerId;
+  EFI_DHCP6_STATE          State;
+  EFI_DHCP6_EVENT          Event;
+  DHCP6_SERVICE            *Service;
+  UINT8                    *Option;
+  UINT8                    *Cursor;
+  UINT16                   *Elapsed;
+  UINT32                   UserLen;
+  UINTN                    Index;
+  UINT16                   Length;
 
-  ASSERT(Instance->Config);
-  ASSERT(Instance->IaCb.Ia);
+  ASSERT (Instance->Config);
+  ASSERT (Instance->IaCb.Ia);
 
-  Service   = Instance->Service;
-  ClientId  = Service->ClientId;
+  Service  = Instance->Service;
+  ClientId = Service->ClientId;
 
-  ASSERT(ClientId);
+  ASSERT (ClientId);
 
   //
   // Calculate the added length of customized option list.
@@ -1604,7 +1582,7 @@ Dhcp6SendRenewRebindMsg (
       return EFI_DEVICE_ERROR;
     }
 
-    ServerId = (EFI_DHCP6_DUID *) (Option + 2);
+    ServerId = (EFI_DHCP6_DUID *)(Option + 2);
 
     Cursor = Dhcp6AppendOption (
                Cursor,
@@ -1618,9 +1596,8 @@ Dhcp6SendRenewRebindMsg (
   // Append user-defined when configurate Dhcp6 service.
   //
   for (Index = 0; Index < Instance->Config->OptionCount; Index++) {
-
     UserOpt = Instance->Config->OptionList[Index];
-    Cursor  = Dhcp6AppendOption(
+    Cursor  = Dhcp6AppendOption (
                 Cursor,
                 UserOpt->OpCode,
                 UserOpt->OpLen,
@@ -1631,14 +1608,14 @@ Dhcp6SendRenewRebindMsg (
   //
   // Determine the size/length of packet.
   //
-  Packet->Length += (UINT32) (Cursor - Packet->Dhcp6.Option);
+  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
   // Callback to user with the packet to be sent and check the user's feedback.
   //
-  State  = (RebindRequest) ? Dhcp6Rebinding : Dhcp6Renewing;
-  Event  = (RebindRequest) ? Dhcp6EnterRebinding : Dhcp6EnterRenewing;
+  State = (RebindRequest) ? Dhcp6Rebinding : Dhcp6Renewing;
+  Event = (RebindRequest) ? Dhcp6EnterRebinding : Dhcp6EnterRenewing;
 
   Status = Dhcp6CallbackUser (Instance, Event, &Packet);
 
@@ -1707,19 +1684,19 @@ Dhcp6StartInfoRequest (
   IN VOID                      *CallbackContext OPTIONAL
   )
 {
-  EFI_STATUS                   Status;
-  DHCP6_INF_CB                 *InfCb;
-  DHCP6_SERVICE                *Service;
-  EFI_TPL                      OldTpl;
+  EFI_STATUS     Status;
+  DHCP6_INF_CB   *InfCb;
+  DHCP6_SERVICE  *Service;
+  EFI_TPL        OldTpl;
 
-  Service  = Instance->Service;
+  Service = Instance->Service;
 
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl           = gBS->RaiseTPL (TPL_CALLBACK);
   Instance->UdpSts = EFI_ALREADY_STARTED;
   //
   // Create and initialize the control block for the info-request.
   //
-  InfCb = AllocateZeroPool (sizeof(DHCP6_INF_CB));
+  InfCb = AllocateZeroPool (sizeof (DHCP6_INF_CB));
 
   if (InfCb == NULL) {
     gBS->RestoreTPL (OldTpl);
@@ -1752,7 +1729,7 @@ Dhcp6StartInfoRequest (
   //
   // Register receive callback for the stateless exchange process.
   //
-  Status = UdpIoRecvDatagram(
+  Status = UdpIoRecvDatagram (
              Service->UdpIo,
              Dhcp6ReceivePacket,
              Service,
@@ -1803,24 +1780,24 @@ Dhcp6SendInfoRequestMsg (
   IN EFI_DHCP6_RETRANSMISSION  *Retransmission
   )
 {
-  EFI_STATUS                   Status;
-  EFI_DHCP6_PACKET             *Packet;
-  EFI_DHCP6_PACKET_OPTION      *UserOpt;
-  EFI_DHCP6_DUID               *ClientId;
-  DHCP6_SERVICE                *Service;
-  UINT8                        *Cursor;
-  UINT16                       *Elapsed;
-  UINT32                       UserLen;
-  UINTN                        Index;
-  UINT16                       Length;
+  EFI_STATUS               Status;
+  EFI_DHCP6_PACKET         *Packet;
+  EFI_DHCP6_PACKET_OPTION  *UserOpt;
+  EFI_DHCP6_DUID           *ClientId;
+  DHCP6_SERVICE            *Service;
+  UINT8                    *Cursor;
+  UINT16                   *Elapsed;
+  UINT32                   UserLen;
+  UINTN                    Index;
+  UINT16                   Length;
 
-  ASSERT(OptionRequest);
+  ASSERT (OptionRequest);
 
   Service  = Instance->Service;
   ClientId = Service->ClientId;
   UserLen  = NTOHS (OptionRequest->OpLen) + 4;
 
-  ASSERT(ClientId);
+  ASSERT (ClientId);
 
   //
   // Calculate the added length of customized option list.
@@ -1842,7 +1819,7 @@ Dhcp6SendInfoRequestMsg (
   Packet->Dhcp6.Header.MessageType   = Dhcp6MsgInfoRequest;
   Packet->Dhcp6.Header.TransactionId = Service->Xid++;
 
-  InfCb->Xid                         = Packet->Dhcp6.Header.TransactionId;
+  InfCb->Xid = Packet->Dhcp6.Header.TransactionId;
 
   //
   // Assembly Dhcp6 options for info-request message.
@@ -1876,9 +1853,8 @@ Dhcp6SendInfoRequestMsg (
   // Append user-defined when configurate Dhcp6 service.
   //
   for (Index = 0; Index < OptionCount; Index++) {
-
     UserOpt = OptionList[Index];
-    Cursor  = Dhcp6AppendOption(
+    Cursor  = Dhcp6AppendOption (
                 Cursor,
                 UserOpt->OpCode,
                 UserOpt->OpLen,
@@ -1889,7 +1865,7 @@ Dhcp6SendInfoRequestMsg (
   //
   // Determine the size/length of packet.
   //
-  Packet->Length += (UINT32) (Cursor - Packet->Dhcp6.Option);
+  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
@@ -1913,7 +1889,6 @@ Dhcp6SendInfoRequestMsg (
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, Retransmission);
 }
 
-
 /**
   Create the Confirm message and send it.
 
@@ -1927,19 +1902,19 @@ Dhcp6SendInfoRequestMsg (
 **/
 EFI_STATUS
 Dhcp6SendConfirmMsg (
-  IN DHCP6_INSTANCE            *Instance
+  IN DHCP6_INSTANCE  *Instance
   )
 {
-  UINT8                        *Cursor;
-  UINTN                        Index;
-  UINT16                       Length;
-  UINT32                       UserLen;
-  EFI_STATUS                   Status;
-  DHCP6_SERVICE                *Service;
-  EFI_DHCP6_DUID               *ClientId;
-  EFI_DHCP6_PACKET             *Packet;
-  EFI_DHCP6_PACKET_OPTION      *UserOpt;
-  UINT16                       *Elapsed;
+  UINT8                    *Cursor;
+  UINTN                    Index;
+  UINT16                   Length;
+  UINT32                   UserLen;
+  EFI_STATUS               Status;
+  DHCP6_SERVICE            *Service;
+  EFI_DHCP6_DUID           *ClientId;
+  EFI_DHCP6_PACKET         *Packet;
+  EFI_DHCP6_PACKET_OPTION  *UserOpt;
+  UINT16                   *Elapsed;
 
   ASSERT (Instance->Config != NULL);
   ASSERT (Instance->IaCb.Ia != NULL);
@@ -2013,7 +1988,7 @@ Dhcp6SendConfirmMsg (
   //
   // Determine the size/length of packet.
   //
-  Packet->Length += (UINT32) (Cursor - Packet->Dhcp6.Option);
+  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
@@ -2049,8 +2024,6 @@ Dhcp6SendConfirmMsg (
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, NULL);
 }
 
-
-
 /**
   Handle with the Dhcp6 reply message.
 
@@ -2065,13 +2038,13 @@ Dhcp6SendConfirmMsg (
 **/
 EFI_STATUS
 Dhcp6HandleReplyMsg (
-  IN DHCP6_INSTANCE           *Instance,
-  IN EFI_DHCP6_PACKET         *Packet
+  IN DHCP6_INSTANCE    *Instance,
+  IN EFI_DHCP6_PACKET  *Packet
   )
 {
-  EFI_STATUS                  Status;
-  UINT8                       *Option;
-  UINT16                      StsCode;
+  EFI_STATUS  Status;
+  UINT8       *Option;
+  UINT16      StsCode;
 
   ASSERT (Instance->Config != NULL);
   ASSERT (Instance->IaCb.Ia != NULL);
@@ -2096,7 +2069,7 @@ Dhcp6HandleReplyMsg (
              Dhcp6OptRapidCommit
              );
 
-  if ((Option != NULL && !Instance->Config->RapidCommit) || (Option == NULL && Instance->Config->RapidCommit)) {
+  if (((Option != NULL) && !Instance->Config->RapidCommit) || ((Option == NULL) && Instance->Config->RapidCommit)) {
     return EFI_DEVICE_ERROR;
   }
 
@@ -2104,11 +2077,11 @@ Dhcp6HandleReplyMsg (
   // As to a valid reply packet in response to a request/renew/rebind packet,
   // ignore the packet if not contains the Ia option
   //
-  if (Instance->IaCb.Ia->State == Dhcp6Requesting ||
-      Instance->IaCb.Ia->State == Dhcp6Renewing ||
-      Instance->IaCb.Ia->State == Dhcp6Rebinding
-      ) {
-
+  if ((Instance->IaCb.Ia->State == Dhcp6Requesting) ||
+      (Instance->IaCb.Ia->State == Dhcp6Renewing) ||
+      (Instance->IaCb.Ia->State == Dhcp6Rebinding)
+      )
+  {
     Option = Dhcp6SeekIaOption (
                Packet->Dhcp6.Option,
                Packet->Length,
@@ -2133,10 +2106,9 @@ Dhcp6HandleReplyMsg (
   // the client considers the decline/release event completed regardless of the
   // status code.
   //
-  if (Instance->IaCb.Ia->State == Dhcp6Declining || Instance->IaCb.Ia->State == Dhcp6Releasing) {
-
+  if ((Instance->IaCb.Ia->State == Dhcp6Declining) || (Instance->IaCb.Ia->State == Dhcp6Releasing)) {
     if (Instance->IaCb.Ia->IaAddressCount != 0) {
-      Instance->IaCb.Ia->State       = Dhcp6Bound;
+      Instance->IaCb.Ia->State = Dhcp6Bound;
     } else {
       ASSERT (Instance->IaCb.Ia->ReplyPacket);
       FreePool (Instance->IaCb.Ia->ReplyPacket);
@@ -2159,7 +2131,7 @@ Dhcp6HandleReplyMsg (
     //
     // Reset start time for next exchange.
     //
-    Instance->StartTime       = 0;
+    Instance->StartTime = 0;
 
     Status = EFI_SUCCESS;
     goto ON_EXIT;
@@ -2186,7 +2158,7 @@ Dhcp6HandleReplyMsg (
       //
       // Reset start time for next exchange.
       //
-      Instance->StartTime       = 0;
+      Instance->StartTime = 0;
 
       //
       // Set bound state and store the reply packet.
@@ -2209,7 +2181,7 @@ Dhcp6HandleReplyMsg (
       //
       // For sync, set the success flag out of polling in start/renewrebind.
       //
-      Instance->UdpSts         = EFI_SUCCESS;
+      Instance->UdpSts = EFI_SUCCESS;
 
       //
       // Maybe this is a new round DHCP process due to some reason, such as NotOnLink
@@ -2235,70 +2207,72 @@ Dhcp6HandleReplyMsg (
     }
 
     goto ON_EXIT;
-
   } else if (Option != NULL) {
     //
     // Any error status code option is found.
     //
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *) (Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(Option + 4)));
     switch (StsCode) {
-    case Dhcp6StsUnspecFail:
-      //
-      // It indicates the server is unable to process the message due to an
-      // unspecified failure condition, so just retry if possible.
-      //
-      break;
-
-    case Dhcp6StsUseMulticast:
-      //
-      // It indicates the server receives a message via unicast from a client
-      // to which the server has not sent a unicast option, so retry it by
-      // multi-cast address.
-      //
-      if (Instance->Unicast != NULL) {
-        FreePool (Instance->Unicast);
-        Instance->Unicast = NULL;
-      }
-      break;
-
-    case Dhcp6StsNotOnLink:
-      if (Instance->IaCb.Ia->State == Dhcp6Confirming) {
+      case Dhcp6StsUnspecFail:
         //
-        // Before initiate new round DHCP, cache the current IA.
+        // It indicates the server is unable to process the message due to an
+        // unspecified failure condition, so just retry if possible.
         //
-        Status = Dhcp6CacheIa (Instance);
-        if (EFI_ERROR (Status)) {
-          return  Status;
+        break;
+
+      case Dhcp6StsUseMulticast:
+        //
+        // It indicates the server receives a message via unicast from a client
+        // to which the server has not sent a unicast option, so retry it by
+        // multi-cast address.
+        //
+        if (Instance->Unicast != NULL) {
+          FreePool (Instance->Unicast);
+          Instance->Unicast = NULL;
         }
 
-        //
-        // Restart S.A.R.R process to acquire new address.
-        //
-        Status = Dhcp6InitSolicitMsg (Instance);
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-      }
-      break;
+        break;
 
-    case Dhcp6StsNoBinding:
-      if (Instance->IaCb.Ia->State == Dhcp6Renewing || Instance->IaCb.Ia->State == Dhcp6Rebinding) {
-        //
-        // Refer to RFC3315 Chapter 18.1.8, for each IA in the original Renew or Rebind message, the client
-        // sends a Request message if the IA contained a Status Code option with the NoBinding status.
-        //
-        Status = Dhcp6SendRequestMsg(Instance);
-        if (EFI_ERROR (Status)) {
-          return Status;
-        }
-      }
-      break;
+      case Dhcp6StsNotOnLink:
+        if (Instance->IaCb.Ia->State == Dhcp6Confirming) {
+          //
+          // Before initiate new round DHCP, cache the current IA.
+          //
+          Status = Dhcp6CacheIa (Instance);
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
 
-    default:
-      //
-      // The other status code, just restart solicitation.
-      //
-      break;
+          //
+          // Restart S.A.R.R process to acquire new address.
+          //
+          Status = Dhcp6InitSolicitMsg (Instance);
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
+        }
+
+        break;
+
+      case Dhcp6StsNoBinding:
+        if ((Instance->IaCb.Ia->State == Dhcp6Renewing) || (Instance->IaCb.Ia->State == Dhcp6Rebinding)) {
+          //
+          // Refer to RFC3315 Chapter 18.1.8, for each IA in the original Renew or Rebind message, the client
+          // sends a Request message if the IA contained a Status Code option with the NoBinding status.
+          //
+          Status = Dhcp6SendRequestMsg (Instance);
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
+        }
+
+        break;
+
+      default:
+        //
+        // The other status code, just restart solicitation.
+        //
+        break;
     }
   }
 
@@ -2306,7 +2280,7 @@ Dhcp6HandleReplyMsg (
 
 ON_EXIT:
 
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     Status = Dhcp6DequeueRetry (
                Instance,
                Packet->Dhcp6.Header.TransactionId,
@@ -2316,7 +2290,6 @@ ON_EXIT:
 
   return Status;
 }
-
 
 /**
   Select the appointed Dhcp6 advertisement message.
@@ -2331,12 +2304,12 @@ ON_EXIT:
 **/
 EFI_STATUS
 Dhcp6SelectAdvertiseMsg (
-  IN DHCP6_INSTANCE           *Instance,
-  IN EFI_DHCP6_PACKET         *AdSelect
+  IN DHCP6_INSTANCE    *Instance,
+  IN EFI_DHCP6_PACKET  *AdSelect
   )
 {
-  EFI_STATUS                  Status;
-  UINT8                       *Option;
+  EFI_STATUS  Status;
+  UINT8       *Option;
 
   ASSERT (AdSelect != NULL);
 
@@ -2361,7 +2334,7 @@ Dhcp6SelectAdvertiseMsg (
              FALSE
              );
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -2369,21 +2342,20 @@ Dhcp6SelectAdvertiseMsg (
   // Check whether there is server unicast option in the selected advertise
   // packet, and update it.
   //
-  Option = Dhcp6SeekOption(
+  Option = Dhcp6SeekOption (
              AdSelect->Dhcp6.Option,
              AdSelect->Length - 4,
              Dhcp6OptServerUnicast
              );
 
   if (Option != NULL) {
-
-    Instance->Unicast = AllocateZeroPool (sizeof(EFI_IPv6_ADDRESS));
+    Instance->Unicast = AllocateZeroPool (sizeof (EFI_IPv6_ADDRESS));
 
     if (Instance->Unicast == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
 
-    CopyMem (Instance->Unicast, Option + 4, sizeof(EFI_IPv6_ADDRESS));
+    CopyMem (Instance->Unicast, Option + 4, sizeof (EFI_IPv6_ADDRESS));
   }
 
   //
@@ -2401,7 +2373,6 @@ Dhcp6SelectAdvertiseMsg (
   return Dhcp6SendRequestMsg (Instance);
 }
 
-
 /**
   Handle with the Dhcp6 advertisement message.
 
@@ -2416,16 +2387,16 @@ Dhcp6SelectAdvertiseMsg (
 **/
 EFI_STATUS
 Dhcp6HandleAdvertiseMsg (
-  IN DHCP6_INSTANCE           *Instance,
-  IN EFI_DHCP6_PACKET         *Packet
+  IN DHCP6_INSTANCE    *Instance,
+  IN EFI_DHCP6_PACKET  *Packet
   )
 {
-  EFI_STATUS                  Status;
-  UINT8                       *Option;
-  BOOLEAN                     Timeout;
+  EFI_STATUS  Status;
+  UINT8       *Option;
+  BOOLEAN     Timeout;
 
-  ASSERT(Instance->Config);
-  ASSERT(Instance->IaCb.Ia);
+  ASSERT (Instance->Config);
+  ASSERT (Instance->IaCb.Ia);
 
   Timeout = FALSE;
 
@@ -2435,14 +2406,13 @@ Dhcp6HandleAdvertiseMsg (
   // this reply message. Or else, process the advertise messages as normal.
   // See details in the section-17.1.4 of rfc-3315.
   //
-  Option = Dhcp6SeekOption(
+  Option = Dhcp6SeekOption (
              Packet->Dhcp6.Option,
              Packet->Length - 4,
              Dhcp6OptRapidCommit
              );
 
-  if (Option != NULL && Instance->Config->RapidCommit && Packet->Dhcp6.Header.MessageType == Dhcp6MsgReply) {
-
+  if ((Option != NULL) && Instance->Config->RapidCommit && (Packet->Dhcp6.Header.MessageType == Dhcp6MsgReply)) {
     return Dhcp6HandleReplyMsg (Instance, Packet);
   }
 
@@ -2490,12 +2460,11 @@ Dhcp6HandleAdvertiseMsg (
     CopyMem (Instance->AdSelect, Packet, Packet->Size);
 
     Instance->AdPref = 0xff;
-
   } else if (Status == EFI_NOT_READY) {
     //
     // Not_ready means user wants to continue to receive more advertise packets.
     //
-    if (Instance->AdPref == 0xff && Instance->AdSelect == NULL) {
+    if ((Instance->AdPref == 0xff) && (Instance->AdSelect == NULL)) {
       //
       // It's a tricky point. The timer routine set adpref as 0xff if the first
       // rt timeout and no advertisement received, which means any advertisement
@@ -2508,13 +2477,13 @@ Dhcp6HandleAdvertiseMsg (
     // Check whether the current packet has a 255 preference option or not.
     // Take non-preference option as 0 value.
     //
-    Option = Dhcp6SeekOption(
+    Option = Dhcp6SeekOption (
                Packet->Dhcp6.Option,
                Packet->Length - 4,
                Dhcp6OptPreference
                );
 
-    if (Instance->AdSelect == NULL || (Option != NULL && *(Option + 4) > Instance->AdPref)) {
+    if ((Instance->AdSelect == NULL) || ((Option != NULL) && (*(Option + 4) > Instance->AdPref))) {
       //
       // No advertisements received before or preference is more than other
       // advertisements received before. Then store the new packet and the
@@ -2541,7 +2510,6 @@ Dhcp6HandleAdvertiseMsg (
       // preference is less than other advertisements received before.
       // Leave the packet alone.
     }
-
   } else {
     //
     // Other error status means termination.
@@ -2554,13 +2522,12 @@ Dhcp6HandleAdvertiseMsg (
   // RT has elapsed, or get a highest preference 255 advertise.
   // See details in the section-17.1.2 of rfc-3315.
   //
-  if (Instance->AdPref == 0xff || Timeout) {
+  if ((Instance->AdPref == 0xff) || Timeout) {
     Status = Dhcp6SelectAdvertiseMsg (Instance, Instance->AdSelect);
   }
 
   return Status;
 }
-
 
 /**
   The Dhcp6 stateful exchange process routine.
@@ -2571,14 +2538,14 @@ Dhcp6HandleAdvertiseMsg (
 **/
 VOID
 Dhcp6HandleStateful (
-  IN DHCP6_INSTANCE         *Instance,
-  IN EFI_DHCP6_PACKET       *Packet
+  IN DHCP6_INSTANCE    *Instance,
+  IN EFI_DHCP6_PACKET  *Packet
   )
 {
-  EFI_STATUS                Status;
-  EFI_DHCP6_DUID            *ClientId;
-  DHCP6_SERVICE             *Service;
-  UINT8                     *Option;
+  EFI_STATUS      Status;
+  EFI_DHCP6_DUID  *ClientId;
+  DHCP6_SERVICE   *Service;
+  UINT8           *Option;
 
   Service  = Instance->Service;
   ClientId = Service->ClientId;
@@ -2595,27 +2562,27 @@ Dhcp6HandleStateful (
   //
   // Discard the packet if not advertisement or reply packet.
   //
-  if (Packet->Dhcp6.Header.MessageType != Dhcp6MsgAdvertise && Packet->Dhcp6.Header.MessageType != Dhcp6MsgReply) {
+  if ((Packet->Dhcp6.Header.MessageType != Dhcp6MsgAdvertise) && (Packet->Dhcp6.Header.MessageType != Dhcp6MsgReply)) {
     goto ON_CONTINUE;
   }
 
   //
   // Check whether include client Id or not.
   //
-  Option = Dhcp6SeekOption(
+  Option = Dhcp6SeekOption (
              Packet->Dhcp6.Option,
              Packet->Length - 4,
              Dhcp6OptClientId
              );
 
-  if (Option == NULL || CompareMem (Option + 4, ClientId->Duid, ClientId->Length) != 0) {
+  if ((Option == NULL) || (CompareMem (Option + 4, ClientId->Duid, ClientId->Length) != 0)) {
     goto ON_CONTINUE;
   }
 
   //
   // Check whether include server Id or not.
   //
-  Option = Dhcp6SeekOption(
+  Option = Dhcp6SeekOption (
              Packet->Dhcp6.Option,
              Packet->Length - 4,
              Dhcp6OptServerId
@@ -2626,35 +2593,36 @@ Dhcp6HandleStateful (
   }
 
   switch (Instance->IaCb.Ia->State) {
-  case Dhcp6Selecting:
-    //
-    // Handle the advertisement message when in the Dhcp6Selecting state.
-    // Do not need check return status, if failed, just continue to the next.
-    //
-    Dhcp6HandleAdvertiseMsg (Instance, Packet);
-    break;
+    case Dhcp6Selecting:
+      //
+      // Handle the advertisement message when in the Dhcp6Selecting state.
+      // Do not need check return status, if failed, just continue to the next.
+      //
+      Dhcp6HandleAdvertiseMsg (Instance, Packet);
+      break;
 
-  case Dhcp6Requesting:
-  case Dhcp6Confirming:
-  case Dhcp6Renewing:
-  case Dhcp6Rebinding:
-  case Dhcp6Releasing:
-  case Dhcp6Declining:
-    //
-    // Handle the reply message when in the Dhcp6Requesting,  Dhcp6Renewing
-    // Dhcp6Rebinding, Dhcp6Releasing and Dhcp6Declining state.
-    // If failed here, it should reset the current session.
-    //
-    Status = Dhcp6HandleReplyMsg (Instance, Packet);
-    if (EFI_ERROR (Status)) {
-      goto ON_EXIT;
-    }
-    break;
-  default:
-    //
-    // Other state has not supported yet.
-    //
-    break;
+    case Dhcp6Requesting:
+    case Dhcp6Confirming:
+    case Dhcp6Renewing:
+    case Dhcp6Rebinding:
+    case Dhcp6Releasing:
+    case Dhcp6Declining:
+      //
+      // Handle the reply message when in the Dhcp6Requesting,  Dhcp6Renewing
+      // Dhcp6Rebinding, Dhcp6Releasing and Dhcp6Declining state.
+      // If failed here, it should reset the current session.
+      //
+      Status = Dhcp6HandleReplyMsg (Instance, Packet);
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
+
+      break;
+    default:
+      //
+      // Other state has not supported yet.
+      //
+      break;
   }
 
 ON_CONTINUE:
@@ -2673,7 +2641,6 @@ ON_EXIT:
   }
 }
 
-
 /**
   The Dhcp6 stateless exchange process routine.
 
@@ -2683,15 +2650,15 @@ ON_EXIT:
 **/
 VOID
 Dhcp6HandleStateless (
-  IN DHCP6_INSTANCE         *Instance,
-  IN EFI_DHCP6_PACKET       *Packet
+  IN DHCP6_INSTANCE    *Instance,
+  IN EFI_DHCP6_PACKET  *Packet
   )
 {
-  EFI_STATUS                Status;
-  DHCP6_SERVICE             *Service;
-  DHCP6_INF_CB              *InfCb;
-  UINT8                     *Option;
-  BOOLEAN                   IsMatched;
+  EFI_STATUS     Status;
+  DHCP6_SERVICE  *Service;
+  DHCP6_INF_CB   *InfCb;
+  UINT8          *Option;
+  BOOLEAN        IsMatched;
 
   Service   = Instance->Service;
   Status    = EFI_SUCCESS;
@@ -2776,7 +2743,6 @@ ON_EXIT:
   }
 }
 
-
 /**
   The receive callback function for Dhcp6 exchange process.
 
@@ -2789,37 +2755,37 @@ ON_EXIT:
 VOID
 EFIAPI
 Dhcp6ReceivePacket (
-  IN NET_BUF                *Udp6Wrap,
-  IN UDP_END_POINT          *EndPoint,
-  IN EFI_STATUS             IoStatus,
-  IN VOID                   *Context
+  IN NET_BUF        *Udp6Wrap,
+  IN UDP_END_POINT  *EndPoint,
+  IN EFI_STATUS     IoStatus,
+  IN VOID           *Context
   )
 {
-  EFI_DHCP6_HEADER          *Head;
-  EFI_DHCP6_PACKET          *Packet;
-  DHCP6_SERVICE             *Service;
-  DHCP6_INSTANCE            *Instance;
-  DHCP6_TX_CB               *TxCb;
-  UINT32                    Size;
-  BOOLEAN                   IsDispatched;
-  BOOLEAN                   IsStateless;
-  LIST_ENTRY                *Entry1;
-  LIST_ENTRY                *Next1;
-  LIST_ENTRY                *Entry2;
-  LIST_ENTRY                *Next2;
-  EFI_STATUS                Status;
+  EFI_DHCP6_HEADER  *Head;
+  EFI_DHCP6_PACKET  *Packet;
+  DHCP6_SERVICE     *Service;
+  DHCP6_INSTANCE    *Instance;
+  DHCP6_TX_CB       *TxCb;
+  UINT32            Size;
+  BOOLEAN           IsDispatched;
+  BOOLEAN           IsStateless;
+  LIST_ENTRY        *Entry1;
+  LIST_ENTRY        *Next1;
+  LIST_ENTRY        *Entry2;
+  LIST_ENTRY        *Next2;
+  EFI_STATUS        Status;
 
   ASSERT (Udp6Wrap != NULL);
   ASSERT (Context != NULL);
 
-  Service      = (DHCP6_SERVICE *) Context;
+  Service      = (DHCP6_SERVICE *)Context;
   Instance     = NULL;
   Packet       = NULL;
   IsDispatched = FALSE;
   IsStateless  = FALSE;
 
   if (EFI_ERROR (IoStatus)) {
-    return ;
+    return;
   }
 
   if (Udp6Wrap->TotalSize < sizeof (EFI_DHCP6_HEADER)) {
@@ -2830,7 +2796,7 @@ Dhcp6ReceivePacket (
   // Copy the net buffer received from upd6 to a Dhcp6 packet.
   //
   Size   = sizeof (EFI_DHCP6_PACKET) + Udp6Wrap->TotalSize;
-  Packet = (EFI_DHCP6_PACKET *) AllocateZeroPool (Size);
+  Packet = (EFI_DHCP6_PACKET *)AllocateZeroPool (Size);
 
   if (Packet == NULL) {
     goto ON_CONTINUE;
@@ -2838,7 +2804,7 @@ Dhcp6ReceivePacket (
 
   Packet->Size   = Size;
   Head           = &Packet->Dhcp6.Header;
-  Packet->Length = NetbufCopy (Udp6Wrap, 0, Udp6Wrap->TotalSize, (UINT8 *) Head);
+  Packet->Length = NetbufCopy (Udp6Wrap, 0, Udp6Wrap->TotalSize, (UINT8 *)Head);
 
   if (Packet->Length == 0) {
     goto ON_CONTINUE;
@@ -2848,11 +2814,9 @@ Dhcp6ReceivePacket (
   // Dispatch packet to right instance by transaction id.
   //
   NET_LIST_FOR_EACH_SAFE (Entry1, Next1, &Service->Child) {
-
     Instance = NET_LIST_USER_STRUCT (Entry1, DHCP6_INSTANCE, Link);
 
     NET_LIST_FOR_EACH_SAFE (Entry2, Next2, &Instance->TxList) {
-
       TxCb = NET_LIST_USER_STRUCT (Entry2, DHCP6_TX_CB, Link);
 
       if (Packet->Dhcp6.Header.TransactionId == TxCb->Xid) {
@@ -2863,7 +2827,8 @@ Dhcp6ReceivePacket (
         if (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgInfoRequest) {
           IsStateless = TRUE;
         }
-        IsDispatched  = TRUE;
+
+        IsDispatched = TRUE;
         break;
       }
     }
@@ -2893,11 +2858,11 @@ ON_CONTINUE:
 
   if (!IsDispatched) {
     Status = UdpIoRecvDatagram (
-             Service->UdpIo,
-             Dhcp6ReceivePacket,
-             Service,
-             0
-             );
+               Service->UdpIo,
+               Dhcp6ReceivePacket,
+               Service,
+               0
+               );
     if (EFI_ERROR (Status)) {
       NET_LIST_FOR_EACH_SAFE (Entry1, Next1, &Service->Child) {
         Instance = NET_LIST_USER_STRUCT (Entry1, DHCP6_INSTANCE, Link);
@@ -2929,7 +2894,7 @@ ON_CONTINUE:
 **/
 BOOLEAN
 Dhcp6LinkMovDetect (
-  IN  DHCP6_INSTANCE            *Instance
+  IN  DHCP6_INSTANCE  *Instance
   )
 {
   UINT32                       InterruptStatus;
@@ -2938,7 +2903,7 @@ Dhcp6LinkMovDetect (
   EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
 
   ASSERT (Instance != NULL);
-  Snp = Instance->Service->Snp;
+  Snp          = Instance->Service->Snp;
   MediaPresent = Instance->MediaPresent;
 
   //
@@ -2963,9 +2928,9 @@ Dhcp6LinkMovDetect (
   if (!MediaPresent && Instance->MediaPresent) {
     return TRUE;
   }
+
   return FALSE;
 }
-
 
 /**
   The timer routine of the Dhcp6 instance for each second.
@@ -2977,28 +2942,27 @@ Dhcp6LinkMovDetect (
 VOID
 EFIAPI
 Dhcp6OnTimerTick (
-  IN EFI_EVENT              Event,
-  IN VOID                   *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  LIST_ENTRY                *Entry;
-  LIST_ENTRY                *NextEntry;
-  DHCP6_INSTANCE            *Instance;
-  DHCP6_TX_CB               *TxCb;
-  DHCP6_IA_CB               *IaCb;
-  UINT32                    LossTime;
-  EFI_STATUS                Status;
+  LIST_ENTRY      *Entry;
+  LIST_ENTRY      *NextEntry;
+  DHCP6_INSTANCE  *Instance;
+  DHCP6_TX_CB     *TxCb;
+  DHCP6_IA_CB     *IaCb;
+  UINT32          LossTime;
+  EFI_STATUS      Status;
 
   ASSERT (Context != NULL);
 
-  Instance = (DHCP6_INSTANCE *) Context;
+  Instance = (DHCP6_INSTANCE *)Context;
 
   //
   // 1. Loop the tx list, count live time of every tx packet to check whether
   //    need re-transmit or not.
   //
   NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Instance->TxList) {
-
     TxCb = NET_LIST_USER_STRUCT (Entry, DHCP6_TX_CB, Link);
 
     TxCb->TickTime++;
@@ -3007,7 +2971,7 @@ Dhcp6OnTimerTick (
       //
       // Handle the first rt in the transmission of solicit specially.
       //
-      if ((TxCb->RetryCnt == 0 || TxCb->SolicitRetry) && TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgSolicit) {
+      if (((TxCb->RetryCnt == 0) || TxCb->SolicitRetry) && (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgSolicit)) {
         if (Instance->AdSelect == NULL) {
           //
           // Set adpref as 0xff here to indicate select any advertisement
@@ -3024,9 +2988,11 @@ Dhcp6OnTimerTick (
           } else if (EFI_ERROR (Status)) {
             TxCb->RetryCnt++;
           }
+
           return;
         }
       }
+
       //
       // Increase the retry count for the packet and add up the total loss time.
       //
@@ -3036,7 +3002,7 @@ Dhcp6OnTimerTick (
       //
       // Check whether overflow the max retry count limit for this packet
       //
-      if (TxCb->RetryCtl.Mrc != 0 && TxCb->RetryCtl.Mrc < TxCb->RetryCnt) {
+      if ((TxCb->RetryCtl.Mrc != 0) && (TxCb->RetryCtl.Mrc < TxCb->RetryCnt)) {
         Status = EFI_NO_RESPONSE;
         goto ON_CLOSE;
       }
@@ -3044,7 +3010,7 @@ Dhcp6OnTimerTick (
       //
       // Check whether overflow the max retry duration for this packet
       //
-      if (TxCb->RetryCtl.Mrd != 0 && TxCb->RetryCtl.Mrd <= TxCb->RetryLos) {
+      if ((TxCb->RetryCtl.Mrd != 0) && (TxCb->RetryCtl.Mrd <= TxCb->RetryLos)) {
         Status = EFI_NO_RESPONSE;
         goto ON_CLOSE;
       }
@@ -3061,7 +3027,7 @@ Dhcp6OnTimerTick (
                          TRUE
                          );
 
-      if (TxCb->RetryCtl.Mrt != 0 && TxCb->RetryCtl.Mrt < TxCb->RetryExp) {
+      if ((TxCb->RetryCtl.Mrt != 0) && (TxCb->RetryCtl.Mrt < TxCb->RetryExp)) {
         TxCb->RetryExp = Dhcp6CalculateExpireTime (
                            TxCb->RetryCtl.Mrt,
                            TRUE,
@@ -3074,7 +3040,7 @@ Dhcp6OnTimerTick (
       // duration time.
       //
       LossTime = TxCb->RetryLos + TxCb->RetryExp;
-      if (TxCb->RetryCtl.Mrd != 0 && TxCb->RetryCtl.Mrd < LossTime) {
+      if ((TxCb->RetryCtl.Mrd != 0) && (TxCb->RetryCtl.Mrd < LossTime)) {
         TxCb->RetryExp = TxCb->RetryCtl.Mrd - TxCb->RetryLos;
       }
 
@@ -3100,22 +3066,19 @@ Dhcp6OnTimerTick (
   //
   IaCb = &Instance->IaCb;
 
-  if (Instance->Config == NULL || IaCb->Ia == NULL) {
+  if ((Instance->Config == NULL) || (IaCb->Ia == NULL)) {
     return;
   }
 
-  if (IaCb->Ia->State == Dhcp6Bound || IaCb->Ia->State == Dhcp6Renewing || IaCb->Ia->State == Dhcp6Rebinding) {
-
+  if ((IaCb->Ia->State == Dhcp6Bound) || (IaCb->Ia->State == Dhcp6Renewing) || (IaCb->Ia->State == Dhcp6Rebinding)) {
     IaCb->LeaseTime++;
 
-    if (IaCb->LeaseTime > IaCb->T2 && IaCb->Ia->State == Dhcp6Bound) {
+    if ((IaCb->LeaseTime > IaCb->T2) && (IaCb->Ia->State == Dhcp6Bound)) {
       //
       // Exceed t2, send rebind packet to extend the Ia lease.
       //
       Dhcp6SendRenewRebindMsg (Instance, TRUE);
-
-    } else if (IaCb->LeaseTime > IaCb->T1 && IaCb->Ia->State == Dhcp6Bound) {
-
+    } else if ((IaCb->LeaseTime > IaCb->T1) && (IaCb->Ia->State == Dhcp6Bound)) {
       //
       // Exceed t1, send renew packet to extend the Ia lease.
       //
@@ -3133,28 +3096,32 @@ Dhcp6OnTimerTick (
 
   return;
 
- ON_CLOSE:
+ON_CLOSE:
 
   if (Dhcp6IsValidTxCb (Instance, TxCb) &&
-      TxCb->TxPacket != NULL &&
-      (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgInfoRequest ||
-      TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgRenew       ||
-      TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgConfirm)
-      ) {
+      (TxCb->TxPacket != NULL) &&
+      ((TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgInfoRequest) ||
+       (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgRenew) ||
+       (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgConfirm))
+      )
+  {
     //
     // The failure of renew/Confirm will still switch to the bound state.
     //
     if ((TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgRenew) ||
-        (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgConfirm)) {
+        (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgConfirm))
+    {
       ASSERT (Instance->IaCb.Ia);
       Instance->IaCb.Ia->State = Dhcp6Bound;
     }
+
     //
     // The failure of info-request will return no response.
     //
     if (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgInfoRequest) {
       Instance->UdpSts = EFI_NO_RESPONSE;
     }
+
     Dhcp6DequeueRetry (
       Instance,
       TxCb->Xid,

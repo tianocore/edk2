@@ -36,36 +36,36 @@
 EFI_STATUS
 EFIAPI
 LibResetSystem (
-  IN EFI_RESET_TYPE   ResetType,
-  IN EFI_STATUS       ResetStatus,
-  IN UINTN            DataSize,
-  IN CHAR16           *ResetData OPTIONAL
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN CHAR16          *ResetData OPTIONAL
   )
 {
-  ARM_SMC_ARGS ArmSmcArgs;
+  ARM_SMC_ARGS  ArmSmcArgs;
 
   switch (ResetType) {
-  case EfiResetPlatformSpecific:
+    case EfiResetPlatformSpecific:
     // Map the platform specific reset as reboot
-  case EfiResetWarm:
+    case EfiResetWarm:
     // Map a warm reset into a cold reset
-  case EfiResetCold:
-    // Send a PSCI 0.2 SYSTEM_RESET command
-    ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
-    break;
-  case EfiResetShutdown:
-    // Send a PSCI 0.2 SYSTEM_OFF command
-    ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
-    break;
-  default:
-    ASSERT (FALSE);
-    return EFI_UNSUPPORTED;
+    case EfiResetCold:
+      // Send a PSCI 0.2 SYSTEM_RESET command
+      ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
+      break;
+    case EfiResetShutdown:
+      // Send a PSCI 0.2 SYSTEM_OFF command
+      ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
+      break;
+    default:
+      ASSERT (FALSE);
+      return EFI_UNSUPPORTED;
   }
 
   ArmCallSmc (&ArmSmcArgs);
 
   // We should never be here
-  DEBUG ((EFI_D_ERROR, "%a: PSCI Reset failed\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a: PSCI Reset failed\n", __FUNCTION__));
   CpuDeadLoop ();
   return EFI_UNSUPPORTED;
 }

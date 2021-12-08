@@ -27,12 +27,12 @@ EFI_SMM_SYSTEM_TABLE2  gSmmCoreSmst = {
   SmmInstallConfigurationTable,
   {
     {
-      (EFI_SMM_CPU_IO2) SmmEfiNotAvailableYetArg5,       // SmmMemRead
-      (EFI_SMM_CPU_IO2) SmmEfiNotAvailableYetArg5        // SmmMemWrite
+      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetArg5,        // SmmMemRead
+      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetArg5         // SmmMemWrite
     },
     {
-      (EFI_SMM_CPU_IO2) SmmEfiNotAvailableYetArg5,       // SmmIoRead
-      (EFI_SMM_CPU_IO2) SmmEfiNotAvailableYetArg5        // SmmIoWrite
+      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetArg5,        // SmmIoRead
+      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetArg5         // SmmIoWrite
     }
   },
   SmmAllocatePool,
@@ -81,30 +81,30 @@ BOOLEAN  mAcpiS3Enable = FALSE;
 // Table of SMI Handlers that are registered by the SMM Core when it is initialized
 //
 SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
-  { SmmDriverDispatchHandler,   &gEfiEventDxeDispatchGuid,           NULL, TRUE  },
-  { SmmReadyToLockHandler,      &gEfiDxeSmmReadyToLockProtocolGuid,  NULL, TRUE },
-  { SmmLegacyBootHandler,       &gEfiEventLegacyBootGuid,            NULL, FALSE },
-  { SmmExitBootServicesHandler, &gEfiEventExitBootServicesGuid,      NULL, FALSE },
-  { SmmReadyToBootHandler,      &gEfiEventReadyToBootGuid,           NULL, FALSE },
-  { SmmEndOfDxeHandler,         &gEfiEndOfDxeEventGroupGuid,         NULL, TRUE },
-  { NULL,                       NULL,                                NULL, FALSE }
+  { SmmDriverDispatchHandler,   &gEfiEventDxeDispatchGuid,          NULL, TRUE  },
+  { SmmReadyToLockHandler,      &gEfiDxeSmmReadyToLockProtocolGuid, NULL, TRUE  },
+  { SmmLegacyBootHandler,       &gEfiEventLegacyBootGuid,           NULL, FALSE },
+  { SmmExitBootServicesHandler, &gEfiEventExitBootServicesGuid,     NULL, FALSE },
+  { SmmReadyToBootHandler,      &gEfiEventReadyToBootGuid,          NULL, FALSE },
+  { SmmEndOfDxeHandler,         &gEfiEndOfDxeEventGroupGuid,        NULL, TRUE  },
+  { NULL,                       NULL,                               NULL, FALSE }
 };
 
 //
 // Table of SMI Handlers that are registered by the SMM Core when it is initialized
 //
 SMM_CORE_SMI_HANDLERS  mSmmCoreS3SmiHandlers[] = {
-  { SmmS3SmmInitDoneHandler,    &gEdkiiS3SmmInitDoneGuid,            NULL, FALSE },
-  { SmmEndOfS3ResumeHandler,    &gEdkiiEndOfS3ResumeGuid,            NULL, FALSE },
-  { NULL,                       NULL,                                NULL, FALSE }
+  { SmmS3SmmInitDoneHandler, &gEdkiiS3SmmInitDoneGuid, NULL, FALSE },
+  { SmmEndOfS3ResumeHandler, &gEdkiiEndOfS3ResumeGuid, NULL, FALSE },
+  { NULL,                    NULL,                     NULL, FALSE }
 };
 
-UINTN                           mFullSmramRangeCount;
-EFI_SMRAM_DESCRIPTOR            *mFullSmramRanges;
+UINTN                 mFullSmramRangeCount;
+EFI_SMRAM_DESCRIPTOR  *mFullSmramRanges;
 
-EFI_SMM_DRIVER_ENTRY            *mSmmCoreDriverEntry;
+EFI_SMM_DRIVER_ENTRY  *mSmmCoreDriverEntry;
 
-EFI_LOADED_IMAGE_PROTOCOL       *mSmmCoreLoadedImage;
+EFI_LOADED_IMAGE_PROTOCOL  *mSmmCoreLoadedImage;
 
 /**
   Place holder function until all the SMM System Table Service are available.
@@ -123,11 +123,11 @@ EFI_LOADED_IMAGE_PROTOCOL       *mSmmCoreLoadedImage;
 EFI_STATUS
 EFIAPI
 SmmEfiNotAvailableYetArg5 (
-  UINTN Arg1,
-  UINTN Arg2,
-  UINTN Arg3,
-  UINTN Arg4,
-  UINTN Arg5
+  UINTN  Arg1,
+  UINTN  Arg2,
+  UINTN  Arg3,
+  UINTN  Arg4,
+  UINTN  Arg5
   )
 {
   //
@@ -158,25 +158,25 @@ EFI_STATUS
 EFIAPI
 SmmLegacyBootHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
-  EFI_STATUS    Status;
-  EFI_HANDLE    SmmHandle;
-  UINTN         Index;
+  EFI_STATUS  Status;
+  EFI_HANDLE  SmmHandle;
+  UINTN       Index;
 
   //
   // Install SMM Legacy Boot protocol.
   //
   SmmHandle = NULL;
-  Status = SmmInstallProtocolInterface (
-             &SmmHandle,
-             &gEdkiiSmmLegacyBootProtocolGuid,
-             EFI_NATIVE_INTERFACE,
-             NULL
-             );
+  Status    = SmmInstallProtocolInterface (
+                &SmmHandle,
+                &gEdkiiSmmLegacyBootProtocolGuid,
+                EFI_NATIVE_INTERFACE,
+                NULL
+                );
 
   mInLegacyBoot = TRUE;
 
@@ -213,25 +213,25 @@ EFI_STATUS
 EFIAPI
 SmmExitBootServicesHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
-  EFI_STATUS    Status;
-  EFI_HANDLE    SmmHandle;
-  UINTN         Index;
+  EFI_STATUS  Status;
+  EFI_HANDLE  SmmHandle;
+  UINTN       Index;
 
   //
   // Install SMM Exit Boot Services protocol.
   //
   SmmHandle = NULL;
-  Status = SmmInstallProtocolInterface (
-             &SmmHandle,
-             &gEdkiiSmmExitBootServicesProtocolGuid,
-             EFI_NATIVE_INTERFACE,
-             NULL
-             );
+  Status    = SmmInstallProtocolInterface (
+                &SmmHandle,
+                &gEdkiiSmmExitBootServicesProtocolGuid,
+                EFI_NATIVE_INTERFACE,
+                NULL
+                );
 
   SmiHandlerUnRegister (DispatchHandle);
 
@@ -269,10 +269,10 @@ SmmExitBootServicesHandler (
 EFI_STATUS
 EFIAPI
 SmmS3EntryCallBack (
-  IN           EFI_HANDLE           DispatchHandle,
-  IN     CONST VOID                 *Context         OPTIONAL,
-  IN OUT       VOID                 *CommBuffer      OPTIONAL,
-  IN OUT       UINTN                *CommBufferSize  OPTIONAL
+  IN           EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID        *Context         OPTIONAL,
+  IN OUT       VOID        *CommBuffer      OPTIONAL,
+  IN OUT       UINTN       *CommBufferSize  OPTIONAL
   )
 {
   mDuringS3Resume = TRUE;
@@ -297,24 +297,24 @@ EFI_STATUS
 EFIAPI
 SmmReadyToBootHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
-  EFI_STATUS                        Status;
-  EFI_HANDLE                        SmmHandle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  SmmHandle;
 
   //
   // Install SMM Ready To Boot protocol.
   //
   SmmHandle = NULL;
-  Status = SmmInstallProtocolInterface (
-             &SmmHandle,
-             &gEdkiiSmmReadyToBootProtocolGuid,
-             EFI_NATIVE_INTERFACE,
-             NULL
-             );
+  Status    = SmmInstallProtocolInterface (
+                &SmmHandle,
+                &gEdkiiSmmReadyToBootProtocolGuid,
+                EFI_NATIVE_INTERFACE,
+                NULL
+                );
 
   SmiHandlerUnRegister (DispatchHandle);
 
@@ -342,8 +342,8 @@ EFI_STATUS
 EFIAPI
 SmmReadyToLockHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
@@ -365,12 +365,12 @@ SmmReadyToLockHandler (
   // Install SMM Ready to lock protocol
   //
   SmmHandle = NULL;
-  Status = SmmInstallProtocolInterface (
-             &SmmHandle,
-             &gEfiSmmReadyToLockProtocolGuid,
-             EFI_NATIVE_INTERFACE,
-             NULL
-             );
+  Status    = SmmInstallProtocolInterface (
+                &SmmHandle,
+                &gEfiSmmReadyToLockProtocolGuid,
+                EFI_NATIVE_INTERFACE,
+                NULL
+                );
 
   //
   // Make sure SMM CPU I/O 2 Protocol has been installed into the handle database
@@ -381,9 +381,10 @@ SmmReadyToLockHandler (
   // Print a message on a debug build if the SMM CPU I/O 2 Protocol is not installed
   //
   DEBUG_CODE_BEGIN ();
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "\nSMM: SmmCpuIo Arch Protocol not present!!\n"));
-    }
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "\nSMM: SmmCpuIo Arch Protocol not present!!\n"));
+  }
+
   DEBUG_CODE_END ();
 
   //
@@ -396,7 +397,7 @@ SmmReadyToLockHandler (
   // evaluated to false if this is a debug build
   //
   DEBUG_CODE_BEGIN ();
-    SmmDisplayDiscoveredNotDispatched ();
+  SmmDisplayDiscoveredNotDispatched ();
   DEBUG_CODE_END ();
 
   //
@@ -428,29 +429,29 @@ EFI_STATUS
 EFIAPI
 SmmEndOfDxeHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
-  EFI_STATUS                        Status;
-  EFI_HANDLE                        SmmHandle;
-  EFI_SMM_SX_DISPATCH2_PROTOCOL     *SxDispatch;
-  EFI_SMM_SX_REGISTER_CONTEXT       EntryRegisterContext;
-  EFI_HANDLE                        S3EntryHandle;
+  EFI_STATUS                     Status;
+  EFI_HANDLE                     SmmHandle;
+  EFI_SMM_SX_DISPATCH2_PROTOCOL  *SxDispatch;
+  EFI_SMM_SX_REGISTER_CONTEXT    EntryRegisterContext;
+  EFI_HANDLE                     S3EntryHandle;
 
-  DEBUG ((EFI_D_INFO, "SmmEndOfDxeHandler\n"));
+  DEBUG ((DEBUG_INFO, "SmmEndOfDxeHandler\n"));
 
   //
   // Install SMM EndOfDxe protocol
   //
   SmmHandle = NULL;
-  Status = SmmInstallProtocolInterface (
-             &SmmHandle,
-             &gEfiSmmEndOfDxeProtocolGuid,
-             EFI_NATIVE_INTERFACE,
-             NULL
-             );
+  Status    = SmmInstallProtocolInterface (
+                &SmmHandle,
+                &gEfiSmmEndOfDxeProtocolGuid,
+                EFI_NATIVE_INTERFACE,
+                NULL
+                );
 
   if (mAcpiS3Enable) {
     //
@@ -468,12 +469,12 @@ SmmEndOfDxeHandler (
       //
       EntryRegisterContext.Type  = SxS3;
       EntryRegisterContext.Phase = SxEntry;
-      Status = SxDispatch->Register (
-                             SxDispatch,
-                             SmmS3EntryCallBack,
-                             &EntryRegisterContext,
-                             &S3EntryHandle
-                             );
+      Status                     = SxDispatch->Register (
+                                                 SxDispatch,
+                                                 SmmS3EntryCallBack,
+                                                 &EntryRegisterContext,
+                                                 &S3EntryHandle
+                                                 );
       ASSERT_EFI_ERROR (Status);
     }
   }
@@ -499,8 +500,8 @@ EFI_STATUS
 EFIAPI
 SmmS3SmmInitDoneHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
@@ -518,12 +519,12 @@ SmmS3SmmInitDoneHandler (
   // Install SMM S3SmmInitDone protocol
   //
   SmmHandle = NULL;
-  Status = SmmInstallProtocolInterface (
-             &SmmHandle,
-             &gEdkiiS3SmmInitDoneGuid,
-             EFI_NATIVE_INTERFACE,
-             NULL
-             );
+  Status    = SmmInstallProtocolInterface (
+                &SmmHandle,
+                &gEdkiiS3SmmInitDoneGuid,
+                EFI_NATIVE_INTERFACE,
+                NULL
+                );
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -531,10 +532,10 @@ SmmS3SmmInitDoneHandler (
   // installation event.
   //
   Status = SmmUninstallProtocolInterface (
-           SmmHandle,
-           &gEdkiiS3SmmInitDoneGuid,
-           NULL
-           );
+             SmmHandle,
+             &gEdkiiS3SmmInitDoneGuid,
+             NULL
+             );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
@@ -558,8 +559,8 @@ EFI_STATUS
 EFIAPI
 SmmEndOfS3ResumeHandler (
   IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *Context,        OPTIONAL
-  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
@@ -577,12 +578,12 @@ SmmEndOfS3ResumeHandler (
   // Install SMM EndOfS3Resume protocol
   //
   SmmHandle = NULL;
-  Status = SmmInstallProtocolInterface (
-             &SmmHandle,
-             &gEdkiiEndOfS3ResumeGuid,
-             EFI_NATIVE_INTERFACE,
-             NULL
-             );
+  Status    = SmmInstallProtocolInterface (
+                &SmmHandle,
+                &gEdkiiEndOfS3ResumeGuid,
+                EFI_NATIVE_INTERFACE,
+                NULL
+                );
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -590,10 +591,10 @@ SmmEndOfS3ResumeHandler (
   // installation event.
   //
   Status = SmmUninstallProtocolInterface (
-           SmmHandle,
-           &gEdkiiEndOfS3ResumeGuid,
-           NULL
-           );
+             SmmHandle,
+             &gEdkiiEndOfS3ResumeGuid,
+             NULL
+             );
   ASSERT_EFI_ERROR (Status);
 
   mDuringS3Resume = FALSE;
@@ -614,10 +615,10 @@ SmmEndOfS3ResumeHandler (
 **/
 BOOLEAN
 InternalIsBufferOverlapped (
-  IN UINT8      *Buff1,
-  IN UINTN      Size1,
-  IN UINT8      *Buff2,
-  IN UINTN      Size2
+  IN UINT8  *Buff1,
+  IN UINTN  Size1,
+  IN UINT8  *Buff2,
+  IN UINTN  Size2
   )
 {
   //
@@ -644,7 +645,7 @@ VOID
 EFIAPI
 SmmEntryPoint (
   IN CONST EFI_SMM_ENTRY_CONTEXT  *SmmEntryContext
-)
+  )
 {
   EFI_STATUS                  Status;
   EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
@@ -693,9 +694,9 @@ SmmEntryPoint (
       // Synchronous SMI for SMM Core or request from Communicate protocol
       //
       IsOverlapped = InternalIsBufferOverlapped (
-                       (UINT8 *) CommunicationBuffer,
+                       (UINT8 *)CommunicationBuffer,
                        BufferSize,
-                       (UINT8 *) gSmmCorePrivate,
+                       (UINT8 *)gSmmCorePrivate,
                        sizeof (*gSmmCorePrivate)
                        );
       if (!SmmIsBufferOutsideSmmValid ((UINTN)CommunicationBuffer, BufferSize) || IsOverlapped) {
@@ -705,23 +706,23 @@ SmmEntryPoint (
         // return EFI_INVALID_PARAMETER
         //
         gSmmCorePrivate->CommunicationBuffer = NULL;
-        gSmmCorePrivate->ReturnStatus = EFI_ACCESS_DENIED;
+        gSmmCorePrivate->ReturnStatus        = EFI_ACCESS_DENIED;
       } else {
         CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommunicationBuffer;
-        BufferSize -= OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
-        Status = SmiManage (
-                   &CommunicateHeader->HeaderGuid,
-                   NULL,
-                   CommunicateHeader->Data,
-                   &BufferSize
-                   );
+        BufferSize       -= OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
+        Status            = SmiManage (
+                              &CommunicateHeader->HeaderGuid,
+                              NULL,
+                              CommunicateHeader->Data,
+                              &BufferSize
+                              );
         //
         // Update CommunicationBuffer, BufferSize and ReturnStatus
         // Communicate service finished, reset the pointer to CommBuffer to NULL
         //
-        gSmmCorePrivate->BufferSize = BufferSize + OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
+        gSmmCorePrivate->BufferSize          = BufferSize + OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
         gSmmCorePrivate->CommunicationBuffer = NULL;
-        gSmmCorePrivate->ReturnStatus = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
+        gSmmCorePrivate->ReturnStatus        = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
       }
     }
   }
@@ -755,13 +756,13 @@ SmmCoreInstallLoadedImage (
   VOID
   )
 {
-  EFI_STATUS                 Status;
-  EFI_HANDLE                 Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   //
   // Allocate a Loaded Image Protocol in EfiBootServicesData
   //
-  Status = gBS->AllocatePool (EfiBootServicesData, sizeof(EFI_LOADED_IMAGE_PROTOCOL), (VOID **)&mSmmCoreLoadedImage);
+  Status = gBS->AllocatePool (EfiBootServicesData, sizeof (EFI_LOADED_IMAGE_PROTOCOL), (VOID **)&mSmmCoreLoadedImage);
   ASSERT_EFI_ERROR (Status);
 
   ZeroMem (mSmmCoreLoadedImage, sizeof (EFI_LOADED_IMAGE_PROTOCOL));
@@ -769,9 +770,9 @@ SmmCoreInstallLoadedImage (
   // Fill in the remaining fields of the Loaded Image Protocol instance.
   // Note: ImageBase is an SMRAM address that can not be accessed outside of SMRAM if SMRAM window is closed.
   //
-  mSmmCoreLoadedImage->Revision      = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
-  mSmmCoreLoadedImage->ParentHandle  = gSmmCorePrivate->SmmIplImageHandle;
-  mSmmCoreLoadedImage->SystemTable   = gST;
+  mSmmCoreLoadedImage->Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
+  mSmmCoreLoadedImage->ParentHandle = gSmmCorePrivate->SmmIplImageHandle;
+  mSmmCoreLoadedImage->SystemTable  = gST;
 
   mSmmCoreLoadedImage->ImageBase     = (VOID *)(UINTN)gSmmCorePrivate->PiSmmCoreImageBase;
   mSmmCoreLoadedImage->ImageSize     = gSmmCorePrivate->PiSmmCoreImageSize;
@@ -784,7 +785,8 @@ SmmCoreInstallLoadedImage (
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEfiLoadedImageProtocolGuid, mSmmCoreLoadedImage,
+                  &gEfiLoadedImageProtocolGuid,
+                  mSmmCoreLoadedImage,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
@@ -792,40 +794,40 @@ SmmCoreInstallLoadedImage (
   //
   // Allocate a Loaded Image Protocol in SMM
   //
-  Status = SmmAllocatePool (EfiRuntimeServicesData, sizeof(EFI_SMM_DRIVER_ENTRY), (VOID **)&mSmmCoreDriverEntry);
-  ASSERT_EFI_ERROR(Status);
+  Status = SmmAllocatePool (EfiRuntimeServicesData, sizeof (EFI_SMM_DRIVER_ENTRY), (VOID **)&mSmmCoreDriverEntry);
+  ASSERT_EFI_ERROR (Status);
 
-  ZeroMem (mSmmCoreDriverEntry, sizeof(EFI_SMM_DRIVER_ENTRY));
+  ZeroMem (mSmmCoreDriverEntry, sizeof (EFI_SMM_DRIVER_ENTRY));
   //
   // Fill in the remaining fields of the Loaded Image Protocol instance.
   //
-  mSmmCoreDriverEntry->Signature = EFI_SMM_DRIVER_ENTRY_SIGNATURE;
-  mSmmCoreDriverEntry->SmmLoadedImage.Revision = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
+  mSmmCoreDriverEntry->Signature                   = EFI_SMM_DRIVER_ENTRY_SIGNATURE;
+  mSmmCoreDriverEntry->SmmLoadedImage.Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
   mSmmCoreDriverEntry->SmmLoadedImage.ParentHandle = gSmmCorePrivate->SmmIplImageHandle;
-  mSmmCoreDriverEntry->SmmLoadedImage.SystemTable = gST;
+  mSmmCoreDriverEntry->SmmLoadedImage.SystemTable  = gST;
 
-  mSmmCoreDriverEntry->SmmLoadedImage.ImageBase = (VOID *)(UINTN)gSmmCorePrivate->PiSmmCoreImageBase;
-  mSmmCoreDriverEntry->SmmLoadedImage.ImageSize = gSmmCorePrivate->PiSmmCoreImageSize;
+  mSmmCoreDriverEntry->SmmLoadedImage.ImageBase     = (VOID *)(UINTN)gSmmCorePrivate->PiSmmCoreImageBase;
+  mSmmCoreDriverEntry->SmmLoadedImage.ImageSize     = gSmmCorePrivate->PiSmmCoreImageSize;
   mSmmCoreDriverEntry->SmmLoadedImage.ImageCodeType = EfiRuntimeServicesCode;
   mSmmCoreDriverEntry->SmmLoadedImage.ImageDataType = EfiRuntimeServicesData;
 
   mSmmCoreDriverEntry->ImageEntryPoint = gSmmCorePrivate->PiSmmCoreEntryPoint;
   mSmmCoreDriverEntry->ImageBuffer     = gSmmCorePrivate->PiSmmCoreImageBase;
-  mSmmCoreDriverEntry->NumberOfPage    = EFI_SIZE_TO_PAGES((UINTN)gSmmCorePrivate->PiSmmCoreImageSize);
+  mSmmCoreDriverEntry->NumberOfPage    = EFI_SIZE_TO_PAGES ((UINTN)gSmmCorePrivate->PiSmmCoreImageSize);
 
   //
   // Create a new image handle in the SMM handle database for the SMM Driver
   //
   mSmmCoreDriverEntry->SmmImageHandle = NULL;
-  Status = SmmInstallProtocolInterface (
-             &mSmmCoreDriverEntry->SmmImageHandle,
-             &gEfiLoadedImageProtocolGuid,
-             EFI_NATIVE_INTERFACE,
-             &mSmmCoreDriverEntry->SmmLoadedImage
-             );
-  ASSERT_EFI_ERROR(Status);
+  Status                              = SmmInstallProtocolInterface (
+                                          &mSmmCoreDriverEntry->SmmImageHandle,
+                                          &gEfiLoadedImageProtocolGuid,
+                                          EFI_NATIVE_INTERFACE,
+                                          &mSmmCoreDriverEntry->SmmLoadedImage
+                                          );
+  ASSERT_EFI_ERROR (Status);
 
-  return ;
+  return;
 }
 
 /**
@@ -876,7 +878,7 @@ SmmMain (
   // Copy FullSmramRanges to SMRAM
   //
   mFullSmramRangeCount = gSmmCorePrivate->SmramRangeCount;
-  mFullSmramRanges = AllocatePool (mFullSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
+  mFullSmramRanges     = AllocatePool (mFullSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
   ASSERT (mFullSmramRanges != NULL);
   CopyMem (mFullSmramRanges, gSmmCorePrivate->SmramRanges, mFullSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
 

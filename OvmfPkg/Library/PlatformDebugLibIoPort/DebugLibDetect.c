@@ -13,12 +13,12 @@
 //
 // Set to TRUE if the debug I/O port has been checked
 //
-STATIC BOOLEAN mDebugIoPortChecked = FALSE;
+STATIC BOOLEAN  mDebugIoPortChecked = FALSE;
 
 //
 // Set to TRUE if the debug I/O port is enabled
 //
-STATIC BOOLEAN mDebugIoPortFound = FALSE;
+STATIC BOOLEAN  mDebugIoPortFound = FALSE;
 
 /**
   This constructor function must not do anything.
@@ -58,8 +58,9 @@ PlatformDebugLibIoPortFound (
   )
 {
   if (!mDebugIoPortChecked) {
-    mDebugIoPortFound = PlatformDebugLibIoPortDetect ();
+    mDebugIoPortFound   = PlatformDebugLibIoPortDetect ();
     mDebugIoPortChecked = TRUE;
   }
+
   return mDebugIoPortFound;
 }

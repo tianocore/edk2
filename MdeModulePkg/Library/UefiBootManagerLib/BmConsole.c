@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalBm.h"
 
-CHAR16       *mConVarName[] = {
+CHAR16  *mConVarName[] = {
   L"ConIn",
   L"ConOut",
   L"ErrOut",
@@ -28,16 +28,16 @@ BmGetVideoController (
   VOID
   )
 {
-  EFI_STATUS                Status;
-  UINTN                     RootBridgeHandleCount;
-  EFI_HANDLE                *RootBridgeHandleBuffer;
-  UINTN                     HandleCount;
-  EFI_HANDLE                *HandleBuffer;
-  UINTN                     RootBridgeIndex;
-  UINTN                     Index;
-  EFI_HANDLE                VideoController;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
-  PCI_TYPE00                Pci;
+  EFI_STATUS           Status;
+  UINTN                RootBridgeHandleCount;
+  EFI_HANDLE           *RootBridgeHandleBuffer;
+  UINTN                HandleCount;
+  EFI_HANDLE           *HandleBuffer;
+  UINTN                RootBridgeIndex;
+  UINTN                Index;
+  EFI_HANDLE           VideoController;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  PCI_TYPE00           Pci;
 
   //
   // Make all the PCI_IO protocols show up
@@ -72,18 +72,18 @@ BmGetVideoController (
     }
 
     for (Index = 0; Index < HandleCount; Index++) {
-      Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID **) &PciIo);
+      Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID **)&PciIo);
       if (!EFI_ERROR (Status)) {
         //
         // Check for all video controller
         //
         Status = PciIo->Pci.Read (
-                          PciIo,
-                          EfiPciIoWidthUint32,
-                          0,
-                          sizeof (Pci) / sizeof (UINT32),
-                          &Pci
-                          );
+                              PciIo,
+                              EfiPciIoWidthUint32,
+                              0,
+                              sizeof (Pci) / sizeof (UINT32),
+                              &Pci
+                              );
         if (!EFI_ERROR (Status) && IS_PCI_VGA (&Pci)) {
           // TODO: use IS_PCI_DISPLAY??
           VideoController = HandleBuffer[Index];
@@ -91,12 +91,14 @@ BmGetVideoController (
         }
       }
     }
+
     FreePool (HandleBuffer);
 
     if (VideoController != NULL) {
       break;
     }
   }
+
   FreePool (RootBridgeHandleBuffer);
 
   return VideoController;
@@ -113,7 +115,7 @@ BmGetVideoController (
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 EfiBootManagerGetGopDevicePath (
-  IN  EFI_HANDLE                       VideoController
+  IN  EFI_HANDLE  VideoController
   )
 {
   UINTN                                Index;
@@ -129,7 +131,6 @@ EfiBootManagerGetGopDevicePath (
   EFI_DEVICE_PATH_PROTOCOL             *TempDevicePath;
   EFI_DEVICE_PATH_PROTOCOL             *GopPool;
   EFI_DEVICE_PATH_PROTOCOL             *ReturnDevicePath;
-
 
   Status = gBS->ProtocolsPerHandle (
                   VideoController,
@@ -161,7 +162,7 @@ EfiBootManagerGetGopDevicePath (
         Status = gBS->OpenProtocol (
                         OpenInfoBuffer[Index].ControllerHandle,
                         &gEfiDevicePathProtocolGuid,
-                        (VOID **) &DevicePath,
+                        (VOID **)&DevicePath,
                         NULL,
                         NULL,
                         EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -174,9 +175,10 @@ EfiBootManagerGetGopDevicePath (
         for (Next = DevicePath; !IsDevicePathEnd (Next); Next = NextDevicePathNode (Next)) {
           Previous = Next;
         }
+
         ASSERT (Previous != NULL);
 
-        if (DevicePathType (Previous) == ACPI_DEVICE_PATH && DevicePathSubType (Previous) == ACPI_ADR_DP) {
+        if ((DevicePathType (Previous) == ACPI_DEVICE_PATH) && (DevicePathSubType (Previous) == ACPI_ADR_DP)) {
           Status = gBS->OpenProtocol (
                           OpenInfoBuffer[Index].ControllerHandle,
                           &gEfiGraphicsOutputProtocolGuid,
@@ -190,19 +192,19 @@ EfiBootManagerGetGopDevicePath (
             // Append the device path to GOP pool when there is GOP protocol installed.
             //
             TempDevicePath = GopPool;
-            GopPool = AppendDevicePathInstance (GopPool, DevicePath);
+            GopPool        = AppendDevicePathInstance (GopPool, DevicePath);
             gBS->FreePool (TempDevicePath);
           }
         }
 
-        if (DevicePathType (Previous) == HARDWARE_DEVICE_PATH && DevicePathSubType (Previous) == HW_CONTROLLER_DP) {
+        if ((DevicePathType (Previous) == HARDWARE_DEVICE_PATH) && (DevicePathSubType (Previous) == HW_CONTROLLER_DP)) {
           //
           // Recursively look for GOP child in this frame buffer handle
           //
-          DEBUG ((EFI_D_INFO, "[Bds] Looking for GOP child deeper ... \n"));
-          TempDevicePath = GopPool;
+          DEBUG ((DEBUG_INFO, "[Bds] Looking for GOP child deeper ... \n"));
+          TempDevicePath   = GopPool;
           ReturnDevicePath = EfiBootManagerGetGopDevicePath (OpenInfoBuffer[Index].ControllerHandle);
-          GopPool = AppendDevicePathInstance (GopPool, ReturnDevicePath);
+          GopPool          = AppendDevicePathInstance (GopPool, ReturnDevicePath);
           gBS->FreePool (ReturnDevicePath);
           gBS->FreePool (TempDevicePath);
         }
@@ -228,10 +230,10 @@ EfiBootManagerGetGopDevicePath (
 EFI_STATUS
 EFIAPI
 EfiBootManagerConnectVideoController (
-  EFI_HANDLE                 VideoController  OPTIONAL
+  EFI_HANDLE  VideoController  OPTIONAL
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL   *Gop;
+  EFI_DEVICE_PATH_PROTOCOL  *Gop;
 
   if (VideoController == NULL) {
     //
@@ -285,21 +287,21 @@ EfiBootManagerConnectVideoController (
 **/
 BOOLEAN
 BmUpdateSystemTableConsole (
-  IN     CHAR16                   *VarName,
-  IN     EFI_GUID                 *ConsoleGuid,
-  IN OUT EFI_HANDLE               *ConsoleHandle,
-  IN OUT VOID                     **ProtocolInterface
+  IN     CHAR16      *VarName,
+  IN     EFI_GUID    *ConsoleGuid,
+  IN OUT EFI_HANDLE  *ConsoleHandle,
+  IN OUT VOID        **ProtocolInterface
   )
 {
-  EFI_STATUS                      Status;
-  UINTN                           DevicePathSize;
-  EFI_DEVICE_PATH_PROTOCOL        *FullDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL        *VarConsole;
-  EFI_DEVICE_PATH_PROTOCOL        *Instance;
-  EFI_DEVICE_PATH_PROTOCOL        *FullInstance;
-  VOID                            *Interface;
-  EFI_HANDLE                      NewHandle;
-  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *TextOut;
+  EFI_STATUS                       Status;
+  UINTN                            DevicePathSize;
+  EFI_DEVICE_PATH_PROTOCOL         *FullDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL         *VarConsole;
+  EFI_DEVICE_PATH_PROTOCOL         *Instance;
+  EFI_DEVICE_PATH_PROTOCOL         *FullInstance;
+  VOID                             *Interface;
+  EFI_HANDLE                       NewHandle;
+  EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *TextOut;
 
   ASSERT (VarName != NULL);
   ASSERT (ConsoleHandle != NULL);
@@ -308,11 +310,11 @@ BmUpdateSystemTableConsole (
 
   if (*ConsoleHandle != NULL) {
     Status = gBS->HandleProtocol (
-                   *ConsoleHandle,
-                   ConsoleGuid,
-                   &Interface
-                   );
-    if (Status == EFI_SUCCESS && Interface == *ProtocolInterface) {
+                    *ConsoleHandle,
+                    ConsoleGuid,
+                    &Interface
+                    );
+    if ((Status == EFI_SUCCESS) && (Interface == *ProtocolInterface)) {
       //
       // If ConsoleHandle is valid and console protocol on this handle also
       // also matched, just return.
@@ -324,7 +326,7 @@ BmUpdateSystemTableConsole (
   //
   // Get all possible consoles device path from EFI variable
   //
-  GetEfiGlobalVariable2 (VarName, (VOID **) &VarConsole, NULL);
+  GetEfiGlobalVariable2 (VarName, (VOID **)&VarConsole, NULL);
   if (VarConsole == NULL) {
     //
     // If there is no any console device, just return.
@@ -338,9 +340,9 @@ BmUpdateSystemTableConsole (
     //
     // Check every instance of the console variable
     //
-    Instance  = GetNextDevicePathInstance (&VarConsole, &DevicePathSize);
+    Instance = GetNextDevicePathInstance (&VarConsole, &DevicePathSize);
     if (Instance == NULL) {
-      DEBUG ((EFI_D_ERROR, "[Bds] No valid console instance is found for %s!\n", VarName));
+      DEBUG ((DEBUG_ERROR, "[Bds] No valid console instance is found for %s!\n", VarName));
       // We should not ASSERT when all the console devices are removed.
       // ASSERT_EFI_ERROR (EFI_NOT_FOUND);
       FreePool (FullDevicePath);
@@ -351,11 +353,11 @@ BmUpdateSystemTableConsole (
     // Find console device handle by device path instance
     //
     FullInstance = Instance;
-    Status = gBS->LocateDevicePath (
-                    ConsoleGuid,
-                    &Instance,
-                    &NewHandle
-                    );
+    Status       = gBS->LocateDevicePath (
+                          ConsoleGuid,
+                          &Instance,
+                          &NewHandle
+                          );
     FreePool (FullInstance);
     if (!EFI_ERROR (Status)) {
       //
@@ -376,16 +378,16 @@ BmUpdateSystemTableConsole (
           //
           // If it is console out device, set console mode 80x25 if current mode is invalid.
           //
-          TextOut = (EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *) Interface;
+          TextOut = (EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *)Interface;
           if (TextOut->Mode->Mode == -1) {
             TextOut->SetMode (TextOut, 0);
           }
         }
+
         FreePool (FullDevicePath);
         return TRUE;
       }
     }
-
   } while (Instance != NULL);
 
   //
@@ -435,10 +437,11 @@ EfiBootManagerUpdateConsoleVariable (
   if (CustomizedConDevicePath == ExclusiveDevicePath) {
     return EFI_UNSUPPORTED;
   }
+
   //
   // Delete the ExclusiveDevicePath from current default console
   //
-  GetEfiGlobalVariable2 (mConVarName[ConsoleType], (VOID **) &VarConsole, NULL);
+  GetEfiGlobalVariable2 (mConVarName[ConsoleType], (VOID **)&VarConsole, NULL);
   //
   // Initialize NewDevicePath
   //
@@ -448,9 +451,10 @@ EfiBootManagerUpdateConsoleVariable (
   // If ExclusiveDevicePath is even the part of the instance in VarConsole, delete it.
   // In the end, NewDevicePath is the final device path.
   //
-  if (ExclusiveDevicePath != NULL && VarConsole != NULL) {
-      NewDevicePath = BmDelPartMatchInstance (VarConsole, ExclusiveDevicePath);
+  if ((ExclusiveDevicePath != NULL) && (VarConsole != NULL)) {
+    NewDevicePath = BmDelPartMatchInstance (VarConsole, ExclusiveDevicePath);
   }
+
   //
   // Try to append customized device path to NewDevicePath.
   //
@@ -465,9 +469,9 @@ EfiBootManagerUpdateConsoleVariable (
       // just append current customized device path
       //
       TempNewDevicePath = NewDevicePath;
-      NewDevicePath = AppendDevicePathInstance (NewDevicePath, CustomizedConDevicePath);
+      NewDevicePath     = AppendDevicePathInstance (NewDevicePath, CustomizedConDevicePath);
       if (TempNewDevicePath != NULL) {
-        FreePool(TempNewDevicePath);
+        FreePool (TempNewDevicePath);
       }
     }
   }
@@ -479,27 +483,27 @@ EfiBootManagerUpdateConsoleVariable (
                   mConVarName[ConsoleType],
                   &gEfiGlobalVariableGuid,
                   EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS
-                                                  | ((ConsoleType < ConInDev) ? EFI_VARIABLE_NON_VOLATILE : 0),
+                  | ((ConsoleType < ConInDev) ? EFI_VARIABLE_NON_VOLATILE : 0),
                   GetDevicePathSize (NewDevicePath),
                   NewDevicePath
                   );
 
   if (VarConsole == NewDevicePath) {
     if (VarConsole != NULL) {
-      FreePool(VarConsole);
+      FreePool (VarConsole);
     }
   } else {
     if (VarConsole != NULL) {
-      FreePool(VarConsole);
+      FreePool (VarConsole);
     }
+
     if (NewDevicePath != NULL) {
-      FreePool(NewDevicePath);
+      FreePool (NewDevicePath);
     }
   }
 
   return Status;
 }
-
 
 /**
   Connect the console device base on the variable ConsoleType.
@@ -515,7 +519,7 @@ EfiBootManagerUpdateConsoleVariable (
 EFI_STATUS
 EFIAPI
 EfiBootManagerConnectConsoleVariable (
-  IN  CONSOLE_TYPE              ConsoleType
+  IN  CONSOLE_TYPE  ConsoleType
   )
 {
   EFI_STATUS                Status;
@@ -538,7 +542,7 @@ EfiBootManagerConnectConsoleVariable (
   //
   // Check if the console variable exist
   //
-  GetEfiGlobalVariable2 (mConVarName[ConsoleType], (VOID **) &StartDevicePath, NULL);
+  GetEfiGlobalVariable2 (mConVarName[ConsoleType], (VOID **)&StartDevicePath, NULL);
   if (StartDevicePath == NULL) {
     return EFI_UNSUPPORTED;
   }
@@ -548,13 +552,13 @@ EfiBootManagerConnectConsoleVariable (
     //
     // Check every instance of the console variable
     //
-    Instance  = GetNextDevicePathInstance (&CopyOfDevicePath, &Size);
+    Instance = GetNextDevicePathInstance (&CopyOfDevicePath, &Size);
     if (Instance == NULL) {
       FreePool (StartDevicePath);
       return EFI_UNSUPPORTED;
     }
 
-    Next      = Instance;
+    Next = Instance;
     while (!IsDevicePathEndType (Next)) {
       Next = NextDevicePathNode (Next);
     }
@@ -568,23 +572,26 @@ EfiBootManagerConnectConsoleVariable (
     //
     if ((DevicePathType (Instance) == MESSAGING_DEVICE_PATH) &&
         ((DevicePathSubType (Instance) == MSG_USB_CLASS_DP) || (DevicePathSubType (Instance) == MSG_USB_WWID_DP))
-       ) {
+        )
+    {
       Status = BmConnectUsbShortFormDevicePath (Instance);
       if (!EFI_ERROR (Status)) {
         DeviceExist = TRUE;
       }
     } else {
       for (Next = Instance; !IsDevicePathEnd (Next); Next = NextDevicePathNode (Next)) {
-        if (DevicePathType (Next) == ACPI_DEVICE_PATH && DevicePathSubType (Next) == ACPI_ADR_DP) {
+        if ((DevicePathType (Next) == ACPI_DEVICE_PATH) && (DevicePathSubType (Next) == ACPI_ADR_DP)) {
           break;
-        } else if (DevicePathType (Next) == HARDWARE_DEVICE_PATH &&
-                   DevicePathSubType (Next) == HW_CONTROLLER_DP &&
-                   DevicePathType (NextDevicePathNode (Next)) == ACPI_DEVICE_PATH &&
-                   DevicePathSubType (NextDevicePathNode (Next)) == ACPI_ADR_DP
-                   ) {
+        } else if ((DevicePathType (Next) == HARDWARE_DEVICE_PATH) &&
+                   (DevicePathSubType (Next) == HW_CONTROLLER_DP) &&
+                   (DevicePathType (NextDevicePathNode (Next)) == ACPI_DEVICE_PATH) &&
+                   (DevicePathSubType (NextDevicePathNode (Next)) == ACPI_ADR_DP)
+                   )
+        {
           break;
         }
       }
+
       if (!IsDevicePathEnd (Next)) {
         //
         // For GOP device path, start the video driver with NULL remaining device path
@@ -597,6 +604,7 @@ EfiBootManagerConnectConsoleVariable (
       } else {
         Status = EfiBootManagerConnectDevicePath (Instance, NULL);
       }
+
       if (EFI_ERROR (Status)) {
         //
         // Delete the instance from the console varialbe
@@ -606,7 +614,8 @@ EfiBootManagerConnectConsoleVariable (
         DeviceExist = TRUE;
       }
     }
-    FreePool(Instance);
+
+    FreePool (Instance);
   } while (CopyOfDevicePath != NULL);
 
   FreePool (StartDevicePath);
@@ -617,7 +626,6 @@ EfiBootManagerConnectConsoleVariable (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   This function will search every input/output device in current system,
@@ -643,46 +651,46 @@ EfiBootManagerConnectAllConsoles (
   // Update all the console variables
   //
   gBS->LocateHandleBuffer (
-          ByProtocol,
-          &gEfiSimpleTextInProtocolGuid,
-          NULL,
-          &HandleCount,
-          &HandleBuffer
-          );
+         ByProtocol,
+         &gEfiSimpleTextInProtocolGuid,
+         NULL,
+         &HandleCount,
+         &HandleBuffer
+         );
 
   for (Index = 0; Index < HandleCount; Index++) {
     gBS->HandleProtocol (
-            HandleBuffer[Index],
-            &gEfiDevicePathProtocolGuid,
-            (VOID **) &ConDevicePath
-            );
+           HandleBuffer[Index],
+           &gEfiDevicePathProtocolGuid,
+           (VOID **)&ConDevicePath
+           );
     EfiBootManagerUpdateConsoleVariable (ConIn, ConDevicePath, NULL);
   }
 
   if (HandleBuffer != NULL) {
-    FreePool(HandleBuffer);
+    FreePool (HandleBuffer);
     HandleBuffer = NULL;
   }
 
   gBS->LocateHandleBuffer (
-          ByProtocol,
-          &gEfiSimpleTextOutProtocolGuid,
-          NULL,
-          &HandleCount,
-          &HandleBuffer
-          );
+         ByProtocol,
+         &gEfiSimpleTextOutProtocolGuid,
+         NULL,
+         &HandleCount,
+         &HandleBuffer
+         );
   for (Index = 0; Index < HandleCount; Index++) {
     gBS->HandleProtocol (
-            HandleBuffer[Index],
-            &gEfiDevicePathProtocolGuid,
-            (VOID **) &ConDevicePath
-            );
+           HandleBuffer[Index],
+           &gEfiDevicePathProtocolGuid,
+           (VOID **)&ConDevicePath
+           );
     EfiBootManagerUpdateConsoleVariable (ConOut, ConDevicePath, NULL);
     EfiBootManagerUpdateConsoleVariable (ErrOut, ConDevicePath, NULL);
   }
 
   if (HandleBuffer != NULL) {
-    FreePool(HandleBuffer);
+    FreePool (HandleBuffer);
   }
 
   //
@@ -690,7 +698,6 @@ EfiBootManagerConnectAllConsoles (
   //
   EfiBootManagerConnectAllDefaultConsoles ();
 }
-
 
 /**
   This function will connect all the console devices base on the console
@@ -706,9 +713,9 @@ EfiBootManagerConnectAllDefaultConsoles (
   VOID
   )
 {
-  EFI_STATUS                Status;
-  BOOLEAN                   OneConnected;
-  BOOLEAN                   SystemTableUpdated;
+  EFI_STATUS  Status;
+  BOOLEAN     OneConnected;
+  BOOLEAN     SystemTableUpdated;
 
   OneConnected = FALSE;
 
@@ -716,32 +723,36 @@ EfiBootManagerConnectAllDefaultConsoles (
   if (!EFI_ERROR (Status)) {
     OneConnected = TRUE;
   }
-  PERF_EVENT ("ConOutReady");
 
+  PERF_EVENT ("ConOutReady");
 
   Status = EfiBootManagerConnectConsoleVariable (ConIn);
   if (!EFI_ERROR (Status)) {
     OneConnected = TRUE;
   }
+
   PERF_EVENT ("ConInReady");
 
   Status = EfiBootManagerConnectConsoleVariable (ErrOut);
   if (!EFI_ERROR (Status)) {
     OneConnected = TRUE;
   }
+
   PERF_EVENT ("ErrOutReady");
 
   SystemTableUpdated = FALSE;
   //
   // Fill console handles in System Table if no console device assignd.
   //
-  if (BmUpdateSystemTableConsole (L"ConIn", &gEfiSimpleTextInProtocolGuid, &gST->ConsoleInHandle, (VOID **) &gST->ConIn)) {
+  if (BmUpdateSystemTableConsole (L"ConIn", &gEfiSimpleTextInProtocolGuid, &gST->ConsoleInHandle, (VOID **)&gST->ConIn)) {
     SystemTableUpdated = TRUE;
   }
-  if (BmUpdateSystemTableConsole (L"ConOut", &gEfiSimpleTextOutProtocolGuid, &gST->ConsoleOutHandle, (VOID **) &gST->ConOut)) {
+
+  if (BmUpdateSystemTableConsole (L"ConOut", &gEfiSimpleTextOutProtocolGuid, &gST->ConsoleOutHandle, (VOID **)&gST->ConOut)) {
     SystemTableUpdated = TRUE;
   }
-  if (BmUpdateSystemTableConsole (L"ErrOut", &gEfiSimpleTextOutProtocolGuid, &gST->StandardErrorHandle, (VOID **) &gST->StdErr)) {
+
+  if (BmUpdateSystemTableConsole (L"ErrOut", &gEfiSimpleTextOutProtocolGuid, &gST->StandardErrorHandle, (VOID **)&gST->StdErr)) {
     SystemTableUpdated = TRUE;
   }
 
@@ -751,10 +762,10 @@ EfiBootManagerConnectAllDefaultConsoles (
     //
     gST->Hdr.CRC32 = 0;
     gBS->CalculateCrc32 (
-          (UINT8 *) &gST->Hdr,
-          gST->Hdr.HeaderSize,
-          &gST->Hdr.CRC32
-          );
+           (UINT8 *)&gST->Hdr,
+           gST->Hdr.HeaderSize,
+           &gST->Hdr.CRC32
+           );
   }
 
   return OneConnected ? EFI_SUCCESS : EFI_DEVICE_ERROR;

@@ -10,29 +10,29 @@
 #ifndef _TCP_DRIVER_H_
 #define _TCP_DRIVER_H_
 
-#define TCP_DRIVER_SIGNATURE   SIGNATURE_32 ('T', 'C', 'P', 'D')
+#define TCP_DRIVER_SIGNATURE  SIGNATURE_32 ('T', 'C', 'P', 'D')
 
-#define TCP_PORT_KNOWN         1024
-#define TCP_PORT_USER_RESERVED 65535
+#define TCP_PORT_KNOWN          1024
+#define TCP_PORT_USER_RESERVED  65535
 
 typedef struct _TCP_HEARTBEAT_TIMER {
-  EFI_EVENT  TimerEvent;
-  INTN       RefCnt;
+  EFI_EVENT    TimerEvent;
+  INTN         RefCnt;
 } TCP_HEARTBEAT_TIMER;
 
 typedef struct _TCP_SERVICE_DATA {
-  UINT32                        Signature;
-  EFI_HANDLE                    ControllerHandle;
-  EFI_HANDLE                    DriverBindingHandle;
-  UINT8                         IpVersion;
-  IP_IO                         *IpIo;
-  EFI_SERVICE_BINDING_PROTOCOL  ServiceBinding;
-  LIST_ENTRY                    SocketList;
+  UINT32                          Signature;
+  EFI_HANDLE                      ControllerHandle;
+  EFI_HANDLE                      DriverBindingHandle;
+  UINT8                           IpVersion;
+  IP_IO                           *IpIo;
+  EFI_SERVICE_BINDING_PROTOCOL    ServiceBinding;
+  LIST_ENTRY                      SocketList;
 } TCP_SERVICE_DATA;
 
 typedef struct _TCP_PROTO_DATA {
-  TCP_SERVICE_DATA  *TcpService;
-  TCP_CB            *TcpPcb;
+  TCP_SERVICE_DATA    *TcpService;
+  TCP_CB              *TcpPcb;
 } TCP_PROTO_DATA;
 
 #define TCP_SERVICE_FROM_THIS(a) \

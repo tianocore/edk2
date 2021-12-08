@@ -26,10 +26,10 @@
 //
 extern EFI_DRIVER_BINDING_PROTOCOL  gRedfishConfigDriverBinding;
 
-extern REDFISH_CONFIG_DRIVER_DATA        gRedfishConfigData;
-extern EDKII_REDFISH_CREDENTIAL_PROTOCOL *gCredential;
-extern EFI_EVENT                         gEndOfDxeEvent;
-extern EFI_EVENT                         gExitBootServiceEvent;
+extern REDFISH_CONFIG_DRIVER_DATA         gRedfishConfigData;
+extern EDKII_REDFISH_CREDENTIAL_PROTOCOL  *gCredential;
+extern EFI_EVENT                          gEndOfDxeEvent;
+extern EFI_EVENT                          gExitBootServiceEvent;
 
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
@@ -151,9 +151,10 @@ RedfishConfigDriverBindingStart (
 EFI_STATUS
 EFIAPI
 RedfishConfigDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN  EFI_HANDLE                  ControllerHandle,
-  IN  UINTN                       NumberOfChildren,
-  IN  EFI_HANDLE                  *ChildHandleBuffer OPTIONAL
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   );
+
 #endif

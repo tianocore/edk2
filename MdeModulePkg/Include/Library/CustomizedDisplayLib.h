@@ -45,8 +45,8 @@ Statement
 EFI_STATUS
 EFIAPI
 DisplayPageFrame (
-  IN FORM_DISPLAY_ENGINE_FORM       *FormData,
-  OUT EFI_SCREEN_DESCRIPTOR         *ScreenForStatement
+  IN FORM_DISPLAY_ENGINE_FORM  *FormData,
+  OUT EFI_SCREEN_DESCRIPTOR    *ScreenForStatement
   );
 
 /**
@@ -70,9 +70,9 @@ ClearDisplayPage (
 VOID
 EFIAPI
 RefreshKeyHelp (
-  IN FORM_DISPLAY_ENGINE_FORM      *FormData,
-  IN FORM_DISPLAY_ENGINE_STATEMENT *Statement,
-  IN  BOOLEAN                      Selected
+  IN FORM_DISPLAY_ENGINE_FORM       *FormData,
+  IN FORM_DISPLAY_ENGINE_STATEMENT  *Statement,
+  IN  BOOLEAN                       Selected
   );
 
 /**
@@ -87,8 +87,8 @@ RefreshKeyHelp (
 VOID
 EFIAPI
 UpdateStatusBar (
-  IN  UINTN                  MessageType,
-  IN  BOOLEAN                State
+  IN  UINTN    MessageType,
+  IN  BOOLEAN  State
   );
 
 /**
@@ -103,7 +103,7 @@ UpdateStatusBar (
 VOID
 EFIAPI
 CreateDialog (
-  OUT EFI_INPUT_KEY  *Key,        OPTIONAL
+  OUT EFI_INPUT_KEY  *Key         OPTIONAL,
   ...
   );
 
@@ -147,12 +147,13 @@ FormExitPolicy (
 UINT64
 EFIAPI
 FormExitTimeout (
-  IN FORM_DISPLAY_ENGINE_FORM      *FormData
+  IN FORM_DISPLAY_ENGINE_FORM  *FormData
   );
 
 //
 // Print Functions
 //
+
 /**
   Prints a unicode string to the default console, at
   the supplied cursor position, using L"%s" format.
@@ -167,11 +168,10 @@ FormExitTimeout (
 UINTN
 EFIAPI
 PrintStringAt (
-  IN UINTN     Column,
-  IN UINTN     Row,
-  IN CHAR16    *String
+  IN UINTN   Column,
+  IN UINTN   Row,
+  IN CHAR16  *String
   );
-
 
 /**
   Prints a unicode string with the specified width to the default console, at
@@ -189,10 +189,10 @@ PrintStringAt (
 UINTN
 EFIAPI
 PrintStringAtWithWidth (
-  IN UINTN     Column,
-  IN UINTN     Row,
-  IN CHAR16    *String,
-  IN UINTN     Width
+  IN UINTN   Column,
+  IN UINTN   Row,
+  IN CHAR16  *String,
+  IN UINTN   Width
   );
 
 /**
@@ -209,9 +209,9 @@ PrintStringAtWithWidth (
 UINTN
 EFIAPI
 PrintCharAt (
-  IN UINTN     Column,
-  IN UINTN     Row,
-  CHAR16       Character
+  IN UINTN  Column,
+  IN UINTN  Row,
+  CHAR16    Character
   );
 
 /**
@@ -227,16 +227,17 @@ PrintCharAt (
 VOID
 EFIAPI
 ClearLines (
-  IN UINTN               LeftColumn,
-  IN UINTN               RightColumn,
-  IN UINTN               TopRow,
-  IN UINTN               BottomRow,
-  IN UINTN               TextAttribute
+  IN UINTN  LeftColumn,
+  IN UINTN  RightColumn,
+  IN UINTN  TopRow,
+  IN UINTN  BottomRow,
+  IN UINTN  TextAttribute
   );
 
 //
 // Color Setting Functions
 //
+
 /**
   Get OEM/Vendor specific popup attribute colors.
 

@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Snp.h"
 
-
 /**
   Call UNDI to start the interface and changes the snp state.
 
@@ -20,69 +19,71 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 PxeStart (
-  IN SNP_DRIVER *Snp
+  IN SNP_DRIVER  *Snp
   )
 {
   PXE_CPB_START_31  *Cpb31;
 
-  Cpb31  = Snp->Cpb;
+  Cpb31 = Snp->Cpb;
   //
   // Initialize UNDI Start CDB for H/W UNDI
   //
-  Snp->Cdb.OpCode     = PXE_OPCODE_START;
-  Snp->Cdb.OpFlags    = PXE_OPFLAGS_NOT_USED;
-  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.DBsize     = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
-  Snp->Cdb.DBaddr     = PXE_DBADDR_NOT_USED;
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.OpCode    = PXE_OPCODE_START;
+  Snp->Cdb.OpFlags   = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb.CPBsize   = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.DBsize    = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr   = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.DBaddr    = PXE_DBADDR_NOT_USED;
+  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum     = Snp->IfNum;
+  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Make changes to H/W UNDI Start CDB if this is
   // a S/W UNDI.
   //
   if (Snp->IsSwUndi) {
-    Snp->Cdb.CPBsize  = (UINT16) sizeof (PXE_CPB_START_31);
-    Snp->Cdb.CPBaddr  = (UINT64)(UINTN) Cpb31;
+    Snp->Cdb.CPBsize = (UINT16)sizeof (PXE_CPB_START_31);
+    Snp->Cdb.CPBaddr = (UINT64)(UINTN)Cpb31;
 
-    Cpb31->Delay     = (UINT64)(UINTN) &SnpUndi32CallbackDelay;
-    Cpb31->Block     = (UINT64)(UINTN) &SnpUndi32CallbackBlock;
+    Cpb31->Delay = (UINT64)(UINTN)&SnpUndi32CallbackDelay;
+    Cpb31->Block = (UINT64)(UINTN)&SnpUndi32CallbackBlock;
 
     //
     // Virtual == Physical.  This can be set to zero.
     //
-    Cpb31->Virt2Phys = (UINT64)(UINTN) 0;
-    Cpb31->Mem_IO    = (UINT64)(UINTN) &SnpUndi32CallbackMemio;
+    Cpb31->Virt2Phys = (UINT64)(UINTN)0;
+    Cpb31->Mem_IO    = (UINT64)(UINTN)&SnpUndi32CallbackMemio;
 
-    Cpb31->Map_Mem   = (UINT64)(UINTN) &SnpUndi32CallbackMap;
-    Cpb31->UnMap_Mem = (UINT64)(UINTN) &SnpUndi32CallbackUnmap;
-    Cpb31->Sync_Mem  = (UINT64)(UINTN) &SnpUndi32CallbackSync;
+    Cpb31->Map_Mem   = (UINT64)(UINTN)&SnpUndi32CallbackMap;
+    Cpb31->UnMap_Mem = (UINT64)(UINTN)&SnpUndi32CallbackUnmap;
+    Cpb31->Sync_Mem  = (UINT64)(UINTN)&SnpUndi32CallbackSync;
 
-    Cpb31->Unique_ID = (UINT64)(UINTN) Snp;
+    Cpb31->Unique_ID = (UINT64)(UINTN)Snp;
   }
+
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.start()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.start()  "));
 
-  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
 
   if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
     //
     // UNDI could not be started. Return UNDI error.
     //
     DEBUG (
-      (EFI_D_ERROR,
-      "\nsnp->undi.start()  %xh:%xh\n",
-      Snp->Cdb.StatCode,
-      Snp->Cdb.StatFlags)
+      (DEBUG_ERROR,
+       "\nsnp->undi.start()  %xh:%xh\n",
+       Snp->Cdb.StatCode,
+       Snp->Cdb.StatFlags)
       );
 
     return EFI_DEVICE_ERROR;
   }
+
   //
   // Set simple network state to Started and return success.
   //
@@ -90,7 +91,6 @@ PxeStart (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Change the state of a network interface from "stopped" to "started."
@@ -111,7 +111,7 @@ PxeStart (
 EFI_STATUS
 EFIAPI
 SnpUndi32Start (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This
   )
 {
   SNP_DRIVER  *Snp;
@@ -128,23 +128,24 @@ SnpUndi32Start (
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   switch (Snp->Mode.State) {
-  case EfiSimpleNetworkStopped:
-    break;
+    case EfiSimpleNetworkStopped:
+      break;
 
-  case EfiSimpleNetworkStarted:
-  case EfiSimpleNetworkInitialized:
-    Status = EFI_ALREADY_STARTED;
-    goto ON_EXIT;
+    case EfiSimpleNetworkStarted:
+    case EfiSimpleNetworkInitialized:
+      Status = EFI_ALREADY_STARTED;
+      goto ON_EXIT;
 
-  default:
-    Status = EFI_DEVICE_ERROR;
-    goto ON_EXIT;
+    default:
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
   }
 
   Status = PxeStart (Snp);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
+
   //
   // clear the map_list in SNP structure
   //

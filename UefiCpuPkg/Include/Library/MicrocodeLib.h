@@ -52,7 +52,7 @@ GetProcessorMicrocodeCpuId (
 UINT32
 EFIAPI
 GetMicrocodeLength (
-  IN CPU_MICROCODE_HEADER *Microcode
+  IN CPU_MICROCODE_HEADER  *Microcode
   );
 
 /**
@@ -65,7 +65,7 @@ GetMicrocodeLength (
 VOID
 EFIAPI
 LoadMicrocode (
-  IN CPU_MICROCODE_HEADER *Microcode
+  IN CPU_MICROCODE_HEADER  *Microcode
   );
 
 /**
@@ -109,12 +109,12 @@ LoadMicrocode (
 BOOLEAN
 EFIAPI
 IsValidMicrocode (
-  IN CPU_MICROCODE_HEADER       *Microcode,
-  IN UINTN                      MicrocodeLength,
-  IN UINT32                     MinimumRevision,
-  IN EDKII_PEI_MICROCODE_CPU_ID *MicrocodeCpuIds,
-  IN UINTN                      MicrocodeCpuIdCount,
-  IN BOOLEAN                    VerifyChecksum
+  IN CPU_MICROCODE_HEADER        *Microcode,
+  IN UINTN                       MicrocodeLength,
+  IN UINT32                      MinimumRevision,
+  IN EDKII_PEI_MICROCODE_CPU_ID  *MicrocodeCpuIds,
+  IN UINTN                       MicrocodeCpuIdCount,
+  IN BOOLEAN                     VerifyChecksum
   );
 
 #endif

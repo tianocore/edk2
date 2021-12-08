@@ -16,16 +16,16 @@
 #include <Library/BaseMemoryLib.h>
 #include <Guid/SmmRegisterInfoGuid.h>
 
-#define SMM_DATA_PORT       0xB3
-#define SMM_CONTROL_PORT    0xB2
+#define SMM_DATA_PORT     0xB3
+#define SMM_CONTROL_PORT  0xB2
 
 typedef struct {
-  UINT8   GblBitOffset;
-  UINT8   ApmBitOffset;
-  UINT32  Address;
+  UINT8     GblBitOffset;
+  UINT8     ApmBitOffset;
+  UINT32    Address;
 } SMM_CONTROL2_REG;
 
-SMM_CONTROL2_REG        mSmiCtrlReg;
+SMM_CONTROL2_REG  mSmiCtrlReg;
 
 /**
   Invokes SMI activation from either the preboot or runtime environment.
@@ -48,15 +48,15 @@ SMM_CONTROL2_REG        mSmiCtrlReg;
 EFI_STATUS
 EFIAPI
 Activate (
-  IN CONST EFI_SMM_CONTROL2_PROTOCOL     *This,
-  IN OUT  UINT8                          *CommandPort       OPTIONAL,
-  IN OUT  UINT8                          *DataPort          OPTIONAL,
-  IN      BOOLEAN                        Periodic           OPTIONAL,
-  IN      EFI_SMM_PERIOD                 ActivationInterval OPTIONAL
+  IN CONST EFI_SMM_CONTROL2_PROTOCOL  *This,
+  IN OUT  UINT8                       *CommandPort       OPTIONAL,
+  IN OUT  UINT8                       *DataPort          OPTIONAL,
+  IN      BOOLEAN                     Periodic           OPTIONAL,
+  IN      EFI_SMM_PERIOD              ActivationInterval OPTIONAL
   )
 {
-  UINT32                                 SmiEn;
-  UINT32                                 SmiEnableBits;
+  UINT32  SmiEn;
+  UINT32  SmiEnableBits;
 
   if (Periodic) {
     return EFI_INVALID_PARAMETER;
@@ -71,7 +71,7 @@ Activate (
     IoWrite32 (mSmiCtrlReg.Address, SmiEn | SmiEnableBits);
   }
 
-  IoWrite8 (SMM_DATA_PORT,    DataPort    == NULL ? 0 : *DataPort);
+  IoWrite8 (SMM_DATA_PORT, DataPort    == NULL ? 0 : *DataPort);
   IoWrite8 (SMM_CONTROL_PORT, CommandPort == NULL ? 0 : *CommandPort);
   return EFI_SUCCESS;
 }
@@ -88,8 +88,8 @@ Activate (
 EFI_STATUS
 EFIAPI
 Deactivate (
-  IN CONST EFI_SMM_CONTROL2_PROTOCOL     *This,
-  IN       BOOLEAN                       Periodic
+  IN CONST EFI_SMM_CONTROL2_PROTOCOL  *This,
+  IN       BOOLEAN                    Periodic
   )
 {
   if (Periodic) {
@@ -105,7 +105,7 @@ Deactivate (
 ///
 /// SMM COntrol2 Protocol instance
 ///
-EFI_SMM_CONTROL2_PROTOCOL mSmmControl2 = {
+EFI_SMM_CONTROL2_PROTOCOL  mSmmControl2 = {
   Activate,
   Deactivate,
   0
@@ -123,12 +123,12 @@ EFI_SMM_CONTROL2_PROTOCOL mSmmControl2 = {
 **/
 PLD_GENERIC_REGISTER *
 GetSmmCtrlRegById (
-  IN PLD_SMM_REGISTERS    *SmmRegister,
-  IN UINT32               Id
+  IN PLD_SMM_REGISTERS  *SmmRegister,
+  IN UINT32             Id
   )
 {
-  UINT32                  Index;
-  PLD_GENERIC_REGISTER    *PldReg;
+  UINT32                Index;
+  PLD_GENERIC_REGISTER  *PldReg;
 
   PldReg = NULL;
   for (Index = 0; Index < SmmRegister->Count; Index++) {
@@ -150,18 +150,19 @@ GetSmmCtrlRegById (
       (PldReg->Address.Address          == 0) ||
       (PldReg->Address.RegisterBitWidth != 1) ||
       (PldReg->Address.AddressSpaceId   != EFI_ACPI_3_0_SYSTEM_IO) ||
-      (PldReg->Value != 1)) {
+      (PldReg->Value != 1))
+  {
     DEBUG ((DEBUG_INFO, "Unexpected SMM register.\n"));
     DEBUG ((DEBUG_INFO, "AddressSpaceId= 0x%x\n", PldReg->Address.AddressSpaceId));
     DEBUG ((DEBUG_INFO, "RegBitWidth   = 0x%x\n", PldReg->Address.RegisterBitWidth));
     DEBUG ((DEBUG_INFO, "RegBitOffset  = 0x%x\n", PldReg->Address.RegisterBitOffset));
     DEBUG ((DEBUG_INFO, "AccessSize    = 0x%x\n", PldReg->Address.AccessSize));
-    DEBUG ((DEBUG_INFO, "Address       = 0x%lx\n",PldReg->Address.Address ));
+    DEBUG ((DEBUG_INFO, "Address       = 0x%lx\n", PldReg->Address.Address));
     return NULL;
   }
+
   return PldReg;
 }
-
 
 /**
   Fixup data pointers so that the services can be called in virtual mode.
@@ -173,14 +174,13 @@ GetSmmCtrlRegById (
 VOID
 EFIAPI
 SmmControlVirtualAddressChangeEvent (
-  IN EFI_EVENT                  Event,
-  IN VOID                       *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  EfiConvertPointer (0x0, (VOID **) &(mSmmControl2.Trigger));
-  EfiConvertPointer (0x0, (VOID **) &(mSmmControl2.Clear));
+  EfiConvertPointer (0x0, (VOID **)&(mSmmControl2.Trigger));
+  EfiConvertPointer (0x0, (VOID **)&(mSmmControl2.Clear));
 }
-
 
 /**
   This function installs EFI_SMM_CONTROL2_PROTOCOL.
@@ -195,28 +195,29 @@ SmmControlVirtualAddressChangeEvent (
 EFI_STATUS
 EFIAPI
 SmmControlEntryPoint (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
-  EFI_HOB_GUID_TYPE       *GuidHob;
-  PLD_SMM_REGISTERS       *SmmRegister;
-  PLD_GENERIC_REGISTER    *SmiGblEnReg;
-  PLD_GENERIC_REGISTER    *SmiApmEnReg;
-  EFI_EVENT               Event;
+  EFI_STATUS            Status;
+  EFI_HOB_GUID_TYPE     *GuidHob;
+  PLD_SMM_REGISTERS     *SmmRegister;
+  PLD_GENERIC_REGISTER  *SmiGblEnReg;
+  PLD_GENERIC_REGISTER  *SmiApmEnReg;
+  EFI_EVENT             Event;
 
   GuidHob = GetFirstGuidHob (&gSmmRegisterInfoGuid);
   if (GuidHob == NULL) {
     return EFI_UNSUPPORTED;
   }
 
-  SmmRegister = (PLD_SMM_REGISTERS *) (GET_GUID_HOB_DATA(GuidHob));
+  SmmRegister = (PLD_SMM_REGISTERS *)(GET_GUID_HOB_DATA (GuidHob));
   SmiGblEnReg = GetSmmCtrlRegById (SmmRegister, REGISTER_ID_SMI_GBL_EN);
   if (SmiGblEnReg == NULL) {
     DEBUG ((DEBUG_ERROR, "SMI global enable reg not found.\n"));
     return EFI_NOT_FOUND;
   }
+
   mSmiCtrlReg.Address      = (UINT32)SmiGblEnReg->Address.Address;
   mSmiCtrlReg.GblBitOffset = SmiGblEnReg->Address.RegisterBitOffset;
 
@@ -231,6 +232,7 @@ SmmControlEntryPoint (
     DEBUG ((DEBUG_ERROR, "APM:0x%x, GBL:0x%x\n", SmiApmEnReg->Address.Address, mSmiCtrlReg.Address));
     return EFI_UNSUPPORTED;
   }
+
   mSmiCtrlReg.ApmBitOffset = SmiApmEnReg->Address.RegisterBitOffset;
 
   //

@@ -24,9 +24,9 @@
 **/
 VOID
 WifiMgrUpdateConnectMessage (
-  IN  WIFI_MGR_DEVICE_DATA      *Nic,
-  IN  BOOLEAN                   ConnectStateChanged,
-  IN  EFI_STRING                ConnectStatusMessage
+  IN  WIFI_MGR_DEVICE_DATA  *Nic,
+  IN  BOOLEAN               ConnectStateChanged,
+  IN  EFI_STRING            ConnectStatusMessage
   );
 
 /**
@@ -183,12 +183,12 @@ WifiMgrDxeHiiConfigAccessRouteConfig (
 EFI_STATUS
 EFIAPI
 WifiMgrDxeHiiConfigAccessCallback (
-  IN     CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN     EFI_BROWSER_ACTION                     Action,
-  IN     EFI_QUESTION_ID                        QuestionId,
-  IN     UINT8                                  Type,
-  IN OUT EFI_IFR_TYPE_VALUE                     *Value,
-  OUT    EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN     CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN     EFI_BROWSER_ACTION                    Action,
+  IN     EFI_QUESTION_ID                       QuestionId,
+  IN     UINT8                                 Type,
+  IN OUT EFI_IFR_TYPE_VALUE                    *Value,
+  OUT    EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   );
 
 /**
@@ -203,7 +203,7 @@ WifiMgrDxeHiiConfigAccessCallback (
 **/
 EFI_STATUS
 WifiMgrDxeConfigFormInit (
-  WIFI_MGR_PRIVATE_DATA    *Private
+  WIFI_MGR_PRIVATE_DATA  *Private
   );
 
 /**
@@ -217,7 +217,7 @@ WifiMgrDxeConfigFormInit (
 **/
 EFI_STATUS
 WifiMgrDxeConfigFormUnload (
-  WIFI_MGR_PRIVATE_DATA    *Private
+  WIFI_MGR_PRIVATE_DATA  *Private
   );
 
 /**
@@ -234,8 +234,8 @@ WifiMgrDxeConfigFormUnload (
 **/
 EFI_STATUS
 WifiMgrRefreshNetworkList (
-  IN    WIFI_MGR_PRIVATE_DATA        *Private,
-  OUT   WIFI_MANAGER_IFR_NVDATA      *IfrNvData
+  IN    WIFI_MGR_PRIVATE_DATA    *Private,
+  OUT   WIFI_MANAGER_IFR_NVDATA  *IfrNvData
   );
 
 #endif

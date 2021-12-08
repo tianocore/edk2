@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Driver.h"
 
-EFI_SERVICE_BINDING_PROTOCOL    mHash2ServiceBindingProtocol = {
+EFI_SERVICE_BINDING_PROTOCOL  mHash2ServiceBindingProtocol = {
   Hash2ServiceBindingCreateChild,
   Hash2ServiceBindingDestroyChild
 };
@@ -32,14 +32,14 @@ EFI_SERVICE_BINDING_PROTOCOL    mHash2ServiceBindingProtocol = {
 EFI_STATUS
 EFIAPI
 Hash2ServiceBindingCreateChild (
-  IN     EFI_SERVICE_BINDING_PROTOCOL    *This,
-  IN OUT EFI_HANDLE                      *ChildHandle
+  IN     EFI_SERVICE_BINDING_PROTOCOL  *This,
+  IN OUT EFI_HANDLE                    *ChildHandle
   )
 {
-  EFI_STATUS          Status;
-  HASH2_SERVICE_DATA  *Hash2ServiceData;
-  HASH2_INSTANCE_DATA *Instance;
-  EFI_TPL             OldTpl;
+  EFI_STATUS           Status;
+  HASH2_SERVICE_DATA   *Hash2ServiceData;
+  HASH2_INSTANCE_DATA  *Instance;
+  EFI_TPL              OldTpl;
 
   if ((This == NULL) || (ChildHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -87,7 +87,6 @@ Hash2ServiceBindingCreateChild (
   return Status;
 }
 
-
 /**
   Destroys a child handle with a set of I/O services.
 
@@ -112,16 +111,16 @@ Hash2ServiceBindingCreateChild (
 EFI_STATUS
 EFIAPI
 Hash2ServiceBindingDestroyChild (
-  IN EFI_SERVICE_BINDING_PROTOCOL    *This,
-  IN EFI_HANDLE                      ChildHandle
+  IN EFI_SERVICE_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                    ChildHandle
   )
 {
-  EFI_STATUS                     Status;
-  HASH2_SERVICE_DATA             *Hash2ServiceData;
-  EFI_HASH2_PROTOCOL             *Hash2Protocol;
-  HASH2_INSTANCE_DATA            *Instance;
-  EFI_TPL                        OldTpl;
-  LIST_ENTRY                     *Entry;
+  EFI_STATUS           Status;
+  HASH2_SERVICE_DATA   *Hash2ServiceData;
+  EFI_HASH2_PROTOCOL   *Hash2Protocol;
+  HASH2_INSTANCE_DATA  *Instance;
+  EFI_TPL              OldTpl;
+  LIST_ENTRY           *Entry;
 
   if ((This == NULL) || (ChildHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -133,7 +132,7 @@ Hash2ServiceBindingDestroyChild (
   // Check if this ChildHandle is valid
   //
   Instance = NULL;
-  for(Entry = (&Hash2ServiceData->ChildrenList)->ForwardLink; Entry != (&Hash2ServiceData->ChildrenList); Entry = Entry->ForwardLink) {
+  for (Entry = (&Hash2ServiceData->ChildrenList)->ForwardLink; Entry != (&Hash2ServiceData->ChildrenList); Entry = Entry->ForwardLink) {
     Instance = HASH2_INSTANCE_DATA_FROM_LINK (Entry);
     if (Instance->Handle == ChildHandle) {
       break;
@@ -141,8 +140,9 @@ Hash2ServiceBindingDestroyChild (
       Instance = NULL;
     }
   }
+
   if (Instance == NULL) {
-    DEBUG ((EFI_D_ERROR, "Hash2ServiceBindingDestroyChild - Invalid handle\n"));
+    DEBUG ((DEBUG_ERROR, "Hash2ServiceBindingDestroyChild - Invalid handle\n"));
     return EFI_UNSUPPORTED;
   }
 
@@ -200,12 +200,12 @@ Hash2ServiceBindingDestroyChild (
 EFI_STATUS
 EFIAPI
 Hash2DriverEntryPoint (
-  IN EFI_HANDLE          ImageHandle,
-  IN EFI_SYSTEM_TABLE    *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS         Status;
-  HASH2_SERVICE_DATA *Hash2ServiceData;
+  EFI_STATUS          Status;
+  HASH2_SERVICE_DATA  *Hash2ServiceData;
 
   //
   // Initialize the Hash Service Data.
@@ -215,7 +215,7 @@ Hash2DriverEntryPoint (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Hash2ServiceData->Signature     = HASH2_SERVICE_DATA_SIGNATURE;
+  Hash2ServiceData->Signature = HASH2_SERVICE_DATA_SIGNATURE;
   CopyMem (&Hash2ServiceData->ServiceBinding, &mHash2ServiceBindingProtocol, sizeof (EFI_SERVICE_BINDING_PROTOCOL));
   InitializeListHead (&Hash2ServiceData->ChildrenList);
 

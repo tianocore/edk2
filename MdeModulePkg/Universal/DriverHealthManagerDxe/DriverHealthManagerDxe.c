@@ -13,13 +13,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DriverHealthManagerDxe.h"
 #include "DriverHealthManagerVfr.h"
 
-EFI_HII_CONFIG_ACCESS_PROTOCOL mDriverHealthManagerConfigAccess     = {
+EFI_HII_CONFIG_ACCESS_PROTOCOL  mDriverHealthManagerConfigAccess = {
   DriverHealthManagerFakeExtractConfig,
   DriverHealthManagerFakeRouteConfig,
   DriverHealthManagerCallback
 };
 
-EFI_GUID mDriverHealthManagerForm = DRIVER_HEALTH_MANAGER_FORMSET_GUID;
+EFI_GUID  mDriverHealthManagerForm = DRIVER_HEALTH_MANAGER_FORMSET_GUID;
 
 FORM_DEVICE_PATH  mDriverHealthManagerFormDevicePath = {
   {
@@ -27,8 +27,8 @@ FORM_DEVICE_PATH  mDriverHealthManagerFormDevicePath = {
       HARDWARE_DEVICE_PATH,
       HW_VENDOR_DP,
       {
-        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
-        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
     },
     EFI_CALLER_ID_GUID
@@ -37,8 +37,8 @@ FORM_DEVICE_PATH  mDriverHealthManagerFormDevicePath = {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
     {
-      (UINT8) (END_DEVICE_PATH_LENGTH),
-      (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
+      (UINT8)(END_DEVICE_PATH_LENGTH),
+      (UINT8)((END_DEVICE_PATH_LENGTH) >> 8)
     }
   }
 };
@@ -48,9 +48,8 @@ EFI_BOOT_MANAGER_DRIVER_HEALTH_INFO  *mDriverHealthManagerHealthInfo     = NULL;
 UINTN                                mDriverHealthManagerHealthInfoCount = 0;
 EFI_HII_DATABASE_PROTOCOL            *mDriverHealthManagerDatabase;
 
-
-extern UINT8 DriverHealthManagerVfrBin[];
-extern UINT8 DriverHealthConfigureVfrBin[];
+extern UINT8  DriverHealthManagerVfrBin[];
+extern UINT8  DriverHealthConfigureVfrBin[];
 
 /**
   This function allows a caller to extract the current configuration for one
@@ -77,15 +76,16 @@ extern UINT8 DriverHealthConfigureVfrBin[];
 EFI_STATUS
 EFIAPI
 DriverHealthManagerFakeExtractConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Request,
-  OUT EFI_STRING                             *Progress,
-  OUT EFI_STRING                             *Results
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Request,
+  OUT EFI_STRING                            *Progress,
+  OUT EFI_STRING                            *Results
   )
 {
-  if (Progress == NULL || Results == NULL) {
+  if ((Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   *Progress = Request;
   return EFI_NOT_FOUND;
 }
@@ -109,12 +109,12 @@ DriverHealthManagerFakeExtractConfig (
 EFI_STATUS
 EFIAPI
 DriverHealthManagerFakeRouteConfig (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  CONST EFI_STRING                       Configuration,
-  OUT EFI_STRING                             *Progress
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  CONST EFI_STRING                      Configuration,
+  OUT EFI_STRING                            *Progress
   )
 {
-  if (Configuration == NULL || Progress == NULL) {
+  if ((Configuration == NULL) || (Progress == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -139,17 +139,17 @@ DriverHealthManagerFakeRouteConfig (
 EFI_STATUS
 EFIAPI
 InitializeDriverHealthManager (
-  EFI_HANDLE                 ImageHandle,
-  EFI_SYSTEM_TABLE           *SystemTable
+  EFI_HANDLE        ImageHandle,
+  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                  Status;
-  EFI_HANDLE                  Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
   Status = gBS->LocateProtocol (
                   &gEfiHiiDatabaseProtocolGuid,
                   NULL,
-                  (VOID **) &mDriverHealthManagerDatabase
+                  (VOID **)&mDriverHealthManagerDatabase
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -163,7 +163,6 @@ InitializeDriverHealthManager (
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
-
 
   //
   // Publish Driver Health HII data.
@@ -203,16 +202,16 @@ InitializeDriverHealthManager (
 **/
 CHAR8 *
 DriverHealthManagerSelectBestLanguage (
-  IN CHAR8        *SupportedLanguages,
-  IN BOOLEAN      Iso639Language
+  IN CHAR8    *SupportedLanguages,
+  IN BOOLEAN  Iso639Language
   )
 {
-  CHAR8           *LanguageVariable;
-  CHAR8           *BestLanguage;
+  CHAR8  *LanguageVariable;
+  CHAR8  *BestLanguage;
 
-  GetEfiGlobalVariable2 (Iso639Language ? L"Lang" : L"PlatformLang", (VOID**)&LanguageVariable, NULL);
+  GetEfiGlobalVariable2 (Iso639Language ? L"Lang" : L"PlatformLang", (VOID **)&LanguageVariable, NULL);
 
-  BestLanguage = GetBestLanguage(
+  BestLanguage = GetBestLanguage (
                    SupportedLanguages,
                    Iso639Language,
                    (LanguageVariable != NULL) ? LanguageVariable : "",
@@ -225,8 +224,6 @@ DriverHealthManagerSelectBestLanguage (
 
   return BestLanguage;
 }
-
-
 
 /**
 
@@ -248,25 +245,25 @@ DriverHealthManagerSelectBestLanguage (
 **/
 EFI_STATUS
 DriverHealthManagerGetComponentNameWorker (
-  IN  EFI_GUID                    *ProtocolGuid,
-  IN  EFI_HANDLE                  DriverBindingHandle,
-  OUT EFI_COMPONENT_NAME_PROTOCOL **ComponentName,
-  OUT CHAR8                       **SupportedLanguage
+  IN  EFI_GUID                     *ProtocolGuid,
+  IN  EFI_HANDLE                   DriverBindingHandle,
+  OUT EFI_COMPONENT_NAME_PROTOCOL  **ComponentName,
+  OUT CHAR8                        **SupportedLanguage
   )
 {
-  EFI_STATUS                      Status;
+  EFI_STATUS  Status;
 
   //
   // Locate Component Name (2) protocol on the driver binging handle.
   //
   Status = gBS->OpenProtocol (
-                 DriverBindingHandle,
-                 ProtocolGuid,
-                 (VOID **) ComponentName,
-                 NULL,
-                 NULL,
-                 EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                 );
+                  DriverBindingHandle,
+                  ProtocolGuid,
+                  (VOID **)ComponentName,
+                  NULL,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -276,7 +273,7 @@ DriverHealthManagerGetComponentNameWorker (
   //
   *SupportedLanguage = DriverHealthManagerSelectBestLanguage (
                          (*ComponentName)->SupportedLanguages,
-                         (BOOLEAN) (ProtocolGuid == &gEfiComponentNameProtocolGuid)
+                         (BOOLEAN)(ProtocolGuid == &gEfiComponentNameProtocolGuid)
                          );
   if (*SupportedLanguage == NULL) {
     Status = EFI_UNSUPPORTED;
@@ -307,9 +304,9 @@ DriverHealthManagerGetDriverNameWorker (
   OUT CHAR16      **DriverName
   )
 {
-  EFI_STATUS                     Status;
-  CHAR8                          *BestLanguage;
-  EFI_COMPONENT_NAME_PROTOCOL    *ComponentName;
+  EFI_STATUS                   Status;
+  CHAR8                        *BestLanguage;
+  EFI_COMPONENT_NAME_PROTOCOL  *ComponentName;
 
   //
   // Retrieve Component Name (2) protocol instance on the driver binding handle and
@@ -356,8 +353,8 @@ DriverHealthManagerGetDriverName (
   IN  EFI_HANDLE  DriverBindingHandle
   )
 {
-  EFI_STATUS      Status;
-  CHAR16          *DriverName;
+  EFI_STATUS  Status;
+  CHAR16      *DriverName;
 
   //
   // Get driver name from UEFI 2.0 Component Name 2 protocol interface.
@@ -377,8 +374,6 @@ DriverHealthManagerGetDriverName (
     return ConvertDevicePathToText (DevicePathFromHandle (DriverBindingHandle), FALSE, TRUE);
   }
 }
-
-
 
 /**
   This function gets controller name from Component Name 2 protocol interface and Component Name protocol interface
@@ -412,9 +407,9 @@ DriverHealthManagerGetControllerNameWorker (
   OUT CHAR16      **ControllerName
   )
 {
-  EFI_STATUS                     Status;
-  CHAR8                          *BestLanguage;
-  EFI_COMPONENT_NAME_PROTOCOL    *ComponentName;
+  EFI_STATUS                   Status;
+  CHAR8                        *BestLanguage;
+  EFI_COMPONENT_NAME_PROTOCOL  *ComponentName;
 
   //
   // Retrieve Component Name (2) protocol instance on the driver binding handle and
@@ -471,8 +466,8 @@ DriverHealthManagerGetControllerName (
   IN  EFI_HANDLE  ChildHandle
   )
 {
-  EFI_STATUS      Status;
-  CHAR16          *ControllerName;
+  EFI_STATUS  Status;
+  CHAR16      *ControllerName;
 
   //
   // Get controller name from UEFI 2.0 Component Name 2 protocol interface.
@@ -519,11 +514,11 @@ DriverHealthManagerGetControllerName (
 EFI_STATUS
 EFIAPI
 DriverHealthManagerRepairNotify (
-  IN UINTN        Value,
-  IN UINTN        Limit
+  IN UINTN  Value,
+  IN UINTN  Limit
   )
 {
-  DEBUG ((EFI_D_INFO, "[DriverHealthManagement]RepairNotify: %d/%d\n", Value, Limit));
+  DEBUG ((DEBUG_INFO, "[DriverHealthManagement]RepairNotify: %d/%d\n", Value, Limit));
   return EFI_SUCCESS;
 }
 
@@ -538,8 +533,8 @@ DriverHealthManagerRepairNotify (
 **/
 EFI_STATUS
 DriverHealthManagerGetFormsetId (
-  IN  EFI_HII_HANDLE   Handle,
-  OUT EFI_GUID         *FormsetGuid
+  IN  EFI_HII_HANDLE  Handle,
+  OUT EFI_GUID        *FormsetGuid
   )
 {
   EFI_STATUS                   Status;
@@ -559,23 +554,25 @@ DriverHealthManagerGetFormsetId (
   //
   BufferSize     = 0;
   HiiPackageList = NULL;
-  Status = mDriverHealthManagerDatabase->ExportPackageLists (mDriverHealthManagerDatabase, Handle, &BufferSize, HiiPackageList);
+  Status         = mDriverHealthManagerDatabase->ExportPackageLists (mDriverHealthManagerDatabase, Handle, &BufferSize, HiiPackageList);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HiiPackageList = AllocatePool (BufferSize);
     ASSERT (HiiPackageList != NULL);
 
     Status = mDriverHealthManagerDatabase->ExportPackageLists (mDriverHealthManagerDatabase, Handle, &BufferSize, HiiPackageList);
   }
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   ASSERT (HiiPackageList != NULL);
 
   //
   // Get Form package from this HII package List
   //
   for (Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER); Offset < ReadUnaligned32 (&HiiPackageList->PackageLength); Offset += PackageHeader.Length) {
-    Package = ((UINT8 *) HiiPackageList) + Offset;
+    Package = ((UINT8 *)HiiPackageList) + Offset;
     CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
 
     if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
@@ -583,19 +580,20 @@ DriverHealthManagerGetFormsetId (
       // Search FormSet in this Form Package
       //
 
-      for (Offset2 = sizeof (EFI_HII_PACKAGE_HEADER); Offset2 < PackageHeader.Length; Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length) {
+      for (Offset2 = sizeof (EFI_HII_PACKAGE_HEADER); Offset2 < PackageHeader.Length; Offset2 += ((EFI_IFR_OP_HEADER *)OpCodeData)->Length) {
         OpCodeData = Package + Offset2;
 
-        if ((((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) &&
-            (((EFI_IFR_OP_HEADER *) OpCodeData)->Length > OFFSET_OF (EFI_IFR_FORM_SET, Flags))) {
+        if ((((EFI_IFR_OP_HEADER *)OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) &&
+            (((EFI_IFR_OP_HEADER *)OpCodeData)->Length > OFFSET_OF (EFI_IFR_FORM_SET, Flags)))
+        {
           //
           // Try to compare against formset class GUID
           //
-          NumberOfClassGuid = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
-          ClassGuid         = (EFI_GUID *) (OpCodeData + sizeof (EFI_IFR_FORM_SET));
+          NumberOfClassGuid = (UINT8)(((EFI_IFR_FORM_SET *)OpCodeData)->Flags & 0x3);
+          ClassGuid         = (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_FORM_SET));
           for (Index = 0; Index < NumberOfClassGuid; Index++) {
             if (CompareGuid (&gEfiHiiDriverHealthFormsetGuid, &ClassGuid[Index])) {
-              CopyMem (FormsetGuid, &((EFI_IFR_FORM_SET *) OpCodeData)->Guid, sizeof (EFI_GUID));
+              CopyMem (FormsetGuid, &((EFI_IFR_FORM_SET *)OpCodeData)->Guid, sizeof (EFI_GUID));
               FreePool (HiiPackageList);
               return EFI_SUCCESS;
             }
@@ -629,15 +627,15 @@ DriverHealthManagerGetFormsetId (
 **/
 VOID
 DriverHealthManagerProcessSingleControllerHealth (
-  IN  EFI_DRIVER_HEALTH_PROTOCOL         *DriverHealth,
-  IN  EFI_HANDLE                         ControllerHandle, OPTIONAL
-  IN  EFI_HANDLE                         ChildHandle,      OPTIONAL
-  IN  EFI_DRIVER_HEALTH_STATUS           HealthStatus,
-  IN  EFI_DRIVER_HEALTH_HII_MESSAGE      **MessageList,    OPTIONAL
-  IN  EFI_HII_HANDLE                     FormHiiHandle
+  IN  EFI_DRIVER_HEALTH_PROTOCOL     *DriverHealth,
+  IN  EFI_HANDLE                     ControllerHandle  OPTIONAL,
+  IN  EFI_HANDLE                     ChildHandle       OPTIONAL,
+  IN  EFI_DRIVER_HEALTH_STATUS       HealthStatus,
+  IN  EFI_DRIVER_HEALTH_HII_MESSAGE  **MessageList     OPTIONAL,
+  IN  EFI_HII_HANDLE                 FormHiiHandle
   )
 {
-  EFI_STATUS                         Status;
+  EFI_STATUS  Status;
 
   ASSERT (HealthStatus != EfiDriverHealthStatusConfigurationRequired);
   //
@@ -646,34 +644,34 @@ DriverHealthManagerProcessSingleControllerHealth (
   // will be in (Health, Failed, Configuration Required).
   //
   switch (HealthStatus) {
+    case EfiDriverHealthStatusRepairRequired:
+      Status = DriverHealth->Repair (
+                               DriverHealth,
+                               ControllerHandle,
+                               ChildHandle,
+                               DriverHealthManagerRepairNotify
+                               );
+      break;
 
-  case EfiDriverHealthStatusRepairRequired:
-    Status = DriverHealth->Repair (
-                             DriverHealth,
-                             ControllerHandle,
-                             ChildHandle,
-                             DriverHealthManagerRepairNotify
-                             );
-    break;
-
-  case EfiDriverHealthStatusRebootRequired:
-    gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
-    break;
-
-  case EfiDriverHealthStatusReconnectRequired:
-    Status = gBS->DisconnectController (ControllerHandle, NULL, NULL);
-    if (EFI_ERROR (Status)) {
-      //
-      // Disconnect failed.  Need to promote reconnect to a reboot.
-      //
+    case EfiDriverHealthStatusRebootRequired:
       gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
-    } else {
-      gBS->ConnectController (ControllerHandle, NULL, NULL, TRUE);
-    }
-    break;
+      break;
 
-  default:
-    break;
+    case EfiDriverHealthStatusReconnectRequired:
+      Status = gBS->DisconnectController (ControllerHandle, NULL, NULL);
+      if (EFI_ERROR (Status)) {
+        //
+        // Disconnect failed.  Need to promote reconnect to a reboot.
+        //
+        gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+      } else {
+        gBS->ConnectController (ControllerHandle, NULL, NULL, TRUE);
+      }
+
+      break;
+
+    default:
+      break;
   }
 }
 
@@ -685,26 +683,26 @@ DriverHealthManagerProcessSingleControllerHealth (
 **/
 VOID
 DriverHealthManagerUpdateForm (
-  BOOLEAN                     ConfigureOnly
+  BOOLEAN  ConfigureOnly
   )
 {
-  EFI_STATUS                  Status;
-  EFI_IFR_GUID_LABEL          *StartLabel;
-  EFI_IFR_GUID_LABEL          *EndLabel;
-  VOID                        *StartOpCodeHandle;
-  VOID                        *EndOpCodeHandle;
-  UINTN                       Index;
-  EFI_STRING_ID               Prompt;
-  EFI_STRING_ID               Help;
-  CHAR16                      String[512];
-  UINTN                       StringCount;
-  EFI_STRING                  TmpString;
-  EFI_STRING                  DriverName;
-  EFI_STRING                  ControllerName;
-  UINTN                       MessageIndex;
-  EFI_HANDLE                  DriverHandle;
-  EFI_STRING_ID               DevicePath;
-  EFI_GUID                    FormsetGuid;
+  EFI_STATUS          Status;
+  EFI_IFR_GUID_LABEL  *StartLabel;
+  EFI_IFR_GUID_LABEL  *EndLabel;
+  VOID                *StartOpCodeHandle;
+  VOID                *EndOpCodeHandle;
+  UINTN               Index;
+  EFI_STRING_ID       Prompt;
+  EFI_STRING_ID       Help;
+  CHAR16              String[512];
+  UINTN               StringCount;
+  EFI_STRING          TmpString;
+  EFI_STRING          DriverName;
+  EFI_STRING          ControllerName;
+  UINTN               MessageIndex;
+  EFI_HANDLE          DriverHandle;
+  EFI_STRING_ID       DevicePath;
+  EFI_GUID            FormsetGuid;
 
   EfiBootManagerFreeDriverHealthInfo (mDriverHealthManagerHealthInfo, mDriverHealthManagerHealthInfoCount);
   mDriverHealthManagerHealthInfo = EfiBootManagerGetDriverHealthInfo (&mDriverHealthManagerHealthInfoCount);
@@ -721,21 +719,22 @@ DriverHealthManagerUpdateForm (
   //
   // Create Hii Extend Label OpCode as the start opcode
   //
-  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
   StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
   StartLabel->Number       = LABEL_BEGIN;
 
   //
   // Create Hii Extend Label OpCode as the end opcode
   //
-  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
   EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
   EndLabel->Number       = LABEL_END;
 
   for (Index = 0; Index < mDriverHealthManagerHealthInfoCount; Index++) {
-    if (ConfigureOnly && mDriverHealthManagerHealthInfo[Index].HealthStatus != EfiDriverHealthStatusConfigurationRequired) {
+    if (ConfigureOnly && (mDriverHealthManagerHealthInfo[Index].HealthStatus != EfiDriverHealthStatusConfigurationRequired)) {
       continue;
     }
+
     DriverName = DriverHealthManagerGetDriverName (mDriverHealthManagerHealthInfo[Index].DriverHealthHandle);
     ASSERT (DriverName != NULL);
 
@@ -756,31 +755,33 @@ DriverHealthManagerUpdateForm (
       UnicodeSPrint (String, sizeof (String), L"%s    %s", DriverName, ControllerName);
       FreePool (ControllerName);
     }
+
     FreePool (DriverName);
 
     Prompt = HiiSetString (mDriverHealthManagerHiiHandle, 0, String, NULL);
 
-    switch(mDriverHealthManagerHealthInfo[Index].HealthStatus) {
-    case EfiDriverHealthStatusRepairRequired:
-      TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_REPAIR_REQUIRED), NULL);
-      break;
-    case EfiDriverHealthStatusConfigurationRequired:
-      TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_CONFIGURATION_REQUIRED), NULL);
-      break;
-    case EfiDriverHealthStatusFailed:
-      TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_FAILED), NULL);
-      break;
-    case EfiDriverHealthStatusReconnectRequired:
-      TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_RECONNECT_REQUIRED), NULL);
-      break;
-    case EfiDriverHealthStatusRebootRequired:
-      TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_REBOOT_REQUIRED), NULL);
-      break;
-    default:
-      ASSERT (mDriverHealthManagerHealthInfo[Index].HealthStatus == EfiDriverHealthStatusHealthy);
-      TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_HEALTHY), NULL);
-      break;
+    switch (mDriverHealthManagerHealthInfo[Index].HealthStatus) {
+      case EfiDriverHealthStatusRepairRequired:
+        TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_REPAIR_REQUIRED), NULL);
+        break;
+      case EfiDriverHealthStatusConfigurationRequired:
+        TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_CONFIGURATION_REQUIRED), NULL);
+        break;
+      case EfiDriverHealthStatusFailed:
+        TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_FAILED), NULL);
+        break;
+      case EfiDriverHealthStatusReconnectRequired:
+        TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_RECONNECT_REQUIRED), NULL);
+        break;
+      case EfiDriverHealthStatusRebootRequired:
+        TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_REBOOT_REQUIRED), NULL);
+        break;
+      default:
+        ASSERT (mDriverHealthManagerHealthInfo[Index].HealthStatus == EfiDriverHealthStatusHealthy);
+        TmpString = HiiGetString (mDriverHealthManagerHiiHandle, STRING_TOKEN (STR_HEALTHY), NULL);
+        break;
     }
+
     StringCount = UnicodeSPrint (String, sizeof (String), L"%s\n", TmpString);
     FreePool (TmpString);
 
@@ -798,59 +799,62 @@ DriverHealthManagerUpdateForm (
         FreePool (TmpString);
       }
     }
+
     Help = HiiSetString (mDriverHealthManagerHiiHandle, 0, String, NULL);
 
     switch (mDriverHealthManagerHealthInfo[Index].HealthStatus) {
-    case EfiDriverHealthStatusConfigurationRequired:
-      Status = mDriverHealthManagerDatabase->GetPackageListHandle (
-                                               mDriverHealthManagerDatabase,
-                                               mDriverHealthManagerHealthInfo[Index].HiiHandle,
-                                               &DriverHandle
-                                               );
-      ASSERT_EFI_ERROR (Status);
-      TmpString  = ConvertDevicePathToText (DevicePathFromHandle (DriverHandle), FALSE, TRUE);
-      DevicePath = HiiSetString (mDriverHealthManagerHiiHandle, 0, TmpString, NULL);
-      FreePool (TmpString);
+      case EfiDriverHealthStatusConfigurationRequired:
+        Status = mDriverHealthManagerDatabase->GetPackageListHandle (
+                                                 mDriverHealthManagerDatabase,
+                                                 mDriverHealthManagerHealthInfo[Index].HiiHandle,
+                                                 &DriverHandle
+                                                 );
+        ASSERT_EFI_ERROR (Status);
+        TmpString  = ConvertDevicePathToText (DevicePathFromHandle (DriverHandle), FALSE, TRUE);
+        DevicePath = HiiSetString (mDriverHealthManagerHiiHandle, 0, TmpString, NULL);
+        FreePool (TmpString);
 
-      Status = DriverHealthManagerGetFormsetId (mDriverHealthManagerHealthInfo[Index].HiiHandle, &FormsetGuid);
-      ASSERT_EFI_ERROR (Status);
+        Status = DriverHealthManagerGetFormsetId (mDriverHealthManagerHealthInfo[Index].HiiHandle, &FormsetGuid);
+        ASSERT_EFI_ERROR (Status);
 
-      HiiCreateGotoExOpCode (
-        StartOpCodeHandle,
-        0,
-        Prompt,
-        Help,
-        0,
-        0,
-        0,
-        &FormsetGuid,
-        DevicePath
-        );
-      break;
+        HiiCreateGotoExOpCode (
+          StartOpCodeHandle,
+          0,
+          Prompt,
+          Help,
+          0,
+          0,
+          0,
+          &FormsetGuid,
+          DevicePath
+          );
+        break;
 
-    case EfiDriverHealthStatusRepairRequired:
-    case EfiDriverHealthStatusReconnectRequired:
-    case EfiDriverHealthStatusRebootRequired:
-      HiiCreateActionOpCode (
-        StartOpCodeHandle,
-        (EFI_QUESTION_ID) (Index + QUESTION_ID_DRIVER_HEALTH_BASE),
-        Prompt,
-        Help,
-        EFI_IFR_FLAG_CALLBACK,
-        0
-        );
-      break;
+      case EfiDriverHealthStatusRepairRequired:
+      case EfiDriverHealthStatusReconnectRequired:
+      case EfiDriverHealthStatusRebootRequired:
+        HiiCreateActionOpCode (
+          StartOpCodeHandle,
+          (EFI_QUESTION_ID)(Index + QUESTION_ID_DRIVER_HEALTH_BASE),
+          Prompt,
+          Help,
+          EFI_IFR_FLAG_CALLBACK,
+          0
+          );
+        break;
 
-    default:
-      ASSERT (mDriverHealthManagerHealthInfo[Index].HealthStatus == EfiDriverHealthStatusHealthy ||
-              mDriverHealthManagerHealthInfo[Index].HealthStatus == EfiDriverHealthStatusFailed);
-      HiiCreateTextOpCode (
-        StartOpCodeHandle,
-        Prompt,
-        Help,
-        0
-        );
-      break;
+      default:
+        ASSERT (
+          mDriverHealthManagerHealthInfo[Index].HealthStatus == EfiDriverHealthStatusHealthy ||
+          mDriverHealthManagerHealthInfo[Index].HealthStatus == EfiDriverHealthStatusFailed
+          );
+        HiiCreateTextOpCode (
+          StartOpCodeHandle,
+          Prompt,
+          Help,
+          0
+          );
+        break;
     }
   }
 
@@ -881,18 +885,18 @@ DriverHealthManagerCleanDynamicString (
   EFI_HII_PACKAGE_HEADER       *PackageHeader;
   UINT32                       FixedStringSize;
 
-  FixedStringSize = *(UINT32 *) &STRING_ARRAY_NAME - sizeof (UINT32);
+  FixedStringSize = *(UINT32 *)&STRING_ARRAY_NAME - sizeof (UINT32);
   BufferSize      = sizeof (EFI_HII_PACKAGE_LIST_HEADER) + FixedStringSize + sizeof (EFI_HII_PACKAGE_HEADER);
   HiiPackageList  = AllocatePool (BufferSize);
   ASSERT (HiiPackageList != NULL);
 
-  HiiPackageList->PackageLength = (UINT32) BufferSize;
+  HiiPackageList->PackageLength = (UINT32)BufferSize;
   CopyMem (&HiiPackageList->PackageListGuid, &gEfiCallerIdGuid, sizeof (EFI_GUID));
 
-  PackageHeader = (EFI_HII_PACKAGE_HEADER *) (HiiPackageList + 1);
+  PackageHeader = (EFI_HII_PACKAGE_HEADER *)(HiiPackageList + 1);
   CopyMem (PackageHeader, STRING_ARRAY_NAME + sizeof (UINT32), FixedStringSize);
 
-  PackageHeader = (EFI_HII_PACKAGE_HEADER *) ((UINT8 *) PackageHeader + PackageHeader->Length);
+  PackageHeader         = (EFI_HII_PACKAGE_HEADER *)((UINT8 *)PackageHeader + PackageHeader->Length);
   PackageHeader->Type   = EFI_HII_PACKAGE_END;
   PackageHeader->Length = sizeof (EFI_HII_PACKAGE_HEADER);
 
@@ -928,22 +932,23 @@ DriverHealthManagerCleanDynamicString (
 EFI_STATUS
 EFIAPI
 DriverHealthManagerCallback (
-  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL   *This,
-  IN  EFI_BROWSER_ACTION                     Action,
-  IN  EFI_QUESTION_ID                        QuestionId,
-  IN  UINT8                                  Type,
-  IN  EFI_IFR_TYPE_VALUE                     *Value,
-  OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
+  IN  CONST EFI_HII_CONFIG_ACCESS_PROTOCOL  *This,
+  IN  EFI_BROWSER_ACTION                    Action,
+  IN  EFI_QUESTION_ID                       QuestionId,
+  IN  UINT8                                 Type,
+  IN  EFI_IFR_TYPE_VALUE                    *Value,
+  OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   )
 {
-  UINTN                                      Index;
+  UINTN  Index;
 
-  if (QuestionId == QUESTION_ID_REFRESH_MANAGER || QuestionId == QUESTION_ID_REFRESH_CONFIGURE) {
+  if ((QuestionId == QUESTION_ID_REFRESH_MANAGER) || (QuestionId == QUESTION_ID_REFRESH_CONFIGURE)) {
     if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
-      DriverHealthManagerUpdateForm ((BOOLEAN) (QuestionId == QUESTION_ID_REFRESH_CONFIGURE));
+      DriverHealthManagerUpdateForm ((BOOLEAN)(QuestionId == QUESTION_ID_REFRESH_CONFIGURE));
     } else if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
       DriverHealthManagerCleanDynamicString ();
     }
+
     return EFI_SUCCESS;
   }
 
@@ -958,7 +963,7 @@ DriverHealthManagerCallback (
     return EFI_INVALID_PARAMETER;
   }
 
-  DEBUG ((EFI_D_ERROR, "QuestionId = %x\n", QuestionId));
+  DEBUG ((DEBUG_ERROR, "QuestionId = %x\n", QuestionId));
 
   //
   // We will have returned from processing a callback - user either hit ESC to exit, or selected
@@ -979,9 +984,7 @@ DriverHealthManagerCallback (
     mDriverHealthManagerHealthInfo[Index].HiiHandle
     );
 
-  DriverHealthManagerUpdateForm ((BOOLEAN) (QuestionId == QUESTION_ID_REFRESH_CONFIGURE));
+  DriverHealthManagerUpdateForm ((BOOLEAN)(QuestionId == QUESTION_ID_REFRESH_CONFIGURE));
 
   return EFI_SUCCESS;
 }
-
-

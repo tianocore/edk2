@@ -24,9 +24,9 @@
 EFI_STATUS
 EFIAPI
 VerifyBlob (
-  IN  CONST CHAR16    *BlobName,
-  IN  CONST VOID      *Buf,
-  IN  UINT32          BufSize
+  IN  CONST CHAR16  *BlobName,
+  IN  CONST VOID    *Buf,
+  IN  UINT32        BufSize
   )
 {
   return EFI_SUCCESS;

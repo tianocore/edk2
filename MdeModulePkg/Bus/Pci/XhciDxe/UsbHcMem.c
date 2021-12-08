@@ -7,9 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Xhci.h"
-
 
 /**
   Allocate a block of memory to be used by the buffer pool.
@@ -22,17 +20,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 USBHC_MEM_BLOCK *
 UsbHcAllocMemBlock (
-  IN  USBHC_MEM_POOL      *Pool,
-  IN  UINTN               Pages
+  IN  USBHC_MEM_POOL  *Pool,
+  IN  UINTN           Pages
   )
 {
-  USBHC_MEM_BLOCK         *Block;
-  EFI_PCI_IO_PROTOCOL     *PciIo;
-  VOID                    *BufHost;
-  VOID                    *Mapping;
-  EFI_PHYSICAL_ADDRESS    MappedAddr;
-  UINTN                   Bytes;
-  EFI_STATUS              Status;
+  USBHC_MEM_BLOCK       *Block;
+  EFI_PCI_IO_PROTOCOL   *PciIo;
+  VOID                  *BufHost;
+  VOID                  *Mapping;
+  EFI_PHYSICAL_ADDRESS  MappedAddr;
+  UINTN                 Bytes;
+  EFI_STATUS            Status;
 
   PciIo = Pool->PciIo;
 
@@ -47,9 +45,9 @@ UsbHcAllocMemBlock (
   //
   ASSERT (USBHC_MEM_UNIT * 8 <= EFI_PAGE_SIZE);
 
-  Block->BufLen   = EFI_PAGES_TO_SIZE (Pages);
-  Block->BitsLen  = Block->BufLen / (USBHC_MEM_UNIT * 8);
-  Block->Bits     = AllocateZeroPool (Block->BitsLen);
+  Block->BufLen  = EFI_PAGES_TO_SIZE (Pages);
+  Block->BitsLen = Block->BufLen / (USBHC_MEM_UNIT * 8);
+  Block->Bits    = AllocateZeroPool (Block->BitsLen);
 
   if (Block->Bits == NULL) {
     gBS->FreePool (Block);
@@ -73,7 +71,7 @@ UsbHcAllocMemBlock (
     goto FREE_BITARRAY;
   }
 
-  Bytes = EFI_PAGES_TO_SIZE (Pages);
+  Bytes  = EFI_PAGES_TO_SIZE (Pages);
   Status = PciIo->Map (
                     PciIo,
                     EfiPciIoOperationBusMasterCommonBuffer,
@@ -87,9 +85,9 @@ UsbHcAllocMemBlock (
     goto FREE_BUFFER;
   }
 
-  Block->BufHost  = BufHost;
-  Block->Buf      = (UINT8 *) ((UINTN) MappedAddr);
-  Block->Mapping  = Mapping;
+  Block->BufHost = BufHost;
+  Block->Buf     = (UINT8 *)((UINTN)MappedAddr);
+  Block->Mapping = Mapping;
 
   return Block;
 
@@ -102,7 +100,6 @@ FREE_BITARRAY:
   return NULL;
 }
 
-
 /**
   Free the memory block from the memory pool.
 
@@ -112,11 +109,11 @@ FREE_BITARRAY:
 **/
 VOID
 UsbHcFreeMemBlock (
-  IN USBHC_MEM_POOL       *Pool,
-  IN USBHC_MEM_BLOCK      *Block
+  IN USBHC_MEM_POOL   *Pool,
+  IN USBHC_MEM_BLOCK  *Block
   )
 {
-  EFI_PCI_IO_PROTOCOL     *PciIo;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
 
   ASSERT ((Pool != NULL) && (Block != NULL));
 
@@ -132,7 +129,6 @@ UsbHcFreeMemBlock (
   gBS->FreePool (Block);
 }
 
-
 /**
   Alloc some memory from the block.
 
@@ -145,22 +141,22 @@ UsbHcFreeMemBlock (
 **/
 VOID *
 UsbHcAllocMemFromBlock (
-  IN  USBHC_MEM_BLOCK     *Block,
-  IN  UINTN               Units
+  IN  USBHC_MEM_BLOCK  *Block,
+  IN  UINTN            Units
   )
 {
-  UINTN                   Byte;
-  UINT8                   Bit;
-  UINTN                   StartByte;
-  UINT8                   StartBit;
-  UINTN                   Available;
-  UINTN                   Count;
+  UINTN  Byte;
+  UINT8  Bit;
+  UINTN  StartByte;
+  UINT8  StartBit;
+  UINTN  Available;
+  UINTN  Count;
 
   ASSERT ((Block != 0) && (Units != 0));
 
-  StartByte  = 0;
-  StartBit   = 0;
-  Available  = 0;
+  StartByte = 0;
+  StartBit  = 0;
+  Available = 0;
 
   for (Byte = 0, Bit = 0; Byte < Block->BitsLen;) {
     //
@@ -176,13 +172,12 @@ UsbHcAllocMemFromBlock (
       }
 
       NEXT_BIT (Byte, Bit);
-
     } else {
       NEXT_BIT (Byte, Bit);
 
-      Available  = 0;
-      StartByte  = Byte;
-      StartBit   = Bit;
+      Available = 0;
+      StartByte = Byte;
+      StartBit  = Bit;
     }
   }
 
@@ -193,13 +188,13 @@ UsbHcAllocMemFromBlock (
   //
   // Mark the memory as allocated
   //
-  Byte  = StartByte;
-  Bit   = StartBit;
+  Byte = StartByte;
+  Bit  = StartBit;
 
   for (Count = 0; Count < Units; Count++) {
     ASSERT (!USB_HC_BIT_IS_SET (Block->Bits[Byte], Bit));
 
-    Block->Bits[Byte] = (UINT8) (Block->Bits[Byte] | USB_HC_BIT (Bit));
+    Block->Bits[Byte] = (UINT8)(Block->Bits[Byte] | USB_HC_BIT (Bit));
     NEXT_BIT (Byte, Bit);
   }
 
@@ -218,16 +213,16 @@ UsbHcAllocMemFromBlock (
 **/
 EFI_PHYSICAL_ADDRESS
 UsbHcGetPciAddrForHostAddr (
-  IN USBHC_MEM_POOL       *Pool,
-  IN VOID                 *Mem,
-  IN UINTN                Size
+  IN USBHC_MEM_POOL  *Pool,
+  IN VOID            *Mem,
+  IN UINTN           Size
   )
 {
-  USBHC_MEM_BLOCK         *Head;
-  USBHC_MEM_BLOCK         *Block;
-  UINTN                   AllocSize;
-  EFI_PHYSICAL_ADDRESS    PhyAddr;
-  UINTN                   Offset;
+  USBHC_MEM_BLOCK       *Head;
+  USBHC_MEM_BLOCK       *Block;
+  UINTN                 AllocSize;
+  EFI_PHYSICAL_ADDRESS  PhyAddr;
+  UINTN                 Offset;
 
   Head      = Pool->Head;
   AllocSize = USBHC_MEM_ROUND (Size);
@@ -241,7 +236,7 @@ UsbHcGetPciAddrForHostAddr (
     // scan the memory block list for the memory block that
     // completely contains the allocated memory.
     //
-    if ((Block->BufHost <= (UINT8 *) Mem) && (((UINT8 *) Mem + AllocSize) <= (Block->BufHost + Block->BufLen))) {
+    if ((Block->BufHost <= (UINT8 *)Mem) && (((UINT8 *)Mem + AllocSize) <= (Block->BufHost + Block->BufLen))) {
       break;
     }
   }
@@ -250,8 +245,8 @@ UsbHcGetPciAddrForHostAddr (
   //
   // calculate the pci memory address for host memory address.
   //
-  Offset = (UINT8 *)Mem - Block->BufHost;
-  PhyAddr = (EFI_PHYSICAL_ADDRESS)(UINTN) (Block->Buf + Offset);
+  Offset  = (UINT8 *)Mem - Block->BufHost;
+  PhyAddr = (EFI_PHYSICAL_ADDRESS)(UINTN)(Block->Buf + Offset);
   return PhyAddr;
 }
 
@@ -267,16 +262,16 @@ UsbHcGetPciAddrForHostAddr (
 **/
 EFI_PHYSICAL_ADDRESS
 UsbHcGetHostAddrForPciAddr (
-  IN USBHC_MEM_POOL       *Pool,
-  IN VOID                 *Mem,
-  IN UINTN                Size
+  IN USBHC_MEM_POOL  *Pool,
+  IN VOID            *Mem,
+  IN UINTN           Size
   )
 {
-  USBHC_MEM_BLOCK         *Head;
-  USBHC_MEM_BLOCK         *Block;
-  UINTN                   AllocSize;
-  EFI_PHYSICAL_ADDRESS    HostAddr;
-  UINTN                   Offset;
+  USBHC_MEM_BLOCK       *Head;
+  USBHC_MEM_BLOCK       *Block;
+  UINTN                 AllocSize;
+  EFI_PHYSICAL_ADDRESS  HostAddr;
+  UINTN                 Offset;
 
   Head      = Pool->Head;
   AllocSize = USBHC_MEM_ROUND (Size);
@@ -290,7 +285,7 @@ UsbHcGetHostAddrForPciAddr (
     // scan the memory block list for the memory block that
     // completely contains the allocated memory.
     //
-    if ((Block->Buf <= (UINT8 *) Mem) && (((UINT8 *) Mem + AllocSize) <= (Block->Buf + Block->BufLen))) {
+    if ((Block->Buf <= (UINT8 *)Mem) && (((UINT8 *)Mem + AllocSize) <= (Block->Buf + Block->BufLen))) {
       break;
     }
   }
@@ -299,8 +294,8 @@ UsbHcGetHostAddrForPciAddr (
   //
   // calculate the pci memory address for host memory address.
   //
-  Offset = (UINT8 *)Mem - Block->Buf;
-  HostAddr = (EFI_PHYSICAL_ADDRESS)(UINTN) (Block->BufHost + Offset);
+  Offset   = (UINT8 *)Mem - Block->Buf;
+  HostAddr = (EFI_PHYSICAL_ADDRESS)(UINTN)(Block->BufHost + Offset);
   return HostAddr;
 }
 
@@ -313,15 +308,14 @@ UsbHcGetHostAddrForPciAddr (
 **/
 VOID
 UsbHcInsertMemBlockToPool (
-  IN USBHC_MEM_BLOCK      *Head,
-  IN USBHC_MEM_BLOCK      *Block
+  IN USBHC_MEM_BLOCK  *Head,
+  IN USBHC_MEM_BLOCK  *Block
   )
 {
   ASSERT ((Head != NULL) && (Block != NULL));
   Block->Next = Head->Next;
   Head->Next  = Block;
 }
-
 
 /**
   Is the memory block empty?
@@ -334,10 +328,10 @@ UsbHcInsertMemBlockToPool (
 **/
 BOOLEAN
 UsbHcIsMemBlockEmpty (
-  IN USBHC_MEM_BLOCK     *Block
+  IN USBHC_MEM_BLOCK  *Block
   )
 {
-  UINTN                   Index;
+  UINTN  Index;
 
   for (Index = 0; Index < Block->BitsLen; Index++) {
     if (Block->Bits[Index] != 0) {
@@ -348,7 +342,6 @@ UsbHcIsMemBlockEmpty (
   return TRUE;
 }
 
-
 /**
   Unlink the memory block from the pool's list.
 
@@ -358,11 +351,11 @@ UsbHcIsMemBlockEmpty (
 **/
 VOID
 UsbHcUnlinkMemBlock (
-  IN USBHC_MEM_BLOCK      *Head,
-  IN USBHC_MEM_BLOCK      *BlockToUnlink
+  IN USBHC_MEM_BLOCK  *Head,
+  IN USBHC_MEM_BLOCK  *BlockToUnlink
   )
 {
-  USBHC_MEM_BLOCK         *Block;
+  USBHC_MEM_BLOCK  *Block;
 
   ASSERT ((Head != NULL) && (BlockToUnlink != NULL));
 
@@ -374,7 +367,6 @@ UsbHcUnlinkMemBlock (
     }
   }
 }
-
 
 /**
   Initialize the memory management pool for the host controller.
@@ -390,7 +382,7 @@ UsbHcInitMemPool (
   IN EFI_PCI_IO_PROTOCOL  *PciIo
   )
 {
-  USBHC_MEM_POOL          *Pool;
+  USBHC_MEM_POOL  *Pool;
 
   Pool = AllocatePool (sizeof (USBHC_MEM_POOL));
 
@@ -398,8 +390,8 @@ UsbHcInitMemPool (
     return Pool;
   }
 
-  Pool->PciIo   = PciIo;
-  Pool->Head    = UsbHcAllocMemBlock (Pool, USBHC_MEM_DEFAULT_PAGES);
+  Pool->PciIo = PciIo;
+  Pool->Head  = UsbHcAllocMemBlock (Pool, USBHC_MEM_DEFAULT_PAGES);
 
   if (Pool->Head == NULL) {
     gBS->FreePool (Pool);
@@ -408,7 +400,6 @@ UsbHcInitMemPool (
 
   return Pool;
 }
-
 
 /**
   Release the memory management pool.
@@ -421,10 +412,10 @@ UsbHcInitMemPool (
 **/
 EFI_STATUS
 UsbHcFreeMemPool (
-  IN USBHC_MEM_POOL       *Pool
+  IN USBHC_MEM_POOL  *Pool
   )
 {
-  USBHC_MEM_BLOCK *Block;
+  USBHC_MEM_BLOCK  *Block;
 
   ASSERT (Pool->Head != NULL);
 
@@ -443,7 +434,6 @@ UsbHcFreeMemPool (
   return EFI_SUCCESS;
 }
 
-
 /**
   Allocate some memory from the host controller's memory pool
   which can be used to communicate with host controller.
@@ -456,16 +446,16 @@ UsbHcFreeMemPool (
 **/
 VOID *
 UsbHcAllocateMem (
-  IN  USBHC_MEM_POOL      *Pool,
-  IN  UINTN               Size
+  IN  USBHC_MEM_POOL  *Pool,
+  IN  UINTN           Size
   )
 {
-  USBHC_MEM_BLOCK         *Head;
-  USBHC_MEM_BLOCK         *Block;
-  USBHC_MEM_BLOCK         *NewBlock;
-  VOID                    *Mem;
-  UINTN                   AllocSize;
-  UINTN                   Pages;
+  USBHC_MEM_BLOCK  *Head;
+  USBHC_MEM_BLOCK  *Block;
+  USBHC_MEM_BLOCK  *NewBlock;
+  VOID             *Mem;
+  UINTN            AllocSize;
+  UINTN            Pages;
 
   Mem       = NULL;
   AllocSize = USBHC_MEM_ROUND (Size);
@@ -503,7 +493,7 @@ UsbHcAllocateMem (
   NewBlock = UsbHcAllocMemBlock (Pool, Pages);
 
   if (NewBlock == NULL) {
-    DEBUG ((EFI_D_ERROR, "UsbHcAllocateMem: failed to allocate block\n"));
+    DEBUG ((DEBUG_ERROR, "UsbHcAllocateMem: failed to allocate block\n"));
     return NULL;
   }
 
@@ -520,7 +510,6 @@ UsbHcAllocateMem (
   return Mem;
 }
 
-
 /**
   Free the allocated memory back to the memory pool.
 
@@ -531,22 +520,22 @@ UsbHcAllocateMem (
 **/
 VOID
 UsbHcFreeMem (
-  IN USBHC_MEM_POOL       *Pool,
-  IN VOID                 *Mem,
-  IN UINTN                Size
+  IN USBHC_MEM_POOL  *Pool,
+  IN VOID            *Mem,
+  IN UINTN           Size
   )
 {
-  USBHC_MEM_BLOCK         *Head;
-  USBHC_MEM_BLOCK         *Block;
-  UINT8                   *ToFree;
-  UINTN                   AllocSize;
-  UINTN                   Byte;
-  UINTN                   Bit;
-  UINTN                   Count;
+  USBHC_MEM_BLOCK  *Head;
+  USBHC_MEM_BLOCK  *Block;
+  UINT8            *ToFree;
+  UINTN            AllocSize;
+  UINTN            Byte;
+  UINTN            Bit;
+  UINTN            Count;
 
   Head      = Pool->Head;
   AllocSize = USBHC_MEM_ROUND (Size);
-  ToFree    = (UINT8 *) Mem;
+  ToFree    = (UINT8 *)Mem;
 
   for (Block = Head; Block != NULL; Block = Block->Next) {
     //
@@ -557,8 +546,8 @@ UsbHcFreeMem (
       //
       // compute the start byte and bit in the bit array
       //
-      Byte  = ((ToFree - Block->BufHost) / USBHC_MEM_UNIT) / 8;
-      Bit   = ((ToFree - Block->BufHost) / USBHC_MEM_UNIT) % 8;
+      Byte = ((ToFree - Block->BufHost) / USBHC_MEM_UNIT) / 8;
+      Bit  = ((ToFree - Block->BufHost) / USBHC_MEM_UNIT) % 8;
 
       //
       // reset associated bits in bit array
@@ -566,7 +555,7 @@ UsbHcFreeMem (
       for (Count = 0; Count < (AllocSize / USBHC_MEM_UNIT); Count++) {
         ASSERT (USB_HC_BIT_IS_SET (Block->Bits[Byte], Bit));
 
-        Block->Bits[Byte] = (UINT8) (Block->Bits[Byte] ^ USB_HC_BIT (Bit));
+        Block->Bits[Byte] = (UINT8)(Block->Bits[Byte] ^ USB_HC_BIT (Bit));
         NEXT_BIT (Byte, Bit);
       }
 
@@ -589,7 +578,7 @@ UsbHcFreeMem (
     UsbHcFreeMemBlock (Pool, Block);
   }
 
-  return ;
+  return;
 }
 
 /**
@@ -621,13 +610,13 @@ UsbHcAllocateAlignedPages (
   OUT VOID                  **Mapping
   )
 {
-  EFI_STATUS            Status;
-  VOID                  *Memory;
-  UINTN                 AlignedMemory;
-  UINTN                 AlignmentMask;
-  UINTN                 UnalignedPages;
-  UINTN                 RealPages;
-  UINTN                 Bytes;
+  EFI_STATUS  Status;
+  VOID        *Memory;
+  UINTN       AlignedMemory;
+  UINTN       AlignmentMask;
+  UINTN       UnalignedPages;
+  UINTN       RealPages;
+  UINTN       Bytes;
 
   //
   // Alignment must be a power of two or zero.
@@ -641,12 +630,13 @@ UsbHcAllocateAlignedPages (
   if (Pages == 0) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (Alignment > EFI_PAGE_SIZE) {
     //
     // Calculate the total number of pages since alignment is larger than page size.
     //
-    AlignmentMask  = Alignment - 1;
-    RealPages      = Pages + EFI_SIZE_TO_PAGES (Alignment);
+    AlignmentMask = Alignment - 1;
+    RealPages     = Pages + EFI_SIZE_TO_PAGES (Alignment);
     //
     // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
     //
@@ -663,8 +653,9 @@ UsbHcAllocateAlignedPages (
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
-    AlignedMemory  = ((UINTN) Memory + AlignmentMask) & ~AlignmentMask;
-    UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN) Memory);
+
+    AlignedMemory  = ((UINTN)Memory + AlignmentMask) & ~AlignmentMask;
+    UnalignedPages = EFI_SIZE_TO_PAGES (AlignedMemory - (UINTN)Memory);
     if (UnalignedPages > 0) {
       //
       // Free first unaligned page(s).
@@ -672,6 +663,7 @@ UsbHcAllocateAlignedPages (
       Status = PciIo->FreeBuffer (PciIo, UnalignedPages, Memory);
       ASSERT_EFI_ERROR (Status);
     }
+
     Memory         = (VOID *)(UINTN)(AlignedMemory + EFI_PAGES_TO_SIZE (Pages));
     UnalignedPages = RealPages - Pages - UnalignedPages;
     if (UnalignedPages > 0) {
@@ -696,25 +688,26 @@ UsbHcAllocateAlignedPages (
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
-    AlignedMemory  = (UINTN) Memory;
+
+    AlignedMemory = (UINTN)Memory;
   }
 
-  Bytes = EFI_PAGES_TO_SIZE (Pages);
+  Bytes  = EFI_PAGES_TO_SIZE (Pages);
   Status = PciIo->Map (
                     PciIo,
                     EfiPciIoOperationBusMasterCommonBuffer,
-                    (VOID *) AlignedMemory,
+                    (VOID *)AlignedMemory,
                     &Bytes,
                     DeviceAddress,
                     Mapping
                     );
 
   if (EFI_ERROR (Status) || (Bytes != EFI_PAGES_TO_SIZE (Pages))) {
-    Status = PciIo->FreeBuffer (PciIo, Pages, (VOID *) AlignedMemory);
+    Status = PciIo->FreeBuffer (PciIo, Pages, (VOID *)AlignedMemory);
     return EFI_OUT_OF_RESOURCES;
   }
 
-  *HostAddress = (VOID *) AlignedMemory;
+  *HostAddress = (VOID *)AlignedMemory;
 
   return EFI_SUCCESS;
 }
@@ -730,13 +723,13 @@ UsbHcAllocateAlignedPages (
 **/
 VOID
 UsbHcFreeAlignedPages (
-  IN EFI_PCI_IO_PROTOCOL    *PciIo,
-  IN VOID                   *HostAddress,
-  IN UINTN                  Pages,
-  VOID                      *Mapping
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN VOID                 *HostAddress,
+  IN UINTN                Pages,
+  VOID                    *Mapping
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS  Status;
 
   ASSERT (Pages != 0);
 

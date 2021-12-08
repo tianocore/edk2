@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Definition of USB CBI0 Transport Protocol
 //
-USB_MASS_TRANSPORT mUsbCbi0Transport = {
+USB_MASS_TRANSPORT  mUsbCbi0Transport = {
   USB_MASS_STORE_CBI0,
   UsbCbiInit,
   UsbCbiExecCommand,
@@ -26,7 +26,7 @@ USB_MASS_TRANSPORT mUsbCbi0Transport = {
 //
 // Definition of USB CBI1 Transport Protocol
 //
-USB_MASS_TRANSPORT mUsbCbi1Transport = {
+USB_MASS_TRANSPORT  mUsbCbi1Transport = {
   USB_MASS_STORE_CBI1,
   UsbCbiInit,
   UsbCbiExecCommand,
@@ -52,8 +52,8 @@ USB_MASS_TRANSPORT mUsbCbi1Transport = {
 **/
 EFI_STATUS
 UsbCbiInit (
-  IN  EFI_USB_IO_PROTOCOL   *UsbIo,
-  OUT VOID                  **Context       OPTIONAL
+  IN  EFI_USB_IO_PROTOCOL  *UsbIo,
+  OUT VOID                 **Context       OPTIONAL
   )
 {
   USB_CBI_PROTOCOL              *UsbCbi;
@@ -82,8 +82,9 @@ UsbCbiInit (
   }
 
   Interface = &UsbCbi->Interface;
-  if ((Interface->InterfaceProtocol != USB_MASS_STORE_CBI0)
-      && (Interface->InterfaceProtocol != USB_MASS_STORE_CBI1)) {
+  if (  (Interface->InterfaceProtocol != USB_MASS_STORE_CBI0)
+     && (Interface->InterfaceProtocol != USB_MASS_STORE_CBI1))
+  {
     Status = EFI_UNSUPPORTED;
     goto ON_ERROR;
   }
@@ -102,27 +103,27 @@ UsbCbiInit (
       // Use the first Bulk-In and Bulk-Out endpoints
       //
       if (USB_IS_IN_ENDPOINT (EndPoint.EndpointAddress) &&
-         (UsbCbi->BulkInEndpoint == NULL)) {
-
-        UsbCbi->BulkInEndpoint  = (EFI_USB_ENDPOINT_DESCRIPTOR *) (UsbCbi + 1);
-        CopyMem(UsbCbi->BulkInEndpoint, &EndPoint, sizeof (EndPoint));;
+          (UsbCbi->BulkInEndpoint == NULL))
+      {
+        UsbCbi->BulkInEndpoint = (EFI_USB_ENDPOINT_DESCRIPTOR *)(UsbCbi + 1);
+        CopyMem (UsbCbi->BulkInEndpoint, &EndPoint, sizeof (EndPoint));
       }
 
       if (USB_IS_OUT_ENDPOINT (EndPoint.EndpointAddress) &&
-         (UsbCbi->BulkOutEndpoint == NULL)) {
-
-        UsbCbi->BulkOutEndpoint   = (EFI_USB_ENDPOINT_DESCRIPTOR *) (UsbCbi + 1) + 1;
-        CopyMem(UsbCbi->BulkOutEndpoint, &EndPoint, sizeof (EndPoint));
+          (UsbCbi->BulkOutEndpoint == NULL))
+      {
+        UsbCbi->BulkOutEndpoint = (EFI_USB_ENDPOINT_DESCRIPTOR *)(UsbCbi + 1) + 1;
+        CopyMem (UsbCbi->BulkOutEndpoint, &EndPoint, sizeof (EndPoint));
       }
     } else if (USB_IS_INTERRUPT_ENDPOINT (EndPoint.Attributes)) {
       //
       // Use the first interrupt endpoint if it is CBI0
       //
       if ((Interface->InterfaceProtocol == USB_MASS_STORE_CBI0) &&
-          (UsbCbi->InterruptEndpoint == NULL)) {
-
-        UsbCbi->InterruptEndpoint   = (EFI_USB_ENDPOINT_DESCRIPTOR *) (UsbCbi + 1) + 2;
-        CopyMem(UsbCbi->InterruptEndpoint, &EndPoint, sizeof (EndPoint));
+          (UsbCbi->InterruptEndpoint == NULL))
+      {
+        UsbCbi->InterruptEndpoint = (EFI_USB_ENDPOINT_DESCRIPTOR *)(UsbCbi + 1) + 2;
+        CopyMem (UsbCbi->InterruptEndpoint, &EndPoint, sizeof (EndPoint));
       }
     }
   }
@@ -131,6 +132,7 @@ UsbCbiInit (
     Status = EFI_UNSUPPORTED;
     goto ON_ERROR;
   }
+
   if ((Interface->InterfaceProtocol == USB_MASS_STORE_CBI0) && (UsbCbi->InterruptEndpoint == NULL)) {
     Status = EFI_UNSUPPORTED;
     goto ON_ERROR;
@@ -166,10 +168,10 @@ ON_ERROR:
 **/
 EFI_STATUS
 UsbCbiSendCommand (
-  IN USB_CBI_PROTOCOL       *UsbCbi,
-  IN UINT8                  *Cmd,
-  IN UINT8                  CmdLen,
-  IN UINT32                 Timeout
+  IN USB_CBI_PROTOCOL  *UsbCbi,
+  IN UINT8             *Cmd,
+  IN UINT8             CmdLen,
+  IN UINT32            Timeout
   )
 {
   EFI_USB_DEVICE_REQUEST  Request;
@@ -188,8 +190,8 @@ UsbCbiSendCommand (
   Request.Index       = UsbCbi->Interface.InterfaceNumber;
   Request.Length      = CmdLen;
 
-  Status              = EFI_SUCCESS;
-  Timeout             = Timeout / USB_MASS_1_MILLISECOND;
+  Status  = EFI_SUCCESS;
+  Timeout = Timeout / USB_MASS_1_MILLISECOND;
 
   for (Retry = 0; Retry < USB_CBI_MAX_RETRY; Retry++) {
     //
@@ -223,7 +225,6 @@ UsbCbiSendCommand (
   return Status;
 }
 
-
 /**
   Transfer data between the device and host.
 
@@ -244,20 +245,20 @@ UsbCbiSendCommand (
 **/
 EFI_STATUS
 UsbCbiDataTransfer (
-  IN USB_CBI_PROTOCOL         *UsbCbi,
-  IN EFI_USB_DATA_DIRECTION   DataDir,
-  IN OUT UINT8                *Data,
-  IN OUT UINTN                *TransLen,
-  IN UINT32                   Timeout
+  IN USB_CBI_PROTOCOL        *UsbCbi,
+  IN EFI_USB_DATA_DIRECTION  DataDir,
+  IN OUT UINT8               *Data,
+  IN OUT UINTN               *TransLen,
+  IN UINT32                  Timeout
   )
 {
-  EFI_USB_ENDPOINT_DESCRIPTOR *Endpoint;
-  EFI_STATUS                  Status;
-  UINT32                      TransStatus;
-  UINTN                       Remain;
-  UINTN                       Increment;
-  UINT8                       *Next;
-  UINTN                       Retry;
+  EFI_USB_ENDPOINT_DESCRIPTOR  *Endpoint;
+  EFI_STATUS                   Status;
+  UINT32                       TransStatus;
+  UINTN                        Remain;
+  UINTN                        Increment;
+  UINT8                        *Next;
+  UINTN                        Retry;
 
   //
   // If no data to transfer, just return EFI_SUCCESS.
@@ -287,7 +288,7 @@ UsbCbiDataTransfer (
   while (Remain > 0) {
     TransStatus = 0;
 
-    if (Remain > (UINTN) USB_CBI_MAX_PACKET_NUM * Endpoint->MaxPacketSize) {
+    if (Remain > (UINTN)USB_CBI_MAX_PACKET_NUM * Endpoint->MaxPacketSize) {
       Increment = USB_CBI_MAX_PACKET_NUM * Endpoint->MaxPacketSize;
     } else {
       Increment = Remain;
@@ -334,7 +335,7 @@ UsbCbiDataTransfer (
       goto ON_EXIT;
     }
 
-    Next += Increment;
+    Next   += Increment;
     Remain -= Increment;
   }
 
@@ -342,7 +343,6 @@ ON_EXIT:
   *TransLen -= Remain;
   return Status;
 }
-
 
 /**
   Gets the result of high level command execution from interrupt endpoint.
@@ -362,20 +362,20 @@ ON_EXIT:
 **/
 EFI_STATUS
 UsbCbiGetStatus (
-  IN  USB_CBI_PROTOCOL        *UsbCbi,
-  IN  UINT32                  Timeout,
-  OUT USB_CBI_STATUS          *Result
+  IN  USB_CBI_PROTOCOL  *UsbCbi,
+  IN  UINT32            Timeout,
+  OUT USB_CBI_STATUS    *Result
   )
 {
-  UINTN                     Len;
-  UINT8                     Endpoint;
-  EFI_STATUS                Status;
-  UINT32                    TransStatus;
-  INTN                      Retry;
+  UINTN       Len;
+  UINT8       Endpoint;
+  EFI_STATUS  Status;
+  UINT32      TransStatus;
+  INTN        Retry;
 
-  Endpoint  = UsbCbi->InterruptEndpoint->EndpointAddress;
-  Status    = EFI_SUCCESS;
-  Timeout   = Timeout / USB_MASS_1_MILLISECOND;
+  Endpoint = UsbCbi->InterruptEndpoint->EndpointAddress;
+  Status   = EFI_SUCCESS;
+  Timeout  = Timeout / USB_MASS_1_MILLISECOND;
 
   //
   // Attempt to the read the result from interrupt endpoint
@@ -404,7 +404,6 @@ UsbCbiGetStatus (
 
   return Status;
 }
-
 
 /**
   Execute USB mass storage command through the CBI0/CBI1 transport protocol.
@@ -436,13 +435,13 @@ UsbCbiExecCommand (
   OUT UINT32                  *CmdStatus
   )
 {
-  USB_CBI_PROTOCOL          *UsbCbi;
-  USB_CBI_STATUS            Result;
-  EFI_STATUS                Status;
-  UINTN                     TransLen;
+  USB_CBI_PROTOCOL  *UsbCbi;
+  USB_CBI_STATUS    Result;
+  EFI_STATUS        Status;
+  UINTN             TransLen;
 
-  *CmdStatus  = USB_MASS_CMD_SUCCESS;
-  UsbCbi      = (USB_CBI_PROTOCOL *) Context;
+  *CmdStatus = USB_MASS_CMD_SUCCESS;
+  UsbCbi     = (USB_CBI_PROTOCOL *)Context;
 
   //
   // Send the command to the device. Return immediately if device
@@ -450,8 +449,8 @@ UsbCbiExecCommand (
   //
   Status = UsbCbiSendCommand (UsbCbi, Cmd, CmdLen, Timeout);
   if (EFI_ERROR (Status)) {
-    gBS->Stall(10 * USB_MASS_1_MILLISECOND);
-    DEBUG ((EFI_D_ERROR, "UsbCbiExecCommand: UsbCbiSendCommand (%r)\n",Status));
+    gBS->Stall (10 * USB_MASS_1_MILLISECOND);
+    DEBUG ((DEBUG_ERROR, "UsbCbiExecCommand: UsbCbiSendCommand (%r)\n", Status));
     return Status;
   }
 
@@ -459,11 +458,11 @@ UsbCbiExecCommand (
   // Transfer the data. Return this status if no interrupt endpoint
   // is used to report the transfer status.
   //
-  TransLen = (UINTN) DataLen;
+  TransLen = (UINTN)DataLen;
 
-  Status   = UsbCbiDataTransfer (UsbCbi, DataDir, Data, &TransLen, Timeout);
+  Status = UsbCbiDataTransfer (UsbCbi, DataDir, Data, &TransLen, Timeout);
   if (UsbCbi->InterruptEndpoint == NULL) {
-    DEBUG ((EFI_D_ERROR, "UsbCbiExecCommand: UsbCbiDataTransfer (%r)\n",Status));
+    DEBUG ((DEBUG_ERROR, "UsbCbiExecCommand: UsbCbiDataTransfer (%r)\n", Status));
     return Status;
   }
 
@@ -472,7 +471,7 @@ UsbCbiExecCommand (
   //
   Status = UsbCbiGetStatus (UsbCbi, Timeout, &Result);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "UsbCbiExecCommand: UsbCbiGetStatus (%r)\n",Status));
+    DEBUG ((DEBUG_ERROR, "UsbCbiExecCommand: UsbCbiGetStatus (%r)\n", Status));
     return Status;
   }
 
@@ -483,7 +482,7 @@ UsbCbiExecCommand (
     // Do not set the USB_MASS_CMD_FAIL for a request sense command
     // as a bad result type doesn't mean a cmd failure
     //
-    if (Result.Type != 0 && *(UINT8*)Cmd != 0x03) {
+    if ((Result.Type != 0) && (*(UINT8 *)Cmd != 0x03)) {
       *CmdStatus = USB_MASS_CMD_FAIL;
     }
   } else {
@@ -491,39 +490,38 @@ UsbCbiExecCommand (
     // Check page 27, CBI spec 1.1 for vaious reture status.
     //
     switch (Result.Value & 0x03) {
-    case 0x00:
-      //
-      // Pass
-      //
-      *CmdStatus = USB_MASS_CMD_SUCCESS;
-      break;
+      case 0x00:
+        //
+        // Pass
+        //
+        *CmdStatus = USB_MASS_CMD_SUCCESS;
+        break;
 
-    case 0x02:
-      //
-      // Phase Error, response with reset.
-      // No break here to fall through to "Fail".
-      //
-      UsbCbiResetDevice (UsbCbi, FALSE);
+      case 0x02:
+        //
+        // Phase Error, response with reset.
+        // No break here to fall through to "Fail".
+        //
+        UsbCbiResetDevice (UsbCbi, FALSE);
 
-    case 0x01:
-      //
-      // Fail
-      //
-      *CmdStatus = USB_MASS_CMD_FAIL;
-      break;
+      case 0x01:
+        //
+        // Fail
+        //
+        *CmdStatus = USB_MASS_CMD_FAIL;
+        break;
 
-    case 0x03:
-      //
-      // Persistent Fail. Need to send REQUEST SENSE.
-      //
-      *CmdStatus = USB_MASS_CMD_PERSISTENT;
-      break;
+      case 0x03:
+        //
+        // Persistent Fail. Need to send REQUEST SENSE.
+        //
+        *CmdStatus = USB_MASS_CMD_PERSISTENT;
+        break;
     }
   }
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Reset the USB mass storage device by CBI protocol.
@@ -542,17 +540,17 @@ UsbCbiExecCommand (
 **/
 EFI_STATUS
 UsbCbiResetDevice (
-  IN  VOID                    *Context,
-  IN  BOOLEAN                  ExtendedVerification
+  IN  VOID     *Context,
+  IN  BOOLEAN  ExtendedVerification
   )
 {
-  UINT8                     ResetCmd[USB_CBI_RESET_CMD_LEN];
-  USB_CBI_PROTOCOL          *UsbCbi;
-  USB_CBI_STATUS            Result;
-  EFI_STATUS                Status;
-  UINT32                    Timeout;
+  UINT8             ResetCmd[USB_CBI_RESET_CMD_LEN];
+  USB_CBI_PROTOCOL  *UsbCbi;
+  USB_CBI_STATUS    Result;
+  EFI_STATUS        Status;
+  UINT32            Timeout;
 
-  UsbCbi = (USB_CBI_PROTOCOL *) Context;
+  UsbCbi = (USB_CBI_PROTOCOL *)Context;
 
   //
   // Fill in the reset command.
@@ -587,7 +585,6 @@ UsbCbiResetDevice (
   return Status;
 }
 
-
 /**
   Clean up the CBI protocol's resource.
 
@@ -598,7 +595,7 @@ UsbCbiResetDevice (
 **/
 EFI_STATUS
 UsbCbiCleanUp (
-  IN  VOID                   *Context
+  IN  VOID  *Context
   )
 {
   FreePool (Context);

@@ -66,7 +66,7 @@ typedef enum {
   ///
   ///   EFI_UNSUPPORTED The MP table is not supported on this platform.
   ///
-  EfiGetPlatformBinaryMpTable      = 0,
+  EfiGetPlatformBinaryMpTable = 0,
   ///
   /// This mode returns a block of data. The content and usage is IBV or OEM defined.
   /// OEMs or IBVs normally use this function for nonstandard Compatibility16 runtime soft
@@ -104,7 +104,7 @@ typedef enum {
   ///
   ///   EFI_UNSUPPORTED Oem INT is not supported on this platform.
   ///
-  EfiGetPlatformBinaryOemIntData   = 1,
+  EfiGetPlatformBinaryOemIntData = 1,
   ///
   /// This mode returns a block of data. The content and usage is IBV defined. OEMs or
   /// IBVs normally use this mode for nonstandard Compatibility16 runtime 16 bit routines. It
@@ -146,57 +146,57 @@ typedef enum {
   ///
   ///   EFI_UNSUPPORTED Oem16 is not supported on this platform.
   ///
-  EfiGetPlatformBinaryOem16Data    = 2,
-///
-/// This mode returns a block of data. The content and usage are IBV defined. OEMs or
-/// IBVs normally use this mode for nonstandard Compatibility16 runtime 32 bit routines. It
-/// is the responsibility of this routine to coalesce multiple OEM 32 bit functions, if they
-/// exist, into one coherent package that is understandable by the Compatibility16 code.
-///
-/// Example usage: A legacy mobile BIOS that has a pre existing runtime
-/// interface to return the battery status to calling applications.
-///
-/// This mode is invoked twice. The first invocation has LegacySegment and
-/// LegacyOffset set to 0. The mode returns the table address in EFI memory and its size.
-///
-/// The second invocation has LegacySegment and LegacyOffset set to the location
-/// in the 0xF0000 or 0xE0000 block to which the table is to be copied. The second
-/// invocation allows any table address fix ups to occur in the EFI memory copy of the table.
-/// The caller, not EfiGetPlatformBinaryOem32Data, copies the modified table to
-/// the allocated region in 0xF0000 or 0xE0000 block after the second invocation..
-///
-/// Note: There are two generic mechanisms by which this mode can be used.
-/// Mechanism 1: This mode returns the data and the Legacy BIOS Protocol copies
-/// the data into the F0000 or E0000 block in the Compatibility16 code. The
-/// EFI_COMPATIBILITY16_TABLE entries Oem32Segment and Oem32Offset can
-/// be viewed as two UINT16 entries.
-/// Mechanism 2: This mode directly fills in the EFI_COMPATIBILITY16_TABLE with
-/// a pointer to the INT15 E820 region containing the 32 bit code. It returns
-/// EFI_UNSUPPORTED. The EFI_COMPATIBILITY16_TABLE entries,
-/// Oem32Segment and Oem32Offset, can be viewed as two UINT16 entries or
-/// as a single UINT32 entry as determined by the IBV.
-///
-/// The function parameters associated with this mode are:
-///
-///   TableSize Size of data.
-///
-///   Location Location to place the table. 0x00 or 0xE0000 or 0xF0000 64 KB blocks.
-///       Bit 0 = 1 0xF0000 64 KB block.
-///       Bit 1 = 1 0xE0000 64 KB block.
-///       Multiple bits can be set.
-///
-///   Alignment Bit mapped address alignment granularity.
-///       The first nonzero bit from the right is the address granularity.
-///
-///   LegacySegment Segment in which EfiCompatibility code will place the table or data.
-///
-///   LegacyOffset Offset in which EfiCompatibility code will place the table or data.
-///
-/// The return values associated with this mode are:
-///   EFI_SUCCESS The data was returned successfully.
-///   EFI_UNSUPPORTED Oem32 is not supported on this platform.
-///
-EfiGetPlatformBinaryOem32Data    = 3,
+  EfiGetPlatformBinaryOem16Data = 2,
+  ///
+  /// This mode returns a block of data. The content and usage are IBV defined. OEMs or
+  /// IBVs normally use this mode for nonstandard Compatibility16 runtime 32 bit routines. It
+  /// is the responsibility of this routine to coalesce multiple OEM 32 bit functions, if they
+  /// exist, into one coherent package that is understandable by the Compatibility16 code.
+  ///
+  /// Example usage: A legacy mobile BIOS that has a pre existing runtime
+  /// interface to return the battery status to calling applications.
+  ///
+  /// This mode is invoked twice. The first invocation has LegacySegment and
+  /// LegacyOffset set to 0. The mode returns the table address in EFI memory and its size.
+  ///
+  /// The second invocation has LegacySegment and LegacyOffset set to the location
+  /// in the 0xF0000 or 0xE0000 block to which the table is to be copied. The second
+  /// invocation allows any table address fix ups to occur in the EFI memory copy of the table.
+  /// The caller, not EfiGetPlatformBinaryOem32Data, copies the modified table to
+  /// the allocated region in 0xF0000 or 0xE0000 block after the second invocation..
+  ///
+  /// Note: There are two generic mechanisms by which this mode can be used.
+  /// Mechanism 1: This mode returns the data and the Legacy BIOS Protocol copies
+  /// the data into the F0000 or E0000 block in the Compatibility16 code. The
+  /// EFI_COMPATIBILITY16_TABLE entries Oem32Segment and Oem32Offset can
+  /// be viewed as two UINT16 entries.
+  /// Mechanism 2: This mode directly fills in the EFI_COMPATIBILITY16_TABLE with
+  /// a pointer to the INT15 E820 region containing the 32 bit code. It returns
+  /// EFI_UNSUPPORTED. The EFI_COMPATIBILITY16_TABLE entries,
+  /// Oem32Segment and Oem32Offset, can be viewed as two UINT16 entries or
+  /// as a single UINT32 entry as determined by the IBV.
+  ///
+  /// The function parameters associated with this mode are:
+  ///
+  ///   TableSize Size of data.
+  ///
+  ///   Location Location to place the table. 0x00 or 0xE0000 or 0xF0000 64 KB blocks.
+  ///       Bit 0 = 1 0xF0000 64 KB block.
+  ///       Bit 1 = 1 0xE0000 64 KB block.
+  ///       Multiple bits can be set.
+  ///
+  ///   Alignment Bit mapped address alignment granularity.
+  ///       The first nonzero bit from the right is the address granularity.
+  ///
+  ///   LegacySegment Segment in which EfiCompatibility code will place the table or data.
+  ///
+  ///   LegacyOffset Offset in which EfiCompatibility code will place the table or data.
+  ///
+  /// The return values associated with this mode are:
+  ///   EFI_SUCCESS The data was returned successfully.
+  ///   EFI_UNSUPPORTED Oem32 is not supported on this platform.
+  ///
+  EfiGetPlatformBinaryOem32Data = 3,
   ///
   /// This mode returns a TPM binary image for the onboard TPM device.
   ///
@@ -226,7 +226,7 @@ EfiGetPlatformBinaryOem32Data    = 3,
   ///
   ///   EFI_NOT_FOUND No BinaryImage was found.
   ///
-  EfiGetPlatformBinaryTpmBinary    = 4,
+  EfiGetPlatformBinaryTpmBinary = 4,
   ///
   /// The mode finds the Compatibility16 Rom Image.
   ///
@@ -250,7 +250,7 @@ EfiGetPlatformBinaryOem32Data    = 3,
   ///
   ///    EFI_NOT_FOUND ROM not found.
   ///
-  EfiGetPlatformBinarySystemRom    = 5,
+  EfiGetPlatformBinarySystemRom = 5,
   ///
   /// This mode returns the Base address of PciExpress memory mapped configuration
   /// address space.
@@ -275,9 +275,9 @@ EfiGetPlatformBinaryOem32Data    = 3,
   ///
   ///   EFI_UNSUPPORTED System does not PciExpress.
   ///
-  EfiGetPlatformPciExpressBase     = 6,
+  EfiGetPlatformPciExpressBase = 6,
   ///
-  EfiGetPlatformPmmSize            = 7,
+  EfiGetPlatformPmmSize = 7,
   ///
   EfiGetPlatformEndOpromShadowAddr = 8,
   ///
@@ -301,7 +301,7 @@ typedef enum {
   ///
   ///   AdditionalData NULL.
   ///
-  EfiGetPlatformVgaHandle       = 0,
+  EfiGetPlatformVgaHandle = 0,
   ///
   /// This mode returns the Compatibility16 policy for the device that should be the IDE
   /// controller used during a Compatibility16 boot.
@@ -317,7 +317,7 @@ typedef enum {
   ///   AdditionalData Pointer to HddInfo.
   ///     Information about all onboard IDE controllers.
   ///
-  EfiGetPlatformIdeHandle       = 1,
+  EfiGetPlatformIdeHandle = 1,
   ///
   /// This mode returns the Compatibility16 policy for the device that should be the ISA bus
   /// controller used during a Compatibility16 boot.
@@ -332,7 +332,7 @@ typedef enum {
   ///
   ///   AdditionalData NULL.
   ///
-  EfiGetPlatformIsaBusHandle    = 2,
+  EfiGetPlatformIsaBusHandle = 2,
   ///
   /// This mode returns the Compatibility16 policy for the device that should be the USB
   /// device used during a Compatibility16 boot.
@@ -347,7 +347,7 @@ typedef enum {
   ///
   ///   AdditionalData NULL.
   ///
-  EfiGetPlatformUsbHandle       = 3
+  EfiGetPlatformUsbHandle = 3
 } EFI_GET_PLATFORM_HANDLE_MODE;
 
 /**
@@ -387,7 +387,7 @@ typedef enum {
   ///
   ///       AdditionalData NULL.
   ///
-  EfiPlatformHookShadowServiceRoms= 1,
+  EfiPlatformHookShadowServiceRoms = 1,
   ///
   /// This mode allows platform to perform any required operation after an OpROM has
   /// completed its initialization.
@@ -404,21 +404,21 @@ typedef enum {
   ///
   ///       AdditionalData NULL.
   ///
-  EfiPlatformHookAfterRomInit     = 2
+  EfiPlatformHookAfterRomInit = 2
 } EFI_GET_PLATFORM_HOOK_MODE;
 
 ///
 /// This IRQ has not been assigned to PCI.
 ///
-#define PCI_UNUSED        0x00
+#define PCI_UNUSED  0x00
 ///
 /// This IRQ has been assigned to PCI.
 ///
-#define PCI_USED          0xFF
+#define PCI_USED  0xFF
 ///
 /// This IRQ has been used by an SIO legacy device and cannot be used by PCI.
 ///
-#define LEGACY_USED       0xFE
+#define LEGACY_USED  0xFE
 
 #pragma pack(1)
 
@@ -426,7 +426,7 @@ typedef struct {
   ///
   /// IRQ for this entry.
   ///
-  UINT8 Irq;
+  UINT8    Irq;
   ///
   /// Status of this IRQ.
   ///
@@ -437,102 +437,100 @@ typedef struct {
   /// LEGACY_USED 0xFE. This IRQ has been used by an SIO legacy
   /// device and cannot be used by PCI.
   ///
-  UINT8 Used;
+  UINT8    Used;
 } EFI_LEGACY_IRQ_PRIORITY_TABLE_ENTRY;
 
 //
 // Define PIR table structures
 //
-#define EFI_LEGACY_PIRQ_TABLE_SIGNATURE SIGNATURE_32 ('$', 'P', 'I', 'R')
+#define EFI_LEGACY_PIRQ_TABLE_SIGNATURE  SIGNATURE_32 ('$', 'P', 'I', 'R')
 
 typedef struct {
   ///
   /// $PIR.
   ///
-  UINT32  Signature;
+  UINT32    Signature;
   ///
   /// 0x00.
   ///
-  UINT8   MinorVersion;
+  UINT8     MinorVersion;
   ///
   /// 0x01 for table version 1.0.
   ///
-  UINT8   MajorVersion;
+  UINT8     MajorVersion;
   ///
   /// 0x20 + RoutingTableEntries * 0x10.
   ///
-  UINT16  TableSize;
+  UINT16    TableSize;
   ///
   /// PCI interrupt router bus.
   ///
-  UINT8   Bus;
+  UINT8     Bus;
   ///
   /// PCI interrupt router device/function.
   ///
-  UINT8   DevFun;
+  UINT8     DevFun;
   ///
   /// If nonzero, bit map of IRQs reserved for PCI.
   ///
-  UINT16  PciOnlyIrq;
+  UINT16    PciOnlyIrq;
   ///
   /// Vendor ID of a compatible PCI interrupt router.
   ///
-  UINT16  CompatibleVid;
+  UINT16    CompatibleVid;
   ///
   /// Device ID of a compatible PCI interrupt router.
   ///
-  UINT16  CompatibleDid;
+  UINT16    CompatibleDid;
   ///
   /// If nonzero, a value passed directly to the IRQ miniport's Initialize function.
   ///
-  UINT32  Miniport;
+  UINT32    Miniport;
   ///
   /// Reserved for future usage.
   ///
-  UINT8   Reserved[11];
+  UINT8     Reserved[11];
   ///
   /// This byte plus the sum of all other bytes in the LocalPirqTable equal 0x00.
   ///
-  UINT8   Checksum;
+  UINT8     Checksum;
 } EFI_LEGACY_PIRQ_TABLE_HEADER;
-
 
 typedef struct {
   ///
   /// If nonzero, a value assigned by the IBV.
   ///
-  UINT8   Pirq;
+  UINT8     Pirq;
   ///
   /// If nonzero, the IRQs that can be assigned to this device.
   ///
-  UINT16  IrqMask;
+  UINT16    IrqMask;
 } EFI_LEGACY_PIRQ_ENTRY;
 
 typedef struct {
   ///
   /// PCI bus of the entry.
   ///
-  UINT8                 Bus;
+  UINT8                    Bus;
   ///
   /// PCI device of this entry.
   ///
-  UINT8                 Device;
+  UINT8                    Device;
   ///
   /// An IBV value and IRQ mask for PIRQ pins A through D.
   ///
-  EFI_LEGACY_PIRQ_ENTRY PirqEntry[4];
+  EFI_LEGACY_PIRQ_ENTRY    PirqEntry[4];
   ///
   /// If nonzero, the slot number assigned by the board manufacturer.
   ///
-  UINT8                 Slot;
+  UINT8                    Slot;
   ///
   /// Reserved for future use.
   ///
-  UINT8                 Reserved;
+  UINT8                    Reserved;
 } EFI_LEGACY_IRQ_ROUTING_ENTRY;
 
 #pragma pack()
-
 
 /**
   Finds the binary data or other platform information.
@@ -629,9 +627,9 @@ EFI_STATUS
   IN EFI_LEGACY_BIOS_PLATFORM_PROTOCOL   *This,
   IN EFI_GET_PLATFORM_HOOK_MODE          Mode,
   IN UINT16                              Type,
-  IN  EFI_HANDLE                         DeviceHandle, OPTIONAL
-  IN  OUT UINTN                          *ShadowAddress, OPTIONAL
-  IN  EFI_COMPATIBILITY16_TABLE          *Compatibility16Table, OPTIONAL
+  IN  EFI_HANDLE                         DeviceHandle  OPTIONAL,
+  IN  OUT UINTN                          *ShadowAddress  OPTIONAL,
+  IN  EFI_COMPATIBILITY16_TABLE          *Compatibility16Table  OPTIONAL,
   OUT  VOID                               **AdditionalData OPTIONAL
   );
 
@@ -660,9 +658,9 @@ EFI_STATUS
   IN EFI_LEGACY_BIOS_PLATFORM_PROTOCOL   *This,
   OUT VOID                               **RoutingTable,
   OUT UINTN                              *RoutingTableEntries,
-  OUT VOID                               **LocalPirqTable, OPTIONAL
-  OUT UINTN                              *PirqTableSize, OPTIONAL
-  OUT VOID                               **LocalIrqPriorityTable, OPTIONAL
+  OUT VOID                               **LocalPirqTable  OPTIONAL,
+  OUT UINTN                              *PirqTableSize  OPTIONAL,
+  OUT VOID                               **LocalIrqPriorityTable  OPTIONAL,
   OUT UINTN                              *IrqPriorityTableEntries OPTIONAL
   );
 
@@ -725,31 +723,31 @@ struct _EFI_LEGACY_BIOS_PLATFORM_PROTOCOL {
   ///
   ///  Gets binary data or other platform information.
   ///
-  EFI_LEGACY_BIOS_PLATFORM_GET_PLATFORM_INFO    GetPlatformInfo;
+  EFI_LEGACY_BIOS_PLATFORM_GET_PLATFORM_INFO      GetPlatformInfo;
   ///
   ///  Returns a buffer of all handles matching the requested subfunction.
   ///
-  EFI_LEGACY_BIOS_PLATFORM_GET_PLATFORM_HANDLE  GetPlatformHandle;
+  EFI_LEGACY_BIOS_PLATFORM_GET_PLATFORM_HANDLE    GetPlatformHandle;
   ///
   ///  Loads and initializes the traditional BIOS SMM handler.
-  EFI_LEGACY_BIOS_PLATFORM_SMM_INIT             SmmInit;
+  EFI_LEGACY_BIOS_PLATFORM_SMM_INIT               SmmInit;
   ///
   ///  Allows platform to perform any required actions after a LegacyBios operation.
   ///
-  EFI_LEGACY_BIOS_PLATFORM_HOOKS                PlatformHooks;
+  EFI_LEGACY_BIOS_PLATFORM_HOOKS                  PlatformHooks;
   ///
   ///  Gets $PIR table.
-  EFI_LEGACY_BIOS_PLATFORM_GET_ROUTING_TABLE    GetRoutingTable;
+  EFI_LEGACY_BIOS_PLATFORM_GET_ROUTING_TABLE      GetRoutingTable;
   ///
   ///  Translates the given PIRQ to the final value after traversing any PCI bridges.
   ///
-  EFI_LEGACY_BIOS_PLATFORM_TRANSLATE_PIRQ       TranslatePirq;
+  EFI_LEGACY_BIOS_PLATFORM_TRANSLATE_PIRQ         TranslatePirq;
   ///
   ///  Final platform function before the system attempts to boot to a traditional OS.
   ///
-  EFI_LEGACY_BIOS_PLATFORM_PREPARE_TO_BOOT      PrepareToBoot;
+  EFI_LEGACY_BIOS_PLATFORM_PREPARE_TO_BOOT        PrepareToBoot;
 };
 
-extern EFI_GUID gEfiLegacyBiosPlatformProtocolGuid;
+extern EFI_GUID  gEfiLegacyBiosPlatformProtocolGuid;
 
 #endif

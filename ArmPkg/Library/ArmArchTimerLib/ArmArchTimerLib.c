@@ -7,7 +7,6 @@
 
 **/
 
-
 #include <Base.h>
 #include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
@@ -16,15 +15,14 @@
 #include <Library/PcdLib.h>
 #include <Library/ArmGenericTimerCounterLib.h>
 
-#define TICKS_PER_MICRO_SEC     (PcdGet32 (PcdArmArchTimerFreqInHz)/1000000U)
+#define TICKS_PER_MICRO_SEC  (PcdGet32 (PcdArmArchTimerFreqInHz)/1000000U)
 
 // Select appropriate multiply function for platform architecture.
 #ifdef MDE_CPU_ARM
-#define MULT_U64_X_N MultU64x32
+#define MULT_U64_X_N  MultU64x32
 #else
-#define MULT_U64_X_N MultU64x64
+#define MULT_U64_X_N  MultU64x64
 #endif
-
 
 RETURN_STATUS
 EFIAPI
@@ -36,7 +34,6 @@ TimerConstructor (
   // Check if the ARM Generic Timer Extension is implemented.
   //
   if (ArmIsArchTimerImplemented ()) {
-
     //
     // Check if Architectural Timer frequency is pre-determined by the platform
     // (ie. nonzero).
@@ -49,7 +46,7 @@ TimerConstructor (
       //
       ASSERT (TICKS_PER_MICRO_SEC);
 
-#ifdef MDE_CPU_ARM
+ #ifdef MDE_CPU_ARM
       //
       // Only set the frequency for ARMv7. We expect the secure firmware to
       // have already done it.
@@ -59,7 +56,8 @@ TimerConstructor (
       if (ArmHasSecurityExtensions ()) {
         ArmGenericTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
       }
-#endif
+
+ #endif
     }
 
     //
@@ -68,9 +66,8 @@ TimerConstructor (
     // If the reset value (0) is returned, just ASSERT.
     //
     ASSERT (ArmGenericTimerGetTimerFreq () != 0);
-
   } else {
-    DEBUG ((EFI_D_ERROR, "ARM Architectural Timer is not available in the CPU, hence this library cannot be used.\n"));
+    DEBUG ((DEBUG_ERROR, "ARM Architectural Timer is not available in the CPU, hence this library cannot be used.\n"));
     ASSERT (0);
   }
 
@@ -90,15 +87,15 @@ EFIAPI
 GetPlatformTimerFreq (
   )
 {
-  UINTN TimerFreq;
+  UINTN  TimerFreq;
 
   TimerFreq = PcdGet32 (PcdArmArchTimerFreqInHz);
   if (TimerFreq == 0) {
     TimerFreq = ArmGenericTimerGetTimerFreq ();
   }
+
   return TimerFreq;
 }
-
 
 /**
   Stalls the CPU for the number of microseconds specified by MicroSeconds.
@@ -111,11 +108,11 @@ GetPlatformTimerFreq (
 UINTN
 EFIAPI
 MicroSecondDelay (
-  IN      UINTN                     MicroSeconds
+  IN      UINTN  MicroSeconds
   )
 {
-  UINT64 TimerTicks64;
-  UINT64 SystemCounterVal;
+  UINT64  TimerTicks64;
+  UINT64  SystemCounterVal;
 
   // Calculate counter ticks that represent requested delay:
   //  = MicroSeconds x TICKS_PER_MICRO_SEC
@@ -141,7 +138,6 @@ MicroSecondDelay (
   return MicroSeconds;
 }
 
-
 /**
   Stalls the CPU for at least the given number of nanoseconds.
 
@@ -158,13 +154,13 @@ MicroSecondDelay (
 UINTN
 EFIAPI
 NanoSecondDelay (
-  IN  UINTN NanoSeconds
+  IN  UINTN  NanoSeconds
   )
 {
   UINTN  MicroSeconds;
 
   // Round up to 1us Tick Number
-  MicroSeconds = NanoSeconds / 1000;
+  MicroSeconds  = NanoSeconds / 1000;
   MicroSeconds += ((NanoSeconds % 1000) == 0) ? 0 : 1;
 
   MicroSecondDelay (MicroSeconds);
@@ -219,13 +215,13 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  OUT      UINT64                    *StartValue,  OPTIONAL
-  OUT      UINT64                    *EndValue     OPTIONAL
+  OUT      UINT64  *StartValue   OPTIONAL,
+  OUT      UINT64  *EndValue     OPTIONAL
   )
 {
   if (StartValue != NULL) {
     // Timer starts at 0
-    *StartValue = (UINT64)0ULL ;
+    *StartValue = (UINT64)0ULL;
   }
 
   if (EndValue != NULL) {
@@ -250,7 +246,7 @@ GetPerformanceCounterProperties (
 UINT64
 EFIAPI
 GetTimeInNanoSecond (
-  IN      UINT64                     Ticks
+  IN      UINT64  Ticks
   )
 {
   UINT64  NanoSeconds;
@@ -267,7 +263,8 @@ GetTimeInNanoSecond (
                   DivU64x32Remainder (
                     Ticks,
                     TimerFreq,
-                    &Remainder),
+                    &Remainder
+                    ),
                   1000000000U
                   );
 
@@ -277,8 +274,9 @@ GetTimeInNanoSecond (
   //
   NanoSeconds += DivU64x32 (
                    MULT_U64_X_N (
-                     (UINT64) Remainder,
-                     1000000000U),
+                     (UINT64)Remainder,
+                     1000000000U
+                     ),
                    TimerFreq
                    );
 

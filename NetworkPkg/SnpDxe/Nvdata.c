@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Snp.h"
 
-
 /**
   This routine calls Undi to read the desired number of eeprom bytes.
 
@@ -26,60 +25,60 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 PxeNvDataRead (
-  IN SNP_DRIVER *Snp,
-  IN UINTN      Offset,
-  IN UINTN      BufferSize,
-  IN OUT VOID   *Buffer
+  IN SNP_DRIVER  *Snp,
+  IN UINTN       Offset,
+  IN UINTN       BufferSize,
+  IN OUT VOID    *Buffer
   )
 {
-  PXE_DB_NVDATA *Db;
+  PXE_DB_NVDATA  *Db;
 
-  Db                  = Snp->Db;
-  Snp->Cdb.OpCode     = PXE_OPCODE_NVDATA;
+  Db              = Snp->Db;
+  Snp->Cdb.OpCode = PXE_OPCODE_NVDATA;
 
-  Snp->Cdb.OpFlags    = PXE_OPFLAGS_NVDATA_READ;
+  Snp->Cdb.OpFlags = PXE_OPFLAGS_NVDATA_READ;
 
-  Snp->Cdb.CPBsize    = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr    = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb.CPBsize = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb.CPBaddr = PXE_CPBADDR_NOT_USED;
 
-  Snp->Cdb.DBsize     = (UINT16) sizeof (PXE_DB_NVDATA);
-  Snp->Cdb.DBaddr     = (UINT64)(UINTN) Db;
+  Snp->Cdb.DBsize = (UINT16)sizeof (PXE_DB_NVDATA);
+  Snp->Cdb.DBaddr = (UINT64)(UINTN)Db;
 
-  Snp->Cdb.StatCode   = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags  = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum      = Snp->IfNum;
-  Snp->Cdb.Control    = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb.IFnum     = Snp->IfNum;
+  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
-  DEBUG ((EFI_D_NET, "\nsnp->undi.nvdata ()  "));
+  DEBUG ((DEBUG_NET, "\nsnp->undi.nvdata ()  "));
 
-  (*Snp->IssueUndi32Command) ((UINT64)(UINTN) &Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
 
   switch (Snp->Cdb.StatCode) {
-  case PXE_STATCODE_SUCCESS:
-    break;
+    case PXE_STATCODE_SUCCESS:
+      break;
 
-  case PXE_STATCODE_UNSUPPORTED:
-    DEBUG (
-      (EFI_D_NET,
-      "\nsnp->undi.nvdata()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
+    case PXE_STATCODE_UNSUPPORTED:
+      DEBUG (
+        (DEBUG_NET,
+         "\nsnp->undi.nvdata()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
 
-    return EFI_UNSUPPORTED;
+      return EFI_UNSUPPORTED;
 
-  default:
-    DEBUG (
-      (EFI_D_NET,
-      "\nsnp->undi.nvdata()  %xh:%xh\n",
-      Snp->Cdb.StatFlags,
-      Snp->Cdb.StatCode)
-      );
+    default:
+      DEBUG (
+        (DEBUG_NET,
+         "\nsnp->undi.nvdata()  %xh:%xh\n",
+         Snp->Cdb.StatFlags,
+         Snp->Cdb.StatCode)
+        );
 
-    return EFI_DEVICE_ERROR;
+      return EFI_DEVICE_ERROR;
   }
 
   ASSERT (Offset < sizeof (Db->Data));
@@ -88,7 +87,6 @@ PxeNvDataRead (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Performs read and write operations on the NVRAM device attached to a network
@@ -144,11 +142,11 @@ PxeNvDataRead (
 EFI_STATUS
 EFIAPI
 SnpUndi32NvData (
-  IN EFI_SIMPLE_NETWORK_PROTOCOL *This,
-  IN BOOLEAN                     ReadWrite,
-  IN UINTN                       Offset,
-  IN UINTN                       BufferSize,
-  IN OUT VOID                    *Buffer
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      ReadWrite,
+  IN UINTN                        Offset,
+  IN UINTN                        BufferSize,
+  IN OUT VOID                     *Buffer
   )
 {
   SNP_DRIVER  *Snp;
@@ -170,24 +168,26 @@ SnpUndi32NvData (
   // Return error if the SNP is not initialized.
   //
   switch (Snp->Mode.State) {
-  case EfiSimpleNetworkInitialized:
-    break;
+    case EfiSimpleNetworkInitialized:
+      break;
 
-  case EfiSimpleNetworkStopped:
-    Status = EFI_NOT_STARTED;
-    goto ON_EXIT;
+    case EfiSimpleNetworkStopped:
+      Status = EFI_NOT_STARTED;
+      goto ON_EXIT;
 
-  default:
-    Status = EFI_DEVICE_ERROR;
-    goto ON_EXIT;
+    default:
+      Status = EFI_DEVICE_ERROR;
+      goto ON_EXIT;
   }
+
   //
   // Return error if non-volatile memory variables are not valid.
   //
-  if (Snp->Mode.NvRamSize == 0 || Snp->Mode.NvRamAccessSize == 0) {
+  if ((Snp->Mode.NvRamSize == 0) || (Snp->Mode.NvRamAccessSize == 0)) {
     Status = EFI_UNSUPPORTED;
     goto ON_EXIT;
   }
+
   //
   // Check for invalid parameter combinations.
   //
@@ -197,10 +197,12 @@ SnpUndi32NvData (
       (Offset + BufferSize > Snp->Mode.NvRamSize) ||
       (BufferSize % Snp->Mode.NvRamAccessSize != 0) ||
       (Offset % Snp->Mode.NvRamAccessSize != 0)
-      ) {
+      )
+  {
     Status = EFI_INVALID_PARAMETER;
     goto ON_EXIT;
   }
+
   //
   // check the implementation flags of undi if we can write the nvdata!
   //

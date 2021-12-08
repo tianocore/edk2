@@ -12,7 +12,7 @@
 UINTN
 EFIAPI
 ArmGicV2AcknowledgeInterrupt (
-  IN  UINTN          GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   )
 {
   // Read the Interrupt Acknowledge Register
@@ -22,8 +22,8 @@ ArmGicV2AcknowledgeInterrupt (
 VOID
 EFIAPI
 ArmGicV2EndOfInterrupt (
-  IN  UINTN                 GicInterruptInterfaceBase,
-  IN UINTN                  Source
+  IN  UINTN  GicInterruptInterfaceBase,
+  IN UINTN   Source
   )
 {
   MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, Source);

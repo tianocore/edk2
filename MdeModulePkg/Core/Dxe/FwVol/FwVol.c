@@ -11,14 +11,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeMain.h"
 #include "FwVolDriver.h"
 
-
 //
 // Protocol notify related globals
 //
-VOID          *gEfiFwVolBlockNotifyReg;
-EFI_EVENT     gEfiFwVolBlockEvent;
+VOID       *gEfiFwVolBlockNotifyReg;
+EFI_EVENT  gEfiFwVolBlockEvent;
 
-FV_DEVICE mFvDevice = {
+FV_DEVICE  mFvDevice = {
   FV2_DEVICE_SIGNATURE,
   NULL,
   NULL,
@@ -29,7 +28,7 @@ FV_DEVICE mFvDevice = {
     FvReadFileSection,
     FvWriteFile,
     FvGetNextFile,
-  sizeof (UINTN),
+    sizeof (UINTN),
     NULL,
     FvGetVolumeInfo,
     FvSetVolumeInfo
@@ -38,17 +37,17 @@ FV_DEVICE mFvDevice = {
   NULL,
   NULL,
   NULL,
-  { NULL, NULL },
+  { NULL,                 NULL},
   0,
   0,
   FALSE,
   FALSE
 };
 
-
 //
 // FFS helper functions
 //
+
 /**
   Read data from Firmware Block by FVB protocol Read.
   The data may cross the multi block ranges.
@@ -68,27 +67,27 @@ FV_DEVICE mFvDevice = {
 **/
 EFI_STATUS
 ReadFvbData (
-  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *Fvb,
-  IN OUT EFI_LBA                                *StartLba,
-  IN OUT UINTN                                  *Offset,
-  IN     UINTN                                  DataSize,
-  OUT    UINT8                                  *Data
+  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb,
+  IN OUT EFI_LBA                             *StartLba,
+  IN OUT UINTN                               *Offset,
+  IN     UINTN                               DataSize,
+  OUT    UINT8                               *Data
   )
 {
-  UINTN                       BlockSize;
-  UINTN                       NumberOfBlocks;
-  UINTN                       BlockIndex;
-  UINTN                       ReadDataSize;
-  EFI_STATUS                  Status;
+  UINTN       BlockSize;
+  UINTN       NumberOfBlocks;
+  UINTN       BlockIndex;
+  UINTN       ReadDataSize;
+  EFI_STATUS  Status;
 
   //
   // Try read data in current block
   //
   BlockIndex   = 0;
   ReadDataSize = DataSize;
-  Status = Fvb->Read (Fvb, *StartLba, *Offset, &ReadDataSize, Data);
+  Status       = Fvb->Read (Fvb, *StartLba, *Offset, &ReadDataSize, Data);
   if (Status == EFI_SUCCESS) {
-    *Offset  += DataSize;
+    *Offset += DataSize;
     return EFI_SUCCESS;
   } else if (Status != EFI_BAD_BUFFER_SIZE) {
     //
@@ -118,9 +117,10 @@ ReadFvbData (
       if (EFI_ERROR (Status)) {
         return Status;
       }
-      Data += BlockSize;
+
+      Data     += BlockSize;
       DataSize -= BlockSize;
-      BlockIndex ++;
+      BlockIndex++;
     }
 
     //
@@ -150,7 +150,7 @@ ReadFvbData (
   // Update Lba and Offset used by the following read.
   //
   *StartLba += BlockIndex;
-  *Offset   = DataSize;
+  *Offset    = DataSize;
 
   return EFI_SUCCESS;
 }
@@ -173,8 +173,8 @@ ReadFvbData (
 **/
 EFI_STATUS
 GetFwVolHeader (
-  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL     *Fvb,
-  OUT    EFI_FIRMWARE_VOLUME_HEADER             **FwVolHeader
+  IN     EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb,
+  OUT    EFI_FIRMWARE_VOLUME_HEADER          **FwVolHeader
   )
 {
   EFI_STATUS                  Status;
@@ -187,10 +187,10 @@ GetFwVolHeader (
   //
   // Read the standard FV header
   //
-  StartLba = 0;
-  Offset   = 0;
+  StartLba  = 0;
+  Offset    = 0;
   FvhLength = sizeof (EFI_FIRMWARE_VOLUME_HEADER);
-  Status = ReadFvbData (Fvb, &StartLba, &Offset, FvhLength, (UINT8 *)&TempFvh);
+  Status    = ReadFvbData (Fvb, &StartLba, &Offset, FvhLength, (UINT8 *)&TempFvh);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -207,7 +207,8 @@ GetFwVolHeader (
   // understand it...
   //
   if ((!CompareGuid (&TempFvh.FileSystemGuid, &gEfiFirmwareFileSystem2Guid)) &&
-      (!CompareGuid (&TempFvh.FileSystemGuid, &gEfiFirmwareFileSystem3Guid))) {
+      (!CompareGuid (&TempFvh.FileSystemGuid, &gEfiFirmwareFileSystem3Guid)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -228,8 +229,8 @@ GetFwVolHeader (
   // Read the rest of the header
   //
   FvhLength = TempFvh.HeaderLength - sizeof (EFI_FIRMWARE_VOLUME_HEADER);
-  Buffer = (UINT8 *)*FwVolHeader + sizeof (EFI_FIRMWARE_VOLUME_HEADER);
-  Status = ReadFvbData (Fvb, &StartLba, &Offset, FvhLength, Buffer);
+  Buffer    = (UINT8 *)*FwVolHeader + sizeof (EFI_FIRMWARE_VOLUME_HEADER);
+  Status    = ReadFvbData (Fvb, &StartLba, &Offset, FvhLength, Buffer);
   if (EFI_ERROR (Status)) {
     //
     // Read failed so free buffer
@@ -239,8 +240,6 @@ GetFwVolHeader (
 
   return Status;
 }
-
-
 
 /**
   Free FvDevice resource when error happens
@@ -253,8 +252,8 @@ FreeFvDeviceResource (
   IN FV_DEVICE  *FvDevice
   )
 {
-  FFS_FILE_LIST_ENTRY         *FfsFileEntry;
-  LIST_ENTRY                  *NextEntry;
+  FFS_FILE_LIST_ENTRY  *FfsFileEntry;
+  LIST_ENTRY           *NextEntry;
 
   //
   // Free File List Entry
@@ -279,7 +278,7 @@ FreeFvDeviceResource (
 
     CoreFreePool (FfsFileEntry);
 
-    FfsFileEntry = (FFS_FILE_LIST_ENTRY *) NextEntry;
+    FfsFileEntry = (FFS_FILE_LIST_ENTRY *)NextEntry;
   }
 
   if (!FvDevice->IsMemoryMapped) {
@@ -297,8 +296,6 @@ FreeFvDeviceResource (
   return;
 }
 
-
-
 /**
   Check if an FV is consistent and allocate cache for it.
 
@@ -314,30 +311,30 @@ FvCheck (
   IN OUT FV_DEVICE  *FvDevice
   )
 {
-  EFI_STATUS                            Status;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb;
-  EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
-  EFI_FIRMWARE_VOLUME_EXT_HEADER        *FwVolExtHeader;
-  EFI_FVB_ATTRIBUTES_2                  FvbAttributes;
-  EFI_FV_BLOCK_MAP_ENTRY                *BlockMap;
-  FFS_FILE_LIST_ENTRY                   *FfsFileEntry;
-  EFI_FFS_FILE_HEADER                   *FfsHeader;
-  UINT8                                 *CacheLocation;
-  UINTN                                 Index;
-  EFI_LBA                               LbaIndex;
-  UINTN                                 Size;
-  EFI_FFS_FILE_STATE                    FileState;
-  UINT8                                 *TopFvAddress;
-  UINTN                                 TestLength;
-  EFI_PHYSICAL_ADDRESS                  PhysicalAddress;
-  BOOLEAN                               FileCached;
-  UINTN                                 WholeFileSize;
-  EFI_FFS_FILE_HEADER                   *CacheFfsHeader;
+  EFI_STATUS                          Status;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER      *FwVolExtHeader;
+  EFI_FVB_ATTRIBUTES_2                FvbAttributes;
+  EFI_FV_BLOCK_MAP_ENTRY              *BlockMap;
+  FFS_FILE_LIST_ENTRY                 *FfsFileEntry;
+  EFI_FFS_FILE_HEADER                 *FfsHeader;
+  UINT8                               *CacheLocation;
+  UINTN                               Index;
+  EFI_LBA                             LbaIndex;
+  UINTN                               Size;
+  EFI_FFS_FILE_STATE                  FileState;
+  UINT8                               *TopFvAddress;
+  UINTN                               TestLength;
+  EFI_PHYSICAL_ADDRESS                PhysicalAddress;
+  BOOLEAN                             FileCached;
+  UINTN                               WholeFileSize;
+  EFI_FFS_FILE_HEADER                 *CacheFfsHeader;
 
-  FileCached = FALSE;
+  FileCached     = FALSE;
   CacheFfsHeader = NULL;
 
-  Fvb = FvDevice->Fvb;
+  Fvb         = FvDevice->Fvb;
   FwVolHeader = FvDevice->FwVolHeader;
 
   Status = Fvb->GetAttributes (Fvb, &FvbAttributes);
@@ -345,7 +342,7 @@ FvCheck (
     return Status;
   }
 
-  Size = (UINTN) FwVolHeader->FvLength;
+  Size = (UINTN)FwVolHeader->FvLength;
   if ((FvbAttributes & EFI_FVB2_MEMORY_MAPPED) != 0) {
     FvDevice->IsMemoryMapped = TRUE;
 
@@ -357,10 +354,10 @@ FvCheck (
     //
     // Don't cache memory mapped FV really.
     //
-    FvDevice->CachedFv = (UINT8 *) (UINTN) PhysicalAddress;
+    FvDevice->CachedFv = (UINT8 *)(UINTN)PhysicalAddress;
   } else {
     FvDevice->IsMemoryMapped = FALSE;
-    FvDevice->CachedFv = AllocatePool (Size);
+    FvDevice->CachedFv       = AllocatePool (Size);
 
     if (FvDevice->CachedFv == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -376,9 +373,9 @@ FvCheck (
     //
     // Copy FV into memory using the block map.
     //
-    BlockMap = FwVolHeader->BlockMap;
+    BlockMap      = FwVolHeader->BlockMap;
     CacheLocation = FvDevice->CachedFv;
-    LbaIndex = 0;
+    LbaIndex      = 0;
     while ((BlockMap->NumBlocks != 0) || (BlockMap->Length != 0)) {
       //
       // read the FV data
@@ -417,7 +414,6 @@ FvCheck (
     FvDevice->ErasePolarity = 0;
   }
 
-
   //
   // go through the whole FV cache, check the consistence of the FV.
   // Make a linked list of all the Ffs file headers
@@ -432,21 +428,21 @@ FvCheck (
     //
     // Searching for files starts on an 8 byte aligned boundary after the end of the Extended Header if it exists.
     //
-    FwVolExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *) (FvDevice->CachedFv + FwVolHeader->ExtHeaderOffset);
-    FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FwVolExtHeader + FwVolExtHeader->ExtHeaderSize);
+    FwVolExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *)(FvDevice->CachedFv + FwVolHeader->ExtHeaderOffset);
+    FfsHeader      = (EFI_FFS_FILE_HEADER *)((UINT8 *)FwVolExtHeader + FwVolExtHeader->ExtHeaderSize);
   } else {
-    FfsHeader = (EFI_FFS_FILE_HEADER *) (FvDevice->CachedFv + FwVolHeader->HeaderLength);
+    FfsHeader = (EFI_FFS_FILE_HEADER *)(FvDevice->CachedFv + FwVolHeader->HeaderLength);
   }
-  FfsHeader = (EFI_FFS_FILE_HEADER *) ALIGN_POINTER (FfsHeader, 8);
-  TopFvAddress = FvDevice->EndOfCachedFv;
-  while (((UINTN) FfsHeader >= (UINTN) FvDevice->CachedFv) && ((UINTN) FfsHeader <= (UINTN) ((UINTN) TopFvAddress - sizeof (EFI_FFS_FILE_HEADER)))) {
 
+  FfsHeader    = (EFI_FFS_FILE_HEADER *)ALIGN_POINTER (FfsHeader, 8);
+  TopFvAddress = FvDevice->EndOfCachedFv;
+  while (((UINTN)FfsHeader >= (UINTN)FvDevice->CachedFv) && ((UINTN)FfsHeader <= (UINTN)((UINTN)TopFvAddress - sizeof (EFI_FFS_FILE_HEADER)))) {
     if (FileCached) {
       CoreFreePool (CacheFfsHeader);
       FileCached = FALSE;
     }
 
-    TestLength = TopFvAddress - ((UINT8 *) FfsHeader);
+    TestLength = TopFvAddress - ((UINT8 *)FfsHeader);
     if (TestLength > sizeof (EFI_FFS_FILE_HEADER)) {
       TestLength = sizeof (EFI_FFS_FILE_HEADER);
     }
@@ -460,15 +456,18 @@ FvCheck (
 
     if (!IsValidFfsHeader (FvDevice->ErasePolarity, FfsHeader, &FileState)) {
       if ((FileState == EFI_FILE_HEADER_INVALID) ||
-          (FileState == EFI_FILE_HEADER_CONSTRUCTION)) {
+          (FileState == EFI_FILE_HEADER_CONSTRUCTION))
+      {
         if (IS_FFS_FILE2 (FfsHeader)) {
           if (!FvDevice->IsFfs3Fv) {
-            DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsHeader->Name));
+            DEBUG ((DEBUG_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &FfsHeader->Name));
           }
-          FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + sizeof (EFI_FFS_FILE_HEADER2));
+
+          FfsHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsHeader + sizeof (EFI_FFS_FILE_HEADER2));
         } else {
-          FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + sizeof (EFI_FFS_FILE_HEADER));
+          FfsHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsHeader + sizeof (EFI_FFS_FILE_HEADER));
         }
+
         continue;
       } else {
         //
@@ -487,12 +486,13 @@ FvCheck (
         // Here is to cache FFS file to memory buffer for following checksum calculating.
         // And then, the cached file buffer can be also used for FvReadFile.
         //
-        WholeFileSize = IS_FFS_FILE2 (CacheFfsHeader) ? FFS_FILE2_SIZE (CacheFfsHeader): FFS_FILE_SIZE (CacheFfsHeader);
+        WholeFileSize  = IS_FFS_FILE2 (CacheFfsHeader) ? FFS_FILE2_SIZE (CacheFfsHeader) : FFS_FILE_SIZE (CacheFfsHeader);
         CacheFfsHeader = AllocateCopyPool (WholeFileSize, CacheFfsHeader);
         if (CacheFfsHeader == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
           goto Done;
         }
+
         FileCached = TRUE;
       }
     }
@@ -508,12 +508,12 @@ FvCheck (
     if (IS_FFS_FILE2 (CacheFfsHeader)) {
       ASSERT (FFS_FILE2_SIZE (CacheFfsHeader) > 0x00FFFFFF);
       if (!FvDevice->IsFfs3Fv) {
-        DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &CacheFfsHeader->Name));
-        FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (CacheFfsHeader));
+        DEBUG ((DEBUG_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &CacheFfsHeader->Name));
+        FfsHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsHeader + FFS_FILE2_SIZE (CacheFfsHeader));
         //
         // Adjust pointer to the next 8-byte aligned boundary.
         //
-        FfsHeader = (EFI_FFS_FILE_HEADER *) (((UINTN) FfsHeader + 7) & ~0x07);
+        FfsHeader = (EFI_FFS_FILE_HEADER *)(((UINTN)FfsHeader + 7) & ~0x07);
         continue;
       }
     }
@@ -533,23 +533,22 @@ FvCheck (
         goto Done;
       }
 
-      FfsFileEntry->FfsHeader = CacheFfsHeader;
+      FfsFileEntry->FfsHeader  = CacheFfsHeader;
       FfsFileEntry->FileCached = FileCached;
-      FileCached = FALSE;
+      FileCached               = FALSE;
       InsertTailList (&FvDevice->FfsFileListHeader, &FfsFileEntry->Link);
     }
 
     if (IS_FFS_FILE2 (CacheFfsHeader)) {
-      FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (CacheFfsHeader));
+      FfsHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsHeader + FFS_FILE2_SIZE (CacheFfsHeader));
     } else {
-      FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE_SIZE (CacheFfsHeader));
+      FfsHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsHeader + FFS_FILE_SIZE (CacheFfsHeader));
     }
 
     //
     // Adjust pointer to the next 8-byte aligned boundary.
     //
     FfsHeader = (EFI_FFS_FILE_HEADER *)(((UINTN)FfsHeader + 7) & ~0x07);
-
   }
 
 Done:
@@ -558,13 +557,12 @@ Done:
       CoreFreePool (CacheFfsHeader);
       FileCached = FALSE;
     }
+
     FreeFvDeviceResource (FvDevice);
   }
 
   return Status;
 }
-
-
 
 /**
   This notification function is invoked when an instance of the
@@ -579,32 +577,33 @@ Done:
 VOID
 EFIAPI
 NotifyFwVolBlock (
-  IN  EFI_EVENT Event,
-  IN  VOID      *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
-  EFI_HANDLE                            Handle;
-  EFI_STATUS                            Status;
-  UINTN                                 BufferSize;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL    *Fvb;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL         *Fv;
-  FV_DEVICE                             *FvDevice;
-  EFI_FIRMWARE_VOLUME_HEADER            *FwVolHeader;
+  EFI_HANDLE                          Handle;
+  EFI_STATUS                          Status;
+  UINTN                               BufferSize;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *Fvb;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL       *Fv;
+  FV_DEVICE                           *FvDevice;
+  EFI_FIRMWARE_VOLUME_HEADER          *FwVolHeader;
+
   //
   // Examine all new handles
   //
-  for (;;) {
+  for ( ; ;) {
     //
     // Get the next handle
     //
     BufferSize = sizeof (Handle);
-    Status = CoreLocateHandle (
-              ByRegisterNotify,
-              NULL,
-              gEfiFwVolBlockNotifyReg,
-              &BufferSize,
-              &Handle
-              );
+    Status     = CoreLocateHandle (
+                   ByRegisterNotify,
+                   NULL,
+                   gEfiFwVolBlockNotifyReg,
+                   &BufferSize,
+                   &Handle
+                   );
 
     //
     // If not found, we're done
@@ -631,6 +630,7 @@ NotifyFwVolBlock (
     if (EFI_ERROR (Status)) {
       continue;
     }
+
     ASSERT (FwVolHeader != NULL);
 
     if (!VerifyFvHeaderChecksum (FwVolHeader)) {
@@ -653,7 +653,6 @@ NotifyFwVolBlock (
         //
         FvDevice->Fvb = Fvb;
       }
-
     } else {
       //
       // No FwVol protocol on the handle so create a new one
@@ -678,11 +677,11 @@ NotifyFwVolBlock (
         // Install an New FV protocol on the existing handle
         //
         Status = CoreInstallProtocolInterface (
-                    &Handle,
-                    &gEfiFirmwareVolume2ProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &FvDevice->Fv
-                    );
+                   &Handle,
+                   &gEfiFirmwareVolume2ProtocolGuid,
+                   EFI_NATIVE_INTERFACE,
+                   &FvDevice->Fv
+                   );
         ASSERT_EFI_ERROR (Status);
       } else {
         //
@@ -695,8 +694,6 @@ NotifyFwVolBlock (
 
   return;
 }
-
-
 
 /**
   This routine is the driver initialization entry point.  It registers
@@ -712,8 +709,8 @@ NotifyFwVolBlock (
 EFI_STATUS
 EFIAPI
 FwVolDriverInit (
-  IN EFI_HANDLE                   ImageHandle,
-  IN EFI_SYSTEM_TABLE             *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   gEfiFwVolBlockEvent = EfiCreateProtocolNotifyEvent (
@@ -725,5 +722,3 @@ FwVolDriverInit (
                           );
   return EFI_SUCCESS;
 }
-
-

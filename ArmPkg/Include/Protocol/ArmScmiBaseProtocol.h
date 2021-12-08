@@ -17,24 +17,24 @@
 #define BASE_PROTOCOL_VERSION_V1  0x10000
 #define BASE_PROTOCOL_VERSION_V2  0x20000
 
-#define NUM_PROTOCOL_MASK      0xFFU
-#define NUM_AGENT_MASK         0xFFU
+#define NUM_PROTOCOL_MASK  0xFFU
+#define NUM_AGENT_MASK     0xFFU
 
-#define NUM_AGENT_SHIFT        0x8
+#define NUM_AGENT_SHIFT  0x8
 
 /** Returns total number of protocols that are
   implemented (excluding the Base protocol)
 */
-#define SCMI_TOTAL_PROTOCOLS(Attr) (Attr & NUM_PROTOCOL_MASK)
+#define SCMI_TOTAL_PROTOCOLS(Attr)  (Attr & NUM_PROTOCOL_MASK)
 
 // Returns total number of agents in the system.
-#define SCMI_TOTAL_AGENTS(Attr)    ((Attr >> NUM_AGENT_SHIFT) & NUM_AGENT_MASK)
+#define SCMI_TOTAL_AGENTS(Attr)  ((Attr >> NUM_AGENT_SHIFT) & NUM_AGENT_MASK)
 
 #define ARM_SCMI_BASE_PROTOCOL_GUID  { \
   0xd7e5abe9, 0x33ab, 0x418e, {0x9f, 0x91, 0x72, 0xda, 0xe2, 0xba, 0x8e, 0x2f} \
   }
 
-extern EFI_GUID gArmScmiBaseProtocolGuid;
+extern EFI_GUID  gArmScmiBaseProtocolGuid;
 
 typedef struct _SCMI_BASE_PROTOCOL SCMI_BASE_PROTOCOL;
 
@@ -50,7 +50,7 @@ typedef struct _SCMI_BASE_PROTOCOL SCMI_BASE_PROTOCOL;
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_BASE_GET_VERSION) (
+(EFIAPI *SCMI_BASE_GET_VERSION)(
   IN  SCMI_BASE_PROTOCOL  *This,
   OUT UINT32              *Version
   );
@@ -67,7 +67,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_BASE_GET_TOTAL_PROTOCOLS) (
+(EFIAPI *SCMI_BASE_GET_TOTAL_PROTOCOLS)(
   IN  SCMI_BASE_PROTOCOL  *This,
   OUT UINT32              *TotalProtocols
   );
@@ -85,7 +85,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_BASE_DISCOVER_VENDOR) (
+(EFIAPI *SCMI_BASE_DISCOVER_VENDOR)(
   IN  SCMI_BASE_PROTOCOL  *This,
   OUT UINT8               VendorIdentifier[SCMI_MAX_STR_LEN]
   );
@@ -103,7 +103,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_BASE_DISCOVER_SUB_VENDOR) (
+(EFIAPI *SCMI_BASE_DISCOVER_SUB_VENDOR)(
   IN  SCMI_BASE_PROTOCOL  *This,
   OUT UINT8               VendorIdentifier[SCMI_MAX_STR_LEN]
   );
@@ -120,7 +120,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION) (
+(EFIAPI *SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION)(
   IN  SCMI_BASE_PROTOCOL  *This,
   OUT UINT32              *ImplementationVersion
   );
@@ -141,7 +141,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *SCMI_BASE_DISCOVER_LIST_PROTOCOLS) (
+(EFIAPI *SCMI_BASE_DISCOVER_LIST_PROTOCOLS)(
   IN     SCMI_BASE_PROTOCOL  *This,
   IN OUT UINT32              *ProtocolListSize,
   OUT    UINT8               *ProtocolList
@@ -149,20 +149,20 @@ EFI_STATUS
 
 // Base protocol.
 typedef struct _SCMI_BASE_PROTOCOL {
-  SCMI_BASE_GET_VERSION                      GetVersion;
-  SCMI_BASE_GET_TOTAL_PROTOCOLS              GetTotalProtocols;
-  SCMI_BASE_DISCOVER_VENDOR                  DiscoverVendor;
-  SCMI_BASE_DISCOVER_SUB_VENDOR              DiscoverSubVendor;
-  SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION  DiscoverImplementationVersion;
-  SCMI_BASE_DISCOVER_LIST_PROTOCOLS          DiscoverListProtocols;
+  SCMI_BASE_GET_VERSION                        GetVersion;
+  SCMI_BASE_GET_TOTAL_PROTOCOLS                GetTotalProtocols;
+  SCMI_BASE_DISCOVER_VENDOR                    DiscoverVendor;
+  SCMI_BASE_DISCOVER_SUB_VENDOR                DiscoverSubVendor;
+  SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION    DiscoverImplementationVersion;
+  SCMI_BASE_DISCOVER_LIST_PROTOCOLS            DiscoverListProtocols;
 } SCMI_BASE_PROTOCOL;
 
 // SCMI Message IDs for Base protocol.
 typedef enum {
-  ScmiMessageIdBaseDiscoverVendor                 = 0x3,
-  ScmiMessageIdBaseDiscoverSubVendor              = 0x4,
-  ScmiMessageIdBaseDiscoverImplementationVersion  = 0x5,
-  ScmiMessageIdBaseDiscoverListProtocols          = 0x6
+  ScmiMessageIdBaseDiscoverVendor                = 0x3,
+  ScmiMessageIdBaseDiscoverSubVendor             = 0x4,
+  ScmiMessageIdBaseDiscoverImplementationVersion = 0x5,
+  ScmiMessageIdBaseDiscoverListProtocols         = 0x6
 } SCMI_MESSAGE_ID_BASE;
 
 #endif /* ARM_SCMI_BASE_PROTOCOL_H_ */

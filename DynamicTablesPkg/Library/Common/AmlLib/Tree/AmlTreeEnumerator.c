@@ -33,25 +33,26 @@
 BOOLEAN
 EFIAPI
 AmlEnumTree (
-  IN      AML_NODE_HEADER               * Node,
-  IN      EDKII_AML_TREE_ENUM_CALLBACK    CallBack,
-  IN  OUT VOID                          * Context,  OPTIONAL
-      OUT EFI_STATUS                    * Status    OPTIONAL
+  IN      AML_NODE_HEADER               *Node,
+  IN      EDKII_AML_TREE_ENUM_CALLBACK  CallBack,
+  IN  OUT VOID                          *Context   OPTIONAL,
+  OUT EFI_STATUS                        *Status    OPTIONAL
   )
 {
-  BOOLEAN               ContinueEnum;
+  BOOLEAN  ContinueEnum;
 
-  EAML_PARSE_INDEX      Index;
-  EAML_PARSE_INDEX      MaxIndex;
+  EAML_PARSE_INDEX  Index;
+  EAML_PARSE_INDEX  MaxIndex;
 
-  LIST_ENTRY          * StartLink;
-  LIST_ENTRY          * CurrentLink;
+  LIST_ENTRY  *StartLink;
+  LIST_ENTRY  *CurrentLink;
 
   if (!IS_AML_NODE_VALID (Node) || (CallBack == NULL)) {
     ASSERT (0);
     if (Status != NULL) {
       *Status = EFI_INVALID_PARAMETER;
     }
+
     return FALSE;
   }
 
@@ -62,11 +63,11 @@ AmlEnumTree (
 
   // Iterate through the fixed list of arguments.
   MaxIndex = (EAML_PARSE_INDEX)AmlGetFixedArgumentCount (
-                                 (AML_OBJECT_NODE*)Node
+                                 (AML_OBJECT_NODE *)Node
                                  );
   for (Index = EAmlParseIndexTerm0; Index < MaxIndex; Index++) {
     ContinueEnum = AmlEnumTree (
-                     AmlGetFixedArgument ((AML_OBJECT_NODE*)Node, Index),
+                     AmlGetFixedArgument ((AML_OBJECT_NODE *)Node, Index),
                      CallBack,
                      Context,
                      Status
@@ -82,7 +83,7 @@ AmlEnumTree (
     CurrentLink = StartLink->ForwardLink;
     while (CurrentLink != StartLink) {
       ContinueEnum = AmlEnumTree (
-                       (AML_NODE_HEADER*)CurrentLink,
+                       (AML_NODE_HEADER *)CurrentLink,
                        CallBack,
                        Context,
                        Status
@@ -90,6 +91,7 @@ AmlEnumTree (
       if (ContinueEnum == FALSE) {
         return ContinueEnum;
       }
+
       CurrentLink = CurrentLink->ForwardLink;
     } // while
   }

@@ -41,5 +41,4 @@ CpuFlushTlb (
   VOID
   );
 
-
 #endif

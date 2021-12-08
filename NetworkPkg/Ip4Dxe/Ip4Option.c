@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Ip4Impl.h"
 
-
 /**
   Validate the IP4 option format for both the packets we received
   and will transmit.
@@ -24,74 +23,72 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 BOOLEAN
 Ip4OptionIsValid (
-  IN UINT8                  *Option,
-  IN UINT32                 OptionLen,
-  IN BOOLEAN                Rcvd
+  IN UINT8    *Option,
+  IN UINT32   OptionLen,
+  IN BOOLEAN  Rcvd
   )
 {
-  UINT32                    Cur;
-  UINT32                    Len;
-  UINT32                    Point;
+  UINT32  Cur;
+  UINT32  Len;
+  UINT32  Point;
 
-  Cur       = 0;
+  Cur = 0;
 
   while (Cur < OptionLen) {
     switch (Option[Cur]) {
-    case IP4_OPTION_NOP:
-      Cur++;
-      break;
+      case IP4_OPTION_NOP:
+        Cur++;
+        break;
 
-    case IP4_OPTION_EOP:
-      Cur = OptionLen;
-      break;
+      case IP4_OPTION_EOP:
+        Cur = OptionLen;
+        break;
 
-    case IP4_OPTION_LSRR:
-    case IP4_OPTION_SSRR:
-    case IP4_OPTION_RR:
-      Len   = Option[Cur + 1];
-      Point = Option[Cur + 2];
+      case IP4_OPTION_LSRR:
+      case IP4_OPTION_SSRR:
+      case IP4_OPTION_RR:
+        Len   = Option[Cur + 1];
+        Point = Option[Cur + 2];
 
-      //
-      // SRR/RR options are formatted as |Type|Len|Point|Ip1|Ip2|...
-      //
-      if ((OptionLen - Cur < Len) || (Len < 3) || ((Len - 3) % 4 != 0)) {
-        return FALSE;
-      }
+        //
+        // SRR/RR options are formatted as |Type|Len|Point|Ip1|Ip2|...
+        //
+        if ((OptionLen - Cur < Len) || (Len < 3) || ((Len - 3) % 4 != 0)) {
+          return FALSE;
+        }
 
-      if ((Point > Len + 1) || (Point % 4 != 0)) {
-        return FALSE;
-      }
+        if ((Point > Len + 1) || (Point % 4 != 0)) {
+          return FALSE;
+        }
 
-      //
-      // The Point must point pass the last entry if the packet is received
-      // by us. It must point to 4 if the packet is to be sent by us for
-      // source route option.
-      //
-      if ((Option[Cur] != IP4_OPTION_RR) &&
-          ((Rcvd && (Point != Len + 1)) || (!Rcvd && (Point != 4)))) {
+        //
+        // The Point must point pass the last entry if the packet is received
+        // by us. It must point to 4 if the packet is to be sent by us for
+        // source route option.
+        //
+        if ((Option[Cur] != IP4_OPTION_RR) &&
+            ((Rcvd && (Point != Len + 1)) || (!Rcvd && (Point != 4))))
+        {
+          return FALSE;
+        }
 
-        return FALSE;
-      }
+        Cur += Len;
+        break;
 
-      Cur += Len;
-      break;
+      default:
+        Len = Option[Cur + 1];
 
-    default:
-      Len = Option[Cur + 1];
+        if ((OptionLen - Cur < Len) || (Len < 2)) {
+          return FALSE;
+        }
 
-      if ((OptionLen - Cur < Len) || (Len < 2)) {
-        return FALSE;
-      }
-
-      Cur = Cur + Len;
-      break;
+        Cur = Cur + Len;
+        break;
     }
-
   }
 
   return TRUE;
 }
-
 
 /**
   Copy the option from the original option to buffer. It
@@ -112,27 +109,27 @@ Ip4OptionIsValid (
 **/
 EFI_STATUS
 Ip4CopyOption (
-  IN     UINT8              *Option,
-  IN     UINT32             OptionLen,
-  IN     BOOLEAN            FirstFragment,
-  IN OUT UINT8              *Buf,           OPTIONAL
-  IN OUT UINT32             *BufLen
+  IN     UINT8    *Option,
+  IN     UINT32   OptionLen,
+  IN     BOOLEAN  FirstFragment,
+  IN OUT UINT8    *Buf            OPTIONAL,
+  IN OUT UINT32   *BufLen
   )
 {
-  UINT8                     OptBuf[40];
-  UINT32                    Cur;
-  UINT32                    Next;
-  UINT8                     Type;
-  UINT32                    Len;
+  UINT8   OptBuf[40];
+  UINT32  Cur;
+  UINT32  Next;
+  UINT8   Type;
+  UINT32  Len;
 
   ASSERT ((BufLen != NULL) && (OptionLen <= 40));
 
-  Cur   = 0;
-  Next  = 0;
+  Cur  = 0;
+  Next = 0;
 
   while (Cur < OptionLen) {
-    Type  = Option[Cur];
-    Len   = Option[Cur + 1];
+    Type = Option[Cur];
+    Len  = Option[Cur + 1];
 
     if (Type == IP4_OPTION_NOP) {
       //
@@ -142,18 +139,16 @@ Ip4CopyOption (
       OptBuf[Next] = IP4_OPTION_NOP;
       Next++;
       Cur++;
-
     } else if (Type == IP4_OPTION_EOP) {
       //
       // Don't append the EOP to avoid including only a EOP option
       //
       break;
-
     } else {
       //
       // don't copy options that is only valid for the first fragment
       //
-      if (FirstFragment || (Type & IP4_OPTION_COPY_MASK) != 0) {
+      if (FirstFragment || ((Type & IP4_OPTION_COPY_MASK) != 0)) {
         CopyMem (OptBuf + Next, Option + Cur, Len);
         Next += Len;
       }

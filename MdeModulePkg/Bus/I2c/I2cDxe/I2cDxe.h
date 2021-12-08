@@ -30,24 +30,24 @@
 #include <Protocol/I2cBusConfigurationManagement.h>
 #include <Protocol/LoadedImage.h>
 
-#define I2C_DEVICE_SIGNATURE          SIGNATURE_32 ('I', '2', 'C', 'D')
-#define I2C_HOST_SIGNATURE            SIGNATURE_32 ('I', '2', 'C', 'H')
-#define I2C_REQUEST_SIGNATURE         SIGNATURE_32 ('I', '2', 'C', 'R')
+#define I2C_DEVICE_SIGNATURE   SIGNATURE_32 ('I', '2', 'C', 'D')
+#define I2C_HOST_SIGNATURE     SIGNATURE_32 ('I', '2', 'C', 'H')
+#define I2C_REQUEST_SIGNATURE  SIGNATURE_32 ('I', '2', 'C', 'R')
 
 //
 // Synchronize access to the list of requests
 //
-#define TPL_I2C_SYNC                  TPL_NOTIFY
+#define TPL_I2C_SYNC  TPL_NOTIFY
 
 //
 //  I2C bus context
 //
 typedef struct {
-  EFI_I2C_ENUMERATE_PROTOCOL       *I2cEnumerate;
-  EFI_I2C_HOST_PROTOCOL            *I2cHost;
-  EFI_HANDLE                       Controller;
-  EFI_DEVICE_PATH_PROTOCOL         *ParentDevicePath;
-  EFI_HANDLE                       DriverBindingHandle;
+  EFI_I2C_ENUMERATE_PROTOCOL    *I2cEnumerate;
+  EFI_I2C_HOST_PROTOCOL         *I2cHost;
+  EFI_HANDLE                    Controller;
+  EFI_DEVICE_PATH_PROTOCOL      *ParentDevicePath;
+  EFI_HANDLE                    DriverBindingHandle;
 } I2C_BUS_CONTEXT;
 
 //
@@ -57,36 +57,36 @@ typedef struct {
   //
   // Structure identification
   //
-  UINT32                        Signature;
+  UINT32                      Signature;
 
   //
   // I2c device handle
   //
-  EFI_HANDLE                    Handle;
+  EFI_HANDLE                  Handle;
 
   //
   // Upper level API to support the I2C device I/O
   //
-  EFI_I2C_IO_PROTOCOL           I2cIo;
+  EFI_I2C_IO_PROTOCOL         I2cIo;
 
   //
   // Device path for this device
   //
-  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
 
   //
   // Platform specific data for this device
   //
-  CONST EFI_I2C_DEVICE          *I2cDevice;
+  CONST EFI_I2C_DEVICE        *I2cDevice;
 
   //
   // Context for the common I/O support including the
   // lower level API to the host controller.
   //
-  I2C_BUS_CONTEXT               *I2cBusContext;
+  I2C_BUS_CONTEXT             *I2cBusContext;
 } I2C_DEVICE_CONTEXT;
 
-#define I2C_DEVICE_CONTEXT_FROM_PROTOCOL(a) CR (a, I2C_DEVICE_CONTEXT, I2cIo, I2C_DEVICE_SIGNATURE)
+#define I2C_DEVICE_CONTEXT_FROM_PROTOCOL(a)  CR (a, I2C_DEVICE_CONTEXT, I2cIo, I2C_DEVICE_SIGNATURE)
 
 //
 // I2C Request
@@ -95,41 +95,41 @@ typedef struct {
   //
   // Signature
   //
-  UINT32                            Signature;
+  UINT32                    Signature;
 
   //
   // Next request in the pending request list
   //
-  LIST_ENTRY                        Link;
+  LIST_ENTRY                Link;
 
   //
   // I2C bus configuration for the operation
   //
-  UINTN                             I2cBusConfiguration;
+  UINTN                     I2cBusConfiguration;
 
   //
   // I2C slave address for the operation
   //
-  UINTN                             SlaveAddress;
+  UINTN                     SlaveAddress;
 
   //
   // Event to set for asynchronous operations, NULL for
   // synchronous operations
   //
-  EFI_EVENT                         Event;
+  EFI_EVENT                 Event;
 
   //
   // I2C operation description
   //
-  EFI_I2C_REQUEST_PACKET            *RequestPacket;
+  EFI_I2C_REQUEST_PACKET    *RequestPacket;
 
   //
   // Optional buffer to receive the I2C operation completion status
   //
-  EFI_STATUS                        *Status;
+  EFI_STATUS                *Status;
 } I2C_REQUEST;
 
-#define I2C_REQUEST_FROM_ENTRY(a)         CR (a, I2C_REQUEST, Link, I2C_REQUEST_SIGNATURE);
+#define I2C_REQUEST_FROM_ENTRY(a)  CR (a, I2C_REQUEST, Link, I2C_REQUEST_SIGNATURE);
 
 //
 // I2C host context
@@ -138,66 +138,66 @@ typedef struct {
   //
   // Structure identification
   //
-  UINTN Signature;
+  UINTN                                            Signature;
 
   //
   // Current I2C bus configuration
   //
-  UINTN I2cBusConfiguration;
+  UINTN                                            I2cBusConfiguration;
 
   //
   // I2C bus configuration management event
   //
-  EFI_EVENT I2cBusConfigurationEvent;
+  EFI_EVENT                                        I2cBusConfigurationEvent;
 
   //
   // I2C operation completion event
   //
-  EFI_EVENT I2cEvent;
+  EFI_EVENT                                        I2cEvent;
 
   //
   // I2C operation and I2C bus configuration management status
   //
-  EFI_STATUS Status;
+  EFI_STATUS                                       Status;
 
   //
   // I2C bus configuration management operation pending
   //
-  BOOLEAN I2cBusConfigurationManagementPending;
+  BOOLEAN                                          I2cBusConfigurationManagementPending;
 
   //
   // I2C request list maintained by I2C Host
   //
-  LIST_ENTRY                  RequestList;
+  LIST_ENTRY                                       RequestList;
 
   //
   // Upper level API
   //
-  EFI_I2C_HOST_PROTOCOL       I2cHost;
+  EFI_I2C_HOST_PROTOCOL                            I2cHost;
 
   //
   // I2C bus configuration management protocol
   //
-  EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL *I2cBusConfigurationManagement;
+  EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL    *I2cBusConfigurationManagement;
 
   //
   // Lower level API for I2C master (controller)
   //
-  EFI_I2C_MASTER_PROTOCOL *I2cMaster;
+  EFI_I2C_MASTER_PROTOCOL                          *I2cMaster;
 } I2C_HOST_CONTEXT;
 
-#define I2C_HOST_CONTEXT_FROM_PROTOCOL(a) CR (a, I2C_HOST_CONTEXT, I2cHost, I2C_HOST_SIGNATURE)
+#define I2C_HOST_CONTEXT_FROM_PROTOCOL(a)  CR (a, I2C_HOST_CONTEXT, I2cHost, I2C_HOST_SIGNATURE)
 
 //
 // Global Variables
 //
-extern EFI_COMPONENT_NAME_PROTOCOL    gI2cBusComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL   gI2cBusComponentName2;
-extern EFI_DRIVER_BINDING_PROTOCOL    gI2cBusDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gI2cBusComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gI2cBusComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gI2cBusDriverBinding;
 
-extern EFI_COMPONENT_NAME_PROTOCOL    gI2cHostComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL   gI2cHostComponentName2;
-extern EFI_DRIVER_BINDING_PROTOCOL    gI2cHostDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gI2cHostComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gI2cHostComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gI2cHostDriverBinding;
 
 /**
   Start the I2C driver
@@ -217,7 +217,7 @@ extern EFI_DRIVER_BINDING_PROTOCOL    gI2cHostDriverBinding;
 EFI_STATUS
 RegisterI2cDevice (
   IN I2C_BUS_CONTEXT           *I2cBus,
-  IN EFI_HANDLE                 Controller,
+  IN EFI_HANDLE                Controller,
   IN EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath
   );
 
@@ -237,9 +237,9 @@ RegisterI2cDevice (
 **/
 EFI_STATUS
 UnRegisterI2cDevice (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     Controller,
-  IN  EFI_HANDLE                     Handle
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Controller,
+  IN  EFI_HANDLE                   Handle
   );
 
 /**
@@ -256,8 +256,8 @@ UnRegisterI2cDevice (
 **/
 EFI_STATUS
 I2cBusDevicePathAppend (
-  IN I2C_DEVICE_CONTEXT     *I2cDeviceContext,
-  IN BOOLEAN                BuildControllerNode
+  IN I2C_DEVICE_CONTEXT  *I2cDeviceContext,
+  IN BOOLEAN             BuildControllerNode
   );
 
 /**
@@ -514,9 +514,9 @@ I2cBusDriverStop (
 EFI_STATUS
 EFIAPI
 I2cBusComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME2_PROTOCOL *This,
-  IN  CHAR8                        *Language,
-  OUT CHAR16                       **DriverName
+  IN  EFI_COMPONENT_NAME2_PROTOCOL  *This,
+  IN  CHAR8                         *Language,
+  OUT CHAR16                        **DriverName
   );
 
 /**
@@ -590,11 +590,11 @@ I2cBusComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 I2cBusComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME2_PROTOCOL                    *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME2_PROTOCOL  *This,
+  IN  EFI_HANDLE                    ControllerHandle,
+  IN  EFI_HANDLE                    ChildHandle        OPTIONAL,
+  IN  CHAR8                         *Language,
+  OUT CHAR16                        **ControllerName
   );
 
 /**
@@ -610,9 +610,9 @@ I2cBusComponentNameGetControllerName (
 **/
 EFI_STATUS
 EFIAPI
-InitializeI2cBus(
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+InitializeI2cBus (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
 /**
@@ -630,7 +630,7 @@ InitializeI2cBus(
 EFI_STATUS
 EFIAPI
 I2cBusUnload (
-  IN EFI_HANDLE             ImageHandle
+  IN EFI_HANDLE  ImageHandle
   );
 
 /**
@@ -643,7 +643,7 @@ I2cBusUnload (
 **/
 VOID
 ReleaseI2cDeviceContext (
-  IN I2C_DEVICE_CONTEXT          *I2cDeviceContext
+  IN I2C_DEVICE_CONTEXT  *I2cDeviceContext
   );
 
 /**
@@ -657,8 +657,8 @@ ReleaseI2cDeviceContext (
 **/
 EFI_STATUS
 I2cHostRequestComplete (
-  I2C_HOST_CONTEXT *I2cHost,
-  EFI_STATUS       Status
+  I2C_HOST_CONTEXT  *I2cHost,
+  EFI_STATUS        Status
   );
 
 /**
@@ -688,7 +688,7 @@ I2cHostRequestComplete (
 **/
 EFI_STATUS
 I2cHostRequestEnable (
-  I2C_HOST_CONTEXT *I2cHost
+  I2C_HOST_CONTEXT  *I2cHost
   );
 
 /**
@@ -779,9 +779,9 @@ I2cHostDriverSupported (
 EFI_STATUS
 EFIAPI
 I2cHostDriverStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL        *This,
-  IN EFI_HANDLE                         Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL           *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -813,10 +813,10 @@ I2cHostDriverStart (
 EFI_STATUS
 EFIAPI
 I2cHostDriverStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL       *This,
-  IN  EFI_HANDLE                        Controller,
-  IN  UINTN                             NumberOfChildren,
-  IN  EFI_HANDLE                        *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Controller,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
 /**
@@ -861,9 +861,9 @@ I2cHostDriverStop (
 EFI_STATUS
 EFIAPI
 I2cHostComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME2_PROTOCOL *This,
-  IN  CHAR8                        *Language,
-  OUT CHAR16                       **DriverName
+  IN  EFI_COMPONENT_NAME2_PROTOCOL  *This,
+  IN  CHAR8                         *Language,
+  OUT CHAR16                        **DriverName
   );
 
 /**
@@ -937,11 +937,11 @@ I2cHostComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 I2cHostComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME2_PROTOCOL                    *This,
-  IN  EFI_HANDLE                                      ControllerHandle,
-  IN  EFI_HANDLE                                      ChildHandle        OPTIONAL,
-  IN  CHAR8                                           *Language,
-  OUT CHAR16                                          **ControllerName
+  IN  EFI_COMPONENT_NAME2_PROTOCOL  *This,
+  IN  EFI_HANDLE                    ControllerHandle,
+  IN  EFI_HANDLE                    ChildHandle        OPTIONAL,
+  IN  CHAR8                         *Language,
+  OUT CHAR16                        **ControllerName
   );
 
 /**
@@ -956,8 +956,8 @@ I2cHostComponentNameGetControllerName (
 VOID
 EFIAPI
 I2cHostRequestCompleteEvent (
-  IN EFI_EVENT Event,
-  IN VOID *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -972,8 +972,8 @@ I2cHostRequestCompleteEvent (
 VOID
 EFIAPI
 I2cHostI2cBusConfigurationAvailable (
-  IN EFI_EVENT Event,
-  IN VOID *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -1065,9 +1065,9 @@ I2cHostQueueRequest (
 **/
 EFI_STATUS
 EFIAPI
-InitializeI2cHost(
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+InitializeI2cHost (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
 /**
@@ -1085,7 +1085,7 @@ InitializeI2cHost(
 EFI_STATUS
 EFIAPI
 I2cHostUnload (
-  IN EFI_HANDLE             ImageHandle
+  IN EFI_HANDLE  ImageHandle
   );
 
-#endif  //  __I2C_DXE_H__
+#endif //  __I2C_DXE_H__

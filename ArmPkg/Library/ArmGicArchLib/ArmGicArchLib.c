@@ -9,7 +9,7 @@
 #include <Library/ArmLib.h>
 #include <Library/ArmGicLib.h>
 
-STATIC ARM_GIC_ARCH_REVISION        mGicArchRevision;
+STATIC ARM_GIC_ARCH_REVISION  mGicArchRevision;
 
 RETURN_STATUS
 EFIAPI
@@ -17,7 +17,7 @@ ArmGicArchLibInitialize (
   VOID
   )
 {
-  UINT32    IccSre;
+  UINT32  IccSre;
 
   // Ideally we would like to use the GICC IIDR Architecture version here, but
   // this does not seem to be very reliable as the implementation could easily
@@ -38,6 +38,7 @@ ArmGicArchLibInitialize (
       ArmGicV3SetControlSystemRegisterEnable (IccSre | ICC_SRE_EL2_SRE);
       IccSre = ArmGicV3GetControlSystemRegisterEnable ();
     }
+
     if (IccSre & ICC_SRE_EL2_SRE) {
       mGicArchRevision = ARM_GIC_ARCH_REVISION_3;
       goto Done;

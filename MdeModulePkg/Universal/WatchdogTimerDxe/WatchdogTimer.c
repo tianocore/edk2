@@ -37,7 +37,6 @@ EFI_WATCHDOG_TIMER_NOTIFY  mWatchdogTimerNotifyFunction = NULL;
 //
 EFI_EVENT  mWatchdogTimerEvent;
 
-
 /**
   Notification function that is called if the watchdog timer is fired.
 
@@ -56,8 +55,8 @@ EFI_EVENT  mWatchdogTimerEvent;
 VOID
 EFIAPI
 WatchdogTimerDriverExpires (
-  IN EFI_EVENT    Timer,
-  IN VOID         *Context
+  IN EFI_EVENT  Timer,
+  IN VOID       *Context
   )
 {
   REPORT_STATUS_CODE (EFI_ERROR_CODE | EFI_ERROR_MINOR, (EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED));
@@ -69,14 +68,13 @@ WatchdogTimerDriverExpires (
     mWatchdogTimerNotifyFunction (mWatchdogTimerPeriod);
   }
 
-  DEBUG ((EFI_D_ERROR, "Watchdog Timer resetting system\n"));
+  DEBUG ((DEBUG_ERROR, "Watchdog Timer resetting system\n"));
 
   //
   // Reset the platform
   //
   gRT->ResetSystem (EfiResetCold, EFI_TIMEOUT, 0, NULL);
 }
-
 
 /**
   Registers a handler that is to be invoked when the watchdog timer fires.
@@ -112,14 +110,15 @@ WatchdogTimerDriverRegisterHandler (
   // If NotifyFunction is NULL, and a handler was not previously registered,
   // return EFI_INVALID_PARAMETER.
   //
-  if (NotifyFunction == NULL && mWatchdogTimerNotifyFunction == NULL) {
+  if ((NotifyFunction == NULL) && (mWatchdogTimerNotifyFunction == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // If NotifyFunction is not NULL, and a handler is already registered,
   // return EFI_ALREADY_STARTED.
   //
-  if (NotifyFunction != NULL && mWatchdogTimerNotifyFunction != NULL) {
+  if ((NotifyFunction != NULL) && (mWatchdogTimerNotifyFunction != NULL)) {
     return EFI_ALREADY_STARTED;
   }
 

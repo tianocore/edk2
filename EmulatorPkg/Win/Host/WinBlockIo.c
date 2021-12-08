@@ -7,63 +7,60 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "WinHost.h"
 
-#define WIN_NT_BLOCK_IO_PRIVATE_SIGNATURE SIGNATURE_32 ('N', 'T', 'b', 'k')
+#define WIN_NT_BLOCK_IO_PRIVATE_SIGNATURE  SIGNATURE_32 ('N', 'T', 'b', 'k')
 typedef struct {
-  UINTN                       Signature;
+  UINTN                    Signature;
 
-  EMU_IO_THUNK_PROTOCOL       *Thunk;
+  EMU_IO_THUNK_PROTOCOL    *Thunk;
 
-  CHAR16                      *FileName;
-  BOOLEAN                     Removable;
-  BOOLEAN                     Readonly;
+  CHAR16                   *FileName;
+  BOOLEAN                  Removable;
+  BOOLEAN                  Readonly;
 
-  HANDLE                      NtHandle;
-  UINT32                      BlockSize;
+  HANDLE                   NtHandle;
+  UINT32                   BlockSize;
 
-  EFI_BLOCK_IO_MEDIA          *Media;
-  EMU_BLOCK_IO_PROTOCOL       EmuBlockIo;
+  EFI_BLOCK_IO_MEDIA       *Media;
+  EMU_BLOCK_IO_PROTOCOL    EmuBlockIo;
 } WIN_NT_BLOCK_IO_PRIVATE;
 
 #define WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS(a) \
          CR(a, WIN_NT_BLOCK_IO_PRIVATE, EmuBlockIo, WIN_NT_BLOCK_IO_PRIVATE_SIGNATURE)
 
-
 EFI_STATUS
 WinNtBlockIoReset (
-  IN EMU_BLOCK_IO_PROTOCOL    *This,
-  IN BOOLEAN                  ExtendedVerification
+  IN EMU_BLOCK_IO_PROTOCOL  *This,
+  IN BOOLEAN                ExtendedVerification
   );
-
-
-
 
 EFI_STATUS
 SetFilePointer64 (
-  IN  WIN_NT_BLOCK_IO_PRIVATE    *Private,
-  IN  INT64                      DistanceToMove,
-  OUT UINT64                     *NewFilePointer,
-  IN  DWORD                      MoveMethod
-)
+  IN  WIN_NT_BLOCK_IO_PRIVATE  *Private,
+  IN  INT64                    DistanceToMove,
+  OUT UINT64                   *NewFilePointer,
+  IN  DWORD                    MoveMethod
+  )
+
 /*++
 
 This function extends the capability of SetFilePointer to accept 64 bit parameters
 
 --*/
 {
-  EFI_STATUS    Status;
-  LARGE_INTEGER LargeInt;
+  EFI_STATUS     Status;
+  LARGE_INTEGER  LargeInt;
 
   LargeInt.QuadPart = DistanceToMove;
-  Status = EFI_SUCCESS;
+  Status            = EFI_SUCCESS;
 
   LargeInt.LowPart = SetFilePointer (
-    Private->NtHandle,
-    LargeInt.LowPart,
-    &LargeInt.HighPart,
-    MoveMethod
-  );
+                       Private->NtHandle,
+                       LargeInt.LowPart,
+                       &LargeInt.HighPart,
+                       MoveMethod
+                       );
 
-  if (LargeInt.LowPart == -1 && GetLastError () != NO_ERROR) {
+  if ((LargeInt.LowPart == -1) && (GetLastError () != NO_ERROR)) {
     Status = EFI_INVALID_PARAMETER;
   }
 
@@ -74,16 +71,14 @@ This function extends the capability of SetFilePointer to accept 64 bit paramete
   return Status;
 }
 
-
-
 EFI_STATUS
 WinNtBlockIoOpenDevice (
-  IN WIN_NT_BLOCK_IO_PRIVATE   *Private,
-  IN EFI_BLOCK_IO_MEDIA        *Media
+  IN WIN_NT_BLOCK_IO_PRIVATE  *Private,
+  IN EFI_BLOCK_IO_MEDIA       *Media
   )
 {
-  EFI_STATUS            Status;
-  UINT64                FileSize;
+  EFI_STATUS  Status;
+  UINT64      FileSize;
 
   //
   // If the device is already opened, close it
@@ -96,19 +91,19 @@ WinNtBlockIoOpenDevice (
   // Open the device
   //
   Private->NtHandle = CreateFile (
-    Private->FileName,
-    GENERIC_READ | (Private->Readonly ? 0 : GENERIC_WRITE),
-    FILE_SHARE_READ | FILE_SHARE_WRITE,
-    NULL,
-    OPEN_ALWAYS, // Create if it doesn't exist
-    0,
-    NULL
-  );
+                        Private->FileName,
+                        GENERIC_READ | (Private->Readonly ? 0 : GENERIC_WRITE),
+                        FILE_SHARE_READ | FILE_SHARE_WRITE,
+                        NULL,
+                        OPEN_ALWAYS, // Create if it doesn't exist
+                        0,
+                        NULL
+                        );
 
   if (Private->NtHandle == INVALID_HANDLE_VALUE) {
-    DEBUG ((EFI_D_INFO, "OpenBlock: Could not open %S, %x\n", Private->FileName, GetLastError ()));
+    DEBUG ((DEBUG_INFO, "OpenBlock: Could not open %S, %x\n", Private->FileName, GetLastError ()));
     Media->MediaPresent = FALSE;
-    Status = EFI_NO_MEDIA;
+    Status              = EFI_NO_MEDIA;
     goto Done;
   }
 
@@ -118,14 +113,14 @@ WinNtBlockIoOpenDevice (
   Status = SetFilePointer64 (Private, 0, &FileSize, FILE_END);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "OpenBlock: Could not get filesize of %s\n", Private->FileName));
+    DEBUG ((DEBUG_ERROR, "OpenBlock: Could not get filesize of %s\n", Private->FileName));
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
 
   Media->LastBlock = DivU64x32 (FileSize, (UINT32)Private->BlockSize) - 1;
 
-  DEBUG ((EFI_D_INIT, "OpenBlock: opened %S\n", Private->FileName));
+  DEBUG ((DEBUG_INIT, "OpenBlock: opened %S\n", Private->FileName));
   Status = EFI_SUCCESS;
 
 Done:
@@ -138,15 +133,14 @@ Done:
   return Status;
 }
 
-
 EFI_STATUS
 EFIAPI
 WinNtBlockIoCreateMapping (
-  IN     EMU_BLOCK_IO_PROTOCOL    *This,
-  IN     EFI_BLOCK_IO_MEDIA       *Media
+  IN     EMU_BLOCK_IO_PROTOCOL  *This,
+  IN     EFI_BLOCK_IO_MEDIA     *Media
   )
 {
-  WIN_NT_BLOCK_IO_PRIVATE    *Private;
+  WIN_NT_BLOCK_IO_PRIVATE  *Private;
 
   Private = WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -164,7 +158,6 @@ WinNtBlockIoCreateMapping (
   Media->LowestAlignedLba              = 0;
   Media->LogicalBlocksPerPhysicalBlock = 0;
 
-
   // EFI_BLOCK_IO_PROTOCOL_REVISION3
   Media->OptimalTransferLengthGranularity = 0;
 
@@ -175,12 +168,11 @@ WinNtBlockIoCreateMapping (
   return WinNtBlockIoOpenDevice (Private, Media);
 }
 
-
-
 EFI_STATUS
 WinNtBlockIoError (
-  IN WIN_NT_BLOCK_IO_PRIVATE      *Private
-)
+  IN WIN_NT_BLOCK_IO_PRIVATE  *Private
+  )
+
 /*++
 
 Routine Description:
@@ -197,49 +189,47 @@ Returns:
 
 --*/
 {
-  EFI_BLOCK_IO_MEDIA    *Media;
-  EFI_STATUS            Status;
+  EFI_BLOCK_IO_MEDIA  *Media;
+  EFI_STATUS          Status;
 
   Media = Private->Media;
 
   switch (GetLastError ()) {
+    case ERROR_NOT_READY:
+      Media->ReadOnly     = FALSE;
+      Media->MediaPresent = FALSE;
+      Status              = EFI_NO_MEDIA;
+      break;
 
-  case ERROR_NOT_READY:
-    Media->ReadOnly = FALSE;
-    Media->MediaPresent = FALSE;
-    Status = EFI_NO_MEDIA;
-    break;
+    case ERROR_WRONG_DISK:
+      Media->ReadOnly     = FALSE;
+      Media->MediaPresent = TRUE;
+      Media->MediaId++;
+      Status = EFI_MEDIA_CHANGED;
+      break;
 
-  case ERROR_WRONG_DISK:
-    Media->ReadOnly = FALSE;
-    Media->MediaPresent = TRUE;
-    Media->MediaId++;
-    Status = EFI_MEDIA_CHANGED;
-    break;
+    case ERROR_WRITE_PROTECT:
+      Media->ReadOnly = TRUE;
+      Status          = EFI_WRITE_PROTECTED;
+      break;
 
-  case ERROR_WRITE_PROTECT:
-    Media->ReadOnly = TRUE;
-    Status = EFI_WRITE_PROTECTED;
-    break;
-
-  default:
-    Status = EFI_DEVICE_ERROR;
-    break;
+    default:
+      Status = EFI_DEVICE_ERROR;
+      break;
   }
 
-  if (Status == EFI_NO_MEDIA || Status == EFI_MEDIA_CHANGED) {
+  if ((Status == EFI_NO_MEDIA) || (Status == EFI_MEDIA_CHANGED)) {
     WinNtBlockIoReset (&Private->EmuBlockIo, FALSE);
   }
 
   return Status;
 }
 
-
 EFI_STATUS
 WinNtSignalToken (
-  IN OUT EFI_BLOCK_IO2_TOKEN      *Token,
-  IN     EFI_STATUS               Status
-)
+  IN OUT EFI_BLOCK_IO2_TOKEN  *Token,
+  IN     EFI_STATUS           Status
+  )
 {
   if (Token != NULL) {
     if (Token->Event != NULL) {
@@ -248,6 +238,7 @@ WinNtSignalToken (
       return EFI_SUCCESS;
     }
   }
+
   return Status;
 }
 
@@ -291,15 +282,15 @@ WinNtBlockIoReadBlocks (
   IN     EFI_LBA                Lba,
   IN OUT EFI_BLOCK_IO2_TOKEN    *Token,
   IN     UINTN                  BufferSize,
-     OUT VOID                   *Buffer
+  OUT VOID                      *Buffer
   )
 {
-  WIN_NT_BLOCK_IO_PRIVATE *Private;
-  BOOL                    Flag;
-  EFI_STATUS              Status;
-  DWORD                   BytesRead;
-  UINT64                  DistanceToMove;
-  UINT64                  DistanceMoved;
+  WIN_NT_BLOCK_IO_PRIVATE  *Private;
+  BOOL                     Flag;
+  EFI_STATUS               Status;
+  DWORD                    BytesRead;
+  UINT64                   DistanceToMove;
+  UINT64                   DistanceMoved;
 
   Private = WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -307,10 +298,10 @@ WinNtBlockIoReadBlocks (
   // Seek to proper position
   //
   DistanceToMove = MultU64x32 (Lba, (UINT32)Private->BlockSize);
-  Status = SetFilePointer64 (Private, DistanceToMove, &DistanceMoved, FILE_BEGIN);
+  Status         = SetFilePointer64 (Private, DistanceToMove, &DistanceMoved, FILE_BEGIN);
 
   if (EFI_ERROR (Status) || (DistanceToMove != DistanceMoved)) {
-    DEBUG ((EFI_D_INIT, "ReadBlocks: SetFilePointer failed\n"));
+    DEBUG ((DEBUG_INIT, "ReadBlocks: SetFilePointer failed\n"));
     return WinNtBlockIoError (Private->Media);
   }
 
@@ -322,7 +313,6 @@ WinNtBlockIoReadBlocks (
   Private->Media->MediaPresent = TRUE;
   return WinNtSignalToken (Token, EFI_SUCCESS);
 }
-
 
 /**
   Write BufferSize bytes from Lba into Buffer.
@@ -365,12 +355,12 @@ WinNtBlockIoWriteBlocks (
   IN     VOID                   *Buffer
   )
 {
-  WIN_NT_BLOCK_IO_PRIVATE *Private;
-  UINTN                   BytesWritten;
-  BOOL                    Success;
-  EFI_STATUS              Status;
-  UINT64                  DistanceToMove;
-  UINT64                  DistanceMoved;
+  WIN_NT_BLOCK_IO_PRIVATE  *Private;
+  UINTN                    BytesWritten;
+  BOOL                     Success;
+  EFI_STATUS               Status;
+  UINT64                   DistanceToMove;
+  UINT64                   DistanceMoved;
 
   Private = WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -378,10 +368,10 @@ WinNtBlockIoWriteBlocks (
   // Seek to proper position
   //
   DistanceToMove = MultU64x32 (Lba, (UINT32)Private->BlockSize);
-  Status = SetFilePointer64 (Private, DistanceToMove, &DistanceMoved, FILE_BEGIN);
+  Status         = SetFilePointer64 (Private, DistanceToMove, &DistanceMoved, FILE_BEGIN);
 
   if (EFI_ERROR (Status) || (DistanceToMove != DistanceMoved)) {
-    DEBUG ((EFI_D_INIT, "WriteBlocks: SetFilePointer failed\n"));
+    DEBUG ((DEBUG_INIT, "WriteBlocks: SetFilePointer failed\n"));
     return WinNtBlockIoError (Private->Media);
   }
 
@@ -422,13 +412,12 @@ WinNtBlockIoWriteBlocks (
 **/
 EFI_STATUS
 WinNtBlockIoFlushBlocks (
-  IN     EMU_BLOCK_IO_PROTOCOL    *This,
-  IN OUT EFI_BLOCK_IO2_TOKEN      *Token
+  IN     EMU_BLOCK_IO_PROTOCOL  *This,
+  IN OUT EFI_BLOCK_IO2_TOKEN    *Token
   )
 {
   return WinNtSignalToken (Token, EFI_SUCCESS);
 }
-
 
 /**
   Reset the block device hardware.
@@ -445,11 +434,11 @@ WinNtBlockIoFlushBlocks (
 **/
 EFI_STATUS
 WinNtBlockIoReset (
-  IN EMU_BLOCK_IO_PROTOCOL    *This,
-  IN BOOLEAN                  ExtendedVerification
+  IN EMU_BLOCK_IO_PROTOCOL  *This,
+  IN BOOLEAN                ExtendedVerification
   )
 {
-  WIN_NT_BLOCK_IO_PRIVATE *Private;
+  WIN_NT_BLOCK_IO_PRIVATE  *Private;
 
   Private = WIN_NT_BLOCK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -461,7 +450,7 @@ WinNtBlockIoReset (
   return EFI_SUCCESS;
 }
 
-EMU_BLOCK_IO_PROTOCOL gEmuBlockIoProtocol = {
+EMU_BLOCK_IO_PROTOCOL  gEmuBlockIoProtocol = {
   WinNtBlockIoReset,
   WinNtBlockIoReadBlocks,
   WinNtBlockIoWriteBlocks,
@@ -472,7 +461,7 @@ EMU_BLOCK_IO_PROTOCOL gEmuBlockIoProtocol = {
 EFI_STATUS
 EFIAPI
 WinNtBlockIoThunkOpen (
-  IN  EMU_IO_THUNK_PROTOCOL   *This
+  IN  EMU_IO_THUNK_PROTOCOL  *This
   )
 {
   WIN_NT_BLOCK_IO_PRIVATE  *Private;
@@ -487,12 +476,13 @@ WinNtBlockIoThunkOpen (
   Private->Thunk     = This;
   CopyMem (&Private->EmuBlockIo, &gEmuBlockIoProtocol, sizeof (gEmuBlockIoProtocol));
   Private->BlockSize = 512;
-  Private->NtHandle = INVALID_HANDLE_VALUE;
+  Private->NtHandle  = INVALID_HANDLE_VALUE;
 
   Private->FileName = AllocateCopyPool (StrSize (This->ConfigString), This->ConfigString);
   if (Private->FileName == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   //
   // Parse ConfigString
   // <ConfigString> := <FileName> ':' [RF][OW] ':' <BlockSize>
@@ -503,12 +493,14 @@ WinNtBlockIoThunkOpen (
     Private->Readonly  = FALSE;
   } else {
     for (*Str++ = L'\0'; *Str != L'\0'; Str++) {
-      if (*Str == 'R' || *Str == 'F') {
-        Private->Removable = (BOOLEAN) (*Str == L'R');
+      if ((*Str == 'R') || (*Str == 'F')) {
+        Private->Removable = (BOOLEAN)(*Str == L'R');
       }
-      if (*Str == 'O' || *Str == 'W') {
-        Private->Readonly = (BOOLEAN) (*Str == L'O');
+
+      if ((*Str == 'O') || (*Str == 'W')) {
+        Private->Readonly = (BOOLEAN)(*Str == L'O');
       }
+
       if (*Str == ':') {
         Private->BlockSize = wcstol (++Str, NULL, 0);
         break;
@@ -521,11 +513,10 @@ WinNtBlockIoThunkOpen (
   return EFI_SUCCESS;
 }
 
-
 EFI_STATUS
 EFIAPI
 WinNtBlockIoThunkClose (
-  IN  EMU_IO_THUNK_PROTOCOL   *This
+  IN  EMU_IO_THUNK_PROTOCOL  *This
   )
 {
   WIN_NT_BLOCK_IO_PRIVATE  *Private;
@@ -536,15 +527,14 @@ WinNtBlockIoThunkClose (
     if (Private->FileName != NULL) {
       FreePool (Private->FileName);
     }
+
     FreePool (Private);
   }
 
   return EFI_SUCCESS;
 }
 
-
-
-EMU_IO_THUNK_PROTOCOL mWinNtBlockIoThunkIo = {
+EMU_IO_THUNK_PROTOCOL  mWinNtBlockIoThunkIo = {
   &gEmuBlockIoProtocolGuid,
   NULL,
   NULL,
@@ -553,5 +543,3 @@ EMU_IO_THUNK_PROTOCOL mWinNtBlockIoThunkIo = {
   WinNtBlockIoThunkClose,
   NULL
 };
-
-

@@ -18,24 +18,28 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 ProtocolIsVariablePolicyEnabled (
-  OUT BOOLEAN *State
+  OUT BOOLEAN  *State
   );
 
-EFI_HANDLE                          mHandle                    = NULL;
-EFI_EVENT                           mVirtualAddressChangeEvent = NULL;
-VOID                                *mFtwRegistration          = NULL;
-VOID                                ***mVarCheckAddressPointer = NULL;
-UINTN                               mVarCheckAddressPointerCount = 0;
-EDKII_VARIABLE_LOCK_PROTOCOL        mVariableLock              = { VariableLockRequestToLock };
-EDKII_VARIABLE_POLICY_PROTOCOL      mVariablePolicyProtocol    = { EDKII_VARIABLE_POLICY_PROTOCOL_REVISION,
-                                                                    DisableVariablePolicy,
-                                                                    ProtocolIsVariablePolicyEnabled,
-                                                                    RegisterVariablePolicy,
-                                                                    DumpVariablePolicy,
-                                                                    LockVariablePolicy };
-EDKII_VAR_CHECK_PROTOCOL            mVarCheck                  = { VarCheckRegisterSetVariableCheckHandler,
-                                                                    VarCheckVariablePropertySet,
-                                                                    VarCheckVariablePropertyGet };
+EFI_HANDLE                      mHandle                      = NULL;
+EFI_EVENT                       mVirtualAddressChangeEvent   = NULL;
+VOID                            *mFtwRegistration            = NULL;
+VOID                            ***mVarCheckAddressPointer   = NULL;
+UINTN                           mVarCheckAddressPointerCount = 0;
+EDKII_VARIABLE_LOCK_PROTOCOL    mVariableLock                = { VariableLockRequestToLock };
+EDKII_VARIABLE_POLICY_PROTOCOL  mVariablePolicyProtocol      = {
+  EDKII_VARIABLE_POLICY_PROTOCOL_REVISION,
+  DisableVariablePolicy,
+  ProtocolIsVariablePolicyEnabled,
+  RegisterVariablePolicy,
+  DumpVariablePolicy,
+  LockVariablePolicy
+};
+EDKII_VAR_CHECK_PROTOCOL        mVarCheck = {
+  VarCheckRegisterSetVariableCheckHandler,
+  VarCheckVariablePropertySet,
+  VarCheckVariablePropertyGet
+};
 
 /**
   Some Secure Boot Policy Variable may update following other variable changes(SecureBoot follows PK change, etc).
@@ -44,7 +48,7 @@ EDKII_VAR_CHECK_PROTOCOL            mVarCheck                  = { VarCheckRegis
 **/
 VOID
 EFIAPI
-RecordSecureBootPolicyVarData(
+RecordSecureBootPolicyVarData (
   VOID
   );
 
@@ -60,7 +64,6 @@ AtRuntime (
 {
   return EfiAtRuntime ();
 }
-
 
 /**
   Initializes a basic mutual exclusion lock.
@@ -80,13 +83,12 @@ AtRuntime (
 **/
 EFI_LOCK *
 InitializeLock (
-  IN OUT EFI_LOCK                         *Lock,
-  IN     EFI_TPL                          Priority
+  IN OUT EFI_LOCK  *Lock,
+  IN     EFI_TPL   Priority
   )
 {
   return EfiInitializeLock (Lock, Priority);
 }
-
 
 /**
   Acquires lock only at boot time. Simply returns at runtime.
@@ -102,14 +104,13 @@ InitializeLock (
 **/
 VOID
 AcquireLockOnlyAtBootTime (
-  IN EFI_LOCK                             *Lock
+  IN EFI_LOCK  *Lock
   )
 {
   if (!AtRuntime ()) {
     EfiAcquireLock (Lock);
   }
 }
-
 
 /**
   Releases lock only at boot time. Simply returns at runtime.
@@ -125,7 +126,7 @@ AcquireLockOnlyAtBootTime (
 **/
 VOID
 ReleaseLockOnlyAtBootTime (
-  IN EFI_LOCK                             *Lock
+  IN EFI_LOCK  *Lock
   )
 {
   if (!AtRuntime ()) {
@@ -145,10 +146,10 @@ ReleaseLockOnlyAtBootTime (
 **/
 EFI_STATUS
 GetFtwProtocol (
-  OUT VOID                                **FtwProtocol
+  OUT VOID  **FtwProtocol
   )
 {
-  EFI_STATUS                              Status;
+  EFI_STATUS  Status;
 
   //
   // Locate Fault Tolerent Write protocol
@@ -185,10 +186,9 @@ GetFvbByHandle (
   return gBS->HandleProtocol (
                 FvBlockHandle,
                 &gEfiFirmwareVolumeBlockProtocolGuid,
-                (VOID **) FvBlock
+                (VOID **)FvBlock
                 );
 }
-
 
 /**
   Function returns an array of handles that support the FVB protocol
@@ -207,11 +207,11 @@ GetFvbByHandle (
 **/
 EFI_STATUS
 GetFvbCountAndBuffer (
-  OUT UINTN                               *NumberHandles,
-  OUT EFI_HANDLE                          **Buffer
+  OUT UINTN       *NumberHandles,
+  OUT EFI_HANDLE  **Buffer
   )
 {
-  EFI_STATUS                              Status;
+  EFI_STATUS  Status;
 
   //
   // Locate all handles of Fvb protocol
@@ -226,7 +226,6 @@ GetFvbCountAndBuffer (
   return Status;
 }
 
-
 /**
   Notification function of EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE.
 
@@ -240,45 +239,45 @@ GetFvbCountAndBuffer (
 VOID
 EFIAPI
 VariableClassAddressChangeEvent (
-  IN EFI_EVENT                            Event,
-  IN VOID                                 *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  UINTN          Index;
+  UINTN  Index;
 
   if (mVariableModuleGlobal->FvbInstance != NULL) {
-    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetBlockSize);
-    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetPhysicalAddress);
-    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetAttributes);
-    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->SetAttributes);
-    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Read);
-    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Write);
-    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->EraseBlocks);
-    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance);
+    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->GetBlockSize);
+    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->GetPhysicalAddress);
+    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->GetAttributes);
+    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->SetAttributes);
+    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->Read);
+    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->Write);
+    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance->EraseBlocks);
+    EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->FvbInstance);
   }
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->PlatformLangCodes);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->LangCodes);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->PlatformLang);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->VariableGlobal.HobVariableBase);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal);
-  EfiConvertPointer (0x0, (VOID **) &mNvVariableCache);
-  EfiConvertPointer (0x0, (VOID **) &mNvFvHeaderCache);
+
+  EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->PlatformLangCodes);
+  EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->LangCodes);
+  EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->PlatformLang);
+  EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase);
+  EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->VariableGlobal.VolatileVariableBase);
+  EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal->VariableGlobal.HobVariableBase);
+  EfiConvertPointer (0x0, (VOID **)&mVariableModuleGlobal);
+  EfiConvertPointer (0x0, (VOID **)&mNvVariableCache);
+  EfiConvertPointer (0x0, (VOID **)&mNvFvHeaderCache);
 
   if (mAuthContextOut.AddressPointer != NULL) {
     for (Index = 0; Index < mAuthContextOut.AddressPointerCount; Index++) {
-      EfiConvertPointer (0x0, (VOID **) mAuthContextOut.AddressPointer[Index]);
+      EfiConvertPointer (0x0, (VOID **)mAuthContextOut.AddressPointer[Index]);
     }
   }
 
   if (mVarCheckAddressPointer != NULL) {
     for (Index = 0; Index < mVarCheckAddressPointerCount; Index++) {
-      EfiConvertPointer (0x0, (VOID **) mVarCheckAddressPointer[Index]);
+      EfiConvertPointer (0x0, (VOID **)mVarCheckAddressPointer[Index]);
     }
   }
 }
-
 
 /**
   Notification function of EVT_GROUP_READY_TO_BOOT event group.
@@ -294,11 +293,11 @@ VariableClassAddressChangeEvent (
 VOID
 EFIAPI
 OnReadyToBoot (
-  EFI_EVENT                               Event,
-  VOID                                    *Context
+  EFI_EVENT  Event,
+  VOID       *Context
   )
 {
-  EFI_STATUS        Status;
+  EFI_STATUS  Status;
 
   if (!mEndOfDxe) {
     MorLockInitAtEndOfDxe ();
@@ -308,13 +307,14 @@ OnReadyToBoot (
     //
     // Set the End Of DXE bit in case the EFI_END_OF_DXE_EVENT_GROUP_GUID event is not signaled.
     //
-    mEndOfDxe = TRUE;
+    mEndOfDxe               = TRUE;
     mVarCheckAddressPointer = VarCheckLibInitializeAtEndOfDxe (&mVarCheckAddressPointerCount);
     //
     // The initialization for variable quota.
     //
     InitializeVariableQuota ();
   }
+
   ReclaimForOS ();
   if (FeaturePcdGet (PcdVariableCollectStatistics)) {
     if (mVariableModuleGlobal->VariableGlobal.AuthFormat) {
@@ -339,17 +339,17 @@ OnReadyToBoot (
 VOID
 EFIAPI
 OnEndOfDxe (
-  EFI_EVENT                               Event,
-  VOID                                    *Context
+  EFI_EVENT  Event,
+  VOID       *Context
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
-  DEBUG ((EFI_D_INFO, "[Variable]END_OF_DXE is signaled\n"));
+  DEBUG ((DEBUG_INFO, "[Variable]END_OF_DXE is signaled\n"));
   MorLockInitAtEndOfDxe ();
   Status = LockVariablePolicy ();
   ASSERT_EFI_ERROR (Status);
-  mEndOfDxe = TRUE;
+  mEndOfDxe               = TRUE;
   mVarCheckAddressPointer = VarCheckLibInitializeAtEndOfDxe (&mVarCheckAddressPointerCount);
   //
   // The initialization for variable quota.
@@ -371,7 +371,7 @@ VariableWriteServiceInitializeDxe (
   VOID
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS  Status;
 
   Status = VariableWriteServiceInitialize ();
   if (EFI_ERROR (Status)) {
@@ -382,7 +382,7 @@ VariableWriteServiceInitializeDxe (
   // Some Secure Boot Policy Var (SecureBoot, etc) updates following other
   // Secure Boot Policy Variable change. Record their initial value.
   //
-  RecordSecureBootPolicyVarData();
+  RecordSecureBootPolicyVarData ();
 
   //
   // Install the Variable Write Architectural protocol.
@@ -409,27 +409,27 @@ VariableWriteServiceInitializeDxe (
 VOID
 EFIAPI
 FtwNotificationEvent (
-  IN  EFI_EVENT                           Event,
-  IN  VOID                                *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
-  EFI_STATUS                              Status;
-  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL      *FvbProtocol;
-  EFI_FAULT_TOLERANT_WRITE_PROTOCOL       *FtwProtocol;
-  EFI_PHYSICAL_ADDRESS                    NvStorageVariableBase;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR         GcdDescriptor;
-  EFI_PHYSICAL_ADDRESS                    BaseAddress;
-  UINT64                                  Length;
-  EFI_PHYSICAL_ADDRESS                    VariableStoreBase;
-  UINT64                                  VariableStoreLength;
-  UINTN                                   FtwMaxBlockSize;
+  EFI_STATUS                          Status;
+  EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvbProtocol;
+  EFI_FAULT_TOLERANT_WRITE_PROTOCOL   *FtwProtocol;
+  EFI_PHYSICAL_ADDRESS                NvStorageVariableBase;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR     GcdDescriptor;
+  EFI_PHYSICAL_ADDRESS                BaseAddress;
+  UINT64                              Length;
+  EFI_PHYSICAL_ADDRESS                VariableStoreBase;
+  UINT64                              VariableStoreLength;
+  UINTN                               FtwMaxBlockSize;
 
   //
   // Ensure FTW protocol is installed.
   //
-  Status = GetFtwProtocol ((VOID**) &FtwProtocol);
+  Status = GetFtwProtocol ((VOID **)&FtwProtocol);
   if (EFI_ERROR (Status)) {
-    return ;
+    return;
   }
 
   Status = FtwProtocol->GetMaxBlockSize (FtwProtocol, &FtwMaxBlockSize);
@@ -438,7 +438,7 @@ FtwNotificationEvent (
   }
 
   NvStorageVariableBase = NV_STORAGE_VARIABLE_BASE;
-  VariableStoreBase = NvStorageVariableBase + mNvFvHeaderCache->HeaderLength;
+  VariableStoreBase     = NvStorageVariableBase + mNvFvHeaderCache->HeaderLength;
 
   //
   // Let NonVolatileVariableBase point to flash variable store base directly after FTW ready.
@@ -450,19 +450,20 @@ FtwNotificationEvent (
   //
   Status = GetFvbInfoByAddress (NvStorageVariableBase, NULL, &FvbProtocol);
   if (EFI_ERROR (Status)) {
-    return ;
+    return;
   }
+
   mVariableModuleGlobal->FvbInstance = FvbProtocol;
 
   //
   // Mark the variable storage region of the FLASH as RUNTIME.
   //
   VariableStoreLength = mNvVariableCache->Size;
-  BaseAddress = VariableStoreBase & (~EFI_PAGE_MASK);
-  Length      = VariableStoreLength + (VariableStoreBase - BaseAddress);
-  Length      = (Length + EFI_PAGE_SIZE - 1) & (~EFI_PAGE_MASK);
+  BaseAddress         = VariableStoreBase & (~EFI_PAGE_MASK);
+  Length              = VariableStoreLength + (VariableStoreBase - BaseAddress);
+  Length              = (Length + EFI_PAGE_SIZE - 1) & (~EFI_PAGE_MASK);
 
-  Status      = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
+  Status = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "Variable driver failed to get flash memory attribute.\n"));
   } else {
@@ -487,9 +488,7 @@ FtwNotificationEvent (
   // Close the notify event to avoid install gEfiVariableWriteArchProtocolGuid again.
   //
   gBS->CloseEvent (Event);
-
 }
-
 
 /**
   This API function returns whether or not the policy engine is
@@ -505,13 +504,12 @@ FtwNotificationEvent (
 EFI_STATUS
 EFIAPI
 ProtocolIsVariablePolicyEnabled (
-  OUT BOOLEAN *State
+  OUT BOOLEAN  *State
   )
 {
   *State = IsVariablePolicyEnabled ();
   return EFI_SUCCESS;
 }
-
 
 /**
   Variable Driver main entry point. The Variable driver places the 4 EFI
@@ -528,13 +526,13 @@ ProtocolIsVariablePolicyEnabled (
 EFI_STATUS
 EFIAPI
 VariableServiceInitialize (
-  IN EFI_HANDLE                         ImageHandle,
-  IN EFI_SYSTEM_TABLE                   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                            Status;
-  EFI_EVENT                             ReadyToBootEvent;
-  EFI_EVENT                             EndOfDxeEvent;
+  EFI_STATUS  Status;
+  EFI_EVENT   ReadyToBootEvent;
+  EFI_EVENT   EndOfDxeEvent;
 
   Status = VariableCommonInitialize ();
   ASSERT_EFI_ERROR (Status);
@@ -629,13 +627,12 @@ VariableServiceInitialize (
   Status = VarCheckRegisterSetVariableCheckHandler (ValidateSetVariable);
   ASSERT_EFI_ERROR (Status);
   Status = gBS->InstallMultipleProtocolInterfaces (
-                    &mHandle,
-                    &gEdkiiVariablePolicyProtocolGuid,
-                    &mVariablePolicyProtocol,
-                    NULL
-                    );
+                  &mHandle,
+                  &gEdkiiVariablePolicyProtocolGuid,
+                  &mVariablePolicyProtocol,
+                  NULL
+                  );
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }
-

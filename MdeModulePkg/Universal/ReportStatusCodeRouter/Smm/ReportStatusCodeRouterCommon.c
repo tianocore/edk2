@@ -9,22 +9,22 @@
 
 #include "ReportStatusCodeRouterCommon.h"
 
-LIST_ENTRY   mCallbackListHead          = INITIALIZE_LIST_HEAD_VARIABLE (mCallbackListHead);
+LIST_ENTRY  mCallbackListHead = INITIALIZE_LIST_HEAD_VARIABLE (mCallbackListHead);
 
 //
 // Report operation nest status.
 // If it is set, then the report operation has nested.
 //
-UINT32       mStatusCodeNestStatus = 0;
+UINT32  mStatusCodeNestStatus = 0;
 
-EFI_MM_STATUS_CODE_PROTOCOL   mSmmStatusCodeProtocol  = {
+EFI_MM_STATUS_CODE_PROTOCOL  mSmmStatusCodeProtocol = {
   ReportDispatcher
 };
 
-EFI_MM_RSC_HANDLER_PROTOCOL   mSmmRscHandlerProtocol = {
+EFI_MM_RSC_HANDLER_PROTOCOL  mSmmRscHandlerProtocol = {
   Register,
   Unregister
-  };
+};
 
 /**
   Register the callback function for ReportStatusCode() notification.
@@ -45,10 +45,10 @@ EFI_MM_RSC_HANDLER_PROTOCOL   mSmmRscHandlerProtocol = {
 EFI_STATUS
 EFIAPI
 Register (
-  IN EFI_MM_RSC_HANDLER_CALLBACK    Callback
+  IN EFI_MM_RSC_HANDLER_CALLBACK  Callback
   )
 {
-  LIST_ENTRY                      *Link;
+  LIST_ENTRY                     *Link;
   MM_RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
 
   if (Callback == NULL) {
@@ -95,8 +95,8 @@ Unregister (
   IN EFI_MM_RSC_HANDLER_CALLBACK  Callback
   )
 {
-  LIST_ENTRY                        *Link;
-  MM_RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
+  LIST_ENTRY                     *Link;
+  MM_RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
 
   if (Callback == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -116,7 +116,6 @@ Unregister (
 
   return EFI_NOT_FOUND;
 }
-
 
 /**
   Provides an interface that a software module can call to report a status code.
@@ -140,16 +139,16 @@ Unregister (
 EFI_STATUS
 EFIAPI
 ReportDispatcher (
-  IN CONST EFI_MM_STATUS_CODE_PROTOCOL   *This,
-  IN EFI_STATUS_CODE_TYPE                CodeType,
-  IN EFI_STATUS_CODE_VALUE               Value,
-  IN UINT32                              Instance,
-  IN CONST EFI_GUID                      *CallerId,
-  IN EFI_STATUS_CODE_DATA                *Data      OPTIONAL
+  IN CONST EFI_MM_STATUS_CODE_PROTOCOL  *This,
+  IN EFI_STATUS_CODE_TYPE               CodeType,
+  IN EFI_STATUS_CODE_VALUE              Value,
+  IN UINT32                             Instance,
+  IN CONST EFI_GUID                     *CallerId,
+  IN EFI_STATUS_CODE_DATA               *Data      OPTIONAL
   )
 {
-  LIST_ENTRY                        *Link;
-  MM_RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
+  LIST_ENTRY                     *Link;
+  MM_RSC_HANDLER_CALLBACK_ENTRY  *CallbackEntry;
 
   //
   // Use atom operation to avoid the reentant of report.
@@ -169,10 +168,9 @@ ReportDispatcher (
                      CodeType,
                      Value,
                      Instance,
-                     (EFI_GUID*)CallerId,
+                     (EFI_GUID *)CallerId,
                      Data
                      );
-
   }
 
   //
@@ -197,10 +195,10 @@ GenericStatusCodeCommonEntry (
   VOID
   )
 {
-  EFI_STATUS     Status;
-  EFI_HANDLE     Handle;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
 
-  Handle     = NULL;
+  Handle = NULL;
 
   //
   // Install SmmRscHandler Protocol

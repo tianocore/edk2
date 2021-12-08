@@ -26,15 +26,15 @@ EFI_LEGACY_8259_PROTOCOL  mInterrupt8259 = {
 //
 // Global for the handle that the Legacy 8259 Protocol is installed
 //
-EFI_HANDLE                m8259Handle             = NULL;
+EFI_HANDLE  m8259Handle = NULL;
 
-UINT8                     mMasterBase             = 0xff;
-UINT8                     mSlaveBase              = 0xff;
-EFI_8259_MODE             mMode                   = Efi8259ProtectedMode;
-UINT16                    mProtectedModeMask      = 0xffff;
-UINT16                    mLegacyModeMask;
-UINT16                    mProtectedModeEdgeLevel = 0x0000;
-UINT16                    mLegacyModeEdgeLevel;
+UINT8          mMasterBase        = 0xff;
+UINT8          mSlaveBase         = 0xff;
+EFI_8259_MODE  mMode              = Efi8259ProtectedMode;
+UINT16         mProtectedModeMask = 0xffff;
+UINT16         mLegacyModeMask;
+UINT16         mProtectedModeEdgeLevel = 0x0000;
+UINT16         mLegacyModeEdgeLevel;
 
 //
 // Worker Functions
@@ -55,10 +55,10 @@ Interrupt8259WriteMask (
   IN UINT16  EdgeLevel
   )
 {
-  IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, (UINT8) Mask);
-  IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, (UINT8) (Mask >> 8));
-  IoWrite8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_MASTER, (UINT8) EdgeLevel);
-  IoWrite8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_SLAVE, (UINT8) (EdgeLevel >> 8));
+  IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, (UINT8)Mask);
+  IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, (UINT8)(Mask >> 8));
+  IoWrite8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_MASTER, (UINT8)EdgeLevel);
+  IoWrite8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_SLAVE, (UINT8)(EdgeLevel >> 8));
 }
 
 /**
@@ -83,14 +83,14 @@ Interrupt8259ReadMask (
     MasterValue = IoRead8 (LEGACY_8259_MASK_REGISTER_MASTER);
     SlaveValue  = IoRead8 (LEGACY_8259_MASK_REGISTER_SLAVE);
 
-    *Mask = (UINT16) (MasterValue | (SlaveValue << 8));
+    *Mask = (UINT16)(MasterValue | (SlaveValue << 8));
   }
 
   if (EdgeLevel != NULL) {
     MasterValue = IoRead8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_MASTER);
     SlaveValue  = IoRead8 (LEGACY_8259_EDGE_LEVEL_TRIGGERED_REGISTER_SLAVE);
 
-    *EdgeLevel = (UINT16) (MasterValue | (SlaveValue << 8));
+    *EdgeLevel = (UINT16)(MasterValue | (SlaveValue << 8));
   }
 }
 
@@ -117,8 +117,8 @@ Interrupt8259SetVectorBase (
   IN UINT8                     SlaveBase
   )
 {
-  UINT8   Mask;
-  EFI_TPL OriginalTpl;
+  UINT8    Mask;
+  EFI_TPL  OriginalTpl;
 
   OriginalTpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
   //
@@ -230,9 +230,9 @@ EFI_STATUS
 EFIAPI
 Interrupt8259GetMask (
   IN  EFI_LEGACY_8259_PROTOCOL  *This,
-  OUT UINT16                    *LegacyMask, OPTIONAL
-  OUT UINT16                    *LegacyEdgeLevel, OPTIONAL
-  OUT UINT16                    *ProtectedMask, OPTIONAL
+  OUT UINT16                    *LegacyMask  OPTIONAL,
+  OUT UINT16                    *LegacyEdgeLevel  OPTIONAL,
+  OUT UINT16                    *ProtectedMask  OPTIONAL,
   OUT UINT16                    *ProtectedEdgeLevel OPTIONAL
   )
 {
@@ -272,9 +272,9 @@ EFI_STATUS
 EFIAPI
 Interrupt8259SetMask (
   IN EFI_LEGACY_8259_PROTOCOL  *This,
-  IN UINT16                    *LegacyMask, OPTIONAL
-  IN UINT16                    *LegacyEdgeLevel, OPTIONAL
-  IN UINT16                    *ProtectedMask, OPTIONAL
+  IN UINT16                    *LegacyMask  OPTIONAL,
+  IN UINT16                    *LegacyEdgeLevel  OPTIONAL,
+  IN UINT16                    *ProtectedMask  OPTIONAL,
   IN UINT16                    *ProtectedEdgeLevel OPTIONAL
   )
 {
@@ -314,7 +314,7 @@ EFIAPI
 Interrupt8259SetMode (
   IN EFI_LEGACY_8259_PROTOCOL  *This,
   IN EFI_8259_MODE             Mode,
-  IN UINT16                    *Mask, OPTIONAL
+  IN UINT16                    *Mask  OPTIONAL,
   IN UINT16                    *EdgeLevel OPTIONAL
   )
 {
@@ -416,9 +416,9 @@ Interrupt8259GetVector (
   }
 
   if (Irq <= Efi8259Irq7) {
-    *Vector = (UINT8) (mMasterBase + Irq);
+    *Vector = (UINT8)(mMasterBase + Irq);
   } else {
-    *Vector = (UINT8) (mSlaveBase + (Irq - Efi8259Irq8));
+    *Vector = (UINT8)(mSlaveBase + (Irq - Efi8259Irq8));
   }
 
   return EFI_SUCCESS;
@@ -447,11 +447,11 @@ Interrupt8259EnableIrq (
     return EFI_INVALID_PARAMETER;
   }
 
-  mProtectedModeMask = (UINT16) (mProtectedModeMask & ~(1 << Irq));
+  mProtectedModeMask = (UINT16)(mProtectedModeMask & ~(1 << Irq));
   if (LevelTriggered) {
-    mProtectedModeEdgeLevel = (UINT16) (mProtectedModeEdgeLevel | (1 << Irq));
+    mProtectedModeEdgeLevel = (UINT16)(mProtectedModeEdgeLevel | (1 << Irq));
   } else {
-    mProtectedModeEdgeLevel = (UINT16) (mProtectedModeEdgeLevel & ~(1 << Irq));
+    mProtectedModeEdgeLevel = (UINT16)(mProtectedModeEdgeLevel & ~(1 << Irq));
   }
 
   Interrupt8259WriteMask (mProtectedModeMask, mProtectedModeEdgeLevel);
@@ -480,9 +480,9 @@ Interrupt8259DisableIrq (
     return EFI_INVALID_PARAMETER;
   }
 
-  mProtectedModeMask = (UINT16) (mProtectedModeMask | (1 << Irq));
+  mProtectedModeMask = (UINT16)(mProtectedModeMask | (1 << Irq));
 
-  mProtectedModeEdgeLevel = (UINT16) (mProtectedModeEdgeLevel & ~(1 << Irq));
+  mProtectedModeEdgeLevel = (UINT16)(mProtectedModeEdgeLevel & ~(1 << Irq));
 
   Interrupt8259WriteMask (mProtectedModeMask, mProtectedModeEdgeLevel);
 
@@ -507,14 +507,14 @@ Interrupt8259GetInterruptLine (
   OUT UINT8                     *Vector
   )
 {
-  EFI_PCI_IO_PROTOCOL *PciIo;
-  UINT8               InterruptLine;
-  EFI_STATUS          Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  UINT8                InterruptLine;
+  EFI_STATUS           Status;
 
   Status = gBS->HandleProtocol (
                   PciHandle,
                   &gEfiPciIoProtocolGuid,
-                  (VOID **) &PciIo
+                  (VOID **)&PciIo
                   );
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
@@ -583,8 +583,8 @@ Install8259 (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS   Status;
-  EFI_8259_IRQ Irq;
+  EFI_STATUS    Status;
+  EFI_8259_IRQ  Irq;
 
   //
   // Initialze mask values from PCDs

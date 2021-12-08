@@ -23,7 +23,7 @@ X2ApicGetConfigData (
   IN UINTN  NumberOfProcessors
   )
 {
-  BOOLEAN                            *ConfigData;
+  BOOLEAN  *ConfigData;
 
   ConfigData = AllocateZeroPool (sizeof (BOOLEAN) * NumberOfProcessors);
   ASSERT (ConfigData != NULL);
@@ -56,10 +56,10 @@ X2ApicSupport (
   IN VOID                              *ConfigData  OPTIONAL
   )
 {
-  BOOLEAN                            *X2ApicEnabled;
+  BOOLEAN  *X2ApicEnabled;
 
   ASSERT (ConfigData != NULL);
-  X2ApicEnabled = (BOOLEAN *) ConfigData;
+  X2ApicEnabled = (BOOLEAN *)ConfigData;
   //
   // *ConfigData indicates if X2APIC enabled on current processor
   //
@@ -90,11 +90,11 @@ EFIAPI
 X2ApicInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData,  OPTIONAL
+  IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   )
 {
-  BOOLEAN                            *X2ApicEnabled;
+  BOOLEAN  *X2ApicEnabled;
 
   //
   // The scope of the MSR_IA32_APIC_BASE is core for below processor type, only program
@@ -107,7 +107,7 @@ X2ApicInitialize (
   }
 
   ASSERT (ConfigData != NULL);
-  X2ApicEnabled = (BOOLEAN *) ConfigData;
+  X2ApicEnabled = (BOOLEAN *)ConfigData;
   if (X2ApicEnabled[ProcessorNumber]) {
     PRE_SMM_CPU_REGISTER_TABLE_WRITE_FIELD (
       ProcessorNumber,
@@ -133,5 +133,6 @@ X2ApicInitialize (
         );
     }
   }
+
   return RETURN_SUCCESS;
 }

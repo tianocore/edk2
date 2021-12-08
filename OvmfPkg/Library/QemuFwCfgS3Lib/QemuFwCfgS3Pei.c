@@ -71,9 +71,9 @@
 RETURN_STATUS
 EFIAPI
 QemuFwCfgS3CallWhenBootScriptReady (
-  IN     FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION *Callback,
-  IN OUT VOID                                 *Context,          OPTIONAL
-  IN     UINTN                                ScratchBufferSize
+  IN     FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION  *Callback,
+  IN OUT VOID                                  *Context           OPTIONAL,
+  IN     UINTN                                 ScratchBufferSize
   )
 {
   return RETURN_UNSUPPORTED;

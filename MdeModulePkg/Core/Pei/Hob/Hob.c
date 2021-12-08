@@ -24,28 +24,28 @@ EFI_STATUS
 EFIAPI
 PeiGetHobList (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
-  IN OUT VOID          **HobList
+  IN OUT VOID                **HobList
   )
 {
-  PEI_CORE_INSTANCE *PrivateData;
+  PEI_CORE_INSTANCE  *PrivateData;
 
   //
   // Only check this parameter in debug mode
   //
 
   DEBUG_CODE_BEGIN ();
-    if (HobList == NULL) {
-      return EFI_INVALID_PARAMETER;
-    }
+  if (HobList == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   DEBUG_CODE_END ();
 
-  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
+  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
 
-  *HobList    = PrivateData->HobList.Raw;
+  *HobList = PrivateData->HobList.Raw;
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Add a new HOB to the HOB List.
@@ -65,19 +65,18 @@ EFI_STATUS
 EFIAPI
 PeiCreateHob (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
-  IN UINT16            Type,
-  IN UINT16            Length,
-  IN OUT VOID          **Hob
+  IN UINT16                  Type,
+  IN UINT16                  Length,
+  IN OUT VOID                **Hob
   )
 {
-  EFI_STATUS                           Status;
-  EFI_HOB_HANDOFF_INFO_TABLE           *HandOffHob;
-  EFI_HOB_GENERIC_HEADER               *HobEnd;
-  EFI_PHYSICAL_ADDRESS                 FreeMemory;
-
+  EFI_STATUS                  Status;
+  EFI_HOB_HANDOFF_INFO_TABLE  *HandOffHob;
+  EFI_HOB_GENERIC_HEADER      *HobEnd;
+  EFI_PHYSICAL_ADDRESS        FreeMemory;
 
   Status = PeiGetHobList (PeiServices, Hob);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -89,31 +88,32 @@ PeiCreateHob (
   if (0x10000 - Length <= 0x7) {
     return EFI_INVALID_PARAMETER;
   }
-  Length     = (UINT16)((Length + 0x7) & (~0x7));
+
+  Length = (UINT16)((Length + 0x7) & (~0x7));
 
   FreeMemory = HandOffHob->EfiFreeMemoryTop -
                HandOffHob->EfiFreeMemoryBottom;
 
   if (FreeMemory < Length) {
-    DEBUG ((EFI_D_ERROR, "PeiCreateHob fail: Length - 0x%08x\n", (UINTN)Length));
-    DEBUG ((EFI_D_ERROR, "  FreeMemoryTop    - 0x%08x\n", (UINTN)HandOffHob->EfiFreeMemoryTop));
-    DEBUG ((EFI_D_ERROR, "  FreeMemoryBottom - 0x%08x\n", (UINTN)HandOffHob->EfiFreeMemoryBottom));
+    DEBUG ((DEBUG_ERROR, "PeiCreateHob fail: Length - 0x%08x\n", (UINTN)Length));
+    DEBUG ((DEBUG_ERROR, "  FreeMemoryTop    - 0x%08x\n", (UINTN)HandOffHob->EfiFreeMemoryTop));
+    DEBUG ((DEBUG_ERROR, "  FreeMemoryBottom - 0x%08x\n", (UINTN)HandOffHob->EfiFreeMemoryBottom));
     return EFI_OUT_OF_RESOURCES;
   }
 
-  *Hob = (VOID*) (UINTN) HandOffHob->EfiEndOfHobList;
-  ((EFI_HOB_GENERIC_HEADER*) *Hob)->HobType   = Type;
-  ((EFI_HOB_GENERIC_HEADER*) *Hob)->HobLength = Length;
-  ((EFI_HOB_GENERIC_HEADER*) *Hob)->Reserved  = 0;
+  *Hob                                        = (VOID *)(UINTN)HandOffHob->EfiEndOfHobList;
+  ((EFI_HOB_GENERIC_HEADER *)*Hob)->HobType   = Type;
+  ((EFI_HOB_GENERIC_HEADER *)*Hob)->HobLength = Length;
+  ((EFI_HOB_GENERIC_HEADER *)*Hob)->Reserved  = 0;
 
-  HobEnd = (EFI_HOB_GENERIC_HEADER*) ((UINTN) *Hob + Length);
-  HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
+  HobEnd                      = (EFI_HOB_GENERIC_HEADER *)((UINTN)*Hob + Length);
+  HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 
   HobEnd->HobType   = EFI_HOB_TYPE_END_OF_HOB_LIST;
-  HobEnd->HobLength = (UINT16) sizeof (EFI_HOB_GENERIC_HEADER);
+  HobEnd->HobLength = (UINT16)sizeof (EFI_HOB_GENERIC_HEADER);
   HobEnd->Reserved  = 0;
   HobEnd++;
-  HandOffHob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
+  HandOffHob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 
   return EFI_SUCCESS;
 }
@@ -130,26 +130,27 @@ PeiCreateHob (
 **/
 EFI_STATUS
 PeiInstallSecHobData (
-  IN CONST EFI_PEI_SERVICES     **PeiServices,
-  IN EFI_HOB_GENERIC_HEADER     *SecHobList
+  IN CONST EFI_PEI_SERVICES  **PeiServices,
+  IN EFI_HOB_GENERIC_HEADER  *SecHobList
   )
 {
-  EFI_STATUS                    Status;
-  EFI_HOB_HANDOFF_INFO_TABLE    *HandOffHob;
-  EFI_PEI_HOB_POINTERS          HobStart;
-  EFI_PEI_HOB_POINTERS          Hob;
-  UINTN                         SecHobListLength;
-  EFI_PHYSICAL_ADDRESS          FreeMemory;
-  EFI_HOB_GENERIC_HEADER        *HobEnd;
+  EFI_STATUS                  Status;
+  EFI_HOB_HANDOFF_INFO_TABLE  *HandOffHob;
+  EFI_PEI_HOB_POINTERS        HobStart;
+  EFI_PEI_HOB_POINTERS        Hob;
+  UINTN                       SecHobListLength;
+  EFI_PHYSICAL_ADDRESS        FreeMemory;
+  EFI_HOB_GENERIC_HEADER      *HobEnd;
 
   HandOffHob = NULL;
-  Status = PeiGetHobList (PeiServices, (VOID **) &HandOffHob);
-  if (EFI_ERROR(Status)) {
+  Status     = PeiGetHobList (PeiServices, (VOID **)&HandOffHob);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
+
   ASSERT (HandOffHob != NULL);
 
-  HobStart.Raw = (UINT8 *) SecHobList;
+  HobStart.Raw = (UINT8 *)SecHobList;
   //
   // The HobList must not contain a EFI_HOB_HANDOFF_INFO_TABLE HOB (PHIT) HOB.
   //
@@ -158,8 +159,10 @@ PeiInstallSecHobData (
   // Calculate the SEC HOB List length,
   // not including the terminated HOB(EFI_HOB_TYPE_END_OF_HOB_LIST).
   //
-  for (Hob.Raw = HobStart.Raw; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob));
-  SecHobListLength = (UINTN) Hob.Raw - (UINTN) HobStart.Raw;
+  for (Hob.Raw = HobStart.Raw; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+  }
+
+  SecHobListLength = (UINTN)Hob.Raw - (UINTN)HobStart.Raw;
   //
   // The length must be 8-bytes aligned.
   //
@@ -175,17 +178,17 @@ PeiInstallSecHobData (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Hob.Raw = (UINT8 *) (UINTN) HandOffHob->EfiEndOfHobList;
+  Hob.Raw = (UINT8 *)(UINTN)HandOffHob->EfiEndOfHobList;
   CopyMem (Hob.Raw, HobStart.Raw, SecHobListLength);
 
-  HobEnd = (EFI_HOB_GENERIC_HEADER *) ((UINTN) Hob.Raw + SecHobListLength);
-  HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
+  HobEnd                      = (EFI_HOB_GENERIC_HEADER *)((UINTN)Hob.Raw + SecHobListLength);
+  HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 
   HobEnd->HobType   = EFI_HOB_TYPE_END_OF_HOB_LIST;
-  HobEnd->HobLength = (UINT16) sizeof (EFI_HOB_GENERIC_HEADER);
+  HobEnd->HobLength = (UINT16)sizeof (EFI_HOB_GENERIC_HEADER);
   HobEnd->Reserved  = 0;
   HobEnd++;
-  HandOffHob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
+  HandOffHob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 
   return EFI_SUCCESS;
 }
@@ -208,27 +211,27 @@ PeiCoreBuildHobHandoffInfoTable (
   IN UINT64                MemoryLength
   )
 {
-  EFI_HOB_HANDOFF_INFO_TABLE   *Hob;
-  EFI_HOB_GENERIC_HEADER       *HobEnd;
+  EFI_HOB_HANDOFF_INFO_TABLE  *Hob;
+  EFI_HOB_GENERIC_HEADER      *HobEnd;
 
-  Hob                      = (VOID *)(UINTN)MemoryBegin;
-  HobEnd                   = (EFI_HOB_GENERIC_HEADER*) (Hob+1);
-  Hob->Header.HobType      = EFI_HOB_TYPE_HANDOFF;
-  Hob->Header.HobLength    = (UINT16) sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
-  Hob->Header.Reserved     = 0;
+  Hob                   = (VOID *)(UINTN)MemoryBegin;
+  HobEnd                = (EFI_HOB_GENERIC_HEADER *)(Hob+1);
+  Hob->Header.HobType   = EFI_HOB_TYPE_HANDOFF;
+  Hob->Header.HobLength = (UINT16)sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
+  Hob->Header.Reserved  = 0;
 
-  HobEnd->HobType          = EFI_HOB_TYPE_END_OF_HOB_LIST;
-  HobEnd->HobLength        = (UINT16) sizeof (EFI_HOB_GENERIC_HEADER);
-  HobEnd->Reserved         = 0;
+  HobEnd->HobType   = EFI_HOB_TYPE_END_OF_HOB_LIST;
+  HobEnd->HobLength = (UINT16)sizeof (EFI_HOB_GENERIC_HEADER);
+  HobEnd->Reserved  = 0;
 
-  Hob->Version             = EFI_HOB_HANDOFF_TABLE_VERSION;
-  Hob->BootMode            = BootMode;
+  Hob->Version  = EFI_HOB_HANDOFF_TABLE_VERSION;
+  Hob->BootMode = BootMode;
 
   Hob->EfiMemoryTop        = MemoryBegin + MemoryLength;
   Hob->EfiMemoryBottom     = MemoryBegin;
   Hob->EfiFreeMemoryTop    = MemoryBegin + MemoryLength;
-  Hob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS) (UINTN) (HobEnd + 1);
-  Hob->EfiEndOfHobList     = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
+  Hob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS)(UINTN)(HobEnd + 1);
+  Hob->EfiEndOfHobList     = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 
   return EFI_SUCCESS;
 }

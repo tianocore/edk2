@@ -28,7 +28,7 @@
 UINTN
 EFIAPI
 MicroSecondDelay (
-  IN      UINTN                     MicroSeconds
+  IN      UINTN  MicroSeconds
   )
 {
   return NanoSecondDelay (MicroSeconds * 1000);
@@ -47,24 +47,24 @@ MicroSecondDelay (
 UINTN
 EFIAPI
 NanoSecondDelay (
-  IN      UINTN                     NanoSeconds
+  IN      UINTN  NanoSeconds
   )
 {
-  EMU_THUNK_PPI           *ThunkPpi;
-  EFI_STATUS              Status;
-  EMU_THUNK_PROTOCOL      *Thunk;
+  EMU_THUNK_PPI       *ThunkPpi;
+  EFI_STATUS          Status;
+  EMU_THUNK_PROTOCOL  *Thunk;
 
   //
   // Locate EmuThunkPpi for
   //
   Status = PeiServicesLocatePpi (
-              &gEmuThunkPpiGuid,
-              0,
-              NULL,
-              (VOID **) &ThunkPpi
+             &gEmuThunkPpiGuid,
+             0,
+             NULL,
+             (VOID **)&ThunkPpi
              );
   if (!EFI_ERROR (Status)) {
-    Thunk  = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
+    Thunk = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
     Thunk->Sleep (NanoSeconds * 100);
     return NanoSeconds;
   }
@@ -89,22 +89,22 @@ GetPerformanceCounter (
   VOID
   )
 {
-  EMU_THUNK_PPI           *ThunkPpi;
-  EFI_STATUS              Status;
-  EMU_THUNK_PROTOCOL      *Thunk;
+  EMU_THUNK_PPI       *ThunkPpi;
+  EFI_STATUS          Status;
+  EMU_THUNK_PROTOCOL  *Thunk;
 
   //
   // Locate EmuThunkPpi for
   //
   Status = PeiServicesLocatePpi (
-              &gEmuThunkPpiGuid,
-              0,
-              NULL,
-              (VOID **) &ThunkPpi
+             &gEmuThunkPpiGuid,
+             0,
+             NULL,
+             (VOID **)&ThunkPpi
              );
   if (!EFI_ERROR (Status)) {
-    Thunk  = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
-    return  Thunk->QueryPerformanceCounter ();
+    Thunk = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
+    return Thunk->QueryPerformanceCounter ();
   }
 
   return 0;
@@ -136,33 +136,34 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  OUT      UINT64                    *StartValue,  OPTIONAL
-  OUT      UINT64                    *EndValue     OPTIONAL
+  OUT      UINT64  *StartValue   OPTIONAL,
+  OUT      UINT64  *EndValue     OPTIONAL
   )
 {
-  EMU_THUNK_PPI           *ThunkPpi;
-  EFI_STATUS              Status;
-  EMU_THUNK_PROTOCOL      *Thunk;
+  EMU_THUNK_PPI       *ThunkPpi;
+  EFI_STATUS          Status;
+  EMU_THUNK_PROTOCOL  *Thunk;
 
   //
   // Locate EmuThunkPpi for
   //
   Status = PeiServicesLocatePpi (
-              &gEmuThunkPpiGuid,
-              0,
-              NULL,
-              (VOID **) &ThunkPpi
+             &gEmuThunkPpiGuid,
+             0,
+             NULL,
+             (VOID **)&ThunkPpi
              );
   if (!EFI_ERROR (Status)) {
     if (StartValue != NULL) {
       *StartValue = 0ULL;
     }
+
     if (EndValue != NULL) {
       *EndValue = (UINT64)-1LL;
     }
 
-    Thunk  = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
-    return  Thunk->QueryPerformanceFrequency ();
+    Thunk = (EMU_THUNK_PROTOCOL *)ThunkPpi->Thunk ();
+    return Thunk->QueryPerformanceFrequency ();
   }
 
   return 0;
@@ -204,9 +205,9 @@ GetTimeInNanoSecond (
   // Since 2^29 < 1,000,000,000 = 0x3B9ACA00 < 2^30, Remainder should < 2^(64-30) = 2^34,
   // i.e. highest bit set in Remainder should <= 33.
   //
-  Shift = MAX (0, HighBitSet64 (Remainder) - 33);
-  Remainder = RShiftU64 (Remainder, (UINTN) Shift);
-  Frequency = RShiftU64 (Frequency, (UINTN) Shift);
+  Shift        = MAX (0, HighBitSet64 (Remainder) - 33);
+  Remainder    = RShiftU64 (Remainder, (UINTN)Shift);
+  Frequency    = RShiftU64 (Frequency, (UINTN)Shift);
   NanoSeconds += DivU64x64Remainder (MultU64x32 (Remainder, 1000000000u), Frequency, NULL);
 
   return NanoSeconds;

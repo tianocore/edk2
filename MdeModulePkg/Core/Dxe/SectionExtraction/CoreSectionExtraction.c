@@ -42,15 +42,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   CR (Node, CORE_SECTION_CHILD_NODE, Link, CORE_SECTION_CHILD_SIGNATURE)
 
 typedef struct {
-  UINT32                      Signature;
-  LIST_ENTRY                  Link;
-  UINT32                      Type;
-  UINT32                      Size;
+  UINT32        Signature;
+  LIST_ENTRY    Link;
+  UINT32        Type;
+  UINT32        Size;
   //
   // StreamBase + OffsetInStream == pointer to section header in stream.  The
   // stream base is always known when walking the sections within.
   //
-  UINT32                      OffsetInStream;
+  UINT32        OffsetInStream;
   //
   // Then EncapsulatedStreamHandle below is always 0 if the section is NOT an
   // encapsulating section.  Otherwise, it contains the stream handle
@@ -58,40 +58,39 @@ typedef struct {
   // encapsulating child is encountered, irrespective of whether the
   // encapsulated stream is processed further.
   //
-  UINTN                       EncapsulatedStreamHandle;
-  EFI_GUID                    *EncapsulationGuid;
+  UINTN         EncapsulatedStreamHandle;
+  EFI_GUID      *EncapsulationGuid;
   //
   // If the section REQUIRES an extraction protocol, register for RPN
   // when the required GUIDed extraction protocol becomes available.
   //
-  EFI_EVENT                   Event;
+  EFI_EVENT     Event;
 } CORE_SECTION_CHILD_NODE;
 
-#define CORE_SECTION_STREAM_SIGNATURE SIGNATURE_32('S','X','S','S')
+#define CORE_SECTION_STREAM_SIGNATURE  SIGNATURE_32('S','X','S','S')
 #define STREAM_NODE_FROM_LINK(Node) \
   CR (Node, CORE_SECTION_STREAM_NODE, Link, CORE_SECTION_STREAM_SIGNATURE)
 
 typedef struct {
-  UINT32                      Signature;
-  LIST_ENTRY                  Link;
-  UINTN                       StreamHandle;
-  UINT8                       *StreamBuffer;
-  UINTN                       StreamLength;
-  LIST_ENTRY                  Children;
+  UINT32        Signature;
+  LIST_ENTRY    Link;
+  UINTN         StreamHandle;
+  UINT8         *StreamBuffer;
+  UINTN         StreamLength;
+  LIST_ENTRY    Children;
   //
   // Authentication status is from GUIDed encapsulations.
   //
-  UINT32                      AuthenticationStatus;
+  UINT32        AuthenticationStatus;
 } CORE_SECTION_STREAM_NODE;
 
-#define NULL_STREAM_HANDLE    0
+#define NULL_STREAM_HANDLE  0
 
 typedef struct {
   CORE_SECTION_CHILD_NODE     *ChildNode;
   CORE_SECTION_STREAM_NODE    *ParentStream;
   VOID                        *Registration;
 } RPN_EVENT_CONTEXT;
-
 
 /**
   The ExtractSection() function processes the input section and
@@ -179,24 +178,23 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 CustomGuidedSectionExtract (
-  IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *This,
-  IN CONST  VOID                                   *InputSection,
-  OUT       VOID                                   **OutputBuffer,
-  OUT       UINTN                                  *OutputSize,
-  OUT       UINT32                                 *AuthenticationStatus
+  IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  *This,
+  IN CONST  VOID                                    *InputSection,
+  OUT       VOID                                    **OutputBuffer,
+  OUT       UINTN                                   *OutputSize,
+  OUT       UINT32                                  *AuthenticationStatus
   );
 
 //
 // Module globals
 //
-LIST_ENTRY mStreamRoot = INITIALIZE_LIST_HEAD_VARIABLE (mStreamRoot);
+LIST_ENTRY  mStreamRoot = INITIALIZE_LIST_HEAD_VARIABLE (mStreamRoot);
 
-EFI_HANDLE mSectionExtractionHandle = NULL;
+EFI_HANDLE  mSectionExtractionHandle = NULL;
 
-EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL mCustomGuidedSectionExtractionProtocol = {
+EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  mCustomGuidedSectionExtractionProtocol = {
   CustomGuidedSectionExtract
 };
-
 
 /**
   Entry point of the section extraction code. Initializes an instance of the
@@ -212,13 +210,13 @@ EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL mCustomGuidedSectionExtractionProtocol = 
 EFI_STATUS
 EFIAPI
 InitializeSectionExtraction (
-  IN EFI_HANDLE                   ImageHandle,
-  IN EFI_SYSTEM_TABLE             *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                         Status;
-  EFI_GUID                           *ExtractHandlerGuidTable;
-  UINTN                              ExtractHandlerNumber;
+  EFI_STATUS  Status;
+  EFI_GUID    *ExtractHandlerGuidTable;
+  UINTN       ExtractHandlerNumber;
 
   //
   // Get custom extract guided section method guid list
@@ -231,17 +229,16 @@ InitializeSectionExtraction (
   //
   while (ExtractHandlerNumber-- > 0) {
     Status = CoreInstallProtocolInterface (
-              &mSectionExtractionHandle,
-              &ExtractHandlerGuidTable [ExtractHandlerNumber],
-              EFI_NATIVE_INTERFACE,
-              &mCustomGuidedSectionExtractionProtocol
-              );
+               &mSectionExtractionHandle,
+               &ExtractHandlerGuidTable[ExtractHandlerNumber],
+               EFI_NATIVE_INTERFACE,
+               &mCustomGuidedSectionExtractionProtocol
+               );
     ASSERT_EFI_ERROR (Status);
   }
 
   return Status;
 }
-
 
 /**
   Check if a stream is valid.
@@ -254,16 +251,16 @@ InitializeSectionExtraction (
 **/
 BOOLEAN
 IsValidSectionStream (
-  IN  VOID              *SectionStream,
-  IN  UINTN             SectionStreamLength
+  IN  VOID   *SectionStream,
+  IN  UINTN  SectionStreamLength
   )
 {
-  UINTN                       TotalLength;
-  UINTN                       SectionLength;
-  EFI_COMMON_SECTION_HEADER   *SectionHeader;
-  EFI_COMMON_SECTION_HEADER   *NextSectionHeader;
+  UINTN                      TotalLength;
+  UINTN                      SectionLength;
+  EFI_COMMON_SECTION_HEADER  *SectionHeader;
+  EFI_COMMON_SECTION_HEADER  *NextSectionHeader;
 
-  TotalLength = 0;
+  TotalLength   = 0;
   SectionHeader = (EFI_COMMON_SECTION_HEADER *)SectionStream;
 
   while (TotalLength < SectionStreamLength) {
@@ -272,6 +269,7 @@ IsValidSectionStream (
     } else {
       SectionLength = SECTION_SIZE (SectionHeader);
     }
+
     TotalLength += SectionLength;
 
     if (TotalLength == SectionStreamLength) {
@@ -281,20 +279,19 @@ IsValidSectionStream (
     //
     // Move to the next byte following the section...
     //
-    SectionHeader = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) SectionHeader + SectionLength);
+    SectionHeader = (EFI_COMMON_SECTION_HEADER *)((UINT8 *)SectionHeader + SectionLength);
 
     //
     // Figure out where the next section begins
     //
-    NextSectionHeader = ALIGN_POINTER(SectionHeader, 4);
-    TotalLength += (UINTN) NextSectionHeader - (UINTN) SectionHeader;
-    SectionHeader = NextSectionHeader;
+    NextSectionHeader = ALIGN_POINTER (SectionHeader, 4);
+    TotalLength      += (UINTN)NextSectionHeader - (UINTN)SectionHeader;
+    SectionHeader     = NextSectionHeader;
   }
 
   ASSERT (FALSE);
   return FALSE;
 }
-
 
 /**
   Worker function.  Constructor for section streams.
@@ -331,15 +328,15 @@ IsValidSectionStream (
 **/
 EFI_STATUS
 OpenSectionStreamEx (
-  IN     UINTN                                     SectionStreamLength,
-  IN     VOID                                      *SectionStream,
-  IN     BOOLEAN                                   AllocateBuffer,
-  IN     UINT32                                    AuthenticationStatus,
-     OUT UINTN                                     *SectionStreamHandle
+  IN     UINTN    SectionStreamLength,
+  IN     VOID     *SectionStream,
+  IN     BOOLEAN  AllocateBuffer,
+  IN     UINT32   AuthenticationStatus,
+  OUT UINTN       *SectionStreamHandle
   )
 {
-  CORE_SECTION_STREAM_NODE    *NewStream;
-  EFI_TPL                     OldTpl;
+  CORE_SECTION_STREAM_NODE  *NewStream;
+  EFI_TPL                   OldTpl;
 
   //
   // Allocate a new stream
@@ -360,6 +357,7 @@ OpenSectionStreamEx (
         CoreFreePool (NewStream);
         return EFI_OUT_OF_RESOURCES;
       }
+
       //
       // Copy in stream data
       //
@@ -382,8 +380,8 @@ OpenSectionStreamEx (
   //
   // Initialize the rest of the section stream
   //
-  NewStream->Signature = CORE_SECTION_STREAM_SIGNATURE;
-  NewStream->StreamHandle = (UINTN) NewStream;
+  NewStream->Signature    = CORE_SECTION_STREAM_SIGNATURE;
+  NewStream->StreamHandle = (UINTN)NewStream;
   NewStream->StreamLength = SectionStreamLength;
   InitializeListHead (&NewStream->Children);
   NewStream->AuthenticationStatus = AuthenticationStatus;
@@ -399,7 +397,6 @@ OpenSectionStreamEx (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   SEP member function.  This function creates and returns a new section stream
@@ -419,9 +416,9 @@ OpenSectionStreamEx (
 EFI_STATUS
 EFIAPI
 OpenSectionStream (
-  IN     UINTN                                     SectionStreamLength,
-  IN     VOID                                      *SectionStream,
-     OUT UINTN                                     *SectionStreamHandle
+  IN     UINTN  SectionStreamLength,
+  IN     VOID   *SectionStream,
+  OUT UINTN     *SectionStreamHandle
   )
 {
   //
@@ -440,8 +437,6 @@ OpenSectionStream (
            );
 }
 
-
-
 /**
   Worker function.  Determine if the input stream:child matches the input type.
 
@@ -459,26 +454,29 @@ OpenSectionStream (
 **/
 BOOLEAN
 ChildIsType (
-  IN CORE_SECTION_STREAM_NODE *Stream,
-  IN CORE_SECTION_CHILD_NODE  *Child,
-  IN EFI_SECTION_TYPE         SearchType,
-  IN EFI_GUID                 *SectionDefinitionGuid
+  IN CORE_SECTION_STREAM_NODE  *Stream,
+  IN CORE_SECTION_CHILD_NODE   *Child,
+  IN EFI_SECTION_TYPE          SearchType,
+  IN EFI_GUID                  *SectionDefinitionGuid
   )
 {
-  EFI_GUID_DEFINED_SECTION    *GuidedSection;
+  EFI_GUID_DEFINED_SECTION  *GuidedSection;
 
   if (SearchType == EFI_SECTION_ALL) {
     return TRUE;
   }
+
   if (Child->Type != SearchType) {
     return FALSE;
   }
+
   if ((SearchType != EFI_SECTION_GUID_DEFINED) || (SectionDefinitionGuid == NULL)) {
     return TRUE;
   }
-  GuidedSection = (EFI_GUID_DEFINED_SECTION * )(Stream->StreamBuffer + Child->OffsetInStream);
+
+  GuidedSection = (EFI_GUID_DEFINED_SECTION *)(Stream->StreamBuffer + Child->OffsetInStream);
   if (IS_SECTION2 (GuidedSection)) {
-    return CompareGuid (&(((EFI_GUID_DEFINED_SECTION2 *) GuidedSection)->SectionDefinitionGuid), SectionDefinitionGuid);
+    return CompareGuid (&(((EFI_GUID_DEFINED_SECTION2 *)GuidedSection)->SectionDefinitionGuid), SectionDefinitionGuid);
   } else {
     return CompareGuid (&GuidedSection->SectionDefinitionGuid, SectionDefinitionGuid);
   }
@@ -499,33 +497,34 @@ ChildIsType (
 **/
 BOOLEAN
 VerifyGuidedSectionGuid (
-  IN  EFI_GUID                                  *GuidedSectionGuid,
-  OUT EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL    **GuidedSectionExtraction
+  IN  EFI_GUID                                *GuidedSectionGuid,
+  OUT EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  **GuidedSectionExtraction
   )
 {
-  EFI_GUID              *GuidRecorded;
-  VOID                  *Interface;
-  EFI_STATUS            Status;
+  EFI_GUID    *GuidRecorded;
+  VOID        *Interface;
+  EFI_STATUS  Status;
 
   Interface = NULL;
 
   //
   // Check if there is the Guided Section GUID configuration table recorded the GUID itself.
   //
-  Status = EfiGetSystemConfigurationTable (GuidedSectionGuid, (VOID **) &GuidRecorded);
+  Status = EfiGetSystemConfigurationTable (GuidedSectionGuid, (VOID **)&GuidRecorded);
   if (Status == EFI_SUCCESS) {
     if (CompareGuid (GuidRecorded, GuidedSectionGuid)) {
       //
       // Found the recorded GuidedSectionGuid.
       //
-      Status = CoreLocateProtocol (GuidedSectionGuid, NULL, (VOID **) &Interface);
-      if (!EFI_ERROR (Status) && Interface != NULL) {
+      Status = CoreLocateProtocol (GuidedSectionGuid, NULL, (VOID **)&Interface);
+      if (!EFI_ERROR (Status) && (Interface != NULL)) {
         //
         // Found the supported Guided Section Extraction Porotocol for the Guided Section.
         //
-        *GuidedSectionExtraction = (EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *) Interface;
+        *GuidedSectionExtraction = (EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *)Interface;
         return TRUE;
       }
+
       return FALSE;
     }
   }
@@ -544,8 +543,8 @@ VerifyGuidedSectionGuid (
 VOID
 EFIAPI
 NotifyGuidedExtraction (
-  IN   EFI_EVENT   Event,
-  IN   VOID        *RpnContext
+  IN   EFI_EVENT  Event,
+  IN   VOID       *RpnContext
   )
 {
   EFI_STATUS                              Status;
@@ -558,7 +557,7 @@ NotifyGuidedExtraction (
 
   Context = RpnContext;
 
-  GuidedHeader = (EFI_GUID_DEFINED_SECTION *) (Context->ParentStream->StreamBuffer + Context->ChildNode->OffsetInStream);
+  GuidedHeader = (EFI_GUID_DEFINED_SECTION *)(Context->ParentStream->StreamBuffer + Context->ChildNode->OffsetInStream);
   ASSERT (GuidedHeader->CommonHeader.Type == EFI_SECTION_GUID_DEFINED);
 
   if (!VerifyGuidedSectionGuid (Context->ChildNode->EncapsulationGuid, &GuidedExtraction)) {
@@ -617,11 +616,11 @@ NotifyGuidedExtraction (
 **/
 VOID
 CreateGuidedExtractionRpnEvent (
-  IN CORE_SECTION_STREAM_NODE      *ParentStream,
-  IN CORE_SECTION_CHILD_NODE       *ChildNode
+  IN CORE_SECTION_STREAM_NODE  *ParentStream,
+  IN CORE_SECTION_CHILD_NODE   *ChildNode
   )
 {
-  RPN_EVENT_CONTEXT *Context;
+  RPN_EVENT_CONTEXT  *Context;
 
   //
   // Allocate new event structure and context
@@ -629,7 +628,7 @@ CreateGuidedExtractionRpnEvent (
   Context = AllocatePool (sizeof (RPN_EVENT_CONTEXT));
   ASSERT (Context != NULL);
 
-  Context->ChildNode = ChildNode;
+  Context->ChildNode    = ChildNode;
   Context->ParentStream = ParentStream;
 
   Context->ChildNode->Event = EfiCreateProtocolNotifyEvent (
@@ -664,37 +663,37 @@ CreateGuidedExtractionRpnEvent (
 **/
 EFI_STATUS
 CreateChildNode (
-  IN     CORE_SECTION_STREAM_NODE              *Stream,
-  IN     UINT32                                ChildOffset,
-  OUT    CORE_SECTION_CHILD_NODE               **ChildNode
+  IN     CORE_SECTION_STREAM_NODE  *Stream,
+  IN     UINT32                    ChildOffset,
+  OUT    CORE_SECTION_CHILD_NODE   **ChildNode
   )
 {
-  EFI_STATUS                                   Status;
-  EFI_COMMON_SECTION_HEADER                    *SectionHeader;
-  EFI_COMPRESSION_SECTION                      *CompressionHeader;
-  EFI_GUID_DEFINED_SECTION                     *GuidedHeader;
-  EFI_DECOMPRESS_PROTOCOL                      *Decompress;
-  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL       *GuidedExtraction;
-  VOID                                         *NewStreamBuffer;
-  VOID                                         *ScratchBuffer;
-  UINT32                                       ScratchSize;
-  UINTN                                        NewStreamBufferSize;
-  UINT32                                       AuthenticationStatus;
-  VOID                                         *CompressionSource;
-  UINT32                                       CompressionSourceSize;
-  UINT32                                       UncompressedLength;
-  UINT8                                        CompressionType;
-  UINT16                                       GuidedSectionAttributes;
+  EFI_STATUS                              Status;
+  EFI_COMMON_SECTION_HEADER               *SectionHeader;
+  EFI_COMPRESSION_SECTION                 *CompressionHeader;
+  EFI_GUID_DEFINED_SECTION                *GuidedHeader;
+  EFI_DECOMPRESS_PROTOCOL                 *Decompress;
+  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  *GuidedExtraction;
+  VOID                                    *NewStreamBuffer;
+  VOID                                    *ScratchBuffer;
+  UINT32                                  ScratchSize;
+  UINTN                                   NewStreamBufferSize;
+  UINT32                                  AuthenticationStatus;
+  VOID                                    *CompressionSource;
+  UINT32                                  CompressionSourceSize;
+  UINT32                                  UncompressedLength;
+  UINT8                                   CompressionType;
+  UINT16                                  GuidedSectionAttributes;
 
-  CORE_SECTION_CHILD_NODE                      *Node;
+  CORE_SECTION_CHILD_NODE  *Node;
 
-  SectionHeader = (EFI_COMMON_SECTION_HEADER *) (Stream->StreamBuffer + ChildOffset);
+  SectionHeader = (EFI_COMMON_SECTION_HEADER *)(Stream->StreamBuffer + ChildOffset);
 
   //
   // Allocate a new node
   //
   *ChildNode = AllocateZeroPool (sizeof (CORE_SECTION_CHILD_NODE));
-  Node = *ChildNode;
+  Node       = *ChildNode;
   if (Node == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -703,15 +702,16 @@ CreateChildNode (
   // Now initialize it
   //
   Node->Signature = CORE_SECTION_CHILD_SIGNATURE;
-  Node->Type = SectionHeader->Type;
+  Node->Type      = SectionHeader->Type;
   if (IS_SECTION2 (SectionHeader)) {
     Node->Size = SECTION2_SIZE (SectionHeader);
   } else {
     Node->Size = SECTION_SIZE (SectionHeader);
   }
-  Node->OffsetInStream = ChildOffset;
+
+  Node->OffsetInStream           = ChildOffset;
   Node->EncapsulatedStreamHandle = NULL_STREAM_HANDLE;
-  Node->EncapsulationGuid = NULL;
+  Node->EncapsulationGuid        = NULL;
 
   //
   // If it's an encapsulating section, then create the new section stream also
@@ -726,18 +726,18 @@ CreateChildNode (
         return EFI_NOT_FOUND;
       }
 
-      CompressionHeader = (EFI_COMPRESSION_SECTION *) SectionHeader;
+      CompressionHeader = (EFI_COMPRESSION_SECTION *)SectionHeader;
 
       if (IS_SECTION2 (CompressionHeader)) {
-        CompressionSource = (VOID *) ((UINT8 *) CompressionHeader + sizeof (EFI_COMPRESSION_SECTION2));
-        CompressionSourceSize = (UINT32) (SECTION2_SIZE (CompressionHeader) - sizeof (EFI_COMPRESSION_SECTION2));
-        UncompressedLength = ((EFI_COMPRESSION_SECTION2 *) CompressionHeader)->UncompressedLength;
-        CompressionType = ((EFI_COMPRESSION_SECTION2 *) CompressionHeader)->CompressionType;
+        CompressionSource     = (VOID *)((UINT8 *)CompressionHeader + sizeof (EFI_COMPRESSION_SECTION2));
+        CompressionSourceSize = (UINT32)(SECTION2_SIZE (CompressionHeader) - sizeof (EFI_COMPRESSION_SECTION2));
+        UncompressedLength    = ((EFI_COMPRESSION_SECTION2 *)CompressionHeader)->UncompressedLength;
+        CompressionType       = ((EFI_COMPRESSION_SECTION2 *)CompressionHeader)->CompressionType;
       } else {
-        CompressionSource = (VOID *) ((UINT8 *) CompressionHeader + sizeof (EFI_COMPRESSION_SECTION));
-        CompressionSourceSize = (UINT32) (SECTION_SIZE (CompressionHeader) - sizeof (EFI_COMPRESSION_SECTION));
-        UncompressedLength = CompressionHeader->UncompressedLength;
-        CompressionType = CompressionHeader->CompressionType;
+        CompressionSource     = (VOID *)((UINT8 *)CompressionHeader + sizeof (EFI_COMPRESSION_SECTION));
+        CompressionSourceSize = (UINT32)(SECTION_SIZE (CompressionHeader) - sizeof (EFI_COMPRESSION_SECTION));
+        UncompressedLength    = CompressionHeader->UncompressedLength;
+        CompressionType       = CompressionHeader->CompressionType;
       }
 
       //
@@ -745,7 +745,7 @@ CreateChildNode (
       //
       if (UncompressedLength > 0) {
         NewStreamBufferSize = UncompressedLength;
-        NewStreamBuffer = AllocatePool (NewStreamBufferSize);
+        NewStreamBuffer     = AllocatePool (NewStreamBufferSize);
         if (NewStreamBuffer == NULL) {
           CoreFreePool (Node);
           return EFI_OUT_OF_RESOURCES;
@@ -781,6 +781,7 @@ CreateChildNode (
             if (!EFI_ERROR (Status)) {
               Status = EFI_BAD_BUFFER_SIZE;
             }
+
             return Status;
           }
 
@@ -808,7 +809,7 @@ CreateChildNode (
           }
         }
       } else {
-        NewStreamBuffer = NULL;
+        NewStreamBuffer     = NULL;
         NewStreamBufferSize = 0;
       }
 
@@ -824,17 +825,19 @@ CreateChildNode (
         CoreFreePool (NewStreamBuffer);
         return Status;
       }
+
       break;
 
     case EFI_SECTION_GUID_DEFINED:
-      GuidedHeader = (EFI_GUID_DEFINED_SECTION *) SectionHeader;
+      GuidedHeader = (EFI_GUID_DEFINED_SECTION *)SectionHeader;
       if (IS_SECTION2 (GuidedHeader)) {
-        Node->EncapsulationGuid = &(((EFI_GUID_DEFINED_SECTION2 *) GuidedHeader)->SectionDefinitionGuid);
-        GuidedSectionAttributes = ((EFI_GUID_DEFINED_SECTION2 *) GuidedHeader)->Attributes;
+        Node->EncapsulationGuid = &(((EFI_GUID_DEFINED_SECTION2 *)GuidedHeader)->SectionDefinitionGuid);
+        GuidedSectionAttributes = ((EFI_GUID_DEFINED_SECTION2 *)GuidedHeader)->Attributes;
       } else {
         Node->EncapsulationGuid = &GuidedHeader->SectionDefinitionGuid;
         GuidedSectionAttributes = GuidedHeader->Attributes;
       }
+
       if (VerifyGuidedSectionGuid (Node->EncapsulationGuid, &GuidedExtraction)) {
         //
         // NewStreamBuffer is always allocated by ExtractSection... No caller
@@ -903,21 +906,22 @@ CreateChildNode (
 
           if (IS_SECTION2 (GuidedHeader)) {
             Status = OpenSectionStreamEx (
-                       SECTION2_SIZE (GuidedHeader) - ((EFI_GUID_DEFINED_SECTION2 *) GuidedHeader)->DataOffset,
-                       (UINT8 *) GuidedHeader + ((EFI_GUID_DEFINED_SECTION2 *) GuidedHeader)->DataOffset,
+                       SECTION2_SIZE (GuidedHeader) - ((EFI_GUID_DEFINED_SECTION2 *)GuidedHeader)->DataOffset,
+                       (UINT8 *)GuidedHeader + ((EFI_GUID_DEFINED_SECTION2 *)GuidedHeader)->DataOffset,
                        TRUE,
                        AuthenticationStatus,
                        &Node->EncapsulatedStreamHandle
                        );
           } else {
             Status = OpenSectionStreamEx (
-                       SECTION_SIZE (GuidedHeader) - ((EFI_GUID_DEFINED_SECTION *) GuidedHeader)->DataOffset,
-                       (UINT8 *) GuidedHeader + ((EFI_GUID_DEFINED_SECTION *) GuidedHeader)->DataOffset,
+                       SECTION_SIZE (GuidedHeader) - ((EFI_GUID_DEFINED_SECTION *)GuidedHeader)->DataOffset,
+                       (UINT8 *)GuidedHeader + ((EFI_GUID_DEFINED_SECTION *)GuidedHeader)->DataOffset,
                        TRUE,
                        AuthenticationStatus,
                        &Node->EncapsulatedStreamHandle
                        );
           }
+
           if (EFI_ERROR (Status)) {
             CoreFreePool (Node);
             return Status;
@@ -942,7 +946,6 @@ CreateChildNode (
 
   return EFI_SUCCESS;
 }
-
 
 /**
   Worker function  Recursively searches / builds section stream database
@@ -978,22 +981,22 @@ CreateChildNode (
 **/
 EFI_STATUS
 FindChildNode (
-  IN     CORE_SECTION_STREAM_NODE                   *SourceStream,
-  IN     EFI_SECTION_TYPE                           SearchType,
-  IN OUT UINTN                                      *SectionInstance,
-  IN     EFI_GUID                                   *SectionDefinitionGuid,
-  IN     UINT32                                     Depth,
-  OUT    CORE_SECTION_CHILD_NODE                    **FoundChild,
-  OUT    CORE_SECTION_STREAM_NODE                   **FoundStream,
-  OUT    UINT32                                     *AuthenticationStatus
+  IN     CORE_SECTION_STREAM_NODE  *SourceStream,
+  IN     EFI_SECTION_TYPE          SearchType,
+  IN OUT UINTN                     *SectionInstance,
+  IN     EFI_GUID                  *SectionDefinitionGuid,
+  IN     UINT32                    Depth,
+  OUT    CORE_SECTION_CHILD_NODE   **FoundChild,
+  OUT    CORE_SECTION_STREAM_NODE  **FoundStream,
+  OUT    UINT32                    *AuthenticationStatus
   )
 {
-  CORE_SECTION_CHILD_NODE                       *CurrentChildNode;
-  CORE_SECTION_CHILD_NODE                       *RecursedChildNode;
-  CORE_SECTION_STREAM_NODE                      *RecursedFoundStream;
-  UINT32                                        NextChildOffset;
-  EFI_STATUS                                    ErrorStatus;
-  EFI_STATUS                                    Status;
+  CORE_SECTION_CHILD_NODE   *CurrentChildNode;
+  CORE_SECTION_CHILD_NODE   *RecursedChildNode;
+  CORE_SECTION_STREAM_NODE  *RecursedFoundStream;
+  UINT32                    NextChildOffset;
+  EFI_STATUS                ErrorStatus;
+  EFI_STATUS                Status;
 
   ASSERT (*SectionInstance > 0);
 
@@ -1002,14 +1005,15 @@ FindChildNode (
   }
 
   CurrentChildNode = NULL;
-  ErrorStatus = EFI_NOT_FOUND;
+  ErrorStatus      = EFI_NOT_FOUND;
 
   if (SourceStream->StreamLength == 0) {
     return EFI_NOT_FOUND;
   }
 
   if (IsListEmpty (&SourceStream->Children) &&
-      SourceStream->StreamLength >= sizeof (EFI_COMMON_SECTION_HEADER)) {
+      (SourceStream->StreamLength >= sizeof (EFI_COMMON_SECTION_HEADER)))
+  {
     //
     // This occurs when a section stream exists, but no child sections
     // have been parsed out yet.  Therefore, extract the first child and add it
@@ -1030,9 +1034,9 @@ FindChildNode (
   // adding children until either the requested section is found, or we run
   // out of data
   //
-  CurrentChildNode = CHILD_SECTION_NODE_FROM_LINK (GetFirstNode(&SourceStream->Children));
+  CurrentChildNode = CHILD_SECTION_NODE_FROM_LINK (GetFirstNode (&SourceStream->Children));
 
-  for (;;) {
+  for ( ; ;) {
     ASSERT (CurrentChildNode != NULL);
     if (ChildIsType (SourceStream, CurrentChildNode, SearchType, SectionDefinitionGuid)) {
       //
@@ -1043,8 +1047,8 @@ FindChildNode (
         //
         // Got it!
         //
-        *FoundChild = CurrentChildNode;
-        *FoundStream = SourceStream;
+        *FoundChild           = CurrentChildNode;
+        *FoundStream          = SourceStream;
         *AuthenticationStatus = SourceStream->AuthenticationStatus;
         return EFI_SUCCESS;
       }
@@ -1060,22 +1064,22 @@ FindChildNode (
       // If the current node is an encapsulating node, recurse into it...
       //
       Status = FindChildNode (
-                (CORE_SECTION_STREAM_NODE *)CurrentChildNode->EncapsulatedStreamHandle,
-                SearchType,
-                SectionInstance,
-                SectionDefinitionGuid,
-                Depth + 1,
-                &RecursedChildNode,
-                &RecursedFoundStream,
-                AuthenticationStatus
-                );
+                 (CORE_SECTION_STREAM_NODE *)CurrentChildNode->EncapsulatedStreamHandle,
+                 SearchType,
+                 SectionInstance,
+                 SectionDefinitionGuid,
+                 Depth + 1,
+                 &RecursedChildNode,
+                 &RecursedFoundStream,
+                 AuthenticationStatus
+                 );
       if (*SectionInstance == 0) {
         //
         // The recursive FindChildNode() call decreased (*SectionInstance) to
         // zero.
         //
         ASSERT_EFI_ERROR (Status);
-        *FoundChild = RecursedChildNode;
+        *FoundChild  = RecursedChildNode;
         *FoundStream = RecursedFoundStream;
         return EFI_SUCCESS;
       } else {
@@ -1087,6 +1091,7 @@ FindChildNode (
           //
           return Status;
         }
+
         //
         // Save the error code and continue to find the requested child node in
         // the rest of the stream.
@@ -1120,7 +1125,7 @@ FindChildNode (
       // Round up to 4 byte boundary
       //
       NextChildOffset += 3;
-      NextChildOffset &= ~(UINTN) 3;
+      NextChildOffset &= ~(UINTN)3;
       if (NextChildOffset <= SourceStream->StreamLength - sizeof (EFI_COMMON_SECTION_HEADER)) {
         //
         // There's an unparsed child remaining in the stream, so create a new child node
@@ -1137,7 +1142,6 @@ FindChildNode (
   }
 }
 
-
 /**
   Worker function.  Search stream database for requested stream handle.
 
@@ -1152,15 +1156,15 @@ FindChildNode (
 **/
 EFI_STATUS
 FindStreamNode (
-  IN  UINTN                                     SearchHandle,
-  OUT CORE_SECTION_STREAM_NODE                  **FoundStream
+  IN  UINTN                     SearchHandle,
+  OUT CORE_SECTION_STREAM_NODE  **FoundStream
   )
 {
-  CORE_SECTION_STREAM_NODE                      *StreamNode;
+  CORE_SECTION_STREAM_NODE  *StreamNode;
 
   if (!IsListEmpty (&mStreamRoot)) {
     StreamNode = STREAM_NODE_FROM_LINK (GetFirstNode (&mStreamRoot));
-    for (;;) {
+    for ( ; ;) {
       if (StreamNode->StreamHandle == SearchHandle) {
         *FoundStream = StreamNode;
         return EFI_SUCCESS;
@@ -1174,7 +1178,6 @@ FindStreamNode (
 
   return EFI_NOT_FOUND;
 }
-
 
 /**
   SEP member function.  Retrieves requested section from section stream.
@@ -1237,32 +1240,31 @@ FindStreamNode (
 EFI_STATUS
 EFIAPI
 GetSection (
-  IN UINTN                                              SectionStreamHandle,
-  IN EFI_SECTION_TYPE                                   *SectionType,
-  IN EFI_GUID                                           *SectionDefinitionGuid,
-  IN UINTN                                              SectionInstance,
-  IN VOID                                               **Buffer,
-  IN OUT UINTN                                          *BufferSize,
-  OUT UINT32                                            *AuthenticationStatus,
-  IN BOOLEAN                                            IsFfs3Fv
+  IN UINTN             SectionStreamHandle,
+  IN EFI_SECTION_TYPE  *SectionType,
+  IN EFI_GUID          *SectionDefinitionGuid,
+  IN UINTN             SectionInstance,
+  IN VOID              **Buffer,
+  IN OUT UINTN         *BufferSize,
+  OUT UINT32           *AuthenticationStatus,
+  IN BOOLEAN           IsFfs3Fv
   )
 {
-  CORE_SECTION_STREAM_NODE                              *StreamNode;
-  EFI_TPL                                               OldTpl;
-  EFI_STATUS                                            Status;
-  CORE_SECTION_CHILD_NODE                               *ChildNode;
-  CORE_SECTION_STREAM_NODE                              *ChildStreamNode;
-  UINTN                                                 CopySize;
-  UINT32                                                ExtractedAuthenticationStatus;
-  UINTN                                                 Instance;
-  UINT8                                                 *CopyBuffer;
-  UINTN                                                 SectionSize;
-  EFI_COMMON_SECTION_HEADER                             *Section;
-
+  CORE_SECTION_STREAM_NODE   *StreamNode;
+  EFI_TPL                    OldTpl;
+  EFI_STATUS                 Status;
+  CORE_SECTION_CHILD_NODE    *ChildNode;
+  CORE_SECTION_STREAM_NODE   *ChildStreamNode;
+  UINTN                      CopySize;
+  UINT32                     ExtractedAuthenticationStatus;
+  UINTN                      Instance;
+  UINT8                      *CopyBuffer;
+  UINTN                      SectionSize;
+  EFI_COMMON_SECTION_HEADER  *Section;
 
   ChildStreamNode = NULL;
-  OldTpl = CoreRaiseTpl (TPL_NOTIFY);
-  Instance = SectionInstance + 1;
+  OldTpl          = CoreRaiseTpl (TPL_NOTIFY);
+  Instance        = SectionInstance + 1;
 
   //
   // Locate target stream
@@ -1280,8 +1282,8 @@ GetSection (
     //
     // SectionType == NULL means return the WHOLE section stream...
     //
-    CopySize = StreamNode->StreamLength;
-    CopyBuffer = StreamNode->StreamBuffer;
+    CopySize              = StreamNode->StreamLength;
+    CopyBuffer            = StreamNode->StreamBuffer;
     *AuthenticationStatus = StreamNode->AuthenticationStatus;
   } else {
     //
@@ -1299,17 +1301,21 @@ GetSection (
                );
     if (EFI_ERROR (Status)) {
       if (Status == EFI_ABORTED) {
-        DEBUG ((DEBUG_ERROR, "%a: recursion aborted due to nesting depth\n",
-          __FUNCTION__));
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: recursion aborted due to nesting depth\n",
+          __FUNCTION__
+          ));
         //
         // Map "aborted" to "not found".
         //
         Status = EFI_NOT_FOUND;
       }
+
       goto GetSection_Done;
     }
 
-    Section = (EFI_COMMON_SECTION_HEADER *) (ChildStreamNode->StreamBuffer + ChildNode->OffsetInStream);
+    Section = (EFI_COMMON_SECTION_HEADER *)(ChildStreamNode->StreamBuffer + ChildNode->OffsetInStream);
 
     if (IS_SECTION2 (Section)) {
       ASSERT (SECTION2_SIZE (Section) > 0x00FFFFFF);
@@ -1318,12 +1324,14 @@ GetSection (
         Status = EFI_NOT_FOUND;
         goto GetSection_Done;
       }
-      CopySize = SECTION2_SIZE (Section) - sizeof (EFI_COMMON_SECTION_HEADER2);
-      CopyBuffer = (UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER2);
+
+      CopySize   = SECTION2_SIZE (Section) - sizeof (EFI_COMMON_SECTION_HEADER2);
+      CopyBuffer = (UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER2);
     } else {
-      CopySize = SECTION_SIZE (Section) - sizeof (EFI_COMMON_SECTION_HEADER);
-      CopyBuffer = (UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER);
+      CopySize   = SECTION_SIZE (Section) - sizeof (EFI_COMMON_SECTION_HEADER);
+      CopyBuffer = (UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER);
     }
+
     *AuthenticationStatus = ExtractedAuthenticationStatus;
   }
 
@@ -1333,7 +1341,7 @@ GetSection (
     // Caller allocated buffer.  Fill to size and return required size...
     //
     if (*BufferSize < CopySize) {
-      Status = EFI_WARN_BUFFER_TOO_SMALL;
+      Status   = EFI_WARN_BUFFER_TOO_SMALL;
       CopySize = *BufferSize;
     }
   } else {
@@ -1346,6 +1354,7 @@ GetSection (
       goto GetSection_Done;
     }
   }
+
   CopyMem (*Buffer, CopyBuffer, CopySize);
   *BufferSize = SectionSize;
 
@@ -1355,7 +1364,6 @@ GetSection_Done:
   return Status;
 }
 
-
 /**
   Worker function.  Destructor for child nodes.
 
@@ -1364,7 +1372,7 @@ GetSection_Done:
 **/
 VOID
 FreeChildNode (
-  IN  CORE_SECTION_CHILD_NODE                   *ChildNode
+  IN  CORE_SECTION_CHILD_NODE  *ChildNode
   )
 {
   ASSERT (ChildNode->Signature == CORE_SECTION_CHILD_SIGNATURE);
@@ -1391,7 +1399,6 @@ FreeChildNode (
   CoreFreePool (ChildNode);
 }
 
-
 /**
   SEP member function.  Deletes an existing section stream
 
@@ -1408,15 +1415,15 @@ FreeChildNode (
 EFI_STATUS
 EFIAPI
 CloseSectionStream (
-  IN  UINTN                                     StreamHandleToClose,
-  IN  BOOLEAN                                   FreeStreamBuffer
+  IN  UINTN    StreamHandleToClose,
+  IN  BOOLEAN  FreeStreamBuffer
   )
 {
-  CORE_SECTION_STREAM_NODE                      *StreamNode;
-  EFI_TPL                                       OldTpl;
-  EFI_STATUS                                    Status;
-  LIST_ENTRY                                    *Link;
-  CORE_SECTION_CHILD_NODE                       *ChildNode;
+  CORE_SECTION_STREAM_NODE  *StreamNode;
+  EFI_TPL                   OldTpl;
+  EFI_STATUS                Status;
+  LIST_ENTRY                *Link;
+  CORE_SECTION_CHILD_NODE   *ChildNode;
 
   OldTpl = CoreRaiseTpl (TPL_NOTIFY);
 
@@ -1430,13 +1437,15 @@ CloseSectionStream (
     //
     RemoveEntryList (&StreamNode->Link);
     while (!IsListEmpty (&StreamNode->Children)) {
-      Link = GetFirstNode (&StreamNode->Children);
+      Link      = GetFirstNode (&StreamNode->Children);
       ChildNode = CHILD_SECTION_NODE_FROM_LINK (Link);
       FreeChildNode (ChildNode);
     }
+
     if (FreeStreamBuffer) {
       CoreFreePool (StreamNode->StreamBuffer);
     }
+
     CoreFreePool (StreamNode);
     Status = EFI_SUCCESS;
   } else {
@@ -1446,7 +1455,6 @@ CloseSectionStream (
   CoreRestoreTpl (OldTpl);
   return Status;
 }
-
 
 /**
   The ExtractSection() function processes the input section and
@@ -1534,19 +1542,19 @@ CloseSectionStream (
 EFI_STATUS
 EFIAPI
 CustomGuidedSectionExtract (
-  IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL *This,
-  IN CONST  VOID                                   *InputSection,
-  OUT       VOID                                   **OutputBuffer,
-  OUT       UINTN                                  *OutputSize,
-  OUT       UINT32                                 *AuthenticationStatus
+  IN CONST  EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  *This,
+  IN CONST  VOID                                    *InputSection,
+  OUT       VOID                                    **OutputBuffer,
+  OUT       UINTN                                   *OutputSize,
+  OUT       UINT32                                  *AuthenticationStatus
   )
 {
-  EFI_STATUS      Status;
-  VOID            *ScratchBuffer;
-  VOID            *AllocatedOutputBuffer;
-  UINT32          OutputBufferSize;
-  UINT32          ScratchBufferSize;
-  UINT16          SectionAttribute;
+  EFI_STATUS  Status;
+  VOID        *ScratchBuffer;
+  VOID        *AllocatedOutputBuffer;
+  UINT32      OutputBufferSize;
+  UINT32      ScratchBufferSize;
+  UINT16      SectionAttribute;
 
   //
   // Init local variable
@@ -1588,8 +1596,10 @@ CustomGuidedSectionExtract (
       if (ScratchBuffer != NULL) {
         FreePool (ScratchBuffer);
       }
+
       return EFI_OUT_OF_RESOURCES;
     }
+
     *OutputBuffer = AllocatedOutputBuffer;
   }
 
@@ -1609,9 +1619,11 @@ CustomGuidedSectionExtract (
     if (AllocatedOutputBuffer != NULL) {
       CoreFreePool (AllocatedOutputBuffer);
     }
+
     if (ScratchBuffer != NULL) {
       CoreFreePool (ScratchBuffer);
     }
+
     DEBUG ((DEBUG_ERROR, "Extract guided section Failed - %r\n", Status));
     return Status;
   }
@@ -1628,7 +1640,7 @@ CustomGuidedSectionExtract (
   //
   // Set real size of output buffer.
   //
-  *OutputSize = (UINTN) OutputBufferSize;
+  *OutputSize = (UINTN)OutputBufferSize;
 
   //
   // Free unused scratch buffer.

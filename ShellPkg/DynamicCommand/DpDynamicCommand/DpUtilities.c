@@ -55,23 +55,24 @@
 **/
 UINT64
 GetDuration (
-  IN OUT MEASUREMENT_RECORD   *Measurement
+  IN OUT MEASUREMENT_RECORD  *Measurement
   )
 {
-  UINT64    Duration;
-  BOOLEAN   Error;
+  UINT64   Duration;
+  BOOLEAN  Error;
 
   if (Measurement->EndTimeStamp == 0) {
     return 0;
   }
 
   Duration = Measurement->EndTimeStamp - Measurement->StartTimeStamp;
-  Error = (BOOLEAN)(Duration > Measurement->EndTimeStamp);
+  Error    = (BOOLEAN)(Duration > Measurement->EndTimeStamp);
 
   if (Error) {
-    DEBUG ((EFI_D_ERROR, ALit_TimerLibError));
+    DEBUG ((DEBUG_ERROR, ALit_TimerLibError));
     Duration = 0;
   }
+
   return Duration;
 }
 
@@ -87,18 +88,18 @@ GetDuration (
   @retval     FALSE       The measurement record is NOT for an EFI Phase.
 **/
 BOOLEAN
-IsPhase(
-  IN MEASUREMENT_RECORD        *Measurement
+IsPhase (
+  IN MEASUREMENT_RECORD  *Measurement
   )
 {
-  BOOLEAN   RetVal;
+  BOOLEAN  RetVal;
 
   RetVal = (BOOLEAN)(
-            ((AsciiStrCmp (Measurement->Token, ALit_SEC) == 0)    ||
-             (AsciiStrCmp (Measurement->Token, ALit_PEI) == 0)    ||
-             (AsciiStrCmp (Measurement->Token, ALit_DXE) == 0)    ||
-             (AsciiStrCmp (Measurement->Token, ALit_BDS) == 0))
-            );
+                     ((AsciiStrCmp (Measurement->Token, ALit_SEC) == 0)    ||
+                      (AsciiStrCmp (Measurement->Token, ALit_PEI) == 0)    ||
+                      (AsciiStrCmp (Measurement->Token, ALit_DXE) == 0)    ||
+                      (AsciiStrCmp (Measurement->Token, ALit_BDS) == 0))
+                     );
   return RetVal;
 }
 
@@ -112,24 +113,24 @@ IsPhase(
 
 **/
 BOOLEAN
-IsCorePerf(
-  IN MEASUREMENT_RECORD        *Measurement
+IsCorePerf (
+  IN MEASUREMENT_RECORD  *Measurement
   )
 {
-  BOOLEAN   RetVal;
+  BOOLEAN  RetVal;
 
   RetVal = (BOOLEAN)(
-            ((Measurement->Identifier == MODULE_START_ID)            ||
-             (Measurement->Identifier == MODULE_END_ID)              ||
-             (Measurement->Identifier == MODULE_LOADIMAGE_START_ID)  ||
-             (Measurement->Identifier == MODULE_LOADIMAGE_END_ID)    ||
-             (Measurement->Identifier == MODULE_DB_START_ID)         ||
-             (Measurement->Identifier == MODULE_DB_END_ID)           ||
-             (Measurement->Identifier == MODULE_DB_SUPPORT_START_ID) ||
-             (Measurement->Identifier == MODULE_DB_SUPPORT_END_ID)   ||
-             (Measurement->Identifier == MODULE_DB_STOP_START_ID)    ||
-             (Measurement->Identifier == MODULE_DB_STOP_START_ID))
-            );
+                     ((Measurement->Identifier == MODULE_START_ID)            ||
+                      (Measurement->Identifier == MODULE_END_ID)              ||
+                      (Measurement->Identifier == MODULE_LOADIMAGE_START_ID)  ||
+                      (Measurement->Identifier == MODULE_LOADIMAGE_END_ID)    ||
+                      (Measurement->Identifier == MODULE_DB_START_ID)         ||
+                      (Measurement->Identifier == MODULE_DB_END_ID)           ||
+                      (Measurement->Identifier == MODULE_DB_SUPPORT_START_ID) ||
+                      (Measurement->Identifier == MODULE_DB_SUPPORT_END_ID)   ||
+                      (Measurement->Identifier == MODULE_DB_STOP_START_ID)    ||
+                      (Measurement->Identifier == MODULE_DB_STOP_START_ID))
+                     );
   return RetVal;
 }
 
@@ -147,14 +148,14 @@ IsCorePerf(
 **/
 VOID
 DpGetShortPdbFileName (
-  IN  CHAR8     *PdbFileName,
-  OUT CHAR16    *UnicodeBuffer
+  IN  CHAR8   *PdbFileName,
+  OUT CHAR16  *UnicodeBuffer
   )
 {
-  UINTN IndexA;     // Current work location within an ASCII string.
-  UINTN IndexU;     // Current work location within a Unicode string.
-  UINTN StartIndex;
-  UINTN EndIndex;
+  UINTN  IndexA;    // Current work location within an ASCII string.
+  UINTN  IndexU;    // Current work location within a Unicode string.
+  UINTN  StartIndex;
+  UINTN  EndIndex;
 
   ZeroMem (UnicodeBuffer, (DP_GAUGE_STRING_LENGTH + 1) * sizeof (CHAR16));
 
@@ -162,8 +163,9 @@ DpGetShortPdbFileName (
     StrnCpyS (UnicodeBuffer, DP_GAUGE_STRING_LENGTH + 1, L" ", 1);
   } else {
     StartIndex = 0;
-    for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++)
-      ;
+    for (EndIndex = 0; PdbFileName[EndIndex] != 0; EndIndex++) {
+    }
+
     for (IndexA = 0; PdbFileName[IndexA] != 0; IndexA++) {
       if ((PdbFileName[IndexA] == '\\') || (PdbFileName[IndexA] == '/')) {
         StartIndex = IndexA + 1;
@@ -176,7 +178,7 @@ DpGetShortPdbFileName (
 
     IndexU = 0;
     for (IndexA = StartIndex; IndexA < EndIndex; IndexA++) {
-      UnicodeBuffer[IndexU] = (CHAR16) PdbFileName[IndexA];
+      UnicodeBuffer[IndexU] = (CHAR16)PdbFileName[IndexA];
       IndexU++;
       if (IndexU >= DP_GAUGE_STRING_LENGTH) {
         UnicodeBuffer[DP_GAUGE_STRING_LENGTH] = 0;
@@ -204,26 +206,26 @@ DpGetShortPdbFileName (
 **/
 VOID
 DpGetNameFromHandle (
-  IN EFI_HANDLE   Handle
+  IN EFI_HANDLE  Handle
   )
 {
-  EFI_STATUS                   Status;
-  EFI_LOADED_IMAGE_PROTOCOL    *Image;
-  CHAR8                        *PdbFileName;
-  EFI_DRIVER_BINDING_PROTOCOL  *DriverBinding;
-  EFI_STRING                   StringPtr;
-  EFI_DEVICE_PATH_PROTOCOL     *LoadedImageDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
-  EFI_GUID                     *NameGuid;
-  CHAR16                       *NameString;
-  UINTN                        StringSize;
-  CHAR8                        *PlatformLanguage;
-  CHAR8                        *BestLanguage;
-  EFI_COMPONENT_NAME2_PROTOCOL *ComponentName2;
+  EFI_STATUS                    Status;
+  EFI_LOADED_IMAGE_PROTOCOL     *Image;
+  CHAR8                         *PdbFileName;
+  EFI_DRIVER_BINDING_PROTOCOL   *DriverBinding;
+  EFI_STRING                    StringPtr;
+  EFI_DEVICE_PATH_PROTOCOL      *LoadedImageDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  EFI_GUID                      *NameGuid;
+  CHAR16                        *NameString;
+  UINTN                         StringSize;
+  CHAR8                         *PlatformLanguage;
+  CHAR8                         *BestLanguage;
+  EFI_COMPONENT_NAME2_PROTOCOL  *ComponentName2;
 
-  Image = NULL;
+  Image                 = NULL;
   LoadedImageDevicePath = NULL;
-  DevicePath = NULL;
+  DevicePath            = NULL;
 
   //
   // Method 1: Get the name string from image PDB
@@ -231,14 +233,14 @@ DpGetNameFromHandle (
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiLoadedImageProtocolGuid,
-                  (VOID **) &Image
+                  (VOID **)&Image
                   );
 
   if (EFI_ERROR (Status)) {
     Status = gBS->OpenProtocol (
                     Handle,
                     &gEfiDriverBindingProtocolGuid,
-                    (VOID **) &DriverBinding,
+                    (VOID **)&DriverBinding,
                     NULL,
                     NULL,
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -247,7 +249,7 @@ DpGetNameFromHandle (
       Status = gBS->HandleProtocol (
                       DriverBinding->ImageHandle,
                       &gEfiLoadedImageProtocolGuid,
-                      (VOID **) &Image
+                      (VOID **)&Image
                       );
     }
   }
@@ -267,14 +269,14 @@ DpGetNameFromHandle (
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiComponentName2ProtocolGuid,
-                  (VOID **) &ComponentName2
+                  (VOID **)&ComponentName2
                   );
   if (!EFI_ERROR (Status)) {
     //
     // Firstly use platform language setting, secondly use driver's first supported language.
     //
-    GetVariable2 (L"PlatformLang", &gEfiGlobalVariableGuid, (VOID**)&PlatformLanguage, NULL);
-    BestLanguage = GetBestLanguage(
+    GetVariable2 (L"PlatformLang", &gEfiGlobalVariableGuid, (VOID **)&PlatformLanguage, NULL);
+    BestLanguage = GetBestLanguage (
                      ComponentName2->SupportedLanguages,
                      FALSE,
                      (PlatformLanguage != NULL) ? PlatformLanguage : "",
@@ -299,7 +301,7 @@ DpGetNameFromHandle (
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiLoadedImageDevicePathProtocolGuid,
-                  (VOID **) &LoadedImageDevicePath
+                  (VOID **)&LoadedImageDevicePath
                   );
   if (!EFI_ERROR (Status) && (LoadedImageDevicePath != NULL)) {
     DevicePath = LoadedImageDevicePath;
@@ -313,10 +315,11 @@ DpGetNameFromHandle (
     //
     NameGuid = NULL;
     while (!IsDevicePathEndType (DevicePath)) {
-      NameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) DevicePath);
+      NameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)DevicePath);
       if (NameGuid != NULL) {
         break;
       }
+
       DevicePath = NextDevicePathNode (DevicePath);
     }
 
@@ -326,13 +329,13 @@ DpGetNameFromHandle (
       //
       NameString = NULL;
       StringSize = 0;
-      Status = GetSectionFromAnyFv (
-                NameGuid,
-                EFI_SECTION_USER_INTERFACE,
-                0,
-                (VOID **) &NameString,
-                &StringSize
-                );
+      Status     = GetSectionFromAnyFv (
+                     NameGuid,
+                     EFI_SECTION_USER_INTERFACE,
+                     0,
+                     (VOID **)&NameString,
+                     &StringSize
+                     );
 
       if (!EFI_ERROR (Status)) {
         //
@@ -347,6 +350,7 @@ DpGetNameFromHandle (
         //
         UnicodeSPrint (mGaugeString, sizeof (mGaugeString), L"%g", NameGuid);
       }
+
       return;
     } else {
       //
@@ -386,7 +390,7 @@ DpGetNameFromHandle (
 **/
 UINT64
 DurationInMicroSeconds (
-  IN UINT64 Duration
+  IN UINT64  Duration
   )
 {
   return DivU64x32 (Duration, 1000);
@@ -406,17 +410,18 @@ DurationInMicroSeconds (
   @retval     >=0   Return value is the index into CumData where Token is found.
 **/
 INTN
-GetCumulativeItem(
-  IN MEASUREMENT_RECORD   *Measurement
+GetCumulativeItem (
+  IN MEASUREMENT_RECORD  *Measurement
   )
 {
-  INTN    Index;
+  INTN  Index;
 
-  for( Index = 0; Index < (INTN)NumCum; ++Index) {
+  for ( Index = 0; Index < (INTN)NumCum; ++Index) {
     if (AsciiStrCmp (Measurement->Token, CumData[Index].Name) == 0) {
       return Index;  // Exit, we found a match
     }
   }
+
   // If the for loop exits, Token was not found.
   return -1;   // Indicate failure
 }

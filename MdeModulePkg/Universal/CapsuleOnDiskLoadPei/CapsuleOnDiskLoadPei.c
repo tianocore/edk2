@@ -58,15 +58,15 @@
 EFI_STATUS
 EFIAPI
 LoadCapsuleOnDisk (
-  IN EFI_PEI_SERVICES              **PeiServices,
-  IN EDKII_PEI_CAPSULE_ON_DISK_PPI   *This
+  IN EFI_PEI_SERVICES               **PeiServices,
+  IN EDKII_PEI_CAPSULE_ON_DISK_PPI  *This
   );
 
-static EDKII_PEI_CAPSULE_ON_DISK_PPI mCapsuleOnDiskPpi = {
+static EDKII_PEI_CAPSULE_ON_DISK_PPI  mCapsuleOnDiskPpi = {
   LoadCapsuleOnDisk
 };
 
-static EFI_PEI_PPI_DESCRIPTOR mCapsuleOnDiskPpiList = {
+static EFI_PEI_PPI_DESCRIPTOR  mCapsuleOnDiskPpiList = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEdkiiPeiCapsuleOnDiskPpiGuid,
   &mCapsuleOnDiskPpi
@@ -84,21 +84,21 @@ static EFI_PEI_PPI_DESCRIPTOR mCapsuleOnDiskPpiList = {
 static
 BOOLEAN
 CheckCapsuleFromRam (
-  IN CONST EFI_PEI_SERVICES          **PeiServices
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  EFI_STATUS              Status;
-  PEI_CAPSULE_PPI         *Capsule;
+  EFI_STATUS       Status;
+  PEI_CAPSULE_PPI  *Capsule;
 
   Status = PeiServicesLocatePpi (
              &gEfiPeiCapsulePpiGuid,
              0,
              NULL,
-             (VOID **) &Capsule
+             (VOID **)&Capsule
              );
-  if (!EFI_ERROR(Status)) {
+  if (!EFI_ERROR (Status)) {
     Status = Capsule->CheckCapsuleUpdate ((EFI_PEI_SERVICES **)PeiServices);
-    if (!EFI_ERROR(Status)) {
+    if (!EFI_ERROR (Status)) {
       return TRUE;
     }
   }
@@ -119,20 +119,20 @@ IsCapsuleOnDiskMode (
   VOID
   )
 {
-  EFI_STATUS                      Status;
-  UINTN                           Size;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI *PPIVariableServices;
-  BOOLEAN                         CodRelocInfo;
+  EFI_STATUS                       Status;
+  UINTN                            Size;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI  *PPIVariableServices;
+  BOOLEAN                          CodRelocInfo;
 
   Status = PeiServicesLocatePpi (
              &gEfiPeiReadOnlyVariable2PpiGuid,
              0,
              NULL,
-             (VOID **) &PPIVariableServices
+             (VOID **)&PPIVariableServices
              );
   ASSERT_EFI_ERROR (Status);
 
-  Size = sizeof (BOOLEAN);
+  Size   = sizeof (BOOLEAN);
   Status = PPIVariableServices->GetVariable (
                                   PPIVariableServices,
                                   COD_RELOCATION_INFO_VAR_NAME,
@@ -142,8 +142,8 @@ IsCapsuleOnDiskMode (
                                   &CodRelocInfo
                                   );
 
-  if (EFI_ERROR (Status) || Size != sizeof(BOOLEAN) || !CodRelocInfo) {
-    DEBUG (( DEBUG_ERROR, "Error Get CodRelocationInfo variable %r!\n", Status));
+  if (EFI_ERROR (Status) || (Size != sizeof (BOOLEAN)) || !CodRelocInfo) {
+    DEBUG ((DEBUG_ERROR, "Error Get CodRelocationInfo variable %r!\n", Status));
     return FALSE;
   }
 
@@ -169,37 +169,42 @@ IsCapsuleOnDiskMode (
 static
 EFI_STATUS
 RetrieveRelocatedCapsule (
-  IN UINT8                *RelocCapsuleBuf,
-  IN UINTN                RelocCapsuleTotalSize
+  IN UINT8  *RelocCapsuleBuf,
+  IN UINTN  RelocCapsuleTotalSize
   )
 {
-  UINTN                    Index;
-  UINT8                    *CapsuleDataBufEnd;
-  UINT8                    *CapsulePtr;
-  UINT32                   CapsuleSize;
-  UINT64                   TotalImageSize;
-  UINTN                    CapsuleNum;
+  UINTN   Index;
+  UINT8   *CapsuleDataBufEnd;
+  UINT8   *CapsulePtr;
+  UINT32  CapsuleSize;
+  UINT64  TotalImageSize;
+  UINTN   CapsuleNum;
 
   //
   // Temp file contains at least 2 capsule (including 1 capsule name capsule) & 1 UINT64
   //
-  if (RelocCapsuleTotalSize < sizeof(UINT64) + sizeof(EFI_CAPSULE_HEADER) * 2) {
+  if (RelocCapsuleTotalSize < sizeof (UINT64) + sizeof (EFI_CAPSULE_HEADER) * 2) {
     return EFI_INVALID_PARAMETER;
   }
 
-  CopyMem(&TotalImageSize, RelocCapsuleBuf, sizeof(UINT64));
+  CopyMem (&TotalImageSize, RelocCapsuleBuf, sizeof (UINT64));
 
-  DEBUG ((DEBUG_INFO, "ProcessRelocatedCapsule CapsuleBuf %x TotalCapSize %lx\n",
-                      RelocCapsuleBuf, TotalImageSize));
+  DEBUG ((
+    DEBUG_INFO,
+    "ProcessRelocatedCapsule CapsuleBuf %x TotalCapSize %lx\n",
+    RelocCapsuleBuf,
+    TotalImageSize
+    ));
 
-  RelocCapsuleBuf += sizeof(UINT64);
+  RelocCapsuleBuf += sizeof (UINT64);
 
   //
   // TempCaspule file length check
   //
-  if (MAX_ADDRESS - TotalImageSize <= sizeof(UINT64) ||
-      (UINT64)RelocCapsuleTotalSize != TotalImageSize + sizeof(UINT64) ||
-      (UINTN)(MAX_ADDRESS - (PHYSICAL_ADDRESS)(UINTN)RelocCapsuleBuf) <= TotalImageSize) {
+  if ((MAX_ADDRESS - TotalImageSize <= sizeof (UINT64)) ||
+      ((UINT64)RelocCapsuleTotalSize != TotalImageSize + sizeof (UINT64)) ||
+      ((UINTN)(MAX_ADDRESS - (PHYSICAL_ADDRESS)(UINTN)RelocCapsuleBuf) <= TotalImageSize))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -212,14 +217,16 @@ RetrieveRelocatedCapsule (
   CapsuleNum = 0;
 
   while (CapsulePtr < CapsuleDataBufEnd) {
-    if ((CapsuleDataBufEnd - CapsulePtr) < sizeof(EFI_CAPSULE_HEADER) ||
-        ((EFI_CAPSULE_HEADER *)CapsulePtr)->CapsuleImageSize < sizeof(EFI_CAPSULE_HEADER) ||
-        (UINTN)(MAX_ADDRESS - (PHYSICAL_ADDRESS)(UINTN)CapsulePtr) < ((EFI_CAPSULE_HEADER *)CapsulePtr)->CapsuleImageSize
-        ) {
+    if (((CapsuleDataBufEnd - CapsulePtr) < sizeof (EFI_CAPSULE_HEADER)) ||
+        (((EFI_CAPSULE_HEADER *)CapsulePtr)->CapsuleImageSize < sizeof (EFI_CAPSULE_HEADER)) ||
+        ((UINTN)(MAX_ADDRESS - (PHYSICAL_ADDRESS)(UINTN)CapsulePtr) < ((EFI_CAPSULE_HEADER *)CapsulePtr)->CapsuleImageSize)
+        )
+    {
       break;
     }
+
     CapsulePtr += ((EFI_CAPSULE_HEADER *)CapsulePtr)->CapsuleImageSize;
-    CapsuleNum ++;
+    CapsuleNum++;
   }
 
   if (CapsulePtr != CapsuleDataBufEnd) {
@@ -242,7 +249,7 @@ RetrieveRelocatedCapsule (
     CapsuleSize = ((EFI_CAPSULE_HEADER *)CapsulePtr)->CapsuleImageSize;
     BuildCvHob ((EFI_PHYSICAL_ADDRESS)(UINTN)CapsulePtr, CapsuleSize);
 
-    DEBUG((DEBUG_INFO, "Capsule saved in address %x size %x\n", CapsulePtr, CapsuleSize));
+    DEBUG ((DEBUG_INFO, "Capsule saved in address %x size %x\n", CapsulePtr, CapsuleSize));
 
     CapsulePtr += CapsuleSize;
     Index++;
@@ -270,22 +277,22 @@ InitializeCapsuleOnDiskLoad (
   UINTN       BootMode;
   UINTN       FileNameSize;
 
-  BootMode = GetBootModeHob();
-  ASSERT(BootMode == BOOT_ON_FLASH_UPDATE);
+  BootMode = GetBootModeHob ();
+  ASSERT (BootMode == BOOT_ON_FLASH_UPDATE);
 
   //
   // If there are capsules provisioned in memory, quit.
   // Only one capsule resource is accept, CapsuleOnRam's priority is higher than CapsuleOnDisk.
   //
-  if (CheckCapsuleFromRam(PeiServices)) {
-    DEBUG((DEBUG_ERROR, "Capsule On Memory Detected! Quit.\n"));
+  if (CheckCapsuleFromRam (PeiServices)) {
+    DEBUG ((DEBUG_ERROR, "Capsule On Memory Detected! Quit.\n"));
     return EFI_ABORTED;
   }
 
-  DEBUG_CODE (
-   VOID *CapsuleOnDiskModePpi;
+  DEBUG_CODE_BEGIN ();
+  VOID  *CapsuleOnDiskModePpi;
 
-  if (!IsCapsuleOnDiskMode()){
+  if (!IsCapsuleOnDiskMode ()) {
     return EFI_NOT_FOUND;
   }
 
@@ -298,17 +305,18 @@ InitializeCapsuleOnDiskLoad (
              NULL,
              (VOID **)&CapsuleOnDiskModePpi
              );
-    if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, "Locate CapsuleOnDiskModePpi error %x\n", Status));
-      return Status;
-    }
-  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Locate CapsuleOnDiskModePpi error %x\n", Status));
+    return Status;
+  }
+
+  DEBUG_CODE_END ();
 
   Status = PeiServicesInstallPpi (&mCapsuleOnDiskPpiList);
   ASSERT_EFI_ERROR (Status);
 
   FileNameSize = PcdGetSize (PcdCoDRelocationFileName);
-  Status = PcdSetPtrS (PcdRecoveryFileName, &FileNameSize, (VOID *) PcdGetPtr(PcdCoDRelocationFileName));
+  Status       = PcdSetPtrS (PcdRecoveryFileName, &FileNameSize, (VOID *)PcdGetPtr (PcdCoDRelocationFileName));
   ASSERT_EFI_ERROR (Status);
 
   return Status;
@@ -329,8 +337,8 @@ InitializeCapsuleOnDiskLoad (
 EFI_STATUS
 EFIAPI
 LoadCapsuleOnDisk (
-  IN EFI_PEI_SERVICES                     **PeiServices,
-  IN EDKII_PEI_CAPSULE_ON_DISK_PPI          *This
+  IN EFI_PEI_SERVICES               **PeiServices,
+  IN EDKII_PEI_CAPSULE_ON_DISK_PPI  *This
   )
 {
   EFI_STATUS                          Status;
@@ -359,14 +367,16 @@ LoadCapsuleOnDisk (
           (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_EC_RECOVERY_PPI_NOT_FOUND)
           );
       }
+
       break;
     }
+
     NumberRecoveryCapsules = 0;
-    Status = DeviceRecoveryPpi->GetNumberRecoveryCapsules (
-                                  (EFI_PEI_SERVICES **)PeiServices,
-                                  DeviceRecoveryPpi,
-                                  &NumberRecoveryCapsules
-                                  );
+    Status                 = DeviceRecoveryPpi->GetNumberRecoveryCapsules (
+                                                  (EFI_PEI_SERVICES **)PeiServices,
+                                                  DeviceRecoveryPpi,
+                                                  &NumberRecoveryCapsules
+                                                  );
     DEBUG ((DEBUG_INFO, "LoadCapsuleOnDisk - GetNumberRecoveryCapsules (%d) - %r\n", NumberRecoveryCapsules, Status));
     if (EFI_ERROR (Status)) {
       continue;
@@ -374,13 +384,13 @@ LoadCapsuleOnDisk (
 
     for (CapsuleInstance = 1; CapsuleInstance <= NumberRecoveryCapsules; CapsuleInstance++) {
       CapsuleSize = 0;
-      Status = DeviceRecoveryPpi->GetRecoveryCapsuleInfo (
-                                    (EFI_PEI_SERVICES **)PeiServices,
-                                    DeviceRecoveryPpi,
-                                    CapsuleInstance,
-                                    &CapsuleSize,
-                                    &CapsuleType
-                                    );
+      Status      = DeviceRecoveryPpi->GetRecoveryCapsuleInfo (
+                                         (EFI_PEI_SERVICES **)PeiServices,
+                                         DeviceRecoveryPpi,
+                                         CapsuleInstance,
+                                         &CapsuleSize,
+                                         &CapsuleType
+                                         );
       DEBUG ((DEBUG_INFO, "LoadCapsuleOnDisk - GetRecoveryCapsuleInfo (%d - %x) - %r\n", CapsuleInstance, CapsuleSize, Status));
       if (EFI_ERROR (Status)) {
         break;
@@ -405,14 +415,14 @@ LoadCapsuleOnDisk (
                                     );
       DEBUG ((DEBUG_INFO, "LoadCapsuleOnDisk - LoadRecoveryCapsule (%d) - %r\n", CapsuleInstance, Status));
       if (EFI_ERROR (Status)) {
-        FreePages (CapsuleBuffer, EFI_SIZE_TO_PAGES(CapsuleSize));
+        FreePages (CapsuleBuffer, EFI_SIZE_TO_PAGES (CapsuleSize));
         break;
       }
 
       //
       // Capsule Update Mode, Split relocated Capsule buffer into different capsule vehical hobs.
       //
-      Status = RetrieveRelocatedCapsule(CapsuleBuffer, CapsuleSize);
+      Status = RetrieveRelocatedCapsule (CapsuleBuffer, CapsuleSize);
 
       break;
     }

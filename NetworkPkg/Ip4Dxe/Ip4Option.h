@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __EFI_IP4_OPTION_H__
 #define __EFI_IP4_OPTION_H__
 
-#define IP4_OPTION_EOP        0
-#define IP4_OPTION_NOP        1
-#define IP4_OPTION_LSRR       131  // Loss source and record routing,   10000011
-#define IP4_OPTION_SSRR       137  // Strict source and record routing, 10001001
-#define IP4_OPTION_RR         7    // Record routing, 00000111
+#define IP4_OPTION_EOP   0
+#define IP4_OPTION_NOP   1
+#define IP4_OPTION_LSRR  131       // Loss source and record routing,   10000011
+#define IP4_OPTION_SSRR  137       // Strict source and record routing, 10001001
+#define IP4_OPTION_RR    7         // Record routing, 00000111
 
 #define IP4_OPTION_COPY_MASK  0x80
 
@@ -33,9 +33,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 BOOLEAN
 Ip4OptionIsValid (
-  IN UINT8                  *Option,
-  IN UINT32                 OptionLen,
-  IN BOOLEAN                Rcvd
+  IN UINT8    *Option,
+  IN UINT32   OptionLen,
+  IN BOOLEAN  Rcvd
   );
 
 /**
@@ -57,10 +57,11 @@ Ip4OptionIsValid (
 **/
 EFI_STATUS
 Ip4CopyOption (
-  IN     UINT8              *Option,
-  IN     UINT32             OptionLen,
-  IN     BOOLEAN            FirstFragment,
-  IN OUT UINT8              *Buf,           OPTIONAL
-  IN OUT UINT32             *BufLen
+  IN     UINT8    *Option,
+  IN     UINT32   OptionLen,
+  IN     BOOLEAN  FirstFragment,
+  IN OUT UINT8    *Buf            OPTIONAL,
+  IN OUT UINT32   *BufLen
   );
+
 #endif

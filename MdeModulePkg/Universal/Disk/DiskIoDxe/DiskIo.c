@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Driver binding protocol implementation for DiskIo driver.
 //
-EFI_DRIVER_BINDING_PROTOCOL gDiskIoDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gDiskIoDriverBinding = {
   DiskIoDriverBindingSupported,
   DiskIoDriverBindingStart,
   DiskIoDriverBindingStop,
@@ -32,7 +32,7 @@ EFI_DRIVER_BINDING_PROTOCOL gDiskIoDriverBinding = {
 // Template for DiskIo private data structure.
 // The pointer to BlockIo protocol interface is assigned dynamically.
 //
-DISK_IO_PRIVATE_DATA        gDiskIoPrivateDataTemplate = {
+DISK_IO_PRIVATE_DATA  gDiskIoPrivateDataTemplate = {
   DISK_IO_PRIVATE_DATA_SIGNATURE,
   {
     EFI_DISK_IO_PROTOCOL_REVISION,
@@ -69,8 +69,8 @@ DiskIoDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
-  EFI_STATUS            Status;
-  EFI_BLOCK_IO_PROTOCOL *BlockIo;
+  EFI_STATUS             Status;
+  EFI_BLOCK_IO_PROTOCOL  *BlockIo;
 
   //
   // Open the IO Abstraction(s) needed to perform the supported test.
@@ -78,7 +78,7 @@ DiskIoDriverBindingSupported (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiBlockIoProtocolGuid,
-                  (VOID **) &BlockIo,
+                  (VOID **)&BlockIo,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -98,7 +98,6 @@ DiskIoDriverBindingSupported (
          );
   return EFI_SUCCESS;
 }
-
 
 /**
   Start this driver on ControllerHandle by opening a Block IO protocol and
@@ -136,7 +135,7 @@ DiskIoDriverBindingStart (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiBlockIoProtocolGuid,
-                  (VOID **) &gDiskIoPrivateDataTemplate.BlockIo,
+                  (VOID **)&gDiskIoPrivateDataTemplate.BlockIo,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -148,7 +147,7 @@ DiskIoDriverBindingStart (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiBlockIo2ProtocolGuid,
-                  (VOID **) &gDiskIoPrivateDataTemplate.BlockIo2,
+                  (VOID **)&gDiskIoPrivateDataTemplate.BlockIo2,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
@@ -169,10 +168,12 @@ DiskIoDriverBindingStart (
   //
   // The BlockSize and IoAlign of BlockIo and BlockIo2 should equal.
   //
-  ASSERT ((Instance->BlockIo2 == NULL) ||
-          ((Instance->BlockIo->Media->IoAlign == Instance->BlockIo2->Media->IoAlign) &&
-           (Instance->BlockIo->Media->BlockSize == Instance->BlockIo2->Media->BlockSize)
-          ));
+  ASSERT (
+    (Instance->BlockIo2 == NULL) ||
+    ((Instance->BlockIo->Media->IoAlign == Instance->BlockIo2->Media->IoAlign) &&
+     (Instance->BlockIo->Media->BlockSize == Instance->BlockIo2->Media->BlockSize)
+    )
+    );
 
   InitializeListHead (&Instance->TaskQueue);
   EfiInitializeLock (&Instance->TaskQueueLock, TPL_NOTIFY);
@@ -191,21 +192,24 @@ DiskIoDriverBindingStart (
   if (Instance->BlockIo2 != NULL) {
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &ControllerHandle,
-                    &gEfiDiskIoProtocolGuid,  &Instance->DiskIo,
-                    &gEfiDiskIo2ProtocolGuid, &Instance->DiskIo2,
+                    &gEfiDiskIoProtocolGuid,
+                    &Instance->DiskIo,
+                    &gEfiDiskIo2ProtocolGuid,
+                    &Instance->DiskIo2,
                     NULL
                     );
   } else {
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &ControllerHandle,
-                    &gEfiDiskIoProtocolGuid,  &Instance->DiskIo,
+                    &gEfiDiskIoProtocolGuid,
+                    &Instance->DiskIo,
                     NULL
                     );
   }
 
 ErrorExit:
   if (EFI_ERROR (Status)) {
-    if (Instance != NULL && Instance->SharedWorkingBuffer != NULL) {
+    if ((Instance != NULL) && (Instance->SharedWorkingBuffer != NULL)) {
       FreeAlignedPages (
         Instance->SharedWorkingBuffer,
         EFI_SIZE_TO_PAGES (PcdGet32 (PcdDiskIoDataBufferBlockNum) * Instance->BlockIo->Media->BlockSize)
@@ -246,17 +250,17 @@ ErrorExit1:
 EFI_STATUS
 EFIAPI
 DiskIoDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
-  IN  EFI_HANDLE                     ControllerHandle,
-  IN  UINTN                          NumberOfChildren,
-  IN  EFI_HANDLE                     *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   ControllerHandle,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS            Status;
-  EFI_DISK_IO_PROTOCOL  *DiskIo;
-  EFI_DISK_IO2_PROTOCOL *DiskIo2;
-  DISK_IO_PRIVATE_DATA  *Instance;
-  BOOLEAN               AllTaskDone;
+  EFI_STATUS             Status;
+  EFI_DISK_IO_PROTOCOL   *DiskIo;
+  EFI_DISK_IO2_PROTOCOL  *DiskIo2;
+  DISK_IO_PRIVATE_DATA   *Instance;
+  BOOLEAN                AllTaskDone;
 
   //
   // Get our context back.
@@ -264,7 +268,7 @@ DiskIoDriverBindingStop (
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiDiskIoProtocolGuid,
-                  (VOID **) &DiskIo,
+                  (VOID **)&DiskIo,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -272,10 +276,11 @@ DiskIoDriverBindingStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   Status = gBS->OpenProtocol (
                   ControllerHandle,
                   &gEfiDiskIo2ProtocolGuid,
-                  (VOID **) &DiskIo2,
+                  (VOID **)&DiskIo2,
                   This->DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -295,21 +300,25 @@ DiskIoDriverBindingStop (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+
     Status = gBS->UninstallMultipleProtocolInterfaces (
                     ControllerHandle,
-                    &gEfiDiskIoProtocolGuid,  &Instance->DiskIo,
-                    &gEfiDiskIo2ProtocolGuid, &Instance->DiskIo2,
+                    &gEfiDiskIoProtocolGuid,
+                    &Instance->DiskIo,
+                    &gEfiDiskIo2ProtocolGuid,
+                    &Instance->DiskIo2,
                     NULL
                     );
   } else {
     Status = gBS->UninstallMultipleProtocolInterfaces (
                     ControllerHandle,
-                    &gEfiDiskIoProtocolGuid,  &Instance->DiskIo,
+                    &gEfiDiskIoProtocolGuid,
+                    &Instance->DiskIo,
                     NULL
                     );
   }
-  if (!EFI_ERROR (Status)) {
 
+  if (!EFI_ERROR (Status)) {
     do {
       EfiAcquireLock (&Instance->TaskQueueLock);
       AllTaskDone = IsListEmpty (&Instance->TaskQueue);
@@ -344,7 +353,6 @@ DiskIoDriverBindingStop (
   return Status;
 }
 
-
 /**
   Destroy the sub task.
 
@@ -355,15 +363,16 @@ DiskIoDriverBindingStop (
 **/
 LIST_ENTRY *
 DiskIoDestroySubtask (
-  IN DISK_IO_PRIVATE_DATA     *Instance,
-  IN DISK_IO_SUBTASK          *Subtask
+  IN DISK_IO_PRIVATE_DATA  *Instance,
+  IN DISK_IO_SUBTASK       *Subtask
   )
 {
-  LIST_ENTRY               *Link;
+  LIST_ENTRY  *Link;
 
   if (Subtask->Task != NULL) {
     EfiAcquireLock (&Subtask->Task->SubtasksLock);
   }
+
   Link = RemoveEntryList (&Subtask->Link);
   if (Subtask->Task != NULL) {
     EfiReleaseLock (&Subtask->Task->SubtasksLock);
@@ -378,10 +387,12 @@ DiskIoDestroySubtask (
         : EFI_SIZE_TO_PAGES (Subtask->Length)
         );
     }
+
     if (Subtask->BlockIo2Token.Event != NULL) {
       gBS->CloseEvent (Subtask->BlockIo2Token.Event);
     }
   }
+
   FreePool (Subtask);
 
   return Link;
@@ -396,8 +407,8 @@ DiskIoDestroySubtask (
 VOID
 EFIAPI
 DiskIo2OnReadWriteComplete (
-  IN EFI_EVENT            Event,
-  IN VOID                 *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   DISK_IO_SUBTASK       *Subtask;
@@ -405,7 +416,7 @@ DiskIo2OnReadWriteComplete (
   EFI_STATUS            TransactionStatus;
   DISK_IO_PRIVATE_DATA  *Instance;
 
-  Subtask           = (DISK_IO_SUBTASK *) Context;
+  Subtask           = (DISK_IO_SUBTASK *)Context;
   TransactionStatus = Subtask->BlockIo2Token.TransactionStatus;
   Task              = Subtask->Task;
   Instance          = Task->Instance;
@@ -416,7 +427,8 @@ DiskIo2OnReadWriteComplete (
 
   if ((Subtask->WorkingBuffer != NULL) && !EFI_ERROR (TransactionStatus) &&
       (Task->Token != NULL) && !Subtask->Write
-     ) {
+      )
+  {
     CopyMem (Subtask->Buffer, Subtask->WorkingBuffer + Subtask->Offset, Subtask->Length);
   }
 
@@ -454,22 +466,23 @@ DiskIo2OnReadWriteComplete (
 **/
 DISK_IO_SUBTASK *
 DiskIoCreateSubtask (
-  IN BOOLEAN          Write,
-  IN UINT64           Lba,
-  IN UINT32           Offset,
-  IN UINTN            Length,
-  IN VOID             *WorkingBuffer,  OPTIONAL
-  IN VOID             *Buffer,
-  IN BOOLEAN          Blocking
+  IN BOOLEAN  Write,
+  IN UINT64   Lba,
+  IN UINT32   Offset,
+  IN UINTN    Length,
+  IN VOID     *WorkingBuffer   OPTIONAL,
+  IN VOID     *Buffer,
+  IN BOOLEAN  Blocking
   )
 {
-  DISK_IO_SUBTASK       *Subtask;
-  EFI_STATUS            Status;
+  DISK_IO_SUBTASK  *Subtask;
+  EFI_STATUS       Status;
 
   Subtask = AllocateZeroPool (sizeof (DISK_IO_SUBTASK));
   if (Subtask == NULL) {
     return NULL;
   }
+
   Subtask->Signature     = DISK_IO_SUBTASK_SIGNATURE;
   Subtask->Write         = Write;
   Subtask->Lba           = Lba;
@@ -491,10 +504,16 @@ DiskIoCreateSubtask (
       return NULL;
     }
   }
+
   DEBUG ((
-    EFI_D_BLKIO,
+    DEBUG_BLKIO,
     "  %c:Lba/Offset/Length/WorkingBuffer/Buffer = %016lx/%08x/%08x/%08x/%08x\n",
-    Write ? 'W': 'R', Lba, Offset, Length, WorkingBuffer, Buffer
+    Write ? 'W' : 'R',
+    Lba,
+    Offset,
+    Length,
+    WorkingBuffer,
+    Buffer
     ));
 
   return Subtask;
@@ -527,20 +546,20 @@ DiskIoCreateSubtaskList (
   IN OUT LIST_ENTRY        *Subtasks
   )
 {
-  UINT32                BlockSize;
-  UINT32                IoAlign;
-  UINT64                Lba;
-  UINT64                OverRunLba;
-  UINT32                UnderRun;
-  UINT32                OverRun;
-  UINT8                 *BufferPtr;
-  UINTN                 Length;
-  UINTN                 DataBufferSize;
-  DISK_IO_SUBTASK       *Subtask;
-  VOID                  *WorkingBuffer;
-  LIST_ENTRY            *Link;
+  UINT32           BlockSize;
+  UINT32           IoAlign;
+  UINT64           Lba;
+  UINT64           OverRunLba;
+  UINT32           UnderRun;
+  UINT32           OverRun;
+  UINT8            *BufferPtr;
+  UINTN            Length;
+  UINTN            DataBufferSize;
+  DISK_IO_SUBTASK  *Subtask;
+  VOID             *WorkingBuffer;
+  LIST_ENTRY       *Link;
 
-  DEBUG ((EFI_D_BLKIO, "DiskIo: Create subtasks for task: Offset/BufferSize/Buffer = %016lx/%08x/%08x\n", Offset, BufferSize, Buffer));
+  DEBUG ((DEBUG_BLKIO, "DiskIo: Create subtasks for task: Offset/BufferSize/Buffer = %016lx/%08x/%08x\n", Offset, BufferSize, Buffer));
 
   BlockSize = Instance->BlockIo->Media->BlockSize;
   IoAlign   = Instance->BlockIo->Media->IoAlign;
@@ -549,7 +568,7 @@ DiskIoCreateSubtaskList (
   }
 
   Lba       = DivU64x32Remainder (Offset, BlockSize, &UnderRun);
-  BufferPtr = (UINT8 *) Buffer;
+  BufferPtr = (UINT8 *)Buffer;
 
   //
   // Special handling for zero BufferSize
@@ -559,6 +578,7 @@ DiskIoCreateSubtaskList (
     if (Subtask == NULL) {
       goto Done;
     }
+
     InsertTailList (Subtasks, &Subtask->Link);
     return TRUE;
   }
@@ -573,6 +593,7 @@ DiskIoCreateSubtaskList (
         goto Done;
       }
     }
+
     if (Write) {
       //
       // A half write operation can be splitted to a blocking block-read and half write operation
@@ -582,6 +603,7 @@ DiskIoCreateSubtaskList (
       if (Subtask == NULL) {
         goto Done;
       }
+
       InsertTailList (Subtasks, &Subtask->Link);
     }
 
@@ -589,12 +611,13 @@ DiskIoCreateSubtaskList (
     if (Subtask == NULL) {
       goto Done;
     }
+
     InsertTailList (Subtasks, &Subtask->Link);
 
     BufferPtr  += Length;
     Offset     += Length;
     BufferSize -= Length;
-    Lba ++;
+    Lba++;
   }
 
   OverRunLba  = Lba + DivU64x32Remainder (BufferSize, BlockSize, &OverRun);
@@ -609,6 +632,7 @@ DiskIoCreateSubtaskList (
         goto Done;
       }
     }
+
     if (Write) {
       //
       // A half write operation can be splitted to a blocking block-read and half write operation
@@ -618,6 +642,7 @@ DiskIoCreateSubtaskList (
       if (Subtask == NULL) {
         goto Done;
       }
+
       InsertTailList (Subtasks, &Subtask->Link);
     }
 
@@ -625,6 +650,7 @@ DiskIoCreateSubtaskList (
     if (Subtask == NULL) {
       goto Done;
     }
+
     InsertTailList (Subtasks, &Subtask->Link);
   }
 
@@ -637,25 +663,26 @@ DiskIoCreateSubtaskList (
       if (Subtask == NULL) {
         goto Done;
       }
+
       InsertTailList (Subtasks, &Subtask->Link);
 
       BufferPtr  += BufferSize;
       Offset     += BufferSize;
       BufferSize -= BufferSize;
-
     } else {
       if (Blocking) {
         //
         // Use the allocated buffer instead of the original buffer
         // to avoid alignment issue.
         //
-        for (; Lba < OverRunLba; Lba += PcdGet32 (PcdDiskIoDataBufferBlockNum)) {
+        for ( ; Lba < OverRunLba; Lba += PcdGet32 (PcdDiskIoDataBufferBlockNum)) {
           DataBufferSize = MIN (BufferSize, PcdGet32 (PcdDiskIoDataBufferBlockNum) * BlockSize);
 
           Subtask = DiskIoCreateSubtask (Write, Lba, 0, DataBufferSize, SharedWorkingBuffer, BufferPtr, Blocking);
           if (Subtask == NULL) {
             goto Done;
           }
+
           InsertTailList (Subtasks, &Subtask->Link);
 
           BufferPtr  += DataBufferSize;
@@ -668,7 +695,7 @@ DiskIoCreateSubtaskList (
           //
           // If there is not enough memory, downgrade to blocking access
           //
-          DEBUG ((EFI_D_VERBOSE, "DiskIo: No enough memory so downgrade to blocking access\n"));
+          DEBUG ((DEBUG_VERBOSE, "DiskIo: No enough memory so downgrade to blocking access\n"));
           if (!DiskIoCreateSubtaskList (Instance, Write, Offset, BufferSize, BufferPtr, TRUE, SharedWorkingBuffer, Subtasks)) {
             goto Done;
           }
@@ -677,6 +704,7 @@ DiskIoCreateSubtaskList (
           if (Subtask == NULL) {
             goto Done;
           }
+
           InsertTailList (Subtasks, &Subtask->Link);
         }
 
@@ -697,8 +725,9 @@ Done:
   //
   for (Link = GetFirstNode (Subtasks); !IsNull (Subtasks, Link); ) {
     Subtask = CR (Link, DISK_IO_SUBTASK, Link, DISK_IO_SUBTASK_SIGNATURE);
-    Link = DiskIoDestroySubtask (Instance, Subtask);
+    Link    = DiskIoDestroySubtask (Instance, Subtask);
   }
+
   return FALSE;
 }
 
@@ -714,7 +743,7 @@ Done:
 EFI_STATUS
 EFIAPI
 DiskIo2Cancel (
-  IN EFI_DISK_IO2_PROTOCOL *This
+  IN EFI_DISK_IO2_PROTOCOL  *This
   )
 {
   DISK_IO_PRIVATE_DATA  *Instance;
@@ -726,9 +755,10 @@ DiskIo2Cancel (
   EfiAcquireLock (&Instance->TaskQueueLock);
 
   for (Link = GetFirstNode (&Instance->TaskQueue)
-    ; !IsNull (&Instance->TaskQueue, Link)
-    ; Link = GetNextNode (&Instance->TaskQueue, Link)
-    ) {
+       ; !IsNull (&Instance->TaskQueue, Link)
+       ; Link = GetNextNode (&Instance->TaskQueue, Link)
+       )
+  {
     Task = CR (Link, DISK_IO2_TASK, Link, DISK_IO2_TASK_SIGNATURE);
 
     if (Task->Token != NULL) {
@@ -756,12 +786,12 @@ DiskIo2Cancel (
 **/
 BOOLEAN
 DiskIo2RemoveCompletedTask (
-  IN DISK_IO_PRIVATE_DATA     *Instance
+  IN DISK_IO_PRIVATE_DATA  *Instance
   )
 {
-  BOOLEAN                     QueueEmpty;
-  LIST_ENTRY                  *Link;
-  DISK_IO2_TASK               *Task;
+  BOOLEAN        QueueEmpty;
+  LIST_ENTRY     *Link;
+  DISK_IO2_TASK  *Task;
 
   QueueEmpty = TRUE;
 
@@ -773,10 +803,11 @@ DiskIo2RemoveCompletedTask (
       ASSERT (Task->Token == NULL);
       FreePool (Task);
     } else {
-      Link = GetNextNode (&Instance->TaskQueue, Link);
+      Link       = GetNextNode (&Instance->TaskQueue, Link);
       QueueEmpty = FALSE;
     }
   }
+
   EfiReleaseLock (&Instance->TaskQueueLock);
 
   return QueueEmpty;
@@ -797,41 +828,42 @@ DiskIo2RemoveCompletedTask (
 **/
 EFI_STATUS
 DiskIo2ReadWriteDisk (
-  IN DISK_IO_PRIVATE_DATA     *Instance,
-  IN BOOLEAN                  Write,
-  IN UINT32                   MediaId,
-  IN UINT64                   Offset,
-  IN EFI_DISK_IO2_TOKEN       *Token,
-  IN UINTN                    BufferSize,
-  IN UINT8                    *Buffer
+  IN DISK_IO_PRIVATE_DATA  *Instance,
+  IN BOOLEAN               Write,
+  IN UINT32                MediaId,
+  IN UINT64                Offset,
+  IN EFI_DISK_IO2_TOKEN    *Token,
+  IN UINTN                 BufferSize,
+  IN UINT8                 *Buffer
   )
 {
-  EFI_STATUS             Status;
-  EFI_BLOCK_IO_PROTOCOL  *BlockIo;
-  EFI_BLOCK_IO2_PROTOCOL *BlockIo2;
-  EFI_BLOCK_IO_MEDIA     *Media;
-  LIST_ENTRY             *Link;
-  LIST_ENTRY             *NextLink;
-  LIST_ENTRY             Subtasks;
-  DISK_IO_SUBTASK        *Subtask;
-  DISK_IO2_TASK          *Task;
-  EFI_TPL                OldTpl;
-  BOOLEAN                Blocking;
-  BOOLEAN                SubtaskBlocking;
-  LIST_ENTRY             *SubtasksPtr;
+  EFI_STATUS              Status;
+  EFI_BLOCK_IO_PROTOCOL   *BlockIo;
+  EFI_BLOCK_IO2_PROTOCOL  *BlockIo2;
+  EFI_BLOCK_IO_MEDIA      *Media;
+  LIST_ENTRY              *Link;
+  LIST_ENTRY              *NextLink;
+  LIST_ENTRY              Subtasks;
+  DISK_IO_SUBTASK         *Subtask;
+  DISK_IO2_TASK           *Task;
+  EFI_TPL                 OldTpl;
+  BOOLEAN                 Blocking;
+  BOOLEAN                 SubtaskBlocking;
+  LIST_ENTRY              *SubtasksPtr;
 
-  Task      = NULL;
-  BlockIo   = Instance->BlockIo;
-  BlockIo2  = Instance->BlockIo2;
-  Media     = BlockIo->Media;
-  Status    = EFI_SUCCESS;
-  Blocking  = (BOOLEAN) ((Token == NULL) || (Token->Event == NULL));
+  Task     = NULL;
+  BlockIo  = Instance->BlockIo;
+  BlockIo2 = Instance->BlockIo2;
+  Media    = BlockIo->Media;
+  Status   = EFI_SUCCESS;
+  Blocking = (BOOLEAN)((Token == NULL) || (Token->Event == NULL));
 
   if (Blocking) {
     //
     // Wait till pending async task is completed.
     //
-    while (!DiskIo2RemoveCompletedTask (Instance));
+    while (!DiskIo2RemoveCompletedTask (Instance)) {
+    }
 
     SubtasksPtr = &Subtasks;
   } else {
@@ -858,15 +890,18 @@ DiskIo2ReadWriteDisk (
     if (Task != NULL) {
       FreePool (Task);
     }
+
     return EFI_OUT_OF_RESOURCES;
   }
+
   ASSERT (!IsListEmpty (SubtasksPtr));
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   for ( Link = GetFirstNode (SubtasksPtr), NextLink = GetNextNode (SubtasksPtr, Link)
-      ; !IsNull (SubtasksPtr, Link)
-      ; Link = NextLink, NextLink = GetNextNode (SubtasksPtr, NextLink)
-      ) {
+        ; !IsNull (SubtasksPtr, Link)
+        ; Link = NextLink, NextLink = GetNextNode (SubtasksPtr, NextLink)
+        )
+  {
     Subtask         = CR (Link, DISK_IO_SUBTASK, Link, DISK_IO_SUBTASK_SIGNATURE);
     Subtask->Task   = Task;
     SubtaskBlocking = Subtask->Blocking;
@@ -902,7 +937,6 @@ DiskIo2ReadWriteDisk (
                              (Subtask->WorkingBuffer != NULL) ? Subtask->WorkingBuffer : Subtask->Buffer
                              );
       }
-
     } else {
       //
       // Read
@@ -951,7 +985,7 @@ DiskIo2ReadWriteDisk (
   //
   if (EFI_ERROR (Status)) {
     while (!IsNull (SubtasksPtr, NextLink)) {
-      Subtask = CR (NextLink, DISK_IO_SUBTASK, Link, DISK_IO_SUBTASK_SIGNATURE);
+      Subtask  = CR (NextLink, DISK_IO_SUBTASK, Link, DISK_IO_SUBTASK_SIGNATURE);
       NextLink = DiskIoDestroySubtask (Instance, Subtask);
     }
   }
@@ -970,7 +1004,7 @@ DiskIo2ReadWriteDisk (
       // Task->Token should be set to NULL by the DiskIo2OnReadWriteComplete
       // It it's not, that means the non-blocking request was downgraded to blocking request.
       //
-      DEBUG ((EFI_D_VERBOSE, "DiskIo: Non-blocking request was downgraded to blocking request, signal event directly.\n"));
+      DEBUG ((DEBUG_VERBOSE, "DiskIo: Non-blocking request was downgraded to blocking request, signal event directly.\n"));
       Task->Token->TransactionStatus = Status;
       gBS->SignalEvent (Task->Token->Event);
     }
@@ -1008,17 +1042,22 @@ DiskIo2ReadWriteDisk (
 EFI_STATUS
 EFIAPI
 DiskIo2ReadDiskEx (
-  IN EFI_DISK_IO2_PROTOCOL        *This,
-  IN UINT32                       MediaId,
-  IN UINT64                       Offset,
-  IN OUT EFI_DISK_IO2_TOKEN       *Token,
-  IN UINTN                        BufferSize,
-  OUT VOID                        *Buffer
+  IN EFI_DISK_IO2_PROTOCOL   *This,
+  IN UINT32                  MediaId,
+  IN UINT64                  Offset,
+  IN OUT EFI_DISK_IO2_TOKEN  *Token,
+  IN UINTN                   BufferSize,
+  OUT VOID                   *Buffer
   )
 {
   return DiskIo2ReadWriteDisk (
            DISK_IO_PRIVATE_DATA_FROM_DISK_IO2 (This),
-           FALSE, MediaId, Offset, Token, BufferSize, (UINT8 *) Buffer
+           FALSE,
+           MediaId,
+           Offset,
+           Token,
+           BufferSize,
+           (UINT8 *)Buffer
            );
 }
 
@@ -1047,17 +1086,22 @@ DiskIo2ReadDiskEx (
 EFI_STATUS
 EFIAPI
 DiskIo2WriteDiskEx (
-  IN EFI_DISK_IO2_PROTOCOL        *This,
-  IN UINT32                       MediaId,
-  IN UINT64                       Offset,
-  IN OUT EFI_DISK_IO2_TOKEN       *Token,
-  IN UINTN                        BufferSize,
-  IN VOID                         *Buffer
+  IN EFI_DISK_IO2_PROTOCOL   *This,
+  IN UINT32                  MediaId,
+  IN UINT64                  Offset,
+  IN OUT EFI_DISK_IO2_TOKEN  *Token,
+  IN UINTN                   BufferSize,
+  IN VOID                    *Buffer
   )
 {
   return DiskIo2ReadWriteDisk (
            DISK_IO_PRIVATE_DATA_FROM_DISK_IO2 (This),
-           TRUE, MediaId, Offset, Token, BufferSize, (UINT8 *) Buffer
+           TRUE,
+           MediaId,
+           Offset,
+           Token,
+           BufferSize,
+           (UINT8 *)Buffer
            );
 }
 
@@ -1070,15 +1114,15 @@ DiskIo2WriteDiskEx (
 VOID
 EFIAPI
 DiskIo2OnFlushComplete (
-  IN EFI_EVENT                 Event,
-  IN VOID                      *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  DISK_IO2_FLUSH_TASK             *Task;
+  DISK_IO2_FLUSH_TASK  *Task;
 
   gBS->CloseEvent (Event);
 
-  Task = (DISK_IO2_FLUSH_TASK *) Context;
+  Task = (DISK_IO2_FLUSH_TASK *)Context;
   ASSERT (Task->Signature == DISK_IO2_FLUSH_TASK_SIGNATURE);
   Task->Token->TransactionStatus = Task->BlockIo2Token.TransactionStatus;
   gBS->SignalEvent (Task->Token->Event);
@@ -1104,13 +1148,13 @@ DiskIo2OnFlushComplete (
 EFI_STATUS
 EFIAPI
 DiskIo2FlushDiskEx (
-  IN EFI_DISK_IO2_PROTOCOL        *This,
-  IN OUT EFI_DISK_IO2_TOKEN       *Token
+  IN EFI_DISK_IO2_PROTOCOL   *This,
+  IN OUT EFI_DISK_IO2_TOKEN  *Token
   )
 {
-  EFI_STATUS                      Status;
-  DISK_IO2_FLUSH_TASK             *Task;
-  DISK_IO_PRIVATE_DATA            *Private;
+  EFI_STATUS            Status;
+  DISK_IO2_FLUSH_TASK   *Task;
+  DISK_IO_PRIVATE_DATA  *Private;
 
   Private = DISK_IO_PRIVATE_DATA_FROM_DISK_IO2 (This);
 
@@ -1131,9 +1175,10 @@ DiskIo2FlushDiskEx (
       FreePool (Task);
       return Status;
     }
+
     Task->Signature = DISK_IO2_FLUSH_TASK_SIGNATURE;
     Task->Token     = Token;
-    Status = Private->BlockIo2->FlushBlocksEx (Private->BlockIo2, &Task->BlockIo2Token);
+    Status          = Private->BlockIo2->FlushBlocksEx (Private->BlockIo2, &Task->BlockIo2Token);
     if (EFI_ERROR (Status)) {
       gBS->CloseEvent (Task->BlockIo2Token.Event);
       FreePool (Task);
@@ -1180,10 +1225,14 @@ DiskIoReadDisk (
 {
   return DiskIo2ReadWriteDisk (
            DISK_IO_PRIVATE_DATA_FROM_DISK_IO (This),
-           FALSE, MediaId, Offset, NULL, BufferSize, (UINT8 *) Buffer
+           FALSE,
+           MediaId,
+           Offset,
+           NULL,
+           BufferSize,
+           (UINT8 *)Buffer
            );
 }
-
 
 /**
   Writes BufferSize bytes from Buffer into Offset.
@@ -1222,7 +1271,12 @@ DiskIoWriteDisk (
 {
   return DiskIo2ReadWriteDisk (
            DISK_IO_PRIVATE_DATA_FROM_DISK_IO (This),
-           TRUE, MediaId, Offset, NULL, BufferSize, (UINT8 *) Buffer
+           TRUE,
+           MediaId,
+           Offset,
+           NULL,
+           BufferSize,
+           (UINT8 *)Buffer
            );
 }
 
@@ -1239,11 +1293,11 @@ DiskIoWriteDisk (
 EFI_STATUS
 EFIAPI
 InitializeDiskIo (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   //
   // Install driver model protocol(s).

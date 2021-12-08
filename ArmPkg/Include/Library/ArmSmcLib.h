@@ -14,14 +14,14 @@
  * The native size is used for the arguments.
  */
 typedef struct {
-  UINTN  Arg0;
-  UINTN  Arg1;
-  UINTN  Arg2;
-  UINTN  Arg3;
-  UINTN  Arg4;
-  UINTN  Arg5;
-  UINTN  Arg6;
-  UINTN  Arg7;
+  UINTN    Arg0;
+  UINTN    Arg1;
+  UINTN    Arg2;
+  UINTN    Arg3;
+  UINTN    Arg4;
+  UINTN    Arg5;
+  UINTN    Arg6;
+  UINTN    Arg7;
 } ARM_SMC_ARGS;
 
 /**
@@ -34,7 +34,7 @@ typedef struct {
 **/
 VOID
 ArmCallSmc (
-  IN OUT ARM_SMC_ARGS *Args
+  IN OUT ARM_SMC_ARGS  *Args
   );
 
 #endif // ARM_SMC_LIB_H_

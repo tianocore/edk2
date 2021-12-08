@@ -21,7 +21,7 @@ typedef struct _PEI_SEC_PERFORMANCE_PPI PEI_SEC_PERFORMANCE_PPI;
 /// Performance data collected in SEC phase.
 ///
 typedef struct {
-  UINT64         ResetEnd; ///< Timer value logged at the beginning of firmware image execution, in unit of nanosecond.
+  UINT64    ResetEnd;      ///< Timer value logged at the beginning of firmware image execution, in unit of nanosecond.
 } FIRMWARE_SEC_PERFORMANCE;
 
 /**
@@ -42,7 +42,7 @@ typedef struct {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *GET_SEC_PERFORMANCE) (
+(EFIAPI *GET_SEC_PERFORMANCE)(
   IN CONST EFI_PEI_SERVICES          **PeiServices,
   IN       PEI_SEC_PERFORMANCE_PPI   *This,
   OUT      FIRMWARE_SEC_PERFORMANCE  *Performance
@@ -52,9 +52,9 @@ EFI_STATUS
 /// This PPI provides function to get performance data collected in SEC phase.
 ///
 struct _PEI_SEC_PERFORMANCE_PPI {
-  GET_SEC_PERFORMANCE         GetPerformance;
+  GET_SEC_PERFORMANCE    GetPerformance;
 };
 
-extern EFI_GUID gPeiSecPerformancePpiGuid;
+extern EFI_GUID  gPeiSecPerformancePpiGuid;
 
 #endif

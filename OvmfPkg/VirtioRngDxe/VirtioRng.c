@@ -64,12 +64,12 @@ STATIC
 EFI_STATUS
 EFIAPI
 VirtioRngGetInfo (
-  IN      EFI_RNG_PROTOCOL        *This,
-  IN OUT  UINTN                   *RNGAlgorithmListSize,
-  OUT     EFI_RNG_ALGORITHM       *RNGAlgorithmList
+  IN      EFI_RNG_PROTOCOL   *This,
+  IN OUT  UINTN              *RNGAlgorithmListSize,
+  OUT     EFI_RNG_ALGORITHM  *RNGAlgorithmList
   )
 {
-  if (This == NULL || RNGAlgorithmListSize == NULL) {
+  if ((This == NULL) || (RNGAlgorithmListSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -121,31 +121,32 @@ STATIC
 EFI_STATUS
 EFIAPI
 VirtioRngGetRNG (
-  IN EFI_RNG_PROTOCOL            *This,
-  IN EFI_RNG_ALGORITHM           *RNGAlgorithm, OPTIONAL
-  IN UINTN                       RNGValueLength,
-  OUT UINT8                      *RNGValue
+  IN EFI_RNG_PROTOCOL   *This,
+  IN EFI_RNG_ALGORITHM  *RNGAlgorithm  OPTIONAL,
+  IN UINTN              RNGValueLength,
+  OUT UINT8             *RNGValue
   )
 {
-  VIRTIO_RNG_DEV            *Dev;
-  DESC_INDICES              Indices;
-  volatile UINT8            *Buffer;
-  UINTN                     Index;
-  UINT32                    Len;
-  UINT32                    BufferSize;
-  EFI_STATUS                Status;
-  EFI_PHYSICAL_ADDRESS      DeviceAddress;
-  VOID                      *Mapping;
+  VIRTIO_RNG_DEV        *Dev;
+  DESC_INDICES          Indices;
+  volatile UINT8        *Buffer;
+  UINTN                 Index;
+  UINT32                Len;
+  UINT32                BufferSize;
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  DeviceAddress;
+  VOID                  *Mapping;
 
-  if (This == NULL || RNGValueLength == 0 || RNGValue == NULL) {
+  if ((This == NULL) || (RNGValueLength == 0) || (RNGValue == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // We only support the raw algorithm, so reject requests for anything else
   //
-  if (RNGAlgorithm != NULL &&
-      !CompareGuid (RNGAlgorithm, &gEfiRngAlgorithmRaw)) {
+  if ((RNGAlgorithm != NULL) &&
+      !CompareGuid (RNGAlgorithm, &gEfiRngAlgorithmRaw))
+  {
     return EFI_UNSUPPORTED;
   }
 
@@ -180,17 +181,21 @@ VirtioRngGetRNG (
     BufferSize = (UINT32)MIN (RNGValueLength - Index, (UINTN)MAX_UINT32);
 
     VirtioPrepare (&Dev->Ring, &Indices);
-    VirtioAppendDesc (&Dev->Ring,
+    VirtioAppendDesc (
+      &Dev->Ring,
       DeviceAddress + Index,
       BufferSize,
       VRING_DESC_F_WRITE,
-      &Indices);
+      &Indices
+      );
 
     if (VirtioFlush (Dev->VirtIo, 0, &Dev->Ring, &Indices, &Len) !=
-        EFI_SUCCESS) {
+        EFI_SUCCESS)
+    {
       Status = EFI_DEVICE_ERROR;
       goto UnmapBuffer;
     }
+
     ASSERT (Len > 0);
     ASSERT (Len <= BufferSize);
   }
@@ -207,6 +212,7 @@ VirtioRngGetRNG (
   for (Index = 0; Index < RNGValueLength; Index++) {
     RNGValue[Index] = Buffer[Index];
   }
+
   Status = EFI_SUCCESS;
 
 UnmapBuffer:
@@ -227,32 +233,32 @@ STATIC
 EFI_STATUS
 EFIAPI
 VirtioRngInit (
-  IN OUT VIRTIO_RNG_DEV *Dev
+  IN OUT VIRTIO_RNG_DEV  *Dev
   )
 {
-  UINT8      NextDevStat;
-  EFI_STATUS Status;
-  UINT16     QueueSize;
-  UINT64     Features;
-  UINT64     RingBaseShift;
+  UINT8       NextDevStat;
+  EFI_STATUS  Status;
+  UINT16      QueueSize;
+  UINT64      Features;
+  UINT64      RingBaseShift;
 
   //
   // Execute virtio-0.9.5, 2.2.1 Device Initialization Sequence.
   //
   NextDevStat = 0;             // step 1 -- reset device
-  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
+  Status      = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
 
   NextDevStat |= VSTAT_ACK;    // step 2 -- acknowledge device presence
-  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
+  Status       = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
 
   NextDevStat |= VSTAT_DRIVER; // step 3 -- we know how to drive it
-  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
+  Status       = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
@@ -293,6 +299,7 @@ VirtioRngInit (
   if (EFI_ERROR (Status)) {
     goto Failed;
   }
+
   Status = Dev->VirtIo->GetQueueNumMax (Dev->VirtIo, &QueueSize);
   if (EFI_ERROR (Status)) {
     goto Failed;
@@ -355,7 +362,7 @@ VirtioRngInit (
   //
   if (Dev->VirtIo->Revision < VIRTIO_SPEC_REVISION (1, 0, 0)) {
     Features &= ~(UINT64)(VIRTIO_F_VERSION_1 | VIRTIO_F_IOMMU_PLATFORM);
-    Status = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
+    Status    = Dev->VirtIo->SetGuestFeatures (Dev->VirtIo, Features);
     if (EFI_ERROR (Status)) {
       goto UnmapQueue;
     }
@@ -365,7 +372,7 @@ VirtioRngInit (
   // step 6 -- initialization complete
   //
   NextDevStat |= VSTAT_DRIVER_OK;
-  Status = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
+  Status       = Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, NextDevStat);
   if (EFI_ERROR (Status)) {
     goto UnmapQueue;
   }
@@ -373,8 +380,8 @@ VirtioRngInit (
   //
   // populate the exported interface's attributes
   //
-  Dev->Rng.GetInfo    = VirtioRngGetInfo;
-  Dev->Rng.GetRNG     = VirtioRngGetRNG;
+  Dev->Rng.GetInfo = VirtioRngGetInfo;
+  Dev->Rng.GetRNG  = VirtioRngGetRNG;
 
   return EFI_SUCCESS;
 
@@ -395,12 +402,11 @@ Failed:
   return Status; // reached only via Failed above
 }
 
-
 STATIC
 VOID
 EFIAPI
 VirtioRngUninit (
-  IN OUT VIRTIO_RNG_DEV *Dev
+  IN OUT VIRTIO_RNG_DEV  *Dev
   )
 {
   //
@@ -423,11 +429,11 @@ STATIC
 VOID
 EFIAPI
 VirtioRngExitBoot (
-  IN  EFI_EVENT Event,
-  IN  VOID      *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
-  VIRTIO_RNG_DEV *Dev;
+  VIRTIO_RNG_DEV  *Dev;
 
   DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
   //
@@ -440,7 +446,6 @@ VirtioRngExitBoot (
   Dev = Context;
   Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
 }
-
 
 //
 // Probe, start and stop functions of this driver, called by the DXE core for
@@ -461,13 +466,13 @@ STATIC
 EFI_STATUS
 EFIAPI
 VirtioRngDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS             Status;
-  VIRTIO_DEVICE_PROTOCOL *VirtIo;
+  EFI_STATUS              Status;
+  VIRTIO_DEVICE_PROTOCOL  *VirtIo;
 
   //
   // Attempt to open the device with the VirtIo set of interfaces. On success,
@@ -496,8 +501,12 @@ VirtioRngDriverBindingSupported (
   // We needed VirtIo access only transitorily, to see whether we support the
   // device or not.
   //
-  gBS->CloseProtocol (DeviceHandle, &gVirtioDeviceProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  gBS->CloseProtocol (
+         DeviceHandle,
+         &gVirtioDeviceProtocolGuid,
+         This->DriverBindingHandle,
+         DeviceHandle
+         );
   return Status;
 }
 
@@ -505,22 +514,27 @@ STATIC
 EFI_STATUS
 EFIAPI
 VirtioRngDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
   VIRTIO_RNG_DEV  *Dev;
-  EFI_STATUS Status;
+  EFI_STATUS      Status;
 
-  Dev = (VIRTIO_RNG_DEV *) AllocateZeroPool (sizeof *Dev);
+  Dev = (VIRTIO_RNG_DEV *)AllocateZeroPool (sizeof *Dev);
   if (Dev == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->OpenProtocol (DeviceHandle, &gVirtioDeviceProtocolGuid,
-                  (VOID **)&Dev->VirtIo, This->DriverBindingHandle,
-                  DeviceHandle, EFI_OPEN_PROTOCOL_BY_DRIVER);
+  Status = gBS->OpenProtocol (
+                  DeviceHandle,
+                  &gVirtioDeviceProtocolGuid,
+                  (VOID **)&Dev->VirtIo,
+                  This->DriverBindingHandle,
+                  DeviceHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   if (EFI_ERROR (Status)) {
     goto FreeVirtioRng;
   }
@@ -533,8 +547,13 @@ VirtioRngDriverBindingStart (
     goto CloseVirtIo;
   }
 
-  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_CALLBACK,
-                  &VirtioRngExitBoot, Dev, &Dev->ExitBoot);
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_CALLBACK,
+                  &VirtioRngExitBoot,
+                  Dev,
+                  &Dev->ExitBoot
+                  );
   if (EFI_ERROR (Status)) {
     goto UninitDev;
   }
@@ -544,9 +563,12 @@ VirtioRngDriverBindingStart (
   // interface.
   //
   Dev->Signature = VIRTIO_RNG_SIG;
-  Status = gBS->InstallProtocolInterface (&DeviceHandle,
-                  &gEfiRngProtocolGuid, EFI_NATIVE_INTERFACE,
-                  &Dev->Rng);
+  Status         = gBS->InstallProtocolInterface (
+                          &DeviceHandle,
+                          &gEfiRngProtocolGuid,
+                          EFI_NATIVE_INTERFACE,
+                          &Dev->Rng
+                          );
   if (EFI_ERROR (Status)) {
     goto CloseExitBoot;
   }
@@ -560,8 +582,12 @@ UninitDev:
   VirtioRngUninit (Dev);
 
 CloseVirtIo:
-  gBS->CloseProtocol (DeviceHandle, &gVirtioDeviceProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  gBS->CloseProtocol (
+         DeviceHandle,
+         &gVirtioDeviceProtocolGuid,
+         This->DriverBindingHandle,
+         DeviceHandle
+         );
 
 FreeVirtioRng:
   FreePool (Dev);
@@ -569,20 +595,19 @@ FreeVirtioRng:
   return Status;
 }
 
-
 STATIC
 EFI_STATUS
 EFIAPI
 VirtioRngDriverBindingStop (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  DeviceHandle,
-  IN UINTN                       NumberOfChildren,
-  IN EFI_HANDLE                  *ChildHandleBuffer
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   DeviceHandle,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  EFI_STATUS                      Status;
-  EFI_RNG_PROTOCOL                *Rng;
-  VIRTIO_RNG_DEV                  *Dev;
+  EFI_STATUS        Status;
+  EFI_RNG_PROTOCOL  *Rng;
+  VIRTIO_RNG_DEV    *Dev;
 
   Status = gBS->OpenProtocol (
                   DeviceHandle,                     // candidate device
@@ -601,8 +626,11 @@ VirtioRngDriverBindingStop (
   //
   // Handle Stop() requests for in-use driver instances gracefully.
   //
-  Status = gBS->UninstallProtocolInterface (DeviceHandle,
-                  &gEfiRngProtocolGuid, &Dev->Rng);
+  Status = gBS->UninstallProtocolInterface (
+                  DeviceHandle,
+                  &gEfiRngProtocolGuid,
+                  &Dev->Rng
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -611,21 +639,24 @@ VirtioRngDriverBindingStop (
 
   VirtioRngUninit (Dev);
 
-  gBS->CloseProtocol (DeviceHandle, &gVirtioDeviceProtocolGuid,
-         This->DriverBindingHandle, DeviceHandle);
+  gBS->CloseProtocol (
+         DeviceHandle,
+         &gVirtioDeviceProtocolGuid,
+         This->DriverBindingHandle,
+         DeviceHandle
+         );
 
   FreePool (Dev);
 
   return EFI_SUCCESS;
 }
 
-
 //
 // The static object that groups the Supported() (ie. probe), Start() and
 // Stop() functions of the driver together. Refer to UEFI Spec 2.3.1 + Errata
 // C, 10.1 EFI Driver Binding Protocol.
 //
-STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
+STATIC EFI_DRIVER_BINDING_PROTOCOL  gDriverBinding = {
   &VirtioRngDriverBindingSupported,
   &VirtioRngDriverBindingStart,
   &VirtioRngDriverBindingStop,
@@ -634,7 +665,6 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
         // EfiLibInstallDriverBindingComponentName2() in VirtioRngEntryPoint()
   NULL  // DriverBindingHandle, ditto
 };
-
 
 //
 // The purpose of the following scaffolding (EFI_COMPONENT_NAME_PROTOCOL and
@@ -645,21 +675,21 @@ STATIC EFI_DRIVER_BINDING_PROTOCOL gDriverBinding = {
 //
 
 STATIC
-EFI_UNICODE_STRING_TABLE mDriverNameTable[] = {
+EFI_UNICODE_STRING_TABLE  mDriverNameTable[] = {
   { "eng;en", L"Virtio Random Number Generator Driver" },
-  { NULL,     NULL                   }
+  { NULL,     NULL                                     }
 };
 
 STATIC
-EFI_COMPONENT_NAME_PROTOCOL gComponentName;
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName;
 
 STATIC
 EFI_STATUS
 EFIAPI
 VirtioRngGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
-  IN  CHAR8                       *Language,
-  OUT CHAR16                      **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -675,30 +705,29 @@ STATIC
 EFI_STATUS
 EFIAPI
 VirtioRngGetDeviceName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
-  IN  EFI_HANDLE                  DeviceHandle,
-  IN  EFI_HANDLE                  ChildHandle,
-  IN  CHAR8                       *Language,
-  OUT CHAR16                      **ControllerName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  EFI_HANDLE                   DeviceHandle,
+  IN  EFI_HANDLE                   ChildHandle,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **ControllerName
   )
 {
   return EFI_UNSUPPORTED;
 }
 
 STATIC
-EFI_COMPONENT_NAME_PROTOCOL gComponentName = {
+EFI_COMPONENT_NAME_PROTOCOL  gComponentName = {
   &VirtioRngGetDriverName,
   &VirtioRngGetDeviceName,
   "eng" // SupportedLanguages, ISO 639-2 language codes
 };
 
 STATIC
-EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     &VirtioRngGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) &VirtioRngGetDeviceName,
+EFI_COMPONENT_NAME2_PROTOCOL  gComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)&VirtioRngGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)&VirtioRngGetDeviceName,
   "en" // SupportedLanguages, RFC 4646 language codes
 };
-
 
 //
 // Entry point of this driver.
@@ -706,8 +735,8 @@ EFI_COMPONENT_NAME2_PROTOCOL gComponentName2 = {
 EFI_STATUS
 EFIAPI
 VirtioRngEntryPoint (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return EfiLibInstallDriverBindingComponentName2 (

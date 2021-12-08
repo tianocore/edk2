@@ -9,13 +9,13 @@
 
 #include "UefiShellDriver1CommandsLib.h"
 
-#define MAX_LEN_DRIVER_NAME 35
+#define MAX_LEN_DRIVER_NAME  35
 
-STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
-  {L"-sfo", TypeFlag},
-  {L"-l", TypeValue},
-  {NULL, TypeMax}
-  };
+STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
+  { L"-sfo", TypeFlag  },
+  { L"-l",   TypeValue },
+  { NULL,    TypeMax   }
+};
 
 /**
   Get a device path (in text format) for a given handle.
@@ -26,59 +26,64 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   @return         A pointer to the driver path as a string.  The callee must
                   free this memory.
 **/
-CHAR16*
-GetDevicePathTextForHandle(
-  IN EFI_HANDLE TheHandle
+CHAR16 *
+GetDevicePathTextForHandle (
+  IN EFI_HANDLE  TheHandle
   )
 {
-  EFI_STATUS                Status;
-  EFI_LOADED_IMAGE_PROTOCOL *LoadedImage;
-  EFI_DEVICE_PATH_PROTOCOL  *ImageDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *FinalPath;
-  CHAR16                    *RetVal;
+  EFI_STATUS                 Status;
+  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL   *ImageDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL   *FinalPath;
+  CHAR16                     *RetVal;
 
   FinalPath = NULL;
 
   Status = gBS->OpenProtocol (
-                TheHandle,
-                &gEfiLoadedImageProtocolGuid,
-                (VOID**)&LoadedImage,
-                gImageHandle,
-                NULL,
-                EFI_OPEN_PROTOCOL_GET_PROTOCOL
-               );
-  if (!EFI_ERROR (Status)) {
-    Status = gBS->OpenProtocol (
-                  LoadedImage->DeviceHandle,
-                  &gEfiDevicePathProtocolGuid,
-                  (VOID**)&ImageDevicePath,
+                  TheHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **)&LoadedImage,
                   gImageHandle,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                 );
+                  );
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->OpenProtocol (
+                    LoadedImage->DeviceHandle,
+                    &gEfiDevicePathProtocolGuid,
+                    (VOID **)&ImageDevicePath,
+                    gImageHandle,
+                    NULL,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
     if (!EFI_ERROR (Status)) {
       FinalPath = AppendDevicePath (ImageDevicePath, LoadedImage->FilePath);
-      gBS->CloseProtocol(
-        LoadedImage->DeviceHandle,
-        &gEfiDevicePathProtocolGuid,
-        gImageHandle,
-        NULL);
+      gBS->CloseProtocol (
+             LoadedImage->DeviceHandle,
+             &gEfiDevicePathProtocolGuid,
+             gImageHandle,
+             NULL
+             );
     }
-    gBS->CloseProtocol(
-                TheHandle,
-                &gEfiLoadedImageProtocolGuid,
-                gImageHandle,
-                NULL);
+
+    gBS->CloseProtocol (
+           TheHandle,
+           &gEfiLoadedImageProtocolGuid,
+           gImageHandle,
+           NULL
+           );
   }
 
   if (FinalPath == NULL) {
     return (NULL);
   }
-  RetVal = gEfiShellProtocol->GetFilePathFromDevicePath(FinalPath);
+
+  RetVal = gEfiShellProtocol->GetFilePathFromDevicePath (FinalPath);
   if (RetVal == NULL) {
-    RetVal = ConvertDevicePathToText(FinalPath, TRUE, TRUE);
+    RetVal = ConvertDevicePathToText (FinalPath, TRUE, TRUE);
   }
-  FreePool(FinalPath);
+
+  FreePool (FinalPath);
   return (RetVal);
 }
 
@@ -91,15 +96,17 @@ GetDevicePathTextForHandle(
   @retval FALSE             The driver does not have Driver Configuration.
 **/
 BOOLEAN
-ReturnDriverConfig(
-  IN CONST EFI_HANDLE TheHandle
+ReturnDriverConfig (
+  IN CONST EFI_HANDLE  TheHandle
   )
 {
-  EFI_STATUS                  Status;
-  Status = gBS->OpenProtocol((EFI_HANDLE)TheHandle, &gEfiDriverConfigurationProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL);
-  if (EFI_ERROR(Status)) {
+  EFI_STATUS  Status;
+
+  Status = gBS->OpenProtocol ((EFI_HANDLE)TheHandle, &gEfiDriverConfigurationProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL);
+  if (EFI_ERROR (Status)) {
     return (FALSE);
   }
+
   return (TRUE);
 }
 
@@ -112,18 +119,20 @@ ReturnDriverConfig(
   @retval FALSE             The driver does not have Driver Diagnostics.
 **/
 BOOLEAN
-ReturnDriverDiag(
-  IN CONST EFI_HANDLE TheHandle
+ReturnDriverDiag (
+  IN CONST EFI_HANDLE  TheHandle
   )
 {
-  EFI_STATUS                  Status;
-  Status = gBS->OpenProtocol((EFI_HANDLE)TheHandle, &gEfiDriverDiagnostics2ProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL);
-  if (EFI_ERROR(Status)) {
-    Status = gBS->OpenProtocol((EFI_HANDLE)TheHandle, &gEfiDriverDiagnosticsProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL);
-    if (EFI_ERROR(Status)) {
+  EFI_STATUS  Status;
+
+  Status = gBS->OpenProtocol ((EFI_HANDLE)TheHandle, &gEfiDriverDiagnostics2ProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL);
+  if (EFI_ERROR (Status)) {
+    Status = gBS->OpenProtocol ((EFI_HANDLE)TheHandle, &gEfiDriverDiagnosticsProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL);
+    if (EFI_ERROR (Status)) {
       return (FALSE);
     }
   }
+
   return (TRUE);
 }
 
@@ -136,21 +145,22 @@ ReturnDriverDiag(
   @retval 0xFFFFFFFF  An error ocurred.
 **/
 UINT32
-ReturnDriverVersion(
-  IN CONST EFI_HANDLE TheHandle
+ReturnDriverVersion (
+  IN CONST EFI_HANDLE  TheHandle
   )
 {
-  EFI_DRIVER_BINDING_PROTOCOL *DriverBinding;
-  EFI_STATUS                  Status;
-  UINT32                      RetVal;
+  EFI_DRIVER_BINDING_PROTOCOL  *DriverBinding;
+  EFI_STATUS                   Status;
+  UINT32                       RetVal;
 
   RetVal = (UINT32)-1;
 
-  Status = gBS->OpenProtocol((EFI_HANDLE)TheHandle, &gEfiDriverBindingProtocolGuid, (VOID**)&DriverBinding, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (!EFI_ERROR(Status)) {
+  Status = gBS->OpenProtocol ((EFI_HANDLE)TheHandle, &gEfiDriverBindingProtocolGuid, (VOID **)&DriverBinding, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+  if (!EFI_ERROR (Status)) {
     RetVal = DriverBinding->Version;
-    gBS->CloseProtocol(TheHandle, &gEfiDriverBindingProtocolGuid, gImageHandle, NULL);
+    gBS->CloseProtocol (TheHandle, &gEfiDriverBindingProtocolGuid, gImageHandle, NULL);
   }
+
   return (RetVal);
 }
 
@@ -163,18 +173,18 @@ ReturnDriverVersion(
 **/
 CHAR16 *
 GetImageNameFromHandle (
-  IN CONST EFI_HANDLE Handle
+  IN CONST EFI_HANDLE  Handle
   )
 {
-  EFI_STATUS                        Status;
-  EFI_DRIVER_BINDING_PROTOCOL       *DriverBinding;
-  EFI_LOADED_IMAGE_PROTOCOL         *LoadedImage;
-  EFI_DEVICE_PATH_PROTOCOL          *DevPathNode;
-  EFI_GUID                          *NameGuid;
-  CHAR16                            *ImageName;
-  UINTN                             BufferSize;
-  UINT32                            AuthenticationStatus;
-  EFI_FIRMWARE_VOLUME2_PROTOCOL     *Fv2;
+  EFI_STATUS                     Status;
+  EFI_DRIVER_BINDING_PROTOCOL    *DriverBinding;
+  EFI_LOADED_IMAGE_PROTOCOL      *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL       *DevPathNode;
+  EFI_GUID                       *NameGuid;
+  CHAR16                         *ImageName;
+  UINTN                          BufferSize;
+  UINT32                         AuthenticationStatus;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv2;
 
   LoadedImage   = NULL;
   DriverBinding = NULL;
@@ -183,18 +193,19 @@ GetImageNameFromHandle (
   Status = gBS->OpenProtocol (
                   Handle,
                   &gEfiDriverBindingProtocolGuid,
-                  (VOID **) &DriverBinding,
+                  (VOID **)&DriverBinding,
                   NULL,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-      return NULL;
+    return NULL;
   }
+
   Status = gBS->OpenProtocol (
                   DriverBinding->ImageHandle,
                   &gEfiLoadedImageProtocolGuid,
-                  (VOID**)&LoadedImage,
+                  (VOID **)&LoadedImage,
                   gImageHandle,
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -204,6 +215,7 @@ GetImageNameFromHandle (
     if (DevPathNode == NULL) {
       return NULL;
     }
+
     while (!IsDevicePathEnd (DevPathNode)) {
       NameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)DevPathNode);
       if (NameGuid != NULL) {
@@ -225,18 +237,22 @@ GetImageNameFromHandle (
           if (!EFI_ERROR (Status)) {
             break;
           }
+
           ImageName = NULL;
         }
       }
+
       //
       // Next device path node
       //
       DevPathNode = NextDevicePathNode (DevPathNode);
     }
+
     if (ImageName == NULL) {
       ImageName = ConvertDevicePathToText (LoadedImage->FilePath, TRUE, TRUE);
     }
   }
+
   return ImageName;
 }
 
@@ -253,75 +269,75 @@ ShellCommandRunDrivers (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS          Status;
-  LIST_ENTRY          *Package;
-  CHAR16              *ProblemParam;
-  SHELL_STATUS        ShellStatus;
-  CHAR8               *Language;
-  CONST CHAR16        *Lang;
-  EFI_HANDLE          *HandleList;
-  EFI_HANDLE          *HandleWalker;
-  UINTN               ChildCount;
-  UINTN               DeviceCount;
-  CHAR16              ChildCountStr[21];
-  CHAR16              DeviceCountStr[21];
-  CHAR16              *Temp2;
-  CONST CHAR16        *FullDriverName;
-  CHAR16              *TruncatedDriverName;
-  CHAR16              *ImageName;
-  CHAR16              *FormatString;
-  UINT32              DriverVersion;
-  BOOLEAN             DriverConfig;
-  BOOLEAN             DriverDiag;
-  BOOLEAN             SfoFlag;
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+  CHAR8         *Language;
+  CONST CHAR16  *Lang;
+  EFI_HANDLE    *HandleList;
+  EFI_HANDLE    *HandleWalker;
+  UINTN         ChildCount;
+  UINTN         DeviceCount;
+  CHAR16        ChildCountStr[21];
+  CHAR16        DeviceCountStr[21];
+  CHAR16        *Temp2;
+  CONST CHAR16  *FullDriverName;
+  CHAR16        *TruncatedDriverName;
+  CHAR16        *ImageName;
+  CHAR16        *FormatString;
+  UINT32        DriverVersion;
+  BOOLEAN       DriverConfig;
+  BOOLEAN       DriverDiag;
+  BOOLEAN       SfoFlag;
 
-  ShellStatus         = SHELL_SUCCESS;
-  Status              = EFI_SUCCESS;
-  Language            = NULL;
-  FormatString        = NULL;
-  SfoFlag             = FALSE;
+  ShellStatus  = SHELL_SUCCESS;
+  Status       = EFI_SUCCESS;
+  Language     = NULL;
+  FormatString = NULL;
+  SfoFlag      = FALSE;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
   //
-  Status = ShellInitialize();
-  ASSERT_EFI_ERROR(Status);
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
 
-  Status = CommandInit();
-  ASSERT_EFI_ERROR(Status);
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
 
   //
   // parse the command line
   //
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR(Status)) {
-    if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"drivers", ProblemParam);
-      FreePool(ProblemParam);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"drivers", ProblemParam);
+      FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      ASSERT(FALSE);
+      ASSERT (FALSE);
     }
   } else {
-    if (ShellCommandLineGetCount(Package) > 1) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"drivers");
+    if (ShellCommandLineGetCount (Package) > 1) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"drivers");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      if (ShellCommandLineGetFlag(Package, L"-l")){
-        Lang = ShellCommandLineGetValue(Package, L"-l");
+      if (ShellCommandLineGetFlag (Package, L"-l")) {
+        Lang = ShellCommandLineGetValue (Package, L"-l");
         if (Lang != NULL) {
-          Language = AllocateZeroPool(StrSize(Lang));
-          AsciiSPrint(Language, StrSize(Lang), "%S", Lang);
+          Language = AllocateZeroPool (StrSize (Lang));
+          AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
         } else {
-          ASSERT(Language == NULL);
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drivers", L"-l");
+          ASSERT (Language == NULL);
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drivers", L"-l");
           ShellCommandLineFreeVarList (Package);
           return (SHELL_INVALID_PARAMETER);
         }
       }
 
       if (ShellCommandLineGetFlag (Package, L"-sfo")) {
-        SfoFlag = TRUE;
+        SfoFlag      = TRUE;
         FormatString = HiiGetString (gShellDriver1HiiHandle, STRING_TOKEN (STR_DRIVERS_ITEM_LINE_SFO), Language);
         //
         // print the SFO header
@@ -332,34 +348,36 @@ ShellCommandRunDrivers (
           Language,
           STRING_TOKEN (STR_GEN_SFO_HEADER),
           gShellDriver1HiiHandle,
-          L"drivers");
+          L"drivers"
+          );
       } else {
         FormatString = HiiGetString (gShellDriver1HiiHandle, STRING_TOKEN (STR_DRIVERS_ITEM_LINE), Language);
         //
         // print the header row
         //
-        ShellPrintHiiEx(
+        ShellPrintHiiEx (
           -1,
           -1,
           Language,
           STRING_TOKEN (STR_DRIVERS_HEADER_LINES),
-          gShellDriver1HiiHandle);
+          gShellDriver1HiiHandle
+          );
       }
 
-      HandleList = GetHandleListByProtocol(&gEfiDriverBindingProtocolGuid);
-      for (HandleWalker = HandleList ; HandleWalker != NULL && *HandleWalker != NULL ; HandleWalker++){
+      HandleList = GetHandleListByProtocol (&gEfiDriverBindingProtocolGuid);
+      for (HandleWalker = HandleList; HandleWalker != NULL && *HandleWalker != NULL; HandleWalker++) {
         ChildCount     = 0;
         DeviceCount    = 0;
-        Status         = ParseHandleDatabaseForChildDevices (*HandleWalker, &ChildCount , NULL);
-        Status         = PARSE_HANDLE_DATABASE_DEVICES      (*HandleWalker, &DeviceCount, NULL);
-        Temp2          = GetDevicePathTextForHandle(*HandleWalker);
-        DriverVersion  = ReturnDriverVersion(*HandleWalker);
-        DriverConfig   = ReturnDriverConfig(*HandleWalker);
-        DriverDiag     = ReturnDriverDiag  (*HandleWalker);
-        FullDriverName = GetStringNameFromHandle(*HandleWalker, Language);
+        Status         = ParseHandleDatabaseForChildDevices (*HandleWalker, &ChildCount, NULL);
+        Status         = PARSE_HANDLE_DATABASE_DEVICES (*HandleWalker, &DeviceCount, NULL);
+        Temp2          = GetDevicePathTextForHandle (*HandleWalker);
+        DriverVersion  = ReturnDriverVersion (*HandleWalker);
+        DriverConfig   = ReturnDriverConfig (*HandleWalker);
+        DriverDiag     = ReturnDriverDiag (*HandleWalker);
+        FullDriverName = GetStringNameFromHandle (*HandleWalker, Language);
         ImageName      = GetImageNameFromHandle (*HandleWalker);
 
-        UnicodeValueToStringS (ChildCountStr,  sizeof (ChildCountStr),  0, ChildCount,  0);
+        UnicodeValueToStringS (ChildCountStr, sizeof (ChildCountStr), 0, ChildCount, 0);
         UnicodeValueToStringS (DeviceCountStr, sizeof (DeviceCountStr), 0, DeviceCount, 0);
         TruncatedDriverName = NULL;
         if (!SfoFlag && (FullDriverName != NULL)) {
@@ -398,12 +416,15 @@ ShellCommandRunDrivers (
             Temp2 == NULL ? L"" : Temp2
             );
         }
+
         if (TruncatedDriverName != NULL) {
           FreePool (TruncatedDriverName);
         }
+
         if (Temp2 != NULL) {
-          FreePool(Temp2);
+          FreePool (Temp2);
         }
+
         if (ImageName != NULL) {
           FreePool (ImageName);
         }
@@ -414,9 +435,10 @@ ShellCommandRunDrivers (
         }
       }
     }
-    SHELL_FREE_NON_NULL(Language);
+
+    SHELL_FREE_NON_NULL (Language);
     ShellCommandLineFreeVarList (Package);
-    SHELL_FREE_NON_NULL(FormatString);
+    SHELL_FREE_NON_NULL (FormatString);
   }
 
   return (ShellStatus);

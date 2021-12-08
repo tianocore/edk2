@@ -15,7 +15,6 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
 
-
 /**
   Publish PEI & DXE (Decompressed) Memory based FVs to let PEI
   and DXE know about them.
@@ -65,7 +64,7 @@ PeiFvInitialization (
   //
   PeiServicesInstallFvInfoPpi (
     NULL,
-    (VOID *)(UINTN) PcdGet32 (PcdOvmfDxeMemFvBase),
+    (VOID *)(UINTN)PcdGet32 (PcdOvmfDxeMemFvBase),
     PcdGet32 (PcdOvmfDxeMemFvSize),
     NULL,
     NULL
@@ -73,4 +72,3 @@ PeiFvInitialization (
 
   return EFI_SUCCESS;
 }
-

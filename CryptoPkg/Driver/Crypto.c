@@ -18,7 +18,7 @@
   A macro used to retrieve the FixedAtBuild PcdCryptoServiceFamilyEnable with a
   typecast to its associcted structure type PCD_CRYPTO_SERVICE_FAMILY_ENABLE.
 **/
-#define EDKII_CRYPTO_PCD ((const PCD_CRYPTO_SERVICE_FAMILY_ENABLE *) \
+#define EDKII_CRYPTO_PCD  ((const PCD_CRYPTO_SERVICE_FAMILY_ENABLE *)\
   (FixedPcdGetPtr (PcdCryptoServiceFamilyEnable)))
 
 /**
@@ -119,9 +119,9 @@ CryptoServiceGetCryptoVersion (
   return EDKII_CRYPTO_VERSION;
 }
 
-//=====================================================================================
+// =====================================================================================
 //    One-Way Cryptographic Hash Primitives
-//=====================================================================================
+// =====================================================================================
 
 /**
   MD4 is deprecated and unsupported any longer.
@@ -244,6 +244,7 @@ DeprecatedCryptoServiceMd4HashAll (
 }
 
 #ifndef ENABLE_MD5_DEPRECATED_INTERFACES
+
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
@@ -390,7 +391,9 @@ DeprecatedCryptoServiceMd5HashAll (
 {
   return BaseCryptLibServiceDeprecated ("Md5HashAll"), FALSE;
 }
+
 #else
+
 /**
   Retrieves the size, in bytes, of the context buffer required for MD5 hash operations.
 
@@ -548,9 +551,11 @@ CryptoServiceMd5HashAll (
 {
   return CALL_BASECRYPTLIB (Md5.Services.HashAll, Md5HashAll, (Data, DataSize, HashValue), FALSE);
 }
+
 #endif
 
 #ifdef DISABLE_SHA1_DEPRECATED_INTERFACES
+
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
 
@@ -699,7 +704,9 @@ DeprecatedCryptoServiceSha1HashAll (
 {
   return BaseCryptLibServiceDeprecated ("Sha1HashAll"), FALSE;
 }
+
 #else
+
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-1 hash operations.
 
@@ -857,6 +864,7 @@ CryptoServiceSha1HashAll (
 {
   return CALL_BASECRYPTLIB (Sha1.Services.HashAll, Sha1HashAll, (Data, DataSize, HashValue), FALSE);
 }
+
 #endif
 
 /**
@@ -1455,9 +1463,9 @@ CryptoServiceSm3HashAll (
   return CALL_BASECRYPTLIB (Sm3.Services.HashAll, Sm3HashAll, (Data, DataSize, HashValue), FALSE);
 }
 
-//=====================================================================================
+// =====================================================================================
 //    MAC (Message Authentication Code) Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   HMAC MD5 is deprecated and unsupported any longer.
@@ -1839,9 +1847,9 @@ CryptoServiceHmacSha256Final (
   return CALL_BASECRYPTLIB (HmacSha256.Services.Final, HmacSha256Final, (HmacSha256Context, HmacValue), FALSE);
 }
 
-//=====================================================================================
+// =====================================================================================
 //    Symmetric Cryptography Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   TDES is deprecated and unsupported any longer.
@@ -2268,9 +2276,9 @@ DeprecatedCryptoServiceArc4Reset (
   return BaseCryptLibServiceDeprecated ("Arc4Reset"), FALSE;
 }
 
-//=====================================================================================
+// =====================================================================================
 //    Asymmetric Cryptography Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   Allocates and initializes one RSA context for subsequent use.
@@ -2638,7 +2646,7 @@ EFIAPI
 CryptoServiceX509GetCommonName (
   IN      CONST UINT8  *Cert,
   IN      UINTN        CertSize,
-  OUT     CHAR8        *CommonName,  OPTIONAL
+  OUT     CHAR8        *CommonName   OPTIONAL,
   IN OUT  UINTN        *CommonNameSize
   )
 {
@@ -2674,10 +2682,10 @@ CryptoServiceX509GetCommonName (
 RETURN_STATUS
 EFIAPI
 CryptoServiceX509GetOrganizationName (
-  IN      CONST UINT8   *Cert,
-  IN      UINTN         CertSize,
-  OUT     CHAR8         *NameBuffer,  OPTIONAL
-  IN OUT  UINTN         *NameBufferSize
+  IN      CONST UINT8  *Cert,
+  IN      UINTN        CertSize,
+  OUT     CHAR8        *NameBuffer   OPTIONAL,
+  IN OUT  UINTN        *NameBufferSize
   )
 {
   return CALL_BASECRYPTLIB (X509.Services.GetOrganizationName, X509GetOrganizationName, (Cert, CertSize, NameBuffer, NameBufferSize), RETURN_UNSUPPORTED);
@@ -2945,8 +2953,8 @@ CryptoServicePkcs1v2Encrypt (
   IN   UINTN        PublicKeySize,
   IN   UINT8        *InData,
   IN   UINTN        InDataSize,
-  IN   CONST UINT8  *PrngSeed,  OPTIONAL
-  IN   UINTN        PrngSeedSize,  OPTIONAL
+  IN   CONST UINT8  *PrngSeed   OPTIONAL,
+  IN   UINTN        PrngSeedSize   OPTIONAL,
   OUT  UINT8        **EncryptedData,
   OUT  UINTN        *EncryptedDataSize
   )
@@ -3005,7 +3013,7 @@ CryptoServicePkcs7GetSigners (
 VOID
 EFIAPI
 CryptoServicePkcs7FreeSigners (
-  IN  UINT8        *Certs
+  IN  UINT8  *Certs
   )
 {
   CALL_VOID_BASECRYPTLIB (Pkcs.Services.Pkcs7FreeSigners, Pkcs7FreeSigners, (Certs));
@@ -3172,7 +3180,6 @@ CryptoServiceVerifyEKUsInPkcs7Signature (
   return CALL_BASECRYPTLIB (Pkcs.Services.VerifyEKUsInPkcs7Signature, VerifyEKUsInPkcs7Signature, (Pkcs7Signature, SignatureSize, RequiredEKUs, RequiredEKUsSize, RequireAllPresent), FALSE);
 }
 
-
 /**
   Extracts the attached content from a PKCS#7 signed data if existed. The input signed
   data could be wrapped in a ContentInfo structure.
@@ -3276,9 +3283,9 @@ CryptoServiceImageTimestampVerify (
   return CALL_BASECRYPTLIB (Pkcs.Services.ImageTimestampVerify, ImageTimestampVerify, (AuthData, DataSize, TsaCert, CertSize, SigningTime), FALSE);
 }
 
-//=====================================================================================
+// =====================================================================================
 //    DH Key Exchange Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   Allocates and Initializes one Diffie-Hellman Context for subsequent use.
@@ -3459,9 +3466,9 @@ CryptoServiceDhComputeKey (
   return CALL_BASECRYPTLIB (Dh.Services.ComputeKey, DhComputeKey, (DhContext, PeerPublicKey, PeerPublicKeySize, Key, KeySize), FALSE);
 }
 
-//=====================================================================================
+// =====================================================================================
 //    Pseudo-Random Generation Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   Sets up the seed value for the pseudorandom number generator.
@@ -3515,9 +3522,9 @@ CryptoServiceRandomBytes (
   return CALL_BASECRYPTLIB (Random.Services.Bytes, RandomBytes, (Output, Size), FALSE);
 }
 
-//=====================================================================================
+// =====================================================================================
 //    Key Derivation Function Primitive
-//=====================================================================================
+// =====================================================================================
 
 /**
   Derive key data using HMAC-SHA256 based KDF.
@@ -3580,7 +3587,7 @@ CryptoServiceTlsInitialize (
 VOID
 EFIAPI
 CryptoServiceTlsCtxFree (
-  IN   VOID                  *TlsCtx
+  IN   VOID  *TlsCtx
   )
 {
   CALL_VOID_BASECRYPTLIB (Tls.Services.CtxFree, TlsCtxFree, (TlsCtx));
@@ -3600,8 +3607,8 @@ CryptoServiceTlsCtxFree (
 VOID *
 EFIAPI
 CryptoServiceTlsCtxNew (
-  IN     UINT8                    MajorVer,
-  IN     UINT8                    MinorVer
+  IN     UINT8  MajorVer,
+  IN     UINT8  MinorVer
   )
 {
   return CALL_BASECRYPTLIB (Tls.Services.CtxNew, TlsCtxNew, (MajorVer, MinorVer), NULL);
@@ -3619,7 +3626,7 @@ CryptoServiceTlsCtxNew (
 VOID
 EFIAPI
 CryptoServiceTlsFree (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
   CALL_VOID_BASECRYPTLIB (Tls.Services.Free, TlsFree, (Tls));
@@ -3641,7 +3648,7 @@ CryptoServiceTlsFree (
 VOID *
 EFIAPI
 CryptoServiceTlsNew (
-  IN     VOID                     *TlsCtx
+  IN     VOID  *TlsCtx
   )
 {
   return CALL_BASECRYPTLIB (Tls.Services.New, TlsNew, (TlsCtx), NULL);
@@ -3661,7 +3668,7 @@ CryptoServiceTlsNew (
 BOOLEAN
 EFIAPI
 CryptoServiceTlsInHandshake (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
   return CALL_BASECRYPTLIB (Tls.Services.InHandshake, TlsInHandshake, (Tls), FALSE);
@@ -3696,11 +3703,11 @@ CryptoServiceTlsInHandshake (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsDoHandshake (
-  IN     VOID                     *Tls,
-  IN     UINT8                    *BufferIn, OPTIONAL
-  IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
-  IN OUT UINTN                    *BufferOutSize
+  IN     VOID   *Tls,
+  IN     UINT8  *BufferIn  OPTIONAL,
+  IN     UINTN  BufferInSize  OPTIONAL,
+  OUT UINT8     *BufferOut  OPTIONAL,
+  IN OUT UINTN  *BufferOutSize
   )
 {
   return CALL_BASECRYPTLIB (Tls.Services.DoHandshake, TlsDoHandshake, (Tls, BufferIn, BufferInSize, BufferOut, BufferOutSize), EFI_UNSUPPORTED);
@@ -3734,11 +3741,11 @@ CryptoServiceTlsDoHandshake (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsHandleAlert (
-  IN     VOID                     *Tls,
-  IN     UINT8                    *BufferIn, OPTIONAL
-  IN     UINTN                    BufferInSize, OPTIONAL
-     OUT UINT8                    *BufferOut, OPTIONAL
-  IN OUT UINTN                    *BufferOutSize
+  IN     VOID   *Tls,
+  IN     UINT8  *BufferIn  OPTIONAL,
+  IN     UINTN  BufferInSize  OPTIONAL,
+  OUT UINT8     *BufferOut  OPTIONAL,
+  IN OUT UINTN  *BufferOutSize
   )
 {
   return CALL_BASECRYPTLIB (Tls.Services.HandleAlert, TlsHandleAlert, (Tls, BufferIn, BufferInSize, BufferOut, BufferOutSize), EFI_UNSUPPORTED);
@@ -3765,9 +3772,9 @@ CryptoServiceTlsHandleAlert (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsCloseNotify (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *Buffer,
-  IN OUT UINTN                    *BufferSize
+  IN     VOID   *Tls,
+  IN OUT UINT8  *Buffer,
+  IN OUT UINTN  *BufferSize
   )
 {
   return CALL_BASECRYPTLIB (Tls.Services.CloseNotify, TlsCloseNotify, (Tls, Buffer, BufferSize), EFI_UNSUPPORTED);
@@ -3790,9 +3797,9 @@ CryptoServiceTlsCloseNotify (
 INTN
 EFIAPI
 CryptoServiceTlsCtrlTrafficOut (
-  IN     VOID                     *Tls,
-  IN OUT VOID                     *Buffer,
-  IN     UINTN                    BufferSize
+  IN     VOID   *Tls,
+  IN OUT VOID   *Buffer,
+  IN     UINTN  BufferSize
   )
 {
   return CALL_BASECRYPTLIB (Tls.Services.CtrlTrafficOut, TlsCtrlTrafficOut, (Tls, Buffer, BufferSize), 0);
@@ -3815,9 +3822,9 @@ CryptoServiceTlsCtrlTrafficOut (
 INTN
 EFIAPI
 CryptoServiceTlsCtrlTrafficIn (
-  IN     VOID                     *Tls,
-  IN     VOID                     *Buffer,
-  IN     UINTN                    BufferSize
+  IN     VOID   *Tls,
+  IN     VOID   *Buffer,
+  IN     UINTN  BufferSize
   )
 {
   return CALL_BASECRYPTLIB (Tls.Services.CtrlTrafficIn, TlsCtrlTrafficIn, (Tls, Buffer, BufferSize), 0);
@@ -3841,9 +3848,9 @@ CryptoServiceTlsCtrlTrafficIn (
 INTN
 EFIAPI
 CryptoServiceTlsRead (
-  IN     VOID                     *Tls,
-  IN OUT VOID                     *Buffer,
-  IN     UINTN                    BufferSize
+  IN     VOID   *Tls,
+  IN OUT VOID   *Buffer,
+  IN     UINTN  BufferSize
   )
 {
   return CALL_BASECRYPTLIB (Tls.Services.Read, TlsRead, (Tls, Buffer, BufferSize), 0);
@@ -3867,9 +3874,9 @@ CryptoServiceTlsRead (
 INTN
 EFIAPI
 CryptoServiceTlsWrite (
-  IN     VOID                     *Tls,
-  IN     VOID                     *Buffer,
-  IN     UINTN                    BufferSize
+  IN     VOID   *Tls,
+  IN     VOID   *Buffer,
+  IN     UINTN  BufferSize
   )
 {
   return CALL_BASECRYPTLIB (Tls.Services.Write, TlsWrite, (Tls, Buffer, BufferSize), 0);
@@ -3892,9 +3899,9 @@ CryptoServiceTlsWrite (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsSetVersion (
-  IN     VOID                     *Tls,
-  IN     UINT8                    MajorVer,
-  IN     UINT8                    MinorVer
+  IN     VOID   *Tls,
+  IN     UINT8  MajorVer,
+  IN     UINT8  MinorVer
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.Version, TlsSetVersion, (Tls, MajorVer, MinorVer), EFI_UNSUPPORTED);
@@ -3916,8 +3923,8 @@ CryptoServiceTlsSetVersion (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsSetConnectionEnd (
-  IN     VOID                     *Tls,
-  IN     BOOLEAN                  IsServer
+  IN     VOID     *Tls,
+  IN     BOOLEAN  IsServer
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.ConnectionEnd, TlsSetConnectionEnd, (Tls, IsServer), EFI_UNSUPPORTED);
@@ -3944,9 +3951,9 @@ CryptoServiceTlsSetConnectionEnd (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsSetCipherList (
-  IN     VOID                     *Tls,
-  IN     UINT16                   *CipherId,
-  IN     UINTN                    CipherNum
+  IN     VOID    *Tls,
+  IN     UINT16  *CipherId,
+  IN     UINTN   CipherNum
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.CipherList, TlsSetCipherList, (Tls, CipherId, CipherNum), EFI_UNSUPPORTED);
@@ -3967,7 +3974,7 @@ CryptoServiceTlsSetCipherList (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsSetCompressionMethod (
-  IN     UINT8                    CompMethod
+  IN     UINT8  CompMethod
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.CompressionMethod, TlsSetCompressionMethod, (CompMethod), EFI_UNSUPPORTED);
@@ -3985,8 +3992,8 @@ CryptoServiceTlsSetCompressionMethod (
 VOID
 EFIAPI
 CryptoServiceTlsSetVerify (
-  IN     VOID                     *Tls,
-  IN     UINT32                   VerifyMode
+  IN     VOID    *Tls,
+  IN     UINT32  VerifyMode
   )
 {
   CALL_VOID_BASECRYPTLIB (TlsSet.Services.Verify, TlsSetVerify, (Tls, VerifyMode));
@@ -4007,9 +4014,9 @@ CryptoServiceTlsSetVerify (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsSetVerifyHost (
-  IN     VOID                     *Tls,
-  IN     UINT32                   Flags,
-  IN     CHAR8                    *HostName
+  IN     VOID    *Tls,
+  IN     UINT32  Flags,
+  IN     CHAR8   *HostName
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.VerifyHost, TlsSetVerifyHost, (Tls, Flags, HostName), EFI_UNSUPPORTED);
@@ -4033,9 +4040,9 @@ CryptoServiceTlsSetVerifyHost (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsSetSessionId (
-  IN     VOID                     *Tls,
-  IN     UINT8                    *SessionId,
-  IN     UINT16                   SessionIdLen
+  IN     VOID    *Tls,
+  IN     UINT8   *SessionId,
+  IN     UINT16  SessionIdLen
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.SessionId, TlsSetSessionId, (Tls, SessionId, SessionIdLen), EFI_UNSUPPORTED);
@@ -4061,9 +4068,9 @@ CryptoServiceTlsSetSessionId (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsSetCaCertificate (
-  IN     VOID                     *Tls,
-  IN     VOID                     *Data,
-  IN     UINTN                    DataSize
+  IN     VOID   *Tls,
+  IN     VOID   *Data,
+  IN     UINTN  DataSize
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.CaCertificate, TlsSetCaCertificate, (Tls, Data, DataSize), EFI_UNSUPPORTED);
@@ -4089,9 +4096,9 @@ CryptoServiceTlsSetCaCertificate (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsSetHostPublicCert (
-  IN     VOID                     *Tls,
-  IN     VOID                     *Data,
-  IN     UINTN                    DataSize
+  IN     VOID   *Tls,
+  IN     VOID   *Data,
+  IN     UINTN  DataSize
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.HostPublicCert, TlsSetHostPublicCert, (Tls, Data, DataSize), EFI_UNSUPPORTED);
@@ -4116,9 +4123,9 @@ CryptoServiceTlsSetHostPublicCert (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsSetHostPrivateKey (
-  IN     VOID                     *Tls,
-  IN     VOID                     *Data,
-  IN     UINTN                    DataSize
+  IN     VOID   *Tls,
+  IN     VOID   *Data,
+  IN     UINTN  DataSize
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.HostPrivateKey, TlsSetHostPrivateKey, (Tls, Data, DataSize), EFI_UNSUPPORTED);
@@ -4141,8 +4148,8 @@ CryptoServiceTlsSetHostPrivateKey (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsSetCertRevocationList (
-  IN     VOID                     *Data,
-  IN     UINTN                    DataSize
+  IN     VOID   *Data,
+  IN     UINTN  DataSize
   )
 {
   return CALL_BASECRYPTLIB (TlsSet.Services.CertRevocationList, TlsSetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
@@ -4164,7 +4171,7 @@ CryptoServiceTlsSetCertRevocationList (
 UINT16
 EFIAPI
 CryptoServiceTlsGetVersion (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.Version, TlsGetVersion, (Tls), 0);
@@ -4186,7 +4193,7 @@ CryptoServiceTlsGetVersion (
 UINT8
 EFIAPI
 CryptoServiceTlsGetConnectionEnd (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.ConnectionEnd, TlsGetConnectionEnd, (Tls), 0);
@@ -4209,8 +4216,8 @@ CryptoServiceTlsGetConnectionEnd (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsGetCurrentCipher (
-  IN     VOID                     *Tls,
-  IN OUT UINT16                   *CipherId
+  IN     VOID    *Tls,
+  IN OUT UINT16  *CipherId
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.CurrentCipher, TlsGetCurrentCipher, (Tls, CipherId), EFI_UNSUPPORTED);
@@ -4235,8 +4242,8 @@ CryptoServiceTlsGetCurrentCipher (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsGetCurrentCompressionId (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *CompressionId
+  IN     VOID   *Tls,
+  IN OUT UINT8  *CompressionId
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.CurrentCompressionId, TlsGetCurrentCompressionId, (Tls, CompressionId), EFI_UNSUPPORTED);
@@ -4258,7 +4265,7 @@ CryptoServiceTlsGetCurrentCompressionId (
 UINT32
 EFIAPI
 CryptoServiceTlsGetVerify (
-  IN     VOID                     *Tls
+  IN     VOID  *Tls
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.Verify, TlsGetVerify, (Tls), 0);
@@ -4282,9 +4289,9 @@ CryptoServiceTlsGetVerify (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsGetSessionId (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *SessionId,
-  IN OUT UINT16                   *SessionIdLen
+  IN     VOID    *Tls,
+  IN OUT UINT8   *SessionId,
+  IN OUT UINT16  *SessionIdLen
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.SessionId, TlsGetSessionId, (Tls, SessionId, SessionIdLen), EFI_UNSUPPORTED);
@@ -4304,8 +4311,8 @@ CryptoServiceTlsGetSessionId (
 VOID
 EFIAPI
 CryptoServiceTlsGetClientRandom (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *ClientRandom
+  IN     VOID   *Tls,
+  IN OUT UINT8  *ClientRandom
   )
 {
   CALL_VOID_BASECRYPTLIB (TlsGet.Services.ClientRandom, TlsGetClientRandom, (Tls, ClientRandom));
@@ -4325,8 +4332,8 @@ CryptoServiceTlsGetClientRandom (
 VOID
 EFIAPI
 CryptoServiceTlsGetServerRandom (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *ServerRandom
+  IN     VOID   *Tls,
+  IN OUT UINT8  *ServerRandom
   )
 {
   CALL_VOID_BASECRYPTLIB (TlsGet.Services.ServerRandom, TlsGetServerRandom, (Tls, ServerRandom));
@@ -4349,8 +4356,8 @@ CryptoServiceTlsGetServerRandom (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsGetKeyMaterial (
-  IN     VOID                     *Tls,
-  IN OUT UINT8                    *KeyMaterial
+  IN     VOID   *Tls,
+  IN OUT UINT8  *KeyMaterial
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.KeyMaterial, TlsGetKeyMaterial, (Tls, KeyMaterial), EFI_UNSUPPORTED);
@@ -4375,9 +4382,9 @@ CryptoServiceTlsGetKeyMaterial (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsGetCaCertificate (
-  IN     VOID                     *Tls,
-  OUT    VOID                     *Data,
-  IN OUT UINTN                    *DataSize
+  IN     VOID   *Tls,
+  OUT    VOID   *Data,
+  IN OUT UINTN  *DataSize
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.CaCertificate, TlsGetCaCertificate, (Tls, Data, DataSize), EFI_UNSUPPORTED);
@@ -4403,9 +4410,9 @@ CryptoServiceTlsGetCaCertificate (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsGetHostPublicCert (
-  IN     VOID                     *Tls,
-  OUT    VOID                     *Data,
-  IN OUT UINTN                    *DataSize
+  IN     VOID   *Tls,
+  OUT    VOID   *Data,
+  IN OUT UINTN  *DataSize
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.HostPublicCert, TlsGetHostPublicCert, (Tls, Data, DataSize), EFI_UNSUPPORTED);
@@ -4430,9 +4437,9 @@ CryptoServiceTlsGetHostPublicCert (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsGetHostPrivateKey (
-  IN     VOID                     *Tls,
-  OUT    VOID                     *Data,
-  IN OUT UINTN                    *DataSize
+  IN     VOID   *Tls,
+  OUT    VOID   *Data,
+  IN OUT UINTN  *DataSize
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.HostPrivateKey, TlsGetHostPrivateKey, (Tls, Data, DataSize), EFI_UNSUPPORTED);
@@ -4456,14 +4463,14 @@ CryptoServiceTlsGetHostPrivateKey (
 EFI_STATUS
 EFIAPI
 CryptoServiceTlsGetCertRevocationList (
-  OUT    VOID                     *Data,
-  IN OUT UINTN                    *DataSize
+  OUT    VOID   *Data,
+  IN OUT UINTN  *DataSize
   )
 {
   return CALL_BASECRYPTLIB (TlsGet.Services.CertRevocationList, TlsGetCertRevocationList, (Data, DataSize), EFI_UNSUPPORTED);
 }
 
-const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
+const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   /// Version
   CryptoServiceGetCryptoVersion,
   /// HMAC MD5 - deprecated and unsupported
@@ -4494,7 +4501,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   DeprecatedCryptoServiceMd4Update,
   DeprecatedCryptoServiceMd4Final,
   DeprecatedCryptoServiceMd4HashAll,
-#ifndef ENABLE_MD5_DEPRECATED_INTERFACES
+ #ifndef ENABLE_MD5_DEPRECATED_INTERFACES
   /// Md5 - deprecated and unsupported
   DeprecatedCryptoServiceMd5GetContextSize,
   DeprecatedCryptoServiceMd5Init,
@@ -4502,7 +4509,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   DeprecatedCryptoServiceMd5Update,
   DeprecatedCryptoServiceMd5Final,
   DeprecatedCryptoServiceMd5HashAll,
-#else
+ #else
   /// Md5
   CryptoServiceMd5GetContextSize,
   CryptoServiceMd5Init,
@@ -4510,7 +4517,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceMd5Update,
   CryptoServiceMd5Final,
   CryptoServiceMd5HashAll,
-#endif
+ #endif
   /// Pkcs
   CryptoServicePkcs1v2Encrypt,
   CryptoServicePkcs5HashPassword,
@@ -4545,7 +4552,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceRsaPkcs1Verify,
   CryptoServiceRsaGetPrivateKeyFromPem,
   CryptoServiceRsaGetPublicKeyFromX509,
-#ifdef DISABLE_SHA1_DEPRECATED_INTERFACES
+ #ifdef DISABLE_SHA1_DEPRECATED_INTERFACES
   /// Sha1 - deprecated and unsupported
   DeprecatedCryptoServiceSha1GetContextSize,
   DeprecatedCryptoServiceSha1Init,
@@ -4553,7 +4560,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   DeprecatedCryptoServiceSha1Update,
   DeprecatedCryptoServiceSha1Final,
   DeprecatedCryptoServiceSha1HashAll,
-#else
+ #else
   /// Sha1
   CryptoServiceSha1GetContextSize,
   CryptoServiceSha1Init,
@@ -4561,7 +4568,7 @@ const EDKII_CRYPTO_PROTOCOL mEdkiiCrypto = {
   CryptoServiceSha1Update,
   CryptoServiceSha1Final,
   CryptoServiceSha1HashAll,
-#endif
+ #endif
   /// Sha256
   CryptoServiceSha256GetContextSize,
   CryptoServiceSha256Init,

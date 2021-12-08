@@ -22,7 +22,6 @@ Abstract:
 #include <Protocol/EmuIoThunk.h>
 #include <Protocol/EmuSnp.h>
 
-
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -32,35 +31,34 @@ Abstract:
 #include <Library/MemoryAllocationLib.h>
 #include <Library/NetLib.h>
 
-#define NET_ETHER_HEADER_SIZE     14
+#define NET_ETHER_HEADER_SIZE  14
 
 //
 //  Private data for driver.
 //
-#define EMU_SNP_PRIVATE_DATA_SIGNATURE SIGNATURE_32( 'U', 'S', 'N', 'P' )
+#define EMU_SNP_PRIVATE_DATA_SIGNATURE  SIGNATURE_32( 'U', 'S', 'N', 'P' )
 
 typedef struct {
-  UINTN                       Signature;
-  EMU_IO_THUNK_PROTOCOL       *IoThunk;
-  EMU_SNP_PROTOCOL            *Io;
-  EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
+  UINTN                          Signature;
+  EMU_IO_THUNK_PROTOCOL          *IoThunk;
+  EMU_SNP_PROTOCOL               *Io;
+  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
 
-  EFI_HANDLE                  EfiHandle;
-  EFI_HANDLE                  DeviceHandle;
+  EFI_HANDLE                     EfiHandle;
+  EFI_HANDLE                     DeviceHandle;
 
-  EFI_SIMPLE_NETWORK_PROTOCOL Snp;
-  EFI_SIMPLE_NETWORK_MODE     Mode;
+  EFI_SIMPLE_NETWORK_PROTOCOL    Snp;
+  EFI_SIMPLE_NETWORK_MODE        Mode;
 
-  EFI_UNICODE_STRING_TABLE    *ControllerNameTable;
-
+  EFI_UNICODE_STRING_TABLE       *ControllerNameTable;
 } EMU_SNP_PRIVATE_DATA;
 
 #define EMU_SNP_PRIVATE_DATA_FROM_SNP_THIS(a) \
       CR( a, EMU_SNP_PRIVATE_DATA, Snp, EMU_SNP_PRIVATE_DATA_SIGNATURE )
 
-extern EFI_DRIVER_BINDING_PROTOCOL    gEmuSnpDriverBinding;
-extern EFI_COMPONENT_NAME_PROTOCOL    gEmuSnpDriverComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL   gEmuSnpDriverComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gEmuSnpDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gEmuSnpDriverComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gEmuSnpDriverComponentName2;
 
 /**
   Test to see if this driver supports ControllerHandle. This service
@@ -82,9 +80,9 @@ extern EFI_COMPONENT_NAME2_PROTOCOL   gEmuSnpDriverComponentName2;
 EFI_STATUS
 EFIAPI
 EmuSnpDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 /**
@@ -106,9 +104,9 @@ EmuSnpDriverBindingSupported (
 EFI_STATUS
 EFIAPI
 EmuSnpDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL  * This,
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
-  IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   );
 
 /**
@@ -147,8 +145,8 @@ EmuSnpDriverBindingStop (
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpStart(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
+EmuSnpStart (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This
   );
 
 /**
@@ -161,8 +159,8 @@ EmuSnpStart(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpStop(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
+EmuSnpStop (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This
   );
 
 /**
@@ -187,10 +185,10 @@ EmuSnpStop(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpInitialize(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
-  IN UINTN              ExtraRxBufferSize OPTIONAL,
-  IN UINTN              ExtraTxBufferSize OPTIONAL
+EmuSnpInitialize (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN UINTN                        ExtraRxBufferSize OPTIONAL,
+  IN UINTN                        ExtraTxBufferSize OPTIONAL
   );
 
 /**
@@ -207,9 +205,9 @@ EmuSnpInitialize(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpReset(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
-  IN BOOLEAN              ExtendedVerification
+EmuSnpReset (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      ExtendedVerification
   );
 
 /**
@@ -223,8 +221,8 @@ EmuSnpReset(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpShutdown(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This
+EmuSnpShutdown (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This
   );
 
 /**
@@ -250,13 +248,13 @@ EmuSnpShutdown(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpReceiveFilters(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
-  IN UINT32              EnableBits,
-  IN UINT32              DisableBits,
-  IN BOOLEAN              ResetMcastFilter,
-  IN UINTN              McastFilterCount OPTIONAL,
-  IN EFI_MAC_ADDRESS*          McastFilter OPTIONAL
+EmuSnpReceiveFilters (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN UINT32                       EnableBits,
+  IN UINT32                       DisableBits,
+  IN BOOLEAN                      ResetMcastFilter,
+  IN UINTN                        McastFilterCount OPTIONAL,
+  IN EFI_MAC_ADDRESS              *McastFilter OPTIONAL
   );
 
 /**
@@ -272,10 +270,10 @@ EmuSnpReceiveFilters(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpStationAddress(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
-  IN BOOLEAN              Reset,
-  IN EFI_MAC_ADDRESS*          NewMacAddr OPTIONAL
+EmuSnpStationAddress (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      Reset,
+  IN EFI_MAC_ADDRESS              *NewMacAddr OPTIONAL
   );
 
 /**
@@ -299,11 +297,11 @@ EmuSnpStationAddress(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpStatistics(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
-  IN BOOLEAN              Reset,
-  IN OUT UINTN*            StatisticsSize OPTIONAL,
-  OUT EFI_NETWORK_STATISTICS*      StatisticsTable OPTIONAL
+EmuSnpStatistics (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      Reset,
+  IN OUT UINTN                    *StatisticsSize OPTIONAL,
+  OUT EFI_NETWORK_STATISTICS      *StatisticsTable OPTIONAL
   );
 
 /**
@@ -327,11 +325,11 @@ EmuSnpStatistics(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpMcastIptoMac(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
-  IN BOOLEAN              Ipv6,
-  IN EFI_IP_ADDRESS*          Ip,
-  OUT EFI_MAC_ADDRESS*        Mac
+EmuSnpMcastIptoMac (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      Ipv6,
+  IN EFI_IP_ADDRESS               *Ip,
+  OUT EFI_MAC_ADDRESS             *Mac
   );
 
 /**
@@ -352,12 +350,12 @@ EmuSnpMcastIptoMac(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpNvdata(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
-  IN BOOLEAN              ReadOrWrite,
-  IN UINTN              Offset,
-  IN UINTN              BufferSize,
-  IN OUT VOID*            Buffer
+EmuSnpNvdata (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN BOOLEAN                      ReadOrWrite,
+  IN UINTN                        Offset,
+  IN UINTN                        BufferSize,
+  IN OUT VOID                     *Buffer
   );
 
 /**
@@ -383,10 +381,10 @@ EmuSnpNvdata(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpGetStatus(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
-  OUT UINT32*              InterruptStatus,
-  OUT VOID**              TxBuffer
+EmuSnpGetStatus (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  OUT UINT32                      *InterruptStatus,
+  OUT VOID                        **TxBuffer
   );
 
 /**
@@ -420,14 +418,14 @@ EmuSnpGetStatus(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpTransmit(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
-  IN UINTN              HeaderSize,
-  IN UINTN              BufferSize,
-  IN VOID*              Buffer,
-  IN EFI_MAC_ADDRESS*          SrcAddr OPTIONAL,
-  IN EFI_MAC_ADDRESS*          DestAddr OPTIONAL,
-  IN UINT16*              Protocol OPTIONAL
+EmuSnpTransmit (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  IN UINTN                        HeaderSize,
+  IN UINTN                        BufferSize,
+  IN VOID                         *Buffer,
+  IN EFI_MAC_ADDRESS              *SrcAddr OPTIONAL,
+  IN EFI_MAC_ADDRESS              *DestAddr OPTIONAL,
+  IN UINT16                       *Protocol OPTIONAL
   );
 
 /**
@@ -462,21 +460,21 @@ EmuSnpTransmit(
 **/
 EFI_STATUS
 EFIAPI
-EmuSnpReceive(
-  IN EFI_SIMPLE_NETWORK_PROTOCOL*    This,
-  OUT UINTN*              HeaderSize OPTIONAL,
-  IN OUT UINTN*            BuffSize,
-  OUT VOID*              Buffer,
-  OUT EFI_MAC_ADDRESS*        SourceAddr OPTIONAL,
-  OUT EFI_MAC_ADDRESS*        DestinationAddr OPTIONAL,
-  OUT UINT16*              Protocol OPTIONAL
+EmuSnpReceive (
+  IN EFI_SIMPLE_NETWORK_PROTOCOL  *This,
+  OUT UINTN                       *HeaderSize OPTIONAL,
+  IN OUT UINTN                    *BuffSize,
+  OUT VOID                        *Buffer,
+  OUT EFI_MAC_ADDRESS             *SourceAddr OPTIONAL,
+  OUT EFI_MAC_ADDRESS             *DestinationAddr OPTIONAL,
+  OUT UINT16                      *Protocol OPTIONAL
   );
 
 VOID
 EFIAPI
-EmuSnpWaitForPacketNotify(
-  IN EFI_EVENT            Event,
-  IN VOID*              Private
+EmuSnpWaitForPacketNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Private
   );
 
-#endif  // _EMU_SNP_H_
+#endif // _EMU_SNP_H_

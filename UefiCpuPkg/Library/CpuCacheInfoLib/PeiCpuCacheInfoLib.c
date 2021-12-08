@@ -24,10 +24,10 @@
 **/
 EFI_STATUS
 CpuCacheInfoGetMpServices (
-  OUT MP_SERVICES           *MpServices
+  OUT MP_SERVICES  *MpServices
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = PeiServicesLocatePpi (&gEdkiiPeiMpServices2PpiGuid, 0, NULL, (VOID **)&MpServices->Ppi);
   ASSERT_EFI_ERROR (Status);
@@ -44,12 +44,12 @@ CpuCacheInfoGetMpServices (
 **/
 VOID
 CpuCacheInfoStartupAllCPUs (
-  IN MP_SERVICES            MpServices,
-  IN EFI_AP_PROCEDURE       Procedure,
-  IN VOID                   *ProcedureArgument
+  IN MP_SERVICES       MpServices,
+  IN EFI_AP_PROCEDURE  Procedure,
+  IN VOID              *ProcedureArgument
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = MpServices.Ppi->StartupAllCPUs (MpServices.Ppi, Procedure, 0, ProcedureArgument);
   ASSERT_EFI_ERROR (Status);
@@ -64,12 +64,12 @@ CpuCacheInfoStartupAllCPUs (
 **/
 VOID
 CpuCacheInfoGetProcessorInfo (
-  IN MP_SERVICES                MpServices,
-  IN UINTN                      ProcessorNum,
-  OUT EFI_PROCESSOR_INFORMATION *ProcessorInfo
+  IN MP_SERVICES                 MpServices,
+  IN UINTN                       ProcessorNum,
+  OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfo
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS  Status;
 
   Status = MpServices.Ppi->GetProcessorInfo (MpServices.Ppi, ProcessorNum, ProcessorInfo);
   ASSERT_EFI_ERROR (Status);
@@ -84,11 +84,11 @@ CpuCacheInfoGetProcessorInfo (
 **/
 UINT32
 CpuCacheInfoWhoAmI (
-  IN MP_SERVICES            MpServices
+  IN MP_SERVICES  MpServices
   )
 {
-  EFI_STATUS                Status;
-  UINTN                     ProcessorNum;
+  EFI_STATUS  Status;
+  UINTN       ProcessorNum;
 
   Status = MpServices.Ppi->WhoAmI (MpServices.Ppi, &ProcessorNum);
   ASSERT_EFI_ERROR (Status);
@@ -105,12 +105,12 @@ CpuCacheInfoWhoAmI (
 **/
 UINT32
 CpuCacheInfoGetNumberOfProcessors (
-  IN MP_SERVICES            MpServices
+  IN MP_SERVICES  MpServices
   )
 {
-  EFI_STATUS                Status;
-  UINTN                     NumberOfProcessor;
-  UINTN                     NumberOfEnabledProcessor;
+  EFI_STATUS  Status;
+  UINTN       NumberOfProcessor;
+  UINTN       NumberOfEnabledProcessor;
 
   Status = MpServices.Ppi->GetNumberOfProcessors (MpServices.Ppi, &NumberOfProcessor, &NumberOfEnabledProcessor);
   ASSERT_EFI_ERROR (Status);

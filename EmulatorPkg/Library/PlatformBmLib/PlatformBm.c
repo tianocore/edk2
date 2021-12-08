@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PlatformBm.h"
 
-EFI_GUID mBootMenuFile = {
+EFI_GUID  mBootMenuFile = {
   0xEEC25BDC, 0x67F2, 0x4D95, { 0xB1, 0xD5, 0xF8, 0x1B, 0x20, 0x39, 0xD1, 0x1D }
 };
 
@@ -20,24 +20,24 @@ SetupVariableInit (
   VOID
   )
 {
-  EFI_STATUS                      Status;
-  UINTN                           Size;
-  EMU_SYSTEM_CONFIGURATION        SystemConfigData;
+  EFI_STATUS                Status;
+  UINTN                     Size;
+  EMU_SYSTEM_CONFIGURATION  SystemConfigData;
 
-  Size = sizeof (SystemConfigData);
+  Size   = sizeof (SystemConfigData);
   Status = gRT->GetVariable (
                   L"Setup",
                   &gEmuSystemConfigGuid,
                   NULL,
                   &Size,
-                  (VOID *) &SystemConfigData
+                  (VOID *)&SystemConfigData
                   );
 
   if (EFI_ERROR (Status)) {
     //
     // SetupVariable is corrupt
     //
-    SystemConfigData.ConOutRow = PcdGet32 (PcdConOutColumn);
+    SystemConfigData.ConOutRow    = PcdGet32 (PcdConOutColumn);
     SystemConfigData.ConOutColumn = PcdGet32 (PcdConOutRow);
 
     Status = gRT->SetVariable (
@@ -45,7 +45,7 @@ SetupVariableInit (
                     &gEmuSystemConfigGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                     sizeof (SystemConfigData),
-                    (VOID *) &SystemConfigData
+                    (VOID *)&SystemConfigData
                     );
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Failed to save Setup Variable to non-volatile storage, Status = %r\n", Status));
@@ -55,10 +55,9 @@ SetupVariableInit (
 
 EFI_DEVICE_PATH *
 FvFilePath (
-  EFI_GUID                     *FileGuid
+  EFI_GUID  *FileGuid
   )
 {
-
   EFI_STATUS                         Status;
   EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
@@ -68,12 +67,12 @@ FvFilePath (
   Status = gBS->HandleProtocol (
                   gImageHandle,
                   &gEfiLoadedImageProtocolGuid,
-                  (VOID **) &LoadedImage
+                  (VOID **)&LoadedImage
                   );
   ASSERT_EFI_ERROR (Status);
   return AppendDevicePathNode (
            DevicePathFromHandle (LoadedImage->DeviceHandle),
-           (EFI_DEVICE_PATH_PROTOCOL *) &FileNode
+           (EFI_DEVICE_PATH_PROTOCOL *)&FileNode
            );
 }
 
@@ -91,28 +90,28 @@ FvFilePath (
 **/
 UINTN
 RegisterBootManagerMenuAppBootOption (
-  EFI_GUID                         *FileGuid,
-  CHAR16                           *Description,
-  UINTN                            Position,
-  BOOLEAN                          IsBootCategory
+  EFI_GUID  *FileGuid,
+  CHAR16    *Description,
+  UINTN     Position,
+  BOOLEAN   IsBootCategory
   )
 {
-  EFI_STATUS                       Status;
-  EFI_BOOT_MANAGER_LOAD_OPTION     NewOption;
-  EFI_DEVICE_PATH_PROTOCOL         *DevicePath;
-  UINTN                            OptionNumber;
+  EFI_STATUS                    Status;
+  EFI_BOOT_MANAGER_LOAD_OPTION  NewOption;
+  EFI_DEVICE_PATH_PROTOCOL      *DevicePath;
+  UINTN                         OptionNumber;
 
   DevicePath = FvFilePath (FileGuid);
-  Status = EfiBootManagerInitializeLoadOption (
-             &NewOption,
-             LoadOptionNumberUnassigned,
-             LoadOptionTypeBoot,
-             IsBootCategory ? LOAD_OPTION_ACTIVE : LOAD_OPTION_CATEGORY_APP,
-             Description,
-             DevicePath,
-             NULL,
-             0
-             );
+  Status     = EfiBootManagerInitializeLoadOption (
+                 &NewOption,
+                 LoadOptionNumberUnassigned,
+                 LoadOptionTypeBoot,
+                 IsBootCategory ? LOAD_OPTION_ACTIVE : LOAD_OPTION_CATEGORY_APP,
+                 Description,
+                 DevicePath,
+                 NULL,
+                 0
+                 );
   ASSERT_EFI_ERROR (Status);
   FreePool (DevicePath);
 
@@ -136,16 +135,16 @@ RegisterBootManagerMenuAppBootOption (
 **/
 BOOLEAN
 IsBootManagerMenuAppFilePath (
-  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
-)
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
 {
-  EFI_HANDLE                      FvHandle;
-  VOID                            *NameGuid;
-  EFI_STATUS                      Status;
+  EFI_HANDLE  FvHandle;
+  VOID        *NameGuid;
+  EFI_STATUS  Status;
 
   Status = gBS->LocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &DevicePath, &FvHandle);
   if (!EFI_ERROR (Status)) {
-    NameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *) DevicePath);
+    NameGuid = EfiGetNameGuidFromFwVolDevicePathNode ((CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)DevicePath);
     if (NameGuid != NULL) {
       return CompareGuid (NameGuid, &mBootMenuFile);
     }
@@ -167,10 +166,10 @@ GetBootManagerMenuAppOption (
   VOID
   )
 {
-  UINTN                        BootOptionCount;
-  EFI_BOOT_MANAGER_LOAD_OPTION *BootOptions;
-  UINTN                        Index;
-  UINTN                        OptionNumber;
+  UINTN                         BootOptionCount;
+  EFI_BOOT_MANAGER_LOAD_OPTION  *BootOptions;
+  UINTN                         Index;
+  UINTN                         OptionNumber;
 
   OptionNumber = 0;
 
@@ -189,7 +188,7 @@ GetBootManagerMenuAppOption (
     //
     // If not found the BootManagerMenuApp, create it.
     //
-    OptionNumber = (UINT16) RegisterBootManagerMenuAppBootOption (&mBootMenuFile, L"UEFI BootManagerMenuApp", (UINTN) -1, FALSE);
+    OptionNumber = (UINT16)RegisterBootManagerMenuAppBootOption (&mBootMenuFile, L"UEFI BootManagerMenuApp", (UINTN)-1, FALSE);
   }
 
   return OptionNumber;
@@ -205,13 +204,13 @@ PlatformBootManagerBeforeConsole (
   VOID
   )
 {
-  UINTN       Index;
+  UINTN  Index;
 
   SetupVariableInit ();
 
   EfiEventGroupSignal (&gEfiEndOfDxeEventGroupGuid);
 
-  Index   = 0;
+  Index = 0;
   while (gPlatformConsole[Index].DevicePath != NULL) {
     //
     // Update the console variable with the connect type
@@ -256,8 +255,8 @@ PlatformBdsConnectSequence (
 **/
 VOID
 PlatformBdsDiagnostics (
-  IN EXTENDMEM_COVERAGE_LEVEL    MemoryTestLevel,
-  IN BOOLEAN                     QuietBoot
+  IN EXTENDMEM_COVERAGE_LEVEL  MemoryTestLevel,
+  IN BOOLEAN                   QuietBoot
   )
 {
   EFI_STATUS  Status;
@@ -317,14 +316,14 @@ PlatformBdsRegisterStaticBootOptions (
   F2.ScanCode    = SCAN_F2;
   F2.UnicodeChar = CHAR_NULL;
   EfiBootManagerGetBootManagerMenu (&BootOption);
-  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16) BootOption.OptionNumber, 0, &F2, NULL);
+  EfiBootManagerAddKeyOptionVariable (NULL, (UINT16)BootOption.OptionNumber, 0, &F2, NULL);
 
   //
   // 3. Boot Device List menu
   //
-  F7.ScanCode     = SCAN_F7;
-  F7.UnicodeChar  = CHAR_NULL;
-  OptionNumber    = GetBootManagerMenuAppOption ();
+  F7.ScanCode    = SCAN_F7;
+  F7.UnicodeChar = CHAR_NULL;
+  OptionNumber   = GetBootManagerMenuAppOption ();
   EfiBootManagerAddKeyOptionVariable (NULL, (UINT16)OptionNumber, 0, &F7, NULL);
 
   PrintXY (10, 10, &White, &Black, L"F2    to enter Setup.                              ");
@@ -339,7 +338,7 @@ PlatformBdsRegisterStaticBootOptions (
 **/
 UINTN
 BootOptionPriority (
-  CONST EFI_BOOT_MANAGER_LOAD_OPTION *BootOption
+  CONST EFI_BOOT_MANAGER_LOAD_OPTION  *BootOption
   )
 {
   //
@@ -348,6 +347,7 @@ BootOptionPriority (
   if (StrCmp (BootOption->Description, L"UEFI Shell") == 0) {
     return 0;
   }
+
   return 100;
 }
 
@@ -377,37 +377,35 @@ PlatformBootManagerAfterConsole (
   VOID
   )
 {
-
   //
   // Go the different platform policy with different boot mode
   // Notes: this part code can be change with the table policy
   //
   switch (GetBootModeHob ()) {
+    case BOOT_ASSUMING_NO_CONFIGURATION_CHANGES:
+    case BOOT_WITH_MINIMAL_CONFIGURATION:
+      PlatformBdsDiagnostics (IGNORE, TRUE);
 
-  case BOOT_ASSUMING_NO_CONFIGURATION_CHANGES:
-  case BOOT_WITH_MINIMAL_CONFIGURATION:
-    PlatformBdsDiagnostics (IGNORE, TRUE);
+      //
+      // Perform some platform specific connect sequence
+      //
+      PlatformBdsConnectSequence ();
+      break;
 
-    //
-    // Perform some platform specific connect sequence
-    //
-    PlatformBdsConnectSequence ();
-    break;
+    case BOOT_IN_RECOVERY_MODE:
+      PlatformBdsDiagnostics (EXTENSIVE, FALSE);
+      break;
 
-  case BOOT_IN_RECOVERY_MODE:
-    PlatformBdsDiagnostics (EXTENSIVE, FALSE);
-    break;
-
-  case BOOT_WITH_FULL_CONFIGURATION:
-  case BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS:
-  case BOOT_WITH_DEFAULT_SETTINGS:
-  default:
-    PlatformBdsDiagnostics (IGNORE, TRUE);
-    PlatformBdsRegisterStaticBootOptions ();
-    PlatformBdsConnectSequence ();
-    EfiBootManagerRefreshAllBootOption ();
-    EfiBootManagerSortLoadOptionVariable (LoadOptionTypeBoot, (SORT_COMPARE)CompareBootOption);
-    break;
+    case BOOT_WITH_FULL_CONFIGURATION:
+    case BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS:
+    case BOOT_WITH_DEFAULT_SETTINGS:
+    default:
+      PlatformBdsDiagnostics (IGNORE, TRUE);
+      PlatformBdsRegisterStaticBootOptions ();
+      PlatformBdsConnectSequence ();
+      EfiBootManagerRefreshAllBootOption ();
+      EfiBootManagerSortLoadOptionVariable (LoadOptionTypeBoot, (SORT_COMPARE)CompareBootOption);
+      break;
   }
 }
 
@@ -419,12 +417,12 @@ PlatformBootManagerAfterConsole (
 VOID
 EFIAPI
 PlatformBootManagerWaitCallback (
-  UINT16          TimeoutRemain
+  UINT16  TimeoutRemain
   )
 {
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION Black;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION White;
-  UINT16                              Timeout;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  Black;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  White;
+  UINT16                               Timeout;
 
   Timeout = PcdGet16 (PcdPlatformBootTimeOut);
 
@@ -456,4 +454,3 @@ PlatformBootManagerUnableToBoot (
 {
   return;
 }
-

@@ -41,79 +41,79 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gPs2KeyboardComponentName2;
 //
 // Driver Private Data
 //
-#define KEYBOARD_CONSOLE_IN_DEV_SIGNATURE       SIGNATURE_32 ('k', 'k', 'e', 'y')
-#define KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE SIGNATURE_32 ('k', 'c', 'e', 'n')
+#define KEYBOARD_CONSOLE_IN_DEV_SIGNATURE        SIGNATURE_32 ('k', 'k', 'e', 'y')
+#define KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE  SIGNATURE_32 ('k', 'c', 'e', 'n')
 
 typedef struct _KEYBOARD_CONSOLE_IN_EX_NOTIFY {
-  UINTN                               Signature;
-  EFI_KEY_DATA                        KeyData;
-  EFI_KEY_NOTIFY_FUNCTION             KeyNotificationFn;
-  LIST_ENTRY                          NotifyEntry;
+  UINTN                      Signature;
+  EFI_KEY_DATA               KeyData;
+  EFI_KEY_NOTIFY_FUNCTION    KeyNotificationFn;
+  LIST_ENTRY                 NotifyEntry;
 } KEYBOARD_CONSOLE_IN_EX_NOTIFY;
 
 #define KEYBOARD_SCAN_CODE_MAX_COUNT  32
 typedef struct {
-  UINT8                               Buffer[KEYBOARD_SCAN_CODE_MAX_COUNT];
-  UINTN                               Head;
-  UINTN                               Tail;
+  UINT8    Buffer[KEYBOARD_SCAN_CODE_MAX_COUNT];
+  UINTN    Head;
+  UINTN    Tail;
 } SCAN_CODE_QUEUE;
 
-#define KEYBOARD_EFI_KEY_MAX_COUNT    256
+#define KEYBOARD_EFI_KEY_MAX_COUNT  256
 typedef struct {
-  EFI_KEY_DATA                        Buffer[KEYBOARD_EFI_KEY_MAX_COUNT];
-  UINTN                               Head;
-  UINTN                               Tail;
+  EFI_KEY_DATA    Buffer[KEYBOARD_EFI_KEY_MAX_COUNT];
+  UINTN           Head;
+  UINTN           Tail;
 } EFI_KEY_QUEUE;
 
 typedef struct {
-  UINTN                               Signature;
+  UINTN                                Signature;
 
-  EFI_HANDLE                          Handle;
-  EFI_SIMPLE_TEXT_INPUT_PROTOCOL      ConIn;
-  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL   ConInEx;
+  EFI_HANDLE                           Handle;
+  EFI_SIMPLE_TEXT_INPUT_PROTOCOL       ConIn;
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL    ConInEx;
 
-  EFI_EVENT                           TimerEvent;
+  EFI_EVENT                            TimerEvent;
 
-  UINT32                              DataRegisterAddress;
-  UINT32                              StatusRegisterAddress;
-  UINT32                              CommandRegisterAddress;
+  UINT32                               DataRegisterAddress;
+  UINT32                               StatusRegisterAddress;
+  UINT32                               CommandRegisterAddress;
 
-  BOOLEAN                             LeftCtrl;
-  BOOLEAN                             RightCtrl;
-  BOOLEAN                             LeftAlt;
-  BOOLEAN                             RightAlt;
-  BOOLEAN                             LeftShift;
-  BOOLEAN                             RightShift;
-  BOOLEAN                             LeftLogo;
-  BOOLEAN                             RightLogo;
-  BOOLEAN                             Menu;
-  BOOLEAN                             SysReq;
+  BOOLEAN                              LeftCtrl;
+  BOOLEAN                              RightCtrl;
+  BOOLEAN                              LeftAlt;
+  BOOLEAN                              RightAlt;
+  BOOLEAN                              LeftShift;
+  BOOLEAN                              RightShift;
+  BOOLEAN                              LeftLogo;
+  BOOLEAN                              RightLogo;
+  BOOLEAN                              Menu;
+  BOOLEAN                              SysReq;
 
-  BOOLEAN                             CapsLock;
-  BOOLEAN                             NumLock;
-  BOOLEAN                             ScrollLock;
+  BOOLEAN                              CapsLock;
+  BOOLEAN                              NumLock;
+  BOOLEAN                              ScrollLock;
 
-  BOOLEAN                             IsSupportPartialKey;
+  BOOLEAN                              IsSupportPartialKey;
   //
   // Queue storing key scancodes
   //
-  SCAN_CODE_QUEUE                     ScancodeQueue;
-  EFI_KEY_QUEUE                       EfiKeyQueue;
-  EFI_KEY_QUEUE                       EfiKeyQueueForNotify;
+  SCAN_CODE_QUEUE                      ScancodeQueue;
+  EFI_KEY_QUEUE                        EfiKeyQueue;
+  EFI_KEY_QUEUE                        EfiKeyQueueForNotify;
 
   //
   // Error state
   //
-  BOOLEAN                             KeyboardErr;
+  BOOLEAN                              KeyboardErr;
 
-  EFI_UNICODE_STRING_TABLE            *ControllerNameTable;
+  EFI_UNICODE_STRING_TABLE             *ControllerNameTable;
 
-  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  EFI_DEVICE_PATH_PROTOCOL             *DevicePath;
   //
   // Notification Function List
   //
-  LIST_ENTRY                          NotifyList;
-  EFI_EVENT                           KeyNotifyProcessEvent;
+  LIST_ENTRY                           NotifyList;
+  EFI_EVENT                            KeyNotifyProcessEvent;
 } KEYBOARD_CONSOLE_IN_DEV;
 
 #define KEYBOARD_CONSOLE_IN_DEV_FROM_THIS(a)  CR (a, KEYBOARD_CONSOLE_IN_DEV, ConIn, KEYBOARD_CONSOLE_IN_DEV_SIGNATURE)
@@ -124,11 +124,12 @@ typedef struct {
       KEYBOARD_CONSOLE_IN_DEV_SIGNATURE \
       )
 
-#define TABLE_END 0x0
+#define TABLE_END  0x0
 
 //
 // Driver entry point
 //
+
 /**
   The user Entry Point for module Ps2Keyboard. The user code starts with this function.
 
@@ -142,58 +143,57 @@ typedef struct {
 EFI_STATUS
 EFIAPI
 InstallPs2KeyboardDriver (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_SYSTEM_TABLE     *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   );
 
 #define KEYBOARD_8042_DATA_REGISTER     0x60
 #define KEYBOARD_8042_STATUS_REGISTER   0x64
 #define KEYBOARD_8042_COMMAND_REGISTER  0x64
 
-#define KEYBOARD_KBEN                   0xF4
-#define KEYBOARD_CMDECHO_ACK            0xFA
+#define KEYBOARD_KBEN         0xF4
+#define KEYBOARD_CMDECHO_ACK  0xFA
 
-#define KEYBOARD_MAX_TRY                256     // 256
-#define KEYBOARD_TIMEOUT                65536   // 0.07s
-#define KEYBOARD_WAITFORVALUE_TIMEOUT   1000000 // 1s
-#define KEYBOARD_BAT_TIMEOUT            4000000 // 4s
-#define KEYBOARD_TIMER_INTERVAL         200000  // 0.02s
-#define SCANCODE_EXTENDED0              0xE0
-#define SCANCODE_EXTENDED1              0xE1
-#define SCANCODE_CTRL_MAKE              0x1D
-#define SCANCODE_CTRL_BREAK             0x9D
-#define SCANCODE_ALT_MAKE               0x38
-#define SCANCODE_ALT_BREAK              0xB8
-#define SCANCODE_LEFT_SHIFT_MAKE        0x2A
-#define SCANCODE_LEFT_SHIFT_BREAK       0xAA
-#define SCANCODE_RIGHT_SHIFT_MAKE       0x36
-#define SCANCODE_RIGHT_SHIFT_BREAK      0xB6
-#define SCANCODE_CAPS_LOCK_MAKE         0x3A
-#define SCANCODE_NUM_LOCK_MAKE          0x45
-#define SCANCODE_SCROLL_LOCK_MAKE       0x46
-#define SCANCODE_DELETE_MAKE            0x53
-#define SCANCODE_LEFT_LOGO_MAKE         0x5B //GUI key defined in Keyboard scan code
-#define SCANCODE_LEFT_LOGO_BREAK        0xDB
-#define SCANCODE_RIGHT_LOGO_MAKE        0x5C
-#define SCANCODE_RIGHT_LOGO_BREAK       0xDC
-#define SCANCODE_MENU_MAKE              0x5D //APPS key defined in Keyboard scan code
-#define SCANCODE_MENU_BREAK             0xDD
-#define SCANCODE_SYS_REQ_MAKE           0x37
-#define SCANCODE_SYS_REQ_BREAK          0xB7
-#define SCANCODE_SYS_REQ_MAKE_WITH_ALT  0x54
-#define SCANCODE_SYS_REQ_BREAK_WITH_ALT 0xD4
+#define KEYBOARD_MAX_TRY                 256     // 256
+#define KEYBOARD_TIMEOUT                 65536   // 0.07s
+#define KEYBOARD_WAITFORVALUE_TIMEOUT    1000000 // 1s
+#define KEYBOARD_BAT_TIMEOUT             4000000 // 4s
+#define KEYBOARD_TIMER_INTERVAL          200000  // 0.02s
+#define SCANCODE_EXTENDED0               0xE0
+#define SCANCODE_EXTENDED1               0xE1
+#define SCANCODE_CTRL_MAKE               0x1D
+#define SCANCODE_CTRL_BREAK              0x9D
+#define SCANCODE_ALT_MAKE                0x38
+#define SCANCODE_ALT_BREAK               0xB8
+#define SCANCODE_LEFT_SHIFT_MAKE         0x2A
+#define SCANCODE_LEFT_SHIFT_BREAK        0xAA
+#define SCANCODE_RIGHT_SHIFT_MAKE        0x36
+#define SCANCODE_RIGHT_SHIFT_BREAK       0xB6
+#define SCANCODE_CAPS_LOCK_MAKE          0x3A
+#define SCANCODE_NUM_LOCK_MAKE           0x45
+#define SCANCODE_SCROLL_LOCK_MAKE        0x46
+#define SCANCODE_DELETE_MAKE             0x53
+#define SCANCODE_LEFT_LOGO_MAKE          0x5B// GUI key defined in Keyboard scan code
+#define SCANCODE_LEFT_LOGO_BREAK         0xDB
+#define SCANCODE_RIGHT_LOGO_MAKE         0x5C
+#define SCANCODE_RIGHT_LOGO_BREAK        0xDC
+#define SCANCODE_MENU_MAKE               0x5D// APPS key defined in Keyboard scan code
+#define SCANCODE_MENU_BREAK              0xDD
+#define SCANCODE_SYS_REQ_MAKE            0x37
+#define SCANCODE_SYS_REQ_BREAK           0xB7
+#define SCANCODE_SYS_REQ_MAKE_WITH_ALT   0x54
+#define SCANCODE_SYS_REQ_BREAK_WITH_ALT  0xD4
 
-#define SCANCODE_MAX_MAKE               0x60
+#define SCANCODE_MAX_MAKE  0x60
 
-
-#define KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA     BIT0        ///< 0 - Output register has no data; 1 - Output register has data
-#define KEYBOARD_STATUS_REGISTER_HAS_INPUT_DATA      BIT1        ///< 0 - Input register has no data;  1 - Input register has data
-#define KEYBOARD_STATUS_REGISTER_SYSTEM_FLAG         BIT2        ///< Set to 0 after power on reset
-#define KEYBOARD_STATUS_REGISTER_INPUT_DATA_TYPE     BIT3        ///< 0 - Data in input register is data; 1 - Data in input register is command
-#define KEYBOARD_STATUS_REGISTER_ENABLE_FLAG         BIT4        ///< 0 - Keyboard is disable; 1 - Keyboard is enable
-#define KEYBOARD_STATUS_REGISTER_TRANSMIT_TIMEOUT    BIT5        ///< 0 - Transmit is complete without timeout; 1 - Transmit is timeout without complete
-#define KEYBOARD_STATUS_REGISTER_RECEIVE_TIMEOUT     BIT6        ///< 0 - Receive is complete without timeout; 1 - Receive is timeout without complete
-#define KEYBOARD_STATUS_REGISTER_PARITY              BIT7        ///< 0 - Odd parity; 1 - Even parity
+#define KEYBOARD_STATUS_REGISTER_HAS_OUTPUT_DATA   BIT0          ///< 0 - Output register has no data; 1 - Output register has data
+#define KEYBOARD_STATUS_REGISTER_HAS_INPUT_DATA    BIT1          ///< 0 - Input register has no data;  1 - Input register has data
+#define KEYBOARD_STATUS_REGISTER_SYSTEM_FLAG       BIT2          ///< Set to 0 after power on reset
+#define KEYBOARD_STATUS_REGISTER_INPUT_DATA_TYPE   BIT3          ///< 0 - Data in input register is data; 1 - Data in input register is command
+#define KEYBOARD_STATUS_REGISTER_ENABLE_FLAG       BIT4          ///< 0 - Keyboard is disable; 1 - Keyboard is enable
+#define KEYBOARD_STATUS_REGISTER_TRANSMIT_TIMEOUT  BIT5          ///< 0 - Transmit is complete without timeout; 1 - Transmit is timeout without complete
+#define KEYBOARD_STATUS_REGISTER_RECEIVE_TIMEOUT   BIT6          ///< 0 - Receive is complete without timeout; 1 - Receive is timeout without complete
+#define KEYBOARD_STATUS_REGISTER_PARITY            BIT7          ///< 0 - Odd parity; 1 - Even parity
 
 #define KEYBOARD_8042_COMMAND_READ                          0x20
 #define KEYBOARD_8042_COMMAND_WRITE                         0x60
@@ -203,14 +203,13 @@ InstallPs2KeyboardDriver (
 #define KEYBOARD_8042_COMMAND_KEYBOARD_INTERFACE_SELF_TEST  0xAB
 #define KEYBOARD_8042_COMMAND_DISABLE_KEYBOARD_INTERFACE    0xAD
 
-#define KEYBOARD_8048_COMMAND_CLEAR_OUTPUT_DATA             0xF4
-#define KEYBOARD_8048_COMMAND_RESET                         0xFF
-#define KEYBOARD_8048_COMMAND_SELECT_SCAN_CODE_SET          0xF0
+#define KEYBOARD_8048_COMMAND_CLEAR_OUTPUT_DATA     0xF4
+#define KEYBOARD_8048_COMMAND_RESET                 0xFF
+#define KEYBOARD_8048_COMMAND_SELECT_SCAN_CODE_SET  0xF0
 
-#define KEYBOARD_8048_RETURN_8042_BAT_SUCCESS               0xAA
-#define KEYBOARD_8048_RETURN_8042_BAT_ERROR                 0xFC
-#define KEYBOARD_8048_RETURN_8042_ACK                       0xFA
-
+#define KEYBOARD_8048_RETURN_8042_BAT_SUCCESS  0xAA
+#define KEYBOARD_8048_RETURN_8042_BAT_ERROR    0xFC
+#define KEYBOARD_8048_RETURN_8042_ACK          0xFA
 
 //
 // Keyboard Controller Status
@@ -221,6 +220,7 @@ InstallPs2KeyboardDriver (
 //
 // Other functions that are used among .c files
 //
+
 /**
   Show keyboard status lights according to
   indicators in ConsoleIn.
@@ -232,7 +232,7 @@ InstallPs2KeyboardDriver (
 **/
 EFI_STATUS
 UpdateStatusLights (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn
   );
 
 /**
@@ -261,7 +261,7 @@ KeyboardRead (
 **/
 VOID
 KeyGetchar (
-  IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  IN OUT KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn
   );
 
 /**
@@ -273,8 +273,8 @@ KeyGetchar (
 VOID
 EFIAPI
 KeyNotifyProcessHandler (
-  IN  EFI_EVENT                 Event,
-  IN  VOID                      *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   );
 
 /**
@@ -290,10 +290,9 @@ KeyNotifyProcessHandler (
 **/
 EFI_STATUS
 InitKeyboard (
-  IN OUT KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  IN BOOLEAN                     ExtendedVerification
+  IN OUT KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  IN BOOLEAN                      ExtendedVerification
   );
-
 
 /**
   Timer event handler: read a series of scancodes from 8042
@@ -309,8 +308,8 @@ InitKeyboard (
 VOID
 EFIAPI
 KeyboardTimerHandler (
-  IN EFI_EVENT    Event,
-  IN VOID         *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
@@ -358,8 +357,8 @@ KeyboardReadKeyStroke (
 VOID
 EFIAPI
 KeyboardWaitForKey (
-  IN  EFI_EVENT               Event,
-  IN  VOID                    *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   );
 
 /**
@@ -372,7 +371,7 @@ KeyboardWaitForKey (
 **/
 UINT8
 KeyReadStatusRegister (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn
   );
 
 /**
@@ -388,7 +387,7 @@ KeyReadStatusRegister (
 BOOLEAN
 EFIAPI
 CheckKeyboardConnect (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
+  IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn
   );
 
 /**
@@ -402,8 +401,8 @@ CheckKeyboardConnect (
 VOID
 EFIAPI
 KeyboardWaitForKeyEx (
-  IN  EFI_EVENT               Event,
-  IN  VOID                    *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   );
 
 //
@@ -447,8 +446,8 @@ KeyboardEfiResetEx (
 EFI_STATUS
 EFIAPI
 KeyboardReadKeyStrokeEx (
-  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *This,
-  OUT EFI_KEY_DATA                      *KeyData
+  IN  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *This,
+  OUT EFI_KEY_DATA                       *KeyData
   );
 
 /**
@@ -526,8 +525,8 @@ KeyboardUnregisterKeyNotify (
 **/
 VOID
 PushEfikeyBufTail (
-  IN  EFI_KEY_QUEUE         *Queue,
-  IN  EFI_KEY_DATA          *KeyData
+  IN  EFI_KEY_QUEUE  *Queue,
+  IN  EFI_KEY_DATA   *KeyData
   );
 
 /**
@@ -556,8 +555,8 @@ IsKeyRegistered (
 **/
 VOID
 InitializeKeyState (
-  IN  KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
-  OUT EFI_KEY_STATE           *KeyState
+  IN  KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
+  OUT EFI_KEY_STATE            *KeyState
   );
 
 #endif
