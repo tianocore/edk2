@@ -171,8 +171,6 @@ typedef struct AcpiPpttGenerator {
   UINT32                  ProcHierarchyNodeCount;
   /// Count of Cache Structures
   UINT32                  CacheStructCount;
-  /// Count of Id Structures
-  UINT32                  IdStructCount;
   /// List of indexed CM objects for PPTT generation
   PPTT_NODE_INDEXER       *NodeIndexer;
   /// Pointer to the start of Processor Hierarchy nodes in
@@ -180,8 +178,6 @@ typedef struct AcpiPpttGenerator {
   PPTT_NODE_INDEXER       *ProcHierarchyNodeIndexedList;
   /// Pointer to the start of Cache Structures in the Node Indexer array
   PPTT_NODE_INDEXER       *CacheStructIndexedList;
-  /// Pointer to the start of Id Structures in the Node Indexer array
-  PPTT_NODE_INDEXER       *IdStructIndexedList;
 } ACPI_PPTT_GENERATOR;
 
 #pragma pack()
