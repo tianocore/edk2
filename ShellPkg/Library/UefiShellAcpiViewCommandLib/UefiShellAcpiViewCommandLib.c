@@ -62,7 +62,7 @@ ACPI_TABLE_PARSER  ParserList[] = {
     ParseAcpiMcfg },
   { EFI_ACPI_6_4_PLATFORM_COMMUNICATIONS_CHANNEL_TABLE_SIGNATURE,
     ParseAcpiPcct },
-  { EFI_ACPI_6_2_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE,
+  { EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE,
     ParseAcpiPptt },
   { RSDP_TABLE_INFO,                                                                                     ParseAcpiRsdp },
   { EFI_ACPI_6_2_SYSTEM_LOCALITY_INFORMATION_TABLE_SIGNATURE,                                            ParseAcpiSlit },
