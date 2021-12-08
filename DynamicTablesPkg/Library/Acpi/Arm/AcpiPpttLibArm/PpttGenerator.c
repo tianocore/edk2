@@ -727,6 +727,35 @@ AddProcHierarchyNodes (
 }
 
 /**
+  Test whether CacheId is unique among the CacheIdList.
+
+  @param [in]  CacheId          Cache ID to check.
+  @param [in]  CacheIdList      List of already existing cache IDs.
+  @param [in]  CacheIdListSize  Size of CacheIdList.
+
+  @retval TRUE                  CacheId does not exist in CacheIdList.
+  @retval FALSE                 CacheId already exists in CacheIdList.
+**/
+STATIC
+BOOLEAN
+IsCacheIdUnique (
+  IN CONST UINT32  CacheId,
+  IN CONST UINT32  *CacheIdList,
+  IN CONST UINT32  CacheIdListSize
+  )
+{
+  UINT32  Index;
+
+  for (Index = 0; Index < CacheIdListSize; Index++) {
+    if (CacheIdList[Index] == CacheId) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
   Update the Cache Type Structure (Type 1) information.
 
   This function populates the Cache Type Structures with information from
@@ -738,10 +767,12 @@ AddProcHierarchyNodes (
   @param [in]  Pptt                 Pointer to PPTT table structure.
   @param [in]  NodesStartOffset     Offset from the start of PPTT table to the
                                     start of Cache Type Structures.
+  @param [in]  Revision             Revision of the PPTT table being requested.
 
   @retval EFI_SUCCESS               Structures updated successfully.
   @retval EFI_INVALID_PARAMETER     A parameter is invalid.
   @retval EFI_NOT_FOUND             A required object was not found.
+  @retval EFI_OUT_OF_RESOURCES      Out of resources.
 **/
 STATIC
 EFI_STATUS
@@ -749,7 +780,8 @@ AddCacheTypeStructures (
   IN  CONST ACPI_PPTT_GENERATOR                   *CONST             Generator,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST             CfgMgrProtocol,
   IN  CONST EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt,
-  IN  CONST UINT32                                                   NodesStartOffset
+  IN  CONST UINT32                                                   NodesStartOffset,
+  IN  CONST UINT32                                                   Revision
   )
 {
   EFI_STATUS                         Status;
@@ -758,6 +790,9 @@ AddCacheTypeStructures (
   CM_ARM_CACHE_INFO                  *CacheInfoNode;
   PPTT_NODE_INDEXER                  *CacheNodeIterator;
   UINT32                             NodeCount;
+  BOOLEAN                            CacheIdUnique;
+  UINT32                             NodeIndex;
+  UINT32                             *FoundCacheIds;
 
   ASSERT (
     (Generator != NULL) &&
@@ -771,7 +806,13 @@ AddCacheTypeStructures (
   CacheNodeIterator = Generator->CacheStructIndexedList;
   NodeCount         = Generator->CacheStructCount;
 
-  while (NodeCount-- != 0) {
+  FoundCacheIds = AllocateZeroPool (NodeCount * sizeof (*FoundCacheIds));
+  if (FoundCacheIds == NULL) {
+    DEBUG ((DEBUG_ERROR, "ERROR: PPTT: Failed to allocate resources.\n"));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (NodeIndex = 0; NodeIndex < NodeCount; NodeIndex++) {
     CacheInfoNode = (CM_ARM_CACHE_INFO *)CacheNodeIterator->Object;
 
     // Populate the node header
@@ -789,6 +830,7 @@ AddCacheTypeStructures (
     CacheStruct->Flags.CacheTypeValid      = 1;
     CacheStruct->Flags.WritePolicyValid    = 1;
     CacheStruct->Flags.LineSizeValid       = 1;
+    CacheStruct->Flags.CacheIdValid        = 1;
     CacheStruct->Flags.Reserved            = 0;
 
     // Populate the reference to the next level of cache
@@ -811,7 +853,7 @@ AddCacheTypeStructures (
           CacheInfoNode->Token,
           Status
           ));
-        return Status;
+        goto cleanup;
       }
 
       // Update Cache Structure with the offset for the next level of cache
@@ -835,7 +877,7 @@ AddCacheTypeStructures (
         CacheInfoNode->NumberOfSets,
         Status
         ));
-      return Status;
+      goto cleanup;
     }
 
     if (CacheInfoNode->NumberOfSets > PPTT_ARM_CACHE_NUMBER_OF_SETS_MAX) {
@@ -862,7 +904,7 @@ AddCacheTypeStructures (
         CacheInfoNode->Associativity,
         Status
         ));
-      return Status;
+      goto cleanup;
     }
 
     // Validate the Associativity field based on the architecture specification
@@ -881,7 +923,7 @@ AddCacheTypeStructures (
         CacheInfoNode->Associativity,
         Status
         ));
-      return Status;
+      goto cleanup;
     }
 
     if (CacheInfoNode->Associativity > PPTT_ARM_CACHE_ASSOCIATIVITY_MAX) {
@@ -923,7 +965,7 @@ AddCacheTypeStructures (
         CacheInfoNode->LineSize,
         Status
         ));
-      return Status;
+      goto cleanup;
     }
 
     if ((CacheInfoNode->LineSize & (CacheInfoNode->LineSize - 1)) != 0) {
@@ -935,18 +977,58 @@ AddCacheTypeStructures (
         CacheInfoNode->LineSize,
         Status
         ));
-      return Status;
+      goto cleanup;
     }
 
     CacheStruct->LineSize = CacheInfoNode->LineSize;
+
+    if (Revision >= 3) {
+      // Validate and populate cache id
+      if (CacheInfoNode->CacheId == 0) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: PPTT: The cache id cannot be zero. Status = %r\n",
+          Status
+          ));
+        goto cleanup;
+      }
+
+      CacheIdUnique = IsCacheIdUnique (
+                        CacheInfoNode->CacheId,
+                        FoundCacheIds,
+                        NodeIndex
+                        );
+      if (!CacheIdUnique) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: PPTT: The cache id is not unique. " \
+          "CacheId = %d. Status = %r\n",
+          CacheInfoNode->CacheId,
+          Status
+          ));
+        goto cleanup;
+      }
+
+      // Store the cache id so we can check future cache ids for uniqueness
+      FoundCacheIds[NodeIndex] = CacheInfoNode->CacheId;
+
+      CacheStruct->CacheId = CacheInfoNode->CacheId;
+    }
 
     // Next Cache Type Structure
     CacheStruct = (EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE *)((UINT8 *)CacheStruct +
                                                         CacheStruct->Length);
     CacheNodeIterator++;
-  } // Cache Type Structure
+  } // for Cache Type Structure
 
-  return EFI_SUCCESS;
+  Status = EFI_SUCCESS;
+
+cleanup:
+  FreePool (FoundCacheIds);
+
+  return Status;
 }
 
 /**
@@ -1205,7 +1287,8 @@ BuildPpttTable (
                Generator,
                CfgMgrProtocol,
                Pptt,
-               CacheStructOffset
+               CacheStructOffset,
+               AcpiTableInfo->AcpiTableRevision
                );
     if (EFI_ERROR (Status)) {
       DEBUG ((
