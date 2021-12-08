@@ -34,7 +34,6 @@
     The following Configuration Manager Object(s) are used by this Generator:
     - EArmObjProcHierarchyInfo (REQUIRED)
     - EArmObjCacheInfo
-    - EArmObjProcNodeIdInfo
     - EArmObjCmRef
     - EArmObjGicCInfo (REQUIRED)
 */
@@ -57,16 +56,6 @@ GET_OBJECT_LIST (
   EObjNameSpaceArm,
   EArmObjCacheInfo,
   CM_ARM_CACHE_INFO
-  );
-
-/**
-  This macro expands to a function that retrieves the ID information for
-  Processor Hierarchy Nodes from the Configuration Manager.
-*/
-GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjProcNodeIdInfo,
-  CM_ARM_PROC_NODE_ID_INFO
   );
 
 /**
@@ -129,15 +118,6 @@ GET_SIZE_OF_PPTT_STRUCTS (
   CacheTypeStructs,
   sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_CACHE),
   CM_ARM_CACHE_INFO
-  );
-
-/** This macro expands to a function that retrieves the amount of memory
-    required to store the ID Structures (Type 2) and updates the Node Indexer.
-*/
-GET_SIZE_OF_PPTT_STRUCTS (
-  IdStructs,
-  sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_ID),
-  CM_ARM_PROC_NODE_ID_INFO
   );
 
 /**
@@ -373,8 +353,8 @@ AddPrivateResources (
     }
 
     // The Node indexer has the Processor hierarchy nodes at the begining
-    // followed by the cache structs and Id structs. Therefore we can
-    // skip the Processor hierarchy nodes in the node indexer search.
+    // followed by the cache structs. Therefore we can skip the Processor
+    // hierarchy nodes in the node indexer search.
     Status = GetPpttNodeReferencedByToken (
                Generator->CacheStructIndexedList,
                (Generator->ProcTopologyStructCount -
@@ -970,71 +950,6 @@ AddCacheTypeStructures (
 }
 
 /**
-  Update the ID Type Structure (Type 2) information.
-
-  This function populates the ID Type Structures with information from
-  the Configuration Manager and and adds this information to the PPTT table.
-
-  @param [in]  Generator          Pointer to the PPTT Generator.
-  @param [in]  CfgMgrProtocol     Pointer to the Configuration Manager
-                                  Protocol Interface.
-  @param [in]  Pptt               Pointer to PPTT table structure.
-  @param [in]  NodesStartOffset   Offset from the start of PPTT table to the
-                                  start of ID Type Structures.
-
-  @retval EFI_SUCCESS             Structures updated successfully.
-  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
-  @retval EFI_NOT_FOUND           A required object was not found.
-**/
-STATIC
-EFI_STATUS
-AddIdTypeStructures (
-  IN  CONST ACPI_PPTT_GENERATOR                   *CONST             Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST             CfgMgrProtocol,
-  IN  CONST EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  *Pptt,
-  IN  CONST UINT32                                                   NodesStartOffset
-  )
-{
-  EFI_ACPI_6_3_PPTT_STRUCTURE_ID  *IdStruct;
-  CM_ARM_PROC_NODE_ID_INFO        *ProcIdInfoNode;
-  PPTT_NODE_INDEXER               *IdStructIterator;
-  UINT32                          NodeCount;
-
-  ASSERT (
-    (Generator != NULL) &&
-    (CfgMgrProtocol != NULL) &&
-    (Pptt != NULL)
-    );
-
-  IdStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_ID *)((UINT8 *)Pptt + NodesStartOffset);
-
-  IdStructIterator = Generator->IdStructIndexedList;
-  NodeCount        = Generator->IdStructCount;
-  while (NodeCount-- != 0) {
-    ProcIdInfoNode = (CM_ARM_PROC_NODE_ID_INFO *)IdStructIterator->Object;
-
-    // Populate the node
-    IdStruct->Type        = EFI_ACPI_6_3_PPTT_TYPE_ID;
-    IdStruct->Length      = sizeof (EFI_ACPI_6_3_PPTT_STRUCTURE_ID);
-    IdStruct->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
-    IdStruct->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
-    IdStruct->VendorId    = ProcIdInfoNode->VendorId;
-    IdStruct->Level1Id    = ProcIdInfoNode->Level1Id;
-    IdStruct->Level2Id    = ProcIdInfoNode->Level2Id;
-    IdStruct->MajorRev    = ProcIdInfoNode->MajorRev;
-    IdStruct->MinorRev    = ProcIdInfoNode->MinorRev;
-    IdStruct->SpinRev     = ProcIdInfoNode->SpinRev;
-
-    // Next ID Type Structure
-    IdStruct = (EFI_ACPI_6_3_PPTT_STRUCTURE_ID *)((UINT8 *)IdStruct +
-                                                  IdStruct->Length);
-    IdStructIterator++;
-  } // ID Type Structure
-
-  return EFI_SUCCESS;
-}
-
-/**
   Construct the PPTT ACPI table.
 
   This function invokes the Configuration Manager protocol interface
@@ -1072,15 +987,12 @@ BuildPpttTable (
   UINT32      ProcTopologyStructCount;
   UINT32      ProcHierarchyNodeCount;
   UINT32      CacheStructCount;
-  UINT32      IdStructCount;
 
   UINT32  ProcHierarchyNodeOffset;
   UINT32  CacheStructOffset;
-  UINT32  IdStructOffset;
 
   CM_ARM_PROC_HIERARCHY_INFO  *ProcHierarchyNodeList;
   CM_ARM_CACHE_INFO           *CacheStructList;
-  CM_ARM_PROC_NODE_ID_INFO    *IdStructList;
 
   ACPI_PPTT_GENERATOR  *Generator;
 
@@ -1155,27 +1067,6 @@ BuildPpttTable (
   ProcTopologyStructCount    += CacheStructCount;
   Generator->CacheStructCount = CacheStructCount;
 
-  // Get the processor hierarchy node ID info and update the processor topology
-  // structure count with ID Structures (Type 2)
-  Status = GetEArmObjProcNodeIdInfo (
-             CfgMgrProtocol,
-             CM_NULL_TOKEN,
-             &IdStructList,
-             &IdStructCount
-             );
-  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: PPTT: Failed to get processor hierarchy node ID info. " \
-      "Status = %r\n",
-      Status
-      ));
-    goto error_handler;
-  }
-
-  ProcTopologyStructCount += IdStructCount;
-  Generator->IdStructCount = IdStructCount;
-
   // Allocate Node Indexer array
   NodeIndexer = (PPTT_NODE_INDEXER *)AllocateZeroPool (
                                        sizeof (PPTT_NODE_INDEXER) *
@@ -1238,27 +1129,6 @@ BuildPpttTable (
       Generator->CacheStructCount,
       CacheStructOffset,
       Generator->CacheStructIndexedList
-      ));
-  }
-
-  // Include the size of ID Type Structures and index them
-  if (Generator->IdStructCount != 0) {
-    IdStructOffset                 = TableSize;
-    Generator->IdStructIndexedList = NodeIndexer;
-    TableSize                     += GetSizeofIdStructs (
-                                       IdStructOffset,
-                                       IdStructList,
-                                       Generator->IdStructCount,
-                                       &NodeIndexer
-                                       );
-    DEBUG ((
-      DEBUG_INFO,
-      " IdStructCount = %d\n" \
-      " IdStructOffset = 0x%x\n" \
-      " IdStructIndexedList = 0x%p\n",
-      Generator->IdStructCount,
-      IdStructOffset,
-      Generator->IdStructIndexedList
       ));
   }
 
@@ -1341,24 +1211,6 @@ BuildPpttTable (
       DEBUG ((
         DEBUG_ERROR,
         "ERROR: PPTT: Failed to add Cache Type Structures. Status = %r\n",
-        Status
-        ));
-      goto error_handler;
-    }
-  }
-
-  // Add ID Type Structures (Type 2) to the generated table
-  if (Generator->IdStructCount != 0) {
-    Status = AddIdTypeStructures (
-               Generator,
-               CfgMgrProtocol,
-               Pptt,
-               IdStructOffset
-               );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "ERROR: PPTT: Failed to add ID Type Structures. Status = %r\n",
         Status
         ));
       goto error_handler;
@@ -1487,8 +1339,6 @@ ACPI_PPTT_GENERATOR  PpttGenerator = {
   // Count of Processor Hierarchy Nodes
   0,
   // Count of Cache Structures
-  0,
-  // Count of Id Structures
   0,
   // Pointer to PPTT Node Indexer
   NULL

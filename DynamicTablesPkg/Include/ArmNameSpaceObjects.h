@@ -50,7 +50,7 @@ typedef enum ArmObjectID {
   EArmObjSmmuInterruptArray,           ///< 26 - SMMU Interrupt Array
   EArmObjProcHierarchyInfo,            ///< 27 - Processor Hierarchy Info
   EArmObjCacheInfo,                    ///< 28 - Cache Info
-  EArmObjProcNodeIdInfo,               ///< 29 - Processor Node ID Info
+  EArmObjReserved29,                   ///< 29 - Reserved
   EArmObjCmRef,                        ///< 30 - CM Object Reference
   EArmObjMemoryAffinityInfo,           ///< 31 - Memory Affinity Info
   EArmObjDeviceHandleAcpi,             ///< 32 - Device Handle Acpi
@@ -746,27 +746,6 @@ typedef struct CmArmCacheInfo {
   /// Line size in bytes
   UINT16             LineSize;
 } CM_ARM_CACHE_INFO;
-
-/** A structure that describes the ID Structure (Type 2) in PPTT
-
-    ID: EArmObjProcNodeIdInfo
-*/
-typedef struct CmArmProcNodeIdInfo {
-  /// A unique token used to identify this object
-  CM_OBJECT_TOKEN    Token;
-  // Vendor ID (as described in ACPI ID registry)
-  UINT32             VendorId;
-  /// First level unique node ID
-  UINT64             Level1Id;
-  /// Second level unique node ID
-  UINT64             Level2Id;
-  /// Major revision of the node
-  UINT16             MajorRev;
-  /// Minor revision of the node
-  UINT16             MinorRev;
-  /// Spin revision of the node
-  UINT16             SpinRev;
-} CM_ARM_PROC_NODE_ID_INFO;
 
 /** A structure that describes a reference to another Configuration Manager
     object.
