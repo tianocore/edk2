@@ -39,7 +39,10 @@
   stdlib.h
   string.h
   # Wrapper header files end #
+  brotli/c/common/constants.c
+  brotli/c/common/context.c
   brotli/c/common/dictionary.c
+  brotli/c/common/shared_dictionary.c
   brotli/c/common/transform.c
   brotli/c/dec/bit_reader.c
   brotli/c/dec/decode.c
